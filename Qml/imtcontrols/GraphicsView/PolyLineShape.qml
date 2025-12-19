@@ -19,8 +19,11 @@ BoundingBox {
 	property string shapePointBorderColor: color;
 	property bool hasHoverReaction: true;
 
-	property int inValidPointIndex: -1;
+	property int invalidPointIndex: -1;
 
+	onInvalidPointIndexChanged: {
+		shapeChanged()
+	}
 
 	function draw(ctx, transformMatrixArg){
 
@@ -67,15 +70,31 @@ BoundingBox {
 		ctx.lineWidth = 2
 
 		let drawMultiColor = isMultiColor && colorList.length == points.length
-		if(!drawMultiColor){
+		if(!drawMultiColor || invalidPointIndex < 0){
 			ctx.beginPath()
 		}
 		for(let i = 0;i < points.length; i++){
-			if(drawMultiColor){
+			if(drawMultiColor || (invalidPointIndex >= 0)){
 				ctx.beginPath()
-				ctx.strokeStyle = colorList[i]
-				ctx.fillStyle = colorList[i]
+
+				if(invalidPointIndex == i){
+					ctx.strokeStyle = "#ff0000"
+					ctx.fillStyle = "#ff0000"
+				}
+				else if(isSelected){
+					ctx.strokeStyle = DesignScheme.selectionColor
+					ctx.fillStyle = DesignScheme.selectionColor
+				}
+				else if(!drawMultiColor){
+					ctx.strokeStyle = polylineShape.shapePointBorderColor
+					ctx.fillStyle = polylineShape.color
+				}
+				else if(drawMultiColor){
+					ctx.strokeStyle = colorList[i]
+					ctx.fillStyle = colorList[i]
+				}
 			}
+
 			let point = getScreenPosition(points[i]);
 			if(i == highlightedNodeIndex){
 				DesignScheme.drawSelectedNode(ctx, point, shapeSelectedPointSize);
@@ -83,19 +102,32 @@ BoundingBox {
 			else {
 				DesignScheme.drawNode(ctx, point, shapePointSize)
 			}
-			if(drawMultiColor){
+			if(drawMultiColor  || (invalidPointIndex >= 0)){
 				ctx.stroke();
 				ctx.fill();
 				ctx.closePath();
 			}
 		}
 
-		if(!drawMultiColor){
+		if(!drawMultiColor || invalidPointIndex < 0){
 			ctx.stroke();
 			ctx.fill();
 
 			ctx.closePath();
 
+		}
+	}
+
+	function drawEditPoints(ctx){
+		ctx.globalAlpha = 1
+		for(let i = 0; i < points.length; i++){
+			let point = getScreenPosition(points[i]);
+			if(invalidPointIndex !== i){
+				DesignScheme.drawEditPoint(ctx, point)
+			}
+			else {
+				DesignScheme.drawEditPoint(ctx, point, "#ff0000")
+			}
 		}
 	}
 

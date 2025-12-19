@@ -126,10 +126,10 @@ QtObject {
 		ctx.closePath();
 	}
 
-	function drawEditPoint(ctx, point){
+	function drawEditPoint(ctx, point, color){
 		let radius = boundingBoxControlPointRadius;
-		ctx.strokeStyle = boundingBoxBorderColor;
-		ctx.fillStyle = boundingBoxBorderColor;
+		ctx.strokeStyle = color !== undefined ? color : boundingBoxBorderColor;
+		ctx.fillStyle = color !== undefined ? color : boundingBoxBorderColor;
 		ctx.lineWidth = boundingBoxLineWidth
 
 		ctx.moveTo(point.x, point.y)

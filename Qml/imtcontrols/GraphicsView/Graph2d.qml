@@ -62,6 +62,8 @@ Rectangle{
 	property bool setMinZoomByFitToView: false
 	property bool restrictFitByResize: false
 
+	property bool hasPointValidation: false;
+
 	property alias hasLeftButtonMenu: graphicsView.hasLeftButtonMenu;
 	property alias hasRightButtonMenu: graphicsView.hasRightButtonMenu;
 	property alias restrictMove: graphicsView.restrictMove;
@@ -69,6 +71,46 @@ Rectangle{
 	property alias restrictSelect: graphicsView.restrictSelect;
 	property alias hideScrollbars: graphicsView.hideScrollbars;
 
+	signal invalidPoint(int lineIndex, int pointIndex);
+
+	function validatator(pointsArg){
+		return validatorBase(pointsArg);
+	}
+
+	function validatorBase(pointsArg){
+		let prevPoint
+		for(let i = 0; i < pointsArg.length; i++){
+			let point = pointsArg[i]
+			if(i > 0 && point.x < prevPoint.x){
+				return i;
+			}
+			prevPoint = point
+		}
+		return -1;
+
+	}
+
+	function validatePoints(){
+		if(!hasPointValidation){
+			return;
+		}
+		let activeLayer  = graphicsView.getActiveLayer()
+		let shapeModel = activeLayer.shapeModel;
+		for(let i = 0; i < shapeModel.length; i++){
+			let shape = shapeModel[i];
+			let points = shape.points
+			let screenPointArr = []
+			for(let j = 0; j < points.length; j++){
+				let screenPoint = shape.getScreenPosition(points[j])
+				screenPointArr.push(screenPoint)
+			}
+			let invalidIndex = validatator(screenPointArr)
+			shape.invalidPointIndex = invalidIndex;
+			if(invalidIndex >= 0){
+				invalidPoint(i, invalidIndex);
+			}
+		}
+	}
 
 	function requestPaint() {
 		graphicsView.resize()
@@ -165,11 +207,6 @@ Rectangle{
 		requestPaint()
 	}
 
-	// onPointCountChanged: {
-	// 	reset()
-	// 	requestPaint()
-	// }
-
 	BaseText{
 		id: curveTitle;
 
@@ -206,6 +243,7 @@ Rectangle{
 			propagateMouseEvents: true
 			hasHoverReaction: true;
 			hasResetViewButton: false
+			receiveMouseEvents: isPointsEditMode;
 
 			//renderStrategy: Canvas.Immediate
 
@@ -231,8 +269,14 @@ Rectangle{
 				}
 			}
 
+			onMouseReleased: {
+				if(graph.hasPointValidation && receiveMouseEvents){
+					graph.validatePoints()
+				}
+			}
+
 			function fitToActiveLayer(){
-				fitToInactivAndActiveLayer()
+				graph.fitToView()
 			}
 
 			function fitToWidthFunction(){
@@ -294,7 +338,6 @@ Rectangle{
 				}
 
 
-
 				if (gridWidth <= 0 || maxX <= 0){
 					return
 				}
@@ -303,7 +346,7 @@ Rectangle{
 				graph.xScale = (graph.xScale * scale_)
 				setLayersParams()
 				graph.wasFitToWidth = true
-				graphicsView.fitToInactivAndActiveLayer()
+				graph.fitToView()
 			}
 
 			function resize(){
@@ -316,7 +359,7 @@ Rectangle{
 						graph.wasFitToWidth = false
 					}
 					if(ok){
-						fitToInactivAndActiveLayer()
+						graph.fitToView()
 						if(graph.setMinZoomByFitToView){
 							minZoomLevel = scaleCoeff
 						}
