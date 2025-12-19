@@ -158,7 +158,7 @@ void CUdpServerComp::SendedResponse(QByteArray requestId)
 {
     for (int i=0;i< m_requests.GetCount();i++){
         if (m_requests.GetAt(i)->GetRequestId() == requestId){
-            m_requests.RemoveAt(i);
+            m_requests.PopAt(i);
         }
     }
 }
