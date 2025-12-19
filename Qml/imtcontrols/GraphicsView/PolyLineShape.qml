@@ -19,6 +19,8 @@ BoundingBox {
 	property string shapePointBorderColor: color;
 	property bool hasHoverReaction: true;
 
+	property int inValidPointIndex: -1;
+
 
 	function draw(ctx, transformMatrixArg){
 
@@ -114,7 +116,7 @@ BoundingBox {
 		if(!hasHoverReaction){
 			return;
 		}
-		let point  = getLogPosition(Qt.point(mouseEvent.x, mouseEvent.y))
+		let point  = Qt.point(mouseEvent.x, mouseEvent.y)
 		let foundNodeIndex = findNodeIndex(point)
 		if(foundNodeIndex > -1){
 			highlightedNodeCoordinate = points[foundNodeIndex]

@@ -57,10 +57,9 @@ QtObject {
 
 	onMousePressed: {
 		mouseIsPressed = true;
-		//mousePressedCoord = getLogPosition(Qt.point(mouseEvent.x, mouseEvent.y))
 		mousePressedCoord = Qt.point(mouseEvent.x, mouseEvent.y)
 		if(viewItem.isPointsEditMode){
-			editNodeIndex = findNodeIndex(getLogPosition(mousePressedCoord))
+			editNodeIndex = findNodeIndex(mousePressedCoord)
 		}
 	}
 	onMouseReleased: {
@@ -150,15 +149,9 @@ QtObject {
 	function findNodeIndex(position){
 		let foundIndex = -1
 		for(let i = 0; i < points.length; i++){
-			let point = points[i];
-			let pointSize = (DesignScheme.shapePointSize + Style.marginS)/viewItem.viewMatrix.xScale();
-			// if(point.x >= position.x - pointSize
-			// 	&& point.x <= position.x + pointSize
-			// 	&& point.y >= position.y - pointSize
-			// 	&& point.y <= position.y + pointSize
-			// 	){
-			// 	foundIndex = i;
-			// }
+			let point = getScreenPosition(points[i])
+			let pointSize = (DesignScheme.shapePointSize + Style.marginS)
+
 			let dist = AnalyticGeometry.distanceBetweenPoints2d(point, position)
 
 			if(dist <= pointSize){

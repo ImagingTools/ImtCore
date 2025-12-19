@@ -40,7 +40,7 @@ BoundingBox {
 
 	function isInside(xArg, yArg){
 
-		let mousePoint = getLogPosition(Qt.point(xArg, yArg))
+		let mousePoint = Qt.point(xArg, yArg)
 		if(findNodeIndex(mousePoint) > -1){
 			return true;
 		}
