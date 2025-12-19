@@ -272,10 +272,16 @@ Rectangle{
 					}
 				}
 
-				if(graph.rightLimit !== undefined){
-					let rightLimitScreen = rightLimitShape.getScreenPosition(rightLimitShape.points[0]).x
-					if(rightLimitScreen > maxX){
-						maxX = rightLimitScreen
+				if(graph.alwaysShowOrigin || graph.leftLimit !==undefined){
+					let leftLimitScreenX = originShape.getScreenPosition(originShape.points[0].x)
+					if(leftLimitScreenX < minX){
+						minX = leftLimitScreenX
+					}
+				}
+				if(graph.rightLimit !==undefined){
+					let rightLimitScreenX = rightLimitShape.getScreenPosition(rightLimitShape.points[0].x)
+					if(rightLimitScreenX > maxX){
+						maxX = rightLimitScreenX;
 					}
 				}
 
@@ -287,15 +293,17 @@ Rectangle{
 					return
 				}
 
+
+
 				if (gridWidth <= 0 || maxX <= 0){
 					return
 				}
 
-				let scale_ = delta > 0 ? gridWidth/ delta : 1
+				let scale_ = delta > 0 ? (gridWidth)/ delta : 1
 				graph.xScale = (graph.xScale * scale_)
 				setLayersParams()
 				graph.wasFitToWidth = true
-				graphicsView.requestPaint()
+				graphicsView.fitToInactivAndActiveLayer()
 			}
 
 			function resize(){
