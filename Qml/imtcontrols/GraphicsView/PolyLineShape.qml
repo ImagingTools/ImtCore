@@ -19,9 +19,9 @@ BoundingBox {
 	property string shapePointBorderColor: color;
 	property bool hasHoverReaction: true;
 
-	property int invalidPointIndex: -1;
+	property var invalidPointIndexArr: [];
 
-	onInvalidPointIndexChanged: {
+	onInvalidPointIndexArrChanged: {
 		shapeChanged()
 	}
 
@@ -70,14 +70,14 @@ BoundingBox {
 		ctx.lineWidth = 2
 
 		let drawMultiColor = isMultiColor && colorList.length == points.length
-		if(!drawMultiColor || invalidPointIndex < 0){
+		if(!drawMultiColor || !invalidPointIndexArr.length){
 			ctx.beginPath()
 		}
 		for(let i = 0;i < points.length; i++){
-			if(drawMultiColor || (invalidPointIndex >= 0)){
+			if(drawMultiColor || (invalidPointIndexArr.length)){
 				ctx.beginPath()
 
-				if(invalidPointIndex == i){
+				if(invalidPointIndexArr.indexOf(i) > -1){
 					ctx.strokeStyle = "#ff0000"
 					ctx.fillStyle = "#ff0000"
 				}
@@ -102,14 +102,14 @@ BoundingBox {
 			else {
 				DesignScheme.drawNode(ctx, point, shapePointSize)
 			}
-			if(drawMultiColor  || (invalidPointIndex >= 0)){
+			if(drawMultiColor  || (invalidPointIndexArr.length)){
 				ctx.stroke();
 				ctx.fill();
 				ctx.closePath();
 			}
 		}
 
-		if(!drawMultiColor || invalidPointIndex < 0){
+		if(!drawMultiColor || !invalidPointIndexArr.length){
 			ctx.stroke();
 			ctx.fill();
 
@@ -122,7 +122,7 @@ BoundingBox {
 		ctx.globalAlpha = 1
 		for(let i = 0; i < points.length; i++){
 			let point = getScreenPosition(points[i]);
-			if(invalidPointIndex !== i){
+			if(invalidPointIndexArr.indexOf(i) < 0){
 				DesignScheme.drawEditPoint(ctx, point)
 			}
 			else {

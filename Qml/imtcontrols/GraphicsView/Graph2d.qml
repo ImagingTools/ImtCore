@@ -63,6 +63,7 @@ Rectangle{
 	property bool restrictFitByResize: false
 
 	property bool hasPointValidation: false;
+	property bool hasPointMovementControl: true;
 
 	property alias hasLeftButtonMenu: graphicsView.hasLeftButtonMenu;
 	property alias hasRightButtonMenu: graphicsView.hasRightButtonMenu;
@@ -78,16 +79,34 @@ Rectangle{
 	}
 
 	function validatorBase(pointsArg){
+		let indexArr = []
 		let prevPoint
 		for(let i = 0; i < pointsArg.length; i++){
 			let point = pointsArg[i]
 			if(i > 0 && point.x < prevPoint.x){
-				return i;
+				indexArr.push(i);
 			}
 			prevPoint = point
 		}
-		return -1;
+		return indexArr;
+	}
 
+	function validatorBaseBothDirection(pointsArg){
+		let indexArr = []
+		for(let i = 0; i < pointsArg.length; i++){
+			let point = pointsArg[i]
+			if(i > 0){
+				if(pointsArg[i].x < pointsArg[i-1].x){
+					indexArr.push(i);
+				}
+			}
+			if(i < (pointsArg.length -1)){
+				if(pointsArg[i].x > pointsArg[i+1].x){
+					indexArr.push(i);
+				}
+			}
+		}
+		return indexArr;
 	}
 
 	function validatePoints(){
@@ -104,10 +123,12 @@ Rectangle{
 				let screenPoint = shape.getScreenPosition(points[j])
 				screenPointArr.push(screenPoint)
 			}
-			let invalidIndex = validatator(screenPointArr)
-			shape.invalidPointIndex = invalidIndex;
-			if(invalidIndex >= 0){
-				invalidPoint(i, invalidIndex);
+			let invalidIndexArr = validatator(screenPointArr)
+			shape.invalidPointIndexArr = invalidIndexArr;
+			if(invalidIndexArr.length){
+				for(let k = 0; k < invalidIndexArr.length; k++){
+					invalidPoint(i, invalidIndexArr[k]);
+				}
 			}
 		}
 	}
@@ -544,6 +565,49 @@ Rectangle{
 				else {
 					toolTip.closeTooltip()
 				}
+			}
+
+			function editPointsFunction(mouse){
+				let pointScreen = Qt.point(mouse.x, mouse.y)
+				if(graph.hasPointMovementControl){
+					let ok = true;
+					let margin_ = Style.marginXS
+					let delta = margin_
+					let prevPointScreen
+					let nextPointScreen
+					let isFirstPoint = (editNodeIndex == 0)
+					let isLastPoint = (editNodeIndex == (points.length -1))
+					if(!isFirstPoint && !isLastPoint){
+						prevPointScreen = getScreenPosition(points[editNodeIndex - 1])
+						nextPointScreen = getScreenPosition(points[editNodeIndex +1])
+						let okPrev = (pointScreen.x - prevPointScreen.x) > margin_
+						let okNext = (nextPointScreen.x - pointScreen.x) > margin_
+						ok = okPrev > margin_ && okNext
+						if(!ok){
+							if(!okPrev){
+								pointScreen.x = prevPointScreen.x + delta
+							}
+							else if(!okNext){
+								pointScreen.x = nextPointScreen.x - delta
+							}
+						}
+					}
+					else if(isFirstPoint){
+						nextPointScreen = getScreenPosition(points[editNodeIndex +1])
+						ok = (nextPointScreen.x - pointScreen.x) > margin_
+						if(!ok){
+							pointScreen.x = nextPointScreen.x - delta
+						}
+					}
+					else if(isLastPoint){
+						prevPointScreen = getScreenPosition(points[editNodeIndex - 1])
+						ok = (pointScreen.x - prevPointScreen.x) > margin_
+						if(!ok){
+							pointScreen.x = prevPointScreen.x + delta
+						}
+					}
+				}
+				points[editNodeIndex] = getLogPosition(pointScreen)
 			}
 		}
 	}

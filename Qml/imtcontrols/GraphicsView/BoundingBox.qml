@@ -548,14 +548,16 @@ GraphicsShapeBase {
 			//console.log("mouseIsPressed:: ", mouseIsPressed)
 			if(mouseIsPressed){
 				if(editNodeIndex > -1){
-					points[editNodeIndex] = getLogPosition(Qt.point(mouseEvent.x, mouseEvent.y))
+					editPointsFunction(mouseEvent)
+					//points[editNodeIndex] = getLogPosition(Qt.point(mouseEvent.x, mouseEvent.y))
 				}
 				shapeChanged()
-
 			}
-
 		}
+	}
 
+	function editPointsFunction(mouse){
+		points[editNodeIndex] = getLogPosition(Qt.point(mouse.x, mouse.y))
 	}
 
 	property var pointsBackupScreen: []
