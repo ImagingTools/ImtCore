@@ -42,6 +42,8 @@ Graph2d{
 
 		activeLayer.addShape(line)
 
+		graphicsViewAlias.firstResize = true;
+
 		requestPaint();
 	}
 

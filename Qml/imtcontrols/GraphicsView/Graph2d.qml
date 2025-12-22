@@ -46,6 +46,9 @@ Rectangle{
 	property var rightLimit;
 	property var leftLimit;
 
+	property int coordinateShiftX: 0
+	property int coordinateShiftY: 0
+
 	property real xScale: 1
 	property real yScale: 1
 
@@ -139,6 +142,15 @@ Rectangle{
 
 	function fitToView(){
 		graphicsView.fitToInactivAndActiveLayer();
+		if(coordinateShiftX !==0 || coordinateShiftY !== 0){
+			if(coordinateShiftX !== 0){
+				graphicsView.deltaX +=  coordinateShiftX * graphicsView.scaleCoeff
+			}
+			if(coordinateShiftY !== 0){
+				graphicsView.deltaY +=  coordinateShiftY * graphicsView.scaleCoeff
+			}
+			graphicsView.requestPaint()
+		}
 	}
 
 	function setEditMode(mode){
@@ -212,6 +224,7 @@ Rectangle{
 	}
 
 	function reset(){
+		graphicsView.firstResize = true;
 		wasFitToWidth = false
 		xScale = xScaleBackup
 	}
@@ -226,6 +239,28 @@ Rectangle{
 		let line = activeLayer.shapeModel[0]
 		line.points = linePoints
 		requestPaint()
+	}
+
+	onLeftLimitChanged: {
+		originShape.points = [leftLimit]
+	}
+
+	onRightLimitChanged: {
+		rightLimitShape.points = [rightLimit]
+	}
+
+	function setLeftLimit(limitArg, requestPaintArg){
+		leftLimit = limitArg
+		if(requestPaintArg){
+			requestPaint()
+		}
+	}
+
+	function setRightLimit(limitArg, requestPaintArg){
+		rightLimit = limitArg
+		if(requestPaintArg){
+			requestPaint()
+		}
 	}
 
 	BaseText{

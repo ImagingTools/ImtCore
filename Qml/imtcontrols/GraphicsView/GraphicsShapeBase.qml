@@ -52,7 +52,9 @@ QtObject {
 	signal mousePositionShift(real deltaX, real deltaY)
 
 	onShapeChanged: {
-		viewItem.requestPaint();
+		if(viewItem){
+			viewItem.requestPaint();
+		}
 	}
 
 	onMousePressed: {
