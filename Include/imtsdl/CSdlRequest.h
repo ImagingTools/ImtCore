@@ -28,9 +28,10 @@ public:
 	enum Type
 	{
 		T_QUERY,
-		T_MUTATION
+		T_MUTATION,
+		T_SUBSCRIPTION
 	};
-	I_DECLARE_ENUM(Type, T_QUERY, T_MUTATION)
+	I_DECLARE_ENUM(Type, T_QUERY, T_MUTATION, T_SUBSCRIPTION)
 
 	Type GetType() const;
 	void SetType(Type type);
