@@ -69,6 +69,11 @@ I_EXPORT_COMPONENT(
 			"Server controller",
 			"Server Controller" IM_AUTHOR("Roman Kucherenko"));
 
+I_EXPORT_COMPONENT(
+			SslConfigurationAdapter,
+			"SSL configuration adapter",
+			"SSL Secure Connection Adapter" IM_AUTHOR("Roman Kucherenko"));
+
 
 } // namespace ImtComPck
 
