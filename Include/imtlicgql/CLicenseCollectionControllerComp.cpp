@@ -234,10 +234,12 @@ bool CLicenseCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 		return false;
 	}
 
+	QByteArray objectId = *arguments.input.Version_1_0->id;
 	licenseInfoPtr->ResetData();
 
-	QByteArray objectId = *licenseUpdateRequest.GetRequestedArguments().input.Version_1_0->id;
-	sdl::imtlic::Licenses::CLicenseDefinitionData::V1_0 licenseData = *licenseUpdateRequest.GetRequestedArguments().input.Version_1_0->item;
+	licenseInfoPtr->SetObjectUuid(objectId);
+
+	sdl::imtlic::Licenses::CLicenseDefinitionData::V1_0 licenseData = *arguments.input.Version_1_0->item;
 
 	if (!FillObjectFromRepresentation(licenseData, *licenseInfoPtr, objectId, errorMessage)){
 		errorMessage = QString("Unable to update object from representation. Error: '%1'").arg(errorMessage);

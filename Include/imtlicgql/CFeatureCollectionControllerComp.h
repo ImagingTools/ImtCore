@@ -18,6 +18,8 @@ public:
 
 	I_BEGIN_COMPONENT(CFeatureCollectionControllerComp);
 		I_ASSIGN(m_featureInfoFactCompPtr, "FeatureFactory", "Factory used for creation of the new feature instance", true, "FeatureFactory");
+		I_ASSIGN(m_productCollectionCompPtr, "ProductCollection", "Product collection", false, "ProductCollection");
+		I_ASSIGN(m_licenseCollectionCompPtr, "LicenseCollection", "License collection", false, "LicenseCollection");
 	I_END_COMPONENT;
 
 protected:
@@ -32,6 +34,8 @@ protected:
 				QString& errorMessage) const;
 
 	// reimplemented (sdl::imtlic::Features::CFeatureCollectionControllerCompBase)
+	virtual void OnAfterRemoveElements(const QByteArrayList& elementIds, const imtgql::CGqlRequest& gqlRequest) const override;
+
 	virtual bool CreateRepresentationFromObject(
 				const imtbase::IObjectCollectionIterator& objectCollectionIterator,
 				const sdl::imtlic::Features::CFeaturesListGqlRequest& featuresListRequest,
@@ -53,7 +57,13 @@ protected:
 				QString& errorMessage) const override;
 
 private:
+	void SynchronizeProducts(const QByteArray& featureId, const imtlic::IFeatureInfo* featureInfoPtr = nullptr) const;
+	void SynchronizeLicenses(const QByteArray& featureId, const imtlic::IFeatureInfo* featureInfoPtr = nullptr) const;
+
+private:
 	I_FACT(imtlic::IFeatureInfo, m_featureInfoFactCompPtr);
+	I_REF(imtbase::IObjectCollection, m_productCollectionCompPtr);
+	I_REF(imtbase::IObjectCollection, m_licenseCollectionCompPtr);
 };
 
 

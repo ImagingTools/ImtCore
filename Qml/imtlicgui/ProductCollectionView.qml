@@ -15,7 +15,7 @@ RemoteCollectionView {
 	visibleMetaInfo: false;
 	
 	collectionId: "Products";
-
+	documentCollectionFilter: null
 	additionalFieldIds: [ProductItemTypeMetaInfo.s_productId]
 	
 	commandsDelegateComp: Component {ProductCollectionViewCommandsDelegate {

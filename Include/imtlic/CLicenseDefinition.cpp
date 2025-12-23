@@ -26,6 +26,48 @@ CLicenseDefinition::CLicenseDefinition()
 }
 
 
+bool CLicenseDefinition::ContainsFeature(const QByteArray& featureId) const
+{
+	for (const FeatureInfo& currentFeatureInfo : std::as_const(m_featureInfos)){
+		if (currentFeatureInfo.id == featureId){
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+bool CLicenseDefinition::RemoveFeature(const QByteArray& featureId)
+{
+	for (int i = m_featureInfos.size() - 1; i >= 0; --i){
+		if (m_featureInfos[i].id == featureId){
+			istd::CChangeNotifier notifier(this);
+
+			m_featureInfos.remove(i);
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+bool CLicenseDefinition::AddFeature(ILicenseDefinition::FeatureInfo& featureInfo)
+{
+	if (ContainsFeature(featureInfo.id)){
+		return false;
+	}
+
+	istd::CChangeNotifier notifier(this);
+
+	m_featureInfos << featureInfo;
+
+	return true;
+}
+
+
 // reimplemented (imtlic::ILicenseDefinition)
 
 

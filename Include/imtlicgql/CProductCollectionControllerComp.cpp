@@ -32,7 +32,7 @@ sdl::imtbase::ImtCollection::CImportObjectPayload CProductCollectionControllerCo
 			if (response.Version_1_0->objectId){
 				objectId = *response.Version_1_0->objectId;
 			}
-			
+
 			imtbase::IObjectCollection::DataPtr dataPtr;
 			if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
 				imtlic::IProductInfo* productInfoPtr = dynamic_cast<imtlic::IProductInfo*>(dataPtr.GetPtr());
@@ -65,7 +65,7 @@ sdl::imtbase::ImtCollection::CImportObjectPayload CProductCollectionControllerCo
 			}
 		}
 	}
-	
+
 	return response;
 }
 
@@ -110,7 +110,7 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 		
 		return false;
 	}
-	
+
 	QByteArray objectId = objectCollectionIterator.GetObjectId();
 	
 	imtlic::CIdentifiableProductInfo* productInfoPtr = nullptr;
@@ -118,105 +118,105 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 	if (objectCollectionIterator.GetObjectData(dataPtr)){
 		productInfoPtr = dynamic_cast<imtlic::CIdentifiableProductInfo*>(dataPtr.GetPtr());
 	}
-	
+
 	if (productInfoPtr == nullptr){
 		errorMessage = QString("Unable to create representation from object '%1'").arg(qPrintable(objectId));
 		SendErrorMessage(0, errorMessage, "CProductCollectionControllerComp");
 		
 		return false;
 	}
-	
+
 	idoc::MetaInfoPtr metaInfo = objectCollectionIterator.GetDataMetaInfo();
-	
+
 	sdl::imtlic::Products::ProductsListRequestInfo requestInfo = productsListRequest.GetRequestInfo();
-	
+
 	if (requestInfo.items.isIdRequested){
 		representationObject.id = QByteArray(objectId);
 	}
-	
+
 	if (requestInfo.items.isTypeIdRequested){
 		representationObject.typeId = QByteArray(m_objectCollectionCompPtr->GetObjectTypeId(objectId));
 	}
-	
+
 	if (requestInfo.items.isProductIdRequested){
 		representationObject.productId = QByteArray(productInfoPtr->GetProductId());
 	}
-	
+
 	if (requestInfo.items.isNameRequested){
 		representationObject.name = QString(productInfoPtr->GetName());
 	}
-	
+
 	if (requestInfo.items.isProductNameRequested){
 		representationObject.productName = QString(productInfoPtr->GetName());
 	}
-	
+
 	if (requestInfo.items.isDescriptionRequested){
 		QString description = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::ElementInfoType::EIT_DESCRIPTION).toString();
 		representationObject.description = description;
 	}
-	
+
 	if (requestInfo.items.isCategoryIdRequested){
 		representationObject.categoryId = QByteArray(productInfoPtr->GetCategoryId());
 	}
-	
+
 	if (requestInfo.items.isFeaturesRequested){
 		representationObject.features = QByteArray(productInfoPtr->GetFeatures()->GetElementIds().toList().join(';'));
 	}
-	
+
 	if (requestInfo.items.isLicensesRequested){
 		imtsdl::TElementList<sdl::imtlic::Products::CLicenseData::V1_0> licenseDataList;
-		
+
 		if (m_licenseCollectionCompPtr.IsValid()){
 			imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
 			fieldFilter.fieldId = "ProductId";
 			fieldFilter.filterValue = objectId;
-			
+
 			imtbase::IComplexCollectionFilter::GroupFilter groupFilter;
 			groupFilter.fieldFilters << fieldFilter;
-			
+
 			imtbase::CComplexCollectionFilter complexFilter;
 			complexFilter.SetFieldsFilter(groupFilter);
-			
+
 			iprm::CParamsSet filterParam;
 			filterParam.SetEditableParameter("ComplexFilter", &complexFilter);
-			
+
 			imtbase::ICollectionInfo::Ids licenseCollectionIds = m_licenseCollectionCompPtr->GetElementIds(0, -1, &filterParam);
-			
+
 			for (const imtbase::ICollectionInfo::Id& licenseCollectionId : licenseCollectionIds){
 				imtbase::IObjectCollection::DataPtr licenseDataPtr;
 				if (m_licenseCollectionCompPtr->GetObjectData(licenseCollectionId, licenseDataPtr)){
 					const imtlic::CLicenseDefinition* licenseInfoPtr = dynamic_cast<const imtlic::CLicenseDefinition*>(licenseDataPtr.GetPtr());
 					if (licenseInfoPtr != nullptr){
 						sdl::imtlic::Products::CLicenseData::V1_0 licenseData;
-						
+
 						licenseData.id = QByteArray(licenseCollectionId);
 						licenseData.licenseId = QByteArray(licenseInfoPtr->GetLicenseId());
 						licenseData.licenseName = QString(licenseInfoPtr->GetLicenseName());
 						licenseData.name = licenseData.licenseName;
-						
+
 						licenseDataList << licenseData;
 					}
 				}
 			}
 		}
-		
+
 		representationObject.licenses = std::move(licenseDataList);
 	}
-	
+
 	if (requestInfo.items.isAddedRequested){
 		QDateTime addedTime = objectCollectionIterator.GetElementInfo("Added").toDateTime().toUTC();
-		
+
 		QString added = addedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
 		representationObject.added = QString(added);
 	}
-	
+
 	if (requestInfo.items.isTimeStampRequested){
 		QDateTime lastModifiedTime = objectCollectionIterator.GetElementInfo("TimeStamp").toDateTime().toUTC();
-		
+
 		QString lastModified = lastModifiedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
 		representationObject.timeStamp = QString(lastModified);
 	}
-	
+
 	return true;
 }
 
@@ -229,28 +229,28 @@ istd::IChangeableUniquePtr CProductCollectionControllerComp::CreateObjectFromRep
 	if (!m_productInfoFactCompPtr.IsValid()){
 		errorMessage = QString("Unable to create object from representation. Error: Attribute 'm_productInfoFactCompPtr' was not set");
 		SendErrorMessage(0, errorMessage, "CProductCollectionControllerComp");
-		
+
 		return nullptr;
 	}
-	
+
 	imtlic::IProductInfoUniquePtr productInstancePtr = m_productInfoFactCompPtr.CreateInstance();
 	if (!productInstancePtr.IsValid()){
 		errorMessage = QString("Unable to create product instance. Error: Invalid object");
 		SendErrorMessage(0, errorMessage, "CProductCollectionControllerComp");
-		
+
 		return nullptr;
 	}
-	
+
 	if (!FillObjectFromRepresentation(productDataRepresentation, *productInstancePtr, newObjectId, errorMessage)){
 		errorMessage = QString("Unable to create product instance from representation. Error: '%1'");
 		SendErrorMessage(0, errorMessage, "CProductCollectionControllerComp");
-		
+
 		return nullptr;
 	}
-	
+
 	istd::IChangeableUniquePtr retVal;
 	retVal.MoveCastedPtr<imtlic::IProductInfo>(productInstancePtr);
-	
+
 	return retVal;
 }
 
@@ -265,33 +265,33 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 	if (productInfoPtr == nullptr){
 		errorMessage = QString("Unable to create representation from object. Error: Object is invalid");
 		SendErrorMessage(0, errorMessage, "CProductCollectionControllerComp");
-		
+
 		return false;
 	}
-	
+
 	sdl::imtlic::Products::ProductItemRequestArguments arguments = productItemRequest.GetRequestedArguments();
-	
+
 	QByteArray id;
 	if (arguments.input.Version_1_0->id){
 		id = *arguments.input.Version_1_0->id;
 	}
 	representationPayload.id = QByteArray(id);
-	
+
 	QByteArray productId = productInfoPtr->GetProductId();
 	representationPayload.productId = QByteArray((productId));
-	
+
 	QString productName = productInfoPtr->GetName();
 	representationPayload.name = QString((productName));
 	representationPayload.productName = QString((productName));
-	
+
 	QString description = productInfoPtr->GetProductDescription();
 	representationPayload.description = QString((description));
-	
+
 	QByteArray categoryId = productInfoPtr->GetCategoryId();
 	representationPayload.categoryId = QByteArray((categoryId));
-	
+
 	representationPayload.features = QByteArray((productInfoPtr->GetFeatures()->GetElementIds().toList().join(';')));
-	
+
 	return true;
 }
 
@@ -309,32 +309,34 @@ bool CProductCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 		
 		return false;
 	}
-	
+
 	sdl::imtlic::Products::ProductUpdateRequestArguments arguments = productUpdateRequest.GetRequestedArguments();
 	if (!arguments.input.Version_1_0.has_value()){
 		Q_ASSERT(false);
 		return false;
 	}
-	
+
 	QByteArray objectId;
 	if (arguments.input.Version_1_0->id){
 		objectId = *productUpdateRequest.GetRequestedArguments().input.Version_1_0->id;
 	}
-	
+
 	sdl::imtlic::Products::CProductData::V1_0 productData;
 	if (arguments.input.Version_1_0->item){
 		productData = *productUpdateRequest.GetRequestedArguments().input.Version_1_0->item;
 	}
-	
+
 	productInfoPtr->ResetData();
-	
+
+	productInfoPtr->SetObjectUuid(objectId);
+
 	if (!FillObjectFromRepresentation(productData, *productInfoPtr, objectId, errorMessage)){
 		errorMessage = QString("Unable to update product from representation. Error: '%1'").arg(errorMessage);
 		SendErrorMessage(0, errorMessage, "CProductCollectionControllerComp");
-		
+
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -347,7 +349,7 @@ QString CProductCollectionControllerComp::GetExtensionFromMimeType(const imtbase
 	else if (mimeType.GetSubType() == "x-c"){
 		return QStringLiteral("h");
 	}
-	
+
 	return QString();
 }
 
@@ -361,7 +363,7 @@ QString CProductCollectionControllerComp::GetExportFileName(const QByteArray& ob
 			return productInfoPtr->GetProductId() + "Features";
 		}
 	}
-	
+
 	return QString();
 }
 

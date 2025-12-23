@@ -22,6 +22,10 @@ public:
 
 	CLicenseDefinition();
 
+	bool ContainsFeature(const QByteArray& featureId) const;
+	bool RemoveFeature(const QByteArray& featureId);
+	bool AddFeature(ILicenseDefinition::FeatureInfo& featureInfo);
+
 	// reimplemented (imtlic::ILicenseDefinition)
 	virtual QString GetLicenseName() const override;
 	virtual void SetLicenseName(const QString& licenseName) override;

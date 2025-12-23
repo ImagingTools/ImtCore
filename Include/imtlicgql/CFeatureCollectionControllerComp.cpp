@@ -8,6 +8,8 @@
 // ImtCore includes
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtlic/CFeatureInfo.h>
+#include <imtlic/IProductInfo.h>
+#include <imtlic/CLicenseDefinition.h>
 
 
 namespace imtlicgql
@@ -159,6 +161,15 @@ bool CFeatureCollectionControllerComp::CreateRepresentationModelFromFeatureInfo(
 
 
 // reimplemented (sdl::imtlic::Features::CFeatureCollectionControllerCompBase)
+
+void CFeatureCollectionControllerComp::OnAfterRemoveElements(const QByteArrayList& elementIds, const imtgql::CGqlRequest& /*gqlRequest*/) const
+{
+	for (const QByteArray& elementId : elementIds){
+		SynchronizeProducts(elementId);
+		SynchronizeLicenses(elementId);
+	}
+}
+
 
 bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 			const imtbase::IObjectCollectionIterator& objectCollectionIterator,
@@ -387,10 +398,12 @@ bool CFeatureCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 		return false;
 	}
 
+	QByteArray featureId = *arguments.input.Version_1_0->id;
+
 	featureInfoPtr->ResetData();
 
-	QByteArray featureId = *updateFeatureRequest.GetRequestedArguments().input.Version_1_0->id;
-	sdl::imtlic::Features::CFeatureData::V1_0 featureData = *updateFeatureRequest.GetRequestedArguments().input.Version_1_0->item;
+	featureInfoPtr->SetObjectUuid(featureId);
+	sdl::imtlic::Features::CFeatureData::V1_0 featureData = *arguments.input.Version_1_0->item;
 
 	bool ok = CreateFeatureFromRepresentationModel(featureData, featureId, *featureInfoPtr, errorMessage);
 	if (!ok){
@@ -400,7 +413,71 @@ bool CFeatureCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 		return false;
 	}
 
+	SynchronizeProducts(featureId, featureInfoPtr);
+	SynchronizeLicenses(featureId, featureInfoPtr);
+
 	return true;
+}
+
+
+// private methods
+
+void CFeatureCollectionControllerComp::SynchronizeProducts(const QByteArray& featureId, const imtlic::IFeatureInfo* featureInfoPtr) const
+{
+	if (m_productCollectionCompPtr.IsValid()){
+		imtbase::ICollectionInfo::Ids elementIds = m_productCollectionCompPtr->GetElementIds();
+		for (const imtbase::ICollectionInfo::Id& elementId : elementIds){
+			imtbase::IObjectCollection::DataPtr dataPtr;
+			if (m_productCollectionCompPtr->GetObjectData(elementId, dataPtr)){
+				imtlic::IProductInfo* productInfoPtr = dynamic_cast<imtlic::IProductInfo*>(dataPtr.GetPtr());
+				if (productInfoPtr != nullptr){
+					imtbase::IObjectCollection*  featureCollectionPtr = productInfoPtr->GetFeatures();
+					if (featureCollectionPtr != nullptr){
+						imtbase::ICollectionInfo::Ids featureElementIds =featureCollectionPtr->GetElementIds();
+						if (featureElementIds.contains(featureId)){
+							productInfoPtr->RemoveFeature(featureId);
+
+							if (featureInfoPtr != nullptr){
+								productInfoPtr->AddFeature(featureId, *featureInfoPtr);
+							}
+
+							m_productCollectionCompPtr->SetObjectData(elementId, *productInfoPtr);
+							return;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+
+void CFeatureCollectionControllerComp::SynchronizeLicenses(const QByteArray& featureId, const imtlic::IFeatureInfo* featureInfoPtr) const
+{
+	if (m_licenseCollectionCompPtr.IsValid()){
+		imtbase::ICollectionInfo::Ids elementIds = m_licenseCollectionCompPtr->GetElementIds();
+		for (const imtbase::ICollectionInfo::Id& elementId : elementIds){
+			imtbase::IObjectCollection::DataPtr dataPtr;
+			if (m_licenseCollectionCompPtr->GetObjectData(elementId, dataPtr)){
+				imtlic::CLicenseDefinition* licenseDefinitionPtr = dynamic_cast<imtlic::CLicenseDefinition*>(dataPtr.GetPtr());
+				if (licenseDefinitionPtr != nullptr){
+					if (licenseDefinitionPtr->ContainsFeature(featureId)){
+						licenseDefinitionPtr->RemoveFeature(featureId);
+
+						if (featureInfoPtr != nullptr){
+							imtlic::ILicenseDefinition::FeatureInfo featureInfo;
+							featureInfo.id = featureId;
+							featureInfo.name = featureInfoPtr->GetFeatureName();
+							licenseDefinitionPtr->AddFeature(featureInfo);
+						}
+
+						m_licenseCollectionCompPtr->SetObjectData(elementId, *licenseDefinitionPtr);
+						return;
+					}
+				}
+			}
+		}
+	}
 }
 
 

@@ -15,6 +15,7 @@ RemoteCollectionView {
 	visibleMetaInfo: false;
 	
 	collectionId: "Licenses";
+	documentCollectionFilter: null
 	
 	commandsDelegateComp: Component {DocumentCollectionViewDelegate {
 			collectionView: root;
