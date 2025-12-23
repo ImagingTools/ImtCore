@@ -89,7 +89,7 @@ class Repeater extends Item {
     $modelChanged(){
         this.$disconnectModel()
         for(let key in this.$items){
-            if(key !== 'length') {
+            if(key !== 'length' && key !== undefined) {
                 let obj = this.$items[key]
                 obj.destroy()
                 delete this.$items[key]
