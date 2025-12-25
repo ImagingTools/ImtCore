@@ -38,6 +38,21 @@ idoc::IUndoManagerSharedPtr CCollectionDocumentManagerComp::CreateUndoManager() 
 }
 
 
+QList<imtdoc::IDocumentManagerEventHandler*> CCollectionDocumentManagerComp::GetDocumentManagerEventHandlers() const
+{
+	QList<imtdoc::IDocumentManagerEventHandler*> retVal;
+
+	if (m_handlerCompPtr.IsValid()){
+		for (int i = 0; i < m_handlerCompPtr.GetCount(); i++){
+			if (m_handlerCompPtr[i] != nullptr);
+			retVal.append(m_handlerCompPtr[i]);
+		}
+	}
+
+	return retVal;
+}
+
+
 // private methods
 
 int CCollectionDocumentManagerComp::GetObjectFactoryIndex(const QByteArray& typeId) const

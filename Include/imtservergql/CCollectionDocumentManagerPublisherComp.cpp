@@ -1,15 +1,22 @@
 #include <imtservergql/CCollectionDocumentManagerPublisherComp.h>
 
 
-// Qt includes
-#include <QtCore/QMutexLocker>
-
 // ImtCore includes
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/CollectionDocumentManager.h>
+#include <imtdoc/CDocumentChangedEvent.h>
+#include <imtdoc/CDocumentClosedEvent.h>
+#include <imtdoc/CDocumentCreatedEvent.h>
+#include <imtdoc/CDocumentOpenedEvent.h>
+#include <imtdoc/CDocumentRenamedEvent.h>
+#include <imtdoc/CDocumentSavedAsEvent.h>
+#include <imtdoc/CDocumentSavedEvent.h>
+#include <imtdoc/CDocumentUndoRedoChangedEvent.h>
 
 
 namespace imtservergql
 {
+
+
+namespace CDM = sdl::imtbase::CollectionDocumentManager;
 
 
 // protected methods
@@ -35,126 +42,239 @@ bool CCollectionDocumentManagerPublisherComp::IsRequestSupported(const imtgql::C
 }
 
 
-// reimplemented (iomod::CSingleModelObserverBase)
+// reimplemented (imtdoc::IDocumentManagerEventHandler)
 
-void CCollectionDocumentManagerPublisherComp::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
+bool CCollectionDocumentManagerPublisherComp::ProcessEvent(imtdoc::CEventBase* eventPtr)
 {
-	QVariant varChanged;
-	QVariant varClosed;
+	eventPtr->Accept();
 
-	const istd::IChangeable::ChangeInfoMap& map = changeSet.GetChangeInfoMap();
-	Q_ASSERT(map.count() <= 1);
+	bool retVal = false;
 
-	sdl::imtbase::CollectionDocumentManager::CDocumentManagerNotification sdlNotification;
-	sdlNotification.Version_1_0.emplace();
-	sdl::imtbase::CollectionDocumentManager::CDocumentManagerNotification::V1_0& sdlNotificationV1 = *sdlNotification.Version_1_0;
+	retVal = retVal || OnDocumentCreated(eventPtr);
+	retVal = retVal || OnDocumentOpened(eventPtr);
+	retVal = retVal || OnDocumentRenamed(eventPtr);
+	retVal = retVal || OnDocumentChanged(eventPtr);
+	retVal = retVal || OnDocumentUndoRedoChanged(eventPtr);
+	retVal = retVal || OnDocumentSaved(eventPtr);
+	retVal = retVal || OnDocumentSavedAs(eventPtr);
+	retVal = retVal || OnDocumentClosed(eventPtr);
 
-	if (map.contains(imtdoc::IDocumentManager::CN_NEW_DOCUMENT_CREATED)){
-		Q_ASSERT(map.values(imtdoc::IDocumentManager::CN_NEW_DOCUMENT_CREATED).size() == 1);
-		varChanged = map.value(imtdoc::IDocumentManager::CN_NEW_DOCUMENT_CREATED);
+	return retVal;
+}
 
-		sdlNotificationV1.documentOperation = sdl::imtbase::CollectionDocumentManager::EDocumentOperation::NewDocumentCreated;
-	}
-	else if (map.contains(imtdoc::IDocumentManager::CN_DOCUMENT_OPENED)){
-		Q_ASSERT(map.values(imtdoc::IDocumentManager::CN_DOCUMENT_OPENED).size() == 1);
-		varChanged = map.value(imtdoc::IDocumentManager::CN_DOCUMENT_OPENED);
 
-		sdlNotificationV1.documentOperation = sdl::imtbase::CollectionDocumentManager::EDocumentOperation::DocumentOpened;
-	}
-	else if (map.contains(imtdoc::IDocumentManager::CN_DOCUMENT_RENAMED)){
-		Q_ASSERT(map.values(imtdoc::IDocumentManager::CN_DOCUMENT_RENAMED).size() == 1);
-		varChanged = map.value(imtdoc::IDocumentManager::CN_DOCUMENT_RENAMED);
-
-		sdlNotificationV1.documentOperation = sdl::imtbase::CollectionDocumentManager::EDocumentOperation::DocumentRenamed;
-	}
-	else if (map.contains(imtdoc::IDocumentManager::CN_DOCUMENT_CHANGED)){
-		Q_ASSERT(map.values(imtdoc::IDocumentManager::CN_DOCUMENT_CHANGED).size() == 1);
-		varChanged = map.value(imtdoc::IDocumentManager::CN_DOCUMENT_CHANGED);
-
-		sdlNotificationV1.documentOperation = sdl::imtbase::CollectionDocumentManager::EDocumentOperation::DocumentChanged;
-	}
-	else if (map.contains(imtdoc::IDocumentManager::CN_DOCUMENT_UNDO_CHANGED)){
-		Q_ASSERT(map.values(imtdoc::IDocumentManager::CN_DOCUMENT_UNDO_CHANGED).size() == 1);
-		varChanged = map.value(imtdoc::IDocumentManager::CN_DOCUMENT_UNDO_CHANGED);
-
-		if (!varChanged.canConvert<imtdoc::IDocumentManager::DocumentUndoNotification>()){
-			Q_ASSERT(false);
-
-			return;
-		}
-
-		imtdoc::IDocumentManager::DocumentUndoNotification notification =
-			varChanged.value<imtdoc::IDocumentManager::DocumentUndoNotification>();
-
-		sdl::imtbase::UndoManager::CUndoInfo sdlNotification;
-		sdl::imtbase::UndoManager::CUndoInfo::V1_0& sdlNotificationV1 = sdlNotification.Version_1_0.emplace();
-
-		sdlNotificationV1.documentId = notification.documentId;
-		sdlNotificationV1.status.emplace().status = sdl::imtbase::UndoManager::EUndoStatus::Success;
-		sdlNotificationV1.isDirty = notification.isDirty;
-		sdlNotificationV1.availableUndoSteps = notification.availableUndoSteps;
-		sdlNotificationV1.availableRedoSteps = notification.availableRedoSteps;
-		sdlNotificationV1.undoLevelDescriptions.emplace();
-		sdlNotificationV1.redoLevelDescriptions.emplace();
-		for (int i = 0; i < notification.undoLevelDescriptions.count(); i++){
-			sdlNotificationV1.undoLevelDescriptions->append(notification.undoLevelDescriptions[i]);
-		}
-		for (int i = 0; i < notification.redoLevelDescriptions.count(); i++){
-			sdlNotificationV1.redoLevelDescriptions->append(notification.redoLevelDescriptions[i]);
-		}
-
-		PublishRepresentation(
-			QByteArrayLiteral("On") + *m_collectionIdAttrPtr + QByteArrayLiteral("UndoChanged"),
-			notification.userId,
-			sdlNotification);
-
-		return;
-	}
-	else if (map.contains(imtdoc::IDocumentManager::CN_DOCUMENT_SAVED)){
-		Q_ASSERT(map.values(imtdoc::IDocumentManager::CN_DOCUMENT_SAVED).size() == 1);
-		varChanged = map.value(imtdoc::IDocumentManager::CN_DOCUMENT_SAVED);
-
-		sdlNotificationV1.documentOperation = sdl::imtbase::CollectionDocumentManager::EDocumentOperation::DocumentSaved;
-	}
-	else if (map.contains(imtdoc::IDocumentManager::CN_DOCUMENT_CLOSED)){
-		Q_ASSERT(map.values(imtdoc::IDocumentManager::CN_DOCUMENT_CLOSED).size() == 1);
-		varClosed = map.value(imtdoc::IDocumentManager::CN_DOCUMENT_CLOSED);
-
-		sdlNotificationV1.documentOperation = sdl::imtbase::CollectionDocumentManager::EDocumentOperation::DocumentClosed;
-	}
-	else{
-		return;
+bool CCollectionDocumentManagerPublisherComp::OnDocumentCreated(imtdoc::CEventBase* eventPtr) const
+{
+	imtdoc::CDocumentCreatedEvent* concreteEventPtr = dynamic_cast<imtdoc::CDocumentCreatedEvent*>(eventPtr);
+	if (concreteEventPtr == nullptr){
+		return false;
 	}
 
-	QByteArray userId;
+	imtdoc::IDocumentManager::DocumentNotification notification;
+	FillDocumentNotification(concreteEventPtr, notification);
 
-	if (varChanged.canConvert<imtdoc::IDocumentManager::DocumentNotification>()){
-		imtdoc::IDocumentManager::DocumentNotification notification =
-			varChanged.value<imtdoc::IDocumentManager::DocumentNotification>();
+	sdl::imtbase::CollectionDocumentManager::CDocumentManagerNotification::V1_0 sdlNotification;
+	FillSdlNotification(notification, CDM::EDocumentOperation::NewDocumentCreated, sdlNotification);
 
-		userId = notification.userId;
+	PublishRepresentation(GetCommandId(), notification.userId, sdlNotification);
 
-		sdlNotificationV1.documentName = notification.documentName;
-		sdlNotificationV1.documentId = notification.documentId;
-		sdlNotificationV1.objectId = notification.objectId;
+	return true;
+}
+
+
+bool CCollectionDocumentManagerPublisherComp::OnDocumentOpened(imtdoc::CEventBase* eventPtr) const
+{
+	imtdoc::CDocumentOpenedEvent* concreteEventPtr = dynamic_cast<imtdoc::CDocumentOpenedEvent*>(eventPtr);
+	if (concreteEventPtr == nullptr){
+		return false;
 	}
-	else if (varClosed.canConvert<imtdoc::IDocumentManager::DocumentClosedNotification>()){
-		imtdoc::IDocumentManager::DocumentClosedNotification notification =
-			varClosed.value<imtdoc::IDocumentManager::DocumentClosedNotification>();
 
-		userId = notification.userId;
+	imtdoc::IDocumentManager::DocumentNotification notification;
+	FillDocumentNotification(concreteEventPtr, notification);
 
-		sdlNotificationV1.documentName = notification.documentId;
-		sdlNotificationV1.documentId = notification.documentId;
+	sdl::imtbase::CollectionDocumentManager::CDocumentManagerNotification::V1_0 sdlNotification;
+	FillSdlNotification(notification, CDM::EDocumentOperation::DocumentOpened, sdlNotification);
+
+	PublishRepresentation(GetCommandId(), notification.userId, sdlNotification);
+
+	return true;
+}
+
+
+bool CCollectionDocumentManagerPublisherComp::OnDocumentRenamed(imtdoc::CEventBase* eventPtr) const
+{
+	imtdoc::CDocumentRenamedEvent* concreteEventPtr = dynamic_cast<imtdoc::CDocumentRenamedEvent*>(eventPtr);
+	if (concreteEventPtr == nullptr){
+		return false;
 	}
-	else{
-		return;
+
+	imtdoc::IDocumentManager::DocumentNotification notification;
+	FillDocumentNotification(concreteEventPtr, notification);
+
+	sdl::imtbase::CollectionDocumentManager::CDocumentManagerNotification::V1_0 sdlNotification;
+	FillSdlNotification(notification, CDM::EDocumentOperation::DocumentRenamed, sdlNotification);
+
+	PublishRepresentation(GetCommandId(), notification.userId, sdlNotification);
+
+	return true;
+}
+
+
+bool CCollectionDocumentManagerPublisherComp::OnDocumentChanged(imtdoc::CEventBase* eventPtr) const
+{
+	imtdoc::CDocumentChangedEvent* concreteEventPtr = dynamic_cast<imtdoc::CDocumentChangedEvent*>(eventPtr);
+	if (concreteEventPtr == nullptr){
+		return false;
+	}
+
+	imtdoc::IDocumentManager::DocumentNotification notification;
+	FillDocumentNotification(concreteEventPtr, notification);
+
+	sdl::imtbase::CollectionDocumentManager::CDocumentManagerNotification::V1_0 sdlNotification;
+	FillSdlNotification(notification, CDM::EDocumentOperation::DocumentChanged, sdlNotification);
+
+	PublishRepresentation(GetCommandId(), notification.userId, sdlNotification);
+
+	return true;
+}
+
+
+bool CCollectionDocumentManagerPublisherComp::OnDocumentUndoRedoChanged(
+	imtdoc::CEventBase* eventPtr) const
+{
+	imtdoc::CDocumentUndoRedoChangedEvent* concreteEventPtr = dynamic_cast<imtdoc::CDocumentUndoRedoChangedEvent*>(eventPtr);
+	if (concreteEventPtr == nullptr){
+		return false;
+	}
+
+	sdl::imtbase::UndoManager::CUndoInfo::V1_0 sdlNotification;
+
+	sdlNotification.documentId = concreteEventPtr->GetDocumentId();
+	sdlNotification.status.emplace().status = sdl::imtbase::UndoManager::EUndoStatus::Success;
+	sdlNotification.isDirty = concreteEventPtr->IsDocumentDirty();
+
+	const idoc::IUndoManager& undoManager = concreteEventPtr->GetUndoManager();
+	int availableUndoSteps = undoManager.GetAvailableUndoSteps();
+	int availableRedoSteps = undoManager.GetAvailableRedoSteps();
+
+	sdlNotification.availableUndoSteps = availableUndoSteps;
+	sdlNotification.availableRedoSteps = availableRedoSteps;
+	sdlNotification.undoLevelDescriptions.emplace();
+	sdlNotification.redoLevelDescriptions.emplace();
+	for (int i = 0; i < availableUndoSteps; i++){
+		sdlNotification.undoLevelDescriptions->append(undoManager.GetUndoLevelDescription(i));
+	}
+	for (int i = 0; i < availableRedoSteps; i++){
+		sdlNotification.redoLevelDescriptions->append(undoManager.GetRedoLevelDescription(i));
 	}
 
 	PublishRepresentation(
-		QByteArrayLiteral("On") + *m_collectionIdAttrPtr + QByteArrayLiteral("DocumentChanged"),
-		userId,
+		QByteArrayLiteral("On") + *m_collectionIdAttrPtr + QByteArrayLiteral("UndoChanged"),
+		concreteEventPtr->GetUserId(),
 		sdlNotification);
+
+	return true;
+}
+
+
+bool CCollectionDocumentManagerPublisherComp::OnDocumentSaved(imtdoc::CEventBase* eventPtr) const
+{
+	imtdoc::CDocumentSavedEvent* concreteEventPtr = dynamic_cast<imtdoc::CDocumentSavedEvent*>(eventPtr);
+	if (concreteEventPtr == nullptr){
+		return false;
+	}
+
+	imtdoc::IDocumentManager::DocumentNotification notification;
+	FillDocumentNotification(concreteEventPtr, notification);
+
+	sdl::imtbase::CollectionDocumentManager::CDocumentManagerNotification::V1_0 sdlNotification;
+	FillSdlNotification(notification, CDM::EDocumentOperation::DocumentSaved, sdlNotification);
+
+	PublishRepresentation(GetCommandId(), notification.userId, sdlNotification);
+
+	return true;
+}
+
+
+bool CCollectionDocumentManagerPublisherComp::OnDocumentSavedAs(imtdoc::CEventBase* eventPtr) const
+{
+	imtdoc::CDocumentSavedAsEvent* concreteEventPtr = dynamic_cast<imtdoc::CDocumentSavedAsEvent*>(eventPtr);
+	if (concreteEventPtr == nullptr){
+		return false;
+	}
+
+	imtdoc::IDocumentManager::DocumentNotification notification;
+	FillDocumentNotification(concreteEventPtr, notification);
+
+	sdl::imtbase::CollectionDocumentManager::CDocumentManagerNotification::V1_0 sdlNotification;
+	FillSdlNotification(notification, CDM::EDocumentOperation::DocumentSavedAs, sdlNotification);
+
+	PublishRepresentation(GetCommandId(), notification.userId, sdlNotification);
+
+	return true;
+}
+
+
+bool CCollectionDocumentManagerPublisherComp::OnDocumentClosed(imtdoc::CEventBase* eventPtr) const
+{
+	imtdoc::CDocumentClosedEvent* concreteEventPtr = dynamic_cast<imtdoc::CDocumentClosedEvent*>(eventPtr);
+	if (concreteEventPtr == nullptr){
+		return false;
+	}
+
+	sdl::imtbase::CollectionDocumentManager::CDocumentManagerNotification::V1_0 sdlNotification;
+	sdlNotification.documentOperation = CDM::EDocumentOperation::DocumentClosed;
+	sdlNotification.documentId = concreteEventPtr->GetDocumentId();
+	sdlNotification.documentName.emplace();
+
+	PublishRepresentation(GetCommandId(), concreteEventPtr->GetUserId(), sdlNotification);
+
+	return true;
+}
+
+
+void CCollectionDocumentManagerPublisherComp::FillDocumentNotification(
+	const imtdoc::CEventBase* eventPtr,
+	imtdoc::IDocumentManager::DocumentNotification& notification) const
+{
+	notification.userId = eventPtr->GetUserId();
+	notification.documentId = eventPtr->GetDocumentId();
+	notification.typeId = eventPtr->GetDocumentTypeId();
+	notification.url = eventPtr->GetDocumentUrl();
+	notification.name = eventPtr->GetDocumentName();
+	notification.isDirty = eventPtr->IsDocumentDirty();
+}
+
+
+void CCollectionDocumentManagerPublisherComp::FillSdlNotification(
+	const imtdoc::IDocumentManager::DocumentNotification& notification,
+	sdl::imtbase::CollectionDocumentManager::EDocumentOperation operation,
+	sdl::imtbase::CollectionDocumentManager::CDocumentManagerNotification::V1_0& sdlNotification) const
+{
+	sdlNotification.documentOperation = operation;
+	sdlNotification.documentId = notification.documentId;
+	sdlNotification.documentName = notification.name;
+	sdlNotification.objectId = ConvertUrlToObjectId(notification.url);
+	sdlNotification.isDirty = notification.isDirty;
+}
+
+
+QByteArray CCollectionDocumentManagerPublisherComp::ConvertUrlToObjectId(const QUrl& url) const
+{
+	QString path = url.path();
+
+	QStringList parts = path.split('/', Qt::SkipEmptyParts);
+	if (parts.count() == 1){
+		return parts.first().toUtf8();
+	}
+
+	return QByteArray();
+}
+
+
+QByteArray CCollectionDocumentManagerPublisherComp::GetCommandId() const
+{
+	return QByteArrayLiteral("On") + *m_collectionIdAttrPtr + QByteArrayLiteral("DocumentChanged");
 }
 
 

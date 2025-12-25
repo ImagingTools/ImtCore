@@ -39,21 +39,25 @@ public:
 
 	struct DocumentInfo
 	{
-		QByteArray documentId;
-		QByteArray objectId;
-		QByteArray objectTypeId;
-		QString documentName;
-		bool isDirty;
+		QByteArray typeId;
+		QUrl url;
+		QString name;
+		bool isDirty = false;
 	};
-	typedef QList<DocumentInfo> DocumentList;
 
-	struct DocumentNotification : public DocumentInfo
+	struct DocumentListItem : public DocumentInfo
+	{
+		QByteArray documentId;
+	};
+	typedef QList<DocumentListItem> DocumentList;
+
+	struct DocumentNotification : public DocumentListItem
 	{
 		QByteArray userId;
 	};
 	typedef std::shared_ptr<DocumentNotification> DocumentNotificationPtr;
 
-	struct DocumentUndoNotification
+	struct DocumentUndoRedoNotification
 	{
 		QByteArray userId;
 		QByteArray documentId;
@@ -83,7 +87,7 @@ public:
 	typedef DocumentNotification DocumentChangedInfo;
 
 	static const QByteArray CN_DOCUMENT_UNDO_CHANGED;
-	typedef DocumentUndoNotification DocumentUndoChangedInfo;
+	typedef DocumentUndoRedoNotification DocumentUndoRedoChangedInfo;
 
 	static const QByteArray CN_DOCUMENT_SAVED;
 	typedef DocumentNotification DocumentSavedInfo;
@@ -174,5 +178,5 @@ public:
 
 
 Q_DECLARE_METATYPE(imtdoc::IDocumentManager::DocumentNotification);
-Q_DECLARE_METATYPE(imtdoc::IDocumentManager::DocumentUndoNotification);
+Q_DECLARE_METATYPE(imtdoc::IDocumentManager::DocumentUndoRedoNotification);
 Q_DECLARE_METATYPE(imtdoc::IDocumentManager::DocumentClosedNotification);

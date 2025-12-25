@@ -55,6 +55,8 @@ bool CGqlPublisherCompBase::RegisterSubscription(
 		return false;
 	}
 
+	QMutexLocker locker(&m_mutex);
+
 	for (RequestNetworks& requestNetworks: m_registeredSubscribers){
 		if (requestNetworks.gqlRequest.GetCommandId() == gqlRequest.GetCommandId()){
 			requestNetworks.networkRequests.insert(subscriptionId, &networkRequest);
@@ -77,6 +79,8 @@ bool CGqlPublisherCompBase::RegisterSubscription(
 
 bool CGqlPublisherCompBase::UnregisterSubscription(const QByteArray& subscriptionId)
 {
+	QMutexLocker locker(&m_mutex);
+
 	for (int i = 0; i < m_registeredSubscribers.size(); i++){
 		RequestNetworks& requestNetworks = m_registeredSubscribers[i];
 		if (requestNetworks.networkRequests.contains(subscriptionId)){
@@ -112,7 +116,7 @@ bool CGqlPublisherCompBase::PushDataToSubscriber(
 			const QByteArray& commandId,
 			const QByteArray& data,
 			const imtrest::IRequest& networkRequest,
-			const bool useAwsStyle)
+			const bool useAwsStyle) const
 {
 	if (!m_requestManagerCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'RequestManager' was not set", "CGqlPublisherCompBase");
@@ -155,9 +159,11 @@ bool CGqlPublisherCompBase::PushDataToSubscriber(
 }
 
 
-bool CGqlPublisherCompBase::PublishData(const QByteArray& commandId, const QByteArray& data)
+bool CGqlPublisherCompBase::PublishData(const QByteArray& commandId, const QByteArray& data) const
 {
-	for (RequestNetworks& requestNetworks: m_registeredSubscribers){
+	QMutexLocker locker(&m_mutex);
+
+	for (const RequestNetworks& requestNetworks: m_registeredSubscribers){
 		if (commandId == requestNetworks.gqlRequest.GetCommandId()){
 			for (auto it = requestNetworks.networkRequests.constBegin(); it != requestNetworks.networkRequests.constEnd(); ++it){
 				const imtrest::IRequest* networkRequestPtr = requestNetworks.networkRequests[it.key()];

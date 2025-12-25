@@ -1,12 +1,13 @@
 #pragma once
 
 
-// ACF includes
-#include <imod/TSingleModelObserverBase.h>
-
 // ImtCore includes
 #include <imtdoc/IDocumentManager.h>
+#include <imtdoc/IDocumentManagerEventHandler.h>
 #include <imtservergql/CGqlPublisherCompBase.h>
+
+// ImtCore includes
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/CollectionDocumentManager.h>
 
 
 namespace imtservergql
@@ -15,12 +16,13 @@ namespace imtservergql
 
 class CCollectionDocumentManagerPublisherComp:
 	public CGqlPublisherCompBase,
-	public imod::TSingleModelObserverBase<imtdoc::IDocumentManager>
+	virtual public imtdoc::IDocumentManagerEventHandler
 {
 public:
 	typedef CGqlPublisherCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CCollectionDocumentManagerPublisherComp)
+		I_REGISTER_INTERFACE(imtdoc::IDocumentManagerEventHandler)
 		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection ID", true, "DummyCollection");
 	I_END_COMPONENT;
 
@@ -28,15 +30,35 @@ protected:
 	// reimplemented (imtgql::IGqlSubscriberController)
 	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
 
-	// reimplemented (iomod::CSingleModelObserverBase)
-	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
+	// reimplemented (imtdoc::IDocumentManagerEventHandler)
+	virtual bool ProcessEvent(imtdoc::CEventBase* eventPtr) override;
 
-private:
+protected:
+	virtual bool OnDocumentCreated(imtdoc::CEventBase* eventPtr) const;
+	virtual bool OnDocumentOpened(imtdoc::CEventBase* eventPtr) const;
+	virtual bool OnDocumentRenamed(imtdoc::CEventBase* eventPtr) const;
+	virtual bool OnDocumentChanged(imtdoc::CEventBase* eventPtr) const;
+	virtual bool OnDocumentUndoRedoChanged(imtdoc::CEventBase* eventPtr) const;
+	virtual bool OnDocumentSaved(imtdoc::CEventBase* eventPtr) const;
+	virtual bool OnDocumentSavedAs(imtdoc::CEventBase* eventPtr) const;
+	virtual bool OnDocumentClosed(imtdoc::CEventBase* eventPtr) const;
+
+protected:
+	void FillDocumentNotification(
+		const imtdoc::CEventBase* eventPtr,
+		imtdoc::IDocumentManager::DocumentNotification& notification) const;
+	void FillSdlNotification(
+		const imtdoc::IDocumentManager::DocumentNotification& notification,
+		sdl::imtbase::CollectionDocumentManager::EDocumentOperation operation,
+		sdl::imtbase::CollectionDocumentManager::CDocumentManagerNotification::V1_0& sdlNotification) const;
+	QByteArray ConvertUrlToObjectId(const QUrl& url) const;
+	QByteArray GetCommandId() const;
+
 	template<class Representation>
 	void PublishRepresentation(
 		const QByteArray& commandId,
 		const QByteArray& userId,
-		const Representation& representation);
+		const Representation& representation) const;
 
 private:
 	I_ATTR(QByteArray, m_collectionIdAttrPtr);
@@ -49,7 +71,7 @@ template<class Representation>
 void CCollectionDocumentManagerPublisherComp::PublishRepresentation(
 	const QByteArray& commandId,
 	const QByteArray& userId,
-	const Representation& representation)
+	const Representation& representation) const
 {
 	QJsonObject jsonObject;
 	if (!representation.WriteToJsonObject(jsonObject)){

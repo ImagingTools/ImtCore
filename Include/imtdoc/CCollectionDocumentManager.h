@@ -13,6 +13,7 @@
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtdoc/IDocumentManager.h>
+#include <imtdoc/IDocumentManagerEventHandler.h>
 
 
 namespace imtdoc
@@ -58,7 +59,9 @@ protected:
 	const WorkingDocument* FindDocument(const QByteArray& userId, const QByteArray& documentId) const;
 	bool FindDocument(int undoManagerModelId, QByteArray& outUserId, QByteArray& outDocumentId);
 	void InitializeDocumentObservers(WorkingDocument& document, const QByteArray& userId);
+	QUrl ObjectIdToUrl(const QByteArray& objectId);
 
+	virtual QList<imtdoc::IDocumentManagerEventHandler*> GetDocumentManagerEventHandlers() const;
 	virtual imtbase::IObjectCollection* GetCollection() const = 0;
 	virtual istd::IChangeableSharedPtr CreateObject(const QByteArray& typeId) const = 0;
 	virtual idoc::IUndoManagerSharedPtr CreateUndoManager() const = 0;
@@ -67,8 +70,8 @@ protected:
 	struct WorkingDocument
 	{
 		QByteArray objectId;
-		QByteArray objectTypeId;
-		QString documentName;
+		QByteArray typeId;
+		QString name;
 		istd::IChangeableSharedPtr objectPtr;
 		idoc::IUndoManagerSharedPtr undoManagerPtr;
 		bool isDirty;

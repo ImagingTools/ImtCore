@@ -79,7 +79,7 @@ typedef imtservergql::CGqlCollectionImportControllerComp GqlCollectionImportCont
 typedef imtservergql::CCollectionImportControllerComp CollectionImportController;
 typedef imtservergql::CCollectionImportJobParamsFillerComp CollectionImportJobParamsFiller;
 typedef imtservergql::CCollectionDocumentManagerControllerComp CollectionDocumentManagerController;
-typedef ibase::TModelObserverCompWrap<imtservergql::CCollectionDocumentManagerPublisherComp> CollectionDocumentManagerPublisher;
+typedef imtservergql::CCollectionDocumentManagerPublisherComp CollectionDocumentManagerPublisher;
 
 
 } // namespace ImtServerGqlPck

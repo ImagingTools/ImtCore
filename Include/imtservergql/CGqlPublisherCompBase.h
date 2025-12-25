@@ -43,8 +43,8 @@ public:
 	virtual void OnRequestDestroyed(imtrest::IRequest* request) override;
 
 protected:
-	virtual bool PushDataToSubscriber(const QByteArray& subscriptionId, const QByteArray& commandId, const QByteArray& data, const imtrest::IRequest& networkRequest, const bool useAwsStyle = true);
-	virtual bool PublishData(const QByteArray& commandId, const QByteArray& data);
+	virtual bool PushDataToSubscriber(const QByteArray& subscriptionId, const QByteArray& commandId, const QByteArray& data, const imtrest::IRequest& networkRequest, const bool useAwsStyle = true) const;
+	virtual bool PublishData(const QByteArray& commandId, const QByteArray& data) const;
 
 protected:
 	I_MULTIATTR(QByteArray, m_commandIdsAttrPtr);
@@ -61,7 +61,8 @@ protected:
 		}
 	};
 
-	QList<RequestNetworks> m_registeredSubscribers;
+	mutable QList<RequestNetworks> m_registeredSubscribers;
+	mutable QMutex m_mutex;
 };
 
 

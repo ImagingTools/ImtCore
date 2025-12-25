@@ -22,14 +22,19 @@ CDM::CDocumentList CCollectionDocumentManagerControllerComp::OnGetOpenedDocument
 		QByteArray userId = GetUserId(gqlRequest);
 
 		imtdoc::IDocumentManager::DocumentList list = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
-		for (const imtdoc::IDocumentManager::DocumentInfo& info : list){
+		for (const imtdoc::IDocumentManager::DocumentListItem& info : list){
 			CDM::CDocumentInfo sdlInfo;
 			sdlInfo.Version_1_0.emplace();
 
+			QString path = info.url.path();
+			QStringList parts = path.split('/', Qt::SkipEmptyParts);
+			Q_ASSERT(parts.count() == 1);
+			QByteArray objectId = parts.first().toUtf8();
+
 			sdlInfo.Version_1_0->documentId = info.documentId;
-			sdlInfo.Version_1_0->documentName = info.documentName;
-			sdlInfo.Version_1_0->objectId = info.objectId;
-			sdlInfo.Version_1_0->objectTypeId = info.objectTypeId;
+			sdlInfo.Version_1_0->documentName = info.name;
+			sdlInfo.Version_1_0->objectId = objectId;
+			sdlInfo.Version_1_0->objectTypeId = info.typeId;
 			sdlInfo.Version_1_0->isDirty = info.isDirty;
 
 			retVal.Version_1_0->documentList->append(sdlInfo.Version_1_0);
