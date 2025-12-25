@@ -9,8 +9,6 @@
 #include <istd/CSystem.h>
 #include <iprm/CParamsSet.h>
 #include <iprm/COptionsManager.h>
-#include <iprm/CEnableableParam.h>
-#include <ifile/CFileNameParam.h>
 
 // ImtCore includes
 #include <imtsdl/CSdlRequest.h>
@@ -139,7 +137,9 @@ void CGqlHandlerBaseClassGeneratorComp::AddMethodsForDocument(QTextStream& strea
 
 	const imtsdl::SdlRequestList requestList = m_sdlRequestListCompPtr->GetRequests(true);
 	for (const imtsdl::CSdlRequest& sdlRequest: requestList){
-		AddMethodForDocument(stream, sdlRequest, hIndents);
+		if (sdlRequest.GetType() != imtsdl::CSdlRequest::T_SUBSCRIPTION) {
+			AddMethodForDocument(stream, sdlRequest, hIndents);
+		}
 	}
 }
 
@@ -221,7 +221,9 @@ void CGqlHandlerBaseClassGeneratorComp::AddCollectionMethodsImplForDocument(QTex
 
 		// create sections for expected command IDs
 		for (const imtsdl::CSdlRequest& sdlRequest: requestList){
-			AddImplCodeForRequest(stream, sdlRequest, hIndents + 1);
+			if (sdlRequest.GetType() != imtsdl::CSdlRequest::T_SUBSCRIPTION) {
+				AddImplCodeForRequest(stream, sdlRequest, hIndents + 1);
+			}
 		}
 
 		// create default section

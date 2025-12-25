@@ -98,10 +98,10 @@ private:
 	bool AddImplCodeForRequest(QTextStream& stream, const ImplGenerationInfo& sdlRequest, imtsdl::CSdlDocumentType::OperationType operationType, const imtsdl::CSdlDocumentType& sdlDocumentType, uint hIndents = 0) const;
 	void AddSpecialMethodImplCodeForDocument(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType) const;
 	void AddSpecialMethodImplCode(QTextStream& stream, imtsdl::CSdlDocumentType::OperationType operationType, const QList<ImplGenerationInfo>& requestList, const QString& className, uint hIndents = 1) const;
-	QString GetInputExtractionStringForTypeName(const imtsdl::CSdlRequest& sdlRequest, const QString typeName, const QString version = QString(), bool* okPtr = nullptr) const;
+	QString GetInputExtractionStringForTypeName(const imtsdl::CSdlRequest& sdlRequest, const QString& typeName, const QString& version = QString(), bool* okPtr = nullptr) const;
 
 	/// \param _isRoot - internal recursive param. NEVER SET IT!
-	bool FindCallChainForField(const imtsdl::CSdlField& sdlRequest, const QString typeName, QString& callChain, bool _isRoot = true) const;
+	bool FindCallChainForField(const imtsdl::CSdlField& sdlRequest, const QString& typeName, QString& callChain, bool _isRoot = true) const;
 
 private:
 	I_REF(imtsdl::ISdlProcessArgumentsParser, m_argumentParserCompPtr);

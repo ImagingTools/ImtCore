@@ -9,8 +9,6 @@
 #include <istd/CSystem.h>
 #include <iprm/CParamsSet.h>
 #include <iprm/COptionsManager.h>
-#include <iprm/CEnableableParam.h>
-#include <ifile/CFileNameParam.h>
 
 // ImtCore includes
 #include <imtsdl/CSimpleFileJoinerComp.h>
@@ -75,7 +73,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessEntry (
 	Q_ASSERT(m_dependentSchemaListCompPtr.IsValid());
 
 
-	const imtsdl::CSdlDocumentType* sdlDocumentType = dynamic_cast<const imtsdl::CSdlDocumentType*>(&sdlEntry);
+	const auto* sdlDocumentType = dynamic_cast<const imtsdl::CSdlDocumentType*>(&sdlEntry);
 	if (sdlDocumentType == nullptr || (headerDevicePtr == nullptr && sourceDevicePtr == nullptr)){
 		return false;
 	}
@@ -97,15 +95,15 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessEntry (
 QList<imtsdl::IncludeDirective> CGqlCollectionControllerBaseClassGeneratorComp::GetIncludeDirectives() const
 {
 	if (!m_sdlRequestListCompPtr.IsValid()){
-		return QList<imtsdl::IncludeDirective>();
+		return {};
 	}
 
 	imtsdl::SdlDocumentTypeList list = m_sdlDocumentListCompPtr->GetDocumentTypes(true);
 	if (list.isEmpty()){
-		return QList<imtsdl::IncludeDirective>();
+		return {};
 	}
 
-	static QList<imtsdl::IncludeDirective> retVal = {
+	static QList retVal = {
 		CreateImtDirective("<imtservergql/CObjectCollectionControllerCompBase.h>")
 	};
 
@@ -209,7 +207,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(cons
 		operationsList.removeAll(imtsdl::CSdlDocumentType::OT_GET_VIEW);
 	}
 
-	// remove all collection trtivial types
+	// remove all collection trivial types
 	operationsList.removeAll(imtsdl::CSdlDocumentType::OT_DELETE);
 	operationsList.removeAll(imtsdl::CSdlDocumentType::OT_ELEMENT_IDS);
 	operationsList.removeAll(imtsdl::CSdlDocumentType::OT_ELEMENTS_COUNT);
@@ -388,10 +386,10 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddRequiredIncludesForDocum
 	FeedStream(stream, 1, false);
 
 	const QMultiMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> operationsList = sdlDocumentType.GetOperationsList();
-	for (auto operationIter = operationsList.cbegin(); operationIter != operationsList.cend(); ++operationIter){
+	for (const auto & operationIter : operationsList){
 		FeedStreamHorizontally(stream, hIndents);
 		stream << QStringLiteral("#include \"C");
-		stream << GetCapitalizedValue(operationIter->GetName());
+		stream << GetCapitalizedValue(operationIter.GetName());
 		stream << QStringLiteral("GqlRequest.h\"");
 
 		FeedStream(stream, 1, false);
@@ -422,7 +420,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodsForDocument(
 #endif
 	while (operationsIter.hasNext()){
 		auto operation = operationsIter.next();
-		imtsdl::CSdlRequest sdlRequest = operation.value();
+		const imtsdl::CSdlRequest& sdlRequest = operation.value();
 		imtsdl::CSdlDocumentType::OperationType operationType = operation.key();
 
 		if (	operationType == imtsdl::CSdlDocumentType::OT_GET ||
@@ -923,24 +921,24 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddCollectionMethodsImplFor
 	const QString className = 'C' + sdlDocumentType.GetName() + QStringLiteral("CollectionControllerCompBase");
 
 	QMultiMap<imtsdl::CSdlDocumentType::OperationType, ImplGenerationInfo> requestInfoMultiMap;
-	QMultiMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> requestMap(sdlDocumentType.GetOperationsList());
+	QMultiMap requestMap(sdlDocumentType.GetOperationsList());
 	const QString typeClassName = sdlDocumentType.GetReferenceType().GetName();
 	for (auto mapIter = requestMap.cbegin(); mapIter != requestMap.cend(); ++mapIter){
 		requestInfoMultiMap.insert(mapIter.key(), ImplGenerationInfo(mapIter.value(), typeClassName));
 	}
 
 	for (const imtsdl::CSdlDocumentType& documentType: sdlDocumentType.GetSubtypes()){
-		QMultiMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> subtypeRequestMap(documentType.GetOperationsList());
+		QMultiMap subtypeRequestMap(documentType.GetOperationsList());
 		const QString subtypeClassName = documentType.GetReferenceType().GetName();
 		for (auto mapIter = subtypeRequestMap.cbegin(); mapIter != subtypeRequestMap.cend(); ++mapIter){
 			requestInfoMultiMap.insert(mapIter.key(), ImplGenerationInfo(mapIter.value(), subtypeClassName));
 		}
 	}
-	QList<imtsdl::CSdlDocumentType::OperationType> remainingOperations({
-																		imtsdl::CSdlDocumentType::OT_GET,
-																		imtsdl::CSdlDocumentType::OT_INSERT,
-																		imtsdl::CSdlDocumentType::OT_UPDATE,
-																		imtsdl::CSdlDocumentType::OT_LIST});
+	QList remainingOperations({
+					imtsdl::CSdlDocumentType::OT_GET,
+					imtsdl::CSdlDocumentType::OT_INSERT,
+					imtsdl::CSdlDocumentType::OT_UPDATE,
+					imtsdl::CSdlDocumentType::OT_LIST});
 
 	for (imtsdl::CSdlDocumentType::OperationType operationType: requestInfoMultiMap.uniqueKeys()){
 		const QList<ImplGenerationInfo> requestList = requestInfoMultiMap.values(operationType);
@@ -1126,7 +1124,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddSpecialMethodImplCodeFor
 	const QString className = 'C' + sdlDocumentType.GetName() + QStringLiteral("CollectionControllerCompBase");
 
 	QMultiMap<imtsdl::CSdlDocumentType::OperationType, ImplGenerationInfo> requestInfoMultiMap;
-	QMultiMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> requestMap(sdlDocumentType.GetOperationsList());
+	QMultiMap requestMap(sdlDocumentType.GetOperationsList());
 	const QString typeClassName = sdlDocumentType.GetReferenceType().GetName();
 	for (auto mapIter = requestMap.cbegin(); mapIter != requestMap.cend(); ++mapIter){
 		if (s_nonTrivialOperationMethodsMap.contains(mapIter.key())){
@@ -1135,7 +1133,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddSpecialMethodImplCodeFor
 	}
 
 	for (const imtsdl::CSdlDocumentType& documentType: sdlDocumentType.GetSubtypes()){
-		QMultiMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> subtypeRequestMap(documentType.GetOperationsList());
+		QMultiMap subtypeRequestMap(documentType.GetOperationsList());
 		const QString subtypeClassName = documentType.GetReferenceType().GetName();
 		for (auto mapIter = subtypeRequestMap.cbegin(); mapIter != subtypeRequestMap.cend(); ++mapIter){
 			if (s_nonTrivialOperationMethodsMap.contains(mapIter.key())){
@@ -1144,7 +1142,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddSpecialMethodImplCodeFor
 		}
 	}
 
-	QList<imtsdl::CSdlDocumentType::OperationType> remainingOperations(requestInfoMultiMap.uniqueKeys());
+	QList remainingOperations(requestInfoMultiMap.uniqueKeys());
 	QMutableListIterator remainingOperationsIter(remainingOperations);
 	while(remainingOperationsIter.hasNext()){
 		imtsdl::CSdlDocumentType::OperationType operationType = remainingOperationsIter.next();
@@ -1452,8 +1450,8 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 
 QString CGqlCollectionControllerBaseClassGeneratorComp::GetInputExtractionStringForTypeName(
 			const imtsdl::CSdlRequest& sdlRequest,
-			const QString typeName,
-			const QString version,
+			const QString& typeName,
+			const QString& version,
 			bool* okPtr) const
 {
 	QString retVal = QStringLiteral(".GetRequestedArguments().");
@@ -1488,11 +1486,11 @@ QString CGqlCollectionControllerBaseClassGeneratorComp::GetInputExtractionString
 
 	SendErrorMessage(0, QString("'collectionSchema' section processing error: Unable to find reference name '%1' in input arguments for '%2'").arg(sdlRequest.GetName(), typeName));
 
-	return QString();
+	return {};
 }
 
 
-bool CGqlCollectionControllerBaseClassGeneratorComp::FindCallChainForField(const imtsdl::CSdlField& aSdlField, const QString typeName, QString& callChain, bool _isRoot) const
+bool CGqlCollectionControllerBaseClassGeneratorComp::FindCallChainForField(const imtsdl::CSdlField& aSdlField, const QString& typeName, QString& callChain, bool _isRoot) const
 {
 	bool isCustom = false;
 	ConvertType(aSdlField, &isCustom);
@@ -1514,7 +1512,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::FindCallChainForField(const
 		return true;
 	}
 
-	imtsdl::CSdlType* sdlTypePtr = dynamic_cast<imtsdl::CSdlType*>(foundEntry.get());
+        auto sdlTypePtr = dynamic_cast<imtsdl::CSdlType*>(foundEntry.get());
 	if (sdlTypePtr != nullptr){
 		for (const imtsdl::CSdlField& sdlField: sdlTypePtr->GetFields()){
 			if (sdlField.GetType() == typeName || FindCallChainForField(sdlField, typeName, callChain, false)){

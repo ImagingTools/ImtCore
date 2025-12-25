@@ -38,7 +38,7 @@ bool CGqlSchemaParser::ParseGqlSchema()
 {
 	bool retVal = true;
 
-	retVal = retVal && MoveToNextReadableSymbol();
+	retVal = MoveToNextReadableSymbol();
 	QByteArray keyword;
 	retVal = retVal && ReadToDelimeterOrSpace("{", keyword);
 
@@ -106,7 +106,7 @@ bool CGqlSchemaParser::ParseGqlSchema()
 }
 
 
-bool CGqlSchemaParser::SetSchemaName(const QString& schemaName)
+bool CGqlSchemaParser::SetSchemaName(const QString& schemaName) const
 {
 	iprm::ITextParam* nameParamPtr = dynamic_cast<iprm::ITextParam*>(m_schemaParamsPtr->GetEditableParameter(SdlCustomSchemaKeys::SchemaName.toUtf8()));
 	if (nameParamPtr == nullptr){
