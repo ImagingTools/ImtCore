@@ -37,7 +37,7 @@ class CTimeRange
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -91,7 +91,7 @@ class CSdlSize
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -145,7 +145,7 @@ class CSdlPoint
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -199,7 +199,7 @@ class CParamTypeIds
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -277,7 +277,7 @@ class CUrlParam
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -335,7 +335,7 @@ class CIdParam
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -387,7 +387,7 @@ class CTextParam
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -439,7 +439,7 @@ class CEnableableParam
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -491,7 +491,7 @@ class CIntegerParam
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -543,7 +543,7 @@ class CDoubleParam
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -595,7 +595,7 @@ class COption
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -653,7 +653,7 @@ class COptionsList
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -709,7 +709,7 @@ class CSelectionParam
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -763,7 +763,7 @@ class CSchedulerParam
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -817,7 +817,7 @@ class CBackupSettings
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -871,7 +871,7 @@ class CDatabaseAccessSettings
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -933,7 +933,7 @@ class CFileNameParam
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -987,7 +987,7 @@ class CParamsSet
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -1047,7 +1047,7 @@ class CMimeType
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};

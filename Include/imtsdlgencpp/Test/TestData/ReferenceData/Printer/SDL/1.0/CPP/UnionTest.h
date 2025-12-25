@@ -66,7 +66,7 @@ class CCoords
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -120,7 +120,7 @@ class CPrinterSpecificationBase
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -172,7 +172,7 @@ class CLink
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -228,7 +228,7 @@ class CPrinterBase
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};

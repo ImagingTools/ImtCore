@@ -11,12 +11,11 @@
 #include <iproc/IProcessor.h>
 #include <itest/CStandardTestExecutor.h>
 #include <iprm/CParamsSet.h>
-#include <ifile/CFileNameParam.h>
 
 // generated includes
 #include <GeneratedFiles/ImtSdlGenTest/CImtSdlGenTest.h>
 
-#define IMT_QML_FINAL_APPROVED 0
+
 namespace imtsdlgentest
 {
 

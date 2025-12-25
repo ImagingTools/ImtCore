@@ -129,7 +129,7 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const imtsdl::CSdlType& sd
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize");
+	stream << QStringLiteral("PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize");
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream, 2);

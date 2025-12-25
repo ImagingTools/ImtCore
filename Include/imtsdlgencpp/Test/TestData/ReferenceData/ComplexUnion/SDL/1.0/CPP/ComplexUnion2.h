@@ -52,7 +52,7 @@ class CResult
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -126,7 +126,7 @@ class CArea
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -186,7 +186,7 @@ class CAnalyzer
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -242,7 +242,7 @@ class CInspection
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -302,7 +302,7 @@ class CProductOverview
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -366,7 +366,7 @@ class CLocalizedText
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -420,7 +420,7 @@ class CCoordinates
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -476,7 +476,7 @@ class CExtendedMetaData
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -530,7 +530,7 @@ class CResultMetaData
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -596,7 +596,7 @@ class COverallResultValues
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -656,7 +656,7 @@ class CUnionTestingType
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -712,7 +712,7 @@ class CCDMResultVarRecursive
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -772,7 +772,7 @@ class CCDMResultVarString
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -832,7 +832,7 @@ class CCDMResult
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -892,7 +892,7 @@ class CPointsInCoordinateFormat
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -944,7 +944,7 @@ class CCollectionViewParamsTest
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};

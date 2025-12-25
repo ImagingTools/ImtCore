@@ -132,7 +132,7 @@ class CTimeFilter
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -190,7 +190,7 @@ class CFieldSortingInfo
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -244,7 +244,7 @@ class CFieldFilter
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -302,7 +302,7 @@ class CGroupFilter
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};
@@ -358,7 +358,7 @@ class CComplexCollectionFilter
 public:
 	enum ProtocolVersion
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
 		PV_1_0,
 		PV_LAST = PV_1_0
 	};

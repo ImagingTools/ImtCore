@@ -6,11 +6,8 @@
 #include <QtCore/QTextStream>
 
 // Acf includes
-#include <istd/CSystem.h>
 #include <iprm/CParamsSet.h>
 #include <iprm/COptionsManager.h>
-#include <iprm/CEnableableParam.h>
-#include <ifile/CFileNameParam.h>
 
 // ImtCore includes
 #include <imtsdl/CSimpleFileJoinerComp.h>
@@ -34,7 +31,7 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessEntry (
 	Q_ASSERT(m_sdlTypeListCompPtr.IsValid());
 	Q_ASSERT(m_dependentSchemaListCompPtr.IsValid());
 
-	const imtsdl::CSdlRequest* sdlRequestPtr = dynamic_cast<const imtsdl::CSdlRequest*>(&sdlEntry);
+	const auto* sdlRequestPtr = dynamic_cast<const imtsdl::CSdlRequest*>(&sdlEntry);
 	if (sdlRequestPtr == nullptr || (headerDevicePtr == nullptr && sourceDevicePtr == nullptr)){
 		I_CRITICAL();
 
@@ -456,9 +453,9 @@ void CGqlWrapClassCodeGeneratorComp::GenerateRequestedFieldsParsing(
 	}
 
 	std::shared_ptr<imtsdl::CSdlEntryBase> foundEntry = GetSdlTypeOrEnumOrUnionForField(sdlField, 
-																						m_sdlTypeListCompPtr->GetSdlTypes(false),
-																						m_sdlEnumListCompPtr->GetEnums(false),
-																						m_sdlUnionListCompPtr->GetUnions(false));
+				m_sdlTypeListCompPtr->GetSdlTypes(false),
+				m_sdlEnumListCompPtr->GetEnums(false),
+				m_sdlUnionListCompPtr->GetUnions(false));
 	const imtsdl::CSdlType* sdlTypePtr = dynamic_cast<imtsdl::CSdlType*>(foundEntry.get());
 	const imtsdl::CSdlUnion* sdlUnionPtr = dynamic_cast<imtsdl::CSdlUnion*>(foundEntry.get());
 	if(sdlTypePtr == nullptr && sdlUnionPtr == nullptr){
@@ -526,13 +523,13 @@ void CGqlWrapClassCodeGeneratorComp::GenerateRequestedFieldsParsing(
 		bool isEnum = false;
 		bool isUnion = false;
 		ConvertTypeOrEnumOrUnion(typeField,
-								 m_sdlEnumListCompPtr->GetEnums(false),
-								 m_sdlUnionListCompPtr->GetUnions(false),
-								 &isCustom,
-								 nullptr,
-								 nullptr,
-								 &isEnum,
-								 &isUnion);
+					m_sdlEnumListCompPtr->GetEnums(false),
+					m_sdlUnionListCompPtr->GetUnions(false),
+					&isCustom,
+					nullptr,
+					nullptr,
+					&isEnum,
+					&isUnion);
 		if (!isCustom || isEnum || isUnion){
 			continue;
 		}
