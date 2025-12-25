@@ -22,7 +22,7 @@ public:
 
 	I_BEGIN_COMPONENT(CCollectionDocumentManagerComp)
 		I_REGISTER_INTERFACE(imtdoc::IDocumentManager)
-		I_ASSIGN_MULTI_0(m_handlerCompPtr, "DocumentManagerEventHandler", "Document manager event handler", false, "DocumentManagerEventHandler");
+		I_ASSIGN_MULTI_0(m_handlerCompPtr, "DocumentManagerEventHandler", "Document manager event handler", false);
 		I_ASSIGN_MULTI_0(m_objectTypeIdsAttrPtr, "ObjectTypeIdList", "List of the object type-IDs according to the list of factories ('ObjectFactories')", true);
 		I_ASSIGN(m_collectionCompPtr, "Collection", "Document collection containing related documents", true, "Collection");
 		I_ASSIGN(m_undoManagerFactPtr, "UndoManager", "Factory of the undo manager", false, "UndoManager");
