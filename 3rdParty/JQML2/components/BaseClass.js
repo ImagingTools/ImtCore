@@ -297,7 +297,6 @@ class BaseClass extends QtObject {
 
 	toJson() {
 		let list = this.getProperties()
-
 		let json = '{'
 		let isFirst = true
 		for (let i = 0; i < list.length; i++) {
@@ -307,6 +306,7 @@ class BaseClass extends QtObject {
 			}
 			if (!isFirst) json += ','
 			isFirst = false
+
 			if (typeof this[key] === 'object') {
 				if (Array.isArray(this[key])) {
 

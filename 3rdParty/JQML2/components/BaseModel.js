@@ -15,7 +15,7 @@ class BaseModel extends ListModel {
 		let list = []
 
 		for (let key in item.$properties) {
-			if (key[0] === 'm' && key[1] === '_') {
+			if (key[0] === 'm' && key[1] === '_' || key == '__typename') {
 				list.push(key)
 			}
 		}
