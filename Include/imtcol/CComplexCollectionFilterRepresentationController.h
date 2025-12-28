@@ -39,7 +39,7 @@ private:
 		ilog::IMessageConsumer* messageConsumerPtr);
 	static bool ProcessGroupFilter(
 		const sdl::imtbase::ComplexCollectionFilter::CGroupFilter::V1_0& source,
-		imtbase::IComplexCollectionFilter::GroupFilter& target,
+		imtbase::IComplexCollectionFilter::FilterExpression& target,
 		ilog::IMessageConsumer* messageConsumerPtr);
 
 	static void SendErrorMessage(const QString& message, ilog::IMessageConsumer* messageConsumerPtr);

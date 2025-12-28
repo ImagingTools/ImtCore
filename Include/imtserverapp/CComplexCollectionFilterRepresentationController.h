@@ -22,7 +22,11 @@ public:
 		FOF_EQUAL = 2,
 		FOF_LESS = 4,
 		FOF_GREATER = 8,
-		FOF_CONTAINS = 16
+		FOF_CONTAINS = 16,
+		FOF_ARRAY_IS_EMPTY = 32,
+		FOF_ARRAY_HAS_ANY = 64,
+		FOF_ARRAY_HAS_ALL = 128,
+		FOF_ARRAY_ILIKE_ANY = 256
 	};
 
 	CComplexCollectionFilterRepresentationController();
@@ -41,17 +45,36 @@ public:
 private:
 	QString GetFlagsAsString(int flags) const;
 	bool GetFieldFilterFromSdlRepresentation(
-				const sdl::imtbase::ComplexCollectionFilter::CFieldFilter::V1_0& representation,
+				const sdl::imtbase::ComplexCollectionFilter::FieldFilterUnion& representation,
 				imtbase::IComplexCollectionFilter::FieldFilter& fieldFilter) const;
 	bool GetSdlRepresentationFromFieldFilter(
 				const imtbase::IComplexCollectionFilter::FieldFilter& fieldFilter,
-				sdl::imtbase::ComplexCollectionFilter::CFieldFilter::V1_0& representation) const;
+				sdl::imtbase::ComplexCollectionFilter::FieldFilterUnion& representation) const;
 	bool GetGroupFilterFromSdlRepresentation(
 				const sdl::imtbase::ComplexCollectionFilter::CGroupFilter::V1_0& representation,
-				imtbase::IComplexCollectionFilter::GroupFilter& groupFilter) const;
+				imtbase::IComplexCollectionFilter::FilterExpression& groupFilter) const;
 	bool GetSdlRepresentationFromGroupFilter(
-				const imtbase::IComplexCollectionFilter::GroupFilter& groupFilter,
+				const imtbase::IComplexCollectionFilter::FilterExpression& groupFilter,
 				sdl::imtbase::ComplexCollectionFilter::CGroupFilter::V1_0& representation) const;
+
+	bool GetSdlMetaTypeFromVariantType(const int& typeId, sdl::imtbase::ComplexCollectionFilter::ValueType& sdlType) const;
+	bool GetQVariantFromSdlValue(const QString& sdlValue, const sdl::imtbase::ComplexCollectionFilter::ValueType& valueType, QVariant& value) const;
+	int ComputeFlagsFromSdlOperations(
+				const imtsdl::TElementList<sdl::imtbase::ComplexCollectionFilter::FilterOperation>& filterOperations) const;
+	void MapFieldOperationToSdlOperations(
+				imtbase::IComplexCollectionFilter::FieldOperation op,
+				imtsdl::TElementList<sdl::imtbase::ComplexCollectionFilter::FilterOperation>& outOperations) const;
+
+	bool FieldIsExists(const imtbase::IComplexCollectionFilter::Fields& fields, const QByteArray& fieldId) const;
+	bool CreateOrUpdateFieldInfo(
+				imtbase::IComplexCollectionFilter::Fields& fields,
+				const QByteArray& fieldId,
+				std::optional<imtbase::IComplexCollectionFilter::FieldType> fieldType = std::nullopt,
+				std::optional<bool> filterable = std::nullopt,
+				std::optional<bool> sortable = std::nullopt,
+				std::optional<bool> isDistinct = std::nullopt,
+				std::optional<imtbase::IComplexCollectionFilter::SortingOrder> sortingOrder = std::nullopt
+			) const;
 
 private:
 	static const QMap<int, imtbase::IComplexCollectionFilter::FieldOperation> s_allowableFlagsCombination;

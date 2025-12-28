@@ -72,7 +72,14 @@ OptionsFilterDelegate {
 				}
 				else{
 					let filter = defaultFieldFilter.copyMe()
-					filter.m_filterValue = optionId
+					if (filter.m_filterValue !== undefined){
+						filter.m_filterValue = optionId
+					}
+
+					if (filter.m_filterValues !== undefined){
+						filter.m_filterValues.push(optionId)
+					}
+
 					collectionFilter.addFieldFilter(filter)
 				}
 			}

@@ -23,7 +23,8 @@ public:
 
 private:
 	static QString ProcessColumn(const imtbase::IComplexCollectionFilter::FieldFilter& filter, SqlContext sqlContext = SC_GENERAL);
-	static QString ProcessGroup(const imtbase::IComplexCollectionFilter::GroupFilter& filter, SqlContext sqlContext = SC_GENERAL);
+	static QString ProcessGroup(const imtbase::IComplexCollectionFilter::FilterExpression& filter, SqlContext sqlContext = SC_GENERAL);
+	static QString ToSqlArray(const QVariantList& values);
 };
 
 

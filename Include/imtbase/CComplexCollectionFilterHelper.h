@@ -16,11 +16,12 @@ public:
 	static void SetSortingOrder(IComplexCollectionFilter& filter, const QByteArrayList& fieldIds, IComplexCollectionFilter::SortingOrder order);
 
 	static QSet<QByteArray> GetSortingFieldIds(const IComplexCollectionFilter& filter);
-	static QSet<QByteArray> GetFilteringFieldIds(const IComplexCollectionFilter::GroupFilter& filter);
+	static QSet<QByteArray> GetFilteringFieldIds(const IComplexCollectionFilter::FilterExpression& filter);
 
-	static QString GetTextFilter(const imtbase::IComplexCollectionFilter::GroupFilter& filter);
+	static QString GetTextFilter(const imtbase::IComplexCollectionFilter::FilterExpression& filter);
 	static void SetTextFilter(imtbase::IComplexCollectionFilter& filter, const QByteArrayList& fieldIds, const QString& text);
-	static void FillTextFilter(imtbase::IComplexCollectionFilter::GroupFilter& groupFilter, const QByteArrayList& fieldIds, const QString& text);
+
+	static void FillTextFilter(imtbase::IComplexCollectionFilter::FilterExpression& groupFilter, const QByteArrayList& fieldIds, const QString& text);
 };
 
 

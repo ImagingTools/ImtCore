@@ -14,25 +14,6 @@ namespace imtbase
 
 // public methods of the embedded class FieldFilter
 
-bool IComplexCollectionFilter::FieldSortingInfo::operator==(const FieldSortingInfo& other) const
-{
-	bool retVal = true;
-
-	retVal = retVal && (fieldId == other.fieldId);
-	retVal = retVal && (sortingOrder == other.sortingOrder);
-
-	return retVal;
-}
-
-
-bool IComplexCollectionFilter::FieldSortingInfo::operator!=(const FieldSortingInfo& other) const
-{
-	return !(*this == other);
-}
-
-
-// public methods of the embedded class FieldFilter
-
 bool IComplexCollectionFilter::FieldFilter::operator==(const FieldFilter& other) const
 {
 	bool retVal = true;
@@ -51,20 +32,79 @@ bool IComplexCollectionFilter::FieldFilter::operator!=(const FieldFilter& other)
 }
 
 
-// public methods of the embedded class GroupFilter
+// public methods of the embedded class FilterExpression
 
-bool IComplexCollectionFilter::GroupFilter::operator==(const GroupFilter& other) const
+bool IComplexCollectionFilter::FilterExpression::operator==(const FilterExpression& other) const
 {
 	bool retVal = true;
 
 	retVal = retVal && (fieldFilters == other.fieldFilters);
-	retVal = retVal && (groupFilters == other.groupFilters);
+	retVal = retVal && (filterExpressions == other.filterExpressions);
 	retVal = retVal && (logicalOperation == other.logicalOperation);
 
 	return retVal;
 }
 
-bool IComplexCollectionFilter::GroupFilter::operator!=(const GroupFilter& other) const
+bool IComplexCollectionFilter::FilterExpression::operator!=(const FilterExpression& other) const
+{
+	return !(*this == other);
+}
+
+
+// public methods of the embedded class FieldMetaInfo
+
+bool IComplexCollectionFilter::FieldMetaInfo::operator==(const FieldMetaInfo& other) const
+{
+	bool retVal = true;
+
+	retVal = retVal && (type == other.type);
+	retVal = retVal && (flags == other.flags);
+	retVal = retVal && (isDistinct == other.isDistinct);
+	retVal = retVal && (sortingOrder == other.sortingOrder);
+
+	return retVal;
+}
+
+
+bool IComplexCollectionFilter::FieldMetaInfo::operator!=(const FieldMetaInfo& other) const
+{
+	return !(*this == other);
+}
+
+
+// public methods of the embedded class TextFilter
+
+bool IComplexCollectionFilter::TextFilter::operator==(const TextFilter& other) const
+{
+	bool retVal = true;
+
+	retVal = retVal && (text == other.text);
+	retVal = retVal && (fieldIds == other.fieldIds);
+
+	return retVal;
+}
+
+
+bool IComplexCollectionFilter::TextFilter::operator!=(const TextFilter& other) const
+{
+	return !(*this == other);
+}
+
+
+// public methods of the embedded class FieldInfo
+
+bool IComplexCollectionFilter::FieldInfo::operator==(const FieldInfo& other) const
+{
+	bool retVal = true;
+
+	retVal = retVal && (id == other.id);
+	retVal = retVal && (metaInfo == other.metaInfo);
+
+	return retVal;
+}
+
+
+bool IComplexCollectionFilter::FieldInfo::operator!=(const FieldInfo& other) const
 {
 	return !(*this == other);
 }

@@ -8,9 +8,9 @@ namespace imtbase
 
 IComplexCollectionFilter::SortingOrder CComplexCollectionFilterHelper::GetSortingOrder(const IComplexCollectionFilter& filter, const QByteArrayList& fieldIds)
 {
-	for (const IComplexCollectionFilter::FieldSortingInfo& info : filter.GetSortingInfo()){
-		if (fieldIds.contains(info.fieldId) || fieldIds.isEmpty()){
-			return info.sortingOrder;
+	for (const IComplexCollectionFilter::FieldInfo& info : filter.GetFields()){
+		if (fieldIds.contains(info.id) || fieldIds.isEmpty()){
+			return info.metaInfo.sortingOrder;
 		}
 	}
 
@@ -20,18 +20,16 @@ IComplexCollectionFilter::SortingOrder CComplexCollectionFilterHelper::GetSortin
 
 void CComplexCollectionFilterHelper::SetSortingOrder(IComplexCollectionFilter& filter, const QByteArrayList& fieldIds, IComplexCollectionFilter::SortingOrder order)
 {
-	IComplexCollectionFilter::FieldSortingInfoList infoList;
-
 	for (const QByteArray& id : fieldIds){
-		IComplexCollectionFilter::FieldSortingInfo info;
+		IComplexCollectionFilter::FieldInfo* infoPtr = filter.GetEditableFieldInfo(id);
+		if (infoPtr != nullptr){
+			if (!(infoPtr->metaInfo.flags & IComplexCollectionFilter::SO_SORT)){
+				infoPtr->metaInfo.flags &= IComplexCollectionFilter::SO_SORT;
+			}
 
-		info.fieldId = id;
-		info.sortingOrder = order;
-
-		infoList.append(info);
+			infoPtr->metaInfo.sortingOrder = order;
+		}
 	}
-
-	filter.SetSortingInfo(infoList);
 }
 
 
@@ -39,15 +37,17 @@ QSet<QByteArray> CComplexCollectionFilterHelper::GetSortingFieldIds(const ICompl
 {
 	QSet<QByteArray> retVal;
 
-	for (const IComplexCollectionFilter::FieldSortingInfo& info : filter.GetSortingInfo()){
-		retVal += info.fieldId;
+	for (const IComplexCollectionFilter::FieldInfo& info : filter.GetFields()){
+		if (info.metaInfo.flags & IComplexCollectionFilter::SO_SORT && info.metaInfo.sortingOrder != IComplexCollectionFilter::SO_NO_ORDER){
+			retVal += info.id;
+		}
 	}
 
 	return retVal;
 }
 
 
-QSet<QByteArray> CComplexCollectionFilterHelper::GetFilteringFieldIds(const IComplexCollectionFilter::GroupFilter& filter)
+QSet<QByteArray> CComplexCollectionFilterHelper::GetFilteringFieldIds(const IComplexCollectionFilter::FilterExpression& filter)
 {
 	QSet<QByteArray> retVal;
 
@@ -55,7 +55,7 @@ QSet<QByteArray> CComplexCollectionFilterHelper::GetFilteringFieldIds(const ICom
 		retVal += fieldFilter.fieldId;
 	}
 
-	for (const IComplexCollectionFilter::GroupFilter& groupFilter : filter.groupFilters){
+	for (const IComplexCollectionFilter::FilterExpression& groupFilter : filter.filterExpressions){
 		retVal += GetFilteringFieldIds(groupFilter);
 	}
 
@@ -63,9 +63,9 @@ QSet<QByteArray> CComplexCollectionFilterHelper::GetFilteringFieldIds(const ICom
 }
 
 
-QString CComplexCollectionFilterHelper::GetTextFilter(const imtbase::IComplexCollectionFilter::GroupFilter& filter)
+QString CComplexCollectionFilterHelper::GetTextFilter(const imtbase::IComplexCollectionFilter::FilterExpression& filter)
 {
-	for (const IComplexCollectionFilter::GroupFilter& groupFilter : filter.groupFilters){
+	for (const IComplexCollectionFilter::FilterExpression& groupFilter : filter.filterExpressions){
 		QString retVal = GetTextFilter(groupFilter);
 
 		if (!retVal.isEmpty()){
@@ -79,15 +79,20 @@ QString CComplexCollectionFilterHelper::GetTextFilter(const imtbase::IComplexCol
 
 void CComplexCollectionFilterHelper::SetTextFilter(imtbase::IComplexCollectionFilter& filter, const QByteArrayList& fieldIds, const QString& text)
 {
-	imtbase::IComplexCollectionFilter::GroupFilter groupFilter;
+	for (const QByteArray& id : fieldIds){
+		IComplexCollectionFilter::FieldInfo* infoPtr = filter.GetEditableFieldInfo(id);
+		if (infoPtr != nullptr){
+			if (!(infoPtr->metaInfo.flags & IComplexCollectionFilter::SO_TEXT_FILTER)){
+				infoPtr->metaInfo.flags &= IComplexCollectionFilter::SO_TEXT_FILTER;
+			}
+		}
+	}
 
-	FillTextFilter(groupFilter, fieldIds, text);
-
-	filter.SetFieldsFilter(groupFilter);
+	filter.SetTextFilter(text);
 }
 
 
-void CComplexCollectionFilterHelper::FillTextFilter(imtbase::IComplexCollectionFilter::GroupFilter& groupFilter, const QByteArrayList& fieldIds, const QString& text)
+void CComplexCollectionFilterHelper::FillTextFilter(imtbase::IComplexCollectionFilter::FilterExpression& groupFilter, const QByteArrayList& fieldIds, const QString& text)
 {
 	QVector<imtbase::IComplexCollectionFilter::FieldFilter> fieldFilters;
 	for (const QByteArray& fieldId : fieldIds){
@@ -103,7 +108,6 @@ void CComplexCollectionFilterHelper::FillTextFilter(imtbase::IComplexCollectionF
 	groupFilter.fieldFilters = fieldFilters;
 	groupFilter.logicalOperation = imtbase::IComplexCollectionFilter::LO_OR;
 }
-
 
 } // namespace imtbase
 

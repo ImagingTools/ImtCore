@@ -522,18 +522,19 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateTextFilterQuery(
 
 bool CSqlDatabaseObjectDelegateCompBase::CreateTextFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& textFilterQuery) const
 {
-	const QString textFilter = collectionFilter.GetTextFilter();
-	const QByteArrayList fieldIds = collectionFilter.GetTextFilterFieldsList();
-	if (fieldIds.isEmpty() || textFilter.isEmpty()){
-		return false;
-	}
+	textFilterQuery.clear();
 
-	for (const QByteArray& fieldId : fieldIds){
-		if (!textFilterQuery.isEmpty()){
-			textFilterQuery += QStringLiteral(" OR ");
+	QString textFilter = collectionFilter.GetTextFilter();
+	if (!textFilter.isEmpty()){
+		for (const imtbase::IComplexCollectionFilter::FieldInfo& info : collectionFilter.GetFields()){
+			if (info.metaInfo.flags & imtbase::IComplexCollectionFilter::SO_TEXT_FILTER){
+				if (!textFilterQuery.isEmpty()){
+					textFilterQuery += QStringLiteral(" OR ");
+				}
+		
+				textFilterQuery += QStringLiteral(R"("%1" ILIKE '%%2%')").arg(QString::fromUtf8(info.id), textFilter);
+			}
 		}
-
-		textFilterQuery += QStringLiteral(R"("%1" ILIKE '%%2%')").arg(QString::fromUtf8(fieldId), textFilter);
 	}
 
 	return true;

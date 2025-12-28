@@ -41,11 +41,11 @@ QByteArray CAuthorizationControllerComp::GetUserObjectId(const QByteArray& login
 	fieldFilter.fieldId = "Id";
 	fieldFilter.filterValue = login;
 
-	imtbase::IComplexCollectionFilter::GroupFilter groupFilter;
+	imtbase::IComplexCollectionFilter::FilterExpression groupFilter;
 	groupFilter.fieldFilters << fieldFilter;
 
 	imtbase::CComplexCollectionFilter complexFilter;
-	complexFilter.SetFieldsFilter(groupFilter);
+	complexFilter.SetFilterExpression(groupFilter);
 
 	iprm::CParamsSet filterParam;
 	filterParam.SetEditableParameter("ComplexFilter", &complexFilter);
@@ -138,11 +138,11 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 		fieldFilter.fieldId = "DocumentId";
 		fieldFilter.filterValue = objectId;
 
-		imtbase::IComplexCollectionFilter::GroupFilter groupFilter;
+		imtbase::IComplexCollectionFilter::FilterExpression groupFilter;
 		groupFilter.fieldFilters << fieldFilter;
 
 		imtbase::CComplexCollectionFilter complexFilter;
-		complexFilter.SetFieldsFilter(groupFilter);
+		complexFilter.SetFilterExpression(groupFilter);
 
 		iprm::CParamsSet filterParam;
 		filterParam.SetEditableParameter("ComplexFilter", &complexFilter);

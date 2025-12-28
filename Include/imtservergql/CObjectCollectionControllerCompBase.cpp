@@ -140,7 +140,7 @@ const imtbase::ISearchResults* CObjectCollectionControllerCompBase::Search(const
 		}
 	}
 
-	groupFilter.fieldFilters = fieldList;
+	// groupFilter.fieldFilters = fieldList;
 	complexFilter.fieldsFilter = groupFilter;
 
 	imtgql::CGqlParamObject input;
@@ -1539,40 +1539,65 @@ istd::IChangeableUniquePtr CObjectCollectionControllerCompBase::ExtractObject(co
 
 void CObjectCollectionControllerCompBase::ReplaceComplexFilterFields(imtbase::IComplexCollectionFilter& filter) const
 {
-	imtbase::IComplexCollectionFilter::FieldSortingInfoList sortingInfoList = filter.GetSortingInfo();
-	for (imtbase::IComplexCollectionFilter::FieldSortingInfo& fieldSortingInfo : sortingInfoList){
-		if (m_fieldReplacementMap.contains(fieldSortingInfo.fieldId)){
-			fieldSortingInfo.fieldId = m_fieldReplacementMap[fieldSortingInfo.fieldId];
+	for (const imtbase::IComplexCollectionFilter::FieldInfo& info: filter.GetFields()){
+		imtbase::IComplexCollectionFilter::FieldInfo* editableInfoPtr = filter.GetEditableFieldInfo(info.id);
+		if (editableInfoPtr != nullptr){
+			if (m_fieldReplacementMap.contains(editableInfoPtr->id)){
+				editableInfoPtr->id = m_fieldReplacementMap[editableInfoPtr->id];
+			}
 		}
 	}
-	filter.SetSortingInfo(sortingInfoList);
 
-	std::function<void (imtbase::IComplexCollectionFilter::GroupFilter&)> ProcessGroupFilter = [&](imtbase::IComplexCollectionFilter::GroupFilter& groupFilter){
+	std::function<void (imtbase::IComplexCollectionFilter::FilterExpression&)> ProcessGroupFilter = [&](imtbase::IComplexCollectionFilter::FilterExpression& groupFilter){
 		for (imtbase::IComplexCollectionFilter::FieldFilter& fieldFilter : groupFilter.fieldFilters){
 			if (m_fieldReplacementMap.contains(fieldFilter.fieldId)){
 				fieldFilter.fieldId = m_fieldReplacementMap[fieldFilter.fieldId];
 			}
 		}
 
-		for (imtbase::IComplexCollectionFilter::GroupFilter& groupFilterItem : groupFilter.groupFilters){
+		for (imtbase::IComplexCollectionFilter::FilterExpression& groupFilterItem : groupFilter.filterExpressions){
 			ProcessGroupFilter(groupFilterItem);
 		}
 	};
 
-	imtbase::IComplexCollectionFilter::GroupFilter fieldsFilter = filter.GetFieldsFilter();
+	imtbase::IComplexCollectionFilter::FilterExpression fieldsFilter = filter.GetFilterExpression();
 	ProcessGroupFilter(fieldsFilter);
-	filter.SetFieldsFilter(fieldsFilter);
+	filter.SetFilterExpression(fieldsFilter);
 
-	QByteArrayList textFilterFieldsList = filter.GetTextFilterFieldsList();
-	QByteArrayList retValFieldsList = textFilterFieldsList;
+	UpdateFieldsInfoFromHeaders(filter);
+}
 
-	for (int i = 0; i < textFilterFieldsList.size(); i++){
-		if (m_fieldReplacementMap.contains(textFilterFieldsList[i])){
-			retValFieldsList[i] = m_fieldReplacementMap[textFilterFieldsList[i]];
-		}
+
+void CObjectCollectionControllerCompBase::UpdateFieldsInfoFromHeaders(imtbase::IComplexCollectionFilter& filter) const
+{
+	if (!m_headersProviderCompPtr.IsValid()){
+		return;
 	}
 
-	filter.SetTextFilterFieldsList(retValFieldsList);
+	imtcol::ICollectionHeadersProvider::HeaderIds headerIds = m_headersProviderCompPtr->GetHeaderIds();
+	for (const QByteArray& headerId : headerIds){
+		imtcol::ICollectionHeadersProvider::HeaderInfo headerInfo;
+		if (m_headersProviderCompPtr->GetHeaderInfo(headerId, headerInfo)){
+			imtbase::IComplexCollectionFilter::FieldInfo* fieldInfoPtr = filter.GetEditableFieldInfo(headerId);
+			if (fieldInfoPtr != nullptr){
+				if (headerInfo.filterable){
+					if (!(fieldInfoPtr->metaInfo.flags & imtbase::IComplexCollectionFilter::SO_TEXT_FILTER)){
+						fieldInfoPtr->metaInfo.flags &= imtbase::IComplexCollectionFilter::SO_TEXT_FILTER;
+					}
+				}
+
+				if (headerInfo.sortable){
+					if (!(fieldInfoPtr->metaInfo.flags & imtbase::IComplexCollectionFilter::SO_SORT)){
+						fieldInfoPtr->metaInfo.flags &= imtbase::IComplexCollectionFilter::SO_SORT;
+					}
+				}
+
+				if (headerInfo.fieldType == imtcol::ICollectionHeadersProvider::FT_ARRAY){
+					fieldInfoPtr->metaInfo.type = imtbase::IComplexCollectionFilter::FT_ARRAY;
+				}
+			}
+		}
+	}
 }
 
 
@@ -2703,7 +2728,7 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 		bool isComplexFilterOk = complexFilterSdl.ReadFromGraphQlObject(*complexFilterModelPtr);
 		if (isComplexFilterOk){
 			istd::TDelPtr<imtbase::CComplexCollectionFilter> complexFilterPtr = new imtbase::CComplexCollectionFilter();
-			if (imtcol::CComplexCollectionFilterRepresentationController::ComplexCollectionFilterRepresentationToModel(complexFilterSdl, *complexFilterPtr, GetLogPtr())){
+			if (m_complexCollectionFilterRepresentationController.GetDataModelFromSdlRepresentation(*complexFilterPtr, complexFilterSdl)){
 				ReplaceComplexFilterFields(*complexFilterPtr);
 				SetAdditionalFilters(gqlRequest, *complexFilterPtr);
 
@@ -2799,10 +2824,7 @@ bool CObjectCollectionControllerCompBase::CreateCollectionFilterFromSdl(
 			iprm::CParamsSet& filterParams) const
 {
 	istd::TDelPtr<imtbase::CComplexCollectionFilter> complexFilterPtr = new imtbase::CComplexCollectionFilter();
-	if (imtcol::CComplexCollectionFilterRepresentationController::ComplexCollectionFilterRepresentationToModel(
-					collectionFilter,
-					*complexFilterPtr,
-					GetLogPtr())){
+	if (m_complexCollectionFilterRepresentationController.GetDataModelFromSdlRepresentation(*complexFilterPtr, collectionFilter)){
 		ReplaceComplexFilterFields(*complexFilterPtr);
 		filterParams.SetEditableParameter("ComplexFilter", complexFilterPtr.PopPtr(), true);
 

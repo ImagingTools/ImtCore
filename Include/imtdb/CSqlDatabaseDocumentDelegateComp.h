@@ -176,6 +176,7 @@ protected:
 	virtual QByteArray GetCustomColumnsQuery() const;
 	virtual bool CreateDocumentCollectionFilterQuery(const imtcol::IDocumentCollectionFilter& documentCollectionFilter, QString& documentFilterQuery) const;
 	virtual bool CreateDocumentIdFilterQuery(const imtcol::IDocumentIdFilter& documentIdFilter, QString& documentIdFilterQuery) const;
+	bool IsArrayOperation(const QString& query, const QString& field) const;
 
 protected:
 	I_ATTR(bool, m_useDataMetaInfoAttrPtr);

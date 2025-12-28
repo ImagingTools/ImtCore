@@ -23,6 +23,12 @@ enum FilterOperation
 	Less
 	Greater
 	Contains
+
+	# array semantics
+	ArrayHasAny
+	ArrayHasAll
+	ArrayIsEmpty
+	ArrayILikeAny
 }
 
 enum LogicalOperation
@@ -45,17 +51,28 @@ type FieldSortingInfo
 	sortingOrder: String!
 }
 
+union FieldFilterUnion  = FieldFilter | ArrayFieldFilter
+
+# ScalarFieldFilter
 type FieldFilter
 {
 	fieldId: ID!
-	filterValue: String!
+	filterValue: String
 	filterValueType: ValueType!
 	filterOperations: [FilterOperation]!
 }
 
+type ArrayFieldFilter
+{
+	fieldId: ID!							# The unique identifier of the field to filter
+	filterValues: [String]!					# List of values to filter by, stored as strings
+	filterValueType: ValueType!				# The type of elements in the array (Integer, Number, String, Bool)
+	filterOperations: [FilterOperation]!	# List of operations to apply on the array field
+}
+
 type GroupFilter
 {
-	fieldFilters: [FieldFilter]
+	fieldFilters: [FieldFilterUnion]
 	groupFilters: [GroupFilter]
 	logicalOperation: LogicalOperation!
 }

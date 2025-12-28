@@ -293,11 +293,11 @@ bool CLicenseCollectionControllerComp::FillObjectFromRepresentation(
 	fieldFilter.fieldId = "LicenseId";
 	fieldFilter.filterValue = licenseId;
 	
-	imtbase::IComplexCollectionFilter::GroupFilter groupFilter;
+	imtbase::IComplexCollectionFilter::FilterExpression groupFilter;
 	groupFilter.fieldFilters << fieldFilter;
 	
 	imtbase::CComplexCollectionFilter complexFilter;
-	complexFilter.SetFieldsFilter(groupFilter);
+	complexFilter.SetFilterExpression(groupFilter);
 	
 	iprm::CParamsSet filterParam;
 	filterParam.SetEditableParameter("ComplexFilter", &complexFilter);

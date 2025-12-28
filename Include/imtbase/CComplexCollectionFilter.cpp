@@ -15,62 +15,102 @@ namespace imtbase
 
 bool CComplexCollectionFilter::AddFieldFilter(const FieldFilter& fieldFilter)
 {
-	if (m_fieldsFilter.fieldFilters.contains(fieldFilter)){
+	if (m_filterExpression.fieldFilters.contains(fieldFilter)){
 		return false;
 	}
-	
+
 	istd::CChangeNotifier changeNotifier(this);
-	
-	m_fieldsFilter.fieldFilters << fieldFilter;
-	
+
+	m_filterExpression.fieldFilters << fieldFilter;
+
 	return true;
 }
 
 
-bool CComplexCollectionFilter::AddGroupFilter(const GroupFilter& groupFilter)
+bool CComplexCollectionFilter::AddFilterExpression(const FilterExpression& groupFilter)
 {
-	if (m_fieldsFilter.groupFilters.contains(groupFilter)){
+	if (m_filterExpression.filterExpressions.contains(groupFilter)){
 		return false;
 	}
-	
+
 	istd::CChangeNotifier changeNotifier(this);
-	
-	m_fieldsFilter.groupFilters << groupFilter;
-	
+
+	m_filterExpression.filterExpressions << groupFilter;
+
 	return true;
+}
+
+
+QByteArrayList CComplexCollectionFilter::GetDistinctFieldsList() const
+{
+	QByteArrayList retVal;
+
+	for (const CComplexCollectionFilter::FieldInfo& info : m_fields){
+		if (info.metaInfo.isDistinct){
+			retVal << info.id;
+		}
+	}
+
+	return retVal;
+}
+
+
+QByteArrayList CComplexCollectionFilter::GetFilterableFieldList() const
+{
+	QByteArrayList retVal;
+
+	for (const CComplexCollectionFilter::FieldInfo& info : m_fields){
+		if (info.metaInfo.flags & CComplexCollectionFilter::SO_TEXT_FILTER){
+			retVal << info.id;
+		}
+	}
+
+	return retVal;
 }
 
 
 // reimplemented (imtbase::IComplexCollectionFilter)
 
-const IComplexCollectionFilter::FieldSortingInfoList& CComplexCollectionFilter::GetSortingInfo() const
+CComplexCollectionFilter::FieldInfo* CComplexCollectionFilter::GetEditableFieldInfo(const QByteArray& fieldId)
 {
-	return m_sortingInfo;
+	for (CComplexCollectionFilter::FieldInfo& info : m_fields){
+		if (info.id == fieldId){
+			return &info;
+		}
+	}
+
+	return nullptr;
 }
 
 
-void CComplexCollectionFilter::SetSortingInfo(const FieldSortingInfoList& info)
+const CComplexCollectionFilter::Fields& CComplexCollectionFilter::GetFields() const
 {
-	if (m_sortingInfo != info){
+	return m_fields;
+}
+
+
+void CComplexCollectionFilter::SetFields(const Fields& fields)
+{
+	if (m_fields != fields){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_sortingInfo = info;
+		m_fields = fields;
 	}
 }
 
 
-const IComplexCollectionFilter::GroupFilter& CComplexCollectionFilter::GetFieldsFilter() const
+const IComplexCollectionFilter::FilterExpression& CComplexCollectionFilter::GetFilterExpression() const
 {
-	return m_fieldsFilter;
+	return m_filterExpression;
 }
 
 
-void CComplexCollectionFilter::SetFieldsFilter(const GroupFilter& filter)
+void CComplexCollectionFilter::SetFilterExpression(const FilterExpression& filter)
 {
-	if (m_fieldsFilter != filter){
+	if (m_filterExpression != filter){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_fieldsFilter = filter;
+		m_filterExpression = filter;
 	}
 }
 
@@ -86,24 +126,6 @@ void CComplexCollectionFilter::SetTimeFilter(const imtbase::ITimeFilterParam& fi
 	istd::CChangeNotifier changeNotifier(this);
 
 	m_timeFilter.CopyFrom(filter);
-}
-
-
-const QByteArrayList& CComplexCollectionFilter::GetDistinctFieldsList() const
-{
-	return m_distinctFields;
-}
-
-
-void CComplexCollectionFilter::SetDistinctFieldsList(const QByteArrayList& filedIds)
-{
-	QSet<QByteArray> idsSet(filedIds.cbegin(), filedIds.cend());
-
-	if (idsSet.count() == filedIds.count()){
-		istd::CChangeNotifier changeNotifier(this);
-
-		m_distinctFields = filedIds;
-	}
 }
 
 
@@ -123,22 +145,6 @@ void CComplexCollectionFilter::SetTextFilter(const QString& textFilter)
 }
 
 
-const QByteArrayList& CComplexCollectionFilter::GetTextFilterFieldsList() const
-{
-	return m_textFilter.fieldIds;
-}
-
-
-void CComplexCollectionFilter::SetTextFilterFieldsList(const QByteArrayList& fieldIds)
-{
-	if (m_textFilter.fieldIds != fieldIds){
-		istd::CChangeNotifier changeNotifier(this);
-
-		m_textFilter.fieldIds = fieldIds;
-	}
-}
-
-
 // reimplemented (iser::ISerializable)
 
 bool CComplexCollectionFilter::Serialize(iser::IArchive &archive)
@@ -148,25 +154,25 @@ bool CComplexCollectionFilter::Serialize(iser::IArchive &archive)
 	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
 
 	// Serialization of the sorting model
-	int sortingItemCount = m_sortingInfo.count();
+	int sortingItemCount = m_fields.count();
 
 	static iser::CArchiveTag sortingFieldListTag("SortingFieldList", "Sorting field list", iser::CArchiveTag::TT_MULTIPLE);
 	static iser::CArchiveTag sortingFieldTag("SortingField", "Sorting field", iser::CArchiveTag::TT_GROUP);
 	retVal = retVal && archive.BeginMultiTag(sortingFieldListTag, sortingFieldTag, sortingItemCount);
 
-	m_sortingInfo.resize(sortingItemCount);
+	m_fields.resize(sortingItemCount);
 	for (int i = 0; i < sortingItemCount; i++){
-		FieldSortingInfo sortInfo;
+		FieldInfo sortInfo;
 		if (archive.IsStoring()){
-			sortInfo = m_sortingInfo[i];
+			sortInfo = m_fields[i];
 		}
 
 		retVal = retVal && archive.BeginTag(sortingFieldTag);
-		retVal = retVal && SerializeFieldSortingInfo(sortInfo, archive);
+		retVal = retVal && SerializeFields(sortInfo, archive);
 		retVal = retVal && archive.EndTag(sortingFieldTag);
 
 		if (!archive.IsStoring()){
-			m_sortingInfo[i] = sortInfo;
+			m_fields[i] = sortInfo;
 		}
 	}
 
@@ -175,7 +181,7 @@ bool CComplexCollectionFilter::Serialize(iser::IArchive &archive)
 	// Serialization of the filtering model
 	static iser::CArchiveTag filterTag("FieldsFilter", "Fields filter", iser::CArchiveTag::TT_GROUP);
 	retVal = retVal && archive.BeginTag(filterTag);
-	retVal = retVal && SerializeGroupFilter(m_fieldsFilter, archive);
+	retVal = retVal && SerializeGroupFilter(m_filterExpression, archive);
 	retVal = retVal && archive.EndTag(filterTag);
 
 	// Serialization of the time filter model
@@ -183,9 +189,6 @@ bool CComplexCollectionFilter::Serialize(iser::IArchive &archive)
 	retVal = retVal && archive.BeginTag(timeFilterTag);
 	retVal = retVal && m_timeFilter.Serialize(archive);
 	retVal = retVal && archive.EndTag(timeFilterTag);
-
-	// Serialization of the distinct fields IDs
-	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_distinctFields, "DistinctFields", "FieldId");
 
 	return retVal;
 }
@@ -205,10 +208,10 @@ bool CComplexCollectionFilter::CopyFrom(const IChangeable &object, Compatibility
 	if (implPtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_sortingInfo = implPtr->m_sortingInfo;
-		m_fieldsFilter = implPtr->m_fieldsFilter;
+		m_filterExpression = implPtr->m_filterExpression;
+		m_fields = implPtr->m_fields;
 		m_timeFilter = implPtr->m_timeFilter;
-		m_distinctFields = implPtr->m_distinctFields;
+		m_textFilter = implPtr->m_textFilter;
 
 		return true;
 	}
@@ -222,10 +225,10 @@ bool CComplexCollectionFilter::IsEqual(const IChangeable &object) const
 	const CComplexCollectionFilter* implPtr = dynamic_cast<const CComplexCollectionFilter*>(&object);
 	if (implPtr != nullptr){
 		return
-			(m_sortingInfo == implPtr->m_sortingInfo) &&
-			(m_fieldsFilter == implPtr->m_fieldsFilter) &&
-			(m_timeFilter.IsEqual(implPtr->m_timeFilter) &&
-			(m_distinctFields == implPtr->m_distinctFields));
+			(m_filterExpression == implPtr->m_filterExpression) &&
+			(m_fields == implPtr->m_fields) &&
+			(m_textFilter == implPtr->m_textFilter) &&
+			(m_timeFilter.IsEqual(implPtr->m_timeFilter));
 	}
 
 	return false;
@@ -247,35 +250,48 @@ bool CComplexCollectionFilter::ResetData(CompatibilityMode /*mode*/)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
-	m_sortingInfo.clear();
+	m_fields.clear();
+	m_filterExpression.fieldFilters.clear();
+	m_filterExpression.filterExpressions.clear();
+	m_filterExpression.logicalOperation = LO_AND;
+	m_textFilter.text.clear();
+	m_textFilter.fieldIds.clear();
+	m_timeFilter.ResetData();
 
-	m_fieldsFilter.fieldFilters.clear();
-	m_fieldsFilter.groupFilters.clear();
-	m_fieldsFilter.logicalOperation = LO_AND;
-	m_distinctFields.clear();
-
-	return m_timeFilter.ResetData();
+	return true;
 }
 
 
 // private methods
 
-bool CComplexCollectionFilter::SerializeFieldSortingInfo(IComplexCollectionFilter::FieldSortingInfo& object, iser::IArchive& archive)
+bool CComplexCollectionFilter::SerializeFields(IComplexCollectionFilter::FieldInfo& object, iser::IArchive& archive)
 {
 	bool retVal = true;
 
-	static iser::CArchiveTag fieldIdTag("FieldId", "Collection field ID", iser::CArchiveTag::TT_LEAF);
+	static iser::CArchiveTag fieldIdTag("FieldId", "Field-ID", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(fieldIdTag);
-	retVal = retVal && archive.Process(object.fieldId);
+	retVal = retVal && archive.Process(object.id);
 	retVal = retVal && archive.EndTag(fieldIdTag);
 
-	static iser::CArchiveTag orderTag("SortingOrder", "Sorting order", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(orderTag);
-	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeEnum<
-		SortingOrder,
-		IComplexCollectionFilter::ToString,
-		IComplexCollectionFilter::FromString>(archive, object.sortingOrder);
-	retVal = retVal && archive.EndTag(orderTag);
+	static iser::CArchiveTag fieldTypeTag("FieldType", "Field Type", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(fieldTypeTag);
+	retVal = retVal && I_SERIALIZE_ENUM(FieldType, archive, object.metaInfo.type);
+	retVal = retVal && archive.EndTag(fieldTypeTag);
+
+	static iser::CArchiveTag flagsTag("Flags", "Flags", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(flagsTag);
+	// retVal = retVal && I_SERIALIZE_FLAG(SupportedOperations, archive, object.metaInfo.flags);
+	retVal = retVal && archive.EndTag(flagsTag);
+
+	static iser::CArchiveTag isDistinctTag("IsDistinct", "Is Distinct", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(isDistinctTag);
+	retVal = retVal && archive.Process(object.metaInfo.isDistinct);
+	retVal = retVal && archive.EndTag(isDistinctTag);
+
+	static iser::CArchiveTag sortingOrderTag("SortingOrder", "Sorting Order", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(sortingOrderTag);
+	retVal = retVal && I_SERIALIZE_ENUM(SortingOrder, archive, object.metaInfo.sortingOrder);
+	retVal = retVal && archive.EndTag(sortingOrderTag);
 
 	return retVal;
 }
@@ -301,13 +317,14 @@ bool CComplexCollectionFilter::SerializeFieldFilter(IComplexCollectionFilter::Fi
 		FieldOperation,
 		IComplexCollectionFilter::ToString,
 		IComplexCollectionFilter::FromString>(archive, object.filterOperation);
+
 	retVal = retVal && archive.EndTag(operationTag);
 
 	return retVal;
 }
 
 
-bool CComplexCollectionFilter::SerializeGroupFilter(IComplexCollectionFilter::GroupFilter& object, iser::IArchive& archive)
+bool CComplexCollectionFilter::SerializeGroupFilter(IComplexCollectionFilter::FilterExpression& object, iser::IArchive& archive)
 {
 	bool retVal = true;
 
@@ -337,17 +354,17 @@ bool CComplexCollectionFilter::SerializeGroupFilter(IComplexCollectionFilter::Gr
 	retVal = retVal && archive.EndTag(fieldFilterListTag);
 
 	// Serialization of the sorting model
-	int groupFilterCount = object.groupFilters.count();
+	int groupFilterCount = object.filterExpressions.count();
 
 	static iser::CArchiveTag groupFilterListTag("GroupFilterList", "Group filter list", iser::CArchiveTag::TT_MULTIPLE);
-	static iser::CArchiveTag groupFilterTag("GroupFilter", "Group filter", iser::CArchiveTag::TT_GROUP);
+	static iser::CArchiveTag groupFilterTag("FilterExpression", "Group filter", iser::CArchiveTag::TT_GROUP);
 	retVal = retVal && archive.BeginMultiTag(groupFilterListTag, groupFilterTag, groupFilterCount);
 
-	object.groupFilters.resize(groupFilterCount);
+	object.filterExpressions.resize(groupFilterCount);
 	for (int i = 0; i < groupFilterCount; i++){
-		GroupFilter groupFilter;
+		FilterExpression groupFilter;
 		if (archive.IsStoring()){
-			groupFilter = object.groupFilters[i];
+			groupFilter = object.filterExpressions[i];
 		}
 
 		retVal = retVal && archive.BeginTag(groupFilterTag);
@@ -355,7 +372,7 @@ bool CComplexCollectionFilter::SerializeGroupFilter(IComplexCollectionFilter::Gr
 		retVal = retVal && archive.EndTag(groupFilterTag);
 
 		if (!archive.IsStoring()){
-			object.groupFilters[i] = groupFilter;
+			object.filterExpressions[i] = groupFilter;
 		}
 	}
 

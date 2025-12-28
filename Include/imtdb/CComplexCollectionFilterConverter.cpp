@@ -33,47 +33,68 @@ QMap<imtbase::IComplexCollectionFilter::FieldOperation, QString> boolOperations(
 	{imtbase::IComplexCollectionFilter::FO_EQUAL, "="},
 	{imtbase::IComplexCollectionFilter::FO_NOT_EQUAL, "!="}});
 
+QSet<imtbase::IComplexCollectionFilter::FieldOperation> arrayOperations({
+	imtbase::IComplexCollectionFilter::FO_ARRAY_HAS_ANY,
+	imtbase::IComplexCollectionFilter::FO_ARRAY_NOT_HAS_ANY,
+	imtbase::IComplexCollectionFilter::FO_ARRAY_HAS_ALL,
+	imtbase::IComplexCollectionFilter::FO_ARRAY_NOT_HAS_ALL,
+	imtbase::IComplexCollectionFilter::FO_ARRAY_IS_EMPTY,
+	imtbase::IComplexCollectionFilter::FO_ARRAY_NOT_IS_EMPTY,
+	imtbase::IComplexCollectionFilter::FO_ARRAY_ILIKE_ANY,
+	imtbase::IComplexCollectionFilter::FO_ARRAY_NOT_ILIKE_ANY
+});
+
 
 QString CComplexCollectionFilterConverter::CreateSqlSortQuery(const imtbase::IComplexCollectionFilter& filter)
 {
-	QVector<imtbase::IComplexCollectionFilter::FieldSortingInfo> infoList = filter.GetSortingInfo();
-	QString retVal = !infoList.isEmpty() ? "ORDER BY" : "";
+	QStringList orderParts;
 
-	for (int i = 0; i < infoList.count(); i++){
-		const imtbase::IComplexCollectionFilter::FieldSortingInfo& info = infoList[i];
+	const imtbase::IComplexCollectionFilter::Fields& fields = filter.GetFields();
 
-		if (info.fieldId.isEmpty()){
-			return QString();
+	for (const imtbase::IComplexCollectionFilter::FieldInfo& info : fields){
+		if (!(info.metaInfo.flags & imtbase::IComplexCollectionFilter::SO_SORT)){
+			continue;
+		}
+
+		if (info.metaInfo.sortingOrder == imtbase::IComplexCollectionFilter::SO_NO_ORDER){
+			continue;
+		}
+
+		if (info.id.isEmpty()){
+			qWarning() << "Empty field id in sort filter";
+			continue;
 		}
 
 		QString order;
+		switch (info.metaInfo.sortingOrder){
+			case imtbase::IComplexCollectionFilter::SO_ASC:
+				order = QStringLiteral("ASC");
+				break;
 
-		switch (info.sortingOrder){
-		case imtbase::IComplexCollectionFilter::SO_ASC:
-			order = "ASC";
-			break;
-		case imtbase::IComplexCollectionFilter::SO_DESC:
-			order = "DESC";
-			break;
-		default:
-			qWarning() << "Unexpected sortingOrder" << imtbase::IComplexCollectionFilter::ToString(info.sortingOrder);
-			break;
+			case imtbase::IComplexCollectionFilter::SO_DESC:
+				order = QStringLiteral("DESC");
+				break;
+
+			default:
+				qWarning() << "Unexpected sortingOrder" << imtbase::IComplexCollectionFilter::ToString(info.metaInfo.sortingOrder);
+				continue;
 		}
 
-		if (order.isEmpty()){
-			return QString();
-		}
-
-		retVal += QString("%0 \"%1\" %2").arg(i > 0 ? "," : "").arg(qPrintable(info.fieldId)).arg(order);
+		orderParts << QStringLiteral("\"%1\" %2").arg(QString::fromUtf8(info.id), order);
 	}
 
-	return retVal;
+	if (orderParts.isEmpty()){
+		return QString();
+	}
+
+	return QStringLiteral("ORDER BY %1").arg(orderParts.join(", "));
 }
+
 
 
 QString CComplexCollectionFilterConverter::CreateSqlFilterQuery(const imtbase::IComplexCollectionFilter& filter, SqlContext sqlContext)
 {
-	QString retVal = ProcessGroup(filter.GetFieldsFilter(), sqlContext);
+	QString retVal = ProcessGroup(filter.GetFilterExpression(), sqlContext);
 
 	retVal = retVal.mid(1, retVal.length() - 2);
 
@@ -86,11 +107,11 @@ QString CComplexCollectionFilterConverter::ProcessColumn(const imtbase::IComplex
 	QString retVal;
 	bool isOk = false;
 
-	if (numericTypes.contains(filter.filterValue.type()) && numericOperations.contains(filter.filterOperation)){
+	if (numericTypes.contains(filter.filterValue.typeId()) && numericOperations.contains(filter.filterOperation)){
 		QString filterValue;
 		QString type;
 
-		switch (filter.filterValue.type()){
+		switch (filter.filterValue.typeId()){
 		case QMetaType::Int:
 			filterValue = QString::number(filter.filterValue.toInt(&isOk));
 			type = "int";
@@ -117,7 +138,7 @@ QString CComplexCollectionFilterConverter::ProcessColumn(const imtbase::IComplex
 			retVal = QString("%1 %2 %3").arg(columnExpr, numericOperations[filter.filterOperation], filterValue);
 		}
 	}
-	else if (stringTypes.contains(filter.filterValue.type()) && stringOperations.contains(filter.filterOperation)){
+	else if (stringTypes.contains(filter.filterValue.typeId()) && stringOperations.contains(filter.filterOperation)){
 		QString filterValue = filter.filterValue.toString();
 		if (filter.filterOperation == imtbase::IComplexCollectionFilter::FO_CONTAINS){
 			filterValue.prepend("%");
@@ -136,18 +157,88 @@ QString CComplexCollectionFilterConverter::ProcessColumn(const imtbase::IComplex
 		retVal = sqlContext == SC_POSTGRES ? QString("(\"%1\")::text %2 '%3'").arg(qPrintable(filter.fieldId), stringOperations[filter.filterOperation], filterValue)
 							: QString("\"%1\" %2 '%3'").arg(qPrintable(filter.fieldId), stringOperations[filter.filterOperation], filterValue);
 	}
-	else if (boolTypes.contains(filter.filterValue.type()) && boolOperations.contains(filter.filterOperation)){
+	else if (boolTypes.contains(filter.filterValue.typeId()) && boolOperations.contains(filter.filterOperation)){
 		bool value = filter.filterValue.toBool();
 		QString columnExpr = sqlContext == SC_POSTGRES ? QString("coalesce((\"%1\")::bool, false)").arg(qPrintable(filter.fieldId))
 										: QString("\"%1\"").arg(qPrintable(filter.fieldId));
 		retVal = QString("%1 %2 %3").arg(columnExpr, boolOperations[filter.filterOperation], value ? "true" : "false");
+	}
+	else if (sqlContext == SC_POSTGRES && arrayOperations.contains(filter.filterOperation)){
+		const QString columnExpr = QString("\"%1\"").arg(qPrintable(filter.fieldId));
+
+		switch (filter.filterOperation){
+		case imtbase::IComplexCollectionFilter::FO_ARRAY_IS_EMPTY:
+			return QString("coalesce(jsonb_array_length(%1), 0) = 0").arg(columnExpr);
+
+		case imtbase::IComplexCollectionFilter::FO_ARRAY_NOT_IS_EMPTY:
+			return QString("jsonb_array_length(%1) > 0").arg(columnExpr);
+
+		case imtbase::IComplexCollectionFilter::FO_ARRAY_HAS_ANY:
+		case imtbase::IComplexCollectionFilter::FO_ARRAY_NOT_HAS_ANY:
+		case imtbase::IComplexCollectionFilter::FO_ARRAY_HAS_ALL:
+		case imtbase::IComplexCollectionFilter::FO_ARRAY_NOT_HAS_ALL: {
+			const QVariantList values = filter.filterValue.toList();
+			if (values.isEmpty()){
+				return {};
+			}
+
+			const QString sqlArray = ToSqlArray(values);
+
+			QString expr;
+
+			if (filter.filterOperation == imtbase::IComplexCollectionFilter::FO_ARRAY_HAS_ANY ||
+				filter.filterOperation == imtbase::IComplexCollectionFilter::FO_ARRAY_NOT_HAS_ANY){
+				expr = QString("%1 ?| %2").arg(columnExpr, sqlArray);
+			}
+			else{
+				expr = QString("%1 ?& %2").arg(columnExpr, sqlArray);
+			}
+
+			if (filter.filterOperation == imtbase::IComplexCollectionFilter::FO_ARRAY_NOT_HAS_ANY ||
+				filter.filterOperation == imtbase::IComplexCollectionFilter::FO_ARRAY_NOT_HAS_ALL){
+				expr.prepend("NOT (").append(")");
+			}
+
+			return expr;
+		}
+		case imtbase::IComplexCollectionFilter::FO_ARRAY_ILIKE_ANY:
+			case imtbase::IComplexCollectionFilter::FO_ARRAY_NOT_ILIKE_ANY: {
+				const QVariantList values = filter.filterValue.toList();
+				if (values.isEmpty()){
+					return {};
+				}
+
+				QStringList likeConditions;
+				for (const QVariant& v : values){
+					QString pattern = v.toString().replace("'", "''");
+					likeConditions << QString("elem ILIKE '%%%1%%'").arg(pattern);
+				}
+
+				QString expr = QString(
+					"EXISTS ("
+					"SELECT 1 "
+					"FROM jsonb_array_elements_text(%1) AS elem "
+					"WHERE %2"
+					")"
+				).arg(columnExpr, likeConditions.join(" OR "));
+
+				if (filter.filterOperation == imtbase::IComplexCollectionFilter::FO_ARRAY_NOT_ILIKE_ANY){
+					expr.prepend("NOT (").append(")");
+				}
+
+				return expr;
+			}
+
+		default:
+			break;
+		}
 	}
 
 	return retVal;
 };
 
 
-QString CComplexCollectionFilterConverter::ProcessGroup(const imtbase::IComplexCollectionFilter::GroupFilter& filter, SqlContext sqlContext)
+QString CComplexCollectionFilterConverter::ProcessGroup(const imtbase::IComplexCollectionFilter::FilterExpression& filter, SqlContext sqlContext)
 {
 	QString retVal;
 	QString logicOperation;
@@ -171,16 +262,16 @@ QString CComplexCollectionFilterConverter::ProcessGroup(const imtbase::IComplexC
 			continue;
 		}
 
-		retVal += retVal.isEmpty() ? retValPart : QString(" %1 %2").arg(logicOperation).arg(retValPart);
+		retVal += retVal.isEmpty() ? retValPart : QString(" %1 %2").arg(logicOperation, retValPart);
 	}
 
-	for (const imtbase::IComplexCollectionFilter::GroupFilter& groupFilter : filter.groupFilters){
+	for (const imtbase::IComplexCollectionFilter::FilterExpression& groupFilter : filter.filterExpressions){
 		QString retValPart = ProcessGroup(groupFilter, sqlContext);
 		if (retValPart.isEmpty()){
 			continue;
 		}
 
-		retVal += retVal.isEmpty() ? retValPart : QString(" %1 %2").arg(logicOperation).arg(retValPart);
+		retVal += retVal.isEmpty() ? retValPart : QString(" %1 %2").arg(logicOperation, retValPart);
 	}
 
 	if (!retVal.isEmpty()){
@@ -189,6 +280,21 @@ QString CComplexCollectionFilterConverter::ProcessGroup(const imtbase::IComplexC
 	}
 
 	return retVal;
+};
+
+
+QString CComplexCollectionFilterConverter::ToSqlArray(const QVariantList& values)
+{
+	QStringList parts;
+	for (const QVariant& v : values){
+		if (v.typeId() == QMetaType::QString || v.typeId() == QMetaType::QByteArray){
+			parts << QString("'%1'").arg(v.toString().replace("'", "''"));
+		}
+		else{
+			parts << v.toString();
+		}
+	}
+	return QString("ARRAY[%1]").arg(parts.join(", "));
 };
 
 

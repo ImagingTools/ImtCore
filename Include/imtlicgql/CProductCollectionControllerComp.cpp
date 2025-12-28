@@ -171,11 +171,11 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 			fieldFilter.fieldId = "ProductId";
 			fieldFilter.filterValue = objectId;
 
-			imtbase::IComplexCollectionFilter::GroupFilter groupFilter;
+			imtbase::IComplexCollectionFilter::FilterExpression groupFilter;
 			groupFilter.fieldFilters << fieldFilter;
 
 			imtbase::CComplexCollectionFilter complexFilter;
-			complexFilter.SetFieldsFilter(groupFilter);
+			complexFilter.SetFilterExpression(groupFilter);
 
 			iprm::CParamsSet filterParam;
 			filterParam.SetEditableParameter("ComplexFilter", &complexFilter);
@@ -408,11 +408,11 @@ bool CProductCollectionControllerComp::FillObjectFromRepresentation(
 	fieldFilter.fieldId = "ProductId";
 	fieldFilter.filterValue = productId;
 	
-	imtbase::IComplexCollectionFilter::GroupFilter groupFilter;
+	imtbase::IComplexCollectionFilter::FilterExpression groupFilter;
 	groupFilter.fieldFilters << fieldFilter;
 	
 	imtbase::CComplexCollectionFilter complexFilter;
-	complexFilter.SetFieldsFilter(groupFilter);
+	complexFilter.SetFilterExpression(groupFilter);
 	
 	iprm::CParamsSet filterParam;
 	filterParam.SetEditableParameter("ComplexFilter", &complexFilter);
@@ -446,11 +446,11 @@ bool CProductCollectionControllerComp::FillObjectFromRepresentation(
 	nameFieldFilter.fieldId = "ProductName";
 	nameFieldFilter.filterValue = name;
 	
-	imtbase::IComplexCollectionFilter::GroupFilter nameGroupFilter;
+	imtbase::IComplexCollectionFilter::FilterExpression nameGroupFilter;
 	nameGroupFilter.fieldFilters << nameFieldFilter;
 	
 	imtbase::CComplexCollectionFilter nameComplexFilter;
-	nameComplexFilter.SetFieldsFilter(nameGroupFilter);
+	nameComplexFilter.SetFilterExpression(nameGroupFilter);
 	
 	iprm::CParamsSet nameFilterParam;
 	nameFilterParam.SetEditableParameter("ComplexFilter", &nameComplexFilter);

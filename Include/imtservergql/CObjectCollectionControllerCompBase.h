@@ -188,6 +188,7 @@ public:
 
 protected:
 	void ReplaceComplexFilterFields(imtbase::IComplexCollectionFilter& filter) const;
+	void UpdateFieldsInfoFromHeaders(imtbase::IComplexCollectionFilter& filter) const;
 
 	virtual bool GetOperationFromRequest(const imtgql::CGqlRequest& gqlRequest, imtgql::CGqlParamObject& gqlObject, QString& errorMessage, int& operationType) const;
 	virtual QByteArray GetObjectIdFromInputParams(const imtgql::CGqlParamObject &inputParams) const;

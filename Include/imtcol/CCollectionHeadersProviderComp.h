@@ -20,6 +20,7 @@ public:
 	I_BEGIN_COMPONENT(CCollectionHeadersProviderComp);
 		I_REGISTER_INTERFACE(imtcol::ICollectionHeadersProvider);
 		I_ASSIGN_MULTI_0(m_headersIdsAttrPtr, "HeaderIds", "Headers Ids", true);
+		I_ASSIGN_MULTI_0(m_arrayTypeHeadersIdsAttrPtr, "ArrayTypeHeaderIds", "List of header IDs that represent ARRAY-type fields. Any header NOT listed here is treated as SCALAR by default.", false);
 		I_ASSIGN_MULTI_0(m_headersNamesAttrPtr, "HeaderNames", "Headers names", true);
 		I_ASSIGN_MULTI_0(m_sortableHeaderIdsAttrPtr, "SortableHeaderIds", "Header-IDs that can be sorted", false);
 		I_ASSIGN_MULTI_0(m_filterableHeaderIdsAttrPtr, "FilterableHeaderIds", "Header-IDs that can be filtered", false);
@@ -33,6 +34,7 @@ protected:
 
 private:
 	I_MULTIATTR(QByteArray, m_headersIdsAttrPtr);
+	I_MULTIATTR(QByteArray, m_arrayTypeHeadersIdsAttrPtr);
 	I_MULTITEXTATTR(m_headersNamesAttrPtr);
 	I_MULTIATTR(QByteArray, m_sortableHeaderIdsAttrPtr);
 	I_MULTIATTR(QByteArray, m_filterableHeaderIdsAttrPtr);

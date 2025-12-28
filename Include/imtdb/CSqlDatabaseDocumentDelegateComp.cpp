@@ -23,6 +23,7 @@
 #include <imtbase/ICollectionFilter.h>
 #include <imtdb/CComplexCollectionFilterConverter.h>
 #include <imtcol/IObjectTypeIdFilter.h>
+#include <imtbase/CComplexCollectionFilter.h>
 
 
 namespace imtdb
@@ -101,7 +102,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionQuery(
 	if (paramsPtr != nullptr){
 		const iprm::IParamsSet::Ids paramIds = paramsPtr->GetParamIds();
 		if (paramIds.contains("ComplexFilter")){
-			iprm::TParamsPtr<imtbase::IComplexCollectionFilter> complexFilterParamPtr(paramsPtr, "ComplexFilter");
+			iprm::TParamsPtr<imtbase::CComplexCollectionFilter> complexFilterParamPtr(paramsPtr, "ComplexFilter");
 			if (complexFilterParamPtr.IsValid()){
 				QByteArrayList fieldIds = complexFilterParamPtr->GetDistinctFieldsList();
 	
@@ -113,10 +114,10 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionQuery(
 					const QByteArray& dataColumn = m_useDataMetaInfoAttrPtr.IsValid() && *m_useDataMetaInfoAttrPtr
 														? s_dataMetaInfoColumn : s_documentColumn;
 					fieldId = s_filterableColumns.contains(fieldId) ? QStringLiteral(R"("%1")").arg(fieldId) : CreateJsonExtractSql(dataColumn, fieldId);
-	
+
 					distinctString += i > 0 ? QStringLiteral(", %1").arg(fieldId) : fieldId;
 				}
-	
+
 				if (!distinctString.isEmpty()){
 					selectionQuery = QStringLiteral("SELECT DISTINCT ON (%1) * FROM (%2) as collectiondata").arg(distinctString, selectionQuery).toUtf8();
 				}
@@ -1459,22 +1460,46 @@ bool CSqlDatabaseDocumentDelegateComp::CreateObjectFilterQuery(const imtbase::IC
 
 bool CSqlDatabaseDocumentDelegateComp::CreateTextFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& textFilterQuery) const
 {
+	textFilterQuery.clear();
+
+	bool useDataMeta = m_useDataMetaInfoAttrPtr.IsValid() ? *m_useDataMetaInfoAttrPtr : false;
+	QString jsonKey = useDataMeta ? s_dataMetaInfoColumn : s_documentColumn;
+
 	QString textFilter = collectionFilter.GetTextFilter();
-	QByteArrayList fieldIds = collectionFilter.GetTextFilterFieldsList();
-	if (fieldIds.isEmpty() || textFilter.isEmpty()){
-		return false;
-	}
+	if (!textFilter.isEmpty()){
+		for (const imtbase::IComplexCollectionFilter::FieldInfo& info : collectionFilter.GetFields()){
+			if (info.metaInfo.flags & imtbase::IComplexCollectionFilter::SO_TEXT_FILTER){
+				if (!textFilterQuery.isEmpty()){
+					textFilterQuery += QStringLiteral(" OR ");
+				}
 
-	for (const QByteArray& fieldId : fieldIds){
-		if (!textFilterQuery.isEmpty()){
-			textFilterQuery += QStringLiteral(" OR ");
+				if (info.metaInfo.type == imtbase::IComplexCollectionFilter::FT_SCALAR){
+					textFilterQuery += QStringLiteral(R"(%1 ILIKE '%%2%')")
+								.arg(
+									CreateJsonExtractSql(jsonKey, info.id, QMetaType::QString, "root"),
+									textFilter
+									);
+				}
+				else if (info.metaInfo.type == imtbase::IComplexCollectionFilter::FT_ARRAY){
+					QString expr = QString(
+						"EXISTS ("
+						"SELECT 1 "
+						"FROM jsonb_array_elements_text(%1) AS elem "
+						"WHERE %2"
+						")"
+					).arg(
+							CreateJsonExtractSql(jsonKey, info.id, QMetaType::QJsonArray, "root"),
+							QString("elem ILIKE '%%%1%%'").arg(textFilter)
+						);
+
+					textFilterQuery += expr;
+				}
+				else{
+					qWarning() << "Unable to create text filter: unsupported field type:" << info.id << info.metaInfo.type;
+					return false;
+				}
+			}
 		}
-
-		textFilterQuery += QStringLiteral(R"("%1" ILIKE '%%2%')").arg(QString::fromUtf8(fieldId), textFilter);
-	}
-
-	if (!textFilterQuery.isEmpty()){
-		SubstituteFieldIds(textFilterQuery);
 	}
 
 	return true;
@@ -1516,7 +1541,12 @@ void CSqlDatabaseDocumentDelegateComp::SubstituteFieldIds(QString& query, bool c
 		substitute.replace("\"", "");
 
 		if (!s_filterableColumns.contains(substitute)){
-			substitute = CreateJsonExtractSql(jsonKey, substitute, castToStr ? QMetaType::QString : QMetaType::QJsonObject, "root");
+			if (IsArrayOperation(query, substitute)){
+				substitute = CreateJsonExtractSql(jsonKey, substitute, QMetaType::QJsonArray, "root");
+			}
+			else{
+				substitute = CreateJsonExtractSql(jsonKey, substitute, QMetaType::QString, "root");
+			}
 			query.replace(item, substitute);
 		}
 		else if (substitute != s_addedColumn){
@@ -1663,6 +1693,39 @@ bool CSqlDatabaseDocumentDelegateComp::CreateDocumentIdFilterQuery(
 	documentIdFilterQuery = QString(R"(root."DocumentId" %0 (%1))").arg(conditionStr, idStrings.join(", "));
 
 	return true;
+}
+
+
+bool CSqlDatabaseDocumentDelegateComp::IsArrayOperation(
+			const QString& query,
+			const QString& field) const
+{
+	const QString escapedField = QRegularExpression::escape(field);
+
+	static const QString operatorsPattern =
+		R"("%1"\s*(\?\&|\?\||\?|@>|<@))";
+
+	QRegularExpression reOperators(
+		operatorsPattern.arg(escapedField)
+	);
+
+	if (reOperators.match(query).hasMatch()){
+		return true;
+	}
+
+	static const QString functionsPattern =
+		R"(jsonb_array_elements(_text)?\s*\(\s*"%1"\s*\))";
+
+	QRegularExpression reFunctions(
+		functionsPattern.arg(escapedField),
+		QRegularExpression::CaseInsensitiveOption
+	);
+
+	if (reFunctions.match(query).hasMatch()){
+		return true;
+	}
+
+	return false;
 }
 
 

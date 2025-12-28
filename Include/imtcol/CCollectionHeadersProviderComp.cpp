@@ -48,6 +48,12 @@ bool CCollectionHeadersProviderComp::GetHeaderInfo(const QByteArray& headerId, H
 		headerInfo.permissionId = m_headerPermissionsAttrPtr[headerIndex];
 	}
 
+	if (m_arrayTypeHeadersIdsAttrPtr.IsValid()){
+		if (m_arrayTypeHeadersIdsAttrPtr.FindValue(headerId) >= 0){
+			headerInfo.fieldType = FT_ARRAY;
+		}
+	}
+
 	return true;
 }
 

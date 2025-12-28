@@ -52,11 +52,11 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 	fieldFilter.fieldId = "Id";
 	fieldFilter.filterValue = username;
 	
-	imtbase::IComplexCollectionFilter::GroupFilter groupFilter;
+	imtbase::IComplexCollectionFilter::FilterExpression groupFilter;
 	groupFilter.fieldFilters << fieldFilter;
 	
 	imtbase::CComplexCollectionFilter complexFilter;
-	complexFilter.SetFieldsFilter(groupFilter);
+	complexFilter.SetFilterExpression(groupFilter);
 
 	iprm::CParamsSet filterParam;
 	filterParam.SetEditableParameter("ComplexFilter", &complexFilter);
@@ -147,11 +147,11 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 		mailFieldFilter.fieldId = "Mail";
 		mailFieldFilter.filterValue = mail;
 		
-		imtbase::IComplexCollectionFilter::GroupFilter mailGroupFilter;
+		imtbase::IComplexCollectionFilter::FilterExpression mailGroupFilter;
 		mailGroupFilter.fieldFilters << mailFieldFilter;
 		
 		imtbase::CComplexCollectionFilter mailComplexFilter;
-		mailComplexFilter.SetFieldsFilter(mailGroupFilter);
+		mailComplexFilter.SetFilterExpression(mailGroupFilter);
 		
 		iprm::CParamsSet mailFilterParam;
 		mailFilterParam.SetEditableParameter("ComplexFilter", &mailComplexFilter);

@@ -513,15 +513,15 @@ void CObjectCollectionViewComp::OnComponentCreated()
 	}
 
 	if (m_complexFilterCompPtr.IsValid()){
-		imtbase::IComplexCollectionFilter::GroupFilter mainGroup = m_complexFilterCompPtr->GetFieldsFilter();
-		Q_ASSERT(mainGroup.groupFilters.count() == 0);
-		if (mainGroup.groupFilters.count() == 0){
+		imtbase::IComplexCollectionFilter::FilterExpression mainGroup = m_complexFilterCompPtr->GetFilterExpression();
+		Q_ASSERT(mainGroup.filterExpressions.count() == 0);
+		if (mainGroup.filterExpressions.count() == 0){
 			// Create group filters for text and object filtering
-			mainGroup.groupFilters.append(imtbase::IComplexCollectionFilter::GroupFilter());
-			mainGroup.groupFilters.append(imtbase::IComplexCollectionFilter::GroupFilter());
+			mainGroup.filterExpressions.append(imtbase::IComplexCollectionFilter::FilterExpression());
+			mainGroup.filterExpressions.append(imtbase::IComplexCollectionFilter::FilterExpression());
 
 			// Set OR operation for fields text filtering
-			mainGroup.groupFilters[0].logicalOperation = imtbase::IComplexCollectionFilter::LO_OR;
+			mainGroup.filterExpressions[0].logicalOperation = imtbase::IComplexCollectionFilter::LO_OR;
 		}
 	}
 }
@@ -1670,12 +1670,12 @@ void CObjectCollectionViewComp::TableModel::SetTextFilter(const QString& textFil
 	m_filter.SetTextFilter(textFilter);
 
 	if (m_parent.m_complexFilterCompPtr.IsValid()){
-		imtbase::IComplexCollectionFilter::GroupFilter mainGroupFilter = m_parent.m_complexFilterCompPtr->GetFieldsFilter();
-		Q_ASSERT(mainGroupFilter.groupFilters.count() == 2);
-		if (mainGroupFilter.groupFilters.count() >= 1){
-			imtbase::CComplexCollectionFilterHelper::FillTextFilter(mainGroupFilter.groupFilters[0], filterableInfoIds, textFilter);
+		imtbase::IComplexCollectionFilter::FilterExpression mainGroupFilter = m_parent.m_complexFilterCompPtr->GetFilterExpression();
+		Q_ASSERT(mainGroupFilter.filterExpressions.count() == 2);
+		if (mainGroupFilter.filterExpressions.count() >= 1){
+			imtbase::CComplexCollectionFilterHelper::FillTextFilter(mainGroupFilter.filterExpressions[0], filterableInfoIds, textFilter);
 		}
-		m_parent.m_complexFilterCompPtr->SetFieldsFilter(mainGroupFilter);
+		m_parent.m_complexFilterCompPtr->SetFilterExpression(mainGroupFilter);
 	}
 
 	if (objectCollectionPtr)

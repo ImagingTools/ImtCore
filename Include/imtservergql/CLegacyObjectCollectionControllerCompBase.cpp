@@ -139,29 +139,30 @@ istd::IChangeableUniquePtr CLegacyObjectCollectionControllerCompBase::ExtractObj
 
 void CLegacyObjectCollectionControllerCompBase::ReplaceComplexFilterFields(imtbase::IComplexCollectionFilter& filter) const
 {
-	imtbase::IComplexCollectionFilter::FieldSortingInfoList sortingInfoList = filter.GetSortingInfo();
-	for (imtbase::IComplexCollectionFilter::FieldSortingInfo& fieldSortingInfo : sortingInfoList){
-		if (m_fieldReplacementMap.contains(fieldSortingInfo.fieldId)){
-			fieldSortingInfo.fieldId = m_fieldReplacementMap[fieldSortingInfo.fieldId];
+	for (const imtbase::IComplexCollectionFilter::FieldInfo& info: filter.GetFields()){
+		imtbase::IComplexCollectionFilter::FieldInfo* editableInfoPtr = filter.GetEditableFieldInfo(info.id);
+		if (editableInfoPtr != nullptr){
+			if (m_fieldReplacementMap.contains(editableInfoPtr->id)){
+				editableInfoPtr->id = m_fieldReplacementMap[editableInfoPtr->id];
+			}
 		}
 	}
-	filter.SetSortingInfo(sortingInfoList);
 
-	std::function<void (imtbase::IComplexCollectionFilter::GroupFilter&)> ProcessGroupFilter = [&](imtbase::IComplexCollectionFilter::GroupFilter& groupFilter){
+	std::function<void (imtbase::IComplexCollectionFilter::FilterExpression&)> ProcessGroupFilter = [&](imtbase::IComplexCollectionFilter::FilterExpression& groupFilter){
 		for (imtbase::IComplexCollectionFilter::FieldFilter& fieldFilter : groupFilter.fieldFilters){
 			if (m_fieldReplacementMap.contains(fieldFilter.fieldId)){
 				fieldFilter.fieldId = m_fieldReplacementMap[fieldFilter.fieldId];
 			}
 		}
 
-		for (imtbase::IComplexCollectionFilter::GroupFilter& groupFilterItem : groupFilter.groupFilters){
+		for (imtbase::IComplexCollectionFilter::FilterExpression& groupFilterItem : groupFilter.filterExpressions){
 			ProcessGroupFilter(groupFilterItem);
 		}
 	};
 
-	imtbase::IComplexCollectionFilter::GroupFilter fieldsFilter = filter.GetFieldsFilter();
+	imtbase::IComplexCollectionFilter::FilterExpression fieldsFilter = filter.GetFilterExpression();
 	ProcessGroupFilter(fieldsFilter);
-	filter.SetFieldsFilter(fieldsFilter);
+	filter.SetFilterExpression(fieldsFilter);
 }
 
 
