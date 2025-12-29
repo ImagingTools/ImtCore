@@ -1474,11 +1474,16 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTextFilterQuery(const imtbase::ICom
 				}
 
 				if (info.metaInfo.type == imtbase::IComplexCollectionFilter::FT_SCALAR){
-					textFilterQuery += QStringLiteral(R"(%1 ILIKE '%%2%')")
-								.arg(
-									CreateJsonExtractSql(jsonKey, info.id, QMetaType::QString, "root"),
-									textFilter
-									);
+					if (s_filterableColumns.contains(info.id)){
+						textFilterQuery += QStringLiteral(R"(root."%1" ILIKE '%%2%')").arg(QString::fromUtf8(info.id), textFilter);
+					}
+					else{
+						textFilterQuery += QStringLiteral(R"(%1 ILIKE '%%2%')")
+									.arg(
+										CreateJsonExtractSql(jsonKey, info.id, QMetaType::QString, "root"),
+										textFilter
+										);
+					}
 				}
 				else if (info.metaInfo.type == imtbase::IComplexCollectionFilter::FT_ARRAY){
 					QString expr = QString(

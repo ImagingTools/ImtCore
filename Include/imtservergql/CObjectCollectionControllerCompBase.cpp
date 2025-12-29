@@ -121,26 +121,27 @@ const imtbase::ISearchResults* CObjectCollectionControllerCompBase::Search(const
 	sdl::imtbase::ComplexCollectionFilter::CGroupFilter::V1_0 groupFilter;
 	groupFilter.logicalOperation = sdl::imtbase::ComplexCollectionFilter::LogicalOperation::Or;
 
-	imtsdl::TElementList<sdl::imtbase::ComplexCollectionFilter::CFieldFilter::V1_0> fieldList;
+	QList<sdl::imtbase::ComplexCollectionFilter::FieldFilterUnion> fieldList;
 	for (const QByteArray& headerId : headerIds){
 		typename imtcol::ICollectionHeadersProvider::HeaderInfo headerInfo;
 		if (m_headersProviderCompPtr->GetHeaderInfo(headerId, headerInfo)){
 			if (headerInfo.filterable){
-				sdl::imtbase::ComplexCollectionFilter::CFieldFilter::V1_0 fieldFilter;
-				fieldFilter.fieldId = headerInfo.headerId;
-				fieldFilter.filterValue = text;
-				fieldFilter.filterValueType = sdl::imtbase::ComplexCollectionFilter::ValueType::String;
+				sdl::imtbase::ComplexCollectionFilter::CFieldFilter fieldFilter;
+				fieldFilter.Version_1_0.Emplace();
+				fieldFilter.Version_1_0->fieldId = headerInfo.headerId;
+				fieldFilter.Version_1_0->filterValue = text;
+				fieldFilter.Version_1_0->filterValueType = sdl::imtbase::ComplexCollectionFilter::ValueType::String;
 
 				imtsdl::TElementList<sdl::imtbase::ComplexCollectionFilter::FilterOperation> filterOperations;
 				filterOperations << sdl::imtbase::ComplexCollectionFilter::FilterOperation::Contains;
-				fieldFilter.filterOperations = filterOperations;
+				fieldFilter.Version_1_0->filterOperations = filterOperations;
 
-				fieldList << fieldFilter;
+				fieldList << sdl::imtbase::ComplexCollectionFilter::FieldFilterUnion(fieldFilter);
 			}
 		}
 	}
 
-	// groupFilter.fieldFilters = fieldList;
+	groupFilter.fieldFilters.Emplace().FromList(fieldList);
 	complexFilter.fieldsFilter = groupFilter;
 
 	imtgql::CGqlParamObject input;
