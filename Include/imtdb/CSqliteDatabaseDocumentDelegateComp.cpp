@@ -263,6 +263,68 @@ bool CSqliteDatabaseDocumentDelegateComp::CreateObjectFilterQuery(const imtbase:
 }
 
 
+QByteArray CSqliteDatabaseDocumentDelegateComp::GetObjectSelectionQuery(
+			const QByteArray& objectId,
+			const iprm::IParamsSet* paramsPtr) const
+{
+	QString documentFilterQuery;
+	if (paramsPtr != nullptr){
+		const iprm::IParamsSet::Ids paramIds = paramsPtr->GetParamIds();
+		if (paramIds.contains("DocumentFilter")){
+			iprm::TParamsPtr<imtcol::IDocumentCollectionFilter> documentFilterParamPtr(
+						paramsPtr, "DocumentFilter");
+			if (documentFilterParamPtr.IsValid()){
+				CreateDocumentCollectionFilterQuery(
+							*documentFilterParamPtr.GetPtr(),
+							documentFilterQuery);
+			}
+		}
+	}
+
+	if (documentFilterQuery.isEmpty()){
+		documentFilterQuery =
+				QString("(root.\"%0\" = 'Active')")
+				.arg(QString::fromUtf8(s_stateColumn));
+	}
+
+	QString schemaPrefix;
+	if (m_tableSchemaAttrPtr.IsValid()){
+		schemaPrefix = QString("%1.").arg(qPrintable(*m_tableSchemaAttrPtr));
+	}
+
+	return QString(R"(
+		SELECT
+			root.*,
+			root1."TimeStamp" AS "Added"
+		FROM %0 "%1" AS root
+		LEFT JOIN %0 "%1" AS root1
+			ON root1."%3" = root."%3"
+		   AND %6 = 1
+		WHERE (%2)
+		  AND root."%3" = '%4'
+		ORDER BY %5 DESC;
+	)")
+			.arg(
+				schemaPrefix,
+				QString::fromUtf8(*m_tableNameAttrPtr),
+				documentFilterQuery,
+				QString::fromUtf8(s_documentIdColumn),
+				QString::fromUtf8(objectId),
+				CreateJsonExtractSql(
+					s_revisionInfoColumn,
+					s_revisionNumberKey,
+					QMetaType::Int,
+					"root"),
+				CreateJsonExtractSql(
+					s_revisionInfoColumn,
+					s_revisionNumberKey,
+					QMetaType::Int,
+					"root1"))
+			.toUtf8();
+}
+
+
+
 } // namespace imtdb
 
 
