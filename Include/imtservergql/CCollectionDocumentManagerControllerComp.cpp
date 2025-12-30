@@ -28,8 +28,7 @@ CDM::CDocumentList CCollectionDocumentManagerControllerComp::OnGetOpenedDocument
 
 			QString path = info.url.path();
 			QStringList parts = path.split('/', Qt::SkipEmptyParts);
-			Q_ASSERT(parts.count() == 1);
-			QByteArray objectId = parts.first().toUtf8();
+			QByteArray objectId = parts.count() > 0 ? parts.last().toUtf8() : QByteArray();
 
 			sdlInfo.Version_1_0->documentId = info.documentId;
 			sdlInfo.Version_1_0->documentName = info.name;
