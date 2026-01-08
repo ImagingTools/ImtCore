@@ -67,7 +67,6 @@ void CUdpServerComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-
 	if (m_startServerOnCreateAttrPtr.IsValid() && *m_startServerOnCreateAttrPtr){
 		EnsureServerStarted();
 	}
@@ -78,12 +77,16 @@ void CUdpServerComp::OnComponentCreated()
 
 const ISender* CUdpServerComp::GetSender(const QByteArray& requestId) const
 {
-    if(m_requests.GetCount()==0) return nullptr;
-	for (int i=0;i< m_requests.GetCount();i++){
+	if (m_requests.GetCount() == 0){
+		return nullptr;
+	}
+
+	for (int i = 0; i < m_requests.GetCount(); i++){
 		if (m_requests.GetAt(i)->GetRequestId() == requestId){
-			CUdpSender *sender;
-			sender = new CUdpSender(m_requests.GetAt(i));
-            connect(sender, &CUdpSender::sended, this, &CUdpServerComp::SendedResponse);
+			CUdpSender* sender = new CUdpSender(m_requests.GetAt(i));
+
+			connect(sender, &CUdpSender::sended, this, &CUdpServerComp::SendedResponse);
+
 			return sender;
 		}
 	}
@@ -116,15 +119,13 @@ IServer::ServerStatus CUdpServerComp::GetServerStatus() const
 
 // private methods
 
-bool CUdpServerComp::StartListening(const QHostAddress &address, quint16 port)
+bool CUdpServerComp::StartListening(const QHostAddress& /*address*/, quint16 port)
 {
-    if(m_udpSocket.bind(QHostAddress::Any, port)){
-		connect(
-					&m_udpSocket,
-					&QUdpSocket::readyRead,
-					this,
-					&CUdpServerComp::ReadPendingDatagrams);
-		qDebug()<<"Udp server start for port"<<port;
+	if (m_udpSocket.bind(QHostAddress::Any, port)){
+		connect(&m_udpSocket, &QUdpSocket::readyRead, this, &CUdpServerComp::ReadPendingDatagrams);
+
+		qDebug()<<"UDP-server starting on port: "<<port;
+
 		return true;
 	}
 
@@ -134,34 +135,36 @@ bool CUdpServerComp::StartListening(const QHostAddress &address, quint16 port)
 
 void CUdpServerComp::ReadPendingDatagrams()
 {
-    int i;
-	while (m_udpSocket.hasPendingDatagrams()) {
+	while (m_udpSocket.hasPendingDatagrams()){
 		QNetworkDatagram datagram = m_udpSocket.receiveDatagram();
-        CUdpRequest*req = new CUdpRequest(
-					*m_requestHandlerCompPtr.GetPtr(),
-					*m_protocolEngineCompPtr.GetPtr(),
-					&m_udpSocket,
-					datagram.senderAddress(),
-					datagram.senderPort());
+		CUdpRequest* req = new CUdpRequest(
+			*m_requestHandlerCompPtr.GetPtr(),
+			*m_protocolEngineCompPtr.GetPtr(),
+			&m_udpSocket,
+			datagram.senderAddress(),
+			datagram.senderPort());
 
-         m_requests.PushBack(req);
-        QByteArray data =datagram.data();
-        qDebug()<<"UDP datagramma"<<data.toHex();
-        req->SetBody(data);
-        ConstResponsePtr resp = m_requestHandlerCompPtr->ProcessRequest(*req, datagram.data());
-		//m_udpSocket.writeDatagram(datagram.makeReply(resp->GetData()));
+		m_requests.PushBack(req);
+		QByteArray data = datagram.data();
+
+		qDebug() << "UDP-datagramm: " << data.toHex();
+
+		req->SetBody(data);
+
+		ConstResponsePtr resp = m_requestHandlerCompPtr->ProcessRequest(*req, datagram.data());
 	}
 }
 
 
 void CUdpServerComp::SendedResponse(QByteArray requestId)
 {
-    for (int i=0;i< m_requests.GetCount();i++){
-        if (m_requests.GetAt(i)->GetRequestId() == requestId){
-            m_requests.PopAt(i);
-        }
-    }
+	for (int i = 0; i < m_requests.GetCount(); i++){
+		if (m_requests.GetAt(i)->GetRequestId() == requestId){
+			m_requests.PopAt(i);
+		}
+	}
 }
+
 
 bool CUdpServerComp::EnsureServerStarted()
 {

@@ -363,7 +363,7 @@ bool CGqlSchemaParserComp::ExtractTypesFromImport(const QStringList& importFiles
 {
 	// process found files
 	for (const QString& schemaPath: std::as_const(importFilesList)){
-		iproc::IProcessorPtr newSchemaProcessor(m_fileSchemaParserCompFactPtr.CreateInstance());
+		iproc::IProcessorUniquePtr newSchemaProcessor(m_fileSchemaParserCompFactPtr.CreateInstance());
 		ifile::CFileNameParam schemaFilePathParam;
 		schemaFilePathParam.SetPath(schemaPath);
 		iprm::CParamsSet outputParams;

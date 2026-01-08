@@ -44,8 +44,9 @@ QList<imtdoc::IDocumentManagerEventHandler*> CCollectionDocumentManagerComp::Get
 
 	if (m_handlerCompPtr.IsValid()){
 		for (int i = 0; i < m_handlerCompPtr.GetCount(); i++){
-			if (m_handlerCompPtr[i] != nullptr);
-			retVal.append(m_handlerCompPtr[i]);
+			if (m_handlerCompPtr[i] != nullptr){
+				retVal.append(m_handlerCompPtr[i]);
+			}
 		}
 	}
 
