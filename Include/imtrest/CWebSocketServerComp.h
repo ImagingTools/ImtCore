@@ -9,8 +9,10 @@
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
+#include <ibase/TRuntimeStatusHanderCompWrap.h>
 #include <iprm/IParamsSet.h>
 #include <iprm/IOptionsList.h>
+#include <imod/CMultiModelDispatcherBase.h>
 
 // ImtCore includes
 #include <imtbase/IUrlParam.h>
@@ -39,14 +41,16 @@ class CWebSocketThread;
 */
 class CWebSocketServerComp:
 			public QObject,
-			public ilog::CLoggerComponentBase,
+			public ibase::TRuntimeStatusHanderCompWrap<ilog::CLoggerComponentBase>,
+			private imod::CMultiModelDispatcherBase,
 			virtual public IRequestManager,
 			virtual public imtcom::IConnectionStatusProvider,
 			virtual public IServer
 {
 	Q_OBJECT
 public:
-	typedef ilog::CLoggerComponentBase BaseClass;
+	typedef ibase::TRuntimeStatusHanderCompWrap<ilog::CLoggerComponentBase> BaseClass;
+	typedef imod::CMultiModelDispatcherBase BaseClass2;
 
 	I_BEGIN_COMPONENT(CWebSocketServerComp);
 		I_REGISTER_INTERFACE(IRequestManager)
@@ -60,6 +64,7 @@ public:
 		I_ASSIGN(m_startServerOnCreateAttrPtr, "StartServerOnCreate", "If enabled, the server will be started on after component creation", true, true);
 		I_ASSIGN(m_webServerInterfaceCompPtr, "WebServerConnectionInterface", "Parameter providing the WebSocket-server port to be listened", true, "WebServerConnectionInterface");
 		I_ASSIGN(m_sslConfigurationCompPtr, "SslConfiguration", "SSL Configuration is used by networking classes to relay information about an open SSL connection and to allow the server to control certain features of that connection.", false, "SslConfiguration")
+		I_ASSIGN_TO(m_sslConfigurationModelCompPtr, m_sslConfigurationCompPtr, false)
 		I_ASSIGN(m_sslConfigurationManagerCompPtr, "SslConfigurationManager", "SSL configuration manager, used to create an SSL configuration for server", false, "SslConfigurationManager")
 		I_ASSIGN(m_productId, "ProductId", "Product-ID used with corresponded GraphQL-requests", false, "");
 		I_ASSIGN(m_subprotocolListCompPtr, "SupportedSubprotocols", "Supported Web Socket subprotocols", false, "SupportedSubprotocols");
@@ -93,6 +98,12 @@ public:
 	virtual const ISender* GetSender(const QByteArray& requestId) const override;
 
 protected:
+	// reimplemented (imod::CMultiModelDispatcherBase)
+	virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
+
+	// reimplemented (ibase::TRuntimeStatusHanderCompWrap)
+	virtual void OnSystemShutdown() override;
+
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 	virtual void OnComponentDestroyed() override;
@@ -131,10 +142,13 @@ private:
 	I_ATTR(bool, m_startServerOnCreateAttrPtr);
 	I_REF(imtcom::IServerConnectionInterface, m_webServerInterfaceCompPtr);
 	I_REF(iprm::IParamsSet, m_sslConfigurationCompPtr);
+	I_REF(imod::IModel, m_sslConfigurationModelCompPtr);
 	I_REF(imtcom::ISslConfigurationManager, m_sslConfigurationManagerCompPtr);
 	I_REF(IProtocolEngine, m_httpProtocolEngineCompPtr);
 	I_ATTR(QByteArray, m_productId);
 	I_REF(iprm::IOptionsList, m_subprotocolListCompPtr);
+
+	bool m_isInitialized = false;
 };
 
 
