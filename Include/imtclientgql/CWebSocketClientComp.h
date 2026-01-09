@@ -31,19 +31,22 @@ namespace imtclientgql
 {
 
 
-class CWebSocketClientCompBase:public ibase::TRuntimeStatusHanderCompWrap <ilog::CLoggerComponentBase>
+class CWebSocketClientCompBase:
+	public ibase::TRuntimeStatusHanderCompWrap <ilog::CLoggerComponentBase>
 {
 public:
 	typedef ibase::TRuntimeStatusHanderCompWrap <ilog::CLoggerComponentBase> BaseClass;
 	
 	I_BEGIN_COMPONENT(CWebSocketClientCompBase);
 		I_ASSIGN(m_sslConfigurationCompPtr, "SslConfiguration", "SSL Configuration is used by networking classes to relay information about an open SSL connection and to allow the server to control certain features of that connection.", false, "SslConfiguration")
+		I_ASSIGN_TO(m_sslConfigurationModelCompPtr, m_sslConfigurationCompPtr, false)
 		I_ASSIGN(m_sslConfigurationManagerCompPtr, "SslConfigurationManager", "SSL configuration manager, used to create an SSL configuration for server", false, "SslConfigurationManager")
 		I_ASSIGN(m_subprotocolListCompPtr, "Subprotocols", "Web Socket subprotocols", false, "Subprotocols");
 	I_END_COMPONENT;
 		
 protected:
 	I_REF(iprm::IParamsSet, m_sslConfigurationCompPtr);
+	I_REF(imod::IModel, m_sslConfigurationModelCompPtr);
 	I_REF(imtcom::ISslConfigurationManager, m_sslConfigurationManagerCompPtr);
 	I_REF(iprm::IOptionsList, m_subprotocolListCompPtr);
 };
@@ -54,11 +57,13 @@ class CWebSocketClientComp:
 			virtual public imtrest::ISender,
 			virtual public imtcom::IConnectionController,
 			virtual public imtrest::IRequestManager,
-			virtual public imtclientgql::IGqlClient
+			virtual public imtclientgql::IGqlClient,
+	private imod::CMultiModelDispatcherBase
 {
 	Q_OBJECT
 public:
 	typedef CWebSocketClientCompBase BaseClass;
+	typedef imod::CMultiModelDispatcherBase BaseClass2;
 
 	I_BEGIN_COMPONENT(CWebSocketClientComp);
 		I_REGISTER_INTERFACE(ISender)
@@ -100,6 +105,9 @@ public:
 
 protected:
 	QByteArray Sign(const QByteArray& message, const QByteArray& key = "") const;
+
+	// reimplemented (imod::CMultiModelDispatcherBase)
+	virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
 
 	// reimplemented (ibase::TRuntimeStatusHanderCompWrap)
 	virtual void OnSystemShutdown() override;
@@ -184,6 +192,8 @@ private:
 	istd::TPointerVector<imtrest::IRequest> m_cacheQueries;
 	QAbstractSocket::SocketError m_lastSocketError;
 	mutable QReadWriteLock m_queryDataMapLock;
+
+	bool m_isInitialized = false;
 
 	imod::TModelWrap<ConnectionStatusProvider> m_connectionStatusProvider;
 };

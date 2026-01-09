@@ -164,6 +164,18 @@ QByteArray CWebSocketClientComp::Sign(const QByteArray& message, const QByteArra
 }
 
 
+// reimplemented (imod::CMultiModelDispatcherBase)
+
+void CWebSocketClientComp::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet)
+{
+	Q_ASSERT_X(m_sslConfigurationCompPtr.IsValid() && m_sslConfigurationManagerCompPtr.IsValid(), "Update server's SSL configuration", "SSL configuration or manager is not set!");
+
+	if (m_connectOnCreateAttrPtr.IsValid() && *m_connectOnCreateAttrPtr && m_isInitialized){
+		EnsureWebSocketConnection();
+	}
+}
+
+
 // reimplemented (ibase::TRuntimeStatusHanderCompWrap)
 
 void CWebSocketClientComp::OnSystemShutdown()
@@ -175,6 +187,8 @@ void CWebSocketClientComp::OnSystemShutdown()
 	m_webSocket.moveToThread(qApp->thread());
 
 	m_webSocket.close();
+
+	BaseClass2::UnregisterAllModels();
 }
 
 
@@ -208,9 +222,15 @@ void CWebSocketClientComp::OnComponentCreated()
 		}
 	}
 
+	if (m_sslConfigurationModelCompPtr.IsValid() && m_sslConfigurationManagerCompPtr.IsValid()){
+		BaseClass2::RegisterModel(m_sslConfigurationModelCompPtr.GetPtr());
+	}
+
 	if (m_connectOnCreateAttrPtr.IsValid() && *m_connectOnCreateAttrPtr){
 		EnsureWebSocketConnection();
 	}
+
+	m_isInitialized = true;
 }
 
 
@@ -439,9 +459,12 @@ void CWebSocketClientComp::EnsureWebSocketConnection()
 				m_webSocket.setSslConfiguration(sslConfiguration);
 			}
 		}
+		else{
+			m_webSocket.setSslConfiguration(QSslConfiguration());
+		}
 	}
 
-	SendInfoMessage(0, QString("Try connect to the WebSocket-server: Host: %1; Port: %2").arg(url.host()).arg(url.port()));
+	SendInfoMessage(0, QString("Try connect to the WebSocket-server: Host: %1; Port: %2, Protocol: %3").arg(url.host()).arg(url.port()).arg(url.scheme()));
 
 #if QT_VERSION >= QT_VERSION_CHECK(6,4,0)
 	QWebSocketHandshakeOptions handshakeOptions;

@@ -1,3 +1,23 @@
+/********************************************************************************
+**
+**	Copyright (C) 2017-2020 ImagingTools GmbH
+**
+**	This file is part of the ImagingTools SDK.
+**
+**	This file may be used under the terms of the GNU Lesser
+**	General Public License version 2.1 as published by the Free Software
+**	Foundation and appearing in the file LicenseLGPL.txt included in the
+**	packaging of this file.  Please review the following information to
+**	ensure the GNU Lesser General Public License version 2.1 requirements
+**	will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+**
+**	If you are unsure which license is appropriate for your use, please
+**	contact us at info@imagingtools.de.
+**
+**
+********************************************************************************/
+
+
 #include <imtrest/CWebSocketServerComp.h>
 
 
@@ -123,9 +143,40 @@ const ISender* CWebSocketServerComp::GetSender(const QByteArray& requestId) cons
 
 // reimplemented (icomp::CComponentBase)
 
+void CWebSocketServerComp::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
+{
+	Q_ASSERT_X(m_sslConfigurationCompPtr.IsValid() && m_sslConfigurationManagerCompPtr.IsValid(), "Update server's SSL configuration", "SSL configuration or manager is not set!");
+
+	if (m_startServerOnCreateAttrPtr.IsValid() && *m_startServerOnCreateAttrPtr && m_isInitialized){
+		while (m_webSocketThreadList.count() > 0){
+			imtrest::CWebSocketThread* webSocketThread = m_webSocketThreadList.back();
+			webSocketThread->disconnect();
+			m_webSocketThreadList.pop_back();
+		}
+		StopServer();
+		EnsureServerStarted();
+	}
+}
+
+
+// reimplemented (ibase::TRuntimeStatusHanderCompWrap)
+
+void CWebSocketServerComp::OnSystemShutdown()
+{
+	BaseClass2::UnregisterAllModels();
+}
+
+
+// reimplemented (imod::CMultiModelDispatcherBase)
+
 void CWebSocketServerComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
+
+	if (m_sslConfigurationModelCompPtr.IsValid() && m_sslConfigurationManagerCompPtr.IsValid()){
+		BaseClass2::RegisterModel(m_sslConfigurationModelCompPtr.GetPtr());
+	}
+
 	if (m_startServerOnCreateAttrPtr.IsValid() && *m_startServerOnCreateAttrPtr){
 		EnsureServerStarted();
 	}
@@ -133,6 +184,8 @@ void CWebSocketServerComp::OnComponentCreated()
 	connect(&m_timer, &QTimer::timeout, this, &CWebSocketServerComp::OnTimeout);
 
 	m_timer.start(5000);
+
+	m_isInitialized = true;
 }
 
 
@@ -223,6 +276,10 @@ bool CWebSocketServerComp::StartListening(const QHostAddress& address, quint16 p
 				SendInfoMessage(0, QString("Secure connection (SSL) enabled on web socket server"));
 
 				isSecureConnection = true;
+			}
+			else{
+				QString message = QString("Could not enable secure connection (SSL) on web socket server");
+				SendErrorMessage(0, message);
 			}
 		}
 	}
