@@ -3,13 +3,11 @@
 
 // Qt includes
 #include <QtCore/QByteArray>
-#include <QtCore/QVariant>
 
 // ACF includes
 #include <iser/IObject.h>
 
 // ImtCore includes
-#include <istd/TSmartPtr.h>
 #include <imtgql/CGqlEnum.h>
 
 

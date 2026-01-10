@@ -1,5 +1,7 @@
 #include <imtgui/CCollectionNumericItemDelegate.h>
 
+// Qt includes
+#include <QtWidgets/QSpinBox>
 
 // ImtCore includes
 #include <imtgui/CObjectCollectionViewComp.h>

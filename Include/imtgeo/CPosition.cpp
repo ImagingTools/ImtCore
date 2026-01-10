@@ -82,7 +82,7 @@ int CPosition::GetZoomLevel() const
 
 void CPosition::SetZoomLevel(const double& zoom)
 {
-	if(m_zoomLevel != zoom){
+	if(!qFuzzyCompare(m_zoomLevel, zoom)){
 		m_zoomLevel = zoom;
 		istd::CChangeNotifier notifier(this);
 	}

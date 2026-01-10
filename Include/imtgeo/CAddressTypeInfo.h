@@ -1,9 +1,6 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QUuid>
-
 // ImtCore includes
 #include <imtgeo/IAddressTypeInfo.h>
 
@@ -42,7 +39,7 @@ protected:
 
 private:
     QByteArray m_id;
-	QString m_name;    
+	QString m_name;
 	QString m_shortName;
 	QString m_description;
 

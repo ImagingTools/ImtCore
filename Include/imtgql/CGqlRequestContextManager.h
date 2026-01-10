@@ -1,9 +1,6 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QThreadStorage>
-
 // ImtCore includes
 #include <imtgql/IGqlContext.h>
 
@@ -15,7 +12,7 @@ namespace imtgql
 class CGqlRequestContextManager
 {
 public:
-	static void SetContext(const imtgql::IGqlContext* contextPtr)
+	static void SetContext(const IGqlContext* contextPtr)
 	{
 		if (contextPtr == nullptr) {
 			s_context.Reset();

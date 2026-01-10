@@ -1,7 +1,5 @@
 #include "CTileProvider.h"
 
-// STL includes
-#include <cmath>
 
 using namespace std;
 
@@ -50,7 +48,7 @@ double CTileProvider::tiley2lat(qint64 y, int z) const
 }
 
 
-QList<QPair<QPair<qint64, qint64>, int> > CTileProvider::getTileSet(QGeoCoordinate coordLeftTop, QGeoCoordinate coordRightBottom, int z) const
+QList<QPair<QPair<qint64, qint64>, int> > CTileProvider::getTileSet(const QGeoCoordinate& coordLeftTop, const QGeoCoordinate& coordRightBottom, int z) const
 {
 	QList<QPair<QPair<qint64, qint64>, int>> tileList;
 
@@ -72,7 +70,7 @@ QList<QPair<QPair<qint64, qint64>, int> > CTileProvider::getTileSet(QGeoCoordina
 }
 
 
-QPair<QPair<qint64, qint64>, int> CTileProvider::getTile(QGeoCoordinate coord, int z) const
+QPair<QPair<qint64, qint64>, int> CTileProvider::getTile(const QGeoCoordinate& coord, int z) const
 {
 	QPair<QPair<qint64, qint64>, int> tileData;
 
@@ -84,14 +82,15 @@ QPair<QPair<qint64, qint64>, int> CTileProvider::getTile(QGeoCoordinate coord, i
 	return tileData;
 }
 
-qint64 CTileProvider::getTileNumber(QGeoCoordinate coord, int z) const
+
+qint64 CTileProvider::getTileNumber(const QGeoCoordinate& coord, int z) const
 {
 	qint64 tileNumber = 0;
 
 	qint64 x = long2tilex(coord.longitude(), z);
 	qint64 y = lat2tiley(coord.latitude(), z);
 
-	qint64 tileCountInRow = (double)(1 << z);
+	qint64 tileCountInRow = (1 << z);
 
 	tileNumber = tileCountInRow * y + x;
 

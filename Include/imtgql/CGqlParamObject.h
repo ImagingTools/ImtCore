@@ -3,13 +3,11 @@
 
 // Qt includes
 #include <QtCore/QByteArray>
-#include <QtCore/QVariant>
 
 // ACF includes
 #include <iser/IObject.h>
 
 // ImtCore includes
-#include <istd/TSmartPtr.h>
 #include <imtgql/CGqlEnum.h>
 
 
@@ -25,14 +23,14 @@ public:
 	QByteArrayList GetParamIds() const;
 	QVariant GetParamArgumentValue(const QByteArray& paramId) const;
 	CGqlParamObject* CreateParamObject(const QByteArray& paramId);
-	const CGqlParamObject* GetParamArgumentObjectPtr(const QByteArray& paramId, int index = 0) const;
-	int GetObjectsCount(const QByteArray& paramId) const;
+	const CGqlParamObject* GetParamArgumentObjectPtr(const QByteArray& paramId, qsizetype index = 0) const;
+	qsizetype GetObjectsCount(const QByteArray& paramId) const;
 	QList<const CGqlParamObject*> GetParamArgumentObjectPtrList(const QByteArray& paramId) const;
 	CGqlParamObject* GetParentObject() const;
 	void InsertParam(const QByteArray& paramId, const QVariant& value);
 	void InsertParam(const QByteArray& paramId, const imtgql::CGqlEnum& value);
 	void InsertParam(const QByteArray& paramId, const CGqlParamObject& object);
-	void InsertParam(const QByteArray& paramId, const QList<CGqlParamObject> objectList);
+	void InsertParam(const QByteArray& paramId, const QList<CGqlParamObject>& objectList);
 	CGqlParamObject* AppendParamToArray(const QByteArray& paramId, const CGqlParamObject& object);
 	bool IsObject(const QByteArray& paramId) const;
 	bool IsEnum(const QByteArray& paramId) const;

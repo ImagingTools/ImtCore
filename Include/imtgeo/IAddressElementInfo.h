@@ -14,7 +14,7 @@ namespace imtgeo
 	Interface for describing an address element object.
 	\ingroup Address
 */
-class IAddressElementInfo: virtual public iser::IObject, virtual public imtgeo::IPosition
+class IAddressElementInfo: virtual public iser::IObject, virtual public IPosition
 {
 public:
 

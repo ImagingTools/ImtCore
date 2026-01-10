@@ -55,8 +55,7 @@ bool CCluster::Serialize(iser::IArchive &archive)
 {
     istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
 
-    bool retVal;
-    retVal = BaseClass::Serialize(archive);
+    bool retVal = BaseClass::Serialize(archive);
 
     retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_childrenIds, "ObjectIds", "ObjectId");
 

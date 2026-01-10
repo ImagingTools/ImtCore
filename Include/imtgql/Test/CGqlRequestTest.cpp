@@ -3,6 +3,7 @@
 
 // ImtCore includes
 #include <imtgql/CGqlRequest.h>
+#include <imtgql/CGqlFieldFragment.h>
 
 
 const char* emptyQuery = R"(
@@ -410,7 +411,7 @@ void CGqlRequestTest::CreateUnionRequest()
 
 void CGqlRequestTest::ParseUnionFields()
 {
-	int errorPosition = -1;
+	qsizetype errorPosition = -1;
 
 	imtgql::CGqlRequest request;
 	bool retVal = request.ParseQuery(unionFieldsQuery, errorPosition);
@@ -423,7 +424,7 @@ void CGqlRequestTest::ParseUnionFields()
 
 void CGqlRequestTest::ParseEmpty()
 {
-	int errorPosition = -1;
+	qsizetype errorPosition = -1;
 
 	imtgql::CGqlRequest request;
 	bool retVal = request.ParseQuery(emptyQuery, errorPosition);
@@ -436,7 +437,7 @@ void CGqlRequestTest::ParseEmpty()
 
 void CGqlRequestTest::ParseSimple()
 {
-	int errorPosition = -1;
+	qsizetype errorPosition = -1;
 
 	imtgql::CGqlRequest request;
 	bool retVal = request.ParseQuery(simpleQuery, errorPosition);
@@ -449,7 +450,7 @@ void CGqlRequestTest::ParseSimple()
 
 void CGqlRequestTest::ParseFields()
 {
-	int errorPosition = -1;
+	qsizetype errorPosition = -1;
 
 	imtgql::CGqlRequest request;
 	bool retVal = request.ParseQuery(fieldsQuery, errorPosition);
@@ -462,7 +463,7 @@ void CGqlRequestTest::ParseFields()
 
 void CGqlRequestTest::ParseComplexFields()
 {
-	int errorPosition = -1;
+	qsizetype errorPosition = -1;
 
 	imtgql::CGqlRequest request;
 	bool retVal = request.ParseQuery(complexFieldsQuery, errorPosition);
@@ -474,7 +475,7 @@ void CGqlRequestTest::ParseComplexFields()
 
 void CGqlRequestTest::ParseSubstrateTest()
 {
-	int errorPosition = -1;
+	qsizetype errorPosition = -1;
 
 	imtgql::CGqlRequest request;
 	bool retVal = request.ParseQuery(substratQuery, errorPosition);
@@ -487,7 +488,7 @@ void CGqlRequestTest::ParseSubstrateTest()
 
 void CGqlRequestTest::ParseObjectQuery()
 {
-	int errorPosition = -1;
+	qsizetype errorPosition = -1;
 
 	imtgql::CGqlRequest request;
 	bool retVal = request.ParseQuery(objectQuery, errorPosition);
@@ -500,7 +501,7 @@ void CGqlRequestTest::ParseObjectQuery()
 
 void CGqlRequestTest::ParseArrayQuery()
 {
-	int errorPosition = -1;
+	qsizetype errorPosition = -1;
 
 	imtgql::CGqlRequest request;
 	bool retVal = request.ParseQuery(arrayQuery, errorPosition);
@@ -513,7 +514,7 @@ void CGqlRequestTest::ParseArrayQuery()
 
 void CGqlRequestTest::ParseArrayOfObjectArraysQuery()
 {
-	int errorPosition = -1;
+	qsizetype errorPosition = -1;
 
 	imtgql::CGqlRequest request;
 	bool retVal = request.ParseQuery(arrayOfObjectArraysQuery, errorPosition);
@@ -526,7 +527,7 @@ void CGqlRequestTest::ParseArrayOfObjectArraysQuery()
 
 void CGqlRequestTest::ParseComplexTest()
 {
-	int errorPosition = -1;
+	qsizetype errorPosition = -1;
 
 	imtgql::CGqlRequest request;
 	bool retVal = request.ParseQuery(complexQuery, errorPosition);

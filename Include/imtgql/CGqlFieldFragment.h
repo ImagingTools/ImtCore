@@ -13,11 +13,6 @@ class CGqlFieldFragment: public CGqlFieldObject
 {
 public:
 	typedef CGqlFieldObject BaseClass;
-
-	CGqlFieldFragment()
-		:BaseClass()
-	{
-	}
 };
 
 

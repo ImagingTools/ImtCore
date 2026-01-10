@@ -1,16 +1,12 @@
 #pragma once
 
 
-// Qt includes
-#include <QtPositioning/QGeoCoordinate>
-
 // ACF includes
 #include <istd/IPolymorphic.h>
 
 // ImtCore includes
 #include <imtbase/CTreeItemModel.h>
 #include <imtgeo/CPosition.h>
-#include <imtgeo/IPosition.h>
 #include <imtgeo/CCluster.h>
 
 namespace imtgeo
@@ -24,9 +20,7 @@ public:
     CClusterCreator();
     ~CClusterCreator();
 
-
 protected:
-
     QPair<double, double> coordToMercator(const QGeoCoordinate &coord) const;
     double getDistanceBetweenObjects(const QGeoCoordinate &coord1, const QGeoCoordinate &coord2) const;
     double getDistanceLimitCoeff(double zoomLevel) const;

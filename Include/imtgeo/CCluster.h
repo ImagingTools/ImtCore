@@ -18,7 +18,7 @@ namespace imtgeo
     Class for describing a cluster of objects on the map.
 
 */
-class CCluster: public CPositionIdentifiable, virtual public imtgeo::ICluster
+class CCluster: public CPositionIdentifiable, virtual public ICluster
 {
 public:
     typedef CPositionIdentifiable BaseClass;

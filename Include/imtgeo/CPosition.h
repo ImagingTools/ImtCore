@@ -1,9 +1,6 @@
 #pragma once
 
 
-// Qt includes
-#include <QtPositioning/QGeoCoordinate>
-
 // ImtDev includes
 #include <imtbase/TIdentifiableWrap.h>
 #include <imtgeo/IPosition.h>
@@ -14,7 +11,7 @@ namespace imtgeo
 /**
 	Class for describing the coordinates of an object with id.
 */
-class CPosition: virtual public imtgeo::IPosition
+class CPosition: virtual public IPosition
 {
 public:
 	CPosition();

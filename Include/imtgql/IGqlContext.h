@@ -1,9 +1,6 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QUuid>
-
 // ACF includes
 #include <iser/IObject.h>
 
@@ -43,7 +40,7 @@ public:
 	virtual void SetUserInfo(const imtauth::IUserInfo* userInfoPtr) = 0;
 
 	virtual Headers GetHeaders() const = 0;
-	virtual void SetHeaders(const Headers headers) = 0;
+	virtual void SetHeaders(const Headers& headers) = 0;
 };
 
 

@@ -16,10 +16,10 @@ namespace imtgql
 class IGqlContextController: virtual public istd::IPolymorphic
 {
 public:
-	virtual imtgql::IGqlContext* GetRequestContext(
-				const imtgql::CGqlRequest& gqlRequest,
+	virtual IGqlContext* GetRequestContext(
+				const CGqlRequest& gqlRequest,
 				const QByteArray& token,
-				const imtgql::IGqlContext::Headers& headers,
+				const IGqlContext::Headers& headers,
 				QString& errorMessage) const = 0;
 };
 

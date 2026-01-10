@@ -120,7 +120,7 @@ void CCompositeObjectViewComp::CreateView()
 						QByteArray objectFromExtendId = m_objectsFromExtendAttrPtr[extenderCounter];
 						const istd::IChangeable* objectFromExtendPtr = nullptr;
 
-						for (QByteArray currentObjectId : objectIds){
+						for (const QByteArray& currentObjectId : objectIds){
 							if (objectFromExtendId == currentObjectId){
 								objectFromExtendPtr = objectProviderPtr->GetObjectPtr(objectFromExtendId);
 								if (objectFromExtendPtr != nullptr){
@@ -147,7 +147,7 @@ void CCompositeObjectViewComp::DestroyView()
 
 	m_viewExtenders.clear();
 
-	for (icomp::IComponentSharedPtr viewComponentPtr : m_views){
+	for (const icomp::IComponentSharedPtr& viewComponentPtr : m_views){
 		iqtgui::IGuiObject* viewGuiObjectPtr = CompCastPtr<iqtgui::IGuiObject>(viewComponentPtr.get());
 		if (viewGuiObjectPtr != nullptr){
 			viewGuiObjectPtr->DestroyGui();

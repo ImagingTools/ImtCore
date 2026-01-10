@@ -1,12 +1,10 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QUuid>
-
 // ImtCore includes
 #include <imtgeo/IAddressElementInfo.h>
 #include <imtgeo/CPosition.h>
+
 
 namespace imtgeo
 {

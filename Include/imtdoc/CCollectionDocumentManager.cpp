@@ -98,7 +98,7 @@ QByteArray CCollectionDocumentManager::CreateNewDocument(const QByteArray& userI
 		info.documentId = retVal;
 		info.typeId = documentTypeId;
 		info.isDirty = false;
-	
+
 		istd::IChangeable::ChangeSet changeSet(CF_NEW_DOCUMENT_CREATED);
 		changeSet.SetChangeInfo(CN_NEW_DOCUMENT_CREATED, QVariant::fromValue(info));
 		istd::CChangeNotifier notifier(this, &changeSet);

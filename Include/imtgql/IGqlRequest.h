@@ -40,7 +40,7 @@ public:
 	virtual QByteArray GetCommandId() const = 0;
 	virtual RequestType GetRequestType() const = 0;
 	virtual QByteArray GetQuery() const = 0;
-	virtual const imtgql::IGqlContext* GetRequestContext() const = 0;
+	virtual const IGqlContext* GetRequestContext() const = 0;
 	/**
 		The version of the exchange protocol used to determine the message version. X-Protocol-Version HTTP header \sa imtbase::s_protocolVersionHeaderId
 	*/

@@ -14,11 +14,11 @@ class CDocumentSavedEvent : public CEventBase
 public:
 	CDocumentSavedEvent() = delete;
 	CDocumentSavedEvent(
-		QByteArray userId,
-		QByteArray documentId,
-		QByteArray documentTypeId,
-		QString documentName,
-		QUrl documentUrl,
+		const QByteArray& userId,
+		const QByteArray& documentId,
+		const QByteArray& documentTypeId,
+		const QString& documentName,
+		const QUrl& documentUrl,
 		bool isDirty);
 
 	// reimplemented (CEventBase)

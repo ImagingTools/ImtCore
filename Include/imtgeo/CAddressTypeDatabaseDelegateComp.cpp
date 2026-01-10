@@ -25,7 +25,7 @@ istd::IChangeableUniquePtr CAddressTypeDatabaseDelegateComp::CreateObjectFromRec
 		return nullptr;
 	}
 
-	imtgeo::IAddressTypeInfoUniquePtr adrTypeInfoPtr = m_adrTypeInfoFactCompPtr.CreateInstance();
+	IAddressTypeInfoUniquePtr adrTypeInfoPtr = m_adrTypeInfoFactCompPtr.CreateInstance();
 	if (!adrTypeInfoPtr.IsValid()){
 		return nullptr;
 	}
@@ -95,18 +95,18 @@ QByteArray CAddressTypeDatabaseDelegateComp::CreateDeleteObjectsQuery(
 	if (objectIds.isEmpty()){
 		return QByteArray();
 	}
-	
+
 	QStringList quotedIds;
 	for (const QByteArray& objectId : objectIds){
 		quotedIds << QString("'%1'").arg(qPrintable(objectId));
 	}
-	
+
 	QString query = QString(
 						"DELETE FROM \"AddressTypes\" WHERE \"Id\" IN (%1);")
 						.arg(
 							quotedIds.join(", ")
 							);
-	
+
 	return query.toUtf8();
 }
 

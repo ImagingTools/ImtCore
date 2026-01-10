@@ -5,7 +5,7 @@
 #include <imtgql/IGqlRequest.h>
 #include <imtgql/CGqlParamObject.h>
 #include <imtgql/CGqlFieldObject.h>
-#include <imtgql/CGqlFieldFragment.h>
+
 
 namespace imtgql
 {
@@ -18,15 +18,15 @@ public:
 	~CGqlRequest();
 
 	void AddParamValue(const QByteArray& paramId, const QVariant& value);
-	void AddParamValue(const QByteArray& paramId, const imtgql::CGqlEnum& value);
+	void AddParamValue(const QByteArray& paramId, const CGqlEnum& value);
 	void AddParam(const QByteArray& paramId, const CGqlParamObject& param);
 	void AddField(const QByteArray& fieldId, const CGqlFieldObject& field);
 	void AddSimpleField(const QByteArray& fieldId);
-	void SetGqlContext(imtgql::IGqlContextSharedPtr gqlContext);
+	void SetGqlContext(IGqlContextSharedPtr gqlContext);
 	void SetRequestType(RequestType requestType);
 	void SetCommandId(const QByteArray& commandId);
-	QByteArray GetHeader(QByteArray headerId) const;
-	void SetHeader(QByteArray headerId, QByteArray value);
+	QByteArray GetHeader(const QByteArray& headerId) const;
+	void SetHeader(const QByteArray& headerId, const QByteArray& value);
 
 	const CGqlFieldObject& GetFields() const;
 	const CGqlParamObject& GetParams() const;
@@ -38,13 +38,13 @@ public:
 
 	void SetProtocolVersion(const QByteArray& protocolVersion);
 
-	bool ParseQuery(const QByteArray& query, int &errorPosition);
+	bool ParseQuery(const QByteArray& query, qsizetype& errorPosition);
 
 	// reimplemented (IGqlRequest)
 	virtual QByteArray GetCommandId() const override;
 	virtual RequestType GetRequestType() const override;
 	virtual QByteArray GetQuery() const override;
-	virtual const imtgql::IGqlContext* GetRequestContext() const override;
+	virtual const IGqlContext* GetRequestContext() const override;
 	virtual QByteArray GetProtocolVersion() const override;
 
 	// reimplemented (iser::IObject)
@@ -93,10 +93,10 @@ protected:
 	CGqlParamObject* m_activeGqlObjectPtr;
 	CGqlFieldObject* m_activeFieldObjectPtr;
 	QList<CGqlParamObject*> m_objectArrayList;
-	imtgql::IGqlContextSharedPtr m_gqlContextPtr;
+	IGqlContextSharedPtr m_gqlContextPtr;
 	QList<QByteArray> m_activeArrayIds;
 
-	static const QHash<QByteArray, imtgql::IGqlRequest::RequestType> s_requestNameMap;
+	static const QHash<QByteArray, IGqlRequest::RequestType> s_requestNameMap;
 };
 
 

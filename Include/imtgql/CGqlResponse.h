@@ -13,7 +13,7 @@ namespace imtgql
 class CGqlResponseBase: virtual public IGqlResponse
 {
 public:
-	explicit CGqlResponseBase(GqlRequestPtr originalRequestPtr);
+	explicit CGqlResponseBase(const GqlRequestPtr& originalRequestPtr);
 
 	void SetResponseData(const QByteArray& data);
 

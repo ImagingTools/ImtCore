@@ -3,7 +3,6 @@
 
 // ImtCore includes
 #include <imtdb/CSqlJsonDatabaseDelegateComp.h>
-#include <imtgeo/ICluster.h>
 
 
 

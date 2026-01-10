@@ -16,14 +16,14 @@ public:
 	/**
 		Get IDs of the supported commands.
 	*/
-	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const = 0;
+	virtual bool IsRequestSupported(const CGqlRequest& gqlRequest) const = 0;
 
 	/**
 		Register subscriprion for a GraphQL-based request.
 	*/
 	virtual bool RegisterSubscription(
 				const QByteArray& subscriptionId,
-				const imtgql::CGqlRequest& gqlRequest,
+				const CGqlRequest& gqlRequest,
 				const imtrest::IRequest& networkRequest,
 				QString& errorMessage) = 0;
 	virtual bool UnregisterSubscription(const QByteArray& subscriptionId) = 0;

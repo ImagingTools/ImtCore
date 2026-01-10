@@ -27,7 +27,8 @@ QVariant CAddressCollectionControllerComp::GetObjectInformation(
 		if (informationId == QByteArray("Added")){
 			return metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_CREATION_TIME);
 		}
-		else if (informationId == QByteArray("LastModified")){
+
+		if (informationId == QByteArray("LastModified")){
 			return metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME);
 		}
 	}
@@ -76,8 +77,8 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
 		//imtbase::CCollectionFilter filterOnParentId;
 		imtbase::CCollectionFilter filterOnParentIds;
 		imtbase::CCollectionFilter filterOnTypeId;
-		int offset = 0, count = -1;
-		//QString parentId = "";
+		int offset = 0;
+		int count = -1;
 		QString parentIds = "";
 		QString filterText = "";
 		QString typeId = "";
@@ -86,16 +87,11 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
 			count = viewParamsGql->GetParamArgumentValue("count").toInt();
 
 			QByteArray filterBA = viewParamsGql->GetParamArgumentValue("FilterModel").toByteArray();
-			//qDebug() << "filterBA:: " << filterBA;
 			if (!filterBA.isEmpty()){
 				imtbase::CTreeItemModel generalModel;
 				generalModel.CreateFromJson(filterBA);
 
-				//parentIds = "{00000817-0000-0000-0000-000000000000}";//generalModel.GetData("ParentId").toString();
-
 				parentIds = generalModel.GetData("ParentIds").toString();
-				//qDebug()<< "filter::: parentIds::: " << parentIds;
-
 				if (!parentIds.isEmpty()){
 					QStringList parentIdList = parentIds.split(",");
 					QJsonArray jsonArray;
@@ -196,7 +192,6 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
 					objectCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), offset, count, &filterParams));
 
 		if (objectCollectionIterator != nullptr){
-			int whileCount = 0;
 			while (objectCollectionIterator->Next()){
 				imtbase::IObjectCollection::DataPtr objectDataPtr;
 				if (objectCollectionIterator->GetObjectData(objectDataPtr)){
@@ -224,8 +219,6 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
 							}
 						}
 
-						//qDebug() << "fullAddress::: "  << fullAddress;
-
 						itemsModel->SetData("FullAddress", fullAddress, itemIndex);
 						itemsModel->SetData("Id", addressId, itemIndex);
 						itemsModel->SetData("Name", name, itemIndex);
@@ -238,21 +231,10 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
 					}
 
 				}
-				else {
-					//qDebug() << "тест" << " return nullptr";
-					//return nullptr;
-				}
-				whileCount++;
-				//qDebug() << "тест" << whileCount;
-
-
-
 			}//while
-			//qDebug() << "тест" << " while exit";
-
 		}//ITERATOR
 
-		if (!itemsModel->GetItemsCount() && !parentIds.isEmpty() && filterText.isEmpty()){
+		if ((itemsModel->GetItemsCount() == 0) && !parentIds.isEmpty() && filterText.isEmpty()){
 			notificationModel->SetData("Close", true);
 		}
 

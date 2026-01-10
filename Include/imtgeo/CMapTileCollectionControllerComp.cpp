@@ -1,17 +1,9 @@
 #include <imtgeo/CMapTileCollectionControllerComp.h>
 
 
-// STL includes
-#include <cmath>
-
 // ACF includes
-#include <idoc/CStandardDocumentMetaInfo.h>
 #include <idoc/IDocumentMetaInfo.h>
 #include <iprm/CParamsSet.h>
-
-// ImtCore includes
-#include <imtbase/CCollectionFilter.h>
-#include <imtgeo/CAddressElementInfo.h>
 
 
 namespace imtgeo
@@ -27,7 +19,8 @@ QVariant CMapTileCollectionControllerComp::GetObjectInformation(
 		if (informationId == QByteArray("Added")){
 			return metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_CREATION_TIME);
 		}
-		else if (informationId == QByteArray("LastModified")){
+
+		if (informationId == QByteArray("LastModified")){
 			return metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME);
 		}
 	}
@@ -65,7 +58,7 @@ imtbase::CTreeItemModel* CMapTileCollectionControllerComp::ListObjects(const imt
 		const imtgql::CGqlParamObject* viewParamsGql = nullptr;
 		QList<imtgql::CGqlParamObject> inputParams;
 		inputParams.append(gqlRequest.GetParams());
-		if (inputParams.size() > 0){
+		if (!inputParams.isEmpty()){
 			viewParamsGql = inputParams.at(0).GetParamArgumentObjectPtr("viewParams");
 		}
 
@@ -94,7 +87,7 @@ imtbase::CTreeItemModel* CMapTileCollectionControllerComp::ListObjects(const imt
 		}
 
 		{
-			if (tileList.count()){
+			if (!tileList.isEmpty()){
 				int itemIndex = 0;
 				int z = tileList.at(0).second;
 				for (int i = 0; i < tileList.size(); i++){

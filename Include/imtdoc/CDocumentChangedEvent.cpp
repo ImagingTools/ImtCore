@@ -8,14 +8,14 @@ namespace imtdoc
 // public methods
 
 CDocumentChangedEvent::CDocumentChangedEvent(
-	QByteArray userId,
-	QByteArray documentId,
-	QByteArray documentTypeId,
-	QString documentName,
-	QUrl documentUrl,
-	bool isDirty,
-	const istd::IChangeable& document,
-	const istd::IChangeable::ChangeSet& changeSet)
+			const QByteArray& userId,
+			const QByteArray& documentId,
+			const QByteArray& documentTypeId,
+			const QString& documentName,
+			const QUrl& documentUrl,
+			bool isDirty,
+			const istd::IChangeable& document,
+			const istd::IChangeable::ChangeSet& changeSet)
 	:m_document(document),
 	m_changeSet(changeSet)
 {
@@ -34,7 +34,7 @@ const istd::IChangeable& CDocumentChangedEvent::GetDocument() const
 }
 
 
-const istd::IChangeable::ChangeSet CDocumentChangedEvent::GetChangeSet() const
+istd::IChangeable::ChangeSet CDocumentChangedEvent::GetChangeSet() const
 {
 	return m_changeSet;
 }

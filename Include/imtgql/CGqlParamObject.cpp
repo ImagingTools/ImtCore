@@ -2,7 +2,6 @@
 
 
 // ACF includes
-#include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
 
 
@@ -59,7 +58,7 @@ CGqlParamObject *CGqlParamObject::CreateParamObject(const QByteArray& paramId)
 }
 
 
-const CGqlParamObject* CGqlParamObject::GetParamArgumentObjectPtr(const QByteArray &paramId,int index) const
+const CGqlParamObject* CGqlParamObject::GetParamArgumentObjectPtr(const QByteArray &paramId, qsizetype index) const
 {
 	const CGqlParamObject* retVal = nullptr;
 
@@ -112,7 +111,7 @@ void CGqlParamObject::InsertParam(const QByteArray &paramId, const CGqlParamObje
 }
 
 
-void CGqlParamObject::InsertParam(const QByteArray &paramId, const QList<CGqlParamObject> objectList)
+void CGqlParamObject::InsertParam(const QByteArray &paramId, const QList<CGqlParamObject>& objectList)
 {
 	QList<istd::TSharedInterfacePtr<CGqlParamObject>> objectPtrList;
 	for (int i = 0; i < objectList.count(); i++){
@@ -180,11 +179,11 @@ bool CGqlParamObject::IsEnum(const QByteArray &paramId) const
 }
 
 
-int CGqlParamObject::GetObjectsCount(const QByteArray &paramId) const
+qsizetype CGqlParamObject::GetObjectsCount(const QByteArray &paramId) const
 {
-	int retVal = 0;
+	qsizetype retVal = 0;
 	if (m_objectParamsArray.contains(paramId)){
-		retVal = m_objectParamsArray[paramId].count();
+		retVal = m_objectParamsArray[paramId].size();
 	}
 
 	return retVal;

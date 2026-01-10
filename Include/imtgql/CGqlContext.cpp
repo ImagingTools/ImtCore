@@ -2,7 +2,6 @@
 
 
 // ACF includes
-#include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
@@ -14,13 +13,13 @@ namespace imtgql
 
 // public methods
 
-imtgql::CGqlContext::CGqlContext()
+CGqlContext::CGqlContext()
 	:m_userInfoPtr(nullptr)
 {
 }
 
 
-imtgql::CGqlContext::~CGqlContext()
+CGqlContext::~CGqlContext()
 {
 }
 
@@ -135,7 +134,7 @@ IGqlContext::Headers CGqlContext::GetHeaders() const
 }
 
 
-void CGqlContext::SetHeaders(const Headers headers)
+void CGqlContext::SetHeaders(const Headers& headers)
 {
 	if (m_headers != headers){
 		istd::CChangeNotifier changeNotifier(this);
@@ -199,7 +198,7 @@ int CGqlContext::GetSupportedOperations() const
 
 bool CGqlContext::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/)
 {
-	const CGqlContext* sourcePtr = dynamic_cast<const CGqlContext*>(&object);
+	auto sourcePtr = dynamic_cast<const CGqlContext*>(&object);
 	if (sourcePtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);
 

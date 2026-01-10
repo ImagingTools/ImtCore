@@ -56,7 +56,7 @@ imtbase::CTreeItemModel* CAddressControllerComp::GetObject(
 		QString address = addressInfoPtr->GetAddress();
 		if (address == QString(""))
 		{
-			for (QByteArray elemId : parents)
+			for (const QByteArray& elemId: parents)
 			{
 				imtbase::IObjectCollection::DataPtr dataElementPtr;
 				if (m_objectCollectionCompPtr->GetObjectData(elemId, dataElementPtr)){
@@ -105,7 +105,8 @@ imtbase::CTreeItemModel* CAddressControllerComp::InsertObject(
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	imtbase::CTreeItemModel* notificationModel = nullptr;
 	QByteArray newObjectId;
-	QString name, description;
+	QString name;
+	QString description;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
@@ -248,7 +249,8 @@ imtbase::CTreeItemModel* CAddressControllerComp::UpdateObject(
 
 	QByteArray oldObjectId = GetObjectIdFromInputParams(*inputParamPtr);
 	QByteArray newObjectId;
-	QString name, description;
+	QString name;
+	QString description;
 
 	QString splitObjectId = oldObjectId;
 
@@ -268,7 +270,7 @@ imtbase::CTreeItemModel* CAddressControllerComp::UpdateObject(
 
 			istd::IChangeableUniquePtr savedObject = CreateObjectFromRequest(gqlRequest, newObjectId, errorMessage);
 			if (savedObject.IsValid()){
-				if (m_objectCollectionCompPtr->SetObjectData(oldObjectId, *savedObject) == false){
+				if (!m_objectCollectionCompPtr->SetObjectData(oldObjectId, *savedObject)){
 					errorMessage = QObject::tr("Can not update object: %1").arg(splitObjectId);
 				}
 				else{

@@ -8,12 +8,12 @@ namespace imtdoc
 // public methods
 
 CDocumentClosedEvent::CDocumentClosedEvent(
-	QByteArray userId,
-	QByteArray documentId,
-	QByteArray documentTypeId,
-	QString documentName,
-	QUrl documentUrl,
-	bool isDirty)
+			const QByteArray& userId,
+			const QByteArray& documentId,
+			const QByteArray& documentTypeId,
+			const QString& documentName,
+			const QUrl& documentUrl,
+			bool isDirty)
 {
 	m_userId = userId;
 	m_documentId = documentId;

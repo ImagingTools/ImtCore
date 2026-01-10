@@ -1,7 +1,6 @@
 #include <imtfile/CFileProviderComp.h>
 
 // Qt includes
-#include <QtCore/QRegularExpression>
 #include <QtCore/QRegularExpressionMatch>
 
 
@@ -16,12 +15,12 @@ bool CFileProviderComp::LoadData(QByteArray& data, const QByteArray& name) const
 	QByteArray workingFileName = name;
 	QString homeDirPath = *m_homeDirPathAttrPtr;
 
-	if (m_fileTemplatePathCompPtr.IsValid() && m_fileTemplatePathCompPtr->GetPath().length()){
+	if (m_fileTemplatePathCompPtr.IsValid() && !m_fileTemplatePathCompPtr->GetPath().isEmpty()){
 		homeDirPath = m_fileTemplatePathCompPtr->GetPath();
 	}
 
 	if (*m_pathsProblemsAutoSolveAttrPtr){
-		int indexOfPathSeparator = -1;
+		qsizetype indexOfPathSeparator = -1;
 		QRegularExpression regexp("(.\\/.)");
 
 		QRegularExpressionMatch indexOfPathSeparatorMatch = regexp.match(workingFileName);
@@ -49,26 +48,23 @@ bool CFileProviderComp::LoadData(QByteArray& data, const QByteArray& name) const
 		return false;
 	}
 
-	else {
-		QString destinationFileAbsoluteFilePath = destinationEntry.absoluteFilePath();
 
-		if (homeDirPath == ":"){
-			destinationFileAbsoluteFilePath = destinationEntryPath;
-		}
-
-		if (destinationFileAbsoluteFilePath.endsWith('/')){
-			destinationFileAbsoluteFilePath.chop(1);
-		}
-
-		QFile destinationFile(destinationFileAbsoluteFilePath);
-
-		if (!destinationFile.open(QFile::ReadOnly)){
-			return false;
-		}
-
-		data = destinationFile.readAll();
-		destinationFile.close();
+	QString destinationFileAbsoluteFilePath = destinationEntry.absoluteFilePath();
+	if (homeDirPath == ":"){
+		destinationFileAbsoluteFilePath = destinationEntryPath;
 	}
+
+	if (destinationFileAbsoluteFilePath.endsWith('/')){
+		destinationFileAbsoluteFilePath.chop(1);
+	}
+
+	QFile destinationFile(destinationFileAbsoluteFilePath);
+	if (!destinationFile.open(QFile::ReadOnly)){
+		return false;
+	}
+
+	data = destinationFile.readAll();
+	destinationFile.close();
 
 	return true;
 }

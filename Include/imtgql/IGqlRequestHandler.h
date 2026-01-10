@@ -16,12 +16,12 @@ public:
 	/**
 		Get IDs of the supported commands.
 	*/
-	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const = 0;
+	virtual bool IsRequestSupported(const CGqlRequest& gqlRequest) const = 0;
 
 	/**
 		Create response for a GraphQL-based request.
 	*/
-	virtual imtbase::CTreeItemModel* CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
+	virtual imtbase::CTreeItemModel* CreateResponse(const CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
 };
 
 

@@ -1,9 +1,9 @@
 #include <imtgeo/CAddressElementDatabaseDelegateComp.h>
 
+
 // ACF includes
 #include <imod/TModelWrap.h>
 #include <iprm/TParamsPtr.h>
-#include <idoc/CStandardDocumentMetaInfo.h>
 
 
 namespace imtgeo
@@ -35,7 +35,7 @@ istd::IChangeableUniquePtr CAddressElementDatabaseDelegateComp::CreateObjectFrom
 	}
 
 	if (record.contains("Id")){
-		CPositionIdentifiable* adrElementIdentifiableInfoPtr = dynamic_cast<CPositionIdentifiable*>(adrElementInfoPtr.GetPtr());
+		auto adrElementIdentifiableInfoPtr = dynamic_cast<CPositionIdentifiable*>(adrElementInfoPtr.GetPtr());
 		if (adrElementIdentifiableInfoPtr != nullptr){
 			QByteArray id = record.value("Id").toByteArray();
 			adrElementIdentifiableInfoPtr->SetObjectUuid(id);
@@ -104,7 +104,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CAddressElementDatabaseDelegateCo
 	const istd::IChangeable* valuePtr,
 	const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	const IAddressElementInfo* adrInfoPtr = dynamic_cast<const IAddressElementInfo*>(valuePtr);
+	auto adrInfoPtr = dynamic_cast<const IAddressElementInfo*>(valuePtr);
 	if (adrInfoPtr == nullptr){
 		return NewObjectQuery();
 	}
@@ -114,10 +114,10 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CAddressElementDatabaseDelegateCo
 
 	QList<QByteArray> parentIds = adrInfoPtr->GetParentIds();
 	QJsonArray json;
-	for (QByteArray parentId : parentIds){
+	for (const QByteArray& parentId : parentIds){
 		json.append(QJsonValue(QString(parentId)));
 	}
-	QJsonDocument document = QJsonDocument(json);
+	QJsonDocument document(json);
 	QByteArray parents = document.toJson(QJsonDocument::Compact);
 
 	QByteArray typeId = adrInfoPtr->GetAddressTypeId();
@@ -150,18 +150,18 @@ QByteArray CAddressElementDatabaseDelegateComp::CreateDeleteObjectsQuery(
 	if (objectIds.isEmpty()){
 		return QByteArray();
 	}
-	
+
 	QStringList quotedIds;
 	for (const QByteArray& objectId : objectIds){
 		quotedIds << QString("'%1'").arg(qPrintable(objectId));
 	}
-	
+
 	QString query = QString(
 						"DELETE FROM \"AddressElements\" WHERE \"Id\" IN (%1);")
 						.arg(
 							quotedIds.join(", ")
 							);
-	
+
 	return query.toUtf8();
 }
 
@@ -182,18 +182,18 @@ QByteArray CAddressElementDatabaseDelegateComp::CreateUpdateObjectQuery(
 	const imtbase::IOperationContext* /*operationContextPtr*/,
 	bool /*useExternDelegate*/) const
 {
-	const IAddressElementInfo* adrInfoPtr = dynamic_cast<const IAddressElementInfo*>(&object);
-	const CPositionIdentifiable* positionInfoPtr = dynamic_cast<const CPositionIdentifiable*>(&object);
+	auto adrInfoPtr = dynamic_cast<const IAddressElementInfo*>(&object);
+	auto positionInfoPtr = dynamic_cast<const CPositionIdentifiable*>(&object);
 	if (adrInfoPtr == nullptr || objectId.isEmpty()){
 		return QByteArray();
 	}
 	QByteArray adrId = positionInfoPtr->GetObjectUuid();
 	QList<QByteArray> parentIds = adrInfoPtr->GetParentIds();
 	QJsonArray json;
-	for (QByteArray parentId : parentIds){
+	for (const QByteArray& parentId : parentIds){
 		json.append(QJsonValue(QString(parentId)));
 	}
-	QJsonDocument document = QJsonDocument(json);
+	QJsonDocument document(json);
 	QByteArray parents = document.toJson(QJsonDocument::Compact);
 	QByteArray typeId = adrInfoPtr->GetAddressTypeId();
 	QString adrName = adrInfoPtr->GetName();
@@ -247,58 +247,49 @@ QByteArray CAddressElementDatabaseDelegateComp::CreateDescriptionObjectQuery(
 QByteArray CAddressElementDatabaseDelegateComp::GetSelectionQuery(const QByteArray &objectId, int offset, int count, const iprm::IParamsSet *paramsPtr) const
 {
 	if (!objectId.isEmpty()){
-
-//        return QString("SELECT * FROM \"%1\" WHERE \"%2\" = '%3'")
-//                    .arg(qPrintable(*m_tableNameAttrPtr))
-//                    .arg(qPrintable(*m_objectIdColumnAttrPtr))
-//                    .arg(qPrintable(objectId))
-//                    .toUtf8();
-
-        return QString(R"sql(SELECT "Id", "ParentIds", "Type", "Name", "Latitude", "Longitude",(SELECT get_full_address(ae."ParentIds", ae."Name", ae."Type")) AS "FullAddress" FROM "%1" AS ae WHERE ae."%2" = '%3')sql")
+		return QString(R"sql(SELECT "Id", "ParentIds", "Type", "Name", "Latitude", "Longitude",(SELECT get_full_address(ae."ParentIds", ae."Name", ae."Type")) AS "FullAddress" FROM "%1" AS ae WHERE ae."%2" = '%3')sql")
 					.arg(qPrintable(*m_tableNameAttrPtr))
 					.arg(qPrintable(*m_objectIdColumnAttrPtr))
 					.arg(qPrintable(objectId))
 					.toUtf8();
 	}
-	else{
-		QString sortQuery;
-		QString filterQuery;
-		QString textFilter;
-		if (count == 0){
+
+	QString sortQuery;
+	QString filterQuery;
+	QString textFilter;
+	if (count == 0){
+		return QByteArray();
+	}
+	if (paramsPtr != nullptr){
+		if (!CreateFilterQuery(*paramsPtr, filterQuery)){
 			return QByteArray();
 		}
-		if (paramsPtr != nullptr){
-			if (!CreateFilterQuery(*paramsPtr, filterQuery)){
+
+		iprm::TParamsPtr<imtbase::ICollectionFilter> collectionFilterParamPtr(paramsPtr, "Filter");
+		if (collectionFilterParamPtr.IsValid()){
+			textFilter = collectionFilterParamPtr->GetTextFilter();
+			if (!CreateSortQuery(*collectionFilterParamPtr, sortQuery)){
 				return QByteArray();
 			}
-
-			iprm::TParamsPtr<imtbase::ICollectionFilter> collectionFilterParamPtr(paramsPtr, "Filter");
-			if (collectionFilterParamPtr.IsValid()){
-				textFilter = collectionFilterParamPtr->GetTextFilter();                
-				if (!CreateSortQuery(*collectionFilterParamPtr, sortQuery)){
-					return QByteArray();
-				}
-			}
 		}
-
-		QByteArray paginationQuery;
-		if (!CreatePaginationQuery(offset, count, paginationQuery)){
-			return QByteArray();
-		}
-
-        QString baseSelelectionQuery = QString(R"sql(SELECT "Id", "ParentIds", "Type", "Name", "Latitude", "Longitude",(SELECT get_full_address(ae."ParentIds", ae."Name", ae."Type")) AS "FullAddress" FROM "%1" AS ae )sql")
-					.arg(qPrintable(*m_tableNameAttrPtr));
-
-		// Due to a bug in qt in the context of resolving of an expression like this: '%<SOME_NUMBER>%'
-		QString retVal = "(" + baseSelelectionQuery;
-		retVal += QString(" ") + filterQuery;
-		retVal += QString(" ") + qPrintable(paginationQuery) + ")";
-		retVal += QString(" ") + sortQuery;
-
-		return retVal.toUtf8();
 	}
 
-	return QByteArray();
+	QByteArray paginationQuery;
+	if (!CreatePaginationQuery(offset, count, paginationQuery)){
+		return QByteArray();
+	}
+
+	QString baseSelelectionQuery = QString(R"sql(SELECT "Id", "ParentIds", "Type", "Name", "Latitude", "Longitude",(SELECT get_full_address(ae."ParentIds", ae."Name", ae."Type")) AS "FullAddress" FROM "%1" AS ae )sql")
+				.arg(qPrintable(*m_tableNameAttrPtr));
+
+	// Due to a bug in qt in the context of resolving of an expression like this: '%<SOME_NUMBER>%'
+	QString retVal = "(" + baseSelelectionQuery;
+	retVal += QString(" ") + filterQuery;
+	retVal += QString(" ") + qPrintable(paginationQuery) + ")";
+	retVal += QString(" ") + sortQuery;
+
+	return retVal.toUtf8();
+
 }
 
 
@@ -308,11 +299,11 @@ bool CAddressElementDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsS
 
 	QString textFilterQuery;
 	QString parentIdsFilterQuery;
-    QString parentIdFilterQuery;
+	QString parentIdFilterQuery;
 	QString typeIdFilterQuery;
 	iprm::TParamsPtr<imtbase::ICollectionFilter> collectionFilterParamPtr(&filterParams, "Filter");
 	iprm::TParamsPtr<imtbase::ICollectionFilter> parentIdsFilterParamPtr(&filterParams, "ParentIds");
-    iprm::TParamsPtr<imtbase::ICollectionFilter> parentIdFilterParamPtr(&filterParams, "ParentId");
+	iprm::TParamsPtr<imtbase::ICollectionFilter> parentIdFilterParamPtr(&filterParams, "ParentId");
 	iprm::TParamsPtr<imtbase::ICollectionFilter> typeIdFilterParamPtr(&filterParams, "TypeId");
 	if (collectionFilterParamPtr.IsValid()){
 		CreateTextFilterQuery(*collectionFilterParamPtr, textFilterQuery);
@@ -322,20 +313,20 @@ bool CAddressElementDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsS
 		parentIdsFilterQuery = "'" + parentIdsFilterParamPtr->GetTextFilter() + "' <@ (\"ParentIds\")";
 	}
 
-    if (parentIdFilterParamPtr.IsValid() ){
-        if(parentIdFilterParamPtr->GetTextFilter() != ""){
-            parentIdFilterQuery = QString(R"("ParentIds"->>(jsonb_array_length("ParentIds")-1))").append(" = ").append("'").append(parentIdFilterParamPtr->GetTextFilter().append("'"));
-        }
-        else {
-            parentIdFilterQuery = QString(R"(jsonb_array_length("ParentIds") = 0)");
-        }
-    }
+	if (parentIdFilterParamPtr.IsValid() ){
+		if(parentIdFilterParamPtr->GetTextFilter() != ""){
+			parentIdFilterQuery = QString(R"("ParentIds"->>(jsonb_array_length("ParentIds")-1))").append(" = ").append("'").append(parentIdFilterParamPtr->GetTextFilter().append("'"));
+		}
+		else {
+			parentIdFilterQuery = QString(R"(jsonb_array_length("ParentIds") = 0)");
+		}
+	}
 
 	if (typeIdFilterParamPtr.IsValid() && typeIdFilterParamPtr->GetTextFilter() != ""){
 		typeIdFilterQuery = "\"Type\" = '" + typeIdFilterParamPtr->GetTextFilter() + "'";
 	}
 
-    if (!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty() || !parentIdsFilterQuery.isEmpty() || !parentIdFilterQuery.isEmpty()|| !typeIdFilterQuery.isEmpty()){
+	if (!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty() || !parentIdsFilterQuery.isEmpty() || !parentIdFilterQuery.isEmpty()|| !typeIdFilterQuery.isEmpty()){
 		filterQuery = " WHERE ";
 	}
 
@@ -346,9 +337,7 @@ bool CAddressElementDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsS
 
 	if (!textFilterQuery.isEmpty()){
 		filterQuery += "(" + textFilterQuery + ")";
-		//qDebug() << "textFilterQuery::: " << textFilterQuery;
 	}
-
 
 	if ((!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty()) && !parentIdsFilterQuery.isEmpty()){
 		filterQuery += " AND ";
@@ -358,44 +347,44 @@ bool CAddressElementDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsS
 		filterQuery += "(" + parentIdsFilterQuery + ")";
 	}
 
-    if ((!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty() || !parentIdsFilterQuery.isEmpty()) && !parentIdFilterQuery.isEmpty()){
-        filterQuery += " AND ";
-    }
+	if ((!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty() || !parentIdsFilterQuery.isEmpty()) && !parentIdFilterQuery.isEmpty()){
+		filterQuery += " AND ";
+	}
 
-    if (!typeIdFilterQuery.isEmpty()){
-        filterQuery += "(" + parentIdFilterQuery + ")";
-    }
+	if (!typeIdFilterQuery.isEmpty()){
+		filterQuery += "(" + parentIdFilterQuery + ")";
+	}
 
-    if ((!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty() || !parentIdsFilterQuery.isEmpty()  || !parentIdFilterQuery.isEmpty()) && !typeIdFilterQuery.isEmpty()){
-        filterQuery += " AND ";
-    }
+	if ((!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty() || !parentIdsFilterQuery.isEmpty()  || !parentIdFilterQuery.isEmpty()) && !typeIdFilterQuery.isEmpty()){
+		filterQuery += " AND ";
+	}
 
-    if (!typeIdFilterQuery.isEmpty()){
-        filterQuery += "(" + typeIdFilterQuery + ")";
-    }
+	if (!typeIdFilterQuery.isEmpty()){
+		filterQuery += "(" + typeIdFilterQuery + ")";
+	}
 
 	return true;
 }
 
 bool CAddressElementDatabaseDelegateComp::CreateTextFilterQuery(const imtbase::ICollectionFilter &collectionFilter, QString &textFilterQuery) const
 {
-    QByteArrayList filteringColumnIds = collectionFilter.GetFilteringInfoIds();
-    if (filteringColumnIds.isEmpty()){
-        return true;
-    }
+	QByteArrayList filteringColumnIds = collectionFilter.GetFilteringInfoIds();
+	if (filteringColumnIds.isEmpty()){
+		return true;
+	}
 
-    QString textFilter = collectionFilter.GetTextFilter();
-    if (!textFilter.isEmpty()){
-        textFilterQuery = QString("\"%1\" ILIKE '%2%'").arg(qPrintable(filteringColumnIds.first())).arg(textFilter);
+	QString textFilter = collectionFilter.GetTextFilter();
+	if (!textFilter.isEmpty()){
+		textFilterQuery = QString("\"%1\" ILIKE '%2%'").arg(qPrintable(filteringColumnIds.first())).arg(textFilter);
 
-        for (int i = 1; i < filteringColumnIds.count(); ++i){
-            textFilterQuery += " OR ";
+		for (int i = 1; i < filteringColumnIds.count(); ++i){
+			textFilterQuery += " OR ";
 
-            textFilterQuery += QString("\"%1\" ILIKE '%2%'").arg(qPrintable(filteringColumnIds[i])).arg(textFilter);
-        }
-    }
+			textFilterQuery += QString("\"%1\" ILIKE '%2%'").arg(qPrintable(filteringColumnIds[i])).arg(textFilter);
+		}
+	}
 
-    return true;
+	return true;
 }
 
 } // namespace imtgeo

@@ -29,7 +29,7 @@ public:
 	virtual const imtauth::IUserInfo* GetUserInfo() const override;
 	virtual void SetUserInfo(const imtauth::IUserInfo* userInfoPtr) override;
 	virtual Headers GetHeaders() const override;
-	virtual void SetHeaders(const Headers headers) override;
+	virtual void SetHeaders(const Headers& headers) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive &archive) override;

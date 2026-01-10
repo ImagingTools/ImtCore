@@ -7,7 +7,7 @@ namespace imtgql
 
 // public methods
 
-CGqlResponseBase::CGqlResponseBase(GqlRequestPtr originalRequestPtr)
+CGqlResponseBase::CGqlResponseBase(const GqlRequestPtr& originalRequestPtr)
 	:m_originalRequestPtr(originalRequestPtr)
 {
 }

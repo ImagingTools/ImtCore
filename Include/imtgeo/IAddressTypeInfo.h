@@ -10,7 +10,7 @@ namespace imtgeo
 
 
 /**
-	Common interface for a addreess type info instance.
+	Common interface for an address type info instance.
 	\ingroup AddressType
 */
 class IAddressTypeInfo: virtual public iser::IObject

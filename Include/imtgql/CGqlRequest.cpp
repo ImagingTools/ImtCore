@@ -6,7 +6,6 @@
 #include <QtCore/QJsonObject>
 
 // ACF includes
-#include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
 
 // ImtCore includes
@@ -18,22 +17,23 @@ namespace imtgql
 {
 
 
-const QHash<QByteArray, imtgql::IGqlRequest::RequestType> CGqlRequest::s_requestNameMap = {
-	{ QByteArrayLiteral("query"), imtgql::IGqlRequest::RT_QUERY },
-	{ QByteArrayLiteral("mutation"), imtgql::IGqlRequest::RT_MUTATION },
-	{ QByteArrayLiteral("subscription"), imtgql::IGqlRequest::RT_SUBSCRIPTION },
+const QHash<QByteArray, IGqlRequest::RequestType> CGqlRequest::s_requestNameMap = {
+	{ QByteArrayLiteral("query"), IGqlRequest::RT_QUERY },
+	{ QByteArrayLiteral("mutation"), IGqlRequest::RT_MUTATION },
+	{ QByteArrayLiteral("subscription"), IGqlRequest::RT_SUBSCRIPTION },
 };
 
 
 // public methods
 
-imtgql::CGqlRequest::CGqlRequest(RequestType requestType, const QByteArray& commandId)
+CGqlRequest::CGqlRequest(RequestType requestType, const QByteArray& commandId)
 	:m_commandId(commandId),
 	m_requestType(requestType),
 	m_startKey(false),
 	m_startValue(false),
 	m_startParams(false),
 	m_startFields(false),
+	m_startFragment(false),
 	m_startArrayPrimitives(false),
 	m_textString(false),
 	m_activeGqlObjectPtr(nullptr),
@@ -43,7 +43,7 @@ imtgql::CGqlRequest::CGqlRequest(RequestType requestType, const QByteArray& comm
 }
 
 
-imtgql::CGqlRequest::~CGqlRequest()
+CGqlRequest::~CGqlRequest()
 {
 }
 
@@ -66,7 +66,7 @@ void CGqlRequest::AddSimpleField(const QByteArray &fieldId)
 }
 
 
-void CGqlRequest::SetGqlContext(imtgql::IGqlContextSharedPtr gqlContext)
+void CGqlRequest::SetGqlContext(IGqlContextSharedPtr gqlContext)
 {
 	if (m_gqlContextPtr.GetPtr() != gqlContext.GetPtr()){
 		istd::CChangeNotifier changeNotifier(this);
@@ -88,7 +88,7 @@ void CGqlRequest::SetCommandId(const QByteArray& commandId)
 }
 
 
-QByteArray CGqlRequest::GetHeader(QByteArray headerId) const
+QByteArray CGqlRequest::GetHeader(const QByteArray& headerId) const
 {
 	const IGqlContext* gqlContext = GetRequestContext();
 	if (gqlContext != nullptr){
@@ -101,7 +101,7 @@ QByteArray CGqlRequest::GetHeader(QByteArray headerId) const
 }
 
 
-void CGqlRequest::SetHeader(QByteArray headerId, QByteArray value)
+void CGqlRequest::SetHeader(const QByteArray& headerId, const QByteArray& value)
 {
 	if (m_gqlContextPtr.IsValid()){
 		IGqlContext::Headers headers = m_gqlContextPtr->GetHeaders();
@@ -160,7 +160,7 @@ QByteArray CGqlRequest::GetCommandId() const
 
 // reimplemented (IGqlRequest)
 
-imtgql::IGqlRequest::RequestType CGqlRequest::GetRequestType() const
+IGqlRequest::RequestType CGqlRequest::GetRequestType() const
 {
 	return m_requestType;
 }
@@ -174,13 +174,13 @@ QByteArray CGqlRequest::GetQuery() const
 	QByteArray type;
 	switch (m_requestType)
 	{
-	case imtgql::IGqlRequest::RT_QUERY:
+	case RT_QUERY:
 		type = QByteArrayLiteral("query");
 		break;
-	case imtgql::IGqlRequest::RT_MUTATION:
+	case RT_MUTATION:
 		type = QByteArrayLiteral("mutation");
 		break;
-	case imtgql::IGqlRequest::RT_SUBSCRIPTION:
+	case RT_SUBSCRIPTION:
 		type = QByteArrayLiteral("subscription");
 		break;
 	default:
@@ -210,7 +210,7 @@ QByteArray CGqlRequest::GetProtocolVersion() const
 }
 
 
-bool CGqlRequest::ParseQuery(const QByteArray& query, int& errorPosition)
+bool CGqlRequest::ParseQuery(const QByteArray& query, qsizetype& errorPosition)
 {
 	if(query.isEmpty()){
 		return false;
@@ -226,7 +226,7 @@ bool CGqlRequest::ParseQuery(const QByteArray& query, int& errorPosition)
 		return false;
 	}
 
-	int index = body.indexOf('{');
+	qsizetype index = body.indexOf('{');
 	if (index == -1){
 		return false;
 	}
@@ -243,11 +243,11 @@ bool CGqlRequest::ParseQuery(const QByteArray& query, int& errorPosition)
 		}
 	}
 
-	if (!CGqlRequest::s_requestNameMap.contains(type)){
+	if (!s_requestNameMap.contains(type)){
 		return false;
 	}
 
-	m_requestType = CGqlRequest::s_requestNameMap[type];
+	m_requestType = s_requestNameMap[type];
 
 	body = body.mid(index + 1);
 	index = body.lastIndexOf('}');
@@ -283,7 +283,7 @@ bool CGqlRequest::ParseQuery(const QByteArray& query, int& errorPosition)
 	m_startFragment = false;
 
 	QByteArray text;
-	for (int i = 0; i < body.length() ; ++i){
+	for (qsizetype i = 0; i < body.length() ; ++i){
 		char chr = body[i];
 		switch (chr){
 		case '(':
@@ -357,17 +357,17 @@ bool CGqlRequest::ParseQuery(const QByteArray& query, int& errorPosition)
 					m_activeFieldObjectPtr = m_activeFieldObjectPtr->GetParentObject();
 				}
 				if (m_activeGqlObjectPtr == nullptr && m_activeFieldObjectPtr == nullptr){
-					if (m_startFields == true){
+					if (m_startFields){
 						if (!text.isEmpty()){
 							SetParseObject(text);
 						}
 
 						return true;
 					}
-					else{
-						errorPosition = i + index;
-						return false;
-					}
+
+					errorPosition = i + index;
+
+					return false;
 				}
 			}
 			break;
@@ -425,7 +425,7 @@ bool CGqlRequest::ParseQuery(const QByteArray& query, int& errorPosition)
 				return false;
 			}
 			break;
-		
+
 		case '[':
 			if (startBigText){
 				text.append(chr);
@@ -440,7 +440,7 @@ bool CGqlRequest::ParseQuery(const QByteArray& query, int& errorPosition)
 				m_startKey = true;
 			}
 			break;
-		
+
 		case ']':
 			if (startBigText){
 				text.append(chr);
@@ -499,7 +499,7 @@ bool CGqlRequest::ParseQuery(const QByteArray& query, int& errorPosition)
 			break;
 
 		default:
-			if (startText == false && !text.isEmpty()){
+			if (!startText && !text.isEmpty()){
 				SetParseText(text);
 				text.clear();
 				if (!m_startFields){
@@ -508,6 +508,7 @@ bool CGqlRequest::ParseQuery(const QByteArray& query, int& errorPosition)
 			}
 			text.append(chr);
 			startText = true;
+
 			break;
 		}
 	}
@@ -591,8 +592,7 @@ bool CGqlRequest::ResetData(istd::IChangeable::CompatibilityMode /*mode*/)
 
 QByteArray CGqlRequest::CreateQueryFields() const
 {
-	QByteArray retVal;
-	retVal = AddObjectFieldPart(m_fields);
+	QByteArray retVal = AddObjectFieldPart(m_fields);
 	if (retVal.isEmpty()){
 		retVal = QByteArrayLiteral("{}");
 	}
@@ -603,8 +603,7 @@ QByteArray CGqlRequest::CreateQueryFields() const
 
 QByteArray CGqlRequest::CreateQueryParams() const
 {
-	QByteArray retVal;
-	retVal = AddObjectParamPart(m_params);
+	QByteArray retVal = AddObjectParamPart(m_params);
 
 	return retVal;
 }
@@ -647,7 +646,7 @@ QByteArray CGqlRequest::AddObjectParamPart(const CGqlParamObject& gqlObject) con
 	QByteArray retVal;
 
 	QByteArrayList paramIds = gqlObject.GetParamIds();
-	for (int i = 0; i < paramIds.count(); ++i){
+	for (qsizetype i = 0; i < paramIds.count(); ++i){
 		const QByteArray& paramId = paramIds[i];
 
 		if (gqlObject.IsObject(paramId)){
@@ -658,8 +657,8 @@ QByteArray CGqlRequest::AddObjectParamPart(const CGqlParamObject& gqlObject) con
 		}
 		else if (gqlObject.IsObjectList(paramId)){
 			retVal += paramId + QByteArrayLiteral(" :[");
-			int objectsCount = gqlObject.GetObjectsCount(paramId);
-			for (int objectIndex = 0; objectIndex < objectsCount; objectIndex++){
+			qsizetype objectsCount = gqlObject.GetObjectsCount(paramId);
+			for (qsizetype objectIndex = 0; objectIndex < objectsCount; objectIndex++){
 				if (objectIndex > 0){
 					retVal += ',';
 				}
@@ -761,8 +760,8 @@ QByteArray CGqlRequest::AddObjectParamValue(const QVariant& value) const
 		}
 		retVal += ']';
 	}
-	else if (value.canConvert<imtgql::CGqlEnum>()){
-		retVal += value.value<imtgql::CGqlEnum>().GetValue();
+	else if (value.canConvert<CGqlEnum>()){
+		retVal += value.value<CGqlEnum>().GetValue();
 	}
 	else {
 		QByteArray data = value.toByteArray();
@@ -892,13 +891,14 @@ void CGqlRequest::SetParseText(const QByteArray& text)
 
 		return;
 	}
-	else if (!lastArrayId.isEmpty() &&  !m_objectArrayList.isEmpty() && m_objectArrayList.last() == m_activeGqlObjectPtr){
+
+	if (!lastArrayId.isEmpty() &&  !m_objectArrayList.isEmpty() && m_objectArrayList.last() == m_activeGqlObjectPtr){
 		CGqlParamObject newObject;
 		m_activeGqlObjectPtr = m_activeGqlObjectPtr->AppendParamToArray(lastArrayId, newObject);
 		m_currentField = text;
 	}
 	else if (m_startKey){
-		if (m_activeFieldObjectPtr){
+		if (m_activeFieldObjectPtr != nullptr){
 			m_activeFieldObjectPtr->InsertField(text);
 		}
 

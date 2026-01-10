@@ -16,7 +16,7 @@ public:
 	/**
 		Create object from the GraphQL
 	*/
-	virtual istd::IChangeableUniquePtr ExtractObject(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& errorMessage) const = 0;
+	virtual istd::IChangeableUniquePtr ExtractObject(const CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& errorMessage) const = 0;
 };
 
 
