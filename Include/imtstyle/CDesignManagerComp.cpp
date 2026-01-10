@@ -10,6 +10,7 @@
 #include <iqt/CDesignThemeEvent.h>
 
 // ImtCore includes
+#include <imtbase/imtbase.h>
 #include <imtbase/ICollectionInfo.h>
 
 
@@ -127,7 +128,7 @@ bool CDesignManagerComp::ApplyDesignScheme(const QByteArray& themeId)
 
 	qDebug() << qPrintable(QString("%1: Start applying color scheme-ID: %2").arg(qPrintable(componentId)).arg(qPrintable(themeId)));
 
-	imtstyle::CImtStyle* imtStylePtr = imtstyle::CImtStyle::GetInstance();
+	CImtStyle* imtStylePtr = CImtStyle::GetInstance();
 	Q_ASSERT(imtStylePtr != nullptr);
 
 	if (m_paletteProviderCompPtr.IsValid()){
@@ -197,7 +198,7 @@ int CDesignManagerComp::DesignList::GetOptionsFlags() const
 
 int CDesignManagerComp::DesignList::GetOptionsCount() const
 {
-	return m_designList.count();
+	return imtbase::narrow_cast<int>(m_designList.size());
 }
 
 

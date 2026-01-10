@@ -5,6 +5,9 @@
 #include <iser/CMemoryWriteArchive.h>
 #include <iser/CMemoryReadArchive.h>
 
+// ImtCore includes
+#include <imtbase/imtbase.h>
+
 
 namespace imtservergql
 {
@@ -46,9 +49,8 @@ bool CSerializableObjectCollectionControllerComp::SerializeObject(
 
 		return false;
 	}
-	else{
-		objectData = QByteArray((char*)archivePtr->GetBuffer(), archivePtr->GetBufferSize());
-	}
+
+	objectData = QByteArray((char*)archivePtr->GetBuffer(), archivePtr->GetBufferSize());
 
 	return true;
 }
@@ -66,7 +68,8 @@ bool CSerializableObjectCollectionControllerComp::DeSerializeObject(
 		return false;
 	}
 
-	iser::CMemoryReadArchive archive(objectData.data(), objectData.length());
+	const int bufferSize = imtbase::narrow_cast<int>(objectData.length());
+	iser::CMemoryReadArchive archive(objectData.data(), bufferSize);
 	if (!serializableObject->Serialize(archive)){
 		QByteArray errorMessage = QString("Unable to deserialize object '%1'").arg(qPrintable(objectData)).toUtf8();
 		SendErrorMessage(0, errorMessage);
@@ -92,7 +95,7 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetMetaInf
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
 
-	imtgql::CGqlParamObject inputParams = gqlRequest.GetParams();
+	const imtgql::CGqlParamObject& inputParams = gqlRequest.GetParams();
 
 	QByteArray objectId = GetObjectIdFromInputParams(inputParams);
 	dataModel->SetData("id", objectId);
@@ -129,7 +132,7 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetInfo(
 	imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
 	imtbase::CTreeItemModel* infoModelPtr = dataModel->AddTreeModel("info");
 
-	const imtgql::CGqlParamObject inputParams = gqlRequest.GetParams();
+	const imtgql::CGqlParamObject& inputParams = gqlRequest.GetParams();
 
 	QByteArray objectId = GetObjectIdFromInputParams(inputParams);
 	infoModelPtr->SetData("id", objectId);
@@ -162,7 +165,7 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetDataMet
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
 
-	const imtgql::CGqlParamObject inputParams = gqlRequest.GetParams();
+	const imtgql::CGqlParamObject& inputParams = gqlRequest.GetParams();
 
 	QByteArray objectId = GetObjectIdFromInputParams(inputParams);
 	dataModel->SetData("id", objectId);
@@ -197,7 +200,7 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetObject(
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
 
-	const imtgql::CGqlParamObject inputParams = gqlRequest.GetParams();
+	const imtgql::CGqlParamObject& inputParams = gqlRequest.GetParams();
 
 	QByteArray objectId = GetObjectIdFromInputParams(inputParams);
 
@@ -334,7 +337,7 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::ListObject
 		return nullptr;
 	}
 
-	const imtgql::CGqlParamObject inputParams = gqlRequest.GetParams();
+	const imtgql::CGqlParamObject& inputParams = gqlRequest.GetParams();
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 
@@ -348,8 +351,8 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::ListObject
 		viewParamsGql = inputObject->GetParamArgumentObjectPtr("viewParams");
 	}
 
-	int offset = 0, count = -1;
-
+	int offset = 0;
+	int count = -1;
 	QByteArray data;
 	if (viewParamsGql != nullptr){
 		offset = viewParamsGql->GetParamArgumentValue("offset").toInt();

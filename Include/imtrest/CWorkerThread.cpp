@@ -1,11 +1,11 @@
 #include <imtrest/CWorkerThread.h>
 
-// ImtCore includes
-#include <imtrest/CWorkerManagerComp.h>
 
 // Qt includes
 #include <QtCore/QDebug>
 
+// ImtCore includes
+#include <imtrest/CWorkerManagerComp.h>
 
 
 namespace imtrest
@@ -13,11 +13,12 @@ namespace imtrest
 
 
 CWorkerThread::CWorkerThread(const CWorkerManagerComp* workerManager, const QByteArray& subCommandId)
-	:m_status(ST_PROCESS),
-	m_workerPtr(nullptr),
-	m_subCommandId(subCommandId)
+	: m_status(ST_PROCESS),
+	  m_workerPtr(nullptr),
+	  m_requestPtr(nullptr),
+	  m_subCommandId(subCommandId)
 {
-	m_workerManager = dynamic_cast<CWorkerManagerComp*>(const_cast<CWorkerManagerComp*>(workerManager));
+	m_workerManager = const_cast<CWorkerManagerComp*>(workerManager);
 }
 
 

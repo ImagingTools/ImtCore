@@ -22,6 +22,7 @@
 #include <iqt/iqt.h>
 
 // ImtCore includes
+#include <imtbase/imtbase.h>
 #include <imtbase/CSearchResults.h>
 #include <imtbase/IIdentifiable.h>
 #include <imtbase/CCollectionFilter.h>
@@ -269,7 +270,7 @@ sdl::imtbase::ImtCollection::CDuplicateElementsPayload CObjectCollectionControll
 
 	istd::CChangeGroup changeGroup(m_objectCollectionCompPtr.GetPtr());
 
-	int count = elementIds.size();
+	int count = imtbase::narrow_cast<int>(elementIds.size());
 	for (const QByteArray& elementId : elementIds){
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (m_objectCollectionCompPtr->GetObjectData(elementId, dataPtr)){
@@ -1608,7 +1609,7 @@ bool CObjectCollectionControllerCompBase::GetOperationFromRequest(
 			QString& /*errorMessage*/,
 			int& operationType) const
 {
-	const imtgql::CGqlFieldObject fields = gqlRequest.GetFields();
+	const imtgql::CGqlFieldObject& fields = gqlRequest.GetFields();
 
 	const QByteArrayList ids = fields.GetFieldIds();
 	for (const QByteArray& fieldId: ids){
@@ -1870,7 +1871,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
 
-	if (!response.WriteToModel(*dataModelPtr, false)){
+	if (!response.WriteToModel(*dataModelPtr, 0)){
 		errorMessage = QString("Unable to update object '%1'. Error: Unable to write notification data to the model").arg(qPrintable(objectId));
 		return nullptr;
 	}
@@ -2624,7 +2625,7 @@ bool CObjectCollectionControllerCompBase::SetupGqlItem(
 QByteArrayList CObjectCollectionControllerCompBase::GetInformationIds(const imtgql::CGqlRequest& gqlRequest, const QByteArray& objectId) const
 {
 	QByteArrayList retVal;
-	const imtgql::CGqlFieldObject fields = gqlRequest.GetFields();
+	const imtgql::CGqlFieldObject& fields = gqlRequest.GetFields();
 	const imtgql::CGqlFieldObject* findObject = fields.GetFieldArgumentObjectPtr(objectId);
 	if (findObject != nullptr){
 		retVal =findObject->GetFieldIds();
@@ -3047,9 +3048,8 @@ bool CObjectCollectionControllerCompBase::SerializeObject(
 	if (!serializableObject->Serialize(*archivePtr.GetPtr())){
 		return false;
 	}
-	else{
-		objectData = archivePtr->GetData();
-	}
+
+	objectData = archivePtr->GetData();
 
 	return true;
 }

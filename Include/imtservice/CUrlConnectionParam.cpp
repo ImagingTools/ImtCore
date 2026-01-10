@@ -2,12 +2,14 @@
 
 
 // ACF includes
-#include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
 #include <istd/CChangeGroup.h>
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
 #include <iser/CPrimitiveTypesSerializer.h>
+
+// ImtCore includes
+#include <imtbase/imtbase.h>
 
 
 namespace imtservice
@@ -23,7 +25,7 @@ CUrlConnectionParam::CUrlConnectionParam()
 }
 
 
-void CUrlConnectionParam::AddExternConnection(imtservice::IServiceConnectionParam::IncomingConnectionParam externConnection)
+void CUrlConnectionParam::AddExternConnection(const imtservice::IServiceConnectionParam::IncomingConnectionParam& externConnection)
 {
 	if (!m_externConnectionList.contains(externConnection)){
 		istd::CChangeNotifier changeNotifier(this);
@@ -51,7 +53,7 @@ bool CUrlConnectionParam::Serialize(iser::IArchive& archive)
 
 	retVal = retVal && BaseClass::Serialize(archive);
 
-	int objectCount = m_externConnectionList.count();
+	int objectCount = imtbase::narrow_cast<int>(m_externConnectionList.count());
 	if (!archive.IsStoring()){
 		objectCount = 0;
 
