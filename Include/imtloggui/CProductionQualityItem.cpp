@@ -1,8 +1,6 @@
 #include <imtloggui/CProductionQualityItem.h>
 
 // Qt includes
-#include <QtGui/QPainter>
-#include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QGraphicsSceneHoverEvent>
 
@@ -17,9 +15,10 @@ namespace imtloggui
 // public methods
 
 CProductionQualityItem::CProductionQualityItem(QGraphicsItem* parent)
-	:BaseClass(parent),
-	m_positionProviderPtr(nullptr),
-	m_style(DS_BAR)
+	: BaseClass(parent),
+	  m_modelPtr(nullptr),
+	  m_positionProviderPtr(nullptr),
+	  m_style(DS_BAR)
 {
 }
 
@@ -236,7 +235,7 @@ void CProductionQualityItem::DrawBars(QPainter* painter)
 	pen.setWidth(0);
 	painter->setPen(pen);
 
-	quint64 count = m_okPoints.count();
+	qsizetype count = m_okPoints.size();
 	for (int i = 0; i < count; i++){
 		QTransform transform = savedTransform;
 		transform.translate(m_okPoints[i].x(), 0);
@@ -411,7 +410,7 @@ void CProductionQualityItem::DrawPolylines(QPainter* painter)
 
 	QTransform savedTransform = painter->transform();
 
-	quint64 count = m_okPoints.count() - 3;
+	qsizetype count = m_okPoints.size() - 3;
 	for (int i = 1; i < count; i++){
 		QTransform transform = savedTransform;
 		transform.translate(m_okPoints[i].x(), 0);

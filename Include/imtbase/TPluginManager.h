@@ -2,9 +2,7 @@
 
 
 // Qt includes
-#include <QtCore/QMap>
 #include <QtCore/QLibrary>
-#include <QtCore/QFileInfo>
 #include <QtCore/QDir>
 
 // Windows includes
@@ -28,11 +26,11 @@ template <class PluginInterface, typename CreateFunction, typename DestroyFuncti
 class TPluginManager: virtual public ilog::ILoggable
 {
 public:
-	TPluginManager()
+	TPluginManager() : m_pluginStatusMonitorPtr(nullptr)
 	{
 	}
-	
-	TPluginManager(const QByteArray& createMethodName, const QByteArray& destroyMethodName, imtbase::IPluginStatusMonitor* pluginStatusMonitorPtr);
+
+	TPluginManager(const QByteArray& createMethodName, const QByteArray& destroyMethodName, IPluginStatusMonitor* pluginStatusMonitorPtr);
 
 	virtual bool LoadPluginDirectory(
 				const QString& pluginDirectoryPath,
@@ -47,7 +45,7 @@ public:
 	struct PluginInfo
 	{
 		PluginInfo()
-			:pluginPtr(NULL)
+			:pluginPtr(nullptr)
 		{
 		}
 
@@ -60,7 +58,7 @@ public:
 	Plugins m_plugins;
 
 protected:
-	void SetStatusManager(imtbase::IPluginStatusMonitor* pluginStatusMonitorPtr);
+	void SetStatusManager(IPluginStatusMonitor* pluginStatusMonitorPtr);
 
 	/**
 		Do some initialization for concrete plugin implementation.
@@ -120,7 +118,7 @@ protected:
 protected:
 	QByteArray m_createMethodName;
 	QByteArray m_destroyMethodName;
-	imtbase::IPluginStatusMonitor* m_pluginStatusMonitorPtr;
+	IPluginStatusMonitor* m_pluginStatusMonitorPtr;
 	Logger m_logger;
 };
 
@@ -159,7 +157,7 @@ inline ilog::IMessageConsumer* TPluginManager<PluginInterface, CreateFunction, D
 // protected methods
 
 template <class PluginInterface, typename CreateFunction, typename DestroyFunction>
-void TPluginManager<PluginInterface, CreateFunction, DestroyFunction>::SetStatusManager(imtbase::IPluginStatusMonitor* pluginStatusMonitorPtr)
+void TPluginManager<PluginInterface, CreateFunction, DestroyFunction>::SetStatusManager(IPluginStatusMonitor* pluginStatusMonitorPtr)
 {
 	m_pluginStatusMonitorPtr = pluginStatusMonitorPtr;
 }

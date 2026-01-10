@@ -36,23 +36,24 @@ public:
 	struct Job
 	{
 		Job()
-			:status(JS_NONE)
+			:status(JS_NONE),
+			filterPtr(nullptr)
 		{
 		}
 
 		JobStatus status;
 		QByteArray uuid;
-		const imtlog::IEventFilter* filterPtr;
-		imtlog::CMessageFilterParams filterParams;
+		const IEventFilter* filterPtr;
+		CMessageFilterParams filterParams;
 		CMessagesReader::EventContainerPtr containerPtr;
 	};
 
 	typedef QList<Job> JobList;
 
 	explicit CMessagesReadJobController(
-				QString dir,
-				QString containerExtension,
-				QString archiveExtension,
+				const QString& dir,
+				const QString& containerExtension,
+				const QString& archiveExtension,
 				iser::IVersionInfo* versionInfoPtr,
 				imtfile::IFileCompression* compressorPtr,
 				ilog::IMessageConsumer* logPtr);

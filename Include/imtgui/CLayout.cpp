@@ -12,6 +12,9 @@
 #include <istd/CChangeNotifier.h>
 #include <istd/CChangeGroup.h>
 
+// ImtCore includes
+#include <imtbase/imtbase.h>
+
 
 namespace imtgui
 {
@@ -20,10 +23,10 @@ namespace imtgui
 // public methods
 
 CLayout::CLayout(CLayout* parentLayoutPtr)
-	:m_parent(parentLayoutPtr),
-	m_layoutType(LT_NONE),
+	:m_layoutType(LT_NONE),
 	m_alignType(AT_LEFT),
-	m_title("No name")
+	m_title("No name"),
+	m_parent(parentLayoutPtr)
 {
 	// Delegate change notifications to the parent layout:
 	SetSlavePtr(m_parent);
@@ -166,7 +169,7 @@ ILayout* CLayout::GetParent() const
 
 int CLayout::GetChildsCount() const
 {
-	return m_childs.count();
+	return imtbase::narrow_cast<int>(m_childs.count());
 }
 
 
@@ -227,7 +230,7 @@ ILayout* CLayout::TakeFirst()
 
 ILayout* CLayout::TakeLast()
 {
-	return TakeChild(m_childs.count() - 1);
+	return TakeChild(imtbase::narrow_cast<int>(m_childs.count() - 1));
 }
 
 

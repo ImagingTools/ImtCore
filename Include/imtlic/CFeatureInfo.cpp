@@ -2,12 +2,15 @@
 
 
 // ACF includes
-#include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
 #include <imod/TModelWrap.h>
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
 #include <iser/CPrimitiveTypesSerializer.h>
+
+// ImtCore includes
+#include <imtcore/Version.h>
+#include <imtbase/imtbase.h>
 
 
 namespace imtlic
@@ -17,6 +20,7 @@ namespace imtlic
 // public methods
 
 CFeatureInfo::CFeatureInfo() :
+	m_optional(false),
 	m_isPermission(true),
 	m_parentFeaturePtr(nullptr)
 {
@@ -73,7 +77,7 @@ void CFeatureInfo::SetParentFeature(const IFeatureInfo *parentFeaturePtr)
 }
 
 
-void CFeatureInfo::SetDependencies(QByteArrayList dependencies)
+void CFeatureInfo::SetDependencies(const QByteArrayList& dependencies)
 {
 	if (m_dependencies != dependencies){
 		istd::CChangeNotifier notifier(this);
@@ -245,12 +249,12 @@ bool CFeatureInfo::Serialize(iser::IArchive& archive)
 	iser::CArchiveTag subFeaturesTag("SubFeatures", "Subfeatures of the feature", iser::CArchiveTag::TT_MULTIPLE);
 	iser::CArchiveTag subfeatureTag("Object", "Object item", iser::CArchiveTag::TT_GROUP, &subFeaturesTag);
 
-	int subfeaturesCount = m_subFeatures.count();
+	int subfeaturesCount = imtbase::narrow_cast<int>(m_subFeatures.size());
 
 	retVal = retVal && archive.BeginMultiTag(subFeaturesTag, subfeatureTag, subfeaturesCount);
 
 	if (!archive.IsStoring()){
-		int oldSubfeaturesCount = m_subFeatures.count();
+		int oldSubfeaturesCount = imtbase::narrow_cast<int>(m_subFeatures.size());
 
 		m_subFeatures.resize(subfeaturesCount);
 
@@ -259,7 +263,7 @@ bool CFeatureInfo::Serialize(iser::IArchive& archive)
 		}
 	}
 
-	for (int i = 0; i < m_subFeatures.count(); i++){
+	for (int i = 0; i < m_subFeatures.size(); i++){
 		FeatureInfoPtr featureInfoPtr = m_subFeatures[i];
 		retVal = retVal && archive.BeginTag(subfeatureTag);
 		retVal = retVal && featureInfoPtr->Serialize(archive);
@@ -294,7 +298,7 @@ bool CFeatureInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*
 
 		m_subFeatures.clear();
 
-		int subfeaturesCount = sourcePtr->m_subFeatures.count();
+		qsizetype subfeaturesCount = sourcePtr->m_subFeatures.count();
 
 		m_subFeatures.resize(subfeaturesCount);
 

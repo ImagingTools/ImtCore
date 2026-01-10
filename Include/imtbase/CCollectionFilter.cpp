@@ -13,9 +13,7 @@ namespace imtbase
 
 
 CCollectionFilter::CCollectionFilter()
-	:m_filter(QString()),
-	m_sortingOrder(SO_NO_ORDER),
-	m_sortingInfoIds(QByteArrayList())
+	:m_sortingOrder(SO_NO_ORDER)
 {
 }
 

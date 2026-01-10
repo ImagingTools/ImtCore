@@ -18,6 +18,8 @@ namespace imtapp
 class CSchedulerParams: virtual public ISchedulerParams
 {
 public:
+	CSchedulerParams();
+
 	// reimplemented (ISchedulerParams)
 	virtual const QDateTime& GetStartTime() const override;
 	virtual void SetStartTime(const QDateTime& startTime) override;

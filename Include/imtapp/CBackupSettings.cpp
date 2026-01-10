@@ -2,7 +2,6 @@
 
 
 // ACF includes
-#include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
@@ -14,6 +13,10 @@ namespace imtapp
 
 
 // public methods
+CBackupSettings::CBackupSettings() : m_interval(0)
+{
+}
+
 
 // reimplemented (ISchedulerParams)
 

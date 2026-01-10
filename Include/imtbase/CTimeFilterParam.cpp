@@ -15,10 +15,10 @@ namespace imtbase
 // public methods
 
 CTimeFilterParam::CTimeFilterParam()
-	:m_timeUnit(TU_CUSTOM),
+	:m_timeRange(QDateTime(), QDateTime()),
+	m_timeUnit(TU_CUSTOM),
 	m_interpretationMode(IM_FOR),
-	m_timeUnitMultiplier(1),
-	m_timeRange(QDateTime(), QDateTime())
+	m_timeUnitMultiplier(1)
 {
 }
 
@@ -201,7 +201,7 @@ bool CTimeFilterParam::IsEqual(const IChangeable& object) const
 {
 	const CTimeFilterParam* implPtr = dynamic_cast<const CTimeFilterParam*>(&object);
 	if (implPtr != nullptr){
-		return 
+		return
 					(m_timeRange == implPtr->m_timeRange) &&
 					(m_timeUnit == implPtr->m_timeUnit) &&
 					(m_interpretationMode == implPtr->m_interpretationMode) &&

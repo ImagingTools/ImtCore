@@ -18,6 +18,7 @@ namespace imtapp
 class CBackupSettings: virtual public IBackupSettings
 {
 public:
+	CBackupSettings();
 	// reimplemented (ISchedulerParams)
 	virtual const QDateTime& GetStartTime() const override;
 	virtual void SetStartTime(const QDateTime& startTime) override;
