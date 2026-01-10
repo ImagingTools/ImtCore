@@ -262,6 +262,7 @@ QVariant CCompositeDeviceInstanceBase::SubDeviceCollectionInfo::GetElementInfo(
 		return true;
 	default:
 		I_IF_DEBUG(qDebug() << __FILE__ << __LINE__ << "Unknown info type: " << infoType;)
+		break;
 	}
 
 	return QVariant();
