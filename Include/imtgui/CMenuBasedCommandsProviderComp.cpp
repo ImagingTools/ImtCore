@@ -103,7 +103,7 @@ void CMenuBasedCommandsProviderComp::UpdateMenuCommandVisualStatus()
 
 // private slots
 
-void CMenuBasedCommandsProviderComp::OnCommandActivated(bool)
+void CMenuBasedCommandsProviderComp::OnCommandActivated(bool /* checked */)
 {
 	QWidget* menuPtr = m_menuGuiCompPtr->GetWidget();
 	if (menuPtr != nullptr){

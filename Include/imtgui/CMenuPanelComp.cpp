@@ -19,12 +19,12 @@ namespace imtgui
 // public methods
 
 CMenuPanelComp::CMenuPanelComp()
-	:m_pageSubselectionObserver(*this),
+	:m_subselectionModelIndex(0),
+	m_visualStatusModelIndex(0),
+	m_pageSubselectionObserver(*this),
 	m_pageVisualStatusObserver(*this),
 	m_monitorInfoObserver(*this),
-	m_menuPanelVisibilityObserver(*this),
-	m_subselectionModelIndex(0),
-	m_visualStatusModelIndex(0)
+	m_menuPanelVisibilityObserver(*this)
 {
 }
 
