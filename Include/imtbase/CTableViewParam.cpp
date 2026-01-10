@@ -56,7 +56,7 @@ bool CTableViewParam::Serialize(iser::IArchive& archive)
 	}
 
 	QByteArrayList keys = m_headerInfoMap.keys();
-	int count = keys.count();
+	int count = keys.size();
 
 	if (!archive.IsStoring()){
 		m_headerInfoMap.clear();

@@ -298,7 +298,7 @@ bool CCollectionInfo::Serialize(iser::IArchive& archive)
 	changeSet.SetChangeInfo(CN_ALL_CHANGED, QVariant());
 	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this, &changeSet);
 
-	int itemCount = m_items.count();
+	int itemCount = m_items.size();
 
 	if (!archive.IsStoring()){
 		m_items.clear();

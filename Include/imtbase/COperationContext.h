@@ -15,7 +15,7 @@ class COperationContext: virtual public imtbase::IOperationContext
 public:
 	COperationContext();
 
-	void SetOperationOwnerId(IdentifableObjectInfo operationOwnerId);
+	void SetOperationOwnerId(const imtbase::IOperationContext::IdentifableObjectInfo& operationOwnerId);
 	void SetOperationDescription(const QString& operationDescription);
 
 	// reimplemented (imtbase::IOperationContext)

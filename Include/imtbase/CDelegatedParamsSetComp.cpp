@@ -14,7 +14,7 @@ iprm::IParamsSet::Ids CDelegatedParamsSetComp::GetParamIds(bool editableOnly) co
 	if (m_paramsSetCompPtr.IsValid()){
 		return m_paramsSetCompPtr->GetParamIds(editableOnly);
 	}
-	
+
 	return iprm::IParamsSet::Ids();
 }
 
@@ -46,7 +46,7 @@ bool CDelegatedParamsSetComp::Serialize(iser::IArchive& archive)
 	if (m_paramsSetCompPtr.IsValid()){
 		return false;
 	}
-	
+
 	return m_paramsSetCompPtr->Serialize(archive);
 }
 

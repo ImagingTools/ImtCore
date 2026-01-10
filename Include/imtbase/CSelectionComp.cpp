@@ -22,7 +22,7 @@ void CSelectionComp::OnConstraintsUpdated(const istd::IChangeable::ChangeSet& /*
 			break;
 
 		case ASM_SELECT_ALL:
-			for (Id id : constraints){
+			for (const Id& id : constraints){
 				selection += id;
 			}
 			break;
@@ -38,7 +38,7 @@ void CSelectionComp::OnConstraintsUpdated(const istd::IChangeable::ChangeSet& /*
 
 		case ASM_UNSELECT_MISSING:
 			selection = GetSelectedIds();
-			for (Id id : selection){
+			for (const Id& id : selection){
 				if (constraints.contains(id)){
 					tempSelection += id;
 				}

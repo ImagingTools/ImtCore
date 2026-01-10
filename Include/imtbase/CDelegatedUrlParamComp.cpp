@@ -1,6 +1,10 @@
 #include <imtbase/CDelegatedUrlParamComp.h>
 
 
+// Qt includes
+#include <QtCore/QUrl>
+
+
 namespace imtbase
 {
 

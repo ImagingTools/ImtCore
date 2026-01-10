@@ -96,7 +96,7 @@ void CParameterLinkControllerComp::OnUpdate(const istd::IChangeable::ChangeSet& 
 				if (removeTargetOptions.count() > 0){
 					istd::CChangeGroup changeGroup(m_paramsManagerCompPtr.GetPtr());
 
-					for (int i = removeTargetOptions.count() - 1; i >= 0; i--){
+					for (int i = removeTargetOptions.size() - 1; i >= 0; i--){
 						m_paramsManagerCompPtr->RemoveParamsSet(removeTargetOptions[i]);
 					}
 				}

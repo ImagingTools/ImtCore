@@ -25,7 +25,7 @@ void CFileBasedTranslationManagerComp::LoadTranslations()
 			QByteArray languageId = m_languagesAttrPtr[translatorIndex];
 
 			if (*m_ignoreLocaleAttrPtr){
-				int pos = languageId.indexOf("_");
+				qsizetype pos = languageId.indexOf("_");
 				if (pos >= 0){
 					languageId.chop(languageId.length() - pos);
 				}
@@ -43,7 +43,7 @@ void CFileBasedTranslationManagerComp::LoadTranslations()
 
 			translator.translatorPtr.SetPtr(qtTranslatorPtr.PopPtr());
 			translator.languageId = languageId;
-			
+
 			if (translatorIndex < m_languageNamesAttrPtr.GetCount()){
 				translator.languageName = m_languageNamesAttrPtr[translatorIndex];
 			}

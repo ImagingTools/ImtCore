@@ -154,7 +154,7 @@ bool CComplexCollectionFilter::Serialize(iser::IArchive &archive)
 	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
 
 	// Serialization of the sorting model
-	int sortingItemCount = m_fields.count();
+	int sortingItemCount = m_fields.size();
 
 	static iser::CArchiveTag sortingFieldListTag("SortingFieldList", "Sorting field list", iser::CArchiveTag::TT_MULTIPLE);
 	static iser::CArchiveTag sortingFieldTag("SortingField", "Sorting field", iser::CArchiveTag::TT_GROUP);
@@ -329,7 +329,7 @@ bool CComplexCollectionFilter::SerializeGroupFilter(IComplexCollectionFilter::Fi
 	bool retVal = true;
 
 	// Serialization of the sorting model
-	int fieldFilterCount = object.fieldFilters.count();
+	int fieldFilterCount = object.fieldFilters.size();
 
 	static iser::CArchiveTag fieldFilterListTag("FieldFilterList", "Field filter list", iser::CArchiveTag::TT_MULTIPLE);
 	static iser::CArchiveTag fieldFilterTag("FieldFilter", "Field filter", iser::CArchiveTag::TT_GROUP);
@@ -354,7 +354,7 @@ bool CComplexCollectionFilter::SerializeGroupFilter(IComplexCollectionFilter::Fi
 	retVal = retVal && archive.EndTag(fieldFilterListTag);
 
 	// Serialization of the sorting model
-	int groupFilterCount = object.filterExpressions.count();
+	int groupFilterCount = object.filterExpressions.size();
 
 	static iser::CArchiveTag groupFilterListTag("GroupFilterList", "Group filter list", iser::CArchiveTag::TT_MULTIPLE);
 	static iser::CArchiveTag groupFilterTag("FilterExpression", "Group filter", iser::CArchiveTag::TT_GROUP);

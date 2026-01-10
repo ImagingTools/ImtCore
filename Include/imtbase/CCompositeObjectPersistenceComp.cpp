@@ -106,7 +106,7 @@ ifile::IFilePersistence::OperationState CCompositeObjectPersistenceComp::LoadFro
 
 			return OS_FAILED;
 		}
-		
+
 		istd::IChangeable* objectPtr = const_cast<istd::IChangeable*>(documentPtr->GetObjectPtr(elementInfo.id));
 		if (objectPtr == nullptr){
 			if ((documentPtr->GetOperationFlags() & imtbase::IObjectCollection::OF_SUPPORT_INSERT) == 0){
@@ -119,7 +119,7 @@ ifile::IFilePersistence::OperationState CCompositeObjectPersistenceComp::LoadFro
 
 			objectPtr = const_cast<istd::IChangeable*>(documentPtr->GetObjectPtr(id));
 		}
-	
+
 		if (objectPtr == nullptr){
 			tempPath.removeRecursively();
 
@@ -129,31 +129,28 @@ ifile::IFilePersistence::OperationState CCompositeObjectPersistenceComp::LoadFro
 		QString elementFilePath = tempPath.path() + QDir::separator() + elementInfo.fileName;
 		int status = persistencePtr->LoadFromFile(*objectPtr, elementFilePath);
 		if (status != ifile::IFilePersistence::OS_OK){
-			if (*m_workingModeAttrPtr != WM_IGNORE_ERRORS){
+			if (!*m_workingModeAttrPtr){
 				SendErrorMessage(0, QString("Archive element could not be read: '%1'").arg(elementFilePath));
 
 				tempPath.removeRecursively();
 
 				return OS_FAILED;
 			}
-			else{
-				SendWarningMessage(0, QString("Archive element could not be read: '%1'").arg(elementFilePath));
-			}
 
+			SendWarningMessage(0, QString("Archive element could not be read: '%1'").arg(elementFilePath));
 		}
 	}
 
 	if (!LoadAdditionalData(data, tempPath.path())){
-		if (*m_workingModeAttrPtr != WM_IGNORE_ERRORS){
+		if (!*m_workingModeAttrPtr){
 			SendErrorMessage(0, QString("Additional data could not be loaded: '%1'").arg(tempPath.path()));
 
 			tempPath.removeRecursively();
 
 			return OS_FAILED;
 		}
-		else{
-			SendWarningMessage(0, QString("Additional data could not be loaded: '%1'").arg(tempPath.path()));
-		}
+
+		SendWarningMessage(0, QString("Additional data could not be loaded: '%1'").arg(tempPath.path()));
 	}
 
 	tempPath.removeRecursively();
@@ -193,7 +190,7 @@ ifile::IFilePersistence::OperationState CCompositeObjectPersistenceComp::SaveToF
 	imtbase::ICollectionInfo::Ids ids = documentPtr->GetElementIds();
 
 	QVector<BundleElementInfo> contentMetaInfo;
-	
+
 	for (const imtbase::ICollectionInfo::Id& objectId: ids){
 		const istd::IChangeable *objectPtr = documentPtr->GetObjectPtr(objectId);
 		if (objectPtr == nullptr){
@@ -221,24 +218,22 @@ ifile::IFilePersistence::OperationState CCompositeObjectPersistenceComp::SaveToF
 		if (extensions.count() > 0){
 			objectFileName.append(QString(".%1").arg(extensions[0]));
 		}
-		
+
 		QString objectFilePath = QDir::toNativeSeparators(tempPath.path() + QDir::separator() + objectFileName);
 
 		if (persistencePtr->SaveToFile(*objectPtr, objectFilePath) != OS_OK){
-			if (*m_workingModeAttrPtr != WM_IGNORE_ERRORS){
+			if (!*m_workingModeAttrPtr){
 				SendErrorMessage(0, QString("Object could not be saved to: '%1'").arg(objectFilePath));
 
 				tempPath.removeRecursively();
 
 				return OS_FAILED;
 			}
-			else{
-				SendWarningMessage(0, QString("Object could not be saved to: '%1'").arg(objectFilePath));
-			}
+			SendWarningMessage(0, QString("Object could not be saved to: '%1'").arg(objectFilePath));
 		}
 
 		BundleElementInfo elementInfo;
-		
+
 		elementInfo.fileName = objectFileName;
 		elementInfo.id = objectId;
 		elementInfo.typeId = typeId;
@@ -256,7 +251,7 @@ ifile::IFilePersistence::OperationState CCompositeObjectPersistenceComp::SaveToF
 	if (bundleInfoWritten){
 		if (m_fileCompressionCompPtr.IsValid()){
 			bool isCompressOk = m_fileCompressionCompPtr->CompressFolder(tempPath.path(), filePath, true);
-		
+
 			if (isCompressOk){
 				tempPath.removeRecursively();
 
@@ -316,7 +311,7 @@ const ifile::IFilePersistence* CCompositeObjectPersistenceComp::GetFilePersisten
 
 bool CCompositeObjectPersistenceComp::SerializeBundleMetaInfo(QVector<BundleElementInfo>& contentMetaInfo, iser::IArchive& archive) const
 {
-	int objectCount = contentMetaInfo.count();
+	int objectCount = contentMetaInfo.size();
 
 	if (!archive.IsStoring()){
 		objectCount = 0;
@@ -330,7 +325,7 @@ bool CCompositeObjectPersistenceComp::SerializeBundleMetaInfo(QVector<BundleElem
 	bool retVal = true;
 
 	retVal = retVal && archive.BeginMultiTag(objectListTag, objectTag, objectCount);
-	
+
 	for (int i = 0; i < objectCount; i++){
 		retVal = retVal && archive.BeginTag(objectTag);
 

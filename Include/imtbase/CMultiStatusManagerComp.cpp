@@ -52,13 +52,10 @@ QDateTime CMultiStatusManagerComp::GetInformationTimeStamp() const
 	for (int i = 0; i < m_informationProvidersCompPtr.GetCount(); ++i){
 		const istd::IInformationProvider* informationProviderPtr = m_informationProvidersCompPtr[i];
 
-		if (informationProviderPtr){
+		if (informationProviderPtr != nullptr){
 			QDateTime timeStamp = informationProviderPtr->GetInformationTimeStamp();
 
-			if (!retVal.isNull()){
-				retVal = timeStamp; 
-			}
-			else if (retVal < timeStamp){
+			if (!retVal.isNull() || retVal < timeStamp){
 				retVal = timeStamp;
 			}
 		}
@@ -75,7 +72,7 @@ istd::IInformationProvider::InformationCategory CMultiStatusManagerComp::GetInfo
 	for (int i = 0; i < m_informationProvidersCompPtr.GetCount(); ++i){
 		const istd::IInformationProvider* informationProviderPtr = m_informationProvidersCompPtr[i];
 
-		if (informationProviderPtr){
+		if (informationProviderPtr != nullptr){
 			retVal = qMax(retVal, informationProviderPtr->GetInformationCategory());
 		}
 	}

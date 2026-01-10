@@ -119,11 +119,7 @@ bool CIdentifiable::ResetData(CompatibilityMode /*mode*/)
 
 bool CIdentifiable::IsIdentifierAccepted(const QByteArray& identifier) const
 {
-	if(identifier.isEmpty()){
-		return false;
-	}
-
-	return true;
+	return !identifier.isEmpty();
 }
 
 

@@ -58,17 +58,15 @@ bool CSelectionAdapterComp::SetSelectedIds(const Ids& selectedIds)
 
 			return m_selectionCompPtr->SetSelectedOptionIndex(-1);
 		}
-		else{
-			int index = GetOptionIndex(*selectedIds.begin());
 
-			if (index >= 0){
-				istd::IChangeable::ChangeSet changeSet(CF_SELECTION_CHANGED);
-				istd::CChangeNotifier notifier(this, &changeSet);
+		int index = GetOptionIndex(*selectedIds.begin());
+		if (index >= 0){
+			istd::IChangeable::ChangeSet changeSet(CF_SELECTION_CHANGED);
+			istd::CChangeNotifier notifier(this, &changeSet);
 
-				UpdateBlockerPtr blockerPtr = CreateUpdateBlocker();
+			UpdateBlockerPtr blockerPtr = CreateUpdateBlocker();
 
-				return m_selectionCompPtr->SetSelectedOptionIndex(index);
-			}
+			return m_selectionCompPtr->SetSelectedOptionIndex(index);
 		}
 	}
 
@@ -212,7 +210,7 @@ bool CSelectionAdapterComp::Constraints::GetSubsetInfo(
 			ICollectionInfo& /*subsetInfo*/,
 			int /*offset*/,
 			int /*count*/,
-			const iprm::IParamsSet* /*selectionParamsPtr*/, 
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
 			ilog::IMessageConsumer* /*logPtr*/) const
 {
 	return false;

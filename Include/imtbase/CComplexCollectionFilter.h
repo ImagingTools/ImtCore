@@ -25,7 +25,7 @@ public:
 	// reimplemented (imtbase::IComplexCollectionFilter)
 	virtual FieldInfo* GetEditableFieldInfo(const QByteArray& fieldId) override;
 	virtual const Fields& GetFields() const override;
-	virtual void SetFields(const Fields& filter) override;
+	virtual void SetFields(const Fields& fields) override;
 	virtual const FilterExpression& GetFilterExpression() const override;
 	virtual void SetFilterExpression(const FilterExpression& filter) override;
 	virtual const imtbase::ITimeFilterParam& GetTimeFilter() const override;

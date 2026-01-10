@@ -30,7 +30,7 @@ int CObjectMetaInfoUniquenessValidatorComp::IsUniqueValue(const imtbase::IObject
 		}
 
 		imtbase::ICollectionInfo::Ids objectIds = currentCollectionPtr->GetElementIds();
-		int objectCount = objectIds.count();
+		int objectCount = objectIds.size();
 		for (int objectIndex = 0; objectIndex < objectCount && isUnique; objectIndex++){
 			QByteArray currentObjectId = objectIds[objectIndex];
 

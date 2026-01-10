@@ -254,7 +254,7 @@ void CParamsManagerAdapterComp::UpdateList()
 		for (const QByteArray& id : elementIds){
 			if (m_typeIdsAttrPtr.IsValid()){
 				QByteArray typeId = m_collectionCompPtr->GetObjectTypeId(id);
-				
+
 				int index = m_typeIdsAttrPtr.FindValue(typeId);
 				if (index < 0){
 					continue;

@@ -83,8 +83,8 @@ QString CLocalizedHelpPathProviderComp::GetPathForLocale(int languageIndex) cons
 			QEventLoop loop;
 			QTimer timer;
 			timer.setSingleShot(true);
-			timer.connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
-			timer.connect(replyPtr, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+			QObject::connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
+			QObject::connect(replyPtr, &QNetworkReply::finished, &loop, &QEventLoop::quit);
 			timer.start(10000);
 			loop.exec();
 
@@ -99,7 +99,7 @@ QString CLocalizedHelpPathProviderComp::GetPathForLocale(int languageIndex) cons
 				}
 			}
 			else{
-				replyPtr->disconnect(replyPtr, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+				QObject::disconnect(replyPtr, &QNetworkReply::finished, &loop, &QEventLoop::quit);
 				replyPtr->abort();
 			}
 		}

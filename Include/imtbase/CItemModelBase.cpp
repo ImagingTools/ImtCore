@@ -119,7 +119,7 @@ QString CItemModelBase::toGraphQL() const
 	QString result = "{";
 	const QStringList keys = getProperties();
 	for (int i = 0; i < keys.size(); ++i){
-		QString key = keys[i];
+		const QString& key = keys[i];
 		QString jsonKey = getJSONKeyForProperty(key);
 		QVariant value = property(key.toUtf8());
 		result += key + ":";

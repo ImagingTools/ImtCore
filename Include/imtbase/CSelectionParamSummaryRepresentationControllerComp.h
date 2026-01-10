@@ -25,7 +25,7 @@ public:
 
 protected:
 	// reimplemented (ISummaryRepresentationController)
-	virtual bool CreateSummaryRepresentation(const istd::IChangeable& object, QString& textRepresentation) const override;
+	virtual bool CreateSummaryRepresentation(const istd::IChangeable& param, QString& textRepresentation) const override;
 };
 
 

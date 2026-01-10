@@ -24,7 +24,7 @@ class CSingleObjectProviderComp:
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
-		
+
 	I_BEGIN_COMPONENT(CSingleObjectProviderComp);
 		I_REGISTER_INTERFACE(IObjectProvider);
 		I_ASSIGN(m_dataObjectCompPtr, "Object", "Object", false, "Object");

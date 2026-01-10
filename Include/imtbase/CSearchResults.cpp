@@ -11,10 +11,9 @@
 namespace imtbase
 {
 
-
 // public methods
 
-void CSearchResults::AddSearchResult(imtbase::ISearchResults::SearchResult searchResult)
+void CSearchResults::AddSearchResult(const imtbase::ISearchResults::SearchResult& searchResult)
 {
 	if (!m_searchResults.contains(searchResult)){
 		istd::CChangeNotifier changeNotifier(this);
@@ -46,7 +45,7 @@ bool CSearchResults::Serialize(iser::IArchive& archive)
 
 	bool retVal = true;
 
-	int count = m_searchResults.count();
+	int count = m_searchResults.size();
 
 	if (!archive.IsStoring()){
 		m_searchResults.clear();

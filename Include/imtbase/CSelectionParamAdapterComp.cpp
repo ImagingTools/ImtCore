@@ -155,7 +155,7 @@ int CSelectionParamAdapterComp::Constraints::GetOptionsFlags() const
 
 int CSelectionParamAdapterComp::Constraints::GetOptionsCount() const
 {
-	return m_parentPtr->m_selectionConstraintsPtr->GetElementIds().count();
+	return m_parentPtr->m_selectionConstraintsPtr->GetElementIds().size();
 }
 
 

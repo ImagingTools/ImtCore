@@ -49,7 +49,7 @@ void CParamsSetJoiner::SetParams(const iprm::IParamsSet* paramsSet1, const iprm:
 iprm::IParamsSet::Ids CParamsSetJoiner::GetParamIds(bool editableOnly) const
 {
 	iprm::IParamsSet::Ids retVal;
-	
+
 	if (m_paramsSet1 != nullptr){
 		retVal = m_paramsSet1->GetParamIds(editableOnly);
 	}

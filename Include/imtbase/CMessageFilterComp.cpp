@@ -66,9 +66,8 @@ bool CMessageFilterComp::IsMessageAccepted(int messageId) const
 
 		return resultIds.contains(messageId);
 	}
-	else{
-		return !rejectedIds.contains(messageId);
-	}
+	
+	return !rejectedIds.contains(messageId);
 }
 
 

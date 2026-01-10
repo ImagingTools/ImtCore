@@ -32,7 +32,7 @@ public:
 
 	// reimplemented (imtbase::IMultiStatusProvider)
 	virtual const imtbase::ICollectionInfo& GetStatusList() const override;
-	virtual const istd::IInformationProvider* GetStatus(const QByteArray& statusId) const override;
+	virtual const istd::IInformationProvider* GetStatus(const QByteArray& pluginId) const override;
 
 private:
 	QMap<QByteArray, QByteArray> m_pluginTypeIds;

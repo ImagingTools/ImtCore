@@ -12,7 +12,7 @@ namespace imtbase
 class CSearchResults: virtual public imtbase::ISearchResults
 {
 public:
-	void AddSearchResult(imtbase::ISearchResults::SearchResult searchResult);
+	void AddSearchResult(const imtbase::ISearchResults::SearchResult& searchResult);
 
 	// reimplemented (ISearchResults)
 	virtual int GetSearchResultsCount() const override;

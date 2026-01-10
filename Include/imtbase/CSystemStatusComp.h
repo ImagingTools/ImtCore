@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtCore/QThread>
+#include <QtCore/QUrl>
 #include <QtCore/QTimer>
 #include <QtCore/QFutureWatcher>
 

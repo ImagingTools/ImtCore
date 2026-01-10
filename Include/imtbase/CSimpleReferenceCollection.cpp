@@ -42,7 +42,7 @@ IReferenceCollection::ICollectionObjectLinkPtr CSimpleReferenceCollection::GetOb
 		return nullptr;
 	}
 
-	int referencesCount = m_references.count();
+	int referencesCount = m_references.size();
 	for (int i = 0; i < referencesCount; ++i){
 		const Reference& ref = m_references[i];
 		if (ref.id == objectId && (repositoryId.isEmpty() || (ref.repositoryId == repositoryId))){
@@ -56,7 +56,7 @@ IReferenceCollection::ICollectionObjectLinkPtr CSimpleReferenceCollection::GetOb
 			return retVal;
 		}
 	}
-	
+
 	return ICollectionObjectLinkPtr();
 }
 
@@ -145,7 +145,7 @@ imtbase::ICollectionInfo::Ids CSimpleReferenceCollection::GetElementIds(
 
 	Q_ASSERT(offset >= 0);
 
-	int elementsCount = count >= 0 ? qMin(count, m_references.count()) : m_references.count();
+	int elementsCount = count >= 0 ? qMin(count, m_references.size()) : m_references.size();
 
 	for (int i = offset; i < elementsCount; ++i){
 		retVal.push_back(m_references[i].id);
@@ -218,7 +218,7 @@ bool CSimpleReferenceCollection::Serialize(iser::IArchive& archive)
 	static iser::CArchiveTag referencesTag("References", "List of references", iser::CArchiveTag::TT_MULTIPLE);
 	static iser::CArchiveTag referenceTag("Reference", "Single reference item", iser::CArchiveTag::TT_GROUP, &referencesTag);
 
-	int referencesCount = m_references.count();
+	int referencesCount = m_references.size();
 	retVal = retVal && archive.BeginMultiTag(referencesTag, referenceTag, referencesCount);
 
 	if (!archive.IsStoring()){
@@ -240,7 +240,7 @@ bool CSimpleReferenceCollection::Serialize(iser::IArchive& archive)
 
 		retVal = retVal && archive.EndTag(referenceTag);
 	}
-	
+
 	retVal = retVal && archive.EndTag(referencesTag);
 
 	return retVal;

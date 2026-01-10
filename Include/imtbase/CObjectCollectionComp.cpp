@@ -69,7 +69,7 @@ bool CObjectCollectionComp::ResetData(CompatibilityMode /*mode*/)
 			}
 		}
 		
-		if (elementIds.size() > 0){
+		if (!elementIds.isEmpty()){
 			RemoveElements(elementIds);
 		}
 	}

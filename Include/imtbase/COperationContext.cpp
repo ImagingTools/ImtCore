@@ -22,7 +22,7 @@ COperationContext::COperationContext()
 }
 
 
-void COperationContext::SetOperationOwnerId(imtbase::IOperationContext::IdentifableObjectInfo operationOwnerId)
+void COperationContext::SetOperationOwnerId(const imtbase::IOperationContext::IdentifableObjectInfo& operationOwnerId)
 {
 	if (m_operationOwnerId != operationOwnerId){
 		istd::CChangeNotifier changeNotifier(this);

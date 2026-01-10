@@ -88,14 +88,14 @@ private:
 		{
 			return (id == other.id) && (name == other.name) && (description == other.description) && (typeId == other.typeId) && (repositoryId == other.typeId);
 		}
-		
+
 		bool operator !=(const Reference& other) const
 		{
 			return !operator==(other);
 		}
 	};
 	typedef QVector<Reference> References;
-	
+
 	References m_references;
 
 	const imtbase::IObjectCollection* m_sourceCollectionInfoPtr;

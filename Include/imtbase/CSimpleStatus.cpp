@@ -122,7 +122,7 @@ void CSimpleStatus::SetInformationFlags(int flags)
 bool CSimpleStatus::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
 	const istd::IInformationProvider* providerPtr = dynamic_cast<const istd::IInformationProvider*>(&object);
-	if (providerPtr){
+	if (providerPtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);
 
 		m_timeStamp = providerPtr->GetInformationTimeStamp();

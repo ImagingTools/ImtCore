@@ -30,12 +30,12 @@ CObjectCollectionBase::CObjectCollectionBase()
 	:m_modelUpdateBridge(this),
 	m_lock(QReadWriteLock::Recursive)
 {
-	
+
 }
 
 
 CObjectCollectionBase::~CObjectCollectionBase()
-{	
+{
 	RemoveAllObjects();
 }
 
@@ -263,7 +263,7 @@ bool CObjectCollectionBase::RemoveElements(const Ids& elementIds, const IOperati
 
 	changeInfoMap.insert(CN_ELEMENTS_REMOVED, QVariant::fromValue(notifierInfo));
 	changeSet.SetChangeInfoMap(changeInfoMap);
-	
+
 	locker.unlock();
 
 	return true;
@@ -406,10 +406,9 @@ IObjectCollectionUniquePtr CObjectCollectionBase::CreateSubCollection(
 		Q_ASSERT(offset >= 0);
 
 		QWriteLocker locker(&m_lock);
+		qsizetype objectsCount = count >= 0 ? qMin(count, m_objects.size()) : m_objects.size();
 
-		int objectsCount = count >= 0 ? qMin(count, m_objects.count()) : m_objects.count();
-
-		for (int i = offset; i < objectsCount; i++){
+		for (qsizetype i = offset; i < objectsCount; i++){
 			collectionPtr->InsertNewObject(m_objects[i].typeId, m_objects[i].name, m_objects[i].description, m_objects[i].dataPtr.GetPtr(), m_objects[i].id);
 		}
 
@@ -499,7 +498,7 @@ int CObjectCollectionBase::GetElementsCount(
 {
 	QReadLocker locker(&m_lock);
 
-	return m_objects.count();
+	return m_objects.size();
 }
 
 
@@ -515,7 +514,7 @@ ICollectionInfo::Ids CObjectCollectionBase::GetElementIds(
 
 	QReadLocker locker(&m_lock);
 
-	int objectsCount = count >= 0 ? qMin(count, m_objects.count()) : m_objects.count();
+	int objectsCount = count >= 0 ? qMin(count, m_objects.count()) : m_objects.size();
 
 	for (int i = offset; i < objectsCount; i++){
 		retVal.push_back(m_objects[i].id);
@@ -696,7 +695,7 @@ bool CObjectCollectionBase::Serialize(iser::IArchive& archive)
 	else{
 		m_lock.lockForWrite();
 	}
-	int objectCount = m_objects.count();
+	int objectCount = m_objects.size();
 
 	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
 
@@ -735,7 +734,7 @@ bool CObjectCollectionBase::Serialize(iser::IArchive& archive)
 		retVal = retVal && archive.BeginTag(typeIdTag);
 		retVal = retVal && archive.Process(elementInfo.typeId);
 		retVal = retVal && archive.EndTag(typeIdTag);
-		
+
 		iser::CArchiveTag objectNameTag("Name", "Object name", iser::CArchiveTag::TT_LEAF, &objectTag);
 		retVal = retVal && archive.BeginTag(objectNameTag);
 		retVal = retVal && archive.Process(elementInfo.name);
@@ -854,46 +853,45 @@ bool CObjectCollectionBase::CopyFrom(const IChangeable& object, CompatibilityMod
 
 		return true;
 	}
-	else{
-		const IObjectCollection* sourceCollectionPtr = dynamic_cast<const IObjectCollection*>(&object);
-		if (sourceCollectionPtr != nullptr){
-			istd::CChangeNotifier changeNotifier(this);
 
-			Ids sourceElementIds = sourceCollectionPtr->GetElementIds();
-			Ids targetIds = GetElementIds();
+	const IObjectCollection* sourceCollectionPtr = dynamic_cast<const IObjectCollection*>(&object);
+	if (sourceCollectionPtr != nullptr){
+		istd::CChangeNotifier changeNotifier(this);
 
-			for (const QByteArray& elementId : sourceElementIds){
-				QString name = sourceCollectionPtr->GetElementInfo(elementId, EIT_NAME).toString();
-				QString description = sourceCollectionPtr->GetElementInfo(elementId, EIT_DESCRIPTION).toString();
-				QByteArray typeId = sourceCollectionPtr->GetObjectTypeId(elementId);
-				const istd::IChangeable* sourceObjectPtr = sourceCollectionPtr->GetObjectPtr(elementId);
+		Ids sourceElementIds = sourceCollectionPtr->GetElementIds();
+		Ids targetIds = GetElementIds();
 
-				if (!targetIds.contains(elementId)){
-					QByteArray newId = InsertNewObject(typeId, name, description, sourceObjectPtr);
-					if (newId.isEmpty()){
-						return false;
-					}
+		for (const QByteArray& elementId : sourceElementIds){
+			QString name = sourceCollectionPtr->GetElementInfo(elementId, EIT_NAME).toString();
+			QString description = sourceCollectionPtr->GetElementInfo(elementId, EIT_DESCRIPTION).toString();
+			QByteArray typeId = sourceCollectionPtr->GetObjectTypeId(elementId);
+			const istd::IChangeable* sourceObjectPtr = sourceCollectionPtr->GetObjectPtr(elementId);
+
+			if (!targetIds.contains(elementId)){
+				QByteArray newId = InsertNewObject(typeId, name, description, sourceObjectPtr);
+				if (newId.isEmpty()){
+					return false;
 				}
-				else{
-					ObjectInfo* targetInfoPtr = GetObjectInfo(elementId);
-					Q_ASSERT(targetInfoPtr != nullptr);
+			}
+			else{
+				ObjectInfo* targetInfoPtr = GetObjectInfo(elementId);
+				Q_ASSERT(targetInfoPtr != nullptr);
 
-					if (sourceObjectPtr != nullptr){
-						if (!targetInfoPtr->dataPtr.IsValid()){
-							targetInfoPtr->dataPtr.TakeOver(CreateDataObject(typeId));
-						}
+				if (sourceObjectPtr != nullptr){
+					if (!targetInfoPtr->dataPtr.IsValid()){
+						targetInfoPtr->dataPtr.TakeOver(CreateDataObject(typeId));
+					}
 
-						if (targetInfoPtr->dataPtr.IsValid()){
-							if (!targetInfoPtr->dataPtr->CopyFrom(*sourceObjectPtr)){
-								return false;
-							}
+					if (targetInfoPtr->dataPtr.IsValid()){
+						if (!targetInfoPtr->dataPtr->CopyFrom(*sourceObjectPtr)){
+							return false;
 						}
 					}
 				}
 			}
-
-			return true;
 		}
+
+		return true;
 	}
 
 	return false;
