@@ -10,7 +10,7 @@ namespace imtservice
 
 
 /**
-	Interface for describing an service connections info.
+	Interface for describing a service connections info.
 	\ingroup Service
 */
 class IServiceConnectionLinkParam: virtual public IServiceConnectionInfo

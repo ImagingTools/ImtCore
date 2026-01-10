@@ -19,7 +19,7 @@ public:
 
 	CUrlConnectionParam();
 
-	void AddExternConnection(IncomingConnectionParam IncomingConnectionParam);
+	void AddExternConnection(const imtservice::IServiceConnectionParam::IncomingConnectionParam& externConnection);
 
 	// reimplemented (imtservice::IServiceConnectionParam)
 	virtual QList<IncomingConnectionParam> GetIncomingConnections() const override;

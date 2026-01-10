@@ -3,7 +3,6 @@
 
 // ImtCore includes
 #include <imtbase/IPluginInfo.h>
-#include <imtserverapp/IRepresentationController.h>
 #include <imtservice/IConnectionCollection.h>
 
 
@@ -17,9 +16,9 @@ namespace imtservice
 class IConnectionCollectionPlugin: virtual public imtbase::IPluginInfo
 {
 public:
-	typedef istd::TIFactory<imtservice::IConnectionCollection> IConnectionCollectionFactory;
-	typedef istd::TUniqueInterfacePtr<imtservice::IConnectionCollection> IConnectionCollectionUniquePtr;
-	typedef istd::TSharedInterfacePtr<imtservice::IConnectionCollection> IConnectionCollectionSharedPtr;
+	typedef istd::TIFactory<IConnectionCollection> IConnectionCollectionFactory;
+	typedef istd::TUniqueInterfacePtr<IConnectionCollection> IConnectionCollectionUniquePtr;
+	typedef istd::TSharedInterfacePtr<IConnectionCollection> IConnectionCollectionSharedPtr;
 
 	/**
 		Get access to the ConnectionCollection factory.

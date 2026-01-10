@@ -2,15 +2,10 @@
 
 
 // Qt includes
-#include <QtCore/QUrl>
 #include <QtCore/QUuid>
-
 
 // ACF includes
 #include <iser/ISerializable.h>
-
-// ImtCore includes
-#include <imtcom/CServerConnectionInterfaceParam.h>
 
 
 namespace imtservice
@@ -18,7 +13,7 @@ namespace imtservice
 
 
 /**
-	Interface for describing an service connection param.
+	Interface for describing a service connection param.
 	\ingroup Service
 */
 class IServiceConnectionParam: virtual public iser::ISerializable
@@ -52,7 +47,7 @@ public:
 		}
 	};
 
-	typedef QList<IServiceConnectionParam::IncomingConnectionParam> IncomingConnectionList;
+	typedef QList<IncomingConnectionParam> IncomingConnectionList;
 
 	virtual QList<IncomingConnectionParam> GetIncomingConnections() const = 0;
 };

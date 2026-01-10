@@ -31,7 +31,7 @@ public:
 	virtual QByteArray InsertNewConnection(
 				const QByteArray& connectionId,
 				const QUrl& url,
-				imtservice::IServiceConnectionInfo::ConnectionType connectionType,
+				IServiceConnectionInfo::ConnectionType connectionType,
 				const QString& name = QString(),
 				const QString& description = QString() ) = 0;
 };

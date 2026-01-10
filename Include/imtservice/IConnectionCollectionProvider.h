@@ -12,7 +12,7 @@ namespace imtservice
 
 
 /**
-	Interface for describing an service connection collection.
+	Interface for describing a service connection collection.
 	\ingroup Service
 */
 class IConnectionCollectionProvider: virtual public istd::IPolymorphic

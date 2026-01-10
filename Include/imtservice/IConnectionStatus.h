@@ -13,7 +13,7 @@ namespace imtservice
 
 
 /**
-	Interface for describing an service connection status.
+	Interface for describing a service connection status.
 	\ingroup Service
 */
 class IConnectionStatus: virtual public istd::IChangeable

@@ -15,15 +15,15 @@ namespace imtservice
 */
 template <class ComponentClass>
 class TConnectionCollectionPluginComponentImpl:
-			public imtbase::TBasePluginComponentImpl<ComponentClass, imtservice::IConnectionCollectionPlugin>
+			public imtbase::TBasePluginComponentImpl<ComponentClass, IConnectionCollectionPlugin>
 {
 public:
-	typedef imtbase::TBasePluginComponentImpl<ComponentClass, imtservice::IConnectionCollectionPlugin> BaseClass;
+	typedef imtbase::TBasePluginComponentImpl<ComponentClass, IConnectionCollectionPlugin> BaseClass;
 
 	TConnectionCollectionPluginComponentImpl(const QString& pluginName, const QByteArray& typeId);
 
-	// reimplemented (imtservice::IConnectionCollectionPlugin)
-	virtual const imtservice::IConnectionCollectionPlugin::IConnectionCollectionFactory* GetConnectionCollectionFactory() const override;
+	// reimplemented (IConnectionCollectionPlugin)
+	virtual const IConnectionCollectionPlugin::IConnectionCollectionFactory* GetConnectionCollectionFactory() const override;
 };
 
 
@@ -38,9 +38,9 @@ TConnectionCollectionPluginComponentImpl<ComponentClass>::TConnectionCollectionP
 // reimplemented (imtbase::IParamsSetPlugin)
 
 template <class ComponentClass>
-const imtservice::IConnectionCollectionPlugin::IConnectionCollectionFactory* TConnectionCollectionPluginComponentImpl<ComponentClass>::GetConnectionCollectionFactory() const
+const IConnectionCollectionPlugin::IConnectionCollectionFactory* TConnectionCollectionPluginComponentImpl<ComponentClass>::GetConnectionCollectionFactory() const
 {
-	return BaseClass::m_component.template GetInterface<imtservice::IConnectionCollectionPlugin::IConnectionCollectionFactory>(QByteArray());
+	return BaseClass::m_component.template GetInterface<IConnectionCollectionPlugin::IConnectionCollectionFactory>(QByteArray());
 }
 
 

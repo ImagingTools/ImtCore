@@ -14,11 +14,8 @@ QByteArray CUrlConnectionParamRepresentationController::GetModelId() const
 bool CUrlConnectionParamRepresentationController::IsModelSupported(const istd::IChangeable& dataModel) const
 {
 	const CUrlConnectionParam* urlConnectionParamPtr = dynamic_cast<const CUrlConnectionParam*>(&dataModel);
-	if (urlConnectionParamPtr != nullptr){
-		return true;
-	}
 
-	return false;
+	return urlConnectionParamPtr != nullptr;
 }
 
 
@@ -86,8 +83,8 @@ bool CUrlConnectionParamRepresentationController::GetRepresentationFromDataModel
 
 	imtbase::CTreeItemModel* externPortsModelPtr = representation.AddTreeModel("ExternPorts");
 
-	QList<imtservice::IServiceConnectionParam::IncomingConnectionParam> incomingConnections = urlConnectionParamPtr->GetIncomingConnections();
-	for (const imtservice::IServiceConnectionParam::IncomingConnectionParam& incomingConnection : incomingConnections){
+	QList<IServiceConnectionParam::IncomingConnectionParam> incomingConnections = urlConnectionParamPtr->GetIncomingConnections();
+	for (const IServiceConnectionParam::IncomingConnectionParam& incomingConnection : incomingConnections){
 		int externIndex = externPortsModelPtr->InsertNewItem();
 
 		externPortsModelPtr->SetData("Id", incomingConnection.id, externIndex);
@@ -135,7 +132,7 @@ bool CUrlConnectionParamRepresentationController::GetDataModelFromRepresentation
 		imtbase::CTreeItemModel* externPortsModelPtr = representation.GetTreeItemModel("ExternPorts");
 		if (externPortsModelPtr != nullptr){
 			for (int i = 0; i < externPortsModelPtr->GetItemsCount(); i++){
-				imtservice::IServiceConnectionParam::IncomingConnectionParam incomingConnection;
+				IServiceConnectionParam::IncomingConnectionParam incomingConnection;
 
 				if (externPortsModelPtr->ContainsKey("Id", i)){
 					QByteArray id = externPortsModelPtr->GetData("Id", i).toByteArray();

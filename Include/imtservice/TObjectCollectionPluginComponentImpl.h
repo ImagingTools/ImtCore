@@ -15,15 +15,15 @@ namespace imtservice
 */
 template <class ComponentClass>
 class TObjectCollectionPluginComponentImpl:
-			public imtbase::TBasePluginComponentImpl<ComponentClass, imtservice::IObjectCollectionPlugin>
+			public imtbase::TBasePluginComponentImpl<ComponentClass, IObjectCollectionPlugin>
 {
 public:
-	typedef imtbase::TBasePluginComponentImpl<ComponentClass, imtservice::IObjectCollectionPlugin> BaseClass;
+	typedef imtbase::TBasePluginComponentImpl<ComponentClass, IObjectCollectionPlugin> BaseClass;
 
 	TObjectCollectionPluginComponentImpl(const QString& pluginName, const QByteArray& typeId);
 
-	// reimplemented (imtservice::IObjectCollectionPlugin)
-	virtual const imtservice::IObjectCollectionPlugin::IObjectCollectionFactory* GetObjectCollectionFactory() const override;
+	// reimplemented (IObjectCollectionPlugin)
+	virtual const IObjectCollectionPlugin::IObjectCollectionFactory* GetObjectCollectionFactory() const override;
 };
 
 
@@ -38,9 +38,9 @@ TObjectCollectionPluginComponentImpl<ComponentClass>::TObjectCollectionPluginCom
 // reimplemented (imtbase::IParamsSetPlugin)
 
 template <class ComponentClass>
-const imtservice::IObjectCollectionPlugin::IObjectCollectionFactory* TObjectCollectionPluginComponentImpl<ComponentClass>::GetObjectCollectionFactory() const
+const IObjectCollectionPlugin::IObjectCollectionFactory* TObjectCollectionPluginComponentImpl<ComponentClass>::GetObjectCollectionFactory() const
 {
-	return BaseClass::m_component.template GetInterface<imtservice::IObjectCollectionPlugin::IObjectCollectionFactory>(QByteArray());
+	return BaseClass::m_component.template GetInterface<IObjectCollectionPlugin::IObjectCollectionFactory>(QByteArray());
 }
 
 
