@@ -2,7 +2,6 @@
 
 
 // ACF includes
-#include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
 #include <istd/CChangeGroup.h>
 #include <iser/IArchive.h>
@@ -99,7 +98,7 @@ int CTestInfo::GetSupportedOperations() const
 }
 
 
-bool CTestInfo::CopyFrom(const IChangeable &object, CompatibilityMode mode)
+bool CTestInfo::CopyFrom(const IChangeable &object, CompatibilityMode /* mode */)
 {
 	istd::CChangeGroup changeGroup(this);
 

@@ -1,9 +1,6 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QDateTime>
-
 // ACF includes
 #include <iser/IObject.h>
 #include <idoc/IDocumentMetaInfo.h>

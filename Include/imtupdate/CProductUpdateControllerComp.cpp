@@ -204,7 +204,9 @@ void CProductUpdateControllerComp::OnComponentCreated()
 
 
 bool CProductUpdateControllerComp::FinishAppInstallation(iprm::IParamsSet& params, bool* isRestartRequired)
-{	
+{
+	Q_UNUSED(params)
+	Q_UNUSED(isRestartRequired)
 	if(HasDelayedUpdate()){
 		InstallDelayedUpdate();
 	}
@@ -341,6 +343,7 @@ bool CProductUpdateControllerComp::InstallDelayedUpdate()
 
 bool CProductUpdateControllerComp::FinishAppInstallationForWindows(iprm::IParamsSet& params) const
 {
+	Q_UNUSED(params)
 /// \todo change debug to verbose messages
 #ifdef Q_OS_WIN
 	QStringList appArgs = qApp->arguments();
@@ -469,6 +472,7 @@ bool CProductUpdateControllerComp::FinishAppInstallationForWindows(iprm::IParams
 
 qlonglong CProductUpdateControllerComp::_winProcessPIDByName(const QString& pName) const
 {
+	Q_UNUSED(pName)
 	int retval = -1;
 #ifdef Q_OS_WINDOWS
 	HANDLE hSnap = NULL;
@@ -516,6 +520,7 @@ bool CProductUpdateControllerComp::_winTerminateProcess(const QString& pName) co
 
 bool CProductUpdateControllerComp::_winTerminateProcess(const qlonglong& pID) const
 {
+	Q_UNUSED(pID)
 	int retval = 0;
 #ifdef Q_OS_WINDOWS
 	if(!_winProcessIsRunning(pID)) return true;
@@ -534,7 +539,9 @@ bool CProductUpdateControllerComp::_winTerminateProcess(const qlonglong& pID) co
 bool CProductUpdateControllerComp::_winProcessIsRunning(const qlonglong& pID) const
 {
 	int retval = 0;
-	if(pID < 0) return retval;
+	if(pID < 0){
+		return false;
+	}
 #ifdef Q_OS_WINDOWS
 	HANDLE hSnap = NULL;
 	PROCESSENTRY32 pe32;
@@ -560,6 +567,7 @@ bool CProductUpdateControllerComp::_winProcessIsRunning(const qlonglong& pID) co
 
 bool CProductUpdateControllerComp::_winProcessIsRunning(const QString& pName) const
 {
+	Q_UNUSED(pName)
 	int retval = 0;
 #ifdef Q_OS_WINDOWS
 	HANDLE hSnap = NULL;

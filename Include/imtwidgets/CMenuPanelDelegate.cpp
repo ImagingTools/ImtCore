@@ -2,7 +2,6 @@
 
 
 // Qt includes
-#include <QtCore/QtMath>
 #include <QtGui/QPainter>
 
 // ImtCore includes
@@ -17,16 +16,17 @@ namespace imtwidgets
 // public methods
 
 CMenuPanelDelegate::CMenuPanelDelegate(QTreeView* menuPanelPtr)
-	:QStyledItemDelegate(menuPanelPtr),
-	m_indent(0),
-	m_height(0),
-	m_iconSizeRatio(1),
-	m_iconSizeHoverRatio(1),
-
-	m_topPadding(0),
-	m_leftPadding(0),
-	m_rightPadding(0),
-	m_iconToTextPadding(0)
+	: QStyledItemDelegate(menuPanelPtr),
+	  m_indent(0),
+	  m_height(0),
+	  m_iconSizeRatio(1),
+	  m_iconSizeHoverRatio(1),
+	  m_iconHeight(0),
+	  m_iconHeightHover(0),
+	  m_topPadding(0),
+	  m_leftPadding(0),
+	  m_rightPadding(0),
+	  m_iconToTextPadding(0)
 {
 }
 

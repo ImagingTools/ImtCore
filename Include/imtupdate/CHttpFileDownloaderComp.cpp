@@ -21,7 +21,7 @@ CHttpFileDownloaderComp::DownloadStatus CHttpFileDownloaderComp::DownloadFile(
 			const QString& remoteLink,
 			const QString& localFilePath,
 			bool contunieDownload,
-			ibase::IProgressManager* progressManagerPtr) const
+			ibase::IProgressManager* /* progressManagerPtr */) const
 {
 	IDownloader::DownloadStatus downloadingStatus = IDownloader::DS_FAILED;
 
@@ -48,7 +48,7 @@ CHttpFileDownloaderComp::DownloadStatus CHttpFileDownloaderComp::DownloadFile(
 	Q_ASSERT_X (replyPtr != nullptr, __FILE__, "Invlid reply");
 	if (replyPtr != nullptr){
 		const QByteArray body = replyPtr->readAll();
-		if (replyPtr->error()){
+		if (replyPtr->error() != QNetworkReply::NoError){
 			SendErrorMessage(0, replyPtr->errorString());
 			qDebug() << body;
 		}

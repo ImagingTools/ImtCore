@@ -2,7 +2,6 @@
 
 
 // Qt includes
-#include <QtWidgets/QSpinBox>
 #include <QtWidgets/QStyledItemDelegate>
 
 
@@ -21,7 +20,7 @@ public:
 		SpinDouble = QMetaType::Double,
 	};
 
-	CNumericItemDelegate(Type type = CNumericItemDelegate::SpinInt, QObject* parent = 0);
+	CNumericItemDelegate(Type type = SpinInt, QObject* parent = 0);
 	virtual ~CNumericItemDelegate();
 
 	void SetMaximum(int max);

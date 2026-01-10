@@ -1,9 +1,6 @@
 #include <imtwidgets/CMenuPanel.h>
 
 
-// STL includes
-#include <math.h>
-
 // Qt includes
 #include <QtCore/QDebug>
 #include <QtCore/QEvent>
@@ -23,8 +20,11 @@ namespace imtwidgets
 
 CMenuPanel::CMenuPanel(QWidget* parent)
 	:QWidget(parent),
-	m_maxWidth(0),
+	m_cachedItemHeight(0),
+	m_cachedIconSizeRatio(0),
+	m_cachedFontSizeRatio(0),
 	m_minWidth(0),
+	m_maxWidth(0),
 	m_indent(0),
 	m_verticalPadding(0),
 	m_animationAction(AA_NONE),
@@ -35,14 +35,11 @@ CMenuPanel::CMenuPanel(QWidget* parent)
 	m_guiCreated(false),
 	m_animationWidth(this),
 	m_animationIndent(this),
-	m_mainWidgetPtr(nullptr),
 	m_leftFramePtr(parent),
+	m_mainWidgetPtr(nullptr),
 	m_parentWidgetPtr(nullptr),
 	m_delegatePtr(nullptr),
-	m_shadowPtr(nullptr),
-	m_cachedItemHeight(0),
-	m_cachedIconSizeRatio(0),
-	m_cachedFontSizeRatio(0)
+	m_shadowPtr(nullptr)
 {
 	setupUi(this);
 
@@ -788,8 +785,9 @@ void CMenuPanel::enterEvent(QEvent* /*event*/)
 void CMenuPanel::enterEvent(QEnterEvent* /*event*/)
 #endif
 {
-	if (m_animationEnabled == false)
+	if (!m_animationEnabled){
 		return;
+	}
 	if (!PageTree->currentIndex().isValid()){
 		m_animationAction = AA_EXPAND;
 		return;
@@ -805,8 +803,9 @@ void CMenuPanel::enterEvent(QEnterEvent* /*event*/)
 
 void CMenuPanel::leaveEvent(QEvent* /*event*/)
 {
-	if (m_animationEnabled == false)
+	if (!m_animationEnabled){
 		return;
+	}
 	if (!PageTree->currentIndex().isValid()){
 		m_animationAction = AA_COLLAPSE;
 		return;
@@ -831,7 +830,7 @@ void CMenuPanel::resizeEvent(QResizeEvent* event)
 		BottomPageTree->setMaximumWidth(this->width());
 		BottomPageTree->setMinimumWidth(this->width());
 
-		if (m_parentWidgetPtr){
+		if (m_parentWidgetPtr != nullptr){
 			QRect rect = this->geometry();
 			rect.setWidth(this->width() + 5);
 			m_parentWidgetPtr->setGeometry(rect);
@@ -922,7 +921,7 @@ QModelIndex CMenuPanel::GetModelIndexFromModel(const QByteArray& pageId, const Q
 void CMenuPanel::SetMinimumPanelWidth(int width)
 {
 	if (m_mainWidgetPtr != nullptr){
-		if (m_leftFramePtr){
+		if (m_leftFramePtr != nullptr){
 			m_leftFramePtr->setMinimumWidth(width);
 			m_leftFramePtr->setMaximumWidth(width);
 		}
@@ -1048,7 +1047,7 @@ void CMenuPanel::StartAnimation()
 		if (m_mainWidgetPtr != nullptr){
 			m_animationWidth.setStartValue(QRect(0, 0, this->width(), height()));
 			m_animationWidth.setEndValue(QRect(0, 0, m_maxWidth, height()));
-			if (m_shadowPtr){
+			if (m_shadowPtr != nullptr){
 				m_shadowPtr->setEnabled(true);
 			}
 		}
@@ -1075,7 +1074,7 @@ void CMenuPanel::StartAnimation()
 		if (m_mainWidgetPtr != nullptr){
 			m_animationWidth.setStartValue(QRect(0, 0, width(), height()));
 			m_animationWidth.setEndValue(QRect(0, 0, m_minWidth, height()));
-			if (m_shadowPtr){
+			if (m_shadowPtr != nullptr){
 				m_shadowPtr->setEnabled(false);
 			}
 		}

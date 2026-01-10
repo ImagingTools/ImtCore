@@ -5,7 +5,6 @@
 #include <QtCore/QPropertyAnimation>
 #include <QtCore/QSortFilterProxyModel>
 #include <QtGui/QStandardItemModel>
-#include <QtWidgets/QTreeView>
 
 // ACF includes
 #include <iwidgets/CFocusDecorator.h>

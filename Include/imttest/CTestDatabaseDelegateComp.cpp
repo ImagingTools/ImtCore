@@ -27,7 +27,7 @@ istd::IChangeableUniquePtr CTestDatabaseDelegateComp::CreateObjectFromRecord(con
 		return nullptr;
 	}
 
-	istd::TUniqueInterfacePtr<imttest::ITestInfo> testInfoPtr = m_testFactCompPtr.CreateInstance();
+	istd::TUniqueInterfacePtr<ITestInfo> testInfoPtr = m_testFactCompPtr.CreateInstance();
 	if (!testInfoPtr.IsValid()){
 		return nullptr;
 	}
@@ -50,7 +50,7 @@ istd::IChangeableUniquePtr CTestDatabaseDelegateComp::CreateObjectFromRecord(con
 	}
 
 	istd::IChangeableUniquePtr retVal;
-	retVal.MoveCastedPtr<imttest::ITestInfo>(testInfoPtr);
+	retVal.MoveCastedPtr<ITestInfo>(testInfoPtr);
 
 	return retVal;
 }
@@ -81,7 +81,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CTestDatabaseDelegateComp::Create
 	}
 	QString testName;
 	QString testDescription;
-	const imttest::ITestInfo* testInfoPtr = dynamic_cast<const imttest::ITestInfo*>(valuePtr);
+	const ITestInfo* testInfoPtr = dynamic_cast<const ITestInfo*>(valuePtr);
 	if (testInfoPtr != nullptr){
 		testName = testInfoPtr->GetTestName();
 		testDescription = testInfoPtr->GetTestDescription();
@@ -106,9 +106,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CTestDatabaseDelegateComp::Create
 		if(testId.isEmpty()){
 			return NewObjectQuery();
 		}
-		else{
-			retVal.objectName = QString(testId);
-		}
+
+		retVal.objectName = QString(testId);
 	}
 	else{
 		retVal.objectName = testName;
@@ -125,12 +124,12 @@ QByteArray CTestDatabaseDelegateComp::CreateDeleteObjectsQuery(
 	if (objectIds.isEmpty()){
 		return QByteArray();
 	}
-	
+
 	QStringList quotedIds;
 	for (const QByteArray& objectId : objectIds){
 		quotedIds << QString("'%1'").arg(objectId);
 	}
-	
+
 	QString query = QString(
 						"DELETE FROM \"%1\" WHERE \"%2\" IN (%3);")
 						.arg(
@@ -138,14 +137,14 @@ QByteArray CTestDatabaseDelegateComp::CreateDeleteObjectsQuery(
 							QString::fromUtf8(*m_objectIdColumnAttrPtr),
 							quotedIds.join(", ")
 							);
-	
+
 	return query.toUtf8();
 }
 
 
 QByteArray CTestDatabaseDelegateComp::CreateDeleteObjectSetQuery(
 			const imtbase::IObjectCollection& /*collection*/,
-			const iprm::IParamsSet* paramsPtr,
+			const iprm::IParamsSet* /* paramsPtr */,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	return QByteArray();
@@ -153,13 +152,13 @@ QByteArray CTestDatabaseDelegateComp::CreateDeleteObjectSetQuery(
 
 
 QByteArray CTestDatabaseDelegateComp::CreateUpdateObjectQuery(
-			const imtbase::IObjectCollection& collection,
+			const imtbase::IObjectCollection& /* collection */,
 			const QByteArray& objectId,
 			const istd::IChangeable& object,
 			const imtbase::IOperationContext* /*operationContextPtr*/,
 			bool /*useExternDelegate*/) const
 {
-	const imttest::ITestInfo* testInfoPtr = dynamic_cast<const imttest::ITestInfo*>(&object);
+	const ITestInfo* testInfoPtr = dynamic_cast<const ITestInfo*>(&object);
 	if (testInfoPtr == nullptr){
 		return QByteArray();
 	}
@@ -186,10 +185,10 @@ QByteArray CTestDatabaseDelegateComp::CreateRenameObjectQuery(
 			const QString& newObjectName,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	const imttest::ITestInfo* testInfoPtr = nullptr;
+	const ITestInfo* testInfoPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr objectPtr;
 	if (collection.GetObjectData(objectId, objectPtr)){
-		testInfoPtr = dynamic_cast<const imttest::ITestInfo*>(objectPtr.GetPtr());
+		testInfoPtr = dynamic_cast<const ITestInfo*>(objectPtr.GetPtr());
 	}
 
 	if (testInfoPtr == nullptr){
@@ -214,10 +213,10 @@ QByteArray CTestDatabaseDelegateComp::CreateDescriptionObjectQuery(
 			const QString& description,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	const imttest::ITestInfo* testPtr = nullptr;
+	const ITestInfo* testPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr objectPtr;
 	if (collection.GetObjectData(objectId, objectPtr)){
-		testPtr = dynamic_cast<const imttest::ITestInfo*>(objectPtr.GetPtr());
+		testPtr = dynamic_cast<const ITestInfo*>(objectPtr.GetPtr());
 	}
 
 	if (testPtr == nullptr){
@@ -241,7 +240,7 @@ QByteArray CTestDatabaseDelegateComp::CreateDescriptionObjectQuery(
 
 idoc::MetaInfoPtr CTestDatabaseDelegateComp::CreateObjectMetaInfo(const QByteArray& /*typeId*/) const
 {
-	return  idoc::MetaInfoPtr(new imttest::CTestMetaInfo());
+	return  idoc::MetaInfoPtr(new CTestMetaInfo());
 }
 
 
@@ -250,29 +249,29 @@ bool CTestDatabaseDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& re
 	if (record.contains("Id")){
 		QString testId = record.value("Id").toString();
 
-		metaInfo.SetMetaInfo(imttest::ITestInfo::MIT_TEST_ID, testId);
+		metaInfo.SetMetaInfo(ITestInfo::MIT_TEST_ID, testId);
 	}
 
 	if (record.contains("Name")){
 		QString testName = record.value("Name").toString();
 
-		metaInfo.SetMetaInfo(imttest::ITestInfo::MIT_TEST_NAME, testName);
+		metaInfo.SetMetaInfo(ITestInfo::MIT_TEST_NAME, testName);
 	}
 
 	if (record.contains("Description")){
 		QString testDescription = record.value("Description").toString();
 
-		metaInfo.SetMetaInfo(imttest::ITestInfo::MIT_TEST_DESCRIPTION, testDescription);
+		metaInfo.SetMetaInfo(ITestInfo::MIT_TEST_DESCRIPTION, testDescription);
 	}
 
 	return true;
 }
 
-QByteArray CTestDatabaseDelegateComp::CreateDataMetaInfoQuery(const imtbase::IObjectCollection &collection, const QByteArray &objectId, const idoc::IDocumentMetaInfo *dataMetaInfoPtr) const
+QByteArray CTestDatabaseDelegateComp::CreateDataMetaInfoQuery(const imtbase::IObjectCollection& /* collection */, const QByteArray &objectId, const idoc::IDocumentMetaInfo *dataMetaInfoPtr) const
 {
 	if(dataMetaInfoPtr != nullptr && !objectId.isEmpty()){
-		QString name = dataMetaInfoPtr->GetMetaInfo(imttest::ITestInfo::MIT_TEST_NAME).toString();
-		QString description = dataMetaInfoPtr->GetMetaInfo(imttest::ITestInfo::MIT_TEST_DESCRIPTION).toString();
+		QString name = dataMetaInfoPtr->GetMetaInfo(ITestInfo::MIT_TEST_NAME).toString();
+		QString description = dataMetaInfoPtr->GetMetaInfo(ITestInfo::MIT_TEST_DESCRIPTION).toString();
 		QDateTime added = dataMetaInfoPtr->GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME).toDateTime();
 		QString str_Added = added.isValid() ? added.toString("yyyy-MM-dd hh:mm:ss") : "null";
 		QDateTime lastModificationTime = dataMetaInfoPtr->GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME).toDateTime();
@@ -289,7 +288,7 @@ QByteArray CTestDatabaseDelegateComp::CreateDataMetaInfoQuery(const imtbase::IOb
 	return QByteArray();
 }
 
-QByteArray CTestDatabaseDelegateComp::CreateCollectionItemMetaInfoQuery(const imtbase::IObjectCollection &collection, const QByteArray &objectId, const idoc::IDocumentMetaInfo *collectionItemMetaInfoPtr) const
+QByteArray CTestDatabaseDelegateComp::CreateCollectionItemMetaInfoQuery(const imtbase::IObjectCollection& /* collection */, const QByteArray &objectId, const idoc::IDocumentMetaInfo *collectionItemMetaInfoPtr) const
 {
 	if(collectionItemMetaInfoPtr != nullptr && !objectId.isEmpty()){
 		QString name = collectionItemMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_TITLE).toString();

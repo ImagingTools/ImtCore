@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtGui/QPainter>
+#include <QtWidgets/QSpinBox>
 
 
 namespace imtwidgets
@@ -55,7 +56,7 @@ void CNumericItemDelegate::SetDecimals(int decimal)
 QWidget *CNumericItemDelegate::createEditor(
 			QWidget*parent,
 			const QStyleOptionViewItem& option,
-			const QModelIndex&) const
+			const QModelIndex& /* index */) const
 {
 	if (m_type == CNumericItemDelegate::SpinInt){
 		QSpinBox *editor = new QSpinBox(parent);
@@ -66,7 +67,7 @@ QWidget *CNumericItemDelegate::createEditor(
 
 		return editor;
 	}
-	else if (m_type == CNumericItemDelegate::SpinDouble){
+	if (m_type == CNumericItemDelegate::SpinDouble){
 		QDoubleSpinBox *editor = new QDoubleSpinBox(parent);
 		editor->setMaximum(m_max);
 		editor->setMinimum(m_min);
@@ -98,7 +99,9 @@ void CNumericItemDelegate::setEditorData(QWidget*editor, const QModelIndex& inde
 
 void CNumericItemDelegate::setModelData(QWidget* editor, QAbstractItemModel*model, const QModelIndex &index) const
 {
-	if (!model || !index.isValid()) return;
+	if ((model == nullptr) || !index.isValid()){
+		return;
+	}
 	if (m_type == CNumericItemDelegate::SpinInt){
 		QSpinBox *spinbox = qobject_cast<QSpinBox*>(editor);
 		int value = spinbox->value();
@@ -109,12 +112,10 @@ void CNumericItemDelegate::setModelData(QWidget* editor, QAbstractItemModel*mode
 		double value = spinbox->value();
 		model->setData(index, value, Qt::EditRole);
 	}
-	else
-		return;
 }
 
 
-void CNumericItemDelegate::updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem& option, const QModelIndex& ) const
+void CNumericItemDelegate::updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem& option, const QModelIndex& /* index */) const
 {
 	editor->setGeometry(option.rect);
 }

@@ -75,7 +75,7 @@ void CInstallationVersionInfo::SetVersionFromString(const QString &versionString
 	int fixVersion = 0;
 	int buildIdVersion = 0;
 
-	if (versionParts.size() > 0){
+	if (!versionParts.isEmpty()){
 		majorVersion = versionParts[0].toInt(&isMajorVersionConverted);
 	}
 
@@ -117,7 +117,7 @@ void CInstallationVersionInfo::SetVersionFromString(const QString &versionString
 
 // reimplemented (istd::IChangable)
 
-bool CInstallationVersionInfo::ResetData(CompatibilityMode)
+bool CInstallationVersionInfo::ResetData(CompatibilityMode /* mode */)
 {
 	istd::CChangeNotifier changeNotifier(this);
 	m_majorVersion = 0;

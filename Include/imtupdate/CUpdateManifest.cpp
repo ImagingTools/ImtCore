@@ -65,7 +65,7 @@ int CUpdateManifest::GetSupportedOperations() const
 }
 
 
-bool CUpdateManifest::CopyFrom(const IChangeable& object, CompatibilityMode mode)
+bool CUpdateManifest::CopyFrom(const IChangeable& object, CompatibilityMode /* mode */)
 {
 	const CUpdateManifest* objectPtr = dynamic_cast<const CUpdateManifest*>(&object);
 

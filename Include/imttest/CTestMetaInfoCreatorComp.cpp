@@ -32,13 +32,13 @@ bool CTestMetaInfoCreatorComp::CreateMetaInfo(
 		return true;
 	}
 
-	const imttest::ITestInfo* testPtr = dynamic_cast<const imttest::ITestInfo*>(dataPtr);
+	const ITestInfo* testPtr = dynamic_cast<const ITestInfo*>(dataPtr);
 	if (testPtr == nullptr){
 		return false;
 	}
 
-	metaInfoPtr->SetMetaInfo(imttest::ITestInfo::MIT_TEST_ID, testPtr->GetTestId());
-	metaInfoPtr->SetMetaInfo(imttest::ITestInfo::MIT_TEST_NAME, testPtr->GetTestName());
+	metaInfoPtr->SetMetaInfo(ITestInfo::MIT_TEST_ID, testPtr->GetTestId());
+	metaInfoPtr->SetMetaInfo(ITestInfo::MIT_TEST_NAME, testPtr->GetTestName());
 
 	return true;
 }

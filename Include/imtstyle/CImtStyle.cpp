@@ -8,8 +8,6 @@
 #include <QtGui/QPainterPath>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QStyleOption>
-#include <QtWidgets/QToolButton>
-#include <QtWidgets/QStyleFactory>
 #include <QtGui/QPixmapCache>
 
 // ACF includes

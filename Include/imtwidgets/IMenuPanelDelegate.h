@@ -4,9 +4,6 @@
 // Qt includes
 #include <QtWidgets/QStyledItemDelegate>
 
-// Qt includes
-#include <QtWidgets/QTreeView>
-
 
 namespace imtwidgets
 {

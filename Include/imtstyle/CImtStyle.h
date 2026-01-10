@@ -2,7 +2,6 @@
 
 
 // Qt includes
-#include <QtCore/QMap>
 #include <QtWidgets/QProxyStyle>
 #include <QtWidgets/QStyleOption>
 

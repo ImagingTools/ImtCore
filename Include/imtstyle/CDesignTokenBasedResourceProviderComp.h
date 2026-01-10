@@ -3,7 +3,6 @@
 
 // Qt includes
 #include <QtGui/QFont>
-#include <QtGui/QPalette>
 
 // ACF includes
 #include <icomp/CComponentBase.h>

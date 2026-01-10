@@ -14,7 +14,7 @@ namespace imttest
 {
 
 
-class CTestInfo: virtual public imttest::ITestInfo
+class CTestInfo: virtual public ITestInfo
 {
 public:
 	CTestInfo();

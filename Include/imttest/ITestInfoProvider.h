@@ -42,7 +42,7 @@ public:
 	/**
 		Get information for a test installation instance.
 	*/
-	virtual const imttest::ITestInfo* GetTest(const QByteArray& instanceId) const = 0;
+	virtual const ITestInfo* GetTest(const QByteArray& instanceId) const = 0;
 };
 
 

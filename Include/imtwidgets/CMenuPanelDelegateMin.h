@@ -1,8 +1,12 @@
 #pragma once
 
 
+// Qt includes
+#include <QtWidgets/QTreeView>
+
 // ImtCore includes
 #include <imtwidgets/CMenuPanelDelegate.h>
+
 
 namespace imtwidgets
 {
