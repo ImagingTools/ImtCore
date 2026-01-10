@@ -51,7 +51,7 @@ QString CMultiDocumentWorkspaceGuiComp::GetSaveFilePath(const QByteArray& docume
 	QInputDialog nameDialog(GetWidget());
 
 	bool isAccepted;
-	QString resourceName = nameDialog.getText(GetWidget(), tr("Document Name"), tr("Please enter the name of the document:"), QLineEdit::Normal, QString(), &isAccepted).trimmed();
+	QString resourceName = QInputDialog::getText(GetWidget(), tr("Document Name"), tr("Please enter the name of the document:"), QLineEdit::Normal, QString(), &isAccepted).trimmed();
 	if (!isAccepted){
 		return QString();
 	}

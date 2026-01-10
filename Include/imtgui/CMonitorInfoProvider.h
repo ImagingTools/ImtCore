@@ -72,7 +72,7 @@ private:
 	QList<MonitorInfo> m_monitors;
 
 private:
-	QSize RetrievePhysicalSize(QString monitorId);
+	QSize RetrievePhysicalSize(const QString& monitorId);
 };
 
 
