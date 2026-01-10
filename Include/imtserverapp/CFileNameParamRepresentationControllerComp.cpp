@@ -22,11 +22,8 @@ QByteArray CFileNameParamRepresentationControllerComp::GetTypeId() const
 bool CFileNameParamRepresentationControllerComp::IsModelSupported(const istd::IChangeable& dataModel) const
 {
 	const ifile::IFileNameParam* fileNameParamPtr = dynamic_cast<const ifile::IFileNameParam*>(&dataModel);
-	if (fileNameParamPtr != nullptr){
-		return true;
-	}
-	
-	return false;
+
+	return fileNameParamPtr != nullptr;
 }
 
 
@@ -40,13 +37,13 @@ bool CFileNameParamRepresentationControllerComp::GetSdlRepresentationFromDataMod
 	if (fileNameParamPtr == nullptr){
 		return false;
 	}
-	
+
 	QString path = fileNameParamPtr->GetPath();
 	sdlRepresentation.path = path;
-	
+
 	int type = fileNameParamPtr->GetPathType();
 	sdlRepresentation.pathType = type;
-	
+
 	return true;
 }
 
@@ -60,7 +57,7 @@ bool CFileNameParamRepresentationControllerComp::GetDataModelFromSdlRepresentati
 	if (fileNameParamPtr == nullptr){
 		return false;
 	}
-	
+
 	if (sdlRepresentation.path){
 		fileNameParamPtr->SetPath(*sdlRepresentation.path);
 	}

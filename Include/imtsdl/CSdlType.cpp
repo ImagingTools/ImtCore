@@ -4,7 +4,6 @@
 #include <istd/CChangeNotifier.h>
 #include <iser/CArchiveTag.h>
 #include <iser/IArchive.h>
-#include <iser/CPrimitiveTypesSerializer.h>
 #include <iprm/CParamsSet.h>
 
 
@@ -17,10 +16,6 @@ namespace imtsdl
 
 
 // public methods
-
-CSdlType::CSdlType() :CSdlEntryBase()
-{
-}
 
 
 SdlFieldList CSdlType::GetFields() const

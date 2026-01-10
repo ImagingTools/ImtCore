@@ -16,14 +16,14 @@ namespace imtserverapp
 template<class SdlClass>
 class TJsonRepresentationControllerCompWrap:
 			public ilog::CLoggerComponentBase,
-			public imtserverapp::TJsonRepresentationControllerWrap<SdlClass>
+			public TJsonRepresentationControllerWrap<SdlClass>
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
-	typedef imtserverapp::TJsonRepresentationControllerWrap<SdlClass> BaseClass2;
+	typedef TJsonRepresentationControllerWrap<SdlClass> BaseClass2;
 	
 	I_BEGIN_BASE_COMPONENT(TJsonRepresentationControllerCompWrap);
-		I_REGISTER_INTERFACE(imtserverapp::IJsonRepresentationController);
+		I_REGISTER_INTERFACE(IJsonRepresentationController);
 		I_ASSIGN(m_modelIdAttrPtr, "ModelId", "Model-ID", false, "");
 		I_ASSIGN(m_nameAttrPtr, "Name", "Name", false, "");
 		I_ASSIGN(m_descriptionAttrPtr, "Description", "Description", false, "");

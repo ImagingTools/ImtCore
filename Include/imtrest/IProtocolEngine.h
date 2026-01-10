@@ -1,17 +1,14 @@
 #pragma once
 
 
-// Qt includes
-#include <QtNetwork/QAbstractSocket>
-
 // ACF includes
 #include <iser/IVersionInfo.h>
 
 // ImtCore includes
 #include <imtrest/IRequest.h>
 #include <imtrest/IRequestServlet.h>
-#include <imtrest/ISender.h>
 #include <imtrest/IResponse.h>
+
 
 namespace imtrest
 {

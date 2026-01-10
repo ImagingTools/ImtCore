@@ -298,7 +298,7 @@ QStringList CGqlSchemaParserComp::GetPathsFromImportEntry(QString importDirectiv
 	}
 	importDirective.resize(importDirective.length() - versionLength);
 
-	// check if entry is file
+	// check if entry is filed
 	QStringList pathParts = importDirective.split('.');
 
 	if (!version.isEmpty()){

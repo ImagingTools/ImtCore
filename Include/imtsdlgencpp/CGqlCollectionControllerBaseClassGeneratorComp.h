@@ -16,6 +16,7 @@
 #include <imtsdl/ISdlRequestListProvider.h>
 #include <imtsdl/ISdlDocumentTypeListProvider.h>
 #include <imtsdl/CSdlTools.h>
+#include <imtsdl/CSdlDocumentType.h>
 #include <imtsdlgencpp/CCxxProcessorCompBase.h>
 #include <imtsdlgencpp/CSdlGenTools.h>
 

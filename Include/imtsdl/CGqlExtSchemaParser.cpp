@@ -6,6 +6,7 @@
 
 // ImtCore includes
 #include <imtsdl/CSdlTools.h>
+#include <imtsdl/CSdlDocumentType.h>
 #include <imtsdl/CSdlEnumConverter.h>
 
 
@@ -16,7 +17,7 @@ namespace imtsdl
 
 // protected constructor
 
-CGqlExtSchemaParser::CGqlExtSchemaParser(): BaseClass()
+CGqlExtSchemaParser::CGqlExtSchemaParser()
 {
 }
 

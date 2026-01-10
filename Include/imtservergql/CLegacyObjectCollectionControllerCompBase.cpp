@@ -172,7 +172,7 @@ bool CLegacyObjectCollectionControllerCompBase::GetOperationFromRequest(
 		QString& errorMessage,
 		int& operationType) const
 {
-	const imtgql::CGqlFieldObject fields = gqlRequest.GetFields();
+	const imtgql::CGqlFieldObject& fields = gqlRequest.GetFields();
 
 	const QByteArrayList Ids = fields.GetFieldIds();
 	for (const QByteArray& fieldId: Ids){
@@ -735,7 +735,8 @@ imtbase::CTreeItemModel* CLegacyObjectCollectionControllerCompBase::GetElementId
 		return nullptr;
 	}
 
-	int offset = 0, count = -1;
+	int offset = 0;
+	int count = -1;
 	iprm::CParamsSet filterParams;
 	const imtgql::CGqlParamObject* viewParamsPtr = inputParamPtr->GetParamArgumentObjectPtr("viewParams");
 	if (viewParamsPtr != nullptr){
@@ -1350,7 +1351,7 @@ bool CLegacyObjectCollectionControllerCompBase::SetupGqlItem(
 QByteArrayList CLegacyObjectCollectionControllerCompBase::GetInformationIds(const imtgql::CGqlRequest& gqlRequest, const QByteArray& objectId) const
 {
 	QByteArrayList retVal;
-	const imtgql::CGqlFieldObject fields = gqlRequest.GetFields();
+	const imtgql::CGqlFieldObject& fields = gqlRequest.GetFields();
 	const imtgql::CGqlFieldObject* findObject = fields.GetFieldArgumentObjectPtr(objectId);
 	if (findObject != nullptr){
 		retVal =findObject->GetFieldIds();
@@ -1489,20 +1490,6 @@ void CLegacyObjectCollectionControllerCompBase::PrepareFilters(
 	else{
 		imtbase::CTreeItemModel objectFilterModel;
 		SetObjectFilter(gqlRequest, objectFilterModel, *objectFilterPtr);
-	}
-
-	if (generalModel.ContainsKey("TimeFilter")){
-		imtbase::CTreeItemModel* timeRangeFilterModelPtr = generalModel.GetTreeItemModel("TimeFilter");
-		if (timeRangeFilterModelPtr != nullptr){
-			imtbase::CTimeFilterParam* timeFilterParamPtr = new imtbase::CTimeFilterParam();
-
-			// if (m_timeFilterParamRepresentationController.GetDataModelFromRepresentation(*timeRangeFilterModelPtr, *timeFilterParamPtr)){
-			// 	filterParams.SetEditableParameter("TimeFilter", timeFilterParamPtr, true);
-			// }
-			// else{
-			// 	SendWarningMessage(0, QString("Unable to create time range filter param from representation model"));
-			// }
-		}
 	}
 
 	filterParams.SetEditableParameter("Filter", collectionFilterPtr, true);

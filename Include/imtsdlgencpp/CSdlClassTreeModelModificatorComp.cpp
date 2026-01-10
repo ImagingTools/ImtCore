@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtsdl/CSdlType.h>
+#include <imtsdl/CSdlEnum.h>
 #include <imtsdlgencpp/CSdlUnionConverter.h>
 
 
@@ -129,13 +130,13 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(
 		return;
 	}
 
-	else if (isArray){
+	if (isArray){
 		AddPrimitiveArrayFieldWriteToModelCode(stream, field, sdlType, isEnum, isUnion, optional);
 
 		return;
 	}
 
-	else if ((isCustom && !isEnum && !isUnion)){
+	if ((isCustom && !isEnum && !isUnion)){
 		AddCustomFieldWriteToModelCode(stream, field, sdlType, optional);
 
 		return;
@@ -268,7 +269,7 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(
 				*m_sdlEnumListCompPtr,
 				*m_sdlUnionListCompPtr,
 				2,
-				imtsdlgencpp::CSdlUnionConverter::ConversionType::CT_MODEL_SCALAR,
+				CT_MODEL_SCALAR,
 				"model.SetData(");
 		}
 		else {
@@ -322,13 +323,13 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(
 		return;
 	}
 
-	else if (isArray){
+	if (isArray){
 		AddPrimitiveArrayFieldReadFromModelCode(stream, field, sdlType, isEnum, isUnion, optional);
 
 		return;
 	}
 
-	else if (isCustom && !isEnum && !isUnion){
+	if (isCustom && !isEnum && !isUnion){
 		AddCustomFieldReadFromModelCode(stream, field, sdlType, optional);
 
 		return;

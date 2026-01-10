@@ -22,11 +22,8 @@ QByteArray CEnableableParamRepresentationControllerComp::GetTypeId() const
 bool CEnableableParamRepresentationControllerComp::IsModelSupported(const istd::IChangeable &dataModel) const
 {
 	const iprm::IEnableableParam* enableableParamPtr = dynamic_cast<const iprm::IEnableableParam*>(&dataModel);
-	if (enableableParamPtr != nullptr){
-		return true;
-	}
-	
-	return false;
+
+	return enableableParamPtr != nullptr;
 }
 
 
@@ -40,10 +37,10 @@ bool CEnableableParamRepresentationControllerComp::GetSdlRepresentationFromDataM
 	if (enableableParamPtr == nullptr){
 		return false;
 	}
-	
+
 	bool isEnabled = enableableParamPtr->IsEnabled();
 	sdlRepresentation.value = isEnabled;
-	
+
 	return true;
 }
 

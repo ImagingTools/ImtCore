@@ -5,7 +5,6 @@
 #include <istd/IPolymorphic.h>
 
 // ImtCore includes
-#include <imtsdl/imtsdl.h>
 #include <imtsdl/CSdlDocumentType.h>
 
 

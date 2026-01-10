@@ -30,11 +30,8 @@ QByteArray CDocumentIdFilterRepresentationController::GetTypeId() const
 bool CDocumentIdFilterRepresentationController::IsModelSupported(const istd::IChangeable& dataModel) const
 {
 	const imtcol::IDocumentIdFilter* documentIdFilterPtr = dynamic_cast<const imtcol::IDocumentIdFilter*>(&dataModel);
-	if (documentIdFilterPtr != nullptr){
-		return true;
-	}
 
-	return false;
+	return documentIdFilterPtr != nullptr;
 }
 
 

@@ -37,7 +37,7 @@ protected:
 				const istd::IChangeable& dataModel,
 				imtbase::CTreeItemModel& representation,
 				const iprm::IParamsSet* paramsPtr = nullptr) const = 0;
-	virtual bool CheckPermissions(imtauth::IUserInfo::FeatureIds userPermissions, const QByteArray& paramId) const;
+	virtual bool CheckPermissions(const imtauth::IUserInfo::FeatureIds& userPermissions, const QByteArray& paramId) const;
 
 	// reimplemented (IRepresentationController)
 	virtual QByteArray GetModelId() const override;

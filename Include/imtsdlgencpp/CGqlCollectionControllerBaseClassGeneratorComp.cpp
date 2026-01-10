@@ -1512,7 +1512,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::FindCallChainForField(const
 		return true;
 	}
 
-        auto sdlTypePtr = dynamic_cast<imtsdl::CSdlType*>(foundEntry.get());
+	auto sdlTypePtr = dynamic_cast<imtsdl::CSdlType*>(foundEntry.get());
 	if (sdlTypePtr != nullptr){
 		for (const imtsdl::CSdlField& sdlField: sdlTypePtr->GetFields()){
 			if (sdlField.GetType() == typeName || FindCallChainForField(sdlField, typeName, callChain, false)){

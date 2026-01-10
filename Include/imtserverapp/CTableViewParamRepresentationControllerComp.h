@@ -11,18 +11,18 @@ namespace imtserverapp
 
 class CTableViewParamRepresentationControllerComp:
 			public ilog::CLoggerComponentBase,
-			virtual public imtserverapp::IRepresentationController
+			virtual public IRepresentationController
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CTableViewParamRepresentationControllerComp)
-		I_REGISTER_INTERFACE(imtserverapp::IRepresentationController);
+		I_REGISTER_INTERFACE(IRepresentationController);
 		I_ASSIGN(m_modelIdAttrPtr, "ModelId", "Model-ID", false, "");
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (imtserverapp::IRepresentationController)
+	// reimplemented (IRepresentationController)
 	virtual QByteArray GetModelId() const override;
 	virtual bool IsModelSupported(const istd::IChangeable& dataModel) const override;
 	virtual bool GetRepresentationFromDataModel(

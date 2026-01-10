@@ -14,10 +14,6 @@ namespace imtsdl
 
 // public methods
 
-CSdlEnum::CSdlEnum() :CSdlEntryBase()
-{
-}
-
 
 QList<QPair<QString, QString>> CSdlEnum::GetValues() const
 {

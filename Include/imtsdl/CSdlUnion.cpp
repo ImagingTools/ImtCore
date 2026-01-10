@@ -2,13 +2,13 @@
 
 
 // ACF includes
-#include <istd/CChangeNotifier.h>
-#include <iser/CArchiveTag.h>
 #include <iser/IArchive.h>
-#include <iser/CPrimitiveTypesSerializer.h>
-#include <iprm/CParamsSet.h>
+#include <iprm/IParamsSet.h>
+#include <iser/CArchiveTag.h>
+#include <istd/CChangeNotifier.h>
 
 // ImtCore includes
+#include <imtbase/imtbase.h>
 #include <imtsdl/CSdlType.h>
 
 
@@ -17,11 +17,6 @@ namespace imtsdl
 
 
 // public methods
-
-CSdlUnion::CSdlUnion()
-	:CSdlEntryBase()
-{
-}
 
 
 QList<QString> CSdlUnion::GetTypes() const
@@ -86,7 +81,7 @@ bool CSdlUnion::Serialize(iser::IArchive& archive)
 	iser::CArchiveTag elementsTag("Types", "List of elements", iser::CArchiveTag::TT_MULTIPLE);
 	iser::CArchiveTag elementNameTag("TypeName", "Single element", iser::CArchiveTag::TT_LEAF, &elementsTag);
 
-	int elementsCount = m_types.count();
+	int elementsCount = imtbase::narrow_cast<int>(m_types.count());
 	bool isStoring = archive.IsStoring();
 
 	retVal = retVal && archive.BeginMultiTag(elementsTag, elementNameTag, elementsCount);

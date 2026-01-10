@@ -11,7 +11,7 @@ namespace imtserverapp
 
 
 class CTimeFilterParamRepresentationController:
-			public imtserverapp::TJsonRepresentationControllerWrap<sdl::imtbase::ComplexCollectionFilter::CTimeFilter::V1_0>
+			public TJsonRepresentationControllerWrap<sdl::imtbase::ComplexCollectionFilter::CTimeFilter::V1_0>
 {
 public:
 	CTimeFilterParamRepresentationController();

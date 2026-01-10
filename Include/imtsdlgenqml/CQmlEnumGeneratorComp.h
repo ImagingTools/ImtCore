@@ -12,7 +12,6 @@
 
 // ImtCore includes
 #include <imtsdl/ISdlProcessArgumentsParser.h>
-#include <imtsdl/ISdlTypeListProvider.h>
 #include <imtsdl/ISdlDocumentTypeListProvider.h>
 #include <imtsdl/CSdlTools.h>
 

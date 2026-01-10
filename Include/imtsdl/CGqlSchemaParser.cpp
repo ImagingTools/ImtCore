@@ -11,6 +11,7 @@
 
 // ImtCore includes
 #include <imtsdl/CSdlTools.h>
+#include <imtsdl/CSdlType.h>
 
 
 namespace imtsdl
@@ -302,10 +303,10 @@ bool CGqlSchemaParser::ProcessType()
 	if (typeName == m_keywordMap[KI_QUERY]){
 		return ProcessQuery();
 	}
-	else if (typeName == m_keywordMap[KI_MUTATION]){
+	if (typeName == m_keywordMap[KI_MUTATION]){
 		return ProcessMutation();
 	}
-	else if (typeName == m_keywordMap[KI_SUBSCRIPTION]){
+	if (typeName == m_keywordMap[KI_SUBSCRIPTION]){
 		return ProcessSubscription();
 	}
 
@@ -769,7 +770,7 @@ bool CGqlSchemaParser::ReadToDelimeter(const QByteArray& delimeters,
 	}
 
 	while (!m_stream.atEnd()){
-		int foundPosition = delimeters.indexOf(m_lastReadChar);
+		qsizetype foundPosition = delimeters.indexOf(m_lastReadChar);
 		if (foundPosition >= 0){
 			m_useLastReadChar = !skipDelimeter;
 

@@ -7,7 +7,7 @@
 // ImtCore includes
 #include <imtsdl/CSdlEntryBase.h>
 #include <imtsdl/CSdlType.h>
-#include <qassert.h>
+#include <imtsdl/CSdlField.h>
 
 
 namespace imtsdlgencpp
@@ -698,7 +698,7 @@ bool CSdlUnionObjectGeneratorComp::ProcessSourceClassListFile(QTextStream& strea
 }
 
 
-bool CSdlUnionObjectGeneratorComp::ProcessInsertToList(QTextStream& stream, const imtsdl::CSdlEntryBase& sdlEntry, QByteArray /*insertData*/) const
+bool CSdlUnionObjectGeneratorComp::ProcessInsertToList(QTextStream& stream, const imtsdl::CSdlEntryBase& sdlEntry, const QByteArray& /*insertData*/) const
 {
 	const imtsdl::CSdlUnion* sdlUnion = dynamic_cast<const imtsdl::CSdlUnion*>(&sdlEntry);
 
@@ -775,7 +775,7 @@ bool CSdlUnionObjectGeneratorComp::ProcessInsertToList(QTextStream& stream, cons
 }
 
 
-bool CSdlUnionObjectGeneratorComp::ProcessConvertListData(QTextStream& stream, const imtsdl::CSdlEntryBase& sdlEntry, QByteArray convertFormat) const
+bool CSdlUnionObjectGeneratorComp::ProcessConvertListData(QTextStream& stream, const imtsdl::CSdlEntryBase& sdlEntry, const QByteArray& convertFormat) const
 {
 	const imtsdl::CSdlUnion* sdlUnion = dynamic_cast<const imtsdl::CSdlUnion*>(&sdlEntry);
 

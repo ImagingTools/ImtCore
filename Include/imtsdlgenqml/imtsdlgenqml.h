@@ -1,8 +1,5 @@
 #pragma once
 
-// Qt includes
-#include <QtCore/QList>
-
 
 namespace imtsdlgenqml
 {

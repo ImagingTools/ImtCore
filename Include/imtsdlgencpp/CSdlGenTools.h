@@ -1,7 +1,5 @@
 #pragma once
 
-// Qt includes
-#include <QtCore/QSet>
 
 // ImtCore includes
 #include <imtsdl/imtsdl.h>
@@ -9,6 +7,7 @@
 #include <imtsdl/ISdlEnumListProvider.h>
 #include <imtsdl/ISdlUnionListProvider.h>
 #include <imtsdl/CSdlTools.h>
+#include <imtsdl/CSdlField.h>
 
 
 class QTextStream;

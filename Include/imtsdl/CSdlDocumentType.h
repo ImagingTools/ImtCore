@@ -9,6 +9,7 @@
 #include <iprm/IParamsSet.h>
 
 // ImtCore includes
+#include <imtsdl/imtsdl.h>
 #include <imtsdl/CSdlType.h>
 #include <imtsdl/CSdlUnion.h>
 #include <imtsdl/CSdlRequest.h>
@@ -16,6 +17,10 @@
 
 namespace imtsdl
 {
+
+
+class CSdlDocumentType;
+typedef QList<CSdlDocumentType> SdlDocumentTypeList;
 
 
 class CSdlDocumentType: virtual public CSdlEntryBase

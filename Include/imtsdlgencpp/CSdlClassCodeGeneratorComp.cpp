@@ -6,10 +6,8 @@
 #include <QtCore/QTextStream>
 
 //Acf includes
-#include <istd/CSystem.h>
 #include <iprm/CParamsSet.h>
 #include <iprm/COptionsManager.h>
-#include <ifile/CFileNameParam.h>
 #include <iprm/TParamsPtr.h>
 
 // ImtCore includes

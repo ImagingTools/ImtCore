@@ -30,11 +30,8 @@ QByteArray CIdParamRepresentationController::GetTypeId() const
 bool CIdParamRepresentationController::IsModelSupported(const istd::IChangeable& dataModel) const
 {
 	const iprm::IIdParam* idParamPtr = dynamic_cast<const iprm::IIdParam*>(&dataModel);
-	if (idParamPtr != nullptr){
-		return true;
-	}
 
-	return false;
+	return idParamPtr != nullptr;
 }
 
 

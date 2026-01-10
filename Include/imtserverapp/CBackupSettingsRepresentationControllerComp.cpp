@@ -25,11 +25,8 @@ QByteArray CBackupSettingsRepresentationControllerComp::GetTypeId() const
 bool CBackupSettingsRepresentationControllerComp::IsModelSupported(const istd::IChangeable &dataModel) const
 {
 	const imtapp::IBackupSettings* backupSettingsPtr = dynamic_cast<const imtapp::IBackupSettings*>(&dataModel);
-	if (backupSettingsPtr != nullptr){
-		return true;
-	}
-	
-	return false;
+
+	return backupSettingsPtr != nullptr;
 }
 
 
@@ -43,20 +40,20 @@ bool CBackupSettingsRepresentationControllerComp::GetSdlRepresentationFromDataMo
 	if (backupSettingsPtr == nullptr){
 		return false;
 	}
-	
+
 	sdl::imtbase::ImtBaseTypes::CSchedulerParam::V1_0 schedulerParam;
 	schedulerParam.interval = backupSettingsPtr->GetInterval();
-	
+
 	QDateTime startTime = backupSettingsPtr->GetStartTime();
-	
+
 	QString format = m_dateFormatAttrPtr.IsValid() ? *m_dateFormatAttrPtr : "dd-MM-yyyy HH:mm";
 	schedulerParam.startTime = startTime.toString(format);
-	
+
 	sdlRepresentation.schedulerParam = schedulerParam;
-	
+
 	QString backupFolderPath = backupSettingsPtr->GetPath();
 	sdlRepresentation.folderPath = backupFolderPath;
-	
+
 	return true;
 }
 
@@ -70,26 +67,26 @@ bool CBackupSettingsRepresentationControllerComp::GetDataModelFromSdlRepresentat
 	if (backupSettingsPtr == nullptr){
 		return false;
 	}
-	
+
 	if (!sdlRepresentation.schedulerParam || !sdlRepresentation.folderPath){
 		return false;
 	}
-	
+
 	sdl::imtbase::ImtBaseTypes::CSchedulerParam::V1_0 schedulerParam = *sdlRepresentation.schedulerParam;
-	
+
 	int interval = *schedulerParam.interval;
 	backupSettingsPtr->SetInterval(interval);
-	
+
 	QString startTime = *schedulerParam.startTime;
-	
+
 	QString format = m_dateFormatAttrPtr.IsValid() ? *m_dateFormatAttrPtr : "dd-MM-yyyy HH:mm";
 	QDateTime startDateTime = QDateTime::fromString(startTime, format);
-	
+
 	backupSettingsPtr->SetStartTime(startDateTime);
-	
+
 	QString folderPath = *sdlRepresentation.folderPath;
 	backupSettingsPtr->SetPath(folderPath);
-	
+
 	return true;
 }
 

@@ -30,7 +30,7 @@ class CSdlUnionGeneratorComp:
 			public CCxxProcessorCompBase,
 			private imtsdl::CSdlTools,
 			private CSdlGenTools,
-			private imtsdlgencpp::CSdlUnionConverter
+			private CSdlUnionConverter
 {
 
 public:

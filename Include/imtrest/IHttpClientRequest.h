@@ -2,13 +2,10 @@
 
 
 // Qt includes
-#include <QtCore/QObject>
-#include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkReply>
 
 // ACF includes
 #include <istd/IChangeable.h>
-#include <istd/CChangeNotifier.h>
 
 
 namespace imtrest
@@ -16,15 +13,15 @@ namespace imtrest
 
 
 /**
-	Interface for a container that containing information about HTTP requests(is an unit of model).
+	Interface for a container that containing information about HTTP requests(is a unit of model).
 */
 class IHttpClientRequest: virtual public istd::IChangeable
 {
 public:
 	enum RequestState
 	{
-		RS_CREATED				= 0x0000, ///< Just created, and not ready to be proceed
-		RS_READY_TO_PROCESSING	= 0x0001, ///< ready to proceed (When all properties has been set)
+		RS_CREATED				= 0x0000, ///< Just created, and not ready to be proceeded
+		RS_READY_TO_PROCESSING	= 0x0001, ///< ready to proceed (When all properties have been set)
 		RS_PROCESSING			= 0x0002, ///< Processing of the request started
 		RS_FINISHED				= 0x0004, ///< Processing of the request has been finished
 		RS_NO_ERROR				= 0x0008, ///< Processing of the request has been finished with normal result

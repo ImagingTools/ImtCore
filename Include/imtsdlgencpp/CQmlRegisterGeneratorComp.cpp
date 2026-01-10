@@ -1,9 +1,6 @@
 #include "CQmlRegisterGeneratorComp.h"
 
 
-// C includes
-#include <iostream>
-
 // Qt includes
 #include <QtCore/QDir>
 #include <QtCore/QTextStream>
@@ -74,7 +71,7 @@ void GenerateRegisterFunctions(QTextStream& stream, const QList<T>& entryList, b
 // public methods
 
 bool CQmlRegisterGeneratorComp::ProcessEntry (
-			const imtsdl::CSdlEntryBase& sdlEntry,
+			const imtsdl::CSdlEntryBase& /* sdlEntry */,
 			QIODevice* headerDevicePtr,
 			QIODevice* /*sourceDevicePtr*/,
 			const iprm::IParamsSet* /*paramsPtr*/) const

@@ -37,7 +37,7 @@ public:
 		\param paramsPtr - (required)
 				- (required) [\c s_sourceDirPathParamId]	\c ifile::IFileNameParam	- dir fo files search
 				- (required) [\c s_targetFilePathParamId]	\c ifile::IFileNameParam	- file path where file will be created
-				- (optional) [\c s_appendModeParamId]		\c iprm::IEnableableParam	- if enabled file data will be append
+				- (optional) [\c s_appendModeParamId]		\c iprm::IEnableableParam	- if enabled file data will be appended
 		\param inputPtr (required)
 				- list of file filters as \c iprm::IOptionsList \note order will be preserved
 					- [id] - unused

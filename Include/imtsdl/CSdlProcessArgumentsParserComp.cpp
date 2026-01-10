@@ -4,11 +4,9 @@
 //Qt includes
 #include <QtCore/QRegularExpression>
 #include <QtCore/QCommandLineParser>
-#include <QtCore/QFileInfo>
 #include <QtCore/QDir>
 
 // ImtCore includes
-#include <imtsdl/imtsdl.h>
 #include <imtsdl/CSdlTools.h>
 #include <imtsdl/CConfigReader.h>
 
@@ -178,7 +176,7 @@ bool CSdlProcessArgumentsParserComp::SetArguments(const QStringList& arguments)
 		m_namespacePrefix = commandLineParser.value(namespacePrefixOption);
 	}
 	if (!m_namespacePrefix.isNull()){
-		imtsdl::CSdlTools::s_sdlGlobalPrefix = m_namespacePrefix;
+		CSdlTools::s_sdlGlobalPrefix = m_namespacePrefix;
 	}
 	if (commandLineParser.isSet(generateOption)){
 		m_isGenerateMode = true;

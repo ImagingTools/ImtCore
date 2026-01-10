@@ -76,7 +76,7 @@ imtbase::CTreeItemModel* CGqlRepresentationDataControllerComp::CreateInternalRes
 	if (requestType == imtgql::IGqlRequest::RT_QUERY){
 		return CreateRepresentationFromRequest(gqlRequest, errorMessage);
 	}
-	else if (requestType == imtgql::IGqlRequest::RT_MUTATION){
+	if (requestType == imtgql::IGqlRequest::RT_MUTATION){
 		QList<imtgql::CGqlParamObject> params;
 		params.append(gqlRequest.GetParams());
 		if (!params.isEmpty()){

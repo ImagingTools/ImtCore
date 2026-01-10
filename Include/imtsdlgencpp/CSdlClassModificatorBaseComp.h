@@ -16,7 +16,6 @@
 #include <imtsdl/ISdlUnionListProvider.h>
 #include <imtsdl/CSdlTools.h>
 #include <imtsdlgencpp/IIncludeDirectivesProvider.h>
-#include <imtsdlgencpp/ICxxFileProcessor.h>
 #include <imtsdlgencpp/ICxxModifier.h>
 #include <imtsdlgencpp/CCxxProcessorCompBase.h>
 

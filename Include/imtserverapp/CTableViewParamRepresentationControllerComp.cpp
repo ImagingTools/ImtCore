@@ -5,9 +5,7 @@
 #include <iprm/TParamsPtr.h>
 
 // ImtCore includes
-#include <imtauth/IUserInfo.h>
 #include <imtqml/IPageGuiElementModel.h>
-#include <imtserverapp/IGuiElementContainer.h>
 #include <imtbase/ITableViewParam.h>
 
 
@@ -32,11 +30,8 @@ QByteArray CTableViewParamRepresentationControllerComp::GetModelId() const
 bool CTableViewParamRepresentationControllerComp::IsModelSupported(const istd::IChangeable& dataModel) const
 {
 	const imtbase::ITableViewParam* guiElementPtr = dynamic_cast<const imtbase::ITableViewParam*>(&dataModel);
-	if (guiElementPtr != nullptr){
-		return true;
-	}
 
-	return false;
+	return guiElementPtr != nullptr;
 }
 
 

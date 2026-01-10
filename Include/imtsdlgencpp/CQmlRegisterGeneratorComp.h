@@ -29,7 +29,7 @@ namespace imtsdlgencpp
 class  CQmlRegisterGeneratorComp:
 			public CCxxProcessorCompBase,
 			private imtsdl::CSdlTools,
-			private imtsdlgencpp::CSdlGenTools,
+			private CSdlGenTools,
 			private imtsdl::CSdlEnumConverter
 {
 

@@ -20,7 +20,6 @@ class TSdlAbstractListModel: public QAbstractListModel
 public:
 	TSdlAbstractListModel(QObject* parent = nullptr);
 
-
 	void ClearCache();
 	virtual QVariant GetOrCreateCachedObject(int index) const = 0;
 	virtual QVariantMap  get(int row) const;
@@ -71,10 +70,13 @@ QVariantMap  TSdlAbstractListModel<ModelDataType, ModelObjectDataType>::get(int 
 {
 	QVariantMap data;
 	QModelIndex idx = index(row, 0);
-	if (!idx.isValid()) return data;
+	if (!idx.isValid()){
+		return data;
+	}
 	QHash<int, QByteArray> roles = roleNames();
-	for (auto it = roles.begin(); it != roles.end(); ++it)
+	for (auto it = roles.begin(); it != roles.end(); ++it){
 		data[it.value()] = idx.data(it.key());
+	}
 	return data;
 }
 
@@ -82,7 +84,9 @@ QVariantMap  TSdlAbstractListModel<ModelDataType, ModelObjectDataType>::get(int 
 template <class ModelDataType, class ModelObjectDataType>
 void TSdlAbstractListModel<ModelDataType, ModelObjectDataType>::remove(int index)
 {
-	if (index < 0 || index >= Version_1_0->size()) return;
+	if (index < 0 || index >= Version_1_0->size()){
+		return;
+	}
 	beginRemoveRows(QModelIndex(), index, index);
 	Version_1_0->removeAt(index);
 	ClearCache();

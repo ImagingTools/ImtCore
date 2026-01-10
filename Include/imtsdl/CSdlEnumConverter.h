@@ -1,14 +1,10 @@
 #pragma once
 
-// Qt includes
-#include <QtCore/QSet>
-#include <QtCore/QTextStream>
 
 // ACF includes
 #include <icomp/TReferenceMember.h>
 
 // ImtCore includes
-#include <imtsdl/imtsdl.h>
 #include <imtsdl/CSdlEnum.h>
 
 

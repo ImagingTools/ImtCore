@@ -1,18 +1,14 @@
 #pragma once
 
 
-// std includes
-#include <memory>
-
 // Qt includes
 #include <QtCore/QString>
 
 //Acf includes
 #include <iser/ISerializable.h>
-#include <iprm/IParamsSet.h>
 
 // ImtCore includes
-#include <imtsdl/imtsdl.h>
+#include <imtsdl/CSdlField.h>
 #include <imtsdl/CSdlEntryBase.h>
 
 
@@ -20,13 +16,15 @@ namespace imtsdl
 {
 
 
+class CSdlType;
+typedef QList<CSdlType> SdlTypeList;
+
+
 class CSdlType: virtual public CSdlEntryBase
 {
 
 public:
 	typedef CSdlEntryBase BaseClass;
-
-	CSdlType();
 
 	[[nodiscard]] SdlFieldList GetFields() const;
 	void SetFields(const SdlFieldList& fields);

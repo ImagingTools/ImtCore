@@ -50,8 +50,8 @@ private:
 	bool ProcessSourceClassListFile(QTextStream& stream, const imtsdl::CSdlEntryBase& sdlEntry) const;
 	// void CreatePropertiesForType(QTextStream& stream, const imtsdl::SdlFieldList& fieldList) const;
 	// void CreateAccessMethodsDefinition(QTextStream& stream, const imtsdl::SdlFieldList& fieldList) const;
-	bool ProcessInsertToList(QTextStream& stream, const imtsdl::CSdlEntryBase& sdlEntry, QByteArray insertData) const;
-	bool ProcessConvertListData(QTextStream& stream, const imtsdl::CSdlEntryBase& sdlEntry, QByteArray convertFormat) const;
+	bool ProcessInsertToList(QTextStream& stream, const imtsdl::CSdlEntryBase& sdlEntry, const QByteArray& /*insertData*/) const;
+	bool ProcessConvertListData(QTextStream& stream, const imtsdl::CSdlEntryBase& sdlEntry, const QByteArray& convertFormat) const;
 
 private:
 	I_REF(imtsdl::ISdlTypeListProvider, m_sdlTypeListCompPtr);

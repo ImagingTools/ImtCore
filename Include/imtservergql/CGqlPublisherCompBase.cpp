@@ -20,7 +20,7 @@ namespace imtservergql
 
 bool CGqlPublisherCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
 {
-	imtgql::CGqlFieldObject fieldsPtr = gqlRequest.GetFields();
+	const imtgql::CGqlFieldObject& fieldsPtr = gqlRequest.GetFields();
 	if (fieldsPtr.GetFieldIds().isEmpty()){
 		return false;
 	}
@@ -86,7 +86,7 @@ bool CGqlPublisherCompBase::UnregisterSubscription(const QByteArray& subscriptio
 		if (requestNetworks.networkRequests.contains(subscriptionId)){
 			requestNetworks.networkRequests.remove(subscriptionId);
 			
-			if (requestNetworks.networkRequests.size() == 0){
+			if (requestNetworks.networkRequests.isEmpty()){
 				m_registeredSubscribers.removeAt(i);
 			}
 			

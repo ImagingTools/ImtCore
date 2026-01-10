@@ -14,6 +14,11 @@ namespace imtsdl
 
 // public methods
 
+CSdlRequest::CSdlRequest() : m_type(T_QUERY)
+{
+}
+
+
 CSdlRequest::Type CSdlRequest::GetType() const
 {
 	return m_type;

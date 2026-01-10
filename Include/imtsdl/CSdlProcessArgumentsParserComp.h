@@ -21,7 +21,7 @@ namespace imtsdl
 
 class CSdlProcessArgumentsParserComp:
 			public ilog::CLoggerComponentBase,
-			virtual public imtsdl::ISdlEditableProcessArgumentsParser
+			virtual public ISdlEditableProcessArgumentsParser
 {
 
 

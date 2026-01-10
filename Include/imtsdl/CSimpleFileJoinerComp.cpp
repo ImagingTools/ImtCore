@@ -3,7 +3,6 @@
 
 // Qt includes
 #include <QtCore/QString>
-#include <QtCore/QFile>
 #include <QtCore/QDir>
 #include <QtCore/QThread>
 
@@ -45,9 +44,6 @@ iproc::IProcessor::TaskState CSimpleFileJoinerComp::DoProcessing(
 		return TS_INVALID;
 	}
 
-	QString sourceDirPath;
-	QString targetFilePath;
-
 	// ensure all required params is set
 	iprm::TParamsPtr<ifile::IFileNameParam> sourceDirPathParamPtr(paramsPtr, s_sourceDirPathParamId, true);
 	if (!sourceDirPathParamPtr.IsValid()){
@@ -55,7 +51,7 @@ iproc::IProcessor::TaskState CSimpleFileJoinerComp::DoProcessing(
 
 		return TS_INVALID;
 	}
-	sourceDirPath = sourceDirPathParamPtr->GetPath();
+	QString sourceDirPath = sourceDirPathParamPtr->GetPath();
 
 	iprm::TParamsPtr<ifile::IFileNameParam> targetFilePathParamPtr(paramsPtr, s_targetFilePathParamId, true);
 	if (!targetFilePathParamPtr.IsValid()){
@@ -63,7 +59,7 @@ iproc::IProcessor::TaskState CSimpleFileJoinerComp::DoProcessing(
 
 		return TS_INVALID;
 	}
-	targetFilePath = targetFilePathParamPtr->GetPath();
+	QString targetFilePath = targetFilePathParamPtr->GetPath();
 
 	QDir sourceDir(sourceDirPath);
 	if (!sourceDir.exists()){
@@ -72,7 +68,7 @@ iproc::IProcessor::TaskState CSimpleFileJoinerComp::DoProcessing(
 		return TS_INVALID;
 	}
 
-	const iprm::IOptionsList* filesToJoinListPtr = dynamic_cast<const iprm::IOptionsList*>(inputPtr);
+	auto filesToJoinListPtr = dynamic_cast<const iprm::IOptionsList*>(inputPtr);
 	if (filesToJoinListPtr == nullptr){
 		SendErrorMessage(0, QString("Files to join is not set"));
 

@@ -5,6 +5,9 @@
 #include <iser/CArchiveTag.h>
 #include <iser/IArchive.h>
 
+// ImtCore includes
+#include <imtbase/imtbase.h>
+
 
 
 namespace imtsdl
@@ -25,7 +28,7 @@ bool CSdlField::SerializeSdlFieldList(
 	bool retVal = true;
 
 	bool isStoring = archive.IsStoring();
-	int elementsCount = container.count();
+	int elementsCount = imtbase::narrow_cast<int>(container.count());
 
 	retVal = retVal && archive.BeginMultiTag(elementsTag, elementTag, elementsCount);
 	if (!retVal){

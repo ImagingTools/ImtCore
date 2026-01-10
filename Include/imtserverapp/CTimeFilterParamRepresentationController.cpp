@@ -41,11 +41,8 @@ QByteArray CTimeFilterParamRepresentationController::GetTypeId() const
 bool CTimeFilterParamRepresentationController::IsModelSupported(const istd::IChangeable& dataModel) const
 {
 	const imtbase::ITimeFilterParam* timeFilterParamPtr = dynamic_cast<const imtbase::ITimeFilterParam*>(&dataModel);
-	if (timeFilterParamPtr != nullptr){
-		return true;
-	}
 
-	return false;
+	return timeFilterParamPtr != nullptr;
 }
 
 

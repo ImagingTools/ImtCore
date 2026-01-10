@@ -409,7 +409,7 @@ CCollectionImportControllerComp::FilelUploadStatus CCollectionImportControllerCo
 		result.Unite(fileInfoPtr->uploadedChunks[index]);
 	}
 
-	for (int i = intersectsWith.size() - 1; i >= 0; i--){
+	for (qsizetype i = intersectsWith.size() - 1; i >= 0; i--){
 		fileInfoPtr->uploadedChunks.remove(i);
 	}
 

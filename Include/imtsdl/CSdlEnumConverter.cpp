@@ -2,13 +2,12 @@
 
 
 // Qt includes
-#include <QtCore/QFileInfo>
 #include <QtCore/QDir>
 #include <QtCore/QRegularExpression>
 
 // ImtCore includes
-#include <imtsdl/ISdlProcessArgumentsParser.h>
 #include <imtsdl/CSdlTools.h>
+#include <imtsdl/CSdlEnum.h>
 
 
 namespace imtsdl

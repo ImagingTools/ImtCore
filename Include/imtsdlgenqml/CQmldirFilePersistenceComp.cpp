@@ -3,7 +3,6 @@
 
 // Qt includes
 #include <QtCore/QTextStream>
-#include <QtCore/QRegularExpression>
 #include <QtCore/QRegularExpressionMatch>
 
 // ACF includes

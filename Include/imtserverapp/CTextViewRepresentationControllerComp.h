@@ -9,16 +9,16 @@ namespace imtserverapp
 {
 
 
-class CTextViewRepresentationControllerComp: public imtserverapp::CTextParamRepresentationControllerComp
+class CTextViewRepresentationControllerComp: public CTextParamRepresentationControllerComp
 {
 public:
-	typedef imtserverapp::CTextParamRepresentationControllerComp BaseClass;
+	typedef CTextParamRepresentationControllerComp BaseClass;
 
 	I_BEGIN_COMPONENT(CTextViewRepresentationControllerComp)
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CTextParam::V1_0>)
+	// reimplemented (TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CTextParam::V1_0>)
 	virtual QByteArray GetTypeId() const override;
 };
 

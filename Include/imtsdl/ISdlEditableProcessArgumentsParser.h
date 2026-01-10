@@ -8,7 +8,7 @@
 namespace imtsdl
 {
 
-/// an editable version of a \c ISdlProcessArgumentsParser \note SOULD be used only for tests
+/// an editable version of a \c ISdlProcessArgumentsParser \note SHOULD be used only for tests
 class ISdlEditableProcessArgumentsParser: virtual public ISdlProcessArgumentsParser
 {
 public:

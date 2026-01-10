@@ -24,7 +24,7 @@ public:
 	virtual bool IsVisible() const = 0;
 	virtual int GetPriority() const = 0;
 	virtual int GetAlignment() const = 0;
-	virtual const imtserverapp::IGuiElementContainer* GetSubElements() const = 0;
+	virtual const IGuiElementContainer* GetSubElements() const = 0;
 };
 
 

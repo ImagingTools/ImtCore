@@ -1,10 +1,6 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QSet>
-#include <QtCore/QTextStream>
-
 // ACF includes
 #include <icomp/TReferenceMember.h>
 
@@ -52,7 +48,7 @@ public:
 				const ConversionType& conversionType = CT_MODEL_SCALAR,
 				const QString& addCommand = QString(),
 				const QString& customModelTarget = QString(),
-				const QString returnOnFail = QStringLiteral("false"));
+				const QString& returnOnFail = QStringLiteral("false"));
 	static void WriteUnionConversionFromData(
 				QTextStream& stream,
 				const imtsdl::CSdlUnion& sdlUnion,

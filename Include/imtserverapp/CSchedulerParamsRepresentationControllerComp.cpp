@@ -22,11 +22,8 @@ QByteArray CSchedulerParamsRepresentationControllerComp::GetTypeId() const
 bool CSchedulerParamsRepresentationControllerComp::IsModelSupported(const istd::IChangeable &dataModel) const
 {
 	const imtapp::ISchedulerParams* schedulerParamsPtr = dynamic_cast<const imtapp::ISchedulerParams*>(&dataModel);
-	if (schedulerParamsPtr != nullptr){
-		return true;
-	}
-	
-	return false;
+
+	return schedulerParamsPtr != nullptr;
 }
 
 
@@ -40,14 +37,14 @@ bool CSchedulerParamsRepresentationControllerComp::GetSdlRepresentationFromDataM
 	if (schedulerParamsPtr == nullptr){
 		return false;
 	}
-	
+
 	sdlRepresentation.interval = schedulerParamsPtr->GetInterval();
-	
+
 	QDateTime startTime = schedulerParamsPtr->GetStartTime();
-	
+
 	QString format = m_dateFormatAttrPtr.IsValid() ? *m_dateFormatAttrPtr : "dd-MM-yyyy HH:mm";
 	sdlRepresentation.startTime = startTime.toString(format);
-	
+
 	return true;
 }
 
@@ -61,21 +58,21 @@ bool CSchedulerParamsRepresentationControllerComp::GetDataModelFromSdlRepresenta
 	if (schedulerParamsPtr == nullptr){
 		return false;
 	}
-	
+
 	if (!sdlRepresentation.interval || !sdlRepresentation.startTime){
 		return false;
 	}
-	
+
 	int interval = *sdlRepresentation.interval;
 	schedulerParamsPtr->SetInterval(interval);
-	
+
 	QString startTime = *sdlRepresentation.startTime;
-	
+
 	QString format = m_dateFormatAttrPtr.IsValid() ? *m_dateFormatAttrPtr : "dd-MM-yyyy HH:mm";
 	QDateTime startDateTime = QDateTime::fromString(startTime, format);
-	
+
 	schedulerParamsPtr->SetStartTime(startDateTime);
-	
+
 	return true;
 }
 

@@ -13,6 +13,7 @@
 // ImtCore includes
 #include <imtsdl/CSdlField.h>
 #include <imtsdl/CSdlType.h>
+#include <imtsdl/CSdlEnum.h>
 #include <imtsdl/CSdlRequest.h>
 #include <imtsdl/CSdlDocumentType.h>
 
@@ -120,7 +121,7 @@ QString CSdlGenTools::CStructNamespaceConverter::GetString() const
 		retVal += QStringLiteral("GqlRequest");
 	}
 
-	auto sdlEnumPtr = dynamic_cast<const imtsdl::CSdlEnum*>(namespaceEntryPtr);
+	const auto* sdlEnumPtr = dynamic_cast<const imtsdl::CSdlEnum*>(namespaceEntryPtr);
 	if (sdlEnumPtr != nullptr){
 		retVal += imtsdl::CSdlTools::GetCapitalizedValue(sdlEnumPtr->GetName());
 	}

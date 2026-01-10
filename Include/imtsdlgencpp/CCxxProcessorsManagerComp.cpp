@@ -5,19 +5,20 @@
 #include <iostream>
 
 // Qt includes
-#include <QtCore/QFileInfo>
 #include <QtCore/QTemporaryDir>
 #include <QtCore/QLockFile>
 
 // ACF includes
 #include <istd/CSystem.h>
 #include <iprm/TParamsPtr.h>
-#include <iprm/IOptionsManager.h>
 #include <iprm/CParamsSet.h>
-#include <ifile/CFileNameParam.h>
 
 // ImtCore includes
 #include<imtsdl/CSdlTools.h>
+#include<imtsdl/CSdlType.h>
+#include<imtsdl/CSdlEnum.h>
+#include<imtsdl/CSdlDocumentType.h>
+#include<imtsdl/CSdlRequest.h>
 
 
 namespace imtsdlgencpp
@@ -150,7 +151,7 @@ iproc::IProcessor::TaskState CCxxProcessorsManagerComp::DoProcessing(
 
 	// begin files (if it only one)
 	if (headerFiles.size() == 1){
-		FilePtr filePtr = headerFiles.first();
+		const FilePtr& filePtr = headerFiles.first();
 		if (!filePtr){
 			I_CRITICAL();
 
@@ -164,7 +165,7 @@ iproc::IProcessor::TaskState CCxxProcessorsManagerComp::DoProcessing(
 		}
 	}
 	if (sourceFiles.size() == 1){
-		FilePtr filePtr = sourceFiles.first();
+		const FilePtr& filePtr = sourceFiles.first();
 		if (!filePtr){
 			I_CRITICAL();
 
@@ -229,7 +230,7 @@ iproc::IProcessor::TaskState CCxxProcessorsManagerComp::DoProcessing(
 
 	// end files (if it only one)
 	if (headerFiles.size() == 1){
-		FilePtr filePtr = headerFiles.first();
+		const FilePtr& filePtr = headerFiles.first();
 		if (!filePtr){
 			I_CRITICAL();
 
@@ -243,7 +244,7 @@ iproc::IProcessor::TaskState CCxxProcessorsManagerComp::DoProcessing(
 		}
 	}
 	if (sourceFiles.size() == 1){
-		FilePtr filePtr = sourceFiles.first();
+		const FilePtr& filePtr = sourceFiles.first();
 		if (!filePtr){
 			I_CRITICAL();
 

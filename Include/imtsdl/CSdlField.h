@@ -12,6 +12,9 @@
 namespace imtsdl
 {
 
+class CSdlField;
+typedef QList<CSdlField> SdlFieldList;
+
 
 class CSdlField: public iser::ISerializable
 {

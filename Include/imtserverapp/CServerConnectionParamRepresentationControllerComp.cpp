@@ -21,13 +21,9 @@ QByteArray CServerConnectionParamRepresentationControllerComp::GetTypeId() const
 
 bool CServerConnectionParamRepresentationControllerComp::IsModelSupported(const istd::IChangeable& dataModel) const
 {
-	const imtcom::IServerConnectionInterface* serverConnectionParamPtr =
-				dynamic_cast<const imtcom::IServerConnectionInterface*>(&dataModel);
-	if (serverConnectionParamPtr != nullptr){
-		return true;
-	}
+	const auto* serverConnectionParamPtr = dynamic_cast<const imtcom::IServerConnectionInterface*>(&dataModel);
 
-	return false;
+	return serverConnectionParamPtr != nullptr;
 }
 
 
@@ -48,7 +44,7 @@ bool CServerConnectionParamRepresentationControllerComp::GetSdlRepresentationFro
 
 	int flags = serverConnectionParamPtr->GetConnectionFlags();
 
-	
+
 	switch (flags){
 	case imtcom::IServerConnectionInterface::CF_DEFAULT:
 		sdlRepresentation.isSecure = false;

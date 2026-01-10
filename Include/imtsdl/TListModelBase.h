@@ -21,6 +21,7 @@ protected:
 	QString toGraphQL();
 	bool isEqualWithModel(TListModelBase<ModelDataType, ModelObjectDataType>* otherModelPtr);
 	void insert(int index, ModelObjectDataType* item);
+
 	// reimplemented (TSdlAbstractListModel)
 	virtual QVariant GetOrCreateCachedObject(int index) const override;
 };
@@ -165,7 +166,9 @@ bool TListModelBase<ModelDataType, ModelObjectDataType>::isEqualWithModel(TListM
 template <class ModelDataType, class ModelObjectDataType>
 void TListModelBase<ModelDataType, ModelObjectDataType>::insert(int index, ModelObjectDataType* item)
 {
-	if (index < 0 || index > this->Version_1_0->size()) return;
+	if (index < 0 || index > this->Version_1_0->size()) {
+		return;
+	}
 	this->beginInsertRows(QModelIndex(), index, index);
 	this->Version_1_0->insert(index, *item->Version_1_0);
 	this->ClearCache();

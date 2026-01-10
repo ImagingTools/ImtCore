@@ -31,14 +31,14 @@ protected:
 
 private:
 	bool GetRepresentationFromGuiElementContainer(
-				const imtserverapp::IGuiElementContainer& guiElementContainer,
-				sdl::imtbase::Commands::CGuiElementContainer::V1_0& representation,
-				const QByteArray languageId,
-				const imtauth::IUserInfo* userInfoPtr) const;
+			const imtserverapp::IGuiElementContainer& guiElementContainer,
+			sdl::imtbase::Commands::CGuiElementContainer::V1_0& representation,
+			const QByteArray& languageId,
+			const imtauth::IUserInfo* userInfoPtr) const;
 	bool GetRepresentationFromGuiElement(
-				const imtserverapp::IGuiElementModel& guiElementModel,
-				sdl::imtbase::Commands::CGuiElementModel::V1_0& representation,
-				const QByteArray languageId) const;
+	const imtserverapp::IGuiElementModel& guiElementModel,
+	sdl::imtbase::Commands::CGuiElementModel::V1_0& representation,
+	const QByteArray& languageId) const;
 	QString TranslateName(const QString& name, const QString& context, const QByteArray& languageId) const;
 	
 protected:

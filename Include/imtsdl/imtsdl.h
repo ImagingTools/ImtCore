@@ -8,21 +8,6 @@ namespace imtsdl
 {
 
 
-class CSdlField;
-class CSdlType;
-class CSdlRequest;
-class CSdlDocumentType;
-class CSdlEnum;
-class CSdlUnion;
-
-typedef QList<CSdlType> SdlTypeList;
-typedef QList<CSdlField> SdlFieldList;
-typedef QList<CSdlRequest> SdlRequestList;
-typedef QList<CSdlDocumentType> SdlDocumentTypeList;
-typedef QList<CSdlEnum> SdlEnumList;
-typedef QList<CSdlUnion> SdlUnionList;
-
-
 enum KeyId
 {
 	KI_QUERY,
@@ -131,7 +116,7 @@ struct QtResourceModelParamIds
 template<>
 struct std::hash<imtsdl::IncludeDirective>
 {
-	size_t operator()(const imtsdl::IncludeDirective& s, size_t seed = 0)
+	size_t operator()(const imtsdl::IncludeDirective& s, size_t seed = 0) const
 	{
 		return qHashMulti(seed, s.priority, s.remark, s.path, s.type);
 	}

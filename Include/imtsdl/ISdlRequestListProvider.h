@@ -2,9 +2,7 @@
 
 
 // ImtCore includes
-#include <imtsdl/imtsdl.h>
-#include <imtsdl/CSdlField.h>
-#include <imtsdl/CSdlType.h>
+#include <imtsdl/CSdlRequest.h>
 
 
 namespace imtsdl

@@ -65,7 +65,7 @@ public:
 				ibase::IProgressManager* progressManagerPtr = NULL) override;
 
 protected:
-	QStringList GetPathsFromImportEntry(QString importEntry, const QStringList& searchPathList) const;
+	QStringList GetPathsFromImportEntry(QString importDirective, const QStringList& searchPathList) const;
 	QString FindFileInList(const QString& relativePath, const QStringList& searchPathList) const;
 	QStringList FindFilesFromDir(const QString& relativeDirPath, const QStringList& searchPathList) const;
 	bool ExtractTypesFromImport(const QStringList& importFilesList);

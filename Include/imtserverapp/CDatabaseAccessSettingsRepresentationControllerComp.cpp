@@ -22,11 +22,8 @@ QByteArray CDatabaseAccessSettingsRepresentationControllerComp::GetTypeId() cons
 bool CDatabaseAccessSettingsRepresentationControllerComp::IsModelSupported(const istd::IChangeable &dataModel) const
 {
 	const imtdb::IDatabaseLoginSettings* databaseLoginSettingsPtr = dynamic_cast<const imtdb::IDatabaseLoginSettings*>(&dataModel);
-	if (databaseLoginSettingsPtr != nullptr){
-		return true;
-	}
-	
-	return false;
+
+	return databaseLoginSettingsPtr != nullptr;
 }
 
 

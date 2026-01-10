@@ -659,13 +659,13 @@ QString CSdlClassGqlModificatorComp::GetConvertEndForFieldString(const imtsdl::C
 
 CSdlUnionConverter::ConversionType CSdlClassGqlModificatorComp::GetUnionScalarConversionType() const
 {
-	return CSdlUnionConverter::ConversionType::CT_GQL_SCALAR;
+	return CT_GQL_SCALAR;
 }
 
 
 CSdlUnionConverter::ConversionType CSdlClassGqlModificatorComp::GetUnionArrayConversionType() const
 {
-	return CSdlUnionConverter::ConversionType::CT_GQL_ARRAY;
+	return CT_GQL_ARRAY;
 }
 
 
@@ -679,8 +679,8 @@ void CSdlClassGqlModificatorComp::AddUnionFieldValueReadFromObject(QTextStream& 
 	Q_ASSERT(unionPtr != nullptr);
 	const QStringList unionTypeList = unionPtr->GetTypes();
 	for (const QString& unionType: unionTypeList){
-		std::shared_ptr<imtsdl::CSdlEntryBase> foundEntryPtr = FindEntryByName(unionType);
-		if (foundEntryPtr != nullptr){
+		std::shared_ptr<imtsdl::CSdlEntryBase> foundUnionEntryPtr = FindEntryByName(unionType);
+		if (foundUnionEntryPtr != nullptr){
 			hasComplexTypes = true;
 		}
 		else {

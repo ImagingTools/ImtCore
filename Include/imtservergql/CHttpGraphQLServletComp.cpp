@@ -46,7 +46,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 {
 	m_lastRequest.ResetData();
 
-	int errorPosition = -1;
+	qsizetype errorPosition = -1;
 	const QByteArray requestBody = request.GetBody();
 	if (!m_lastRequest.ParseQuery(requestBody, errorPosition)){
 		qCritical() << __FILE__ << __LINE__ << QStringLiteral("Error when parsing request: '%1'; Error position: '%2'")
@@ -62,7 +62,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 	for (HeadersMap::const_iterator headerIter = headers.cbegin(); headerIter != headers.cend(); ++headerIter){
 		// find header. compare with lowercase. RFC 2616: 4.2
 		if (headerIter.key().toLower() == imtbase::s_protocolVersionHeaderId.toLower()){
-			const QByteArray protocolVersion = *headerIter;
+			const QByteArray& protocolVersion = *headerIter;
 			m_lastRequest.SetProtocolVersion(protocolVersion);
 
 			break;
@@ -79,7 +79,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 		if (state == JwtState::JS_EXPIRED){
 			return CreateResponse(StatusCode::SC_UNAUTHORIZED, QByteArray(), request);
 		}
-		else if (state == JwtState::JS_INVALID){
+		if (state == JwtState::JS_INVALID){
 			return CreateResponse(StatusCode::SC_FORBIDDEN, QByteArray(), request);
 		}
 	}
@@ -182,7 +182,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 
 		return CreateResponse(StatusCode::SC_BAD_REQUEST, responseData, request);
 	}
-	else if (!responseData.isEmpty()){
+	if (!responseData.isEmpty()){
 		return CreateResponse(
 			StatusCode::SC_OK,
 			responseData,

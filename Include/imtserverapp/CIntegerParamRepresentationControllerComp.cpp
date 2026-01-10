@@ -22,11 +22,8 @@ QByteArray CIntegerParamRepresentationControllerComp::GetTypeId() const
 bool CIntegerParamRepresentationControllerComp::IsModelSupported(const istd::IChangeable& dataModel) const
 {
 	const iprm::ITextParam* textParamPtr = dynamic_cast<const iprm::ITextParam*>(&dataModel);
-	if (textParamPtr != nullptr){
-		return true;
-	}
-	
-	return false;
+
+	return textParamPtr != nullptr;
 }
 
 
@@ -40,14 +37,14 @@ bool CIntegerParamRepresentationControllerComp::GetSdlRepresentationFromDataMode
 	if (textParamPtr == nullptr){
 		return false;
 	}
-	
+
 	bool ok = false;
 	QString text = textParamPtr->GetText();
 	sdlRepresentation.value = text.toInt(&ok, 10);
 	if (!ok){
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -61,14 +58,14 @@ bool CIntegerParamRepresentationControllerComp::GetDataModelFromSdlRepresentatio
 	if (textParamPtr == nullptr){
 		return false;
 	}
-	
+
 	if (!sdlRepresentation.value){
 		return false;
 	}
-	
+
 	QString text = QString::number(*sdlRepresentation.value);
 	textParamPtr->SetText(text);
-	
+
 	return true;
 }
 

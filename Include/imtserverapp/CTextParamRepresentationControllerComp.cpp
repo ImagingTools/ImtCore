@@ -23,11 +23,8 @@ QByteArray CTextParamRepresentationControllerComp::GetTypeId() const
 bool CTextParamRepresentationControllerComp::IsModelSupported(const istd::IChangeable& dataModel) const
 {
 	const iprm::ITextParam* textParamPtr = dynamic_cast<const iprm::ITextParam*>(&dataModel);
-	if (textParamPtr != nullptr){
-		return true;
-	}
-	
-	return false;
+
+	return textParamPtr != nullptr;
 }
 
 
@@ -41,10 +38,10 @@ bool CTextParamRepresentationControllerComp::GetSdlRepresentationFromDataModel(
 	if (textParamPtr == nullptr){
 		return false;
 	}
-	
+
 	QString text = textParamPtr->GetText();
 	sdlRepresentation.text = text;
-	
+
 	return true;
 }
 
@@ -58,14 +55,14 @@ bool CTextParamRepresentationControllerComp::GetDataModelFromSdlRepresentation(
 	if (textParamPtr == nullptr){
 		return false;
 	}
-	
+
 	if (!sdlRepresentation.text){
 		return false;
 	}
-	
+
 	QString text = *sdlRepresentation.text;
 	textParamPtr->SetText(text);
-	
+
 	return true;
 }
 

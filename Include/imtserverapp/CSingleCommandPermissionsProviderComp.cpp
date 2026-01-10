@@ -9,7 +9,7 @@ namespace imtserverapp
 
 CSingleCommandPermissionsProviderComp::LogicalCheckMode CSingleCommandPermissionsProviderComp::GetCommandPermissionCheckMode() const
 {
-	return CSingleCommandPermissionsProviderComp::LogicalCheckMode::LCM_AND;
+	return LCM_AND;
 }
 
 

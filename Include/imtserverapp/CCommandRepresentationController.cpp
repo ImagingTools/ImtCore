@@ -31,11 +31,8 @@ QByteArray CCommandRepresentationController::GetModelId() const
 bool CCommandRepresentationController::IsModelSupported(const istd::IChangeable& dataModel) const
 {
 	const imtserverapp::IGuiElementModel* guiElementPtr = dynamic_cast<const imtserverapp::IGuiElementModel*>(&dataModel);
-	if (guiElementPtr != nullptr){
-		return true;
-	}
 
-	return false;
+	return guiElementPtr != nullptr;
 }
 
 

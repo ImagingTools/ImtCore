@@ -7,6 +7,9 @@
 #include <iser/CPrimitiveTypesSerializer.h>
 #include <iprm/CParamsSet.h>
 
+// ImtCore includes
+#include <imtbase/imtbase.h>
+
 
 namespace imtsdl
 {
@@ -169,7 +172,7 @@ bool CSdlDocumentType::SerializeDocumentTypeList(
 	bool retVal = true;
 
 	bool isStoring = archive.IsStoring();
-	int elementsCount = container.count();
+	int elementsCount = imtbase::narrow_cast<int>(container.size());
 
 	retVal = retVal && archive.BeginMultiTag(elementsTag, elementTag, elementsCount);
 	if (!retVal){
@@ -222,7 +225,7 @@ bool CSdlDocumentType::SerializeOperationsList(
 	static iser::CArchiveTag parameterValueTag(valueTagId, "Value of parameter", iser::CArchiveTag::TT_GROUP, &parameterTag, true);
 
 	if (archive.IsStoring()){
-		int paramsCount = container.count();
+		int paramsCount = imtbase::narrow_cast<int>(container.size());
 
 		retVal = retVal && archive.BeginMultiTag(parametersTag, parameterTag, paramsCount);
 

@@ -95,7 +95,7 @@ bool CCommandsControllerComp::CheckPermissions(const imtgql::CGqlRequest& /*gqlR
 bool CCommandsControllerComp::GetRepresentationFromGuiElementContainer(
 			const imtserverapp::IGuiElementContainer& guiElementContainer,
 			sdl::imtbase::Commands::CGuiElementContainer::V1_0& representation,
-			const QByteArray languageId,
+			const QByteArray& languageId,
 			const imtauth::IUserInfo* userInfoPtr) const
 {
 	imtauth::IUserInfo::FeatureIds userPermissions;
@@ -157,7 +157,7 @@ bool CCommandsControllerComp::GetRepresentationFromGuiElementContainer(
 bool CCommandsControllerComp::GetRepresentationFromGuiElement(
 	const imtserverapp::IGuiElementModel& guiElementModel,
 	sdl::imtbase::Commands::CGuiElementModel::V1_0& representation,
-	const QByteArray languageId) const
+	const QByteArray& languageId) const
 {
 	representation.elementId = guiElementModel.GetElementId();
 	

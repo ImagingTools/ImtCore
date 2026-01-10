@@ -20,6 +20,10 @@ namespace imtsdl
 {
 
 
+class CSdlRequest;
+typedef QList<CSdlRequest> SdlRequestList;
+
+
 class CSdlRequest: virtual public CSdlEntryBase
 {
 
@@ -33,6 +37,7 @@ public:
 	};
 	I_DECLARE_ENUM(Type, T_QUERY, T_MUTATION, T_SUBSCRIPTION)
 
+	CSdlRequest();
 	Type GetType() const;
 	void SetType(Type type);
 

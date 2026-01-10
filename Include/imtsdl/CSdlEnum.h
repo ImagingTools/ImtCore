@@ -9,16 +9,18 @@ namespace imtsdl
 {
 
 
+class CSdlEnum;
+typedef QList<CSdlEnum> SdlEnumList;
+
+
 class CSdlEnum: virtual public CSdlEntryBase
 {
 
 public:
 	typedef CSdlEntryBase BaseClass;
 
-	CSdlEnum();
-
 	[[nodiscard]] QList<QPair<QString, QString>> GetValues() const;
-	void SetValues(const QList<QPair<QString, QString>>& name);
+	void SetValues(const QList<QPair<QString, QString>>& values);
 	void AddValue(const QPair<QString, QString>& value);
 
 	// reimplemented(iser::ISerializable)
@@ -31,6 +33,7 @@ public:
 private:
 	QList<QPair<QString/*OriginalName*/, QString/*StringEquivalent*/>> m_values;
 };
+
 
 
 }

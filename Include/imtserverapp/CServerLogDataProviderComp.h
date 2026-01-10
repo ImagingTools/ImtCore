@@ -1,9 +1,6 @@
 #pragma once
 
 
-// ACF includes
-#include <ilog/TLoggerCompWrap.h>
-
 // ImtCore includes
 #include <imtrest/CBinaryDataProviderComp.h>
 

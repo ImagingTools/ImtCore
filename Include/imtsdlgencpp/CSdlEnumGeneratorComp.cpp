@@ -6,13 +6,12 @@
 #include <QtCore/QTextStream>
 
 //Acf includes
-#include <istd/CSystem.h>
 #include <iprm/CParamsSet.h>
 #include <iprm/COptionsManager.h>
-#include <ifile/CFileNameParam.h>
 
 // ImtCore includes
 #include <imtsdl/CSdlType.h>
+#include <imtsdl/CSdlEnum.h>
 
 
 namespace imtsdlgencpp

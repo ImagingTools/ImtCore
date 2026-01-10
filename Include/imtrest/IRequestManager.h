@@ -2,8 +2,6 @@
 
 
 // ACF includes
-#include <imtrest/INetworkObject.h>
-#include <imtrest/IRequest.h>
 #include <imtrest/ISender.h>
 
 

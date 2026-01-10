@@ -17,7 +17,7 @@
 // ImtCore includes
 #include <imtsdlgenqml/imtsdlgenqml.h>
 #include <imtsdl/CSdlType.h>
-#include <imtsdl/CSdlRequest.h>
+#include <imtsdl/CSdlEnum.h>
 #include <imtsdlgenqml/CQmldirFilePersistenceComp.h>
 
 

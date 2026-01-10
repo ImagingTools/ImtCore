@@ -125,7 +125,7 @@ void CObjectCollectionChangeNotifierComp::OnUpdate(const istd::IChangeable::Chan
 			if (!isRemoved){
 				dataObject.insert("itemId", QString(itemId));
 				
-				if (itemId.isEmpty() && m_isSendItemSource.IsValid() && m_objectCollectionCompPtr.IsValid() && *m_isSendItemSource == true){
+				if (itemId.isEmpty() && m_isSendItemSource.IsValid() && m_objectCollectionCompPtr.IsValid() && *m_isSendItemSource){
 					imtbase::IObjectCollection::DataPtr dataPtr;
 					m_objectCollectionCompPtr->GetObjectData(itemId, dataPtr);
 					QByteArray representationData;

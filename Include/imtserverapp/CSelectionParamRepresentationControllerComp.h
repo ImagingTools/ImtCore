@@ -10,16 +10,16 @@ namespace imtserverapp
 {
 
 
-class CSelectionParamRepresentationControllerComp: public imtserverapp::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CSelectionParam::V1_0>
+class CSelectionParamRepresentationControllerComp: public TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CSelectionParam::V1_0>
 {
 public:
-	typedef imtserverapp::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CSelectionParam::V1_0> BaseClass;
+	typedef TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CSelectionParam::V1_0> BaseClass;
 
 	I_BEGIN_COMPONENT(CSelectionParamRepresentationControllerComp)
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CSelectionParam::V1_0>)
+	// reimplemented (TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CSelectionParam::V1_0>)
 	virtual QByteArray GetTypeId() const override;
 	virtual bool IsModelSupported(const istd::IChangeable& dataModel) const override;
 	virtual bool GetSdlRepresentationFromDataModel(

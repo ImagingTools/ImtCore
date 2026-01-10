@@ -34,7 +34,7 @@ imtbase::CTreeItemModel* CGqlRepresentationControllerCompBase::CreateInternalRes
 	if (requestType == imtgql::IGqlRequest::RT_QUERY){
 		return CreateRepresentationFromRequest(gqlRequest, errorMessage);
 	}
-	else if (requestType == imtgql::IGqlRequest::RT_MUTATION){
+	if (requestType == imtgql::IGqlRequest::RT_MUTATION){
 		const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 		if (inputParamPtr == nullptr){
 			return nullptr;

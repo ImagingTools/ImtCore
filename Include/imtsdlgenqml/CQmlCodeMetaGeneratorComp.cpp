@@ -17,6 +17,7 @@
 
 // ImtCore includes
 #include <imtsdl/CSdlType.h>
+#include <imtsdl/CSdlDocumentType.h>
 #include <imtsdlgenqml/CQmldirFilePersistenceComp.h>
 #include <imtsdlgenqml/imtsdlgenqml.h>
 
@@ -200,7 +201,7 @@ iproc::IProcessor::TaskState CQmlCodeMetaGeneratorComp::DoProcessing(
 
 	/// \todo remove this! use persistance!!!!!!!
 	QXmlStreamWriter xmlWriter(&qrcFile);
-	xmlWriter.setAutoFormatting(1);
+	xmlWriter.setAutoFormatting(true);
 
 	xmlWriter.writeStartDocument();
 	xmlWriter.writeStartElement("RCC");

@@ -3,7 +3,6 @@
 
 // Qt includes
 #include <QtCore/QThread>
-#include <QtCore/QMutex>
 
 // ACF includes
 #include <istd/TDelPtr.h>
@@ -11,7 +10,6 @@
 // ImtCore includes
 #include <imtrest/IRequest.h>
 #include <imtrest/ISender.h>
-#include <imtrest/IRequestServlet.h>
 #include <imtrest/CWorker.h>
 
 

@@ -13,7 +13,7 @@ namespace imtserverapp
 
 
 template<class SdlClass>
-class TJsonRepresentationControllerWrap: virtual public imtserverapp::IJsonRepresentationController
+class TJsonRepresentationControllerWrap: virtual public IJsonRepresentationController
 {
 public:
 	virtual RepresentationInfo GetRepresentationInfo() const override;
@@ -38,9 +38,9 @@ protected:
 
 
 template<class SdlClass>
-imtserverapp::IJsonRepresentationController::RepresentationInfo TJsonRepresentationControllerWrap<SdlClass>::GetRepresentationInfo() const
+IJsonRepresentationController::RepresentationInfo TJsonRepresentationControllerWrap<SdlClass>::GetRepresentationInfo() const
 {
-	imtserverapp::IJsonRepresentationController::RepresentationInfo representationInfo;
+	RepresentationInfo representationInfo;
 	representationInfo.modelId = m_modelId;
 	representationInfo.name = m_name;
 	representationInfo.description = m_description;

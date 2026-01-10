@@ -9,10 +9,10 @@ namespace imtserverapp
 {
 
 
-class CPasswordParamRepresentationControllerComp: public imtserverapp::CTextParamRepresentationControllerComp
+class CPasswordParamRepresentationControllerComp: public CTextParamRepresentationControllerComp
 {
 public:
-	typedef imtserverapp::CTextParamRepresentationControllerComp BaseClass;
+	typedef CTextParamRepresentationControllerComp BaseClass;
 
 	I_BEGIN_COMPONENT(CPasswordParamRepresentationControllerComp)
 	I_END_COMPONENT;

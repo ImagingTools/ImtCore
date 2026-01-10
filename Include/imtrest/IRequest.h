@@ -1,9 +1,6 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QIODevice>
-
 // ACF includes
 #include <istd/TSmartPtr.h>
 #include <istd/TInterfacePtr.h>

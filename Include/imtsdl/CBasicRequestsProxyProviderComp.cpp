@@ -1,6 +1,8 @@
 #include <imtsdl/CBasicRequestsProxyProviderComp.h>
 
 
+// ImtCore includes
+#include <imtsdl/CSdlDocumentType.h>
 
 
 namespace imtsdl

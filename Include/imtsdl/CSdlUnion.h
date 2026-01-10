@@ -1,15 +1,11 @@
 #pragma once
 
 
-// STL includes
-#include <memory>
-
 // Qt includes
 #include <QtCore/QString>
 
 // ACF includes
 #include <iser/ISerializable.h>
-#include <iprm/IParamsSet.h>
 
 // ImtCore includes
 #include <imtsdl/imtsdl.h>
@@ -20,13 +16,15 @@ namespace imtsdl
 {
 
 
+class CSdlUnion;
+typedef QList<CSdlUnion> SdlUnionList;
+
+
 class CSdlUnion: virtual public CSdlEntryBase
 {
 
 public:
 	typedef CSdlEntryBase BaseClass;
-
-	CSdlUnion();
 
 	/// \todo rename it to _TypeName and add methods , that returns \c CSdlType
 	[[nodiscard]] QList<QString> GetTypes() const;

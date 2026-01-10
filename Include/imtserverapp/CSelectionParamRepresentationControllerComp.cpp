@@ -22,11 +22,8 @@ QByteArray CSelectionParamRepresentationControllerComp::GetTypeId() const
 bool CSelectionParamRepresentationControllerComp::IsModelSupported(const istd::IChangeable& dataModel) const
 {
 	const iprm::ISelectionParam* selectionParamPtr = dynamic_cast<const iprm::ISelectionParam*>(&dataModel);
-	if (selectionParamPtr != nullptr){
-		return true;
-	}
-	
-	return false;
+
+	return selectionParamPtr != nullptr;
 }
 
 
@@ -40,9 +37,9 @@ bool CSelectionParamRepresentationControllerComp::GetSdlRepresentationFromDataMo
 	if (selectionParamPtr == nullptr){
 		return false;
 	}
-	
+
 	imtsdl::TElementList<sdl::imtbase::ImtBaseTypes::COption::V1_0> optionList;
-	
+
 	const iprm::IOptionsList* optionListPtr = selectionParamPtr->GetSelectionConstraints();
 	if (optionListPtr != nullptr){
 		for (int i = 0; i < optionListPtr->GetOptionsCount(); ++i){
@@ -51,18 +48,18 @@ bool CSelectionParamRepresentationControllerComp::GetSdlRepresentationFromDataMo
 			option.name = optionListPtr->GetOptionName(i);
 			option.description = optionListPtr->GetOptionDescription(i);
 			option.enabled = optionListPtr->IsOptionEnabled(i);
-			
+
 			optionList << option;
 		}
 	}
-	
+
 	sdl::imtbase::ImtBaseTypes::COptionsList::V1_0 optionsList;
 	optionsList.options = optionList;
-	
+
 	int selectedIndex = selectionParamPtr->GetSelectedOptionIndex();
 	sdlRepresentation.selectedIndex = selectedIndex;
 	sdlRepresentation.constraints = optionsList;
-	
+
 	return true;
 }
 
@@ -76,14 +73,14 @@ bool CSelectionParamRepresentationControllerComp::GetDataModelFromSdlRepresentat
 	if (selectionParamPtr == nullptr){
 		return false;
 	}
-	
+
 	if (!sdlRepresentation.selectedIndex){
 		return false;
 	}
-	
+
 	int selectedIndex = *sdlRepresentation.selectedIndex;
 	selectionParamPtr->SetSelectedOptionIndex(selectedIndex);
-	
+
 	return true;
 }
 

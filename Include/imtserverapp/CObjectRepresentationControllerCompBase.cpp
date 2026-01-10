@@ -13,7 +13,7 @@ namespace imtserverapp
 
 // protected methods
 
-bool CObjectRepresentationControllerCompBase::CheckPermissions(imtauth::IUserInfo::FeatureIds userPermissions, const QByteArray& paramId) const
+bool CObjectRepresentationControllerCompBase::CheckPermissions(const imtauth::IUserInfo::FeatureIds& userPermissions, const QByteArray& paramId) const
 {
 	if (m_commandPermissionsProviderCompPtr.IsValid()){
 		QByteArrayList elementPermissions = m_commandPermissionsProviderCompPtr->GetCommandPermissions(paramId);

@@ -1,14 +1,10 @@
 #pragma once
 
-
 // Qt includes
-#include <QtCore/QObject>
+#include <QtCore/QMetaObject>
 
 // Acf includes
 #include <istd/IPolymorphic.h>
-
-// ImtCore includes
-#include <imtsdl/imtsdl.h>
 
 
 namespace imtsdl
@@ -18,7 +14,6 @@ namespace imtsdl
 class ISdlProcessArgumentsParser: virtual public istd::IPolymorphic
 {
 	Q_GADGET
-
 public:
 	static inline const QString s_sourceFileType = QStringLiteral("CPP");
 	static inline const QString s_headerFileType = QStringLiteral("H");

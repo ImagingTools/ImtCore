@@ -15,6 +15,8 @@
 
 // ImtCore includes
 #include <imtsdl/CSdlType.h>
+#include <imtsdl/CSdlField.h>
+#include <imtsdl/CSdlEnum.h>
 
 
 namespace imtsdlgenqml
@@ -171,7 +173,7 @@ iproc::IProcessor::TaskState CQmlCodeGeneratorComp::DoProcessing(
 
 	/// \todo remove it. Use persistence!
 	QXmlStreamWriter xmlWriter(&qrcFile);
-	xmlWriter.setAutoFormatting(1);
+	xmlWriter.setAutoFormatting(true);
 
 	xmlWriter.writeStartDocument();
 	xmlWriter.writeStartElement("RCC");
@@ -268,8 +270,9 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 
 		if (foundEntry->IsExternal()){
 			QString qmlImportDeclaration = foundEntry->GetQmlImportDeclaration();
-			if (!qmlImportDeclaration.isEmpty())
+			if (!qmlImportDeclaration.isEmpty()){
 				requiredImports << qmlImportDeclaration;
+			}
 		}
 	}
 
@@ -324,7 +327,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 		else if (isEnum){
 			ifStream << QStringLiteral("string");
 		}
-		else if (unionPtr){
+		else if (unionPtr != nullptr){
 			ifStream << QStringLiteral("var");
 		}
 		else {

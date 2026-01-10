@@ -22,11 +22,7 @@ QByteArray CUrlParamRepresentationControllerComp::GetTypeId() const
 bool CUrlParamRepresentationControllerComp::IsModelSupported(const istd::IChangeable& dataModel) const
 {
 	const imtbase::IUrlParam* urlParamPtr = dynamic_cast<const imtbase::IUrlParam*>(&dataModel);
-	if (urlParamPtr != nullptr){
-		return true;
-	}
-	
-	return false;
+	return urlParamPtr != nullptr;
 }
 
 

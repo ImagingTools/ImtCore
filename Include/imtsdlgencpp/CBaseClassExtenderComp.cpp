@@ -91,7 +91,7 @@ QStringList GetDirectivesByRemark(const QMap<QString, QString>& direciveIncludeM
 	QMapIterator mapIterator(direciveIncludeMap);
 	while(mapIterator.hasNext()){
 		auto mapIndex = mapIterator.next();
-		QString includeDirective = mapIndex.value();
+		const QString& includeDirective = mapIndex.value();
 		QRegularExpressionMatch match = s_includeRemarkRegExp.match(includeDirective);
 		if(match.hasMatch()){
 			const QString containerRemarkName = match.capturedTexts().constLast();

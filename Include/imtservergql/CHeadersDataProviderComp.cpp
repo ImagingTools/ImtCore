@@ -16,11 +16,8 @@ bool CHeadersDataProviderComp::IsRequestSupported(const imtgql::CGqlRequest& gql
 	bool isSupported = BaseClass::IsRequestSupported(gqlRequest);
 	if (!isSupported){
 		QByteArray commandId = gqlRequest.GetCommandId();
-		if (commandId.isEmpty()){
-			return true;
-		}
 
-		return false;
+		return commandId.isEmpty();
 	}
 
 	return true;
@@ -38,12 +35,12 @@ imtbase::CTreeItemModel* CHeadersDataProviderComp::CreateInternalResponse(
 	if(gqlContextPtr != nullptr){
 		languageId =  gqlContextPtr->GetLanguageId();
 	}
-	
+
 	if (gqlContextPtr == nullptr){
 		errorMessage = QString("Unable to create response. Error: GraphQL context is invalid");
 		return nullptr;
 	}
-	
+
 	istd::TDelPtr<imtbase::CTreeItemModel> dataModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* headersModelPtr = dataModelPtr->AddTreeModel("headers");
 

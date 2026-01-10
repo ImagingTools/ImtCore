@@ -5,7 +5,7 @@
 #include <istd/IPolymorphic.h>
 
 // ImtCore includes
-#include <imtsdl/imtsdl.h>
+#include <imtsdl/CSdlUnion.h>
 
 
 namespace imtsdl

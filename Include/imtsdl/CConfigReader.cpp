@@ -1,10 +1,10 @@
-#include <QtCore/qfileinfo.h>
 #include <imtsdl/CConfigReader.h>
 
 
 //Qt includes
 #include <QtCore/QSettings>
 #include <QtCore/QMetaEnum>
+#include <QtCore/QFileInfo>
 
 
 namespace imtsdl

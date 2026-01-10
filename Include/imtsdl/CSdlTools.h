@@ -8,9 +8,8 @@
 #include <iprm/IOptionsManager.h>
 
 // ImtCore includes
-#include <imtsdl/imtsdl.h>
-#include <imtsdl/CSdlEnum.h>
 #include <imtsdl/CSdlUnion.h>
+#include <imtsdl/CSdlRequest.h>
 #include <imtsdl/ISdlProcessArgumentsParser.h>
 #include <imtsdl/ISdlTypeListProvider.h>
 #include <imtsdl/ISdlEnumListProvider.h>
@@ -99,7 +98,7 @@ public:
 	[[nodiscard]] static bool EnsureFieldHasValidType(const CSdlField& sdlField, const SdlTypeList& typeList, const SdlEnumList& enumList, const SdlUnionList& unionList);
 	[[nodiscard]] static bool GetSdlTypeForField(const CSdlField& sdlField, const SdlTypeList& typeList, CSdlType& sdlType);
 	[[nodiscard]] static bool GetSdlEnumForField(const CSdlField& sdlField, const SdlEnumList& enumList, CSdlEnum& sdlEnum);
-	[[nodiscard]] static bool GetSdlUnionForField(const CSdlField& sdlField, const SdlUnionList& unionList, CSdlUnion& sdlEnum);
+	[[nodiscard]] static bool GetSdlUnionForField(const CSdlField& sdlField, const SdlUnionList& unionList, CSdlUnion& sdlUnion);
 	/// \todo rename it to 'GetSdlEntryFromField'
 	[[nodiscard]] static std::shared_ptr<CSdlEntryBase> GetSdlTypeOrEnumOrUnionForField(const CSdlField& sdlField, const SdlTypeList& typeList, const SdlEnumList& enumList, const SdlUnionList& unionList);
 
@@ -120,7 +119,7 @@ public:
 	/// \sa imtsdl::ISdlProcessArgumentsParser::s_headerFileType imtsdl::ISdlProcessArgumentsParser::s_sourceFileType
 	[[nodiscard]] static QMap<QString/*type*/, QString/*path*/> CalculateTargetCppFilesFromSchemaParams(const iprm::IParamsSet& schemaParams, const ISdlProcessArgumentsParser& argumentParser, bool relativePath = false);
 
-	/// resolves a complete output path from schema params and template(if enabled) if tepmplate is not enabled, returns \c argumentParser.GetOutputDirectoryPath() \note returns clean path \sa QDir::cleanPath
+	/// resolves a complete output path from schema params and template(if enabled) if template is not enabled, returns \c argumentParser.GetOutputDirectoryPath() \note returns clean path \sa QDir::cleanPath
 	[[nodiscard]] static QString GetCompleteOutputPath(const iprm::IParamsSet& schemaParams, const ISdlProcessArgumentsParser& argumentParser, bool cleanPath, bool cppPath);
 	[[nodiscard]] static QString GetCompleteOutputPath(const icomp::TReferenceMember<iprm::IParamsSet>& schemaParamsCompPtr, const ISdlProcessArgumentsParser& argumentParser, bool cleanPath, bool cppPath);
 
@@ -128,7 +127,7 @@ public:
 	[[nodiscard]] static QString GetTempOutputPathFromParams(const iprm::IParamsSet* paramsPtr, const QString& fallbackPath = QString());
 
 	[[nodiscard]] static QString ProcessTemplateString(const iprm::IParamsSet& schemaParams, const QString& templateString, const QString& outputDirPath);
-	[[nodiscard]] static bool UpdateTypeInfo(CSdlEntryBase& sdlEntry, const iprm::IParamsSet* schemaParamsPtr, const imtsdl::ISdlProcessArgumentsParser* argumentParamsPtr);
+	[[nodiscard]] static bool UpdateTypeInfo(CSdlEntryBase& sdlEntry, const iprm::IParamsSet* schemaParamsPtr, const imtsdl::ISdlProcessArgumentsParser* argumentParserPtr);
 
 	[[nodiscard]] static QStringList GetAutoJoinedCppFilePaths(const iprm::IParamsSet& schemaParams, const ISdlProcessArgumentsParser& argParser);
 	[[nodiscard]] static QString GetQmlModuleNameFromParamsOrArguments(
@@ -157,7 +156,7 @@ public:
 	[[nodiscard]] static IncludeDirective CreateCustomDirective(const QString& path);
 
 private:
-	[[nodiscard]] static QMap<QString/*type*/, QString/*path*/> CalculateTargetCppFilesFromSchemaParams(const iprm::IParamsSet& schemaParams, const QString& baseDirPath, const QString defaultName = QString());
+	[[nodiscard]] static QMap<QString/*type*/, QString/*path*/> CalculateTargetCppFilesFromSchemaParams(const iprm::IParamsSet& schemaParams, const QString& baseDirPath, const QString& defaultName = QString());
 
 };
 

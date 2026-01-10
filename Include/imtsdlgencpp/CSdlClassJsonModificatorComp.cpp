@@ -282,7 +282,7 @@ bool CSdlClassJsonModificatorComp::AddContainerListAccessCode(
 			ListAccessResult& result) const
 {
 	std::shared_ptr<imtsdl::CSdlEntryBase> foundEntry = FindEntryByName(field.GetType());
-	bool idUnion = (foundEntry != nullptr && dynamic_cast<imtsdl::CSdlUnion*>(foundEntry.get()));
+	bool idUnion = (foundEntry && (dynamic_cast<imtsdl::CSdlUnion*>(foundEntry.get()) != nullptr));
 
 	if (idUnion){
 		result.customAccessedElementName = "a";

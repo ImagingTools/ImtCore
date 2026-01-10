@@ -14,13 +14,13 @@ namespace imtserverapp
 
 class CSingleCommandPermissionsProviderComp :
 			public ilog::CLoggerComponentBase,
-			virtual public imtserverapp::ICommandPermissionsProvider
+			virtual public ICommandPermissionsProvider
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CSingleCommandPermissionsProviderComp);
-		I_REGISTER_INTERFACE(imtserverapp::ICommandPermissionsProvider);
+		I_REGISTER_INTERFACE(ICommandPermissionsProvider);
 		I_ASSIGN(m_commandIdAttrPtr, "CommandId", "ID of the command permission are requested for", true, "");
 		I_ASSIGN_MULTI_0(m_commandPermissionsAttrPtr, "CommandPermissions", "List of command permissons", true);
 	I_END_COMPONENT;

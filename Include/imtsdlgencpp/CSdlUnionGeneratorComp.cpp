@@ -1,21 +1,17 @@
 #include "CSdlUnionGeneratorComp.h"
 
 
-// C includes
-#include <iostream>
-
 // Qt includes
 #include <QtCore/QDir>
 #include <QtCore/QTextStream>
 
 //Acf includes
-#include <istd/CSystem.h>
 #include <iprm/CParamsSet.h>
 #include <iprm/COptionsManager.h>
-#include <ifile/CFileNameParam.h>
 
 // ImtCore includes
 #include <imtsdl/CSdlType.h>
+#include <imtsdl/CSdlField.h>
 
 
 namespace imtsdlgencpp
@@ -85,7 +81,7 @@ bool CSdlUnionGeneratorComp::ProcessEntry(
 	stream << QStringLiteral(" std::variant<");
 
 	// add all union types
-	int countTypes = convertedTypeList.count();
+	qsizetype countTypes = convertedTypeList.size();
 	for (int i = 0; i < countTypes; ++i){
 		stream << convertedTypeList[i];
 		if (i < countTypes - 1){

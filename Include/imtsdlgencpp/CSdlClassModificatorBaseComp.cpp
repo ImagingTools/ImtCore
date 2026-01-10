@@ -2,12 +2,7 @@
 
 
 // Qt includes
-#include <QtCore/QDir>
-#include <QtCore/QRegularExpression>
 #include <QtCore/QRegularExpressionMatch>
-
-//Acf includes
-#include <istd/CSystem.h>
 
 // imtbase includes
 #include <imtbase/CTempDir.h>

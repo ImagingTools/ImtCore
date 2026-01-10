@@ -49,11 +49,8 @@ QByteArray CGuiElementContainerRepresentationControllerComp::GetModelId() const
 bool CGuiElementContainerRepresentationControllerComp::IsModelSupported(const istd::IChangeable& dataModel) const
 {
 	const imtserverapp::IGuiElementContainer* guiElementPtr = dynamic_cast<const imtserverapp::IGuiElementContainer*>(&dataModel);
-	if (guiElementPtr != nullptr){
-		return true;
-	}
 
-	return false;
+	return guiElementPtr != nullptr;
 }
 
 
@@ -129,12 +126,12 @@ bool CGuiElementContainerRepresentationControllerComp::GetRepresentationFromData
 			int alignment2 = representation.GetData("alignment", j + 1).toInt();
 			int priority1   = representation.GetData("priority", j).toInt();
 			int priority2   = representation.GetData("priority", j + 1).toInt();
-	
+
 			bool needSwap = false;
 
 			if (alignment1 != alignment2){
 				needSwap = (alignment1 == Qt::AlignBottom && alignment2 == Qt::AlignTop);
-			} 
+			}
 			else {
 				needSwap = (priority1 < priority2);
 			}

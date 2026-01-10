@@ -17,6 +17,7 @@
 
 // ImtCore includes
 #include <imtsdl/CSdlType.h>
+#include <imtsdl/CSdlRequest.h>
 #include <imtsdlgenqml/CQmldirFilePersistenceComp.h>
 #include <imtsdlgenqml/imtsdlgenqml.h>
 
@@ -102,6 +103,8 @@ iproc::IProcessor::TaskState CQmlCodeRequestGeneratorComp::DoProcessing(
 			qmlClassName = sdlRequest.GetName() + QStringLiteral("ModelController");
 			functionName = QStringLiteral("saveDataModel");
 			parentQmlName = QStringLiteral("GqlBasedDataModelController");
+			break;
+		default:
 			break;
 		}
 		

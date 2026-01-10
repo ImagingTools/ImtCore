@@ -62,11 +62,8 @@ QByteArray CComplexCollectionFilterRepresentationController::GetTypeId() const
 bool CComplexCollectionFilterRepresentationController::IsModelSupported(const istd::IChangeable& dataModel) const
 {
 	const imtbase::IComplexCollectionFilter* complexFilterPtr = dynamic_cast<const imtbase::IComplexCollectionFilter*>(&dataModel);
-	if (complexFilterPtr != nullptr){
-		return true;
-	}
-
-	return false;
+	
+	return complexFilterPtr != nullptr;
 }
 
 
@@ -271,7 +268,7 @@ bool CComplexCollectionFilterRepresentationController::GetFieldFilterFromSdlRepr
 	bool isOk = true;
 	bool retVal = true;
 
-	if (auto fieldFilterSdl = std::get_if<Filter::CFieldFilter>(&u)){
+	if (const auto *fieldFilterSdl = std::get_if<Filter::CFieldFilter>(&u)){
 		if (!fieldFilterSdl->Version_1_0.HasValue()){
 			return false;
 		}
@@ -311,7 +308,7 @@ bool CComplexCollectionFilterRepresentationController::GetFieldFilterFromSdlRepr
 			fieldFilter.filterOperation = s_allowableFlagsCombination[flags];
 		}
 	}
-	else if (auto arrayFilterSdl = std::get_if<Filter::CArrayFieldFilter>(&u)){
+	else if (const auto* arrayFilterSdl = std::get_if<Filter::CArrayFieldFilter>(&u)){
 		if (!arrayFilterSdl->Version_1_0.HasValue()){
 			return false;
 		}

@@ -1,13 +1,6 @@
 #pragma once
 
 
-// Qt includes
-#include <QtNetwork/QAbstractSocket>
-
-// ACF includes
-#include <iser/IVersionInfo.h>
-
-
 namespace imtrest
 {
 

@@ -5,8 +5,6 @@
 #include <ostream>
 
 // Qt includes
-#include <QtCore/QFileInfo>
-#include <QtCore/QDir>
 #include <QtCore/QDirIterator>
 #include <QtCore/QRegularExpression>
 
@@ -21,6 +19,7 @@
 #include <imtsdl/CSdlField.h>
 #include <imtsdl/CSdlType.h>
 #include <imtsdl/CSdlRequest.h>
+#include <imtsdl/CSdlEnum.h>
 
 
 namespace imtsdl
@@ -618,7 +617,7 @@ QString CSdlTools::GetFromVariantConversionString(const CSdlField& sdlField)
 	if (sdlType == QStringLiteral("ID")){
 		return QStringLiteral("toByteArray()");
 	}
-	else if (sdlField.IsArray()){
+	if (sdlField.IsArray()){
 		return QStringLiteral("toList()");
 	}
 
@@ -946,7 +945,7 @@ QString CSdlTools::GetNamespaceFromParamsOrArguments(
 }
 
 
-QMap<QString, QString> CSdlTools::CalculateTargetCppFilesFromSchemaParams(const iprm::IParamsSet& schemaParams, const QString& baseDirPath, const QString defaultName)
+QMap<QString, QString> CSdlTools::CalculateTargetCppFilesFromSchemaParams(const iprm::IParamsSet& schemaParams, const QString& baseDirPath, const QString& defaultName)
 {
 	QMap<QString, QString> retVal;
 

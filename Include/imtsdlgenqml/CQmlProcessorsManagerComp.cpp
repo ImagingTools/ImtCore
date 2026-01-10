@@ -15,11 +15,9 @@
 #include <iprm/TParamsPtr.h>
 #include <iprm/IOptionsManager.h>
 #include <iprm/CParamsSet.h>
-#include <ifile/IFileNameParam.h>
 
 // ImtCore includes
 #include<imtsdl/CSdlTools.h>
-
 
 
 namespace imtsdlgenqml

@@ -26,7 +26,7 @@ class CSdlClassTreeModelModificatorComp:
 	using CSdlGenTools::AddArrayInternalChecksFail;
 
 public:
-	typedef imtsdlgencpp::CSdlClassModificatorBaseComp BaseClass;
+	typedef CSdlClassModificatorBaseComp BaseClass;
 
 	I_BEGIN_COMPONENT(CSdlClassTreeModelModificatorComp)
 	I_END_COMPONENT;

@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtsdl/CSdlType.h>
+#include <imtsdl/CSdlEnum.h>
 
 
 namespace imtsdlgencpp

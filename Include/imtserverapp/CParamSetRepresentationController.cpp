@@ -7,7 +7,6 @@
 #include <iqt/iqt.h>
 
 // ImtCore includes
-#include <iqt/iqt.h>
 #include <imtauth/IUserInfo.h>
 
 
@@ -28,11 +27,8 @@ QByteArray CParamSetRepresentationController::GetTypeId() const
 bool CParamSetRepresentationController::IsModelSupported(const istd::IChangeable& dataModel) const
 {
 	const iprm::IParamsSet* paramsSetPtr = dynamic_cast<const iprm::IParamsSet*>(&dataModel);
-	if (paramsSetPtr != nullptr){
-		return true;
-	}
 
-	return false;
+	return paramsSetPtr != nullptr;
 }
 
 

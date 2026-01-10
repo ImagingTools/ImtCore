@@ -7,6 +7,7 @@
 // ImtCore includes
 #include <imtsdl/CSdlEntryBase.h>
 #include <imtsdl/CSdlType.h>
+#include <imtsdl/CSdlField.h>
 
 
 namespace imtsdlgencpp

@@ -2,13 +2,12 @@
 
 
 // Qt includes
-#include <QtCore/QFileInfo>
 #include <QtCore/QDir>
 #include <QtCore/QRegularExpression>
 
 // ImtCore includes
-#include <imtsdl/ISdlProcessArgumentsParser.h>
 #include <imtsdl/CSdlTools.h>
+#include <imtsdl/CSdlField.h>
 #include <imtsdlgencpp/CSdlGenTools.h>
 
 
@@ -24,9 +23,9 @@ void FeedStreamHorizontally(QTextStream& stream, uint indents, char indentDelimi
 }
 
 
-void FeedStream(QTextStream& stream, uint indents, char indentDelimiter = '\t')
+void FeedStream(QTextStream& stream, uint indents, bool flush)
 {
-	imtsdl::CSdlTools::FeedStream(stream, indents, indentDelimiter);
+	imtsdl::CSdlTools::FeedStream(stream, indents, flush);
 }
 
 
@@ -51,7 +50,7 @@ void CSdlUnionConverter::WriteConversionFromUnion(
 			const ConversionType& conversionType,
 			const QString& addCommand,
 			const QString& customModelTarget,
-			const QString returnOnFail)
+			const QString& returnOnFail)
 {
 	QString typeNamespace = imtsdl::CSdlTools::BuildNamespaceFromParams(sdlUnion.GetSchemaParams(), false, true);
 	if (typeNamespace != relatedNamespace){
