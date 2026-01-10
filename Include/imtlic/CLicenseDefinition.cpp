@@ -8,6 +8,10 @@
 #include <iser/CArchiveTag.h>
 #include <iser/CPrimitiveTypesSerializer.h>
 
+// ImtCore includes
+#include <imtcore/Version.h>
+#include <imtbase/imtbase.h>
+
 
 namespace imtlic
 {
@@ -40,7 +44,7 @@ bool CLicenseDefinition::ContainsFeature(const QByteArray& featureId) const
 
 bool CLicenseDefinition::RemoveFeature(const QByteArray& featureId)
 {
-	for (int i = m_featureInfos.size() - 1; i >= 0; --i){
+	for (qsizetype i = m_featureInfos.size() - 1; i >= 0; --i){
 		if (m_featureInfos[i].id == featureId){
 			istd::CChangeNotifier notifier(this);
 
@@ -219,7 +223,7 @@ bool CLicenseDefinition::Serialize(iser::IArchive& archive)
 	iser::CArchiveTag featuresTag("Features", "List of license features", iser::CArchiveTag::TT_MULTIPLE);
 	iser::CArchiveTag featureInfoTag("Feature", "Feature information", iser::CArchiveTag::TT_GROUP);
 
-	int featuresCount = m_featureInfos.count();
+	int featuresCount = imtbase::narrow_cast<int>(m_featureInfos.count());
 	retVal = retVal && archive.BeginMultiTag(featuresTag, featureInfoTag, featuresCount);
 
 	if (retVal && !archive.IsStoring()){

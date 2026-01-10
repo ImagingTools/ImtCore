@@ -8,8 +8,9 @@
 #include <iser/CArchiveTag.h>
 
 // ImtCore includes
+#include <imtcore/Version.h>
+#include <imtbase/imtbase.h>
 #include <imtlic/ILicenseInstance.h>
-#include <imtlic/IProductLicensingInfo.h>
 
 
 namespace imtlic
@@ -258,7 +259,7 @@ bool CProductInstanceInfo::Serialize(iser::IArchive& archive)
 	iser::CArchiveTag licenseInstanceTag("LicenseInstance", "License instance", iser::CArchiveTag::TT_GROUP);
 	iser::CArchiveTag licenseTag("LicenseData", "License data", iser::CArchiveTag::TT_GROUP);
 
-	int licensesCount = m_licenses.count();
+	int licensesCount = imtbase::narrow_cast<int>(m_licenses.size());
 
 	retVal = retVal && archive.BeginMultiTag(licensesTag, licenseInstanceTag, licensesCount);
 

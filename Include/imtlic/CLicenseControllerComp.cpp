@@ -14,6 +14,7 @@
 #include <ilog/CMessage.h>
 
 // ImtCore includes
+#include <imtbase/imtbase.h>
 #include <imtbase/ICollectionInfo.h>
 #include <imtlic/CProductInstanceInfo.h>
 
@@ -68,34 +69,33 @@ bool CLicenseControllerComp::ImportLicense(const QString& licenseFilePath, ilog:
 
 					return true;
 				}
-				else{
-					if (logPtr != nullptr){
-						QString addtionalMessage;
-						if (m_additionalImportLicenseErrorMessageAttrPtr.IsValid()){
-							addtionalMessage = *m_additionalImportLicenseErrorMessageAttrPtr;
-						}
 
-						QString errorMessage = QT_TR_NOOP("License file could not be imported");
-						if (!addtionalMessage.isEmpty()){
-							errorMessage += ".\n" + addtionalMessage;
-						}
-
-						ilog::IMessageConsumer::MessagePtr messagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, errorMessage, "License Manager"));
-
-						logPtr->AddMessage(messagePtr);
+				if (logPtr != nullptr){
+					QString addtionalMessage;
+					if (m_additionalImportLicenseErrorMessageAttrPtr.IsValid()){
+						addtionalMessage = *m_additionalImportLicenseErrorMessageAttrPtr;
 					}
 
-					// Restore the license backup:
-					if (!backupFilePath.isEmpty()){
-						if (istd::CSystem::FileCopy(backupFilePath, targetFilePath, true)){
-							QFile::remove(backupFilePath);
-						}
-						else{
-							if (logPtr != nullptr){
-								ilog::IMessageConsumer::MessagePtr messagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, tr("Restore of the last license failed"), "License Manager"));
+					QString errorMessage = QT_TR_NOOP("License file could not be imported");
+					if (!addtionalMessage.isEmpty()){
+						errorMessage += ".\n" + addtionalMessage;
+					}
 
-								logPtr->AddMessage(messagePtr);
-							}
+					ilog::IMessageConsumer::MessagePtr messagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, errorMessage, "License Manager"));
+
+					logPtr->AddMessage(messagePtr);
+				}
+
+				// Restore the license backup:
+				if (!backupFilePath.isEmpty()){
+					if (istd::CSystem::FileCopy(backupFilePath, targetFilePath, true)){
+						QFile::remove(backupFilePath);
+					}
+					else{
+						if (logPtr != nullptr){
+							ilog::IMessageConsumer::MessagePtr messagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, tr("Restore of the last license failed"), "License Manager"));
+
+							logPtr->AddMessage(messagePtr);
 						}
 					}
 				}
@@ -223,7 +223,7 @@ void CLicenseControllerComp::OnComponentCreated()
 
 	m_isInitializing = false;
 
-	int oneHour = 1000 * 60 * 60;
+	constexpr std::chrono::hours oneHour(1);
 	QTimer::singleShot(oneHour, this, &CLicenseControllerComp::OnFingeprintCheckTimer);
 
 	connect(&m_checkLicenseTimer, &QTimer::timeout, this, &CLicenseControllerComp::OnFingeprintCheckTimer);
@@ -348,7 +348,7 @@ bool CLicenseControllerComp::LoadFingerprint(const QString& filePath, imtlic::IP
 		QDateTime currentTime = QDateTime::currentDateTime();
 		QDateTime fingerprintTimeStamp = fingerprintInfo.lastModified();
 
-		int days = fingerprintTimeStamp.daysTo(currentTime);
+		int days = imtbase::narrow_cast<int>(fingerprintTimeStamp.daysTo(currentTime));
 		if (days < *m_fingerprintExpirationAttrPtr){
 			daysUntilExpire = *m_fingerprintExpirationAttrPtr - days;
 
@@ -372,7 +372,7 @@ QString CLicenseControllerComp::GetFingerprintPath() const
 		return QString();
 	}
 
-	int checksum = istd::CCrcCalculator::GetCrcFromFile(licenseFilePath);
+	quint32 checksum = istd::CCrcCalculator::GetCrcFromFile(licenseFilePath);
 
 	QString checkSumString = QString::number(checksum, 16).rightJustified(8, '0').toUpper();
 
