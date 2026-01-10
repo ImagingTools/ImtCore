@@ -27,7 +27,7 @@ bool CObjectCollectionMigrationControllerComp::DoMigration(int& resultRevision, 
 	if (!subRange.IsValid()){
 		return false;
 	}
-	
+
 	if (!m_range.Contains(subRange)){
 		return false;
 	}

@@ -82,7 +82,7 @@ void CStaticEncryptionKeyProviderComp::OnComponentCreated()
 void CStaticEncryptionKeyProviderComp::OnComponentDestroyed()
 {
 	m_updateBridge.EnsureModelsDetached();
-	
+
 	BaseClass::OnComponentDestroyed();
 }
 

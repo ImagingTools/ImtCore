@@ -10,6 +10,9 @@
 // ACF includes
 #include <iprm/TParamsPtr.h>
 
+// ImtCore includes
+#include <imtbase/imtbase.h>
+
 
 namespace imtdb
 {
@@ -248,7 +251,7 @@ void CDatabaseAutomaticBackupComp::OnTimeout()
 	bool shouldBackup = !validLastBackupDate;
 	if (validLastBackupDate){
 		const int interval = schedulerParamPtr->GetInterval();
-		const int secs = m_lastBackupDateTime.secsTo(currentDateTime);
+		const int secs = imtbase::narrow_cast<int>(m_lastBackupDateTime.secsTo(currentDateTime));
 		shouldBackup = bool(secs >= interval);
 	}
 

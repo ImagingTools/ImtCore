@@ -9,6 +9,9 @@
 #include <istd/CChangeNotifier.h>
 #include <istd/TDelPtr.h>
 
+// ImtCore includes
+#include <imtbase/imtbase.h>
+
 
 namespace imtdev
 {
@@ -216,7 +219,7 @@ int CCompositeDeviceInstanceBase::SubDeviceCollectionInfo::GetElementsCount(
 			const iprm::IParamsSet* /*selectionParamsPtr*/,
 			ilog::IMessageConsumer* /*logPtr*/) const
 {
-	return m_parentPtr->m_subDeviceMap.count();
+	return imtbase::narrow_cast<int>(m_parentPtr->m_subDeviceMap.count());
 }
 
 
@@ -257,6 +260,8 @@ QVariant CCompositeDeviceInstanceBase::SubDeviceCollectionInfo::GetElementInfo(
 		return m_parentPtr->m_subDeviceMap[elementId].description;
 	case EIT_ENABLED:
 		return true;
+	default:
+		I_IF_DEBUG(qDebug() << __FILE__ << __LINE__ << "Unknown info type: " << infoType;)
 	}
 
 	return QVariant();

@@ -8,7 +8,8 @@
 #include <iser/CMemoryWriteArchive.h>
 #include <iser/CMemoryReadArchive.h>
 
-// Acula includes
+// ImtCore includes
+#include <imtbase/imtbase.h>
 #include <imtdev/IDeviceDataProvider.h>
 
 
@@ -64,7 +65,7 @@ ifile::IFilePersistence::OperationState CDeviceDataFilePersistenceComp::LoadFrom
 	}
 
 	if (!deviceDataBuffer.isEmpty()){
-		iser::CMemoryReadArchive dataArchive(deviceDataBuffer.constData(), deviceDataBuffer.size());
+		iser::CMemoryReadArchive dataArchive(deviceDataBuffer.constData(),  imtbase::narrow_cast<int>(deviceDataBuffer.size()));
 
 		retVal = serializablePtr->Serialize(dataArchive);
 		if (!retVal){

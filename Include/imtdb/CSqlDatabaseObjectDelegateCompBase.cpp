@@ -11,6 +11,7 @@
 #include <idoc/CStandardDocumentMetaInfo.h>
 
 // ImtCore includes
+#include <imtbase/imtbase.h>
 #include <imtdb/CComplexCollectionFilterConverter.h>
 
 
@@ -51,12 +52,11 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetObjectTypeId(const QByteArray&
 					if (record.contains(columnId)){
 						return record.value(columnId).toByteArray();
 					}
-					else{
-						// Fallback:
-						if (m_typesCompPtr.IsValid()){
-							if (m_typesCompPtr->GetOptionsCount() == 1){
-								return m_typesCompPtr->GetOptionId(0);
-							}
+
+					// Fallback:
+					if (m_typesCompPtr.IsValid()){
+						if (m_typesCompPtr->GetOptionsCount() == 1){
+							return m_typesCompPtr->GetOptionId(0);
 						}
 					}
 				}
@@ -104,57 +104,53 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionQuery(
 				.arg(qPrintable(objectId))
 				.toUtf8();
 		}
-		else{
-			return QString("SELECT * FROM \"%1\" WHERE \"%2\" = '%3'")
-					.arg(qPrintable(*m_tableNameAttrPtr))
-					.arg(qPrintable(*m_objectIdColumnAttrPtr))
-					.arg(qPrintable(objectId))
-					.toUtf8();
-		}
+
+		return QString("SELECT * FROM \"%1\" WHERE \"%2\" = '%3'")
+				.arg(qPrintable(*m_tableNameAttrPtr))
+				.arg(qPrintable(*m_objectIdColumnAttrPtr))
+				.arg(qPrintable(objectId))
+				.toUtf8();
 	}
-	else{
-		QString sortQuery;
-		QString filterQuery;
-		if (count == 0){
+
+	QString sortQuery;
+	QString filterQuery;
+	if (count == 0){
+		return QByteArray();
+	}
+	if (paramsPtr != nullptr){
+		if (!CreateFilterQuery(*paramsPtr, filterQuery)){
 			return QByteArray();
 		}
-		if (paramsPtr != nullptr){
-			if (!CreateFilterQuery(*paramsPtr, filterQuery)){
+
+		iprm::IParamsSet::Ids paramIds = paramsPtr->GetParamIds();
+		if (paramIds.contains("ComplexFilter")){
+			iprm::TParamsPtr<imtbase::IComplexCollectionFilter> complexFilterParamPtr(paramsPtr, "ComplexFilter");
+			if (!CreateSortQuery(*complexFilterParamPtr, sortQuery)){
 				return QByteArray();
 			}
-
-			iprm::IParamsSet::Ids paramIds = paramsPtr->GetParamIds();
-			if (paramIds.contains("ComplexFilter")){
-				iprm::TParamsPtr<imtbase::IComplexCollectionFilter> complexFilterParamPtr(paramsPtr, "ComplexFilter");
-				if (!CreateSortQuery(*complexFilterParamPtr, sortQuery)){
-					return QByteArray();
-				}
-			}
-			else if (paramIds.contains("Filter")){
-				iprm::TParamsPtr<imtbase::ICollectionFilter> collectionFilterParamPtr(paramsPtr, "Filter");
-				if (!CreateSortQuery(*collectionFilterParamPtr, sortQuery)){
-					return QByteArray();
-				}
+		}
+		else if (paramIds.contains("Filter")){
+			iprm::TParamsPtr<imtbase::ICollectionFilter> collectionFilterParamPtr(paramsPtr, "Filter");
+			if (!CreateSortQuery(*collectionFilterParamPtr, sortQuery)){
+				return QByteArray();
 			}
 		}
-
-		QByteArray paginationQuery;
-		if (!CreatePaginationQuery(offset, count, paginationQuery)){
-			return QByteArray();
-		}
-
-		QString baseSelelectionQuery = GetBaseSelectionQuery();
-
-		// Due to a bug in qt in the context of resolving of an expression like this: '%<SOME_NUMBER>%'
-		QString retVal = "(" + baseSelelectionQuery;
-		retVal += QString(" ") + filterQuery;
-		retVal += QString(" ") + qPrintable(paginationQuery) + ")";
-		retVal += QString(" ") + sortQuery;
-
-		return retVal.toUtf8();
 	}
 
-	return QByteArray();
+	QByteArray paginationQuery;
+	if (!CreatePaginationQuery(offset, count, paginationQuery)){
+		return QByteArray();
+	}
+
+	QString baseSelelectionQuery = GetBaseSelectionQuery();
+
+	// Due to a bug in qt in the context of resolving of an expression like this: '%<SOME_NUMBER>%'
+	QString retVal = "(" + baseSelelectionQuery;
+	retVal += QString(" ") + filterQuery;
+	retVal += QString(" ") + qPrintable(paginationQuery) + ")";
+	retVal += QString(" ") + sortQuery;
+
+	return retVal.toUtf8();
 }
 
 
@@ -355,7 +351,7 @@ bool CSqlDatabaseObjectDelegateCompBase::SetCollectionItemMetaInfoFromRecord(con
 	}
 
 	if (record.contains("Checksum")){
-		int checksum = record.value("Checksum").toUInt();
+		int checksum = imtbase::narrow_cast<int>(record.value("Checksum").toUInt());
 
 		metaInfo.SetMetaInfo(idoc::IDocumentMetaInfo::MIT_CONTENT_CHECKSUM, checksum);
 	}
@@ -531,7 +527,7 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateTextFilterQuery(const imtbase::IC
 				if (!textFilterQuery.isEmpty()){
 					textFilterQuery += QStringLiteral(" OR ");
 				}
-		
+
 				textFilterQuery += QStringLiteral(R"("%1" ILIKE '%%2%')").arg(QString::fromUtf8(info.id), textFilter);
 			}
 		}

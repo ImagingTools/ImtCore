@@ -15,9 +15,9 @@ namespace imtdev
 // public methods
 
 CDeviceControllerProxyComp::CDeviceControllerProxyComp()
-	:m_enumeratorIndex(-1),
+	:m_deviceStateProviderUpdateBridge(&m_deviceStateProvider),
+	m_enumeratorIndex(-1),
 	m_resultHandlerPtr(nullptr),
-	m_deviceStateProviderUpdateBridge(&m_deviceStateProvider),
 	m_overriddenDeviceInfoObserver(*this)
 {
 	m_deviceStateProvider.SetParent(*this);
@@ -54,9 +54,8 @@ bool CDeviceControllerProxyComp::SetDeviceInstanceName(const QByteArray& deviceI
 	if (!m_overriddenDeviceInfo.GetElementIds().contains(deviceId)){
 		return !m_overriddenDeviceInfo.InsertItem(deviceId, name, "").isEmpty();
 	}
-	else{
-		return m_overriddenDeviceInfo.SetElementName(deviceId, name);
-	}
+
+	return m_overriddenDeviceInfo.SetElementName(deviceId, name);
 }
 
 
@@ -65,9 +64,8 @@ bool CDeviceControllerProxyComp::SetDeviceInstanceDescription(const QByteArray& 
 	if (!m_overriddenDeviceInfo.GetElementIds().contains(deviceId)){
 		return !m_overriddenDeviceInfo.InsertItem(deviceId, "", description).isEmpty();
 	}
-	else{
-		return m_overriddenDeviceInfo.SetElementDescription(deviceId, description);
-	}
+
+	return m_overriddenDeviceInfo.SetElementDescription(deviceId, description);
 }
 
 
@@ -123,7 +121,7 @@ IDeviceEnumerator::StartResult CDeviceControllerProxyComp::StartEnumeration(IDev
 void CDeviceControllerProxyComp::CancelEnumeration()
 {
 	IDeviceEnumerator* deviceEnumeratorPtr = GetCurrentDeviceEnumerator();
-	if (deviceEnumeratorPtr){
+	if (deviceEnumeratorPtr != nullptr){
 		deviceEnumeratorPtr->CancelEnumeration();
 	}
 
@@ -178,7 +176,7 @@ void CDeviceControllerProxyComp::OnComponentCreated()
 	BaseClass::OnComponentCreated();
 
 	if (*m_intervalAttrPtr > 0){
-		m_intervalTimer.setInterval(*m_intervalAttrPtr * 1000);
+		m_intervalTimer.setInterval(std::chrono::seconds(*m_intervalAttrPtr));
 	}
 
 	connect(&m_intervalTimer, &QTimer::timeout, this, &CDeviceControllerProxyComp::OnIntervalTimer);
@@ -237,7 +235,7 @@ void CDeviceControllerProxyComp::StartEnumeration()
 	Q_ASSERT(m_enumeratorIndex == -1);
 
 	IDeviceEnumerator* deviceEnumeratorPtr = GetNextDeviceEnumerator();
-	if (deviceEnumeratorPtr){
+	if (deviceEnumeratorPtr != nullptr){
 		if (m_intervalTimer.interval() > 0){
 			m_intervalTimer.start();
 		}
@@ -264,12 +262,12 @@ IDeviceEnumerator* CDeviceControllerProxyComp::GetNextDeviceEnumerator()
 		if (m_deviceEnumeratorCompPtr[m_enumeratorIndex] != nullptr){
 			return m_deviceEnumeratorCompPtr[m_enumeratorIndex];
 		}
-		else{
-			return GetNextDeviceEnumerator();
-		}
+
+		return GetNextDeviceEnumerator();
 	}
 
 	m_enumeratorIndex = -1;
+
 	return nullptr;
 }
 
@@ -321,7 +319,7 @@ void CDeviceControllerProxyComp::UpdateDeviceList()
 				const imtbase::ICollectionInfo& deviceList = deviceControllerPtr->GetDeviceInstanceList();
 
 				imtbase::ICollectionInfo::Ids ids = deviceList.GetElementIds();
-				for (const imtbase::ICollectionInfo::Id id : ids){
+				for (const imtbase::ICollectionInfo::Id& id : ids){
 					QString name = deviceList.GetElementInfo(id, imtbase::ICollectionInfo::EIT_NAME).toString();
 					QString description = deviceList.GetElementInfo(id, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 
@@ -387,7 +385,7 @@ QByteArray CDeviceControllerProxyComp::GetDeviceTypeId(const QByteArray& deviceI
 
 // private methods
 
-void CDeviceControllerProxyComp::OnOverriddenDeviceInfoUpdated(const istd::IChangeable::ChangeSet& changeset, const imtbase::ICollectionInfo* objectPtr)
+void CDeviceControllerProxyComp::OnOverriddenDeviceInfoUpdated(const istd::IChangeable::ChangeSet& /* changeset */, const imtbase::ICollectionInfo* /* objectPtr */)
 {
 	UpdateDeviceList();
 }

@@ -143,11 +143,8 @@ int CMigrationControllerComp::GetLastMigration(const QString& migrationFolder, Q
 
 		return avaliableMigration;
 	}
-	else{
-		errorMessage = QString("Directory containing SQL-migration files doesn't exist: '%1'").arg(migrationFolder);
 
-		return -1;
-	}
+	errorMessage = QString("Directory containing SQL-migration files doesn't exist: '%1'").arg(migrationFolder);
 
 	return -1;
 }

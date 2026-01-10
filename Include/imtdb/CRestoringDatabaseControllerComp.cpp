@@ -202,11 +202,7 @@ bool CRestoringDatabaseControllerComp::ExecuteCommand(QProcess& process, const Q
 	process.startCommand(command);
 #endif
 	
-	if(!process.waitForFinished()){
-		return false;
-	}
-
-	return true;
+	return process.waitForFinished();
 }
 
 

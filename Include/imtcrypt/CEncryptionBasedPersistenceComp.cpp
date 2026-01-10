@@ -79,11 +79,7 @@ bool CEncryptionBasedPersistenceComp::IsOperationSupported(
 			int /*flags*/,
 			bool /*beQuiet*/) const
 {
-	if (dataObjectPtr != nullptr){
-		return true;
-	}
-
-	return false;
+	return dataObjectPtr != nullptr;
 }
 
 
@@ -230,9 +226,9 @@ CEncryptionBasedPersistenceComp::LocalKeyProvider::LocalKeyProvider(
 	const imtcrypt::IEncryption::EncryptionAlgorithm& algorithm,
 	const QByteArray& keyFirst,
 	const QByteArray& keySecond)
-	:m_algorithm(algorithm)
-	,m_keyFirst(keyFirst)
-	, m_keySecond(keySecond)
+	:m_keyFirst(keyFirst)
+	,m_keySecond(keySecond)
+	, m_algorithm(algorithm)
 {
 }
 
@@ -259,13 +255,12 @@ bool CEncryptionBasedPersistenceComp::LocalKeyProvider::IsRequestOk(KeyType type
 		(type == imtcrypt::IEncryptionKeysProvider::KT_PASSWORD || type == IEncryptionKeysProvider::KT_INIT_VECTOR)){
 		return true;
 	}
-	else if ((m_algorithm == imtcrypt::IEncryption::EA_RSA) &&
+	if ((m_algorithm == imtcrypt::IEncryption::EA_RSA) &&
 		(type == imtcrypt::IEncryptionKeysProvider::KT_PRIVATE || type == IEncryptionKeysProvider::KT_PUBLIC)){
 		return true;
 	}
-	else {
-		return false;
-	}
+
+	return false;
 }
 
 

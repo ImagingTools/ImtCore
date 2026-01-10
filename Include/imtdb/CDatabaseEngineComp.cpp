@@ -116,8 +116,8 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(
 
 	const QSqlError queryError = retVal.lastError();
 	const QSqlError dbError = databaseConnection.lastError();
-	if (sqlError){
-		*sqlError = dbError.type() ? dbError : queryError;
+	if (sqlError != nullptr){
+		*sqlError = dbError.type() != QSqlError::NoError ? dbError : queryError;
 	}
 
 	if ((dbError.type() != QSqlError::NoError) || (retVal.lastError().type() != QSqlError::NoError)){
@@ -333,7 +333,7 @@ bool CDatabaseEngineComp::ExecuteDatabasePatches() const
 
 		return false;
 	}
-	else if (newRevision >= 0){
+	if (newRevision >= 0){
 		// Set max revision to database
 		QSqlError sqlError;
 		QVariantMap valuesRevision({ {QStringLiteral(":Revision"), newRevision} });
@@ -375,7 +375,7 @@ void CDatabaseEngineComp::OnDatabaseAccessChanged(
 }
 
 
-QSqlDatabase CDatabaseEngineComp::InitDatabase(QByteArray databaseDriverTypeId) const
+QSqlDatabase CDatabaseEngineComp::InitDatabase(const QByteArray& databaseDriverTypeId) const
 {
 	QSqlDatabase databaseConnection = QSqlDatabase::addDatabase(databaseDriverTypeId, GetConnectionName());
 

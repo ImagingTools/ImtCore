@@ -5,7 +5,6 @@
 #include <iprm/TParamsPtr.h>
 #include <iprm/ITextParam.h>
 #include <iprm/IIdParam.h>
-#include <iprm/IEnableableParam.h>
 #include <istd/TOptDelPtr.h>
 #include <istd/CCrcCalculator.h>
 #include <iser/CJsonMemReadArchive.h>
@@ -15,6 +14,7 @@
 #include <idoc/CStandardDocumentMetaInfo.h>
 
 // ImtCore includes
+#include <imtbase/imtbase.h>
 #include <imtbase/CObjectCollection.h>
 #include <imtcol/IDocumentCollectionFilter.h>
 
@@ -102,7 +102,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlJsonDatabaseDelegateComp::Cre
 		QByteArray documentContent;
 		if (WriteDataToMemory(typeId, *workingDocumentPtr, documentContent)){
 			QByteArray objectId = proposedObjectId.isEmpty() ? QUuid::createUuid().toByteArray(QUuid::WithoutBraces) : proposedObjectId;
-			quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
+			quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), imtbase::narrow_cast<int>(documentContent.size()));
 
 			int revisionVersion = 1;
 			QString queryStr;
@@ -138,12 +138,12 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateDeleteObjectsQuery(
 	if (objectIds.isEmpty()){
 		return QByteArray();
 	}
-	
+
 	QStringList quotedIds;
 	for (const QByteArray& objectId : objectIds){
 		quotedIds << QString("'%1'").arg(qPrintable(objectId));
 	}
-	
+
 	QString query = QString(
 						"DELETE FROM \"%1\" WHERE \"%2\" IN (%3);")
 						.arg(
@@ -151,7 +151,7 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateDeleteObjectsQuery(
 							QString::fromUtf8(qPrintable(*m_objectIdColumnAttrPtr)),
 							quotedIds.join(", ")
 							);
-	
+
 	return query.toUtf8();
 }
 
@@ -167,7 +167,7 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 	QByteArray documentContent;
 	if (WriteDataToMemory("DocumentInfo", object, documentContent)){
-		quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
+		quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), imtbase::narrow_cast<int>(documentContent.size()));
 
 		QString queryStr;
 		if (*m_isMultiTypeAttrPtr){
@@ -228,13 +228,12 @@ QString CSqlJsonDatabaseDelegateComp::GetBaseSelectionQuery() const
 				.arg(qPrintable(*m_objectIdColumnAttrPtr))
 				.arg(qPrintable(*m_tableNameAttrPtr));
 	}
-	else{
-		return QString("SELECT \"Id\", \"%1\", \"Document\", \"RevisionNumber\", \"LastModified\","
-					   "(SELECT \"LastModified\" FROM \"%2\" as t1 WHERE \"RevisionNumber\" = 1 AND root.\"%1\" = t1.\"%1\" LIMIT 1) as \"Added\" FROM \"%2\""
-					   " as root WHERE \"IsActive\" = true")
-				.arg(qPrintable(*m_objectIdColumnAttrPtr))
-				.arg(qPrintable(*m_tableNameAttrPtr));
-	}
+
+	return QString("SELECT \"Id\", \"%1\", \"Document\", \"RevisionNumber\", \"LastModified\","
+					"(SELECT \"LastModified\" FROM \"%2\" as t1 WHERE \"RevisionNumber\" = 1 AND root.\"%1\" = t1.\"%1\" LIMIT 1) as \"Added\" FROM \"%2\""
+					" as root WHERE \"IsActive\" = true")
+			.arg(qPrintable(*m_objectIdColumnAttrPtr))
+			.arg(qPrintable(*m_tableNameAttrPtr));
 }
 
 
@@ -312,6 +311,8 @@ bool CSqlJsonDatabaseDelegateComp::CreateSortQuery(const imtbase::ICollectionFil
 	}
 
 	switch (collectionFilter.GetSortingOrder()){
+	case imtbase::ICollectionFilter::SO_NO_ORDER:
+		I_IF_DEBUG(qWarning() << __FILE__ << __LINE__ <<  "sorting order is not set, using default sorting order (ASC).";)
 	case imtbase::ICollectionFilter::SO_ASC:
 		sortOrder = "ASC";
 		break;
@@ -409,7 +410,7 @@ bool CSqlJsonDatabaseDelegateComp::CreateObjectFilterQuery(
 		for (int i = 0; i < idsList.size(); i++){
 			QByteArray key = idsList[i];
 
-			const iprm::ITextParam* textParamPtr = dynamic_cast<const iprm::ITextParam*>(filterParams.GetParameter(key));
+			auto textParamPtr = dynamic_cast<const iprm::ITextParam*>(filterParams.GetParameter(key));
 			if (textParamPtr == nullptr){
 				continue;
 			}
@@ -548,31 +549,31 @@ QByteArray CSqlJsonDatabaseDelegateComp::GetObjectSelectionQuery(const QByteArra
 			iprm::TParamsPtr<imtcol::IDocumentCollectionFilter> documentFilterParamPtr(paramsPtr, "DocumentFilter");
 			if (documentFilterParamPtr.IsValid()){
 				imtcol::IDocumentCollectionFilter::DocumentStates states = documentFilterParamPtr->GetDocumentStates();
-				
+
 				if (states.contains(imtcol::IDocumentCollectionFilter::DS_ACTIVE)){
 					stateDocumentFilter += QString("\"IsActive\" = true");
 				}
-				
+
 				if (states.contains(imtcol::IDocumentCollectionFilter::DS_INACTIVE)){
 					if (!stateDocumentFilter.isEmpty()){
 						stateDocumentFilter += QString(" OR ");
 					}
-					
+
 					stateDocumentFilter += QString("\"IsActive\" = false");
 				}
 			}
 		}
 	}
-	
+
 	if (stateDocumentFilter.isEmpty()){
 		stateDocumentFilter = QString("\"IsActive\" = true");
 	}
-	
+
 	QString schemaPrefix;
 	if (m_tableSchemaAttrPtr.IsValid()){
 		schemaPrefix = QString("%1.").arg(qPrintable(*m_tableSchemaAttrPtr));
 	}
-	
+
 	return QString("(SELECT * FROM %0\"%1\" WHERE (%2) AND \"DocumentId\" = '%3') ORDER BY \"RevisionNumber\" DESC;")
 		.arg(schemaPrefix)
 		.arg(qPrintable(*m_tableNameAttrPtr))
@@ -586,9 +587,9 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateOperationDescriptionQuery(
 	const imtbase::IOperationContext* operationContextPtr) const
 {
 	if (operationContextPtr != nullptr){
-		imtbase::IOperationContext* operationPtr = const_cast<imtbase::IOperationContext*>(operationContextPtr);
+		auto operationPtr = const_cast<imtbase::IOperationContext*>(operationContextPtr);
 		if (operationPtr != nullptr){
-			imtbase::CObjectCollection* changeCollectionPtr = dynamic_cast<imtbase::CObjectCollection*>(operationPtr->GetChangesCollection());
+			auto changeCollectionPtr = dynamic_cast<imtbase::CObjectCollection*>(operationPtr->GetChangesCollection());
 
 			QByteArray json;
 			{
@@ -630,7 +631,7 @@ bool CSqlJsonDatabaseDelegateComp::WriteDataToMemory(
 			const istd::IChangeable& object,
 			QByteArray& data) const
 {
-	iser::ISerializable* serializableObjectPtr = const_cast<iser::ISerializable*>(dynamic_cast<const iser::ISerializable*>(&object));
+	auto serializableObjectPtr = const_cast<iser::ISerializable*>(dynamic_cast<const iser::ISerializable*>(&object));
 	if (serializableObjectPtr == nullptr){
 		Q_ASSERT(0);
 		return false;
@@ -643,7 +644,7 @@ bool CSqlJsonDatabaseDelegateComp::WriteDataToMemory(
 	}
 
 	data = archive.GetData();
-	
+
 	return true;
 }
 
@@ -653,7 +654,7 @@ bool CSqlJsonDatabaseDelegateComp::ReadDataFromMemory(
 			const QByteArray& data,
 			istd::IChangeable& object) const
 {
-	iser::ISerializable* serializableObjectPtr = dynamic_cast<iser::ISerializable*>(&object);
+	auto serializableObjectPtr = dynamic_cast<iser::ISerializable*>(&object);
 	if (serializableObjectPtr == nullptr){
 		Q_ASSERT(0);
 		return false;

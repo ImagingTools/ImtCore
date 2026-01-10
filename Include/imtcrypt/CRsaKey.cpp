@@ -14,16 +14,19 @@ void CRsaKey::GenerateRsaKeys()
 {
 	RSA* keypair = RSA_new();
 	BIGNUM *e = BN_new();
-	BN_set_word(e, RSA_F4);  //65537
-	if (RSA_generate_key_ex(keypair, 512, e, nullptr)){
+	BN_set_word(e, RSA_F4);
+	constexpr int keyLength = 512;
+	if (RSA_generate_key_ex(keypair, keyLength, e, nullptr) != 0){
 		RSA* privKey;
 		RSA* pubKey;
 		privKey = RSAPrivateKey_dup(keypair);
 		pubKey = RSAPublicKey_dup(keypair);
-		if (privKey)
+		if (privKey != nullptr){
 			RSA_free(privKey);
-		if (pubKey)
+		}
+		if (pubKey != nullptr){
 			RSA_free(pubKey);
+		}
 
 		BIO *bio = BIO_new(BIO_s_mem());
 		i2d_RSAPrivateKey_bio(bio, privKey);

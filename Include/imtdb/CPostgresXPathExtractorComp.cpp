@@ -11,7 +11,7 @@ namespace imtdb
 
 QString CPostgresXPathExtractorComp::ExtractXPath(
 			const QString& jsonKey,
-			const QString& key,
+			const QString& fieldId,
 			QMetaType::Type metaType,
 			const QString& tableAlias) const
 {
@@ -22,29 +22,29 @@ QString CPostgresXPathExtractorComp::ExtractXPath(
 	switch (metaType){
 	case QMetaType::QString:
 	case QMetaType::QByteArray:
-		return QString(R"(%1->>'%2')").arg(prefix, key);
+		return QString(R"(%1->>'%2')").arg(prefix, fieldId);
 
 	case QMetaType::Int:
 	case QMetaType::UInt:
 	case QMetaType::Short:
 	case QMetaType::UShort:
-		return QString(R"((%1->>'%2')::int)").arg(prefix, key);
+		return QString(R"((%1->>'%2')::int)").arg(prefix, fieldId);
 
 	case QMetaType::LongLong:
 	case QMetaType::ULongLong:
-		return QString(R"((%1->>'%2')::bigint)").arg(prefix, key);
+		return QString(R"((%1->>'%2')::bigint)").arg(prefix, fieldId);
 
 	case QMetaType::Double:
 	case QMetaType::Float:
-		return QString(R"((%1->>'%2')::float)").arg(prefix, key);
+		return QString(R"((%1->>'%2')::float)").arg(prefix, fieldId);
 
 	case QMetaType::Bool:
-		return QString(R"((%1->>'%2')::boolean)").arg(prefix, key);
+		return QString(R"((%1->>'%2')::boolean)").arg(prefix, fieldId);
 
 	case QMetaType::QJsonObject:
 	case QMetaType::QJsonValue:
 	case QMetaType::QJsonArray:
-		return QString(R"(%1->'%2')").arg(prefix, key);
+		return QString(R"(%1->'%2')").arg(prefix, fieldId);
 
 	default:
 		return QString();

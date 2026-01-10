@@ -42,9 +42,8 @@ bool CDeviceControllerCompBase::SetDeviceInstanceName(const QByteArray& deviceId
 	if (!m_overriddenDeviceInfo.GetElementIds().contains(deviceId)){
 		return !m_overriddenDeviceInfo.InsertItem(deviceId, name, "").isEmpty();
 	}
-	else{
-		return m_overriddenDeviceInfo.SetElementName(deviceId, name);
-	}
+
+	return m_overriddenDeviceInfo.SetElementName(deviceId, name);
 }
 
 
@@ -53,9 +52,8 @@ bool CDeviceControllerCompBase::SetDeviceInstanceDescription(const QByteArray& d
 	if (!m_overriddenDeviceInfo.GetElementIds().contains(deviceId)){
 		return !m_overriddenDeviceInfo.InsertItem(deviceId, "", description).isEmpty();
 	}
-	else{
-		return m_overriddenDeviceInfo.SetElementDescription(deviceId, description);
-	}
+
+	return m_overriddenDeviceInfo.SetElementDescription(deviceId, description);
 }
 
 
@@ -177,7 +175,7 @@ void CDeviceControllerCompBase::OnComponentDestroyed()
 
 // private methods
 
-void CDeviceControllerCompBase::OnOverriddenDeviceInfoUpdated(const istd::IChangeable::ChangeSet& changeset, const imtbase::ICollectionInfo* objectPtr)
+void CDeviceControllerCompBase::OnOverriddenDeviceInfoUpdated(const istd::IChangeable::ChangeSet& /* changeset */, const imtbase::ICollectionInfo* /* objectPtr */)
 {
 	UpdateDeviceList();
 }

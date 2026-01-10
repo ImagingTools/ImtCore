@@ -2,6 +2,7 @@
 
 
 // ImtCore includes
+#include <imtbase/imtbase.h>
 #include <imtbase/IObjectCollection.h>
 
 
@@ -38,7 +39,7 @@ QSqlRecord CSqlDatabaseObjectCollectionIterator::GetRecord()
 
 bool CSqlDatabaseObjectCollectionIterator::Next() const
 {
-	int recordsSize = m_records.size();
+	int recordsSize = imtbase::narrow_cast<int>(m_records.size());
 	if (m_currentIndex < recordsSize - 1){
 		m_currentIndex++;
 

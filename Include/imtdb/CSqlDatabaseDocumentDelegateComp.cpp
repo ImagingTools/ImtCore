@@ -20,6 +20,7 @@
 #include <idoc/CStandardDocumentMetaInfo.h>
 
 // ImtCore includes
+#include <imtbase/imtbase.h>
 #include <imtbase/ICollectionFilter.h>
 #include <imtdb/CComplexCollectionFilterConverter.h>
 #include <imtcol/IObjectTypeIdFilter.h>
@@ -787,7 +788,7 @@ bool CSqlDatabaseDocumentDelegateComp::ClearDependentMetaInfo(const MetaFieldCle
 		.arg(jsonbExpr, metaInfo.dependentKey);
 
 	QStringList quotedIds;
-	for (const QString& id : metaInfo.objectIds) {
+	for (const QByteArray& id : metaInfo.objectIds) {
 		QString escapedId = QString(id).replace("'", "''");
 		quotedIds << QString("'%1'").arg(escapedId);
 	}
@@ -841,7 +842,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 		return retVal;
 	}
 
-	const quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContentJson.constData(), documentContentJson.size());
+	const quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContentJson.constData(), imtbase::narrow_cast<int>(documentContentJson.size()));
 
 	QString schemaPrefix;
 	if (m_tableSchemaAttrPtr.IsValid()){
@@ -1726,11 +1727,7 @@ bool CSqlDatabaseDocumentDelegateComp::IsArrayOperation(
 		QRegularExpression::CaseInsensitiveOption
 	);
 
-	if (reFunctions.match(query).hasMatch()){
-		return true;
-	}
-
-	return false;
+	return reFunctions.match(query).hasMatch();
 }
 
 

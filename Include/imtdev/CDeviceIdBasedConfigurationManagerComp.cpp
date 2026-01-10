@@ -6,6 +6,7 @@
 #include <istd/CChangeNotifier.h>
 
 // ImtCore includes
+#include <imtbase/imtbase.h>
 #include <imtdev/IDeviceSpecification.h>
 
 
@@ -71,7 +72,7 @@ bool CDeviceIdBasedConfigurationManagerComp::Serialize(iser::IArchive& archive)
 {
 	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
 
-	int itemCount = m_configurations.count();
+	int itemCount = imtbase::narrow_cast<int>(m_configurations.count());
 	if (!archive.IsStoring()){
 		m_configurations.clear();
 		itemCount = 0;

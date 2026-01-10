@@ -2,6 +2,7 @@
 
 
 // ImtCore includes
+#include <imtbase/imtbase.h>
 #include <imtbase/IObjectCollection.h>
 
 
@@ -24,7 +25,7 @@ CSqlDatabaseCollectionStructureIterator::CSqlDatabaseCollectionStructureIterator
 
 bool CSqlDatabaseCollectionStructureIterator::Next()
 {
-	int recordsSize = m_records.size();
+	int recordsSize = imtbase::narrow_cast<int>(m_records.size());
 	if (m_currentIndex < recordsSize - 1){
 		m_currentIndex++;
 
@@ -60,7 +61,7 @@ imtbase::IHierarchicalStructureInfo::ItemInfo CSqlDatabaseCollectionStructureIte
 	imtbase::IHierarchicalStructureInfo::ItemInfo itemInfo;
 	itemInfo.itemId = m_records[m_currentIndex].value("Id").toByteArray();
 	itemInfo.name = m_records[m_currentIndex].value("Name").toByteArray();
-	// itemInfo.description = m_records[m_currentIndex].value("Description").toByteArray();
+	itemInfo.description = m_records[m_currentIndex].value("Description").toByteArray();
 
 	return itemInfo;
 }
@@ -68,7 +69,7 @@ imtbase::IHierarchicalStructureInfo::ItemInfo CSqlDatabaseCollectionStructureIte
 
 int CSqlDatabaseCollectionStructureIterator::GetItemCount() const
 {
-	return m_records.count();
+	return imtbase::narrow_cast<int>(m_records.size());
 }
 
 

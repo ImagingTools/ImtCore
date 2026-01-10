@@ -93,7 +93,7 @@ protected:
 	virtual bool ExecuteDatabasePatches() const;
 	virtual bool ExecuteTransaction(const QByteArray& sqlQuery) const;
 	void OnDatabaseAccessChanged(const istd::IChangeable::ChangeSet& changeSet, const imtdb::IDatabaseLoginSettings* databaseAccessSettingsPtr);
-	QSqlDatabase InitDatabase(QByteArray databaseDriverTypeId) const;
+	QSqlDatabase InitDatabase(const QByteArray& databaseDriverTypeId) const;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;

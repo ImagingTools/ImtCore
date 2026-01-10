@@ -12,8 +12,8 @@
 #include <iser/CJsonMemWriteArchive.h>
 
 // ImtCore includes
+#include <imtbase/imtbase.h>
 #include <imtbase/ICollectionFilter.h>
-
 
 namespace imtdb
 {
@@ -118,7 +118,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateLegac
 			return retVal;
 		}
 
-		checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
+		checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), imtbase::narrow_cast<int>(documentContent.size()));
 	}
 	else{
 		SendCriticalMessage(0, "Document instance is invalid. SQL-query could not be created");
@@ -204,12 +204,12 @@ QByteArray CSqlDatabaseDocumentDelegateLegacyComp::CreateDeleteObjectsQuery(
 	if (objectIds.isEmpty()){
 		return QByteArray();
 	}
-	
+
 	QStringList quotedIds;
 	for (const QByteArray& objectId : objectIds){
 		quotedIds << QString("'%1'").arg(qPrintable(objectId));
 	}
-	
+
 	QString query = QString(
 						"DELETE FROM \"%1\" WHERE \"%2\" IN (%3);")
 						.arg(
@@ -217,7 +217,7 @@ QByteArray CSqlDatabaseDocumentDelegateLegacyComp::CreateDeleteObjectsQuery(
 							QString::fromUtf8(s_idColumn),
 							quotedIds.join(", ")
 							);
-	
+
 	return query.toUtf8();
 }
 
@@ -266,7 +266,7 @@ QByteArray CSqlDatabaseDocumentDelegateLegacyComp::CreateUpdateObjectQuery(
 
 	QByteArray documentContent;
 	if (WriteDataToMemory(typeId, object, documentContent)){
-		quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
+		quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), imtbase::narrow_cast<int>(documentContent.size()));
 		QByteArray revisionUuid = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 		retVal = QString("UPDATE \"%1\" SET \"LastRevisionId\" = '%2' WHERE \"%3\" = '%4';")
@@ -568,7 +568,7 @@ bool CSqlDatabaseDocumentDelegateLegacyComp::WriteDataToMemory(const QByteArray&
 
 	QString fileName = QUuid::createUuid().toString();
 	QString workingExtension;
-	for (const QString ext : supportedExts){
+	for (const QString& ext : std::as_const(supportedExts)){
 		QString filePath = fileName + "." + ext;
 		if (documentPersistencePtr->IsOperationSupported(&object, &filePath, flags, false)){
 			workingExtension = ext;
@@ -626,7 +626,7 @@ bool CSqlDatabaseDocumentDelegateLegacyComp::ReadDataFromMemory(const QByteArray
 
 	QString fileName = QUuid::createUuid().toString();
 	QString workingExtension;
-	for (const QString ext : supportedExts){
+	for (const QString& ext : std::as_const(supportedExts)){
 		QString filePath = fileName + "." + ext;
 		if (documentPersistencePtr->IsOperationSupported(&object, &filePath, flags, false)){
 			workingExtension = ext;

@@ -1,8 +1,8 @@
 #include <imtdevgui/CDeviceSelectionGuiComp.h>
 
 
-// ImtCore incldues
-#include <iprm/IOptionsList.h>
+// ImtCore includes
+#include <imtbase/imtbase.h>
 
 
 namespace imtdevgui
@@ -27,7 +27,7 @@ CDeviceSelectionGuiComp::CDeviceSelectionGuiComp()
 // protected methods
 
 void CDeviceSelectionGuiComp::OnDeviceListUpdated(
-	const istd::IChangeable::ChangeSet& changeSet, const imtbase::ICollectionInfo* objectPtr)
+	const istd::IChangeable::ChangeSet& /* changeSet */, const imtbase::ICollectionInfo* objectPtr)
 {
 	static QIcon emptyIcon("");
 
@@ -42,7 +42,7 @@ void CDeviceSelectionGuiComp::OnDeviceListUpdated(
 
 	imtbase::ICollectionInfo::Ids deviceIds = objectPtr->GetElementIds();
 	int currentIndex = -1;
-	int count = deviceIds.count();
+	int count = imtbase::narrow_cast<int>(deviceIds.count());
 	for (int i = 0; i < count; ++i) {
 		DeviceListComboBox->insertItem(i, emptyIcon,
 			objectPtr->GetElementInfo(deviceIds[i], imtbase::ICollectionInfo::EIT_NAME).toString());
