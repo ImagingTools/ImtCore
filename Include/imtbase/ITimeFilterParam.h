@@ -47,8 +47,8 @@ public:
 
 	I_DECLARE_ENUM(InterpretationMode, IM_FOR, IM_CURRENT, IM_LAST);
 
-	virtual imtbase::CTimeRange GetTimeRange() const = 0;
-	virtual void SetTimeRange(const imtbase::CTimeRange& timeRange) = 0;
+	virtual CTimeRange GetTimeRange() const = 0;
+	virtual void SetTimeRange(const CTimeRange& timeRange) = 0;
 	virtual TimeUnit GetTimeUnit() const = 0;
 	virtual void SetTimeUnit(TimeUnit timeUnit, InterpretationMode interpretationMode, int multiplier = 1) = 0;
 	virtual InterpretationMode GetInterpretationMode() const = 0;

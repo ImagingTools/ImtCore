@@ -28,7 +28,7 @@ public:
 	/**
 		Add child item model to main model
 	*/
-	virtual imtbase::ITreeItemModel* AddTreeModel(const QByteArray &key, int index = 0) = 0;
+	virtual ITreeItemModel* AddTreeModel(const QByteArray &key, int index = 0) = 0;
 
 	/**
 		Add child extern item model to main model
@@ -58,7 +58,7 @@ public:
 	/**
 		Get parent model for current model
 	*/
-	virtual imtbase::ITreeItemModel* GetParent() const = 0;
+	virtual ITreeItemModel* GetParent() const = 0;
 
 	/**
 		Checking that the item tree model
@@ -73,7 +73,7 @@ public:
 	/**
 		Get tree item model by key
 	*/
-	virtual imtbase::ITreeItemModel* GetRepresentation(const QByteArray &key, int index = 0) const = 0;
+	virtual ITreeItemModel* GetRepresentation(const QByteArray &key, int index = 0) const = 0;
 
 	/**
 		Get items count for model

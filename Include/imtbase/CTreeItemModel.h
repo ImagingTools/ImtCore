@@ -134,7 +134,7 @@ Q_SIGNALS:
 	void stateChanged(const QString& state);
 	void needsReload();
 	void modelChanged();
-	
+
 protected:
 	bool SerializeRecursive(iser::IArchive& archive, const QByteArray& tagName);
 

@@ -3,8 +3,6 @@
 
 // Qt includes
 #include <QtCore/QByteArray>
-#include <QtCore/QString>
-#include <QtCore/QDateTime>
 
 // ACF includes
 #include <istd/TSingleFactory.h>
@@ -29,7 +27,7 @@ namespace imtbase
 template <class BaseInterface, class ObjectImpl>
 class TAggergatedObjectCollectionWrap:
 			virtual public BaseInterface,
-			virtual public imtbase::IObjectCollection,
+			virtual public IObjectCollection,
 			virtual public iser::ISerializable
 {
 public:
@@ -42,8 +40,8 @@ public:
 	void SetOperationFlags(int flags, const QByteArray& objectId = QByteArray());
 
 	// reimplemented (IObjectCollection)
-	virtual const imtbase::IRevisionController* GetRevisionController() const override;
-	virtual const imtbase::ICollectionDataController* GetDataController() const override;
+	virtual const IRevisionController* GetRevisionController() const override;
+	virtual const ICollectionDataController* GetDataController() const override;
 	virtual int GetOperationFlags(const QByteArray& objectId = QByteArray()) const override;
 	virtual QByteArray InsertNewObject(
 				const QByteArray& typeId,
@@ -67,8 +65,8 @@ public:
 	virtual const istd::IChangeable* GetObjectPtr(const QByteArray& objectId) const override;
 	virtual bool GetObjectData( const QByteArray& objectId, DataPtr& dataPtr, const iprm::IParamsSet* dataConfigurationPtr = nullptr) const override;
 	virtual bool SetObjectData( const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS, const IOperationContext* operationContextPtr = nullptr) override;
-	virtual imtbase::IObjectCollectionUniquePtr CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr) const override;
-	virtual imtbase::IObjectCollectionIterator* CreateObjectCollectionIterator(
+	virtual IObjectCollectionUniquePtr CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr) const override;
+	virtual IObjectCollectionIterator* CreateObjectCollectionIterator(
 				const QByteArray& objectId = QByteArray(),
 				int offset = 0,
 				int count = -1,
@@ -86,7 +84,7 @@ public:
 				const iprm::IParamsSet* selectionParamsPtr = nullptr,
 				ilog::IMessageConsumer* logPtr = nullptr) const override;
 	virtual bool GetSubsetInfo(
-				imtbase::ICollectionInfo& subsetInfo,
+				ICollectionInfo& subsetInfo,
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr,
@@ -153,14 +151,14 @@ void TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::SetOperationFla
 // reimplemented (IObjectCollection)
 
 template<class BaseInterface, class ObjectImpl>
-inline const imtbase::IRevisionController* TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetRevisionController() const
+inline const IRevisionController* TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetRevisionController() const
 {
 	return m_collection.GetRevisionController();
 }
 
 
 template<class BaseInterface, class ObjectImpl>
-inline const imtbase::ICollectionDataController* TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetDataController() const
+inline const ICollectionDataController* TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetDataController() const
 {
 	return m_collection.GetDataController();
 }
@@ -258,7 +256,7 @@ inline bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::SetObjec
 
 
 template<class BaseInterface, class ObjectImpl>
-inline imtbase::IObjectCollectionUniquePtr TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::CreateSubCollection(
+inline IObjectCollectionUniquePtr TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::CreateSubCollection(
 			int offset,
 			int count,
 			const iprm::IParamsSet* selectionParamsPtr) const
@@ -268,7 +266,7 @@ inline imtbase::IObjectCollectionUniquePtr TAggergatedObjectCollectionWrap<BaseI
 
 
 template<class BaseInterface, class ObjectImpl>
-imtbase::IObjectCollectionIterator* TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::CreateObjectCollectionIterator(
+IObjectCollectionIterator* TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::CreateObjectCollectionIterator(
 			const QByteArray& objectId,
 			int offset,
 			int count,
@@ -288,7 +286,7 @@ inline const iprm::IOptionsList* TAggergatedObjectCollectionWrap<BaseInterface, 
 
 
 template<class BaseInterface, class ObjectImpl>
-inline imtbase::ICollectionInfo::Id TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetObjectTypeId(const QByteArray& /*objectId*/) const
+inline ICollectionInfo::Id TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetObjectTypeId(const QByteArray& /*objectId*/) const
 {
 	return m_types.GetOptionId(0);
 }
@@ -310,7 +308,7 @@ inline int TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetElemen
 
 
 template<class BaseInterface, class ObjectImpl>
-inline imtbase::ICollectionInfo::Ids TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetElementIds(
+inline ICollectionInfo::Ids TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetElementIds(
 			int offset,
 			int count,
 			const iprm::IParamsSet* selectionParamsPtr,
@@ -322,7 +320,7 @@ inline imtbase::ICollectionInfo::Ids TAggergatedObjectCollectionWrap<BaseInterfa
 
 template<class BaseInterface, class ObjectImpl>
 inline bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetSubsetInfo(
-			imtbase::ICollectionInfo& subsetInfo,
+			ICollectionInfo& subsetInfo,
 			int offset,
 			int count,
 			const iprm::IParamsSet* selectionParamsPtr,

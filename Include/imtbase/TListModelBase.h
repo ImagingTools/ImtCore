@@ -15,7 +15,7 @@ template <class ModelDataType, class ModelObjectDataType>
 class TListModelBase: public QAbstractListModel
 {
 public:
-	TListModelBase(QObject* parent = nullptr);
+	explicit TListModelBase(QObject* parent = nullptr);
 protected:
 	// reimplemented (QAbstractListModel)
 	virtual int rowCount(const QModelIndex&  parent = QModelIndex()) const override;

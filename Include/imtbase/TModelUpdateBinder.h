@@ -1,12 +1,11 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QtGlobal>
+
 // ACF includes
 #include <imod/CMultiModelDispatcherBase.h>
-
-// Qt
-#include <QtCore/QMap>
-#include <QtCore/QtGlobal>
 
 
 namespace imtbase
@@ -62,7 +61,7 @@ public:
 	typedef void (Parent::*CallbackMethod)(const istd::IChangeable::ChangeSet& changeSet, const ModelInterface* objectPtr);
 	typedef imod::CMultiModelDispatcherBase BaseClass;
 
-	TModelUpdateBinder(Parent& parent);
+	explicit TModelUpdateBinder(Parent& parent);
 
 	bool RegisterObject(const ModelInterface* dataPtr, CallbackMethod callbackMethod, int modelId = 0);
 	bool RegisterObject(ModelInterface* dataPtr, CallbackMethod callbackMethod, int modelId = 0);
@@ -99,7 +98,7 @@ bool TModelUpdateBinder<ModelInterface, Parent>::RegisterObject(const ModelInter
 template <typename ModelInterface, typename Parent>
 bool TModelUpdateBinder<ModelInterface, Parent>::RegisterObject(ModelInterface* dataPtr, CallbackMethod callbackMethod, int modelId)
 {
-	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(dataPtr);
+	auto modelPtr = dynamic_cast<imod::IModel*>(dataPtr);
 	if (modelPtr != nullptr){
 		m_callbackMap[modelId] = callbackMethod;
 		if (BaseClass::RegisterModel(modelPtr, modelId)){

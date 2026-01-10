@@ -1,9 +1,6 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QJsonObject>
-
 // ACF includes
 #include <istd/IPolymorphic.h>
 

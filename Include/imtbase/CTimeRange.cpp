@@ -30,8 +30,6 @@ CTimeRange::CTimeRange(const QDateTime& begin, const QDateTime& end)
 
 	m_begin = begin;
 	m_end = end;
-
-	return;
 }
 
 
@@ -149,7 +147,7 @@ CTimeRange CTimeRange::Intersect(const CTimeRange& other) const
 	if (!IsClosed() || !other.IsClosed()){
 		return CTimeRange();
 	}
-	
+
 	if (other.m_begin <= m_begin){
 		if (other.m_end >= m_end){
 			return CTimeRange(m_begin, m_end);
@@ -189,7 +187,7 @@ bool CTimeRange::operator!=(const CTimeRange& other) const
 bool CTimeRange::Serialize(iser::IArchive& archive)
 {
 	bool retVal = true;
-	
+
 	static iser::CArchiveTag beginTimeTag("BeginTime", "Start of the time range", iser::CArchiveTag::TT_GROUP);
 	retVal = retVal && archive.BeginTag(beginTimeTag);
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeDateTime(archive, m_begin);

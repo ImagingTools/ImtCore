@@ -95,7 +95,7 @@ imod::IModel* TDelegatedSupplierCompBase<ProviderInterface, ObjectInterface>::Ge
 		return m_objectSupplierCompPtr->GetWorkStatusModel();
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -142,7 +142,7 @@ const ilog::IMessageContainer* TDelegatedSupplierCompBase<ProviderInterface, Obj
 		return m_objectSupplierCompPtr->GetWorkMessages(containerType);
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -153,7 +153,7 @@ iprm::IParamsSet* TDelegatedSupplierCompBase<ProviderInterface, ObjectInterface>
 		return m_objectSupplierCompPtr->GetModelParametersSet();
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 

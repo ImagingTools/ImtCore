@@ -14,16 +14,16 @@ namespace imtbase
 	Generic implementation of task plugin.
 */
 template <class ComponentClass>
-class TParamsSetPluginComponentImpl: public imtbase::TBasePluginComponentImpl<ComponentClass, imtbase::IParamsSetPlugin>
+class TParamsSetPluginComponentImpl: public TBasePluginComponentImpl<ComponentClass, IParamsSetPlugin>
 {
 public:
-	typedef imtbase::TBasePluginComponentImpl<ComponentClass, imtbase::IParamsSetPlugin> BaseClass;
+	typedef TBasePluginComponentImpl<ComponentClass, IParamsSetPlugin> BaseClass;
 
 	TParamsSetPluginComponentImpl(const QString& pluginName, const QByteArray& typeId);
 
 	// reimplemented (imtbase::IParamsSetPlugin)
-	virtual const imtbase::IParamsSetPlugin::IParamsSetFactory* GetParamsSetFactory() const override;
-	virtual const imtbase::IParamsSetPlugin::IRepresentationControllerFactory* GetRepresentationControllerFactory() const override;
+	virtual const IParamsSetPlugin::IParamsSetFactory* GetParamsSetFactory() const override;
+	virtual const IParamsSetPlugin::IRepresentationControllerFactory* GetRepresentationControllerFactory() const override;
 };
 
 
@@ -38,16 +38,16 @@ TParamsSetPluginComponentImpl<ComponentClass>::TParamsSetPluginComponentImpl(con
 // reimplemented (imtbase::IParamsSetPlugin)
 
 template <class ComponentClass>
-const imtbase::IParamsSetPlugin::IParamsSetFactory* TParamsSetPluginComponentImpl<ComponentClass>::GetParamsSetFactory() const
+const IParamsSetPlugin::IParamsSetFactory* TParamsSetPluginComponentImpl<ComponentClass>::GetParamsSetFactory() const
 {
-	return BaseClass::m_component.template GetInterface<imtbase::IParamsSetPlugin::IParamsSetFactory>(QByteArray());
+	return BaseClass::m_component.template GetInterface<IParamsSetPlugin::IParamsSetFactory>(QByteArray());
 }
 
 
 template <class ComponentClass>
-const imtbase::IParamsSetPlugin::IRepresentationControllerFactory* TParamsSetPluginComponentImpl<ComponentClass>::GetRepresentationControllerFactory() const
+const IParamsSetPlugin::IRepresentationControllerFactory* TParamsSetPluginComponentImpl<ComponentClass>::GetRepresentationControllerFactory() const
 {
-	return BaseClass::m_component.template GetInterface<imtbase::IParamsSetPlugin::IRepresentationControllerFactory>(QByteArray());
+	return BaseClass::m_component.template GetInterface<IParamsSetPlugin::IRepresentationControllerFactory>(QByteArray());
 }
 
 

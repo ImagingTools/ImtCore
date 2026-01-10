@@ -30,7 +30,7 @@ public:
 
 	virtual QByteArrayList GetHeaderIds() const = 0;
 	virtual HeaderInfo GetHeaderInfo(const QByteArray& headerId) const = 0;
-	virtual bool SetHeaderInfo(QByteArray headerId, ITableViewParam::HeaderInfo headerInfo) = 0;
+	virtual bool SetHeaderInfo(QByteArray headerId, HeaderInfo headerInfo) = 0;
 };
 
 

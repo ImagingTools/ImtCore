@@ -3,11 +3,9 @@
 
 // ACF includes
 #include <istd/CChangeGroup.h>
-#include <istd/TDelPtr.h>
 
 // ImtCore includes
 #include <imtbase/CIdentifiable.h>
-#include <imtcore/Version.h>
 
 
 namespace imtbase

@@ -69,10 +69,11 @@ public:
 
 	struct ItemInfo
 	{
-		ItemType itemType;
+		ItemType itemType = IT_NODE;
 		Id itemId;
 		Id parentId;
 		QString name;
+		QString description;
 		QSharedPointer<idoc::IDocumentMetaInfo> metaInfo;
 	};
 

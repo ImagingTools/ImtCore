@@ -6,7 +6,6 @@
 
 // ACF includes
 #include <icomp/CComponentBase.h>
-#include <icomp/CInterfaceManipBase.h>
 
 
 namespace imtbase
@@ -65,7 +64,7 @@ private:
 
 template <class InterfaceType>
 inline TCompPtr<InterfaceType>::TCompPtr()
-	:m_interfacePtr(NULL)
+	:m_interfacePtr(nullptr)
 {
 }
 
@@ -138,7 +137,7 @@ template <class InterfaceType>
 inline void TCompPtr<InterfaceType>::SetPtr(icomp::IComponent* pointer)
 {
 	InterfaceType* castedPtr = BaseClass::ExtractInterface<InterfaceType>(pointer);
-	if (castedPtr != NULL){
+	if (castedPtr != nullptr){
 		m_ptr.reset(pointer);
 
 		m_interfacePtr = castedPtr;

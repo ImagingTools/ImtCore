@@ -2,7 +2,6 @@
 
 
 // Qt includes
-#include <QtCore/QVector>
 #include <QtCore/QByteArray>
 
 // ACF includes

@@ -1,6 +1,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QUrl>
+
 // ACF includes
 #include <ifile/IFileNameParam.h>
 

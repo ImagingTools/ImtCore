@@ -81,7 +81,7 @@ bool CTreeItemModel::Copy(const CTreeItemModel* object)
 
 			if (treeItemModelPtr != nullptr){
 				CTreeItemModel* subModelPtr = new CTreeItemModel();
-				
+
 				if (!subModelPtr->Copy(treeItemModelPtr)){
 					delete item;
 					delete subModelPtr;
@@ -259,7 +259,7 @@ void CTreeItemModel::InsertNewItemWithParameters(int index, const QVariantMap& m
 
 int CTreeItemModel::InsertNewItem()
 {
-	int index = m_items.count();
+	int index = m_items.size();
 
 	beginInsertRows(QModelIndex(), index, index);
 
@@ -306,7 +306,7 @@ int CTreeItemModel::InsertNewItem(int index)
 int CTreeItemModel::RemoveItem(int index)
 {
 	if (index < 0 || index > m_items.count() - 1){
-		return false;
+		return -1;
 	}
 
 	beginRemoveRows(QModelIndex(), index, index);
@@ -322,7 +322,7 @@ int CTreeItemModel::RemoveItem(int index)
 
 	OnModelChanged();
 
-	return true;
+	return index;
 }
 
 bool CTreeItemModel::SwapItems(int index1, int index2)
@@ -542,7 +542,7 @@ bool CTreeItemModel::RemoveData(const QByteArray& key, int index)
 	}
 
 	OnModelChanged();
-	
+
 	return true;
 }
 
@@ -618,7 +618,7 @@ CTreeItemModel* CTreeItemModel::GetModelFromItem(int itemIndex) const
 
 int CTreeItemModel::GetItemsCount() const
 {
-	return m_items.count();
+	return m_items.size();
 }
 
 
@@ -797,7 +797,7 @@ QString CTreeItemModel::ToJson()
 
 int CTreeItemModel::rowCount(const QModelIndex& /*parent*/) const
 {
-	return m_items.count();
+	return m_items.size();
 }
 
 
@@ -890,7 +890,7 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive& archive, const QByteArra
 		isMultiTag = true;
 	}
 
-	if (isMultiTag == false){
+	if (!isMultiTag){
 		if (!tagName.isEmpty()){
 			retVal = retVal && archive.BeginTag(objectTag);
 		}
@@ -1036,7 +1036,7 @@ bool CTreeItemModel::ParseRecursive(const QJsonObject& jsonObject, int index)
 				jsonValue = *arrayIterator;
 				if(jsonValue.isObject()){
 					treeItemModel->InsertNewItem();
-					treeItemModel->ParseRecursive(jsonValue.toObject(), treeItemModel->m_items.count() - 1);
+					treeItemModel->ParseRecursive(jsonValue.toObject(), treeItemModel->m_items.size() - 1);
 				}
 				else if(jsonValue.isArray()){
 				}

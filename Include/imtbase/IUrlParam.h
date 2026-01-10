@@ -1,9 +1,6 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QUrl>
-
 // ACF includes
 #include <iser/ISerializable.h>
 
@@ -13,7 +10,7 @@ namespace imtbase
 
 
 /**
-	Interface for a object containing URL.
+	Interface for an object containing URL.
 */
 class IUrlParam: virtual public iser::ISerializable
 {
