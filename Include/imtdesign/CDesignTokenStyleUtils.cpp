@@ -11,11 +11,6 @@
 // Qt includes
 #include <QtCore/QtCore>
 
-// ACF includes
-#include <ilog/TLoggerCompWrap.h>
-#include <ifile/IFileNameParam.h>
-#include <iprm/IParamsSet.h>
-
 // ImtCore includes
 #include <imtbase/CCollectionInfo.h>
 #include <imtdesign/IDesignTokenFileParser.h>
@@ -131,7 +126,7 @@ const QMap<QString, QFont::SpacingType> CDesignTokenStyleUtils::s_fontSpacingTyp
 
 QString CDesignTokenStyleUtils::GetColorName(QPalette::ColorGroup group, QPalette::ColorRole role)
 {
-	return CDesignTokenStyleUtils::s_colorGroupNamesMap.key(group) + CDesignTokenStyleUtils::s_colorRolesNamesMap.key(role);
+	return s_colorGroupNamesMap.key(group) + s_colorRolesNamesMap.key(role);
 }
 
 
@@ -153,7 +148,7 @@ QPalette CDesignTokenStyleUtils::GetPaletteFromMultiEntry(const QJsonValue& styl
 						QString colorTextValue = jsonColorValue->toString();
 						QString roleName = jsonColorValue.key();
 
-						if (!CDesignTokenStyleUtils::CreateColorFromGrb(colorTextValue, color)){
+						if (!CreateColorFromGrb(colorTextValue, color)){
 							#if QT_VERSION >= 0x060600
 							color.setNamedColor(colorTextValue);
 							#else
@@ -203,19 +198,16 @@ bool SetVariableColor(QByteArray& data, const QPalette& palette)
 		}
 
 		if(indexOfBeginVariable > -1 && indexOfEndVariable > indexOfBeginVariable){
-
 			int lengthOfVariable = indexOfEndVariable - indexOfBeginVariable - 2;
 			QString colorName = data.mid(indexOfBeginVariable+2, lengthOfVariable);
 
 			QPalette::ColorGroup colorGroup;
 			QPalette::ColorRole colorRole;
-
 			if(CDesignTokenStyleUtils::GetColorRoleGroup(colorName, colorGroup, colorRole)){
 				QColor color = palette.color(colorGroup, colorRole);
 				QByteArray colorHex;
 				if(color.name() == "#000000"){
-					//						colorHex = m_designTokenFileParserCompPtr->GetRawColor(m_currentTheme, colorGroup, colorRole);
-					if(!colorHex.length()){
+					if(colorHex.isEmpty()){
 						colorHex = "#000000";
 					}
 				}
@@ -229,6 +221,7 @@ bool SetVariableColor(QByteArray& data, const QPalette& palette)
 	}
 	return false;
 }
+
 
 QByteArrayList CDesignTokenStyleUtils::GetVariables(const QByteArray& data, const QChar& variableBeginSymbol, const QChar& variableBeginSymbol2, const QChar& variableEndSymbol)
 {
@@ -268,37 +261,40 @@ QByteArrayList CDesignTokenStyleUtils::GetVariables(const QByteArray& data, cons
 	return retval;
 }
 
+
 bool CDesignTokenStyleUtils::SetVariables(QByteArray& data, const QChar& variableBeginSymbol, const QChar& variableBeginSymbol2, const QChar& variableEndSymbol, const QMap<QByteArray, QByteArray>& variables)
 {
 	bool retval = SetVariable_(data, variableBeginSymbol, variableBeginSymbol2, variableEndSymbol, variables);
-	while(SetVariable_(data, variableBeginSymbol, variableBeginSymbol2, variableEndSymbol, variables));
+	while(SetVariable_(data, variableBeginSymbol, variableBeginSymbol2, variableEndSymbol, variables)){}
 	return retval;
 }
+
 
 bool CDesignTokenStyleUtils::SetVariables(QByteArray& data, const QChar& variableBeginSymbol, const QChar& variableBeginSymbol2, const QChar& variableEndSymbol, const QVariantMap& variables)
 {
 	QMap<QByteArray, QByteArray> _variables;
 	for(auto variable = variables.cbegin(); variable != variables.cend(); ++variable){
-		auto k = variable.key();
+		const auto& k = variable.key();
 		auto ks = k.toUtf8();
 		_variables.insert(ks, variable->toByteArray());
 	}
 	bool retval = SetVariable_(data, variableBeginSymbol, variableBeginSymbol2, variableEndSymbol, _variables);
-	while(SetVariable_(data, variableBeginSymbol, variableBeginSymbol2, variableEndSymbol, _variables));
+	while(SetVariable_(data, variableBeginSymbol, variableBeginSymbol2, variableEndSymbol, _variables)){}
 	return retval;
 }
+
 
 bool CDesignTokenStyleUtils::SetVariablesFromDualVariable(QByteArray& data, const QChar& variableBeginSymbol, const QChar& variableBeginSymbol2, const QChar& variableEndSymbol, const QVariantMap& variables)
 {
 	bool retval = SetVariablesFromDualVariable_(data, variableBeginSymbol, variableBeginSymbol2, variableEndSymbol, variables);
-	while(SetVariablesFromDualVariable_(data, variableBeginSymbol, variableBeginSymbol2, variableEndSymbol, variables));
+	while(SetVariablesFromDualVariable_(data, variableBeginSymbol, variableBeginSymbol2, variableEndSymbol, variables)){}
 	return retval;
 }
 
 
 bool CDesignTokenStyleUtils::GetColorRoleGroup(const QString& name, QPalette::ColorGroup& group, QPalette::ColorRole& role)
 {
-	const QStringList& groupNames = CDesignTokenStyleUtils::s_colorGroupNamesMap.keys();
+	const QStringList& groupNames = s_colorGroupNamesMap.keys();
 
 	for(const QString& groupName: groupNames){
 
@@ -306,9 +302,7 @@ bool CDesignTokenStyleUtils::GetColorRoleGroup(const QString& name, QPalette::Co
 		QRegularExpressionMatchIterator globalMatch = groupRegEx.globalMatch(name);
 
 		if(globalMatch.hasNext()){
-
-			QRegularExpressionMatch groupRegExMatch;
-			groupRegExMatch = globalMatch.next();
+			QRegularExpressionMatch groupRegExMatch = globalMatch.next();
 
 			if(!s_colorGroupNamesMap.contains(groupName)){
 				return false;
@@ -351,12 +345,12 @@ QPalette CDesignTokenStyleUtils::GetPaletteFromEntry(const QJsonValue& paletteEn
 	for(QJsonObject::const_iterator value = paletteEntryObject.constBegin(); value != paletteEntryObject.constEnd(); ++value){
 		QPalette::ColorGroup colorGroup;
 		QPalette::ColorRole colorRole;
-		CDesignTokenStyleUtils::GetColorRoleGroup(value.key(), colorGroup, colorRole);
+		GetColorRoleGroup(value.key(), colorGroup, colorRole);
 
 		QColor color;
-		if (!CDesignTokenStyleUtils::CreateColorFromGrb(value->toString(), color)){
+		if (!CreateColorFromGrb(value->toString(), color)){
 			#if QT_VERSION >= 0x060600
-			color.fromString(value->toString());
+			color = QColor::fromString(value->toString());
 			#else
 			color.setNamedColor(value->toString());
 			#endif
@@ -380,12 +374,15 @@ imtstyle::IColorPaletteProvider::GradientColors CDesignTokenStyleUtils::GetGradi
 
 bool CDesignTokenStyleUtils::CreateColorFromGrb(const QString& rgbString, QColor& color)
 {
-	int indexOfBegin = rgbString.indexOf("rgb(");
+	qsizetype indexOfBegin = rgbString.indexOf("rgb(");
 	if(indexOfBegin >= 0){
-		bool rFill = false, gFill = false;
-		QString r,g,b;
+		bool rFill = false;
+		bool gFill = false;
+		QString r;
+		QString g;
+		QString b;
 
-		for(int i = indexOfBegin + 4; i < rgbString.length(); ++i){
+		for(qsizetype i = indexOfBegin + 4; i < rgbString.length(); ++i){
 			QChar symbol = rgbString[i];
 			if(symbol.isDigit()){
 				if(!rFill){
@@ -406,7 +403,9 @@ bool CDesignTokenStyleUtils::CreateColorFromGrb(const QString& rgbString, QColor
 					gFill = true;
 				}
 				else{
-					int iR = r.toInt(), iG = g.toInt(), iB = b.toInt();
+					int iR = r.toInt();
+					int iG = g.toInt();
+					int iB = b.toInt();
 					color = QColor::fromRgb(iR, iG, iB);
 					return color.isValid();
 				}
@@ -496,9 +495,7 @@ bool CDesignTokenStyleUtils::GetFontsFromEntry(const QJsonValue& fontsEntry, QMa
 	QJsonObject jsonObject = fontsEntry.toObject();
 
 	for(QJsonObject::const_iterator fontEntry = jsonObject.constBegin(); fontEntry != jsonObject.constEnd(); ++ fontEntry){
-
 		QJsonObject fontObject = fontEntry->toObject();
-
 		QFont font;
 
 		bool Bold = false;
@@ -615,17 +612,17 @@ bool CDesignTokenStyleUtils::GetFontsFromEntry(const QJsonValue& fontsEntry, QMa
 		}
 
 		//------------------------------------------String
-		if((GetStringValue(fontObject, "Family", family) || GetStringValue(fontObject, "Families", family)) && family.length()){
+		if((GetStringValue(fontObject, "Family", family) || GetStringValue(fontObject, "Families", family)) && !family.isEmpty()){
 			font.setFamily(family);
 		}
 
-		if(GetStringValue(fontObject, "StyleName", styleName) && styleName.length()){
+		if(GetStringValue(fontObject, "StyleName", styleName) && !styleName.isEmpty()){
 			font.setStyleName(styleName);
 		}
 
 		//------------------------------------------StringList
 #if QT_VERSION >= QT_VERSION_CHECK(5, 13, 0)
-		if((GetStringListValue(fontObject, "Family", families) || GetStringListValue(fontObject, "Families", families)) && families.size()){
+		if((GetStringListValue(fontObject, "Family", families) || GetStringListValue(fontObject, "Families", families)) && !families.isEmpty()){
 			font.setFamilies(families);
 		}
 #endif
@@ -683,16 +680,16 @@ bool CDesignTokenStyleUtils::CreateCssFont(QByteArray& output, const QFont& font
 	#endif
 
 	QByteArray fontFamilyString = "font-family: ";
-	if(font.family().length()){
+	if(!font.family().isEmpty()){
 		fontFamilyString.append('"').append(font.family().toUtf8()).append('"');
 	}
-	else if(fontFamilies.count()){
+	else if(!fontFamilies.isEmpty()){
 		QStringList tempFonts = fontFamilies;
 		for(QStringList::iterator fontIter = tempFonts.begin(); fontIter != tempFonts.end(); ++fontIter){
 			fontIter->append('"');
 			fontIter->prepend('"');
 		}
-	
+
 		fontFamilyString.append(tempFonts.join(", ").toUtf8());
 	}
 
@@ -738,7 +735,7 @@ bool CDesignTokenStyleUtils::CreateCssFont(QByteArray& output, const QFont& font
 		fontDecorations << "line-through";
 
 	}
-	if(fontDecorations.size()){
+	if(!fontDecorations.isEmpty()){
 		output += "text-decoration: ";
 		output += fontDecorations.join(", ").toUtf8();
 		output += ";\n";
@@ -761,7 +758,7 @@ bool CDesignTokenStyleUtils::CreateCssFont(QByteArray& output, const QFont& font
 }
 
 
-bool CDesignTokenStyleUtils::SetVariable_(QByteArray& data, const QChar& variableBeginSymbol, const QChar& variableBeginSymbol2, const QChar& variableEndSymbol, const QMap<QByteArray, QByteArray> variables)
+bool CDesignTokenStyleUtils::SetVariable_(QByteArray& data, const QChar& variableBeginSymbol, const QChar& variableBeginSymbol2, const QChar& variableEndSymbol, const QMap<QByteArray, QByteArray>& variables)
 {
 	QMap<QString, QVariant> _variables;
 	for (const QByteArray& variablesKey : variables.keys()){
@@ -798,7 +795,7 @@ bool CDesignTokenStyleUtils::SetVariable_(QByteArray& data, const QChar& variabl
 
 			QByteArray variableName = data.mid(indexOfBeginVariable + 2, lengthOfVariable).toUpper();
 			QVariant newColor;
-			bool hasNewColor = CDesignTokenStyleUtils::FindColorEnrty(variableName, _variables, newColor);
+			bool hasNewColor = FindColorEnrty(variableName, _variables, newColor);
 			if (hasNewColor && newColor.isValid()){
 				data.replace(indexOfBeginVariable, lengthOfVariable + 3, newColor.toByteArray());
 				return true;
@@ -847,8 +844,8 @@ bool CDesignTokenStyleUtils::SetVariablesFromDualVariable_(QByteArray& data, con
 
 				QVariant currentVariableColorroles;
 				QVariant currentVariableColor;
-				bool hasColorGroup = CDesignTokenStyleUtils::FindColorEnrty(varGroup, variables, currentVariableColorroles, QString::fromUtf8("Colors"));
-				bool hasColorRole = CDesignTokenStyleUtils::FindColorEnrty(varRole, currentVariableColorroles.toMap(),currentVariableColor);
+				bool hasColorGroup = FindColorEnrty(varGroup, variables, currentVariableColorroles, QString::fromUtf8("Colors"));
+				bool hasColorRole = FindColorEnrty(varRole, currentVariableColorroles.toMap(),currentVariableColor);
 				if (hasColorGroup && hasColorRole && currentVariableColor.isValid()){
 					data.replace(indexOfBeginVariable, lengthOfVariable + 3, currentVariableColor.toString().toUtf8());
 					return true;
@@ -867,7 +864,7 @@ bool CDesignTokenStyleUtils::FindColorEnrty(const QByteArray& name, const QVaria
 
 	for (const QString& key: std::as_const(keys)){
 		QString clearKey = key;
-		if(appendix.length() && key.endsWith(appendix, Qt::CaseInsensitive)){
+		if(!appendix.isEmpty() && key.endsWith(appendix, Qt::CaseInsensitive)){
 			clearKey = clearKey.chopped(appendix.length());
 		}
 		clearKey = clearKey.toUpper();

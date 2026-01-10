@@ -2,11 +2,7 @@
 
 
 // ACF includes
-#include <iprm/IParamsSet.h>
-#include <iprm/IEnableableParam.h>
-#include <iprm/IIdParam.h>
-#include <ibase/IApplication.h>
-#include <ifile/IFileNameParam.h>
+#include <istd/CSystem.h>
 
 // ImtCore includes
 #include <imtbase/ICollectionInfo.h>
@@ -22,10 +18,8 @@ namespace imtdesign
 
 QByteArray CDesignTokenIconProcessorComp::GetHelpString() const
 {
-	QByteArray retVal;
 	QString helpText = "Invalid arguments \n \t\tAnd other help text\n\n";
-
-	retVal = helpText.toLocal8Bit().constData();
+	QByteArray retVal = helpText.toLocal8Bit().constData();
 
 	return retVal;
 }
@@ -50,7 +44,7 @@ int CDesignTokenIconProcessorComp::Exec()
 
 	QByteArrayList designTokenFileMultiPath = m_argumentParserCompPtr->GetDesignTokenFileMultiPath();
 
-	for (QByteArray designTokenFilePath: designTokenFileMultiPath){
+	for (const QByteArray& designTokenFilePath: designTokenFileMultiPath){
 		m_designTokenFileParserCompPtr->SetFile(designTokenFilePath);
 		m_designTokenFileParserCompPtr->ParseFile();
 
@@ -58,8 +52,9 @@ int CDesignTokenIconProcessorComp::Exec()
 		m_outputDirName = m_argumentParserCompPtr->GetOutputDirectoryPath();
 		m_inputDirName = imageInputDirectoryPath;
 		m_projectName = m_argumentParserCompPtr->GetProjectName();
-		if (!m_inputDirName.length()){
+		if (m_inputDirName.isEmpty()){
 			qInfo() << "Icons directory was not set. Skipping...";
+
 			return 0;
 		}
 
@@ -163,10 +158,8 @@ QByteArray CDesignTokenIconProcessorComp::GetFileNameForState(const QString& fil
 }
 
 
-bool CDesignTokenIconProcessorComp::SetColor(const QString& fileName, const QString& outputFileName, const QByteArray& replacedColor, const QByteArray& reoplacebleColor) const
+bool CDesignTokenIconProcessorComp::SetColor(const QString& fileName, const QString& outputFileName, const QByteArray& replacedColor, const QByteArray& replacebleColor) const
 {
-	QByteArray fileData;
-
 	QString readFilePath = QFile::exists(outputFileName) ? outputFileName : fileName;
 
 	QFile originalImageFile(readFilePath);
@@ -177,7 +170,7 @@ bool CDesignTokenIconProcessorComp::SetColor(const QString& fileName, const QStr
 		return false;
 	}
 
-	fileData = originalImageFile.readAll();
+	QByteArray fileData = originalImageFile.readAll();
 	originalImageFile.close();
 	if (fileData.length() < 1){
 		qWarning() << "Skpiipng empty file" << readFilePath;
@@ -185,7 +178,7 @@ bool CDesignTokenIconProcessorComp::SetColor(const QString& fileName, const QStr
 		return true;
 	}
 
-	QRegularExpression groupRegEx(reoplacebleColor, QRegularExpression::PatternOption::CaseInsensitiveOption);
+	QRegularExpression groupRegEx(replacebleColor, QRegularExpression::PatternOption::CaseInsensitiveOption);
 	QRegularExpressionMatchIterator globalMatch = groupRegEx.globalMatch(fileData);
 
 	while (globalMatch.hasNext()){

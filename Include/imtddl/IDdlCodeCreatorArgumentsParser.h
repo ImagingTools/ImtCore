@@ -3,7 +3,6 @@
 
 // Qt includes
 #include <QtCore/QByteArray>
-#include <QtCore/QByteArrayList>
 
 
 namespace imtddl

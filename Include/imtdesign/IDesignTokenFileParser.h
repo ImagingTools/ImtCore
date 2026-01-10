@@ -5,8 +5,6 @@
 #include <QtCore/QtCore>
 #include <QtGui/QPalette>
 
-// ACF includes
-
 // ImtCore includes
 #include <imtstyle/IColorPaletteProvider.h>
 #include <imtstyle/IFontProvider.h>

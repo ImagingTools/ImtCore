@@ -6,7 +6,6 @@
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
-#include <iprm/IParamsSet.h>
 
 // ImtCore includes
 #include <imtddl/IDdlCodeCreatorArgumentsParser.h>

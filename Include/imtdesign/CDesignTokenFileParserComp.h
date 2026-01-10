@@ -2,14 +2,11 @@
 
 
 // Qt includes
-#include <QtCore/QtCore>
-#include <QtGui/QPalette>
+#include <QtGui/QFont>
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
 #include <ifile/IFileNameParam.h>
-#include <iprm/IParamsSet.h>
-#include <istd/CSystem.h>
 
 // ImtCore includes
 #include <imtbase/CCollectionInfo.h>

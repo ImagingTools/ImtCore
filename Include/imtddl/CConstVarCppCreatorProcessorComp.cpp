@@ -1,13 +1,9 @@
 #include <imtddl/CConstVarCppCreatorProcessorComp.h>
 
 
-// STL includes
-#include <iostream>
-
 // ACF includes
 #include <iprm/ITextParam.h>
 #include <iprm/TParamsPtr.h>
-#include <istd/CSystem.h>
 
 // Qt includes
 #include <QtCore/QFile>
@@ -75,7 +71,7 @@ QString CConstVarCppCreatorProcessorComp::GetModuleName(const iprm::IParamsSet* 
 
 
 bool CConstVarCppCreatorProcessorComp::CreateBody(
-			const QString /*moduleName*/,
+			const QString& /*moduleName*/,
 			const QJsonDocument& templateDocument,
 			const iprm::IParamsSet* /*paramsPtr*/)
 {
@@ -96,7 +92,7 @@ bool CConstVarCppCreatorProcessorComp::CreateBody(
 		QJsonObject properties = rootObject.value("properties").toObject();
 		QStringList propertyKeys = properties.keys();
 
-		for (QString key: propertyKeys){
+		for (QString& key: propertyKeys){
 			if (key.isEmpty()){
 				Q_ASSERT(0);
 

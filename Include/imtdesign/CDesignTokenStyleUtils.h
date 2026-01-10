@@ -3,7 +3,6 @@
 
 // Qt includes
 #include <QtCore/QtCore>
-#include <QtGui/QPalette>
 #include <QtGui/QFont>
 
 
@@ -94,7 +93,7 @@ private:
 				const QChar& variableBeginSymbol,
 				const QChar& variableBeginSymbol2,
 				const QChar& variableEndSymbol,
-				const QMap<QByteArray, QByteArray> variables);
+				const QMap<QByteArray, QByteArray>& variables);
 	static bool SetVariablesFromDualVariable_(
 				QByteArray& data,
 				const QChar& variableBeginSymbol,

@@ -1,11 +1,8 @@
 #include <imtdesign/CDesignTokenStyleSheetProcessorComp.h>
 
+
 // ACF includes
-#include <iprm/IParamsSet.h>
-#include <iprm/IEnableableParam.h>
-#include <iprm/IIdParam.h>
-#include <ibase/IApplication.h>
-#include <ifile/IFileNameParam.h>
+#include <istd/CSystem.h>
 
 // ImtCore includes
 #include <imtbase/ICollectionInfo.h>
@@ -21,9 +18,9 @@ namespace imtdesign
 
 QByteArray CDesignTokenStyleSheetProcessorComp::GetHelpString() const
 {
-	QByteArray retval;
 	QString helpText = "Invalid arguments \n \t\tAnd other help text\n\n";
-	retval = helpText.toLocal8Bit().constData();
+	QByteArray retval = helpText.toLocal8Bit().constData();
+
 	return retval;
 }
 
@@ -41,7 +38,7 @@ int CDesignTokenStyleSheetProcessorComp::Exec()
 
 	QByteArrayList designTokenFileMultiPath = m_argumentParserCompPtr->GetDesignTokenFileMultiPath();
 
-	for (QByteArray designTokenFilePath: designTokenFileMultiPath){
+	for (const QByteArray& designTokenFilePath: designTokenFileMultiPath){
 		m_designTokenFileParserCompPtr->SetFile(designTokenFilePath);
 		m_designTokenFileParserCompPtr->ParseFile();
 	}
@@ -49,7 +46,7 @@ int CDesignTokenStyleSheetProcessorComp::Exec()
 	QVector<QByteArray> styles = m_designTokenFileParserCompPtr->GetDesignSchemaList().GetElementIds();
 	m_outputDirName = m_argumentParserCompPtr->GetOutputDirectoryPath();
 	m_inputDirName = m_argumentParserCompPtr->GetStyleSheetsInputDirectoryPath();
-	if(!m_inputDirName.length()){
+	if(m_inputDirName.isEmpty()){
 		qInfo() << "Folder containing styles was not set, processing skipping...";
 		return 0;
 	}
@@ -213,7 +210,7 @@ bool CDesignTokenStyleSheetProcessorComp::SetVariableColor(QByteArray& data, con
 				QByteArray colorHex;
 				if(color.name() == "#000000"){
 					colorHex = m_designTokenFileParserCompPtr->GetRawColor(m_currentTheme, colorGroup, colorRole);
-					if(!colorHex.length()){
+					if(colorHex.isEmpty()){
 						colorHex = "#000000";
 					}
 				}

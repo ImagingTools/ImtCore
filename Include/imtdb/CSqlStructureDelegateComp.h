@@ -3,8 +3,6 @@
 
 // Qt includes
 #include <QtCore/QJsonDocument>
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
 
 // ImtCore includes
 #include <imtdb/CSqlStructureDelegateCompBase.h>

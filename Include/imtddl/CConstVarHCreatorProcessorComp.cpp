@@ -1,9 +1,6 @@
 #include <imtddl/CConstVarHCreatorProcessorComp.h>
 
 
-// STL includes
-#include <iostream>
-
 // ACF includes
 #include <iprm/ITextParam.h>
 #include <iprm/TParamsPtr.h>
@@ -75,7 +72,7 @@ QString CConstVarHCreatorProcessorComp::GetModuleName(const iprm::IParamsSet* pa
 
 
 bool CConstVarHCreatorProcessorComp::CreateBody(
-			const QString /*moduleName*/,
+			const QString& /*moduleName*/,
 			const QJsonDocument& templateDocument,
 			const iprm::IParamsSet* /*paramsPtr*/)
 {

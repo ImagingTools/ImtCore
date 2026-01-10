@@ -53,7 +53,7 @@ public:
 
 	/**
 		Get selection query for the listing objects in the collection.
-		\param objectId		If non empty, the given object will be selected.
+		\param objectId		If not empty, the given object will be selected.
 		\param offset		if positive, first N rows given by \c offset will be skipped from the result.
 		\param count		if positive, only N rows given by \c count will be returned in the result object.
 		\param paramsPtr	additional query parameters (e.g. filtering, searching, sorting and so on).

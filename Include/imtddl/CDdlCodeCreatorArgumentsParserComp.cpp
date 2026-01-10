@@ -11,7 +11,7 @@ bool CDdlCodeCreatorArgumentsParserComp::CheckArgument(AvailableArguments argume
 
 	QByteArrayList args = m_commands.values(argument);
 
-	for(const QByteArray &arg : ::std::as_const(args)){
+	for(const QByteArray& arg: std::as_const(args)){
 		if(m_arguments.contains(arg)){
 			retval = true;
 			break;
@@ -29,14 +29,14 @@ QByteArray CDdlCodeCreatorArgumentsParserComp::GetArgumentKey(AvailableArguments
 	QByteArrayList args = m_commands.values(argument);
 	QByteArray argKey;
 
-	for(const QByteArray &arg : ::std::as_const(args)){
+	for(const QByteArray& arg: std::as_const(args)){
 		if(m_arguments.contains(arg)){
 			argKey = arg;
 			break;
 		}
 	}
 
-	int indexOfArg = m_arguments.indexOf(argKey);
+	qsizetype indexOfArg = m_arguments.indexOf(argKey);
 
 	if(indexOfArg > -1 && m_arguments.size() > indexOfArg){
 		retval = m_arguments[indexOfArg];
@@ -50,7 +50,7 @@ QByteArray CDdlCodeCreatorArgumentsParserComp::GetArgumentValue(AvailableArgumen
 {
 	QByteArray retval;
 	QByteArray AC_key = this->GetArgumentKey(argument);
-	int indexOfArg = m_arguments.indexOf(AC_key);
+	qsizetype indexOfArg = m_arguments.indexOf(AC_key);
 
 	if(indexOfArg > -1 && m_arguments.size() > ++indexOfArg){
 		if(!m_arguments[indexOfArg].startsWith('-')){

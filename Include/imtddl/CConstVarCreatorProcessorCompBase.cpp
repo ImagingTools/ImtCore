@@ -4,7 +4,6 @@
 // Qt includes
 #include <QtCore/QFile>
 #include <QtCore/QDir>
-#include <QtCore/QTextStream>
 
 // ACF includes
 #include <iprm/ITextParam.h>
@@ -22,7 +21,7 @@ bool CConstVarCreatorProcessorCompBase::OpenFiles(const iprm::IParamsSet* /*para
 }
 
 
-bool CConstVarCreatorProcessorCompBase::OpenFile(const QString filePath, QFile& file, QFile::OpenMode openMode)
+bool CConstVarCreatorProcessorCompBase::OpenFile(const QString& filePath, QFile& file, QFile::OpenMode openMode)
 {
 	QFileInfo fileInfo(filePath);
 
@@ -99,7 +98,7 @@ QString CConstVarCreatorProcessorCompBase::GetModuleName(const iprm::IParamsSet*
 }
 
 
-bool CConstVarCreatorProcessorCompBase::CreateBody(const QString /*moduleName*/, const QJsonDocument& /*templateDocument*/, const iprm::IParamsSet* /*paramsPtr*/)
+bool CConstVarCreatorProcessorCompBase::CreateBody(const QString& /* moduleName */, const QJsonDocument& /* templateDocument */, const iprm::IParamsSet* /* paramsPtr */)
 {
 	return false;
 }
@@ -137,7 +136,7 @@ iproc::IProcessor::TaskState CConstVarCreatorProcessorCompBase::DoProcessing(
 	templateDir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
 	QFileInfoList list = templateDir.entryInfoList();
 
-	for (QFileInfo fileInfo: list){
+	for (const QFileInfo& fileInfo: list){
 		QFile templateFile(fileInfo.filePath());
 
 		if (!templateFile.open(QFile::ReadOnly)){

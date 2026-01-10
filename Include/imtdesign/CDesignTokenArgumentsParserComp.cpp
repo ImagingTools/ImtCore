@@ -36,7 +36,7 @@ QByteArray CDesignTokenArgumentsParserComp::GetArgumentKey(AvailableArguments ar
 		}
 	}
 
-	int indexOfArg = m_arguments.indexOf(argKey);
+	qsizetype indexOfArg = m_arguments.indexOf(argKey);
 
 	if(indexOfArg > -1 && m_arguments.size() > indexOfArg){
 		retval = m_arguments[indexOfArg];
@@ -50,7 +50,7 @@ QByteArray CDesignTokenArgumentsParserComp::GetArgumentValue(AvailableArguments 
 {
 	QByteArray retval;
 	QByteArray AC_key = this->GetArgumentKey(argument);
-	int indexOfArg = m_arguments.indexOf(AC_key);
+	qsizetype indexOfArg = m_arguments.indexOf(AC_key);
 
 	if(indexOfArg > -1 && m_arguments.size() > ++indexOfArg){
 		if(!m_arguments[indexOfArg].startsWith('-')){
@@ -75,10 +75,7 @@ QByteArrayList CDesignTokenArgumentsParserComp::GetArgumentValueMulti(AvailableA
 		}
 	}
 
-	int indexOfArg = m_arguments.indexOf(argValue);
-
-	// qDebug() << m_arguments;
-
+	qsizetype indexOfArg = m_arguments.indexOf(argValue);
 	while(indexOfArg > -1 && m_arguments.size() > indexOfArg + 1){
 		++indexOfArg;
 		if(m_arguments[indexOfArg].startsWith('-') || m_arguments[indexOfArg].startsWith("/?")){

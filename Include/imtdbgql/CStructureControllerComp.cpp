@@ -69,12 +69,7 @@ imtbase::CTreeItemModel* CStructureControllerComp::GetElements(
 		itemsModel = new imtbase::CTreeItemModel();
 		notificationModel = new imtbase::CTreeItemModel();
 
-		const imtgql::CGqlParamObject* viewParamsGql = nullptr;
 		const imtgql::CGqlParamObject* inputObject = inputParams.GetParamArgumentObjectPtr("input");
-		if (inputObject != nullptr){
-			viewParamsGql = inputObject->GetParamArgumentObjectPtr("viewParams");
-		}
-
 		iprm::CParamsSet filterParams;
 
 		QByteArray parentNodeId = inputParams.GetParamArgumentValue("ParentNodeId").toByteArray();

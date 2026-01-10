@@ -4,9 +4,6 @@
 // Qt includes
 #include <QtXml/QtXml>
 
-// ImtCore includes
-#include <imtbase/ICollectionInfo.h>
-
 
 namespace imtdesign
 {
@@ -67,7 +64,7 @@ bool CDesignTokenWebQrcGeneratorComp::CreateQrc(const QString& prefix, const QSt
 	QFile outputFile(outputFileName);
 	outputFile.open(QFile::WriteOnly);
 	QXmlStreamWriter xmlWriter(&outputFile);
-	xmlWriter.setAutoFormatting(1);
+	xmlWriter.setAutoFormatting(true);
 
 	xmlWriter.writeStartDocument();
 	xmlWriter.writeStartElement("RCC");
@@ -97,7 +94,7 @@ bool CDesignTokenWebQrcGeneratorComp::CreateQrcRecursivly(const QString& inputDi
 	QFile outputFile(outputFileName);
 	outputFile.open(QFile::WriteOnly);
 	QXmlStreamWriter xmlWriter(&outputFile);
-	xmlWriter.setAutoFormatting(1);
+	xmlWriter.setAutoFormatting(true);
 
 	xmlWriter.writeStartDocument();
 	xmlWriter.writeStartElement("RCC");
@@ -127,7 +124,7 @@ bool CDesignTokenWebQrcGeneratorComp::CreateQrcForDirs(const QStringList& inputD
 		qCritical() << "Cannot open resource file" << outputFileName;
 	}
 	QXmlStreamWriter xmlWriter(&outputFile);
-	xmlWriter.setAutoFormatting(1);
+	xmlWriter.setAutoFormatting(true);
 
 	xmlWriter.writeStartDocument();
 

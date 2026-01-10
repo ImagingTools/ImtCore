@@ -8,7 +8,7 @@ namespace imtdbgql
 void CSdlMetaInfoTools::GetMetaInfo(const QVariant& metaInfoData, istd::TSharedNullable<bool>& output)
 {
 	bool metaInfoValue = metaInfoData.toBool();
-	output = std::move(metaInfoValue);
+	output = metaInfoValue;
 }
 
 
@@ -17,7 +17,7 @@ void CSdlMetaInfoTools::GetMetaInfo(const QVariant& metaInfoData, istd::TSharedN
 	bool ok = false;
 	int metaInfoValue = metaInfoData.toInt(&ok);
 	if (ok){
-		output = std::move(metaInfoValue);
+		output = metaInfoValue;
 	}
 }
 
@@ -27,7 +27,7 @@ void CSdlMetaInfoTools::GetMetaInfo(const QVariant& metaInfoData, istd::TSharedN
 	bool ok = false;
 	long metaInfoValue = metaInfoData.toLongLong(&ok);
 	if (ok){
-		output = std::move(metaInfoValue);
+		output = metaInfoValue;
 	}
 }
 
@@ -37,7 +37,7 @@ void CSdlMetaInfoTools::GetMetaInfo(const QVariant& metaInfoData, istd::TSharedN
 	bool ok = false;
 	long long metaInfoValue = metaInfoData.toLongLong(&ok);
 	if (ok){
-		output = std::move(metaInfoValue);
+		output = metaInfoValue;
 	}
 }
 
@@ -47,7 +47,7 @@ void CSdlMetaInfoTools::GetMetaInfo(const QVariant& metaInfoData, istd::TSharedN
 	bool ok = false;
 	float metaInfoValue = metaInfoData.toFloat(&ok);
 	if (ok){
-		output = std::move(metaInfoValue);
+		output = metaInfoValue;
 	}
 }
 
@@ -57,7 +57,7 @@ void CSdlMetaInfoTools::GetMetaInfo(const QVariant& metaInfoData, istd::TSharedN
 	bool ok = false;
 	double metaInfoValue = metaInfoData.toDouble(&ok);
 	if (ok){
-		output = std::move(metaInfoValue);
+		output = metaInfoValue;
 	}
 }
 

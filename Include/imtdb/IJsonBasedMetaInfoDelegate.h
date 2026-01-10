@@ -17,7 +17,7 @@ class IJsonBasedMetaInfoDelegate : virtual public istd::IPolymorphic
 {
 public:
 	/**
-		Create JSON-representation of the given meta informations.
+		Create JSON-representation of the given meta information.
 	*/
 	virtual bool ToJsonRepresentation(const idoc::IDocumentMetaInfo& metaInfo, QByteArray& json) const = 0;
 

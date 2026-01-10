@@ -1,14 +1,6 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QtCore>
-
-// ACF includes
-#include <ilog/TLoggerCompWrap.h>
-#include <iprm/IParamsSet.h>
-
-
 namespace imtdesign
 {
 

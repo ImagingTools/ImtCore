@@ -7,13 +7,11 @@
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
 #include <iprm/IParamsSet.h>
-#include <istd/CSystem.h>
 
 // ImtCore includes
 #include <imtdesign/IDesignTokenProcessor.h>
 #include <imtdesign/IDesignTokenArgumentsParser.h>
 #include <imtdesign/IDesignTokenFileParser.h>
-#include <imtdesign/IDesignTokenQrcUpdater.h>
 
 
 namespace imtdesign
@@ -47,7 +45,7 @@ private:
 
 	I_REF(IDesignTokenArgumentsParser, m_argumentParserCompPtr);
 	I_REF(IDesignTokenFileParser, m_designTokenFileParserCompPtr);
-	
+
 	QByteArrayList m_templateIconColorList;
 	QMap<QByteArray/*template color*/,QByteArray> m_normalColor;
 	QMap<QByteArray/*template color*/,QByteArray> m_offNormalColor;
@@ -71,7 +69,7 @@ private:
 	/**
 		sets new color in single image
 	*/
-	bool SetColor(const QString& fileName, const QString& outputFileName, const QByteArray& replacedColor, const QByteArray& reolacebleColor) const;
+	bool SetColor(const QString& fileName, const QString& outputFileName, const QByteArray& replacedColor, const QByteArray& replacebleColor) const;
 
 	/**
 		sets all available colors for single images

@@ -29,13 +29,13 @@ int CStandardSqlMetaInfoTableDelegateComp::GetMetaInfoType(const QByteArray& col
 	temp.remove("\"");
 
 	QByteArray metaInfoId = temp.toLocal8Bit();
-	
+
 	for (const QPair<int, QByteArray>& item : m_metaInfoIds){
 		if (item.second == metaInfoId){
 			return item.first;
 		}
 	}
-	
+
 	return -1;
 }
 
@@ -69,7 +69,7 @@ QVariant CStandardSqlMetaInfoTableDelegateComp::FromTableRepresentation(const QV
 {
 	if (columnId == "Preview"){
 		QByteArray imageBuffer = QByteArray::fromBase64(data.toByteArray());
-		
+
 		QDataStream dataStream(imageBuffer);
 		QImage image;
 

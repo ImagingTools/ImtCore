@@ -13,7 +13,6 @@
 #include <imtdesign/IDesignTokenArgumentsParser.h>
 #include <imtdesign/IDesignTokenFileParser.h>
 #include <imtdesign/IDesignTokenQrcUpdater.h>
-#include <imtdesign/CDesignTokenArgumentsParserComp.h>
 
 
 

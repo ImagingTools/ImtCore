@@ -51,7 +51,7 @@ bool CDesignTokenQrcUpdaterComp::CreateQrc(const QString& prefix, const QString&
 	QFile outputFile(outputFileName);
 	outputFile.open(QFile::WriteOnly);
 	QXmlStreamWriter xmlWriter(&outputFile);
-	xmlWriter.setAutoFormatting(1);
+	xmlWriter.setAutoFormatting(true);
 
 	xmlWriter.writeStartDocument();
 	xmlWriter.writeStartElement("RCC");
@@ -81,7 +81,7 @@ bool CDesignTokenQrcUpdaterComp::CreateQrcRecursivly(const QString& inputDirName
 	QFile outputFile(outputFileName);
 	outputFile.open(QFile::WriteOnly);
 	QXmlStreamWriter xmlWriter(&outputFile);
-	xmlWriter.setAutoFormatting(1);
+	xmlWriter.setAutoFormatting(true);
 
 	xmlWriter.writeStartDocument();
 	xmlWriter.writeStartElement("RCC");
@@ -111,7 +111,7 @@ bool CDesignTokenQrcUpdaterComp::CreateQrcForDirs(const QStringList& inputDirNam
 		qCritical() << "Cannot open resource file" << outputFileName;
 	}
 	QXmlStreamWriter xmlWriter(&outputFile);
-	xmlWriter.setAutoFormatting(1);
+	xmlWriter.setAutoFormatting(true);
 
 	xmlWriter.writeStartDocument();
 

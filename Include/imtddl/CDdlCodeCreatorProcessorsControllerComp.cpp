@@ -16,27 +16,14 @@ void CDdlCodeCreatorProcessorsControllerComp::OnComponentCreated()
 	BaseClass::OnComponentCreated();
 
 	iprm::CParamsSet ddlParams;
-//	iprm::CTextParam templateFilePathParam;
 	iprm::CTextParam templateDirPathParam;
 	iprm::CTextParam cppDirPathParam;
 	iprm::CTextParam qmlDirPathParam;
-//	iprm::CTextParam outputCppFilePathParam;
-//	iprm::CTextParam outputHFilePathParam;
-//	iprm::CTextParam outputQmlFilePathParam;
-//	iprm::CTextParam outputQmldirFilePathParam;
 	iprm::CTextParam moduleCppNameParam;
 	iprm::CTextParam moduleQmlNameParam;
 
 	QString beginInfoString =  "DDL code creator started";
 	if(m_argumentParserCompPtr.IsValid()){
-
-//		const QString templateFilePath = m_argumentParserCompPtr->GetTemplateFilePath();
-//		if(!templateFilePath.isEmpty()){
-//			beginInfoString += "\n\t| Template file: " + templateFilePath;
-//			templateFilePathParam.SetText(templateFilePath);
-//			ddlParams.SetEditableParameter("TemplateFilePath", &templateFilePathParam);
-//		}
-
 		const QString templateDirPath = m_argumentParserCompPtr->GetTemplateDirPath();
 		if(!templateDirPath.isEmpty()){
 			beginInfoString += "\n\t| Template directory: " + templateDirPath;
@@ -74,22 +61,11 @@ void CDdlCodeCreatorProcessorsControllerComp::OnComponentCreated()
 
 	}
 	SendInfoMessage(0, ::qPrintable(beginInfoString));
-
-	// QString lockFileName = m_argumentParserCompPtr->GetOutputDirectoryPath() + "/DesignToken.lock";
-	// QLockFile lockFile(lockFileName);
-	// if(!lockFile.lock()){
-	// 	SendWarningMessage(0, QString("Unable to lock '%1' ").arg(lockFileName));
-	// }
-
 	for (int i = 0; i < m_ddlProcessors.GetCount(); ++i){
 		if(m_ddlProcessors[i]->DoProcessing(&ddlParams, nullptr, nullptr) != iproc::IProcessor::TS_OK){
-			// if(!m_argumentParserCompPtr->IsErrorsIgnoreRequested()){
-			// 	lockFile.unlock();
-				::exit(-1);
-			// }
+			::exit(-1);
 		}
 	}
-	// lockFile.unlock();
 
 	QCoreApplication::exit(0);
 }

@@ -1,9 +1,6 @@
 #include <imtddl/CConstVarQmlCreatorProcessorComp.h>
 
 
-// STL includes
-#include <iostream>
-
 // Qt includes
 #include <QtCore/QFile>
 #include <QtCore/QTextStream>
@@ -40,7 +37,7 @@ QString CConstVarQmlCreatorProcessorComp::GetModuleName(const iprm::IParamsSet* 
 
 
 bool CConstVarQmlCreatorProcessorComp::CreateBody(
-			const QString /*moduleName*/,
+			const QString& /*moduleName*/,
 			const QJsonDocument& templateDocument,
 			const iprm::IParamsSet* paramsPtr)
 {
@@ -72,7 +69,7 @@ bool CConstVarQmlCreatorProcessorComp::CreateBody(
 	}
 
 	if (rootObject.value("type") == "object"){
-		for (QString key: propertyKeys){
+		for (const QString& key: propertyKeys){
 			QJsonObject property = properties.value(key).toObject();
 			QString normalKey = key;
 			if (normalKey.size() > 0){

@@ -17,9 +17,9 @@ public:
 
 protected:
 	// reimplemented (CConstVarCreatorProcessorCompBase)
-	virtual bool OpenFiles(const iprm::IParamsSet* paramsPtr);
+	virtual bool OpenFiles(const iprm::IParamsSet* paramsPtr) override;
 	virtual QString GetModuleName(const iprm::IParamsSet* paramsPtr) override;
-	virtual bool CreateBody(const QString moduleName, const QJsonDocument& templateDocument, const iprm::IParamsSet* paramsPtr) override;
+	virtual bool CreateBody(const QString& moduleName, const QJsonDocument& templateDocument, const iprm::IParamsSet* paramsPtr) override;
 
 private:
 	QFile m_outputFile;

@@ -3,7 +3,6 @@
 
 // Qt includes
 #include <QtCore/QByteArray>
-#include <QtCore/QString>
 
 
 // ACF includes
@@ -15,7 +14,7 @@ namespace imtdbgql
 {
 
 /**
-	This is a comfort class for transerring metadata to a \c istd::TSharedNullable container from \c idoc::IDocumentMetaInfo.
+	This is a comfort class for transferring metadata to a \c istd::TSharedNullable container from \c idoc::IDocumentMetaInfo.
 */
 class CSdlMetaInfoTools
 {

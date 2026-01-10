@@ -75,7 +75,7 @@ QString CConstVarQrcCreatorProcessorComp::GetModuleName(const iprm::IParamsSet* 
 }
 
 
-bool CConstVarQrcCreatorProcessorComp::CreateBody(const QString moduleName, const QJsonDocument& templateDocument, const iprm::IParamsSet* paramsPtr)
+bool CConstVarQrcCreatorProcessorComp::CreateBody(const QString& moduleName, const QJsonDocument& templateDocument, const iprm::IParamsSet* paramsPtr)
 {
 	QJsonObject rootObject = templateDocument.object();
 

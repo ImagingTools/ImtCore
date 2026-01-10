@@ -1,15 +1,13 @@
 #pragma once
 
-// ACF includes
-#include <ilog/TLoggerCompWrap.h>
-#include <iproc/TSyncProcessorCompBase.h>
-
-// ImtCore includes
-#include <imtddl/IDdlCodeCreatorArgumentsParser.h>
 
 // Qt includes
 #include <QtCore/QJsonDocument>
 #include <QtCore/QFile>
+
+// ACF includes
+#include <ilog/TLoggerCompWrap.h>
+#include <iproc/TSyncProcessorCompBase.h>
 
 
 namespace imtddl
@@ -22,14 +20,14 @@ public:
 
 protected:
 	virtual bool OpenFiles(const iprm::IParamsSet* paramsPtr);
-	virtual bool OpenFile(const QString filePath, QFile& file, QFile::OpenMode openMode = QFile::ReadOnly);
+	virtual bool OpenFile(const QString& filePath, QFile& file, QFile::OpenMode openMode = QFile::ReadOnly);
 	virtual bool CloseFiles(const iprm::IParamsSet* paramsPtr);
 	virtual QString GetTemplateDirPath(const iprm::IParamsSet* paramsPtr) const;
 	virtual QString GetCppDirPath(const iprm::IParamsSet* paramsPtr) const;
 	virtual QString GetQmlDirPath(const iprm::IParamsSet* paramsPtr) const;
 //	virtual QByteArray GetOutputFileKey();
 	virtual QString GetModuleName(const iprm::IParamsSet* paramsPtr);
-	virtual bool CreateBody(const QString moduleName, const QJsonDocument& templateDocument, const iprm::IParamsSet* paramsPtr);
+	virtual bool CreateBody(const QString& moduleName, const QJsonDocument& templateDocument, const iprm::IParamsSet* paramsPtr);
 
 	// reimplemented (iproc::IProcessor)
 	virtual TaskState DoProcessing(

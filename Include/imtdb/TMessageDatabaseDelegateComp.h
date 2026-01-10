@@ -1,18 +1,15 @@
 #pragma once
 
 
+// Qt includes
+#include <QtSql/QSqlRecord>
+
 // ACF includes
 #include <istd/CCrcCalculator.h>
 #include <istd/TDelPtr.h>
 #include <ilog/CMessage.h>
 #include <iprm/IParamsSet.h>
 #include <iprm/ITextParam.h>
-
-// ImtCore includes
-#include <imtbase/IObjectCollection.h>
-
-// Qt includes
-#include <QtSql/QSqlRecord>
 
 
 namespace imtdb
@@ -85,7 +82,7 @@ bool TMessageDatabaseDelegateComp<BaseDelegate>::CreateObjectFilterQuery(const i
 			QByteArrayList idsList(paramIds.cbegin(), paramIds.cend());
 #endif
 			for (int i = 0; i < idsList.size(); i++){
-				QByteArray key = idsList[i];
+				const QByteArray& key = idsList[i];
 
 				const iprm::ITextParam* textParamPtr = dynamic_cast<const iprm::ITextParam*>(categoryParamsSetPtr->GetParameter(key));
 				if (textParamPtr == nullptr){
@@ -138,7 +135,7 @@ bool TMessageDatabaseDelegateComp<BaseDelegate>::CreateObjectFilterQuery(const i
 			QByteArrayList idsList(paramIds.cbegin(), paramIds.cend());
 #endif
 			for (int i = 0; i < idsList.size(); i++){
-				QByteArray key = idsList[i];
+				const QByteArray& key = idsList[i];
 
 				const iprm::ITextParam* textParamPtr = dynamic_cast<const iprm::ITextParam*>(sourceParamsSetPtr->GetParameter(key));
 				if (textParamPtr == nullptr){

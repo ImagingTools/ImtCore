@@ -56,8 +56,8 @@ void CDatabaseLoginSettingsEditorComp::UpdateGui(const istd::IChangeable::Change
 	UserEdit->setText(objectPtr->GetUserName());
 	PasswordEdit->setText(objectPtr->GetPassword());
 
-	bool useSsl = objectPtr->GetConnectionFlags() & imtdb::IDatabaseLoginSettings::COF_SSL;
-	
+	bool useSsl = (objectPtr->GetConnectionFlags() & imtdb::IDatabaseLoginSettings::COF_SSL) != 0;
+
 	UseSslCheck->setChecked(useSsl);
 }
 

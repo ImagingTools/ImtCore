@@ -1,12 +1,10 @@
 #include <imtdesign/CDesignTokenFileParserComp.h>
 
 
-// Qt includes
-#include <QtCore/QRegularExpression>
-#include <QtCore/QRegularExpressionMatch>
-#include <QtCore/QRegularExpressionMatchIterator>
+// ACF includes
+#include <istd/CSystem.h>
 
-// Imtcore includes
+// ImtCore includes
 #include <imtdesign/CDesignTokenStyleUtils.h>
 
 
@@ -31,7 +29,7 @@ QByteArray CDesignTokenFileParserComp::GetRawColor(
 
 bool CDesignTokenFileParserComp::GetStyleSheetColorPalette(const QByteArray& designSchemaId, QVariantMap& palette) const
 {
-	if(!designSchemaId.length() && m_styleSheetColors.size()){
+	if(designSchemaId.isEmpty() &&! m_styleSheetColors.isEmpty()){
 		palette = m_stylesPalettes.first();
 	}
 	else{
@@ -44,13 +42,13 @@ bool CDesignTokenFileParserComp::GetStyleSheetColorPalette(const QByteArray& des
 
 bool CDesignTokenFileParserComp::GetBasePalette(const QByteArray& designSchemaId, QVariantMap& palette) const
 {
-	if(m_stylesBasePalettes.size()){
-		if(!designSchemaId.length()){
+	if(!m_stylesBasePalettes.isEmpty()){
+		if(designSchemaId.isEmpty()){
 			palette = m_stylesBasePalettes.first();
 
 			return true;
 		}
-		else if (m_stylesBasePalettes.contains(designSchemaId)){
+		if (m_stylesBasePalettes.contains(designSchemaId)){
 			palette = m_stylesBasePalettes[designSchemaId];
 
 			return true;
@@ -137,7 +135,7 @@ bool CDesignTokenFileParserComp::ParseFile()
 
 	const QString designTokenFileFileBaseName(QFileInfo(designTokenFile).baseName());
 
-	for (const QJsonValue& style : ::std::as_const(designTokenStylesArray)){
+	for (const auto& style : ::std::as_const(designTokenStylesArray)){
 		QJsonObject styleEntry = style.toObject();
 		QString styleName = styleEntry["Name"].toString();
 
@@ -148,13 +146,13 @@ bool CDesignTokenFileParserComp::ParseFile()
 		}
 
 		if (styleName != designTokenFileFileBaseName){
-			SendVerboseMessage(0, QString("The file name and the theme name have different case '%1' VS '%2'").arg(designTokenFileFileBaseName).arg(styleName));
+			SendVerboseMessage(QString("The file name and the theme name have different case '%1' VS '%2'").arg(designTokenFileFileBaseName).arg(styleName));
 		}
 
 		ReplaceColorNamesRecursive(styleEntry, colorPaletteVariables);
 		m_stylesBasePalettes.insert(styleName.toUtf8(), colorPaletteVariables);
 
-		if (!styleName.length()){
+		if (styleName.isEmpty()){
 			SendInfoMessage (0,"Skipping invalid style object");
 
 			continue;
@@ -162,7 +160,6 @@ bool CDesignTokenFileParserComp::ParseFile()
 
 
 		QJsonArray iconTemplateList = styleEntry["IconTemplateList"].toArray();
-		// make ref to simplify parsing process to support old versions
 		if (iconTemplateList.isEmpty()){
 			QJsonObject object;
 			object.insert(QStringLiteral("IconColor"), styleEntry["IconColor"]);
@@ -278,7 +275,7 @@ bool CDesignTokenFileParserComp::SplitFile(const QString& outputDirPath, const Q
 
 	QJsonObject designTokenObjectSplitted = designTokenObject;
 
-	for (const QJsonValue& style: ::std::as_const(designTokenStylesArray)){
+	for (const auto& style: ::std::as_const(designTokenStylesArray)){
 		QJsonArray stylesArray;
 
 		QJsonObject styleEntry = style.toObject();
@@ -326,7 +323,7 @@ const imtbase::ICollectionInfo& CDesignTokenFileParserComp::GetDesignSchemaList(
 
 bool CDesignTokenFileParserComp::GetColorPalette(const QByteArray& designSchemaId, ColorSchema& palette) const
 {
-	if(!designSchemaId.length() && m_colorPalettes.size()){
+	if(designSchemaId.isEmpty() && !m_colorPalettes.isEmpty()){
 		palette = m_colorPalettes.first();
 	}
 
@@ -336,7 +333,7 @@ bool CDesignTokenFileParserComp::GetColorPalette(const QByteArray& designSchemaI
 }
 
 
-QByteArrayList CDesignTokenFileParserComp::GetTemplateIconColorList(const QByteArray&) const
+QByteArrayList CDesignTokenFileParserComp::GetTemplateIconColorList(const QByteArray& /* styleName */) const
 {
 	return m_templateIconColorList;
 }

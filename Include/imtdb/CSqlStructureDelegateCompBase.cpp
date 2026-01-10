@@ -218,12 +218,8 @@ bool CSqlStructureDelegateCompBase::MoveLeaf(
 		return false;
 	}
 
-	int count = sqlQuery.numRowsAffected();
-	if (count > 0){
-		return true;
-	}
-
-	return false;
+	int affectedRows = sqlQuery.numRowsAffected();
+	return affectedRows > 0;
 }
 
 
@@ -261,12 +257,9 @@ bool CSqlStructureDelegateCompBase::RemoveLeaf(
 		return false;
 	}
 
-	int count = sqlQuery.numRowsAffected();
-	if (count > 0){
-		return true;
-	}
+	int affectedRows = sqlQuery.numRowsAffected();
 
-	return false;
+	return affectedRows > 0;
 }
 
 

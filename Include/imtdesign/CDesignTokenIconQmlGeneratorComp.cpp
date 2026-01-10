@@ -4,11 +4,6 @@
 // Qt includes
 #include <QtXml/QtXml>
 
-// ImtCore includes
-#include <imtbase/ICollectionInfo.h>
-
-#include <QtCore/QString>
-
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
 #define QT_ENDL Qt::endl
@@ -95,7 +90,7 @@ bool CDesignTokenIconQmlGeneratorComp::CreateQrc(const QString& prefix, const QS
 	QFile outputFile(outputFileName);
 	outputFile.open(QFile::WriteOnly);
 	QXmlStreamWriter xmlWriter(&outputFile);
-	xmlWriter.setAutoFormatting(1);
+	xmlWriter.setAutoFormatting(true);
 
 	xmlWriter.writeStartDocument();
 	xmlWriter.writeStartElement("RCC");
@@ -125,7 +120,7 @@ bool CDesignTokenIconQmlGeneratorComp::CreateQrcRecursivly(const QString& inputD
 	QFile outputFile(outputFileName);
 	outputFile.open(QFile::WriteOnly);
 	QXmlStreamWriter xmlWriter(&outputFile);
-	xmlWriter.setAutoFormatting(1);
+	xmlWriter.setAutoFormatting(true);
 
 	xmlWriter.writeStartDocument();
 	xmlWriter.writeStartElement("RCC");
@@ -155,7 +150,7 @@ bool CDesignTokenIconQmlGeneratorComp::CreateQrcForDirs(const QStringList& input
 		qCritical() << "Cannot open resource file" << outputFileName;
 	}
 	QXmlStreamWriter xmlWriter(&outputFile);
-	xmlWriter.setAutoFormatting(1);
+	xmlWriter.setAutoFormatting(true);
 
 	xmlWriter.writeStartDocument();
 
