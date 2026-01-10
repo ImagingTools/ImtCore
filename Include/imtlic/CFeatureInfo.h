@@ -21,7 +21,7 @@ public:
 	void SetFeatureDescription(const QString& description);
 	void SetOptional(bool optional);
 	void SetParentFeature(const IFeatureInfo* parentFeaturePtr);
-	void SetDependencies(QByteArrayList dependencies);
+	void SetDependencies(const QByteArrayList& dependencies);
 	void SetIsPermission(bool isPermission);
 
 	// reimplemented (IFeatureInfo)
