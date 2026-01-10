@@ -11,23 +11,23 @@ namespace imtservergql
 {
 
 
-class CPermissibleGqlRequestHandlerComp: public imtservergql::CGqlRequestHandlerCompBase
+class CPermissibleGqlRequestHandlerComp: public CGqlRequestHandlerCompBase
 {
 public:
-	typedef imtservergql::CGqlRequestHandlerCompBase BaseClass;
+	typedef CGqlRequestHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CPermissibleGqlRequestHandlerComp);
 		I_ASSIGN(m_commandPermissionsCompPtr, "CommandPermissions", "Command Permissions", false, "Command Permissions");
 		I_ASSIGN(m_checkPermissionCompPtr, "PermissionChecker", "Checker of the permissions", false, "PermissionChecker");
 	I_END_COMPONENT;
 
-	// reimplemented (imtservergql::CGqlRequestHandlerCompBase)
+	// reimplemented (CGqlRequestHandlerCompBase)
 	virtual imtbase::CTreeItemModel* CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 protected:
 	virtual bool CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 
-	// reimplemented (imtservergql::CGqlRequestHandlerCompBase)
+	// reimplemented (CGqlRequestHandlerCompBase)
 	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 protected:

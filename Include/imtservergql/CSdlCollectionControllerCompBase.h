@@ -10,10 +10,10 @@ namespace imtservergql
 {
 
 
-class CSdlCollectionControllerCompBase : public imtservergql::CObjectCollectionControllerCompBase
+class CSdlCollectionControllerCompBase : public CObjectCollectionControllerCompBase
 {
 public:
-	typedef imtservergql::CObjectCollectionControllerCompBase BaseClass;
+	typedef CObjectCollectionControllerCompBase BaseClass;
 	I_BEGIN_BASE_COMPONENT(CSdlCollectionControllerCompBase)
 	I_END_COMPONENT
 

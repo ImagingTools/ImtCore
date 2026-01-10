@@ -4,9 +4,6 @@
 // std includes
 #include <cmath>
 
-// STL includes
-#include <cmath>
-
 // ImtCore includes
 #include <imtbase/CCollectionFilter.h>
 
@@ -43,13 +40,14 @@ imtbase::CTreeItemModel* CObjectMetaInfoCollectionControllerComp::ListObjects(co
 		const imtgql::CGqlParamObject* viewParamsGql = nullptr;
 		QList<imtgql::CGqlParamObject> inputParams;
 		inputParams.append(gqlRequest.GetParams());
-		if (inputParams.size() > 0){
+		if (!inputParams.isEmpty()){
 			viewParamsGql = inputParams.at(0).GetParamArgumentObjectPtr("viewParams");
 		}
 
 		iprm::CParamsSet filterParams;
 		imtbase::CCollectionFilter m_filter;
-		int offset = 0, count = -1;
+		int offset = 0;
+		int count = -1;
 		if (viewParamsGql != nullptr){
 			offset = viewParamsGql->GetParamArgumentValue("offset").toInt();
 			count = viewParamsGql->GetParamArgumentValue("count").toInt();

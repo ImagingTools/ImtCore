@@ -29,7 +29,7 @@ imtbase::CTreeItemModel* CSdlCollectionControllerCompBase::ListObjects(
 	const imtgql::CGqlParamObject* viewParamsGql = nullptr;
 	QList<imtgql::CGqlParamObject> inputParams;
 	inputParams.append(gqlRequest.GetParams());
-	if (inputParams.size() > 0){
+	if (!inputParams.isEmpty()){
 		viewParamsGql = inputParams.at(0).GetParamArgumentObjectPtr("viewParams");
 	}
 
