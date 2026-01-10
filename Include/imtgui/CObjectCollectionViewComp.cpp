@@ -26,6 +26,7 @@
 #include <iwidgets/iwidgets.h>
 
 // IntCore includes
+#include <imtbase/imtbase.h>
 #include <imtbase/IObjectCollectionIterator.h>
 #include <imtgui/ICollectionViewDelegate.h>
 
@@ -38,8 +39,8 @@ namespace imtgui
 
 CObjectCollectionViewComp::CObjectCollectionViewComp()
 	:m_semaphoreCounter(0),
-	m_currentInformationViewPtr(nullptr),
 	m_tableModel(*this),
+	m_currentInformationViewPtr(nullptr),
 	m_complexFilterObserver(*this)
 {
 	m_pageSelection.SetParent(this);
@@ -48,7 +49,7 @@ CObjectCollectionViewComp::CObjectCollectionViewComp()
 	qRegisterMetaType<istd::IChangeable::ChangeSet>("istd::IChangeable::ChangeSet");
 
 	m_textFilterTimer.setSingleShot(true);
-	m_textFilterTimer.setInterval(1000);
+	m_textFilterTimer.setInterval(std::chrono::seconds(1));
 }
 
 
@@ -123,15 +124,13 @@ ICollectionViewDelegate* CObjectCollectionViewComp::GetViewDelegatePtr(const QBy
 	if (typeId.isEmpty()){
 		return &m_defaultViewDelegate;
 	}
-	else{
-		if (m_viewDelegateMap.contains(typeId)){
-			return m_viewDelegateMap[typeId];
-		}
-		else{
-			QByteArray componentId = GetComponentId(GetComponentContext().get());
-			Q_ASSERT_X(false, qPrintable(QString("%1").arg(__LINE__)), qPrintable(QString("Type-ID of the view delegate: '%1' not found, %2").arg(qPrintable(typeId)).arg(qPrintable(componentId))));
-		}
+
+	if (m_viewDelegateMap.contains(typeId)){
+		return m_viewDelegateMap[typeId];
 	}
+
+	QByteArray componentId = GetComponentId(GetComponentContext().get());
+	Q_ASSERT_X(false, qPrintable(QString("%1").arg(__LINE__)), qPrintable(QString("Type-ID of the view delegate: '%1' not found, %2").arg(qPrintable(typeId)).arg(qPrintable(componentId))));
 
 	return nullptr;
 }
@@ -166,7 +165,7 @@ void CObjectCollectionViewComp::OnRestoreSettings(const QSettings& settings)
 	if (!settings.contains(settingsKey)){
 		return;
 	}
-	
+
 	QVariant settingsValue = settings.value(settingsKey);
 #if QT_VERSION < 0x060000
 	if (settingsValue.type() != QMetaType::QByteArray){
@@ -185,7 +184,7 @@ void CObjectCollectionViewComp::OnRestoreSettings(const QSettings& settings)
 	}
 
 	TypeIdColumnsSettings typeIdColumnsSettings;
-	
+
 	QJsonArray jsonTypeIds = jsonDocument.array();
 	if (jsonTypeIds.isEmpty()){
 		return;
@@ -218,7 +217,7 @@ void CObjectCollectionViewComp::OnRestoreSettings(const QSettings& settings)
 			ColumnSettings columnSettings;
 
 			QStringList keys = jsonColumn.keys();
-			for (QString key : keys){
+			for (const QString& key : keys){
 				QVariant variant = jsonColumn[key].toVariant();
 				if (!variant.isValid()){
 					return;
@@ -246,7 +245,7 @@ void CObjectCollectionViewComp::OnSaveSettings(QSettings& settings) const
 	QJsonDocument jsonDocument;
 	QJsonArray jsonTypeIds;
 
-	for (QString typeId : m_typeIdColumnsSettings.keys()){
+	for (const QString& typeId : m_typeIdColumnsSettings.keys()){
 		ColumnsList columnsList = m_typeIdColumnsSettings[typeId];
 
 		QJsonObject jsonTypeId;
@@ -258,10 +257,10 @@ void CObjectCollectionViewComp::OnSaveSettings(QSettings& settings) const
 			QStringList columnSettingsKeys = columnSettings.keys();
 
 			QJsonObject jsonColumnSettings;
-			for (QString columnSettingsKey : columnSettingsKeys){
+			for (const QString& columnSettingsKey : columnSettingsKeys){
 				jsonColumnSettings.insert(columnSettingsKey, QJsonValue::fromVariant(columnSettings[columnSettingsKey]));
 			}
-			
+
 			jsonColumns.append(QJsonValue::fromVariant(jsonColumnSettings));
 		}
 		jsonTypeId.insert("Columns", QJsonValue::fromVariant(jsonColumns));
@@ -359,7 +358,7 @@ void CObjectCollectionViewComp::OnGuiCreated()
 		connect(m_escShortCutPtr, &QShortcut::activated, this, &CObjectCollectionViewComp::OnEscShortCut);
 	}
 
-	if (*m_useSearchWidgetAttrPtr == true){
+	if (*m_useSearchWidgetAttrPtr){
 		connect(m_searchShortCutPtr, &QShortcut::activated, this, &CObjectCollectionViewComp::OnSearchShortCut);
 	}
 
@@ -593,7 +592,7 @@ QStringList CObjectCollectionViewComp::GetMetaInfoHeaders(const QByteArray& type
 	QVector<QByteArray> fieldIds = fieldCollection.GetElementIds();
 
 	QStringList headers;
-	for (QByteArray fieldId : fieldIds){
+	for (const QByteArray& fieldId : fieldIds){
 		headers += fieldCollection.GetElementInfo(fieldId, imtbase::ICollectionInfo::EIT_NAME).toString();
 	}
 
@@ -627,7 +626,7 @@ void CObjectCollectionViewComp::EnsureColumnsSettingsSynchronized() const
 	QStringList headers = GetMetaInfoHeaders(m_currentTypeId);
 
 	int totalWidth = 0;
-	
+
 	for (int i = 0; i < ids.count(); i++){
 		int columndIndex = ItemList->header()->logicalIndex(i);
 		totalWidth += ItemList->columnWidth(columndIndex);
@@ -664,7 +663,7 @@ void CObjectCollectionViewComp::RestoreColumnsSettings()
 
 	QVector<QByteArray> tempFieldIds = GetMetaInfoIds(m_currentTypeId);
 	QStringList fieldIds;
-	for (QByteArray tempFieldId : tempFieldIds){
+	for (const QByteArray& tempFieldId : tempFieldIds){
 		fieldIds.append(tempFieldId);
 	}
 
@@ -723,7 +722,7 @@ void CObjectCollectionViewComp::RestoreColumnsSettings()
 
 		for (int i = 0; i < columnsList.count(); i++){
 			ColumnSettings columnSettings = columnsList[i];
-			
+
 			QVariant varFieldId = columnSettings["FieldId"];
 			QVariant varWidth = columnSettings["Width"];
 
@@ -759,7 +758,7 @@ void CObjectCollectionViewComp::RestoreColumnsSettings()
 				else{
 					ItemList->resizeColumnToContents(0);
 				}
-				
+
 				currentIndex++;
 				continue;
 			}
@@ -1007,7 +1006,7 @@ void CObjectCollectionViewComp::OnTypeChanged()
 	if (!selectedItems.isEmpty()){
 		m_currentTypeId = selectedItems[0]->data(0, ICollectionViewDelegate::DR_TYPE_ID).toByteArray();
 	}
-	
+
 	QStringList headerLabels;
 	headerLabels.append(GetMetaInfoHeaders(m_currentTypeId));
 
@@ -1189,8 +1188,7 @@ void CObjectCollectionViewComp::DoUpdateGui(const istd::IChangeable::ChangeSet& 
 			int typesCount = objectTypeInfoPtr->GetOptionsCount();
 
 			QByteArray lastTypeId = m_currentTypeId;
-
-			istd::IChangeable::ChangeInfoMap changeInfoMap = changeSet.GetChangeInfoMap();
+			const istd::IChangeable::ChangeInfoMap& changeInfoMap = changeSet.GetChangeInfoMap();
 
 			if (changeInfoMap.isEmpty()){
 				TypeList->clear();
@@ -1253,7 +1251,7 @@ void CObjectCollectionViewComp::DoUpdateGui(const istd::IChangeable::ChangeSet& 
 	m_tableModel.SetSorting(ItemList->header()->sortIndicatorSection(), ItemList->header()->sortIndicatorOrder());
 
 	m_tableModel.UpdateFromData(*collectionPtr, changeSet);
-	
+
 	RestoreColumnsSettings();
 }
 
@@ -1446,10 +1444,10 @@ istd::IFactoryInfo::KeyList CObjectCollectionViewComp::FocusDecorationFactory::G
 
 
 CObjectCollectionViewComp::TableModel::TableModel(CObjectCollectionViewComp& parent)
-	:m_fetchedRowCount(0),
+	:m_batchSize(50),
+	m_fetchedRowCount(0),
 	m_totalRowCount(0),
-	m_parent(parent),
-	m_batchSize(50)
+	m_parent(parent)
 {
 }
 
@@ -1518,7 +1516,7 @@ void CObjectCollectionViewComp::TableModel::UpdateFromData(const imtbase::IObjec
 			int pageIndex = m_parent.m_pageSelection.GetSelectedOptionIndex();
 
 			beginInsertRows(QModelIndex(), 0, m_batchSize - 1);
-		
+
 			istd::TDelPtr<imtbase::IObjectCollectionIterator> collectionIterator = collection.CreateObjectCollectionIterator(QByteArray(), pageIndex * m_batchSize, m_batchSize, &filterParams);
 			Q_ASSERT(collectionIterator.IsValid());
 
@@ -1578,10 +1576,9 @@ void CObjectCollectionViewComp::TableModel::UpdateItem(const imtbase::IObjectCol
 	if (metaInfo.isEmpty()){
 		return;
 	}
-	else{
-		m_metaInfo = metaInfo;
-		m_metaInfoMap[objectId] = m_metaInfo;
-	}
+
+	m_metaInfo = metaInfo;
+	m_metaInfoMap[objectId] = m_metaInfo;
 }
 
 
@@ -1678,8 +1675,9 @@ void CObjectCollectionViewComp::TableModel::SetTextFilter(const QString& textFil
 		m_parent.m_complexFilterCompPtr->SetFilterExpression(mainGroupFilter);
 	}
 
-	if (objectCollectionPtr)
+	if (objectCollectionPtr != nullptr){
 		UpdateFromData(*objectCollectionPtr, istd::IChangeable::GetAnyChange());
+	}
 }
 
 
@@ -1701,7 +1699,7 @@ int CObjectCollectionViewComp::TableModel::columnCount(const QModelIndex& parent
 		return 0;
 	}
 
-	return m_columns.count();
+	return imtbase::narrow_cast<int>(m_columns.size());
 }
 
 
@@ -1850,7 +1848,7 @@ void CObjectCollectionViewComp::TableModel::fetchMore(const QModelIndex& parent)
 	filterParams.SetEditableParameter("Filter", &m_filter);
 
 	istd::TDelPtr<imtbase::IObjectCollectionIterator> collectionIterator = collectionPtr->CreateObjectCollectionIterator(QByteArray(), start, itemsToFetch, &filterParams);
-	
+
 	if (collectionIterator.IsValid()){
 		while (collectionIterator->Next()){
 			++m_fetchedRowCount;
@@ -1860,13 +1858,13 @@ void CObjectCollectionViewComp::TableModel::fetchMore(const QModelIndex& parent)
 	else{
 		imtbase::ICollectionInfo::Ids fetchedIds = collectionPtr->GetElementIds(start, itemsToFetch, &filterParams);
 		if (!fetchedIds.isEmpty()){
-			m_fetchedRowCount += fetchedIds.count();
+			m_fetchedRowCount += fetchedIds.size();
 
 			m_ids += fetchedIds;
 		}
 	}
 
-	Q_ASSERT(m_ids.count() == m_fetchedRowCount);
+	Q_ASSERT(m_ids.size() == m_fetchedRowCount);
 
 	endInsertRows();
 }

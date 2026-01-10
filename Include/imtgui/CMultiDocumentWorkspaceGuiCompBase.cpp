@@ -19,6 +19,9 @@
 #include <idoc/IDocumentTemplate.h>
 #include <iwidgets/CWidgetUpdateBlocker.h>
 
+// ImtCore includes
+#include <imtbase/imtbase.h>
+
 
 namespace imtgui
 {
@@ -99,7 +102,7 @@ void CMultiDocumentWorkspaceGuiCompBase::SetActiveView(istd::IPolymorphic* viewP
 
 int CMultiDocumentWorkspaceGuiCompBase::GetFixedWindowsCount() const
 {
-	return m_fixedTabs.size();
+	return imtbase::narrow_cast<int>(m_fixedTabs.size());
 }
 
 
@@ -121,7 +124,7 @@ void CMultiDocumentWorkspaceGuiCompBase::UpdateAllTitles()
 			QString fileText = infoPtr->filePath.isEmpty()?
 						"":
 						QFileInfo(infoPtr->filePath).completeBaseName();
-			
+
 			QString titleName = infoPtr->filePath.isEmpty()?
 						tr("<no name>"):
 						QFileInfo(infoPtr->filePath).completeBaseName();
@@ -195,14 +198,12 @@ bool CMultiDocumentWorkspaceGuiCompBase::AddTab(const QString& name, iqtgui::IGu
 
 		return true;
 	}
-	else{
-		m_fixedTabs.pop_back();
 
-		tabFrame->deleteLater();
-		tabFrame = nullptr;
+	m_fixedTabs.pop_back();
+	tabFrame->deleteLater();
+	tabFrame = nullptr;
 
-		return false;
-	}
+	return false;
 }
 
 
@@ -359,7 +360,7 @@ void CMultiDocumentWorkspaceGuiCompBase::OnGuiCreated()
 
 	m_closeCurrentTabShortcutPtr = new QShortcut(GetQtWidget());
 	m_closeCurrentTabShortcutPtr->setKey(Qt::CTRL + Qt::Key_W);
-	
+
 	// Add additional fixed UI components to the tab bar:
 	for (int i = 0; i < m_fixedTabsCompPtr.GetCount(); ++i){
 		iqtgui::IGuiObject* guiPtr = m_fixedTabsCompPtr[i];
@@ -803,12 +804,11 @@ const ibase::IHierarchicalCommand* CMultiDocumentWorkspaceGuiCompBase::Commands:
 				if (decoratorPtr != nullptr){
 					return decoratorPtr->GetCommands();
 				}
-				else{
-					istd::IPolymorphic* viewPtr = m_parentPtr->GetActiveView();
-					ibase::ICommandsProvider* viewCommandsProviderPtr = CompCastPtr<ibase::ICommandsProvider>(viewPtr);
-					if (viewCommandsProviderPtr != nullptr){
-						return viewCommandsProviderPtr->GetCommands();
-					}
+
+				istd::IPolymorphic* viewPtr = m_parentPtr->GetActiveView();
+				ibase::ICommandsProvider* viewCommandsProviderPtr = CompCastPtr<ibase::ICommandsProvider>(viewPtr);
+				if (viewCommandsProviderPtr != nullptr){
+					return viewCommandsProviderPtr->GetCommands();
 				}
 			}
 			else{

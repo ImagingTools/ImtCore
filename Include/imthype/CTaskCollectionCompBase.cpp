@@ -6,9 +6,9 @@
 #include <iser/CPrimitiveTypesSerializer.h>
 
 // ImtCore includes
+#include <imtbase/imtbase.h>
 #include <imtbase/MetaTypes.h>
 #include <imthype/ITaskCollectionContext.h>
-#include <imthype/CTaskCollectionCompBase.h>
 #include <imthype/CTaskCollectionUpdateEvent.h>
 #include <imtcore/Version.h>
 
@@ -72,7 +72,7 @@ bool CTaskCollectionCompBase::SetUserTaskId(const QByteArray& taskUuid, const QB
 
 				task.userDefinedTaskId = userTaskId;
 			}
-			
+
 			return true;
 		}
 	}
@@ -157,7 +157,7 @@ const imtbase::IObjectCollection* CTaskCollectionCompBase::GetTaskInputs() const
 }
 
 
-QString CTaskCollectionCompBase::GenerateUniqueObjectName(QString newName, QString oldName) const
+QString CTaskCollectionCompBase::GenerateUniqueObjectName(const QString& newName, const QString& oldName) const
 {
 	imtbase::ICollectionInfo::Ids ids = GetElementIds();
 
@@ -194,9 +194,9 @@ const imtbase::ICollectionDataController* CTaskCollectionCompBase::GetDataContro
 }
 
 
-int CTaskCollectionCompBase::GetOperationFlags(const QByteArray& taskId) const
+int CTaskCollectionCompBase::GetOperationFlags(const QByteArray& objectId) const
 {
-	if (taskId.isEmpty()){
+	if (objectId.isEmpty()){
 		int flags = 0;
 
 		if (*m_allowAddTasksAttrPtr){
@@ -209,7 +209,7 @@ int CTaskCollectionCompBase::GetOperationFlags(const QByteArray& taskId) const
 	}
 
 	for (const Task& task : m_tasks){
-		if (task.uuid == taskId){
+		if (task.uuid == objectId){
 			return task.taskFlags;
 		}
 	}
@@ -269,7 +269,7 @@ QByteArray CTaskCollectionCompBase::InsertNewObject(
 		if (!proposedObjectId.isEmpty() && !ids.contains(proposedObjectId)){
 			newTask.uuid = proposedObjectId;
 		}
-		
+
 		istd::IChangeable::ChangeSet changeSet(CF_ADDED);
 		changeSet.SetChangeInfo(imtbase::IObjectCollection::CN_ELEMENT_INSERTED, newTask.uuid);
 		istd::CChangeNotifier changeNotifier(this, &changeSet);
@@ -296,7 +296,7 @@ bool CTaskCollectionCompBase::RemoveElements(const Ids& objectIds, const imtbase
 
 	MultiElementNotifierInfo notifierInfo;
 	notifierInfo.elementIds = objectIds;
-	
+
 	TaskList::iterator iter = m_tasks.begin();
 	while (iter != m_tasks.end()){
 		const QByteArray& taskId = iter->uuid;
@@ -308,7 +308,7 @@ bool CTaskCollectionCompBase::RemoveElements(const Ids& objectIds, const imtbase
 			++iter;
 		}
 	}
-	
+
 	istd::IChangeable::ChangeSet changeSet(CF_REMOVED);
 	changeSet.SetChangeInfo(CN_ELEMENTS_REMOVED, QVariant::fromValue(notifierInfo));
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
@@ -447,7 +447,7 @@ imtbase::ICollectionInfo::Id CTaskCollectionCompBase::GetObjectTypeId(const QByt
 
 int CTaskCollectionCompBase::GetElementsCount(const iprm::IParamsSet* /*selectionParamPtr*/, ilog::IMessageConsumer* /*logPtr*/) const
 {
-	return m_tasks.count();
+	return imtbase::narrow_cast<int>(m_tasks.count());
 }
 
 
@@ -459,11 +459,12 @@ imtbase::ICollectionInfo::Ids CTaskCollectionCompBase::GetElementIds(
 {
 	Ids retVal;
 
-	Q_ASSERT(offset >= 0);
+	qsizetype objectsCount = m_tasks.size();
+	if( count >= 0) {
+		objectsCount = qMin(count, m_tasks.size());
+	}
 
-	int objectsCount = count >= 0 ? qMin(count, m_tasks.count()) : m_tasks.count();
-
-	for (int i = offset; i < objectsCount; ++i){
+	for (qsizetype i = offset; i < objectsCount; ++i){
 		retVal.push_back(m_tasks[i].uuid);
 	}
 
@@ -502,6 +503,8 @@ QVariant CTaskCollectionCompBase::GetElementInfo(const QByteArray& elementId, in
 
 		case EIT_ENABLED:
 			return m_tasks[taskIndex].isEnabled;
+		default:
+			I_IF_DEBUG(qWarning() << __FILE__ << __LINE__ << "Unexpected info type: " << infoType;)
 		}
 	}
 
@@ -515,16 +518,16 @@ idoc::MetaInfoPtr CTaskCollectionCompBase::GetElementMetaInfo(const Id& /*elemen
 }
 
 
-bool CTaskCollectionCompBase::SetElementName(const QByteArray& objectId, const QString& objectName, ilog::IMessageConsumer* /*logPtr*/)
+bool CTaskCollectionCompBase::SetElementName(const QByteArray& elementId, const QString& objectName, ilog::IMessageConsumer* /*logPtr*/)
 {
 	for (Task& task : m_tasks){
-		if (task.uuid == objectId){
+		if (task.uuid == elementId){
 			if (task.name != objectName){
 				QString uniqueObjectName = GenerateUniqueObjectName(objectName, task.name);
 
 				if (task.name != uniqueObjectName){
 					istd::IChangeable::ChangeSet changeSet(CF_ELEMENT_RENAMED);
-					changeSet.SetChangeInfo(imtbase::IObjectCollection::CN_ELEMENT_RENAMED, objectId);
+					changeSet.SetChangeInfo(imtbase::IObjectCollection::CN_ELEMENT_RENAMED, elementId);
 					istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 					task.name = uniqueObjectName;
@@ -539,13 +542,13 @@ bool CTaskCollectionCompBase::SetElementName(const QByteArray& objectId, const Q
 }
 
 
-bool CTaskCollectionCompBase::SetElementDescription(const QByteArray& objectId, const QString& objectDescription, ilog::IMessageConsumer* /*logPtr*/)
+bool CTaskCollectionCompBase::SetElementDescription(const QByteArray& elementId, const QString& objectDescription, ilog::IMessageConsumer* /*logPtr*/)
 {
 	for (Task& task : m_tasks){
-		if (task.uuid == objectId){
+		if (task.uuid == elementId){
 			if (task.description != objectDescription){
 				istd::IChangeable::ChangeSet changeSet(CF_ELEMENT_DESCRIPTION_CHANGED);
-				changeSet.SetChangeInfo(imtbase::IObjectCollection::CN_ELEMENT_DESCRIPTION_CHANGED, objectId);
+				changeSet.SetChangeInfo(imtbase::IObjectCollection::CN_ELEMENT_DESCRIPTION_CHANGED, elementId);
 				istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 				task.description = objectDescription;
@@ -660,7 +663,7 @@ bool CTaskCollectionCompBase::Serialize(iser::IArchive& archive)
 	static const iser::CArchiveTag taskEnabledTag("IsEnabled", "Status of the task", iser::CArchiveTag::TT_LEAF, &taskTag);
 	static const iser::CArchiveTag taskFlagsTag("Flags", "Flags of the task", iser::CArchiveTag::TT_LEAF, &taskTag);
 	static const iser::CArchiveTag taskInputsTag("TaskInputs", "Collection of the task inputs", iser::CArchiveTag::TT_GROUP);
-	
+
 	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
 
 	TaskList emptyList;
@@ -673,7 +676,7 @@ bool CTaskCollectionCompBase::Serialize(iser::IArchive& archive)
 		}
 	}
 
-	int tasksCount = tasks.count();
+	int tasksCount = imtbase::narrow_cast<int>(tasks.size());
 
 	bool retVal = true;
 	retVal = retVal && archive.BeginMultiTag(tasksTag, taskTag, tasksCount);
@@ -895,19 +898,19 @@ void CTaskCollectionCompBase::OnComponentDestroyed()
 
 void CTaskCollectionCompBase::OnTaskInputsUpdated(const istd::IChangeable::ChangeSet& changeSet, const imtbase::IObjectCollection* objectCollectionPtr)
 {
-	istd::IChangeable::ChangeInfoMap changeInfoMap = changeSet.GetChangeInfoMap();
+	const istd::IChangeable::ChangeInfoMap& changeInfoMap = changeSet.GetChangeInfoMap();
 
 	if (changeInfoMap.contains(imtbase::IObjectCollection::CN_ELEMENTS_REMOVED)){
 		QSet<QByteArray> inputIds;
 
 		imtbase::IObjectCollection::Ids ids = objectCollectionPtr->GetElementIds();
-		for (const QByteArray id : ids){
+		for (const QByteArray& id : ids){
 			QByteArray inputId = objectCollectionPtr->GetElementInfo(id, imtbase::IObjectCollection::EIT_NAME).toString().toUtf8();
 			inputIds += inputId;
 		}
 
 		ids = GetElementIds();
-		for (const QByteArray id : ids){
+		for (const QByteArray& id: ids){
 			QByteArray inputId = GetTaskInputId(id);
 			if (!inputIds.contains(inputId)){
 				SetTaskInputId(id, QByteArray());
@@ -925,7 +928,7 @@ void CTaskCollectionCompBase::OnTaskInputsUpdated(const istd::IChangeable::Chang
 		QString newInputName = objectCollectionPtr->GetElementInfo(changedElementId, imtbase::IObjectCollection::EIT_NAME).toString().toUtf8();
 
 		imtbase::ICollectionInfo::Ids taskIds = GetElementIds();
-		for (const QByteArray taskId : taskIds){
+		for (const QByteArray& taskId : taskIds){
 			QByteArray inputId = GetTaskInputId(taskId);
 			if (inputId == oldInputName.toUtf8()){
 				SetTaskInputId(taskId, newInputName.toUtf8());
@@ -939,7 +942,7 @@ void CTaskCollectionCompBase::OnTaskInputsUpdated(const istd::IChangeable::Chang
 			if (eventPtr != nullptr){
 				if (eventPtr != nullptr){
 					imtbase::IObjectCollection::Ids ids = GetElementIds();
-					for (const QByteArray id : ids){
+					for (const QByteArray& id : ids){
 						if (GetTaskInputId(id) == eventPtr->GetOldValue().toByteArray()){
 							SetTaskInputId(id, eventPtr->GetNewValue().toByteArray());
 						}

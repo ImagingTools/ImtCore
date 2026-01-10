@@ -8,15 +8,15 @@
 #endif
 
 
-// STL includes
-#include <cstring>
-
 // Qt includes
 #include <QtCore/QSettings>
 #include <QtGui/QGuiApplication>
 
 // ACF includes
 #include <istd/CChangeNotifier.h>
+
+// ImtCore includes
+#include <imtbase/imtbase.h>
 
 
 namespace imtgui
@@ -39,7 +39,7 @@ CMonitorInfoProvider::CMonitorInfoProvider()
 
 int CMonitorInfoProvider::GetMonitorsCount() const
 {
-	return m_monitors.count();
+	return imtbase::narrow_cast<int>(m_monitors.size());
 }
 
 
@@ -175,7 +175,7 @@ void CMonitorInfoProvider::OrientationChanged(Qt::ScreenOrientation /*orientatio
 
 // private methods
 
-QSize CMonitorInfoProvider::RetrievePhysicalSize(QString monitorId)
+QSize CMonitorInfoProvider::RetrievePhysicalSize(const QString& monitorId)
 {
 	if (m_physicalSize.width() > 0 && m_physicalSize.height() > 0){
 		return m_physicalSize;

@@ -14,6 +14,8 @@
 #include <ifile/CCompactXmlFileWriteArchive.h>
 #include <ifile/CFileListProviderComp.h>
 
+// ImtCore includes
+#include <imtbase/imtbase.h>
 
 namespace imthype
 {
@@ -370,7 +372,7 @@ int CJobQueueManagerCompBase::GetElementsCount(const iprm::IParamsSet* /*selecti
 {
 	QReadLocker lock(&m_mutex);
 
-	return m_jobItems.count();
+	return imtbase::narrow_cast<int>(m_jobItems.size());
 }
 
 
@@ -387,7 +389,7 @@ imtbase::ICollectionInfo::Ids CJobQueueManagerCompBase::GetElementIds(
 
 	Q_ASSERT(offset >= 0);
 
-	int elementsCount = count >= 0 ? qMin(count, m_jobItems.count()) : m_jobItems.count();
+	qsizetype elementsCount = count >= 0 ? qMin(count, m_jobItems.size()) : m_jobItems.size();
 
 	for (int i = offset; i < elementsCount; ++i){
 		retVal.push_back(m_jobItems[i].uuid);
@@ -416,6 +418,8 @@ QVariant CJobQueueManagerCompBase::GetElementInfo(const QByteArray& elementId, i
 		switch (infoType){
 		case EIT_NAME:
 			return m_jobItems[index].name;
+		default:
+			I_IF_DEBUG(qWarning() << __FILE__ << __LINE__ << "Unexpected info type: " << infoType;)
 		}
 	}
 
@@ -594,7 +598,7 @@ void CJobQueueManagerCompBase::OnComponentCreated()
 		if (*m_pollFileSystemAttrPtr){
 			connect(&m_syncTimer, &QTimer::timeout, this, &CJobQueueManagerCompBase::OnSync);
 
-			m_syncTimer.start(1000);
+			m_syncTimer.start(std::chrono::seconds(1));
 		}
 
 		lock.unlock();

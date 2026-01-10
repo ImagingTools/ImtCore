@@ -1,6 +1,9 @@
 #include <imtgui/CMultiStatusProviderGuiComp.h>
 
 
+// ImtCore includes
+#include <imtbase/imtbase.h>
+
 namespace imtgui
 {
 
@@ -49,7 +52,7 @@ void CMultiStatusProviderGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& 
 	UpdateStatusesGui(*multiStatusProviderPtr);
 
 	const istd::IInformationProvider* informationProviderPtr = dynamic_cast<const istd::IInformationProvider*>(multiStatusProviderPtr);
-	if (informationProviderPtr){
+	if (informationProviderPtr != nullptr){
 		UpdateCommonStatusGui(*informationProviderPtr);
 	}
 }
@@ -71,7 +74,7 @@ void CMultiStatusProviderGuiComp::UpdateStatusesGui(const imtbase::IMultiStatusP
 
 	imtbase::ICollectionInfo::Ids statusIds = statusProviderInfo.GetElementIds();
 
-	SubStatusesTable->setRowCount(statusIds.count());
+	SubStatusesTable->setRowCount(imtbase::narrow_cast<int>(statusIds.size()));
 
 	for (int i = 0; i < statusIds.count(); ++i){
 		QByteArray statusInfoId = statusIds[i];
