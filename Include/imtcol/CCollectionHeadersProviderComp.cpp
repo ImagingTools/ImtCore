@@ -9,9 +9,9 @@ namespace imtcol
 
 // reimplemented (imtcol::ICollectionHeadersProvider)
 
-imtcol::ICollectionHeadersProvider::HeaderIds CCollectionHeadersProviderComp::GetHeaderIds() const
+ICollectionHeadersProvider::HeaderIds CCollectionHeadersProviderComp::GetHeaderIds() const
 {
-	imtcol::ICollectionHeadersProvider::HeaderIds retVal;
+	HeaderIds retVal;
 
 	for (int i = 0; i < m_headersIdsAttrPtr.GetCount(); ++i){
 		retVal << m_headersIdsAttrPtr[i];

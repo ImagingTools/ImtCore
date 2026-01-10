@@ -22,6 +22,7 @@ public:
 		I_ASSIGN(m_commandIdAttrPtr, "Command-ID", "Request command-ID", true, "");
 	I_END_COMPONENT;
 
+	CSimpleConnectionCheckerComp();
 	// reimplemented (IConnectionStatusProvider)
 	virtual ConnectionStatus GetConnectionStatus() const override;
 

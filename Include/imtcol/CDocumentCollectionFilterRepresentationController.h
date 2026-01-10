@@ -18,7 +18,7 @@ class CDocumentCollectionFilterRepresentationController
 public:
 	static bool DocumentCollectionFilterRepresentationToModel(
 				const sdl::imtbase::DocumentCollectionFilter::CDocumentCollectionFilter::V1_0& filterRepresentaion,
-				imtcol::IDocumentCollectionFilter& filterModel,
+				IDocumentCollectionFilter& filterModel,
 				ilog::IMessageConsumer* messageConsumerPtr);
 };
 

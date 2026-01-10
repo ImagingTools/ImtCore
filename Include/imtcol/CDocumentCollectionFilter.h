@@ -9,7 +9,7 @@ namespace imtcol
 {
 
 
-class CDocumentCollectionFilter: virtual public imtcol::IDocumentCollectionFilter
+class CDocumentCollectionFilter: virtual public IDocumentCollectionFilter
 {
 public:
 	// reimplemented (imtcol::IDocumentCollectionFilter)

@@ -53,7 +53,7 @@ void CInternetConnectionCheckerComp::OnComponentCreated()
 
 #if QT_VERSION > QT_VERSION_CHECK(5, 15, 0)
 	m_managerPtr->setTransferTimeout(m_requestTimeout);
-#endif 
+#endif
 	connect(&m_timer, &QTimer::timeout, this, &CInternetConnectionCheckerComp::OnTimer);
 	m_timer.setSingleShot(true);
 	m_timer.setInterval(m_requestDelay);
@@ -107,13 +107,12 @@ void CInternetConnectionCheckerComp::OnRequestFinished()
 
 				return;
 			}
-			else{
-				if (m_status != CS_DISCONNECTED){
-					istd::CChangeNotifier notifier(this);
 
-					m_status = CS_DISCONNECTED;
-					SendVerboseMessage("No internet connection");
-				}
+			if (m_status != CS_DISCONNECTED){
+				istd::CChangeNotifier notifier(this);
+
+				m_status = CS_DISCONNECTED;
+				SendVerboseMessage("No internet connection");
 			}
 		}
 	}

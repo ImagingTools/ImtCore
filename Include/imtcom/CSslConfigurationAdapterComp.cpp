@@ -245,7 +245,7 @@ bool CSslConfigurationAdapterComp::ApplyFilePath(iprm::IParamsSet& paramsSet, co
 
 void CSslConfigurationAdapterComp::ProvideSslEnabled() const
 {
-	iprm::TEditableParamsPtr<iprm::IEnableableParam> sslEnableParamPtr(m_sslConfigurationCompPtr.GetPtr(), imtcom::ISslConfigurationManager::ParamKeys::s_enableSslModeParamKey);
+	iprm::TEditableParamsPtr<iprm::IEnableableParam> sslEnableParamPtr(m_sslConfigurationCompPtr.GetPtr(), ISslConfigurationManager::ParamKeys::s_enableSslModeParamKey);
 	if (sslEnableParamPtr.IsValid()){
 		sslEnableParamPtr->SetEnabled(true);
 	}

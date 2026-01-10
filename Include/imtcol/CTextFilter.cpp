@@ -2,7 +2,6 @@
 
 
 // ACF includes
-#include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
@@ -63,7 +62,7 @@ bool CTextFilter::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.BeginTag(textTag);
 	retVal = retVal && archive.Process(m_text);
 	retVal = retVal && archive.EndTag(textTag);
-	
+
 	return retVal;
 }
 
@@ -78,7 +77,7 @@ int CTextFilter::GetSupportedOperations() const
 
 bool CTextFilter::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
-	const CTextFilter* sourcePtr = dynamic_cast<const CTextFilter*>(&object);
+	auto sourcePtr = dynamic_cast<const CTextFilter*>(&object);
 	if (sourcePtr != nullptr){
 		istd::CChangeNotifier notifier(this, &istd::IChangeable::GetAllChanges());
 

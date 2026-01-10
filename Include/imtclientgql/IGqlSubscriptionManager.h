@@ -15,7 +15,7 @@ class IGqlSubscriptionManager: virtual public istd::IChangeable
 public:
 	virtual QByteArray RegisterSubscription(
 				const imtgql::IGqlRequest& subscriptionRequest,
-				imtclientgql::IGqlSubscriptionClient* subscriptionClientPtr) = 0;
+				IGqlSubscriptionClient* subscriptionClientPtr) = 0;
 	virtual bool UnregisterSubscription(const QByteArray& subscriptionId) = 0;
 };
 

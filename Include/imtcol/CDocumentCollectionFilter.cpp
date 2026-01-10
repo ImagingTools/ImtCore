@@ -2,11 +2,9 @@
 
 
 // ACF includes
-#include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
 #include <istd/CChangeGroup.h>
 #include <iser/IArchive.h>
-#include <iser/CArchiveTag.h>
 
 
 namespace imtcol
@@ -33,7 +31,7 @@ void CDocumentCollectionFilter::SetDocumentId(const QByteArray& documentId)
 }
 
 
-imtcol::IDocumentCollectionFilter::DocumentStates CDocumentCollectionFilter::GetDocumentStates() const
+IDocumentCollectionFilter::DocumentStates CDocumentCollectionFilter::GetDocumentStates() const
 {
 	return m_states;
 }
@@ -87,7 +85,7 @@ bool CDocumentCollectionFilter::CopyFrom(const IChangeable& object, Compatibilit
 {
 	istd::CChangeGroup changeGroup(this);
 
-	const CDocumentCollectionFilter* sourcePtr = dynamic_cast<const CDocumentCollectionFilter*>(&object);
+	auto sourcePtr = dynamic_cast<const CDocumentCollectionFilter*>(&object);
 	if (sourcePtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);
 

@@ -18,7 +18,7 @@ namespace imtcom
 
 class CSslConfigurationAdapterComp:
 			public ilog::CLoggerComponentBase,
-			virtual public imtcom::ISslConfigurationApplier
+			virtual public ISslConfigurationApplier
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;

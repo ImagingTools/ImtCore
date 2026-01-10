@@ -1,15 +1,14 @@
 #include <imtcom/CSimpleConnectionCheckerComp.h>
 
 
-// ImtCore includes
-#include <imtgql/CGqlRequest.h>
-
-
 namespace imtcom
 {
 
 
 // public methods
+CSimpleConnectionCheckerComp::CSimpleConnectionCheckerComp() : m_status(CS_UNKNOWN)
+{
+}
 
 // reimplemented (IConnectionStatusProvider)
 

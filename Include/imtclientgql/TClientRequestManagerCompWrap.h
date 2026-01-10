@@ -9,7 +9,6 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtgql/CGqlRequest.h>
 #include <imtclientgql/IGqlClient.h>
 
 
@@ -36,7 +35,7 @@ protected:
 			return SdlClass();
 		}
 
-		imtclientgql::IGqlClient::GqlRequestPtr requestPtr;
+		IGqlClient::GqlRequestPtr requestPtr;
 		
 		requestPtr.MoveCastedPtr(request.CloneMe());
 		if (!requestPtr.IsValid()){

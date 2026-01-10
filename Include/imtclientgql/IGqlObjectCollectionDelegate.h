@@ -6,8 +6,8 @@
 
 // ImtCore includes
 #include <imtbase/IMetaInfoCreator.h>
-#include <imtbase/IObjectCollection.h>
 #include <imtbase/IOperationContext.h>
+#include <imtbase/IObjectCollection.h>
 #include <imtgql/IGqlResponse.h>
 
 

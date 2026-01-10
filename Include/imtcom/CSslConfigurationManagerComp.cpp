@@ -9,7 +9,6 @@
 
 // ACF includes
 #include <iprm/TParamsPtr.h>
-#include <iprm/IEnableableParam.h>
 #include <iprm/INameParam.h>
 #include <iprm/IOptionsList.h>
 #include <iprm/ISelectionParam.h>

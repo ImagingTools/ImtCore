@@ -16,7 +16,7 @@ namespace imtclientgql
 template <class Base>
 class TSubscriberCompWrap:
 			public Base,
-			virtual public imtclientgql::IGqlSubscriptionClient
+			virtual public IGqlSubscriptionClient
 {
 public:
 	typedef Base BaseClass;

@@ -1,9 +1,6 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QByteArray>
-
 // ACF includes
 #include <istd/IChangeable.h>
 

@@ -38,7 +38,7 @@ void CAsyncConnectionCheckerComp::SendRequest()
 		url.append("/graphql");
 
 		QUrl requestUrl(url);
-		QNetworkRequest networkRequest = QNetworkRequest(requestUrl);
+		QNetworkRequest networkRequest(requestUrl);
 
 		imtgql::CGqlRequest request(imtgql::CGqlRequest::RT_QUERY, "GetDatabaseStatus");
 
@@ -103,8 +103,8 @@ IConnectionStatusProvider::ConnectionStatus CAsyncConnectionCheckerComp::GetConn
 
 void CAsyncConnectionCheckerComp::ReplyFinished()
 {
-	QNetworkReply* reply = dynamic_cast<QNetworkReply*>(sender());
-	if(reply){
+	auto reply = dynamic_cast<QNetworkReply*>(sender());
+	if(reply != nullptr){
 		QByteArray representationData = reply->readAll();
 
 		imtbase::CTreeItemModel representationModel;

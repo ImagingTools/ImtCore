@@ -12,7 +12,7 @@ namespace imtcol
 {
 
 
-class CCollectionHeadersProviderComp : public icomp::CComponentBase, virtual public imtcol::ICollectionHeadersProvider
+class CCollectionHeadersProviderComp : public icomp::CComponentBase, virtual public ICollectionHeadersProvider
 {
 public:
 	typedef icomp::CComponentBase BaseClass;

@@ -28,7 +28,7 @@ const QMap<int, imtbase::IComplexCollectionFilter::FieldOperation> CComplexColle
 };
 
 
-QString CComplexCollectionFilterRepresentationController::GetFlagsAsString(int flags)
+QString CComplexCollectionFilterRepresentationController::GetFlagsAsString(int /* flags */)
 {
 	QString retVal;
 	return retVal;
@@ -36,27 +36,27 @@ QString CComplexCollectionFilterRepresentationController::GetFlagsAsString(int f
 
 
 bool CComplexCollectionFilterRepresentationController::ProcessFieldFilter(
-			const sdl::imtbase::ComplexCollectionFilter::CFieldFilter::V1_0& source,
-			imtbase::IComplexCollectionFilter::FieldFilter& target,
-			ilog::IMessageConsumer* messageConsumerPtr)
+			const sdl::imtbase::ComplexCollectionFilter::CFieldFilter::V1_0& /* source */,
+			imtbase::IComplexCollectionFilter::FieldFilter& /* target */,
+			ilog::IMessageConsumer* /* messageConsumerPtr */)
 {
 	return false;
 }
 
 
 bool CComplexCollectionFilterRepresentationController::ProcessGroupFilter(
-			const sdl::imtbase::ComplexCollectionFilter::CGroupFilter::V1_0& source,
-			imtbase::IComplexCollectionFilter::FilterExpression& target,
-			ilog::IMessageConsumer* messageConsumerPtr)
+			const sdl::imtbase::ComplexCollectionFilter::CGroupFilter::V1_0& /* source */,
+			imtbase::IComplexCollectionFilter::FilterExpression& /* target */,
+			ilog::IMessageConsumer* /* messageConsumerPtr */)
 {
 	return true;
 }
 
 
 bool CComplexCollectionFilterRepresentationController::ComplexCollectionFilterRepresentationToModel(
-	sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0& filterRepresentaion,
-	imtbase::IComplexCollectionFilter& filter,
-	ilog::IMessageConsumer* messageConsumerPtr)
+	sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0& /* filterRepresentaion */,
+	imtbase::IComplexCollectionFilter& /* filter */,
+	ilog::IMessageConsumer* /* messageConsumerPtr */)
 {
 	return true;
 }

@@ -114,7 +114,7 @@ bool CServerConnectionInterfaceParam::GetUrl(ProtocolType protocol, QUrl& url) c
 
 		break;
 	}
-	
+
 	url.setScheme(scheme);
 	url.setHost(m_host);
 	url.setPort(port);

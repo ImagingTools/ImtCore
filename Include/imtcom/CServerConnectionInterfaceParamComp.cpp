@@ -14,10 +14,10 @@ int CServerConnectionInterfaceParamComp::GetConnectionFlags() const
 		if (m_sslEnabledCompPtr->IsEnabled()){
 			return CF_SECURE;
 		}
-		else{
-			return CF_DEFAULT;
-		}
+
+		return CF_DEFAULT;
 	}
+
 	return BaseClass2::GetConnectionFlags();
 }
 

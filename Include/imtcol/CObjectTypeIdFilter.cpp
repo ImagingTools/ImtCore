@@ -2,7 +2,6 @@
 
 
 // ACF includes
-#include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
@@ -59,7 +58,7 @@ int CObjectTypeIdFilter::GetSupportedOperations() const
 
 bool CObjectTypeIdFilter::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
-	const CObjectTypeIdFilter* sourcePtr = dynamic_cast<const CObjectTypeIdFilter*>(&object);
+	auto sourcePtr = dynamic_cast<const CObjectTypeIdFilter*>(&object);
 	if (sourcePtr != nullptr){
 		istd::CChangeNotifier notifier(this, &istd::IChangeable::GetAllChanges());
 
