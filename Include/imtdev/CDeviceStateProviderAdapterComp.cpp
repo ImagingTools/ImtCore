@@ -1,10 +1,6 @@
 #include <imtdev/CDeviceStateProviderAdapterComp.h>
 
 
-// ACF includes
-#include <istd/CChangeNotifier.h>
-
-
 namespace imtdev
 {
 

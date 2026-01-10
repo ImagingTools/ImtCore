@@ -19,7 +19,7 @@ namespace imtdev
 
 class CDeviceIdBasedConfigurationManagerComp:
 			public ilog::CLoggerComponentBase,
-			virtual public imtdev::IDeviceConfigurationManager,
+			virtual public IDeviceConfigurationManager,
 			virtual public iser::ISerializable
 {
 public:

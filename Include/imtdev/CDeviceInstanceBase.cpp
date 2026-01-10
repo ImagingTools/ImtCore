@@ -3,7 +3,6 @@
 
 // ACF includes
 #include <istd/CChangeNotifier.h>
-#include <istd/TDelPtr.h>
 
 
 namespace imtdev
@@ -27,11 +26,11 @@ CDeviceInstanceBase::~CDeviceInstanceBase()
 
 // reimplemented (imtdev::IEditableDeviceInstance)
 
-bool CDeviceInstanceBase::SetIdentifier(IdentifierTypes idType, const QByteArray& value)
+bool CDeviceInstanceBase::SetIdentifier(IdentifierTypes idType, const QByteArray& id)
 {
 	istd::CChangeNotifier notifier(this);
 
-	m_identifiers[idType] = value;
+	m_identifiers[idType] = id;
 
 	return true;
 }

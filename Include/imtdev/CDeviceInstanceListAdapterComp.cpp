@@ -1,10 +1,6 @@
 #include <imtdev/CDeviceInstanceListAdapterComp.h>
 
 
-// ACF includes
-#include <istd/CChangeNotifier.h>
-
-
 namespace imtdev
 {
 
@@ -130,7 +126,7 @@ void CDeviceInstanceListAdapterComp::OnComponentCreated()
 	BaseClass::OnComponentCreated();
 
 	if (m_deviceControllerCompPtr.IsValid()){
-		imod::IModel* modelPtr = const_cast<imod::IModel*>(
+		auto modelPtr = const_cast<imod::IModel*>(
 			dynamic_cast<const imod::IModel*>(&m_deviceControllerCompPtr->GetDeviceInstanceList()));
 		if (modelPtr != nullptr){
 			modelPtr->AttachObserver(&m_updateBridge);

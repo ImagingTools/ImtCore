@@ -32,13 +32,13 @@ public:
 	virtual QByteArray GetClass() const = 0;
 
 	/**
-		Get an unique device type-ID e.g. "Logitech_MX_Master_3"
+		Get a unique device type-ID e.g. "Logitech_MX_Master_3"
 		to identify a specific device type/model
 	*/
 	virtual QByteArray GetTypeId() const = 0;
 
 	/**
-		Get human readable name of the device type/device model e.g. "Logitech MX Master 3 Wireless Mouse"
+		Get human-readable name of the device type/device model e.g. "Logitech MX Master 3 Wireless Mouse"
 	*/
 	virtual QString GetTypeName() const = 0;
 
