@@ -47,17 +47,17 @@ bool CAesEncryption::Encrypt(const QByteArray& inputData, const CAesKey& key, QB
 	QByteArray aesIV = key.GetIV();
 
 	// Encrypt it!
-	if (!EVP_EncryptInit_ex(m_aesEncryptContext, EVP_aes_256_cbc(), NULL, (uchar *)aesKey.data(), (uchar*)aesIV.data())){
+	if (EVP_EncryptInit_ex(m_aesEncryptContext, EVP_aes_256_cbc(), NULL, (uchar *)aesKey.data(), (uchar*)aesIV.data()) == 0){
 		return false;
 	}
 
-	if (!EVP_EncryptUpdate(m_aesEncryptContext, encryptedMessage, (int*)&blockLength, (unsigned char*)inputData.data(), inputData.length())){
+	if (EVP_EncryptUpdate(m_aesEncryptContext, encryptedMessage, (int*)&blockLength, (unsigned char*)inputData.data(), inputData.length()) == 0){
 		return false;
 	}
 
 	encryptedMessageLength += blockLength;
 
-	if (!EVP_EncryptFinal_ex(m_aesEncryptContext, encryptedMessage + encryptedMessageLength, (int*)&blockLength)){
+	if (EVP_EncryptFinal_ex(m_aesEncryptContext, encryptedMessage + encryptedMessageLength, (int*)&blockLength) == 0){
 		return false;
 	}
 
@@ -84,17 +84,17 @@ bool CAesEncryption::Decrypt(const QByteArray& inputData, const CAesKey& key, QB
 	QByteArray aesIV = key.GetIV();
 
 	// Decrypt it!
-	if (!EVP_DecryptInit_ex(m_aesDecryptContext, EVP_aes_256_cbc(), NULL, (uchar*)aesKey.data(), (uchar*)aesIV.data())){
+	if (EVP_DecryptInit_ex(m_aesDecryptContext, EVP_aes_256_cbc(), NULL, (uchar*)aesKey.data(), (uchar*)aesIV.data()) == 0){
 		return false;
 	}
 
-	if (!EVP_DecryptUpdate(m_aesDecryptContext, decryptedMessage, (int*)&blockLength, (uchar*)inputData.data(), (int)inputData.length())){
+	if (EVP_DecryptUpdate(m_aesDecryptContext, decryptedMessage, (int*)&blockLength, (uchar*)inputData.data(), (int)inputData.length()) == 0){
 		return false;
 	}
 
 	decryptedMessageLength += blockLength;
 
-	if (!EVP_DecryptFinal_ex(m_aesDecryptContext, decryptedMessage + decryptedMessageLength, (int*)&blockLength)){
+	if (EVP_DecryptFinal_ex(m_aesDecryptContext, decryptedMessage + decryptedMessageLength, (int*)&blockLength) == 0){
 		return false;
 	}
 
