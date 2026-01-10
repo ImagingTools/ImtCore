@@ -21,7 +21,7 @@ public:
 	static QByteArray GetTypeName();
 
 	CPosition3d();
-	CPosition3d(const i3d::CVector3d& center);
+	CPosition3d(const i3d::CVector3d& position);
 
 	const i3d::CVector3d& GetPosition() const;
 	void SetPosition(const i3d::CVector3d& position);

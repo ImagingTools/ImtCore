@@ -41,7 +41,7 @@ bool CPointCloud3d::CreateCloud(PointFormat pointFormat,
 	m_gridSize.Clear();
 	bool retVal = Create(pointFormat, pointsCount, dataPtr);
 
-	if (retVal && gridSizePtr){
+	if (retVal && (gridSizePtr != nullptr)){
 		m_gridSize = *gridSizePtr;
 	}
 

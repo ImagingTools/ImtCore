@@ -58,7 +58,7 @@ public:
 	void SetCalibration3d(const CImage3dCalibration& calibration3d);
 	void SetReferenceBitmap(const iimg::CGeneralBitmap& referenceBitmap);
 	void ResetReferenceBitmap();
-	void SetRobotTrajectory(const IDepthBitmap::RobotTrajectory& robotPositions);
+	void SetRobotTrajectory(const IDepthBitmap::RobotTrajectory& robotTrajectory);
 
 	bool ComputeDepthRange(const i2d::IObject2d* aoi, istd::CRange& depthRange) const;
 
