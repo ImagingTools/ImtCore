@@ -9,6 +9,7 @@
 #include <iser/CPrimitiveTypesSerializer.h>
 
 // ImtCore includes
+#include <imtcore/Version.h>
 #include <imtlic/CFeatureInfo.h>
 
 

@@ -1,6 +1,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QDateTime>
+
 // ImtCore includes
 #include <imtlic/ILicenseInstance.h>
 #include <imtlic/CLicenseDefinition.h>
