@@ -34,11 +34,11 @@ QByteArray CSubscriberCompBase::GetCommandId(const QByteArray& subscriptionId) c
 	if (index < 0){
 		return QByteArray();
 	}
-	
+
 	if (index >= m_commandAttrPtr.GetCount()){
 		return QByteArray();
 	}
-	
+
 	return m_commandAttrPtr[index];
 }
 

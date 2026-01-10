@@ -101,7 +101,7 @@ public:
 	virtual bool GetItemIds(const imtgql::IGqlResponse& response, Ids& out) const override;
 	virtual imtbase::IObjectCollection* GetSubCollection(
 				imtbase::IObjectCollection& collection,
-				const imtgql::IGqlResponse& reqponse,
+				const imtgql::IGqlResponse& response,
 				QList<imtbase::IMetaInfoCreator*> metaInfoCreatorList) const override;
 
 	// reimplemented (icomp::CComponentBase)

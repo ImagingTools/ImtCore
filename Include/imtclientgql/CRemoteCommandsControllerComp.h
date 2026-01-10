@@ -11,11 +11,11 @@ namespace imtclientgql
 
 
 class CRemoteCommandsControllerComp:
-			public imtclientgql::TClientRequestManagerCompWrap<
+			public TClientRequestManagerCompWrap<
 						sdl::imtbase::Commands::CGraphQlHandlerCompBase>
 {
 public:
-	typedef imtclientgql::TClientRequestManagerCompWrap<
+	typedef TClientRequestManagerCompWrap<
 				sdl::imtbase::Commands::CGraphQlHandlerCompBase> BaseClass;
 
 	I_BEGIN_COMPONENT(CRemoteCommandsControllerComp);
@@ -27,7 +27,7 @@ protected:
 	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
 	virtual sdl::imtbase::Commands::CGuiElementContainer OnGetCommands(
 				const sdl::imtbase::Commands::CGetCommandsGqlRequest& getCommandsRequest,
-				const ::imtgql::CGqlRequest& gqlRequest,
+				const imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 
 protected:

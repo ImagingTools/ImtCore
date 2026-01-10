@@ -47,7 +47,7 @@ void CModelSubscriberComp::OnResponseReceived(const QByteArray& subscriptionId, 
 			if (changeSetObject.contains("ids")){
 				QSet<int> ids;
 				QJsonArray idsArray = changeSetObject.value("ids").toArray();
-				for (const QJsonValue& value : idsArray){
+				for (const auto& value : idsArray){
 					if (value.isObject()){
 						QJsonObject obj = value.toObject();
 						ids << obj.value("id").toInt();

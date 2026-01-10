@@ -129,7 +129,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateInsertObjectRequest
 						QString("Unable to create insert request for object with id '%1', typeId '%2'. Error: Serialization object failed")
 							.arg(qPrintable(proposedObjectId), qPrintable(typeId)),
 							"CGqlObjectCollectionDelegateComp");
-	
+
 			return nullptr;
 		}
 	}
@@ -165,7 +165,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateInsertObjectRequest
 
 imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetObjectRequest(
 			const QByteArray& objectId,
-			const iprm::IParamsSet* paramsPtr) const
+			const iprm::IParamsSet* /* paramsPtr */) const
 {
 	if (!m_collectionIdAttrPtr.IsValid()){
 		return nullptr;
@@ -491,7 +491,7 @@ bool CGqlObjectCollectionDelegateComp::GetObjectData(const imtgql::IGqlResponse&
 }
 
 
-bool CGqlObjectCollectionDelegateComp::GetMetaInfo(const imtgql::IGqlResponse& response, idoc::IDocumentMetaInfo& out) const
+bool CGqlObjectCollectionDelegateComp::GetMetaInfo(const imtgql::IGqlResponse& response, idoc::IDocumentMetaInfo& /* out */) const
 {
 	sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload::V1_0 getElementMetaInfoPayload;
 	ResponseData responseData = GetResponseData(response);
@@ -561,7 +561,7 @@ imtbase::IObjectCollection* CGqlObjectCollectionDelegateComp::GetSubCollection(
 				QString description = *subCollectionItem->itemInfo->description;
 
 				idoc::MetaInfoPtr dataMetainfoPtr;
-				auto CreateMetaInfo = [&objectId, this, &objectTypeId](const QByteArray typeId,
+				auto CreateMetaInfo = [&objectId, this](const QByteArray& typeId,
 										 QList<imtbase::IMetaInfoCreator*> metaInfoCreatorList){
 					idoc::MetaInfoPtr metaInfoPtr;
 					for (int i = 0; i < metaInfoCreatorList.count(); i++){
@@ -574,21 +574,21 @@ imtbase::IObjectCollection* CGqlObjectCollectionDelegateComp::GetSubCollection(
 									// TODO: Read full object ?
 									m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr);
 								}
-	
+
 								metaInfoCreatorPtr->CreateMetaInfo(dataPtr.GetPtr(), typeId, metaInfoPtr);
 							}
 						}
 					}
-	
+
 					if (!metaInfoPtr.IsValid()){
 						metaInfoPtr.SetPtr(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>());
 					}
-	
+
 					Q_ASSERT(metaInfoPtr.IsValid());
-	
+
 					return metaInfoPtr;
 				};
-	
+
 				dataMetainfoPtr = CreateMetaInfo(objectTypeId, metaInfoCreatorList);
 
 				idoc::CStandardDocumentMetaInfo metainfo;
@@ -607,7 +607,7 @@ imtbase::IObjectCollection* CGqlObjectCollectionDelegateComp::GetSubCollection(
 						qDebug() << "Deserialization of the object was failed!";
 					}
 				}
-				
+
 				imtbase::COperationContext operationContext;
 				if (subCollectionItem->operationContext){
 					QByteArray operationContextData = (*subCollectionItem->operationContext).toUtf8();
@@ -623,7 +623,7 @@ imtbase::IObjectCollection* CGqlObjectCollectionDelegateComp::GetSubCollection(
 							dataMetainfoPtr.GetPtr(),
 							&metainfo,
 							&operationContext);
-	
+
 				dataMetainfoPtr.SetPtr(nullptr);
 			}
 		}
@@ -704,9 +704,7 @@ bool CGqlObjectCollectionDelegateComp::SerializeObject(const istd::IPolymorphic*
 		SendErrorMessage(0, QString("Unable to serialize object. Error: Serialization failed"));
 		return false;
 	}
-	else{
-		objectData = archivePtr->GetData();
-	}
+	objectData = archivePtr->GetData();
 
 	return true;
 }
@@ -725,7 +723,7 @@ bool CGqlObjectCollectionDelegateComp::DeSerializeObject(istd::IPolymorphic* obj
 		return false;
 	}
 
-	iser::CJsonMemReadArchive archive(objectData, objectData.length());
+	iser::CJsonMemReadArchive archive(objectData, !objectData.isEmpty());
 	if (!serializableObjectPtr->Serialize(archive)){
 		SendErrorMessage(0, QString("Unable to deserialize object. Error: Deserialization failed"));
 

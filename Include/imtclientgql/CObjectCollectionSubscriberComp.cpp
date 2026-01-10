@@ -21,26 +21,26 @@ void CObjectCollectionSubscriberComp::OnResponseReceived(const QByteArray& subsc
 		SendErrorMessage(0, QString("Unable to response received for subscription ID '%1'").arg(qPrintable(subscriptionId)), "CObjectCollectionSubscriberComp");
 		return;
 	}
-	
+
 	istd::IChangeable::ChangeSet changeSet;
 	imtbase::ICollectionInfo::NotifierInfo notifierInfo;
-	
+
 	QJsonDocument document = QJsonDocument::fromJson(subscriptionData);
 	QJsonObject subscriptionObject = document.object();
-	
+
 	if (subscriptionObject.contains("data")){
 		subscriptionObject = subscriptionObject.value("data").toObject();
 	}
-	
+
 	QByteArray commandId = GetCommandId(subscriptionId);
 	if (commandId.isEmpty()){
 		return;
 	}
-	
+
 	if (subscriptionObject.contains(commandId)){
 		subscriptionObject = subscriptionObject.value(commandId).toObject();
 	}
-	
+
 	QByteArray itemId;
 	if (subscriptionObject.contains("itemId")){
 		itemId = subscriptionObject.value("itemId").toString().toUtf8();
@@ -48,23 +48,23 @@ void CObjectCollectionSubscriberComp::OnResponseReceived(const QByteArray& subsc
 
 	if (subscriptionObject.contains("operationContext")){
 		imtbase::IOperationContext::OperationContextInfo info;
-		
+
 		QJsonObject operationContextObj = subscriptionObject.value("operationContext").toObject();
 		if (operationContextObj.contains("ownerId")){
 			QString ownerId = operationContextObj.value("ownerId").toString();
 			info.id = ownerId.toUtf8();
 		}
-		
+
 		if (operationContextObj.contains("ownerName")){
 			QString ownerName = operationContextObj.value("ownerName").toString();
 			info.name = ownerName;
 		}
-		
+
 		changeSet.SetChangeInfo(
 			imtbase::IOperationContext::OPERATION_CONTEXT_INFO,
 			QVariant::fromValue<imtbase::IOperationContext::OperationContextInfo>(info));
 	}
-	
+
 	if (subscriptionObject.contains("typeOperation")){
 		QByteArray typeOperation = subscriptionObject.value("typeOperation").toString().toUtf8();
 		if (typeOperation == "inserted"){
@@ -74,15 +74,15 @@ void CObjectCollectionSubscriberComp::OnResponseReceived(const QByteArray& subsc
 		else if (typeOperation == "removed"){
 			if (subscriptionObject.contains("itemIds")){
 				QJsonArray itemIdsArr = subscriptionObject.value("itemIds").toArray();
-				
+
 				imtbase::ICollectionInfo::MultiElementNotifierInfo multiElementNotifierInfo;
-				for (const QJsonValue& itemIdValue : itemIdsArr){
+				for (const auto& itemIdValue : itemIdsArr){
 					multiElementNotifierInfo.elementIds.append(itemIdValue.toString().toUtf8());
 				}
-				
+
 				changeSet.SetChangeInfo(imtbase::IObjectCollection::CN_ELEMENTS_REMOVED, QVariant::fromValue(multiElementNotifierInfo));
 			}
-			
+
 			changeSet += imtbase::ICollectionInfo::CF_REMOVED;
 		}
 		else if (typeOperation == "updated"){

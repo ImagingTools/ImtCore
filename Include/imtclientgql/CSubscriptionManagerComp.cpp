@@ -6,11 +6,6 @@
 #include <QtCore/QMessageAuthenticationCode>
 #include <QtNetwork/QNetworkRequest>
 #include <QtCore/QUrl>
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonDocument>
-
-// ACF includes
-#include <istd/TDelPtr.h>
 
 // ImtCore includes
 #include <imtrest/CWebSocketRequest.h>
@@ -27,7 +22,7 @@ namespace imtclientgql
 
 QByteArray CSubscriptionManagerComp::RegisterSubscription(
 			const imtgql::IGqlRequest& subscriptionRequest,
-			imtclientgql::IGqlSubscriptionClient* subscriptionClient)
+			IGqlSubscriptionClient* subscriptionClient)
 {
 	if (!m_connectionStatusProviderCompPtr.IsValid()){
 		return QByteArray();
@@ -37,11 +32,14 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(
 		return QByteArray();
 	}
 
-	QByteArray clientId;
-	const imtgql::CGqlRequest* requestImplPtr = dynamic_cast<const imtgql::CGqlRequest*>(&subscriptionRequest);
-	if (requestImplPtr != nullptr){
-		clientId = requestImplPtr->GetHeader("clientid");
+	auto requestImplPtr = dynamic_cast<const imtgql::CGqlRequest*>(&subscriptionRequest);
+	if (requestImplPtr == nullptr){
+		SendWarningMessage(0, "Unexpected subscription request");
+
+		return QByteArray();
 	}
+
+	QByteArray clientId = requestImplPtr->GetHeader("clientid");
 
 	QMutexLocker locker(&m_registeredClientsMutex);
 
@@ -58,7 +56,7 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(
 	SubscriptionHelper subscriptionHelper;
 	subscriptionHelper.m_request = *requestImplPtr;
 	subscriptionHelper.m_clientId = clientId;
-	subscriptionHelper.m_status = imtclientgql::IGqlSubscriptionClient::SS_IN_REGISTRATION;
+	subscriptionHelper.m_status = IGqlSubscriptionClient::SS_IN_REGISTRATION;
 	subscriptionHelper.m_clients.append(subscriptionClient);
 	m_registeredClients.insert(subscriptionId.toLocal8Bit(), subscriptionHelper);
 
@@ -97,7 +95,7 @@ void CSubscriptionManagerComp::OnUpdate(const istd::IChangeable::ChangeSet& chan
 	for (const QByteArray& subscriptionId : m_registeredClients.keys()){
 		if (!changeSet.Contains(imtcom::IConnectionStatusProvider::CS_CONNECTED)){
 			if (m_registeredClients[subscriptionId].m_clientId == clientId){
-				m_registeredClients[subscriptionId].m_status = imtclientgql::IGqlSubscriptionClient::SS_IN_REGISTRATION;
+				m_registeredClients[subscriptionId].m_status = IGqlSubscriptionClient::SS_IN_REGISTRATION;
 			}
 		}
 		else{
@@ -123,7 +121,7 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 
 	QByteArray commandId = subCommandId.isEmpty() ? request.GetCommandId() : subCommandId;
 
-	const imtrest::CWebSocketRequest* webSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&request);
+	auto webSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&request);
 	if (webSocketRequest != nullptr){
 		QByteArray message = webSocketRequest->GetBody();
 
@@ -143,10 +141,10 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 		{
 		case imtrest::CWebSocketRequest::MT_CONNECTION_ACK:
 			for (const QByteArray& subscriptionId : m_registeredClients.keys()){
-				if (m_registeredClients[subscriptionId].m_status == imtclientgql::IGqlSubscriptionClient::SS_IN_REGISTRATION){
+				if (m_registeredClients[subscriptionId].m_status == IGqlSubscriptionClient::SS_IN_REGISTRATION){
 					istd::IChangeableUniquePtr objectPtr(m_registeredClients[subscriptionId].m_request.CloneMe());
 					locker.unlock();
-					imtgql::CGqlRequest* requestPtr = dynamic_cast<imtgql::CGqlRequest*>(objectPtr.GetPtr());
+					auto requestPtr = dynamic_cast<imtgql::CGqlRequest*>(objectPtr.GetPtr());
 					if (requestPtr != nullptr){
 						SubscriptionRegister(*requestPtr, subscriptionId);
 					}
@@ -158,9 +156,9 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 		case imtrest::CWebSocketRequest::MT_START_ACK:{
 			QByteArray subscriptionId = rootObject.value("id").toString().toLocal8Bit();
 			if (m_registeredClients.contains(subscriptionId)){
-				m_registeredClients[subscriptionId].m_status = imtclientgql::IGqlSubscriptionClient::SS_REGISTERED;
+				m_registeredClients[subscriptionId].m_status = IGqlSubscriptionClient::SS_REGISTERED;
 
-				for (imtclientgql::IGqlSubscriptionClient* subscriptionClientPtr : m_registeredClients[subscriptionId].m_clients){
+				for (IGqlSubscriptionClient* subscriptionClientPtr : m_registeredClients[subscriptionId].m_clients){
 					if (subscriptionClientPtr != nullptr){
 						subscriptionClientPtr->OnSubscriptionStatusChanged(subscriptionId, m_registeredClients[subscriptionId].m_status, message);
 					}
@@ -172,7 +170,7 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 		case imtrest::CWebSocketRequest::MT_DATA:{
 			QByteArray subscriptionId = rootObject.value("id").toString().toLocal8Bit();
 			if (m_registeredClients.contains(subscriptionId)){
-				for (imtclientgql::IGqlSubscriptionClient* subscriptionClientPtr : m_registeredClients[subscriptionId].m_clients){
+				for (IGqlSubscriptionClient* subscriptionClientPtr : m_registeredClients[subscriptionId].m_clients){
 					if (subscriptionClientPtr != nullptr){
 						if (!rootObject.contains("payload")){
 							break;
@@ -240,7 +238,7 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 
 // reimplemented (IGqlClient)
 
-IGqlClient::GqlResponsePtr CSubscriptionManagerComp::SendRequest(IGqlClient::GqlRequestPtr requestPtr, imtbase::IUrlParam*) const
+IGqlClient::GqlResponsePtr CSubscriptionManagerComp::SendRequest(IGqlClient::GqlRequestPtr requestPtr, imtbase::IUrlParam* /* urlParamPtr */) const
 {
 	QString key = QUuid::createUuid().toString(QUuid::WithoutBraces);
 
@@ -254,7 +252,7 @@ IGqlClient::GqlResponsePtr CSubscriptionManagerComp::SendRequest(IGqlClient::Gql
 	const imtgql::IGqlContext* contextPtr = requestPtr->GetRequestContext();
 	if (contextPtr != nullptr){
 		imtgql::IGqlContext::Headers headers = contextPtr->GetHeaders();
-		for (QByteArray headerId: headers.keys()){
+		for (const QByteArray& headerId: headers.keys()){
 			if (headerId != "accept-encoding" && headerId != "x-authentication-token"){
 				headersObject[headerId] = QString(headers.value(headerId));
 			}
@@ -288,9 +286,8 @@ IGqlClient::GqlResponsePtr CSubscriptionManagerComp::SendRequest(IGqlClient::Gql
 
 			break;
 		}
-		else{
-			resultCode = 0;
-		}
+
+		resultCode = 0;
 	}
 
 	if(resultCode == 1){
@@ -301,7 +298,7 @@ IGqlClient::GqlResponsePtr CSubscriptionManagerComp::SendRequest(IGqlClient::Gql
 			m_queryDataMap.remove(key);
 			queryLocker.unlock();
 
-			imtgql::CGqlResponse* responsePtr = new imtgql::CGqlResponse(requestPtr);
+			auto responsePtr = new imtgql::CGqlResponse(requestPtr);
 			responsePtr->SetResponseData(responseData);
 
 			retVal.SetPtr(responsePtr);
@@ -316,7 +313,7 @@ IGqlClient::GqlResponsePtr CSubscriptionManagerComp::SendRequest(IGqlClient::Gql
 
 // protected methods
 
-void CSubscriptionManagerComp::SubscriptionRegister(const imtgql::CGqlRequest& subscriptionRequest, QByteArray subscriptionId) const
+void CSubscriptionManagerComp::SubscriptionRegister(const imtgql::CGqlRequest& subscriptionRequest, const QByteArray& subscriptionId) const
 {
 	if (!m_engineCompPtr.IsValid()){
 		Q_ASSERT(0);
@@ -350,7 +347,7 @@ void CSubscriptionManagerComp::SubscriptionRegister(const imtgql::CGqlRequest& s
 	const imtgql::IGqlContext* contextPtr = subscriptionRequest.GetRequestContext();
 	if (contextPtr != nullptr){
 		imtgql::IGqlContext::Headers headers = contextPtr->GetHeaders();
-		for (QByteArray headerId: headers.keys()){
+		for (const QByteArray& headerId: headers.keys()){
 			if (headerId != "accept-encoding"){
 				headersObject[headerId] = QString(headers.value(headerId));
 			}
@@ -371,7 +368,7 @@ bool CSubscriptionManagerComp::SendRequestInternal(const imtgql::IGqlRequest& re
 	bool retVal = false;
 	QByteArray clientId;
 
-	const imtgql::CGqlRequest* requestImplPtr = dynamic_cast<const imtgql::CGqlRequest*>(&request);
+	auto requestImplPtr = dynamic_cast<const imtgql::CGqlRequest*>(&request);
 	if (requestImplPtr != nullptr){
 		clientId = requestImplPtr->GetHeader("clientid");
 	}
@@ -402,7 +399,7 @@ void CSubscriptionManagerComp::OnComponentCreated()
 }
 
 
-imtrest::ConstResponsePtr CSubscriptionManagerComp::CreateErrorResponse(QByteArray errorMessage, const imtrest::IRequest& request) const
+imtrest::ConstResponsePtr CSubscriptionManagerComp::CreateErrorResponse(const QByteArray& errorMessage, const imtrest::IRequest& request) const
 {
 	QByteArray requestBody = request.GetBody();
 	QJsonDocument document = QJsonDocument::fromJson(requestBody);
@@ -415,14 +412,13 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::CreateErrorResponse(QByteArr
 						.arg(object["id"].toString())
 						.arg(QString(errorMessage));
 
-	QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
-
+	QByteArray responseTypeId("text/html; charset=utf-8");
 	imtrest::ConstResponsePtr responsePtr(
 				engine.CreateResponse(
 							request,
 							imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE,
 							body.toUtf8(),
-							reponseTypeId).PopInterfacePtr());
+							responseTypeId).PopInterfacePtr());
 
 	SendErrorMessage(0, QString(errorMessage));
 
@@ -439,17 +435,17 @@ CSubscriptionManagerComp::NetworkOperation::NetworkOperation(int timeout, const 
 	timerFlag = false;
 
 	// If the network reply is finished, the internal event loop will be finished:
-	QObject::connect(parent, &CSubscriptionManagerComp::OnQueryDataReceived, &connectionLoop, &QEventLoop::exit);
+	connect(parent, &CSubscriptionManagerComp::OnQueryDataReceived, &connectionLoop, &QEventLoop::exit);
 
 	// If the application will be finished, the internal event loop will be also finished:
-	QObject::connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit, &connectionLoop, &QEventLoop::quit);
+	connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit, &connectionLoop, &QEventLoop::quit);
 
 	// If a timeout for the request was defined, start the timer:
 	if (timeout > 0){
 		timer.setSingleShot(true);
 
 		// If the timer is running out, the internal event loop will be finished:
-		QObject::connect(&timer, &QTimer::timeout, &connectionLoop, &QEventLoop::quit);
+		connect(&timer, &QTimer::timeout, &connectionLoop, &QEventLoop::quit);
 		timer.setInterval(timeout);
 	}
 }

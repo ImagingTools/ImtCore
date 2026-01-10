@@ -4,13 +4,11 @@
 // Qt includes
 #include <QtCore/QMessageAuthenticationCode>
 #include <QtCore/QUrl>
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonDocument>
 #include <QtCore/QFile>
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 4, 0)
 #include <QtWebSockets/QWebSocketHandshakeOptions>
-#endif 
+#endif
 
 // ACF includes
 #include <istd/TDelPtr.h>
@@ -40,7 +38,7 @@ CWebSocketClientComp::CWebSocketClientComp()
 
 // reimplemented (imtclientgql::IGqlClient)
 
-IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(IGqlClient::GqlRequestPtr requestPtr, imtbase::IUrlParam* /*urlParamPtr*/) const
+IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* /*urlParamPtr*/) const
 {
 	QString key = QUuid::createUuid().toString(QUuid::WithoutBraces);
 
@@ -75,10 +73,9 @@ IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(IGqlClient::GqlRequ
 
 	GqlResponsePtr retVal;
 
-	int resultCode = 0;
 	for (int i = 0; i < 100; i++){
 		networkOperation.timer.start();
-		resultCode = networkOperation.connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
+		networkOperation.connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
 		QCoreApplication::processEvents();
 		QWriteLocker writeLock(&m_queryDataMapLock);
 		if (m_queryDataMap.contains(key)){
@@ -494,17 +491,17 @@ CWebSocketClientComp::NetworkOperation::NetworkOperation(int timeout, const CWeb
 	timerFlag = false;
 
 	// If the network reply is finished, the internal event loop will be finished:
-	QObject::connect(parent, &CWebSocketClientComp::EmitQueryDataReceived, &connectionLoop, &QEventLoop::exit);
+	connect(parent, &CWebSocketClientComp::EmitQueryDataReceived, &connectionLoop, &QEventLoop::exit);
 
 	// If the application will be finished, the internal event loop will be also finished:
-	QObject::connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit, &connectionLoop, &QEventLoop::quit);
+	connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit, &connectionLoop, &QEventLoop::quit);
 
 	// If a timeout for the request was defined, start the timer:
 	if (timeout > 0){
 		timer.setSingleShot(true);
 
 		// If the timer is running out, the internal event loop will be finished:
-		QObject::connect(&timer, &QTimer::timeout, &connectionLoop, &QEventLoop::quit);
+		connect(&timer, &QTimer::timeout, &connectionLoop, &QEventLoop::quit);
 
 		timer.start(timeout);
 	}
@@ -520,13 +517,12 @@ CWebSocketClientComp::NetworkOperation::~NetworkOperation()
 // public methods of embedded class ConnectionStatusProvider
 
 CWebSocketClientComp::ConnectionStatusProvider::ConnectionStatusProvider()
-	:m_connectionStatus(imtcom::IConnectionStatusProvider::CS_UNKNOWN)
+	:m_connectionStatus(CS_UNKNOWN)
 {
 }
 
 
-void CWebSocketClientComp::ConnectionStatusProvider::SetConnectionStatus(
-			imtcom::IConnectionStatusProvider::ConnectionStatus status)
+void CWebSocketClientComp::ConnectionStatusProvider::SetConnectionStatus(ConnectionStatus status)
 {
 	if (m_connectionStatus != status){
 		istd::IChangeable::ChangeSet changeSet(status);

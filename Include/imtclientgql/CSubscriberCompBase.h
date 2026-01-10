@@ -14,7 +14,7 @@ namespace imtclientgql
 
 class CSubscriberCompBase:
 			public ilog::CLoggerComponentBase,
-			virtual public imtclientgql::IGqlSubscriptionClient
+			virtual public IGqlSubscriptionClient
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;

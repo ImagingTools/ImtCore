@@ -30,17 +30,17 @@ class CSubscriptionManagerComp:
 			public QObject,
 			public ilog::CLoggerComponentBase,
 			public imod::CSingleModelObserverBase,
-			virtual public imtclientgql::IGqlSubscriptionManager,
+			virtual public IGqlSubscriptionManager,
 			virtual public imtrest::IRequestServlet,
-			virtual public imtclientgql::IGqlClient
+			virtual public IGqlClient
 {
 	Q_OBJECT
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CSubscriptionManagerComp);
-		I_REGISTER_INTERFACE(imtclientgql::IGqlSubscriptionManager);
-		I_REGISTER_INTERFACE(imtclientgql::IGqlClient);
+		I_REGISTER_INTERFACE(IGqlSubscriptionManager);
+		I_REGISTER_INTERFACE(IGqlClient);
 		I_REGISTER_INTERFACE(imtrest::IRequestServlet);
 		I_ASSIGN(m_subscriptionSenderCompPtr, "SubscriptionSender", "Subscription sender", false, "SubscriptionSender");
 		I_ASSIGN(m_requestManagerCompPtr, "RequestManager", "Request manager for sending a request", false, "RequestManager");
@@ -61,10 +61,10 @@ public:
 	virtual imtrest::ConstResponsePtr ProcessRequest(const imtrest::IRequest& request, const QByteArray& subCommandId = QByteArray()) const override;
 
 	// reimplemented (IGqlClient)
-	virtual GqlResponsePtr SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* = nullptr) const override;
+	virtual GqlResponsePtr SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* urlParamPtr = nullptr) const override;
 
 protected:
-	virtual void SubscriptionRegister(const imtgql::CGqlRequest& subscriptionRequest, QByteArray subscriptionId) const;
+	virtual void SubscriptionRegister(const imtgql::CGqlRequest& subscriptionRequest, const QByteArray& subscriptionId) const;
 	virtual bool SendRequestInternal(const imtgql::IGqlRequest& request, imtrest::ConstRequestPtr& requestPtr) const;
 
 	// reimplemented (icomp::CComponentBase)
@@ -74,7 +74,7 @@ Q_SIGNALS:
 	void OnQueryDataReceived(int resultCode = 1) const;
 
 private:
-	virtual imtrest::ConstResponsePtr CreateErrorResponse(QByteArray errorMessage, const imtrest::IRequest& request) const;
+	virtual imtrest::ConstResponsePtr CreateErrorResponse(const QByteArray& errorMessage, const imtrest::IRequest& request) const;
 
 private:
 	I_REF(imtrest::ISender, m_subscriptionSenderCompPtr);
@@ -88,8 +88,8 @@ private:
 	public:
 		imtgql::CGqlRequest m_request;
 		QByteArray m_clientId;
-		imtclientgql::IGqlSubscriptionClient::SubscriptionStatus m_status;
-		QList<imtclientgql::IGqlSubscriptionClient*> m_clients;
+		IGqlSubscriptionClient::SubscriptionStatus m_status;
+		QList<IGqlSubscriptionClient*> m_clients;
 	};
 
 	class NetworkOperation

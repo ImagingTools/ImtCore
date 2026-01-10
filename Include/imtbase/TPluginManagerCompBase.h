@@ -64,7 +64,7 @@ protected:
 
 	protected:
 		// reimplemented (imod::CSingleModelObserverBase)
-		virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet);
+		virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
 
 	private:
 		TPluginManagerCompBase& m_parent;
@@ -137,7 +137,7 @@ void TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, Ba
 			for (int pluginPathIndex = 0; pluginPathIndex < pluginPathsCount; ++pluginPathIndex){
 				
 				bool isEnabled = true;
-				if (paramListPtr != NULL){
+				if (paramListPtr != nullptr){
 					isEnabled = paramListPtr->IsOptionEnabled(pluginPathIndex);
 				}
 

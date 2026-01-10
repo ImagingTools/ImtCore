@@ -7,7 +7,6 @@
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/IMetaInfoCreator.h>
-#include <imtclientgql/IClientProtocolEngine.h>
 #include <imtclientgql/IGqlObjectCollectionDelegate.h>
 #include <imtclientgql/IGqlClient.h>
 
@@ -74,7 +73,7 @@ public:
 
 	// reimplemented (ICollectionInfo)
 	virtual int GetElementsCount(
-				const iprm::IParamsSet* selectionParamPtr = nullptr,
+				const iprm::IParamsSet* selectionParamsPtr = nullptr,
 				ilog::IMessageConsumer* logPtr = nullptr) const override;
 	virtual Ids GetElementIds(
 				int offset = 0,

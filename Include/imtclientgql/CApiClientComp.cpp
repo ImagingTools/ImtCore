@@ -27,7 +27,7 @@ CApiClientComp::CApiClientComp()
 IGqlClient::GqlResponsePtr CApiClientComp::SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* urlParam) const
 {
 	if (!requestPtr.IsValid()){
-		return IGqlClient::GqlResponsePtr(nullptr);
+		return GqlResponsePtr(nullptr);
 	}
 
 	GqlResponsePtr retVal;
@@ -43,9 +43,7 @@ IGqlClient::GqlResponsePtr CApiClientComp::SendRequest(GqlRequestPtr requestPtr,
 				QString message = "Send request with ID " + uuid + "\n" + requestPtr->GetQuery();
 				SendVerboseMessage(message, "API client");
 
-				imtcom::CRequestSender requestSender;
-				QNetworkReply* replyPtr = requestSender.DoSyncPost(*networkRequestPtr, requestPtr->GetQuery(), m_timeout);
-
+				QNetworkReply* replyPtr = imtcom::CRequestSender::DoSyncPost(*networkRequestPtr, requestPtr->GetQuery(), m_timeout);
 				if (replyPtr != nullptr){
 					QNetworkReply::NetworkError error = replyPtr->error();
 					if (error == QNetworkReply::NoError){

@@ -10,10 +10,10 @@ namespace imtclientgql
 {
 
 
-class CRemoteObjectCollectionControllerComp: public imtclientgql::TClientRequestManagerCompWrap<sdl::imtbase::ImtCollection::CGraphQlHandlerCompBase>
+class CRemoteObjectCollectionControllerComp: public TClientRequestManagerCompWrap<sdl::imtbase::ImtCollection::CGraphQlHandlerCompBase>
 {
 public:
-	typedef imtclientgql::TClientRequestManagerCompWrap<sdl::imtbase::ImtCollection::CGraphQlHandlerCompBase> BaseClass;
+	typedef TClientRequestManagerCompWrap<sdl::imtbase::ImtCollection::CGraphQlHandlerCompBase> BaseClass;
 
 	I_BEGIN_COMPONENT(CRemoteObjectCollectionControllerComp);
 		I_ASSIGN_MULTI_0(m_collectionIdsAttrPtr, "CollectionIds", "Collection-IDs", false);

@@ -3,7 +3,6 @@
 
 // ACF includes
 #include <istd/IChangeable.h>
-#include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
 #include <imtclientgql/CSubscriberCompBase.h>

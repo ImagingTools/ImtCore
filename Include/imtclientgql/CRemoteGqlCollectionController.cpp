@@ -198,7 +198,7 @@ bool CRemoteGqlCollectionController::SetObjectData(
 	if (m_gqlClientPtr == nullptr || m_gqlObjectCollectionDelegatePtr == nullptr){
 		return false;
 	}
-	
+
 	bool retVal = false;
 
 	QByteArray typeId = GetObjectTypeId(objectId);
@@ -318,17 +318,17 @@ idoc::MetaInfoPtr CRemoteGqlCollectionController::GetDataMetaInfo(const Id& obje
 			if (m_metaInfoCreatorMap.contains(typeId)){
 				imtbase::IMetaInfoCreator* metaInfoCreatorPtr = m_metaInfoCreatorMap[typeId];
 				Q_ASSERT(metaInfoCreatorPtr != nullptr);
-				
+
 				// TODO: Read full object ?
 				imtbase::IObjectCollection::DataPtr dataPtr;
 				GetObjectData(objectId, dataPtr);
-				
+
 				metaInfoCreatorPtr->CreateMetaInfo(dataPtr.GetPtr(), typeId, metaInfoPtr);
 			}
 			else{
 				metaInfoPtr.SetPtr(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>());
 			}
-			
+
 			retVal = metaInfoPtr;
 		}
 	}

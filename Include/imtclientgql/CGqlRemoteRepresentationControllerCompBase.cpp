@@ -32,9 +32,8 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerCompBase::CreateInter
 		if (responsePtr.IsValid()){
 			return CreateTreeItemModelFromResponse(gqlRequest.GetCommandId(), *responsePtr);
 		}
-		else{
-			errorMessage = QString("Command could not be processed by the remote server: '%1'").arg(qPrintable(requestPtr->GetCommandId()));
-		}
+
+		errorMessage = QString("Command could not be processed by the remote server: '%1'").arg(qPrintable(requestPtr->GetCommandId()));
 	}
 
 	return nullptr;

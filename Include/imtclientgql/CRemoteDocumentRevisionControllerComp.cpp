@@ -11,7 +11,7 @@ namespace imtclientgql
 
 sdl::imtbase::DocumentRevision::CRevisionInfoList CRemoteDocumentRevisionControllerComp::OnGetRevisionInfoList(
 			const sdl::imtbase::DocumentRevision::CGetRevisionInfoListGqlRequest& /*getRevisionInfoListRequest*/,
-			const ::imtgql::CGqlRequest& gqlRequest,
+			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	return SendModelRequest<sdl::imtbase::DocumentRevision::CRevisionInfoList>(gqlRequest, errorMessage);
@@ -20,7 +20,7 @@ sdl::imtbase::DocumentRevision::CRevisionInfoList CRemoteDocumentRevisionControl
 
 sdl::imtbase::DocumentRevision::CBackupRevisionResponse CRemoteDocumentRevisionControllerComp::OnBackupRevision(
 			const sdl::imtbase::DocumentRevision::CBackupRevisionGqlRequest& /*backupRevisionRequest*/,
-			const ::imtgql::CGqlRequest& gqlRequest,
+			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	return SendModelRequest<sdl::imtbase::DocumentRevision::CBackupRevisionResponse>(gqlRequest, errorMessage);
@@ -29,7 +29,7 @@ sdl::imtbase::DocumentRevision::CBackupRevisionResponse CRemoteDocumentRevisionC
 
 sdl::imtbase::DocumentRevision::CRestoreRevisionResponse CRemoteDocumentRevisionControllerComp::OnRestoreRevision(
 			const sdl::imtbase::DocumentRevision::CRestoreRevisionGqlRequest& /*restoreRevisionRequest*/,
-			const ::imtgql::CGqlRequest& gqlRequest,
+			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	return SendModelRequest<sdl::imtbase::DocumentRevision::CRestoreRevisionResponse>(gqlRequest, errorMessage);
@@ -38,7 +38,7 @@ sdl::imtbase::DocumentRevision::CRestoreRevisionResponse CRemoteDocumentRevision
 
 sdl::imtbase::DocumentRevision::CExportRevisionResponse CRemoteDocumentRevisionControllerComp::OnExportRevision(
 			const sdl::imtbase::DocumentRevision::CExportRevisionGqlRequest& /*exportRevisionRequest*/,
-			const ::imtgql::CGqlRequest& gqlRequest,
+			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	return SendModelRequest<sdl::imtbase::DocumentRevision::CExportRevisionResponse>(gqlRequest, errorMessage);
@@ -47,7 +47,7 @@ sdl::imtbase::DocumentRevision::CExportRevisionResponse CRemoteDocumentRevisionC
 
 sdl::imtbase::DocumentRevision::CDeleteRevisionResponse CRemoteDocumentRevisionControllerComp::OnDeleteRevision(
 			const sdl::imtbase::DocumentRevision::CDeleteRevisionGqlRequest& /*deleteRevisionRequest*/,
-			const ::imtgql::CGqlRequest& gqlRequest,
+			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	return SendModelRequest<sdl::imtbase::DocumentRevision::CDeleteRevisionResponse>(gqlRequest, errorMessage);

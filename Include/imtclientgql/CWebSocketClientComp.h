@@ -31,8 +31,7 @@ namespace imtclientgql
 {
 
 
-class CWebSocketClientCompBase:
-	public ibase::TRuntimeStatusHanderCompWrap <ilog::CLoggerComponentBase>
+class CWebSocketClientCompBase:public ibase::TRuntimeStatusHanderCompWrap <ilog::CLoggerComponentBase>
 {
 public:
 	typedef ibase::TRuntimeStatusHanderCompWrap <ilog::CLoggerComponentBase> BaseClass;
@@ -57,8 +56,8 @@ class CWebSocketClientComp:
 			virtual public imtrest::ISender,
 			virtual public imtcom::IConnectionController,
 			virtual public imtrest::IRequestManager,
-			virtual public imtclientgql::IGqlClient,
-	private imod::CMultiModelDispatcherBase
+			virtual public IGqlClient,
+			private imod::CMultiModelDispatcherBase
 {
 	Q_OBJECT
 public:
@@ -84,7 +83,7 @@ public:
 		I_ASSIGN(m_serverPasswordAttrPtr, "ServerPasswordParam", "Parameter providing the server password to be connected", false, "");
 		I_ASSIGN(m_clientIdAttrPtr, "ClientId", "ID of the client that needs to be identified on the server", false, "");
 		I_ASSIGN(m_clientIdCompPtr, "ClientIdParam", "Parameter providing the client-ID that needs to be identified on the server", false, "ClientIdParam");
-		I_ASSIGN(m_productId, "ProductId", "Product-ID used with corresponded grapgQl requests", false, "");
+		I_ASSIGN(m_productId, "ProductId", "Product-ID used with corresponded GraphQl requests", false, "");
 	I_END_COMPONENT;
 
 	CWebSocketClientComp();
