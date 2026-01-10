@@ -420,6 +420,7 @@ QVariant CJobQueueManagerCompBase::GetElementInfo(const QByteArray& elementId, i
 			return m_jobItems[index].name;
 		default:
 			I_IF_DEBUG(qWarning() << __FILE__ << __LINE__ << "Unexpected info type: " << infoType;)
+			break;
 		}
 	}
 

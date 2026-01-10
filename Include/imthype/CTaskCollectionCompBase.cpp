@@ -505,6 +505,7 @@ QVariant CTaskCollectionCompBase::GetElementInfo(const QByteArray& elementId, in
 			return m_tasks[taskIndex].isEnabled;
 		default:
 			I_IF_DEBUG(qWarning() << __FILE__ << __LINE__ << "Unexpected info type: " << infoType;)
+			break;
 		}
 	}
 
