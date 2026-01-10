@@ -129,7 +129,7 @@ void CSelectionParamLayoutFittableEditorGui::OnUpdate(const istd::IChangeable::C
 }
 
 
-void CSelectionParamLayoutFittableEditorGui::OnObjectNameChanged(const QString newObjectName)
+void CSelectionParamLayoutFittableEditorGui::OnObjectNameChanged(const QString& newObjectName)
 {
 	if (!m_comboBoxPtr.isNull()){
 		m_comboBoxPtr->setObjectName(newObjectName + "LineEdit");

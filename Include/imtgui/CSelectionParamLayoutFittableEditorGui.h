@@ -51,7 +51,7 @@ protected:
 	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
 
 private Q_SLOTS:
-	void OnObjectNameChanged(const QString newObjectName);
+	void OnObjectNameChanged(const QString& newObjectName);
 	void OnInputValueChanged();
 
 private:

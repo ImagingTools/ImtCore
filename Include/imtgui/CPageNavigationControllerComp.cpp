@@ -14,9 +14,9 @@ namespace imtgui
 
 CPageNavigationControllerComp::CPageNavigationControllerComp()
 	:m_currentPageIndex(-1),
-	m_isUpdateBlocked(false),
 	m_pageSubselectionObserver(*this),
-	m_subselectionModelIndex(0)
+	m_subselectionModelIndex(0),
+	m_isUpdateBlocked(false)
 {
 }
 
@@ -63,7 +63,7 @@ void CPageNavigationControllerComp::AddPageStep(const QByteArray& pageId)
 
 	m_visitedPages.push_back(pageId);
 
-	m_currentPageIndex = m_visitedPages.count() - 1;
+	m_currentPageIndex = m_visitedPages.size() - 1;
 }
 
 

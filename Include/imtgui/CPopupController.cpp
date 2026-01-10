@@ -1,4 +1,4 @@
- #include <imtgui/CPopupController.h>
+#include <imtgui/CPopupController.h>
 
 
 // Qt includes
@@ -55,11 +55,11 @@ void CPopupController::SetParentWidget(QWidget* parentPtr)
 	m_parentPtr = parentPtr;
 
 	if (m_parentPtr == nullptr){
-		for (PopupItemPtr itemPtr : m_items){
+		for (const PopupItemPtr& itemPtr : m_items){
 			itemPtr->widgetPtr->setParent(nullptr);
 		}
 
-		for (PopupItemPtr itemPtr : m_visibleItems){
+		for (const PopupItemPtr& itemPtr : m_visibleItems){
 			itemPtr->widgetPtr->setParent(nullptr);
 		}
 	}
@@ -485,7 +485,7 @@ void CPopupController::ValidateVisibleItems()
 	for (int visibleIndex = 0; visibleIndex < m_visibleItems.count(); visibleIndex++){
 		totalHeight += m_spacing + m_visibleItems[visibleIndex]->widgetPtr->height();
 		if (totalHeight > qAbs(m_rect.height())){
-			for (int removeIndex = m_visibleItems.count() - 1; removeIndex >= visibleIndex; removeIndex--){
+			for (qsizetype removeIndex = m_visibleItems.size() - 1; removeIndex >= visibleIndex; removeIndex--){
 				Q_ASSERT(removeIndex >= 0);
 				m_visibleItems[removeIndex]->fadeAnimation.stop();
 				m_visibleItems[removeIndex]->timeoutTimer.stop();
@@ -529,7 +529,7 @@ void CPopupController::ArrangeVisibleItems()
 		break;
 	}
 
-	for (PopupItemPtr itemPtr : m_visibleItems){
+	for (const PopupItemPtr& itemPtr : m_visibleItems){
 		QPoint itemPos = refPos;
 		if (size.width() < 0){
 			itemPos.rx() -= itemPtr->widgetPtr->width();
@@ -554,7 +554,7 @@ void CPopupController::ArrangeVisibleItems()
 void CPopupController::ShowItems()
 {
 	int totalHeight = -m_spacing;
-	for (PopupItemPtr itemPtr : m_visibleItems){
+	for (const PopupItemPtr& itemPtr : m_visibleItems){
 		totalHeight += m_spacing + itemPtr->widgetPtr->height();
 	}
 

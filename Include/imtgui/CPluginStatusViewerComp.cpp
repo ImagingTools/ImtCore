@@ -29,7 +29,7 @@ void CPluginStatusViewerComp::UpdateGui(const istd::IChangeable::ChangeSet& /*ch
 	const imtbase::ICollectionInfo& collectionInfo = pluginStatusMonitorPtr->GetStatusList();
 
 	imtbase::ICollectionInfo::Ids ids = collectionInfo.GetElementIds();
-	for (QByteArray id : ids){
+	for (const QByteArray& id : ids){
 		const istd::IInformationProvider* statusPtr = pluginStatusMonitorPtr->GetStatus(id);
 		if (statusPtr != nullptr){
 			QString name = collectionInfo.GetElementInfo(id, imtbase::ICollectionInfo::EIT_NAME).toString();

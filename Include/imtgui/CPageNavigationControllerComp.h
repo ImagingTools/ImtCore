@@ -67,7 +67,7 @@ protected:
 private:
 	QByteArrayList m_visitedPages;
 	QByteArrayList m_pages;
-	int m_currentPageIndex;
+	qsizetype m_currentPageIndex;
 
 	I_REF(iprm::ISelectionParam, m_pageSelectionCompPtr);
 	I_REF(imod::IModel, m_pageSelectionModelCompPtr);

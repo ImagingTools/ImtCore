@@ -46,7 +46,7 @@ void CJobExecutionControllerCompBase::OnComponentCreated()
 
 	connect(&m_updateJobQueueTimer, SIGNAL(timeout()), this, SLOT(OnJobPolling()));
 
-	m_updateJobQueueTimer.start(1000);
+	m_updateJobQueueTimer.start(std::chrono::seconds(1));
 
 	if (m_jobQueueManagerCompPtr.IsValid()){
 		m_jobQueueObserver.RegisterObject(m_jobQueueManagerCompPtr.GetPtr(), &CJobExecutionControllerCompBase::OnJobQueueChanged);
@@ -188,17 +188,8 @@ void CJobExecutionControllerCompBase::Task::run()
 {
 	QDateTime startTime = QDateTime::currentDateTime();
 
-	IJobQueueManager::ProcessingStatus jobStatus = IJobQueueManager::PS_NONE;
-
 	m_jobOutput.SetStartTime(QDateTime::currentDateTime());
-
 	int processingState = m_taskProcessor.ExecuteTask(*m_inputPtr, *m_paramsPtr, m_jobOutput, m_progressPtr);
-	if (processingState == iproc::IProcessor::TS_CANCELED){
-		jobStatus = IJobQueueManager::PS_CANCELED;
-	}
-	else{
-		jobStatus = IJobQueueManager::PS_FINISHED;
-	}
 
 	istd::IInformationProvider::InformationCategory result = istd::IInformationProvider::IC_NONE;
 

@@ -53,7 +53,7 @@ QString GetExportFileName(const imtbase::IObjectCollection& collection, const QB
 }
 
 
-QString ComposeExportFilePath(const QString olderPath, const QString& projectName)
+QString ComposeExportFilePath(const QString& olderPath, const QString& projectName)
 {
 	if (olderPath.isEmpty()){
 		return projectName;
@@ -74,8 +74,8 @@ QString CObjectCollectionViewDelegate::s_dateTimeFormat = QString("dd.MM.yyyy hh
 
 CObjectCollectionViewDelegate::CObjectCollectionViewDelegate()
 	:m_editCommands(tr("&Edit"), 100),
-	m_insertCommand(tr("New"), 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
 	m_editContentsCommand(tr("Edit"), 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_DOCUMENT_MANAGER),
+	m_insertCommand(tr("New"), 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
 	m_duplicateCommand(tr("Duplicate"), 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
 	m_removeCommand(tr("Remove"), 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
 	m_importCommand(tr("Import"), 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
@@ -176,7 +176,7 @@ void CObjectCollectionViewDelegate::UpdateItemSelection(
 			if (selectedItems.count() == 1){
 				int revision = -1;
 
-				QByteArray objectId = selectedItems[0];
+				const QByteArray& objectId = selectedItems[0];
 				idoc::MetaInfoPtr metaInfo = m_collectionPtr->GetElementMetaInfo(objectId);
 				if (metaInfo.IsValid()){
 					QVariant variant = metaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_REVISION);
@@ -328,9 +328,8 @@ QString CObjectCollectionViewDelegate::RenameObject(const QByteArray& objectId, 
 			if (m_collectionPtr->SetElementName(objectId, retVal)){
 				return retVal;
 			}
-			else{
-				QMessageBox::critical(nullptr, tr("Error"), tr("The name could not be set"));
-			}
+
+			QMessageBox::critical(nullptr, tr("Error"), tr("The name could not be set"));
 		}
 
 		QMessageBox::critical(nullptr, tr("Error"), tr("The name contains some not allowed characters"));
@@ -478,7 +477,7 @@ const ibase::IHierarchicalCommand* CObjectCollectionViewDelegate::GetCommands() 
 bool CObjectCollectionViewDelegate::IsNameUnique(const QString& name, const QStringList& existingNames) const
 {
 	for (int index = 0; index < existingNames.count(); ++index){
-		QString itemName = existingNames[index];
+		const QString& itemName = existingNames[index];
 		if (name == itemName){
 			return false;
 		}
@@ -749,7 +748,7 @@ QString CObjectCollectionViewDelegate::CreateFileExportFilter(const QByteArray& 
 	if (const ifile::IFileTypeInfo* fileTypeInfoPtr = FindFileInfo("", FOT_EXPORT)){
 		ifilegui::CFileDialogLoaderComp::AppendLoaderFilterList(*fileTypeInfoPtr, nullptr, -1, allExt, filters, false);
 	}
-	
+
 	// add others as well
 	QByteArray typeId = m_collectionPtr->GetObjectTypeId(objectId);
 
@@ -898,7 +897,7 @@ void CObjectCollectionViewDelegate::OnExport()
 	Q_ASSERT(m_collectionPtr != nullptr);
 	Q_ASSERT(!m_selectedItemIds.isEmpty());
 
-	if (m_selectedItemIds.isEmpty() || !m_collectionPtr){
+	if (m_selectedItemIds.isEmpty() || (m_collectionPtr == nullptr)){
 		return;
 	}
 
@@ -910,19 +909,19 @@ void CObjectCollectionViewDelegate::OnExport()
 		QString selectedFilter = FindSelectedFilter(filters, m_exportFilePath);
 		m_exportFilePath = ComposeExportFilePath(m_exportFilePath, GetExportFileName(*m_collectionPtr, objectId));
 		m_exportFilePath = QFileDialog::getSaveFileName(
-			m_parentGuiPtr ? m_parentGuiPtr->GetWidget() : nullptr,
+			m_parentGuiPtr != nullptr ? m_parentGuiPtr->GetWidget() : nullptr,
 			tr("Export File"), m_exportFilePath.isEmpty() ? "export" : m_exportFilePath,
 			filters, selectedFilter.isEmpty() ? nullptr : &selectedFilter);
 
 		if (!m_exportFilePath.isEmpty()){
 			if (!ExportObject(objectId, m_exportFilePath)){
-				QMessageBox::critical(m_parentGuiPtr ? m_parentGuiPtr->GetWidget() : nullptr, tr("Collection"), tr("Document could not be exported"));
+				QMessageBox::critical(m_parentGuiPtr != nullptr ? m_parentGuiPtr->GetWidget() : nullptr, tr("Collection"), tr("Document could not be exported"));
 			}
 		}
 	}
 	// Multiple items will be exported:
 	else{
-		QString targetFolder = QFileDialog::getExistingDirectory(m_parentGuiPtr ? m_parentGuiPtr->GetWidget() : nullptr, tr("Select Targetn Folder"));
+		QString targetFolder = QFileDialog::getExistingDirectory(m_parentGuiPtr != nullptr ? m_parentGuiPtr->GetWidget() : nullptr, tr("Select Targetn Folder"));
 		if (!targetFolder.isEmpty()){
 			QString fileExt;
 
@@ -958,12 +957,8 @@ void CObjectCollectionViewDelegate::OnExport()
 					exportFilePath += "." + fileExt;
 				}
 
-				if (!ExportObject(objectId, exportFilePath)){
-//					QMessageBox::critical(m_parentGuiPtr ? m_parentGuiPtr->GetWidget() : nullptr, tr("Collection"), tr("Document could not be exported"));
-				}
-
 				if (progressLoggerPtr != nullptr){
-					progressLoggerPtr->OnProgress(double(i + 1) / m_selectedItemIds.count());
+					progressLoggerPtr->OnProgress(double(i + 1) / m_selectedItemIds.size());
 					if (progressLoggerPtr->IsCanceled()){
 						break;
 					}
@@ -1032,7 +1027,7 @@ void CObjectCollectionViewDelegate::OnRename(bool /*checked*/)
 		return;
 	}
 
-	for (QByteArray itemId : m_selectedItemIds){
+	for (const QByteArray& itemId : m_selectedItemIds){
 		if (!itemId.isEmpty()){
 			RenameObject(itemId, "");
 		}

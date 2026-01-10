@@ -336,7 +336,7 @@ private:
 	
 	private:
 		int m_batchSize;
-		int m_fetchedRowCount;
+		qsizetype m_fetchedRowCount;
 		mutable imtbase::ICollectionInfo::Ids m_ids;
 		int m_totalRowCount;
 		ICollectionViewDelegate::ObjectMetaInfo m_metaInfo;

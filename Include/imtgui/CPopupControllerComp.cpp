@@ -51,11 +51,7 @@ void CPopupControllerComp::ClosePopup(const QByteArray& popupId)
 
 		ShowItems();
 		ArrangeVisibleItems();
-
-		return;
 	}
-
-	return;
 }
 
 
@@ -206,17 +202,14 @@ void CPopupControllerComp::OnFadeFinished()
 
 void CPopupControllerComp::CalculatePopupAreaFromScreen()
 {
-	QGuiApplication* appPtr= dynamic_cast<QGuiApplication*>(qApp);
-	if (appPtr != nullptr){
-		QScreen* screenPtr = appPtr->primaryScreen();
-		if (screenPtr != nullptr){
-			QRect rect = screenPtr->geometry();
-			m_anchor = rect.bottomRight();
-			m_size.setWidth(-rect.width() * *m_xRatioAttrPtr);
-			m_size.setHeight(-rect.height() * *m_yRatioAttrPtr);
+	QScreen* screenPtr = QGuiApplication::primaryScreen();
+	if (screenPtr != nullptr){
+		QRect rect = screenPtr->geometry();
+		m_anchor = rect.bottomRight();
+		m_size.setWidth(-rect.width() * *m_xRatioAttrPtr);
+		m_size.setHeight(-rect.height() * *m_yRatioAttrPtr);
 
-			return;
-		}
+		return;
 	}
 
 	m_size = QSize();
@@ -301,7 +294,7 @@ void CPopupControllerComp::ValidateVisibleItems()
 	for (int visibleIndex = 0; visibleIndex < m_visibleItems.count(); visibleIndex++){
 		totalHeight += *m_spacingAttrPtr + m_visibleItems[visibleIndex]->widgetPtr->height();
 		if (totalHeight > qAbs(m_size.height())){
-			for (int removeIndex = m_visibleItems.count() - 1; removeIndex >= visibleIndex; removeIndex--){
+			for (qsizetype removeIndex = m_visibleItems.count() - 1; removeIndex >= visibleIndex; removeIndex--){
 				Q_ASSERT(removeIndex >= 0);
 				m_visibleItems[removeIndex]->fadeAnimation.stop();
 				m_visibleItems[removeIndex]->timeoutTimer.stop();
@@ -320,7 +313,7 @@ void CPopupControllerComp::ValidateVisibleItems()
 void CPopupControllerComp::ArrangeVisibleItems()
 {
 	QPoint refPos = m_anchor;
-	for (PopupItemPtr itemPtr : m_visibleItems){
+	for (const PopupItemPtr& itemPtr : m_visibleItems){
 		QPoint itemPos = refPos;
 		if (m_size.width() < 0){
 			itemPos.rx() -= itemPtr->widgetPtr->width();
@@ -345,7 +338,7 @@ void CPopupControllerComp::ArrangeVisibleItems()
 void CPopupControllerComp::ShowItems()
 {
 	int totalHeight = -*m_spacingAttrPtr;
-	for (PopupItemPtr itemPtr : m_visibleItems){
+	for (const PopupItemPtr& itemPtr : m_visibleItems){
 		totalHeight += *m_spacingAttrPtr + itemPtr->widgetPtr->height();
 	}
 

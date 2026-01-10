@@ -1,4 +1,4 @@
-#pragma once
+#include <imthttp/CHttpFileTransfer.h>
 
 
 // Qt includes
@@ -8,8 +8,8 @@
 #include <QtNetwork/QNetworkReply>
 
 // ImtCore includes
+#include <QtNetwork/QNetworkReply.h>
 #include <imtcom/CRequestSender.h>
-#include <imthttp/CHttpFileTransfer.h>
 
 
 namespace imthttp
@@ -29,13 +29,9 @@ bool CHttpFileTransfer::UploadFile(const QString& filePath, const QUrl& url) con
 			request.setUrl(url);
 			QNetworkReply* replyPtr = imtcom::CRequestSender::DoSyncPut(request, data, 30000);
 			if (replyPtr != nullptr){
-				if (!replyPtr->error()){
-					replyPtr->deleteLater();
-
-					return true;
-				}
-
 				replyPtr->deleteLater();
+
+				return replyPtr->error() == QNetworkReply::NoError;
 			}
 		}
 	}
@@ -51,7 +47,7 @@ bool CHttpFileTransfer::DownloadFile(const QString& filePath, const QUrl& url) c
 		request.setUrl(url);
 		QNetworkReply* replyPtr = imtcom::CRequestSender::DoSyncGet(request, 30000);
 		if (replyPtr != nullptr){
-			if (!replyPtr->error()){
+			if (replyPtr->error() == QNetworkReply::NoError){
 				QFile file(filePath);
 				if (file.open(QIODevice::WriteOnly)){
 					QByteArray data = replyPtr->readAll();

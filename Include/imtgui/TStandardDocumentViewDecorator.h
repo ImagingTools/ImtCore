@@ -288,7 +288,7 @@ TStandardDocumentViewDecorator<WorkspaceImpl, UI>::TStandardDocumentViewDecorato
 			RegisterModel(viewModelPtr, MI_VIEW_CONSTRAINTS);
 		}
 	}
-	
+
 	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(undoManagerPtr);
 	if (modelPtr != nullptr){
 		RegisterModel(modelPtr, MI_UNDO_MANAGER);
@@ -328,7 +328,7 @@ void TStandardDocumentViewDecorator<WorkspaceImpl, UI>::UpdateButtonsStatus()
 	m_parentPtr->GetDocumentFromView(*m_viewObjectPtr, &documentInfo);
 
 	isSaveActive = isSaveActive || documentInfo.isDirty;
- 
+
 	if (m_filePersistencePtr == nullptr){
 		isSaveActive = false;
 	}
