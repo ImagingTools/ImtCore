@@ -21,7 +21,7 @@ public:
 	/**
 		Get access to the job processor factory.
 	*/
-	virtual const imthype::IJobProcessorFactory* GetJobProcessorFactory() const = 0;
+	virtual const IJobProcessorFactory* GetJobProcessorFactory() const = 0;
 };
 
 

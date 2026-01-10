@@ -18,14 +18,14 @@ namespace imthypegui
 
 
 class CPluginBasedTaskManagerGuiComp:
-			public imtbase::TPluginManagerCompBase<imthypegui::ITaskEditorPlugin,
+			public imtbase::TPluginManagerCompBase<ITaskEditorPlugin,
 						IMT_CREATE_PLUGIN_FUNCTION(TaskEditor),
 						IMT_DESTROY_PLUGIN_FUNCTION(TaskEditor),
 						ilog::TLoggerCompWrap<CTaskManagerGuiComp>>
 {
 	Q_OBJECT
 public:
-	typedef imtbase::TPluginManagerCompBase<imthypegui::ITaskEditorPlugin, 
+	typedef imtbase::TPluginManagerCompBase<ITaskEditorPlugin,
 				IMT_CREATE_PLUGIN_FUNCTION(TaskEditor),
 				IMT_DESTROY_PLUGIN_FUNCTION(TaskEditor),
 				ilog::TLoggerCompWrap<CTaskManagerGuiComp>> BaseClass;
@@ -37,7 +37,7 @@ public:
 
 protected:
 	// reimplemented (TPluginManagerCompBase)
-	virtual void OnPluginsCreated();
+	virtual void OnPluginsCreated() override;
 
 	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiCreated() override;
@@ -45,7 +45,7 @@ protected:
 	virtual void OnGuiRetranslate() override;
 
 private:
-	typedef QMap<QByteArray, imthypegui::ITaskEditorPlugin*> PluginsMap;
+	typedef QMap<QByteArray, ITaskEditorPlugin*> PluginsMap;
 	PluginsMap m_pluginsMap;
 };
 

@@ -2,7 +2,6 @@
 
 
 // Qt includes
-#include <QtCore/QItemSelectionModel>
 #include <QtCore/QItemSelection>
 #include <QtGui/QStandardItemModel>
 #include <QtWidgets/QMenu>
@@ -12,9 +11,7 @@
 
 // ACF includes
 #include <imod/CMultiModelDispatcherBase.h>
-#include <iimg/IBitmapProvider.h>
 #include <iimg/CBitmap.h>
-#include <ifile/IFileNameParam.h>
 #include <ibase/ICommandsProvider.h>
 #include <iqtgui/TDesignerGuiObserverCompBase.h>
 #include <iqtgui/CHierarchicalCommand.h>
@@ -26,8 +23,6 @@
 #include <istd/CChangeNotifier.h>
 
 // ImtCore
-#include <imtbase/IObjectCollectionEvent.h>
-#include <imtbase/MetaTypes.h>
 #include <imtbase/TModelUpdateBinder.h>
 
 // Acula includes
@@ -45,7 +40,7 @@ namespace imthypegui
 
 template <class UI>
 class TTaskCollectionEditorCompBase:
-	public iqtgui::StateIconWrapper< 
+	public iqtgui::StateIconWrapper<
 			iqtgui::TDesignerGuiObserverCompBase<
 							UI,
 							imthype::ITaskCollection> >,
@@ -109,7 +104,7 @@ protected:
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
 
 	// reimplemented (imod::CMultiModelDispatcherBase)
-	virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet);
+	virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
 
 private:
 	class TaskSettings: virtual public imthype::ITaskSettings
@@ -179,7 +174,7 @@ protected:
 	typedef QMap<QByteArray, iqtgui::IGuiObjectSharedPtr> EditorsMap;
 	EditorsMap m_editorsMap;
 
-	typedef QMap<QByteArray, int> TypeToIndexMap;
+	typedef QMap<QByteArray, qsizetype> TypeToIndexMap;
 	TypeToIndexMap m_typeToStackIndexMap;
 
 	QMenu m_startVariableMenus;
@@ -352,10 +347,10 @@ void TTaskCollectionEditorCompBase<UI>::DeleteTask()
 	const QModelIndex index = indexes[0];
 
 	QByteArray taskId = index.data(CTaskItemDelegate::DR_TASK_UUID).toByteArray();
-	
+
 	imtbase::ICollectionInfo::Ids elementIds;
 	elementIds << taskId;
-	
+
 	objectPtr->RemoveElements(elementIds);
 }
 
@@ -530,7 +525,7 @@ void TTaskCollectionEditorCompBase<UI>::RenameTask(bool autoRename)
 						int pos;
 						QString name = newName;
 						if (inputValidator.validate(name, pos) != QValidator::Acceptable){
-							QMessageBox::critical(NULL, tr("Error"), tr("The task name contains some not allowed characters"));
+							QMessageBox::critical(nullptr, tr("Error"), tr("The task name contains some not allowed characters"));
 
 							return;
 						}
@@ -538,10 +533,10 @@ void TTaskCollectionEditorCompBase<UI>::RenameTask(bool autoRename)
 						QByteArray taskId = index.data(CTaskItemDelegate::DR_TASK_UUID).toByteArray();
 
 						bool isNewNameExists = false;
-						
+
 						if (!autoRename){
 							imtbase::IObjectCollection::Ids ids = objectPtr->GetElementIds();
-							for (imtbase::IObjectCollection::Id id : ids){
+							for (const imtbase::IObjectCollection::Id& id : ids){
 								QString taskName = objectPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_NAME).toString();
 
 								if (newName == taskName){
@@ -612,7 +607,7 @@ int TTaskCollectionEditorCompBase<UI>::GetLastNumberedUserId()
 	int lastUserId = 0;
 
 	imtbase::IObjectCollection::Ids ids = objectPtr->GetElementIds();
-	for (imtbase::IObjectCollection::Id id : ids){
+	for (const imtbase::IObjectCollection::Id& id : ids){
 		QByteArray userId = objectPtr->GetUserTaskId(id);
 
 		bool isOk = false;
@@ -754,7 +749,7 @@ void TTaskCollectionEditorCompBase<UI>::UpdateTaskItemState(const QModelIndex& i
 		const iimg::IBitmap* inputBitmapPtr = dynamic_cast<const iimg::IBitmap*>(taskResultsProviderPtr->GetObjectPtr(*m_previewArtifactIdAttrPtr));
 		if (inputBitmapPtr != nullptr){
 			// check if this is already QImage, to avoid extra copying
-			if (auto imagePtr = dynamic_cast<const iimg::CBitmap*>(inputBitmapPtr)) {
+			if (const auto* imagePtr = dynamic_cast<const iimg::CBitmap*>(inputBitmapPtr)) {
 				m_itemModel.setData(index, imagePtr->GetQImage(), CTaskItemDelegate::DR_TASK_PREVIEW_OBJECT);
 			}
 			else { // na ja, then copy it to QImage
@@ -835,7 +830,7 @@ void TTaskCollectionEditorCompBase<UI>::OnGuiModelAttached()
 	BaseClass::OnGuiModelAttached();
 
 	imthype::ITaskCollection* objectPtr = BaseClass::GetObjectPtr();
-	if (objectPtr != NULL){
+	if (objectPtr != nullptr){
 		const iprm::IOptionsList* taskTypesPtr = objectPtr->GetObjectTypesInfo();
 		if (taskTypesPtr != nullptr){
 			int taskTypesCount = taskTypesPtr->GetOptionsCount();
@@ -886,7 +881,7 @@ void TTaskCollectionEditorCompBase<UI>::UpdateGui(const istd::IChangeable::Chang
 	BaseClass2::UnregisterAllModels();
 
 	const imthype::ITaskCollection* objectPtr = BaseClass::GetObjectPtr();
-	if (objectPtr == NULL){
+	if (objectPtr == nullptr){
 		UpdateCommands();
 		return;
 	}
@@ -928,7 +923,7 @@ void TTaskCollectionEditorCompBase<UI>::UpdateGui(const istd::IChangeable::Chang
 
 		const iinsp::ISupplier* taskPtr = objectPtr->GetTask(taskId);
 		imod::IModel* taskModelPtr = const_cast<imod::IModel*>(dynamic_cast<const imod::IModel*>(taskPtr));
-		if (taskModelPtr != NULL){
+		if (taskModelPtr != nullptr){
 			BaseClass2::RegisterModel(taskModelPtr, modelId++);
 		}
 	}

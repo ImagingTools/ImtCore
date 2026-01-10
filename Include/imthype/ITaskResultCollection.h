@@ -22,7 +22,7 @@ namespace imthype
 class ITaskResultCollection:
 			virtual public imtbase::IObjectCollection,
 			virtual public imtbase::IMultiStatusProvider,
-			virtual public imthype::ITaskMetaInfo
+			virtual public ITaskMetaInfo
 {
 public:
 	virtual void SetArtifactType(const QByteArray& artifactId, ArtifactType artifactType) = 0;

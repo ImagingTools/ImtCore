@@ -14,7 +14,7 @@ namespace imthype
 
 /**
 	Common interface for a job output. The job output is a collection of object references categorized by their logical type.
-	The interface provides also the access to the processing informations and logs.
+	The interface provides also the access to the processing information and logs.
 */
 class IJobOutput: virtual public IProcessingInfo, virtual public imtbase::IReferenceCollection
 {

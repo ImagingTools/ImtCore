@@ -5,9 +5,6 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QList>
 
-// ACF includes
-#include <istd/TSmartPtr.h>
-
 // ImtCore includes
 #include <imtbase/ICollectionInfo.h>
 #include <imtbase/IReferenceCollection.h>

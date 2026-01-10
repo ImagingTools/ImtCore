@@ -16,7 +16,7 @@ namespace imthype
 
 
 /**
-	Common interace for a task collection.
+	Common interface for a task collection.
 	Please note that this is just the container of the tasks without any business logic about how these tasks should be performed.
 */
 class ITaskCollection: virtual public imtbase::IObjectCollection

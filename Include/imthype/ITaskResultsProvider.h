@@ -4,9 +4,6 @@
 // ACF includes
 #include <istd/IInformationProvider.h>
 
-// ImtCore includes
-#include <imtbase/IObjectCollection.h>
-
 // Acula includes
 #include <imthype/ITaskResultCollection.h>
 
@@ -24,7 +21,7 @@ public:
 	/**
 		Get access to the collection of results.
 	*/
-	virtual const imthype::ITaskResultCollection* GetResults() const = 0;
+	virtual const ITaskResultCollection* GetResults() const = 0;
 };
 
 

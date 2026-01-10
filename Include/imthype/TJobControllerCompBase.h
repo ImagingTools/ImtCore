@@ -40,7 +40,7 @@ public:
 
 	TJobControllerCompBase();
 
-	// reimplemented (imthype::TIJobController)
+	// reimplemented (TIJobController)
 	virtual typename IJobController::RequestStatus BeginJob(const QByteArray& jobId, const JobParams& jobParams) override;
 	virtual JobResultPtr GetJobResult(const QByteArray& jobId) const override;
 	virtual typename IJobController::JobStatus GetJobStatus(const QByteArray& jobId) const override;
@@ -85,18 +85,18 @@ protected:
 
 private:
 	void OnJobQueueChanged(
-		const istd::IChangeable::ChangeSet& changeset, const imthype::IJobQueueManager* modelPtr);
-	void OnTaskStatusChanged(const QByteArray& queueJobId, imthype::IJobQueueManager::ProcessingStatus taskStatus);
+	const istd::IChangeable::ChangeSet& changeset, const IJobQueueManager* modelPtr);
+	void OnTaskStatusChanged(const QByteArray& queueJobId, IJobQueueManager::ProcessingStatus taskStatus);
 	void OnTaskProgressChanged(const QByteArray& queueJobId, double progress);
 	QByteArray FindJob(const QByteArray& queueJobId) const;
 
 private:
 	I_ATTR(QByteArray, m_defaultJobTypeIdAttrPtr);
 	I_REF(imtbase::IProgressSessionsManager, m_progressSessionManagerCompPtr);
-	I_REF(imthype::IJobQueueManager, m_jobQueueManagerCompPtr);
+	I_REF(IJobQueueManager, m_jobQueueManagerCompPtr);
 	I_FACT(iprm::IParamsSet, m_jobParamsCompPtr);
 
-	imtbase::TModelUpdateBinder<imthype::IJobQueueManager, TJobControllerCompBase> m_jobQueueObserver;
+	imtbase::TModelUpdateBinder<IJobQueueManager, TJobControllerCompBase> m_jobQueueObserver;
 };
 
 
@@ -247,18 +247,18 @@ void TJobControllerCompBase<JobParams, JobResult, JobInfoExtension>::OnComponent
 // private methods
 
 template<typename JobParams, typename JobResult, typename JobInfoExtension>
-void TJobControllerCompBase<JobParams, JobResult, JobInfoExtension>::OnJobQueueChanged(const istd::IChangeable::ChangeSet& changeset, const imthype::IJobQueueManager* modelPtr)
+void TJobControllerCompBase<JobParams, JobResult, JobInfoExtension>::OnJobQueueChanged(const istd::IChangeable::ChangeSet& changeset, const IJobQueueManager* /* modelPtr */)
 {
-	if (changeset.GetChangeInfoMap().contains(imthype::IJobQueueManager::CN_JOB_PROGRESS_CHANGED)){
-		QVariant value = changeset.GetChangeInfoMap().value(imthype::IJobQueueManager::CN_JOB_PROGRESS_CHANGED);
-		imthype::IJobQueueManager::JobProgressInfo info = value.value<imthype::IJobQueueManager::JobProgressInfo>();
+	if (changeset.GetChangeInfoMap().contains(IJobQueueManager::CN_JOB_PROGRESS_CHANGED)){
+		QVariant value = changeset.GetChangeInfoMap().value(IJobQueueManager::CN_JOB_PROGRESS_CHANGED);
+		IJobQueueManager::JobProgressInfo info = value.value<IJobQueueManager::JobProgressInfo>();
 
 		OnTaskProgressChanged(info.elementId, info.progress);
 	}
 
-	if (changeset.GetChangeInfoMap().contains(imthype::IJobQueueManager::CN_JOB_STATUS_CHANGED)){
-		QVariant value = changeset.GetChangeInfoMap().value(imthype::IJobQueueManager::CN_JOB_STATUS_CHANGED);
-		imthype::IJobQueueManager::JobStatusInfo info = value.value<imthype::IJobQueueManager::JobStatusInfo>();
+	if (changeset.GetChangeInfoMap().contains(IJobQueueManager::CN_JOB_STATUS_CHANGED)){
+		QVariant value = changeset.GetChangeInfoMap().value(IJobQueueManager::CN_JOB_STATUS_CHANGED);
+		IJobQueueManager::JobStatusInfo info = value.value<IJobQueueManager::JobStatusInfo>();
 
 		OnTaskStatusChanged(info.elementId, info.status);
 	}
@@ -266,7 +266,7 @@ void TJobControllerCompBase<JobParams, JobResult, JobInfoExtension>::OnJobQueueC
 
 
 template<typename JobParams, typename JobResult, typename JobInfoExtension>
-inline void TJobControllerCompBase<JobParams, JobResult, JobInfoExtension>::OnTaskStatusChanged(const QByteArray& queueJobId, imthype::IJobQueueManager::ProcessingStatus taskStatus)
+inline void TJobControllerCompBase<JobParams, JobResult, JobInfoExtension>::OnTaskStatusChanged(const QByteArray& queueJobId, IJobQueueManager::ProcessingStatus taskStatus)
 {
 	QMutexLocker locker(&m_mutex);
 

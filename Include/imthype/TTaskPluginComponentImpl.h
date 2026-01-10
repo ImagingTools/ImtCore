@@ -16,15 +16,15 @@ namespace imthype
 	Generic implementation of task plugin.
 */
 template <class ComponentClass>
-class TTaskPluginComponentImpl: public imtbase::TBasePluginComponentImpl<ComponentClass, imthype::ITaskPlugin>
+class TTaskPluginComponentImpl: public imtbase::TBasePluginComponentImpl<ComponentClass, ITaskPlugin>
 {
 public:
-	typedef imtbase::TBasePluginComponentImpl<ComponentClass, imthype::ITaskPlugin> BaseClass;
+	typedef imtbase::TBasePluginComponentImpl<ComponentClass, ITaskPlugin> BaseClass;
 
 	TTaskPluginComponentImpl(const QString& pluginName, const QByteArray& typeId);
 
-	// reimplemented (imthype::ITaskPlugin)
-	virtual const imthype::ITaskPlugin::ISupplierFactory* GetTaskFactory() const override;
+	// reimplemented (ITaskPlugin)
+	virtual const ITaskPlugin::ISupplierFactory* GetTaskFactory() const override;
 };
 
 
@@ -36,12 +36,12 @@ TTaskPluginComponentImpl<ComponentClass>::TTaskPluginComponentImpl(const QString
 }
 
 
-// reimplemented (imthype::ITaskPlugin)
+// reimplemented (ITaskPlugin)
 
 template <class ComponentClass>
-const imthype::ITaskPlugin::ISupplierFactory* TTaskPluginComponentImpl<ComponentClass>::GetTaskFactory() const
+const ITaskPlugin::ISupplierFactory* TTaskPluginComponentImpl<ComponentClass>::GetTaskFactory() const
 {
-	return BaseClass::m_component.template GetInterface<imthype::ITaskPlugin::ISupplierFactory>(QByteArray());
+	return BaseClass::m_component.template GetInterface<ITaskPlugin::ISupplierFactory>(QByteArray());
 }
 
 

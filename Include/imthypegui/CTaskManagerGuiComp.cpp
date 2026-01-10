@@ -45,7 +45,7 @@ void CTaskManagerGuiComp::OnToggleTaskList(bool toggled)
 		}
 		else {
 			if (ShowListButton->menu() == nullptr) {
-				auto listMenu = new QMenu(ShowListButton);
+				auto* listMenu = new QMenu(ShowListButton);
 				listMenu->addActions(AddButton->actions());
 				listMenu->addAction(&m_executeAllTasksCommand);
 				ShowListButton->setMenu(listMenu);

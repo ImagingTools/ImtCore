@@ -2,7 +2,6 @@
 
 
 // ACF includes
-#include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
 #include <istd/CChangeGroup.h>
 
@@ -13,16 +12,14 @@ namespace imthype
 
 // public methods
 
-CTaskCollectionUpdateEvent::CTaskCollectionUpdateEvent()
+CTaskCollectionUpdateEvent::CTaskCollectionUpdateEvent() : m_updateType(UT_USER_TASK_ID)
 {
 }
 
 
 CTaskCollectionUpdateEvent::CTaskCollectionUpdateEvent(
 			const QByteArray& itemId,
-			UpdateType updateType,
-			const QVariant oldValue,
-			const QVariant newValue)
+			UpdateType updateType, const QVariant& oldValue, const QVariant& newValue)
 	:m_itemId(itemId),
 	m_updateType(updateType),
 	m_oldValue(oldValue),
@@ -59,7 +56,7 @@ int CTaskCollectionUpdateEvent::GetSupportedOperations() const
 
 bool CTaskCollectionUpdateEvent::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
-	const CTaskCollectionUpdateEvent* sourcePtr = dynamic_cast<const CTaskCollectionUpdateEvent*>(&object);
+	auto sourcePtr = dynamic_cast<const CTaskCollectionUpdateEvent*>(&object);
 	if (sourcePtr != nullptr){
 		istd::CChangeGroup changeGroup(this);
 
@@ -90,13 +87,9 @@ bool CTaskCollectionUpdateEvent::CopyFrom(const IChangeable& object, Compatibili
 
 bool CTaskCollectionUpdateEvent::IsEqual(const IChangeable& object) const
 {
-	const CTaskCollectionUpdateEvent* sourcePtr = dynamic_cast<const CTaskCollectionUpdateEvent*>(&object);
-	if (sourcePtr != NULL){
-		if (m_updateType != sourcePtr->m_updateType){
-			return false;
-		}
-
-		return true;
+	auto sourcePtr = dynamic_cast<const CTaskCollectionUpdateEvent*>(&object);
+	if (sourcePtr != nullptr){
+		return m_updateType == sourcePtr->m_updateType;
 	}
 
 	return false;

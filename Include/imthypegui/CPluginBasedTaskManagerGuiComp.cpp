@@ -3,8 +3,6 @@
 
 // Qt includes
 #include <QtCore/QUuid>
-#include <QtWidgets/QMessageBox>
-#include <QtWidgets/QInputDialog>
 
 // Acula includes
 #include <imthypegui/CTaskSettingsDialog.h>
@@ -54,10 +52,10 @@ void CPluginBasedTaskManagerGuiComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
 
-	int lastTaskEditorIndex = m_typeToStackIndexMap.count();
+	qsizetype lastTaskEditorIndex = m_typeToStackIndexMap.size();
 
 	for (PluginsMap::ConstIterator pluginIter = m_pluginsMap.constBegin(); pluginIter != m_pluginsMap.constEnd(); ++pluginIter){
-		QByteArray editorTypeId = pluginIter.key();
+		const QByteArray& editorTypeId = pluginIter.key();
 		if (m_editorsMap.contains(editorTypeId)){
 			continue;
 		}

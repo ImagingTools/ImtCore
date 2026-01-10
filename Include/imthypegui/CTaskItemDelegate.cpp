@@ -9,7 +9,6 @@
 #include <QtCore/QModelIndex>
 
 // ACF includes
-#include <istd/IInformationProvider.h>
 #include <iqtgui/iqtgui.h>
 
 
@@ -189,7 +188,7 @@ void CTaskItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opt
 
 QWidget* CTaskItemDelegate::createEditor(QWidget* /*parent*/, const QStyleOptionViewItem& /*option*/, const QModelIndex& /*index*/) const
 {
-	return NULL;
+	return nullptr;
 }
 
 

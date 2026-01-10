@@ -23,7 +23,7 @@ iprm::IParamsSet::Ids CTaskParamsComp::GetParamIds(bool editableOnly) const
 const iser::ISerializable* CTaskParamsComp::GetParameter(const QByteArray& id) const
 {
 	const iser::ISerializable* paramPtr = BaseClass::GetParameter(id);
-	if (paramPtr != NULL){
+	if (paramPtr != nullptr){
 		return paramPtr;
 	}
 

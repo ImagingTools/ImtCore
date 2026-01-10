@@ -154,7 +154,7 @@ protected:
 
 		Note: For newly created object, oldName must be empty.
 	*/
-	virtual QString GenerateUniqueObjectName(QString newName, QString oldName) const;
+	virtual QString GenerateUniqueObjectName(const QString& newName, const QString& oldName) const;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;

@@ -21,7 +21,7 @@ public:
 	CTaskCollectionUpdateEvent();
 	CTaskCollectionUpdateEvent(
 				const QByteArray& itemId,
-				UpdateType updateType, const QVariant oldValue = QVariant(), const QVariant newValue = QVariant());
+				UpdateType updateType, const QVariant& oldValue = QVariant(), const QVariant& newValue = QVariant());
 	UpdateType GetUpdateType() const;
 	QVariant GetOldValue() const;
 	QVariant GetNewValue() const;

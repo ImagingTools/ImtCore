@@ -2,7 +2,6 @@
 
 
 // Qt includes
-#include <QtWidgets/QDialog>
 #if QT_VERSION > 0x060000
 #include <QtGui/QRegularExpressionValidator>
 #endif

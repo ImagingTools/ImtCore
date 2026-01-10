@@ -25,7 +25,7 @@ QByteArray CTaskCollectionContextDemultiplexerComp::GetTaskId() const
 {
 	QMutexLocker lock(&m_dataMutex);
 
-	if (m_outputsCompPtr.IsValid() && m_outputsCompPtr.GetCount()){
+	if (m_outputsCompPtr.IsValid() && (m_outputsCompPtr.GetCount() != 0)){
 		ITaskCollectionContext* contextPtr = m_outputsCompPtr[0];
 		if (contextPtr != nullptr){
 			return contextPtr->GetTaskId();
@@ -53,7 +53,7 @@ QByteArray CTaskCollectionContextDemultiplexerComp::GetTaskInputId() const
 {
 	QMutexLocker lock(&m_dataMutex);
 
-	if (m_outputsCompPtr.IsValid() && m_outputsCompPtr.GetCount()){
+	if (m_outputsCompPtr.IsValid() && (m_outputsCompPtr.GetCount() != 0)){
 		ITaskCollectionContext* contextPtr = m_outputsCompPtr[0];
 		if (contextPtr != nullptr){
 			return contextPtr->GetTaskInputId();

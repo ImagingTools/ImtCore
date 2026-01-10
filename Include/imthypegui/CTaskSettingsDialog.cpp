@@ -21,7 +21,7 @@ CTaskSettingsDialog::~CTaskSettingsDialog()
 }
 
 
-void CTaskSettingsDialog::SetCurrentSelectedInputId(QByteArray currentSelectedInputId)
+void CTaskSettingsDialog::SetCurrentSelectedInputId(const QByteArray& currentSelectedInputId)
 {
 	m_currentSelectedInputId = currentSelectedInputId;
 }

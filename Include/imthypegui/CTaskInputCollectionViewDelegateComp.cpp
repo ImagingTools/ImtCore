@@ -116,10 +116,7 @@ void CTaskInputCollectionViewDelegateComp::SetupSummaryInformation()
 
 bool CTaskInputCollectionViewDelegateComp::IsEditorEnabled(const QByteArray& columnId) const
 {
-	if (columnId == "Name"){
-		return false;
-	}
-	return true;
+	return columnId != "Name";
 }
 
 

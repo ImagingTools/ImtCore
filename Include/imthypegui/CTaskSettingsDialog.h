@@ -25,7 +25,7 @@ public:
 	CTaskSettingsDialog(QWidget* parent);
 	~CTaskSettingsDialog();
 
-	void SetCurrentSelectedInputId(QByteArray currentSelectedInputId);
+	void SetCurrentSelectedInputId(const QByteArray& currentSelectedInputId);
 	void RegisterInputsCollection(const imtbase::IObjectCollection* inputsCollectionPtr);
 
 private:

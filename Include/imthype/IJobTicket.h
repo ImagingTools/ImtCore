@@ -5,7 +5,6 @@
 #include <imtbase/IReferenceCollection.h>
 
 // Acula includes
-#include <imthype/IProcessingInfo.h>
 #include <imthype/IJobQueueManager.h>
 
 
@@ -41,14 +40,14 @@ public:
 	virtual const iprm::IParamsSet* GetParams() const = 0;
 	virtual void SetParams(iprm::IParamsSet* paramsPtr) = 0;
 
-	virtual imthype::IJobQueueManager::ProcessingStatus GetProcessingStatus() const = 0;
-	virtual void SetProcessingStatus(imthype::IJobQueueManager::ProcessingStatus status) = 0;
+	virtual IJobQueueManager::ProcessingStatus GetProcessingStatus() const = 0;
+	virtual void SetProcessingStatus(IJobQueueManager::ProcessingStatus status) = 0;
 
 	virtual double GetProgress() const = 0;
 	virtual void SetProgress(double progress) = 0;
 
-	virtual const imthype::IJobOutput* GetResults() const = 0;
-	virtual void SetResults(const imthype::IJobOutput& results) = 0;
+	virtual const IJobOutput* GetResults() const = 0;
+	virtual void SetResults(const IJobOutput& results) = 0;
 
 	virtual const imtbase::IReferenceCollection* GetInput() const = 0;
 	virtual void SetInput(const imtbase::IReferenceCollection& input) = 0;

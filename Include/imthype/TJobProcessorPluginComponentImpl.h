@@ -16,15 +16,15 @@ namespace imthype
 	Generic implementation of task plugin.
 */
 template <class ComponentClass>
-class TJobProcessorPluginComponentImpl: public imtbase::TBasePluginComponentImpl<ComponentClass, imthype::IJobProcessorPlugin>
+class TJobProcessorPluginComponentImpl: public imtbase::TBasePluginComponentImpl<ComponentClass, IJobProcessorPlugin>
 {
 public:
-	typedef imtbase::TBasePluginComponentImpl<ComponentClass, imthype::IJobProcessorPlugin> BaseClass;
+	typedef imtbase::TBasePluginComponentImpl<ComponentClass, IJobProcessorPlugin> BaseClass;
 
 	TJobProcessorPluginComponentImpl(const QString& pluginName, const QByteArray& typeId);
 
-	// reimplemented (imthype::IJobProcessorPlugin)
-	virtual const imthype::IJobProcessorFactory* GetJobProcessorFactory() const override;
+	// reimplemented (IJobProcessorPlugin)
+	virtual const IJobProcessorFactory* GetJobProcessorFactory() const override;
 };
 
 
@@ -36,12 +36,12 @@ TJobProcessorPluginComponentImpl<ComponentClass>::TJobProcessorPluginComponentIm
 }
 
 
-// reimplemented (imthype::IJobProcessorPlugin)
+// reimplemented (IJobProcessorPlugin)
 
 template <class ComponentClass>
-const imthype::IJobProcessorFactory* TJobProcessorPluginComponentImpl<ComponentClass>::GetJobProcessorFactory() const
+const IJobProcessorFactory* TJobProcessorPluginComponentImpl<ComponentClass>::GetJobProcessorFactory() const
 {
-	return BaseClass::m_component.template GetInterface<imthype::IJobProcessorFactory>(QByteArray());
+	return BaseClass::m_component.template GetInterface<IJobProcessorFactory>(QByteArray());
 }
 
 

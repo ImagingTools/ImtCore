@@ -50,7 +50,7 @@ protected Q_SLOTS:
 
 protected:
 	// reimplemented (TTaskCollectionEditorCompBase)
-	virtual QItemSelectionModel* GetTaskSelectionModel() const;
+	virtual QItemSelectionModel* GetTaskSelectionModel() const override;
 	virtual void UpdateCommands() override;
 
 	// reimplemented (iqtgui::CGuiComponentBase)

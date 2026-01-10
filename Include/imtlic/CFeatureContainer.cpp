@@ -16,7 +16,7 @@ CFeatureContainer::CFeatureContainer()
 IFeatureInfoSharedPtr CFeatureContainer::FindFeatureById(const QByteArray& featureId) const
 {
 	imtbase::ICollectionInfo::Ids featureIds = GetFeatureList().GetElementIds();
-	for (QByteArray id : featureIds){
+	for (const QByteArray& id : featureIds){
 		IFeatureInfoSharedPtr featurePtr = GetFeatureInfo(id);
 		Q_ASSERT(featurePtr.IsValid());
 		if (featurePtr.IsValid()){

@@ -4,9 +4,6 @@
 // Qt includes
 #include <QtWidgets/QItemDelegate>
 
-// ACF includes
-#include <iqtgui/TMakeIconProviderCompWrap.h>
-
 
 namespace imthypegui
 {
