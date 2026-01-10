@@ -6,11 +6,8 @@
 #include <QtWidgets/QGraphicsItem>
 
 // ACF includes
-#include <iprm/IEnableableParam.h>
 #include <iprm/IIdParam.h>
 #include <iprm/IOptionsList.h>
-#include <iprm/ISelectionParam.h>
-//#include <iser/IArchive.h>
 #include <imod/TSingleModelObserverBase.h>
 #include <istd/TSmartPtr.h>
 #include <icomp/CComponentBase.h>

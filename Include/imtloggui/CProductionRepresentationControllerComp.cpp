@@ -56,7 +56,7 @@ void CProductionRepresentationControllerComp::BuildRepresentation(
 
 		if (containerPtr.IsValid()){
 			ilog::IMessageContainer::Messages messages = containerPtr->GetMessages();
-			for (ilog::IMessageContainer::Messages::reverse_iterator it = messages.rbegin(); it != messages.rend(); it++){
+			for (auto it = messages.rbegin(); it != messages.rend(); ++it){
 				representationPtr->AddMessage(*it);
 			}
 		}

@@ -4,11 +4,9 @@
 // Qt includes
 #include <QtCore/QMap>
 #include <QtCore/QMutex>
-#include <QtCore/QDateTime>
 #include <QtCore/QThread>
 #include <QtCore/QReadWriteLock>
 #include <QtCore/QFileInfo>
-#include <QtCore/QTimer>
 
 // ACF includes
 #include <istd/TSmartPtr.h>
@@ -26,7 +24,6 @@
 #include <imtbase/IMetaInfoCreator.h>
 #include <imtbase/IRevisionController.h>
 #include <imtbase/ICollectionDataController.h>
-#include <imtbase/CObjectCollectionMetaInfo.h>
 #include <imtfile/IFileCompression.h>
 #include <imtrepo/IFileCollectionInfo.h>
 #include <imtrepo/IFileObjectCollection.h>

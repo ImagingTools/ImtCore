@@ -2,11 +2,11 @@
 
 
 // Qt includes
-#include <QtCore/QtCore>
 #include <QtGui/QColor>
 
 // ACF includes
 #include <iser/ISerializable.h>
+#include <i2d/IObject2d.h>
 #include <i2d/CVector2d.h>
 #include <i2d/CLine2d.h>
 

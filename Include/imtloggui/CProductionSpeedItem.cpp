@@ -2,10 +2,7 @@
 
 
 // Qt includes
-#include <QtGui/QPainter>
-#include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
-#include <QtWidgets/QGraphicsSceneHoverEvent>
 
 
 namespace imtloggui

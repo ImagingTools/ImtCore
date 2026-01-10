@@ -4,10 +4,6 @@
 // Qt includes
 #include <QtCore/QObject>
 
-// ACF includes
-#include <ilog/TLoggerCompWrap.h>
-#include <iprm/IOptionsList.h>
-
 // ImtCore includes
 #include <imtbase/IObjectCollectionIterator.h>
 

@@ -1,9 +1,6 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QDateTime>
-
 // ACF includes
 #include <ifile/IFileMetaInfoProvider.h>
 

@@ -2,13 +2,10 @@
 
 
 // Qt includes
-#include <QtCore/QCoreApplication>
 #include <QtCore/QMutableListIterator>
-#include <QtCore/QCoreApplication>
 
 // ImtCore includes
 #include <imtrest/IProtocolEngine.h>
-#include <imtrest/ISender.h>
 #include <imtrest/CWebSocketServerComp.h>
 #include <imtrest/CWebSocketRequest.h>
 #include <imtrest/CHttpRequest.h>

@@ -1,9 +1,6 @@
 #pragma once
 
 
-// Qt includes
-#include <QtWidgets/QGraphicsScene>
-
 // ACF includes
 #include <istd/IPolymorphic.h>
 

@@ -2,8 +2,6 @@
 
 
 // Qt includes
-
-#include <QtWebSockets/QWebSocketServer>
 #include <QtWebSockets/QWebSocket>
 #include <QtCore/QSharedPointer>
 
@@ -15,8 +13,6 @@
 #include <imod/CMultiModelDispatcherBase.h>
 
 // ImtCore includes
-#include <imtbase/IUrlParam.h>
-#include <imtrest/IRequest.h>
 #include <imtrest/IRequestServlet.h>
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/ISubscriberEngine.h>

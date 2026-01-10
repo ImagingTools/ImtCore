@@ -1,9 +1,6 @@
 #pragma once
 
 
-// Qt includes
-#include <QtGui/QGuiApplication>
-
 // ACF includes
 #include <istd/CGeneralTimeStamp.h>
 #include <imod/TModelWrap.h>
@@ -16,7 +13,6 @@
 
 // ImtCore includes
 #include <imtqml/IQuickObject.h>
-#include <imtqml/IQuickApplication.h>
 
 
 namespace imtqml
@@ -49,8 +45,8 @@ public:
 	CQuickApplicationCompBase();
 
 	// reimplemented (ibase::IApplication)
-	virtual bool InitializeApplication(int argc, char** argv);
-	virtual QStringList GetApplicationArguments() const;
+	virtual bool InitializeApplication(int argc, char** argv) override;
+	virtual QStringList GetApplicationArguments() const override;
 
 protected:
 	QGuiApplication* GetQtApplication() const;
@@ -71,7 +67,7 @@ private:
 		void SetRuntimeStatus(IRuntimeStatusProvider::RuntimeStatus runtimeStatus);
 
 		// reimplemented (ibase::IRuntimeStatusProvider)
-		virtual IRuntimeStatusProvider::RuntimeStatus GetRuntimeStatus() const;
+		virtual IRuntimeStatusProvider::RuntimeStatus GetRuntimeStatus() const override;
 
 	private:
 		IRuntimeStatusProvider::RuntimeStatus m_status;

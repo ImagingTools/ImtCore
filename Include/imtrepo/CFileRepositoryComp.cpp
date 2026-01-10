@@ -3,19 +3,14 @@
 
 // Qt includes
 #include <QtCore/QUuid>
-#include <QtCore/QDir>
 
 // ACF includes
-#include <istd/TOptDelPtr.h>
 #include <istd/CChangeNotifier.h>
 #include <istd/CSystem.h>
 #include <istd/CCrcCalculator.h>
-#include <iser/IArchive.h>
-#include <iser/CArchiveTag.h>
 #include <ilog/CMessage.h>
 
 // ImtCore includes
-#include <imtcore/Version.h>
 #include <imtbase/CTempDir.h>
 
 

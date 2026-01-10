@@ -5,7 +5,6 @@
 #include <QtCore/QMap>
 
 // ACF includes
-#include <istd/TDelPtr.h>
 #include <istd/CClassInfo.h>
 #include <i2d/CRectangle.h>
 #include <i2d/CCircle.h>

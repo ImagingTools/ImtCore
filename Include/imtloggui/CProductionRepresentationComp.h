@@ -2,7 +2,6 @@
 
 
 // Qt includes
-#include <QtCore/QDateTime>
 #include <QtCore/QMap>
 
 // ACF includes

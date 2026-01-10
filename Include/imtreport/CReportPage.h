@@ -5,7 +5,6 @@
 #include <QtCore/QMap>
 
 // ACF includes
-#include <istd/TSmartPtr.h>
 #include <ibase/TFactorisableContainer.h>
 #include <i2d/IObject2d.h>
 

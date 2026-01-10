@@ -2,9 +2,6 @@
 
 
 // Qt includes
-#include <QtCore/QDir>
-#include <QtCore/QFile>
-#include <QtCore/QFileInfo>
 #include <QtCore/QTextStream>
 
 // ACF includes

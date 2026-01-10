@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtCore/QThread>
+#include <QtWidgets/QGraphicsScene>
 
 
 namespace imtloggui

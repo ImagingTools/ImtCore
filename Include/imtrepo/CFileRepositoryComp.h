@@ -4,11 +4,9 @@
 // Qt includes
 #include <QtCore/QMap>
 #include <QtCore/QMutex>
-#include <QtCore/QDateTime>
 #include <QtCore/QThread>
 #include <QtCore/QReadWriteLock>
 #include <QtCore/QFileInfo>
-#include <QtCore/QTimer>
 
 // ACF includes
 #include <istd/TSmartPtr.h>
@@ -19,7 +17,6 @@
 #include <ifile/IFileNameParam.h>
 #include <ifile/IFilePersistence.h>
 #include <ifile/IFileResourceTypeConstraints.h>
-#include <iauth/ILogin.h>
 #include <iauth/IRightsProvider.h>
 
 // ImtCore includes
@@ -27,10 +24,8 @@
 #include <imtbase/IRevisionController.h>
 #include <imtbase/ICollectionDataController.h>
 #include <imtbase/CObjectCollectionMetaInfo.h>
-#include <imtfile/IFileCompression.h>
 #include <imtrepo/IFileCollectionInfo.h>
 #include <imtrepo/IFileObjectCollection.h>
-#include <imtrepo/IRepositoryItemInfoProvider.h>
 #include <imtrepo/CFileCollectionItem.h>
 
 
@@ -248,7 +243,7 @@ protected:
 	ResourceTypeConstraintsModel m_resourceTypeConstraints;
 
 	/**
-		Path to the directory where the file file collection is located.
+		Path to the directory where the file collection is located.
 		If the path is set, the incomming file will be copied to this location,
 		otherwise only a link to the file wil be created.
 	*/

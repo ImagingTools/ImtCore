@@ -8,9 +8,7 @@
 #include <imeas/CGeneralDataSequence.h>
 
 // ImtCore includes
-#include <imtloggui/CProductionSpeedItem.h>
 #include <imtloggui/CProductionQualityItem.h>
-#include <imtloggui/CProductionSpeedItem.h>
 #include <imtloggui/CProductionRepresentationControllerComp.h>
 #include <imtloggui/CProductionRepresentationComp.h>
 

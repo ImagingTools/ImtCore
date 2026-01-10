@@ -2,7 +2,6 @@
 
 
 // Qt includes
-#include <QtCore/QDataStream>
 #include <QtWebSockets/QWebSocket>
 
 // ImtCore includes

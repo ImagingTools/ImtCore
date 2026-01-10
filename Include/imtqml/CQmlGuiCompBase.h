@@ -9,6 +9,7 @@
 // ACF includes
 #include <ibase/TLocalizableWrap.h>
 #include <icomp/CComponentBase.h>
+#include <imod/TModelWrap.h>
 #include <iqtgui/IVisualStatus.h>
 #include <iqtgui/IGuiObject.h>
 #include <iqtgui/TMakeIconProviderCompWrap.h>

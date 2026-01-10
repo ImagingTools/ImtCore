@@ -5,9 +5,6 @@
 #include <QtCore/QThread>
 #include <QtCore/QMutex>
 
-// ACF includes
-#include <istd/TDelPtr.h>
-
 // ImtCore includes
 #include <imtrest/IRequestServlet.h>
 #include <imtrest/ISender.h>

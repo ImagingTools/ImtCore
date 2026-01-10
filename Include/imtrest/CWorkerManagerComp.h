@@ -2,7 +2,6 @@
 
 
 // Qt includes
-#include <QtCore/QThread>
 #include <QtCore/QMutex>
 
 // ACF includes

@@ -82,7 +82,7 @@ TQmlModelEditorCompBase<ModelInterface>::TQmlModelEditorCompBase()
 // reimplemented (imod::CSingleModelObserverBase)
 
 template<typename ModelInterface>
-inline void TQmlModelEditorCompBase<ModelInterface>::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
+inline void TQmlModelEditorCompBase<ModelInterface>::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	if (IsUpdateBlocked()){
 		return;

@@ -6,7 +6,6 @@
 
 // ACF includes
 #include <icomp/CComponentBase.h>
-#include <imod/TModelWrap.h>
 
 // ImtCore includes
 #include <imtqml/IQuickObject.h>

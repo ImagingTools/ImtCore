@@ -2,7 +2,6 @@
 
 
 // Qt includes
-#include <QtCore/QtGlobal>
 #include <QtQuick/QQuickItem>
 
 

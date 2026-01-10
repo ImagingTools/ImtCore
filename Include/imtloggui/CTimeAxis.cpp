@@ -7,7 +7,6 @@
 // Qt includes
 #include <QtCore/QRectF>
 #include <QtGui/QFont>
-#include <QtGui/QPainter>
 #include <QtGui/QPen>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsView>
@@ -24,8 +23,8 @@ namespace imtloggui
 CTimeAxis::CTimeAxis(QGraphicsItem* parent)
 	:BaseClass(parent),
 	m_fontMetrics(QFont()),
-	m_labelWidthFactor(1.5),
-	m_minMinorTickStep(20)
+	m_minMinorTickStep(20),
+	m_labelWidthFactor(1.5)
 {
 	setZValue(100000);
 

@@ -2,7 +2,6 @@
 
 
 // Qt includes
-#include <QtCore/QDir>
 #include <QtCore/QUuid>
 
 // ACF includes
@@ -16,7 +15,6 @@
 #include <istd/CChangeNotifier.h>
 #include <istd/CCrcCalculator.h>
 #include <istd/CSystem.h>
-#include <istd/TOptDelPtr.h>
 
 // ImtCore includes
 #include <imtcore/Version.h>

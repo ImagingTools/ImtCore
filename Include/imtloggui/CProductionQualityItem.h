@@ -6,7 +6,6 @@
 
 // ACF includes
 #include <istd/IChangeable.h>
-#include <istd/TSmartPtr.h>
 
 // ImtCore includes
 #include <imtloggui/IEventScenePositionProvider.h>
