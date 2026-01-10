@@ -89,7 +89,7 @@ QString CSqliteDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 				  AND CAST(json_extract(root1."RevisionInfo", '$.RevisionNumber') AS INTEGER) = 1
 				ORDER BY root1."TimeStamp" DESC
 				LIMIT 1
-			) AS root1 
+			) AS root1
 			ON root1."DocumentId" = root."DocumentId"
 			%3
 			)")
