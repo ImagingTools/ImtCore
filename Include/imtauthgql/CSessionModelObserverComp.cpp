@@ -1,9 +1,6 @@
 #include <imtauthgql/CSessionModelObserverComp.h>
 
 
-// Qt includes
-#include <QtCore/QtDebug>
-
 // ImtCore includes
 #include <imtgql/IGqlRequestProvider.h>
 

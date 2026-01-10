@@ -33,7 +33,7 @@ imtauth::IRoleUniquePtr CRoleCollectionAdapterComp::GetRole(const QByteArray& ob
 			if (rolePtr != nullptr){
 				imtauth::IRoleUniquePtr roleInfoUniquePtr;
 				roleInfoUniquePtr.MoveCastedPtr(rolePtr->CloneMe());
-				
+
 				return roleInfoUniquePtr;
 			}
 		}

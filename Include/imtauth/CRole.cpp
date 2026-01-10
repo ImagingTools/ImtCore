@@ -5,11 +5,13 @@
 #include <QtCore/QByteArrayList>
 
 // ACF includes
-#include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
 #include <iser/CPrimitiveTypesSerializer.h>
+
+// ImtCore includes
+#include <imtcore/Version.h>
 
 
 namespace imtauth
@@ -188,8 +190,8 @@ bool CRole::IncludeRole(const QByteArray& roleId)
 
 void CRole::ExcludeRole(const QByteArray& roleId)
 {
-	bool result = m_parents.removeAll(roleId);
-	if (result){
+	qsizetype numberOfRemovedElements = m_parents.removeAll(roleId);
+	if (numberOfRemovedElements != 0){
 		istd::CChangeNotifier changeNotifier(this);
 	}
 }

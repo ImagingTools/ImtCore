@@ -28,9 +28,9 @@ public:
 protected:
 	// reimplemented (imtauth::IJwtSessionController)
 	virtual bool ValidateSession(const QByteArray& sessionId) const override;
-	virtual JwtState ValidateJwt(const QByteArray& jwt) const override;
-	virtual bool RefreshToken(const QByteArray& refreshToken, UserSession& outputData) const override;
-	virtual bool CreateNewSession(const QByteArray& userId, UserSession& outputData) const override;
+	virtual JwtState ValidateJwt(const QByteArray& token) const override;
+	virtual bool RefreshToken(const QByteArray& refreshToken, UserSession& userSession) const override;
+	virtual bool CreateNewSession(const QByteArray& userId, UserSession& userSession) const override;
 	virtual imtauth::ISessionSharedPtr GetSession(const QByteArray& sessionId) const override;
 	virtual bool RemoveSession(const QByteArray& sessionId) const override;
 	virtual QByteArray GetUserFromJwt(const QByteArray& jwt) const override;

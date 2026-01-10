@@ -2,7 +2,6 @@
 
 
 // ACF includes
-#include <iser/IObject.h>
 #include <ifile/IFileNameParam.h>
 
 // ImtCore includes

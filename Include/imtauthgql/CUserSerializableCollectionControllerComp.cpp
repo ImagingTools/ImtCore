@@ -3,9 +3,7 @@
 
 // ACF includes
 #include <iprm/CTextParam.h>
-#include <iprm/CParamsSet.h>
 #include <iser/CMemoryWriteArchive.h>
-#include <iser/CMemoryReadArchive.h>
 
 // ImtCore includes
 #include <imtauth/CUserInfo.h>
@@ -34,7 +32,7 @@ void CUserSerializableCollectionControllerComp::CustomProcessObject(
 		productId = gqlRequest.GetHeader("productId");
 	}
 
-	imtauth::IUserInfo* objectInfoPtr = dynamic_cast<imtauth::IUserInfo*>(&object);
+	auto objectInfoPtr = dynamic_cast<imtauth::IUserInfo*>(&object);
 	if (objectInfoPtr != nullptr){
 		if (!objectInfoPtr->IsAdmin()){
 			QByteArrayList products = objectInfoPtr->GetProducts();

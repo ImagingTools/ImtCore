@@ -40,7 +40,7 @@ int CApplicationInfoDelegatorComp::GetMainVersionId() const
 }
 
 
-const iser::IVersionInfo& CApplicationInfoDelegatorComp::GetVersionInfo() const 
+const iser::IVersionInfo& CApplicationInfoDelegatorComp::GetVersionInfo() const
 {
 	if (m_applicationInfoCompPtr.IsValid()){
 		return m_applicationInfoCompPtr->GetVersionInfo();

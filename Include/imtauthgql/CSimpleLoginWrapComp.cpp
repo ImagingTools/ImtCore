@@ -109,7 +109,7 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 		m_gqlContextSharedPtr = new imtgql::CGqlContext();
 		m_gqlContextSharedPtr->SetToken(m_loggedUserToken);
 		m_gqlContextSharedPtr->SetProductId(productId);
-	
+
 		imtgql::CGqlRequestContextManager::SetContext(m_gqlContextSharedPtr.GetPtr());
 
 		if (response.Version_1_0->username){
@@ -118,7 +118,7 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 
 			m_loggedUserId = *response.Version_1_0->username;
 		}
-		
+
 		return true;
 	}
 

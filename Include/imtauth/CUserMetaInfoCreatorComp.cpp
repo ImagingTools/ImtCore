@@ -44,13 +44,13 @@ bool CUserMetaInfoCreatorComp::CreateMetaInfo(
 	metaInfoPtr->SetMetaInfo(imtauth::IUserInfo::MIT_PASSWORD_HASH, userInfoPtr->GetPasswordHash());
 	metaInfoPtr->SetMetaInfo(imtauth::IUserInfo::MIT_SYSTEM_ID, "");
 	metaInfoPtr->SetMetaInfo(imtauth::IUserInfo::MIT_SYSTEM_NAME, "");
-	
+
 	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
 	for (const imtauth::IUserInfo::SystemInfo& systemInfo : systemInfoList){
 		if (systemInfo.enabled){
 			metaInfoPtr->SetMetaInfo(imtauth::IUserInfo::MIT_SYSTEM_ID, systemInfo.systemId);
 			metaInfoPtr->SetMetaInfo(imtauth::IUserInfo::MIT_SYSTEM_NAME, systemInfo.systemName);
-			
+
 			break;
 		}
 	}

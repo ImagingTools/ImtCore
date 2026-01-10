@@ -61,14 +61,7 @@ bool CRemotePermissionCheckerComp::CheckPermission(const imtauth::IUserInfo::Fea
 
 	ok = m_permissionCheckerCompPtr->CheckPermission(userPermissions, result);
 
-	qDebug() << "OK: " << ok;
-	qDebug() << "\n";
-
-	if (ok){
-		return true;
-	}
-
-	return false;
+	return ok;
 }
 
 

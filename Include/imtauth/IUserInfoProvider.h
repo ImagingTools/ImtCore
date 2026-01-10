@@ -6,7 +6,7 @@
 #include <iprm/IParamsSet.h>
 #include <idoc/IDocumentMetaInfo.h>
 
-// ImtCore inludes
+// ImtCore includes
 #include <imtauth/IUserInfo.h>
 
 

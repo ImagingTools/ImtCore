@@ -14,6 +14,9 @@ QString CUserInfoMetaInfo::GetMetaInfoName(int metaInfoType) const
 	switch (metaInfoType){
 	case IUserInfo::MetaInfoTypes::MIT_EMAIL:
 		return QObject::tr("Email");
+
+	default:
+		break;
 	}
 
 	return BaseClass::GetMetaInfoName(metaInfoType);

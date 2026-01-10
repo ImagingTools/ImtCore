@@ -51,7 +51,7 @@ istd::IChangeableUniquePtr CUsersSessionsDatabaseDelegateComp::CreateObjectFromR
 		return nullptr;
 	}
 
-	imtauth::CSessionInfo* sessionInfoPtr = dynamic_cast<imtauth::CSessionInfo*>(sessionDataPtr.GetPtr());
+	auto sessionInfoPtr = dynamic_cast<imtauth::CSessionInfo*>(sessionDataPtr.GetPtr());
 	if (sessionInfoPtr == nullptr){
 		return nullptr;
 	}
@@ -88,7 +88,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUsersSessionsDatabaseDelegateCom
 			const istd::IChangeable* valuePtr,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	const imtauth::ISession* sessionPtr = dynamic_cast<const imtauth::ISession*>(valuePtr);
+	auto sessionPtr = dynamic_cast<const imtauth::ISession*>(valuePtr);
 	if (sessionPtr == nullptr){
 		return NewObjectQuery();
 	}
@@ -114,7 +114,7 @@ QByteArray CUsersSessionsDatabaseDelegateComp::CreateUpdateObjectQuery(
 			const imtbase::IOperationContext* /*operationContextPtr*/,
 			bool /*useExternDelegate*/) const
 {
-	const imtauth::ISession* sessionPtr = dynamic_cast<const imtauth::ISession*>(&object);
+	auto sessionPtr = dynamic_cast<const imtauth::ISession*>(&object);
 	if (sessionPtr == nullptr){
 		return QByteArray();
 	}
@@ -175,7 +175,7 @@ bool CUsersSessionsDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsSe
 {
 	iprm::IParamsSet::Ids paramIds = filterParams.GetParamIds();
 	if (paramIds.contains("RefreshToken")){
-		const iprm::ITextParam* textParamPtr = dynamic_cast<const iprm::ITextParam*>(filterParams.GetParameter("RefreshToken"));
+		auto textParamPtr = dynamic_cast<const iprm::ITextParam*>(filterParams.GetParameter("RefreshToken"));
 		if (textParamPtr == nullptr){
 			return false;
 		}

@@ -74,8 +74,8 @@ protected:
 private:
 	bool SendUserCode(const QByteArray& userId, const imtauth::IUserInfo& userInfo) const;
 	imtauth::IUserInfoSharedPtr GetUserInfoByLogin(const QByteArray& login) const;
-	const QByteArray GetUserIdByLogin(const QByteArray& login) const;
-	const QByteArray GetUserIdByEmail(const QString& email) const;
+	QByteArray GetUserIdByLogin(const QByteArray& login) const;
+	QByteArray GetUserIdByEmail(const QString& email) const;
 
 private:
 	I_REF(imtauth::IUserVerificationController, m_userVerificationControllerCompPtr);

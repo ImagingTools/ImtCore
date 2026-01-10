@@ -7,6 +7,9 @@
 #include <iser/CArchiveTag.h>
 #include <iser/CPrimitiveTypesSerializer.h>
 
+// ImtCore includes
+#include <imtcore/Version.h>
+
 
 namespace imtauth
 {

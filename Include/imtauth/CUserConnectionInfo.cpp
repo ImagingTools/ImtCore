@@ -27,7 +27,7 @@ void CUserConnectionInfo::SetUserId(const QByteArray& userId)
 {
 	if (m_userId != userId){
 		istd::CChangeNotifier changeNotifier(this);
-		
+
 		m_userId = userId;
 	}
 }
@@ -43,7 +43,7 @@ void CUserConnectionInfo::SetLastConnection(const QDateTime& lastConnection)
 {
 	if (m_lastConnection != lastConnection){
 		istd::CChangeNotifier changeNotifier(this);
-		
+
 		m_lastConnection = lastConnection;
 	}
 }
@@ -69,7 +69,7 @@ bool CUserConnectionInfo::Serialize(iser::IArchive &archive)
 	retVal = retVal && archive.BeginTag(userIdTag);
 	retVal = retVal && archive.Process(m_userId);
 	retVal = retVal && archive.EndTag(userIdTag);
-	
+
 	iser::CArchiveTag lastConnectionTag("LastConnection", "Last Connection", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(lastConnectionTag);
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeDateTime(archive, m_lastConnection);

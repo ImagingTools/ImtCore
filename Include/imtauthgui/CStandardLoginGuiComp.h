@@ -8,7 +8,6 @@
 #include <iauth/ILogin.h>
 #include <iauth/IRightsProvider.h>
 #include <iqt/ISettingsProvider.h>
-#include <iqtgui/IDialog.h>
 #include <iqtgui/TDesignerGuiCompBase.h>
 #include <iqtgui/TRestorableGuiWrap.h>
 #include <ilog/IMessageConsumer.h>

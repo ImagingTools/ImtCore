@@ -12,7 +12,7 @@ namespace imtauthdb
 class CUsersSqlPathExtractorComp: public imtdb::CPostgresXPathExtractorComp
 {
 public:
-	typedef imtdb::CPostgresXPathExtractorComp BaseClass;
+	typedef CPostgresXPathExtractorComp BaseClass;
 	
 	I_BEGIN_COMPONENT(CUsersSqlPathExtractorComp)
 	I_END_COMPONENT

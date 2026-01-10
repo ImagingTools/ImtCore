@@ -51,7 +51,7 @@ imtbase::CTreeItemModel* CUserSettingsControllerComp::CreateRepresentationFromRe
 
 	istd::TDelPtr<iprm::CParamsSet> paramsPtr = new imod::TModelWrap<iprm::CParamsSet>();
 
-	iprm::CIdParam* languageIdParamPtr = new iprm::CIdParam();
+	auto languageIdParamPtr = new iprm::CIdParam();
 	languageIdParamPtr->SetId(languageId);
 	paramsPtr->SetEditableParameter("LanguageParam", languageIdParamPtr, true);
 

@@ -235,7 +235,7 @@ istd::IChangeableUniquePtr CUserRecentAction::CloneMe(CompatibilityMode mode) co
 }
 
 
-bool CUserRecentAction::ResetData(CompatibilityMode mode)
+bool CUserRecentAction::ResetData(CompatibilityMode /* mode */)
 {
 	istd::CChangeNotifier changeNotifier(this);
 

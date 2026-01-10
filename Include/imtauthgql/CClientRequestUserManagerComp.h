@@ -29,7 +29,7 @@ public:
 	virtual imtauth::IUserInfoUniquePtr GetUser(const QByteArray& userId) const override;
 	virtual bool RemoveUser(const QByteArray& userId) override;
 	virtual QByteArray CreateUser(const QString& userName, const QByteArray& login, const QByteArray& password, const QString& email) override;
-	virtual bool ChangeUserPassword(const QByteArray& userId, const QByteArray& oldPassword, const QByteArray& newPassword) override;
+	virtual bool ChangeUserPassword(const QByteArray& login, const QByteArray& oldPassword, const QByteArray& newPassword) override;
 	virtual bool AddRolesToUser(const QByteArray& userId, const QByteArray& productId, const QByteArrayList& roleIds) override;
 	virtual bool RemoveRolesFromUser(const QByteArray& userId, const QByteArray& productId, const QByteArrayList& roleIds) override;
 	virtual QByteArrayList GetUserPermissions(const QByteArray& userId, const QByteArray& productId) const override;

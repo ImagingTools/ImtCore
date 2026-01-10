@@ -76,7 +76,7 @@ sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload CRoleRemoteCollectionCon
 					QString permissionName = GetPermissionName(permissionId);
 					newData += permissionName + "\n";
 				}
-				
+
 				parameter.data = newData;
 			}
 		}

@@ -2,7 +2,6 @@
 
 
 // Qt includes
-#include <QtWidgets/QMessageBox>
 #include <QtWidgets/QFileDialog>
 
 // ACF includes
@@ -22,8 +21,8 @@ namespace imtauthgui
 // public methods
 
 CAccountInfoEditorComp::CAccountInfoEditorComp()
-	:m_addressObserver(*this),
-	m_blockComboChanged(false)
+	:m_blockComboChanged(false),
+	m_addressObserver(*this)
 {
 }
 
@@ -62,7 +61,7 @@ void CAccountInfoEditorComp::UpdateGui(const istd::IChangeable::ChangeSet& /*cha
 
 		if (bitmapPtr != nullptr){
 			if(!bitmapPtr->IsEmpty()){
-				imod::IModel* accountPicureModelPtr = dynamic_cast<imod::IModel*>(
+				auto accountPicureModelPtr = dynamic_cast<imod::IModel*>(
 							const_cast<iimg::IBitmap*>(bitmapPtr));
 
 				if (accountPicureModelPtr != nullptr){
@@ -81,7 +80,7 @@ void CAccountInfoEditorComp::OnGuiModelAttached()
 {
 	BaseClass::OnGuiModelAttached();
 
-	imod::IModel* contactModelPtr = dynamic_cast<imod::IModel*>(
+	auto contactModelPtr = dynamic_cast<imod::IModel*>(
 				const_cast<imtauth::IContactInfo*>(
 							GetObservedObject()->GetAccountOwner()));
 
@@ -99,7 +98,7 @@ void CAccountInfoEditorComp::OnGuiModelAttached()
 
 void CAccountInfoEditorComp::OnGuiModelDetached()
 {
-	imod::IModel* contactModelPtr = dynamic_cast<imod::IModel*>(
+	auto contactModelPtr = dynamic_cast<imod::IModel*>(
 				const_cast<imtauth::IContactInfo*>(
 							GetObservedObject()->GetAccountOwner()));
 
@@ -107,7 +106,7 @@ void CAccountInfoEditorComp::OnGuiModelDetached()
 		contactModelPtr->DetachAllObservers();
 	}
 
-	imod::IModel* accountPicureModelPtr = dynamic_cast<imod::IModel*>(
+	auto accountPicureModelPtr = dynamic_cast<imod::IModel*>(
 				const_cast<iimg::IBitmap*>(&GetObservedObject()->GetAccountPicture()));
 
 	if (accountPicureModelPtr != nullptr){
@@ -194,9 +193,10 @@ void CAccountInfoEditorComp::OnGuiDestroyed()
 
 void CAccountInfoEditorComp::OnComponentCreated()
 {
-	QIcon icon = GetIcon(":/Icons/Account"); 
+	QIcon icon = GetIcon(":/Icons/Account");
 	if (!icon.isNull()){
-		iimg::CBitmap bitmap(icon.pixmap(300, 300).toImage());
+		constexpr int s_pixmapSize = 300;
+		iimg::CBitmap bitmap(icon.pixmap(s_pixmapSize, s_pixmapSize).toImage());
 		m_emptyAccountPicture.CopyFrom(bitmap);
 	}
 
@@ -247,13 +247,13 @@ void CAccountInfoEditorComp::SetupCompanyAddress() const
 	if (accountPtr != nullptr){
 		const imtauth::IContactInfo* contactPtr = accountPtr->GetAccountOwner();
 		if (contactPtr != nullptr){
-			imtauth::IAddressManager* addressManager = dynamic_cast<imtauth::IAddressManager*>(
+			auto addressManager = dynamic_cast<imtauth::IAddressManager*>(
 						const_cast<imtauth::IAddressProvider*>(contactPtr->GetAddresses()));
 
 			if (addressManager != nullptr){
 				imtbase::ICollectionInfo::Ids ids = addressManager->GetAddressList().GetElementIds();
 				if (ids.isEmpty()){
-					imtauth::CAddress* addressPtr = new imtauth::CAddress();
+					auto addressPtr = new imtauth::CAddress();
 
 					addressManager->AddAddress(addressPtr);
 				}
@@ -407,19 +407,20 @@ void CAccountInfoEditorComp::on_LoadPicture_triggered(QAction* /*action*/)
 		ifilegui::CFileDialogLoaderComp::AppendLoaderFilterList(*filePersistencePtr, nullptr, ifile::IFileTypeInfo::QF_LOAD, allExt, filterList, false);
 	}
 
-	if (filterList.size() > 1){
+	if (filterList.isEmpty()){
+		filterList.prepend(tr("All file types (%1)").arg("*.*"));
+	}
+	else if (filterList.size() > 1){
 		filterList.prepend(tr("All known file types (%1)").arg("*." + allExt.join(" *.")));
 	}
 
-	if (filterList.size() == 0){
-		filterList.prepend(tr("All file types (%1)").arg("*.*"));
-	}
 
 	QString representationFilePath = QFileDialog::getOpenFileName(GetWidget(), tr("Select picture file"), "", filterList.join("\n"));
 	if (!representationFilePath.isEmpty()){
 		QImage image(representationFilePath);
 		if (!image.isNull()){
-			image = image.scaled(300, 300, Qt::KeepAspectRatio);
+			constexpr int s_pixmapSize = 300;
+			image = image.scaled(s_pixmapSize, s_pixmapSize, Qt::KeepAspectRatio);
 
 			iimg::CBitmap bitmap(image);
 

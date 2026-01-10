@@ -21,7 +21,7 @@ bool CUserGroupCollectionControllerComp::FillObjectFromRepresentation(
 			QByteArray& newObjectId,
 			QString& errorMessage) const
 {
-	imtauth::CIdentifiableUserGroupInfo* userGroupInfoPtr = dynamic_cast<imtauth::CIdentifiableUserGroupInfo*>(&object);
+	auto userGroupInfoPtr = dynamic_cast<imtauth::CIdentifiableUserGroupInfo*>(&object);
 	if (userGroupInfoPtr == nullptr){
 		errorMessage = QString("Unable to cast user group instance to identifable object. Error: Invalid object");
 		SendErrorMessage(0, errorMessage, "CUserGroupCollectionControllerComp");
@@ -48,7 +48,7 @@ bool CUserGroupCollectionControllerComp::FillObjectFromRepresentation(
 	for (imtbase::ICollectionInfo::Id& collectionId : collectionIds){
 		imtbase::IObjectCollection::DataPtr groupDataPtr;
 		if (m_objectCollectionCompPtr->GetObjectData(collectionId, groupDataPtr)){
-			imtauth::IUserGroupInfo* currentUserGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(groupDataPtr.GetPtr());
+			auto currentUserGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(groupDataPtr.GetPtr());
 			if (currentUserGroupInfoPtr != nullptr){
 				if (collectionId != newObjectId){
 					QString currentUserGroupName = currentUserGroupInfoPtr->GetName();
@@ -162,7 +162,7 @@ sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload CUserGroupCollectionCont
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-		const imtauth::IUserGroupInfo* userGroupInfoPtr = dynamic_cast<const imtauth::IUserGroupInfo*>(dataPtr.GetPtr());
+		auto userGroupInfoPtr = dynamic_cast<const imtauth::IUserGroupInfo*>(dataPtr.GetPtr());
 		if (userGroupInfoPtr != nullptr){
 			sdl::imtbase::ImtCollection::CElementMetaInfo::V1_0 elementMetaInfo;
 		
@@ -345,7 +345,7 @@ istd::IChangeableUniquePtr CUserGroupCollectionControllerComp::CreateObjectFromR
 		return nullptr;
 	}
 
-	imtauth::CIdentifiableUserGroupInfo* userGroupInfoPtr = dynamic_cast<imtauth::CIdentifiableUserGroupInfo*>(userGroupInstancePtr.GetPtr());
+	auto userGroupInfoPtr = dynamic_cast<imtauth::CIdentifiableUserGroupInfo*>(userGroupInstancePtr.GetPtr());
 	if (userGroupInfoPtr == nullptr){
 		errorMessage = QString("Unable to cast user group instance to identifable object. Error: Invalid object");
 		SendErrorMessage(0, errorMessage, "CUserGroupCollectionControllerComp");
@@ -378,7 +378,7 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 			sdl::imtauth::Groups::CGroupData::V1_0& representationPayload,
 			QString& errorMessage) const
 {
-	const imtauth::CIdentifiableUserGroupInfo* userGroupInfoPtr = dynamic_cast<const imtauth::CIdentifiableUserGroupInfo*>(&data);
+	auto userGroupInfoPtr = dynamic_cast<const imtauth::CIdentifiableUserGroupInfo*>(&data);
 	if (userGroupInfoPtr == nullptr){
 		errorMessage = QString("Unable to create representation from object. Error: Object is invalid");
 		SendErrorMessage(0, errorMessage, "CUserGroupCollectionControllerComp");

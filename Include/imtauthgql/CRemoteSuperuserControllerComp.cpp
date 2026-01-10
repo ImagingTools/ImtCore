@@ -20,7 +20,7 @@ bool CRemoteSuperuserControllerComp::SetSuperuserPassword(const QByteArray& pass
 		Q_ASSERT_X(false, "Attribute 'ApplicationInfo' was not set", "CRemoteSuperuserControllerComp");
 		return false;
 	}
-	
+
 	namespace userssdl = sdl::imtauth::Users;
 
 	userssdl::CreateSuperuserRequestArguments arguments;

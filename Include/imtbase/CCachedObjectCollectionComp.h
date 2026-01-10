@@ -91,7 +91,7 @@ public:
 
 	// reimplemented (ICollectionInfo)
 	virtual int GetElementsCount(
-				const iprm::IParamsSet* selectionParamPtr = nullptr,
+				const iprm::IParamsSet* selectionParamsPtr = nullptr,
 				ilog::IMessageConsumer* logPtr = nullptr) const override;
 	virtual Ids GetElementIds(
 				int offset = 0,

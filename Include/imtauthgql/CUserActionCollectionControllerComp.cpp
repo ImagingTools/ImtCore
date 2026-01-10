@@ -26,7 +26,6 @@ bool CUserActionCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	QByteArray objectId = objectCollectionIterator.GetObjectId();
-	sdl::imtauth::UserActions::GetUserActionsRequestArguments arguments = getUserActionsRequest.GetRequestedArguments();
 	sdl::imtauth::UserActions::GetUserActionsRequestInfo requestInfo = getUserActionsRequest.GetRequestInfo();
 
 	const imtauth::IUserRecentAction* userRecentActionPtr = nullptr;

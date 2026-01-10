@@ -114,7 +114,7 @@ bool CAddress::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.BeginTag(countryTag);
 	retVal = retVal && archive.Process(m_country);
 	retVal = retVal && archive.EndTag(countryTag);
-	
+
 	iser::CArchiveTag cityTag("City", "City name", iser::CArchiveTag::TT_LEAF);
 	retVal = archive.BeginTag(cityTag);
 	retVal = retVal && archive.Process(m_city);

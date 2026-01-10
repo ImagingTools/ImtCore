@@ -146,7 +146,7 @@ sdl::imtbase::ImtCollection::CVisualStatus CRoleCollectionControllerComp::OnGetO
 		Q_ASSERT(false);
 		return response;
 	}
-	
+
 	if (!response.Version_1_0->text.has_value()){
 		Q_ASSERT(false);
 		return response;
@@ -245,7 +245,7 @@ sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload CRoleCollectionControlle
 			for (const QByteArray& permissionId : permissionsIds){
 				permissionsData += permissionId + "\n";
 			}
-			
+
 			permissionsParameter.data = permissionsData;
 		}
 
@@ -314,7 +314,7 @@ bool CRoleCollectionControllerComp::CreateRepresentationFromObject(
 
 	if (requestInfo.items.isAddedRequested){
 		QDateTime addedTime = objectCollectionIterator.GetElementInfo("Added").toDateTime().toUTC();
-		
+
 		QString added = addedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
 		representationObject.added = QString(added);
 	}
@@ -382,7 +382,7 @@ istd::IChangeableUniquePtr CRoleCollectionControllerComp::CreateObjectFromRepres
 
 bool CRoleCollectionControllerComp::CreateRepresentationFromObject(
 			const istd::IChangeable& data,
-			const sdl::imtauth::Roles::CRoleItemGqlRequest& roleItemRequest,
+			const sdl::imtauth::Roles::CRoleItemGqlRequest& /* roleItemRequest */,
 			sdl::imtauth::Roles::CRoleData::V1_0& representationPayload,
 			QString& errorMessage) const
 {
@@ -393,8 +393,6 @@ bool CRoleCollectionControllerComp::CreateRepresentationFromObject(
 
 		return false;
 	}
-
-	sdl::imtauth::Roles::RoleItemRequestArguments arguments = roleItemRequest.GetRequestedArguments();
 
 	QByteArray id = roleInfoPtr->GetObjectUuid();
 	representationPayload.id = QByteArray(id);

@@ -180,7 +180,7 @@ sdl::imtauth::Users::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
 		return sdl::imtauth::Users::CRegisterUserPayload();
 	}
 
-	imtbase::IIdentifiable* userIdentifierPtr = dynamic_cast<imtbase::IIdentifiable*>(userInfoPtr.GetPtr());
+	auto userIdentifierPtr = dynamic_cast<imtbase::IIdentifiable*>(userInfoPtr.GetPtr());
 	if (userIdentifierPtr == nullptr){
 		Q_ASSERT_X(false, "User instance is invalid", "CUserControllerComp");
 
@@ -241,7 +241,7 @@ sdl::imtauth::Users::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
 		for (const QByteArray& roleId : roleIds){
 			imtbase::IObjectCollection::DataPtr roleDataPtr;
 			if (m_roleCollectionCompPtr->GetObjectData(roleId, roleDataPtr)){
-				const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(roleDataPtr.GetPtr());
+				auto roleInfoPtr = dynamic_cast<const imtauth::IRole*>(roleDataPtr.GetPtr());
 				if (roleInfoPtr != nullptr){
 					if (roleInfoPtr->GetProductId() == productId && roleInfoPtr->IsDefault()){
 						userInfoPtr->AddRole(productId, roleId);
@@ -535,7 +535,7 @@ sdl::imtauth::Users::CCreateSuperuserPayload CUserControllerComp::OnCreateSuperu
 		return retVal;
 	}
 
-	imtbase::IIdentifiable* userIdentifierPtr = dynamic_cast<imtbase::IIdentifiable*>(superuserInfoPtr.GetPtr());
+	auto userIdentifierPtr = dynamic_cast<imtbase::IIdentifiable*>(superuserInfoPtr.GetPtr());
 	if (userIdentifierPtr == nullptr){
 		Q_ASSERT_X(false, "User instance is invalid", "CUserControllerComp");
 
@@ -660,7 +660,7 @@ imtauth::IUserInfoSharedPtr CUserControllerComp::GetUserInfoByLogin(const QByteA
 }
 
 
-const QByteArray CUserControllerComp::GetUserIdByLogin(const QByteArray& login) const
+QByteArray CUserControllerComp::GetUserIdByLogin(const QByteArray& login) const
 {
 	imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
 	fieldFilter.fieldId = "Id";
@@ -673,7 +673,7 @@ const QByteArray CUserControllerComp::GetUserIdByLogin(const QByteArray& login) 
 	filterParam.SetEditableParameter("ComplexFilter", &complexFilter);
 
 	imtbase::IObjectCollection::Ids userIds = m_userCollectionCompPtr->GetElementIds(0, -1, &filterParam);
-	if (userIds.size() > 0){
+	if (!userIds.isEmpty()){
 		return userIds[0];
 	}
 
@@ -681,7 +681,7 @@ const QByteArray CUserControllerComp::GetUserIdByLogin(const QByteArray& login) 
 }
 
 
-const QByteArray CUserControllerComp::GetUserIdByEmail(const QString& email) const
+QByteArray CUserControllerComp::GetUserIdByEmail(const QString& email) const
 {
 	if (!m_userCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'UserCollection' was not set", "CUserControllerComp");
@@ -699,7 +699,7 @@ const QByteArray CUserControllerComp::GetUserIdByEmail(const QString& email) con
 	filterParam.SetEditableParameter("ComplexFilter", &complexFilter);
 
 	imtbase::IObjectCollection::Ids userIds = m_userCollectionCompPtr->GetElementIds(0, -1, &filterParam);
-	if (userIds.size() > 0){
+	if (!userIds.isEmpty()){
 		return userIds[0];
 	}
 

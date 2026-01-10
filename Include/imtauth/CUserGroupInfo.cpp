@@ -71,12 +71,12 @@ void CUserGroupInfo::AddUser(const QByteArray& userId)
 
 bool CUserGroupInfo::RemoveUser(const QByteArray& userId)
 {
-	bool result = m_userIds.removeAll(userId);
-	if (result){
+	qsizetype removedCount = m_userIds.removeAll(userId);
+	if (removedCount != 0){
 		istd::CChangeNotifier changeNotifier(this);
 	}
 
-	return result;
+	return removedCount != 0;
 }
 
 
@@ -108,12 +108,12 @@ bool CUserGroupInfo::AddParentGroup(const QByteArray& parentGroupId)
 
 bool CUserGroupInfo::RemoveParentGroup(const QByteArray& parentGroupId)
 {
-	bool result = m_parentGroupIds.removeAll(parentGroupId);
-	if (result){
+	qsizetype removedCount = m_parentGroupIds.removeAll(parentGroupId);
+	if (removedCount != 0){
 		istd::CChangeNotifier changeNotifier(this);
 	}
 
-	return result;
+	return removedCount != 0;
 }
 
 

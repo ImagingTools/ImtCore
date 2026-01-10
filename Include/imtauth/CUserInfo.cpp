@@ -9,6 +9,7 @@
 #include <iser/CPrimitiveTypesSerializer.h>
 
 // ImtCore includes
+#include <imtcore/Version.h>
 #include <imtauth/IUserGroupInfoProvider.h>
 
 
@@ -76,12 +77,12 @@ void CUserInfo::AddToGroup(const QByteArray& groupId)
 
 bool CUserInfo::RemoveFromGroup(const QByteArray& groupId)
 {
-	bool result = m_groupIds.removeAll(groupId);
-	if (result){
+	qsizetype removedCount = m_groupIds.removeAll(groupId);
+	if (removedCount != 0){
 		istd::CChangeNotifier changeNotifier(this);
 	}
 
-	return result;
+	return removedCount != 0;
 }
 
 
@@ -200,7 +201,7 @@ bool CUserInfo::Serialize(iser::IArchive &archive)
 	}
 
 	if (imtCoreVersion >= 10734){
-		int count = m_systemInfos.count();
+		int count = m_systemInfos.size();
 
 		if (!archive.IsStoring()){
 			m_systemInfos.clear();

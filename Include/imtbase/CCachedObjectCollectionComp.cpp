@@ -129,7 +129,7 @@ bool CCachedObjectCollectionComp::RemoveElements(const Ids& elementIds, const IO
 	if (!m_objectCollectionCompPtr.IsValid()){
 		return false;
 	}
-	
+
 	imtbase::ICollectionInfo::MultiElementNotifierInfo notifierInfo;
 	notifierInfo.elementIds = elementIds;
 
@@ -261,11 +261,11 @@ imtbase::IObjectCollectionIterator* CCachedObjectCollectionComp::CreateObjectCol
 	// if (collectionChacheItemPtr != nullptr){
 	// 	return collectionChacheItemPtr->cachePtr->CreateObjectCollectionIterator(objectId, offset, count, selectionParamsPtr);
 	// }
-	
+
 	if (!m_objectCollectionCompPtr.IsValid()){
 		return nullptr;
 	}
-	
+
 	return m_objectCollectionCompPtr->CreateObjectCollectionIterator(objectId, offset, count, selectionParamsPtr);
 }
 

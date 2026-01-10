@@ -27,8 +27,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserGroupDatabaseDelegateComp::C
 			const imtbase::IOperationContext* operationContextPtr) const
 {
 	NewObjectQuery retVal = BaseClass::CreateNewObjectQuery(typeId, proposedObjectId, objectName, objectDescription, valuePtr, operationContextPtr);
-	
-	const imtauth::IUserGroupInfo* groupInfoPtr = dynamic_cast<const imtauth::IUserGroupInfo*>(valuePtr);
+
+	auto groupInfoPtr = dynamic_cast<const imtauth::IUserGroupInfo*>(valuePtr);
 	if (groupInfoPtr == nullptr){
 		return NewObjectQuery();
 	}
@@ -37,7 +37,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserGroupDatabaseDelegateComp::C
 	for (const QByteArray& userId : userIds){
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (m_userCollectionCompPtr->GetObjectData(userId, dataPtr)){
-			imtauth::IUserInfo* userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(dataPtr.GetPtr());
+			auto userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(dataPtr.GetPtr());
 			if (userInfoPtr != nullptr){
 				if (!userInfoPtr->GetGroups().contains(proposedObjectId)){
 					userInfoPtr->AddToGroup(proposedObjectId);
@@ -60,7 +60,7 @@ QByteArray CUserGroupDatabaseDelegateComp::CreateUpdateObjectQuery(
 			bool useExternDelegate) const
 {
 	QByteArray retVal = BaseClass::CreateUpdateObjectQuery(collection, objectId, object, operationContextPtr, useExternDelegate);
-	
+
 	const imtauth::IUserGroupInfo* oldGroupInfoPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (collection.GetObjectData(objectId, dataPtr)){
@@ -70,8 +70,8 @@ QByteArray CUserGroupDatabaseDelegateComp::CreateUpdateObjectQuery(
 	if (oldGroupInfoPtr == nullptr){
 		return QByteArray();
 	}
-	
-	const imtauth::IUserGroupInfo* newGroupInfoPtr = dynamic_cast<const imtauth::IUserGroupInfo*>(&object);
+
+	auto newGroupInfoPtr = dynamic_cast<const imtauth::IUserGroupInfo*>(&object);
 	if (newGroupInfoPtr == nullptr){
 		return QByteArray();
 	}
@@ -98,7 +98,7 @@ QByteArray CUserGroupDatabaseDelegateComp::CreateUpdateObjectQuery(
 		for (const QByteArray& userId : addedUsers){
 			imtbase::IObjectCollection::DataPtr dataPtr;
 			if (m_userCollectionCompPtr->GetObjectData(userId, dataPtr)){
-				imtauth::IUserInfo* userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(dataPtr.GetPtr());
+				auto userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(dataPtr.GetPtr());
 				if (userInfoPtr != nullptr){
 					if (!userInfoPtr->GetGroups().contains(objectId)){
 						userInfoPtr->AddToGroup(objectId);
@@ -112,7 +112,7 @@ QByteArray CUserGroupDatabaseDelegateComp::CreateUpdateObjectQuery(
 		for (const QByteArray& userId : removedUsers){
 			imtbase::IObjectCollection::DataPtr dataPtr;
 			if (m_userCollectionCompPtr->GetObjectData(userId, dataPtr)){
-				imtauth::IUserInfo* userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(dataPtr.GetPtr());
+				auto userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(dataPtr.GetPtr());
 				if (userInfoPtr != nullptr){
 					bool result = userInfoPtr->RemoveFromGroup(objectId);
 					if (result){

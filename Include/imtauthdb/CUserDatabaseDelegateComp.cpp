@@ -28,7 +28,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserDatabaseDelegateComp::Create
 {
 	NewObjectQuery retVal = BaseClass::CreateNewObjectQuery(typeId, proposedObjectId, objectName, objectDescription, valuePtr, operationContextPtr);
 
-	const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(valuePtr);
+	auto userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(valuePtr);
 	if (userInfoPtr == nullptr){
 		return NewObjectQuery();
 	}
@@ -38,7 +38,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserDatabaseDelegateComp::Create
 		for (const QByteArray& groupId : groupIds){
 			imtbase::IObjectCollection::DataPtr dataPtr;
 			if (m_userGroupCollectionCompPtr->GetObjectData(groupId, dataPtr)){
-				imtauth::IUserGroupInfo* userGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(dataPtr.GetPtr());
+				auto userGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(dataPtr.GetPtr());
 				if (userGroupInfoPtr != nullptr){
 					userGroupInfoPtr->AddUser(proposedObjectId);
 					retVal.query += m_userGroupDatabaseDelegateCompPtr->CreateUpdateObjectQuery(
@@ -75,7 +75,7 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 		return QByteArray();
 	}
 
-	imtauth::IUserInfo* userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(&const_cast<istd::IChangeable&>(object));
+	auto userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(&const_cast<istd::IChangeable&>(object));
 	Q_ASSERT(userInfoPtr != nullptr);
 	if (userInfoPtr == nullptr){
 		return QByteArray();
@@ -123,7 +123,7 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 			for (const QByteArray& groupId : removedGroups){
 				imtbase::IObjectCollection::DataPtr dataPtr;
 				if (m_userGroupCollectionCompPtr->GetObjectData(groupId, dataPtr)){
-					imtauth::IUserGroupInfo* userGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(dataPtr.GetPtr());
+					auto userGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(dataPtr.GetPtr());
 					if (userGroupInfoPtr != nullptr){
 						bool result = userGroupInfoPtr->RemoveUser(objectId);
 						if (result){

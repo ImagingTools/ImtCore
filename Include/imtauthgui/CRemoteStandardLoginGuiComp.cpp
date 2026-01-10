@@ -33,7 +33,7 @@ bool CRemoteStandardLoginGuiComp::eventFilter(QObject* watched, QEvent* event)
 	if (m_loginCompPtr.IsValid()){
 		bool isLogged = m_loginCompPtr->GetLoggedUser() != NULL;
 
-		QKeyEvent* keyEventPtr = dynamic_cast<QKeyEvent*>(event);
+		auto keyEventPtr = dynamic_cast<QKeyEvent*>(event);
 		if (keyEventPtr != nullptr){
 			int pressedKey = keyEventPtr->key();
 
@@ -98,9 +98,10 @@ void CRemoteStandardLoginGuiComp::OnGuiShown()
 
 	on_SuPasswordEdit_textEdited("");
 
-	if (!LoadingLabel->movie()) {
-		auto movie = new QMovie(":/Animation/Loading", "", LoadingLabel);
-		movie->setScaledSize(QSize(50, 50));
+	if (LoadingLabel->movie() == nullptr) {
+		constexpr int scaledSize = 50;
+		auto *movie = new QMovie(":/Animation/Loading", "", LoadingLabel);
+		movie->setScaledSize(QSize(scaledSize, scaledSize));
 		LoadingLabel->setMovie(movie);
 	}
 
@@ -111,8 +112,9 @@ void CRemoteStandardLoginGuiComp::OnGuiShown()
 
 void CRemoteStandardLoginGuiComp::OnGuiHidden()
 {
-	if (LoadingLabel->movie())
+	if (LoadingLabel->movie() != nullptr){
 		LoadingLabel->movie()->stop();
+	}
 
 	BaseClass::OnGuiHidden();
 }
@@ -143,7 +145,7 @@ void CRemoteStandardLoginGuiComp::OnGuiCreated()
 
 void CRemoteStandardLoginGuiComp::OnGuiDestroyed()
 {
-	if (LoadingLabel->movie()) {
+	if (LoadingLabel->movie() != nullptr) {
 		LoadingLabel->movie()->stop();
 	}
 
@@ -198,7 +200,7 @@ void CRemoteStandardLoginGuiComp::on_LoginButton_clicked()
 		StackedWidget->setCurrentIndex(US_WAIT_INDICATOR);
 
 		if (m_loginCompPtr->Login(userName, password)){
-			if (RememberMe->isChecked() == false){
+			if (!RememberMe->isChecked()){
 				UserEdit->setText("");
 			}
 		}
@@ -263,11 +265,11 @@ void CRemoteStandardLoginGuiComp::on_SuConfirmPasswordEdit_textEdited(const QStr
 
 void CRemoteStandardLoginGuiComp::OnSetSuPasswordFinished()
 {
-	CRemoteStandardLoginGuiComp::SetSuPasswordThread::ThreadState state = m_setSuPasswordThread.GetState();
-	if (state == CRemoteStandardLoginGuiComp::SetSuPasswordThread::ThreadState::TS_OK){
+	SetSuPasswordThread::ThreadState state = m_setSuPasswordThread.GetState();
+	if (state != SetSuPasswordThread::ThreadState::TS_OK){
 		StackedWidget->setCurrentIndex(US_USER_PASSWORD_LOGIN);
 	}
-	else if (state == CRemoteStandardLoginGuiComp::SetSuPasswordThread::ThreadState::TS_FAILED){
+	else if (state == SetSuPasswordThread::ThreadState::TS_FAILED){
 		StackedWidget->setCurrentIndex(US_ENTER_SU_PASSWORD);
 
 		QMessageBox::critical(GetWidget(), tr("User Management"), tr("Password for the super user could not be set"), QMessageBox::Close);

@@ -54,10 +54,10 @@ void CSessionModelSubscriberControllerComp::OnSessionModelChanged(const istd::IC
 								.arg(QString(id))
 								.arg(QString(sessionId))
 								.arg(qPrintable(changeSetDocument.toJson(QJsonDocument::Compact))).toUtf8();
-			QByteArray reponseTypeId = QByteArray("application/json; charset=utf-8");
+			QByteArray responseTypeId("application/json; charset=utf-8");
 			const imtrest::IProtocolEngine& engine = networkRequest->GetProtocolEngine();
 
-			imtrest::ConstResponsePtr responsePtr(engine.CreateResponse(*networkRequest, imtrest::IProtocolEngine::SC_OK, body, reponseTypeId).PopInterfacePtr());
+			imtrest::ConstResponsePtr responsePtr(engine.CreateResponse(*networkRequest, imtrest::IProtocolEngine::SC_OK, body, responseTypeId).PopInterfacePtr());
 			if (responsePtr.IsValid()){
 				const imtrest::ISender* sender = m_requestManagerCompPtr->GetSender(networkRequest->GetRequestId());
 				if (sender != nullptr){

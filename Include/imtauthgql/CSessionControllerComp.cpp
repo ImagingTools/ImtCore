@@ -27,7 +27,7 @@ imtbase::CTreeItemModel* CSessionControllerComp::GetObject(const imtgql::CGqlReq
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(sessionId, dataPtr)){
-		const imtauth::ISession* sessionInfoPtr = dynamic_cast<const imtauth::ISession*>(dataPtr.GetPtr());
+		auto sessionInfoPtr = dynamic_cast<const imtauth::ISession*>(dataPtr.GetPtr());
 		if (sessionInfoPtr != nullptr){
 			QByteArray token = sessionInfoPtr->GetToken();
 			QByteArray userId = sessionInfoPtr->GetUserId();

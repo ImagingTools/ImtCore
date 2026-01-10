@@ -31,13 +31,10 @@ QByteArray CUsersSettingsDatabaseDelegateComp::GetSelectionQuery(
 					.arg(qPrintable(objectId))
 					.toUtf8();
 	}
-	else{
-		QString retVal = GetBaseSelectionQuery();
 
-		return retVal.toUtf8();
-	}
+	QString retVal = GetBaseSelectionQuery();
 
-	return QByteArray();
+	return retVal.toUtf8();
 }
 
 
@@ -46,7 +43,7 @@ istd::IChangeableUniquePtr CUsersSettingsDatabaseDelegateComp::CreateObjectFromR
 	if (!m_databaseEngineCompPtr.IsValid() || !m_userSettingsInfoFactCompPtr.IsValid()){
 		return nullptr;
 	}
-	
+
 	imtauth::IUserSettingsUniquePtr userSettingsPtr = m_userSettingsInfoFactCompPtr.CreateInstance();
 	if (!userSettingsPtr.IsValid()){
 		return nullptr;
@@ -59,15 +56,11 @@ istd::IChangeableUniquePtr CUsersSettingsDatabaseDelegateComp::CreateObjectFromR
 
 	userSettingsPtr->SetUserId(userId);
 
-	QByteArray data;
-
 	iprm::IParamsSet* paramSetPtr = userSettingsPtr->GetSettings();
 	if (paramSetPtr != nullptr){
 		if (record.contains("Settings")){
-			data = record.value("Settings").toByteArray();
-
+			QByteArray data = record.value("Settings").toByteArray();
 			iser::CCompactXmlMemReadArchive archive(data);
-
 			if (!paramSetPtr->Serialize(archive)){
 				return nullptr;
 			}
@@ -89,13 +82,12 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUsersSettingsDatabaseDelegateCom
 			const istd::IChangeable* valuePtr,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	const imtauth::IUserSettings* userSettingsPtr = dynamic_cast<const imtauth::IUserSettings*>(valuePtr);
+	auto userSettingsPtr = dynamic_cast<const imtauth::IUserSettings*>(valuePtr);
 	if (userSettingsPtr == nullptr){
 		return NewObjectQuery();
 	}
 
 	iprm::IParamsSet* settingsPtr = userSettingsPtr->GetSettings();
-
 	if (settingsPtr == nullptr){
 		return NewObjectQuery();
 	}
@@ -132,18 +124,18 @@ QByteArray CUsersSettingsDatabaseDelegateComp::CreateDeleteObjectsQuery(
 	if (objectIds.isEmpty()){
 		return QByteArray();
 	}
-	
+
 	QStringList quotedIds;
 	for (const QByteArray& objectId : objectIds){
 		quotedIds << QString("'%1'").arg(qPrintable(objectId));
 	}
-	
+
 	QString query = QString(
 						"DELETE FROM \"UserSettings\" WHERE \"UserId\" IN (%3);")
 						.arg(
 							quotedIds.join(", ")
 							);
-	
+
 	return query.toUtf8();
 }
 
@@ -164,7 +156,7 @@ QByteArray CUsersSettingsDatabaseDelegateComp::CreateUpdateObjectQuery(
 			const imtbase::IOperationContext* /*operationContextPtr*/,
 			bool /*useExternDelegate*/) const
 {
-	const imtauth::IUserSettings* userSettingsPtr = dynamic_cast<const imtauth::IUserSettings*>(&object);
+	auto userSettingsPtr = dynamic_cast<const imtauth::IUserSettings*>(&object);
 	if (userSettingsPtr == nullptr){
 		return QByteArray();
 	}

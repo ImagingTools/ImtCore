@@ -135,6 +135,9 @@ istd::TUniqueInterfacePtr<imtauth::IUserInfo> CLdapAuthorizationControllerComp::
 
 		return userInfoPtr.PopPtr();
 	}
+
+#else
+	Q_UNUSED(ldapUserId)
 #endif
 
 	return nullptr;
@@ -149,25 +152,25 @@ sdl::imtauth::Authorization::CAuthorizationPayload CLdapAuthorizationControllerC
 	if (m_enableableParamCompPtr.IsValid()){
 		bool enabled = m_enableableParamCompPtr->IsEnabled();
 		if (enabled){
-			
+
 			sdl::imtauth::Authorization::AuthorizationRequestArguments arguments = authorizationRequest.GetRequestedArguments();
 			if (!arguments.input.Version_1_0.has_value()){
 				Q_ASSERT(false);
 				return sdl::imtauth::Authorization::CAuthorizationPayload();
 			}
-			
+
 			sdl::imtauth::Authorization::CAuthorizationInput::V1_0 inputArgument = *arguments.input.Version_1_0;
 
 			QByteArray login;
 			if (inputArgument.login){
 				login = inputArgument.login->toUtf8();
 			}
-			
+
 			QByteArray productId;
 			if (inputArgument.productId){
 				productId = *inputArgument.productId;
 			}
-			
+
 			QByteArray password;
 			if (inputArgument.password){
 				password = inputArgument.password->toUtf8();
@@ -238,12 +241,11 @@ sdl::imtauth::Authorization::CAuthorizationPayload CLdapAuthorizationControllerC
 
 					return retVal;
 				}
-				else{
-					sdl::imtauth::Authorization::CAuthorizationPayload retVal;
-					retVal = CreateInvalidLoginOrPasswordResponse(login, errorMessage);
 
-					return retVal;
-				}
+				sdl::imtauth::Authorization::CAuthorizationPayload retVal;
+				retVal = CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+
+				return retVal;
 			}
 		}
 	}

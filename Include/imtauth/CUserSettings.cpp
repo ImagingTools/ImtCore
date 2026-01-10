@@ -116,18 +116,14 @@ bool imtauth::CUserSettings::CopyFrom(const IChangeable& object, CompatibilityMo
 			istd::IChangeableSharedPtr dataPtr = sourcePtr->m_settingsPtr->CloneMe();
 			m_settingsPtr.SetCastedPtr(dataPtr);
 
-			if (!m_settingsPtr.IsValid()){
-				return false;
-			}
-
-			return true;
+			return m_settingsPtr.IsValid();
 		}
-		else if (m_settingsPtr.IsValid() && !sourcePtr->m_settingsPtr.IsValid()){
+		if (m_settingsPtr.IsValid() && !sourcePtr->m_settingsPtr.IsValid()){
 			m_settingsPtr.Reset();
 
 			return true;
 		}
-		else if (m_settingsPtr.IsValid() && sourcePtr->m_settingsPtr.IsValid()){
+		if (m_settingsPtr.IsValid() && sourcePtr->m_settingsPtr.IsValid()){
 			return m_settingsPtr->CopyFrom(*sourcePtr->m_settingsPtr);
 		}
 	}

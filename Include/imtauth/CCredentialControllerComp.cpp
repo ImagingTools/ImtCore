@@ -46,7 +46,8 @@ bool CCredentialControllerComp::CheckCredential(const QByteArray& login, const Q
 	filterParam.SetEditableParameter("ComplexFilter", &complexFilter);
 
 	imtbase::IObjectCollection::Ids userIds = m_userCollectionCompPtr->GetElementIds(0, -1, &filterParam);
-	return userIds.size() > 0;
+
+	return !userIds.isEmpty();
 }
 
 

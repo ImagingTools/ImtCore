@@ -205,7 +205,7 @@ bool CJwtSessionControllerComp::RemoveSession(const QByteArray& sessionId) const
 	if (sessionId.isEmpty()){
 		return false;
 	}
-	
+
 	imtbase::ICollectionInfo::Ids elementIds;
 	elementIds << sessionId;
 
@@ -264,7 +264,7 @@ QByteArray CJwtSessionControllerComp::JsonObjectToBase64(const QJsonObject& obje
 
 QJsonObject CJwtSessionControllerComp::JsonObjectFromBase64(const QByteArray& data) const
 {
-	QByteArray json = data.fromBase64(
+	QByteArray json = QByteArray::fromBase64(
 				data,
 				QByteArray::Base64UrlEncoding | QByteArray::OmitTrailingEquals);
 	QJsonDocument document = QJsonDocument::fromJson(json);

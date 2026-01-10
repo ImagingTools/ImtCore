@@ -10,8 +10,6 @@
 #include <iauth/ILogin.h>
 #include <iauth/IRightsProvider.h>
 #include <iprm/IEnableableParam.h>
-#include <imod/TModelWrap.h>
-#include <ibase/TRuntimeStatusHanderCompWrap.h>
 
 // ImtCore includes
 #include <imtclientgql/TClientRequestManagerCompWrap.h>

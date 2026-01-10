@@ -25,7 +25,7 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (imtauth::ICheckPermission)
-	virtual bool CheckPermission(const imtauth::IUserInfo::FeatureIds& userPermissions, const QByteArrayList& permissions) override;
+	virtual bool CheckPermission(const IUserInfo::FeatureIds &userPermissions, const QByteArrayList &permissionIds) override;
 };
 
 

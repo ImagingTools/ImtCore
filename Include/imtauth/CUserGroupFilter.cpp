@@ -31,7 +31,7 @@ void CUserGroupFilter::SetUserId(const QByteArray& userId)
 {
 	if (m_userId != userId){
 		istd::CChangeNotifier notifier(this);
-		
+
 		m_userId = userId;
 	}
 }
@@ -47,7 +47,7 @@ void CUserGroupFilter::SetGroupIds(const QByteArrayList& groupIds)
 {
 	if (m_groupIds != groupIds){
 		istd::CChangeNotifier notifier(this);
-		
+
 		m_groupIds = groupIds;
 	}
 }
@@ -65,7 +65,7 @@ bool CUserGroupFilter::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.BeginTag(userIdTag);
 	retVal = retVal && archive.Process(m_userId);
 	retVal = retVal && archive.EndTag(userIdTag);
-	
+
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_groupIds, "GroupIds", "GroupIds");
 
 	return retVal;
@@ -90,7 +90,7 @@ bool CUserGroupFilter::CopyFrom(const IChangeable& object, CompatibilityMode /*m
 
 		m_userId = sourcePtr->m_userId;
 		m_groupIds = sourcePtr->m_groupIds;
-		
+
 		return true;
 	}
 

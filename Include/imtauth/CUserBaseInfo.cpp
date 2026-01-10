@@ -5,13 +5,13 @@
 #include <QtCore/QByteArrayList>
 
 // ACF includes
-#include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
 #include <iser/CPrimitiveTypesSerializer.h>
 
 // ImtCore includes
+#include <imtcore/Version.h>
 #include <imtbase/IObjectCollection.h>
 
 
@@ -309,7 +309,7 @@ bool CUserBaseInfo::Serialize(iser::IArchive &archive)
 
 	if (imtCoreVersion >= 6940){
 		QByteArrayList keys = m_permissionsMap.keys();
-		int count = keys.count();
+		int count = keys.size();
 
 		if (!archive.IsStoring()){
 			m_permissionsMap.clear();
@@ -356,7 +356,7 @@ bool CUserBaseInfo::Serialize(iser::IArchive &archive)
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_restrictions, "Restrictions", "Restriction");
 
 	QByteArrayList keys = m_rolesMap.keys();
-	int count = keys.count();
+	int count = keys.size();
 
 	if (!archive.IsStoring()){
 		m_rolesMap.clear();

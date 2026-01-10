@@ -14,7 +14,6 @@
 // ImtCore includes
 #include <imtbase/CTreeItemModel.h>
 #include <imtbase/TModelUpdateBinder.h>
-#include <imtbase/IUrlParam.h>
 #include <imtqml/IQuickObject.h>
 #include <imtcom/IServerConnectionInterface.h>
 

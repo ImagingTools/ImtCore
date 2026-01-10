@@ -102,12 +102,12 @@ bool CContactBaseInfo::AddGroup(const QByteArray& groupId)
 
 bool CContactBaseInfo::RemoveGroup(const QByteArray& groupId)
 {
-	bool result = m_groupIds.removeAll(groupId);
-	if (result){
+	qsizetype numberOfRemovedElements = m_groupIds.removeAll(groupId);
+	if (numberOfRemovedElements != 0){
 		istd::CChangeNotifier changeNotifier(this);
 	}
 
-	return result;
+	return numberOfRemovedElements != 0;
 }
 
 

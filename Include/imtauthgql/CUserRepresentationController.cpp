@@ -21,7 +21,7 @@ bool CUserRepresentationController::FillUserInfoFromRepresentation(
 			const QByteArray& userId,
 			QString& errorMessage) const
 {
-	imtauth::CIdentifiableUserInfo* userInfoPtr = dynamic_cast<imtauth::CIdentifiableUserInfo*>(&userObject);
+	auto userInfoPtr = dynamic_cast<imtauth::CIdentifiableUserInfo*>(&userObject);
 	if (userInfoPtr == nullptr){
 		errorMessage = QString("Unable to create representation from object. Error: Object is invalid");
 
@@ -63,7 +63,7 @@ bool CUserRepresentationController::FillUserInfoFromRepresentation(
 			if (userElementId != userId){
 				imtbase::IObjectCollection::DataPtr dataPtr;
 				if (userCollectionPtr->GetObjectData(userElementId, dataPtr)){
-					const imtauth::CUserInfo* currentUserInfoPtr = dynamic_cast<const imtauth::CUserInfo*>(dataPtr.GetPtr());
+					auto currentUserInfoPtr = dynamic_cast<const imtauth::CUserInfo*>(dataPtr.GetPtr());
 					if (currentUserInfoPtr != nullptr){
 						QByteArray currentUsername = currentUserInfoPtr->GetId();
 						if (currentUsername.toLower() == username.toLower()){

@@ -71,7 +71,7 @@ void CAdministrationObserverQmlComp::OnCommandsModelChanged(QVariant value)
 	m_commandsList.ResetChilds();
 
 	for (int i = 0; i < commandsModelPtr->GetItemsCount(); i++){
-		iqtgui::CHierarchicalCommand* commandPtr = new iqtgui::CHierarchicalCommand("", 100, ibase::ICommand::CF_TOOLBAR);
+		auto commandPtr = new iqtgui::CHierarchicalCommand("", 100, ibase::ICommand::CF_TOOLBAR);
 
 		if (commandsModelPtr->ContainsKey("Id", i)){
 			QByteArray commandId = commandsModelPtr->GetData("Id", i).toByteArray();
@@ -112,7 +112,7 @@ void CAdministrationObserverQmlComp::OnCommandsModelChanged(QVariant value)
 
 void CAdministrationObserverQmlComp::OnTriggered()
 {
-	iqtgui::CHierarchicalCommand* commandPtr = dynamic_cast<iqtgui::CHierarchicalCommand*>(sender());
+	auto commandPtr = dynamic_cast<iqtgui::CHierarchicalCommand*>(sender());
 	if (commandPtr != nullptr){
 		QByteArray commandId = commandPtr->GetCommandId();
 

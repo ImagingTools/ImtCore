@@ -23,7 +23,7 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 			QByteArray& newObjectId,
 			QString& errorMessage) const
 {
-	imtauth::CIdentifiableUserInfo* userInfoPtr = dynamic_cast<imtauth::CIdentifiableUserInfo*>(&object);
+	auto userInfoPtr = dynamic_cast<imtauth::CIdentifiableUserInfo*>(&object);
 	if (userInfoPtr == nullptr){
 		errorMessage = QString("Unable to create representation from object. Error: Object is invalid");
 		SendErrorMessage(0, errorMessage, "CUserCollectionControllerComp");
@@ -66,7 +66,7 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 		QByteArray userObjectId = userIds[0];
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (m_objectCollectionCompPtr->GetObjectData(userObjectId, dataPtr)){
-			const imtauth::CUserInfo* currentUserInfoPtr = dynamic_cast<const imtauth::CUserInfo*>(dataPtr.GetPtr());
+			auto currentUserInfoPtr = dynamic_cast<const imtauth::CUserInfo*>(dataPtr.GetPtr());
 			if (currentUserInfoPtr != nullptr){
 				if (userObjectId != newObjectId){
 					QByteArray currentUsername = currentUserInfoPtr->GetId();
@@ -269,7 +269,7 @@ sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload CUserCollectionControlle
 		return response;
 	}
 
-	const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
+	auto userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
 	if (userInfoPtr == nullptr){
 		Q_ASSERT(false);
 		return response;
@@ -529,7 +529,7 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateObjectFromRepres
 		return nullptr;
 	}
 
-	imtauth::CIdentifiableUserInfo* userInfoPtr = dynamic_cast<imtauth::CIdentifiableUserInfo*>(userInstancePtr.GetPtr());
+	auto userInfoPtr = dynamic_cast<imtauth::CIdentifiableUserInfo*>(userInstancePtr.GetPtr());
 	if (userInfoPtr == nullptr){
 		errorMessage = QString("Unable to cast user instance to identifable object. Error: Invalid object");
 		SendErrorMessage(0, errorMessage, "CUserCollectionControllerComp");
@@ -581,7 +581,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	sdl::imtauth::Users::CUserData::V1_0& representationPayload,
 	QString& errorMessage) const
 {
-	const imtauth::CIdentifiableUserInfo* userInfoPtr = dynamic_cast<const imtauth::CIdentifiableUserInfo*>(&data);
+	auto userInfoPtr = dynamic_cast<const imtauth::CIdentifiableUserInfo*>(&data);
 	if (userInfoPtr == nullptr){
 		errorMessage = QString("Unable to create representation from object. Error: Object is invalid");
 		SendErrorMessage(0, errorMessage, "CUserCollectionControllerComp");
@@ -667,7 +667,7 @@ bool CUserCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 	
 	sdl::imtauth::Users::CUserData::V1_0 userData = *arguments.input.Version_1_0->item;
 
-	imtauth::CIdentifiableUserInfo* userInfoPtr = dynamic_cast<imtauth::CIdentifiableUserInfo*>(&object);
+	auto userInfoPtr = dynamic_cast<imtauth::CIdentifiableUserInfo*>(&object);
 	if (userInfoPtr == nullptr){
 		errorMessage = QString("Unable to cast user instance to identifable object. Error: Invalid object");
 		SendErrorMessage(0, errorMessage, "CUserCollectionControllerComp");

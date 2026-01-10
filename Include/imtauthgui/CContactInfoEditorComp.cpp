@@ -51,7 +51,7 @@ void CContactInfoEditorComp::UpdateGui(const istd::IChangeable::ChangeSet& /*cha
 		for (const QByteArray& id : ids){
 			const imtauth::IAddress* addressPtr = addressesPtr->GetAddress(id);
 			if (addressPtr != nullptr){
-				QTreeWidgetItem* itemPtr = new QTreeWidgetItem({
+				auto* itemPtr = new QTreeWidgetItem({
 							addressPtr->GetCountry(),
 							addressPtr->GetCity(),
 							QString::number(addressPtr->GetPostalCode()),
@@ -94,7 +94,7 @@ void CContactInfoEditorComp::UpdateModel() const
 	contactPtr->SetNameField(imtauth::IContactInfo::NFT_LAST_NAME, LastNameEdit->text());
 	contactPtr->SetNameField(imtauth::IContactInfo::NFT_NICKNAME, NicknameEdit->text());
 
-	imtauth::IAddressManager* addressesPtr = dynamic_cast<imtauth::IAddressManager*>(
+	auto addressesPtr = dynamic_cast<imtauth::IAddressManager*>(
 				const_cast<imtauth::IAddressProvider*>(contactPtr->GetAddresses()));
 
 	if (addressesPtr != nullptr){
@@ -105,7 +105,7 @@ void CContactInfoEditorComp::UpdateModel() const
 		int count = Addresses->topLevelItemCount();
 		for (int i = 0; i < count; i++){
 			QTreeWidgetItem* itemPtr = Addresses->topLevelItem(i);
-			
+
 			imtauth::CAddress address;
 			address.SetCountry(itemPtr->text(0));
 			address.SetCity(itemPtr->text(1));
@@ -196,11 +196,11 @@ void CContactInfoEditorComp::on_Addresses_itemChanged(QTreeWidgetItem* item, int
 {
 	if (!m_isReadOnly && !IsUpdateBlocked() && IsModelAttached()){
 		UpdateBlocker updateBlocker(this);
-		
+
 		imtauth::IContactInfo* contactPtr = GetObservedObject();
 		Q_ASSERT(contactPtr != nullptr);
 
-		imtauth::IAddressManager* addressManagerPtr = dynamic_cast<imtauth::IAddressManager*>(
+		auto addressManagerPtr = dynamic_cast<imtauth::IAddressManager*>(
 					const_cast<imtauth::IAddressProvider*>(contactPtr->GetAddresses()));
 
 		if (addressManagerPtr != nullptr){
@@ -209,7 +209,7 @@ void CContactInfoEditorComp::on_Addresses_itemChanged(QTreeWidgetItem* item, int
 			imtbase::ICollectionInfo::Ids ids = addressManagerPtr->GetAddressList().GetElementIds();
 			for (const QByteArray& id : ids){
 				if (id == changedAddressId){
-					imtauth::IAddress* addressPtr = const_cast<imtauth::IAddress*>(addressManagerPtr->GetAddress(id));
+					auto addressPtr = const_cast<imtauth::IAddress*>(addressManagerPtr->GetAddress(id));
 					if (addressManagerPtr != nullptr){
 						istd::CChangeGroup changeGroup(addressManagerPtr);
 
@@ -230,7 +230,7 @@ void CContactInfoEditorComp::on_AddAddress_triggered(QAction * /*action*/)
 	imtauth::IContactInfo* personPtr = GetObservedObject();
 	Q_ASSERT(personPtr != nullptr);
 
-	imtauth::IAddressManager* addressesPtr = dynamic_cast<imtauth::IAddressManager*>(
+	auto addressesPtr = dynamic_cast<imtauth::IAddressManager*>(
 				const_cast<imtauth::IAddressProvider*>(personPtr->GetAddresses()));
 
 	if (addressesPtr != nullptr){
@@ -246,7 +246,7 @@ void CContactInfoEditorComp::on_RemoveAddress_triggered(QAction* /*action*/)
 	imtauth::IContactInfo* personPtr = GetObservedObject();
 	Q_ASSERT(personPtr != nullptr);
 
-	imtauth::IAddressManager* addressesPtr = dynamic_cast<imtauth::IAddressManager*>(
+	auto addressesPtr = dynamic_cast<imtauth::IAddressManager*>(
 		const_cast<imtauth::IAddressProvider*>(personPtr->GetAddresses()));
 
 	if (addressesPtr != nullptr){

@@ -73,10 +73,10 @@ imtauth::IJwtSessionController::JwtState CRemoteJwtSessionControllerComp::Valida
 		if (state == sessionsdl::JwtState::EXPIRED){
 			return imtauth::IJwtSessionController::JS_EXPIRED;
 		}
-		else if (state == sessionsdl::JwtState::INVALID){
+		if (state == sessionsdl::JwtState::INVALID){
 			return imtauth::IJwtSessionController::JS_INVALID;
 		}
-		else if (state == sessionsdl::JwtState::OK){
+		if (state == sessionsdl::JwtState::OK){
 			return imtauth::IJwtSessionController::JS_OK;
 		}
 	}

@@ -17,7 +17,7 @@ class IUserManager: virtual public istd::IPolymorphic
 public:
 	virtual QByteArrayList GetUserIds() const = 0;
 	virtual QByteArray GetUserObjectId(const QByteArray& login) const = 0;
-	virtual imtauth::IUserInfoUniquePtr GetUser(const QByteArray& userId) const = 0;
+	virtual IUserInfoUniquePtr GetUser(const QByteArray& userId) const = 0;
 	virtual bool RemoveUser(const QByteArray& userId) = 0;
 	virtual QByteArray CreateUser(const QString& userName, const QByteArray& login, const QByteArray& password, const QString& email) = 0;
 	virtual bool ChangeUserPassword(const QByteArray& userId, const QByteArray& oldPassword, const QByteArray& newPassword) = 0;
