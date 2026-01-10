@@ -49,9 +49,8 @@ iprm::IParamsSetUniquePtr CPluginBasedJobQueueManagerComp::CreateJobParameters(
 
 				return newParamsPtr;
 			}
-			else {
-				SendCriticalMessage(0, "Job parameter could not be created");
-			}
+
+			SendCriticalMessage(0, "Job parameter could not be created");
 
 			return paramsFactoryPtr->CreateInstance(taskTypeId);
 		}

@@ -38,9 +38,8 @@ const IJobProcessor* CPluginBasedJobExecutionComp::GetTaskProcessor(const QByteA
 
 				return m_jobProcessorMap[workerTypeId].GetPtr();
 			}
-			else {
-				SendCriticalMessage(0, "Job processor could not be created");
-			}
+
+			SendCriticalMessage(0, "Job processor could not be created");
 		}
 	}
 
