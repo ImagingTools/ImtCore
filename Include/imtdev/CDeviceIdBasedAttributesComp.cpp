@@ -3,7 +3,6 @@
 
 // ACF includes
 #include <iprm/CParamsSet.h>
-#include <istd/CChangeNotifier.h>
 #include <istd/CChangeGroup.h>
 
 // ImtCore includes
@@ -117,13 +116,13 @@ void CDeviceIdBasedAttributesComp::OnSelectionChanged(const istd::IChangeable::C
 }
 
 
-void CDeviceIdBasedAttributesComp::OnDeviceStateChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const imtdev::IDeviceStateProvider* /*objectPtr*/)
+void CDeviceIdBasedAttributesComp::OnDeviceStateChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const IDeviceStateProvider* /*objectPtr*/)
 {
 	UpdateModel();
 }
 
 
-void CDeviceIdBasedAttributesComp::OnInstanceAttributesChanged(const istd::IChangeable::ChangeSet& changeSet, const iattr::IAttributesProvider* objectPtr)
+void CDeviceIdBasedAttributesComp::OnInstanceAttributesChanged(const istd::IChangeable::ChangeSet& /* changeSet */, const iattr::IAttributesProvider* objectPtr)
 {
 	istd::CChangeGroup group(&m_instanceAttributes);
 

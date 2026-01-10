@@ -20,7 +20,7 @@ class CDeviceDataFilePersistenceComp:
 			public ilog::CLoggerComponentBase,
 			virtual public ifile::IFilePersistence
 {
-	Q_DECLARE_TR_FUNCTIONS(CDeviceDataFilePersistenceComp);
+	Q_DECLARE_TR_FUNCTIONS(CDeviceDataFilePersistenceComp)
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
