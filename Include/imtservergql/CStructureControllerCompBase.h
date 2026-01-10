@@ -6,8 +6,6 @@
 
 // ImtCore includes
 #include <imtbase/IHierarchicalStructure.h>
-#include <imtbase/IObjectCollectionIterator.h>
-#include <imtbase/IOperationContext.h>
 #include <imtbase/IDocumentChangeGenerator.h>
 #include <imtservergql/CGqlRequestHandlerCompBase.h>
 #include <imtbase/IOperationContextController.h>

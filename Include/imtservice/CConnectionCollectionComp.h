@@ -5,7 +5,6 @@
 #include <ilog/TLoggerCompWrap.h>
 #include <ilog/ITracingConfiguration.h>
 #include <ibase/IApplicationInfo.h>
-#include <iprm/IEnableableParam.h>
 
 // ImtCore includes
 #include <imtbase/TAggergatedObjectCollectionWrap.h>
@@ -47,7 +46,7 @@ public:
 	virtual QByteArray InsertNewConnection(
 				const QByteArray& connectionId,
 				const QUrl& url,
-				imtservice::IServiceConnectionInfo::ConnectionType connectionType,
+				IServiceConnectionInfo::ConnectionType connectionType,
 				const QString& name = QString(),
 				const QString& description = QString() ) override;
 

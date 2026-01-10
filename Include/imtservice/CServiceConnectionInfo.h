@@ -14,7 +14,7 @@ namespace imtservice
 class CServiceConnectionInfo:
 			public imtcom::CServerConnectionInterfaceParam,
 			virtual public IServiceConnectionInfo,
-			virtual public imtservice::IConnectionStatus
+			virtual public IConnectionStatus
 {
 public:
 	typedef imtcom::CServerConnectionInterfaceParam BaseClass;
@@ -22,15 +22,15 @@ public:
 	CServiceConnectionInfo();
 	
 	void SetConnectionType(ConnectionType connectionType);
-	void SetServiceTypeId(const QByteArray& serviceTypeName);
+	void SetServiceTypeId(const QByteArray& serviceTypeId);
 	void SetDefaultServiceInterface(const imtcom::IServerConnectionInterface& defaultInterface);
 	
-	// reimplemented (imtservice::IServiceConnectionInfo)
+	// reimplemented (IServiceConnectionInfo)
 	virtual ConnectionType GetConnectionType() const override;
 	virtual QByteArray GetServiceTypeId() const override;
 	virtual const imtcom::IServerConnectionInterface& GetDefaultInterface() const override;
 
-	// reimplemented (imtservice::IConnectionStatus)
+	// reimplemented (IConnectionStatus)
 	virtual ConnectionStatus GetConnectionStatus() const override;
 	
 	// reimplemented (iser::ISerializable)

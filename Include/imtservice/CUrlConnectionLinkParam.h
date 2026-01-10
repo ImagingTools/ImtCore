@@ -11,17 +11,17 @@ namespace imtservice
 
 
 class CUrlConnectionLinkParam:
-			public imtservice::CServiceConnectionInfo,
-			public virtual imtservice::IServiceConnectionLinkParam
+			public CServiceConnectionInfo,
+			public virtual IServiceConnectionLinkParam
 {
 public:
-	typedef imtservice::CServiceConnectionInfo BaseClass;
+	typedef CServiceConnectionInfo BaseClass;
 
 	CUrlConnectionLinkParam();
 
 	void SetDependantServiceConnectionId(const QByteArray& connectionId);
 
-	// reimplemented (imtservice::IServiceConnectionLinkParam)
+	// reimplemented (IServiceConnectionLinkParam)
 	virtual QByteArray GetDependantServiceConnectionId() const override;
 
 	// reimplemented (iser::ISerializable)

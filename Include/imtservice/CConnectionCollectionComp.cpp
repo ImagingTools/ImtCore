@@ -81,7 +81,7 @@ bool CConnectionCollectionComp::SetServerConnectionInterface(const QByteArray& c
 		bool retVal = true;
 		imtbase::ICollectionInfo::Ids elementIds = m_collection.GetElementIds();
 		for (int index = 0; index < elementIds.size(); index++){
-			imtbase::ICollectionInfo::Id elementId = elementIds[index];
+			const imtbase::ICollectionInfo::Id& elementId = elementIds[index];
 			if (elementId == connectionId){
 				if (index < m_serverInterfaceListCompPtr.GetCount()){
 					retVal = retVal && m_serverInterfaceListCompPtr[index]->CopyFrom(connectionInterface);

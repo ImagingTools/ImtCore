@@ -12,10 +12,10 @@ namespace imtservergql
 {
 
 
-class CTableViewParamControllerComp: public imtservergql::CGqlRequestHandlerCompBase
+class CTableViewParamControllerComp: public CGqlRequestHandlerCompBase
 {
 public:
-	typedef  imtservergql::CGqlRequestHandlerCompBase BaseClass;
+	typedef  CGqlRequestHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CTableViewParamControllerComp);
 		I_ASSIGN(m_tableViewParamRepresentationControllerCompPtr, "TableViewParamRepresentationController", "Table view param representation controller", true, "TableViewParamRepresentationController");
@@ -26,7 +26,7 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (imtservergql::CGqlRequestHandlerCompBase)
+	// reimplemented (CGqlRequestHandlerCompBase)
 	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 protected:

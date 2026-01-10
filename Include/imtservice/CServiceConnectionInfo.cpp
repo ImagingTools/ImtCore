@@ -2,7 +2,6 @@
 
 
 // ACF includes
-#include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
 #include <istd/CChangeGroup.h>
 #include <iser/IArchive.h>
@@ -17,8 +16,8 @@ namespace imtservice
 // public methods
 
 CServiceConnectionInfo::CServiceConnectionInfo()
-	:m_connectionStatus(CS_OK),
-	m_connectionType(CT_INPUT)
+	:m_connectionType(CT_INPUT),
+	m_connectionStatus(CS_OK)
 {
 }
 

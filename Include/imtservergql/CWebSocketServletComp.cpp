@@ -91,7 +91,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::InitConnection(const imtrest::I
 		return CreateDataResponse(data, request);
 	}
 
-	return imtrest::ConstResponsePtr();	
+	return imtrest::ConstResponsePtr();
 }
 
 imtrest::ConstResponsePtr CWebSocketServletComp::KeepAliveAcknowledge(const imtrest::IRequest& request) const
@@ -102,12 +102,10 @@ imtrest::ConstResponsePtr CWebSocketServletComp::KeepAliveAcknowledge(const imtr
 
 		return imtrest::ConstResponsePtr();
 	}
-	else{
-		QByteArray data = QString(R"({"type": "pong"})").toUtf8();
 
-		return CreateDataResponse(data, request);
-	}
-	return imtrest::ConstResponsePtr();
+	QByteArray data = QString(R"({"type": "pong"})").toUtf8();
+
+	return CreateDataResponse(data, request);
 }
 
 
@@ -136,7 +134,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 		body = QByteArray("{\"query\": \"") + body + QByteArray("\"}");
 	}
 
-	int errorPosition;
+	qsizetype errorPosition;
 	if (!gqlRequest.ParseQuery(body, errorPosition)){
 		QString errorMessage = QString("Error when parsing request: '%1'; Error position: '%2'")
 								.arg(qPrintable(body)).arg(errorPosition);
@@ -226,10 +224,10 @@ imtrest::ConstResponsePtr CWebSocketServletComp::UnregisterSubscription(const im
 }
 
 
-imtrest::ConstResponsePtr CWebSocketServletComp::CreateDataResponse(QByteArray data, const imtrest::IRequest& request) const
+imtrest::ConstResponsePtr CWebSocketServletComp::CreateDataResponse(const QByteArray& data, const imtrest::IRequest& request) const
 {
 	const imtrest::IProtocolEngine& engine = request.GetProtocolEngine();
-	
+
 	QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
 	QByteArray commandId = request.GetCommandId();
 
@@ -244,7 +242,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::CreateDataResponse(QByteArray d
 }
 
 
-imtrest::ConstResponsePtr CWebSocketServletComp::CreateErrorResponse(QByteArray errorMessage, const imtrest::IRequest& request) const
+imtrest::ConstResponsePtr CWebSocketServletComp::CreateErrorResponse(const QByteArray& errorMessage, const imtrest::IRequest& request) const
 {
 	QByteArray requestBody = request.GetBody();
 	QJsonDocument document = QJsonDocument::fromJson(requestBody);
@@ -255,7 +253,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::CreateErrorResponse(QByteArray 
 	QString body = QString(R"({"id": "%1","type": "error","payload": {"errors": [{"errorType": "ProcessRequestError","message": "%2"}]}})")
 							.arg(object["id"].toString())
 							.arg(QString(errorMessage));
-	
+
 	QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
 
 	imtrest::ConstResponsePtr responsePtr(

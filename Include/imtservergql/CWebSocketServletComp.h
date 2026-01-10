@@ -39,8 +39,8 @@ protected:
 	virtual imtrest::ConstResponsePtr ProcessGqlRequest(const imtrest::IRequest& request) const;
 	virtual imtrest::ConstResponsePtr RegisterSubscription(const imtrest::IRequest& request) const;
 	virtual imtrest::ConstResponsePtr UnregisterSubscription(const imtrest::IRequest& request) const;
-	virtual imtrest::ConstResponsePtr CreateDataResponse(QByteArray data, const imtrest::IRequest& request) const;
-	virtual imtrest::ConstResponsePtr CreateErrorResponse(QByteArray errorMessage, const imtrest::IRequest& request) const;
+	virtual imtrest::ConstResponsePtr CreateDataResponse(const QByteArray& data, const imtrest::IRequest& request) const;
+	virtual imtrest::ConstResponsePtr CreateErrorResponse(const QByteArray& errorMessage, const imtrest::IRequest& request) const;
 
 private:
 	I_MULTIREF(imtgql::IGqlSubscriberController, m_gqlSubscriberControllersCompPtr);

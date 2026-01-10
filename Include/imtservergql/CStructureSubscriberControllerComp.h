@@ -14,11 +14,11 @@ namespace imtservergql
 
 
 class CStructureSubscriberControllerComp:
-			public imtservergql::CGqlPublisherCompBase,
+			public CGqlPublisherCompBase,
 			public imod::TSingleModelObserverBase<istd::IChangeable>
 {
 public:
-	typedef imtservergql::CGqlPublisherCompBase BaseClass;
+	typedef CGqlPublisherCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CStructureSubscriberControllerComp);
 		I_ASSIGN(m_collectionStructureCompPtr, "CollectionStructure", "Collection structure", true, "CollectionStructure");
