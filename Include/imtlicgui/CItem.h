@@ -7,14 +7,13 @@
 
 // ImtCore includes
 #include <imtlicgui/IItem.h>
-#include <imtlicgui/IItemChangeHandler.h>
 
 
 namespace imtlicgui
 {
 
 
-class CItem: public istd::THierarchicalBase<imtlicgui::IItemTree>
+class CItem: public istd::THierarchicalBase<IItemTree>
 {
 public:
 	CItem();

@@ -51,10 +51,8 @@ imtbase::CTimeRange CMessagesReader::ReadTimeRange() const
 	QMap<QDate, QString> dirMap = GetDirMap(m_dir);
 
 	if (!dirMap.isEmpty()){
-		QMap<QDate, QString>::const_iterator itDate;
-
 		bool finish = false;
-		itDate = dirMap.cbegin();
+		QMap<QDate, QString>::const_iterator itDate = dirMap.cbegin();
 		while (itDate != dirMap.cend() && !finish){
 			QMap<QDateTime, QString> fileMap = GetFileMap(*itDate);
 			QMap<QDateTime, QString>::const_iterator itTime = fileMap.cbegin();
@@ -68,21 +66,21 @@ imtbase::CTimeRange CMessagesReader::ReadTimeRange() const
 					}
 				}
 
-				itTime++;
+				++itTime;
 			}
 
-			itDate++;
+			++itDate;
 		}
 
 		finish = false;
 		itDate = dirMap.cend();
 		while (itDate != dirMap.cbegin() && !finish){
-			itDate--;
+			--itDate;
 
 			QMap<QDateTime, QString> fileMap = GetFileMap(*itDate);
 			QMap<QDateTime, QString>::const_iterator itTime = fileMap.cend();
 			while (itTime != fileMap.cbegin() && !finish){
-				itTime--;
+				--itTime;
 
 				EventContainerPtr containerPtr = ImportContainer(*itTime);
 				if (containerPtr.IsValid()){
@@ -111,11 +109,10 @@ CMessagesReader::EventContainerListPtr CMessagesReader::ReadContainers(const imt
 
 	EventContainerListPtr retVal(new EventContainerList());
 
-	QDateTime begin = timeRange.GetBeginTime();
-	QDateTime end = timeRange.GetEndTime();
+	const QDateTime& begin = timeRange.GetBeginTime();
+	const QDateTime& end = timeRange.GetEndTime();
 	QDate beginDate = begin.date();
 	QDate endDate = end.date();
-	QStringList dateList;
 
 	QMap<QDate, QString> dirMap = GetDirMap(m_dir);
 
@@ -138,7 +135,7 @@ CMessagesReader::EventContainerListPtr CMessagesReader::ReadContainers(const imt
 				if (timeRange.Intersect(container->GetTimeRange()).IsClosed()){
 					const ilog::IMessageContainer::Messages messages = container->GetMessages();
 
-					for (ilog::IMessageContainer::Messages::const_iterator it = messages.begin(); it != messages.end(); it++){
+					for (auto it = messages.begin(); it != messages.end(); ++it){
 						QDateTime timeStamp = (*it)->GetInformationTimeStamp();
 						if (timeRange.Contains(timeStamp)){
 							retVal->append(container);

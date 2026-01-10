@@ -2,7 +2,6 @@
 
 
 // ImtCore includes
-#include <imtlic/IProductInstanceInfo.h>
 #include <imtlic/IPartProductionInfo.h>
 
 namespace imtbase
@@ -22,13 +21,13 @@ class IProductInfo;
 	Common interface for a hardware product instance. A product instance is the result of the hardware installation by the customer.
 	\ingroup LicenseManagement
 */
-class ILicensedHardwareInstanceInfo: virtual public IPartProductionInfo //, IProductInstanceInfo
+class ILicensedHardwareInstanceInfo: virtual public IPartProductionInfo
 {
 public:
 	enum MetaInfoTypes
 	{
 		/**
-			Serial number of the product..
+			Serial number of the product.
 		*/
 		MIT_SERIAL_NUMBER = idoc::IDocumentMetaInfo::MIT_USER + 2000,
 

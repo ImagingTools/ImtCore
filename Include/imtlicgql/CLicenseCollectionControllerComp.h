@@ -3,7 +3,6 @@
 
 // ImtCore includes
 #include <imtlic/ILicenseDefinition.h>
-#include <imtservergql/CObjectCollectionControllerCompBase.h>
 #include <GeneratedFiles/imtlicsdl/SDL/1.0/CPP/Licenses.h>
 
 

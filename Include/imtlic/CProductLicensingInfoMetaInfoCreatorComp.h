@@ -13,7 +13,7 @@ namespace imtlic
 
 
 /**
-	Meta-info creator for the product' licensing information object.
+	Meta-info creator for the product's licensing information object.
 */
 class CProductLicensingInfoMetaInfoCreatorComp: public imtbase::CObjectMetaInfoCreatorCompBase
 {

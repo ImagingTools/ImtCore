@@ -136,7 +136,7 @@ istd::IChangeableUniquePtr CAccountControllerComp::CreateObjectFromInputParams(
 		}
 
 		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
-		for (imtbase::ICollectionInfo::Id collectionId : collectionIds){
+		for (const imtbase::ICollectionInfo::Id& collectionId : collectionIds){
 			imtbase::IObjectCollection::DataPtr dataPtr;
 			if (m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)){
 				imtauth::IContactBaseInfo* accountInfoPtr = dynamic_cast<imtauth::IContactBaseInfo*>(dataPtr.GetPtr());

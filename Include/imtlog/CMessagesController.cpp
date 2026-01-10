@@ -7,7 +7,6 @@
 
 // ACF includes
 #include <ifile/CCompactXmlFileWriteArchive.h>
-#include <ifile/CCompactXmlFileReadArchive.h>
 #include <iser/CPrimitiveTypesSerializer.h>
 #include <istd/CSystem.h>
 #include <istd/CChangeGroup.h>
@@ -211,7 +210,7 @@ void CMessagesController::OnTimer()
 			continue;
 		}
 
-		it++;
+		++it;
 	}
 
 	if (!m_writingQueue.isEmpty()){
@@ -229,7 +228,7 @@ void CMessagesController::OnTimer()
 				continue;
 			}
 
-			cacheIter++;
+			++cacheIter;
 		}
 	}
 }

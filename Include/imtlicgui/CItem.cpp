@@ -2,8 +2,12 @@
 
 
 // ACF includes
-#include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
+
+// ImtCore includes
+#include <imtbase/imtbase.h>
+#include <imtlicgui/IItemChangeHandler.h>
+
 
 
 namespace imtlicgui
@@ -208,7 +212,7 @@ IItemChangeHandler* CItem::FindItemChangeHandler() const
 
 int CItem::GetChildsCount() const
 {
-	return m_childs.count();
+	return imtbase::narrow_cast<int>(m_childs.count());
 }
 
 

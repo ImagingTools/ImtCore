@@ -3,27 +3,25 @@
 
 // Qt includes
 #include <QtCore/QDebug>
-#include <QtCore/QThread>
 #include <QtCore/QQueue>
 #include <QtCore/QTimer>
-#include <QtCore/QSignalMapper>
 
 // ACF includes
 #include <iser/IVersionInfo.h>
 #include <ifile/IFileNameParam.h>
 #include <ilog/IMessageContainer.h>
-#include <ibase/TRuntimeStatusHanderCompWrap.h>
 #include <ilog/TLoggerCompWrap.h>
 #include <ilog/TMessageDelegatorComp.h>
-#include <imod/TModelWrap.h>
 
 // ImtCore includes
+#include <imtbase/ITimeRangeProvider.h>
 #include <imtfile/IFileCompression.h>
 #include <imtlog/IEventProvider.h>
 #include <imtlog/CEventContainer.h>
 #include <imtlog/CMessagesReader.h>
 #include <imtlog/CMessagesReadJobController.h>
 #include <imtlog/CWorkerBase.h>
+
 
 
 namespace imtlog

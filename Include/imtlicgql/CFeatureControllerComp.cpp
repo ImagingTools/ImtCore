@@ -192,10 +192,9 @@ bool CFeatureControllerComp::GetOperationFromRequest(
 			QString& errorMessage,
 			int& operationType) const
 {
-	const imtgql::CGqlFieldObject fieldList = gqlRequest.GetFields();
+	const imtgql::CGqlFieldObject& fieldList = gqlRequest.GetFields();
 
 	if (fieldList.GetFieldIds().contains("treeItem")){
-		// operationType = OT_USER_OPERATION + 1;
 		return true;
 	}
 

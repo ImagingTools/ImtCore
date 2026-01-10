@@ -43,7 +43,7 @@ bool CProductInstanceMetaInfoCreatorComp::CreateMetaInfo(
 	QString retVal;
 
 	imtbase::ICollectionInfo::Ids ids = productInstancePtr->GetLicenseInstances().GetElementIds();
-	for (imtbase::ICollectionInfo::Id id : ids){
+	for (const imtbase::ICollectionInfo::Id& id : ids){
 		const imtlic::ILicenseInstance* licenseInstancePtr = productInstancePtr->GetLicenseInstance(id);
 		QDateTime expirationDate = licenseInstancePtr->GetExpiration();
 		QString licenseName = licenseInstancePtr->GetLicenseName();

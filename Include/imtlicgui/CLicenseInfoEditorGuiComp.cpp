@@ -4,10 +4,6 @@
 // ACF includes
 #include <istd/CChangeGroup.h>
 
-// ImtCore includes
-#include <imtlic/IFeatureInfo.h>
-#include <imtlic/IFeatureDependenciesProvider.h>
-
 namespace imtlicgui
 {
 

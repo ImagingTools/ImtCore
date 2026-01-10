@@ -389,7 +389,7 @@ QByteArray CProductInstanceInfoEditorComp::GetProductId(const QString& productNa
 		const imtbase::IObjectCollection* productsCollectionPtr = productInstanceInfoPtr->GetProductDatabase();
 		if (productsCollectionPtr != nullptr){
 			imtbase::ICollectionInfo::Ids productCollectionIds = productsCollectionPtr->GetElementIds();
-			for (const QByteArray productCollectionId : productCollectionIds){
+			for (const QByteArray& productCollectionId : productCollectionIds){
 				if (productsCollectionPtr->GetElementInfo(productCollectionId, imtbase::ICollectionInfo::EIT_NAME).toString() == productName){
 					return productCollectionId;
 				}
@@ -408,7 +408,7 @@ QByteArray CProductInstanceInfoEditorComp::GetCustomerId(const QString& customer
 		const imtbase::IObjectCollection* customerCollectionPtr = productInstanceInfoPtr->GetCustomerDatabase();
 		if (customerCollectionPtr != nullptr){
 			imtbase::ICollectionInfo::Ids customerCollectionIds = customerCollectionPtr->GetElementIds();
-			for (const QByteArray customerCollectionId : customerCollectionIds){
+			for (const QByteArray& customerCollectionId : customerCollectionIds){
 				imtbase::IObjectCollection::DataPtr dataPtr;
 				if (customerCollectionPtr->GetObjectData(customerCollectionId, dataPtr)){
 					imtauth::IAccountInfo* customerPtr = dynamic_cast<imtauth::IAccountInfo*>(dataPtr.GetPtr());

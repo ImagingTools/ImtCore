@@ -9,8 +9,8 @@
 #include <idoc/IDocumentMetaInfo.h>
 
 // ImtCore includes
-#include <imtlic/ILicenseInstanceProvider.h>
 #include <imtbase/IObjectCollection.h>
+#include <imtlic/ILicenseInstanceProvider.h>
 
 
 namespace imtbase
@@ -32,7 +32,7 @@ class IProductInfo;
 	There is no license validation logic yet at this level. It is only an overview of the registered licenses in the specified product installation.
 	\ingroup LicenseManagement
 */
-class IProductInstanceInfo: virtual public imtlic::ILicenseInstanceProvider, virtual public iser::IObject
+class IProductInstanceInfo: virtual public ILicenseInstanceProvider, virtual public iser::IObject
 {
 public:
 	enum MetaInfoTypes
@@ -70,9 +70,9 @@ public:
 	virtual const imtbase::IObjectCollection* GetCustomerDatabase() const = 0;
 
 	/**
-		Setup the instance of a given product.
+		Setups the instance of a given product.
 		\param productId	Logical ID of the product (not some repository ID!)
-		\param instanceId	An unique identifier for the product instance. By example - it can be a MAC-address of some hardware device.
+		\param instanceId	A unique identifier for the product instance. For example - it can be a MAC-address of some hardware device.
 		\param customerId	Logical ID of the product (not some repository ID!)
 		*/
 	virtual void SetupProductInstance(
@@ -110,14 +110,14 @@ public:
 
 	/**
 		Get related product-ID.
-		Additional informations about the product can be accessed using this ID in the product database.
+		Additional information about the product can be accessed using this ID in the product database.
 		\sa GetProductDatabase
 	*/
 	virtual QByteArray GetProductId() const = 0;
 
 	/**
 		Get customer-ID of this product instance.
-		Additional informations about the customer can be accessed using this ID in the customer database.
+		Additional information about the customer can be accessed using this ID in the customer database.
 		\sa GetCustomerDatabase
 	*/
 	virtual QByteArray GetCustomerId() const = 0;

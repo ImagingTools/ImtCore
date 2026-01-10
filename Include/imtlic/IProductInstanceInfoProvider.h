@@ -41,7 +41,7 @@ public:
 	/**
 		Get information for a product installation instance.
 	*/
-	virtual const imtlic::IProductInstanceInfo* GetProductInstance(const QByteArray& instanceId) const = 0;
+	virtual const IProductInstanceInfo* GetProductInstance(const QByteArray& instanceId) const = 0;
 };
 
 

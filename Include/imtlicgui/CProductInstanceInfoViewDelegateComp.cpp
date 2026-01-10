@@ -32,8 +32,7 @@ bool CProductInstanceInfoViewDelegateComp::GetSummaryInformation(
 	if (m_collectionPtr == nullptr){
 		return false;
 	}
-	idoc::MetaInfoPtr metaInfoPtr;
-	metaInfoPtr = m_collectionPtr->GetDataMetaInfo(objectId);
+	idoc::MetaInfoPtr metaInfoPtr = m_collectionPtr->GetDataMetaInfo(objectId);
 	if (!metaInfoPtr.IsValid()){
 		Q_ASSERT(metaInfoPtr.IsValid());
 
@@ -133,7 +132,7 @@ QByteArray CProductInstanceInfoViewDelegateComp::GetEncryptionKey(imtcrypt::IEnc
 			imtbase::IObjectCollection::DataPtr dataPtr;
 			m_collectionPtr->GetObjectData(id, dataPtr);
 			if (dataPtr.IsValid()){
-				imtlic::IProductInstanceInfo* productInstanceInfoPtr = dynamic_cast<imtlic::IProductInstanceInfo*>(dataPtr.GetPtr());
+				auto productInstanceInfoPtr = dynamic_cast<imtlic::IProductInstanceInfo*>(dataPtr.GetPtr());
 				Q_ASSERT(productInstanceInfoPtr != nullptr);
 
 				if (productInstanceInfoPtr != nullptr){
@@ -165,8 +164,7 @@ void CProductInstanceInfoViewDelegateComp::OnExportLicense()
 			imtbase::IObjectCollection::DataPtr dataPtr;
 			m_collectionPtr->GetObjectData(id, dataPtr);
 			if (dataPtr.IsValid()){
-				imtlic::IProductInstanceInfo* productInstanceInfoPtr;
-				productInstanceInfoPtr = dynamic_cast<imtlic::IProductInstanceInfo*>(dataPtr.GetPtr());
+				auto productInstanceInfoPtr = dynamic_cast<imtlic::IProductInstanceInfo*>(dataPtr.GetPtr());
 				Q_ASSERT(productInstanceInfoPtr != nullptr);
 				if (m_licensePersistenceCompPtr.IsValid()){
 					m_licensePersistenceCompPtr->SaveToFile(*productInstanceInfoPtr);

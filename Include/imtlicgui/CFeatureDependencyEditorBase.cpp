@@ -8,7 +8,6 @@
 #include <istd/CChangeGroup.h>
 
 // ImtCore includes
-#include <imtlic/IFeatureDependenciesManager.h>
 #include <imtlic/IFeatureInfo.h>
 
 

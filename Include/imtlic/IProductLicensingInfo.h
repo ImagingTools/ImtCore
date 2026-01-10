@@ -6,7 +6,6 @@
 
 // ImtCore includes
 #include <imtlic/ILicenseInfoProvider.h>
-#include <imtlic/IProductInfo.h>
 
 
 namespace imtbase

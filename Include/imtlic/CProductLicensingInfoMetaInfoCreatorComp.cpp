@@ -35,7 +35,7 @@ bool CProductLicensingInfoMetaInfoCreatorComp::CreateMetaInfo(
 		return true;
 	}
 
-	const imtlic::IProductLicensingInfo* productLicensingInfoPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(dataPtr);
+	auto productLicensingInfoPtr = dynamic_cast<const IProductLicensingInfo*>(dataPtr);
 	if (productLicensingInfoPtr == nullptr){
 		return false;
 	}
@@ -43,18 +43,15 @@ bool CProductLicensingInfoMetaInfoCreatorComp::CreateMetaInfo(
 	QString retVal;
 
 	imtbase::ICollectionInfo::Ids ids = productLicensingInfoPtr->GetLicenseList().GetElementIds();
-	for (imtbase::ICollectionInfo::Id id : ids){
-		istd::TUniqueInterfacePtr<imtlic::ILicenseDefinition> licenseInfoPtr = productLicensingInfoPtr->GetLicenseInfo(id);
+	for (const imtbase::ICollectionInfo::Id& id : ids){
+		istd::TUniqueInterfacePtr<ILicenseDefinition> licenseInfoPtr = productLicensingInfoPtr->GetLicenseInfo(id);
 		if (licenseInfoPtr.IsValid()){
 			retVal += licenseInfoPtr->GetLicenseName() + " (" + licenseInfoPtr->GetLicenseId() + ")" + "\n";
 		}
 	}
 
 	retVal.chop(1);
-
 	metaInfoPtr->SetMetaInfo(IProductLicensingInfoProvider::MIT_LICENSES_INFO_LIST, retVal);
-//	metaInfoPtr->SetMetaInfo(IProductLicensingInfo::MIT_PRODUCT_NAME, productLicensingInfoPtr->GetName());
-//	metaInfoPtr->SetMetaInfo(IProductLicensingInfo::MIT_PRODUCT_CATEGORY_ID, productLicensingInfoPtr->GetCategoryId());
 
 	return true;
 }
@@ -65,7 +62,7 @@ bool CProductLicensingInfoMetaInfoCreatorComp::CreateMetaInfo(
 QString CProductLicensingInfoMetaInfoCreatorComp::MetaInfo::GetMetaInfoName(int metaInfoType) const
 {
 	switch (metaInfoType){
-	case imtlic::IProductLicensingInfoProvider::MIT_LICENSES_INFO_LIST:
+	case IProductLicensingInfoProvider::MIT_LICENSES_INFO_LIST:
 		return QObject::tr("Licenses");
 	}
 

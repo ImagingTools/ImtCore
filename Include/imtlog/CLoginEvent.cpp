@@ -3,11 +3,9 @@
 
 // ACF includes
 #include <iser/IArchive.h>
-#include <istd/TDelPtr.h>
 #include <iser/CArchiveTag.h>
 #include <istd/CClassInfo.h>
 #include <istd/CChangeNotifier.h>
-#include <istd/CChangeGroup.h>
 #include <ilog/CMessageContainer.h>
 
 

@@ -42,7 +42,7 @@ public:
 	/**
 		Get license information for a given product. All available licenses are returned.
 	*/
-	virtual const imtlic::IProductLicensingInfo* GetProductLicenses(const QByteArray& productId) const = 0;
+	virtual const IProductLicensingInfo* GetProductLicenses(const QByteArray& productId) const = 0;
 };
 
 

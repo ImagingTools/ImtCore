@@ -6,7 +6,6 @@
 
 // ImtCore includes
 #include <imtlic/CFeatureInfo.h>
-#include <imtlic/IFeatureDependenciesManager.h>
 
 
 namespace imtlicgui

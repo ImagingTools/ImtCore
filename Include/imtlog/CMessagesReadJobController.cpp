@@ -15,9 +15,9 @@ namespace imtlog
 // public methods
 
 CMessagesReadJobController::CMessagesReadJobController(
-			QString dir,
-			QString containerExtension,
-			QString archiveExtension,
+			const QString& dir,
+			const QString& containerExtension,
+			const QString& archiveExtension,
 			iser::IVersionInfo* versionInfoPtr,
 			imtfile::IFileCompression* compressorPtr,
 			ilog::IMessageConsumer* logPtr)
@@ -55,11 +55,11 @@ bool CMessagesReadJobController::IsJobExists(const QByteArray& jobId) const
 
 	JobList::const_iterator it = m_jobList.cbegin();
 	while (it != m_jobList.end()){
-		if ((*it).uuid == jobId){
+		if (it->uuid == jobId){
 			return true;
 		}
 
-		it++;
+		++it;
 	}
 
 	return false;
@@ -79,7 +79,7 @@ bool CMessagesReadJobController::TakeJobResult(const QByteArray& jobId, CMessage
 			return true;
 		}
 
-		it++;
+		++it;
 	}
 
 	return false;
@@ -135,7 +135,7 @@ void CMessagesReadJobController::ProcessJob(Job& job)
 		CMessagesReader::EventContainerList::const_iterator it = containerListPtr->begin();
 		while (it != containerListPtr->end()){
 			ilog::IMessageContainer::Messages messages = (*it)->GetMessages();
-			for (ilog::IMessageContainer::Messages::reverse_iterator rit = messages.rbegin(); rit != messages.rend(); rit++){
+			for (auto rit = messages.rbegin(); rit != messages.rend(); ++rit){
 				if (job.filterPtr != nullptr){
 					if(		job.filterParams.GetFilterTimeRange().Contains((*rit)->GetInformationTimeStamp()) &&
 							job.filterPtr->IsMessageAccepted(*(*rit), &job.filterParams)){
@@ -147,7 +147,7 @@ void CMessagesReadJobController::ProcessJob(Job& job)
 				}
 			}
 
-			it++;
+			++it;
 		}
 	}
 

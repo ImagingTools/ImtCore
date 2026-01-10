@@ -3,9 +3,7 @@
 
 // Qt includes
 #include <QtCore/QMap>
-#include <QtCore/QDateTime>
 #include <QtCore/QString>
-
 
 // ACF includes
 #include <ilog/IMessageConsumer.h>

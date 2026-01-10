@@ -3,7 +3,6 @@
 
 // Qt includes
 #include <QtCore/QSet>
-#include <QtCore/QVector>
 
 // ACF includes
 #include <idoc/IDocumentMetaInfo.h>

@@ -4,7 +4,6 @@
 // Qt includes
 #include <QtCore/QByteArray>
 #include <QtCore/QString>
-#include <QtCore/QDateTime>
 
 // ACF includes
 #include <iser/IObject.h>
@@ -117,12 +116,12 @@ public:
 	/**
 		Get the list of feature-IDs supported by this license.
 	*/
-	virtual ILicenseDefinition::FeatureInfos GetFeatureInfos() const = 0;
+	virtual FeatureInfos GetFeatureInfos() const = 0;
 
 	/**
 		Set the list of feature-IDs supported by this license.
 	*/
-	virtual void SetFeatureInfos(const ILicenseDefinition::FeatureInfos& featureInfos) = 0;
+	virtual void SetFeatureInfos(const FeatureInfos& featureInfos) = 0;
 };
 
 

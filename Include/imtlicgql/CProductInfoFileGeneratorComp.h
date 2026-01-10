@@ -1,15 +1,11 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QTextStream>
-
 // ACF includes
 #include <ifile/IFilePersistence.h>
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
-#include <imtlic/CFeatureInfo.h>
 #include <imtlic/CProductInfo.h>
 
 

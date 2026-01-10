@@ -50,7 +50,7 @@ bool CPermissionsProviderComp::CreateRepresentationModelFromFeatureInfo(
 		Q_ASSERT(childModelPtr != nullptr);
 
 		for (int i = 0; i < subFeatures.count(); i++){
-			const imtlic::IFeatureInfo::FeatureInfoPtr featureInfoPtr = subFeatures.at(i);
+			const imtlic::IFeatureInfo::FeatureInfoPtr& featureInfoPtr = subFeatures.at(i);
 			if (!featureInfoPtr.IsValid()){
 				errorMessage = QString("Unable to create representation model for invalid subfeature. Parent feature id: %1.").arg(qPrintable(featureId));
 				return false;

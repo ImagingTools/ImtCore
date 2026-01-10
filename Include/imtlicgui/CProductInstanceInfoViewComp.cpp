@@ -9,7 +9,6 @@
 #include <QtWidgets/QMessageBox>
 
 // ACF includes
-#include <istd/CSystem.h>
 #include <ilog/CMessageContainer.h>
 #include <iprm/CNameParam.h>
 #include <ifilegui/CFileDialogLoaderComp.h>
