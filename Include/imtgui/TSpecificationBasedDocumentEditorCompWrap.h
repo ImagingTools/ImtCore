@@ -11,11 +11,11 @@
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/TModelUpdateBinder.h>
-#include <imtcol/IObjectTypeIdFilter.h>
 
 
 namespace imtgui
 {
+
 
 template<typename Base>
 class TSpecificationBasedDocumentEditorCompWrap : public Base
@@ -165,9 +165,6 @@ inline void TSpecificationBasedDocumentEditorCompWrap<BaseClass>::OnSpecificatio
 		istd::TUniqueInterfacePtr<iprm::IParamsSet> filterPtr(m_collectionFilterFactPtr.CreateInstance());
 		Q_ASSERT(filterPtr.IsValid());
 
-		iprm::TEditableParamsPtr<imtcol::IObjectTypeIdFilter> objectTypeIdFilter(filterPtr.GetPtr(), "ObjectTypeIdFilter");
-		Q_ASSERT(objectTypeIdFilter.IsValid());
-
 		if (PrepareSpecificationCollectionFilter(*filterPtr)){
 			QByteArrayList ids = collectionPtr->GetElementIds(0, -1, filterPtr.GetPtr());
 
@@ -186,3 +183,5 @@ inline void TSpecificationBasedDocumentEditorCompWrap<BaseClass>::OnSpecificatio
 
 
 } // namespace imtgui
+
+
