@@ -198,8 +198,11 @@ void CView3dProviderComp::OnRestoreSettings(const QSettings& settings)
 
 	// camera
 	if (m_cameraCompPtr.IsValid()){
-		if (settings.contains("Camera/Position")){
-			m_cameraCompPtr->MoveTo(settings.value("Camera/Position").value<QVector3D>());
+		if (settings.contains("Camera/PositionComponents")){
+			QVariantList loadedList = settings.value("Camera/PositionComponents").toList();
+			QString loaded = settings.value("Camera/PositionComponents").toString();
+			QVector3D vecLoaded(loadedList[0].toFloat(), loadedList[1].toFloat(), loadedList[2].toFloat());
+			m_cameraCompPtr->MoveTo(vecLoaded);
 		}
 
 		if (settings.contains("Camera/Rotation")){
@@ -221,7 +224,9 @@ void CView3dProviderComp::OnSaveSettings(QSettings& settings) const
 
 	if (m_cameraCompPtr.IsValid()){
 		settings.beginGroup("Camera");
-		settings.setValue("Position", m_cameraCompPtr->GetPosition());
+		auto& vec = m_cameraCompPtr->GetPosition();
+		QVariantList list = { vec.x(), vec.y(), vec.z() };
+		settings.setValue("PositionComponents", list);
 		settings.setValue("Rotation", m_cameraCompPtr->GetRotation());
 		settings.endGroup();
 	}
