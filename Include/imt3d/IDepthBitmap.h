@@ -62,7 +62,18 @@ public:
 
 	typedef std::vector<RobotPosition> RobotTrajectory;
 
-	virtual const RobotTrajectory* GetRobotTrajectory() const = 0;
+	virtual RobotTrajectory GetRobotTrajectory() const = 0;
+
+	struct BaseCorrection {
+		imath::TVector<4, float> translation;
+		imath::TVector<3, float> rotationDeg;
+		BaseCorrection() {
+			translation.Reset();
+			rotationDeg.Reset();
+		}
+	};
+
+	virtual BaseCorrection GetBaseCorrection() const = 0;
 };
 
 

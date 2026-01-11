@@ -58,7 +58,8 @@ public:
 	void SetCalibration3d(const CImage3dCalibration& calibration3d);
 	void SetReferenceBitmap(const iimg::CGeneralBitmap& referenceBitmap);
 	void ResetReferenceBitmap();
-	void SetRobotTrajectory(const IDepthBitmap::RobotTrajectory& robotTrajectory);
+	void SetRobotTrajectory(const IDepthBitmap::RobotTrajectory& robotPositions);
+	void SetBaseCorrection(const IDepthBitmap::BaseCorrection& baseCorrection);
 
 	bool ComputeDepthRange(const i2d::IObject2d* aoi, istd::CRange& depthRange) const;
 
@@ -67,7 +68,8 @@ public:
 	virtual bool CreateDepthBitmap(const istd::CRange & depthRange, const istd::CIndex2d & size) override;
 	virtual const IImage3dCalibration* GetCalibration3d() const override;
 	virtual const iimg::IBitmap* GetReferenceBitmap() const override;
-	virtual const RobotTrajectory* GetRobotTrajectory() const override;
+	virtual RobotTrajectory GetRobotTrajectory() const override;
+	virtual BaseCorrection GetBaseCorrection() const override;
 
 	// reimplemented (iimg::IRasterImage)
 	virtual void ResetImage() override;
@@ -102,6 +104,7 @@ private:
 	CImage3dCalibration m_calibration3d;
 	iimg::CGeneralBitmap m_referenceBitmap;
 	RobotTrajectory m_robotTrajectory;
+	BaseCorrection m_baseCorrection;
 };
 
 

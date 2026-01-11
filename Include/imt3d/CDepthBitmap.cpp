@@ -84,6 +84,11 @@ void CDepthBitmap::SetRobotTrajectory(const IDepthBitmap::RobotTrajectory& robot
 	EnsureMetaInfoCreated();
 }
 
+void CDepthBitmap::SetBaseCorrection(const IDepthBitmap::BaseCorrection & baseCorrection)
+{
+	m_baseCorrection = baseCorrection;
+}
+
 
 bool CDepthBitmap::ComputeDepthRange(const i2d::IObject2d* aoiPtr, istd::CRange& depthRange) const
 {
@@ -176,19 +181,28 @@ bool CDepthBitmap::CreateDepthBitmap(const istd::CRange& depthRange, const istd:
 	return false;
 }
 
+
 const IImage3dCalibration* CDepthBitmap::GetCalibration3d() const
 {
 	return &m_calibration3d;
 }
+
 
 const iimg::IBitmap* CDepthBitmap::GetReferenceBitmap() const
 {
 	return &m_referenceBitmap;
 }
 
-const IDepthBitmap::RobotTrajectory* CDepthBitmap::GetRobotTrajectory() const
+
+IDepthBitmap::RobotTrajectory CDepthBitmap::GetRobotTrajectory() const
 {
-	return &m_robotTrajectory;
+	return m_robotTrajectory;
+}
+
+
+CDepthBitmap::BaseCorrection CDepthBitmap::GetBaseCorrection() const
+{
+	return m_baseCorrection;
 }
 
 
@@ -348,51 +362,52 @@ bool CDepthBitmap::CopyFrom(const istd::IChangeable& object, CompatibilityMode m
 
 		return BaseClass::CopyFrom(object, mode);
 	}
-	
-	const iimg::IBitmap* inputBitmapPtr = dynamic_cast<const IBitmap*>(&object);
-	if (inputBitmapPtr != NULL){
-		iimg::IBitmap::PixelFormat format = inputBitmapPtr->GetPixelFormat();
-		if (format == iimg::IBitmap::PF_FLOAT32){
-			istd::CIndex2d size = inputBitmapPtr->GetImageSize();
+	else{
+		const iimg::IBitmap* inputBitmapPtr = dynamic_cast<const IBitmap*>(&object);
+		if (inputBitmapPtr != NULL){
+			iimg::IBitmap::PixelFormat format = inputBitmapPtr->GetPixelFormat();
+			if (format == iimg::IBitmap::PF_FLOAT32){
+				istd::CIndex2d size = inputBitmapPtr->GetImageSize();
 
-			float minValue = std::numeric_limits<float>::max();
-			float maxValue = std::numeric_limits<float>::lowest();
+				float minValue = std::numeric_limits<float>::max();
+				float maxValue = std::numeric_limits<float>::lowest();
 
-			for (int y = 0; y < size.GetY(); ++y){
-				const float* inputLinePtr = (const float*)inputBitmapPtr->GetLinePtr(y);
+				for (int y = 0; y < size.GetY(); ++y){
+					const float* inputLinePtr = (const float*)inputBitmapPtr->GetLinePtr(y);
 
-				for (int x = 0; x < size.GetX(); ++x){
-					float value = inputLinePtr[x];
+					for (int x = 0; x < size.GetX(); ++x){
+						float value = inputLinePtr[x];
 
-					if (!std::isnan(value)){
-						if (value < minValue){
-							minValue = value;
-						}
+						if (!std::isnan(value)){
+							if (value < minValue){
+								minValue = value;
+							}
 
-						if (value > maxValue){
-							maxValue = value;
+							if (value > maxValue){
+								maxValue = value;
+							}
 						}
 					}
 				}
-			}
 
-			if (minValue == std::numeric_limits<float>::max()){ minValue = 0; }
-			if (maxValue == std::numeric_limits<float>::lowest()){ maxValue = 1; }
+				if (minValue == std::numeric_limits<float>::max()) minValue = 0;
+				if (maxValue == std::numeric_limits<float>::lowest()) maxValue = 1;
 
-			if (size.GetX() > 0 && size.GetY() > 0){
-				Q_ASSERT_X(maxValue >= minValue, "CDepthBitmap::CopyFrom", "Invalid depth range");
-			}
+				if (size.GetX() > 0 && size.GetY() > 0){
+					Q_ASSERT_X(maxValue >= minValue, "CDepthBitmap::CopyFrom", "Invalid depth range");
+				}
 
-			istd::CChangeNotifier changeNotifier(this);
+				istd::CChangeNotifier changeNotifier(this);
 
-			istd::CRange depthRange(minValue, maxValue);
+				istd::CRange depthRange(minValue, maxValue);
 
-			if (CreateDepthBitmap(depthRange, size)){
-				bool retVal = BaseClass::CopyFrom(object, mode);
+				if (CreateDepthBitmap(depthRange, size)){
+					bool retVal = BaseClass::CopyFrom(object, mode);
 
-				EnsureMetaInfoCreated();
+					EnsureMetaInfoCreated();
 
-				return retVal;
+					return retVal;
+				}
 			}
 		}
 	}
