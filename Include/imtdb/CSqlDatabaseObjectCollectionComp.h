@@ -46,7 +46,6 @@ public:
 		I_ASSIGN(m_dbEngineCompPtr, "DatabaseEngine", "Database engine used for low level SQL quering", true, "DatabaseEngine");
 		I_ASSIGN(m_objectDelegateCompPtr, "ObjectDelegate", "Database object delegate used for creation of C++ objects from the SQL record", true, "ObjectDelegate");
 		I_ASSIGN(m_metaInfoCreatorCompPtr, "MetaInfoCreator", "Meta-info creator", false, "MetaInfoCreator");
-		I_ASSIGN(m_filterParamsCompPtr, "FilteringParams", "Parameter using for the filterering the table", false, "FilteringParams");
 		I_ASSIGN(m_databaseAccessSettingsCompPtr, "DatabaseAccessSettings", "Database access settings", false, "DatabaseAccessSettings");
 		I_ASSIGN(m_collectionDataControllerCompPtr, "CollectionDataController", "Data export/import controller for the collection", false, "DataController");
 	I_END_COMPONENT;
@@ -132,9 +131,6 @@ protected:
 	virtual bool ExecuteTransaction(const QByteArray& sqlQuery) const;
 	virtual bool ExecuteTransaction(const QByteArray& sqlQuery, const QVariantMap& bindValues) const;
 	QSqlRecord GetObjectRecord(const QByteArray& objectId) const;
-	void OnFilterParamsChanged(
-				const istd::IChangeable::ChangeSet& changeSet,
-				const iprm::IParamsSet* filterParamsPtr);
 	void OnDatabaseAccessChanged(
 				const istd::IChangeable::ChangeSet& changeSet,
 				const imtdb::IDatabaseLoginSettings* databaseAccessSettingsPtr);
@@ -153,11 +149,9 @@ private:
 	I_FACT(imtbase::IObjectCollection, m_objectCollectionFactoryCompPtr);
 	I_REF(ISqlDatabaseObjectDelegate, m_objectDelegateCompPtr);
 	I_REF(imtbase::IMetaInfoCreator, m_metaInfoCreatorCompPtr);
-	I_REF(iprm::IParamsSet, m_filterParamsCompPtr);
 	I_REF(imtdb::IDatabaseLoginSettings, m_databaseAccessSettingsCompPtr);
 	I_REF(imtbase::ICollectionDataController, m_collectionDataControllerCompPtr);
 
-	imtbase::TModelUpdateBinder<iprm::IParamsSet, CSqlDatabaseObjectCollectionComp> m_filterParamsObserver;
 	imtbase::TModelUpdateBinder<imtdb::IDatabaseLoginSettings, CSqlDatabaseObjectCollectionComp> m_databaseAccessObserver;
 
 	bool m_isInitialized;

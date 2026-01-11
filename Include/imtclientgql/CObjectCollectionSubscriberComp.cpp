@@ -92,6 +92,10 @@ void CObjectCollectionSubscriberComp::OnResponseReceived(const QByteArray& subsc
 	}
 
 	if (m_objectCollectionCompPtr.IsValid()){
+		if (changeSet.IsEmpty()){
+			changeSet = istd::IChangeable::GetAnyChange();
+		}
+
 		istd::CChangeNotifier notifier(m_objectCollectionCompPtr.GetPtr(), &changeSet);
 	}
 }

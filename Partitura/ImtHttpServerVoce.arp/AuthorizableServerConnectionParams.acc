@@ -54,6 +54,7 @@
                             <Values>
                                 <Value>PumaConnectionInterface</Value>
                                 <Value>ServerConnectionInterface</Value>
+                                <Value>gRPCConnectionInterface</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -62,11 +63,24 @@
                             <Values>
                                 <Value>PumaConnectionInterface</Value>
                                 <Value>ServerConnectionInterface</Value>
+                                <Value>gRPCConnectionInterface</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="TypeId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Default"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="gRPCConnectionInterface" PackageId="ImtComPck" ComponentId="ServerConnectionInterfaceParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultgRPCPort" Type="Integer" ExportId="DefaultgRPCPort">
+                        <Data IsEnabled="true" Value="50101"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ExternalEnableSSL" Type="Reference" ExportId="ExternalEnableSSL">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -84,5 +98,6 @@
     <ExportedComponents>
         <Component ExportedId="PumaConnectionInterface" ComponentId="PumaConnectionInterface"/>
         <Component ExportedId="ServerConnectionInterface" ComponentId="ServerConnectionInterface"/>
+        <Component ExportedId="gRPCConnectionInterface" ComponentId="gRPCConnectionInterface"/>
     </ExportedComponents>
 </Acf>

@@ -118,7 +118,7 @@ public:
 	virtual bool InitializeDelegate(
 				imtbase::IObjectCollection* collectionPtr,
 				iqtgui::IGuiObject* parentGuiPtr,
-				const imtbase::ICollectionFilter* filterPtr) = 0;
+				const iprm::IParamsSet* filterParamsPtr) = 0;
 
 	/**
 		Get access to the visual status of the document type supported by this delegate.

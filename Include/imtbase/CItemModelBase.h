@@ -30,11 +30,11 @@ public:
 	Q_INVOKABLE virtual QStringList getProperties() const;
 	Q_INVOKABLE virtual QString getJSONKeyForProperty(const QString& propertyName) const;
 
-signals:
+Q_SIGNALS:
 	void modelChanged(const QVariantList& changes);
 	void finished();
 
-public slots:
+public Q_SLOTS:
 	void OnInternalModelChanged();
 	void OnModelChanged(const QVariantList& changes);
 

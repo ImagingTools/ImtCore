@@ -83,7 +83,7 @@ CObjectCollectionViewDelegate::CObjectCollectionViewDelegate()
 	m_restoreCommand(tr("Restore"), 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
 	m_collectionPtr(nullptr),
 	m_parentGuiPtr(nullptr),
-	m_filterPtr(nullptr)
+	m_filterParamsPtr(nullptr)
 {
 	SetupSummaryInformation();
 
@@ -104,11 +104,11 @@ CObjectCollectionViewDelegate::~CObjectCollectionViewDelegate()
 bool CObjectCollectionViewDelegate::InitializeDelegate(
 			imtbase::IObjectCollection* collectionPtr,
 			iqtgui::IGuiObject* parentGuiPtr,
-			const imtbase::ICollectionFilter* filterPtr)
+			const iprm::IParamsSet* filterParamsPtr)
 {
 	m_collectionPtr = collectionPtr;
 	m_parentGuiPtr = parentGuiPtr;
-	m_filterPtr = filterPtr;
+	m_filterParamsPtr = filterParamsPtr;
 
 	if (m_collectionPtr != nullptr){
 		SetupCommands();

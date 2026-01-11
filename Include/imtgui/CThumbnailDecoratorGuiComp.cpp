@@ -1183,7 +1183,7 @@ bool CThumbnailDecoratorGuiComp::IsUserActionAllowed(UserAction action)
 	bool isHomeEnabled = true;
 	bool isLogged = true;
 
-	if (m_rightsCompPtr.IsValid()){
+	if (m_rightsCompPtr.IsValid() && m_closeRightIdAttrPtr.IsValid()){
 		hasCloseRight = m_rightsCompPtr->HasRight(*m_closeRightIdAttrPtr, true);
 	}
 

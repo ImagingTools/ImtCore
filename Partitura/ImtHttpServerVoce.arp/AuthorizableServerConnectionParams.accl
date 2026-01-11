@@ -11,6 +11,7 @@
         <Element ComponentName="PumaConnectionInterface" X="250" Y="375" Note=""/>
         <Element ComponentName="ServerConnectionInterface" X="840" Y="380" Note=""/>
         <Element ComponentName="ServerConnectionParams" X="550" Y="225" Note=""/>
+        <Element ComponentName="gRPCConnectionInterface" X="1200" Y="200" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

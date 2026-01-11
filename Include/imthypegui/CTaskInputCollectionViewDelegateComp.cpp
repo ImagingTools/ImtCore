@@ -116,7 +116,10 @@ void CTaskInputCollectionViewDelegateComp::SetupSummaryInformation()
 
 bool CTaskInputCollectionViewDelegateComp::IsEditorEnabled(const QByteArray& columnId) const
 {
-	return columnId != "Name";
+	if (columnId == "Name"){
+		return false;
+	}
+	return true;
 }
 
 
@@ -188,7 +191,7 @@ QString CTaskInputCollectionViewDelegateComp::RenameObject(const QByteArray& obj
 
 		bool ok;
 		int value = name.toInt(&ok);
-		if (!ok || value < 0 || value > 255){
+		if (!ok || value <= 0 || value > 255){
 			QMessageBox::critical(nullptr, tr("Error"), tr("Incorrect object name. Object name must be a number between 0 and 255"));
 
 			return QString();

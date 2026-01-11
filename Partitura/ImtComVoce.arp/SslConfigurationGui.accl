@@ -2,14 +2,14 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5225" Description="ACF"/>
-            <Version Id="1" Number="2174" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+            <Version Id="0" Number="5434" Description="ACF"/>
+            <Version Id="1" Number="2255" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395265" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="ActivatorProxy" X="280" Y="700" Note=""/>
-        <Element ComponentName="CaCertificateGui" X="900" Y="550" Note=""/>
+        <Element ComponentName="ActivatorProxy" X="240" Y="700" Note=""/>
+        <Element ComponentName="CaCertificateGui" X="900" Y="540" Note=""/>
         <Element ComponentName="EnableSslGui" X="600" Y="250" Note=""/>
         <Element ComponentName="LocalCertificateGui" X="660" Y="540" Note=""/>
         <Element ComponentName="SslConfigurationGui" X="640" Y="400" Note=""/>

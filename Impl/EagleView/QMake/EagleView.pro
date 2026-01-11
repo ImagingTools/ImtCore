@@ -22,7 +22,7 @@ win32-msvc*{
 	QMAKE_CXXFLAGS += /wd4264
 
 	# copying all Qt DLLs to destination directory
-	greaterThan(QT_MAJOR_VERSION, 4): QMAKE_POST_LINK = set path=$(QTDIR)\bin;%path% && $(QTDIR)\bin\windeployqt $$DESTDIR
+	greaterThan(QT_MAJOR_VERSION, 4): QMAKE_POST_LINK = set path=$(QTDIR)\bin;%path% && $(QTDIR)\bin\windeployqt $$DESTDIR/$${TARGET}.exe
 }
 
 !macx-ios*{

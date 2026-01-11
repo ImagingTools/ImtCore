@@ -108,7 +108,7 @@ void CGqlRequest::errorOccurred(QNetworkReply::NetworkError /*code*/)
 	}
 }
 
-void CGqlRequest::onSslErrors(const QList<QSslError>& errors)
+void CGqlRequest::onSslErrors(const QList<QSslError>& /*errors*/)
 {
 	QNetworkReply* networkReplyPtr = dynamic_cast<QNetworkReply*>(sender());
 	if (networkReplyPtr != nullptr){

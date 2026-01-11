@@ -20,7 +20,7 @@ namespace imtdb
 
 CDatabaseAccessSettings::CDatabaseAccessSettings()
 	:m_port(0),
-	m_connectionOptionFlags(0)
+	m_connectionOptionFlags(COF_NO_SECURITY)
 {
 }
 

@@ -38,9 +38,9 @@ QByteArray CStandardCollectionViewDelegateComp::GetSupportedTypeId() const
 bool CStandardCollectionViewDelegateComp::InitializeDelegate(
 			imtbase::IObjectCollection* collectionPtr,
 			iqtgui::IGuiObject* parentGuiPtr,
-			const imtbase::ICollectionFilter* filterPtr)
+			const iprm::IParamsSet* filterParamsPtr)
 {
-	if (!BaseClass2::InitializeDelegate(collectionPtr, parentGuiPtr, filterPtr)){
+	if (!BaseClass2::InitializeDelegate(collectionPtr, parentGuiPtr, filterParamsPtr)){
 		return false;
 	}
 
@@ -70,6 +70,20 @@ bool CStandardCollectionViewDelegateComp::OpenDocumentEditor(
 	}
 
 	return false;
+}
+
+
+bool CStandardCollectionViewDelegateComp::IsCommandSupported(int commandId) const
+{
+	if (commandId == CI_EXPORT){
+		return *m_isExportSupportedAttrPtr;
+	}
+
+	if (commandId == CI_IMPORT){
+		return *m_isImportSupportedAttrPtr;
+	}
+
+	return BaseClass2::IsCommandSupported(commandId);
 }
 
 

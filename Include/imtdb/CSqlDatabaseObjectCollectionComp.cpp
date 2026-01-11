@@ -23,8 +23,7 @@ namespace imtdb
 // public methods
 
 CSqlDatabaseObjectCollectionComp::CSqlDatabaseObjectCollectionComp()
-	:m_filterParamsObserver(*this),
-	m_databaseAccessObserver(*this),
+	:m_databaseAccessObserver(*this),
 	m_isInitialized(false)
 {
 }
@@ -438,10 +437,9 @@ imtbase::IObjectCollectionUniquePtr CSqlDatabaseObjectCollectionComp::CreateSubC
 	}
 
 	imtbase::IObjectCollectionUniquePtr collectionPtr = m_objectCollectionFactoryCompPtr.CreateInstance();
-	imtbase::CParamsSetJoiner filterParams(selectionParamsPtr, m_filterParamsCompPtr.GetPtr());
 
 	if (m_objectDelegateCompPtr.IsValid()){
-		QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(QByteArray(), offset, count, &filterParams);
+		QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(QByteArray(), offset, count, selectionParamsPtr);
 		if (objectSelectionQuery.isEmpty()){
 			return nullptr;
 		}
@@ -527,9 +525,7 @@ int CSqlDatabaseObjectCollectionComp::GetElementsCount(const iprm::IParamsSet* s
 		return 0;
 	}
 
-	imtbase::CParamsSetJoiner filterParams(selectionParamPtr, m_filterParamsCompPtr.GetPtr());
-
-	QByteArray countQuery = m_objectDelegateCompPtr->GetCountQuery(&filterParams);
+	QByteArray countQuery = m_objectDelegateCompPtr->GetCountQuery(selectionParamPtr);
 	if (!countQuery.isEmpty()){
 		QSqlError sqlError;
 		QSqlQuery result = m_dbEngineCompPtr->ExecSqlQuery(countQuery, &sqlError);
@@ -559,10 +555,8 @@ imtbase::ICollectionInfo::Ids CSqlDatabaseObjectCollectionComp::GetElementIds(
 {
 	Ids retVal;
 
-	imtbase::CParamsSetJoiner filterParams(selectionParamsPtr, m_filterParamsCompPtr.GetPtr());
-
 	if (m_objectDelegateCompPtr.IsValid() && m_dbEngineCompPtr.IsValid()){
-		QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(QByteArray(), offset, count, &filterParams);
+		QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(QByteArray(), offset, count, selectionParamsPtr);
 		if (objectSelectionQuery.isEmpty()){
 			return Ids();
 		}
@@ -599,10 +593,8 @@ imtbase::IObjectCollectionIterator* CSqlDatabaseObjectCollectionComp::CreateObje
 			int count,
 			const iprm::IParamsSet* selectionParamsPtr) const
 {
-	imtbase::CParamsSetJoiner filterParams(selectionParamsPtr, m_filterParamsCompPtr.GetPtr());
-
 	if (m_objectDelegateCompPtr.IsValid() && m_dbEngineCompPtr.IsValid()){
-		QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(objectId, offset, count, &filterParams);
+		QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(objectId, offset, count, selectionParamsPtr);
 		if (objectSelectionQuery.isEmpty()){
 			return nullptr;
 		}
@@ -943,13 +935,9 @@ QSqlRecord CSqlDatabaseObjectCollectionComp::GetObjectRecord(const QByteArray& o
 }
 
 
-void CSqlDatabaseObjectCollectionComp::OnFilterParamsChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const iprm::IParamsSet* /*filterParamsPtr*/)
-{
-	istd::CChangeNotifier changeNotifier(this);
-}
-
-
-void CSqlDatabaseObjectCollectionComp::OnDatabaseAccessChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const imtdb::IDatabaseLoginSettings* /*databaseAccessSettingsPtr*/)
+void CSqlDatabaseObjectCollectionComp::OnDatabaseAccessChanged(
+			const istd::IChangeable::ChangeSet& /*changeSet*/,
+			const imtdb::IDatabaseLoginSettings* /*databaseAccessSettingsPtr*/)
 {
 	istd::CChangeNotifier changeNotifier(this);
 }
@@ -966,10 +954,6 @@ void CSqlDatabaseObjectCollectionComp::OnComponentCreated()
 
 	m_isInitialized = false;
 
-	if (m_filterParamsCompPtr.IsValid()){
-		m_filterParamsObserver.RegisterObject(m_filterParamsCompPtr.GetPtr(), &CSqlDatabaseObjectCollectionComp::OnFilterParamsChanged);
-	}
-
 	if (m_databaseAccessSettingsCompPtr.IsValid()){
 		m_databaseAccessObserver.RegisterObject(m_databaseAccessSettingsCompPtr.GetPtr(), &CSqlDatabaseObjectCollectionComp::OnDatabaseAccessChanged);
 	}
@@ -980,7 +964,6 @@ void CSqlDatabaseObjectCollectionComp::OnComponentCreated()
 
 void CSqlDatabaseObjectCollectionComp::OnComponentDestroyed()
 {
-	m_filterParamsObserver.UnregisterAllObjects();
 	m_databaseAccessObserver.UnregisterAllObjects();
 
 	BaseClass::OnComponentDestroyed();

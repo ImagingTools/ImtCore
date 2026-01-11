@@ -14,7 +14,9 @@ namespace imtbase
 
 // public methods
 
-CItemModelBase::CItemModelBase(QObject* parent) : QObject(parent), m_owner(nullptr)
+CItemModelBase::CItemModelBase(QObject* parent)
+	:QObject(parent),
+	m_owner(nullptr)
 {
 	QObject::connect(this, &CItemModelBase::modelChanged, this, &CItemModelBase::OnModelChanged);
 }
@@ -36,11 +38,13 @@ void CItemModelBase::endChanges()
 {
 	if (!m_isTransaction){
 		qWarning() << "No active transaction";
+
 		return;
 	}
 
 	if (m_changeCount > 0){
 		emit modelChanged(m_changeList);
+
 		m_changeCount = 0;
 	}
 

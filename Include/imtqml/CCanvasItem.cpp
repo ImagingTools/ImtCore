@@ -92,7 +92,7 @@ QSize CCanvasItem::measureText(QString string)
 	return QSize(length, 0);
 }
 
-void CCanvasItem::arc(double x, double y, double radius, double startAngle, double endAngle, bool anticlockwise)
+void CCanvasItem::arc(double x, double y, double radius, double startAngle, double endAngle, bool /*anticlockwise*/)
 {
 	if(!m_pixmap){
 		return;

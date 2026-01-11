@@ -165,6 +165,13 @@ void CMenuPanelComp::OnGuiDesignChanged()
 
 	iqtgui::SetStyleSheetFromFile(GetWidget(), GetStyleSheetPath(":/Styles/MenuPanel"));
 
+	m_pagesInfoMap.clear();
+
+	iprm::ISelectionParam* pageSelectionPtr = GetObservedObject();
+	Q_ASSERT(pageSelectionPtr != nullptr);
+
+	CreatePageTree(*pageSelectionPtr, QByteArray());
+
 	if (!IsUpdateBlocked()){
 		UpdateBlocker blockUpdate(this);
 

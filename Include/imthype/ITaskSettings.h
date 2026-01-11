@@ -2,7 +2,7 @@
 
 
 // ACF includes
-#include <istd/IChangeable.h>
+#include <imtbase/IObjectCollection.h>
 
 
 namespace imthype

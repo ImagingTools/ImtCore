@@ -385,7 +385,7 @@ QByteArray CDeviceControllerProxyComp::GetDeviceTypeId(const QByteArray& deviceI
 
 // private methods
 
-void CDeviceControllerProxyComp::OnOverriddenDeviceInfoUpdated(const istd::IChangeable::ChangeSet& /* changeset */, const imtbase::ICollectionInfo* /* objectPtr */)
+void CDeviceControllerProxyComp::OnOverriddenDeviceInfoUpdated(const istd::IChangeable::ChangeSet& /*changeset*/, const imtbase::ICollectionInfo* /*objectPtr*/)
 {
 	UpdateDeviceList();
 }

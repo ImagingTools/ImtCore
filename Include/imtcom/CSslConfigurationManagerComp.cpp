@@ -9,6 +9,7 @@
 
 // ACF includes
 #include <iprm/TParamsPtr.h>
+#include <iprm/IEnableableParam.h>
 #include <iprm/INameParam.h>
 #include <iprm/IOptionsList.h>
 #include <iprm/ISelectionParam.h>
@@ -314,12 +315,16 @@ QSharedPointer<QSslCertificate> CSslConfigurationManagerComp::CreateSslCertifica
 
 bool CSslConfigurationManagerComp::CreateSslConfiguration(const iprm::IParamsSet& params, QSslConfiguration& output) const
 {
+	bool retValue = true;
 	// setup local certificate
 	iprm::TParamsPtr<iprm::IParamsSet> localCertificateParamPtr(&params, ParamKeys::s_localCertParamKey, false);
 	if (localCertificateParamPtr.IsValid()){
 		QSharedPointer<QSslCertificate> sslCertificalePtr = CreateSslCertificateFromParams(*localCertificateParamPtr);
 		if (!sslCertificalePtr.isNull()){
 			output.setLocalCertificate(*sslCertificalePtr);
+		}
+		else{
+			retValue = false;
 		}
 	}
 
@@ -332,6 +337,9 @@ bool CSslConfigurationManagerComp::CreateSslConfiguration(const iprm::IParamsSet
 		if (!localCertificateChain.isEmpty()){
 			output.setLocalCertificateChain(localCertificateChain);
 		}
+		else{
+			retValue = false;
+		}
 	}
 
 	// setup CA certificate
@@ -340,6 +348,9 @@ bool CSslConfigurationManagerComp::CreateSslConfiguration(const iprm::IParamsSet
 		QSharedPointer<QSslCertificate> sslCaCertificalePtr = CreateSslCertificateFromParams(*caCertificateParamsPtr);
 		if (!sslCaCertificalePtr.isNull()){
 			output.addCaCertificate(*sslCaCertificalePtr);
+		}
+		else{
+			retValue = false;
 		}
 	}
 
@@ -351,6 +362,9 @@ bool CSslConfigurationManagerComp::CreateSslConfiguration(const iprm::IParamsSet
 		if (!caCertificateChain.isEmpty()){
 			output.setCaCertificates(caCertificateChain);
 		}
+		else{
+			retValue = false;
+		}
 	}
 
 	// setup private key
@@ -359,6 +373,9 @@ bool CSslConfigurationManagerComp::CreateSslConfiguration(const iprm::IParamsSet
 		QSharedPointer<QSslKey> qSslKeyPtr = CreateSslKeyFromParams(*privateKeyParamPtr);
 		if (!qSslKeyPtr.isNull()){
 			output.setPrivateKey(*qSslKeyPtr);
+		}
+		else{
+			retValue = false;
 		}
 	}
 
@@ -370,7 +387,7 @@ bool CSslConfigurationManagerComp::CreateSslConfiguration(const iprm::IParamsSet
 	const QSsl::SslProtocol sslProtocol = GetSslProtocolFromParams(params);
 	output.setProtocol(sslProtocol);
 
-	return true;
+	return retValue;
 }
 
 

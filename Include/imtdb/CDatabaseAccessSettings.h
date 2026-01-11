@@ -50,7 +50,7 @@ protected:
 	QString m_databasePath;
 	QString m_userName;
 	QString m_password;
-	int m_connectionOptionFlags;
+    int m_connectionOptionFlags = COF_NO_SECURITY;
 };
 
 

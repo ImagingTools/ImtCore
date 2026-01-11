@@ -20,13 +20,18 @@ class IDatabaseLoginSettings: virtual public istd::IChangeable
 public:
 	enum ConnectionOptionFlags
 	{
-		/**
+        /**
+            If the flag is enabled, non-secure connection will be used.
+        */
+        COF_NO_SECURITY = 1,
+
+        /**
 			If the flag is enabled, SSL connection should be used.
 		*/
-		COF_SSL = 1
+        COF_SSL = 2
 	};
 
-	I_DECLARE_FLAGS(ConnectionOptionFlags, COF_SSL);
+    I_DECLARE_FLAGS(ConnectionOptionFlags, COF_NO_SECURITY, COF_SSL);
 
 	virtual QString GetHost() const = 0;
 	virtual void SetHost(const QString& host) = 0;

@@ -35,14 +35,17 @@ public:
 		I_ASSIGN(m_editDialogCompPtr, "EditDialog", "Dialog used for editing the collection items", false, "EditDialog");
 		I_ASSIGN_TO(m_editDialogObserverCompPtr, m_editDialogCompPtr, true);
 		I_ASSIGN(m_useCompressorAttrPtr, "UseCompressor", "If enable, use ZIP-compression for import/export of objects", true, true);
+		I_ASSIGN(m_isExportSupportedAttrPtr, "ExportSupported", "If enable, export command will be enabled", true, true);
+		I_ASSIGN(m_isImportSupportedAttrPtr, "ImportSupported", "If enable, import command will be enabled", true, true);
 	I_END_COMPONENT;
 
 	CStandardCollectionViewDelegateComp();
 
 	// reimplemented (ICollectionViewDelegate)
 	virtual QByteArray GetSupportedTypeId() const override;
-	virtual bool InitializeDelegate(imtbase::IObjectCollection* collectionPtr, iqtgui::IGuiObject* parentGuiPtr, const imtbase::ICollectionFilter* filterPtr) override;
+	virtual bool InitializeDelegate(imtbase::IObjectCollection* collectionPtr, iqtgui::IGuiObject* parentGuiPtr, const iprm::IParamsSet* filterParamsPtr) override;
 	virtual bool OpenDocumentEditor(const QByteArray& objectId, const QByteArray& viewTypeId = QByteArray()) const override;
+	virtual bool IsCommandSupported(int commandId) const override;
 
 protected:
 	// reimplemented (icomp::CComponentBase)
@@ -78,6 +81,9 @@ private:
 
 	I_REF(iqtgui::IDialog, m_editDialogCompPtr);
 	I_REF(imod::IObserver, m_editDialogObserverCompPtr);
+
+	I_ATTR(bool, m_isExportSupportedAttrPtr);
+	I_ATTR(bool, m_isImportSupportedAttrPtr);
 
 private:
 	idoc::MetaInfoPtr m_selectedMetaInfoPtr;

@@ -17,7 +17,7 @@ bool CUserActionManagerComp::CreateUserAction(
 			imtauth::IUserRecentAction::UserInfo userInfo,
 			imtauth::IUserRecentAction::ActionTypeInfo actionTypeInfo,
 			imtauth::IUserRecentAction::TargetInfo targetInfo,
-			const iprm::IParamsSet* /* paramsPtr */) const
+			const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	if (!m_userActionCollectionCompPtr.IsValid()){
 		return false;

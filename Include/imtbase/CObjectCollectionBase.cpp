@@ -482,6 +482,7 @@ idoc::MetaInfoPtr CObjectCollectionBase::GetDataMetaInfo(const Id& objectId) con
 
 			if (objectInfo.contentsMetaInfoPtr.IsValid()){
 				metaInfoPtr.MoveCastedPtr(objectInfo.contentsMetaInfoPtr->CloneMe());
+				break;
 			}
 		}
 	}
@@ -853,45 +854,46 @@ bool CObjectCollectionBase::CopyFrom(const IChangeable& object, CompatibilityMod
 
 		return true;
 	}
+	else{
+		const IObjectCollection* sourceCollectionPtr = dynamic_cast<const IObjectCollection*>(&object);
+		if (sourceCollectionPtr != nullptr){
+			istd::CChangeNotifier changeNotifier(this);
 
-	const IObjectCollection* sourceCollectionPtr = dynamic_cast<const IObjectCollection*>(&object);
-	if (sourceCollectionPtr != nullptr){
-		istd::CChangeNotifier changeNotifier(this);
+			Ids sourceElementIds = sourceCollectionPtr->GetElementIds();
+			Ids targetIds = GetElementIds();
 
-		Ids sourceElementIds = sourceCollectionPtr->GetElementIds();
-		Ids targetIds = GetElementIds();
+			for (const QByteArray& elementId : sourceElementIds){
+				QString name = sourceCollectionPtr->GetElementInfo(elementId, EIT_NAME).toString();
+				QString description = sourceCollectionPtr->GetElementInfo(elementId, EIT_DESCRIPTION).toString();
+				QByteArray typeId = sourceCollectionPtr->GetObjectTypeId(elementId);
+				const istd::IChangeable* sourceObjectPtr = sourceCollectionPtr->GetObjectPtr(elementId);
 
-		for (const QByteArray& elementId : sourceElementIds){
-			QString name = sourceCollectionPtr->GetElementInfo(elementId, EIT_NAME).toString();
-			QString description = sourceCollectionPtr->GetElementInfo(elementId, EIT_DESCRIPTION).toString();
-			QByteArray typeId = sourceCollectionPtr->GetObjectTypeId(elementId);
-			const istd::IChangeable* sourceObjectPtr = sourceCollectionPtr->GetObjectPtr(elementId);
-
-			if (!targetIds.contains(elementId)){
-				QByteArray newId = InsertNewObject(typeId, name, description, sourceObjectPtr);
-				if (newId.isEmpty()){
-					return false;
-				}
-			}
-			else{
-				ObjectInfo* targetInfoPtr = GetObjectInfo(elementId);
-				Q_ASSERT(targetInfoPtr != nullptr);
-
-				if (sourceObjectPtr != nullptr){
-					if (!targetInfoPtr->dataPtr.IsValid()){
-						targetInfoPtr->dataPtr.TakeOver(CreateDataObject(typeId));
+				if (!targetIds.contains(elementId)){
+					QByteArray newId = InsertNewObject(typeId, name, description, sourceObjectPtr);
+					if (newId.isEmpty()){
+						return false;
 					}
+				}
+				else{
+					ObjectInfo* targetInfoPtr = GetObjectInfo(elementId);
+					Q_ASSERT(targetInfoPtr != nullptr);
 
-					if (targetInfoPtr->dataPtr.IsValid()){
-						if (!targetInfoPtr->dataPtr->CopyFrom(*sourceObjectPtr)){
-							return false;
+					if (sourceObjectPtr != nullptr){
+						if (!targetInfoPtr->dataPtr.IsValid()){
+							targetInfoPtr->dataPtr.TakeOver(CreateDataObject(typeId));
+						}
+
+						if (targetInfoPtr->dataPtr.IsValid()){
+							if (!targetInfoPtr->dataPtr->CopyFrom(*sourceObjectPtr)){
+								return false;
+							}
 						}
 					}
 				}
 			}
-		}
 
-		return true;
+			return true;
+		}
 	}
 
 	return false;

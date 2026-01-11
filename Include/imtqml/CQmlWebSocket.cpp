@@ -85,7 +85,7 @@ QStringList CQmlWebSocket::requestedSubprotocols() const
 }
 
 
-void CQmlWebSocket::setRequestedSubprotocols(const QStringList& protocols) 
+void CQmlWebSocket::setRequestedSubprotocols(const QStringList& /*protocols*/)
 {
 }
 

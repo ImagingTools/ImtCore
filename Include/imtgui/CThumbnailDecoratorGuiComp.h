@@ -61,7 +61,7 @@ public:
 		I_ASSIGN(m_autoLogoutMinutesAttrPtr, "AutoLogoutMinutes", "Time intervall for the automatic logout", false, 60);
 		I_ASSIGN(m_defaultPageIndexAttrPtr, "DefaultPageIndex", "Index of the default (start) page", false, -1);
 		I_ASSIGN(m_welcomeTextAttrPtr, "WelcomeText", "Welcome text on the start page", true, "Welcome");
-		I_ASSIGN(m_closeRightIdAttrPtr, "CloseRightId", "ID of the user right to close the application", true, "Close");
+		I_ASSIGN(m_closeRightIdAttrPtr, "CloseRightId", "ID of the user right to close the application", false, "Close");
 		I_ASSIGN_MULTI_0(m_disablePageListViewIndexesAttrPtr, "DisablePageListViewIndexes", "List of page indexes where the page list view is not shown", false);
 		I_ASSIGN(m_showPageTitlesAttrPtr, "ShowPageTitles", "Show title of the current page in the main tool bar", true, true);
 		I_ASSIGN(m_loginGuiCompPtr, "LoginGui", "Login gui", false, "StandardLoginGui");

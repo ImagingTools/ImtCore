@@ -337,7 +337,14 @@ bool CSqlDatabaseObjectDelegateCompBase::SetCollectionItemMetaInfoFromRecord(con
 		metaInfo.SetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME, insertionTime);
 	}
 
-	if (record.contains("TimeStamp")){
+	if (record.contains("LastModified")){
+		QDateTime lastModificationTime = record.value("LastModified").toDateTime();
+
+		metaInfo.SetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME, lastModificationTime);
+		metaInfo.SetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME, lastModificationTime);
+	}
+
+	else if (record.contains("TimeStamp")){
 		QDateTime lastModificationTime = record.value("TimeStamp").toDateTime();
 
 		metaInfo.SetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME, lastModificationTime);
@@ -393,7 +400,7 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateFilterQuery(const iprm::IParamsSe
 	QString textFilterQuery;
 
 	iprm::IParamsSet::Ids paramIds = filterParams.GetParamIds();
-	if (paramIds.contains(QByteArrayLiteral("ObjectFilter"))){
+	if (!paramIds.contains(QByteArrayLiteral("ComplexFilter"))){
 		retVal = CreateObjectFilterQuery(filterParams, objectFilterQuery);
 		if (!retVal){
 			return false;

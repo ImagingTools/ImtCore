@@ -3,6 +3,7 @@
 
 // ImtCore includes
 #include <imtbase/imtbase.h>
+#include <iprm/IOptionsList.h>
 
 
 namespace imtdevgui
@@ -27,7 +28,7 @@ CDeviceSelectionGuiComp::CDeviceSelectionGuiComp()
 // protected methods
 
 void CDeviceSelectionGuiComp::OnDeviceListUpdated(
-	const istd::IChangeable::ChangeSet& /* changeSet */, const imtbase::ICollectionInfo* objectPtr)
+	const istd::IChangeable::ChangeSet& /*changeSet*/, const imtbase::ICollectionInfo* objectPtr)
 {
 	static QIcon emptyIcon("");
 

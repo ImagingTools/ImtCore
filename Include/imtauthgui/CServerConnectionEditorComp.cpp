@@ -17,10 +17,16 @@ void CServerConnectionEditorComp::UpdateGui(const istd::IChangeable::ChangeSet& 
 {
 	imtcom::IServerConnectionInterface* serverConnectionPtr = GetObservedObject();
 	Q_ASSERT(serverConnectionPtr != nullptr);
+	QString host = serverConnectionPtr->GetHost();
+	if (!host.isEmpty()){
+		ServerConnectionGroup->setVisible(true);
+		HostEdit->setText(host);
+	}
+	else{
+		ServerConnectionGroup->setVisible(false);
+	}
 
-	HostEdit->setText(serverConnectionPtr->GetHost());
-
-	imtcom::IServerConnectionInterface::ProtocolTypes supportedProtocols =serverConnectionPtr->GetSupportedProtocols();
+	imtcom::IServerConnectionInterface::ProtocolTypes supportedProtocols = serverConnectionPtr->GetSupportedProtocols();
 
 	if (supportedProtocols.contains(imtcom::IServerConnectionInterface::PT_HTTP)){
 		HttpPortGroup->setVisible(true);
@@ -36,6 +42,14 @@ void CServerConnectionEditorComp::UpdateGui(const istd::IChangeable::ChangeSet& 
 	}
 	else{
 		WebsocketPortGroup->setVisible(false);
+	}
+
+	if (supportedProtocols.contains(imtcom::IServerConnectionInterface::PT_GRPC)){
+		GrpcPortGroup->setVisible(true);
+		GrpcPortEdit->setText(QString::number(serverConnectionPtr->GetPort(imtcom::IServerConnectionInterface::PT_GRPC)));
+	}
+	else{
+		GrpcPortGroup->setVisible(false);
 	}
 }
 
@@ -57,6 +71,10 @@ void CServerConnectionEditorComp::UpdateModel() const
 
 	if (supportedProtocols.contains(imtcom::IServerConnectionInterface::PT_WEBSOCKET)){
 		serverConnectionPtr->SetPort(imtcom::IServerConnectionInterface::PT_WEBSOCKET, WebsocketPortEdit->text().toInt());
+	}
+
+	if (supportedProtocols.contains(imtcom::IServerConnectionInterface::PT_GRPC)){
+		serverConnectionPtr->SetPort(imtcom::IServerConnectionInterface::PT_GRPC, GrpcPortEdit->text().toInt());
 	}
 }
 

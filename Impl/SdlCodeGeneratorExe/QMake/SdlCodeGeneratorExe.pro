@@ -16,7 +16,7 @@ win32-msvc*{
 	QMAKE_CXXFLAGS += /wd4264
 
 	# copying all Qt DLLs to destination directory
-	QMAKE_POST_LINK = $$(QTDIR)\bin\windeployqt $$DESTDIR\SdlCodeGenerator.exe --verbose 2
+	QMAKE_POST_LINK = $$(QTDIR)\bin\windeployqt $$DESTDIR/$${TARGET}.exe --verbose 2
 }
 
 

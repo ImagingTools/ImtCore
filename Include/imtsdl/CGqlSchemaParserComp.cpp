@@ -298,7 +298,7 @@ QStringList CGqlSchemaParserComp::GetPathsFromImportEntry(QString importDirectiv
 	}
 	importDirective.resize(importDirective.length() - versionLength);
 
-	// check if entry is filed
+	// check if entry is file
 	QStringList pathParts = importDirective.split('.');
 
 	if (!version.isEmpty()){
@@ -595,7 +595,6 @@ bool CGqlSchemaParserComp::SetupSchemaFilePath(const istd::IPolymorphic* inputPt
 	}
 
 	return true;
-
 }
 
 

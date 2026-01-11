@@ -175,7 +175,7 @@ void CDeviceControllerCompBase::OnComponentDestroyed()
 
 // private methods
 
-void CDeviceControllerCompBase::OnOverriddenDeviceInfoUpdated(const istd::IChangeable::ChangeSet& /* changeset */, const imtbase::ICollectionInfo* /* objectPtr */)
+void CDeviceControllerCompBase::OnOverriddenDeviceInfoUpdated(const istd::IChangeable::ChangeSet& /*changeset*/, const imtbase::ICollectionInfo* /*objectPtr*/)
 {
 	UpdateDeviceList();
 }

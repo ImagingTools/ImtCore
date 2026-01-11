@@ -25,11 +25,11 @@ CPluginStatusMonitorViewDelegateComp::CPluginStatusMonitorViewDelegateComp()
 bool CPluginStatusMonitorViewDelegateComp::InitializeDelegate(
 			imtbase::IObjectCollection* collectionPtr,
 			iqtgui::IGuiObject* parentGuiPtr,
-			const imtbase::ICollectionFilter* filterPtr)
+			const iprm::IParamsSet* filterParamsPtr)
 {
 	m_collectionPtr = collectionPtr;
 	m_parentGuiPtr = parentGuiPtr;
-	m_filterPtr = filterPtr;
+	m_filterPtr = filterParamsPtr;
 
 	if (m_collectionPtr != nullptr){
 		OnLanguageChanged();
