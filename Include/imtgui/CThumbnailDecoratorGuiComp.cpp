@@ -423,6 +423,7 @@ void CThumbnailDecoratorGuiComp::OnGuiDestroyed()
 	m_loginObserver.UnregisterAllModels();
 	m_pageVisualStatusObserver.UnregisterAllModels();
 
+	m_mainToolBar = nullptr;
 	BaseClass::OnGuiDestroyed();
 }
 
