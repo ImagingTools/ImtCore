@@ -1512,7 +1512,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTextFilterQuery(const imtbase::ICom
 }
 
 
-void CSqlDatabaseDocumentDelegateComp::SubstituteFieldIds(QString& query, bool castToStr) const
+void CSqlDatabaseDocumentDelegateComp::SubstituteFieldIds(QString& query, bool /*castToStr*/) const
 {
 	Q_ASSERT(!query.isEmpty());
 

@@ -1027,6 +1027,13 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 	stream << '{';
 	FeedStream(stream, 1, false);
 
+	// checks for unused arguments
+	if (operationType == imtsdl::CSdlDocumentType::OT_GET) {
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("Q_UNUSED(objectTypeId);");
+		FeedStream(stream, 2, false);
+	}
+
 	// method's body
 	// for list we must ensure, the iterator is not null
 	if (operationType == imtsdl::CSdlDocumentType::OT_LIST){
