@@ -443,6 +443,8 @@ void CObjectCollectionViewComp::OnGuiCreated()
 
 	if (m_filterParamsCompPtr.IsValid()){
 		m_filterObserver.RegisterObject(m_filterParamsCompPtr.GetPtr(), &CObjectCollectionViewComp::OnFilterUpdate);
+	}
+
 	if (m_filterEditPlaceholderTextAttrPtr.IsValid()) {
 		FilterEdit->setPlaceholderText(*m_filterEditPlaceholderTextAttrPtr);
 	}
@@ -556,15 +558,15 @@ void CObjectCollectionViewComp::OnComponentCreated()
 	if (m_filterParamsCompPtr.IsValid()){
 		iprm::TEditableParamsPtr<imtbase::IComplexCollectionFilter> complexFilterParamPtr(m_filterParamsCompPtr.GetPtr(), "ComplexFilter");
 		if (complexFilterParamPtr.IsValid()){
-			imtbase::IComplexCollectionFilter::GroupFilter mainGroup = complexFilterParamPtr->GetFieldsFilter();
-			Q_ASSERT(mainGroup.groupFilters.count() == 0);
-			if (mainGroup.groupFilters.count() == 0){
+			imtbase::IComplexCollectionFilter::FilterExpression mainGroup = complexFilterParamPtr->GetFilterExpression();
+			Q_ASSERT(mainGroup.filterExpressions.count() == 0);
+			if (mainGroup.filterExpressions.count() == 0) {
 				// Create group filters for text and object filtering
-				mainGroup.groupFilters.append(imtbase::IComplexCollectionFilter::GroupFilter());
-				mainGroup.groupFilters.append(imtbase::IComplexCollectionFilter::GroupFilter());
+				mainGroup.filterExpressions.append(imtbase::IComplexCollectionFilter::FilterExpression());
+				mainGroup.filterExpressions.append(imtbase::IComplexCollectionFilter::FilterExpression());
 
 				// Set OR operation for fields text filtering
-				mainGroup.groupFilters[0].logicalOperation = imtbase::IComplexCollectionFilter::LO_OR;
+				mainGroup.filterExpressions[0].logicalOperation = imtbase::IComplexCollectionFilter::LO_OR;
 			}
 		}
 	}
@@ -1723,13 +1725,13 @@ void CObjectCollectionViewComp::TableModel::SetTextFilter(const QString& textFil
 	if (m_parent.m_filterParamsCompPtr.IsValid()){
 		iprm::TEditableParamsPtr<imtbase::IComplexCollectionFilter> complexFilterParamPtr(m_parent.m_filterParamsCompPtr.GetPtr(), "ComplexFilter");
 		if (complexFilterParamPtr.IsValid()){
-			imtbase::IComplexCollectionFilter::GroupFilter mainGroupFilter = complexFilterParamPtr->GetFieldsFilter();
-			Q_ASSERT(mainGroupFilter.groupFilters.count() == 2);
-			if (mainGroupFilter.groupFilters.count() >= 1){
-				imtbase::CComplexCollectionFilterHelper::FillTextFilter(mainGroupFilter.groupFilters[0], filterableInfoIds, textFilter);
+			imtbase::IComplexCollectionFilter::FilterExpression mainGroupFilter = complexFilterParamPtr->GetFilterExpression();
+			Q_ASSERT(mainGroupFilter.filterExpressions.count() == 2);
+			if (mainGroupFilter.filterExpressions.count() >= 1) {
+				imtbase::CComplexCollectionFilterHelper::FillTextFilter(mainGroupFilter.filterExpressions[0], filterableInfoIds, textFilter);
 			}
-
-			complexFilterParamPtr->SetFieldsFilter(mainGroupFilter);
+	
+			complexFilterParamPtr->SetFilterExpression(mainGroupFilter);
 		}
 	}
 
