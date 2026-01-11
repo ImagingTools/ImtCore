@@ -20,6 +20,7 @@
 #include <istd/CChangeGroup.h>
 #include <imod/IModel.h>
 #include <iprm/CParamsSet.h>
+#include <iprm/TParamsPtr.h>
 #include <idoc/IDocumentMetaInfo.h>
 #include <iqtgui/CCommandTools.h>
 #include <iqtgui/CHierarchicalCommand.h>
@@ -39,9 +40,9 @@ namespace imtgui
 
 CObjectCollectionViewComp::CObjectCollectionViewComp()
 	:m_semaphoreCounter(0),
-	m_tableModel(*this),
 	m_currentInformationViewPtr(nullptr),
-	m_complexFilterObserver(*this)
+	m_tableModel(*this),
+	m_filterObserver(*this)
 {
 	m_pageSelection.SetParent(this);
 	m_commands.SetParent(this);
@@ -144,6 +145,10 @@ const ICollectionViewDelegate* CObjectCollectionViewComp::GetViewDelegate(const 
 
 void CObjectCollectionViewComp::OnPageSelectionUpdated()
 {
+	if (m_semaphoreCounter > 0){
+		return;
+	}
+
 	imtbase::IObjectCollection* collectionPtr = GetObservedObject();
 	if (collectionPtr != nullptr){
 		ItemList->selectionModel()->clearSelection();
@@ -301,14 +306,32 @@ void CObjectCollectionViewComp::OnGuiModelAttached()
 	Q_ASSERT(objectPtr != nullptr);
 
 	if (m_viewDelegateMap.isEmpty()){
-		m_defaultViewDelegate.InitializeDelegate(objectPtr, this, &m_tableModel.GetFilter());
+		m_defaultViewDelegate.InitializeDelegate(objectPtr, this, m_filterParamsCompPtr.GetPtr());
 	}
 
 	for (ViewDelegateMap::Iterator iter = m_viewDelegateMap.begin(); iter != m_viewDelegateMap.end(); ++iter){
-		iter.value()->InitializeDelegate(objectPtr, this, &m_tableModel.GetFilter());
+		iter.value()->InitializeDelegate(objectPtr, this, m_filterParamsCompPtr.GetPtr());
+	}
+
+	if (m_filterParamsGuiCompPtr.IsValid() && m_filterParamsObserverCompPtr.IsValid()){
+		if (m_filterParamsCompPtr.IsValid() && m_filterParamsModelCompPtr.IsValid()){
+			m_filterParamsModelCompPtr->AttachObserver(m_filterParamsObserverCompPtr.GetPtr());
+		}
 	}
 
 	BaseClass::OnGuiModelAttached();
+}
+
+
+void CObjectCollectionViewComp::OnGuiModelDetached()
+{
+	if (m_filterParamsGuiCompPtr.IsValid() && m_filterParamsObserverCompPtr.IsValid()){
+		if (m_filterParamsCompPtr.IsValid() && m_filterParamsModelCompPtr.IsValid()){
+			m_filterParamsModelCompPtr->DetachObserver(m_filterParamsObserverCompPtr.GetPtr());
+		}
+	}
+
+	BaseClass::OnGuiModelDetached();
 }
 
 
@@ -418,10 +441,8 @@ void CObjectCollectionViewComp::OnGuiCreated()
 
 	ShowMetaInfoPanelButton->setVisible(*m_viewRightPanelAttrPtr);
 
-	if (m_complexFilterModelCompPtr.IsValid()){
-		m_complexFilterObserver.RegisterObject(m_complexFilterCompPtr.GetPtr(), &CObjectCollectionViewComp::OnComplexFilterUpdate);
-	}
-
+	if (m_filterParamsCompPtr.IsValid()){
+		m_filterObserver.RegisterObject(m_filterParamsCompPtr.GetPtr(), &CObjectCollectionViewComp::OnFilterUpdate);
 	if (m_filterEditPlaceholderTextAttrPtr.IsValid()) {
 		FilterEdit->setPlaceholderText(*m_filterEditPlaceholderTextAttrPtr);
 	}
@@ -430,7 +451,7 @@ void CObjectCollectionViewComp::OnGuiCreated()
 
 void CObjectCollectionViewComp::OnGuiDestroyed()
 {
-	m_complexFilterObserver.UnregisterAllObjects();
+	m_filterObserver.UnregisterAllObjects();
 
 	m_collectionCommandsLeftToolBar.UnregisterCommands();
 	m_collectionCommandsCenterToolBar.UnregisterCommands();
@@ -478,6 +499,27 @@ void CObjectCollectionViewComp::OnGuiDesignChanged()
 }
 
 
+void CObjectCollectionViewComp::OnGuiModelShown()
+{
+	if (*m_updateOnChangesAttrPtr){
+		QList<bool> enabledStates;
+		const imtbase::IObjectCollection* collectionPtr = GetObservedObject();
+		const iprm::IOptionsList* objectTypeInfoPtr = collectionPtr->GetObjectTypesInfo();
+		if (objectTypeInfoPtr != nullptr) {
+			int typesCount = objectTypeInfoPtr->GetOptionsCount();
+			for (int typeIndex = 0; typeIndex < typesCount; ++typeIndex) {
+				enabledStates << objectTypeInfoPtr->IsOptionEnabled(typeIndex);
+			}
+		}
+
+		if (enabledStates != m_enabledStates) {
+			m_enabledStates = enabledStates;
+			UpdateGui(istd::IChangeable::GetAnyChange());
+		}
+	}
+}
+
+
 // reimplemented (imod::CMultiModelDispatcherBase)
 
 void CObjectCollectionViewComp::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& /*changeSet*/)
@@ -511,16 +553,19 @@ void CObjectCollectionViewComp::OnComponentCreated()
 		}
 	}
 
-	if (m_complexFilterCompPtr.IsValid()){
-		imtbase::IComplexCollectionFilter::FilterExpression mainGroup = m_complexFilterCompPtr->GetFilterExpression();
-		Q_ASSERT(mainGroup.filterExpressions.count() == 0);
-		if (mainGroup.filterExpressions.count() == 0){
-			// Create group filters for text and object filtering
-			mainGroup.filterExpressions.append(imtbase::IComplexCollectionFilter::FilterExpression());
-			mainGroup.filterExpressions.append(imtbase::IComplexCollectionFilter::FilterExpression());
+	if (m_filterParamsCompPtr.IsValid()){
+		iprm::TEditableParamsPtr<imtbase::IComplexCollectionFilter> complexFilterParamPtr(m_filterParamsCompPtr.GetPtr(), "ComplexFilter");
+		if (complexFilterParamPtr.IsValid()){
+			imtbase::IComplexCollectionFilter::GroupFilter mainGroup = complexFilterParamPtr->GetFieldsFilter();
+			Q_ASSERT(mainGroup.groupFilters.count() == 0);
+			if (mainGroup.groupFilters.count() == 0){
+				// Create group filters for text and object filtering
+				mainGroup.groupFilters.append(imtbase::IComplexCollectionFilter::GroupFilter());
+				mainGroup.groupFilters.append(imtbase::IComplexCollectionFilter::GroupFilter());
 
-			// Set OR operation for fields text filtering
-			mainGroup.filterExpressions[0].logicalOperation = imtbase::IComplexCollectionFilter::LO_OR;
+				// Set OR operation for fields text filtering
+				mainGroup.groupFilters[0].logicalOperation = imtbase::IComplexCollectionFilter::LO_OR;
+			}
 		}
 	}
 }
@@ -543,20 +588,20 @@ void CObjectCollectionViewComp::UpdateCommands()
 	istd::IChangeable::ChangeSet changes(ibase::ICommandsProvider::CF_COMMANDS);
 	istd::CChangeNotifier changeNotifier(&m_commands, &changes);
 
-	QModelIndexList selectedIndexes = ItemList->selectionModel()->selectedRows();
-
 	imtbase::ICollectionInfo::Ids itemIds;
 
-	QSet<QByteArray> selectedTypes;
+	{
+		QModelIndexList selectedIndexes = ItemList->selectionModel()->selectedRows();
 
-	if (!selectedIndexes.isEmpty()){
-		const imtbase::IObjectCollection* collectionPtr = GetObservedObject();
-		Q_ASSERT(collectionPtr != nullptr);
-		for (int i = 0; i < selectedIndexes.count(); ++i){
-			QModelIndex mappedIndex = selectedIndexes[i]; //m_proxyModelPtr->mapToSource(selectedIndexes[i]);
-			QByteArray itemId = m_tableModel.data(mappedIndex, ICollectionViewDelegate::DR_OBJECT_ID).toByteArray();
-			if (!itemId.isEmpty()){
-				itemIds.push_back(itemId);
+		if (!selectedIndexes.isEmpty()){
+			const imtbase::IObjectCollection* collectionPtr = GetObservedObject();
+			Q_ASSERT(collectionPtr != nullptr);
+			for (int i = 0; i < selectedIndexes.count(); ++i){
+				const QModelIndex& mappedIndex = selectedIndexes[i]; //m_proxyModelPtr->mapToSource(selectedIndexes[i]);
+				QByteArray itemId = m_tableModel.data(mappedIndex, ICollectionViewDelegate::DR_OBJECT_ID).toByteArray();
+				if (!itemId.isEmpty()){
+					itemIds.push_back(itemId);
+				}
 			}
 		}
 	}
@@ -841,7 +886,7 @@ void CObjectCollectionViewComp::UpdateTypeStatus()
 }
 
 
-void CObjectCollectionViewComp::OnComplexFilterUpdate(const istd::IChangeable::ChangeSet&, const imtbase::IComplexCollectionFilter* /*filterPtr*/)
+void CObjectCollectionViewComp::OnFilterUpdate(const istd::IChangeable::ChangeSet&, const iprm::IParamsSet* /*paramsPtr*/)
 {
 	const imtbase::IObjectCollection* collectionPtr = GetObservedObject();
 	if (collectionPtr != nullptr){
@@ -990,6 +1035,10 @@ void CObjectCollectionViewComp::OnSectionMoved(int logicalIndex, int /*oldVisual
 
 void CObjectCollectionViewComp::OnSortingChanged(int logicalIndex, Qt::SortOrder order)
 {
+	if (m_semaphoreCounter > 0){
+		return;
+	}
+
 	m_tableModel.SetSorting(logicalIndex, order);
 
 	RestoreColumnsSettings();
@@ -1182,6 +1231,7 @@ void CObjectCollectionViewComp::DoUpdateGui(const istd::IChangeable::ChangeSet& 
 
 	{
 		SignalSemaphore semaphore(m_semaphoreCounter);
+		m_enabledStates.clear();
 
 		const iprm::IOptionsList* objectTypeInfoPtr = collectionPtr->GetObjectTypesInfo();
 		if (objectTypeInfoPtr != nullptr){
@@ -1196,7 +1246,9 @@ void CObjectCollectionViewComp::DoUpdateGui(const istd::IChangeable::ChangeSet& 
 				QTreeWidgetItem* activeTypeItemPtr = nullptr;
 
 				for (int typeIndex = 0; typeIndex < typesCount; ++typeIndex){
-					if (objectTypeInfoPtr->IsOptionEnabled(typeIndex)){
+					bool enabled = objectTypeInfoPtr->IsOptionEnabled(typeIndex);
+					m_enabledStates << enabled;
+					if (enabled){
 						QByteArray typeId = objectTypeInfoPtr->GetOptionId(typeIndex);
 						QString typeName = objectTypeInfoPtr->GetOptionName(typeIndex);
 
@@ -1462,11 +1514,10 @@ void CObjectCollectionViewComp::TableModel::UpdateFromData(const imtbase::IObjec
 	iprm::CParamsSet filterParams;
 	filterParams.SetEditableParameter("Filter", &m_filter);
 	filterParams.SetEditableParameter("ObjectTypeIdFilter", &m_objectTypeIdFilter);
-	if (m_parent.m_complexFilterCompPtr.IsValid()){
-		filterParams.SetEditableParameter("ComplexFilter", m_parent.m_complexFilterCompPtr.GetPtr());
-	}
 
 	m_objectTypeIdFilter.SetObjectTypeId(m_parent.m_currentTypeId);
+
+	filterParams.SetSlaveSet(m_parent.m_filterParamsCompPtr.GetPtr());
 
 	m_totalRowCount = collection.GetElementsCount(&filterParams);
 	m_fetchedRowCount = 0;
@@ -1615,14 +1666,17 @@ void CObjectCollectionViewComp::TableModel::SetSorting(int logicalIndex, Qt::Sor
 
 	m_filter.SetSortingInfoIds(QByteArrayList() << informationIds[logicalIndex]);
 
-	if (m_parent.m_complexFilterCompPtr.IsValid()){
-		imtbase::IComplexCollectionFilter::SortingOrder complexFilterSortingOrder =
-			order == Qt::AscendingOrder ?
-			imtbase::IComplexCollectionFilter::SO_ASC : imtbase::IComplexCollectionFilter::SO_DESC;
-		imtbase::CComplexCollectionFilterHelper::SetSortingOrder(
-			*m_parent.m_complexFilterCompPtr.GetPtr(),
-			m_filter.GetSortingInfoIds(),
-			complexFilterSortingOrder);
+	if (m_parent.m_filterParamsCompPtr.IsValid()){
+		iprm::TEditableParamsPtr<imtbase::IComplexCollectionFilter> complexFilterParamPtr(m_parent.m_filterParamsCompPtr.GetPtr(), "ComplexFilter");
+		if (complexFilterParamPtr.IsValid()){
+			imtbase::IComplexCollectionFilter::SortingOrder complexFilterSortingOrder =
+						order == Qt::AscendingOrder ?
+						imtbase::IComplexCollectionFilter::SO_ASC : imtbase::IComplexCollectionFilter::SO_DESC;
+			imtbase::CComplexCollectionFilterHelper::SetSortingOrder(
+						*complexFilterParamPtr,
+						m_filter.GetSortingInfoIds(),
+						complexFilterSortingOrder);
+		}
 	}
 
 	if (objectCollectionPtr != nullptr && !m_parent.IsUpdateBlocked()){
@@ -1666,13 +1720,17 @@ void CObjectCollectionViewComp::TableModel::SetTextFilter(const QString& textFil
 
 	m_filter.SetTextFilter(textFilter);
 
-	if (m_parent.m_complexFilterCompPtr.IsValid()){
-		imtbase::IComplexCollectionFilter::FilterExpression mainGroupFilter = m_parent.m_complexFilterCompPtr->GetFilterExpression();
-		Q_ASSERT(mainGroupFilter.filterExpressions.count() == 2);
-		if (mainGroupFilter.filterExpressions.count() >= 1){
-			imtbase::CComplexCollectionFilterHelper::FillTextFilter(mainGroupFilter.filterExpressions[0], filterableInfoIds, textFilter);
+	if (m_parent.m_filterParamsCompPtr.IsValid()){
+		iprm::TEditableParamsPtr<imtbase::IComplexCollectionFilter> complexFilterParamPtr(m_parent.m_filterParamsCompPtr.GetPtr(), "ComplexFilter");
+		if (complexFilterParamPtr.IsValid()){
+			imtbase::IComplexCollectionFilter::GroupFilter mainGroupFilter = complexFilterParamPtr->GetFieldsFilter();
+			Q_ASSERT(mainGroupFilter.groupFilters.count() == 2);
+			if (mainGroupFilter.groupFilters.count() >= 1){
+				imtbase::CComplexCollectionFilterHelper::FillTextFilter(mainGroupFilter.groupFilters[0], filterableInfoIds, textFilter);
+			}
+
+			complexFilterParamPtr->SetFieldsFilter(mainGroupFilter);
 		}
-		m_parent.m_complexFilterCompPtr->SetFilterExpression(mainGroupFilter);
 	}
 
 	if (objectCollectionPtr != nullptr){
@@ -1784,7 +1842,11 @@ Qt::ItemFlags CObjectCollectionViewComp::TableModel::flags(const QModelIndex& in
 	}
 
 	int rowIndex = index.row();
-	if (rowIndex  < 0){
+	if (rowIndex < 0){
+		return Qt::NoItemFlags;
+	}
+
+	if (rowIndex >= m_ids.count()){
 		return Qt::NoItemFlags;
 	}
 

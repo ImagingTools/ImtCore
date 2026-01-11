@@ -1,7 +1,14 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QPointer>
+#include <QtCore/QThread>
+#include <QtCore/QDir>
+#include <QtWidgets/QDialog>
+
 // ACF includes
+#include <istd/CSystem.h>
 #include <imod/TSingleModelObserverBase.h>
 #include <icomp/CComponentBase.h>
 #include <ifile/IFilePersistence.h>
@@ -12,6 +19,7 @@
 // ImtCore includes
 #include <imtgui/CObjectCollectionViewDelegate.h>
 #include <iprm/CParamsSet.h>
+#include <imtgui/COpenDocumentWorker.h>
 
 
 namespace imtgui
@@ -57,7 +65,7 @@ public:
 	virtual bool InitializeDelegate(
 				imtbase::IObjectCollection* collectionPtr,
 				iqtgui::IGuiObject* parentGuiPtr,
-				const imtbase::ICollectionFilter* filterPtr) override;
+				const iprm::IParamsSet* filterParamsPtr) override;
 	virtual QByteArray CreateNewObject(
 				const QByteArray& typeId,
 				const QString& objectName,
@@ -73,7 +81,10 @@ public:
 
 protected:
 	virtual bool RenameObjectOnSave() const;
-	// callback from the proxy (to reimplement)
+	
+	/** 
+		Callback from the proxy (to reimplement)
+	*/
 	virtual QString CommentDocumentChanges(int revision) const;
 
 	/**
@@ -156,14 +167,15 @@ private:
 	void InitializeVisualStatus();
 
 protected:
+	typedef istd::TPointerVector<ICollectionViewDelegate::ObjectInfo> OpenedDocuments;
+	mutable OpenedDocuments m_openedDocuments;
+	mutable iprm::CParamsSet m_loadFilterParamSet;
+
 	/**
 		Underlaying document manager used for object operations.
 	*/
 	I_REF(idoc::IDocumentManager, m_documentManagerCompPtr);
 	I_REF(imod::IModel, m_documentManagerModelCompPtr);
-	typedef istd::TPointerVector<ICollectionViewDelegate::ObjectInfo> OpenedDocuments;
-	mutable OpenedDocuments m_openedDocuments;
-	mutable iprm::CParamsSet m_loadFilterParamSet;
 
 private:
 	/**
@@ -219,6 +231,11 @@ private:
 	DocumentManagerObserver m_documentManagerObserver;
 
 	QByteArray m_closedForRestoreId;
+
+private:
+	friend class COpenDocumentWorker;
+
+	void FinishOpenDocumentAsync(const OpenDocumentResult& result, QPointer<QObject> workerObj, QPointer<QDialog> progressDlg) const;
 };
 
 

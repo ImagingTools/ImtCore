@@ -2,6 +2,7 @@
 
 
 // Qt includes
+#include <QtCore/QList>
 #include <QtCore/QThread>
 #include <QtCore/QTimer>
 #include <QtCore/QSortFilterProxyModel>
@@ -56,6 +57,7 @@ public:
 		I_ASSIGN(m_useCloseButtonAttrPtr, "UseCloseButton", "Add close button to the right", true, false);
 		I_ASSIGN(m_viewRightPanelAttrPtr, "ViewRightPanel", "View right panel", true, true);
 		I_ASSIGN(m_viewFilterAttrPtr, "ViewFilter", "View filter for default", true, false);
+		I_ASSIGN(m_updateOnChangesAttrPtr, "UpdateOnChanges", "Update the view on changes of the observed collection", true, false);
 	I_END_COMPONENT;
 
 protected:
@@ -64,6 +66,9 @@ protected:
 	I_ATTR(bool, m_viewRightPanelAttrPtr);
 	I_ATTR(bool, m_viewFilterAttrPtr);
 	I_ATTR(bool, m_useCloseButtonAttrPtr);
+	I_ATTR(bool, m_updateOnChangesAttrPtr);
+
+	QList<bool> m_enabledStates;
 };
 
 
@@ -116,11 +121,12 @@ NOTE
 			, true, -1);
 		I_ASSIGN_MULTI_0(m_viewDelegatesCompPtr, "ViewDelegates", "List of view delegates (corresponding with the object type) used for the collection", false);
 		I_ASSIGN(m_filterParamsGuiCompPtr, "FilterParamsGui", "UI for the additional filtering parameters for the collection", false, "FilterParamsGui");
+		I_ASSIGN_TO(m_filterParamsObserverCompPtr, m_filterParamsGuiCompPtr, false);
 		I_ASSIGN(m_filterSelectionCompPtr, "FilterSelection", "Filter selection", false, "FilterSelection");
 		I_ASSIGN(m_paginationGuiCompPtr, "PaginationGui", "Pagination gui", false, "PaginationGui");
 		I_ASSIGN_TO(m_paginationGuiObserverCompPtr, m_paginationGuiCompPtr, false);
-		I_ASSIGN(m_complexFilterCompPtr, "CompelxCollectionFilter", "Compelx collection filter", false, "CompelxCollectionFilter");
-		I_ASSIGN_TO(m_complexFilterModelCompPtr, m_complexFilterCompPtr, true);
+		I_ASSIGN(m_filterParamsCompPtr, "FilteringParams", "Parameter using for the filterering the table", false, "FilteringParams");
+		I_ASSIGN_TO(m_filterParamsModelCompPtr, m_filterParamsCompPtr, false);
 		I_ASSIGN(m_filterEditPlaceholderTextAttrPtr, "FilterEditPlaceholderText", "Filter text box placeholder text", false, "");
 	I_END_COMPONENT;
 
@@ -157,12 +163,14 @@ protected:
 	// reimplemented (iqtgui::TGuiObserverWrap)
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
 	virtual void OnGuiModelAttached() override;
+	virtual void OnGuiModelDetached() override;
 
 	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiCreated() override;
 	virtual void OnGuiDestroyed() override;
 	virtual void OnGuiRetranslate() override;
 	virtual void OnGuiDesignChanged() override;
+	virtual void OnGuiModelShown() override;
 
 	// reimplemented (imod::CMultiModelDispatcherBase)
 	virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
@@ -252,7 +260,7 @@ private:
 	void RestoreColumnsSettings();
 	void ValidateSectionSize(int logicalIndex, int newSize);
 	void UpdateTypeStatus();
-	void OnComplexFilterUpdate(const istd::IChangeable::ChangeSet&, const imtbase::IComplexCollectionFilter* filterPtr);
+	void OnFilterUpdate(const istd::IChangeable::ChangeSet&, const iprm::IParamsSet* filterPtr);
 
 	// reimplemented (QObject)
 	virtual bool eventFilter(QObject* object, QEvent* event) override;
@@ -368,7 +376,7 @@ private:
 
 	iqtgui::IGuiObject* m_currentInformationViewPtr;
 
-	imtbase::TModelUpdateBinder<imtbase::IComplexCollectionFilter, CObjectCollectionViewComp> m_complexFilterObserver;
+	imtbase::TModelUpdateBinder<iprm::IParamsSet, CObjectCollectionViewComp> m_filterObserver;
 
 	QTimer m_textFilterTimer;
 
@@ -381,11 +389,12 @@ private:
 	I_ATTR(int, m_rightToolBarCommandGroupIdAttrPtr);
 	I_MULTIREF(ICollectionViewDelegate, m_viewDelegatesCompPtr);
 	I_REF(iqtgui::IGuiObject, m_filterParamsGuiCompPtr);
+	I_REF(imod::IObserver, m_filterParamsObserverCompPtr);
 	I_REF(iprm::ISelectionParam, m_filterSelectionCompPtr);
 	I_REF(iqtgui::IGuiObject, m_paginationGuiCompPtr);
 	I_REF(imod::IObserver, m_paginationGuiObserverCompPtr);
-	I_REF(imtbase::IComplexCollectionFilter, m_complexFilterCompPtr);
-	I_REF(imod::IModel, m_complexFilterModelCompPtr);
+	I_REF(iprm::IParamsSet, m_filterParamsCompPtr);
+	I_REF(imod::IModel, m_filterParamsModelCompPtr);
 	I_TEXTATTR(m_filterEditPlaceholderTextAttrPtr);
 
 	imtgui::CCommandToolBar m_collectionCommandsLeftToolBar;

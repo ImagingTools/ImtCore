@@ -3,7 +3,6 @@
 
 // Qt includes
 #include <QtCore/QUuid>
-#include <QtCore/QDir>
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QInputDialog>
 
@@ -17,11 +16,15 @@
 #include <imtbase/IRevisionController.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/IDocumentManagerExtender.h>
+#include <imtgui/CProgressDialog.h>
+#include <imtgui/COpenDocumentWorker.h>
 
 
 namespace imtgui
 {
 
+
+// public methods
 
 CDocumentCollectionViewDelegateComp::CDocumentCollectionViewDelegateComp()
 	:m_collectionPersistence(*this),
@@ -41,9 +44,9 @@ QByteArray CDocumentCollectionViewDelegateComp::GetSupportedTypeId() const
 bool CDocumentCollectionViewDelegateComp::InitializeDelegate(
 			imtbase::IObjectCollection* collectionPtr,
 			iqtgui::IGuiObject* parentGuiPtr,
-			const imtbase::ICollectionFilter* filterPtr)
+			const iprm::IParamsSet* filterParamsPtr)
 {
-	if (!BaseClass2::InitializeDelegate(collectionPtr, parentGuiPtr, filterPtr)){
+	if (!BaseClass2::InitializeDelegate(collectionPtr, parentGuiPtr, filterParamsPtr)){
 		return false;
 	}
 
@@ -290,82 +293,53 @@ bool CDocumentCollectionViewDelegateComp::OpenDocumentEditor(
 			const QByteArray& objectId,
 			const QByteArray& viewTypeId) const
 {
-	if (!m_documentManagerCompPtr.IsValid()){
+	if (!m_documentManagerCompPtr.IsValid() || (m_collectionPtr == nullptr) || !m_filePersistenceCompPtr.IsValid()){
 		return false;
 	}
 
-	if (!m_filePersistenceCompPtr.IsValid()){
-		return false;
-	}
-
-	ObjectInfo* objectInfoPtr = nullptr;
-	bool isAlreadyOpened = false;
+	// Already open -> activate
+	ObjectInfo* existingInfoPtr = nullptr;
 	for (int i = 0; i < m_openedDocuments.GetCount(); ++i){
 		if (m_openedDocuments.GetAt(i)->uuid == objectId){
-			isAlreadyOpened = true;
-			objectInfoPtr = m_openedDocuments.GetAt(i);
+			existingInfoPtr = m_openedDocuments.GetAt(i);
 			break;
 		}
 	}
-
-	if (isAlreadyOpened){
-		int count = m_documentManagerCompPtr->GetDocumentsCount();
+	if (existingInfoPtr != nullptr){
+		const int count = m_documentManagerCompPtr->GetDocumentsCount();
 		for (int i = 0; i < count; i++){
-			if (objectInfoPtr->objectPtr.GetPtr() == &m_documentManagerCompPtr->GetDocumentFromIndex(i)) {
+			if (existingInfoPtr->objectPtr.GetPtr() == &m_documentManagerCompPtr->GetDocumentFromIndex(i)) {
 				istd::IPolymorphic* viewPtr = m_documentManagerCompPtr->GetViewFromIndex(i, 0);
 				if (viewPtr != nullptr){
 					m_documentManagerCompPtr->SetActiveView(viewPtr);
 				}
 			}
 		}
-
 		return false;
 	}
 
-	objectInfoPtr = new ObjectInfo;
-	objectInfoPtr->typeId = m_collectionPtr->GetObjectTypeId(objectId);
-	objectInfoPtr->name = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
-	objectInfoPtr->uuid = objectId;
+	// progress dialog
+	QDialog* progressDlg = new imtgui::CProgressDialog(nullptr, tr("Loading document..."), true);
+	progressDlg->setAttribute(Qt::WA_DeleteOnClose);
 
-	QStringList fileExtensions;
-	if (!m_filePersistenceCompPtr->GetFileExtensions(fileExtensions)){
-		return false;
-	}
+	QThread* thread = new QThread();
+	COpenDocumentWorker* worker = new COpenDocumentWorker(this, objectId, viewTypeId);
+	worker->moveToThread(thread);
 
-	Q_ASSERT(!fileExtensions.isEmpty());
+	QPointer<QObject> workerPtr(worker);
+	QPointer<QDialog> progressDlgPtr(progressDlg);
 
-	QString fileExtension = fileExtensions[0];
+	connect(thread, &QThread::started, worker, &COpenDocumentWorker::Run);
+	connect(worker, &COpenDocumentWorker::Finished, this,
+		[this, workerPtr, progressDlgPtr](const OpenDocumentResult& result){
+			FinishOpenDocumentAsync(result, workerPtr, progressDlgPtr);
+		},
+		Qt::QueuedConnection);
+	connect(worker, &QObject::destroyed, thread, &QThread::quit);
+	connect(thread, &QThread::finished, thread, &QObject::deleteLater);
 
-	QString tempPath = QDir::tempPath() + "/ImtCore/" + QUuid::createUuid().toString();
-	istd::CSystem::EnsurePathExists(tempPath);
-	QString tempFilePath = tempPath + "/" + objectInfoPtr->name + "." + fileExtension;
-
-	imtbase::IObjectCollection::DataPtr documentDataPtr;
-	if (m_collectionPtr->GetObjectData(objectId, documentDataPtr, &m_loadFilterParamSet)){
-		int state = m_filePersistenceCompPtr->SaveToFile(*documentDataPtr, tempFilePath);
-		if (state == ifile::IFilePersistence::OS_OK){
-			if (m_documentManagerCompPtr->OpenDocument(&objectInfoPtr->typeId, &tempFilePath, true, viewTypeId, &objectInfoPtr->objectPtr)){
-				m_openedDocuments.PushBack(objectInfoPtr);
-
-				QDir tempDir(tempPath);
-				tempDir.removeRecursively();
-
-				return true;
-			}
-		}
-	}
-
-	QDir tempDir(tempPath);
-	tempDir.removeRecursively();
-
-	if (m_collectionPtr != nullptr){
-		QVariant documentName = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME);
-		if (documentName.isValid()){
-			QMessageBox::critical(nullptr, "", tr("Item \"%1\" could not be opened").arg(documentName.toString()));
-		}
-	}
-
-	return false;
+	thread->start();
+	return true;
 }
 
 
@@ -393,6 +367,7 @@ QString CDocumentCollectionViewDelegateComp::CommentDocumentChanges(int /*revisi
 
 	return comment;
 }
+
 
 
 // reimplemented (imtgui::CObjectCollectionViewDelegate)
@@ -539,6 +514,48 @@ void CDocumentCollectionViewDelegateComp::InitializeVisualStatus()
 	}
 }
 
+
+void CDocumentCollectionViewDelegateComp::FinishOpenDocumentAsync(
+	const OpenDocumentResult& result,
+	QPointer<QObject> workerObj,
+	QPointer<QDialog> progressDlg) const
+{
+	if (progressDlg){
+		progressDlg->close();
+	}
+	if (workerObj){
+		QMetaObject::invokeMethod(workerObj, "deleteLater", Qt::QueuedConnection);
+	}
+
+	// cleanup helper
+	auto cleanupTemp = [&result](){
+		if (!result.tempPath.isEmpty()){
+			QDir tempDir(result.tempPath);
+			tempDir.removeRecursively();
+		}
+	};
+
+	if (!result.success){
+		cleanupTemp();
+		QMessageBox::critical(nullptr, "", tr("Item \"%1\" could not be opened").arg(result.objectName));
+		return;
+	}
+
+	ObjectInfo* objectInfoPtr = new ObjectInfo;
+	objectInfoPtr->typeId = result.typeId;
+	objectInfoPtr->name = result.objectName;
+	objectInfoPtr->uuid = result.objectId;
+
+	if (m_documentManagerCompPtr->OpenDocument(&objectInfoPtr->typeId, &result.tempFilePath, true, result.viewTypeId, &objectInfoPtr->objectPtr)){
+		m_openedDocuments.PushBack(objectInfoPtr);
+		cleanupTemp();
+		return;
+	}
+
+	delete objectInfoPtr;
+	cleanupTemp();
+	QMessageBox::critical(nullptr, "", tr("Item \"%1\" could not be opened").arg(result.objectName));
+}
 
 // protected slots
 
@@ -740,6 +757,7 @@ void CDocumentCollectionViewDelegateComp::DocumentManagerObserver::OnUpdate(cons
 		}
 	}
 }
+
 
 
 } // namespace imtgui
