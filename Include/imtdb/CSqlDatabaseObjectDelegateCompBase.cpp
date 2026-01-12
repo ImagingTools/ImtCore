@@ -5,6 +5,8 @@
 #include <QtSql/QSqlRecord>
 
 // ACF includes
+#include <istd/TOptDelPtr.h>
+#include <iprm/CParamsSet.h>
 #include <imod/TModelWrap.h>
 #include <iprm/TParamsPtr.h>
 #include <iprm/ITextParam.h>
@@ -117,20 +119,29 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionQuery(
 	if (count == 0){
 		return QByteArray();
 	}
+
+	istd::TOptDelPtr<const iprm::IParamsSet> selectionParamsPtr;
 	if (paramsPtr != nullptr){
-		if (!CreateFilterQuery(*paramsPtr, filterQuery)){
+		selectionParamsPtr.SetPtr(paramsPtr, false);
+	}
+	else{
+		selectionParamsPtr.SetPtr(new iprm::CParamsSet(), true);
+	}
+
+	if (selectionParamsPtr.IsValid()){
+		if (!CreateFilterQuery(*selectionParamsPtr, filterQuery)){
 			return QByteArray();
 		}
 
-		iprm::IParamsSet::Ids paramIds = paramsPtr->GetParamIds();
+		iprm::IParamsSet::Ids paramIds = selectionParamsPtr->GetParamIds();
 		if (paramIds.contains("ComplexFilter")){
-			iprm::TParamsPtr<imtbase::IComplexCollectionFilter> complexFilterParamPtr(paramsPtr, "ComplexFilter");
+			iprm::TParamsPtr<imtbase::IComplexCollectionFilter> complexFilterParamPtr(selectionParamsPtr.GetPtr(), "ComplexFilter");
 			if (!CreateSortQuery(*complexFilterParamPtr, sortQuery)){
 				return QByteArray();
 			}
 		}
 		else if (paramIds.contains("Filter")){
-			iprm::TParamsPtr<imtbase::ICollectionFilter> collectionFilterParamPtr(paramsPtr, "Filter");
+			iprm::TParamsPtr<imtbase::ICollectionFilter> collectionFilterParamPtr(selectionParamsPtr.GetPtr(), "Filter");
 			if (!CreateSortQuery(*collectionFilterParamPtr, sortQuery)){
 				return QByteArray();
 			}
