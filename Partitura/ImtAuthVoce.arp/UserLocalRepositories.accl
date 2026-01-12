@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5332" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5445" Description="ACF"/>
+            <Version Id="1" Number="2256" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -13,6 +13,18 @@
         <Element ComponentName="UserRepository" X="575" Y="175" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
+        <EmbededRegistry Id="RoleRepository">
+            <PositionMap>
+                <Element ComponentName="JsonSerializer" X="325" Y="75" Note=""/>
+                <Element ComponentName="Repository" X="575" Y="475" Note=""/>
+                <Element ComponentName="Role" X="900" Y="300" Note=""/>
+                <Element ComponentName="RoleCollectionAdapter" X="950" Y="475" Note=""/>
+                <Element ComponentName="RoleDatabaseDelegate" X="575" Y="275" Note=""/>
+                <Element ComponentName="SqliteXPathExtractor" X="250" Y="475" Note=""/>
+                <Element ComponentName="Types" X="825" Y="75" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
         <EmbededRegistry Id="UserGroupRepository">
             <PositionMap>
                 <Element ComponentName="CompactXmlFileSerializer" X="200" Y="325" Note=""/>
@@ -34,18 +46,6 @@
                 <Element ComponentName="UserCollectionAdapter" X="200" Y="550" Note=""/>
                 <Element ComponentName="UserDatabaseDelegate" X="550" Y="350" Note=""/>
                 <Element ComponentName="UserInfo" X="875" Y="350" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
-        <EmbededRegistry Id="RoleRepository">
-            <PositionMap>
-                <Element ComponentName="JsonSerializer" X="325" Y="75" Note=""/>
-                <Element ComponentName="Repository" X="575" Y="475" Note=""/>
-                <Element ComponentName="Role" X="900" Y="300" Note=""/>
-                <Element ComponentName="RoleCollectionAdapter" X="950" Y="475" Note=""/>
-                <Element ComponentName="RoleDatabaseDelegate" X="575" Y="275" Note=""/>
-                <Element ComponentName="SqliteXPathExtractor" X="250" Y="475" Note=""/>
-                <Element ComponentName="Types" X="825" Y="75" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>
