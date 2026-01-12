@@ -42,9 +42,13 @@ void CServerConnectionInterfaceParamComp::OnComponentCreated()
 
 		BaseClass2::SetPort(PT_GRPC, *m_defaulGrpcSocketPortAttrPtr);
 	}
+
+	QString host = "localhost";
 	if (m_defaultHostAttrPtr.IsValid()){
-		BaseClass2::SetHost(*m_defaultHostAttrPtr);
+		host = *m_defaultHostAttrPtr;
 	}
+
+	BaseClass2::SetHost(host);
 }
 
 
