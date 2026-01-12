@@ -8,7 +8,6 @@
 #include <QtNetwork/QNetworkReply>
 
 // ImtCore includes
-#include <QtNetwork/QNetworkReply.h>
 #include <imtcom/CRequestSender.h>
 
 
