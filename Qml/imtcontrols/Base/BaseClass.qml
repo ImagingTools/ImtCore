@@ -324,7 +324,18 @@ QtObject {
 						}
 
 						if (typeof this[key][j] === "string"){
-							graphQL += "\"" + this[key][j] + "\""
+							let data = this[key][j]
+
+							data = data.replace(/\\/g, "\\\\")
+							data = data.replace(/\"/g, "\\\"")
+							data = data.replace(/\r/g, "\\\\r")
+							data = data.replace(/\n/g, "\\\\n")
+							data = data.replace(/\t/g, "\\\\t")
+
+							graphQL += "\"" + data + "\""
+						}
+						else if(typeof this[key][j] === "object" && this[key][j] instanceof BaseClass) {
+							graphQL += this[key][j].toGraphQL()
 						}
 						else{
 							graphQL += this[key][j]
