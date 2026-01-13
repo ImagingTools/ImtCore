@@ -1,0 +1,15 @@
+#!/bin/sh
+SCRIPT_PATH="$IMTCOREDIR/PartituraUpgrade.py"
+WORK_DIR="."
+
+cd "$(git rev-parse --show-toplevel)" || exit 1
+
+case "$(uname -s)" in
+  *MINGW*|*MSYS*|*CYGWIN*|*NT*) PYTHON_CMD="$IMTCOREDIR/3rdParty/Python/3.8/python.exe" ;;
+  *) PYTHON_CMD="python3" ;;
+esac
+
+echo "Using: $PYTHON_CMD"
+
+"$PYTHON_CMD" -u "$SCRIPT_PATH" -D "$WORK_DIR" || { echo "Failed"; exit 1; }
+echo "Success"
