@@ -1,0 +1,7 @@
+3rdParty/**/*.dll filter=lfs diff=lfs merge=lfs -text
+3rdParty/**/*.lib filter=lfs diff=lfs merge=lfs -text
+3rdParty/**/*.pyd filter=lfs diff=lfs merge=lfs -text
+3rdParty/**/*.so filter=lfs diff=lfs merge=lfs -text
+3rdParty/**/*.dylib filter=lfs diff=lfs merge=lfs -text
+3rdParty/**/*.exe filter=lfs diff=lfs merge=lfs -text
+3rdParty/**/*.a filter=lfs diff=lfs merge=lfs -text
