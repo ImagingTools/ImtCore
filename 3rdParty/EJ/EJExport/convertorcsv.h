@@ -1,5 +1,0 @@
-#ifndef CONVERTORCSV_H
-#define CONVERTORCSV_H
-
-
-#endif // CONVERTORCSV_H
