@@ -1,0 +1,33 @@
+{
+	"standalone": false,
+	"properties": {
+		"virtual": {
+			"width": 1920,
+			"height": 1080
+		},
+
+		"disableAnimations": false,
+		"requireExplicitRecursiveVisibilityStyle": true,
+		"requireVerticalTextAlignmentStyle": true,
+
+		"html5.prefix": "",
+
+		"style.font" : {
+			"family": "Arial",
+			"pixelSize": 16,
+			"pointSize": 0,
+			"lineHeight": 1.2,
+			"weight": 400
+		},
+
+		"trace" : {
+			"keys" : false,
+			"focus": false,
+			"listeners": false
+		},
+
+		"log": { "disable": false },
+
+		"system.fingerprint": false
+	}
+}

@@ -1,0 +1,22 @@
+#ifndef COMMON_GLOBAL_H
+#define COMMON_GLOBAL_H
+
+#include <QtCore/qglobal.h>
+
+//#if defined(COMMON_LIBRARY)
+//#  define COMMONSHARED_EXPORT Q_DECL_EXPORT
+//#else
+//#  define COMMONSHARED_EXPORT Q_DECL_IMPORT
+//#endif
+
+#define COMMONSHARED_EXPORT
+
+
+#if defined(INTERFACE_LIBRARY)
+#  define INTERFACESHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define INTERFACESHARED_EXPORT Q_DECL_IMPORT
+#endif
+//#  define COMMONSHARED_EXPORT Q_DECL_EXPORT
+
+#endif // COMMON_GLOBAL_H

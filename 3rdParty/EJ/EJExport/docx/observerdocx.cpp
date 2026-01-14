@@ -1,0 +1,692 @@
+#include "observerdocx.h"
+#include "paragraphnodedocx.h"
+#include "tablenodedocx.h"
+#include "textnode.h"
+#include "textnodedocx.h"
+#include "tablesplug.h"
+#include "imageplug.h"
+#include "imagenodedocx.h"
+#include "zipper.h"
+#include <zlib.h>
+#include <tableignorcellstruct.h>
+#include "storagehelper.h"
+
+//QString ObserverDocx::pathToResources;
+
+
+ObserverDocx::ObserverDocx(){
+    qDebug()<<"ObserverDocs done";
+    cmToTwip = CM_TO_TWIP;
+}
+
+bool ObserverDocx::archved(QString pathFile, QString zipPath){
+
+    Zipper zipper;
+    QDir dir(pathFile);
+    zipper.toZip(pathFile, zipPath);
+    //dir.removeRecursively();
+    return true;
+}
+
+bool ObserverDocx::unzipDocument(QString format){
+    QString zipPath(":/formats/" +  format + ".zip");
+    Zipper zipper;
+
+    QString pathTemp = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
+    zipper.unzip(pathTemp,zipPath);
+    return true;
+}
+
+QMap<QString, int> ObserverDocx::border(QMap<QString, int> styles, CellStyle *cellStyle){
+    if( cellStyle->topBorder()->m_width == -1 || cellStyle->topBorder()->m_width == 100){
+        styles.insert("topBorderSize", 4);
+    }
+    styles.insert("topBorderSize", ((cellStyle->topBorder()->m_width/100)*4) );
+    //      BOT
+    if( cellStyle->bottomBorder()->m_width == -1 || cellStyle->bottomBorder()->m_width == 100){
+        styles.insert("bottomBorderSize", 4);
+    }
+    styles.insert("bottomBorderSize", ((cellStyle->bottomBorder()->m_width/100)*4) );
+    //      LEFT
+    if( cellStyle->leftBorder()->m_width == -1 || cellStyle->leftBorder()->m_width == 100){
+        styles.insert("leftBorderSize", 4);
+    }
+    styles.insert("leftBorderSize", ((cellStyle->leftBorder()->m_width/100)*4) );
+    //      RIGHT
+    if( cellStyle->rightBorder()->m_width == -1 || cellStyle->rightBorder()->m_width == 100){
+        styles.insert("rightBorderSize", 4);
+    }
+    styles.insert("rightBorderSize", ((cellStyle->rightBorder()->m_width/100)*4) );
+    return styles;
+}
+
+QMap<QString, int> ObserverDocx::changeStyle(QMap<QString, int>style_tumbler, NumStyleBlock *nsb){
+    //style_tumbler.remove("StyleMode");
+    style_tumbler.insert("StyleMode", 1);
+    TextNodeDocx texter;
+
+    if( nsb->style->m_vid == e_PropDoc::PARAGRAPH_STYLE ){
+        ParagraphStyle *stl = (ParagraphStyle*)nsb->style;
+        if( stl->m_align == ParagraphStyle::AlignLeft){ style_tumbler.insert("Align",0);}
+        if( stl->m_align == ParagraphStyle::AlignRight){ style_tumbler.insert("Align",1);}
+        if( stl->m_align == ParagraphStyle::AlignHCenter){ style_tumbler.insert("Align",2);}
+
+    }else if( nsb->style->m_vid == e_PropDoc::TEXT_STYLE){ //m_vid
+        TextStyle *stl = (TextStyle*)nsb->style;
+        style_tumbler.insert("SizeFont", stl->m_font.pixelSize()); //or pixel?
+        qDebug() << "<><><>brushColor: " << stl->m_brushColor;
+        style_tumbler.insert("AlphaBrush",stl->m_brushColor.alpha());
+        style_tumbler.insert("RedBrush",stl->m_brushColor.red() );
+        style_tumbler.insert("GreenBrush",stl->m_brushColor.green() );
+        qDebug() << "Kotik говорит" << stl->m_brushColor.green() ;
+        style_tumbler.insert("BlueBrush",stl->m_brushColor.blue() );
+
+        style_tumbler.insert("Red",stl->m_fontColor.red() );
+        style_tumbler.insert("Green",stl->m_fontColor.green() );
+        style_tumbler.insert("Blue",stl->m_fontColor.blue());
+
+        if (stl->m_font.bold())         { style_tumbler.insert("Bold",1);}else{style_tumbler.insert("Bold",0);}
+        if (stl->m_font.italic() )      { style_tumbler.insert("Italic", 1);}else{style_tumbler.insert("Italic",0);}
+        if (stl->m_font.underline())    {style_tumbler.insert("UnderLine",1);}else{style_tumbler.insert("Underline",0);}
+        if (stl->m_font.strikeOut() )   { style_tumbler.insert("StrikeOut", 1);}else{style_tumbler.insert("StrikeOut",0);}
+
+        //STYLE
+        if( stl->m_fontStyle == TextStyle::NORMAL){
+            style_tumbler.insert("SizeFont", 24);
+        }
+        if( stl->m_fontStyle == TextStyle::NORMAL_BIG1){
+            style_tumbler.insert("SizeFont", 30);
+        }
+        if( stl->m_fontStyle == TextStyle::NORMAL_BIG2){
+            style_tumbler.insert("SizeFont", 32);
+        }
+        if( stl->m_fontStyle == TextStyle::NORMAL_SMALL1){
+            style_tumbler.insert("SizeFont", 21);
+        }
+        if( stl->m_fontStyle == TextStyle::NORMAL_SMALL2){
+            style_tumbler.insert("SizeFont", 16);
+        }
+        if( stl->m_fontStyle == TextStyle::HEADING1){
+            style_tumbler.insert("Bold",1);
+            style_tumbler.insert("Italic",0);
+            style_tumbler.insert("UnderLine",0);
+            style_tumbler.insert("StrikeOut",0);
+            style_tumbler.insert("SizeFont", 38);
+        }
+        if( stl->m_fontStyle == TextStyle::HEADING2){
+            style_tumbler.insert("Bold",1);
+            style_tumbler.insert("Italic",0);
+            style_tumbler.insert("UnderLine",0);
+            style_tumbler.insert("StrikeOut",0);
+            style_tumbler.insert("SizeFont", 36);
+        }
+        if( stl->m_fontStyle == TextStyle::HEADING3){
+            style_tumbler.insert("Bold",1);
+            style_tumbler.insert("Italic",0);
+            style_tumbler.insert("UnderLine",0);
+            style_tumbler.insert("StrikeOut",0);
+            style_tumbler.insert("SizeFont", 28);
+        }
+        if( stl->m_fontStyle == TextStyle::HEADING4){
+            style_tumbler.insert("Bold",1);
+            style_tumbler.insert("Italic",1);
+            style_tumbler.insert("UnderLine",0);
+            style_tumbler.insert("StrikeOut",0);
+            style_tumbler.insert("SizeFont", 26);
+        }
+        if( stl->m_fontStyle == TextStyle::HEADING5){
+            style_tumbler.insert("Bold",1);
+            style_tumbler.insert("Italic",1);
+            style_tumbler.insert("UnderLine",1);
+            style_tumbler.insert("StrikeOut",0);
+            style_tumbler.insert("SizeFont", 38);
+        }
+
+    }
+
+    return style_tumbler;
+}
+
+
+
+QDomDocument ObserverDocx::glue(QList<QDomElement> nodesList){
+    QListIterator<QDomElement> iterator(nodesList);
+
+    QDomDocument doc;
+    QDomElement root = doc.createElement("w:document");
+    //root.setAttribute("xmlns:ve", "http://schemas.openxmlformats.org/markup-compatibility/2006");
+    //root.setAttribute("xmlns:m", "http://schemas.openxmlformats.org/officeDocument/2006/math");
+    //root.setAttribute("xmlns:wne", "http://schemas.microsoft.com/office/word/2006/wordml");
+    root.setAttribute("xmlns:mc", "http://schemas.openxmlformats.org/markup-compatibility/2006");
+    root.setAttribute("xmlns:o", "urn:schemas-microsoft-com:office:office");
+    root.setAttribute("xmlns:r", "http://schemas.openxmlformats.org/officeDocument/2006/relationships");
+    root.setAttribute("xmlns:v", "urn:schemas-microsoft-com:vml");
+    root.setAttribute("xmlns:w", "http://schemas.openxmlformats.org/wordprocessingml/2006/main");
+    root.setAttribute("xmlns:w10", "urn:schemas-microsoft-com:office:word");
+    root.setAttribute("xmlns:wp", "http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing");
+    root.setAttribute("xmlns:wps", "http://schemas.microsoft.com/office/word/2010/wordprocessingShape");
+    root.setAttribute("xmlns:wpg", "http://schemas.microsoft.com/office/word/2010/wordprocessingGroup");
+    root.setAttribute("xmlns:wp14", "http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing");
+    root.setAttribute("xmlns:w14", "http://schemas.microsoft.com/office/word/2010/wordml");
+    root.setAttribute("mc:Ignorable", "w14 wp14");
+    doc.appendChild(root);
+    QDomElement body = doc.createElement("w:body");
+
+    while (iterator.hasNext()) {
+        body.appendChild( iterator.peekNext() );
+        iterator.next();
+    }
+    QDomElement sectPr = ObserverDocx::createSectPr(QString::number(sectW),QString::number(sectH),QString::number(sectPgMarLeft),
+                                                    QString::number(sectPgMarRight),QString::number(sectPgMarTop),QString::number(sectPgMarBottom),
+                                                    QString::number(sectPgMarHeader),QString::number(sectPgMarFooter),QString::number(sectPgMarGutter));
+    body.appendChild(sectPr);
+
+    root.appendChild(body);
+    return doc;
+}
+
+QDomElement ObserverDocx::createSectPr(QString width, QString height, QString left, QString right, QString top,
+                                       QString bottom, QString header, QString footer, QString gutter){
+    QDomDocument doc;
+    QDomElement wsectPr = doc.createElement("w:sectPr");
+
+    QDomElement wType =doc.createElement("w:type");
+        wType.setAttribute("w:val", "nextPage");
+    QDomElement wPgSz = doc.createElement("w:pgSz");
+        wPgSz.setAttribute("w:w", width); //21000  11906
+        wPgSz.setAttribute("w:h", height); //29700  16838
+    QDomElement wPgMar = doc.createElement("w:pgMar");
+        wPgMar.setAttribute("w:left", left); //2500
+        wPgMar.setAttribute("w:right", right); //2500
+        wPgMar.setAttribute("w:header", header);
+        wPgMar.setAttribute("w:top", top); //1500
+        wPgMar.setAttribute("w:footer",footer);
+        wPgMar.setAttribute("w:bottom", bottom); //1500
+        wPgMar.setAttribute("w:gutter", gutter);
+    QDomElement wPgNumType = doc.createElement("w:pgNumType");
+        wPgNumType.setAttribute("w:fmt", "decimal");
+    QDomElement wFormProt = doc.createElement("w:formProt");
+        wFormProt.setAttribute("w:val", "false");
+    QDomElement wTextDirection = doc.createElement("w:textDirection");
+        wTextDirection.setAttribute("w:val", "lrTb");
+    QDomElement wDocGrid = doc.createElement("w:docGrid");
+        wDocGrid.setAttribute("w:type", "default");
+        wDocGrid.setAttribute("w:linePitch", "240");
+        wDocGrid.setAttribute("w:charSpace", "4294961151");
+    //
+
+
+    wsectPr.appendChild(wType);
+    wsectPr.appendChild(wPgSz);
+    wsectPr.appendChild(wPgMar);
+    wsectPr.appendChild(wPgNumType);
+    wsectPr.appendChild(wFormProt);
+    wsectPr.appendChild(wTextDirection);
+    wsectPr.appendChild(wDocGrid);
+
+    return wsectPr;
+
+}
+
+QList<QDomElement> ObserverDocx::observe(Document *doc){
+    QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
+
+    QList<QDomElement> paragraphsList;
+    QList<QDomElement> nodesList;
+    QMap<QString, int> style_tumbler;
+    Buff buff;
+    QList<Block*> *lBlocks = doc->lBlocks;
+    Block *curBlock;
+    //QList<> imageMediaList;
+    int id_count=0;
+    int id_image=4;
+    int index = 0;
+
+    doc->lPages->at(0)->leftMarging;
+    //width; height; left; right; top; bottom; header; footer; gutter;
+    sectW = (int)(doc->lPages->at(0)->width*cmToTwip);
+    sectH =(int)(doc->lPages->at(0)->height*cmToTwip);
+    sectPgMarLeft = (int)(doc->lPages->at(0)->leftMarging*cmToTwip);
+    sectPgMarRight =(int)(doc->lPages->at(0)->rightMarging*cmToTwip);
+    sectPgMarTop = (int) (doc->lPages->at(0)->topMarging*cmToTwip);
+    sectPgMarBottom = (int)(doc->lPages->at(0)->bottomMarging*cmToTwip);
+    sectPgMarHeader = 0;
+    sectPgMarFooter = 0;
+    sectPgMarGutter = 0;
+
+    style_tumbler.insert("StyleMode", 1);
+    style_tumbler.insert("SizeFont",24);
+    while (index < doc->lBlocks->count()) {
+
+        curBlock = lBlocks->at(index);
+        qDebug()<< "Block: " << curBlock->type;
+
+        //      <--------------TEXT
+        if( curBlock->type == e_typeBlocks::TEXT){
+            TextBlock *blocText = (TextBlock*)curBlock;
+            TextNodeDocx texter;
+            QDomElement textNode;
+            if (style_tumbler.value("StyleMode") == 0){
+                textNode = texter.addText(blocText->text);
+            }
+            if( style_tumbler.value("StyleMode") == 1 ){
+                textNode = texter.addTextWithStyle(blocText->text,  style_tumbler);
+            }
+
+            nodesList.append(textNode);
+        }
+
+        //      <--------------SPACE
+        if( curBlock->type == e_typeBlocks::SPACE){
+            //text += "";
+            QString empty = " ";
+            TextNodeDocx texter;
+            QDomElement textNode = texter.addText(empty);
+            nodesList.append(textNode);
+        }
+
+
+        //      <--------------IMAGE 103
+        if( curBlock->type == e_typeBlocks::EXT_IMAGE){
+
+            ImageBlock *imageB = (ImageBlock*)curBlock;
+            QString name;
+            qDebug() << "Width IMAGE " << imageB->width;
+            id_count++;
+
+            //init
+            ImageNodeDocx image;
+            QDomElement imageNode;
+
+            //MAIN
+            index++;
+            curBlock = lBlocks->at(index);
+            while( !(curBlock->type == e_typeBlocks::END_GROUP) ){
+                if(curBlock->type == 22){
+                    PropByteArrayBlock *pbab = (PropByteArrayBlock*)curBlock;
+                    QByteArray ba = pbab->data;
+                    //name = QTextCodec::codecForMib(1015)->toUnicode(ba);
+                    ba = ba.toHex();
+                    int size = ba.size();
+                    for(int i = 0; i < size; ++i){
+                      qDebug() << ba[i];
+                      name = name + ba[i];
+                      qDebug()<< name;
+                    }
+                    qDebug()<< name;
+                }
+
+                index++;
+                curBlock = lBlocks->at(index);
+            }
+            //a->b
+            QString idImageStr = QString::number(id_count);
+            QString filePath = StorageHelper::pathPic() + name;
+
+            qDebug() << "Name;" << name;
+            qDebug()<< "StorageHelper"<<StorageHelper::pathPic();
+            qDebug() << "filePath" << filePath;
+            //MediaFolder       QFile(".../docx/word/media").exists();
+//            if ( ! QFile(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)+ "/storage/data/files/"+name).exists()){
+            if ( ! QFile(filePath).exists()){
+                qDebug()<<"Error: файл " + filePath + " отсутвует";
+            }
+
+
+
+            if (!QFile::copy(filePath,
+                        QStandardPaths::writableLocation(QStandardPaths::TempLocation) +
+                            "/docx/word/media/image" + idImageStr)){
+                qDebug() << "Ошибка копирования: неправильно указан путь или объекта не существует ";
+            }
+
+
+
+            //FINAL
+            imageNode = image.addImage(name, ((imageB->width/100)*MM_TO_CM*CM_TO_EMUS),
+                                       ((imageB->height()/100)*MM_TO_CM*CM_TO_EMUS),
+                                       id_image, id_count); //948055  946785
+            nodesList.append(imageNode);
+            id_image++;
+        }
+
+
+        //      <--------------STYLE
+        if( curBlock->type == e_typeBlocks::NUM_STYLE ){
+            qDebug() << "Стилистический блок! ";
+            NumStyleBlock *nsb = (NumStyleBlock*)curBlock;
+            style_tumbler = changeStyle(style_tumbler,nsb);
+        }
+
+        //      <--------------TABLE 104
+        if(curBlock->type == e_typeBlocks::EXT_TABLE){
+            //init
+            QDomElement nodeTable;
+            QList<QDomElement> cellElement;
+            TextNodeDocx texter;
+            ParagraphNodeDocx paragr;
+            QList<int> lTblGrid;
+
+            TableBlock *curTable = (TableBlock*)curBlock;
+            for(int i=0; i < curTable->lColums.count();++i){
+                lTblGrid.append( curTable->lColums.at(i)->sizeProp.current);
+            }
+            CellNodeDocx *celler = new CellNodeDocx();
+
+
+
+            qDebug() << " TABLE{  } ";
+            int column = curTable->nColums();
+            int row = curTable->nRows();
+            int currentColumn = -1;
+            int currentRow = 0;
+            bool isBlockContinue = false;
+            bool isNextBlockContinue = false;
+            Empty emptyCell;
+
+            while( curBlock->type != e_typeBlocks::BASECELL){
+                qDebug() << "i: " << index ;
+                qDebug() << "ORA ORA: " << curBlock->type;
+                index++;
+                curBlock = lBlocks->at(index);
+                if( curBlock->type == e_typeBlocks::NUM_STYLE){NumStyleBlock *nsb = (NumStyleBlock*)curBlock;style_tumbler = changeStyle(style_tumbler, nsb);}
+            }
+
+
+
+
+
+            QDomElement wp;
+            QList<QDomElement> listTempR; //Список текстовых элементов, из которых будет состоять параграф.
+
+            curBlock = lBlocks->at(index);
+            CellBlock *cellBlock = (CellBlock*)curBlock;
+            Block *nextBlock;
+            CellStyle *cellStyle = cellBlock->cellStyle;
+            style_tumbler = border(style_tumbler, cellStyle);
+            //int* vectorGridColTable = new int[curTable->lColums.count()];
+
+            //index++;
+            while( index <= curTable->endBlock())
+            {
+                //init next and current Blocks
+                curBlock = lBlocks->at(index);
+                if( index != curTable->endBlock() ){
+                    nextBlock = lBlocks->at(index+1);
+                }else{
+                    nextBlock = nullptr;
+//                    delete nextBlock;
+                }
+
+
+
+                qDebug() << "Индекс: "<< index;
+                qDebug() << " Сейчас блок типа: " << curBlock->type;
+                if( curBlock->type == e_typeBlocks::TEXT){
+
+                    TextBlock *textBlock = (TextBlock*)curBlock;
+                    listTempR.append(texter.addTextWithStyle(textBlock->text, style_tumbler));
+                }
+                if( curBlock->type == e_typeBlocks::SPACE){
+                    listTempR.append(texter.addTextWithStyle(" ", style_tumbler));
+                }
+                if( curBlock->type == e_typeBlocks::NUM_STYLE ){
+                    qDebug() << "Стилистический блок! ";
+                    NumStyleBlock *nsb = (NumStyleBlock*)curBlock;
+                    style_tumbler = changeStyle(style_tumbler,nsb);
+                }
+                if( curBlock->type == e_typeBlocks::BASECELL ){
+
+                    if( currentColumn < column ){
+                        currentColumn++;
+                        if(currentColumn > column -1)
+                        {
+                            currentColumn=0;
+                            currentRow++;
+                        }
+                    }
+
+
+                    qDebug() << currentColumn;
+                    qDebug() << currentRow;
+                    CellBlock *cellBlock = (CellBlock*)curBlock;
+                    CellStyle *cellStyle = cellBlock->cellStyle;
+                    if( (currentColumn == 0) && (currentRow ==2)){
+                        qDebug() << "Hello";
+                    }
+
+
+                    //Чекаем: эта ячейка mergeContinue?
+                    if( buff.column.contains(currentColumn)){
+                        if( buff.row.contains(currentRow)){
+                            celler->isMerge = true;
+                            celler->restart = false;
+                            isBlockContinue = true;
+                            QString tempIdColumn = QString::number( currentColumn);
+                            QString tempIdRow = QString::number( currentRow);
+                            QString idStyleTumbler = tempIdColumn + tempIdRow;
+                            style_tumbler = buff.styles.value(idStyleTumbler);
+                        }
+                    }else{
+                        isBlockContinue = false;
+                    }
+
+
+
+                    if(cellBlock->visible){
+
+                        style_tumbler.insert("width",cellBlock->width*cmToTwip);
+
+                        style_tumbler.insert( "RedBrushCell", cellStyle->m_brushColor.red());
+                        style_tumbler.insert( "BlueBrushCell", cellStyle->m_brushColor.blue());
+                        style_tumbler.insert( "GreenBrushCell", cellStyle->m_brushColor.green());
+                        //Обычный блок почему именно в visible?
+                        if( (cellBlock->mergeColums == 0) && (!isBlockContinue) ){
+                            celler->isMerge = false;
+                            style_tumbler.insert("gridSpan", 0);
+                        }
+
+                        //Слияние / Merge
+                        if( cellBlock->mergeColums != 0){
+                            style_tumbler.insert("gridSpan", cellBlock->mergeColums);
+                            celler->restart = true;
+                            celler->isMerge = true;
+
+
+                            //Выделяем какие ячейки mergeContinue
+                            int finalContinueCell = currentRow + cellBlock->mergeRows-1;
+                            for(int i=currentRow+1; i <= finalContinueCell; ++i){
+                                buff.column.append(currentColumn);
+                                buff.row.append(i);
+                                QString tempIdColumn = QString::number( currentColumn);
+                                QString tempIdRow = QString::number( i);
+                                QString idStyleTumbler = tempIdColumn + tempIdRow;
+                                buff.styles.insert(idStyleTumbler, style_tumbler);
+                            }
+
+
+                        }
+
+
+
+                        //Назначение ширины границы {твоего сознаний}
+                        style_tumbler = border(style_tumbler, cellStyle);
+
+                        /*    Текст из ЦелБлока
+                        if(!cellBlock->text.isEmpty()){
+                            //listTempR.append(texter.addText(cellBlock->text));
+                            listTempR.append(texter.addTextWithStyle(cellBlock->text, style_tumbler));
+                        }*/
+
+                    }
+                    //Пустая ячейка
+                    if( !cellBlock->visible && !isBlockContinue){
+                        emptyCell.column.append(currentColumn);
+                        emptyCell.row.append(currentRow);
+                    }
+
+                }
+
+                // !!!nextBlock!!!
+                if(nextBlock && (nextBlock->type == e_typeBlocks::BASECELL)){
+                    //Для continue: след. блок -- mergeContinue
+                    if( buff.column.contains(currentColumn+1)){
+                        if( buff.row.contains(currentRow)){
+                            isNextBlockContinue = true;
+                        }
+                    }
+                    CellBlock *cellB = (CellBlock*)nextBlock;
+                    if(cellB->visible  || isNextBlockContinue){
+                        if( !listTempR.empty() ){
+                            wp = paragr.addParagraphWithStyles(listTempR, style_tumbler);
+                            //wp =paragr.addParagraph(listTempR);
+                            listTempR.clear();
+                        }else{
+                            wp = paragr.addParagraphEmpty();
+                        }
+                        cellElement.append( celler->addCellWithStyle(wp, style_tumbler));
+                        isBlockContinue = false;
+                        isNextBlockContinue = false;
+                    }
+                }
+                if(index == curTable->endBlock()){
+                    if( !listTempR.empty() ){
+                        //wp =paragr.addParagraph(listTempR);
+                        wp = paragr.addParagraphWithStyles(listTempR, style_tumbler);
+                        listTempR.clear();
+                    }else{
+                        wp = paragr.addParagraphEmpty();
+                    }
+                    cellElement.append( celler->addCellWithStyle(wp, style_tumbler));
+                }
+                index++;
+            }
+            qDebug() << " ВЫшели из while";
+            TableNodeDocx table;
+            qDebug() << curTable->width*cmToTwip;
+            table.tblInd =QString::number( 0);
+            table.gridColList = lTblGrid;
+            table.width = QString::number( curTable->width*cmToTwip );
+            paragraphsList.append( table.addTable(row, column, cellElement, emptyCell));
+
+            cellElement.clear();
+            lTblGrid.clear();
+            delete celler;
+
+        }
+
+        //  <--------------ENTER
+        if( curBlock->type == e_typeBlocks::ENTER ){
+            ParagraphNodeDocx parag;
+            QDomElement p;
+            if( !nodesList.empty() ){
+
+                p= parag.addParagraphWithStyles(nodesList,style_tumbler);
+                paragraphsList.append(p);
+                nodesList.clear();
+            }else{
+                p = parag.addParagraphEmpty();
+                paragraphsList.append(p);
+            }
+        }
+
+       index++;
+
+    }
+
+
+    if( !nodesList.empty()){
+        ParagraphNodeDocx parag;
+        QDomElement p;
+        p = parag.addParagraphWithStyles(nodesList, style_tumbler);
+        paragraphsList.append(p);
+        nodesList.clear();
+    }
+
+    style_tumbler.clear();
+
+    ObserverDocx::addImageRelationship( QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/docx/word/_rels",
+                                       id_count);
+
+    return paragraphsList;
+}
+
+void ObserverDocx::write(QDomDocument doc){
+    QDir dir;
+    dir = dir.currentPath();
+    dir.cdUp();
+    QString path = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/docx";
+    //.../exportDocs/docx";
+    QFile file(path+"/word/document.xml");
+    if(file.open(QIODevice::ReadWrite | QIODevice::Text | QIODevice::Truncate) ){
+        QTextStream stream(&file);
+        stream << doc.toString();
+        file.close();
+    }else{
+        qDebug()<<" Ошибка записи файла (ObserverDocx::write)";
+    }
+
+}
+
+
+void ObserverDocx::addImageRelationship(QString path, int id_count){
+    //default id = for rs 4'
+
+    int id =4;
+    QDomDocument doc;
+    QDomElement relationships;
+    QDomElement relationship;
+    //<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+     //   prolog.setAttribute("version", "1.0");
+     //   prolog.setAttribute("encoding", "UTF-8");
+    doc.appendChild(doc.createProcessingInstruction("xml", " version=\"1.0\" encoding=\"UTF-8\" " ));
+
+    relationships = doc.createElement("Relationships");
+    relationships.setAttribute("xmlns","http://schemas.openxmlformats.org/package/2006/relationships");
+
+
+
+    QFile file(path+ "/document.xml.rels");
+    qDebug() << file;
+
+    if(file.open(QIODevice::ReadWrite | QIODevice::Text | QIODevice::Truncate)){
+        //1
+        QDomElement relationshipStyle = doc.createElement("Relationship");
+        relationshipStyle.setAttribute("Id", "rId1");
+        relationshipStyle.setAttribute("Type", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles");
+        relationshipStyle.setAttribute("Target", "styles.xml");
+        relationships.appendChild(relationshipStyle);
+        //2
+        QDomElement relationshipFontTable = doc.createElement("Relationship");
+        relationshipFontTable.setAttribute("Id", "rId2");
+        relationshipFontTable.setAttribute("Type", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable");
+        relationshipFontTable.setAttribute("Target", "fontTable.xml");
+        relationships.appendChild(relationshipFontTable);
+        //3
+        QDomElement relationshipSetting = doc.createElement("Relationship");
+        relationshipSetting.setAttribute("Id", "rId3");
+        relationshipSetting.setAttribute("Type", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings");
+        relationshipSetting.setAttribute("Target", "settings.xml");
+        relationships.appendChild(relationshipSetting);
+        //cicle
+        for(int i=1 ; i <= id_count ;i++){
+            QString idI =  QString::number(id);
+            QString numId = QString::number(i);
+            relationship = doc.createElement("Relationship");
+            relationship.setAttribute("Id","rId"+ idI);
+            relationship.setAttribute("Type","http://schemas.openxmlformats.org/officeDocument/2006/relationships/image");
+            relationship.setAttribute("Target","media/image"+numId);
+            id++;
+            relationships.appendChild(relationship);
+        }
+        doc.appendChild(relationships);
+
+        //Запись файла
+        QTextStream stream(&file);
+        stream << doc.toString();
+        file.close();
+
+    }else{
+        qDebug()<<" Ошибка записи файла (ImageRelation)";
+    }
+}

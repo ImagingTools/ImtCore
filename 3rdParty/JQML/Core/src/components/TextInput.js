@@ -1,0 +1,370 @@
+import {Item} from './Item'
+import {Font} from '../utils/Font'
+import {Signal} from '../utils/Signal'
+
+export class TextInput extends Item {
+
+    static AlignLeft = 0
+    static AlignRight = 1
+    static AlignHCenter = 2
+    static AlignJustify = 3
+    static AlignTop = 4
+    static AlignBottom = 5
+    static AlignVCenter = 6
+
+    static NoWrap = 0
+    static WordWrap = 1
+    static WrapAnywhere = 2
+    static Wrap = 3
+
+    static Normal = 0
+    static Password = 1
+    static NoEcho = 2
+    static PasswordEchoOnEdit = 3
+
+    $contentWidthAuto = true
+	$contentHeightAuto = true
+
+    $widthAuto = true
+	$heightAuto = true
+    $editing = false
+
+    constructor(args) {
+        super(args)
+
+        this.$cP('text', '', this.$textChanged)
+        this.$cP('color', 'black', this.$colorChanged)
+        this.$cP('contentHeight', 0)
+        this.$cP('contentWidth', 0)
+        this.$cP('horizontalAlignment', TextInput.AlignLeft, this.$horizontalAlignmentChanged)
+        this.$cP('verticalAlignment', TextInput.AlignTop, this.$verticalAlignmentChanged)
+        this.$cP('wrapMode', TextInput.NoWrap, this.$wrapModeChanged)
+        this.$cPC('font', Font(), this.$fontChanged)
+        this.$cP('selectionColor', '#000080', this.$selectionColorChanged)
+        this.$cP('selectedTextColor', '#fff', this.$selectedTextColorChanged)
+        this.$cP('echoMode', TextInput.Normal, this.$echoModeChanged)
+        this.$cP('validator', undefined, this.$validatorChanged)
+        this.$cP('readOnly', false, this.$readOnlyChanged)
+        this.$cP('acceptableInput', true)
+
+
+        this.$cS('accepted')
+        this.$cS('editingFinished')
+        this.$cS('textEdited')
+  
+
+        this.$updateTimer = null
+    }
+    $validatorChanged(){
+        // if(this.$validator) this.$validator.$destroy()
+
+        // this.validator(this)
+        // this.$validator = this.children.splice(this.children.length-1, 1)[0]
+    }
+
+    $domCreate(){
+        super.$domCreate()
+
+        this.impl = document.createElement("input")
+        this.dom.style.display = 'flex'
+        this.dom.appendChild(this.impl);
+        
+        this.impl.autocomplete = "new-password"
+        this.impl.style.textAlign = "inherit"
+        this.impl.style.width = "100%";
+        this.impl.style.height = 'auto'
+
+		this.impl.style.borderWidth = "0"
+		this.impl.style.background = "none"
+		this.impl.style.outline = "none"
+
+
+        this.impl.addEventListener("input", function(e) {
+            this.$editing = true
+            if(this.$p.validator.val){
+                if(this.$p.validator.val.validate(this.impl.value)){
+                    this.text = this.impl.value
+                    this.acceptableInput = true
+                    this.textEdited()
+                } else {
+                    this.impl.value = this.$p.text.val
+                    this.acceptableInput = false
+                }
+            } else {
+                this.text = this.impl.value
+                this.acceptableInput = true
+                this.textEdited()
+            }
+			
+		}.bind(this))
+
+        this.$fontChanged()
+    }
+
+    $sID(ID){
+        super.$sID(ID)
+        this.impl.name = this.ID.size ? this.ID.values().next().value : ''
+    }
+    $visibleChanged(){
+        super.$visibleChanged()
+        this.$updateGeometry()
+    }
+    $updateGeometry(){
+        clearTimeout(this.$updateTimer)
+        
+        this.$updateTimer = setTimeout(()=>{
+            if(this.impl){
+                let rect = this.impl.getBoundingClientRect()
+                if(this.$contentHeightAuto){
+                    if(this.$heightAuto && this.$p.height.val !== rect.height) {
+                        this.$p.height.val = rect.height
+                        this.$p.height.getSignal()()
+                        this.$heightAuto = true
+                        // this.dom.style.height = `${rect.height}px`
+                    }
+                    this.contentHeight = rect.height
+                }
+                if(this.$contentWidthAuto){
+                    if(this.$widthAuto && this.$p.width.val !== rect.width) {
+                        this.$p.width.val = rect.width
+                        this.$p.width.getSignal()()
+                        this.$widthAuto = true
+                        // this.dom.style.width = `${rect.width}px`
+                    }
+                    this.contentWidth = rect.width
+                }
+            }
+            
+        }, 1000 / Core.FPS)
+        
+
+    }
+    $show(){
+        this.dom.style.display = 'flex'
+    }
+    $echoModeChanged(){
+        switch(this.echoMode){
+			case TextInput.Normal:
+				this.impl.type = "text";
+				break;
+			case TextInput.Password:
+				this.impl.type = "password";
+				break;
+		}
+    }
+    $readOnlyChanged(){
+        if(this.readOnly){
+            this.impl.readOnly = true
+        } else {
+            this.impl.readOnly = false
+        }
+    }
+    $focusChanged(){
+        // super.$focusChanged()
+        if(this.$p.focus.val) {
+            this.impl.focus()
+            Core.setFocus(this)
+        } else {
+            this.impl.blur()
+            if(this.$editing) {
+                this.$editing = false
+                this.editingFinished()
+            }
+        }
+    }
+    $selectionColorChanged(){
+        this.$updateSelection()
+    }
+    $selectedTextColorChanged(){
+        this.$updateSelection()
+    }
+    $updateSelection(){
+		if(this.$style) this.$style.remove() 
+		this.$style = document.head.appendChild(document.createElement("style"))
+		this.$style.innerHTML = `#el-${this.UID} input::selection{color: ${this.$p.selectedTextColor.val}; background: ${this.$p.selectionColor.val}} #el-${this.UID} input::-moz-selection{color: ${this.$p.selectedTextColor.val}; background: ${this.$p.selectionColor.val}}`
+	}
+    $opacityChanged(){
+        this.dom.style.opacity = this.opacity
+    }
+
+    
+    $widthChanged(){
+        super.$widthChanged()
+        this.$widthAuto = false
+        // this.$contentWAuto = false
+        // this.$calcWH()
+        this.$updateGeometry()
+        this.$horizontalAlignmentChanged()
+    }
+    $heightChanged(){
+        super.$heightChanged()
+        this.$heightAuto = false
+        // this.$contentHAuto = false
+        // this.$calcWH()
+        this.$updateGeometry()
+        this.$verticalAlignmentChanged()
+    }
+
+    $textChanged(){
+		this.impl.value = this.$p.text.val
+
+        // let tempText = document.createElement("span")
+        // tempText.innerHTML = this.text
+        // document.body.appendChild(tempText);
+
+        // let rect = tempText.getBoundingClientRect()
+        // this.contentWidth = rect.width
+        // this.contentHeight = rect.height
+        // tempText.remove()
+        this.$updateGeometry()
+    }
+
+    
+    selectAll(){
+        this.impl.select()
+    }
+    $colorChanged(){
+        this.impl.style.color = `${this.$p.color.val}`
+    }
+
+    $horizontalAlignmentChanged(){
+        switch(this.$p.horizontalAlignment.val){
+			case TextInput.AlignLeft:
+				this.impl.style.textAlign = "start";
+				this.dom.style.justifyContent = "flex-start";
+				break;
+			case TextInput.AlignRight:
+				this.impl.style.textAlign = "end";
+				this.dom.style.justifyContent = "flex-end";
+				break;
+			case TextInput.AlignHCenter:
+				this.impl.style.textAlign = "center";
+				this.dom.style.justifyContent = "center";
+				break;
+		}
+    }
+    $verticalAlignmentChanged(){
+        switch(this.$p.verticalAlignment.val){
+			case TextInput.AlignTop:
+				this.dom.style.alignItems = "flex-start";
+				break;
+			case TextInput.AlignBottom:
+				this.dom.style.alignItems = "flex-end";
+				break;
+			case TextInput.AlignVCenter:
+				this.dom.style.alignItems = "center";
+				break;
+		}
+    }
+    $wrapModeChanged(){
+        switch(this.$p.wrapMode.val){
+            case TextInput.NoWrap: this.impl.style.whiteSpace = "pre"; break;
+            case TextInput.WordWrap: this.impl.style.whiteSpace = "pre-wrap"; this.impl.style.wordWrap = "normal"; break;
+            case TextInput.WrapAnywhere: this.impl.style.whiteSpace = "pre-wrap"; this.impl.style.wordBreak = "break-all"; break;
+            case TextInput.Wrap: this.impl.style.whiteSpace = "pre-wrap"; this.impl.style.wordWrap = "break-word"; break;
+        }
+        this.$updateGeometry()
+    }
+
+    $fontChanged(){
+        this.impl.style.fontFamily = this.$p['font.family'].val ? this.$p['font.family'].val : 'unset';
+        this.impl.style.fontSize = `${this.$p['font.pixelSize'].val}px`
+        this.impl.style.fontStyle = this.$p['font.italic'].val ? 'italic' : 'normal';
+        this.impl.style.fontWeight = this.$p['font.bold'].val ? 'bold' : 'normal';
+        this.impl.style.textDecoration = this.$p['font.underline'].val ? 'underline' : 'unset';
+        // this.impl.style.height = `${this.$p['font.pixelSize'].val}px`
+        this.$updateGeometry()
+
+        if(this.$p['font.family'].val && this.$p['font.pixelSize'].val){
+            document.fonts.load(`${this.$p['font.pixelSize'].val}px ${this.$p['font.family'].val}`).then((fonts)=>{
+                if(fonts.length) this.$updateGeometry()
+            })
+        }
+    }
+
+    $keydown(e, state){
+        if(e.key === 'Enter' || e.key === 'Return'){
+            e.preventDefault()
+            if(this.$p.validator.val){
+                if(this.$p.validator.val.validate(this.impl.value)){
+                    this.accepted()
+                    this.editingFinished()
+                    this.acceptableInput = true
+                } else {
+                    this.acceptableInput = false
+                }
+            } else {
+                this.accepted()
+                this.editingFinished()
+                this.acceptableInput = true
+            }
+            
+        }
+    }
+
+    $destroy(){
+        // if(this.$validator) this.$validator.$destroy()
+        clearTimeout(this.$updateTimer)
+        this.impl.remove()
+        super.$destroy()
+    }
+
+    $mousedown(e, state) {
+        // e.preventDefault()
+		if(this.$p.enabled.val){
+
+            state.blocked(this)
+		}
+	}
+	$mouseup(e, state) {
+		// e.preventDefault()
+		if(this.$p.enabled.val){
+            if(this.focus) {
+                this.impl.focus()
+                Core.setFocus(this)
+            } else {
+                this.focus = true
+            }
+            
+            state.release()
+		}
+	}
+    $mousemove(e, state) {
+		// e.preventDefault()
+		if(this.$p.enabled.val){
+
+		}
+		
+	}
+
+    $touchstart(e, state) {
+        // e.preventDefault()
+		if(this.$p.enabled.val){
+
+            state.blocked(this)
+		}
+	}
+	$touchend(e, state) {
+		// e.preventDefault()
+		if(this.$p.enabled.val){
+            if(this.focus) {
+                this.impl.focus()
+                Core.setFocus(this)
+            } else {
+                this.focus = true
+            }
+
+            state.release()
+		}
+	}
+    $touchmove(e, state) {
+		// e.preventDefault()
+		if(this.$p.enabled.val){
+
+		}
+		
+	}
+    
+}
+
+QML.TextInput = TextInput
