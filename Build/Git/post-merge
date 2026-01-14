@@ -1,15 +1,21 @@
 #!/bin/sh
-SCRIPT_PATH="$IMTCOREDIR/PartituraUpgrade.py"
-WORK_DIR="."
 
-cd "$(git rev-parse --show-toplevel)" || exit 1
+echo "Running post-merge hook..."
 
-case "$(uname -s)" in
-  *MINGW*|*MSYS*|*CYGWIN*|*NT*) PYTHON_CMD="$IMTCOREDIR/3rdParty/Python/3.8/python.exe" ;;
-  *) PYTHON_CMD="python3" ;;
-esac
+REPO_ROOT="$(pwd)"
+BAT_FILE="$REPO_ROOT/Build/Git/UpdateVersion.bat"
 
-echo "Using: $PYTHON_CMD"
+echo "Looking for: $BAT_FILE"
 
-"$PYTHON_CMD" -u "$SCRIPT_PATH" -D "$WORK_DIR" || { echo "Failed"; exit 1; }
-echo "Success"
+if [ -f "$BAT_FILE" ]; then
+    echo "Executing $BAT_FILE..."
+    cd "$REPO_ROOT"
+    cmd //c "$BAT_FILE"
+else
+    echo "Error: $BAT_FILE not found"
+    echo "Checking Build/Git directory:"
+    ls -la "Build/Git/" 2>/dev/null || echo "Directory Build/Git does not exist"
+    exit 1
+fi
+
+echo "Post-merge hook completed"
