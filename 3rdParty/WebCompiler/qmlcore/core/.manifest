@@ -1,0 +1,8 @@
+{
+	"package": "core",
+	"properties": {
+		"resolutionWidth": 0,
+		"resolutionHeight": 0,
+		"useNativeFocusForInput": true
+	}
+}

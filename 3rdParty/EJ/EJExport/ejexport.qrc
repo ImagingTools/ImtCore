@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>formats/docx.zip</file>
+        <file>formats/xlsx.zip</file>
+    </qresource>
+</RCC>
