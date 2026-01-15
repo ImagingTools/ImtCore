@@ -16,7 +16,6 @@ _deps/
 build/
 Build/*/build/
 Build/*/*.dir/
-Makefile
 
 # Visual Studio artifacts
 # Note: We keep 3rdParty Visual Studio files tracked
@@ -33,13 +32,15 @@ Build/**/*.vcxproj.filters
 *.VC.opendb
 .vs/
 ipch/
-# Build output directories
-x64/
-Win32/
-Debug/
-Release/
-RelWithDebInfo/
-MinSizeRel/
+# Build output directories (root level only, not in 3rdParty)
+/x64/
+/Win32/
+/Debug/
+/Release/
+/RelWithDebInfo/
+/MinSizeRel/
+# Build output in source directories
+**/obj/
 # Debug symbols and intermediates
 *.ilk
 *.exp
@@ -53,8 +54,10 @@ MinSizeRel/
 moc_*.cpp
 qrc_*.cpp
 ui_*.h
-Makefile*
-!*.pro
+# QMake generated makefiles (not source Makefiles)
+Makefile.Debug
+Makefile.Release
+# object_script files
 object_script.*.Release
 object_script.*.Debug
 
