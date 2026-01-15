@@ -27,8 +27,8 @@ public:
 	virtual void SetJobName(const QString& name) override;
 	virtual QByteArray GetContextId() const override;
 	virtual void SetContextId(const QByteArray& contextId) override;
-	virtual const iprm::IParamsSet* GetParams() const override;
-	virtual void SetParams(iprm::IParamsSet* paramsPtr) override;
+	virtual iprm::IParamsSetSharedPtr GetParams() const override;
+	virtual void SetParams(const iprm::IParamsSetSharedPtr& paramsPtr) override;
 	virtual imthype::IJobQueueManager::ProcessingStatus GetProcessingStatus() const override;
 	virtual void SetProcessingStatus(imthype::IJobQueueManager::ProcessingStatus status) override;
 	virtual double GetProgress() const override;
@@ -37,6 +37,8 @@ public:
 	virtual void SetResults(const imthype::IJobOutput& results) override;
 	virtual const imtbase::IReferenceCollection* GetInput() const override;
 	virtual void SetInput(const imtbase::IReferenceCollection& input) override;
+
+	virtual void SetParamsFactory(const ParamsFactoryFunction& factory) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -50,7 +52,8 @@ private:
 	imthype::IJobQueueManager::ProcessingStatus m_processingStatus;
 	CStandardJobOutput m_results;
 	imtbase::CSimpleReferenceCollection m_input;
-	istd::TSmartPtr<iprm::IParamsSet> m_paramsPtr;
+	iprm::IParamsSetSharedPtr m_paramsPtr;
+	ParamsFactoryFunction m_paramsFactory;
 };
 
 typedef imtbase::TIdentifiableWrap<CJobTicket> CIdentifiableJobInfo;

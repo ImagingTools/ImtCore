@@ -1,5 +1,7 @@
 #pragma once
 
+// Qt includes
+#include <functional>
 
 // ImtCore includes
 #include <imtbase/IReferenceCollection.h>
@@ -25,6 +27,8 @@ public:
 		MIT_PROCESSING_STATUS
 	};
 
+	typedef std::function<iprm::IParamsSetSharedPtr(const QByteArray& contextId, const QByteArray& typeId)> ParamsFactoryFunction;
+
 	virtual QByteArray GetTypeId() const = 0;
 	virtual void SetTypeId(const QByteArray& typeId) = 0;
 
@@ -37,8 +41,8 @@ public:
 	virtual QByteArray GetContextId() const = 0;
 	virtual void SetContextId(const QByteArray& contextId) = 0;
 
-	virtual const iprm::IParamsSet* GetParams() const = 0;
-	virtual void SetParams(iprm::IParamsSet* paramsPtr) = 0;
+	virtual iprm::IParamsSetSharedPtr GetParams() const = 0;
+	virtual void SetParams(const iprm::IParamsSetSharedPtr& paramsPtr) = 0;
 
 	virtual IJobQueueManager::ProcessingStatus GetProcessingStatus() const = 0;
 	virtual void SetProcessingStatus(IJobQueueManager::ProcessingStatus status) = 0;
@@ -51,7 +55,12 @@ public:
 
 	virtual const imtbase::IReferenceCollection* GetInput() const = 0;
 	virtual void SetInput(const imtbase::IReferenceCollection& input) = 0;
+
+	virtual void SetParamsFactory(const ParamsFactoryFunction& factory) = 0;
 };
+
+
+typedef istd::TSharedInterfacePtr<IJobTicket> IJobTicketSharedPtr;
 
 
 } // namespace imthype
