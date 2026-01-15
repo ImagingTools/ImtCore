@@ -1,4 +1,0 @@
-{
-	"requires": ["video.html5"],
-	"templates": ["*.html", "config.xml", "build.py"]
-}
