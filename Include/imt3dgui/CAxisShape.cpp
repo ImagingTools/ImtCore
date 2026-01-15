@@ -150,30 +150,58 @@ void CAxisShape::Draw(QPainter& painter)
 
 	painter.setRenderHint(QPainter::TextAntialiasing, true);
 	painter.setPen(Qt::darkGray);
-	painter.setFont(GetAxeLabelFont());
+	QFont font = GetAxeLabelFont();
+	painter.setFont(font);
+	
+	QFontMetrics fontMetrics(font);
+	const int textOffset = 5; // Offset in pixels to separate text from axis endpoint
 
 	QString xLabel = m_axisConfigs[AT_X].label;
 	QPoint windowCoordinate = ModelToWindow(QVector3D(m_axisConfigs[AT_X].axisLength * m_axisConfigs[AT_X].axisRange.GetMaxValue(), 0.0, 0.0));
+	QRect textRect = fontMetrics.boundingRect(xLabel);
+	windowCoordinate.setX(windowCoordinate.x() + textOffset);
+	windowCoordinate.setY(windowCoordinate.y() + textRect.height() / 2);
 	painter.drawText(windowCoordinate, xLabel);
 
 	if (m_axisConfigs[AT_X].axisRange.GetMinValue() < 0.0){
-		painter.drawText(ModelToWindow(QVector3D(m_axisConfigs[AT_X].axisLength * m_axisConfigs[AT_X].axisRange.GetMinValue(), 0.0, 0.0)), QString("-") + xLabel);
+		QString negXLabel = QString("-") + xLabel;
+		windowCoordinate = ModelToWindow(QVector3D(m_axisConfigs[AT_X].axisLength * m_axisConfigs[AT_X].axisRange.GetMinValue(), 0.0, 0.0));
+		textRect = fontMetrics.boundingRect(negXLabel);
+		windowCoordinate.setX(windowCoordinate.x() - textRect.width() - textOffset);
+		windowCoordinate.setY(windowCoordinate.y() + textRect.height() / 2);
+		painter.drawText(windowCoordinate, negXLabel);
 	}
 
 	QString yLabel = m_axisConfigs[AT_Y].label;
 	windowCoordinate = ModelToWindow(QVector3D(0.0, m_axisConfigs[AT_Y].axisLength * m_axisConfigs[AT_Y].axisRange.GetMaxValue(), 0.0));
+	textRect = fontMetrics.boundingRect(yLabel);
+	windowCoordinate.setX(windowCoordinate.x() + textOffset);
+	windowCoordinate.setY(windowCoordinate.y() + textRect.height() / 2);
 	painter.drawText(windowCoordinate, yLabel);
 
 	if (m_axisConfigs[AT_Y].axisRange.GetMinValue() < 0.0){
-		painter.drawText(ModelToWindow(QVector3D(0.0, m_axisConfigs[AT_Y].axisLength * m_axisConfigs[AT_Y].axisRange.GetMinValue(), 0.0)), QString("-") + yLabel);
+		QString negYLabel = QString("-") + yLabel;
+		windowCoordinate = ModelToWindow(QVector3D(0.0, m_axisConfigs[AT_Y].axisLength * m_axisConfigs[AT_Y].axisRange.GetMinValue(), 0.0));
+		textRect = fontMetrics.boundingRect(negYLabel);
+		windowCoordinate.setX(windowCoordinate.x() - textRect.width() - textOffset);
+		windowCoordinate.setY(windowCoordinate.y() + textRect.height() / 2);
+		painter.drawText(windowCoordinate, negYLabel);
 	}
 
 	QString zLabel = m_axisConfigs[AT_Z].label;
 	windowCoordinate = ModelToWindow(QVector3D(0.0, 0.0, m_axisConfigs[AT_Z].axisLength * m_axisConfigs[AT_Z].axisRange.GetMaxValue()));
+	textRect = fontMetrics.boundingRect(zLabel);
+	windowCoordinate.setX(windowCoordinate.x() + textOffset);
+	windowCoordinate.setY(windowCoordinate.y() + textRect.height() / 2);
 	painter.drawText(windowCoordinate, zLabel);
 
 	if (m_axisConfigs[AT_Z].axisRange.GetMinValue() < 0.0){
-		painter.drawText(ModelToWindow(QVector3D(0.0, 0.0, m_axisConfigs[AT_Z].axisLength * m_axisConfigs[AT_Z].axisRange.GetMinValue())), QString("-") + zLabel);
+		QString negZLabel = QString("-") + zLabel;
+		windowCoordinate = ModelToWindow(QVector3D(0.0, 0.0, m_axisConfigs[AT_Z].axisLength * m_axisConfigs[AT_Z].axisRange.GetMinValue()));
+		textRect = fontMetrics.boundingRect(negZLabel);
+		windowCoordinate.setX(windowCoordinate.x() - textRect.width() - textOffset);
+		windowCoordinate.setY(windowCoordinate.y() + textRect.height() / 2);
+		painter.drawText(windowCoordinate, negZLabel);
 	}
 
 	painter.restore();
