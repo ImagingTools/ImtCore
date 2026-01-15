@@ -1,6 +1,5 @@
 #pragma once
 
-
 // Qt includes
 #include <functional>
 
