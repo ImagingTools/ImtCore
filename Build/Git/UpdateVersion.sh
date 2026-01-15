@@ -16,6 +16,8 @@ if [ -z "$REV" ]; then
     exit 1
 fi
 
+REV_OFFSET=$((REV + 10000))
+
 # Check if working directory is dirty
 git diff-index --quiet HEAD --
 if [ $? -eq 0 ]; then
@@ -24,13 +26,13 @@ else
     DIRTY=1
 fi
 
-echo "Git revision: $REV, dirty: $DIRTY"
+echo "Git revision: $REV (version: $REV_OFFSET), dirty: $DIRTY"
 echo "Processing file: $FILE"
 
 OUT="${FILE%.xtrsvn}"
 
 # Replace placeholders: $WCREV$ with revision count, $WCMODS?1:0$ with dirty flag
 # REV and DIRTY are numeric values from git, so they are safe to use directly in sed
-sed -e "s/\\\$WCREV\\\$/$REV/g" -e "s/\\\$WCMODS?1:0\\\$/$DIRTY/g" "$FILE" > "$OUT"
+sed -e "s/\\\$WCREV\\\$/$REV_OFFSET/g" -e "s/\\\$WCMODS?1:0\\\$/$DIRTY/g" "$FILE" > "$OUT"
 
-echo "Wrote $OUT with WCREV=$REV and WCMODS=$DIRTY"
+echo "Wrote $OUT with WCREV=$REV_OFFSET and WCMODS=$DIRTY"
