@@ -96,9 +96,8 @@ conaninfo.txt
 conanbuildinfo.*
 conan.lock
 graph_info.json
-deactivate_conanbuildenv-*.sh
-activate_conanbuildenv-*.sh
-conanrunenv-*.sh
+*conanbuildenv*.sh
+*conanrunenv*.sh
 CMakeUserPresets.json
 
 # Python artifacts (build scripts)
