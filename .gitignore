@@ -11,10 +11,8 @@ cmake_uninstall.cmake
 install_manifest.txt
 CTestTestfile.cmake
 Testing/
-*.cmake.in
 _deps/
 build/
-Build/*/build/
 Build/*/*.dir/
 
 # Visual Studio artifacts
@@ -108,7 +106,6 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.egg-info/
-dist/
 .eggs/
 *.egg
 
