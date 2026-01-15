@@ -2,20 +2,15 @@
 
 
 // Qt includes
-#include <QtCore/QFileInfo>
-#include <QtCore/QFile>
 #include <QtCore/QUuid>
 
 // ACF includes
 #include <istd/TDelPtr.h>
 #include <istd/CSystem.h>
-#include <iser/CPrimitiveTypesSerializer.h>
-#include <ifile/CCompactXmlFileReadArchive.h>
-#include <ifile/CCompactXmlFileWriteArchive.h>
-#include <ifile/CFileListProviderComp.h>
 
 // ImtCore includes
 #include <imtbase/imtbase.h>
+#include <imthype/CJobTicket.h>
 
 namespace imthype
 {
@@ -24,9 +19,36 @@ namespace imthype
 // public methods
 
 CJobQueueManagerCompBase::CJobQueueManagerCompBase()
-	:m_directoryBlocked(false),
-	m_mutex(QReadWriteLock::Recursive)
+	:m_mutex(QReadWriteLock::Recursive)
 {
+}
+
+
+// protected methods
+
+const IJobTicket* CJobQueueManagerCompBase::GetJobTicket(const QByteArray& jobId) const
+{
+	if (!m_jobTicketsCollectionCompPtr.IsValid()){
+		return nullptr;
+	}
+
+	const istd::IChangeable* objectPtr = m_jobTicketsCollectionCompPtr->GetObjectPtr(jobId);
+	return dynamic_cast<const IJobTicket*>(objectPtr);
+}
+
+
+IJobTicket* CJobQueueManagerCompBase::GetJobTicket(const QByteArray& jobId)
+{
+	if (!m_jobTicketsCollectionCompPtr.IsValid()){
+		return nullptr;
+	}
+
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (m_jobTicketsCollectionCompPtr->GetObjectData(jobId, dataPtr)){
+		return dynamic_cast<IJobTicket*>(dataPtr.GetPtr());
+	}
+
+	return nullptr;
 }
 
 
@@ -36,9 +58,9 @@ QByteArray CJobQueueManagerCompBase::GetTaskTypeId(const QByteArray& jobId) cons
 {
 	QReadLocker lock(&m_mutex);
 
-	int index = FindItemById(jobId);
-	if (index >= 0){
-		return m_jobItems[index].typeId;
+	const IJobTicket* ticketPtr = GetJobTicket(jobId);
+	if (ticketPtr){
+		return ticketPtr->GetTypeId();
 	}
 
 	return QByteArray();
@@ -53,123 +75,128 @@ QByteArray CJobQueueManagerCompBase::InsertNewJobIntoQueue(
 			const IJobSchedulerParams* /*schedulerParamsPtr*/,
 			ilog::IMessageConsumer* /*logPtr*/)
 {
-	DirectoryBlocker blockDirectory(*this);
-
-	JobItem jobItem;
-
-	jobItem.contextId = contextId;
-	jobItem.uuid = QUuid::createUuid().toByteArray();
-	jobItem.typeId = typeId;
-	jobItem.processingStatus = PS_WAITING_FOR_ACCEPTING;
-	
-	if (!jobItem.input.CopyFrom(input)){
+	if (!m_jobTicketsCollectionCompPtr.IsValid()){
+		SendErrorMessage(0, "Job tickets collection is not set");
 		return QByteArray();
 	}
 
-	if (jobProcessingParamsPtr != nullptr){
-		jobItem.paramsPtr.FromUnique(CreateJobParameters(contextId, typeId, jobProcessingParamsPtr));
-		if (!jobItem.paramsPtr.IsValid()){
-			SendErrorMessage(0, "Job parameters could not be created");
+	QByteArray jobId = QUuid::createUuid().toByteArray();
 
+	// Create a new job ticket
+	CJobTicket jobTicket;
+	jobTicket.SetUuid(jobId);
+	jobTicket.SetContextId(contextId);
+	jobTicket.SetTypeId(typeId);
+	jobTicket.SetProcessingStatus(PS_WAITING_FOR_ACCEPTING);
+	jobTicket.SetInput(input);
+
+	if (jobProcessingParamsPtr != nullptr){
+		iprm::IParamsSetUniquePtr paramsPtr = CreateJobParameters(contextId, typeId, jobProcessingParamsPtr);
+		if (!paramsPtr){
+			SendErrorMessage(0, "Job parameters could not be created");
 			return QByteArray();
 		}
+		jobTicket.SetParams(paramsPtr.release());
 	}
-
-	istd::IChangeable::ChangeSet changeSet = istd::IChangeable::GetAnyChange();
-	imtbase::ICollectionInfo::NotifierInfo info;
-	info.elementId = jobItem.uuid;
-	changeSet.SetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_INSERTED, QVariant::fromValue(info));
-
-	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 	QWriteLocker lock(&m_mutex);
 
-	m_jobItems.push_back(jobItem);
-
-	SaveJobItem(jobItem);
+	imtbase::IObjectCollection::Id insertedId = m_jobTicketsCollectionCompPtr->InsertNewObject(
+				typeId,
+				QString(),
+				QString(),
+				&jobTicket,
+				jobId);
 
 	lock.unlock();
 
-	return jobItem.uuid;
+	if (insertedId.isEmpty()){
+		SendErrorMessage(0, "Failed to insert job ticket into collection");
+		return QByteArray();
+	}
+
+	return insertedId;
 }
 
 
 bool CJobQueueManagerCompBase::CancelJob(const QByteArray & jobId)
 {
-	DirectoryBlocker blockDirectory(*this);
+	if (!m_jobTicketsCollectionCompPtr.IsValid()){
+		return false;
+	}
 
 	QWriteLocker lock(&m_mutex);
 
-	int index = FindItemById(jobId);
-	if (index >= 0){
-		JobItem& item = m_jobItems[index];
-
-		istd::IChangeable::ChangeSet changeSet = istd::IChangeable::GetAnyChange();
-		std::unique_ptr<istd::CChangeNotifier> notifierPtr;
-
-		if (item.processingStatus < PS_RUNNING){
-			JobStatusInfo info;
-			info.elementId = jobId;
-			info.status = PS_CANCELED;
-
-			changeSet.SetChangeInfo(IJobQueueManager::CN_JOB_STATUS_CHANGED, QVariant::fromValue(info));
-
-			notifierPtr.reset(new istd::CChangeNotifier(this, &changeSet));
-
-			item.processingStatus = PS_CANCELED;
-		}
-
-		if (item.processingStatus == PS_RUNNING){
-			JobStatusInfo info;
-			info.elementId = jobId;
-			info.status = PS_CANCELING;
-
-			changeSet.SetChangeInfo(IJobQueueManager::CN_JOB_STATUS_CHANGED, QVariant::fromValue(info));
-
-			notifierPtr.reset(new istd::CChangeNotifier(this, &changeSet));
-
-			item.processingStatus = PS_CANCELING;
-		}
-
-		SaveJobItem(item);
-
-		lock.unlock();
-
-		return true;
+	IJobTicket* ticketPtr = GetJobTicket(jobId);
+	if (!ticketPtr){
+		return false;
 	}
 
-	return false;
+	ProcessingStatus currentStatus = ticketPtr->GetProcessingStatus();
+	ProcessingStatus newStatus = currentStatus;
+
+	if (currentStatus < PS_RUNNING){
+		newStatus = PS_CANCELED;
+	}
+	else if (currentStatus == PS_RUNNING){
+		newStatus = PS_CANCELING;
+	}
+	else{
+		lock.unlock();
+		return false;
+	}
+
+	istd::IChangeable::ChangeSet changeSet = istd::IChangeable::GetAnyChange();
+	JobStatusInfo info;
+	info.elementId = jobId;
+	info.status = newStatus;
+
+	changeSet.SetChangeInfo(IJobQueueManager::CN_JOB_STATUS_CHANGED, QVariant::fromValue(info));
+
+	istd::CChangeNotifier changeNotifier(this, &changeSet);
+
+	ticketPtr->SetProcessingStatus(newStatus);
+
+	m_jobTicketsCollectionCompPtr->SetObjectData(jobId, *ticketPtr);
+
+	lock.unlock();
+
+	return true;
 }
 
 
 bool CJobQueueManagerCompBase::ResumeJob(const QByteArray & jobId)
 {
-	DirectoryBlocker blockDirectory(*this);
+	if (!m_jobTicketsCollectionCompPtr.IsValid()){
+		return false;
+	}
 
 	QWriteLocker lock(&m_mutex);
 
-	int index = FindItemById(jobId);
-	if (index >= 0){
-		JobItem& item = m_jobItems[index];
+	IJobTicket* ticketPtr = GetJobTicket(jobId);
+	if (!ticketPtr){
+		return false;
+	}
 
-		if ((item.processingStatus == PS_CANCELED) || (item.processingStatus == PS_FINISHED)){
-			istd::IChangeable::ChangeSet changeSet = istd::IChangeable::GetAnyChange();
-			JobStatusInfo info;
-			info.elementId = jobId;
-			info.status = PS_WAITING_FOR_PROCESSING;
+	ProcessingStatus currentStatus = ticketPtr->GetProcessingStatus();
 
-			changeSet.SetChangeInfo(IJobQueueManager::CN_JOB_STATUS_CHANGED, QVariant::fromValue(info));
+	if ((currentStatus == PS_CANCELED) || (currentStatus == PS_FINISHED)){
+		istd::IChangeable::ChangeSet changeSet = istd::IChangeable::GetAnyChange();
+		JobStatusInfo info;
+		info.elementId = jobId;
+		info.status = PS_WAITING_FOR_PROCESSING;
 
-			istd::CChangeNotifier changeNotifier(this, &changeSet);
+		changeSet.SetChangeInfo(IJobQueueManager::CN_JOB_STATUS_CHANGED, QVariant::fromValue(info));
 
-			item.processingStatus = PS_WAITING_FOR_PROCESSING;
+		istd::CChangeNotifier changeNotifier(this, &changeSet);
 
-			SaveJobItem(item);
+		ticketPtr->SetProcessingStatus(PS_WAITING_FOR_PROCESSING);
 
-			lock.unlock();
+		m_jobTicketsCollectionCompPtr->SetObjectData(jobId, *ticketPtr);
 
-			return true;
-		}
+		lock.unlock();
+
+		return true;
 	}
 
 	lock.unlock();
@@ -180,42 +207,39 @@ bool CJobQueueManagerCompBase::ResumeJob(const QByteArray & jobId)
 
 bool CJobQueueManagerCompBase::RemoveJob(const QByteArray& jobId)
 {
-	DirectoryBlocker blockDirectory(*this);
+	if (!m_jobTicketsCollectionCompPtr.IsValid()){
+		return false;
+	}
 
 	QWriteLocker lock(&m_mutex);
 
-	int index = FindItemById(jobId);
-	if (index >= 0){
-		// Job is running:
-		const JobItem& item = m_jobItems[index];
-		if (m_jobItems[index].processingStatus > PS_NONE && m_jobItems[index].processingStatus < PS_CANCELED){
-			if (!CancelJob(jobId)){
-				lock.unlock();
-			
-				return false;
-			}
-		}
-
-		istd::IChangeable::ChangeSet changeSet = istd::IChangeable::GetAnyChange();
-		imtbase::ICollectionInfo::ElementsRemoveInfo info;
-		info.elementIds << jobId;
-
-		changeSet.SetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENTS_REMOVED, QVariant::fromValue(info));
-
-		istd::CChangeNotifier changeNotifier(this, &changeSet);
-
-		QFile::remove(GetJobItemPath(item.uuid));
-
-		m_jobItems.removeAt(index);
-
-		lock.unlock();
-
-		return true;
+	const IJobTicket* ticketPtr = GetJobTicket(jobId);
+	if (!ticketPtr){
+		return false;
 	}
+
+	// Job is running - cancel it first:
+	ProcessingStatus status = ticketPtr->GetProcessingStatus();
+	if (status > PS_NONE && status < PS_CANCELED){
+		if (!CancelJob(jobId)){
+			lock.unlock();
+			return false;
+		}
+	}
+
+	istd::IChangeable::ChangeSet changeSet = istd::IChangeable::GetAnyChange();
+	imtbase::ICollectionInfo::ElementsRemoveInfo info;
+	info.elementIds << jobId;
+
+	changeSet.SetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENTS_REMOVED, QVariant::fromValue(info));
+
+	istd::CChangeNotifier changeNotifier(this, &changeSet);
+
+	bool result = m_jobTicketsCollectionCompPtr->RemoveElements(imtbase::IObjectCollection::Ids() << jobId);
 
 	lock.unlock();
 
-	return false;
+	return result;
 }
 
 
@@ -226,21 +250,25 @@ bool CJobQueueManagerCompBase::GetJobConfiguration(
 {
 	QReadLocker lock(&m_mutex);
 
-	int index = FindItemById(jobId);
-	if (index >= 0){
-		const JobItem& jobItem = m_jobItems[index];
-		
-		if (input.CopyFrom(jobItem.input)){
-			if (jobItem.paramsPtr.IsValid()){
-				processingParamsPtr.FromUnique(CreateJobParameters(jobItem.contextId, jobItem.typeId, nullptr));
-				if (processingParamsPtr.IsValid()){
-					return processingParamsPtr->CopyFrom(*jobItem.paramsPtr);
-				}
-			}
+	const IJobTicket* ticketPtr = GetJobTicket(jobId);
+	if (!ticketPtr){
+		return false;
+	}
+
+	const imtbase::IReferenceCollection* inputPtr = ticketPtr->GetInput();
+	if (!inputPtr || !input.CopyFrom(*inputPtr)){
+		return false;
+	}
+
+	const iprm::IParamsSet* paramsPtr = ticketPtr->GetParams();
+	if (paramsPtr){
+		processingParamsPtr.FromUnique(CreateJobParameters(ticketPtr->GetContextId(), ticketPtr->GetTypeId(), nullptr));
+		if (processingParamsPtr.IsValid()){
+			return processingParamsPtr->CopyFrom(*paramsPtr);
 		}
 	}
 
-	return false;
+	return true;
 }
 
 
@@ -248,9 +276,9 @@ CJobQueueManagerCompBase::ProcessingStatus CJobQueueManagerCompBase::GetProcessi
 {
 	QReadLocker lock(&m_mutex);
 
-	int index = FindItemById(jobId);
-	if (index >= 0){
-		return m_jobItems[index].processingStatus;
+	const IJobTicket* ticketPtr = GetJobTicket(jobId);
+	if (ticketPtr){
+		return ticketPtr->GetProcessingStatus();
 	}
 
 	return PS_NONE;
@@ -259,29 +287,29 @@ CJobQueueManagerCompBase::ProcessingStatus CJobQueueManagerCompBase::GetProcessi
 
 bool CJobQueueManagerCompBase::SetProcessingStatus(const QByteArray & jobId, ProcessingStatus status)
 {
-	DirectoryBlocker blockDirectory(*this);
-
-	int index = FindItemById(jobId);
-	if (index >= 0){
-		JobItem& item = m_jobItems[index];
-
-		istd::IChangeable::ChangeSet changeSet = istd::IChangeable::GetAnyChange();
-		JobStatusInfo info;
-		info.elementId = jobId;
-		info.status = status;
-
-		changeSet.SetChangeInfo(IJobQueueManager::CN_JOB_STATUS_CHANGED, QVariant::fromValue(info));
-
-		istd::CChangeNotifier changeNotifier(this, &changeSet);
-
-		item.processingStatus = status;
-
-		SaveJobItem(item);
-
-		return true;
+	if (!m_jobTicketsCollectionCompPtr.IsValid()){
+		return false;
 	}
 
-	return false;
+	IJobTicket* ticketPtr = GetJobTicket(jobId);
+	if (!ticketPtr){
+		return false;
+	}
+
+	istd::IChangeable::ChangeSet changeSet = istd::IChangeable::GetAnyChange();
+	JobStatusInfo info;
+	info.elementId = jobId;
+	info.status = status;
+
+	changeSet.SetChangeInfo(IJobQueueManager::CN_JOB_STATUS_CHANGED, QVariant::fromValue(info));
+
+	istd::CChangeNotifier changeNotifier(this, &changeSet);
+
+	ticketPtr->SetProcessingStatus(status);
+
+	m_jobTicketsCollectionCompPtr->SetObjectData(jobId, *ticketPtr);
+
+	return true;
 }
 
 
@@ -289,9 +317,9 @@ double CJobQueueManagerCompBase::GetProgress(const QByteArray & jobId) const
 {
 	QReadLocker lock(&m_mutex);
 
-	int index = FindItemById(jobId);
-	if (index >= 0){
-		return m_jobItems[index].progress;
+	const IJobTicket* ticketPtr = GetJobTicket(jobId);
+	if (ticketPtr){
+		return ticketPtr->GetProgress();
 	}
 
 	return 0.0;
@@ -300,26 +328,30 @@ double CJobQueueManagerCompBase::GetProgress(const QByteArray & jobId) const
 
 bool CJobQueueManagerCompBase::SetProgress(const QByteArray& jobId, double progress)
 {
-	int index = FindItemById(jobId);
-	if (index >= 0){
-		JobItem& item = m_jobItems[index];
+	if (!m_jobTicketsCollectionCompPtr.IsValid()){
+		return false;
+	}
 
-		if (!qFuzzyCompare(item.progress, progress)){
-			istd::IChangeable::ChangeSet changeSet = istd::IChangeable::GetAnyChange();
-			JobProgressInfo info;
-			info.elementId = jobId;
-			info.progress = progress;
+	IJobTicket* ticketPtr = GetJobTicket(jobId);
+	if (!ticketPtr){
+		return false;
+	}
 
-			changeSet.SetChangeInfo(IJobQueueManager::CN_JOB_PROGRESS_CHANGED, QVariant::fromValue(info));
+	if (!qFuzzyCompare(ticketPtr->GetProgress(), progress)){
+		istd::IChangeable::ChangeSet changeSet = istd::IChangeable::GetAnyChange();
+		JobProgressInfo info;
+		info.elementId = jobId;
+		info.progress = progress;
 
-			istd::CChangeNotifier changeNotifier(this, &changeSet);
+		changeSet.SetChangeInfo(IJobQueueManager::CN_JOB_PROGRESS_CHANGED, QVariant::fromValue(info));
 
-			item.progress = progress;
+		istd::CChangeNotifier changeNotifier(this, &changeSet);
 
-			SaveJobItem(item);
+		ticketPtr->SetProgress(progress);
 
-			return true;
-		}
+		m_jobTicketsCollectionCompPtr->SetObjectData(jobId, *ticketPtr);
+
+		return true;
 	}
 
 	return false;
@@ -330,9 +362,12 @@ bool CJobQueueManagerCompBase::GetJobResult(const QByteArray& jobId, IJobOutput&
 {
 	QReadLocker lock(&m_mutex);
 
-	int index = FindItemById(jobId);
-	if (index >= 0){
-		return result.CopyFrom(m_jobItems[index].results);
+	const IJobTicket* ticketPtr = GetJobTicket(jobId);
+	if (ticketPtr){
+		const IJobOutput* resultsPtr = ticketPtr->GetResults();
+		if (resultsPtr){
+			return result.CopyFrom(*resultsPtr);
+		}
 	}
 
 	return false;
@@ -341,25 +376,30 @@ bool CJobQueueManagerCompBase::GetJobResult(const QByteArray& jobId, IJobOutput&
 
 bool CJobQueueManagerCompBase::SetJobResult(const QByteArray& jobId, const IJobOutput& result)
 {
-	int index = FindItemById(jobId);
-	if (index >= 0){
-		JobItem& item = m_jobItems[index];
+	if (!m_jobTicketsCollectionCompPtr.IsValid()){
+		return false;
+	}
 
-		if (!result.IsEqual(item.results)){
-			istd::IChangeable::ChangeSet changeSet = istd::IChangeable::GetAnyChange();
-			JobResultInfo info;
-			info.elementId = jobId;
+	IJobTicket* ticketPtr = GetJobTicket(jobId);
+	if (!ticketPtr){
+		return false;
+	}
 
-			changeSet.SetChangeInfo(IJobQueueManager::CN_JOB_RESULT_CHANGED, QVariant::fromValue(info));
+	const IJobOutput* currentResultsPtr = ticketPtr->GetResults();
+	if (!currentResultsPtr || !result.IsEqual(*currentResultsPtr)){
+		istd::IChangeable::ChangeSet changeSet = istd::IChangeable::GetAnyChange();
+		JobResultInfo info;
+		info.elementId = jobId;
 
-			istd::CChangeNotifier changeNotifier(this, &changeSet);
+		changeSet.SetChangeInfo(IJobQueueManager::CN_JOB_RESULT_CHANGED, QVariant::fromValue(info));
 
-			item.results.CopyFrom(result);
+		istd::CChangeNotifier changeNotifier(this, &changeSet);
 
-			SaveJobItem(item);
+		ticketPtr->SetResults(result);
 
-			return true;
-		}
+		m_jobTicketsCollectionCompPtr->SetObjectData(jobId, *ticketPtr);
+
+		return true;
 	}
 
 	return false;
@@ -368,11 +408,15 @@ bool CJobQueueManagerCompBase::SetJobResult(const QByteArray& jobId, const IJobO
 
 // reimplemented (imtbase::ICollectionInfo)
 
-int CJobQueueManagerCompBase::GetElementsCount(const iprm::IParamsSet* /*selectionParamPtr*/, ilog::IMessageConsumer* /*logPtr*/) const
+int CJobQueueManagerCompBase::GetElementsCount(const iprm::IParamsSet* selectionParamPtr, ilog::IMessageConsumer* logPtr) const
 {
 	QReadLocker lock(&m_mutex);
 
-	return imtbase::narrow_cast<int>(m_jobItems.size());
+	if (!m_jobTicketsCollectionCompPtr.IsValid()){
+		return 0;
+	}
+
+	return m_jobTicketsCollectionCompPtr->GetElementsCount(selectionParamPtr, logPtr);
 }
 
 
@@ -380,185 +424,92 @@ int CJobQueueManagerCompBase::GetElementsCount(const iprm::IParamsSet* /*selecti
 imtbase::ICollectionInfo::Ids CJobQueueManagerCompBase::GetElementIds(
 			int offset,
 			int count,
-			const iprm::IParamsSet* /*selectionParamsPtr*/,
-			ilog::IMessageConsumer* /*logPtr*/) const
+			const iprm::IParamsSet* selectionParamsPtr,
+			ilog::IMessageConsumer* logPtr) const
 {
 	QReadLocker lock(&m_mutex);
 
-	Ids retVal;
-
-	Q_ASSERT(offset >= 0);
-
-	qsizetype elementsCount = count >= 0 ? qMin(count, m_jobItems.size()) : m_jobItems.size();
-
-	for (int i = offset; i < elementsCount; ++i){
-		retVal.push_back(m_jobItems[i].uuid);
+	if (!m_jobTicketsCollectionCompPtr.IsValid()){
+		return Ids();
 	}
 
-	return retVal;
+	return m_jobTicketsCollectionCompPtr->GetElementIds(offset, count, selectionParamsPtr, logPtr);
 }
 
 bool CJobQueueManagerCompBase::GetSubsetInfo(
-			imtbase::ICollectionInfo& /*subsetInfo*/,
-			int /*offset*/,
-			int /*count*/,
-			const iprm::IParamsSet* /*selectionParamsPtr*/,
-			ilog::IMessageConsumer* /*logPtr*/) const
+			imtbase::ICollectionInfo& subsetInfo,
+			int offset,
+			int count,
+			const iprm::IParamsSet* selectionParamsPtr,
+			ilog::IMessageConsumer* logPtr) const
 {
-	return false;
+	if (!m_jobTicketsCollectionCompPtr.IsValid()){
+		return false;
+	}
+
+	return m_jobTicketsCollectionCompPtr->GetSubsetInfo(subsetInfo, offset, count, selectionParamsPtr, logPtr);
 }
 
 
-QVariant CJobQueueManagerCompBase::GetElementInfo(const QByteArray& elementId, int infoType, ilog::IMessageConsumer* /*logPtr*/) const
+QVariant CJobQueueManagerCompBase::GetElementInfo(const QByteArray& elementId, int infoType, ilog::IMessageConsumer* logPtr) const
 {
 	QReadLocker lock(&m_mutex);
 
-	int index = FindItemById(elementId);
-	if (index >= 0){
+	if (!m_jobTicketsCollectionCompPtr.IsValid()){
+		return QVariant();
+	}
+
+	const IJobTicket* ticketPtr = GetJobTicket(elementId);
+	if (ticketPtr){
 		switch (infoType){
 		case EIT_NAME:
-			return m_jobItems[index].name;
+			return ticketPtr->GetJobName();
 		default:
-			I_IF_DEBUG(qWarning() << __FILE__ << __LINE__ << "Unexpected info type: " << infoType;)
 			break;
 		}
 	}
 
-	return QVariant();
+	return m_jobTicketsCollectionCompPtr->GetElementInfo(elementId, infoType, logPtr);
 }
 
 
-idoc::MetaInfoPtr CJobQueueManagerCompBase::GetElementMetaInfo(const Id& /*elementId*/, ilog::IMessageConsumer* /*logPtr*/) const
+idoc::MetaInfoPtr CJobQueueManagerCompBase::GetElementMetaInfo(const Id& elementId, ilog::IMessageConsumer* logPtr) const
 {
-	return idoc::MetaInfoPtr();
-}
-
-
-bool CJobQueueManagerCompBase::SetElementName(const Id& /*elementId*/, const QString& /*name*/, ilog::IMessageConsumer* /*logPtr*/)
-{
-	return false;
-}
-
-
-bool CJobQueueManagerCompBase::SetElementDescription(const Id& /*elementId*/, const QString& /*description*/, ilog::IMessageConsumer* /*logPtr*/)
-{
-	return false;
-}
-
-
-bool CJobQueueManagerCompBase::SetElementEnabled(const Id& /*elementId*/, bool /*isEnabled*/, ilog::IMessageConsumer* /*logPtr*/)
-{
-	return false;
-}
-
-
-// protected methods
-
-bool CJobQueueManagerCompBase::SerializeJobItem(JobItem& item, iser::IArchive& archive) const
-{
-	bool retVal = true;
-
-	static iser::CArchiveTag contextIdTag("ContextId", "ID of the job context", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(contextIdTag);
-	retVal = retVal && archive.Process(item.contextId);
-	retVal = retVal && archive.EndTag(contextIdTag);
-
-	static iser::CArchiveTag uuidTag("Uuid", "UUID of the job", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(uuidTag);
-	retVal = retVal && archive.Process(item.uuid);
-	retVal = retVal && archive.EndTag(uuidTag);
-
-	static iser::CArchiveTag typeIdTag("TypeId", "Processing type-ID", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(typeIdTag);
-	retVal = retVal && archive.Process(item.typeId);
-	retVal = retVal && archive.EndTag(typeIdTag);
-
-	static iser::CArchiveTag nameTag("Name", "Name of the job", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(nameTag);
-	retVal = retVal && archive.Process(item.name);
-	retVal = retVal && archive.EndTag(nameTag);
-
-	static iser::CArchiveTag inputTag("Input", "Job input", iser::CArchiveTag::TT_GROUP);
-	retVal = retVal && archive.BeginTag(inputTag);
-	retVal = retVal && item.input.Serialize(archive);
-	retVal = retVal && archive.EndTag(inputTag);
-
-	static iser::CArchiveTag statusTag("Status", "Processing status", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(statusTag);
-	retVal = retVal && I_SERIALIZE_ENUM(ProcessingStatus, archive, item.processingStatus);
-	retVal = retVal && archive.EndTag(statusTag);
-
-	static iser::CArchiveTag progressTag("Progress", "Processing progress", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(progressTag);
-	retVal = retVal && archive.Process(item.progress);
-	retVal = retVal && archive.EndTag(progressTag);
-
-	if (retVal && !archive.IsStoring()){
-		item.paramsPtr.FromUnique(CreateJobParameters(item.contextId, item.typeId, nullptr));
+	if (!m_jobTicketsCollectionCompPtr.IsValid()){
+		return idoc::MetaInfoPtr();
 	}
 
-	if (item.paramsPtr.IsValid()){
-		static iser::CArchiveTag paramsTag("Configuration", "Processing parameters", iser::CArchiveTag::TT_GROUP);
-		retVal = retVal && archive.BeginTag(paramsTag);
-		retVal = retVal && item.paramsPtr->Serialize(archive);
-		retVal = retVal && archive.EndTag(paramsTag);
-	}
-
-	static iser::CArchiveTag resultsTag("Results", "Job results", iser::CArchiveTag::TT_GROUP);
-	retVal = retVal && archive.BeginTag(resultsTag);
-	retVal = retVal && item.results.Serialize(archive);
-	retVal = retVal && archive.EndTag(resultsTag);
-
-	return retVal;
+	return m_jobTicketsCollectionCompPtr->GetElementMetaInfo(elementId, logPtr);
 }
 
 
-QString CJobQueueManagerCompBase::SaveJobItem(const JobItem& jobItem) const
+bool CJobQueueManagerCompBase::SetElementName(const Id& elementId, const QString& name, ilog::IMessageConsumer* logPtr)
 {
-	if (!m_dataFolderCompPtr.IsValid()){
-		return QString();
+	if (!m_jobTicketsCollectionCompPtr.IsValid()){
+		return false;
 	}
 
-	QString rootFolder = m_dataFolderCompPtr->GetPath();
-	istd::CSystem::EnsurePathExists(rootFolder);
-
-	QString itemFilePath = GetJobItemPath(jobItem.uuid);
-
-	ifile::CCompactXmlFileWriteArchive archive(itemFilePath, m_versionInfoCompPtr.GetPtr());
-
-	if (!SerializeJobItem(const_cast<JobItem&>(jobItem), archive)){
-		SendErrorMessage(0, QString("Job item '%1' could not be saved into '%2'").arg(jobItem.name).arg(itemFilePath));
-
-		return QString();
-	}
-
-	return itemFilePath;
+	return m_jobTicketsCollectionCompPtr->SetElementName(elementId, name, logPtr);
 }
 
 
-QString CJobQueueManagerCompBase::GetJobItemPath(const QByteArray& jobId) const
+bool CJobQueueManagerCompBase::SetElementDescription(const Id& elementId, const QString& description, ilog::IMessageConsumer* logPtr)
 {
-	if (!m_dataFolderCompPtr.IsValid()){
-		return QString();
+	if (!m_jobTicketsCollectionCompPtr.IsValid()){
+		return false;
 	}
 
-	QString rootFolder = m_dataFolderCompPtr->GetPath();
-
-	QString itemFilePath = rootFolder + "/" + jobId + ".xml";
-
-	return itemFilePath;
+	return m_jobTicketsCollectionCompPtr->SetElementDescription(elementId, description, logPtr);
 }
 
 
-int CJobQueueManagerCompBase::FindItemById(const QByteArray& itemId) const
+bool CJobQueueManagerCompBase::SetElementEnabled(const Id& elementId, bool isEnabled, ilog::IMessageConsumer* logPtr)
 {
-	for (int i = 0; i < m_jobItems.count(); ++i){
-		if (m_jobItems[i].uuid == itemId){
-			return i;
-		}
+	if (!m_jobTicketsCollectionCompPtr.IsValid()){
+		return false;
 	}
 
-	return -1;
+	return m_jobTicketsCollectionCompPtr->SetElementEnabled(elementId, isEnabled, logPtr);
 }
 
 
@@ -568,41 +519,9 @@ void CJobQueueManagerCompBase::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	DirectoryBlocker blockDirectory(*this);
-
-	m_dataFolderCompPtr.EnsureInitialized();
-	if (!m_dataFolderCompPtr.IsValid()){
-		SendCriticalMessage(0, "Wrong component configuration. Job data folder component was not set");
-	}
-	else{
-		QString dataFolderPath = m_dataFolderCompPtr->GetPath();
-		if (dataFolderPath.isEmpty()){
-			SendErrorMessage(0, "Job data folder was not set");
-			
-			return;
-		}
-
-		if (!QFile::exists(dataFolderPath)){
-			if (!istd::CSystem::EnsurePathExists(dataFolderPath)){
-				SendErrorMessage(0, QString("Job data folder '%1' could not be created").arg(dataFolderPath));
-			
-				return;
-			}
-		}
-
-		istd::CChangeNotifier changeNotifier(this);
-
-		QWriteLocker lock(&m_mutex);
-
-		ReadJobItems(m_jobItems);
-
-		if (*m_pollFileSystemAttrPtr){
-			connect(&m_syncTimer, &QTimer::timeout, this, &CJobQueueManagerCompBase::OnSync);
-
-			m_syncTimer.start(std::chrono::seconds(1));
-		}
-
-		lock.unlock();
+	m_jobTicketsCollectionCompPtr.EnsureInitialized();
+	if (!m_jobTicketsCollectionCompPtr.IsValid()){
+		SendCriticalMessage(0, "Wrong component configuration. Job tickets collection component was not set");
 	}
 }
 
@@ -610,60 +529,6 @@ void CJobQueueManagerCompBase::OnComponentCreated()
 void CJobQueueManagerCompBase::OnComponentDestroyed()
 {
 	BaseClass::OnComponentDestroyed();
-}
-
-
-// private methods
-
-void CJobQueueManagerCompBase::ReadJobItems(JobItems& items) const
-{
-	items.clear();
-
-	if (!m_dataFolderCompPtr.IsValid()){
-		return;
-	}
-
-	QString rootFolder = m_dataFolderCompPtr->GetPath();
-	QDir itemsDir(rootFolder);
-
-	QFileInfoList itemFiles;
-	ifile::CFileListProviderComp::CreateFileList(itemsDir, 0, 0, QStringList() << "*.xml", QDir::Name, itemFiles);
-
-	for (int fileIndex = 0; fileIndex < itemFiles.count(); ++fileIndex){
-		QString itemFilePath = itemFiles[fileIndex].absoluteFilePath();
-
-		ifile::CCompactXmlFileReadArchive archive(itemFilePath);
-		JobItem jobItem;
-
-		if (!SerializeJobItem(jobItem, archive)){
-			SendErrorMessage(0, QString("Job item '%1' could not be loaded from'%2'").arg(jobItem.name).arg(itemFilePath));
-
-			QFile::remove(itemFilePath);
-
-			continue;
-		}
-
-		items.push_back(jobItem);
-	}
-}
-
-
-// private slots
-
-void CJobQueueManagerCompBase::OnSync()
-{
-	if (!m_directoryBlocked){
-		JobItems items;
-		ReadJobItems(items);
-
-		istd::CChangeNotifier changeNotifier(this);
-
-		QWriteLocker lock(&m_mutex);
-
-		m_jobItems = items;
-
-		lock.unlock();
-	}
 }
 
 

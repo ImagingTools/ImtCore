@@ -2,20 +2,20 @@
 
 
 // Qt includes
-#include <QtCore/QMap>
 #include <QtCore/QReadWriteLock>
 #include <QtCore/QObject>
-#include <QtCore/QTimer>
-#include <QtCore/QFileSystemWatcher>
 
 // ACF includes
 #include <iprm/IParamsSet.h>
 #include <iprm/IOptionsList.h>
 #include <ilog/TLoggerCompWrap.h>
-#include <ifile/IFileNameParam.h>
+
+// ImtCore includes
+#include <imtbase/IObjectCollection.h>
 
 // Acula includes
 #include <imthype/IJobQueueManager.h>
+#include <imthype/IJobTicket.h>
 #include <imthype/CStandardJobOutput.h>
 
 
@@ -34,9 +34,7 @@ public:
 
 	I_BEGIN_BASE_COMPONENT(CJobQueueManagerCompBase);
 		I_REGISTER_INTERFACE(IJobQueueManager);
-		I_ASSIGN(m_dataFolderCompPtr, "DataFolder", "Path used for persistence of the job data", true, "DataFolder");
-		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info used for persistence of the job items", true, "VersionInfo");
-		I_ASSIGN(m_pollFileSystemAttrPtr, "PollFileSystem", "If enabled, the folder with the job items will be observed and the items will be re-read on changes in the folder structure", true, false);
+		I_ASSIGN(m_jobTicketsCollectionCompPtr, "JobTicketsCollection", "External object collection containing job tickets", true, "JobTicketsCollection");
 	I_END_COMPONENT;
 
 	CJobQueueManagerCompBase();
@@ -86,75 +84,17 @@ public:
 	virtual bool SetElementEnabled(const Id& elementId, bool isEnabled = true, ilog::IMessageConsumer* logPtr = nullptr) override;
 
 protected:
-	struct JobItem
-	{
-		JobItem()
-			:processingStatus(PS_NONE),
-			progress(0.0)
-		{
-		}
-
-		QByteArray typeId;
-		QByteArray uuid;
-		QString name;
-		QByteArray contextId;
-		iprm::IParamsSetSharedPtr paramsPtr;
-		ProcessingStatus processingStatus;
-		double progress;
-
-		CStandardJobOutput results;
-		imtbase::CSimpleReferenceCollection input;
-	};
-
-	typedef QVector<JobItem> JobItems;
-
-protected:
-	virtual bool SerializeJobItem(JobItem& item, iser::IArchive& archive) const;
-	virtual QString SaveJobItem(const JobItem& jobItem) const;
-	virtual QString GetJobItemPath(const QByteArray& jobId) const;
-
-	int FindItemById(const QByteArray& itemId) const;
+	const IJobTicket* GetJobTicket(const QByteArray& jobId) const;
+	IJobTicket* GetJobTicket(const QByteArray& jobId);
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 	virtual void OnComponentDestroyed() override;
 
-private:
-	void ReadJobItems(JobItems& items) const;
-
-private Q_SLOTS:
-	void OnSync();
-
 protected:
-	I_REF(ifile::IFileNameParam, m_dataFolderCompPtr);
-	I_REF(iser::IVersionInfo, m_versionInfoCompPtr);
-	I_ATTR(bool, m_pollFileSystemAttrPtr);
-
-	JobItems m_jobItems;
-
-	bool m_directoryBlocked;
-
-	class DirectoryBlocker
-	{
-	public:
-		DirectoryBlocker(CJobQueueManagerCompBase& parent)
-			:m_parent(parent)
-		{
-			parent.m_directoryBlocked = true;
-		}
-
-		~DirectoryBlocker()
-		{
-			m_parent.m_directoryBlocked = false;
-		}
-
-	private:
-		CJobQueueManagerCompBase& m_parent;
-	};
+	I_REF(imtbase::IObjectCollection, m_jobTicketsCollectionCompPtr);
 
 	mutable QReadWriteLock m_mutex;
-
-	QTimer m_syncTimer;
 };
 
 
