@@ -2,3 +2,122 @@
 AuxInclude/
 Bin/
 Lib/
+
+# CMake build artifacts
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+cmake_uninstall.cmake
+install_manifest.txt
+CTestTestfile.cmake
+Testing/
+*.cmake.in
+_deps/
+build/
+Build/*/build/
+Build/*/*.dir/
+Makefile
+
+# Visual Studio artifacts
+# Note: We keep 3rdParty Visual Studio files tracked
+# Generated .sln and .vcxproj in Build directories
+Build/**/*.sln
+Build/**/*.vcxproj
+Build/**/*.vcxproj.filters
+*.vcxproj.user
+*.suo
+*.user
+*.sdf
+*.opensdf
+*.VC.db
+*.VC.opendb
+.vs/
+ipch/
+# Build output directories
+x64/
+Win32/
+Debug/
+Release/
+RelWithDebInfo/
+MinSizeRel/
+# Debug symbols and intermediates
+*.ilk
+*.exp
+*.pdb
+*.iobj
+*.ipdb
+
+# QMake artifacts
+*.pro.user
+*.pro.user.*
+moc_*.cpp
+qrc_*.cpp
+ui_*.h
+Makefile*
+!*.pro
+object_script.*.Release
+object_script.*.Debug
+
+# Qt artifacts
+*.qmlc
+*.jsc
+*.qm
+
+# Compiled Object files
+*.o
+*.obj
+*.lo
+*.slo
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.so.*
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.a
+*.lib
+*.la
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Conan artifacts
+conan_toolchain.cmake
+conaninfo.txt
+conanbuildinfo.*
+conan.lock
+graph_info.json
+deactivate_conanbuildenv-*.sh
+activate_conanbuildenv-*.sh
+conanrunenv-*.sh
+CMakeUserPresets.json
+
+# Python artifacts (build scripts)
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+.eggs/
+*.egg
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS-specific files
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
