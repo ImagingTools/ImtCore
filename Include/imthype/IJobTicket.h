@@ -1,6 +1,9 @@
 #pragma once
 
 
+// Qt includes
+#include <functional>
+
 // ImtCore includes
 #include <imtbase/IReferenceCollection.h>
 
@@ -24,6 +27,8 @@ public:
 		MIT_PROGRESS,
 		MIT_PROCESSING_STATUS
 	};
+
+	typedef std::function<iprm::IParamsSetUniquePtr(const QByteArray& contextId, const QByteArray& typeId)> ParamsFactoryFunction;
 
 	virtual QByteArray GetTypeId() const = 0;
 	virtual void SetTypeId(const QByteArray& typeId) = 0;
@@ -51,6 +56,8 @@ public:
 
 	virtual const imtbase::IReferenceCollection* GetInput() const = 0;
 	virtual void SetInput(const imtbase::IReferenceCollection& input) = 0;
+
+	virtual void SetParamsFactory(const ParamsFactoryFunction& factory) = 0;
 };
 
 

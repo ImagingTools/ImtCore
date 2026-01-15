@@ -36,6 +36,10 @@ IJobTicketSharedPtr CJobQueueManagerCompBase::GetJobTicket(const QByteArray& job
 	if (m_jobTicketsCollectionCompPtr->GetObjectData(jobId, dataPtr)){
 		IJobTicket* ticketPtr = dynamic_cast<IJobTicket*>(dataPtr.GetPtr());
 		if (ticketPtr){
+			// Set params factory for proper deserialization
+			ticketPtr->SetParamsFactory([this](const QByteArray& ctx, const QByteArray& type) {
+				return CreateJobParameters(ctx, type, nullptr);
+			});
 			return IJobTicketSharedPtr(dataPtr, ticketPtr);
 		}
 	}
@@ -81,6 +85,11 @@ QByteArray CJobQueueManagerCompBase::InsertNewJobIntoQueue(
 	jobTicket.SetTypeId(typeId);
 	jobTicket.SetProcessingStatus(PS_WAITING_FOR_ACCEPTING);
 	jobTicket.SetInput(input);
+
+	// Set params factory for proper deserialization
+	jobTicket.SetParamsFactory([this](const QByteArray& ctx, const QByteArray& type) {
+		return CreateJobParameters(ctx, type, nullptr);
+	});
 
 	if (jobProcessingParamsPtr != nullptr){
 		iprm::IParamsSetUniquePtr paramsPtr = CreateJobParameters(contextId, typeId, jobProcessingParamsPtr);

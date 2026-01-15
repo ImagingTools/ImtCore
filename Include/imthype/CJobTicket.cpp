@@ -160,6 +160,12 @@ void CJobTicket::SetInput(const imtbase::IReferenceCollection& input)
 }
 
 
+void CJobTicket::SetParamsFactory(const ParamsFactoryFunction& factory)
+{
+	m_paramsFactory = factory;
+}
+
+
 // reimplemented (iser::ISerializable)
 
 bool CJobTicket::Serialize(iser::IArchive& archive)
@@ -203,8 +209,11 @@ bool CJobTicket::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_progress);
 	retVal = retVal && archive.EndTag(progressTag);
 
-	// Note: Parameters require factory context for proper deserialization.
-	// The IObjectCollection implementation is responsible for ensuring proper param creation.
+	// Create params object during deserialization if factory is set
+	if (retVal && !archive.IsStoring() && m_paramsFactory){
+		m_paramsPtr.FromUnique(m_paramsFactory(m_contextId, m_typeId));
+	}
+
 	if (m_paramsPtr.IsValid()){
 		static iser::CArchiveTag paramsTag("Configuration", "Processing parameters", iser::CArchiveTag::TT_GROUP);
 		retVal = retVal && archive.BeginTag(paramsTag);
