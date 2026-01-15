@@ -221,10 +221,11 @@ bool CJobQueueManagerCompBase::RemoveJob(const QByteArray& jobId)
 	// Job is running - cancel it first:
 	ProcessingStatus status = ticketPtr->GetProcessingStatus();
 	if (status > PS_NONE && status < PS_CANCELED){
+		lock.unlock();
 		if (!CancelJob(jobId)){
-			lock.unlock();
 			return false;
 		}
+		lock.relock();
 	}
 
 	istd::IChangeable::ChangeSet changeSet = istd::IChangeable::GetAnyChange();
@@ -291,6 +292,8 @@ bool CJobQueueManagerCompBase::SetProcessingStatus(const QByteArray & jobId, Pro
 		return false;
 	}
 
+	QWriteLocker lock(&m_mutex);
+
 	IJobTicket* ticketPtr = GetJobTicket(jobId);
 	if (!ticketPtr){
 		return false;
@@ -308,6 +311,8 @@ bool CJobQueueManagerCompBase::SetProcessingStatus(const QByteArray & jobId, Pro
 	ticketPtr->SetProcessingStatus(status);
 
 	m_jobTicketsCollectionCompPtr->SetObjectData(jobId, *ticketPtr);
+
+	lock.unlock();
 
 	return true;
 }
@@ -332,6 +337,8 @@ bool CJobQueueManagerCompBase::SetProgress(const QByteArray& jobId, double progr
 		return false;
 	}
 
+	QWriteLocker lock(&m_mutex);
+
 	IJobTicket* ticketPtr = GetJobTicket(jobId);
 	if (!ticketPtr){
 		return false;
@@ -351,8 +358,12 @@ bool CJobQueueManagerCompBase::SetProgress(const QByteArray& jobId, double progr
 
 		m_jobTicketsCollectionCompPtr->SetObjectData(jobId, *ticketPtr);
 
+		lock.unlock();
+
 		return true;
 	}
+
+	lock.unlock();
 
 	return false;
 }
@@ -380,6 +391,8 @@ bool CJobQueueManagerCompBase::SetJobResult(const QByteArray& jobId, const IJobO
 		return false;
 	}
 
+	QWriteLocker lock(&m_mutex);
+
 	IJobTicket* ticketPtr = GetJobTicket(jobId);
 	if (!ticketPtr){
 		return false;
@@ -399,8 +412,12 @@ bool CJobQueueManagerCompBase::SetJobResult(const QByteArray& jobId, const IJobO
 
 		m_jobTicketsCollectionCompPtr->SetObjectData(jobId, *ticketPtr);
 
+		lock.unlock();
+
 		return true;
 	}
+
+	lock.unlock();
 
 	return false;
 }
