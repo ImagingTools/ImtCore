@@ -226,6 +226,12 @@ bool CJobQueueManagerCompBase::RemoveJob(const QByteArray& jobId)
 			return false;
 		}
 		lock.relock();
+		
+		// Re-check that the ticket still exists after relock
+		ticketPtr = GetJobTicket(jobId);
+		if (!ticketPtr){
+			return false;
+		}
 	}
 
 	istd::IChangeable::ChangeSet changeSet = istd::IChangeable::GetAnyChange();
@@ -264,8 +270,11 @@ bool CJobQueueManagerCompBase::GetJobConfiguration(
 	const iprm::IParamsSet* paramsPtr = ticketPtr->GetParams();
 	if (paramsPtr){
 		processingParamsPtr.FromUnique(CreateJobParameters(ticketPtr->GetContextId(), ticketPtr->GetTypeId(), nullptr));
-		if (processingParamsPtr.IsValid()){
-			return processingParamsPtr->CopyFrom(*paramsPtr);
+		if (!processingParamsPtr.IsValid()){
+			return false;
+		}
+		if (!processingParamsPtr->CopyFrom(*paramsPtr)){
+			return false;
 		}
 	}
 
