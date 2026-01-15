@@ -209,15 +209,18 @@ bool CJobTicket::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_progress);
 	retVal = retVal && archive.EndTag(progressTag);
 
-	// Create params object during deserialization if factory is set
-	if (retVal && !archive.IsStoring() && m_paramsFactory){
-		m_paramsPtr.FromUnique(m_paramsFactory(m_contextId, m_typeId));
-	}
-
-	if (m_paramsPtr.IsValid()){
-		static iser::CArchiveTag paramsTag("Configuration", "Processing parameters", iser::CArchiveTag::TT_GROUP);
-		retVal = retVal && archive.BeginTag(paramsTag);
-		retVal = retVal && m_paramsPtr->Serialize(archive);
+	// Handle params serialization/deserialization
+	static iser::CArchiveTag paramsTag("Configuration", "Processing parameters", iser::CArchiveTag::TT_GROUP);
+	if (retVal && archive.BeginTag(paramsTag)){
+		// Create params object during deserialization if factory is set
+		if (!archive.IsStoring() && !m_paramsPtr.IsValid() && m_paramsFactory){
+			m_paramsPtr.FromUnique(m_paramsFactory(m_contextId, m_typeId));
+		}
+		
+		if (m_paramsPtr.IsValid()){
+			retVal = retVal && m_paramsPtr->Serialize(archive);
+		}
+		
 		retVal = retVal && archive.EndTag(paramsTag);
 	}
 
