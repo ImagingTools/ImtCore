@@ -142,7 +142,6 @@ bool CJobQueueManagerCompBase::CancelJob(const QByteArray & jobId)
 		newStatus = PS_CANCELING;
 	}
 	else{
-		lock.unlock();
 		return false;
 	}
 
@@ -158,8 +157,6 @@ bool CJobQueueManagerCompBase::CancelJob(const QByteArray & jobId)
 	ticketPtr->SetProcessingStatus(newStatus);
 
 	m_jobTicketsCollectionCompPtr->SetObjectData(jobId, *ticketPtr);
-
-	lock.unlock();
 
 	return true;
 }
@@ -194,12 +191,8 @@ bool CJobQueueManagerCompBase::ResumeJob(const QByteArray & jobId)
 
 		m_jobTicketsCollectionCompPtr->SetObjectData(jobId, *ticketPtr);
 
-		lock.unlock();
-
 		return true;
 	}
-
-	lock.unlock();
 
 	return false;
 }
@@ -243,8 +236,6 @@ bool CJobQueueManagerCompBase::RemoveJob(const QByteArray& jobId)
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 	bool result = m_jobTicketsCollectionCompPtr->RemoveElements(imtbase::IObjectCollection::Ids() << jobId);
-
-	lock.unlock();
 
 	return result;
 }
@@ -321,8 +312,6 @@ bool CJobQueueManagerCompBase::SetProcessingStatus(const QByteArray & jobId, Pro
 
 	m_jobTicketsCollectionCompPtr->SetObjectData(jobId, *ticketPtr);
 
-	lock.unlock();
-
 	return true;
 }
 
@@ -367,12 +356,8 @@ bool CJobQueueManagerCompBase::SetProgress(const QByteArray& jobId, double progr
 
 		m_jobTicketsCollectionCompPtr->SetObjectData(jobId, *ticketPtr);
 
-		lock.unlock();
-
 		return true;
 	}
-
-	lock.unlock();
 
 	return false;
 }
@@ -421,12 +406,8 @@ bool CJobQueueManagerCompBase::SetJobResult(const QByteArray& jobId, const IJobO
 
 		m_jobTicketsCollectionCompPtr->SetObjectData(jobId, *ticketPtr);
 
-		lock.unlock();
-
 		return true;
 	}
-
-	lock.unlock();
 
 	return false;
 }
