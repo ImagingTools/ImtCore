@@ -3,19 +3,40 @@
 echo "Running post-merge hook..."
 
 REPO_ROOT="$(pwd)"
-BAT_FILE="$REPO_ROOT/Build/Git/UpdateVersion.bat"
 
-echo "Looking for: $BAT_FILE"
-
-if [ -f "$BAT_FILE" ]; then
-    echo "Executing $BAT_FILE..."
-    cd "$REPO_ROOT"
-    cmd //c "$BAT_FILE"
-else
-    echo "Error: $BAT_FILE not found"
-    echo "Checking Build/Git directory:"
-    ls -la "Build/Git/" 2>/dev/null || echo "Directory Build/Git does not exist"
-    exit 1
-fi
+# Detect OS
+OS_TYPE="$(uname -s)"
+case "$OS_TYPE" in
+    MINGW*|MSYS*|CYGWIN*)
+        # Windows
+        SCRIPT="$REPO_ROOT/Build/Git/UpdateVersion.bat"
+        echo "Detected Windows, using: $SCRIPT"
+        if [ -f "$SCRIPT" ]; then
+            echo "Executing $SCRIPT..."
+            cd "$REPO_ROOT"
+            cmd //c "$SCRIPT"
+        else
+            echo "Error: $SCRIPT not found"
+            exit 1
+        fi
+        ;;
+    Linux*|Darwin*)
+        # Linux or macOS
+        SCRIPT="$REPO_ROOT/Build/Git/UpdateVersion.sh"
+        echo "Detected Unix-like OS ($OS_TYPE), using: $SCRIPT"
+        if [ -f "$SCRIPT" ]; then
+            echo "Executing $SCRIPT..."
+            cd "$REPO_ROOT"
+            bash "$SCRIPT"
+        else
+            echo "Error: $SCRIPT not found"
+            exit 1
+        fi
+        ;;
+    *)
+        echo "Error: Unsupported OS type: $OS_TYPE"
+        exit 1
+        ;;
+esac
 
 echo "Post-merge hook completed"
