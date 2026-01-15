@@ -84,8 +84,7 @@ public:
 	virtual bool SetElementEnabled(const Id& elementId, bool isEnabled = true, ilog::IMessageConsumer* logPtr = nullptr) override;
 
 protected:
-	const IJobTicket* GetJobTicket(const QByteArray& jobId) const;
-	IJobTicket* GetJobTicket(const QByteArray& jobId);
+	IJobTicketSharedPtr GetJobTicket(const QByteArray& jobId) const;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;

@@ -54,6 +54,9 @@ public:
 };
 
 
+typedef istd::TSharedInterfacePtr<IJobTicket> IJobTicketSharedPtr;
+
+
 } // namespace imthype
 
 

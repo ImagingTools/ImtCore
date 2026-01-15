@@ -26,29 +26,21 @@ CJobQueueManagerCompBase::CJobQueueManagerCompBase()
 
 // protected methods
 
-const IJobTicket* CJobQueueManagerCompBase::GetJobTicket(const QByteArray& jobId) const
+IJobTicketSharedPtr CJobQueueManagerCompBase::GetJobTicket(const QByteArray& jobId) const
 {
 	if (!m_jobTicketsCollectionCompPtr.IsValid()){
-		return nullptr;
-	}
-
-	const istd::IChangeable* objectPtr = m_jobTicketsCollectionCompPtr->GetObjectPtr(jobId);
-	return dynamic_cast<const IJobTicket*>(objectPtr);
-}
-
-
-IJobTicket* CJobQueueManagerCompBase::GetJobTicket(const QByteArray& jobId)
-{
-	if (!m_jobTicketsCollectionCompPtr.IsValid()){
-		return nullptr;
+		return IJobTicketSharedPtr();
 	}
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_jobTicketsCollectionCompPtr->GetObjectData(jobId, dataPtr)){
-		return dynamic_cast<IJobTicket*>(dataPtr.GetPtr());
+		IJobTicket* ticketPtr = dynamic_cast<IJobTicket*>(dataPtr.GetPtr());
+		if (ticketPtr){
+			return IJobTicketSharedPtr(dataPtr, ticketPtr);
+		}
 	}
 
-	return nullptr;
+	return IJobTicketSharedPtr();
 }
 
 
@@ -58,7 +50,7 @@ QByteArray CJobQueueManagerCompBase::GetTaskTypeId(const QByteArray& jobId) cons
 {
 	QReadLocker lock(&m_mutex);
 
-	const IJobTicket* ticketPtr = GetJobTicket(jobId);
+	IJobTicketSharedPtr ticketPtr = GetJobTicket(jobId);
 	if (ticketPtr){
 		return ticketPtr->GetTypeId();
 	}
@@ -127,7 +119,7 @@ bool CJobQueueManagerCompBase::CancelJob(const QByteArray & jobId)
 
 	QWriteLocker lock(&m_mutex);
 
-	IJobTicket* ticketPtr = GetJobTicket(jobId);
+	IJobTicketSharedPtr ticketPtr = GetJobTicket(jobId);
 	if (!ticketPtr){
 		return false;
 	}
@@ -170,7 +162,7 @@ bool CJobQueueManagerCompBase::ResumeJob(const QByteArray & jobId)
 
 	QWriteLocker lock(&m_mutex);
 
-	IJobTicket* ticketPtr = GetJobTicket(jobId);
+	IJobTicketSharedPtr ticketPtr = GetJobTicket(jobId);
 	if (!ticketPtr){
 		return false;
 	}
@@ -206,7 +198,7 @@ bool CJobQueueManagerCompBase::RemoveJob(const QByteArray& jobId)
 
 	QWriteLocker lock(&m_mutex);
 
-	const IJobTicket* ticketPtr = GetJobTicket(jobId);
+	IJobTicketSharedPtr ticketPtr = GetJobTicket(jobId);
 	if (!ticketPtr){
 		return false;
 	}
@@ -248,7 +240,7 @@ bool CJobQueueManagerCompBase::GetJobConfiguration(
 {
 	QReadLocker lock(&m_mutex);
 
-	const IJobTicket* ticketPtr = GetJobTicket(jobId);
+	IJobTicketSharedPtr ticketPtr = GetJobTicket(jobId);
 	if (!ticketPtr){
 		return false;
 	}
@@ -277,7 +269,7 @@ CJobQueueManagerCompBase::ProcessingStatus CJobQueueManagerCompBase::GetProcessi
 {
 	QReadLocker lock(&m_mutex);
 
-	const IJobTicket* ticketPtr = GetJobTicket(jobId);
+	IJobTicketSharedPtr ticketPtr = GetJobTicket(jobId);
 	if (ticketPtr){
 		return ticketPtr->GetProcessingStatus();
 	}
@@ -294,7 +286,7 @@ bool CJobQueueManagerCompBase::SetProcessingStatus(const QByteArray & jobId, Pro
 
 	QWriteLocker lock(&m_mutex);
 
-	IJobTicket* ticketPtr = GetJobTicket(jobId);
+	IJobTicketSharedPtr ticketPtr = GetJobTicket(jobId);
 	if (!ticketPtr){
 		return false;
 	}
@@ -320,7 +312,7 @@ double CJobQueueManagerCompBase::GetProgress(const QByteArray & jobId) const
 {
 	QReadLocker lock(&m_mutex);
 
-	const IJobTicket* ticketPtr = GetJobTicket(jobId);
+	IJobTicketSharedPtr ticketPtr = GetJobTicket(jobId);
 	if (ticketPtr){
 		return ticketPtr->GetProgress();
 	}
@@ -337,7 +329,7 @@ bool CJobQueueManagerCompBase::SetProgress(const QByteArray& jobId, double progr
 
 	QWriteLocker lock(&m_mutex);
 
-	IJobTicket* ticketPtr = GetJobTicket(jobId);
+	IJobTicketSharedPtr ticketPtr = GetJobTicket(jobId);
 	if (!ticketPtr){
 		return false;
 	}
@@ -367,7 +359,7 @@ bool CJobQueueManagerCompBase::GetJobResult(const QByteArray& jobId, IJobOutput&
 {
 	QReadLocker lock(&m_mutex);
 
-	const IJobTicket* ticketPtr = GetJobTicket(jobId);
+	IJobTicketSharedPtr ticketPtr = GetJobTicket(jobId);
 	if (ticketPtr){
 		const IJobOutput* resultsPtr = ticketPtr->GetResults();
 		if (resultsPtr){
@@ -387,7 +379,7 @@ bool CJobQueueManagerCompBase::SetJobResult(const QByteArray& jobId, const IJobO
 
 	QWriteLocker lock(&m_mutex);
 
-	IJobTicket* ticketPtr = GetJobTicket(jobId);
+	IJobTicketSharedPtr ticketPtr = GetJobTicket(jobId);
 	if (!ticketPtr){
 		return false;
 	}
@@ -466,7 +458,7 @@ QVariant CJobQueueManagerCompBase::GetElementInfo(const QByteArray& elementId, i
 		return QVariant();
 	}
 
-	const IJobTicket* ticketPtr = GetJobTicket(elementId);
+	IJobTicketSharedPtr ticketPtr = GetJobTicket(elementId);
 	if (ticketPtr){
 		switch (infoType){
 		case EIT_NAME:
