@@ -88,15 +88,15 @@ void CJobTicket::SetContextId(const QByteArray& contextId)
 }
 
 
-const iprm::IParamsSet* CJobTicket::GetParams() const
+iprm::IParamsSetSharedPtr CJobTicket::GetParams() const
 {
-	return m_paramsPtr.GetPtr();
+	return m_paramsPtr;
 }
 
 
-void CJobTicket::SetParams(iprm::IParamsSet* paramsPtr)
+void CJobTicket::SetParams(const iprm::IParamsSetSharedPtr& paramsPtr)
 {
-	m_paramsPtr.SetPtr(paramsPtr);
+	m_paramsPtr = paramsPtr;
 }
 
 
@@ -214,7 +214,7 @@ bool CJobTicket::Serialize(iser::IArchive& archive)
 	if (retVal && archive.BeginTag(paramsTag)){
 		// Create params object during deserialization if factory is set
 		if (m_paramsFactory && !archive.IsStoring() && !m_paramsPtr.IsValid()){
-			m_paramsPtr.FromUnique(m_paramsFactory(m_contextId, m_typeId));
+			m_paramsPtr = m_paramsFactory(m_contextId, m_typeId);
 		}
 		
 		if (m_paramsPtr.IsValid()){

@@ -37,8 +37,9 @@ IJobTicketSharedPtr CJobQueueManagerCompBase::GetJobTicket(const QByteArray& job
 		IJobTicket* ticketPtr = dynamic_cast<IJobTicket*>(dataPtr.GetPtr());
 		if (ticketPtr){
 			// Set params factory for proper deserialization
-			ticketPtr->SetParamsFactory([this](const QByteArray& ctx, const QByteArray& type) {
-				return CreateJobParameters(ctx, type, nullptr);
+			ticketPtr->SetParamsFactory([this](const QByteArray& ctx, const QByteArray& type) -> iprm::IParamsSetSharedPtr {
+				iprm::IParamsSetUniquePtr uniquePtr = CreateJobParameters(ctx, type, nullptr);
+				return iprm::IParamsSetSharedPtr(uniquePtr.release());
 			});
 			return IJobTicketSharedPtr(dataPtr, ticketPtr);
 		}
@@ -87,8 +88,9 @@ QByteArray CJobQueueManagerCompBase::InsertNewJobIntoQueue(
 	jobTicket.SetInput(input);
 
 	// Set params factory for proper deserialization
-	jobTicket.SetParamsFactory([this](const QByteArray& ctx, const QByteArray& type) {
-		return CreateJobParameters(ctx, type, nullptr);
+	jobTicket.SetParamsFactory([this](const QByteArray& ctx, const QByteArray& type) -> iprm::IParamsSetSharedPtr {
+		iprm::IParamsSetUniquePtr uniquePtr = CreateJobParameters(ctx, type, nullptr);
+		return iprm::IParamsSetSharedPtr(uniquePtr.release());
 	});
 
 	if (jobProcessingParamsPtr != nullptr){
@@ -97,7 +99,7 @@ QByteArray CJobQueueManagerCompBase::InsertNewJobIntoQueue(
 			SendErrorMessage(0, "Job parameters could not be created");
 			return QByteArray();
 		}
-		jobTicket.SetParams(paramsPtr.release());
+		jobTicket.SetParams(iprm::IParamsSetSharedPtr(paramsPtr.release()));
 	}
 
 	QWriteLocker lock(&m_mutex);
@@ -259,8 +261,8 @@ bool CJobQueueManagerCompBase::GetJobConfiguration(
 		return false;
 	}
 
-	const iprm::IParamsSet* paramsPtr = ticketPtr->GetParams();
-	if (paramsPtr){
+	iprm::IParamsSetSharedPtr paramsPtr = ticketPtr->GetParams();
+	if (paramsPtr.IsValid()){
 		processingParamsPtr.FromUnique(CreateJobParameters(ticketPtr->GetContextId(), ticketPtr->GetTypeId(), nullptr));
 		if (!processingParamsPtr.IsValid()){
 			return false;
