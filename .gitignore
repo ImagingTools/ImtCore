@@ -107,6 +107,7 @@ __pycache__/
 *.egg-info/
 .eggs/
 *.egg
+*.pyc
 
 # IDE and Editor files
 .vscode/
