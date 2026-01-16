@@ -745,9 +745,9 @@ QMatrix4x4 COpenGLWidget::GetProjectionMatrix() const
 
 void COpenGLWidget::GetFovRect(float aspectRatio, float nearPlane, float& width, float& height)
 {
-	float fov_y = 45.0 * M_PI / 180.0;
+	float fov_y = s_verticalAngle * M_PI / 180.0f;
 
-	height = 2.0f * nearPlane * std::tan(fov_y / 2.0);
+	height = 2.0f * nearPlane * std::tan(fov_y / 2.0f);
 
 	width = height * aspectRatio;
 }
