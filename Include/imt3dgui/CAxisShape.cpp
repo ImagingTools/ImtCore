@@ -156,16 +156,21 @@ void CAxisShape::Draw(QPainter& painter)
 	QFontMetrics fontMetrics(font);
 	
 	// Calculate text offset that scales with zoom to work correctly in orthographic projection
-	// Use a small world-space offset and project it to get the appropriate screen-space offset
-	double baseOffset = m_axisConfigs[AT_X].axisLength * 0.02; // 2% of axis length
-	QPoint origin = ModelToWindow(QVector3D(0.0, 0.0, 0.0));
-	QPoint offsetPoint = ModelToWindow(QVector3D(baseOffset, 0.0, 0.0));
-	int textOffset = qAbs(offsetPoint.x() - origin.x());
-	textOffset = qMax(textOffset, 3); // Ensure minimum offset of 3 pixels
+	// Use a small world-space offset (percentage of axis length) and project it to screen space
+	const double offsetFactor = 0.02; // 2% of axis length
+	const int minPixelOffset = 3; // Minimum offset in pixels
 
+	// X axis labels
 	QString xLabel = m_axisConfigs[AT_X].label;
 	QPoint windowCoordinate = ModelToWindow(QVector3D(m_axisConfigs[AT_X].axisLength * m_axisConfigs[AT_X].axisRange.GetMaxValue(), 0.0, 0.0));
 	QRect textRect = fontMetrics.boundingRect(xLabel);
+	
+	// Calculate offset based on X axis length
+	double baseOffset = m_axisConfigs[AT_X].axisLength * offsetFactor;
+	QPoint origin = ModelToWindow(QVector3D(0.0, 0.0, 0.0));
+	QPoint offsetPoint = ModelToWindow(QVector3D(baseOffset, 0.0, 0.0));
+	int textOffset = qMax(qAbs(offsetPoint.x() - origin.x()), minPixelOffset);
+	
 	windowCoordinate.setX(windowCoordinate.x() + textOffset);
 	windowCoordinate.setY(windowCoordinate.y() + textRect.height() / 2);
 	painter.drawText(windowCoordinate, xLabel);
@@ -179,9 +184,17 @@ void CAxisShape::Draw(QPainter& painter)
 		painter.drawText(windowCoordinate, negXLabel);
 	}
 
+	// Y axis labels
 	QString yLabel = m_axisConfigs[AT_Y].label;
 	windowCoordinate = ModelToWindow(QVector3D(0.0, m_axisConfigs[AT_Y].axisLength * m_axisConfigs[AT_Y].axisRange.GetMaxValue(), 0.0));
 	textRect = fontMetrics.boundingRect(yLabel);
+	
+	// Calculate offset based on Y axis length
+	baseOffset = m_axisConfigs[AT_Y].axisLength * offsetFactor;
+	origin = ModelToWindow(QVector3D(0.0, 0.0, 0.0));
+	offsetPoint = ModelToWindow(QVector3D(0.0, baseOffset, 0.0));
+	textOffset = qMax(qAbs(offsetPoint.x() - origin.x()), minPixelOffset);
+	
 	windowCoordinate.setX(windowCoordinate.x() + textOffset);
 	windowCoordinate.setY(windowCoordinate.y() + textRect.height() / 2);
 	painter.drawText(windowCoordinate, yLabel);
@@ -195,9 +208,17 @@ void CAxisShape::Draw(QPainter& painter)
 		painter.drawText(windowCoordinate, negYLabel);
 	}
 
+	// Z axis labels
 	QString zLabel = m_axisConfigs[AT_Z].label;
 	windowCoordinate = ModelToWindow(QVector3D(0.0, 0.0, m_axisConfigs[AT_Z].axisLength * m_axisConfigs[AT_Z].axisRange.GetMaxValue()));
 	textRect = fontMetrics.boundingRect(zLabel);
+	
+	// Calculate offset based on Z axis length
+	baseOffset = m_axisConfigs[AT_Z].axisLength * offsetFactor;
+	origin = ModelToWindow(QVector3D(0.0, 0.0, 0.0));
+	offsetPoint = ModelToWindow(QVector3D(0.0, 0.0, baseOffset));
+	textOffset = qMax(qAbs(offsetPoint.x() - origin.x()), minPixelOffset);
+	
 	windowCoordinate.setX(windowCoordinate.x() + textOffset);
 	windowCoordinate.setY(windowCoordinate.y() + textRect.height() / 2);
 	painter.drawText(windowCoordinate, zLabel);
