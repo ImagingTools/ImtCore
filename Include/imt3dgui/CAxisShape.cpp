@@ -154,7 +154,14 @@ void CAxisShape::Draw(QPainter& painter)
 	painter.setFont(font);
 	
 	QFontMetrics fontMetrics(font);
-	const int textOffset = 5; // Offset in pixels to separate text from axis endpoint
+	
+	// Calculate text offset that scales with zoom to work correctly in orthographic projection
+	// Use a small world-space offset and project it to get the appropriate screen-space offset
+	double baseOffset = m_axisConfigs[AT_X].axisLength * 0.02; // 2% of axis length
+	QPoint origin = ModelToWindow(QVector3D(0.0, 0.0, 0.0));
+	QPoint offsetPoint = ModelToWindow(QVector3D(baseOffset, 0.0, 0.0));
+	int textOffset = qAbs(offsetPoint.x() - origin.x());
+	textOffset = qMax(textOffset, 3); // Ensure minimum offset of 3 pixels
 
 	QString xLabel = m_axisConfigs[AT_X].label;
 	QPoint windowCoordinate = ModelToWindow(QVector3D(m_axisConfigs[AT_X].axisLength * m_axisConfigs[AT_X].axisRange.GetMaxValue(), 0.0, 0.0));
