@@ -20,11 +20,11 @@ The `Include/` folder contains 61 libraries organized in a flat structure:
 ### Identified Patterns
 
 #### 1. **Suffix-Based Technical Layers**
-- `*gui` - Qt-based user interface components (10 libraries)
-- `*gql` - GraphQL API endpoints (8 libraries)
-- `*db` - Database persistence layers (2 libraries)
-- `*qml` - QML/JavaScript UI components (5 libraries)
-- `gen*` - Code generators (3 libraries)
+- `*gui` - Qt-based user interface components (9 libraries: imt3dgui, imtauthgui, imtdbgui, imtdevgui, imtgui, imthypegui, imtlicgui, imtloggui, imtreportgui)
+- `*gql` - GraphQL API endpoints (8 libraries: imtgql, imtclientgql, imtservergql, imtguigql, imtgqltest, imtauthgql, imtlicgql, imtdbgql)
+- `*db` - Database persistence layers (2 libraries: imtauthdb, imtlicdb)
+- `*qml` - QML/JavaScript UI components (3 libraries: imtqml, imtqml2d, imtstylecontrolsqml)
+- `gen*` - Code generators (3 libraries: imtsdlgencpp, imtsdlgenqml, imtddl)
 
 #### 2. **Domain Areas** (no suffix)
 - **Core Infrastructure**: base, core, com, col, test

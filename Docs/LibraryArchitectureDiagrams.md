@@ -99,18 +99,18 @@ Total: 61 libraries in flat structure
                             ↑ Used by ↑
 ┌─────────────────────────────────────────────────────────────┐
 │              API LAYER (*gql suffix)                        │
-│  imtauthgql, imtlicgql, imtdbgql, imtguigql,               │
-│  imtclientgql, imtservergql, imtgqltest                    │
-│                          (7 libraries)                      │
+│  imtgql, imtclientgql, imtservergql, imtguigql,            │
+│  imtgqltest, imtauthgql, imtlicgql, imtdbgql               │
+│                          (8 libraries)                      │
 └─────────────────────────────────────────────────────────────┘
                             ↑ Used by ↑
 ┌─────────────────────────────────────────────────────────────┐
 │              UI LAYER (*gui/*qml suffix)                    │
-│  imtauthgui, imtlicgui, imtdbgui, imtdevgui,               │
-│  imtloggui, imtreportgui, imt3dgui, imthypegui,            │
-│  imtgui, imtwidgets, imtqml, imtqml2d,                     │
-│  imtstyle, imtstylecontrolsqml                             │
-│                         (14 libraries)                      │
+│  imt3dgui, imthypegui, imtauthgui, imtlicgui, imtdbgui,    │
+│  imtdevgui, imtloggui, imtreportgui, imtgui, imtwidgets,   │
+│  imtqml, imtqml2d, imtstyle, imtstylecontrolsqml,          │
+│  imtdesign                                                  │
+│                         (15 libraries)                      │
 └─────────────────────────────────────────────────────────────┘
                             ↑ Used by ↑
 ┌─────────────────────────────────────────────────────────────┐

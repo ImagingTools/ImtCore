@@ -52,29 +52,31 @@ GraphQL-based API layer for client-server communication. This includes core Grap
 - **imtlicgql** - License GraphQL API (also in Licensing section)
 - **imtdbgql** - Database GraphQL API (also in Database section)
 
-### User Interface (13 libraries)
-Qt/QML-based user interface components and frameworks. This includes core UI libraries plus domain-specific GUI libraries listed in their respective sections.
+### User Interface (16 libraries total: 7 core + 9 domain-specific)
+Qt/QML-based user interface components and frameworks. Includes core UI libraries and domain-specific GUI libraries.
 
-#### Qt Widgets
+#### Qt Widgets (3 core libraries)
 - **imtgui** - Core Qt GUI widgets and layouts
 - **imtwidgets** - Extended widget library
 - **imtstyle** - Theme and style management
 
-#### QML/JavaScript
+#### QML/JavaScript (3 core libraries)
 - **imtqml** - Core QML utilities and components
 - **imtqml2d** - 2D graphics and drawing in QML
 - **imtstylecontrolsqml** - QML style controls and themes
 
-#### Design System
+#### Design System (1 core library)
 - **imtdesign** - Design tokens and system components
 
-#### Domain-Specific UI (also listed in their domains)
-- **imtauthgui** - Authentication UI
-- **imtdbgui** - Database management UI
-- **imtlicgui** - License management UI
-- **imtdevgui** - Developer tools UI
-- **imtloggui** - Logging and monitoring UI
-- **imtreportgui** - Report viewing and creation UI
+#### Domain-Specific GUI (9 libraries, also listed in their domains)
+- **imt3dgui** - 3D visualization GUI (also in Visualization)
+- **imthypegui** - Hypermedia UI (also in Visualization)
+- **imtauthgui** - Authentication UI (also in Authentication)
+- **imtdbgui** - Database management UI (also in Database)
+- **imtlicgui** - License management UI (also in Licensing)
+- **imtdevgui** - Developer tools UI (also in Development)
+- **imtloggui** - Logging and monitoring UI (also in Reporting)
+- **imtreportgui** - Report viewing and creation UI (also in Reporting)
 
 ### 3D & Visualization (6 libraries)
 2D/3D rendering, visualization, and hypermedia content.
@@ -288,24 +290,26 @@ See `Docs/LibraryReorganizationProposal.md` for:
 
 **Total Libraries:** 61
 
-**By Category:**
-- Core Infrastructure: 7
-- Authentication: 4
-- Database: 5
-- Licensing: 4
-- GraphQL APIs: 5 (core) + 3 (domain-specific counted in their domains)
-- User Interface: 7 (core) + 6 (domain-specific counted in their domains)
-- Visualization: 6
-- Content/Media: 3
-- Communication: 4
-- Security: 1
-- Code Generation: 5
-- Development Tools: 4
-- Reporting/Logging: 4
-- Application Frameworks: 3
+**By Category (with cross-reference notes):**
+- Core Infrastructure: 7 unique libraries
+- Authentication: 4 libraries (auth, authdb, authgql, authgui)
+- Database: 5 libraries (db, dbgql, dbgui, mdbx, mongo)
+- Licensing: 4 libraries (lic, licdb, licgql, licgui)
+- GraphQL APIs: 8 libraries (5 core: gql, clientgql, servergql, guigql, gqltest + 3 domain: authgql, licgql, dbgql)
+- User Interface: 16 libraries (7 core + 9 domain-specific gui libraries)
+- Visualization: 6 libraries (3d, 3dgui, 3dview, hype, hypegui, geo)
+- Content/Media: 3 unique libraries (img, doc, repo)
+- Communication: 4 unique libraries (http, rest, mail, service)
+- Security: 1 library (crypt)
+- Code Generation: 5 libraries (sdl, sdlgencpp, sdlgenqml, ddl, oas)
+- Development Tools: 4 libraries (dev, devgui, py, ej)
+- Reporting/Logging: 4 libraries (report, reportgui, log, loggui)
+- Application Frameworks: 3 libraries (app, serverapp, update)
 
-**Note:** Some libraries appear in multiple categories (e.g., domain-specific *gql and *gui libraries).
-The total unique library count is 61, though the sum of categories is higher due to cross-references.
+**Total Unique Libraries:** 61
+
+**Note:** Domain-specific *gql and *gui libraries are counted both in their technical category (GraphQL/UI) 
+and in their respective domain category. The total unique count avoids this duplication.
 
 ## ⚠️ Current Limitations
 
