@@ -9,6 +9,21 @@ ImagingTools Core SDK is an extension framework for ACF.
 The main goal of this framework is the implementation of components and interfaces using for realization of the business logic,
 which can find a general application in every software product.
 
+\section LibraryOrganization Library Organization
+The ImtCore framework consists of 61 libraries organized in the Include/ directory.
+For a complete overview of all libraries, their purposes, and relationships, see:
+- Include/README.md - Complete library index with categorization
+- Docs/LibraryQuickReference.md - Quick lookup guide for finding the right library
+- Docs/LibraryArchitectureDiagrams.md - Visual diagrams of library structure
+- Docs/LibraryReorganizationProposal.md - Detailed proposal for future improvements
+
+Libraries are organized by suffix to indicate technical layers:
+- No suffix: Core business logic (e.g., imtauth)
+- *gui: Qt-based user interface components (e.g., imtauthgui)
+- *gql: GraphQL API endpoints (e.g., imtauthgql)
+- *db: Database persistence layers (e.g., imtauthdb)
+- *qml: QML/JavaScript UI components (e.g., imtqml)
+
 \defgroup Collection Collection
 \section Motivation Motivation
 One of the most important aspects in the software development is the definition and implementation of the data layer.
