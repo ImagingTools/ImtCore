@@ -41,17 +41,19 @@ Software licensing and activation management.
 - **imtlicgui** - License management UI
 
 ### GraphQL APIs (8 libraries)
-GraphQL-based API layer for client-server communication.
+GraphQL-based API layer for client-server communication. This includes core GraphQL libraries plus domain-specific API libraries listed in their respective sections.
 
 - **imtgql** - Core GraphQL request/response handling
 - **imtclientgql** - Client-side GraphQL operations and caching
 - **imtservergql** - Server-side GraphQL schema and resolvers
 - **imtguigql** - UI integration with GraphQL
 - **imtgqltest** - GraphQL testing framework
-- *(See also domain-specific gql libraries: auth, db, lic)*
+- **imtauthgql** - Authentication GraphQL API (also in Auth section)
+- **imtlicgql** - License GraphQL API (also in Licensing section)
+- **imtdbgql** - Database GraphQL API (also in Database section)
 
-### User Interface (11 libraries)
-Qt/QML-based user interface components and frameworks.
+### User Interface (13 libraries)
+Qt/QML-based user interface components and frameworks. This includes core UI libraries plus domain-specific GUI libraries listed in their respective sections.
 
 #### Qt Widgets
 - **imtgui** - Core Qt GUI widgets and layouts
@@ -66,7 +68,7 @@ Qt/QML-based user interface components and frameworks.
 #### Design System
 - **imtdesign** - Design tokens and system components
 
-#### Domain-Specific UI
+#### Domain-Specific UI (also listed in their domains)
 - **imtauthgui** - Authentication UI
 - **imtdbgui** - Database management UI
 - **imtlicgui** - License management UI
@@ -84,23 +86,20 @@ Qt/QML-based user interface components and frameworks.
 - **imthypegui** - Hypermedia UI components
 - **imtgeo** - Geographic/geospatial data handling
 
-### Content & Media (5 libraries)
-Document, image, and content management.
+### Content & Media (3 libraries)
+Document, image, and content management. File operations and compression are in Core Infrastructure.
 
 - **imtimg** - Image processing and manipulation
 - **imtdoc** - Document handling and management
 - **imtrepo** - Repository and version control
-- **imtfile** - File operations (see Core)
-- **imtzip** - Compression (see Core)
 
-### Communication & Integration (5 libraries)
-Network communication, email, and web services.
+### Communication & Integration (4 libraries)
+Network communication, email, and web services. Core communication protocols are in Core Infrastructure.
 
 - **imthttp** - HTTP client and server implementation
 - **imtrest** - REST API framework
 - **imtmail** - SMTP email client and message handling
 - **imtservice** - Service and daemon framework
-- **imtcom** - Core communication (see Core)
 
 ### Security (1 library)
 Cryptography and encryption services.
@@ -294,16 +293,19 @@ See `Docs/LibraryReorganizationProposal.md` for:
 - Authentication: 4
 - Database: 5
 - Licensing: 4
-- GraphQL APIs: 8
-- User Interface: 11
+- GraphQL APIs: 5 (core) + 3 (domain-specific counted in their domains)
+- User Interface: 7 (core) + 6 (domain-specific counted in their domains)
 - Visualization: 6
-- Content/Media: 5
-- Communication: 5
+- Content/Media: 3
+- Communication: 4
 - Security: 1
 - Code Generation: 5
 - Development Tools: 4
 - Reporting/Logging: 4
 - Application Frameworks: 3
+
+**Note:** Some libraries appear in multiple categories (e.g., domain-specific *gql and *gui libraries).
+The total unique library count is 61, though the sum of categories is higher due to cross-references.
 
 ## ⚠️ Current Limitations
 
