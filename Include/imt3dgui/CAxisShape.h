@@ -43,6 +43,12 @@ protected:
 
 private:
 	QFont GetAxeLabelFont() const;
+	void AddLetterGeometry(std::vector<imt3d::CPointCloud3d::PointXyzwRgba32>& vertices, 
+	                       QVector<GLuint>& indices,
+	                       const QString& letter,
+	                       const QVector3D& position,
+	                       float size,
+	                       const QVector3D& color);
 
 private:
 	imt3d::CPointCloud3d m_data;
