@@ -5,8 +5,8 @@ This GitHub Actions workflow integrates with an external TeamCity build server t
 ## Overview
 
 The `teamcity-trigger.yml` workflow:
-1. Triggers a TeamCity build when pull requests are created/updated or commits are pushed to main/master
-2. Waits for the TeamCity build to complete
+1. Triggers TeamCity builds (Windows and Linux) in parallel when pull requests are created/updated or commits are pushed to main/master
+2. Waits for both TeamCity builds to complete
 3. Reports the build status back to GitHub (success/failure)
 
 ## Configuration
@@ -24,7 +24,8 @@ Configure the following variables in your GitHub repository settings (Settings �
 |------------|-------------|---------|
 | `TEAMCITY_URL` | Your TeamCity server URL (without trailing slash) | `https://teamcity.example.com` |
 | `TEAMCITY_TOKEN` | TeamCity access token with build trigger permissions | `eyJ0eXAiOiJKV1Q...` |
-| `TEAMCITY_BUILD_TYPE` | TeamCity build configuration ID | `ImtCore_Build` or `ProjectId_BuildConfigId` |
+| `TEAMCITY_BUILD_TYPE_WINDOWS` | TeamCity build configuration ID for Windows builds | `ImtCore_Build_Windows` or `ProjectId_BuildConfigId_Windows` |
+| `TEAMCITY_BUILD_TYPE_LINUX` | TeamCity build configuration ID for Linux builds | `ImtCore_Build_Linux` or `ProjectId_BuildConfigId_Linux` |
 
 ### How to Get TeamCity Configuration Values
 
@@ -40,11 +41,16 @@ Your TeamCity server base URL, for example: `https://teamcity.example.com`
 6. Set appropriate permissions (at minimum: trigger builds, view build status)
 7. Copy the generated token
 
-#### 3. TeamCity Build Configuration ID
+#### 3. TeamCity Build Configuration IDs
+You need to set up two separate build configurations in TeamCity - one for Windows and one for Linux.
+
+For each build configuration:
 1. Open your build configuration in TeamCity
 2. The build configuration ID is shown in the URL or in the build configuration settings
 3. Format is usually: `ProjectId_BuildConfigurationId`
-4. Example: `ImtCore_CMakeBuild` or `ImagingTools_ImtCore_Build`
+4. Examples:
+   - Windows: `ImtCore_CMakeBuild_Windows` or `ImagingTools_ImtCore_Build_Windows`
+   - Linux: `ImtCore_CMakeBuild_Linux` or `ImagingTools_ImtCore_Build_Linux`
 
 ## Setting Up GitHub Repository Variables
 
@@ -52,13 +58,19 @@ Your TeamCity server base URL, for example: `https://teamcity.example.com`
 2. Click **Settings** → **Secrets and variables** → **Actions**
 3. Click on the **Variables** tab
 4. Click **New repository variable**
-5. Add each of the three variables listed above
+5. Add each of the four variables listed above:
+   - `TEAMCITY_URL`
+   - `TEAMCITY_TOKEN`
+   - `TEAMCITY_BUILD_TYPE_WINDOWS`
+   - `TEAMCITY_BUILD_TYPE_LINUX`
 
 ## Workflow Triggers
 
 The workflow triggers on:
 - **Pull Requests**: Any pull request event (opened, synchronized, reopened)
 - **Push to main/master**: Direct commits to main or master branches
+
+Both Windows and Linux builds are triggered in parallel for each event.
 
 ## Build Information Passed to TeamCity
 
@@ -77,7 +89,7 @@ You can adjust this by modifying the `MAX_WAIT` variable in the workflow file.
 ## Troubleshooting
 
 ### "TeamCity configuration not found in repository variables"
-- Ensure all three required variables (TEAMCITY_URL, TEAMCITY_TOKEN, TEAMCITY_BUILD_TYPE) are configured in your repository settings under the Variables tab
+- Ensure all four required variables (TEAMCITY_URL, TEAMCITY_TOKEN, TEAMCITY_BUILD_TYPE_WINDOWS, TEAMCITY_BUILD_TYPE_LINUX) are configured in your repository settings under the Variables tab
 
 ### "Failed to trigger TeamCity build"
 - Verify the TeamCity URL is correct and accessible
@@ -95,12 +107,26 @@ You can adjust this by modifying the `MAX_WAIT` variable in the workflow file.
 - Click on the "Build URL" link in the GitHub Actions log to view detailed build logs in TeamCity
 - Fix the build issues in TeamCity and retry
 
-## Example TeamCity Build Configuration
+## Example TeamCity Build Configurations
 
-Your TeamCity build configuration should:
-1. Be configured to build from the Git repository
-2. Have the necessary build steps (CMake, QMake, etc.)
-3. Have appropriate VCS triggers or rely solely on GitHub Actions to trigger builds
+You should have two separate TeamCity build configurations:
+
+### Windows Build Configuration
+- Configured to build on Windows agents
+- Should include Windows-specific build steps (Visual Studio, MSVC compiler, etc.)
+- VCS root pointing to the Git repository
+- Optionally use QMake or CMake with Windows-specific settings
+
+### Linux Build Configuration
+- Configured to build on Linux agents
+- Should include Linux-specific build steps (GCC/Clang compiler, make, etc.)
+- VCS root pointing to the Git repository
+- Optionally use QMake or CMake with Linux-specific settings
+
+Both configurations:
+1. Must be configured to build from the same Git repository
+2. Should have the necessary build steps (CMake, QMake, etc.)
+3. Can rely solely on GitHub Actions to trigger builds (no VCS triggers needed)
 
 ## Security Notes
 

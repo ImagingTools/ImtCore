@@ -13,31 +13,32 @@ permissions:
   checks: write
 
 jobs:
-  trigger-teamcity:
-    name: Trigger TeamCity Build
+  trigger-teamcity-windows:
+    name: Trigger TeamCity Build (Windows)
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Trigger TeamCity Build
+      - name: Trigger TeamCity Windows Build
         id: teamcity
         env:
           TEAMCITY_URL: ${{ vars.TEAMCITY_URL }}
           TEAMCITY_TOKEN: ${{ vars.TEAMCITY_TOKEN }}
-          TEAMCITY_BUILD_TYPE: ${{ vars.TEAMCITY_BUILD_TYPE }}
+          TEAMCITY_BUILD_TYPE: ${{ vars.TEAMCITY_BUILD_TYPE_WINDOWS }}
         run: |
           if [ -z "$TEAMCITY_URL" ] || [ -z "$TEAMCITY_TOKEN" ] || [ -z "$TEAMCITY_BUILD_TYPE" ]; then
             echo "Error: TeamCity configuration not found in repository variables"
             echo "Please configure the following repository variables:"
             echo "  - TEAMCITY_URL: Your TeamCity server URL (e.g., https://teamcity.example.com)"
             echo "  - TEAMCITY_TOKEN: TeamCity access token with build trigger permissions"
-            echo "  - TEAMCITY_BUILD_TYPE: TeamCity build configuration ID (e.g., ImtCore_Build)"
+            echo "  - TEAMCITY_BUILD_TYPE_WINDOWS: TeamCity build configuration ID for Windows (e.g., ImtCore_Build_Windows)"
             exit 1
           fi
 
           # Trigger TeamCity build
+          echo "Triggering Windows build: $TEAMCITY_BUILD_TYPE"
           RESPONSE=$(curl -s -w "\n%{http_code}" \
             -X POST \
             -H "Authorization: Bearer $TEAMCITY_TOKEN" \
@@ -50,7 +51,7 @@ jobs:
           BODY=$(echo "$RESPONSE" | sed '$d')
 
           if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
-            echo "TeamCity build triggered successfully"
+            echo "TeamCity Windows build triggered successfully"
             BUILD_ID=$(echo "$BODY" | jq -r '.id // empty')
             if [ -z "$BUILD_ID" ]; then
               echo "Error: Failed to extract build ID from TeamCity response"
@@ -60,19 +61,19 @@ jobs:
             echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
             echo "Build ID: $BUILD_ID"
           else
-            echo "Failed to trigger TeamCity build. HTTP Status: $HTTP_CODE"
+            echo "Failed to trigger TeamCity Windows build. HTTP Status: $HTTP_CODE"
             echo "Response: $BODY"
             exit 1
           fi
 
-      - name: Wait for TeamCity Build
+      - name: Wait for TeamCity Windows Build
         if: steps.teamcity.outputs.build_id
         env:
           TEAMCITY_URL: ${{ vars.TEAMCITY_URL }}
           TEAMCITY_TOKEN: ${{ vars.TEAMCITY_TOKEN }}
           BUILD_ID: ${{ steps.teamcity.outputs.build_id }}
         run: |
-          echo "Waiting for TeamCity build $BUILD_ID to complete..."
+          echo "Waiting for TeamCity Windows build $BUILD_ID to complete..."
 
           MAX_WAIT=3600  # Maximum wait time in seconds (1 hour)
           ELAPSED=0
@@ -108,10 +109,10 @@ jobs:
               echo "Build URL: $BUILD_URL"
 
               if [ "$STATUS" = "SUCCESS" ]; then
-                echo "✅ TeamCity build completed successfully!"
+                echo "✅ TeamCity Windows build completed successfully!"
                 exit 0
               else
-                echo "❌ TeamCity build failed with status: $STATUS"
+                echo "❌ TeamCity Windows build failed with status: $STATUS"
                 exit 1
               fi
             fi
@@ -120,14 +121,134 @@ jobs:
             ELAPSED=$((ELAPSED + POLL_INTERVAL))
           done
 
-          echo "⏱️ Timeout waiting for TeamCity build to complete"
+          echo "⏱️ Timeout waiting for TeamCity Windows build to complete"
           exit 1
 
-      - name: Report Status
+      - name: Report Windows Build Status
         if: always()
         run: |
           if [ "${{ job.status }}" = "success" ]; then
-            echo "✅ TeamCity integration successful"
+            echo "✅ TeamCity Windows build integration successful"
           else
-            echo "❌ TeamCity integration failed"
+            echo "❌ TeamCity Windows build integration failed"
+          fi
+
+  trigger-teamcity-linux:
+    name: Trigger TeamCity Build (Linux)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Trigger TeamCity Linux Build
+        id: teamcity
+        env:
+          TEAMCITY_URL: ${{ vars.TEAMCITY_URL }}
+          TEAMCITY_TOKEN: ${{ vars.TEAMCITY_TOKEN }}
+          TEAMCITY_BUILD_TYPE: ${{ vars.TEAMCITY_BUILD_TYPE_LINUX }}
+        run: |
+          if [ -z "$TEAMCITY_URL" ] || [ -z "$TEAMCITY_TOKEN" ] || [ -z "$TEAMCITY_BUILD_TYPE" ]; then
+            echo "Error: TeamCity configuration not found in repository variables"
+            echo "Please configure the following repository variables:"
+            echo "  - TEAMCITY_URL: Your TeamCity server URL (e.g., https://teamcity.example.com)"
+            echo "  - TEAMCITY_TOKEN: TeamCity access token with build trigger permissions"
+            echo "  - TEAMCITY_BUILD_TYPE_LINUX: TeamCity build configuration ID for Linux (e.g., ImtCore_Build_Linux)"
+            exit 1
+          fi
+
+          # Trigger TeamCity build
+          echo "Triggering Linux build: $TEAMCITY_BUILD_TYPE"
+          RESPONSE=$(curl -s -w "\n%{http_code}" \
+            -X POST \
+            -H "Authorization: Bearer $TEAMCITY_TOKEN" \
+            -H "Content-Type: application/xml" \
+            -H "Accept: application/json" \
+            --data "<build><buildType id=\"$TEAMCITY_BUILD_TYPE\"/><properties><property name=\"env.GIT_BRANCH\" value=\"$GITHUB_REF\"/><property name=\"env.GIT_COMMIT\" value=\"$GITHUB_SHA\"/></properties></build>" \
+            "$TEAMCITY_URL/app/rest/buildQueue")
+
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+
+          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
+            echo "TeamCity Linux build triggered successfully"
+            BUILD_ID=$(echo "$BODY" | jq -r '.id // empty')
+            if [ -z "$BUILD_ID" ]; then
+              echo "Error: Failed to extract build ID from TeamCity response"
+              echo "Response: $BODY"
+              exit 1
+            fi
+            echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
+            echo "Build ID: $BUILD_ID"
+          else
+            echo "Failed to trigger TeamCity Linux build. HTTP Status: $HTTP_CODE"
+            echo "Response: $BODY"
+            exit 1
+          fi
+
+      - name: Wait for TeamCity Linux Build
+        if: steps.teamcity.outputs.build_id
+        env:
+          TEAMCITY_URL: ${{ vars.TEAMCITY_URL }}
+          TEAMCITY_TOKEN: ${{ vars.TEAMCITY_TOKEN }}
+          BUILD_ID: ${{ steps.teamcity.outputs.build_id }}
+        run: |
+          echo "Waiting for TeamCity Linux build $BUILD_ID to complete..."
+
+          MAX_WAIT=3600  # Maximum wait time in seconds (1 hour)
+          ELAPSED=0
+          POLL_INTERVAL=30
+
+          while [ $ELAPSED -lt $MAX_WAIT ]; do
+            RESPONSE=$(curl -s -w "\n%{http_code}" \
+              -H "Authorization: Bearer $TEAMCITY_TOKEN" \
+              -H "Accept: application/json" \
+              "$TEAMCITY_URL/app/rest/builds/id:$BUILD_ID?fields=id,state,status,statusText,webUrl")
+
+            HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+            BODY=$(echo "$RESPONSE" | sed '$d')
+
+            if [ "$HTTP_CODE" -ne 200 ]; then
+              echo "Failed to get build status. HTTP Status: $HTTP_CODE"
+              echo "Response body: $BODY"
+              exit 1
+            fi
+
+            # Extract state and status, trim leading/trailing whitespace
+            STATE=$(echo "$BODY" | jq -r '.state // "unknown"' | xargs)
+            STATUS=$(echo "$BODY" | jq -r '.status // "unknown"' | xargs)
+            STATUS_TEXT=$(echo "$BODY" | jq -r '.statusText // ""')
+
+            echo "Build state: $STATE, status: $STATUS"
+            if [ -n "$STATUS_TEXT" ]; then
+              echo "Status text: $STATUS_TEXT"
+            fi
+
+            if [ "$STATE" = "finished" ]; then
+              BUILD_URL=$(echo "$BODY" | jq -r '.webUrl // "N/A"')
+              echo "Build URL: $BUILD_URL"
+
+              if [ "$STATUS" = "SUCCESS" ]; then
+                echo "✅ TeamCity Linux build completed successfully!"
+                exit 0
+              else
+                echo "❌ TeamCity Linux build failed with status: $STATUS"
+                exit 1
+              fi
+            fi
+
+            sleep $POLL_INTERVAL
+            ELAPSED=$((ELAPSED + POLL_INTERVAL))
+          done
+
+          echo "⏱️ Timeout waiting for TeamCity Linux build to complete"
+          exit 1
+
+      - name: Report Linux Build Status
+        if: always()
+        run: |
+          if [ "${{ job.status }}" = "success" ]; then
+            echo "✅ TeamCity Linux build integration successful"
+          else
+            echo "❌ TeamCity Linux build integration failed"
           fi
