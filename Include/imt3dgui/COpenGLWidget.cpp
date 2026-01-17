@@ -719,16 +719,17 @@ QMatrix4x4 COpenGLWidget::GetProjectionMatrix() const
 
 	double cameraZ = m_cameraPtr->GetPosition().z();
 
-	float w = 0, h = 0;
-	GetFovRect(aspectRatio, cameraZ / 2, w, h);
-
-	double orthoFactor = w / 2;
-
 	switch (m_projectionMode){
 		case PM_ORTHO:
+		{
+			// Calculate orthographic bounds to match perspective FOV at camera distance
+			// This provides better visual correspondence when switching between projection modes
+			float w = 0, h = 0;
+			GetFovRect(aspectRatio, cameraZ, w, h);
+			double orthoFactor = h / 2.0;
 			projectionMatrix.ortho(-orthoFactor * aspectRatio, orthoFactor * aspectRatio, -orthoFactor, orthoFactor, s_nearPlane, s_farPlane);
-			projectionMatrix.scale(1.0);
 			break;
+		}
 		case PM_PERSPECTIVE:
 			projectionMatrix.perspective(s_verticalAngle, aspectRatio, s_nearPlane, s_farPlane);
 			break;
@@ -744,9 +745,9 @@ QMatrix4x4 COpenGLWidget::GetProjectionMatrix() const
 
 void COpenGLWidget::GetFovRect(float aspectRatio, float nearPlane, float& width, float& height)
 {
-	float fov_y = 45.0 * M_PI / 180.0;
+	float fov_y = s_verticalAngle * M_PI / 180.0f;
 
-	height = 2.0f * nearPlane * std::tan(fov_y / 2.0);
+	height = 2.0f * nearPlane * std::tan(fov_y / 2.0f);
 
 	width = height * aspectRatio;
 }

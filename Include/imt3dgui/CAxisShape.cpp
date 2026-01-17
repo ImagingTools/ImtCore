@@ -1,4 +1,5 @@
 #include <imt3dgui/CAxisShape.h>
+#include <cmath>
 
 
 namespace imt3dgui
@@ -150,30 +151,87 @@ void CAxisShape::Draw(QPainter& painter)
 
 	painter.setRenderHint(QPainter::TextAntialiasing, true);
 	painter.setPen(Qt::darkGray);
-	painter.setFont(GetAxeLabelFont());
+	QFont font = GetAxeLabelFont();
+	painter.setFont(font);
+	
+	QFontMetrics fontMetrics(font);
+	
+	// Calculate text offset that scales with zoom to work correctly in orthographic projection
+	// Use a small world-space offset (percentage of axis length) and project it to screen space
+	const double offsetFactor = 0.02; // 2% of axis length
+	const int minPixelOffset = 3; // Minimum offset in pixels
+	
+	QPoint origin = ModelToWindow(QVector3D(0.0, 0.0, 0.0));
 
+	// X axis labels
 	QString xLabel = m_axisConfigs[AT_X].label;
 	QPoint windowCoordinate = ModelToWindow(QVector3D(m_axisConfigs[AT_X].axisLength * m_axisConfigs[AT_X].axisRange.GetMaxValue(), 0.0, 0.0));
+	QRect textRect = fontMetrics.boundingRect(xLabel);
+	
+	// Calculate offset based on X axis length - project a small offset in X direction
+	double baseOffset = m_axisConfigs[AT_X].axisLength * offsetFactor;
+	QPoint offsetPoint = ModelToWindow(QVector3D(baseOffset, 0.0, 0.0));
+	int textOffset = qMax(qAbs(offsetPoint.x() - origin.x()), minPixelOffset);
+	
+	windowCoordinate.setX(windowCoordinate.x() + textOffset);
+	windowCoordinate.setY(windowCoordinate.y() + textRect.height() / 2);
 	painter.drawText(windowCoordinate, xLabel);
 
 	if (m_axisConfigs[AT_X].axisRange.GetMinValue() < 0.0){
-		painter.drawText(ModelToWindow(QVector3D(m_axisConfigs[AT_X].axisLength * m_axisConfigs[AT_X].axisRange.GetMinValue(), 0.0, 0.0)), QString("-") + xLabel);
+		QString negXLabel = QString("-") + xLabel;
+		windowCoordinate = ModelToWindow(QVector3D(m_axisConfigs[AT_X].axisLength * m_axisConfigs[AT_X].axisRange.GetMinValue(), 0.0, 0.0));
+		textRect = fontMetrics.boundingRect(negXLabel);
+		windowCoordinate.setX(windowCoordinate.x() - textRect.width() - textOffset);
+		windowCoordinate.setY(windowCoordinate.y() + textRect.height() / 2);
+		painter.drawText(windowCoordinate, negXLabel);
 	}
 
+	// Y axis labels
 	QString yLabel = m_axisConfigs[AT_Y].label;
 	windowCoordinate = ModelToWindow(QVector3D(0.0, m_axisConfigs[AT_Y].axisLength * m_axisConfigs[AT_Y].axisRange.GetMaxValue(), 0.0));
+	textRect = fontMetrics.boundingRect(yLabel);
+	
+	// Calculate offset based on Y axis length - project a small offset in Y direction and use screen-space distance
+	baseOffset = m_axisConfigs[AT_Y].axisLength * offsetFactor;
+	offsetPoint = ModelToWindow(QVector3D(0.0, baseOffset, 0.0));
+	QPoint delta = offsetPoint - origin;
+	textOffset = qMax(static_cast<int>(std::sqrt(delta.x() * delta.x() + delta.y() * delta.y())), minPixelOffset);
+	
+	windowCoordinate.setX(windowCoordinate.x() + textOffset);
+	windowCoordinate.setY(windowCoordinate.y() + textRect.height() / 2);
 	painter.drawText(windowCoordinate, yLabel);
 
 	if (m_axisConfigs[AT_Y].axisRange.GetMinValue() < 0.0){
-		painter.drawText(ModelToWindow(QVector3D(0.0, m_axisConfigs[AT_Y].axisLength * m_axisConfigs[AT_Y].axisRange.GetMinValue(), 0.0)), QString("-") + yLabel);
+		QString negYLabel = QString("-") + yLabel;
+		windowCoordinate = ModelToWindow(QVector3D(0.0, m_axisConfigs[AT_Y].axisLength * m_axisConfigs[AT_Y].axisRange.GetMinValue(), 0.0));
+		textRect = fontMetrics.boundingRect(negYLabel);
+		windowCoordinate.setX(windowCoordinate.x() - textRect.width() - textOffset);
+		windowCoordinate.setY(windowCoordinate.y() + textRect.height() / 2);
+		painter.drawText(windowCoordinate, negYLabel);
 	}
 
+	// Z axis labels
 	QString zLabel = m_axisConfigs[AT_Z].label;
 	windowCoordinate = ModelToWindow(QVector3D(0.0, 0.0, m_axisConfigs[AT_Z].axisLength * m_axisConfigs[AT_Z].axisRange.GetMaxValue()));
+	textRect = fontMetrics.boundingRect(zLabel);
+	
+	// Calculate offset based on Z axis length - project a small offset in Z direction and use screen-space distance
+	baseOffset = m_axisConfigs[AT_Z].axisLength * offsetFactor;
+	offsetPoint = ModelToWindow(QVector3D(0.0, 0.0, baseOffset));
+	delta = offsetPoint - origin;
+	textOffset = qMax(static_cast<int>(std::sqrt(delta.x() * delta.x() + delta.y() * delta.y())), minPixelOffset);
+	
+	windowCoordinate.setX(windowCoordinate.x() + textOffset);
+	windowCoordinate.setY(windowCoordinate.y() + textRect.height() / 2);
 	painter.drawText(windowCoordinate, zLabel);
 
 	if (m_axisConfigs[AT_Z].axisRange.GetMinValue() < 0.0){
-		painter.drawText(ModelToWindow(QVector3D(0.0, 0.0, m_axisConfigs[AT_Z].axisLength * m_axisConfigs[AT_Z].axisRange.GetMinValue())), QString("-") + zLabel);
+		QString negZLabel = QString("-") + zLabel;
+		windowCoordinate = ModelToWindow(QVector3D(0.0, 0.0, m_axisConfigs[AT_Z].axisLength * m_axisConfigs[AT_Z].axisRange.GetMinValue()));
+		textRect = fontMetrics.boundingRect(negZLabel);
+		windowCoordinate.setX(windowCoordinate.x() - textRect.width() - textOffset);
+		windowCoordinate.setY(windowCoordinate.y() + textRect.height() / 2);
+		painter.drawText(windowCoordinate, negZLabel);
 	}
 
 	painter.restore();
