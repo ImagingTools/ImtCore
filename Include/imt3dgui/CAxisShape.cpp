@@ -103,76 +103,23 @@ void CAxisShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet & /*chan
 		return;
 	}
 
-	// Rebuild the entire geometry with axis lines and 3D letter labels
-	std::vector<imt3d::CPointCloud3d::PointXyzwRgba32> vertices;
-	m_indices.clear();
+	// X
+	imt3d::CPointCloud3d::PointXyzwRgba32* a = (imt3d::CPointCloud3d::PointXyzwRgba32*)m_data.GetPointData(AT_X * 2);
+	a->data[AT_X] = m_axisConfigs[AT_X].axisLength * m_axisConfigs[AT_X].axisRange.GetMinValue();
+	imt3d::CPointCloud3d::PointXyzwRgba32* b = (imt3d::CPointCloud3d::PointXyzwRgba32*)m_data.GetPointData(AT_X * 2 + 1);
+	b->data[AT_X] = m_axisConfigs[AT_X].axisLength * m_axisConfigs[AT_X].axisRange.GetMaxValue();
 
-	// Calculate label size and offset based on axis length
-	float minAxisLength = m_axisConfigs[AT_X].axisLength;
-	if (m_axisConfigs[AT_Y].axisLength < minAxisLength)
-		minAxisLength = m_axisConfigs[AT_Y].axisLength;
-	if (m_axisConfigs[AT_Z].axisLength < minAxisLength)
-		minAxisLength = m_axisConfigs[AT_Z].axisLength;
-	
-	float labelSize = minAxisLength * 0.1f;
-	float labelOffset = labelSize * 0.5f;
+	// Y
+	a = (imt3d::CPointCloud3d::PointXyzwRgba32*)m_data.GetPointData(AT_Y * 2);
+	a->data[AT_Y] = m_axisConfigs[AT_Y].axisLength * m_axisConfigs[AT_Y].axisRange.GetMinValue();
+	b = (imt3d::CPointCloud3d::PointXyzwRgba32*)m_data.GetPointData(AT_Y * 2 + 1);
+	b->data[AT_Y] = m_axisConfigs[AT_Y].axisLength * m_axisConfigs[AT_Y].axisRange.GetMaxValue();
 
-	// X axis line
-	imt3d::CPointCloud3d::PointXyzwRgba32 vertex;
-	vertex.data[0] = m_axisConfigs[AT_X].axisLength * m_axisConfigs[AT_X].axisRange.GetMinValue();
-	vertex.data[1] = 0.0f;
-	vertex.data[2] = 0.0f;
-	vertex.data[3] = 1.0f;
-	vertex.data[4] = 1.0f; // Red
-	vertex.data[5] = 0.0f;
-	vertex.data[6] = 0.0f;
-	vertex.data[7] = 1.0f;
-	vertices.push_back(vertex);
-	
-	vertex.data[0] = m_axisConfigs[AT_X].axisLength * m_axisConfigs[AT_X].axisRange.GetMaxValue();
-	vertices.push_back(vertex);
-	m_indices.push_back(vertices.size() - 2);
-	m_indices.push_back(vertices.size() - 1);
-
-	// Y axis line
-	vertex.data[0] = 0.0f;
-	vertex.data[1] = m_axisConfigs[AT_Y].axisLength * m_axisConfigs[AT_Y].axisRange.GetMinValue();
-	vertex.data[2] = 0.0f;
-	vertex.data[4] = 0.0f;
-	vertex.data[5] = 1.0f; // Green
-	vertex.data[6] = 0.0f;
-	vertices.push_back(vertex);
-	
-	vertex.data[1] = m_axisConfigs[AT_Y].axisLength * m_axisConfigs[AT_Y].axisRange.GetMaxValue();
-	vertices.push_back(vertex);
-	m_indices.push_back(vertices.size() - 2);
-	m_indices.push_back(vertices.size() - 1);
-
-	// Z axis line
-	vertex.data[0] = 0.0f;
-	vertex.data[1] = 0.0f;
-	vertex.data[2] = m_axisConfigs[AT_Z].axisLength * m_axisConfigs[AT_Z].axisRange.GetMinValue();
-	vertex.data[4] = 0.0f;
-	vertex.data[5] = 0.0f;
-	vertex.data[6] = 1.0f; // Blue
-	vertices.push_back(vertex);
-	
-	vertex.data[2] = m_axisConfigs[AT_Z].axisLength * m_axisConfigs[AT_Z].axisRange.GetMaxValue();
-	vertices.push_back(vertex);
-	m_indices.push_back(vertices.size() - 2);
-	m_indices.push_back(vertices.size() - 1);
-
-	// Add 3D letter labels using OpenGL primitives
-	QVector3D xPos(m_axisConfigs[AT_X].axisLength * m_axisConfigs[AT_X].axisRange.GetMaxValue() + labelOffset, 0.0f, 0.0f);
-	QVector3D yPos(0.0f, m_axisConfigs[AT_Y].axisLength * m_axisConfigs[AT_Y].axisRange.GetMaxValue() + labelOffset, 0.0f);
-	QVector3D zPos(0.0f, 0.0f, m_axisConfigs[AT_Z].axisLength * m_axisConfigs[AT_Z].axisRange.GetMaxValue() + labelOffset);
-
-	AddLetterGeometry(vertices, m_indices, m_axisConfigs[AT_X].label, xPos, labelSize, QVector3D(1.0f, 0.0f, 0.0f));
-	AddLetterGeometry(vertices, m_indices, m_axisConfigs[AT_Y].label, yPos, labelSize, QVector3D(0.0f, 1.0f, 0.0f));
-	AddLetterGeometry(vertices, m_indices, m_axisConfigs[AT_Z].label, zPos, labelSize, QVector3D(0.0f, 0.0f, 1.0f));
-
-	// Recreate point cloud with new geometry
-	m_data.CreateCloud(imt3d::CPointCloud3d::PF_XYZW_RGBA_32, vertices.size(), vertices.data());
+	// Z
+	a = (imt3d::CPointCloud3d::PointXyzwRgba32*)m_data.GetPointData(AT_Z * 2);
+	a->data[AT_Z] = m_axisConfigs[AT_Z].axisLength * m_axisConfigs[AT_Z].axisRange.GetMinValue();
+	b = (imt3d::CPointCloud3d::PointXyzwRgba32*)m_data.GetPointData(AT_Z * 2 + 1);
+	b->data[AT_Z] = m_axisConfigs[AT_Z].axisLength * m_axisConfigs[AT_Z].axisRange.GetMaxValue();
 
 	m_doUpdate = false;
 }
@@ -193,72 +140,51 @@ void CAxisShape::DrawShapeGl(QOpenGLShaderProgram& /*program*/, QOpenGLFunctions
 
 // reimplement (imt3dgui::IDrawable)
 
-void CAxisShape::Draw(QPainter& /*painter*/)
+void CAxisShape::Draw(QPainter& painter)
 {
-	// Labels are now rendered as 3D OpenGL primitives in DrawShapeGl
-	// No 2D text rendering needed
-}
+	if (!IsVisible()){
+		return;
+	}
 
+	painter.save();
 
-// private methods
-
-void CAxisShape::AddLetterGeometry(std::vector<imt3d::CPointCloud3d::PointXyzwRgba32>& vertices, 
-                                    QVector<GLuint>& indices,
-                                    const QString& letter,
-                                    const QVector3D& position,
-                                    float size,
-                                    const QVector3D& color)
-{
-	// Helper lambda to add a line segment
-	auto addLine = [&](float x1, float y1, float z1, float x2, float y2, float z2) {
-		imt3d::CPointCloud3d::PointXyzwRgba32 v1, v2;
-		
-		v1.data[0] = position.x() + x1 * size;
-		v1.data[1] = position.y() + y1 * size;
-		v1.data[2] = position.z() + z1 * size;
-		v1.data[3] = 1.0f;
-		v1.data[4] = color.x();
-		v1.data[5] = color.y();
-		v1.data[6] = color.z();
-		v1.data[7] = 1.0f;
-		
-		v2.data[0] = position.x() + x2 * size;
-		v2.data[1] = position.y() + y2 * size;
-		v2.data[2] = position.z() + z2 * size;
-		v2.data[3] = 1.0f;
-		v2.data[4] = color.x();
-		v2.data[5] = color.y();
-		v2.data[6] = color.z();
-		v2.data[7] = 1.0f;
-		
-		vertices.push_back(v1);
-		vertices.push_back(v2);
-		indices.push_back(vertices.size() - 2);
-		indices.push_back(vertices.size() - 1);
-	};
-
-	// Define letter geometry using simple line primitives
-	// Letters are drawn in a normalized coordinate system (0-1 range)
-	QString upperLetter = letter.toUpper();
+	// Use a clear, readable font for axis labels
+	QFont font("Arial", 10);
+	font.setBold(true);
+	painter.setFont(font);
+	painter.setRenderHint(QPainter::TextAntialiasing, true);
 	
-	if (upperLetter == "X") {
-		// X is two diagonal lines forming a cross
-		addLine(-0.5f, -0.5f, 0.0f,  0.5f,  0.5f, 0.0f); // Bottom-left to top-right
-		addLine(-0.5f,  0.5f, 0.0f,  0.5f, -0.5f, 0.0f); // Top-left to bottom-right
-	}
-	else if (upperLetter == "Y") {
-		// Y is a vertical line with two diagonal lines at top
-		addLine( 0.0f,  0.0f, 0.0f,  0.0f, -0.5f, 0.0f); // Vertical stem
-		addLine( 0.0f,  0.0f, 0.0f, -0.5f,  0.5f, 0.0f); // Top-left diagonal
-		addLine( 0.0f,  0.0f, 0.0f,  0.5f,  0.5f, 0.0f); // Top-right diagonal
-	}
-	else if (upperLetter == "Z") {
-		// Z is three lines forming the letter
-		addLine(-0.5f,  0.5f, 0.0f,  0.5f,  0.5f, 0.0f); // Top horizontal
-		addLine( 0.5f,  0.5f, 0.0f, -0.5f, -0.5f, 0.0f); // Diagonal
-		addLine(-0.5f, -0.5f, 0.0f,  0.5f, -0.5f, 0.0f); // Bottom horizontal
-	}
-	// Unknown letters are silently ignored and will not be rendered
+	QFontMetrics fontMetrics(font);
+	const int textOffset = 5; // Fixed pixel offset from axis endpoint
+	
+	// X axis label
+	QString xLabel = m_axisConfigs[AT_X].label;
+	QPoint xPos = ModelToWindow(QVector3D(m_axisConfigs[AT_X].axisLength * m_axisConfigs[AT_X].axisRange.GetMaxValue(), 0.0, 0.0));
+	QRect xTextRect = fontMetrics.boundingRect(xLabel);
+	xPos.setX(xPos.x() + textOffset);
+	xPos.setY(xPos.y() + xTextRect.height() / 2);
+	painter.setPen(QColor(255, 0, 0)); // Red for X axis
+	painter.drawText(xPos, xLabel);
+
+	// Y axis label
+	QString yLabel = m_axisConfigs[AT_Y].label;
+	QPoint yPos = ModelToWindow(QVector3D(0.0, m_axisConfigs[AT_Y].axisLength * m_axisConfigs[AT_Y].axisRange.GetMaxValue(), 0.0));
+	QRect yTextRect = fontMetrics.boundingRect(yLabel);
+	yPos.setX(yPos.x() + textOffset);
+	yPos.setY(yPos.y() + yTextRect.height() / 2);
+	painter.setPen(QColor(0, 255, 0)); // Green for Y axis
+	painter.drawText(yPos, yLabel);
+
+	// Z axis label
+	QString zLabel = m_axisConfigs[AT_Z].label;
+	QPoint zPos = ModelToWindow(QVector3D(0.0, 0.0, m_axisConfigs[AT_Z].axisLength * m_axisConfigs[AT_Z].axisRange.GetMaxValue()));
+	QRect zTextRect = fontMetrics.boundingRect(zLabel);
+	zPos.setX(zPos.x() + textOffset);
+	zPos.setY(zPos.y() + zTextRect.height() / 2);
+	painter.setPen(QColor(0, 0, 255)); // Blue for Z axis
+	painter.drawText(zPos, zLabel);
+
+	painter.restore();
 }
 
 

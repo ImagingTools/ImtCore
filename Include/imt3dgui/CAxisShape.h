@@ -42,16 +42,6 @@ protected:
 	virtual void Draw(QPainter& painter) override;
 
 private:
-	// Creates 3D line geometry for a letter (X, Y, or Z) at the specified position
-	// Unknown letters will not be rendered
-	void AddLetterGeometry(std::vector<imt3d::CPointCloud3d::PointXyzwRgba32>& vertices, 
-	                       QVector<GLuint>& indices,
-	                       const QString& letter,
-	                       const QVector3D& position,
-	                       float size,
-	                       const QVector3D& color);
-
-private:
 	imt3d::CPointCloud3d m_data;
 
 	struct AxisConfig
