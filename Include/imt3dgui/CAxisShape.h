@@ -42,7 +42,8 @@ protected:
 	virtual void Draw(QPainter& painter) override;
 
 private:
-	QFont GetAxeLabelFont() const;
+	// Creates 3D line geometry for a letter (X, Y, or Z) at the specified position
+	// Unknown letters will not be rendered
 	void AddLetterGeometry(std::vector<imt3d::CPointCloud3d::PointXyzwRgba32>& vertices, 
 	                       QVector<GLuint>& indices,
 	                       const QString& letter,
@@ -63,7 +64,6 @@ private:
 
 	QMap<AxisType, AxisConfig> m_axisConfigs;
 
-	static const float s_zoomFontFactor;
 	bool m_doUpdate;
 };
 

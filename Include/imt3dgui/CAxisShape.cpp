@@ -6,10 +6,6 @@ namespace imt3dgui
 {
 
 
-// static members
-const float CAxisShape::s_zoomFontFactor = 50.0f;
-
-
 // public methods
 
 CAxisShape::CAxisShape()
@@ -112,9 +108,13 @@ void CAxisShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet & /*chan
 	m_indices.clear();
 
 	// Calculate label size and offset based on axis length
-	float labelSize = qMin(m_axisConfigs[AT_X].axisLength, 
-	                       qMin(m_axisConfigs[AT_Y].axisLength, 
-	                            m_axisConfigs[AT_Z].axisLength)) * 0.1f;
+	float minAxisLength = m_axisConfigs[AT_X].axisLength;
+	if (m_axisConfigs[AT_Y].axisLength < minAxisLength)
+		minAxisLength = m_axisConfigs[AT_Y].axisLength;
+	if (m_axisConfigs[AT_Z].axisLength < minAxisLength)
+		minAxisLength = m_axisConfigs[AT_Z].axisLength;
+	
+	float labelSize = minAxisLength * 0.1f;
 	float labelOffset = labelSize * 0.5f;
 
 	// X axis line
@@ -180,7 +180,10 @@ void CAxisShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet & /*chan
 
 void CAxisShape::DrawShapeGl(QOpenGLShaderProgram& /*program*/, QOpenGLFunctions& functions)
 {
-	double lineWidth = m_axisConfigs[AT_X].lineWidth;
+	// Use the maximum line width from all axes since glLineWidth applies to all lines
+	double lineWidth = qMax(m_axisConfigs[AT_X].lineWidth,
+	                        qMax(m_axisConfigs[AT_Y].lineWidth,
+	                             m_axisConfigs[AT_Z].lineWidth));
 
 	functions.glLineWidth(lineWidth);
 
@@ -255,24 +258,7 @@ void CAxisShape::AddLetterGeometry(std::vector<imt3d::CPointCloud3d::PointXyzwRg
 		addLine( 0.5f,  0.5f, 0.0f, -0.5f, -0.5f, 0.0f); // Diagonal
 		addLine(-0.5f, -0.5f, 0.0f,  0.5f, -0.5f, 0.0f); // Bottom horizontal
 	}
-	// If the letter is not X, Y, or Z, we could add more letters or just skip
-	// For now, default letters will just not be rendered
-}
-
-QFont CAxisShape::GetAxeLabelFont() const
-{
-	if (m_cameraPtr == nullptr){
-		return QFont();
-	}
-
-	float fontSize = qAbs(s_zoomFontFactor / m_cameraPtr->GetPosition().z());
-	fontSize = qMin(fontSize, 20.0f);
-
-	QFont font("Verdana");
-	font.setPointSizeF(fontSize);
-	font.setWeight(QFont::Weight(80));
-
-	return font;
+	// Unknown letters are silently ignored and will not be rendered
 }
 
 
