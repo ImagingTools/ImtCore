@@ -59,9 +59,9 @@ namespace imtdev
 	// Use as file persistence
 	ifile::IFilePersistence* pPersistence = pFilePersistence;
 	
-	// Load device data
-	I_CREATE(istd::CChangeable, pData);
-	I_CREATE(ibase::CProgressManager, pProgress);
+	// Load device data (provide your own data object and progress manager)
+	istd::IChangeable* pData = /* your data object */;
+	ibase::IProgressManager* pProgress = /* your progress manager */;
 	auto result = pPersistence->LoadFromFile(*pData, "device_data.bin", pProgress);
 	
 	if (result == ifile::IFilePersistence::OS_SUCCESS)

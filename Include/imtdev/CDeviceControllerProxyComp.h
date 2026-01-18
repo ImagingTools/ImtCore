@@ -71,9 +71,9 @@ namespace imtdev
 	// Create proxy controller
 	I_CREATE(CDeviceControllerProxyComp, pProxy);
 	
-	// Add controllers
-	I_GETREF(IDeviceController, pController1);  // USB device controller
-	I_GETREF(IDeviceController, pController2);  // Network device controller
+	// Add controllers (assuming they are registered in component system)
+	I_REF(IDeviceController, pController1);  // USB device controller
+	I_REF(IDeviceController, pController2);  // Network device controller
 	pProxy->AddDeviceController(pController1);
 	pProxy->AddDeviceController(pController2);
 	

@@ -257,12 +257,16 @@ protected:
 		QMap<int, VersionItem> m_versions;
 	};
 
-	mutable imod::CModelUpdateBridge m_updateBridge;  ///< Bridge for change notifications (mutable for change tracking in const methods)
-	mutable std::unique_ptr<iattr::IAttributesProvider> m_attributesPtr;  ///< Lazy-created attributes (mutable to allow creation in const GetAttributes())
+	/// Bridge for change notifications (mutable for change tracking in const methods)
+	mutable imod::CModelUpdateBridge m_updateBridge;
+	/// Lazy-created attributes (mutable to allow creation in const GetAttributes())
+	mutable std::unique_ptr<iattr::IAttributesProvider> m_attributesPtr;
 
 private:
-	QMap<int, QByteArray> m_identifiers;  ///< Storage for device identifiers by type
-	imod::TModelWrap<VersionInfo> m_versionInfo;  ///< Version information with change tracking
+	/// Storage for device identifiers by type
+	QMap<int, QByteArray> m_identifiers;
+	/// Version information with change tracking
+	imod::TModelWrap<VersionInfo> m_versionInfo;
 };
 
 
