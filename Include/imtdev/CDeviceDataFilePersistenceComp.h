@@ -14,7 +14,77 @@ namespace imtdev
 
 
 /**
-	This component realizes the implementation of the \c ifile::IFilePersistence interface using underlaying \c IDeviceDataPersistence instance.
+	@brief File persistence adapter for device data
+	
+	CDeviceDataFilePersistenceComp implements the **Adapter Pattern** to adapt
+	IDeviceDataPersistence (low-level device storage) to ifile::IFilePersistence
+	(file-based persistence). This enables device data to be saved and loaded using
+	standard file operations.
+	
+	This component realizes the implementation of the ifile::IFilePersistence interface
+	using an underlying IDeviceDataPersistence instance, bridging device hardware storage
+	with file system operations.
+	
+	@par Purpose:
+	Enables device data to be treated as files by:
+	- Converting device storage operations to file load/save operations
+	- Supporting progress tracking for long-running operations
+	- Providing file type information for UI file dialogs
+	- Validating operations against device capabilities
+	
+	@par Key Features:
+	- **Storage Abstraction**: Maps device ROM/EEPROM to file operations
+	- **Progress Support**: Tracks read/write progress for UI feedback
+	- **File Type Info**: Provides file extensions and descriptions
+	- **Operation Validation**: Checks if operations are supported before execution
+	- **Metadata Handling**: Preserves device metadata in file operations
+	
+	@par Component Configuration:
+	- **DeviceDataPersistence**: Reference to IDeviceDataPersistence providing low-level access
+	
+	@par Supported Operations:
+	- **LoadFromFile**: Reads device data from storage into memory object
+	- **SaveToFile**: Writes memory object to device storage
+	- **IsOperationSupported**: Validates whether operation can be performed
+	
+	@par Usage Example:
+	@code{.cpp}
+	// Create file persistence adapter
+	I_CREATE(CDeviceDataFilePersistenceComp, pFilePersistence);
+	
+	// Connect to device data persistence
+	I_GETREF(IDeviceDataPersistence, pDeviceDataPersistence);
+	pFilePersistence->SetDeviceDataPersistence(pDeviceDataPersistence);
+	
+	// Use as file persistence
+	ifile::IFilePersistence* pPersistence = pFilePersistence;
+	
+	// Load device data
+	I_CREATE(istd::CChangeable, pData);
+	I_CREATE(ibase::CProgressManager, pProgress);
+	auto result = pPersistence->LoadFromFile(*pData, "device_data.bin", pProgress);
+	
+	if (result == ifile::IFilePersistence::OS_SUCCESS)
+	{
+		// Process loaded data
+	}
+	
+	// Save device data
+	result = pPersistence->SaveToFile(*pData, "device_data.bin", pProgress);
+	
+	// Get file type info for file dialog
+	QStringList extensions;
+	pPersistence->GetFileExtensions(extensions);  // e.g., ["*.bin", "*.dat"]
+	@endcode
+	
+	@par File Format:
+	The actual file format depends on the device and storage type (ROM/EEPROM).
+	Typically binary data with optional metadata header.
+	
+	@see IDeviceDataPersistence
+	@see ifile::IFilePersistence
+	@see ibase::IProgressManager
+	@ingroup imtdev
 */
 class CDeviceDataFilePersistenceComp:
 			public ilog::CLoggerComponentBase,

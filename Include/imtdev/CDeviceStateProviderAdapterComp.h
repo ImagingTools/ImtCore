@@ -13,6 +13,65 @@ namespace imtdev
 {
 
 
+/**
+	@brief Adapter component providing standalone device state provider
+	
+	CDeviceStateProviderAdapterComp implements the **Adapter Pattern** to extract
+	and expose the IDeviceStateProvider interface from an IDeviceController as a
+	standalone component. This enables state tracking to be used independently of
+	the full controller interface.
+	
+	@par Purpose:
+	Decouples device state tracking from device control operations, enabling:
+	- State monitoring without controller access
+	- Independent state provider references
+	- Simplified dependency injection
+	- UI binding to state changes only
+	
+	@par Key Features:
+	- **Standalone Interface**: Provides IDeviceStateProvider without full controller
+	- **Change Forwarding**: Propagates state change notifications from controller
+	- **Automatic Binding**: Connects to controller's state provider on creation
+	- **Cleanup Handling**: Properly unbinds on destruction
+	
+	@par Component Configuration:
+	- **DeviceController**: Reference to IDeviceController whose state provider to adapt
+	
+	@par Lifecycle:
+	- OnComponentCreated(): Binds to controller's state provider for change notifications
+	- OnComponentDestroyed(): Unbinds from controller's state provider
+	
+	@par Usage Example:
+	@code{.cpp}
+	// Create state provider adapter
+	I_CREATE(CDeviceStateProviderAdapterComp, pStateAdapter);
+	
+	// Connect to device controller
+	I_GETREF(IDeviceController, pController);
+	pStateAdapter->SetDeviceController(pController);
+	
+	// Use as standalone state provider
+	IDeviceStateProvider* pStateProvider = pStateAdapter;
+	IDeviceStateProvider::DeviceState state = pStateProvider->GetDeviceState(deviceId);
+	
+	// Register for state change notifications
+	class StateObserver : public istd::IChangeObserver
+	{
+		void OnChanged(const istd::IChangeable* changeable, int flags) override
+		{
+			if (flags & IDeviceStateProvider::CF_STATE_CHANGED)
+			{
+				// Update UI based on state change
+			}
+		}
+	};
+	@endcode
+	
+	@see IDeviceStateProvider
+	@see IDeviceController
+	@see CDeviceInstanceListAdapterComp
+	@ingroup imtdev
+*/
 class CDeviceStateProviderAdapterComp:
 			public icomp::CComponentBase,
 			public IDeviceStateProvider

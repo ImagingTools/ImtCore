@@ -16,6 +16,71 @@ namespace imtdev
 {
 
 
+/**
+	@brief Selection-based device attributes component
+	
+	CDeviceIdBasedAttributesComp manages device attributes that automatically synchronize
+	with device selection, providing separate static and instance-specific attribute
+	providers. It observes device selection, state changes, and instance attribute updates
+	to maintain current attribute values.
+	
+	@par Purpose:
+	Enables UI binding to device attributes by:
+	- Automatically loading attributes when device is selected
+	- Maintaining separate static and instance attributes
+	- Synchronizing with device state transitions
+	- Providing change notifications for UI updates
+	
+	@par Key Features:
+	- **Dual Attribute Sets**: Separate managers for static and instance attributes
+	- **Selection Awareness**: Updates when selected device changes
+	- **State Tracking**: Refreshes attributes on device state changes
+	- **Automatic Synchronization**: Syncs with device instance attribute changes
+	- **Sub-Element Access**: Exposes static and instance attributes as separate sub-elements
+	
+	@par Component Structure:
+	The component exposes multiple sub-elements:
+	- **StaticAttributes**: Device specification static attributes (IAttributesProvider)
+	- **InstanceAttributes**: Device instance runtime attributes (IAttributesProvider)
+	
+	@par Component Configuration:
+	- **DeviceSelection**: Reference to ISelection providing selected device ID
+	- **DeviceController**: Reference to IDeviceController for device instance access
+	- **DeviceStateProvider**: Reference to IDeviceStateProvider for state monitoring
+	
+	@par Attribute Types:
+	- **Static Attributes**: From device specification (e.g., supported features, hardware limits)
+	- **Instance Attributes**: From device instance (e.g., temperature, calibration date, serial number)
+	
+	@par Usage Example:
+	@code{.cpp}
+	// Create attributes component
+	I_CREATE(CDeviceIdBasedAttributesComp, pAttrs);
+	
+	// Connect dependencies
+	I_GETREF(imtbase::ISelection, pDeviceSelection);
+	I_GETREF(IDeviceController, pController);
+	I_GETREF(IDeviceStateProvider, pStateProvider);
+	
+	pAttrs->SetDeviceSelection(pDeviceSelection);
+	pAttrs->SetDeviceController(pController);
+	pAttrs->SetDeviceStateProvider(pStateProvider);
+	
+	// Access static attributes
+	const iattr::IAttributesProvider* pStaticAttrs = pAttrs->GetStaticAttributes();
+	QVariant maxResolution = pStaticAttrs->GetAttributeValue("MaxResolution");
+	
+	// Access instance attributes
+	const iattr::IAttributesProvider* pInstanceAttrs = pAttrs->GetInstanceAttributes();
+	QVariant temperature = pInstanceAttrs->GetAttributeValue("Temperature");
+	QVariant serialNumber = pInstanceAttrs->GetAttributeValue("SerialNumber");
+	@endcode
+	
+	@see IDeviceInstance
+	@see IDeviceSpecification
+	@see imtbase::ISelection
+	@ingroup imtdev
+*/
 class CDeviceIdBasedAttributesComp: public ilog::CLoggerComponentBase
 {
 public:

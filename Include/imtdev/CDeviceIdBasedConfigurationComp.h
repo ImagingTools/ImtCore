@@ -16,6 +16,80 @@ namespace imtdev
 {
 
 
+/**
+	@brief Selection-based device configuration component
+	
+	CDeviceIdBasedConfigurationComp implements the **Adapter Pattern** to provide
+	device-specific configuration as an iprm::IParamsSet that automatically synchronizes
+	with device selection. It bridges device configuration management with parameter-based
+	UI frameworks.
+	
+	This component observes device selection, configuration changes, and device state,
+	maintaining bidirectional synchronization between the UI parameter set and the
+	device's persistent configuration.
+	
+	@par Purpose:
+	Enables seamless UI binding to device configurations by:
+	- Automatically loading configuration when device is selected
+	- Synchronizing parameter changes back to configuration manager
+	- Handling device state transitions (updating when device opens/closes)
+	- Preventing recursive updates with FlagLocker pattern
+	
+	@par Key Features:
+	- **Automatic Synchronization**: Bidirectional sync between UI params and device config
+	- **Selection Awareness**: Updates when selected device changes
+	- **State Tracking**: Refreshes configuration on device state changes
+	- **Anti-Recursion**: FlagLocker prevents infinite update loops
+	- **Change Notifications**: Triggers updates through model update binders
+	
+	@par Component Configuration:
+	- **DeviceSelection**: Reference to ISelection providing selected device ID
+	- **DeviceController**: Reference to IDeviceController for device instance access
+	- **DeviceConfigurationManager**: Reference to IDeviceConfigurationManager for persistence
+	- **DeviceStateProvider**: Reference to IDeviceStateProvider for state monitoring
+	
+	@par Synchronization Flow:
+	@code
+	User selects device
+	  ↓
+	Configuration loaded from manager
+	  ↓
+	Parameters updated in UI
+	  ↓
+	User modifies parameter
+	  ↓
+	Configuration saved to manager
+	  ↓
+	Change notification fired
+	@endcode
+	
+	@par Usage Example:
+	@code{.cpp}
+	// Create configuration component
+	I_CREATE(CDeviceIdBasedConfigurationComp, pConfig);
+	
+	// Connect dependencies
+	I_GETREF(imtbase::ISelection, pDeviceSelection);
+	I_GETREF(IDeviceController, pController);
+	I_GETREF(IDeviceConfigurationManager, pConfigMgr);
+	I_GETREF(IDeviceStateProvider, pStateProvider);
+	
+	pConfig->SetDeviceSelection(pDeviceSelection);
+	pConfig->SetDeviceController(pController);
+	pConfig->SetDeviceConfigurationManager(pConfigMgr);
+	pConfig->SetDeviceStateProvider(pStateProvider);
+	
+	// Use as parameter set for UI binding
+	iprm::IParamsSet* pParams = pConfig;
+	QVariant value = pParams->GetParamValue("BaudRate");
+	pParams->SetParamValue("BaudRate", 115200);  // Auto-saves to manager
+	@endcode
+	
+	@see IDeviceConfigurationManager
+	@see imtbase::ISelection
+	@see CDeviceIdBasedConfigurationManagerComp
+	@ingroup imtdev
+*/
 class CDeviceIdBasedConfigurationComp:
 			public ilog::CLoggerComponentBase,
 			public iprm::CParamsSet
