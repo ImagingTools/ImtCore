@@ -37,9 +37,10 @@ namespace imtdev
 	- **Device Metadata**: Additional metadata stored on device (via IDocumentMetaInfo)
 	- **Parameter Sets**: Configuration data structured as key-value parameters
 	
-	@par Usage Example:
+	@par Usage Pattern:
 	@code{.cpp}
-	I_GETREF(IDeviceDataProvider, pDataProvider);
+	// Obtain data provider reference (via component system)
+	IDeviceDataProvider* pDataProvider = /* get from component system */;
 	
 	// Access device metadata
 	idoc::IDocumentMetaInfo* pMetaInfo = pDataProvider->GetDeviceMetaInfo();

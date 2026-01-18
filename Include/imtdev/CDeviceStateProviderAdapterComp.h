@@ -41,14 +41,12 @@ namespace imtdev
 	- OnComponentCreated(): Binds to controller's state provider for change notifications
 	- OnComponentDestroyed(): Unbinds from controller's state provider
 	
-	@par Usage Example:
+	@par Usage Pattern:
 	@code{.cpp}
-	// Create state provider adapter
-	I_CREATE(CDeviceStateProviderAdapterComp, pStateAdapter);
+	// Obtain state provider adapter instance (via component system)
+	CDeviceStateProviderAdapterComp* pStateAdapter = /* get from component system */;
 	
-	// Connect to device controller
-	I_GETREF(IDeviceController, pController);
-	pStateAdapter->SetDeviceController(pController);
+	// Component is configured with DeviceController reference
 	
 	// Use as standalone state provider
 	IDeviceStateProvider* pStateProvider = pStateAdapter;

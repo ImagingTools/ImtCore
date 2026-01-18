@@ -47,16 +47,13 @@ namespace imtdev
 	- **SaveToFile**: Writes memory object to device storage
 	- **IsOperationSupported**: Validates whether operation can be performed
 	
-	@par Usage Example:
+	@par Usage Pattern:
 	@code{.cpp}
-	// Create file persistence adapter
-	I_CREATE(CDeviceDataFilePersistenceComp, pFilePersistence);
+	// Obtain file persistence adapter instance (via component system)
+	CDeviceDataFilePersistenceComp* pFilePersistence = /* get from component system */;
 	
-	// Connect to device data persistence
-	I_GETREF(IDeviceDataPersistence, pDeviceDataPersistence);
-	pFilePersistence->SetDeviceDataPersistence(pDeviceDataPersistence);
-	
-	// Use as file persistence
+	// Component is configured with IDeviceDataPersistence reference
+	// Access as file persistence interface
 	ifile::IFilePersistence* pPersistence = pFilePersistence;
 	
 	// Load device data (provide your own data object and progress manager)

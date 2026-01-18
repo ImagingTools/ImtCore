@@ -32,9 +32,10 @@ namespace imtdev
 	- **ST_ROM**: Read-only memory (typically firmware, factory data)
 	- **ST_EEPROM**: Electrically erasable programmable ROM (user configuration, calibration)
 	
-	@par Usage Example:
+	@par Usage Pattern:
 	@code{.cpp}
-	I_GETREF(IDeviceDataPersistence, pPersistence);
+	// Obtain persistence interface reference (via component system)
+	IDeviceDataPersistence* pPersistence = /* get from component system */;
 	
 	// Check if device is ready
 	if (!pPersistence->IsDeviceReady())
@@ -44,7 +45,7 @@ namespace imtdev
 	}
 	
 	// Read device metadata
-	I_CREATE(idoc::CDocumentMetaInfo, pMetaInfo);
+	idoc::IDocumentMetaInfo* pMetaInfo = /* create meta info object */;
 	if (pPersistence->ReadDeviceMetaInfo(*pMetaInfo))
 	{
 		QString serialNum = pMetaInfo->GetMetaInfo(
@@ -55,7 +56,7 @@ namespace imtdev
 	
 	// Read all data from EEPROM
 	QByteArray eepromData;
-	I_CREATE(ibase::CProgressManager, pProgress);
+	ibase::IProgressManager* pProgress = /* your progress manager */;
 	if (pPersistence->ReadDataFromStorage(eepromData, 
 	                                       IDeviceDataPersistence::ST_EEPROM, 
 	                                       pProgress))
@@ -64,7 +65,7 @@ namespace imtdev
 	}
 	
 	// Write data to EEPROM
-	QByteArray newData = PrepareConfigurationData();
+	QByteArray newData = /* prepare configuration data */;
 	pPersistence->WriteDataToStorage(newData, 
 	                                 IDeviceDataPersistence::ST_EEPROM,
 	                                 pProgress);
@@ -91,8 +92,10 @@ public:
 	*/
 	enum StorageType
 	{
-		ST_ROM,      ///< Read-only memory (firmware, factory data)
-		ST_EEPROM    ///< Electrically erasable programmable ROM (user configuration)
+		/// Read-only memory (firmware, factory data)
+		ST_ROM,
+		/// Electrically erasable programmable ROM (user configuration)
+		ST_EEPROM
 	};
 
 	/**
@@ -103,9 +106,12 @@ public:
 	*/
 	enum MetaInfo
 	{
-		MIT_SERIAL_NUMBER = idoc::IDocumentMetaInfo::MIT_USER,  ///< Device serial number
-		MIT_VERSION_NUMBER,     ///< Device version number
-		MIT_FIRMWARE_VERSION    ///< Firmware version string
+		/// Device serial number
+		MIT_SERIAL_NUMBER = idoc::IDocumentMetaInfo::MIT_USER,
+		/// Device version number
+		MIT_VERSION_NUMBER,
+		/// Firmware version string
+		MIT_FIRMWARE_VERSION
 	};
 
 	/**

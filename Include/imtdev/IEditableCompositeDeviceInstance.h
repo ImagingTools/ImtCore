@@ -30,10 +30,10 @@ class IDeviceSpecification;
 	- **Remove Sub-Device**: Remove existing sub-devices from the composite
 	- **Type Validation**: Ensure sub-devices match supported types
 	
-	@par Usage Example:
+	@par Usage Pattern:
 	@code{.cpp}
-	// Create editable composite device instance
-	I_CREATE(CCompositeDeviceInstanceBase, pComposite);
+	// Obtain or create editable composite device instance
+	CCompositeDeviceInstanceBase* pComposite = /* your composite instance */;
 	
 	// Add a camera sub-device
 	QByteArray cameraTypeId = "StandardCamera";
@@ -48,7 +48,7 @@ class IDeviceSpecification;
 	if (!cameraId.isEmpty())
 	{
 		// Sub-device successfully added
-		const IDeviceInstance* pCamera = 
+		const IDeviceInstance* pCamera =
 			pComposite->GetSubDeviceInstance(cameraId);
 	}
 	

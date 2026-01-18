@@ -88,9 +88,12 @@ public:
 		*/
 		enum EnumerationResult
 		{
-			ER_OK,        ///< Enumeration completed successfully
-			ER_CANCELED,  ///< Enumeration was canceled via CancelEnumeration()
-			ER_FAILED     ///< Enumeration failed due to an error
+			/// Enumeration completed successfully
+			ER_OK,
+			/// Enumeration was canceled via CancelEnumeration()
+			ER_CANCELED,
+			/// Enumeration failed due to an error
+			ER_FAILED
 		};
 
 		/**
@@ -115,9 +118,12 @@ public:
 	*/
 	enum StartResult
 	{
-		SR_OK,                                   ///< Enumeration started successfully
-		SR_PREVIOUS_ENUMERATION_NOT_FINISHED,    ///< Cannot start - previous enumeration still running
-		SR_FAILED                                ///< Failed to start enumeration
+		/// Enumeration started successfully
+		SR_OK,
+		/// Cannot start - previous enumeration still running
+		SR_PREVIOUS_ENUMERATION_NOT_FINISHED,
+		/// Failed to start enumeration
+		SR_FAILED
 	};
 
 	/**

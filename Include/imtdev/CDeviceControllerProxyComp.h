@@ -66,14 +66,14 @@ namespace imtdev
 	3. Handles enumeration failures gracefully
 	4. Respects the configured interval
 	
-	@par Usage Example:
+	@par Usage Pattern:
 	@code{.cpp}
-	// Create proxy controller
-	I_CREATE(CDeviceControllerProxyComp, pProxy);
+	// Obtain proxy controller instance (created via component system)
+	CDeviceControllerProxyComp* pProxy = /* get from component system */;
 	
-	// Add controllers (assuming they are registered in component system)
-	I_REF(IDeviceController, pController1);  // USB device controller
-	I_REF(IDeviceController, pController2);  // Network device controller
+	// Obtain controller references (configured via component system)
+	IDeviceController* pController1 = /* USB device controller reference */;
+	IDeviceController* pController2 = /* Network device controller reference */;
 	pProxy->AddDeviceController(pController1);
 	pProxy->AddDeviceController(pController2);
 	

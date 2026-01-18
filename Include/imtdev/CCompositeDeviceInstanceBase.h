@@ -101,7 +101,8 @@ namespace imtdev
 class CCompositeDeviceInstanceBase : public CDeviceInstanceBase, virtual public IEditableCompositeDeviceInstance
 {
 public:
-	typedef CDeviceInstanceBase BaseClass;  ///< Base class type alias
+	/// Base class type alias
+	typedef CDeviceInstanceBase BaseClass;
 
 	/**
 		@brief Constructor
@@ -293,7 +294,8 @@ private:
 					ilog::IMessageConsumer* logPtr = nullptr) override;
 
 	private:
-		CCompositeDeviceInstanceBase* m_parentPtr;  ///< Pointer to parent composite device
+		/// Pointer to parent composite device
+		CCompositeDeviceInstanceBase* m_parentPtr;
 	};
 
 private:
@@ -313,13 +315,18 @@ private:
 	*/
 	struct SubDeviceItem
 	{
-		QString name;                    ///< Human-readable name
-		QString description;             ///< Description text
-		DeviceInstancePtr instancePtr;   ///< Device instance pointer
+		/// Human-readable name
+		QString name;
+		/// Description text
+		QString description;
+		/// Device instance pointer
+		DeviceInstancePtr instancePtr;
 	};
 
-	QMap<QByteArray, SubDeviceItem> m_subDeviceMap;  ///< Map of sub-devices by ID
-	imod::TModelWrap<SubDeviceCollectionInfo> m_subDeviceCollection;  ///< Collection with change tracking
+	/// Map of sub-devices by ID
+	QMap<QByteArray, SubDeviceItem> m_subDeviceMap;
+	/// Collection with change tracking
+	imod::TModelWrap<SubDeviceCollectionInfo> m_subDeviceCollection;
 };
 
 

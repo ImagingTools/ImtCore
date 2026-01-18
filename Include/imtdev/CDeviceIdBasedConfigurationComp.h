@@ -63,21 +63,16 @@ namespace imtdev
 	Change notification fired
 	@endcode
 	
-	@par Usage Example:
+	@par Usage Pattern:
 	@code{.cpp}
-	// Create configuration component
-	I_CREATE(CDeviceIdBasedConfigurationComp, pConfig);
+	// Obtain configuration component instance (via component system)
+	CDeviceIdBasedConfigurationComp* pConfig = /* get from component system */;
 	
-	// Connect dependencies
-	I_GETREF(imtbase::ISelection, pDeviceSelection);
-	I_GETREF(IDeviceController, pController);
-	I_GETREF(IDeviceConfigurationManager, pConfigMgr);
-	I_GETREF(IDeviceStateProvider, pStateProvider);
-	
-	pConfig->SetDeviceSelection(pDeviceSelection);
-	pConfig->SetDeviceController(pController);
-	pConfig->SetDeviceConfigurationManager(pConfigMgr);
-	pConfig->SetDeviceStateProvider(pStateProvider);
+	// Component is configured with required dependencies:
+	// - DeviceSelection reference
+	// - DeviceController reference
+	// - DeviceConfigurationManager reference
+	// - DeviceStateProvider reference
 	
 	// Use as parameter set for UI binding
 	iprm::IParamsSet* pParams = pConfig;

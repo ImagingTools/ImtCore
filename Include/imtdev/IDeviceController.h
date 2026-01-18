@@ -41,10 +41,10 @@ class IDeviceSpecification;
 	- **DS_CLOSED**: Device is available but not actively processing
 	- **DS_OPENED**: Device is active and can execute commands
 	
-	@par Usage Example:
+	@par Usage Pattern:
 	@code{.cpp}
-	// Get device controller reference
-	I_GETREF(IDeviceController, pController);
+	// Obtain device controller reference (via component system)
+	IDeviceController* pController = /* get from component system */;
 	
 	// Enumerate available devices
 	pController->EnumerateDevices();
@@ -53,7 +53,7 @@ class IDeviceSpecification;
 	const ICollectionInfo& devices = pController->GetDeviceInstanceList();
 	
 	// Get device instance information
-	QByteArray deviceId = GetFirstDeviceId(devices);
+	QByteArray deviceId = /* get device ID from list */;
 	DeviceInstancePtr pInstance = pController->GetDeviceInstance(deviceId);
 	
 	// Open device for command execution

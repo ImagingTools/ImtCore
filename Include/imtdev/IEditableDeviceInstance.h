@@ -33,9 +33,9 @@ namespace imtdev
 	
 	@par Usage Example:
 	@code{.cpp}
-	// Typically created via factory or controller
-	// For illustration, using component creation macro:
-	I_CREATE(CDeviceInstanceBase, pEditableInstance);
+	// Typically obtained from device controller or factory
+	// For implementation reference:
+	CDeviceInstanceBase* pEditableInstance = /* your instance */;
 	
 	// Or obtained from controller with editable interface:
 	// EditableDeviceInstancePtr pEditableInstance = ...;

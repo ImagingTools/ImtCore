@@ -42,9 +42,10 @@ typedef QSharedPointer<iprm::IParamsSet> DeviceConfigurationPtr;
 	- **Persistence**: Configurations can be serialized and stored across sessions
 	- **Change Tracking**: Extends istd::IChangeable for configuration change notifications
 	
-	@par Usage Example:
+	@par Usage Pattern:
 	@code{.cpp}
-	I_GETREF(IDeviceConfigurationManager, pConfigMgr);
+	// Obtain configuration manager reference (via component system)
+	IDeviceConfigurationManager* pConfigMgr = /* get from component system */;
 	
 	// Get existing configuration for a device
 	QByteArray deviceId = "DEVICE_001";
@@ -64,7 +65,7 @@ typedef QSharedPointer<iprm::IParamsSet> DeviceConfigurationPtr;
 	else
 	{
 		// No configuration exists for this device - create new one
-		I_CREATE(iprm::CParamsSet, pNewConfig);
+		iprm::IParamsSet* pNewConfig = /* create params set */;
 		pNewConfig->SetParamValue("BaudRate", 9600);
 		pConfigMgr->SetDeviceConfiguration(deviceId, *pNewConfig);
 	}

@@ -73,8 +73,10 @@ public:
 	*/
 	enum DeviceCapabilities
 	{
-		DC_READ = 1,   ///< Device supports read operations
-		DC_WRITE = 2   ///< Device supports write operations
+		/// Device supports read operations
+		DC_READ = 1,
+		/// Device supports write operations
+		DC_WRITE = 2
 	};
 
 	/**

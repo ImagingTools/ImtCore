@@ -39,14 +39,12 @@ namespace imtdev
 	@par Component Configuration:
 	- **DeviceController**: Reference to IDeviceController whose device list to adapt
 	
-	@par Usage Example:
+	@par Usage Pattern:
 	@code{.cpp}
-	// Create adapter
-	I_CREATE(CDeviceInstanceListAdapterComp, pAdapter);
+	// Obtain adapter instance (via component system)
+	CDeviceInstanceListAdapterComp* pAdapter = /* get from component system */;
 	
-	// Connect to device controller
-	I_GETREF(IDeviceController, pController);
-	pAdapter->SetDeviceController(pController);
+	// Component is configured with DeviceController reference
 	
 	// Use as collection info
 	imtbase::ICollectionInfo* pCollection = pAdapter;

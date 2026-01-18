@@ -52,19 +52,15 @@ namespace imtdev
 	- **Static Attributes**: From device specification (e.g., supported features, hardware limits)
 	- **Instance Attributes**: From device instance (e.g., temperature, calibration date, serial number)
 	
-	@par Usage Example:
+	@par Usage Pattern:
 	@code{.cpp}
-	// Create attributes component
-	I_CREATE(CDeviceIdBasedAttributesComp, pAttrs);
+	// Obtain attributes component instance (via component system)
+	CDeviceIdBasedAttributesComp* pAttrs = /* get from component system */;
 	
-	// Connect dependencies
-	I_GETREF(imtbase::ISelection, pDeviceSelection);
-	I_GETREF(IDeviceController, pController);
-	I_GETREF(IDeviceStateProvider, pStateProvider);
-	
-	pAttrs->SetDeviceSelection(pDeviceSelection);
-	pAttrs->SetDeviceController(pController);
-	pAttrs->SetDeviceStateProvider(pStateProvider);
+	// Component is configured with required dependencies:
+	// - DeviceSelection reference
+	// - DeviceController reference
+	// - DeviceStateProvider reference
 	
 	// Access static attributes
 	const iattr::IAttributesProvider* pStaticAttrs = pAttrs->GetStaticAttributes();

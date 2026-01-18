@@ -66,7 +66,8 @@ public:
 	*/
 	enum IdentifierTypes
 	{
-		IT_SERIAL  ///< Serial number identifier
+		/// Serial number identifier
+		IT_SERIAL
 	};
 
 	/**
@@ -77,12 +78,18 @@ public:
 	*/
 	enum VersionIds
 	{
-		VI_FIRMWARE_VERSION_MAJOR = iser::IVersionInfo::UserVersionId, ///< Major firmware version number
-		VI_FIRMWARE_VERSION_MINOR,  ///< Minor firmware version number
-		VI_FIRMWARE_VERSION_PATCH,  ///< Patch firmware version number
-		VI_HARDWARE_VERSION_MAJOR,  ///< Major hardware version number
-		VI_HARDWARE_VERSION_MINOR,  ///< Minor hardware version number
-		VI_HARDWARE_VERSION_PATCH,  ///< Patch hardware version number
+		/// Major firmware version number
+		VI_FIRMWARE_VERSION_MAJOR = iser::IVersionInfo::UserVersionId,
+		/// Minor firmware version number
+		VI_FIRMWARE_VERSION_MINOR,
+		/// Patch firmware version number
+		VI_FIRMWARE_VERSION_PATCH,
+		/// Major hardware version number
+		VI_HARDWARE_VERSION_MAJOR,
+		/// Minor hardware version number
+		VI_HARDWARE_VERSION_MINOR,
+		/// Patch hardware version number
+		VI_HARDWARE_VERSION_PATCH,
 	};
 
 	/**

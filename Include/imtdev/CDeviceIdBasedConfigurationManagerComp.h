@@ -60,23 +60,17 @@ namespace imtdev
 	}
 	@endcode
 	
-	@par Usage Example:
+	@par Usage Pattern:
 	@code{.cpp}
-	// Create configuration manager
-	I_CREATE(CDeviceIdBasedConfigurationManagerComp, pConfigMgr);
+	// Obtain configuration manager instance (via component system)
+	CDeviceIdBasedConfigurationManagerComp* pConfigMgr = /* get from component system */;
 	
-	// Connect device controller for validation
-	I_GETREF(IDeviceController, pController);
-	pConfigMgr->SetDeviceController(pController);
-	
-	// Register configuration factories for deserialization
-	I_GETREF(ConfigurationFactory, pCameraConfigFactory);
-	I_GETREF(ConfigurationFactory, pSensorConfigFactory);
-	pConfigMgr->AddConfigurationFactory(pCameraConfigFactory);
-	pConfigMgr->AddConfigurationFactory(pSensorConfigFactory);
+	// Component is configured with:
+	// - DeviceController reference for validation
+	// - ConfigurationFactory references for deserialization
 	
 	// Store device configuration
-	I_CREATE(iprm::CParamsSet, pConfig);
+	iprm::CParamsSet* pConfig = /* your params set */;
 	pConfig->SetParamValue("BaudRate", 115200);
 	pConfigMgr->SetDeviceConfiguration("DEVICE_001", *pConfig);
 	
@@ -84,8 +78,8 @@ namespace imtdev
 	DeviceConfigurationPtr pStoredConfig = 
 	    pConfigMgr->GetDeviceConfiguration("DEVICE_001");
 	
-	// Serialize to file
-	iser::IArchive& archive = GetArchive();
+	// Serialize to archive
+	iser::IArchive& archive = /* your archive */;
 	pConfigMgr->Serialize(archive);
 	@endcode
 	
