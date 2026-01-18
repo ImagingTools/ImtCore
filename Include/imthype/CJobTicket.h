@@ -43,6 +43,9 @@ public:
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
 
+	// reimplemented (istd::IChangeable)
+	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+
 private:
 	QByteArray m_typeId;
 	QByteArray m_uuid;

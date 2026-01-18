@@ -235,6 +235,30 @@ bool CJobTicket::Serialize(iser::IArchive& archive)
 }
 
 
+bool CJobTicket::CopyFrom(const IChangeable &object, CompatibilityMode mode)
+{
+	const CJobTicket* sourcePtr = dynamic_cast<const CJobTicket*>(&object);
+	if (sourcePtr != nullptr){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_typeId = sourcePtr->m_typeId;
+		m_uuid = sourcePtr->m_uuid;
+		m_name = sourcePtr->m_name;
+		m_contextId = sourcePtr->m_contextId;
+		m_progress = sourcePtr->m_progress;
+		m_processingStatus = sourcePtr->m_processingStatus;
+		m_results = sourcePtr->m_results;
+		m_input = sourcePtr->m_input;
+		m_paramsPtr = sourcePtr->m_paramsPtr;
+		m_paramsFactory = sourcePtr->m_paramsFactory;
+
+		return true;
+	}
+
+	return false;
+}
+
+
 } // namespace imthype
 
 
