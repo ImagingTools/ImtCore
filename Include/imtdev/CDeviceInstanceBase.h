@@ -37,7 +37,10 @@ namespace imtdev
 	
 	@par Usage Example:
 	@code{.cpp}
-	// Create device instance
+	// Typically obtained from device controller
+	DeviceInstancePtr pInstance = pController->GetDeviceInstance(deviceId);
+	
+	// For direct creation in derived classes or special scenarios:
 	CDeviceInstanceBase deviceInstance;
 	
 	// Set device identifier
@@ -254,8 +257,8 @@ protected:
 		QMap<int, VersionItem> m_versions;
 	};
 
-	mutable imod::CModelUpdateBridge m_updateBridge;  ///< Bridge for change notifications
-	mutable std::unique_ptr<iattr::IAttributesProvider> m_attributesPtr;  ///< Lazy-created attributes
+	mutable imod::CModelUpdateBridge m_updateBridge;  ///< Bridge for change notifications (mutable for change tracking in const methods)
+	mutable std::unique_ptr<iattr::IAttributesProvider> m_attributesPtr;  ///< Lazy-created attributes (mutable to allow creation in const GetAttributes())
 
 private:
 	QMap<int, QByteArray> m_identifiers;  ///< Storage for device identifiers by type

@@ -33,8 +33,12 @@ namespace imtdev
 	
 	@par Usage Example:
 	@code{.cpp}
-	// Create editable device instance
+	// Typically created via factory or controller
+	// For illustration, using component creation macro:
 	I_CREATE(CDeviceInstanceBase, pEditableInstance);
+	
+	// Or obtained from controller with editable interface:
+	// EditableDeviceInstancePtr pEditableInstance = ...;
 	
 	// Set device identifier (e.g., serial number)
 	QByteArray serialNumber = "SN123456789";

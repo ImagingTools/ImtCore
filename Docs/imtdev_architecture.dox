@@ -364,10 +364,11 @@ I_GETREF(IDeviceController, pController);
 pController->EnumerateDevices();
 
 // 3. Get device list
-auto deviceList = pController->GetDeviceList();
+auto deviceList = pController->GetDeviceInstanceList();
 
-// 4. Open a device
-auto pAccessor = pController->OpenDevice(deviceList[0]);
+// 4. Open a device (get device ID from list first)
+QByteArray deviceId = GetDeviceIdFromList(deviceList, 0);
+auto pAccessor = pController->OpenDevice(deviceId, nullptr);
 
 // 5. Execute command
 pAccessor->ExecuteCommand(commandId, params);
@@ -379,8 +380,12 @@ pController->CloseDevice(pAccessor);
 @subsection imtdev_scenario_composite Hierarchical Device Access
 
 @code{.cpp}
-// 1. Open composite device
-auto pAccessor = pController->OpenDevice(compositeDeviceInstance);
+// 1. Get device ID from controller's device list
+const imtbase::ICollectionInfo& deviceList = pController->GetDeviceInstanceList();
+QByteArray compositeDeviceId = GetDeviceIdFromList(deviceList, 0);
+
+// 2. Open composite device
+auto pAccessor = pController->OpenDevice(compositeDeviceId, nullptr);
 
 // 2. Get sub-device list
 auto subDevices = pAccessor->GetSubDeviceList();

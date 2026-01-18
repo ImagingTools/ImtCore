@@ -117,7 +117,9 @@ public:
 	*/
 	enum ChangeFlags
 	{
-		CF_STATE_CHANGED = istd::IChangeable::ChangeFlags::CF_NO_UNDO + 7171  ///< Device state has changed
+		/// Device state has changed
+		/// Offset value (7171) ensures no collision with base class change flags
+		CF_STATE_CHANGED = istd::IChangeable::ChangeFlags::CF_NO_UNDO + 7171
 	};
 
 	/**
