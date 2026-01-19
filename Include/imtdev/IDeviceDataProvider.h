@@ -40,7 +40,7 @@ namespace imtdev
 	@par Usage Pattern:
 	@code{.cpp}
 	// Obtain data provider reference (via component system)
-	IDeviceDataProvider* pDataProvider = /* get from component system */;
+	IDeviceDataProvider* pDataProvider = // get from component system
 	
 	// Access device metadata
 	idoc::IDocumentMetaInfo* pMetaInfo = pDataProvider->GetDeviceMetaInfo();

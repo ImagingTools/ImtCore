@@ -69,11 +69,11 @@ namespace imtdev
 	@par Usage Pattern:
 	@code{.cpp}
 	// Obtain proxy controller instance (created via component system)
-	CDeviceControllerProxyComp* pProxy = /* get from component system */;
+	CDeviceControllerProxyComp* pProxy = // get from component system
 	
 	// Obtain controller references (configured via component system)
-	IDeviceController* pController1 = /* USB device controller reference */;
-	IDeviceController* pController2 = /* Network device controller reference */;
+	IDeviceController* pController1 = // USB device controller reference
+	IDeviceController* pController2 = // Network device controller reference
 	pProxy->AddDeviceController(pController1);
 	pProxy->AddDeviceController(pController2);
 	

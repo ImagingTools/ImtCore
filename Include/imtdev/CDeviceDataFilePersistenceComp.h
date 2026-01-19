@@ -50,15 +50,15 @@ namespace imtdev
 	@par Usage Pattern:
 	@code{.cpp}
 	// Obtain file persistence adapter instance (via component system)
-	CDeviceDataFilePersistenceComp* pFilePersistence = /* get from component system */;
+	CDeviceDataFilePersistenceComp* pFilePersistence = // get from component system
 	
 	// Component is configured with IDeviceDataPersistence reference
 	// Access as file persistence interface
 	ifile::IFilePersistence* pPersistence = pFilePersistence;
 	
 	// Load device data (provide your own data object and progress manager)
-	istd::IChangeable* pData = /* your data object */;
-	ibase::IProgressManager* pProgress = /* your progress manager */;
+	istd::IChangeable* pData = // your data object
+	ibase::IProgressManager* pProgress = // your progress manager
 	auto result = pPersistence->LoadFromFile(*pData, "device_data.bin", pProgress);
 	
 	if (result == ifile::IFilePersistence::OS_SUCCESS)

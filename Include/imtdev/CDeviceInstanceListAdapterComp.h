@@ -42,7 +42,7 @@ namespace imtdev
 	@par Usage Pattern:
 	@code{.cpp}
 	// Obtain adapter instance (via component system)
-	CDeviceInstanceListAdapterComp* pAdapter = /* get from component system */;
+	CDeviceInstanceListAdapterComp* pAdapter = // get from component system
 	
 	// Component is configured with DeviceController reference
 	

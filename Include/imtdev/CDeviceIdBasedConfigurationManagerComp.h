@@ -63,14 +63,14 @@ namespace imtdev
 	@par Usage Pattern:
 	@code{.cpp}
 	// Obtain configuration manager instance (via component system)
-	CDeviceIdBasedConfigurationManagerComp* pConfigMgr = /* get from component system */;
+	CDeviceIdBasedConfigurationManagerComp* pConfigMgr = // get from component system
 	
 	// Component is configured with:
 	// - DeviceController reference for validation
 	// - ConfigurationFactory references for deserialization
 	
 	// Store device configuration
-	iprm::CParamsSet* pConfig = /* your params set */;
+	iprm::CParamsSet* pConfig = // your params set
 	pConfig->SetParamValue("BaudRate", 115200);
 	pConfigMgr->SetDeviceConfiguration("DEVICE_001", *pConfig);
 	
@@ -79,7 +79,7 @@ namespace imtdev
 	    pConfigMgr->GetDeviceConfiguration("DEVICE_001");
 	
 	// Serialize to archive
-	iser::IArchive& archive = /* your archive */;
+	iser::IArchive& archive = // your archive
 	pConfigMgr->Serialize(archive);
 	@endcode
 	

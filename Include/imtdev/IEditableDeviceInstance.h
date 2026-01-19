@@ -35,7 +35,7 @@ namespace imtdev
 	@code{.cpp}
 	// Typically obtained from device controller or factory
 	// For implementation reference:
-	CDeviceInstanceBase* pEditableInstance = /* your instance */;
+	CDeviceInstanceBase* pEditableInstance = // your instance
 	
 	// Or obtained from controller with editable interface:
 	// EditableDeviceInstancePtr pEditableInstance = ...;

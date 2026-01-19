@@ -33,7 +33,7 @@ class IDeviceSpecification;
 	@par Usage Pattern:
 	@code{.cpp}
 	// Obtain or create editable composite device instance
-	CCompositeDeviceInstanceBase* pComposite = /* your composite instance */;
+	CCompositeDeviceInstanceBase* pComposite = // your composite instance
 	
 	// Add a camera sub-device
 	QByteArray cameraTypeId = "StandardCamera";
