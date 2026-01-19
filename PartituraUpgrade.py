@@ -234,7 +234,7 @@ def main():
             outputFilePath = re.sub(r'\.xtrsvn$', '', str(xtrAttrFilePath))
             print(f'Creating {outputFilePath}')
 
-            data = data.replace('$WCREV$', revision)
+            data = data.replace('$WCREV$', revision + 10000)
             data = data.replace('$WCDATE$', info['date'])
             data = data.replace('$WCMODS$', info['modified'])
             data = data.replace('$WCRANGE$', info['hash'])
