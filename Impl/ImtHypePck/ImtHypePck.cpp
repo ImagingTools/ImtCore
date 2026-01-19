@@ -70,6 +70,11 @@ I_EXPORT_COMPONENT(
 			"Job Ticket Info");
 
 I_EXPORT_COMPONENT(
+			JobTicket,
+			"Job ticket component",
+			"Job Ticket Component Factory");
+
+I_EXPORT_COMPONENT(
 			JobTicketMetaInfoCreator,
 			"Job ticket meta info creator",
 			"Job Ticket Meta Info Creator");
