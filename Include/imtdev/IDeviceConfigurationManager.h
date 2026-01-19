@@ -71,9 +71,10 @@ typedef QSharedPointer<iprm::IParamsSet> DeviceConfigurationPtr;
 	}
 	
 	// Register for configuration change notifications
-	class ConfigObserver : public istd::IChangeObserver
+	class ConfigObserver : public imod::CSingleModelObserverBase
 	{
-		void OnChanged(const istd::IChangeable* changeable, int changeFlags) override
+	protected:
+		void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override
 		{
 			// Configuration changed - update UI or sync with device
 		}

@@ -53,11 +53,13 @@ namespace imtdev
 	IDeviceStateProvider::DeviceState state = pStateProvider->GetDeviceState(deviceId);
 	
 	// Register for state change notifications
-	class StateObserver : public istd::IChangeObserver
+	class StateObserver : public imod::CSingleModelObserverBase
 	{
-		void OnChanged(const istd::IChangeable* changeable, int flags) override
+	protected:
+		void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override
 		{
-			if (flags & IDeviceStateProvider::CF_STATE_CHANGED)
+			int changeFlags = changeSet.GetFlags();
+			if (changeFlags & IDeviceStateProvider::CF_STATE_CHANGED)
 			{
 				// Update UI based on state change
 			}
