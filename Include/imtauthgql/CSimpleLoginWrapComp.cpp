@@ -180,11 +180,11 @@ bool CSimpleLoginWrapComp::LoginWithRefreshToken(const QString& userName, const 
 			return false;
 		}
 
-		if (!response.Version_1_0 || !response.Version_1_0->ok){
+		if (!response.Version_1_0 || !response.Version_1_0->ok.has_value() || !*response.Version_1_0->ok){
 			return false;
 		}
 
-		if (!response.Version_1_0->userSession){
+		if (!response.Version_1_0->userSession.has_value()){
 			return false;
 		}
 
@@ -198,13 +198,13 @@ bool CSimpleLoginWrapComp::LoginWithRefreshToken(const QString& userName, const 
 
 		m_userInfoPtr->SetId(userName.toUtf8());
 
-		if (response.Version_1_0->userSession->accessToken){
+		if (response.Version_1_0->userSession->accessToken.has_value()){
 			m_loggedUserToken = *response.Version_1_0->userSession->accessToken;
 		}
-		if (response.Version_1_0->userSession->refreshToken){
+		if (response.Version_1_0->userSession->refreshToken.has_value()){
 			m_loggedUserRefreshToken = *response.Version_1_0->userSession->refreshToken;
 		}
-		if (response.Version_1_0->userSession->userId){
+		if (response.Version_1_0->userSession->userId.has_value()){
 			m_loggedUserId = *response.Version_1_0->userSession->userId;
 		}
 
