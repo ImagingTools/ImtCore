@@ -45,7 +45,7 @@ typedef QSharedPointer<iprm::IParamsSet> DeviceConfigurationPtr;
 	@par Usage Pattern:
 	@code{.cpp}
 	// Obtain configuration manager reference (via component system)
-	IDeviceConfigurationManager* pConfigMgr = /* get from component system */;
+	IDeviceConfigurationManager* pConfigMgr = // get from component system
 	
 	// Get existing configuration for a device
 	QByteArray deviceId = "DEVICE_001";
@@ -65,7 +65,7 @@ typedef QSharedPointer<iprm::IParamsSet> DeviceConfigurationPtr;
 	else
 	{
 		// No configuration exists for this device - create new one
-		iprm::IParamsSet* pNewConfig = /* create params set */;
+		iprm::IParamsSet* pNewConfig = // create params set
 		pNewConfig->SetParamValue("BaudRate", 9600);
 		pConfigMgr->SetDeviceConfiguration(deviceId, *pNewConfig);
 	}

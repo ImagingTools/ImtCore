@@ -66,7 +66,7 @@ namespace imtdev
 	@par Usage Pattern:
 	@code{.cpp}
 	// Obtain configuration component instance (via component system)
-	CDeviceIdBasedConfigurationComp* pConfig = /* get from component system */;
+	CDeviceIdBasedConfigurationComp* pConfig = // get from component system
 	
 	// Component is configured with required dependencies:
 	// - DeviceSelection reference

@@ -55,7 +55,7 @@ namespace imtdev
 	@par Usage Pattern:
 	@code{.cpp}
 	// Obtain attributes component instance (via component system)
-	CDeviceIdBasedAttributesComp* pAttrs = /* get from component system */;
+	CDeviceIdBasedAttributesComp* pAttrs = // get from component system
 	
 	// Component is configured with required dependencies:
 	// - DeviceSelection reference

@@ -44,7 +44,7 @@ namespace imtdev
 	@par Usage Pattern:
 	@code{.cpp}
 	// Obtain state provider adapter instance (via component system)
-	CDeviceStateProviderAdapterComp* pStateAdapter = /* get from component system */;
+	CDeviceStateProviderAdapterComp* pStateAdapter = // get from component system
 	
 	// Component is configured with DeviceController reference
 	

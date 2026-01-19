@@ -35,7 +35,7 @@ namespace imtdev
 	@par Usage Pattern:
 	@code{.cpp}
 	// Obtain persistence interface reference (via component system)
-	IDeviceDataPersistence* pPersistence = /* get from component system */;
+	IDeviceDataPersistence* pPersistence = // get from component system
 	
 	// Check if device is ready
 	if (!pPersistence->IsDeviceReady())
@@ -45,7 +45,7 @@ namespace imtdev
 	}
 	
 	// Read device metadata
-	idoc::IDocumentMetaInfo* pMetaInfo = /* create meta info object */;
+	idoc::IDocumentMetaInfo* pMetaInfo = // create meta info object
 	if (pPersistence->ReadDeviceMetaInfo(*pMetaInfo))
 	{
 		QString serialNum = pMetaInfo->GetMetaInfo(
@@ -56,7 +56,7 @@ namespace imtdev
 	
 	// Read all data from EEPROM
 	QByteArray eepromData;
-	ibase::IProgressManager* pProgress = /* your progress manager */;
+	ibase::IProgressManager* pProgress = // your progress manager
 	if (pPersistence->ReadDataFromStorage(eepromData, 
 	                                       IDeviceDataPersistence::ST_EEPROM, 
 	                                       pProgress))
@@ -65,7 +65,7 @@ namespace imtdev
 	}
 	
 	// Write data to EEPROM
-	QByteArray newData = /* prepare configuration data */;
+	QByteArray newData = // prepare configuration data
 	pPersistence->WriteDataToStorage(newData, 
 	                                 IDeviceDataPersistence::ST_EEPROM,
 	                                 pProgress);

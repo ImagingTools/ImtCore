@@ -44,7 +44,7 @@ class IDeviceSpecification;
 	@par Usage Pattern:
 	@code{.cpp}
 	// Obtain device controller reference (via component system)
-	IDeviceController* pController = /* get from component system */;
+	IDeviceController* pController = // get from component system
 	
 	// Enumerate available devices
 	pController->EnumerateDevices();
@@ -53,7 +53,7 @@ class IDeviceSpecification;
 	const ICollectionInfo& devices = pController->GetDeviceInstanceList();
 	
 	// Get device instance information
-	QByteArray deviceId = /* get device ID from list */;
+	QByteArray deviceId = // get device ID from list
 	DeviceInstancePtr pInstance = pController->GetDeviceInstance(deviceId);
 	
 	// Open device for command execution
