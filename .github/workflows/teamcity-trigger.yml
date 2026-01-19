@@ -40,7 +40,7 @@ jobs:
           # Determine the correct branch reference
           # For pull requests, use the source branch (GITHUB_HEAD_REF)
           # For push events, use GITHUB_REF
-          if [ -n "${{ github.event.pull_request.head.ref }}" ]; then
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
             GIT_BRANCH="refs/heads/${{ github.event.pull_request.head.ref }}"
             echo "Pull request detected, using branch: $GIT_BRANCH"
           else
@@ -171,7 +171,7 @@ jobs:
           # Determine the correct branch reference
           # For pull requests, use the source branch (GITHUB_HEAD_REF)
           # For push events, use GITHUB_REF
-          if [ -n "${{ github.event.pull_request.head.ref }}" ]; then
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
             GIT_BRANCH="refs/heads/${{ github.event.pull_request.head.ref }}"
             echo "Pull request detected, using branch: $GIT_BRANCH"
           else
