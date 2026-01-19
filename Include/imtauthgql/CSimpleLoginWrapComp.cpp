@@ -196,16 +196,24 @@ bool CSimpleLoginWrapComp::LoginWithRefreshToken(const QString& userName, const 
 			return false;
 		}
 
-		m_userInfoPtr->SetId(userName.toUtf8());
+		// Extract session data from response
+		QByteArray userId;
+		if (response.Version_1_0->userSession->userId.has_value()){
+			userId = *response.Version_1_0->userSession->userId;
+			m_loggedUserId = userId;
+		}
+		else{
+			// Fallback to username if userId not in response
+			m_loggedUserId = userName.toUtf8();
+		}
+
+		m_userInfoPtr->SetId(m_loggedUserId);
 
 		if (response.Version_1_0->userSession->accessToken.has_value()){
 			m_loggedUserToken = *response.Version_1_0->userSession->accessToken;
 		}
 		if (response.Version_1_0->userSession->refreshToken.has_value()){
 			m_loggedUserRefreshToken = *response.Version_1_0->userSession->refreshToken;
-		}
-		if (response.Version_1_0->userSession->userId.has_value()){
-			m_loggedUserId = *response.Version_1_0->userSession->userId;
 		}
 
 		imtqml::CGqlModel::SetGlobalAccessToken(m_loggedUserToken);

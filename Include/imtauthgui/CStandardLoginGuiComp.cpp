@@ -164,15 +164,9 @@ void CStandardLoginGuiComp::OnRestoreSettings(const QSettings& settings)
 		UserEdit->setText(lastUser);
 		
 		// Try to login with refresh token if available
-		if (!refreshToken.isEmpty() && m_loginCompPtr.IsValid()){
-			// Try to cast to CSimpleLoginWrapComp to access refresh token login
-			auto* loginWrapPtr = dynamic_cast<imtauthgql::CSimpleLoginWrapComp*>(m_loginCompPtr.GetPtr());
-			if (loginWrapPtr != nullptr){
-				if (loginWrapPtr->LoginWithRefreshToken(lastUser, refreshToken)){
-					// Successfully logged in with refresh token
-					return;
-				}
-			}
+		if (TryRestoreSessionWithRefreshToken(lastUser, refreshToken)){
+			// Successfully logged in with refresh token
+			return;
 		}
 	}
 
@@ -194,17 +188,10 @@ void CStandardLoginGuiComp::OnSaveSettings(QSettings& settings) const
 	settings.setValue("LastUser", lastUser);
 	
 	// Save refresh token only if "Remember me" is checked
-	if (isRememberMe && m_loginCompPtr.IsValid()){
-		auto* loginWrapPtr = dynamic_cast<imtauthgql::CSimpleLoginWrapComp*>(m_loginCompPtr.GetPtr());
-		if (loginWrapPtr != nullptr){
-			QByteArray refreshToken = loginWrapPtr->GetRefreshToken();
-			settings.setValue("RefreshToken", refreshToken);
-		}
-	}
-	else{
-		// Clear refresh token if "Remember me" is not checked
-		settings.remove("RefreshToken");
-	}
+	SaveRefreshTokenIfRememberMe(settings);
+	
+	// Clear refresh token if "Remember me" is not checked
+	ClearRefreshTokenIfNeeded(settings);
 }
 
 
@@ -358,6 +345,48 @@ void CStandardLoginGuiComp::CheckMatchingPassword()
 
 void CStandardLoginGuiComp::ShowLoadingPage()
 {
+}
+
+
+bool CStandardLoginGuiComp::TryRestoreSessionWithRefreshToken(const QString& userName, const QByteArray& refreshToken)
+{
+	if (refreshToken.isEmpty() || !m_loginCompPtr.IsValid()){
+		return false;
+	}
+	
+	// Try to cast to CSimpleLoginWrapComp to access refresh token login
+	auto* loginWrapPtr = dynamic_cast<imtauthgql::CSimpleLoginWrapComp*>(m_loginCompPtr.GetPtr());
+	if (loginWrapPtr != nullptr){
+		return loginWrapPtr->LoginWithRefreshToken(userName, refreshToken);
+	}
+	
+	return false;
+}
+
+
+void CStandardLoginGuiComp::SaveRefreshTokenIfRememberMe(QSettings& settings) const
+{
+	bool isRememberMe = RememberMe->isChecked();
+	
+	if (isRememberMe && m_loginCompPtr.IsValid()){
+		auto* loginWrapPtr = dynamic_cast<imtauthgql::CSimpleLoginWrapComp*>(m_loginCompPtr.GetPtr());
+		if (loginWrapPtr != nullptr){
+			QByteArray refreshToken = loginWrapPtr->GetRefreshToken();
+			if (!refreshToken.isEmpty()){
+				settings.setValue("RefreshToken", refreshToken);
+			}
+		}
+	}
+}
+
+
+void CStandardLoginGuiComp::ClearRefreshTokenIfNeeded(QSettings& settings) const
+{
+	bool isRememberMe = RememberMe->isChecked();
+	
+	if (!isRememberMe){
+		settings.remove("RefreshToken");
+	}
 }
 
 
