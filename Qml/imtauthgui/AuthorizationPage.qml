@@ -1,5 +1,4 @@
 import QtQuick 2.12
-import Qt.labs.settings 1.0
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
@@ -27,39 +26,11 @@ Rectangle {
 
 	property alias rememberMe: rememberMeCheckBox.checked
 
-	Settings {
-		id: loginSettings
-		category: "Login"
-		property alias rememberMe: authPageContainer.rememberMe
-		property string lastUser: ""
-		property string refreshToken: ""
-	}
-
-	// Sync with AuthorizationController
+	// Sync rememberMe with AuthorizationController
 	Binding {
 		target: AuthorizationController
 		property: "rememberMe"
 		value: authPageContainer.rememberMe
-	}
-	Binding {
-		target: AuthorizationController
-		property: "lastUser"
-		value: loginSettings.lastUser
-	}
-	Binding {
-		target: AuthorizationController
-		property: "storedRefreshToken"
-		value: loginSettings.refreshToken
-	}
-	Binding {
-		target: loginSettings
-		property: "lastUser"
-		value: AuthorizationController.lastUser
-	}
-	Binding {
-		target: loginSettings
-		property: "refreshToken"
-		value: AuthorizationController.storedRefreshToken
 	}
 
 	Component.onCompleted: {
@@ -82,9 +53,9 @@ Rectangle {
 
 			passwordTextInput.text = "";
 			
-			// Restore username if "Remember me" is checked
-			if (rememberMeCheckBox.checked && loginSettings.lastUser !== "") {
-				loginTextInput.text = loginSettings.lastUser;
+			// Restore username from AuthorizationController if "Remember me" is checked
+			if (authPageContainer.rememberMe && AuthorizationController.lastUser !== "") {
+				loginTextInput.text = AuthorizationController.lastUser;
 				passwordTextInput.forceActiveFocus();
 			}
 			else {
