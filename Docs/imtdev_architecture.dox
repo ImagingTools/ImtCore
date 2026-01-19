@@ -1,0 +1,500 @@
+/**
+@page imtdev_architecture ImtDev Library Architecture
+
+@tableofcontents
+
+@section imtdev_overview Overview
+
+The **imtdev** library is a comprehensive device abstraction framework designed for managing, 
+controlling, and interfacing with hardware devices. It provides a complete ecosystem for device 
+discovery, lifecycle management, state tracking, configuration persistence, and command execution.
+
+@section imtdev_purpose Core Purpose
+
+The library addresses the following key requirements:
+- **Device Discovery**: Asynchronous enumeration and identification of connected devices
+- **Instance Management**: Runtime management of device instances with dynamic metadata
+- **State Tracking**: Monitor device lifecycle states (none, closed, opened)
+- **Command Execution**: Execute device-specific commands on open devices
+- **Data Persistence**: Read/write device storage (ROM, EEPROM) with metadata
+- **Configuration Management**: Device-specific configuration persistence and retrieval
+- **Multi-Controller Support**: Aggregation of multiple device controllers via proxy pattern
+- **Hierarchical Devices**: Support for composite devices containing sub-devices
+
+@section imtdev_architecture_layers Architectural Layers
+
+@subsection imtdev_arch_interface Interface Layer (13 Interfaces)
+
+The interface layer defines the core abstractions for device management:
+
+<table>
+<tr><th>Interface</th><th>Purpose</th></tr>
+<tr><td>@ref imtdev::IDeviceInstance</td>
+    <td>Describes runtime information about a device instance (identifiers, versions, attributes)</td></tr>
+<tr><td>@ref imtdev::IEditableDeviceInstance</td>
+    <td>Mutable version of IDeviceInstance allowing modification of device metadata</td></tr>
+<tr><td>@ref imtdev::IDeviceSpecification</td>
+    <td>Describes static information about device types/classes (capabilities, commands, schemas)</td></tr>
+<tr><td>@ref imtdev::IDeviceController</td>
+    <td>Central control hub for device enumeration, opening/closing, and instance retrieval</td></tr>
+<tr><td>@ref imtdev::IDeviceAccessor</td>
+    <td>Provides access to an open device for command execution and sub-device navigation</td></tr>
+<tr><td>@ref imtdev::IDeviceEnumerator</td>
+    <td>Asynchronous device discovery protocol with callback-based result delivery</td></tr>
+<tr><td>@ref imtdev::IDeviceStateProvider</td>
+    <td>Tracks runtime state of devices (DS_NONE, DS_CLOSED, DS_OPENED)</td></tr>
+<tr><td>@ref imtdev::IDeviceConfigurationManager</td>
+    <td>Manages device-specific configuration persistence and deserialization</td></tr>
+<tr><td>@ref imtdev::IDeviceDataPersistence</td>
+    <td>Low-level storage access for ROM/EEPROM operations (read, write, reset)</td></tr>
+<tr><td>@ref imtdev::IDeviceDataProvider</td>
+    <td>Combines device instance information with configuration data retrieval</td></tr>
+<tr><td>@ref imtdev::ICompositeDeviceInstance</td>
+    <td>Extends IDeviceInstance for hierarchical device support with sub-devices</td></tr>
+<tr><td>@ref imtdev::IEditableCompositeDeviceInstance</td>
+    <td>Mutable version supporting dynamic sub-device addition and removal</td></tr>
+<tr><td>@ref imtdev::ICompositeDeviceSpecification</td>
+    <td>Extends IDeviceSpecification with sub-device metadata and specifications</td></tr>
+</table>
+
+@subsection imtdev_arch_base Base Implementation Classes
+
+<table>
+<tr><th>Class</th><th>Role</th></tr>
+<tr><td>@ref imtdev::CDeviceInstanceBase</td>
+    <td>Base implementation of IEditableDeviceInstance with identifier storage, 
+        version tracking, attributes management, and model update notifications</td></tr>
+<tr><td>@ref imtdev::CCompositeDeviceInstanceBase</td>
+    <td>Extends CDeviceInstanceBase to support hierarchical sub-devices with 
+        factory-based creation and nested device tracking</td></tr>
+</table>
+
+@subsection imtdev_arch_controllers Controller Components
+
+<table>
+<tr><th>Component</th><th>Pattern</th><th>Purpose</th></tr>
+<tr><td>@ref imtdev::CDeviceControllerCompBase</td>
+    <td>Base Implementation</td>
+    <td>Base controller implementing IDeviceController with thread-safe device 
+        enumeration, lifecycle management, and state provider</td></tr>
+<tr><td>@ref imtdev::CDeviceControllerProxyComp</td>
+    <td>Proxy Pattern</td>
+    <td>Aggregates multiple IDeviceController instances, delegates operations 
+        to appropriate underlying controller, manages multi-controller enumeration</td></tr>
+</table>
+
+@subsection imtdev_arch_adapters Adapter Components
+
+<table>
+<tr><th>Component</th><th>Adapts From → To</th><th>Purpose</th></tr>
+<tr><td>@ref imtdev::CDeviceInstanceListAdapterComp</td>
+    <td>IDeviceController → ICollectionInfo</td>
+    <td>Adapts device controller's device list to collection-based access patterns</td></tr>
+<tr><td>@ref imtdev::CDeviceStateProviderAdapterComp</td>
+    <td>IDeviceController → IDeviceStateProvider</td>
+    <td>Provides standalone state provider interface decoupled from controller</td></tr>
+<tr><td>@ref imtdev::CDeviceDataFilePersistenceComp</td>
+    <td>IDeviceDataPersistence → ifile::IFilePersistence</td>
+    <td>Enables file-based persistence of device data with progress tracking</td></tr>
+<tr><td>@ref imtdev::CDeviceIdBasedConfigurationComp</td>
+    <td>Device Configuration → iprm::IParamsSet</td>
+    <td>Adapts device-specific configurations to parameters set interface with 
+        bidirectional synchronization</td></tr>
+</table>
+
+@subsection imtdev_arch_config Configuration Management
+
+<table>
+<tr><th>Component</th><th>Purpose</th></tr>
+<tr><td>@ref imtdev::CDeviceIdBasedConfigurationManagerComp</td>
+    <td>Manages factory-based configuration deserialization and device-ID-based 
+        configuration storage with serialization support</td></tr>
+<tr><td>@ref imtdev::CDeviceIdBasedAttributesComp</td>
+    <td>Manages static and instance-specific device attributes with dynamic 
+        synchronization based on device selection and state</td></tr>
+</table>
+
+@section imtdev_design_patterns Design Patterns
+
+The imtdev library employs several design patterns to achieve flexibility and maintainability:
+
+@subsection imtdev_pattern_adapter Adapter Pattern
+
+Used to bridge between different interface requirements:
+- **CDeviceInstanceListAdapterComp**: Adapts device list to ICollectionInfo
+- **CDeviceStateProviderAdapterComp**: Provides standalone state provider
+- **CDeviceDataFilePersistenceComp**: Adapts device data to file persistence
+- **CDeviceIdBasedConfigurationComp**: Adapts device config to params set
+
+@subsection imtdev_pattern_proxy Proxy Pattern
+
+- **CDeviceControllerProxyComp**: Aggregates multiple device controllers, 
+  delegates operations to the appropriate underlying controller based on 
+  device type, manages unified enumeration
+
+@subsection imtdev_pattern_composite Composite Pattern
+
+- **ICompositeDeviceInstance / ICompositeDeviceSpecification**: Support 
+  hierarchical device structures where devices can contain sub-devices, 
+  enabling recursive device tree navigation
+
+@subsection imtdev_pattern_observer Observer Pattern
+
+Change notification throughout the system:
+- Model update bridges (CModelUpdateBridge) for change notifications
+- IChangeable interface for observer registration
+- TModelUpdateBinder for automatic binding/unbinding
+- Multi-model dispatchers for aggregating multiple change sources
+
+@subsection imtdev_pattern_factory Factory Pattern
+
+- Device instance creation in CCompositeDeviceInstanceBase
+- Virtual CreateDeviceInstance() method for extensibility
+- Configuration factories in CDeviceIdBasedConfigurationManagerComp
+
+@subsection imtdev_pattern_template Template Method Pattern
+
+- CDeviceInstanceBase and CCompositeDeviceInstanceBase provide virtual 
+  extension points for derived classes to customize behavior
+
+@subsection imtdev_pattern_strategy Strategy Pattern
+
+- Multiple configuration factories for different device types
+- Pluggable attribute managers
+- Extensible enumeration strategies
+
+@section imtdev_key_abstractions Key Abstractions
+
+@subsection imtdev_abstraction_instances Device Instances
+
+**Device Instances** are runtime objects representing connected or manageable devices:
+- Carry unique identifiers (serial numbers, device IDs)
+- Track version information (firmware, hardware, protocol versions)
+- Provide dynamic attributes for runtime properties
+- Support mutation through IEditableDeviceInstance interface
+- Can be hierarchical (composite devices with sub-devices)
+
+@subsection imtdev_abstraction_specs Device Specifications
+
+**Device Specifications** are static metadata defining device classes and types:
+- Specify device capabilities (READ_ONLY, READ_WRITE)
+- Define supported commands and their parameters
+- Provide default and valid configuration schemas
+- Describe human-readable device information (name, description)
+- Support sub-device specifications for composite devices
+
+@subsection imtdev_abstraction_states Device States
+
+Device lifecycle is tracked through three states:
+- **DS_NONE**: Device is unavailable or not connected
+- **DS_CLOSED**: Device is available but not actively processing
+- **DS_OPENED**: Device is active and can execute commands
+
+State transitions are managed by IDeviceController and monitored via IDeviceStateProvider.
+
+@subsection imtdev_abstraction_controllers Controllers and Accessors
+
+**Controllers** (IDeviceController):
+- Enumerate available devices asynchronously
+- Open and close device connections
+- Maintain device instance registry
+- Provide state tracking
+- Support device name/description overrides
+
+**Accessors** (IDeviceAccessor):
+- Execute commands on open devices
+- Navigate hierarchical device structures
+- Access sub-devices in composite configurations
+- Provide current state and instance information
+
+@subsection imtdev_abstraction_persistence Data Persistence
+
+Device storage management:
+- **Storage Types**: ROM (read-only), EEPROM (read-write)
+- **Metadata Storage**: Serial numbers, versions, firmware versions
+- **Progress Tracking**: Support for long-running read/write operations
+- **Reset Operations**: Restore factory defaults or clear storage
+
+@subsection imtdev_abstraction_config Configuration Management
+
+Device-specific configuration handling:
+- **Configuration Manager**: Centralized storage and retrieval
+- **Factory-Based Deserialization**: Type-specific configuration loading
+- **Selection-Based Binding**: Automatic configuration sync with device selection
+- **Bidirectional Synchronization**: Changes propagate between device and UI
+- **Persistence**: Serialization support for configuration storage
+
+@section imtdev_relationships Component Relationships
+
+@code
+IDeviceController (base interface)
+├── CDeviceControllerCompBase (base implementation)
+│   ├── Device enumeration
+│   ├── Device lifecycle (open/close)
+│   ├── Thread-safe device list management
+│   └── State provider
+│
+├── CDeviceControllerProxyComp (multi-controller aggregation)
+│   ├── Delegates to multiple controllers
+│   ├── Unified device enumeration
+│   └── Automatic enumeration control
+│
+├─→ IDeviceEnumerator (async discovery)
+├─→ IDeviceStateProvider (state tracking)
+└─→ IDeviceAccessor (device access)
+
+IDeviceInstance (runtime device info)
+├── IEditableDeviceInstance (mutable interface)
+├── CDeviceInstanceBase (base implementation)
+│   ├── Identifier storage by type
+│   ├── Version info tracking
+│   ├── Attributes management
+│   └── Model update notifications
+│
+└── CCompositeDeviceInstanceBase
+    ├── Extends CDeviceInstanceBase
+    ├── Factory-based sub-device creation
+    └── Hierarchical device management
+        └── ICompositeDeviceInstance (hierarchical support)
+            └── IEditableCompositeDeviceInstance
+
+IDeviceSpecification (static device info)
+└── ICompositeDeviceSpecification (hierarchical specs)
+
+Configuration Management
+├── IDeviceConfigurationManager (interface)
+├── CDeviceIdBasedConfigurationManagerComp (storage/factory)
+│   ├── Factory-based deserialization
+│   ├── Device-ID-based storage
+│   └── Serialization support
+│
+└── CDeviceIdBasedConfigurationComp (selection-based binding)
+    ├── Observes device selection
+    ├── Observes configuration changes
+    ├── Bidirectional sync
+    └── Anti-recursion guards
+
+Attributes & Persistence
+├── CDeviceIdBasedAttributesComp
+│   ├── Static attributes
+│   ├── Instance-specific attributes
+│   └── Dynamic sync based on device ID
+│
+├── IDeviceDataPersistence (low-level storage)
+├── CDeviceDataFilePersistenceComp (file adapter)
+└── IDeviceDataProvider (instance + config data)
+@endcode
+
+@section imtdev_thread_safety Thread Safety
+
+The library implements several thread safety mechanisms:
+
+- **Mutex Protection**: CDeviceControllerCompBase uses QMutex (Qt5) or 
+  QRecursiveMutex (Qt6) for protecting device list and opened devices map
+- **Anti-recursion Guards**: CDeviceIdBasedConfigurationComp uses FlagLocker 
+  pattern to prevent recursive updates
+- **Model Updates**: CModelUpdateBridge ensures thread-safe change notifications
+  across component boundaries
+- **Asynchronous Enumeration**: Callback-based enumeration prevents blocking 
+  and race conditions
+
+@section imtdev_extensibility Extensibility Points
+
+The library provides multiple extension mechanisms:
+
+1. **Virtual Methods**: 
+   - `CreateDeviceInstance()` in CCompositeDeviceInstanceBase
+   - Template methods in base classes for customization
+
+2. **Component Injection**: 
+   - Reference-based dependencies (I_ASSIGN, I_MULTIREF)
+   - Support for multiple implementations
+
+3. **Attribute Managers**: 
+   - Pluggable through manager interfaces
+   - Separate static and instance attributes
+
+4. **Configuration Factories**: 
+   - Multiple factory instances for type-specific deserialization
+   - Extensible factory registration
+
+5. **Observer Pattern**: 
+   - Change listeners via IChangeable
+   - Model update bridges for notifications
+
+6. **Enumeration Strategies**: 
+   - Custom enumerator implementations
+   - Asynchronous discovery protocols
+
+@section imtdev_dependencies Dependencies
+
+@subsection imtdev_dep_external External Dependencies
+
+- **Qt Framework**: QtCore for threading, signals/slots, containers
+  - Qt5: QMutex
+  - Qt6: QRecursiveMutex
+- **ACF/ACL Framework**: Application Component Framework components
+
+@subsection imtdev_dep_acf ACF Components
+
+- **iattr**: Attribute management interfaces
+- **imod**: Model update and notification system
+- **icomp**: Component infrastructure
+- **iser**: Serialization and versioning
+- **ilog**: Logging facilities
+- **idoc**: Documentation interfaces
+- **iprm**: Parameter set management
+- **istd**: Standard utilities and interfaces
+- **ibase**: Base interfaces and types
+- **ifile**: File persistence interfaces
+
+@subsection imtdev_dep_imtcore ImtCore Components
+
+- **imtbase**: Collection info, model update binders, core utilities
+
+@section imtdev_usage_scenarios Usage Scenarios
+
+@subsection imtdev_scenario_basic Basic Device Enumeration and Control
+
+@code{.cpp}
+// 1. Get device controller
+I_GETREF(IDeviceController, pController);
+
+// 2. Enumerate devices
+pController->EnumerateDevices();
+
+// 3. Get device list
+auto deviceList = pController->GetDeviceInstanceList();
+
+// 4. Open a device (get device ID from list first)
+QByteArray deviceId = GetDeviceIdFromList(deviceList, 0);
+auto pAccessor = pController->OpenDevice(deviceId, nullptr);
+
+// 5. Execute command
+pAccessor->ExecuteCommand(commandId, params);
+
+// 6. Close device
+pController->CloseDevice(pAccessor);
+@endcode
+
+@subsection imtdev_scenario_composite Hierarchical Device Access
+
+@code{.cpp}
+// 1. Get device ID from controller's device list
+const imtbase::ICollectionInfo& deviceList = pController->GetDeviceInstanceList();
+QByteArray compositeDeviceId = GetDeviceIdFromList(deviceList, 0);
+
+// 2. Open composite device
+auto pAccessor = pController->OpenDevice(compositeDeviceId, nullptr);
+
+// 2. Get sub-device list
+auto subDevices = pAccessor->GetSubDeviceList();
+
+// 3. Open sub-device
+auto pSubAccessor = pAccessor->OpenSubDevice(subDevices[0]);
+
+// 4. Execute command on sub-device
+pSubAccessor->ExecuteCommand(commandId, params);
+@endcode
+
+@subsection imtdev_scenario_config Configuration Management
+
+@code{.cpp}
+// 1. Get configuration manager
+I_GETREF(IDeviceConfigurationManager, pConfigMgr);
+
+// 2. Get configuration for device
+auto pConfig = pConfigMgr->GetConfiguration(deviceId);
+
+// 3. Modify configuration
+pConfig->SetParameter(paramName, value);
+
+// 4. Save configuration
+pConfigMgr->SaveConfiguration(deviceId, pConfig);
+@endcode
+
+@subsection imtdev_scenario_persistence Data Persistence
+
+@code{.cpp}
+// 1. Get data persistence interface
+I_GETREF(IDeviceDataPersistence, pPersistence);
+
+// 2. Read device data
+std::vector<uint8_t> data;
+pPersistence->ReadData(storageType, offset, size, data, progress);
+
+// 3. Write device data
+pPersistence->WriteData(storageType, offset, data, progress);
+
+// 4. Reset to factory defaults
+pPersistence->ResetData(storageType);
+@endcode
+
+@subsection imtdev_scenario_proxy Multi-Controller Management
+
+@code{.cpp}
+// 1. Create proxy controller
+I_CREATE(CDeviceControllerProxyComp, pProxyController);
+
+// 2. Add controllers
+pProxyController->AddController(pController1);
+pProxyController->AddController(pController2);
+
+// 3. Enable automatic enumeration
+pProxyController->SetAutoEnumeration(true);
+
+// 4. Use unified device list
+auto allDevices = pProxyController->GetDeviceList();
+@endcode
+
+@section imtdev_best_practices Best Practices
+
+@subsection imtdev_bp_lifecycle Device Lifecycle Management
+
+- Always close devices when done to free resources
+- Handle device state changes through IDeviceStateProvider observers
+- Implement proper error handling for device operations
+- Use weak references for device instances to prevent memory leaks
+
+@subsection imtdev_bp_thread Thread Safety
+
+- Access device lists within mutex-protected scopes
+- Use model update bridges for cross-thread notifications
+- Avoid blocking operations in enumeration callbacks
+- Implement proper synchronization in derived classes
+
+@subsection imtdev_bp_extension Extending the Library
+
+- Override virtual methods in base classes for customization
+- Implement factory methods for custom device instance creation
+- Use component references for dependency injection
+- Register configuration factories for custom device types
+
+@subsection imtdev_bp_config Configuration Handling
+
+- Use anti-recursion guards when implementing bidirectional sync
+- Implement proper serialization for configuration persistence
+- Validate configuration parameters before applying
+- Provide default configurations for fallback scenarios
+
+@section imtdev_future_directions Future Directions
+
+Potential areas for library enhancement:
+
+- **Plugin Architecture**: Dynamic loading of device controller plugins
+- **Remote Device Support**: Network-based device access and control
+- **Device Discovery Protocols**: Support for standard protocols (UPnP, mDNS, etc.)
+- **Advanced State Management**: State machine implementation for complex device workflows
+- **Performance Optimization**: Caching strategies for frequently accessed data
+- **Enhanced Error Handling**: Structured error codes and recovery mechanisms
+- **Async Command Execution**: Non-blocking command execution with futures/promises
+- **Device Groups**: Logical grouping of devices for batch operations
+
+@section imtdev_references References
+
+- Qt Documentation: https://doc.qt.io/
+- ACF/ACL Framework Documentation (internal)
+- Device Driver Development Best Practices
+- Design Patterns: Elements of Reusable Object-Oriented Software
+
+*/

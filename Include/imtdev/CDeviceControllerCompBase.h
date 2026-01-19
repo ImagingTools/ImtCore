@@ -22,6 +22,52 @@ namespace imtdev
 {
 
 
+/**
+	@brief Base controller component implementing IDeviceController interface
+	
+	CDeviceControllerCompBase provides a complete, reusable implementation of the
+	IDeviceController interface with thread-safe device management, enumeration support,
+	and state tracking capabilities.
+	
+	This class serves as the foundation for device controller implementations throughout
+	the system, handling common concerns like device list management, device name/description
+	overrides, and state provider functionality.
+	
+	@par Key Features:
+	- **Thread-Safe Device Management**: Mutex-protected device list and opened devices map
+	- **Device Enumeration**: Support for asynchronous device discovery
+	- **State Tracking**: Built-in device state provider for monitoring device states
+	- **Name/Description Overrides**: Customizable device names and descriptions
+	- **Auto-Close**: Automatically close devices not found during enumeration
+	- **Collection Info**: Provides device list as ICollectionInfo for UI binding
+	- **Logging Support**: Integrated with logging framework (CLoggerComponentBase)
+	
+	@par Component Structure:
+	The component exposes multiple sub-elements:
+	- **DeviceInfoList**: Collection of discovered devices (ICollectionInfo)
+	- **OverriddenDeviceInfo**: Collection of custom names/descriptions
+	- **DeviceStateProvider**: State tracking for all devices (IDeviceStateProvider)
+	
+	@par Configuration:
+	- **AutoClose**: Boolean attribute to enable/disable automatic device closing (default: true)
+	
+	@par Thread Safety:
+	Uses QMutex (Qt5) or QRecursiveMutex (Qt6) to protect:
+	- Device list updates
+	- Opened devices map
+	- State queries
+	
+	@par Usage Pattern:
+	Derived classes should:
+	1. Implement device-specific enumeration logic
+	2. Call UpdateDeviceList() with discovered devices
+	3. Override OpenDevice() and CloseDevice() for device-specific operations
+	4. Provide device specifications via GetDeviceStaticInfo()
+	
+	@see IDeviceController
+	@see CDeviceControllerProxyComp
+	@ingroup imtdev
+*/
 class CDeviceControllerCompBase:
 			public QObject,
 			public ilog::CLoggerComponentBase,

@@ -14,6 +14,57 @@ namespace imtdev
 {
 
 
+/**
+	@brief Adapter component for device controller's device list
+	
+	CDeviceInstanceListAdapterComp implements the **Adapter Pattern** to adapt
+	IDeviceController's device list to the imtbase::ICollectionInfo interface.
+	This enables device lists to be used with UI frameworks and other systems
+	that work with collection-based data.
+	
+	@par Purpose:
+	Bridges the gap between device management (IDeviceController) and collection-based
+	access patterns (ICollectionInfo), enabling:
+	- UI binding to device lists
+	- Collection-based iteration and filtering
+	- Metadata access for display purposes
+	- Device name/description customization
+	
+	@par Key Features:
+	- **Transparent Adaptation**: Delegates all operations to underlying controller's device list
+	- **Change Forwarding**: Propagates change notifications from controller to observers
+	- **Metadata Support**: Provides device information in collection format
+	- **Write-Through**: Name and description changes are written through to controller
+	
+	@par Component Configuration:
+	- **DeviceController**: Reference to IDeviceController whose device list to adapt
+	
+	@par Usage Pattern:
+	@code{.cpp}
+	// Obtain adapter instance (via component system)
+	CDeviceInstanceListAdapterComp* pAdapter = /* get from component system */;
+	
+	// Component is configured with DeviceController reference
+	
+	// Use as collection info
+	imtbase::ICollectionInfo* pCollection = pAdapter;
+	int deviceCount = pCollection->GetElementsCount();
+	imtbase::ICollectionInfo::Ids ids = pCollection->GetElementIds();
+	
+	// Display in UI list
+	for (const QByteArray& id : ids)
+	{
+		QString name = pCollection->GetElementInfo(id, IT_NAME).toString();
+		QString desc = pCollection->GetElementInfo(id, IT_DESCRIPTION).toString();
+		// Add to UI...
+	}
+	@endcode
+	
+	@see IDeviceController
+	@see imtbase::ICollectionInfo
+	@see CDeviceStateProviderAdapterComp
+	@ingroup imtdev
+*/
 class CDeviceInstanceListAdapterComp:
 			public icomp::CComponentBase,
 			public imtbase::ICollectionInfo

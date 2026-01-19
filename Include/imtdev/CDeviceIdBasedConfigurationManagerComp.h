@@ -17,6 +17,81 @@ namespace imtdev
 {
 
 
+/**
+	@brief Device-ID-based configuration manager component
+	
+	CDeviceIdBasedConfigurationManagerComp implements IDeviceConfigurationManager to
+	provide centralized storage and retrieval of device-specific configurations indexed
+	by device ID. It supports factory-based deserialization and serialization for
+	configuration persistence across sessions.
+	
+	@par Purpose:
+	Manages the lifecycle of device configurations including:
+	- Storage of configuration parameter sets per device ID
+	- Factory-based deserialization for loading saved configurations
+	- Serialization support for persisting configurations
+	- Validation against device specifications
+	- Change notifications when configurations are modified
+	
+	@par Key Features:
+	- **Device-ID Indexed Storage**: QMap-based storage keyed by device ID
+	- **Factory Pattern**: Multiple configuration factories for different device types
+	- **Serialization**: Implements iser::ISerializable for save/load support
+	- **Validation**: Uses device controller to validate configurations
+	- **Change Tracking**: Notifies observers when configurations change
+	- **Type Association**: Stores device type ID with each configuration
+	
+	@par Component Configuration:
+	- **DeviceController**: Reference to IDeviceController for validation and device info
+	- **ConfigurationFactory**: Multi-reference to configuration factories for deserialization
+	
+	@par Storage Structure:
+	@code
+	Internal Storage:
+	{
+	  "DEVICE_001": {
+	    deviceTypeId: "StandardCamera",
+	    configuration: {BaudRate: 115200, Exposure: 100, ...}
+	  },
+	  "DEVICE_002": {
+	    deviceTypeId: "TemperatureSensor",
+	    configuration: {SampleRate: 10, Units: "Celsius", ...}
+	  }
+	}
+	@endcode
+	
+	@par Usage Pattern:
+	@code{.cpp}
+	// Obtain configuration manager instance (via component system)
+	CDeviceIdBasedConfigurationManagerComp* pConfigMgr = /* get from component system */;
+	
+	// Component is configured with:
+	// - DeviceController reference for validation
+	// - ConfigurationFactory references for deserialization
+	
+	// Store device configuration
+	iprm::CParamsSet* pConfig = /* your params set */;
+	pConfig->SetParamValue("BaudRate", 115200);
+	pConfigMgr->SetDeviceConfiguration("DEVICE_001", *pConfig);
+	
+	// Retrieve device configuration
+	DeviceConfigurationPtr pStoredConfig = 
+	    pConfigMgr->GetDeviceConfiguration("DEVICE_001");
+	
+	// Serialize to archive
+	iser::IArchive& archive = /* your archive */;
+	pConfigMgr->Serialize(archive);
+	@endcode
+	
+	@par Serialization:
+	Configurations are serialized with their associated device type IDs, enabling
+	proper factory-based deserialization when loading from persistent storage.
+	
+	@see IDeviceConfigurationManager
+	@see CDeviceIdBasedConfigurationComp
+	@see iser::ISerializable
+	@ingroup imtdev
+*/
 class CDeviceIdBasedConfigurationManagerComp:
 			public ilog::CLoggerComponentBase,
 			virtual public IDeviceConfigurationManager,
