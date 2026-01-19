@@ -318,7 +318,6 @@ void CCollectionImportControllerComp::OnJobQueueChanged(const istd::IChangeable:
 						m_jobQueueManagerCompPtr->GetJobResult(sessionPtr->jobId, jobOutput);
 						istd::IInformationProvider::InformationCategory category = jobOutput.GetInformationCategory();
 
-						m_jobQueueManagerCompPtr->RemoveJob(sessionPtr->jobId);
 						m_fileManagerCompPtr->FinishSession(sessionId);
 
 						if (info.status == imthype::IJobQueueManager::PS_CANCELED){
