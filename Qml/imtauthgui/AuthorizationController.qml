@@ -168,10 +168,6 @@ QtObject {
 	}
 
 	function saveLoginSettingsToServer(){
-		if (userTokenProvider.userId === ""){
-			return; // No user logged in yet
-		}
-		
 		var settings = {
 			"rememberMe": root.rememberMe,
 			"lastUser": root.lastUser,
@@ -179,6 +175,7 @@ QtObject {
 		};
 		
 		saveSettingsMutation.settingsData = JSON.stringify(settings);
+		saveSettingsMutation.userId = userTokenProvider.userId !== "" ? userTokenProvider.userId : "anonymous";
 		saveSettingsMutation.send();
 	}
 
@@ -465,7 +462,7 @@ QtObject {
 						}
 					}
 					catch (e) {
-						console.log("Failed to parse login settings: " + e);
+						console.log("Failed to parse login settings from server. JSON: " + settingsJson + ", Error: " + e);
 					}
 					
 					// If no auto-login, show the login page
@@ -481,11 +478,11 @@ QtObject {
 		gqlCommandId: ImtbaseSettingsSdlCommandIds.s_setSettings
 		
 		property string settingsData: ""
+		property string userId: "anonymous"
 		
 		inputObjectComp: Component {
 			SetSettingsInput {
-				// Use userId if logged in, otherwise use anonymous
-				m_userId: root.userTokenProvider.userId !== "" ? root.userTokenProvider.userId : "anonymous"
+				m_userId: saveSettingsMutation.userId
 				m_settings: saveSettingsMutation.settingsData
 			}
 		}
@@ -494,7 +491,7 @@ QtObject {
 			SetSettingsPayload {
 				onFinished: {
 					if (!m_ok) {
-						console.log("Failed to save login settings to server");
+						console.log("Failed to save login settings to server for userId: " + saveSettingsMutation.userId);
 					}
 				}
 			}
