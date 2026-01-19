@@ -36,7 +36,6 @@ IJobTicketSharedPtr CJobQueueManagerCompBase::GetJobTicket(const QByteArray& job
 	if (m_jobTicketsCollectionCompPtr->GetObjectData(jobId, dataPtr)){
 		IJobTicket* ticketPtr = dynamic_cast<IJobTicket*>(dataPtr.GetPtr());
 		if (ticketPtr){
-			iprm::IParamsSetSharedPtr retVal;
 			// Set params factory for proper deserialization
 			ticketPtr->SetParamsFactory([this](const QByteArray& ctx, const QByteArray& type) -> iprm::IParamsSetSharedPtr {
 				iprm::IParamsSetUniquePtr uniquePtr = CreateJobParameters(ctx, type, nullptr);
@@ -45,8 +44,10 @@ IJobTicketSharedPtr CJobQueueManagerCompBase::GetJobTicket(const QByteArray& job
 				
 				return retVal;
 			});
+			IJobTicketSharedPtr retVal;
+			retVal.SetCastedPtr(dataPtr);
 
-			return IJobTicketSharedPtr(ticketPtr);
+			return retVal;
 		}
 	}
 
@@ -61,7 +62,7 @@ QByteArray CJobQueueManagerCompBase::GetTaskTypeId(const QByteArray& jobId) cons
 	QReadLocker lock(&m_mutex);
 
 	IJobTicketSharedPtr ticketPtr = GetJobTicket(jobId);
-	if (ticketPtr){
+	if (ticketPtr.IsValid()){
 		return ticketPtr->GetTypeId();
 	}
 
@@ -326,6 +327,8 @@ bool CJobQueueManagerCompBase::SetProcessingStatus(const QByteArray & jobId, Pro
 	ticketPtr->SetProcessingStatus(status);
 
 	m_jobTicketsCollectionCompPtr->SetObjectData(jobId, *ticketPtr);
+
+	lock.unlock();
 
 	return true;
 }
