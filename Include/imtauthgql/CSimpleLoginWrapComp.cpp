@@ -203,7 +203,10 @@ bool CSimpleLoginWrapComp::LoginWithRefreshToken(const QString& userName, const 
 			m_loggedUserId = userId;
 		}
 		else{
-			// Fallback to username if userId not in response
+			// Fallback to username if userId not in response.
+			// This can occur when refreshing an older session token that
+			// was created before userId was added to the response.
+			// In such cases, the username parameter provides the login identifier.
 			m_loggedUserId = userName.toUtf8();
 		}
 
