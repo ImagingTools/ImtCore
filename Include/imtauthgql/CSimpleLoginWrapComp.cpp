@@ -10,6 +10,7 @@
 #include <imtqml/CGqlModel.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Sessions.h>
 #include <imtgql/CGqlRequestContextManager.h>
 
 
@@ -103,6 +104,9 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 		if (response.Version_1_0->token){
 			m_loggedUserToken = *response.Version_1_0->token;
 		}
+		if (response.Version_1_0->refreshToken){
+			m_loggedUserRefreshToken = *response.Version_1_0->refreshToken;
+		}
 		imtqml::CGqlModel::SetGlobalAccessToken(m_loggedUserToken);
 
 		m_gqlContextSharedPtr.Reset();
@@ -135,6 +139,7 @@ bool CSimpleLoginWrapComp::Logout()
 		m_loggedUserId.clear();
 		m_loggedUserToken.clear();
 		m_loggedUserPassword.clear();
+		m_loggedUserRefreshToken.clear();
 		m_userPermissionIds.clear();
 		m_userInfoPtr.Reset();
 		m_gqlContextSharedPtr.Reset();
@@ -144,6 +149,87 @@ bool CSimpleLoginWrapComp::Logout()
 	}
 
 	return false;
+}
+
+
+bool CSimpleLoginWrapComp::LoginWithRefreshToken(const QString& userName, const QByteArray& refreshToken)
+{
+	if (!m_applicationInfoCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'ApplicationInfo' was not set", "CSimpleLoginWrapComp");
+		return false;
+	}
+
+	if (!m_loggedUserToken.isEmpty()){
+		return false;
+	}
+
+	// Use Sessions SDL schema to refresh token
+	namespace sessionsdl = sdl::imtauth::Sessions;
+
+	sessionsdl::RefreshTokenRequestArguments arguments;
+	arguments.input.Version_1_0 = sessionsdl::CRefreshTokenInput::V1_0();
+	arguments.input.Version_1_0->refreshToken = refreshToken;
+
+	imtgql::CGqlRequest gqlRequest;
+	if (sessionsdl::CRefreshTokenGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+		typedef sessionsdl::CRefreshTokenPayload Response;
+
+		QString errorMessage;
+		Response response = SendModelRequest<Response>(gqlRequest, errorMessage);
+		if (!errorMessage.isEmpty()){
+			return false;
+		}
+
+		if (!response.Version_1_0 || !response.Version_1_0->ok){
+			return false;
+		}
+
+		if (!response.Version_1_0->userSession){
+			return false;
+		}
+
+		QByteArray productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
+
+		// Set up user session with refreshed tokens
+		m_userInfoPtr.FromUnique(m_userInfoFactCompPtr.CreateInstance());
+		if (!m_userInfoPtr.IsValid()){
+			return false;
+		}
+
+		m_userInfoPtr->SetId(userName.toUtf8());
+
+		if (response.Version_1_0->userSession->accessToken){
+			m_loggedUserToken = *response.Version_1_0->userSession->accessToken;
+		}
+		if (response.Version_1_0->userSession->refreshToken){
+			m_loggedUserRefreshToken = *response.Version_1_0->userSession->refreshToken;
+		}
+		if (response.Version_1_0->userSession->userId){
+			m_loggedUserId = *response.Version_1_0->userSession->userId;
+		}
+
+		imtqml::CGqlModel::SetGlobalAccessToken(m_loggedUserToken);
+
+		m_gqlContextSharedPtr.Reset();
+		m_gqlContextSharedPtr = new imtgql::CGqlContext();
+		m_gqlContextSharedPtr->SetToken(m_loggedUserToken);
+		m_gqlContextSharedPtr->SetProductId(productId);
+
+		imtgql::CGqlRequestContextManager::SetContext(m_gqlContextSharedPtr.GetPtr());
+
+		istd::CChangeNotifier notifier(this);
+		Q_UNUSED(notifier);
+
+		return true;
+	}
+
+	return false;
+}
+
+
+QByteArray CSimpleLoginWrapComp::GetRefreshToken() const
+{
+	return m_loggedUserRefreshToken;
 }
 
 
