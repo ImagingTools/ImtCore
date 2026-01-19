@@ -81,10 +81,11 @@ bash UpdateVersion.sh
 
 ## Version Management
 
-The version information is stored in `Partitura/ImtCoreVoce.arp/VersionInfo.acc` and is automatically generated from the git repository state:
+The version information is stored in `Partitura/ImtCoreVoce.arp/VersionInfo.acc` and is automatically generated from the template file `VersionInfo.acc.xtrsvn` based on the git repository state:
 
 - **Revision number**: Based on the commit count from `origin/master` (+ 10000 offset)
-- **Dirty flag**: Indicates whether there are uncommitted changes (1 = dirty, 0 = clean)
+
+The UpdateVersion script replaces the `$WCREV$` placeholder in the template with the actual revision number.
 
 The `post-merge` hook (installed by `InstallHooks`) ensures that version files are updated automatically after each `git pull`.
 
