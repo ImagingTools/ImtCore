@@ -17,6 +17,7 @@
 #include <imthype/CPluginBasedJobQueueManagerComp.h>
 #include <imthype/CPluginBasedJobExecutionComp.h>
 #include <imthype/CJobTicket.h>
+#include <imthype/CJobTicketComp.h>
 #include <imthype/CJobTicketMetaInfoCreatorComp.h>
 
 
@@ -43,6 +44,7 @@ typedef icomp::TModelCompWrap<
 						imthype::IJobTicket,
 						iser::ISerializable,
 						istd::IChangeable>> JobTicketInfo;
+typedef icomp::TModelCompWrap<imthype::CJobTicketComp> JobTicket;
 typedef imthype::CJobTicketMetaInfoCreatorComp JobTicketMetaInfoCreator;
 
 
