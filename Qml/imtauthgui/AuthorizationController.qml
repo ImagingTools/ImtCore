@@ -161,17 +161,6 @@ QtObject {
 		root.lastUser = "";
 	}
 
-	function setRememberMe(remember) {
-		root.rememberMe = remember;
-		if (!remember) {
-			clearRefreshToken();
-		}
-	}
-
-	function getRememberMe() {
-		return root.rememberMe;
-	}
-
 	function loginWithRefreshToken(userName, refreshToken){
 		refreshTokenForLoginGqlSender.userName = userName;
 		refreshTokenForLoginGqlSender.refreshToken = refreshToken;
