@@ -71,6 +71,39 @@ jobs:
             fi
             echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
             echo "Build ID: $BUILD_ID"
+
+            # Verify the branch name in TeamCity matches the request
+            echo "Verifying branch name in TeamCity..."
+            VERIFY_RESPONSE=$(curl -s -w "\n%{http_code}" \
+              -H "Authorization: Bearer $TEAMCITY_TOKEN" \
+              -H "Accept: application/json" \
+              "$TEAMCITY_URL/app/rest/builds/id:$BUILD_ID?fields=id,branchName,properties(property(name,value))")
+
+            VERIFY_HTTP_CODE=$(echo "$VERIFY_RESPONSE" | tail -n1)
+            VERIFY_BODY=$(echo "$VERIFY_RESPONSE" | sed '$d')
+
+            if [ "$VERIFY_HTTP_CODE" -eq 200 ]; then
+              TEAMCITY_BRANCH=$(echo "$VERIFY_BODY" | jq -r '.branchName // empty')
+              # Also check the GIT_BRANCH property we set
+              TC_GIT_BRANCH=$(echo "$VERIFY_BODY" | jq -r '.properties.property[] | select(.name == "env.GIT_BRANCH") | .value // empty')
+
+              echo "Requested branch: $GIT_BRANCH"
+              echo "TeamCity branch name: $TEAMCITY_BRANCH"
+              echo "TeamCity GIT_BRANCH property: $TC_GIT_BRANCH"
+
+              # Verify the GIT_BRANCH property matches what we sent
+              if [ "$TC_GIT_BRANCH" = "$GIT_BRANCH" ]; then
+                echo "✓ Branch verification successful: TeamCity received the correct branch"
+              else
+                echo "✗ Branch verification failed: Mismatch detected"
+                echo "  Expected: $GIT_BRANCH"
+                echo "  Got: $TC_GIT_BRANCH"
+                exit 1
+              fi
+            else
+              echo "Warning: Failed to verify branch (HTTP $VERIFY_HTTP_CODE), but build was triggered"
+              echo "Response: $VERIFY_BODY"
+            fi
           else
             echo "Failed to trigger TeamCity Windows build. HTTP Status: $HTTP_CODE"
             echo "Response: $BODY"
@@ -202,6 +235,39 @@ jobs:
             fi
             echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
             echo "Build ID: $BUILD_ID"
+
+            # Verify the branch name in TeamCity matches the request
+            echo "Verifying branch name in TeamCity..."
+            VERIFY_RESPONSE=$(curl -s -w "\n%{http_code}" \
+              -H "Authorization: Bearer $TEAMCITY_TOKEN" \
+              -H "Accept: application/json" \
+              "$TEAMCITY_URL/app/rest/builds/id:$BUILD_ID?fields=id,branchName,properties(property(name,value))")
+
+            VERIFY_HTTP_CODE=$(echo "$VERIFY_RESPONSE" | tail -n1)
+            VERIFY_BODY=$(echo "$VERIFY_RESPONSE" | sed '$d')
+
+            if [ "$VERIFY_HTTP_CODE" -eq 200 ]; then
+              TEAMCITY_BRANCH=$(echo "$VERIFY_BODY" | jq -r '.branchName // empty')
+              # Also check the GIT_BRANCH property we set
+              TC_GIT_BRANCH=$(echo "$VERIFY_BODY" | jq -r '.properties.property[] | select(.name == "env.GIT_BRANCH") | .value // empty')
+
+              echo "Requested branch: $GIT_BRANCH"
+              echo "TeamCity branch name: $TEAMCITY_BRANCH"
+              echo "TeamCity GIT_BRANCH property: $TC_GIT_BRANCH"
+
+              # Verify the GIT_BRANCH property matches what we sent
+              if [ "$TC_GIT_BRANCH" = "$GIT_BRANCH" ]; then
+                echo "✓ Branch verification successful: TeamCity received the correct branch"
+              else
+                echo "✗ Branch verification failed: Mismatch detected"
+                echo "  Expected: $GIT_BRANCH"
+                echo "  Got: $TC_GIT_BRANCH"
+                exit 1
+              fi
+            else
+              echo "Warning: Failed to verify branch (HTTP $VERIFY_HTTP_CODE), but build was triggered"
+              echo "Response: $VERIFY_BODY"
+            fi
           else
             echo "Failed to trigger TeamCity Linux build. HTTP Status: $HTTP_CODE"
             echo "Response: $BODY"
