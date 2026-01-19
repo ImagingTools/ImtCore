@@ -27,13 +27,10 @@ QtObject {
 	signal registerSuccessfully();
 	signal registerFailed();
 
-	Settings {
-		id: loginSettings
-		category: "Login"
-		property bool rememberMe: false
-		property string lastUser: ""
-		property string refreshToken: ""
-	}
+	// Properties to store remember me state and credentials
+	property bool rememberMe: false
+	property string lastUser: ""
+	property string storedRefreshToken: ""
 	
 	property XmlHttpRequestProxy requestProxy: XmlHttpRequestProxy {
 		onForbidden: {
@@ -83,8 +80,8 @@ QtObject {
 				}
 				else {
 					// For non-web platforms, try to restore session with refresh token
-					if (loginSettings.rememberMe && loginSettings.refreshToken !== "" && loginSettings.lastUser !== "") {
-						root.loginWithRefreshToken(loginSettings.lastUser, loginSettings.refreshToken);
+					if (root.rememberMe && root.storedRefreshToken !== "" && root.lastUser !== "") {
+						root.loginWithRefreshToken(root.lastUser, root.storedRefreshToken);
 						return;
 					}
 				}
@@ -150,9 +147,9 @@ QtObject {
 	}
 
 	function saveRefreshTokenIfRememberMe(){
-		if (loginSettings.rememberMe) {
-			loginSettings.refreshToken = userTokenProvider.refreshToken;
-			loginSettings.lastUser = userTokenProvider.login;
+		if (root.rememberMe) {
+			root.storedRefreshToken = userTokenProvider.refreshToken;
+			root.lastUser = userTokenProvider.login;
 		}
 		else {
 			clearRefreshToken();
@@ -160,19 +157,19 @@ QtObject {
 	}
 
 	function clearRefreshToken(){
-		loginSettings.refreshToken = "";
-		loginSettings.lastUser = "";
+		root.storedRefreshToken = "";
+		root.lastUser = "";
 	}
 
 	function setRememberMe(remember) {
-		loginSettings.rememberMe = remember;
+		root.rememberMe = remember;
 		if (!remember) {
 			clearRefreshToken();
 		}
 	}
 
 	function getRememberMe() {
-		return loginSettings.rememberMe;
+		return root.rememberMe;
 	}
 
 	function loginWithRefreshToken(userName, refreshToken){

@@ -31,7 +31,35 @@ Rectangle {
 		id: loginSettings
 		category: "Login"
 		property alias rememberMe: authPageContainer.rememberMe
-		property alias lastUser: loginTextInput.text
+		property string lastUser: ""
+		property string refreshToken: ""
+	}
+
+	// Sync with AuthorizationController
+	Binding {
+		target: AuthorizationController
+		property: "rememberMe"
+		value: authPageContainer.rememberMe
+	}
+	Binding {
+		target: AuthorizationController
+		property: "lastUser"
+		value: loginSettings.lastUser
+	}
+	Binding {
+		target: AuthorizationController
+		property: "storedRefreshToken"
+		value: loginSettings.refreshToken
+	}
+	Binding {
+		target: loginSettings
+		property: "lastUser"
+		value: AuthorizationController.lastUser
+	}
+	Binding {
+		target: loginSettings
+		property: "refreshToken"
+		value: AuthorizationController.storedRefreshToken
 	}
 
 	Component.onCompleted: {
