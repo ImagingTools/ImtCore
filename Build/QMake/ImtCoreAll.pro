@@ -438,9 +438,9 @@ SUBDIRS += ImtServerAppPck
 ImtServerAppPck.file = ../../Impl/ImtServerAppPck/QMake/ImtServerAppPck.pro
 ImtServerAppPck.depends = imtserverapp
 
-# SUBDIRS += EagleView
-# EagleView.file = ../../Impl/EagleView/QMake/EagleView.pro
-# EagleView.depends = imt3dgui
+SUBDIRS += EagleView
+EagleView.file = ../../Impl/EagleView/QMake/EagleView.pro
+EagleView.depends = imt3dgui
 
 SUBDIRS += ImtHypePck
 ImtHypePck.file = ../../Impl/ImtHypePck/QMake/ImtHypePck.pro
