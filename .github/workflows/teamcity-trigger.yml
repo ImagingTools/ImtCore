@@ -40,7 +40,7 @@ jobs:
           # Determine the correct branch reference
           # For pull requests, use the source branch (GITHUB_HEAD_REF)
           # For push events, use GITHUB_REF
-          if [ -n "${{ github.event.pull_request.head.ref }}" ]; then
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
             GIT_BRANCH="refs/heads/${{ github.event.pull_request.head.ref }}"
             echo "Pull request detected, using branch: $GIT_BRANCH"
           else
@@ -71,6 +71,49 @@ jobs:
             fi
             echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
             echo "Build ID: $BUILD_ID"
+
+            # Verify the branch name in TeamCity matches the request
+            echo "Verifying branch name in TeamCity..."
+
+            # First, check the buildQueue to get the queued build information
+            VERIFY_RESPONSE=$(curl -s -w "\n%{http_code}" \
+              -H "Authorization: Bearer $TEAMCITY_TOKEN" \
+              -H "Accept: application/json" \
+              "$TEAMCITY_URL/app/rest/buildQueue/id:$BUILD_ID?fields=id,branchName,properties(property(name,value))")
+
+            VERIFY_HTTP_CODE=$(echo "$VERIFY_RESPONSE" | tail -n1)
+            VERIFY_BODY=$(echo "$VERIFY_RESPONSE" | sed '$d')
+
+            echo "Debug: HTTP Status Code: $VERIFY_HTTP_CODE"
+            echo "Debug: Response from TeamCity:"
+            echo "$VERIFY_BODY" | jq '.' 2>/dev/null || echo "$VERIFY_BODY"
+
+            if [ "$VERIFY_HTTP_CODE" -eq 200 ]; then
+              TEAMCITY_BRANCH=$(echo "$VERIFY_BODY" | jq -r '.branchName // empty')
+              # Also check the GIT_BRANCH property we set
+              TC_GIT_BRANCH=$(echo "$VERIFY_BODY" | jq -r '.properties.property[]? | select(.name == "env.GIT_BRANCH") | .value // empty' 2>/dev/null)
+
+              echo "Requested branch: $GIT_BRANCH"
+              echo "TeamCity branch name: $TEAMCITY_BRANCH"
+              echo "TeamCity GIT_BRANCH property: $TC_GIT_BRANCH"
+
+              # Verify the GIT_BRANCH property matches what we sent
+              if [ -n "$TC_GIT_BRANCH" ] && [ "$TC_GIT_BRANCH" = "$GIT_BRANCH" ]; then
+                echo "✓ Branch verification successful: TeamCity received the correct branch"
+              elif [ -z "$TC_GIT_BRANCH" ]; then
+                echo "⚠ Warning: Could not retrieve env.GIT_BRANCH property from TeamCity"
+                echo "  This might indicate the property was not set or TeamCity hasn't processed it yet"
+                echo "  Requested: $GIT_BRANCH"
+              else
+                echo "✗ Branch verification failed: Mismatch detected"
+                echo "  Expected: $GIT_BRANCH"
+                echo "  Got: $TC_GIT_BRANCH"
+                exit 1
+              fi
+            else
+              echo "Warning: Failed to verify branch (HTTP $VERIFY_HTTP_CODE), but build was triggered"
+              echo "Response: $VERIFY_BODY"
+            fi
           else
             echo "Failed to trigger TeamCity Windows build. HTTP Status: $HTTP_CODE"
             echo "Response: $BODY"
@@ -171,7 +214,7 @@ jobs:
           # Determine the correct branch reference
           # For pull requests, use the source branch (GITHUB_HEAD_REF)
           # For push events, use GITHUB_REF
-          if [ -n "${{ github.event.pull_request.head.ref }}" ]; then
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
             GIT_BRANCH="refs/heads/${{ github.event.pull_request.head.ref }}"
             echo "Pull request detected, using branch: $GIT_BRANCH"
           else
@@ -202,6 +245,49 @@ jobs:
             fi
             echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
             echo "Build ID: $BUILD_ID"
+
+            # Verify the branch name in TeamCity matches the request
+            echo "Verifying branch name in TeamCity..."
+
+            # First, check the buildQueue to get the queued build information
+            VERIFY_RESPONSE=$(curl -s -w "\n%{http_code}" \
+              -H "Authorization: Bearer $TEAMCITY_TOKEN" \
+              -H "Accept: application/json" \
+              "$TEAMCITY_URL/app/rest/buildQueue/id:$BUILD_ID?fields=id,branchName,properties(property(name,value))")
+
+            VERIFY_HTTP_CODE=$(echo "$VERIFY_RESPONSE" | tail -n1)
+            VERIFY_BODY=$(echo "$VERIFY_RESPONSE" | sed '$d')
+
+            echo "Debug: HTTP Status Code: $VERIFY_HTTP_CODE"
+            echo "Debug: Response from TeamCity:"
+            echo "$VERIFY_BODY" | jq '.' 2>/dev/null || echo "$VERIFY_BODY"
+
+            if [ "$VERIFY_HTTP_CODE" -eq 200 ]; then
+              TEAMCITY_BRANCH=$(echo "$VERIFY_BODY" | jq -r '.branchName // empty')
+              # Also check the GIT_BRANCH property we set
+              TC_GIT_BRANCH=$(echo "$VERIFY_BODY" | jq -r '.properties.property[]? | select(.name == "env.GIT_BRANCH") | .value // empty' 2>/dev/null)
+
+              echo "Requested branch: $GIT_BRANCH"
+              echo "TeamCity branch name: $TEAMCITY_BRANCH"
+              echo "TeamCity GIT_BRANCH property: $TC_GIT_BRANCH"
+
+              # Verify the GIT_BRANCH property matches what we sent
+              if [ -n "$TC_GIT_BRANCH" ] && [ "$TC_GIT_BRANCH" = "$GIT_BRANCH" ]; then
+                echo "✓ Branch verification successful: TeamCity received the correct branch"
+              elif [ -z "$TC_GIT_BRANCH" ]; then
+                echo "⚠ Warning: Could not retrieve env.GIT_BRANCH property from TeamCity"
+                echo "  This might indicate the property was not set or TeamCity hasn't processed it yet"
+                echo "  Requested: $GIT_BRANCH"
+              else
+                echo "✗ Branch verification failed: Mismatch detected"
+                echo "  Expected: $GIT_BRANCH"
+                echo "  Got: $TC_GIT_BRANCH"
+                exit 1
+              fi
+            else
+              echo "Warning: Failed to verify branch (HTTP $VERIFY_HTTP_CODE), but build was triggered"
+              echo "Response: $VERIFY_BODY"
+            fi
           else
             echo "Failed to trigger TeamCity Linux build. HTTP Status: $HTTP_CODE"
             echo "Response: $BODY"
