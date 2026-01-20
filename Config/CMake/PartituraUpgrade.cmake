@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.26)
 
+## DEPRECATED TODO: remove it
 function (imt_core_upgrade_partitura A_WORKING_DIRECTORY)
+
+	return()
 
 	set (CUSTOM_PYTHON OFF)
 	if (NOT PYTHONEXE)
