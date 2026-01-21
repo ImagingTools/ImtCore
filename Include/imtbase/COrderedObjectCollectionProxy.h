@@ -5,6 +5,9 @@
 #include <QtCore/QVector>
 #include <QtCore/QSet>
 
+// ACF includes
+#include <istd/TUniqueInterfacePtr.h>
+
 // ImtCore includes
 #include <imtbase/IOrderedObjectCollection.h>
 
@@ -18,9 +21,12 @@ namespace imtbase
 	This class wraps an existing IObjectCollection and maintains a custom ordering for its items.
 	Uses composition (aggregation) to delegate operations to the wrapped collection.
 	
-	\note The proxy does not observe changes to the parent collection. If items are added or
-	removed from the parent collection directly (bypassing the proxy), the custom order will
+	\note The proxy does not observe changes to the aggregated collection. If items are added or
+	removed from the aggregated collection directly (bypassing the proxy), the custom order will
 	be automatically synchronized when GetOrderedItemIds() or GetElementIds() is called.
+	
+	\note The proxy does NOT take ownership of the aggregated collection pointer. The caller
+	is responsible for managing the lifetime of the collection object.
 	
 	\ingroup Collection
 */
@@ -28,10 +34,16 @@ class COrderedObjectCollectionProxy: virtual public IOrderedObjectCollection
 {
 public:
 	/**
-		Constructor.
-		\param collectionPtr    Pointer to the collection to wrap (must not be null)
+		Constructor for non-owning proxy.
+		\param collectionPtr    Pointer to the collection to wrap (must not be null). Proxy does NOT take ownership.
 	*/
 	COrderedObjectCollectionProxy(IObjectCollection* collectionPtr);
+	
+	/**
+		Constructor for owning proxy.
+		\param collectionPtr    Unique pointer to the collection to wrap. Proxy takes ownership.
+	*/
+	COrderedObjectCollectionProxy(IObjectCollectionUniquePtr collectionPtr);
 	
 	virtual ~COrderedObjectCollectionProxy();
 
@@ -137,7 +149,8 @@ private:
 	Ids ApplyCustomOrder(const Ids& ids) const;
 
 private:
-	IObjectCollection* m_collectionPtr;					// Aggregated pointer to the wrapped collection
+	IObjectCollectionUniquePtr m_ownedCollection;		// Owned collection (if proxy takes ownership)
+	IObjectCollection* m_collectionPtr;					// Pointer to the aggregated collection (owned or non-owned)
 	mutable QVector<QByteArray> m_customOrder;			// Stores the custom order of item IDs when m_hasCustomOrder is true
 	mutable bool m_hasCustomOrder;						// Flag indicating whether a custom order is currently active
 };

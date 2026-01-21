@@ -1,6 +1,9 @@
 #include <imtbase/COrderedObjectCollectionProxy.h>
 
 
+// C++ includes
+#include <utility>
+
 // ACF includes
 #include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
@@ -18,6 +21,15 @@ namespace imtbase
 
 COrderedObjectCollectionProxy::COrderedObjectCollectionProxy(IObjectCollection* collectionPtr)
 	:m_collectionPtr(collectionPtr),
+	 m_hasCustomOrder(false)
+{
+	Q_ASSERT(m_collectionPtr != nullptr);
+}
+
+
+COrderedObjectCollectionProxy::COrderedObjectCollectionProxy(IObjectCollectionUniquePtr collectionPtr)
+	:m_ownedCollection(std::move(collectionPtr)),
+	 m_collectionPtr(m_ownedCollection.Get()),
 	 m_hasCustomOrder(false)
 {
 	Q_ASSERT(m_collectionPtr != nullptr);
@@ -266,23 +278,11 @@ IObjectCollectionUniquePtr COrderedObjectCollectionProxy::CreateSubCollection(
 	// Create a proxy around a subcollection
 	IObjectCollectionUniquePtr subCollection = m_collectionPtr->CreateSubCollection(offset, count, selectionParamsPtr);
 	if (subCollection){
-		IObjectCollection* subCollectionRawPtr = subCollection.Release();
-		COrderedObjectCollectionProxy* proxyPtr = nullptr;
-		try {
-			proxyPtr = new COrderedObjectCollectionProxy(subCollectionRawPtr);
-			// Copy the ordering state (these operations are noexcept for QVector and bool)
-			proxyPtr->m_customOrder = m_customOrder;
-			proxyPtr->m_hasCustomOrder = m_hasCustomOrder;
-			return IObjectCollectionUniquePtr(proxyPtr);
-		}
-		catch (...) {
-			// If exception occurs during construction or assignment:
-			// - If constructor threw, proxyPtr is nullptr, just delete subCollectionRawPtr
-			// - If assignment threw, proxyPtr is valid but not yet wrapped, delete both
-			delete proxyPtr;
-			delete subCollectionRawPtr;
-			throw;
-		}
+		// Use the owning constructor so the proxy takes ownership of the subcollection
+		COrderedObjectCollectionProxy* proxyPtr = new COrderedObjectCollectionProxy(std::move(subCollection));
+		proxyPtr->m_customOrder = m_customOrder;
+		proxyPtr->m_hasCustomOrder = m_hasCustomOrder;
+		return IObjectCollectionUniquePtr(proxyPtr);
 	}
 	return IObjectCollectionUniquePtr();
 }
@@ -474,9 +474,15 @@ bool COrderedObjectCollectionProxy::IsEqual(const IChangeable& object) const
 
 istd::IChangeableUniquePtr COrderedObjectCollectionProxy::CloneMe(CompatibilityMode mode) const
 {
-	// Note: The clone shares the same collection pointer as the original.
+	// Note: The clone shares the same collection pointer as the original for non-owning proxies.
+	// For owning proxies, cloning is not supported (would require cloning the owned collection).
 	// This is intentional for the proxy pattern, where clones manage ordering independently
 	// but delegate data operations to the same collection.
+	if (m_ownedCollection){
+		// Cannot clone an owning proxy (would need to clone the collection itself)
+		return istd::IChangeableUniquePtr();
+	}
+	
 	COrderedObjectCollectionProxy* clonePtr = new COrderedObjectCollectionProxy(m_collectionPtr);
 	clonePtr->m_customOrder = m_customOrder;
 	clonePtr->m_hasCustomOrder = m_hasCustomOrder;
