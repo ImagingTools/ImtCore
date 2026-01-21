@@ -549,6 +549,10 @@ bool COrderedObjectCollectionProxy::IsEqual(const IChangeable& object) const
 
 istd::IChangeableUniquePtr COrderedObjectCollectionProxy::CloneMe(CompatibilityMode mode) const
 {
+	if (m_collectionPtr == nullptr){
+		return istd::IChangeableUniquePtr();
+	}
+	
 	// Note: The clone shares the same collection pointer as the original for non-owning proxies.
 	// For owning proxies, cloning is not supported (would require cloning the owned collection).
 	// This is intentional for the proxy pattern, where clones manage ordering independently
