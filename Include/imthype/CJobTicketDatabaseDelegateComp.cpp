@@ -170,12 +170,30 @@ QByteArray CJobTicketDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 
 QByteArray CJobTicketDatabaseDelegateComp::CreateRenameObjectQuery(
-			const imtbase::IObjectCollection& /*collection*/,
-			const QByteArray& /*objectId*/,
-			const QString& /*newObjectName*/,
+			const imtbase::IObjectCollection& collection,
+			const QByteArray& objectId,
+			const QString& newObjectName,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	return QByteArray();
+	const IJobTicket* jobTicketPtr = nullptr;
+	imtbase::IObjectCollection::DataPtr objectPtr;
+	if (collection.GetObjectData(objectId, objectPtr)){
+		jobTicketPtr = dynamic_cast<const IJobTicket*>(objectPtr.GetPtr());
+	}
+
+	if (jobTicketPtr == nullptr){
+		return QByteArray();
+	}
+
+	if (objectId.isEmpty()){
+		return QByteArray();
+	}
+
+	QByteArray retVal = QString("UPDATE \"JobTickets\" SET \"Name\" = '%1' WHERE \"Id\" = '%2';")
+			.arg(newObjectName)
+			.arg(qPrintable(objectId)).toLocal8Bit();
+
+	return retVal;
 }
 
 
