@@ -5,7 +5,6 @@
 #include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
 #include <iser/CArchiveTag.h>
-#include <iser/CPrimitiveTypesSerializer.h>
 
 // ImtCore includes
 #include <imtbase/CObjectCollection.h>
@@ -248,7 +247,7 @@ bool COrderedObjectCollectionProxy::Serialize(iser::IArchive& archive)
 	// Serialize custom order flag
 	static iser::CArchiveTag hasCustomOrderTag("HasCustomOrder", "Flag indicating if custom order is active");
 	retVal = retVal && archive.BeginTag(hasCustomOrderTag);
-	retVal = retVal && iser::Serialize(archive, m_hasCustomOrder);
+	retVal = retVal && archive.Process(m_hasCustomOrder);
 	retVal = retVal && archive.EndTag(hasCustomOrderTag);
 
 	// Serialize custom order list if active
@@ -265,7 +264,7 @@ bool COrderedObjectCollectionProxy::Serialize(iser::IArchive& archive)
 
 		for (int i = 0; i < orderCount; ++i){
 			retVal = retVal && archive.BeginTag(itemIdTag);
-			retVal = retVal && iser::Serialize(archive, m_customOrder[i]);
+			retVal = retVal && archive.Process(m_customOrder[i]);
 			retVal = retVal && archive.EndTag(itemIdTag);
 		}
 
