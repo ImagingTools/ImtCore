@@ -63,6 +63,10 @@ public:
 		Q_INIT_RESOURCE(imtbaseCollectionDocumentManagerSdl);
 		Q_INIT_RESOURCE(imtbaseUndoManagerSdl);
 		Q_INIT_RESOURCE(imtbaseDocumentIdFilterSdl);
+		Q_INIT_RESOURCE(imtbaseProgressManagerSdl);
+		Q_INIT_RESOURCE(imtbaseCollectionImportSdl);
+		Q_INIT_RESOURCE(imt2dGeometrySdl);
+		Q_INIT_RESOURCE(imt2dPaintSystemSdl);
 	}
 
 	static void InitQml()
