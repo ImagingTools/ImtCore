@@ -270,14 +270,17 @@ IObjectCollectionUniquePtr COrderedObjectCollectionProxy::CreateSubCollection(
 		COrderedObjectCollectionProxy* proxyPtr = nullptr;
 		try {
 			proxyPtr = new COrderedObjectCollectionProxy(subCollectionRawPtr);
+			// Copy the ordering state (these operations are noexcept for QVector and bool)
 			proxyPtr->m_customOrder = m_customOrder;
 			proxyPtr->m_hasCustomOrder = m_hasCustomOrder;
 			return IObjectCollectionUniquePtr(proxyPtr);
 		}
 		catch (...) {
-			// Clean up on exception
-			delete subCollectionRawPtr;
+			// If exception occurs during construction or assignment:
+			// - If constructor threw, proxyPtr is nullptr, just delete subCollectionRawPtr
+			// - If assignment threw, proxyPtr is valid but not yet wrapped, delete both
 			delete proxyPtr;
+			delete subCollectionRawPtr;
 			throw;
 		}
 	}
