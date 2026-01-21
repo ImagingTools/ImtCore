@@ -162,7 +162,7 @@ IHierarchicalStructure* COrderedObjectCollectionProxy::GetCollectionStructure() 
 	if (!m_collectionPtr.IsValid()){
 		return nullptr;
 	}
-	return m_collectionPtr.GetPtr()->GetCollectionStructure();
+	return m_collectionPtr->GetCollectionStructure();
 }
 
 
@@ -171,7 +171,7 @@ const IRevisionController* COrderedObjectCollectionProxy::GetRevisionController(
 	if (!m_collectionPtr.IsValid()){
 		return nullptr;
 	}
-	return m_collectionPtr.GetPtr()->GetRevisionController();
+	return m_collectionPtr->GetRevisionController();
 }
 
 
@@ -180,7 +180,7 @@ const ICollectionDataController* COrderedObjectCollectionProxy::GetDataControlle
 	if (!m_collectionPtr.IsValid()){
 		return nullptr;
 	}
-	return m_collectionPtr.GetPtr()->GetDataController();
+	return m_collectionPtr->GetDataController();
 }
 
 
@@ -189,7 +189,7 @@ int COrderedObjectCollectionProxy::GetOperationFlags(const QByteArray& objectId)
 	if (!m_collectionPtr.IsValid()){
 		return 0;
 	}
-	return m_collectionPtr.GetPtr()->GetOperationFlags(objectId);
+	return m_collectionPtr->GetOperationFlags(objectId);
 }
 
 
@@ -207,7 +207,7 @@ ICollectionInfo::Id COrderedObjectCollectionProxy::InsertNewObject(
 		return Id();
 	}
 	// Insert into collection
-	const Id newId = m_collectionPtr.GetPtr()->InsertNewObject(
+	const Id newId = m_collectionPtr->InsertNewObject(
 				typeId,
 				name,
 				description,
@@ -231,7 +231,7 @@ bool COrderedObjectCollectionProxy::RemoveElements(const Ids& elementIds, const 
 	if (!m_collectionPtr.IsValid()){
 		return false;
 	}
-	const bool result = m_collectionPtr.GetPtr()->RemoveElements(elementIds, operationContextPtr);
+	const bool result = m_collectionPtr->RemoveElements(elementIds, operationContextPtr);
 
 	if (result && m_hasCustomOrder){
 		// Remove deleted items from custom order
@@ -251,7 +251,7 @@ bool COrderedObjectCollectionProxy::RemoveElementSet(
 	if (!m_collectionPtr.IsValid()){
 		return false;
 	}
-	return m_collectionPtr.GetPtr()->RemoveElementSet(selectionParamsPtr, operationContextPtr);
+	return m_collectionPtr->RemoveElementSet(selectionParamsPtr, operationContextPtr);
 }
 
 
@@ -262,7 +262,7 @@ bool COrderedObjectCollectionProxy::RestoreObjects(
 	if (!m_collectionPtr.IsValid()){
 		return false;
 	}
-	return m_collectionPtr.GetPtr()->RestoreObjects(objectIds, operationContextPtr);
+	return m_collectionPtr->RestoreObjects(objectIds, operationContextPtr);
 }
 
 
@@ -273,7 +273,7 @@ bool COrderedObjectCollectionProxy::RestoreObjectSet(
 	if (!m_collectionPtr.IsValid()){
 		return false;
 	}
-	return m_collectionPtr.GetPtr()->RestoreObjectSet(selectionParamsPtr, operationContextPtr);
+	return m_collectionPtr->RestoreObjectSet(selectionParamsPtr, operationContextPtr);
 }
 
 
@@ -282,7 +282,7 @@ const istd::IChangeable* COrderedObjectCollectionProxy::GetObjectPtr(const Id& o
 	if (!m_collectionPtr.IsValid()){
 		return nullptr;
 	}
-	return m_collectionPtr.GetPtr()->GetObjectPtr(objectId);
+	return m_collectionPtr->GetObjectPtr(objectId);
 }
 
 
@@ -291,7 +291,7 @@ bool COrderedObjectCollectionProxy::GetObjectData(const Id& objectId, DataPtr& d
 	if (!m_collectionPtr.IsValid()){
 		return false;
 	}
-	return m_collectionPtr.GetPtr()->GetObjectData(objectId, dataPtr, dataConfigurationPtr);
+	return m_collectionPtr->GetObjectData(objectId, dataPtr, dataConfigurationPtr);
 }
 
 
@@ -304,7 +304,7 @@ bool COrderedObjectCollectionProxy::SetObjectData(
 	if (!m_collectionPtr.IsValid()){
 		return false;
 	}
-	return m_collectionPtr.GetPtr()->SetObjectData(objectId, object, mode, operationContextPtr);
+	return m_collectionPtr->SetObjectData(objectId, object, mode, operationContextPtr);
 }
 
 
@@ -317,7 +317,7 @@ IObjectCollectionUniquePtr COrderedObjectCollectionProxy::CreateSubCollection(
 		return IObjectCollectionUniquePtr();
 	}
 	// Create a proxy around a subcollection
-	IObjectCollectionUniquePtr subCollection = m_collectionPtr.GetPtr()->CreateSubCollection(offset, count, selectionParamsPtr);
+	IObjectCollectionUniquePtr subCollection = m_collectionPtr->CreateSubCollection(offset, count, selectionParamsPtr);
 	if (subCollection){
 		// Use the owning constructor so the proxy takes ownership of the subcollection
 		COrderedObjectCollectionProxy* proxyPtr = new COrderedObjectCollectionProxy(std::move(subCollection));
@@ -338,7 +338,7 @@ IObjectCollectionIterator* COrderedObjectCollectionProxy::CreateObjectCollection
 	if (!m_collectionPtr.IsValid()){
 		return nullptr;
 	}
-	return m_collectionPtr.GetPtr()->CreateObjectCollectionIterator(objectId, offset, count, selectionParamsPtr);
+	return m_collectionPtr->CreateObjectCollectionIterator(objectId, offset, count, selectionParamsPtr);
 }
 
 
@@ -349,7 +349,7 @@ const iprm::IOptionsList* COrderedObjectCollectionProxy::GetObjectTypesInfo() co
 	if (!m_collectionPtr.IsValid()){
 		return nullptr;
 	}
-	return m_collectionPtr.GetPtr()->GetObjectTypesInfo();
+	return m_collectionPtr->GetObjectTypesInfo();
 }
 
 
@@ -358,7 +358,7 @@ ICollectionInfo::Id COrderedObjectCollectionProxy::GetObjectTypeId(const Id& obj
 	if (!m_collectionPtr.IsValid()){
 		return Id();
 	}
-	return m_collectionPtr.GetPtr()->GetObjectTypeId(objectId);
+	return m_collectionPtr->GetObjectTypeId(objectId);
 }
 
 
@@ -367,7 +367,7 @@ idoc::MetaInfoPtr COrderedObjectCollectionProxy::GetDataMetaInfo(const Id& objec
 	if (!m_collectionPtr.IsValid()){
 		return idoc::MetaInfoPtr();
 	}
-	return m_collectionPtr.GetPtr()->GetDataMetaInfo(objectId);
+	return m_collectionPtr->GetDataMetaInfo(objectId);
 }
 
 
@@ -380,7 +380,7 @@ int COrderedObjectCollectionProxy::GetElementsCount(
 	if (!m_collectionPtr.IsValid()){
 		return 0;
 	}
-	return m_collectionPtr.GetPtr()->GetElementsCount(selectionParamPtr, logPtr);
+	return m_collectionPtr->GetElementsCount(selectionParamPtr, logPtr);
 }
 
 
@@ -394,7 +394,7 @@ Ids COrderedObjectCollectionProxy::GetElementIds(
 		return Ids();
 	}
 	// Get IDs from collection
-	Ids collectionIds = m_collectionPtr.GetPtr()->GetElementIds(0, -1, selectionParamsPtr, logPtr);
+	Ids collectionIds = m_collectionPtr->GetElementIds(0, -1, selectionParamsPtr, logPtr);
 
 	// Apply custom ordering if active
 	if (m_hasCustomOrder){
@@ -427,7 +427,7 @@ bool COrderedObjectCollectionProxy::GetSubsetInfo(
 	if (!m_collectionPtr.IsValid()){
 		return false;
 	}
-	return m_collectionPtr.GetPtr()->GetSubsetInfo(subsetInfo, offset, count, selectionParamsPtr, logPtr);
+	return m_collectionPtr->GetSubsetInfo(subsetInfo, offset, count, selectionParamsPtr, logPtr);
 }
 
 
@@ -436,7 +436,7 @@ QVariant COrderedObjectCollectionProxy::GetElementInfo(const Id& elementId, int 
 	if (!m_collectionPtr.IsValid()){
 		return QVariant();
 	}
-	return m_collectionPtr.GetPtr()->GetElementInfo(elementId, infoType, logPtr);
+	return m_collectionPtr->GetElementInfo(elementId, infoType, logPtr);
 }
 
 
@@ -445,7 +445,7 @@ idoc::MetaInfoPtr COrderedObjectCollectionProxy::GetElementMetaInfo(const Id& el
 	if (!m_collectionPtr.IsValid()){
 		return idoc::MetaInfoPtr();
 	}
-	return m_collectionPtr.GetPtr()->GetElementMetaInfo(elementId, logPtr);
+	return m_collectionPtr->GetElementMetaInfo(elementId, logPtr);
 }
 
 
@@ -454,7 +454,7 @@ bool COrderedObjectCollectionProxy::SetElementName(const Id& elementId, const QS
 	if (!m_collectionPtr.IsValid()){
 		return false;
 	}
-	return m_collectionPtr.GetPtr()->SetElementName(elementId, name, logPtr);
+	return m_collectionPtr->SetElementName(elementId, name, logPtr);
 }
 
 
@@ -463,7 +463,7 @@ bool COrderedObjectCollectionProxy::SetElementDescription(const Id& elementId, c
 	if (!m_collectionPtr.IsValid()){
 		return false;
 	}
-	return m_collectionPtr.GetPtr()->SetElementDescription(elementId, description, logPtr);
+	return m_collectionPtr->SetElementDescription(elementId, description, logPtr);
 }
 
 
@@ -472,7 +472,7 @@ bool COrderedObjectCollectionProxy::SetElementEnabled(const Id& elementId, bool 
 	if (!m_collectionPtr.IsValid()){
 		return false;
 	}
-	return m_collectionPtr.GetPtr()->SetElementEnabled(elementId, isEnabled, logPtr);
+	return m_collectionPtr->SetElementEnabled(elementId, isEnabled, logPtr);
 }
 
 
@@ -558,7 +558,7 @@ istd::IChangeableUniquePtr COrderedObjectCollectionProxy::CloneMe(CompatibilityM
 	// Note: The clone always creates a non-owning proxy that shares the same collection pointer.
 	// This is intentional for the proxy pattern, where clones manage ordering independently
 	// but delegate data operations to the same collection.
-	COrderedObjectCollectionProxy* clonePtr = new COrderedObjectCollectionProxy(m_collectionPtr.GetPtr(), false);
+	COrderedObjectCollectionProxy* clonePtr = new COrderedObjectCollectionProxy(&(*m_collectionPtr), false);
 	clonePtr->m_customOrder = m_customOrder;
 	clonePtr->m_hasCustomOrder = m_hasCustomOrder;
 	return istd::IChangeableUniquePtr(clonePtr);
@@ -580,7 +580,7 @@ Ids COrderedObjectCollectionProxy::GetCollectionElementIds() const
 	if (!m_collectionPtr.IsValid()){
 		return Ids();
 	}
-	return m_collectionPtr.GetPtr()->GetElementIds();
+	return m_collectionPtr->GetElementIds();
 }
 
 
@@ -663,7 +663,7 @@ void COrderedObjectCollectionProxy::AttachCollectionObserver()
 {
 	// Attach the aggregated collection to the update bridge so changes are forwarded to proxy observers
 	// Note: Q_ASSERT in constructor ensures m_collectionPtr is valid
-	istd::IChangeable* changeablePtr = dynamic_cast<istd::IChangeable*>(m_collectionPtr.GetPtr());
+	istd::IChangeable* changeablePtr = dynamic_cast<istd::IChangeable*>(&(*m_collectionPtr));
 	if (changeablePtr != nullptr) {
 		changeablePtr->AttachObserver(&m_updateBridge);
 	}
