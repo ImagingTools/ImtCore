@@ -29,7 +29,7 @@ class COrderedObjectCollectionProxy: virtual public IOrderedObjectCollection
 public:
 	/**
 		Constructor.
-		\param collectionPtr	Pointer to the collection to wrap (must not be null)
+		\param collectionPtr    Pointer to the collection to wrap (must not be null)
 	*/
 	COrderedObjectCollectionProxy(IObjectCollection* collectionPtr);
 	

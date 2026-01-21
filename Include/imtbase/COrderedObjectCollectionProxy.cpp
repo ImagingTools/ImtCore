@@ -266,10 +266,20 @@ IObjectCollectionUniquePtr COrderedObjectCollectionProxy::CreateSubCollection(
 	// Create a proxy around a subcollection
 	IObjectCollectionUniquePtr subCollection = m_collectionPtr->CreateSubCollection(offset, count, selectionParamsPtr);
 	if (subCollection){
-		COrderedObjectCollectionProxy* proxyPtr = new COrderedObjectCollectionProxy(subCollection.Release());
-		proxyPtr->m_customOrder = m_customOrder;
-		proxyPtr->m_hasCustomOrder = m_hasCustomOrder;
-		return IObjectCollectionUniquePtr(proxyPtr);
+		IObjectCollection* subCollectionRawPtr = subCollection.Release();
+		COrderedObjectCollectionProxy* proxyPtr = nullptr;
+		try {
+			proxyPtr = new COrderedObjectCollectionProxy(subCollectionRawPtr);
+			proxyPtr->m_customOrder = m_customOrder;
+			proxyPtr->m_hasCustomOrder = m_hasCustomOrder;
+			return IObjectCollectionUniquePtr(proxyPtr);
+		}
+		catch (...) {
+			// Clean up on exception
+			delete subCollectionRawPtr;
+			delete proxyPtr;
+			throw;
+		}
 	}
 	return IObjectCollectionUniquePtr();
 }
