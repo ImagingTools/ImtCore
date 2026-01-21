@@ -38,7 +38,7 @@ void COrderedObjectCollectionTest::testSetItemOrder()
 	const QByteArray id3 = baseCollection.InsertNewObject("TestType", "Item3", "Description3");
 
 	// Create ordered proxy
-	imtbase::COrderedObjectCollectionProxy orderedProxy(baseCollection);
+	imtbase::COrderedObjectCollectionProxy orderedProxy(&baseCollection);
 
 	// Test initial order (should match insertion order)
 	imtbase::ICollectionInfo::Ids initialIds = orderedProxy.GetOrderedItemIds();
@@ -72,7 +72,7 @@ void COrderedObjectCollectionTest::testGetItemOrder()
 	const QByteArray id3 = baseCollection.InsertNewObject("TestType", "Item3", "Description3");
 
 	// Create ordered proxy
-	imtbase::COrderedObjectCollectionProxy orderedProxy(baseCollection);
+	imtbase::COrderedObjectCollectionProxy orderedProxy(&baseCollection);
 
 	// Test getting positions
 	QCOMPARE(orderedProxy.GetItemOrder(id1), 0);
@@ -104,7 +104,7 @@ void COrderedObjectCollectionTest::testSetItemsOrder()
 	const QByteArray id3 = baseCollection.InsertNewObject("TestType", "Item3", "Description3");
 
 	// Create ordered proxy
-	imtbase::COrderedObjectCollectionProxy orderedProxy(baseCollection);
+	imtbase::COrderedObjectCollectionProxy orderedProxy(&baseCollection);
 
 	// Set custom order
 	imtbase::ICollectionInfo::Ids newOrder;
@@ -139,7 +139,7 @@ void COrderedObjectCollectionTest::testResetItemOrder()
 	const QByteArray id3 = baseCollection.InsertNewObject("TestType", "Item3", "Description3");
 
 	// Create ordered proxy
-	imtbase::COrderedObjectCollectionProxy orderedProxy(baseCollection);
+	imtbase::COrderedObjectCollectionProxy orderedProxy(&baseCollection);
 
 	// Set custom order
 	orderedProxy.SetItemOrder(id3, 0);
@@ -171,7 +171,7 @@ void COrderedObjectCollectionTest::testInsertNewItem()
 	const QByteArray id2 = baseCollection.InsertNewObject("TestType", "Item2", "Description2");
 
 	// Create ordered proxy with custom order
-	imtbase::COrderedObjectCollectionProxy orderedProxy(baseCollection);
+	imtbase::COrderedObjectCollectionProxy orderedProxy(&baseCollection);
 	orderedProxy.SetItemOrder(id2, 0);  // Set custom order: id2, id1
 
 	// Insert new item through proxy
@@ -199,7 +199,7 @@ void COrderedObjectCollectionTest::testRemoveItem()
 	const QByteArray id3 = baseCollection.InsertNewObject("TestType", "Item3", "Description3");
 
 	// Create ordered proxy with custom order
-	imtbase::COrderedObjectCollectionProxy orderedProxy(baseCollection);
+	imtbase::COrderedObjectCollectionProxy orderedProxy(&baseCollection);
 	imtbase::ICollectionInfo::Ids customOrder;
 	customOrder << id3 << id1 << id2;
 	orderedProxy.SetItemsOrder(customOrder);
@@ -231,7 +231,7 @@ void COrderedObjectCollectionTest::testGetOrderedItemIds()
 	const QByteArray id3 = baseCollection.InsertNewObject("TestType", "Item3", "Description3");
 
 	// Create ordered proxy
-	imtbase::COrderedObjectCollectionProxy orderedProxy(baseCollection);
+	imtbase::COrderedObjectCollectionProxy orderedProxy(&baseCollection);
 
 	// Test GetElementIds respects custom order
 	orderedProxy.SetItemOrder(id3, 0);
@@ -261,7 +261,7 @@ void COrderedObjectCollectionTest::testDelegatedOperations()
 	const QByteArray id2 = baseCollection.InsertNewObject("TestType", "Item2", "Description2");
 
 	// Create ordered proxy
-	imtbase::COrderedObjectCollectionProxy orderedProxy(baseCollection);
+	imtbase::COrderedObjectCollectionProxy orderedProxy(&baseCollection);
 
 	// Test GetOperationFlags delegation
 	int flags = orderedProxy.GetOperationFlags();
@@ -290,7 +290,7 @@ void COrderedObjectCollectionTest::testSerialization()
 	const QByteArray id3 = baseCollection.InsertNewObject("TestType", "Item3", "Description3");
 
 	// Create ordered proxy with custom order
-	imtbase::COrderedObjectCollectionProxy orderedProxy(baseCollection);
+	imtbase::COrderedObjectCollectionProxy orderedProxy(&baseCollection);
 	imtbase::ICollectionInfo::Ids customOrder;
 	customOrder << id3 << id1 << id2;
 	orderedProxy.SetItemsOrder(customOrder);

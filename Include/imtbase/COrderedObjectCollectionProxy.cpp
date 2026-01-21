@@ -16,9 +16,15 @@ namespace imtbase
 
 // public methods
 
-COrderedObjectCollectionProxy::COrderedObjectCollectionProxy(IObjectCollection& parent)
-	:m_parent(parent),
+COrderedObjectCollectionProxy::COrderedObjectCollectionProxy(IObjectCollection* collectionPtr)
+	:m_collectionPtr(collectionPtr),
 	 m_hasCustomOrder(false)
+{
+	Q_ASSERT(m_collectionPtr != nullptr);
+}
+
+
+COrderedObjectCollectionProxy::~COrderedObjectCollectionProxy()
 {
 }
 
@@ -33,14 +39,14 @@ bool COrderedObjectCollectionProxy::SetItemOrder(const Id& itemId, int position)
 
 	// Initialize custom order if not yet done
 	if (!m_hasCustomOrder){
-		m_customOrder = GetParentElementIds();
+		m_customOrder = GetCollectionElementIds();
 		m_hasCustomOrder = true;
 	}
 
 	// Find the item in the current order
 	int currentIndex = m_customOrder.indexOf(itemId);
 	if (currentIndex < 0){
-		// Item not found in parent collection
+		// Item not found in collection
 		return false;
 	}
 
@@ -69,9 +75,9 @@ int COrderedObjectCollectionProxy::GetItemOrder(const Id& itemId) const
 		return m_customOrder.indexOf(itemId);
 	}
 
-	// No custom order, get position from parent
-	const Ids parentIds = GetParentElementIds();
-	return parentIds.indexOf(itemId);
+	// No custom order, get position from collection
+	const Ids collectionIds = GetCollectionElementIds();
+	return collectionIds.indexOf(itemId);
 }
 
 
@@ -81,12 +87,12 @@ bool COrderedObjectCollectionProxy::SetItemsOrder(const Ids& orderedIds)
 		return false;
 	}
 
-	// Verify all IDs exist in parent collection
-	const Ids parentIds = GetParentElementIds();
+	// Verify all IDs exist in collection
+	const Ids collectionIds = GetCollectionElementIds();
 	
 	// Check that all provided IDs are valid
 	for (const Id& id : orderedIds){
-		if (!parentIds.contains(id)){
+		if (!collectionIds.contains(id)){
 			return false;
 		}
 	}
@@ -114,7 +120,7 @@ Ids COrderedObjectCollectionProxy::GetOrderedItemIds() const
 		return m_customOrder;
 	}
 
-	return GetParentElementIds();
+	return GetCollectionElementIds();
 }
 
 
@@ -137,9 +143,27 @@ bool COrderedObjectCollectionProxy::ResetItemOrder()
 
 // reimplemented (imtbase::IObjectCollection)
 
+IHierarchicalStructure* COrderedObjectCollectionProxy::GetCollectionStructure() const
+{
+	return m_collectionPtr->GetCollectionStructure();
+}
+
+
+const IRevisionController* COrderedObjectCollectionProxy::GetRevisionController() const
+{
+	return m_collectionPtr->GetRevisionController();
+}
+
+
+const ICollectionDataController* COrderedObjectCollectionProxy::GetDataController() const
+{
+	return m_collectionPtr->GetDataController();
+}
+
+
 int COrderedObjectCollectionProxy::GetOperationFlags(const QByteArray& objectId) const
 {
-	return m_parent.GetOperationFlags(objectId);
+	return m_collectionPtr->GetOperationFlags(objectId);
 }
 
 
@@ -153,8 +177,8 @@ ICollectionInfo::Id COrderedObjectCollectionProxy::InsertNewObject(
 			const idoc::IDocumentMetaInfo* elementMetaInfoPtr,
 			const IOperationContext* operationContextPtr)
 {
-	// Insert into parent collection
-	const Id newId = m_parent.InsertNewObject(
+	// Insert into collection
+	const Id newId = m_collectionPtr->InsertNewObject(
 				typeId,
 				name,
 				description,
@@ -173,25 +197,9 @@ ICollectionInfo::Id COrderedObjectCollectionProxy::InsertNewObject(
 }
 
 
-bool COrderedObjectCollectionProxy::GetObjectData(const Id& objectId, DataPtr& dataPtr, const iprm::IParamsSet* dataConfigurationPtr) const
-{
-	return m_parent.GetObjectData(objectId, dataPtr, dataConfigurationPtr);
-}
-
-
-bool COrderedObjectCollectionProxy::SetObjectData(
-			const Id& objectId,
-			const istd::IChangeable& object,
-			CompatibilityMode mode,
-			const IOperationContext* operationContextPtr)
-{
-	return m_parent.SetObjectData(objectId, object, mode, operationContextPtr);
-}
-
-
 bool COrderedObjectCollectionProxy::RemoveElements(const Ids& elementIds, const IOperationContext* operationContextPtr)
 {
-	const bool result = m_parent.RemoveElements(elementIds, operationContextPtr);
+	const bool result = m_collectionPtr->RemoveElements(elementIds, operationContextPtr);
 
 	if (result && m_hasCustomOrder){
 		// Remove deleted items from custom order
@@ -204,7 +212,108 @@ bool COrderedObjectCollectionProxy::RemoveElements(const Ids& elementIds, const 
 }
 
 
+bool COrderedObjectCollectionProxy::RemoveElementSet(
+			const iprm::IParamsSet* selectionParamsPtr,
+			const IOperationContext* operationContextPtr)
+{
+	return m_collectionPtr->RemoveElementSet(selectionParamsPtr, operationContextPtr);
+}
+
+
+bool COrderedObjectCollectionProxy::RestoreObjects(
+			const Ids& objectIds,
+			const IOperationContext* operationContextPtr)
+{
+	return m_collectionPtr->RestoreObjects(objectIds, operationContextPtr);
+}
+
+
+bool COrderedObjectCollectionProxy::RestoreObjectSet(
+			const iprm::IParamsSet* selectionParamsPtr,
+			const IOperationContext* operationContextPtr)
+{
+	return m_collectionPtr->RestoreObjectSet(selectionParamsPtr, operationContextPtr);
+}
+
+
+const istd::IChangeable* COrderedObjectCollectionProxy::GetObjectPtr(const Id& objectId) const
+{
+	return m_collectionPtr->GetObjectPtr(objectId);
+}
+
+
+bool COrderedObjectCollectionProxy::GetObjectData(const Id& objectId, DataPtr& dataPtr, const iprm::IParamsSet* dataConfigurationPtr) const
+{
+	return m_collectionPtr->GetObjectData(objectId, dataPtr, dataConfigurationPtr);
+}
+
+
+bool COrderedObjectCollectionProxy::SetObjectData(
+			const Id& objectId,
+			const istd::IChangeable& object,
+			CompatibilityMode mode,
+			const IOperationContext* operationContextPtr)
+{
+	return m_collectionPtr->SetObjectData(objectId, object, mode, operationContextPtr);
+}
+
+
+IObjectCollectionUniquePtr COrderedObjectCollectionProxy::CreateSubCollection(
+			int offset,
+			int count,
+			const iprm::IParamsSet* selectionParamsPtr) const
+{
+	// Create a proxy around a subcollection
+	IObjectCollectionUniquePtr subCollection = m_collectionPtr->CreateSubCollection(offset, count, selectionParamsPtr);
+	if (subCollection){
+		COrderedObjectCollectionProxy* proxyPtr = new COrderedObjectCollectionProxy(subCollection.Release());
+		proxyPtr->m_customOrder = m_customOrder;
+		proxyPtr->m_hasCustomOrder = m_hasCustomOrder;
+		return IObjectCollectionUniquePtr(proxyPtr);
+	}
+	return IObjectCollectionUniquePtr();
+}
+
+
+IObjectCollectionIterator* COrderedObjectCollectionProxy::CreateObjectCollectionIterator(
+			const QByteArray& objectId,
+			int offset,
+			int count,
+			const iprm::IParamsSet* selectionParamsPtr) const
+{
+	return m_collectionPtr->CreateObjectCollectionIterator(objectId, offset, count, selectionParamsPtr);
+}
+
+
+// reimplemented (IObjectCollectionInfo)
+
+const iprm::IOptionsList* COrderedObjectCollectionProxy::GetObjectTypesInfo() const
+{
+	return m_collectionPtr->GetObjectTypesInfo();
+}
+
+
+ICollectionInfo::Id COrderedObjectCollectionProxy::GetObjectTypeId(const Id& objectId) const
+{
+	return m_collectionPtr->GetObjectTypeId(objectId);
+}
+
+
+idoc::MetaInfoPtr COrderedObjectCollectionProxy::GetDataMetaInfo(const Id& objectId) const
+{
+	return m_collectionPtr->GetDataMetaInfo(objectId);
+}
+
+
 // reimplemented (ICollectionInfo)
+
+int COrderedObjectCollectionProxy::GetElementsCount(
+			const iprm::IParamsSet* selectionParamPtr,
+			ilog::IMessageConsumer* logPtr) const
+{
+	return m_collectionPtr->GetElementsCount(selectionParamPtr, logPtr);
+}
+
 
 Ids COrderedObjectCollectionProxy::GetElementIds(
 			int offset,
@@ -212,27 +321,68 @@ Ids COrderedObjectCollectionProxy::GetElementIds(
 			const iprm::IParamsSet* selectionParamsPtr,
 			ilog::IMessageConsumer* logPtr) const
 {
-	// Get IDs from parent
-	Ids parentIds = m_parent.GetElementIds(0, -1, selectionParamsPtr, logPtr);
+	// Get IDs from collection
+	Ids collectionIds = m_collectionPtr->GetElementIds(0, -1, selectionParamsPtr, logPtr);
 
 	// Apply custom ordering if active
 	if (m_hasCustomOrder){
-		parentIds = ApplyCustomOrder(parentIds);
+		collectionIds = ApplyCustomOrder(collectionIds);
 	}
 
 	// Apply offset and count
 	if (offset > 0 || count >= 0){
 		const int startIndex = qMax(0, offset);
-		const int endIndex = (count >= 0) ? qMin(startIndex + count, parentIds.size()) : parentIds.size();
+		const int endIndex = (count >= 0) ? qMin(startIndex + count, collectionIds.size()) : collectionIds.size();
 		
-		if (startIndex < parentIds.size()){
-			return parentIds.mid(startIndex, endIndex - startIndex);
+		if (startIndex < collectionIds.size()){
+			return collectionIds.mid(startIndex, endIndex - startIndex);
 		}
 		
 		return Ids();
 	}
 
-	return parentIds;
+	return collectionIds;
+}
+
+
+bool COrderedObjectCollectionProxy::GetSubsetInfo(
+			ICollectionInfo& subsetInfo,
+			int offset,
+			int count,
+			const iprm::IParamsSet* selectionParamsPtr,
+			ilog::IMessageConsumer* logPtr) const
+{
+	return m_collectionPtr->GetSubsetInfo(subsetInfo, offset, count, selectionParamsPtr, logPtr);
+}
+
+
+QVariant COrderedObjectCollectionProxy::GetElementInfo(const Id& elementId, int infoType, ilog::IMessageConsumer* logPtr) const
+{
+	return m_collectionPtr->GetElementInfo(elementId, infoType, logPtr);
+}
+
+
+idoc::MetaInfoPtr COrderedObjectCollectionProxy::GetElementMetaInfo(const Id& elementId, ilog::IMessageConsumer* logPtr) const
+{
+	return m_collectionPtr->GetElementMetaInfo(elementId, logPtr);
+}
+
+
+bool COrderedObjectCollectionProxy::SetElementName(const Id& elementId, const QString& name, ilog::IMessageConsumer* logPtr)
+{
+	return m_collectionPtr->SetElementName(elementId, name, logPtr);
+}
+
+
+bool COrderedObjectCollectionProxy::SetElementDescription(const Id& elementId, const QString& description, ilog::IMessageConsumer* logPtr)
+{
+	return m_collectionPtr->SetElementDescription(elementId, description, logPtr);
+}
+
+
+bool COrderedObjectCollectionProxy::SetElementEnabled(const Id& elementId, bool isEnabled, ilog::IMessageConsumer* logPtr)
+{
+	return m_collectionPtr->SetElementEnabled(elementId, isEnabled, logPtr);
 }
 
 
@@ -287,52 +437,53 @@ int COrderedObjectCollectionProxy::GetSupportedOperations() const
 }
 
 
+bool COrderedObjectCollectionProxy::CopyFrom(const IChangeable& object, CompatibilityMode mode)
+{
+	const COrderedObjectCollectionProxy* otherPtr = dynamic_cast<const COrderedObjectCollectionProxy*>(&object);
+	if (otherPtr != nullptr){
+		m_customOrder = otherPtr->m_customOrder;
+		m_hasCustomOrder = otherPtr->m_hasCustomOrder;
+		return true;
+	}
+	return false;
+}
+
+
+bool COrderedObjectCollectionProxy::IsEqual(const IChangeable& object) const
+{
+	const COrderedObjectCollectionProxy* otherPtr = dynamic_cast<const COrderedObjectCollectionProxy*>(&object);
+	if (otherPtr != nullptr){
+		return (m_hasCustomOrder == otherPtr->m_hasCustomOrder) && (m_customOrder == otherPtr->m_customOrder);
+	}
+	return false;
+}
+
+
 istd::IChangeableUniquePtr COrderedObjectCollectionProxy::CloneMe(CompatibilityMode mode) const
 {
-	// Note: The clone shares the same parent collection reference as the original.
+	// Note: The clone shares the same collection pointer as the original.
 	// This is intentional for the proxy pattern, where clones manage ordering independently
-	// but delegate data operations to the same parent collection.
-	COrderedObjectCollectionProxy* clonePtr = new COrderedObjectCollectionProxy(m_parent);
+	// but delegate data operations to the same collection.
+	COrderedObjectCollectionProxy* clonePtr = new COrderedObjectCollectionProxy(m_collectionPtr);
 	clonePtr->m_customOrder = m_customOrder;
 	clonePtr->m_hasCustomOrder = m_hasCustomOrder;
 	return istd::IChangeableUniquePtr(clonePtr);
 }
 
 
-// reimplemented (CObjectCollectionBase)
-
-istd::IChangeableUniquePtr COrderedObjectCollectionProxy::CreateObjectInstance(const QByteArray& typeId) const
+bool COrderedObjectCollectionProxy::ResetData(CompatibilityMode mode)
 {
-	// Delegate to parent's factory
-	const IObjectCollection::IDataFactory* factoryPtr = dynamic_cast<const IObjectCollection::IDataFactory*>(&m_parent);
-	if (factoryPtr != nullptr){
-		return factoryPtr->CreateInstance(typeId);
-	}
-	return istd::IChangeableUniquePtr();
-}
-
-
-IObjectCollection* COrderedObjectCollectionProxy::CreateSubCollectionInstance() const
-{
-	return new COrderedObjectCollectionProxy(m_parent);
-}
-
-
-bool COrderedObjectCollectionProxy::InsertObjectIntoCollection(ObjectInfo info)
-{
-	// This method is called by base class methods.
-	// For the proxy, insertion is delegated to the parent through InsertNewObject.
-	// This method should not be used directly for the proxy pattern.
-	// Return false to indicate insertion should go through the overridden InsertNewObject.
-	return false;
+	m_customOrder.clear();
+	m_hasCustomOrder = false;
+	return true;
 }
 
 
 // private methods
 
-Ids COrderedObjectCollectionProxy::GetParentElementIds() const
+Ids COrderedObjectCollectionProxy::GetCollectionElementIds() const
 {
-	return m_parent.GetElementIds();
+	return m_collectionPtr->GetElementIds();
 }
 
 
@@ -342,17 +493,17 @@ void COrderedObjectCollectionProxy::SynchronizeOrder() const
 		return;
 	}
 
-	// Get current IDs from parent
-	const Ids parentIds = GetParentElementIds();
+	// Get current IDs from collection
+	const Ids collectionIds = GetCollectionElementIds();
 	
 	// Use QSet for O(1) lookups instead of O(n) contains()
-	const QSet<QByteArray> parentIdsSet(parentIds.begin(), parentIds.end());
+	const QSet<QByteArray> collectionIdsSet(collectionIds.begin(), collectionIds.end());
 
-	// Remove items that no longer exist in parent
+	// Remove items that no longer exist in collection
 	QVector<QByteArray> newOrder;
 	newOrder.reserve(m_customOrder.size());
 	for (const QByteArray& id : m_customOrder){
-		if (parentIdsSet.contains(id)){
+		if (collectionIdsSet.contains(id)){
 			newOrder.append(id);
 		}
 	}
@@ -360,8 +511,8 @@ void COrderedObjectCollectionProxy::SynchronizeOrder() const
 	// Use QSet for O(1) lookups of items already in new order
 	const QSet<QByteArray> newOrderSet(newOrder.begin(), newOrder.end());
 	
-	// Add any new items from parent that aren't in custom order
-	for (const QByteArray& id : parentIds){
+	// Add any new items from collection that aren't in custom order
+	for (const QByteArray& id : collectionIds){
 		if (!newOrderSet.contains(id)){
 			newOrder.append(id);
 		}

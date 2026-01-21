@@ -5,11 +5,7 @@
 #include <QtCore/QVector>
 #include <QtCore/QSet>
 
-// ACF includes
-#include <istd/TComposedFactory.h>
-
 // ImtCore includes
-#include <imtbase/CObjectCollectionBase.h>
 #include <imtbase/IOrderedObjectCollection.h>
 
 
@@ -20,6 +16,7 @@ namespace imtbase
 /**
 	Implementation of an ordered object collection facade.
 	This class wraps an existing IObjectCollection and maintains a custom ordering for its items.
+	Uses composition (aggregation) to delegate operations to the wrapped collection.
 	
 	\note The proxy does not observe changes to the parent collection. If items are added or
 	removed from the parent collection directly (bypassing the proxy), the custom order will
@@ -27,20 +24,16 @@ namespace imtbase
 	
 	\ingroup Collection
 */
-class COrderedObjectCollectionProxy:
-			public CObjectCollectionBase,
-			virtual public IOrderedObjectCollection,
-			public istd::TComposedFactory<istd::IChangeable>
+class COrderedObjectCollectionProxy: virtual public IOrderedObjectCollection
 {
 public:
-	typedef CObjectCollectionBase BaseClass;
-	typedef istd::TComposedFactory<istd::IChangeable> BaseClass2;
-
 	/**
 		Constructor.
-		\param parent		The parent collection to wrap
+		\param collectionPtr	Pointer to the collection to wrap (must not be null)
 	*/
-	COrderedObjectCollectionProxy(IObjectCollection& parent);
+	COrderedObjectCollectionProxy(IObjectCollection* collectionPtr);
+	
+	virtual ~COrderedObjectCollectionProxy();
 
 	// reimplemented (IOrderedObjectCollection)
 	virtual bool SetItemOrder(const Id& itemId, int position) override;
@@ -50,6 +43,9 @@ public:
 	virtual bool ResetItemOrder() override;
 
 	// reimplemented (imtbase::IObjectCollection)
+	virtual IHierarchicalStructure* GetCollectionStructure() const override;
+	virtual const IRevisionController* GetRevisionController() const override;
+	virtual const ICollectionDataController* GetDataController() const override;
 	virtual int GetOperationFlags(const QByteArray& objectId = QByteArray()) const override;
 	virtual Id InsertNewObject(
 				const QByteArray& typeId,
@@ -60,42 +56,77 @@ public:
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
 				const idoc::IDocumentMetaInfo* elementMetaInfoPtr = nullptr,
 				const IOperationContext* operationContextPtr = nullptr) override;
+	virtual bool RemoveElements(const Ids& elementIds, const IOperationContext* operationContextPtr = nullptr) override;
+	virtual bool RemoveElementSet(
+				const iprm::IParamsSet* selectionParamsPtr = nullptr,
+				const IOperationContext* operationContextPtr = nullptr) override;
+	virtual bool RestoreObjects(
+				const Ids& objectIds,
+				const IOperationContext* operationContextPtr = nullptr) override;
+	virtual bool RestoreObjectSet(
+				const iprm::IParamsSet* selectionParamsPtr = nullptr,
+				const IOperationContext* operationContextPtr = nullptr) override;
+	virtual const istd::IChangeable* GetObjectPtr(const Id& objectId) const override;
 	virtual bool GetObjectData(const Id& objectId, DataPtr& dataPtr, const iprm::IParamsSet* dataConfigurationPtr = nullptr) const override;
 	virtual bool SetObjectData(
 				const Id& objectId,
 				const istd::IChangeable& object,
 				CompatibilityMode mode = CM_WITHOUT_REFS,
 				const IOperationContext* operationContextPtr = nullptr) override;
-	virtual bool RemoveElements(const Ids& elementIds, const IOperationContext* operationContextPtr = nullptr) override;
+	virtual IObjectCollectionUniquePtr CreateSubCollection(
+				int offset = 0,
+				int count = -1,
+				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
+	virtual IObjectCollectionIterator* CreateObjectCollectionIterator(
+				const QByteArray& objectId = QByteArray(),
+				int offset = 0,
+				int count = -1,
+				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
+
+	// reimplemented (IObjectCollectionInfo)
+	virtual const iprm::IOptionsList* GetObjectTypesInfo() const override;
+	virtual Id GetObjectTypeId(const Id& objectId) const override;
+	virtual idoc::MetaInfoPtr GetDataMetaInfo(const Id& objectId) const override;
 
 	// reimplemented (ICollectionInfo)
+	virtual int GetElementsCount(
+				const iprm::IParamsSet* selectionParamPtr = nullptr,
+				ilog::IMessageConsumer* logPtr = nullptr) const override;
 	virtual Ids GetElementIds(
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr,
 				ilog::IMessageConsumer* logPtr = nullptr) const override;
+	virtual bool GetSubsetInfo(
+				ICollectionInfo& subsetInfo,
+				int offset = 0,
+				int count = -1,
+				const iprm::IParamsSet* selectionParamsPtr = nullptr,
+				ilog::IMessageConsumer* logPtr = nullptr) const override;
+	virtual QVariant GetElementInfo(const Id& elementId, int infoType, ilog::IMessageConsumer* logPtr = nullptr) const override;
+	virtual idoc::MetaInfoPtr GetElementMetaInfo(const Id& elementId, ilog::IMessageConsumer* logPtr = nullptr) const override;
+	virtual bool SetElementName(const Id& elementId, const QString& name, ilog::IMessageConsumer* logPtr = nullptr) override;
+	virtual bool SetElementDescription(const Id& elementId, const QString& description, ilog::IMessageConsumer* logPtr = nullptr) override;
+	virtual bool SetElementEnabled(const Id& elementId, bool isEnabled = true, ilog::IMessageConsumer* logPtr = nullptr) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
 
 	// reimplemented (istd::IChangeable)
 	virtual int GetSupportedOperations() const override;
+	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	virtual bool IsEqual(const IChangeable& object) const override;
 	virtual istd::IChangeableUniquePtr CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
-
-protected:
-	// reimplemented (CObjectCollectionBase)
-	virtual istd::IChangeableUniquePtr CreateObjectInstance(const QByteArray& typeId) const override;
-	virtual IObjectCollection* CreateSubCollectionInstance() const override;
-	virtual bool InsertObjectIntoCollection(ObjectInfo info) override;
+	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 private:
 	/**
-		Get the ordered list of IDs from the parent collection.
+		Get the ordered list of IDs from the aggregated collection.
 	*/
-	Ids GetParentElementIds() const;
+	Ids GetCollectionElementIds() const;
 
 	/**
-		Synchronize the custom order with the parent collection's current state.
+		Synchronize the custom order with the aggregated collection's current state.
 		This adds any new items and removes deleted items from the custom order.
 	*/
 	void SynchronizeOrder() const;
@@ -106,9 +137,9 @@ private:
 	Ids ApplyCustomOrder(const Ids& ids) const;
 
 private:
-	IObjectCollection& m_parent;
-	mutable QVector<QByteArray> m_customOrder;		// Stores the custom order of item IDs when m_hasCustomOrder is true
-	mutable bool m_hasCustomOrder;					// Flag indicating whether a custom order is currently active
+	IObjectCollection* m_collectionPtr;					// Aggregated pointer to the wrapped collection
+	mutable QVector<QByteArray> m_customOrder;			// Stores the custom order of item IDs when m_hasCustomOrder is true
+	mutable bool m_hasCustomOrder;						// Flag indicating whether a custom order is currently active
 };
 
 
