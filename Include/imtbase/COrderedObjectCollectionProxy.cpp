@@ -8,6 +8,7 @@
 #include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
 #include <iser/CArchiveTag.h>
+#include <iser/IArchive.h>
 
 // ImtCore includes
 #include <imtbase/CObjectCollection.h>
@@ -523,7 +524,7 @@ bool COrderedObjectCollectionProxy::Serialize(iser::IArchive& archive)
 
 int COrderedObjectCollectionProxy::GetSupportedOperations() const
 {
-	return OP_COPY | OP_COMPARE | OP_CLONE;
+	return SO_COPY | SO_COMPARE | SO_CLONE;
 }
 
 
@@ -663,9 +664,9 @@ void COrderedObjectCollectionProxy::AttachCollectionObserver()
 {
 	// Attach the aggregated collection to the update bridge so changes are forwarded to proxy observers
 	// Note: Q_ASSERT in constructor ensures m_collectionPtr is valid
-	istd::IChangeable* changeablePtr = dynamic_cast<istd::IChangeable*>(m_collectionPtr.GetPtr());
-	if (changeablePtr != nullptr) {
-		changeablePtr->AttachObserver(&m_updateBridge);
+	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(m_collectionPtr.GetPtr());
+	if (modelPtr != nullptr) {
+		modelPtr->AttachObserver(&m_updateBridge);
 	}
 }
 
