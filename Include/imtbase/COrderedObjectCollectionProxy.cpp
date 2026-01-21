@@ -558,7 +558,7 @@ istd::IChangeableUniquePtr COrderedObjectCollectionProxy::CloneMe(CompatibilityM
 	// Note: The clone always creates a non-owning proxy that shares the same collection pointer.
 	// This is intentional for the proxy pattern, where clones manage ordering independently
 	// but delegate data operations to the same collection.
-	COrderedObjectCollectionProxy* clonePtr = new COrderedObjectCollectionProxy(&(*m_collectionPtr), false);
+	COrderedObjectCollectionProxy* clonePtr = new COrderedObjectCollectionProxy(m_collectionPtr.GetPtr(), false);
 	clonePtr->m_customOrder = m_customOrder;
 	clonePtr->m_hasCustomOrder = m_hasCustomOrder;
 	return istd::IChangeableUniquePtr(clonePtr);
@@ -663,7 +663,7 @@ void COrderedObjectCollectionProxy::AttachCollectionObserver()
 {
 	// Attach the aggregated collection to the update bridge so changes are forwarded to proxy observers
 	// Note: Q_ASSERT in constructor ensures m_collectionPtr is valid
-	istd::IChangeable* changeablePtr = dynamic_cast<istd::IChangeable*>(&(*m_collectionPtr));
+	istd::IChangeable* changeablePtr = dynamic_cast<istd::IChangeable*>(m_collectionPtr.GetPtr());
 	if (changeablePtr != nullptr) {
 		changeablePtr->AttachObserver(&m_updateBridge);
 	}
