@@ -19,23 +19,19 @@ namespace imtbase
 
 // public methods
 
-COrderedObjectCollectionProxy::COrderedObjectCollectionProxy(IObjectCollection* collectionPtr)
-	:m_collectionPtr(collectionPtr),
-	 m_updateBridge(this, imod::CModelUpdateBridge::UF_SOURCE),
+COrderedObjectCollectionProxy::COrderedObjectCollectionProxy(IObjectCollection* collectionPtr, bool takeOwnership)
+	:m_updateBridge(this, imod::CModelUpdateBridge::UF_SOURCE),
 	 m_hasCustomOrder(false)
 {
-	Q_ASSERT(m_collectionPtr != nullptr);
-	AttachCollectionObserver();
-}
-
-
-COrderedObjectCollectionProxy::COrderedObjectCollectionProxy(IObjectCollectionUniquePtr collectionPtr)
-	:m_ownedCollection(std::move(collectionPtr)),
-	 m_collectionPtr(m_ownedCollection.Get()),
-	 m_updateBridge(this, imod::CModelUpdateBridge::UF_SOURCE),
-	 m_hasCustomOrder(false)
-{
-	Q_ASSERT(m_collectionPtr != nullptr);
+	Q_ASSERT(collectionPtr != nullptr);
+	
+	if (takeOwnership) {
+		m_collectionPtr.TakeOver(collectionPtr);
+	}
+	else {
+		m_collectionPtr = collectionPtr;
+	}
+	
 	AttachCollectionObserver();
 }
 
@@ -163,37 +159,37 @@ bool COrderedObjectCollectionProxy::ResetItemOrder()
 
 IHierarchicalStructure* COrderedObjectCollectionProxy::GetCollectionStructure() const
 {
-	if (m_collectionPtr == nullptr){
+	if (!m_collectionPtr.IsValid()){
 		return nullptr;
 	}
-	return m_collectionPtr->GetCollectionStructure();
+	return m_collectionPtr.GetPtr()->GetCollectionStructure();
 }
 
 
 const IRevisionController* COrderedObjectCollectionProxy::GetRevisionController() const
 {
-	if (m_collectionPtr == nullptr){
+	if (!m_collectionPtr.IsValid()){
 		return nullptr;
 	}
-	return m_collectionPtr->GetRevisionController();
+	return m_collectionPtr.GetPtr()->GetRevisionController();
 }
 
 
 const ICollectionDataController* COrderedObjectCollectionProxy::GetDataController() const
 {
-	if (m_collectionPtr == nullptr){
+	if (!m_collectionPtr.IsValid()){
 		return nullptr;
 	}
-	return m_collectionPtr->GetDataController();
+	return m_collectionPtr.GetPtr()->GetDataController();
 }
 
 
 int COrderedObjectCollectionProxy::GetOperationFlags(const QByteArray& objectId) const
 {
-	if (m_collectionPtr == nullptr){
+	if (!m_collectionPtr.IsValid()){
 		return 0;
 	}
-	return m_collectionPtr->GetOperationFlags(objectId);
+	return m_collectionPtr.GetPtr()->GetOperationFlags(objectId);
 }
 
 
@@ -207,11 +203,11 @@ ICollectionInfo::Id COrderedObjectCollectionProxy::InsertNewObject(
 			const idoc::IDocumentMetaInfo* elementMetaInfoPtr,
 			const IOperationContext* operationContextPtr)
 {
-	if (m_collectionPtr == nullptr){
+	if (!m_collectionPtr.IsValid()){
 		return Id();
 	}
 	// Insert into collection
-	const Id newId = m_collectionPtr->InsertNewObject(
+	const Id newId = m_collectionPtr.GetPtr()->InsertNewObject(
 				typeId,
 				name,
 				description,
@@ -232,10 +228,10 @@ ICollectionInfo::Id COrderedObjectCollectionProxy::InsertNewObject(
 
 bool COrderedObjectCollectionProxy::RemoveElements(const Ids& elementIds, const IOperationContext* operationContextPtr)
 {
-	if (m_collectionPtr == nullptr){
+	if (!m_collectionPtr.IsValid()){
 		return false;
 	}
-	const bool result = m_collectionPtr->RemoveElements(elementIds, operationContextPtr);
+	const bool result = m_collectionPtr.GetPtr()->RemoveElements(elementIds, operationContextPtr);
 
 	if (result && m_hasCustomOrder){
 		// Remove deleted items from custom order
@@ -252,10 +248,10 @@ bool COrderedObjectCollectionProxy::RemoveElementSet(
 			const iprm::IParamsSet* selectionParamsPtr,
 			const IOperationContext* operationContextPtr)
 {
-	if (m_collectionPtr == nullptr){
+	if (!m_collectionPtr.IsValid()){
 		return false;
 	}
-	return m_collectionPtr->RemoveElementSet(selectionParamsPtr, operationContextPtr);
+	return m_collectionPtr.GetPtr()->RemoveElementSet(selectionParamsPtr, operationContextPtr);
 }
 
 
@@ -263,10 +259,10 @@ bool COrderedObjectCollectionProxy::RestoreObjects(
 			const Ids& objectIds,
 			const IOperationContext* operationContextPtr)
 {
-	if (m_collectionPtr == nullptr){
+	if (!m_collectionPtr.IsValid()){
 		return false;
 	}
-	return m_collectionPtr->RestoreObjects(objectIds, operationContextPtr);
+	return m_collectionPtr.GetPtr()->RestoreObjects(objectIds, operationContextPtr);
 }
 
 
@@ -274,28 +270,28 @@ bool COrderedObjectCollectionProxy::RestoreObjectSet(
 			const iprm::IParamsSet* selectionParamsPtr,
 			const IOperationContext* operationContextPtr)
 {
-	if (m_collectionPtr == nullptr){
+	if (!m_collectionPtr.IsValid()){
 		return false;
 	}
-	return m_collectionPtr->RestoreObjectSet(selectionParamsPtr, operationContextPtr);
+	return m_collectionPtr.GetPtr()->RestoreObjectSet(selectionParamsPtr, operationContextPtr);
 }
 
 
 const istd::IChangeable* COrderedObjectCollectionProxy::GetObjectPtr(const Id& objectId) const
 {
-	if (m_collectionPtr == nullptr){
+	if (!m_collectionPtr.IsValid()){
 		return nullptr;
 	}
-	return m_collectionPtr->GetObjectPtr(objectId);
+	return m_collectionPtr.GetPtr()->GetObjectPtr(objectId);
 }
 
 
 bool COrderedObjectCollectionProxy::GetObjectData(const Id& objectId, DataPtr& dataPtr, const iprm::IParamsSet* dataConfigurationPtr) const
 {
-	if (m_collectionPtr == nullptr){
+	if (!m_collectionPtr.IsValid()){
 		return false;
 	}
-	return m_collectionPtr->GetObjectData(objectId, dataPtr, dataConfigurationPtr);
+	return m_collectionPtr.GetPtr()->GetObjectData(objectId, dataPtr, dataConfigurationPtr);
 }
 
 
@@ -305,10 +301,10 @@ bool COrderedObjectCollectionProxy::SetObjectData(
 			CompatibilityMode mode,
 			const IOperationContext* operationContextPtr)
 {
-	if (m_collectionPtr == nullptr){
+	if (!m_collectionPtr.IsValid()){
 		return false;
 	}
-	return m_collectionPtr->SetObjectData(objectId, object, mode, operationContextPtr);
+	return m_collectionPtr.GetPtr()->SetObjectData(objectId, object, mode, operationContextPtr);
 }
 
 
@@ -317,11 +313,11 @@ IObjectCollectionUniquePtr COrderedObjectCollectionProxy::CreateSubCollection(
 			int count,
 			const iprm::IParamsSet* selectionParamsPtr) const
 {
-	if (m_collectionPtr == nullptr){
+	if (!m_collectionPtr.IsValid()){
 		return IObjectCollectionUniquePtr();
 	}
 	// Create a proxy around a subcollection
-	IObjectCollectionUniquePtr subCollection = m_collectionPtr->CreateSubCollection(offset, count, selectionParamsPtr);
+	IObjectCollectionUniquePtr subCollection = m_collectionPtr.GetPtr()->CreateSubCollection(offset, count, selectionParamsPtr);
 	if (subCollection){
 		// Use the owning constructor so the proxy takes ownership of the subcollection
 		COrderedObjectCollectionProxy* proxyPtr = new COrderedObjectCollectionProxy(std::move(subCollection));
@@ -339,10 +335,10 @@ IObjectCollectionIterator* COrderedObjectCollectionProxy::CreateObjectCollection
 			int count,
 			const iprm::IParamsSet* selectionParamsPtr) const
 {
-	if (m_collectionPtr == nullptr){
+	if (!m_collectionPtr.IsValid()){
 		return nullptr;
 	}
-	return m_collectionPtr->CreateObjectCollectionIterator(objectId, offset, count, selectionParamsPtr);
+	return m_collectionPtr.GetPtr()->CreateObjectCollectionIterator(objectId, offset, count, selectionParamsPtr);
 }
 
 
@@ -350,28 +346,28 @@ IObjectCollectionIterator* COrderedObjectCollectionProxy::CreateObjectCollection
 
 const iprm::IOptionsList* COrderedObjectCollectionProxy::GetObjectTypesInfo() const
 {
-	if (m_collectionPtr == nullptr){
+	if (!m_collectionPtr.IsValid()){
 		return nullptr;
 	}
-	return m_collectionPtr->GetObjectTypesInfo();
+	return m_collectionPtr.GetPtr()->GetObjectTypesInfo();
 }
 
 
 ICollectionInfo::Id COrderedObjectCollectionProxy::GetObjectTypeId(const Id& objectId) const
 {
-	if (m_collectionPtr == nullptr){
+	if (!m_collectionPtr.IsValid()){
 		return Id();
 	}
-	return m_collectionPtr->GetObjectTypeId(objectId);
+	return m_collectionPtr.GetPtr()->GetObjectTypeId(objectId);
 }
 
 
 idoc::MetaInfoPtr COrderedObjectCollectionProxy::GetDataMetaInfo(const Id& objectId) const
 {
-	if (m_collectionPtr == nullptr){
+	if (!m_collectionPtr.IsValid()){
 		return idoc::MetaInfoPtr();
 	}
-	return m_collectionPtr->GetDataMetaInfo(objectId);
+	return m_collectionPtr.GetPtr()->GetDataMetaInfo(objectId);
 }
 
 
@@ -381,10 +377,10 @@ int COrderedObjectCollectionProxy::GetElementsCount(
 			const iprm::IParamsSet* selectionParamPtr,
 			ilog::IMessageConsumer* logPtr) const
 {
-	if (m_collectionPtr == nullptr){
+	if (!m_collectionPtr.IsValid()){
 		return 0;
 	}
-	return m_collectionPtr->GetElementsCount(selectionParamPtr, logPtr);
+	return m_collectionPtr.GetPtr()->GetElementsCount(selectionParamPtr, logPtr);
 }
 
 
@@ -394,11 +390,11 @@ Ids COrderedObjectCollectionProxy::GetElementIds(
 			const iprm::IParamsSet* selectionParamsPtr,
 			ilog::IMessageConsumer* logPtr) const
 {
-	if (m_collectionPtr == nullptr){
+	if (!m_collectionPtr.IsValid()){
 		return Ids();
 	}
 	// Get IDs from collection
-	Ids collectionIds = m_collectionPtr->GetElementIds(0, -1, selectionParamsPtr, logPtr);
+	Ids collectionIds = m_collectionPtr.GetPtr()->GetElementIds(0, -1, selectionParamsPtr, logPtr);
 
 	// Apply custom ordering if active
 	if (m_hasCustomOrder){
@@ -428,55 +424,55 @@ bool COrderedObjectCollectionProxy::GetSubsetInfo(
 			const iprm::IParamsSet* selectionParamsPtr,
 			ilog::IMessageConsumer* logPtr) const
 {
-	if (m_collectionPtr == nullptr){
+	if (!m_collectionPtr.IsValid()){
 		return false;
 	}
-	return m_collectionPtr->GetSubsetInfo(subsetInfo, offset, count, selectionParamsPtr, logPtr);
+	return m_collectionPtr.GetPtr()->GetSubsetInfo(subsetInfo, offset, count, selectionParamsPtr, logPtr);
 }
 
 
 QVariant COrderedObjectCollectionProxy::GetElementInfo(const Id& elementId, int infoType, ilog::IMessageConsumer* logPtr) const
 {
-	if (m_collectionPtr == nullptr){
+	if (!m_collectionPtr.IsValid()){
 		return QVariant();
 	}
-	return m_collectionPtr->GetElementInfo(elementId, infoType, logPtr);
+	return m_collectionPtr.GetPtr()->GetElementInfo(elementId, infoType, logPtr);
 }
 
 
 idoc::MetaInfoPtr COrderedObjectCollectionProxy::GetElementMetaInfo(const Id& elementId, ilog::IMessageConsumer* logPtr) const
 {
-	if (m_collectionPtr == nullptr){
+	if (!m_collectionPtr.IsValid()){
 		return idoc::MetaInfoPtr();
 	}
-	return m_collectionPtr->GetElementMetaInfo(elementId, logPtr);
+	return m_collectionPtr.GetPtr()->GetElementMetaInfo(elementId, logPtr);
 }
 
 
 bool COrderedObjectCollectionProxy::SetElementName(const Id& elementId, const QString& name, ilog::IMessageConsumer* logPtr)
 {
-	if (m_collectionPtr == nullptr){
+	if (!m_collectionPtr.IsValid()){
 		return false;
 	}
-	return m_collectionPtr->SetElementName(elementId, name, logPtr);
+	return m_collectionPtr.GetPtr()->SetElementName(elementId, name, logPtr);
 }
 
 
 bool COrderedObjectCollectionProxy::SetElementDescription(const Id& elementId, const QString& description, ilog::IMessageConsumer* logPtr)
 {
-	if (m_collectionPtr == nullptr){
+	if (!m_collectionPtr.IsValid()){
 		return false;
 	}
-	return m_collectionPtr->SetElementDescription(elementId, description, logPtr);
+	return m_collectionPtr.GetPtr()->SetElementDescription(elementId, description, logPtr);
 }
 
 
 bool COrderedObjectCollectionProxy::SetElementEnabled(const Id& elementId, bool isEnabled, ilog::IMessageConsumer* logPtr)
 {
-	if (m_collectionPtr == nullptr){
+	if (!m_collectionPtr.IsValid()){
 		return false;
 	}
-	return m_collectionPtr->SetElementEnabled(elementId, isEnabled, logPtr);
+	return m_collectionPtr.GetPtr()->SetElementEnabled(elementId, isEnabled, logPtr);
 }
 
 
@@ -555,20 +551,14 @@ bool COrderedObjectCollectionProxy::IsEqual(const IChangeable& object) const
 
 istd::IChangeableUniquePtr COrderedObjectCollectionProxy::CloneMe(CompatibilityMode mode) const
 {
-	if (m_collectionPtr == nullptr){
+	if (!m_collectionPtr.IsValid()){
 		return istd::IChangeableUniquePtr();
 	}
 	
-	// Note: The clone shares the same collection pointer as the original for non-owning proxies.
-	// For owning proxies, cloning is not supported (would require cloning the owned collection).
+	// Note: The clone always creates a non-owning proxy that shares the same collection pointer.
 	// This is intentional for the proxy pattern, where clones manage ordering independently
 	// but delegate data operations to the same collection.
-	if (m_ownedCollection){
-		// Cannot clone an owning proxy (would need to clone the collection itself)
-		return istd::IChangeableUniquePtr();
-	}
-	
-	COrderedObjectCollectionProxy* clonePtr = new COrderedObjectCollectionProxy(m_collectionPtr);
+	COrderedObjectCollectionProxy* clonePtr = new COrderedObjectCollectionProxy(m_collectionPtr.GetPtr(), false);
 	clonePtr->m_customOrder = m_customOrder;
 	clonePtr->m_hasCustomOrder = m_hasCustomOrder;
 	return istd::IChangeableUniquePtr(clonePtr);
@@ -587,10 +577,10 @@ bool COrderedObjectCollectionProxy::ResetData(CompatibilityMode mode)
 
 Ids COrderedObjectCollectionProxy::GetCollectionElementIds() const
 {
-	if (m_collectionPtr == nullptr){
+	if (!m_collectionPtr.IsValid()){
 		return Ids();
 	}
-	return m_collectionPtr->GetElementIds();
+	return m_collectionPtr.GetPtr()->GetElementIds();
 }
 
 
@@ -672,8 +662,8 @@ void COrderedObjectCollectionProxy::CopyOrderingState(const COrderedObjectCollec
 void COrderedObjectCollectionProxy::AttachCollectionObserver()
 {
 	// Attach the aggregated collection to the update bridge so changes are forwarded to proxy observers
-	// Note: Q_ASSERT in constructor ensures m_collectionPtr is not null
-	istd::IChangeable* changeablePtr = dynamic_cast<istd::IChangeable*>(m_collectionPtr);
+	// Note: Q_ASSERT in constructor ensures m_collectionPtr is valid
+	istd::IChangeable* changeablePtr = dynamic_cast<istd::IChangeable*>(m_collectionPtr.GetPtr());
 	if (changeablePtr != nullptr) {
 		changeablePtr->AttachObserver(&m_updateBridge);
 	}

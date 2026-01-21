@@ -29,9 +29,8 @@ namespace imtbase
 	state. If items are added or removed from the aggregated collection, the custom order will be
 	updated when GetOrderedItemIds() or GetElementIds() is called.
 	
-	\note Ownership: The proxy supports two modes:
-	- Non-owning mode: Pass a raw pointer to the constructor. The caller manages the collection's lifetime.
-	- Owning mode: Pass a unique_ptr to the constructor. The proxy takes ownership and manages the collection's lifetime.
+	\note Ownership: The proxy uses istd::TOptInterfacePtr which supports both managed (owned) 
+	and unmanaged (non-owned) pointers. Use the takeOwnership parameter to control ownership.
 	
 	\ingroup Collection
 */
@@ -39,16 +38,11 @@ class COrderedObjectCollectionProxy: virtual public IOrderedObjectCollection
 {
 public:
 	/**
-		Constructor for non-owning proxy.
-		\param collectionPtr    Pointer to the collection to wrap (must not be null). Proxy does NOT take ownership.
+		Constructor.
+		\param collectionPtr    Pointer to the collection to wrap (must not be null).
+		\param takeOwnership    If true, proxy takes ownership; if false, caller manages lifetime (default: false).
 	*/
-	COrderedObjectCollectionProxy(IObjectCollection* collectionPtr);
-	
-	/**
-		Constructor for owning proxy.
-		\param collectionPtr    Unique pointer to the collection to wrap. Proxy takes ownership.
-	*/
-	COrderedObjectCollectionProxy(IObjectCollectionUniquePtr collectionPtr);
+	explicit COrderedObjectCollectionProxy(IObjectCollection* collectionPtr, bool takeOwnership = false);
 	
 	virtual ~COrderedObjectCollectionProxy();
 
@@ -164,11 +158,10 @@ private:
 	void AttachCollectionObserver();
 
 private:
-	IObjectCollectionUniquePtr m_ownedCollection;		// Owned collection (if proxy takes ownership)
-	IObjectCollection* m_collectionPtr;					// Pointer to the aggregated collection (owned or non-owned)
-	imod::CModelUpdateBridge m_updateBridge;			// Bridge for forwarding change notifications from aggregated collection to proxy observers
-	mutable QVector<QByteArray> m_customOrder;			// Stores the custom order of item IDs when m_hasCustomOrder is true
-	mutable bool m_hasCustomOrder;						// Flag indicating whether a custom order is currently active
+	istd::TOptInterfacePtr<IObjectCollection> m_collectionPtr;	// Managed or unmanaged pointer to the aggregated collection
+	imod::CModelUpdateBridge m_updateBridge;					// Bridge for forwarding change notifications from aggregated collection to proxy observers
+	mutable QVector<QByteArray> m_customOrder;					// Stores the custom order of item IDs when m_hasCustomOrder is true
+	mutable bool m_hasCustomOrder;								// Flag indicating whether a custom order is currently active
 };
 
 
