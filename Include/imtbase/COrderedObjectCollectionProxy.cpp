@@ -4,6 +4,8 @@
 // ACF includes
 #include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
+#include <iser/CArchiveTag.h>
+#include <iser/CPrimitiveTypesSerializer.h>
 
 // ImtCore includes
 #include <imtbase/CObjectCollection.h>
@@ -82,11 +84,16 @@ bool COrderedObjectCollectionProxy::SetItemsOrder(const Ids& orderedIds)
 
 	// Verify all IDs exist in parent collection
 	const Ids parentIds = GetParentElementIds();
+	
+	// Check that all provided IDs are valid
 	for (const Id& id : orderedIds){
 		if (!parentIds.contains(id)){
 			return false;
 		}
 	}
+	
+	// Note: This method allows setting a partial order (subset of items).
+	// Any items not in orderedIds will be appended at the end when retrieved.
 
 	// Notify change before modifying data
 	istd::IChangeable::ChangeSet changeSet(CF_CHANGED);
@@ -104,7 +111,7 @@ Ids COrderedObjectCollectionProxy::GetOrderedItemIds() const
 {
 	if (m_hasCustomOrder){
 		// Synchronize to ensure we have current items
-		const_cast<COrderedObjectCollectionProxy*>(this)->SynchronizeOrder();
+		SynchronizeOrder();
 		return m_customOrder;
 	}
 
@@ -230,6 +237,49 @@ Ids COrderedObjectCollectionProxy::GetElementIds(
 }
 
 
+// reimplemented (iser::ISerializable)
+
+bool COrderedObjectCollectionProxy::Serialize(iser::IArchive& archive)
+{
+	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
+
+	bool retVal = true;
+
+	// Serialize custom order flag
+	static iser::CArchiveTag hasCustomOrderTag("HasCustomOrder", "Flag indicating if custom order is active");
+	retVal = retVal && archive.BeginTag(hasCustomOrderTag);
+	retVal = retVal && iser::Serialize(archive, m_hasCustomOrder);
+	retVal = retVal && archive.EndTag(hasCustomOrderTag);
+
+	// Serialize custom order list if active
+	if (m_hasCustomOrder){
+		static iser::CArchiveTag customOrderTag("CustomOrder", "Custom order of item IDs", iser::CArchiveTag::TT_MULTIPLE);
+		static iser::CArchiveTag itemIdTag("ItemId", "Item ID", iser::CArchiveTag::TT_LEAF, &customOrderTag);
+
+		int orderCount = m_customOrder.size();
+		retVal = retVal && archive.BeginMultiTag(customOrderTag, itemIdTag, orderCount);
+
+		if (!archive.IsStoring()){
+			m_customOrder.resize(orderCount);
+		}
+
+		for (int i = 0; i < orderCount; ++i){
+			retVal = retVal && archive.BeginTag(itemIdTag);
+			retVal = retVal && iser::Serialize(archive, m_customOrder[i]);
+			retVal = retVal && archive.EndTag(itemIdTag);
+		}
+
+		retVal = retVal && archive.EndMultiTag(customOrderTag);
+	}
+	else if (!archive.IsStoring()){
+		// Clear custom order when loading and flag is false
+		m_customOrder.clear();
+	}
+
+	return retVal;
+}
+
+
 // reimplemented (istd::IChangeable)
 
 int COrderedObjectCollectionProxy::GetSupportedOperations() const
@@ -240,6 +290,9 @@ int COrderedObjectCollectionProxy::GetSupportedOperations() const
 
 istd::IChangeableUniquePtr COrderedObjectCollectionProxy::CloneMe(CompatibilityMode mode) const
 {
+	// Note: The clone shares the same parent collection reference as the original.
+	// This is intentional for the proxy pattern, where clones manage ordering independently
+	// but delegate data operations to the same parent collection.
 	COrderedObjectCollectionProxy* clonePtr = new COrderedObjectCollectionProxy(m_parent);
 	clonePtr->m_customOrder = m_customOrder;
 	clonePtr->m_hasCustomOrder = m_hasCustomOrder;
@@ -268,8 +321,10 @@ IObjectCollection* COrderedObjectCollectionProxy::CreateSubCollectionInstance() 
 
 bool COrderedObjectCollectionProxy::InsertObjectIntoCollection(ObjectInfo info)
 {
-	// This method is called by base class methods
-	// For the proxy, we delegate to parent
+	// This method is called by base class methods.
+	// For the proxy, insertion is delegated to the parent through InsertNewObject.
+	// This method should not be used directly for the proxy pattern.
+	// Return false to indicate insertion should go through the overridden InsertNewObject.
 	return false;
 }
 
@@ -282,7 +337,7 @@ Ids COrderedObjectCollectionProxy::GetParentElementIds() const
 }
 
 
-void COrderedObjectCollectionProxy::SynchronizeOrder()
+void COrderedObjectCollectionProxy::SynchronizeOrder() const
 {
 	if (!m_hasCustomOrder){
 		return;
@@ -290,18 +345,25 @@ void COrderedObjectCollectionProxy::SynchronizeOrder()
 
 	// Get current IDs from parent
 	const Ids parentIds = GetParentElementIds();
+	
+	// Use QSet for O(1) lookups instead of O(n) contains()
+	const QSet<QByteArray> parentIdsSet(parentIds.begin(), parentIds.end());
 
 	// Remove items that no longer exist in parent
 	QVector<QByteArray> newOrder;
+	newOrder.reserve(m_customOrder.size());
 	for (const QByteArray& id : m_customOrder){
-		if (parentIds.contains(id)){
+		if (parentIdsSet.contains(id)){
 			newOrder.append(id);
 		}
 	}
 
+	// Use QSet for O(1) lookups of items already in new order
+	const QSet<QByteArray> newOrderSet(newOrder.begin(), newOrder.end());
+	
 	// Add any new items from parent that aren't in custom order
 	for (const QByteArray& id : parentIds){
-		if (!newOrder.contains(id)){
+		if (!newOrderSet.contains(id)){
 			newOrder.append(id);
 		}
 	}
@@ -317,17 +379,24 @@ Ids COrderedObjectCollectionProxy::ApplyCustomOrder(const Ids& ids) const
 	}
 
 	Ids orderedIds;
+	orderedIds.reserve(ids.size());
+	
+	// Use QSet for O(1) lookups instead of O(n) contains()
+	const QSet<QByteArray> idsSet(ids.begin(), ids.end());
 
 	// Add items in custom order
 	for (const QByteArray& id : m_customOrder){
-		if (ids.contains(id)){
+		if (idsSet.contains(id)){
 			orderedIds.append(id);
 		}
 	}
 
+	// Use QSet for O(1) lookups of items already in ordered list
+	const QSet<QByteArray> orderedIdsSet(orderedIds.begin(), orderedIds.end());
+	
 	// Add any items not in custom order at the end
 	for (const QByteArray& id : ids){
-		if (!orderedIds.contains(id)){
+		if (!orderedIdsSet.contains(id)){
 			orderedIds.append(id);
 		}
 	}

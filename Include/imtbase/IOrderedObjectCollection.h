@@ -43,8 +43,9 @@ public:
 	virtual bool SetItemsOrder(const Ids& orderedIds) = 0;
 
 	/**
-		Get all item IDs in their current custom order.
-		\return List of item IDs in custom order
+		Get all item IDs in their current custom order if a custom order is active.
+		If no custom order is set, the items are returned in the parent collection's default order.
+		\return List of item IDs in the effective order (custom order if set, otherwise default order)
 	*/
 	virtual Ids GetOrderedItemIds() const = 0;
 

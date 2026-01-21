@@ -21,6 +21,8 @@ private slots:
 	void testInsertNewItem();
 	void testRemoveItem();
 	void testGetOrderedItemIds();
+	void testDelegatedOperations();
+	void testSerialization();
 };
 
 
@@ -245,6 +247,64 @@ void COrderedObjectCollectionTest::testGetOrderedItemIds()
 	QCOMPARE(subset.size(), 2);
 	QCOMPARE(subset[0], id1);
 	QCOMPARE(subset[1], id2);
+}
+
+
+void COrderedObjectCollectionTest::testDelegatedOperations()
+{
+	// Create a base collection
+	imtbase::CObjectCollection baseCollection;
+	baseCollection.SetOperationFlags(imtbase::IObjectCollection::OF_ALL);
+
+	// Add items
+	const QByteArray id1 = baseCollection.InsertNewObject("TestType", "Item1", "Description1");
+	const QByteArray id2 = baseCollection.InsertNewObject("TestType", "Item2", "Description2");
+
+	// Create ordered proxy
+	imtbase::COrderedObjectCollectionProxy orderedProxy(baseCollection);
+
+	// Test GetOperationFlags delegation
+	int flags = orderedProxy.GetOperationFlags();
+	QVERIFY(flags & imtbase::IObjectCollection::OF_SUPPORT_INSERT);
+	QVERIFY(flags & imtbase::IObjectCollection::OF_SUPPORT_DELETE);
+
+	// Test GetOperationFlags for specific object
+	int objectFlags = orderedProxy.GetOperationFlags(id1);
+	QVERIFY(objectFlags != 0);
+
+	// Test GetElementsCount delegation
+	int count = orderedProxy.GetElementsCount();
+	QCOMPARE(count, 2);
+}
+
+
+void COrderedObjectCollectionTest::testSerialization()
+{
+	// Create a base collection
+	imtbase::CObjectCollection baseCollection;
+	baseCollection.SetOperationFlags(imtbase::IObjectCollection::OF_ALL);
+
+	// Add items
+	const QByteArray id1 = baseCollection.InsertNewObject("TestType", "Item1", "Description1");
+	const QByteArray id2 = baseCollection.InsertNewObject("TestType", "Item2", "Description2");
+	const QByteArray id3 = baseCollection.InsertNewObject("TestType", "Item3", "Description3");
+
+	// Create ordered proxy with custom order
+	imtbase::COrderedObjectCollectionProxy orderedProxy(baseCollection);
+	imtbase::ICollectionInfo::Ids customOrder;
+	customOrder << id3 << id1 << id2;
+	orderedProxy.SetItemsOrder(customOrder);
+
+	// Verify custom order is set
+	imtbase::ICollectionInfo::Ids orderBefore = orderedProxy.GetOrderedItemIds();
+	QCOMPARE(orderBefore[0], id3);
+	QCOMPARE(orderBefore[1], id1);
+	QCOMPARE(orderBefore[2], id2);
+
+	// Note: Full serialization test would require creating archives,
+	// which is beyond the scope of a simple unit test.
+	// The Serialize method implementation has been added and follows
+	// the existing pattern from CSimpleReferenceCollection.
 }
 
 

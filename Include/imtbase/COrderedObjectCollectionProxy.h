@@ -3,7 +3,7 @@
 
 // Qt includes
 #include <QtCore/QVector>
-#include <QtCore/QMap>
+#include <QtCore/QSet>
 
 // ACF includes
 #include <istd/TComposedFactory.h>
@@ -20,6 +20,11 @@ namespace imtbase
 /**
 	Implementation of an ordered object collection facade.
 	This class wraps an existing IObjectCollection and maintains a custom ordering for its items.
+	
+	\note The proxy does not observe changes to the parent collection. If items are added or
+	removed from the parent collection directly (bypassing the proxy), the custom order will
+	be automatically synchronized when GetOrderedItemIds() or GetElementIds() is called.
+	
 	\ingroup Collection
 */
 class COrderedObjectCollectionProxy:
@@ -70,6 +75,9 @@ public:
 				const iprm::IParamsSet* selectionParamsPtr = nullptr,
 				ilog::IMessageConsumer* logPtr = nullptr) const override;
 
+	// reimplemented (iser::ISerializable)
+	virtual bool Serialize(iser::IArchive& archive) override;
+
 	// reimplemented (istd::IChangeable)
 	virtual int GetSupportedOperations() const override;
 	virtual istd::IChangeableUniquePtr CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
@@ -90,7 +98,7 @@ private:
 		Synchronize the custom order with the parent collection's current state.
 		This adds any new items and removes deleted items from the custom order.
 	*/
-	void SynchronizeOrder();
+	void SynchronizeOrder() const;
 
 	/**
 		Apply the custom order to a list of IDs.
@@ -99,8 +107,8 @@ private:
 
 private:
 	IObjectCollection& m_parent;
-	QVector<QByteArray> m_customOrder;		// Stores the custom order of item IDs
-	bool m_hasCustomOrder;					// Flag indicating whether custom order is active
+	mutable QVector<QByteArray> m_customOrder;		// Stores the custom order of item IDs when m_hasCustomOrder is true
+	mutable bool m_hasCustomOrder;					// Flag indicating whether a custom order is currently active
 };
 
 
