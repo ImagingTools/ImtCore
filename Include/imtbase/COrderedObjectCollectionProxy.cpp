@@ -204,7 +204,6 @@ ICollectionInfo::Id COrderedObjectCollectionProxy::InsertNewObject(
 	if (m_collectionPtr == nullptr){
 		return Id();
 	}
-	
 	// Insert into collection
 	const Id newId = m_collectionPtr->InsertNewObject(
 				typeId,
@@ -230,7 +229,6 @@ bool COrderedObjectCollectionProxy::RemoveElements(const Ids& elementIds, const 
 	if (m_collectionPtr == nullptr){
 		return false;
 	}
-	
 	const bool result = m_collectionPtr->RemoveElements(elementIds, operationContextPtr);
 
 	if (result && m_hasCustomOrder){
@@ -316,7 +314,6 @@ IObjectCollectionUniquePtr COrderedObjectCollectionProxy::CreateSubCollection(
 	if (m_collectionPtr == nullptr){
 		return IObjectCollectionUniquePtr();
 	}
-	
 	// Create a proxy around a subcollection
 	IObjectCollectionUniquePtr subCollection = m_collectionPtr->CreateSubCollection(offset, count, selectionParamsPtr);
 	if (subCollection){
@@ -394,7 +391,6 @@ Ids COrderedObjectCollectionProxy::GetElementIds(
 	if (m_collectionPtr == nullptr){
 		return Ids();
 	}
-	
 	// Get IDs from collection
 	Ids collectionIds = m_collectionPtr->GetElementIds(0, -1, selectionParamsPtr, logPtr);
 
