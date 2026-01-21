@@ -48,11 +48,8 @@ private slots:
 
 void COrderedObjectCollectionTest::initTestCase()
 {
-	// Register factory for test data type
-	istd::CComposedFactory<istd::IChangeable>::Instance().RegisterCreator(
-		"TestType",
-		[]() -> istd::IChangeable* { return new CTestData(); }
-	);
+	// No factory registration needed in initTestCase.
+	// Factory is registered per test on the specific CObjectCollection instance.
 }
 
 
@@ -61,6 +58,9 @@ void COrderedObjectCollectionTest::testSetItemOrder()
 	// Create a base collection
 	imtbase::CObjectCollection baseCollection;
 	baseCollection.SetOperationFlags(imtbase::IObjectCollection::OF_ALL);
+	
+	// Register factory for test data type
+	baseCollection.RegisterFactory<CTestData>("TestType");
 
 	// Add some items
 	const QByteArray id1 = baseCollection.InsertNewObject("TestType", "Item1", "Description1");
@@ -95,6 +95,9 @@ void COrderedObjectCollectionTest::testGetItemOrder()
 	// Create a base collection
 	imtbase::CObjectCollection baseCollection;
 	baseCollection.SetOperationFlags(imtbase::IObjectCollection::OF_ALL);
+	
+	// Register factory for test data type
+	baseCollection.RegisterFactory<CTestData>("TestType");
 
 	// Add some items
 	const QByteArray id1 = baseCollection.InsertNewObject("TestType", "Item1", "Description1");
@@ -127,6 +130,9 @@ void COrderedObjectCollectionTest::testSetItemsOrder()
 	// Create a base collection
 	imtbase::CObjectCollection baseCollection;
 	baseCollection.SetOperationFlags(imtbase::IObjectCollection::OF_ALL);
+	
+	// Register factory for test data type
+	baseCollection.RegisterFactory<CTestData>("TestType");
 
 	// Add some items
 	const QByteArray id1 = baseCollection.InsertNewObject("TestType", "Item1", "Description1");
@@ -162,6 +168,9 @@ void COrderedObjectCollectionTest::testResetItemOrder()
 	// Create a base collection
 	imtbase::CObjectCollection baseCollection;
 	baseCollection.SetOperationFlags(imtbase::IObjectCollection::OF_ALL);
+	
+	// Register factory for test data type
+	baseCollection.RegisterFactory<CTestData>("TestType");
 
 	// Add some items
 	const QByteArray id1 = baseCollection.InsertNewObject("TestType", "Item1", "Description1");
@@ -195,6 +204,9 @@ void COrderedObjectCollectionTest::testInsertNewItem()
 	// Create a base collection
 	imtbase::CObjectCollection baseCollection;
 	baseCollection.SetOperationFlags(imtbase::IObjectCollection::OF_ALL);
+	
+	// Register factory for test data type
+	baseCollection.RegisterFactory<CTestData>("TestType");
 
 	// Add initial items
 	const QByteArray id1 = baseCollection.InsertNewObject("TestType", "Item1", "Description1");
@@ -222,6 +234,9 @@ void COrderedObjectCollectionTest::testRemoveItem()
 	// Create a base collection
 	imtbase::CObjectCollection baseCollection;
 	baseCollection.SetOperationFlags(imtbase::IObjectCollection::OF_ALL);
+	
+	// Register factory for test data type
+	baseCollection.RegisterFactory<CTestData>("TestType");
 
 	// Add items
 	const QByteArray id1 = baseCollection.InsertNewObject("TestType", "Item1", "Description1");
@@ -254,6 +269,9 @@ void COrderedObjectCollectionTest::testGetOrderedItemIds()
 	// Create a base collection
 	imtbase::CObjectCollection baseCollection;
 	baseCollection.SetOperationFlags(imtbase::IObjectCollection::OF_ALL);
+	
+	// Register factory for test data type
+	baseCollection.RegisterFactory<CTestData>("TestType");
 
 	// Add items
 	const QByteArray id1 = baseCollection.InsertNewObject("TestType", "Item1", "Description1");
@@ -285,6 +303,9 @@ void COrderedObjectCollectionTest::testDelegatedOperations()
 	// Create a base collection
 	imtbase::CObjectCollection baseCollection;
 	baseCollection.SetOperationFlags(imtbase::IObjectCollection::OF_ALL);
+	
+	// Register factory for test data type
+	baseCollection.RegisterFactory<CTestData>("TestType");
 
 	// Add items
 	const QByteArray id1 = baseCollection.InsertNewObject("TestType", "Item1", "Description1");
@@ -313,6 +334,9 @@ void COrderedObjectCollectionTest::testSerialization()
 	// Create a base collection
 	imtbase::CObjectCollection baseCollection;
 	baseCollection.SetOperationFlags(imtbase::IObjectCollection::OF_ALL);
+	
+	// Register factory for test data type
+	baseCollection.RegisterFactory<CTestData>("TestType");
 
 	// Add items
 	const QByteArray id1 = baseCollection.InsertNewObject("TestType", "Item1", "Description1");

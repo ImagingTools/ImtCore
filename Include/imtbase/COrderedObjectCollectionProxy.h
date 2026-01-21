@@ -5,9 +5,6 @@
 #include <QtCore/QVector>
 #include <QtCore/QSet>
 
-// ACF includes
-#include <istd/TUniqueInterfacePtr.h>
-
 // ImtCore includes
 #include <imtbase/IOrderedObjectCollection.h>
 
