@@ -175,6 +175,10 @@ QByteArray CJobTicketDatabaseDelegateComp::CreateRenameObjectQuery(
 			const QString& newObjectName,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
+	if (objectId.isEmpty()){
+		return QByteArray();
+	}
+
 	const IJobTicket* jobTicketPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr objectPtr;
 	if (collection.GetObjectData(objectId, objectPtr)){
@@ -182,10 +186,6 @@ QByteArray CJobTicketDatabaseDelegateComp::CreateRenameObjectQuery(
 	}
 
 	if (jobTicketPtr == nullptr){
-		return QByteArray();
-	}
-
-	if (objectId.isEmpty()){
 		return QByteArray();
 	}
 
