@@ -43,16 +43,16 @@ bool COrderedObjectCollectionProxy::SetItemOrder(const Id& itemId, int position)
 		return false;
 	}
 
+	// Notify change before modifying data
+	istd::IChangeable::ChangeSet changeSet(CF_CHANGED);
+	istd::CChangeNotifier changeNotifier(this, &changeSet);
+
 	// Remove from current position
 	m_customOrder.remove(currentIndex);
 
 	// Insert at new position (clamp to valid range)
 	int targetPosition = qMin(position, m_customOrder.size());
 	m_customOrder.insert(targetPosition, itemId);
-
-	// Notify change
-	istd::IChangeable::ChangeSet changeSet(CF_CHANGED);
-	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 	return true;
 }
@@ -88,13 +88,13 @@ bool COrderedObjectCollectionProxy::SetItemsOrder(const Ids& orderedIds)
 		}
 	}
 
+	// Notify change before modifying data
+	istd::IChangeable::ChangeSet changeSet(CF_CHANGED);
+	istd::CChangeNotifier changeNotifier(this, &changeSet);
+
 	// Set the new order
 	m_customOrder = orderedIds;
 	m_hasCustomOrder = true;
-
-	// Notify change
-	istd::IChangeable::ChangeSet changeSet(CF_CHANGED);
-	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 	return true;
 }
@@ -118,12 +118,12 @@ bool COrderedObjectCollectionProxy::ResetItemOrder()
 		return true;
 	}
 
-	m_customOrder.clear();
-	m_hasCustomOrder = false;
-
-	// Notify change
+	// Notify change before modifying data
 	istd::IChangeable::ChangeSet changeSet(CF_CHANGED);
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
+
+	m_customOrder.clear();
+	m_hasCustomOrder = false;
 
 	return true;
 }
