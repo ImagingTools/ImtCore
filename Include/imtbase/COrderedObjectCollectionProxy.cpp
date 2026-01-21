@@ -21,23 +21,43 @@ namespace imtbase
 
 COrderedObjectCollectionProxy::COrderedObjectCollectionProxy(IObjectCollection* collectionPtr)
 	:m_collectionPtr(collectionPtr),
+	 m_updateBridge(this, imod::CModelUpdateBridge::UF_SOURCE),
 	 m_hasCustomOrder(false)
 {
 	Q_ASSERT(m_collectionPtr != nullptr);
+	
+	// Attach the aggregated collection to the update bridge so changes are forwarded to proxy observers
+	if (m_collectionPtr != nullptr){
+		istd::IChangeable* changeablePtr = dynamic_cast<istd::IChangeable*>(m_collectionPtr);
+		if (changeablePtr != nullptr){
+			changeablePtr->AttachObserver(&m_updateBridge);
+		}
+	}
 }
 
 
 COrderedObjectCollectionProxy::COrderedObjectCollectionProxy(IObjectCollectionUniquePtr collectionPtr)
 	:m_ownedCollection(std::move(collectionPtr)),
 	 m_collectionPtr(m_ownedCollection.Get()),
+	 m_updateBridge(this, imod::CModelUpdateBridge::UF_SOURCE),
 	 m_hasCustomOrder(false)
 {
 	Q_ASSERT(m_collectionPtr != nullptr);
+	
+	// Attach the aggregated collection to the update bridge so changes are forwarded to proxy observers
+	if (m_collectionPtr != nullptr){
+		istd::IChangeable* changeablePtr = dynamic_cast<istd::IChangeable*>(m_collectionPtr);
+		if (changeablePtr != nullptr){
+			changeablePtr->AttachObserver(&m_updateBridge);
+		}
+	}
 }
 
 
 COrderedObjectCollectionProxy::~COrderedObjectCollectionProxy()
 {
+	// Ensure all models are properly detached before destruction
+	m_updateBridge.EnsureModelsDetached();
 }
 
 

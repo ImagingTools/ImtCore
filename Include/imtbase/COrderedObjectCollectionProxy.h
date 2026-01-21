@@ -5,6 +5,9 @@
 #include <QtCore/QVector>
 #include <QtCore/QSet>
 
+// ACF includes
+#include <imod/CModelUpdateBridge.h>
+
 // ImtCore includes
 #include <imtbase/IOrderedObjectCollection.h>
 
@@ -18,9 +21,13 @@ namespace imtbase
 	This class wraps an existing IObjectCollection and maintains a custom ordering for its items.
 	Uses composition (aggregation) to delegate operations to the wrapped collection.
 	
-	\note The proxy does not observe changes to the aggregated collection. If items are added or
-	removed from the aggregated collection directly (bypassing the proxy), the custom order will
-	be automatically synchronized when GetOrderedItemIds() or GetElementIds() is called.
+	\note Change Notification: The proxy uses imod::CModelUpdateBridge to forward change notifications
+	from the aggregated collection to observers of the proxy. When the underlying collection changes,
+	observers of the proxy are automatically notified.
+	
+	\note The proxy automatically synchronizes the custom order with the aggregated collection's current
+	state. If items are added or removed from the aggregated collection, the custom order will be
+	updated when GetOrderedItemIds() or GetElementIds() is called.
 	
 	\note Ownership: The proxy supports two modes:
 	- Non-owning mode: Pass a raw pointer to the constructor. The caller manages the collection's lifetime.
@@ -154,6 +161,7 @@ private:
 private:
 	IObjectCollectionUniquePtr m_ownedCollection;		// Owned collection (if proxy takes ownership)
 	IObjectCollection* m_collectionPtr;					// Pointer to the aggregated collection (owned or non-owned)
+	imod::CModelUpdateBridge m_updateBridge;			// Bridge for forwarding change notifications from aggregated collection to proxy observers
 	mutable QVector<QByteArray> m_customOrder;			// Stores the custom order of item IDs when m_hasCustomOrder is true
 	mutable bool m_hasCustomOrder;						// Flag indicating whether a custom order is currently active
 };
