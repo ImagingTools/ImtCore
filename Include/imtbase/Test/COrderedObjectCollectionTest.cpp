@@ -5,6 +5,24 @@
 // Qt includes
 #include <QtTest/QtTest>
 
+// ACF includes
+#include <istd/CChangeable.h>
+
+
+// Simple test data class for the tests
+class CTestData: public istd::CChangeable
+{
+public:
+	CTestData() {}
+	virtual ~CTestData() {}
+	
+	virtual int GetSupportedOperations() const override { return OP_CLONE | OP_COPY | OP_COMPARE; }
+	virtual istd::IChangeableUniquePtr CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override
+	{
+		return istd::IChangeableUniquePtr(new CTestData());
+	}
+};
+
 
 /**
 	Unit test for the ordered object collection facade.
@@ -14,6 +32,7 @@ class COrderedObjectCollectionTest: public QObject
 	Q_OBJECT
 
 private slots:
+	void initTestCase();
 	void testSetItemOrder();
 	void testGetItemOrder();
 	void testSetItemsOrder();
@@ -24,6 +43,16 @@ private slots:
 	void testDelegatedOperations();
 	void testSerialization();
 };
+
+
+void COrderedObjectCollectionTest::initTestCase()
+{
+	// Register factory for test data type
+	istd::CComposedFactory<istd::IChangeable>::Instance().RegisterCreator(
+		"TestType",
+		[]() -> istd::IChangeable* { return new CTestData(); }
+	);
+}
 
 
 void COrderedObjectCollectionTest::testSetItemOrder()
