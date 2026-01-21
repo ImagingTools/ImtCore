@@ -3,6 +3,7 @@
 
 // ACF includes
 #include <istd/TInterfacePtr.h>
+#include <iser/ISerializable.h>
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
@@ -17,7 +18,7 @@ namespace imtbase
 	This facade extends IObjectCollection to allow setting custom order for items.
 	\ingroup Collection
 */
-class IOrderedObjectCollection: virtual public IObjectCollection
+class IOrderedObjectCollection: virtual public IObjectCollection, virtual public iser::ISerializable
 {
 public:
 	/**
