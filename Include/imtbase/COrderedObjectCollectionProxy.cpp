@@ -157,24 +157,36 @@ bool COrderedObjectCollectionProxy::ResetItemOrder()
 
 IHierarchicalStructure* COrderedObjectCollectionProxy::GetCollectionStructure() const
 {
+	if (m_collectionPtr == nullptr){
+		return nullptr;
+	}
 	return m_collectionPtr->GetCollectionStructure();
 }
 
 
 const IRevisionController* COrderedObjectCollectionProxy::GetRevisionController() const
 {
+	if (m_collectionPtr == nullptr){
+		return nullptr;
+	}
 	return m_collectionPtr->GetRevisionController();
 }
 
 
 const ICollectionDataController* COrderedObjectCollectionProxy::GetDataController() const
 {
+	if (m_collectionPtr == nullptr){
+		return nullptr;
+	}
 	return m_collectionPtr->GetDataController();
 }
 
 
 int COrderedObjectCollectionProxy::GetOperationFlags(const QByteArray& objectId) const
 {
+	if (m_collectionPtr == nullptr){
+		return 0;
+	}
 	return m_collectionPtr->GetOperationFlags(objectId);
 }
 
@@ -189,6 +201,10 @@ ICollectionInfo::Id COrderedObjectCollectionProxy::InsertNewObject(
 			const idoc::IDocumentMetaInfo* elementMetaInfoPtr,
 			const IOperationContext* operationContextPtr)
 {
+	if (m_collectionPtr == nullptr){
+		return Id();
+	}
+	
 	// Insert into collection
 	const Id newId = m_collectionPtr->InsertNewObject(
 				typeId,
@@ -211,6 +227,10 @@ ICollectionInfo::Id COrderedObjectCollectionProxy::InsertNewObject(
 
 bool COrderedObjectCollectionProxy::RemoveElements(const Ids& elementIds, const IOperationContext* operationContextPtr)
 {
+	if (m_collectionPtr == nullptr){
+		return false;
+	}
+	
 	const bool result = m_collectionPtr->RemoveElements(elementIds, operationContextPtr);
 
 	if (result && m_hasCustomOrder){
@@ -228,6 +248,9 @@ bool COrderedObjectCollectionProxy::RemoveElementSet(
 			const iprm::IParamsSet* selectionParamsPtr,
 			const IOperationContext* operationContextPtr)
 {
+	if (m_collectionPtr == nullptr){
+		return false;
+	}
 	return m_collectionPtr->RemoveElementSet(selectionParamsPtr, operationContextPtr);
 }
 
@@ -236,6 +259,9 @@ bool COrderedObjectCollectionProxy::RestoreObjects(
 			const Ids& objectIds,
 			const IOperationContext* operationContextPtr)
 {
+	if (m_collectionPtr == nullptr){
+		return false;
+	}
 	return m_collectionPtr->RestoreObjects(objectIds, operationContextPtr);
 }
 
@@ -244,18 +270,27 @@ bool COrderedObjectCollectionProxy::RestoreObjectSet(
 			const iprm::IParamsSet* selectionParamsPtr,
 			const IOperationContext* operationContextPtr)
 {
+	if (m_collectionPtr == nullptr){
+		return false;
+	}
 	return m_collectionPtr->RestoreObjectSet(selectionParamsPtr, operationContextPtr);
 }
 
 
 const istd::IChangeable* COrderedObjectCollectionProxy::GetObjectPtr(const Id& objectId) const
 {
+	if (m_collectionPtr == nullptr){
+		return nullptr;
+	}
 	return m_collectionPtr->GetObjectPtr(objectId);
 }
 
 
 bool COrderedObjectCollectionProxy::GetObjectData(const Id& objectId, DataPtr& dataPtr, const iprm::IParamsSet* dataConfigurationPtr) const
 {
+	if (m_collectionPtr == nullptr){
+		return false;
+	}
 	return m_collectionPtr->GetObjectData(objectId, dataPtr, dataConfigurationPtr);
 }
 
@@ -266,6 +301,9 @@ bool COrderedObjectCollectionProxy::SetObjectData(
 			CompatibilityMode mode,
 			const IOperationContext* operationContextPtr)
 {
+	if (m_collectionPtr == nullptr){
+		return false;
+	}
 	return m_collectionPtr->SetObjectData(objectId, object, mode, operationContextPtr);
 }
 
@@ -275,6 +313,10 @@ IObjectCollectionUniquePtr COrderedObjectCollectionProxy::CreateSubCollection(
 			int count,
 			const iprm::IParamsSet* selectionParamsPtr) const
 {
+	if (m_collectionPtr == nullptr){
+		return IObjectCollectionUniquePtr();
+	}
+	
 	// Create a proxy around a subcollection
 	IObjectCollectionUniquePtr subCollection = m_collectionPtr->CreateSubCollection(offset, count, selectionParamsPtr);
 	if (subCollection){
@@ -294,6 +336,9 @@ IObjectCollectionIterator* COrderedObjectCollectionProxy::CreateObjectCollection
 			int count,
 			const iprm::IParamsSet* selectionParamsPtr) const
 {
+	if (m_collectionPtr == nullptr){
+		return nullptr;
+	}
 	return m_collectionPtr->CreateObjectCollectionIterator(objectId, offset, count, selectionParamsPtr);
 }
 
@@ -302,18 +347,27 @@ IObjectCollectionIterator* COrderedObjectCollectionProxy::CreateObjectCollection
 
 const iprm::IOptionsList* COrderedObjectCollectionProxy::GetObjectTypesInfo() const
 {
+	if (m_collectionPtr == nullptr){
+		return nullptr;
+	}
 	return m_collectionPtr->GetObjectTypesInfo();
 }
 
 
 ICollectionInfo::Id COrderedObjectCollectionProxy::GetObjectTypeId(const Id& objectId) const
 {
+	if (m_collectionPtr == nullptr){
+		return Id();
+	}
 	return m_collectionPtr->GetObjectTypeId(objectId);
 }
 
 
 idoc::MetaInfoPtr COrderedObjectCollectionProxy::GetDataMetaInfo(const Id& objectId) const
 {
+	if (m_collectionPtr == nullptr){
+		return idoc::MetaInfoPtr();
+	}
 	return m_collectionPtr->GetDataMetaInfo(objectId);
 }
 
@@ -324,6 +378,9 @@ int COrderedObjectCollectionProxy::GetElementsCount(
 			const iprm::IParamsSet* selectionParamPtr,
 			ilog::IMessageConsumer* logPtr) const
 {
+	if (m_collectionPtr == nullptr){
+		return 0;
+	}
 	return m_collectionPtr->GetElementsCount(selectionParamPtr, logPtr);
 }
 
@@ -334,6 +391,10 @@ Ids COrderedObjectCollectionProxy::GetElementIds(
 			const iprm::IParamsSet* selectionParamsPtr,
 			ilog::IMessageConsumer* logPtr) const
 {
+	if (m_collectionPtr == nullptr){
+		return Ids();
+	}
+	
 	// Get IDs from collection
 	Ids collectionIds = m_collectionPtr->GetElementIds(0, -1, selectionParamsPtr, logPtr);
 
@@ -365,36 +426,54 @@ bool COrderedObjectCollectionProxy::GetSubsetInfo(
 			const iprm::IParamsSet* selectionParamsPtr,
 			ilog::IMessageConsumer* logPtr) const
 {
+	if (m_collectionPtr == nullptr){
+		return false;
+	}
 	return m_collectionPtr->GetSubsetInfo(subsetInfo, offset, count, selectionParamsPtr, logPtr);
 }
 
 
 QVariant COrderedObjectCollectionProxy::GetElementInfo(const Id& elementId, int infoType, ilog::IMessageConsumer* logPtr) const
 {
+	if (m_collectionPtr == nullptr){
+		return QVariant();
+	}
 	return m_collectionPtr->GetElementInfo(elementId, infoType, logPtr);
 }
 
 
 idoc::MetaInfoPtr COrderedObjectCollectionProxy::GetElementMetaInfo(const Id& elementId, ilog::IMessageConsumer* logPtr) const
 {
+	if (m_collectionPtr == nullptr){
+		return idoc::MetaInfoPtr();
+	}
 	return m_collectionPtr->GetElementMetaInfo(elementId, logPtr);
 }
 
 
 bool COrderedObjectCollectionProxy::SetElementName(const Id& elementId, const QString& name, ilog::IMessageConsumer* logPtr)
 {
+	if (m_collectionPtr == nullptr){
+		return false;
+	}
 	return m_collectionPtr->SetElementName(elementId, name, logPtr);
 }
 
 
 bool COrderedObjectCollectionProxy::SetElementDescription(const Id& elementId, const QString& description, ilog::IMessageConsumer* logPtr)
 {
+	if (m_collectionPtr == nullptr){
+		return false;
+	}
 	return m_collectionPtr->SetElementDescription(elementId, description, logPtr);
 }
 
 
 bool COrderedObjectCollectionProxy::SetElementEnabled(const Id& elementId, bool isEnabled, ilog::IMessageConsumer* logPtr)
 {
+	if (m_collectionPtr == nullptr){
+		return false;
+	}
 	return m_collectionPtr->SetElementEnabled(elementId, isEnabled, logPtr);
 }
 
@@ -502,6 +581,9 @@ bool COrderedObjectCollectionProxy::ResetData(CompatibilityMode mode)
 
 Ids COrderedObjectCollectionProxy::GetCollectionElementIds() const
 {
+	if (m_collectionPtr == nullptr){
+		return Ids();
+	}
 	return m_collectionPtr->GetElementIds();
 }
 
