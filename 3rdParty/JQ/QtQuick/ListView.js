@@ -316,7 +316,7 @@ class ListView extends Flickable {
 
             item.xChanged.connect(() => {
                 if (this.orientation === ListView.Horizontal) {
-                    let _index = this.__items.indexOf(item)
+                    let _index = this.model.data.indexOf(item.model)
                     if (_index >= 0 && this.__items[_index + 1]) {
                         this.__items[_index + 1].x = this.__items[_index].x + this.__items[_index].width + this.spacing
                     }
@@ -325,7 +325,7 @@ class ListView extends Flickable {
             })
             item.yChanged.connect(() => {
                 if (this.orientation === ListView.Vertical) {
-                    let _index = this.__items.indexOf(item)
+                    let _index = this.model.data.indexOf(item.model)
                     if (_index >= 0 && this.__items[_index + 1]) {
                         this.__items[_index + 1].y = this.__items[_index].y + this.__items[_index].height + this.spacing
                     }
@@ -334,7 +334,7 @@ class ListView extends Flickable {
             })
             item.widthChanged.connect(() => {
                 if (this.orientation === ListView.Horizontal) {
-                    let _index = this.__items.indexOf(item)
+                    let _index = this.model.data.indexOf(item.model)
                     if (_index >= 0 && this.__items[_index + 1]) {
                         this.__items[_index + 1].x = this.__items[_index].x + this.__items[_index].width + this.spacing
                     }
@@ -343,7 +343,7 @@ class ListView extends Flickable {
             })
             item.heightChanged.connect(() => {
                 if (this.orientation === ListView.Vertical) {
-                    let _index = this.__items.indexOf(item)
+                    let _index = this.model.data.indexOf(item.model)
                     if (_index >= 0 && this.__items[_index + 1]) {
                         this.__items[_index + 1].y = this.__items[_index].y + this.__items[_index].height + this.spacing
                     }
@@ -354,7 +354,7 @@ class ListView extends Flickable {
                 JQApplication.updateLater(this)
             })
             item.indexChanged.connect(() => {
-                let _index = this.__items.indexOf(item)
+                let _index = this.model.data.indexOf(item.model)
                 if (this.orientation === ListView.Horizontal) {
                     if(_index > 0){
                         item.x = this.__items[_index - 1].x + this.__items[_index - 1].width + this.spacing
