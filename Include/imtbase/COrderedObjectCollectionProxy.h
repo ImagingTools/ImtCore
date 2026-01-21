@@ -25,8 +25,9 @@ namespace imtbase
 	removed from the aggregated collection directly (bypassing the proxy), the custom order will
 	be automatically synchronized when GetOrderedItemIds() or GetElementIds() is called.
 	
-	\note The proxy does NOT take ownership of the aggregated collection pointer. The caller
-	is responsible for managing the lifetime of the collection object.
+	\note Ownership: The proxy supports two modes:
+	- Non-owning mode: Pass a raw pointer to the constructor. The caller manages the collection's lifetime.
+	- Owning mode: Pass a unique_ptr to the constructor. The proxy takes ownership and manages the collection's lifetime.
 	
 	\ingroup Collection
 */
@@ -147,6 +148,11 @@ private:
 		Apply the custom order to a list of IDs.
 	*/
 	Ids ApplyCustomOrder(const Ids& ids) const;
+	
+	/**
+		Copy the ordering state from another proxy (used internally).
+	*/
+	void CopyOrderingState(const COrderedObjectCollectionProxy& other);
 
 private:
 	IObjectCollectionUniquePtr m_ownedCollection;		// Owned collection (if proxy takes ownership)

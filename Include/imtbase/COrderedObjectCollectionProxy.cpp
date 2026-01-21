@@ -280,8 +280,8 @@ IObjectCollectionUniquePtr COrderedObjectCollectionProxy::CreateSubCollection(
 	if (subCollection){
 		// Use the owning constructor so the proxy takes ownership of the subcollection
 		COrderedObjectCollectionProxy* proxyPtr = new COrderedObjectCollectionProxy(std::move(subCollection));
-		proxyPtr->m_customOrder = m_customOrder;
-		proxyPtr->m_hasCustomOrder = m_hasCustomOrder;
+		// Copy the ordering state using the dedicated method
+		proxyPtr->CopyOrderingState(*this);
 		return IObjectCollectionUniquePtr(proxyPtr);
 	}
 	return IObjectCollectionUniquePtr();
@@ -571,6 +571,13 @@ Ids COrderedObjectCollectionProxy::ApplyCustomOrder(const Ids& ids) const
 	}
 
 	return orderedIds;
+}
+
+
+void COrderedObjectCollectionProxy::CopyOrderingState(const COrderedObjectCollectionProxy& other)
+{
+	m_customOrder = other.m_customOrder;
+	m_hasCustomOrder = other.m_hasCustomOrder;
 }
 
 
