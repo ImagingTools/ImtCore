@@ -27,6 +27,7 @@ public:
 	{
 		QByteArray sessionId;
 		QByteArray collectionId;
+		QByteArray userId;
 		std::vector<FileInfo> files;
 		iprm::IParamsSetSharedPtr additionalParams;
 	};
