@@ -25,14 +25,7 @@ COrderedObjectCollectionProxy::COrderedObjectCollectionProxy(IObjectCollection* 
 	 m_hasCustomOrder(false)
 {
 	Q_ASSERT(m_collectionPtr != nullptr);
-	
-	// Attach the aggregated collection to the update bridge so changes are forwarded to proxy observers
-	if (m_collectionPtr != nullptr){
-		istd::IChangeable* changeablePtr = dynamic_cast<istd::IChangeable*>(m_collectionPtr);
-		if (changeablePtr != nullptr){
-			changeablePtr->AttachObserver(&m_updateBridge);
-		}
-	}
+	AttachCollectionObserver();
 }
 
 
@@ -43,14 +36,7 @@ COrderedObjectCollectionProxy::COrderedObjectCollectionProxy(IObjectCollectionUn
 	 m_hasCustomOrder(false)
 {
 	Q_ASSERT(m_collectionPtr != nullptr);
-	
-	// Attach the aggregated collection to the update bridge so changes are forwarded to proxy observers
-	if (m_collectionPtr != nullptr){
-		istd::IChangeable* changeablePtr = dynamic_cast<istd::IChangeable*>(m_collectionPtr);
-		if (changeablePtr != nullptr){
-			changeablePtr->AttachObserver(&m_updateBridge);
-		}
-	}
+	AttachCollectionObserver();
 }
 
 
@@ -680,6 +666,17 @@ void COrderedObjectCollectionProxy::CopyOrderingState(const COrderedObjectCollec
 {
 	m_customOrder = other.m_customOrder;
 	m_hasCustomOrder = other.m_hasCustomOrder;
+}
+
+
+void COrderedObjectCollectionProxy::AttachCollectionObserver()
+{
+	// Attach the aggregated collection to the update bridge so changes are forwarded to proxy observers
+	// Note: Q_ASSERT in constructor ensures m_collectionPtr is not null
+	istd::IChangeable* changeablePtr = dynamic_cast<istd::IChangeable*>(m_collectionPtr);
+	if (changeablePtr != nullptr) {
+		changeablePtr->AttachObserver(&m_updateBridge);
+	}
 }
 
 

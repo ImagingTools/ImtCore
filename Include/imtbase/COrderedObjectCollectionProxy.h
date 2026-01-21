@@ -157,6 +157,11 @@ private:
 		Copy the ordering state from another proxy (used internally).
 	*/
 	void CopyOrderingState(const COrderedObjectCollectionProxy& other);
+	
+	/**
+		Attach the aggregated collection to the update bridge (helper for constructors).
+	*/
+	void AttachCollectionObserver();
 
 private:
 	IObjectCollectionUniquePtr m_ownedCollection;		// Owned collection (if proxy takes ownership)
