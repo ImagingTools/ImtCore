@@ -1,6 +1,11 @@
 #include <imthype/CJobTicketDatabaseDelegateComp.h>
 
 
+// ACF includes
+#include <iser/CJsonMemReadArchive.h>
+#include <iser/CJsonMemWriteArchive.h>
+
+
 namespace imthype
 {
 
@@ -60,6 +65,57 @@ istd::IChangeableUniquePtr CJobTicketDatabaseDelegateComp::CreateObjectFromRecor
 		jobTicketPtr->SetProcessingStatus(static_cast<IJobQueueManager::ProcessingStatus>(status));
 	}
 
+	// Deserialize Params from JSON
+	if (record.contains("Params")){
+		QString paramsDataBase64 = record.value("Params").toString();
+		if (!paramsDataBase64.isEmpty()){
+			QByteArray paramsData = QByteArray::fromBase64(paramsDataBase64.toUtf8());
+			if (!paramsData.isEmpty()){
+				iprm::IParamsSetSharedPtr paramsPtr = jobTicketPtr->GetParams();
+				if (paramsPtr.IsValid()){
+					iser::CJsonMemReadArchive archive(paramsData);
+					paramsPtr->Serialize(archive);
+				}
+			}
+		}
+	}
+
+	// Deserialize Results from JSON
+	if (record.contains("Results")){
+		QString resultsDataBase64 = record.value("Results").toString();
+		if (!resultsDataBase64.isEmpty()){
+			QByteArray resultsData = QByteArray::fromBase64(resultsDataBase64.toUtf8());
+			if (!resultsData.isEmpty()){
+				const IJobOutput* resultsPtr = jobTicketPtr->GetResults();
+				if (resultsPtr != nullptr){
+					auto serializablePtr = const_cast<iser::ISerializable*>(dynamic_cast<const iser::ISerializable*>(resultsPtr));
+					if (serializablePtr != nullptr){
+						iser::CJsonMemReadArchive archive(resultsData);
+						serializablePtr->Serialize(archive);
+					}
+				}
+			}
+		}
+	}
+
+	// Deserialize Input from JSON
+	if (record.contains("Input")){
+		QString inputDataBase64 = record.value("Input").toString();
+		if (!inputDataBase64.isEmpty()){
+			QByteArray inputData = QByteArray::fromBase64(inputDataBase64.toUtf8());
+			if (!inputData.isEmpty()){
+				const imtbase::IReferenceCollection* inputPtr = jobTicketPtr->GetInput();
+				if (inputPtr != nullptr){
+					auto serializablePtr = const_cast<iser::ISerializable*>(dynamic_cast<const iser::ISerializable*>(inputPtr));
+					if (serializablePtr != nullptr){
+						iser::CJsonMemReadArchive archive(inputData);
+						serializablePtr->Serialize(archive);
+					}
+				}
+			}
+		}
+	}
+
 	istd::IChangeableUniquePtr retVal;
 	retVal.MoveCastedPtr<IJobTicket>(jobTicketPtr);
 
@@ -87,8 +143,44 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CJobTicketDatabaseDelegateComp::C
 	double progress = jobTicketPtr->GetProgress();
 	int processingStatus = static_cast<int>(jobTicketPtr->GetProcessingStatus());
 
+	// Serialize Params to JSON
+	QByteArray paramsData;
+	iprm::IParamsSetSharedPtr paramsPtr = jobTicketPtr->GetParams();
+	if (paramsPtr.IsValid()){
+		iser::CJsonMemWriteArchive archive(nullptr);
+		if (paramsPtr->Serialize(archive)){
+			paramsData = archive.GetData();
+		}
+	}
+
+	// Serialize Results to JSON
+	QByteArray resultsData;
+	const IJobOutput* resultsPtr = jobTicketPtr->GetResults();
+	if (resultsPtr != nullptr){
+		auto serializablePtr = const_cast<iser::ISerializable*>(dynamic_cast<const iser::ISerializable*>(resultsPtr));
+		if (serializablePtr != nullptr){
+			iser::CJsonMemWriteArchive archive(nullptr);
+			if (serializablePtr->Serialize(archive)){
+				resultsData = archive.GetData();
+			}
+		}
+	}
+
+	// Serialize Input to JSON
+	QByteArray inputData;
+	const imtbase::IReferenceCollection* inputPtr = jobTicketPtr->GetInput();
+	if (inputPtr != nullptr){
+		auto serializablePtr = const_cast<iser::ISerializable*>(dynamic_cast<const iser::ISerializable*>(inputPtr));
+		if (serializablePtr != nullptr){
+			iser::CJsonMemWriteArchive archive(nullptr);
+			if (serializablePtr->Serialize(archive)){
+				inputData = archive.GetData();
+			}
+		}
+	}
+
 	NewObjectQuery retVal;
-	retVal.query = QString("INSERT INTO \"JobTickets\"(\"Id\", \"TypeId\", \"Uuid\", \"Name\", \"ContextId\", \"Progress\", \"ProcessingStatus\") VALUES('%1', '%2', '%3', '%4', '%5', %6, %7);")
+	retVal.query = QString("INSERT INTO \"JobTickets\"(\"Id\", \"TypeId\", \"Uuid\", \"Name\", \"ContextId\", \"Progress\", \"ProcessingStatus\", \"Params\", \"Results\", \"Input\") VALUES('%1', '%2', '%3', '%4', '%5', %6, %7, '%8', '%9', '%10');")
 				.arg(qPrintable(proposedObjectId))
 				.arg(qPrintable(typeId))
 				.arg(qPrintable(uuid))
@@ -96,6 +188,9 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CJobTicketDatabaseDelegateComp::C
 				.arg(qPrintable(contextId))
 				.arg(progress)
 				.arg(processingStatus)
+				.arg(QString::fromUtf8(paramsData.toBase64()))
+				.arg(QString::fromUtf8(resultsData.toBase64()))
+				.arg(QString::fromUtf8(inputData.toBase64()))
 				.toUtf8();
 	retVal.objectName = name;
 
@@ -155,13 +250,52 @@ QByteArray CJobTicketDatabaseDelegateComp::CreateUpdateObjectQuery(
 	double progress = jobTicketPtr->GetProgress();
 	int processingStatus = static_cast<int>(jobTicketPtr->GetProcessingStatus());
 
-	QByteArray retVal = QString("UPDATE \"JobTickets\" SET \"TypeId\" = '%1', \"Uuid\" = '%2', \"Name\" = '%3', \"ContextId\" = '%4', \"Progress\" = %5, \"ProcessingStatus\" = %6 WHERE \"Id\" ='%7';")
+	// Serialize Params to JSON
+	QByteArray paramsData;
+	iprm::IParamsSetSharedPtr paramsPtr = jobTicketPtr->GetParams();
+	if (paramsPtr.IsValid()){
+		iser::CJsonMemWriteArchive archive(nullptr);
+		if (paramsPtr->Serialize(archive)){
+			paramsData = archive.GetData();
+		}
+	}
+
+	// Serialize Results to JSON
+	QByteArray resultsData;
+	const IJobOutput* resultsPtr = jobTicketPtr->GetResults();
+	if (resultsPtr != nullptr){
+		auto serializablePtr = const_cast<iser::ISerializable*>(dynamic_cast<const iser::ISerializable*>(resultsPtr));
+		if (serializablePtr != nullptr){
+			iser::CJsonMemWriteArchive archive(nullptr);
+			if (serializablePtr->Serialize(archive)){
+				resultsData = archive.GetData();
+			}
+		}
+	}
+
+	// Serialize Input to JSON
+	QByteArray inputData;
+	const imtbase::IReferenceCollection* inputPtr = jobTicketPtr->GetInput();
+	if (inputPtr != nullptr){
+		auto serializablePtr = const_cast<iser::ISerializable*>(dynamic_cast<const iser::ISerializable*>(inputPtr));
+		if (serializablePtr != nullptr){
+			iser::CJsonMemWriteArchive archive(nullptr);
+			if (serializablePtr->Serialize(archive)){
+				inputData = archive.GetData();
+			}
+		}
+	}
+
+	QByteArray retVal = QString("UPDATE \"JobTickets\" SET \"TypeId\" = '%1', \"Uuid\" = '%2', \"Name\" = '%3', \"ContextId\" = '%4', \"Progress\" = %5, \"ProcessingStatus\" = %6, \"Params\" = '%7', \"Results\" = '%8', \"Input\" = '%9' WHERE \"Id\" ='%10';")
 				.arg(qPrintable(typeId))
 				.arg(qPrintable(uuid))
 				.arg(name)
 				.arg(qPrintable(contextId))
 				.arg(progress)
 				.arg(processingStatus)
+				.arg(QString::fromUtf8(paramsData.toBase64()))
+				.arg(QString::fromUtf8(resultsData.toBase64()))
+				.arg(QString::fromUtf8(inputData.toBase64()))
 				.arg(qPrintable(objectId))
 				.toUtf8();
 
