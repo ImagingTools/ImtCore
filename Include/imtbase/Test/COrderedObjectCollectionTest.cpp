@@ -7,6 +7,7 @@
 
 // ACF includes
 #include <istd/CChangeable.h>
+#include <istd/TComposedFactory.h>
 
 
 // Simple test data class for the tests
