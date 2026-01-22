@@ -42,13 +42,10 @@ jobs:
           # For push events, use GITHUB_REF
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             GIT_BRANCH="refs/heads/${{ github.event.pull_request.head.ref }}"
-            BRANCH_NAME="${{ github.event.pull_request.head.ref }}"
-            echo "Pull request detected, using branch: $GIT_BRANCH (TeamCity branch name: $BRANCH_NAME)"
+            echo "Pull request detected, using branch: $GIT_BRANCH"
           else
             GIT_BRANCH="${GITHUB_REF}"
-            # Extract branch name from refs/heads/main -> main
-            BRANCH_NAME="${GITHUB_REF#refs/heads/}"
-            echo "Push event detected, using ref: $GIT_BRANCH (TeamCity branch name: $BRANCH_NAME)"
+            echo "Push event detected, using ref: $GIT_BRANCH"
           fi
 
           # Trigger TeamCity build
@@ -58,7 +55,7 @@ jobs:
             -H "Authorization: Bearer $TEAMCITY_TOKEN" \
             -H "Content-Type: application/xml" \
             -H "Accept: application/json" \
-            --data "<build><buildType id=\"$TEAMCITY_BUILD_TYPE\"/><branchName>$BRANCH_NAME</branchName><properties><property name=\"env.GIT_BRANCH\" value=\"$GIT_BRANCH\"/><property name=\"env.GIT_COMMIT\" value=\"$GITHUB_SHA\"/></properties></build>" \
+            --data "<build><buildType id=\"$TEAMCITY_BUILD_TYPE\"/><branchName>$GIT_BRANCH</branchName><properties><property name=\"env.GIT_BRANCH\" value=\"$GIT_BRANCH\"/><property name=\"env.GIT_COMMIT\" value=\"$GITHUB_SHA\"/></properties></build>" \
             "$TEAMCITY_URL/app/rest/buildQueue")
 
           HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
@@ -219,13 +216,10 @@ jobs:
           # For push events, use GITHUB_REF
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             GIT_BRANCH="refs/heads/${{ github.event.pull_request.head.ref }}"
-            BRANCH_NAME="${{ github.event.pull_request.head.ref }}"
-            echo "Pull request detected, using branch: $GIT_BRANCH (TeamCity branch name: $BRANCH_NAME)"
+            echo "Pull request detected, using branch: $GIT_BRANCH"
           else
             GIT_BRANCH="${GITHUB_REF}"
-            # Extract branch name from refs/heads/main -> main
-            BRANCH_NAME="${GITHUB_REF#refs/heads/}"
-            echo "Push event detected, using ref: $GIT_BRANCH (TeamCity branch name: $BRANCH_NAME)"
+            echo "Push event detected, using ref: $GIT_BRANCH"
           fi
 
           # Trigger TeamCity build
@@ -235,7 +229,7 @@ jobs:
             -H "Authorization: Bearer $TEAMCITY_TOKEN" \
             -H "Content-Type: application/xml" \
             -H "Accept: application/json" \
-            --data "<build><buildType id=\"$TEAMCITY_BUILD_TYPE\"/><branchName>$BRANCH_NAME</branchName><properties><property name=\"env.GIT_BRANCH\" value=\"$GIT_BRANCH\"/><property name=\"env.GIT_COMMIT\" value=\"$GITHUB_SHA\"/></properties></build>" \
+            --data "<build><buildType id=\"$TEAMCITY_BUILD_TYPE\"/><branchName>$GIT_BRANCH</branchName><properties><property name=\"env.GIT_BRANCH\" value=\"$GIT_BRANCH\"/><property name=\"env.GIT_COMMIT\" value=\"$GITHUB_SHA\"/></properties></build>" \
             "$TEAMCITY_URL/app/rest/buildQueue")
 
           HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
