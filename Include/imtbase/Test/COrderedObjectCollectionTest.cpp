@@ -6,18 +6,18 @@
 #include <QtTest/QtTest>
 
 // ACF includes
-#include <istd/CChangeable.h>
+#include <istd/IChangeable.h>
 #include <istd/TComposedFactory.h>
 
 
 // Simple test data class for the tests
-class CTestData: public istd::CChangeable
+class CTestData: public istd::IChangeable
 {
 public:
 	CTestData() {}
 	virtual ~CTestData() {}
 	
-	virtual int GetSupportedOperations() const override { return OP_CLONE | OP_COPY | OP_COMPARE; }
+	virtual int GetSupportedOperations() const override { return SO_CLONE | SO_COPY | SO_COMPARE; }
 	virtual istd::IChangeableUniquePtr CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override
 	{
 		return istd::IChangeableUniquePtr(new CTestData());
@@ -363,4 +363,3 @@ void COrderedObjectCollectionTest::testSerialization()
 
 
 QTEST_MAIN(COrderedObjectCollectionTest)
-#include "COrderedObjectCollectionTest.moc"
