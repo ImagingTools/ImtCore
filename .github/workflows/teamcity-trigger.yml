@@ -97,17 +97,17 @@ jobs:
               echo "TeamCity branch name: $TEAMCITY_BRANCH"
               echo "TeamCity GIT_BRANCH property: $TC_GIT_BRANCH"
 
-              # Verify the GIT_BRANCH property matches what we sent
-              if [ -n "$TC_GIT_BRANCH" ] && [ "$TC_GIT_BRANCH" = "$GIT_BRANCH" ]; then
+              # Verify the branch name matches what we sent
+              if [ -n "$TEAMCITY_BRANCH" ] && [ "$TEAMCITY_BRANCH" = "$GIT_BRANCH" ]; then
                 echo "✓ Branch verification successful: TeamCity received the correct branch"
-              elif [ -z "$TC_GIT_BRANCH" ]; then
-                echo "⚠ Warning: Could not retrieve env.GIT_BRANCH property from TeamCity"
-                echo "  This might indicate the property was not set or TeamCity hasn't processed it yet"
+              elif [ -z "$TEAMCITY_BRANCH" ]; then
+                echo "⚠ Warning: Could not retrieve branchName from TeamCity"
+                echo "  This might indicate the branch was not set or TeamCity hasn't processed it yet"
                 echo "  Requested: $GIT_BRANCH"
               else
                 echo "✗ Branch verification failed: Mismatch detected"
                 echo "  Expected: $GIT_BRANCH"
-                echo "  Got: $TC_GIT_BRANCH"
+                echo "  Got: $TEAMCITY_BRANCH"
                 exit 1
               fi
             else
@@ -271,17 +271,17 @@ jobs:
               echo "TeamCity branch name: $TEAMCITY_BRANCH"
               echo "TeamCity GIT_BRANCH property: $TC_GIT_BRANCH"
 
-              # Verify the GIT_BRANCH property matches what we sent
-              if [ -n "$TC_GIT_BRANCH" ] && [ "$TC_GIT_BRANCH" = "$GIT_BRANCH" ]; then
+              # Verify the branch name matches what we sent
+              if [ -n "$TEAMCITY_BRANCH" ] && [ "$TEAMCITY_BRANCH" = "$GIT_BRANCH" ]; then
                 echo "✓ Branch verification successful: TeamCity received the correct branch"
-              elif [ -z "$TC_GIT_BRANCH" ]; then
-                echo "⚠ Warning: Could not retrieve env.GIT_BRANCH property from TeamCity"
-                echo "  This might indicate the property was not set or TeamCity hasn't processed it yet"
+              elif [ -z "$TEAMCITY_BRANCH" ]; then
+                echo "⚠ Warning: Could not retrieve branchName from TeamCity"
+                echo "  This might indicate the branch was not set or TeamCity hasn't processed it yet"
                 echo "  Requested: $GIT_BRANCH"
               else
                 echo "✗ Branch verification failed: Mismatch detected"
                 echo "  Expected: $GIT_BRANCH"
-                echo "  Got: $TC_GIT_BRANCH"
+                echo "  Got: $TEAMCITY_BRANCH"
                 exit 1
               fi
             else
