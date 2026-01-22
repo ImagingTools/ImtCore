@@ -597,7 +597,11 @@ void COrderedObjectCollectionProxy::SynchronizeOrder() const
 	
 	// Use QSet for O(1) lookups instead of O(n) contains()
 #if QT_VERSION < 0x050E00  // Qt 5.14
-	const QSet<QByteArray> collectionIdsSet = collectionIds.toList().toSet();
+	QSet<QByteArray> collectionIdsSet;
+	collectionIdsSet.reserve(collectionIds.size());
+	for (const auto& id : collectionIds){
+		collectionIdsSet.insert(id);
+	}
 #else
 	const QSet<QByteArray> collectionIdsSet(collectionIds.begin(), collectionIds.end());
 #endif
@@ -613,7 +617,11 @@ void COrderedObjectCollectionProxy::SynchronizeOrder() const
 
 	// Use QSet for O(1) lookups of items already in new order
 #if QT_VERSION < 0x050E00  // Qt 5.14
-	const QSet<QByteArray> newOrderSet = newOrder.toList().toSet();
+	QSet<QByteArray> newOrderSet;
+	newOrderSet.reserve(newOrder.size());
+	for (const auto& id : newOrder){
+		newOrderSet.insert(id);
+	}
 #else
 	const QSet<QByteArray> newOrderSet(newOrder.begin(), newOrder.end());
 #endif
@@ -640,7 +648,11 @@ Ids COrderedObjectCollectionProxy::ApplyCustomOrder(const Ids& ids) const
 	
 	// Use QSet for O(1) lookups instead of O(n) contains()
 #if QT_VERSION < 0x050E00  // Qt 5.14
-	const QSet<QByteArray> idsSet = ids.toList().toSet();
+	QSet<QByteArray> idsSet;
+	idsSet.reserve(ids.size());
+	for (const auto& id : ids){
+		idsSet.insert(id);
+	}
 #else
 	const QSet<QByteArray> idsSet(ids.begin(), ids.end());
 #endif
@@ -654,7 +666,11 @@ Ids COrderedObjectCollectionProxy::ApplyCustomOrder(const Ids& ids) const
 
 	// Use QSet for O(1) lookups of items already in ordered list
 #if QT_VERSION < 0x050E00  // Qt 5.14
-	const QSet<QByteArray> orderedIdsSet = orderedIds.toList().toSet();
+	QSet<QByteArray> orderedIdsSet;
+	orderedIdsSet.reserve(orderedIds.size());
+	for (const auto& id : orderedIds){
+		orderedIdsSet.insert(id);
+	}
 #else
 	const QSet<QByteArray> orderedIdsSet(orderedIds.begin(), orderedIds.end());
 #endif
