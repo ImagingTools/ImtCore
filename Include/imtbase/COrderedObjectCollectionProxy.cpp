@@ -320,8 +320,9 @@ IObjectCollectionUniquePtr COrderedObjectCollectionProxy::CreateSubCollection(
 	// Create a proxy around a subcollection
 	IObjectCollectionUniquePtr subCollection = m_collectionPtr->CreateSubCollection(offset, count, selectionParamsPtr);
 	if (subCollection){
-		// Use the owning constructor so the proxy takes ownership of the subcollection
-		COrderedObjectCollectionProxy* proxyPtr = new COrderedObjectCollectionProxy(std::move(subCollection));
+		// Release ownership from the smart pointer and pass to the proxy's owning constructor
+		IObjectCollection* subCollectionPtr = subCollection.Release();
+		COrderedObjectCollectionProxy* proxyPtr = new COrderedObjectCollectionProxy(subCollectionPtr, true);
 		// Copy the ordering state using the dedicated method
 		proxyPtr->CopyOrderingState(*this);
 		return IObjectCollectionUniquePtr(proxyPtr);
@@ -576,7 +577,7 @@ bool COrderedObjectCollectionProxy::ResetData(CompatibilityMode mode)
 
 // private methods
 
-Ids COrderedObjectCollectionProxy::GetCollectionElementIds() const
+imtbase::Ids COrderedObjectCollectionProxy::GetCollectionElementIds() const
 {
 	if (!m_collectionPtr.IsValid()){
 		return Ids();
