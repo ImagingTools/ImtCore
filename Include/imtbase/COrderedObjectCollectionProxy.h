@@ -45,6 +45,9 @@ public:
 	*/
 	explicit COrderedObjectCollectionProxy(IObjectCollection* collectionPtr, bool takeOwnership = false);
 	
+	COrderedObjectCollectionProxy(IObjectCollectionUniquePtr&& collectionPtr);
+	COrderedObjectCollectionProxy(const istd::TOptInterfacePtr<IObjectCollection>& collectionPtr);
+
 	virtual ~COrderedObjectCollectionProxy();
 
 	// reimplemented (IOrderedObjectCollection)
