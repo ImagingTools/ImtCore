@@ -6,6 +6,7 @@
 #include <QtCore/QSet>
 
 // ACF includes
+#include <istd/TOptInterfacePtr.h>
 #include <imod/CModelUpdateBridge.h>
 
 // ImtCore includes

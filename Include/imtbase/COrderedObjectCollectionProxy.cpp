@@ -385,7 +385,7 @@ int COrderedObjectCollectionProxy::GetElementsCount(
 }
 
 
-Ids COrderedObjectCollectionProxy::GetElementIds(
+imtbase::Ids COrderedObjectCollectionProxy::GetElementIds(
 			int offset,
 			int count,
 			const iprm::IParamsSet* selectionParamsPtr,
