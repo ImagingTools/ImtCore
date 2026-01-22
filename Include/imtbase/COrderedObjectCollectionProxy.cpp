@@ -27,13 +27,29 @@ COrderedObjectCollectionProxy::COrderedObjectCollectionProxy(IObjectCollection* 
 	Q_ASSERT(collectionPtr != nullptr);
 	
 	if (takeOwnership) {
-		m_collectionPtr.Attach(collectionPtr, true);
+		m_collectionPtr.AdoptRawPtr(collectionPtr);
 	}
 	else {
-		m_collectionPtr.Attach(collectionPtr, false);
+		m_collectionPtr.SetUnmanagedPtr(collectionPtr);
 	}
 	
 	AttachCollectionObserver();
+}
+
+
+COrderedObjectCollectionProxy::COrderedObjectCollectionProxy(IObjectCollectionUniquePtr&& collectionPtr)
+	:m_updateBridge(this, imod::CModelUpdateBridge::UF_SOURCE),
+	m_hasCustomOrder(false)
+{
+	m_collectionPtr.TakeOver(collectionPtr);
+}
+
+
+COrderedObjectCollectionProxy::COrderedObjectCollectionProxy(const istd::TOptInterfacePtr<IObjectCollection>& collectionPtr)
+	:m_updateBridge(this, imod::CModelUpdateBridge::UF_SOURCE),
+	m_hasCustomOrder(false)
+{
+	m_collectionPtr = collectionPtr;
 }
 
 
@@ -66,8 +82,7 @@ bool COrderedObjectCollectionProxy::SetItemOrder(const Id& itemId, int position)
 	}
 
 	// Notify change before modifying data
-	istd::IChangeable::ChangeSet changeSet(CF_CHANGED);
-	istd::CChangeNotifier changeNotifier(this, &changeSet);
+	istd::CChangeNotifier changeNotifier(this);
 
 	// Remove from current position
 	m_customOrder.remove(currentIndex);
@@ -114,10 +129,7 @@ bool COrderedObjectCollectionProxy::SetItemsOrder(const Ids& orderedIds)
 	
 	// Note: This method allows setting a partial order (subset of items).
 	// Any items not in orderedIds will be appended at the end when retrieved.
-
-	// Notify change before modifying data
-	istd::IChangeable::ChangeSet changeSet(CF_CHANGED);
-	istd::CChangeNotifier changeNotifier(this, &changeSet);
+	istd::CChangeNotifier changeNotifier(this);
 
 	// Set the new order
 	m_customOrder = orderedIds;
@@ -127,7 +139,7 @@ bool COrderedObjectCollectionProxy::SetItemsOrder(const Ids& orderedIds)
 }
 
 
-Ids COrderedObjectCollectionProxy::GetOrderedItemIds() const
+imtbase::ICollectionInfo::Ids COrderedObjectCollectionProxy::GetOrderedItemIds() const
 {
 	if (m_hasCustomOrder){
 		// Synchronize to ensure we have current items
@@ -145,9 +157,7 @@ bool COrderedObjectCollectionProxy::ResetItemOrder()
 		return true;
 	}
 
-	// Notify change before modifying data
-	istd::IChangeable::ChangeSet changeSet(CF_CHANGED);
-	istd::CChangeNotifier changeNotifier(this, &changeSet);
+	istd::CChangeNotifier changeNotifier(this);
 
 	m_customOrder.clear();
 	m_hasCustomOrder = false;
@@ -319,13 +329,16 @@ IObjectCollectionUniquePtr COrderedObjectCollectionProxy::CreateSubCollection(
 	}
 	// Create a proxy around a subcollection
 	IObjectCollectionUniquePtr subCollection = m_collectionPtr->CreateSubCollection(offset, count, selectionParamsPtr);
-	if (subCollection){
+	if (subCollection.IsValid()){
 		// Release ownership from the smart pointer and pass to the proxy's owning constructor
-		IObjectCollection* subCollectionPtr = subCollection.Release();
-		COrderedObjectCollectionProxy* proxyPtr = new COrderedObjectCollectionProxy(subCollectionPtr, true);
+		COrderedObjectCollectionProxy* proxyPtr = new COrderedObjectCollectionProxy(std::move(subCollection));
+
 		// Copy the ordering state using the dedicated method
 		proxyPtr->CopyOrderingState(*this);
-		return IObjectCollectionUniquePtr(proxyPtr);
+
+		IObjectCollectionUniquePtr retVal;
+		retVal.SetPtr(proxyPtr);
+		return proxyPtr;
 	}
 	return IObjectCollectionUniquePtr();
 }
@@ -386,7 +399,7 @@ int COrderedObjectCollectionProxy::GetElementsCount(
 }
 
 
-imtbase::Ids COrderedObjectCollectionProxy::GetElementIds(
+imtbase::ICollectionInfo::Ids COrderedObjectCollectionProxy::GetElementIds(
 			int offset,
 			int count,
 			const iprm::IParamsSet* selectionParamsPtr,
@@ -529,7 +542,7 @@ int COrderedObjectCollectionProxy::GetSupportedOperations() const
 }
 
 
-bool COrderedObjectCollectionProxy::CopyFrom(const IChangeable& object, CompatibilityMode mode)
+bool COrderedObjectCollectionProxy::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
 	const COrderedObjectCollectionProxy* otherPtr = dynamic_cast<const COrderedObjectCollectionProxy*>(&object);
 	if (otherPtr != nullptr){
@@ -551,7 +564,7 @@ bool COrderedObjectCollectionProxy::IsEqual(const IChangeable& object) const
 }
 
 
-istd::IChangeableUniquePtr COrderedObjectCollectionProxy::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr COrderedObjectCollectionProxy::CloneMe(CompatibilityMode /*mode*/) const
 {
 	if (!m_collectionPtr.IsValid()){
 		return istd::IChangeableUniquePtr();
@@ -560,24 +573,28 @@ istd::IChangeableUniquePtr COrderedObjectCollectionProxy::CloneMe(CompatibilityM
 	// Note: The clone always creates a non-owning proxy that shares the same collection pointer.
 	// This is intentional for the proxy pattern, where clones manage ordering independently
 	// but delegate data operations to the same collection.
-	COrderedObjectCollectionProxy* clonePtr = new COrderedObjectCollectionProxy(m_collectionPtr.GetPtr(), false);
+	COrderedObjectCollectionProxy* clonePtr = new COrderedObjectCollectionProxy(m_collectionPtr);
 	clonePtr->m_customOrder = m_customOrder;
 	clonePtr->m_hasCustomOrder = m_hasCustomOrder;
+
 	return istd::IChangeableUniquePtr(clonePtr);
 }
 
 
-bool COrderedObjectCollectionProxy::ResetData(CompatibilityMode mode)
+bool COrderedObjectCollectionProxy::ResetData(CompatibilityMode /*mode*/)
 {
+	istd::CChangeNotifier changeNotifier(this);
+
 	m_customOrder.clear();
 	m_hasCustomOrder = false;
+
 	return true;
 }
 
 
 // private methods
 
-imtbase::Ids COrderedObjectCollectionProxy::GetCollectionElementIds() const
+imtbase::ICollectionInfo::Ids COrderedObjectCollectionProxy::GetCollectionElementIds() const
 {
 	if (!m_collectionPtr.IsValid()){
 		return Ids();
@@ -621,7 +638,7 @@ void COrderedObjectCollectionProxy::SynchronizeOrder() const
 }
 
 
-Ids COrderedObjectCollectionProxy::ApplyCustomOrder(const Ids& ids) const
+imtbase::ICollectionInfo::Ids COrderedObjectCollectionProxy::ApplyCustomOrder(const Ids& ids) const
 {
 	if (!m_hasCustomOrder || m_customOrder.isEmpty()){
 		return ids;

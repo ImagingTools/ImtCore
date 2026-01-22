@@ -237,6 +237,8 @@ bool CJobTicket::Serialize(iser::IArchive& archive)
 
 bool CJobTicket::CopyFrom(const IChangeable &object, CompatibilityMode mode)
 {
+	Q_UNUSED(mode);
+
 	const CJobTicket* sourcePtr = dynamic_cast<const CJobTicket*>(&object);
 	if (sourcePtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);
