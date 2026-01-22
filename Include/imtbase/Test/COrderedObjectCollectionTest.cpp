@@ -8,6 +8,7 @@
 // ACF includes
 #include <istd/IChangeable.h>
 #include <istd/TComposedFactory.h>
+#include <istd/TSingleFactory.h>
 
 
 // Simple test data class for the tests
@@ -58,9 +59,10 @@ void COrderedObjectCollectionTest::testSetItemOrder()
 	// Create a base collection
 	imtbase::CObjectCollection baseCollection;
 	baseCollection.SetOperationFlags(imtbase::IObjectCollection::OF_ALL);
-	
+
+	typedef istd::TSingleFactory<istd::IChangeable, CTestData> TestDataImpl;
 	// Register factory for test data type
-	baseCollection.RegisterFactory<CTestData>("TestType");
+	baseCollection.RegisterFactory<TestDataImpl>("TestType");
 
 	// Add some items
 	const QByteArray id1 = baseCollection.InsertNewObject("TestType", "Item1", "Description1");
@@ -95,9 +97,10 @@ void COrderedObjectCollectionTest::testGetItemOrder()
 	// Create a base collection
 	imtbase::CObjectCollection baseCollection;
 	baseCollection.SetOperationFlags(imtbase::IObjectCollection::OF_ALL);
-	
+
+	typedef istd::TSingleFactory<istd::IChangeable, CTestData> TestDataImpl;
 	// Register factory for test data type
-	baseCollection.RegisterFactory<CTestData>("TestType");
+	baseCollection.RegisterFactory<TestDataImpl>("TestType");
 
 	// Add some items
 	const QByteArray id1 = baseCollection.InsertNewObject("TestType", "Item1", "Description1");
@@ -130,9 +133,10 @@ void COrderedObjectCollectionTest::testSetItemsOrder()
 	// Create a base collection
 	imtbase::CObjectCollection baseCollection;
 	baseCollection.SetOperationFlags(imtbase::IObjectCollection::OF_ALL);
-	
+
+	typedef istd::TSingleFactory<istd::IChangeable, CTestData> TestDataImpl;
 	// Register factory for test data type
-	baseCollection.RegisterFactory<CTestData>("TestType");
+	baseCollection.RegisterFactory<TestDataImpl>("TestType");
 
 	// Add some items
 	const QByteArray id1 = baseCollection.InsertNewObject("TestType", "Item1", "Description1");
@@ -168,9 +172,10 @@ void COrderedObjectCollectionTest::testResetItemOrder()
 	// Create a base collection
 	imtbase::CObjectCollection baseCollection;
 	baseCollection.SetOperationFlags(imtbase::IObjectCollection::OF_ALL);
-	
+
+	typedef istd::TSingleFactory<istd::IChangeable, CTestData> TestDataImpl;
 	// Register factory for test data type
-	baseCollection.RegisterFactory<CTestData>("TestType");
+	baseCollection.RegisterFactory<TestDataImpl>("TestType");
 
 	// Add some items
 	const QByteArray id1 = baseCollection.InsertNewObject("TestType", "Item1", "Description1");
@@ -204,9 +209,11 @@ void COrderedObjectCollectionTest::testInsertNewItem()
 	// Create a base collection
 	imtbase::CObjectCollection baseCollection;
 	baseCollection.SetOperationFlags(imtbase::IObjectCollection::OF_ALL);
-	
+
+	typedef istd::TSingleFactory<istd::IChangeable, CTestData> TestDataImpl;
+
 	// Register factory for test data type
-	baseCollection.RegisterFactory<CTestData>("TestType");
+	baseCollection.RegisterFactory<TestDataImpl>("TestType");
 
 	// Add initial items
 	const QByteArray id1 = baseCollection.InsertNewObject("TestType", "Item1", "Description1");
@@ -234,9 +241,11 @@ void COrderedObjectCollectionTest::testRemoveItem()
 	// Create a base collection
 	imtbase::CObjectCollection baseCollection;
 	baseCollection.SetOperationFlags(imtbase::IObjectCollection::OF_ALL);
-	
+
+	typedef istd::TSingleFactory<istd::IChangeable, CTestData> TestDataImpl;
+
 	// Register factory for test data type
-	baseCollection.RegisterFactory<CTestData>("TestType");
+	baseCollection.RegisterFactory<TestDataImpl>("TestType");
 
 	// Add items
 	const QByteArray id1 = baseCollection.InsertNewObject("TestType", "Item1", "Description1");
@@ -269,9 +278,11 @@ void COrderedObjectCollectionTest::testGetOrderedItemIds()
 	// Create a base collection
 	imtbase::CObjectCollection baseCollection;
 	baseCollection.SetOperationFlags(imtbase::IObjectCollection::OF_ALL);
-	
+
+	typedef istd::TSingleFactory<istd::IChangeable, CTestData> TestDataImpl;
+
 	// Register factory for test data type
-	baseCollection.RegisterFactory<CTestData>("TestType");
+	baseCollection.RegisterFactory<TestDataImpl>("TestType");
 
 	// Add items
 	const QByteArray id1 = baseCollection.InsertNewObject("TestType", "Item1", "Description1");
@@ -303,9 +314,11 @@ void COrderedObjectCollectionTest::testDelegatedOperations()
 	// Create a base collection
 	imtbase::CObjectCollection baseCollection;
 	baseCollection.SetOperationFlags(imtbase::IObjectCollection::OF_ALL);
-	
+
+	typedef istd::TSingleFactory<istd::IChangeable, CTestData> TestDataImpl;
+
 	// Register factory for test data type
-	baseCollection.RegisterFactory<CTestData>("TestType");
+	baseCollection.RegisterFactory<TestDataImpl>("TestType");
 
 	// Add items
 	const QByteArray id1 = baseCollection.InsertNewObject("TestType", "Item1", "Description1");
@@ -334,9 +347,11 @@ void COrderedObjectCollectionTest::testSerialization()
 	// Create a base collection
 	imtbase::CObjectCollection baseCollection;
 	baseCollection.SetOperationFlags(imtbase::IObjectCollection::OF_ALL);
-	
+
+	typedef istd::TSingleFactory<istd::IChangeable, CTestData> TestDataImpl;
+
 	// Register factory for test data type
-	baseCollection.RegisterFactory<CTestData>("TestType");
+	baseCollection.RegisterFactory<TestDataImpl>("TestType");
 
 	// Add items
 	const QByteArray id1 = baseCollection.InsertNewObject("TestType", "Item1", "Description1");
@@ -362,4 +377,4 @@ void COrderedObjectCollectionTest::testSerialization()
 }
 
 
-QTEST_MAIN(COrderedObjectCollectionTest)
+// QTEST_MAIN(COrderedObjectCollectionTest)
