@@ -1,3 +1,4 @@
+#include "imthype/IJobOutput.h"
 #include <imthype/CJobTicketDatabaseDelegateComp.h>
 
 
@@ -117,7 +118,7 @@ istd::IChangeableUniquePtr CJobTicketDatabaseDelegateComp::CreateObjectFromRecor
 	}
 
 	istd::IChangeableUniquePtr retVal;
-	retVal.MoveCastedPtr<IJobTicket>(jobTicketPtr);
+	retVal.MoveCastedPtr<IJobTicket>(jobTicketPtr.GetPtr());
 
 	return retVal;
 }
