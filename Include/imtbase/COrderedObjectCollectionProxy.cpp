@@ -27,10 +27,10 @@ COrderedObjectCollectionProxy::COrderedObjectCollectionProxy(IObjectCollection* 
 	Q_ASSERT(collectionPtr != nullptr);
 	
 	if (takeOwnership) {
-		m_collectionPtr.TakeOver(collectionPtr);
+		m_collectionPtr.Attach(collectionPtr, true);
 	}
 	else {
-		m_collectionPtr = collectionPtr;
+		m_collectionPtr.Attach(collectionPtr, false);
 	}
 	
 	AttachCollectionObserver();
