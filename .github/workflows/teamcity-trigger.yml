@@ -97,7 +97,7 @@ jobs:
               echo "TeamCity branch name: $TEAMCITY_BRANCH"
               echo "TeamCity GIT_BRANCH property: $TC_GIT_BRANCH"
 
-              # Verify both the branch name and GIT_BRANCH property match what we sent
+              # Verify the branch name matches what we sent
               if [ -n "$TEAMCITY_BRANCH" ] && [ "$TEAMCITY_BRANCH" = "$GIT_BRANCH" ]; then
                 echo "✓ Branch verification successful: TeamCity received the correct branch"
               elif [ -z "$TEAMCITY_BRANCH" ]; then
@@ -271,7 +271,7 @@ jobs:
               echo "TeamCity branch name: $TEAMCITY_BRANCH"
               echo "TeamCity GIT_BRANCH property: $TC_GIT_BRANCH"
 
-              # Verify both the branch name and GIT_BRANCH property match what we sent
+              # Verify the branch name matches what we sent
               if [ -n "$TEAMCITY_BRANCH" ] && [ "$TEAMCITY_BRANCH" = "$GIT_BRANCH" ]; then
                 echo "✓ Branch verification successful: TeamCity received the correct branch"
               elif [ -z "$TEAMCITY_BRANCH" ]; then
