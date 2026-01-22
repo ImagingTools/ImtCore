@@ -596,7 +596,11 @@ void COrderedObjectCollectionProxy::SynchronizeOrder() const
 	const Ids collectionIds = GetCollectionElementIds();
 	
 	// Use QSet for O(1) lookups instead of O(n) contains()
+#if QT_VERSION < 0x050E00  // Qt 5.14
+	const QSet<QByteArray> collectionIdsSet = QSet<QByteArray>(collectionIds.toList().toSet());
+#else
 	const QSet<QByteArray> collectionIdsSet(collectionIds.begin(), collectionIds.end());
+#endif
 
 	// Remove items that no longer exist in collection
 	QVector<QByteArray> newOrder;
@@ -608,7 +612,11 @@ void COrderedObjectCollectionProxy::SynchronizeOrder() const
 	}
 
 	// Use QSet for O(1) lookups of items already in new order
+#if QT_VERSION < 0x050E00  // Qt 5.14
+	const QSet<QByteArray> newOrderSet = QSet<QByteArray>(newOrder.toList().toSet());
+#else
 	const QSet<QByteArray> newOrderSet(newOrder.begin(), newOrder.end());
+#endif
 	
 	// Add any new items from collection that aren't in custom order
 	for (const QByteArray& id : collectionIds){
@@ -631,7 +639,11 @@ Ids COrderedObjectCollectionProxy::ApplyCustomOrder(const Ids& ids) const
 	orderedIds.reserve(ids.size());
 	
 	// Use QSet for O(1) lookups instead of O(n) contains()
+#if QT_VERSION < 0x050E00  // Qt 5.14
+	const QSet<QByteArray> idsSet = QSet<QByteArray>(ids.toList().toSet());
+#else
 	const QSet<QByteArray> idsSet(ids.begin(), ids.end());
+#endif
 
 	// Add items in custom order
 	for (const QByteArray& id : m_customOrder){
@@ -641,7 +653,11 @@ Ids COrderedObjectCollectionProxy::ApplyCustomOrder(const Ids& ids) const
 	}
 
 	// Use QSet for O(1) lookups of items already in ordered list
+#if QT_VERSION < 0x050E00  // Qt 5.14
+	const QSet<QByteArray> orderedIdsSet = QSet<QByteArray>(orderedIds.toList().toSet());
+#else
 	const QSet<QByteArray> orderedIdsSet(orderedIds.begin(), orderedIds.end());
+#endif
 	
 	// Add any items not in custom order at the end
 	for (const QByteArray& id : ids){
