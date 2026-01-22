@@ -510,7 +510,7 @@ bool COrderedObjectCollectionProxy::Serialize(iser::IArchive& archive)
 			retVal = retVal && archive.EndTag(itemIdTag);
 		}
 
-		retVal = retVal && archive.EndMultiTag(customOrderTag);
+		retVal = retVal && archive.EndTag(customOrderTag);
 	}
 	else if (!archive.IsStoring()){
 		// Clear custom order when loading and flag is false
