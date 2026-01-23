@@ -5,10 +5,12 @@ include($(ACFCONFIGDIR)/QMake/QtBaseConfig.pri)
 include($$PWD/../../../Config/QMake/ImtCore.pri)
 
 CONFIG += network websockets
+QT += websockets
 
-LIBS += -L../../../Lib/$$COMPILER_DIR -limtbase -limtcom -limthttp
-LIBS += -L$$(ACFSLNDIR)/Lib/$$COMPILER_DIR -liproc
+LIBS += -L../../../Lib/$$COMPILER_DIR -limtbase -limthttp -limtrepo -limtcom -limtbasesdl
+LIBS += -L$$(ACFSLNDIR)/Lib/$$COMPILER_DIR -liproc -lidoc -listd
 
+include($(ACFCONFIGDIR)/QMake/AcfQt.pri)
 include($(ACFCONFIGDIR)/QMake/AcfStd.pri)
 
 # Set OS-specific build options:

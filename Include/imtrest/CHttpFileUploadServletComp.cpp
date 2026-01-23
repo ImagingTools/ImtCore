@@ -5,7 +5,7 @@
 #include <QtCore/QRegularExpression>
 
 // ImtCore includes
-#include <imtrest/IProtocolEngine.h>
+#include <imthttp/IProtocolEngine.h>
 
 
 namespace imtrest
@@ -20,15 +20,15 @@ QByteArray CHttpFileUploadServletComp::s_octetStreamTypeId = QByteArrayLiteral("
 
 // reimplemented (CHttpServletCompBase)
 
-ConstResponsePtr CHttpFileUploadServletComp::OnPut(
+imthttp::ConstResponsePtr CHttpFileUploadServletComp::OnPut(
 			const QByteArray& /*commandId*/,
-			const IRequest::CommandParams& /*commandParams*/,
+			const imthttp::IRequest::CommandParams& /*commandParams*/,
 			const HeadersMap& headers,
-			const CHttpRequest& request) const
+			const imthttp::CHttpRequest& request) const
 {
 	Q_ASSERT(m_fileUploadHandlerPtr.IsValid());
 
-	ConstResponsePtr retVal;
+	imthttp::ConstResponsePtr retVal;
 
 	if (!m_fileUploadHandlerPtr.IsValid()){
 		retVal = CreateResponse(
@@ -171,7 +171,7 @@ CHttpFileUploadServletComp::RangeData CHttpFileUploadServletComp::GetRangeDataFr
 }
 
 
-CHttpResponse::Headers CHttpFileUploadServletComp::GetRequestHeaders(const CHttpRequest& request) const
+CHttpResponse::Headers CHttpFileUploadServletComp::GetRequestHeaders(const imthttp::CHttpRequest& request) const
 {
 	CHttpResponse::Headers headers;
 
@@ -183,8 +183,8 @@ CHttpResponse::Headers CHttpFileUploadServletComp::GetRequestHeaders(const CHttp
 }
 
 
-ConstResponsePtr CHttpFileUploadServletComp::CreateResponse(
-			const IRequest& request,
+imthttp::ConstResponsePtr CHttpFileUploadServletComp::CreateResponse(
+			const imthttp::IRequest& request,
 			int statusCode,
 			const CHttpResponse::Headers& headers,
 			const QByteArray& data,
@@ -192,7 +192,7 @@ ConstResponsePtr CHttpFileUploadServletComp::CreateResponse(
 {
 	const IProtocolEngine& engine = request.GetProtocolEngine();
 
-	ConstResponsePtr responsePtr(engine.CreateResponse(
+	imthttp::ConstResponsePtr responsePtr(engine.CreateResponse(
 		request,
 		statusCode,
 		data,

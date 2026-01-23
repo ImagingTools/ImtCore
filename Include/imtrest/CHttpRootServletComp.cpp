@@ -9,12 +9,12 @@
 #include "zlib.h"
 
 // ImtCore includes
-#include <imtrest/IRequest.h>
+#include <imthttp/IRequest.h>
 #include <imtrest/ISender.h>
-#include <imtrest/IResponse.h>
-#include <imtrest/IProtocolEngine.h>
+#include <imthttp/IResponse.h>
+#include <imthttp/IProtocolEngine.h>
 #include <imtrest/CHttpResponse.h>
-#include <imtrest/CHttpRequest.h>
+#include <imthttp/CHttpRequest.h>
 
 
 namespace imtrest
@@ -31,7 +31,7 @@ bool CHttpRootServletComp::IsCommandSupported(const QByteArray& commandId) const
 }
 
 
-imtrest::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRequest& request, const QByteArray& /*subCommandId*/) const
+imtrest::imthttp::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const imthttp::IRequest& request, const QByteArray& /*subCommandId*/) const
 {
 	QByteArray commandId = request.GetCommandId();
 	if (commandId.startsWith('/')){
@@ -46,7 +46,7 @@ imtrest::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRequest& r
 
 	const IRequestServlet* handlerPtr = FindRequestHandler(commandId);
 	if (handlerPtr != nullptr){
-		ConstResponsePtr responsePtr = handlerPtr->ProcessRequest(request, commandId);
+		imthttp::ConstResponsePtr responsePtr = handlerPtr->ProcessRequest(request, commandId);
 		const CHttpResponse* httpResponseConstPtr = dynamic_cast<const CHttpResponse*>(responsePtr.GetPtr());
 		CHttpResponse* httpResponsePtr = dynamic_cast<CHttpResponse*>(const_cast<CHttpResponse*>(httpResponseConstPtr));
 
@@ -69,7 +69,7 @@ imtrest::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRequest& r
 				QByteArray qData = qCompress(data, 8);
 				qData.remove(0, 4);
 				httpResponsePtr->SetData(qData);
-				IResponse::Headers headers = responsePtr->GetHeaders();
+				imthttp::IResponse::Headers headers = responsePtr->GetHeaders();
 				headers.insert("content-encoding", "deflate");
 				httpResponsePtr->SetHeaders(headers);
 			}
@@ -94,7 +94,7 @@ imtrest::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRequest& r
 				datastream << crc;
 				datastream << qData.length();
 				httpResponsePtr->SetData(outData);
-				IResponse::Headers headers = responsePtr->GetHeaders();
+				imthttp::IResponse::Headers headers = responsePtr->GetHeaders();
 				headers.insert("content-encoding", "gzip");
 				httpResponsePtr->SetHeaders(headers);
 			}
@@ -106,7 +106,7 @@ imtrest::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRequest& r
 		QByteArray body = QByteArray("<html><head><title>Error</title></head><body><p>Empty command-ID</p></body></html>");
 		QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
 
-		ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId).PopInterfacePtr());
+		imthttp::ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId).PopInterfacePtr());
 
 		return responsePtr;
 	}
@@ -116,7 +116,7 @@ imtrest::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRequest& r
 		QByteArray body = QString("<html><head><title>Error</title></head><body><p>The requested command could not be executed. No servlet was found for the given command: '%1'</p></body></html>").arg(qPrintable(commandIdSafe)).toUtf8();
 		QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
 
-		ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId).PopInterfacePtr());
+		imthttp::ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId).PopInterfacePtr());
 
 		SendErrorMessage(0, QString("No request handler found for: '%1'").arg(qPrintable(commandId)));
 

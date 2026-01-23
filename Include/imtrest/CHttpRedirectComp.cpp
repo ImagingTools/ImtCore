@@ -2,9 +2,9 @@
 
 
 // ImtCore includes
-#include <imtrest/CHttpRequest.h>
+#include <imthttp/CHttpRequest.h>
 #include <imtrest/CHttpResponse.h>
-#include <imtrest/IProtocolEngine.h>
+#include <imthttp/IProtocolEngine.h>
 
 
 namespace imtrest
@@ -19,7 +19,7 @@ bool CHttpRedirectComp::IsCommandSupported(const QByteArray& commandId) const
 }
 
 
-ConstResponsePtr CHttpRedirectComp::ProcessRequest(const IRequest& request, const QByteArray& /*subCommandId*/) const
+imthttp::ConstResponsePtr CHttpRedirectComp::ProcessRequest(const imthttp::IRequest& request, const QByteArray& /*subCommandId*/) const
 {
 	QByteArray commandId = request.GetCommandId();
 	if (commandId.startsWith('/')){
@@ -36,7 +36,7 @@ ConstResponsePtr CHttpRedirectComp::ProcessRequest(const IRequest& request, cons
 		body.append(*m_redirectToCommandIdAttrPtr);
 		body.append(R"(" /></head>)");
 
-		ConstResponsePtr retval = ConstResponsePtr(request.GetProtocolEngine()
+		imthttp::ConstResponsePtr retval = ConstResponsePtr(request.GetProtocolEngine()
 			.CreateResponse(
 				request,
 				IProtocolEngine::SC_MOVED_PERMANENTLY,
@@ -46,7 +46,7 @@ ConstResponsePtr CHttpRedirectComp::ProcessRequest(const IRequest& request, cons
 		return retval;
 	}
 
-	ConstResponsePtr retval = ConstResponsePtr(request.GetProtocolEngine()
+	imthttp::ConstResponsePtr retval = ConstResponsePtr(request.GetProtocolEngine()
 		.CreateResponse(
 			request,
 			IProtocolEngine::SC_NOT_FOUND,

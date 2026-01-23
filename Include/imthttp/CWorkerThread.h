@@ -1,0 +1,62 @@
+#pragma once
+
+
+// Qt includes
+#include <QtCore/QThread>
+
+// ACF includes
+#include <istd/TDelPtr.h>
+
+// ImtCore includes
+#include <imthttp/IRequest.h>
+#include <imthttp/ISender.h>
+#include <imthttp/CWorker.h>
+
+
+namespace imthttp
+{
+
+class CWorkerManagerComp;
+
+
+class CWorkerThread: public QThread
+{
+	Q_OBJECT
+public:
+	CWorkerThread(const CWorkerManagerComp* workerManager, const QByteArray& subCommandId);
+
+	enum Status
+	{
+		ST_PROCESS,
+		ST_CLOSE
+	};
+
+	Status GetStatus();
+	void SetStatus(Status status);
+	void SetRequestPtr(const IRequest* requestPtr);
+	const ISender* GetSender(const QByteArray& requestId);
+
+	//reimplemented (QThread)
+	virtual void run() override;
+
+Q_SIGNALS:
+	void StartProcess(const IRequest* request, const QByteArray& subCommandId);
+	void FinishProcess(const IRequest* request, const QByteArray& subCommandId);
+
+protected Q_SLOTS:
+	void OnStarted();
+	void OnFinishProcess(const IRequest* request, const QByteArray& subCommandId);
+
+private:
+	Status m_status;
+	mutable CWorkerManagerComp* m_workerManager;
+	istd::TDelPtr<CWorker> m_workerPtr;
+	const IRequest* m_requestPtr;
+	mutable QMutex m_statusMutex;
+	QByteArray m_subCommandId;
+};
+
+
+} // namespace imthttp
+
+

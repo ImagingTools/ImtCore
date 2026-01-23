@@ -11,8 +11,8 @@
 
 // ImtCore includes
 #include <imtrest/IRequestServlet.h>
-#include <imtrest/IRequest.h>
-#include <imtrest/IProtocolEngine.h>
+#include <imthttp/IRequest.h>
+#include <imthttp/IProtocolEngine.h>
 
 
 namespace imtrest
@@ -217,13 +217,13 @@ bool CHttpHtmlFolderBasedServletComp::IsCommandSupported(const QByteArray& comma
 }
 
 
-ConstResponsePtr CHttpHtmlFolderBasedServletComp::ProcessRequest(const IRequest& request, const QByteArray& /*subCommandId*/) const
+imthttp::ConstResponsePtr CHttpHtmlFolderBasedServletComp::ProcessRequest(const imthttp::IRequest& request, const QByteArray& /*subCommandId*/) const
 {
 	const IProtocolEngine& engine = request.GetProtocolEngine();
 	QByteArray errorBody = "<html><head><title>Error</title></head><body><p>File resource was not found</p></body></html>";
 	QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
 
-	ConstResponsePtr errorResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_RESOURCE_NOT_AVAILABLE, errorBody, reponseTypeId).PopInterfacePtr());
+	imthttp::ConstResponsePtr errorResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_RESOURCE_NOT_AVAILABLE, errorBody, reponseTypeId).PopInterfacePtr());
 
 	auto generateErrorResponsePtr = [&request, &engine, reponseTypeId](QByteArray errorBody){
 		qCritical() << __FILE__ << __LINE__ << "Error occurred" << errorBody;
@@ -299,7 +299,7 @@ ConstResponsePtr CHttpHtmlFolderBasedServletComp::ProcessRequest(const IRequest&
 		destinationFile.close();
 	}
 
-	ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OK, body, reponseTypeId).PopInterfacePtr());
+	imthttp::ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OK, body, reponseTypeId).PopInterfacePtr());
 
 	return responsePtr;
 }

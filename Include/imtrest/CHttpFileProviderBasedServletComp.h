@@ -6,7 +6,7 @@
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
-#include <imtrest/IBinaryDataProvider.h>
+#include <imthttp/IBinaryDataProvider.h>
 #include <imtrest/CHttpServletCompBase.h>
 
 
@@ -34,15 +34,15 @@ public:
 	// reimplemented (IRequestHandler)
 	virtual ConstResponsePtr OnGet(
 				const QByteArray& commandId,
-				const imtrest::IRequest::CommandParams& commandParams,
+				const imthttp::IRequest::CommandParams& commandParams,
 				const HeadersMap& headers,
-				const imtrest::CHttpRequest& request) const override;
+				const imthttp::CHttpRequest& request) const override;
 
 protected:
 	I_ATTR(QString, m_fileIdCommandParamAttrPtr);
 	I_ATTR(QString, m_limitIdCommandParamAttrPtr);
 	I_ATTR(QString, m_offsetIdCommandParamAttrPtr);
-	I_MULTIREF(imtrest::IBinaryDataProvider, m_binaryDataProvidersCompPtr);
+	I_MULTIREF(imthttp::IBinaryDataProvider, m_binaryDataProvidersCompPtr);
 
 private:
 	QByteArray m_beginOfMessage;
