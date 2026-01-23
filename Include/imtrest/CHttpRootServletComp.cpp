@@ -13,7 +13,7 @@
 #include <imtrest/ISender.h>
 #include <imthttp/IResponse.h>
 #include <imthttp/IProtocolEngine.h>
-#include <imtrest/CHttpResponse.h>
+#include <imthttp/CHttpResponse.h>
 #include <imthttp/CHttpRequest.h>
 
 
@@ -47,8 +47,8 @@ imtrest::imthttp::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const im
 	const IRequestServlet* handlerPtr = FindRequestHandler(commandId);
 	if (handlerPtr != nullptr){
 		imthttp::ConstResponsePtr responsePtr = handlerPtr->ProcessRequest(request, commandId);
-		const CHttpResponse* httpResponseConstPtr = dynamic_cast<const CHttpResponse*>(responsePtr.GetPtr());
-		CHttpResponse* httpResponsePtr = dynamic_cast<CHttpResponse*>(const_cast<CHttpResponse*>(httpResponseConstPtr));
+		const imthttp::CHttpResponse* httpResponseConstPtr = dynamic_cast<const imthttp::CHttpResponse*>(responsePtr.GetPtr());
+		imthttp::CHttpResponse* httpResponsePtr = dynamic_cast<imthttp::CHttpResponse*>(const_cast<imthttp::CHttpResponse*>(httpResponseConstPtr));
 
 		if (m_autoCompressionAttrPtr->GetValue() == true && httpResponsePtr != nullptr){
 			EncodingType encodingType = ET_NONE;
@@ -123,7 +123,7 @@ imtrest::imthttp::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const im
 		return responsePtr;
 	}
 
-	return ConstResponsePtr();
+	return imthttp::ConstResponsePtr();
 }
 
 

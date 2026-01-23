@@ -87,7 +87,7 @@ imthttp::ConstResponsePtr CHttpFileProviderBasedServletComp:: OnGet(
 			const QByteArray& /*commandId*/,
 			const imtrest::imthttp::IRequest::CommandParams& commandParams,
 			const HeadersMap& /*headers*/,
-			const imtrest::CHttpRequest& request) const
+			const imthttp::CHttpRequest& request) const
 {
 	const IProtocolEngine& engine = request.GetProtocolEngine();
 	QByteArray errorBody = "<html><head><title>Error</title></head><body><p>File resource was not found</p></body></html>";

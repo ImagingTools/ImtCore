@@ -5,7 +5,7 @@
 #include <imthttp/IRequest.h>
 #include <imthttp/IResponse.h>
 #include <imthttp/IProtocolEngine.h>
-#include <imtrest/CHttpResponse.h>
+#include <imthttp/CHttpResponse.h>
 
 
 namespace imtrest
@@ -16,14 +16,14 @@ namespace imtrest
 
 // reimplemented (IProtocolEngine)
 
-imthttp::ConstResponsePtr CHttpServletCompBase::ProcessRequest(const imtrest::IRequest& request, const QByteArray& /*subCommandId*/) const
+imthttp::ConstResponsePtr CHttpServletCompBase::ProcessRequest(const imthttp::IRequest& request, const QByteArray& /*subCommandId*/) const
 {
-	imtrest::CHttpRequest* httpRequestPtr = dynamic_cast<imtrest::CHttpRequest*>(const_cast<imtrest::IRequest*>(&request));
+	imthttp::CHttpRequest* httpRequestPtr = dynamic_cast<imthttp::CHttpRequest*>(const_cast<imthttp::IRequest*>(&request));
 	if (httpRequestPtr == nullptr){
 		Q_ASSERT_X(false, "CHttpServletCompBase::ProcessRequest", "Invalid request type, a HTTP request was expected");
 		SendErrorMessage(0, QString("Invalid request type, a HTTP request was expected"));
 
-		return ConstResponsePtr();
+		return imthttp::ConstResponsePtr();
 	}
 
 	return OnRequestReceived(*httpRequestPtr);
@@ -76,7 +76,7 @@ bool CHttpServletCompBase::IsCommandSupported(const QByteArray& commandId) const
 
 // protected methods
 
-imthttp::ConstResponsePtr CHttpServletCompBase::OnRequestReceived(const imtrest::CHttpRequest& request) const
+imthttp::ConstResponsePtr CHttpServletCompBase::OnRequestReceived(const imthttp::CHttpRequest& request) const
 {
 	QByteArray commandId;
 	imtrest::imthttp::IRequest::CommandParams commandParams;
@@ -114,7 +114,7 @@ imthttp::ConstResponsePtr CHttpServletCompBase::OnRequestReceived(const imtrest:
 		break;
 	}
 
-	return ConstResponsePtr();
+	return imthttp::ConstResponsePtr();
 }
 
 
@@ -122,7 +122,7 @@ imthttp::ConstResponsePtr CHttpServletCompBase::OnGet(
 			const QByteArray& commandId,
 			const imtrest::imthttp::IRequest::CommandParams& commandParams,
 			const HeadersMap& headers,
-			const imtrest::CHttpRequest& request) const
+			const imthttp::CHttpRequest& request) const
 {
 	Q_UNUSED(commandId);
 	Q_UNUSED(commandParams);
@@ -136,7 +136,7 @@ imthttp::ConstResponsePtr CHttpServletCompBase::OnPost(
 			const QByteArray& commandId,
 			const imtrest::imthttp::IRequest::CommandParams& commandParams,
 			const HeadersMap& headers,
-			const imtrest::CHttpRequest& request) const
+			const imthttp::CHttpRequest& request) const
 {
 	Q_UNUSED(commandId);
 	Q_UNUSED(commandParams);
@@ -150,7 +150,7 @@ imthttp::ConstResponsePtr CHttpServletCompBase::OnDelete(
 			const QByteArray& commandId,
 			const imtrest::imthttp::IRequest::CommandParams& commandParams,
 			const HeadersMap& headers,
-			const imtrest::CHttpRequest& request) const
+			const imthttp::CHttpRequest& request) const
 {
 	Q_UNUSED(commandId);
 	Q_UNUSED(commandParams);
@@ -164,7 +164,7 @@ imthttp::ConstResponsePtr CHttpServletCompBase::OnPatch(
 			const QByteArray& commandId,
 			const imtrest::imthttp::IRequest::CommandParams& commandParams,
 			const HeadersMap& headers,
-			const imtrest::CHttpRequest& request) const
+			const imthttp::CHttpRequest& request) const
 {
 	Q_UNUSED(commandId);
 	Q_UNUSED(commandParams);
@@ -178,7 +178,7 @@ imthttp::ConstResponsePtr CHttpServletCompBase::OnPut(
 			const QByteArray& commandId,
 			const imtrest::imthttp::IRequest::CommandParams& commandParams,
 			const HeadersMap& headers,
-			const imtrest::CHttpRequest& request) const
+			const imthttp::CHttpRequest& request) const
 {
 	Q_UNUSED(commandId);
 	Q_UNUSED(commandParams);
@@ -192,7 +192,7 @@ imthttp::ConstResponsePtr CHttpServletCompBase::OnHead(
 			const QByteArray& commandId,
 			const imtrest::imthttp::IRequest::CommandParams& commandParams,
 			const HeadersMap& headers,
-			const imtrest::CHttpRequest& request) const
+			const imthttp::CHttpRequest& request) const
 {
 	Q_UNUSED(commandId);
 	Q_UNUSED(commandParams);
@@ -206,7 +206,7 @@ imthttp::ConstResponsePtr CHttpServletCompBase::OnOptions(
 			const QByteArray& commandId,
 			const imtrest::imthttp::IRequest::CommandParams& commandParams,
 			const HeadersMap& headers,
-			const imtrest::CHttpRequest& request) const
+			const imthttp::CHttpRequest& request) const
 {
 	Q_UNUSED(commandId);
 	Q_UNUSED(commandParams);
@@ -219,7 +219,7 @@ imthttp::ConstResponsePtr CHttpServletCompBase::OnUnknown(
 			const QByteArray& commandId,
 			const imtrest::imthttp::IRequest::CommandParams& commandParams,
 			const HeadersMap& headers,
-			const imtrest::CHttpRequest& request) const
+			const imthttp::CHttpRequest& request) const
 {
 	Q_UNUSED(commandId);
 	Q_UNUSED(commandParams);
@@ -232,7 +232,7 @@ imthttp::ConstResponsePtr CHttpServletCompBase::OnInvalid(
 			const QByteArray& commandId,
 			const imtrest::imthttp::IRequest::CommandParams& commandParams,
 			const HeadersMap& headers,
-			const imtrest::CHttpRequest& request) const
+			const imthttp::CHttpRequest& request) const
 {
 	Q_UNUSED(commandId);
 	Q_UNUSED(commandParams);
@@ -241,7 +241,7 @@ imthttp::ConstResponsePtr CHttpServletCompBase::OnInvalid(
 	return CreateDefaultErrorResponse("INVALID request received but is NOT implemented!", request);
 }
 
-imthttp::ConstResponsePtr CHttpServletCompBase::CreateDefaultErrorResponse(const QByteArray& errorString, const imtrest::CHttpRequest& request) const
+imthttp::ConstResponsePtr CHttpServletCompBase::CreateDefaultErrorResponse(const QByteArray& errorString, const imthttp::CHttpRequest& request) const
 {
 	qCritical() << __FILE__ << __LINE__ << __FUNCTION__ << errorString;
 	SendErrorMessage(0, errorString);
@@ -259,7 +259,7 @@ imthttp::ConstResponsePtr CHttpServletCompBase::CreateDefaultErrorResponse(const
 
 
 void CHttpServletCompBase::ExtractRequestInfo(
-			const imtrest::CHttpRequest& request,
+			const imthttp::CHttpRequest& request,
 			QByteArray& commandId,
 			imtrest::imthttp::IRequest::CommandParams& commandParams,
 			HeadersMap& headers)

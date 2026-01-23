@@ -74,7 +74,7 @@ imthttp::ConstResponsePtr CHttpFileUploadServletComp::OnPut(
 		}
 	}
 
-	CHttpResponse::Headers responseHeaders = GetRequestHeaders(request);
+	imthttp::CHttpResponse::Headers responseHeaders = GetRequestHeaders(request);
 
 	if (		length == 0 ||
 				range.GetMaxValue() < 0 ||
@@ -171,9 +171,9 @@ CHttpFileUploadServletComp::RangeData CHttpFileUploadServletComp::GetRangeDataFr
 }
 
 
-CHttpResponse::Headers CHttpFileUploadServletComp::GetRequestHeaders(const imthttp::CHttpRequest& request) const
+imthttp::CHttpResponse::Headers CHttpFileUploadServletComp::GetRequestHeaders(const imthttp::CHttpRequest& request) const
 {
-	CHttpResponse::Headers headers;
+	imthttp::CHttpResponse::Headers headers;
 
 	for (const QByteArray& headerId : request.GetHeaders()){
 		headers[headerId] = request.GetHeaderValue(headerId);
@@ -186,7 +186,7 @@ CHttpResponse::Headers CHttpFileUploadServletComp::GetRequestHeaders(const imtht
 imthttp::ConstResponsePtr CHttpFileUploadServletComp::CreateResponse(
 			const imthttp::IRequest& request,
 			int statusCode,
-			const CHttpResponse::Headers& headers,
+			const imthttp::CHttpResponse::Headers& headers,
 			const QByteArray& data,
 			const QByteArray& dataTypeId) const
 {
@@ -198,10 +198,10 @@ imthttp::ConstResponsePtr CHttpFileUploadServletComp::CreateResponse(
 		data,
 		dataTypeId).PopInterfacePtr());
 
-	CHttpResponse* httpResponsePtr = const_cast<CHttpResponse*>(dynamic_cast<const CHttpResponse*>(responsePtr.GetPtr()));
+	imthttp::CHttpResponse* httpResponsePtr = const_cast<imthttp::CHttpResponse*>(dynamic_cast<const imthttp::CHttpResponse*>(responsePtr.GetPtr()));
 	Q_ASSERT(httpResponsePtr != nullptr);
 
-	CHttpResponse::Headers responseHeaders = httpResponsePtr->GetHeaders();
+	imthttp::CHttpResponse::Headers responseHeaders = httpResponsePtr->GetHeaders();
 	for (const QByteArray& headerId : headers.keys()){
 		if (!responseHeaders.contains(headerId)){
 			if (headerId.compare("content-length", Qt::CaseInsensitive)){

@@ -3,7 +3,7 @@
 
 // ImtCore includes
 #include <imthttp/CHttpRequest.h>
-#include <imtrest/CHttpResponse.h>
+#include <imthttp/CHttpResponse.h>
 #include <imthttp/IProtocolEngine.h>
 
 

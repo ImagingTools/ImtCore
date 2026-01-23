@@ -121,7 +121,7 @@ imthttp::ConstResponsePtr CDelegatedServletComp::ProcessRequest(const imthttp::I
 
 	Q_ASSERT(false);
 
-	return ConstResponsePtr();
+	return imthttp::ConstResponsePtr();
 }
 
 
