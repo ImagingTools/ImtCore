@@ -22,11 +22,12 @@ private Q_SLOTS:
 
 	void TestComplexCollectionFilter();
 
+	void cleanup();
 	void cleanupTestCase();
 
 private:
 	QDir m_tempOutputDir;
-
+	bool m_isAllTestsPassed;
 };
 
 

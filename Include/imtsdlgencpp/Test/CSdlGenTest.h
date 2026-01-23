@@ -26,10 +26,12 @@ private Q_SLOTS:
 	void TestComplexUnion();
 	void PrinterTest();
 
+	void cleanup();
 	void cleanupTestCase();
 
 private:
 	QDir m_tempOutputDir;
+	bool m_isAllTestsPassed;
 
 };
 

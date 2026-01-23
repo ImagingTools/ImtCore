@@ -171,6 +171,7 @@ void ExecuteTest(
 
 void CSdlGenQmlTest::initTestCase()
 {
+	m_isAllTestsPassed = true;
 	m_tempOutputDir.setPath("SdlGenQmlTest");
 	if (m_tempOutputDir.exists()){
 		QVERIFY(m_tempOutputDir.removeRecursively());
@@ -191,10 +192,18 @@ void CSdlGenQmlTest::TestComplexCollectionFilter()
 }
 
 
+void CSdlGenQmlTest::cleanup() 
+{
+	m_isAllTestsPassed = m_isAllTestsPassed && !QTest::currentTestFailed();
+}
+
+
 void CSdlGenQmlTest::cleanupTestCase()
 {
 	if (m_tempOutputDir.exists()){
-		QVERIFY(m_tempOutputDir.removeRecursively());
+		if (m_isAllTestsPassed) {
+			QVERIFY(m_tempOutputDir.removeRecursively());
+		}
 	}
 }
 

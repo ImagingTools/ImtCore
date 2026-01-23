@@ -8,7 +8,7 @@ BaseClass {
 	property var m_fieldIds: []
 
 	Component.onCompleted: {
-	this._internal.removed = ["m_text","m_fieldIds"]
+		this._internal.removed = ["m_text","m_fieldIds"]
 	}
 
 	function hasText(){
@@ -19,7 +19,7 @@ BaseClass {
 		return (m_fieldIds !== undefined && m_fieldIds !== null)
 	}
 
-	function createFieldIds(typename){
+	function emplaceFieldIds(typename){
 		m_fieldIds = []
 		this._internal.removeAt('m_fieldIds')
 	}
