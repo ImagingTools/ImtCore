@@ -29,7 +29,7 @@ BaseClass {
 		return (m_filterOperations !== undefined && m_filterOperations !== null)
 	}
 
-	function createFilterValues(typename){
+	function emplaceFilterValues(typename){
 		m_filterValues = []
 		this._internal.removeAt('m_filterValues')
 	}

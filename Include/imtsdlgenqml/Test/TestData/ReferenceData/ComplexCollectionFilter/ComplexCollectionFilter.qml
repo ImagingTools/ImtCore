@@ -34,31 +34,31 @@ BaseClass {
 		return (m_distinctFields !== undefined && m_distinctFields !== null)
 	}
 
-	function createSortingInfo(typename){
+	function emplaceSortingInfo(typename){
 		m_sortingInfo = createComponent('m_sortingInfo', typename).createObject(this)
 		m_sortingInfo.owner = this
 		this._internal.removeAt('m_sortingInfo')
 	}
 
-	function createFieldsFilter(typename){
+	function emplaceFieldsFilter(typename){
 		m_fieldsFilter = createComponent('m_fieldsFilter', typename).createObject(this)
 		m_fieldsFilter.owner = this
 		this._internal.removeAt('m_fieldsFilter')
 	}
 
-	function createTimeFilter(typename){
+	function emplaceTimeFilter(typename){
 		m_timeFilter = createComponent('m_timeFilter', typename).createObject(this)
 		m_timeFilter.owner = this
 		this._internal.removeAt('m_timeFilter')
 	}
 
-	function createTextFilter(typename){
+	function emplaceTextFilter(typename){
 		m_textFilter = createComponent('m_textFilter', typename).createObject(this)
 		m_textFilter.owner = this
 		this._internal.removeAt('m_textFilter')
 	}
 
-	function createDistinctFields(typename){
+	function emplaceDistinctFields(typename){
 		m_distinctFields = []
 		this._internal.removeAt('m_distinctFields')
 	}
@@ -98,6 +98,10 @@ BaseClass {
 		switch (propertyId){
 			case 'm_sortingInfo': return Qt.createComponent('qrc:/qml/imtbaseComplexCollectionFilterSdl/FieldSortingInfo.qml')
 		}
+	}
+
+	function createSortingInfoArrayElement(typename){
+		return createElement('m_sortingInfo', typename).createObject()
 	}
 
 	function createComponent(propertyId, typename){

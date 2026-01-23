@@ -19,7 +19,7 @@ BaseClass {
 		return (m_fieldIds !== undefined && m_fieldIds !== null)
 	}
 
-	function createFieldIds(typename){
+	function emplaceFieldIds(typename){
 		m_fieldIds = []
 		this._internal.removeAt('m_fieldIds')
 	}

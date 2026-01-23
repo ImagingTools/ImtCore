@@ -24,13 +24,13 @@ BaseClass {
 		return (m_logicalOperation !== undefined && m_logicalOperation !== null)
 	}
 
-	function createFieldFilters(typename){
+	function emplaceFieldFilters(typename){
 		m_fieldFilters = createComponent('m_fieldFilters', typename).createObject(this)
 		m_fieldFilters.owner = this
 		this._internal.removeAt('m_fieldFilters')
 	}
 
-	function createGroupFilters(typename){
+	function emplaceGroupFilters(typename){
 		m_groupFilters = createComponent('m_groupFilters', typename).createObject(this)
 		m_groupFilters.owner = this
 		this._internal.removeAt('m_groupFilters')
@@ -67,6 +67,14 @@ BaseClass {
 			}
 			case 'm_groupFilters': return Qt.createComponent('qrc:/qml/imtbaseComplexCollectionFilterSdl/GroupFilter.qml')
 		}
+	}
+
+	function createFieldFiltersArrayElement(typename){
+		return createElement('m_fieldFilters', typename).createObject()
+	}
+
+	function createGroupFiltersArrayElement(typename){
+		return createElement('m_groupFilters', typename).createObject()
 	}
 
 	function createComponent(propertyId, typename){
