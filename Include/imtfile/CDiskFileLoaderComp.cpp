@@ -1,4 +1,4 @@
-#include <imtfile/CFileProviderComp.h>
+#include <imtfile/CDiskFileLoaderComp.h>
 
 // Qt includes
 #include <QtCore/QRegularExpressionMatch>
@@ -10,7 +10,7 @@ namespace imtfile
 
 // reimplemented (IFileProvider)
 
-bool CFileProviderComp::LoadData(QByteArray& data, const QByteArray& name) const
+bool CDiskFileLoaderComp::LoadData(QByteArray& data, const QByteArray& name) const
 {
 	QByteArray workingFileName = name;
 	QString homeDirPath = *m_homeDirPathAttrPtr;
