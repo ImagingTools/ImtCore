@@ -1,9 +1,6 @@
 #include "CQmlProcessorsManagerComp.h"
 
 
-// std includes
-#include <iostream>
-
 // Qt includes
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QFileInfo>
@@ -15,6 +12,7 @@
 #include <iprm/TParamsPtr.h>
 #include <iprm/IOptionsManager.h>
 #include <iprm/CParamsSet.h>
+#include <iproc/IProcessor.h>
 
 // ImtCore includes
 #include<imtsdl/CSdlTools.h>
@@ -42,7 +40,7 @@ iproc::IProcessor::TaskState CQmlProcessorsManagerComp::DoProcessing(
 			0,
 			QString("Unable to create output directory '%1'").arg(outputDirPath));
 
-		::exit(4);
+		return TS_INVALID;
 	}
 
 	QLockFile lockFile(outputDirPath + QStringLiteral("/SDL_GEN.lock"));
@@ -76,7 +74,7 @@ iproc::IProcessor::TaskState CQmlProcessorsManagerComp::DoProcessing(
 	lockFile.unlock();
 
 	if (!isCodeCreated){
-		::exit(5);
+		return TS_INVALID;
 	}
 
 
@@ -84,7 +82,7 @@ iproc::IProcessor::TaskState CQmlProcessorsManagerComp::DoProcessing(
 		SendInfoMessage(0, QString::number(qApp->applicationPid()) + ":SDL:processing finished [creation] " + QString::number(timer.elapsed()));
 	}
 
-	::exit(0);
+	return TS_OK;
 }
 
 
