@@ -68,6 +68,13 @@ QtObject {
 		onResult: {
 			if (status === "EXISTS"){
 				if (Qt.platform.os === "web"){
+					// Load rememberMe state from localStorage
+					let rememberMeStr = localStorage.getItem("rememberMe");
+					if (rememberMeStr === "true") {
+						root.rememberMe = true;
+						root.lastUser = localStorage.getItem("lastUser") || "";
+					}
+					
 					let token = localStorage.getItem("accessToken");
 					let refreshToken = localStorage.getItem("refreshToken");
 					if (token && token !== ""){
@@ -136,6 +143,9 @@ QtObject {
 		localStorage.setItem("systemId", userTokenProvider.systemId);
 		localStorage.setItem("productId", userTokenProvider.productId);
 		localStorage.setItem("permissions", userTokenProvider.permissions);
+		// Save rememberMe state locally for web
+		localStorage.setItem("rememberMe", root.rememberMe ? "true" : "false");
+		localStorage.setItem("lastUser", root.lastUser);
 	}
 	
 	function removeDataFromStorage(){
@@ -146,14 +156,24 @@ QtObject {
 		localStorage.removeItem("systemId");
 		localStorage.removeItem("productId");
 		localStorage.removeItem("permissions");
+		localStorage.removeItem("rememberMe");
+		localStorage.removeItem("lastUser");
 	}
 
 	function saveRefreshTokenIfRememberMe(){
 		if (root.rememberMe) {
 			root.storedRefreshToken = userTokenProvider.refreshToken;
 			root.lastUser = userTokenProvider.login;
-			// Save to server
-			saveLoginSettingsToServer();
+			
+			if (Qt.platform.os === "web"){
+				// For web, save to localStorage (already done in saveDataToStorage)
+				// Just need to ensure the data is current
+				saveDataToStorage();
+			}
+			else {
+				// For non-web platforms, save to server
+				saveLoginSettingsToServer();
+			}
 		}
 		else {
 			clearRefreshToken();
@@ -163,8 +183,17 @@ QtObject {
 	function clearRefreshToken(){
 		root.storedRefreshToken = "";
 		root.lastUser = "";
-		// Clear from server
-		saveLoginSettingsToServer();
+		
+		if (Qt.platform.os === "web"){
+			// For web, clear from localStorage
+			localStorage.removeItem("refreshToken");
+			localStorage.removeItem("rememberMe");
+			localStorage.removeItem("lastUser");
+		}
+		else {
+			// For non-web platforms, clear from server
+			saveLoginSettingsToServer();
+		}
 	}
 
 	function saveLoginSettingsToServer(){
@@ -239,6 +268,11 @@ QtObject {
 			// Clear refresh token on logout for non-web platforms
 			clearRefreshToken();
 		}
+		
+		// Clear rememberMe state
+		root.rememberMe = false;
+		root.lastUser = "";
+		root.storedRefreshToken = "";
 		
 		loggedOut();
 	}
