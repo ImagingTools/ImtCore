@@ -46,7 +46,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="WebSocketProtocolEngine" PackageId="ImtRestPck" ComponentId="WebSocketProtocolEngine">
+        <Element Id="WebSocketProtocolEngine" PackageId="ImtHttpPck" ComponentId="WebSocketProtocolEngine">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
@@ -58,7 +58,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="WebSocketServer" PackageId="ImtRestPck" ComponentId="WebSocketServer">
+        <Element Id="WebSocketServer" PackageId="ImtHttpPck" ComponentId="WebSocketServer">
             <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
                     <AttributeInfo Id="HttpProtocolEngine" Type="Reference" ExportId="HttpProtocolEngine">
@@ -121,7 +121,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="WorkerManager" PackageId="ImtRestPck" ComponentId="WorkerManaqer">
+        <Element Id="WorkerManager" PackageId="ImtHttpPck" ComponentId="WorkerManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
@@ -149,10 +149,10 @@
         <Interface InterfaceId="imtclientgql::IGqlClient" ComponentId="SubscriptionManager"/>
         <Interface InterfaceId="imtclientgql::IGqlSubscriptionManager" ComponentId="SubscriptionManager"/>
         <Interface InterfaceId="imtcom::IConnectionStatusProvider" ComponentId="WebSocketServer"/>
-        <Interface InterfaceId="imtrest::IProtocolEngine" ComponentId="WebSocketProtocolEngine"/>
-        <Interface InterfaceId="imtrest::IRequestManager" ComponentId="WebSocketServer"/>
+        <Interface InterfaceId="imthttp::IProtocolEngine" ComponentId="WebSocketProtocolEngine"/>
+        <Interface InterfaceId="imthttp::IRequestManager" ComponentId="WebSocketServer"/>
         <Interface InterfaceId="imtrest::IRequestServlet" ComponentId="WebSocketServlet"/>
-        <Interface InterfaceId="imtrest::IServer" ComponentId="WebSocketServer"/>
+        <Interface InterfaceId="imthttp::IServer" ComponentId="WebSocketServer"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="WebSocketServer"/>
     </ExportedInterfaces>
     <ExportedComponents/>

@@ -10,7 +10,7 @@
     <Description>HTTP server framework</Description>
     <Keywords>HTTP Server Company='ImagingTools' Project='&quot;Core Framework&quot;'</Keywords>
     <ElementsList>
-        <Element Id="HttpProtocolEngine" PackageId="ImtRestPck" ComponentId="HttpProtocolEngine">
+        <Element Id="HttpProtocolEngine" PackageId="ImtHttpPck" ComponentId="HttpProtocolEngine">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
@@ -34,7 +34,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="TcpServer" PackageId="ImtRestPck" ComponentId="TcpServer">
+        <Element Id="TcpServer" PackageId="ImtHttpPck" ComponentId="TcpServer">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
@@ -70,7 +70,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="WorkerManager" PackageId="ImtRestPck" ComponentId="WorkerManaqer">
+        <Element Id="WorkerManager" PackageId="ImtHttpPck" ComponentId="WorkerManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
@@ -94,9 +94,9 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtrest::IProtocolEngine" ComponentId="HttpProtocolEngine"/>
-        <Interface InterfaceId="imtrest::IRequestManager" ComponentId="TcpServer"/>
-        <Interface InterfaceId="imtrest::IServer" ComponentId="TcpServer"/>
+        <Interface InterfaceId="imthttp::IProtocolEngine" ComponentId="HttpProtocolEngine"/>
+        <Interface InterfaceId="imthttp::IRequestManager" ComponentId="TcpServer"/>
+        <Interface InterfaceId="imthttp::IServer" ComponentId="TcpServer"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="TcpServer"/>
     </ExportedInterfaces>
     <ExportedComponents/>
