@@ -29,7 +29,16 @@ echo ""
 # Validate JSON format
 if command -v python3 &> /dev/null; then
     echo "Validating JSON format..."
-    python3 -c "import json; f = open('${FIGMA_TOKENS_FILE}'); json.load(f); f.close()"
+    python3 << EOF
+import json
+try:
+    with open('${FIGMA_TOKENS_FILE}', 'r') as f:
+        json.load(f)
+    exit(0)
+except Exception as e:
+    print(f"Error: {e}")
+    exit(1)
+EOF
     if [ $? -eq 0 ]; then
         echo "✓ JSON is valid"
     else
