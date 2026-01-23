@@ -4038,6 +4038,8 @@ bool CPrinterCollectionControllerCompBase::GetOperationFromRequest(const ::imtgq
 
 bool CPrinterCollectionControllerCompBase::CreateRepresentationFromObject(const istd::IChangeable& data, const QByteArray& objectTypeId, const ::imtgql::CGqlRequest& gqlRequest, ::imtbase::CTreeItemModel& dataModel, QString& errorMessage) const
 {
+	Q_UNUSED(objectTypeId);
+
 	const QByteArray commandId = gqlRequest.GetCommandId();
 
 	//GetSpecifications
