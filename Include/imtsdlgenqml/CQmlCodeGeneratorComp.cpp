@@ -34,7 +34,7 @@ iproc::IProcessor::TaskState CQmlCodeGeneratorComp::DoProcessing(
 	Q_ASSERT(m_sdlEnumListCompPtr.IsValid());
 	Q_ASSERT(m_dependentSchemaListCompPtr.IsValid());
 
-	iproc::IProcessor::TaskState retVal = TS_OK;
+	TaskState retVal = TS_OK;
 
 	if (!m_argumentParserCompPtr->IsQmlEnabled()){
 		return retVal;
@@ -98,13 +98,13 @@ iproc::IProcessor::TaskState CQmlCodeGeneratorComp::DoProcessing(
 		}
 	}
 
-	// Then let extenders to make changes
+	// Then let extenders make changes
 	const int extendersCount = m_codeGeneratorExtenderListCompPtr.GetCount();
 	for (int i = 0; i < extendersCount; ++i){
-		iproc::IProcessor* extenderPtr = m_codeGeneratorExtenderListCompPtr[i];
+		IProcessor* extenderPtr = m_codeGeneratorExtenderListCompPtr[i];
 		Q_ASSERT(extenderPtr != nullptr);
 
-		iproc::IProcessor::TaskState extenderResult = extenderPtr->DoProcessing(paramsPtr, inputPtr, outputPtr, progressManagerPtr);
+		TaskState extenderResult = extenderPtr->DoProcessing(paramsPtr, inputPtr, outputPtr, progressManagerPtr);
 		if (extenderResult != TS_OK){
 			return extenderResult;
 		}
@@ -160,7 +160,7 @@ iproc::IProcessor::TaskState CQmlCodeGeneratorComp::DoProcessing(
 	}
 
 	// and finally create a QRC file
-	QString qrcFilePath = GetAutoDefinedQmlQrcFilePath(*m_customSchemaParamsCompPtr, imtsdl::CSdlTools::GetCompleteOutputPath(m_customSchemaParamsCompPtr, *m_argumentParserCompPtr, true, false));
+	QString qrcFilePath = GetAutoDefinedQmlQrcFilePath(*m_customSchemaParamsCompPtr, GetCompleteOutputPath(m_customSchemaParamsCompPtr, *m_argumentParserCompPtr, true, false));
 	QFile qrcFile(qrcFilePath);
 	if (!qrcFile.open(QIODevice::WriteOnly)){
 		SendCriticalMessage(0,
@@ -209,6 +209,7 @@ iproc::IProcessor::TaskState CQmlCodeGeneratorComp::DoProcessing(
 
 bool CQmlCodeGeneratorComp::ReOpenFiles()
 {
+	Q_ASSERT(m_qmlFilePtr != nullptr);
 	if (!m_qmlFilePtr->open(QIODevice::WriteOnly | QIODevice::Append)){
 		SendCriticalMessage(0,
 					QString("Unable to open file: '%1'. Error: %2")
@@ -227,6 +228,7 @@ bool CQmlCodeGeneratorComp::CloseFiles()
 {
 	bool retVal = true;
 
+	Q_ASSERT(m_qmlFilePtr != nullptr);
 	retVal = m_qmlFilePtr->flush();
 	m_qmlFilePtr->close();
 
@@ -236,6 +238,7 @@ bool CQmlCodeGeneratorComp::CloseFiles()
 
 bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 {
+	Q_ASSERT(m_qmlFilePtr != nullptr);
 	if (!m_qmlFilePtr->open(QIODevice::WriteOnly)){
 		SendCriticalMessage(0,
 						 QString("Unable to open file: '%1'. Error: %2")
@@ -314,7 +317,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 
 		const std::shared_ptr<imtsdl::CSdlEntryBase> foundEntryPtr = GetSdlTypeOrEnumOrUnionForField(sdlField, allTypes, enumList, unionList);
 		const bool isEnum = bool(dynamic_cast<const imtsdl::CSdlEnum*>(foundEntryPtr.get()) != nullptr);
-		const imtsdl::CSdlUnion* unionPtr = dynamic_cast<const imtsdl::CSdlUnion*>(foundEntryPtr.get());
+		const auto* unionPtr = dynamic_cast<const imtsdl::CSdlUnion*>(foundEntryPtr.get());
 
 		bool isCustom = false;
 		QString convertedType = QmlConvertType(sdlField.GetType(), &isCustom);
@@ -384,10 +387,6 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 	// public class comfort methods
 	// has<PROPERTY>()
 	for (const imtsdl::CSdlField& sdlField: typeFieldList){
-		const std::shared_ptr<imtsdl::CSdlEntryBase> foundEntryPtr = GetSdlTypeOrEnumOrUnionForField(sdlField, allTypes, enumList, unionList);
-		bool isCustom = false;
-		const QString convertedType = QmlConvertType(sdlField.GetType(), &isCustom);
-
 		FeedStream(ifStream, 1, false);
 		FeedStreamHorizontally(ifStream, 1);
 		ifStream << QStringLiteral("function has");
@@ -414,7 +413,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 
 		bool isEnum = bool (dynamic_cast<imtsdl::CSdlEnum*>(foundEntryPtr.get()) != nullptr);
 		bool isCustom = false;
-		const QString convertedType = QmlConvertType(sdlField.GetType(), &isCustom);
+		QmlConvertType(sdlField.GetType(), &isCustom);
 		const bool isUserType = isCustom && !isEnum;
 
 		if ((!isCustom && !sdlField.IsArray()) || isEnum){
@@ -423,7 +422,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 
 		FeedStream(ifStream, 1, false);
 		FeedStreamHorizontally(ifStream, 1);
-		ifStream << QStringLiteral("function create");
+		ifStream << QStringLiteral("function emplace");
 		ifStream << GetCapitalizedValue(sdlField.GetId());
 		ifStream << QStringLiteral("(typename){");
 		FeedStream(ifStream, 1, false);
@@ -519,7 +518,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 		const QString convertedType = QmlConvertType(sdlField.GetType(), &isCustom);
 		const bool isEnum = bool(dynamic_cast<const imtsdl::CSdlEnum*>(foundEntryPtr.get()) != nullptr);
 		const bool isUserType = isCustom && !isEnum;
-		const imtsdl::CSdlUnion* unionPtr = dynamic_cast<const imtsdl::CSdlUnion*>(foundEntryPtr.get());
+		const auto* unionPtr = dynamic_cast<const imtsdl::CSdlUnion*>(foundEntryPtr.get());
 
 		// skip simple scalars and list of scalars
 		if (!sdlField.IsArray() || !isUserType || (sdlField.IsArray() && !isUserType)){
@@ -573,8 +572,39 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 	FeedStreamHorizontally(ifStream, 2);
 	ifStream << '}'; // end of switch
 	FeedStream(ifStream, 1, false);
+	
 	FeedStreamHorizontally(ifStream, 1);
 	ifStream << '}'; // end of function
+
+	// comfort createElement function
+	for (const imtsdl::CSdlField& sdlField: typeFieldList){
+		bool isCustom = false;
+		const std::shared_ptr<imtsdl::CSdlEntryBase> foundEntryPtr = GetSdlTypeOrEnumOrUnionForField(sdlField, allTypes, enumList, unionList);
+		QmlConvertType(sdlField.GetType(), &isCustom);
+		const bool isEnum = bool(dynamic_cast<const imtsdl::CSdlEnum*>(foundEntryPtr.get()) != nullptr);
+		const bool isUserType = isCustom && !isEnum;
+
+		if (!sdlField.IsArray() || !isUserType || (sdlField.IsArray() && !isUserType)){
+			continue;
+		}
+
+		FeedStream(ifStream, 2, false);
+
+		FeedStreamHorizontally(ifStream, 1);
+		ifStream << QStringLiteral("function create");
+		ifStream << GetCapitalizedValue(sdlField.GetId());
+		ifStream << QStringLiteral("ArrayElement(typename){");
+		FeedStream(ifStream, 1, false);
+
+		FeedStreamHorizontally(ifStream, 2);
+		ifStream << QStringLiteral("return createElement('m_");
+		ifStream << GetDecapitalizedValue(sdlField.GetId());
+		ifStream << QStringLiteral("', typename).createObject()");
+		FeedStream(ifStream, 1, false);
+
+		FeedStreamHorizontally(ifStream, 1);
+		ifStream << '}';
+	}
 
 	// createComponent (custom and arrays only)
 	FeedStream(ifStream, 2, false);
@@ -601,7 +631,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 			continue;
 		}
 
-		const imtsdl::CSdlUnion* unionPtr = dynamic_cast<const imtsdl::CSdlUnion*>(foundEntryPtr.get());
+		const auto* unionPtr = dynamic_cast<const imtsdl::CSdlUnion*>(foundEntryPtr.get());
 		if (sdlField.IsArray()){
 			FeedStreamHorizontally(ifStream, 3);
 			ifStream << QStringLiteral("case 'm_") << GetDecapitalizedValue(sdlField.GetId());
@@ -792,6 +822,7 @@ bool CQmlCodeGeneratorComp::EndQmlFile(const imtsdl::CSdlType& /*sdlType*/)
 
 void CQmlCodeGeneratorComp::AbortCurrentProcessing()
 {
+	Q_ASSERT(m_qmlFilePtr != nullptr);
 	m_qmlFilePtr->close();
 
 	I_CRITICAL();
