@@ -216,7 +216,7 @@ ListModel {
 		return retVal
 	}
 
-	/// \deprecated! OBSOLUTE function ONLY for support legacy code DO NOT USE IT! Use \c appendElement() instead. Will be removed next releases.
+	/// \deprecated! OBSOLETE function ONLY for support legacy code DO NOT USE IT! Use \c appendElement() instead. Will be removed next releases.
 	function addElement(element){
 		insertElement(this.count, element)
 	}
