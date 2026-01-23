@@ -34,6 +34,7 @@
         <file alias="imtauthgui/PasswordRecoveryDialog.qml">PasswordRecoveryDialog.qml</file>
 	<file alias="imtauthgui/UserSettingsController.qml">UserSettingsController.qml</file>
 	<file alias="imtauthgui/UserActionCollectionView.qml">UserActionCollectionView.qml</file>
+	<file alias="imtauthgui/PlatformSettings.qml">PlatformSettings.qml</file>
         <file alias="imtauthgui/qmldir">qmldir</file>
     </qresource>
     <qresource prefix="/"/>

@@ -1,7 +1,6 @@
 pragma Singleton
 
 import QtQuick 2.12
-import Qt.labs.settings 1.0
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
@@ -32,13 +31,23 @@ QtObject {
 	property string lastUser: ""
 	property string storedRefreshToken: ""
 	
-	// Settings for desktop platforms (Qt.labs.settings)
-	Settings {
-		id: desktopSettings
+	// Platform-aware settings storage
+	property PlatformSettings loginSettings: PlatformSettings {
 		category: "Login"
-		property alias rememberMe: root.rememberMe
-		property alias lastUser: root.lastUser
-		property alias storedRefreshToken: root.storedRefreshToken
+		rememberMe: root.rememberMe
+		lastUser: root.lastUser
+		storedRefreshToken: root.storedRefreshToken
+		
+		Component.onCompleted: {
+			// Load initial values from storage
+			root.rememberMe = rememberMe;
+			root.lastUser = lastUser;
+			root.storedRefreshToken = storedRefreshToken;
+		}
+		
+		onRememberMeChanged: root.rememberMe = rememberMe
+		onLastUserChanged: root.lastUser = lastUser
+		onStoredRefreshTokenChanged: root.storedRefreshToken = storedRefreshToken
 	}
 	
 	property XmlHttpRequestProxy requestProxy: XmlHttpRequestProxy {
@@ -74,13 +83,7 @@ QtObject {
 		onResult: {
 			if (status === "EXISTS"){
 				if (Qt.platform.os === "web"){
-					// Load rememberMe state from localStorage
-					let rememberMeStr = localStorage.getItem("rememberMe");
-					if (rememberMeStr === "true") {
-						root.rememberMe = true;
-						root.lastUser = localStorage.getItem("lastUser") || "";
-					}
-					
+					// For web, also check localStorage for existing session tokens
 					let token = localStorage.getItem("accessToken");
 					let refreshToken = localStorage.getItem("refreshToken");
 					if (token && token !== ""){
@@ -94,13 +97,12 @@ QtObject {
 					
 					AuthorizationController.removeDataFromStorage();
 				}
-				else {
-					// For non-web platforms, settings are loaded automatically via Settings component
-					// Try to restore session with refresh token if available
-					if (root.rememberMe && root.storedRefreshToken !== "" && root.lastUser !== "") {
-						root.loginWithRefreshToken(root.lastUser, root.storedRefreshToken);
-						return;
-					}
+				
+				// For both platforms, settings are loaded automatically via PlatformSettings
+				// Try to restore session with refresh token if available
+				if (root.rememberMe && root.storedRefreshToken !== "" && root.lastUser !== "") {
+					root.loginWithRefreshToken(root.lastUser, root.storedRefreshToken);
+					return;
 				}
 			}
 			
@@ -151,9 +153,6 @@ QtObject {
 		localStorage.setItem("systemId", userTokenProvider.systemId);
 		localStorage.setItem("productId", userTokenProvider.productId);
 		localStorage.setItem("permissions", userTokenProvider.permissions);
-		// Save rememberMe state locally for web
-		localStorage.setItem("rememberMe", root.rememberMe ? "true" : "false");
-		localStorage.setItem("lastUser", root.lastUser);
 	}
 	
 	function removeDataFromStorage(){
@@ -164,8 +163,6 @@ QtObject {
 		localStorage.removeItem("systemId");
 		localStorage.removeItem("productId");
 		localStorage.removeItem("permissions");
-		localStorage.removeItem("rememberMe");
-		localStorage.removeItem("lastUser");
 	}
 
 	function saveRefreshTokenIfRememberMe(){
@@ -174,10 +171,10 @@ QtObject {
 			root.lastUser = userTokenProvider.login;
 			
 			if (Qt.platform.os === "web"){
-				// For web, save to localStorage
+				// For web, also save to the legacy localStorage for session tokens
 				saveDataToStorage();
 			}
-			// For desktop, Settings component handles persistence automatically
+			// PlatformSettings handles persistence automatically for both platforms
 		}
 		else {
 			clearRefreshToken();
@@ -187,14 +184,13 @@ QtObject {
 	function clearRefreshToken(){
 		root.storedRefreshToken = "";
 		root.lastUser = "";
+		root.rememberMe = false;
 		
 		if (Qt.platform.os === "web"){
-			// For web, clear from localStorage
+			// For web, clear from legacy localStorage
 			localStorage.removeItem("refreshToken");
-			localStorage.removeItem("rememberMe");
-			localStorage.removeItem("lastUser");
 		}
-		// For desktop, Settings component handles persistence automatically
+		// PlatformSettings handles persistence automatically for both platforms
 	}
 
 	function loginWithRefreshToken(userName, refreshToken){
@@ -245,15 +241,9 @@ QtObject {
 		if (Qt.platform.os === "web"){
 			removeDataFromStorage();
 		}
-		else {
-			// Clear refresh token on logout for non-web platforms
-			clearRefreshToken();
-		}
 		
-		// Clear rememberMe state
-		root.rememberMe = false;
-		root.lastUser = "";
-		root.storedRefreshToken = "";
+		// Clear rememberMe state via PlatformSettings
+		clearRefreshToken();
 		
 		loggedOut();
 	}
