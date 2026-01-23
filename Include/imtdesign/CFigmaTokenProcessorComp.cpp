@@ -329,7 +329,8 @@ bool CFigmaTokenProcessorComp::ExtractFonts(const QJsonObject& figmaTokensJson, 
 					if (weightStr == "bold" || weightStr == "700") {
 						fontDef["Bold"] = true;
 					}
-				} else if (weight.isDouble()) {
+				} else if (weight.isDouble() || !weight.isNull()) {
+					// isDouble() returns true for both integers and doubles in JSON
 					int weightInt = weight.toInt();
 					fontDef["Weight"] = weightInt >= 700 ? 75 : 50;
 					fontDef["Bold"] = weightInt >= 700;

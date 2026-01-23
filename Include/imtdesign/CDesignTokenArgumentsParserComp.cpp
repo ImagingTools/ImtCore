@@ -118,6 +118,7 @@ void CDesignTokenArgumentsParserComp::SetArguments(int argc, char** argv)
 	m_commands.insert(AA_WEB, "-W");
 	m_commands.insert(AA_QML, "--qml");
 	m_commands.insert(AA_COMMON, "--common");
+	// QMultiMap supports multiple values per key - both flags work
 	m_commands.insert(AA_FIGMA_TOKEN_FILE_PATH, "--figma");
 	m_commands.insert(AA_FIGMA_TOKEN_FILE_PATH, "-figma");
 }

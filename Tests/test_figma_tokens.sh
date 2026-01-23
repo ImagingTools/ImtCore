@@ -29,7 +29,7 @@ echo ""
 # Validate JSON format
 if command -v python3 &> /dev/null; then
     echo "Validating JSON format..."
-    python3 -c "import json; json.load(open('${FIGMA_TOKENS_FILE}'))" 
+    python3 -c "import json; f = open('${FIGMA_TOKENS_FILE}'); json.load(f); f.close()"
     if [ $? -eq 0 ]; then
         echo "✓ JSON is valid"
     else
