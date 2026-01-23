@@ -29,17 +29,16 @@ echo ""
 # Validate JSON format
 if command -v python3 &> /dev/null; then
     echo "Validating JSON format..."
-    python3 << EOF
+    if python3 << EOF
 import json
 try:
     with open('${FIGMA_TOKENS_FILE}', 'r') as f:
         json.load(f)
-    exit(0)
 except Exception as e:
     print(f"Error: {e}")
     exit(1)
 EOF
-    if [ $? -eq 0 ]; then
+    then
         echo "✓ JSON is valid"
     else
         echo "✗ JSON is invalid"
@@ -86,12 +85,11 @@ echo ""
 
 # Run the Figma token processor
 echo "Running Figma token processor..."
-"${DESIGN_TOKEN_CREATOR}" \
+if "${DESIGN_TOKEN_CREATOR}" \
     --figma "${FIGMA_TOKENS_FILE}" \
     -OD "${TEST_OUTPUT_DIR}" \
     -P "TestApp"
-
-if [ $? -eq 0 ]; then
+then
     echo "✓ Processor executed successfully"
 else
     echo "✗ Processor failed"

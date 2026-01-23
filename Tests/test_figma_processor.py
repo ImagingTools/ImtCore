@@ -121,10 +121,11 @@ def extract_fonts(tokens_json):
         if 'fontFamily' in value_obj:
             font_def['Family'] = value_obj['fontFamily']
         
-        if 'fontSize' in value_obj:
-            size_str = str(value_obj['fontSize']).replace('px', '')
+		if 'fontSize' in value_obj:
+            size_str = str(value_obj['fontSize']).replace('px', '').strip()
             try:
-                font_def['PointSize'] = int(float(size_str))
+                # Convert directly to int to avoid float precision issues
+                font_def['PointSize'] = int(size_str) if size_str.isdigit() else int(float(size_str))
             except (ValueError, TypeError):
                 font_def['PointSize'] = 11
         

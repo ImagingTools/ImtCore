@@ -317,10 +317,16 @@ bool CFigmaTokenProcessorComp::ExtractFonts(const QJsonObject& figmaTokensJson, 
 				fontDef["Family"] = valueObj["fontFamily"].toString();
 			}
 			if (valueObj.contains("fontSize")) {
-				QString size = valueObj["fontSize"].toString();
-				// Remove "px" suffix if present
-				size.remove("px");
-				fontDef["PointSize"] = size.toInt();
+				QString sizeStr = valueObj["fontSize"].toString().replace("px", "").trimmed();
+				bool ok = false;
+				int sizeInt = sizeStr.toInt(&ok);
+				if (ok && sizeInt > 0) {
+					fontDef["PointSize"] = sizeInt;
+				} else {
+					// Try as double then convert to int
+					double sizeDouble = sizeStr.toDouble(&ok);
+					fontDef["PointSize"] = (ok && sizeDouble > 0) ? static_cast<int>(sizeDouble) : 11;
+				}
 			}
 			if (valueObj.contains("fontWeight")) {
 				QJsonValue weight = valueObj["fontWeight"];
