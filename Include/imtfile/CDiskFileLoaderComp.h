@@ -28,7 +28,7 @@ public:
 	I_BEGIN_COMPONENT(CDiskFileLoaderComp);
 		I_REGISTER_INTERFACE(IFileProvider);
 		I_ASSIGN(m_homeDirPathAttrPtr, "HomePath", "Home path", true, QDir::currentPath());
-		I_ASSIGN(m_pathsProblemsAutoSolveAttrPtr, "AutoSolvePathsProblems", "If 'true' servelt'll automatically solve paths problems", true, true);
+		I_ASSIGN(m_pathsProblemsAutoSolveAttrPtr, "AutoSolvePathsProblems", "If 'true' servlet'll automatically solve paths problems", true, true);
 		I_ASSIGN(m_fileTemplatePathCompPtr, "FileTemplateHomePath", "FileTemplate based Home path\n Note: type is ignored only value matters \n Warning: overwrites HomePath!", false, "FileTemplatePath");
 	I_END_COMPONENT
 
