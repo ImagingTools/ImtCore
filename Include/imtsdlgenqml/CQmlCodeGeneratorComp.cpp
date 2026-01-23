@@ -360,10 +360,12 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 	}
 
 	FeedStream(ifStream, 2, false);
+
 	FeedStreamHorizontally(ifStream, 1);
 	ifStream << QStringLiteral("Component.onCompleted: {");
 	FeedStream(ifStream, 1, false);
-	FeedStreamHorizontally(ifStream, 1);
+
+	FeedStreamHorizontally(ifStream, 2);
 	ifStream << QStringLiteral("this._internal.removed = [");
 	for (int index = 0; index < typeFieldList.count(); index++){
 		if (index > 0){
@@ -374,6 +376,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 	}
 	ifStream << QStringLiteral("]");
 	FeedStream(ifStream, 1, false);
+
 	FeedStreamHorizontally(ifStream, 1);
 	ifStream << QStringLiteral("}");
 	FeedStream(ifStream, 1, false);

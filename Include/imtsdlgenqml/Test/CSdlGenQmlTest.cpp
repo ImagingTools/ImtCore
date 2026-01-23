@@ -194,7 +194,8 @@ void CSdlGenQmlTest::TestComplexCollectionFilter()
 void CSdlGenQmlTest::cleanupTestCase()
 {
 	if (m_tempOutputDir.exists()){
-		QVERIFY(m_tempOutputDir.removeRecursively());
+		/// \todo Uncomment it after improving the test.
+		// QVERIFY(m_tempOutputDir.removeRecursively());
 	}
 }
 

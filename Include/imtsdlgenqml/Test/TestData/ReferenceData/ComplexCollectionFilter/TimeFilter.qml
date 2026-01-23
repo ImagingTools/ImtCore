@@ -11,7 +11,7 @@ BaseClass {
 	property int m_unitMultiplier: 0
 
 	Component.onCompleted: {
-	this._internal.removed = ["m_timeRange","m_timeUnit","m_interpretationMode","m_unitMultiplier"]
+		this._internal.removed = ["m_timeRange","m_timeUnit","m_interpretationMode","m_unitMultiplier"]
 	}
 
 	function hasTimeRange(){

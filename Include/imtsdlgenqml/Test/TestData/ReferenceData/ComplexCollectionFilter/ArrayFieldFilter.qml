@@ -10,7 +10,7 @@ BaseClass {
 	property var m_filterOperations: []
 
 	Component.onCompleted: {
-	this._internal.removed = ["m_fieldId","m_filterValues","m_filterValueType","m_filterOperations"]
+		this._internal.removed = ["m_fieldId","m_filterValues","m_filterValueType","m_filterOperations"]
 	}
 
 	function hasFieldId(){

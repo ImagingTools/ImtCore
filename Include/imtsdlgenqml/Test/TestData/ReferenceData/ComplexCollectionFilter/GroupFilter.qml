@@ -9,7 +9,7 @@ BaseClass {
 	property string m_logicalOperation: ''
 
 	Component.onCompleted: {
-	this._internal.removed = ["m_fieldFilters","m_groupFilters","m_logicalOperation"]
+		this._internal.removed = ["m_fieldFilters","m_groupFilters","m_logicalOperation"]
 	}
 
 	function hasFieldFilters(){

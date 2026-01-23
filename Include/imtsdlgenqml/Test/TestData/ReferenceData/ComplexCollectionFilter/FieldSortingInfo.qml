@@ -8,7 +8,7 @@ BaseClass {
 	property string m_sortingOrder: ''
 
 	Component.onCompleted: {
-	this._internal.removed = ["m_fieldId","m_sortingOrder"]
+		this._internal.removed = ["m_fieldId","m_sortingOrder"]
 	}
 
 	function hasFieldId(){

@@ -11,7 +11,7 @@ BaseClass {
 	property var m_distinctFields: []
 
 	Component.onCompleted: {
-	this._internal.removed = ["m_sortingInfo","m_fieldsFilter","m_timeFilter","m_textFilter","m_distinctFields"]
+		this._internal.removed = ["m_sortingInfo","m_fieldsFilter","m_timeFilter","m_textFilter","m_distinctFields"]
 	}
 
 	function hasSortingInfo(){
