@@ -125,7 +125,7 @@ def extract_fonts(tokens_json):
             size_str = str(value_obj['fontSize']).replace('px', '')
             try:
                 font_def['PointSize'] = int(float(size_str))
-            except:
+            except (ValueError, TypeError):
                 font_def['PointSize'] = 11
         
         if 'fontWeight' in value_obj:
