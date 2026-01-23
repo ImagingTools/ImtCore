@@ -1,0 +1,3 @@
+[submodule "3rdParty/Python"]
+path = 3rdParty/Python
+url = https://github.com/ImagingTools/Python.git
