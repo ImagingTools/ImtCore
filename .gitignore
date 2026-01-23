@@ -125,7 +125,3 @@ __pycache__/
 Thumbs.db
 Desktop.ini
 $RECYCLE.BIN/
-
-# 3rdParty/Python is managed as a submodule (will be tracked in .gitmodules)
-# Temporarily ignore until submodule is properly configured
-/3rdParty/Python/
