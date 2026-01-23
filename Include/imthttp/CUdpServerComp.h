@@ -17,7 +17,7 @@
 // ImtCore includes
 #include <imtcom/IServerConnectionInterface.h>
 #include <imthttp/IRequest.h>
-#include <imthttp/IRequestServlet.h>
+
 #include <imthttp/IProtocolEngine.h>
 #include <imthttp/IRequestManager.h>
 #include <imthttp/IServer.h>
@@ -55,7 +55,7 @@ public:
 	CUdpServerComp();
 	~CUdpServerComp();
 
-	imthttp::IRequestServlet* GetRequestServlet();
+	imthttp::imtrest::IRequestServlet* GetRequestServlet();
 	int GetThreadsLimit();
 
 protected:
@@ -85,7 +85,7 @@ private Q_SLOTS:
     void SendedResponse(QByteArray);
 
 private:
-	I_REF(imthttp::IRequestServlet, m_requestHandlerCompPtr);
+	I_REF(imthttp::imtrest::IRequestServlet, m_requestHandlerCompPtr);
 	I_REF(IProtocolEngine, m_protocolEngineCompPtr);
 	I_REF(imtcom::IServerConnectionInterface, m_serverConnnectionInterfaceCompPtr);
 

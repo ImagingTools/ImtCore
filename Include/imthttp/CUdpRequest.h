@@ -8,7 +8,7 @@
 
 // ImtCore includes
 #include <imthttp/IRequest.h>
-#include <imthttp/IRequestServlet.h>
+
 #include <imthttp/http_parser.h>
 #include <imthttp/CHttpRequest.h>
 
@@ -21,7 +21,7 @@ class CUdpRequest: public CHttpRequest
 {
 	Q_OBJECT
 public:
-	CUdpRequest(const IRequestServlet& requestHandler,
+	CUdpRequest(const imtrest::IRequestServlet& requestHandler,
 				const IProtocolEngine& engine,
 				QUdpSocket *socket,
 				QHostAddress address,

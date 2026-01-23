@@ -30,13 +30,13 @@ IProtocolEngine* CWebSocketServerComp::GetHttpProtocolEngine()
 }
 
 
-imthttp::IRequestServlet* CWebSocketServerComp::GetRequestServerServlet()
+imthttp::imtrest::IRequestServlet* CWebSocketServerComp::GetRequestServerServlet()
 {
 	return m_requestServerHandlerCompPtr.GetPtr();
 }
 
 
-imthttp::IRequestServlet* CWebSocketServerComp::GetRequestClientServlet()
+imthttp::imtrest::IRequestServlet* CWebSocketServerComp::GetRequestClientServlet()
 {
 	return m_requestClientHandlerCompPtr.GetPtr();
 }

@@ -15,6 +15,12 @@
 #include <imthttp/CSocketThread.h>
 
 
+namespace imtrest
+{
+class IRequestServlet;
+}
+
+
 namespace imthttp
 {
 
@@ -40,7 +46,7 @@ public:
 	explicit CMultiThreadServer(CTcpServerComp* rootServer);
 	virtual ~CMultiThreadServer();
 
-	imthttp::IRequestServlet* GetRequestServlet();
+	imthttp::imtrest::IRequestServlet* GetRequestServlet();
 	imthttp::IProtocolEngine* GetProtocolEngine();
 
 	[[nodiscard]] bool IsSecureConnection() const;

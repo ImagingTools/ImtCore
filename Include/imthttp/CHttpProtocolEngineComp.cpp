@@ -150,14 +150,14 @@ bool CHttpProtocolEngineComp::GetProtocolStatusCode(int statusCode, int& protoco
 }
 
 
-imthttp::IRequestUniquePtr CHttpProtocolEngineComp::CreateRequest(const IRequestServlet& requestHandler) const
+imthttp::IRequestUniquePtr CHttpProtocolEngineComp::CreateRequest(const imtrest::IRequestServlet& requestHandler) const
 {
 	return new CHttpRequest(requestHandler, *this);
 }
 
 
 imthttp::IRequestUniquePtr CHttpProtocolEngineComp::CreateRequestForSend(
-			const IRequestServlet& requestHandler,
+			const imtrest::IRequestServlet& requestHandler,
 			int /*statusCode*/,
 			const QByteArray& /*data*/,
 			const QByteArray& /*dataTypeId*/) const

@@ -35,7 +35,7 @@ CMultiThreadServer::~CMultiThreadServer()
 }
 
 
-imthttp::IRequestServlet* CMultiThreadServer::GetRequestServlet()
+imthttp::imtrest::IRequestServlet* CMultiThreadServer::GetRequestServlet()
 {
 	return m_rootServer.GetRequestServlet();
 }

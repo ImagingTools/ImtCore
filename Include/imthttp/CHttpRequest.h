@@ -7,8 +7,14 @@
 
 // ImtCore includes
 #include <imthttp/IRequest.h>
-#include <imthttp/IRequestServlet.h>
+#include <imthttp/IProtocolEngine.h>
 #include <imthttp/http_parser.h>
+
+
+namespace imtrest
+{
+	class imtrest::IRequestServlet;
+}
 
 
 namespace imthttp
@@ -31,7 +37,7 @@ public:
 		MT_PATCH = 64
 	};
 
-	CHttpRequest(const IRequestServlet& requestHandler, const IProtocolEngine& engine);
+	CHttpRequest(const imtrest::IRequestServlet& requestHandler, const IProtocolEngine& engine);
 
 	QByteArrayList GetHeaders() const;
 	QByteArray GetHeaderValue(const QByteArray& headerType) const;
@@ -83,7 +89,7 @@ protected:
 	QByteArray m_body;
 	QByteArray m_data;
 
-	const IRequestServlet& m_requestHandler;
+	const imtrest::IRequestServlet& m_requestHandler;
 	const IProtocolEngine& m_engine;
 	QObject* m_socket;
 

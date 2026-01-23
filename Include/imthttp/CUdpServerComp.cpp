@@ -33,7 +33,7 @@ CUdpServerComp::~CUdpServerComp()
 }
 
 
-imthttp::IRequestServlet* CUdpServerComp::GetRequestServlet()
+imthttp::imtrest::IRequestServlet* CUdpServerComp::GetRequestServlet()
 {
 	if (!m_requestHandlerCompPtr.IsValid()){
 		return nullptr;

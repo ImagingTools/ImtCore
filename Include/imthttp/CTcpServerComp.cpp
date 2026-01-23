@@ -35,7 +35,7 @@ CTcpServerComp::~CTcpServerComp()
 }
 
 
-imthttp::IRequestServlet* CTcpServerComp::GetRequestServlet()
+imthttp::imtrest::IRequestServlet* CTcpServerComp::GetRequestServlet()
 {
 	if (!m_requestHandlerCompPtr.IsValid()){
 		return nullptr;

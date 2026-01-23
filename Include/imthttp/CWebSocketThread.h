@@ -6,12 +6,18 @@
 #include <QtCore/QMutex>
 
 // ImtCore includes
-#include <imthttp/IRequestServlet.h>
+
 #include <imthttp/ISender.h>
 
 // Qt includes
 #include <QtWebSockets/QWebSocket>
 #include <QtCore/QPointer>
+
+
+namespace imtrest
+{
+class IRequestServlet;
+}
 
 
 namespace imthttp
@@ -53,7 +59,7 @@ public:
 	void SetSocketStatus(Status socketStatus);
 	Status GetSocketStatus();
 	QByteArray GetRequestId();
-	// imthttp::IRequestServlet* GetRequestServlet();
+	// imthttp::imtrest::IRequestServlet* GetRequestServlet();
 
 	[[nodiscard]] bool IsSecureConnection() const;
 	void EnableSecureConnection(bool isSecureConnection = true);
@@ -85,8 +91,8 @@ private:
 	bool m_isSecureConnection;
 
 	imthttp::IProtocolEngine* m_httpEnginePtr;
-	imthttp::IRequestServlet* m_requestServerHandlerPtr;
-	imthttp::IRequestServlet* m_requestClientHandlerPtr;
+	imthttp::imtrest::IRequestServlet* m_requestServerHandlerPtr;
+	imthttp::imtrest::IRequestServlet* m_requestClientHandlerPtr;
 	QByteArray m_productId;
 
 	QByteArray m_requestId;

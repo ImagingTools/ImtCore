@@ -25,7 +25,7 @@ CWebSocketRequest::CWebSocketRequest(const IProtocolEngine& engine)
 }
 
 
-CWebSocketRequest::CWebSocketRequest(const IRequestServlet& handler, const IProtocolEngine& engine)
+CWebSocketRequest::CWebSocketRequest(const imtrest::IRequestServlet& handler, const IProtocolEngine& engine)
 			:m_state(RS_NON_STARTED),
 			m_requestHandlerPtr(&handler),
 			m_engine(engine)
@@ -160,7 +160,7 @@ void CWebSocketRequest::SetBody(const QByteArray &body)
 }
 
 
-void CWebSocketRequest::SetRequestHandler(const IRequestServlet* requestHandlerPtr)
+void CWebSocketRequest::SetRequestHandler(const imtrest::IRequestServlet* requestHandlerPtr)
 {
 	if (m_requestHandlerPtr != requestHandlerPtr){
 		m_requestHandlerPtr = requestHandlerPtr;

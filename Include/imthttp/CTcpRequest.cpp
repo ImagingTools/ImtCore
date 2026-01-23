@@ -15,7 +15,7 @@ namespace imthttp
 
 
 // public methods
-CTcpRequest::CTcpRequest(const IRequestServlet& handler, const IProtocolEngine& engine)
+CTcpRequest::CTcpRequest(const imtrest::IRequestServlet& handler, const IProtocolEngine& engine)
     :CHttpRequest(handler, engine)
 {
 

@@ -13,7 +13,7 @@
 #include <imod/CMultiModelDispatcherBase.h>
 
 // ImtCore includes
-#include <imthttp/IRequestServlet.h>
+
 #include <imthttp/IProtocolEngine.h>
 #include <imthttp/ISubscriberEngine.h>
 #include <imthttp/IRequestManager.h>
@@ -22,6 +22,12 @@
 #include <imtcom/IServerConnectionInterface.h>
 #include <imtcom/IConnectionStatusProvider.h>
 #include <imtcom/ISslConfigurationManager.h>
+
+
+namespace imtrest
+{
+class IRequestServlet;
+}
 
 
 namespace imthttp
@@ -68,8 +74,8 @@ public:
 
 	IProtocolEngine* GetProtocolEngine();
 	IProtocolEngine* GetHttpProtocolEngine();
-	imthttp::IRequestServlet* GetRequestServerServlet();
-	imthttp::IRequestServlet* GetRequestClientServlet();
+	imthttp::imtrest::IRequestServlet* GetRequestServerServlet();
+	imthttp::imtrest::IRequestServlet* GetRequestClientServlet();
 	QByteArray GetProductId();
 	void SetConnectionStatus(const QByteArray& clientId);
 
@@ -131,8 +137,8 @@ protected:
 	QMap <QByteArray, imtcom::IConnectionStatusProvider::ConnectionStatus> m_senderLoginStatusMap;
 	mutable QReadWriteLock m_sendersLock;
 private:
-	I_REF(imthttp::IRequestServlet, m_requestServerHandlerCompPtr);
-	I_REF(imthttp::IRequestServlet, m_requestClientHandlerCompPtr);
+	I_REF(imthttp::imtrest::IRequestServlet, m_requestServerHandlerCompPtr);
+	I_REF(imthttp::imtrest::IRequestServlet, m_requestClientHandlerCompPtr);
 	I_REF(IProtocolEngine, m_protocolEngineCompPtr);
 	I_REF(ISubscriberEngine, m_subscriberEngineCompPtr);
 	I_ATTR(bool, m_startServerOnCreateAttrPtr);

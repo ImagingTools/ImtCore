@@ -64,7 +64,7 @@ QByteArray CSocketThread::GetRequestId()
 }
 
 
-imthttp::IRequestServlet* CSocketThread::GetRequestServlet()
+imthttp::imtrest::IRequestServlet* CSocketThread::GetRequestServlet()
 {
 	return m_requestHandlerPtr;
 }

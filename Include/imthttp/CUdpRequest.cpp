@@ -11,7 +11,7 @@ namespace imthttp
 
 
 // public methods
-CUdpRequest::CUdpRequest(const IRequestServlet& handler,
+CUdpRequest::CUdpRequest(const imtrest::IRequestServlet& handler,
 				const IProtocolEngine& engine,
 				QUdpSocket *socket,
 				QHostAddress address,

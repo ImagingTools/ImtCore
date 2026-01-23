@@ -6,8 +6,13 @@
 
 // ImtCore includes
 #include <imthttp/IRequest.h>
-#include <imthttp/IRequestServlet.h>
 #include <imthttp/IResponse.h>
+
+
+namespace imtrest
+{
+	class IRequestServlet;
+}
 
 
 namespace imthttp
@@ -150,7 +155,7 @@ public:
 		\param socketPtr		Socket instance for reading the incommming data
 		\param requestHandler	Instance to process the request after all data has been read.
 	*/
-	virtual imthttp::IRequestUniquePtr CreateRequest(const IRequestServlet& requestHandler) const = 0;
+	virtual imthttp::IRequestUniquePtr CreateRequest(const imtrest::IRequestServlet& requestHandler) const = 0;
 
 	/**
 		Create request for sending data.
@@ -158,7 +163,7 @@ public:
 		\param request	Related request.
 	*/
 	virtual imthttp::IRequestUniquePtr CreateRequestForSend(
-				const IRequestServlet& requestHandler,
+				const imtrest::IRequestServlet& requestHandler,
 				int statusCode,
 				const QByteArray& data,
 				const QByteArray& dataTypeId) const = 0;

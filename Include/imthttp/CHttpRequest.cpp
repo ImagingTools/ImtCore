@@ -31,7 +31,7 @@ static http_parser_settings s_httpParserSettings
 
 // public methods
 
-CHttpRequest::CHttpRequest(const IRequestServlet& handler, const IProtocolEngine& engine)
+CHttpRequest::CHttpRequest(const imtrest::IRequestServlet& handler, const IProtocolEngine& engine)
 	:m_state(RS_NON_STARTED),
 	m_requestHandler(handler),
 	m_engine(engine)

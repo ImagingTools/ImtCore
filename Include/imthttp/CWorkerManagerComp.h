@@ -8,7 +8,7 @@
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
-#include <imthttp/IRequestServlet.h>
+
 #include <imthttp/IRequestManager.h>
 #include <imthttp/CWorkerThread.h>
 
@@ -20,14 +20,14 @@ namespace imthttp
 class CWorkerManagerComp:
 			public QObject,
 			public ilog::CLoggerComponentBase,
-			public imthttp::IRequestServlet
+			public imthttp::imtrest::IRequestServlet
 {
 	Q_OBJECT
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CWorkerManagerComp);
-		I_REGISTER_INTERFACE(IRequestServlet)
+		I_REGISTER_INTERFACE(imtrest::IRequestServlet)
 		I_ASSIGN(m_requestHandlerCompPtr, "RequestHandler", "Request handler registered for the server", true, "RequestHandler");
 		I_ASSIGN(m_requestManagerCompPtr, "RequestManager", "Request manager registered for the server", true, "RequestManager");
 		I_ASSIGN(m_threadsLimitAttrPtr, "ThreadsLimit", "Limit of threads", true, 5);
@@ -38,7 +38,7 @@ public:
 	IRequestServletPtr CreateServlet();
 	const ISender* GetSender(const QByteArray& requestId);
 
-	// reimplemented (imthttp::IRequestServlet)
+	// reimplemented (imthttp::imtrest::IRequestServlet)
 	virtual bool IsCommandSupported(const QByteArray& commandId) const override;
 	virtual ConstResponsePtr ProcessRequest(const IRequest& request, const QByteArray& subCommandId = QByteArray()) const override;
 
@@ -50,7 +50,7 @@ protected Q_SLOTS:
 	void AboutToQuit();
 
 private:
-	I_FACT(imthttp::IRequestServlet, m_requestHandlerCompPtr);
+	I_FACT(imthttp::imtrest::IRequestServlet, m_requestHandlerCompPtr);
 	I_REF(imthttp::IRequestManager, m_requestManagerCompPtr);
 	I_ATTR(int, m_threadsLimitAttrPtr);
 

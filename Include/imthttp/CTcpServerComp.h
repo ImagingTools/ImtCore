@@ -17,11 +17,17 @@
 // ImtCore includes
 #include <imtcom/IServerConnectionInterface.h>
 #include <imthttp/IRequest.h>
-#include <imthttp/IRequestServlet.h>
+
 #include <imthttp/IProtocolEngine.h>
 #include <imthttp/IRequestManager.h>
 #include <imthttp/IServer.h>
 #include <imtcom/ISslConfigurationManager.h>
+
+
+namespace imtrest
+{
+class IRequestServlet;
+}
 
 
 namespace imthttp
@@ -63,7 +69,7 @@ public:
 	CTcpServerComp();
 	~CTcpServerComp();
 
-	imthttp::IRequestServlet* GetRequestServlet();
+	imthttp::imtrest::IRequestServlet* GetRequestServlet();
 	imthttp::IProtocolEngine* GetProtocolEngine();
 	int GetThreadsLimit();
 
@@ -93,7 +99,7 @@ private Q_SLOTS:
 	void OnNewThreadConnection(const IRequest* request, const QByteArray& subCommandId);
 
 private:
-	I_REF(imthttp::IRequestServlet, m_requestHandlerCompPtr);
+	I_REF(imthttp::imtrest::IRequestServlet, m_requestHandlerCompPtr);
 	I_REF(IProtocolEngine, m_protocolEngineCompPtr);
 	I_REF(imtcom::IServerConnectionInterface, m_serverConnnectionInterfaceCompPtr);
 	I_REF(iprm::IParamsSet, m_sslConfigurationCompPtr);

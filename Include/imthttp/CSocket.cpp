@@ -102,7 +102,7 @@ void CSocket::OnHandleSslErrors(QList<QSslError> errorList)
 
 void CSocket::HandleReadyRead()
 {
-	imthttp::IRequestServlet* requestHandlerPtr = m_rootSocket->GetRequestServlet();
+	imthttp::imtrest::IRequestServlet* requestHandlerPtr = m_rootSocket->GetRequestServlet();
 	Q_ASSERT(requestHandlerPtr != nullptr);
 
 	if (requestHandlerPtr == nullptr){

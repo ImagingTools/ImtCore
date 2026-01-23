@@ -6,7 +6,7 @@
 #include <QtCore/QMutex>
 
 // ImtCore includes
-#include <imthttp/IRequestServlet.h>
+
 #include <imthttp/ISender.h>
 #include <imthttp/CSocket.h>
 
@@ -18,7 +18,7 @@ class CMultiThreadServer;
 
 class CSocketThread:
 			public QThread,
-			virtual public IRequestServlet,
+			virtual public imtrest::IRequestServlet,
 			virtual public ISender
 {
 	Q_OBJECT
@@ -36,7 +36,7 @@ public:
 	void SetSocketStatus(Status socketStatus);
 	Status GetSocketStatus();
 	QByteArray GetRequestId();
-	imthttp::IRequestServlet* GetRequestServlet();
+	imthttp::imtrest::IRequestServlet* GetRequestServlet();
 
 	[[nodiscard]] bool IsSecureConnection() const;
 	void EnableSecureConnection(bool isSecureConnection = true);
@@ -64,7 +64,7 @@ private:
 	CMultiThreadServer* m_server;
 	qintptr m_socketDescriptor;
 	const imthttp::IProtocolEngine* m_enginePtr;
-	imthttp::IRequestServlet* m_requestHandlerPtr;
+	imthttp::imtrest::IRequestServlet* m_requestHandlerPtr;
 	mutable QMutex m_socketDescriptorMutex;
 	mutable QMutex m_statusMutex;
 	Status m_status;
