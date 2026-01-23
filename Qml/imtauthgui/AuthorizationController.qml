@@ -1,6 +1,7 @@
 pragma Singleton
 
 import QtQuick 2.12
+import Qt.labs.settings 1.0
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
@@ -9,7 +10,6 @@ import imtauthgui 1.0
 import imtauthUsersSdl 1.0
 import imtauthAuthorizationSdl 1.0
 import imtauthSessionsSdl 1.0
-import imtbaseSettingsSdl 1.0
 
 QtObject {
 	id: root;
@@ -32,8 +32,14 @@ QtObject {
 	property string lastUser: ""
 	property string storedRefreshToken: ""
 	
-	// Flag to track if settings have been loaded from server
-	property bool settingsLoaded: false
+	// Settings for desktop platforms (Qt.labs.settings)
+	Settings {
+		id: desktopSettings
+		category: "Login"
+		property alias rememberMe: root.rememberMe
+		property alias lastUser: root.lastUser
+		property alias storedRefreshToken: root.storedRefreshToken
+	}
 	
 	property XmlHttpRequestProxy requestProxy: XmlHttpRequestProxy {
 		onForbidden: {
@@ -89,10 +95,12 @@ QtObject {
 					AuthorizationController.removeDataFromStorage();
 				}
 				else {
-					// For non-web platforms, try to load settings from server first
-					// The actual login attempt will happen in loadSettingsQuery.onFinished
-					root.loadLoginSettingsFromServer();
-					return;
+					// For non-web platforms, settings are loaded automatically via Settings component
+					// Try to restore session with refresh token if available
+					if (root.rememberMe && root.storedRefreshToken !== "" && root.lastUser !== "") {
+						root.loginWithRefreshToken(root.lastUser, root.storedRefreshToken);
+						return;
+					}
 				}
 			}
 			
@@ -166,14 +174,10 @@ QtObject {
 			root.lastUser = userTokenProvider.login;
 			
 			if (Qt.platform.os === "web"){
-				// For web, save to localStorage (already done in saveDataToStorage)
-				// Just need to ensure the data is current
+				// For web, save to localStorage
 				saveDataToStorage();
 			}
-			else {
-				// For non-web platforms, save to server
-				saveLoginSettingsToServer();
-			}
+			// For desktop, Settings component handles persistence automatically
 		}
 		else {
 			clearRefreshToken();
@@ -190,30 +194,7 @@ QtObject {
 			localStorage.removeItem("rememberMe");
 			localStorage.removeItem("lastUser");
 		}
-		else {
-			// For non-web platforms, clear from server
-			saveLoginSettingsToServer();
-		}
-	}
-
-	function saveLoginSettingsToServer(){
-		var settings = {
-			"rememberMe": root.rememberMe,
-			"lastUser": root.lastUser,
-			"refreshToken": root.storedRefreshToken
-		};
-		
-		saveSettingsMutation.settingsData = JSON.stringify(settings);
-		saveSettingsMutation.userId = userTokenProvider.userId !== "" ? userTokenProvider.userId : "anonymous";
-		saveSettingsMutation.send();
-	}
-
-	function loadLoginSettingsFromServer(){
-		if (root.settingsLoaded){
-			return; // Already loaded
-		}
-		
-		loadSettingsQuery.send();
+		// For desktop, Settings component handles persistence automatically
 	}
 
 	function loginWithRefreshToken(userName, refreshToken){
@@ -450,82 +431,6 @@ QtObject {
 					else {
 						// Refresh token login failed, clear stored token
 						root.clearRefreshToken();
-					}
-				}
-			}
-		}
-	}
-
-	// GQL sender for loading login settings from server
-	property GqlSdlRequestSender loadSettingsQuery: GqlSdlRequestSender {
-		gqlCommandId: ImtbaseSettingsSdlCommandIds.s_getSettings
-		
-		inputObjectComp: Component {
-			GetSettingsInput {
-				// Use a special anonymous user ID for pre-login settings
-				m_userId: "anonymous"
-			}
-		}
-
-		sdlObjectComp: Component {
-			ParamsSet {
-				onFinished: {
-					root.settingsLoaded = true;
-					
-					// Parse the settings JSON
-					try {
-						var settingsJson = this.toJson();
-						if (settingsJson && settingsJson !== "") {
-							var settings = JSON.parse(settingsJson);
-							
-							if (settings.rememberMe !== undefined) {
-								root.rememberMe = settings.rememberMe;
-							}
-							if (settings.lastUser !== undefined) {
-								root.lastUser = settings.lastUser;
-							}
-							if (settings.refreshToken !== undefined) {
-								root.storedRefreshToken = settings.refreshToken;
-							}
-							
-							// Now try to restore session with refresh token if available
-							if (root.rememberMe && root.storedRefreshToken !== "" && root.lastUser !== "") {
-								root.loginWithRefreshToken(root.lastUser, root.storedRefreshToken);
-								return;
-							}
-						}
-					}
-					catch (e) {
-						console.log("Failed to parse login settings from server. JSON: " + settingsJson + ", Error: " + e);
-					}
-					
-					// If no auto-login, show the login page
-					root.superuserExistResult("EXISTS", "");
-				}
-			}
-		}
-	}
-
-	// GQL sender for saving login settings to server
-	property GqlSdlRequestSender saveSettingsMutation: GqlSdlRequestSender {
-		requestType: 1 // Mutation
-		gqlCommandId: ImtbaseSettingsSdlCommandIds.s_setSettings
-		
-		property string settingsData: ""
-		property string userId: "anonymous"
-		
-		inputObjectComp: Component {
-			SetSettingsInput {
-				m_userId: saveSettingsMutation.userId
-				m_settings: saveSettingsMutation.settingsData
-			}
-		}
-
-		sdlObjectComp: Component {
-			SetSettingsPayload {
-				onFinished: {
-					if (!m_ok) {
-						console.log("Failed to save login settings to server for userId: " + saveSettingsMutation.userId);
 					}
 				}
 			}
