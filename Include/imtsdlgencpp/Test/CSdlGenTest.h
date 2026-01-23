@@ -1,9 +1,6 @@
 #pragma once
 
 
-// STL includes
-#include <memory>
-
 // Qt includes
 #include <QtCore/QObject>
 #include <QtCore/QDir>
