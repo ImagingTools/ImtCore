@@ -15,6 +15,7 @@
 #include <imtdesign/CDesignTokenCommonQrcGeneratorComp.h>
 #include <imtdesign/CDesignTokenWebQrcGeneratorComp.h>
 #include <imtdesign/CDesignTokenSplitProcessorComp.h>
+#include <imtdesign/CFigmaTokenProcessorComp.h>
 
 #include <imtdesign/CDesignTokenIconQmlGeneratorComp.h>
 
@@ -35,6 +36,7 @@ typedef imtdesign::CDesignTokenCommonQrcGeneratorComp CDesignTokenCommonQrcGener
 typedef imtdesign::CDesignTokenWebQrcGeneratorComp DesignTokenWebQrcGenerator;
 typedef imtdesign::CDesignTokenSplitProcessorComp DesignTokenSplitProcessor;
 typedef imtdesign::CDesignTokenIconQmlGeneratorComp DesignTokenIconQmlGenerator;
+typedef imtdesign::CFigmaTokenProcessorComp FigmaTokenProcessor;
 
 
 } // namespace ImtDesignPck
