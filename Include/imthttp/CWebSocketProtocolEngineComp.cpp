@@ -29,6 +29,12 @@ const iser::IVersionInfo* CWebSocketProtocolEngineComp::GetProtocolVersion() con
 }
 
 
+IProtocolEngine::ProtocolPattern CWebSocketProtocolEngineComp::GetProtocolPattern() const
+{
+	return PP_STREAMING;
+}
+
+
 bool CWebSocketProtocolEngineComp::GetProtocolStatusCode(int /*statusCode*/, int& protocolStatusCode, QByteArray& statusCodeLiteral) const
 {
 	protocolStatusCode = 200;

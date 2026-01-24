@@ -26,6 +26,12 @@ const iser::IVersionInfo* CHttpProtocolEngineComp::GetProtocolVersion() const
 }
 
 
+IProtocolEngine::ProtocolPattern CHttpProtocolEngineComp::GetProtocolPattern() const
+{
+	return PP_REQUEST_RESPONSE;
+}
+
+
 bool CHttpProtocolEngineComp::GetProtocolStatusCode(int statusCode, int& protocolStatusCode, QByteArray& statusCodeLiteral) const
 {
 	auto setProtocolStatusCode = [&protocolStatusCode, &statusCodeLiteral](const int& protocolStatusCodeValue, const QByteArray& statusCodeLiteralValue){

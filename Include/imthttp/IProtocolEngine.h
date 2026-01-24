@@ -21,10 +21,37 @@ namespace imthttp
 
 /**
 	Interface for core-level protocol definition.
+	Supports multiple communication patterns for different protocols.
 */
 class IProtocolEngine: virtual public istd::IPolymorphic
 {
 public:
+	/**
+		Communication pattern supported by the protocol.
+	*/
+	enum ProtocolPattern
+	{
+		/**
+			Request-response pattern (HTTP, TCP with request/response).
+		*/
+		PP_REQUEST_RESPONSE,
+		
+		/**
+			Publish-subscribe pattern (MQTT, AMQP).
+		*/
+		PP_PUBLISH_SUBSCRIBE,
+		
+		/**
+			Bidirectional streaming (WebSocket, gRPC streams).
+		*/
+		PP_STREAMING,
+		
+		/**
+			Datagram/message-based (UDP, ZeroMQ).
+		*/
+		PP_DATAGRAM
+	};
+
 	enum StatusCode
 	{
 		/**
@@ -134,6 +161,7 @@ public:
 
 	/**
 		Get type-ID of the used protocol.
+		\return Protocol identifier (e.g., "http", "mqtt", "websocket", "tcp", "udp")
 	*/
 	virtual QByteArray GetProtocolTypeId() const = 0;
 
@@ -143,7 +171,18 @@ public:
 	virtual const iser::IVersionInfo* GetProtocolVersion() const = 0;
 
 	/**
+		Get the communication pattern supported by this protocol.
+		\return The protocol pattern (request-response, pub-sub, streaming, or datagram)
+	*/
+	virtual ProtocolPattern GetProtocolPattern() const = 0;
+
+	/**
 		Get the protocol-specific code for the engine's status.
+		Maps generic status codes to protocol-specific codes.
+		\param statusCode Generic status code
+		\param protocolStatusCode Output: protocol-specific status code
+		\param statusCodeLiteral Output: human-readable status description
+		\return true if mapping was successful, false otherwise
 	*/
 	virtual bool GetProtocolStatusCode(
 				int statusCode,
