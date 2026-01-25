@@ -30,7 +30,7 @@ public:
 	// reimplemented (istd::IChangeable)
 	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
-	// Additional helper for internal use
+	// Helper method for debugging and diagnostics (not part of IJobStatus interface)
 	QByteArray GetJobId() const { return m_jobId; }
 
 private:

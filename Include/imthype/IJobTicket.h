@@ -22,7 +22,7 @@ public:
 		MIT_TYPE_ID,
 		MIT_UUID,
 		MIT_JOB_NAME,
-		MIT_CONTEXT_ID
+		MIT_CONTEXT_ID,
 	};
 
 	typedef std::function<iprm::IParamsSetSharedPtr(const QByteArray& contextId, const QByteArray& typeId)> ParamsFactoryFunction;
