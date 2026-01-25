@@ -140,9 +140,10 @@ bool CJobStatus::Serialize(iser::IArchive& archive)
 
 	static iser::CArchiveTag statusTag("Status", "Processing status", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(statusTag);
-	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeEnum<IJobQueueManager::ProcessingStatus,
-																	  IJobQueueManager::ToString,
-																	  IJobQueueManager::FromString>(archive, m_processingStatus);
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeEnum<
+				IJobQueueManager::ProcessingStatus,
+				IJobQueueManager::ToString,
+				IJobQueueManager::FromString>(archive, m_processingStatus);
 	retVal = retVal && archive.EndTag(statusTag);
 
 	static iser::CArchiveTag progressTag("Progress", "Processing progress", iser::CArchiveTag::TT_LEAF);

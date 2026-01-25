@@ -49,9 +49,10 @@ bool CJobExecutionMessage::Serialize(iser::IArchive& archive)
 
 	static iser::CArchiveTag eventTypeTag("EventType", "Execution event type", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(eventTypeTag);
-	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeEnum<IJobExecutionLog::ExecutionEventType,
-																	  IJobExecutionLog::ToString,
-																	  IJobExecutionLog::FromString>(archive, m_eventType);
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeEnum<
+				IJobExecutionLog::ExecutionEventType,
+				IJobExecutionLog::ToString,
+				IJobExecutionLog::FromString>(archive, m_eventType);
 	retVal = retVal && archive.EndTag(eventTypeTag);
 
 	return retVal;
@@ -71,7 +72,7 @@ QByteArray CJobExecutionMessage::GetFactoryId() const
 bool CJobExecutionMessage::CopyFrom(const istd::IChangeable& object, istd::IChangeable::CompatibilityMode mode)
 {
 	// First copy the base class
-	if (!ilog::CMessage::CopyFrom(object, mode)) {
+	if (!BaseClass::CopyFrom(object, mode)){
 		return false;
 	}
 
