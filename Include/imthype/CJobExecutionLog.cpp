@@ -1,12 +1,13 @@
 #include <imthype/CJobExecutionLog.h>
 
 
+// imthype includes
+#include <imthype/CJobExecutionMessage.h>
+
 // ACF includes
-#include <ilog/CMessage.h>
 #include <istd/CChangeNotifier.h>
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
-#include <iser/CPrimitiveTypesSerializer.h>
 
 
 namespace imthype
@@ -43,14 +44,9 @@ void CJobExecutionLog::LogExecutionEvent(
 			break;
 	}
 	
-	// Create and add the message with MessagePtr (shared pointer)
-	int messageIndex = GetMessagesCount();
-
-	ilog::IMessageConsumer::MessagePtr messagePtr(new ilog::CMessage(category, 0, message, "JobExecutionLog", 0, &timestamp));
+	// Create and add the execution message with event type
+	ilog::IMessageConsumer::MessagePtr messagePtr(new CJobExecutionMessage(eventType, category, message, "JobExecutionLog", 0, &timestamp));
 	BaseClass::AddMessage(messagePtr);
-
-	// Track the event type for fast lookup
-	m_eventTypeMap.insert(eventType, messageIndex);
 }
 
 
@@ -58,8 +54,19 @@ ilog::IMessageContainer::Messages CJobExecutionLog::GetExecutionEvents(Execution
 {
 	ilog::IMessageContainer::Messages events;
 	
-	// TODO: Implement filtering of messages for the related event type.
-
+	// Iterate through all messages and filter by event type
+	int messageCount = GetMessagesCount();
+	for (int i = 0; i < messageCount; ++i) {
+		const ilog::CMessage& msg = GetMessage(i);
+		
+		// Check if this is a CJobExecutionMessage and if it matches the requested event type
+		const CJobExecutionMessage* executionMsg = dynamic_cast<const CJobExecutionMessage*>(&msg);
+		if (executionMsg && executionMsg->GetEventType() == eventType) {
+			// Create a MessagePtr from the message reference
+			events.append(ilog::IMessageConsumer::MessagePtr(new CJobExecutionMessage(*executionMsg)));
+		}
+	}
+	
 	return events;
 }
 
@@ -68,83 +75,20 @@ bool CJobExecutionLog::Serialize(iser::IArchive& archive)
 {
 	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
 	
-	bool retVal = true;
-	
 	// Serialize the message container (parent class)
-	static iser::CArchiveTag messagesTag("Messages", "Execution log messages", iser::CArchiveTag::TT_GROUP);
-	retVal = retVal && archive.BeginTag(messagesTag);
-	retVal = retVal && ilog::CMessageContainer::Serialize(archive);
-	retVal = retVal && archive.EndTag(messagesTag);
-	
-	// Serialize the event type map
-	int eventMapCount = m_eventTypeMap.size();
-	
-	static iser::CArchiveTag eventMapListTag("EventMapList", "Event type mapping list", iser::CArchiveTag::TT_MULTIPLE);
-	static iser::CArchiveTag eventMapEntryTag("EventMapEntry", "Event map entry", iser::CArchiveTag::TT_GROUP, &eventMapListTag);
-	
-	retVal = retVal && archive.BeginMultiTag(eventMapListTag, eventMapEntryTag, eventMapCount);
-	
-	if (archive.IsStoring()) {
-		auto it = m_eventTypeMap.begin();
-		for (int i = 0; i < eventMapCount; ++i, ++it) {
-			retVal = retVal && archive.BeginTag(eventMapEntryTag);
-			
-			int eventType = static_cast<int>(it.key());
-			int messageIndex = it.value();
-			
-			static iser::CArchiveTag eventTypeTag("EventType", "Event type", iser::CArchiveTag::TT_LEAF, &eventMapEntryTag);
-			retVal = retVal && archive.BeginTag(eventTypeTag);
-			retVal = retVal && archive.Process(eventType);
-			retVal = retVal && archive.EndTag(eventTypeTag);
-			
-			static iser::CArchiveTag messageIndexTag("MessageIndex", "Message index", iser::CArchiveTag::TT_LEAF, &eventMapEntryTag);
-			retVal = retVal && archive.BeginTag(messageIndexTag);
-			retVal = retVal && archive.Process(messageIndex);
-			retVal = retVal && archive.EndTag(messageIndexTag);
-			
-			retVal = retVal && archive.EndTag(eventMapEntryTag);
-		}
-	} else {
-		m_eventTypeMap.clear();
-		
-		for (int i = 0; i < eventMapCount; ++i) {
-			retVal = retVal && archive.BeginTag(eventMapEntryTag);
-			
-			int eventType = 0;
-			int messageIndex = 0;
-			
-			static iser::CArchiveTag eventTypeTag("EventType", "Event type", iser::CArchiveTag::TT_LEAF, &eventMapEntryTag);
-			retVal = retVal && archive.BeginTag(eventTypeTag);
-			retVal = retVal && archive.Process(eventType);
-			retVal = retVal && archive.EndTag(eventTypeTag);
-			
-			static iser::CArchiveTag messageIndexTag("MessageIndex", "Message index", iser::CArchiveTag::TT_LEAF, &eventMapEntryTag);
-			retVal = retVal && archive.BeginTag(messageIndexTag);
-			retVal = retVal && archive.Process(messageIndex);
-			retVal = retVal && archive.EndTag(messageIndexTag);
-			
-			retVal = retVal && archive.EndTag(eventMapEntryTag);
-			
-			m_eventTypeMap.insert(static_cast<ExecutionEventType>(eventType), messageIndex);
-		}
-	}
-	
-	retVal = retVal && archive.EndTag(eventMapListTag);
-	
-	return retVal;
+	// The event types are stored within each CJobExecutionMessage, so no separate map needed
+	return ilog::CMessageContainer::Serialize(archive);
 }
 
 
-bool CJobExecutionLog::CopyFrom(const istd::IChangeable& object, CompatibilityMode /*mode*/)
+bool CJobExecutionLog::CopyFrom(const istd::IChangeable& object, CompatibilityMode mode)
 {
 	const CJobExecutionLog* sourcePtr = dynamic_cast<const CJobExecutionLog*>(&object);
 	if (sourcePtr) {
 		istd::CChangeNotifier changeNotifier(this);
 		
-		ilog::CMessageContainer::CopyFrom(*sourcePtr);
-		m_eventTypeMap = sourcePtr->m_eventTypeMap;
-		
-		return true;
+		// Copy the message container
+		return ilog::CMessageContainer::CopyFrom(*sourcePtr, mode);
 	}
 	
 	return false;
@@ -155,10 +99,8 @@ bool CJobExecutionLog::IsEqual(const istd::IChangeable& object) const
 {
 	const CJobExecutionLog* sourcePtr = dynamic_cast<const CJobExecutionLog*>(&object);
 	if (sourcePtr) {
-		bool retVal = ilog::CMessageContainer::IsEqual(*sourcePtr);
-		retVal = retVal && (m_eventTypeMap == sourcePtr->m_eventTypeMap);
-		
-		return retVal;
+		// Compare the message containers
+		return ilog::CMessageContainer::IsEqual(*sourcePtr);
 	}
 	
 	return false;
@@ -180,10 +122,8 @@ bool CJobExecutionLog::ResetData(CompatibilityMode mode)
 {
 	istd::CChangeNotifier changeNotifier(this);
 	
-	ilog::CMessageContainer::ResetData(mode);
-	m_eventTypeMap.clear();
-	
-	return true;
+	// Reset the message container
+	return ilog::CMessageContainer::ResetData(mode);
 }
 
 

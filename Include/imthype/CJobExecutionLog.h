@@ -44,9 +44,6 @@ public:
 	virtual istd::IChangeableUniquePtr CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
-private:
-	// Map event types to message indices for fast lookup
-	QMultiHash<ExecutionEventType, int> m_eventTypeMap;
 };
 
 
