@@ -63,7 +63,10 @@ ilog::IMessageContainer::Messages CJobExecutionLog::GetExecutionEvents(Execution
 	// Retrieve the actual messages as shared pointers
 	for (int index : indices) {
 		if (index < GetMessagesCount()) {
-			events.append(GetMessage(index));
+			// Create a shared pointer from the message
+			const ilog::CMessage& msg = GetMessage(index);
+			ilog::IMessageConsumer::MessagePtr msgPtr(new ilog::CMessage(msg));
+			events.append(msgPtr);
 		}
 	}
 	
