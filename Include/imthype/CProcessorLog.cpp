@@ -1,6 +1,10 @@
 #include <imthype/CProcessorLog.h>
 
 
+// ACF includes
+#include <istd/CChangeNotifier.h>
+
+
 namespace imthype
 {
 
@@ -25,7 +29,10 @@ QByteArray CProcessorLog::GetProcessorId() const
 
 void CProcessorLog::SetProcessorId(const QByteArray& processorId)
 {
-	m_processorId = processorId;
+	if (m_processorId != processorId) {
+		istd::CChangeNotifier changeNotifier(this);
+		m_processorId = processorId;
+	}
 }
 
 
@@ -37,7 +44,10 @@ QByteArray CProcessorLog::GetJobId() const
 
 void CProcessorLog::SetJobId(const QByteArray& jobId)
 {
-	m_jobId = jobId;
+	if (m_jobId != jobId) {
+		istd::CChangeNotifier changeNotifier(this);
+		m_jobId = jobId;
+	}
 }
 
 

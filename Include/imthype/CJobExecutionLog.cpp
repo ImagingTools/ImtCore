@@ -3,6 +3,7 @@
 
 // ACF includes
 #include <ilog/CMessage.h>
+#include <istd/CChangeNotifier.h>
 
 
 namespace imthype
@@ -25,6 +26,8 @@ void CJobExecutionLog::LogExecutionEvent(
 	const QString& message,
 	const QDateTime& timestamp)
 {
+	istd::CChangeNotifier changeNotifier(this);
+	
 	// Create a log message with appropriate severity based on event type
 	ilog::IMessage::MessageSeverity severity = ilog::IMessage::MS_INFO;
 	
