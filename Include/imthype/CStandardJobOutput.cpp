@@ -212,13 +212,10 @@ void CStandardJobOutput::SetExecutionLog(const IJobExecutionLog& executionLog)
 {
 	istd::CChangeNotifier changeNotifier(this);
 	
-	// Copy the execution log
-	m_executionLog.Clear();
-	const ilog::IMessageContainer* containerPtr = dynamic_cast<const ilog::IMessageContainer*>(&executionLog);
-	if (containerPtr) {
-		for (int i = 0; i < containerPtr->GetMessagesCount(); ++i) {
-			m_executionLog.AddMessage(containerPtr->GetMessagePtr(i));
-		}
+	// Copy the execution log using CopyFrom
+	const istd::IChangeable* changeablePtr = dynamic_cast<const istd::IChangeable*>(&executionLog);
+	if (changeablePtr) {
+		m_executionLog.CopyFrom(*changeablePtr);
 	}
 }
 
@@ -233,11 +230,10 @@ void CStandardJobOutput::SetProcessorLog(const ilog::IMessageContainer& processo
 {
 	istd::CChangeNotifier changeNotifier(this);
 	
-	// Copy the processor log
-	m_processorLog.Clear();
-	
-	for (int i = 0; i < processorLog.GetMessagesCount(); ++i) {
-		m_processorLog.AddMessage(processorLog.GetMessagePtr(i));
+	// Copy the processor log using CopyFrom
+	const istd::IChangeable* changeablePtr = dynamic_cast<const istd::IChangeable*>(&processorLog);
+	if (changeablePtr) {
+		m_processorLog.CopyFrom(*changeablePtr);
 	}
 }
 
