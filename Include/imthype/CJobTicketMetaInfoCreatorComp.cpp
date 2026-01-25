@@ -39,8 +39,7 @@ bool CJobTicketMetaInfoCreatorComp::CreateMetaInfo(
 	metaInfoPtr->SetMetaInfo(imthype::IJobTicket::MIT_UUID, jobTicketInfoPtr->GetUuid());
 	metaInfoPtr->SetMetaInfo(imthype::IJobTicket::MIT_JOB_NAME, jobTicketInfoPtr->GetJobName());
 	metaInfoPtr->SetMetaInfo(imthype::IJobTicket::MIT_CONTEXT_ID, jobTicketInfoPtr->GetContextId());
-	metaInfoPtr->SetMetaInfo(imthype::IJobTicket::MIT_PROGRESS, jobTicketInfoPtr->GetProgress());
-	metaInfoPtr->SetMetaInfo(imthype::IJobTicket::MIT_PROCESSING_STATUS, jobTicketInfoPtr->GetProcessingStatus());
+	// Note: MIT_PROGRESS and MIT_PROCESSING_STATUS removed - status/progress now in separate IJobStatus
 
 	return true;
 }
@@ -53,12 +52,9 @@ idoc::IDocumentMetaInfo::MetaInfoTypes CJobTicketMetaInfoCreatorComp::MetaInfo::
 	return {
 		imthype::IJobTicket::MIT_UUID,
 		imthype::IJobTicket::MIT_JOB_NAME,
-		imthype::IJobTicket::MIT_CONTEXT_ID,
-		imthype::IJobTicket::MIT_PROGRESS,
-		imthype::IJobTicket::MIT_PROCESSING_STATUS
+		imthype::IJobTicket::MIT_CONTEXT_ID
+		// Note: MIT_PROGRESS and MIT_PROCESSING_STATUS removed - status/progress now in separate IJobStatus
 	};
-
-	return MetaInfoTypes();
 }
 
 

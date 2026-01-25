@@ -230,11 +230,8 @@ void CStandardJobOutput::SetProcessorLog(const ilog::IMessageContainer& processo
 {
 	istd::CChangeNotifier changeNotifier(this);
 	
-	// Copy the processor log using CopyFrom
-	const istd::IChangeable* changeablePtr = dynamic_cast<const istd::IChangeable*>(&processorLog);
-	if (changeablePtr) {
-		m_processorLog.CopyFrom(*changeablePtr);
-	}
+	// Copy the processor log using CopyFrom (IMessageContainer inherits from IChangeable)
+	m_processorLog.CopyFrom(processorLog);
 }
 
 
@@ -298,12 +295,12 @@ bool CStandardJobOutput::Serialize(iser::IArchive& archive)
 	retVal = m_results.Serialize(archive);
 	retVal = retVal && archive.EndTag(outputTag);
 
-	static iser::CArchiveTag executionLogTag("ExecutionLog", "Job execution log");
+	static iser::CArchiveTag executionLogTag("ExecutionLog", "Job execution log", iser::CArchiveTag::TT_GROUP);
 	retVal = retVal && archive.BeginTag(executionLogTag);
 	retVal = retVal && m_executionLog.Serialize(archive);
 	retVal = retVal && archive.EndTag(executionLogTag);
 
-	static iser::CArchiveTag processorLogTag("ProcessorLog", "Processor/worker log");
+	static iser::CArchiveTag processorLogTag("ProcessorLog", "Processor/worker log", iser::CArchiveTag::TT_GROUP);
 	retVal = retVal && archive.BeginTag(processorLogTag);
 	retVal = retVal && m_processorLog.Serialize(archive);
 	retVal = retVal && archive.EndTag(processorLogTag);
@@ -326,9 +323,13 @@ bool CStandardJobOutput::CopyFrom(const istd::IChangeable& object, Compatibility
 		m_jobName = sourcePtr->m_jobName;
 		m_outputTypeMap = sourcePtr->m_outputTypeMap;
 		
-		// Copy logs
-		m_executionLog.CopyFrom(sourcePtr->m_executionLog);
-		m_processorLog.CopyFrom(sourcePtr->m_processorLog);
+		// Copy logs (CopyFrom can fail, check return value)
+		if (!m_executionLog.CopyFrom(sourcePtr->m_executionLog)) {
+			return false;
+		}
+		if (!m_processorLog.CopyFrom(sourcePtr->m_processorLog)) {
+			return false;
+		}
 
 		return true;
 	}
@@ -379,9 +380,9 @@ bool CStandardJobOutput::ResetData(CompatibilityMode /*mode*/)
 	m_jobName.clear();
 	m_outputTypeMap.clear();
 	
-	// Reset logs
-	m_executionLog.Clear();
-	m_processorLog.Clear();
+	// Reset logs using ResetData
+	m_executionLog.ResetData();
+	m_processorLog.ResetData();
 
 	return true;
 }
