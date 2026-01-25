@@ -133,7 +133,7 @@ public:
 		\param eventType Type of events to retrieve
 		\return List of messages matching the event type
 	*/
-	virtual QList<ilog::IMessage> GetExecutionEvents(ExecutionEventType eventType) const = 0;
+	virtual QList<ilog::CMessage> GetExecutionEvents(ExecutionEventType eventType) const = 0;
 };
 
 
