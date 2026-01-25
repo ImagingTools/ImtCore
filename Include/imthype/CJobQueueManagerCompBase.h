@@ -88,7 +88,6 @@ public:
 protected:
 	IJobTicketSharedPtr GetJobTicket(const QByteArray& jobId) const;
 	IJobStatusSharedPtr GetJobStatus(const QByteArray& jobId) const;
-	IJobStatusSharedPtr GetOrCreateJobStatus(const QByteArray& jobId);
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;

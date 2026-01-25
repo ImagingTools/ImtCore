@@ -67,21 +67,6 @@ IJobStatusSharedPtr CJobQueueManagerCompBase::GetJobStatus(const QByteArray& job
 }
 
 
-IJobStatusSharedPtr CJobQueueManagerCompBase::GetOrCreateJobStatus(const QByteArray& jobId)
-{
-	// Check if status already exists
-	if (m_jobStatusMap.contains(jobId)){
-		return m_jobStatusMap.value(jobId);
-	}
-	
-	// Create new status entry for this job
-	IJobStatusSharedPtr statusPtr(new CJobStatus(jobId));
-	m_jobStatusMap.insert(jobId, statusPtr);
-	
-	return statusPtr;
-}
-
-
 // reimplemented (IJobQueueManager)
 
 QByteArray CJobQueueManagerCompBase::GetTaskTypeId(const QByteArray& jobId) const
@@ -156,8 +141,9 @@ QByteArray CJobQueueManagerCompBase::InsertNewJobIntoQueue(
 	}
 
 	// Create separate status object for tracking execution state
-	IJobStatusSharedPtr statusPtr = GetOrCreateJobStatus(jobId);
+	IJobStatusSharedPtr statusPtr(new CJobStatus(jobId));
 	statusPtr->SetProcessingStatus(PS_WAITING_FOR_ACCEPTING);
+	m_jobStatusMap.insert(jobId, statusPtr);
 
 	lock.unlock();
 
@@ -365,8 +351,8 @@ bool CJobQueueManagerCompBase::SetProcessingStatus(const QByteArray & jobId, Pro
 		return false;
 	}
 
-	// Set status in separate status object
-	IJobStatusSharedPtr statusPtr = GetOrCreateJobStatus(jobId);
+	// Get status object (should exist since it's created with the job)
+	IJobStatusSharedPtr statusPtr = GetJobStatus(jobId);
 	if (!statusPtr.IsValid()){
 		return false;
 	}
@@ -416,8 +402,8 @@ bool CJobQueueManagerCompBase::SetProgress(const QByteArray& jobId, double progr
 		return false;
 	}
 
-	// Set progress in separate status object
-	IJobStatusSharedPtr statusPtr = GetOrCreateJobStatus(jobId);
+	// Get status object (should exist since it's created with the job)
+	IJobStatusSharedPtr statusPtr = GetJobStatus(jobId);
 	if (!statusPtr.IsValid()){
 		return false;
 	}
