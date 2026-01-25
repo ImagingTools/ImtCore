@@ -23,6 +23,8 @@ public:
 		MIT_UUID,
 		MIT_JOB_NAME,
 		MIT_CONTEXT_ID,
+		MIT_PROGRESS,
+		MIT_PROCESSING_STATUS
 	};
 
 	typedef std::function<iprm::IParamsSetSharedPtr(const QByteArray& contextId, const QByteArray& typeId)> ParamsFactoryFunction;
@@ -41,6 +43,12 @@ public:
 
 	virtual iprm::IParamsSetSharedPtr GetParams() const = 0;
 	virtual void SetParams(const iprm::IParamsSetSharedPtr& paramsPtr) = 0;
+
+	virtual IJobQueueManager::ProcessingStatus GetProcessingStatus() const = 0;
+	virtual void SetProcessingStatus(IJobQueueManager::ProcessingStatus status) = 0;
+
+	virtual double GetProgress() const = 0;
+	virtual void SetProgress(double progress) = 0;
 
 	virtual const IJobOutput* GetResults() const = 0;
 	virtual void SetResults(const IJobOutput& results) = 0;

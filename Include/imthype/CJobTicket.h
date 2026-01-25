@@ -29,6 +29,10 @@ public:
 	virtual void SetContextId(const QByteArray& contextId) override;
 	virtual iprm::IParamsSetSharedPtr GetParams() const override;
 	virtual void SetParams(const iprm::IParamsSetSharedPtr& paramsPtr) override;
+	virtual imthype::IJobQueueManager::ProcessingStatus GetProcessingStatus() const override;
+	virtual void SetProcessingStatus(imthype::IJobQueueManager::ProcessingStatus status) override;
+	virtual double GetProgress() const override;
+	virtual void SetProgress(double progress) override;
 	virtual const imthype::IJobOutput* GetResults() const override;
 	virtual void SetResults(const imthype::IJobOutput& results) override;
 	virtual const imtbase::IReferenceCollection* GetInput() const override;
@@ -47,6 +51,8 @@ private:
 	QByteArray m_uuid;
 	QString m_name;
 	QByteArray m_contextId;
+	double m_progress;
+	imthype::IJobQueueManager::ProcessingStatus m_processingStatus;
 	CStandardJobOutput m_results;
 	imtbase::CSimpleReferenceCollection m_input;
 	iprm::IParamsSetSharedPtr m_paramsPtr;
