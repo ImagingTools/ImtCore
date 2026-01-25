@@ -4,6 +4,7 @@
 // ACF includes
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
+#include <iser/CPrimitiveTypesSerializer.h>
 #include <istd/CClassInfo.h>
 #include <istd/CChangeNotifier.h>
 #include <ilog/CMessageContainer.h>
@@ -48,12 +49,9 @@ bool CJobExecutionMessage::Serialize(iser::IArchive& archive)
 
 	static iser::CArchiveTag eventTypeTag("EventType", "Execution event type", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(eventTypeTag);
-	int eventTypeInt = static_cast<int>(m_eventType);
-	retVal = retVal && archive.Process(eventTypeInt);
-	if (archive.IsStoring()) {
-		m_eventType = static_cast<IJobExecutionLog::ExecutionEventType>(eventTypeInt);
-	}
-
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeEnum<IJobExecutionLog::ExecutionEventType,
+																	  IJobExecutionLog::ToString,
+																	  IJobExecutionLog::FromString>(archive, m_eventType);
 	retVal = retVal && archive.EndTag(eventTypeTag);
 
 	return retVal;
