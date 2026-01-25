@@ -4,6 +4,9 @@
 // ImtCore includes
 #include <imthype/IJobStatus.h>
 
+// ACF includes
+#include <iser/ISerializable.h>
+
 
 namespace imthype
 {

@@ -91,11 +91,11 @@ int CJobStatus::GetSupportedOperations() const
 bool CJobStatus::IsEqual(const IChangeable& object) const
 {
 	const CJobStatus* implPtr = dynamic_cast<const CJobStatus*>(&object);
-	if (implPtr != nullptr){
+	if (implPtr != nullptr) {
 		return
 			(m_jobId == implPtr->m_jobId) &&
 			(m_processingStatus == implPtr->m_processingStatus) &&
-			(qFuzzyCompare(m_progress, implPtr->m_progress));
+			(qFuzzyIsNull(m_progress - implPtr->m_progress));
 	}
 
 	return false;
