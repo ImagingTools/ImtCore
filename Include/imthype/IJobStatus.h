@@ -11,16 +11,6 @@ namespace imthype
 
 /**
 	Interface for managing job execution status and progress.
-	
-	This interface is separated from IJobTicket to follow the Single Responsibility Principle.
-	IJobTicket represents the job configuration and identity, while IJobStatus tracks the 
-	runtime state (status and progress) of a job's execution.
-	
-	Design Rationale:
-	- Job ticket is immutable job configuration (what to execute)
-	- Job status is mutable execution state (how execution is progressing)
-	- Separation allows independent persistence, caching, and change tracking
-	- Enables lighter-weight status queries without loading full job configuration
 */
 class IJobStatus: virtual public istd::IChangeable
 {
