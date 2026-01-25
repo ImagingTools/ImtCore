@@ -124,7 +124,7 @@ double CJobTicket::GetProgress() const
 
 void CJobTicket::SetProgress(double progress)
 {
-	if (m_progress != progress){
+	if (!qFuzzyCompare(m_progress, progress)){
 		istd::CChangeNotifier changeNotifier(this);
 
 		m_progress = progress;
@@ -194,11 +194,6 @@ bool CJobTicket::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_name);
 	retVal = retVal && archive.EndTag(nameTag);
 
-	static iser::CArchiveTag inputTag("Input", "Job input", iser::CArchiveTag::TT_GROUP);
-	retVal = retVal && archive.BeginTag(inputTag);
-	retVal = retVal && m_input.Serialize(archive);
-	retVal = retVal && archive.EndTag(inputTag);
-
 	static iser::CArchiveTag statusTag("Status", "Processing status", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(statusTag);
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeEnum<IJobQueueManager::ProcessingStatus,
@@ -210,6 +205,11 @@ bool CJobTicket::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.BeginTag(progressTag);
 	retVal = retVal && archive.Process(m_progress);
 	retVal = retVal && archive.EndTag(progressTag);
+
+	static iser::CArchiveTag inputTag("Input", "Job input", iser::CArchiveTag::TT_GROUP);
+	retVal = retVal && archive.BeginTag(inputTag);
+	retVal = retVal && m_input.Serialize(archive);
+	retVal = retVal && archive.EndTag(inputTag);
 
 	// Handle params serialization/deserialization
 	static iser::CArchiveTag paramsTag("Configuration", "Processing parameters", iser::CArchiveTag::TT_GROUP);

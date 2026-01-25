@@ -142,7 +142,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CJobTicketDatabaseDelegateComp::C
 	QString name = jobTicketPtr->GetJobName();
 	QByteArray contextId = jobTicketPtr->GetContextId();
 	double progress = jobTicketPtr->GetProgress();
-	int processingStatus = static_cast<int>(jobTicketPtr->GetProcessingStatus());
+	IJobQueueManager::ProcessingStatus processingStatus = jobTicketPtr->GetProcessingStatus();
 
 	// Serialize Params to JSON
 	QByteArray paramsData;
@@ -188,7 +188,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CJobTicketDatabaseDelegateComp::C
 				.arg(name)
 				.arg(qPrintable(contextId))
 				.arg(progress)
-				.arg(processingStatus)
+				.arg(static_cast<int>(processingStatus))
 				.arg(QString::fromUtf8(paramsData.toBase64()))
 				.arg(QString::fromUtf8(resultsData.toBase64()))
 				.arg(QString::fromUtf8(inputData.toBase64()))
@@ -249,7 +249,7 @@ QByteArray CJobTicketDatabaseDelegateComp::CreateUpdateObjectQuery(
 	QString name = jobTicketPtr->GetJobName();
 	QByteArray contextId = jobTicketPtr->GetContextId();
 	double progress = jobTicketPtr->GetProgress();
-	int processingStatus = static_cast<int>(jobTicketPtr->GetProcessingStatus());
+	IJobQueueManager::ProcessingStatus processingStatus = jobTicketPtr->GetProcessingStatus();
 
 	// Serialize Params to JSON
 	QByteArray paramsData;
@@ -293,7 +293,7 @@ QByteArray CJobTicketDatabaseDelegateComp::CreateUpdateObjectQuery(
 				.arg(name)
 				.arg(qPrintable(contextId))
 				.arg(progress)
-				.arg(processingStatus)
+				.arg(static_cast<int>(processingStatus))
 				.arg(QString::fromUtf8(paramsData.toBase64()))
 				.arg(QString::fromUtf8(resultsData.toBase64()))
 				.arg(QString::fromUtf8(inputData.toBase64()))
