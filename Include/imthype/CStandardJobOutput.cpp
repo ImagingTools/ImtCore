@@ -202,6 +202,51 @@ void CStandardJobOutput::SetOutputType(const QByteArray& outputObjectId, Process
 }
 
 
+const IJobExecutionLog* CStandardJobOutput::GetExecutionLog() const
+{
+	return &m_executionLog;
+}
+
+
+void CStandardJobOutput::SetExecutionLog(const IJobExecutionLog& executionLog)
+{
+	istd::CChangeNotifier changeNotifier(this);
+	
+	// Copy the execution log
+	m_executionLog.Clear();
+	const ilog::IMessageContainer* containerPtr = dynamic_cast<const ilog::IMessageContainer*>(&executionLog);
+	if (containerPtr) {
+		for (int i = 0; i < containerPtr->GetMessagesCount(); ++i) {
+			m_executionLog.AddMessage(containerPtr->GetMessage(i));
+		}
+	}
+}
+
+
+const IProcessorLog* CStandardJobOutput::GetProcessorLog() const
+{
+	return &m_processorLog;
+}
+
+
+void CStandardJobOutput::SetProcessorLog(const IProcessorLog& processorLog)
+{
+	istd::CChangeNotifier changeNotifier(this);
+	
+	// Copy the processor log
+	m_processorLog.Clear();
+	m_processorLog.SetJobId(processorLog.GetJobId());
+	m_processorLog.SetProcessorId(processorLog.GetProcessorId());
+	
+	const ilog::IMessageContainer* containerPtr = dynamic_cast<const ilog::IMessageContainer*>(&processorLog);
+	if (containerPtr) {
+		for (int i = 0; i < containerPtr->GetMessagesCount(); ++i) {
+			m_processorLog.AddMessage(containerPtr->GetMessage(i));
+		}
+	}
+}
+
+
 // reimplemented (istd::IInformationProvider)
 
 QDateTime CStandardJobOutput::GetInformationTimeStamp() const
