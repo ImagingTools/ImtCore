@@ -351,7 +351,7 @@ bool CJobQueueManagerCompBase::SetProcessingStatus(const QByteArray & jobId, Pro
 		return false;
 	}
 
-	// Get status object (should exist since it's created with the job)
+	// Get status object (created with job; validation is defensive)
 	IJobStatusSharedPtr statusPtr = GetJobStatus(jobId);
 	if (!statusPtr.IsValid()){
 		return false;
@@ -402,7 +402,7 @@ bool CJobQueueManagerCompBase::SetProgress(const QByteArray& jobId, double progr
 		return false;
 	}
 
-	// Get status object (should exist since it's created with the job)
+	// Get status object (created with job; validation is defensive)
 	IJobStatusSharedPtr statusPtr = GetJobStatus(jobId);
 	if (!statusPtr.IsValid()){
 		return false;
