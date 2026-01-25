@@ -370,7 +370,7 @@ istd::IChangeableUniquePtr CStandardJobOutput::CloneMe(CompatibilityMode mode) c
 }
 
 
-bool CStandardJobOutput::ResetData(CompatibilityMode /*mode*/)
+bool CStandardJobOutput::ResetData(CompatibilityMode mode)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
