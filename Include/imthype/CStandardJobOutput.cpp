@@ -217,7 +217,7 @@ void CStandardJobOutput::SetExecutionLog(const IJobExecutionLog& executionLog)
 	const ilog::IMessageContainer* containerPtr = dynamic_cast<const ilog::IMessageContainer*>(&executionLog);
 	if (containerPtr) {
 		for (int i = 0; i < containerPtr->GetMessagesCount(); ++i) {
-			m_executionLog.AddMessage(containerPtr->GetMessage(i));
+			m_executionLog.AddMessage(containerPtr->GetMessagePtr(i));
 		}
 	}
 }
@@ -237,7 +237,7 @@ void CStandardJobOutput::SetProcessorLog(const ilog::IMessageContainer& processo
 	m_processorLog.Clear();
 	
 	for (int i = 0; i < processorLog.GetMessagesCount(); ++i) {
-		m_processorLog.AddMessage(processorLog.GetMessage(i));
+		m_processorLog.AddMessage(processorLog.GetMessagePtr(i));
 	}
 }
 
