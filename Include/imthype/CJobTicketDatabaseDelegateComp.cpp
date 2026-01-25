@@ -56,15 +56,7 @@ istd::IChangeableUniquePtr CJobTicketDatabaseDelegateComp::CreateObjectFromRecor
 		jobTicketPtr->SetContextId(contextId);
 	}
 
-	if (record.contains("Progress")){
-		double progress = record.value("Progress").toDouble();
-		jobTicketPtr->SetProgress(progress);
-	}
-
-	if (record.contains("ProcessingStatus")){
-		int status = record.value("ProcessingStatus").toInt();
-		jobTicketPtr->SetProcessingStatus(static_cast<IJobQueueManager::ProcessingStatus>(status));
-	}
+	// Note: Progress and ProcessingStatus are now managed separately via IJobStatus, not persisted with IJobTicket
 
 	// Deserialize Params from JSON
 	if (record.contains("Params")){
@@ -141,8 +133,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CJobTicketDatabaseDelegateComp::C
 	QByteArray uuid = jobTicketPtr->GetUuid();
 	QString name = jobTicketPtr->GetJobName();
 	QByteArray contextId = jobTicketPtr->GetContextId();
-	double progress = jobTicketPtr->GetProgress();
-	int processingStatus = static_cast<int>(jobTicketPtr->GetProcessingStatus());
+	// Note: Progress and ProcessingStatus are now managed separately via IJobStatus, not persisted with IJobTicket
 
 	// Serialize Params to JSON
 	QByteArray paramsData;
@@ -181,14 +172,12 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CJobTicketDatabaseDelegateComp::C
 	}
 
 	NewObjectQuery retVal;
-	retVal.query = QString("INSERT INTO \"JobTickets\"(\"Id\", \"TypeId\", \"Uuid\", \"Name\", \"ContextId\", \"Progress\", \"ProcessingStatus\", \"Params\", \"Results\", \"Input\") VALUES('%1', '%2', '%3', '%4', '%5', %6, %7, '%8', '%9', '%10');")
+	retVal.query = QString("INSERT INTO \"JobTickets\"(\"Id\", \"TypeId\", \"Uuid\", \"Name\", \"ContextId\", \"Params\", \"Results\", \"Input\") VALUES('%1', '%2', '%3', '%4', '%5', '%6', '%7', '%8');")
 				.arg(qPrintable(proposedObjectId))
 				.arg(qPrintable(typeId))
 				.arg(qPrintable(uuid))
 				.arg(name)
 				.arg(qPrintable(contextId))
-				.arg(progress)
-				.arg(processingStatus)
 				.arg(QString::fromUtf8(paramsData.toBase64()))
 				.arg(QString::fromUtf8(resultsData.toBase64()))
 				.arg(QString::fromUtf8(inputData.toBase64()))
@@ -248,8 +237,7 @@ QByteArray CJobTicketDatabaseDelegateComp::CreateUpdateObjectQuery(
 	QByteArray uuid = jobTicketPtr->GetUuid();
 	QString name = jobTicketPtr->GetJobName();
 	QByteArray contextId = jobTicketPtr->GetContextId();
-	double progress = jobTicketPtr->GetProgress();
-	int processingStatus = static_cast<int>(jobTicketPtr->GetProcessingStatus());
+	// Note: Progress and ProcessingStatus are now managed separately via IJobStatus, not persisted with IJobTicket
 
 	// Serialize Params to JSON
 	QByteArray paramsData;
@@ -287,13 +275,11 @@ QByteArray CJobTicketDatabaseDelegateComp::CreateUpdateObjectQuery(
 		}
 	}
 
-	QByteArray retVal = QString("UPDATE \"JobTickets\" SET \"TypeId\" = '%1', \"Uuid\" = '%2', \"Name\" = '%3', \"ContextId\" = '%4', \"Progress\" = %5, \"ProcessingStatus\" = %6, \"Params\" = '%7', \"Results\" = '%8', \"Input\" = '%9' WHERE \"Id\" ='%10';")
+	QByteArray retVal = QString("UPDATE \"JobTickets\" SET \"TypeId\" = '%1', \"Uuid\" = '%2', \"Name\" = '%3', \"ContextId\" = '%4', \"Params\" = '%5', \"Results\" = '%6', \"Input\" = '%7' WHERE \"Id\" ='%8';")
 				.arg(qPrintable(typeId))
 				.arg(qPrintable(uuid))
 				.arg(name)
 				.arg(qPrintable(contextId))
-				.arg(progress)
-				.arg(processingStatus)
 				.arg(QString::fromUtf8(paramsData.toBase64()))
 				.arg(QString::fromUtf8(resultsData.toBase64()))
 				.arg(QString::fromUtf8(inputData.toBase64()))
