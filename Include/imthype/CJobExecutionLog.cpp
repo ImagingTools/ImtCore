@@ -53,17 +53,17 @@ void CJobExecutionLog::LogExecutionEvent(
 }
 
 
-QList<ilog::CMessage> CJobExecutionLog::GetExecutionEvents(ExecutionEventType eventType) const
+ilog::IMessageContainer::Messages CJobExecutionLog::GetExecutionEvents(ExecutionEventType eventType) const
 {
-	QList<ilog::CMessage> events;
+	ilog::IMessageContainer::Messages events;
 	
 	// Get all message indices for this event type
 	QList<int> indices = m_eventTypeMap.values(eventType);
 	
-	// Retrieve the actual messages
+	// Retrieve the actual messages as shared pointers
 	for (int index : indices) {
 		if (index < GetMessagesCount()) {
-			events.append(GetMessage(index));
+			events.append(GetMessagePtr(index));
 		}
 	}
 	

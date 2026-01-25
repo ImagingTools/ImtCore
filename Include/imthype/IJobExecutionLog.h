@@ -131,9 +131,9 @@ public:
 	/**
 		Get all execution events of a specific type.
 		\param eventType Type of events to retrieve
-		\return List of messages matching the event type
+		\return List of message pointers matching the event type
 	*/
-	virtual QList<ilog::CMessage> GetExecutionEvents(ExecutionEventType eventType) const = 0;
+	virtual ilog::IMessageContainer::Messages GetExecutionEvents(ExecutionEventType eventType) const = 0;
 };
 
 

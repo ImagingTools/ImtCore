@@ -31,7 +31,7 @@ public:
 		ExecutionEventType eventType,
 		const QString& message,
 		const QDateTime& timestamp = QDateTime::currentDateTime()) override;
-	virtual QList<ilog::CMessage> GetExecutionEvents(ExecutionEventType eventType) const override;
+	virtual ilog::IMessageContainer::Messages GetExecutionEvents(ExecutionEventType eventType) const override;
 	
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
