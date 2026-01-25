@@ -68,8 +68,14 @@ QByteArray CJobExecutionMessage::GetFactoryId() const
 
 // reimplemented (istd::IChangeable)
 
-bool CJobExecutionMessage::CopyFrom(const istd::IChangeable& object, istd::IChangeable::CompatibilityMode /*mode*/)
+bool CJobExecutionMessage::CopyFrom(const istd::IChangeable& object, istd::IChangeable::CompatibilityMode mode)
 {
+	// First copy the base class
+	if (!ilog::CMessage::CopyFrom(object, mode)) {
+		return false;
+	}
+
+	// Then copy our derived members
 	const CJobExecutionMessage* sourcePtr = dynamic_cast<const CJobExecutionMessage*>(&object);
 	if (sourcePtr != nullptr){
 		m_eventType = sourcePtr->m_eventType;
