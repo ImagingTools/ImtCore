@@ -77,41 +77,66 @@ bool CJobExecutionLog::Serialize(iser::IArchive& archive)
 	
 	bool retVal = true;
 	
-	// Serialize the message container
-	static iser::CArchiveTag messagesTag("Messages", "Execution log messages");
+	// Serialize the message container (parent class)
+	static iser::CArchiveTag messagesTag("Messages", "Execution log messages", iser::CArchiveTag::TT_GROUP);
 	retVal = retVal && archive.BeginTag(messagesTag);
 	retVal = retVal && ilog::CMessageContainer::Serialize(archive);
 	retVal = retVal && archive.EndTag(messagesTag);
 	
 	// Serialize the event type map
-	static iser::CArchiveTag eventMapTag("EventMap", "Event type mapping");
-	retVal = retVal && archive.BeginTag(eventMapTag);
+	int eventMapCount = m_eventTypeMap.size();
+	
+	static iser::CArchiveTag eventMapListTag("EventMapList", "Event type mapping list", iser::CArchiveTag::TT_MULTIPLE);
+	static iser::CArchiveTag eventMapEntryTag("EventMapEntry", "Event map entry", iser::CArchiveTag::TT_GROUP, &eventMapListTag);
+	
+	retVal = retVal && archive.BeginMultiTag(eventMapListTag, eventMapEntryTag, eventMapCount);
 	
 	if (archive.IsStoring()) {
-		int count = m_eventTypeMap.size();
-		retVal = retVal && archive.Process(count);
-		
-		for (auto it = m_eventTypeMap.begin(); it != m_eventTypeMap.end(); ++it) {
+		auto it = m_eventTypeMap.begin();
+		for (int i = 0; i < eventMapCount; ++i, ++it) {
+			retVal = retVal && archive.BeginTag(eventMapEntryTag);
+			
 			int eventType = static_cast<int>(it.key());
 			int messageIndex = it.value();
+			
+			static iser::CArchiveTag eventTypeTag("EventType", "Event type", iser::CArchiveTag::TT_LEAF, &eventMapEntryTag);
+			retVal = retVal && archive.BeginTag(eventTypeTag);
 			retVal = retVal && archive.Process(eventType);
+			retVal = retVal && archive.EndTag(eventTypeTag);
+			
+			static iser::CArchiveTag messageIndexTag("MessageIndex", "Message index", iser::CArchiveTag::TT_LEAF, &eventMapEntryTag);
+			retVal = retVal && archive.BeginTag(messageIndexTag);
 			retVal = retVal && archive.Process(messageIndex);
+			retVal = retVal && archive.EndTag(messageIndexTag);
+			
+			retVal = retVal && archive.EndTag(eventMapEntryTag);
 		}
 	} else {
 		m_eventTypeMap.clear();
-		int count = 0;
-		retVal = retVal && archive.Process(count);
 		
-		for (int i = 0; i < count; ++i) {
+		for (int i = 0; i < eventMapCount; ++i) {
+			retVal = retVal && archive.BeginTag(eventMapEntryTag);
+			
 			int eventType = 0;
 			int messageIndex = 0;
+			
+			static iser::CArchiveTag eventTypeTag("EventType", "Event type", iser::CArchiveTag::TT_LEAF, &eventMapEntryTag);
+			retVal = retVal && archive.BeginTag(eventTypeTag);
 			retVal = retVal && archive.Process(eventType);
+			retVal = retVal && archive.EndTag(eventTypeTag);
+			
+			static iser::CArchiveTag messageIndexTag("MessageIndex", "Message index", iser::CArchiveTag::TT_LEAF, &eventMapEntryTag);
+			retVal = retVal && archive.BeginTag(messageIndexTag);
 			retVal = retVal && archive.Process(messageIndex);
+			retVal = retVal && archive.EndTag(messageIndexTag);
+			
+			retVal = retVal && archive.EndTag(eventMapEntryTag);
+			
 			m_eventTypeMap.insert(static_cast<ExecutionEventType>(eventType), messageIndex);
 		}
 	}
 	
-	retVal = retVal && archive.EndTag(eventMapTag);
+	retVal = retVal && archive.EndTag(eventMapListTag);
 	
 	return retVal;
 }
