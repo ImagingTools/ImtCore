@@ -142,7 +142,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CJobTicketDatabaseDelegateComp::C
 	QString name = jobTicketPtr->GetJobName();
 	QByteArray contextId = jobTicketPtr->GetContextId();
 	double progress = jobTicketPtr->GetProgress();
-	ProcessingStatus processingStatus = jobTicketPtr->GetProcessingStatus();
+	IJobQueueManager::ProcessingStatus processingStatus = jobTicketPtr->GetProcessingStatus();
 
 	// Serialize Params to JSON
 	QByteArray paramsData;
@@ -249,7 +249,7 @@ QByteArray CJobTicketDatabaseDelegateComp::CreateUpdateObjectQuery(
 	QString name = jobTicketPtr->GetJobName();
 	QByteArray contextId = jobTicketPtr->GetContextId();
 	double progress = jobTicketPtr->GetProgress();
-	ProcessingStatus processingStatus = jobTicketPtr->GetProcessingStatus();
+	IJobQueueManager::ProcessingStatus processingStatus = jobTicketPtr->GetProcessingStatus();
 
 	// Serialize Params to JSON
 	QByteArray paramsData;

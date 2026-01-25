@@ -19,9 +19,9 @@ CJobExecutionLog::CJobExecutionLog()
 
 
 void CJobExecutionLog::LogExecutionEvent(
-	ExecutionEventType eventType,
-	const QString& message,
-	const QDateTime& timestamp)
+			ExecutionEventType eventType,
+			const QString& message,
+			const QDateTime& timestamp)
 {
 	istd::CChangeNotifier changeNotifier(this);
 	
@@ -45,9 +45,10 @@ void CJobExecutionLog::LogExecutionEvent(
 	
 	// Create and add the message with MessagePtr (shared pointer)
 	int messageIndex = GetMessagesCount();
-	ilog::IMessageConsumer::MessagePtr messagePtr(new ilog::CMessage(category, 0, message, "JobExecutionLog"));
-	ilog::CMessageContainer::AddMessage(messagePtr);
-	
+
+	ilog::IMessageConsumer::MessagePtr messagePtr(new ilog::CMessage(category, 0, message, "JobExecutionLog", 0, &timestamp));
+	BaseClass::AddMessage(messagePtr);
+
 	// Track the event type for fast lookup
 	m_eventTypeMap.insert(eventType, messageIndex);
 }
@@ -57,19 +58,8 @@ ilog::IMessageContainer::Messages CJobExecutionLog::GetExecutionEvents(Execution
 {
 	ilog::IMessageContainer::Messages events;
 	
-	// Get all message indices for this event type
-	QList<int> indices = m_eventTypeMap.values(eventType);
-	
-	// Retrieve the actual messages as shared pointers
-	for (int index : indices) {
-		if (index < GetMessagesCount()) {
-			// Create a shared pointer from the message
-			const ilog::CMessage& msg = GetMessage(index);
-			ilog::IMessageConsumer::MessagePtr msgPtr(new ilog::CMessage(msg));
-			events.append(msgPtr);
-		}
-	}
-	
+	// TODO: Implement filtering of messages for the related event type.
+
 	return events;
 }
 

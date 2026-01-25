@@ -19,11 +19,13 @@ namespace imthype
 	Stores system-level job controller events and lifecycle tracking.
 */
 class CJobExecutionLog: 
-	virtual public IJobExecutionLog,
 	public ilog::CMessageContainer,
+	virtual public IJobExecutionLog,
 	virtual public iser::ISerializable
 {
 public:
+	typedef ilog::CMessageContainer BaseClass;
+
 	CJobExecutionLog();
 	
 	// reimplemented (IJobExecutionLog)
