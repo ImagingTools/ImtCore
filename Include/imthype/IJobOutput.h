@@ -7,7 +7,9 @@
 // Acula includes
 #include <imthype/IProcessingInfo.h>
 #include <imthype/IJobExecutionLog.h>
-#include <imthype/IProcessorLog.h>
+
+// ACF includes
+#include <ilog/IMessageContainer.h>
 
 
 namespace imthype
@@ -74,13 +76,13 @@ public:
 		Get the processor log (worker processing output).
 		\return Pointer to processor log, or nullptr if not set
 	*/
-	virtual const IProcessorLog* GetProcessorLog() const = 0;
+	virtual const ilog::IMessageContainer* GetProcessorLog() const = 0;
 	
 	/**
 		Set the processor log.
 		\param processorLog Worker processing log
 	*/
-	virtual void SetProcessorLog(const IProcessorLog& processorLog) = 0;
+	virtual void SetProcessorLog(const ilog::IMessageContainer& processorLog) = 0;
 };
 
 

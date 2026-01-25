@@ -223,25 +223,21 @@ void CStandardJobOutput::SetExecutionLog(const IJobExecutionLog& executionLog)
 }
 
 
-const IProcessorLog* CStandardJobOutput::GetProcessorLog() const
+const ilog::IMessageContainer* CStandardJobOutput::GetProcessorLog() const
 {
 	return &m_processorLog;
 }
 
 
-void CStandardJobOutput::SetProcessorLog(const IProcessorLog& processorLog)
+void CStandardJobOutput::SetProcessorLog(const ilog::IMessageContainer& processorLog)
 {
 	istd::CChangeNotifier changeNotifier(this);
 	
 	// Copy the processor log
 	m_processorLog.Clear();
-	m_processorLog.SetProcessorId(processorLog.GetProcessorId());
 	
-	const ilog::IMessageContainer* containerPtr = dynamic_cast<const ilog::IMessageContainer*>(&processorLog);
-	if (containerPtr) {
-		for (int i = 0; i < containerPtr->GetMessagesCount(); ++i) {
-			m_processorLog.AddMessage(containerPtr->GetMessage(i));
-		}
+	for (int i = 0; i < processorLog.GetMessagesCount(); ++i) {
+		m_processorLog.AddMessage(processorLog.GetMessage(i));
 	}
 }
 

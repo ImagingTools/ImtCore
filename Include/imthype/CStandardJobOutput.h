@@ -11,7 +11,9 @@
 #include <imthype/IJobOutput.h>
 #include <imthype/CProcessingInfo.h>
 #include <imthype/CJobExecutionLog.h>
-#include <imthype/CProcessorLog.h>
+
+// ACF includes
+#include <ilog/CMessageContainer.h>
 
 
 namespace imthype
@@ -90,8 +92,8 @@ public:
 	virtual void SetOutputType(const QByteArray & outputObjectId, ProcessingOutputType outputType) override;
 	virtual const IJobExecutionLog* GetExecutionLog() const override;
 	virtual void SetExecutionLog(const IJobExecutionLog& executionLog) override;
-	virtual const IProcessorLog* GetProcessorLog() const override;
-	virtual void SetProcessorLog(const IProcessorLog& processorLog) override;
+	virtual const ilog::IMessageContainer* GetProcessorLog() const override;
+	virtual void SetProcessorLog(const ilog::IMessageContainer& processorLog) override;
 
 	// reimplemented (istd::IInformationProvider)
 	virtual QDateTime GetInformationTimeStamp() const override;
@@ -120,8 +122,8 @@ private:
 	imtbase::CSimpleReferenceCollection m_results;
 	
 	// Separate logs for different purposes
-	CJobExecutionLog m_executionLog;  // System-level controller events
-	CProcessorLog m_processorLog;      // Worker processing output
+	CJobExecutionLog m_executionLog;         // System-level controller events
+	ilog::CMessageContainer m_processorLog;  // Worker processing output
 };
 
 
