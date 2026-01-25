@@ -16,8 +16,6 @@ namespace imthype
 // public methods
 
 CJobTicket::CJobTicket()
-	:m_progress(0.0),
-	m_processingStatus(IJobQueueManager::PS_NONE)
 {
 }
 
@@ -100,38 +98,6 @@ void CJobTicket::SetParams(const iprm::IParamsSetSharedPtr& paramsPtr)
 }
 
 
-imthype::IJobQueueManager::ProcessingStatus CJobTicket::GetProcessingStatus() const
-{
-	return m_processingStatus;
-}
-
-
-void CJobTicket::SetProcessingStatus(imthype::IJobQueueManager::ProcessingStatus status)
-{
-	if (m_processingStatus != status){
-		istd::CChangeNotifier changeNotifier(this);
-
-		m_processingStatus = status;
-	}
-}
-
-
-double CJobTicket::GetProgress() const
-{
-	return m_progress;
-}
-
-
-void CJobTicket::SetProgress(double progress)
-{
-	if (m_progress != progress){
-		istd::CChangeNotifier changeNotifier(this);
-
-		m_progress = progress;
-	}
-}
-
-
 const imthype::IJobOutput* CJobTicket::GetResults() const
 {
 	return &m_results;
@@ -199,18 +165,6 @@ bool CJobTicket::Serialize(iser::IArchive& archive)
 	retVal = retVal && m_input.Serialize(archive);
 	retVal = retVal && archive.EndTag(inputTag);
 
-	static iser::CArchiveTag statusTag("Status", "Processing status", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(statusTag);
-	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeEnum<IJobQueueManager::ProcessingStatus,
-																	  IJobQueueManager::ToString,
-																	  IJobQueueManager::FromString>(archive, m_processingStatus);
-	retVal = retVal && archive.EndTag(statusTag);
-
-	static iser::CArchiveTag progressTag("Progress", "Processing progress", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(progressTag);
-	retVal = retVal && archive.Process(m_progress);
-	retVal = retVal && archive.EndTag(progressTag);
-
 	// Handle params serialization/deserialization
 	static iser::CArchiveTag paramsTag("Configuration", "Processing parameters", iser::CArchiveTag::TT_GROUP);
 	if (retVal && archive.BeginTag(paramsTag)){
@@ -247,8 +201,6 @@ bool CJobTicket::CopyFrom(const IChangeable &object, CompatibilityMode mode)
 		m_uuid = sourcePtr->m_uuid;
 		m_name = sourcePtr->m_name;
 		m_contextId = sourcePtr->m_contextId;
-		m_progress = sourcePtr->m_progress;
-		m_processingStatus = sourcePtr->m_processingStatus;
 		m_results = sourcePtr->m_results;
 		m_input = sourcePtr->m_input;
 		m_paramsPtr = sourcePtr->m_paramsPtr;

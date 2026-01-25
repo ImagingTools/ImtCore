@@ -58,12 +58,6 @@ void CJobStatus::SetProgress(double progress)
 }
 
 
-QByteArray CJobStatus::GetJobId() const
-{
-	return m_jobId;
-}
-
-
 // reimplemented (istd::IChangeable)
 
 bool CJobStatus::CopyFrom(const IChangeable& object, CompatibilityMode mode)

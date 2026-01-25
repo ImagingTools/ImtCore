@@ -22,7 +22,7 @@ namespace imthype
 	- Separation allows independent persistence, caching, and change tracking
 	- Enables lighter-weight status queries without loading full job configuration
 */
-class IJobStatus
+class IJobStatus: virtual public istd::IChangeable
 {
 public:
 	virtual ~IJobStatus() = default;
@@ -48,11 +48,6 @@ public:
 		\param progress Progress value between 0.0 and 1.0
 	*/
 	virtual void SetProgress(double progress) = 0;
-
-	/**
-		Get the job UUID this status belongs to.
-	*/
-	virtual QByteArray GetJobId() const = 0;
 };
 
 

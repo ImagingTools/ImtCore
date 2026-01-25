@@ -15,7 +15,7 @@ namespace imthype
 	Stores job execution status and progress information separately from 
 	the job configuration (IJobTicket).
 */
-class CJobStatus: virtual public IJobStatus, virtual public istd::IChangeable
+class CJobStatus: virtual public IJobStatus
 {
 public:
 	CJobStatus();
@@ -26,10 +26,12 @@ public:
 	virtual void SetProcessingStatus(IJobQueueManager::ProcessingStatus status) override;
 	virtual double GetProgress() const override;
 	virtual void SetProgress(double progress) override;
-	virtual QByteArray GetJobId() const override;
 
 	// reimplemented (istd::IChangeable)
 	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+
+	// Additional helper for internal use
+	QByteArray GetJobId() const { return m_jobId; }
 
 private:
 	QByteArray m_jobId;
