@@ -63,7 +63,7 @@ ilog::IMessageContainer::Messages CJobExecutionLog::GetExecutionEvents(Execution
 	// Retrieve the actual messages as shared pointers
 	for (int index : indices) {
 		if (index < GetMessagesCount()) {
-			events.append(GetMessagePtr(index));
+			events.append(GetMessage(index));
 		}
 	}
 	
@@ -183,11 +183,11 @@ istd::IChangeableUniquePtr CJobExecutionLog::CloneMe(CompatibilityMode mode) con
 }
 
 
-bool CJobExecutionLog::ResetData(CompatibilityMode /*mode*/)
+bool CJobExecutionLog::ResetData(CompatibilityMode mode)
 {
 	istd::CChangeNotifier changeNotifier(this);
 	
-	ilog::CMessageContainer::Clear();
+	ilog::CMessageContainer::ResetData(mode);
 	m_eventTypeMap.clear();
 	
 	return true;
