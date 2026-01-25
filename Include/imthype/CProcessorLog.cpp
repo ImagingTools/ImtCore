@@ -3,6 +3,9 @@
 
 // ACF includes
 #include <istd/CChangeNotifier.h>
+#include <iser/IArchive.h>
+#include <iser/CArchiveTag.h>
+#include <iser/CPrimitiveTypesSerializer.h>
 
 
 namespace imthype
@@ -14,9 +17,8 @@ CProcessorLog::CProcessorLog()
 }
 
 
-CProcessorLog::CProcessorLog(const QByteArray& jobId, const QByteArray& processorId)
-	:m_jobId(jobId),
-	m_processorId(processorId)
+CProcessorLog::CProcessorLog(const QByteArray& processorId)
+	:m_processorId(processorId)
 {
 }
 
@@ -36,18 +38,77 @@ void CProcessorLog::SetProcessorId(const QByteArray& processorId)
 }
 
 
-QByteArray CProcessorLog::GetJobId() const
+bool CProcessorLog::Serialize(iser::IArchive& archive)
 {
-	return m_jobId;
+	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
+	
+	bool retVal = true;
+	
+	// Serialize the processor ID
+	static iser::CArchiveTag processorIdTag("ProcessorId", "Processor identifier", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(processorIdTag);
+	retVal = retVal && archive.Process(m_processorId);
+	retVal = retVal && archive.EndTag(processorIdTag);
+	
+	// Serialize the message container
+	static iser::CArchiveTag messagesTag("Messages", "Processor log messages");
+	retVal = retVal && archive.BeginTag(messagesTag);
+	retVal = retVal && ilog::CMessageContainer::Serialize(archive);
+	retVal = retVal && archive.EndTag(messagesTag);
+	
+	return retVal;
 }
 
 
-void CProcessorLog::SetJobId(const QByteArray& jobId)
+bool CProcessorLog::CopyFrom(const istd::IChangeable& object, CompatibilityMode /*mode*/)
 {
-	if (m_jobId != jobId) {
+	const CProcessorLog* sourcePtr = dynamic_cast<const CProcessorLog*>(&object);
+	if (sourcePtr) {
 		istd::CChangeNotifier changeNotifier(this);
-		m_jobId = jobId;
+		
+		m_processorId = sourcePtr->m_processorId;
+		ilog::CMessageContainer::CopyFrom(*sourcePtr);
+		
+		return true;
 	}
+	
+	return false;
+}
+
+
+bool CProcessorLog::IsEqual(const istd::IChangeable& object) const
+{
+	const CProcessorLog* sourcePtr = dynamic_cast<const CProcessorLog*>(&object);
+	if (sourcePtr) {
+		bool retVal = (m_processorId == sourcePtr->m_processorId);
+		retVal = retVal && ilog::CMessageContainer::IsEqual(*sourcePtr);
+		
+		return retVal;
+	}
+	
+	return false;
+}
+
+
+istd::IChangeableUniquePtr CProcessorLog::CloneMe(CompatibilityMode mode) const
+{
+	istd::IChangeableUniquePtr clonePtr(new CProcessorLog);
+	if (clonePtr->CopyFrom(*this, mode)) {
+		return clonePtr;
+	}
+	
+	return nullptr;
+}
+
+
+bool CProcessorLog::ResetData(CompatibilityMode /*mode*/)
+{
+	istd::CChangeNotifier changeNotifier(this);
+	
+	m_processorId.clear();
+	ilog::CMessageContainer::Clear();
+	
+	return true;
 }
 
 

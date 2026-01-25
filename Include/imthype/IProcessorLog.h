@@ -32,18 +32,6 @@ public:
 		\param processorId Identifier of the processor
 	*/
 	virtual void SetProcessorId(const QByteArray& processorId) = 0;
-	
-	/**
-		Get the job ID this log belongs to.
-		\return Job identifier
-	*/
-	virtual QByteArray GetJobId() const = 0;
-	
-	/**
-		Set the job ID this log belongs to.
-		\param jobId Job identifier
-	*/
-	virtual void SetJobId(const QByteArray& jobId) = 0;
 };
 
 

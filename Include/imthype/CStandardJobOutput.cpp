@@ -235,7 +235,6 @@ void CStandardJobOutput::SetProcessorLog(const IProcessorLog& processorLog)
 	
 	// Copy the processor log
 	m_processorLog.Clear();
-	m_processorLog.SetJobId(processorLog.GetJobId());
 	m_processorLog.SetProcessorId(processorLog.GetProcessorId());
 	
 	const ilog::IMessageContainer* containerPtr = dynamic_cast<const ilog::IMessageContainer*>(&processorLog);

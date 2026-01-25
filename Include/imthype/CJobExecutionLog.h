@@ -6,6 +6,7 @@
 
 // ACF includes
 #include <ilog/CMessageContainer.h>
+#include <iser/ISerializable.h>
 
 
 namespace imthype
@@ -19,11 +20,11 @@ namespace imthype
 */
 class CJobExecutionLog: 
 	virtual public IJobExecutionLog,
-	public ilog::CMessageContainer
+	public ilog::CMessageContainer,
+	virtual public iser::ISerializable
 {
 public:
 	CJobExecutionLog();
-	explicit CJobExecutionLog(const QByteArray& jobId);
 	
 	// reimplemented (IJobExecutionLog)
 	virtual void LogExecutionEvent(
@@ -32,13 +33,16 @@ public:
 		const QDateTime& timestamp = QDateTime::currentDateTime()) override;
 	virtual QList<ilog::IMessage> GetExecutionEvents(ExecutionEventType eventType) const override;
 	
-	// Additional helper methods
-	QByteArray GetJobId() const { return m_jobId; }
-	void SetJobId(const QByteArray& jobId) { m_jobId = jobId; }
+	// reimplemented (iser::ISerializable)
+	virtual bool Serialize(iser::IArchive& archive) override;
+	
+	// reimplemented (istd::IChangeable)
+	virtual bool CopyFrom(const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	virtual bool IsEqual(const istd::IChangeable& object) const override;
+	virtual istd::IChangeableUniquePtr CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
+	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 private:
-	QByteArray m_jobId;
-	
 	// Map event types to message indices for fast lookup
 	QMultiHash<ExecutionEventType, int> m_eventTypeMap;
 };
