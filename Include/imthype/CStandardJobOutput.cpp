@@ -307,6 +307,16 @@ bool CStandardJobOutput::Serialize(iser::IArchive& archive)
 	retVal = m_results.Serialize(archive);
 	retVal = retVal && archive.EndTag(outputTag);
 
+	static iser::CArchiveTag executionLogTag("ExecutionLog", "Job execution log");
+	retVal = retVal && archive.BeginTag(executionLogTag);
+	retVal = retVal && m_executionLog.Serialize(archive);
+	retVal = retVal && archive.EndTag(executionLogTag);
+
+	static iser::CArchiveTag processorLogTag("ProcessorLog", "Processor/worker log");
+	retVal = retVal && archive.BeginTag(processorLogTag);
+	retVal = retVal && m_processorLog.Serialize(archive);
+	retVal = retVal && archive.EndTag(processorLogTag);
+
 	return retVal;
 }
 
@@ -324,6 +334,10 @@ bool CStandardJobOutput::CopyFrom(const istd::IChangeable& object, Compatibility
 
 		m_jobName = sourcePtr->m_jobName;
 		m_outputTypeMap = sourcePtr->m_outputTypeMap;
+		
+		// Copy logs
+		m_executionLog.CopyFrom(sourcePtr->m_executionLog);
+		m_processorLog.CopyFrom(sourcePtr->m_processorLog);
 
 		return true;
 	}
@@ -341,6 +355,10 @@ bool CStandardJobOutput::IsEqual(const istd::IChangeable& object) const
 
 		retVal = retVal && (m_jobName == sourcePtr->m_jobName);
 		retVal = retVal && (m_outputTypeMap == sourcePtr->m_outputTypeMap);
+		
+		// Compare logs
+		retVal = retVal && m_executionLog.IsEqual(sourcePtr->m_executionLog);
+		retVal = retVal && m_processorLog.IsEqual(sourcePtr->m_processorLog);
 
 		return retVal;
 	}
@@ -369,6 +387,10 @@ bool CStandardJobOutput::ResetData(CompatibilityMode /*mode*/)
 
 	m_jobName.clear();
 	m_outputTypeMap.clear();
+	
+	// Reset logs
+	m_executionLog.Clear();
+	m_processorLog.Clear();
 
 	return true;
 }
