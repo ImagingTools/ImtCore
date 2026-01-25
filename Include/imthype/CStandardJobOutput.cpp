@@ -381,8 +381,8 @@ bool CStandardJobOutput::ResetData(CompatibilityMode /*mode*/)
 	m_outputTypeMap.clear();
 	
 	// Reset logs using ResetData
-	m_executionLog.ResetData();
-	m_processorLog.ResetData();
+	m_executionLog.ResetData(mode);
+	m_processorLog.ResetData(mode);
 
 	return true;
 }
