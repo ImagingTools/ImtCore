@@ -18,7 +18,7 @@ namespace imthype
 	
 	Stores system-level job controller events and lifecycle tracking.
 */
-class CJobExecutionLog: 
+class CJobExecutionLog:
 	public ilog::CMessageContainer,
 	virtual public IJobExecutionLog,
 	virtual public iser::ISerializable
@@ -43,7 +43,6 @@ public:
 	virtual bool IsEqual(const istd::IChangeable& object) const override;
 	virtual istd::IChangeableUniquePtr CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
-
 };
 
 

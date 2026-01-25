@@ -55,15 +55,12 @@ ilog::IMessageContainer::Messages CJobExecutionLog::GetExecutionEvents(Execution
 	ilog::IMessageContainer::Messages events;
 	
 	// Iterate through all messages and filter by event type
-	int messageCount = GetMessagesCount();
-	for (int i = 0; i < messageCount; ++i) {
-		const ilog::CMessage& msg = GetMessage(i);
-		
+	const ilog::IMessageContainer::Messages messages = BaseClass::GetMessages();
+	for (const ilog::IMessageConsumer::MessagePtr& message : messages) {
 		// Check if this is a CJobExecutionMessage and if it matches the requested event type
-		const CJobExecutionMessage* executionMsg = dynamic_cast<const CJobExecutionMessage*>(&msg);
+		const CJobExecutionMessage* executionMsg = dynamic_cast<const CJobExecutionMessage*>(message.GetPtr());
 		if (executionMsg && executionMsg->GetEventType() == eventType) {
-			// Create a MessagePtr from the message reference
-			events.append(ilog::IMessageConsumer::MessagePtr(new CJobExecutionMessage(*executionMsg)));
+			events.push_back(ilog::IMessageConsumer::MessagePtr(new CJobExecutionMessage(*executionMsg)));
 		}
 	}
 	
