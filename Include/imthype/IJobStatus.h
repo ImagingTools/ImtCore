@@ -25,8 +25,6 @@ namespace imthype
 class IJobStatus: virtual public istd::IChangeable
 {
 public:
-	virtual ~IJobStatus() = default;
-
 	/**
 		Get current processing status of the job.
 	*/
