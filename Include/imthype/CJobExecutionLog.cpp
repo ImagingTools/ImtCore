@@ -43,10 +43,10 @@ void CJobExecutionLog::LogExecutionEvent(
 			break;
 	}
 	
-	// Create and add the message
+	// Create and add the message with MessagePtr (shared pointer)
 	int messageIndex = GetMessagesCount();
-	ilog::CMessage logMessage(category, 0, message, QString(), timestamp);
-	ilog::CMessageContainer::AddMessage(logMessage);
+	ilog::IMessageConsumer::MessagePtr messagePtr(new ilog::CMessage(category, 0, message, "JobExecutionLog"));
+	ilog::CMessageContainer::AddMessage(messagePtr);
 	
 	// Track the event type for fast lookup
 	m_eventTypeMap.insert(eventType, messageIndex);
