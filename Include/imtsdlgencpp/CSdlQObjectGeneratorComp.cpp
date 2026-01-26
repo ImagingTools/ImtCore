@@ -815,7 +815,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 			FeedStream(stream, 1, false);
 
 			FeedStreamHorizontally(stream);
-			stream << QStringLiteral("return QVariant::fromValue(new ") << CSdlGenTools::GetQObjectTypeName(field, m_sdlTypeListCompPtr->GetSdlTypes(false), m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false), false) << QStringLiteral("(this));");
+			stream << QStringLiteral("return QVariant::fromValue(new ") << CSdlGenTools::GetQObjectTypeName(field, m_sdlTypeListCompPtr->GetSdlTypes(false), m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false), false) << QStringLiteral("());");
 			FeedStream(stream, 1, false);
 
 			stream << QStringLiteral("}");
