@@ -88,6 +88,11 @@ QtObject {
 		needsRepresentationUpdate = true
 	}
 	
+	function clearRegisteredControllers(){
+		registeredControllers = {}
+		needsRepresentationUpdate = true
+	}
+	
 	property Component paramsSetInfoComp: Component {
 		QtObject {
 			property string m_paramId

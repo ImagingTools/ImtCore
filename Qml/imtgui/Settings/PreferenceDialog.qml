@@ -19,7 +19,7 @@ Dialog {
 	property SettingsController settingsController: SettingsController {}
 	
 	property bool hasChanges: false
-	property var changedParams: new Set()
+	property var changedParams: ({})
 	
 	Component.onCompleted: {
 		updateButtons()
@@ -51,11 +51,13 @@ Dialog {
 			setButtonName(Enums.cancel, qsTr("Close"))
 
 			// Save all changed params efficiently
-			for (let paramId of changedParams){
-				settingsController.saveParam(paramId)
+			for (let paramId in changedParams){
+				if (changedParams[paramId]){
+					settingsController.saveParam(paramId)
+				}
 			}
 			
-			changedParams.clear()
+			changedParams = {}
 			hasChanges = false
 		}
 	}
@@ -74,9 +76,9 @@ Dialog {
 					messageDialog.hasChanges = true
 				}
 				
-				// Track main param ID efficiently
+				// Track main param ID efficiently (object-based for QML compatibility)
 				let mainParamId = paramId.includes("/") ? paramId.split("/")[0] : paramId
-				messageDialog.changedParams.add(mainParamId)
+				messageDialog.changedParams[mainParamId] = true
 			}
 		}
 	}

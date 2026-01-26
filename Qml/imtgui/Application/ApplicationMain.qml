@@ -319,7 +319,7 @@ Item {
 		
 		function fillPreferenceParamsSet(){
 			// Clear previous registrations to prevent stale controller references from previous dialog sessions
-			settingsController.registeredControllers = {}
+			settingsController.clearRegisteredControllers()
 			
 			if (Qt.platform.os !== "web"){
 				settingsController.registerParamsSetController("Network", qsTr("Network"), clientSettingsController)
