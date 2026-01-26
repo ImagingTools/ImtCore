@@ -1,25 +1,51 @@
 # ImtCore
 
+## Environment Variables Setup
+
+Before building the project, you need to set the following environment variables:
+
+### PYTHON38DIR
+Set this to the path of your Python 3.8 installation directory (the directory containing `include/` and `libs/` subdirectories).
+
+#### Windows (PowerShell)
+```powershell
+$env:PYTHON38DIR = "C:\Python38"
+# Or set permanently:
+[System.Environment]::SetEnvironmentVariable('PYTHON38DIR', 'C:\Python38', 'User')
+```
+
+#### Windows (Command Prompt)
+```cmd
+set PYTHON38DIR=C:\Python38
+# Or set permanently:
+setx PYTHON38DIR "C:\Python38"
+```
+
+#### Linux/macOS
+```bash
+export PYTHON38DIR="/usr/local/lib/python3.8"
+# Or add to ~/.bashrc or ~/.zshrc:
+echo 'export PYTHON38DIR="/usr/local/lib/python3.8"' >> ~/.bashrc
+```
+
+### PYTHONEXE (Optional)
+Set this to specify the Python executable path. If not set, the build system will default to `python.exe` (Windows) or `python3` (Linux/macOS).
+
+#### Windows
+```cmd
+set PYTHONEXE=C:\Python38\python.exe
+```
+
+#### Linux/macOS
+```bash
+export PYTHONEXE=/usr/bin/python3
+```
+
 ## Initial Setup
 
 After cloning the repository for the first time, follow these steps:
 
-### 1. Clone with Submodules
-
-This repository uses Git submodules for some dependencies (like the Python distribution in `3rdParty/Python`). When cloning, use:
-
-```bash
-git clone --recurse-submodules https://github.com/ImagingTools/ImtCore.git
-```
-
-Or if you already cloned without submodules:
-
-```bash
-git submodule init
-git submodule update
-```
-
-### 2. Install Git LFS
+### 1. Install Git LFS
 
 This repository uses Git LFS (Large File Storage) for binary files in the `3rdParty` directory. If you encounter issues with LFS files, ensure Git LFS is installed:
 
@@ -56,7 +82,7 @@ If you cloned the repository before installing Git LFS, pull the LFS files:
 git lfs pull
 ```
 
-### 3. Install Git Hooks
+### 2. Install Git Hooks
 
 To automatically update version files after each `git pull`, install the post-merge hook:
 
@@ -76,7 +102,7 @@ bash InstallHooks.sh
 
 This will install a hook that automatically runs the `UpdateVersion` script after each merge/pull operation.
 
-### 4. Update Version Files (Manual)
+### 3. Update Version Files (Manual)
 
 If you need to manually update version files (for example, after switching branches or making local changes):
 

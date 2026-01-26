@@ -5,11 +5,17 @@ if(WIN32)
 endif()
 
 function(imtcore_generate_tests pathToClassTest)
-	set(PYTHONEXE ${IMTCOREDIR}/3rdParty/Python/3.8/python.exe)
-	set(GENERATE_H_TESTS_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../CGenerateTest.h)
-	if (NOT WIN32 AND NOT ANDROID)
-		set(PYTHONEXE python3)
+	set(PYTHONEXE "$ENV{PYTHONEXE}")
+	
+	if(PYTHONEXE STREQUAL "")
+		if (WIN32 AND NOT ANDROID)
+			set(PYTHONEXE python.exe)
+		else()
+			set(PYTHONEXE python3)
+		endif()
 	endif()
+	
+	set(GENERATE_H_TESTS_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../CGenerateTest.h)
 
 	add_custom_command(
 		OUTPUT ${GENERATE_H_TESTS_FILE}
