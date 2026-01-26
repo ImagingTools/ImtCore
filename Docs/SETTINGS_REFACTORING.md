@@ -121,7 +121,7 @@ onEditorModelDataChanged: {
 **After:**
 ```qml
 property bool hasChanges: false
-property var changedParams: new Set()
+property var changedParams: ({})
 
 onEditorModelDataChanged: {
     if (!hasChanges){
@@ -132,15 +132,16 @@ onEditorModelDataChanged: {
     }
     
     let mainParamId = paramId.includes("/") ? paramId.split("/")[0] : paramId
-    changedParams.add(mainParamId)  // Automatic deduplication
+    changedParams[mainParamId] = true  // Automatic deduplication
 }
 ```
 
 **Benefits:**
 - Simpler code structure
-- Automatic deduplication via Set
+- Automatic deduplication via object keys
 - Reduced UI updates
 - Better performance with many changes
+- QML-compatible (works across all Qt versions)
 
 ### 4. Controller Registration Cleanup
 
@@ -156,7 +157,7 @@ function fillPreferenceParamsSet(){
 **After:**
 ```qml
 function fillPreferenceParamsSet(){
-    settingsController.registeredControllers = {}  // Clear before re-registering
+    settingsController.clearRegisteredControllers()  // Clear before re-registering
     settingsController.registerParamsSetController("Network", qsTr("Network"), clientSettingsController)
     settingsController.registerParamsSetController("General", qsTr("General"), userSettingsController)
 }
@@ -165,13 +166,14 @@ function fillPreferenceParamsSet(){
 **Benefits:**
 - Prevents stale controller references
 - Ensures clean state on each dialog open
+- Better encapsulation through dedicated method
 - Better memory management
 
 ## Performance Improvements
 
 1. **Memory Usage**: Reduced by ~30-40% through single controller instance and caching
 2. **Dialog Open Time**: Improved by 20-50% through lazy representation updates
-3. **Change Tracking**: O(n) instead of O(n²) complexity with Set-based tracking
+3. **Change Tracking**: O(n) instead of O(n²) complexity with object-based tracking
 4. **UI Updates**: Reduced from N updates to 1 update on first change
 
 ## Migration Guide
