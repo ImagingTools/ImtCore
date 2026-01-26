@@ -246,6 +246,18 @@ Item {
 		}
 	}
 	
+	PatTokenSettingsController {
+		id: patTokenSettingsController
+		
+		Component.onCompleted: {
+			// Initialize PAT tokens parameter
+			let patTokensParam = paramsSetController.getParameterById("PatTokens")
+			if (!patTokensParam || !patTokensParam.m_id) {
+				paramsSetController.addParam("PatTokenList", "PatTokens", qsTr("PAT Tokens"), qsTr("Personal Access Tokens for API authentication"), "{\"tokens\":[]}")
+			}
+		}
+	}
+	
 	PageAboutProvider {
 		id: pageAboutProvider
 	}
@@ -320,6 +332,9 @@ Item {
 			if (Qt.platform.os !== "web"){
 				settingsController.registerParamsSetController("Network", qsTr("Network"), clientSettingsController)
 			}
+			
+			// Register PAT tokens settings (always available)
+			settingsController.registerParamsSetController("PatTokens", qsTr("PAT Tokens"), patTokenSettingsController)
 			
 			if (application.serverConnected){
 				settingsController.registerParamsSetController("General", qsTr("General"), userSettingsController)
