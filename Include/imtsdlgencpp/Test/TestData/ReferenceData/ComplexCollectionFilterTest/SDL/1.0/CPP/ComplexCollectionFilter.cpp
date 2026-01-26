@@ -4213,6 +4213,13 @@ void CGroupFilterObject::ResetFieldFilters()
 }
 
 
+QVariant CGroupFilterObject::createFieldFiltersArrayElement(const QVariant& v)
+{
+	Q_UNUSED(v);
+	return QVariant::fromValue(new sdl::imtbase::ComplexCollectionFilter::CFieldFilterObject());
+}
+
+
 QVariant CGroupFilterObject::GetGroupFilters()
 {
 	if (Version_1_0->groupFilters.has_value()){
@@ -4263,6 +4270,13 @@ void CGroupFilterObject::ResetGroupFilters()
 		itemPtr->deleteLater();
 	}
 	m_groupFiltersQObjectPtr = QVariant();
+}
+
+
+QVariant CGroupFilterObject::createGroupFiltersArrayElement(const QVariant& v)
+{
+	Q_UNUSED(v);
+	return QVariant::fromValue(new sdl::imtbase::ComplexCollectionFilter::CGroupFilterObject());
 }
 
 
@@ -4533,6 +4547,13 @@ void CComplexCollectionFilterObject::ResetSortingInfo()
 		itemPtr->deleteLater();
 	}
 	m_sortingInfoQObjectPtr = QVariant();
+}
+
+
+QVariant CComplexCollectionFilterObject::createSortingInfoArrayElement(const QVariant& v)
+{
+	Q_UNUSED(v);
+	return QVariant::fromValue(new sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObject());
 }
 
 
