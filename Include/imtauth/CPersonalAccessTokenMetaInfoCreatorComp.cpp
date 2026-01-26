@@ -1,0 +1,63 @@
+#include <imtauth/CPersonalAccessTokenMetaInfoCreatorComp.h>
+
+
+// ACF includes
+#include <imod/TModelWrap.h>
+
+// ImtCore includes
+#include <imtbase/ICollectionInfo.h>
+#include <imtauth/IPersonalAccessToken.h>
+
+
+namespace imtauth
+{
+
+
+// protected methods
+
+// reimplemented (imtbase::IMetaInfoCreator)
+
+bool CPersonalAccessTokenMetaInfoCreatorComp::CreateMetaInfo(
+			const istd::IChangeable* dataPtr,
+			const QByteArray& typeId,
+			idoc::MetaInfoPtr& metaInfoPtr) const
+{
+	if (typeId != *m_objectTypeIdAttrPtr){
+		return false;
+	}
+
+	metaInfoPtr.SetPtr(new imod::TModelWrap<MetaInfo>);
+
+	if (dataPtr == nullptr){
+		return true;
+	}
+
+	const imtauth::IPersonalAccessToken* tokenPtr = dynamic_cast<const imtauth::IPersonalAccessToken*>(dataPtr);
+	if (tokenPtr == nullptr){
+		return false;
+	}
+
+	metaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_ID, tokenPtr->GetId());
+	metaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_NAME, tokenPtr->GetName());
+	metaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION, tokenPtr->GetDescription());
+
+	return true;
+}
+
+
+QString CPersonalAccessTokenMetaInfoCreatorComp::MetaInfo::GetMetaInfoName(int metaInfoType) const
+{
+	switch (metaInfoType){
+		case idoc::IDocumentMetaInfo::MIT_ID:
+			return QObject::tr("ID");
+		case idoc::IDocumentMetaInfo::MIT_NAME:
+			return QObject::tr("Name");
+		case idoc::IDocumentMetaInfo::MIT_DESCRIPTION:
+			return QObject::tr("Description");
+		default:
+			return BaseClass::GetMetaInfoName(metaInfoType);
+	}
+}
+
+
+} // namespace imtauth
