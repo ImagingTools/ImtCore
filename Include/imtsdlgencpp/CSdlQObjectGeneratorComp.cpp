@@ -133,7 +133,7 @@ bool CSdlQObjectGeneratorComp::ProcessHeaderClassFile(QTextStream& stream, const
 
 		if (isCustom && !isEnum){
 			FeedStreamHorizontally(stream);
-			stream << QStringLiteral("Q_INVOKABLE void create") << GetCapitalizedValue(field.GetId()) << QStringLiteral("();");
+			stream << QStringLiteral("Q_INVOKABLE void emplace") << GetCapitalizedValue(field.GetId()) << QStringLiteral("();");
 			FeedStream(stream, 1, false);
 
 			FeedStreamHorizontally(stream);
@@ -747,7 +747,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 		// Create property implemented
 		if (isCustom && !isEnum){
 			stream << QStringLiteral("void C") << sdlEntry.GetName() << QStringLiteral("Object");
-			stream << QStringLiteral("::create") << GetCapitalizedValue(field.GetId()) << QStringLiteral("()");
+			stream << QStringLiteral("::emplace") << GetCapitalizedValue(field.GetId()) << QStringLiteral("()");
 			FeedStream(stream, 1, false);
 			stream << QStringLiteral("{");
 			FeedStream(stream, 1, false);

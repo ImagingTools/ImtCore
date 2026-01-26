@@ -406,17 +406,17 @@ public:
 	QVariant GetSpecification();
 	void SetSpecification(const QVariant& v);
 	Q_INVOKABLE bool hasSpecification();
-	Q_INVOKABLE void createSpecification();
+	Q_INVOKABLE void emplaceSpecification();
 	void ResetSpecification();
 	QVariant GetSimpleTest();
 	void SetSimpleTest(const QVariant& v);
 	Q_INVOKABLE bool hasSimpleTest();
-	Q_INVOKABLE void createSimpleTest();
+	Q_INVOKABLE void emplaceSimpleTest();
 	void ResetSimpleTest();
 	QVariant GetMixedTest();
 	void SetMixedTest(const QVariant& v);
 	Q_INVOKABLE bool hasMixedTest();
-	Q_INVOKABLE void createMixedTest();
+	Q_INVOKABLE void emplaceMixedTest();
 	void ResetMixedTest();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
@@ -487,7 +487,7 @@ public:
 	QVariant GetData();
 	void SetData(const QVariant& v);
 	Q_INVOKABLE bool hasData();
-	Q_INVOKABLE void createData();
+	Q_INVOKABLE void emplaceData();
 	void ResetData();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;

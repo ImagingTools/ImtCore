@@ -1771,7 +1771,7 @@ bool CGeometryObject::hasPoints()
 }
 
 
-void CGeometryObject::createPoints()
+void CGeometryObject::emplacePoints()
 {
 	Version_1_0->Points.emplace();
 
@@ -1824,7 +1824,7 @@ bool CGeometryObject::hasRequiredPoints()
 }
 
 
-void CGeometryObject::createRequiredPoints()
+void CGeometryObject::emplaceRequiredPoints()
 {
 	Version_1_0->RequiredPoints.emplace();
 
@@ -1877,7 +1877,7 @@ bool CGeometryObject::hasOptionalPoints()
 }
 
 
-void CGeometryObject::createOptionalPoints()
+void CGeometryObject::emplaceOptionalPoints()
 {
 	Version_1_0->OptionalPoints.emplace();
 

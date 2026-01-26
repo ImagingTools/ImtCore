@@ -1931,7 +1931,7 @@ public:
 	QVariant GetOptions();
 	void SetOptions(const QVariant& v);
 	Q_INVOKABLE bool hasOptions();
-	Q_INVOKABLE void createOptions();
+	Q_INVOKABLE void emplaceOptions();
 	void ResetOptions();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
@@ -2003,7 +2003,7 @@ public:
 	QVariant GetConstraints();
 	void SetConstraints(const QVariant& v);
 	Q_INVOKABLE bool hasConstraints();
-	Q_INVOKABLE void createConstraints();
+	Q_INVOKABLE void emplaceConstraints();
 	void ResetConstraints();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
@@ -2139,7 +2139,7 @@ public:
 	QVariant GetSchedulerParam();
 	void SetSchedulerParam(const QVariant& v);
 	Q_INVOKABLE bool hasSchedulerParam();
-	Q_INVOKABLE void createSchedulerParam();
+	Q_INVOKABLE void emplaceSchedulerParam();
 	void ResetSchedulerParam();
 	QVariant GetFolderPath();
 	void SetFolderPath(const QVariant& v);
