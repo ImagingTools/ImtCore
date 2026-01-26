@@ -7,30 +7,12 @@ import imtbaseImtBaseTypesSdl 1.0
 ParamsSetController {
 	id: root
 	
-	signal patTokensChanged()
-	
-	property PatTokenListParam patTokenListParam: PatTokenListParam {}
+	Component.onCompleted: {
+		// Initialize PAT tokens parameter
+		paramsSetController.addParam("PatTokenList", "PatTokens", qsTr("PAT Tokens"), qsTr("Personal Access Tokens for API authentication"), "{\"tokens\":[]}")
+	}
 	
 	function saveParam(){
-		// Save tokens to local storage or user settings
-		let patTokenParameter = getParameterById("PatTokens")
-		if (patTokenParameter.m_data !== patTokenListParam.toJson()){
-			patTokenListParam.createFromJson(patTokenParameter.m_data)
-		}
-		
-		// Trigger save operation
-		patTokensChanged()
-	}
-	
-	onParamModelCreated: {
-		// Load existing PAT tokens
-		let patTokenParameter = getParameterById("PatTokens")
-		if (patTokenParameter && patTokenParameter.m_data) {
-			patTokenListParam.createFromJson(patTokenParameter.m_data)
-		}
-	}
-	
-	function getPatTokens() {
-		return patTokenListParam
+		// Save is handled by the parameter system automatically
 	}
 }

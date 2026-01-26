@@ -248,14 +248,6 @@ Item {
 	
 	PatTokenSettingsController {
 		id: patTokenSettingsController
-		
-		Component.onCompleted: {
-			// Initialize PAT tokens parameter
-			let patTokensParam = paramsSetController.getParameterById("PatTokens")
-			if (!patTokensParam || !patTokensParam.m_id) {
-				paramsSetController.addParam("PatTokenList", "PatTokens", qsTr("PAT Tokens"), qsTr("Personal Access Tokens for API authentication"), "{\"tokens\":[]}")
-			}
-		}
 	}
 	
 	PageAboutProvider {

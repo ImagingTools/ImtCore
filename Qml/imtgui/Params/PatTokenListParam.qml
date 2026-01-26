@@ -7,8 +7,6 @@ Param {
 	
 	property ListModel tokens: ListModel {}
 	
-	signal tokensChanged()
-	
 	function addToken(name, token, description) {
 		tokens.append({
 			"name": name,
@@ -16,13 +14,13 @@ Param {
 			"description": description || "",
 			"createdDate": new Date().toISOString()
 		})
-		tokensChanged()
+		modelChanged([{name: "tokens"}])
 	}
 	
 	function removeToken(index) {
 		if (index >= 0 && index < tokens.count) {
 			tokens.remove(index)
-			tokensChanged()
+			modelChanged([{name: "tokens"}])
 		}
 	}
 	
@@ -34,7 +32,7 @@ Param {
 				"description": description || "",
 				"createdDate": tokens.get(index).createdDate
 			})
-			tokensChanged()
+			modelChanged([{name: "tokens"}])
 		}
 	}
 	
@@ -78,13 +76,6 @@ Param {
 		} catch (e) {
 			console.error("Failed to parse PAT tokens JSON:", e)
 			return false
-		}
-	}
-	
-	Connections {
-		target: root.tokens
-		function onCountChanged() {
-			root.tokensChanged()
 		}
 	}
 }
