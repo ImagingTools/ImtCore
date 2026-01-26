@@ -97,7 +97,7 @@ QtObject {
 	}
 	
 	function createRepresentation(){
-		// Only rebuild if controllers changed
+		// Only rebuild if controllers changed or on first call
 		if (!needsRepresentationUpdate){
 			return paramsSet
 		}
