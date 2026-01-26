@@ -359,6 +359,8 @@ bool CLink::V1_0::operator==(const V1_0& other) const
 bool CLink::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	if (!link){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "link").toLocal8Bit().constData();)
+
 		return false;
 	}
 	model.SetData("link", *link, modelIndex);
@@ -396,6 +398,8 @@ bool CLink::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int m
 bool CLink::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!link){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "link").toLocal8Bit().constData();)
+
 		return false;
 	}
 	gqlObject.InsertParam("link", QVariant(*link));
@@ -430,6 +434,8 @@ bool CLink::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlO
 bool CLink::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!link){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "link").toLocal8Bit().constData();)
+
 		return false;
 	}
 	jsonObject["link"] = QJsonValue::fromVariant(*link);
@@ -716,6 +722,8 @@ bool CPrinterBase::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int mode
 	}
 
 	if (!specification){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "specification").toLocal8Bit().constData();)
+
 		return false;
 	}
 	QVariant specificationVariantValue;
@@ -738,6 +746,8 @@ bool CPrinterBase::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int mode
 
 
 	if (!simpleTest){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "simpleTest").toLocal8Bit().constData();)
+
 		return false;
 	}
 	QVariant simpleTestVariantValue;
@@ -750,6 +760,8 @@ bool CPrinterBase::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int mode
 
 
 	if (!mixedTest){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "mixedTest").toLocal8Bit().constData();)
+
 		return false;
 	}
 	QVariant mixedTestVariantValue;
@@ -905,6 +917,8 @@ bool CPrinterBase::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 	}
 
 	if (!specification){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "specification").toLocal8Bit().constData();)
+
 		return false;
 	}
 	::imtgql::CGqlParamObject specificationDataObject;
@@ -923,6 +937,8 @@ bool CPrinterBase::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 	gqlObject.InsertParam("specification", specificationDataObject);
 
 	if (!simpleTest){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "simpleTest").toLocal8Bit().constData();)
+
 		return false;
 	}
 	::imtgql::CGqlParamObject simpleTestDataObject;
@@ -935,6 +951,8 @@ bool CPrinterBase::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 	gqlObject.InsertParam("simpleTest", simpleTestDataObject);
 
 	if (!mixedTest){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "mixedTest").toLocal8Bit().constData();)
+
 		return false;
 	}
 	::imtgql::CGqlParamObject mixedTestDataObject;
@@ -1105,6 +1123,8 @@ bool CPrinterBase::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 	}
 
 	if (!specification){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "specification").toLocal8Bit().constData();)
+
 		return false;
 	}
 	if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>(specification.GetPtr())){
@@ -1128,6 +1148,8 @@ bool CPrinterBase::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 
 
 	if (!simpleTest){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "simpleTest").toLocal8Bit().constData();)
+
 		return false;
 	}
 	if (const QString* val = std::get_if<QString>(simpleTest.GetPtr())){
@@ -1145,6 +1167,8 @@ bool CPrinterBase::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 
 
 	if (!mixedTest){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "mixedTest").toLocal8Bit().constData();)
+
 		return false;
 	}
 	if (const QString* val = std::get_if<QString>(mixedTest.GetPtr())){

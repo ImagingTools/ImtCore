@@ -295,6 +295,9 @@ void CObjectModificatorCompBase::AddScalarFieldWriteToObjectCode(QTextStream& st
 	FeedStream(stream, 1, false);
 
 	if (isStrict){
+
+		AddErrorReport(stream, QStringLiteral("Field: '%3' doesn't exist, but required"), 2, QStringList({QString("\"%1\"").arg(field.GetId())}));
+
 		FeedStreamHorizontally(stream, 2);
 		stream << QStringLiteral("return false;\n\t}");
 		FeedStream(stream, 1, false);
@@ -437,7 +440,8 @@ void CObjectModificatorCompBase::AddCustomFieldWriteToObjectImplCode(
 
 void CObjectModificatorCompBase::AddArrayFieldWriteToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional) const
 {
-	if (!optional && field.IsRequired()){
+	const bool isStrict = bool(!optional && field.IsRequired());
+	if (isStrict){
 		if (field.IsArray() && field.IsNonEmpty()){
 			AddArrayInternalChecksFail(stream, field, true);
 		}
