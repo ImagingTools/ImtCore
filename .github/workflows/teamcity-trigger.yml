@@ -50,6 +50,19 @@ jobs:
 
           # Trigger TeamCity build
           echo "Triggering Windows build: $TEAMCITY_BUILD_TYPE"
+          
+          # Debug: Display the full curl command that will be executed
+          echo "========================================"
+          echo "DEBUG: Full curl command with verbose flags:"
+          echo "curl -v -i -s -w \"\\n%{http_code}\" \\"
+          echo "  -X POST \\"
+          echo "  -H \"Authorization: Bearer [REDACTED]\" \\"
+          echo "  -H \"Content-Type: application/xml\" \\"
+          echo "  -H \"Accept: application/json\" \\"
+          echo "  --data \"<build><buildType id=\\\"$TEAMCITY_BUILD_TYPE\\\"/><branchName>$GIT_BRANCH</branchName><properties><property name=\\\"env.GIT_BRANCH\\\" value=\\\"$GIT_BRANCH\\\"/><property name=\\\"env.GIT_COMMIT\\\" value=\\\"$GITHUB_SHA\\\"/></properties></build>\" \\"
+          echo "  \"$TEAMCITY_URL/app/rest/buildQueue\""
+          echo "========================================"
+          
           RESPONSE=$(curl -s -w "\n%{http_code}" \
             -X POST \
             -H "Authorization: Bearer $TEAMCITY_TOKEN" \
@@ -57,6 +70,13 @@ jobs:
             -H "Accept: application/json" \
             --data "<build><buildType id=\"$TEAMCITY_BUILD_TYPE\"/><branchName>$GIT_BRANCH</branchName><properties><property name=\"env.GIT_BRANCH\" value=\"$GIT_BRANCH\"/><property name=\"env.GIT_COMMIT\" value=\"$GITHUB_SHA\"/></properties></build>" \
             "$TEAMCITY_URL/app/rest/buildQueue")
+          
+          # Debug: Display the raw response
+          echo "========================================"
+          echo "DEBUG: Raw curl response:"
+          echo "Response body and HTTP code:"
+          echo "$RESPONSE"
+          echo "========================================"
 
           HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
           BODY=$(echo "$RESPONSE" | sed '$d')
