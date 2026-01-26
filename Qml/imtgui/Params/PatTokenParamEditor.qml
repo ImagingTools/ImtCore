@@ -123,7 +123,7 @@ ParamEditorBase {
 												text: delegateRoot.showToken ? model.token : "•••••••••••••••"
 												font.pixelSize: Style.fontSizeS
 												color: Style.textColor
-												font.family: "monospace"
+												font.family: Qt.platform.os === "web" ? "monospace" : "Courier"
 											}
 											
 											Button {
