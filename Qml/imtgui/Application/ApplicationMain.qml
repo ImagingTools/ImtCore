@@ -317,10 +317,13 @@ Item {
 			settingsController.registerParamEditor("ServerLog", serverLogProviderComp)
 		}
 		
+		/**
+		 * Fills the preference dialog with appropriate settings controllers.
+		 * Clears all registered controllers before registering for the current dialog session.
+		 * This ensures we don't carry over stale controller references from previous sessions
+		 * and guarantees a clean, consistent settings state each time the dialog opens.
+		 */
 		function fillPreferenceParamsSet(){
-			// Clear all registered controllers before registering for the current dialog session.
-			// This ensures we don't carry over stale controller references from previous sessions
-			// and guarantees a clean, consistent settings state each time the dialog opens.
 			settingsController.clearRegisteredControllers()
 			
 			if (Qt.platform.os !== "web"){

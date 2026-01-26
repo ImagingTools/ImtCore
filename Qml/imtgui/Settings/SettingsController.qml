@@ -88,8 +88,10 @@ QtObject {
 		needsRepresentationUpdate = true
 	}
 	
-	// Clears all registered controller references and invalidates cached representation.
-	// Call this before re-registering controllers to ensure clean state.
+	/**
+	 * Clears all registered controller references and invalidates cached representation.
+	 * Call this before re-registering controllers to ensure clean state.
+	 */
 	function clearRegisteredControllers(){
 		registeredControllers = {}
 		needsRepresentationUpdate = true

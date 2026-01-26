@@ -53,9 +53,7 @@ Dialog {
 
 			// Save all changed params efficiently
 			for (let paramId in changedParams){
-				if (changedParams[paramId]){
-					settingsController.saveParam(paramId)
-				}
+				settingsController.saveParam(paramId)
 			}
 			
 			changedParams = {}
