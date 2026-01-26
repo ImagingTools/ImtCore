@@ -511,6 +511,7 @@ public:
 	Q_INVOKABLE bool hasLinkList();
 	Q_INVOKABLE void emplaceLinkList();
 	void ResetLinkList();
+	Q_INVOKABLE QVariant createLinkListArrayElement(const QVariant& v);
 	QVariant GetSpecification();
 	void SetSpecification(const QVariant& v);
 	Q_INVOKABLE bool hasSpecification();

@@ -620,16 +620,19 @@ public:
 	Q_INVOKABLE bool hasPoints();
 	Q_INVOKABLE void emplacePoints();
 	void ResetPoints();
+	Q_INVOKABLE QVariant createPointsArrayElement(const QVariant& v);
 	QVariant GetRequiredPoints();
 	void SetRequiredPoints(const QVariant& v);
 	Q_INVOKABLE bool hasRequiredPoints();
 	Q_INVOKABLE void emplaceRequiredPoints();
 	void ResetRequiredPoints();
+	Q_INVOKABLE QVariant createRequiredPointsArrayElement(const QVariant& v);
 	QVariant GetOptionalPoints();
 	void SetOptionalPoints(const QVariant& v);
 	Q_INVOKABLE bool hasOptionalPoints();
 	Q_INVOKABLE void emplaceOptionalPoints();
 	void ResetOptionalPoints();
+	Q_INVOKABLE QVariant createOptionalPointsArrayElement(const QVariant& v);
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;

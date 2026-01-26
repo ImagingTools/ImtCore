@@ -3335,6 +3335,12 @@ void CPrinterBaseObject::ResetLinkList()
 	m_linkListQObjectPtr = QVariant();
 }
 
+QVariant CPrinterBaseObject::createLinkListArrayElement(const QVariant& v)
+{
+	Q_UNUSED(v);
+	return QVariant::fromValue(new sdl::modsdl::UnionTest::CLinkObject());
+}
+
 
 QVariant CPrinterBaseObject::GetSpecification()
 {

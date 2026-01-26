@@ -1788,6 +1788,13 @@ void CGeometryObject::ResetPoints()
 }
 
 
+QVariant CGeometryObject::createPointsArrayElement(const QVariant& v)
+{
+	Q_UNUSED(v);
+	return QVariant::fromValue(new sdl::complextest::ComplexUnion1::CPointObject());
+}
+
+
 QVariant CGeometryObject::GetRequiredPoints()
 {
 	if (Version_1_0->RequiredPoints.has_value()){
@@ -1841,6 +1848,13 @@ void CGeometryObject::ResetRequiredPoints()
 }
 
 
+QVariant CGeometryObject::createRequiredPointsArrayElement(const QVariant& v)
+{
+	Q_UNUSED(v);
+	return QVariant::fromValue(new sdl::complextest::ComplexUnion1::CPointObject());
+}
+
+
 QVariant CGeometryObject::GetOptionalPoints()
 {
 	if (Version_1_0->OptionalPoints.has_value()){
@@ -1891,6 +1905,13 @@ void CGeometryObject::ResetOptionalPoints()
 		itemPtr->deleteLater();
 	}
 	m_optionalPointsQObjectPtr = QVariant();
+}
+
+
+QVariant CGeometryObject::createOptionalPointsArrayElement(const QVariant& v)
+{
+	Q_UNUSED(v);
+	return QVariant::fromValue(new sdl::complextest::ComplexUnion1::CPointObject());
 }
 
 
