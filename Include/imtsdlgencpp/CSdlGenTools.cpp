@@ -352,6 +352,8 @@ void CSdlGenTools::AddArrayInternalChecksFail(QTextStream& stream, const imtsdl:
 	stream << QStringLiteral("){");
 	imtsdl::CSdlTools::FeedStream(stream, 1, false);
 
+	AddErrorReport(stream, QStringLiteral("Field: '%3' doesn't exist, but required"), 2, QStringList({QString("\"%1\"").arg(field.GetId())}));
+	
 	imtsdl::CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
 	stream << QStringLiteral("return false;\n\t}");
 	imtsdl::CSdlTools::FeedStream(stream, 1, false);

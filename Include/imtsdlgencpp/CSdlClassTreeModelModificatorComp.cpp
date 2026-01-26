@@ -149,6 +149,8 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(
 		stream << GetNullCheckString(field) << QStringLiteral("){");
 		FeedStream(stream, 1, false);
 
+		AddErrorReport(stream, QStringLiteral("Field: '%3' doesn't exist, but required"), 2, QStringList({QString("\"%1\"").arg(field.GetId())}));
+
 		FeedStreamHorizontally(stream, 2);
 		stream << QStringLiteral("return false;\n\t}");
 		FeedStream(stream, 1, false);
@@ -488,9 +490,13 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldWriteToModelCode(
 		stream << QStringLiteral("if (");
 		stream << GetNullCheckString(field) << QStringLiteral("){");
 		FeedStream(stream, 1, false);
+
+		AddErrorReport(stream, QStringLiteral("Field: '%3' doesn't exist, but required"), 2, QStringList({QString("\"%1\"").arg(field.GetId())}));
+
 		FeedStreamHorizontally(stream, 2);
 		stream << QStringLiteral("return false;\n\t}");
 		FeedStream(stream, 1, false);
+
 		AddCustomFieldWriteToModelImplCode(stream, field, sdlType, optional);
 	}
 	else {

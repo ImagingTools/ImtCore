@@ -26,11 +26,15 @@ bool CPoint::V1_0::operator==(const V1_0& other) const
 bool CPoint::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	if (!X){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "X").toLocal8Bit().constData();)
+
 		return false;
 	}
 	model.SetData("X", *X, modelIndex);
 
 	if (!Y){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "Y").toLocal8Bit().constData();)
+
 		return false;
 	}
 	model.SetData("Y", *Y, modelIndex);
@@ -81,11 +85,15 @@ bool CPoint::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 bool CPoint::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!X){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "X").toLocal8Bit().constData();)
+
 		return false;
 	}
 	gqlObject.InsertParam("X", QVariant(*X));
 
 	if (!Y){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "Y").toLocal8Bit().constData();)
+
 		return false;
 	}
 	gqlObject.InsertParam("Y", QVariant(*Y));
@@ -131,11 +139,15 @@ bool CPoint::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 bool CPoint::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!X){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "X").toLocal8Bit().constData();)
+
 		return false;
 	}
 	jsonObject["X"] = QJsonValue::fromVariant(*X);
 
 	if (!Y){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "Y").toLocal8Bit().constData();)
+
 		return false;
 	}
 	jsonObject["Y"] = QJsonValue::fromVariant(*Y);
@@ -432,6 +444,8 @@ bool CGeometry::V1_0::operator==(const V1_0& other) const
 bool CGeometry::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	if (!GeometryType){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "GeometryType").toLocal8Bit().constData();)
+
 		return false;
 	}
 	QString geometryTypeStringValue;
@@ -456,6 +470,8 @@ bool CGeometry::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIn
 	}
 
 	if (!Points){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "Points").toLocal8Bit().constData();)
+
 		return false;
 	}
 	::imtbase::CTreeItemModel* newPointsModelPtr = model.AddTreeModel("Points", modelIndex);
@@ -469,6 +485,8 @@ bool CGeometry::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIn
 		}
 	}
 	if (!RequiredPoints || RequiredPoints->isEmpty()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "RequiredPoints").toLocal8Bit().constData();)
+
 		return false;
 	}
 	::imtbase::CTreeItemModel* newRequiredPointsModelPtr = model.AddTreeModel("RequiredPoints", modelIndex);
@@ -682,6 +700,8 @@ bool CGeometry::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, i
 bool CGeometry::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!GeometryType){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "GeometryType").toLocal8Bit().constData();)
+
 		return false;
 	}
 	QString geometryTypeStringValue;
@@ -706,6 +726,8 @@ bool CGeometry::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject)
 	}
 
 	if (!Points){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "Points").toLocal8Bit().constData();)
+
 		return false;
 	}
 	QList<::imtgql::CGqlParamObject> pointsDataObjectList;
@@ -721,6 +743,8 @@ bool CGeometry::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject)
 	gqlObject.InsertParam("Points", pointsDataObjectList);
 
 	if (!RequiredPoints || RequiredPoints->isEmpty()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "RequiredPoints").toLocal8Bit().constData();)
+
 		return false;
 	}
 	QList<::imtgql::CGqlParamObject> requiredPointsDataObjectList;
@@ -954,6 +978,8 @@ bool CGeometry::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 bool CGeometry::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!GeometryType){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "GeometryType").toLocal8Bit().constData();)
+
 		return false;
 	}
 	QString geometryTypeStringValue;
@@ -978,6 +1004,8 @@ bool CGeometry::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 	}
 
 	if (!Points){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "Points").toLocal8Bit().constData();)
+
 		return false;
 	}
 	QJsonArray newPointsArray;
@@ -993,6 +1021,8 @@ bool CGeometry::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 	jsonObject["Points"] = newPointsArray;
 
 	if (!RequiredPoints || RequiredPoints->isEmpty()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "RequiredPoints").toLocal8Bit().constData();)
+
 		return false;
 	}
 	QJsonArray newRequiredPointsArray;
