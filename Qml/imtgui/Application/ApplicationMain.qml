@@ -318,7 +318,9 @@ Item {
 		}
 		
 		function fillPreferenceParamsSet(){
-			// Clear previous registrations to prevent stale controller references from previous dialog sessions
+			// Clear all registered controllers before registering for the current dialog session.
+			// This ensures we don't carry over stale controller references from previous sessions
+			// and guarantees a clean, consistent settings state each time the dialog opens.
 			settingsController.clearRegisteredControllers()
 			
 			if (Qt.platform.os !== "web"){

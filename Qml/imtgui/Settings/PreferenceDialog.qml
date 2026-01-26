@@ -16,6 +16,7 @@ Dialog {
 	// notClosingButtons: Enums.apply;
 	
 	property ParamsSet paramsSet: ParamsSet {}
+	// Required: SettingsController instance provided by parent component
 	property SettingsController settingsController
 	
 	property bool hasChanges: false
@@ -76,7 +77,8 @@ Dialog {
 					messageDialog.hasChanges = true
 				}
 				
-				// Track main param ID efficiently (object-based for QML compatibility)
+				// Extract main param ID: nested params use "parent/child" format, 
+				// we only track the parent ID to avoid redundant saves
 				let mainParamId = paramId.includes("/") ? paramId.split("/")[0] : paramId
 				messageDialog.changedParams[mainParamId] = true
 			}
