@@ -15942,6 +15942,12 @@ void CAreaObject::ResetResults()
 	m_resultsQObjectPtr = QVariant();
 }
 
+QVariant CAreaObject::createResultsArrayElement(const QVariant& v)
+{
+	Q_UNUSED(v);
+	return QVariant::fromValue(new sdl::complextest::ComplexUnion2::CResultObject());
+}
+
 
 QString CAreaObject::toJson() const
 {
@@ -16244,6 +16250,12 @@ void CAnalyzerObject::ResetAreas()
 		itemPtr->deleteLater();
 	}
 	m_areasQObjectPtr = QVariant();
+}
+
+QVariant CAnalyzerObject::createAreasArrayElement(const QVariant& v)
+{
+	Q_UNUSED(v);
+	return QVariant::fromValue(new sdl::complextest::ComplexUnion2::CAreaObject());
 }
 
 
@@ -16581,6 +16593,12 @@ void CInspectionObject::ResetAnalyzers()
 		itemPtr->deleteLater();
 	}
 	m_analyzersQObjectPtr = QVariant();
+}
+
+QVariant CInspectionObject::createAnalyzersArrayElement(const QVariant& v)
+{
+	Q_UNUSED(v);
+	return QVariant::fromValue(new sdl::complextest::ComplexUnion2::CAnalyzerObject());
 }
 
 
@@ -16978,6 +16996,12 @@ void CProductOverviewObject::ResetInspections()
 		itemPtr->deleteLater();
 	}
 	m_inspectionsQObjectPtr = QVariant();
+}
+
+QVariant CProductOverviewObject::createInspectionsArrayElement(const QVariant& v)
+{
+	Q_UNUSED(v);
+	return QVariant::fromValue(new sdl::complextest::ComplexUnion2::CInspectionObject());
 }
 
 
@@ -18166,6 +18190,12 @@ void CResultMetaDataObject::ResetExtendedMetaData()
 	m_extendedMetaDataQObjectPtr = QVariant();
 }
 
+QVariant CResultMetaDataObject::createExtendedMetaDataArrayElement(const QVariant& v)
+{
+	Q_UNUSED(v);
+	return QVariant::fromValue(new sdl::complextest::ComplexUnion2::CExtendedMetaDataObject());
+}
+
 
 QString CResultMetaDataObject::toJson() const
 {
@@ -19276,6 +19306,12 @@ void CCDMResultVarRecursiveObject::ResetOverallResultValues()
 	m_overallResultValuesQObjectPtr = QVariant();
 }
 
+QVariant CCDMResultVarRecursiveObject::createOverallResultValuesArrayElement(const QVariant& v)
+{
+	Q_UNUSED(v);
+	return QVariant::fromValue(new sdl::complextest::ComplexUnion2::COverallResultValuesObject());
+}
+
 
 QString CCDMResultVarRecursiveObject::toJson() const
 {
@@ -19659,6 +19695,12 @@ void CCDMResultVarStringObject::ResetOverallResultValues()
 		itemPtr->deleteLater();
 	}
 	m_overallResultValuesQObjectPtr = QVariant();
+}
+
+QVariant CCDMResultVarStringObject::createOverallResultValuesArrayElement(const QVariant& v)
+{
+	Q_UNUSED(v);
+	return QVariant::fromValue(new sdl::complextest::ComplexUnion2::COverallResultValuesObject());
 }
 
 
@@ -20062,6 +20104,12 @@ void CCDMResultObject::ResetOverallResultValues()
 		itemPtr->deleteLater();
 	}
 	m_overallResultValuesQObjectPtr = QVariant();
+}
+
+QVariant CCDMResultObject::createOverallResultValuesArrayElement(const QVariant& v)
+{
+	Q_UNUSED(v);
+	return QVariant::fromValue(new sdl::complextest::ComplexUnion2::COverallResultValuesObject());
 }
 
 

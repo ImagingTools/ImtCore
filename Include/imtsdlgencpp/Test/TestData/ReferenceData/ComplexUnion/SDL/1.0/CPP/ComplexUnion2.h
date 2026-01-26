@@ -1154,6 +1154,7 @@ public:
 	Q_INVOKABLE bool hasResults();
 	Q_INVOKABLE void emplaceResults();
 	void ResetResults();
+	Q_INVOKABLE QVariant createResultsArrayElement(const QVariant& v);
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
@@ -1233,6 +1234,7 @@ public:
 	Q_INVOKABLE bool hasAreas();
 	Q_INVOKABLE void emplaceAreas();
 	void ResetAreas();
+	Q_INVOKABLE QVariant createAreasArrayElement(const QVariant& v);
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
@@ -1317,6 +1319,7 @@ public:
 	Q_INVOKABLE bool hasAnalyzers();
 	Q_INVOKABLE void emplaceAnalyzers();
 	void ResetAnalyzers();
+	Q_INVOKABLE QVariant createAnalyzersArrayElement(const QVariant& v);
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
@@ -1411,6 +1414,7 @@ public:
 	Q_INVOKABLE bool hasInspections();
 	Q_INVOKABLE void emplaceInspections();
 	void ResetInspections();
+	Q_INVOKABLE QVariant createInspectionsArrayElement(const QVariant& v);
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
@@ -1725,6 +1729,7 @@ public:
 	Q_INVOKABLE bool hasExtendedMetaData();
 	Q_INVOKABLE void emplaceExtendedMetaData();
 	void ResetExtendedMetaData();
+	Q_INVOKABLE QVariant createExtendedMetaDataArrayElement(const QVariant& v);
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
@@ -1984,6 +1989,7 @@ public:
 	Q_INVOKABLE bool hasOverallResultValues();
 	Q_INVOKABLE void emplaceOverallResultValues();
 	void ResetOverallResultValues();
+	Q_INVOKABLE QVariant createOverallResultValuesArrayElement(const QVariant& v);
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
@@ -2074,6 +2080,7 @@ public:
 	Q_INVOKABLE bool hasOverallResultValues();
 	Q_INVOKABLE void emplaceOverallResultValues();
 	void ResetOverallResultValues();
+	Q_INVOKABLE QVariant createOverallResultValuesArrayElement(const QVariant& v);
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
@@ -2165,6 +2172,7 @@ public:
 	Q_INVOKABLE bool hasOverallResultValues();
 	Q_INVOKABLE void emplaceOverallResultValues();
 	void ResetOverallResultValues();
+	Q_INVOKABLE QVariant createOverallResultValuesArrayElement(const QVariant& v);
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
