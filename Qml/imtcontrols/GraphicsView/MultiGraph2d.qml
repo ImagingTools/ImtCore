@@ -125,7 +125,9 @@ Graph2d{
 
 	function getLineCount(){
 		let activeLayer = graphicsViewAlias.getActiveLayer()
-		if (!activeLayer) return 0
+		if(!activeLayer){
+			return 0
+		}
 		let shapeModel = activeLayer.shapeModel
 
 		return shapeModel.length
