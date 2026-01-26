@@ -192,6 +192,7 @@ Item {
 	}
 	
 	property alias thumbnailDecoratorGui: thumbnailDecorator;
+	property alias settingsController: thumbnailDecorator.settingsController;
 	
 	property ApplicationInfoProvider applicationInfoProvider : ApplicationInfoProvider
 	{
@@ -317,6 +318,8 @@ Item {
 		}
 		
 		function fillPreferenceParamsSet(){
+			settingsController.registeredControllers = {} // Clear previous registrations
+			
 			if (Qt.platform.os !== "web"){
 				settingsController.registerParamsSetController("Network", qsTr("Network"), clientSettingsController)
 			}

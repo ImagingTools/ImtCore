@@ -14,6 +14,7 @@ QtObject {
 	
 	property var supportedParamEditors: ({})
 	property var registeredControllers: ({})
+	property bool needsRepresentationUpdate: true
 	
 	property Component textParamEditorComp: Component { TextParamEditor {} }
 	property Component textViewParamEditorComp: Component { TextParamView {} }
@@ -84,6 +85,7 @@ QtObject {
 		paramsSetInfo.m_controller = controller
 		
 		registeredControllers[id] = paramsSetInfo
+		needsRepresentationUpdate = true
 	}
 	
 	property Component paramsSetInfoComp: Component {
@@ -95,6 +97,11 @@ QtObject {
 	}
 	
 	function createRepresentation(){
+		// Only rebuild if controllers changed
+		if (!needsRepresentationUpdate){
+			return paramsSet
+		}
+		
 		paramsSetController.clearParamsSet()
 		
 		for (let key in registeredControllers){
@@ -106,6 +113,7 @@ QtObject {
 			}
 		}
 		
+		needsRepresentationUpdate = false
 		return paramsSet
 	}
 	

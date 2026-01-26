@@ -18,6 +18,9 @@ Dialog {
 	property ParamsSet paramsSet: ParamsSet {}
 	property SettingsController settingsController: SettingsController {}
 	
+	property bool hasChanges: false
+	property var changedParams: new Set()
+	
 	Component.onCompleted: {
 		updateButtons()
 	}
@@ -47,17 +50,15 @@ Dialog {
 			setButtonEnabled(Enums.apply, false)
 			setButtonName(Enums.cancel, qsTr("Close"))
 
-			for (let key in paramIdsChanges){
-				let changes = paramIdsChanges[key]
-				
-				settingsController.saveParam(key)
+			// Save all changed params efficiently
+			for (let paramId of changedParams){
+				settingsController.saveParam(paramId)
 			}
 			
-			paramIdsChanges = {}
+			changedParams.clear()
+			hasChanges = false
 		}
 	}
-	
-	property var paramIdsChanges: ({})
 	
 	contentComp: Component {
 		Preference {
@@ -67,24 +68,15 @@ Dialog {
 			settingsController: messageDialog.settingsController
 			
 			onEditorModelDataChanged: {
-				messageDialog.buttons.setButtonState(Enums.apply, true);
-				messageDialog.buttonsModel.setProperty(1, "name", qsTr("Cancel"));
-				
-				let changeObj = {}
-				let mainParamId = paramId
-				if (paramId.includes("/")){
-					let ids = paramId.split("/")
-					mainParamId = ids[0]
+				if (!messageDialog.hasChanges){
+					messageDialog.buttons.setButtonState(Enums.apply, true);
+					messageDialog.buttonsModel.setProperty(1, "name", qsTr("Cancel"));
+					messageDialog.hasChanges = true
 				}
 				
-				if (mainParamId in messageDialog.paramIdsChanges){
-					if (!messageDialog.paramIdsChanges[mainParamId].includes(paramId)){
-						messageDialog.paramIdsChanges[mainParamId].push(paramId)
-					}
-				}
-				else{
-					messageDialog.paramIdsChanges[mainParamId] = [paramId]
-				}
+				// Track main param ID efficiently
+				let mainParamId = paramId.includes("/") ? paramId.split("/")[0] : paramId
+				messageDialog.changedParams.add(mainParamId)
 			}
 		}
 	}
