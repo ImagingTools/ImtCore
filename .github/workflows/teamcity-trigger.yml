@@ -41,11 +41,14 @@ jobs:
           # For pull requests, use the source branch (GITHUB_HEAD_REF)
           # For push events, use GITHUB_REF
           if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BRANCH_NAME="${{ github.event.pull_request.head.ref }}"
             GIT_BRANCH="refs/heads/${{ github.event.pull_request.head.ref }}"
-            echo "Pull request detected, using branch: $GIT_BRANCH"
+            echo "Pull request detected, using branch: $BRANCH_NAME (ref: $GIT_BRANCH)"
           else
             GIT_BRANCH="${GITHUB_REF}"
-            echo "Push event detected, using ref: $GIT_BRANCH"
+            # Extract branch name from ref (refs/heads/main -> main)
+            BRANCH_NAME="${GITHUB_REF#refs/heads/}"
+            echo "Push event detected, using branch: $BRANCH_NAME (ref: $GIT_BRANCH)"
           fi
 
           # Trigger TeamCity build
@@ -55,7 +58,7 @@ jobs:
             -H "Authorization: Bearer $TEAMCITY_TOKEN" \
             -H "Content-Type: application/xml" \
             -H "Accept: application/json" \
-            --data "<build><buildType id=\"$TEAMCITY_BUILD_TYPE\"/><branchName>$GIT_BRANCH</branchName><properties><property name=\"env.GIT_BRANCH\" value=\"$GIT_BRANCH\"/><property name=\"env.GIT_COMMIT\" value=\"$GITHUB_SHA\"/></properties></build>" \
+            --data "<build><buildType id=\"$TEAMCITY_BUILD_TYPE\"/><branchName>$BRANCH_NAME</branchName><properties><property name=\"env.GIT_BRANCH\" value=\"$GIT_BRANCH\"/><property name=\"env.GIT_COMMIT\" value=\"$GITHUB_SHA\"/></properties></build>" \
             "$TEAMCITY_URL/app/rest/buildQueue")
 
           HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
@@ -93,20 +96,20 @@ jobs:
               # Also check the GIT_BRANCH property we set
               TC_GIT_BRANCH=$(echo "$VERIFY_BODY" | jq -r '.properties.property[]? | select(.name == "env.GIT_BRANCH") | .value // empty' 2>/dev/null)
 
-              echo "Requested branch: $GIT_BRANCH"
+              echo "Requested branch: $BRANCH_NAME"
               echo "TeamCity branch name: $TEAMCITY_BRANCH"
               echo "TeamCity GIT_BRANCH property: $TC_GIT_BRANCH"
 
               # Verify the branch name matches what we sent
-              if [ -n "$TEAMCITY_BRANCH" ] && [ "$TEAMCITY_BRANCH" = "$GIT_BRANCH" ]; then
+              if [ -n "$TEAMCITY_BRANCH" ] && [ "$TEAMCITY_BRANCH" = "$BRANCH_NAME" ]; then
                 echo "✓ Branch verification successful: TeamCity received the correct branch"
               elif [ -z "$TEAMCITY_BRANCH" ]; then
                 echo "⚠ Warning: Could not retrieve branchName from TeamCity"
                 echo "  This might indicate the branch was not set or TeamCity hasn't processed it yet"
-                echo "  Requested: $GIT_BRANCH"
+                echo "  Requested: $BRANCH_NAME"
               else
                 echo "✗ Branch verification failed: Mismatch detected"
-                echo "  Expected: $GIT_BRANCH"
+                echo "  Expected: $BRANCH_NAME"
                 echo "  Got: $TEAMCITY_BRANCH"
                 exit 1
               fi
@@ -215,11 +218,14 @@ jobs:
           # For pull requests, use the source branch (GITHUB_HEAD_REF)
           # For push events, use GITHUB_REF
           if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BRANCH_NAME="${{ github.event.pull_request.head.ref }}"
             GIT_BRANCH="refs/heads/${{ github.event.pull_request.head.ref }}"
-            echo "Pull request detected, using branch: $GIT_BRANCH"
+            echo "Pull request detected, using branch: $BRANCH_NAME (ref: $GIT_BRANCH)"
           else
             GIT_BRANCH="${GITHUB_REF}"
-            echo "Push event detected, using ref: $GIT_BRANCH"
+            # Extract branch name from ref (refs/heads/main -> main)
+            BRANCH_NAME="${GITHUB_REF#refs/heads/}"
+            echo "Push event detected, using branch: $BRANCH_NAME (ref: $GIT_BRANCH)"
           fi
 
           # Trigger TeamCity build
@@ -229,7 +235,7 @@ jobs:
             -H "Authorization: Bearer $TEAMCITY_TOKEN" \
             -H "Content-Type: application/xml" \
             -H "Accept: application/json" \
-            --data "<build><buildType id=\"$TEAMCITY_BUILD_TYPE\"/><branchName>$GIT_BRANCH</branchName><properties><property name=\"env.GIT_BRANCH\" value=\"$GIT_BRANCH\"/><property name=\"env.GIT_COMMIT\" value=\"$GITHUB_SHA\"/></properties></build>" \
+            --data "<build><buildType id=\"$TEAMCITY_BUILD_TYPE\"/><branchName>$BRANCH_NAME</branchName><properties><property name=\"env.GIT_BRANCH\" value=\"$GIT_BRANCH\"/><property name=\"env.GIT_COMMIT\" value=\"$GITHUB_SHA\"/></properties></build>" \
             "$TEAMCITY_URL/app/rest/buildQueue")
 
           HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
@@ -267,20 +273,20 @@ jobs:
               # Also check the GIT_BRANCH property we set
               TC_GIT_BRANCH=$(echo "$VERIFY_BODY" | jq -r '.properties.property[]? | select(.name == "env.GIT_BRANCH") | .value // empty' 2>/dev/null)
 
-              echo "Requested branch: $GIT_BRANCH"
+              echo "Requested branch: $BRANCH_NAME"
               echo "TeamCity branch name: $TEAMCITY_BRANCH"
               echo "TeamCity GIT_BRANCH property: $TC_GIT_BRANCH"
 
               # Verify the branch name matches what we sent
-              if [ -n "$TEAMCITY_BRANCH" ] && [ "$TEAMCITY_BRANCH" = "$GIT_BRANCH" ]; then
+              if [ -n "$TEAMCITY_BRANCH" ] && [ "$TEAMCITY_BRANCH" = "$BRANCH_NAME" ]; then
                 echo "✓ Branch verification successful: TeamCity received the correct branch"
               elif [ -z "$TEAMCITY_BRANCH" ]; then
                 echo "⚠ Warning: Could not retrieve branchName from TeamCity"
                 echo "  This might indicate the branch was not set or TeamCity hasn't processed it yet"
-                echo "  Requested: $GIT_BRANCH"
+                echo "  Requested: $BRANCH_NAME"
               else
                 echo "✗ Branch verification failed: Mismatch detected"
-                echo "  Expected: $GIT_BRANCH"
+                echo "  Expected: $BRANCH_NAME"
                 echo "  Got: $TEAMCITY_BRANCH"
                 exit 1
               fi
