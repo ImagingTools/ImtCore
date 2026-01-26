@@ -140,6 +140,12 @@ bool CSdlQObjectGeneratorComp::ProcessHeaderClassFile(QTextStream& stream, const
 			stream << QStringLiteral("void Reset") << GetCapitalizedValue(field.GetId()) << QStringLiteral("();");
 			FeedStream(stream, 1, false);
 		}
+
+		if (isCustom && !isEnum && isArray){
+			FeedStreamHorizontally(stream);
+			stream << QStringLiteral("Q_INVOKABLE QVariant create") << GetCapitalizedValue(field.GetId()) << QStringLiteral("ArrayElement(const QVariant& v);");
+			FeedStream(stream, 1, false);
+		}
 	}
 
 	// CItemModelBase implemented
@@ -793,6 +799,26 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 			FeedStream(stream, 1, false);
 
 			stream << '}';
+			FeedStream(stream, 3, false);
+		}
+
+		// create array element implementation
+		if (isCustom && !isEnum && isArray){
+			stream << QStringLiteral("QVariant C") << sdlEntry.GetName() << QStringLiteral("Object");
+			stream << QStringLiteral("::create") << GetCapitalizedValue(field.GetId()) << QStringLiteral("ArrayElement(const QVariant& v)");
+			FeedStream(stream, 1, false);
+			stream << QStringLiteral("{");
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream);
+			stream << QStringLiteral("Q_UNUSED(v);");
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream);
+			stream << QStringLiteral("return QVariant::fromValue(new ") << CSdlGenTools::GetQObjectTypeName(field, m_sdlTypeListCompPtr->GetSdlTypes(false), m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false), false) << QStringLiteral("(this));");
+			FeedStream(stream, 1, false);
+
+			stream << QStringLiteral("}");
 			FeedStream(stream, 3, false);
 		}
 
