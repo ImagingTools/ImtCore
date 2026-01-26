@@ -16,7 +16,7 @@ Dialog {
 	// notClosingButtons: Enums.apply;
 	
 	property ParamsSet paramsSet: ParamsSet {}
-	property SettingsController settingsController: SettingsController {}
+	property SettingsController settingsController
 	
 	property bool hasChanges: false
 	property var changedParams: ({})

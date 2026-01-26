@@ -10,7 +10,7 @@ Item {
 	id: root;
 	
 	property ParamsSet paramsSet: ParamsSet {}
-	property SettingsController settingsController: SettingsController {}
+	property SettingsController settingsController
 	
 	signal editorModelDataChanged(string paramId, string key);
 	
