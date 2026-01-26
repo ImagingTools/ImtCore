@@ -660,11 +660,13 @@ public:
 	Q_INVOKABLE bool hasFieldFilters();
 	Q_INVOKABLE void emplaceFieldFilters();
 	void ResetFieldFilters();
+	Q_INVOKABLE QVariant createFieldFiltersArrayElement(const QVariant& v);
 	QVariant GetGroupFilters();
 	void SetGroupFilters(const QVariant& v);
 	Q_INVOKABLE bool hasGroupFilters();
 	Q_INVOKABLE void emplaceGroupFilters();
 	void ResetGroupFilters();
+	Q_INVOKABLE QVariant createGroupFiltersArrayElement(const QVariant& v);
 	QVariant GetLogicalOperation();
 	void SetLogicalOperation(const QVariant& v);
 	Q_INVOKABLE bool hasLogicalOperation();
@@ -740,6 +742,7 @@ public:
 	Q_INVOKABLE bool hasSortingInfo();
 	Q_INVOKABLE void emplaceSortingInfo();
 	void ResetSortingInfo();
+	Q_INVOKABLE QVariant createSortingInfoArrayElement(const QVariant& v);
 	QVariant GetFieldsFilter();
 	void SetFieldsFilter(const QVariant& v);
 	Q_INVOKABLE bool hasFieldsFilter();
