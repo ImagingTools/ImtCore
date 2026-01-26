@@ -7,6 +7,10 @@ Param {
 	
 	property ListModel tokens: ListModel {}
 	
+	Component.onCompleted: {
+		// Initialize empty tokens list
+	}
+	
 	function addToken(name, token, description) {
 		tokens.append({
 			"name": name,

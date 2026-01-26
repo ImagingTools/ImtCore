@@ -7,9 +7,11 @@ import imtbaseImtBaseTypesSdl 1.0
 ParamsSetController {
 	id: root
 	
+	readonly property string emptyTokensJson: "{\"tokens\":[]}"
+	
 	Component.onCompleted: {
 		// Initialize PAT tokens parameter
-		paramsSetController.addParam("PatTokenList", "PatTokens", qsTr("PAT Tokens"), qsTr("Personal Access Tokens for API authentication"), "{\"tokens\":[]}")
+		paramsSetController.addParam("PatTokenList", "PatTokens", qsTr("PAT Tokens"), qsTr("Personal Access Tokens for API authentication"), emptyTokensJson)
 	}
 	
 	function saveParam(){

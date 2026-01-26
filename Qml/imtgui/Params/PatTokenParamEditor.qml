@@ -68,12 +68,15 @@ ParamEditorBase {
 						model: patTokenEditor.patTokenParam ? patTokenEditor.patTokenParam.tokens : null
 						
 						delegate: Rectangle {
+							id: delegateRoot
 							width: tokenListView.width
 							height: tokenItemColumn.height + Style.marginM
 							color: Style.baseColor
 							border.color: Style.borderColor
 							border.width: 1
 							radius: Style.radiusS
+							
+							property bool showToken: false
 							
 							Column {
 								id: tokenItemColumn
@@ -117,19 +120,17 @@ ParamEditorBase {
 											}
 											
 											Text {
-												text: showToken ? model.token : "•••••••••••••••"
+												text: delegateRoot.showToken ? model.token : "•••••••••••••••"
 												font.pixelSize: Style.fontSizeS
 												color: Style.textColor
 												font.family: "monospace"
 											}
 											
-											property bool showToken: false
-											
 											Button {
-												text: parent.showToken ? qsTr("Hide") : qsTr("Show")
+												text: delegateRoot.showToken ? qsTr("Hide") : qsTr("Show")
 												height: Style.sizeHintXXXS
 												width: Style.sizeHintXXXS
-												onClicked: parent.showToken = !parent.showToken
+												onClicked: delegateRoot.showToken = !delegateRoot.showToken
 											}
 										}
 										
@@ -149,7 +150,7 @@ ParamEditorBase {
 										enabled: !patTokenEditor.readOnly
 										onClicked: {
 											if (patTokenEditor.patTokenParam) {
-												patTokenEditor.patTokenParam.removeToken(model.index)
+												patTokenEditor.patTokenParam.removeToken(index)
 											}
 										}
 									}
