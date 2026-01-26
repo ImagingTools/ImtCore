@@ -15496,7 +15496,7 @@ bool CResultObject::hasGeometry()
 }
 
 
-void CResultObject::createGeometry()
+void CResultObject::emplaceGeometry()
 {
 	Version_1_0->Geometry.emplace();
 
@@ -15841,7 +15841,7 @@ bool CAreaObject::hasIconPosition()
 }
 
 
-void CAreaObject::createIconPosition()
+void CAreaObject::emplaceIconPosition()
 {
 	Version_1_0->IconPosition.emplace();
 
@@ -15926,7 +15926,7 @@ bool CAreaObject::hasResults()
 }
 
 
-void CAreaObject::createResults()
+void CAreaObject::emplaceResults()
 {
 	Version_1_0->Results.emplace();
 
@@ -16230,7 +16230,7 @@ bool CAnalyzerObject::hasAreas()
 }
 
 
-void CAnalyzerObject::createAreas()
+void CAnalyzerObject::emplaceAreas()
 {
 	Version_1_0->Areas.emplace();
 
@@ -16567,7 +16567,7 @@ bool CInspectionObject::hasAnalyzers()
 }
 
 
-void CInspectionObject::createAnalyzers()
+void CInspectionObject::emplaceAnalyzers()
 {
 	Version_1_0->Analyzers.emplace();
 
@@ -16964,7 +16964,7 @@ bool CProductOverviewObject::hasInspections()
 }
 
 
-void CProductOverviewObject::createInspections()
+void CProductOverviewObject::emplaceInspections()
 {
 	Version_1_0->Inspections.emplace();
 
@@ -17729,7 +17729,7 @@ bool CExtendedMetaDataObject::hasValue()
 }
 
 
-void CExtendedMetaDataObject::createValue()
+void CExtendedMetaDataObject::emplaceValue()
 {
 	Version_1_0->value.emplace();
 
@@ -18097,7 +18097,7 @@ bool CResultMetaDataObject::hasDescription()
 }
 
 
-void CResultMetaDataObject::createDescription()
+void CResultMetaDataObject::emplaceDescription()
 {
 	Version_1_0->description.emplace();
 
@@ -18150,7 +18150,7 @@ bool CResultMetaDataObject::hasExtendedMetaData()
 }
 
 
-void CResultMetaDataObject::createExtendedMetaData()
+void CResultMetaDataObject::emplaceExtendedMetaData()
 {
 	Version_1_0->extendedMetaData.emplace();
 
@@ -18737,7 +18737,7 @@ bool CUnionTestingTypeObject::hasSimpleUnion()
 }
 
 
-void CUnionTestingTypeObject::createSimpleUnion()
+void CUnionTestingTypeObject::emplaceSimpleUnion()
 {
 	Version_1_0->simpleUnion.emplace();
 
@@ -18801,7 +18801,7 @@ bool CUnionTestingTypeObject::hasComplexUnion()
 }
 
 
-void CUnionTestingTypeObject::createComplexUnion()
+void CUnionTestingTypeObject::emplaceComplexUnion()
 {
 	Version_1_0->complexUnion.emplace();
 
@@ -18875,7 +18875,7 @@ bool CUnionTestingTypeObject::hasMixedUnion()
 }
 
 
-void CUnionTestingTypeObject::createMixedUnion()
+void CUnionTestingTypeObject::emplaceMixedUnion()
 {
 	Version_1_0->mixedUnion.emplace();
 
@@ -19154,7 +19154,7 @@ bool CCDMResultVarRecursiveObject::hasResultMetaData()
 }
 
 
-void CCDMResultVarRecursiveObject::createResultMetaData()
+void CCDMResultVarRecursiveObject::emplaceResultMetaData()
 {
 	Version_1_0->resultMetaData.emplace();
 
@@ -19207,7 +19207,7 @@ bool CCDMResultVarRecursiveObject::hasResultContent()
 }
 
 
-void CCDMResultVarRecursiveObject::createResultContent()
+void CCDMResultVarRecursiveObject::emplaceResultContent()
 {
 	Version_1_0->resultContent.emplace();
 
@@ -19260,7 +19260,7 @@ bool CCDMResultVarRecursiveObject::hasOverallResultValues()
 }
 
 
-void CCDMResultVarRecursiveObject::createOverallResultValues()
+void CCDMResultVarRecursiveObject::emplaceOverallResultValues()
 {
 	Version_1_0->overallResultValues.emplace();
 
@@ -19560,7 +19560,7 @@ bool CCDMResultVarStringObject::hasResultMetaData()
 }
 
 
-void CCDMResultVarStringObject::createResultMetaData()
+void CCDMResultVarStringObject::emplaceResultMetaData()
 {
 	Version_1_0->resultMetaData.emplace();
 
@@ -19645,7 +19645,7 @@ bool CCDMResultVarStringObject::hasOverallResultValues()
 }
 
 
-void CCDMResultVarStringObject::createOverallResultValues()
+void CCDMResultVarStringObject::emplaceOverallResultValues()
 {
 	Version_1_0->overallResultValues.emplace();
 
@@ -19942,7 +19942,7 @@ bool CCDMResultObject::hasResultMetaData()
 }
 
 
-void CCDMResultObject::createResultMetaData()
+void CCDMResultObject::emplaceResultMetaData()
 {
 	Version_1_0->resultMetaData.emplace();
 
@@ -19995,7 +19995,7 @@ bool CCDMResultObject::hasResultContent()
 }
 
 
-void CCDMResultObject::createResultContent()
+void CCDMResultObject::emplaceResultContent()
 {
 	Version_1_0->resultContent.emplace();
 
@@ -20048,7 +20048,7 @@ bool CCDMResultObject::hasOverallResultValues()
 }
 
 
-void CCDMResultObject::createOverallResultValues()
+void CCDMResultObject::emplaceOverallResultValues()
 {
 	Version_1_0->overallResultValues.emplace();
 
@@ -20533,7 +20533,7 @@ bool CCollectionViewParamsTestObject::hasFilterModel()
 }
 
 
-void CCollectionViewParamsTestObject::createFilterModel()
+void CCollectionViewParamsTestObject::emplaceFilterModel()
 {
 	Version_1_0->filterModel.emplace();
 

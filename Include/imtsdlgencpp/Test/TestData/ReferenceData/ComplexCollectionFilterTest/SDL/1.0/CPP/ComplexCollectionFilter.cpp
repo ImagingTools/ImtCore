@@ -3384,7 +3384,7 @@ bool CTimeFilterObject::hasTimeRange()
 }
 
 
-void CTimeFilterObject::createTimeRange()
+void CTimeFilterObject::emplaceTimeRange()
 {
 	Version_1_0->timeRange.emplace();
 
@@ -4196,7 +4196,7 @@ bool CGroupFilterObject::hasFieldFilters()
 }
 
 
-void CGroupFilterObject::createFieldFilters()
+void CGroupFilterObject::emplaceFieldFilters()
 {
 	Version_1_0->fieldFilters.emplace();
 
@@ -4249,7 +4249,7 @@ bool CGroupFilterObject::hasGroupFilters()
 }
 
 
-void CGroupFilterObject::createGroupFilters()
+void CGroupFilterObject::emplaceGroupFilters()
 {
 	Version_1_0->groupFilters.emplace();
 
@@ -4519,7 +4519,7 @@ bool CComplexCollectionFilterObject::hasSortingInfo()
 }
 
 
-void CComplexCollectionFilterObject::createSortingInfo()
+void CComplexCollectionFilterObject::emplaceSortingInfo()
 {
 	Version_1_0->sortingInfo.emplace();
 
@@ -4572,7 +4572,7 @@ bool CComplexCollectionFilterObject::hasFieldsFilter()
 }
 
 
-void CComplexCollectionFilterObject::createFieldsFilter()
+void CComplexCollectionFilterObject::emplaceFieldsFilter()
 {
 	Version_1_0->fieldsFilter.emplace();
 
@@ -4625,7 +4625,7 @@ bool CComplexCollectionFilterObject::hasTimeFilter()
 }
 
 
-void CComplexCollectionFilterObject::createTimeFilter()
+void CComplexCollectionFilterObject::emplaceTimeFilter()
 {
 	Version_1_0->timeFilter.emplace();
 

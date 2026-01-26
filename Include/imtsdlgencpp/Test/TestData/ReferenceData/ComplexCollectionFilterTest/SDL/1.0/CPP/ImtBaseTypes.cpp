@@ -11589,7 +11589,7 @@ bool COptionsListObject::hasOptions()
 }
 
 
-void COptionsListObject::createOptions()
+void COptionsListObject::emplaceOptions()
 {
 	Version_1_0->options.emplace();
 
@@ -11845,7 +11845,7 @@ bool CSelectionParamObject::hasConstraints()
 }
 
 
-void CSelectionParamObject::createConstraints()
+void CSelectionParamObject::emplaceConstraints()
 {
 	Version_1_0->constraints.emplace();
 
@@ -12289,7 +12289,7 @@ bool CBackupSettingsObject::hasSchedulerParam()
 }
 
 
-void CBackupSettingsObject::createSchedulerParam()
+void CBackupSettingsObject::emplaceSchedulerParam()
 {
 	Version_1_0->schedulerParam.emplace();
 

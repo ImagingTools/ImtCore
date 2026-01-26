@@ -2471,7 +2471,7 @@ bool CPrinterBaseObject::hasSpecification()
 }
 
 
-void CPrinterBaseObject::createSpecification()
+void CPrinterBaseObject::emplaceSpecification()
 {
 	Version_1_0->specification.emplace();
 
@@ -2531,7 +2531,7 @@ bool CPrinterBaseObject::hasSimpleTest()
 }
 
 
-void CPrinterBaseObject::createSimpleTest()
+void CPrinterBaseObject::emplaceSimpleTest()
 {
 	Version_1_0->simpleTest.emplace();
 
@@ -2593,7 +2593,7 @@ bool CPrinterBaseObject::hasMixedTest()
 }
 
 
-void CPrinterBaseObject::createMixedTest()
+void CPrinterBaseObject::emplaceMixedTest()
 {
 	Version_1_0->mixedTest.emplace();
 
@@ -2828,7 +2828,7 @@ bool CPrinterListObject::hasData()
 }
 
 
-void CPrinterListObject::createData()
+void CPrinterListObject::emplaceData()
 {
 	Version_1_0->data.emplace();
 
