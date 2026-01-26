@@ -489,6 +489,7 @@ public:
 	Q_INVOKABLE bool hasData();
 	Q_INVOKABLE void emplaceData();
 	void ResetData();
+	Q_INVOKABLE QVariant createDataArrayElement(const QVariant& v);
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
