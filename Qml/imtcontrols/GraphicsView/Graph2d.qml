@@ -77,6 +77,26 @@ Rectangle{
 
 	signal invalidPoint(int lineIndex, int pointIndex);
 
+	onLeftLimitChanged: {
+		originShape.points = [leftLimit]
+	}
+
+	onRightLimitChanged: {
+		rightLimitShape.points = [rightLimit]
+	}
+
+	onLinePointsChanged: {
+		reset()
+
+		let activeLayer = graphicsView.getActiveLayer()
+		if(!activeLayer || !activeLayer.shapeModel.length){
+			return
+		}
+		let line = activeLayer.shapeModel[0]
+		line.points = linePoints
+		requestPaint()
+	}
+
 	function validatator(pointsArg){
 		return validatorBase(pointsArg);
 	}
@@ -227,26 +247,6 @@ Rectangle{
 		graphicsView.firstResize = true;
 		wasFitToWidth = false
 		xScale = xScaleBackup
-	}
-
-	onLinePointsChanged: {
-		reset()
-
-		let activeLayer = graphicsView.getActiveLayer()
-		if(!activeLayer || !activeLayer.shapeModel.length){
-			return
-		}
-		let line = activeLayer.shapeModel[0]
-		line.points = linePoints
-		requestPaint()
-	}
-
-	onLeftLimitChanged: {
-		originShape.points = [leftLimit]
-	}
-
-	onRightLimitChanged: {
-		rightLimitShape.points = [rightLimit]
 	}
 
 	function setLeftLimit(limitArg, requestPaintArg){
