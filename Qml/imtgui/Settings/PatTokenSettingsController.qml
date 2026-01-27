@@ -8,12 +8,12 @@ ParamsSetController {
 	id: root
 	
 	readonly property string emptyTokensJson: "{\"tokens\":[]}"
+	paramModel: ParamsSet {}
 	
 	Component.onCompleted: {
-		// Initialize PAT tokens parameter
-		paramsSetController.addParam("PatTokenList", "PatTokens", qsTr("PAT Tokens"), qsTr("Personal Access Tokens for API authentication"), emptyTokensJson)
+		addParam("PatTokenList", "PatTokens", qsTr("PAT Tokens"), qsTr("Personal Access Tokens for API authentication"), emptyTokensJson)
 	}
-	
+
 	function saveParam(){
 		// Save is handled by the parameter system automatically
 	}

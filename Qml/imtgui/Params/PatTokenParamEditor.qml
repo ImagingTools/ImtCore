@@ -26,26 +26,41 @@ ParamEditorBase {
 				id: contentColumn
 				width: parent.width
 				spacing: Style.marginM
-				
-				// Header with title and description
-				Column {
-					width: parent.width
-					spacing: Style.marginXS
-					
-					Text {
-						text: patTokenEditor.name
-						font.pixelSize: Style.fontSizeM
-						font.bold: true
-						color: Style.textColor
-					}
-					
-					Text {
-						text: patTokenEditor.description
-						font.pixelSize: Style.fontSizeS
-						color: Style.hintTextColor
-						visible: patTokenEditor.description !== ""
-						wrapMode: Text.WordWrap
+
+				Item {
+					width: contentColumn.width
+					height: titleColumn.height
+					Column {
+						id: titleColumn
 						width: parent.width
+						spacing: Style.marginXS
+						
+						Text {
+							text: patTokenEditor.name
+							font.pixelSize: Style.fontSizeM
+							font.bold: true
+							color: Style.textColor
+						}
+						
+						Text {
+							text: patTokenEditor.description
+							font.pixelSize: Style.fontSizeS
+							color: Style.hintTextColor
+							visible: patTokenEditor.description !== ""
+							wrapMode: Text.WordWrap
+							width: parent.width
+						}
+					}
+
+					Button {
+						anchors.right: parent.right
+						anchors.verticalCenter: parent.verticalCenter
+						width: Style.sizeHintBXS
+						height: Style.controlHeightM
+						text: qsTr("New Token")
+						onClicked: {
+							ModalDialogManager.openDialog(addTokenDialogComp, {})
+						}
 					}
 				}
 				
@@ -67,92 +82,21 @@ ParamEditorBase {
 						
 						model: patTokenEditor.patTokenParam ? patTokenEditor.patTokenParam.tokens : null
 						
-						delegate: Rectangle {
+						delegate: ElementView {
 							id: delegateRoot
 							width: tokenListView.width
-							height: tokenItemColumn.height + Style.marginM
-							color: Style.baseColor
-							border.color: Style.borderColor
-							border.width: 1
-							radius: Style.radiusS
-							
-							property bool showToken: false
-							
-							Column {
-								id: tokenItemColumn
-								anchors.fill: parent
-								anchors.margins: Style.marginS
-								spacing: Style.marginXS
-								
-								Row {
-									width: parent.width
-									spacing: Style.marginS
-									
-									Column {
-										width: parent.width - deleteButton.width - Style.marginS
-										spacing: Style.marginXS
-										
-										Text {
-											text: model.name
-											font.pixelSize: Style.fontSizeM
-											font.bold: true
-											color: Style.textColor
-											width: parent.width
-											elide: Text.ElideRight
-										}
-										
-										Text {
-											text: model.description
-											font.pixelSize: Style.fontSizeS
-											color: Style.hintTextColor
-											visible: model.description !== ""
-											width: parent.width
-											wrapMode: Text.WordWrap
-										}
-										
-										Row {
-											spacing: Style.marginXS
-											
-											Text {
-												text: qsTr("Token:")
-												font.pixelSize: Style.fontSizeS
-												color: Style.hintTextColor
-											}
-											
-											Text {
-												text: delegateRoot.showToken ? model.token : "•••••••••••••••"
-												font.pixelSize: Style.fontSizeS
-												color: Style.textColor
-												font.family: Qt.platform.os === "web" ? "monospace" : "Courier"
-											}
-											
-											Button {
-												text: delegateRoot.showToken ? qsTr("Hide") : qsTr("Show")
-												height: Style.sizeHintXXXS
-												width: Style.sizeHintXXXS
-												onClicked: delegateRoot.showToken = !delegateRoot.showToken
-											}
-										}
-										
-										Text {
-											text: qsTr("Created: ") + new Date(model.createdDate).toLocaleString()
-											font.pixelSize: Style.fontSizeXS
-											color: Style.hintTextColor
-										}
-									}
-									
-									Button {
-										id: deleteButton
-										text: qsTr("Delete")
-										width: Style.sizeHintXXXS
-										height: Style.sizeHintXXXS
-										anchors.verticalCenter: parent.verticalCenter
-										enabled: !patTokenEditor.readOnly
-										onClicked: {
-											if (patTokenEditor.patTokenParam) {
-												patTokenEditor.patTokenParam.removeToken(index)
-											}
-										}
+							name: model.name
+							description: model.description
+
+							controlComp: Component {
+								Button {
+									anchors.right: parent.right
+									anchors.verticalCenter: parent.verticalCenter
+									width: Style.sizeHintBXS
+									height: Style.controlHeightM
+									text: qsTr("Delete")
+									onClicked: {
+										patTokenEditor.patTokenParam.removeToken(model.index)
 									}
 								}
 							}
@@ -166,15 +110,6 @@ ParamEditorBase {
 							color: Style.hintTextColor
 						}
 					}
-				}
-				
-				// Add token button
-				Button {
-					text: qsTr("Add PAT Token")
-					width: Style.sizeHintXS
-					height: Style.sizeHintXXXS
-					enabled: !patTokenEditor.readOnly
-					onClicked: addTokenDialog.open()
 				}
 			}
 			
@@ -193,13 +128,13 @@ ParamEditorBase {
 					
 					Component.onCompleted: {
 						clearButtons()
-						addButton(Enums.apply, qsTr("Add"), false)
+						addButton(Enums.apply, qsTr("Add"), true)
 						addButton(Enums.cancel, qsTr("Cancel"), true)
 					}
 					
 					onFinished: {
-						if (buttonId === Enums.apply) {
-							if (tokenName.trim() !== "" && tokenValue.trim() !== "") {
+						if (buttonId === Enums.apply){
+							if (tokenName.trim() !== "" && tokenValue.trim() !== ""){
 								if (patTokenEditor.patTokenParam) {
 									patTokenEditor.patTokenParam.addToken(
 										tokenName.trim(),
@@ -207,18 +142,16 @@ ParamEditorBase {
 										tokenDescription.trim()
 									)
 								}
-								close()
-							} else {
+							}
+							else{
 								ModalDialogManager.showInfoDialog(qsTr("Name and Token fields are required"))
 							}
 						}
 					}
 					
 					contentComp: Component {
-						Column {
+						GroupElementView {
 							width: addDialog.width - Style.marginL
-							spacing: Style.marginM
-							
 							TextInputElementView {
 								width: parent.width
 								name: qsTr("Token Name")
@@ -246,12 +179,6 @@ ParamEditorBase {
 						}
 					}
 				}
-			}
-			
-			property var addTokenDialog: null
-			
-			Component.onCompleted: {
-				addTokenDialog = addTokenDialogComp.createObject(tokenEditorView)
 			}
 		}
 	}
