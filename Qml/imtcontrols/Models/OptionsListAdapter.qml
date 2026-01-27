@@ -17,7 +17,7 @@ OptionsList {
     
     onCollectionModelChanged: {
         if (!hasOptions()){
-            createOptions()
+            emplaceOptions()
         }
         
         m_options.clear()
