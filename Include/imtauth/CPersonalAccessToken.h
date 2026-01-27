@@ -1,6 +1,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QDateTime>
+
 // ImtCore includes
 #include <imtauth/IPersonalAccessToken.h>
 

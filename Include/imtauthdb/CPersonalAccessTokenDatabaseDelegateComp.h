@@ -2,6 +2,7 @@
 
 
 // ImtCore includes
+#include <imtauth/IPersonalAccessToken.h>
 #include <imtdb/CSqlDatabaseObjectDelegateCompBase.h>
 
 
@@ -36,6 +37,20 @@ public:
 	virtual QByteArray CreateDeleteObjectsQuery(
 				const imtbase::IObjectCollection& collection,
 				const QByteArrayList& objectIds,
+				const imtbase::IOperationContext* operationContextPtr) const override;
+	virtual QByteArray CreateDeleteObjectSetQuery(
+				const imtbase::IObjectCollection& collection,
+				const iprm::IParamsSet* paramsPtr = nullptr,
+				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
+	virtual QByteArray CreateRenameObjectQuery(
+				const imtbase::IObjectCollection& collection,
+				const QByteArray& objectId,
+				const QString& newObjectName,
+				const imtbase::IOperationContext* operationContextPtr) const override;
+	virtual QByteArray CreateDescriptionObjectQuery(
+				const imtbase::IObjectCollection& collection,
+				const QByteArray& objectId,
+				const QString& description,
 				const imtbase::IOperationContext* operationContextPtr) const override;
 
 protected:

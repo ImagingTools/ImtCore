@@ -37,26 +37,13 @@ bool CPersonalAccessTokenMetaInfoCreatorComp::CreateMetaInfo(
 		return false;
 	}
 
-	metaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_ID, tokenPtr->GetId());
-	metaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_NAME, tokenPtr->GetName());
-	metaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION, tokenPtr->GetDescription());
-
 	return true;
 }
 
 
 QString CPersonalAccessTokenMetaInfoCreatorComp::MetaInfo::GetMetaInfoName(int metaInfoType) const
 {
-	switch (metaInfoType){
-		case idoc::IDocumentMetaInfo::MIT_ID:
-			return QObject::tr("ID");
-		case idoc::IDocumentMetaInfo::MIT_NAME:
-			return QObject::tr("Name");
-		case idoc::IDocumentMetaInfo::MIT_DESCRIPTION:
-			return QObject::tr("Description");
-		default:
-			return BaseClass::GetMetaInfoName(metaInfoType);
-	}
+	return BaseClass::GetMetaInfoName(metaInfoType);
 }
 
 

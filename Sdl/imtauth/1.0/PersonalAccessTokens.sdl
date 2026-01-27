@@ -10,17 +10,13 @@ import {
 	"../../../../ImtCore/Sdl/imtbase/1.0/ImtCollection.sdl"
 }
 
-input PersonalAccessTokensListInput {
-	userId: ID
-	viewParams: CollectionViewParams
-}
-
-type PersonalAccessTokenItemData {
+type PersonalAccessToken
+{
 	id: ID!
-	typeId: ID!
 	userId: ID!
-	name: String
+	name: String!
 	description: String
+	tokenHash: ID!
 	scopes: [ID]
 	createdAt: String
 	lastUsedAt: String
@@ -28,36 +24,20 @@ type PersonalAccessTokenItemData {
 	revoked: Bool
 }
 
-type PersonalAccessTokensListPayload {
-	items: [PersonalAccessTokenItemData]
-	notification: NotificationItem
+type PersonalAccessTokenList
+{
+	tokens: [PersonalAccessToken]
 }
 
-type PersonalAccessTokenData {
-	id: ID!
+input TokenInput {
+	token: ID!
+}
+
+input UserIdInput {
 	userId: ID!
-	name: String
-	description: String
-	scopes: [ID]
-	createdAt: String
-	lastUsedAt: String
-	expiresAt: String
-	revoked: Bool
 }
 
-input PersonalAccessTokenDataInput {
-	id: ID!
-	typeId: ID!
-	item: PersonalAccessTokenData!
-	name: String
-	description: String
-}
-
-input PersonalAccessTokenItemInput {
-	id: ID!
-}
-
-input CreatePersonalAccessTokenInput {
+input CreateTokenInput {
 	userId: ID!
 	name: String!
 	description: String
@@ -65,27 +45,25 @@ input CreatePersonalAccessTokenInput {
 	expiresAt: String
 }
 
-type CreatePersonalAccessTokenPayload {
+type CreateTokenPayload {
 	id: ID!
 	token: ID!
 	success: Boolean!
 	message: String
 }
 
-input RevokePersonalAccessTokenInput {
-	id: ID!
-}
-
-type RevokePersonalAccessTokenPayload {
+type RevokeTokenPayload {
 	success: Boolean!
 	message: String
 }
 
-input ValidatePersonalAccessTokenInput {
-	token: ID!
+type DeleteTokenPayload {
+	success: Boolean!
+	message: String
 }
 
-type ValidatePersonalAccessTokenPayload {
+type ValidateTokenPayload 
+{
 	valid: Boolean!
 	userId: ID
 	scopes: [ID]
@@ -93,32 +71,15 @@ type ValidatePersonalAccessTokenPayload {
 }
 
 type Query {
-	PersonalAccessTokensList (input: PersonalAccessTokensListInput): PersonalAccessTokensListPayload!
-	PersonalAccessTokenItem (input: PersonalAccessTokenItemInput): PersonalAccessTokenData!
-	ValidatePersonalAccessToken (input: ValidatePersonalAccessTokenInput): ValidatePersonalAccessTokenPayload!
+	GetTokenList (input: UserIdInput): PersonalAccessTokenList!
+	GetToken (input: InputId): PersonalAccessToken!
+	ValidateToken (input: TokenInput): ValidateTokenPayload!
 }
 
 type Mutation {
-	CreatePersonalAccessToken (input: CreatePersonalAccessTokenInput): CreatePersonalAccessTokenPayload!
-	RevokePersonalAccessToken (input: RevokePersonalAccessTokenInput): RevokePersonalAccessTokenPayload!
-	PersonalAccessTokenUpdate (input: PersonalAccessTokenDataInput): UpdatedNotificationPayload!
-	PersonalAccessTokenDelete (input: PersonalAccessTokenItemInput): DeletedNotificationPayload!
+	CreateToken (input: CreateTokenInput): CreateTokenPayload!
+	RevokeToken (input: InputId): RevokeTokenPayload!
+	DeleteToken (input: InputId): DeleteTokenPayload!
 }
 
-collectionSchema {
-	type PersonalAccessToken {
-		ref: PersonalAccessTokenItemData
-		operations {
-			list: PersonalAccessTokensList
-		}
-		subtype PersonalAccessToken {
-			ref: PersonalAccessTokenData
-			operations {
-				get: PersonalAccessTokenItem
-				update: PersonalAccessTokenUpdate
-				delete: PersonalAccessTokenDelete
-			}
-		}
-	}
-}
 

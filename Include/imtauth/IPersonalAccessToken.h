@@ -3,6 +3,7 @@
 
 // ACF includes
 #include <istd/IChangeable.h>
+#include <idoc/IDocumentMetaInfo.h>
 
 
 namespace imtauth
@@ -156,8 +157,8 @@ public:
 };
 
 
-using IPersonalAccessTokenUniquePtr = istd::TUniquePtr<IPersonalAccessToken>;
-using IPersonalAccessTokenSharedPtr = istd::TSharedPtr<IPersonalAccessToken>;
+using IPersonalAccessTokenUniquePtr = istd::TUniqueInterfacePtr<IPersonalAccessToken>;
+using IPersonalAccessTokenSharedPtr = istd::TSharedInterfacePtr<IPersonalAccessToken>;
 
 
 } // namespace imtauth

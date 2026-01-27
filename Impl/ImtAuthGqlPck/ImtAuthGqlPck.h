@@ -41,6 +41,7 @@
 #include <imtauthgql/CClientRequestRoleInfoProviderComp.h>
 #include <imtauthgql/CClientRequestGroupInfoProviderComp.h>
 #include <imtauthgql/CTokenBasedPermissionsProviderComp.h>
+#include <imtauthgql/CPersonalAccessTokenControllerComp.h>
 
 
 /**
@@ -85,6 +86,7 @@ typedef imtauthgql::CClientRequestUserInfoProviderComp ClientRequestUserInfoProv
 typedef imtauthgql::CClientRequestRoleInfoProviderComp ClientRequestRoleInfoProvider;
 typedef imtauthgql::CClientRequestGroupInfoProviderComp ClientRequestGroupInfoProvider;
 typedef imtauthgql::CTokenBasedPermissionsProviderComp ClientRequestTokenBasedPermissionsProvider;
+typedef imtauthgql::CPersonalAccessTokenControllerComp PersonalAccessTokenController;
 
 
 } // namespace ImtAuthGqlPck
