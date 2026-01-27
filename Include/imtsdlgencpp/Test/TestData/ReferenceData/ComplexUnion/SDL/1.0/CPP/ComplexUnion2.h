@@ -1984,6 +1984,7 @@ public:
 	Q_INVOKABLE bool hasResultContent();
 	Q_INVOKABLE void emplaceResultContent();
 	void ResetResultContent();
+	Q_INVOKABLE QVariant createResultContentArrayElement(const QVariant& v);
 	QVariant GetOverallResultValues();
 	void SetOverallResultValues(const QVariant& v);
 	Q_INVOKABLE bool hasOverallResultValues();
@@ -2167,6 +2168,7 @@ public:
 	Q_INVOKABLE bool hasResultContent();
 	Q_INVOKABLE void emplaceResultContent();
 	void ResetResultContent();
+	Q_INVOKABLE QVariant createResultContentArrayElement(const QVariant& v);
 	QVariant GetOverallResultValues();
 	void SetOverallResultValues(const QVariant& v);
 	Q_INVOKABLE bool hasOverallResultValues();

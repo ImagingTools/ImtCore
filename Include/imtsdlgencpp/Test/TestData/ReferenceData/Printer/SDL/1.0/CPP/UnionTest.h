@@ -522,6 +522,7 @@ public:
 	Q_INVOKABLE bool hasSpecificationList();
 	Q_INVOKABLE void emplaceSpecificationList();
 	void ResetSpecificationList();
+	Q_INVOKABLE QVariant createSpecificationListArrayElement(const QVariant& v);
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
