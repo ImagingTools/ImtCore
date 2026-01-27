@@ -112,27 +112,10 @@ public:
 									  const imtsdl::SdlTypeList& typeList,
 									  const imtsdl::SdlEnumList& enumList,
 									  const imtsdl::SdlUnionList& unionList,
-									  bool withPointer = true);
-
-	static QString GetQObjectElementTypeName(const imtsdl::CSdlField& sdlField,
-									  const imtsdl::SdlTypeList& typeList,
-									  const imtsdl::SdlEnumList& enumList,
-									  const imtsdl::SdlUnionList& unionList,
-									  bool withPointer = true);
+									  bool withPointer = true,
+									  bool treatArrayAsElement = false);
 
 	[[nodiscard]] static QString GetTempVariableWrappedValue(const QString& variableName);
-
-	[[nodiscard]] static QString GetTempVariableWrappedValue(const imtsdl::CSdlField& sdlField);
-
-private:
-	static QString GetQObjectTypeNameImpl(const imtsdl::CSdlField& sdlField,
-										  const imtsdl::SdlTypeList& typeList,
-										  const imtsdl::SdlEnumList& enumList,
-										  const imtsdl::SdlUnionList& unionList,
-										  bool withPointer,
-										  bool treatArrayAsElement);
-
-public:
 };
 
 

@@ -448,26 +448,6 @@ QString CSdlGenTools::GetQObjectTypeName(const imtsdl::CSdlField& sdlField,
 			const imtsdl::SdlTypeList& typeList,
 			const imtsdl::SdlEnumList& enumList,
 			const imtsdl::SdlUnionList& unionList,
-			bool withPointer)
-{
-	return GetQObjectTypeNameImpl(sdlField, typeList, enumList, unionList, withPointer, false);
-}
-
-
-QString CSdlGenTools::GetQObjectElementTypeName(const imtsdl::CSdlField& sdlField,
-			const imtsdl::SdlTypeList& typeList,
-			const imtsdl::SdlEnumList& enumList,
-			const imtsdl::SdlUnionList& unionList,
-			bool withPointer)
-{
-	return GetQObjectTypeNameImpl(sdlField, typeList, enumList, unionList, withPointer, true);
-}
-
-
-QString CSdlGenTools::GetQObjectTypeNameImpl(const imtsdl::CSdlField& sdlField,
-			const imtsdl::SdlTypeList& typeList,
-			const imtsdl::SdlEnumList& enumList,
-			const imtsdl::SdlUnionList& unionList,
 			bool withPointer,
 			bool treatArrayAsElement)
 {
@@ -514,7 +494,7 @@ QString CSdlGenTools::GetQObjectTypeNameImpl(const imtsdl::CSdlField& sdlField,
 			retVal += QStringLiteral("QString");
 		}
 		else {
-			Q_ASSERT_X(false, "CSdlGenTools::GetQObjectTypeNameImpl", sdlField.GetType().toUtf8() + " field.GetType() not implemented");
+			Q_ASSERT_X(false, "CSdlGenTools::GetQObjectTypeName", sdlField.GetType().toUtf8() + " field.GetType() not implemented");
 		}
 
 		if (isArray && !treatArrayAsElement){
