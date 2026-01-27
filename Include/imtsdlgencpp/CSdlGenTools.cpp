@@ -525,6 +525,73 @@ QString CSdlGenTools::GetQObjectTypeName(const imtsdl::CSdlField& sdlField,
 }
 
 
+QString CSdlGenTools::GetQObjectElementTypeName(const imtsdl::CSdlField& sdlField,
+			const imtsdl::SdlTypeList& typeList,
+			const imtsdl::SdlEnumList& enumList,
+			const imtsdl::SdlUnionList& unionList,
+			bool withPointer)
+{
+	QString retVal = "";
+	bool isArray = false;
+	bool isCustom = false;
+	bool isEnum = false;
+	bool isUnion = false;
+
+	const QString convertedType = imtsdl::CSdlTools::ConvertTypeOrEnumOrUnion(sdlField, enumList, unionList, &isCustom, nullptr, &isArray, &isEnum, &isUnion);
+	std::shared_ptr<imtsdl::CSdlEntryBase> sdlEntryBase = imtsdl::CSdlTools::GetSdlTypeOrEnumOrUnionForField(
+		sdlField,
+		typeList,
+		enumList,
+		unionList);
+
+	QString sdlNamespace;
+	if (sdlEntryBase != nullptr){
+		sdlNamespace = GetNamespaceFromSchemaParams(sdlEntryBase->GetSchemaParams());
+	}
+
+	// For array fields, return the element type (not the list type)
+	if (!isCustom || isEnum){
+		// For primitive types and enums, return the base type without array wrapping
+		if (sdlField.GetType() == "String" || isEnum){
+			retVal = QStringLiteral("QString");
+		}
+		else if (sdlField.GetType() == "Integer" || sdlField.GetType() == "Int"){
+			retVal = QStringLiteral("int");
+		}
+		else if (sdlField.GetType() == "Double" || sdlField.GetType() == "Float"){
+			retVal = QStringLiteral("double");
+		}
+		else if (sdlField.GetType() == "Boolean" || sdlField.GetType() == "Bool"){
+			retVal = QStringLiteral("bool");
+		}
+		else if (sdlField.GetType() == "LongLong" || sdlField.GetType() == "longLong"){
+			retVal = QStringLiteral("int");
+		}
+		else if (sdlField.GetType() == "ID"){
+			retVal = QStringLiteral("QString");
+		}
+		else {
+			Q_ASSERT_X(false, "CSdlGenTools::GetQObjectElementTypeName", sdlField.GetType().toUtf8() + " field.GetType() not implemented");
+		}
+	}
+	else if(isUnion){
+		retVal = "QVariant";
+	}
+	else{
+		// For custom types (both array and non-array), return the Object type
+		retVal = sdlNamespace;
+		retVal += QStringLiteral("::C") + sdlField.GetType();
+		retVal += QStringLiteral("Object");
+
+		if (withPointer){
+			retVal += "*";
+		}
+	}
+
+	return retVal;
+}
+
+
 QString CSdlGenTools::GetTempVariableWrappedValue(const QString& variableName)
 {
 	return QStringLiteral("t_%1").arg(imtsdl::CSdlTools::GetDecapitalizedValue(variableName));
