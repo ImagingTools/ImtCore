@@ -324,13 +324,13 @@ Item {
 			if (Qt.platform.os !== "web"){
 				settingsController.registerParamsSetController("Network", qsTr("Network"), clientSettingsController)
 			}
-			
-			// Register PAT tokens settings (always available)
-			settingsController.registerParamsSetController("PatTokens", qsTr("PAT Tokens"), patTokenSettingsController)
-			
+
 			if (application.serverConnected){
 				settingsController.registerParamsSetController("General", qsTr("General"), userSettingsController)
 				settingsController.registerParamsSetController("About", qsTr("About"), pageAboutProvider)
+
+				// Register PAT tokens settings (always available)
+				settingsController.registerParamsSetController("PatTokens", qsTr("PAT Tokens"), patTokenSettingsController)
 			}
 		}
 	}

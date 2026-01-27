@@ -2,10 +2,12 @@ import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 
-Param {
+QtObject {
 	id: root
 	
 	property ListModel tokens: ListModel {}
+	
+	signal modelChanged(var changeSet)
 	
 	function addToken(name, token, description) {
 		tokens.append({
