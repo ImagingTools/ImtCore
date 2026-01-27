@@ -3,6 +3,8 @@
 
 // ACF includes
 #include <istd/CChangeNotifier.h>
+#include <iser/IArchive.h>
+#include <iser/CArchiveTag.h>
 
 
 namespace imtauth
@@ -187,6 +189,68 @@ bool CPersonalAccessToken::IsExpired() const
 bool CPersonalAccessToken::IsValid() const
 {
 	return !IsRevoked() && !IsExpired();
+}
+
+
+// reimplemented (iser::ISerializable)
+
+bool CPersonalAccessToken::Serialize(iser::IArchive& archive)
+{
+	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
+
+	bool retVal = true;
+
+	static iser::CArchiveTag idTag("Id", "Token identifier");
+	retVal = retVal && archive.BeginTag(idTag);
+	retVal = retVal && archive.Process(m_id);
+	retVal = retVal && archive.EndTag(idTag);
+
+	static iser::CArchiveTag userIdTag("UserId", "User identifier");
+	retVal = retVal && archive.BeginTag(userIdTag);
+	retVal = retVal && archive.Process(m_userId);
+	retVal = retVal && archive.EndTag(userIdTag);
+
+	static iser::CArchiveTag nameTag("Name", "Token name");
+	retVal = retVal && archive.BeginTag(nameTag);
+	retVal = retVal && archive.Process(m_name);
+	retVal = retVal && archive.EndTag(nameTag);
+
+	static iser::CArchiveTag descriptionTag("Description", "Token description");
+	retVal = retVal && archive.BeginTag(descriptionTag);
+	retVal = retVal && archive.Process(m_description);
+	retVal = retVal && archive.EndTag(descriptionTag);
+
+	static iser::CArchiveTag tokenHashTag("TokenHash", "Token hash value");
+	retVal = retVal && archive.BeginTag(tokenHashTag);
+	retVal = retVal && archive.Process(m_tokenHash);
+	retVal = retVal && archive.EndTag(tokenHashTag);
+
+	static iser::CArchiveTag scopesTag("Scopes", "Permission scopes");
+	retVal = retVal && archive.BeginTag(scopesTag);
+	retVal = retVal && archive.Process(m_scopes);
+	retVal = retVal && archive.EndTag(scopesTag);
+
+	static iser::CArchiveTag createdAtTag("CreatedAt", "Creation timestamp");
+	retVal = retVal && archive.BeginTag(createdAtTag);
+	retVal = retVal && archive.Process(m_createdAt);
+	retVal = retVal && archive.EndTag(createdAtTag);
+
+	static iser::CArchiveTag lastUsedAtTag("LastUsedAt", "Last used timestamp");
+	retVal = retVal && archive.BeginTag(lastUsedAtTag);
+	retVal = retVal && archive.Process(m_lastUsedAt);
+	retVal = retVal && archive.EndTag(lastUsedAtTag);
+
+	static iser::CArchiveTag expiresAtTag("ExpiresAt", "Expiration timestamp");
+	retVal = retVal && archive.BeginTag(expiresAtTag);
+	retVal = retVal && archive.Process(m_expiresAt);
+	retVal = retVal && archive.EndTag(expiresAtTag);
+
+	static iser::CArchiveTag revokedTag("Revoked", "Revocation status");
+	retVal = retVal && archive.BeginTag(revokedTag);
+	retVal = retVal && archive.Process(m_revoked);
+	retVal = retVal && archive.EndTag(revokedTag);
+
+	return retVal;
 }
 
 

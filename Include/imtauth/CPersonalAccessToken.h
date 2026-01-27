@@ -4,6 +4,9 @@
 // Qt includes
 #include <QDateTime>
 
+// ACF includes
+#include <iser/ISerializable.h>
+
 // ImtCore includes
 #include <imtauth/IPersonalAccessToken.h>
 
@@ -12,7 +15,8 @@ namespace imtauth
 {
 
 
-class CPersonalAccessToken: virtual public imtauth::IPersonalAccessToken
+class CPersonalAccessToken: virtual public imtauth::IPersonalAccessToken,
+							virtual public iser::ISerializable
 {
 public:
 	// reimplemented (imtauth::IPersonalAccessToken)
@@ -38,6 +42,9 @@ public:
 	virtual void SetRevoked(bool revoked) override;
 	virtual bool IsExpired() const override;
 	virtual bool IsValid() const override;
+
+	// reimplemented (iser::ISerializable)
+	virtual bool Serialize(iser::IArchive& archive) override;
 
 private:
 	QByteArray m_id;
