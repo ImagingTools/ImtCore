@@ -15942,6 +15942,7 @@ void CAreaObject::ResetResults()
 	m_resultsQObjectPtr = QVariant();
 }
 
+
 QVariant CAreaObject::createResultsArrayElement(const QVariant& v)
 {
 	Q_UNUSED(v);
