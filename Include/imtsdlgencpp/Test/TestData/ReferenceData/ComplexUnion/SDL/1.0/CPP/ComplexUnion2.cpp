@@ -16252,6 +16252,7 @@ void CAnalyzerObject::ResetAreas()
 	m_areasQObjectPtr = QVariant();
 }
 
+
 QVariant CAnalyzerObject::createAreasArrayElement(const QVariant& v)
 {
 	Q_UNUSED(v);
@@ -16594,6 +16595,7 @@ void CInspectionObject::ResetAnalyzers()
 	}
 	m_analyzersQObjectPtr = QVariant();
 }
+
 
 QVariant CInspectionObject::createAnalyzersArrayElement(const QVariant& v)
 {
@@ -16997,6 +16999,7 @@ void CProductOverviewObject::ResetInspections()
 	}
 	m_inspectionsQObjectPtr = QVariant();
 }
+
 
 QVariant CProductOverviewObject::createInspectionsArrayElement(const QVariant& v)
 {
@@ -18190,6 +18193,7 @@ void CResultMetaDataObject::ResetExtendedMetaData()
 	m_extendedMetaDataQObjectPtr = QVariant();
 }
 
+
 QVariant CResultMetaDataObject::createExtendedMetaDataArrayElement(const QVariant& v)
 {
 	Q_UNUSED(v);
@@ -19306,6 +19310,7 @@ void CCDMResultVarRecursiveObject::ResetOverallResultValues()
 	m_overallResultValuesQObjectPtr = QVariant();
 }
 
+
 QVariant CCDMResultVarRecursiveObject::createOverallResultValuesArrayElement(const QVariant& v)
 {
 	Q_UNUSED(v);
@@ -19696,6 +19701,7 @@ void CCDMResultVarStringObject::ResetOverallResultValues()
 	}
 	m_overallResultValuesQObjectPtr = QVariant();
 }
+
 
 QVariant CCDMResultVarStringObject::createOverallResultValuesArrayElement(const QVariant& v)
 {
@@ -20105,6 +20111,7 @@ void CCDMResultObject::ResetOverallResultValues()
 	}
 	m_overallResultValuesQObjectPtr = QVariant();
 }
+
 
 QVariant CCDMResultObject::createOverallResultValuesArrayElement(const QVariant& v)
 {

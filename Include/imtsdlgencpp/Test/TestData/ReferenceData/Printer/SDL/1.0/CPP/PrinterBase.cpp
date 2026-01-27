@@ -2844,6 +2844,7 @@ void CPrinterListObject::ResetData()
 	m_dataQObjectPtr = QVariant();
 }
 
+
 QVariant CPrinterListObject::createDataArrayElement(const QVariant& v)
 {
 	Q_UNUSED(v);

@@ -11606,6 +11606,13 @@ void COptionsListObject::ResetOptions()
 }
 
 
+QVariant COptionsListObject::createOptionsArrayElement(const QVariant& v)
+{
+	Q_UNUSED(v);
+	return QVariant::fromValue(new sdl::imtbase::ImtBaseTypes::COptionObject());
+}
+
+
 QString COptionsListObject::toJson() const
 {
 	QJsonObject jsonObject;
