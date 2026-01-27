@@ -1,9 +1,6 @@
 #include <imtauth/CPersonalAccessToken.h>
 
 
-// Qt includes
-#include <QtCore/QDateTime>
-
 // ACF includes
 #include <istd/CChangeNotifier.h>
 #include <iser/IArchive.h>
