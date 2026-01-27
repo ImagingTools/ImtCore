@@ -141,7 +141,7 @@ bool CSdlQObjectGeneratorComp::ProcessHeaderClassFile(QTextStream& stream, const
 			FeedStream(stream, 1, false);
 		}
 
-		if (isCustom && !isEnum && isArray){
+		if (isCustom && !isEnum && isArray && !isUnion){
 			FeedStreamHorizontally(stream);
 			stream << QStringLiteral("Q_INVOKABLE QVariant create") << GetCapitalizedValue(field.GetId()) << QStringLiteral("ArrayElement(const QVariant& v);");
 			FeedStream(stream, 1, false);
@@ -803,7 +803,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 		}
 
 		// create array element implementation
-		if (isCustom && !isEnum && isArray){
+		if (isCustom && !isEnum && isArray && !isUnion){
 			stream << QStringLiteral("QVariant C") << sdlEntry.GetName() << QStringLiteral("Object");
 			stream << QStringLiteral("::create") << GetCapitalizedValue(field.GetId()) << QStringLiteral("ArrayElement(const QVariant& v)");
 			FeedStream(stream, 1, false);
@@ -815,13 +815,20 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 			FeedStream(stream, 1, false);
 
 			FeedStreamHorizontally(stream);
-			stream << QStringLiteral("return QVariant::fromValue(new ") << CSdlGenTools::GetQObjectTypeName(field, m_sdlTypeListCompPtr->GetSdlTypes(false), m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false), false, true) << QStringLiteral("());");
+			stream << QStringLiteral("return QVariant::fromValue(new ");
+			stream << CSdlGenTools::GetQObjectTypeName(
+				field, 
+				m_sdlTypeListCompPtr->GetSdlTypes(false), 
+				m_sdlEnumListCompPtr->GetEnums(false), 
+				m_sdlUnionListCompPtr->GetUnions(false), 
+				false, 
+				true);
+			stream << QStringLiteral("());");
 			FeedStream(stream, 1, false);
 
 			stream << QStringLiteral("}");
 			FeedStream(stream, 3, false);
 		}
-
 	}
 
 	// CItemModelBase implemented
