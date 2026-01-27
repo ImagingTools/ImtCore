@@ -156,8 +156,8 @@ public:
 };
 
 
-using IPersonalAccessTokenUniquePtr = istd::TUniquePtr<IPersonalAccessToken>;
-using IPersonalAccessTokenSharedPtr = istd::TSharedPtr<IPersonalAccessToken>;
+typedef istd::TUniqueInterfacePtr<IPersonalAccessToken> IPersonalAccessTokenUniquePtr;
+typedef istd::TSharedInterfacePtr<IPersonalAccessToken> IPersonalAccessTokenSharedPtr;
 
 
 } // namespace imtauth
