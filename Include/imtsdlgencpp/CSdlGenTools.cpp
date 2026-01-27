@@ -450,6 +450,27 @@ QString CSdlGenTools::GetQObjectTypeName(const imtsdl::CSdlField& sdlField,
 			const imtsdl::SdlUnionList& unionList,
 			bool withPointer)
 {
+	return GetQObjectTypeNameImpl(sdlField, typeList, enumList, unionList, withPointer, false);
+}
+
+
+QString CSdlGenTools::GetQObjectElementTypeName(const imtsdl::CSdlField& sdlField,
+			const imtsdl::SdlTypeList& typeList,
+			const imtsdl::SdlEnumList& enumList,
+			const imtsdl::SdlUnionList& unionList,
+			bool withPointer)
+{
+	return GetQObjectTypeNameImpl(sdlField, typeList, enumList, unionList, withPointer, true);
+}
+
+
+QString CSdlGenTools::GetQObjectTypeNameImpl(const imtsdl::CSdlField& sdlField,
+			const imtsdl::SdlTypeList& typeList,
+			const imtsdl::SdlEnumList& enumList,
+			const imtsdl::SdlUnionList& unionList,
+			bool withPointer,
+			bool treatArrayAsElement)
+{
 	QString retVal = "";
 	bool isArray = false;
 	bool isCustom = false;
@@ -469,7 +490,8 @@ QString CSdlGenTools::GetQObjectTypeName(const imtsdl::CSdlField& sdlField,
 	}
 
 	if (!isCustom || isEnum){
-		if (isArray){
+		// For primitive types and enums
+		if (isArray && !treatArrayAsElement){
 			retVal = QStringLiteral("QList<");
 		}
 
@@ -492,14 +514,15 @@ QString CSdlGenTools::GetQObjectTypeName(const imtsdl::CSdlField& sdlField,
 			retVal += QStringLiteral("QString");
 		}
 		else {
-			Q_ASSERT_X(false, "CSdlQObjectGeneratorComp::ProcessSourceClassFile", sdlField.GetType().toUtf8() + " field.GetType() not implemented");
+			Q_ASSERT_X(false, "CSdlGenTools::GetQObjectTypeNameImpl", sdlField.GetType().toUtf8() + " field.GetType() not implemented");
 		}
 
-		if (isArray){
+		if (isArray && !treatArrayAsElement){
 			retVal += QStringLiteral(">");
 		}
 	}
-	else if(isArray){
+	else if(isArray && !treatArrayAsElement){
+		// For custom array types, return ObjectList
 		retVal = sdlNamespace;
 		retVal += QStringLiteral("::C") + sdlField.GetType();
 		retVal += QStringLiteral("ObjectList");
@@ -512,73 +535,7 @@ QString CSdlGenTools::GetQObjectTypeName(const imtsdl::CSdlField& sdlField,
 		retVal = "QVariant";
 	}
 	else{
-		retVal = sdlNamespace;
-		retVal += QStringLiteral("::C") + sdlField.GetType();
-		retVal += QStringLiteral("Object");
-
-		if (withPointer){
-			retVal += "*";
-		}
-	}
-
-	return retVal;
-}
-
-
-QString CSdlGenTools::GetQObjectElementTypeName(const imtsdl::CSdlField& sdlField,
-			const imtsdl::SdlTypeList& typeList,
-			const imtsdl::SdlEnumList& enumList,
-			const imtsdl::SdlUnionList& unionList,
-			bool withPointer)
-{
-	QString retVal = "";
-	bool isArray = false;
-	bool isCustom = false;
-	bool isEnum = false;
-	bool isUnion = false;
-
-	const QString convertedType = imtsdl::CSdlTools::ConvertTypeOrEnumOrUnion(sdlField, enumList, unionList, &isCustom, nullptr, &isArray, &isEnum, &isUnion);
-	std::shared_ptr<imtsdl::CSdlEntryBase> sdlEntryBase = imtsdl::CSdlTools::GetSdlTypeOrEnumOrUnionForField(
-		sdlField,
-		typeList,
-		enumList,
-		unionList);
-
-	QString sdlNamespace;
-	if (sdlEntryBase != nullptr){
-		sdlNamespace = GetNamespaceFromSchemaParams(sdlEntryBase->GetSchemaParams());
-	}
-
-	// For array fields, return the element type (not the list type)
-	if (!isCustom || isEnum){
-		// For primitive types and enums, return the base type without array wrapping
-		if (sdlField.GetType() == "String" || isEnum){
-			retVal = QStringLiteral("QString");
-		}
-		else if (sdlField.GetType() == "Integer" || sdlField.GetType() == "Int"){
-			retVal = QStringLiteral("int");
-		}
-		else if (sdlField.GetType() == "Double" || sdlField.GetType() == "Float"){
-			retVal = QStringLiteral("double");
-		}
-		else if (sdlField.GetType() == "Boolean" || sdlField.GetType() == "Bool"){
-			retVal = QStringLiteral("bool");
-		}
-		else if (sdlField.GetType() == "LongLong" || sdlField.GetType() == "longLong"){
-			retVal = QStringLiteral("int");
-		}
-		else if (sdlField.GetType() == "ID"){
-			retVal = QStringLiteral("QString");
-		}
-		else {
-			Q_ASSERT_X(false, "CSdlGenTools::GetQObjectElementTypeName", sdlField.GetType().toUtf8() + " field.GetType() not implemented");
-		}
-	}
-	else if(isUnion){
-		retVal = "QVariant";
-	}
-	else{
-		// For custom types (both array and non-array), return the Object type
+		// For custom non-array types, or when treating arrays as elements, return Object
 		retVal = sdlNamespace;
 		retVal += QStringLiteral("::C") + sdlField.GetType();
 		retVal += QStringLiteral("Object");
