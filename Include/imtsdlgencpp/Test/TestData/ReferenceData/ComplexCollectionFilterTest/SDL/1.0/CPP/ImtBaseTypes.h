@@ -1933,6 +1933,7 @@ public:
 	Q_INVOKABLE bool hasOptions();
 	Q_INVOKABLE void emplaceOptions();
 	void ResetOptions();
+	Q_INVOKABLE QVariant createOptionsArrayElement(const QVariant& v);
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
