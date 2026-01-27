@@ -25,54 +25,45 @@ namespace imtauthdb
 
 istd::IChangeableUniquePtr CPersonalAccessTokenDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record, const iprm::IParamsSet* /*dataConfigurationPtr*/) const
 {
-	if (!m_databaseEngineCompPtr.IsValid())
-	{
+	if (!m_databaseEngineCompPtr.IsValid()){
 		return nullptr;
 	}
 
-	if (!m_tokenFactCompPtr.IsValid())
-	{
+	if (!m_tokenFactCompPtr.IsValid()){
 		return nullptr;
 	}
 
 	istd::TUniqueInterfacePtr<imtauth::IPersonalAccessToken> tokenPtr = m_tokenFactCompPtr.CreateInstance();
-	if (!tokenPtr.IsValid())
-	{
+	if (!tokenPtr.IsValid()){
 		return nullptr;
 	}
 
-	if (record.contains("Id"))
-	{
+	if (record.contains("Id")){
 		QByteArray tokenId = record.value("Id").toByteArray();
 		tokenPtr->SetId(tokenId);
 	}
 
-	if (record.contains("UserId"))
-	{
+	if (record.contains("UserId")){
 		QByteArray userId = record.value("UserId").toByteArray();
 		tokenPtr->SetUserId(userId);
 	}
 
-	if (record.contains("Name"))
-	{
+	if (record.contains("Name")){
 		QString name = record.value("Name").toString();
 		tokenPtr->SetName(name);
 	}
 
-	if (record.contains("Description"))
-	{
+	if (record.contains("Description")){
 		QString description = record.value("Description").toString();
 		tokenPtr->SetDescription(description);
 	}
 
-	if (record.contains("TokenHash"))
-	{
+	if (record.contains("TokenHash")){
 		QByteArray tokenHash = record.value("TokenHash").toByteArray();
 		tokenPtr->SetTokenHash(tokenHash);
 	}
 
-	if (record.contains("Scopes"))
-	{
+	if (record.contains("Scopes")){
 		QString scopesStr = record.value("Scopes").toString();
 		QByteArrayList scopes;
 		if (!scopesStr.isEmpty())
@@ -86,14 +77,12 @@ istd::IChangeableUniquePtr CPersonalAccessTokenDatabaseDelegateComp::CreateObjec
 		tokenPtr->SetScopes(scopes);
 	}
 
-	if (record.contains("CreatedAt"))
-	{
+	if (record.contains("CreatedAt")){
 		QDateTime createdAt = QDateTime::fromString(record.value("CreatedAt").toString(), Qt::ISODate);
 		tokenPtr->SetCreatedAt(createdAt);
 	}
 
-	if (record.contains("LastUsedAt"))
-	{
+	if (record.contains("LastUsedAt")){
 		QString lastUsedStr = record.value("LastUsedAt").toString();
 		if (!lastUsedStr.isEmpty())
 		{
@@ -102,8 +91,7 @@ istd::IChangeableUniquePtr CPersonalAccessTokenDatabaseDelegateComp::CreateObjec
 		}
 	}
 
-	if (record.contains("ExpiresAt"))
-	{
+	if (record.contains("ExpiresAt")){
 		QString expiresAtStr = record.value("ExpiresAt").toString();
 		if (!expiresAtStr.isEmpty())
 		{
@@ -112,8 +100,7 @@ istd::IChangeableUniquePtr CPersonalAccessTokenDatabaseDelegateComp::CreateObjec
 		}
 	}
 
-	if (record.contains("Revoked"))
-	{
+	if (record.contains("Revoked")){
 		bool revoked = record.value("Revoked").toBool();
 		tokenPtr->SetRevoked(revoked);
 	}
@@ -133,14 +120,12 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CPersonalAccessTokenDatabaseDeleg
 			const istd::IChangeable* valuePtr,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	if (typeId.isEmpty() || typeId != "PersonalAccessToken")
-	{
+	if (typeId.isEmpty() || typeId != "PersonalAccessToken"){
 		return NewObjectQuery();
 	}
 
 	QByteArray tokenId = proposedObjectId;
-	if (tokenId.isEmpty())
-	{
+	if (tokenId.isEmpty()){
 		tokenId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 	}
 
@@ -155,8 +140,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CPersonalAccessTokenDatabaseDeleg
 	bool revoked = false;
 
 	const imtauth::IPersonalAccessToken* tokenPtr = dynamic_cast<const imtauth::IPersonalAccessToken*>(valuePtr);
-	if (tokenPtr != nullptr)
-	{
+	if (tokenPtr != nullptr){
 		name = tokenPtr->GetName();
 		description = tokenPtr->GetDescription();
 		userId = QString::fromUtf8(tokenPtr->GetUserId());
@@ -175,12 +159,11 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CPersonalAccessTokenDatabaseDeleg
 		revoked = tokenPtr->IsRevoked();
 	}
 
-	if (name.isEmpty())
-	{
+	if (name.isEmpty()){
 		name = objectName;
 	}
-	if (description.isEmpty())
-	{
+
+	if (description.isEmpty()){
 		description = objectDescription;
 	}
 
@@ -197,9 +180,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CPersonalAccessTokenDatabaseDeleg
 			.arg(createdAt)
 			.arg(lastUsedAt)
 			.arg(expiresAt)
-			.arg(revoked ? 1 : 0);
-
-	retVal.objectId = tokenId;
+			.arg(revoked ? 1 : 0).toUtf8();
 
 	return retVal;
 }
@@ -213,8 +194,7 @@ QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateUpdateObjectQuery(
 			bool /*useExternDelegate*/) const
 {
 	const imtauth::IPersonalAccessToken* tokenPtr = dynamic_cast<const imtauth::IPersonalAccessToken*>(&object);
-	if (tokenPtr == nullptr)
-	{
+	if (tokenPtr == nullptr){
 		return QByteArray();
 	}
 
@@ -225,8 +205,7 @@ QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateUpdateObjectQuery(
 	
 	QString scopesStr;
 	QByteArrayList scopes = tokenPtr->GetScopes();
-	for (int i = 0; i < scopes.size(); ++i)
-	{
+	for (int i = 0; i < scopes.size(); ++i){
 		if (i > 0) scopesStr += ",";
 		scopesStr += QString::fromUtf8(scopes[i]);
 	}
@@ -259,14 +238,12 @@ QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateDeleteObjectsQuery(
 			const QByteArrayList& objectIds,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	if (objectIds.isEmpty())
-	{
+	if (objectIds.isEmpty()){
 		return QByteArray();
 	}
 
 	QString idsStr;
-	for (int i = 0; i < objectIds.size(); ++i)
-	{
+	for (int i = 0; i < objectIds.size(); ++i){
 		if (i > 0) idsStr += ", ";
 		idsStr += QString("'%1'").arg(QString::fromUtf8(objectIds[i]));
 	}
@@ -279,27 +256,48 @@ QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateDeleteObjectsQuery(
 }
 
 
+QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateDeleteObjectSetQuery(
+			const imtbase::IObjectCollection& /*collection*/,
+			const iprm::IParamsSet* /*paramsPtr*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
+{
+	return QByteArray();
+}
+
+
+QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateRenameObjectQuery(
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& /*objectId*/,
+			const QString& /*newObjectName*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
+{
+	return QByteArray();
+}
+
+
+QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateDescriptionObjectQuery(
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& /*objectId*/,
+			const QString& /*description*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
+{
+	return QByteArray();
+}
+
+
 // protected methods
 
 // reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
 
 idoc::MetaInfoPtr CPersonalAccessTokenDatabaseDelegateComp::CreateObjectMetaInfo(const QByteArray& typeId) const
 {
-	if (typeId == "PersonalAccessToken")
-	{
-		idoc::MetaInfoPtr metaInfoPtr;
-		metaInfoPtr.SetPtr(new imod::TModelWrap<imtauth::CPersonalAccessTokenMetaInfoCreatorComp::MetaInfo>);
-		return metaInfoPtr;
-	}
-
 	return BaseClass::CreateObjectMetaInfo(typeId);
 }
 
 
 bool CPersonalAccessTokenDatabaseDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const
 {
-	if (!BaseClass::SetObjectMetaInfoFromRecord(record, metaInfo))
-	{
+	if (!BaseClass::SetObjectMetaInfoFromRecord(record, metaInfo)){
 		return false;
 	}
 

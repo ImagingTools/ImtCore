@@ -3,6 +3,7 @@
 
 // ACF includes
 #include <istd/IChangeable.h>
+#include <idoc/IDocumentMetaInfo.h>
 
 
 namespace imtauth
