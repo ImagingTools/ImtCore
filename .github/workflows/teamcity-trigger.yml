@@ -17,6 +17,7 @@ jobs:
     name: Trigger TeamCity Build
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         platform: [windows, linux]
         include:
@@ -29,15 +30,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Install jq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+
       - name: Determine branch
         id: branch
+        shell: bash
         run: |
+          set -euo pipefail
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            echo "BRANCH_NAME=${{ github.event.pull_request.head.ref }}" >> $GITHUB_ENV
-            echo "GIT_BRANCH=refs/heads/${{ github.event.pull_request.head.ref }}" >> $GITHUB_ENV
+            echo "BRANCH_NAME=${{ github.event.pull_request.head.ref }}" >> "$GITHUB_ENV"
+            echo "GIT_BRANCH=refs/heads/${{ github.event.pull_request.head.ref }}" >> "$GITHUB_ENV"
           else
-            echo "GIT_BRANCH=${GITHUB_REF}" >> $GITHUB_ENV
-            echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+            echo "GIT_BRANCH=${GITHUB_REF}" >> "$GITHUB_ENV"
+            echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> "$GITHUB_ENV"
           fi
           echo "Branch: $BRANCH_NAME (ref: $GIT_BRANCH)"
 
@@ -49,68 +57,102 @@ jobs:
           TEAMCITY_BUILD_TYPE: ${{ matrix.build_type }}
           GIT_BRANCH: ${{ env.GIT_BRANCH }}
           BRANCH_NAME: ${{ env.BRANCH_NAME }}
+        shell: bash
         run: |
-          set -e
+          set -euo pipefail
           echo "Triggering TeamCity ${{ matrix.platform }} build: $TEAMCITY_BUILD_TYPE"
+          echo "Branch (TeamCity): $GIT_BRANCH"
+          echo "Commit: $GITHUB_SHA"
 
-          RESPONSE=$(curl -s -w "\n%{http_code}" \
+          XML_PAYLOAD=$(cat <<'XML'
+          <build>
+            <buildType id="__BUILD_TYPE__"/>
+            <branchName>__GIT_BRANCH__</branchName>
+            <properties>
+              <property name="env.GIT_BRANCH" value="__GIT_BRANCH__"/>
+              <property name="env.GIT_COMMIT" value="__GITHUB_SHA__"/>
+            </properties>
+          </build>
+          XML
+          )
+          XML_PAYLOAD="${XML_PAYLOAD/__BUILD_TYPE__/$TEAMCITY_BUILD_TYPE}"
+          XML_PAYLOAD="${XML_PAYLOAD/__GIT_BRANCH__/$GIT_BRANCH}"
+          XML_PAYLOAD="${XML_PAYLOAD/__GITHUB_SHA__/$GITHUB_SHA}"
+
+          # --fail-with-body: если HTTP != 2xx, curl завершится ошибкой и покажет body
+          BODY=$(curl --fail-with-body -sS \
             -X POST \
             -H "Authorization: Bearer $TEAMCITY_TOKEN" \
             -H "Content-Type: application/xml" \
             -H "Accept: application/json" \
-            --data "<build>
-              <buildType id=\"$TEAMCITY_BUILD_TYPE\"/>
-              <branchName>$GIT_BRANCH</branchName>
-              <properties>
-                <property name=\"env.GIT_BRANCH\" value=\"$GIT_BRANCH\"/>
-                <property name=\"env.GIT_COMMIT\" value=\"$GITHUB_SHA\"/>
-              </properties>
-            </build>" \
+            --data "$XML_PAYLOAD" \
             "$TEAMCITY_URL/app/rest/buildQueue")
 
-          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
-          BODY=$(echo "$RESPONSE" | sed '$d')
+          BUILD_ID=$(echo "$BODY" | jq -r '.id // empty')
+          WEB_URL=$(echo "$BODY" | jq -r '.webUrl // empty')
 
-          if [ "$HTTP_CODE" -lt 200 ] || [ "$HTTP_CODE" -ge 300 ]; then
-            echo "❌ Failed to trigger build"
+          if [ -z "$BUILD_ID" ] || [ "$BUILD_ID" = "null" ]; then
+            echo "❌ Failed to parse build id from TeamCity response:"
             echo "$BODY"
             exit 1
           fi
 
-          BUILD_ID=$(echo "$BODY" | jq -r '.id')
-          echo "Build ID=$BUILD_ID"
-          echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
+          echo "✅ Build queued. ID=$BUILD_ID"
+          if [ -n "$WEB_URL" ] && [ "$WEB_URL" != "null" ]; then
+            echo "TeamCity URL: $WEB_URL"
+          fi
+
+          echo "build_id=$BUILD_ID" >> "$GITHUB_OUTPUT"
 
       - name: Wait for TeamCity Build
         if: steps.teamcity.outputs.build_id
+        timeout-minutes: 60
         env:
           TEAMCITY_URL: ${{ vars.TEAMCITY_URL }}
           TEAMCITY_TOKEN: ${{ vars.TEAMCITY_TOKEN }}
           BUILD_ID: ${{ steps.teamcity.outputs.build_id }}
+        shell: bash
         run: |
-          set -e
+          set -euo pipefail
           echo "Waiting for TeamCity build $BUILD_ID..."
 
+          # Максимальное ожидание в секундах (дополнительно к timeout-minutes шага)
+          MAX_WAIT_SECONDS=3300   # 55 минут
+          SLEEP_SECONDS=15
+          ELAPSED=0
+
           while true; do
-            RESPONSE=$(curl -s \
+            # Ретраи на сетевые/временные глюки
+            RESPONSE=$(curl --fail-with-body -sS \
+              --retry 5 --retry-delay 2 --retry-all-errors \
               -H "Authorization: Bearer $TEAMCITY_TOKEN" \
               -H "Accept: application/json" \
               "$TEAMCITY_URL/app/rest/builds/id:$BUILD_ID?fields=state,status,webUrl")
 
-            STATE=$(echo "$RESPONSE" | jq -r '.state')
-            STATUS=$(echo "$RESPONSE" | jq -r '.status')
+            STATE=$(echo "$RESPONSE" | jq -r '.state // empty')
+            STATUS=$(echo "$RESPONSE" | jq -r '.status // empty')
+            WEB_URL=$(echo "$RESPONSE" | jq -r '.webUrl // empty')
 
             echo "State=$STATE Status=$STATUS"
+            if [ -n "$WEB_URL" ] && [ "$WEB_URL" != "null" ]; then
+              echo "TeamCity URL: $WEB_URL"
+            fi
 
             if [ "$STATE" = "finished" ]; then
               if [ "$STATUS" = "SUCCESS" ]; then
                 echo "✅ Build SUCCESS"
                 exit 0
               else
-                echo "❌ Build FAILED"
+                echo "❌ Build FAILED (status=$STATUS)"
                 exit 1
               fi
             fi
 
-            sleep 30
+            if [ "$ELAPSED" -ge "$MAX_WAIT_SECONDS" ]; then
+              echo "❌ Timed out waiting for TeamCity build $BUILD_ID after ${ELAPSED}s"
+              exit 1
+            fi
+
+            sleep "$SLEEP_SECONDS"
+            ELAPSED=$((ELAPSED + SLEEP_SECONDS))
           done
