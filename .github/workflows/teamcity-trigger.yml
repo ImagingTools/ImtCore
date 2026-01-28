@@ -29,6 +29,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          # В PR по умолчанию checkout может оказаться merge-коммитом.
+          # Нам нужен head-branch (copilot/...), чтобы TeamCity корректно определил ветку/ревизию.
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
 
       - name: Install jq
         run: |
@@ -42,17 +46,23 @@ jobs:
           set -euo pipefail
 
           if [ "${{ github.event_name }}" = "pull_request" ]; then
+            # В TeamCity branchName обычно ожидается "имя ветки", а не "refs/heads/...".
             BRANCH_NAME="${{ github.event.pull_request.head.ref }}"
-            GIT_BRANCH="refs/heads/${{ github.event.pull_request.head.ref }}"
+            GIT_BRANCH="$BRANCH_NAME"
+            COMMIT_SHA="${{ github.event.pull_request.head.sha }}"
           else
-            GIT_BRANCH="${GITHUB_REF}"
             BRANCH_NAME="${GITHUB_REF#refs/heads/}"
+            GIT_BRANCH="$BRANCH_NAME"
+            COMMIT_SHA="${GITHUB_SHA}"
           fi
 
           echo "BRANCH_NAME=$BRANCH_NAME" >> "$GITHUB_ENV"
           echo "GIT_BRANCH=$GIT_BRANCH" >> "$GITHUB_ENV"
+          echo "COMMIT_SHA=$COMMIT_SHA" >> "$GITHUB_ENV"
 
-          echo "Branch: $BRANCH_NAME (ref: $GIT_BRANCH)"
+          echo "Branch: $BRANCH_NAME"
+          echo "TeamCity branchName: $GIT_BRANCH"
+          echo "Commit: $COMMIT_SHA"
 
       - name: Trigger TeamCity Build
         id: teamcity
@@ -60,29 +70,33 @@ jobs:
           TEAMCITY_URL: ${{ vars.TEAMCITY_URL }}
           TEAMCITY_TOKEN: ${{ vars.TEAMCITY_TOKEN }}
           TEAMCITY_BUILD_TYPE: ${{ matrix.build_type }}
+          # Важно: сюда передаем именно имя ветки (без refs/heads/)
           GIT_BRANCH: ${{ env.GIT_BRANCH }}
-          BRANCH_NAME: ${{ env.BRANCH_NAME }}
+          # Важно: в PR используем head SHA, иначе TeamCity может собрать дефолтную ветку (main)
+          COMMIT_SHA: ${{ env.COMMIT_SHA }}
         shell: bash
         run: |
           set -euo pipefail
           echo "Triggering TeamCity ${{ matrix.platform }} build: $TEAMCITY_BUILD_TYPE"
-          echo "Branch (TeamCity): $GIT_BRANCH"
-          echo "Commit: $GITHUB_SHA"
+          echo "TeamCity branchName: $GIT_BRANCH"
+          echo "Commit: $COMMIT_SHA"
 
+          # В TeamCity branchName должно быть просто имя ветки (например: copilot/fix-teamcity-trigger-workflow)
+          # Если дать refs/heads/... или отправить SHA merge-коммита, TeamCity нередко уходит в default branch (main).
           XML_PAYLOAD=$(cat <<'XML'
           <build>
             <buildType id="__BUILD_TYPE__"/>
-            <branchName>__GIT_BRANCH__</branchName>
+            <branchName>__BRANCH_NAME__</branchName>
             <properties>
-              <property name="env.GIT_BRANCH" value="__GIT_BRANCH__"/>
-              <property name="env.GIT_COMMIT" value="__GITHUB_SHA__"/>
+              <property name="env.GIT_BRANCH" value="__BRANCH_NAME__"/>
+              <property name="env.GIT_COMMIT" value="__COMMIT_SHA__"/>
             </properties>
           </build>
           XML
           )
           XML_PAYLOAD="${XML_PAYLOAD/__BUILD_TYPE__/$TEAMCITY_BUILD_TYPE}"
-          XML_PAYLOAD="${XML_PAYLOAD/__GIT_BRANCH__/$GIT_BRANCH}"
-          XML_PAYLOAD="${XML_PAYLOAD/__GITHUB_SHA__/$GITHUB_SHA}"
+          XML_PAYLOAD="${XML_PAYLOAD/__BRANCH_NAME__/$GIT_BRANCH}"
+          XML_PAYLOAD="${XML_PAYLOAD/__COMMIT_SHA__/$COMMIT_SHA}"
 
           BODY=$(curl --fail-with-body -sS \
             -X POST \
@@ -107,40 +121,62 @@ jobs:
           fi
 
           echo "build_id=$BUILD_ID" >> "$GITHUB_OUTPUT"
+          echo "web_url=$WEB_URL" >> "$GITHUB_OUTPUT"
 
       - name: Wait for TeamCity Build
         if: steps.teamcity.outputs.build_id
-        timeout-minutes: 60
+        timeout-minutes: 90
         env:
           TEAMCITY_URL: ${{ vars.TEAMCITY_URL }}
           TEAMCITY_TOKEN: ${{ vars.TEAMCITY_TOKEN }}
           BUILD_ID: ${{ steps.teamcity.outputs.build_id }}
+          TRIGGERED_WEB_URL: ${{ steps.teamcity.outputs.web_url }}
         shell: bash
         run: |
           set -euo pipefail
-          echo "Waiting for TeamCity build $BUILD_ID..."
 
-          MAX_WAIT_SECONDS=3300   # 55 минут (доп. защита помимо timeout-minutes)
+          echo "Waiting for TeamCity build $BUILD_ID..."
+          if [ -n "${TRIGGERED_WEB_URL:-}" ] && [ "${TRIGGERED_WEB_URL:-}" != "null" ]; then
+            echo "TeamCity build URL: $TRIGGERED_WEB_URL"
+          fi
+
+          MAX_QUEUED_SECONDS=1800
+          MAX_RUNNING_SECONDS=3600
           SLEEP_SECONDS=15
-          ELAPSED=0
+
+          QUEUED_ELAPSED=0
+          RUNNING_ELAPSED=0
 
           while true; do
             RESPONSE=$(curl --fail-with-body -sS \
               --retry 5 --retry-delay 2 --retry-all-errors \
               -H "Authorization: Bearer $TEAMCITY_TOKEN" \
               -H "Accept: application/json" \
-              "$TEAMCITY_URL/app/rest/builds/id:$BUILD_ID?fields=state,status,webUrl")
+              "$TEAMCITY_URL/app/rest/builds/id:$BUILD_ID?fields=state,status,webUrl,branchName")
 
             STATE=$(echo "$RESPONSE" | jq -r '.state // empty')
             STATUS=$(echo "$RESPONSE" | jq -r '.status // empty')
             WEB_URL=$(echo "$RESPONSE" | jq -r '.webUrl // empty')
+            BRANCH=$(echo "$RESPONSE" | jq -r '.branchName // empty')
 
-            echo "State=$STATE Status=$STATUS"
+            echo "State=$STATE Status=$STATUS BranchName=$BRANCH"
             if [ -n "$WEB_URL" ] && [ "$WEB_URL" != "null" ]; then
               echo "TeamCity URL: $WEB_URL"
             fi
 
-            if [ "$STATE" = "finished" ]; then
+            if [ "$STATE" = "queued" ]; then
+              QUEUED_ELAPSED=$((QUEUED_ELAPSED + SLEEP_SECONDS))
+              if [ "$QUEUED_ELAPSED" -ge "$MAX_QUEUED_SECONDS" ]; then
+                echo "❌ Timed out: build stayed queued for ${QUEUED_ELAPSED}s"
+                exit 1
+              fi
+            elif [ "$STATE" = "running" ]; then
+              RUNNING_ELAPSED=$((RUNNING_ELAPSED + SLEEP_SECONDS))
+              if [ "$RUNNING_ELAPSED" -ge "$MAX_RUNNING_SECONDS" ]; then
+                echo "❌ Timed out: build stayed running for ${RUNNING_ELAPSED}s"
+                exit 1
+              fi
+            elif [ "$STATE" = "finished" ]; then
               if [ "$STATUS" = "SUCCESS" ]; then
                 echo "✅ Build SUCCESS"
                 exit 0
@@ -148,13 +184,10 @@ jobs:
                 echo "❌ Build FAILED (status=$STATUS)"
                 exit 1
               fi
-            fi
-
-            if [ "$ELAPSED" -ge "$MAX_WAIT_SECONDS" ]; then
-              echo "❌ Timed out waiting for TeamCity build $BUILD_ID after ${ELAPSED}s"
-              exit 1
+            else
+              echo "⚠️ Unexpected TeamCity state: '${STATE}'. Full response:"
+              echo "$RESPONSE"
             fi
 
             sleep "$SLEEP_SECONDS"
-            ELAPSED=$((ELAPSED + SLEEP_SECONDS))
           done
