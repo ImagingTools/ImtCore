@@ -5,7 +5,7 @@
 #include <QtCore/QRegularExpression>
 
 // ImtCore includes
-#include <imtrest/IProtocolEngine.h>
+#include <imthttp/IProtocolEngine.h>
 
 
 namespace imtrest
@@ -20,15 +20,15 @@ QByteArray CHttpFileUploadServletComp::s_octetStreamTypeId = QByteArrayLiteral("
 
 // reimplemented (CHttpServletCompBase)
 
-ConstResponsePtr CHttpFileUploadServletComp::OnPut(
+imthttp::ConstResponsePtr CHttpFileUploadServletComp::OnPut(
 			const QByteArray& /*commandId*/,
-			const IRequest::CommandParams& /*commandParams*/,
+			const imthttp::IRequest::CommandParams& /*commandParams*/,
 			const HeadersMap& headers,
-			const CHttpRequest& request) const
+			const imthttp::CHttpRequest& request) const
 {
 	Q_ASSERT(m_fileUploadHandlerPtr.IsValid());
 
-	ConstResponsePtr retVal;
+	imthttp::ConstResponsePtr retVal;
 
 	if (!m_fileUploadHandlerPtr.IsValid()){
 		retVal = CreateResponse(
@@ -74,7 +74,7 @@ ConstResponsePtr CHttpFileUploadServletComp::OnPut(
 		}
 	}
 
-	CHttpResponse::Headers responseHeaders = GetRequestHeaders(request);
+	imthttp::CHttpResponse::Headers responseHeaders = GetRequestHeaders(request);
 
 	if (		length == 0 ||
 				range.GetMaxValue() < 0 ||
@@ -171,9 +171,9 @@ CHttpFileUploadServletComp::RangeData CHttpFileUploadServletComp::GetRangeDataFr
 }
 
 
-CHttpResponse::Headers CHttpFileUploadServletComp::GetRequestHeaders(const CHttpRequest& request) const
+imthttp::CHttpResponse::Headers CHttpFileUploadServletComp::GetRequestHeaders(const imthttp::CHttpRequest& request) const
 {
-	CHttpResponse::Headers headers;
+	imthttp::CHttpResponse::Headers headers;
 
 	for (const QByteArray& headerId : request.GetHeaders()){
 		headers[headerId] = request.GetHeaderValue(headerId);
@@ -183,25 +183,25 @@ CHttpResponse::Headers CHttpFileUploadServletComp::GetRequestHeaders(const CHttp
 }
 
 
-ConstResponsePtr CHttpFileUploadServletComp::CreateResponse(
-			const IRequest& request,
+imthttp::ConstResponsePtr CHttpFileUploadServletComp::CreateResponse(
+			const imthttp::IRequest& request,
 			int statusCode,
-			const CHttpResponse::Headers& headers,
+			const imthttp::CHttpResponse::Headers& headers,
 			const QByteArray& data,
 			const QByteArray& dataTypeId) const
 {
 	const IProtocolEngine& engine = request.GetProtocolEngine();
 
-	ConstResponsePtr responsePtr(engine.CreateResponse(
+	imthttp::ConstResponsePtr responsePtr(engine.CreateResponse(
 		request,
 		statusCode,
 		data,
 		dataTypeId).PopInterfacePtr());
 
-	CHttpResponse* httpResponsePtr = const_cast<CHttpResponse*>(dynamic_cast<const CHttpResponse*>(responsePtr.GetPtr()));
+	imthttp::CHttpResponse* httpResponsePtr = const_cast<imthttp::CHttpResponse*>(dynamic_cast<const imthttp::CHttpResponse*>(responsePtr.GetPtr()));
 	Q_ASSERT(httpResponsePtr != nullptr);
 
-	CHttpResponse::Headers responseHeaders = httpResponsePtr->GetHeaders();
+	imthttp::CHttpResponse::Headers responseHeaders = httpResponsePtr->GetHeaders();
 	for (const QByteArray& headerId : headers.keys()){
 		if (!responseHeaders.contains(headerId)){
 			if (headerId.compare("content-length", Qt::CaseInsensitive)){

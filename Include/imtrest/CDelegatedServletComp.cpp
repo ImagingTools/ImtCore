@@ -8,8 +8,8 @@
 #include <istd/CIdManipBase.h>
 
 // ImtCore includes
-#include <imtrest/IRequest.h>
-#include <imtrest/IProtocolEngine.h>
+#include <imthttp/IRequest.h>
+#include <imthttp/IProtocolEngine.h>
 
 
 namespace imtrest
@@ -60,7 +60,7 @@ bool CDelegatedServletComp::IsCommandSupported(const QByteArray& commandId) cons
 }
 
 
-ConstResponsePtr CDelegatedServletComp::ProcessRequest(const IRequest& request, const QByteArray& subCommandId) const
+imthttp::ConstResponsePtr CDelegatedServletComp::ProcessRequest(const imthttp::IRequest& request, const QByteArray& subCommandId) const
 {
 	QByteArray commandId = subCommandId.isEmpty() ? request.GetCommandId() : subCommandId;
 
@@ -90,7 +90,7 @@ ConstResponsePtr CDelegatedServletComp::ProcessRequest(const IRequest& request, 
 			QByteArray body = QString("<html><head><title>Error</title></head><body><p>The requested command could not be executed. No servlet was found for the given command: '%1'</p></body></html>").arg(qPrintable(commandIdSafe)).toUtf8();
 			QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
 
-			ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId).PopInterfacePtr());
+			imthttp::ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId).PopInterfacePtr());
 
 			SendErrorMessage(0, QString("No request handler found for: '%1'").arg(qPrintable(commandId)));
 
@@ -105,7 +105,7 @@ ConstResponsePtr CDelegatedServletComp::ProcessRequest(const IRequest& request, 
 		QByteArray body = QString("<html><head><title>API-Info</title></head><body><p>Supported paths are: %1</p></body></html>").arg(slavehandlers.join("\n")).toUtf8();
 		QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
 
-		ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId).PopInterfacePtr());
+		imthttp::ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId).PopInterfacePtr());
 
 		return responsePtr;
 	}
@@ -121,7 +121,7 @@ ConstResponsePtr CDelegatedServletComp::ProcessRequest(const IRequest& request, 
 
 	Q_ASSERT(false);
 
-	return ConstResponsePtr();
+	return imthttp::ConstResponsePtr();
 }
 
 

@@ -1,0 +1,51 @@
+#pragma once
+
+// ACF includes
+#include <istd/TDelPtr.h>
+
+// ImtCore  includes
+#include <imthttp/IRequest.h>
+#include <imthttp/IResponse.h>
+
+
+// Qt includes
+#include <QtCore/QTimer>
+#include <QtCore/QPointer>
+#include <QtNetwork/QTcpSocket>
+#include <QtNetwork/QSslConfiguration>
+
+
+namespace imthttp
+{
+
+
+class CMultiThreadServer;
+class CSocketThread;
+
+
+class CSocket: public QObject
+{
+	Q_OBJECT
+public:
+	CSocket(CSocketThread* rootSocket, imthttp::IRequest* request, bool secureConnection, const QSslConfiguration& sslConfiguration, qintptr socketDescriptor);
+	~CSocket();
+
+public Q_SLOTS:
+	void HandleReadyRead();
+	void Disconnected();
+	void OnSendResponse(ConstResponsePtr response);
+	void Abort();
+	void TimeOut();
+	void OnHandleSslErrors(QList<QSslError> errorList);
+
+private:
+	QTimer m_startTimer;
+	CSocketThread* m_rootSocket;
+	QPointer<QTcpSocket> m_socket;
+	istd::TDelPtr<IRequest> m_requestPtr;
+};
+
+
+} // namespace imthttp
+
+

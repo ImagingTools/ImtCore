@@ -7,7 +7,7 @@
 #include <QtCore/QTextStream>
 
 // ImtCore includes
-#include <imtrest/IProtocolEngine.h>
+#include <imthttp/IProtocolEngine.h>
 
 
 namespace imtrest
@@ -83,17 +83,17 @@ QByteArray CHttpFileProviderBasedServletComp::GetMimeType(QByteArray fileSuffix)
 // reimplemented (IRequestHandler)
 
 
-ConstResponsePtr CHttpFileProviderBasedServletComp:: OnGet(
+imthttp::ConstResponsePtr CHttpFileProviderBasedServletComp:: OnGet(
 			const QByteArray& /*commandId*/,
-			const imtrest::IRequest::CommandParams& commandParams,
+			const imtrest::imthttp::IRequest::CommandParams& commandParams,
 			const HeadersMap& /*headers*/,
-			const imtrest::CHttpRequest& request) const
+			const imthttp::CHttpRequest& request) const
 {
 	const IProtocolEngine& engine = request.GetProtocolEngine();
 	QByteArray errorBody = "<html><head><title>Error</title></head><body><p>File resource was not found</p></body></html>";
 	QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
 
-	ConstResponsePtr errorResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_RESOURCE_NOT_AVAILABLE, errorBody, reponseTypeId).PopInterfacePtr());
+	imthttp::ConstResponsePtr errorResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_RESOURCE_NOT_AVAILABLE, errorBody, reponseTypeId).PopInterfacePtr());
 
 	auto generateErrorResponsePtr = [&request, &engine, reponseTypeId](QByteArray errorBody, int _errorCode = IProtocolEngine::SC_INTERNAL_ERROR){
 		qCritical() << __FILE__ << __LINE__ << "Error occurred" << errorBody;
@@ -156,7 +156,7 @@ ConstResponsePtr CHttpFileProviderBasedServletComp:: OnGet(
 		}
 	}
 
-	ConstResponsePtr responsePtr;
+	imthttp::ConstResponsePtr responsePtr;
 
 	if (isDataLoaded){
 		responsePtr = ConstResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OK, body, reponseTypeId).PopInterfacePtr());

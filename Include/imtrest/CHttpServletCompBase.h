@@ -12,13 +12,8 @@
 
 // ImtCore includes
 #include <imtrest/IRequestServlet.h>
-#include <imtrest/CHttpRequest.h>
-
-
-namespace imtrest
-{
-	class IResponse;
-}
+#include <imthttp/CHttpRequest.h>
+#include <imthttp/IResponse.h>
 
 
 namespace imtrest
@@ -41,64 +36,64 @@ public:
 
 	// reimplemented (IRequestHandler)
 	virtual bool IsCommandSupported(const QByteArray& commandId) const override;
-	virtual ConstResponsePtr ProcessRequest(const imtrest::IRequest& request, const QByteArray& subCommandId = QByteArray()) const override;
+	virtual imthttp::ConstResponsePtr ProcessRequest(const imthttp::IRequest& request, const QByteArray& subCommandId = QByteArray()) const override;
 
 protected:
 	typedef QMap<QByteArray, QByteArray> HeadersMap;
 
-	virtual ConstResponsePtr OnGet(
+	virtual imthttp::ConstResponsePtr OnGet(
 				const QByteArray& commandId,
-				const imtrest::IRequest::CommandParams& commandParams,
+				const imthttp::IRequest::CommandParams& commandParams,
 				const HeadersMap& headers,
-				const imtrest::CHttpRequest& request) const;
-	virtual ConstResponsePtr OnPost(
+				const imthttp::CHttpRequest& request) const;
+	virtual imthttp::ConstResponsePtr OnPost(
 				const QByteArray& commandId,
-				const imtrest::IRequest::CommandParams& commandParams,
+				const imthttp::IRequest::CommandParams& commandParams,
 				const HeadersMap& headers,
-				const imtrest::CHttpRequest& request) const;
-	virtual ConstResponsePtr OnDelete(
+				const imthttp::CHttpRequest& request) const;
+	virtual imthttp::ConstResponsePtr OnDelete(
 				const QByteArray& commandId,
-				const imtrest::IRequest::CommandParams& commandParams,
+				const imthttp::IRequest::CommandParams& commandParams,
 				const HeadersMap& headers,
-				const imtrest::CHttpRequest& request) const;
-	virtual ConstResponsePtr OnPatch(
+				const imthttp::CHttpRequest& request) const;
+	virtual imthttp::ConstResponsePtr OnPatch(
 				const QByteArray& commandId,
-				const imtrest::IRequest::CommandParams& commandParams,
+				const imthttp::IRequest::CommandParams& commandParams,
 				const HeadersMap& headers,
-				const imtrest::CHttpRequest& request) const;
-	virtual ConstResponsePtr OnPut(
+				const imthttp::CHttpRequest& request) const;
+	virtual imthttp::ConstResponsePtr OnPut(
 				const QByteArray& commandId,
-				const imtrest::IRequest::CommandParams& commandParams,
+				const imthttp::IRequest::CommandParams& commandParams,
 				const HeadersMap& headers,
-				const imtrest::CHttpRequest& request) const;
-	virtual ConstResponsePtr OnHead(
+				const imthttp::CHttpRequest& request) const;
+	virtual imthttp::ConstResponsePtr OnHead(
 				const QByteArray& commandId,
-				const imtrest::IRequest::CommandParams& commandParams,
+				const imthttp::IRequest::CommandParams& commandParams,
 				const HeadersMap& headers,
-				const imtrest::CHttpRequest& request) const;
-	virtual ConstResponsePtr OnOptions(
+				const imthttp::CHttpRequest& request) const;
+	virtual imthttp::ConstResponsePtr OnOptions(
 				const QByteArray& commandId,
-				const imtrest::IRequest::CommandParams& commandParams,
+				const imthttp::IRequest::CommandParams& commandParams,
 				const HeadersMap& headers,
-				const imtrest::CHttpRequest& request) const;
-	virtual ConstResponsePtr OnUnknown(
+				const imthttp::CHttpRequest& request) const;
+	virtual imthttp::ConstResponsePtr OnUnknown(
 				const QByteArray& commandId,
-				const imtrest::IRequest::CommandParams& commandParams,
+				const imthttp::IRequest::CommandParams& commandParams,
 				const HeadersMap& headers,
-				const imtrest::CHttpRequest& request) const;
-	virtual ConstResponsePtr OnInvalid(
+				const imthttp::CHttpRequest& request) const;
+	virtual imthttp::ConstResponsePtr OnInvalid(
 				const QByteArray& commandId,
-				const imtrest::IRequest::CommandParams& commandParams,
+				const imthttp::IRequest::CommandParams& commandParams,
 				const HeadersMap& headers,
-			const imtrest::CHttpRequest& request) const;
+			const imthttp::CHttpRequest& request) const;
 
 protected:
-	virtual ConstResponsePtr OnRequestReceived(const imtrest::CHttpRequest& request) const;
-	virtual ConstResponsePtr CreateDefaultErrorResponse(const QByteArray& errorString, const imtrest::CHttpRequest& request) const;
+	virtual imthttp::ConstResponsePtr OnRequestReceived(const imthttp::CHttpRequest& request) const;
+	virtual imthttp::ConstResponsePtr CreateDefaultErrorResponse(const QByteArray& errorString, const imthttp::CHttpRequest& request) const;
 	static void ExtractRequestInfo(
-				const imtrest::CHttpRequest& request,
+				const imthttp::CHttpRequest& request,
 				QByteArray& commandId,
-				imtrest::IRequest::CommandParams& commandParams,
+				imthttp::IRequest::CommandParams& commandParams,
 				HeadersMap& headers);
 
 protected:

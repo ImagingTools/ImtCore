@@ -5,14 +5,12 @@
 #include <istd/TInterfacePtr.h>
 
 // ImtCore includes
-#include <imtrest/IResponse.h>
+#include <imthttp/IRequest.h>
+#include <imthttp/IResponse.h>
 
 
 namespace imtrest
 {
-
-
-class IRequest;
 
 
 class IRequestServlet: virtual public istd::IPolymorphic
@@ -27,7 +25,7 @@ public:
 	/**
 		Process a given request.
 	*/
-	virtual ConstResponsePtr ProcessRequest(const IRequest& request, const QByteArray& subCommandId = QByteArray()) const = 0;
+	virtual imthttp::ConstResponsePtr ProcessRequest(const imthttp::IRequest& request, const QByteArray& subCommandId = QByteArray()) const = 0;
 };
 
 
