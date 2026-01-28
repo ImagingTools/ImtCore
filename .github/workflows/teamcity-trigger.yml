@@ -13,356 +13,177 @@ permissions:
   checks: write
 
 jobs:
-  trigger-teamcity-windows:
-    name: Trigger TeamCity Build (Windows)
+  trigger-teamcity:
+    name: Trigger TeamCity Build
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [windows, linux]
+        include:
+          - platform: windows
+            build_type: ${{ vars.TEAMCITY_BUILD_TYPE_WINDOWS }}
+          - platform: linux
+            build_type: ${{ vars.TEAMCITY_BUILD_TYPE_LINUX }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          # For PR: use head SHA to avoid TeamCity building default branch due to merge refs.
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
 
-      - name: Trigger TeamCity Windows Build
+      - name: Install jq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+
+      - name: Determine branch
+        id: branch
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BRANCH_NAME="${{ github.event.pull_request.head.ref }}"
+            TEAMCITY_BRANCH="$BRANCH_NAME"
+            COMMIT_SHA="${{ github.event.pull_request.head.sha }}"
+          else
+            BRANCH_NAME="${GITHUB_REF#refs/heads/}"
+            TEAMCITY_BRANCH="$BRANCH_NAME"
+            COMMIT_SHA="${GITHUB_SHA}"
+          fi
+
+          echo "BRANCH_NAME=$BRANCH_NAME" >> "$GITHUB_ENV"
+          echo "TEAMCITY_BRANCH=$TEAMCITY_BRANCH" >> "$GITHUB_ENV"
+          echo "COMMIT_SHA=$COMMIT_SHA" >> "$GITHUB_ENV"
+
+          echo "Branch: $BRANCH_NAME"
+          echo "TeamCity branchName: $TEAMCITY_BRANCH"
+          echo "Commit: $COMMIT_SHA"
+
+      - name: Trigger TeamCity Build (JSON)
         id: teamcity
         env:
           TEAMCITY_URL: ${{ vars.TEAMCITY_URL }}
           TEAMCITY_TOKEN: ${{ vars.TEAMCITY_TOKEN }}
-          TEAMCITY_BUILD_TYPE: ${{ vars.TEAMCITY_BUILD_TYPE_WINDOWS }}
+          TEAMCITY_BUILD_TYPE: ${{ matrix.build_type }}
+          TEAMCITY_BRANCH: ${{ env.TEAMCITY_BRANCH }}
+          COMMIT_SHA: ${{ env.COMMIT_SHA }}
+        shell: bash
         run: |
-          if [ -z "$TEAMCITY_URL" ] || [ -z "$TEAMCITY_TOKEN" ] || [ -z "$TEAMCITY_BUILD_TYPE" ]; then
-            echo "Error: TeamCity configuration not found in repository variables"
-            echo "Please configure the following repository variables:"
-            echo "  - TEAMCITY_URL: Your TeamCity server URL (e.g., https://teamcity.example.com)"
-            echo "  - TEAMCITY_TOKEN: TeamCity access token with build trigger permissions"
-            echo "  - TEAMCITY_BUILD_TYPE_WINDOWS: TeamCity build configuration ID for Windows (e.g., ImtCore_Build_Windows)"
-            exit 1
-          fi
+          set -euo pipefail
 
-          # Determine the correct branch reference
-          # For pull requests, use the source branch (GITHUB_HEAD_REF)
-          # For push events, use GITHUB_REF
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            BRANCH_NAME="${{ github.event.pull_request.head.ref }}"
-            GIT_BRANCH="refs/heads/${{ github.event.pull_request.head.ref }}"
-            echo "Pull request detected, using branch: $BRANCH_NAME (ref: $GIT_BRANCH)"
-          else
-            GIT_BRANCH="${GITHUB_REF}"
-            # Extract branch name from ref (refs/heads/main -> main)
-            BRANCH_NAME="${GITHUB_REF#refs/heads/}"
-            echo "Push event detected, using branch: $BRANCH_NAME (ref: $GIT_BRANCH)"
-          fi
+          echo "Triggering TeamCity ${{ matrix.platform }} build: $TEAMCITY_BUILD_TYPE"
+          echo "TeamCity branchName: $TEAMCITY_BRANCH"
+          echo "Commit: $COMMIT_SHA"
 
-          # Trigger TeamCity build
-          echo "Triggering Windows build: $TEAMCITY_BUILD_TYPE"
-          RESPONSE=$(curl -s -w "\n%{http_code}" \
+          # Формируем JSON корректно через jq, чтобы не было проблем с экранированием
+          JSON_PAYLOAD=$(jq -n \
+            --arg bt "$TEAMCITY_BUILD_TYPE" \
+            --arg br "$TEAMCITY_BRANCH" \
+            --arg sha "$COMMIT_SHA" \
+            '{
+              buildType: { id: $bt },
+              branchName: $br,
+              properties: {
+                property: [
+                  { name: "env.GIT_BRANCH", value: $br },
+                  { name: "env.GIT_COMMIT", value: $sha }
+                ]
+              }
+            }')
+
+          BODY=$(curl --fail-with-body -sS \
             -X POST \
             -H "Authorization: Bearer $TEAMCITY_TOKEN" \
-            -H "Content-Type: application/xml" \
+            -H "Content-Type: application/json" \
             -H "Accept: application/json" \
-            --data "<build><buildType id=\"$TEAMCITY_BUILD_TYPE\"/><branchName>$BRANCH_NAME</branchName><properties><property name=\"env.GIT_BRANCH\" value=\"$GIT_BRANCH\"/><property name=\"env.GIT_COMMIT\" value=\"$GITHUB_SHA\"/></properties></build>" \
+            --data "$JSON_PAYLOAD" \
             "$TEAMCITY_URL/app/rest/buildQueue")
 
-          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
-          BODY=$(echo "$RESPONSE" | sed '$d')
+          BUILD_ID=$(echo "$BODY" | jq -r '.id // empty')
+          WEB_URL=$(echo "$BODY" | jq -r '.webUrl // empty')
 
-          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
-            echo "TeamCity Windows build triggered successfully"
-            BUILD_ID=$(echo "$BODY" | jq -r '.id // empty')
-            if [ -z "$BUILD_ID" ]; then
-              echo "Error: Failed to extract build ID from TeamCity response"
-              echo "Response: $BODY"
-              exit 1
-            fi
-            echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
-            echo "Build ID: $BUILD_ID"
-
-            # Verify the branch name in TeamCity matches the request
-            echo "Verifying branch name in TeamCity..."
-
-            # First, check the buildQueue to get the queued build information
-            VERIFY_RESPONSE=$(curl -s -w "\n%{http_code}" \
-              -H "Authorization: Bearer $TEAMCITY_TOKEN" \
-              -H "Accept: application/json" \
-              "$TEAMCITY_URL/app/rest/buildQueue/id:$BUILD_ID?fields=id,branchName,properties(property(name,value))")
-
-            VERIFY_HTTP_CODE=$(echo "$VERIFY_RESPONSE" | tail -n1)
-            VERIFY_BODY=$(echo "$VERIFY_RESPONSE" | sed '$d')
-
-            echo "Debug: HTTP Status Code: $VERIFY_HTTP_CODE"
-            echo "Debug: Response from TeamCity:"
-            echo "$VERIFY_BODY" | jq '.' 2>/dev/null || echo "$VERIFY_BODY"
-
-            if [ "$VERIFY_HTTP_CODE" -eq 200 ]; then
-              TEAMCITY_BRANCH=$(echo "$VERIFY_BODY" | jq -r '.branchName // empty')
-              # Also check the GIT_BRANCH property we set
-              TC_GIT_BRANCH=$(echo "$VERIFY_BODY" | jq -r '.properties.property[]? | select(.name == "env.GIT_BRANCH") | .value // empty' 2>/dev/null)
-
-              echo "Requested branch: $BRANCH_NAME"
-              echo "TeamCity branch name: $TEAMCITY_BRANCH"
-              echo "TeamCity GIT_BRANCH property: $TC_GIT_BRANCH"
-
-              # Verify the branch name matches what we sent
-              if [ -n "$TEAMCITY_BRANCH" ] && [ "$TEAMCITY_BRANCH" = "$BRANCH_NAME" ]; then
-                echo "✓ Branch verification successful: TeamCity received the correct branch"
-              elif [ -z "$TEAMCITY_BRANCH" ]; then
-                echo "⚠ Warning: Could not retrieve branchName from TeamCity"
-                echo "  This might indicate the branch was not set or TeamCity hasn't processed it yet"
-                echo "  Requested: $BRANCH_NAME"
-              else
-                echo "✗ Branch verification failed: Mismatch detected"
-                echo "  Expected: $BRANCH_NAME"
-                echo "  Got: $TEAMCITY_BRANCH"
-                exit 1
-              fi
-            else
-              echo "Warning: Failed to verify branch (HTTP $VERIFY_HTTP_CODE), but build was triggered"
-              echo "Response: $VERIFY_BODY"
-            fi
-          else
-            echo "Failed to trigger TeamCity Windows build. HTTP Status: $HTTP_CODE"
-            echo "Response: $BODY"
+          if [ -z "$BUILD_ID" ] || [ "$BUILD_ID" = "null" ]; then
+            echo "❌ Failed to parse build id from TeamCity response:"
+            echo "$BODY"
             exit 1
           fi
 
-      - name: Wait for TeamCity Windows Build
+          echo "✅ Build queued. ID=$BUILD_ID"
+          if [ -n "$WEB_URL" ] && [ "$WEB_URL" != "null" ]; then
+            echo "TeamCity URL: $WEB_URL"
+          fi
+
+          echo "build_id=$BUILD_ID" >> "$GITHUB_OUTPUT"
+          echo "web_url=$WEB_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Wait for TeamCity Build
         if: steps.teamcity.outputs.build_id
+        timeout-minutes: 90
         env:
           TEAMCITY_URL: ${{ vars.TEAMCITY_URL }}
           TEAMCITY_TOKEN: ${{ vars.TEAMCITY_TOKEN }}
           BUILD_ID: ${{ steps.teamcity.outputs.build_id }}
+          TRIGGERED_WEB_URL: ${{ steps.teamcity.outputs.web_url }}
+        shell: bash
         run: |
-          echo "Waiting for TeamCity Windows build $BUILD_ID to complete..."
+          set -euo pipefail
 
-          MAX_WAIT=3600  # Maximum wait time in seconds (1 hour)
-          ELAPSED=0
-          POLL_INTERVAL=30
+          echo "Waiting for TeamCity build $BUILD_ID..."
+          if [ -n "${TRIGGERED_WEB_URL:-}" ] && [ "${TRIGGERED_WEB_URL:-}" != "null" ]; then
+            echo "TeamCity build URL: $TRIGGERED_WEB_URL"
+          fi
 
-          while [ $ELAPSED -lt $MAX_WAIT ]; do
-            RESPONSE=$(curl -s -w "\n%{http_code}" \
+          MAX_QUEUED_SECONDS=1800
+          MAX_RUNNING_SECONDS=3600
+          SLEEP_SECONDS=15
+
+          QUEUED_ELAPSED=0
+          RUNNING_ELAPSED=0
+
+          while true; do
+            RESPONSE=$(curl --fail-with-body -sS \
+              --retry 5 --retry-delay 2 --retry-all-errors \
               -H "Authorization: Bearer $TEAMCITY_TOKEN" \
               -H "Accept: application/json" \
-              "$TEAMCITY_URL/app/rest/builds/id:$BUILD_ID?fields=id,state,status,statusText,webUrl")
+              "$TEAMCITY_URL/app/rest/builds/id:$BUILD_ID?fields=state,status,webUrl,branchName")
 
-            HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
-            BODY=$(echo "$RESPONSE" | sed '$d')
+            STATE=$(echo "$RESPONSE" | jq -r '.state // empty')
+            STATUS=$(echo "$RESPONSE" | jq -r '.status // empty')
+            WEB_URL=$(echo "$RESPONSE" | jq -r '.webUrl // empty')
+            BRANCH=$(echo "$RESPONSE" | jq -r '.branchName // empty')
 
-            if [ "$HTTP_CODE" -ne 200 ]; then
-              echo "Failed to get build status. HTTP Status: $HTTP_CODE"
-              echo "Response body: $BODY"
-              exit 1
+            echo "State=$STATE Status=$STATUS BranchName=$BRANCH"
+            if [ -n "$WEB_URL" ] && [ "$WEB_URL" != "null" ]; then
+              echo "TeamCity URL: $WEB_URL"
             fi
 
-            # Extract state and status, trim leading/trailing whitespace
-            STATE=$(echo "$BODY" | jq -r '.state // "unknown"' | xargs)
-            STATUS=$(echo "$BODY" | jq -r '.status // "unknown"' | xargs)
-            STATUS_TEXT=$(echo "$BODY" | jq -r '.statusText // ""')
-
-            echo "Build state: $STATE, status: $STATUS"
-            if [ -n "$STATUS_TEXT" ]; then
-              echo "Status text: $STATUS_TEXT"
-            fi
-
-            if [ "$STATE" = "finished" ]; then
-              BUILD_URL=$(echo "$BODY" | jq -r '.webUrl // "N/A"')
-              echo "Build URL: $BUILD_URL"
-
-              if [ "$STATUS" = "SUCCESS" ]; then
-                echo "✅ TeamCity Windows build completed successfully!"
-                exit 0
-              else
-                echo "❌ TeamCity Windows build failed with status: $STATUS"
+            if [ "$STATE" = "queued" ]; then
+              QUEUED_ELAPSED=$((QUEUED_ELAPSED + SLEEP_SECONDS))
+              if [ "$QUEUED_ELAPSED" -ge "$MAX_QUEUED_SECONDS" ]; then
+                echo "❌ Timed out: build stayed queued for ${QUEUED_ELAPSED}s"
                 exit 1
               fi
-            fi
-
-            sleep $POLL_INTERVAL
-            ELAPSED=$((ELAPSED + POLL_INTERVAL))
-          done
-
-          echo "⏱️ Timeout waiting for TeamCity Windows build to complete"
-          exit 1
-
-      - name: Report Windows Build Status
-        if: always()
-        run: |
-          if [ "${{ job.status }}" = "success" ]; then
-            echo "✅ TeamCity Windows build integration successful"
-          else
-            echo "❌ TeamCity Windows build integration failed"
-          fi
-
-  trigger-teamcity-linux:
-    name: Trigger TeamCity Build (Linux)
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Trigger TeamCity Linux Build
-        id: teamcity
-        env:
-          TEAMCITY_URL: ${{ vars.TEAMCITY_URL }}
-          TEAMCITY_TOKEN: ${{ vars.TEAMCITY_TOKEN }}
-          TEAMCITY_BUILD_TYPE: ${{ vars.TEAMCITY_BUILD_TYPE_LINUX }}
-        run: |
-          if [ -z "$TEAMCITY_URL" ] || [ -z "$TEAMCITY_TOKEN" ] || [ -z "$TEAMCITY_BUILD_TYPE" ]; then
-            echo "Error: TeamCity configuration not found in repository variables"
-            echo "Please configure the following repository variables:"
-            echo "  - TEAMCITY_URL: Your TeamCity server URL (e.g., https://teamcity.example.com)"
-            echo "  - TEAMCITY_TOKEN: TeamCity access token with build trigger permissions"
-            echo "  - TEAMCITY_BUILD_TYPE_LINUX: TeamCity build configuration ID for Linux (e.g., ImtCore_Build_Linux)"
-            exit 1
-          fi
-
-          # Determine the correct branch reference
-          # For pull requests, use the source branch (GITHUB_HEAD_REF)
-          # For push events, use GITHUB_REF
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            BRANCH_NAME="${{ github.event.pull_request.head.ref }}"
-            GIT_BRANCH="refs/heads/${{ github.event.pull_request.head.ref }}"
-            echo "Pull request detected, using branch: $BRANCH_NAME (ref: $GIT_BRANCH)"
-          else
-            GIT_BRANCH="${GITHUB_REF}"
-            # Extract branch name from ref (refs/heads/main -> main)
-            BRANCH_NAME="${GITHUB_REF#refs/heads/}"
-            echo "Push event detected, using branch: $BRANCH_NAME (ref: $GIT_BRANCH)"
-          fi
-
-          # Trigger TeamCity build
-          echo "Triggering Linux build: $TEAMCITY_BUILD_TYPE"
-          RESPONSE=$(curl -s -w "\n%{http_code}" \
-            -X POST \
-            -H "Authorization: Bearer $TEAMCITY_TOKEN" \
-            -H "Content-Type: application/xml" \
-            -H "Accept: application/json" \
-            --data "<build><buildType id=\"$TEAMCITY_BUILD_TYPE\"/><branchName>$BRANCH_NAME</branchName><properties><property name=\"env.GIT_BRANCH\" value=\"$GIT_BRANCH\"/><property name=\"env.GIT_COMMIT\" value=\"$GITHUB_SHA\"/></properties></build>" \
-            "$TEAMCITY_URL/app/rest/buildQueue")
-
-          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
-          BODY=$(echo "$RESPONSE" | sed '$d')
-
-          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
-            echo "TeamCity Linux build triggered successfully"
-            BUILD_ID=$(echo "$BODY" | jq -r '.id // empty')
-            if [ -z "$BUILD_ID" ]; then
-              echo "Error: Failed to extract build ID from TeamCity response"
-              echo "Response: $BODY"
-              exit 1
-            fi
-            echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
-            echo "Build ID: $BUILD_ID"
-
-            # Verify the branch name in TeamCity matches the request
-            echo "Verifying branch name in TeamCity..."
-
-            # First, check the buildQueue to get the queued build information
-            VERIFY_RESPONSE=$(curl -s -w "\n%{http_code}" \
-              -H "Authorization: Bearer $TEAMCITY_TOKEN" \
-              -H "Accept: application/json" \
-              "$TEAMCITY_URL/app/rest/buildQueue/id:$BUILD_ID?fields=id,branchName,properties(property(name,value))")
-
-            VERIFY_HTTP_CODE=$(echo "$VERIFY_RESPONSE" | tail -n1)
-            VERIFY_BODY=$(echo "$VERIFY_RESPONSE" | sed '$d')
-
-            echo "Debug: HTTP Status Code: $VERIFY_HTTP_CODE"
-            echo "Debug: Response from TeamCity:"
-            echo "$VERIFY_BODY" | jq '.' 2>/dev/null || echo "$VERIFY_BODY"
-
-            if [ "$VERIFY_HTTP_CODE" -eq 200 ]; then
-              TEAMCITY_BRANCH=$(echo "$VERIFY_BODY" | jq -r '.branchName // empty')
-              # Also check the GIT_BRANCH property we set
-              TC_GIT_BRANCH=$(echo "$VERIFY_BODY" | jq -r '.properties.property[]? | select(.name == "env.GIT_BRANCH") | .value // empty' 2>/dev/null)
-
-              echo "Requested branch: $BRANCH_NAME"
-              echo "TeamCity branch name: $TEAMCITY_BRANCH"
-              echo "TeamCity GIT_BRANCH property: $TC_GIT_BRANCH"
-
-              # Verify the branch name matches what we sent
-              if [ -n "$TEAMCITY_BRANCH" ] && [ "$TEAMCITY_BRANCH" = "$BRANCH_NAME" ]; then
-                echo "✓ Branch verification successful: TeamCity received the correct branch"
-              elif [ -z "$TEAMCITY_BRANCH" ]; then
-                echo "⚠ Warning: Could not retrieve branchName from TeamCity"
-                echo "  This might indicate the branch was not set or TeamCity hasn't processed it yet"
-                echo "  Requested: $BRANCH_NAME"
+            elif [ "$STATE" = "running" ]; then
+              RUNNING_ELAPSED=$((RUNNING_ELAPSED + SLEEP_SECONDS))
+              if [ "$RUNNING_ELAPSED" -ge "$MAX_RUNNING_SECONDS" ]; then
+                echo "❌ Timed out: build stayed running for ${RUNNING_ELAPSED}s"
+                exit 1
+              fi
+            elif [ "$STATE" = "finished" ]; then
+              if [ "$STATUS" = "SUCCESS" ]; then
+                echo "✅ Build SUCCESS"
+                exit 0
               else
-                echo "✗ Branch verification failed: Mismatch detected"
-                echo "  Expected: $BRANCH_NAME"
-                echo "  Got: $TEAMCITY_BRANCH"
+                echo "❌ Build FAILED (status=$STATUS)"
                 exit 1
               fi
             else
-              echo "Warning: Failed to verify branch (HTTP $VERIFY_HTTP_CODE), but build was triggered"
-              echo "Response: $VERIFY_BODY"
-            fi
-          else
-            echo "Failed to trigger TeamCity Linux build. HTTP Status: $HTTP_CODE"
-            echo "Response: $BODY"
-            exit 1
-          fi
-
-      - name: Wait for TeamCity Linux Build
-        if: steps.teamcity.outputs.build_id
-        env:
-          TEAMCITY_URL: ${{ vars.TEAMCITY_URL }}
-          TEAMCITY_TOKEN: ${{ vars.TEAMCITY_TOKEN }}
-          BUILD_ID: ${{ steps.teamcity.outputs.build_id }}
-        run: |
-          echo "Waiting for TeamCity Linux build $BUILD_ID to complete..."
-
-          MAX_WAIT=3600  # Maximum wait time in seconds (1 hour)
-          ELAPSED=0
-          POLL_INTERVAL=30
-
-          while [ $ELAPSED -lt $MAX_WAIT ]; do
-            RESPONSE=$(curl -s -w "\n%{http_code}" \
-              -H "Authorization: Bearer $TEAMCITY_TOKEN" \
-              -H "Accept: application/json" \
-              "$TEAMCITY_URL/app/rest/builds/id:$BUILD_ID?fields=id,state,status,statusText,webUrl")
-
-            HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
-            BODY=$(echo "$RESPONSE" | sed '$d')
-
-            if [ "$HTTP_CODE" -ne 200 ]; then
-              echo "Failed to get build status. HTTP Status: $HTTP_CODE"
-              echo "Response body: $BODY"
-              exit 1
+              echo "⚠️ Unexpected TeamCity state: '${STATE}'. Full response:"
+              echo "$RESPONSE"
             fi
 
-            # Extract state and status, trim leading/trailing whitespace
-            STATE=$(echo "$BODY" | jq -r '.state // "unknown"' | xargs)
-            STATUS=$(echo "$BODY" | jq -r '.status // "unknown"' | xargs)
-            STATUS_TEXT=$(echo "$BODY" | jq -r '.statusText // ""')
-
-            echo "Build state: $STATE, status: $STATUS"
-            if [ -n "$STATUS_TEXT" ]; then
-              echo "Status text: $STATUS_TEXT"
-            fi
-
-            if [ "$STATE" = "finished" ]; then
-              BUILD_URL=$(echo "$BODY" | jq -r '.webUrl // "N/A"')
-              echo "Build URL: $BUILD_URL"
-
-              if [ "$STATUS" = "SUCCESS" ]; then
-                echo "✅ TeamCity Linux build completed successfully!"
-                exit 0
-              else
-                echo "❌ TeamCity Linux build failed with status: $STATUS"
-                exit 1
-              fi
-            fi
-
-            sleep $POLL_INTERVAL
-            ELAPSED=$((ELAPSED + POLL_INTERVAL))
+            sleep "$SLEEP_SECONDS"
           done
-
-          echo "⏱️ Timeout waiting for TeamCity Linux build to complete"
-          exit 1
-
-      - name: Report Linux Build Status
-        if: always()
-        run: |
-          if [ "${{ job.status }}" = "success" ]; then
-            echo "✅ TeamCity Linux build integration successful"
-          else
-            echo "❌ TeamCity Linux build integration failed"
-          fi
