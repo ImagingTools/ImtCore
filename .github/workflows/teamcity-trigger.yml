@@ -101,17 +101,29 @@ jobs:
               echo "TeamCity GIT_BRANCH property: $TC_GIT_BRANCH"
 
               # Verify the branch name matches what we sent
+              # Accept if either branchName matches OR env.GIT_BRANCH property matches
+              BRANCH_MATCH=false
               if [ -n "$TEAMCITY_BRANCH" ] && [ "$TEAMCITY_BRANCH" = "$BRANCH_NAME" ]; then
-                echo "✓ Branch verification successful: TeamCity received the correct branch"
-              elif [ -z "$TEAMCITY_BRANCH" ]; then
-                echo "⚠ Warning: Could not retrieve branchName from TeamCity"
-                echo "  This might indicate the branch was not set or TeamCity hasn't processed it yet"
-                echo "  Requested: $BRANCH_NAME"
-              else
-                echo "✗ Branch verification failed: Mismatch detected"
-                echo "  Expected: $BRANCH_NAME"
-                echo "  Got: $TEAMCITY_BRANCH"
-                exit 1
+                echo "✓ Branch verification successful: TeamCity branchName matches requested branch"
+                BRANCH_MATCH=true
+              elif [ -n "$TC_GIT_BRANCH" ] && [ "$TC_GIT_BRANCH" = "$GIT_BRANCH" ]; then
+                echo "✓ Branch verification successful: TeamCity env.GIT_BRANCH property matches (branchName: $TEAMCITY_BRANCH)"
+                BRANCH_MATCH=true
+              fi
+
+              if [ "$BRANCH_MATCH" = "false" ]; then
+                if [ -z "$TEAMCITY_BRANCH" ] && [ -z "$TC_GIT_BRANCH" ]; then
+                  echo "⚠ Warning: Could not retrieve branch information from TeamCity"
+                  echo "  This might indicate the branch was not set or TeamCity hasn't processed it yet"
+                  echo "  Requested: $BRANCH_NAME (ref: $GIT_BRANCH)"
+                else
+                  echo "✗ Branch verification failed: Neither branchName nor env.GIT_BRANCH matches"
+                  echo "  Expected branch: $BRANCH_NAME"
+                  echo "  Expected ref: $GIT_BRANCH"
+                  echo "  Got branchName: $TEAMCITY_BRANCH"
+                  echo "  Got env.GIT_BRANCH: $TC_GIT_BRANCH"
+                  exit 1
+                fi
               fi
             else
               echo "Warning: Failed to verify branch (HTTP $VERIFY_HTTP_CODE), but build was triggered"
@@ -278,17 +290,29 @@ jobs:
               echo "TeamCity GIT_BRANCH property: $TC_GIT_BRANCH"
 
               # Verify the branch name matches what we sent
+              # Accept if either branchName matches OR env.GIT_BRANCH property matches
+              BRANCH_MATCH=false
               if [ -n "$TEAMCITY_BRANCH" ] && [ "$TEAMCITY_BRANCH" = "$BRANCH_NAME" ]; then
-                echo "✓ Branch verification successful: TeamCity received the correct branch"
-              elif [ -z "$TEAMCITY_BRANCH" ]; then
-                echo "⚠ Warning: Could not retrieve branchName from TeamCity"
-                echo "  This might indicate the branch was not set or TeamCity hasn't processed it yet"
-                echo "  Requested: $BRANCH_NAME"
-              else
-                echo "✗ Branch verification failed: Mismatch detected"
-                echo "  Expected: $BRANCH_NAME"
-                echo "  Got: $TEAMCITY_BRANCH"
-                exit 1
+                echo "✓ Branch verification successful: TeamCity branchName matches requested branch"
+                BRANCH_MATCH=true
+              elif [ -n "$TC_GIT_BRANCH" ] && [ "$TC_GIT_BRANCH" = "$GIT_BRANCH" ]; then
+                echo "✓ Branch verification successful: TeamCity env.GIT_BRANCH property matches (branchName: $TEAMCITY_BRANCH)"
+                BRANCH_MATCH=true
+              fi
+
+              if [ "$BRANCH_MATCH" = "false" ]; then
+                if [ -z "$TEAMCITY_BRANCH" ] && [ -z "$TC_GIT_BRANCH" ]; then
+                  echo "⚠ Warning: Could not retrieve branch information from TeamCity"
+                  echo "  This might indicate the branch was not set or TeamCity hasn't processed it yet"
+                  echo "  Requested: $BRANCH_NAME (ref: $GIT_BRANCH)"
+                else
+                  echo "✗ Branch verification failed: Neither branchName nor env.GIT_BRANCH matches"
+                  echo "  Expected branch: $BRANCH_NAME"
+                  echo "  Expected ref: $GIT_BRANCH"
+                  echo "  Got branchName: $TEAMCITY_BRANCH"
+                  echo "  Got env.GIT_BRANCH: $TC_GIT_BRANCH"
+                  exit 1
+                fi
               fi
             else
               echo "Warning: Failed to verify branch (HTTP $VERIFY_HTTP_CODE), but build was triggered"
