@@ -30,8 +30,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          # В PR по умолчанию checkout может оказаться merge-коммитом.
-          # Нам нужен head-branch (copilot/...), чтобы TeamCity корректно определил ветку/ревизию.
+          # For PR: use head SHA to avoid TeamCity building default branch due to merge refs.
           ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
 
       - name: Install jq
@@ -46,64 +45,61 @@ jobs:
           set -euo pipefail
 
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            # В TeamCity branchName обычно ожидается "имя ветки", а не "refs/heads/...".
             BRANCH_NAME="${{ github.event.pull_request.head.ref }}"
-            GIT_BRANCH="$BRANCH_NAME"
+            TEAMCITY_BRANCH="$BRANCH_NAME"
             COMMIT_SHA="${{ github.event.pull_request.head.sha }}"
           else
             BRANCH_NAME="${GITHUB_REF#refs/heads/}"
-            GIT_BRANCH="$BRANCH_NAME"
+            TEAMCITY_BRANCH="$BRANCH_NAME"
             COMMIT_SHA="${GITHUB_SHA}"
           fi
 
           echo "BRANCH_NAME=$BRANCH_NAME" >> "$GITHUB_ENV"
-          echo "GIT_BRANCH=$GIT_BRANCH" >> "$GITHUB_ENV"
+          echo "TEAMCITY_BRANCH=$TEAMCITY_BRANCH" >> "$GITHUB_ENV"
           echo "COMMIT_SHA=$COMMIT_SHA" >> "$GITHUB_ENV"
 
           echo "Branch: $BRANCH_NAME"
-          echo "TeamCity branchName: $GIT_BRANCH"
+          echo "TeamCity branchName: $TEAMCITY_BRANCH"
           echo "Commit: $COMMIT_SHA"
 
-      - name: Trigger TeamCity Build
+      - name: Trigger TeamCity Build (JSON)
         id: teamcity
         env:
           TEAMCITY_URL: ${{ vars.TEAMCITY_URL }}
           TEAMCITY_TOKEN: ${{ vars.TEAMCITY_TOKEN }}
           TEAMCITY_BUILD_TYPE: ${{ matrix.build_type }}
-          # Важно: сюда передаем именно имя ветки (без refs/heads/)
-          GIT_BRANCH: ${{ env.GIT_BRANCH }}
-          # Важно: в PR используем head SHA, иначе TeamCity может собрать дефолтную ветку (main)
+          TEAMCITY_BRANCH: ${{ env.TEAMCITY_BRANCH }}
           COMMIT_SHA: ${{ env.COMMIT_SHA }}
         shell: bash
         run: |
           set -euo pipefail
+
           echo "Triggering TeamCity ${{ matrix.platform }} build: $TEAMCITY_BUILD_TYPE"
-          echo "TeamCity branchName: $GIT_BRANCH"
+          echo "TeamCity branchName: $TEAMCITY_BRANCH"
           echo "Commit: $COMMIT_SHA"
 
-          # В TeamCity branchName должно быть просто имя ветки (например: copilot/fix-teamcity-trigger-workflow)
-          # Если дать refs/heads/... или отправить SHA merge-коммита, TeamCity нередко уходит в default branch (main).
-          XML_PAYLOAD=$(cat <<'XML'
-          <build>
-            <buildType id="__BUILD_TYPE__"/>
-            <branchName>__BRANCH_NAME__</branchName>
-            <properties>
-              <property name="env.GIT_BRANCH" value="__BRANCH_NAME__"/>
-              <property name="env.GIT_COMMIT" value="__COMMIT_SHA__"/>
-            </properties>
-          </build>
-          XML
-          )
-          XML_PAYLOAD="${XML_PAYLOAD/__BUILD_TYPE__/$TEAMCITY_BUILD_TYPE}"
-          XML_PAYLOAD="${XML_PAYLOAD/__BRANCH_NAME__/$GIT_BRANCH}"
-          XML_PAYLOAD="${XML_PAYLOAD/__COMMIT_SHA__/$COMMIT_SHA}"
+          # Формируем JSON корректно через jq, чтобы не было проблем с экранированием
+          JSON_PAYLOAD=$(jq -n \
+            --arg bt "$TEAMCITY_BUILD_TYPE" \
+            --arg br "$TEAMCITY_BRANCH" \
+            --arg sha "$COMMIT_SHA" \
+            '{
+              buildType: { id: $bt },
+              branchName: $br,
+              properties: {
+                property: [
+                  { name: "env.GIT_BRANCH", value: $br },
+                  { name: "env.GIT_COMMIT", value: $sha }
+                ]
+              }
+            }')
 
           BODY=$(curl --fail-with-body -sS \
             -X POST \
             -H "Authorization: Bearer $TEAMCITY_TOKEN" \
-            -H "Content-Type: application/xml" \
+            -H "Content-Type: application/json" \
             -H "Accept: application/json" \
-            --data "$XML_PAYLOAD" \
+            --data "$JSON_PAYLOAD" \
             "$TEAMCITY_URL/app/rest/buildQueue")
 
           BUILD_ID=$(echo "$BODY" | jq -r '.id // empty')
