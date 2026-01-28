@@ -40,13 +40,18 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            echo "BRANCH_NAME=${{ github.event.pull_request.head.ref }}" >> "$GITHUB_ENV"
-            echo "GIT_BRANCH=refs/heads/${{ github.event.pull_request.head.ref }}" >> "$GITHUB_ENV"
+            BRANCH_NAME="${{ github.event.pull_request.head.ref }}"
+            GIT_BRANCH="refs/heads/${{ github.event.pull_request.head.ref }}"
           else
-            echo "GIT_BRANCH=${GITHUB_REF}" >> "$GITHUB_ENV"
-            echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> "$GITHUB_ENV"
+            GIT_BRANCH="${GITHUB_REF}"
+            BRANCH_NAME="${GITHUB_REF#refs/heads/}"
           fi
+
+          echo "BRANCH_NAME=$BRANCH_NAME" >> "$GITHUB_ENV"
+          echo "GIT_BRANCH=$GIT_BRANCH" >> "$GITHUB_ENV"
+
           echo "Branch: $BRANCH_NAME (ref: $GIT_BRANCH)"
 
       - name: Trigger TeamCity Build
@@ -79,7 +84,6 @@ jobs:
           XML_PAYLOAD="${XML_PAYLOAD/__GIT_BRANCH__/$GIT_BRANCH}"
           XML_PAYLOAD="${XML_PAYLOAD/__GITHUB_SHA__/$GITHUB_SHA}"
 
-          # --fail-with-body: если HTTP != 2xx, curl завершится ошибкой и покажет body
           BODY=$(curl --fail-with-body -sS \
             -X POST \
             -H "Authorization: Bearer $TEAMCITY_TOKEN" \
@@ -116,13 +120,11 @@ jobs:
           set -euo pipefail
           echo "Waiting for TeamCity build $BUILD_ID..."
 
-          # Максимальное ожидание в секундах (дополнительно к timeout-minutes шага)
-          MAX_WAIT_SECONDS=3300   # 55 минут
+          MAX_WAIT_SECONDS=3300   # 55 минут (доп. защита помимо timeout-minutes)
           SLEEP_SECONDS=15
           ELAPSED=0
 
           while true; do
-            # Ретраи на сетевые/временные глюки
             RESPONSE=$(curl --fail-with-body -sS \
               --retry 5 --retry-delay 2 --retry-all-errors \
               -H "Authorization: Bearer $TEAMCITY_TOKEN" \
