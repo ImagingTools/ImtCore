@@ -34,18 +34,19 @@ imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(
 		userObjectId = m_jwtSessionControllerCompPtr->GetUserFromJwt(token);
 	}
 	
-	// If JWT validation failed, try PAT validation
+	// If JWT extraction failed, try PAT validation
+	// Note: Token was already validated in CHttpGraphQLServletComp, but we need to
+	// validate again here to extract userId since PAT validation is the only way to get it
 	if (userObjectId.isEmpty() && m_patManagerCompPtr.IsValid()){
 		QByteArrayList scopes;
-		if (m_patManagerCompPtr->ValidateToken(token, userObjectId, scopes)){
-			// Successfully validated as PAT token, userObjectId is now set
-			// Note: We could also use scopes here if needed for permission checks
-		}
+		m_patManagerCompPtr->ValidateToken(token, userObjectId, scopes);
+		// Note: We accept that this causes timestamp to be updated twice for PAT tokens
+		// This is a trade-off for maintaining a clean separation between servlet and controller
 	}
 	
 	// If neither JWT nor PAT validation succeeded
 	if (userObjectId.isEmpty()){
-		errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: Session model is invalid.").arg(qPrintable(token));
+		errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: Invalid authentication token.").arg(qPrintable(token));
 		SendErrorMessage(0, errorMessage, "CGqlContextControllerComp");
 
 		return nullptr;

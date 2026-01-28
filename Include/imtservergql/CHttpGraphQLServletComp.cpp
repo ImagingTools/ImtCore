@@ -80,17 +80,19 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 		if (state == JwtState::JS_EXPIRED){
 			return CreateResponse(StatusCode::SC_UNAUTHORIZED, QByteArray(), request);
 		}
-		// If JWT is invalid, try PAT validation
-		if (state == JwtState::JS_INVALID && m_patManagerCompPtr.IsValid()){
-			QByteArray userId;
-			QByteArrayList scopes;
-			if (!m_patManagerCompPtr->ValidateToken(accessToken, userId, scopes)){
+		else if (state == JwtState::JS_INVALID){
+			// If JWT is invalid, try PAT validation
+			if (m_patManagerCompPtr.IsValid()){
+				QByteArray userId;
+				QByteArrayList scopes;
+				if (!m_patManagerCompPtr->ValidateToken(accessToken, userId, scopes)){
+					return CreateResponse(StatusCode::SC_FORBIDDEN, QByteArray(), request);
+				}
+				// PAT validation successful, continue processing
+			}
+			else{
 				return CreateResponse(StatusCode::SC_FORBIDDEN, QByteArray(), request);
 			}
-			// PAT validation successful, continue processing
-		}
-		else if (state == JwtState::JS_INVALID){
-			return CreateResponse(StatusCode::SC_FORBIDDEN, QByteArray(), request);
 		}
 		// JWT validation successful (JS_OK), continue processing
 	}
