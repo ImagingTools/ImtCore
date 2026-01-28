@@ -44,7 +44,7 @@ IPersonalAccessTokenManager::TokenCreationResult CPersonalAccessTokenManagerComp
 
 	// Create token object
 	IPersonalAccessTokenUniquePtr tokenPtr = m_tokenFactoryCompPtr.CreateInstance();
-	if (!tokenPtr->IsValid()){
+	if (!tokenPtr.IsValid()){
 		SendErrorMessage(0, "Failed to create token object", "CPersonalAccessTokenManagerComp");
 		return result;
 	}
@@ -60,7 +60,7 @@ IPersonalAccessTokenManager::TokenCreationResult CPersonalAccessTokenManagerComp
 	tokenPtr->SetRevoked(false);
 
 	// Store in collection
-	QByteArray retVal = m_tokenCollectionCompPtr->InsertNewObject(tokenId, name, description, tokenPtr.GetPtr());
+	QByteArray retVal = m_tokenCollectionCompPtr->InsertNewObject("PersonalAccessToken", name, description, tokenPtr.GetPtr(), tokenId);
 	if (retVal.isEmpty()){
 		SendErrorMessage(0, "Failed to store token in collection", "CPersonalAccessTokenManagerComp");
 		return result;
@@ -176,24 +176,19 @@ IPersonalAccessTokenSharedPtr CPersonalAccessTokenManagerComp::GetToken(const QB
 		return nullptr;
 	}
 
-	IPersonalAccessToken* tokenPtr = dynamic_cast<IPersonalAccessToken*>(dataPtr.GetPtr());
-	if (!tokenPtr->IsValid()){
+	const IPersonalAccessToken* tokenPtr = dynamic_cast<const IPersonalAccessToken*>(dataPtr.GetPtr());
+	if (tokenPtr == nullptr){
 		return nullptr;
 	}
 
-	// Clone the token
-	IPersonalAccessTokenUniquePtr clonedToken = m_tokenFactoryCompPtr.CreateInstance();
-	if (clonedToken->IsValid()){
-		clonedToken->SetId(tokenPtr->GetId());
-		clonedToken->SetUserId(tokenPtr->GetUserId());
-		clonedToken->SetName(tokenPtr->GetName());
-		clonedToken->SetDescription(tokenPtr->GetDescription());
-		clonedToken->SetTokenHash(tokenPtr->GetTokenHash());
-		clonedToken->SetScopes(tokenPtr->GetScopes());
-		clonedToken->SetCreatedAt(tokenPtr->GetCreatedAt());
-		clonedToken->SetLastUsedAt(tokenPtr->GetLastUsedAt());
-		clonedToken->SetExpiresAt(tokenPtr->GetExpiresAt());
-		clonedToken->SetRevoked(tokenPtr->IsRevoked());
+	// Clone via IChangeable interface (preferred, keeps logic in the token implementation).
+	istd::TUniqueInterfacePtr<IPersonalAccessToken> clonedToken = m_tokenFactoryCompPtr.CreateInstance();
+	if (!clonedToken.IsValid()){
+		return nullptr;
+	}
+
+	if (!clonedToken->CopyFrom(*tokenPtr)){
+		return nullptr;
 	}
 
 	return IPersonalAccessTokenSharedPtr(clonedToken.PopInterfacePtr());
@@ -278,7 +273,7 @@ bool CPersonalAccessTokenManagerComp::DeleteToken(const QByteArray& tokenId)
 QByteArray CPersonalAccessTokenManagerComp::GenerateRandomToken() const
 {
 	// Generate a cryptographically secure random token
-	// Format: imt_pat_<base64url_encoded_random_data>
+	// Format: pat_<base64url_encoded_random_data>
 	// The token should be long enough to be secure (32 bytes = 256 bits of entropy)
 
 	QByteArray randomData;
@@ -294,7 +289,7 @@ QByteArray CPersonalAccessTokenManagerComp::GenerateRandomToken() const
 	}
 
 	// Convert to base64url for safe transmission
-	QByteArray token = "imt_pat_" + randomData.toBase64(QByteArray::Base64UrlEncoding | QByteArray::OmitTrailingEquals);
+	QByteArray token = "pat_" + randomData.toBase64(QByteArray::Base64UrlEncoding | QByteArray::OmitTrailingEquals);
 
 	return token;
 }
