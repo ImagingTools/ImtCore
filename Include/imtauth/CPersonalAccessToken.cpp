@@ -5,6 +5,7 @@
 #include <istd/CChangeNotifier.h>
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
+#include <iser/CPrimitiveTypesSerializer.h>
 
 
 namespace imtauth
@@ -225,24 +226,21 @@ bool CPersonalAccessToken::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_tokenHash);
 	retVal = retVal && archive.EndTag(tokenHashTag);
 
-	static iser::CArchiveTag scopesTag("Scopes", "Permission scopes");
-	retVal = retVal && archive.BeginTag(scopesTag);
-	retVal = retVal && archive.Process(m_scopes);
-	retVal = retVal && archive.EndTag(scopesTag);
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_scopes, "Scopes", "Permission scopes");
 
 	static iser::CArchiveTag createdAtTag("CreatedAt", "Creation timestamp");
 	retVal = retVal && archive.BeginTag(createdAtTag);
-	retVal = retVal && archive.Process(m_createdAt);
+	iser::CPrimitiveTypesSerializer::SerializeDateTime(archive, m_createdAt);
 	retVal = retVal && archive.EndTag(createdAtTag);
 
 	static iser::CArchiveTag lastUsedAtTag("LastUsedAt", "Last used timestamp");
 	retVal = retVal && archive.BeginTag(lastUsedAtTag);
-	retVal = retVal && archive.Process(m_lastUsedAt);
+	iser::CPrimitiveTypesSerializer::SerializeDateTime(archive, m_lastUsedAt);
 	retVal = retVal && archive.EndTag(lastUsedAtTag);
 
 	static iser::CArchiveTag expiresAtTag("ExpiresAt", "Expiration timestamp");
 	retVal = retVal && archive.BeginTag(expiresAtTag);
-	retVal = retVal && archive.Process(m_expiresAt);
+	iser::CPrimitiveTypesSerializer::SerializeDateTime(archive, m_expiresAt);
 	retVal = retVal && archive.EndTag(expiresAtTag);
 
 	static iser::CArchiveTag revokedTag("Revoked", "Revocation status");

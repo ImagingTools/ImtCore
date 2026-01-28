@@ -2,7 +2,7 @@
 
 
 // ACF includes
-#include <istd/IChangeable.h>
+#include <iser/ISerializable.h>
 #include <idoc/IDocumentMetaInfo.h>
 
 
@@ -19,7 +19,7 @@ namespace imtauth
 	
 	\ingroup Authorization
 */
-class IPersonalAccessToken: virtual public istd::IChangeable
+class IPersonalAccessToken: virtual public iser::ISerializable
 {
 public:
 	/**

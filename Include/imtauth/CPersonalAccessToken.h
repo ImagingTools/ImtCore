@@ -4,9 +4,6 @@
 // Qt includes
 #include <QDateTime>
 
-// ACF includes
-#include <iser/ISerializable.h>
-
 // ImtCore includes
 #include <imtauth/IPersonalAccessToken.h>
 
@@ -15,8 +12,7 @@ namespace imtauth
 {
 
 
-class CPersonalAccessToken: virtual public imtauth::IPersonalAccessToken,
-							virtual public iser::ISerializable
+class CPersonalAccessToken: virtual public imtauth::IPersonalAccessToken
 {
 public:
 	// reimplemented (imtauth::IPersonalAccessToken)
