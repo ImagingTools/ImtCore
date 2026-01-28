@@ -29,19 +29,21 @@ imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(
 {
 	QByteArray userObjectId;
 	
-	// Try to get user from JWT first
-	if (m_jwtSessionControllerCompPtr.IsValid()){
-		userObjectId = m_jwtSessionControllerCompPtr->GetUserFromJwt(token);
+	// Extract user ID based on token prefix: pat_ for PAT tokens, otherwise JWT
+	if (token.startsWith("pat_")){
+		// PAT token - validate with PAT manager to extract userId
+		if (m_patManagerCompPtr.IsValid()){
+			QByteArrayList scopes;
+			if (!m_patManagerCompPtr->ValidateToken(token, userObjectId, scopes)){
+				// PAT validation failed - this is unexpected since validation already passed in servlet
+				SendWarningMessage(0, QString("PAT validation failed in GetRequestContext for token '%1'").arg(qPrintable(token)), "CGqlContextControllerComp");
+			}
+		}
 	}
-	
-	// If JWT extraction failed, try PAT validation
-	// Note: Token was already validated in CHttpGraphQLServletComp, but we need to
-	// validate again here to extract userId since PAT validation is the only way to get it
-	if (userObjectId.isEmpty() && m_patManagerCompPtr.IsValid()){
-		QByteArrayList scopes;
-		if (!m_patManagerCompPtr->ValidateToken(token, userObjectId, scopes)){
-			// PAT validation failed - this is unexpected since validation already passed in servlet
-			SendWarningMessage(0, QString("PAT validation failed in GetRequestContext for token '%1'").arg(qPrintable(token)), "CGqlContextControllerComp");
+	else{
+		// JWT token - extract user from JWT controller
+		if (m_jwtSessionControllerCompPtr.IsValid()){
+			userObjectId = m_jwtSessionControllerCompPtr->GetUserFromJwt(token);
 		}
 	}
 	
