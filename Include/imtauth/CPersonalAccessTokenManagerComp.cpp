@@ -129,10 +129,6 @@ bool CPersonalAccessTokenManagerComp::ValidateToken(
 		userId = tokenPtr->GetUserId();
 		scopes = tokenPtr->GetScopes();
 
-		// Update last used timestamp
-		tokenPtr->SetLastUsedAt(QDateTime::currentDateTime());
-		m_tokenCollectionCompPtr->SetObjectData(tokenId, *tokenPtr);
-
 		return true;
 	}
 

@@ -43,8 +43,6 @@ imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(
 			// PAT validation failed - this is unexpected since validation already passed in servlet
 			SendWarningMessage(0, QString("PAT validation failed in GetRequestContext for token '%1'").arg(qPrintable(token)), "CGqlContextControllerComp");
 		}
-		// Note: We accept that this causes timestamp to be updated twice for PAT tokens
-		// This is a trade-off for maintaining a clean separation between servlet and controller
 	}
 	
 	// If neither JWT nor PAT validation succeeded
