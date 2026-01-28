@@ -27,12 +27,23 @@ imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(
 			const imtgql::IGqlContext::Headers& headers,
 			QString& errorMessage) const
 {
-	if (!m_jwtSessionControllerCompPtr.IsValid()){
-		Q_ASSERT(false);
-		return nullptr;
+	QByteArray userObjectId;
+	
+	// Try to get user from JWT first
+	if (m_jwtSessionControllerCompPtr.IsValid()){
+		userObjectId = m_jwtSessionControllerCompPtr->GetUserFromJwt(token);
 	}
-
-	QByteArray userObjectId = m_jwtSessionControllerCompPtr->GetUserFromJwt(token);
+	
+	// If JWT validation failed, try PAT validation
+	if (userObjectId.isEmpty() && m_patManagerCompPtr.IsValid()){
+		QByteArrayList scopes;
+		if (m_patManagerCompPtr->ValidateToken(token, userObjectId, scopes)){
+			// Successfully validated as PAT token, userObjectId is now set
+			// Note: We could also use scopes here if needed for permission checks
+		}
+	}
+	
+	// If neither JWT nor PAT validation succeeded
 	if (userObjectId.isEmpty()){
 		errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: Session model is invalid.").arg(qPrintable(token));
 		SendErrorMessage(0, errorMessage, "CGqlContextControllerComp");

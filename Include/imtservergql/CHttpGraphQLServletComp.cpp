@@ -73,13 +73,36 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 
 	QByteArray accessToken = headers.value(QByteArrayLiteral("x-authentication-token"));
 
+	// Try to validate the token: first as JWT, then as PAT if JWT validation fails
+	bool isTokenValid = false;
+	bool isJwtToken = false;
+	
 	if (!accessToken.isEmpty() && m_jwtSessionControllerCompPtr.IsValid()){
 		using JwtState = imtauth::IJwtSessionController::JwtState;
 		JwtState state = m_jwtSessionControllerCompPtr->ValidateJwt(accessToken);
 		if (state == JwtState::JS_EXPIRED){
 			return CreateResponse(StatusCode::SC_UNAUTHORIZED, QByteArray(), request);
 		}
-		if (state == JwtState::JS_INVALID){
+		if (state == JwtState::JS_OK){
+			isTokenValid = true;
+			isJwtToken = true;
+		}
+		// If JWT is invalid, try PAT validation
+		else if (state == JwtState::JS_INVALID && m_patManagerCompPtr.IsValid()){
+			QByteArray userId;
+			QByteArrayList scopes;
+			if (m_patManagerCompPtr->ValidateToken(accessToken, userId, scopes)){
+				isTokenValid = true;
+				isJwtToken = false;
+				// Update last used timestamp for PAT
+				QByteArray tokenId = accessToken; // Token ID can be extracted if needed
+				// Note: We don't have tokenId here, but ValidateToken already checks validity
+			}
+			else{
+				return CreateResponse(StatusCode::SC_FORBIDDEN, QByteArray(), request);
+			}
+		}
+		else if (state == JwtState::JS_INVALID){
 			return CreateResponse(StatusCode::SC_FORBIDDEN, QByteArray(), request);
 		}
 	}
