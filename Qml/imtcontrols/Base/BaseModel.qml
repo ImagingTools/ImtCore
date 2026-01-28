@@ -12,7 +12,7 @@ ListModel {
 						key.indexOf('m_') >= 0
 						&& typeof item[key] !== "function"
 						&& item[key] !== undefined
-						&& item[key] !== null){
+						&& item[key] !== null || key == '__typename'){
 					list.push(key)
 				}
 			}
@@ -22,7 +22,7 @@ ListModel {
 						key.indexOf('m_') >= 0
 						&& typeof item[key] !== "function"
 						&& item[key] !== undefined
-						&& item[key] !== null){
+						&& item[key] !== null || key == '__typename'){
 					list.push(key)
 				}
 			}

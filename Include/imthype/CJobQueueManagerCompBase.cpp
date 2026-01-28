@@ -95,7 +95,7 @@ QByteArray CJobQueueManagerCompBase::InsertNewJobIntoQueue(
 		return QByteArray();
 	}
 
-	QByteArray jobId = QUuid::createUuid().toByteArray();
+	QByteArray jobId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 	// Create a new job ticket (without status/progress - those are managed separately)
 	CJobTicket jobTicket;

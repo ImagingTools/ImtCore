@@ -16,7 +16,7 @@ public:
 	typedef imtdb::CSqlDatabaseObjectDelegateCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CJobTicketDatabaseDelegateComp)
-		I_ASSIGN(m_jobTicketFactCompPtr, "JobTicket", "Factory used for creation of the new job ticket instance", true, "JobTicket");
+		I_ASSIGN_MULTI_0(m_jobTicketFactCompPtr, "JobTicket", "List of Factories used for creation of the new job ticket instance", true);
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
@@ -54,11 +54,9 @@ public:
 				const QByteArray& objectId,
 				const QString& description,
 				const imtbase::IOperationContext* operationContextPtr) const override;
-	virtual QByteArray GetObjectTypeId(
-			const QByteArray& objectId) const override;
 
 private:
-	I_FACT(IJobTicket, m_jobTicketFactCompPtr);
+	I_MULTIFACT(IJobTicket, m_jobTicketFactCompPtr);
 };
 
 

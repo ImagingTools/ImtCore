@@ -79,6 +79,11 @@ I_EXPORT_COMPONENT(
 			"Job ticket meta info creator",
 			"Job Ticket Meta Info Creator");
 
+I_EXPORT_COMPONENT(
+			JobTicketDatabaseDelegate,
+			"Job ticket database delegate",
+			"Job Ticket Database Delegate");
+
 
 } // namespace ImtHypePck
 
