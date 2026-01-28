@@ -18,17 +18,17 @@ namespace imtfile
 
 
 /**
-	This component provides file from disc, resources or memory
+	This component loads file contents from disk.
  */
-class CFileProviderComp: virtual public IFileProvider, public ilog::CLoggerComponentBase
+class CDiskFileLoaderComp: virtual public IFileProvider, public ilog::CLoggerComponentBase
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
-	I_BEGIN_COMPONENT(CFileProviderComp);
+	I_BEGIN_COMPONENT(CDiskFileLoaderComp);
 		I_REGISTER_INTERFACE(IFileProvider);
 		I_ASSIGN(m_homeDirPathAttrPtr, "HomePath", "Home path", true, QDir::currentPath());
-		I_ASSIGN(m_pathsProblemsAutoSolveAttrPtr, "AutoSolvePathsProblems", "If 'true' servelt'll automatically solve paths problems", true, true);
+		I_ASSIGN(m_pathsProblemsAutoSolveAttrPtr, "AutoSolvePathsProblems", "If 'true' servlet'll automatically solve paths problems", true, true);
 		I_ASSIGN(m_fileTemplatePathCompPtr, "FileTemplateHomePath", "FileTemplate based Home path\n Note: type is ignored only value matters \n Warning: overwrites HomePath!", false, "FileTemplatePath");
 	I_END_COMPONENT
 
