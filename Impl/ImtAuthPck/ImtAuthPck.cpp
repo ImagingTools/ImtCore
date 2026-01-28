@@ -214,6 +214,16 @@ I_EXPORT_COMPONENT(
 			"User action manager",
 			"User Action manager");
 
+I_EXPORT_COMPONENT(
+			PersonalAccessToken,
+			"Personal access token",
+			"Personal Access Token");
+
+I_EXPORT_COMPONENT(
+			PersonalAccessTokenManager,
+			"Personal access token manager",
+			"Personal Access Token Manager");
+
 
 } // namespace ImtAuthPck
 
