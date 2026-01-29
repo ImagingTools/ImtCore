@@ -56,7 +56,7 @@ void CPersonalAccessTokenTest::testTokenCreation()
 	
 	// Verify we can retrieve the token
 	imtauth::IPersonalAccessTokenSharedPtr tokenPtr = m_tokenManagerPtr->GetToken(result.tokenId);
-	QVERIFY2(tokenPtr != nullptr, "Failed to retrieve created token");
+	QVERIFY2(tokenPtr.IsValid(), "Failed to retrieve created token");
 	QCOMPARE(tokenPtr->GetUserId(), userId);
 	QCOMPARE(tokenPtr->GetName(), name);
 }
@@ -218,7 +218,7 @@ void CPersonalAccessTokenTest::testUpdateLastUsedAt()
 	
 	// Get the initial token
 	imtauth::IPersonalAccessTokenSharedPtr tokenPtr = m_tokenManagerPtr->GetToken(result.tokenId);
-	QVERIFY2(tokenPtr != nullptr, "Failed to retrieve token");
+	QVERIFY2(tokenPtr.IsValid(), "Failed to retrieve token");
 	
 	QDateTime initialLastUsed = tokenPtr->GetLastUsedAt();
 	
@@ -231,7 +231,7 @@ void CPersonalAccessTokenTest::testUpdateLastUsedAt()
 	
 	// Get the token again and verify timestamp changed
 	tokenPtr = m_tokenManagerPtr->GetToken(result.tokenId);
-	QVERIFY2(tokenPtr != nullptr, "Failed to retrieve token after update");
+	QVERIFY2(tokenPtr.IsValid(), "Failed to retrieve token after update");
 	
 	QDateTime newLastUsed = tokenPtr->GetLastUsedAt();
 	QVERIFY2(newLastUsed.isValid(), "Last used timestamp should be valid");
@@ -263,7 +263,7 @@ void CPersonalAccessTokenTest::testDeleteToken()
 	
 	// Verify token exists
 	imtauth::IPersonalAccessTokenSharedPtr tokenPtr = m_tokenManagerPtr->GetToken(result.tokenId);
-	QVERIFY2(tokenPtr != nullptr, "Token should exist before deletion");
+	QVERIFY2(tokenPtr.IsValid(), "Token should exist before deletion");
 	
 	// Verify token is in user's token list
 	QByteArrayList tokenIds = m_tokenManagerPtr->GetTokenIds(userId);
@@ -275,7 +275,7 @@ void CPersonalAccessTokenTest::testDeleteToken()
 	
 	// Verify token no longer exists
 	tokenPtr = m_tokenManagerPtr->GetToken(result.tokenId);
-	QVERIFY2(tokenPtr == nullptr, "Token should not exist after deletion");
+	QVERIFY2(!tokenPtr.IsValid(), "Token should not exist after deletion");
 	
 	// Verify token is no longer in user's token list
 	tokenIds = m_tokenManagerPtr->GetTokenIds(userId);
