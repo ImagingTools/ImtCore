@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtCore/QDebug>
+#include <QtCore/QThread>
 
 
 namespace imtauthtest
@@ -160,7 +161,137 @@ void CPersonalAccessTokenTest::testTokenExpiration()
 }
 
 
+void CPersonalAccessTokenTest::testGetTokenIds()
+{
+	QVERIFY2(m_tokenManagerPtr != nullptr, "Token manager not initialized");
+	
+	// Create multiple tokens for the same user
+	QByteArray userId = "test_user_multi";
+	QString name1 = "Token 1";
+	QString name2 = "Token 2";
+	QString name3 = "Token 3";
+	QByteArrayList scopes;
+	scopes << "read:api";
+	
+	imtauth::IPersonalAccessTokenManager::TokenCreationResult result1 = 
+		m_tokenManagerPtr->CreateToken(userId, name1, "", scopes, QDateTime());
+	imtauth::IPersonalAccessTokenManager::TokenCreationResult result2 = 
+		m_tokenManagerPtr->CreateToken(userId, name2, "", scopes, QDateTime());
+	imtauth::IPersonalAccessTokenManager::TokenCreationResult result3 = 
+		m_tokenManagerPtr->CreateToken(userId, name3, "", scopes, QDateTime());
+	
+	QVERIFY2(result1.success, "Failed to create token 1");
+	QVERIFY2(result2.success, "Failed to create token 2");
+	QVERIFY2(result3.success, "Failed to create token 3");
+	
+	// Get all token IDs for this user
+	QByteArrayList tokenIds = m_tokenManagerPtr->GetTokenIds(userId);
+	
+	// Should have at least 3 tokens (may have more from previous tests)
+	QVERIFY2(tokenIds.size() >= 3, "Should have at least 3 tokens for user");
+	
+	// Verify that all three token IDs are in the list
+	QVERIFY2(tokenIds.contains(result1.tokenId), "Token 1 ID should be in the list");
+	QVERIFY2(tokenIds.contains(result2.tokenId), "Token 2 ID should be in the list");
+	QVERIFY2(tokenIds.contains(result3.tokenId), "Token 3 ID should be in the list");
+	
+	// Test with a user that has no tokens
+	QByteArrayList emptyList = m_tokenManagerPtr->GetTokenIds("nonexistent_user");
+	QVERIFY2(emptyList.isEmpty(), "Nonexistent user should have no tokens");
+}
+
+
+void CPersonalAccessTokenTest::testUpdateLastUsedAt()
+{
+	QVERIFY2(m_tokenManagerPtr != nullptr, "Token manager not initialized");
+	
+	// Create a token
+	QByteArray userId = "test_user_lastused";
+	QString name = "Last Used Test Token";
+	QByteArrayList scopes;
+	scopes << "read:api";
+	
+	imtauth::IPersonalAccessTokenManager::TokenCreationResult result = 
+		m_tokenManagerPtr->CreateToken(userId, name, "", scopes, QDateTime());
+	
+	QVERIFY2(result.success, "Failed to create token for last used test");
+	
+	// Get the initial token
+	imtauth::IPersonalAccessTokenSharedPtr tokenPtr = m_tokenManagerPtr->GetToken(result.tokenId);
+	QVERIFY2(tokenPtr != nullptr, "Failed to retrieve token");
+	
+	QDateTime initialLastUsed = tokenPtr->GetLastUsedAt();
+	
+	// Wait a bit to ensure timestamp will be different
+	QThread::msleep(100);
+	
+	// Update the last used timestamp
+	bool updated = m_tokenManagerPtr->UpdateLastUsedAt(result.tokenId);
+	QVERIFY2(updated, "Failed to update last used timestamp");
+	
+	// Get the token again and verify timestamp changed
+	tokenPtr = m_tokenManagerPtr->GetToken(result.tokenId);
+	QVERIFY2(tokenPtr != nullptr, "Failed to retrieve token after update");
+	
+	QDateTime newLastUsed = tokenPtr->GetLastUsedAt();
+	QVERIFY2(newLastUsed.isValid(), "Last used timestamp should be valid");
+	
+	if (initialLastUsed.isValid()) {
+		QVERIFY2(newLastUsed > initialLastUsed, "Last used timestamp should be updated");
+	}
+	
+	// Test updating nonexistent token
+	bool shouldFail = m_tokenManagerPtr->UpdateLastUsedAt("nonexistent_token_id");
+	QVERIFY2(!shouldFail, "Updating nonexistent token should fail");
+}
+
+
+void CPersonalAccessTokenTest::testDeleteToken()
+{
+	QVERIFY2(m_tokenManagerPtr != nullptr, "Token manager not initialized");
+	
+	// Create a token
+	QByteArray userId = "test_user_delete";
+	QString name = "Delete Test Token";
+	QByteArrayList scopes;
+	scopes << "read:api";
+	
+	imtauth::IPersonalAccessTokenManager::TokenCreationResult result = 
+		m_tokenManagerPtr->CreateToken(userId, name, "", scopes, QDateTime());
+	
+	QVERIFY2(result.success, "Failed to create token for delete test");
+	
+	// Verify token exists
+	imtauth::IPersonalAccessTokenSharedPtr tokenPtr = m_tokenManagerPtr->GetToken(result.tokenId);
+	QVERIFY2(tokenPtr != nullptr, "Token should exist before deletion");
+	
+	// Verify token is in user's token list
+	QByteArrayList tokenIds = m_tokenManagerPtr->GetTokenIds(userId);
+	QVERIFY2(tokenIds.contains(result.tokenId), "Token should be in user's token list");
+	
+	// Delete the token
+	bool deleted = m_tokenManagerPtr->DeleteToken(result.tokenId);
+	QVERIFY2(deleted, "Failed to delete token");
+	
+	// Verify token no longer exists
+	tokenPtr = m_tokenManagerPtr->GetToken(result.tokenId);
+	QVERIFY2(tokenPtr == nullptr, "Token should not exist after deletion");
+	
+	// Verify token is no longer in user's token list
+	tokenIds = m_tokenManagerPtr->GetTokenIds(userId);
+	QVERIFY2(!tokenIds.contains(result.tokenId), "Token should not be in user's token list after deletion");
+	
+	// Verify token cannot be validated
+	QByteArray validatedUserId;
+	QByteArrayList validatedScopes;
+	bool shouldBeInvalid = m_tokenManagerPtr->ValidateToken(result.rawToken, validatedUserId, validatedScopes);
+	QVERIFY2(!shouldBeInvalid, "Deleted token should not be valid");
+	
+	// Test deleting nonexistent token
+	bool shouldFail = m_tokenManagerPtr->DeleteToken("nonexistent_token_id");
+	QVERIFY2(!shouldFail, "Deleting nonexistent token should fail");
+}
+
+
 } // namespace imtauthtest
 
-
-QTEST_MAIN(imtauthtest::CPersonalAccessTokenTest)

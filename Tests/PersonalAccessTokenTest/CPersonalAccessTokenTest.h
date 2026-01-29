@@ -32,6 +32,9 @@ private slots:
 	void testTokenValidation();
 	void testTokenRevocation();
 	void testTokenExpiration();
+	void testGetTokenIds();
+	void testUpdateLastUsedAt();
+	void testDeleteToken();
 
 private:
 	QString m_imtCorePath;
