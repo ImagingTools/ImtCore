@@ -4,7 +4,6 @@ import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtauthgui 1.0
 import imtcontrols 1.0
-import imtguigql 1.0
 import imtbaseImtBaseTypesSdl 1.0
 import imtauthPersonalAccessTokensSdl 1.0
 import imtbaseImtCollectionSdl 1.0
@@ -21,8 +20,8 @@ ParamEditorBase {
 
 	property PersonalAccessTokenList personalAccessTokenList: editorModel
 
-	// Controller for PAT operations - GQL-based implementation
-	property GqlBasedPatTokenController patTokenController: GqlBasedPatTokenController {
+	// Controller for PAT operations - injected, protocol-agnostic
+	property PatTokenController patTokenController: PatTokenController {
 		onTokenListReceived: {
 			patTokenEditor.personalAccessTokenList = tokenList
 		}

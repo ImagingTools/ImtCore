@@ -2,6 +2,7 @@ import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
+import imtguigql 1.0
 import imtbaseImtBaseTypesSdl 1.0
 
 QtObject {
@@ -29,7 +30,11 @@ QtObject {
 	property Component constrainedDoubleParamEditorComp: Component { ConstrainedDoubleParamEditor{}}
 	property Component enableableParamEditorComp: Component { EnableableParamEditor {}}
 	property Component serverConnectionParamEditorComp: Component { ServerConnectionParamEditor {}}
-	property Component patTokenParamEditorComp: Component { PatTokenParamEditor {}}
+	property Component patTokenParamEditorComp: Component { 
+		PatTokenParamEditor {
+			patTokenController: GqlBasedPatTokenController {}
+		}
+	}
 	
 	Component.onCompleted: {
 		registerParamEditor(ParamTypeIdsTypeMetaInfo.s_textParam, textParamEditorComp)
