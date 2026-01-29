@@ -4,7 +4,6 @@ import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtauthgui 1.0
 import imtcontrols 1.0
-import imtguigql 1.0
 import imtbaseImtBaseTypesSdl 1.0
 import imtauthPersonalAccessTokensSdl 1.0
 import imtbaseImtCollectionSdl 1.0
@@ -21,110 +20,60 @@ ParamEditorBase {
 
 	property PersonalAccessTokenList personalAccessTokenList: editorModel
 
-	function addNewToken(name, description, scopes, expiresAt){
-		createTokenInput.m_userId = AuthorizationController.getUserId()
-		createTokenInput.m_name = name
-		createTokenInput.m_description = description
-		createTokenInput.m_scopes = scopes
-		createTokenInput.m_expiresAt = expiresAt
+	// Provider for PAT operations - abstracts protocol implementation
+	property PatTokenProvider patTokenProvider: PatTokenProvider {
+		onTokenListReceived: function(tokenList) {
+			patTokenEditor.personalAccessTokenList = tokenList
+		}
+		
+		onTokenCreated: function(success, message, token) {
+			if (success) {
+				ModalDialogManager.openDialog(tokenCreatedDialogComp, {"token": token})
+				patTokenEditor.getTokenList()
+			} else {
+				ModalDialogManager.showErrorDialog(message)
+			}
+		}
+		
+		onTokenDeleted: function(success, message) {
+			if (success) {
+				ModalDialogManager.showInfoDialog(message)
+				patTokenEditor.getTokenList()
+			} else {
+				ModalDialogManager.showErrorDialog(message)
+			}
+		}
+		
+		onTokenRevoked: function(success, message) {
+			if (success) {
+				ModalDialogManager.showInfoDialog(message)
+				patTokenEditor.getTokenList()
+			} else {
+				ModalDialogManager.showErrorDialog(message)
+			}
+		}
+	}
 
-		createTokenRequest.send(createTokenInput)
+	function addNewToken(name, description, scopes, expiresAt){
+		patTokenProvider.createToken(
+			AuthorizationController.getUserId(),
+			name,
+			description,
+			scopes,
+			expiresAt
+		)
 	}
 
 	function deleteToken(tokenId){
-		inputId.m_id = tokenId
-		deleteTokenRequest.send(inputId)
+		patTokenProvider.deleteToken(tokenId)
 	}
 
 	function revokeToken(tokenId){
-		inputId.m_id = tokenId
-		revokeTokenRequest.send(inputId)
+		patTokenProvider.revokeToken(tokenId)
 	}
 
 	function getTokenList(){
-		userIdInput.m_userId = AuthorizationController.getUserId()
-		getTokenListRequest.send(userIdInput)
-	}
-
-	CreateTokenInput {
-		id: createTokenInput
-	}
-
-	InputId {
-		id: inputId
-	}
-
-	UserIdInput {
-		id: userIdInput
-	}
-	
-	GqlSdlRequestSender {
-		id: getTokenListRequest
-		gqlCommandId: ImtauthPersonalAccessTokensSdlCommandIds.s_getTokenList
-		sdlObjectComp: Component {
-			PersonalAccessTokenList {
-				onFinished: {
-					patTokenEditor.personalAccessTokenList = this
-				}
-			}
-		}
-	}
-	
-	GqlSdlRequestSender {
-		id: createTokenRequest
-		gqlCommandId: ImtauthPersonalAccessTokensSdlCommandIds.s_createToken
-		requestType: 1
-		sdlObjectComp: Component {
-			CreateTokenPayload {
-				onFinished: {
-					if (m_success){
-						ModalDialogManager.openDialog(tokenCreatedDialogComp, {"token":m_token})
-						patTokenEditor.getTokenList()
-					}
-					else{
-						ModalDialogManager.showErrorDialog(m_message)
-					}
-				}
-			}
-		}
-	}
-
-	GqlSdlRequestSender {
-		id: deleteTokenRequest
-		gqlCommandId: ImtauthPersonalAccessTokensSdlCommandIds.s_deleteToken
-		requestType: 1
-		sdlObjectComp: Component {
-			DeleteTokenPayload {
-				onFinished: {
-					if (m_success){
-						ModalDialogManager.showInfoDialog(m_message)
-						patTokenEditor.getTokenList()
-					}
-					else{
-						ModalDialogManager.showErrorDialog(m_message)
-					}
-				}
-			}
-		}
-	}
-
-	GqlSdlRequestSender {
-		id: revokeTokenRequest
-		gqlCommandId: ImtauthPersonalAccessTokensSdlCommandIds.s_revokeToken
-		requestType: 1
-		sdlObjectComp: Component {
-			RevokeTokenPayload {
-				onFinished: {
-					if (m_success){
-						ModalDialogManager.showInfoDialog(m_message)
-						patTokenEditor.getTokenList()
-					}
-					else{
-						ModalDialogManager.showErrorDialog(m_message)
-					}
-				}
-			}
-		}
+		patTokenProvider.getTokenList(AuthorizationController.getUserId())
 	}
 
 	Component.onCompleted: {

@@ -12,6 +12,7 @@
         <file alias="imtauthgui/UserManagementProvider.qml">UserManagementProvider.qml</file>
         <file alias="imtauthgui/UserPanel.qml">UserPanel.qml</file>
         <file alias="imtauthgui/UserTokenProvider.qml">UserTokenProvider.qml</file>
+        <file alias="imtauthgui/PatTokenProvider.qml">PatTokenProvider.qml</file>
         <file alias="imtauthgui/RoleCollectionViewCommandsDelegate.qml">RoleCollectionViewCommandsDelegate.qml</file>
         <file alias="imtauthgui/RoleCollectionView.qml">RoleCollectionView.qml</file>
         <file alias="imtauthgui/RoleView.qml">RoleView.qml</file>
