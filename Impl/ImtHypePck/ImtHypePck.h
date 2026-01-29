@@ -19,7 +19,6 @@
 #include <imthype/CJobTicket.h>
 #include <imthype/CJobTicketComp.h>
 #include <imthype/CJobTicketMetaInfoCreatorComp.h>
-#include <imthype/CJobTicketDatabaseDelegateComp.h>
 
 
 /**
@@ -47,7 +46,6 @@ typedef icomp::TModelCompWrap<
 						istd::IChangeable>> JobTicketInfo;
 typedef icomp::TModelCompWrap<imthype::CJobTicketComp> JobTicket;
 typedef imthype::CJobTicketMetaInfoCreatorComp JobTicketMetaInfoCreator;
-typedef imthype::CJobTicketDatabaseDelegateComp JobTicketDatabaseDelegate;
 
 
 } // namespace ImtHypePck

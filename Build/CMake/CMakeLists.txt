@@ -153,6 +153,8 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 	add_subdirectory("${INCLUDE_DIR}/imtservice/CMake" "${AUX_INCLUDE_DIR}/imtservice")
 	add_subdirectory("${INCLUDE_DIR}/imtserverapp/CMake" "${AUX_INCLUDE_DIR}/imtserverapp")
 	add_dependencies(imtserverapp imtbasesdl)
+	add_subdirectory("${INCLUDE_DIR}/imthype/CMake" "${AUX_INCLUDE_DIR}/imthype")
+	add_subdirectory("${INCLUDE_DIR}/imthypegui/CMake" "${AUX_INCLUDE_DIR}/imthypegui")
 
 	if(NOT DEFINED USE_GEO OR USE_GEO)
 		add_subdirectory("${INCLUDE_DIR}/imtgeo/CMake" "${AUX_INCLUDE_DIR}/imtgeo")
@@ -181,9 +183,7 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 		add_subdirectory("${INCLUDE_DIR}/imtdbgui/CMake" "${AUX_INCLUDE_DIR}/imtdbgui")
 		add_subdirectory("${INCLUDE_DIR}/imtlicdb/CMake" "${AUX_INCLUDE_DIR}/imtlicdb")
 		add_subdirectory("${INCLUDE_DIR}/imtdbgql/CMake" "${AUX_INCLUDE_DIR}/imtdbgql")
-		add_subdirectory("${INCLUDE_DIR}/imthype/CMake" "${AUX_INCLUDE_DIR}/imthype")
 		add_subdirectory("${INCLUDE_DIR}/imthypedb/CMake" "${AUX_INCLUDE_DIR}/imthypedb")
-		add_subdirectory("${INCLUDE_DIR}/imthypegui/CMake" "${AUX_INCLUDE_DIR}/imthypegui")
 	endif()
 
 	if(DEFINED USE_MDBX AND USE_MDBX)
@@ -301,6 +301,9 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 		add_subdirectory("${IMPL_DIR}/ImtServerAppPck/CMake" "${AUX_INCLUDE_DIR}/ImtServerAppPck")
 		add_dependencies(ImtServerAppPck imtserverapp)
 
+		add_subdirectory("${IMPL_DIR}/ImtHypePck/CMake" "${AUX_INCLUDE_DIR}/ImtHypePck")
+		add_dependencies(ImtHypePck imthype)
+
 		add_subdirectory("${IMPL_DIR}/ImtHypeGuiPck/CMake" "${AUX_INCLUDE_DIR}/ImtHypeGuiPck")
 		add_dependencies(ImtHypeGuiPck imthypegui imthype)
 
@@ -337,9 +340,6 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 
 			add_subdirectory("${IMPL_DIR}/ImtGuiGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtGuiGqlPck")
 			add_dependencies(ImtGuiGqlPck imtguigql imtdb)
-
-			add_subdirectory("${IMPL_DIR}/ImtHypePck/CMake" "${AUX_INCLUDE_DIR}/ImtHypePck")
-			add_dependencies(ImtHypePck imthype)
 
 			add_subdirectory("${IMPL_DIR}/ImtHypeDbPck/CMake" "${AUX_INCLUDE_DIR}/ImtHypeDbPck")
 			add_dependencies(ImtHypeDbPck imthypedb imtdb imthype)
