@@ -326,36 +326,36 @@ macro(getImtBaseQmlWebDirs webdirs buildwebdir useImtControlsStyle)
 		set(useImtControlsStyle TRUE)
 	endif()
 
-	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/3rdParty/JQML2/core/dist)
+	list(APPEND ${webdirs} ${IMTCOREDIR}/3rdParty/JQML2/core/dist)
 	list(APPEND ${webdirs} ${buildwebdir}/Resources)
 
-	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/Include/imtstylecontrolsqml/Qml/Fonts)
+	list(APPEND ${webdirs} ${IMTCOREDIR}/Include/imtstylecontrolsqml/Qml/Fonts)
 	list(APPEND ${webdirs} ${buildwebdir}/Resources)
 
 	if (useImtControlsStyle)
-		list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/Include/imtstylecontrolsqml/Qml/Acf)
+		list(APPEND ${webdirs} ${IMTCOREDIR}/Include/imtstylecontrolsqml/Qml/Acf)
 		list(APPEND ${webdirs} ${buildwebdir}/src/Acf)
 	endif()
 
-	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/Qml/web)
+	list(APPEND ${webdirs} ${IMTCOREDIR}/Qml/web)
 	list(APPEND ${webdirs} ${buildwebdir}/Resources)
 
-	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/Qml/imtgui)
+	list(APPEND ${webdirs} ${IMTCOREDIR}/Qml/imtgui)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtgui)
 
-	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/Qml/imtguigql)
+	list(APPEND ${webdirs} ${IMTCOREDIR}/Qml/imtguigql)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtguigql)
 
-	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/Qml/imtcolgui)
+	list(APPEND ${webdirs} ${IMTCOREDIR}/Qml/imtcolgui)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtcolgui)
 
-	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/Qml/imtdocgui)
+	list(APPEND ${webdirs} ${IMTCOREDIR}/Qml/imtdocgui)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtdocgui)
 
-	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/Qml/imtcontrols)
+	list(APPEND ${webdirs} ${IMTCOREDIR}/Qml/imtcontrols)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtcontrols)
 
-	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/Impl/ImtCoreLoc/Translations)
+	list(APPEND ${webdirs} ${IMTCOREDIR}/Impl/ImtCoreLoc/Translations)
 	list(APPEND ${webdirs} ${buildwebdir}/Resources/Translations)
 
 	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseComplexCollectionFilterSdl)
@@ -388,15 +388,36 @@ macro(getImtBaseQmlWebDirs webdirs buildwebdir useImtControlsStyle)
 	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseCollectionDocumentManagerSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtbaseCollectionDocumentManagerSdl)
 
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseCollectionImportSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtbaseCollectionImportSdl)
+
 	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseUndoManagerSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtbaseUndoManagerSdl)
 	
 	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseDocumentIdFilterSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtbaseDocumentIdFilterSdl)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseMimeTypeSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtbaseMimeTypeSdl)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseProgressManagerSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtbaseProgressManagerSdl)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imt2dsdl/SDL/1.0/QML/imt2dGeometrySdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imt2dGeometrySdl)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imt2dsdl/SDL/1.0/QML/imt2dPaintSystemSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imt2dPaintSystemSdl)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtcolorsdl/SDL/1.0/QML/imtcolorRgbColorHexSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtcolorRgbColorHexSdl)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtcolorsdl/SDL/1.0/QML/imtcolorLabSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtcolorLabSdl)
 endmacro(getImtBaseQmlWebDirs)
 
 macro(getImtLicQmlWebDirs webdirs buildwebdir)
-	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/Qml/imtlicgui)
+	list(APPEND ${webdirs} ${IMTCOREDIR}/Qml/imtlicgui)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtlicgui)
 
 	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtlicsdl/SDL/1.0/QML/imtlicFeaturesSdl)
@@ -410,7 +431,7 @@ macro(getImtLicQmlWebDirs webdirs buildwebdir)
 endmacro(getImtLicQmlWebDirs)
 
 macro(getImtAuthQmlWebDirs webdirs buildwebdir)
-	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/Qml/imtauthgui)
+	list(APPEND ${webdirs} ${IMTCOREDIR}/Qml/imtauthgui)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthgui)
 
 	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthGroupsSdl)
