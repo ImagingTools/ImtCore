@@ -29,7 +29,7 @@ Rectangle {
 	property alias loadPageByClick: pagesManager.loadByClick;
 	property bool canRecoveryPassword: true;
 
-	property GqlBasedSettingsController settingsController: GqlBasedSettingsController {}
+	property SettingsController settingsController: SettingsController {}
 	
 	Component.onCompleted: {
 		Events.subscribeEvent("StartLoading", thumbnailDecoratorContainer.startLoading);
