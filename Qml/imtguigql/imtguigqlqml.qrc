@@ -25,6 +25,7 @@
         <file alias="imtguigql/GqlSdlRequestSender.qml">GqlSdlRequestSender.qml</file>
         <file alias="imtguigql/XmlHttpRequestProxy.qml">XmlHttpRequestProxy.qml</file>
         <file alias="imtguigql/GqlBasedCommandsController.qml">GqlBasedCommandsController.qml</file>
+        <file alias="imtguigql/GqlBasedPatTokenController.qml">GqlBasedPatTokenController.qml</file>
         <file alias="imtguigql/GqlBasedCollectionDataController.qml">GqlBasedCollectionDataController.qml</file>
         <file alias="imtguigql/GqlBasedObjectVisualStatusProvider.qml">GqlBasedObjectVisualStatusProvider.qml</file>
         <file alias="imtguigql/GqlBasedDataModelProvider.qml">GqlBasedDataModelProvider.qml</file>

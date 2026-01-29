@@ -4,6 +4,7 @@ import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtauthgui 1.0
 import imtcontrols 1.0
+import imtguigql 1.0
 import imtbaseImtBaseTypesSdl 1.0
 import imtauthPersonalAccessTokensSdl 1.0
 import imtbaseImtCollectionSdl 1.0
@@ -20,8 +21,8 @@ ParamEditorBase {
 
 	property PersonalAccessTokenList personalAccessTokenList: editorModel
 
-	// Provider for PAT operations - abstracts protocol implementation
-	property PatTokenProvider patTokenProvider: PatTokenProvider {
+	// Controller for PAT operations - GQL-based implementation
+	property GqlBasedPatTokenController patTokenController: GqlBasedPatTokenController {
 		onTokenListReceived: function(tokenList) {
 			patTokenEditor.personalAccessTokenList = tokenList
 		}
@@ -55,7 +56,7 @@ ParamEditorBase {
 	}
 
 	function addNewToken(name, description, scopes, expiresAt){
-		patTokenProvider.createToken(
+		patTokenController.createToken(
 			AuthorizationController.getUserId(),
 			name,
 			description,
@@ -65,15 +66,15 @@ ParamEditorBase {
 	}
 
 	function deleteToken(tokenId){
-		patTokenProvider.deleteToken(tokenId)
+		patTokenController.deleteToken(tokenId)
 	}
 
 	function revokeToken(tokenId){
-		patTokenProvider.revokeToken(tokenId)
+		patTokenController.revokeToken(tokenId)
 	}
 
 	function getTokenList(){
-		patTokenProvider.getTokenList(AuthorizationController.getUserId())
+		patTokenController.getTokenList(AuthorizationController.getUserId())
 	}
 
 	Component.onCompleted: {

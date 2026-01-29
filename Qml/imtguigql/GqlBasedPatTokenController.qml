@@ -2,32 +2,26 @@ import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
+import imtauthgui 1.0
 import imtguigql 1.0
 import imtbaseImtBaseTypesSdl 1.0
 import imtauthPersonalAccessTokensSdl 1.0
 
 
 /**
-	Provider for Personal Access Token operations.
+	GraphQL-based implementation of PatTokenController.
 	
-	This component abstracts the protocol-specific implementation (GraphQL)
-	from the UI layer. The editor uses only the public interface (signals and functions)
-	without knowing about the underlying transport protocol.
-	
-	Benefits:
-	- Protocol independence: can switch from GraphQL to REST/gRPC without changing the editor
-	- Testability: can mock the provider for testing
-	- Single responsibility: protocol logic separated from UI logic
-	- Reusability: can be used by multiple components
+	This controller encapsulates all GraphQL-specific logic for managing
+	personal access tokens. It inherits from PatTokenController and implements
+	its functions using GqlSdlRequestSender components.
 */
-QtObject {
+PatTokenController {
 	id: root
 	
-	// Signals for communicating results back to consumers
-	signal tokenListReceived(var tokenList)
-	signal tokenCreated(bool success, string message, string token)
-	signal tokenDeleted(bool success, string message)
-	signal tokenRevoked(bool success, string message)
+	// HTTP headers
+	function getHeaders(){
+		return {}
+	}
 	
 	// Input objects for GraphQL requests
 	property CreateTokenInput createTokenInput: CreateTokenInput {}
@@ -35,29 +29,13 @@ QtObject {
 	property InputId revokeInputId: InputId {}
 	property UserIdInput userIdInput: UserIdInput {}
 	
-	/**
-		Get list of tokens for the current user.
-		
-		Result is returned via tokenListReceived signal.
-		
-		\param userId The user ID to get tokens for
-	*/
+	// Override: Get token list
 	function getTokenList(userId) {
 		userIdInput.m_userId = userId
 		getTokenListRequest.send(userIdInput)
 	}
 	
-	/**
-		Create a new token.
-		
-		Result is returned via tokenCreated signal.
-		
-		\param userId User ID who owns the token
-		\param name Token name
-		\param description Token description
-		\param scopes List of permission scopes
-		\param expiresAt Expiration date in ISO format (empty string for no expiration)
-	*/
+	// Override: Create token
 	function createToken(userId, name, description, scopes, expiresAt) {
 		createTokenInput.m_userId = userId
 		createTokenInput.m_name = name
@@ -68,32 +46,19 @@ QtObject {
 		createTokenRequest.send(createTokenInput)
 	}
 	
-	/**
-		Delete a token permanently.
-		
-		Result is returned via tokenDeleted signal.
-		
-		\param tokenId Token ID to delete
-	*/
+	// Override: Delete token
 	function deleteToken(tokenId) {
 		deleteInputId.m_id = tokenId
 		deleteTokenRequest.send(deleteInputId)
 	}
 	
-	/**
-		Revoke a token (mark as invalid but keep for audit).
-		
-		Result is returned via tokenRevoked signal.
-		
-		\param tokenId Token ID to revoke
-	*/
+	// Override: Revoke token
 	function revokeToken(tokenId) {
 		revokeInputId.m_id = tokenId
 		revokeTokenRequest.send(revokeInputId)
 	}
 	
-	// Internal GraphQL request handlers
-	// These can be replaced with different protocol implementations
+	// GraphQL request handlers
 	
 	property GqlSdlRequestSender getTokenListRequest: GqlSdlRequestSender {
 		gqlCommandId: ImtauthPersonalAccessTokensSdlCommandIds.s_getTokenList
@@ -103,6 +68,10 @@ QtObject {
 					root.tokenListReceived(this)
 				}
 			}
+		}
+		
+		function getHeaders(){
+			return root.getHeaders()
 		}
 	}
 	
@@ -116,6 +85,10 @@ QtObject {
 				}
 			}
 		}
+		
+		function getHeaders(){
+			return root.getHeaders()
+		}
 	}
 	
 	property GqlSdlRequestSender deleteTokenRequest: GqlSdlRequestSender {
@@ -128,6 +101,10 @@ QtObject {
 				}
 			}
 		}
+		
+		function getHeaders(){
+			return root.getHeaders()
+		}
 	}
 	
 	property GqlSdlRequestSender revokeTokenRequest: GqlSdlRequestSender {
@@ -139,6 +116,10 @@ QtObject {
 					root.tokenRevoked(m_success, m_message)
 				}
 			}
+		}
+		
+		function getHeaders(){
+			return root.getHeaders()
 		}
 	}
 }
