@@ -22,9 +22,6 @@
             <PositionMap>
                 <Element ComponentName="DatabaseUserSettings" X="600" Y="275" Note=""/>
                 <Element ComponentName="Demultiplexer" X="1025" Y="50" Note=""/>
-                <Element ComponentName="PersonalAccessToken" X="550" Y="700" Note=""/>
-                <Element ComponentName="PersonalAccessTokenController" X="325" Y="550" Note=""/>
-                <Element ComponentName="PersonalAccessTokenManager" X="750" Y="550" Note=""/>
                 <Element ComponentName="SettingsController" X="625" Y="25" Note=""/>
                 <Element ComponentName="TableViewParamController" X="975" Y="250" Note=""/>
                 <Element ComponentName="UserSettings" X="125" Y="75" Note=""/>

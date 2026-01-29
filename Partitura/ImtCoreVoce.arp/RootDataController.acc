@@ -210,7 +210,6 @@
                                         <Values>
                                             <Value>TableViewParamController</Value>
                                             <Value>SettingsController</Value>
-                                            <Value>PersonalAccessTokenController</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -219,47 +218,6 @@
                                 </AttributeInfo>
                                 <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                                     <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
-                    <Element Id="PersonalAccessToken" PackageId="ImtAuthPck" ComponentId="PersonalAccessToken">
-                        <Data IsEnabled="true" Flags="2">
-                            <AttributeInfoMap/>
-                        </Data>
-                    </Element>
-                    <Element Id="PersonalAccessTokenController" PackageId="ImtAuthGqlPck" ComponentId="PersonalAccessTokenController">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="PersonalAccessTokenManager" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="PersonalAccessTokenManager"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="TokenFactory" Type="Factory" ExportId="">
-                                    <Data IsEnabled="true" Value="PersonalAccessToken"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
-                    <Element Id="PersonalAccessTokenManager" PackageId="ImtAuthPck" ComponentId="PersonalAccessTokenManager">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="TokenCollection" Type="Reference" ExportId="PersonalAccessTokenCollection">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="TokenFactory" Type="Factory" ExportId="">
-                                    <Data IsEnabled="true" Value="PersonalAccessToken"/>
                                 </AttributeInfo>
                             </AttributeInfoMap>
                         </Data>
@@ -357,6 +315,7 @@
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="Demultiplexer"/>
     </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="PersonalAccessTokenManager" ComponentId="PersonalAccessTokenController/PersonalAccessTokenManager"/>
         <Component ExportedId="UserSettingsRepository" ComponentId="UserSettings/UserSettingsRepository"/>
     </ExportedComponents>
 </Acf>

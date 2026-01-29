@@ -80,6 +80,7 @@ IPersonalAccessTokenManager::TokenCreationResult CPersonalAccessTokenManagerComp
 bool CPersonalAccessTokenManagerComp::ValidateToken(
 			const QByteArray& rawToken,
 			QByteArray& userId,
+			QByteArray& tokenId,
 			QByteArrayList& scopes) const
 {
 	if (!m_tokenCollectionCompPtr.IsValid()){
@@ -92,9 +93,9 @@ bool CPersonalAccessTokenManagerComp::ValidateToken(
 
 	// Find token by hash
 	imtbase::ICollectionInfo::Ids tokenIds = m_tokenCollectionCompPtr->GetElementIds();
-	for (const QByteArray& tokenId : tokenIds){
+	for (const QByteArray& currentTokenId : std::as_const(tokenIds)){
 		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (!m_tokenCollectionCompPtr->GetObjectData(tokenId, dataPtr)){
+		if (!m_tokenCollectionCompPtr->GetObjectData(currentTokenId, dataPtr)){
 			continue;
 		}
 
@@ -121,12 +122,13 @@ bool CPersonalAccessTokenManagerComp::ValidateToken(
 
 		// Check if token is valid
 		if (!tokenPtr->IsValid()){
-			SendWarningMessage(0, QString("Token '%1' is not valid (revoked or expired)").arg(QString::fromUtf8(tokenId)), "CPersonalAccessTokenManagerComp");
+			SendWarningMessage(0, QString("Token '%1' is not valid (revoked or expired)").arg(QString::fromUtf8(currentTokenId)), "CPersonalAccessTokenManagerComp");
 			return false;
 		}
 
 		// Token is valid
 		userId = tokenPtr->GetUserId();
+		tokenId = tokenPtr->GetId();
 		scopes = tokenPtr->GetScopes();
 
 		return true;

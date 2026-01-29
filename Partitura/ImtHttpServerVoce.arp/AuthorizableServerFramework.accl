@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5436" Description="ACF"/>
-            <Version Id="1" Number="2254" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395266" Description="Qt Framework"/>
+            <Version Id="0" Number="5715" Description="ACF"/>
+            <Version Id="1" Number="2274" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
@@ -12,6 +12,7 @@
         <Element ComponentName="Demultiplexer" X="600" Y="475" Note=""/>
         <Element ComponentName="HttpServerFramework" X="150" Y="100" Note=""/>
         <Element ComponentName="IdentifiableProductInfo" X="1000" Y="600" Note=""/>
+        <Element ComponentName="PersonalAccessTokenController" X="575" Y="601.414213562" Note=""/>
         <Element ComponentName="PumaClientEngine" X="1000" Y="475" Note=""/>
         <Element ComponentName="SlaveSubscriberController" X="975" Y="50" Note=""/>
         <Element ComponentName="UserActionController" X="275" Y="275" Note=""/>

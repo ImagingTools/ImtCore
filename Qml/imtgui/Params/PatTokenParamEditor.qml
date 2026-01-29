@@ -267,11 +267,11 @@ ParamEditorBase {
 								onReused: {
 									if (rowIndex >= 0){
 										let value = getValue()
-										if (value){
+										if (value && value !== ""){
 											timeTextFromISO.text = value.slice(0, 10)
 										}
 										else{
-											timeTextFromISO.text = ""
+											timeTextFromISO.text = qsTr("No Expiration")
 										}
 									}
 								}
@@ -357,7 +357,7 @@ ParamEditorBase {
 					
 					onFinished: {
 						if (buttonId === Enums.apply){
-							patTokenEditor.addNewToken(tokenName.trim(), tokenDescription, ["Test"], expiresAt)
+							patTokenEditor.addNewToken(tokenName.trim(), tokenDescription, [], expiresAt)
 						}
 					}
 					

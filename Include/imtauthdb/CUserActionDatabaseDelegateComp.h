@@ -27,9 +27,6 @@ protected:
 	virtual void OnComponentCreated() override;
 
 private:
-	virtual bool TableExists(const QString& tableName) const;
-
-private:
 	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
 };
 

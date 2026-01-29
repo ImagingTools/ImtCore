@@ -64,10 +64,11 @@ public:
 
 		\param rawToken Plain text token value to validate
 		\param[out] userId User ID associated with the token (if valid)
+		\param[out] tokenId Token ID associated with the token (if valid)
 		\param[out] scopes Permission scopes granted to the token (if valid)
 		\return True if token is valid, false if invalid, revoked, or expired
 	*/
-	virtual bool ValidateToken(const QByteArray& rawToken, QByteArray& userId, QByteArrayList& scopes) const = 0;
+	virtual bool ValidateToken(const QByteArray& rawToken, QByteArray& userId, QByteArray& tokenId, QByteArrayList& scopes) const = 0;
 
 	/**
 		Get list of token IDs for a specific user.

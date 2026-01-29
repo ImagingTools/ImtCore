@@ -178,8 +178,7 @@ void CPersonalAccessToken::SetRevoked(bool revoked)
 
 bool CPersonalAccessToken::IsExpired() const
 {
-	if (!m_expiresAt.isValid())
-	{
+	if (!m_expiresAt.isValid()){
 		return false;  // No expiration set means never expires
 	}
 	
