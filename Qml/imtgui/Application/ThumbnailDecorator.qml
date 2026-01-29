@@ -29,14 +29,7 @@ Rectangle {
 	property alias loadPageByClick: pagesManager.loadByClick;
 	property bool canRecoveryPassword: true;
 
-	property SettingsController settingsController: SettingsController {
-		// Override patTokenParamEditorComp to inject GqlBasedPatTokenController
-		patTokenParamEditorComp: Component { 
-			PatTokenParamEditor {
-				patTokenController: GqlBasedPatTokenController {}
-			}
-		}
-	}
+	property GqlBasedSettingsController settingsController: GqlBasedSettingsController {}
 	
 	Component.onCompleted: {
 		Events.subscribeEvent("StartLoading", thumbnailDecoratorContainer.startLoading);
