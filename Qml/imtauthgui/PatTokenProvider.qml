@@ -28,11 +28,11 @@ QtObject {
 	signal tokenCreated(bool success, string message, string token)
 	signal tokenDeleted(bool success, string message)
 	signal tokenRevoked(bool success, string message)
-	signal errorOccurred(string message)
 	
 	// Input objects for GraphQL requests
 	property CreateTokenInput createTokenInput: CreateTokenInput {}
-	property InputId inputId: InputId {}
+	property InputId deleteInputId: InputId {}
+	property InputId revokeInputId: InputId {}
 	property UserIdInput userIdInput: UserIdInput {}
 	
 	/**
@@ -76,8 +76,8 @@ QtObject {
 		\param tokenId Token ID to delete
 	*/
 	function deleteToken(tokenId) {
-		inputId.m_id = tokenId
-		deleteTokenRequest.send(inputId)
+		deleteInputId.m_id = tokenId
+		deleteTokenRequest.send(deleteInputId)
 	}
 	
 	/**
@@ -88,8 +88,8 @@ QtObject {
 		\param tokenId Token ID to revoke
 	*/
 	function revokeToken(tokenId) {
-		inputId.m_id = tokenId
-		revokeTokenRequest.send(inputId)
+		revokeInputId.m_id = tokenId
+		revokeTokenRequest.send(revokeInputId)
 	}
 	
 	// Internal GraphQL request handlers

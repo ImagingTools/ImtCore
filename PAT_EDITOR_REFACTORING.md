@@ -51,7 +51,6 @@ The provider exposes a clean interface:
 - `tokenCreated(bool success, string message, string token)` - Token created
 - `tokenDeleted(bool success, string message)` - Token deleted
 - `tokenRevoked(bool success, string message)` - Token revoked
-- `errorOccurred(string message)` - Error occurred
 
 **Functions** (for operations):
 - `getTokenList(userId)` - Fetch user's tokens

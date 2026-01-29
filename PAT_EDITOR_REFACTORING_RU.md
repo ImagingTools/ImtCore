@@ -52,7 +52,6 @@
 - `tokenCreated(bool success, string message, string token)` - Токен создан
 - `tokenDeleted(bool success, string message)` - Токен удален
 - `tokenRevoked(bool success, string message)` - Токен отозван
-- `errorOccurred(string message)` - Произошла ошибка
 
 **Функции** (для операций):
 - `getTokenList(userId)` - Получить токены пользователя
