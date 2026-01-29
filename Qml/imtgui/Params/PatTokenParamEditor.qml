@@ -23,11 +23,11 @@ ParamEditorBase {
 
 	// Controller for PAT operations - GQL-based implementation
 	property GqlBasedPatTokenController patTokenController: GqlBasedPatTokenController {
-		onTokenListReceived: function(tokenList) {
+		onTokenListReceived: {
 			patTokenEditor.personalAccessTokenList = tokenList
 		}
 		
-		onTokenCreated: function(success, message, token) {
+		onTokenCreated: {
 			if (success) {
 				ModalDialogManager.openDialog(tokenCreatedDialogComp, {"token": token})
 				patTokenEditor.getTokenList()
@@ -36,7 +36,7 @@ ParamEditorBase {
 			}
 		}
 		
-		onTokenDeleted: function(success, message) {
+		onTokenDeleted: {
 			if (success) {
 				ModalDialogManager.showInfoDialog(message)
 				patTokenEditor.getTokenList()
@@ -45,7 +45,7 @@ ParamEditorBase {
 			}
 		}
 		
-		onTokenRevoked: function(success, message) {
+		onTokenRevoked: {
 			if (success) {
 				ModalDialogManager.showInfoDialog(message)
 				patTokenEditor.getTokenList()
