@@ -83,6 +83,11 @@ private:
 	void OnPumaConnectionStatusUpdate(const istd::IChangeable::ChangeSet& changeSet, const imtcom::IConnectionStatusProvider* objectPtr);
 	void UpdateLoginButtonsState();
 	void CheckMatchingPassword();
+	
+	// Helper methods for refresh token management
+	bool TryRestoreSessionWithRefreshToken(const QString& userName, const QByteArray& refreshToken);
+	void SaveRefreshTokenIfRememberMe(QSettings& settings) const;
+	void ClearRefreshTokenIfNeeded(QSettings& settings) const;
 
 private:
 	class LoginLog: public ilog::IMessageConsumer

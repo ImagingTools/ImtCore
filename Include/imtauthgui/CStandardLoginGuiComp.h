@@ -84,6 +84,11 @@ private:
 	void UpdateLoginButtonsState();
 	void CheckMatchingPassword();
 	void ShowLoadingPage();
+	
+	// Helper methods for refresh token management
+	bool TryRestoreSessionWithRefreshToken(const QString& userName, const QByteArray& refreshToken);
+	void SaveRefreshTokenIfRememberMe(QSettings& settings) const;
+	void ClearRefreshTokenIfNeeded(QSettings& settings) const;
 
 private:
 	class LoginLog: public ilog::IMessageConsumer

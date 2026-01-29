@@ -25,6 +25,30 @@ QtObject {
 	signal changePasswordFailed();
 	signal registerSuccessfully();
 	signal registerFailed();
+
+	// Properties to store remember me state and credentials
+	property bool rememberMe: false
+	property string lastUser: ""
+	property string storedRefreshToken: ""
+	
+	// Platform-aware settings storage
+	property PlatformSettings loginSettings: PlatformSettings {
+		category: "Login"
+		rememberMe: root.rememberMe
+		lastUser: root.lastUser
+		storedRefreshToken: root.storedRefreshToken
+		
+		Component.onCompleted: {
+			// Load initial values from storage
+			root.rememberMe = rememberMe;
+			root.lastUser = lastUser;
+			root.storedRefreshToken = storedRefreshToken;
+		}
+		
+		onRememberMeChanged: root.rememberMe = rememberMe
+		onLastUserChanged: root.lastUser = lastUser
+		onStoredRefreshTokenChanged: root.storedRefreshToken = storedRefreshToken
+	}
 	
 	property XmlHttpRequestProxy requestProxy: XmlHttpRequestProxy {
 		onForbidden: {
@@ -59,6 +83,7 @@ QtObject {
 		onResult: {
 			if (status === "EXISTS"){
 				if (Qt.platform.os === "web"){
+					// For web, also check localStorage for existing session tokens
 					let token = localStorage.getItem("accessToken");
 					let refreshToken = localStorage.getItem("refreshToken");
 					if (token && token !== ""){
@@ -72,6 +97,13 @@ QtObject {
 					
 					AuthorizationController.removeDataFromStorage();
 				}
+				
+				// For both platforms, settings are loaded automatically via PlatformSettings
+				// Try to restore session with refresh token if available
+				if (root.rememberMe && root.storedRefreshToken !== "" && root.lastUser !== "") {
+					root.loginWithRefreshToken(root.lastUser, root.storedRefreshToken);
+					return;
+				}
 			}
 			
 			root.superuserExistResult(status, error)
@@ -84,6 +116,10 @@ QtObject {
 			console.log("UserTokenProvider onAccepted")
 			if (Qt.platform.os == "web"){
 				root.saveDataToStorage();
+			}
+			else {
+				// For non-web platforms, save refresh token if "Remember me" is enabled
+				root.saveRefreshTokenIfRememberMe();
 			}
 			
 			if (isTokenGlobal){
@@ -129,6 +165,40 @@ QtObject {
 		localStorage.removeItem("permissions");
 	}
 
+	function saveRefreshTokenIfRememberMe(){
+		if (root.rememberMe) {
+			root.storedRefreshToken = userTokenProvider.refreshToken;
+			root.lastUser = userTokenProvider.login;
+			
+			if (Qt.platform.os === "web"){
+				// For web, also save to the legacy localStorage for session tokens
+				saveDataToStorage();
+			}
+			// PlatformSettings handles persistence automatically for both platforms
+		}
+		else {
+			clearRefreshToken();
+		}
+	}
+
+	function clearRefreshToken(){
+		root.storedRefreshToken = "";
+		root.lastUser = "";
+		root.rememberMe = false;
+		
+		if (Qt.platform.os === "web"){
+			// For web, clear from legacy localStorage
+			localStorage.removeItem("refreshToken");
+		}
+		// PlatformSettings handles persistence automatically for both platforms
+	}
+
+	function loginWithRefreshToken(userName, refreshToken){
+		refreshTokenForLoginGqlSender.userName = userName;
+		refreshTokenForLoginGqlSender.refreshToken = refreshToken;
+		refreshTokenForLoginGqlSender.send();
+	}
+
 	function updateSuperuserModel(){
 		superuserProvider.superuserExists();
 	}
@@ -171,6 +241,9 @@ QtObject {
 		if (Qt.platform.os === "web"){
 			removeDataFromStorage();
 		}
+		
+		// Clear rememberMe state via PlatformSettings
+		clearRefreshToken();
 		
 		loggedOut();
 	}
@@ -308,6 +381,46 @@ QtObject {
 							XMLHttpRequest.QMLAuthRefreshToken = m_userSession.m_refreshToken
 							root.saveDataToStorage()
 						}
+					}
+				}
+			}
+		}
+	}
+
+	property GqlSdlRequestSender refreshTokenForLoginGqlSender: GqlSdlRequestSender {
+		requestType: 1;
+		gqlCommandId: ImtauthSessionsSdlCommandIds.s_refreshToken;
+		
+		property string userName: ""
+		property string refreshToken: ""
+		
+		inputObjectComp: Component {
+			RefreshTokenInput {
+				m_refreshToken: refreshTokenForLoginGqlSender.refreshToken;
+			}
+		}
+		
+		sdlObjectComp: Component {
+			RefreshTokenPayload {
+				onFinished: {
+					if (m_ok && m_userSession){
+						// Successfully restored session with refresh token
+						root.userTokenProvider.accessToken = m_userSession.m_accessToken;
+						root.userTokenProvider.refreshToken = m_userSession.m_refreshToken;
+						root.userTokenProvider.userId = m_userSession.m_userId;
+						root.userTokenProvider.login = refreshTokenForLoginGqlSender.userName;
+						
+						root.setAccessToken(m_userSession.m_accessToken);
+						root.setRefreshToken(m_userSession.m_refreshToken);
+						
+						// Save updated refresh token
+						root.saveRefreshTokenIfRememberMe();
+						
+						root.loggedIn();
+					}
+					else {
+						// Refresh token login failed, clear stored token
+						root.clearRefreshToken();
 					}
 				}
 			}

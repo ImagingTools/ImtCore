@@ -24,6 +24,15 @@ Rectangle {
 	signal login(string login, string password)
 	signal registerUser(var userData)
 
+	property alias rememberMe: rememberMeCheckBox.checked
+
+	// Sync rememberMe with AuthorizationController
+	Binding {
+		target: AuthorizationController
+		property: "rememberMe"
+		value: authPageContainer.rememberMe
+	}
+
 	Component.onCompleted: {
 		decoratorPause.start();
 	}
@@ -43,9 +52,16 @@ Rectangle {
 			authPageContainer.state = "unauthorized";
 
 			passwordTextInput.text = "";
-			loginTextInput.text = "";
-
-			loginTextInput.forceActiveFocus()
+			
+			// Restore username from AuthorizationController if "Remember me" is checked
+			if (authPageContainer.rememberMe && AuthorizationController.lastUser !== "") {
+				loginTextInput.text = AuthorizationController.lastUser;
+				passwordTextInput.forceActiveFocus();
+			}
+			else {
+				loginTextInput.text = "";
+				loginTextInput.forceActiveFocus();
+			}
 		}
 	}
 
@@ -338,6 +354,23 @@ Rectangle {
 					onClicked: {
 						authPageContainer.passwordRecovery();
 					}
+				}
+			}
+
+			Item{
+				id: rememberMeItem;
+
+				width: parent.width;
+				height: rememberMeCheckBox.height;
+
+				CheckBox {
+					id: rememberMeCheckBox;
+					objectName: "RememberMeCheckBox"
+
+					text: qsTr("Remember me");
+
+					font.family: Style.fontFamily;
+					font.pixelSize: Style.fontSizeM;
 				}
 			}
 
