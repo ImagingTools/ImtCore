@@ -236,9 +236,11 @@ class TextInput extends Item {
     }
 
     cut(){
+        if(this.getPropertyValue('readOnly')) return
+        
         const start = this.$input.selectionStart
         const end = this.$input.selectionEnd
-        if(start !== end){
+        if(start !== end && navigator.clipboard){
             const selectedText = this.$input.value.substring(start, end)
             navigator.clipboard.writeText(selectedText).then(() => {
                 const newText = this.$input.value.substring(0, start) + this.$input.value.substring(end)
@@ -254,7 +256,7 @@ class TextInput extends Item {
     copy(){
         const start = this.$input.selectionStart
         const end = this.$input.selectionEnd
-        if(start !== end){
+        if(start !== end && navigator.clipboard){
             const selectedText = this.$input.value.substring(start, end)
             navigator.clipboard.writeText(selectedText).catch(err => {
                 console.error('Failed to copy text:', err)
@@ -263,26 +265,25 @@ class TextInput extends Item {
     }
 
     paste(){
-        if(!this.getPropertyValue('readOnly')){
+        if(!this.getPropertyValue('readOnly') && navigator.clipboard){
             navigator.clipboard.readText().then(clipboardText => {
                 const start = this.$input.selectionStart
                 const end = this.$input.selectionEnd
                 const currentText = this.$input.value
                 const newText = currentText.substring(0, start) + clipboardText + currentText.substring(end)
                 
+                // Check validator if present
                 if(this.getPropertyValue('validator')){
-                    if(this.getPropertyValue('validator').hasPartialMatch(newText)){
-                        this.getProperty('text').reset(newText)
-                        const newCursorPos = start + clipboardText.length
-                        this.$input.setSelectionRange(newCursorPos, newCursorPos)
-                        this.$updateSelection()
+                    if(!this.getPropertyValue('validator').hasPartialMatch(newText)){
+                        return // Don't paste if validation fails
                     }
-                } else {
-                    this.getProperty('text').reset(newText)
-                    const newCursorPos = start + clipboardText.length
-                    this.$input.setSelectionRange(newCursorPos, newCursorPos)
-                    this.$updateSelection()
                 }
+                
+                // Update text and cursor position
+                this.getProperty('text').reset(newText)
+                const newCursorPos = start + clipboardText.length
+                this.$input.setSelectionRange(newCursorPos, newCursorPos)
+                this.$updateSelection()
             }).catch(err => {
                 console.error('Failed to paste text:', err)
             })
@@ -290,7 +291,9 @@ class TextInput extends Item {
     }
 
     clear(){
-        this.getProperty('text').reset('')
+        if(!this.getPropertyValue('readOnly')){
+            this.getProperty('text').reset('')
+        }
     }
 
     redo(){

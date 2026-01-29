@@ -92,9 +92,11 @@ class TextEdit extends Item {
     }
 
     cut(){
+        if(this.getPropertyValue('readOnly')) return
+        
         const start = this.$input.selectionStart
         const end = this.$input.selectionEnd
-        if(start !== end){
+        if(start !== end && navigator.clipboard){
             const selectedText = this.$input.value.substring(start, end)
             navigator.clipboard.writeText(selectedText).then(() => {
                 const newText = this.$input.value.substring(0, start) + this.$input.value.substring(end)
@@ -110,7 +112,7 @@ class TextEdit extends Item {
     copy(){
         const start = this.$input.selectionStart
         const end = this.$input.selectionEnd
-        if(start !== end){
+        if(start !== end && navigator.clipboard){
             const selectedText = this.$input.value.substring(start, end)
             navigator.clipboard.writeText(selectedText).catch(err => {
                 console.error('Failed to copy text:', err)
@@ -119,7 +121,7 @@ class TextEdit extends Item {
     }
 
     paste(){
-        if(!this.getPropertyValue('readOnly')){
+        if(!this.getPropertyValue('readOnly') && navigator.clipboard){
             navigator.clipboard.readText().then(clipboardText => {
                 const start = this.$input.selectionStart
                 const end = this.$input.selectionEnd
@@ -136,7 +138,9 @@ class TextEdit extends Item {
     }
 
     clear(){
-        this.getProperty('text').reset('')
+        if(!this.getPropertyValue('readOnly')){
+            this.getProperty('text').reset('')
+        }
     }
 
     redo(){
