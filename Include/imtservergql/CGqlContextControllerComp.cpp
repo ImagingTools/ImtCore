@@ -30,7 +30,7 @@ imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(
 	QByteArray userObjectId;
 	
 	// Extract user ID based on token prefix: pat_ for PAT tokens, otherwise JWT
-	if (token.startsWith("pat_")){
+	if (token.startsWith("pat_") && token.size() > 4){
 		// PAT token - validate with PAT manager to extract userId
 		if (m_patManagerCompPtr.IsValid()){
 			QByteArrayList scopes;
