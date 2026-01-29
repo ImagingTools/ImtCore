@@ -65,6 +65,10 @@ bool CBitmapMetaInfoCreatorComp::CreateMetaInfo(
 		metaInfoPtr->SetMetaInfo(IBitmapMetaInfo::MIT_BITMAP_FORMAT, QObject::tr("Float"));
 		metaInfoPtr->SetMetaInfo(IBitmapMetaInfo::MIT_COLOR_SPACE_TYPE, QObject::tr("Unknown"));
 		break;
+	default:
+		metaInfoPtr->SetMetaInfo(IBitmapMetaInfo::MIT_BITMAP_FORMAT, QObject::tr("Unknown"));
+		metaInfoPtr->SetMetaInfo(IBitmapMetaInfo::MIT_COLOR_SPACE_TYPE, QObject::tr("Unknown"));
+		break;
 	}
 
 	return true;

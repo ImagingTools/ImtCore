@@ -32,9 +32,6 @@ bool CLogFilterComp::IsMessageSupported(
 	default:
 		return false;
 	}
-
-	I_CRITICAL();
-	return true;
 }
 
 
