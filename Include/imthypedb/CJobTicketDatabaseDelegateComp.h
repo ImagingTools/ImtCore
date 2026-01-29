@@ -6,7 +6,7 @@
 #include <imthype/IJobTicket.h>
 
 
-namespace imthype
+namespace imthypedb
 {
 
 
@@ -60,6 +60,6 @@ private:
 };
 
 
-} // namespace imthype
+} // namespace imthypedb
 
 

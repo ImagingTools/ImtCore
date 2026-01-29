@@ -1,5 +1,5 @@
 #include "imthype/IJobOutput.h"
-#include <imthype/CJobTicketDatabaseDelegateComp.h>
+#include <imthypedb/CJobTicketDatabaseDelegateComp.h>
 
 
 // ACF includes
@@ -7,7 +7,7 @@
 #include <iser/CJsonMemWriteArchive.h>
 
 
-namespace imthype
+namespace imthypedb
 {
 
 
@@ -351,6 +351,6 @@ QByteArray CJobTicketDatabaseDelegateComp::CreateDescriptionObjectQuery(
 }
 
 
-} // namespace imthype
+} // namespace imthypedb
 
 

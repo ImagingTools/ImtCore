@@ -182,6 +182,7 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 		add_subdirectory("${INCLUDE_DIR}/imtlicdb/CMake" "${AUX_INCLUDE_DIR}/imtlicdb")
 		add_subdirectory("${INCLUDE_DIR}/imtdbgql/CMake" "${AUX_INCLUDE_DIR}/imtdbgql")
 		add_subdirectory("${INCLUDE_DIR}/imthype/CMake" "${AUX_INCLUDE_DIR}/imthype")
+		add_subdirectory("${INCLUDE_DIR}/imthypedb/CMake" "${AUX_INCLUDE_DIR}/imthypedb")
 		add_subdirectory("${INCLUDE_DIR}/imthypegui/CMake" "${AUX_INCLUDE_DIR}/imthypegui")
 	endif()
 
@@ -338,7 +339,10 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 			add_dependencies(ImtGuiGqlPck imtguigql imtdb)
 
 			add_subdirectory("${IMPL_DIR}/ImtHypePck/CMake" "${AUX_INCLUDE_DIR}/ImtHypePck")
-			add_dependencies(ImtHypePck imthype imtdb)
+			add_dependencies(ImtHypePck imthype)
+
+			add_subdirectory("${IMPL_DIR}/ImtHypeDbPck/CMake" "${AUX_INCLUDE_DIR}/ImtHypeDbPck")
+			add_dependencies(ImtHypeDbPck imthypedb imtdb imthype)
 		endif()
 
 		if(NOT DEFINED USE_QT3D OR USE_QT3D)
