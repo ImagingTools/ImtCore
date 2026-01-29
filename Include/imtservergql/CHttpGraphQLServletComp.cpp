@@ -73,14 +73,38 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 
 	QByteArray accessToken = headers.value(QByteArrayLiteral("x-authentication-token"));
 
-	if (!accessToken.isEmpty() && m_jwtSessionControllerCompPtr.IsValid()){
-		using JwtState = imtauth::IJwtSessionController::JwtState;
-		JwtState state = m_jwtSessionControllerCompPtr->ValidateJwt(accessToken);
-		if (state == JwtState::JS_EXPIRED){
-			return CreateResponse(StatusCode::SC_UNAUTHORIZED, QByteArray(), request);
+	// Validate token based on prefix: pat_ for PAT tokens, otherwise JWT
+	if (!accessToken.isEmpty()){
+		// Check if token starts with "pat_" prefix and has content beyond the prefix
+		if (accessToken.size() > 4 && accessToken.startsWith("pat_")){
+			// PAT token - validate with PAT manager
+			if (m_patManagerCompPtr.IsValid()){
+				QByteArray userId;
+				QByteArrayList scopes;
+				if (!m_patManagerCompPtr->ValidateToken(accessToken, userId, scopes)){
+					return CreateResponse(StatusCode::SC_FORBIDDEN, QByteArray(), request);
+				}
+				// PAT validation successful, continue processing
+			}
+			else{
+				return CreateResponse(StatusCode::SC_FORBIDDEN, QByteArray(), request);
+			}
 		}
-		if (state == JwtState::JS_INVALID){
-			return CreateResponse(StatusCode::SC_FORBIDDEN, QByteArray(), request);
+		else{
+			// JWT token - validate with JWT controller
+			if (m_jwtSessionControllerCompPtr.IsValid()){
+				using JwtState = imtauth::IJwtSessionController::JwtState;
+				JwtState state = m_jwtSessionControllerCompPtr->ValidateJwt(accessToken);
+				if (state == JwtState::JS_EXPIRED){
+					return CreateResponse(StatusCode::SC_UNAUTHORIZED, QByteArray(), request);
+				}
+				else if (state == JwtState::JS_INVALID){
+					return CreateResponse(StatusCode::SC_FORBIDDEN, QByteArray(), request);
+				}
+				// JWT validation successful (JS_OK), continue processing
+			}
+			// If JWT controller not configured, allow the token through
+			// and let GetRequestContext handle validation
 		}
 	}
 
