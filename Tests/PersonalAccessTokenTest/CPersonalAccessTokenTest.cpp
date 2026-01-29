@@ -79,16 +79,17 @@ void CPersonalAccessTokenTest::testTokenValidation()
 	
 	// Validate the token
 	QByteArray validatedUserId;
+	QByteArray validatedTokenId;
 	QByteArrayList validatedScopes;
 	
-	bool isValid = m_tokenManagerPtr->ValidateToken(result.rawToken, validatedUserId, validatedScopes);
+	bool isValid = m_tokenManagerPtr->ValidateToken(result.rawToken, validatedUserId, validatedTokenId, validatedScopes);
 	QVERIFY2(isValid, "Token validation failed");
 	QCOMPARE(validatedUserId, userId);
 	QCOMPARE(validatedScopes, scopes);
 	
 	// Test with invalid token
 	QByteArray invalidToken = "imt_pat_invalid_token_12345";
-	bool shouldBeFalse = m_tokenManagerPtr->ValidateToken(invalidToken, validatedUserId, validatedScopes);
+	bool shouldBeFalse = m_tokenManagerPtr->ValidateToken(invalidToken, validatedUserId, validatedTokenId, validatedScopes);
 	QVERIFY2(!shouldBeFalse, "Invalid token was validated as valid");
 }
 
@@ -110,9 +111,10 @@ void CPersonalAccessTokenTest::testTokenRevocation()
 	
 	// Verify token is valid
 	QByteArray validatedUserId;
+	QByteArray validatedTokenId;
 	QByteArrayList validatedScopes;
 	
-	bool isValid = m_tokenManagerPtr->ValidateToken(result.rawToken, validatedUserId, validatedScopes);
+	bool isValid = m_tokenManagerPtr->ValidateToken(result.rawToken, validatedUserId, validatedTokenId, validatedScopes);
 	QVERIFY2(isValid, "Token should be valid before revocation");
 	
 	// Revoke the token
@@ -120,7 +122,7 @@ void CPersonalAccessTokenTest::testTokenRevocation()
 	QVERIFY2(revoked, "Failed to revoke token");
 	
 	// Verify token is no longer valid
-	bool shouldBeInvalid = m_tokenManagerPtr->ValidateToken(result.rawToken, validatedUserId, validatedScopes);
+	bool shouldBeInvalid = m_tokenManagerPtr->ValidateToken(result.rawToken, validatedUserId, validatedTokenId, validatedScopes);
 	QVERIFY2(!shouldBeInvalid, "Revoked token should not be valid");
 }
 
@@ -143,9 +145,10 @@ void CPersonalAccessTokenTest::testTokenExpiration()
 	
 	// Verify token is not valid (expired)
 	QByteArray validatedUserId;
+	QByteArray validatedTokenId;
 	QByteArrayList validatedScopes;
 	
-	bool shouldBeExpired = m_tokenManagerPtr->ValidateToken(result.rawToken, validatedUserId, validatedScopes);
+	bool shouldBeExpired = m_tokenManagerPtr->ValidateToken(result.rawToken, validatedUserId, validatedTokenId, validatedScopes);
 	QVERIFY2(!shouldBeExpired, "Expired token should not be valid");
 	
 	// Create a token that hasn't expired yet
@@ -156,7 +159,7 @@ void CPersonalAccessTokenTest::testTokenExpiration()
 	QVERIFY2(validResult.success, "Failed to create non-expired token");
 	
 	// Verify this token is valid
-	bool isValid = m_tokenManagerPtr->ValidateToken(validResult.rawToken, validatedUserId, validatedScopes);
+	bool isValid = m_tokenManagerPtr->ValidateToken(validResult.rawToken, validatedUserId, validatedTokenId, validatedScopes);
 	QVERIFY2(isValid, "Non-expired token should be valid");
 }
 
@@ -283,8 +286,9 @@ void CPersonalAccessTokenTest::testDeleteToken()
 	
 	// Verify token cannot be validated
 	QByteArray validatedUserId;
+	QByteArray validatedTokenId;
 	QByteArrayList validatedScopes;
-	bool shouldBeInvalid = m_tokenManagerPtr->ValidateToken(result.rawToken, validatedUserId, validatedScopes);
+	bool shouldBeInvalid = m_tokenManagerPtr->ValidateToken(result.rawToken, validatedUserId, validatedTokenId, validatedScopes);
 	QVERIFY2(!shouldBeInvalid, "Deleted token should not be valid");
 	
 	// Test deleting nonexistent token
