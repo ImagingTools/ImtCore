@@ -73,13 +73,19 @@ istd::IChangeableUniquePtr CPersonalAccessTokenDatabaseDelegateComp::CreateObjec
 	}
 
 	if (record.contains("CreatedAt")){
-		const QDateTime createdAt = QDateTime::fromString(record.value("CreatedAt").toString(), Qt::ISODate);
+		QDateTime createdAt = QDateTime::fromString(record.value("CreatedAt").toString(), Qt::ISODate);
+		// Ensure the datetime is properly converted to UTC when read from database
+		if (createdAt.isValid()){
+			createdAt = createdAt.toUTC();
+		}
 		tokenPtr->SetCreatedAt(createdAt);
 	}
 
 	if (record.contains("LastUsedAt")){
 		QDateTime lastUsedAt = record.value("LastUsedAt").toDateTime();
 		if (lastUsedAt.isValid()){
+			// Ensure the datetime is properly converted to UTC when read from database
+			lastUsedAt = lastUsedAt.toUTC();
 			tokenPtr->SetLastUsedAt(lastUsedAt);
 		}
 	}
@@ -87,6 +93,8 @@ istd::IChangeableUniquePtr CPersonalAccessTokenDatabaseDelegateComp::CreateObjec
 	if (record.contains("ExpiresAt")) {
 		QDateTime expiresAt = record.value("ExpiresAt").toDateTime();
 		if (expiresAt.isValid()){
+			// Ensure the datetime is properly converted to UTC when read from database
+			expiresAt = expiresAt.toUTC();
 			tokenPtr->SetExpiresAt(expiresAt);
 		}
 	}

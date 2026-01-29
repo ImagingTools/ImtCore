@@ -20,17 +20,20 @@ static sdl::imtauth::PersonalAccessTokens::CPersonalAccessToken::V1_0 ConvertToS
 
 	QDateTime createdAt = token.GetCreatedAt();
 	if (createdAt.isValid()){
-		sdlToken.createdAt = createdAt.toString(Qt::ISODate);
+		// Convert datetime to UTC before converting to string
+		sdlToken.createdAt = createdAt.toUTC().toString(Qt::ISODate);
 	}
 
 	QDateTime lastUsedAt = token.GetLastUsedAt();
 	if (lastUsedAt.isValid()){
-		sdlToken.lastUsedAt = lastUsedAt.toString(Qt::ISODate);
+		// Convert datetime to UTC before converting to string
+		sdlToken.lastUsedAt = lastUsedAt.toUTC().toString(Qt::ISODate);
 	}
 
 	QDateTime expiresAt = token.GetExpiresAt();
 	if (expiresAt.isValid()){
-		sdlToken.expiresAt = expiresAt.toString(Qt::ISODate);
+		// Convert datetime to UTC before converting to string
+		sdlToken.expiresAt = expiresAt.toUTC().toString(Qt::ISODate);
 	}
 	else{
 		sdlToken.expiresAt = QString();
@@ -255,6 +258,10 @@ sdl::imtauth::PersonalAccessTokens::CCreateTokenPayload CPersonalAccessTokenCont
 		QString expiresAtStr = *inputArgument.expiresAt;
 		if (!expiresAtStr.isEmpty()){
 			expiresAt = QDateTime::fromString(expiresAtStr, Qt::ISODate);
+			// Ensure the datetime is properly converted to UTC
+			if (expiresAt.isValid()){
+				expiresAt = expiresAt.toUTC();
+			}
 		}
 	}
 

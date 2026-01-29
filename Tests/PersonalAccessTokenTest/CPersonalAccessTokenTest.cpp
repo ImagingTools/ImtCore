@@ -43,7 +43,7 @@ void CPersonalAccessTokenTest::testTokenCreation()
 	QString description = "A test token for unit testing";
 	QByteArrayList scopes;
 	scopes << "read:users" << "write:data";
-	QDateTime expiresAt = QDateTime::currentDateTime().addDays(30);
+	QDateTime expiresAt = QDateTime::currentDateTimeUtc().addDays(30);
 	
 	imtauth::IPersonalAccessTokenManager::TokenCreationResult result = 
 		m_tokenManagerPtr->CreateToken(userId, name, description, scopes, expiresAt);
@@ -133,7 +133,7 @@ void CPersonalAccessTokenTest::testTokenExpiration()
 	QString name = "Expired Token";
 	QByteArrayList scopes;
 	scopes << "read:api";
-	QDateTime expiresAt = QDateTime::currentDateTime().addSecs(-3600); // Expired 1 hour ago
+	QDateTime expiresAt = QDateTime::currentDateTimeUtc().addSecs(-3600); // Expired 1 hour ago
 	
 	imtauth::IPersonalAccessTokenManager::TokenCreationResult result = 
 		m_tokenManagerPtr->CreateToken(userId, name, "", scopes, expiresAt);
@@ -148,7 +148,7 @@ void CPersonalAccessTokenTest::testTokenExpiration()
 	QVERIFY2(!shouldBeExpired, "Expired token should not be valid");
 	
 	// Create a token that hasn't expired yet
-	QDateTime futureExpiry = QDateTime::currentDateTime().addDays(7);
+	QDateTime futureExpiry = QDateTime::currentDateTimeUtc().addDays(7);
 	imtauth::IPersonalAccessTokenManager::TokenCreationResult validResult = 
 		m_tokenManagerPtr->CreateToken(userId, "Valid Token", "", scopes, futureExpiry);
 	

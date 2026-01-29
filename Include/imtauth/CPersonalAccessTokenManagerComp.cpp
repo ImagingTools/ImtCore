@@ -55,7 +55,7 @@ IPersonalAccessTokenManager::TokenCreationResult CPersonalAccessTokenManagerComp
 	tokenPtr->SetDescription(description);
 	tokenPtr->SetTokenHash(tokenHash);
 	tokenPtr->SetScopes(scopes);
-	tokenPtr->SetCreatedAt(QDateTime::currentDateTime());
+	tokenPtr->SetCreatedAt(QDateTime::currentDateTimeUtc());
 	tokenPtr->SetExpiresAt(expiresAt);
 	tokenPtr->SetRevoked(false);
 
@@ -246,7 +246,7 @@ bool CPersonalAccessTokenManagerComp::UpdateLastUsedAt(const QByteArray& tokenId
 		return false;
 	}
 
-	tokenPtr->SetLastUsedAt(QDateTime::currentDateTime());
+	tokenPtr->SetLastUsedAt(QDateTime::currentDateTimeUtc());
 
 	return m_tokenCollectionCompPtr->SetObjectData(tokenId, *tokenPtr);
 }
