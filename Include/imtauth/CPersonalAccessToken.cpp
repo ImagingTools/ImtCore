@@ -182,7 +182,7 @@ bool CPersonalAccessToken::IsExpired() const
 		return false;  // No expiration set means never expires
 	}
 	
-	return QDateTime::currentDateTime() > m_expiresAt;
+	return QDateTime::currentDateTimeUtc() > m_expiresAt;
 }
 
 

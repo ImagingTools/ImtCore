@@ -97,37 +97,37 @@ public:
 	
 	/**
 		Get timestamp when the token was created.
-		\return Creation timestamp
+		\return Creation timestamp in UTC
 	*/
 	virtual QDateTime GetCreatedAt() const = 0;
 	
 	/**
 		Set timestamp when the token was created.
-		\param createdAt Creation timestamp to set
+		\param createdAt Creation timestamp in UTC to set
 	*/
 	virtual void SetCreatedAt(const QDateTime& createdAt) = 0;
 	
 	/**
 		Get timestamp when the token was last used.
-		\return Last used timestamp, or invalid QDateTime if never used
+		\return Last used timestamp in UTC, or invalid QDateTime if never used
 	*/
 	virtual QDateTime GetLastUsedAt() const = 0;
 	
 	/**
 		Set timestamp when the token was last used.
-		\param lastUsedAt Last used timestamp to set
+		\param lastUsedAt Last used timestamp in UTC to set
 	*/
 	virtual void SetLastUsedAt(const QDateTime& lastUsedAt) = 0;
 	
 	/**
 		Get timestamp when the token expires.
-		\return Expiration timestamp, or invalid QDateTime if no expiration
+		\return Expiration timestamp in UTC, or invalid QDateTime if no expiration
 	*/
 	virtual QDateTime GetExpiresAt() const = 0;
 	
 	/**
 		Set timestamp when the token expires.
-		\param expiresAt Expiration timestamp to set, or invalid QDateTime for no expiration
+		\param expiresAt Expiration timestamp in UTC to set, or invalid QDateTime for no expiration
 	*/
 	virtual void SetExpiresAt(const QDateTime& expiresAt) = 0;
 	

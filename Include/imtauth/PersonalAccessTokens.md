@@ -9,9 +9,10 @@ The Personal Access Token (PAT) management system provides secure, long-lived AP
 - **Secure Token Generation**: Tokens are generated using cryptographically secure random data
 - **Token Hashing**: Tokens are stored as SHA-256 hashes for security
 - **Scoped Permissions**: Each token can have specific permission scopes
-- **Expiration Support**: Tokens can have optional expiration dates
+- **Expiration Support**: Tokens can have optional expiration dates (in UTC)
 - **Revocation**: Tokens can be revoked at any time
 - **Last Used Tracking**: The system tracks when each token was last used
+- **UTC Timestamps**: All datetime operations use UTC to ensure consistency across timezones
 
 ## Architecture
 
@@ -150,7 +151,7 @@ QString name = "My API Token";
 QString description = "Token for automated scripts";
 QByteArrayList scopes;
 scopes << "read:api" << "write:data";
-QDateTime expiresAt = QDateTime::currentDateTime().addDays(90);
+QDateTime expiresAt = QDateTime::currentDateTimeUtc().addDays(90);
 
 auto result = tokenManager->CreateToken(
     userId, name, description, scopes, expiresAt);
@@ -195,6 +196,7 @@ tokenManager->DeleteToken(tokenId);
 - Expired tokens are automatically rejected
 - Revoked tokens are immediately invalidated
 - Token validation is constant-time to prevent timing attacks
+- All datetime comparisons use UTC to ensure consistency
 
 ## Database Schema
 
