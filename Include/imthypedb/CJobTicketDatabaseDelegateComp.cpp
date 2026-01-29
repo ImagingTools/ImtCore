@@ -1,5 +1,5 @@
 #include "imthype/IJobOutput.h"
-#include <imthype/CJobTicketDatabaseDelegateComp.h>
+#include <imthypedb/CJobTicketDatabaseDelegateComp.h>
 
 
 // ACF includes
@@ -7,7 +7,7 @@
 #include <iser/CJsonMemWriteArchive.h>
 
 
-namespace imthype
+namespace imthypedb
 {
 
 
@@ -73,7 +73,7 @@ istd::IChangeableUniquePtr CJobTicketDatabaseDelegateComp::CreateObjectFromRecor
 
 	if (record.contains("ProcessingStatus")){
 		int status = record.value("ProcessingStatus").toInt();
-		jobTicketPtr->SetProcessingStatus(static_cast<IJobQueueManager::ProcessingStatus>(status));
+		jobTicketPtr->SetProcessingStatus(static_cast<imthype::IJobQueueManager::ProcessingStatus>(status));
 	}
 
 	// Deserialize Params from JSON
@@ -96,7 +96,7 @@ istd::IChangeableUniquePtr CJobTicketDatabaseDelegateComp::CreateObjectFromRecor
 	if (record.contains("Results")){
 		QByteArray resultsData = record.value("Results").toByteArray();
 		if (!resultsData.isEmpty()){
-			const IJobOutput* resultsPtr = jobTicketPtr->GetResults();
+			const imthype::IJobOutput* resultsPtr = jobTicketPtr->GetResults();
 			if (resultsPtr != nullptr){
 				iser::ISerializable* serializablePtr = const_cast<iser::ISerializable*>(dynamic_cast<const iser::ISerializable*>(resultsPtr));
 				if (serializablePtr != nullptr){
@@ -137,7 +137,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CJobTicketDatabaseDelegateComp::C
 			const istd::IChangeable* valuePtr,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	const IJobTicket* jobTicketPtr = dynamic_cast<const IJobTicket*>(valuePtr);
+	const imthype::IJobTicket* jobTicketPtr = dynamic_cast<const imthype::IJobTicket*>(valuePtr);
 	if (jobTicketPtr == nullptr){
 		return NewObjectQuery();
 	}
@@ -147,7 +147,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CJobTicketDatabaseDelegateComp::C
 	QString name = jobTicketPtr->GetJobName();
 	QByteArray contextId = jobTicketPtr->GetContextId();
 	double progress = jobTicketPtr->GetProgress();
-	IJobQueueManager::ProcessingStatus processingStatus = jobTicketPtr->GetProcessingStatus();
+	imthype::IJobQueueManager::ProcessingStatus processingStatus = jobTicketPtr->GetProcessingStatus();
 
 	if (!proposedObjectId.isEmpty()){
 		uuid = proposedObjectId;
@@ -165,7 +165,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CJobTicketDatabaseDelegateComp::C
 
 	// Serialize Results to JSON
 	QByteArray resultsData;
-	const IJobOutput* resultsPtr = jobTicketPtr->GetResults();
+	const imthype::IJobOutput* resultsPtr = jobTicketPtr->GetResults();
 	if (resultsPtr != nullptr){
 		iser::ISerializable* serializablePtr = const_cast<iser::ISerializable*>(dynamic_cast<const iser::ISerializable*>(resultsPtr));
 		if (serializablePtr != nullptr){
@@ -248,7 +248,7 @@ QByteArray CJobTicketDatabaseDelegateComp::CreateUpdateObjectQuery(
 			const imtbase::IOperationContext* /*operationContextPtr*/,
 			bool /*useExternDelegate*/) const
 {
-	const IJobTicket* jobTicketPtr = dynamic_cast<const IJobTicket*>(&object);
+	const imthype::IJobTicket* jobTicketPtr = dynamic_cast<const imthype::IJobTicket*>(&object);
 	if (jobTicketPtr == nullptr || objectId.isEmpty()){
 		return QByteArray();
 	}
@@ -257,7 +257,7 @@ QByteArray CJobTicketDatabaseDelegateComp::CreateUpdateObjectQuery(
 	QString name = jobTicketPtr->GetJobName();
 	QByteArray contextId = jobTicketPtr->GetContextId();
 	double progress = jobTicketPtr->GetProgress();
-	IJobQueueManager::ProcessingStatus processingStatus = jobTicketPtr->GetProcessingStatus();
+	imthype::IJobQueueManager::ProcessingStatus processingStatus = jobTicketPtr->GetProcessingStatus();
 
 	// Serialize Params to JSON
 	QByteArray paramsData;
@@ -271,7 +271,7 @@ QByteArray CJobTicketDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 	// Serialize Results to JSON
 	QByteArray resultsData;
-	const IJobOutput* resultsPtr = jobTicketPtr->GetResults();
+	const imthype::IJobOutput* resultsPtr = jobTicketPtr->GetResults();
 	if (resultsPtr != nullptr){
 		auto serializablePtr = const_cast<iser::ISerializable*>(dynamic_cast<const iser::ISerializable*>(resultsPtr));
 		if (serializablePtr != nullptr){
@@ -322,10 +322,10 @@ QByteArray CJobTicketDatabaseDelegateComp::CreateRenameObjectQuery(
 		return QByteArray();
 	}
 
-	const IJobTicket* jobTicketPtr = nullptr;
+	const imthype::IJobTicket* jobTicketPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr objectPtr;
 	if (collection.GetObjectData(objectId, objectPtr)){
-		jobTicketPtr = dynamic_cast<const IJobTicket*>(objectPtr.GetPtr());
+		jobTicketPtr = dynamic_cast<const imthype::IJobTicket*>(objectPtr.GetPtr());
 	}
 
 	if (jobTicketPtr == nullptr){
@@ -351,6 +351,6 @@ QByteArray CJobTicketDatabaseDelegateComp::CreateDescriptionObjectQuery(
 }
 
 
-} // namespace imthype
+} // namespace imthypedb
 
 

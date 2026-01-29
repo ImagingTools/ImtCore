@@ -6,7 +6,7 @@
 #include <imthype/IJobTicket.h>
 
 
-namespace imthype
+namespace imthypedb
 {
 
 
@@ -56,10 +56,10 @@ public:
 				const imtbase::IOperationContext* operationContextPtr) const override;
 
 private:
-	I_MULTIFACT(IJobTicket, m_jobTicketFactCompPtr);
+	I_MULTIFACT(imthype::IJobTicket, m_jobTicketFactCompPtr);
 };
 
 
-} // namespace imthype
+} // namespace imthypedb
 
 
