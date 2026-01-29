@@ -80,11 +80,13 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 			// PAT token - validate with PAT manager
 			if (m_patManagerCompPtr.IsValid()){
 				QByteArray userId;
+				QByteArray tokenId;
 				QByteArrayList scopes;
-				if (!m_patManagerCompPtr->ValidateToken(accessToken, userId, scopes)){
+				if (!m_patManagerCompPtr->ValidateToken(accessToken, userId, tokenId, scopes)){
 					return CreateResponse(StatusCode::SC_FORBIDDEN, QByteArray(), request);
 				}
-				// PAT validation successful, continue processing
+
+				m_patManagerCompPtr->UpdateLastUsedAt(tokenId);
 			}
 			else{
 				return CreateResponse(StatusCode::SC_FORBIDDEN, QByteArray(), request);

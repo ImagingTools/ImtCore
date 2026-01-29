@@ -32,6 +32,9 @@ static sdl::imtauth::PersonalAccessTokens::CPersonalAccessToken::V1_0 ConvertToS
 	if (expiresAt.isValid()){
 		sdlToken.expiresAt = expiresAt.toString(Qt::ISODate);
 	}
+	else{
+		sdlToken.expiresAt = QString();
+	}
 
 	sdlToken.revoked = token.IsRevoked();
 
@@ -181,8 +184,9 @@ sdl::imtauth::PersonalAccessTokens::CValidateTokenPayload CPersonalAccessTokenCo
 
 	// Validate token
 	QByteArray userId;
+	QByteArray tokenId;
 	QByteArrayList scopes;
-	bool isValid = m_tokenManagerCompPtr->ValidateToken(rawToken, userId, scopes);
+	bool isValid = m_tokenManagerCompPtr->ValidateToken(rawToken, userId, tokenId, scopes);
 
 	response.Version_1_0->valid = isValid;
 

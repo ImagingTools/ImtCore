@@ -93,6 +93,7 @@ protected:
 	virtual bool CreateSortQuery(const imtbase::ICollectionFilter& collectionFilter, QString& sortQuery) const;
 	virtual bool CreateSortQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& sortQuery) const;
 	virtual QString EncodeTextArgument(const QString& argument) const;
+	virtual bool TableExists(const QString& tableName) const;
 
 protected:
 	I_REF(imtdb::IDatabaseEngine, m_databaseEngineCompPtr);

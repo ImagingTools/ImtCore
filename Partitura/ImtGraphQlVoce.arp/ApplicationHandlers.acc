@@ -37,9 +37,6 @@
                     <AttributeInfo Id="Pages" Type="Reference[]" ExportId="Pages">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="PersonalAccessTokenCollection" Type="Reference" ExportId="PersonalAccessTokenCollection">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="RoleCollection" Type="Reference" ExportId="RoleCollection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -108,6 +105,9 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="LogPath" Type="Reference" ExportId="LogPath">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PersonalAccessTokenManager" Type="Reference" ExportId="PersonalAccessTokenManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RedirectToCommandId" Type="Id" ExportId="RedirectToCommandId">
