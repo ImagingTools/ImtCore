@@ -36,7 +36,9 @@ imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(
 			QByteArrayList scopes;
 			if (!m_patManagerCompPtr->ValidateToken(token, userObjectId, scopes)){
 				// PAT validation failed - this is unexpected since validation already passed in servlet
-				SendWarningMessage(0, QString("PAT validation failed in GetRequestContext for token '%1'").arg(qPrintable(token)), "CGqlContextControllerComp");
+				errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: PAT validation failed.").arg(qPrintable(token));
+				SendErrorMessage(0, errorMessage, "CGqlContextControllerComp");
+				return nullptr;
 			}
 		}
 	}
