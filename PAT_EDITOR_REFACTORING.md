@@ -9,9 +9,9 @@ The PAT (Personal Access Token) editor in QML (`PatTokenParamEditor.qml`) had di
 3. **Not reusable**: Other components couldn't easily reuse the PAT operations
 4. **Hard to test**: Cannot mock or test the UI without a GraphQL server
 
-## Solution: Provider Pattern
+## Solution: Controller Pattern
 
-We introduced a **Provider** abstraction layer following the established pattern in `imtauthgui` (e.g., `UserTokenProvider`, `SuperuserProvider`).
+We introduced a **Controller Pattern** following the established architecture in the codebase (e.g., `CommandsController`/`GqlBasedCommandsController`, `CollectionDataController`/`GqlBasedCollectionDataController`).
 
 ### Architecture
 
@@ -22,29 +22,29 @@ We introduced a **Provider** abstraction layer following the established pattern
 │   - Uses signals and functions      │
 └───────────────┬─────────────────────┘
                 │
-                │ Uses interface
+                │ Uses controller
                 ▼
 ┌─────────────────────────────────────┐
-│   PatTokenProvider.qml              │
-│   (Abstraction Layer)               │
-│   - Exposes: signals & functions    │
-│   - Hides: protocol implementation  │
+│   GqlBasedPatTokenController.qml    │
+│   (in imtguigql module)             │
+│   - GraphQL implementation          │
 └───────────────┬─────────────────────┘
                 │
-                │ Implements using
+                │ Inherits from
                 ▼
 ┌─────────────────────────────────────┐
-│   GqlSdlRequestSender               │
-│   (GraphQL Implementation)          │
-│   - Can be replaced with REST/gRPC  │
+│   PatTokenController.qml            │
+│   (in imtauthgui module)            │
+│   - Protocol-agnostic interface     │
+│   - Defines signals & functions     │
 └─────────────────────────────────────┘
 ```
 
 ## Implementation Details
 
-### PatTokenProvider.qml
+### PatTokenController.qml (Base)
 
-The provider exposes a clean interface:
+The base controller defines a protocol-agnostic interface:
 
 **Signals** (for results):
 - `tokenListReceived(var tokenList)` - Token list loaded
@@ -58,12 +58,22 @@ The provider exposes a clean interface:
 - `deleteToken(tokenId)` - Delete token permanently
 - `revokeToken(tokenId)` - Revoke token (keep for audit)
 
-### PatTokenParamEditor.qml
+Default implementations emit warnings and call signals with default values.
+
+### GqlBasedPatTokenController.qml (Implementation)
+
+The GraphQL-based controller:
+1. **Inherits** from `PatTokenController`
+2. **Overrides** all functions with GraphQL implementations
+3. **Uses** `GqlSdlRequestSender` for GraphQL communication
+4. **Located** in `Qml/imtguigql/` module (where all GQL implementations live)
+
+### PatTokenParamEditor.qml (Consumer)
 
 The editor now:
-1. Creates a `PatTokenProvider` instance
-2. Connects to provider signals for results
-3. Calls provider functions for operations
+1. Creates a `GqlBasedPatTokenController` instance
+2. Connects to controller signals for results
+3. Calls controller functions for operations
 4. Has **zero knowledge** of GraphQL or any protocol
 
 **Before refactoring:**
@@ -86,7 +96,7 @@ GqlSdlRequestSender {
 
 **After refactoring:**
 ```qml
-property PatTokenProvider patTokenProvider: PatTokenProvider {
+property GqlBasedPatTokenController patTokenController: GqlBasedPatTokenController {
     onTokenCreated: function(success, message, token) {
         if (success) {
             // handle success
@@ -97,7 +107,7 @@ property PatTokenProvider patTokenProvider: PatTokenProvider {
 }
 
 function addNewToken(name, description, scopes, expiresAt) {
-    patTokenProvider.createToken(
+    patTokenController.createToken(
         AuthorizationController.getUserId(),
         name,
         description,
@@ -109,28 +119,32 @@ function addNewToken(name, description, scopes, expiresAt) {
 
 ## Benefits
 
-1. **Protocol independence**: Can switch from GraphQL to REST/gRPC by only changing the provider
+1. **Protocol independence**: Can switch from GraphQL to REST/gRPC by creating new controller implementation
 2. **Separation of concerns**: UI logic separate from protocol logic
-3. **Testability**: Can create mock providers for testing
-4. **Reusability**: Other components can use the same provider
+3. **Testability**: Can create mock controllers for testing
+4. **Reusability**: Other components can use the same controller
 5. **Maintainability**: Protocol changes don't affect UI code
+6. **Pattern consistency**: Follows established architecture in codebase
 
 ## Switching to Another Protocol
 
 To use a different protocol (e.g., REST):
 
-1. Create `PatTokenRestProvider.qml` with the same interface
+1. Create `RestBasedPatTokenController.qml` that inherits from `PatTokenController`
 2. Implement functions using REST API calls instead of GraphQL
-3. Replace `PatTokenProvider` with `PatTokenRestProvider` in the editor
+3. Replace `GqlBasedPatTokenController` with `RestBasedPatTokenController` in the editor
 
-**No changes needed to PatTokenParamEditor.qml!**
+**No changes needed to PatTokenParamEditor.qml or PatTokenController.qml!**
 
 ## Files Modified
 
-- **Qml/imtauthgui/PatTokenProvider.qml** (new) - Provider abstraction
-- **Qml/imtgui/Params/PatTokenParamEditor.qml** - Refactored to use provider
-- **Qml/imtauthgui/qmldir** - Registered provider component
-- **Qml/imtauthgui/imtauthguiqml.qrc** - Added provider to resources
+- **Qml/imtauthgui/PatTokenController.qml** (new) - Base controller interface
+- **Qml/imtguigql/GqlBasedPatTokenController.qml** (new) - GraphQL implementation
+- **Qml/imtgui/Params/PatTokenParamEditor.qml** - Refactored to use controller
+- **Qml/imtauthgui/qmldir** - Registered base controller
+- **Qml/imtauthgui/imtauthguiqml.qrc** - Added controller to resources
+- **Qml/imtguigql/qmldir** - Registered GQL controller
+- **Qml/imtguigql/imtguigqlqml.qrc** - Added GQL controller to resources
 
 ## Testing
 
@@ -141,4 +155,15 @@ The refactoring maintains the same functionality:
 4. Revoking tokens
 5. Displaying token details in the UI
 
-All operations work identically, but now through the provider abstraction layer.
+All operations work identically, but now through the controller abstraction layer.
+
+## Pattern Consistency
+
+This refactoring follows the **Controller Pattern** already established in the codebase:
+
+| Base Controller | GQL Implementation | Location |
+|-----------------|-------------------|----------|
+| CommandsController | GqlBasedCommandsController | Qml/imtguigql/ |
+| CollectionDataController | GqlBasedCollectionDataController | Qml/imtguigql/ |
+| DataModelController | GqlBasedDataModelController | Qml/imtguigql/ |
+| **PatTokenController** | **GqlBasedPatTokenController** | **Qml/imtguigql/** |

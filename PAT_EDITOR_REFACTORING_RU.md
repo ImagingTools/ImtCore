@@ -9,9 +9,9 @@
 3. **Не переиспользуемый**: Другие компоненты не могли легко переиспользовать операции с PAT
 4. **Трудно тестировать**: Невозможно тестировать UI без GraphQL сервера
 
-## Решение: Паттерн Provider
+## Решение: Паттерн Controller
 
-Мы ввели абстракцию **Provider** следуя установленному паттерну в `imtauthgui` (например, `UserTokenProvider`, `SuperuserProvider`).
+Мы ввели паттерн **Controller** следуя установленной архитектуре в кодовой базе (например, `CommandsController`/`GqlBasedCommandsController`, `CollectionDataController`/`GqlBasedCollectionDataController`).
 
 ### Архитектура
 
@@ -23,29 +23,29 @@
 │   - Использует сигналы и функции    │
 └───────────────┬─────────────────────┘
                 │
-                │ Использует интерфейс
+                │ Использует контроллер
                 ▼
 ┌─────────────────────────────────────┐
-│   PatTokenProvider.qml              │
-│   (Слой абстракции)                 │
-│   - Предоставляет: сигналы и функции│
-│   - Скрывает: реализацию протокола  │
+│   GqlBasedPatTokenController.qml    │
+│   (в модуле imtguigql)              │
+│   - Реализация GraphQL              │
 └───────────────┬─────────────────────┘
                 │
-                │ Реализовано с помощью
+                │ Наследуется от
                 ▼
 ┌─────────────────────────────────────┐
-│   GqlSdlRequestSender               │
-│   (Реализация GraphQL)              │
-│   - Может быть заменен на REST/gRPC │
+│   PatTokenController.qml            │
+│   (в модуле imtauthgui)             │
+│   - Интерфейс без протокола         │
+│   - Определяет сигналы и функции    │
 └─────────────────────────────────────┘
 ```
 
 ## Детали реализации
 
-### PatTokenProvider.qml
+### PatTokenController.qml (Базовый)
 
-Провайдер предоставляет чистый интерфейс:
+Базовый контроллер определяет интерфейс без привязки к протоколу:
 
 **Сигналы** (для результатов):
 - `tokenListReceived(var tokenList)` - Список токенов загружен
@@ -59,12 +59,22 @@
 - `deleteToken(tokenId)` - Удалить токен навсегда
 - `revokeToken(tokenId)` - Отозвать токен (оставить для аудита)
 
-### PatTokenParamEditor.qml
+Реализации по умолчанию выдают предупреждения и вызывают сигналы со значениями по умолчанию.
+
+### GqlBasedPatTokenController.qml (Реализация)
+
+Контроллер на основе GraphQL:
+1. **Наследуется** от `PatTokenController`
+2. **Переопределяет** все функции с реализациями GraphQL
+3. **Использует** `GqlSdlRequestSender` для связи с GraphQL
+4. **Находится** в модуле `Qml/imtguigql/` (где находятся все GQL реализации)
+
+### PatTokenParamEditor.qml (Потребитель)
 
 Редактор теперь:
-1. Создает экземпляр `PatTokenProvider`
-2. Подключается к сигналам провайдера для получения результатов
-3. Вызывает функции провайдера для операций
+1. Создает экземпляр `GqlBasedPatTokenController`
+2. Подключается к сигналам контроллера для получения результатов
+3. Вызывает функции контроллера для операций
 4. **Не знает ничего** о GraphQL или любом другом протоколе
 
 **До рефакторинга:**
@@ -87,7 +97,7 @@ GqlSdlRequestSender {
 
 **После рефакторинга:**
 ```qml
-property PatTokenProvider patTokenProvider: PatTokenProvider {
+property GqlBasedPatTokenController patTokenController: GqlBasedPatTokenController {
     onTokenCreated: function(success, message, token) {
         if (success) {
             // обработка успеха
@@ -98,7 +108,7 @@ property PatTokenProvider patTokenProvider: PatTokenProvider {
 }
 
 function addNewToken(name, description, scopes, expiresAt) {
-    patTokenProvider.createToken(
+    patTokenController.createToken(
         AuthorizationController.getUserId(),
         name,
         description,
@@ -110,28 +120,32 @@ function addNewToken(name, description, scopes, expiresAt) {
 
 ## Преимущества
 
-1. **Независимость от протокола**: Можно переключиться с GraphQL на REST/gRPC, изменив только провайдер
+1. **Независимость от протокола**: Можно переключиться с GraphQL на REST/gRPC, создав новую реализацию контроллера
 2. **Разделение ответственности**: Логика UI отделена от логики протокола
-3. **Тестируемость**: Можно создать mock провайдеры для тестирования
-4. **Переиспользуемость**: Другие компоненты могут использовать тот же провайдер
+3. **Тестируемость**: Можно создать mock контроллеры для тестирования
+4. **Переиспользуемость**: Другие компоненты могут использовать тот же контроллер
 5. **Поддерживаемость**: Изменения протокола не влияют на код UI
+6. **Согласованность паттерна**: Следует установленной архитектуре в кодовой базе
 
 ## Переход на другой протокол
 
 Чтобы использовать другой протокол (например, REST):
 
-1. Создайте `PatTokenRestProvider.qml` с тем же интерфейсом
-2. Реализуйте функции используя REST API вместо GraphQL
-3. Замените `PatTokenProvider` на `PatTokenRestProvider` в редакторе
+1. Создайте `RestBasedPatTokenController.qml`, который наследуется от `PatTokenController`
+2. Реализуйте функции используя REST API вызовы вместо GraphQL
+3. Замените `GqlBasedPatTokenController` на `RestBasedPatTokenController` в редакторе
 
-**Изменения в PatTokenParamEditor.qml не нужны!**
+**Изменения в PatTokenParamEditor.qml или PatTokenController.qml не нужны!**
 
 ## Измененные файлы
 
-- **Qml/imtauthgui/PatTokenProvider.qml** (новый) - Абстракция провайдера
-- **Qml/imtgui/Params/PatTokenParamEditor.qml** - Рефакторинг для использования провайдера
-- **Qml/imtauthgui/qmldir** - Зарегистрирован компонент провайдера
-- **Qml/imtauthgui/imtauthguiqml.qrc** - Добавлен провайдер в ресурсы
+- **Qml/imtauthgui/PatTokenController.qml** (новый) - Интерфейс базового контроллера
+- **Qml/imtguigql/GqlBasedPatTokenController.qml** (новый) - Реализация GraphQL
+- **Qml/imtgui/Params/PatTokenParamEditor.qml** - Рефакторинг для использования контроллера
+- **Qml/imtauthgui/qmldir** - Зарегистрирован базовый контроллер
+- **Qml/imtauthgui/imtauthguiqml.qrc** - Добавлен контроллер в ресурсы
+- **Qml/imtguigql/qmldir** - Зарегистрирован GQL контроллер
+- **Qml/imtguigql/imtguigqlqml.qrc** - Добавлен GQL контроллер в ресурсы
 
 ## Тестирование
 
@@ -142,4 +156,15 @@ function addNewToken(name, description, scopes, expiresAt) {
 4. Отзыв токенов
 5. Отображение деталей токенов в UI
 
-Все операции работают идентично, но теперь через слой абстракции провайдера.
+Все операции работают идентично, но теперь через слой абстракции контроллера.
+
+## Согласованность паттерна
+
+Этот рефакторинг следует паттерну **Controller**, уже установленному в кодовой базе:
+
+| Базовый контроллер | Реализация GQL | Расположение |
+|-------------------|----------------|--------------|
+| CommandsController | GqlBasedCommandsController | Qml/imtguigql/ |
+| CollectionDataController | GqlBasedCollectionDataController | Qml/imtguigql/ |
+| DataModelController | GqlBasedDataModelController | Qml/imtguigql/ |
+| **PatTokenController** | **GqlBasedPatTokenController** | **Qml/imtguigql/** |
