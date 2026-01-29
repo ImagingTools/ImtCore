@@ -1,5 +1,5 @@
 #include "imthype/IJobOutput.h"
-#include <imthype/CJobTicketDatabaseDelegateComp.h>
+#include <imthypedb/CJobTicketDatabaseDelegateComp.h>
 
 
 // ACF includes
@@ -7,19 +7,13 @@
 #include <iser/CJsonMemWriteArchive.h>
 
 
-namespace imthype
+namespace imthypedb
 {
 
 
 // public methods
 
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
-
-QByteArray CJobTicketDatabaseDelegateComp::GetObjectTypeId(const QByteArray& /*objectId*/) const
-{
-	return "JobTicket";
-}
-
 
 istd::IChangeableUniquePtr CJobTicketDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record, const iprm::IParamsSet* /*dataConfigurationPtr*/) const
 {
@@ -31,23 +25,39 @@ istd::IChangeableUniquePtr CJobTicketDatabaseDelegateComp::CreateObjectFromRecor
 		return nullptr;
 	}
 
-	IJobTicketSharedPtr jobTicketPtr = m_jobTicketFactCompPtr.CreateInstance();
+	if (!m_typesCompPtr.IsValid()){
+		return nullptr;
+	}
+
+	QByteArray typeId = record.value("TypeId").toByteArray();
+	if (typeId.isEmpty()){
+		return nullptr;
+	}
+
+	int factoryIndex = iprm::FindOptionIndexById(typeId, *m_typesCompPtr);
+
+	if ((factoryIndex < 0) || (factoryIndex >= m_jobTicketFactCompPtr.GetCount())){
+		return nullptr;
+	}
+
+	istd::TUniqueInterfacePtr jobTicketPtr = m_jobTicketFactCompPtr.CreateInstance(factoryIndex);
+
 	if (!jobTicketPtr.IsValid()){
 		return nullptr;
 	}
 
 	if (record.contains("TypeId")){
-		QByteArray typeId = record.value("TypeId").toByteArray();
+
 		jobTicketPtr->SetTypeId(typeId);
 	}
 
-	if (record.contains("Uuid")){
-		QByteArray uuid = record.value("Uuid").toByteArray();
+	if (record.contains("Id")){
+		QByteArray uuid = record.value("Id").toByteArray();
 		jobTicketPtr->SetUuid(uuid);
 	}
 
-	if (record.contains("Name")){
-		QString name = record.value("Name").toString();
+	if (record.contains("JobNumber")){
+		QString name = jobTicketPtr->GetTypeId() + " - " + record.value("JobNumber").toString();
 		jobTicketPtr->SetJobName(name);
 	}
 
@@ -63,37 +73,35 @@ istd::IChangeableUniquePtr CJobTicketDatabaseDelegateComp::CreateObjectFromRecor
 
 	if (record.contains("ProcessingStatus")){
 		int status = record.value("ProcessingStatus").toInt();
-		jobTicketPtr->SetProcessingStatus(static_cast<IJobQueueManager::ProcessingStatus>(status));
+		jobTicketPtr->SetProcessingStatus(static_cast<imthype::IJobQueueManager::ProcessingStatus>(status));
 	}
 
 	// Deserialize Params from JSON
 	if (record.contains("Params")){
-		QString paramsDataBase64 = record.value("Params").toString();
-		if (!paramsDataBase64.isEmpty()){
-			QByteArray paramsData = QByteArray::fromBase64(paramsDataBase64.toUtf8());
-			if (!paramsData.isEmpty()){
-				iprm::IParamsSetSharedPtr paramsPtr = jobTicketPtr->GetParams();
-				if (paramsPtr.IsValid()){
-					iser::CJsonMemReadArchive archive(paramsData);
-					paramsPtr->Serialize(archive);
-				}
+		QByteArray paramsData = record.value("Params").toByteArray();
+		if (!paramsData.isEmpty()){
+			iprm::IParamsSetSharedPtr paramsPtr = jobTicketPtr->GetParams();
+			if (!paramsPtr.IsValid()){
+				paramsPtr = jobTicketPtr->CreateParams();
+			}
+			if (paramsPtr.IsValid()){
+				iser::CJsonMemReadArchive archive(paramsData);
+				paramsPtr->Serialize(archive);
+				jobTicketPtr->SetParams(paramsPtr);
 			}
 		}
 	}
 
 	// Deserialize Results from JSON
 	if (record.contains("Results")){
-		QString resultsDataBase64 = record.value("Results").toString();
-		if (!resultsDataBase64.isEmpty()){
-			QByteArray resultsData = QByteArray::fromBase64(resultsDataBase64.toUtf8());
-			if (!resultsData.isEmpty()){
-				const IJobOutput* resultsPtr = jobTicketPtr->GetResults();
-				if (resultsPtr != nullptr){
-					auto serializablePtr = const_cast<iser::ISerializable*>(dynamic_cast<const iser::ISerializable*>(resultsPtr));
-					if (serializablePtr != nullptr){
-						iser::CJsonMemReadArchive archive(resultsData);
-						serializablePtr->Serialize(archive);
-					}
+		QByteArray resultsData = record.value("Results").toByteArray();
+		if (!resultsData.isEmpty()){
+			const imthype::IJobOutput* resultsPtr = jobTicketPtr->GetResults();
+			if (resultsPtr != nullptr){
+				iser::ISerializable* serializablePtr = const_cast<iser::ISerializable*>(dynamic_cast<const iser::ISerializable*>(resultsPtr));
+				if (serializablePtr != nullptr){
+					iser::CJsonMemReadArchive archive(resultsData);
+					serializablePtr->Serialize(archive);
 				}
 			}
 		}
@@ -101,24 +109,21 @@ istd::IChangeableUniquePtr CJobTicketDatabaseDelegateComp::CreateObjectFromRecor
 
 	// Deserialize Input from JSON
 	if (record.contains("Input")){
-		QString inputDataBase64 = record.value("Input").toString();
-		if (!inputDataBase64.isEmpty()){
-			QByteArray inputData = QByteArray::fromBase64(inputDataBase64.toUtf8());
-			if (!inputData.isEmpty()){
-				const imtbase::IReferenceCollection* inputPtr = jobTicketPtr->GetInput();
-				if (inputPtr != nullptr){
-					auto serializablePtr = const_cast<iser::ISerializable*>(dynamic_cast<const iser::ISerializable*>(inputPtr));
-					if (serializablePtr != nullptr){
-						iser::CJsonMemReadArchive archive(inputData);
-						serializablePtr->Serialize(archive);
-					}
+		QByteArray inputData = record.value("Input").toByteArray();
+		if (!inputData.isEmpty()){
+			const imtbase::IReferenceCollection* inputPtr = jobTicketPtr->GetInput();
+			if (inputPtr != nullptr){
+				iser::ISerializable* serializablePtr = const_cast<iser::ISerializable*>(dynamic_cast<const iser::ISerializable*>(inputPtr));
+				if (serializablePtr != nullptr){
+					iser::CJsonMemReadArchive archive(inputData);
+					serializablePtr->Serialize(archive);
 				}
 			}
 		}
 	}
 
 	istd::IChangeableUniquePtr retVal;
-	retVal.MoveCastedPtr<IJobTicket>(jobTicketPtr.GetPtr());
+	retVal.MoveCastedPtr(jobTicketPtr);
 
 	return retVal;
 }
@@ -132,7 +137,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CJobTicketDatabaseDelegateComp::C
 			const istd::IChangeable* valuePtr,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	const IJobTicket* jobTicketPtr = dynamic_cast<const IJobTicket*>(valuePtr);
+	const imthype::IJobTicket* jobTicketPtr = dynamic_cast<const imthype::IJobTicket*>(valuePtr);
 	if (jobTicketPtr == nullptr){
 		return NewObjectQuery();
 	}
@@ -142,7 +147,11 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CJobTicketDatabaseDelegateComp::C
 	QString name = jobTicketPtr->GetJobName();
 	QByteArray contextId = jobTicketPtr->GetContextId();
 	double progress = jobTicketPtr->GetProgress();
-	IJobQueueManager::ProcessingStatus processingStatus = jobTicketPtr->GetProcessingStatus();
+	imthype::IJobQueueManager::ProcessingStatus processingStatus = jobTicketPtr->GetProcessingStatus();
+
+	if (!proposedObjectId.isEmpty()){
+		uuid = proposedObjectId;
+	}
 
 	// Serialize Params to JSON
 	QByteArray paramsData;
@@ -156,9 +165,9 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CJobTicketDatabaseDelegateComp::C
 
 	// Serialize Results to JSON
 	QByteArray resultsData;
-	const IJobOutput* resultsPtr = jobTicketPtr->GetResults();
+	const imthype::IJobOutput* resultsPtr = jobTicketPtr->GetResults();
 	if (resultsPtr != nullptr){
-		auto serializablePtr = const_cast<iser::ISerializable*>(dynamic_cast<const iser::ISerializable*>(resultsPtr));
+		iser::ISerializable* serializablePtr = const_cast<iser::ISerializable*>(dynamic_cast<const iser::ISerializable*>(resultsPtr));
 		if (serializablePtr != nullptr){
 			iser::CJsonMemWriteArchive archive(nullptr);
 			if (serializablePtr->Serialize(archive)){
@@ -181,17 +190,17 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CJobTicketDatabaseDelegateComp::C
 	}
 
 	NewObjectQuery retVal;
-	retVal.query = QString("INSERT INTO \"JobTickets\"(\"Id\", \"TypeId\", \"Uuid\", \"Name\", \"ContextId\", \"Progress\", \"ProcessingStatus\", \"Params\", \"Results\", \"Input\") VALUES('%1', '%2', '%3', '%4', '%5', %6, %7, '%8', '%9', '%10');")
+	retVal.query = QString("INSERT INTO \"JobTickets\"(\"Id\", \"TypeId\", \"Name\", \"ContextId\", \"Progress\", \"ProcessingStatus\", \"Params\", \"Results\", \"Input\", \"Added\") VALUES('%1', '%2', '%3', '%4', %5, %6, '%7', '%8', '%9', '%10');")
 				.arg(qPrintable(proposedObjectId))
 				.arg(qPrintable(typeId))
-				.arg(qPrintable(uuid))
 				.arg(name)
 				.arg(qPrintable(contextId))
 				.arg(progress)
 				.arg(static_cast<int>(processingStatus))
-				.arg(QString::fromUtf8(paramsData.toBase64()))
-				.arg(QString::fromUtf8(resultsData.toBase64()))
-				.arg(QString::fromUtf8(inputData.toBase64()))
+				.arg(QString::fromUtf8(paramsData))
+				.arg(QString::fromUtf8(resultsData))
+				.arg(QString::fromUtf8(inputData))
+				.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs))
 				.toUtf8();
 	retVal.objectName = name;
 
@@ -239,17 +248,16 @@ QByteArray CJobTicketDatabaseDelegateComp::CreateUpdateObjectQuery(
 			const imtbase::IOperationContext* /*operationContextPtr*/,
 			bool /*useExternDelegate*/) const
 {
-	const IJobTicket* jobTicketPtr = dynamic_cast<const IJobTicket*>(&object);
+	const imthype::IJobTicket* jobTicketPtr = dynamic_cast<const imthype::IJobTicket*>(&object);
 	if (jobTicketPtr == nullptr || objectId.isEmpty()){
 		return QByteArray();
 	}
 
 	QByteArray typeId = jobTicketPtr->GetTypeId();
-	QByteArray uuid = jobTicketPtr->GetUuid();
 	QString name = jobTicketPtr->GetJobName();
 	QByteArray contextId = jobTicketPtr->GetContextId();
 	double progress = jobTicketPtr->GetProgress();
-	IJobQueueManager::ProcessingStatus processingStatus = jobTicketPtr->GetProcessingStatus();
+	imthype::IJobQueueManager::ProcessingStatus processingStatus = jobTicketPtr->GetProcessingStatus();
 
 	// Serialize Params to JSON
 	QByteArray paramsData;
@@ -263,7 +271,7 @@ QByteArray CJobTicketDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 	// Serialize Results to JSON
 	QByteArray resultsData;
-	const IJobOutput* resultsPtr = jobTicketPtr->GetResults();
+	const imthype::IJobOutput* resultsPtr = jobTicketPtr->GetResults();
 	if (resultsPtr != nullptr){
 		auto serializablePtr = const_cast<iser::ISerializable*>(dynamic_cast<const iser::ISerializable*>(resultsPtr));
 		if (serializablePtr != nullptr){
@@ -287,17 +295,17 @@ QByteArray CJobTicketDatabaseDelegateComp::CreateUpdateObjectQuery(
 		}
 	}
 
-	QByteArray retVal = QString("UPDATE \"JobTickets\" SET \"TypeId\" = '%1', \"Uuid\" = '%2', \"Name\" = '%3', \"ContextId\" = '%4', \"Progress\" = %5, \"ProcessingStatus\" = %6, \"Params\" = '%7', \"Results\" = '%8', \"Input\" = '%9' WHERE \"Id\" ='%10';")
+	QByteArray retVal = QString("UPDATE \"JobTickets\" SET \"TypeId\" = '%1', \"Name\" = '%3', \"ContextId\" = '%4', \"Progress\" = %5, \"ProcessingStatus\" = %6, \"Params\" = '%7', \"Results\" = '%8', \"Input\" = '%9', \"TimeStamp\" = '%10' WHERE \"Id\" ='%2';")
 				.arg(qPrintable(typeId))
-				.arg(qPrintable(uuid))
+				.arg(qPrintable(objectId))
 				.arg(name)
 				.arg(qPrintable(contextId))
 				.arg(progress)
 				.arg(static_cast<int>(processingStatus))
-				.arg(QString::fromUtf8(paramsData.toBase64()))
-				.arg(QString::fromUtf8(resultsData.toBase64()))
-				.arg(QString::fromUtf8(inputData.toBase64()))
-				.arg(qPrintable(objectId))
+				.arg(QString::fromUtf8(paramsData))
+				.arg(QString::fromUtf8(resultsData))
+				.arg(QString::fromUtf8(inputData))
+				.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs))
 				.toUtf8();
 
 	return retVal;
@@ -314,19 +322,20 @@ QByteArray CJobTicketDatabaseDelegateComp::CreateRenameObjectQuery(
 		return QByteArray();
 	}
 
-	const IJobTicket* jobTicketPtr = nullptr;
+	const imthype::IJobTicket* jobTicketPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr objectPtr;
 	if (collection.GetObjectData(objectId, objectPtr)){
-		jobTicketPtr = dynamic_cast<const IJobTicket*>(objectPtr.GetPtr());
+		jobTicketPtr = dynamic_cast<const imthype::IJobTicket*>(objectPtr.GetPtr());
 	}
 
 	if (jobTicketPtr == nullptr){
 		return QByteArray();
 	}
 
-	QByteArray retVal = QString("UPDATE \"JobTickets\" SET \"Name\" = '%1' WHERE \"Id\" = '%2';")
+	QByteArray retVal = QString("UPDATE \"JobTickets\" SET \"Name\" = '%1', \"TimeStamp\" = '%3' WHERE \"Id\" = '%2';")
 			.arg(newObjectName)
-			.arg(qPrintable(objectId)).toLocal8Bit();
+			.arg(qPrintable(objectId))
+			.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs)).toLocal8Bit();
 
 	return retVal;
 }
@@ -342,6 +351,6 @@ QByteArray CJobTicketDatabaseDelegateComp::CreateDescriptionObjectQuery(
 }
 
 
-} // namespace imthype
+} // namespace imthypedb
 
 

@@ -94,6 +94,17 @@ iprm::IParamsSetSharedPtr CJobTicket::GetParams() const
 }
 
 
+iprm::IParamsSetSharedPtr CJobTicket::CreateParams() const
+{
+	iprm::IParamsSetSharedPtr retVal;
+	if (m_paramsFactory){
+		retVal = m_paramsFactory(m_contextId, m_typeId);
+	}
+
+	return retVal;
+}
+
+
 void CJobTicket::SetParams(const iprm::IParamsSetSharedPtr& paramsPtr)
 {
 	m_paramsPtr = paramsPtr;
