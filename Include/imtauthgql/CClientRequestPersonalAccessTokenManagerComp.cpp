@@ -26,13 +26,16 @@ imtauth::IPersonalAccessTokenManager::TokenCreationResult CClientRequestPersonal
 	arguments.input.Version_1_0.Emplace();
 	arguments.input.Version_1_0->userId = userId;
 	arguments.input.Version_1_0->name = name;
+	
 	if (!description.isEmpty()){
 		arguments.input.Version_1_0->description = description;
 	}
+	
 	if (!scopes.isEmpty()){
 		arguments.input.Version_1_0->scopes.Emplace();
 		arguments.input.Version_1_0->scopes->FromList(scopes);
 	}
+	
 	if (expiresAt.isValid()){
 		arguments.input.Version_1_0->expiresAt = expiresAt.toString(Qt::ISODate);
 	}
@@ -116,7 +119,8 @@ QByteArrayList CClientRequestPersonalAccessTokenManagerComp::GetTokenIds(const Q
 	}
 
 	QByteArrayList tokenIds;
-	for (const auto& token : payload.Version_1_0->tokens->ToList()){
+	const auto& tokensList = payload.Version_1_0->tokens->ToList();
+	for (const auto& token : tokensList){
 		if (token.id.HasValue()){
 			tokenIds << *token.id;
 		}
