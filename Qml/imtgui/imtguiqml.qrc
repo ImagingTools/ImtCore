@@ -13,6 +13,11 @@
         <file alias="imtgui/Application/ThumbnailDecorator.qml">Application/ThumbnailDecorator.qml</file>
         <file alias="imtgui/Application/ApplicationEvents.qml">Application/ApplicationEvents.qml</file>
         <file alias="imtgui/Application/ClientSettingsController.qml">Application/ClientSettingsController.qml</file>
+        <file alias="imtgui/Application/ConnectionStateManager.qml">Application/ConnectionStateManager.qml</file>
+        <file alias="imtgui/Application/AuthorizationManager.qml">Application/AuthorizationManager.qml</file>
+        <file alias="imtgui/Application/ServerConnectionManager.qml">Application/ServerConnectionManager.qml</file>
+        <file alias="imtgui/Application/ApplicationStateManager.qml">Application/ApplicationStateManager.qml</file>
+        <file alias="imtgui/Application/ApplicationConfigurator.qml">Application/ApplicationConfigurator.qml</file>
         <file alias="imtgui/Panels/ButtonPanel.qml">Panels/ButtonPanel.qml</file>
         <file alias="imtgui/Panels/CommandsDecorator.qml">Panels/CommandsDecorator.qml</file>
         <file alias="imtgui/Panels/FilterMenu.qml">Panels/FilterMenu.qml</file>
