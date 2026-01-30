@@ -9,8 +9,6 @@
 
 // ImtCore includes
 #include <imtauth/IPersonalAccessTokenManager.h>
-#include <imtbase/IObjectCollection.h>
-#include <imtbase/TModelUpdateBinder.h>
 #include <GeneratedFiles/imtauthgui/ui_CPersonalAccessTokenManagerGuiComp.h>
 
 
@@ -39,7 +37,6 @@ public:
 				Ui::CPersonalAccessTokenManagerGuiComp, imtauth::IPersonalAccessTokenManager> BaseClass;
 
 	I_BEGIN_COMPONENT(CPersonalAccessTokenManagerGuiComp);
-		I_ASSIGN(m_tokenCollectionCompPtr, "TokenCollection", "Token collection to observe", false, "PersonalAccessTokenCollection");
 		I_ATTR(QByteArray, m_userIdAttrPtr);
 	I_END_COMPONENT;
 
@@ -63,7 +60,6 @@ protected:
 private:
 	void RefreshTokenList();
 	void UpdateTokenDetails(const QByteArray& tokenId);
-	void OnTokenCollectionUpdated(const istd::IChangeable::ChangeSet& changeSet, const imtbase::IObjectCollection* collectionPtr);
 	QString FormatDateTime(const QDateTime& dateTime) const;
 	QString FormatScopes(const QByteArrayList& scopes) const;
 
@@ -75,10 +71,8 @@ private Q_SLOTS:
 	void OnRefreshClicked();
 
 private:
-	I_REF(imtbase::IObjectCollection, m_tokenCollectionCompPtr);
 	I_ATTR(QByteArray, m_userIdAttrPtr);
 
-	imtbase::TModelUpdateBinder<imtbase::IObjectCollection, CPersonalAccessTokenManagerGuiComp> m_tokenCollectionObserver;
 	QByteArray m_currentUserId;
 };
 
