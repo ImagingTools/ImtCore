@@ -12,6 +12,11 @@ PagesProvider 1.0 ./Application/PagesProvider.qml
 ThumbnailDecorator 1.0 ./Application/ThumbnailDecorator.qml
 ApplicationEvents 1.0 ./Application/ApplicationEvents.qml
 ClientSettingsController 1.0 ./Application/ClientSettingsController.qml
+ConnectionStateManager 1.0 ./Application/ConnectionStateManager.qml
+AuthorizationManager 1.0 ./Application/AuthorizationManager.qml
+ServerConnectionManager 1.0 ./Application/ServerConnectionManager.qml
+ApplicationStateManager 1.0 ./Application/ApplicationStateManager.qml
+ApplicationConfigurator 1.0 ./Application/ApplicationConfigurator.qml
 
 ButtonPanel 1.0 Panels/ButtonPanel.qml
 CommandsDecorator 1.0 Panels/CommandsDecorator.qml

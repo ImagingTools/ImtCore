@@ -7,107 +7,206 @@ import imtcontrols 1.0
 import imtauthgui 1.0
 import imtauthUsersSdl 1.0
 
-
+/**
+ * ApplicationMain - Main application component (Composition Root)
+ * 
+ * Refactored following SOLID principles:
+ * - Single Responsibility: Acts as composition root, delegates to managers
+ * - Open/Closed: Can be extended with new modes without modification
+ * - Dependency Inversion: Depends on manager abstractions
+ * 
+ * Supports three application modes:
+ * 1. Standalone (no server, no auth)
+ * 2. Server only (server connection, no auth)
+ * 3. Full (server + authorization)
+ */
 Item {
 	id: application;
 	
 	anchors.fill: parent;
 	
+	// ============================================================================
+	// Public Properties (API compatibility maintained)
+	// ============================================================================
+	
 	property Decorators decorators: decorators_
-	
 	property alias localSettings: clientSettingsController.json
-	
 	property alias thumbDecMenuPanelRadius: thumbnailDecorator.menuPanelRadius;
 
 	property bool serverReady: true; // [deprecated]
-	property bool authorizationServerConnected: false;
-	property bool useWebSocketSubscription: false;
+	property bool authorizationServerConnected: false
 	
-	property bool firstModelsIsInit: false;
-	property bool serverConnected: subscriptionManager_.status == 1;
+	// Delegated to configurator
+	property bool useWebSocketSubscription: configurator.useWebSocketSubscription
+	
+	// Delegated to state manager
+	property bool firstModelsIsInit: stateManager.firstModelsInitialized
+	
+	// Delegated to server connection manager
+	property bool serverConnected: serverConnectionMgr.isConnected()
 	
 	property alias subscriptionManager: subscriptionManager_;
-	
 	property alias loadPageByClick: thumbnailDecorator.loadPageByClick;
 	property alias canRecoveryPassword: thumbnailDecorator.canRecoveryPassword;
 	property alias webSocketPortProvider: webSocketPortProvider
-
-	property alias authConnectionState: connectionState.authConnectionState
+	
+	// Delegated to connection state manager
+	property alias authConnectionState: connectionStateMgr.authConnectionState
 	property alias pageAboutProvider: pageAboutProvider
 	
-	// TODO: ConnectionStateMachine.qml
+	// ============================================================================
+	// Managers (SOLID: Single Responsibility for each)
+	// ============================================================================
+	
+	// Application mode configurator
+	ApplicationConfigurator {
+		id: configurator
+		
+		Component.onCompleted: {
+			// Auto-detect mode based on available features
+			autoDetectMode(
+				typeof subscriptionManager_ !== 'undefined',
+				typeof AuthorizationController !== 'undefined'
+			)
+		}
+		
+		onModeChanged: {
+			console.log("Application mode changed to:", mode)
+			configureManagers({
+				connectionStateManager: connectionStateMgr,
+				serverConnectionManager: serverConnectionMgr,
+				authorizationManager: authMgr
+			})
+		}
+	}
+	
+	// Connection state management
+	ConnectionStateManager {
+		id: connectionStateMgr
+		
+		useWebSocketSubscription: configurator.useWebSocketSubscription
+		webSocketStatus: subscriptionManager_.status
+		
+		onConnectionStateChanged: {
+			stateManager.handleConnectionStateChange(status)
+		}
+	}
+	
+	// Server connection management
+	ServerConnectionManager {
+		id: serverConnectionMgr
+		
+		subscriptionManager: subscriptionManager_
+		webSocketPortProvider: webSocketPortProvider
+		applicationInfoProvider: applicationInfoProvider
+		useWebSocketSubscription: configurator.useWebSocketSubscription
+		appId: context.appId
+		
+		onServerUrlChanged: {
+			connectToWebSocket()
+		}
+	}
+	
+	// Authorization management
+	AuthorizationManager {
+		id: authMgr
+		
+		authorizationController: configurator.hasAuthorization ? AuthorizationController : null
+		
+		onAuthorizationRequired: {
+			thumbnailDecorator.showPage(thumbnailDecorator.authorizationPageComp)
+		}
+		
+		onSuperuserCreationRequired: {
+			thumbnailDecorator.showPage(thumbnailDecorator.superuserPasswordPageComp)
+		}
+		
+		onAuthorizationSuccessful: {
+			thumbnailDecorator.drawingContainer.content = Style.drawingContainerDecorator
+			thumbnailDecorator.showPage(undefined)
+			stateManager.updateAllModels()
+		}
+		
+		onAuthorizationFailed: {
+			stateManager.showMessagePage(qsTr("Authorization failed"))
+		}
+		
+		onLoggedOut: {
+			thumbnailDecorator.stopLoading()
+			NavigationController.clear()
+			subscriptionManager_.clear()
+		}
+	}
+	
+	// Application state management
+	ApplicationStateManager {
+		id: stateManager
+		
+		thumbnailDecorator: thumbnailDecorator
+		connectionStateManager: connectionStateMgr
+		
+		onShowErrorPage: {
+			delayedErrorTimer.errorMessage = message
+			delayedErrorTimer.loadingVisible = loading
+			delayedErrorTimer.restart()
+		}
+		
+		onClearErrorPage: {
+			delayedErrorTimer.stop()
+		}
+		
+		onModelsInitialized: {
+			application.firstModelsInit()
+		}
+	}
+	
+	// Timer for delayed error display
+	Timer {
+		id: delayedErrorTimer
+		interval: 1000
+		repeat: false
+		
+		property string errorMessage: ""
+		property bool loadingVisible: false
+		
+		onTriggered: {
+			thumbnailDecorator.stackView.clear()
+			Events.sendEvent("SearchVisible", false)
+			Events.sendEvent("SetUserPanelEnabled", false)
+			application.showMessagePage(errorMessage, loadingVisible)
+		}
+	}
+	
+	// ============================================================================
+	// Legacy Code (TODO: Move to managers)
+	// ============================================================================
+	
+	// TODO: ConnectionStateMachine.qml [DEPRECATED - replaced by ConnectionStateManager]
 	QtObject {
 		id: connectionState
 
-		property int totalStatus: -1
+		property int totalStatus: connectionStateMgr.totalStatus
 		
-		property var status : ({
-			TRY_CONNECTING_TO_AUTH_SERVER: 0,
-			AUTH_SERVER_CONNECTION_ERROR: 1,
-			TRY_CONNECTING_TO_APP_SERVER: 2,
-			APP_SERVER_CONNECTION_ERROR: 3,
-			CONNECTION_SUCCESFUL: 4
-		})
+		property var status : connectionStateMgr.ConnectionStatus
 		
 		// 0 - WebSocket.Connecting, 1 - WebSocket.Open, 2 - WebSocket.Closing, 3 - WebSocket.Closed, 4 - WebSocket.Error
-		property int appConnectionState: application.useWebSocketSubscription ? subscriptionManager_.status : 1
-		property int authConnectionState: 1 // -1 - Unknown, 0 - Connecting, 1 - Connected, 2 - Disconnected
+		property int appConnectionState: connectionStateMgr.appConnectionState
+		property int authConnectionState: connectionStateMgr.authConnectionState
 
 		onAppConnectionStateChanged: {
-			checkState()
+			// Handled by ConnectionStateManager
 		}
 		
 		onAuthConnectionStateChanged: {
-			checkState()
+			// Handled by ConnectionStateManager
 		}
 		
 		function checkState(){
-			if (authConnectionState == 1 && appConnectionState == 1){
-				totalStatus = status.CONNECTION_SUCCESFUL
-			}
-			else if (appConnectionState == 0){
-				totalStatus = status.TRY_CONNECTING_TO_APP_SERVER
-			}
-			else if (appConnectionState == 4 || appConnectionState == 3){
-				totalStatus = status.APP_SERVER_CONNECTION_ERROR
-			}
-			else if (authConnectionState == 0){
-				totalStatus = status.TRY_CONNECTING_TO_AUTH_SERVER
-			}
-			else if (authConnectionState == 2){
-				totalStatus = status.AUTH_SERVER_CONNECTION_ERROR
-			}
+			// Handled by ConnectionStateManager
 		}
 		
 		onTotalStatusChanged: {
-			if (totalStatus == status.TRY_CONNECTING_TO_AUTH_SERVER){
-				internal.errorMessage = qsTr("Try connecting to authorization server ...")
-				internal.loadingVisible = true
-			}
-			else if (totalStatus == status.AUTH_SERVER_CONNECTION_ERROR){
-				internal.errorMessage = qsTr("Authorization server connection error")
-				internal.loadingVisible = false
-			}
-			else if (totalStatus == status.TRY_CONNECTING_TO_APP_SERVER){
-				internal.errorMessage = qsTr("Try connecting to ") + application.getServerUrl() + " ..."
-				internal.loadingVisible = true
-			}
-			else if (totalStatus == status.APP_SERVER_CONNECTION_ERROR){
-				internal.errorMessage = qsTr("Server connection error")
-				internal.loadingVisible = false
-			}
-			else if (totalStatus == status.CONNECTION_SUCCESFUL){
-				thumbnailDecorator.stackView.clear();
-				statusTimer.stop()
-				Events.sendEvent("SearchVisible", true);
-				Events.sendEvent("SetUserPanelEnabled", true);
-				
-				application.firstModelsInit()
-				
-				return
-			}
-
-			statusTimer.restart()
+			// Handled by ApplicationStateManager
 		}
 	}
 	
@@ -116,12 +215,7 @@ Item {
 		interval: 1000
 		repeat: false
 		onTriggered: {
-			thumbnailDecorator.stackView.clear();
-			
-			Events.sendEvent("SearchVisible", false);
-			Events.sendEvent("SetUserPanelEnabled", false);
-			
-			application.showMessagePage(internal.errorMessage, internal.loadingVisible)
+			// Handled by ApplicationStateManager via delayedErrorTimer
 		}
 	}
 	
@@ -131,6 +225,10 @@ Item {
 		property bool loadingVisible: false;
 	}
 
+	// ============================================================================
+	// Public Methods (API compatibility maintained)
+	// ============================================================================
+	
 	function showMessagePage(message, loadingVisible){
 		if (!loadingVisible){
 			loadingVisible = false
@@ -142,13 +240,75 @@ Item {
 		thumbnailDecorator.stackView.addPage(messagePageComp);
 	}
 	
+	function setDecorators(){
+		Style.setDecorators(decorators)
+	}
+	
+	function getServerUrl(){
+		return serverConnectionMgr.getServerUrl()
+	}
+	
+	function reconnect(){
+		serverConnectionMgr.reconnect()
+	}
+	
+	function getHeaders(){
+		return serverConnectionMgr.getHeaders(AuthorizationController.productId)
+	}
+	
+	function updateAllModels(){
+		userSettingsController.getSettings()
+		stateManager.updateAllModels()
+	}
+	
+	function onSimpleUserManagement(){
+		application.updateAllModels()
+	}
+	
+	function onStrongUserManagement(){
+		if (configurator.hasAuthorization) {
+			let loggedUserId = AuthorizationController.getLoggedUserId()
+			if (loggedUserId === ""){
+				AuthorizationController.updateSuperuserModel()
+			}
+		}
+	}
+	
+	function firstModelsInit(force){
+		if (!force){
+			force = false
+		}
+		
+		if (!force && stateManager.firstModelsInitialized){
+			return
+		}
+		
+		if (configurator.hasAuthorization) {
+			authMgr.initialize()
+		}
+		
+		stateManager.initializeModels(force)
+	}
+	
+	function connectToWebSocketServer(){
+		serverConnectionMgr.connectToWebSocket()
+	}
+	
+	// ============================================================================
+	// Signals
+	// ============================================================================
+	
 	signal saveSettings(string json);
 	signal settingsSaved();
 	signal settingsSaveFailed();
 	
+	// ============================================================================
+	// Initialization
+	// ============================================================================
+	
 	Component.onCompleted: {
 		setDecorators()
-		timer.onTriggeredFunc();
+		timer.onTriggeredFunc()
 	}
 	
 	onWidthChanged: {
@@ -163,9 +323,13 @@ Item {
 	
 	onServerConnectedChanged: {
 		if (serverConnected){
-			applicationInfoProvider.updateModel();
+			serverConnectionMgr.updateApplicationInfo()
 		}
 	}
+	
+	// ============================================================================
+	// Visual Components
+	// ============================================================================
 	
 	Decorators {
 		id: decorators_
@@ -175,23 +339,11 @@ Item {
 		id: decoratorsQt;
 	}
 	
-	function setDecorators(){
-		Style.setDecorators(decorators)
-	}
-	
-	function getServerUrl(){
-		return clientSettingsController.getServerUrl()
-	}
-	
-	function reconnect(){
-		webSocketPortProvider.port = -1;
-	}
-	
-	function getHeaders(){
-		return {"productId": AuthorizationController.productId};
-	}
-	
 	property alias thumbnailDecoratorGui: thumbnailDecorator;
+	
+	// ============================================================================
+	// Providers and Controllers
+	// ============================================================================
 	
 	property ApplicationInfoProvider applicationInfoProvider : ApplicationInfoProvider
 	{
@@ -202,7 +354,9 @@ Item {
 				
 				pageAboutProvider.serverVersion = serverApplicationInfo.m_version
 				
-				AuthorizationController.productId = serverApplicationInfo.m_applicationId
+				if (configurator.hasAuthorization) {
+					AuthorizationController.productId = serverApplicationInfo.m_applicationId
+				}
 			}
 		}
 	}
@@ -223,8 +377,12 @@ Item {
 		}
 		
 		onUrlChanged: {
-			// AuthorizationController.logout();
-			application.reconnect();
+			serverConnectionMgr.setServerUrl(getServerUrl())
+			serverConnectionMgr.reconnect()
+		}
+		
+		Component.onCompleted: {
+			serverConnectionMgr.setServerUrl(getServerUrl())
 		}
 	}
 	
@@ -256,7 +414,7 @@ Item {
 	
 	SubscriptionManager {
 		id: subscriptionManager_;
-		active: application.useWebSocketSubscription;
+		active: configurator.useWebSocketSubscription;
 	}
 	
 	property Component messagePageComp: Component {
@@ -273,37 +431,7 @@ Item {
 		id: webSocketPortProvider;
 		
 		onPortChanged: {
-			application.connectToWebSocketServer();
-		}
-	}
-	
-	function getWebSocketUrl(serverUrl){
-		try {
-			let url = new URL(serverUrl);
-
-			let protocol = "ws";
-			if (url.protocol === "https:"){
-				protocol = "wss";
-			}
-
-			url.protocol = protocol
-
-			if (webSocketPortProvider.port >= 0){
-				url.port = webSocketPortProvider.port;
-			}
-			else{
-				console.error("WebSocket port provider has invalid port!");
-			}
-
-			if (context.appId && context.appId !== ""){
-				url.pathname = "/" + context.appId + "/wssub";
-			}
-
-			return String(url)
-		}
-		catch(error){
-			console.error(error);
-			return "";
+			serverConnectionMgr.connectToWebSocket()
 		}
 	}
 	
@@ -321,7 +449,7 @@ Item {
 		}
 		
 		function fillPreferenceParamsSet(){
-			if (Qt.platform.os !== "web"){
+			if (configurator.showNetworkSettings){
 				settingsController.registerParamsSetController("Network", qsTr("Network"), clientSettingsController)
 			}
 
@@ -335,101 +463,45 @@ Item {
 		}
 	}
 	
-	function updateAllModels(){
-		userSettingsController.getSettings()
-		thumbnailDecorator.updateModels();
-	}
-	
-	function onSimpleUserManagement(){
-		application.updateAllModels();
-	}
-	
-	function onStrongUserManagement(){
-		let loggedUserId = AuthorizationController.getLoggedUserId();
-		if (loggedUserId === ""){
-			AuthorizationController.updateSuperuserModel();
-		}
-	}
-	
-	function firstModelsInit(force){
-		if (!force){
-			force = false
-		}
-		
-		if (!force && firstModelsIsInit){
-			return
-		}
-		
-		let loggedUserId = AuthorizationController.getLoggedUserId();
-		if (loggedUserId === ""){
-			AuthorizationController.updateUserManagementModel();
-		}
-		
-		firstModelsIsInit = true;
-	}
-	
-	function connectToWebSocketServer(){
-		if (!application.useWebSocketSubscription){
-			return;
-		}
-		
-		subscriptionManager_.active = false;
-		let serverUrl = getServerUrl();
-		let webSocketServerUrl = getWebSocketUrl(serverUrl);
-		subscriptionManager_.url = webSocketServerUrl;
-		subscriptionManager_.active = true;
-	}
+	// ============================================================================
+	// Authorization Connections
+	// ============================================================================
 	
 	Connections {
-		target: AuthorizationController;
+		target: configurator.hasAuthorization ? AuthorizationController : null
+		enabled: configurator.hasAuthorization
 		
 		function onUserModeChanged(userMode){
-			if (AuthorizationController.isStrongUserManagement()){
-				application.onStrongUserManagement();
-			}
-			else if (AuthorizationController.isSimpleUserManagement()){
-				application.onSimpleUserManagement();
-			}
+			authMgr.handleUserModeChange(userMode)
 		}
 		
 		function onSuperuserExistResult(status, message){
-			if (status === "EXISTS"){
-				thumbnailDecorator.showPage(thumbnailDecorator.authorizationPageComp)
-			}
-			else if (status === "NOT_EXISTS"){
-				thumbnailDecorator.showPage(thumbnailDecorator.superuserPasswordPageComp)
-			}
-			else{
-				// UNKNOWN
-				application.showMessagePage(message);
-			}
+			authMgr.handleSuperuserExistResult(status, message)
 		}
 		
 		function onLoggedIn(){
-			thumbnailDecorator.drawingContainer.content = Style.drawingContainerDecorator;
-			thumbnailDecorator.showPage(undefined)
-			
-			application.updateAllModels();
+			authMgr.handleLoggedIn()
 		}
 		
 		function onLoggedOut(){
-			thumbnailDecorator.stopLoading();
-			application.firstModelsInit(true);
-			NavigationController.clear();
-			subscriptionManager_.clear();
+			authMgr.handleLoggedOut()
 		}
 	}
+	
+	// ============================================================================
+	// WebSocket Port Update Timer
+	// ============================================================================
 	
 	property Timer timer: Timer{
 		interval: 3000;
 		repeat: true;
-		running: application.useWebSocketSubscription && webSocketPortProvider.port == -1;
+		running: configurator.useWebSocketSubscription && webSocketPortProvider.port == -1;
 		onTriggered: {
 			onTriggeredFunc();
 		}
 		
 		function onTriggeredFunc(){
-			if (!application.useWebSocketSubscription){
+			if (!configurator.useWebSocketSubscription){
 				return;
 			}
 			
