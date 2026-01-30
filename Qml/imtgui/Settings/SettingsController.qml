@@ -29,7 +29,7 @@ QtObject {
 	property Component constrainedDoubleParamEditorComp: Component { ConstrainedDoubleParamEditor{}}
 	property Component enableableParamEditorComp: Component { EnableableParamEditor {}}
 	property Component serverConnectionParamEditorComp: Component { ServerConnectionParamEditor {}}
-	property Component patTokenParamEditorComp: Component { PatTokenParamEditor {}}
+	property Component patTokenParamEditorComp: Component { PatTokenParamEditor {} }
 	
 	Component.onCompleted: {
 		registerParamEditor(ParamTypeIdsTypeMetaInfo.s_textParam, textParamEditorComp)
