@@ -74,9 +74,11 @@ void CPersonalAccessTokenManagerGuiComp::OnGuiCreated()
 	RevokeTokenButton->setEnabled(false);
 	DeleteTokenButton->setEnabled(false);
 	
-	// Load user ID from attribute if available
-	if (m_userIdAttrPtr.IsValid()) {
+	// Load user ID from attribute or login component
+	if (m_userIdAttrPtr.IsValid() && !m_userIdAttrPtr->isEmpty()) {
 		m_currentUserId = *m_userIdAttrPtr;
+	} else if (m_loginCompPtr.IsValid()) {
+		m_currentUserId = m_loginCompPtr->GetLoggedUserId();
 	}
 }
 
@@ -110,14 +112,17 @@ void CPersonalAccessTokenManagerGuiComp::RefreshTokenList()
 		return;
 	}
 	
-	// Update user ID from attribute if changed
-	if (m_userIdAttrPtr.IsValid()) {
+	// Update user ID from attribute or login component
+	if (m_userIdAttrPtr.IsValid() && !m_userIdAttrPtr->isEmpty()) {
 		m_currentUserId = *m_userIdAttrPtr;
+	} else if (m_loginCompPtr.IsValid()) {
+		m_currentUserId = m_loginCompPtr->GetLoggedUserId();
 	}
 	
 	if (m_currentUserId.isEmpty()) {
 		TokenListWidget->clear();
 		TokenDetailsText->clear();
+		UserIdLabel->setText("User: <not logged in>");
 		return;
 	}
 	
