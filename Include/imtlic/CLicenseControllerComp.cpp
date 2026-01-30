@@ -48,7 +48,7 @@ bool CLicenseControllerComp::ImportLicense(const QString& licenseFilePath, ilog:
 				backupFilePath = QDir::tempPath() + "/" + QUuid::createUuid().toString(QUuid::WithoutBraces) + "/License.lic";
 				if (!istd::CSystem::FileCopy(targetFilePath, backupFilePath)){
 					if (logPtr != nullptr){
-						ilog::IMessageConsumer::MessagePtr messagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, QT_TR_NOOP("Backup of the existing license failed. Import canceled"), "License Manager", "imtlic::CLicenseControllerComp"));
+						ilog::IMessageConsumer::MessagePtr messagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, QT_TR_NOOP("Backup of the existing license failed. Import canceled"), "License Manager"));
 
 						logPtr->AddMessage(messagePtr);
 					}
@@ -81,7 +81,7 @@ bool CLicenseControllerComp::ImportLicense(const QString& licenseFilePath, ilog:
 							errorMessage += ".\n" + addtionalMessage;
 						}
 
-						ilog::IMessageConsumer::MessagePtr messagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, errorMessage, "License Manager", "imtlic::CLicenseControllerComp"));
+						ilog::IMessageConsumer::MessagePtr messagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, errorMessage, "License Manager"));
 
 						logPtr->AddMessage(messagePtr);
 					}
@@ -93,7 +93,7 @@ bool CLicenseControllerComp::ImportLicense(const QString& licenseFilePath, ilog:
 						}
 						else{
 							if (logPtr != nullptr){
-								ilog::IMessageConsumer::MessagePtr messagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, QT_TR_NOOP("Restore of the last license failed"), "License Manager", "imtlic::CLicenseControllerComp"));
+								ilog::IMessageConsumer::MessagePtr messagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, QT_TR_NOOP("Restore of the last license failed"), "License Manager"));
 
 								logPtr->AddMessage(messagePtr);
 							}
@@ -103,7 +103,7 @@ bool CLicenseControllerComp::ImportLicense(const QString& licenseFilePath, ilog:
 			}
 			else{
 				if (logPtr != nullptr){
-					ilog::IMessageConsumer::MessagePtr messagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, QT_TR_NOOP("License file could not be copied to the target location"), "License Manager", "imtlic::CLicenseControllerComp"));
+					ilog::IMessageConsumer::MessagePtr messagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, QT_TR_NOOP("License file could not be copied to the target location"), "License Manager"));
 
 					logPtr->AddMessage(messagePtr);
 				}
