@@ -17,7 +17,6 @@ namespace imtauthgui
 // public methods
 
 CPersonalAccessTokenManagerGuiComp::CPersonalAccessTokenManagerGuiComp()
-	: m_tokenCollectionObserver(*this)
 {
 }
 
@@ -34,21 +33,15 @@ void CPersonalAccessTokenManagerGuiComp::UpdateGui(const istd::IChangeable::Chan
 
 void CPersonalAccessTokenManagerGuiComp::OnGuiModelAttached()
 {
-	// Attach observer to token collection
-	if (m_tokenCollectionCompPtr.IsValid()) {
-		m_tokenCollectionObserver.RegisterObject(
-			m_tokenCollectionCompPtr.GetPointer(),
-			&CPersonalAccessTokenManagerGuiComp::OnTokenCollectionUpdated);
-	}
-	
 	RefreshTokenList();
 }
 
 
 void CPersonalAccessTokenManagerGuiComp::OnGuiModelDetached()
 {
-	// Detach observer from token collection
-	m_tokenCollectionObserver.UnregisterObject();
+	// Clear UI when model is detached
+	TokenListWidget->clear();
+	TokenDetailsText->clear();
 }
 
 
@@ -104,7 +97,6 @@ void CPersonalAccessTokenManagerGuiComp::OnComponentCreated()
 
 void CPersonalAccessTokenManagerGuiComp::OnComponentDestroyed()
 {
-	m_tokenCollectionObserver.UnregisterObject();
 	BaseClass::OnComponentDestroyed();
 }
 
@@ -189,14 +181,6 @@ void CPersonalAccessTokenManagerGuiComp::UpdateTokenDetails(const QByteArray& to
 	}
 	
 	TokenDetailsText->setHtml(details);
-}
-
-
-void CPersonalAccessTokenManagerGuiComp::OnTokenCollectionUpdated(
-	const istd::IChangeable::ChangeSet& /*changeSet*/, const imtbase::IObjectCollection* /*collectionPtr*/)
-{
-	// Token collection changed, refresh the list
-	RefreshTokenList();
 }
 
 
