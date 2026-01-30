@@ -37,7 +37,7 @@ imtauth::IPersonalAccessTokenManager::TokenCreationResult CClientRequestPersonal
 	}
 	
 	if (expiresAt.isValid()){
-		arguments.input.Version_1_0->expiresAt = expiresAt.toString(Qt::ISODate);
+		arguments.input.Version_1_0->expiresAt = expiresAt.toUTC().toString(Qt::ISODate);
 	}
 
 	tokensdl::CCreateTokenPayload payload;
@@ -92,8 +92,10 @@ bool CClientRequestPersonalAccessTokenManagerComp::ValidateToken(const QByteArra
 		scopes = payload.Version_1_0->scopes->ToList();
 	}
 
-	// Note: tokenId is not returned in the SDL schema's ValidateTokenPayload
-	// This is intentional for security - the token ID may be derived internally
+	// Note: The SDL schema's ValidateTokenPayload does not include a tokenId field.
+	// This is a limitation of the GraphQL client implementation. The tokenId would
+	// need to be added to the ValidateTokenPayload type in PersonalAccessTokens.sdl
+	// to support this parameter. For now, we return an empty tokenId.
 	tokenId = QByteArray();
 
 	return true;
@@ -179,17 +181,17 @@ imtauth::IPersonalAccessTokenSharedPtr CClientRequestPersonalAccessTokenManagerC
 	}
 
 	if (payload.Version_1_0->createdAt.HasValue()){
-		QDateTime createdAt = QDateTime::fromString(*payload.Version_1_0->createdAt, Qt::ISODate);
+		QDateTime createdAt = QDateTime::fromString(*payload.Version_1_0->createdAt, Qt::ISODate).toUTC();
 		tokenPtr->SetCreatedAt(createdAt);
 	}
 
 	if (payload.Version_1_0->lastUsedAt.HasValue()){
-		QDateTime lastUsedAt = QDateTime::fromString(*payload.Version_1_0->lastUsedAt, Qt::ISODate);
+		QDateTime lastUsedAt = QDateTime::fromString(*payload.Version_1_0->lastUsedAt, Qt::ISODate).toUTC();
 		tokenPtr->SetLastUsedAt(lastUsedAt);
 	}
 
 	if (payload.Version_1_0->expiresAt.HasValue()){
-		QDateTime expiresAt = QDateTime::fromString(*payload.Version_1_0->expiresAt, Qt::ISODate);
+		QDateTime expiresAt = QDateTime::fromString(*payload.Version_1_0->expiresAt, Qt::ISODate).toUTC();
 		tokenPtr->SetExpiresAt(expiresAt);
 	}
 
@@ -225,12 +227,17 @@ bool CClientRequestPersonalAccessTokenManagerComp::RevokeToken(const QByteArray&
 
 bool CClientRequestPersonalAccessTokenManagerComp::UpdateLastUsedAt(const QByteArray& tokenId)
 {
-	// Note: UpdateLastUsedAt is typically handled server-side during token validation
-	// For the client implementation, we don't have a direct GraphQL mutation for this
-	// This would typically be called internally by the server when ValidateToken is called
+	// Note: UpdateLastUsedAt is not supported in the GraphQL client implementation.
+	// This operation is typically handled server-side during token validation and does
+	// not have a corresponding GraphQL mutation in the PersonalAccessTokens.sdl schema.
+	// 
+	// In a typical deployment:
+	// - The server automatically updates lastUsedAt when ValidateToken is called
+	// - Clients do not need to explicitly call this method
+	// 
+	// If explicit client-side control of lastUsedAt is required, a new mutation
+	// would need to be added to the SDL schema.
 	
-	// Since the SDL schema doesn't define an UpdateLastUsedAt mutation,
-	// we return false to indicate this operation is not supported in the client
 	Q_UNUSED(tokenId);
 	return false;
 }
