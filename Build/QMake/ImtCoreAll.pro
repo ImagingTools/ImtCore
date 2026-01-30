@@ -222,6 +222,9 @@ imtservice.file = ../../Include/imtservice/QMake/imtservice.pro
 SUBDIRS += imthype
 imthype.file = ../../Include/imthype/QMake/imthype.pro
 
+SUBDIRS += imthypedb
+imthypedb.file = ../../Include/imthypedb/QMake/imthypedb.pro
+
 SUBDIRS += imthypegui
 imthypegui.file = ../../Include/imthypegui/QMake/imthypegui.pro
 
@@ -445,6 +448,10 @@ EagleView.depends = imt3dgui
 SUBDIRS += ImtHypePck
 ImtHypePck.file = ../../Impl/ImtHypePck/QMake/ImtHypePck.pro
 ImtHypePck.depends = imthype
+
+SUBDIRS += ImtHypeDbPck
+ImtHypeDbPck.file = ../../Impl/ImtHypeDbPck/QMake/ImtHypeDbPck.pro
+ImtHypeDbPck.depends = imthypedb
 
 SUBDIRS += ImtHypeGuiPck
 ImtHypeGuiPck.file = ../../Impl/ImtHypeGuiPck/QMake/ImtHypeGuiPck.pro
