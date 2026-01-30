@@ -231,7 +231,7 @@ Item {
 	
 	function showMessagePage(message, loadingVisible){
 		if (!loadingVisible){
-			loadingVisible = false
+			loadingVisible = false;
 		}
 
 		internal.errorMessage = message;
@@ -276,7 +276,7 @@ Item {
 	
 	function firstModelsInit(force){
 		if (!force){
-			force = false
+			force = false;
 		}
 		
 		if (!force && stateManager.firstModelsInitialized){
