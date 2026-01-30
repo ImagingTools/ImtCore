@@ -2,9 +2,9 @@
 
 
 // Qt includes
-#include <QMessageBox>
-#include <QInputDialog>
-#include <QDateTime>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QInputDialog>
+#include <QtCore/QDateTime>
 
 // ImtCore includes
 #include <imtauth/IPersonalAccessToken.h>
