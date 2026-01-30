@@ -23,7 +23,7 @@
 The component follows the standard ImtCore GUI observer pattern:
 
 - **Base Class**: `TDesignerGuiObserverCompBase<Ui::CPersonalAccessTokenManagerGuiComp, IPersonalAccessTokenManager>`
-- **Observer Pattern**: Uses `TModelUpdateBinder` to observe token collection changes
+- **Observer Pattern**: Observes `IPersonalAccessTokenManager` directly through the base class
 - **UI Designer**: Qt Designer file (`.ui`) for visual layout
 - **Component Registration**: Registered in `ImtAuthGuiPck` package
 
@@ -35,23 +35,21 @@ The component follows the standard ImtCore GUI observer pattern:
 <Component Type="PersonalAccessTokenManagerGui" Name="TokenManagerGui">
   <Attr Name="UserId" Value="user123"/>
   <Ref Name="ObservedModel" Source="PersonalAccessTokenManager"/>
-  <Ref Name="TokenCollection" Source="PersonalAccessTokenCollection"/>
 </Component>
 ```
 
 ### Parameters
 
 - **ObservedModel** (required): Reference to `IPersonalAccessTokenManager` instance
-- **TokenCollection** (optional): Reference to token collection for observing changes
 - **UserId** (attribute): User ID for filtering tokens
 
 ## Implementation Details
 
 ### Key Methods
 
-- `UpdateGui()`: Refreshes the UI from the model state
-- `OnGuiModelAttached()`: Attaches observer to token collection
-- `OnGuiModelDetached()`: Detaches observer from token collection
+- `UpdateGui()`: Refreshes the UI from the model state (called automatically if model implements IChangeable)
+- `OnGuiModelAttached()`: Initializes UI when model is attached
+- `OnGuiModelDetached()`: Clears UI when model is detached
 - `RefreshTokenList()`: Updates the token list widget
 - `UpdateTokenDetails()`: Displays selected token information
 
