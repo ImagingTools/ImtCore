@@ -432,12 +432,12 @@ void TTaskCollectionEditorCompBase<UI>::OnTaskSelectionChanged(const QItemSelect
 				taskName = itemPtr->data(CTaskItemDelegate::DR_TASK_NAME).toString();
 				m_selectedTaskId = itemPtr->data(CTaskItemDelegate::DR_TASK_UUID).toByteArray();
 
-				imod::IModel* selectedTaskModelPtr = GetTaskModelFromSelection(selected);
-				if (selectedTaskModelPtr != nullptr){
-					imod::IObserver* selectedObserverPtr = GetTaskModelObserverFromSelection(selected);
-					if ((selectedObserverPtr != nullptr) && !selectedTaskModelPtr->IsAttached(selectedObserverPtr)){
-						selectedTaskModelPtr->AttachObserver(selectedObserverPtr);
-					}
+				const iinsp::ISupplier* supplierPtr = objectPtr->GetTask(m_selectedTaskId);
+				imod::IModel* selectedTaskModelPtr = dynamic_cast<imod::IModel*>(const_cast<iinsp::ISupplier*>(supplierPtr));
+				imod::IObserver* selectedObserverPtr = m_observersMap[typeId];
+
+				if (selectedTaskModelPtr && selectedObserverPtr && !selectedTaskModelPtr->IsAttached(selectedObserverPtr)){
+					selectedTaskModelPtr->AttachObserver(selectedObserverPtr);
 				}
 			}
 		}
@@ -749,7 +749,7 @@ void TTaskCollectionEditorCompBase<UI>::UpdateTaskItemState(const QModelIndex& i
 		const iimg::IBitmap* inputBitmapPtr = dynamic_cast<const iimg::IBitmap*>(taskResultsProviderPtr->GetObjectPtr(*m_previewArtifactIdAttrPtr));
 		if (inputBitmapPtr != nullptr){
 			// check if this is already QImage, to avoid extra copying
-			if (const auto* imagePtr = dynamic_cast<const iimg::CBitmap*>(inputBitmapPtr)) {
+			if (const iimg::CBitmap* imagePtr = dynamic_cast<const iimg::CBitmap*>(inputBitmapPtr)) {
 				m_itemModel.setData(index, imagePtr->GetQImage(), CTaskItemDelegate::DR_TASK_PREVIEW_OBJECT);
 			}
 			else { // na ja, then copy it to QImage
