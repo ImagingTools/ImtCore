@@ -9,6 +9,7 @@
 
 // ImtCore includes
 #include <imtauth/IPersonalAccessTokenManager.h>
+#include <imtauth/ILogin.h>
 #include <GeneratedFiles/imtauthgui/ui_CPersonalAccessTokenManagerGuiComp.h>
 
 
@@ -37,6 +38,7 @@ public:
 				Ui::CPersonalAccessTokenManagerGuiComp, imtauth::IPersonalAccessTokenManager> BaseClass;
 
 	I_BEGIN_COMPONENT(CPersonalAccessTokenManagerGuiComp);
+		I_ASSIGN(m_loginCompPtr, "Login", "Login component to get current user ID", false, "Login");
 		I_ATTR(QByteArray, m_userIdAttrPtr);
 	I_END_COMPONENT;
 
@@ -71,6 +73,7 @@ private Q_SLOTS:
 	void OnRefreshClicked();
 
 private:
+	I_REF(imtauth::ILogin, m_loginCompPtr);
 	I_ATTR(QByteArray, m_userIdAttrPtr);
 
 	QByteArray m_currentUserId;

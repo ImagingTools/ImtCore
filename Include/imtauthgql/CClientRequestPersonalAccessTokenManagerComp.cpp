@@ -4,6 +4,9 @@
 // Qt includes
 #include <QtCore/QDateTime>
 
+// ACF includes
+#include <istd/CChangeNotifier.h>
+
 
 namespace imtauthgql
 {
@@ -57,6 +60,9 @@ imtauth::IPersonalAccessTokenManager::TokenCreationResult CClientRequestPersonal
 	if (!payload.Version_1_0->id.HasValue() || !payload.Version_1_0->token.HasValue()){
 		return result;
 	}
+
+	// Notify observers that the manager state has changed
+	istd::CChangeNotifier changeNotifier(this);
 
 	result.success = true;
 	result.tokenId = *payload.Version_1_0->id;
@@ -221,7 +227,14 @@ bool CClientRequestPersonalAccessTokenManagerComp::RevokeToken(const QByteArray&
 		return false;
 	}
 
-	return *payload.Version_1_0->success;
+	bool success = *payload.Version_1_0->success;
+	
+	// Notify observers if the operation succeeded
+	if (success){
+		istd::CChangeNotifier changeNotifier(this);
+	}
+
+	return success;
 }
 
 
@@ -261,7 +274,14 @@ bool CClientRequestPersonalAccessTokenManagerComp::DeleteToken(const QByteArray&
 		return false;
 	}
 
-	return *payload.Version_1_0->success;
+	bool success = *payload.Version_1_0->success;
+	
+	// Notify observers if the operation succeeded
+	if (success){
+		istd::CChangeNotifier changeNotifier(this);
+	}
+
+	return success;
 }
 
 
