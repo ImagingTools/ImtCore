@@ -194,6 +194,11 @@ I_EXPORT_COMPONENT(
 			"Personal access token controllerr",
 			"Personal Access Token Controller");
 
+I_EXPORT_COMPONENT(
+			ClientRequestPersonalAccessTokenManager,
+			"Client request personal access token manager",
+			"Client Request Personal Access Token Manager");
+
 
 } // namespace ImtAuthGqlPck
 
