@@ -246,13 +246,13 @@ void CPersonalAccessTokenManagerGuiComp::OnCreateTokenClicked()
 {
 	imtauth::IPersonalAccessTokenManager* managerPtr = GetObservedObject();
 	if (managerPtr == nullptr || m_currentUserId.isEmpty()) {
-		QMessageBox::warning(GetGuiObject(), "Error", "No token manager or user ID available.");
+		QMessageBox::warning(GetWidget(), "Error", "No token manager or user ID available.");
 		return;
 	}
 	
 	// Get token name from user
 	bool ok;
-	QString name = QInputDialog::getText(GetGuiObject(), "Create Token",
+	QString name = QInputDialog::getText(GetWidget(), "Create Token",
 		"Token name:", QLineEdit::Normal, "", &ok);
 	
 	if (!ok || name.isEmpty()) {
@@ -260,7 +260,7 @@ void CPersonalAccessTokenManagerGuiComp::OnCreateTokenClicked()
 	}
 	
 	// Get token description
-	QString description = QInputDialog::getText(GetGuiObject(), "Create Token",
+	QString description = QInputDialog::getText(GetWidget(), "Create Token",
 		"Token description:", QLineEdit::Normal, "", &ok);
 	
 	if (!ok) {
@@ -284,12 +284,12 @@ void CPersonalAccessTokenManagerGuiComp::OnCreateTokenClicked()
 			.arg(QString::fromUtf8(result.tokenId))
 			.arg(QString::fromUtf8(result.rawToken));
 		
-		QMessageBox::information(GetGuiObject(), "Token Created", message);
+		QMessageBox::information(GetWidget(), "Token Created", message);
 		
 		// Refresh the token list
 		RefreshTokenList();
 	} else {
-		QMessageBox::warning(GetGuiObject(), "Error", "Failed to create token.");
+		QMessageBox::warning(GetWidget(), "Error", "Failed to create token.");
 	}
 }
 
@@ -303,7 +303,7 @@ void CPersonalAccessTokenManagerGuiComp::OnRevokeTokenClicked()
 	
 	QByteArray tokenId = selectedItems.first()->data(Qt::UserRole).toByteArray();
 	
-	int ret = QMessageBox::question(GetGuiObject(), "Revoke Token",
+	int ret = QMessageBox::question(GetWidget(), "Revoke Token",
 		"Are you sure you want to revoke this token? This cannot be undone.",
 		QMessageBox::Yes | QMessageBox::No);
 	
@@ -314,10 +314,10 @@ void CPersonalAccessTokenManagerGuiComp::OnRevokeTokenClicked()
 	imtauth::IPersonalAccessTokenManager* managerPtr = GetObservedObject();
 	if (managerPtr != nullptr) {
 		if (managerPtr->RevokeToken(tokenId)) {
-			QMessageBox::information(GetGuiObject(), "Success", "Token revoked successfully.");
+			QMessageBox::information(GetWidget(), "Success", "Token revoked successfully.");
 			RefreshTokenList();
 		} else {
-			QMessageBox::warning(GetGuiObject(), "Error", "Failed to revoke token.");
+			QMessageBox::warning(GetWidget(), "Error", "Failed to revoke token.");
 		}
 	}
 }
@@ -332,7 +332,7 @@ void CPersonalAccessTokenManagerGuiComp::OnDeleteTokenClicked()
 	
 	QByteArray tokenId = selectedItems.first()->data(Qt::UserRole).toByteArray();
 	
-	int ret = QMessageBox::question(GetGuiObject(), "Delete Token",
+	int ret = QMessageBox::question(GetWidget(), "Delete Token",
 		"Are you sure you want to permanently delete this token? This cannot be undone.",
 		QMessageBox::Yes | QMessageBox::No);
 	
@@ -343,10 +343,10 @@ void CPersonalAccessTokenManagerGuiComp::OnDeleteTokenClicked()
 	imtauth::IPersonalAccessTokenManager* managerPtr = GetObservedObject();
 	if (managerPtr != nullptr) {
 		if (managerPtr->DeleteToken(tokenId)) {
-			QMessageBox::information(GetGuiObject(), "Success", "Token deleted successfully.");
+			QMessageBox::information(GetWidget(), "Success", "Token deleted successfully.");
 			RefreshTokenList();
 		} else {
-			QMessageBox::warning(GetGuiObject(), "Error", "Failed to delete token.");
+			QMessageBox::warning(GetWidget(), "Error", "Failed to delete token.");
 		}
 	}
 }
