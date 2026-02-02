@@ -174,7 +174,12 @@ I_EXPORT_COMPONENT(
 			"Collection document manager publisher",
 			"Collection Document Manager Publisher");
 
+I_EXPORT_COMPONENT(
+			GqlContextCreator,
+			"GraphQL context creator",
+			"GraphQL GQL Context Creator");
 
+\
 } // namespace ImtServerGqlPck
 
 

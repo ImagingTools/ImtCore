@@ -71,6 +71,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 
 	bool isSuccessful = false;
 
+	QByteArray userId;
 	QByteArray accessToken = headers.value(QByteArrayLiteral("x-authentication-token"));
 
 	// Validate token based on prefix: pat_ for PAT tokens, otherwise JWT
@@ -79,7 +80,6 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 		if (accessToken.size() > 4 && accessToken.startsWith("pat_")){
 			// PAT token - validate with PAT manager
 			if (m_patManagerCompPtr.IsValid()){
-				QByteArray userId;
 				QByteArray tokenId;
 				QByteArrayList scopes;
 				if (!m_patManagerCompPtr->ValidateToken(accessToken, userId, tokenId, scopes)){
@@ -103,34 +103,37 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 				else if (state == JwtState::JS_INVALID){
 					return CreateResponse(StatusCode::SC_FORBIDDEN, QByteArray(), request);
 				}
-				// JWT validation successful (JS_OK), continue processing
+
+				userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(accessToken);
 			}
-			// If JWT controller not configured, allow the token through
-			// and let GetRequestContext handle validation
 		}
 	}
 
-	imtgql::IGqlContext* gqlContextPtr = nullptr;
-	if (!accessToken.isEmpty() && m_gqlContextControllerCompPtr.IsValid()){
+	QByteArray productId;
+	if (headers.contains(imtbase::s_productIdHeaderId)){
+		productId = headers.value(imtbase::s_productIdHeaderId);
+	}
+
+	if (m_gqlContextCreatorCompPtr.IsValid()){
 		QString errorMessage;
-		gqlContextPtr = m_gqlContextControllerCompPtr->GetRequestContext(m_lastRequest, accessToken, headers, errorMessage);
-		if (gqlContextPtr != nullptr){
-			m_lastRequest.SetGqlContext(gqlContextPtr);
-		}
-		else{
+		imtgql::IGqlContextUniquePtr gqlContextPtr = m_gqlContextCreatorCompPtr->CreateGqlContext(accessToken, productId, userId, headers, errorMessage);
+		if (!gqlContextPtr.IsValid()){
 			SendCriticalMessage(
 						0,
-						QStringLiteral("Unable to get a GraphQL context for the access token '%1' for Command-ID: '%2'")
-											.arg(QString(accessToken), QString(gqlCommand)),
+						QStringLiteral("Unable to create a GraphQL context for the access token '%1' for Command-ID: '%2'. Error: '%3'")
+											.arg(QString(accessToken), QString(gqlCommand), errorMessage),
 						QStringLiteral("GraphQL - servlet"));
-
 			return GenerateError(StatusCode::SC_INTERNAL_SERVER_ERROR, QStringLiteral("Request context is invalid"), request);
 		}
+
+		imtgql::IGqlContextSharedPtr shared;
+		shared.MoveCastedPtr(gqlContextPtr);
+		m_lastRequest.SetGqlContext(shared);
+
+		imtgql::CGqlRequestContextManager::SetContext(m_lastRequest.GetRequestContext());
 	}
-	else if (!headers.isEmpty()){
-		gqlContextPtr = new imtgql::CGqlContext();
-		gqlContextPtr->SetHeaders(headers);
-		m_lastRequest.SetGqlContext(gqlContextPtr);
+	else{
+		Q_ASSERT(false);
 	}
 
 	QByteArray responseData;
@@ -152,8 +155,6 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 		QString errorType = QStringLiteral("Warning");
 		istd::TDelPtr<imtbase::CTreeItemModel> sourceItemModelPtr;
 		sourceItemModelPtr.SetPtr(requestHandlerPtr->CreateResponse(m_lastRequest, errorMessage));
-
-		imtgql::CGqlRequestContextManager::Clear();
 
 		bool isError = false;
 		imtbase::CTreeItemModel rootModel;
@@ -202,6 +203,8 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 
 		break;
 	}
+
+	imtgql::CGqlRequestContextManager::Clear();
 
 	if (!isSuccessful){
 		SendErrorMessage(0, QStringLiteral("Invalid command request:'%1'").arg(QString(gqlCommand)), QStringLiteral("GraphQL - servlet"));

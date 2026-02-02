@@ -90,6 +90,10 @@ bool CGuiElementModelRepresentationControllerComp::GetRepresentationFromDataMode
 	int priority = guiElementPtr->GetPriority();
 	int alignment = guiElementPtr->GetAlignment();
 
+	if (!isVisible){
+		return false;
+	}
+
 	QByteArray languageId;
 	if (paramsPtr != nullptr){
 		iprm::TParamsPtr<iprm::IIdParam> languageParamPtr(paramsPtr, "LanguageParam");

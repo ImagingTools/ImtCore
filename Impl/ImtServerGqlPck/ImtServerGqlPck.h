@@ -39,6 +39,7 @@
 #include <imtservergql/CCollectionImportJobParamsFillerComp.h>
 #include <imtservergql/CCollectionDocumentManagerControllerComp.h>
 #include <imtservergql/CCollectionDocumentManagerPublisherComp.h>
+#include <imtservergql/CGqlContextCreatorComp.h>
 
 
 /**
@@ -80,6 +81,7 @@ typedef imtservergql::CCollectionImportControllerComp CollectionImportController
 typedef imtservergql::CCollectionImportJobParamsFillerComp CollectionImportJobParamsFiller;
 typedef imtservergql::CCollectionDocumentManagerControllerComp CollectionDocumentManagerController;
 typedef imtservergql::CCollectionDocumentManagerPublisherComp CollectionDocumentManagerPublisher;
+typedef imtservergql::CGqlContextCreatorComp GqlContextCreator;
 
 
 } // namespace ImtServerGqlPck
