@@ -41,10 +41,10 @@ if(NOT DEFINED ZLIBDIR)
 	endif()
 endif()
 
-include_directories("${BUILDDIR}/ImtCore/AuxInclude/${TARGETNAME}/GeneratedFiles")
-include_directories("${BUILDDIR}/ImtCore/AuxInclude/${TARGETNAME}")
+include_directories("${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles")
+include_directories("${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}")
 include_directories("${IMTCOREDIR}/Include")
 include_directories("${IMTCOREDIR}/Impl")
 include_directories("${IMTCOREDIR}/Sdl")
 
-link_directories("${BUILDDIR}/ImtCore/Lib/${CMAKE_BUILD_TYPE}_${TARGETNAME}")
+link_directories("${IMTCOREDIR_BUILD}/Lib/${CMAKE_BUILD_TYPE}_${TARGETNAME}")
