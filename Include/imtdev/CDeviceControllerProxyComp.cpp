@@ -15,7 +15,7 @@ namespace imtdev
 // public methods
 
 CDeviceControllerProxyComp::CDeviceControllerProxyComp()
-	:m_deviceStateProviderUpdateBridge(&m_deviceStateProvider),
+	:m_deviceStateProviderUpdateBridge(&m_deviceStateProvider, imod::CModelUpdateBridge::UF_SOURCE),
 	m_enumeratorIndex(-1),
 	m_resultHandlerPtr(nullptr),
 	m_overriddenDeviceInfoObserver(*this)
