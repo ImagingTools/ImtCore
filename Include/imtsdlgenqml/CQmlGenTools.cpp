@@ -48,7 +48,6 @@ bool CQmlGenTools::UpdateGenerationResultFile(CSdlQmlGenerationResult& result, c
 	}
 	
 	// Serialize using CJsonMemWriteArchive
-	// NOTE: result is non-const because Serialize() method is not const
 	iser::CJsonMemWriteArchive archive(nullptr);
 	if (result.Serialize(archive)){
 		// Write serialized data to file
@@ -111,7 +110,6 @@ bool CQmlGenTools::WriteGenerationResultFile(CSdlQmlGenerationResult& result, co
 	}
 	
 	// Serialize using CJsonMemWriteArchive
-	// NOTE: result is non-const because Serialize() method is not const
 	iser::CJsonMemWriteArchive archive(nullptr);
 	if (!result.Serialize(archive)){
 		file.close();
