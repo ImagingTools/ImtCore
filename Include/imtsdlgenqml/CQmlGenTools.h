@@ -27,8 +27,7 @@ public:
 		
 		Uses iser::CJsonMemWriteArchive for serialization to ensure proper data formatting.
 		
-		\param result The generation result object containing metadata to save
-		             NOTE: Non-const reference required because Serialize() method is not const
+		\param result The generation result object containing metadata to save (non-const because Serialize() is not const)
 		\param filePath Full path to the JSON file where the result should be saved
 		\return true if the operation succeeded, false otherwise
 	*/
@@ -52,8 +51,7 @@ public:
 		This is a helper method that writes the result to file using iser::CJsonMemWriteArchive.
 		For complete file safety, use UpdateGenerationResultFile instead.
 		
-		\param result The generation result object containing metadata to save
-		             NOTE: Non-const reference required because Serialize() method is not const
+		\param result The generation result object containing metadata to save (non-const because Serialize() is not const)
 		\param filePath Full path to the JSON file where the result should be saved
 		\return true if the operation succeeded, false otherwise
 	*/
