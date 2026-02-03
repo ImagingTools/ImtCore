@@ -16,7 +16,7 @@ namespace imtsdlgenqml
 {
 
 
-bool CQmlGenTools::UpdateGenerationResultFile(const CSdlQmlGenerationResult& result, const QString& filePath)
+bool CQmlGenTools::UpdateGenerationResultFile(CSdlQmlGenerationResult& result, const QString& filePath)
 {
 	// Ensure the directory exists
 	QFileInfo fileInfo(filePath);
@@ -48,9 +48,9 @@ bool CQmlGenTools::UpdateGenerationResultFile(const CSdlQmlGenerationResult& res
 	}
 	
 	// Serialize using CJsonMemWriteArchive
+	// NOTE: result is non-const because Serialize() method is not const
 	iser::CJsonMemWriteArchive archive(nullptr);
-	CSdlQmlGenerationResult* nonConstResult = const_cast<CSdlQmlGenerationResult*>(&result);
-	if (nonConstResult->Serialize(archive)){
+	if (result.Serialize(archive)){
 		// Write serialized data to file
 		QByteArray jsonData = archive.GetData();
 		qint64 bytesWritten = file.write(jsonData);
@@ -93,7 +93,7 @@ bool CQmlGenTools::ReadGenerationResultFile(CSdlQmlGenerationResult& result, con
 }
 
 
-bool CQmlGenTools::WriteGenerationResultFile(const CSdlQmlGenerationResult& result, const QString& filePath)
+bool CQmlGenTools::WriteGenerationResultFile(CSdlQmlGenerationResult& result, const QString& filePath)
 {
 	// Ensure the directory exists
 	QFileInfo fileInfo(filePath);
@@ -111,9 +111,9 @@ bool CQmlGenTools::WriteGenerationResultFile(const CSdlQmlGenerationResult& resu
 	}
 	
 	// Serialize using CJsonMemWriteArchive
+	// NOTE: result is non-const because Serialize() method is not const
 	iser::CJsonMemWriteArchive archive(nullptr);
-	CSdlQmlGenerationResult* nonConstResult = const_cast<CSdlQmlGenerationResult*>(&result);
-	if (!nonConstResult->Serialize(archive)){
+	if (!result.Serialize(archive)){
 		file.close();
 		return false;
 	}
