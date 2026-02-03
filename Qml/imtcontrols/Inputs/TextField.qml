@@ -151,6 +151,7 @@ ControlBase {
 
     TextInput {
         id: textField;
+        objectName: "TextInput"
 
         anchors.fill: parent;
         anchors.leftMargin: containerTextField.margin;

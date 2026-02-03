@@ -14,6 +14,11 @@ I_EXPORT_PACKAGE(
 			"GraphQL component package",
 			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
 
+I_EXPORT_COMPONENT(
+			GqlContext,
+			"GraphQL-related context",
+			"GraphQL Gql Context");
+
 
 } // namespace ImtGqlPck
 

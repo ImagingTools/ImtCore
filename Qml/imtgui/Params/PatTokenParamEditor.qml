@@ -303,15 +303,21 @@ ParamEditorBase {
 							TableCellDelegateBase {
 								id: revokeColumnDelegateBase
 								ToolButton {
+									id: revokeButton
 									anchors.centerIn: parent
 									width: Style.buttonWidthM
 									height: width
-									iconSource: "../../../" + Style.getIconPath("Icons/Restore", Icon.State.On, Icon.Mode.Normal)
-									tooltipText: qsTr("Revoke Token")
+									iconSource: enabled ? "../../../" + Style.getIconPath("Icons/Restore", Icon.State.On, Icon.Mode.Normal) :
+												"../../../" + Style.getIconPath("Icons/Restore", Icon.State.Off, Icon.Mode.Disabled)
+									tooltipText: enabled ? qsTr("Revoke Token") : qsTr("Revoked")
 									onClicked: {
 										let tokenId = tokenTable.elements.get(revokeColumnDelegateBase.rowIndex).item.m_id
 										patTokenEditor.revokeToken(tokenId)
 									}
+								}
+								onReused: {
+									let revoked = tokenTable.elements.get(revokeColumnDelegateBase.rowIndex).item.m_revoked
+									revokeButton.enabled = !revoked
 								}
 							}
 						}

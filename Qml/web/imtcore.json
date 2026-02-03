@@ -24,6 +24,8 @@
         "${IMTCOREDIR_BUILD}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtauthsdl\\SDL\\1.0\\QML\\imtauthAuthorizationOptionsSdl",
         "${IMTCOREDIR_BUILD}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtauthsdl\\SDL\\1.0\\QML\\imtauthSessionsSdl",
         "${IMTCOREDIR_BUILD}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtauthsdl\\SDL\\1.0\\QML\\imtauthProfileSdl",
+        "${IMTCOREDIR_BUILD}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtauthsdl\\SDL\\1.0\\QML\\imtauthPersonalAccessTokensSdl",
+        "${IMTCOREDIR_BUILD}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtauthsdl\\SDL\\1.0\\QML\\imtauthUserActionsSdl",
         "${IMTCOREDIR_BUILD}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtbasesdl\\SDL\\1.0\\QML\\imtbaseImtCollectionSdl",
         "${IMTCOREDIR_BUILD}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtbasesdl\\SDL\\1.0\\QML\\imtbaseImtBaseTypesSdl",
         "${IMTCOREDIR_BUILD}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtbasesdl\\SDL\\1.0\\QML\\imtbaseComplexCollectionFilterSdl",

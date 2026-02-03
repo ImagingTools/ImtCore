@@ -104,7 +104,6 @@ bool CWebSocketClientComp::SendResponse(imtrest::ConstResponsePtr& response) con
 		imtrest::IResponse::Headers headers = response->GetHeaders();
 		data = QString(R"({"type": "query_data","id": "%1","payload": %2})")
 				   .arg(qPrintable(headers.value("id"))).arg(qPrintable(body)).toUtf8();
-		qDebug() << "SendResponse" << data;
 	}
 
 	EmitSendTextMessage(data);

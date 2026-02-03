@@ -76,6 +76,7 @@ Rectangle{
 	property alias hideScrollbars: graphicsView.hideScrollbars;
 
 	signal invalidPoint(int lineIndex, int pointIndex);
+	signal editingFinished();
 
 	onLeftLimitChanged: {
 		originShape.points = [leftLimit]
@@ -308,7 +309,7 @@ Rectangle{
 			property bool lineCreated: false;
 
 			property bool firstResize: true;
-
+			property bool isEditing: false;
 
 			Component.onCompleted: {
 				compl = true
@@ -569,6 +570,18 @@ Rectangle{
 
 			isHidden: graph.isMultiGraph ? false : !graph.linePoints.length
 			hasHoverReaction: graph.hasTooltip
+
+			onEditNodeIndexChanged: {
+				if(editNodeIndex > -1){
+					graphicsView.isEditing = true;
+				}
+				else {
+					if(graphicsView.isEditing){
+						graph.editingFinished()
+					}
+					graphicsView.isEditing = false;
+				}
+			}
 
 			property int lineIndex: 0;
 

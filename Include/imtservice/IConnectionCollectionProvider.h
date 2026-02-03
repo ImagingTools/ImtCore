@@ -5,6 +5,7 @@
 
 // ImtCore includes
 #include <imtservice/IConnectionCollection.h>
+#include <imtservice/IConnectionCollectionPlugin.h>
 
 
 namespace imtservice
@@ -18,8 +19,9 @@ namespace imtservice
 class IConnectionCollectionProvider: virtual public istd::IPolymorphic
 {
 public:
-	virtual std::shared_ptr<IConnectionCollection> GetConnectionCollectionByServicePath(const QString& servicePath) const = 0;
-	virtual std::shared_ptr<IConnectionCollection> GetConnectionCollectionByServiceId(const QByteArray& serviceId) const = 0;
+	// TODO: Raw pointer ???
+	virtual imtservice::IConnectionCollection* GetConnectionCollectionByServicePath(const QString& servicePath) const = 0;
+	virtual imtservice::IConnectionCollection* GetConnectionCollectionByServiceId(const QByteArray& serviceId) const = 0;
 };
 
 
