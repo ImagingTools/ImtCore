@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ImtCore Repository Statistics</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .timestamp {
+            text-align: center;
+            color: white;
+            opacity: 0.8;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .stat-card .icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .label {
+            color: #666;
+            font-size: 1em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .library-list, .package-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .library-item, .package-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .library-item h3, .package-item h3 {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .library-item .details, .package-item .details {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .chart-container {
+            margin: 30px 0;
+            height: 300px;
+        }
+
+        .progress-bar {
+            background: #e9ecef;
+            border-radius: 10px;
+            height: 30px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+            transition: width 1s ease;
+        }
+
+        .code-progress {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .comment-progress {
+            background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .blank-progress {
+            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .quality-score {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .quality-gauge {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 20px;
+            position: relative;
+        }
+
+        .quality-circle {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(
+                from 0deg,
+                #f5576c 0%,
+                #f5576c 50%,
+                #f093fb 50%,
+                #f093fb 70%,
+                #4facfe 70%,
+                #4facfe 85%,
+                #667eea 85%,
+                #667eea 100%
+            );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quality-inner {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quality-value {
+            font-size: 3em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .quality-label {
+            font-size: 0.9em;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .metric-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .metric-item .value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .metric-item .label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .alert-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+
+        .alert-box.success {
+            background: #d4edda;
+            border-left-color: #28a745;
+        }
+
+        .large-files-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+
+        .file-item {
+            background: #f8f9fa;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .file-item .filename {
+            font-family: monospace;
+            font-size: 0.9em;
+            color: #333;
+        }
+
+        .file-item .line-count {
+            background: #667eea;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            padding: 20px;
+            opacity: 0.8;
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .section h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .section p {
+            color: #666;
+        }
+
+        .section-description {
+            margin-bottom: 20px;
+            color: #666;
+        }
+
+        .section-description.small {
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .quality-message {
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .subsection {
+            margin-top: 30px;
+        }
+
+        .metric-item .value.warning {
+            color: #ffc107;
+        }
+
+        .metric-item .value.danger {
+            color: #f5576c;
+        }
+
+        .metric-item .value.critical {
+            color: #dc3545;
+        }
+
+        .metrics-table {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .footer p {
+            margin: 0;
+        }
+
+        .footer p + p {
+            margin-top: 10px;
+        }
+
+        .more-items-text {
+            text-align: center;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 ImtCore Repository Statistics</h1>
+            <p>Application Component Framework - Source Code Metrics</p>
+        </div>
+
+        <div class="timestamp" id="timestamp">
+            Generated: Loading...
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="icon">📄</div>
+                <div class="number" id="total-files">-</div>
+                <div class="label">Source Files</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="icon">📝</div>
+                <div class="number" id="total-lines">-</div>
+                <div class="label">Total Lines</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="icon">💻</div>
+                <div class="number" id="code-lines">-</div>
+                <div class="label">Code Lines</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="icon">📚</div>
+                <div class="number" id="libraries">-</div>
+                <div class="label">Libraries</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="icon">📦</div>
+                <div class="number" id="packages">-</div>
+                <div class="label">Packages</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="icon">🏗️</div>
+                <div class="number" id="classes">-</div>
+                <div class="label">Classes</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="icon">🔌</div>
+                <div class="number" id="interfaces">-</div>
+                <div class="label">Interfaces</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="icon">⚙️</div>
+                <div class="number" id="components">-</div>
+                <div class="label">Components</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📊 Code Composition</h2>
+            <p class="section-description">Distribution of code, comments, and blank lines</p>
+            
+            <div>
+                <strong>Code Lines</strong>
+                <div class="progress-bar">
+                    <div class="progress-fill code-progress" id="code-bar" style="width: 0%">0%</div>
+                </div>
+            </div>
+
+            <div>
+                <strong>Comment Lines</strong>
+                <div class="progress-bar">
+                    <div class="progress-fill comment-progress" id="comment-bar" style="width: 0%">0%</div>
+                </div>
+            </div>
+
+            <div>
+                <strong>Blank Lines</strong>
+                <div class="progress-bar">
+                    <div class="progress-fill blank-progress" id="blank-bar" style="width: 0%">0%</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>✨ Code Quality</h2>
+            <div class="quality-score">
+                <div class="quality-gauge">
+                    <div class="quality-circle">
+                        <div class="quality-inner">
+                            <div class="quality-value" id="quality-score">-</div>
+                            <div class="quality-label">Score</div>
+                        </div>
+                    </div>
+                </div>
+                <p id="quality-message" class="quality-message">Loading...</p>
+            </div>
+
+            <div class="metric-grid">
+                <div class="metric-item">
+                    <div class="value" id="comment-ratio">-</div>
+                    <div class="label">Comment Ratio</div>
+                </div>
+                <div class="metric-item">
+                    <div class="value" id="avg-file-size">-</div>
+                    <div class="label">Avg Lines/File</div>
+                </div>
+                <div class="metric-item">
+                    <div class="value" id="avg-class-size">-</div>
+                    <div class="label">Avg Lines/Class</div>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>Technical Debt Indicators</h3>
+                <div class="metric-grid">
+                    <div class="metric-item">
+                        <div class="value warning" id="todo-count">-</div>
+                        <div class="label">TODOs</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="value danger" id="fixme-count">-</div>
+                        <div class="label">FIXMEs</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="value critical" id="hack-count">-</div>
+                        <div class="label">HACKs</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="large-files-section" class="subsection" style="display: none;">
+                <h3>Large Files (&gt;1000 lines)</h3>
+                <p class="section-description small">
+                    Large files may benefit from refactoring into smaller, more maintainable modules.
+                </p>
+                <div class="large-files-list" id="large-files-list">
+                    Loading...
+                </div>
+            </div>
+        </div>
+
+        <!-- New: Statement & Function Statistics -->
+        <div class="section">
+            <h2>⚡ Code Execution Metrics</h2>
+            <p class="section-description">Metrics related to executable code</p>
+            
+            <div class="metric-grid">
+                <div class="metric-item">
+                    <div class="value" id="total-statements">-</div>
+                    <div class="label">Total Statements</div>
+                </div>
+                <div class="metric-item">
+                    <div class="value" id="total-functions">-</div>
+                    <div class="label">Functions/Methods</div>
+                </div>
+                <div class="metric-item">
+                    <div class="value" id="total-namespaces">-</div>
+                    <div class="label">Unique Namespaces</div>
+                </div>
+                <div class="metric-item">
+                    <div class="value" id="statements-per-function">-</div>
+                    <div class="label">Avg Statements/Function</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- New: SOLID Principles Compliance -->
+        <div class="section">
+            <h2>🎯 SOLID Principles Compliance</h2>
+            <p class="section-description">Object-oriented design quality indicators</p>
+            
+            <div class="quality-score">
+                <div class="quality-gauge">
+                    <div class="quality-circle">
+                        <div class="quality-inner">
+                            <div class="quality-value" id="solid-score">-</div>
+                            <div class="quality-label">SOLID Score</div>
+                        </div>
+                    </div>
+                </div>
+                <p id="solid-message" class="quality-message">Loading...</p>
+            </div>
+
+            <div class="subsection">
+                <h3>📋 Single Responsibility Principle (SRP)</h3>
+                <p class="section-description small">Classes should have only one reason to change</p>
+                <div class="metric-grid">
+                    <div class="metric-item">
+                        <div class="value" id="large-classes-count">-</div>
+                        <div class="label">Large Classes (>15 methods)</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="value" id="avg-methods-per-class">-</div>
+                        <div class="label">Avg Methods/Class</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>🔄 Liskov Substitution Principle (LSP)</h3>
+                <p class="section-description small">Derived classes must be substitutable for base classes</p>
+                <div class="metric-grid">
+                    <div class="metric-item">
+                        <div class="value" id="deep-inheritance-count">-</div>
+                        <div class="label">Deep Inheritance (>4 levels)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>🔌 Interface Segregation Principle (ISP)</h3>
+                <p class="section-description small">Clients should not depend on interfaces they don't use</p>
+                <div class="metric-grid">
+                    <div class="metric-item">
+                        <div class="value" id="large-interfaces-count">-</div>
+                        <div class="label">Large Interfaces (>10 methods)</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="value" id="avg-methods-per-interface">-</div>
+                        <div class="label">Avg Methods/Interface</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>↔️ Dependency Inversion Principle (DIP)</h3>
+                <p class="section-description small">Depend on abstractions, not concretions</p>
+                <div class="metric-grid">
+                    <div class="metric-item">
+                        <div class="value" id="abstract-deps">-</div>
+                        <div class="label">Abstract Dependencies</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="value" id="concrete-deps">-</div>
+                        <div class="label">Concrete Dependencies</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="value" id="abstraction-ratio">-</div>
+                        <div class="label">Abstraction Ratio</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- New: Code Structure -->
+        <div class="section">
+            <h2>🏗️ Code Structure</h2>
+            <p class="section-description">Architecture and organization metrics</p>
+            
+            <div class="metric-grid">
+                <div class="metric-item">
+                    <div class="value" id="include-deps">-</div>
+                    <div class="label">Include Dependencies</div>
+                </div>
+                <div class="metric-item">
+                    <div class="value" id="unique-namespaces-struct">-</div>
+                    <div class="label">Namespace Count</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📚 Libraries</h2>
+            <p class="section-description small">Static libraries in the Include directory</p>
+            <div class="library-list" id="library-list">
+                Loading...
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📦 Packages</h2>
+            <p class="section-description small">Component packages in the Impl directory</p>
+            <div class="package-list" id="package-list">
+                Loading...
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📈 Additional Metrics</h2>
+            <div class="metrics-table">
+                <div>
+                    <strong>Test Files:</strong> <span id="test-files">-</span>
+                </div>
+                <div>
+                    <strong>Documentation Files:</strong> <span id="doc-files">-</span>
+                </div>
+                <div>
+                    <strong>Comment Lines:</strong> <span id="comment-lines">-</span>
+                </div>
+                <div>
+                    <strong>Blank Lines:</strong> <span id="blank-lines">-</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Generated from the <a href="https://github.com/ImagingTools/Acf" target="_blank">ImtCore Repository</a></p>
+            <p>Application Component Framework (ImtCore) - Licensed under LGPL-2.1</p>
+            <p>
+                <a href="https://imagingtools.github.io/Acf/" target="_blank">API Documentation</a> | 
+                <a href="https://github.com/ImagingTools/Acf/blob/main/README.md" target="_blank">README</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Load statistics from JSON file
+        fetch('stats.json')
+            .then(response => response.json())
+            .then(data => {
+                displayStats(data);
+            })
+            .catch(error => {
+                console.error('Error loading statistics:', error);
+                document.getElementById('timestamp').textContent = 'Error loading statistics';
+            });
+
+        function displayStats(stats) {
+            const summary = stats.summary;
+
+            // Update timestamp
+            const date = new Date(stats.generated_at);
+            document.getElementById('timestamp').textContent = 
+                `Generated: ${date.toLocaleString()}`;
+
+            // Update main statistics
+            document.getElementById('total-files').textContent = 
+                summary.total_files.toLocaleString();
+            document.getElementById('total-lines').textContent = 
+                summary.total_lines.toLocaleString();
+            document.getElementById('code-lines').textContent = 
+                summary.code_lines.toLocaleString();
+            document.getElementById('libraries').textContent = 
+                summary.total_libraries.toLocaleString();
+            document.getElementById('packages').textContent = 
+                summary.total_packages.toLocaleString();
+            document.getElementById('classes').textContent = 
+                summary.total_classes.toLocaleString();
+            document.getElementById('interfaces').textContent = 
+                summary.total_interfaces.toLocaleString();
+            document.getElementById('components').textContent = 
+                summary.total_components.toLocaleString();
+
+            // Update additional metrics
+            document.getElementById('test-files').textContent = 
+                summary.test_files.toLocaleString();
+            document.getElementById('doc-files').textContent = 
+                summary.documentation_files.toLocaleString();
+            document.getElementById('comment-lines').textContent = 
+                summary.comment_lines.toLocaleString();
+            document.getElementById('blank-lines').textContent = 
+                summary.blank_lines.toLocaleString();
+
+            // Update quality metrics
+            const qualityScore = summary.quality_score || 0;
+            document.getElementById('quality-score').textContent = qualityScore.toFixed(1);
+            
+            let qualityMessage = '';
+            if (qualityScore >= 90) {
+                qualityMessage = '🎉 Excellent code quality!';
+            } else if (qualityScore >= 75) {
+                qualityMessage = '👍 Good code quality';
+            } else if (qualityScore >= 60) {
+                qualityMessage = '⚠️ Moderate code quality - room for improvement';
+            } else {
+                qualityMessage = '⚠️ Code quality needs attention';
+            }
+            document.getElementById('quality-message').textContent = qualityMessage;
+
+            document.getElementById('comment-ratio').textContent = 
+                (summary.comment_to_code_ratio || 0).toFixed(2);
+            document.getElementById('avg-file-size').textContent = 
+                Math.round(summary.avg_lines_per_file || 0);
+            document.getElementById('avg-class-size').textContent = 
+                Math.round(summary.avg_lines_per_class || 0);
+
+            document.getElementById('todo-count').textContent = 
+                (stats.quality_metrics?.todos || 0).toLocaleString();
+            document.getElementById('fixme-count').textContent = 
+                (stats.quality_metrics?.fixmes || 0).toLocaleString();
+            document.getElementById('hack-count').textContent = 
+                (stats.quality_metrics?.hacks || 0).toLocaleString();
+
+            // Update new execution metrics
+            document.getElementById('total-statements').textContent = 
+                (summary.total_statements || 0).toLocaleString();
+            document.getElementById('total-functions').textContent = 
+                (summary.total_functions || 0).toLocaleString();
+            document.getElementById('total-namespaces').textContent = 
+                (summary.total_namespaces || 0).toLocaleString();
+            
+            const stmtsPerFunc = summary.total_functions > 0 
+                ? (summary.total_statements / summary.total_functions).toFixed(1)
+                : 0;
+            document.getElementById('statements-per-function').textContent = stmtsPerFunc;
+
+            // Update SOLID metrics
+            const solidScore = summary.solid_compliance_score || 0;
+            document.getElementById('solid-score').textContent = solidScore.toFixed(1);
+            
+            let solidMessage = '';
+            if (solidScore >= 90) {
+                solidMessage = '🎉 Excellent SOLID compliance!';
+            } else if (solidScore >= 75) {
+                solidMessage = '👍 Good SOLID compliance';
+            } else if (solidScore >= 60) {
+                solidMessage = '⚠️ Moderate SOLID compliance';
+            } else {
+                solidMessage = '⚠️ SOLID principles need attention';
+            }
+            document.getElementById('solid-message').textContent = solidMessage;
+
+            // Single Responsibility Principle
+            const largeClasses = stats.solid_metrics?.single_responsibility?.large_classes || [];
+            document.getElementById('large-classes-count').textContent = largeClasses.length.toLocaleString();
+            
+            const methodsPerClass = stats.solid_metrics?.single_responsibility?.methods_per_class || [];
+            const avgMethodsPerClass = methodsPerClass.length > 0
+                ? (methodsPerClass.reduce((sum, item) => sum + item.methods, 0) / methodsPerClass.length).toFixed(1)
+                : 0;
+            document.getElementById('avg-methods-per-class').textContent = avgMethodsPerClass;
+
+            // Liskov Substitution Principle
+            const deepInheritance = stats.solid_metrics?.liskov_substitution?.potential_violations || [];
+            document.getElementById('deep-inheritance-count').textContent = deepInheritance.length.toLocaleString();
+
+            // Interface Segregation Principle
+            const largeInterfaces = stats.solid_metrics?.interface_segregation?.large_interfaces || [];
+            document.getElementById('large-interfaces-count').textContent = largeInterfaces.length.toLocaleString();
+            
+            const methodsPerInterface = stats.solid_metrics?.interface_segregation?.methods_per_interface || [];
+            const avgMethodsPerInterface = methodsPerInterface.length > 0
+                ? (methodsPerInterface.reduce((sum, item) => sum + item.methods, 0) / methodsPerInterface.length).toFixed(1)
+                : 0;
+            document.getElementById('avg-methods-per-interface').textContent = avgMethodsPerInterface;
+
+            // Dependency Inversion Principle
+            const abstractDeps = stats.solid_metrics?.dependency_inversion?.abstract_dependencies || 0;
+            const concreteDeps = stats.solid_metrics?.dependency_inversion?.concrete_dependencies || 0;
+            const totalDeps = abstractDeps + concreteDeps;
+            const abstractionRatio = totalDeps > 0 ? (abstractDeps / totalDeps).toFixed(2) : 0;
+            
+            document.getElementById('abstract-deps').textContent = abstractDeps.toLocaleString();
+            document.getElementById('concrete-deps').textContent = concreteDeps.toLocaleString();
+            document.getElementById('abstraction-ratio').textContent = abstractionRatio;
+
+            // Code Structure
+            const includeDeps = Object.keys(stats.code_structure?.include_dependencies || {}).length;
+            document.getElementById('include-deps').textContent = includeDeps.toLocaleString();
+            document.getElementById('unique-namespaces-struct').textContent = 
+                (summary.total_namespaces || 0).toLocaleString();
+
+            // Display large files
+            const largeFiles = stats.quality_metrics?.large_files || [];
+            if (largeFiles.length > 0) {
+                document.getElementById('large-files-section').style.display = 'block';
+                const largeFilesList = document.getElementById('large-files-list');
+                largeFilesList.innerHTML = '';
+                
+                largeFiles.slice(0, 10).forEach(file => {
+                    const item = document.createElement('div');
+                    item.className = 'file-item';
+                    item.innerHTML = `
+                        <div class="filename">${file.file}</div>
+                        <div class="line-count">${file.lines.toLocaleString()} lines</div>
+                    `;
+                    largeFilesList.appendChild(item);
+                });
+
+                if (largeFiles.length > 10) {
+                    const moreItem = document.createElement('p');
+                    moreItem.className = 'more-items-text';
+                    moreItem.textContent = `... and ${largeFiles.length - 10} more`;
+                    largeFilesList.appendChild(moreItem);
+                }
+            }
+
+            // Update progress bars
+            const totalLines = summary.code_lines + summary.comment_lines + summary.blank_lines;
+            const codePercent = (summary.code_lines / totalLines * 100).toFixed(1);
+            const commentPercent = (summary.comment_lines / totalLines * 100).toFixed(1);
+            const blankPercent = (summary.blank_lines / totalLines * 100).toFixed(1);
+
+            setTimeout(() => {
+                document.getElementById('code-bar').style.width = codePercent + '%';
+                document.getElementById('code-bar').textContent = 
+                    `${summary.code_lines.toLocaleString()} (${codePercent}%)`;
+                
+                document.getElementById('comment-bar').style.width = commentPercent + '%';
+                document.getElementById('comment-bar').textContent = 
+                    `${summary.comment_lines.toLocaleString()} (${commentPercent}%)`;
+                
+                document.getElementById('blank-bar').style.width = blankPercent + '%';
+                document.getElementById('blank-bar').textContent = 
+                    `${summary.blank_lines.toLocaleString()} (${blankPercent}%)`;
+            }, 100);
+
+            // Display libraries
+            const libraryList = document.getElementById('library-list');
+            libraryList.innerHTML = '';
+            const sortedLibraries = Object.entries(stats.libraries)
+                .sort((a, b) => b[1].total_lines - a[1].total_lines);
+            
+            sortedLibraries.forEach(([name, info]) => {
+                const item = document.createElement('div');
+                item.className = 'library-item';
+                item.innerHTML = `
+                    <h3>${name}</h3>
+                    <div class="details">
+                        ${info.file_count} files<br>
+                        ${info.total_lines.toLocaleString()} lines
+                    </div>
+                `;
+                libraryList.appendChild(item);
+            });
+
+            // Display packages
+            const packageList = document.getElementById('package-list');
+            packageList.innerHTML = '';
+            const sortedPackages = Object.entries(stats.packages)
+                .sort((a, b) => b[1].total_lines - a[1].total_lines);
+            
+            sortedPackages.forEach(([name, info]) => {
+                const item = document.createElement('div');
+                item.className = 'package-item';
+                item.innerHTML = `
+                    <h3>${name}</h3>
+                    <div class="details">
+                        ${info.file_count} files<br>
+                        ${info.total_lines.toLocaleString()} lines
+                    </div>
+                `;
+                packageList.appendChild(item);
+            });
+        }
+    </script>
+</body>
+</html>
