@@ -21,6 +21,10 @@ endif()
 
 get_filename_component(IMTCOREDIR "../.." ABSOLUTE BASE_DIR ${CMAKE_CURRENT_LIST_DIR})
 
+if(NOT DEFINED IMTCOREDIR_BUILD)
+	set(IMTCOREDIR_BUILD "${IMTCOREDIR}")
+endif()
+
 include(${IMTCOREDIR}/Config/CMake/ImtCoreEnv.cmake)
 include(${IMTCOREDIR}/Config/CMake/PartituraUpgrade.cmake)
 if (NOT ANDROID)
@@ -28,10 +32,6 @@ if (NOT ANDROID)
 endif()
 
 message(VERBOSE "ImtCore ACFDIR_BUILD ${ACFDIR_BUILD}")
-
-if(NOT DEFINED IMTCOREDIR_BUILD)
-	set(IMTCOREDIR_BUILD "${IMTCOREDIR}")
-endif()
 
 set (INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Include")
 set (IMPL_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Impl")
