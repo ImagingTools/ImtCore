@@ -3,19 +3,20 @@
 
 // Qt includes
 #include <QtCore/QFile>
-#include <QtCore/QJsonDocument>
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
 #include <QtCore/QLockFile>
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
+
+// ACF includes
+#include <iser/CJsonMemWriteArchive.h>
+#include <iser/CJsonMemReadArchive.h>
 
 
 namespace imtsdlgenqml
 {
 
 
-bool CQmlGenTools::SaveGenerationResultToFile(const CSdlQmlGenerationResult& result, const QString& filePath)
+bool CQmlGenTools::UpdateGenerationResultFile(const CSdlQmlGenerationResult& result, const QString& filePath)
 {
 	// Ensure the directory exists
 	QFileInfo fileInfo(filePath);
@@ -36,28 +37,37 @@ bool CQmlGenTools::SaveGenerationResultToFile(const CSdlQmlGenerationResult& res
 		return false;
 	}
 	
-	// Convert result to JSON
-	QJsonObject jsonObject = ResultToJson(result);
-	QJsonDocument jsonDoc(jsonObject);
+	// The entire update operation is now protected by the lock
+	bool success = false;
 	
-	// Write to file
+	// Check if file exists - if yes, open for writing; if no, create it
 	QFile file(filePath);
 	if (!file.open(QFile::WriteOnly | QFile::Text)){
 		lockFile.unlock();
 		return false;
 	}
 	
-	qint64 bytesWritten = file.write(jsonDoc.toJson(QJsonDocument::Indented));
+	// Serialize using CJsonMemWriteArchive
+	iser::CJsonMemWriteArchive archive(nullptr);
+	CSdlQmlGenerationResult* nonConstResult = const_cast<CSdlQmlGenerationResult*>(&result);
+	if (nonConstResult->Serialize(archive)){
+		// Write serialized data to file
+		QByteArray jsonData = archive.GetData();
+		qint64 bytesWritten = file.write(jsonData);
+		success = (bytesWritten > 0);
+	}
+	
+	// Close file
 	file.close();
 	
 	// Release the lock
 	lockFile.unlock();
 	
-	return bytesWritten > 0;
+	return success;
 }
 
 
-bool CQmlGenTools::LoadGenerationResultFromFile(CSdlQmlGenerationResult& result, const QString& filePath)
+bool CQmlGenTools::ReadGenerationResultFile(CSdlQmlGenerationResult& result, const QString& filePath)
 {
 	// Check if file exists
 	if (!QFile::exists(filePath)){
@@ -73,76 +83,47 @@ bool CQmlGenTools::LoadGenerationResultFromFile(CSdlQmlGenerationResult& result,
 	QByteArray jsonData = file.readAll();
 	file.close();
 	
-	// Parse JSON
-	QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData);
-	if (jsonDoc.isNull() || !jsonDoc.isObject()){
+	// Deserialize using CJsonMemReadArchive
+	iser::CJsonMemReadArchive archive(jsonData);
+	if (!result.Serialize(archive)){
 		return false;
 	}
 	
-	// Populate result from JSON
-	return JsonToResult(result, jsonDoc.object());
-}
-
-
-QJsonObject CQmlGenTools::ResultToJson(const CSdlQmlGenerationResult& result)
-{
-	QJsonObject jsonObject;
-	
-	// Serialize creation timestamp
-	QDateTime createdAt = result.GetCreatedAt();
-	if (createdAt.isValid()){
-		jsonObject["createdAt"] = createdAt.toString(Qt::ISODate);
-	}
-	
-	// Serialize generator version
-	QString generatorVersion = result.GetGeneratorVersion();
-	if (!generatorVersion.isEmpty()){
-		jsonObject["generatorVersion"] = generatorVersion;
-	}
-	
-	// Serialize created folders
-	QStringList createdFolders = result.GetCreatedFolders();
-	if (!createdFolders.isEmpty()){
-		QJsonArray foldersArray;
-		for (const QString& folder : createdFolders){
-			foldersArray.append(folder);
-		}
-		jsonObject["createdFolders"] = foldersArray;
-	}
-	
-	return jsonObject;
-}
-
-
-bool CQmlGenTools::JsonToResult(CSdlQmlGenerationResult& result, const QJsonObject& jsonObject)
-{
-	// Deserialize creation timestamp
-	if (jsonObject.contains("createdAt")){
-		QString createdAtStr = jsonObject["createdAt"].toString();
-		QDateTime createdAt = QDateTime::fromString(createdAtStr, Qt::ISODate);
-		if (createdAt.isValid()){
-			result.SetCreatedAt(createdAt);
-		}
-	}
-	
-	// Deserialize generator version
-	if (jsonObject.contains("generatorVersion")){
-		result.SetGeneratorVersion(jsonObject["generatorVersion"].toString());
-	}
-	
-	// Deserialize created folders
-	if (jsonObject.contains("createdFolders") && jsonObject["createdFolders"].isArray()){
-		QJsonArray foldersArray = jsonObject["createdFolders"].toArray();
-		QStringList folders;
-		for (const QJsonValue& folderValue : foldersArray){
-			if (folderValue.isString()){
-				folders.append(folderValue.toString());
-			}
-		}
-		result.SetCreatedFolders(folders);
-	}
-	
 	return true;
+}
+
+
+bool CQmlGenTools::WriteGenerationResultFile(const CSdlQmlGenerationResult& result, const QString& filePath)
+{
+	// Ensure the directory exists
+	QFileInfo fileInfo(filePath);
+	QDir dir = fileInfo.absoluteDir();
+	if (!dir.exists()){
+		if (!dir.mkpath(".")){
+			return false;
+		}
+	}
+	
+	// Open file for writing
+	QFile file(filePath);
+	if (!file.open(QFile::WriteOnly | QFile::Text)){
+		return false;
+	}
+	
+	// Serialize using CJsonMemWriteArchive
+	iser::CJsonMemWriteArchive archive(nullptr);
+	CSdlQmlGenerationResult* nonConstResult = const_cast<CSdlQmlGenerationResult*>(&result);
+	if (!nonConstResult->Serialize(archive)){
+		file.close();
+		return false;
+	}
+	
+	// Write serialized data to file
+	QByteArray jsonData = archive.GetData();
+	qint64 bytesWritten = file.write(jsonData);
+	file.close();
+	
+	return bytesWritten > 0;
 }
 
 
