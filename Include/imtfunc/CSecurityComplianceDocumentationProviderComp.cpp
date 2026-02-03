@@ -1,5 +1,6 @@
 // Qt includes
 #include <QtCore/QStringBuilder>
+#include <QtCore/QDateTime>
 
 // ImtCore includes
 #include <imtfunc/CSecurityComplianceDocumentationProviderComp.h>

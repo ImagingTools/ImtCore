@@ -267,7 +267,8 @@ QByteArrayList CFunctionalityManagerComp::GetDisabledFunctionality(int type) con
 QByteArrayList CFunctionalityManagerComp::GetDependentFunctionality(const QByteArray& functionalityId) const
 {
 	QSet<QByteArray> dependents = m_reverseDependencies.value(functionalityId);
-	return dependents.values();
+	// Convert QSet to QList for Qt 6 compatibility (QSet::values() is deprecated)
+	return QByteArrayList(dependents.begin(), dependents.end());
 }
 
 
