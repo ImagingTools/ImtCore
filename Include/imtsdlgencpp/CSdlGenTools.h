@@ -103,20 +103,21 @@ public:
 	template <class SdlEntryClass>
 	[[nodiscard]] static QString GetSdlEntryVersion(const SdlEntryClass& entry, bool addVPrefix = true);
 
+	[[nodiscard]] static QString GetTempVariableWrappedValue(const imtsdl::CSdlField& sdlField);
+
 	static void GenerateIsRequestSupportedMethodImpl(
 				QTextStream& stream,
 				const imtsdl::SdlRequestList& requestList,
 				const QString& className);
 
-	static QString GetQObjectTypeName(const imtsdl::CSdlField& sdlField,
+	[[nodiscard]] static QString GetQObjectTypeName(const imtsdl::CSdlField& sdlField,
 									  const imtsdl::SdlTypeList& typeList,
 									  const imtsdl::SdlEnumList& enumList,
 									  const imtsdl::SdlUnionList& unionList,
-									  bool withPointer = true);
+									  bool withPointer = true,
+									  bool treatArrayAsElement = false);
 
 	[[nodiscard]] static QString GetTempVariableWrappedValue(const QString& variableName);
-
-	[[nodiscard]] static QString GetTempVariableWrappedValue(const imtsdl::CSdlField& sdlField);
 };
 
 

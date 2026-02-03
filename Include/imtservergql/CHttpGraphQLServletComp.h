@@ -5,10 +5,11 @@
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/CHttpServletCompBase.h>
 #include <imtgql/IGqlRequestHandler.h>
-#include <imtgql/IGqlContextController.h>
+#include <imtgql/IGqlContextCreator.h>
 #include <imtgql/IGqlRequestProvider.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtauth/IJwtSessionController.h>
+#include <imtauth/IPersonalAccessTokenManager.h>
 
 
 namespace imtservergql
@@ -24,8 +25,9 @@ public:
 	I_BEGIN_COMPONENT(CHttpGraphQLServletComp);
 		I_REGISTER_INTERFACE(imtgql::IGqlRequestProvider);
 		I_ASSIGN_MULTI_0(m_gqlRequestHandlerCompPtr, "GqlRequestHandler", "Handler for GraphQL-request", true);
-		I_ASSIGN(m_gqlContextControllerCompPtr, "GqlContextController", "GraphQL-related context controller", false, "GqlContextController");
+		I_ASSIGN(m_gqlContextCreatorCompPtr, "GqlContextCreator", "GraphQL-related context creator", false, "GqlContextCreator");
 		I_ASSIGN(m_jwtSessionControllerCompPtr, "JwtSessionController", "JWT session controller", false, "JwtSessionController");
+		I_ASSIGN(m_patManagerCompPtr, "PersonalAccessTokenManager", "Personal Access Token manager", false, "PersonalAccessTokenManager");
 	I_END_COMPONENT;
 
 protected:
@@ -51,8 +53,9 @@ private:
 
 private:
 	I_MULTIREF(imtgql::IGqlRequestHandler, m_gqlRequestHandlerCompPtr);
-	I_REF(imtgql::IGqlContextController, m_gqlContextControllerCompPtr);
+	I_REF(imtgql::IGqlContextCreator, m_gqlContextCreatorCompPtr);
 	I_REF(imtauth::IJwtSessionController, m_jwtSessionControllerCompPtr);
+	I_REF(imtauth::IPersonalAccessTokenManager, m_patManagerCompPtr);
 
 private:
 	mutable imtgql::CGqlRequest m_lastRequest;

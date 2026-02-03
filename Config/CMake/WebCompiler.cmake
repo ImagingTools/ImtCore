@@ -6,9 +6,14 @@ function(imtcore_compile_web)
 	set(QRC_CPP_WEB_FILE ${WEB_BUILD_DIR}/Resources/qrc_${PROJECT_NAME}Web.cpp)
 
 	if(NOT PYTHONEXE)
-		set(PYTHONEXE ${IMTCOREDIR}/3rdParty/Python/3.8/python.exe)
-		if (NOT WIN32)
-			set(PYTHONEXE python3)
+		set(PYTHONEXE "$ENV{PYTHONEXE}")
+		
+		if(PYTHONEXE STREQUAL "")
+			if (WIN32)
+				set(PYTHONEXE python.exe)
+			else()
+				set(PYTHONEXE python3)
+			endif()
 		endif()
 	endif()
 
@@ -62,9 +67,14 @@ function(jqml_compile_web)
 	set(QRC_CPP_WEB_FILE ${buildwebdir}/Resources/qrc_${PROJECT_NAME}Web.cpp)
 
 	if(NOT PYTHONEXE)
-		set(PYTHONEXE ${IMTCOREDIR}/3rdParty/Python/3.8/python.exe)
-		if (NOT WIN32)
-			set(PYTHONEXE python3)
+		set(PYTHONEXE "$ENV{PYTHONEXE}")
+		
+		if(PYTHONEXE STREQUAL "")
+			if (WIN32)
+				set(PYTHONEXE python.exe)
+			else()
+				set(PYTHONEXE python3)
+			endif()
 		endif()
 	endif()
 
@@ -132,9 +142,14 @@ function(jqml_compile_web2)
 	set(QRC_CPP_WEB_FILE ${buildwebdir}/Resources/qrc_${PROJECT_NAME}Web.cpp)
 
 	if(NOT PYTHONEXE)
-		set(PYTHONEXE ${IMTCOREDIR}/3rdParty/Python/3.8/python.exe)
-		if (NOT WIN32)
-			set(PYTHONEXE python3)
+		set(PYTHONEXE "$ENV{PYTHONEXE}")
+		
+		if(PYTHONEXE STREQUAL "")
+			if (WIN32)
+				set(PYTHONEXE python.exe)
+			else()
+				set(PYTHONEXE python3)
+			endif()
 		endif()
 	endif()
 
@@ -214,9 +229,14 @@ function(jq_compile_web)
 	set(QRC_CPP_WEB_FILE ${buildwebdir}/Resources/qrc_${PROJECT_NAME}Web.cpp)
 
 	if(NOT PYTHONEXE)
-		set(PYTHONEXE ${IMTCOREDIR}/3rdParty/Python/3.8/python.exe)
-		if (NOT WIN32)
-			set(PYTHONEXE python3)
+		set(PYTHONEXE "$ENV{PYTHONEXE}")
+		
+		if(PYTHONEXE STREQUAL "")
+			if (WIN32)
+				set(PYTHONEXE python.exe)
+			else()
+				set(PYTHONEXE python3)
+			endif()
 		endif()
 	endif()
 
@@ -338,54 +358,75 @@ macro(getImtBaseQmlWebDirs webdirs buildwebdir useImtControlsStyle)
 	list(APPEND ${webdirs} ${IMTCOREDIR}/Impl/ImtCoreLoc/Translations)
 	list(APPEND ${webdirs} ${buildwebdir}/Resources/Translations)
 
-	list(APPEND ${webdirs} ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseComplexCollectionFilterSdl)
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseComplexCollectionFilterSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtbaseComplexCollectionFilterSdl)
 	
-	list(APPEND ${webdirs} ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseDocumentCollectionFilterSdl)
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseDocumentCollectionFilterSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtbaseDocumentCollectionFilterSdl)
 
-	list(APPEND ${webdirs} ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseImtBaseTypesSdl)
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseImtBaseTypesSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtbaseImtBaseTypesSdl)
 
-	list(APPEND ${webdirs} ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseImtCollectionSdl)
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseImtCollectionSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtbaseImtCollectionSdl)
 
-	list(APPEND ${webdirs} ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseDocumentRevisionSdl)
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseDocumentRevisionSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtbaseDocumentRevisionSdl)
 
-	list(APPEND ${webdirs} ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtappsdl/SDL/1.0/QML/imtappApplicationSdl)
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtappsdl/SDL/1.0/QML/imtappApplicationSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtappApplicationSdl)
 	
-	list(APPEND ${webdirs} ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseSearchSdl)
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseSearchSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtbaseSearchSdl)
 	
-	list(APPEND ${webdirs} ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseCommandsSdl)
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseCommandsSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtbaseCommandsSdl)
 	
-	list(APPEND ${webdirs} ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseSettingsSdl)
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseSettingsSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtbaseSettingsSdl)
 
-	list(APPEND ${webdirs} ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseCollectionDocumentManagerSdl)
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseCollectionDocumentManagerSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtbaseCollectionDocumentManagerSdl)
 
-	list(APPEND ${webdirs} ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseUndoManagerSdl)
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseCollectionImportSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtbaseCollectionImportSdl)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseUndoManagerSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtbaseUndoManagerSdl)
 	
-	list(APPEND ${webdirs} ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseDocumentIdFilterSdl)
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseDocumentIdFilterSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtbaseDocumentIdFilterSdl)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseMimeTypeSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtbaseMimeTypeSdl)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseProgressManagerSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtbaseProgressManagerSdl)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imt2dsdl/SDL/1.0/QML/imt2dGeometrySdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imt2dGeometrySdl)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imt2dsdl/SDL/1.0/QML/imt2dPaintSystemSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imt2dPaintSystemSdl)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtcolorsdl/SDL/1.0/QML/imtcolorRgbColorHexSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtcolorRgbColorHexSdl)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtcolorsdl/SDL/1.0/QML/imtcolorLabSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtcolorLabSdl)
 endmacro(getImtBaseQmlWebDirs)
 
 macro(getImtLicQmlWebDirs webdirs buildwebdir)
 	list(APPEND ${webdirs} ${IMTCOREDIR}/Qml/imtlicgui)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtlicgui)
 
-	list(APPEND ${webdirs} ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtlicsdl/SDL/1.0/QML/imtlicFeaturesSdl)
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtlicsdl/SDL/1.0/QML/imtlicFeaturesSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtlicFeaturesSdl)
 
-	list(APPEND ${webdirs} ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtlicsdl/SDL/1.0/QML/imtlicProductsSdl)
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtlicsdl/SDL/1.0/QML/imtlicProductsSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtlicProductsSdl)
 
-	list(APPEND ${webdirs} ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtlicsdl/SDL/1.0/QML/imtlicLicensesSdl)
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtlicsdl/SDL/1.0/QML/imtlicLicensesSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtlicLicensesSdl)
 endmacro(getImtLicQmlWebDirs)
 
@@ -393,26 +434,29 @@ macro(getImtAuthQmlWebDirs webdirs buildwebdir)
 	list(APPEND ${webdirs} ${IMTCOREDIR}/Qml/imtauthgui)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthgui)
 
-	list(APPEND ${webdirs} ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthGroupsSdl)
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthGroupsSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthGroupsSdl)
 
-	list(APPEND ${webdirs} ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthRolesSdl)
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthRolesSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthRolesSdl)
 
-	list(APPEND ${webdirs} ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthUsersSdl)
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthUsersSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthUsersSdl)
 
-	list(APPEND ${webdirs} ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthAuthorizationSdl)
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthAuthorizationSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthAuthorizationSdl)
 
-	list(APPEND ${webdirs} ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthProfileSdl)
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthProfileSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthProfileSdl)
 
-	list(APPEND ${webdirs} ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthSessionsSdl)
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthSessionsSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthSessionsSdl)
 
-	list(APPEND ${webdirs} ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthAuthorizationOptionsSdl)
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthAuthorizationOptionsSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthAuthorizationOptionsSdl)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthPersonalAccessTokensSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthPersonalAccessTokensSdl)
 endmacro(getImtAuthQmlWebDirs)
 
 macro(getImtCoreQmlWebDirs webdirs buildwebdir)

@@ -410,8 +410,8 @@ class BaseClass extends QtObject {
 					if (this[objKey].destroy){
 						this[objKey].destroy()
 					}
+					this[objKey] = null
 				}
-				this[objKey] = null
 			}
 		}
 

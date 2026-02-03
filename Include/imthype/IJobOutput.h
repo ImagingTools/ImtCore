@@ -6,6 +6,10 @@
 
 // Acula includes
 #include <imthype/IProcessingInfo.h>
+#include <imthype/IJobExecutionLog.h>
+
+// ACF includes
+#include <ilog/IMessageContainer.h>
 
 
 namespace imthype
@@ -14,7 +18,7 @@ namespace imthype
 
 /**
 	Common interface for a job output. The job output is a collection of object references categorized by their logical type.
-	The interface provides also the access to the processing information and logs.
+	The interface provides access to the processing information, execution log, and processor log.
 */
 class IJobOutput: virtual public IProcessingInfo, virtual public imtbase::IReferenceCollection
 {
@@ -55,6 +59,30 @@ public:
 		Set the type of processing output for the given output object.
 	*/
 	virtual void SetOutputType(const QByteArray& outputObjectId, ProcessingOutputType outputType) = 0;
+	
+	/**
+		Get the job execution log (system-level controller events).
+		\return Pointer to execution log, or nullptr if not set
+	*/
+	virtual const IJobExecutionLog* GetExecutionLog() const = 0;
+	
+	/**
+		Set the job execution log.
+		\param executionLog System-level execution log
+	*/
+	virtual void SetExecutionLog(const IJobExecutionLog& executionLog) = 0;
+	
+	/**
+		Get the processor log (worker processing output).
+		\return Pointer to processor log, or nullptr if not set
+	*/
+	virtual const ilog::IMessageContainer* GetProcessorLog() const = 0;
+	
+	/**
+		Set the processor log.
+		\param processorLog Worker processing log
+	*/
+	virtual void SetProcessorLog(const ilog::IMessageContainer& processorLog) = 0;
 };
 
 

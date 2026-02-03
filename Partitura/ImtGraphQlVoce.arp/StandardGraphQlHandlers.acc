@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5430" Description="ACF"/>
-            <Version Id="1" Number="2253" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5715" Description="ACF"/>
+            <Version Id="1" Number="2274" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -64,11 +64,16 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="GqlContextController" PackageId="ImtServerGqlPck" ComponentId="GqlContextController">
+        <Element Id="GqlContext" PackageId="ImtGqlPck" ComponentId="GqlContext">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="GqlContextCreator" PackageId="ImtServerGqlPck" ComponentId="GqlContextCreator">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="JwtSessionController" Type="Reference" ExportId="JwtSessionController">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="GqlContextFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="GqlContext"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -100,8 +105,8 @@
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="GqlContextController" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="GqlContextController"/>
+                    <AttributeInfo Id="GqlContextCreator" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="GqlContextCreator"/>
                     </AttributeInfo>
                     <AttributeInfo Id="GqlRequestHandler" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
@@ -114,6 +119,9 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PersonalAccessTokenManager" Type="Reference" ExportId="PersonalAccessTokenManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="">

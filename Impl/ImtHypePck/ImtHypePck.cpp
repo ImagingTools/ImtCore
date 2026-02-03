@@ -12,7 +12,7 @@ namespace ImtHypePck
 I_EXPORT_PACKAGE(
 			"ImtHypePck",
 			"Acula's task-related components",
-			IM_PROJECT("Acula") IM_COMPANY("ImagingTools") "Job Task");
+			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools") "Job Task");
 
 I_EXPORT_COMPONENT(
 			TaskCollection,

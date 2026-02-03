@@ -534,11 +534,15 @@ bool CFieldSortingInfo::V1_0::operator==(const V1_0& other) const
 bool CFieldSortingInfo::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	if (!fieldId){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "fieldId").toLocal8Bit().constData();)
+
 		return false;
 	}
 	model.SetData("fieldId", *fieldId, modelIndex);
 
 	if (!sortingOrder){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "sortingOrder").toLocal8Bit().constData();)
+
 		return false;
 	}
 	model.SetData("sortingOrder", *sortingOrder, modelIndex);
@@ -589,11 +593,15 @@ bool CFieldSortingInfo::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& 
 bool CFieldSortingInfo::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!fieldId){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "fieldId").toLocal8Bit().constData();)
+
 		return false;
 	}
 	gqlObject.InsertParam("fieldId", QVariant(*fieldId));
 
 	if (!sortingOrder){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "sortingOrder").toLocal8Bit().constData();)
+
 		return false;
 	}
 	gqlObject.InsertParam("sortingOrder", QVariant(*sortingOrder));
@@ -639,11 +647,15 @@ bool CFieldSortingInfo::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParam
 bool CFieldSortingInfo::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!fieldId){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "fieldId").toLocal8Bit().constData();)
+
 		return false;
 	}
 	jsonObject["fieldId"] = QJsonValue::fromVariant(*fieldId);
 
 	if (!sortingOrder){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "sortingOrder").toLocal8Bit().constData();)
+
 		return false;
 	}
 	jsonObject["sortingOrder"] = QJsonValue::fromVariant(*sortingOrder);
@@ -937,16 +949,22 @@ bool CFieldFilter::V1_0::operator==(const V1_0& other) const
 bool CFieldFilter::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	if (!fieldId){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "fieldId").toLocal8Bit().constData();)
+
 		return false;
 	}
 	model.SetData("fieldId", *fieldId, modelIndex);
 
 	if (!filterValue){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "filterValue").toLocal8Bit().constData();)
+
 		return false;
 	}
 	model.SetData("filterValue", *filterValue, modelIndex);
 
 	if (!filterValueType){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "filterValueType").toLocal8Bit().constData();)
+
 		return false;
 	}
 	QString filterValueTypeStringValue;
@@ -1160,16 +1178,22 @@ bool CFieldFilter::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 bool CFieldFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!fieldId){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "fieldId").toLocal8Bit().constData();)
+
 		return false;
 	}
 	gqlObject.InsertParam("fieldId", QVariant(*fieldId));
 
 	if (!filterValue){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "filterValue").toLocal8Bit().constData();)
+
 		return false;
 	}
 	gqlObject.InsertParam("filterValue", QVariant(*filterValue));
 
 	if (!filterValueType){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "filterValueType").toLocal8Bit().constData();)
+
 		return false;
 	}
 	QString filterValueTypeStringValue;
@@ -1375,16 +1399,22 @@ bool CFieldFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 bool CFieldFilter::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!fieldId){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "fieldId").toLocal8Bit().constData();)
+
 		return false;
 	}
 	jsonObject["fieldId"] = QJsonValue::fromVariant(*fieldId);
 
 	if (!filterValue){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "filterValue").toLocal8Bit().constData();)
+
 		return false;
 	}
 	jsonObject["filterValue"] = QJsonValue::fromVariant(*filterValue);
 
 	if (!filterValueType){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "filterValueType").toLocal8Bit().constData();)
+
 		return false;
 	}
 	QString filterValueTypeStringValue;
@@ -1856,6 +1886,8 @@ bool CGroupFilter::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int mode
 		}
 	}
 	if (!logicalOperation){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "logicalOperation").toLocal8Bit().constData();)
+
 		return false;
 	}
 	QString logicalOperationStringValue;
@@ -2023,6 +2055,8 @@ bool CGroupFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 	}
 
 	if (!logicalOperation){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "logicalOperation").toLocal8Bit().constData();)
+
 		return false;
 	}
 	QString logicalOperationStringValue;
@@ -2207,6 +2241,8 @@ bool CGroupFilter::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 	}
 
 	if (!logicalOperation){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "logicalOperation").toLocal8Bit().constData();)
+
 		return false;
 	}
 	QString logicalOperationStringValue;
@@ -3348,7 +3384,7 @@ bool CTimeFilterObject::hasTimeRange()
 }
 
 
-void CTimeFilterObject::createTimeRange()
+void CTimeFilterObject::emplaceTimeRange()
 {
 	Version_1_0->timeRange.emplace();
 
@@ -4160,7 +4196,7 @@ bool CGroupFilterObject::hasFieldFilters()
 }
 
 
-void CGroupFilterObject::createFieldFilters()
+void CGroupFilterObject::emplaceFieldFilters()
 {
 	Version_1_0->fieldFilters.emplace();
 
@@ -4174,6 +4210,13 @@ void CGroupFilterObject::ResetFieldFilters()
 		itemPtr->deleteLater();
 	}
 	m_fieldFiltersQObjectPtr = QVariant();
+}
+
+
+QVariant CGroupFilterObject::createFieldFiltersArrayElement(const QVariant& v)
+{
+	Q_UNUSED(v);
+	return QVariant::fromValue(new sdl::imtbase::ComplexCollectionFilter::CFieldFilterObject());
 }
 
 
@@ -4213,7 +4256,7 @@ bool CGroupFilterObject::hasGroupFilters()
 }
 
 
-void CGroupFilterObject::createGroupFilters()
+void CGroupFilterObject::emplaceGroupFilters()
 {
 	Version_1_0->groupFilters.emplace();
 
@@ -4227,6 +4270,13 @@ void CGroupFilterObject::ResetGroupFilters()
 		itemPtr->deleteLater();
 	}
 	m_groupFiltersQObjectPtr = QVariant();
+}
+
+
+QVariant CGroupFilterObject::createGroupFiltersArrayElement(const QVariant& v)
+{
+	Q_UNUSED(v);
+	return QVariant::fromValue(new sdl::imtbase::ComplexCollectionFilter::CGroupFilterObject());
 }
 
 
@@ -4483,7 +4533,7 @@ bool CComplexCollectionFilterObject::hasSortingInfo()
 }
 
 
-void CComplexCollectionFilterObject::createSortingInfo()
+void CComplexCollectionFilterObject::emplaceSortingInfo()
 {
 	Version_1_0->sortingInfo.emplace();
 
@@ -4497,6 +4547,13 @@ void CComplexCollectionFilterObject::ResetSortingInfo()
 		itemPtr->deleteLater();
 	}
 	m_sortingInfoQObjectPtr = QVariant();
+}
+
+
+QVariant CComplexCollectionFilterObject::createSortingInfoArrayElement(const QVariant& v)
+{
+	Q_UNUSED(v);
+	return QVariant::fromValue(new sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObject());
 }
 
 
@@ -4536,7 +4593,7 @@ bool CComplexCollectionFilterObject::hasFieldsFilter()
 }
 
 
-void CComplexCollectionFilterObject::createFieldsFilter()
+void CComplexCollectionFilterObject::emplaceFieldsFilter()
 {
 	Version_1_0->fieldsFilter.emplace();
 
@@ -4589,7 +4646,7 @@ bool CComplexCollectionFilterObject::hasTimeFilter()
 }
 
 
-void CComplexCollectionFilterObject::createTimeFilter()
+void CComplexCollectionFilterObject::emplaceTimeFilter()
 {
 	Version_1_0->timeFilter.emplace();
 

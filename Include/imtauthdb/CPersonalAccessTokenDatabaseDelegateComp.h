@@ -2,27 +2,25 @@
 
 
 // ImtCore includes
+#include <imtauth/IPersonalAccessToken.h>
 #include <imtdb/CSqlDatabaseObjectDelegateCompBase.h>
-#include <imthype/IJobTicket.h>
 
 
-namespace imthype
+namespace imtauthdb
 {
 
 
-class CJobTicketDatabaseDelegateComp: public imtdb::CSqlDatabaseObjectDelegateCompBase
+class CPersonalAccessTokenDatabaseDelegateComp: public imtdb::CSqlDatabaseObjectDelegateCompBase
 {
 public:
 	typedef imtdb::CSqlDatabaseObjectDelegateCompBase BaseClass;
 
-	I_BEGIN_COMPONENT(CJobTicketDatabaseDelegateComp)
-		I_ASSIGN(m_jobTicketFactCompPtr, "JobTicket", "Factory used for creation of the new job ticket instance", true, "JobTicket");
+	I_BEGIN_COMPONENT(CPersonalAccessTokenDatabaseDelegateComp)
+		I_ASSIGN(m_tokenFactCompPtr, "PersonalAccessToken", "Factory used for creation of the new token", true, "PersonalAccessToken");
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
-	virtual istd::IChangeableUniquePtr CreateObjectFromRecord(
-				const QSqlRecord& record,
-				const iprm::IParamsSet* dataConfigurationPtr = nullptr) const override;
+	virtual istd::IChangeableUniquePtr CreateObjectFromRecord(const QSqlRecord& record, const iprm::IParamsSet* dataConfigurationPtr = nullptr) const override;
 	virtual NewObjectQuery CreateNewObjectQuery(
 				const QByteArray& typeId,
 				const QByteArray& proposedObjectId,
@@ -30,20 +28,20 @@ public:
 				const QString& objectDescription,
 				const istd::IChangeable* valuePtr,
 				const imtbase::IOperationContext* operationContextPtr) const override;
-	virtual QByteArray CreateDeleteObjectsQuery(
-				const imtbase::IObjectCollection& collection,
-				const imtbase::ICollectionInfo::Ids& objectIds,
-				const imtbase::IOperationContext* operationContextPtr) const override;
-	virtual QByteArray CreateDeleteObjectSetQuery(
-				const imtbase::IObjectCollection& collection,
-				const iprm::IParamsSet* paramsPtr = nullptr,
-				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
 	virtual QByteArray CreateUpdateObjectQuery(
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
 				const istd::IChangeable& object,
 				const imtbase::IOperationContext* operationContextPtr,
 				bool useExternDelegate = true) const override;
+	virtual QByteArray CreateDeleteObjectsQuery(
+				const imtbase::IObjectCollection& collection,
+				const QByteArrayList& objectIds,
+				const imtbase::IOperationContext* operationContextPtr) const override;
+	virtual QByteArray CreateDeleteObjectSetQuery(
+				const imtbase::IObjectCollection& collection,
+				const iprm::IParamsSet* paramsPtr = nullptr,
+				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
 	virtual QByteArray CreateRenameObjectQuery(
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
@@ -54,14 +52,18 @@ public:
 				const QByteArray& objectId,
 				const QString& description,
 				const imtbase::IOperationContext* operationContextPtr) const override;
-	virtual QByteArray GetObjectTypeId(
-			const QByteArray& objectId) const override;
+
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
+
+protected:
+	// reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
+	virtual idoc::MetaInfoPtr CreateObjectMetaInfo(const QByteArray& typeId) const override;
+	virtual bool SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const override;
 
 private:
-	I_FACT(IJobTicket, m_jobTicketFactCompPtr);
+	I_FACT(imtauth::IPersonalAccessToken, m_tokenFactCompPtr);
 };
 
 
-} // namespace imthype
-
-
+} // namespace imtauthdb

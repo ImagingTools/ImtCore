@@ -11,6 +11,7 @@
 // ImtCore includes
 #include <imtbase/imtbase.h>
 #include <imthype/CJobTicket.h>
+#include <imthype/CJobStatus.h>
 
 namespace imthype
 {
@@ -55,6 +56,17 @@ IJobTicketSharedPtr CJobQueueManagerCompBase::GetJobTicket(const QByteArray& job
 }
 
 
+IJobStatusSharedPtr CJobQueueManagerCompBase::GetJobStatus(const QByteArray& jobId) const
+{
+	// Status is stored separately from job ticket for lightweight access
+	if (m_jobStatusMap.contains(jobId)){
+		return m_jobStatusMap.value(jobId);
+	}
+	
+	return IJobStatusSharedPtr();
+}
+
+
 // reimplemented (IJobQueueManager)
 
 QByteArray CJobQueueManagerCompBase::GetTaskTypeId(const QByteArray& jobId) const
@@ -83,14 +95,13 @@ QByteArray CJobQueueManagerCompBase::InsertNewJobIntoQueue(
 		return QByteArray();
 	}
 
-	QByteArray jobId = QUuid::createUuid().toByteArray();
+	QByteArray jobId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
-	// Create a new job ticket
+	// Create a new job ticket (without status/progress - those are managed separately)
 	CJobTicket jobTicket;
 	jobTicket.SetUuid(jobId);
 	jobTicket.SetContextId(contextId);
 	jobTicket.SetTypeId(typeId);
-	jobTicket.SetProcessingStatus(PS_WAITING_FOR_ACCEPTING);
 	jobTicket.SetInput(input);
 
 	// Set params factory for proper deserialization
@@ -124,12 +135,17 @@ QByteArray CJobQueueManagerCompBase::InsertNewJobIntoQueue(
 				&jobTicket,
 				jobId);
 
-	lock.unlock();
-
 	if (insertedId.isEmpty()){
 		SendErrorMessage(0, "Failed to insert job ticket into collection");
 		return QByteArray();
 	}
+
+	// Create separate status object for tracking execution state
+	IJobStatusSharedPtr statusPtr(new CJobStatus(jobId));
+	statusPtr->SetProcessingStatus(PS_WAITING_FOR_ACCEPTING);
+	m_jobStatusMap.insert(jobId, statusPtr);
+
+	lock.unlock();
 
 	return insertedId;
 }
@@ -148,7 +164,13 @@ bool CJobQueueManagerCompBase::CancelJob(const QByteArray & jobId)
 		return false;
 	}
 
-	ProcessingStatus currentStatus = ticketPtr->GetProcessingStatus();
+	// Get status from separate status map
+	IJobStatusSharedPtr statusPtr = GetJobStatus(jobId);
+	if (!statusPtr.IsValid()){
+		return false;
+	}
+
+	ProcessingStatus currentStatus = statusPtr->GetProcessingStatus();
 	ProcessingStatus newStatus = currentStatus;
 
 	if (currentStatus < PS_RUNNING){
@@ -170,9 +192,7 @@ bool CJobQueueManagerCompBase::CancelJob(const QByteArray & jobId)
 
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
-	ticketPtr->SetProcessingStatus(newStatus);
-
-	m_jobTicketsCollectionCompPtr->SetObjectData(jobId, *ticketPtr);
+	statusPtr->SetProcessingStatus(newStatus);
 
 	return true;
 }
@@ -191,7 +211,13 @@ bool CJobQueueManagerCompBase::ResumeJob(const QByteArray & jobId)
 		return false;
 	}
 
-	ProcessingStatus currentStatus = ticketPtr->GetProcessingStatus();
+	// Get status from separate status map
+	IJobStatusSharedPtr statusPtr = GetJobStatus(jobId);
+	if (!statusPtr.IsValid()){
+		return false;
+	}
+
+	ProcessingStatus currentStatus = statusPtr->GetProcessingStatus();
 
 	if ((currentStatus == PS_CANCELED) || (currentStatus == PS_FINISHED)){
 		istd::IChangeable::ChangeSet changeSet = istd::IChangeable::GetAnyChange();
@@ -203,9 +229,7 @@ bool CJobQueueManagerCompBase::ResumeJob(const QByteArray & jobId)
 
 		istd::CChangeNotifier changeNotifier(this, &changeSet);
 
-		ticketPtr->SetProcessingStatus(PS_WAITING_FOR_PROCESSING);
-
-		m_jobTicketsCollectionCompPtr->SetObjectData(jobId, *ticketPtr);
+		statusPtr->SetProcessingStatus(PS_WAITING_FOR_PROCESSING);
 
 		return true;
 	}
@@ -227,19 +251,24 @@ bool CJobQueueManagerCompBase::RemoveJob(const QByteArray& jobId)
 		return false;
 	}
 
+	// Get status from separate status map
+	IJobStatusSharedPtr statusPtr = GetJobStatus(jobId);
+	
 	// Job is running - cancel it first:
-	ProcessingStatus status = ticketPtr->GetProcessingStatus();
-	if (status > PS_NONE && status < PS_CANCELED){
-		lock.unlock();
-		if (!CancelJob(jobId)){
-			return false;
-		}
-		lock.relock();
-		
-		// Re-check that the ticket still exists after relock
-		ticketPtr = GetJobTicket(jobId);
-		if (!ticketPtr){
-			return false;
+	if (statusPtr.IsValid()){
+		ProcessingStatus status = statusPtr->GetProcessingStatus();
+		if (status > PS_NONE && status < PS_CANCELED){
+			lock.unlock();
+			if (!CancelJob(jobId)){
+				return false;
+			}
+			lock.relock();
+			
+			// Re-check that the ticket still exists after relock
+			ticketPtr = GetJobTicket(jobId);
+			if (!ticketPtr){
+				return false;
+			}
 		}
 	}
 
@@ -252,6 +281,11 @@ bool CJobQueueManagerCompBase::RemoveJob(const QByteArray& jobId)
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 	bool result = m_jobTicketsCollectionCompPtr->RemoveElements(imtbase::IObjectCollection::Ids() << jobId);
+	
+	// Clean up status entry when job is removed
+	if (result){
+		m_jobStatusMap.remove(jobId);
+	}
 
 	return result;
 }
@@ -293,9 +327,10 @@ CJobQueueManagerCompBase::ProcessingStatus CJobQueueManagerCompBase::GetProcessi
 {
 	QReadLocker lock(&m_mutex);
 
-	IJobTicketSharedPtr ticketPtr = GetJobTicket(jobId);
-	if (ticketPtr){
-		return ticketPtr->GetProcessingStatus();
+	// Get status from separate status map instead of job ticket
+	IJobStatusSharedPtr statusPtr = GetJobStatus(jobId);
+	if (statusPtr.IsValid()){
+		return statusPtr->GetProcessingStatus();
 	}
 
 	return PS_NONE;
@@ -310,8 +345,15 @@ bool CJobQueueManagerCompBase::SetProcessingStatus(const QByteArray & jobId, Pro
 
 	QWriteLocker lock(&m_mutex);
 
+	// Verify job ticket exists
 	IJobTicketSharedPtr ticketPtr = GetJobTicket(jobId);
 	if (!ticketPtr){
+		return false;
+	}
+
+	// Get status object (created with job; validation is defensive)
+	IJobStatusSharedPtr statusPtr = GetJobStatus(jobId);
+	if (!statusPtr.IsValid()){
 		return false;
 	}
 
@@ -324,9 +366,7 @@ bool CJobQueueManagerCompBase::SetProcessingStatus(const QByteArray & jobId, Pro
 
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
-	ticketPtr->SetProcessingStatus(status);
-
-	m_jobTicketsCollectionCompPtr->SetObjectData(jobId, *ticketPtr);
+	statusPtr->SetProcessingStatus(status);
 
 	lock.unlock();
 
@@ -338,9 +378,10 @@ double CJobQueueManagerCompBase::GetProgress(const QByteArray & jobId) const
 {
 	QReadLocker lock(&m_mutex);
 
-	IJobTicketSharedPtr ticketPtr = GetJobTicket(jobId);
-	if (ticketPtr){
-		return ticketPtr->GetProgress();
+	// Get progress from separate status map instead of job ticket
+	IJobStatusSharedPtr statusPtr = GetJobStatus(jobId);
+	if (statusPtr.IsValid()){
+		return statusPtr->GetProgress();
 	}
 
 	return 0.0;
@@ -355,12 +396,19 @@ bool CJobQueueManagerCompBase::SetProgress(const QByteArray& jobId, double progr
 
 	QWriteLocker lock(&m_mutex);
 
+	// Verify job ticket exists
 	IJobTicketSharedPtr ticketPtr = GetJobTicket(jobId);
 	if (!ticketPtr){
 		return false;
 	}
 
-	if (!qFuzzyCompare(ticketPtr->GetProgress(), progress)){
+	// Get status object (created with job; validation is defensive)
+	IJobStatusSharedPtr statusPtr = GetJobStatus(jobId);
+	if (!statusPtr.IsValid()){
+		return false;
+	}
+
+	if (!qFuzzyCompare(statusPtr->GetProgress(), progress)){
 		istd::IChangeable::ChangeSet changeSet = istd::IChangeable::GetAnyChange();
 		JobProgressInfo info;
 		info.elementId = jobId;
@@ -370,9 +418,7 @@ bool CJobQueueManagerCompBase::SetProgress(const QByteArray& jobId, double progr
 
 		istd::CChangeNotifier changeNotifier(this, &changeSet);
 
-		ticketPtr->SetProgress(progress);
-
-		m_jobTicketsCollectionCompPtr->SetObjectData(jobId, *ticketPtr);
+		statusPtr->SetProgress(progress);
 
 		return true;
 	}

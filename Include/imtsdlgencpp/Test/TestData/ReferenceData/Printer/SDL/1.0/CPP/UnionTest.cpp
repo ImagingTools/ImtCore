@@ -26,11 +26,15 @@ bool CCoords::V1_0::operator==(const V1_0& other) const
 bool CCoords::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	if (!X){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "X").toLocal8Bit().constData();)
+
 		return false;
 	}
 	model.SetData("X", *X, modelIndex);
 
 	if (!Y){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "Y").toLocal8Bit().constData();)
+
 		return false;
 	}
 	model.SetData("Y", *Y, modelIndex);
@@ -81,11 +85,15 @@ bool CCoords::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int
 bool CCoords::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!X){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "X").toLocal8Bit().constData();)
+
 		return false;
 	}
 	gqlObject.InsertParam("X", QVariant(*X));
 
 	if (!Y){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "Y").toLocal8Bit().constData();)
+
 		return false;
 	}
 	gqlObject.InsertParam("Y", QVariant(*Y));
@@ -131,11 +139,15 @@ bool CCoords::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 bool CCoords::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!X){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "X").toLocal8Bit().constData();)
+
 		return false;
 	}
 	jsonObject["X"] = QJsonValue::fromVariant(*X);
 
 	if (!Y){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "Y").toLocal8Bit().constData();)
+
 		return false;
 	}
 	jsonObject["Y"] = QJsonValue::fromVariant(*Y);
@@ -766,6 +778,8 @@ bool CLink::V1_0::operator==(const V1_0& other) const
 bool CLink::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	if (!link){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "link").toLocal8Bit().constData();)
+
 		return false;
 	}
 	model.SetData("link", *link, modelIndex);
@@ -922,6 +936,8 @@ bool CLink::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int m
 bool CLink::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!link){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "link").toLocal8Bit().constData();)
+
 		return false;
 	}
 	gqlObject.InsertParam("link", QVariant(*link));
@@ -1074,6 +1090,8 @@ bool CLink::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlO
 bool CLink::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!link){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "link").toLocal8Bit().constData();)
+
 		return false;
 	}
 	jsonObject["link"] = QJsonValue::fromVariant(*link);
@@ -1470,6 +1488,8 @@ bool CPrinterBase::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int mode
 	}
 
 	if (!linkList){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "linkList").toLocal8Bit().constData();)
+
 		return false;
 	}
 	::imtbase::CTreeItemModel* newLinkListModelPtr = model.AddTreeModel("linkList", modelIndex);
@@ -1483,6 +1503,8 @@ bool CPrinterBase::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int mode
 		}
 	}
 	if (!specification){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "specification").toLocal8Bit().constData();)
+
 		return false;
 	}
 	QVariant specificationVariantValue;
@@ -1748,6 +1770,8 @@ bool CPrinterBase::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 	}
 
 	if (!linkList){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "linkList").toLocal8Bit().constData();)
+
 		return false;
 	}
 	QList<::imtgql::CGqlParamObject> linkListDataObjectList;
@@ -1763,6 +1787,8 @@ bool CPrinterBase::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 	gqlObject.InsertParam("linkList", linkListDataObjectList);
 
 	if (!specification){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "specification").toLocal8Bit().constData();)
+
 		return false;
 	}
 	::imtgql::CGqlParamObject specificationDataObject;
@@ -2041,6 +2067,8 @@ bool CPrinterBase::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 	}
 
 	if (!linkList){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "linkList").toLocal8Bit().constData();)
+
 		return false;
 	}
 	QJsonArray newLinkListArray;
@@ -2056,6 +2084,8 @@ bool CPrinterBase::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 	jsonObject["linkList"] = newLinkListArray;
 
 	if (!specification){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "specification").toLocal8Bit().constData();)
+
 		return false;
 	}
 	if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>(specification.GetPtr())){
@@ -3289,7 +3319,7 @@ bool CPrinterBaseObject::hasLinkList()
 }
 
 
-void CPrinterBaseObject::createLinkList()
+void CPrinterBaseObject::emplaceLinkList()
 {
 	Version_1_0->linkList.emplace();
 
@@ -3303,6 +3333,13 @@ void CPrinterBaseObject::ResetLinkList()
 		itemPtr->deleteLater();
 	}
 	m_linkListQObjectPtr = QVariant();
+}
+
+
+QVariant CPrinterBaseObject::createLinkListArrayElement(const QVariant& v)
+{
+	Q_UNUSED(v);
+	return QVariant::fromValue(new sdl::modsdl::UnionTest::CLinkObject());
 }
 
 
@@ -3365,7 +3402,7 @@ bool CPrinterBaseObject::hasSpecification()
 }
 
 
-void CPrinterBaseObject::createSpecification()
+void CPrinterBaseObject::emplaceSpecification()
 {
 	Version_1_0->specification.emplace();
 
@@ -3418,7 +3455,7 @@ bool CPrinterBaseObject::hasSpecificationList()
 }
 
 
-void CPrinterBaseObject::createSpecificationList()
+void CPrinterBaseObject::emplaceSpecificationList()
 {
 	Version_1_0->specificationList.emplace();
 

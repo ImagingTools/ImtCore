@@ -48,7 +48,7 @@ bool CLicenseControllerComp::ImportLicense(const QString& licenseFilePath, ilog:
 				backupFilePath = QDir::tempPath() + "/" + QUuid::createUuid().toString(QUuid::WithoutBraces) + "/License.lic";
 				if (!istd::CSystem::FileCopy(targetFilePath, backupFilePath)){
 					if (logPtr != nullptr){
-						ilog::IMessageConsumer::MessagePtr messagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, tr("Backup of the existing license failed. Import canceled"), "License Manager"));
+						ilog::IMessageConsumer::MessagePtr messagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, QT_TR_NOOP("Backup of the existing license failed. Import canceled"), "License Manager"));
 
 						logPtr->AddMessage(messagePtr);
 					}
@@ -69,40 +69,41 @@ bool CLicenseControllerComp::ImportLicense(const QString& licenseFilePath, ilog:
 
 					return true;
 				}
+				else{
+					if (logPtr != nullptr){
+						QString addtionalMessage;
+						if (m_additionalImportLicenseErrorMessageAttrPtr.IsValid()){
+							addtionalMessage = *m_additionalImportLicenseErrorMessageAttrPtr;
+						}
 
-				if (logPtr != nullptr){
-					QString addtionalMessage;
-					if (m_additionalImportLicenseErrorMessageAttrPtr.IsValid()){
-						addtionalMessage = *m_additionalImportLicenseErrorMessageAttrPtr;
+						QString errorMessage = QT_TR_NOOP("License file could not be imported");
+						if (!addtionalMessage.isEmpty()){
+							errorMessage += ".\n" + addtionalMessage;
+						}
+
+						ilog::IMessageConsumer::MessagePtr messagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, errorMessage, "License Manager"));
+
+						logPtr->AddMessage(messagePtr);
 					}
 
-					QString errorMessage = QT_TR_NOOP("License file could not be imported");
-					if (!addtionalMessage.isEmpty()){
-						errorMessage += ".\n" + addtionalMessage;
-					}
+					// Restore the license backup:
+					if (!backupFilePath.isEmpty()){
+						if (istd::CSystem::FileCopy(backupFilePath, targetFilePath, true)){
+							QFile::remove(backupFilePath);
+						}
+						else{
+							if (logPtr != nullptr){
+								ilog::IMessageConsumer::MessagePtr messagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, QT_TR_NOOP("Restore of the last license failed"), "License Manager"));
 
-					ilog::IMessageConsumer::MessagePtr messagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, errorMessage, "License Manager"));
-
-					logPtr->AddMessage(messagePtr);
-				}
-
-				// Restore the license backup:
-				if (!backupFilePath.isEmpty()){
-					if (istd::CSystem::FileCopy(backupFilePath, targetFilePath, true)){
-						QFile::remove(backupFilePath);
-					}
-					else{
-						if (logPtr != nullptr){
-							ilog::IMessageConsumer::MessagePtr messagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, tr("Restore of the last license failed"), "License Manager"));
-
-							logPtr->AddMessage(messagePtr);
+								logPtr->AddMessage(messagePtr);
+							}
 						}
 					}
 				}
 			}
 			else{
 				if (logPtr != nullptr){
-					ilog::IMessageConsumer::MessagePtr messagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, tr("License file could not be copied to the target location"), "License Manager"));
+					ilog::IMessageConsumer::MessagePtr messagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, QT_TR_NOOP("License file could not be copied to the target location"), "License Manager"));
 
 					logPtr->AddMessage(messagePtr);
 				}
@@ -289,9 +290,9 @@ bool CLicenseControllerComp::ReadLicenseFromFile(imtlic::IProductInstanceInfo& l
 		if (LoadFingerprint(fingerprintFilePath, license, daysUntilExpire)){
 			QByteArray publicKey;
 			if (m_licenseKeysProviderCompPtr.IsValid()){
-				publicKey = m_licenseKeysProviderCompPtr->GetEncryptionKey(imtcrypt::IEncryptionKeysProvider::KT_PUBLIC);
+				publicKey = m_licenseKeysProviderCompPtr->GetEncryptionKey(imtcrypt::IEncryptionKeysProvider::KT_PASSWORD);
 			}
-			if (!publicKey.isEmpty()){
+			if (!publicKey.contains("[Not Available]")){
 				SendWarningMessage(0, QT_TR_NOOP(QString("You have no valid license to run this software anymore. You have %1 day(s) to update your system with a valid license").arg(daysUntilExpire)), "License Management");
 			}
 			else{

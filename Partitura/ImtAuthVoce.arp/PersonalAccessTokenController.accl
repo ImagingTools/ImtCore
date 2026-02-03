@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5715" Description="ACF"/>
+            <Version Id="1" Number="2274" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="PersonalAccessToken" X="600" Y="100" Note=""/>
+        <Element ComponentName="PersonalAccessTokenController" X="250" Y="100" Note=""/>
+        <Element ComponentName="PersonalAccessTokenManager" X="1000" Y="100" Note=""/>
+        <Element ComponentName="PersonalAccessTokenSqlRepository" X="575" Y="500" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

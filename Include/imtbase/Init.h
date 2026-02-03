@@ -67,6 +67,7 @@ public:
 		Q_INIT_RESOURCE(imtbaseCollectionImportSdl);
 		Q_INIT_RESOURCE(imt2dGeometrySdl);
 		Q_INIT_RESOURCE(imt2dPaintSystemSdl);
+		Q_INIT_RESOURCE(imtauthPersonalAccessTokensSdl);
 	}
 
 	static void InitQml()

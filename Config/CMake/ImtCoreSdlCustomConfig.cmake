@@ -16,10 +16,14 @@ macro(ImtCoreGetSdlDeps)
 	set (CUSTOM_PYTHON OFF)
 	if (NOT PYTHONEXE)
 		set (CUSTOM_PYTHON ON)
-		set(PYTHONEXE ${IMTCOREDIR}/3rdParty/Python/3.8/python.exe)
-
-		if (NOT WIN32 AND NOT ANDROID)
-			set(PYTHONEXE python3)
+		set(PYTHONEXE "$ENV{PYTHONEXE}")
+		
+		if(PYTHONEXE STREQUAL "")
+			if (WIN32 AND NOT ANDROID)
+				set(PYTHONEXE python.exe)
+			else()
+				set(PYTHONEXE python3)
+			endif()
 		endif()
 	endif()
 

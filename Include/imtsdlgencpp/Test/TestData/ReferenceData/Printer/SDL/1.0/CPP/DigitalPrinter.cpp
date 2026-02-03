@@ -1121,7 +1121,7 @@ bool CDigitalPrinterSpecificationObject::hasBase()
 }
 
 
-void CDigitalPrinterSpecificationObject::createBase()
+void CDigitalPrinterSpecificationObject::emplaceBase()
 {
 	Version_1_0->base.emplace();
 
@@ -1380,7 +1380,7 @@ bool CDigitalPrinterObject::hasBase()
 }
 
 
-void CDigitalPrinterObject::createBase()
+void CDigitalPrinterObject::emplaceBase()
 {
 	Version_1_0->base.emplace();
 

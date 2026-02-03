@@ -222,13 +222,25 @@ QtObject {
 		let list = []
 		if(Qt.platform.os === 'web'){
 			for(let key in this.$properties){
-				if(key.indexOf('m_') >= 0 && key !== 'owner' && key !== 's_keys' && key !== 'objectName' && key !== 'enableNotifications' && typeof this[key] !== "function"){
+				if(key.indexOf('m_') >= 0
+						&& key !== 'owner'
+						&& key !== 's_keys'
+						&& key !== 'objectName'
+						&& key !== 'enableNotifications'
+						&& typeof this[key] !== "function"
+						|| key == '__typename'){
 					list.push(key)
 				}
 			}
 		} else {
 			for(let key in this){
-				if(key.indexOf('m_') >= 0 && key !== 'objectName' && key !== 'owner' && key !== 's_keys' && key !== 'enableNotifications' && typeof this[key] !== "function"){
+				if(key.indexOf('m_') >= 0
+						&& key !== 'objectName'
+						&& key !== 'owner'
+						&& key !== 's_keys'
+						&& key !== 'enableNotifications'
+						&& typeof this[key] !== "function"
+						|| key == '__typename'){
 					list.push(key)
 				}
 			}
@@ -420,24 +432,29 @@ QtObject {
 			}
 			else if(typeof sourceObject[key] === "object"){
 				if(Array.isArray(sourceObject[key])){
-					let component = createElement(_key)
+					let component = this.createComponent(_key)
 
-					if(this[_key]){
-						if (this[_key].clear){
+					if (this[_key]) {
+						if (this[_key].clear) {
 							this[_key].clear()
 						}
 					} else {
-						if (component){
+						if (component) {
 							let obj = Qt.createComponent('BaseModel.qml').createObject(this)
+							obj.owner = this
 							this[_key] = obj
 						}
 					}
 
 					if (component){
 						for(let sourceObjectInner of sourceObject[key]){
-							let obj = component.createObject(this)
+							let sourceTypename
+							if (sourceObjectInner['__typename']){
+								sourceTypename = sourceObjectInner['__typename']
+							}
+							let obj = this.createElement(_key, sourceTypename).createObject(this)
 							obj.fromObject(sourceObjectInner)
-							this[_key].append({item: obj})
+							this[_key].append({ item: obj })
 							obj.owner = this
 							obj.connectProperties()
 						}
@@ -448,7 +465,18 @@ QtObject {
 				} else {
 					let obj
 					if (!this[_key]){
-						obj = createComponent(_key).createObject(this)
+						let sourceData = sourceObject[key]
+						let sourceTypename
+						if (sourceData['__typename']){
+							sourceTypename = sourceData['__typename']
+						}
+						let component = this.createComponent(_key, sourceTypename)
+						if (component){
+							obj = component.createObject(this)
+						}
+						else{
+							console.log("component error", _key, sourceTypename, JSON.stringify(sourceObject))
+						}
 					}
 					else{
 						obj = this[_key]
@@ -461,7 +489,9 @@ QtObject {
 					obj.connectProperties()
 				}
 			} else {
-				this[_key] = sourceObject[key]
+				if (key != '__typename'){
+					this[_key] = sourceObject[key]
+				}
 			}
 		}
 

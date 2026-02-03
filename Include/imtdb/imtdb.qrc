@@ -5,5 +5,6 @@
 	<file alias="GetRevision.sql">Resources/SQL/GetRevision.sql</file>
 	<file alias="SetRevision.sql">Resources/SQL/SetRevision.sql</file>
 	<file alias="CreateCollectionTable.sql">Resources/SQL/CreateCollectionTable.sql</file>
+	<file alias="CreatePersonalAccessTokenTable.sql">Resources/SQL/CreatePersonalAccessTokenTable.sql</file>
     </qresource>
 </RCC>

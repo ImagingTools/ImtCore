@@ -301,8 +301,22 @@ class ListView extends Flickable {
             item = this.__fromCache()
             this.__items[index] = item
 
-            for(let key in properties){
-                item[key] = properties[key]
+            // for(let key in properties){
+            //     item[key] = properties[key]
+            // }
+
+            if(properties.model){
+                let keys = Object.keys(properties.model)
+                if(keys.length === 1){
+                    item.JQAbstractModelData = properties.model[keys[0]]
+                }
+                item.JQAbstractModel = properties.model
+                delete properties.model
+            }
+
+            if(properties.modelData){
+                item.JQAbstractModelData = properties.modelData
+                delete properties.modelData
             }
 
             item.x = itemInfo.x
@@ -316,7 +330,7 @@ class ListView extends Flickable {
 
             item.xChanged.connect(() => {
                 if (this.orientation === ListView.Horizontal) {
-                    let _index = this.model.data.indexOf(item.model)
+                    let _index = item.JQAbstractModel.index
                     if (_index >= 0 && this.__items[_index + 1]) {
                         this.__items[_index + 1].x = this.__items[_index].x + this.__items[_index].width + this.spacing
                     }
@@ -325,7 +339,7 @@ class ListView extends Flickable {
             })
             item.yChanged.connect(() => {
                 if (this.orientation === ListView.Vertical) {
-                    let _index = this.model.data.indexOf(item.model)
+                    let _index = item.JQAbstractModel.index
                     if (_index >= 0 && this.__items[_index + 1]) {
                         this.__items[_index + 1].y = this.__items[_index].y + this.__items[_index].height + this.spacing
                     }
@@ -334,7 +348,7 @@ class ListView extends Flickable {
             })
             item.widthChanged.connect(() => {
                 if (this.orientation === ListView.Horizontal) {
-                    let _index = this.model.data.indexOf(item.model)
+                    let _index = item.JQAbstractModel.index
                     if (_index >= 0 && this.__items[_index + 1]) {
                         this.__items[_index + 1].x = this.__items[_index].x + this.__items[_index].width + this.spacing
                     }
@@ -343,7 +357,7 @@ class ListView extends Flickable {
             })
             item.heightChanged.connect(() => {
                 if (this.orientation === ListView.Vertical) {
-                    let _index = this.model.data.indexOf(item.model)
+                    let _index = item.JQAbstractModel.index
                     if (_index >= 0 && this.__items[_index + 1]) {
                         this.__items[_index + 1].y = this.__items[_index].y + this.__items[_index].height + this.spacing
                     }
@@ -354,7 +368,7 @@ class ListView extends Flickable {
                 JQApplication.updateLater(this)
             })
             item.indexChanged.connect(() => {
-                let _index = this.model.data.indexOf(item.model)
+                let _index = item.JQAbstractModel.index
                 if (this.orientation === ListView.Horizontal) {
                     if(_index > 0){
                         item.x = this.__items[_index - 1].x + this.__items[_index - 1].width + this.spacing
