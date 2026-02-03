@@ -28,10 +28,11 @@ public:
 		Uses iser::CJsonMemWriteArchive for serialization to ensure proper data formatting.
 		
 		\param result The generation result object containing metadata to save
+		             NOTE: Non-const reference required because Serialize() method is not const
 		\param filePath Full path to the JSON file where the result should be saved
 		\return true if the operation succeeded, false otherwise
 	*/
-	static bool UpdateGenerationResultFile(const CSdlQmlGenerationResult& result, const QString& filePath);
+	static bool UpdateGenerationResultFile(CSdlQmlGenerationResult& result, const QString& filePath);
 	
 	/**
 		Reads generation result metadata from a JSON file.
@@ -52,10 +53,11 @@ public:
 		For complete file safety, use UpdateGenerationResultFile instead.
 		
 		\param result The generation result object containing metadata to save
+		             NOTE: Non-const reference required because Serialize() method is not const
 		\param filePath Full path to the JSON file where the result should be saved
 		\return true if the operation succeeded, false otherwise
 	*/
-	static bool WriteGenerationResultFile(const CSdlQmlGenerationResult& result, const QString& filePath);
+	static bool WriteGenerationResultFile(CSdlQmlGenerationResult& result, const QString& filePath);
 };
 
 
