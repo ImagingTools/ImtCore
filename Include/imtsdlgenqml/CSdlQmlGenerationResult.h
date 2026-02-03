@@ -26,37 +26,37 @@ class CSdlQmlGenerationResult: virtual public iser::ISerializable
 {
 public:
 	/**
-		Get the creation timestamp.
-		\return Creation timestamp
+		\brief Returns the creation timestamp.
+		\returns Creation timestamp
 	*/
 	QDateTime GetCreatedAt() const;
 	
 	/**
-		Set the creation timestamp.
+		\brief Sets the creation timestamp.
 		\param createdAt Creation timestamp to set
 	*/
 	void SetCreatedAt(const QDateTime& createdAt);
 	
 	/**
-		Get the generator version.
-		\return Generator version string
+		\brief Returns the generator version.
+		\returns Generator version string
 	*/
 	QString GetGeneratorVersion() const;
 	
 	/**
-		Set the generator version.
+		\brief Sets the generator version.
 		\param version Generator version to set
 	*/
 	void SetGeneratorVersion(const QString& version);
 	
 	/**
-		Get the list of folders created during generation.
-		\return List of folder paths
+		\brief Returns the list of folders created during generation.
+		\returns List of folder paths
 	*/
 	QStringList GetCreatedFolders() const;
 	
 	/**
-		Set the list of folders created during generation.
+		\brief Sets the list of folders created during generation.
 		\param folders List of folder paths to set
 	*/
 	void SetCreatedFolders(const QStringList& folders);
