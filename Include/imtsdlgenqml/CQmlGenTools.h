@@ -58,6 +58,21 @@ public:
 		\note Non-const reference required because Serialize() method is not const
 	*/
 	static bool WriteGenerationResultFile(CSdlQmlGenerationResult& result, const QString& filePath);
+	
+	/**
+		\brief Appends additional directories to existing generation result file with file locking protection.
+		
+		\details This method reads the existing generation result file, adds new directories to the existing list,
+		updates the creation timestamp, and writes the updated result back to the file. The entire operation
+		(read, modify, write) is protected by a file lock to prevent concurrent access issues.
+		
+		If the file doesn't exist, it creates a new one with the provided directories.
+		
+		\param filePath Full path to the JSON file where the result should be updated
+		\param additionalFolders List of folder paths to append to the existing folders
+		\returns true if the operation succeeded, false otherwise
+	*/
+	static bool AppendFoldersToGenerationResultFile(const QString& filePath, const QStringList& additionalFolders);
 };
 
 
