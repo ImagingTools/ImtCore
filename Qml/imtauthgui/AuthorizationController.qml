@@ -32,23 +32,37 @@ QtObject {
 	property string lastUser: ""
 	property string storedRefreshToken: ""
 	
-	// Platform-aware settings storage
-	property PlatformSettings loginSettings: PlatformSettings {
-		category: "Login"
-		rememberMe: root.rememberMe
-		lastUser: root.lastUser
-		storedRefreshToken: root.storedRefreshToken
+	// Load settings from LocalStorage on component creation
+	Component.onCompleted: {
+		loadLoginSettings();
+	}
+	
+	// Watch for changes and save to LocalStorage
+	onRememberMeChanged: saveLoginSettings()
+	onLastUserChanged: saveLoginSettings()
+	onStoredRefreshTokenChanged: saveLoginSettings()
+	
+	function loadLoginSettings() {
+		let rememberMeStr = LocalStorage.getItem("Login_rememberMe");
+		root.rememberMe = (rememberMeStr === "true");
+		root.lastUser = LocalStorage.getItem("Login_lastUser") || "";
+		root.storedRefreshToken = LocalStorage.getItem("Login_storedRefreshToken") || "";
+	}
+	
+	function saveLoginSettings() {
+		LocalStorage.setItem("Login_rememberMe", root.rememberMe ? "true" : "false");
+		LocalStorage.setItem("Login_lastUser", root.lastUser);
+		LocalStorage.setItem("Login_storedRefreshToken", root.storedRefreshToken);
+	}
+	
+	function clearLoginSettings() {
+		root.rememberMe = false;
+		root.lastUser = "";
+		root.storedRefreshToken = "";
 		
-		Component.onCompleted: {
-			// Load initial values from storage
-			root.rememberMe = rememberMe;
-			root.lastUser = lastUser;
-			root.storedRefreshToken = storedRefreshToken;
-		}
-		
-		onRememberMeChanged: root.rememberMe = rememberMe
-		onLastUserChanged: root.lastUser = lastUser
-		onStoredRefreshTokenChanged: root.storedRefreshToken = storedRefreshToken
+		LocalStorage.removeItem("Login_rememberMe");
+		LocalStorage.removeItem("Login_lastUser");
+		LocalStorage.removeItem("Login_storedRefreshToken");
 	}
 	
 	property XmlHttpRequestProxy requestProxy: XmlHttpRequestProxy {
