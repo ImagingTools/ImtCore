@@ -42,9 +42,6 @@ protected:
 	virtual void Draw(QPainter& painter) override;
 
 private:
-	QFont GetAxeLabelFont() const;
-
-private:
 	imt3d::CPointCloud3d m_data;
 
 	struct AxisConfig
@@ -57,7 +54,6 @@ private:
 
 	QMap<AxisType, AxisConfig> m_axisConfigs;
 
-	static const float s_zoomFontFactor;
 	bool m_doUpdate;
 };
 
