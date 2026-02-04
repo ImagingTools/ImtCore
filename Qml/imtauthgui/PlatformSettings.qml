@@ -1,5 +1,5 @@
 import QtQuick 2.12
-import imtauthgui 1.0
+import imtgui 1.0
 
 // Platform-aware Settings component
 // - Uses LocalStorage singleton which handles web/desktop differences
