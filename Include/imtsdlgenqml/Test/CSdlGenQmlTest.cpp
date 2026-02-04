@@ -3,12 +3,12 @@
 
 // Qt includes
 #include <QtTest/QTest>
-<parameter name="QtCore/QFile">
+#include <QtCore/QFile>
 #include <QtCore/QTemporaryDir>
 
 // ACF includes
 #include <istd/CSystem.h>
-<parameter name="iproc/IProcessor">
+#include <iproc/IProcessor.h>
 #include <itest/CStandardTestExecutor.h>
 #include <iprm/CParamsSet.h>
 #include <iser/CJsonMemWriteArchive.h>
@@ -210,9 +210,9 @@ void CSdlGenQmlTest::TestGenerationResultSerialization()
 	result.SetCreatedFolders(folders);
 
 	// Test serialization
-	QByteArray buffer;
-	iser::CJsonMemWriteArchive writeArchive(buffer);
+	iser::CJsonMemWriteArchive writeArchive(nullptr);
 	QVERIFY(result.Serialize(writeArchive));
+	QByteArray buffer = writeArchive.GetData();
 	QVERIFY(!buffer.isEmpty());
 
 	// Test deserialization
@@ -264,9 +264,10 @@ void CSdlGenQmlTest::TestAppendFoldersToGenerationResultFile()
 	const QString testFilePath = tempDir.path() + "/generation_info.json";
 
 	// Create initial file with some folders
+	static QString generatorVersion = "1.0";
 	imtsdlgenqml::CSdlQmlGenerationResult initialResult;
 	initialResult.SetCreatedAt(QDateTime::currentDateTimeUtc());
-	initialResult.SetGeneratorVersion("1.0");
+	initialResult.SetGeneratorVersion(generatorVersion);
 	QSet<QString> initialFolders;
 	initialFolders << tempDir.path() + "/folder1" << tempDir.path() + "/folder2";
 	initialResult.SetCreatedFolders(initialFolders);
@@ -275,9 +276,7 @@ void CSdlGenQmlTest::TestAppendFoldersToGenerationResultFile()
 	// Append new folders
 	QSet<QString> additionalFolders;
 	additionalFolders << tempDir.path() + "/folder3" << tempDir.path() + "/folder2"; // folder2 is duplicate
-	const QString generatorVersion = "1.0";
-	QVERIFY(imtsdlgenqml::CQmlGenTools::AppendFoldersToGenerationResultFile(
-		additionalFolders, generatorVersion, testFilePath));
+	QVERIFY(imtsdlgenqml::CQmlGenTools::AppendFoldersToGenerationResultFile(testFilePath, additionalFolders));
 
 	// Read back and verify
 	imtsdlgenqml::CSdlQmlGenerationResult loadedResult;
