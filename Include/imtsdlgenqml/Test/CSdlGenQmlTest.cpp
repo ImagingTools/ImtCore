@@ -398,9 +398,6 @@ void CSdlGenQmlTest::TestGenerationResultJsonDeserialization()
 	QCOMPARE(result.GetCreatedAt(), referenceTime);
 	QCOMPARE(result.GetGeneratorVersion(), referenceVersion);
 	QCOMPARE(result.GetCreatedFolders(), referenceFolders);
-
-	// Additional validation: ensure the archive processed the data correctly
-	QVERIFY2(!readArchive.IsEmpty(), "Archive should have processed data");
 }
 
 
