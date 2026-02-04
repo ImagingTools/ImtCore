@@ -3,13 +3,20 @@
 
 // Qt includes
 #include <QtTest/QTest>
-#include <QtCore/QFile>
+<parameter name="QtCore/QFile">
+#include <QtCore/QTemporaryDir>
 
 // ACF includes
 #include <istd/CSystem.h>
-#include <iproc/IProcessor.h>
+<parameter name="iproc/IProcessor">
 #include <itest/CStandardTestExecutor.h>
-#include <iprm/CParamsSet.h> 
+#include <iprm/CParamsSet.h>
+#include <iser/CJsonMemWriteArchive.h>
+#include <iser/CJsonMemReadArchive.h>
+
+// ImtCore includes
+#include <imtsdlgenqml/CSdlQmlGenerationResult.h>
+#include <imtsdlgenqml/CQmlGenTools.h>
 
 // generated includes
 #include <GeneratedFiles/ImtSdlGenQmlTest/CImtSdlGenQmlTest.h>
@@ -189,6 +196,102 @@ void CSdlGenQmlTest::TestComplexCollectionFilter()
 	argParserPtr->SetGqlEnabled();
 	argParserPtr->SetQmlEnabled();
 	ExecuteTest(testSuite, "ComplexCollectionFilter.sdl", "ComplexCollectionFilter", "imtbaseComplexCollectionFilterSdl");
+}
+
+
+void CSdlGenQmlTest::TestGenerationResultSerialization()
+{
+	// Create a generation result object
+	imtsdlgenqml::CSdlQmlGenerationResult result;
+	result.SetCreatedAt(QDateTime::currentDateTimeUtc());
+	result.SetGeneratorVersion("1.0");
+	QSet<QString> folders;
+	folders << "/path/to/folder1" << "/path/to/folder2";
+	result.SetCreatedFolders(folders);
+
+	// Test serialization
+	QByteArray buffer;
+	iser::CJsonMemWriteArchive writeArchive(buffer);
+	QVERIFY(result.Serialize(writeArchive));
+	QVERIFY(!buffer.isEmpty());
+
+	// Test deserialization
+	imtsdlgenqml::CSdlQmlGenerationResult loadedResult;
+	iser::CJsonMemReadArchive readArchive(buffer);
+	QVERIFY(loadedResult.Serialize(readArchive));
+
+	// Verify data
+	QCOMPARE(loadedResult.GetGeneratorVersion(), result.GetGeneratorVersion());
+	QCOMPARE(loadedResult.GetCreatedFolders(), result.GetCreatedFolders());
+	QCOMPARE(loadedResult.GetCreatedAt().toMSecsSinceEpoch(), result.GetCreatedAt().toMSecsSinceEpoch());
+}
+
+
+void CSdlGenQmlTest::TestGenerationResultFileOperations()
+{
+	QTemporaryDir tempDir;
+	QVERIFY(tempDir.isValid());
+
+	const QString testFilePath = tempDir.path() + "/generation_info.json";
+
+	// Create test data
+	imtsdlgenqml::CSdlQmlGenerationResult result;
+	result.SetCreatedAt(QDateTime::currentDateTimeUtc());
+	result.SetGeneratorVersion("1.0");
+	QSet<QString> folders;
+	folders << tempDir.path() + "/folder1" << tempDir.path() + "/folder2";
+	result.SetCreatedFolders(folders);
+
+	// Test write
+	QVERIFY(imtsdlgenqml::CQmlGenTools::WriteGenerationResultFile(result, testFilePath));
+	QVERIFY(QFile::exists(testFilePath));
+
+	// Test read
+	imtsdlgenqml::CSdlQmlGenerationResult loadedResult;
+	QVERIFY(imtsdlgenqml::CQmlGenTools::ReadGenerationResultFile(loadedResult, testFilePath));
+
+	// Verify data
+	QCOMPARE(loadedResult.GetGeneratorVersion(), result.GetGeneratorVersion());
+	QCOMPARE(loadedResult.GetCreatedFolders(), result.GetCreatedFolders());
+}
+
+
+void CSdlGenQmlTest::TestAppendFoldersToGenerationResultFile()
+{
+	QTemporaryDir tempDir;
+	QVERIFY(tempDir.isValid());
+
+	const QString testFilePath = tempDir.path() + "/generation_info.json";
+
+	// Create initial file with some folders
+	imtsdlgenqml::CSdlQmlGenerationResult initialResult;
+	initialResult.SetCreatedAt(QDateTime::currentDateTimeUtc());
+	initialResult.SetGeneratorVersion("1.0");
+	QSet<QString> initialFolders;
+	initialFolders << tempDir.path() + "/folder1" << tempDir.path() + "/folder2";
+	initialResult.SetCreatedFolders(initialFolders);
+	QVERIFY(imtsdlgenqml::CQmlGenTools::WriteGenerationResultFile(initialResult, testFilePath));
+
+	// Append new folders
+	QSet<QString> additionalFolders;
+	additionalFolders << tempDir.path() + "/folder3" << tempDir.path() + "/folder2"; // folder2 is duplicate
+	const QString generatorVersion = "1.0";
+	QVERIFY(imtsdlgenqml::CQmlGenTools::AppendFoldersToGenerationResultFile(
+		additionalFolders, generatorVersion, testFilePath));
+
+	// Read back and verify
+	imtsdlgenqml::CSdlQmlGenerationResult loadedResult;
+	QVERIFY(imtsdlgenqml::CQmlGenTools::ReadGenerationResultFile(loadedResult, testFilePath));
+
+	// Should have all 3 folders (folder2 should not be duplicated)
+	QSet<QString> expectedFolders = initialFolders | additionalFolders;
+	QCOMPARE(loadedResult.GetCreatedFolders(), expectedFolders);
+	QCOMPARE(loadedResult.GetGeneratorVersion(), generatorVersion);
+
+	// Verify timestamp was updated (should be recent)
+	QDateTime now = QDateTime::currentDateTimeUtc();
+	qint64 timeDiffSecs = qAbs(loadedResult.GetCreatedAt().secsTo(now));
+	QVERIFY2(timeDiffSecs < 5, "Timestamp should be updated to current time");
 }
 
 
