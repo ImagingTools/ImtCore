@@ -23,17 +23,6 @@ namespace imtsdlgenqml
 
 bool CQmlGenTools::UpdateGenerationResultFile(CSdlQmlGenerationResult& result, const QString& filePath)
 {
-	// Ensure the directory exists
-	QFileInfo fileInfo(filePath);
-	QDir dir = fileInfo.absoluteDir();
-	if (!dir.exists()){
-		if (!dir.mkpath(".")){
-			qWarning() << "Failed to create directory:" << dir.absolutePath();
-			
-			return false;
-		}
-	}
-	
 	// Create lock file to prevent concurrent access
 	QString lockFilePath = filePath + ".lock";
 	QLockFile lockFile(lockFilePath);
@@ -45,43 +34,13 @@ bool CQmlGenTools::UpdateGenerationResultFile(CSdlQmlGenerationResult& result, c
 		return false;
 	}
 	
-	// Check if file exists - if yes, open for writing; if no, create it
-	QFile file(filePath);
-	if (!file.open(QFile::WriteOnly | QFile::Text)){
-		qWarning() << "Failed to open file for writing:" << filePath << "Error:" << file.errorString();
-		lockFile.unlock();
-		
-		return false;
-	}
-	
-	// Serialize using CJsonMemWriteArchive
-	iser::CJsonMemWriteArchive archive(nullptr);
-	if (!result.Serialize(archive)){
-		qWarning() << "Failed to serialize generation result for file:" << filePath;
-		file.close();
-		lockFile.unlock();
-		
-		return false;
-	}
-	
-	// Write serialized data to file
-	QByteArray jsonData = archive.GetData();
-	qint64 bytesWritten = file.write(jsonData);
-	if (bytesWritten <= 0){
-		qWarning() << "Failed to write data to file:" << filePath;
-		file.close();
-		lockFile.unlock();
-		
-		return false;
-	}
-	
-	// Close file
-	file.close();
+	// Use WriteGenerationResultFile to handle file operations
+	bool success = WriteGenerationResultFile(result, filePath);
 	
 	// Release the lock
 	lockFile.unlock();
 	
-	return true;
+	return success;
 }
 
 
@@ -164,17 +123,6 @@ bool CQmlGenTools::WriteGenerationResultFile(CSdlQmlGenerationResult& result, co
 
 bool CQmlGenTools::AppendFoldersToGenerationResultFile(const QString& filePath, const QSet<QString>& additionalFolders)
 {
-	// Ensure the directory exists
-	QFileInfo fileInfo(filePath);
-	QDir dir = fileInfo.absoluteDir();
-	if (!dir.exists()){
-		if (!dir.mkpath(".")){
-			qWarning() << "Failed to create directory:" << dir.absolutePath();
-			
-			return false;
-		}
-	}
-	
 	// Create lock file to prevent concurrent access
 	QString lockFilePath = filePath + ".lock";
 	QLockFile lockFile(lockFilePath);
@@ -191,21 +139,7 @@ bool CQmlGenTools::AppendFoldersToGenerationResultFile(const QString& filePath, 
 	bool fileExists = QFile::exists(filePath);
 	
 	if (fileExists){
-		QFile file(filePath);
-		if (!file.open(QFile::ReadOnly | QFile::Text)){
-			qWarning() << "Failed to open file for reading:" << filePath << "Error:" << file.errorString();
-			lockFile.unlock();
-			
-			return false;
-		}
-		
-		QByteArray jsonData = file.readAll();
-		file.close();
-		
-		// Deserialize using CJsonMemReadArchive
-		iser::CJsonMemReadArchive archive(jsonData);
-		if (!result.Serialize(archive)){
-			qWarning() << "Failed to deserialize generation result from file:" << filePath;
+		if (!ReadGenerationResultFile(result, filePath)){
 			lockFile.unlock();
 			
 			return false;
@@ -221,42 +155,12 @@ bool CQmlGenTools::AppendFoldersToGenerationResultFile(const QString& filePath, 
 	result.SetCreatedAt(QDateTime::currentDateTimeUtc());
 	
 	// Write updated result back to file
-	QFile file(filePath);
-	if (!file.open(QFile::WriteOnly | QFile::Text)){
-		qWarning() << "Failed to open file for writing:" << filePath << "Error:" << file.errorString();
-		lockFile.unlock();
-		
-		return false;
-	}
-	
-	// Serialize using CJsonMemWriteArchive
-	iser::CJsonMemWriteArchive writeArchive(nullptr);
-	if (!result.Serialize(writeArchive)){
-		qWarning() << "Failed to serialize generation result for file:" << filePath;
-		file.close();
-		lockFile.unlock();
-		
-		return false;
-	}
-	
-	// Write serialized data to file
-	QByteArray jsonData = writeArchive.GetData();
-	qint64 bytesWritten = file.write(jsonData);
-	if (bytesWritten <= 0){
-		qWarning() << "Failed to write data to file:" << filePath;
-		file.close();
-		lockFile.unlock();
-		
-		return false;
-	}
-	
-	// Close file
-	file.close();
+	bool success = WriteGenerationResultFile(result, filePath);
 	
 	// Release the lock
 	lockFile.unlock();
 	
-	return true;
+	return success;
 }
 
 
