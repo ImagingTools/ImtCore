@@ -1,9 +1,8 @@
 import QtQuick 2.12
-import Qt.labs.settings 1.0
+import imtauthgui 1.0
 
 // Platform-aware Settings component
-// - For desktop: Uses Qt.labs.settings for persistent storage
-// - For web: Uses localStorage API
+// - Uses LocalStorage singleton which handles web/desktop differences
 QtObject {
 	id: root
 	
@@ -14,64 +13,27 @@ QtObject {
 	property string lastUser: ""
 	property string storedRefreshToken: ""
 	
-	// Desktop settings (only used on non-web platforms)
-	property Settings desktopSettings: Settings {
-		category: root.category
-		
-		property bool rememberMe: false
-		property string lastUser: ""
-		property string storedRefreshToken: ""
-	}
-	
-	// Load settings from appropriate storage on component creation
+	// Load settings from storage on component creation
 	Component.onCompleted: {
-		if (Qt.platform.os === "web") {
-			// Load from localStorage
-			loadFromLocalStorage();
-		} else {
-			// Load from Qt.labs.settings (automatic via property binding)
-			root.rememberMe = desktopSettings.rememberMe;
-			root.lastUser = desktopSettings.lastUser;
-			root.storedRefreshToken = desktopSettings.storedRefreshToken;
-		}
+		loadFromStorage();
 	}
 	
 	// Watch for changes and save
-	onRememberMeChanged: {
-		if (Qt.platform.os === "web") {
-			saveToLocalStorage();
-		} else {
-			desktopSettings.rememberMe = root.rememberMe;
-		}
-	}
+	onRememberMeChanged: saveToStorage()
+	onLastUserChanged: saveToStorage()
+	onStoredRefreshTokenChanged: saveToStorage()
 	
-	onLastUserChanged: {
-		if (Qt.platform.os === "web") {
-			saveToLocalStorage();
-		} else {
-			desktopSettings.lastUser = root.lastUser;
-		}
-	}
-	
-	onStoredRefreshTokenChanged: {
-		if (Qt.platform.os === "web") {
-			saveToLocalStorage();
-		} else {
-			desktopSettings.storedRefreshToken = root.storedRefreshToken;
-		}
-	}
-	
-	function loadFromLocalStorage() {
-		let rememberMeStr = localStorage.getItem(category + "_rememberMe");
+	function loadFromStorage() {
+		let rememberMeStr = LocalStorage.getItem(category + "_rememberMe");
 		root.rememberMe = (rememberMeStr === "true");
-		root.lastUser = localStorage.getItem(category + "_lastUser") || "";
-		root.storedRefreshToken = localStorage.getItem(category + "_storedRefreshToken") || "";
+		root.lastUser = LocalStorage.getItem(category + "_lastUser") || "";
+		root.storedRefreshToken = LocalStorage.getItem(category + "_storedRefreshToken") || "";
 	}
 	
-	function saveToLocalStorage() {
-		localStorage.setItem(category + "_rememberMe", root.rememberMe ? "true" : "false");
-		localStorage.setItem(category + "_lastUser", root.lastUser);
-		localStorage.setItem(category + "_storedRefreshToken", root.storedRefreshToken);
+	function saveToStorage() {
+		LocalStorage.setItem(category + "_rememberMe", root.rememberMe ? "true" : "false");
+		LocalStorage.setItem(category + "_lastUser", root.lastUser);
+		LocalStorage.setItem(category + "_storedRefreshToken", root.storedRefreshToken);
 	}
 	
 	function clear() {
@@ -79,11 +41,8 @@ QtObject {
 		root.lastUser = "";
 		root.storedRefreshToken = "";
 		
-		if (Qt.platform.os === "web") {
-			localStorage.removeItem(category + "_rememberMe");
-			localStorage.removeItem(category + "_lastUser");
-			localStorage.removeItem(category + "_storedRefreshToken");
-		}
-		// Desktop settings will be cleared automatically via property binding
+		LocalStorage.removeItem(category + "_rememberMe");
+		LocalStorage.removeItem(category + "_lastUser");
+		LocalStorage.removeItem(category + "_storedRefreshToken");
 	}
 }

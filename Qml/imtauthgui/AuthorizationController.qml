@@ -83,9 +83,9 @@ QtObject {
 		onResult: {
 			if (status === "EXISTS"){
 				if (Qt.platform.os === "web"){
-					// For web, also check localStorage for existing session tokens
-					let token = localStorage.getItem("accessToken");
-					let refreshToken = localStorage.getItem("refreshToken");
+					// For web, also check LocalStorage for existing session tokens
+					let token = LocalStorage.getItem("accessToken");
+					let refreshToken = LocalStorage.getItem("refreshToken");
 					if (token && token !== ""){
 						AuthorizationController.readDataFromStorage();
 						AuthorizationController.setAccessToken(token);
@@ -136,33 +136,33 @@ QtObject {
 	}
 	
 	function readDataFromStorage(){
-		userTokenProvider.accessToken = localStorage.getItem("accessToken");
-		userTokenProvider.refreshToken = localStorage.getItem("refreshToken");
-		userTokenProvider.userId = localStorage.getItem("userId");
-		userTokenProvider.login = localStorage.getItem("login");
-		userTokenProvider.systemId = localStorage.getItem("systemId");
-		userTokenProvider.productId = localStorage.getItem("productId");
-		userTokenProvider.permissions = localStorage.getItem("permissions");
+		userTokenProvider.accessToken = LocalStorage.getItem("accessToken");
+		userTokenProvider.refreshToken = LocalStorage.getItem("refreshToken");
+		userTokenProvider.userId = LocalStorage.getItem("userId");
+		userTokenProvider.login = LocalStorage.getItem("login");
+		userTokenProvider.systemId = LocalStorage.getItem("systemId");
+		userTokenProvider.productId = LocalStorage.getItem("productId");
+		userTokenProvider.permissions = LocalStorage.getItem("permissions");
 	}
 	
 	function saveDataToStorage(){
-		localStorage.setItem("accessToken", userTokenProvider.accessToken);
-		localStorage.setItem("refreshToken", userTokenProvider.refreshToken);
-		localStorage.setItem("userId", userTokenProvider.userId);
-		localStorage.setItem("login", userTokenProvider.login);
-		localStorage.setItem("systemId", userTokenProvider.systemId);
-		localStorage.setItem("productId", userTokenProvider.productId);
-		localStorage.setItem("permissions", userTokenProvider.permissions);
+		LocalStorage.setItem("accessToken", userTokenProvider.accessToken);
+		LocalStorage.setItem("refreshToken", userTokenProvider.refreshToken);
+		LocalStorage.setItem("userId", userTokenProvider.userId);
+		LocalStorage.setItem("login", userTokenProvider.login);
+		LocalStorage.setItem("systemId", userTokenProvider.systemId);
+		LocalStorage.setItem("productId", userTokenProvider.productId);
+		LocalStorage.setItem("permissions", userTokenProvider.permissions);
 	}
 	
 	function removeDataFromStorage(){
-		localStorage.removeItem("refreshToken");
-		localStorage.removeItem("accessToken");
-		localStorage.removeItem("userId");
-		localStorage.removeItem("login");
-		localStorage.removeItem("systemId");
-		localStorage.removeItem("productId");
-		localStorage.removeItem("permissions");
+		LocalStorage.removeItem("refreshToken");
+		LocalStorage.removeItem("accessToken");
+		LocalStorage.removeItem("userId");
+		LocalStorage.removeItem("login");
+		LocalStorage.removeItem("systemId");
+		LocalStorage.removeItem("productId");
+		LocalStorage.removeItem("permissions");
 	}
 
 	function saveRefreshTokenIfRememberMe(){
@@ -187,8 +187,8 @@ QtObject {
 		root.rememberMe = false;
 		
 		if (Qt.platform.os === "web"){
-			// For web, clear from legacy localStorage
-			localStorage.removeItem("refreshToken");
+			// For web, clear from LocalStorage
+			LocalStorage.removeItem("refreshToken");
 		}
 		// PlatformSettings handles persistence automatically for both platforms
 	}
