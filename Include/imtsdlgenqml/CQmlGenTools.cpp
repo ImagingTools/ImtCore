@@ -42,7 +42,7 @@ bool CQmlGenTools::ReadGenerationResultFile(CSdlQmlGenerationResult& result, con
 	file.close();
 	
 	// Deserialize using CJsonMemReadArchive
-	iser::CJsonMemReadArchive archive(jsonData);
+	iser::CJsonMemReadArchive archive(jsonData, false);
 	if (!result.Serialize(archive)){
 		qWarning() << "Failed to deserialize generation result from file:" << filePath;
 		
@@ -75,7 +75,7 @@ bool CQmlGenTools::WriteGenerationResultFile(CSdlQmlGenerationResult& result, co
 	}
 	
 	// Serialize using CJsonMemWriteArchive
-	iser::CJsonMemWriteArchive archive(nullptr);
+	iser::CJsonMemWriteArchive archive(nullptr, false);
 	if (!result.Serialize(archive)){
 		qWarning() << "Failed to serialize generation result for file:" << filePath;
 		file.close();
