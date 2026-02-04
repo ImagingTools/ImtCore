@@ -2,6 +2,7 @@
 
 
 // Qt includes
+#include <QtCore/qjsondocument.h>
 #include <QtTest/QTest>
 #include <QtCore/QFile>
 #include <QtCore/QTemporaryDir>
@@ -314,9 +315,10 @@ void CSdlGenQmlTest::TestGenerationResultJsonFormat()
 	// Parse to QJsonDocument and write in indented format (non-compact)
 	QJsonParseError actualParseError;
 	QJsonDocument actualDoc = QJsonDocument::fromJson(actualJson, &actualParseError);
-	QVERIFY2(!actualDoc.isNull(), qPrintable(QString("Failed to parse actual JSON: %1 at offset %2")
-	                                          .arg(actualParseError.errorString())
-	                                          .arg(actualParseError.offset)));
+	QVERIFY2(actualParseError.error == QJsonParseError::NoError, 
+			qPrintable(QString("Failed to parse actual JSON: %1 at offset %2")
+					.arg(actualParseError.errorString())
+					.arg(actualParseError.offset)));
 	QByteArray actualJsonIndented = actualDoc.toJson(QJsonDocument::Indented);
 
 	// Write actual JSON to file in temp output directory
@@ -344,9 +346,10 @@ void CSdlGenQmlTest::TestGenerationResultJsonFormat()
 	// Parse both JSONs to compare semantically (order-independent)
 	QJsonParseError expectedParseError;
 	QJsonDocument expectedDoc = QJsonDocument::fromJson(normalizedExpected, &expectedParseError);
-	QVERIFY2(!expectedDoc.isNull(), qPrintable(QString("Failed to parse expected JSON: %1 at offset %2")
-	                                            .arg(expectedParseError.errorString())
-	                                            .arg(expectedParseError.offset)));
+	QVERIFY2(expectedParseError.error == QJsonParseError::NoError,
+			qPrintable(QString("Failed to parse expected JSON: %1 at offset %2")
+					.arg(expectedParseError.errorString())
+					.arg(expectedParseError.offset)));
 
 	// Compare JSON objects semantically
 	QCOMPARE(actualDoc, expectedDoc);
