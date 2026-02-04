@@ -21,26 +21,6 @@ namespace imtsdlgenqml
 {
 
 
-bool CQmlGenTools::UpdateGenerationResultFile(CSdlQmlGenerationResult& result, const QString& filePath)
-{
-	// Create lock file to prevent concurrent access
-	QString lockFilePath = filePath + ".lock";
-	QLockFile lockFile(lockFilePath);
-	
-	// Try to acquire the lock with a timeout of 10 minutes
-	if (!lockFile.tryLock(std::chrono::minutes(10))){
-		qWarning() << "Failed to acquire lock for file:" << filePath;
-		
-		return false;
-	}
-	
-	// Use WriteGenerationResultFile to handle file operations
-	bool success = WriteGenerationResultFile(result, filePath);
-	
-	return success;
-}
-
-
 bool CQmlGenTools::ReadGenerationResultFile(CSdlQmlGenerationResult& result, const QString& filePath)
 {
 	// Check if file exists
