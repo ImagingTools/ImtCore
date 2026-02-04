@@ -1,0 +1,9 @@
+{
+    "CreatedAt": "2024-01-15T10:30:00.000Z",
+    "CreatedFolders": [
+        "/path/to/folder1",
+        "/path/to/folder2",
+        "/path/to/folder3"
+    ],
+    "GeneratorVersion": "1.0"
+}

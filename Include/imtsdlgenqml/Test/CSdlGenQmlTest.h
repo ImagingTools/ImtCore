@@ -24,6 +24,7 @@ private Q_SLOTS:
 	void TestGenerationResultSerialization();
 	void TestGenerationResultFileOperations();
 	void TestAppendFoldersToGenerationResultFile();
+	void TestGenerationResultJsonFormat();
 
 	void cleanup();
 	void cleanupTestCase();

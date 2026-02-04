@@ -5,6 +5,7 @@
 #include <QtTest/QTest>
 #include <QtCore/QFile>
 #include <QtCore/QTemporaryDir>
+#include <QtCore/QJsonDocument>
 
 // ACF includes
 #include <istd/CSystem.h>
@@ -291,6 +292,49 @@ void CSdlGenQmlTest::TestAppendFoldersToGenerationResultFile()
 	QDateTime now = QDateTime::currentDateTimeUtc();
 	qint64 timeDiffSecs = qAbs(loadedResult.GetCreatedAt().secsTo(now));
 	QVERIFY2(timeDiffSecs < 5, "Timestamp should be updated to current time");
+}
+
+
+void CSdlGenQmlTest::TestGenerationResultJsonFormat()
+{
+	// Create test data with known values
+	imtsdlgenqml::CSdlQmlGenerationResult result;
+	result.SetCreatedAt(QDateTime::fromString("2024-01-15T10:30:00.000Z", Qt::ISODateWithMs));
+	result.SetGeneratorVersion("1.0");
+	QSet<QString> folders;
+	folders << "/path/to/folder1" << "/path/to/folder2" << "/path/to/folder3";
+	result.SetCreatedFolders(folders);
+
+	// Serialize to JSON
+	iser::CJsonMemWriteArchive writeArchive(nullptr);
+	QVERIFY(result.Serialize(writeArchive));
+	QByteArray actualJson = writeArchive.GetData();
+	QVERIFY(!actualJson.isEmpty());
+
+	// Load expected JSON from reference file
+	const QString referenceFilePath = s_testReferenceDataDirectoryPath + "/ExpectedGenerationResult.json";
+	QVERIFY(QFile::exists(referenceFilePath));
+
+	QFile referenceFile(referenceFilePath);
+	QVERIFY(referenceFile.open(QIODevice::ReadOnly | QIODevice::Text));
+	QByteArray expectedJson = referenceFile.readAll();
+	referenceFile.close();
+	QVERIFY(!expectedJson.isEmpty());
+
+	// Normalize line endings for cross-platform compatibility
+	// Replace all CRLF (\r\n) with LF (\n) for both actual and expected
+	QByteArray normalizedActual = actualJson.replace("\r\n", "\n");
+	QByteArray normalizedExpected = expectedJson.replace("\r\n", "\n");
+
+	// Parse both JSONs to compare semantically (order-independent)
+	QJsonDocument actualDoc = QJsonDocument::fromJson(normalizedActual);
+	QJsonDocument expectedDoc = QJsonDocument::fromJson(normalizedExpected);
+
+	QVERIFY(!actualDoc.isNull());
+	QVERIFY(!expectedDoc.isNull());
+
+	// Compare JSON objects
+	QCOMPARE(actualDoc, expectedDoc);
 }
 
 
