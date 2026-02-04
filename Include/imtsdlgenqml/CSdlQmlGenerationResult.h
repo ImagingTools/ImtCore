@@ -4,7 +4,7 @@
 // Qt includes
 #include <QtCore/QDateTime>
 #include <QtCore/QString>
-#include <QtCore/QStringList>
+#include <QtCore/QSet>
 
 // ACF includes
 #include <iser/ISerializable.h>
@@ -50,16 +50,16 @@ public:
 	void SetGeneratorVersion(const QString& version);
 	
 	/**
-		\brief Returns the list of folders created during generation.
-		\returns List of folder paths
+		\brief Returns the set of folders created during generation.
+		\returns Set of folder paths
 	*/
-	QStringList GetCreatedFolders() const;
+	QSet<QString> GetCreatedFolders() const;
 	
 	/**
-		\brief Sets the list of folders created during generation.
-		\param folders List of folder paths to set
+		\brief Sets the set of folders created during generation.
+		\param folders Set of folder paths to set
 	*/
-	void SetCreatedFolders(const QStringList& folders);
+	void SetCreatedFolders(const QSet<QString>& folders);
 	
 	// reimplemented (istd::IChangeable)
 	virtual int GetSupportedOperations() const override;
@@ -74,7 +74,7 @@ public:
 private:
 	QDateTime m_createdAt;
 	QString m_generatorVersion;
-	QStringList m_createdFolders;
+	QSet<QString> m_createdFolders;
 };
 
 

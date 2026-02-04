@@ -47,13 +47,13 @@ void CSdlQmlGenerationResult::SetGeneratorVersion(const QString& version)
 }
 
 
-QStringList CSdlQmlGenerationResult::GetCreatedFolders() const
+QSet<QString> CSdlQmlGenerationResult::GetCreatedFolders() const
 {
 	return m_createdFolders;
 }
 
 
-void CSdlQmlGenerationResult::SetCreatedFolders(const QStringList& folders)
+void CSdlQmlGenerationResult::SetCreatedFolders(const QSet<QString>& folders)
 {
 	if (m_createdFolders != folders){
 		istd::CChangeNotifier changeNotifier(this);
@@ -148,7 +148,16 @@ bool CSdlQmlGenerationResult::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_generatorVersion);
 	retVal = retVal && archive.EndTag(generatorVersionTag);
 	
-	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QStringList>(archive, m_createdFolders, "CreatedFolders", "List of created folders");
+	// Serialize QSet<QString> as QStringList for compatibility
+	if (archive.IsStoring()){
+		QStringList foldersList = m_createdFolders.values();
+		retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QStringList>(archive, foldersList, "CreatedFolders", "Set of created folders");
+	}
+	else{
+		QStringList foldersList;
+		retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QStringList>(archive, foldersList, "CreatedFolders", "Set of created folders");
+		m_createdFolders = QSet<QString>(foldersList.begin(), foldersList.end());
+	}
 	
 	return retVal;
 }
