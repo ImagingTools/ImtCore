@@ -19,22 +19,6 @@ class CQmlGenTools
 {
 public:
 	/**
-		\brief Updates generation result metadata file with file locking protection.
-		
-		\details This is the primary method for working with generation result files. It creates a new file
-		if it doesn't exist or updates an existing one. The entire operation (open/create, write, close)
-		is protected by a file lock to prevent concurrent access issues.
-		
-		Uses iser::CJsonMemWriteArchive for serialization to ensure proper data formatting.
-		
-		\param result The generation result object containing metadata to save
-		\param filePath Full path to the JSON file where the result should be saved
-		\returns true if the operation succeeded, false otherwise
-		\note Non-const reference required because Serialize() method is not const
-	*/
-	static bool UpdateGenerationResultFile(CSdlQmlGenerationResult& result, const QString& filePath);
-	
-	/**
 		\brief Reads generation result metadata from a JSON file.
 		
 		\details This method reads and deserializes the CSdlQmlGenerationResult object from a JSON file
@@ -50,7 +34,6 @@ public:
 		\brief Writes generation result metadata to a JSON file.
 		
 		\details This is a helper method that writes the result to file using iser::CJsonMemWriteArchive.
-		For complete file safety, use UpdateGenerationResultFile instead.
 		
 		\param result The generation result object containing metadata to save
 		\param filePath Full path to the JSON file where the result should be saved
