@@ -46,6 +46,10 @@ ipch/
 *.iobj
 *.ipdb
 
+# Install Temp directories
+/Install/Temp/
+/Install/TempExcl/
+
 # QMake artifacts
 *.pro.user
 *.pro.user.*

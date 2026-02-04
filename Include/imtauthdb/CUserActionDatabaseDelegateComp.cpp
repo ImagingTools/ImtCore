@@ -113,36 +113,6 @@ void CUserActionDatabaseDelegateComp::OnComponentCreated()
 }
 
 
-// private methods
-
-bool CUserActionDatabaseDelegateComp::TableExists(const QString& tableName) const
-{
-	if (!m_databaseEngineCompPtr.IsValid()){
-		return false;
-	}
-
-	QString tableExistsQuery = QString(R"(SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = '%1');)").arg(tableName);
-
-	QSqlError sqlError;
-	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(tableExistsQuery.toUtf8(), &sqlError);
-
-	if (sqlError.type() != QSqlError::NoError){
-		return false;
-	}
-
-	if (!sqlQuery.next()){
-		return false;
-	}
-
-	QSqlRecord record = sqlQuery.record();
-	if (record.contains("exists")){
-		return record.value("exists").toBool();
-	}
-
-	return false;
-}
-
-
 } // namespace imtauthdb
 
 

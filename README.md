@@ -1,5 +1,46 @@
 # ImtCore
 
+## Environment Variables Setup
+
+Before building the project, you need to set the following environment variables:
+
+### PYTHON38DIR
+Set this to the path of your Python 3.8 installation directory (the directory containing `include/` and `libs/` subdirectories).
+
+#### Windows (PowerShell)
+```powershell
+$env:PYTHON38DIR = "C:\Python38"
+# Or set permanently:
+[System.Environment]::SetEnvironmentVariable('PYTHON38DIR', 'C:\Python38', 'User')
+```
+
+#### Windows (Command Prompt)
+```cmd
+set PYTHON38DIR=C:\Python38
+# Or set permanently:
+setx PYTHON38DIR "C:\Python38"
+```
+
+#### Linux/macOS
+```bash
+export PYTHON38DIR="/usr/local/lib/python3.8"
+# Or add to ~/.bashrc or ~/.zshrc:
+echo 'export PYTHON38DIR="/usr/local/lib/python3.8"' >> ~/.bashrc
+```
+
+### PYTHONEXE (Optional)
+Set this to specify the Python executable path. If not set, the build system will default to `python.exe` (Windows) or `python3` (Linux/macOS).
+
+#### Windows
+```cmd
+set PYTHONEXE=C:\Python38\python.exe
+```
+
+#### Linux/macOS
+```bash
+export PYTHONEXE=/usr/bin/python3
+```
+
 ## Initial Setup
 
 After cloning the repository for the first time, follow these steps:

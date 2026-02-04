@@ -1,0 +1,94 @@
+schema {
+	namespace: imtbase
+	version: 1.0
+}
+
+
+import {
+	"ImtBaseTypes.sdl"
+}
+
+enum ValueType
+{
+	Integer
+	Number
+	String
+	Bool
+}
+
+enum FilterOperation
+{
+	Not
+	Equal
+	Less
+	Greater
+	Contains
+
+	# array semantics
+	ArrayHasAny
+	ArrayHasAll
+	ArrayIsEmpty
+	ArrayILikeAny
+}
+
+enum LogicalOperation
+{
+	And
+	Or
+}
+
+type TimeFilter
+{
+	timeRange: TimeRange
+	timeUnit: String
+	interpretationMode: String
+	unitMultiplier: Integer
+}
+
+type FieldSortingInfo
+{
+	fieldId: String!
+	sortingOrder: String!
+}
+
+union FieldFilterUnion  = FieldFilter | ArrayFieldFilter
+
+# ScalarFieldFilter
+type FieldFilter
+{
+	fieldId: ID!
+	filterValue: String
+	filterValueType: ValueType!
+	filterOperations: [FilterOperation]!
+}
+
+type ArrayFieldFilter
+{
+	fieldId: ID!							# The unique identifier of the field to filter
+	filterValues: [String]!					# List of values to filter by, stored as strings
+	filterValueType: ValueType!				# The type of elements in the array (Integer, Number, String, Bool)
+	filterOperations: [FilterOperation]!	# List of operations to apply on the array field
+}
+
+type GroupFilter
+{
+	fieldFilters: [FieldFilterUnion]
+	groupFilters: [GroupFilter]
+	logicalOperation: LogicalOperation!
+}
+
+type TextFilter
+{
+	text: String
+	fieldIds: [ID]
+}
+
+type ComplexCollectionFilter {
+	sortingInfo: [FieldSortingInfo]
+	fieldsFilter: GroupFilter
+	timeFilter: TimeFilter
+	textFilter: TextFilter
+	distinctFields: [ID]
+}
+
+

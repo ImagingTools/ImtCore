@@ -1,0 +1,85 @@
+schema {
+	query: Query
+	mutation: Mutation
+	subscription: Subscription
+	namespace: imtauth
+	version: 1.0
+}
+
+import {
+	"../../../../ImtCore/Sdl/imtbase/1.0/ImtCollection.sdl"
+}
+
+type PersonalAccessToken
+{
+	id: ID!
+	userId: ID!
+	name: String!
+	description: String
+	tokenHash: ID!
+	scopes: [ID]
+	createdAt: String
+	lastUsedAt: String
+	expiresAt: String
+	revoked: Bool
+}
+
+type PersonalAccessTokenList
+{
+	tokens: [PersonalAccessToken]
+}
+
+input TokenInput {
+	token: ID!
+}
+
+input UserIdInput {
+	userId: ID!
+}
+
+input CreateTokenInput {
+	userId: ID!
+	name: String!
+	description: String
+	scopes: [ID]
+	expiresAt: String
+}
+
+type CreateTokenPayload {
+	id: ID!
+	token: ID!
+	success: Boolean!
+	message: String
+}
+
+type RevokeTokenPayload {
+	success: Boolean!
+	message: String
+}
+
+type DeleteTokenPayload {
+	success: Boolean!
+	message: String
+}
+
+type ValidateTokenPayload 
+{
+	valid: Boolean!
+	userId: ID
+	scopes: [ID]
+	message: String
+}
+
+type Query {
+	GetTokenList (input: UserIdInput): PersonalAccessTokenList!
+	GetToken (input: InputId): PersonalAccessToken!
+	ValidateToken (input: TokenInput): ValidateTokenPayload!
+}
+
+type Mutation {
+	CreateToken (input: CreateTokenInput): CreateTokenPayload!
+	RevokeToken (input: InputId): RevokeTokenPayload!
+	DeleteToken (input: InputId): DeleteTokenPayload!
+}
+
+

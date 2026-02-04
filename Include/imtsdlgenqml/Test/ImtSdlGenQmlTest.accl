@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5442" Description="ACF"/>
+            <Version Id="1" Number="2256" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395267" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="ConsoleLog" X="175" Y="400" Note=""/>
+        <Element ComponentName="QmlCodeGenFramework" X="500" Y="275" Note=""/>
+        <Element ComponentName="SdlCoreFramework" X="500" Y="500" Note=""/>
+        <Element ComponentName="_Workaround" X="775" Y="275" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

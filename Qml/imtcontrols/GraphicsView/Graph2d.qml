@@ -76,6 +76,27 @@ Rectangle{
 	property alias hideScrollbars: graphicsView.hideScrollbars;
 
 	signal invalidPoint(int lineIndex, int pointIndex);
+	signal editingFinished();
+
+	onLeftLimitChanged: {
+		originShape.points = [leftLimit]
+	}
+
+	onRightLimitChanged: {
+		rightLimitShape.points = [rightLimit]
+	}
+
+	onLinePointsChanged: {
+		reset()
+
+		let activeLayer = graphicsView.getActiveLayer()
+		if(!activeLayer || !activeLayer.shapeModel.length){
+			return
+		}
+		let line = activeLayer.shapeModel[0]
+		line.points = linePoints
+		requestPaint()
+	}
 
 	function validatator(pointsArg){
 		return validatorBase(pointsArg);
@@ -229,26 +250,6 @@ Rectangle{
 		xScale = xScaleBackup
 	}
 
-	onLinePointsChanged: {
-		reset()
-
-		let activeLayer = graphicsView.getActiveLayer()
-		if(!activeLayer || !activeLayer.shapeModel.length){
-			return
-		}
-		let line = activeLayer.shapeModel[0]
-		line.points = linePoints
-		requestPaint()
-	}
-
-	onLeftLimitChanged: {
-		originShape.points = [leftLimit]
-	}
-
-	onRightLimitChanged: {
-		rightLimitShape.points = [rightLimit]
-	}
-
 	function setLeftLimit(limitArg, requestPaintArg){
 		leftLimit = limitArg
 		if(requestPaintArg){
@@ -308,7 +309,7 @@ Rectangle{
 			property bool lineCreated: false;
 
 			property bool firstResize: true;
-
+			property bool isEditing: false;
 
 			Component.onCompleted: {
 				compl = true
@@ -569,6 +570,18 @@ Rectangle{
 
 			isHidden: graph.isMultiGraph ? false : !graph.linePoints.length
 			hasHoverReaction: graph.hasTooltip
+
+			onEditNodeIndexChanged: {
+				if(editNodeIndex > -1){
+					graphicsView.isEditing = true;
+				}
+				else {
+					if(graphicsView.isEditing){
+						graph.editingFinished()
+					}
+					graphicsView.isEditing = false;
+				}
+			}
 
 			property int lineIndex: 0;
 

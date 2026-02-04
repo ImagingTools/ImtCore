@@ -92,27 +92,63 @@ class TextEdit extends Item {
     }
 
     cut(){
-
+        if(this.getPropertyValue('readOnly')) return
+        
+        const start = this.$input.selectionStart
+        const end = this.$input.selectionEnd
+        if(start !== end && navigator.clipboard){
+            const selectedText = this.$input.value.substring(start, end)
+            navigator.clipboard.writeText(selectedText).then(() => {
+                const newText = this.$input.value.substring(0, start) + this.$input.value.substring(end)
+                this.getProperty('text').reset(newText)
+                this.$input.setSelectionRange(start, start)
+                this.$updateSelection()
+            }).catch(err => {
+                console.error('Failed to cut text:', err)
+            })
+        }
     }
 
     copy(){
-        
+        const start = this.$input.selectionStart
+        const end = this.$input.selectionEnd
+        if(start !== end && navigator.clipboard){
+            const selectedText = this.$input.value.substring(start, end)
+            navigator.clipboard.writeText(selectedText).catch(err => {
+                console.error('Failed to copy text:', err)
+            })
+        }
     }
 
     paste(){
-        
+        if(!this.getPropertyValue('readOnly') && navigator.clipboard){
+            navigator.clipboard.readText().then(clipboardText => {
+                const start = this.$input.selectionStart
+                const end = this.$input.selectionEnd
+                const currentText = this.$input.value
+                const newText = currentText.substring(0, start) + clipboardText + currentText.substring(end)
+                this.getProperty('text').reset(newText)
+                const newCursorPos = start + clipboardText.length
+                this.$input.setSelectionRange(newCursorPos, newCursorPos)
+                this.$updateSelection()
+            }).catch(err => {
+                console.error('Failed to paste text:', err)
+            })
+        }
     }
 
     clear(){
-        
+        if(!this.getPropertyValue('readOnly')){
+            this.getProperty('text').reset('')
+        }
     }
 
     redo(){
-        
+        document.execCommand('redo')
     }
 
     undo(){
-        
+        document.execCommand('undo')
     }
 
     remove(start, end){

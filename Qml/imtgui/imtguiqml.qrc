@@ -47,6 +47,7 @@
         <file alias="imtgui/Settings/SettingsObserver.qml">Settings/SettingsObserver.qml</file>
         <file alias="imtgui/Settings/SettingsProvider.qml">Settings/SettingsProvider.qml</file>
         <file alias="imtgui/Settings/SettingsController.qml">Settings/SettingsController.qml</file>
+        <file alias="imtgui/Settings/PatTokenSettingsController.qml">Settings/PatTokenSettingsController.qml</file>
         <file alias="imtgui/View/MultiPageView.qml">View/MultiPageView.qml</file>
         <file alias="imtgui/View/TabView.qml">View/TabView.qml</file>
         <file alias="imtgui/View/Pagination.qml">View/Pagination.qml</file>
@@ -89,6 +90,7 @@
         <file alias="imtgui/View/ObjectVisualStatusProvider.qml">View/ObjectVisualStatusProvider.qml</file>
         <file alias="imtgui/View/ServerConnectionParamElementView.qml">View/ServerConnectionParamElementView.qml</file>
         <file alias="imtgui/View/ComboBoxGqlElementView.qml">View/ComboBoxGqlElementView.qml</file>
+        <file alias="imtgui/View/ComboBoxAddressElementView.qml">View/ComboBoxAddressElementView.qml</file>
         <file alias="imtgui/View/ComboBoxGqlLegacyElementView.qml">View/ComboBoxGqlLegacyElementView.qml</file>
 	<file alias="imtgui/View/SpinBoxElementView.qml">View/SpinBoxElementView.qml</file>
         <file alias="imtgui/Params/ComposedParamsGui.qml">Params/ComposedParamsGui.qml</file>
@@ -108,6 +110,8 @@
         <file alias="imtgui/Params/ConstrainedDoubleParamEditor.qml">Params/ConstrainedDoubleParamEditor.qml</file>
         <file alias="imtgui/Params/EnableableParamEditor.qml">Params/EnableableParamEditor.qml</file>
         <file alias="imtgui/Params/ServerConnectionParamEditor.qml">Params/ServerConnectionParamEditor.qml</file>
+        <file alias="imtgui/Params/PatTokenListParam.qml">Params/PatTokenListParam.qml</file>
+        <file alias="imtgui/Params/PatTokenParamEditor.qml">Params/PatTokenParamEditor.qml</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

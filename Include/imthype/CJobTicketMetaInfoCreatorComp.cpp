@@ -57,8 +57,6 @@ idoc::IDocumentMetaInfo::MetaInfoTypes CJobTicketMetaInfoCreatorComp::MetaInfo::
 		imthype::IJobTicket::MIT_PROGRESS,
 		imthype::IJobTicket::MIT_PROCESSING_STATUS
 	};
-
-	return MetaInfoTypes();
 }
 
 

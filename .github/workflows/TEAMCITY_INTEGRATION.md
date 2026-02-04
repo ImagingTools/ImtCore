@@ -75,10 +75,16 @@ Both Windows and Linux builds are triggered in parallel for each event.
 ## Build Information Passed to TeamCity
 
 The workflow passes the following information to TeamCity:
-- `env.GIT_BRANCH`: The Git branch reference (e.g., `refs/heads/main` or `refs/pull/123/merge`)
+- **Branch Name** (via `<branchName>` element): The branch to build
+  - For pull requests: `<pr-branch-name>` (e.g., `feature-branch`)
+  - For push events: `<branch-name>` (e.g., `main`)
+  - This tells TeamCity which branch to check out and build
+- `env.GIT_BRANCH`: The full Git branch reference (as a build property)
+  - For pull requests: `refs/heads/<pr-branch-name>` (e.g., `refs/heads/feature-branch`)
+  - For push events: The pushed ref (e.g., `refs/heads/main`)
 - `env.GIT_COMMIT`: The Git commit SHA
 
-You can access these in your TeamCity build configuration if needed.
+The branch name is the primary mechanism that tells TeamCity which branch to build. The `env.GIT_BRANCH` and `env.GIT_COMMIT` properties are available as environment variables in your TeamCity build configuration if needed.
 
 ## Timeout
 
