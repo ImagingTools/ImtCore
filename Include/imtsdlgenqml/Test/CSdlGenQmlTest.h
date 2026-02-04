@@ -21,6 +21,9 @@ private Q_SLOTS:
 	void initTestCase();
 
 	void TestComplexCollectionFilter();
+	void TestGenerationResultSerialization();
+	void TestGenerationResultFileOperations();
+	void TestAppendFoldersToGenerationResultFile();
 
 	void cleanup();
 	void cleanupTestCase();
