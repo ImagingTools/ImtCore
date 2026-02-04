@@ -147,7 +147,7 @@ bool CQmlGenTools::WriteGenerationResultFile(CSdlQmlGenerationResult& result, co
 }
 
 
-bool CQmlGenTools::AppendFoldersToGenerationResultFile(const QString& filePath, const QStringList& additionalFolders)
+bool CQmlGenTools::AppendFoldersToGenerationResultFile(const QString& filePath, const QSet<QString>& additionalFolders)
 {
 	// Ensure the directory exists
 	QFileInfo fileInfo(filePath);
@@ -195,8 +195,7 @@ bool CQmlGenTools::AppendFoldersToGenerationResultFile(const QString& filePath, 
 	
 	// Append additional folders to existing set using operator|=
 	QSet<QString> existingFolders = result.GetCreatedFolders();
-	QSet<QString> newFolders = QSet<QString>(additionalFolders.begin(), additionalFolders.end());
-	existingFolders |= newFolders;
+	existingFolders |= additionalFolders;
 	result.SetCreatedFolders(existingFolders);
 	
 	// Update creation date
