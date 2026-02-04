@@ -215,10 +215,8 @@ iproc::IProcessor::TaskState CQmlCodeGeneratorComp::DoProcessing(
 		generationResult.SetCreatedFolders(createdFolders);
 		
 		// Place generation info file next to depfile
-		const QString depFilePath = m_argumentParserCompPtr->GetDepFilePath();
-		const QFileInfo depFileInfo(depFilePath);
-		const QString generationInfoPath = depFileInfo.absolutePath() + QStringLiteral("/") + 
-		                                     depFileInfo.completeBaseName() + QStringLiteral("_generation_info.json");
+		const QFileInfo depFileInfo(m_argumentParserCompPtr->GetDepFilePath());
+		const QString generationInfoPath = depFileInfo.absolutePath() + QStringLiteral("/generation_info.json");
 		
 		if (!CQmlGenTools::WriteGenerationResultFile(generationResult, generationInfoPath)){
 			SendWarningMessage(0, QString("Unable to create generation info file: '%1'").arg(generationInfoPath));
