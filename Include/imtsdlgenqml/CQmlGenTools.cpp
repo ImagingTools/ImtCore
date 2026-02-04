@@ -9,6 +9,9 @@
 #include <QtCore/QDebug>
 #include <QtCore/QDateTime>
 
+// Standard includes
+#include <chrono>
+
 // ACF includes
 #include <iser/CJsonMemWriteArchive.h>
 #include <iser/CJsonMemReadArchive.h>
@@ -26,6 +29,7 @@ bool CQmlGenTools::UpdateGenerationResultFile(CSdlQmlGenerationResult& result, c
 	if (!dir.exists()){
 		if (!dir.mkpath(".")){
 			qWarning() << "Failed to create directory:" << dir.absolutePath();
+			
 			return false;
 		}
 	}
@@ -34,9 +38,10 @@ bool CQmlGenTools::UpdateGenerationResultFile(CSdlQmlGenerationResult& result, c
 	QString lockFilePath = filePath + ".lock";
 	QLockFile lockFile(lockFilePath);
 	
-	// Try to acquire the lock with a timeout
-	if (!lockFile.tryLock(5000)){
+	// Try to acquire the lock with a timeout of 10 minutes
+	if (!lockFile.tryLock(std::chrono::minutes(10))){
 		qWarning() << "Failed to acquire lock for file:" << filePath;
+		
 		return false;
 	}
 	
@@ -45,6 +50,7 @@ bool CQmlGenTools::UpdateGenerationResultFile(CSdlQmlGenerationResult& result, c
 	if (!file.open(QFile::WriteOnly | QFile::Text)){
 		qWarning() << "Failed to open file for writing:" << filePath << "Error:" << file.errorString();
 		lockFile.unlock();
+		
 		return false;
 	}
 	
@@ -54,6 +60,7 @@ bool CQmlGenTools::UpdateGenerationResultFile(CSdlQmlGenerationResult& result, c
 		qWarning() << "Failed to serialize generation result for file:" << filePath;
 		file.close();
 		lockFile.unlock();
+		
 		return false;
 	}
 	
@@ -64,6 +71,7 @@ bool CQmlGenTools::UpdateGenerationResultFile(CSdlQmlGenerationResult& result, c
 		qWarning() << "Failed to write data to file:" << filePath;
 		file.close();
 		lockFile.unlock();
+		
 		return false;
 	}
 	
@@ -82,6 +90,7 @@ bool CQmlGenTools::ReadGenerationResultFile(CSdlQmlGenerationResult& result, con
 	// Check if file exists
 	if (!QFile::exists(filePath)){
 		qWarning() << "File does not exist:" << filePath;
+		
 		return false;
 	}
 	
@@ -89,6 +98,7 @@ bool CQmlGenTools::ReadGenerationResultFile(CSdlQmlGenerationResult& result, con
 	QFile file(filePath);
 	if (!file.open(QFile::ReadOnly | QFile::Text)){
 		qWarning() << "Failed to open file for reading:" << filePath << "Error:" << file.errorString();
+		
 		return false;
 	}
 	
@@ -99,6 +109,7 @@ bool CQmlGenTools::ReadGenerationResultFile(CSdlQmlGenerationResult& result, con
 	iser::CJsonMemReadArchive archive(jsonData);
 	if (!result.Serialize(archive)){
 		qWarning() << "Failed to deserialize generation result from file:" << filePath;
+		
 		return false;
 	}
 	
@@ -114,6 +125,7 @@ bool CQmlGenTools::WriteGenerationResultFile(CSdlQmlGenerationResult& result, co
 	if (!dir.exists()){
 		if (!dir.mkpath(".")){
 			qWarning() << "Failed to create directory:" << dir.absolutePath();
+			
 			return false;
 		}
 	}
@@ -122,6 +134,7 @@ bool CQmlGenTools::WriteGenerationResultFile(CSdlQmlGenerationResult& result, co
 	QFile file(filePath);
 	if (!file.open(QFile::WriteOnly | QFile::Text)){
 		qWarning() << "Failed to open file for writing:" << filePath << "Error:" << file.errorString();
+		
 		return false;
 	}
 	
@@ -130,6 +143,7 @@ bool CQmlGenTools::WriteGenerationResultFile(CSdlQmlGenerationResult& result, co
 	if (!result.Serialize(archive)){
 		qWarning() << "Failed to serialize generation result for file:" << filePath;
 		file.close();
+		
 		return false;
 	}
 	
@@ -140,6 +154,7 @@ bool CQmlGenTools::WriteGenerationResultFile(CSdlQmlGenerationResult& result, co
 	
 	if (bytesWritten <= 0){
 		qWarning() << "Failed to write data to file:" << filePath;
+		
 		return false;
 	}
 	
@@ -155,6 +170,7 @@ bool CQmlGenTools::AppendFoldersToGenerationResultFile(const QString& filePath, 
 	if (!dir.exists()){
 		if (!dir.mkpath(".")){
 			qWarning() << "Failed to create directory:" << dir.absolutePath();
+			
 			return false;
 		}
 	}
@@ -163,9 +179,10 @@ bool CQmlGenTools::AppendFoldersToGenerationResultFile(const QString& filePath, 
 	QString lockFilePath = filePath + ".lock";
 	QLockFile lockFile(lockFilePath);
 	
-	// Try to acquire the lock with a timeout
-	if (!lockFile.tryLock(5000)){
+	// Try to acquire the lock with a timeout of 10 minutes
+	if (!lockFile.tryLock(std::chrono::minutes(10))){
 		qWarning() << "Failed to acquire lock for file:" << filePath;
+		
 		return false;
 	}
 	
@@ -178,6 +195,7 @@ bool CQmlGenTools::AppendFoldersToGenerationResultFile(const QString& filePath, 
 		if (!file.open(QFile::ReadOnly | QFile::Text)){
 			qWarning() << "Failed to open file for reading:" << filePath << "Error:" << file.errorString();
 			lockFile.unlock();
+			
 			return false;
 		}
 		
@@ -189,6 +207,7 @@ bool CQmlGenTools::AppendFoldersToGenerationResultFile(const QString& filePath, 
 		if (!result.Serialize(archive)){
 			qWarning() << "Failed to deserialize generation result from file:" << filePath;
 			lockFile.unlock();
+			
 			return false;
 		}
 	}
@@ -206,6 +225,7 @@ bool CQmlGenTools::AppendFoldersToGenerationResultFile(const QString& filePath, 
 	if (!file.open(QFile::WriteOnly | QFile::Text)){
 		qWarning() << "Failed to open file for writing:" << filePath << "Error:" << file.errorString();
 		lockFile.unlock();
+		
 		return false;
 	}
 	
@@ -215,6 +235,7 @@ bool CQmlGenTools::AppendFoldersToGenerationResultFile(const QString& filePath, 
 		qWarning() << "Failed to serialize generation result for file:" << filePath;
 		file.close();
 		lockFile.unlock();
+		
 		return false;
 	}
 	
@@ -225,6 +246,7 @@ bool CQmlGenTools::AppendFoldersToGenerationResultFile(const QString& filePath, 
 		qWarning() << "Failed to write data to file:" << filePath;
 		file.close();
 		lockFile.unlock();
+		
 		return false;
 	}
 	

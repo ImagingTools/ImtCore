@@ -77,7 +77,7 @@ int CSdlQmlGenerationResult::GetSupportedOperations() const
 
 bool CSdlQmlGenerationResult::CopyFrom(const IChangeable& object, CompatibilityMode /* mode */)
 {
-	const CSdlQmlGenerationResult* objectPtr = dynamic_cast<const CSdlQmlGenerationResult*>(&object);
+	const auto* objectPtr = dynamic_cast<const CSdlQmlGenerationResult*>(&object);
 	
 	if (objectPtr != nullptr){
 		istd::CChangeNotifier notifier(this);
@@ -95,7 +95,7 @@ bool CSdlQmlGenerationResult::CopyFrom(const IChangeable& object, CompatibilityM
 
 bool CSdlQmlGenerationResult::IsEqual(const IChangeable& object) const
 {
-	const CSdlQmlGenerationResult* otherObjectPtr = dynamic_cast<const CSdlQmlGenerationResult*>(&object);
+	const auto* otherObjectPtr = dynamic_cast<const CSdlQmlGenerationResult*>(&object);
 	if (otherObjectPtr != nullptr){
 		return m_createdAt == otherObjectPtr->m_createdAt &&
 				m_generatorVersion == otherObjectPtr->m_generatorVersion &&

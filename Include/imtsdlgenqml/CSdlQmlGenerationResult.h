@@ -15,12 +15,12 @@ namespace imtsdlgenqml
 
 
 /**
-	The CSdlQmlGenerationResult class provides information about SDL QML code generation results.
+	\brief Provides information about SDL QML code generation results.
 	
-	This class stores metadata about the code generation process including:
+	\details This class stores metadata about the code generation process including:
 	- Creation timestamp
 	- Generator version
-	- List of folders created during generation
+	- Set of folders created during generation
  */
 class CSdlQmlGenerationResult: virtual public iser::ISerializable
 {
@@ -29,7 +29,7 @@ public:
 		\brief Returns the creation timestamp.
 		\returns Creation timestamp
 	*/
-	QDateTime GetCreatedAt() const;
+	[[nodiscard]] QDateTime GetCreatedAt() const;
 	
 	/**
 		\brief Sets the creation timestamp.
@@ -41,7 +41,7 @@ public:
 		\brief Returns the generator version.
 		\returns Generator version string
 	*/
-	QString GetGeneratorVersion() const;
+	[[nodiscard]] QString GetGeneratorVersion() const;
 	
 	/**
 		\brief Sets the generator version.
@@ -53,7 +53,7 @@ public:
 		\brief Returns the set of folders created during generation.
 		\returns Set of folder paths
 	*/
-	QSet<QString> GetCreatedFolders() const;
+	[[nodiscard]] QSet<QString> GetCreatedFolders() const;
 	
 	/**
 		\brief Sets the set of folders created during generation.
@@ -62,14 +62,14 @@ public:
 	void SetCreatedFolders(const QSet<QString>& folders);
 	
 	// reimplemented (istd::IChangeable)
-	virtual int GetSupportedOperations() const override;
-	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
-	virtual bool IsEqual(const IChangeable& object) const override;
-	virtual istd::IChangeableUniquePtr CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
-	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	int GetSupportedOperations() const override;
+	bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	bool IsEqual(const IChangeable& object) const override;
+	istd::IChangeableUniquePtr CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
+	bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 	
 	// reimplemented (iser::ISerializable)
-	virtual bool Serialize(iser::IArchive& archive) override;
+	bool Serialize(iser::IArchive& archive) override;
 
 private:
 	QDateTime m_createdAt;
