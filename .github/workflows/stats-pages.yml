@@ -65,7 +65,7 @@ jobs:
       
       - name: Generate Doxygen documentation
         run: |
-          cd Install
+          cd Docs
           doxygen Doxyfile
       
       - name: Download statistics artifact
@@ -77,20 +77,8 @@ jobs:
       - name: Combine documentation and statistics
         run: |
           mkdir -p combined-docs
-          # Copy Doxygen documentation (generated at ../Docs/TechnicalDoc from Install/)
-          # which is at /home/runner/work/ImtCore/Docs/TechnicalDoc
-          cp -r ../Docs/TechnicalDoc/* combined-docs/ || {
-            echo "Warning: Could not copy from ../Docs/TechnicalDoc, trying alternate paths"
-            # Try other possible locations
-            if [ -d "$GITHUB_WORKSPACE/../Docs/TechnicalDoc" ]; then
-              cp -r $GITHUB_WORKSPACE/../Docs/TechnicalDoc/* combined-docs/
-            elif [ -d "Docs/TechnicalDoc" ]; then
-              cp -r Docs/TechnicalDoc/* combined-docs/
-            else
-              echo "Error: Cannot find Doxygen documentation"
-              exit 1
-            fi
-          }
+          # Copy Doxygen documentation (generated at Docs/TechnicalDoc/html)
+          cp -r Docs/TechnicalDoc/html/* combined-docs/
           # Add statistics page
           mkdir -p combined-docs/stats
           cp -r statistics/stats-page/* combined-docs/stats/
