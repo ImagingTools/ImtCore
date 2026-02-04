@@ -193,13 +193,10 @@ bool CQmlGenTools::AppendFoldersToGenerationResultFile(const QString& filePath, 
 		}
 	}
 	
-	// Append additional folders to existing list
-	QStringList existingFolders = result.GetCreatedFolders();
-	for (const QString& folder : additionalFolders){
-		if (!existingFolders.contains(folder)){
-			existingFolders.append(folder);
-		}
-	}
+	// Append additional folders to existing set using operator|=
+	QSet<QString> existingFolders = result.GetCreatedFolders();
+	QSet<QString> newFolders = QSet<QString>(additionalFolders.begin(), additionalFolders.end());
+	existingFolders |= newFolders;
 	result.SetCreatedFolders(existingFolders);
 	
 	// Update creation date
