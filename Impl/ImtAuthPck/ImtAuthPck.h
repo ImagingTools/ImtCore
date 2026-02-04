@@ -16,7 +16,6 @@
 #include <imtauth/CCompanyInfoMetaInfoCreatorComp.h>
 #include <imtauth/CRoleComp.h>
 #include <imtauth/CRoleMetaInfoCreatorComp.h>
-#include <imtauth/CUserInfo.h>
 #include <imtauth/CUserInfoMetaInfoCreatorComp.h>
 #include <imtauth/CUserInfoComp.h>
 #include <imtauth/CUserGroupInfoComp.h>
@@ -47,6 +46,8 @@
 #include <imtauth/CUserRecentAction.h>
 #include <imtauth/CUserActionMetaInfoCreatorComp.h>
 #include <imtauth/CUserActionManagerComp.h>
+#include <imtauth/CPersonalAccessToken.h>
+#include <imtauth/CPersonalAccessTokenManagerComp.h>
 
 
 namespace ImtAuthPck
@@ -134,7 +135,15 @@ typedef icomp::TModelCompWrap<
 						istd::IChangeable>> UserRecentAction;
 typedef imtauth::CUserActionMetaInfoCreatorComp UserActionMetaInfoCreator;
 typedef imtauth::CUserActionManagerComp UserActionManager;
+typedef icomp::TModelCompWrap<
+			icomp::TMakeComponentWrap <
+						imtauth::CPersonalAccessToken,
+						imtauth::IPersonalAccessToken,
+						iser::ISerializable,
+						istd::IChangeable>> PersonalAccessToken;
+typedef imtauth::CPersonalAccessTokenManagerComp PersonalAccessTokenManager;
 
 
 } // namespace ImtAuthPck
+
 

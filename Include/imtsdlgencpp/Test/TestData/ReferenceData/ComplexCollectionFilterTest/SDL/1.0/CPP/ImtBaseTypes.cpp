@@ -403,11 +403,15 @@ bool CSdlSize::V1_0::operator==(const V1_0& other) const
 bool CSdlSize::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	if (!width){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "width").toLocal8Bit().constData();)
+
 		return false;
 	}
 	model.SetData("width", *width, modelIndex);
 
 	if (!height){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "height").toLocal8Bit().constData();)
+
 		return false;
 	}
 	model.SetData("height", *height, modelIndex);
@@ -458,11 +462,15 @@ bool CSdlSize::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, in
 bool CSdlSize::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!width){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "width").toLocal8Bit().constData();)
+
 		return false;
 	}
 	gqlObject.InsertParam("width", QVariant(*width));
 
 	if (!height){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "height").toLocal8Bit().constData();)
+
 		return false;
 	}
 	gqlObject.InsertParam("height", QVariant(*height));
@@ -508,11 +516,15 @@ bool CSdlSize::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& g
 bool CSdlSize::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!width){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "width").toLocal8Bit().constData();)
+
 		return false;
 	}
 	jsonObject["width"] = QJsonValue::fromVariant(*width);
 
 	if (!height){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "height").toLocal8Bit().constData();)
+
 		return false;
 	}
 	jsonObject["height"] = QJsonValue::fromVariant(*height);
@@ -808,11 +820,15 @@ bool CSdlPoint::V1_0::operator==(const V1_0& other) const
 bool CSdlPoint::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	if (!x){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "x").toLocal8Bit().constData();)
+
 		return false;
 	}
 	model.SetData("x", *x, modelIndex);
 
 	if (!y){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "y").toLocal8Bit().constData();)
+
 		return false;
 	}
 	model.SetData("y", *y, modelIndex);
@@ -863,11 +879,15 @@ bool CSdlPoint::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, i
 bool CSdlPoint::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!x){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "x").toLocal8Bit().constData();)
+
 		return false;
 	}
 	gqlObject.InsertParam("x", QVariant(*x));
 
 	if (!y){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "y").toLocal8Bit().constData();)
+
 		return false;
 	}
 	gqlObject.InsertParam("y", QVariant(*y));
@@ -913,11 +933,15 @@ bool CSdlPoint::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 bool CSdlPoint::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!x){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "x").toLocal8Bit().constData();)
+
 		return false;
 	}
 	jsonObject["x"] = QJsonValue::fromVariant(*x);
 
 	if (!y){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "y").toLocal8Bit().constData();)
+
 		return false;
 	}
 	jsonObject["y"] = QJsonValue::fromVariant(*y);
@@ -8129,6 +8153,8 @@ bool CMimeType::V1_0::operator==(const V1_0& other) const
 bool CMimeType::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	if (!type){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "type").toLocal8Bit().constData();)
+
 		return false;
 	}
 	model.SetData("type", *type, modelIndex);
@@ -8143,6 +8169,8 @@ bool CMimeType::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIn
 	}
 
 	if (!subType){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "subType").toLocal8Bit().constData();)
+
 		return false;
 	}
 	model.SetData("subType", *subType, modelIndex);
@@ -8264,6 +8292,8 @@ bool CMimeType::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, i
 bool CMimeType::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!type){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "type").toLocal8Bit().constData();)
+
 		return false;
 	}
 	gqlObject.InsertParam("type", QVariant(*type));
@@ -8277,6 +8307,8 @@ bool CMimeType::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject)
 	}
 
 	if (!subType){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "subType").toLocal8Bit().constData();)
+
 		return false;
 	}
 	gqlObject.InsertParam("subType", QVariant(*subType));
@@ -8398,6 +8430,8 @@ bool CMimeType::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 bool CMimeType::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!type){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "type").toLocal8Bit().constData();)
+
 		return false;
 	}
 	jsonObject["type"] = QJsonValue::fromVariant(*type);
@@ -8411,6 +8445,8 @@ bool CMimeType::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 	}
 
 	if (!subType){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "subType").toLocal8Bit().constData();)
+
 		return false;
 	}
 	jsonObject["subType"] = QJsonValue::fromVariant(*subType);
@@ -11553,7 +11589,7 @@ bool COptionsListObject::hasOptions()
 }
 
 
-void COptionsListObject::createOptions()
+void COptionsListObject::emplaceOptions()
 {
 	Version_1_0->options.emplace();
 
@@ -11567,6 +11603,13 @@ void COptionsListObject::ResetOptions()
 		itemPtr->deleteLater();
 	}
 	m_optionsQObjectPtr = QVariant();
+}
+
+
+QVariant COptionsListObject::createOptionsArrayElement(const QVariant& v)
+{
+	Q_UNUSED(v);
+	return QVariant::fromValue(new sdl::imtbase::ImtBaseTypes::COptionObject());
 }
 
 
@@ -11809,7 +11852,7 @@ bool CSelectionParamObject::hasConstraints()
 }
 
 
-void CSelectionParamObject::createConstraints()
+void CSelectionParamObject::emplaceConstraints()
 {
 	Version_1_0->constraints.emplace();
 
@@ -12253,7 +12296,7 @@ bool CBackupSettingsObject::hasSchedulerParam()
 }
 
 
-void CBackupSettingsObject::createSchedulerParam()
+void CBackupSettingsObject::emplaceSchedulerParam()
 {
 	Version_1_0->schedulerParam.emplace();
 

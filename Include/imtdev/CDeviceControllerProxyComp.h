@@ -24,6 +24,78 @@ namespace imtdev
 {
 
 
+/**
+	@brief Proxy controller component aggregating multiple device controllers
+	
+	CDeviceControllerProxyComp implements the **Proxy Pattern** to aggregate multiple
+	IDeviceController instances into a unified interface. It provides seamless access
+	to devices from different controllers through a single entry point.
+	
+	This component is essential for systems with multiple device types managed by
+	different controllers, enabling:
+	- Unified device enumeration across all controllers
+	- Automatic routing of operations to appropriate controller
+	- Aggregated device type and instance lists
+	- Centralized state tracking
+	- Automatic periodic enumeration
+	
+	@par Key Features:
+	- **Multi-Controller Aggregation**: Manages multiple IDeviceController instances
+	- **Automatic Enumeration**: Configurable periodic enumeration (default: 5 seconds)
+	- **Smart Routing**: Routes device operations to correct underlying controller
+	- **Unified Device List**: Combines devices from all controllers
+	- **State Aggregation**: Unified state provider across all controllers
+	- **Change Tracking**: Multi-model dispatcher for tracking all controller changes
+	
+	@par Component Structure:
+	The component exposes multiple sub-elements:
+	- **DeviceTypeList**: Collection of all supported device types from all controllers
+	- **DeviceList**: Aggregated list of devices from all controllers (ICollectionInfo)
+	- **DeviceStateProvider**: Unified state provider (IDeviceStateProvider)
+	- **OverriddenDeviceInfo**: Collection of custom names/descriptions
+	
+	@par Configuration:
+	- **DeviceControllers**: Multi-reference to IDeviceController instances to aggregate
+	- **EnableEnumerationControl**: Enable automatic enumeration (default: false)
+	- **EnumerationInterval**: Time between enumeration cycles in seconds (default: 5, 0 = continuous)
+	
+	@par Enumeration Control:
+	When enabled, the proxy automatically:
+	1. Enumerates all controllers periodically
+	2. Updates aggregated device lists
+	3. Handles enumeration failures gracefully
+	4. Respects the configured interval
+	
+	@par Usage Pattern:
+	@code{.cpp}
+	// Obtain proxy controller instance (created via component system)
+	CDeviceControllerProxyComp* pProxy = // get from component system
+	
+	// Obtain controller references (configured via component system)
+	IDeviceController* pController1 = // USB device controller reference
+	IDeviceController* pController2 = // Network device controller reference
+	pProxy->AddDeviceController(pController1);
+	pProxy->AddDeviceController(pController2);
+	
+	// Enable automatic enumeration every 5 seconds
+	pProxy->SetEnumerationControl(true);
+	pProxy->SetEnumerationInterval(5);
+	
+	// Use as unified controller
+	const ICollectionInfo& allDevices = pProxy->GetDeviceInstanceList();
+	DeviceAccessorPtr pAccessor = pProxy->OpenDevice(deviceId, nullptr);
+	@endcode
+	
+	@par Thread Safety:
+	- Inherits thread safety from CMultiModelDispatcherBase
+	- Uses Qt timer for periodic enumeration (thread-safe signal/slot)
+	- Controller operations are delegated with proper synchronization
+	
+	@see IDeviceController
+	@see CDeviceControllerCompBase
+	@see imod::CMultiModelDispatcherBase
+	@ingroup imtdev
+*/
 class CDeviceControllerProxyComp:
 			public QObject,
 			public ilog::CLoggerComponentBase,

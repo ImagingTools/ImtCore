@@ -468,7 +468,7 @@ QByteArray CFileCollectionCompBase::InsertNewObject(
 				return retval;
 			}
 			else{
-				SendErrorMessage(0, QT_TR_NOOP(QString("File could not be saved into '%1'").arg(tempFilePath)));
+				SendVerboseMessage(QT_TR_NOOP(QString("File could not be saved into '%1'").arg(tempFilePath)));
 			}
 		}
 	}

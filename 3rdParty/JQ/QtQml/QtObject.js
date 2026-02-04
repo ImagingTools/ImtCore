@@ -11,7 +11,7 @@ class QtObject extends QObject {
     static meta = Object.assign({}, QObject.meta, {
         model: {type:Var, auto: true, value:undefined, },
         modelData: { type: Var, auto: true, value: undefined },
-        index: {type:Int, value:0, },
+        index: {type:ProxyProperty, },
         children: {type:ProxyProperty, },
         resources: {type:ProxyProperty, },
         data: {type:List, },
@@ -37,8 +37,8 @@ class QtObject extends QObject {
 
         if(properties.model){
             let keys = Object.keys(properties.model)
-            if(keys.length === 1){
-                this.JQAbstractModelData = properties.model[keys[0]]
+            if(keys.length === 1 && !(properties.model[keys[0]] instanceof QObject)){
+                obj.JQAbstractModelData = properties.model[keys[0]]
             }
             obj.JQAbstractModel = properties.model
             delete properties.model
@@ -69,9 +69,13 @@ class QtObject extends QObject {
             // obj.model = ()=>{return obj.JQAbstractModel}
         }
 
-        obj.index = ()=>{return obj.JQAbstractModel ? obj.JQAbstractModel.index : -1}
+        // obj.index = ()=>{return obj.JQAbstractModel ? obj.JQAbstractModel.index : -1}
 
         return obj
+    }
+
+    PROXY__get__index(){
+        return this.JQAbstractModel ? this.JQAbstractModel.index : -1
     }
 
     PROXY__get__children(){

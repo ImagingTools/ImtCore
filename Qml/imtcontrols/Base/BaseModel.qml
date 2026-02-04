@@ -12,7 +12,7 @@ ListModel {
 						key.indexOf('m_') >= 0
 						&& typeof item[key] !== "function"
 						&& item[key] !== undefined
-						&& item[key] !== null){
+						&& item[key] !== null || key == '__typename'){
 					list.push(key)
 				}
 			}
@@ -22,7 +22,7 @@ ListModel {
 						key.indexOf('m_') >= 0
 						&& typeof item[key] !== "function"
 						&& item[key] !== undefined
-						&& item[key] !== null){
+						&& item[key] !== null || key == '__typename'){
 					list.push(key)
 				}
 			}
@@ -216,7 +216,12 @@ ListModel {
 		return retVal
 	}
 
+	/// \deprecated! OBSOLETE function ONLY for support legacy code DO NOT USE IT! Use \c appendElement() instead. Will be removed next releases.
 	function addElement(element){
+		insertElement(this.count, element)
+	}
+	
+	function appendElement(element){
 		insertElement(this.count, element)
 	}
 

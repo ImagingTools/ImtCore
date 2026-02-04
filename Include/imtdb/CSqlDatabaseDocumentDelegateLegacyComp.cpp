@@ -277,6 +277,7 @@ QByteArray CSqlDatabaseDocumentDelegateLegacyComp::CreateUpdateObjectQuery(
 					.toUtf8();
 
 		QString operationComment = operationContextPtr != nullptr ? operationContextPtr->GetOperationDescription() : QString();
+		operationComment = operationComment.replace("'", "''");
 		retVal += QString("INSERT INTO \"%1\"(\"Id\", \"%2\", \"%3\", \"RevisionNumber\", \"Comment\", \"LastModified\", \"Checksum\") VALUES('%4', '%5', '%6', '%7', '%8', '%9', %10);")
 					.arg(qPrintable(*m_revisionsTableNameAttrPtr))
 					.arg(qPrintable(s_documentIdColumn))
@@ -437,9 +438,11 @@ int CSqlDatabaseDocumentDelegateLegacyComp::BackupRevision(
 				.arg(qPrintable(objectId))
 				.toUtf8();
 
+	QString escapedComment = userComment;
+	escapedComment = escapedComment.replace("'", "''");
 	QByteArray updateCommentQuery = QString("UPDATE \"%1\" SET \"Comment\" = '%2' WHERE \"%3\" in (%4)")
 				.arg(qPrintable(*m_revisionsTableNameAttrPtr))
-				.arg(userComment)
+				.arg(escapedComment)
 				.arg(qPrintable(s_idColumn))
 				.arg(qPrintable(lastRevisionQuery))
 				.toUtf8();

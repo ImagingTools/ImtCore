@@ -1641,7 +1641,7 @@ class Instruction {
         code.add(`return ${this.name}}`)
         code.add(this.getMethods())
         code.add(this.getConnectedSignals())
-        code.add(`})).create(${this.parent ? this.parent.name : 'null'},{JQAbstractModel:()=>{return ${this.targetContext.name}.JQAbstractModel}},__context,false)`)
+        code.add(`})).create(${this.parent ? this.parent.name : 'null'},{JQAbstractModel:()=>{return ${this.targetContext.name}.JQAbstractModel}},${this.targetContext.name}.__${this.qmlFile.getContextName()},false)`)
 
         code.add('\n')
         

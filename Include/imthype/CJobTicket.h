@@ -28,6 +28,7 @@ public:
 	virtual QByteArray GetContextId() const override;
 	virtual void SetContextId(const QByteArray& contextId) override;
 	virtual iprm::IParamsSetSharedPtr GetParams() const override;
+	virtual iprm::IParamsSetSharedPtr CreateParams() const override;
 	virtual void SetParams(const iprm::IParamsSetSharedPtr& paramsPtr) override;
 	virtual imthype::IJobQueueManager::ProcessingStatus GetProcessingStatus() const override;
 	virtual void SetProcessingStatus(imthype::IJobQueueManager::ProcessingStatus status) override;
@@ -42,6 +43,9 @@ public:
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
+
+	// reimplemented (istd::IChangeable)
+	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 private:
 	QByteArray m_typeId;

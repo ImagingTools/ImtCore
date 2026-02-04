@@ -48,7 +48,7 @@ DecoratorBase {
 	
 	function updateFilter(){
 		if (!groupFilter.hasFieldFilters()){
-			groupFilter.createFieldFilters();
+			groupFilter.emplaceFieldFilters();
 		}
 
 		groupFilter.m_fieldFilters.clear()

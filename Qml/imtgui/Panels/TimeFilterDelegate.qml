@@ -77,7 +77,7 @@ FilterDelegateBase {
 		}
 
 		if (!timeFilter.hasTimeRange()){
-			timeFilter.createTimeRange()
+			timeFilter.emplaceTimeRange()
 		}
 
 		timeFilter.m_timeRange.m_begin = begin

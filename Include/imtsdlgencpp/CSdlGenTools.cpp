@@ -352,6 +352,8 @@ void CSdlGenTools::AddArrayInternalChecksFail(QTextStream& stream, const imtsdl:
 	stream << QStringLiteral("){");
 	imtsdl::CSdlTools::FeedStream(stream, 1, false);
 
+	AddErrorReport(stream, QStringLiteral("Field: '%3' doesn't exist, but required"), 2, QStringList({QString("\"%1\"").arg(field.GetId())}));
+	
 	imtsdl::CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
 	stream << QStringLiteral("return false;\n\t}");
 	imtsdl::CSdlTools::FeedStream(stream, 1, false);
@@ -446,7 +448,8 @@ QString CSdlGenTools::GetQObjectTypeName(const imtsdl::CSdlField& sdlField,
 			const imtsdl::SdlTypeList& typeList,
 			const imtsdl::SdlEnumList& enumList,
 			const imtsdl::SdlUnionList& unionList,
-			bool withPointer)
+			bool withPointer,
+			bool treatArrayAsElement)
 {
 	QString retVal = "";
 	bool isArray = false;
@@ -467,7 +470,8 @@ QString CSdlGenTools::GetQObjectTypeName(const imtsdl::CSdlField& sdlField,
 	}
 
 	if (!isCustom || isEnum){
-		if (isArray){
+		// For primitive types and enums
+		if (isArray && !treatArrayAsElement){
 			retVal = QStringLiteral("QList<");
 		}
 
@@ -490,14 +494,15 @@ QString CSdlGenTools::GetQObjectTypeName(const imtsdl::CSdlField& sdlField,
 			retVal += QStringLiteral("QString");
 		}
 		else {
-			Q_ASSERT_X(false, "CSdlQObjectGeneratorComp::ProcessSourceClassFile", sdlField.GetType().toUtf8() + " field.GetType() not implemented");
+			Q_ASSERT_X(false, "CSdlGenTools::GetQObjectTypeName", sdlField.GetType().toUtf8() + " field.GetType() not implemented");
 		}
 
-		if (isArray){
+		if (isArray && !treatArrayAsElement){
 			retVal += QStringLiteral(">");
 		}
 	}
-	else if(isArray){
+	else if(isArray && !treatArrayAsElement){
+		// For custom array types, return ObjectList
 		retVal = sdlNamespace;
 		retVal += QStringLiteral("::C") + sdlField.GetType();
 		retVal += QStringLiteral("ObjectList");
@@ -510,6 +515,7 @@ QString CSdlGenTools::GetQObjectTypeName(const imtsdl::CSdlField& sdlField,
 		retVal = "QVariant";
 	}
 	else{
+		// For custom non-array types, or when treating arrays as elements, return Object
 		retVal = sdlNamespace;
 		retVal += QStringLiteral("::C") + sdlField.GetType();
 		retVal += QStringLiteral("Object");

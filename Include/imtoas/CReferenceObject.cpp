@@ -47,7 +47,7 @@ void CReferenceObject::SetDescription(const QString& description)
 }
 
 
-bool CReferenceObject::ReadFromJsonObject(CReferenceObject& object, const QJsonObject& jsonObject, const QJsonObject& globalObject)
+bool CReferenceObject::ReadFromJsonObject(CReferenceObject& object, const QJsonObject& jsonObject, const QJsonObject& /*globalObject*/)
 {
 	QVariant referenceData = jsonObject.value("$ref").toVariant();
 	if (referenceData.isNull()){

@@ -122,6 +122,16 @@ Graph2d{
 		}
 		return true;
 	}
+
+	function getLineCount(){
+		let activeLayer = graphicsViewAlias.getActiveLayer()
+		if(!activeLayer){
+			return 0
+		}
+		let shapeModel = activeLayer.shapeModel
+
+		return shapeModel.length
+	}
 }
 
 

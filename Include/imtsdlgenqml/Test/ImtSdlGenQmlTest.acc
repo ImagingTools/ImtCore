@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5442" Description="ACF"/>
+            <Version Id="1" Number="2256" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395267" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="ConsoleLog" PackageId="BasePck" ComponentId="ConsoleLog">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="QmlCodeGenFramework" PackageId="ImtSdlVoce" ComponentId="QmlCodeGenFramework">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CustomSchemaParams" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SdlCoreFramework/SchemaCustomParams"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DependentSchemaList" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="_Workaround"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="true" Value="ConsoleLog"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlDocumentListProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlEnumListProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlRequestListProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlSchemaParameters" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SdlCoreFramework/SchemaCustomParams"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlUnionListProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SdlCoreFramework" PackageId="ImtSdlV2Voce" ComponentId="SdlCoreFramework">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ConsoleLog"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="_Workaround" PackageId="BasePck" ComponentId="OptionsManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imtsdl::ISdlDocumentTypeListProvider" ComponentId="SdlCoreFramework"/>
+        <Interface InterfaceId="imtsdl::ISdlEditableProcessArgumentsParser" ComponentId="SdlCoreFramework"/>
+        <Interface InterfaceId="imtsdl::ISdlEnumListProvider" ComponentId="SdlCoreFramework"/>
+        <Interface InterfaceId="imtsdl::ISdlProcessArgumentsParser" ComponentId="SdlCoreFramework"/>
+        <Interface InterfaceId="imtsdl::ISdlRequestListProvider" ComponentId="SdlCoreFramework"/>
+        <Interface InterfaceId="imtsdl::ISdlTypeListProvider" ComponentId="SdlCoreFramework"/>
+        <Interface InterfaceId="imtsdl::ISdlUnionListProvider" ComponentId="SdlCoreFramework"/>
+        <Interface InterfaceId="iproc::IProcessor" ComponentId="SdlCoreFramework"/>
+    </ExportedInterfaces>
+    <ExportedComponents>
+        <Component ExportedId="BaseClassExtender" ComponentId="SdlCoreFramework/BaseClassExtender"/>
+        <Component ExportedId="BasicRequestsProvider" ComponentId="SdlCoreFramework/BasicRequestsProvider"/>
+        <Component ExportedId="DependentSchemaList" ComponentId="SdlCoreFramework/DependentSchemaList"/>
+        <Component ExportedId="GqlSchemaParser" ComponentId="SdlCoreFramework/GqlSchemaParser"/>
+        <Component ExportedId="OriginalNamespace" ComponentId="SdlCoreFramework/OriginalNamespace"/>
+        <Component ExportedId="QmlCodeGenFramework" ComponentId="QmlCodeGenFramework"/>
+        <Component ExportedId="SchemaCustomParams" ComponentId="SdlCoreFramework/SchemaCustomParams"/>
+    </ExportedComponents>
+</Acf>

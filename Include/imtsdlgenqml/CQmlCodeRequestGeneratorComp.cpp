@@ -92,22 +92,29 @@ iproc::IProcessor::TaskState CQmlCodeRequestGeneratorComp::DoProcessing(
 		imtsdl::CSdlRequest::Type requestType = sdlRequest.GetType();
 		QString functionName;
 		QString parentQmlName;
-		QString qmlClassName;
+		QString qmlClassName = sdlRequest.GetName();
 		switch (requestType){
+		case imtsdl::CSdlRequest::T_SUBSCRIPTION:
+		if (qmlClassName.startsWith("On")) {
+			qmlClassName.remove(0, 2);
+		}
+		if (qmlClassName.endsWith("ed")) {
+			qmlClassName.chop(2);
+		}
 		case imtsdl::CSdlRequest::T_QUERY:
-			qmlClassName = sdlRequest.GetName() + QStringLiteral("ModelProvider");
+			qmlClassName += QStringLiteral("ModelProvider");
 			functionName = QStringLiteral("requestDataModel");
 			parentQmlName = QStringLiteral("GqlBasedDataModelProvider");
 			break; 
 		case imtsdl::CSdlRequest::T_MUTATION:
-			qmlClassName = sdlRequest.GetName() + QStringLiteral("ModelController");
+			qmlClassName += QStringLiteral("ModelController");
 			functionName = QStringLiteral("saveDataModel");
 			parentQmlName = QStringLiteral("GqlBasedDataModelController");
 			break;
 		default:
 			break;
 		}
-		
+
 		QString qmlClassFileName = qmlClassName + QStringLiteral(".qml");
 
 		file.setFileName(outputDirectoryPath + '/' + qmlClassFileName);
@@ -121,7 +128,7 @@ iproc::IProcessor::TaskState CQmlCodeRequestGeneratorComp::DoProcessing(
 		QmldirFileInfo qmldirFileInfo;
 		qmldirFileInfo.Version = GetTypeVersion(sdlRequest);
 		qmldirFileInfo.Type = qmlClassName;
-		qmldirFileInfo.FileName = qmlClassName;
+		qmldirFileInfo.FileName = qmlClassFileName;
 		qmldirFileInfoList << qmldirFileInfo;
 
 		QTextStream stream(&file);

@@ -621,6 +621,7 @@ ifile::IFilePersistence::OperationState CDocumentCollectionViewDelegateComp::Obj
 				QByteArray typeId = objectInfoPtr->typeId;
 
 				QString objectName = QFileInfo(filePath).completeBaseName();
+				objectName = objectName.replace("'", "''");
 
 				// If the object-ID is empty, we have to insert a new instance to the collection:
 				if (objectInfoPtr->uuid.isEmpty()){
