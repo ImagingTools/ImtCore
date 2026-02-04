@@ -135,9 +135,9 @@ iproc::IProcessor::TaskState CCxxProcessorsManagerComp::DoProcessing(
 		// Add forward declaration file
 		QString fwdFilePath = headerFilePath;
 		if (fwdFilePath.endsWith(".h")){
-			fwdFilePath = fwdFilePath.left(fwdFilePath.length() - 2) + ".fwd.h";
+			fwdFilePath = fwdFilePath.left(fwdFilePath.length() - 2) + "_fwd.h";
 		} else {
-			fwdFilePath += ".fwd.h";
+			fwdFilePath += "_fwd.h";
 		}
 		cumulatedFiles << fwdFilePath;
 
@@ -752,15 +752,15 @@ CCxxProcessorsManagerComp::EntryFileMap CCxxProcessorsManagerComp::CreateForward
 		return retVal;
 	}
 
-	// Get the base header file path and create .fwd.h version
+	// Get the base header file path and create _fwd.h version
 	const QString headerFilePath = CalculateTargetCppFilesFromSchemaParams(*m_schemaParamsCompPtr, *m_argumentParserCompPtr)[imtsdl::ISdlProcessArgumentsParser::s_headerFileType];
 	
-	// Replace .h with .fwd.h
+	// Replace .h with _fwd.h
 	QString fwdFilePath = headerFilePath;
 	if (fwdFilePath.endsWith(".h")){
-		fwdFilePath = fwdFilePath.left(fwdFilePath.length() - 2) + ".fwd.h";
+		fwdFilePath = fwdFilePath.left(fwdFilePath.length() - 2) + "_fwd.h";
 	} else {
-		fwdFilePath += ".fwd.h";
+		fwdFilePath += "_fwd.h";
 	}
 	
 	FilePtr fwdFilePtr = CreateFile(fwdFilePath);
