@@ -9,6 +9,7 @@
 // ImtCore includes
 #include <imtbase/imtbase.h>
 #include <imtauth/IUserSettings.h>
+#include <imtgql/CGqlRequestContextManager.h>
 
 
 namespace imtservergql
@@ -39,6 +40,8 @@ imtgql::IGqlContextUniquePtr CGqlContextCreatorComp::CreateGqlContext(
 	gqlContextPtr->SetToken(token);
 	gqlContextPtr->SetHeaders(headers);
 	gqlContextPtr->SetProductId(productId);
+
+	imtgql::CGqlRequestContextManager::SetContext(dynamic_cast<imtgql::IGqlContext*>(gqlContextPtr->CloneMe().PopInterfacePtr()));
 
 	if (m_userCollectionCompPtr.IsValid() && !userId.isEmpty()){
 		imtbase::IObjectCollection::DataPtr userDataPtr;
