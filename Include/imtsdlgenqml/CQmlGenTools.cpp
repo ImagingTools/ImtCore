@@ -6,6 +6,7 @@
 #include <QtCore/QLockFile>
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
+#include <QtCore/QDebug>
 
 // ACF includes
 #include <iser/CJsonMemWriteArchive.h>
@@ -23,6 +24,7 @@ bool CQmlGenTools::UpdateGenerationResultFile(CSdlQmlGenerationResult& result, c
 	QDir dir = fileInfo.absoluteDir();
 	if (!dir.exists()){
 		if (!dir.mkpath(".")){
+			qWarning() << "Failed to create directory:" << dir.absolutePath();
 			return false;
 		}
 	}
@@ -33,27 +35,35 @@ bool CQmlGenTools::UpdateGenerationResultFile(CSdlQmlGenerationResult& result, c
 	
 	// Try to acquire the lock with a timeout
 	if (!lockFile.tryLock(5000)){
-		// Failed to acquire lock within timeout
+		qWarning() << "Failed to acquire lock for file:" << filePath;
 		return false;
 	}
-	
-	// The entire update operation is now protected by the lock
-	bool success = false;
 	
 	// Check if file exists - if yes, open for writing; if no, create it
 	QFile file(filePath);
 	if (!file.open(QFile::WriteOnly | QFile::Text)){
+		qWarning() << "Failed to open file for writing:" << filePath << "Error:" << file.errorString();
 		lockFile.unlock();
 		return false;
 	}
 	
 	// Serialize using CJsonMemWriteArchive
 	iser::CJsonMemWriteArchive archive(nullptr);
-	if (result.Serialize(archive)){
-		// Write serialized data to file
-		QByteArray jsonData = archive.GetData();
-		qint64 bytesWritten = file.write(jsonData);
-		success = (bytesWritten > 0);
+	if (!result.Serialize(archive)){
+		qWarning() << "Failed to serialize generation result for file:" << filePath;
+		file.close();
+		lockFile.unlock();
+		return false;
+	}
+	
+	// Write serialized data to file
+	QByteArray jsonData = archive.GetData();
+	qint64 bytesWritten = file.write(jsonData);
+	if (bytesWritten <= 0){
+		qWarning() << "Failed to write data to file:" << filePath;
+		file.close();
+		lockFile.unlock();
+		return false;
 	}
 	
 	// Close file
@@ -62,7 +72,7 @@ bool CQmlGenTools::UpdateGenerationResultFile(CSdlQmlGenerationResult& result, c
 	// Release the lock
 	lockFile.unlock();
 	
-	return success;
+	return true;
 }
 
 
@@ -70,12 +80,14 @@ bool CQmlGenTools::ReadGenerationResultFile(CSdlQmlGenerationResult& result, con
 {
 	// Check if file exists
 	if (!QFile::exists(filePath)){
+		qWarning() << "File does not exist:" << filePath;
 		return false;
 	}
 	
 	// Read file
 	QFile file(filePath);
 	if (!file.open(QFile::ReadOnly | QFile::Text)){
+		qWarning() << "Failed to open file for reading:" << filePath << "Error:" << file.errorString();
 		return false;
 	}
 	
@@ -85,6 +97,7 @@ bool CQmlGenTools::ReadGenerationResultFile(CSdlQmlGenerationResult& result, con
 	// Deserialize using CJsonMemReadArchive
 	iser::CJsonMemReadArchive archive(jsonData);
 	if (!result.Serialize(archive)){
+		qWarning() << "Failed to deserialize generation result from file:" << filePath;
 		return false;
 	}
 	
@@ -99,6 +112,7 @@ bool CQmlGenTools::WriteGenerationResultFile(CSdlQmlGenerationResult& result, co
 	QDir dir = fileInfo.absoluteDir();
 	if (!dir.exists()){
 		if (!dir.mkpath(".")){
+			qWarning() << "Failed to create directory:" << dir.absolutePath();
 			return false;
 		}
 	}
@@ -106,12 +120,14 @@ bool CQmlGenTools::WriteGenerationResultFile(CSdlQmlGenerationResult& result, co
 	// Open file for writing
 	QFile file(filePath);
 	if (!file.open(QFile::WriteOnly | QFile::Text)){
+		qWarning() << "Failed to open file for writing:" << filePath << "Error:" << file.errorString();
 		return false;
 	}
 	
 	// Serialize using CJsonMemWriteArchive
 	iser::CJsonMemWriteArchive archive(nullptr);
 	if (!result.Serialize(archive)){
+		qWarning() << "Failed to serialize generation result for file:" << filePath;
 		file.close();
 		return false;
 	}
@@ -121,7 +137,12 @@ bool CQmlGenTools::WriteGenerationResultFile(CSdlQmlGenerationResult& result, co
 	qint64 bytesWritten = file.write(jsonData);
 	file.close();
 	
-	return bytesWritten > 0;
+	if (bytesWritten <= 0){
+		qWarning() << "Failed to write data to file:" << filePath;
+		return false;
+	}
+	
+	return true;
 }
 
 
