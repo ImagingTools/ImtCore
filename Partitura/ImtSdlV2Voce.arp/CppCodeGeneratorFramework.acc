@@ -110,6 +110,13 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
+                    <AttributeInfo Id="FwdProcessorsList" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>SdlForwardDeclGeneratorFramework/SdlForwardDeclGenerator</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
