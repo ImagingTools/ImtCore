@@ -37,9 +37,6 @@ bool CQmlGenTools::UpdateGenerationResultFile(CSdlQmlGenerationResult& result, c
 	// Use WriteGenerationResultFile to handle file operations
 	bool success = WriteGenerationResultFile(result, filePath);
 	
-	// Release the lock
-	lockFile.unlock();
-	
 	return success;
 }
 
@@ -140,8 +137,6 @@ bool CQmlGenTools::AppendFoldersToGenerationResultFile(const QString& filePath, 
 	
 	if (fileExists){
 		if (!ReadGenerationResultFile(result, filePath)){
-			lockFile.unlock();
-			
 			return false;
 		}
 	}
@@ -156,9 +151,6 @@ bool CQmlGenTools::AppendFoldersToGenerationResultFile(const QString& filePath, 
 	
 	// Write updated result back to file
 	bool success = WriteGenerationResultFile(result, filePath);
-	
-	// Release the lock
-	lockFile.unlock();
 	
 	return success;
 }
