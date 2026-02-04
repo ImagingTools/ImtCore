@@ -24,7 +24,7 @@ Rectangle {
 	signal login(string login, string password)
 	signal registerUser(var userData)
 
-	property alias rememberMe: rememberMeCheckBox.checked
+	property bool rememberMe: rememberMeCheckBox.checkState === Qt.Checked
 
 	// Sync rememberMe with AuthorizationController
 	Binding {
@@ -366,11 +366,9 @@ Rectangle {
 				CheckBox {
 					id: rememberMeCheckBox;
 					objectName: "RememberMeCheckBox"
+					checkState: Qt.Checked
 
 					text: qsTr("Remember me");
-
-					font.family: Style.fontFamily;
-					font.pixelSize: Style.fontSizeM;
 				}
 			}
 
@@ -426,7 +424,7 @@ Rectangle {
 					font.family: Style.fontFamily;
 					font.pixelSize: Style.fontSizeM;
 
-					visible:  errorMessage.text != "";
+					visible: text !== "";
 				}
 			}
 

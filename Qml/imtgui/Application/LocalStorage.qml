@@ -10,9 +10,9 @@ QtObject {
 	id: root
 	
 	// Desktop-only settings backend
-	property Settings desktopStorage: Settings {
-		category: "LocalStorage"
-	}
+	// property Settings desktopStorage: Settings {
+	// 	category: "LocalStorage"
+	// }
 	
 	// Get item from storage
 	function getItem(key) {

@@ -128,15 +128,8 @@ QtObject {
 	property UserTokenProvider userTokenProvider: UserTokenProvider {
 		productId: root.productId;
 		onAccepted: {
-			console.log("UserTokenProvider onAccepted")
-			if (Qt.platform.os == "web"){
-				root.saveDataToStorage();
-			}
-			else {
-				// For non-web platforms, save refresh token if "Remember me" is enabled
-				root.saveRefreshTokenIfRememberMe();
-			}
-			
+			root.saveRefreshTokenIfRememberMe();
+
 			if (isTokenGlobal){
 				root.setAccessToken(accessToken);
 				root.setRefreshToken(refreshToken);
