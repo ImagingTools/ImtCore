@@ -41,6 +41,7 @@ public:
 		I_ASSIGN_MULTI_0(m_requestProcessorCompListPtr, "RequestProcessorsList", "The list of C++ processors generation for requests", false)
 		I_ASSIGN_MULTI_0(m_autoProcessorCompListPtr, "AutoProcessorsList", "The list of special C++ processors generation.", false)
 		I_ASSIGN_MULTI_0(m_includeDirectivesProviderListCompPtr, "IncludeDirectivesProviderList", "Providers of include directives, used to generate C(++) directives", false)
+		I_ASSIGN_MULTI_0(m_fwdProcessorCompListPtr, "FwdProcessorsList", "The list of C++ processors generation for forward declarations", false)
 
 	I_END_COMPONENT
 
@@ -52,6 +53,7 @@ protected:
 	I_MULTIREF(ICxxFileProcessor, m_requestProcessorCompListPtr);
 	I_MULTIREF(ICxxFileProcessor, m_autoProcessorCompListPtr);
 	I_MULTIREF(IIncludeDirectivesProvider, m_includeDirectivesProviderListCompPtr);
+	I_MULTIREF(ICxxFileProcessor, m_fwdProcessorCompListPtr);
 };
 
 class CCxxProcessorsManagerComp: public CxxProcessorsManagerAttr1Comp,
@@ -126,6 +128,20 @@ private:
 		\note all parent directories will be created
 	*/
 	[[nodiscard]] FilePtr CreateFile(const QString& filePath) const;
+	
+	/**
+		Creates forward declaration files (.fwd.h)
+		\warning all files will be opened!
+		\note all file pointers MUST NOT be NULL
+	*/
+	[[nodiscard]] EntryFileMap CreateForwardDeclFiles(const iprm::IParamsSet* paramsPtr) const;
+	
+	/**
+		Processes forward declaration generation
+	*/
+	bool ProcessForwardDeclarations(
+				const EntryFileMap& fwdFiles,
+				const iprm::IParamsSet* paramsPtr) const;
 
 
 private:

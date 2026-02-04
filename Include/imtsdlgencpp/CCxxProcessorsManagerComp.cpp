@@ -131,6 +131,15 @@ iproc::IProcessor::TaskState CCxxProcessorsManagerComp::DoProcessing(
 		const QString headerFilePath = CalculateTargetCppFilesFromSchemaParams(*m_schemaParamsCompPtr, *m_argumentParserCompPtr)[imtsdl::ISdlProcessArgumentsParser::s_headerFileType];
 		cumulatedFiles << sourceFilePath;
 		cumulatedFiles << headerFilePath;
+		
+		// Add forward declaration file
+		QString fwdFilePath = headerFilePath;
+		if (fwdFilePath.endsWith(".h")){
+			fwdFilePath = fwdFilePath.left(fwdFilePath.length() - 2) + ".fwd.h";
+		} else {
+			fwdFilePath += ".fwd.h";
+		}
+		cumulatedFiles << fwdFilePath;
 
 		PrintFiles(std::cout, cumulatedFiles, m_argumentParserCompPtr->GetGeneratorType());
 		PrintFiles(m_argumentParserCompPtr->GetDepFilePath(), cumulatedFiles, *m_dependentSchemaListCompPtr);
@@ -253,6 +262,16 @@ iproc::IProcessor::TaskState CCxxProcessorsManagerComp::DoProcessing(
 
 		if (!EndSourceFile(*m_schemaParamsCompPtr, *filePtr, paramsPtr)){
 			SendErrorMessage(0, QString("Unable to end process file '%1'").arg(filePtr->fileName()));
+
+			return TS_INVALID;
+		}
+	}
+
+	// Generate forward declaration files
+	const EntryFileMap fwdFiles = CreateForwardDeclFiles(paramsPtr);
+	if (!fwdFiles.isEmpty()){
+		if (!ProcessForwardDeclarations(fwdFiles, paramsPtr)){
+			SendErrorMessage(0, "Unable to process forward declarations");
 
 			return TS_INVALID;
 		}
@@ -721,6 +740,73 @@ CCxxProcessorsManagerComp::FilePtr CCxxProcessorsManagerComp::CreateFile(const Q
 	}
 
 	return outputFilePtr;
+}
+
+
+CCxxProcessorsManagerComp::EntryFileMap CCxxProcessorsManagerComp::CreateForwardDeclFiles(const iprm::IParamsSet* /*paramsPtr*/) const
+{
+	EntryFileMap retVal;
+
+	imtsdl::ISdlProcessArgumentsParser::CppGenerationMode mode = m_argumentParserCompPtr->GetCppGenerationMode();
+	if (mode == imtsdl::ISdlProcessArgumentsParser::CGM_IMPLEMENTATION_ONLY){
+		return retVal;
+	}
+
+	// Get the base header file path and create .fwd.h version
+	const QString headerFilePath = CalculateTargetCppFilesFromSchemaParams(*m_schemaParamsCompPtr, *m_argumentParserCompPtr)[imtsdl::ISdlProcessArgumentsParser::s_headerFileType];
+	
+	// Replace .h with .fwd.h
+	QString fwdFilePath = headerFilePath;
+	if (fwdFilePath.endsWith(".h")){
+		fwdFilePath = fwdFilePath.left(fwdFilePath.length() - 2) + ".fwd.h";
+	} else {
+		fwdFilePath += ".fwd.h";
+	}
+	
+	FilePtr fwdFilePtr = CreateFile(fwdFilePath);
+	if (!fwdFilePtr){
+		return retVal;
+	}
+	retVal[QString()] = fwdFilePtr;
+
+	return retVal;
+}
+
+
+bool CCxxProcessorsManagerComp::ProcessForwardDeclarations(
+			const EntryFileMap& fwdFiles,
+			const iprm::IParamsSet* paramsPtr) const
+{
+	if (!m_fwdProcessorCompListPtr.IsValid() || fwdFiles.isEmpty()){
+		// nothing todo
+		return true;
+	}
+
+	if (fwdFiles.size() > 1){
+		Q_ASSERT_X(false, __func__, "Multi file processing not implemented");
+		return false;
+	}
+
+	const int fwdProcessorsCount = m_fwdProcessorCompListPtr.GetCount();
+	imtsdl::CSdlType dummyType;
+	if (m_schemaParamsCompPtr.IsValid()){
+		dummyType.SetSchemaParams(*m_schemaParamsCompPtr);
+	}
+	
+	FilePtr fwdFilePtr = GetFilePtrForEntry(dummyType, fwdFiles);
+	Q_ASSERT(fwdFilePtr);
+	
+	for (int i = 0; i < fwdProcessorsCount; ++i){
+		ICxxFileProcessor* processorPtr = m_fwdProcessorCompListPtr[i];
+		Q_ASSERT(processorPtr != nullptr);
+		const bool ok = processorPtr->ProcessEntry(dummyType, fwdFilePtr.get(), nullptr, paramsPtr);
+		if (!ok){
+			SendErrorMessage(0, "Processing forward declarations failed");
+			return false;
+		}
+	}
+
+	return true;
 }
 
 
