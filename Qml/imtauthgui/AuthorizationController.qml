@@ -404,7 +404,7 @@ QtObject {
 		
 		inputObjectComp: Component {
 			RefreshTokenInput {
-				m_refreshToken: refreshTokenForLoginGqlSender.refreshToken;
+				m_refreshToken: root.refreshTokenForLoginGqlSender.refreshToken;
 			}
 		}
 		
@@ -416,7 +416,7 @@ QtObject {
 						root.userTokenProvider.accessToken = m_userSession.m_accessToken;
 						root.userTokenProvider.refreshToken = m_userSession.m_refreshToken;
 						root.userTokenProvider.userId = m_userSession.m_userId;
-						root.userTokenProvider.login = refreshTokenForLoginGqlSender.userName;
+						root.userTokenProvider.login = root.refreshTokenForLoginGqlSender.userName;
 						
 						root.setAccessToken(m_userSession.m_accessToken);
 						root.setRefreshToken(m_userSession.m_refreshToken);
