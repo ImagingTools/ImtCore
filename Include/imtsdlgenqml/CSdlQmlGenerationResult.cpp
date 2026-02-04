@@ -138,12 +138,12 @@ bool CSdlQmlGenerationResult::Serialize(iser::IArchive& archive)
 	
 	bool retVal = true;
 	
-	static iser::CArchiveTag createdAtTag("CreatedAt", "Creation timestamp");
+	static iser::CArchiveTag createdAtTag("CreatedAt", "Creation timestamp", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(createdAtTag);
 	iser::CPrimitiveTypesSerializer::SerializeDateTime(archive, m_createdAt);
 	retVal = retVal && archive.EndTag(createdAtTag);
 	
-	static iser::CArchiveTag generatorVersionTag("GeneratorVersion", "Generator version");
+	static iser::CArchiveTag generatorVersionTag("GeneratorVersion", "Generator version", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(generatorVersionTag);
 	retVal = retVal && archive.Process(m_generatorVersion);
 	retVal = retVal && archive.EndTag(generatorVersionTag);
