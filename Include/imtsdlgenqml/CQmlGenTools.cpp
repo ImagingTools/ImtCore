@@ -1,3 +1,6 @@
+#include <imtsdlgenqml/CQmlGenTools.h>
+
+
 // Standard includes
 #include <chrono>
 
@@ -12,9 +15,6 @@
 // ACF includes
 #include <iser/CJsonMemWriteArchive.h>
 #include <iser/CJsonMemReadArchive.h>
-
-// ImtCore includes
-#include <imtsdlgenqml/CQmlGenTools.h>
 
 
 namespace imtsdlgenqml
