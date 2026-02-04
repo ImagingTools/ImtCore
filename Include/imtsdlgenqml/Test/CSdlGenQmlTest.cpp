@@ -312,8 +312,11 @@ void CSdlGenQmlTest::TestGenerationResultJsonFormat()
 	QVERIFY(!actualJson.isEmpty());
 
 	// Parse to QJsonDocument and write in indented format (non-compact)
-	QJsonDocument actualDoc = QJsonDocument::fromJson(actualJson);
-	QVERIFY(!actualDoc.isNull());
+	QJsonParseError actualParseError;
+	QJsonDocument actualDoc = QJsonDocument::fromJson(actualJson, &actualParseError);
+	QVERIFY2(!actualDoc.isNull(), qPrintable(QString("Failed to parse actual JSON: %1 at offset %2")
+	                                          .arg(actualParseError.errorString())
+	                                          .arg(actualParseError.offset)));
 	QByteArray actualJsonIndented = actualDoc.toJson(QJsonDocument::Indented);
 
 	// Write actual JSON to file in temp output directory
@@ -339,8 +342,11 @@ void CSdlGenQmlTest::TestGenerationResultJsonFormat()
 	QByteArray normalizedExpected = expectedJson.replace("\r\n", "\n");
 
 	// Parse both JSONs to compare semantically (order-independent)
-	QJsonDocument expectedDoc = QJsonDocument::fromJson(normalizedExpected);
-	QVERIFY(!expectedDoc.isNull());
+	QJsonParseError expectedParseError;
+	QJsonDocument expectedDoc = QJsonDocument::fromJson(normalizedExpected, &expectedParseError);
+	QVERIFY2(!expectedDoc.isNull(), qPrintable(QString("Failed to parse expected JSON: %1 at offset %2")
+	                                            .arg(expectedParseError.errorString())
+	                                            .arg(expectedParseError.offset)));
 
 	// Compare JSON objects semantically
 	QCOMPARE(actualDoc, expectedDoc);
