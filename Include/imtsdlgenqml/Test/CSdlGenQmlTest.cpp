@@ -311,6 +311,18 @@ void CSdlGenQmlTest::TestGenerationResultJsonFormat()
 	QByteArray actualJson = writeArchive.GetData();
 	QVERIFY(!actualJson.isEmpty());
 
+	// Parse to QJsonDocument and write in indented format (non-compact)
+	QJsonDocument actualDoc = QJsonDocument::fromJson(actualJson);
+	QVERIFY(!actualDoc.isNull());
+	QByteArray actualJsonIndented = actualDoc.toJson(QJsonDocument::Indented);
+
+	// Write actual JSON to file in temp output directory
+	const QString actualFilePath = m_tempOutputDir.path() + "/ActualGenerationResult.json";
+	QFile actualFile(actualFilePath);
+	QVERIFY(actualFile.open(QIODevice::WriteOnly | QIODevice::Text));
+	QCOMPARE(actualFile.write(actualJsonIndented), static_cast<qint64>(actualJsonIndented.size()));
+	actualFile.close();
+
 	// Load expected JSON from reference file
 	const QString referenceFilePath = s_testReferenceDataDirectoryPath + "/ExpectedGenerationResult.json";
 	QVERIFY(QFile::exists(referenceFilePath));
@@ -323,18 +335,18 @@ void CSdlGenQmlTest::TestGenerationResultJsonFormat()
 
 	// Normalize line endings for cross-platform compatibility
 	// Replace all CRLF (\r\n) with LF (\n) for both actual and expected
-	QByteArray normalizedActual = actualJson.replace("\r\n", "\n");
+	QByteArray normalizedActual = actualJsonIndented.replace("\r\n", "\n");
 	QByteArray normalizedExpected = expectedJson.replace("\r\n", "\n");
 
 	// Parse both JSONs to compare semantically (order-independent)
-	QJsonDocument actualDoc = QJsonDocument::fromJson(normalizedActual);
 	QJsonDocument expectedDoc = QJsonDocument::fromJson(normalizedExpected);
-
-	QVERIFY(!actualDoc.isNull());
 	QVERIFY(!expectedDoc.isNull());
 
-	// Compare JSON objects
+	// Compare JSON objects semantically
 	QCOMPARE(actualDoc, expectedDoc);
+
+	// Also compare normalized file contents directly
+	QCOMPARE(normalizedActual, normalizedExpected);
 }
 
 
