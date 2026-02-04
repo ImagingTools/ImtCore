@@ -11,9 +11,6 @@
 #include <QtWidgets/QMessageBox>
 #include <QtGui/QMovie>
 
-// ImtCore includes
-#include <imtauthgql/CSimpleLoginWrapComp.h>
-
 
 namespace imtauthgui
 {
@@ -396,35 +393,14 @@ void CRemoteStandardLoginGuiComp::CheckMatchingPassword()
 }
 
 
-bool CRemoteStandardLoginGuiComp::TryRestoreSessionWithRefreshToken(const QString& userName, const QByteArray& refreshToken)
+bool CRemoteStandardLoginGuiComp::TryRestoreSessionWithRefreshToken(const QString& /*userName*/, const QByteArray& /*refreshToken*/)
 {
-	if (refreshToken.isEmpty() || !m_loginCompPtr.IsValid()){
-		return false;
-	}
-	
-	// Try to cast to CSimpleLoginWrapComp to access refresh token login
-	auto* loginWrapPtr = dynamic_cast<imtauthgql::CSimpleLoginWrapComp*>(m_loginCompPtr.GetPtr());
-	if (loginWrapPtr != nullptr){
-		return loginWrapPtr->LoginWithRefreshToken(userName, refreshToken);
-	}
-	
 	return false;
 }
 
 
 void CRemoteStandardLoginGuiComp::SaveRefreshTokenIfRememberMe(QSettings& settings) const
 {
-	bool isRememberMe = RememberMe->isChecked();
-	
-	if (isRememberMe && m_loginCompPtr.IsValid()){
-		auto* loginWrapPtr = dynamic_cast<imtauthgql::CSimpleLoginWrapComp*>(m_loginCompPtr.GetPtr());
-		if (loginWrapPtr != nullptr){
-			QByteArray refreshToken = loginWrapPtr->GetRefreshToken();
-			if (!refreshToken.isEmpty()){
-				settings.setValue("RefreshToken", refreshToken);
-			}
-		}
-	}
 }
 
 
