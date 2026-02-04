@@ -211,14 +211,14 @@ void CSdlGenQmlTest::TestGenerationResultSerialization()
 	result.SetCreatedFolders(folders);
 
 	// Test serialization
-	iser::CJsonMemWriteArchive writeArchive(nullptr);
+	iser::CJsonMemWriteArchive writeArchive(nullptr, false);
 	QVERIFY(result.Serialize(writeArchive));
 	QByteArray buffer = writeArchive.GetData();
 	QVERIFY(!buffer.isEmpty());
 
 	// Test deserialization
 	imtsdlgenqml::CSdlQmlGenerationResult loadedResult;
-	iser::CJsonMemReadArchive readArchive(buffer);
+	iser::CJsonMemReadArchive readArchive(buffer, false);
 	QVERIFY(loadedResult.Serialize(readArchive));
 
 	// Verify data
@@ -306,7 +306,7 @@ void CSdlGenQmlTest::TestGenerationResultJsonFormat()
 	result.SetCreatedFolders(folders);
 
 	// Serialize to JSON
-	iser::CJsonMemWriteArchive writeArchive(nullptr);
+	iser::CJsonMemWriteArchive writeArchive(nullptr, false);
 	QVERIFY(result.Serialize(writeArchive));
 	QByteArray actualJson = writeArchive.GetData();
 	QVERIFY(!actualJson.isEmpty());
