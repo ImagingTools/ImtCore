@@ -62,17 +62,17 @@ public:
 	/**
 		\brief Appends additional directories to existing generation result file with file locking protection.
 		
-		\details This method reads the existing generation result file, adds new directories to the existing list,
+		\details This method reads the existing generation result file, adds new directories to the existing set,
 		updates the creation timestamp, and writes the updated result back to the file. The entire operation
 		(read, modify, write) is protected by a file lock to prevent concurrent access issues.
 		
 		If the file doesn't exist, it creates a new one with the provided directories.
 		
 		\param filePath Full path to the JSON file where the result should be updated
-		\param additionalFolders List of folder paths to append to the existing folders
+		\param additionalFolders Set of folder paths to append to the existing folders
 		\returns true if the operation succeeded, false otherwise
 	*/
-	static bool AppendFoldersToGenerationResultFile(const QString& filePath, const QStringList& additionalFolders);
+	static bool AppendFoldersToGenerationResultFile(const QString& filePath, const QSet<QString>& additionalFolders);
 };
 
 
