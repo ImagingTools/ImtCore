@@ -38,6 +38,13 @@ Copy-Item "\path\to\ImtCore\Tests\Docker\run-tests.ps1" .
 .\run-tests.ps1
 ```
 
+**Linux on Windows** (Docker Desktop in Linux mode):
+```bash
+cp /path/to/ImtCore/Tests/Docker/run-tests-linux-on-windows.sh .
+chmod +x run-tests-linux-on-windows.sh
+./run-tests-linux-on-windows.sh
+```
+
 ## Features
 
 - ✅ **Automatic Test Detection**: Scans GUI and API folders, runs tests automatically
@@ -62,6 +69,7 @@ Tests/Docker/
 ├── utils.js                           # Playwright utilities helper
 ├── run-tests.sh                       # Application test runner (Linux)
 ├── run-tests.ps1                      # Application test runner (Windows)
+├── run-tests-linux-on-windows.sh      # Application test runner (Linux on Windows)
 ├── Resources/                         # For application installers, SQL, configs
 └── Startup/                           # For application startup scripts
 
@@ -117,18 +125,36 @@ The scripts handle everything automatically:
 6. Clean up
 
 **Environment Variables:**
-- `BASE_URL` - Application URL
+- `BASE_URL` - Application URL (Linux: http://localhost:3000, Windows: http://host.docker.internal:3000)
 - `START_POSTGRESQL` - Start PostgreSQL (true/false)
 - `POSTGRES_DB` - Database name
 - `TEST_USERNAME`, `TEST_PASSWORD` - Test credentials
 
-**Example:**
+**Linux Example:**
 ```bash
 export BASE_URL="http://localhost:7776"
 export START_POSTGRESQL="true"
 export POSTGRES_DB="myapp_test"
 ./run-tests.sh
 ```
+
+**Windows Example:**
+```powershell
+$env:BASE_URL="http://host.docker.internal:7776"
+$env:START_POSTGRESQL="true"
+$env:POSTGRES_DB="myapp_test"
+.\run-tests.ps1
+```
+
+**Linux on Windows Example:**
+```bash
+export BASE_URL="http://host.docker.internal:7776"
+export START_POSTGRESQL="true"
+export POSTGRES_DB="myapp_test"
+./run-tests-linux-on-windows.sh
+```
+
+**Note:** When running Linux containers on Windows, use `host.docker.internal` to access services on the Windows host.
 
 ## Automatic Test Detection
 
