@@ -337,24 +337,12 @@ void CSdlGenQmlTest::TestGenerationResultJsonFormat()
 	referenceFile.close();
 	QVERIFY(!expectedJson.isEmpty());
 
-	// Normalize line endings for cross-platform compatibility
-	// Replace all CRLF (\r\n) with LF (\n) for both actual and expected
-	QByteArray normalizedActual = actualJsonIndented.replace("\r\n", "\n");
-	QByteArray normalizedExpected = expectedJson.replace("\r\n", "\n");
+	iser::CJsonMemReadArchive readArchive(expectedJson, false);
+	imtsdlgenqml::CSdlQmlGenerationResult expectedResult;
+	QVERIFY(expectedResult.Serialize(readArchive));
 
-	// Parse both JSONs to compare semantically (order-independent)
-	QJsonParseError expectedParseError;
-	QJsonDocument expectedDoc = QJsonDocument::fromJson(normalizedExpected, &expectedParseError);
-	QVERIFY2(expectedParseError.error == QJsonParseError::NoError,
-			qPrintable(QString("Failed to parse expected JSON: %1 at offset %2")
-					.arg(expectedParseError.errorString())
-					.arg(expectedParseError.offset)));
-
-	// Compare JSON objects semantically
-	QCOMPARE(actualDoc, expectedDoc);
-
-	// Also compare normalized file contents directly
-	QCOMPARE(normalizedActual, normalizedExpected);
+	// Compare actual and expected results
+	QVERIFY2(result.IsEqual(expectedResult), "Actual generation result does not match expected result");
 }
 
 
