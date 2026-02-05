@@ -169,7 +169,7 @@ bool CSdlQmlGenerationResult::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.EndTag(generatorVersionTag);
 	
 	// Serialize QSet<QString> as QStringList for compatibility
-	SerializeQSetAsQStringList(archive, m_createdFolders, "CreatedFolders", "Set of created folders");
+	retVal = retVal && SerializeQSetAsQStringList(archive, m_createdFolders, "dirs", "Set of created folders");
 	
 	return retVal;
 }

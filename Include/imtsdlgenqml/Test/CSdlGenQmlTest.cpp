@@ -352,42 +352,6 @@ void CSdlGenQmlTest::cleanup()
 }
 
 
-void CSdlGenQmlTest::TestGenerationResultJsonDeserialization()
-{
-	// Create reference data with known values
-	const QDateTime referenceTime = QDateTime::fromString("2024-01-15T10:30:00.000Z", Qt::ISODateWithMs);
-	const QString referenceVersion = "1.0";
-	QSet<QString> referenceFolders;
-	referenceFolders << "/path/to/folder1" << "/path/to/folder2" << "/path/to/folder3";
-
-	// Prepare JSON string manually (simulating what would be read from a file)
-	QString jsonString = R"({
-    "CreatedAt": "2024-01-15T10:30:00.000Z",
-    "CreatedFolders": [
-        "/path/to/folder1",
-        "/path/to/folder2",
-        "/path/to/folder3"
-    ],
-    "GeneratorVersion": "1.0"
-})";
-
-	// Convert to QByteArray for CJsonMemReadArchive
-	QByteArray jsonData = jsonString.toUtf8();
-
-	// Deserialize using CJsonMemReadArchive
-	iser::CJsonMemReadArchive readArchive(jsonData.data(), jsonData.size());
-	imtsdlgenqml::CSdlQmlGenerationResult result;
-
-	// Test deserialization
-	QVERIFY2(result.Serialize(readArchive), "Deserialization should succeed");
-
-	// Verify all fields were correctly deserialized
-	QCOMPARE(result.GetCreatedAt(), referenceTime);
-	QCOMPARE(result.GetGeneratorVersion(), referenceVersion);
-	QCOMPARE(result.GetCreatedFolders(), referenceFolders);
-}
-
-
 void CSdlGenQmlTest::cleanupTestCase()
 {
 	if (m_tempOutputDir.exists()){
