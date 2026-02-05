@@ -24,6 +24,15 @@ Rectangle {
 	signal login(string login, string password)
 	signal registerUser(var userData)
 
+	property bool rememberMe: rememberMeCheckBox.checkState === Qt.Checked
+
+	// Sync rememberMe with AuthorizationController
+	Binding {
+		target: AuthorizationController
+		property: "rememberMe"
+		value: authPageContainer.rememberMe
+	}
+
 	Component.onCompleted: {
 		decoratorPause.start();
 	}
@@ -43,9 +52,16 @@ Rectangle {
 			authPageContainer.state = "unauthorized";
 
 			passwordTextInput.text = "";
-			loginTextInput.text = "";
-
-			loginTextInput.forceActiveFocus()
+			
+			// Restore username from AuthorizationController if "Remember me" is checked
+			if (authPageContainer.rememberMe && AuthorizationController.lastUser !== "") {
+				loginTextInput.text = AuthorizationController.lastUser;
+				passwordTextInput.forceActiveFocus();
+			}
+			else {
+				loginTextInput.text = "";
+				loginTextInput.forceActiveFocus();
+			}
 		}
 	}
 
@@ -342,6 +358,21 @@ Rectangle {
 			}
 
 			Item{
+				id: rememberMeItem;
+
+				width: parent.width;
+				height: rememberMeCheckBox.height;
+
+				CheckBox {
+					id: rememberMeCheckBox;
+					objectName: "RememberMeCheckBox"
+					checkState: Qt.Checked
+
+					text: qsTr("Remember me");
+				}
+			}
+
+			Item{
 				id: registerItem;
 				width: parent.width;
 				height: registerUserText.height;
@@ -393,7 +424,7 @@ Rectangle {
 					font.family: Style.fontFamily;
 					font.pixelSize: Style.fontSizeM;
 
-					visible:  errorMessage.text != "";
+					visible: text !== "";
 				}
 			}
 
