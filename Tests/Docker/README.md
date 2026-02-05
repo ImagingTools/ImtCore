@@ -17,6 +17,10 @@ Complete Docker test infrastructure for running GUI (Playwright) and API (Postma
 ```
 
 **Linux on Windows** (Docker Desktop in Linux mode):
+```batch
+.\Tests\Docker\build-docker-linux-on-windows.bat
+```
+Or use Git Bash/WSL:
 ```bash
 ./Tests/Docker/build-docker-linux-on-windows.sh
 ```
@@ -61,7 +65,8 @@ chmod +x run-tests-linux-on-windows.sh
 Tests/Docker/
 ├── build-docker-linux.sh              # Build script for Linux
 ├── build-docker-windows.ps1           # Build script for Windows  
-├── build-docker-linux-on-windows.sh   # Build script for Linux on Windows
+├── build-docker-linux-on-windows.bat  # Build script for Linux on Windows (native cmd)
+├── build-docker-linux-on-windows.sh   # Build script for Linux on Windows (Git Bash/WSL)
 ├── Dockerfile.linux                   # Linux: Node 18 + Playwright + Newman + Fonts
 ├── Dockerfile.windows                 # Windows: Node 18 + Playwright + Newman
 ├── entrypoint.sh                      # Linux: startup + auto-detection
@@ -102,7 +107,14 @@ From ImtCore repository root (PowerShell):
 
 ### Linux on Windows
 
-From ImtCore repository root (Git Bash or WSL):
+From ImtCore repository root:
+
+**Command Prompt (Recommended):**
+```batch
+.\Tests\Docker\build-docker-linux-on-windows.bat
+```
+
+**Git Bash or WSL:**
 ```bash
 ./Tests/Docker/build-docker-linux-on-windows.sh
 ```
