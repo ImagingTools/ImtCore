@@ -45,17 +45,18 @@ public:
 	/**
 		\brief Appends additional directories to existing generation result file with file locking protection.
 		
-		\details This method reads the existing generation result file, adds new directories to the existing set,
-		updates the creation timestamp, and writes the updated result back to the file. The entire operation
-		(read, modify, write) is protected by a file lock to prevent concurrent access issues.
+		\details This method reads the existing generation result file, adds new directories from the provided
+		update data to the existing set, updates the creation timestamp, and writes the updated result back to the
+		file. The entire operation (read, modify, write) is protected by a file lock to prevent concurrent access issues.
 		
-		If the file doesn't exist, it creates a new one with the provided directories.
+		If the file doesn't exist, it creates a new one with the data from updateData.
 		
 		\param filePath Full path to the JSON file where the result should be updated
-		\param additionalFolders Set of folder paths to append to the existing folders
+		\param updateData Generation result object containing folders to append and optionally a creation timestamp
 		\returns true if the operation succeeded, false otherwise
+		\note If updateData contains a valid creation timestamp, it will be used; otherwise, the current UTC time is set
 	*/
-	static bool AppendFoldersToGenerationResultFile(const QString& filePath, const QSet<QString>& additionalFolders);
+	static bool AppendFoldersToGenerationResultFile(const QString& filePath, const CSdlQmlGenerationResult& updateData);
 };
 
 

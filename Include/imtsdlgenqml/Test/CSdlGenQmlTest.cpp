@@ -274,10 +274,14 @@ void CSdlGenQmlTest::TestAppendFoldersToGenerationResultFile()
 	initialResult.SetCreatedFolders(initialFolders);
 	QVERIFY(imtsdlgenqml::CQmlGenTools::WriteGenerationResultFile(initialResult, testFilePath));
 
-	// Append new folders
+	// Prepare update data with new folders
+	imtsdlgenqml::CSdlQmlGenerationResult updateData;
 	QSet<QString> additionalFolders;
 	additionalFolders << tempDir.path() + "/folder3" << tempDir.path() + "/folder2"; // folder2 is duplicate
-	QVERIFY(imtsdlgenqml::CQmlGenTools::AppendFoldersToGenerationResultFile(testFilePath, additionalFolders));
+	updateData.SetCreatedFolders(additionalFolders);
+	// Not setting createdAt, so current time should be used
+	
+	QVERIFY(imtsdlgenqml::CQmlGenTools::AppendFoldersToGenerationResultFile(testFilePath, updateData));
 
 	// Read back and verify
 	imtsdlgenqml::CSdlQmlGenerationResult loadedResult;
@@ -292,6 +296,27 @@ void CSdlGenQmlTest::TestAppendFoldersToGenerationResultFile()
 	QDateTime now = QDateTime::currentDateTimeUtc();
 	qint64 timeDiffSecs = qAbs(loadedResult.GetCreatedAt().secsTo(now));
 	QVERIFY2(timeDiffSecs < 5, "Timestamp should be updated to current time");
+	
+	// Test 2: Append with a specific timestamp
+	imtsdlgenqml::CSdlQmlGenerationResult updateData2;
+	QSet<QString> moreFolders;
+	moreFolders << tempDir.path() + "/folder4";
+	updateData2.SetCreatedFolders(moreFolders);
+	QDateTime specificTime = QDateTime::fromString("2024-06-15T14:20:00.000Z", Qt::ISODateWithMs);
+	updateData2.SetCreatedAt(specificTime);
+	
+	QVERIFY(imtsdlgenqml::CQmlGenTools::AppendFoldersToGenerationResultFile(testFilePath, updateData2));
+	
+	// Read back and verify specific timestamp was used
+	imtsdlgenqml::CSdlQmlGenerationResult loadedResult2;
+	QVERIFY(imtsdlgenqml::CQmlGenTools::ReadGenerationResultFile(loadedResult2, testFilePath));
+	
+	// Should have all 4 folders now
+	QSet<QString> expectedFolders2 = expectedFolders | moreFolders;
+	QCOMPARE(loadedResult2.GetCreatedFolders(), expectedFolders2);
+	
+	// Verify the specific timestamp was used
+	QCOMPARE(loadedResult2.GetCreatedAt().toMSecsSinceEpoch(), specificTime.toMSecsSinceEpoch());
 }
 
 
