@@ -23,7 +23,8 @@ private Q_SLOTS:
 	void TestComplexCollectionFilter();
 	void TestGenerationResultSerialization();
 	void TestGenerationResultFileOperations();
-	void TestAppendFoldersToGenerationResultFile();
+	void TestAppendFoldersWithAutomaticTimestamp();
+	void TestAppendFoldersWithSpecificTimestamp();
 	void TestGenerationResultJsonFormat();
 
 	void cleanup();
