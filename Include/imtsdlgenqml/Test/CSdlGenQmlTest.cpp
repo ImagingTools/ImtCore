@@ -281,7 +281,7 @@ void CSdlGenQmlTest::TestAppendFoldersWithAutomaticTimestamp()
 	updateData.SetCreatedFolders(additionalFolders);
 	// Not setting createdAt, so current time should be used
 	
-	QVERIFY(imtsdlgenqml::CQmlGenTools::AppendFoldersToGenerationResultFile(testFilePath, updateData));
+	QVERIFY(imtsdlgenqml::CQmlGenTools::UpdateGenerationResult(testFilePath, updateData));
 
 	// Read back and verify
 	imtsdlgenqml::CSdlQmlGenerationResult loadedResult;
@@ -324,7 +324,7 @@ void CSdlGenQmlTest::TestAppendFoldersWithSpecificTimestamp()
 	QDateTime specificTime = QDateTime::fromString("2024-06-15T14:20:00.000Z", Qt::ISODateWithMs);
 	updateData.SetCreatedAt(specificTime);
 	
-	QVERIFY(imtsdlgenqml::CQmlGenTools::AppendFoldersToGenerationResultFile(testFilePath, updateData));
+	QVERIFY(imtsdlgenqml::CQmlGenTools::UpdateGenerationResult(testFilePath, updateData));
 	
 	// Read back and verify specific timestamp was used
 	imtsdlgenqml::CSdlQmlGenerationResult loadedResult;

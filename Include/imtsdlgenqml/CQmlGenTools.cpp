@@ -98,7 +98,7 @@ bool CQmlGenTools::WriteGenerationResultFile(CSdlQmlGenerationResult& result, co
 }
 
 
-bool CQmlGenTools::AppendFoldersToGenerationResultFile(const QString& filePath, const CSdlQmlGenerationResult& updateData)
+bool CQmlGenTools::UpdateGenerationResult(const QString& filePath, const CSdlQmlGenerationResult& updateData)
 {
 	// Create lock file to prevent concurrent access
 	QString lockFilePath = filePath + ".lock";
