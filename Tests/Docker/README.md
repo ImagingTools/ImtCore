@@ -1,294 +1,177 @@
-# ImtCore Docker Test Environment
+# ImtCore Docker Test Infrastructure
 
-This directory contains the Docker infrastructure for running tests in containerized environments, supporting both **Linux** and **Windows** containers. This is the **base infrastructure** that should be used by application repositories (like Lisa) to run their tests.
+Complete Docker test infrastructure for running GUI (Playwright) and API (Postman) tests in isolated containers. Supports both Linux and Windows containers with automatic test detection.
 
-## Key Features
+## Quick Start
 
-- **Automatic Test Detection**: Container automatically detects and runs tests based on folder contents
-- **Playwright Support**: Pre-installed for GUI/browser testing with Verdana fonts
-- **Postman/Newman Support**: Pre-installed for API testing
-- **Playwright Helper**: `utils.js` included with common test utilities (login, screenshots, stability checks)
-- **GUI Tests**: Place Playwright tests in `GUI/` folder - automatically detected and run
-- **API Tests**: Place Postman collections in `API/` folder - automatically detected and run
-- **Example Scripts**: Ready-to-use scripts for Linux and Windows (`run-tests.sh`, `run-tests.ps1`)
-- **Cross-Platform**: Supports both Linux and Windows containers
+### 1. Build Docker Image (in ImtCore repository)
 
-## Overview
+**Linux:**
+```bash
+./Tests/Docker/build-docker-linux.sh
+```
 
-The test execution flow is:
+**Windows:**
+```powershell
+.\Tests\Docker\build-docker-windows.ps1
+```
 
-1. **Build Docker image** from ImtCore - creates the base test environment with Playwright and Newman
-2. **Run container** from application repository (e.g., Lisa) 
-3. **Copy files** from application repository into the running container:
-   - GUI tests (Playwright `.spec.js` or `.spec.ts` files) → `/app/tests/GUI/`
-   - API tests (Postman `.json` collections) → `/app/tests/API/`
-   - Resources (installers, SQL scripts, config files) → `/app/custom-apps/resources/`
-   - Startup scripts (application initialization) → `/app/custom-apps/startup/`
-4. **Tests run automatically**: Container detects tests in GUI and API folders and runs them
+**Linux on Windows** (Docker Desktop in Linux mode):
+```bash
+./Tests/Docker/build-docker-linux-on-windows.sh
+```
+
+### 2. Run Tests (in your application repository)
+
+Copy the run script to your application repository and execute:
+
+**Linux:**
+```bash
+cp /path/to/ImtCore/Tests/Docker/run-tests.sh .
+chmod +x run-tests.sh
+./run-tests.sh
+```
+
+**Windows:**
+```powershell
+Copy-Item "\path\to\ImtCore\Tests\Docker\run-tests.ps1" .
+.\run-tests.ps1
+```
+
+## Features
+
+- ✅ **Automatic Test Detection**: Scans GUI and API folders, runs tests automatically
+- ✅ **Playwright**: Pre-installed with browsers and Verdana fonts for GUI testing
+- ✅ **Newman (Postman CLI)**: Pre-installed for API testing
+- ✅ **utils.js Helper**: Common Playwright utilities (login, screenshots, stability checks)
+- ✅ **PostgreSQL Support**: Optional database with automatic setup
+- ✅ **Cross-Platform**: Linux and Windows containers
+- ✅ **Example Scripts**: Ready-to-use automation for building and running tests
 
 ## Directory Structure
 
 ```
 Tests/Docker/
-├── Dockerfile.linux          # Linux container configuration
-├── Dockerfile.windows        # Windows container configuration
-├── docker-compose.linux.yml  # Linux compose configuration
-├── docker-compose.windows.yml# Windows compose configuration
-├── entrypoint.sh             # Linux startup script
-├── entrypoint.ps1            # Windows startup script
-├── utils.js                  # Playwright test helper utilities
-├── run-tests.sh              # Example script for Linux
-├── run-tests.ps1             # Example script for Windows
-├── .dockerignore             # Files to exclude from build
-├── Resources/                # Base resources from ImtCore
-│   ├── .gitkeep             # Keeps directory in git
-│   └── README.md            # Resources documentation
-├── Startup/                  # Base startup scripts from ImtCore
-│   └── .gitkeep             # Keeps directory in git
-└── README.md                # This file
+├── build-docker-linux.sh              # Build script for Linux
+├── build-docker-windows.ps1           # Build script for Windows  
+├── build-docker-linux-on-windows.sh   # Build script for Linux on Windows
+├── Dockerfile.linux                   # Linux: Node 18 + Playwright + Newman + Fonts
+├── Dockerfile.windows                 # Windows: Node 18 + Playwright + Newman
+├── entrypoint.sh                      # Linux: startup + auto-detection
+├── entrypoint.ps1                     # Windows: startup + auto-detection
+├── utils.js                           # Playwright utilities helper
+├── run-tests.sh                       # Application test runner (Linux)
+├── run-tests.ps1                      # Application test runner (Windows)
+├── Resources/                         # For application installers, SQL, configs
+└── Startup/                           # For application startup scripts
 
 Tests/Fonts/
-└── verdana/                  # Verdana font files for Playwright
-    ├── verdana.ttf
-    ├── verdanab.ttf
-    ├── verdanai.ttf
-    └── verdanaz.ttf
+└── verdana/                           # Verdana fonts for consistent rendering
 ```
 
-## Container Structure
+## Building Docker Images
 
-### Linux Container
-When the Linux container is built, it creates the following structure:
+### Linux (Recommended)
 
-```
-/app/
-├── tests/                   # Test execution directory
-│   ├── GUI/                # GUI tests (copied from application repo)
-│   ├── API/                # API tests (copied from application repo)
-│   └── test-results/       # Test results output
-└── custom-apps/            # Custom application files
-    ├── resources/          # Installation resources
-    │   └── (files from ImtCore + application repo)
-    └── startup/            # Startup scripts
-        └── (scripts from ImtCore + application repo)
-```
-
-### Windows Container
-Windows container structure (paths use Windows notation):
-
-```
-C:\app\
-├── tests\                   # Test execution directory
-│   ├── GUI\                # GUI tests (copied from application repo)
-│   ├── API\                # API tests (copied from application repo)
-│   └── test-results\       # Test results output
-└── custom-apps\            # Custom application files
-    ├── resources\          # Installation resources
-    │   └── (files from ImtCore + application repo)
-    └── startup\            # Startup scripts
-        └── (scripts from ImtCore + application repo)
-```
-
-## Building the Docker Image
-
-### Linux Containers
-
-From the ImtCore repository root:
-
+From ImtCore repository root:
 ```bash
-# Build the Linux image
-docker build -f Tests/Docker/Dockerfile.linux -t imtcore-tests:linux .
-
-# Or using docker-compose
-docker-compose -f Tests/Docker/docker-compose.linux.yml build
+./Tests/Docker/build-docker-linux.sh
 ```
 
-### Windows Containers
+- Runs on Linux, macOS, Windows (via WSL 2)
+- Fast build (~5 min), small image (~1.5 GB)
+- CI/CD compatible
 
-**Requirements:**
-- Windows 10/11 Pro, Enterprise, or Windows Server
-- Docker Desktop with Windows containers mode enabled
-- Hyper-V feature enabled
+### Windows
 
-From the ImtCore repository root (PowerShell or CMD):
-
+From ImtCore repository root (PowerShell):
 ```powershell
-# Build the Windows image
-docker build -f Tests/Docker/Dockerfile.windows -t imtcore-tests:windows .
-
-# Or using docker-compose
-docker-compose -f Tests/Docker/docker-compose.windows.yml build
+.\Tests\Docker\build-docker-windows.ps1
 ```
 
-**Note:** Windows containers can only be built on Windows. Building takes longer (~15-20 minutes first time) and produces larger images (~5 GB) compared to Linux containers.
+- Requires Windows 10/11 Pro+ with Hyper-V
+- Slower build (~15 min), larger image (~5 GB)
 
-### Running Linux Containers on Windows
+### Linux on Windows
 
-You can run Linux containers on Windows using Docker Desktop's Linux mode (default):
-
-1. Ensure Docker Desktop is in Linux containers mode
-2. Build the Linux image as shown above
-3. The container runs using WSL 2 backend
-
-This is the **recommended approach** for most cases as Linux containers are:
-- Faster to build (~5 minutes vs ~15 minutes)
-- Smaller in size (~1.5 GB vs ~5 GB)
-- Compatible with CI/CD (GitHub Actions, GitLab CI, etc.)
-- Work on all platforms (Linux, macOS, Windows)
-
-## Using from Application Repository (e.g., Lisa)
-
-### Option 1: Use the Provided Example Scripts (Recommended)
-
-ImtCore provides ready-to-use example scripts that you can copy to your application repository:
-
-**Linux:**
-1. Copy `Tests/Docker/run-tests.sh` from ImtCore to your application repository
-2. Customize environment variables at the top of the script if needed
-3. Run: `./run-tests.sh`
-
-**Windows:**
-1. Copy `Tests/Docker/run-tests.ps1` from ImtCore to your application repository
-2. Customize parameters if needed
-3. Run: `.\run-tests.ps1`
-
-The example scripts automatically:
-- Start the Docker container
-- Copy GUI tests, API tests, resources, and startup scripts
-- Install additional dependencies (if package.json exists)
-- Run tests and collect results
-- Clean up the container
-
-### Option 2: Manual Setup
-
-### Step 1: Build the Base Image
-
-From your ImtCore repository:
-
-**Linux:**
+From ImtCore repository root (Git Bash or WSL):
 ```bash
-docker build -f Tests/Docker/Dockerfile.linux -t imtcore-tests:linux .
+./Tests/Docker/build-docker-linux-on-windows.sh
 ```
 
-**Windows:**
-```powershell
-docker build -f Tests/Docker/Dockerfile.windows -t imtcore-tests:windows .
-```
+- Checks Docker Desktop is in Linux mode
+- Fast, small, CI/CD compatible
+- **Recommended for Windows developers**
 
-### Step 2: Create Run Script in Your Application Repository
+## Running Tests
 
-**Linux script** (`run-tests-in-docker.sh`):
+### Using Example Scripts (Recommended)
 
+The scripts handle everything automatically:
+
+1. Start Docker container
+2. Copy GUI tests, API tests, resources, startup scripts
+3. Install dependencies
+4. Run tests (auto-detected)
+5. Collect results
+6. Clean up
+
+**Environment Variables:**
+- `BASE_URL` - Application URL
+- `START_POSTGRESQL` - Start PostgreSQL (true/false)
+- `POSTGRES_DB` - Database name
+- `TEST_USERNAME`, `TEST_PASSWORD` - Test credentials
+
+**Example:**
 ```bash
-#!/bin/bash
-set -e
-
-# Configuration
-CONTAINER_NAME="lisa-tests"
-IMAGE_NAME="imtcore-tests:linux"
-
-# Start the container in detached mode
-docker run -d \
-  --name "$CONTAINER_NAME" \
-  --network host \
-  -e BASE_URL="http://localhost:7776" \
-  -e START_POSTGRESQL="true" \
-  -e POSTGRES_DB="lisa_test" \
-  -e DATABASE_URL="postgresql://postgres@localhost:5432/lisa_test" \
-  -e TEST_USERNAME="su" \
-  -e TEST_PASSWORD="1" \
-  "$IMAGE_NAME" \
-  sleep infinity
-
-# Copy test files and resources
-echo "Copying test files..."
-docker cp Tests/GUI "$CONTAINER_NAME:/app/tests/"
-docker cp Tests/API "$CONTAINER_NAME:/app/tests/"
-
-# Copy resources (installers, SQL scripts, etc.)
-echo "Copying resources..."
-docker cp Tests/Docker/Resources/. "$CONTAINER_NAME:/app/custom-apps/resources/"
-
-# Copy startup scripts
-echo "Copying startup scripts..."
-docker cp Tests/Docker/Startup/. "$CONTAINER_NAME:/app/custom-apps/startup/"
-# Make scripts executable
-docker exec "$CONTAINER_NAME" chmod +x /app/custom-apps/startup/*.sh
-
-# Restart container to run startup scripts and auto-detect tests
-echo "Running tests..."
-docker restart "$CONTAINER_NAME"
-docker wait "$CONTAINER_NAME"
-
-# Copy test results out
-echo "Copying test results..."
-docker cp "$CONTAINER_NAME:/app/tests/test-results" ./
-
-# Cleanup
-docker stop "$CONTAINER_NAME" 2>/dev/null || true
-docker rm "$CONTAINER_NAME"
+export BASE_URL="http://localhost:7776"
+export START_POSTGRESQL="true"
+export POSTGRES_DB="myapp_test"
+./run-tests.sh
 ```
 
 ## Automatic Test Detection
 
-The container automatically detects and runs tests based on the presence of files in specific folders:
+**GUI Tests (Playwright):**
+- Place in `Tests/GUI/` folder
+- Files: `*.spec.js` or `*.spec.ts`
+- Auto-runs: `npx playwright test GUI`
 
-### GUI Tests (Playwright)
-- **Location**: `/app/tests/GUI/` (Linux) or `C:\app\tests\GUI\` (Windows)
-- **Detection**: Looks for `*.spec.js` or `*.spec.ts` files
-- **Execution**: Runs `npx playwright test GUI` if tests are found
+**API Tests (Postman):**
+- Place in `Tests/API/` folder
+- Files: `*.json` (Postman collections)
+- Auto-runs: `newman run <collection>.json`
 
-### API Tests (Postman/Newman)
-- **Location**: `/app/tests/API/` (Linux) or `C:\app\tests\API\` (Windows)
-- **Detection**: Looks for `*.json` files (Postman collections)
-- **Execution**: Runs `newman run <collection>.json` for each collection found
-
-### Example Test Structure
-
+**Example:**
 ```
-/app/tests/
+Tests/
 ├── GUI/
-│   ├── login.spec.js         # Playwright test
-│   ├── dashboard.spec.ts     # Playwright test
-│   └── playwright.config.js  # Optional config
+│   ├── login.spec.js          # ← Auto-detected
+│   └── dashboard.spec.ts      # ← Auto-detected
 └── API/
-    ├── user-api.json         # Postman collection
-    └── auth-api.json         # Postman collection
+    ├── users.postman.json     # ← Auto-detected
+    └── auth.postman.json      # ← Auto-detected
 ```
 
-When the container starts (or restarts), it will:
-1. Run startup scripts from `/app/custom-apps/startup/`
-2. Auto-detect tests in GUI and API folders
-3. Run Playwright tests if GUI folder contains `.spec.js` or `.spec.ts` files
-4. Run Newman/Postman tests if API folder contains `.json` files
-5. Exit with appropriate status code
+## Playwright Utilities (utils.js)
 
-**Note**: If no tests are found, the container will exit successfully with a message.
+The container includes `/app/tests/utils.js` with common utilities:
 
-## Playwright Test Utilities (utils.js)
+**Functions:**
+- `login(page, username, password, config, loginPaths)` - Automated login
+- `clickOnElement(page, path, config)` - Click by objectName path
+- `fillTextInput(page, text, path, config)` - Fill text input
+- `selectComboBox(page, selectedText, path, config)` - Select dropdown
+- `waitForPageStability(page, config)` - Wait for DOM stability
+- `checkScreenshot(page, filename, masks, config)` - Screenshot comparison
+- And more...
 
-The container includes a pre-installed `utils.js` helper file at `/app/tests/utils.js` (Linux) or `C:\app\tests\utils.js` (Windows) with common Playwright utilities:
-
-### Usage in Your Tests
-
+**Usage:**
 ```javascript
-const { 
-  defaultConfig,
-  delay,
-  reloadPage,
-  clickAt,
-  checkScreenshot,
-  login,
-  waitForPageStability,
-  clickOnPage,
-  clickOnCommand,
-  selectComboBox,
-  fillTextInput,
-  clickOnButton
-} = require('./utils.js');
+const { login, clickOnPage, checkScreenshot } = require('./utils.js');
 
-test('example test', async ({ page }) => {
-  await login(page, 'username', 'password', defaultConfig, {
+test('user login', async ({ page }) => {
+  await login(page, 'user', 'pass', defaultConfig, {
     username: ['LoginForm', 'UsernameInput'],
     password: ['LoginForm', 'PasswordInput'],
     submit: ['LoginForm', 'LoginButton']
@@ -299,204 +182,115 @@ test('example test', async ({ page }) => {
 });
 ```
 
-### Available Utilities
+## Resources and Startup Scripts
 
-- **`defaultConfig`** - Default configuration with timeouts, base URL, screenshot settings
-- **`delay(time)`** - Wait for specified milliseconds
-- **`reloadPage(page, config, url)`** - Reload page and wait for stability
-- **`clickAt(page, x, y, config)`** - Click at coordinates and wait for stability
-- **`clickOnElement(page, path, config)`** - Click on element by objectName path
-- **`clickOnPage(page, pageId, config)`** - Click on menu page button
-- **`clickOnCommand(page, commandId, config)`** - Click on command button
-- **`clickOnButton(page, buttonPath, config)`** - Click on button by path
-- **`fillTextInput(page, text, path, config)`** - Fill text input field
-- **`selectComboBox(page, selectedText, path, config)`** - Select combobox option
-- **`waitForPageStability(page, config)`** - Wait for DOM to stabilize
-- **`checkScreenshot(page, filename, masks, config)`** - Take and compare screenshot
-- **`login(page, username, password, config, loginPaths)`** - Perform login
+### Resources
 
-### Configuration Example
+Place in `Tests/Docker/Resources/`:
+- Installers: `.exe`, `.msi`, `.deb`, `.rpm`
+- SQL scripts: database setup, migrations
+- Configs: `.json`, `.yaml`, `.xml`
+- Data files
 
-```javascript
-const customConfig = {
-  ...defaultConfig,
-  baseUrl: process.env.BASE_URL || 'http://localhost:3000',
-  timeouts: {
-    delay: 500,
-    locatorWait: 5000,
-    stabilityTotal: 5000,
-  },
-};
-```
+### Startup Scripts
 
-**Windows script** (`run-tests-in-docker.ps1`):
+Place in `Tests/Docker/Startup/`:
 
-```powershell
-# Configuration
-$ContainerName = "lisa-tests"
-$ImageName = "imtcore-tests:windows"
+**Naming** (execution order):
+- `01-setup-database.sh` / `.ps1`
+- `02-install-app.sh` / `.ps1`
+- `03-start-services.sh` / `.ps1`
 
-# Start the container in detached mode
-docker run -d `
-  --name $ContainerName `
-  -e BASE_URL="http://host.docker.internal:7776" `
-  -e START_POSTGRESQL="true" `
-  -e POSTGRES_DB="lisa_test" `
-  -e DATABASE_URL="postgresql://postgres@localhost:5432/lisa_test" `
-  -e TEST_USERNAME="su" `
-  -e TEST_PASSWORD="1" `
-  $ImageName `
-  powershell -Command "Start-Sleep -Seconds 3600"
-
-# Copy test files and resources
-Write-Host "Copying test files..."
-docker cp Tests/GUI "${ContainerName}:C:\app\tests\"
-docker cp Tests/API "${ContainerName}:C:\app\tests\"
-
-# Copy resources (installers, SQL scripts, etc.)
-Write-Host "Copying resources..."
-docker cp Tests/Docker/Resources/. "${ContainerName}:C:\app\custom-apps\resources\"
-
-# Copy startup scripts
-Write-Host "Copying startup scripts..."
-docker cp Tests/Docker/Startup/. "${ContainerName}:C:\app\custom-apps\startup\"
-
-# Restart container to run startup scripts and auto-detect tests
-Write-Host "Running tests..."
-docker restart $ContainerName
-docker wait $ContainerName
-
-# Copy test results out
-Write-Host "Copying test results..."
-docker cp "${ContainerName}:C:\app\tests\test-results" .\
-
-# Cleanup
-docker stop $ContainerName -ErrorAction SilentlyContinue
-docker rm $ContainerName
-```
-
-## Resources Directory
-
-The `Resources/` directory is where you place files needed for application installation:
-
-- **Installers**: `.exe`, `.msi`, `.run`, `.deb`, `.rpm`, `.tar.gz`, `.zip`
-- **SQL Scripts**: Database setup, migrations, seed data
-- **Configuration Files**: `.json`, `.yaml`, `.xml`, `.ini`, `.conf`
-- **Data Files**: Test data, reference data, backups
-
-Files placed in `Tests/Docker/Resources/` in ImtCore are base resources. Application repositories should have their own `Tests/Docker/Resources/` directory with application-specific files.
-
-**Container Paths:**
-- Linux: `/app/custom-apps/resources/`
-- Windows: `C:\app\custom-apps\resources\`
-
-## Startup Directory
-
-The `Startup/` directory contains scripts that run during container startup, after resources are copied.
-
-### Script Naming Convention
-
-Use numbered prefixes to control execution order:
-- Linux: `01-setup-database.sh`, `02-start-application.sh`, `03-wait-for-services.sh`
-- Windows: `01-setup-database.ps1`, `02-start-application.ps1`, `03-wait-for-services.ps1`
-
-### Example Startup Scripts
-
-**Linux** (`01-start-myapp.sh`):
-
+**Example** (`01-start-app.sh`):
 ```bash
 #!/bin/bash
-# 01-start-myapp.sh
-
 set -e
-
 echo "Starting MyApp..."
-
-# Start the application
 /opt/myapp/bin/myapp-server --port 3000 &
 
-# Wait for application to be ready
 for i in {1..30}; do
     if curl -f http://localhost:3000/health; then
         echo "MyApp is ready"
         exit 0
     fi
-    echo "Waiting for MyApp... ($i/30)"
     sleep 2
 done
-
 echo "Failed to start MyApp"
 exit 1
 ```
 
-**Windows** (`01-start-myapp.ps1`):
+## Troubleshooting
 
-```powershell
-# 01-start-myapp.ps1
+### Docker Not in Linux Mode (Windows)
 
-Write-Host "Starting MyApp..."
+**Solution:**
+1. Right-click Docker Desktop tray icon
+2. Select "Switch to Linux containers..."
+3. Restart Docker
 
-# Start the application
-Start-Process -FilePath "C:\Program Files\MyApp\myapp-server.exe" -ArgumentList "--port", "3000"
+### Tests Not Detected
 
-# Wait for application to be ready
-for ($i = 1; $i -le 30; $i++) {
-    try {
-        $response = Invoke-WebRequest -Uri "http://localhost:3000/health" -UseBasicParsing -ErrorAction SilentlyContinue
-        if ($response.StatusCode -eq 200) {
-            Write-Host "MyApp is ready"
-            exit 0
-        }
-    } catch {
-        # Service not ready yet
-    }
-    Write-Host "Waiting for MyApp... ($i/30)"
-    Start-Sleep -Seconds 2
-}
+**Check:**
+- Test files have correct extensions
+- Files are in correct folders (`GUI/` or `API/`)
+- View container logs: `docker logs <container-name>`
 
-Write-Host "Failed to start MyApp"
-exit 1
+### Permission Denied (Linux)
+
+```bash
+chmod +x Tests/Docker/build-docker-linux.sh
+chmod +x Tests/Docker/run-tests.sh
 ```
 
-**Container Paths:**
-- Linux: `/app/custom-apps/startup/`
-- Windows: `C:\app\custom-apps\startup\`
+## Platform Comparison
 
-## Startup Sequence
+| Feature | Linux | Windows | Linux-on-Windows |
+|---------|-------|---------|------------------|
+| Build Time | ~5 min | ~15 min | ~5 min |
+| Image Size | ~1.5 GB | ~5 GB | ~1.5 GB |
+| CI/CD | ✅ Yes | ⚠️ Limited | ✅ Yes |
+| Recommended | ✅ General | Windows apps | ✅ Windows devs |
 
-When the container starts, the entrypoint script executes in this order:
+## CI/CD Integration
 
-1. **PostgreSQL** (optional, if `START_POSTGRESQL=true`)
-   - Initializes and starts PostgreSQL server
-   - Creates database if `POSTGRES_DB` is set
+### GitHub Actions
 
-2. **Startup Scripts** (from `/app/custom-apps/startup/`)
-   - Runs in alphabetical order (use numbered prefixes)
-   - Should start applications and wait for them to be ready
+```yaml
+name: Tests
+on: [push, pull_request]
 
-3. **Tests** (from the CMD or custom command)
-   - Executes the test suite
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Checkout ImtCore
+        uses: actions/checkout@v3
+        with:
+          repository: ImagingTools/ImtCore
+          path: ImtCore
+      
+      - name: Build Docker image
+        run: cd ImtCore && ./Tests/Docker/build-docker-linux.sh
+      
+      - name: Run tests
+        run: ./run-tests.sh
+```
 
-## Environment Variables
+## Summary
 
-Configure the container using these environment variables:
+**For ImtCore:**
+```bash
+./Tests/Docker/build-docker-linux.sh
+```
 
-### Application Settings
-- `BASE_URL` - URL of the application to test (default: `http://localhost:3000`)
-- `CI` - CI mode indicator (default: `true`)
+**For Applications:**
+1. Copy `run-tests.sh` from ImtCore
+2. Create `Tests/GUI/` with Playwright tests
+3. Create `Tests/API/` with Postman collections
+4. Create `Tests/Docker/Resources/` with resources
+5. Create `Tests/Docker/Startup/` with startup scripts
+6. Run `./run-tests.sh`
 
-### PostgreSQL Settings
-- `START_POSTGRESQL` - Start PostgreSQL in container (default: `false`)
-- `POSTGRES_DB` - Database name to create (optional)
-- `DATABASE_URL` - PostgreSQL connection string (optional)
-
-### Custom Settings
-Add your own environment variables as needed:
-- `TEST_USERNAME`, `TEST_PASSWORD` - Test credentials
-- Application-specific configuration
-
-## See Also
-
-- [apps-README.md](apps-README.md) - Documentation for custom applications
-- [Resources/README.md](Resources/README.md) - Resources directory documentation
-- Application repository (e.g., Lisa) - for application-specific test setup
+Tests are auto-detected and executed. Results in `test-results/`.
