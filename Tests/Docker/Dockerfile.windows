@@ -1,0 +1,52 @@
+# Dockerfile for ImtCore test environment (Windows)
+# This container provides the base infrastructure for running tests on Windows.
+# Application-specific files (GUI tests, API tests, resources, startup scripts)
+# should be copied from the application repository (e.g., Lisa) when running the container.
+#
+# Note: Building Windows containers requires:
+# - Windows 10/11 Pro or Windows Server
+# - Docker Desktop with Windows containers enabled
+# - Hyper-V feature enabled
+
+# Use Windows Server Core with Node.js
+FROM mcr.microsoft.com/windows/servercore:ltsc2022
+
+# Install Chocolatey package manager
+RUN powershell -Command \
+    Set-ExecutionPolicy Bypass -Scope Process -Force; \
+    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; \
+    iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+
+# Install Node.js and PostgreSQL via Chocolatey
+RUN choco install -y nodejs --version=18.19.0
+RUN choco install -y postgresql --version=16.1
+
+# Refresh environment variables
+RUN refreshenv
+
+# Set working directory
+WORKDIR C:\\app\\tests
+
+# Create directories for tests, results, and custom apps
+# The custom apps directories will be populated by copying from application repos (e.g., Lisa)
+RUN powershell -Command New-Item -ItemType Directory -Force -Path C:\app\tests, C:\app\tests\GUI, C:\app\tests\API, C:\app\tests\test-results\screenshots, C:\app\tests\test-results\videos, C:\app\custom-apps\startup, C:\app\custom-apps\resources
+
+# Copy entrypoint script
+COPY Tests/Docker/entrypoint.ps1 C:\app\entrypoint.ps1
+
+# Copy startup scripts and resources from ImtCore (if any exist)
+# These are the base scripts that will be supplemented by application-specific scripts
+COPY Tests/Docker/Startup/ C:\app\custom-apps\startup\
+COPY Tests/Docker/Resources/ C:\app\custom-apps\resources\
+
+# Environment variables (can be overridden at runtime)
+ENV BASE_URL=http://host.docker.internal:3000
+ENV CI=true
+ENV START_POSTGRESQL=false
+ENV POSTGRES_DB=""
+
+# Set entrypoint
+ENTRYPOINT ["powershell", "-File", "C:\\app\\entrypoint.ps1"]
+
+# Default command
+CMD ["powershell", "-Command", "Write-Host 'No tests specified. Copy tests from your application repository and run them.'"]
