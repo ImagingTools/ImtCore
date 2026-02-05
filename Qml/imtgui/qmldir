@@ -92,6 +92,7 @@ ServerConnectionParamElementView 1.0 View/ServerConnectionParamElementView.qml
 ComboBoxGqlElementView 1.0 View/ComboBoxGqlElementView.qml
 ComboBoxGqlLegacyElementView 1.0 View/ComboBoxGqlLegacyElementView.qml
 SpinBoxElementView 1.0 View/SpinBoxElementView.qml
+ComboBoxAddressElementView 1.0 View/ComboBoxAddressElementView.qml
 
 singleton PopupManager 1.0 View/PopupManager.qml
 
@@ -114,3 +115,5 @@ EnableableParamEditor 1.0 Params/EnableableParamEditor.qml
 ServerConnectionParamEditor 1.0 Params/ServerConnectionParamEditor.qml
 PatTokenListParam 1.0 Params/PatTokenListParam.qml
 PatTokenParamEditor 1.0 Params/PatTokenParamEditor.qml
+
+
