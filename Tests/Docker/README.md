@@ -43,6 +43,11 @@ Copy-Item "\path\to\ImtCore\Tests\Docker\run-tests.ps1" .
 ```
 
 **Linux on Windows** (Docker Desktop in Linux mode):
+```batch
+copy C:\path\to\ImtCore\Tests\Docker\run-tests-linux-on-windows.bat .
+.\run-tests-linux-on-windows.bat
+```
+Or use Git Bash/WSL:
 ```bash
 cp /path/to/ImtCore/Tests/Docker/run-tests-linux-on-windows.sh .
 chmod +x run-tests-linux-on-windows.sh
@@ -74,7 +79,8 @@ Tests/Docker/
 ├── utils.js                           # Playwright utilities helper
 ├── run-tests.sh                       # Application test runner (Linux)
 ├── run-tests.ps1                      # Application test runner (Windows)
-├── run-tests-linux-on-windows.sh      # Application test runner (Linux on Windows)
+├── run-tests-linux-on-windows.bat    # Application test runner (Linux on Windows - native cmd)
+├── run-tests-linux-on-windows.sh      # Application test runner (Linux on Windows - Git Bash/WSL)
 ├── Resources/                         # For application installers, SQL, configs
 └── Startup/                           # For application startup scripts
 
@@ -159,6 +165,13 @@ $env:POSTGRES_DB="myapp_test"
 ```
 
 **Linux on Windows Example:**
+```batch
+set BASE_URL=http://host.docker.internal:7776
+set START_POSTGRESQL=true
+set POSTGRES_DB=myapp_test
+.\run-tests-linux-on-windows.bat
+```
+Or with Git Bash/WSL:
 ```bash
 export BASE_URL="http://host.docker.internal:7776"
 export START_POSTGRESQL="true"
