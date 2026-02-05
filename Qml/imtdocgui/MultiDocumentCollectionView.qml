@@ -386,12 +386,14 @@ Item {
 			property string documentTypeId
 
 			property var itemViewTypes: ({}) // ViewTypeId -> Item
+			property var viewTypeIds: []
 
 			function initialize(id, typeId){
 				documentId = id
 				documentTypeId = typeId
-				
-				let viewTypeIds = workspaceView.documentManager.getSupportedDocumentViewTypeIds(documentTypeId)
+
+				viewTypeIds = workspaceView.documentManager.getSupportedDocumentViewTypeIds(documentTypeId)
+
 				for (let i = 0; i < viewTypeIds.length; ++i){
 					let viewComp = workspaceView.documentManager.getDocumentEditorFactory(documentTypeId, viewTypeIds[i])
 					addPage(viewComp)
@@ -402,7 +404,7 @@ Item {
 
 			onPageAdded: {
 				let comp = getComponent(index)
-				let viewTypeId = workspaceView.documentManager.getViewTypeIdByViewFactory(documentTypeId, comp)
+				let viewTypeId = viewTypeIds[index]
 
 				itemViewTypes[viewTypeId] = item
 
@@ -432,6 +434,7 @@ Item {
 			function onCommandActivated(commandId){
 				let viewTypeIds = Object.keys(itemViewTypes)
 				if (!viewTypeIds.includes(commandId)){
+					console.error("Unable to command handle. Error: Command-ID: '" + commandId + "' does not found")
 					return
 				}
 
@@ -445,6 +448,8 @@ Item {
 					let currentItem = itemViewTypes[viewTypeId]
 					if (currentItem.commandsController){
 						for (let j = 0; j < viewTypeIds.length; ++j){
+							console.log("viewTypeIds", viewTypeIds[j])
+
 							currentItem.commandsController.setToggled(viewTypeIds[j], viewTypeIds[j] === commandId)
 						}
 					}

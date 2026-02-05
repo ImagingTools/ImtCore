@@ -1,5 +1,15 @@
 # ImtCore
 
+## Documentation
+
+**API Documentation**: [https://imagingtools.github.io/ImtCore/](https://imagingtools.github.io/ImtCore/)  
+Comprehensive technical documentation generated with Doxygen, including class hierarchies, API references, and detailed descriptions.
+
+**Repository Statistics**: [https://imagingtools.github.io/ImtCore/stats/](https://imagingtools.github.io/ImtCore/stats/)  
+View comprehensive code metrics including lines of code, number of classes and components, code quality indicators, and more.
+
+The documentation and statistics are automatically generated from the source code and deployed to GitHub Pages.
+
 ## Environment Variables Setup
 
 Before building the project, you need to set the following environment variables:

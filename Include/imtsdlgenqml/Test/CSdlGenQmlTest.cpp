@@ -2,14 +2,22 @@
 
 
 // Qt includes
+#include <QtCore/QJsonDocument>
 #include <QtTest/QTest>
 #include <QtCore/QFile>
+#include <QtCore/QTemporaryDir>
 
 // ACF includes
 #include <istd/CSystem.h>
 #include <iproc/IProcessor.h>
 #include <itest/CStandardTestExecutor.h>
-#include <iprm/CParamsSet.h> 
+#include <iprm/CParamsSet.h>
+#include <iser/CJsonMemWriteArchive.h>
+#include <iser/CJsonMemReadArchive.h>
+
+// ImtCore includes
+#include <imtsdlgenqml/CSdlQmlGenerationResult.h>
+#include <imtsdlgenqml/CQmlGenTools.h>
 
 // generated includes
 #include <GeneratedFiles/ImtSdlGenQmlTest/CImtSdlGenQmlTest.h>
@@ -189,6 +197,197 @@ void CSdlGenQmlTest::TestComplexCollectionFilter()
 	argParserPtr->SetGqlEnabled();
 	argParserPtr->SetQmlEnabled();
 	ExecuteTest(testSuite, "ComplexCollectionFilter.sdl", "ComplexCollectionFilter", "imtbaseComplexCollectionFilterSdl");
+}
+
+
+void CSdlGenQmlTest::TestGenerationResultSerialization()
+{
+	// Create a generation result object
+	imtsdlgenqml::CSdlQmlGenerationResult result;
+	result.SetCreatedAt(QDateTime::currentDateTimeUtc());
+	result.SetGeneratorVersion("1.0");
+	QSet<QString> folders;
+	folders << "/path/to/folder1" << "/path/to/folder2";
+	result.SetCreatedFolders(folders);
+
+	// Test serialization
+	iser::CJsonMemWriteArchive writeArchive(nullptr, false);
+	QVERIFY(result.Serialize(writeArchive));
+	QByteArray buffer = writeArchive.GetData();
+	QVERIFY(!buffer.isEmpty());
+
+	// Test deserialization
+	imtsdlgenqml::CSdlQmlGenerationResult loadedResult;
+	iser::CJsonMemReadArchive readArchive(buffer, false);
+	QVERIFY(loadedResult.Serialize(readArchive));
+
+	// Verify data
+	QCOMPARE(loadedResult.GetGeneratorVersion(), result.GetGeneratorVersion());
+	QCOMPARE(loadedResult.GetCreatedFolders(), result.GetCreatedFolders());
+	QCOMPARE(loadedResult.GetCreatedAt().toMSecsSinceEpoch(), result.GetCreatedAt().toMSecsSinceEpoch());
+}
+
+
+void CSdlGenQmlTest::TestGenerationResultFileOperations()
+{
+	QTemporaryDir tempDir;
+	QVERIFY(tempDir.isValid());
+
+	const QString testFilePath = tempDir.path() + "/generation_info.json";
+
+	// Create test data
+	imtsdlgenqml::CSdlQmlGenerationResult result;
+	result.SetCreatedAt(QDateTime::currentDateTimeUtc());
+	result.SetGeneratorVersion("1.0");
+	QSet<QString> folders;
+	folders << tempDir.path() + "/folder1" << tempDir.path() + "/folder2";
+	result.SetCreatedFolders(folders);
+
+	// Test write
+	QVERIFY(imtsdlgenqml::CQmlGenTools::WriteGenerationResultFile(result, testFilePath));
+	QVERIFY(QFile::exists(testFilePath));
+
+	// Test read
+	imtsdlgenqml::CSdlQmlGenerationResult loadedResult;
+	QVERIFY(imtsdlgenqml::CQmlGenTools::ReadGenerationResultFile(loadedResult, testFilePath));
+
+	// Verify data
+	QCOMPARE(loadedResult.GetGeneratorVersion(), result.GetGeneratorVersion());
+	QCOMPARE(loadedResult.GetCreatedFolders(), result.GetCreatedFolders());
+}
+
+
+void CSdlGenQmlTest::TestAppendFoldersWithAutomaticTimestamp()
+{
+	QTemporaryDir tempDir;
+	QVERIFY(tempDir.isValid());
+
+	const QString testFilePath = tempDir.path() + "/generation_info.json";
+
+	// Create initial file with some folders
+	static QString generatorVersion = "1.0";
+	imtsdlgenqml::CSdlQmlGenerationResult initialResult;
+	initialResult.SetCreatedAt(QDateTime::currentDateTimeUtc());
+	initialResult.SetGeneratorVersion(generatorVersion);
+	QSet<QString> initialFolders;
+	initialFolders << tempDir.path() + "/folder1" << tempDir.path() + "/folder2";
+	initialResult.SetCreatedFolders(initialFolders);
+	QVERIFY(imtsdlgenqml::CQmlGenTools::WriteGenerationResultFile(initialResult, testFilePath));
+
+	// Prepare update data with new folders
+	imtsdlgenqml::CSdlQmlGenerationResult updateData;
+	QSet<QString> additionalFolders;
+	additionalFolders << tempDir.path() + "/folder3" << tempDir.path() + "/folder2"; // folder2 is duplicate
+	updateData.SetCreatedFolders(additionalFolders);
+	// Not setting createdAt, so current time should be used
+	
+	QVERIFY(imtsdlgenqml::CQmlGenTools::UpdateGenerationResult(testFilePath, updateData));
+
+	// Read back and verify
+	imtsdlgenqml::CSdlQmlGenerationResult loadedResult;
+	QVERIFY(imtsdlgenqml::CQmlGenTools::ReadGenerationResultFile(loadedResult, testFilePath));
+
+	// Should have all 3 folders (folder2 should not be duplicated)
+	QSet<QString> expectedFolders = initialFolders | additionalFolders;
+	QCOMPARE(loadedResult.GetCreatedFolders(), expectedFolders);
+	QCOMPARE(loadedResult.GetGeneratorVersion(), generatorVersion);
+
+	// Verify timestamp was updated (should be recent)
+	QDateTime now = QDateTime::currentDateTimeUtc();
+	qint64 timeDiffSecs = qAbs(loadedResult.GetCreatedAt().secsTo(now));
+	QVERIFY2(timeDiffSecs < 5, "Timestamp should be updated to current time");
+}
+
+
+void CSdlGenQmlTest::TestAppendFoldersWithSpecificTimestamp()
+{
+	QTemporaryDir tempDir;
+	QVERIFY(tempDir.isValid());
+
+	const QString testFilePath = tempDir.path() + "/generation_info.json";
+
+	// Create initial file with some folders
+	static QString generatorVersion = "1.0";
+	imtsdlgenqml::CSdlQmlGenerationResult initialResult;
+	initialResult.SetCreatedAt(QDateTime::currentDateTimeUtc());
+	initialResult.SetGeneratorVersion(generatorVersion);
+	QSet<QString> initialFolders;
+	initialFolders << tempDir.path() + "/folder1" << tempDir.path() + "/folder2";
+	initialResult.SetCreatedFolders(initialFolders);
+	QVERIFY(imtsdlgenqml::CQmlGenTools::WriteGenerationResultFile(initialResult, testFilePath));
+
+	// Prepare update data with specific timestamp
+	imtsdlgenqml::CSdlQmlGenerationResult updateData;
+	QSet<QString> additionalFolders;
+	additionalFolders << tempDir.path() + "/folder3";
+	updateData.SetCreatedFolders(additionalFolders);
+	QDateTime specificTime = QDateTime::fromString("2024-06-15T14:20:00.000Z", Qt::ISODateWithMs);
+	updateData.SetCreatedAt(specificTime);
+	
+	QVERIFY(imtsdlgenqml::CQmlGenTools::UpdateGenerationResult(testFilePath, updateData));
+	
+	// Read back and verify specific timestamp was used
+	imtsdlgenqml::CSdlQmlGenerationResult loadedResult;
+	QVERIFY(imtsdlgenqml::CQmlGenTools::ReadGenerationResultFile(loadedResult, testFilePath));
+	
+	// Should have all 3 folders now
+	QSet<QString> expectedFolders = initialFolders | additionalFolders;
+	QCOMPARE(loadedResult.GetCreatedFolders(), expectedFolders);
+	QCOMPARE(loadedResult.GetGeneratorVersion(), generatorVersion);
+	
+	// Verify the specific timestamp was used
+	QCOMPARE(loadedResult.GetCreatedAt().toMSecsSinceEpoch(), specificTime.toMSecsSinceEpoch());
+}
+
+
+void CSdlGenQmlTest::TestGenerationResultJsonFormat()
+{
+	// Create test data with known values
+	imtsdlgenqml::CSdlQmlGenerationResult result;
+	result.SetCreatedAt(QDateTime::fromString("2024-01-15T10:30:00.000Z", Qt::ISODateWithMs));
+	result.SetGeneratorVersion("1.0");
+	QSet<QString> folders;
+	folders << "/path/to/folder1" << "/path/to/folder2" << "/path/to/folder3";
+	result.SetCreatedFolders(folders);
+
+	// Serialize to JSON
+	iser::CJsonMemWriteArchive writeArchive(nullptr, false);
+	QVERIFY(result.Serialize(writeArchive));
+	QByteArray actualJson = writeArchive.GetData();
+	QVERIFY(!actualJson.isEmpty());
+
+	// Parse to QJsonDocument and write in indented format (non-compact)
+	QJsonParseError actualParseError;
+	QJsonDocument actualDoc = QJsonDocument::fromJson(actualJson, &actualParseError);
+	QVERIFY2(actualParseError.error == QJsonParseError::NoError, 
+			qPrintable(QString("Failed to parse actual JSON: %1 at offset %2")
+					.arg(actualParseError.errorString())
+					.arg(actualParseError.offset)));
+	QByteArray actualJsonIndented = actualDoc.toJson(QJsonDocument::Indented);
+
+	// Write actual JSON to file in temp output directory
+	const QString actualFilePath = m_tempOutputDir.path() + "/ActualGenerationResult.json";
+	QFile actualFile(actualFilePath);
+	QVERIFY(actualFile.open(QIODevice::WriteOnly | QIODevice::Text));
+	QCOMPARE(actualFile.write(actualJsonIndented), static_cast<qint64>(actualJsonIndented.size()));
+	actualFile.close();
+
+	// Load expected JSON from reference file
+	const QString referenceFilePath = s_testReferenceDataDirectoryPath + "/ExpectedGenerationResult.json";
+	QVERIFY(QFile::exists(referenceFilePath));
+
+	QFile referenceFile(referenceFilePath);
+	QVERIFY(referenceFile.open(QIODevice::ReadOnly | QIODevice::Text));
+	QByteArray expectedJson = referenceFile.readAll();
+	referenceFile.close();
+	QVERIFY(!expectedJson.isEmpty());
+
+	iser::CJsonMemReadArchive readArchive(expectedJson, false);
+	imtsdlgenqml::CSdlQmlGenerationResult expectedResult;
+	QVERIFY(expectedResult.Serialize(readArchive));
+
+	// Compare actual and expected results
+	QVERIFY2(result.IsEqual(expectedResult), "Actual generation result does not match expected result");
 }
 
 

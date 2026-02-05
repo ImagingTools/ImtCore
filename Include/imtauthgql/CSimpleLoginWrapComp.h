@@ -53,6 +53,10 @@ public:
 	virtual bool Login(const QString& userName, const QString& password) override;
 	virtual bool Logout() override;
 
+	// Additional login methods
+	virtual bool LoginWithRefreshToken(const QString& userName, const QByteArray& refreshToken);
+	virtual QByteArray GetRefreshToken() const;
+
 	// reimplemented (iauth::IRightsProvider)
 	virtual bool HasRight(
 				const QByteArray& operationId,
@@ -70,6 +74,7 @@ private:
 	QByteArray m_loggedUserId;
 	QByteArray m_loggedUserPassword;
 	QByteArray m_loggedUserToken;
+	QByteArray m_loggedUserRefreshToken;
 	QByteArrayList m_userPermissionIds;
 	imtauth::IUserInfoSharedPtr m_userInfoPtr;
 	imtgql::IGqlContextSharedPtr m_gqlContextSharedPtr;
