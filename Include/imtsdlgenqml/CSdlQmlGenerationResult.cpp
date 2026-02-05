@@ -12,6 +12,26 @@ namespace imtsdlgenqml
 {
 
 
+// static helpers
+
+/// \workaround ACF doens't support iterable containers serialization yet \todo Remove when supported
+bool SerializeQSetAsQStringList(iser::IArchive& archive, QSet<QString>& container, const QByteArray& tagName, const QByteArray& tagDescription)
+{
+	if (archive.IsStoring()){
+		QStringList list = container.values();
+
+		return iser::CPrimitiveTypesSerializer::SerializeContainer<QStringList>(archive, list, tagName, tagDescription);
+	}
+
+	QStringList list;
+	bool retVal = iser::CPrimitiveTypesSerializer::SerializeContainer<QStringList>(archive, list, tagName, tagDescription);
+	container = QSet<QString>(list.begin(), list.end());
+	
+	return retVal;
+}
+
+
+
 // public methods
 
 
@@ -149,15 +169,7 @@ bool CSdlQmlGenerationResult::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.EndTag(generatorVersionTag);
 	
 	// Serialize QSet<QString> as QStringList for compatibility
-	if (archive.IsStoring()){
-		QStringList foldersList = m_createdFolders.values();
-		retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QStringList>(archive, foldersList, "CreatedFolders", "Set of created folders");
-	}
-	else{
-		QStringList foldersList;
-		retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QStringList>(archive, foldersList, "CreatedFolders", "Set of created folders");
-		m_createdFolders = QSet<QString>(foldersList.begin(), foldersList.end());
-	}
+	SerializeQSetAsQStringList(archive, m_createdFolders, "CreatedFolders", "Set of created folders");
 	
 	return retVal;
 }
