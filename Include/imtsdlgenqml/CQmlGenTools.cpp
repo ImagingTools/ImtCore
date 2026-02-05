@@ -98,7 +98,7 @@ bool CQmlGenTools::WriteGenerationResultFile(CSdlQmlGenerationResult& result, co
 }
 
 
-bool CQmlGenTools::AppendFoldersToGenerationResultFile(const QString& filePath, const QSet<QString>& additionalFolders)
+bool CQmlGenTools::AppendFoldersToGenerationResultFile(const QString& filePath, const CSdlQmlGenerationResult& updateData)
 {
 	// Create lock file to prevent concurrent access
 	QString lockFilePath = filePath + ".lock";
@@ -121,13 +121,17 @@ bool CQmlGenTools::AppendFoldersToGenerationResultFile(const QString& filePath, 
 		}
 	}
 	
-	// Append additional folders to existing set using operator|=
+	// Append additional folders from updateData to existing set using operator|=
 	QSet<QString> existingFolders = result.GetCreatedFolders();
-	existingFolders |= additionalFolders;
+	existingFolders |= updateData.GetCreatedFolders();
 	result.SetCreatedFolders(existingFolders);
 	
-	// Update creation date
-	result.SetCreatedAt(QDateTime::currentDateTimeUtc());
+	// Update creation date: use the one from updateData if valid, otherwise use current UTC time
+	QDateTime creationTime = updateData.GetCreatedAt();
+	if (!creationTime.isValid()){
+		creationTime = QDateTime::currentDateTimeUtc();
+	}
+	result.SetCreatedAt(creationTime);
 	
 	// Write updated result back to file
 	bool success = WriteGenerationResultFile(result, filePath);
