@@ -104,4 +104,64 @@ Write-Host "========================================"
 
 # Execute the main command
 Set-Location C:\app\tests
-& $Command[0] $Command[1..($Command.Length-1)]
+
+# Check if we should run tests automatically based on folder contents
+# If no command provided or default command, auto-detect tests
+if ($Command.Count -eq 0 -or $Command[0] -eq "powershell") {
+    Write-Host "Auto-detecting tests..." -ForegroundColor Yellow
+    
+    $GuiTestsFound = $false
+    $ApiTestsFound = $false
+    
+    # Check for GUI tests (Playwright)
+    if (Test-Path "C:\app\tests\GUI") {
+        $guiFiles = Get-ChildItem -Path "C:\app\tests\GUI" -Filter "*.spec.js" -ErrorAction SilentlyContinue
+        if (-not $guiFiles) {
+            $guiFiles = Get-ChildItem -Path "C:\app\tests\GUI" -Filter "*.spec.ts" -ErrorAction SilentlyContinue
+        }
+        if ($guiFiles) {
+            $GuiTestsFound = $true
+            Write-Host "[OK] Found Playwright tests in GUI folder" -ForegroundColor Green
+        }
+    }
+    
+    # Check for API tests (Postman/Newman)
+    if (Test-Path "C:\app\tests\API") {
+        $apiFiles = Get-ChildItem -Path "C:\app\tests\API" -Filter "*.json" -ErrorAction SilentlyContinue
+        if ($apiFiles) {
+            $ApiTestsFound = $true
+            Write-Host "[OK] Found Postman collections in API folder" -ForegroundColor Green
+        }
+    }
+    
+    # Run tests based on what was found
+    if ($GuiTestsFound -or $ApiTestsFound) {
+        $ExitCode = 0
+        
+        if ($GuiTestsFound) {
+            Write-Host "Running Playwright tests..." -ForegroundColor Yellow
+            & npx playwright test GUI
+            if ($LASTEXITCODE -ne 0) { $ExitCode = $LASTEXITCODE }
+        }
+        
+        if ($ApiTestsFound) {
+            Write-Host "Running Postman tests..." -ForegroundColor Yellow
+            Get-ChildItem -Path "C:\app\tests\API" -Filter "*.json" | ForEach-Object {
+                Write-Host "Running collection: $($_.Name)" -ForegroundColor Yellow
+                & newman run $_.FullName
+                if ($LASTEXITCODE -ne 0) { $ExitCode = $LASTEXITCODE }
+            }
+        }
+        
+        exit $ExitCode
+    } else {
+        Write-Host "No tests found in GUI or API folders" -ForegroundColor Yellow
+        Write-Host "To run tests:" -ForegroundColor Yellow
+        Write-Host "  - Copy Playwright tests to C:\app\tests\GUI\" -ForegroundColor Yellow
+        Write-Host "  - Copy Postman collections to C:\app\tests\API\" -ForegroundColor Yellow
+        exit 0
+    }
+} else {
+    # Run the provided command
+    & $Command[0] $Command[1..($Command.Length-1)]
+}

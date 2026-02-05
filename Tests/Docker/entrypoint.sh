@@ -124,4 +124,59 @@ if [ "${PAUSE_BEFORE_TESTS:-false}" = "true" ]; then
     echo -e "${YELLOW}Attach with: docker compose exec tests sh${NC}"
     sleep infinity
 fi
-exec "$@"
+
+# Check if we should run tests automatically based on folder contents
+# If a command is provided, run it; otherwise, auto-detect tests
+if [ "$#" -eq 0 ] || [ "$1" = "echo" ]; then
+    echo -e "${YELLOW}Auto-detecting tests...${NC}"
+    
+    GUI_TESTS_FOUND=false
+    API_TESTS_FOUND=false
+    
+    # Check for GUI tests (Playwright)
+    if [ -d "/app/tests/GUI" ] && [ "$(ls -A /app/tests/GUI 2>/dev/null)" ]; then
+        if ls /app/tests/GUI/*.spec.js 1> /dev/null 2>&1 || ls /app/tests/GUI/*.spec.ts 1> /dev/null 2>&1; then
+            GUI_TESTS_FOUND=true
+            echo -e "${GREEN}✓ Found Playwright tests in GUI folder${NC}"
+        fi
+    fi
+    
+    # Check for API tests (Postman/Newman)
+    if [ -d "/app/tests/API" ] && [ "$(ls -A /app/tests/API 2>/dev/null)" ]; then
+        if ls /app/tests/API/*.json 1> /dev/null 2>&1; then
+            API_TESTS_FOUND=true
+            echo -e "${GREEN}✓ Found Postman collections in API folder${NC}"
+        fi
+    fi
+    
+    # Run tests based on what was found
+    if [ "$GUI_TESTS_FOUND" = true ] || [ "$API_TESTS_FOUND" = true ]; then
+        EXIT_CODE=0
+        
+        if [ "$GUI_TESTS_FOUND" = true ]; then
+            echo -e "${YELLOW}Running Playwright tests...${NC}"
+            npx playwright test GUI || EXIT_CODE=$?
+        fi
+        
+        if [ "$API_TESTS_FOUND" = true ]; then
+            echo -e "${YELLOW}Running Postman tests...${NC}"
+            for collection in /app/tests/API/*.json; do
+                if [ -f "$collection" ]; then
+                    echo -e "${YELLOW}Running collection: $(basename $collection)${NC}"
+                    newman run "$collection" || EXIT_CODE=$?
+                fi
+            done
+        fi
+        
+        exit $EXIT_CODE
+    else
+        echo -e "${YELLOW}No tests found in GUI or API folders${NC}"
+        echo -e "${YELLOW}To run tests:${NC}"
+        echo -e "${YELLOW}  - Copy Playwright tests to /app/tests/GUI/${NC}"
+        echo -e "${YELLOW}  - Copy Postman collections to /app/tests/API/${NC}"
+        exit 0
+    fi
+else
+    # Run the provided command
+    exec "$@"
+fi

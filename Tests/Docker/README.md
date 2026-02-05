@@ -2,18 +2,27 @@
 
 This directory contains the Docker infrastructure for running tests in containerized environments, supporting both **Linux** and **Windows** containers. This is the **base infrastructure** that should be used by application repositories (like Lisa) to run their tests.
 
+## Key Features
+
+- **Automatic Test Detection**: Container automatically detects and runs tests based on folder contents
+- **Playwright Support**: Pre-installed for GUI/browser testing
+- **Postman/Newman Support**: Pre-installed for API testing
+- **GUI Tests**: Place Playwright tests in `GUI/` folder - automatically detected and run
+- **API Tests**: Place Postman collections in `API/` folder - automatically detected and run
+- **Cross-Platform**: Supports both Linux and Windows containers
+
 ## Overview
 
 The test execution flow is:
 
-1. **Build Docker image** from ImtCore - creates the base test environment
+1. **Build Docker image** from ImtCore - creates the base test environment with Playwright and Newman
 2. **Run container** from application repository (e.g., Lisa) 
 3. **Copy files** from application repository into the running container:
-   - GUI tests (Playwright, Selenium, etc.)
-   - API tests (Postman, REST Client, etc.)
-   - Resources (installers, SQL scripts, config files)
-   - Startup scripts (application initialization)
-4. **Execute tests** in the container
+   - GUI tests (Playwright `.spec.js` or `.spec.ts` files) → `/app/tests/GUI/`
+   - API tests (Postman `.json` collections) → `/app/tests/API/`
+   - Resources (installers, SQL scripts, config files) → `/app/custom-apps/resources/`
+   - Startup scripts (application initialization) → `/app/custom-apps/startup/`
+4. **Tests run automatically**: Container detects tests in GUI and API folders and runs them
 
 ## Directory Structure
 
@@ -172,18 +181,55 @@ docker cp Tests/Docker/Startup/. "$CONTAINER_NAME:/app/custom-apps/startup/"
 # Make scripts executable
 docker exec "$CONTAINER_NAME" chmod +x /app/custom-apps/startup/*.sh
 
-# Run the tests
+# Restart container to run startup scripts and auto-detect tests
 echo "Running tests..."
-docker exec "$CONTAINER_NAME" npm test
+docker restart "$CONTAINER_NAME"
+docker wait "$CONTAINER_NAME"
 
 # Copy test results out
 echo "Copying test results..."
 docker cp "$CONTAINER_NAME:/app/tests/test-results" ./
 
 # Cleanup
-docker stop "$CONTAINER_NAME"
+docker stop "$CONTAINER_NAME" 2>/dev/null || true
 docker rm "$CONTAINER_NAME"
 ```
+
+## Automatic Test Detection
+
+The container automatically detects and runs tests based on the presence of files in specific folders:
+
+### GUI Tests (Playwright)
+- **Location**: `/app/tests/GUI/` (Linux) or `C:\app\tests\GUI\` (Windows)
+- **Detection**: Looks for `*.spec.js` or `*.spec.ts` files
+- **Execution**: Runs `npx playwright test GUI` if tests are found
+
+### API Tests (Postman/Newman)
+- **Location**: `/app/tests/API/` (Linux) or `C:\app\tests\API\` (Windows)
+- **Detection**: Looks for `*.json` files (Postman collections)
+- **Execution**: Runs `newman run <collection>.json` for each collection found
+
+### Example Test Structure
+
+```
+/app/tests/
+├── GUI/
+│   ├── login.spec.js         # Playwright test
+│   ├── dashboard.spec.ts     # Playwright test
+│   └── playwright.config.js  # Optional config
+└── API/
+    ├── user-api.json         # Postman collection
+    └── auth-api.json         # Postman collection
+```
+
+When the container starts (or restarts), it will:
+1. Run startup scripts from `/app/custom-apps/startup/`
+2. Auto-detect tests in GUI and API folders
+3. Run Playwright tests if GUI folder contains `.spec.js` or `.spec.ts` files
+4. Run Newman/Postman tests if API folder contains `.json` files
+5. Exit with appropriate status code
+
+**Note**: If no tests are found, the container will exit successfully with a message.
 
 **Windows script** (`run-tests-in-docker.ps1`):
 
@@ -217,16 +263,17 @@ docker cp Tests/Docker/Resources/. "${ContainerName}:C:\app\custom-apps\resource
 Write-Host "Copying startup scripts..."
 docker cp Tests/Docker/Startup/. "${ContainerName}:C:\app\custom-apps\startup\"
 
-# Run the tests
+# Restart container to run startup scripts and auto-detect tests
 Write-Host "Running tests..."
-docker exec $ContainerName npm.cmd test
+docker restart $ContainerName
+docker wait $ContainerName
 
 # Copy test results out
 Write-Host "Copying test results..."
 docker cp "${ContainerName}:C:\app\tests\test-results" .\
 
 # Cleanup
-docker stop $ContainerName
+docker stop $ContainerName -ErrorAction SilentlyContinue
 docker rm $ContainerName
 ```
 

@@ -24,6 +24,10 @@ RUN choco install -y postgresql --version=16.1
 # Refresh environment variables
 RUN refreshenv
 
+# Install Playwright and Newman (Postman CLI) globally
+RUN npm install -g playwright newman
+RUN npx playwright install --with-deps chromium
+
 # Set working directory
 WORKDIR C:\\app\\tests
 
@@ -49,4 +53,4 @@ ENV POSTGRES_DB=""
 ENTRYPOINT ["powershell", "-File", "C:\\app\\entrypoint.ps1"]
 
 # Default command
-CMD ["powershell", "-Command", "Write-Host 'No tests specified. Copy tests from your application repository and run them.'"]
+CMD []

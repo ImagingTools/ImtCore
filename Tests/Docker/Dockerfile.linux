@@ -81,6 +81,10 @@ RUN set -eux; \
 # Set working directory
 WORKDIR /app/tests
 
+# Install Playwright and Newman (Postman CLI) globally
+RUN npm install -g playwright newman && \
+    npx playwright install --with-deps
+
 # Create directories for tests, results, and custom apps
 # The custom apps directories will be populated by copying from application repos (e.g., Lisa)
 RUN mkdir -p \
@@ -108,4 +112,4 @@ ENV START_POSTGRESQL=false
 ENV POSTGRES_DB=""
 
 ENTRYPOINT ["/app/entrypoint.sh"]
-CMD ["echo", "No tests specified. Copy tests from your application repository and run them."] 
+CMD [] 
