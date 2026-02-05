@@ -8,6 +8,7 @@ module.exports = {
     Text: require("./Text"),
     Row: require("./Row"),
     Column: require("./Column"),
+    Flow: require("./Flow"),
     MouseArea: require("./MouseArea"),
     Animation: require("./Animation"),
     PropertyAnimation: require("./PropertyAnimation"),
