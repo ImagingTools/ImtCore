@@ -257,7 +257,7 @@ void CSdlGenQmlTest::TestGenerationResultFileOperations()
 }
 
 
-void CSdlGenQmlTest::TestAppendFoldersToGenerationResultFile()
+void CSdlGenQmlTest::TestAppendFoldersWithAutomaticTimestamp()
 {
 	QTemporaryDir tempDir;
 	QVERIFY(tempDir.isValid());
@@ -296,27 +296,47 @@ void CSdlGenQmlTest::TestAppendFoldersToGenerationResultFile()
 	QDateTime now = QDateTime::currentDateTimeUtc();
 	qint64 timeDiffSecs = qAbs(loadedResult.GetCreatedAt().secsTo(now));
 	QVERIFY2(timeDiffSecs < 5, "Timestamp should be updated to current time");
-	
-	// Test 2: Append with a specific timestamp
-	imtsdlgenqml::CSdlQmlGenerationResult updateData2;
-	QSet<QString> moreFolders;
-	moreFolders << tempDir.path() + "/folder4";
-	updateData2.SetCreatedFolders(moreFolders);
+}
+
+
+void CSdlGenQmlTest::TestAppendFoldersWithSpecificTimestamp()
+{
+	QTemporaryDir tempDir;
+	QVERIFY(tempDir.isValid());
+
+	const QString testFilePath = tempDir.path() + "/generation_info.json";
+
+	// Create initial file with some folders
+	static QString generatorVersion = "1.0";
+	imtsdlgenqml::CSdlQmlGenerationResult initialResult;
+	initialResult.SetCreatedAt(QDateTime::currentDateTimeUtc());
+	initialResult.SetGeneratorVersion(generatorVersion);
+	QSet<QString> initialFolders;
+	initialFolders << tempDir.path() + "/folder1" << tempDir.path() + "/folder2";
+	initialResult.SetCreatedFolders(initialFolders);
+	QVERIFY(imtsdlgenqml::CQmlGenTools::WriteGenerationResultFile(initialResult, testFilePath));
+
+	// Prepare update data with specific timestamp
+	imtsdlgenqml::CSdlQmlGenerationResult updateData;
+	QSet<QString> additionalFolders;
+	additionalFolders << tempDir.path() + "/folder3";
+	updateData.SetCreatedFolders(additionalFolders);
 	QDateTime specificTime = QDateTime::fromString("2024-06-15T14:20:00.000Z", Qt::ISODateWithMs);
-	updateData2.SetCreatedAt(specificTime);
+	updateData.SetCreatedAt(specificTime);
 	
-	QVERIFY(imtsdlgenqml::CQmlGenTools::AppendFoldersToGenerationResultFile(testFilePath, updateData2));
+	QVERIFY(imtsdlgenqml::CQmlGenTools::AppendFoldersToGenerationResultFile(testFilePath, updateData));
 	
 	// Read back and verify specific timestamp was used
-	imtsdlgenqml::CSdlQmlGenerationResult loadedResult2;
-	QVERIFY(imtsdlgenqml::CQmlGenTools::ReadGenerationResultFile(loadedResult2, testFilePath));
+	imtsdlgenqml::CSdlQmlGenerationResult loadedResult;
+	QVERIFY(imtsdlgenqml::CQmlGenTools::ReadGenerationResultFile(loadedResult, testFilePath));
 	
-	// Should have all 4 folders now
-	QSet<QString> expectedFolders2 = expectedFolders | moreFolders;
-	QCOMPARE(loadedResult2.GetCreatedFolders(), expectedFolders2);
+	// Should have all 3 folders now
+	QSet<QString> expectedFolders = initialFolders | additionalFolders;
+	QCOMPARE(loadedResult.GetCreatedFolders(), expectedFolders);
+	QCOMPARE(loadedResult.GetGeneratorVersion(), generatorVersion);
 	
 	// Verify the specific timestamp was used
-	QCOMPARE(loadedResult2.GetCreatedAt().toMSecsSinceEpoch(), specificTime.toMSecsSinceEpoch());
+	QCOMPARE(loadedResult.GetCreatedAt().toMSecsSinceEpoch(), specificTime.toMSecsSinceEpoch());
 }
 
 
