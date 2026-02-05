@@ -56,7 +56,7 @@ public:
 		\returns true if the operation succeeded, false otherwise
 		\note If updateData contains a valid creation timestamp, it will be used; otherwise, the current UTC time is set
 	*/
-	static bool AppendFoldersToGenerationResultFile(const QString& filePath, const CSdlQmlGenerationResult& updateData);
+	static bool UpdateGenerationResult(const QString& filePath, const CSdlQmlGenerationResult& updateData);
 };
 
 
