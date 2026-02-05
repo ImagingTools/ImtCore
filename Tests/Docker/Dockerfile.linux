@@ -98,8 +98,8 @@ RUN chmod +x /app/entrypoint.sh
 
 # Copy startup scripts and resources from ImtCore (if any exist)
 # These are the base scripts that will be supplemented by application-specific scripts
-COPY Tests/Docker/Startup/ /app/custom-apps/startup/ 2>/dev/null || true
-COPY Tests/Docker/Resources/ /app/custom-apps/resources/ 2>/dev/null || true
+COPY Tests/Docker/Startup/ /app/custom-apps/startup/
+COPY Tests/Docker/Resources/ /app/custom-apps/resources/
 
 # Environment variables (can be overridden at runtime)
 ENV BASE_URL=http://localhost:3000
