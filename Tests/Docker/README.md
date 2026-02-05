@@ -5,10 +5,12 @@ This directory contains the Docker infrastructure for running tests in container
 ## Key Features
 
 - **Automatic Test Detection**: Container automatically detects and runs tests based on folder contents
-- **Playwright Support**: Pre-installed for GUI/browser testing
+- **Playwright Support**: Pre-installed for GUI/browser testing with Verdana fonts
 - **Postman/Newman Support**: Pre-installed for API testing
+- **Playwright Helper**: `utils.js` included with common test utilities (login, screenshots, stability checks)
 - **GUI Tests**: Place Playwright tests in `GUI/` folder - automatically detected and run
 - **API Tests**: Place Postman collections in `API/` folder - automatically detected and run
+- **Example Scripts**: Ready-to-use scripts for Linux and Windows (`run-tests.sh`, `run-tests.ps1`)
 - **Cross-Platform**: Supports both Linux and Windows containers
 
 ## Overview
@@ -34,14 +36,23 @@ Tests/Docker/
 ├── docker-compose.windows.yml# Windows compose configuration
 ├── entrypoint.sh             # Linux startup script
 ├── entrypoint.ps1            # Windows startup script
+├── utils.js                  # Playwright test helper utilities
+├── run-tests.sh              # Example script for Linux
+├── run-tests.ps1             # Example script for Windows
 ├── .dockerignore             # Files to exclude from build
 ├── Resources/                # Base resources from ImtCore
 │   ├── .gitkeep             # Keeps directory in git
 │   └── README.md            # Resources documentation
 ├── Startup/                  # Base startup scripts from ImtCore
 │   └── .gitkeep             # Keeps directory in git
-├── apps-README.md           # Documentation for custom apps
 └── README.md                # This file
+
+Tests/Fonts/
+└── verdana/                  # Verdana font files for Playwright
+    ├── verdana.ttf
+    ├── verdanab.ttf
+    ├── verdanai.ttf
+    └── verdanaz.ttf
 ```
 
 ## Container Structure
@@ -126,6 +137,29 @@ This is the **recommended approach** for most cases as Linux containers are:
 - Work on all platforms (Linux, macOS, Windows)
 
 ## Using from Application Repository (e.g., Lisa)
+
+### Option 1: Use the Provided Example Scripts (Recommended)
+
+ImtCore provides ready-to-use example scripts that you can copy to your application repository:
+
+**Linux:**
+1. Copy `Tests/Docker/run-tests.sh` from ImtCore to your application repository
+2. Customize environment variables at the top of the script if needed
+3. Run: `./run-tests.sh`
+
+**Windows:**
+1. Copy `Tests/Docker/run-tests.ps1` from ImtCore to your application repository
+2. Customize parameters if needed
+3. Run: `.\run-tests.ps1`
+
+The example scripts automatically:
+- Start the Docker container
+- Copy GUI tests, API tests, resources, and startup scripts
+- Install additional dependencies (if package.json exists)
+- Run tests and collect results
+- Clean up the container
+
+### Option 2: Manual Setup
 
 ### Step 1: Build the Base Image
 
@@ -230,6 +264,70 @@ When the container starts (or restarts), it will:
 5. Exit with appropriate status code
 
 **Note**: If no tests are found, the container will exit successfully with a message.
+
+## Playwright Test Utilities (utils.js)
+
+The container includes a pre-installed `utils.js` helper file at `/app/tests/utils.js` (Linux) or `C:\app\tests\utils.js` (Windows) with common Playwright utilities:
+
+### Usage in Your Tests
+
+```javascript
+const { 
+  defaultConfig,
+  delay,
+  reloadPage,
+  clickAt,
+  checkScreenshot,
+  login,
+  waitForPageStability,
+  clickOnPage,
+  clickOnCommand,
+  selectComboBox,
+  fillTextInput,
+  clickOnButton
+} = require('./utils.js');
+
+test('example test', async ({ page }) => {
+  await login(page, 'username', 'password', defaultConfig, {
+    username: ['LoginForm', 'UsernameInput'],
+    password: ['LoginForm', 'PasswordInput'],
+    submit: ['LoginForm', 'LoginButton']
+  });
+  
+  await clickOnPage(page, 'Dashboard');
+  await checkScreenshot(page, 'dashboard.png');
+});
+```
+
+### Available Utilities
+
+- **`defaultConfig`** - Default configuration with timeouts, base URL, screenshot settings
+- **`delay(time)`** - Wait for specified milliseconds
+- **`reloadPage(page, config, url)`** - Reload page and wait for stability
+- **`clickAt(page, x, y, config)`** - Click at coordinates and wait for stability
+- **`clickOnElement(page, path, config)`** - Click on element by objectName path
+- **`clickOnPage(page, pageId, config)`** - Click on menu page button
+- **`clickOnCommand(page, commandId, config)`** - Click on command button
+- **`clickOnButton(page, buttonPath, config)`** - Click on button by path
+- **`fillTextInput(page, text, path, config)`** - Fill text input field
+- **`selectComboBox(page, selectedText, path, config)`** - Select combobox option
+- **`waitForPageStability(page, config)`** - Wait for DOM to stabilize
+- **`checkScreenshot(page, filename, masks, config)`** - Take and compare screenshot
+- **`login(page, username, password, config, loginPaths)`** - Perform login
+
+### Configuration Example
+
+```javascript
+const customConfig = {
+  ...defaultConfig,
+  baseUrl: process.env.BASE_URL || 'http://localhost:3000',
+  timeouts: {
+    delay: 500,
+    locatorWait: 5000,
+    stabilityTotal: 5000,
+  },
+};
+```
 
 **Windows script** (`run-tests-in-docker.ps1`):
 

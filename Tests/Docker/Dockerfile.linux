@@ -78,6 +78,12 @@ RUN set -eux; \
     ; \
     rm -rf /var/lib/apt/lists/*
 
+# Copy Verdana fonts (used by Playwright tests)
+COPY Tests/Fonts/verdana /usr/share/fonts/truetype/verdana
+
+# Rebuild font cache
+RUN fc-cache -f -v
+
 # Set working directory
 WORKDIR /app/tests
 
@@ -99,6 +105,9 @@ RUN mkdir -p \
 # Copy entrypoint script
 COPY Tests/Docker/entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
+
+# Copy utils.js helper for Playwright tests
+COPY Tests/Docker/utils.js /app/tests/utils.js
 
 # Copy startup scripts and resources from ImtCore (if any exist)
 # These are the base scripts that will be supplemented by application-specific scripts
