@@ -2,11 +2,10 @@
 
 
 // Qt includes
-#include <QtCore/qjsondocument.h>
+#include <QtCore/QJsonDocument>
 #include <QtTest/QTest>
 #include <QtCore/QFile>
 #include <QtCore/QTemporaryDir>
-#include <QtCore/QJsonDocument>
 
 // ACF includes
 #include <istd/CSystem.h>
