@@ -8,21 +8,21 @@ Complete Docker test infrastructure for running GUI (Playwright) and API (Postma
 
 **Linux:**
 ```bash
-./Tests/Docker/build-docker-linux.sh
+./Tests/Docker/Scripts/build-docker-linux.sh
 ```
 
 **Windows:**
 ```powershell
-.\Tests\Docker\build-docker-windows.ps1
+.\Tests\Docker\Scripts\build-docker-windows.ps1
 ```
 
 **Linux on Windows** (Docker Desktop in Linux mode):
 ```batch
-.\Tests\Docker\build-docker-linux-on-windows.bat
+.\Tests\Docker\Scripts\build-docker-linux-on-windows.bat
 ```
 Or use Git Bash/WSL:
 ```bash
-./Tests/Docker/build-docker-linux-on-windows.sh
+./Tests/Docker/Scripts/build-docker-linux-on-windows.sh
 ```
 
 ### 2. Run Tests (in your application repository)
@@ -31,25 +31,25 @@ Copy the run script to your application repository and execute:
 
 **Linux:**
 ```bash
-cp /path/to/ImtCore/Tests/Docker/run-tests.sh .
+cp /path/to/ImtCore/Tests/Docker/Scripts/run-tests.sh .
 chmod +x run-tests.sh
 ./run-tests.sh
 ```
 
 **Windows:**
 ```powershell
-Copy-Item "\path\to\ImtCore\Tests\Docker\run-tests.ps1" .
+Copy-Item "\path\to\ImtCore\Tests\Docker\Scripts\run-tests.ps1" .
 .\run-tests.ps1
 ```
 
 **Linux on Windows** (Docker Desktop in Linux mode):
 ```batch
-copy C:\path\to\ImtCore\Tests\Docker\run-tests-linux-on-windows.bat .
+copy C:\path\to\ImtCore\Tests\Docker\Scripts\run-tests-linux-on-windows.bat .
 .\run-tests-linux-on-windows.bat
 ```
 Or use Git Bash/WSL:
 ```bash
-cp /path/to/ImtCore/Tests/Docker/run-tests-linux-on-windows.sh .
+cp /path/to/ImtCore/Tests/Docker/Scripts/run-tests-linux-on-windows.sh .
 chmod +x run-tests-linux-on-windows.sh
 ./run-tests-linux-on-windows.sh
 ```
@@ -68,24 +68,27 @@ chmod +x run-tests-linux-on-windows.sh
 
 ```
 Tests/Docker/
-├── build-docker-linux.sh              # Build script for Linux
-├── build-docker-windows.ps1           # Build script for Windows  
-├── build-docker-linux-on-windows.bat  # Build script for Linux on Windows (native cmd)
-├── build-docker-linux-on-windows.sh   # Build script for Linux on Windows (Git Bash/WSL)
-├── Dockerfile.linux                   # Linux: Node 18 + Playwright + Newman + Fonts
-├── Dockerfile.windows                 # Windows: Node 18 + Playwright + Newman
-├── entrypoint.sh                      # Linux: startup + auto-detection
-├── entrypoint.ps1                     # Windows: startup + auto-detection
-├── utils.js                           # Playwright utilities helper
-├── run-tests.sh                       # Application test runner (Linux)
-├── run-tests.ps1                      # Application test runner (Windows)
-├── run-tests-linux-on-windows.bat    # Application test runner (Linux on Windows - native cmd)
-├── run-tests-linux-on-windows.sh      # Application test runner (Linux on Windows - Git Bash/WSL)
-├── Resources/                         # For application installers, SQL, configs
-└── Startup/                           # For application startup scripts
+├── Scripts/                            # All build and run scripts
+│   ├── build-docker-linux.sh           # Build script for Linux
+│   ├── build-docker-windows.ps1        # Build script for Windows  
+│   ├── build-docker-linux-on-windows.bat  # Build Linux on Windows (native cmd)
+│   ├── build-docker-linux-on-windows.sh   # Build Linux on Windows (Git Bash/WSL)
+│   ├── run-tests.sh                    # Application test runner (Linux)
+│   ├── run-tests.ps1                   # Application test runner (Windows)
+│   ├── run-tests-linux-on-windows.bat  # Test runner (Linux on Windows - native cmd)
+│   └── run-tests-linux-on-windows.sh   # Test runner (Linux on Windows - Git Bash/WSL)
+├── GUI/                                # GUI test utilities
+│   └── utils.js                        # Playwright utilities helper
+├── API/                                # API test utilities (placeholder)
+├── Dockerfile.linux                    # Linux: Node 18 + Playwright + Newman + Fonts
+├── Dockerfile.windows                  # Windows: Node 18 + Playwright + Newman
+├── entrypoint.sh                       # Linux: startup + auto-detection
+├── entrypoint.ps1                      # Windows: startup + auto-detection
+├── Resources/                          # For application installers, SQL, configs
+└── Startup/                            # For application startup scripts
 
 Tests/Fonts/
-└── verdana/                           # Verdana fonts for consistent rendering
+└── verdana/                            # Verdana fonts for consistent rendering
 ```
 
 ## Building Docker Images
@@ -94,7 +97,7 @@ Tests/Fonts/
 
 From ImtCore repository root:
 ```bash
-./Tests/Docker/build-docker-linux.sh
+./Tests/Docker/Scripts/build-docker-linux.sh
 ```
 
 - Runs on Linux, macOS, Windows (via WSL 2)
@@ -122,7 +125,7 @@ From ImtCore repository root:
 
 **Git Bash or WSL:**
 ```bash
-./Tests/Docker/build-docker-linux-on-windows.sh
+./Tests/Docker/Scripts/build-docker-linux-on-windows.sh
 ```
 
 - Checks Docker Desktop is in Linux mode
@@ -289,8 +292,8 @@ exit 1
 ### Permission Denied (Linux)
 
 ```bash
-chmod +x Tests/Docker/build-docker-linux.sh
-chmod +x Tests/Docker/run-tests.sh
+chmod +x Tests/Docker/Scripts/build-docker-linux.sh
+chmod +x Tests/Docker/Scripts/run-tests.sh
 ```
 
 ## Platform Comparison
@@ -323,7 +326,7 @@ jobs:
           path: ImtCore
       
       - name: Build Docker image
-        run: cd ImtCore && ./Tests/Docker/build-docker-linux.sh
+        run: cd ImtCore && ./Tests/Docker/Scripts/build-docker-linux.sh
       
       - name: Run tests
         run: ./run-tests.sh
@@ -333,7 +336,7 @@ jobs:
 
 **For ImtCore:**
 ```bash
-./Tests/Docker/build-docker-linux.sh
+./Tests/Docker/Scripts/build-docker-linux.sh
 ```
 
 **For Applications:**

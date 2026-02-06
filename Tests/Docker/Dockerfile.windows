@@ -39,7 +39,7 @@ RUN powershell -Command New-Item -ItemType Directory -Force -Path C:\app\tests, 
 COPY Tests/Docker/entrypoint.ps1 C:\app\entrypoint.ps1
 
 # Copy utils.js helper for Playwright tests
-COPY Tests/Docker/utils.js C:\app\tests\utils.js
+COPY Tests/Docker/GUI/utils.js C:\app\tests\utils.js
 
 # Copy startup scripts and resources from ImtCore (if any exist)
 # These are the base scripts that will be supplemented by application-specific scripts
