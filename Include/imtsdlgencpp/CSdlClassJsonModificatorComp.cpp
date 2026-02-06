@@ -422,9 +422,6 @@ void CSdlClassJsonModificatorComp::AddUnionFieldValueReadFromObject(
 	}
 
 	const QString unionSourceVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("VariantValue");
-	const imtsdl::ISdlProcessArgumentsParser::TypenameWriteMode typenameMode = 
-		m_argumentParserCompPtr.IsValid() ? m_argumentParserCompPtr->GetTypenameWriteMode() : imtsdl::ISdlProcessArgumentsParser::TWM_IF_REQUIRED;
-
 	WriteUnionConversionFromData(stream,
 								 *unionPtr,
 								 unionSourceVarName,
@@ -437,8 +434,7 @@ void CSdlClassJsonModificatorComp::AddUnionFieldValueReadFromObject(
 								 hIndents,
 								 GetUnionScalarConversionType(),
 								 field.GetId(),
-								 QString(),
-								 typenameMode);
+								 QString());
 }
 
 

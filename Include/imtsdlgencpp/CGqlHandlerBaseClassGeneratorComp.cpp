@@ -347,9 +347,6 @@ void CGqlHandlerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& strea
 	const bool isUnion = GetSdlUnionForField(outputArgument, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
 	if (isUnion){
 		const static QString unionSourceVarName = QStringLiteral("&replyPayload");
-		const imtsdl::ISdlProcessArgumentsParser::TypenameWriteMode typenameMode = 
-			m_argumentParserCompPtr.IsValid() ? m_argumentParserCompPtr->GetTypenameWriteMode() : imtsdl::ISdlProcessArgumentsParser::TWM_IF_REQUIRED;
-
 		CSdlUnionConverter::WriteConversionFromUnion(stream,
 					foundUnion,
 					unionSourceVarName,
@@ -364,8 +361,7 @@ void CGqlHandlerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& strea
 					CSdlUnionConverter::CT_MODEL_SCALAR,
 					QStringLiteral("dataModelPtr->SetData("), //QString(),
 					QStringLiteral("*dataModelPtr"),
-					QStringLiteral("nullptr"),
-					typenameMode);
+					QStringLiteral("nullptr"));
 	}
 	else{
 		// [1] write payload variable in model and create variable, to check if it success

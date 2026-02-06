@@ -741,9 +741,6 @@ void CSdlClassGqlModificatorComp::AddUnionFieldValueReadFromObject(QTextStream& 
 		FeedStream(stream, 1, false);
 	}
 
-	const imtsdl::ISdlProcessArgumentsParser::TypenameWriteMode typenameMode = 
-		m_argumentParserCompPtr.IsValid() ? m_argumentParserCompPtr->GetTypenameWriteMode() : imtsdl::ISdlProcessArgumentsParser::TWM_IF_REQUIRED;
-
 	WriteUnionConversionFromData(stream,
 								 *unionPtr,
 								 unionSourceVarName,
@@ -756,8 +753,7 @@ void CSdlClassGqlModificatorComp::AddUnionFieldValueReadFromObject(QTextStream& 
 								 hIndents,
 								 GetUnionScalarConversionType(),
 								 field.GetId(),
-								 tempDataPtrVarName,
-								 typenameMode);
+								 tempDataPtrVarName);
 }
 
 
