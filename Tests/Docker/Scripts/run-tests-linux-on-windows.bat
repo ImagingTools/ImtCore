@@ -2,20 +2,14 @@
 REM Run tests using Linux containers on Windows
 REM This script is meant to be used from application repositories (e.g., Lisa) on Windows
 REM It runs Linux containers via Docker Desktop (WSL 2 backend)
-REM 
-REM Usage:
-REM   1. Ensure Docker Desktop is in Linux containers mode
-REM   2. Build ImtCore Docker image (using build-docker-linux-on-windows.bat)
-REM   3. Run this script from your application repository
-REM   4. Tests will be executed automatically in the container
 
 setlocal enabledelayedexpansion
 
 REM Configuration
 set CONTAINER_NAME=myapp-tests-%RANDOM%%RANDOM%
 if "%IMAGE_NAME%"=="" set IMAGE_NAME=imtcore-tests:linux
-if "%BASE_URL%"=="" set BASE_URL=http://host.docker.internal:3000
-if "%START_POSTGRESQL%"=="" set START_POSTGRESQL=false
+if "%BASE_URL%"=="" set BASE_URL=http://localhost:7776
+if "%START_POSTGRESQL%"=="" set START_POSTGRESQL=true
 if "%POSTGRES_DB%"=="" set POSTGRES_DB=
 if "%DATABASE_URL%"=="" set DATABASE_URL=
 if "%TEST_USERNAME%"=="" set TEST_USERNAME=
@@ -69,8 +63,7 @@ echo Starting Linux container: %CONTAINER_NAME%
 echo Using image: %IMAGE_NAME%
 echo.
 
-REM Start the container in detached mode
-REM Note: Use host.docker.internal to access Windows host from Linux container
+REM Start container but pause before tests so we can docker cp files in
 docker run -d ^
   --name "%CONTAINER_NAME%" ^
   --add-host=host.docker.internal:host-gateway ^
@@ -81,8 +74,8 @@ docker run -d ^
   -e TEST_USERNAME="%TEST_USERNAME%" ^
   -e TEST_PASSWORD="%TEST_PASSWORD%" ^
   -e CI=true ^
-  "%IMAGE_NAME%" ^
-  sleep infinity
+  -e PAUSE_BEFORE_TESTS=false ^
+  "%IMAGE_NAME%"
 
 if errorlevel 1 (
     echo [91mFailed to start container[0m
@@ -97,7 +90,7 @@ if exist "Tests\GUI" (
     dir /b "Tests\GUI" >nul 2>&1
     if not errorlevel 1 (
         echo Copying GUI tests...
-        docker cp Tests/GUI/. "%CONTAINER_NAME%:/app/tests/GUI/"
+        docker cp "Tests\GUI\." "%CONTAINER_NAME%:/app/tests/GUI/"
     )
 )
 
@@ -106,7 +99,7 @@ if exist "Tests\API" (
     dir /b "Tests\API" >nul 2>&1
     if not errorlevel 1 (
         echo Copying API tests...
-        docker cp Tests/API/. "%CONTAINER_NAME%:/app/tests/API/"
+        docker cp "Tests\API\." "%CONTAINER_NAME%:/app/tests/API/"
     )
 )
 
@@ -115,7 +108,7 @@ if exist "Tests\Docker\Resources" (
     dir /b "Tests\Docker\Resources" >nul 2>&1
     if not errorlevel 1 (
         echo Copying resources...
-        docker cp Tests/Docker/Resources/. "%CONTAINER_NAME%:/app/custom-apps/resources/"
+        docker cp "Tests\Docker\Resources\." "%CONTAINER_NAME%:/app/custom-apps/resources/"
     )
 )
 
@@ -124,7 +117,7 @@ if exist "Tests\Docker\Startup" (
     dir /b "Tests\Docker\Startup" >nul 2>&1
     if not errorlevel 1 (
         echo Copying startup scripts...
-        docker cp Tests/Docker/Startup/. "%CONTAINER_NAME%:/app/custom-apps/startup/"
+        docker cp "Tests\Docker\Startup\." "%CONTAINER_NAME%:/app/custom-apps/startup/"
         REM Make scripts executable
         docker exec "%CONTAINER_NAME%" chmod +x /app/custom-apps/startup/*.sh 2>nul
     )
@@ -133,30 +126,25 @@ if exist "Tests\Docker\Startup" (
 REM Copy playwright.config.js if exists
 if exist "Tests\playwright.config.js" (
     echo Copying playwright.config.js...
-    docker cp Tests/playwright.config.js "%CONTAINER_NAME%:/app/tests/"
+    docker cp "Tests\playwright.config.js" "%CONTAINER_NAME%:/app/tests/"
 )
 
 REM Copy package.json if exists (for additional dependencies)
 if exist "Tests\package.json" (
     echo Copying package.json...
-    docker cp Tests/package.json "%CONTAINER_NAME%:/app/tests/"
+    docker cp "Tests\package.json" "%CONTAINER_NAME%:/app/tests/"
     echo Installing additional dependencies...
     docker exec "%CONTAINER_NAME%" npm install
 )
 
-REM Restart container to trigger automatic test detection and execution
+REM Run tests (entrypoint) and capture exit code from docker exec
 echo Running tests...
-docker restart "%CONTAINER_NAME%"
-
-REM Wait for container to finish
-docker wait "%CONTAINER_NAME%"
-
-REM Get exit code
-for /f "delims=" %%i in ('docker inspect "%CONTAINER_NAME%" --format="{{.State.ExitCode}}"') do set EXIT_CODE=%%i
+docker exec "%CONTAINER_NAME%" sh -lc "export PAUSE_BEFORE_TESTS=false; /app/entrypoint.sh"
+set EXIT_CODE=%ERRORLEVEL%
 
 REM Copy test results out
 echo Copying test results...
-docker cp "%CONTAINER_NAME%:/app/tests/test-results" ./test-results 2>nul || echo No test results to copy
+docker cp "%CONTAINER_NAME%:/app/tests/test-results" .\test-results 2>nul || echo No test results to copy
 
 REM Show logs
 echo ==========================================
@@ -164,10 +152,9 @@ echo Container logs:
 echo ==========================================
 docker logs "%CONTAINER_NAME%"
 
-REM Cleanup
+REM Cleanup (stop + remove container, even if it is still running)
 echo Cleaning up...
-docker stop "%CONTAINER_NAME%" >nul 2>&1
-docker rm "%CONTAINER_NAME%" >nul 2>&1
+docker rm -f "%CONTAINER_NAME%" >nul 2>&1
 
 echo ==========================================
 if "%EXIT_CODE%"=="0" (

@@ -109,14 +109,34 @@ else
 fi
 
 # Step 2: Run custom application installers and startup scripts
-if [ -d "/app/custom-apps" ]; then
+if [ -d "/app/startup" ]; then
     echo -e "${YELLOW}Step 2: Running custom application scripts...${NC}"
+    echo -e "${YELLOW}Startup dir: /app/startup${NC}"
 
-    # Run startup scripts in order (01-*, 02-*, etc.)
-    if [ -d "/app/custom-apps/startup" ]; then
-        # Normalize scripts copied from Windows to avoid UTF-8 BOM / CRLF issues
-        for f in /app/custom-apps/startup/*.sh; do
+    echo -e "${YELLOW}Listing /app/startup:${NC}"
+    ls -la /app/startup || true
+
+    # Normalize scripts copied from Windows to avoid UTF-8 BOM / CRLF issues
+    echo -e "${YELLOW}Normalizing .sh scripts (BOM/CRLF) and setting +x...${NC}"
+    shopt -s nullglob
+    STARTUP_SCRIPTS=(/app/startup/*.sh)
+    shopt -u nullglob
+
+    if [ ${#STARTUP_SCRIPTS[@]} -eq 0 ]; then
+        echo -e "${YELLOW}No startup scripts found: /app/startup/*.sh${NC}"
+    else
+        echo -e "${GREEN}Found ${#STARTUP_SCRIPTS[@]} startup script(s):${NC}"
+        for s in "${STARTUP_SCRIPTS[@]}"; do
+            echo -e "${GREEN}  - $(basename "$s")${NC}"
+        done
+
+        for f in "${STARTUP_SCRIPTS[@]}"; do
             [ -f "$f" ] || continue
+
+            echo -e "${YELLOW}Preparing script: $(basename "$f")${NC}"
+
+            # Show first line to quickly spot wrong shebang/BOM
+            head -n 1 "$f" 2>/dev/null | sed 's/\r$//' || true
 
             # Remove UTF-8 BOM if present (EF BB BF)
             sed -i '1s/^\xEF\xBB\xBF//' "$f" || true
@@ -127,19 +147,17 @@ if [ -d "/app/custom-apps" ]; then
             chmod +x "$f" || true
         done
 
-        shopt -s nullglob
-        for startup_script in /app/custom-apps/startup/*.sh; do
-            if [ -f "$startup_script" ] && [ -x "$startup_script" ]; then
-                echo -e "${YELLOW}Running startup script: $(basename "$startup_script")${NC}"
-                /bin/bash "$startup_script"
-            fi
+        echo -e "${YELLOW}Executing startup scripts in lexicographic order...${NC}"
+        for startup_script in "${STARTUP_SCRIPTS[@]}"; do
+            echo -e "${YELLOW}Running startup script: $(basename "$startup_script")${NC}"
+            /bin/bash "$startup_script"
+            echo -e "${GREEN}Finished: $(basename "$startup_script") (exit=$?)${NC}"
         done
-        shopt -u nullglob
     fi
 
     echo -e "${GREEN}✓ Custom applications initialized${NC}"
 else
-    echo -e "${YELLOW}Step 2: No custom applications to start (/app/custom-apps not found)${NC}"
+    echo -e "${YELLOW}Step 2: No custom applications to start (/app/startup not found)${NC}"
 fi
 
 # Step 3: Run tests or custom command
@@ -154,7 +172,6 @@ if [ "${PAUSE_BEFORE_TESTS:-false}" = "true" ]; then
     sleep infinity
 fi
 
-# Check if we should run tests automatically based on folder contents
 # If a command is provided, run it; otherwise, auto-detect tests
 if [ "$#" -eq 0 ] || [ "$1" = "echo" ]; then
     echo -e "${YELLOW}Auto-detecting tests...${NC}"
@@ -162,39 +179,61 @@ if [ "$#" -eq 0 ] || [ "$1" = "echo" ]; then
     GUI_TESTS_FOUND=false
     API_TESTS_FOUND=false
 
-    # Check for GUI tests (Playwright)
+    # Check for GUI tests (Playwright) - recursive, supports *.spec.* and *.test.*
     if [ -d "/app/tests/GUI" ] && [ "$(ls -A /app/tests/GUI 2>/dev/null)" ]; then
-        if ls /app/tests/GUI/*.spec.js 1> /dev/null 2>&1 || ls /app/tests/GUI/*.spec.ts 1> /dev/null 2>&1; then
+        if find /app/tests/GUI -type f \( -name "*.spec.js" -o -name "*.spec.ts" -o -name "*.test.js" -o -name "*.test.ts" \) | grep -q .; then
             GUI_TESTS_FOUND=true
             echo -e "${GREEN}✓ Found Playwright tests in GUI folder${NC}"
         fi
     fi
 
     # Check for API tests (Postman/Newman)
+    # We'll detect collections + environments separately.
     if [ -d "/app/tests/API" ] && [ "$(ls -A /app/tests/API 2>/dev/null)" ]; then
-        if ls /app/tests/API/*.json 1> /dev/null 2>&1; then
+        if find /app/tests/API -type f -name "*collection*.json" | grep -q .; then
             API_TESTS_FOUND=true
             echo -e "${GREEN}✓ Found Postman collections in API folder${NC}"
         fi
     fi
 
-    # Run tests based on what was found
     if [ "$GUI_TESTS_FOUND" = true ] || [ "$API_TESTS_FOUND" = true ]; then
         EXIT_CODE=0
 
         if [ "$GUI_TESTS_FOUND" = true ]; then
-            echo -e "${YELLOW}Running Playwright tests...${NC}"
-            npx playwright test GUI || EXIT_CODE=$?
+            echo -e "${YELLOW}Preparing Playwright dependencies...${NC}"
+            if [ -f "/app/tests/package.json" ]; then
+                if [ -f "/app/tests/package-lock.json" ]; then
+                    (cd /app/tests && npm ci) || EXIT_CODE=$?
+                else
+                    (cd /app/tests && npm install) || EXIT_CODE=$?
+                fi
+            else
+                echo -e "${RED}No /app/tests/package.json found. Cannot install @playwright/test.${NC}"
+                EXIT_CODE=1
+            fi
+
+            if [ "$EXIT_CODE" -eq 0 ]; then
+                echo -e "${YELLOW}Running Playwright tests...${NC}"
+                (cd /app/tests && npx playwright test) || EXIT_CODE=$?
+            fi
         fi
 
         if [ "$API_TESTS_FOUND" = true ]; then
             echo -e "${YELLOW}Running Postman tests...${NC}"
-            for collection in /app/tests/API/*.json; do
-                if [ -f "$collection" ]; then
-                    echo -e "${YELLOW}Running collection: $(basename "$collection")${NC}"
-                    newman run "$collection" || EXIT_CODE=$?
-                fi
-            done
+
+            # Use first environment file if exists (optional)
+            ENV_OPT=""
+            ENV_FILE="$(find /app/tests/API -type f -name "*environment*.json" | head -n 1 || true)"
+            if [ -n "$ENV_FILE" ]; then
+                ENV_OPT="-e $ENV_FILE"
+                echo -e "${YELLOW}Using environment: $(basename "$ENV_FILE")${NC}"
+            fi
+
+            while IFS= read -r -d '' collection; do
+                echo -e "${YELLOW}Running collection: $(basename "$collection")${NC}"
+                # shellcheck disable=SC2086
+                newman run "$collection" $ENV_OPT || EXIT_CODE=$?
+            done < <(find /app/tests/API -type f -name "*collection*.json" -print0)
         fi
 
         exit $EXIT_CODE
@@ -206,6 +245,5 @@ if [ "$#" -eq 0 ] || [ "$1" = "echo" ]; then
         exit 0
     fi
 else
-    # Run the provided command
     exec "$@"
 fi
