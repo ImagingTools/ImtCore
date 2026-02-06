@@ -329,9 +329,6 @@ void CObjectModificatorCompBase::AddScalarFieldWriteToObjectCode(QTextStream& st
 		[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
 		Q_ASSERT(found);
 
-		const imtsdl::ISdlProcessArgumentsParser::TypenameWriteMode typenameMode = 
-			m_argumentParserCompPtr.IsValid() ? m_argumentParserCompPtr->GetTypenameWriteMode() : imtsdl::ISdlProcessArgumentsParser::TWM_IF_REQUIRED;
-
 		WriteConversionFromUnion(
 			stream,
 			foundUnion,
@@ -347,8 +344,7 @@ void CObjectModificatorCompBase::AddScalarFieldWriteToObjectCode(QTextStream& st
 			GetUnionScalarConversionType(),
 			QString(),
 			QString(),
-			QStringLiteral("false"),
-			typenameMode);
+			QStringLiteral("false"));
 	}
 	else{
 		FeedStreamHorizontally(stream, hIndents);
@@ -530,9 +526,6 @@ void CObjectModificatorCompBase::AddArrayFieldWriteToObjectImplCode(
 
 		const QString unionSourceVarName = variableName + QStringLiteral(".GetPtr()");
 
-		const imtsdl::ISdlProcessArgumentsParser::TypenameWriteMode typenameMode = 
-			m_argumentParserCompPtr.IsValid() ? m_argumentParserCompPtr->GetTypenameWriteMode() : imtsdl::ISdlProcessArgumentsParser::TWM_IF_REQUIRED;
-
 		WriteConversionFromUnion(stream,
 			sdlUnion,
 			unionSourceVarName,
@@ -547,8 +540,7 @@ void CObjectModificatorCompBase::AddArrayFieldWriteToObjectImplCode(
 			GetUnionArrayConversionType(),
 			QString(),
 			QString(),
-			QStringLiteral("false"),
-			typenameMode);
+			QStringLiteral("false"));
 	}
 
 	// inLoop: add item
@@ -789,9 +781,6 @@ void CObjectModificatorCompBase::AddFieldValueReadFromObject(QTextStream& stream
 		[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
 		Q_ASSERT(found);
 
-		const imtsdl::ISdlProcessArgumentsParser::TypenameWriteMode typenameMode = 
-			m_argumentParserCompPtr.IsValid() ? m_argumentParserCompPtr->GetTypenameWriteMode() : imtsdl::ISdlProcessArgumentsParser::TWM_IF_REQUIRED;
-
 		WriteUnionConversionFromData(stream,
 			foundUnion,
 			unionSourceVarName,
@@ -804,8 +793,7 @@ void CObjectModificatorCompBase::AddFieldValueReadFromObject(QTextStream& stream
 			hhIndents,
 			GetUnionScalarConversionType(),
 			field.GetId(),
-			QString(),
-			typenameMode);
+			QString());
 	}
 
 	if(!isStrict){
@@ -1055,9 +1043,6 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 		stream << ' ' << dataVarName << QStringLiteral(";");
 		FeedStream(stream, 1, false);
 
-		const imtsdl::ISdlProcessArgumentsParser::TypenameWriteMode typenameMode = 
-			m_argumentParserCompPtr.IsValid() ? m_argumentParserCompPtr->GetTypenameWriteMode() : imtsdl::ISdlProcessArgumentsParser::TWM_IF_REQUIRED;
-
 		WriteUnionConversionFromData(
 			stream,
 			foundUnion,
@@ -1071,8 +1056,7 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 			hIndents + 1,
 			GetUnionArrayConversionType(),
 			GetDecapitalizedValue(field.GetId()),
-			unionSourceVarName,
-			typenameMode);
+			unionSourceVarName);
 
 		FeedStreamHorizontally(stream, hIndents + 1);
 		stream << field.GetId();
