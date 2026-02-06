@@ -140,6 +140,51 @@ bool CObjectModificatorCompBase::ProcessSourceClassFile(const imtsdl::CSdlType& 
 	ofStream << '{';
 	FeedStream(ofStream, 1, false);
 
+	// Write __typename for the type itself based on typename mode
+	const imtsdl::ISdlProcessArgumentsParser::TypenameWriteMode typenameMode = 
+		m_argumentParserCompPtr.IsValid() ? m_argumentParserCompPtr->GetTypenameWriteMode() : imtsdl::ISdlProcessArgumentsParser::TWM_IF_REQUIRED;
+	
+	bool shouldWriteTypename = false;
+	switch (typenameMode)
+	{
+	case imtsdl::ISdlProcessArgumentsParser::TWM_ALWAYS:
+		shouldWriteTypename = true;
+		break;
+	case imtsdl::ISdlProcessArgumentsParser::TWM_IF_REQUIRED:
+		shouldWriteTypename = false; // Non-union types don't require __typename by default
+		break;
+	case imtsdl::ISdlProcessArgumentsParser::TWM_NEVER:
+		shouldWriteTypename = false;
+		break;
+	}
+
+	if (shouldWriteTypename){
+		FeedStreamHorizontally(ofStream);
+		ofStream << GetContainerObjectVariableName();
+		
+		// Different syntax for different modificators
+		const QString containerClass = GetContainerObjectClassName();
+		if (containerClass.contains(QStringLiteral("QJsonObject"))){
+			// JSON: jsonObject["__typename"] = "TypeName";
+			ofStream << QStringLiteral("[\"__typename\"] = \"");
+			ofStream << sdlType.GetName();
+			ofStream << QStringLiteral("\";");
+		}
+		else if (containerClass.contains(QStringLiteral("CGqlParamObject"))){
+			// GraphQL: gqlObject.InsertParam("__typename", QVariant("TypeName"));
+			ofStream << QStringLiteral(".InsertParam(\"__typename\", QVariant(\"");
+			ofStream << sdlType.GetName();
+			ofStream << QStringLiteral("\"));");
+		}
+		else if (containerClass.contains(QStringLiteral("CTreeItemModel"))){
+			// Model: model.SetData("__typename", "TypeName", modelIndex);
+			ofStream << QStringLiteral(".SetData(\"__typename\", \"");
+			ofStream << sdlType.GetName();
+			ofStream << QStringLiteral("\", modelIndex);");
+		}
+		FeedStream(ofStream, 1, false);
+	}
+
 	// add write logic for each field
 	for (const imtsdl::CSdlField& field: sdlType.GetFields()){
 		AddFieldWriteToObjectCode(ofStream, field, false);
