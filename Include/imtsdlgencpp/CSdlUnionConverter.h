@@ -6,6 +6,7 @@
 
 // ImtCore includes
 #include <imtsdl/imtsdl.h>
+#include <imtsdl/ISdlProcessArgumentsParser.h>
 #include <imtsdl/ISdlTypeListProvider.h>
 #include <imtsdl/ISdlEnumListProvider.h>
 #include <imtsdl/ISdlUnionListProvider.h>
@@ -48,7 +49,8 @@ public:
 				const ConversionType& conversionType = CT_MODEL_SCALAR,
 				const QString& addCommand = QString(),
 				const QString& customModelTarget = QString(),
-				const QString& returnOnFail = QStringLiteral("false"));
+				const QString& returnOnFail = QStringLiteral("false"),
+				imtsdl::ISdlProcessArgumentsParser::TypenameWriteMode typenameWriteMode = imtsdl::ISdlProcessArgumentsParser::TWM_IF_REQUIRED);
 	static void WriteUnionConversionFromData(
 				QTextStream& stream,
 				const imtsdl::CSdlUnion& sdlUnion,
@@ -62,7 +64,8 @@ public:
 				uint hIndents = 1,
 				const ConversionType& conversionType = CT_MODEL_SCALAR,
 				const QString& targetName = QString(),
-				const QString& arraySourceVariableName = QString());
+				const QString& arraySourceVariableName = QString(),
+				imtsdl::ISdlProcessArgumentsParser::TypenameWriteMode typenameWriteMode = imtsdl::ISdlProcessArgumentsParser::TWM_IF_REQUIRED);
 };
 
 

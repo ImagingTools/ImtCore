@@ -56,6 +56,7 @@ public:
 	virtual QString GetTemplateOutputPath() const override;
 	virtual QString GetTemplateQmlOutputPath() const override;
 	virtual CppGenerationMode GetCppGenerationMode() const override;
+	virtual TypenameWriteMode GetTypenameWriteMode() const override;
 
 	// reimplemented (imtsdl::ISdlEditableProcessArgumentsParser)
 	virtual bool ReadFromSettings(const QString& settingsFilePath) override;
@@ -79,6 +80,7 @@ public:
 	virtual void SetTemplateEnabled(bool enabled) override;
 	virtual void SetTemplateIncludePath(const QString& templateIncludePath) override;
 	virtual void SetTemplateOutputPath(const QString& templateOutputPath) override;
+	virtual void SetTypenameWriteMode(TypenameWriteMode mode) override;
 
 
 protected:
@@ -123,6 +125,7 @@ private:
 	QString m_outputQmlDirTemplate;
 	QString m_includePathTemplate;
 	std::optional<CppGenerationMode> m_cppGenerationMode;
+	std::optional<TypenameWriteMode> m_typenameWriteMode;
 };
 
 
