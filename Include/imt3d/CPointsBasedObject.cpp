@@ -569,10 +569,8 @@ int CPointsBasedObject::GetPointBytesSize(PointFormat pointFormat)
 	case IPointsBasedObject::PF_XYZW_RGBA_32:
 		return sizeof(PointXyzwRgba32);
 	default:
-		break;
+		return 0;
 	}
-
-	return 0;
 }
 
 
