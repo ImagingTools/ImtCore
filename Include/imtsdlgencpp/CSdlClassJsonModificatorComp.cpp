@@ -444,6 +444,15 @@ void CSdlClassJsonModificatorComp::AddUnionFieldValueWriteToObject(QTextStream& 
 }
 
 
+void CSdlClassJsonModificatorComp::WriteTypenameToObjectCode(QTextStream& stream, const imtsdl::CSdlType& sdlType) const 
+{
+	stream << GetContainerObjectVariableName();
+	stream << QStringLiteral("[\"__typename\"] = \"");
+	stream << sdlType.GetName();
+	stream << "\";";
+}
+
+
 // private methods
 
 QString CSdlClassJsonModificatorComp::GetConvertEndForFieldString(const imtsdl::CSdlField& field, bool forType) const

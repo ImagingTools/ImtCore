@@ -118,6 +118,10 @@ bool CConfigReader::ReadFromFile(const QString& filePath)
 	SetVariableFromConfig(configuration, QStringLiteral("GQL"), gqlEnabled);
 	SetVariableFromConfig(configuration, QStringLiteral("schema-dependencies"), schemaDependencyModeEnabled);
 	SetVariableFromConfig(configuration, QStringLiteral("generate-module"), generateMode);
+	
+	if (!SetEnumVariableFromConfig(configuration, QStringLiteral("typename-mode"), typenameWriteMode)){
+		return false;
+	}
 
 	if (!SetEnumVariableFromConfig(configuration, QStringLiteral("generator"), generatorType)){
 		return false;

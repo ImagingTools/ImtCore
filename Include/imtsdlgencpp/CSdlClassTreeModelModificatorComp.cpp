@@ -58,6 +58,18 @@ bool CSdlClassTreeModelModificatorComp::ProcessSourceClassFile(const imtsdl::CSd
 	ofStream << QStringLiteral("::CTreeItemModel& model, int modelIndex) const\n{");
 	FeedStream(ofStream, 1, false);
 
+	// Write __typename for the type itself based on typename mode
+	const imtsdl::ISdlProcessArgumentsParser::TypenameWriteMode typenameMode = 
+		m_argumentParserCompPtr.IsValid() ? m_argumentParserCompPtr->GetTypenameWriteMode() : imtsdl::ISdlProcessArgumentsParser::TWM_IF_REQUIRED;
+	
+	if (typenameMode == imtsdl::ISdlProcessArgumentsParser::TWM_ALWAYS){
+		FeedStreamHorizontally(ofStream);
+		ofStream << QStringLiteral("model.SetData(\"__typename\", \"");
+		ofStream << sdlType.GetName();
+		ofStream << QStringLiteral("\", modelIndex);");
+		FeedStream(ofStream, 2, false);
+	}
+
 	// add write logic for each field
 	for (const imtsdl::CSdlField& field: sdlType.GetFields()){
 		AddFieldWriteToModelCode(ofStream, field, sdlType, false);

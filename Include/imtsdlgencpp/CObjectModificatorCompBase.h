@@ -224,6 +224,14 @@ protected:
 	 */
 	virtual bool AddContainerListAccessCode(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, quint16 horizontalIndents, ListAccessResult& result) const = 0;
 
+	/*!
+		\brief Writes code that writes the typename to an object
+		\code // example of C++ generated code
+			jsonObject["__typename"] = QStringLiteral("TypeName");
+		\endcode
+	*/
+	virtual void WriteTypenameToObjectCode(QTextStream& stream, const imtsdl::CSdlType& sdlType) const = 0;
+
 	virtual CSdlUnionConverter::ConversionType GetUnionScalarConversionType() const = 0;
 	virtual CSdlUnionConverter::ConversionType GetUnionArrayConversionType() const = 0;
 
