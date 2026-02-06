@@ -47,6 +47,7 @@ Item {
 	property bool headerRightClickEnabled: true;
 	property bool commandsPanelVisible: true
 	property bool loadingDataAfterHeadersReceived: true
+	property bool backgroundUpdatesEnabled: false
 
 	property alias canResetFilters: container.canResetFilters;
 	property int metaInfoWidth: Style.sizeHintXXS;
@@ -399,7 +400,7 @@ Item {
 		}
 
 		function doUpdateGui(){
-			if (!visible){
+			if (!root.backgroundUpdatesEnabled && !visible){
 				internal.updateGuiRequired = true
 				return
 			}
