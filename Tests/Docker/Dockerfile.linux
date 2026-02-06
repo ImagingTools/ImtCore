@@ -110,6 +110,7 @@ RUN chmod +x /app/entrypoint.sh
 COPY Tests/Docker/GUI/utils.js /app/tests/GUI/utils.js
 COPY Tests/Docker/GUI/playwright.config.js /app/tests/playwright.config.js
 COPY Tests/Docker/GUI/package.json /app/tests/package.json
+COPY Tests/Docker/GUI/global-setup.js /app/tests/global-setup.js
 
 # Note: Startup scripts and resources should be copied from application repos (e.g., Lisa)
 # when running the container. The /app/custom-apps directories are created above but

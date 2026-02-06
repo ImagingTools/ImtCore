@@ -1,5 +1,5 @@
 const { chromium } = require('@playwright/test');
-const { waitForPageStability, login } = require('./utils');
+const { waitForPageStability, login } = require('./GUI/utils');
 
 module.exports = async (config) => {
   const use = config?.projects?.[0]?.use || {};
