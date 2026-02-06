@@ -8,11 +8,9 @@
 # Application URL (use localhost for native Windows containers)
 $env:BASE_URL = "http://localhost:8080"
 
-# PostgreSQL database name (Note: PostgreSQL typically not available in Windows containers)
-$env:POSTGRES_DB = ""
-
-# PostgreSQL password (default: root)
-$env:POSTGRES_PASSWORD = "root"
+# PostgreSQL password (optional, default: "root" if not set)
+# Uncomment and set if you need a different password:
+# $env:POSTGRES_PASSWORD = "your_password"
 
 # Test credentials
 $env:TEST_USERNAME = "test@example.com"

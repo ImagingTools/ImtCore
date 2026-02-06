@@ -9,11 +9,9 @@ REM ==========================================
 REM Application URL (use host.docker.internal to access Windows host)
 set BASE_URL=http://host.docker.internal:7776
 
-REM PostgreSQL database name
-set POSTGRES_DB=myapp_test
-
-REM PostgreSQL password (default: root)
-set POSTGRES_PASSWORD=root
+REM PostgreSQL password (optional, default: "root" if not set)
+REM Uncomment and set if you need a different password:
+REM set POSTGRES_PASSWORD=your_password
 
 REM Test credentials
 set TEST_USERNAME=test@example.com

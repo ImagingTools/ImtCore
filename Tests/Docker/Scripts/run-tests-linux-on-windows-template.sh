@@ -9,11 +9,9 @@
 # Application URL (use host.docker.internal to access Windows host)
 export BASE_URL="http://host.docker.internal:7776"
 
-# PostgreSQL database name
-export POSTGRES_DB="myapp_test"
-
-# PostgreSQL password (default: root)
-export POSTGRES_PASSWORD="root"
+# PostgreSQL password (optional, default: "root" if not set)
+# Uncomment and set if you need a different password:
+# export POSTGRES_PASSWORD="your_password"
 
 # Test credentials
 export TEST_USERNAME="test@example.com"
