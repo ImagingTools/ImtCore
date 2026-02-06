@@ -1,53 +1,15 @@
 #!/bin/bash
-# Run tests using Linux containers on Windows
+# Wrapper script - calls the core script with default/example configuration
+# For production use in application repos, copy run-tests-linux-on-windows-template.sh instead
 
-set -e
+# Set defaults if not already set
+export IMAGE_NAME="${IMAGE_NAME:-imtcore-tests:linux}"
+export START_POSTGRESQL="${START_POSTGRESQL:-true}"
 
-CONTAINER_NAME="myapp-tests-$(date +%s)"
-IMAGE_NAME="${IMAGE_NAME:-imtcore-tests:linux}"
-BASE_URL="${BASE_URL:-http://host.docker.internal:3000}"
-START_POSTGRESQL="${START_POSTGRESQL:-false}"
-POSTGRES_DB="${POSTGRES_DB:-}"
-DATABASE_URL="${DATABASE_URL:-}"
-TEST_USERNAME="${TEST_USERNAME:-}"
-TEST_PASSWORD="${TEST_PASSWORD:-}"
-
-echo "=========================================="
-echo "Running Linux containers on Windows"
-echo "=========================================="
-
-if ! command -v docker &> /dev/null; then
-    echo "Error: Docker is not installed or not in PATH"
-    exit 1
-fi
-
-echo "Checking Docker Desktop mode..."
-OS_TYPE=$(docker info --format '{{.OSType}}' 2>/dev/null)
-
-if [ "$OS_TYPE" != "linux" ]; then
-    echo ""
-    echo "Docker Desktop is in Windows containers mode!"
-    echo ""
-    exit 1
-fi
-
-echo "✓ Docker Desktop is in Linux containers mode"
-echo ""
-
-if ! docker image inspect "$IMAGE_NAME" &> /dev/null; then
-    echo "Error: Docker image '$IMAGE_NAME' not found"
-    exit 1
-fi
-
-echo "Starting Linux container: $CONTAINER_NAME"
-echo "Using image: $IMAGE_NAME"
-echo ""
-
-# Start container but pause before running tests so we can copy app-specific files in
-docker run -d \
-  --name "$CONTAINER_NAME" \
-  --add-host=host.docker.internal:host-gateway \
-  -e BASE_URL="$BASE_URL" \
+# Call the core script from the same directory
+SCRIPT_DIR="$(dirname "$0")"
+bash "$SCRIPT_DIR/run-tests-linux-on-windows-core.sh"
+exit $?
   -e START_POSTGRESQL="$START_POSTGRESQL" \
   -e POSTGRES_DB="$POSTGRES_DB" \
   -e DATABASE_URL="$DATABASE_URL" \
