@@ -23,12 +23,22 @@ REM ==========================================
 REM DO NOT MODIFY BELOW THIS LINE
 REM ==========================================
 
-REM Check if IMTCOREDIR environment variable is set
+REM Determine ImtCore directory
 if "%IMTCOREDIR%"=="" (
-  echo ERROR: IMTCOREDIR environment variable is not set.
-  echo Please set it to the path of your ImtCore directory:
-  echo   set IMTCOREDIR=C:\path\to\ImtCore
-  exit /b 1
+  REM If IMTCOREDIR is not set, assume ImtCore is at the same level as the application
+  set SCRIPT_DIR=%~dp0
+  REM Go up to application root (assuming script is in App\Tests\)
+  for %%I in ("%SCRIPT_DIR%..") do set APP_ROOT=%%~fI
+  REM Assume ImtCore is at same level as application
+  if exist "%APP_ROOT%\..\ImtCore\Tests\Docker\Scripts\run-tests-linux-on-windows-core.bat" (
+    for %%I in ("%APP_ROOT%\..\ImtCore") do set IMTCOREDIR=%%~fI
+  ) else (
+    echo ERROR: IMTCOREDIR environment variable is not set and ImtCore not found at expected location.
+    echo Please either:
+    echo   1. Set IMTCOREDIR environment variable: set IMTCOREDIR=C:\path\to\ImtCore
+    echo   2. Place ImtCore at the same level as your application directory
+    exit /b 1
+  )
 )
 
 REM Validate ImtCore path

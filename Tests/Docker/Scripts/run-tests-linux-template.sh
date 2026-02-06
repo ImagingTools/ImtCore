@@ -23,12 +23,22 @@ export TEST_PASSWORD="testpassword"
 # DO NOT MODIFY BELOW THIS LINE
 # ==========================================
 
-# Check if IMTCOREDIR environment variable is set
+# Determine ImtCore directory
 if [ -z "$IMTCOREDIR" ]; then
-    echo "ERROR: IMTCOREDIR environment variable is not set."
-    echo "Please set it to the path of your ImtCore directory:"
-    echo "  export IMTCOREDIR=/path/to/ImtCore"
-    exit 1
+    # If IMTCOREDIR is not set, assume ImtCore is at the same level as the application
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    # Go up to application root (assuming script is in App/Tests/)
+    APP_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+    # Assume ImtCore is at same level as application
+    IMTCOREDIR="$(cd "$APP_ROOT/../ImtCore" 2>/dev/null && pwd)"
+    
+    if [ -z "$IMTCOREDIR" ]; then
+        echo "ERROR: IMTCOREDIR environment variable is not set and ImtCore not found at expected location."
+        echo "Please either:"
+        echo "  1. Set IMTCOREDIR environment variable: export IMTCOREDIR=/path/to/ImtCore"
+        echo "  2. Place ImtCore at the same level as your application directory"
+        exit 1
+    fi
 fi
 
 # Validate ImtCore path

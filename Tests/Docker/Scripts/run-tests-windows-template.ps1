@@ -22,12 +22,24 @@ $env:TEST_PASSWORD = "testpassword"
 # DO NOT MODIFY BELOW THIS LINE
 # ==========================================
 
-# Check if IMTCOREDIR environment variable is set
+# Determine ImtCore directory
 if (-not $env:IMTCOREDIR) {
-    Write-Host "ERROR: IMTCOREDIR environment variable is not set."
-    Write-Host "Please set it to the path of your ImtCore directory:"
-    Write-Host '  $env:IMTCOREDIR = "C:\path\to\ImtCore"'
-    exit 1
+    # If IMTCOREDIR is not set, assume ImtCore is at the same level as the application
+    $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+    # Go up to application root (assuming script is in App\Tests\)
+    $AppRoot = Split-Path -Parent $ScriptDir
+    # Assume ImtCore is at same level as application
+    $ImtCoreCandidate = Join-Path (Split-Path -Parent $AppRoot) "ImtCore"
+    
+    if (Test-Path (Join-Path $ImtCoreCandidate "Tests\Docker\Scripts\run-tests-windows-core.ps1")) {
+        $env:IMTCOREDIR = $ImtCoreCandidate
+    } else {
+        Write-Host "ERROR: IMTCOREDIR environment variable is not set and ImtCore not found at expected location."
+        Write-Host "Please either:"
+        Write-Host '  1. Set IMTCOREDIR environment variable: $env:IMTCOREDIR = "C:\path\to\ImtCore"'
+        Write-Host "  2. Place ImtCore at the same level as your application directory"
+        exit 1
+    }
 }
 
 # Validate ImtCore path
