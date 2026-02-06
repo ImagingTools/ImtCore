@@ -38,6 +38,9 @@ RUN powershell -Command New-Item -ItemType Directory -Force -Path C:\app\tests, 
 # Copy entrypoint script
 COPY Tests/Docker/entrypoint.ps1 C:\app\entrypoint.ps1
 
+# Copy copy-and-run script (for direct docker run from applications)
+COPY Tests/Docker/copy-and-run.ps1 C:\app\copy-and-run.ps1
+
 # Copy GUI utilities (utils.js and playwright.config.js) for Playwright tests
 COPY Tests/Docker/GUI/utils.js C:\app\tests\GUI\utils.js
 COPY Tests/Docker/GUI/playwright.config.js C:\app\tests\playwright.config.js

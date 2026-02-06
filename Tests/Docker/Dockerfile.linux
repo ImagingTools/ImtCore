@@ -106,6 +106,10 @@ RUN mkdir -p \
 COPY Tests/Docker/entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
+# Copy copy-and-run script (for direct docker run from applications)
+COPY Tests/Docker/copy-and-run.sh /app/copy-and-run.sh
+RUN chmod +x /app/copy-and-run.sh
+
 # Copy GUI utilities (utils.js and playwright.config.js) for Playwright tests
 COPY Tests/Docker/GUI/utils.js /app/tests/GUI/utils.js
 COPY Tests/Docker/GUI/playwright.config.js /app/tests/playwright.config.js
