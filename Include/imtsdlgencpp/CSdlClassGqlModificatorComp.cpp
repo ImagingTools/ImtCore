@@ -762,6 +762,121 @@ void CSdlClassGqlModificatorComp::AddUnionFieldValueWriteToObject(QTextStream& /
 
 }
 
+
+bool CSdlClassGqlModificatorComp::ProcessSourceClassFile(const imtsdl::CSdlType& sdlType, QIODevice* sourceDevicePtr, const iprm::IParamsSet* /*paramsPtr*/) const
+{
+	QTextStream ofStream(sourceDevicePtr);
+
+	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
+	CStructNamespaceConverter structNameConverter(sdlType, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
+	structNameConverter.addVersion = true;
+
+	// add method implementation
+
+	// a)write
+	ofStream << QStringLiteral("bool ");
+	ofStream << structNameConverter.GetString();
+	ofStream << ':' << ':';
+	WriteMethodCall(ofStream, MT_WRITE);
+	ofStream << '(';
+	ofStream << GetContainerObjectClassName();
+	ofStream << '&' << ' ';
+	ofStream << GetDecapitalizedValue(GetContainerObjectVariableName());
+	ofStream << QStringLiteral(") const");
+	FeedStream(ofStream, 1, false);
+
+	ofStream << '{';
+	FeedStream(ofStream, 1, false);
+
+	// Write __typename for the type itself based on typename mode
+	const imtsdl::ISdlProcessArgumentsParser::TypenameWriteMode typenameMode = 
+		m_argumentParserCompPtr.IsValid() ? m_argumentParserCompPtr->GetTypenameWriteMode() : imtsdl::ISdlProcessArgumentsParser::TWM_IF_REQUIRED;
+	
+	if (typenameMode == imtsdl::ISdlProcessArgumentsParser::TWM_ALWAYS){
+		FeedStreamHorizontally(ofStream);
+		ofStream << GetContainerObjectVariableName();
+		ofStream << QStringLiteral(".InsertParam(\"__typename\", QVariant(\"");
+		ofStream << sdlType.GetName();
+		ofStream << QStringLiteral("\"));");
+		FeedStream(ofStream, 1, false);
+	}
+
+	// add write logic for each field
+	for (const imtsdl::CSdlField& field: sdlType.GetFields()){
+		AddFieldWriteToObjectCode(ofStream, field, false);
+		FeedStream(ofStream, 1, false);
+	}
+
+	// finish write implementation
+	FeedStreamHorizontally(ofStream);
+	ofStream << QStringLiteral("return true;");
+
+	FeedStream(ofStream, 1, false);
+	ofStream << '}';
+	FeedStream(ofStream, 3, false);
+
+	// b)read
+	ofStream << QStringLiteral("bool ");
+	ofStream << structNameConverter.GetString();
+	ofStream << ':' << ':';
+	WriteMethodCall(ofStream, MT_READ);
+	ofStream << QStringLiteral("(const ");
+	ofStream << GetContainerObjectClassName();
+	ofStream << '&' << ' ';
+	ofStream << GetDecapitalizedValue(GetContainerObjectVariableName());
+	ofStream << QStringLiteral(")");
+	FeedStream(ofStream, 1);
+
+	ofStream << '{';
+	FeedStream(ofStream, 1, false);
+
+	// add read logic for each field
+	for (const imtsdl::CSdlField& field: sdlType.GetFields()){
+		AddFieldReadFromObjectCode(ofStream, field, false);
+		FeedStream(ofStream, 1, false);
+	}
+
+	// finish read implementation
+	FeedStreamHorizontally(ofStream);
+	ofStream << QStringLiteral("return true;");
+	FeedStream(ofStream, 1, false);
+
+	ofStream << '}';
+	FeedStream(ofStream, 3, false);
+
+	// c)opt read
+	ofStream << QStringLiteral("bool ");
+	ofStream << structNameConverter.GetString();
+	ofStream << ':' << ':';
+	WriteMethodCall(ofStream, MT_OPT_READ);
+	ofStream << QStringLiteral("(const ");
+	ofStream << GetContainerObjectClassName();
+	ofStream << '&' << ' ';
+	ofStream << GetDecapitalizedValue(GetContainerObjectVariableName());
+	ofStream << QStringLiteral(")");
+	FeedStream(ofStream, 1, false);
+
+	ofStream << '{';
+	FeedStream(ofStream, 1, false);
+
+	// add OPT read logic for each field
+	for (const imtsdl::CSdlField& field: sdlType.GetFields()){
+		AddFieldReadFromObjectCode(ofStream, field, true);
+		FeedStream(ofStream, 1, false);
+	}
+
+	// finish opt read implementation
+	FeedStreamHorizontally(ofStream);
+	ofStream << QStringLiteral("return true;");
+	FeedStream(ofStream, 1, false);
+
+	ofStream << '}';
+	FeedStream(ofStream, 3, false);
+
+	return true;
+}
+
+
 QString CSdlClassGqlModificatorComp::GetUnionListElementType(bool forScalar) const
 {
 	if (forScalar){

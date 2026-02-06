@@ -52,6 +52,7 @@ protected:
 	virtual void AddUnionFieldValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents) const override;
 	virtual void AddUnionFieldValueWriteToObject(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents) const override;
 	QString GetUnionListElementType(bool forScalar) const override;
+	virtual bool ProcessSourceClassFile(const imtsdl::CSdlType& sdlType, QIODevice* sourceDevicePtr, const iprm::IParamsSet* paramsPtr) const override;
 
 private:
 	/// writes end for convert 'value' to 'dest' \example String() (if string) \example Integer (if long)
