@@ -6,6 +6,7 @@
 #include <QtCore/QTextStream>
 
 // ImtCore includes
+#include <imtsdl/ISdlProcessArgumentsParser.h>
 #include <imtsdl/CSdlType.h>
 #include <imtsdl/CSdlEnum.h>
 
@@ -115,7 +116,7 @@ bool CObjectModificatorCompBase::ProcessHeaderClassFile(const imtsdl::CSdlType& 
 }
 
 
-bool CObjectModificatorCompBase::ProcessSourceClassFile(const imtsdl::CSdlType& sdlType, QIODevice* sourceDevicePtr, const iprm::IParamsSet* /*paramsPtr*/) const
+bool CObjectModificatorCompBase::ProcessSourceClassFile(const imtsdl::CSdlType& sdlType, QIODevice* sourceDevicePtr, const iprm::IParamsSet* /* paramsPtr */) const
 {
 	QTextStream ofStream(sourceDevicePtr);
 
@@ -145,6 +146,15 @@ bool CObjectModificatorCompBase::ProcessSourceClassFile(const imtsdl::CSdlType& 
 		AddFieldWriteToObjectCode(ofStream, field, false);
 		FeedStream(ofStream, 1, false);
 	}
+
+	// add __typename field if required
+	bool addTypeName = m_argumentParserCompPtr->GetTypenameWriteMode() == imtsdl::ISdlProcessArgumentsParser::TWM_ALWAYS;
+	if (addTypeName){
+		FeedStreamHorizontally(ofStream);
+		WriteTypenameToObjectCode(ofStream, sdlType);
+		FeedStream(ofStream, 2, false);
+	}
+	
 
 	// finish write implementation
 	FeedStreamHorizontally(ofStream);
