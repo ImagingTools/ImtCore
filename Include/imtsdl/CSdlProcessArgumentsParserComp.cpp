@@ -285,7 +285,7 @@ bool CSdlProcessArgumentsParserComp::SetArguments(const QStringList& arguments)
 			m_typenameWriteMode = TWM_NEVER;
 		}
 		else {
-			SendErrorMessage(0, QString("Unexpected value for option '--typename-mode' expected one of: ALWAYS | IF-REQUIRED | NEVER"));
+			SendErrorMessage(0, QString("Unexpected value for option '--typename-mode' expected one of: ALWAYS | IF_REQUIRED | NEVER"));
 
 			return false;
 		}
