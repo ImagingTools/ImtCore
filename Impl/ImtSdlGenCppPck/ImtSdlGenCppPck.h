@@ -18,6 +18,7 @@
 #include <imtsdlgencpp/CBaseClassExtenderComp.h>
 #include <imtsdlgencpp/CSdlQObjectGeneratorComp.h>
 #include <imtsdlgencpp/CSdlUnionObjectGeneratorComp.h>
+#include <imtsdlgencpp/CSdlForwardDeclGeneratorComp.h>
 
 
 /**
@@ -41,6 +42,7 @@ typedef imtsdlgencpp::CQmlRegisterGeneratorComp QmlRegisterGenerator;
 typedef imtsdlgencpp::CBaseClassExtenderComp BaseClassExtender;
 typedef imtsdlgencpp::CSdlQObjectGeneratorComp SdlQObjectGenerator;
 typedef imtsdlgencpp::CSdlUnionObjectGeneratorComp SdlUnionObjectGenerator;
+typedef imtsdlgencpp::CSdlForwardDeclGeneratorComp SdlForwardDeclGenerator;
 
 } // namespace ImtSdlGenCppPck
 
