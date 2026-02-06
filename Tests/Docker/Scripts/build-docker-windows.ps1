@@ -1,18 +1,26 @@
-# Build ImtCore Docker image for Windows
-# This script builds the base test infrastructure that applications will use
+# Build ImtCore Docker image for Windows containers
+# This script builds the Windows Docker image
 
 param(
     [string]$ImageName = "imtcore-tests:windows"
 )
 
-$ErrorActionPreference = "Stop"
-
 Write-Host "==========================================" -ForegroundColor Cyan
-Write-Host "Building ImtCore Docker Test Image (Windows)" -ForegroundColor Cyan
+Write-Host "Building ImtCore Docker Test Image" -ForegroundColor Cyan
+Write-Host "(Windows)" -ForegroundColor Cyan
 Write-Host "==========================================" -ForegroundColor Cyan
+Write-Host ""
 
 # Configuration
 $Dockerfile = "Tests\Docker\Dockerfile.windows"
+
+# Check if Docker is installed
+try {
+    docker --version | Out-Null
+} catch {
+    Write-Host "Error: Docker is not installed or not in PATH" -ForegroundColor Red
+    exit 1
+}
 
 # Check if Dockerfile exists
 if (-not (Test-Path $Dockerfile)) {
@@ -21,7 +29,8 @@ if (-not (Test-Path $Dockerfile)) {
     exit 1
 }
 
-Write-Host "Building image: $ImageName" -ForegroundColor Yellow
+Write-Host "Building Windows image..." -ForegroundColor Yellow
+Write-Host "Image: $ImageName" -ForegroundColor Yellow
 Write-Host "Using Dockerfile: $Dockerfile" -ForegroundColor Yellow
 Write-Host ""
 
@@ -31,7 +40,7 @@ docker build -f $Dockerfile -t $ImageName .
 if ($LASTEXITCODE -eq 0) {
     Write-Host ""
     Write-Host "==========================================" -ForegroundColor Cyan
-    Write-Host "✓ Build successful!" -ForegroundColor Green
+    Write-Host "[SUCCESS] Build successful!" -ForegroundColor Green
     Write-Host "==========================================" -ForegroundColor Cyan
     Write-Host "Image: $ImageName" -ForegroundColor Yellow
     Write-Host ""
@@ -39,13 +48,13 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host "  docker images | Select-String imtcore-tests" -ForegroundColor Gray
     Write-Host ""
     Write-Host "To use this image from an application repository:" -ForegroundColor White
-    Write-Host "  1. Copy Tests\Docker\run-tests.ps1 to your application repo" -ForegroundColor Gray
+    Write-Host "  1. Copy Tests\Docker\Scripts\run-tests.ps1 to your application repo" -ForegroundColor Gray
     Write-Host "  2. Run: .\run-tests.ps1" -ForegroundColor Gray
     Write-Host ""
 } else {
     Write-Host ""
     Write-Host "==========================================" -ForegroundColor Cyan
-    Write-Host "✗ Build failed!" -ForegroundColor Red
+    Write-Host "[FAILED] Build failed!" -ForegroundColor Red
     Write-Host "==========================================" -ForegroundColor Cyan
     exit 1
 }

@@ -1,5 +1,5 @@
 # Dockerfile for ImtCore test environment (Windows)
-# This container provides the base infrastructure for running tests on Windows.
+# This container provides the base infrastructure for running tests.
 # Application-specific files (GUI tests, API tests, resources, startup scripts)
 # should be copied from the application repository (e.g., Lisa) when running the container.
 #
@@ -24,16 +24,16 @@ RUN choco install -y postgresql --version=16.1
 # Refresh environment variables
 RUN refreshenv
 
-# Install Playwright and Newman (Postman CLI) globally
-RUN npm install -g playwright newman
-RUN npx playwright install --with-deps chromium
-
 # Set working directory
 WORKDIR C:\\app\\tests
 
+# Install Playwright and Newman (Postman CLI) globally
+RUN npm install -g playwright newman && \
+    npx playwright install --with-deps
+
 # Create directories for tests, results, and custom apps
 # The custom apps directories will be populated by copying from application repos (e.g., Lisa)
-RUN powershell -Command New-Item -ItemType Directory -Force -Path C:\app\tests, C:\app\tests\GUI, C:\app\tests\API, C:\app\tests\test-results\screenshots, C:\app\tests\test-results\videos, C:\app\custom-apps\startup, C:\app\custom-apps\resources
+RUN powershell -Command New-Item -ItemType Directory -Force -Path C:\app\tests, C:\app\tests\GUI, C:\app\tests\API, C:\app\tests\test-results\screenshots, C:\app\tests\test-results\videos, C:\app\startup, C:\app\resources
 
 # Copy entrypoint script
 COPY Tests/Docker/entrypoint.ps1 C:\app\entrypoint.ps1
@@ -41,19 +41,18 @@ COPY Tests/Docker/entrypoint.ps1 C:\app\entrypoint.ps1
 # Copy GUI utilities (utils.js and playwright.config.js) for Playwright tests
 COPY Tests/Docker/GUI/utils.js C:\app\tests\GUI\utils.js
 COPY Tests/Docker/GUI/playwright.config.js C:\app\tests\playwright.config.js
+COPY Tests/Docker/GUI/package.json C:\app\tests\package.json
+COPY Tests/Docker/GUI/global-setup.js C:\app\tests\global-setup.js
 
 # Note: Startup scripts and resources should be copied from application repos (e.g., Lisa)
-# when running the container. The C:\app\custom-apps directories are created above but
+# when running the container. The C:\app directories are created above but
 # left empty in the base image.
 
 # Environment variables (can be overridden at runtime)
-ENV BASE_URL=http://host.docker.internal:3000
+ENV BASE_URL=http://localhost:3000
 ENV CI=true
 ENV START_POSTGRESQL=false
 ENV POSTGRES_DB=""
 
-# Set entrypoint
 ENTRYPOINT ["powershell", "-File", "C:\\app\\entrypoint.ps1"]
-
-# Default command
 CMD []

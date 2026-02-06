@@ -5,12 +5,22 @@
 set -e
 
 echo "=========================================="
-echo "Building ImtCore Docker Test Image (Linux)"
+echo "Building ImtCore Docker Test Image"
+echo "(Linux)"
 echo "=========================================="
+echo ""
 
 # Configuration
-IMAGE_NAME="${IMAGE_NAME:-imtcore-tests:linux}"
+if [ -z "$IMAGE_NAME" ]; then
+    IMAGE_NAME="imtcore-tests:linux"
+fi
 DOCKERFILE="Tests/Docker/Dockerfile.linux"
+
+# Check if Docker is installed
+if ! command -v docker &> /dev/null; then
+    echo "Error: Docker is not installed or not in PATH"
+    exit 1
+fi
 
 # Check if Dockerfile exists
 if [ ! -f "$DOCKERFILE" ]; then
@@ -19,7 +29,8 @@ if [ ! -f "$DOCKERFILE" ]; then
     exit 1
 fi
 
-echo "Building image: $IMAGE_NAME"
+echo "Building Linux image..."
+echo "Image: $IMAGE_NAME"
 echo "Using Dockerfile: $DOCKERFILE"
 echo ""
 
@@ -29,7 +40,7 @@ docker build -f "$DOCKERFILE" -t "$IMAGE_NAME" .
 if [ $? -eq 0 ]; then
     echo ""
     echo "=========================================="
-    echo "✓ Build successful!"
+    echo "[SUCCESS] Build successful!"
     echo "=========================================="
     echo "Image: $IMAGE_NAME"
     echo ""
@@ -37,13 +48,13 @@ if [ $? -eq 0 ]; then
     echo "  docker images | grep imtcore-tests"
     echo ""
     echo "To use this image from an application repository:"
-    echo "  1. Copy Tests/Docker/run-tests.sh to your application repo"
+    echo "  1. Copy Tests/Docker/Scripts/run-tests.sh to your application repo"
     echo "  2. Run: ./run-tests.sh"
     echo ""
 else
     echo ""
     echo "=========================================="
-    echo "✗ Build failed!"
+    echo "[FAILED] Build failed!"
     echo "=========================================="
     exit 1
 fi
