@@ -58,22 +58,38 @@ if [ "${START_POSTGRESQL:-false}" = "true" ]; then
         mkdir -p /var/log/postgresql
         chown -R postgres:postgres /var/log/postgresql
 
-        # Initialize PostgreSQL data directory if it doesn't exist
-        if [ ! -d "/var/lib/postgresql/data" ]; then
-            mkdir -p /var/lib/postgresql/data
-            chown -R postgres:postgres /var/lib/postgresql
+        # Ensure data dir exists and has correct ownership
+        mkdir -p /var/lib/postgresql/data
+        chown -R postgres:postgres /var/lib/postgresql
 
-            # Enable password auth for host connections right from initdb
+        # Initialize PostgreSQL only if not initialized (PG_VERSION is the canonical marker)
+        if [ ! -f "/var/lib/postgresql/data/PG_VERSION" ]; then
+            echo -e "${YELLOW}Initializing PostgreSQL data directory...${NC}"
             su - postgres -c "$PG_BIN_DIR/initdb -D /var/lib/postgresql/data --auth-host=scram-sha-256"
         fi
 
         # Ensure PostgreSQL listens on TCP (localhost at minimum)
         # NOTE: with network_mode: host, listen_addresses='*' exposes postgres on the host network.
         # If you don't want that, change '*' to 'localhost'.
-        su - postgres -c "echo \"listen_addresses='localhost'\" >> /var/lib/postgresql/data/postgresql.conf" || true
+        if ! grep -q "^listen_addresses=" /var/lib/postgresql/data/postgresql.conf 2>/dev/null; then
+            su - postgres -c "echo \"listen_addresses='localhost'\" >> /var/lib/postgresql/data/postgresql.conf" || true
+        fi
 
-        # Start PostgreSQL
-        su - postgres -c "$PG_BIN_DIR/pg_ctl -D /var/lib/postgresql/data -l /var/log/postgresql/postgresql.log start"
+        # If postgres was not shut down cleanly, postmaster.pid can block startup.
+        if [ -f "/var/lib/postgresql/data/postmaster.pid" ]; then
+            OLD_PID="$(head -n 1 /var/lib/postgresql/data/postmaster.pid 2>/dev/null || true)"
+            if [ -n "$OLD_PID" ] && kill -0 "$OLD_PID" 2>/dev/null; then
+                echo -e "${YELLOW}PostgreSQL appears to be running already (pid=$OLD_PID). Skipping start.${NC}"
+            else
+                echo -e "${YELLOW}Found stale postmaster.pid (pid=$OLD_PID). Removing...${NC}"
+                rm -f /var/lib/postgresql/data/postmaster.pid
+                echo -e "${YELLOW}Starting PostgreSQL...${NC}"
+                su - postgres -c "$PG_BIN_DIR/pg_ctl -D /var/lib/postgresql/data -l /var/log/postgresql/postgresql.log start"
+            fi
+        else
+            echo -e "${YELLOW}Starting PostgreSQL...${NC}"
+            su - postgres -c "$PG_BIN_DIR/pg_ctl -D /var/lib/postgresql/data -l /var/log/postgresql/postgresql.log start"
+        fi
 
         # Wait for PostgreSQL to be ready (local socket)
         wait_for_service "PostgreSQL" "su - postgres -c 'psql -c \"SELECT 1\"'"
@@ -98,11 +114,24 @@ if [ -d "/app/custom-apps" ]; then
 
     # Run startup scripts in order (01-*, 02-*, etc.)
     if [ -d "/app/custom-apps/startup" ]; then
+        # Normalize scripts copied from Windows to avoid UTF-8 BOM / CRLF issues
+        for f in /app/custom-apps/startup/*.sh; do
+            [ -f "$f" ] || continue
+
+            # Remove UTF-8 BOM if present (EF BB BF)
+            sed -i '1s/^\xEF\xBB\xBF//' "$f" || true
+
+            # Convert CRLF -> LF
+            sed -i 's/\r$//' "$f" || true
+
+            chmod +x "$f" || true
+        done
+
         shopt -s nullglob
         for startup_script in /app/custom-apps/startup/*.sh; do
             if [ -f "$startup_script" ] && [ -x "$startup_script" ]; then
-                echo -e "${YELLOW}Running startup script: $(basename $startup_script)${NC}"
-                "$startup_script"
+                echo -e "${YELLOW}Running startup script: $(basename "$startup_script")${NC}"
+                /bin/bash "$startup_script"
             fi
         done
         shopt -u nullglob
@@ -129,10 +158,10 @@ fi
 # If a command is provided, run it; otherwise, auto-detect tests
 if [ "$#" -eq 0 ] || [ "$1" = "echo" ]; then
     echo -e "${YELLOW}Auto-detecting tests...${NC}"
-    
+
     GUI_TESTS_FOUND=false
     API_TESTS_FOUND=false
-    
+
     # Check for GUI tests (Playwright)
     if [ -d "/app/tests/GUI" ] && [ "$(ls -A /app/tests/GUI 2>/dev/null)" ]; then
         if ls /app/tests/GUI/*.spec.js 1> /dev/null 2>&1 || ls /app/tests/GUI/*.spec.ts 1> /dev/null 2>&1; then
@@ -140,7 +169,7 @@ if [ "$#" -eq 0 ] || [ "$1" = "echo" ]; then
             echo -e "${GREEN}✓ Found Playwright tests in GUI folder${NC}"
         fi
     fi
-    
+
     # Check for API tests (Postman/Newman)
     if [ -d "/app/tests/API" ] && [ "$(ls -A /app/tests/API 2>/dev/null)" ]; then
         if ls /app/tests/API/*.json 1> /dev/null 2>&1; then
@@ -148,26 +177,26 @@ if [ "$#" -eq 0 ] || [ "$1" = "echo" ]; then
             echo -e "${GREEN}✓ Found Postman collections in API folder${NC}"
         fi
     fi
-    
+
     # Run tests based on what was found
     if [ "$GUI_TESTS_FOUND" = true ] || [ "$API_TESTS_FOUND" = true ]; then
         EXIT_CODE=0
-        
+
         if [ "$GUI_TESTS_FOUND" = true ]; then
             echo -e "${YELLOW}Running Playwright tests...${NC}"
             npx playwright test GUI || EXIT_CODE=$?
         fi
-        
+
         if [ "$API_TESTS_FOUND" = true ]; then
             echo -e "${YELLOW}Running Postman tests...${NC}"
             for collection in /app/tests/API/*.json; do
                 if [ -f "$collection" ]; then
-                    echo -e "${YELLOW}Running collection: $(basename $collection)${NC}"
+                    echo -e "${YELLOW}Running collection: $(basename "$collection")${NC}"
                     newman run "$collection" || EXIT_CODE=$?
                 fi
             done
         fi
-        
+
         exit $EXIT_CODE
     else
         echo -e "${YELLOW}No tests found in GUI or API folders${NC}"

@@ -107,7 +107,7 @@ COPY Tests/Docker/entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
 # Copy utils.js helper for Playwright tests
-COPY Tests/Docker/GUI/utils.js /app/tests/utils.js
+COPY Tests/Docker/utils.js /app/tests/utils.js
 
 # Copy startup scripts and resources from ImtCore (if any exist)
 # These are the base scripts that will be supplemented by application-specific scripts
