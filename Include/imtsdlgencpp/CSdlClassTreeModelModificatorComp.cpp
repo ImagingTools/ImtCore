@@ -58,6 +58,18 @@ bool CSdlClassTreeModelModificatorComp::ProcessSourceClassFile(const imtsdl::CSd
 	ofStream << QStringLiteral("::CTreeItemModel& model, int modelIndex) const\n{");
 	FeedStream(ofStream, 1, false);
 
+	// Write __typename for the type itself based on typename mode
+	const imtsdl::ISdlProcessArgumentsParser::TypenameWriteMode typenameMode = 
+		m_argumentParserCompPtr.IsValid() ? m_argumentParserCompPtr->GetTypenameWriteMode() : imtsdl::ISdlProcessArgumentsParser::TWM_IF_REQUIRED;
+	
+	if (typenameMode == imtsdl::ISdlProcessArgumentsParser::TWM_ALWAYS){
+		FeedStreamHorizontally(ofStream);
+		ofStream << QStringLiteral("model.SetData(\"__typename\", \"");
+		ofStream << sdlType.GetName();
+		ofStream << QStringLiteral("\", modelIndex);");
+		FeedStream(ofStream, 2, false);
+	}
+
 	// add write logic for each field
 	for (const imtsdl::CSdlField& field: sdlType.GetFields()){
 		AddFieldWriteToModelCode(ofStream, field, sdlType, false);
@@ -203,7 +215,9 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(
 				*m_sdlUnionListCompPtr,
 				2,
 				CSdlUnionConverter::ConversionType::CT_MODEL_SCALAR,
-				"model.SetData(");
+				"model.SetData(",
+				QString(),
+				QStringLiteral("false"));
 		}
 		else {
 			stream << QStringLiteral("model.SetData(\"") << field.GetId() << QStringLiteral("\", ");
@@ -272,7 +286,9 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(
 				*m_sdlUnionListCompPtr,
 				2,
 				CT_MODEL_SCALAR,
-				"model.SetData(");
+				"model.SetData(",
+				QString(),
+				QStringLiteral("false"));
 		}
 		else {
 			stream << QStringLiteral("model.SetData(\"") << field.GetId() << QStringLiteral("\", ");
@@ -401,7 +417,11 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(
 				"modelIndex",
 				*m_sdlTypeListCompPtr,
 				*m_sdlEnumListCompPtr,
-				*m_sdlUnionListCompPtr);
+				*m_sdlUnionListCompPtr,
+				1,
+				CT_MODEL_SCALAR,
+				QString(),
+				QString());
 		}
 		else {
 			stream << GetSettingValueString(
@@ -767,7 +787,9 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelImplCo
 			*m_sdlUnionListCompPtr,
 			hIndents + 1,
 			CSdlUnionConverter::ConversionType::CT_MODEL_ARRAY,
-			newTreeModelVarName + QString("->SetData("));
+			newTreeModelVarName + QString("->SetData("),
+			QString(),
+			QStringLiteral("false"));
 	}
 
 	if (!isUnion){

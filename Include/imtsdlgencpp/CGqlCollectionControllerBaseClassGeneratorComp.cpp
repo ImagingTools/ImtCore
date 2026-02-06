@@ -752,7 +752,10 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddPayloadModelWriteCode(
 													 *m_sdlEnumListCompPtr,
 													 *m_sdlUnionListCompPtr,
 													 hIndents,
-													 CSdlUnionConverter::CT_MODEL_SCALAR);
+													 CSdlUnionConverter::CT_MODEL_SCALAR,
+													 QString(),
+													 QString(),
+													 QStringLiteral("false"));
 	}
 	else{
 		// [1] write payload variable in model and create variable, to check if it success
@@ -1351,7 +1354,8 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 														 hIndents + 1,
 														 CSdlUnionConverter::CT_MODEL_SCALAR,
 														 QStringLiteral("dataModel.SetData("), //QString(),
-														 QStringLiteral("dataModel"));
+														 QStringLiteral("dataModel"),
+														 QStringLiteral("false"));
 		}
 		else{
 			// [1] create write check variable
