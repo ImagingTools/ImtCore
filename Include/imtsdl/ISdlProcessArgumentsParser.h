@@ -36,6 +36,14 @@ public:
 	};
 	Q_ENUM(CppGenerationMode)
 
+	enum TypenameWriteMode
+	{
+		TWM_ALWAYS,
+		TWM_IF_REQUIRED,
+		TWM_NEVER
+	};
+	Q_ENUM(TypenameWriteMode)
+
 	virtual bool SetArguments(int argc, char** argv);
 	virtual bool SetArguments(const QStringList& arguments) = 0;
 	virtual QString GetSchemaFilePath() const = 0;
@@ -56,6 +64,7 @@ public:
 	virtual QStringList GetHeadersIncludePaths() const = 0;
 	virtual QString GetDepFilePath() const = 0;
 	virtual CppGenerationMode GetCppGenerationMode() const = 0;
+	virtual TypenameWriteMode GetTypenameWriteMode() const = 0;
 
 	// template
 	virtual bool IsTemplateEnabled() const = 0;

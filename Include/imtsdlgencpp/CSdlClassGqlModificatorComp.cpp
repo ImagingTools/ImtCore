@@ -772,6 +772,16 @@ QString CSdlClassGqlModificatorComp::GetUnionListElementType(bool forScalar) con
 }
 
 
+void CSdlClassGqlModificatorComp::WriteTypenameToObjectCode(QTextStream& stream, const imtsdl::CSdlType& sdlType) const 
+{
+	stream << GetContainerObjectVariableName();
+	stream << QStringLiteral(".InsertParam(");
+	stream << QStringLiteral("\"__typename\", ");
+	stream << QStringLiteral("QVariant(\"") << sdlType.GetName() << "\")";
+	stream << QStringLiteral(");");
+}
+
+
 
 } // namespace imtsdlgencpp
 

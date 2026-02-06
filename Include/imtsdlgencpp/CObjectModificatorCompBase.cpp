@@ -6,6 +6,7 @@
 #include <QtCore/QTextStream>
 
 // ImtCore includes
+#include <imtsdl/ISdlProcessArgumentsParser.h>
 #include <imtsdl/CSdlType.h>
 #include <imtsdl/CSdlEnum.h>
 
@@ -115,8 +116,14 @@ bool CObjectModificatorCompBase::ProcessHeaderClassFile(const imtsdl::CSdlType& 
 }
 
 
-bool CObjectModificatorCompBase::ProcessSourceClassFile(const imtsdl::CSdlType& sdlType, QIODevice* sourceDevicePtr, const iprm::IParamsSet* /*paramsPtr*/) const
+bool CObjectModificatorCompBase::ProcessSourceClassFile(const imtsdl::CSdlType& sdlType, QIODevice* sourceDevicePtr, const iprm::IParamsSet* /* paramsPtr */) const
 {
+	Q_ASSERT(m_argumentParserCompPtr.IsValid());
+	Q_ASSERT(m_sdlTypeListCompPtr.IsValid());
+	Q_ASSERT(m_sdlEnumListCompPtr.IsValid());
+	Q_ASSERT(m_sdlUnionListCompPtr.IsValid());
+	Q_ASSERT(m_originalSchemaNamespaceCompPtr.IsValid());
+
 	QTextStream ofStream(sourceDevicePtr);
 
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
@@ -145,6 +152,15 @@ bool CObjectModificatorCompBase::ProcessSourceClassFile(const imtsdl::CSdlType& 
 		AddFieldWriteToObjectCode(ofStream, field, false);
 		FeedStream(ofStream, 1, false);
 	}
+
+	// add __typename field if required
+	bool addTypeName = m_argumentParserCompPtr->GetTypenameWriteMode() == imtsdl::ISdlProcessArgumentsParser::TWM_ALWAYS;
+	if (addTypeName){
+		FeedStreamHorizontally(ofStream);
+		WriteTypenameToObjectCode(ofStream, sdlType);
+		FeedStream(ofStream, 2, false);
+	}
+	
 
 	// finish write implementation
 	FeedStreamHorizontally(ofStream);
@@ -341,7 +357,10 @@ void CObjectModificatorCompBase::AddScalarFieldWriteToObjectCode(QTextStream& st
 			*m_sdlEnumListCompPtr,
 			*m_sdlUnionListCompPtr,
 			hIndents,
-			GetUnionScalarConversionType());
+			GetUnionScalarConversionType(),
+			QString(),
+			QString(),
+			QStringLiteral("false"));
 	}
 	else{
 		FeedStreamHorizontally(stream, hIndents);
@@ -534,7 +553,10 @@ void CObjectModificatorCompBase::AddArrayFieldWriteToObjectImplCode(
 			*m_sdlEnumListCompPtr,
 			*m_sdlUnionListCompPtr,
 			hIndents + 1,
-			GetUnionArrayConversionType());
+			GetUnionArrayConversionType(),
+			QString(),
+			QString(),
+			QStringLiteral("false"));
 	}
 
 	// inLoop: add item
@@ -786,7 +808,8 @@ void CObjectModificatorCompBase::AddFieldValueReadFromObject(QTextStream& stream
 			*m_sdlUnionListCompPtr,
 			hhIndents,
 			GetUnionScalarConversionType(),
-			field.GetId());
+			field.GetId(),
+			QString());
 	}
 
 	if(!isStrict){

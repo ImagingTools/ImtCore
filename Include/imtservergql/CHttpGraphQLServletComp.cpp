@@ -129,8 +129,6 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 		imtgql::IGqlContextSharedPtr shared;
 		shared.MoveCastedPtr(gqlContextPtr);
 		m_lastRequest.SetGqlContext(shared);
-
-		imtgql::CGqlRequestContextManager::SetContext(m_lastRequest.GetRequestContext());
 	}
 	else{
 		Q_ASSERT(false);

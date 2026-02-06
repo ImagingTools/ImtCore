@@ -43,6 +43,7 @@ public:
 	std::optional<QString> outputDirTemplate;
 	std::optional<QString> qmlOutputDirTemplate;
 	std::optional<QString> includePathTemplate;
+	std::optional<ISdlProcessArgumentsParser::TypenameWriteMode> typenameWriteMode;
 };
 
 

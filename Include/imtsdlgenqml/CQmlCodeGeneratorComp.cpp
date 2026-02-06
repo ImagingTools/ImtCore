@@ -17,6 +17,8 @@
 #include <imtsdl/CSdlType.h>
 #include <imtsdl/CSdlField.h>
 #include <imtsdl/CSdlEnum.h>
+#include <imtsdlgenqml/CSdlQmlGenerationResult.h>
+#include <imtsdlgenqml/CQmlGenTools.h>
 
 
 namespace imtsdlgenqml
@@ -200,6 +202,26 @@ iproc::IProcessor::TaskState CQmlCodeGeneratorComp::DoProcessing(
 
 	qrcFile.flush();
 	qrcFile.close();
+
+	// Create generation result file if generation was successful
+	if (retVal == TS_OK && !m_argumentParserCompPtr->GetDepFilePath().isEmpty()){
+		CSdlQmlGenerationResult generationResult;
+		generationResult.SetCreatedAt(QDateTime::currentDateTimeUtc());
+		generationResult.SetGeneratorVersion(QStringLiteral("1.0"));
+		
+		// Track the created folders
+		QSet<QString> createdFolders;
+		createdFolders.insert(outputDirectoryPath);
+		generationResult.SetCreatedFolders(createdFolders);
+		
+		// Place generation info file next to depfile
+		const QFileInfo depFileInfo(m_argumentParserCompPtr->GetDepFilePath());
+		const QString generationInfoPath = depFileInfo.absolutePath() + QStringLiteral("/generation_info.json");
+		
+		if (!CQmlGenTools::UpdateGenerationResult(generationInfoPath, generationResult)){
+			SendWarningMessage(0, QString("Unable to create generation info file: '%1'").arg(generationInfoPath));
+		}
+	}
 
 	return retVal;
 }

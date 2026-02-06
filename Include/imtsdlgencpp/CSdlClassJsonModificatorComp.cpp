@@ -433,13 +433,23 @@ void CSdlClassJsonModificatorComp::AddUnionFieldValueReadFromObject(
 								 *m_sdlUnionListCompPtr,
 								 hIndents,
 								 GetUnionScalarConversionType(),
-								 field.GetId());
+								 field.GetId(),
+								 QString());
 }
 
 
 void CSdlClassJsonModificatorComp::AddUnionFieldValueWriteToObject(QTextStream& /*stream*/, const imtsdl::CSdlField& /*field*/, bool /*optional*/, quint16 /*hIndents*/) const
 {
 
+}
+
+
+void CSdlClassJsonModificatorComp::WriteTypenameToObjectCode(QTextStream& stream, const imtsdl::CSdlType& sdlType) const 
+{
+	stream << GetContainerObjectVariableName();
+	stream << QStringLiteral("[\"__typename\"] = \"");
+	stream << sdlType.GetName();
+	stream << "\";";
 }
 
 
