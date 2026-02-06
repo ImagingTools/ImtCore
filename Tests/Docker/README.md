@@ -209,7 +209,7 @@ Tests/
 
 ## Playwright Utilities (utils.js)
 
-The container includes `/app/tests/utils.js` with common utilities:
+The container includes `/app/tests/GUI/utils.js` with common utilities:
 
 **Functions:**
 - `login(page, username, password, config, loginPaths)` - Automated login
@@ -222,7 +222,7 @@ The container includes `/app/tests/utils.js` with common utilities:
 
 **Usage:**
 ```javascript
-const { login, clickOnPage, checkScreenshot } = require('./utils.js');
+const { login, clickOnPage, checkScreenshot } = require('../GUI/utils.js');
 
 test('user login', async ({ page }) => {
   await login(page, 'user', 'pass', defaultConfig, {

@@ -2,11 +2,13 @@
 
 This directory contains utilities and helpers for GUI testing with Playwright.
 
-## utils.js
+## Files
 
-Common Playwright test utilities that are automatically available in the test container at `/app/tests/utils.js`.
+### utils.js
 
-### Available Functions
+Common Playwright test utilities that are automatically available in the test container at `/app/tests/GUI/utils.js`.
+
+#### Available Functions
 
 - `login(page, username, password)` - Automated login flow
 - `clickOnElement(page, selector)` - Click on element with wait
@@ -19,10 +21,10 @@ Common Playwright test utilities that are automatically available in the test co
 - `reloadPage(page)` - Reload page and wait
 - `delay(ms)` - Sleep utility
 
-### Usage in Tests
+#### Usage in Tests
 
 ```javascript
-const { login, checkScreenshot, waitForPageStability } = require('./utils.js');
+const { login, checkScreenshot, waitForPageStability } = require('../GUI/utils.js');
 
 test('login test', async ({ page }) => {
   await login(page, 'user@example.com', 'password');
@@ -30,6 +32,19 @@ test('login test', async ({ page }) => {
   await checkScreenshot(page, 'dashboard');
 });
 ```
+
+### playwright.config.js
+
+Default Playwright configuration file that is automatically copied to `/app/tests/playwright.config.js` in the container.
+
+This configuration:
+- Sets test directory to `./GUI`
+- Configures timeouts and retries
+- Sets up reporters (HTML, JSON, JUnit)
+- Defines browser projects
+- Uses environment variables for configuration
+
+Applications can override this by copying their own `playwright.config.js` file to the container.
 
 ## Adding More Utilities
 

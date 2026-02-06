@@ -38,13 +38,13 @@ RUN powershell -Command New-Item -ItemType Directory -Force -Path C:\app\tests, 
 # Copy entrypoint script
 COPY Tests/Docker/entrypoint.ps1 C:\app\entrypoint.ps1
 
-# Copy utils.js helper for Playwright tests
-COPY Tests/Docker/utils.js C:\app\tests\utils.js
+# Copy GUI utilities (utils.js and playwright.config.js) for Playwright tests
+COPY Tests/Docker/GUI/utils.js C:\app\tests\GUI\utils.js
+COPY Tests/Docker/GUI/playwright.config.js C:\app\tests\playwright.config.js
 
-# Copy startup scripts and resources from ImtCore (if any exist)
-# These are the base scripts that will be supplemented by application-specific scripts
-COPY Tests/Docker/Startup/ C:\app\custom-apps\startup\
-COPY Tests/Docker/Resources/ C:\app\custom-apps\resources\
+# Note: Startup scripts and resources should be copied from application repos (e.g., Lisa)
+# when running the container. The C:\app\custom-apps directories are created above but
+# left empty in the base image.
 
 # Environment variables (can be overridden at runtime)
 ENV BASE_URL=http://host.docker.internal:3000
