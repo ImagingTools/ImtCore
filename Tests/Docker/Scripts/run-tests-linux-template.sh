@@ -13,9 +13,13 @@ export BASE_URL="http://localhost:8080"
 # Uncomment and set if you need a different password:
 # export POSTGRES_PASSWORD="your_password"
 
-# Test credentials
-export TEST_USERNAME="test@example.com"
-export TEST_PASSWORD="testpassword"
+# Test credentials - supports multiple users
+# Format: "username1:password1,username2:password2,username3:password3"
+# Or simple single user (backward compatible):
+export TEST_USERS="test@example.com:testpassword"
+# Examples:
+# Single user: export TEST_USERS="admin@example.com:admin123"
+# Multiple users: export TEST_USERS="admin@example.com:admin123,user@example.com:user123,viewer@example.com:viewer123"
 
 # ==========================================
 # DO NOT MODIFY BELOW THIS LINE

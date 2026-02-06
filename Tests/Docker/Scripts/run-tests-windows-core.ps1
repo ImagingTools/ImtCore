@@ -31,8 +31,7 @@ Write-Host "[DEBUG] BASE_URL: $env:BASE_URL"
 Write-Host "[DEBUG] POSTGRES_DB: $env:POSTGRES_DB"
 Write-Host "[DEBUG] POSTGRES_PASSWORD: $env:POSTGRES_PASSWORD"
 Write-Host "[DEBUG] DATABASE_URL: $env:DATABASE_URL"
-Write-Host "[DEBUG] TEST_USERNAME: $env:TEST_USERNAME"
-Write-Host "[DEBUG] TEST_PASSWORD: $env:TEST_PASSWORD"
+Write-Host "[DEBUG] TEST_USERS: $env:TEST_USERS"
 Write-Host ""
 
 # Check if Docker is available
@@ -76,8 +75,7 @@ docker run -d `
   -e POSTGRES_PASSWORD="$env:POSTGRES_PASSWORD" `
   -e POSTGRES_DB="$env:POSTGRES_DB" `
   -e DATABASE_URL="$env:DATABASE_URL" `
-  -e TEST_USERNAME="$env:TEST_USERNAME" `
-  -e TEST_PASSWORD="$env:TEST_PASSWORD" `
+  -e TEST_USERS="$env:TEST_USERS" `
   -e CI=true `
   $env:IMAGE_NAME `
   -Command "Start-Sleep -Seconds 3600"

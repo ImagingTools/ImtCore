@@ -247,6 +247,47 @@ async function login(page, username, password, config = defaultConfig, loginPath
   await clickOnButton(page, paths.submit, config);
 }
 
+/**
+ * Parse TEST_USERS environment variable
+ * Format: "user1:pass1,user2:pass2,user3:pass3"
+ * Returns: [{username: "user1", password: "pass1"}, ...]
+ */
+function parseTestUsers() {
+  const testUsers = process.env.TEST_USERS || '';
+  if (!testUsers) {
+    return [];
+  }
+
+  return testUsers.split(',').map(userPass => {
+    const [username, password] = userPass.trim().split(':');
+    if (!username || !password) {
+      throw new Error(`Invalid TEST_USERS format: "${userPass}". Expected "username:password"`);
+    }
+    return { username, password };
+  });
+}
+
+/**
+ * Run a test function with each user from TEST_USERS
+ * Example:
+ *   await runWithEachUser(page, async (page, user) => {
+ *     await login(page, user.username, user.password, config, loginPaths);
+ *     // run your test...
+ *   });
+ */
+async function runWithEachUser(page, testFn, config = defaultConfig, loginPaths = {}) {
+  const users = parseTestUsers();
+  
+  if (users.length === 0) {
+    throw new Error('No users defined in TEST_USERS environment variable');
+  }
+
+  for (const user of users) {
+    console.log(`Running test with user: ${user.username}`);
+    await testFn(page, user, config, loginPaths);
+  }
+}
+
 module.exports = {
   defaultConfig,
   delay,
@@ -254,6 +295,8 @@ module.exports = {
   clickAt,
   checkScreenshot,
   login,
+  parseTestUsers,
+  runWithEachUser,
   waitForPageStability,
   clickOnPage,
   clickOnCommand,

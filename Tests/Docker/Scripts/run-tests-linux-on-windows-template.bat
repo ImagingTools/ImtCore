@@ -13,9 +13,13 @@ REM PostgreSQL password (optional, default: "root" if not set)
 REM Uncomment and set if you need a different password:
 REM set POSTGRES_PASSWORD=your_password
 
-REM Test credentials
-set TEST_USERNAME=test@example.com
-set TEST_PASSWORD=testpassword
+REM Test credentials - supports multiple users
+REM Format: "username1:password1,username2:password2,username3:password3"
+REM Or simple single user (backward compatible):
+set TEST_USERS=test@example.com:testpassword
+REM Examples:
+REM Single user: set TEST_USERS=admin@example.com:admin123
+REM Multiple users: set TEST_USERS=admin@example.com:admin123,user@example.com:user123,viewer@example.com:viewer123
 
 REM ==========================================
 REM DO NOT MODIFY BELOW THIS LINE
