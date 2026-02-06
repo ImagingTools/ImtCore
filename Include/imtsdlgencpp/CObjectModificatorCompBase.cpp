@@ -118,6 +118,12 @@ bool CObjectModificatorCompBase::ProcessHeaderClassFile(const imtsdl::CSdlType& 
 
 bool CObjectModificatorCompBase::ProcessSourceClassFile(const imtsdl::CSdlType& sdlType, QIODevice* sourceDevicePtr, const iprm::IParamsSet* /* paramsPtr */) const
 {
+	Q_ASSERT(m_argumentParserCompPtr.IsValid());
+	Q_ASSERT(m_sdlTypeListCompPtr.IsValid());
+	Q_ASSERT(m_sdlEnumListCompPtr.IsValid());
+	Q_ASSERT(m_sdlUnionListCompPtr.IsValid());
+	Q_ASSERT(m_originalSchemaNamespaceCompPtr.IsValid());
+
 	QTextStream ofStream(sourceDevicePtr);
 
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
