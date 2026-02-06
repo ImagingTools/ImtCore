@@ -288,6 +288,64 @@ async function runWithEachUser(page, testFn, config = defaultConfig, loginPaths 
   }
 }
 
+/**
+ * Get user-specific screenshot filename
+ * Uses testInfo.project.name to automatically append user info to screenshot names
+ * 
+ * Example:
+ *   const filename = getUserScreenshotName(testInfo, 'homepage.png');
+ *   // Returns: 'homepage-user0.png' for authorized-user0 project
+ *   // Returns: 'homepage.png' for guest project
+ * 
+ * @param {import('@playwright/test').TestInfo} testInfo - Test info from Playwright
+ * @param {string} baseFilename - Base screenshot filename (e.g., 'homepage.png')
+ * @returns {string} - User-specific filename
+ */
+function getUserScreenshotName(testInfo, baseFilename) {
+  const projectName = testInfo.project.name;
+  
+  // Extract user index from project name (e.g., 'authorized-user0' -> 'user0')
+  const match = projectName.match(/^authorized-user(\d+)$/);
+  
+  if (!match) {
+    // Not an authorized project or guest project - use base filename as-is
+    return baseFilename;
+  }
+  
+  const userIndex = match[1];
+  
+  // Insert user info before file extension
+  const lastDot = baseFilename.lastIndexOf('.');
+  if (lastDot === -1) {
+    return `${baseFilename}-user${userIndex}`;
+  }
+  
+  const nameWithoutExt = baseFilename.substring(0, lastDot);
+  const ext = baseFilename.substring(lastDot);
+  return `${nameWithoutExt}-user${userIndex}${ext}`;
+}
+
+/**
+ * Get current user info from testInfo (for use in tests)
+ * 
+ * @param {import('@playwright/test').TestInfo} testInfo - Test info from Playwright
+ * @returns {{userIndex: number, username: string, password: string} | null}
+ */
+function getUserInfoFromTest(testInfo) {
+  const project = testInfo.project;
+  const use = project.use;
+  
+  if (use.userIndex !== undefined && use.username && use.password) {
+    return {
+      userIndex: use.userIndex,
+      username: use.username,
+      password: use.password,
+    };
+  }
+  
+  return null;
+}
+
 module.exports = {
   defaultConfig,
   delay,
@@ -297,6 +355,8 @@ module.exports = {
   login,
   parseTestUsers,
   runWithEachUser,
+  getUserScreenshotName,
+  getUserInfoFromTest,
   waitForPageStability,
   clickOnPage,
   clickOnCommand,

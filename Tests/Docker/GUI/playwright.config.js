@@ -2,18 +2,38 @@
 const { defineConfig } = require('@playwright/test');
 
 /**
- * Playwright configuration for Lisa application testing
+ * Parse TEST_USERS environment variable
+ * Format: "user1:pass1,user2:pass2,user3:pass3"
+ * Returns: [{username: "user1", password: "pass1"}, ...]
+ */
+function parseTestUsers() {
+  const testUsers = process.env.TEST_USERS || '';
+  if (!testUsers) {
+    return [];
+  }
+
+  return testUsers.split(',').map(userPass => {
+    const [username, password] = userPass.trim().split(':');
+    if (!username || !password) {
+      throw new Error(`Invalid TEST_USERS format: "${userPass}". Expected "username:password"`);
+    }
+    return { username, password };
+  });
+}
+
+/**
+ * Playwright configuration with dynamic multi-user support
  *
- * Notes:
- * - baseURL now has a safe default for Docker-on-Windows runs
- * - viewport is defined in config and can be consumed by global-setup.js via config.projects[0].use.viewport
- * - auth credentials are passed via "use" as custom fields so global-setup.js can read them from config
- * - fixed testMatch/testIgnore patterns: since testDir is './GUI', patterns must be relative to that dir
+ * Features:
+ * - Dynamically generates "authorized-user0", "authorized-user1", etc. projects based on TEST_USERS
+ * - Each user gets their own storageState file
+ * - Screenshots automatically include user info via project name
+ * - Single "guest" project for non-authenticated tests
  */
 module.exports = defineConfig({
   testDir: './GUI',
 
-  /* Global setup (login + storageState.json) */
+  /* Global setup (login + storageState for each user) */
   globalSetup: require.resolve('./global-setup'),
 
   /* Maximum time one test can run for */
@@ -55,10 +75,6 @@ module.exports = defineConfig({
       height: Number(process.env.VIEWPORT_HEIGHT || 800),
     },
 
-    /* Custom fields for global-setup.js (read from config first, env fallback) */
-    testUsername: process.env.TEST_USERNAME || 'su',
-    testPassword: process.env.TEST_PASSWORD || '1',
-
     /* Collect trace when retrying the failed test */
     trace: 'on-first-retry',
 
@@ -75,15 +91,22 @@ module.exports = defineConfig({
     actionTimeout: 10 * 1000,
   },
 
-  /* Configure projects */
+  /* Configure projects dynamically based on TEST_USERS */
   projects: [
-    {
-      name: 'authorized',
+    // Generate authorized projects for each user
+    ...parseTestUsers().map((user, index) => ({
+      name: `authorized-user${index}`,
       testMatch: /authorized\/.*\.test\.js/,
       use: {
-        storageState: 'storageState.json',
+        storageState: `storageState-user${index}.json`,
+        // Store user info in project metadata for access in tests
+        userIndex: index,
+        username: user.username,
+        password: user.password,
       },
-    },
+    })),
+    
+    // Guest project (no authentication)
     {
       name: 'guest',
       testIgnore: /authorized\/.*\.test\.js/,

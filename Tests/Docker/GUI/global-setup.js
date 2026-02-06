@@ -1,36 +1,63 @@
 const { chromium } = require('@playwright/test');
 const { waitForPageStability, login } = require('./GUI/utils');
 
+/**
+ * Global setup for Playwright tests with multi-user support
+ * 
+ * Creates separate storageState files for each user defined in the config.
+ * Each authorized project (authorized-user0, authorized-user1, etc.) gets its own auth state.
+ */
 module.exports = async (config) => {
-  const use = config?.projects?.[0]?.use || {};
+  // Get global settings
+  const globalUse = config?.use || {};
+  const baseURL = globalUse.baseURL || process.env.BASE_URL || 'http://host.docker.internal:7776';
+  const viewport = globalUse.viewport || { width: 1400, height: 800 };
 
-  const baseURL = use.baseURL || process.env.BASE_URL || 'http://host.docker.internal:7776';
+  // Find all authorized projects (skip guest project)
+  const authorizedProjects = config?.projects?.filter(p => 
+    p.name.startsWith('authorized-user')
+  ) || [];
 
-  const username = use.testUsername || process.env.TEST_USERNAME || 'su';
-  const password = use.testPassword || process.env.TEST_PASSWORD || '1';
+  if (authorizedProjects.length === 0) {
+    console.log('No authorized projects found. Skipping global setup.');
+    return;
+  }
 
-  const viewport =
-    use.viewport ||
-    (process.env.VIEWPORT_WIDTH && process.env.VIEWPORT_HEIGHT
-      ? { width: Number(process.env.VIEWPORT_WIDTH), height: Number(process.env.VIEWPORT_HEIGHT) }
-      : { width: 1400, height: 800 });
+  console.log(`Setting up authentication for ${authorizedProjects.length} user(s)...`);
 
   const browser = await chromium.launch();
 
-  const context = await browser.newContext({
-    viewport,
-  });
+  try {
+    // Create storageState for each user
+    for (const project of authorizedProjects) {
+      const { username, password, storageState, userIndex } = project.use;
 
-  const page = await context.newPage();
+      if (!username || !password) {
+        console.warn(`Skipping ${project.name}: missing username or password`);
+        continue;
+      }
 
-  await page.goto(baseURL);
-  await waitForPageStability(page);
+      console.log(`Authenticating user${userIndex}: ${username}...`);
 
-  await login(page, username, password);
+      const context = await browser.newContext({ viewport });
+      const page = await context.newPage();
 
-  await waitForPageStability(page);
+      await page.goto(baseURL);
+      await waitForPageStability(page);
 
-  await context.storageState({ path: './storageState.json' });
+      await login(page, username, password);
 
-  await browser.close();
+      await waitForPageStability(page);
+
+      await context.storageState({ path: `./${storageState}` });
+
+      console.log(`✓ Created ${storageState} for ${username}`);
+
+      await context.close();
+    }
+  } finally {
+    await browser.close();
+  }
+
+  console.log('Global setup complete!');
 };
