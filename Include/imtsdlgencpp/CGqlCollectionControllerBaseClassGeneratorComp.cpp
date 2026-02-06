@@ -741,6 +741,9 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddPayloadModelWriteCode(
 	const bool isUnion = GetSdlUnionForField(outputArgument, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
 	if (isUnion){
 		const static QString unionSourceVarName = QStringLiteral("&replyPayload");
+		const imtsdl::ISdlProcessArgumentsParser::TypenameWriteMode typenameMode = 
+			m_argumentParserCompPtr.IsValid() ? m_argumentParserCompPtr->GetTypenameWriteMode() : imtsdl::ISdlProcessArgumentsParser::TWM_IF_REQUIRED;
+
 		CSdlUnionConverter::WriteConversionFromUnion(stream,
 													 foundUnion,
 													 unionSourceVarName,
@@ -752,7 +755,11 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddPayloadModelWriteCode(
 													 *m_sdlEnumListCompPtr,
 													 *m_sdlUnionListCompPtr,
 													 hIndents,
-													 CSdlUnionConverter::CT_MODEL_SCALAR);
+													 CSdlUnionConverter::CT_MODEL_SCALAR,
+													 QString(),
+													 QString(),
+													 QStringLiteral("false"),
+													 typenameMode);
 	}
 	else{
 		// [1] write payload variable in model and create variable, to check if it success
@@ -1338,6 +1345,9 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 		const bool isUnion = GetSdlUnionForField(outputArgument, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
 		if (isUnion){
 			const static QString unionSourceVarName = QStringLiteral("&representationObject");
+			const imtsdl::ISdlProcessArgumentsParser::TypenameWriteMode typenameMode = 
+				m_argumentParserCompPtr.IsValid() ? m_argumentParserCompPtr->GetTypenameWriteMode() : imtsdl::ISdlProcessArgumentsParser::TWM_IF_REQUIRED;
+
 			CSdlUnionConverter::WriteConversionFromUnion(stream,
 														 foundUnion,
 														 unionSourceVarName,
@@ -1351,7 +1361,9 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 														 hIndents + 1,
 														 CSdlUnionConverter::CT_MODEL_SCALAR,
 														 QStringLiteral("dataModel.SetData("), //QString(),
-														 QStringLiteral("dataModel"));
+														 QStringLiteral("dataModel"),
+														 QStringLiteral("false"),
+														 typenameMode);
 		}
 		else{
 			// [1] create write check variable
