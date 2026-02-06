@@ -65,6 +65,10 @@ I_EXPORT_COMPONENT(
 		"Generate icon qml files",
 		"Design Token Web QRC");
 
+I_EXPORT_COMPONENT(
+		FigmaTokenProcessor,
+		"Converts Figma design tokens to theme format",
+		"Figma Design Token Processor");
 
 
 } // namespace ImtDesignPck

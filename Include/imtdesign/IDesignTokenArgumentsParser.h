@@ -80,7 +80,12 @@ public:
 		/**
 			The common qrc file generate
 		*/
-		AA_COMMON
+		AA_COMMON,
+
+		/**
+			The Figma tokens file path parameter
+		*/
+		AA_FIGMA_TOKEN_FILE_PATH
 	};
 
 	virtual void SetArguments(int argc, char**argv) = 0;
