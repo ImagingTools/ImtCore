@@ -8,9 +8,13 @@ setlocal enabledelayedexpansion
 REM Generate unique container name if not provided
 if "%CONTAINER_NAME%"=="" set CONTAINER_NAME=myapp-tests-%RANDOM%%RANDOM%
 
-REM Set defaults for optional variables
-if "%IMAGE_NAME%"=="" set IMAGE_NAME=imtcore-tests:linux
-if "%START_POSTGRESQL%"=="" set START_POSTGRESQL=true
+REM Set constants and defaults
+set IMAGE_NAME=imtcore-tests:linux
+if "%POSTGRES_PASSWORD%"=="" set POSTGRES_PASSWORD=root
+if "%POSTGRES_DB%"=="" set POSTGRES_DB=test_db
+
+REM Auto-construct DATABASE_URL
+set DATABASE_URL=postgresql://postgres:%POSTGRES_PASSWORD%@localhost:5432/%POSTGRES_DB%
 
 echo ==========================================
 echo Running Linux containers on Windows
@@ -21,8 +25,8 @@ echo [DEBUG] Current dir : %CD%
 echo [DEBUG] Container   : %CONTAINER_NAME%
 echo [DEBUG] Image       : %IMAGE_NAME%
 echo [DEBUG] BASE_URL    : %BASE_URL%
-echo [DEBUG] START_POSTGRESQL : %START_POSTGRESQL%
 echo [DEBUG] POSTGRES_DB : %POSTGRES_DB%
+echo [DEBUG] POSTGRES_PASSWORD : %POSTGRES_PASSWORD%
 echo [DEBUG] DATABASE_URL : %DATABASE_URL%
 echo [DEBUG] TEST_USERNAME : %TEST_USERNAME%
 echo [DEBUG] TEST_PASSWORD : %TEST_PASSWORD%
@@ -71,7 +75,8 @@ docker run -d ^
   --add-host=host.docker.internal:host-gateway ^
   --entrypoint sh ^
   -e BASE_URL="%BASE_URL%" ^
-  -e START_POSTGRESQL="%START_POSTGRESQL%" ^
+  -e START_POSTGRESQL=true ^
+  -e POSTGRES_PASSWORD="%POSTGRES_PASSWORD%" ^
   -e POSTGRES_DB="%POSTGRES_DB%" ^
   -e DATABASE_URL="%DATABASE_URL%" ^
   -e TEST_USERNAME="%TEST_USERNAME%" ^

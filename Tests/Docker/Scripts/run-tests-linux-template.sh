@@ -1,39 +1,44 @@
 #!/bin/bash
-# Template wrapper script for running tests in application repos
-# Copy this file to your application repo's Tests directory and configure it for your needs
+# Simple configuration file for running Docker tests (Linux containers on Linux)
+# Copy this file to your application's Tests directory and configure the variables below
 
 # ==========================================
-# CONFIGURATION - MODIFY THESE FOR YOUR APP
+# CONFIGURATION
 # ==========================================
 
-# Your application URL (use localhost since we're using --network host)
+# Application URL (use localhost since we're using --network host)
 export BASE_URL="http://localhost:8080"
 
-# PostgreSQL settings (set START_POSTGRESQL=false if you don't need PostgreSQL)
-export START_POSTGRESQL="true"
+# PostgreSQL database name
 export POSTGRES_DB="myapp_test"
-export DATABASE_URL="postgresql://postgres:postgres@localhost:5432/myapp_test"
 
-# Test user credentials
+# PostgreSQL password (default: root)
+export POSTGRES_PASSWORD="root"
+
+# Test credentials
 export TEST_USERNAME="test@example.com"
 export TEST_PASSWORD="testpassword"
 
-# Docker image name (usually don't need to change this)
-export IMAGE_NAME="imtcore-tests:linux"
-
 # ==========================================
-# CORE LOGIC - DO NOT MODIFY BELOW THIS LINE
+# DO NOT MODIFY BELOW THIS LINE
 # ==========================================
 
-# Find ImtCore path (adjust this path to point to your ImtCore location)
-IMTCORE_PATH="$(dirname "$0")/../../../../ImtCore"
+# Auto-discover ImtCore (looks in parent directories)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+IMTCORE_PATH="$SCRIPT_DIR/../.."
 
 if [ ! -f "$IMTCORE_PATH/Tests/Docker/Scripts/run-tests-linux-core.sh" ]; then
-    echo "ERROR: Cannot find ImtCore at $IMTCORE_PATH"
-    echo "Please update IMTCORE_PATH in this script to point to your ImtCore directory"
+    IMTCORE_PATH="$SCRIPT_DIR/../../.."
+fi
+
+if [ ! -f "$IMTCORE_PATH/Tests/Docker/Scripts/run-tests-linux-core.sh" ]; then
+    IMTCORE_PATH="$SCRIPT_DIR/../../../.."
+fi
+
+if [ ! -f "$IMTCORE_PATH/Tests/Docker/Scripts/run-tests-linux-core.sh" ]; then
+    echo "ERROR: Cannot find ImtCore. Please ensure ImtCore is in a parent directory."
     exit 1
 fi
 
-# Call the core script from ImtCore
 bash "$IMTCORE_PATH/Tests/Docker/Scripts/run-tests-linux-core.sh"
 exit $?

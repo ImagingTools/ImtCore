@@ -9,9 +9,15 @@ if (-not $env:CONTAINER_NAME) {
     $env:CONTAINER_NAME = "imtcore-tests-$(Get-Date -Format 'yyyyMMddHHmmss')"
 }
 
-# Set defaults for optional variables
-if (-not $env:IMAGE_NAME) { $env:IMAGE_NAME = "imtcore-tests:windows" }
-if (-not $env:START_POSTGRESQL) { $env:START_POSTGRESQL = "false" }
+# Set constants and defaults
+$env:IMAGE_NAME = "imtcore-tests:windows"
+if (-not $env:POSTGRES_PASSWORD) { $env:POSTGRES_PASSWORD = "root" }
+if (-not $env:POSTGRES_DB) { $env:POSTGRES_DB = "test_db" }
+
+# Auto-construct DATABASE_URL (Note: PostgreSQL typically not available in Windows containers)
+if ($env:POSTGRES_DB) {
+    $env:DATABASE_URL = "postgresql://postgres:$($env:POSTGRES_PASSWORD)@localhost:5432/$($env:POSTGRES_DB)"
+}
 
 Write-Host "=========================================="
 Write-Host "Running Windows containers on Windows"
@@ -22,8 +28,8 @@ Write-Host "[DEBUG] Current dir: $(Get-Location)"
 Write-Host "[DEBUG] Container: $env:CONTAINER_NAME"
 Write-Host "[DEBUG] Image: $env:IMAGE_NAME"
 Write-Host "[DEBUG] BASE_URL: $env:BASE_URL"
-Write-Host "[DEBUG] START_POSTGRESQL: $env:START_POSTGRESQL"
 Write-Host "[DEBUG] POSTGRES_DB: $env:POSTGRES_DB"
+Write-Host "[DEBUG] POSTGRES_PASSWORD: $env:POSTGRES_PASSWORD"
 Write-Host "[DEBUG] DATABASE_URL: $env:DATABASE_URL"
 Write-Host "[DEBUG] TEST_USERNAME: $env:TEST_USERNAME"
 Write-Host "[DEBUG] TEST_PASSWORD: $env:TEST_PASSWORD"
@@ -66,7 +72,8 @@ docker run -d `
   --name $env:CONTAINER_NAME `
   --entrypoint powershell `
   -e BASE_URL="$env:BASE_URL" `
-  -e START_POSTGRESQL="$env:START_POSTGRESQL" `
+  -e START_POSTGRESQL="false" `
+  -e POSTGRES_PASSWORD="$env:POSTGRES_PASSWORD" `
   -e POSTGRES_DB="$env:POSTGRES_DB" `
   -e DATABASE_URL="$env:DATABASE_URL" `
   -e TEST_USERNAME="$env:TEST_USERNAME" `

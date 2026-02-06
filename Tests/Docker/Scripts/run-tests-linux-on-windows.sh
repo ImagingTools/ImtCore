@@ -3,8 +3,9 @@
 # For production use in application repos, copy run-tests-linux-on-windows-template.sh instead
 
 # Set defaults if not already set
-export IMAGE_NAME="${IMAGE_NAME:-imtcore-tests:linux}"
-export START_POSTGRESQL="${START_POSTGRESQL:-true}"
+export BASE_URL="${BASE_URL:-http://host.docker.internal:8080}"
+export POSTGRES_DB="${POSTGRES_DB:-test_db}"
+export POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-root}"
 
 # Call the core script from the same directory
 SCRIPT_DIR="$(dirname "$0")"
