@@ -29,6 +29,26 @@ void FeedStream(QTextStream& stream, uint indents, bool flush)
 }
 
 
+// Helper function to determine if __typename should be written
+bool ShouldWriteTypename(
+			imtsdl::ISdlProcessArgumentsParser::TypenameWriteMode mode,
+			bool isRequired)
+{
+	using imtsdl::ISdlProcessArgumentsParser;
+	switch (mode)
+	{
+	case ISdlProcessArgumentsParser::TWM_ALWAYS:
+		return true;
+	case ISdlProcessArgumentsParser::TWM_IF_REQUIRED:
+		return isRequired;
+	case ISdlProcessArgumentsParser::TWM_NEVER:
+		return false;
+	default:
+		return isRequired; // default to IF_REQUIRED behavior
+	}
+}
+
+
 /**
 	\todo make a refactoring replace 'text' types and methods to static values.
 		\example 'WriteToJsonObject' -> 'CSdlClassJsonModificatorComp::s_writeMethodName'
@@ -50,7 +70,8 @@ void CSdlUnionConverter::WriteConversionFromUnion(
 			const ConversionType& conversionType,
 			const QString& addCommand,
 			const QString& customModelTarget,
-			const QString& returnOnFail)
+			const QString& returnOnFail,
+			imtsdl::ISdlProcessArgumentsParser::TypenameWriteMode typenameWriteMode)
 {
 	QString typeNamespace = imtsdl::CSdlTools::BuildNamespaceFromParams(sdlUnion.GetSchemaParams(), false, true);
 	if (typeNamespace != relatedNamespace){
@@ -210,12 +231,14 @@ void CSdlUnionConverter::WriteConversionFromUnion(
 				stream << QStringLiteral("}");
 				FeedStream(stream, 1, false);
 
-				// add typename
-				FeedStreamHorizontally(stream, hIndents + 1);
-				stream << targetName;
-				stream << QStringLiteral("DataObject.InsertParam(\"__typename\", QVariant(\"");
-				stream << sdlType << QStringLiteral("\"));");
-				FeedStream(stream, 1, false);
+				// add typename if needed
+				if (ShouldWriteTypename(typenameWriteMode, true)){
+					FeedStreamHorizontally(stream, hIndents + 1);
+					stream << targetName;
+					stream << QStringLiteral("DataObject.InsertParam(\"__typename\", QVariant(\"");
+					stream << sdlType << QStringLiteral("\"));");
+					FeedStream(stream, 1, false);
+				}
 			}
 			else if (conversionType == CT_JSON_SCALAR){
 				QString jsonVariable = targetName + QString("JsonObject");
@@ -241,11 +264,13 @@ void CSdlUnionConverter::WriteConversionFromUnion(
 				stream << QStringLiteral("}");
 				FeedStream(stream, 1, false);
 
-				// add typename
-				FeedStreamHorizontally(stream, hIndents + 1);
-				stream << jsonVariable;
-				stream << QStringLiteral("[\"__typename\"] = \"") << sdlType << QStringLiteral("\";");
-				FeedStream(stream, 1, false);
+				// add typename if needed
+				if (ShouldWriteTypename(typenameWriteMode, true)){
+					FeedStreamHorizontally(stream, hIndents + 1);
+					stream << jsonVariable;
+					stream << QStringLiteral("[\"__typename\"] = \"") << sdlType << QStringLiteral("\";");
+					FeedStream(stream, 1, false);
+				}
 
 				FeedStreamHorizontally(stream, hIndents + 1);
 				stream << QStringLiteral("jsonObject[\"") << targetVariableName << QStringLiteral("\"] = ") << jsonVariable << QStringLiteral(";");
@@ -275,11 +300,13 @@ void CSdlUnionConverter::WriteConversionFromUnion(
 				stream << QStringLiteral("}");
 				FeedStream(stream, 1, false);
 
-				// add typename
-				FeedStreamHorizontally(stream, hIndents + 1);
-				stream << jsonVariable;
-				stream << QStringLiteral("[\"__typename\"] = \"") << sdlType << QStringLiteral("\";");
-				FeedStream(stream, 1, false);
+				// add typename if needed
+				if (ShouldWriteTypename(typenameWriteMode, true)){
+					FeedStreamHorizontally(stream, hIndents + 1);
+					stream << jsonVariable;
+					stream << QStringLiteral("[\"__typename\"] = \"") << sdlType << QStringLiteral("\";");
+					FeedStream(stream, 1, false);
+				}
 
 				FeedStreamHorizontally(stream, hIndents + 1);
 				stream << targetVariableName << QStringLiteral(" << ") << jsonVariable << QStringLiteral(";");
@@ -384,7 +411,8 @@ void CSdlUnionConverter::WriteUnionConversionFromData(
 			uint hIndents,
 			const ConversionType& conversionType,
 			const QString& targetName,
-			const QString& arraySourceVariableName)
+			const QString& arraySourceVariableName,
+			imtsdl::ISdlProcessArgumentsParser::TypenameWriteMode typenameWriteMode)
 {
 	bool isFirstIteration = true;
 	for (const auto& sdlType : sdlUnion.GetTypes()){

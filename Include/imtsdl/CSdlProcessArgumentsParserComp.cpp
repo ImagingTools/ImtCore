@@ -76,6 +76,7 @@ bool CSdlProcessArgumentsParserComp::SetArguments(const QStringList& arguments)
 	QCommandLineOption depFileParhOption("DEPFILE", "Depfile, used by CMake to collect dependencies. MUST be a valid file path if 'generator' option is 'DEPFILE'. If the file exsists it will be overwritten!", "DEPFILE");
 	QCommandLineOption configFilePathOption("config", "Defines a path to a file with initial configuration. NOTE: The parameters from the configuration file may be overridden by command line arguments. WARNING: path MUST be a valid path to existing file!", "config");
 	QCommandLineOption cppModeOption("cpp-mode", "Defines the type of generated files. Headers, sources(implementation) or both(default). Expected values: ALL | HEADER | IMPL", "CPP_MODE");
+	QCommandLineOption typenameWriteModeOption("typename-mode", "Defines when to write __typename field in Json/GraphQL/Model conversions. Expected values: ALWAYS | IF-REQUIRED | NEVER. Default: IF-REQUIRED", "TYPENAME_MODE");
 
 	// special modes
 	QCommandLineOption cppOption("CPP", "C++ Modificator to generate code. (enabled default)");
@@ -106,7 +107,8 @@ bool CSdlProcessArgumentsParserComp::SetArguments(const QStringList& arguments)
 				includeHeadersOption,
 				depFileParhOption,
 				configFilePathOption,
-				cppModeOption
+				cppModeOption,
+				typenameWriteModeOption
 	});
 
 	bool isOptionsAcceptable = true;
@@ -266,6 +268,24 @@ bool CSdlProcessArgumentsParserComp::SetArguments(const QStringList& arguments)
 		}
 		else {
 			SendErrorMessage(0, QString("Unexpected value for option '--cpp-mode' expecdeet one of: ALL | HEADER | IMPL"));
+
+			return false;
+		}
+	}
+
+	if (commandLineParser.isSet(typenameWriteModeOption)){
+		const QString typenameWriteModeValue = commandLineParser.value(typenameWriteModeOption);
+		if (typenameWriteModeValue == QStringLiteral("ALWAYS")){
+			m_typenameWriteMode = TWM_ALWAYS;
+		}
+		else if (typenameWriteModeValue == QStringLiteral("IF-REQUIRED")){
+			m_typenameWriteMode = TWM_IF_REQUIRED;
+		}
+		else if (typenameWriteModeValue == QStringLiteral("NEVER")){
+			m_typenameWriteMode = TWM_NEVER;
+		}
+		else {
+			SendErrorMessage(0, QString("Unexpected value for option '--typename-mode' expected one of: ALWAYS | IF-REQUIRED | NEVER"));
 
 			return false;
 		}
@@ -484,6 +504,12 @@ CSdlProcessArgumentsParserComp::CppGenerationMode CSdlProcessArgumentsParserComp
 }
 
 
+CSdlProcessArgumentsParserComp::TypenameWriteMode CSdlProcessArgumentsParserComp::GetTypenameWriteMode() const
+{
+	return m_typenameWriteMode.value_or(TWM_IF_REQUIRED);
+}
+
+
 bool CSdlProcessArgumentsParserComp::ReadFromSettings(const QString& settingsFilePath)
 {
 
@@ -637,6 +663,12 @@ void CSdlProcessArgumentsParserComp::SetTemplateIncludePath(const QString& templ
 void CSdlProcessArgumentsParserComp::SetTemplateOutputPath(const QString& templateOutputPath)
 {
 	m_outputDirTemplate = templateOutputPath;
+}
+
+
+void CSdlProcessArgumentsParserComp::SetTypenameWriteMode(TypenameWriteMode mode)
+{
+	m_typenameWriteMode = mode;
 }
 
 
