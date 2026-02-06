@@ -6,7 +6,7 @@ $ErrorActionPreference = "Stop"
 
 # Generate unique container name if not provided
 if (-not $env:CONTAINER_NAME) {
-    $env:CONTAINER_NAME = "myapp-tests-$(Get-Date -Format 'yyyyMMddHHmmss')"
+    $env:CONTAINER_NAME = "imtcore-tests-$(Get-Date -Format 'yyyyMMddHHmmss')"
 }
 
 # Set defaults for optional variables

@@ -6,7 +6,7 @@
 set -e
 
 # Generate unique container name if not provided
-CONTAINER_NAME="${CONTAINER_NAME:-myapp-tests-$(date +%s)}"
+CONTAINER_NAME="${CONTAINER_NAME:-imtcore-tests-$(date +%s)}"
 
 # Set defaults for optional variables
 IMAGE_NAME="${IMAGE_NAME:-imtcore-tests:linux}"
