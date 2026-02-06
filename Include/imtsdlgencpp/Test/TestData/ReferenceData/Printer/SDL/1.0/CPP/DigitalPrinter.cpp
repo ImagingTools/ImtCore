@@ -21,6 +21,8 @@ bool CDigitalPrinterSpecification::V1_0::operator==(const V1_0& other) const
 
 bool CDigitalPrinterSpecification::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
+	model.SetData("__typename", "DigitalPrinterSpecification", modelIndex);
+
 
 	if (base){
 		::imtbase::CTreeItemModel* baseNewModelPtr = model.AddTreeModel("base", modelIndex);
@@ -148,6 +150,8 @@ bool CDigitalPrinterSpecification::V1_0::WriteToGraphQlObject(::imtgql::CGqlPara
 		gqlObject.InsertParam("printingTechnology", QVariant(printingTechnologyStringValue));
 	}
 
+	gqlObject.InsertParam("__typename", QVariant("DigitalPrinterSpecification"));
+
 	return true;
 }
 
@@ -242,6 +246,8 @@ bool CDigitalPrinterSpecification::V1_0::WriteToJsonObject(QJsonObject& jsonObje
 		}
 		jsonObject["printingTechnology"] = QJsonValue::fromVariant(printingTechnologyStringValue);
 	}
+
+	jsonObject["__typename"] = "DigitalPrinterSpecification";
 
 	return true;
 }
@@ -557,6 +563,8 @@ bool CDigitalPrinter::V1_0::operator==(const V1_0& other) const
 
 bool CDigitalPrinter::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
+	model.SetData("__typename", "DigitalPrinter", modelIndex);
+
 
 	if (base){
 		::imtbase::CTreeItemModel* baseNewModelPtr = model.AddTreeModel("base", modelIndex);
@@ -684,6 +692,8 @@ bool CDigitalPrinter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlO
 		gqlObject.InsertParam("printingTechnology", QVariant(printingTechnologyStringValue));
 	}
 
+	gqlObject.InsertParam("__typename", QVariant("DigitalPrinter"));
+
 	return true;
 }
 
@@ -778,6 +788,8 @@ bool CDigitalPrinter::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		}
 		jsonObject["printingTechnology"] = QJsonValue::fromVariant(printingTechnologyStringValue);
 	}
+
+	jsonObject["__typename"] = "DigitalPrinter";
 
 	return true;
 }

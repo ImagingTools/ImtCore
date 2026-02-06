@@ -45,6 +45,8 @@ bool CResult::V1_0::operator==(const V1_0& other) const
 
 bool CResult::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
+	model.SetData("__typename", "Result", modelIndex);
+
 	if (!AreaResult){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "AreaResult").toLocal8Bit().constData();)
 
@@ -1353,6 +1355,8 @@ bool CResult::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) c
 	}
 	gqlObject.InsertParam("Geometry", geometryGqlObject);
 
+	gqlObject.InsertParam("__typename", QVariant("Result"));
+
 	return true;
 }
 
@@ -2307,6 +2311,8 @@ bool CResult::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 	}
 	jsonObject["Geometry"] = geometryJsonObject;
 
+	jsonObject["__typename"] = "Result";
+
 	return true;
 }
 
@@ -3184,6 +3190,8 @@ bool CArea::V1_0::operator==(const V1_0& other) const
 
 bool CArea::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
+	model.SetData("__typename", "Area", modelIndex);
+
 	if (!AreaName){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "AreaName").toLocal8Bit().constData();)
 
@@ -4109,6 +4117,8 @@ bool CArea::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) con
 	}
 	gqlObject.InsertParam("Results", resultsDataObjectList);
 
+	gqlObject.InsertParam("__typename", QVariant("Area"));
+
 	return true;
 }
 
@@ -4803,6 +4813,8 @@ bool CArea::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		newResultsArray << newResultsJsonObject;
 	}
 	jsonObject["Results"] = newResultsArray;
+
+	jsonObject["__typename"] = "Area";
 
 	return true;
 }
@@ -5508,6 +5520,8 @@ bool CAnalyzer::V1_0::operator==(const V1_0& other) const
 
 bool CAnalyzer::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
+	model.SetData("__typename", "Analyzer", modelIndex);
+
 	if (!AnalyzerName){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "AnalyzerName").toLocal8Bit().constData();)
 
@@ -5723,6 +5737,8 @@ bool CAnalyzer::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject)
 		gqlObject.InsertParam("Areas", areasDataObjectList);
 	}
 
+	gqlObject.InsertParam("__typename", QVariant("Analyzer"));
+
 	return true;
 }
 
@@ -5895,6 +5911,8 @@ bool CAnalyzer::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		}
 		jsonObject["Areas"] = newAreasArray;
 	}
+
+	jsonObject["__typename"] = "Analyzer";
 
 	return true;
 }
@@ -6255,6 +6273,8 @@ bool CInspection::V1_0::operator==(const V1_0& other) const
 
 bool CInspection::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
+	model.SetData("__typename", "Inspection", modelIndex);
+
 	if (!ID){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "ID").toLocal8Bit().constData();)
 
@@ -6524,6 +6544,8 @@ bool CInspection::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObjec
 		gqlObject.InsertParam("Analyzers", analyzersDataObjectList);
 	}
 
+	gqlObject.InsertParam("__typename", QVariant("Inspection"));
+
 	return true;
 }
 
@@ -6732,6 +6754,8 @@ bool CInspection::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		}
 		jsonObject["Analyzers"] = newAnalyzersArray;
 	}
+
+	jsonObject["__typename"] = "Inspection";
 
 	return true;
 }
@@ -7116,6 +7140,8 @@ bool CProductOverview::V1_0::operator==(const V1_0& other) const
 
 bool CProductOverview::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
+	model.SetData("__typename", "ProductOverview", modelIndex);
+
 	if (!ProductID){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "ProductID").toLocal8Bit().constData();)
 
@@ -7439,6 +7465,8 @@ bool CProductOverview::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gql
 		gqlObject.InsertParam("Inspections", inspectionsDataObjectList);
 	}
 
+	gqlObject.InsertParam("__typename", QVariant("ProductOverview"));
+
 	return true;
 }
 
@@ -7683,6 +7711,8 @@ bool CProductOverview::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		}
 		jsonObject["Inspections"] = newInspectionsArray;
 	}
+
+	jsonObject["__typename"] = "ProductOverview";
 
 	return true;
 }
@@ -8084,6 +8114,8 @@ bool CLocalizedText::V1_0::operator==(const V1_0& other) const
 
 bool CLocalizedText::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
+	model.SetData("__typename", "LocalizedText", modelIndex);
+
 	if (!text){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "text").toLocal8Bit().constData();)
 
@@ -8157,6 +8189,8 @@ bool CLocalizedText::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlOb
 	}
 	gqlObject.InsertParam("locale", QVariant(*locale));
 
+	gqlObject.InsertParam("__typename", QVariant("LocalizedText"));
+
 	return true;
 }
 
@@ -8210,6 +8244,8 @@ bool CLocalizedText::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		return false;
 	}
 	jsonObject["locale"] = QJsonValue::fromVariant(*locale);
+
+	jsonObject["__typename"] = "LocalizedText";
 
 	return true;
 }
@@ -8504,6 +8540,8 @@ bool CCoordinates::V1_0::operator==(const V1_0& other) const
 
 bool CCoordinates::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
+	model.SetData("__typename", "Coordinates", modelIndex);
+
 	if (!x){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "x").toLocal8Bit().constData();)
 
@@ -8604,6 +8642,8 @@ bool CCoordinates::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 	}
 	gqlObject.InsertParam("z", QVariant(*z));
 
+	gqlObject.InsertParam("__typename", QVariant("Coordinates"));
+
 	return true;
 }
 
@@ -8675,6 +8715,8 @@ bool CCoordinates::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		return false;
 	}
 	jsonObject["z"] = QJsonValue::fromVariant(*z);
+
+	jsonObject["__typename"] = "Coordinates";
 
 	return true;
 }
@@ -8973,6 +9015,8 @@ bool CExtendedMetaData::V1_0::operator==(const V1_0& other) const
 
 bool CExtendedMetaData::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
+	model.SetData("__typename", "ExtendedMetaData", modelIndex);
+
 	if (key){
 		model.SetData("key", *key, modelIndex);
 	}
@@ -9096,6 +9140,8 @@ bool CExtendedMetaData::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gq
 		gqlObject.InsertParam("value", valueDataObject);
 	}
 
+	gqlObject.InsertParam("__typename", QVariant("ExtendedMetaData"));
+
 	return true;
 }
 
@@ -9212,6 +9258,8 @@ bool CExtendedMetaData::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		}
 
 	}
+
+	jsonObject["__typename"] = "ExtendedMetaData";
 
 	return true;
 }
@@ -9547,6 +9595,8 @@ bool CResultMetaData::V1_0::operator==(const V1_0& other) const
 
 bool CResultMetaData::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
+	model.SetData("__typename", "ResultMetaData", modelIndex);
+
 	if (!resultId){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "resultId").toLocal8Bit().constData();)
 
@@ -9787,6 +9837,8 @@ bool CResultMetaData::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlO
 		gqlObject.InsertParam("extendedMetaData", extendedMetaDataDataObjectList);
 	}
 
+	gqlObject.InsertParam("__typename", QVariant("ResultMetaData"));
+
 	return true;
 }
 
@@ -9971,6 +10023,8 @@ bool CResultMetaData::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		}
 		jsonObject["extendedMetaData"] = newExtendedMetaDataArray;
 	}
+
+	jsonObject["__typename"] = "ResultMetaData";
 
 	return true;
 }
@@ -10346,6 +10400,8 @@ bool COverallResultValues::V1_0::operator==(const V1_0& other) const
 
 bool COverallResultValues::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
+	model.SetData("__typename", "OverallResultValues", modelIndex);
+
 	if (name){
 		model.SetData("name", *name, modelIndex);
 	}
@@ -10473,6 +10529,8 @@ bool COverallResultValues::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject&
 		gqlObject.InsertParam("highLimit", QVariant(*highLimit));
 	}
 
+	gqlObject.InsertParam("__typename", QVariant("OverallResultValues"));
+
 	return true;
 }
 
@@ -10562,6 +10620,8 @@ bool COverallResultValues::V1_0::WriteToJsonObject(QJsonObject& jsonObject) cons
 	if (highLimit){
 		jsonObject["highLimit"] = QJsonValue::fromVariant(*highLimit);
 	}
+
+	jsonObject["__typename"] = "OverallResultValues";
 
 	return true;
 }
@@ -10874,6 +10934,8 @@ bool CUnionTestingType::V1_0::operator==(const V1_0& other) const
 
 bool CUnionTestingType::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
+	model.SetData("__typename", "UnionTestingType", modelIndex);
+
 	if (simpleUnion){
 		QVariant simpleUnionVariantValue;
 		if (const double* val = std::get_if<double>(simpleUnion.GetPtr())){
@@ -11115,6 +11177,8 @@ bool CUnionTestingType::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gq
 		gqlObject.InsertParam("mixedUnion", mixedUnionDataObject);
 	}
 
+	gqlObject.InsertParam("__typename", QVariant("UnionTestingType"));
+
 	return true;
 }
 
@@ -11341,6 +11405,8 @@ bool CUnionTestingType::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		}
 
 	}
+
+	jsonObject["__typename"] = "UnionTestingType";
 
 	return true;
 }
@@ -11743,6 +11809,8 @@ bool CCDMResultVarRecursive::V1_0::operator==(const V1_0& other) const
 
 bool CCDMResultVarRecursive::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
+	model.SetData("__typename", "CDMResultVarRecursive", modelIndex);
+
 	if (!dataModelTitle){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "dataModelTitle").toLocal8Bit().constData();)
 
@@ -12031,6 +12099,8 @@ bool CCDMResultVarRecursive::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObjec
 		gqlObject.InsertParam("overallResultValues", overallResultValuesDataObjectList);
 	}
 
+	gqlObject.InsertParam("__typename", QVariant("CDMResultVarRecursive"));
+
 	return true;
 }
 
@@ -12272,6 +12342,8 @@ bool CCDMResultVarRecursive::V1_0::WriteToJsonObject(QJsonObject& jsonObject) co
 		}
 		jsonObject["overallResultValues"] = newOverallResultValuesArray;
 	}
+
+	jsonObject["__typename"] = "CDMResultVarRecursive";
 
 	return true;
 }
@@ -12674,6 +12746,8 @@ bool CCDMResultVarString::V1_0::operator==(const V1_0& other) const
 
 bool CCDMResultVarString::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
+	model.SetData("__typename", "CDMResultVarString", modelIndex);
+
 	if (!dataModelTitle){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "dataModelTitle").toLocal8Bit().constData();)
 
@@ -12892,6 +12966,8 @@ bool CCDMResultVarString::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& 
 		gqlObject.InsertParam("overallResultValues", overallResultValuesDataObjectList);
 	}
 
+	gqlObject.InsertParam("__typename", QVariant("CDMResultVarString"));
+
 	return true;
 }
 
@@ -13070,6 +13146,8 @@ bool CCDMResultVarString::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		}
 		jsonObject["overallResultValues"] = newOverallResultValuesArray;
 	}
+
+	jsonObject["__typename"] = "CDMResultVarString";
 
 	return true;
 }
@@ -13430,6 +13508,8 @@ bool CCDMResult::V1_0::operator==(const V1_0& other) const
 
 bool CCDMResult::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
+	model.SetData("__typename", "CDMResult", modelIndex);
+
 	if (!dataModelTitle){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "dataModelTitle").toLocal8Bit().constData();)
 
@@ -13718,6 +13798,8 @@ bool CCDMResult::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject
 		gqlObject.InsertParam("overallResultValues", overallResultValuesDataObjectList);
 	}
 
+	gqlObject.InsertParam("__typename", QVariant("CDMResult"));
+
 	return true;
 }
 
@@ -13959,6 +14041,8 @@ bool CCDMResult::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		}
 		jsonObject["overallResultValues"] = newOverallResultValuesArray;
 	}
+
+	jsonObject["__typename"] = "CDMResult";
 
 	return true;
 }
@@ -14357,6 +14441,8 @@ bool CPointsInCoordinateFormat::V1_0::operator==(const V1_0& other) const
 
 bool CPointsInCoordinateFormat::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
+	model.SetData("__typename", "PointsInCoordinateFormat", modelIndex);
+
 	if (pointAsCoordinates){
 		model.SetData("pointAsCoordinates", *pointAsCoordinates, modelIndex);
 	}
@@ -14394,6 +14480,8 @@ bool CPointsInCoordinateFormat::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamOb
 		gqlObject.InsertParam("pointAsCoordinates", QVariant(*pointAsCoordinates));
 	}
 
+	gqlObject.InsertParam("__typename", QVariant("PointsInCoordinateFormat"));
+
 	return true;
 }
 
@@ -14423,6 +14511,8 @@ bool CPointsInCoordinateFormat::V1_0::WriteToJsonObject(QJsonObject& jsonObject)
 	if (pointAsCoordinates){
 		jsonObject["pointAsCoordinates"] = QJsonValue::fromVariant(*pointAsCoordinates);
 	}
+
+	jsonObject["__typename"] = "PointsInCoordinateFormat";
 
 	return true;
 }
@@ -14697,6 +14787,8 @@ bool CCollectionViewParamsTest::V1_0::operator==(const V1_0& other) const
 
 bool CCollectionViewParamsTest::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
+	model.SetData("__typename", "CollectionViewParamsTest", modelIndex);
+
 	if (count){
 		model.SetData("count", *count, modelIndex);
 	}
@@ -14796,6 +14888,8 @@ bool CCollectionViewParamsTest::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamOb
 		gqlObject.InsertParam("filterModel", filterModelGqlObject);
 	}
 
+	gqlObject.InsertParam("__typename", QVariant("CollectionViewParamsTest"));
+
 	return true;
 }
 
@@ -14868,6 +14962,8 @@ bool CCollectionViewParamsTest::V1_0::WriteToJsonObject(QJsonObject& jsonObject)
 		}
 		jsonObject["filterModel"] = filterModelJsonObject;
 	}
+
+	jsonObject["__typename"] = "CollectionViewParamsTest";
 
 	return true;
 }
