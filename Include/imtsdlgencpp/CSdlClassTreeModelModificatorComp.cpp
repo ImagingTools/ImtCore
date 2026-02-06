@@ -191,6 +191,9 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(
 			imtsdl::CSdlUnion foundUnion;
 			[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
 
+			const imtsdl::ISdlProcessArgumentsParser::TypenameWriteMode typenameMode = 
+				m_argumentParserCompPtr.IsValid() ? m_argumentParserCompPtr->GetTypenameWriteMode() : imtsdl::ISdlProcessArgumentsParser::TWM_IF_REQUIRED;
+
 			WriteConversionFromUnion(stream,
 				foundUnion,
 				unionSourceVarName + QStringLiteral(".GetPtr()"),
@@ -203,7 +206,10 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(
 				*m_sdlUnionListCompPtr,
 				2,
 				CSdlUnionConverter::ConversionType::CT_MODEL_SCALAR,
-				"model.SetData(");
+				"model.SetData(",
+				QString(),
+				QStringLiteral("false"),
+				typenameMode);
 		}
 		else {
 			stream << QStringLiteral("model.SetData(\"") << field.GetId() << QStringLiteral("\", ");
@@ -260,6 +266,9 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(
 			imtsdl::CSdlUnion foundUnion;
 			[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
 
+			const imtsdl::ISdlProcessArgumentsParser::TypenameWriteMode typenameMode = 
+				m_argumentParserCompPtr.IsValid() ? m_argumentParserCompPtr->GetTypenameWriteMode() : imtsdl::ISdlProcessArgumentsParser::TWM_IF_REQUIRED;
+
 			WriteConversionFromUnion(stream,
 				foundUnion,
 				unionSourceVarName + QStringLiteral(".GetPtr()"),
@@ -272,7 +281,10 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(
 				*m_sdlUnionListCompPtr,
 				2,
 				CT_MODEL_SCALAR,
-				"model.SetData(");
+				"model.SetData(",
+				QString(),
+				QStringLiteral("false"),
+				typenameMode);
 		}
 		else {
 			stream << QStringLiteral("model.SetData(\"") << field.GetId() << QStringLiteral("\", ");
@@ -393,6 +405,9 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(
 			stream << QStringLiteral(".value<::imtbase::CTreeItemModel*>()->GetData(\"__typename\").toString();");
 			FeedStream(stream, 1, false);
 
+			const imtsdl::ISdlProcessArgumentsParser::TypenameWriteMode typenameMode = 
+				m_argumentParserCompPtr.IsValid() ? m_argumentParserCompPtr->GetTypenameWriteMode() : imtsdl::ISdlProcessArgumentsParser::TWM_IF_REQUIRED;
+
 			WriteUnionConversionFromData(stream,
 				foundUnion,
 				dataVarName,
@@ -401,7 +416,12 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(
 				"modelIndex",
 				*m_sdlTypeListCompPtr,
 				*m_sdlEnumListCompPtr,
-				*m_sdlUnionListCompPtr);
+				*m_sdlUnionListCompPtr,
+				1,
+				CT_MODEL_SCALAR,
+				QString(),
+				QString(),
+				typenameMode);
 		}
 		else {
 			stream << GetSettingValueString(
@@ -450,6 +470,9 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(
 			stream << QStringLiteral(".value<::imtbase::CTreeItemModel*>()->GetData(\"__typename\").toString();");
 			FeedStream(stream, 1, false);
 
+			const imtsdl::ISdlProcessArgumentsParser::TypenameWriteMode typenameMode = 
+				m_argumentParserCompPtr.IsValid() ? m_argumentParserCompPtr->GetTypenameWriteMode() : imtsdl::ISdlProcessArgumentsParser::TWM_IF_REQUIRED;
+
 			WriteUnionConversionFromData(stream,
 				foundUnion,
 				dataVarName,
@@ -459,7 +482,8 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(
 				*m_sdlTypeListCompPtr,
 				*m_sdlEnumListCompPtr,
 				*m_sdlUnionListCompPtr,
-				2);
+				2,
+				typenameMode);
 		}
 		else{
 			FeedStreamHorizontally(stream, 2);
@@ -756,6 +780,9 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelImplCo
 		[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
 		Q_ASSERT(found);
 
+		const imtsdl::ISdlProcessArgumentsParser::TypenameWriteMode typenameMode = 
+			m_argumentParserCompPtr.IsValid() ? m_argumentParserCompPtr->GetTypenameWriteMode() : imtsdl::ISdlProcessArgumentsParser::TWM_IF_REQUIRED;
+
 		WriteConversionFromUnion(stream, foundUnion,
 			unionSourceVarName + QStringLiteral(".GetPtr()"),
 			unionConvertedVarName,
@@ -767,7 +794,10 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelImplCo
 			*m_sdlUnionListCompPtr,
 			hIndents + 1,
 			CSdlUnionConverter::ConversionType::CT_MODEL_ARRAY,
-			newTreeModelVarName + QString("->SetData("));
+			newTreeModelVarName + QString("->SetData("),
+			QString(),
+			QStringLiteral("false"),
+			typenameMode);
 	}
 
 	if (!isUnion){
@@ -961,6 +991,9 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelImplC
 		imtsdl::CSdlUnion foundUnion;
 		[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
 
+		const imtsdl::ISdlProcessArgumentsParser::TypenameWriteMode typenameMode = 
+			m_argumentParserCompPtr.IsValid() ? m_argumentParserCompPtr->GetTypenameWriteMode() : imtsdl::ISdlProcessArgumentsParser::TWM_IF_REQUIRED;
+
 		WriteUnionConversionFromData(stream,
 			foundUnion,
 			unionSourceVarName,
@@ -972,7 +1005,8 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelImplC
 			*m_sdlUnionListCompPtr,
 			hIndents + 1,
 			CSdlUnionConverter::ConversionType::CT_MODEL_ARRAY,
-			field.GetId());
+			field.GetId(),
+			typenameMode);
 	}
 	else{
 		stream << OptListConvertTypeWithNamespace(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
