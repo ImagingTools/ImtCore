@@ -9,6 +9,7 @@
 // ACF includes
 #include <istd/TComposedFactory.h>
 #include <istd/TSingleFactory.h>
+#include <itest/CStandardTestExecutor.h>
 
 // ImtCore includes
 #include <imtbase/COrderedObjectCollectionProxy.h>
