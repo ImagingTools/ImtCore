@@ -15,7 +15,7 @@ The scripts are organized into three categories:
 ### 1. Build Scripts
 Scripts for building Docker images in ImtCore:
 - `build-docker-linux.sh` - Build Linux container
-- `build-docker-windows.ps1` - Build Windows container
+- `build-docker-windows.bat` - Build Windows container
 - `build-docker-linux-on-windows.bat` - Build Linux container on Windows (cmd)
 - `build-docker-linux-on-windows.sh` - Build Linux container on Windows (Git Bash/WSL)
 
@@ -30,7 +30,7 @@ These scripts contain the core Docker orchestration logic and should **NOT** be 
 - `run-tests-linux-on-windows-core.sh` - Core logic for Git Bash/WSL
 
 **Windows on Windows:**
-- `run-tests-windows-core.ps1` - Core logic for native Windows
+- `run-tests-windows-core.bat` - Core logic for native Windows
 
 ### 3. Template/Wrapper Scripts
 Two types of wrapper scripts:
@@ -39,13 +39,13 @@ Two types of wrapper scripts:
 - `run-tests-linux.sh` - Native Linux development
 - `run-tests-linux-on-windows.bat` - Linux on Windows (cmd)
 - `run-tests-linux-on-windows.sh` - Linux on Windows (bash)
-- `run-tests-windows.ps1` - Native Windows development
+- `run-tests-windows.bat` - Native Windows development
 
 #### B. Templates for application repos (copy these to your app)
 - `run-tests-linux-template.sh` - **Template for Linux on Linux**
 - `run-tests-linux-on-windows-template.bat` - **Template for Linux on Windows (cmd)**
 - `run-tests-linux-on-windows-template.sh` - **Template for Linux on Windows (bash)**
-- `run-tests-windows-template.ps1` - **Template for Windows on Windows**
+- `run-tests-windows-template.bat` - **Template for Windows on Windows**
 
 ## Usage for Application Repos (e.g., Lisa)
 
@@ -77,7 +77,7 @@ chmod +x /path/to/Lisa/Tests/run-tests.sh
 #### Scenario 3: Windows on Windows (Native Windows Containers)
 Use this for testing native Windows applications in Windows containers.
 ```powershell
-Copy-Item C:\path\to\ImtCore\Tests\Docker\Scripts\run-tests-windows-template.ps1 C:\path\to\Lisa\Tests\run-tests.ps1
+Copy-Item C:\path\to\ImtCore\Tests\Docker\Scripts\run-tests-windows-template.bat C:\path\to\Lisa\Tests\run-tests.bat
 ```
 
 ### Step 2: Configure the template
@@ -163,7 +163,7 @@ cd /path/to/Lisa/Tests
 #### Windows on Windows:
 ```powershell
 cd C:\path\to\Lisa\Tests
-.\run-tests.ps1
+.\run-tests.bat
 ```
 
 ## Benefits of This Approach

@@ -36,7 +36,7 @@ RUN npm install -g playwright newman && \
 RUN powershell -Command New-Item -ItemType Directory -Force -Path C:\app\tests, C:\app\tests\GUI, C:\app\tests\API, C:\app\tests\test-results\screenshots, C:\app\tests\test-results\videos, C:\app\startup, C:\app\resources
 
 # Copy entrypoint script
-COPY Tests/Docker/entrypoint.ps1 C:\app\entrypoint.ps1
+COPY Tests/Docker/entrypoint.bat C:\app\entrypoint.bat
 
 # Copy GUI utilities (utils.js and playwright.config.js) for Playwright tests
 COPY Tests/Docker/GUI/utils.js C:\app\tests\GUI\utils.js
@@ -54,5 +54,5 @@ ENV CI=true
 ENV START_POSTGRESQL=false
 ENV POSTGRES_DB=""
 
-ENTRYPOINT ["powershell", "-File", "C:\\app\\entrypoint.ps1"]
+ENTRYPOINT ["cmd", "/c", "C:\\app\\entrypoint.bat"]
 CMD []

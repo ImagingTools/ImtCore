@@ -13,7 +13,7 @@ Complete Docker test infrastructure for running GUI (Playwright) and API (Postma
 
 **Windows:**
 ```powershell
-.\Tests\Docker\Scripts\build-docker-windows.ps1
+.\Tests\Docker\Scripts\build-docker-windows.bat
 ```
 
 **Linux on Windows** (Docker Desktop in Linux mode):
@@ -38,8 +38,8 @@ chmod +x run-tests.sh
 
 **Windows:**
 ```powershell
-Copy-Item "\path\to\ImtCore\Tests\Docker\Scripts\run-tests.ps1" .
-.\run-tests.ps1
+Copy-Item "\path\to\ImtCore\Tests\Docker\Scripts\run-tests.bat" .
+.\run-tests.bat
 ```
 
 **Linux on Windows** (Docker Desktop in Linux mode):
@@ -70,11 +70,11 @@ chmod +x run-tests-linux-on-windows.sh
 Tests/Docker/
 ├── Scripts/                            # All build and run scripts
 │   ├── build-docker-linux.sh           # Build script for Linux
-│   ├── build-docker-windows.ps1        # Build script for Windows  
+│   ├── build-docker-windows.bat        # Build script for Windows  
 │   ├── build-docker-linux-on-windows.bat  # Build Linux on Windows (native cmd)
 │   ├── build-docker-linux-on-windows.sh   # Build Linux on Windows (Git Bash/WSL)
 │   ├── run-tests.sh                    # Application test runner (Linux)
-│   ├── run-tests.ps1                   # Application test runner (Windows)
+│   ├── run-tests.bat                   # Application test runner (Windows)
 │   ├── run-tests-linux-on-windows.bat  # Test runner (Linux on Windows - native cmd)
 │   └── run-tests-linux-on-windows.sh   # Test runner (Linux on Windows - Git Bash/WSL)
 ├── GUI/                                # GUI test utilities
@@ -83,7 +83,7 @@ Tests/Docker/
 ├── Dockerfile.linux                    # Linux: Node 18 + Playwright + Newman + Fonts
 ├── Dockerfile.windows                  # Windows: Node 18 + Playwright + Newman
 ├── entrypoint.sh                       # Linux: startup + auto-detection
-├── entrypoint.ps1                      # Windows: startup + auto-detection
+├── entrypoint.bat                      # Windows: startup + auto-detection
 ├── Resources/                          # For application installers, SQL, configs
 └── Startup/                            # For application startup scripts
 
@@ -108,7 +108,7 @@ From ImtCore repository root:
 
 From ImtCore repository root (PowerShell):
 ```powershell
-.\Tests\Docker\build-docker-windows.ps1
+.\Tests\Docker\build-docker-windows.bat
 ```
 
 - Requires Windows 10/11 Pro+ with Hyper-V
@@ -164,7 +164,7 @@ export POSTGRES_DB="myapp_test"
 $env:BASE_URL="http://host.docker.internal:7776"
 $env:START_POSTGRESQL="true"
 $env:POSTGRES_DB="myapp_test"
-.\run-tests.ps1
+.\run-tests.bat
 ```
 
 **Linux on Windows Example:**
@@ -251,9 +251,9 @@ Place in `Tests/Docker/Resources/`:
 Place in `Tests/Docker/Startup/`:
 
 **Naming** (execution order):
-- `01-setup-database.sh` / `.ps1`
-- `02-install-app.sh` / `.ps1`
-- `03-start-services.sh` / `.ps1`
+- `01-setup-database.sh` / `.bat`
+- `02-install-app.sh` / `.bat`
+- `03-start-services.sh` / `.bat`
 
 **Example** (`01-start-app.sh`):
 ```bash
