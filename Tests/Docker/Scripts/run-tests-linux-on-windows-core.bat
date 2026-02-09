@@ -70,7 +70,44 @@ if exist "Tests\API" (
 )
 echo.
 
-echo Starting idle container (entrypoint will NOT run yet)...
+REM Build volume mount arguments for application directories
+set VOLUME_MOUNTS=
+
+REM Always mount ImtCore GUI utilities (utils.js, playwright.config.js, etc.) from ImtCore
+set IMTCORE_GUI_DIR=%IMTCORE_DIR%\Tests\Docker\GUI
+if exist "%IMTCORE_GUI_DIR%" (
+  set VOLUME_MOUNTS=%VOLUME_MOUNTS% -v "%IMTCORE_GUI_DIR%:/app/tests/GUI:ro"
+  echo [DEBUG] Mounting ImtCore GUI utilities from: %IMTCORE_GUI_DIR%
+)
+
+REM Mount application-specific test directories if they exist
+if exist "Tests\GUI" (
+  set VOLUME_MOUNTS=%VOLUME_MOUNTS% -v "%CD%\Tests\GUI:/app/tests/GUI/app:ro"
+  echo [DEBUG] Mounting application GUI tests from: Tests\GUI
+)
+
+if exist "Tests\API" (
+  set VOLUME_MOUNTS=%VOLUME_MOUNTS% -v "%CD%\Tests\API:/app/tests/API:ro"
+  echo [DEBUG] Mounting application API tests from: Tests\API
+)
+
+if exist "Tests\Startup" (
+  set VOLUME_MOUNTS=%VOLUME_MOUNTS% -v "%CD%\Tests\Startup:/app/startup:ro"
+  echo [DEBUG] Mounting application startup scripts from: Tests\Startup
+)
+
+if exist "Tests\Resources" (
+  set VOLUME_MOUNTS=%VOLUME_MOUNTS% -v "%CD%\Tests\Resources:/app/resources:ro"
+  echo [DEBUG] Mounting application resources from: Tests\Resources
+)
+
+REM Always mount test-results as read-write for output
+if not exist "%CD%\test-results" mkdir "%CD%\test-results"
+set VOLUME_MOUNTS=%VOLUME_MOUNTS% -v "%CD%\test-results:/app/tests/test-results"
+echo [DEBUG] Mounting test results output to: test-results
+
+echo.
+echo Starting container with volume mounts...
 docker run -d ^
   --name "%CONTAINER_NAME%" ^
   --add-host=host.docker.internal:host-gateway ^
@@ -83,6 +120,7 @@ docker run -d ^
   -e TEST_USERS="%TEST_USERS%" ^
   -e UPDATE_SNAPSHOTS="%UPDATE_SNAPSHOTS%" ^
   -e CI=true ^
+  %VOLUME_MOUNTS% ^
   "%IMAGE_NAME%" ^
   -lc "sleep infinity"
 
@@ -93,43 +131,8 @@ if errorlevel 1 (
 
 docker ps -a --filter "name=%CONTAINER_NAME%"
 
-REM Ensure target dirs exist
 echo.
-echo Creating directories in container...
-docker exec "%CONTAINER_NAME%" sh -lc "mkdir -p /app/tests/GUI /app/tests/API /app/startup /app/resources"
-
-echo.
-echo Copying GUI tests...
-if exist "Tests\GUI" (
-  docker cp "Tests\GUI\." "%CONTAINER_NAME%:/app/tests/GUI/"
-) else (
-  echo WARNING: Tests\GUI directory not found - skipping
-)
-
-echo Copying API tests...
-if exist "Tests\API" (
-  docker cp "Tests\API\." "%CONTAINER_NAME%:/app/tests/API/"
-) else (
-  echo WARNING: Tests\API directory not found - skipping
-)
-
-echo Copying resources...
-if exist "Tests\Resources" (
-  docker cp "Tests\Resources\." "%CONTAINER_NAME%:/app/resources/"
-) else (
-  echo WARNING: Tests\Resources directory not found - skipping
-)
-
-echo Copying startup scripts...
-if exist "Tests\Startup" (
-  docker cp "Tests\Startup\." "%CONTAINER_NAME%:/app/startup/"
-  docker exec "%CONTAINER_NAME%" sh -lc "chmod +x /app/startup/*.sh 2>/dev/null || true"
-) else (
-  echo WARNING: Tests\Startup directory not found - skipping
-)
-
-echo.
-echo [DEBUG] Container files after copy:
+echo [DEBUG] Container mounted directories:
 docker exec "%CONTAINER_NAME%" sh -lc "echo '--- /app/startup ---'; ls -la /app/startup 2>/dev/null || echo '(empty)'; echo '--- /app/tests/GUI ---'; ls -la /app/tests/GUI 2>/dev/null || echo '(empty)'; echo '--- /app/tests/API ---'; ls -la /app/tests/API 2>/dev/null || echo '(empty)'"
 
 echo.
@@ -138,12 +141,8 @@ docker exec "%CONTAINER_NAME%" sh -lc "export PAUSE_BEFORE_TESTS=false; /app/ent
 set EXIT_CODE=%ERRORLEVEL%
 echo [DEBUG] Test run exit code: %EXIT_CODE%
 
-set "RESULTS_DIR=%~dp0test-results"
-
 echo.
-echo Copying test results...
-if exist "%RESULTS_DIR%" rmdir /s /q "%RESULTS_DIR%" >nul 2>&1
-docker cp "%CONTAINER_NAME%:/app/tests/test-results" "%RESULTS_DIR%" 2>nul || echo No test results to copy
+echo Test results are available in: test-results\
 
 echo.
 echo ==========================================

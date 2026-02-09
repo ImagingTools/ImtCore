@@ -1,58 +1,55 @@
 # Dockerfile for ImtCore test environment (Windows)
 # This container provides the base infrastructure for running tests.
 # Application-specific files (GUI tests, API tests, resources, startup scripts)
-# should be copied from the application repository (e.g., Lisa) when running the container.
+# should be mounted via volume mounts when running the container.
 #
 # Note: Building Windows containers requires:
 # - Windows 10/11 Pro or Windows Server
 # - Docker Desktop with Windows containers enabled
 # - Hyper-V feature enabled
 
-# Use Windows Server Core with Node.js
+# Use Windows Server Core
 FROM mcr.microsoft.com/windows/servercore:ltsc2022
 
+SHELL ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command"]
+
 # Install Chocolatey package manager
-RUN powershell -Command \
-    Set-ExecutionPolicy Bypass -Scope Process -Force; \
-    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; \
-    iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+RUN iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
-# Install Node.js and PostgreSQL via Chocolatey (latest versions)
-RUN choco install -y nodejs
-RUN choco install -y postgresql
+# Install Node.js LTS and PostgreSQL via Chocolatey
+RUN choco install -y nodejs-lts
+RUN choco install -y postgresql16 --params '/Password:root'
 
-# Refresh environment variables
-RUN refreshenv
+# Install node modules "globally" by adding them to PATH and NODE_PATH
+# This allows Playwright and Newman to be available system-wide
+COPY Tests/Docker/GUI/package.json C:\modules\package.json
+RUN cd C:\modules; `
+    npm install; `
+    npx playwright install chromium --with-deps; `
+    Remove-Item package.json; `
+    [Environment]::SetEnvironmentVariable('path', \"$env:path;C:\modules\node_modules\.bin\", 'Machine'); `
+    [Environment]::SetEnvironmentVariable('NODE_PATH', \"$env:NODE_PATH;C:\modules\node_modules\", 'Machine')
 
-# Set working directory
-WORKDIR C:\\app\\tests
-
-# Install Playwright and Newman (Postman CLI) globally
-RUN npm install -g playwright newman && \
-    npx playwright install --with-deps
-
-# Create directories for tests, results, and custom apps
-# The custom apps directories will be populated by copying from application repos (e.g., Lisa)
-RUN powershell -Command New-Item -ItemType Directory -Force -Path C:\app\tests, C:\app\tests\GUI, C:\app\tests\API, C:\app\tests\test-results\screenshots, C:\app\tests\test-results\videos, C:\app\startup, C:\app\resources
+# Create directories for tests, results, startup scripts, and resources
+# These will be populated via volume mounts at runtime
+RUN New-Item -ItemType Directory -Force -Path C:\app\tests, C:\app\tests\GUI, C:\app\tests\API, C:\app\tests\test-results, C:\app\startup, C:\app\resources
 
 # Copy entrypoint script
 COPY Tests/Docker/entrypoint.bat C:\app\entrypoint.bat
 
-# Copy GUI utilities (utils.js and playwright.config.js) for Playwright tests
-COPY Tests/Docker/GUI/utils.js C:\app\tests\GUI\utils.js
-COPY Tests/Docker/GUI/playwright.config.js C:\app\tests\playwright.config.js
-COPY Tests/Docker/GUI/package.json C:\app\tests\package.json
-COPY Tests/Docker/GUI/global-setup.js C:\app\tests\global-setup.js
-
-# Note: Startup scripts and resources should be copied from application repos (e.g., Lisa)
-# when running the container. The C:\app directories are created above but
-# left empty in the base image.
+# Note: All application files (GUI tests, API tests, resources, startup scripts)
+# should be mounted via -v volume mounts when running the container:
+# Example:
+#   docker run -v "%cd%\Tests\GUI:C:\app\tests\GUI" `
+#              -v "%cd%\Tests\API:C:\app\tests\API" `
+#              -v "%cd%\Tests\Startup:C:\app\startup" `
+#              -v "%cd%\Tests\Resources:C:\app\resources" `
+#              -v "%cd%\test-results:C:\app\tests\test-results" `
+#              imtcore-tests:windows
 
 # Environment variables (can be overridden at runtime)
 ENV BASE_URL=http://localhost:3000
 ENV CI=true
-ENV START_POSTGRESQL=false
-ENV POSTGRES_DB=""
 
 ENTRYPOINT ["cmd", "/c", "C:\\app\\entrypoint.bat"]
 CMD []

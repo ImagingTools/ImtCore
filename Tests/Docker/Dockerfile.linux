@@ -1,7 +1,7 @@
-# Dockerfile for ImtCore test environment
+# Dockerfile for ImtCore test environment (Linux)
 # This container provides the base infrastructure for running tests.
 # Application-specific files (GUI tests, API tests, resources, startup scripts)
-# should be copied from the application repository (e.g., Lisa) when running the container.
+# should be mounted via volume mounts when running the container.
 
 FROM node:18-bookworm
 
@@ -17,7 +17,7 @@ RUN set -eux; \
       gnupg \
       lsb-release \
       xdg-utils \
-      # GUI/Browser testing dependencies (for Playwright, Selenium, etc.)
+      # GUI/Browser testing dependencies (for Playwright)
       fonts-liberation \
       libappindicator3-1 \
       libasound2 \
@@ -54,7 +54,7 @@ RUN set -eux; \
     ; \
     rm -rf /var/lib/apt/lists/*
 
-# 2) Add PostgreSQL PGDG repo and install PostgreSQL 16 (server + client)
+# Add PostgreSQL PGDG repo and install PostgreSQL 16 (server + client)
 RUN set -eux; \
     install -d -m 0755 /etc/apt/keyrings; \
     curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
@@ -87,18 +87,26 @@ RUN fc-cache -f -v
 # Set working directory
 WORKDIR /app/tests
 
-# Install Playwright and Newman (Postman CLI) globally
-RUN npm install -g playwright newman && \
-    npx playwright install --with-deps
+# Install node modules "globally" in a shared location
+# This allows Playwright and Newman to be available system-wide
+COPY Tests/Docker/GUI/package.json /modules/package.json
+RUN cd /modules && \
+    npm install && \
+    npx playwright install chromium --with-deps && \
+    rm package.json && \
+    echo 'export PATH="/modules/node_modules/.bin:$PATH"' >> /etc/profile && \
+    echo 'export NODE_PATH="/modules/node_modules:$NODE_PATH"' >> /etc/profile
 
-# Create directories for tests, results, and custom apps
-# The custom apps directories will be populated by copying from application repos (e.g., Lisa)
+ENV PATH="/modules/node_modules/.bin:$PATH"
+ENV NODE_PATH="/modules/node_modules:$NODE_PATH"
+
+# Create directories for tests, results, startup scripts, and resources
+# These will be populated via volume mounts at runtime
 RUN mkdir -p \
     /app/tests \
     /app/tests/GUI \
     /app/tests/API \
-    /app/tests/test-results/screenshots \
-    /app/tests/test-results/videos \
+    /app/tests/test-results \
     /app/startup \
     /app/resources
 
@@ -106,21 +114,19 @@ RUN mkdir -p \
 COPY Tests/Docker/entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
-# Copy GUI utilities (utils.js and playwright.config.js) for Playwright tests
-COPY Tests/Docker/GUI/utils.js /app/tests/GUI/utils.js
-COPY Tests/Docker/GUI/playwright.config.js /app/tests/playwright.config.js
-COPY Tests/Docker/GUI/package.json /app/tests/package.json
-COPY Tests/Docker/GUI/global-setup.js /app/tests/global-setup.js
-
-# Note: Startup scripts and resources should be copied from application repos (e.g., Lisa)
-# when running the container. The /app/custom-apps directories are created above but
-# left empty in the base image.
+# Note: All application files (GUI tests, API tests, resources, startup scripts)
+# should be mounted via -v volume mounts when running the container:
+# Example:
+#   docker run -v "$(pwd)/Tests/GUI:/app/tests/GUI:ro" \
+#              -v "$(pwd)/Tests/API:/app/tests/API:ro" \
+#              -v "$(pwd)/Tests/Startup:/app/startup:ro" \
+#              -v "$(pwd)/Tests/Resources:/app/resources:ro" \
+#              -v "$(pwd)/test-results:/app/tests/test-results" \
+#              imtcore-tests:linux
 
 # Environment variables (can be overridden at runtime)
 ENV BASE_URL=http://localhost:3000
 ENV CI=true
-ENV START_POSTGRESQL=false
-ENV POSTGRES_DB=""
 
 ENTRYPOINT ["/app/entrypoint.sh"]
 CMD [] 

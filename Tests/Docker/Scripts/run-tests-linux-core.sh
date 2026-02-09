@@ -57,9 +57,45 @@ if [ -d "Tests/API" ]; then
     ls -1 Tests/API 2>/dev/null || echo "  (empty)"
 fi
 echo ""
+# Build volume mount arguments for application directories
+VOLUME_MOUNTS=""
 
-echo "Starting idle container (entrypoint will NOT run yet)..."
-docker run -d \
+# Always mount ImtCore GUI utilities (utils.js, playwright.config.js, etc.) from ImtCore
+IMTCORE_GUI_DIR="$IMTCORE_DIR/Tests/Docker/GUI"
+if [ -d "$IMTCORE_GUI_DIR" ]; then
+    VOLUME_MOUNTS="$VOLUME_MOUNTS -v '$IMTCORE_GUI_DIR:/app/tests/GUI:ro'"
+    echo "[DEBUG] Mounting ImtCore GUI utilities from: $IMTCORE_GUI_DIR"
+fi
+
+# Mount application-specific test directories if they exist
+if [ -d "Tests/GUI" ]; then
+    VOLUME_MOUNTS="$VOLUME_MOUNTS -v '$PWD/Tests/GUI:/app/tests/GUI/app:ro'"
+    echo "[DEBUG] Mounting application GUI tests from: Tests/GUI"
+fi
+
+if [ -d "Tests/API" ]; then
+    VOLUME_MOUNTS="$VOLUME_MOUNTS -v '$PWD/Tests/API:/app/tests/API:ro'"
+    echo "[DEBUG] Mounting application API tests from: Tests/API"
+fi
+
+if [ -d "Tests/Startup" ]; then
+    VOLUME_MOUNTS="$VOLUME_MOUNTS -v '$PWD/Tests/Startup:/app/startup:ro'"
+    echo "[DEBUG] Mounting application startup scripts from: Tests/Startup"
+fi
+
+if [ -d "Tests/Resources" ]; then
+    VOLUME_MOUNTS="$VOLUME_MOUNTS -v '$PWD/Tests/Resources:/app/resources:ro'"
+    echo "[DEBUG] Mounting application resources from: Tests/Resources"
+fi
+
+# Always mount test-results as read-write for output
+mkdir -p "$PWD/test-results"
+VOLUME_MOUNTS="$VOLUME_MOUNTS -v '$PWD/test-results:/app/tests/test-results'"
+echo "[DEBUG] Mounting test results output to: test-results"
+
+echo ""
+echo "Starting container with volume mounts..."
+eval docker run -d \
   --name "$CONTAINER_NAME" \
   --network host \
   --entrypoint sh \
@@ -71,6 +107,7 @@ docker run -d \
   -e TEST_USERS="$TEST_USERS" \
   -e UPDATE_SNAPSHOTS="${UPDATE_SNAPSHOTS:-false}" \
   -e CI=true \
+  $VOLUME_MOUNTS \
   "$IMAGE_NAME" \
   -lc "sleep infinity"
 
@@ -81,43 +118,8 @@ fi
 
 docker ps -a --filter "name=$CONTAINER_NAME"
 
-# Ensure target dirs exist
 echo ""
-echo "Creating directories in container..."
-docker exec "$CONTAINER_NAME" sh -lc "mkdir -p /app/tests/GUI /app/tests/API /app/startup /app/resources"
-
-echo ""
-echo "Copying GUI tests..."
-if [ -d "Tests/GUI" ]; then
-    docker cp "Tests/GUI/." "$CONTAINER_NAME:/app/tests/GUI/"
-else
-    echo "WARNING: Tests/GUI directory not found - skipping"
-fi
-
-echo "Copying API tests..."
-if [ -d "Tests/API" ]; then
-    docker cp "Tests/API/." "$CONTAINER_NAME:/app/tests/API/"
-else
-    echo "WARNING: Tests/API directory not found - skipping"
-fi
-
-echo "Copying resources..."
-if [ -d "Tests/Resources" ]; then
-    docker cp "Tests/Resources/." "$CONTAINER_NAME:/app/resources/"
-else
-    echo "WARNING: Tests/Resources directory not found - skipping"
-fi
-
-echo "Copying startup scripts..."
-if [ -d "Tests/Startup" ]; then
-    docker cp "Tests/Startup/." "$CONTAINER_NAME:/app/startup/"
-    docker exec "$CONTAINER_NAME" sh -lc "chmod +x /app/startup/*.sh 2>/dev/null || true"
-else
-    echo "WARNING: Tests/Startup directory not found - skipping"
-fi
-
-echo ""
-echo "[DEBUG] Container files after copy:"
+echo "[DEBUG] Container mounted directories:"
 docker exec "$CONTAINER_NAME" sh -lc "
   echo '--- /app/startup ---'; 
   ls -la /app/startup 2>/dev/null || echo '(empty)'; 
@@ -136,12 +138,8 @@ set -e
 
 echo "[DEBUG] Test run exit code: $EXIT_CODE"
 
-RESULTS_DIR="$(dirname "$0")/test-results"
-
 echo ""
-echo "Copying test results..."
-rm -rf "$RESULTS_DIR" 2>/dev/null || true
-docker cp "$CONTAINER_NAME:/app/tests/test-results" "$RESULTS_DIR" 2>/dev/null || echo "No test results to copy"
+echo "Test results are available in: test-results/"
 
 echo ""
 echo "=========================================="
