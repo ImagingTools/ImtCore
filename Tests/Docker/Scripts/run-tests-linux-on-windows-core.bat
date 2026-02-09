@@ -29,6 +29,8 @@ echo [DEBUG] POSTGRES_DB : %POSTGRES_DB%
 echo [DEBUG] POSTGRES_PASSWORD : %POSTGRES_PASSWORD%
 echo [DEBUG] DATABASE_URL : %DATABASE_URL%
 echo [DEBUG] TEST_USERS    : %TEST_USERS%
+if "%UPDATE_SNAPSHOTS%"=="" (set UPDATE_SNAPSHOTS=false)
+echo [DEBUG] UPDATE_SNAPSHOTS : %UPDATE_SNAPSHOTS%
 echo.
 
 where docker >nul 2>&1
@@ -79,6 +81,7 @@ docker run -d ^
   -e POSTGRES_DB="%POSTGRES_DB%" ^
   -e DATABASE_URL="%DATABASE_URL%" ^
   -e TEST_USERS="%TEST_USERS%" ^
+  -e UPDATE_SNAPSHOTS="%UPDATE_SNAPSHOTS%" ^
   -e CI=true ^
   "%IMAGE_NAME%" ^
   -lc "sleep infinity"

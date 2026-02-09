@@ -190,7 +190,15 @@ if %GUI_TESTS_FOUND% equ 1 (
     if !EXIT_CODE! equ 0 (
         echo Running Playwright tests...
         cd /d C:\app\tests
-        call npx playwright test
+        
+        REM Build playwright command with optional --update-snapshots flag
+        set PLAYWRIGHT_CMD=npx playwright test
+        if "%UPDATE_SNAPSHOTS%"=="true" (
+            echo UPDATE_SNAPSHOTS=true - updating reference screenshots
+            set PLAYWRIGHT_CMD=!PLAYWRIGHT_CMD! --update-snapshots
+        )
+        
+        call !PLAYWRIGHT_CMD!
         if errorlevel 1 set EXIT_CODE=!ERRORLEVEL!
     )
     

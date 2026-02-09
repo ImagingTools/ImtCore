@@ -150,6 +150,23 @@ The scripts handle everything automatically:
 - `START_POSTGRESQL` - Start PostgreSQL (true/false)
 - `POSTGRES_DB` - Database name
 - `TEST_USERNAME`, `TEST_PASSWORD` - Test credentials
+- `UPDATE_SNAPSHOTS` - Update Playwright reference screenshots (true/false, default: false)
+
+**Updating Reference Screenshots:**
+
+When you need to update Playwright visual regression baseline images:
+
+```bash
+# Linux
+export UPDATE_SNAPSHOTS="true"
+./run-tests.sh
+
+# Windows
+set UPDATE_SNAPSHOTS=true
+.\run-tests.bat
+```
+
+This adds `--update-snapshots` flag to the Playwright command, which updates all screenshot baselines. After updating, commit the new screenshots to your repository.
 
 **Linux Example:**
 ```bash

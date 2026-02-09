@@ -226,7 +226,15 @@ if [ "$#" -eq 0 ] || [ "$1" = "echo" ]; then
 
             if [ "$EXIT_CODE" -eq 0 ]; then
                 echo -e "${YELLOW}Running Playwright tests...${NC}"
-                (cd /app/tests && npx playwright test) || EXIT_CODE=$?
+                
+                # Build playwright command with optional --update-snapshots flag
+                PLAYWRIGHT_CMD="npx playwright test"
+                if [ "${UPDATE_SNAPSHOTS:-false}" = "true" ]; then
+                    echo -e "${YELLOW}UPDATE_SNAPSHOTS=true -> updating reference screenshots${NC}"
+                    PLAYWRIGHT_CMD="$PLAYWRIGHT_CMD --update-snapshots"
+                fi
+                
+                (cd /app/tests && $PLAYWRIGHT_CMD) || EXIT_CODE=$?
             fi
         fi
 

@@ -21,6 +21,11 @@ export TEST_USERS="test@example.com:testpassword"
 # Single user: export TEST_USERS="admin@example.com:admin123"
 # Multiple users: export TEST_USERS="admin@example.com:admin123,user@example.com:user123,viewer@example.com:viewer123"
 
+# Update Playwright reference screenshots (optional, default: false)
+# Set to "true" to update all reference screenshots (visual regression baselines)
+# Uncomment to enable:
+# export UPDATE_SNAPSHOTS="true"
+
 # ==========================================
 # DO NOT MODIFY BELOW THIS LINE
 # ==========================================

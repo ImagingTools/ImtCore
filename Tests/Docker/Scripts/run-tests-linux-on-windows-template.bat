@@ -21,6 +21,11 @@ REM Examples:
 REM Single user: set TEST_USERS=admin@example.com:admin123
 REM Multiple users: set TEST_USERS=admin@example.com:admin123,user@example.com:user123,viewer@example.com:viewer123
 
+REM Update Playwright reference screenshots (optional, default: false)
+REM Set to "true" to update all reference screenshots (visual regression baselines)
+REM Uncomment to enable:
+REM set UPDATE_SNAPSHOTS=true
+
 REM ==========================================
 REM DO NOT MODIFY BELOW THIS LINE
 REM ==========================================

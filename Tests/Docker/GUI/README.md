@@ -141,6 +141,35 @@ Authenticating user2: viewer@example.com...
 Global setup complete!
 ```
 
+## Updating Reference Screenshots
+
+To update Playwright visual regression baseline images:
+
+1. **Set UPDATE_SNAPSHOTS environment variable:**
+   ```bash
+   # Linux/Mac
+   export UPDATE_SNAPSHOTS="true"
+   
+   # Windows (cmd)
+   set UPDATE_SNAPSHOTS=true
+   
+   # Windows (PowerShell)
+   $env:UPDATE_SNAPSHOTS="true"
+   ```
+
+2. **Run tests:** The Playwright command will include `--update-snapshots` flag automatically
+   ```bash
+   ./run-tests.sh  # or run-tests.bat on Windows
+   ```
+
+3. **Commit updated screenshots:** After tests complete, commit the new baseline images to your repository
+
+**What happens:**
+- Playwright runs with `--update-snapshots` flag
+- All `toHaveScreenshot()` assertions update their baseline images
+- User-specific screenshots (dashboard-user0.png, dashboard-user1.png, etc.) all get updated
+- After update, set `UPDATE_SNAPSHOTS=false` or remove the variable for normal testing
+
 ## Adding More Utilities
 
 You can add more GUI test utilities to this directory. They will be available to all Playwright tests running in the container.
