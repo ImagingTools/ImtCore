@@ -116,6 +116,18 @@ if [ -d "/app/startup" ]; then
     echo -e "${YELLOW}Listing /app/startup:${NC}"
     ls -la /app/startup || true
 
+    # Export path environment variables for startup scripts
+    export APP_DIR="/app"
+    export STARTUP_DIR="/app/startup"
+    export RESOURCES_DIR="/app/resources"
+    export TESTS_DIR="/app/tests"
+
+    echo -e "${YELLOW}Environment variables set for startup scripts:${NC}"
+    echo -e "${YELLOW}  APP_DIR=$APP_DIR${NC}"
+    echo -e "${YELLOW}  STARTUP_DIR=$STARTUP_DIR${NC}"
+    echo -e "${YELLOW}  RESOURCES_DIR=$RESOURCES_DIR${NC}"
+    echo -e "${YELLOW}  TESTS_DIR=$TESTS_DIR${NC}"
+
     # Normalize scripts copied from Windows to avoid UTF-8 BOM / CRLF issues
     echo -e "${YELLOW}Normalizing .sh scripts (BOM/CRLF) and setting +x...${NC}"
     shopt -s nullglob

@@ -255,12 +255,50 @@ Place in `Tests/Docker/Startup/`:
 - `02-install-app.sh` / `.bat`
 - `03-start-services.sh` / `.bat`
 
+**Environment Variables Available in Startup Scripts:**
+
+Startup scripts can use these predefined environment variables:
+
+| Variable | Linux Value | Windows Value |
+|----------|-------------|---------------|
+| `APP_DIR` | `/app` | `C:\app` |
+| `STARTUP_DIR` | `/app/startup` | `C:\app\startup` |
+| `RESOURCES_DIR` | `/app/resources` | `C:\app\resources` |
+| `TESTS_DIR` | `/app/tests` | `C:\app\tests` |
+
+**Example** (`01-setup-database.sh`):
+```bash
+#!/bin/bash
+set -e
+echo "Setting up database..."
+
+# Use RESOURCES_DIR environment variable to access resources
+psql -U postgres -f "$RESOURCES_DIR/schema.sql"
+psql -U postgres -f "$RESOURCES_DIR/seed-data.sql"
+
+echo "Database setup complete"
+```
+
+**Example** (`02-install-app.bat` for Windows):
+```batch
+@echo off
+echo Installing application...
+
+REM Use RESOURCES_DIR environment variable to access resources
+copy "%RESOURCES_DIR%\config.json" "C:\MyApp\config.json"
+"%RESOURCES_DIR%\installer.exe" /silent
+
+echo Installation complete
+```
+
 **Example** (`01-start-app.sh`):
 ```bash
 #!/bin/bash
 set -e
 echo "Starting MyApp..."
-/opt/myapp/bin/myapp-server --port 3000 &
+
+# Use RESOURCES_DIR for application files
+/opt/myapp/bin/myapp-server --config "$RESOURCES_DIR/app-config.json" --port 3000 &
 
 for i in {1..30}; do
     if curl -f http://localhost:3000/health; then

@@ -95,6 +95,18 @@ if exist "C:\app\startup" (
     echo Listing C:\app\startup:
     dir /b "C:\app\startup" 2>nul
     
+    REM Export path environment variables for startup scripts
+    set APP_DIR=C:\app
+    set STARTUP_DIR=C:\app\startup
+    set RESOURCES_DIR=C:\app\resources
+    set TESTS_DIR=C:\app\tests
+    
+    echo Environment variables set for startup scripts:
+    echo   APP_DIR=%APP_DIR%
+    echo   STARTUP_DIR=%STARTUP_DIR%
+    echo   RESOURCES_DIR=%RESOURCES_DIR%
+    echo   TESTS_DIR=%TESTS_DIR%
+    
     REM Get all .bat scripts and sort them
     set SCRIPT_COUNT=0
     for %%F in (C:\app\startup\*.bat) do (
