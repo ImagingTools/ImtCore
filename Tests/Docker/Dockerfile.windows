@@ -17,10 +17,9 @@ RUN powershell -Command \
     [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; \
     iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
-# Install Node.js and PostgreSQL via Chocolatey
-# Using nodejs-lts for stable version, remove specific patch version that may not exist
-RUN choco install -y nodejs-lts
-RUN choco install -y postgresql16
+# Install Node.js and PostgreSQL via Chocolatey (latest versions)
+RUN choco install -y nodejs
+RUN choco install -y postgresql
 
 # Refresh environment variables
 RUN refreshenv
