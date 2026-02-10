@@ -5,6 +5,7 @@ const Real = require("../../QtQml/Real")
 const Bool = require("../../QtQml/Bool")
 const List = require("../../QtQml/List")
 const Signal = require("../../QtQml/Signal")
+const Repeater = require("../../QtQuick/Repeater")
 const JQApplication = require("../../core/JQApplication")
 
 
@@ -64,11 +65,18 @@ class ListModel extends QtObject {
         }
 
         for(let obj of this.__views){
-            obj.__updateView(changeSet)
+            if(!(obj instanceof Repeater)) 
+                obj.__updateView(changeSet)
         } 
 
         this.__proxy.dataChanged()
         super.__endUpdate()
+    }
+
+    __updateRepeaters(changeSet){
+        for(let obj of this.__views){
+            if(obj instanceof Repeater) obj.__updateView(changeSet)
+        } 
     }
 
     __removeChild(child){
@@ -97,38 +105,51 @@ class ListModel extends QtObject {
     append(dict){
         JQApplication.updateLater(this)
 
+        let changeSet
+
         if (Array.isArray(dict)) {
 			if (dict.length === 0)
 				return
 
-            this.__changeSet.push([this.data.length, this.data.length+dict.length, 'append'])
+            changeSet = [this.data.length, this.data.length+dict.length, 'append']
+            this.__changeSet.push(changeSet)
             for(let i = 0; i < dict.length; i++){
                 this.data.__push(AbstractItemModel.create(this, this.data.length, dict[i]))
             }
+            
 		} else {
-            this.__changeSet.push([this.data.length, this.data.length+1, 'append'])
+            changeSet = [this.data.length, this.data.length+1, 'append']
+            this.__changeSet.push(changeSet)
             this.data.__push(AbstractItemModel.create(this, this.data.length, dict))
 		}
 
         this.count = this.data.length
+
+        this.__updateRepeaters([changeSet])
     }
     insert(index, dict){
         JQApplication.updateLater(this)
+
+        let changeSet
 
         if (Array.isArray(dict)) {
 			if (dict.length === 0)
 				return
 
-            this.__changeSet.push([index, index+dict.length, 'insert'])
+            changeSet = [index, index+dict.length, 'insert']
+            this.__changeSet.push(changeSet)
             for(let i = 0; i < dict.length; i++){
                 this.data.__splice(i+index, 0, AbstractItemModel.create(this, i+index, dict[i]))
             }
 		} else {
-            this.__changeSet.push([index, index+1, 'insert'])
+            changeSet = [index, index+1, 'insert']
+            this.__changeSet.push(changeSet)
             this.data.__splice(index, 0, AbstractItemModel.create(this, index, dict))
 		}
 
         this.count = this.data.length
+
+        this.__updateRepeaters([changeSet])
     }
 
     __recursiveRemoveLink(obj){
@@ -146,7 +167,9 @@ class ListModel extends QtObject {
     remove(index, count = 1){
         JQApplication.updateLater(this)
 
-        this.__changeSet.push([index, index+count, 'remove'])
+        let changeSet = [index, index+count, 'remove']
+
+        this.__changeSet.push(changeSet)
         let removed = this.data.__splice(index, count)
 
         for(let r of removed){
@@ -160,6 +183,8 @@ class ListModel extends QtObject {
         }
 
         this.count = this.data.length
+
+        this.__updateRepeaters([changeSet])
     }
     get(index){
         return this.data[index]
