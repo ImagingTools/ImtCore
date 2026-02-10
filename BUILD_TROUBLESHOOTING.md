@@ -1,5 +1,36 @@
 # Build Troubleshooting Guide
 
+## Critical: New Library Added in PR #130
+
+**Important:** The imtsdlgencpp library and related files were completely new additions in PR #130. If you're experiencing build errors, you MUST reconfigure your build system from scratch.
+
+## Quick Fix
+
+**For CMake builds:**
+```cmd
+# Windows - Delete build directory
+rd /s /q Build\VC17_64
+
+# Create new build directory and configure
+mkdir Build\VC17_64
+cd Build\VC17_64
+cmake ..\CMake
+
+# Build
+cmake --build .
+```
+
+**For QMake builds:**
+```cmd
+# Clean all generated files
+qmake -r Build\QMake\ImtCoreAll.pro
+nmake distclean
+
+# Reconfigure and build
+qmake -r Build\QMake\ImtCoreAll.pro  
+nmake
+```
+
 ## Common Build Issues and Solutions
 
 ### Issue: Unresolved External Symbols for CBaseClassExtenderComp
