@@ -2,11 +2,7 @@
 
 INCLUDEPATH += $$PWD/../../3rdParty/libmdbx/include
 
-win32 {
-    LIBS += -L$$PWD/../../3rdParty/libmdbx/lib/$$COMPILER_DIR -lmdbx
-}
-
-unix:!macx {
+win32|unix:!macx {
     LIBS += -L$$PWD/../../3rdParty/libmdbx/lib/$$COMPILER_DIR -lmdbx
 }
 
