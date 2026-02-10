@@ -166,7 +166,7 @@ namespace imtlic
 	- **ILicenseDefinition**: License that unlocks this feature
 	- **IFeatureInfoProvider**: Access to feature catalog
 	- **IFeatureDependenciesProvider**: Dependency resolution
-	- **ILicenseBasedRightsProviderComp**: Feature availability checking
+	- **CLicenseBasedRightsProviderComp**: Permission provider based on feature/permission availability (implements IRightsProvider)
 	
 	\sa IProductInfo, ILicenseDefinition, IFeatureInfoProvider, IFeatureDependenciesProvider
 	\ingroup LicenseManagement

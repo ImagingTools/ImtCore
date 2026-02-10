@@ -201,7 +201,7 @@
 	
 	\subsection workflow_feature_check Feature Availability Check
 	1. Application needs to use a Feature
-	2. Query ILicenseBasedRightsProviderComp
+	2. Query CLicenseBasedRightsProviderComp (implements IRightsProvider)
 	3. Check if feature is unlocked by active licenses
 	4. Check feature dependencies (if feature A needs feature B)
 	5. Enable/disable functionality based on result
