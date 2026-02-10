@@ -35,7 +35,7 @@ public:
 	enum MetaInfoTypes
 	{
 		/**
-			List of feature infos given as QStringList.
+			List of feature information given as QStringList.
 		*/
 		MIT_FEATURE_INFO_LIST = idoc::IDocumentMetaInfo::MIT_USER + 1,
 	};

@@ -35,7 +35,7 @@ public:
 	enum MetaInfoTypes
 	{
 		/**
-			List of product instance infos given as QStringList.
+			List of product instance information given as QStringList.
 		*/
 		MIT_LICENSE_INSTANCE_INFO_LIST = idoc::IDocumentMetaInfo::MIT_USER + 1
 	};
