@@ -102,7 +102,7 @@ class Repeater extends Item {
             if (Array.isArray(this.model)) {
                 length = this.model.length
             } else if (typeof this.model === 'object') {
-                if(this.model.__changeSet.length > 0) return
+                if(this.model.count === this.count) return
                 length = this.model.count
             } else if (typeof this.model === 'number') {
                 length = this.model
