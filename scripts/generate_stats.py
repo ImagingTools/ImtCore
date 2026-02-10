@@ -722,21 +722,21 @@ class RepositoryStats:
                 total_complexity = 0
                 nesting_level = 0
                 
-                for line in lines:
+                for idx, line in enumerate(lines):
                     stripped = line.strip()
                     
-                    # Increase nesting
-                    if any(keyword in stripped for keyword in ['if (', 'for (', 'while (', 'switch (']):
+                    # Increase nesting - use word boundaries to avoid false matches
+                    if re.search(r'\b(if|for|while|switch)\s*\(', stripped):
                         total_complexity += (1 + nesting_level)
-                        if '{' in stripped or (len(lines) > lines.index(line) + 1 and '{' in lines[lines.index(line) + 1]):
+                        if '{' in stripped or (idx + 1 < len(lines) and '{' in lines[idx + 1]):
                             nesting_level += 1
                     
                     # Decrease nesting
                     if '}' in stripped:
                         nesting_level = max(0, nesting_level - 1)
                     
-                    # Break-the-flow keywords
-                    if any(keyword in stripped for keyword in ['break', 'continue', 'goto', 'return']):
+                    # Break-the-flow keywords - use word boundaries
+                    if re.search(r'\b(break|continue|goto|return)\b', stripped):
                         total_complexity += 1
                     
                     # Logical operators in conditions
@@ -817,6 +817,10 @@ class RepositoryStats:
     
     def calculate_code_duplication(self):
         """Basic code duplication detection using line-based hashing."""
+        # Constants for duplication detection
+        BLOCK_SIZE = 6  # Number of lines per block for comparison
+        MIN_BLOCK_LENGTH_FOR_DUPLICATION = 100  # Minimum characters to consider as duplicate
+        
         # This is a simplified version - full duplication detection is complex
         # We'll look for significant duplicate blocks
         try:
