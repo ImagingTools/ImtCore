@@ -52,7 +52,7 @@ The repository statistics system provides both **quantity** and **quality** metr
 - **Include Dependencies**: Number of files with tracked dependencies
 - **File Size Distribution**: Histogram of file sizes
 - **Namespace Usage**: Distribution of namespace usage
-- **Export Macros**: Usage of export macros
+- **Export Macros**: Usage of ImtCore and ACF export macros
 
 ## Files
 
@@ -183,7 +183,7 @@ The script classifies lines into:
 
 ### Component Detection
 
-Components are identified by the framework macro:
+Components are identified by the ImtCore framework macro:
 ```cpp
 I_BEGIN_COMPONENT(ComponentName);
     // ... component structure
