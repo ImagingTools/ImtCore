@@ -311,6 +311,15 @@ const char* unionFieldsQuery = R"(
 "}
 )";
 
+const char* variablesInputQuery = R"(
+{
+	"query": "mutation Start($id: ID!) { BeginMeasurementSession(id: $id) { id } }",
+	"variables": { "id": "X-Rite-123" }
+}
+)";
+
+static const QByteArray variablesInputQueryResult = R"({"query": "query Start {Start {BeginMeasurementSession {id}}}"})";
+
 
 const char* arrayQuery2 = R"(
 {"query": "mutation TestMutation {
@@ -536,6 +545,19 @@ void CGqlRequestTest::ParseComplexTest()
 	QVERIFY(retVal);
 	QVERIFY(errorPosition < 0);
 	QCOMPARE(resultQuery, complexQueryResult);
+}
+
+
+void CGqlRequestTest::CreateVariablesQuery()
+{
+	qsizetype errorPosition = -1;
+
+	imtgql::CGqlRequest request;
+	bool retVal = request.ParseQuery(variablesInputQuery, errorPosition);
+	QByteArray resultQuery = request.GetQuery();
+	QVERIFY(retVal);
+	QVERIFY(errorPosition < 0);
+	QCOMPARE(resultQuery, variablesInputQueryResult);
 }
 
 

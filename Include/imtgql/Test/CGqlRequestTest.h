@@ -26,6 +26,7 @@ private slots:
 	void ParseObjectQuery();
 	void ParseArrayQuery();
 	void ParseComplexTest();
+	void CreateVariablesQuery();
 
 	void cleanupTestCase();
 

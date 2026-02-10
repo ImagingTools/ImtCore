@@ -222,7 +222,17 @@ bool CGqlRequest::ParseQuery(const QByteArray& query, qsizetype& errorPosition)
 		return false;
 	}
 
-	QByteArray body = document.object().value(QStringLiteral("query")).toString().toUtf8();
+	const QJsonObject jsonObject = document.object();
+
+	// Parse variables if present
+	if (jsonObject.contains(QStringLiteral("variables"))){
+		const QJsonValue variablesValue = jsonObject.value(QStringLiteral("variables"));
+		if (variablesValue.isObject()){
+			m_variables = variablesValue.toObject();
+		}
+	}
+
+	QByteArray body = jsonObject.value(QStringLiteral("query")).toString().toUtf8();
 	if (body.isEmpty()){
 		return false;
 	}
@@ -556,6 +566,7 @@ bool CGqlRequest::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/
 			m_fields = sourcePtr->m_fields;
 			m_gqlContextPtr = sourcePtr->m_gqlContextPtr;
 			m_protocolVersion = sourcePtr->m_protocolVersion;
+			m_variables = sourcePtr->m_variables;
 
 			return true;
 		}
@@ -584,6 +595,7 @@ bool CGqlRequest::ResetData(istd::IChangeable::CompatibilityMode /*mode*/)
 	m_params.ResetData();
 	m_fields.ResetData();
 	m_protocolVersion.clear();
+	m_variables = QJsonObject();
 
 	return true;
 }

@@ -2,6 +2,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QJsonObject>
+
 // ImtCore includes
 #include <imtgql/IGqlRequest.h>
 #include <imtgql/CGqlParamObject.h>
@@ -90,6 +93,7 @@ protected:
 	bool m_textString;
 	QByteArray m_currentField;
 	QByteArray m_protocolVersion;
+	QJsonObject m_variables;
 
 	CGqlParamObject* m_activeGqlObjectPtr;
 	CGqlFieldObject* m_activeFieldObjectPtr;
