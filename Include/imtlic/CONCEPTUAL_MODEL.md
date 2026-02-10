@@ -38,6 +38,10 @@ A **Feature** represents an individual capability or functionality within a prod
 - Can be organized in hierarchies (feature trees)
 - "Unlocked" through licenses
 
+**Important Distinctions:**
+- **Optional Features** - functionality that can be sold optionally. They are NOT mandatory for the core functionality of the product and can be purchased separately by customers based on their needs. This allows flexible product configurations.
+- **Permission Features** - these are NOT sellable features. They represent access control rights or operational permissions within the application, not product capabilities. Example: a "Close" permission controls whether the application can be exited, which is an operational right, not a sellable product feature.
+
 ### 3. License Definition (ILicenseDefinition, CLicenseDefinition)
 
 A **License Definition** represents a license type that can be purchased. It is essentially a **container of Features** - it specifies which features will be unlocked when this license is activated.
@@ -198,3 +202,8 @@ This documentation update includes:
 - Improved method documentation with parameter descriptions
 - Cross-references between related interfaces
 - Clarification of the conceptual model throughout
+- Explicit emphasis on the distinction between optional features and permission features
+
+---
+
+**Note:** This document is synchronized with the Russian version (CONCEPTUAL_MODEL_RU.md) and German version (DOKUMENTATION_ZUSAMMENFASSUNG.md). When making changes to one version, all language versions must be updated accordingly.

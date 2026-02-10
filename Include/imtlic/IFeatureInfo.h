@@ -69,15 +69,27 @@ public:
 
 	/**
 		Check if this feature is optional.
-		Optional features are not required for basic product operation.
-		\return true if the feature is optional, false if mandatory
+		
+		**Important:** Optional features represent functionality that can be sold optionally.
+		They are NOT mandatory for the core functionality of the product and can be
+		purchased separately by customers based on their needs. This allows flexible
+		product configurations where customers only pay for the features they require.
+		
+		\return true if the feature is optional (can be sold separately), false if mandatory (part of core product)
 	*/
 	virtual bool IsOptional() const = 0;
 
 	/**
 		Check if this feature represents a permission.
-		Permission features are typically used for access control.
-		\return true if this is a permission feature
+		
+		**Important:** Permission features are NOT sellable features. They represent access
+		control rights or operational permissions within the application, not product capabilities.
+		Permissions control what users can do with the application itself.
+		
+		**Example:** A "Close" permission would control whether the application can be exited,
+		which is an operational right, not a product feature that can be sold.
+		
+		\return true if this is a permission feature (access control), false if it's a sellable feature
 	*/
 	virtual bool IsPermission() const = 0;
 

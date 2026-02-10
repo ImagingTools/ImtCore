@@ -59,6 +59,9 @@ Folglich: Produkt → enthält Features
 - Feature als atomare Funktionseinheit erklärt
 - Hierarchische Strukturen dokumentiert
 - Abhängigkeiten und Berechtigungen beschrieben
+- **Wichtig:** Unterschied zwischen optionalen Features (verkaufbar) und Permission-Features (nicht verkaufbar) hervorgehoben
+- Optioanle Features können separat verkauft werden und sind nicht für die Kernfunktionalität erforderlich
+- Permission-Features sind Zugriffsrechte (z.B. "Close"), keine verkaufbaren Produktfunktionen
 
 **ILicenseDefinition:**
 - Lizenz als Container von Features erklärt
@@ -180,6 +183,7 @@ Die Dokumentation ist jetzt vollständig. Mögliche zukünftige Verbesserungen:
 - ✅ Grammatik überprüft und korrigiert
 - ✅ Konsistente Terminologie verwendet
 - ✅ Querverweise zwischen Interfaces hinzugefügt
+- ✅ Unterschied zwischen optionalen und Permission-Features hervorgehoben
 
 ## Fazit
 
@@ -190,3 +194,7 @@ Das imtlic-Modul ist jetzt umfassend dokumentiert und folgt dem beschriebenen ko
 - **Lizenzinstanzen** sind aktivierte Lizenzen
 
 Die Dokumentation macht die Beziehungen zwischen diesen Konzepten klar und erleichtert die Arbeit mit dem Lizenzsystem erheblich.
+
+---
+
+**Hinweis:** Dieses Dokument ist mit der englischen Version (CONCEPTUAL_MODEL.md) und der russischen Version (CONCEPTUAL_MODEL_RU.md) synchronisiert. Bei Änderungen an einer Version müssen alle Sprachversionen aktualisiert werden.
