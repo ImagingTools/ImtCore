@@ -105,6 +105,18 @@ class RepositoryStats:
                 },
             },
         }
+    
+    def should_exclude_path(self, path):
+        """Check if a path should be excluded from analysis.
+        
+        Args:
+            path: Path object to check
+            
+        Returns:
+            True if the path should be excluded, False otherwise
+        """
+        # Exclude ReferenceData directories (contain generated code)
+        return 'ReferenceData' in path.parts
         
     def count_lines(self, file_path):
         """Count and categorize lines in a file as code, comments, or blank lines.
@@ -437,7 +449,7 @@ class RepositoryStats:
         large_file_threshold = 1000  # lines
         
         for file_path in dir_path.rglob('*'):
-            if file_path.is_file() and file_path.suffix in extensions:
+            if file_path.is_file() and file_path.suffix in extensions and not self.should_exclude_path(file_path):
                 self.stats['total_files'] += 1
                 
                 # Count lines
@@ -524,7 +536,8 @@ class RepositoryStats:
         for lib_dir in include_path.iterdir():
             if lib_dir.is_dir() and not lib_dir.name.startswith('.'):
                 lib_name = lib_dir.name
-                files = list(lib_dir.rglob('*.h')) + list(lib_dir.rglob('*.cpp'))
+                files = [f for f in list(lib_dir.rglob('*.h')) + list(lib_dir.rglob('*.cpp')) 
+                        if not self.should_exclude_path(f)]
                 
                 total_lines = 0
                 for f in files:
@@ -545,7 +558,8 @@ class RepositoryStats:
         for pkg_dir in impl_path.iterdir():
             if pkg_dir.is_dir() and not pkg_dir.name.startswith('.'):
                 pkg_name = pkg_dir.name
-                files = list(pkg_dir.rglob('*.h')) + list(pkg_dir.rglob('*.cpp'))
+                files = [f for f in list(pkg_dir.rglob('*.h')) + list(pkg_dir.rglob('*.cpp'))
+                        if not self.should_exclude_path(f)]
                 
                 total_lines = 0
                 for f in files:
@@ -565,7 +579,8 @@ class RepositoryStats:
         if not tests_path.exists():
             return
         
-        test_files = list(tests_path.rglob('*.cpp')) + list(tests_path.rglob('*.h'))
+        test_files = [f for f in list(tests_path.rglob('*.cpp')) + list(tests_path.rglob('*.h'))
+                     if not self.should_exclude_path(f)]
         self.stats['test_files'] = len(test_files)
         
         # Count test cases and classes under test
@@ -585,7 +600,8 @@ class RepositoryStats:
                 if lib_dir.is_dir():
                     test_dir = lib_dir / 'Test'
                     if test_dir.exists():
-                        test_files_lib = list(test_dir.rglob('*.cpp')) + list(test_dir.rglob('*.h'))
+                        test_files_lib = [f for f in list(test_dir.rglob('*.cpp')) + list(test_dir.rglob('*.h'))
+                                        if not self.should_exclude_path(f)]
                         for test_file in test_files_lib:
                             test_info = self.extract_test_info(test_file)
                             test_cases.extend(test_info['test_cases'])
