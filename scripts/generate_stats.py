@@ -610,8 +610,8 @@ class RepositoryStats:
                 
                 # Find test methods (Qt Test style: void testMethodName())
                 # Patterns: void testXxx(), void TestXxx(), private slots: ... testXxx()
-                # Pattern ensures 'test' prefix (case-insensitive) followed by uppercase letter
-                test_method_pattern = r'void\s+([Tt]est[A-Z]\w*)\s*\('
+                # Match 'test' followed by any characters (case-insensitive at start)
+                test_method_pattern = r'void\s+[Tt]est\w*\s*\('
                 test_methods = re.findall(test_method_pattern, content)
                 
                 for method in test_methods:
@@ -680,14 +680,14 @@ class RepositoryStats:
                     
                     # Calculate complexity: 1 + decision points
                     complexity = 1
-                    # Decision points
+                    # Decision points - use word boundaries to avoid false matches
                     complexity += len(re.findall(r'\bif\s*\(', func_body))
                     complexity += len(re.findall(r'\belse\b', func_body))
                     complexity += len(re.findall(r'\bfor\s*\(', func_body))
                     complexity += len(re.findall(r'\bwhile\s*\(', func_body))
                     complexity += len(re.findall(r'\bcase\b', func_body))
                     complexity += len(re.findall(r'\bcatch\s*\(', func_body))
-                    complexity += len(re.findall(r'\b\?\s*', func_body))  # Ternary operator
+                    complexity += len(re.findall(r'\?\s*', func_body))  # Ternary operator
                     complexity += func_body.count('&&')
                     complexity += func_body.count('||')
                     
@@ -754,8 +754,9 @@ class RepositoryStats:
             with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
                 content = f.read()
                 
-                # Find classes
-                class_pattern = r'class\s+(?:ACF_\w+_EXPORT\s+)?(\w+)'
+                # Find class declarations
+                # Match classes with ACF or IMT export macros
+                class_pattern = r'class\s+(?:(?:ACF|IMT)_\w+_EXPORT\s+)?(\w+)'
                 classes = re.findall(class_pattern, content)
                 
                 # Find functions/methods
@@ -839,11 +840,10 @@ class RepositoryStats:
                         total_code_lines += len(code_lines)
                         
                         # Hash sequences of 6 significant lines (non-overlapping blocks)
-                        block_size = 6
-                        for i in range(0, len(code_lines) - block_size + 1, block_size):
-                            block = '\n'.join(code_lines[i:i+block_size])
+                        for i in range(0, len(code_lines) - BLOCK_SIZE + 1, BLOCK_SIZE):
+                            block = '\n'.join(code_lines[i:i+BLOCK_SIZE])
                             # Only consider blocks with substantial content
-                            if len(block) > 100 and not all(c in ' \t\n{}();' for c in block):
+                            if len(block) > MIN_BLOCK_LENGTH_FOR_DUPLICATION and not all(c in ' \t\n{}();' for c in block):
                                 # Normalize whitespace for comparison
                                 normalized = ' '.join(block.split())
                                 block_hash = md5(normalized.encode()).hexdigest()
@@ -858,10 +858,9 @@ class RepositoryStats:
             duplicates = {h: locs for h, locs in line_hashes.items() if len(locs) > 1}
             
             # Count duplicate lines more accurately (avoid double-counting)
-            # Each duplicate block contributes (n-1) * block_size duplicate lines
+            # Each duplicate block contributes (n-1) * BLOCK_SIZE duplicate lines
             # where n is the number of occurrences
-            block_size = 6
-            duplicate_lines = sum((len(locs) - 1) * block_size for locs in duplicates.values())
+            duplicate_lines = sum((len(locs) - 1) * BLOCK_SIZE for locs in duplicates.values())
             
             self.stats['quality_metrics']['code_duplication']['total_duplicate_lines'] = duplicate_lines
             if total_code_lines > 0:
