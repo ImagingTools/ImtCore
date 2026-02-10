@@ -15,7 +15,8 @@ namespace imtlic
 
 
 /**
-	Interface for accessing information about a feature.
+	\interface IFeatureInfo
+	\brief Interface for accessing information about a feature within a product.
 	
 	A Feature represents an individual capability or functionality within a product.
 	Features form the atomic units that define what a product can do. They can be
@@ -24,13 +25,150 @@ namespace imtlic
 	Features are "unlocked" through License Definitions - each license specifies
 	which features it enables when activated.
 	
-	Key characteristics:
-	- Can be optional (not required) or mandatory
-	- Can form parent-child hierarchies for complex feature trees
-	- Can have dependencies on other features
-	- Can be marked as permissions for access control purposes
+	\section feature_concept Conceptual Model
 	
-	\sa IProductInfo, ILicenseDefinition
+	**Features as Capabilities:**
+	- Atomic unit of product functionality
+	- Can be mandatory (always included) or optional (sold separately)
+	- Can be permission-based (access control) vs. feature-based (capability)
+	- Organized in hierarchies for complex products
+	
+	**Feature Hierarchy Example:**
+	```
+	Product "Office Suite"
+	├─ Feature "Document Editing" (Mandatory)
+	│  ├─ Feature "Basic Formatting" (Mandatory)
+	│  ├─ Feature "Advanced Formatting" (Optional)
+	│  └─ Feature "Track Changes" (Optional)
+	├─ Feature "Spreadsheet" (Optional)
+	│  ├─ Feature "Basic Functions" (Mandatory)
+	│  └─ Feature "Pivot Tables" (Optional)
+	└─ Feature "Presentations" (Optional)
+	```
+	
+	\section feature_types Feature Types
+	
+	**Optional vs. Mandatory:**
+	- **Optional Features**: Can be sold separately, customer chooses which to purchase
+	- **Mandatory Features**: Always included, part of core product functionality
+	- Example: Core editing (mandatory), advanced analytics (optional)
+	
+	**Permission vs. Capability:**
+	- **Permission Features**: Access control rights (NOT sellable)
+	  - Example: "Close Application", "Export Data", "Admin Access"
+	  - Control what users can do with the application
+	  - Managed through license-based rights system
+	
+	- **Capability Features**: Product functionality (sellable)
+	  - Example: "Advanced Analytics", "PDF Export", "Cloud Sync"
+	  - Actual features that customers purchase
+	  - Enabled through license activation
+	
+	\section feature_dependencies Feature Dependencies
+	
+	Features can depend on other features:
+	```
+	Feature "Pivot Tables"
+	├─ Depends on: "Basic Spreadsheet Functions"
+	└─ Depends on: "Data Import"
+	```
+	
+	When checking if a feature is available:
+	1. Check if feature is unlocked by active license
+	2. Check if all dependent features are also unlocked
+	3. Recursively validate transitive dependencies
+	4. Feature available only if all dependencies satisfied
+	
+	\section feature_hierarchy Feature Hierarchies
+	
+	Features support parent-child relationships:
+	- **Parent Feature**: Container of related sub-features
+	- **Child Features**: Specialized capabilities within parent
+	- **Depth Control**: Can traverse hierarchy to specific depth
+	- **Navigation**: Can access parent or children
+	
+	Benefits of hierarchies:
+	- Logical grouping of related features
+	- Easier product management
+	- Clearer customer communication
+	- Simplified license definitions
+	
+	\section feature_metainfo Meta-Information
+	
+	Features support meta-information for persistence:
+	- MIT_FEATURE_ID: QByteArray - Unique feature identifier
+	- MIT_FEATURE_NAME: QString - Human-readable feature name
+	- MIT_FEATURE_DESCRIPTION: QString - Detailed description
+	- MIT_IS_OPTIONAL: bool - Whether feature is optional
+	- MIT_IS_PERMISSION: bool - Whether feature is a permission
+	
+	\section feature_usage Usage Examples
+	
+	**Creating a Feature:**
+	```cpp
+	IFeatureInfoSharedPtr feature = ...;  // From factory
+	feature->SetFeatureId("feature-advanced-analytics");
+	feature->SetFeatureName("Advanced Analytics");
+	feature->SetFeatureDescription("Data analysis and reporting tools");
+	feature->SetIsOptional(true);  // Can be sold separately
+	feature->SetIsPermission(false);  // This is a capability, not permission
+	```
+	
+	**Building Feature Hierarchy:**
+	```cpp
+	IFeatureInfoSharedPtr parent = ...; // "Document Editing"
+	IFeatureInfoSharedPtr child1 = ...; // "Basic Formatting"
+	IFeatureInfoSharedPtr child2 = ...; // "Advanced Formatting"
+	
+	parent->InsertSubFeature(child1);
+	parent->InsertSubFeature(child2);
+	
+	// Navigate hierarchy
+	const FeatureInfoList& children = parent->GetSubFeatures();
+	const IFeatureInfo* parentRef = child1->GetParentFeature();
+	```
+	
+	**Setting Dependencies:**
+	```cpp
+	IFeatureInfoSharedPtr pivotTables = ...;
+	IFeatureInfoSharedPtr basicSpreadsheet = ...;
+	
+	FeatureIds dependencies;
+	dependencies.insert(basicSpreadsheet->GetFeatureId());
+	pivotTables->SetDependsOnFeatureIds(dependencies);
+	
+	// Check dependencies
+	FeatureIds deps = pivotTables->GetDependsOnFeatureIds();
+	for (const QByteArray& depId : deps) {
+	    // Validate dependency is available
+	}
+	```
+	
+	\section feature_licensing Feature Licensing
+	
+	Features are unlocked through licenses:
+	1. License Definition specifies which features it includes
+	2. Customer purchases and activates license
+	3. License Instance created on Product Instance
+	4. Features from all active licenses become available
+	5. Application checks feature availability before use
+	
+	**Example License Configuration:**
+	```
+	Basic License:    [Core Editing, Basic Formatting]
+	Pro License:      [Core Editing, Basic Formatting, Advanced Formatting, Spreadsheet]
+	Enterprise:       [All Features]
+	```
+	
+	\section feature_relationships Related Interfaces
+	
+	- **IProductInfo**: Product containing this feature
+	- **ILicenseDefinition**: License that unlocks this feature
+	- **IFeatureInfoProvider**: Access to feature catalog
+	- **IFeatureDependenciesProvider**: Dependency resolution
+	- **ILicenseBasedRightsProviderComp**: Feature availability checking
+	
+	\sa IProductInfo, ILicenseDefinition, IFeatureInfoProvider, IFeatureDependenciesProvider
 	\ingroup LicenseManagement
 */
 class IFeatureInfo: virtual public iser::IObject
