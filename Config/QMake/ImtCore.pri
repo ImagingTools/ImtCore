@@ -1,8 +1,6 @@
 include($(ACFDIR)/Config/QMake/GeneralConfig.pri)
 include($(ACFSLNDIR)/Config/QMake/AcfSln.pri)
 include($(IACFDIR)/Config/QMake/Iacf.pri)
-include($(QSFCOREDIR)/Code/Config/QMake/QsfCore.pri)
-include($(QSFSLNDIR)/Code/Config/QMake/QsfSln.pri)
 
 INCLUDEPATH += $$PWD/../../Include
 INCLUDEPATH += $$PWD/../../Impl
