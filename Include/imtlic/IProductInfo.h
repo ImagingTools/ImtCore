@@ -15,7 +15,18 @@ namespace imtlic
 
 
 /**
-	Common interface for access information about a product.
+	Interface for accessing information about a product (software or hardware).
+	
+	A Product represents a software or hardware offering and is fundamentally defined as
+	a collection of Features. From a licensing perspective, a Product also contains all
+	available License Definitions, where each license "unlocks" a specific set of features.
+	
+	Key responsibilities:
+	- Maintains product identification (ID, name, description, category)
+	- Manages the collection of Features that define the product's capabilities
+	- Can be part of a product family hierarchy
+	
+	\sa IFeatureInfo, ILicenseDefinition, IProductInstanceInfo
 	\ingroup LicenseManagement
 */
 class IProductInfo: virtual public iprm::INameParam
@@ -80,17 +91,23 @@ public:
 	virtual void SetCategoryId(const QByteArray& categoryId) = 0;
 
 	/**
-		Get feature collection.
+		Get the collection of features that define this product's capabilities.
+		A Product is essentially a container of Features.
 	*/
 	virtual imtbase::IObjectCollection* GetFeatures() = 0;
 
 	/**
-		Insert sub feature.
+		Add a feature to this product's feature collection.
+		\param featureId Unique identifier for the feature
+		\param featureInfo Feature information to be added
+		\return true if the feature was successfully added, false otherwise
 	*/
 	virtual bool AddFeature(const QByteArray& featureId, const IFeatureInfo& featureInfo) = 0;
 
 	/**
-		Remove sub feature.
+		Remove a feature from this product's feature collection.
+		\param featureId Unique identifier of the feature to remove
+		\return true if the feature was successfully removed, false otherwise
 	*/
 	virtual bool RemoveFeature(const QByteArray& featureId) = 0;
 };
