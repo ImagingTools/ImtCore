@@ -176,6 +176,11 @@ class QObject extends QBaseObject {
         super.__destroy()
         this.JQDestruction()
     }
+
+    // for compatibility reasons, this will be removed in the future
+    $complete(){
+
+    }
 }
 
 
