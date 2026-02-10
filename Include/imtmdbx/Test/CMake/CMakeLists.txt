@@ -1,4 +1,4 @@
-project(imtmbdxTest)
+project(imtmdbxtest)
 
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
