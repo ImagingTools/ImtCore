@@ -1,4 +1,6 @@
 include(${ACFDIR}/Config/CMake/AcfStd.cmake)
+include(${QSFCOREDIR}/Code/Config/CMake/QsfCore.cmake)
+include(${QSFSLNDIR}/Code/Config/CMake/QsfSln.cmake)
 
 if(WIN32)
 	target_link_libraries(${PROJECT_NAME} advapi32 user32)
