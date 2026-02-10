@@ -722,13 +722,14 @@ class RepositoryStats:
                 total_complexity = 0
                 nesting_level = 0
                 
-                for idx, line in enumerate(lines):
+                for _, line in enumerate(lines):
                     stripped = line.strip()
                     
                     # Increase nesting - use word boundaries to avoid false matches
                     if re.search(r'\b(if|for|while|switch)\s*\(', stripped):
                         total_complexity += (1 + nesting_level)
-                        if '{' in stripped or (idx + 1 < len(lines) and '{' in lines[idx + 1]):
+                        # Check for opening brace in this line or next
+                        if '{' in line:
                             nesting_level += 1
                     
                     # Decrease nesting
