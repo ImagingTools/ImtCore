@@ -466,7 +466,6 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::CloseDocument(
 	QByteArray objectId;
 	QString name;
 	bool isDirty = false;
-	
 	WorkingDocument* workingDocumentPtr = nullptr;
 	{
 		QMutexLocker locker(&m_mutex);
