@@ -54,6 +54,9 @@ public:
 	 * 
 	 * Status codes indicate whether a chunk was successfully received,
 	 * whether more chunks are expected, or if an error occurred.
+	 * 
+	 * @note The enum name contains a typo (Filel instead of File) but is
+	 *       preserved for backward compatibility with existing code.
 	 */
 	enum FilelUploadStatus
 	{
