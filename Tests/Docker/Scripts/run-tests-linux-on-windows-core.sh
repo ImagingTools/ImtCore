@@ -73,6 +73,13 @@ echo ""
 # Build volume mount arguments for application directories
 VOLUME_MOUNTS=""
 
+# Always mount ImtCore entrypoint script from ImtCore
+IMTCORE_ENTRYPOINT="$IMTCORE_DIR/Tests/Docker/entrypoint.sh"
+if [ -f "$IMTCORE_ENTRYPOINT" ]; then
+    VOLUME_MOUNTS="$VOLUME_MOUNTS -v '$IMTCORE_ENTRYPOINT:/app/entrypoint.sh:ro'"
+    echo "[DEBUG] Mounting ImtCore entrypoint from: $IMTCORE_ENTRYPOINT"
+fi
+
 # Always mount ImtCore GUI utilities (utils.js, playwright.config.js, etc.) from ImtCore
 IMTCORE_GUI_DIR="$IMTCORE_DIR/Tests/Docker/GUI"
 if [ -d "$IMTCORE_GUI_DIR" ]; then

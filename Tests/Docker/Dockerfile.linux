@@ -110,14 +110,12 @@ RUN mkdir -p \
     /app/startup \
     /app/resources
 
-# Copy entrypoint script
-COPY Tests/Docker/entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
-
-# Note: All application files (GUI tests, API tests, resources, startup scripts)
+# Note: All application files (GUI tests, API tests, resources, startup scripts, entrypoint)
 # should be mounted via -v volume mounts when running the container:
 # Example:
-#   docker run -v "$(pwd)/Tests/GUI:/app/tests/GUI:ro" \
+#   docker run -v "$IMTCOREDIR/Tests/Docker/entrypoint.sh:/app/entrypoint.sh:ro" \
+#              -v "$IMTCOREDIR/Tests/Docker/GUI:/app/tests/GUI:ro" \
+#              -v "$(pwd)/Tests/GUI:/app/tests/GUI/app:ro" \
 #              -v "$(pwd)/Tests/API:/app/tests/API:ro" \
 #              -v "$(pwd)/Tests/Startup:/app/startup:ro" \
 #              -v "$(pwd)/Tests/Resources:/app/resources:ro" \
@@ -128,5 +126,6 @@ RUN chmod +x /app/entrypoint.sh
 ENV BASE_URL=http://localhost:3000
 ENV CI=true
 
-ENTRYPOINT ["/app/entrypoint.sh"]
+# Default entrypoint (will be overridden to use mounted script)
+ENTRYPOINT ["sh"]
 CMD [] 

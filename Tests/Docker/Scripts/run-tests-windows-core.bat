@@ -72,6 +72,13 @@ echo.
 REM Build volume mount arguments for application directories
 set VOLUME_MOUNTS=
 
+REM Always mount ImtCore entrypoint script from ImtCore
+set IMTCORE_ENTRYPOINT=%IMTCORE_DIR%\Tests\Docker\entrypoint.bat
+if exist "%IMTCORE_ENTRYPOINT%" (
+    set VOLUME_MOUNTS=%VOLUME_MOUNTS% -v "%IMTCORE_ENTRYPOINT%:C:\app\entrypoint.bat"
+    echo [DEBUG] Mounting ImtCore entrypoint from: %IMTCORE_ENTRYPOINT%
+)
+
 REM Always mount ImtCore GUI utilities (utils.js, playwright.config.js, etc.) from ImtCore
 set IMTCORE_GUI_DIR=%IMTCORE_DIR%\Tests\Docker\GUI
 if exist "%IMTCORE_GUI_DIR%" (
