@@ -438,6 +438,12 @@
                 <div class="number" id="components">-</div>
                 <div class="label">Components</div>
             </div>
+
+            <div class="stat-card">
+                <div class="icon">✅</div>
+                <div class="number" id="test-coverage">-</div>
+                <div class="label">Test Coverage</div>
+            </div>
         </div>
 
         <div class="section">
@@ -661,6 +667,63 @@
         </div>
 
         <div class="section">
+            <h2>✅ Test Coverage</h2>
+            <p class="section-description">Comprehensive testing metrics for the codebase</p>
+            <div class="metrics-table">
+                <div>
+                    <strong>Test Coverage:</strong> <span id="coverage-percentage">-</span>
+                </div>
+                <div>
+                    <strong>Total Test Cases:</strong> <span id="total-test-cases">-</span>
+                </div>
+                <div>
+                    <strong>Tested Classes:</strong> <span id="tested-classes">-</span>
+                </div>
+                <div>
+                    <strong>Test Density:</strong> <span id="test-density">-</span> tests per 1000 lines
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🔢 Code Complexity</h2>
+            <p class="section-description">Measures of code complexity and maintainability</p>
+            <div class="metrics-table">
+                <div>
+                    <strong>Average Cyclomatic Complexity:</strong> <span id="avg-cyclomatic">-</span>
+                </div>
+                <div>
+                    <strong>Max Cyclomatic Complexity:</strong> <span id="max-cyclomatic">-</span>
+                </div>
+                <div>
+                    <strong>High Complexity Functions (>10):</strong> <span id="high-complexity-count">-</span>
+                </div>
+                <div>
+                    <strong>Average Cognitive Complexity:</strong> <span id="avg-cognitive">-</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🎯 Code Quality Metrics</h2>
+            <p class="section-description">Overall code quality indicators</p>
+            <div class="metrics-table">
+                <div>
+                    <strong>Maintainability Index:</strong> <span id="maintainability-index">-</span>/100 (<span id="maintainability-category">-</span>)
+                </div>
+                <div>
+                    <strong>Documentation Coverage:</strong> <span id="documentation-coverage">-</span>%
+                </div>
+                <div>
+                    <strong>Code Duplication:</strong> <span id="code-duplication">-</span>%
+                </div>
+                <div>
+                    <strong>Code Churn (6 months):</strong> <span id="code-churn">-</span> changes
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
             <h2>📈 Additional Metrics</h2>
             <div class="metrics-table">
                 <div>
@@ -725,6 +788,43 @@
                 summary.total_interfaces.toLocaleString();
             document.getElementById('components').textContent = 
                 summary.total_components.toLocaleString();
+            
+            // Update test coverage
+            const testCoverage = summary.test_coverage_percentage || 0;
+            document.getElementById('test-coverage').textContent = 
+                testCoverage.toFixed(1) + '%';
+            
+            // Update test coverage details section
+            document.getElementById('coverage-percentage').textContent = 
+                testCoverage.toFixed(1) + '%';
+            document.getElementById('total-test-cases').textContent = 
+                (summary.total_test_cases || 0).toLocaleString();
+            document.getElementById('tested-classes').textContent = 
+                (summary.total_tested_classes || 0).toLocaleString();
+            document.getElementById('test-density').textContent = 
+                (summary.test_density || 0).toFixed(2);
+            
+            // Update complexity metrics
+            document.getElementById('avg-cyclomatic').textContent = 
+                (summary.avg_cyclomatic_complexity || 0).toFixed(2);
+            document.getElementById('max-cyclomatic').textContent = 
+                (stats.quality_metrics?.cyclomatic_complexity?.max_complexity || 0).toLocaleString();
+            document.getElementById('high-complexity-count').textContent = 
+                (stats.quality_metrics?.cyclomatic_complexity?.high_complexity_functions?.length || 0).toLocaleString();
+            document.getElementById('avg-cognitive').textContent = 
+                (summary.avg_cognitive_complexity || 0).toFixed(2);
+            
+            // Update code quality metrics
+            document.getElementById('maintainability-index').textContent = 
+                (summary.maintainability_index || 0).toFixed(1);
+            document.getElementById('maintainability-category').textContent = 
+                stats.quality_metrics?.maintainability_index?.category || 'Unknown';
+            document.getElementById('documentation-coverage').textContent = 
+                (summary.documentation_coverage_percentage || 0).toFixed(1);
+            document.getElementById('code-duplication').textContent = 
+                (summary.code_duplication_percentage || 0).toFixed(2);
+            document.getElementById('code-churn').textContent = 
+                (stats.quality_metrics?.code_churn?.total_commits || 0).toLocaleString();
 
             // Update additional metrics
             document.getElementById('test-files').textContent = 

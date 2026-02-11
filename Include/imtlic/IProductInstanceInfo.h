@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -27,9 +28,27 @@ class IProductInfo;
 
 
 /**
-	Common interface for a product instance. A product instance is the result of the product installation by the customer.
-	A product instance can have a subset of the defined product licenses and is therefore a provider of actually available licenses for the current instance.
-	There is no license validation logic yet at this level. It is only an overview of the registered licenses in the specified product installation.
+	Interface for a product instance.
+	
+	A Product Instance is created when a product is sold, installed, or deployed to a customer.
+	It represents a specific installation of a product and contains:
+	- The relationship to the product definition (via product ID)
+	- Customer information (via customer ID)
+	- Instance-specific identification (instance ID, serial number)
+	- A collection of activated License Instances
+	
+	The Product Instance acts as a provider of actually available licenses for this specific
+	installation. It maintains which licenses have been purchased and activated, but does not
+	perform license validation logic at this level - it provides an overview of registered
+	licenses in the product installation.
+	
+	Key responsibilities:
+	- Links to product and customer databases
+	- Manages activated License Instances with their expiration dates
+	- Tracks instance-specific metadata (serial number, project, usage status)
+	- Provides access to all licenses available in this installation
+	
+	\sa IProductInfo, ILicenseInstance, ILicenseInstanceProvider
 	\ingroup LicenseManagement
 */
 class IProductInstanceInfo: virtual public ILicenseInstanceProvider, virtual public iser::IObject
@@ -56,115 +75,134 @@ public:
 		MIT_HARDWARE_ID,
 		MIT_HARDWARE_MAC_ADDRESS,
 		MIT_IS_PAIRED,
-		MIT_INTERNAL_USE,
-		MIT_IS_MULTI_PRODUCT,
-		MIT_PRODUCT_COUNT
+		MIT_INTERNAL_USE
 	};
 
 	/**
 		Get access to the product database.
+		The product database contains definitions of all available products.
+		\return Pointer to the product database collection
 	*/
 	virtual const imtbase::IObjectCollection* GetProductDatabase() const = 0;
 
 	/**
 		Get access to the customer database.
+		The customer database contains information about all customers.
+		\return Pointer to the customer database collection
 	*/
 	virtual const imtbase::IObjectCollection* GetCustomerDatabase() const = 0;
 
 	/**
-		Setups the instance of a given product.
-		\param productId	Logical ID of the product (not some repository ID!)
-		\param instanceId	A unique identifier for the product instance. For example - it can be a MAC-address of some hardware device.
-		\param customerId	Logical ID of the product (not some repository ID!)
-		*/
+		Set up this instance for a given product.
+		This establishes the relationship between the instance and its product/customer.
+		\param productId Logical ID of the product (not a repository/database ID)
+		\param instanceId Unique identifier for this product instance (e.g., MAC address, hardware ID)
+		\param customerId Logical ID of the customer (not a repository/database ID)
+	*/
 	virtual void SetupProductInstance(
 				const QByteArray& productId,
 				const QByteArray& instanceId,
 				const QByteArray& customerId) = 0;
 
 	/**
-		Add a license to this product instance.
-		\param licenseId	ID of the license to be added to the product. The license should be available in the license collection related to the product.
-		\note Full information about the license is managed by the product licensing info, the license-ID is used only as a link to the license information.
+		Add an activated license to this product instance.
+		\param licenseId ID of the license to activate (must exist in the product's license definitions)
+		\param expirationDate Optional expiration date for the license (invalid QDateTime means no expiration)
+		\note Full license information is managed by IProductLicensingInfo; the license ID serves as a reference
 		\sa IProductLicensingInfo
 	*/
 	virtual void AddLicense(const QByteArray& licenseId, const QDateTime& expirationDate = QDateTime()) = 0;
 
 	/**
-		Remove an existing license from this product instance.
+		Remove an activated license from this product instance.
+		\param licenseId ID of the license to deactivate
 	*/
 	virtual void RemoveLicense(const QByteArray& licenseId) = 0;
 
 	/**
-		Remove all existing licenses from this product instance.
+		Remove all activated licenses from this product instance.
 	*/
 	virtual void ClearLicenses() = 0;
 
 	/**
-		Get the unique-ID of this product instance.
+		Get the unique ID of this product instance.
+		This ID uniquely identifies this specific installation (e.g., MAC address, hardware ID).
+		\return Unique instance identifier
 	*/
 	virtual QByteArray GetProductInstanceId() const = 0;
 
 	/**
-		Set the unique-ID of this product instance.
+		Set the unique ID of this product instance.
+		\param instanceId Unique identifier for this installation
 	*/
 	virtual void SetProductInstanceId(const QByteArray& instanceId) = 0;
 
 	/**
-		Get related product-ID.
-		Additional information about the product can be accessed using this ID in the product database.
+		Get the ID of the product that this is an instance of.
+		Use this ID to look up additional product information in the product database.
+		\return Product ID
 		\sa GetProductDatabase
 	*/
 	virtual QByteArray GetProductId() const = 0;
 
 	/**
-		Get customer-ID of this product instance.
-		Additional information about the customer can be accessed using this ID in the customer database.
+		Get the ID of the customer who owns this product instance.
+		Use this ID to look up additional customer information in the customer database.
+		\return Customer ID
 		\sa GetCustomerDatabase
 	*/
 	virtual QByteArray GetCustomerId() const = 0;
 
 	/**
 		Get the serial number of this product instance.
+		\return Serial number
 	*/
 	virtual QByteArray GetSerialNumber() const = 0;
 
 	/**
 		Set the serial number of this product instance.
+		\param serialNumber Serial number to assign
 	*/
 	virtual void SetSerialNumber(const QByteArray& serialNumber) = 0;
 
 	/**
-		Get the project of this product instance.
+		Get the project this product instance is assigned to.
+		\return Project identifier
 	*/
 	virtual QByteArray GetProject() const = 0;
 
 	/**
-		Set the project of this product instance.
+		Set the project assignment for this product instance.
+		\param project Project identifier
 	*/
 	virtual void SetProject(const QByteArray& project) = 0;
 
 	/**
-		Check this product instance is in use.
+		Check if this product instance is currently in use.
+		\return true if the instance is active/in-use, false otherwise
 	*/
 	virtual bool IsInUse() const = 0;
 
 	/**
-		Set in use for this product instance.
+		Set the usage status for this product instance.
+		\param inUse true to mark as in-use, false otherwise
 	*/
 	virtual void SetInUse(bool inUse) = 0;
 
 	/**
-		Checks whether this product instance is marked for internal use only.
+		Check if this product instance is marked for internal use only.
+		Internal-use instances are typically for testing or company-internal purposes.
+		\return true if marked for internal use only
 	*/
 	virtual bool IsInternalUse() const = 0;
 
 	/**
-		Sets whether this product instance is for internal use only.
+		Set whether this product instance is for internal use only.
+		\param internalUse true to mark for internal use only
 	*/
 	virtual void SetInternalUse(bool internalUse) = 0;
 
-	/**
+ 	/**
 		Checks whether this product instance represents multiple items (multi-product).
 	*/
 	virtual bool IsMultiProduct() const = 0;
