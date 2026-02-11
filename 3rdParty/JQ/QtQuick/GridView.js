@@ -263,7 +263,7 @@ class GridView extends Flickable {
             return
         }
 
-        if(length === 0) return
+        // if(length === 0) return
 
         let columns = Math.trunc(this.width / this.cellWidth)
         if(columns <= 0) columns = 1
