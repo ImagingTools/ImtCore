@@ -222,7 +222,6 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::GetDocumentName(co
 
 IDocumentManager::OperationStatus CCollectionDocumentManager::SetDocumentName(const QByteArray& userId, const QByteArray& documentId, const QString& documentName)
 {
-	
 	WorkingDocument* workingDocumentPtr = nullptr;
 	{
 		QMutexLocker locker(&m_mutex);
