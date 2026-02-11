@@ -53,6 +53,23 @@ type SetDescriptionNotificationPayload {
 	description: String
 }
 
+type MessageItem
+{
+	id: ID
+	infoId: Integer
+	typeId: ID
+	category: Integer
+	text: String
+	flags: Integer
+	source: String
+	timestamp: String
+}
+
+type MessageListPayload {
+	items: [MessageItem]
+	notification: NotificationItem
+}
+
 type RemoveElementsPayload {
 	success: Boolean
 }
