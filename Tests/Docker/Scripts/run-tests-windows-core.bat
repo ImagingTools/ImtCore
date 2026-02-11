@@ -120,7 +120,7 @@ docker run -d ^
   -e CI=true ^
   %VOLUME_MOUNTS% ^
   %IMAGE_NAME% ^
-  /c timeout /t 3600
+  /c "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -NoProfile -Command Start-Sleep -Seconds 3600"
 
 if errorlevel 1 (
     echo ERROR: Failed to start container
