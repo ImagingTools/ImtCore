@@ -47,6 +47,7 @@ Item {
 	property bool headerRightClickEnabled: true;
 	property bool commandsPanelVisible: true
 	property bool loadingDataAfterHeadersReceived: true
+	property bool backgroundUpdatesEnabled: false
 
 	property alias canResetFilters: container.canResetFilters;
 	property int metaInfoWidth: Style.sizeHintXXS;
@@ -299,6 +300,18 @@ Item {
 			
 			function onEndUpdate(){
 				container.loading.stop();
+
+				if(root.visibleMetaInfo ){
+					let ids = container.selectionManager.selectedIds
+					if (root.dataController){
+						if (ids.length === 1){
+							collectionMetaInfo.startLoading()
+							root.dataController.getObjectMetaInfo(ids[0])
+						}
+					}
+					collectionMetaInfo.contentVisible = ids.length === 1;
+					additionalInformation.visible = root.visibleMetaInfo && ids.length === 0;
+				}
 			}
 
 			function onElementsRemoved(elementIds){
@@ -399,7 +412,7 @@ Item {
 		}
 
 		function doUpdateGui(){
-			if (!visible){
+			if (!root.backgroundUpdatesEnabled && !visible){
 				internal.updateGuiRequired = true
 				return
 			}

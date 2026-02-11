@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include "PrinterBase.h"
 
 
@@ -20,6 +21,8 @@ bool CPrinterSpecificationBase::V1_0::operator==(const V1_0& other) const
 
 bool CPrinterSpecificationBase::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
+	model.SetData("__typename", "PrinterSpecificationBase", modelIndex);
+
 	if (name){
 		model.SetData("name", *name, modelIndex);
 	}
@@ -57,6 +60,8 @@ bool CPrinterSpecificationBase::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamOb
 		gqlObject.InsertParam("name", QVariant(*name));
 	}
 
+	gqlObject.InsertParam("__typename", QVariant("PrinterSpecificationBase"));
+
 	return true;
 }
 
@@ -86,6 +91,8 @@ bool CPrinterSpecificationBase::V1_0::WriteToJsonObject(QJsonObject& jsonObject)
 	if (name){
 		jsonObject["name"] = QJsonValue::fromVariant(*name);
 	}
+
+	jsonObject["__typename"] = "PrinterSpecificationBase";
 
 	return true;
 }
@@ -358,6 +365,8 @@ bool CLink::V1_0::operator==(const V1_0& other) const
 
 bool CLink::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
+	model.SetData("__typename", "Link", modelIndex);
+
 	if (!link){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "link").toLocal8Bit().constData();)
 
@@ -404,6 +413,8 @@ bool CLink::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) con
 	}
 	gqlObject.InsertParam("link", QVariant(*link));
 
+	gqlObject.InsertParam("__typename", QVariant("Link"));
+
 	return true;
 }
 
@@ -439,6 +450,8 @@ bool CLink::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		return false;
 	}
 	jsonObject["link"] = QJsonValue::fromVariant(*link);
+
+	jsonObject["__typename"] = "Link";
 
 	return true;
 }
@@ -717,6 +730,8 @@ bool CPrinterBase::V1_0::operator==(const V1_0& other) const
 
 bool CPrinterBase::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
+	model.SetData("__typename", "PrinterBase", modelIndex);
+
 	if (name){
 		model.SetData("name", *name, modelIndex);
 	}
@@ -967,6 +982,8 @@ bool CPrinterBase::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 	}
 	gqlObject.InsertParam("mixedTest", mixedTestDataObject);
 
+	gqlObject.InsertParam("__typename", QVariant("PrinterBase"));
+
 	return true;
 }
 
@@ -1187,6 +1204,8 @@ bool CPrinterBase::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		jsonObject["mixedTest"] = mixedTestJsonObject;
 	}
 
+
+	jsonObject["__typename"] = "PrinterBase";
 
 	return true;
 }
@@ -1584,6 +1603,8 @@ bool CPrinterList::V1_0::operator==(const V1_0& other) const
 
 bool CPrinterList::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
+	model.SetData("__typename", "PrinterList", modelIndex);
+
 	if (data){
 		::imtbase::CTreeItemModel* newDataModelPtr = model.AddTreeModel("data", modelIndex);
 		newDataModelPtr->setIsArray(true);
@@ -1663,6 +1684,8 @@ bool CPrinterList::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 		gqlObject.InsertParam("data", dataDataObjectList);
 	}
 
+	gqlObject.InsertParam("__typename", QVariant("PrinterList"));
+
 	return true;
 }
 
@@ -1738,6 +1761,8 @@ bool CPrinterList::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		}
 		jsonObject["data"] = newDataArray;
 	}
+
+	jsonObject["__typename"] = "PrinterList";
 
 	return true;
 }

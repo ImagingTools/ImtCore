@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include "ComplexCollectionFilter.h"
 
 
@@ -23,6 +24,8 @@ bool CTimeFilter::V1_0::operator==(const V1_0& other) const
 
 bool CTimeFilter::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
+	model.SetData("__typename", "TimeFilter", modelIndex);
+
 
 	if (timeRange){
 		::imtbase::CTreeItemModel* timeRangeNewModelPtr = model.AddTreeModel("timeRange", modelIndex);
@@ -140,6 +143,8 @@ bool CTimeFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObjec
 		gqlObject.InsertParam("unitMultiplier", QVariant(*unitMultiplier));
 	}
 
+	gqlObject.InsertParam("__typename", QVariant("TimeFilter"));
+
 	return true;
 }
 
@@ -224,6 +229,8 @@ bool CTimeFilter::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 	if (unitMultiplier){
 		jsonObject["unitMultiplier"] = QJsonValue::fromVariant(*unitMultiplier);
 	}
+
+	jsonObject["__typename"] = "TimeFilter";
 
 	return true;
 }
@@ -533,6 +540,8 @@ bool CFieldSortingInfo::V1_0::operator==(const V1_0& other) const
 
 bool CFieldSortingInfo::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
+	model.SetData("__typename", "FieldSortingInfo", modelIndex);
+
 	if (!fieldId){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "fieldId").toLocal8Bit().constData();)
 
@@ -606,6 +615,8 @@ bool CFieldSortingInfo::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gq
 	}
 	gqlObject.InsertParam("sortingOrder", QVariant(*sortingOrder));
 
+	gqlObject.InsertParam("__typename", QVariant("FieldSortingInfo"));
+
 	return true;
 }
 
@@ -659,6 +670,8 @@ bool CFieldSortingInfo::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		return false;
 	}
 	jsonObject["sortingOrder"] = QJsonValue::fromVariant(*sortingOrder);
+
+	jsonObject["__typename"] = "FieldSortingInfo";
 
 	return true;
 }
@@ -948,6 +961,8 @@ bool CFieldFilter::V1_0::operator==(const V1_0& other) const
 
 bool CFieldFilter::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
+	model.SetData("__typename", "FieldFilter", modelIndex);
+
 	if (!fieldId){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "fieldId").toLocal8Bit().constData();)
 
@@ -1243,6 +1258,8 @@ bool CFieldFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 	}
 	gqlObject.InsertParam("filterOperations", filterOperationsDataObjectList);
 
+	gqlObject.InsertParam("__typename", QVariant("FieldFilter"));
+
 	return true;
 }
 
@@ -1463,6 +1480,8 @@ bool CFieldFilter::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		newFilterOperationsArray << filterOperationsStringValue;
 	}
 	jsonObject["filterOperations"] = newFilterOperationsArray;
+
+	jsonObject["__typename"] = "FieldFilter";
 
 	return true;
 }
@@ -1861,6 +1880,8 @@ bool CGroupFilter::V1_0::operator==(const V1_0& other) const
 
 bool CGroupFilter::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
+	model.SetData("__typename", "GroupFilter", modelIndex);
+
 	if (fieldFilters){
 		::imtbase::CTreeItemModel* newFieldFiltersModelPtr = model.AddTreeModel("fieldFilters", modelIndex);
 		newFieldFiltersModelPtr->setIsArray(true);
@@ -2073,6 +2094,8 @@ bool CGroupFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 	}
 	gqlObject.InsertParam("logicalOperation", QVariant(logicalOperationStringValue));
 
+	gqlObject.InsertParam("__typename", QVariant("GroupFilter"));
+
 	return true;
 }
 
@@ -2258,6 +2281,8 @@ bool CGroupFilter::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		break;
 	}
 	jsonObject["logicalOperation"] = QJsonValue::fromVariant(logicalOperationStringValue);
+
+	jsonObject["__typename"] = "GroupFilter";
 
 	return true;
 }
@@ -2618,6 +2643,8 @@ bool CComplexCollectionFilter::V1_0::operator==(const V1_0& other) const
 
 bool CComplexCollectionFilter::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
+	model.SetData("__typename", "ComplexCollectionFilter", modelIndex);
+
 	if (sortingInfo){
 		::imtbase::CTreeItemModel* newSortingInfoModelPtr = model.AddTreeModel("sortingInfo", modelIndex);
 		newSortingInfoModelPtr->setIsArray(true);
@@ -2826,6 +2853,8 @@ bool CComplexCollectionFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObj
 		gqlObject.InsertParam("distinctFields", distinctFieldsDataObjectList);
 	}
 
+	gqlObject.InsertParam("__typename", QVariant("ComplexCollectionFilter"));
+
 	return true;
 }
 
@@ -2999,6 +3028,8 @@ bool CComplexCollectionFilter::V1_0::WriteToJsonObject(QJsonObject& jsonObject) 
 		}
 		jsonObject["distinctFields"] = newDistinctFieldsArray;
 	}
+
+	jsonObject["__typename"] = "ComplexCollectionFilter";
 
 	return true;
 }

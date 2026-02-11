@@ -68,6 +68,21 @@ const env = process.env
 // const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\test\\jq.json'
 // const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\Rosa\\rosa.json'
 
+// options.config = "D:/IT/IotPlatform/Build/CMake/../../Include/iotqml/Qml/iot.json"
+// options.name = "index"
+// options.output = "D:/IotPlatform/Bin/web/Resources/"
+// options.root = "/Iot/Views/"
+// options.entry = "D:/IT/IotPlatform/Build/CMake/../../Include/iotqml/Qml/IotPlatformWeb.qml"
+// options.mode = "js"
+
+// options.config = "d:/TEMP/test.json"
+// options.name = "index"
+// options.output = "d:/TEMP"
+// options.root = "/"
+// options.entry = "d:/TEMP/main.qml"
+// options.mode = "js"
+
+
 const configFilePath = path.normalize(options.config.trim())
 const configDirPath = configFilePath.split(/[\\\/]+/g).slice(0, -1).join('/')
 
@@ -125,6 +140,7 @@ class Instruction {
     defineMethods = []
     connectedSignals = []
     assignProperties = []
+    objectProperties = []
 
     id = ''
     qmlFile = null
@@ -349,7 +365,12 @@ class Instruction {
         }
     }
     qmlobj(meta) {
-        this.children.push(new Instruction(this, '', meta[1].slice(1).join('.'), meta[2], null, this.qmlFile, meta.info, this))
+        for (let m of meta[2]) {
+            if(m[0] === 'qmlprop'){
+                m[1] = `${meta[1]}.${m[1]}`
+                this[m[0]](m)
+            }
+        }
     }
     qmlenumdef(meta) {
         Enums[meta[1]] = meta[2]
@@ -1902,8 +1923,9 @@ for (let dirPath of config.dirs) {
             if (type === 'module') {
                 moduleName = name
 
-                if (JQModules[name]) throw `module ${name} already exists`
                 console.log(`    > ${name}`)
+
+                if (JQModules[name]) continue
 
                 JQModules[name] = {}
             }

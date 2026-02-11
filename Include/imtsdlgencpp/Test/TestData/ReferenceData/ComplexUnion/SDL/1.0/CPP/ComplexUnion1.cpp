@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include "ComplexUnion1.h"
 
 
@@ -25,6 +26,8 @@ bool CPoint::V1_0::operator==(const V1_0& other) const
 
 bool CPoint::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
+	model.SetData("__typename", "Point", modelIndex);
+
 	if (!X){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "X").toLocal8Bit().constData();)
 
@@ -98,6 +101,8 @@ bool CPoint::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) co
 	}
 	gqlObject.InsertParam("Y", QVariant(*Y));
 
+	gqlObject.InsertParam("__typename", QVariant("Point"));
+
 	return true;
 }
 
@@ -151,6 +156,8 @@ bool CPoint::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		return false;
 	}
 	jsonObject["Y"] = QJsonValue::fromVariant(*Y);
+
+	jsonObject["__typename"] = "Point";
 
 	return true;
 }
@@ -443,6 +450,8 @@ bool CGeometry::V1_0::operator==(const V1_0& other) const
 
 bool CGeometry::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
+	model.SetData("__typename", "Geometry", modelIndex);
+
 	if (!GeometryType){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "GeometryType").toLocal8Bit().constData();)
 
@@ -773,6 +782,8 @@ bool CGeometry::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject)
 		gqlObject.InsertParam("OptionalPoints", optionalPointsDataObjectList);
 	}
 
+	gqlObject.InsertParam("__typename", QVariant("Geometry"));
+
 	return true;
 }
 
@@ -1050,6 +1061,8 @@ bool CGeometry::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		}
 		jsonObject["OptionalPoints"] = newOptionalPointsArray;
 	}
+
+	jsonObject["__typename"] = "Geometry";
 
 	return true;
 }

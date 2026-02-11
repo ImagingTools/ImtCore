@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -31,6 +32,7 @@ public:
 	virtual void SetGeneratorType(GeneratorType type) = 0;
 	virtual void SetHeadersIncludePaths(const QStringList& includePaths) = 0;
 	virtual void SetDepFilePath(const QString& path) = 0;
+	virtual void SetTypenameWriteMode(TypenameWriteMode mode) = 0;
 
 	// template
 	virtual void SetTemplateEnabled(bool enable = true) = 0;

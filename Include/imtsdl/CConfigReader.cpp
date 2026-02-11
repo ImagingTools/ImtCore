@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtsdl/CConfigReader.h>
 
 
@@ -118,6 +119,10 @@ bool CConfigReader::ReadFromFile(const QString& filePath)
 	SetVariableFromConfig(configuration, QStringLiteral("GQL"), gqlEnabled);
 	SetVariableFromConfig(configuration, QStringLiteral("schema-dependencies"), schemaDependencyModeEnabled);
 	SetVariableFromConfig(configuration, QStringLiteral("generate-module"), generateMode);
+	
+	if (!SetEnumVariableFromConfig(configuration, QStringLiteral("typename-mode"), typenameWriteMode)){
+		return false;
+	}
 
 	if (!SetEnumVariableFromConfig(configuration, QStringLiteral("generator"), generatorType)){
 		return false;
