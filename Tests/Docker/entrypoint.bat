@@ -5,132 +5,164 @@ REM Handles startup sequence: PostgreSQL -> Custom Apps -> Tests
 setlocal enabledelayedexpansion
 
 echo ========================================
-echo Starting Test Environment (Windows^)
+echo Starting Test Environment (Windows)
 echo ========================================
 
-REM Step 1: Start PostgreSQL if needed
-if "%START_POSTGRESQL%"=="true" (
-    echo Step 1: Starting PostgreSQL...
-    
-    REM Find PostgreSQL installation
-    for /d %%P in ("C:\Program Files\PostgreSQL\*") do set PG_PATH=%%P
-    
-    if defined PG_PATH (
-        set PG_BIN=%PG_PATH%\bin
-        set PG_DATA=C:\PostgreSQL\data
-        set PG_LOG=C:\PostgreSQL
-        
-        REM Default password
-        if not defined POSTGRES_PASSWORD set POSTGRES_PASSWORD=root
-        
-        REM Create log directory if needed
-        if not exist "!PG_LOG!" mkdir "!PG_LOG!"
-        
-        REM Ensure data dir exists
-        if not exist "!PG_DATA!" (
-            echo Initializing PostgreSQL data directory...
-            mkdir "!PG_DATA!"
-            "!PG_BIN!\initdb.exe" -D "!PG_DATA!" -U postgres --auth-host=scram-sha-256
-        )
-        
-        REM Check for stale postmaster.pid
-        if exist "!PG_DATA!\postmaster.pid" (
-            set /p OLD_PID=<"!PG_DATA!\postmaster.pid"
-            tasklist /FI "PID eq !OLD_PID!" 2>nul | find "!OLD_PID!" >nul
-            if errorlevel 1 (
-                echo Found stale postmaster.pid (pid=!OLD_PID!^). Removing...
-                del "!PG_DATA!\postmaster.pid"
-                echo Starting PostgreSQL...
-                "!PG_BIN!\pg_ctl.exe" -D "!PG_DATA!" -l "!PG_LOG!\logfile.log" start
-            ) else (
-                echo PostgreSQL appears to be running already (pid=!OLD_PID!^). Skipping start.
-            )
-        ) else (
-            echo Starting PostgreSQL...
-            "!PG_BIN!\pg_ctl.exe" -D "!PG_DATA!" -l "!PG_LOG!\logfile.log" start
-        )
-        
-        REM Wait for PostgreSQL
-        echo Waiting for PostgreSQL to be ready...
-        set /a ATTEMPTS=0
-        :WAIT_PG
-        set /a ATTEMPTS+=1
-        if %ATTEMPTS% gtr 30 (
-            echo [ERROR] PostgreSQL failed to start
-            goto SKIP_PG
-        )
-        "!PG_BIN!\psql.exe" -U postgres -c "SELECT 1" >nul 2>&1
-        if errorlevel 1 (
-            echo   Attempt %ATTEMPTS%/30...
-            timeout /t 2 /nobreak >nul
-            goto WAIT_PG
-        )
-        echo [OK] PostgreSQL is ready
-        
-        REM Set password
-        echo Setting postgres password (default^)
-        "!PG_BIN!\psql.exe" -U postgres -c "ALTER USER postgres WITH PASSWORD '%POSTGRES_PASSWORD%';" >nul 2>&1
-        
-        REM Create test database if specified
-        if defined POSTGRES_DB (
-            echo Creating database: %POSTGRES_DB%
-            "!PG_BIN!\psql.exe" -U postgres -c "CREATE DATABASE %POSTGRES_DB%" >nul 2>&1
-        )
-        
-        echo [OK] PostgreSQL initialized
-        :SKIP_PG
-    ) else (
-        echo [WARNING] PostgreSQL not found in C:\Program Files\PostgreSQL
-        echo Continuing without PostgreSQL...
-    )
-) else (
-    echo Step 1: PostgreSQL startup skipped (START_POSTGRESQL not set to true^)
+REM Add system paths to PATH (for ping, timeout, powershell, etc.)
+set "PATH=C:\Windows\System32;C:\Windows\System32\WindowsPowerShell\v1.0;C:\Windows;!PATH!"
+
+REM Add PostgreSQL to PATH if found (needed for startup scripts even if not starting PG)
+for /d %%P in ("C:\Program Files\PostgreSQL\*") do (
+    set "PATH=%%P\bin;!PATH!"
+    set "PG_BIN=%%P\bin"
 )
 
-REM Step 2: Run custom application installers and startup scripts
-if exist "C:\app\startup" (
-    echo Step 2: Running custom application scripts...
-    echo Startup dir: C:\app\startup
-    
-    echo Listing C:\app\startup:
-    dir /b "C:\app\startup" 2>nul
-    
-    REM Export path environment variables for startup scripts
-    set APP_DIR=C:\app
-    set STARTUP_DIR=C:\app\startup
-    set RESOURCES_DIR=C:\app\resources
-    set TESTS_DIR=C:\app\tests
-    
-    echo Environment variables set for startup scripts:
-    echo   APP_DIR=%APP_DIR%
-    echo   STARTUP_DIR=%STARTUP_DIR%
-    echo   RESOURCES_DIR=%RESOURCES_DIR%
-    echo   TESTS_DIR=%TESTS_DIR%
-    
-    REM Get all .bat scripts and sort them
-    set SCRIPT_COUNT=0
-    for %%F in (C:\app\startup\*.bat) do (
-        set /a SCRIPT_COUNT+=1
-    )
-    
-    if !SCRIPT_COUNT! equ 0 (
-        echo No startup scripts found: C:\app\startup\*.bat
-    ) else (
-        echo Found !SCRIPT_COUNT! startup script(s^):
-        for %%F in (C:\app\startup\*.bat) do echo   - %%~nxF
-        
-        echo Executing startup scripts in lexicographic order...
-        for %%F in (C:\app\startup\*.bat) do (
-            echo Running startup script: %%~nxF
-            call "%%F"
-            echo Finished: %%~nxF (exit=!ERRORLEVEL!^)
-        )
-    )
-    
-    echo [OK] Custom applications initialized
-) else (
-    echo Step 2: No custom applications to start (C:\app\startup not found^)
+REM Step 1: Start PostgreSQL if needed
+if not "!START_POSTGRESQL!"=="true" goto SKIP_POSTGRESQL
+
+echo Step 1: Starting PostgreSQL...
+
+REM Find PostgreSQL installation
+set PG_PATH=
+for /d %%P in ("C:\Program Files\PostgreSQL\*") do set PG_PATH=%%P
+
+if not defined PG_PATH (
+    echo [WARNING] PostgreSQL not found in C:\Program Files\PostgreSQL
+    echo Continuing without PostgreSQL...
+    goto SKIP_POSTGRESQL
 )
+
+set PG_BIN=!PG_PATH!\bin
+set PG_DATA=C:\PostgreSQL\data
+set PG_LOG=C:\PostgreSQL\logfile.log
+
+REM Default password
+if not defined POSTGRES_PASSWORD set POSTGRES_PASSWORD=root
+
+REM Create log directory if needed
+if not exist "C:\PostgreSQL" mkdir "C:\PostgreSQL"
+
+REM Ensure data dir exists
+if not exist "!PG_DATA!" (
+    echo Initializing PostgreSQL data directory...
+    mkdir "!PG_DATA!"
+    "!PG_BIN!\initdb.exe" -D "!PG_DATA!" -U postgres --auth-host=scram-sha-256
+)
+
+REM Check for stale postmaster.pid
+if exist "!PG_DATA!\postmaster.pid" (
+    set /p OLD_PID=<"!PG_DATA!\postmaster.pid"
+    tasklist /FI "PID eq !OLD_PID!" 2>nul | find "!OLD_PID!" >nul
+    if errorlevel 1 (
+        echo Found stale postmaster.pid. Removing...
+        del "!PG_DATA!\postmaster.pid"
+    ) else (
+        echo PostgreSQL appears to be running already. Skipping start.
+        goto WAIT_PG
+    )
+)
+
+echo Starting PostgreSQL...
+"!PG_BIN!\pg_ctl.exe" -D "!PG_DATA!" -l "!PG_LOG!" start -w -t 60
+
+if errorlevel 1 (
+    echo [ERROR] PostgreSQL failed to start. Log contents:
+    echo ----------------------------------------
+    if exist "!PG_LOG!" (
+        type "!PG_LOG!"
+    ) else (
+        echo Log file not found: !PG_LOG!
+    )
+    echo ----------------------------------------
+    goto SKIP_POSTGRESQL
+)
+
+REM Wait for PostgreSQL
+:WAIT_PG
+echo Waiting for PostgreSQL to be ready...
+set ATTEMPTS=0
+
+:WAIT_PG_LOOP
+set /a ATTEMPTS+=1
+if !ATTEMPTS! gtr 30 (
+    echo [ERROR] PostgreSQL failed to start after 30 attempts
+    echo Log contents:
+    echo ----------------------------------------
+    if exist "!PG_LOG!" type "!PG_LOG!"
+    echo ----------------------------------------
+    goto SKIP_POSTGRESQL
+)
+"!PG_BIN!\psql.exe" -U postgres -c "SELECT 1" >nul 2>&1
+if errorlevel 1 (
+    echo   Attempt !ATTEMPTS!/30...
+    timeout /t 2 /nobreak >nul
+    goto WAIT_PG_LOOP
+)
+echo [OK] PostgreSQL is ready
+
+REM Set password
+echo Setting postgres password
+"!PG_BIN!\psql.exe" -U postgres -c "ALTER USER postgres WITH PASSWORD '!POSTGRES_PASSWORD!';" >nul 2>&1
+
+REM Create test database if specified
+if defined POSTGRES_DB (
+    echo Creating database: !POSTGRES_DB!
+    "!PG_BIN!\psql.exe" -U postgres -c "CREATE DATABASE !POSTGRES_DB!" >nul 2>&1
+)
+
+echo [OK] PostgreSQL initialized
+goto AFTER_POSTGRESQL
+
+:SKIP_POSTGRESQL
+if not "!START_POSTGRESQL!"=="true" (
+    echo Step 1: PostgreSQL startup skipped
+)
+
+:AFTER_POSTGRESQL
+
+REM Step 2: Run custom application installers and startup scripts
+if not exist "C:\app\startup" goto SKIP_STARTUP
+
+echo Step 2: Running custom application scripts...
+echo Startup dir: C:\app\startup
+
+echo Listing C:\app\startup:
+dir /b "C:\app\startup" 2>nul
+
+REM Export path environment variables for startup scripts
+set APP_DIR=C:\app
+set STARTUP_DIR=C:\app\startup
+set RESOURCES_DIR=C:\app\resources
+set TESTS_DIR=C:\app\tests
+
+echo Environment variables set for startup scripts:
+echo   APP_DIR=!APP_DIR!
+echo   STARTUP_DIR=!STARTUP_DIR!
+echo   RESOURCES_DIR=!RESOURCES_DIR!
+echo   TESTS_DIR=!TESTS_DIR!
+
+REM Count scripts
+set SCRIPT_COUNT=0
+for %%F in ("C:\app\startup\*.bat") do set /a SCRIPT_COUNT+=1
+
+if !SCRIPT_COUNT! equ 0 (
+    echo No startup scripts found
+) else (
+    echo Found !SCRIPT_COUNT! startup scripts
+    for %%F in ("C:\app\startup\*.bat") do (
+        echo Running startup script: %%~nxF
+        call "%%F"
+        echo Finished: %%~nxF
+    )
+)
+
+echo [OK] Custom applications initialized
+goto AFTER_STARTUP
+
+:SKIP_STARTUP
+echo Step 2: No custom applications to start
+
+:AFTER_STARTUP
 
 REM Step 3: Run tests or custom command
 echo Step 3: Starting tests...
@@ -138,9 +170,9 @@ echo ========================================
 
 cd /d C:\app\tests
 
-if "%PAUSE_BEFORE_TESTS%"=="true" (
-    echo PAUSE_BEFORE_TESTS=true -^> pausing before running tests.
-    echo Attach with: docker exec -it ^<container^> cmd
+if "!PAUSE_BEFORE_TESTS!"=="true" (
+    echo PAUSE_BEFORE_TESTS=true - pausing before running tests.
+    echo Attach with: docker exec -it [container] cmd
     timeout /t 3600 /nobreak >nul
 )
 
@@ -150,7 +182,7 @@ echo Auto-detecting tests...
 set GUI_TESTS_FOUND=0
 set API_TESTS_FOUND=0
 
-REM Check for GUI tests (Playwright^)
+REM Check for GUI tests (Playwright)
 if exist "C:\app\tests\GUI" (
     dir /s /b "C:\app\tests\GUI\*.spec.js" "C:\app\tests\GUI\*.spec.ts" "C:\app\tests\GUI\*.test.js" "C:\app\tests\GUI\*.test.ts" 2>nul | findstr . >nul
     if not errorlevel 1 (
@@ -159,7 +191,7 @@ if exist "C:\app\tests\GUI" (
     )
 )
 
-REM Check for API tests (Postman/Newman^)
+REM Check for API tests (Postman/Newman)
 if exist "C:\app\tests\API" (
     dir /s /b "C:\app\tests\API\*collection*.json" 2>nul | findstr . >nul
     if not errorlevel 1 (
@@ -168,77 +200,84 @@ if exist "C:\app\tests\API" (
     )
 )
 
-if %GUI_TESTS_FOUND% equ 1 (
-    set EXIT_CODE=0
-    
-    echo Preparing Playwright dependencies...
-    if exist "C:\app\tests\package.json" (
-        if exist "C:\app\tests\package-lock.json" (
-            cd /d C:\app\tests
-            call npm ci
-            if errorlevel 1 set EXIT_CODE=!ERRORLEVEL!
-        ) else (
-            cd /d C:\app\tests
-            call npm install
-            if errorlevel 1 set EXIT_CODE=!ERRORLEVEL!
-        )
-    ) else (
-        echo No C:\app\tests\package.json found. Cannot install @playwright/test.
-        set EXIT_CODE=1
-    )
-    
-    if !EXIT_CODE! equ 0 (
-        echo Running Playwright tests...
-        cd /d C:\app\tests
-        
-        REM Build playwright command with optional --update-snapshots flag
-        set PLAYWRIGHT_CMD=npx playwright test
-        if "%UPDATE_SNAPSHOTS%"=="true" (
-            echo UPDATE_SNAPSHOTS=true - updating reference screenshots
-            set PLAYWRIGHT_CMD=!PLAYWRIGHT_CMD! --update-snapshots
-        )
-        
-        call !PLAYWRIGHT_CMD!
+REM Run GUI tests
+if !GUI_TESTS_FOUND! equ 0 goto SKIP_GUI_TESTS
+
+set EXIT_CODE=0
+
+echo Preparing Playwright dependencies...
+if not exist "C:\app\tests\package.json" (
+    echo No C:\app\tests\package.json found. Cannot install dependencies.
+    set EXIT_CODE=1
+    goto END_TESTS
+)
+
+cd /d C:\app\tests
+if exist "C:\app\tests\package-lock.json" (
+    call npm ci
+) else (
+    call npm install
+)
+if errorlevel 1 (
+    set EXIT_CODE=!ERRORLEVEL!
+    goto END_TESTS
+)
+
+echo Running Playwright tests...
+cd /d C:\app\tests
+
+set PLAYWRIGHT_CMD=npx playwright test
+if "!UPDATE_SNAPSHOTS!"=="true" (
+    echo UPDATE_SNAPSHOTS=true - updating reference screenshots
+    set PLAYWRIGHT_CMD=!PLAYWRIGHT_CMD! --update-snapshots
+)
+
+call !PLAYWRIGHT_CMD!
+if errorlevel 1 set EXIT_CODE=!ERRORLEVEL!
+
+goto END_TESTS
+
+:SKIP_GUI_TESTS
+
+REM Run API tests
+if !API_TESTS_FOUND! equ 0 goto SKIP_API_TESTS
+
+set EXIT_CODE=0
+
+echo Running Postman tests...
+
+REM Find environment file
+set ENV_FILE=
+for /r "C:\app\tests\API" %%F in (*environment*.json) do (
+    set "ENV_FILE=%%F"
+    goto RUN_NEWMAN
+)
+
+:RUN_NEWMAN
+if defined ENV_FILE (
+    echo Using environment: !ENV_FILE!
+    for %%C in ("C:\app\tests\API\*collection*.json") do (
+        echo Running collection: %%~nxC
+        call newman run "%%C" -e "!ENV_FILE!"
         if errorlevel 1 set EXIT_CODE=!ERRORLEVEL!
     )
-    
-    exit /b !EXIT_CODE!
+) else (
+    for %%C in ("C:\app\tests\API\*collection*.json") do (
+        echo Running collection: %%~nxC
+        call newman run "%%C"
+        if errorlevel 1 set EXIT_CODE=!ERRORLEVEL!
+    )
 )
 
-if %API_TESTS_FOUND% equ 1 (
-    set EXIT_CODE=0
-    
-    echo Running Postman tests...
-    
-    REM Use first environment file if exists (optional^)
-    for /r "C:\app\tests\API" %%F in (*environment*.json) do (
-        set ENV_FILE=%%F
-        goto :FOUND_ENV
-    )
-    :FOUND_ENV
-    
-    if defined ENV_FILE (
-        echo Using environment: %ENV_FILE%
-        for %%C in (C:\app\tests\API\*collection*.json) do (
-            echo Running collection: %%~nxC
-            call newman run "%%C" -e "%ENV_FILE%"
-            if errorlevel 1 set EXIT_CODE=!ERRORLEVEL!
-        )
-    ) else (
-        for %%C in (C:\app\tests\API\*collection*.json) do (
-            echo Running collection: %%~nxC
-            call newman run "%%C"
-            if errorlevel 1 set EXIT_CODE=!ERRORLEVEL!
-        )
-    )
-    
-    exit /b !EXIT_CODE!
-)
+goto END_TESTS
 
-if %GUI_TESTS_FOUND% equ 0 if %API_TESTS_FOUND% equ 0 (
-    echo No tests found in GUI or API folders
-    echo To run tests:
-    echo   - Copy Playwright tests to C:\app\tests\GUI\
-    echo   - Copy Postman collections to C:\app\tests\API\
-    exit /b 0
-)
+:SKIP_API_TESTS
+
+echo No tests found in GUI or API folders
+echo To run tests:
+echo   - Copy Playwright tests to C:\app\tests\GUI\
+echo   - Copy Postman collections to C:\app\tests\API\
+set EXIT_CODE=0
+
+:END_TESTS
+exit /b !EXIT_CODE!
