@@ -527,7 +527,6 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::GetDocumentUndoMan
 {
 	undoManagerPtr = nullptr;
 
-	
 	QMutexLocker locker(&m_mutex);
 	
 	OperationStatus validationStatus;
