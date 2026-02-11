@@ -9,7 +9,7 @@
 # - Hyper-V feature enabled
 
 # Use Windows Server Core
-FROM mcr.microsoft.com/windows/servercore:ltsc2022
+FROM mcr.microsoft.com/windows/server:ltsc2022
 
 SHELL ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command"]
 
@@ -22,20 +22,18 @@ RUN choco install -y postgresql16 --params '/Password:root'
 
 # Install node modules "globally" by adding them to PATH and NODE_PATH
 # This allows Playwright and Newman to be available system-wide
-COPY Tests/Docker/GUI/package.json C:\modules\package.json
-RUN cd C:\modules; `
-    npm install; `
-    npx playwright install chromium --with-deps; `
-    Remove-Item package.json; `
-    [Environment]::SetEnvironmentVariable('path', \"$env:path;C:\modules\node_modules\.bin\", 'Machine'); `
-    [Environment]::SetEnvironmentVariable('NODE_PATH', \"$env:NODE_PATH;C:\modules\node_modules\", 'Machine')
+RUN New-Item -ItemType Directory -Force -Path C:/modules
+COPY Tests/Docker/GUI/package.json C:/modules/package.json
+RUN cd C:/modules; \
+    npm install; \
+    npx playwright install chromium --with-deps; \
+    Remove-Item package.json;
 
-# Create directories for tests, results, startup scripts, and resources
-# These will be populated via volume mounts at runtime
-RUN New-Item -ItemType Directory -Force -Path C:\app\tests, C:\app\tests\GUI, C:\app\tests\API, C:\app\tests\test-results, C:\app\startup, C:\app\resources
+ENV PATH="C:\\modules\\node_modules\\.bin;${PATH}"
+ENV NODE_PATH="C:\\modules\\node_modules"
 
 # Copy entrypoint script
-COPY Tests/Docker/entrypoint.bat C:\app\entrypoint.bat
+COPY Tests/Docker/entrypoint.bat C:/app/entrypoint.bat
 
 # Note: All application files (GUI tests, API tests, resources, startup scripts)
 # should be mounted via -v volume mounts when running the container:
@@ -46,10 +44,3 @@ COPY Tests/Docker/entrypoint.bat C:\app\entrypoint.bat
 #              -v "%cd%\Tests\Resources:C:\app\resources" `
 #              -v "%cd%\test-results:C:\app\tests\test-results" `
 #              imtcore-tests:windows
-
-# Environment variables (can be overridden at runtime)
-ENV BASE_URL=http://localhost:3000
-ENV CI=true
-
-ENTRYPOINT ["cmd", "/c", "C:\\app\\entrypoint.bat"]
-CMD []
