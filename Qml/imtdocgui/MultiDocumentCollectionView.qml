@@ -448,8 +448,6 @@ Item {
 					let currentItem = itemViewTypes[viewTypeId]
 					if (currentItem.commandsController){
 						for (let j = 0; j < viewTypeIds.length; ++j){
-							console.log("viewTypeIds", viewTypeIds[j])
-
 							currentItem.commandsController.setToggled(viewTypeIds[j], viewTypeIds[j] === commandId)
 						}
 					}

@@ -35,15 +35,25 @@ public:
 	virtual QByteArray GetProductId() const override;
 	virtual QByteArray GetProductInstanceId() const override;
 	virtual void SetProductInstanceId(const QByteArray& instanceId) override;
-	virtual QByteArray GetCustomerId() const override;
+	virtual QByteArray GetCustomerId() const override; // Account
 	virtual QByteArray GetSerialNumber() const override;
 	virtual void SetSerialNumber(const QByteArray& serialNumber) override;
 	virtual QByteArray GetProject() const override;
 	virtual void SetProject(const QByteArray& project) override;
+
+	// Flags
 	virtual bool IsInUse() const override;
 	virtual void SetInUse(bool inUse) override;
 	virtual bool IsInternalUse() const override;
 	virtual void SetInternalUse(bool internalUse) override;
+	virtual bool IsMultiProduct() const override;
+	virtual void SetMultiProduct(bool isMulti) override;
+
+	virtual int GetProductCount() const override;
+	virtual void SetProductCount(int count) override;
+
+	// SetLicensee (Account-ID, count (optional))
+	// GetLicensee
 
 	// reimplemented (imtlic::ILicenseInfoProvider)
 	virtual const imtbase::ICollectionInfo& GetLicenseInstances() const override;
@@ -76,6 +86,8 @@ private:
 	bool m_internalUse;
 	LicenseInstances m_licenses;
 	imtbase::CCollectionInfo m_licenseContainerInfo;
+	bool m_isMultiProduct;
+	int m_productCount;
 };
 
 
