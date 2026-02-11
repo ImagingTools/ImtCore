@@ -81,6 +81,8 @@ private:
 	bool m_internalUse;
 	LicenseInstances m_licenses;
 	imtbase::CCollectionInfo m_licenseContainerInfo;
+	bool m_isMultiProduct;
+	int m_productCount;
 };
 
 
