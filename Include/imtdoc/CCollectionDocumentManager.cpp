@@ -293,7 +293,6 @@ const istd::IChangeable* CCollectionDocumentManager::GetDocumentPtr(const QByteA
 IDocumentManager::OperationStatus CCollectionDocumentManager::GetDocumentData(const QByteArray& userId, const QByteArray& documentId, istd::IChangeableSharedPtr& documentPtr) const
 {
 	QMutexLocker locker(&m_mutex);
-	
 	OperationStatus validationStatus;
 	if (!ValidateInputParams(userId, documentId, validationStatus)){
 		return validationStatus;
