@@ -342,7 +342,6 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
 	if (collectionPtr == nullptr) {
 		return OS_FAILED;
 	}
-	
 	WorkingDocument* workingDocumentPtr = nullptr;
 	{
 		OperationStatus validationStatus;
