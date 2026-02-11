@@ -465,7 +465,6 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
 IDocumentManager::OperationStatus CCollectionDocumentManager::CloseDocument(
 	const QByteArray& userId, const QByteArray& documentId)
 {
-	
 	QByteArray typeId;
 	QByteArray objectId;
 	QString name;
