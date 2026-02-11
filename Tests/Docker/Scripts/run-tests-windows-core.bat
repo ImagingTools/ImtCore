@@ -72,18 +72,24 @@ echo.
 REM Build volume mount arguments for application directories
 set VOLUME_MOUNTS=
 
-REM Always mount ImtCore entrypoint script from ImtCore
-set IMTCORE_ENTRYPOINT=%IMTCORE_DIR%\Tests\Docker\entrypoint.bat
-if exist "%IMTCORE_ENTRYPOINT%" (
-    set VOLUME_MOUNTS=%VOLUME_MOUNTS% -v "%IMTCORE_ENTRYPOINT%:C:\app\entrypoint.bat"
-    echo [DEBUG] Mounting ImtCore entrypoint from: %IMTCORE_ENTRYPOINT%
+REM Get ImtCore Docker directory (parent of Scripts folder where this script is located)
+set IMTCORE_DOCKER_DIR=%~dp0..
+for %%i in ("%IMTCORE_DOCKER_DIR%") do set IMTCORE_DOCKER_DIR=%%~fi
+
+REM Check that entrypoint.bat exists
+if not exist "%IMTCORE_DOCKER_DIR%\entrypoint.bat" (
+    echo ERROR: ImtCore entrypoint not found at: %IMTCORE_DOCKER_DIR%\entrypoint.bat
+    exit /b 1
 )
 
-REM Always mount ImtCore GUI utilities (utils.js, playwright.config.js, etc.) from ImtCore
-set IMTCORE_GUI_DIR=%IMTCORE_DIR%\Tests\Docker\GUI
-if exist "%IMTCORE_GUI_DIR%" (
-    set VOLUME_MOUNTS=%VOLUME_MOUNTS% -v "%IMTCORE_GUI_DIR%:C:\app\tests\GUI"
-    echo [DEBUG] Mounting ImtCore GUI utilities from: %IMTCORE_GUI_DIR%
+REM Mount ImtCore Docker directory (contains entrypoint.bat)
+set VOLUME_MOUNTS=%VOLUME_MOUNTS% -v "%IMTCORE_DOCKER_DIR%:C:\app\imtcore"
+echo [DEBUG] Mounting ImtCore Docker directory from: %IMTCORE_DOCKER_DIR%
+
+REM Mount ImtCore GUI utilities if they exist
+if exist "%IMTCORE_DOCKER_DIR%\GUI" (
+    set VOLUME_MOUNTS=%VOLUME_MOUNTS% -v "%IMTCORE_DOCKER_DIR%\GUI:C:\app\tests\GUI"
+    echo [DEBUG] Mounting ImtCore GUI utilities from: %IMTCORE_DOCKER_DIR%\GUI
 )
 
 REM Mount application-specific test directories if they exist
@@ -118,7 +124,7 @@ docker run -d ^
   --name %CONTAINER_NAME% ^
   --entrypoint cmd ^
   -e BASE_URL=%BASE_URL% ^
-  -e START_POSTGRESQL=false ^
+  -e START_POSTGRESQL=true ^
   -e POSTGRES_PASSWORD=%POSTGRES_PASSWORD% ^
   -e POSTGRES_DB=%POSTGRES_DB% ^
   -e DATABASE_URL=%DATABASE_URL% ^
@@ -142,7 +148,7 @@ docker exec %CONTAINER_NAME% cmd /c "dir C:\app\startup & dir C:\app\tests\GUI &
 
 echo.
 echo Running tests (entrypoint^)...
-docker exec %CONTAINER_NAME% cmd /c "set PAUSE_BEFORE_TESTS=false && C:\app\entrypoint.bat"
+docker exec %CONTAINER_NAME% cmd /c "set PAUSE_BEFORE_TESTS=false && C:\app\imtcore\entrypoint.bat"
 set EXIT_CODE=%ERRORLEVEL%
 
 echo [DEBUG] Test run exit code: %EXIT_CODE%
