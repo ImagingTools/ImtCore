@@ -343,8 +343,8 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
 	}
 	WorkingDocument* workingDocumentPtr = nullptr;
 	{
-		OperationStatus validationStatus;
 		QMutexLocker locker(&m_mutex);
+		OperationStatus validationStatus;
 		if (!ValidateInputParams(userId, documentId, validationStatus)){
 			return validationStatus;
 		}
