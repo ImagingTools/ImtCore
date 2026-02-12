@@ -58,6 +58,8 @@ When a product is deployed to a customer, a Product Instance is created with:
 - Customer information
 - Hardware binding data
 - Collection of activated License Instances
+- Multi-product support for bulk licensing
+- Parent instance reference for license distribution hierarchies
 
 ### License Instances (ILicenseInstance)
 License Instances are activated licenses based on License Definitions, adding:
@@ -182,6 +184,39 @@ instance->SetProductId("product-office-suite");
 // Bind to hardware
 instance->SetHardwareId("MAC-00-11-22-33-44-55");
 ```
+
+### Multi-Product Instances and License Distribution
+
+Multi-product instances allow a single product instance to represent multiple units,
+enabling license distribution to other accounts:
+
+```cpp
+#include <imtlic/IProductInstanceInfo.h>
+
+// Create a multi-product instance (e.g., 10 licenses purchased)
+IProductInstanceInfoSharedPtr parentInstance = ...; // From factory/component system
+parentInstance->SetProductInstanceId("instance-bulk-001");
+parentInstance->SetCustomerId("customer-reseller");
+parentInstance->SetMultiProduct(true);
+parentInstance->SetProductCount(10);  // 10 units available
+
+// Distribute some licenses to another account (child instance)
+IProductInstanceInfoSharedPtr childInstance = ...; // From factory/component system
+childInstance->SetProductInstanceId("instance-customer-456");
+childInstance->SetCustomerId("customer-end-user");
+childInstance->SetParentInstanceId("instance-bulk-001");  // Link to parent
+childInstance->SetProductCount(3);  // 3 units from parent pool
+
+// Parent instance retains remaining units (7 in this case)
+// This enables license pool management and tracking
+```
+
+**Use Cases for Parent-Child Instances:**
+- **Reseller Distribution**: Bulk licenses distributed to end customers
+- **Enterprise Licensing**: Department-level license allocation from corporate pool
+- **Multi-Site Deployments**: Licenses shared across multiple locations
+- **License Pooling**: Centralized license management with distributed usage
+
 
 ### Activating a License Instance
 

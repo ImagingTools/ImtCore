@@ -49,6 +49,8 @@ public:
 	virtual void SetMultiProduct(bool isMulti) override;
 	virtual int GetProductCount() const override;
 	virtual void SetProductCount(int count) override;
+	virtual QByteArray GetParentInstanceId() const override;
+	virtual void SetParentInstanceId(const QByteArray& parentInstanceId) override;
 
 	// reimplemented (imtlic::ILicenseInfoProvider)
 	virtual const imtbase::ICollectionInfo& GetLicenseInstances() const override;
@@ -83,6 +85,7 @@ private:
 	imtbase::CCollectionInfo m_licenseContainerInfo;
 	bool m_isMultiProduct;
 	int m_productCount;
+	QByteArray m_parentInstanceId;
 };
 
 
