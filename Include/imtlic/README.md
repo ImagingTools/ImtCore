@@ -194,14 +194,14 @@ enabling license distribution to other accounts:
 #include <imtlic/IProductInstanceInfo.h>
 
 // Create a multi-product instance (e.g., 10 licenses purchased)
-IProductInstanceInfoSharedPtr parentInstance = ...; // From factory
+IProductInstanceInfoSharedPtr parentInstance = ...; // From factory/component system
 parentInstance->SetProductInstanceId("instance-bulk-001");
 parentInstance->SetCustomerId("customer-reseller");
 parentInstance->SetMultiProduct(true);
 parentInstance->SetProductCount(10);  // 10 units available
 
 // Distribute some licenses to another account (child instance)
-IProductInstanceInfoSharedPtr childInstance = ...; // From factory
+IProductInstanceInfoSharedPtr childInstance = ...; // From factory/component system
 childInstance->SetProductInstanceId("instance-customer-456");
 childInstance->SetCustomerId("customer-end-user");
 childInstance->SetParentInstanceId("instance-bulk-001");  // Link to parent
