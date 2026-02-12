@@ -29,7 +29,7 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (istd::TIFactory)
-	virtual ObjectInterface* CreateInstance(const QByteArray& keyId = "") const override;
+	virtual istd::TUniqueInterfacePtr<ObjectInterface> CreateInstance(const QByteArray& keyId = "") const override;
 
 	// reimplemented (istd::IFactoryInfo)
 	virtual istd::IFactoryInfo::KeyList GetFactoryKeys() const override;
@@ -43,9 +43,11 @@ private:
 // reimplemented (istd::TIFactory)
 
 template<typename ObjectInterface>
-ObjectInterface* TComponentFactoryComp<ObjectInterface>::CreateInstance(const QByteArray& /*keyId*/) const
+istd::TUniqueInterfacePtr<ObjectInterface> TComponentFactoryComp<ObjectInterface>::CreateInstance(const QByteArray& /*keyId*/) const
 {
-	return dynamic_cast<ObjectInterface*>(m_factCompPtr.CreateInstance().PopInterfacePtr());
+	auto componentPtr = m_factCompPtr.CreateInstance();
+	ObjectInterface* rawPtr = dynamic_cast<ObjectInterface*>(componentPtr.PopInterfacePtr());
+	return istd::TUniqueInterfacePtr<ObjectInterface>(rawPtr);
 }
 
 
