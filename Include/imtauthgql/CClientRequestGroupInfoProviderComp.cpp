@@ -96,7 +96,7 @@ imtauth::IUserGroupInfoSharedPtr CClientRequestGroupInfoProviderComp::GetUserGro
 		}
 	}
 
-	return userGroupInfoPtr.PopInterfacePtr();
+	return imtauth::IUserGroupInfoSharedPtr::CreateFromUnique(userGroupInfoPtr);
 }
 
 

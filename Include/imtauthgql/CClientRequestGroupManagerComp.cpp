@@ -102,7 +102,7 @@ imtauth::IUserGroupInfoUniquePtr CClientRequestGroupManagerComp::GetGroup(const 
 		groupInfoPtr->SetUsers(groupData.users->ToList());
 	}
 
-	return groupInfoPtr.PopInterfacePtr();
+	return groupInfoPtr;
 }
 
 

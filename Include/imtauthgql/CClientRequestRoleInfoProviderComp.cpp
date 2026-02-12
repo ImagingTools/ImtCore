@@ -101,7 +101,7 @@ imtauth::IRoleUniquePtr CClientRequestRoleInfoProviderComp::GetRole(const QByteA
 		}
 	}
 
-	return roleInfoPtr.PopInterfacePtr();
+	return roleInfoPtr;
 }
 
 

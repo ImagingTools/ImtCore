@@ -345,9 +345,9 @@ void CPopupController::CreatePopupItem(
 	bool isClosingOnMouseClickAllowed,
 	QWidget* contentWidgetPtr)
 {
-	istd::TDelPtr<IPopupWidget> popupWidgetPtr;
+	istd::TUniqueInterfacePtr<IPopupWidget> popupWidgetPtr;
 	if (m_widgetFactoryPtr != nullptr){
-		popupWidgetPtr.SetPtr(m_widgetFactoryPtr->CreateInstance().PopInterfacePtr());
+		popupWidgetPtr = m_widgetFactoryPtr->CreateInstance();
 	}
 	else{
 		popupWidgetPtr.SetPtr(new CStandardPopupWidget());
