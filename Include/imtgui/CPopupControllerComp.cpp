@@ -219,9 +219,9 @@ void CPopupControllerComp::CalculatePopupAreaFromScreen()
 
 QByteArray CPopupControllerComp::CreatePopupItem(const MessagePtr& messagePtr, int timeout, bool isClosingOnMouseClickAllowed, QWidget* contentWidgetPtr)
 {
-	istd::TDelPtr<IPopupWidget> popupWidgetPtr;
+	istd::TUniqueInterfacePtr<IPopupWidget> popupWidgetPtr;
 	if (m_popupWidgetFactoryCompPtr.IsValid()){
-		popupWidgetPtr.SetPtr(m_popupWidgetFactoryCompPtr->CreateInstance().PopInterfacePtr());
+		popupWidgetPtr = m_popupWidgetFactoryCompPtr->CreateInstance();
 
 	}
 	else{
