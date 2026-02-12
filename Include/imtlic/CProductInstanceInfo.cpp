@@ -24,7 +24,9 @@ CProductInstanceInfo::CProductInstanceInfo():
 	m_customerCollectionPtr(nullptr),
 	m_productCollectionPtr(nullptr),
 	m_inUse(false),
-	m_internalUse(false)
+	m_internalUse(false),
+	m_isMultiProduct(false),
+	m_productCount(1)
 {
 }
 
@@ -61,6 +63,7 @@ void CProductInstanceInfo::AddLicense(const QByteArray& licenseId, const QDateTi
 	if (m_productId.isEmpty()){
 		return;
 	}
+
 	LicenseInstancePtr licenseInstancePtr(new CLicenseInstance);
 	licenseInstancePtr->SetLicenseId(licenseId);
 	licenseInstancePtr->SetExpiration(expirationDate);
@@ -182,6 +185,53 @@ void CProductInstanceInfo::SetInternalUse(bool internalUse)
 }
 
 
+bool CProductInstanceInfo::IsMultiProduct() const
+{
+	return m_isMultiProduct;
+}
+
+
+void CProductInstanceInfo::SetMultiProduct(bool isMulti)
+{
+	if (m_isMultiProduct != isMulti){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_isMultiProduct = isMulti;
+	}
+}
+
+
+int CProductInstanceInfo::GetProductCount() const
+{
+	return m_productCount;
+}
+
+
+void CProductInstanceInfo::SetProductCount(int count)
+{
+	if (m_productCount != count){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_productCount = count;
+	}
+}
+
+
+QByteArray CProductInstanceInfo::GetParentInstanceId() const
+{
+	return m_parentInstanceId;
+}
+
+
+void CProductInstanceInfo::SetParentInstanceId(const QByteArray& parentInstanceId)
+{
+	if (m_parentInstanceId != parentInstanceId){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_parentInstanceId = parentInstanceId;
+	}
+}
+
 // reimplemented (imtlic::ILicenseInfoProvider)
 
 const imtbase::ICollectionInfo& CProductInstanceInfo::GetLicenseInstances() const
@@ -244,6 +294,25 @@ bool CProductInstanceInfo::Serialize(iser::IArchive& archive)
 		retVal = retVal && archive.BeginTag(projectTag);
 		retVal = retVal && archive.Process(m_project);
 		retVal = retVal && archive.EndTag(projectTag);
+	}
+
+	if (imtCoreVersion >= 19722){
+		iser::CArchiveTag isMultiTag("IsMultiProduct", "Is multi product", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(isMultiTag);
+		retVal = retVal && archive.Process(m_isMultiProduct);
+		retVal = retVal && archive.EndTag(isMultiTag);
+
+		iser::CArchiveTag productCountTag("ProductCount", "Product count", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(productCountTag);
+		retVal = retVal && archive.Process(m_productCount);
+		retVal = retVal && archive.EndTag(productCountTag);
+	}
+
+	if (imtCoreVersion >= 19900){
+		iser::CArchiveTag parentInstanceIdTag("ParentInstanceId", "Parent instance ID", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(parentInstanceIdTag);
+		retVal = retVal && archive.Process(m_parentInstanceId);
+		retVal = retVal && archive.EndTag(parentInstanceIdTag);
 	}
 
 	iser::CArchiveTag instanceIdTag("InstanceId", "ID of the product instance", iser::CArchiveTag::TT_LEAF);
@@ -329,6 +398,9 @@ bool CProductInstanceInfo::CopyFrom(const IChangeable& object, CompatibilityMode
 		m_licenseContainerInfo = sourcePtr->m_licenseContainerInfo;
 		m_inUse = sourcePtr->m_inUse;
 		m_internalUse = sourcePtr->m_internalUse;
+		m_isMultiProduct = sourcePtr->m_isMultiProduct;
+		m_productCount = sourcePtr->m_productCount;
+		m_parentInstanceId = sourcePtr->m_parentInstanceId;
 
 		return true;
 	}
@@ -361,6 +433,9 @@ bool CProductInstanceInfo::ResetData(CompatibilityMode /*mode*/)
 	m_licenseContainerInfo.ResetData();
 	m_inUse = false;
 	m_internalUse = false;
+	m_isMultiProduct = false;
+	m_productCount = 0;
+	m_parentInstanceId.clear();
 
 	return true;
 }
@@ -373,5 +448,3 @@ QByteArray CProductInstanceInfo::GetFactoryId() const
 
 
 } // namespace imtlic
-
-

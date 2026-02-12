@@ -75,7 +75,10 @@ public:
 		MIT_HARDWARE_ID,
 		MIT_HARDWARE_MAC_ADDRESS,
 		MIT_IS_PAIRED,
-		MIT_INTERNAL_USE
+		MIT_INTERNAL_USE,
+		MIT_IS_MULTI_PRODUCT,
+		MIT_PRODUCT_COUNT,
+		MIT_PARENT_INSTANCE_ID
 	};
 
 	/**
@@ -201,9 +204,44 @@ public:
 		\param internalUse true to mark for internal use only
 	*/
 	virtual void SetInternalUse(bool internalUse) = 0;
+
+ 	/**
+		Checks whether this product instance represents multiple items (multi-product).
+	*/
+	virtual bool IsMultiProduct() const = 0;
+
+	/**
+		Sets whether this product instance represents multiple items.
+	*/
+	virtual void SetMultiProduct(bool isMulti) = 0;
+
+	/**
+		Get the count of items in this product instance.
+		Valid only if IsMultiProduct() returns true.
+	*/
+	virtual int GetProductCount() const = 0;
+
+	/**
+		Set the count of items in this product instance.
+		This usually makes sense only if the product is marked as multi-product.
+	*/
+	virtual void SetProductCount(int count) = 0;
+
+	/**
+		Get the ID of the parent product instance.
+		For multi-product instances that distribute licenses to other accounts,
+		this references the parent instance that owns the original licenses.
+		\return Parent instance ID, or empty if this is a root instance
+	*/
+	virtual QByteArray GetParentInstanceId() const = 0;
+
+	/**
+		Set the ID of the parent product instance.
+		This establishes a parent-child relationship for license distribution.
+		\param parentInstanceId ID of the parent instance, or empty to mark as root instance
+	*/
+	virtual void SetParentInstanceId(const QByteArray& parentInstanceId) = 0;
 };
 
 
 } // namespace imtlic
-
-

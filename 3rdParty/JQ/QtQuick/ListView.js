@@ -447,7 +447,7 @@ class ListView extends Flickable {
                 return
             }
 
-            if (length === 0) return
+            // if (length === 0) return
 
             JQApplication.beginUpdate()
             JQApplication.updateLater(this)
