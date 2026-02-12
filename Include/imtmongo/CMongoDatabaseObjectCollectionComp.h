@@ -76,7 +76,7 @@ public:
 	virtual bool SetObjectData(const Id& objectId, const istd::IChangeable& object,
 							   CompatibilityMode mode = CM_WITHOUT_REFS,
 							   const imtbase::IOperationContext* operationContextPtr = nullptr) override;
-	virtual imtbase::IObjectCollection* CreateSubCollection(int offset = 0, int count = -1, const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
+	virtual imtbase::IObjectCollectionUniquePtr CreateSubCollection(int offset = 0, int count = -1, const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
 
 	// reimplemented (IObjectCollectionInfo)
 	virtual const iprm::IOptionsList* GetObjectTypesInfo() const override;

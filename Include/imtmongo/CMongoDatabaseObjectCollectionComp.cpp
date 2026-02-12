@@ -160,7 +160,7 @@ bool CMongoDatabaseObjectCollectionComp::SetObjectData(
 }
 
 
-imtbase::IObjectCollection* CMongoDatabaseObjectCollectionComp::CreateSubCollection(
+imtbase::IObjectCollectionUniquePtr CMongoDatabaseObjectCollectionComp::CreateSubCollection(
 			int offset,
 			int count,
 			const iprm::IParamsSet* selectionParamsPtr) const
@@ -191,7 +191,7 @@ imtbase::IObjectCollection* CMongoDatabaseObjectCollectionComp::CreateSubCollect
 			collectionPtr->InsertNewObject(typeId, "", "", dataPtr, objectId);
 		}
 	}
-	return collectionPtr.PopInterfacePtr();
+	return collectionPtr;
 }
 
 
