@@ -77,7 +77,8 @@ public:
 		MIT_IS_PAIRED,
 		MIT_INTERNAL_USE,
 		MIT_IS_MULTI_PRODUCT,
-		MIT_PRODUCT_COUNT
+		MIT_PRODUCT_COUNT,
+		MIT_PARENT_INSTANCE_ID
 	};
 
 	/**
@@ -225,6 +226,21 @@ public:
 		This usually makes sense only if the product is marked as multi-product.
 	*/
 	virtual void SetProductCount(int count) = 0;
+
+	/**
+		Get the ID of the parent product instance.
+		For multi-product instances that distribute licenses to other accounts,
+		this references the parent instance that owns the original licenses.
+		\return Parent instance ID, or empty if this is a root instance
+	*/
+	virtual QByteArray GetParentInstanceId() const = 0;
+
+	/**
+		Set the ID of the parent product instance.
+		This establishes a parent-child relationship for license distribution.
+		\param parentInstanceId ID of the parent instance, or empty to mark as root instance
+	*/
+	virtual void SetParentInstanceId(const QByteArray& parentInstanceId) = 0;
 };
 
 
