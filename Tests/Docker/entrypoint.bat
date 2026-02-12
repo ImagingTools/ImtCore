@@ -11,6 +11,12 @@ echo ========================================
 REM Add system paths to PATH (for ping, timeout, powershell, etc.)
 set "PATH=C:\Windows\System32;C:\Windows\System32\WindowsPowerShell\v1.0;C:\Windows;!PATH!"
 
+REM Add Node.js to PATH
+if exist "C:\Program Files\nodejs" set "PATH=C:\Program Files\nodejs;!PATH!"
+
+REM Add pre-installed node_modules binaries to PATH
+if exist "C:\modules\node_modules\.bin" set "PATH=C:\modules\node_modules\.bin;!PATH!"
+
 REM Add PostgreSQL to PATH if found (needed for startup scripts even if not starting PG)
 for /d %%P in ("C:\Program Files\PostgreSQL\*") do (
     set "PATH=%%P\bin;!PATH!"
@@ -205,15 +211,26 @@ if !GUI_TESTS_FOUND! equ 0 goto SKIP_GUI_TESTS
 
 set EXIT_CODE=0
 
-echo Preparing Playwright dependencies...
-if not exist "C:\app\tests\package.json" (
-    echo No C:\app\tests\package.json found. Cannot install dependencies.
+REM Find package.json location
+set PACKAGE_DIR=
+if exist "C:\app\tests\GUI\package.json" set PACKAGE_DIR=C:\app\tests\GUI
+if exist "C:\app\tests\package.json" set PACKAGE_DIR=C:\app\tests
+
+REM Check if node_modules already exist (pre-installed in image)
+if exist "C:\modules\node_modules\playwright" (
+    echo [OK] Using pre-installed Playwright from C:\modules
+    goto RUN_PLAYWRIGHT
+)
+
+if not defined PACKAGE_DIR (
+    echo No package.json found in C:\app\tests or C:\app\tests\GUI. Cannot install dependencies.
     set EXIT_CODE=1
     goto END_TESTS
 )
 
-cd /d C:\app\tests
-if exist "C:\app\tests\package-lock.json" (
+echo Installing dependencies from !PACKAGE_DIR!...
+cd /d "!PACKAGE_DIR!"
+if exist "package-lock.json" (
     call npm ci
 ) else (
     call npm install
@@ -223,8 +240,9 @@ if errorlevel 1 (
     goto END_TESTS
 )
 
+:RUN_PLAYWRIGHT
 echo Running Playwright tests...
-cd /d C:\app\tests
+cd /d C:\app\tests\GUI
 
 set PLAYWRIGHT_CMD=npx playwright test
 if "!UPDATE_SNAPSHOTS!"=="true" (
