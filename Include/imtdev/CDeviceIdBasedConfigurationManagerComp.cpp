@@ -25,7 +25,7 @@ DeviceConfigurationPtr CDeviceIdBasedConfigurationManagerComp::GetDeviceConfigur
 		DeviceConfigurationPtr configurationPtr;
 
 		if (m_configurations.contains(deviceId)){
-			configurationPtr.reset(new iprm::CParamsSet());
+			configurationPtr.SetPtr(new iprm::CParamsSet());
 			configurationPtr->CopyFrom(*m_configurations[deviceId].configurationPtr);
 
 			return configurationPtr;
@@ -35,7 +35,7 @@ DeviceConfigurationPtr CDeviceIdBasedConfigurationManagerComp::GetDeviceConfigur
 		if (instanceInfoPtr != nullptr){
 			const iprm::IParamsSet& defaultConfiguration = instanceInfoPtr->GetDeviceSpecification().GetDefaultConfiguration();
 
-			configurationPtr.reset(new iprm::CParamsSet());
+			configurationPtr.SetPtr(new iprm::CParamsSet());
 			configurationPtr->CopyFrom(defaultConfiguration);
 
 			return configurationPtr;
@@ -51,7 +51,8 @@ bool CDeviceIdBasedConfigurationManagerComp::SetDeviceConfiguration(const QByteA
 	if (!deviceId.isEmpty()){
 		DeviceInstancePtr instanceInfoPtr = GetDeviceInstance(deviceId);
 		if (instanceInfoPtr != nullptr && instanceInfoPtr->GetDeviceSpecification().AreConfigurationAccepted(configuration)){
-			DeviceConfigurationPtr configurationPtr(new iprm::CParamsSet);
+			DeviceConfigurationPtr configurationPtr;
+			configurationPtr.SetPtr(new iprm::CParamsSet);
 			if (configurationPtr->CopyFrom(configuration)){
 				istd::CChangeNotifier notifier(this);
 
@@ -112,7 +113,7 @@ bool CDeviceIdBasedConfigurationManagerComp::Serialize(iser::IArchive& archive)
 			ConfigurationFactory* factoryPtr = FindConfigurationFactory(deviceTypeId);
 			if (factoryPtr != nullptr){
 				auto configurationUniquePtr = factoryPtr->CreateInstance();
-				configurationPtr = DeviceConfigurationPtr(configurationUniquePtr.PopInterfacePtr());
+				configurationPtr = DeviceConfigurationPtr::CreateFromUnique(configurationUniquePtr);
 				Q_ASSERT(!configurationPtr.isNull());
 				if (configurationPtr.isNull()){
 					retVal = false;
