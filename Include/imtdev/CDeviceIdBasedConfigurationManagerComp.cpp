@@ -111,7 +111,7 @@ bool CDeviceIdBasedConfigurationManagerComp::Serialize(iser::IArchive& archive)
 		if (retVal && !archive.IsStoring()){
 			ConfigurationFactory* factoryPtr = FindConfigurationFactory(deviceTypeId);
 			if (factoryPtr != nullptr){
-				configurationPtr.reset(factoryPtr->CreateInstance());
+				configurationPtr.reset(factoryPtr->CreateInstance().PopInterfacePtr());
 				Q_ASSERT(!configurationPtr.isNull());
 				if (configurationPtr.isNull()){
 					retVal = false;
