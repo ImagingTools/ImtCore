@@ -165,8 +165,7 @@ imtbase::IObjectCollection* CMongoDatabaseObjectCollectionComp::CreateSubCollect
 			int count,
 			const iprm::IParamsSet* selectionParamsPtr) const
 {
-	auto collectionUniquePtr = m_objectCollectionFactoryCompPtr.CreateInstance();
-	imtbase::IObjectCollection* collectionPtr = collectionUniquePtr.PopInterfacePtr();
+	imtbase::IObjectCollection* collectionPtr = m_objectCollectionFactoryCompPtr.CreateInstance().PopInterfacePtr();
 	imtbase::CParamsSetJoiner filterParams(selectionParamsPtr, m_filterParamsCompPtr.GetPtr());
 
 	if (m_objectDelegateCompPtr.IsValid()) {

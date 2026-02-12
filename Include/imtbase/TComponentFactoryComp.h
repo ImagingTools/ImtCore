@@ -46,7 +46,14 @@ template<typename ObjectInterface>
 istd::TUniqueInterfacePtr<ObjectInterface> TComponentFactoryComp<ObjectInterface>::CreateInstance(const QByteArray& /*keyId*/) const
 {
 	auto componentPtr = m_factCompPtr.CreateInstance();
-	ObjectInterface* rawPtr = dynamic_cast<ObjectInterface*>(componentPtr.PopInterfacePtr());
+	istd::IPolymorphic* rawBasePtr = componentPtr.PopInterfacePtr();
+	ObjectInterface* rawPtr = dynamic_cast<ObjectInterface*>(rawBasePtr);
+	
+	// If dynamic_cast fails, delete the original object to prevent leak
+	if (rawPtr == nullptr && rawBasePtr != nullptr) {
+		delete rawBasePtr;
+	}
+	
 	return istd::TUniqueInterfacePtr<ObjectInterface>(rawPtr);
 }
 
