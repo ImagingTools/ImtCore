@@ -347,7 +347,7 @@ void CPopupController::CreatePopupItem(
 {
 	istd::TDelPtr<IPopupWidget> popupWidgetPtr;
 	if (m_widgetFactoryPtr != nullptr){
-		popupWidgetPtr.SetPtr(m_widgetFactoryPtr->CreateInstance());
+		popupWidgetPtr.SetPtr(m_widgetFactoryPtr->CreateInstance().PopInterfacePtr());
 	}
 	else{
 		popupWidgetPtr.SetPtr(new CStandardPopupWidget());

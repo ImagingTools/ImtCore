@@ -221,7 +221,7 @@ QByteArray CPopupControllerComp::CreatePopupItem(const MessagePtr& messagePtr, i
 {
 	istd::TDelPtr<IPopupWidget> popupWidgetPtr;
 	if (m_popupWidgetFactoryCompPtr.IsValid()){
-		popupWidgetPtr.SetPtr(m_popupWidgetFactoryCompPtr->CreateInstance());
+		popupWidgetPtr.SetPtr(m_popupWidgetFactoryCompPtr->CreateInstance().PopInterfacePtr());
 
 	}
 	else{
