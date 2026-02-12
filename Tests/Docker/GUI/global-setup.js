@@ -1,5 +1,5 @@
 const { chromium } = require('@playwright/test');
-const { waitForPageStability, login } = require('./GUI/utils');
+const { waitForPageStability, login } = require('./utils');
 
 /**
  * Global setup for Playwright tests with multi-user support
