@@ -143,6 +143,13 @@ class Item extends QtObject {
     //     this.__updateProperty('anchors')
     // }
 
+    __updateProperties(){
+        if(this.parent){
+            LinkedBool.parentSet(this, 'visible', this.parent.visible)
+        }
+        super.__updateProperties()
+    }
+
     __complete(){
         this.__checkVisibility()
         super.__complete()

@@ -45,6 +45,7 @@ class Loader extends Item {
         if(this.item) this.item.destroy()
         if(!this.sourceComponent) return
 
+        this.__updateProperty('visible')
         let item = this.sourceComponent.createObject(this, {}, true)
         this.item = item
 
@@ -93,6 +94,7 @@ class Loader extends Item {
 
         // let cls = eval(source)
 
+        this.__updateProperty('visible')
         let item = cls.create(this)
         this.item = item
 
