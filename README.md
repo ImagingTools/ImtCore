@@ -10,6 +10,22 @@ View comprehensive code metrics including lines of code, number of classes and c
 
 The documentation and statistics are automatically generated from the source code and deployed to GitHub Pages.
 
+### SDL Schema Documentation
+
+Complete documentation for SDL schema development in ImtCore, with special focus on the `ref` attribute for linking collections to GraphQL types.
+
+**[📚 SDL Documentation Index](Docs/SDL_Documentation_Index.md)** - Complete overview and learning paths
+
+#### Quick Links:
+
+- **[Cheat Sheet](Docs/SDL_Ref_Cheat_Sheet.md)** (7KB) ⭐ **START HERE** - Quick reference card for daily development
+- **[Quick Reference](Docs/SDL_Ref_Quick_Reference.md)** (3KB) - Brief syntax and rules
+- **[Complete Guide](Docs/SDL_Reference_Attribute_Guide.md)** (21KB, 🇷🇺) - Comprehensive documentation with examples
+- **[Practical Examples](Docs/SDL_Ref_Examples.md)** (23KB) - 5 real-world use cases
+- **[Visual Diagrams](Docs/SDL_Ref_Diagrams.md)** (21KB) - 8 diagrams explaining workflows
+
+**Total**: 70KB of documentation | 12 SDL examples | 8 visual diagrams | Russian + English
+
 ## Server Communication and Connection Management
 
 ImtCore includes a comprehensive communication infrastructure for server connection configuration, multi-protocol dispatch, SSL/TLS security, and network connection health monitoring.
