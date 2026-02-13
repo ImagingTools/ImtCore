@@ -12,10 +12,19 @@ The documentation and statistics are automatically generated from the source cod
 
 ### SDL Schema Documentation
 
-- **[Docs/SDL_Reference_Attribute_Guide.md](Docs/SDL_Reference_Attribute_Guide.md)** - Complete guide to the `ref` attribute in SDL schemas (Russian, 21KB)
-- **[Docs/SDL_Ref_Quick_Reference.md](Docs/SDL_Ref_Quick_Reference.md)** - Quick reference for `ref` attribute (English, 3KB)
-- **[Docs/SDL_Ref_Examples.md](Docs/SDL_Ref_Examples.md)** - Practical examples and use cases (5 examples, 23KB)
-- **[Docs/SDL_Ref_Diagrams.md](Docs/SDL_Ref_Diagrams.md)** - Visual diagrams and workflows (8 diagrams, 21KB)
+Complete documentation for SDL schema development in ImtCore, with special focus on the `ref` attribute for linking collections to GraphQL types.
+
+**[📚 SDL Documentation Index](Docs/SDL_Documentation_Index.md)** - Complete overview and learning paths
+
+#### Quick Links:
+
+- **[Cheat Sheet](Docs/SDL_Ref_Cheat_Sheet.md)** (7KB) ⭐ **START HERE** - Quick reference card for daily development
+- **[Quick Reference](Docs/SDL_Ref_Quick_Reference.md)** (3KB) - Brief syntax and rules
+- **[Complete Guide](Docs/SDL_Reference_Attribute_Guide.md)** (21KB, 🇷🇺) - Comprehensive documentation with examples
+- **[Practical Examples](Docs/SDL_Ref_Examples.md)** (23KB) - 5 real-world use cases
+- **[Visual Diagrams](Docs/SDL_Ref_Diagrams.md)** (21KB) - 8 diagrams explaining workflows
+
+**Total**: 70KB of documentation | 12 SDL examples | 8 visual diagrams | Russian + English
 
 ## Server Communication and Connection Management
 
