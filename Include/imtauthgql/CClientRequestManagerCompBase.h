@@ -38,7 +38,10 @@ protected:
 	
 		imtgql::IGqlContext* gqlContextPtr = imtgql::CGqlRequestContextManager::GetContext();
 		if (gqlContextPtr != nullptr){
-			gqlRequest.SetGqlContext(dynamic_cast<imtgql::IGqlContext*>(gqlContextPtr->CloneMe().PopInterfacePtr()));
+			istd::IChangeableUniquePtr clonedPtr = gqlContextPtr->CloneMe();
+			imtgql::IGqlContextUniquePtr castedPtr;
+			castedPtr.MoveCastedPtr(clonedPtr);
+			gqlRequest.SetGqlContext(imtgql::IGqlContextSharedPtr::CreateFromUnique(castedPtr));
 		}
 
 		if (!SdlRequest::SetupGqlRequest(gqlRequest, arguments)){

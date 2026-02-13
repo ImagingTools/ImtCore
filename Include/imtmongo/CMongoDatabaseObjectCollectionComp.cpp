@@ -160,12 +160,12 @@ bool CMongoDatabaseObjectCollectionComp::SetObjectData(
 }
 
 
-imtbase::IObjectCollection* CMongoDatabaseObjectCollectionComp::CreateSubCollection(
+imtbase::IObjectCollectionUniquePtr CMongoDatabaseObjectCollectionComp::CreateSubCollection(
 			int offset,
 			int count,
 			const iprm::IParamsSet* selectionParamsPtr) const
 {
-	imtbase::IObjectCollection* collectionPtr = m_objectCollectionFactoryCompPtr.CreateInstance();
+	imtbase::IObjectCollectionUniquePtr collectionPtr = m_objectCollectionFactoryCompPtr.CreateInstance();
 	imtbase::CParamsSetJoiner filterParams(selectionParamsPtr, m_filterParamsCompPtr.GetPtr());
 
 	if (m_objectDelegateCompPtr.IsValid()) {

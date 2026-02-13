@@ -100,9 +100,8 @@ void CDeviceIdBasedConfigurationComp::UpdateModel()
 			}
 
 			if (!deviceTypeId.isEmpty()){
-				DeviceConfigurationPtr configurationPtr =
-					m_configurationManagerCompPtr->GetDeviceConfiguration(deviceId);
-				if (configurationPtr != nullptr){
+				DeviceConfigurationPtr configurationPtr = m_configurationManagerCompPtr->GetDeviceConfiguration(deviceId);
+				if (configurationPtr.IsValid()){
 					CopyFrom(*configurationPtr);
 				}
 			}
@@ -111,13 +110,17 @@ void CDeviceIdBasedConfigurationComp::UpdateModel()
 }
 
 
-void CDeviceIdBasedConfigurationComp::OnSelectionChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const imtbase::ISelection* /*objectPtr*/)
+void CDeviceIdBasedConfigurationComp::OnSelectionChanged(
+			const istd::IChangeable::ChangeSet& /*changeSet*/,
+			const imtbase::ISelection* /*objectPtr*/)
 {
 	UpdateModel();
 }
 
 
-void CDeviceIdBasedConfigurationComp::OnConfigurationChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const iprm::IParamsSet* /*objectPtr*/)
+void CDeviceIdBasedConfigurationComp::OnConfigurationChanged(
+			const istd::IChangeable::ChangeSet& /*changeSet*/,
+			const iprm::IParamsSet* /*objectPtr*/)
 {
 	if (m_isConfigurationStoreBlocked){
 		return;
@@ -153,7 +156,9 @@ void CDeviceIdBasedConfigurationComp::OnConfigurationChanged(const istd::IChange
 }
 
 
-void CDeviceIdBasedConfigurationComp::OnDeviceStateChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const IDeviceStateProvider* /*objectPtr*/)
+void CDeviceIdBasedConfigurationComp::OnDeviceStateChanged(
+			const istd::IChangeable::ChangeSet& /*changeSet*/,
+			const IDeviceStateProvider* /*objectPtr*/)
 {
 	UpdateModel();
 }

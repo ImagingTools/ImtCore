@@ -495,10 +495,7 @@ bool CRemoteGqlCollectionController::SetElementEnabled(const Id& /*elementId*/, 
 
 imtbase::IObjectCollection::DataPtr CRemoteGqlCollectionController::CreateObjectInstance(const QByteArray& typeId) const
 {
-	istd::IChangeable* objPtr = BaseClass::CreateInstance(typeId);
-	return DataPtr(objPtr, [objPtr](){
-		return objPtr;
-	});
+	return BaseClass::CreateInstance(typeId);
 }
 
 
