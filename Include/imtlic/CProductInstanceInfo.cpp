@@ -308,7 +308,7 @@ bool CProductInstanceInfo::Serialize(iser::IArchive& archive)
 		retVal = retVal && archive.EndTag(productCountTag);
 	}
 
-	if (imtCoreVersion >= 19900){
+	if (imtCoreVersion >= 19776){
 		iser::CArchiveTag parentInstanceIdTag("ParentInstanceId", "Parent instance ID", iser::CArchiveTag::TT_LEAF);
 		retVal = retVal && archive.BeginTag(parentInstanceIdTag);
 		retVal = retVal && archive.Process(m_parentInstanceId);
@@ -434,7 +434,7 @@ bool CProductInstanceInfo::ResetData(CompatibilityMode /*mode*/)
 	m_inUse = false;
 	m_internalUse = false;
 	m_isMultiProduct = false;
-	m_productCount = 0;
+	m_productCount = 1;
 	m_parentInstanceId.clear();
 
 	return true;

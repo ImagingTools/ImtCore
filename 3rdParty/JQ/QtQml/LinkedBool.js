@@ -98,6 +98,10 @@ class LinkedBool extends Property {
      * @returns {Object}
      */
     static get(target, name, meta){
+        if(target.__properties && target.__properties[name]) {
+            target.__updateProperty(name)
+        }
+
         let flag = global.queueFlag[global.queueFlag.length - 1]
         let link = this.queueLink[this.queueLink.length - 1]
         if(link && flag){
