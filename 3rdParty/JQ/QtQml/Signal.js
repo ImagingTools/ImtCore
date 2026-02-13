@@ -23,7 +23,7 @@ class Signal extends BaseObject {
             }
 
             if(name in target.__connections){
-                for(let connection of target.__connections[name].slice()){
+                for(let connection of target.__connections[name]){
                     try {
                         if(connection.target){
                             connection.slot.call(connection.target.__proxy, ...args)  
