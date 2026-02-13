@@ -9,12 +9,12 @@ Complete guide to SDL schema development in ImtCore, focusing on the `ref` attri
 
 ## 📚 Documentation Overview / Обзор документации
 
-This documentation set provides comprehensive coverage of the `ref` attribute in SDL schemas, from basic concepts to advanced patterns.
+This documentation set provides comprehensive coverage of SDL schema development in ImtCore, including the `collectionSchema` block, `ref` attribute, and collection patterns, from basic concepts to advanced patterns.
 
-Этот набор документации обеспечивает полное покрытие атрибута `ref` в SDL схемах, от базовых концепций до продвинутых паттернов.
+Этот набор документации обеспечивает полное покрытие разработки SDL схем в ImtCore, включая блок `collectionSchema`, атрибут `ref` и паттерны коллекций, от базовых концепций до продвинутых паттернов.
 
-**Total Size / Общий размер**: ~70KB of documentation / ~70КБ документации  
-**Languages / Языки**: Russian (primary) + English  
+**Total Size / Общий размер**: ~100KB of documentation / ~100КБ документации  
+**Languages / Языки**: English + Russian (bilingual) / Английский + Русский (двуязычная)  
 **Last Updated / Последнее обновление**: 2026-02-13
 
 ---
@@ -24,6 +24,14 @@ This documentation set provides comprehensive coverage of the `ref` attribute in
 ### For Beginners / Для начинающих
 Start here if you're new to SDL schemas:
 Начните здесь, если вы новичок в SDL схемах:
+
+0. **[CollectionSchema Guide](./SDL_CollectionSchema_Guide.md)** (27KB) 🌟 **NEW! / НОВОЕ!**
+   - What is collectionSchema? / Что такое collectionSchema?
+   - Complete bilingual guide (English + Russian)
+   - Basic syntax and components
+   - Design patterns
+   - Code generation
+   - Real-world examples
 
 1. **[Cheat Sheet](./SDL_Ref_Cheat_Sheet.md)** (7KB) ⭐ **START HERE**
    - Quick template
@@ -66,6 +74,41 @@ Deep dive into SDL architecture:
 ---
 
 ## 📖 Documentation Files / Файлы документации
+
+### 0. SDL_CollectionSchema_Guide.md 🌟 NEW!
+**Size / Размер**: 27KB  
+**Language / Язык**: English + Russian (Bilingual / Двуязычный)  
+**Level / Уровень**: Beginner to Advanced / От начинающего до продвинутого  
+
+**Complete bilingual guide to `collectionSchema` in SDL.**
+
+**Полное двуязычное руководство по `collectionSchema` в SDL.**
+
+**Contains / Содержит:**
+- ✅ What is collectionSchema? / Что такое collectionSchema?
+- ✅ Purpose and role / Назначение и роль
+- ✅ Basic syntax / Базовый синтаксис
+- ✅ Key components (type, ref, operations, subtype)
+- ✅ Complete examples with explanations
+- ✅ Design patterns (List+Details, Hierarchical, Nested)
+- ✅ Code generation details (C++ and QML)
+- ✅ Operation mapping table
+- ✅ Requirements and rules
+- ✅ Common errors and solutions
+- ✅ Best practices
+- ✅ Real-world examples from codebase
+
+**Best for / Лучше всего для:**
+- Understanding the overall collectionSchema concept
+- Learning SDL collection architecture
+- Getting started with SDL development
+- Reference for both beginners and experts
+- Понимание концепции collectionSchema
+- Изучение архитектуры коллекций SDL
+
+**[→ Open CollectionSchema Guide](./SDL_CollectionSchema_Guide.md)**
+
+---
 
 ### 1. SDL_Ref_Cheat_Sheet.md
 **Size / Размер**: 7KB  
@@ -229,49 +272,61 @@ Comprehensive, authoritative guide to the `ref` attribute.
 ### Path 1: Quick Start (30 minutes)
 **Быстрый старт (30 минут)**
 
-1. Read [Cheat Sheet](./SDL_Ref_Cheat_Sheet.md) (5 min)
-2. Look at [Quick Reference](./SDL_Ref_Quick_Reference.md) (5 min)
-3. Study Example 1 in [Examples](./SDL_Ref_Examples.md) (10 min)
+1. Read [CollectionSchema Guide](./SDL_CollectionSchema_Guide.md) - Introduction sections (10 min)
+2. Read [Cheat Sheet](./SDL_Ref_Cheat_Sheet.md) (5 min)
+3. Look at [Quick Reference](./SDL_Ref_Quick_Reference.md) (5 min)
 4. Create your first SDL file (10 min)
 
-### Path 2: Comprehensive Learning (2 hours)
-**Полное изучение (2 часа)**
+### Path 2: Comprehensive Learning (2-3 hours)
+**Полное изучение (2-3 часа)**
 
-1. Read [Quick Reference](./SDL_Ref_Quick_Reference.md) (10 min)
-2. Study [Visual Diagrams](./SDL_Ref_Diagrams.md) (30 min)
-3. Work through all [Examples](./SDL_Ref_Examples.md) (60 min)
-4. Read [Complete Guide](./SDL_Reference_Attribute_Guide.md) (20 min)
+1. Read [CollectionSchema Guide](./SDL_CollectionSchema_Guide.md) completely (45 min)
+2. Read [Quick Reference](./SDL_Ref_Quick_Reference.md) (10 min)
+3. Study [Visual Diagrams](./SDL_Ref_Diagrams.md) (30 min)
+4. Work through all [Examples](./SDL_Ref_Examples.md) (60 min)
+5. Skim [Complete Ref Guide](./SDL_Reference_Attribute_Guide.md) (20 min)
 
-### Path 3: Expert Deep Dive (4 hours)
-**Экспертное погружение (4 часа)**
+### Path 3: Expert Deep Dive (4+ hours)
+**Экспертное погружение (4+ часа)**
 
-1. Read [Complete Guide](./SDL_Reference_Attribute_Guide.md) (60 min)
-2. Study [Visual Diagrams](./SDL_Ref_Diagrams.md) (45 min)
-3. Analyze all [Examples](./SDL_Ref_Examples.md) (90 min)
-4. Examine existing SDL files in codebase (45 min)
+1. Read [CollectionSchema Guide](./SDL_CollectionSchema_Guide.md) (60 min)
+2. Read [Complete Ref Guide](./SDL_Reference_Attribute_Guide.md) (60 min)
+3. Study [Visual Diagrams](./SDL_Ref_Diagrams.md) (45 min)
+4. Analyze all [Examples](./SDL_Ref_Examples.md) (90 min)
+5. Examine existing SDL files in codebase (45 min)
 
 ---
 
 ## 🎓 Use Cases / Сценарии использования
 
-### I need to...
+### I need to... / Мне нужно...
+
+**Understand what collectionSchema is**
+**Понять что такое collectionSchema**
+→ Start with [CollectionSchema Guide](./SDL_CollectionSchema_Guide.md)
 
 **Create a new collection**
-→ Start with [Cheat Sheet](./SDL_Ref_Cheat_Sheet.md) template
+**Создать новую коллекцию**
+→ Use [Cheat Sheet](./SDL_Ref_Cheat_Sheet.md) template and [CollectionSchema Guide](./SDL_CollectionSchema_Guide.md)
 
 **Understand how ref works**
+**Понять как работает ref**
 → Read [Quick Reference](./SDL_Ref_Quick_Reference.md) and [Diagrams](./SDL_Ref_Diagrams.md)
 
 **Fix a ref error**
-→ Check error scenarios in [Diagrams](./SDL_Ref_Diagrams.md) or [Examples](./SDL_Ref_Examples.md)
+**Исправить ошибку ref**
+→ Check error scenarios in [Diagrams](./SDL_Ref_Diagrams.md) or [CollectionSchema Guide](./SDL_CollectionSchema_Guide.md)
 
 **Implement a specific pattern**
-→ Find similar example in [Examples](./SDL_Ref_Examples.md)
+**Реализовать определенный паттерн**
+→ Find similar example in [Examples](./SDL_Ref_Examples.md) or [CollectionSchema Guide](./SDL_CollectionSchema_Guide.md)
 
 **Learn SDL architecture**
-→ Study [Complete Guide](./SDL_Reference_Attribute_Guide.md)
+**Изучить архитектуру SDL**
+→ Study [CollectionSchema Guide](./SDL_CollectionSchema_Guide.md) and [Complete Ref Guide](./SDL_Reference_Attribute_Guide.md)
 
 **Quick syntax lookup**
+**Быстрая справка по синтаксису**
 → Use [Cheat Sheet](./SDL_Ref_Cheat_Sheet.md)
 
 ---
@@ -282,6 +337,7 @@ Comprehensive, authoritative guide to the `ref` attribute.
 
 | Topic / Тема | Coverage / Охват |
 |--------------|------------------|
+| CollectionSchema concept | ████████████████████ 100% |
 | Basic ref syntax | ████████████████████ 100% |
 | Type requirements | ████████████████████ 100% |
 | Common patterns | ████████████████████ 100% |
@@ -378,7 +434,13 @@ This documentation follows these principles:
 
 ### Version History / История версий
 
-- **2026-02-13**: Initial documentation release
+- **2026-02-13 (Update 2)**: Added comprehensive collectionSchema documentation
+  - Created SDL_CollectionSchema_Guide.md (27KB)
+  - Complete bilingual guide (English + Russian)
+  - Updated documentation index
+  - Total 100KB of content now
+
+- **2026-02-13 (Update 1)**: Initial documentation release
   - Created 5 documentation files
   - Total 70KB of content
   - 12 SDL examples
@@ -421,7 +483,11 @@ Found an error or have a suggestion?
 
 **Q: Where do I start?**  
 **В: С чего начать?**  
-A: Start with [Cheat Sheet](./SDL_Ref_Cheat_Sheet.md)
+A: Start with [CollectionSchema Guide](./SDL_CollectionSchema_Guide.md) or [Cheat Sheet](./SDL_Ref_Cheat_Sheet.md)
+
+**Q: What is collectionSchema?**  
+**В: Что такое collectionSchema?**  
+A: See [CollectionSchema Guide](./SDL_CollectionSchema_Guide.md) for complete explanation
 
 **Q: What if ref type not found?**  
 **В: Что если ref тип не найден?**  
@@ -439,15 +505,17 @@ A: `id: ID!` and `typeId: ID!`. See [Quick Reference](./SDL_Ref_Quick_Reference.
 
 ## 🎯 Summary / Резюме
 
-This documentation provides everything you need to work with the `ref` attribute in ImtCore SDL schemas:
+This documentation provides everything you need to work with SDL schemas in ImtCore, including `collectionSchema` blocks and the `ref` attribute:
 
-Эта документация предоставляет все необходимое для работы с атрибутом `ref` в SDL схемах ImtCore:
+Эта документация предоставляет все необходимое для работы с SDL схемами в ImtCore, включая блоки `collectionSchema` и атрибут `ref`:
 
-- ✅ 5 comprehensive documents
-- ✅ 70KB of content
-- ✅ 12 SDL examples
+- ✅ 6 comprehensive documents
+- ✅ 100KB of content
+- ✅ Complete bilingual collectionSchema guide
+- ✅ 12+ SDL examples
 - ✅ 8 visual diagrams
 - ✅ Beginner to advanced coverage
+- ✅ English + Russian support
 - ✅ English + Russian
 - ✅ Real codebase examples
 
