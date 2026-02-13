@@ -10,6 +10,12 @@ View comprehensive code metrics including lines of code, number of classes and c
 
 The documentation and statistics are automatically generated from the source code and deployed to GitHub Pages.
 
+### SDL Schema Documentation
+
+- **[Docs/SDL_Reference_Attribute_Guide.md](Docs/SDL_Reference_Attribute_Guide.md)** - Complete guide to the `ref` attribute in SDL schemas (Russian)
+- **[Docs/SDL_Ref_Quick_Reference.md](Docs/SDL_Ref_Quick_Reference.md)** - Quick reference for `ref` attribute
+- **[Docs/SDL_Ref_Examples.md](Docs/SDL_Ref_Examples.md)** - Practical examples and use cases
+
 ## Server Communication and Connection Management
 
 ImtCore includes a comprehensive communication infrastructure for server connection configuration, multi-protocol dispatch, SSL/TLS security, and network connection health monitoring.
