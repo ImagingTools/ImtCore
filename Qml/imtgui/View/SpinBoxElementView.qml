@@ -12,7 +12,7 @@ ElementView {
     property bool readOnly: false
     property real startValue: 0
     property real from: 0
-    property real to: 99
+    property real to: 999999
     property real stepSize: 1
     property real value: startValue
 
