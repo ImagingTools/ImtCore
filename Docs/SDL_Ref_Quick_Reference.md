@@ -124,5 +124,7 @@ collectionSchema {
 
 ## See Also
 
-- [Complete SDL Reference Guide](./SDL_Reference_Attribute_Guide.md) (Russian)
+- [Complete SDL Reference Guide](./SDL_Reference_Attribute_Guide.md) (Russian, 21KB)
+- [Practical Examples](./SDL_Ref_Examples.md) (5 detailed examples)
+- [Visual Diagrams](./SDL_Ref_Diagrams.md) (8 diagrams explaining ref workflow)
 - [SDL Examples](../Sdl/)

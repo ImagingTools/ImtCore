@@ -721,6 +721,9 @@ collectionSchema {
 - **Класс документа**: `Include/imtsdl/CSdlDocumentType.h`
 - **Примеры SDL**: `Sdl/imtauth/1.0/`, `Sdl/imtlic/1.0/`
 - **Генераторы кода**: `Include/imtsdlgencpp/`, `Include/imtsdlgenqml/`
+- **Краткая справка (English)**: [SDL_Ref_Quick_Reference.md](./SDL_Ref_Quick_Reference.md)
+- **Практические примеры**: [SDL_Ref_Examples.md](./SDL_Ref_Examples.md)
+- **Визуальные диаграммы**: [SDL_Ref_Diagrams.md](./SDL_Ref_Diagrams.md)
 
 ## История изменений
 

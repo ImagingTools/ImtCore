@@ -909,5 +909,6 @@ The `ref` attribute is fundamental to ImtCore's SDL schema system:
 
 For more information, see:
 Для дополнительной информации см.:
-- [Complete SDL Reference Guide](./SDL_Reference_Attribute_Guide.md)
-- [Quick Reference](./SDL_Ref_Quick_Reference.md)
+- [Complete SDL Reference Guide](./SDL_Reference_Attribute_Guide.md) (Полное руководство на русском, 21KB)
+- [Quick Reference](./SDL_Ref_Quick_Reference.md) (Краткая справка на английском, 3KB)
+- [Visual Diagrams](./SDL_Ref_Diagrams.md) (Визуальные диаграммы, 21KB)

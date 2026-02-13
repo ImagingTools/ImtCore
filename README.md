@@ -12,9 +12,10 @@ The documentation and statistics are automatically generated from the source cod
 
 ### SDL Schema Documentation
 
-- **[Docs/SDL_Reference_Attribute_Guide.md](Docs/SDL_Reference_Attribute_Guide.md)** - Complete guide to the `ref` attribute in SDL schemas (Russian)
-- **[Docs/SDL_Ref_Quick_Reference.md](Docs/SDL_Ref_Quick_Reference.md)** - Quick reference for `ref` attribute
-- **[Docs/SDL_Ref_Examples.md](Docs/SDL_Ref_Examples.md)** - Practical examples and use cases
+- **[Docs/SDL_Reference_Attribute_Guide.md](Docs/SDL_Reference_Attribute_Guide.md)** - Complete guide to the `ref` attribute in SDL schemas (Russian, 21KB)
+- **[Docs/SDL_Ref_Quick_Reference.md](Docs/SDL_Ref_Quick_Reference.md)** - Quick reference for `ref` attribute (English, 3KB)
+- **[Docs/SDL_Ref_Examples.md](Docs/SDL_Ref_Examples.md)** - Practical examples and use cases (5 examples, 23KB)
+- **[Docs/SDL_Ref_Diagrams.md](Docs/SDL_Ref_Diagrams.md)** - Visual diagrams and workflows (8 diagrams, 21KB)
 
 ## Server Communication and Connection Management
 
