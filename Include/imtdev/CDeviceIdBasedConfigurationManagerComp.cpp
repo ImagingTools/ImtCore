@@ -114,8 +114,8 @@ bool CDeviceIdBasedConfigurationManagerComp::Serialize(iser::IArchive& archive)
 			if (factoryPtr != nullptr){
 				auto configurationUniquePtr = factoryPtr->CreateInstance();
 				configurationPtr = DeviceConfigurationPtr::CreateFromUnique(configurationUniquePtr);
-				Q_ASSERT(!configurationPtr.isNull());
-				if (configurationPtr.isNull()){
+				Q_ASSERT(configurationPtr.IsValid());
+				if (!configurationPtr.IsValid()){
 					retVal = false;
 				}
 			}

@@ -26,7 +26,7 @@ imtgql::IGqlContextUniquePtr CGqlContextCreatorComp::CreateGqlContext(
 			const QByteArray& productId,
 			const QByteArray& userId,
 			const imtgql::IGqlContext::Headers& headers,
-			QString& errorMessage) const
+			QString& /*errorMessage*/) const
 {
 	if (!m_gqlContextFactCompPtr.IsValid()){
 		return nullptr;
