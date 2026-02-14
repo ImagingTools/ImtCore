@@ -567,10 +567,10 @@ bool CSqlDatabaseDocumentDelegateLegacyComp::WriteDataToMemory(const QByteArray&
 		return false;
 	}
 
-	int operationState = documentPersistencePtr->SaveToDevice(object, &buffer);
+	int operationState = documentPersistencePtr->WriteToDevice(object, buffer, nullptr);
 	buffer.close();
 
-	if (operationState != ifile::IDeviceBasedPersistence::OS_OK){
+	if (operationState != ifile::IDeviceBasedPersistence::Successful){
 		return false;
 	}
 
@@ -596,10 +596,10 @@ bool CSqlDatabaseDocumentDelegateLegacyComp::ReadDataFromMemory(const QByteArray
 		return false;
 	}
 
-	int operationState = documentPersistencePtr->LoadFromDevice(object, &buffer);
+	int operationState = documentPersistencePtr->ReadFromDevice(object, buffer, nullptr);
 	buffer.close();
 
-	if (operationState != ifile::IDeviceBasedPersistence::OS_OK){
+	if (operationState != ifile::IDeviceBasedPersistence::Successful){
 		return false;
 	}
 
