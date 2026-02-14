@@ -123,9 +123,28 @@ Global setup script that runs before all tests.
 
 #### Multi-User Authentication Setup
 
-**IMPORTANT:** The `global-setup.js` file in ImtCore is a **template** that requires configuration for your application's login flow.
+The `global-setup.js` file authenticates each user and creates storageState files for Playwright tests.
 
 ##### How to Configure Authentication
+
+You have **two options** to configure login paths for your application:
+
+**Option 1 - Environment Variable (Quick):**
+
+Set the `LOGIN_PATHS` environment variable with JSON containing your login UI element paths:
+
+```bash
+# Linux / Mac / Git Bash
+export LOGIN_PATHS='{"username":["objectName=usernameInput"],"password":["objectName=passwordInput"],"submit":["objectName=loginButton"]}'
+
+# Windows Command Prompt
+set LOGIN_PATHS={"username":["objectName=usernameInput"],"password":["objectName=passwordInput"],"submit":["objectName=loginButton"]}
+
+# Windows PowerShell
+$env:LOGIN_PATHS='{"username":["objectName=usernameInput"],"password":["objectName=passwordInput"],"submit":["objectName=loginButton"]}'
+```
+
+**Option 2 - Customize the File (Recommended for permanent setup):**
 
 1. **Copy the template to your application:**
    ```bash
@@ -133,7 +152,7 @@ Global setup script that runs before all tests.
       YourApp/Tests/GUI/global-setup.js
    ```
 
-2. **Edit your copy and configure login paths:**
+2. **Edit your copy and hardcode login paths:**
    ```javascript
    const { chromium } = require('@playwright/test');
    const { waitForPageStability, login } = require('./utils');
@@ -141,17 +160,15 @@ Global setup script that runs before all tests.
    module.exports = async (config) => {
      // ... existing code ...
 
-     // Configure login paths for your application
-     const loginConfig = {
-       loginPaths: {
-         username: ["userNameInput"],  // objectName of username field
-         password: ["passwordInput"],  // objectName of password field  
-         submit: ["loginButton"]       // objectName of login button
-       }
+     // Hardcode login paths for your application
+     const loginPaths = {
+       username: ["userNameInput"],  // objectName of username field
+       password: ["passwordInput"],  // objectName of password field  
+       submit: ["loginButton"]       // objectName of login button
      };
 
      // Inside the authentication loop:
-     await login(page, username, password, loginConfig);
+     await login(page, username, password, undefined, loginPaths);
      
      // ... rest of code ...
    };
@@ -166,16 +183,16 @@ Global setup script that runs before all tests.
    });
    ```
 
-##### Without Custom Configuration
+##### Without Configuration
 
-If you don't customize `global-setup.js`, tests will run but won't be authenticated:
+If you don't configure `LOGIN_PATHS` (neither via environment variable nor custom file), tests will run but without authentication:
 - Empty `storageState` files are created
-- Tests run as unauthenticated users
-- You'll see instructions in console output about configuring login
+- Tests run as guest/unauthenticated users
+- You'll see instructions in console output about configuration options
 
 ##### After Configuration
 
-Once configured, you'll see:
+Once configured (either option), you'll see:
 ```
 Setting up authentication for 3 user(s)...
 Authenticating user0: admin@example.com...
