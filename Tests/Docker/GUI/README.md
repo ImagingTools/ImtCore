@@ -121,15 +121,61 @@ projects: [
 
 Global setup script that runs before all tests.
 
-#### Multi-User Authentication
+#### Multi-User Authentication Setup
 
-Automatically creates authentication state files for each user:
-- Logs in each user defined in the projects
-- Saves separate `storageState-user{N}.json` files
-- Each authorized project loads its own auth state
-- Guest project runs without authentication
+**IMPORTANT:** The `global-setup.js` file in ImtCore is a **template** that requires configuration for your application's login flow.
 
-Console output example:
+##### How to Configure Authentication
+
+1. **Copy the template to your application:**
+   ```bash
+   cp $IMTCORE_DIR/Tests/Docker/GUI/global-setup.js \
+      YourApp/Tests/GUI/global-setup.js
+   ```
+
+2. **Edit your copy and configure login paths:**
+   ```javascript
+   const { chromium } = require('@playwright/test');
+   const { waitForPageStability, login } = require('./utils');
+
+   module.exports = async (config) => {
+     // ... existing code ...
+
+     // Configure login paths for your application
+     const loginConfig = {
+       loginPaths: {
+         username: ["userNameInput"],  // objectName of username field
+         password: ["passwordInput"],  // objectName of password field  
+         submit: ["loginButton"]       // objectName of login button
+       }
+     };
+
+     // Inside the authentication loop:
+     await login(page, username, password, loginConfig);
+     
+     // ... rest of code ...
+   };
+   ```
+
+3. **Update playwright.config.js to use your custom global-setup:**
+   ```javascript
+   module.exports = defineConfig({
+     // Change from ImtCore template to your custom file
+     globalSetup: './GUI/global-setup.js',  // Your application's copy
+     // ... rest of config ...
+   });
+   ```
+
+##### Without Custom Configuration
+
+If you don't customize `global-setup.js`, tests will run but won't be authenticated:
+- Empty `storageState` files are created
+- Tests run as unauthenticated users
+- You'll see instructions in console output about configuring login
+
+##### After Configuration
+
+Once configured, you'll see:
 ```
 Setting up authentication for 3 user(s)...
 Authenticating user0: admin@example.com...
