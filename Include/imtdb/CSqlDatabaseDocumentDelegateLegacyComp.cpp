@@ -587,8 +587,7 @@ bool CSqlDatabaseDocumentDelegateLegacyComp::ReadDataFromMemory(const QByteArray
 		return false;
 	}
 
-	QByteArray dataCopy = data;
-	QBuffer buffer(&dataCopy);
+	QBuffer buffer(const_cast<QByteArray*>(&data));
 	if (!buffer.open(QIODevice::ReadOnly)){
 		SendErrorMessage(0, "Failed to open QBuffer for reading");
 		return false;
