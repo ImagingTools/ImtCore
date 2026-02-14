@@ -13,24 +13,24 @@ namespace imtreport
 
 // reimplemented (istd::TIFactory<iser::IObject2d>)
 
-i2d::IObject2d* CGraphicsElementFactory::CreateInstance(const QByteArray& keyId) const
+istd::TUniqueInterfacePtr<i2d::IObject2d> CGraphicsElementFactory::CreateInstance(const QByteArray& keyId) const
 {
 	if (keyId == CRectangleElement::GetTypeName())
-		return new CRectangleElement();
+		return istd::TUniqueInterfacePtr<i2d::IObject2d>(new CRectangleElement());
 	else if (keyId == CCircleElement::GetTypeName())
-		return new CCircleElement();
+		return istd::TUniqueInterfacePtr<i2d::IObject2d>(new CCircleElement());
 	else if (keyId == CTextLabelElement::GetTypeName())
-		return new CTextLabelElement();
+		return istd::TUniqueInterfacePtr<i2d::IObject2d>(new CTextLabelElement());
 	else if (keyId == CPolygonElement::GetTypeName())
-		return new CPolygonElement();
+		return istd::TUniqueInterfacePtr<i2d::IObject2d>(new CPolygonElement());
 	else if (keyId == CLineElement::GetTypeName())
-		return new CLineElement();
+		return istd::TUniqueInterfacePtr<i2d::IObject2d>(new CLineElement());
 	else if (keyId == CImageRectangleElement::GetTypeName())
-		return new CImageRectangleElement();
+		return istd::TUniqueInterfacePtr<i2d::IObject2d>(new CImageRectangleElement());
 	else if (keyId == CTextTable::GetTypeName())
-		return new CTextTable();
+		return istd::TUniqueInterfacePtr<i2d::IObject2d>(new CTextTable());
 	else
-		return nullptr;
+		return istd::TUniqueInterfacePtr<i2d::IObject2d>();
 }
 
 

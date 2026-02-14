@@ -70,7 +70,7 @@ imtauth::IUserInfoUniquePtr CClientRequestUserManagerComp::GetUser(const QByteAr
 		return nullptr;
 	}
 
-	return userInfoPtr.PopInterfacePtr();
+	return userInfoPtr;
 }
 
 

@@ -25,7 +25,7 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (istd::TIFactory)
-	virtual IPopupWidget* CreateInstance(const QByteArray& keyId = "") const override;
+	virtual istd::TUniqueInterfacePtr<IPopupWidget> CreateInstance(const QByteArray& keyId = "") const override;
 
 	// reimplemented (istd::IFactoryInfo)
 	virtual KeyList GetFactoryKeys() const override;

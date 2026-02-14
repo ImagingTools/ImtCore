@@ -20,7 +20,7 @@ namespace imtdev
 	Smart pointer type for managing device configuration lifetimes. Configurations
 	are parameter sets (iprm::IParamsSet) wrapped in shared pointers.
 */
-typedef QSharedPointer<iprm::IParamsSet> DeviceConfigurationPtr;
+typedef istd::TSharedInterfacePtr<iprm::IParamsSet> DeviceConfigurationPtr;
 
 
 /**

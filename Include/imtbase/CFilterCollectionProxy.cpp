@@ -154,10 +154,7 @@ istd::IChangeableUniquePtr CFilterCollectionProxy::CloneMe(CompatibilityMode mod
 
 istd::IChangeableUniquePtr CFilterCollectionProxy::CreateObjectInstance(const QByteArray& typeId) const
 {
-	istd::IChangeable* objPtr = BaseClass2::CreateInstance(typeId);
-	return istd::IChangeableUniquePtr(objPtr, [objPtr](){
-		return objPtr;
-	});
+	return BaseClass2::CreateInstance(typeId);
 }
 
 

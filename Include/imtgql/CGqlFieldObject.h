@@ -48,8 +48,8 @@ protected:
 
 protected:
 	QList<QByteArray> m_emptyFields;
-	QMap<QByteArray, istd::TSharedInterfacePtr<CGqlFieldObject>> m_objectFields; // map <fieldId, smart<CGqlFieldObject>>
-	QMap<QByteArray,  istd::TSharedInterfacePtr<CGqlFieldFragment>> m_fragmentFields; // map <typeId, smart<FieldFragment>>
+	QMap<QByteArray, std::shared_ptr<CGqlFieldObject>> m_objectFields; // map <fieldId, smart<CGqlFieldObject>>
+	QMap<QByteArray, std::shared_ptr<CGqlFieldFragment>> m_fragmentFields; // map <typeId, smart<FieldFragment>>
 	CGqlFieldObject* m_parentPtr;
 };
 

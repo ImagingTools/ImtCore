@@ -10,6 +10,100 @@ View comprehensive code metrics including lines of code, number of classes and c
 
 The documentation and statistics are automatically generated from the source code and deployed to GitHub Pages.
 
+### SDL Schema Documentation
+
+Complete documentation for SDL schema development in ImtCore, with special focus on the `ref` attribute for linking collections to GraphQL types.
+
+**[📚 SDL Documentation Index](Docs/SDL_Documentation_Index.md)** - Complete overview and learning paths
+
+#### Quick Links:
+
+- **[Cheat Sheet](Docs/SDL_Ref_Cheat_Sheet.md)** (7KB) ⭐ **START HERE** - Quick reference card for daily development
+- **[Quick Reference](Docs/SDL_Ref_Quick_Reference.md)** (3KB) - Brief syntax and rules
+- **[Complete Guide](Docs/SDL_Reference_Attribute_Guide.md)** (21KB, 🇷🇺) - Comprehensive documentation with examples
+- **[Practical Examples](Docs/SDL_Ref_Examples.md)** (23KB) - 5 real-world use cases
+- **[Visual Diagrams](Docs/SDL_Ref_Diagrams.md)** (21KB) - 8 diagrams explaining workflows
+
+**Total**: 70KB of documentation | 12 SDL examples | 8 visual diagrams | Russian + English
+
+## Server Communication and Connection Management
+
+ImtCore includes a comprehensive communication infrastructure for server connection configuration, multi-protocol dispatch, SSL/TLS security, and network connection health monitoring.
+
+### Module
+
+- **imtcom** - Server communication and connection management infrastructure
+
+### Key Features
+
+- **Multi-Protocol Support**: HTTP, WebSocket, gRPC, and File protocols
+- **Server Connection Configuration**: Host, port, and protocol management via IServerConnectionInterface
+- **Multi-Protocol Dispatch**: Server lifecycle management with protocol-specific control
+- **SSL/TLS Security**: Comprehensive certificate and key management
+- **Connection Monitoring**: Multiple health checking strategies (timer-based, GraphQL-based, internet availability)
+- **Secure/Insecure Modes**: Connection flags for secure (HTTPS/WSS) and insecure (HTTP/WS) connections
+- **ACF Component Architecture**: Factory-based instantiation with dependency injection
+- **Observable Status**: IChangeable integration for reactive status updates
+
+### Architecture
+
+The module provides multi-protocol server infrastructure:
+
+```
+IServerConnectionInterface (configuration)
+    ↓
+IServerDispatcher (lifecycle management)
+    ↓
+Protocol-specific servers (HTTP, WebSocket)
+    ↓
+IConnectionStatusProvider (health monitoring)
+```
+
+### Core Interfaces
+
+**IServerConnectionInterface:**
+- Multi-protocol configuration (HTTP:9001, WebSocket:9000, gRPC:50101)
+- CF_DEFAULT/CF_SECURE connection flags
+- URL generation with automatic scheme selection
+
+**IServerDispatcher:**
+- Start/stop servers by protocol type
+- Query server status (stopped, starting, running, stopping)
+- Multi-protocol coordination
+
+**IConnectionStatusProvider:**
+- Observable connection status (CS_UNKNOWN, CS_DISCONNECTED, CS_CONNECTED)
+- Three implementation strategies: async HTTP, GraphQL-based, internet availability
+
+### Documentation
+
+- **[Include/imtcom/README.md](Include/imtcom/README.md)** - Complete module documentation with 40+ usage examples
+- **[Include/imtcom/imtcom.h](Include/imtcom/imtcom.h)** - Namespace-level Doxygen documentation
+
+### Usage Example
+
+```cpp
+// Create connection with default ports
+auto connection = icomp::CreateComponent<CServerConnectionInterfaceParamComp>();
+connection->SetHost("api.example.com");
+connection->SetConnectionFlags(IServerConnectionInterface::CF_SECURE);
+
+// Generate protocol-specific URLs
+QUrl httpUrl, wsUrl;
+connection->GetUrl(IServerConnectionInterface::PT_HTTP, httpUrl);
+// httpUrl = "https://api.example.com:9001"
+
+connection->GetUrl(IServerConnectionInterface::PT_WEBSOCKET, wsUrl);
+// wsUrl = "wss://api.example.com:9000"
+
+// Dispatcher manages multiple protocols
+auto dispatcher = icomp::CreateComponent<CServerDispatcherComp>();
+dispatcher->StartServer(IServerConnectionInterface::PT_HTTP);
+dispatcher->StartServer(IServerConnectionInterface::PT_WEBSOCKET);
+```
+
+For detailed documentation and API references, see [Include/imtcom/README.md](Include/imtcom/README.md).
+
 ## License Management
 
 ImtCore includes a comprehensive three-module licensing system for managing software and hardware product licenses:

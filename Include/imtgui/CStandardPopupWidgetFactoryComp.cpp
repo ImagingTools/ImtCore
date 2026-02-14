@@ -14,13 +14,13 @@ namespace imtgui
 
 // reimplemented (istd::TIFactory)
 
-IPopupWidget* CStandardPopupWidgetFactoryComp::CreateInstance(const QByteArray& keyId) const
+istd::TUniqueInterfacePtr<IPopupWidget> CStandardPopupWidgetFactoryComp::CreateInstance(const QByteArray& keyId) const
 {
 	if (keyId.isEmpty()){
-		return new CStandardPopupWidget();
+		return istd::TUniqueInterfacePtr<IPopupWidget>(new CStandardPopupWidget());
 	}
 
-	return nullptr;
+	return istd::TUniqueInterfacePtr<IPopupWidget>();
 }
 
 

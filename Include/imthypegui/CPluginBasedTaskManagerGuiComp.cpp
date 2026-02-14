@@ -64,7 +64,7 @@ void CPluginBasedTaskManagerGuiComp::OnGuiCreated()
 		const istd::TIFactory<iqtgui::IGuiObject>* editorFactoryPtr = m_pluginsMap[editorTypeId]->GetTaskEditorFactory();
 		Q_ASSERT(editorFactoryPtr != nullptr);
 
-		istd::TDelPtr<iqtgui::IGuiObject> editorPtr(editorFactoryPtr->CreateInstance(editorTypeId));
+		istd::TUniqueInterfacePtr<iqtgui::IGuiObject> editorPtr(editorFactoryPtr->CreateInstance(editorTypeId));
 		if (editorPtr.IsValid()){
 			imod::IObserver* observerPtr = dynamic_cast<imod::IObserver*>(editorPtr.GetPtr());
 			if (observerPtr != nullptr){
@@ -74,7 +74,7 @@ void CPluginBasedTaskManagerGuiComp::OnGuiCreated()
 
 				if (editorPtr->CreateGui(pageWidgetPtr.GetPtr())){
 					TaskEditorStack->addWidget(pageWidgetPtr.PopPtr());
-					m_editorsMap[editorTypeId].SetPtr(editorPtr.PopPtr());
+					m_editorsMap[editorTypeId].FromUnique(editorPtr);
 					m_observersMap[editorTypeId] = observerPtr;
 					m_typeToStackIndexMap[editorTypeId] = ++lastTaskEditorIndex;
 				}

@@ -1478,9 +1478,10 @@ const ibase::IHierarchicalCommand* CObjectCollectionViewComp::Commands::GetComma
 
 // reimplemented (IGraphicsEffectFactory)
 
-QGraphicsEffect* CObjectCollectionViewComp::FocusDecorationFactory::CreateInstance(const QByteArray& /*keyId*/) const
+std::unique_ptr<QGraphicsEffect> CObjectCollectionViewComp::FocusDecorationFactory::CreateEffect() const
 {
-	QGraphicsDropShadowEffect* shadowPtr = new QGraphicsDropShadowEffect;
+	std::unique_ptr<QGraphicsDropShadowEffect> shadowPtr = std::make_unique<QGraphicsDropShadowEffect>();
+
 	shadowPtr->setXOffset(0);
 	shadowPtr->setYOffset(0);
 	shadowPtr->setBlurRadius(6);
@@ -1490,13 +1491,7 @@ QGraphicsEffect* CObjectCollectionViewComp::FocusDecorationFactory::CreateInstan
 }
 
 
-istd::IFactoryInfo::KeyList CObjectCollectionViewComp::FocusDecorationFactory::GetFactoryKeys() const
-{
-	istd::IFactoryInfo::KeyList retVal;
-
-	return retVal;
-}
-
+// public methods of the embedded class TableModel
 
 CObjectCollectionViewComp::TableModel::TableModel(CObjectCollectionViewComp& parent)
 	:m_batchSize(50),

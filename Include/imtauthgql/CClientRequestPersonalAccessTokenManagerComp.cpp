@@ -200,7 +200,7 @@ imtauth::IPersonalAccessTokenSharedPtr CClientRequestPersonalAccessTokenManagerC
 		tokenPtr->SetRevoked(*payload.Version_1_0->revoked);
 	}
 
-	return tokenPtr.PopInterfacePtr();
+	return imtauth::IPersonalAccessTokenSharedPtr::CreateFromUnique(tokenPtr);
 }
 
 
