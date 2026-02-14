@@ -587,7 +587,8 @@ bool CSqlDatabaseDocumentDelegateLegacyComp::ReadDataFromMemory(const QByteArray
 		return false;
 	}
 
-	// QByteArray uses copy-on-write, so this is cheap and avoids const_cast
+	// Use copy to avoid const_cast. QByteArray uses copy-on-write, so this shares data until modified.
+	// QBuffer in ReadOnly mode doesn't modify the data, only tracks position internally.
 	QByteArray dataCopy = data;
 	QBuffer buffer(&dataCopy);
 	if (!buffer.open(QIODevice::ReadOnly)){
