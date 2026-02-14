@@ -587,6 +587,7 @@ bool CSqlDatabaseDocumentDelegateLegacyComp::ReadDataFromMemory(const QByteArray
 		return false;
 	}
 
+	// QBuffer requires non-const pointer but won't modify data when opened in ReadOnly mode
 	QBuffer buffer(const_cast<QByteArray*>(&data));
 	if (!buffer.open(QIODevice::ReadOnly)){
 		SendErrorMessage(0, "Failed to open QBuffer for reading");
