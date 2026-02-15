@@ -200,7 +200,15 @@ If your application uses the **standard ImtCore authorization page structure**, 
 
 Once configured (either option), you'll see:
 ```
-Setting up authentication for 3 user(s)...
+🔐 Setting up authentication for 3 user(s)
+======================================================================
+Base URL: http://your-app:7776
+Login paths configuration:
+  Username: ["AuthorizationPage","LoginInput"]
+  Password: ["AuthorizationPage","PasswordInput"]
+  Submit:   ["AuthorizationPage","LoginButton"]
+======================================================================
+
 Authenticating user0: admin@example.com...
 ✓ Created storageState-user0.json for admin@example.com
 Authenticating user1: user@example.com...
@@ -209,6 +217,44 @@ Authenticating user2: viewer@example.com...
 ✓ Created storageState-user2.json for viewer@example.com
 Global setup complete!
 ```
+
+##### Troubleshooting Authentication
+
+**TimeoutError: locator.waitFor: Timeout exceeded**
+
+If you see timeout errors during authentication setup:
+
+1. **Check BASE_URL**: Make sure your application is running and accessible
+   ```bash
+   # Test in browser or with curl
+   curl http://your-app:7776
+   ```
+
+2. **Verify Authorization Page Loads**: Open `BASE_URL` in a browser - you should see the login page immediately
+
+3. **Check objectName Structure**: Use browser dev tools to inspect elements and verify they match:
+   ```html
+   <div objectName="AuthorizationPage">
+     <div objectName="LoginInput">
+       <input objectName="TextInput" />
+     </div>
+     <div objectName="PasswordInput">
+       <input objectName="TextInput" />
+     </div>
+     <div objectName="LoginButton">
+       <div objectName="MouseArea" />
+     </div>
+   </div>
+   ```
+
+4. **Increase Timeouts**: If your app is slow to load, increase timeouts in playwright.config.js:
+   ```javascript
+   timeout: 60000,  // 60 seconds instead of default 30
+   ```
+
+5. **Check Logs**: The error message will show which exact element failed to load
+
+6. **Fallback to Guest**: If authentication fails, tests will still run with empty storageState (as guest user)
 
 ## Updating Reference Screenshots
 

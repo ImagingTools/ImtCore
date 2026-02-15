@@ -64,7 +64,15 @@ module.exports = async (config) => {
     throw new Error('Invalid loginPaths configuration');
   }
 
-  console.log(`Setting up authentication for ${authorizedProjects.length} user(s)...`);
+  console.log('\n' + '='.repeat(70));
+  console.log(`🔐 Setting up authentication for ${authorizedProjects.length} user(s)`);
+  console.log('='.repeat(70));
+  console.log(`Base URL: ${baseURL}`);
+  console.log(`Login paths configuration:`);
+  console.log(`  Username: ${JSON.stringify(loginPaths.username)}`);
+  console.log(`  Password: ${JSON.stringify(loginPaths.password)}`);
+  console.log(`  Submit:   ${JSON.stringify(loginPaths.submit)}`);
+  console.log('='.repeat(70) + '\n');
 
   const browser = await chromium.launch();
 
@@ -83,16 +91,30 @@ module.exports = async (config) => {
       const context = await browser.newContext({ viewport });
       const page = await context.newPage();
 
-      await page.goto(baseURL);
-      await waitForPageStability(page);
+      try {
+        await page.goto(baseURL, { waitUntil: 'networkidle', timeout: 30000 });
+        await waitForPageStability(page);
 
-      await login(page, username, password, undefined, loginPaths);
+        // Wait for authorization page to appear
+        const authPageSelector = '[objectName="AuthorizationPage"]';
+        await page.waitForSelector(authPageSelector, { timeout: 10000 });
+        
+        await login(page, username, password, undefined, loginPaths);
 
-      await waitForPageStability(page);
+        await waitForPageStability(page);
 
-      await context.storageState({ path: `./${storageState}` });
+        await context.storageState({ path: `./${storageState}` });
 
-      console.log(`✓ Created ${storageState} for ${username}`);
+        console.log(`✓ Created ${storageState} for ${username}`);
+      } catch (error) {
+        console.error(`✗ Failed to authenticate ${username}:`, error.message);
+        console.error(`  Make sure the application is running at: ${baseURL}`);
+        console.error(`  And that the authorization page structure matches the loginPaths configuration.`);
+        
+        // Create empty storageState file so tests can run (as guest)
+        await context.storageState({ path: `./${storageState}` });
+        console.log(`  Created empty ${storageState} (tests will run as guest)`);
+      }
 
       await context.close();
     }
