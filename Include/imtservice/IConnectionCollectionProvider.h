@@ -20,9 +20,8 @@ namespace imtservice
 class IConnectionCollectionProvider: virtual public istd::IPolymorphic
 {
 public:
-	// TODO: Raw pointer ???
-	virtual imtservice::IConnectionCollection* GetConnectionCollectionByServicePath(const QString& servicePath) const = 0;
-	virtual imtservice::IConnectionCollection* GetConnectionCollectionByServiceId(const QByteArray& serviceId) const = 0;
+	virtual istd::TSharedInterfacePtr<imtservice::IConnectionCollection> GetConnectionCollectionByServicePath(const QString& servicePath) const = 0;
+	virtual istd::TSharedInterfacePtr<imtservice::IConnectionCollection> GetConnectionCollectionByServiceId(const QByteArray& serviceId) const = 0;
 };
 
 
