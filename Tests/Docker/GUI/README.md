@@ -125,13 +125,22 @@ Global setup script that runs before all tests.
 
 The `global-setup.js` file authenticates each user and creates storageState files for Playwright tests.
 
-##### How to Configure Authentication
+##### Default Configuration
 
-You have **two options** to configure login paths for your application:
+The `global-setup.js` includes **default login paths** for standard ImtCore authorization pages:
+- Login Input: `["AuthorizationPage", "LoginInput"]`
+- Password Input: `["AuthorizationPage", "PasswordInput"]`
+- Login Button: `["AuthorizationPage", "LoginButton"]`
 
-**Option 1 - Environment Variable (Quick):**
+**If your application uses these standard paths, authentication works automatically - no configuration needed!**
 
-Set the `LOGIN_PATHS` environment variable with JSON containing your login UI element paths:
+##### Custom Configuration (Optional)
+
+If your application uses different UI element names, you have **two options**:
+
+**Option 1 - Environment Variable (Quick Override):**
+
+Set the `LOGIN_PATHS` environment variable with JSON containing your custom login UI element paths:
 
 ```bash
 # Linux / Mac / Git Bash
@@ -144,7 +153,7 @@ set LOGIN_PATHS={"username":["objectName=usernameInput"],"password":["objectName
 $env:LOGIN_PATHS='{"username":["objectName=usernameInput"],"password":["objectName=passwordInput"],"submit":["objectName=loginButton"]}'
 ```
 
-**Option 2 - Customize the File (Recommended for permanent setup):**
+**Option 2 - Customize the File (For permanent custom paths):**
 
 1. **Copy the template to your application:**
    ```bash
@@ -183,14 +192,11 @@ $env:LOGIN_PATHS='{"username":["objectName=usernameInput"],"password":["objectNa
    });
    ```
 
-##### Without Configuration
+##### Without Custom Configuration
 
-If you don't configure `LOGIN_PATHS` (neither via environment variable nor custom file), tests will run but without authentication:
-- Empty `storageState` files are created
-- Tests run as guest/unauthenticated users
-- You'll see instructions in console output about configuration options
+If your application uses the **standard ImtCore authorization page structure**, authentication works automatically with the defaults. No configuration needed!
 
-##### After Configuration
+##### After Configuration (Or Using Defaults)
 
 Once configured (either option), you'll see:
 ```
