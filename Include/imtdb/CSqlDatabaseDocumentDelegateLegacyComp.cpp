@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QtCore/QFile>
+#include <QtCore/QBuffer>
 
 // ACF includes
 #include <istd/TOptDelPtr.h>
@@ -553,56 +554,25 @@ istd::IChangeableUniquePtr CSqlDatabaseDocumentDelegateLegacyComp::CreateObject(
 
 bool CSqlDatabaseDocumentDelegateLegacyComp::WriteDataToMemory(const QByteArray& typeId, const istd::IChangeable& object, QByteArray& data) const
 {
-	const ifile::IFilePersistence* documentPersistencePtr = FindDocumentPersistence(typeId);
+	const ifile::IDeviceBasedPersistence* documentPersistencePtr = FindDocumentPersistence(typeId);
 	if (documentPersistencePtr == nullptr){
 		SendErrorMessage(0, QString("Document data could not be written due no persistence was found for the type: %1").arg(qPrintable(typeId)));
 
 		return false;
 	}
 
-	QString tempFolder = QDir::tempPath() + "/ImtCore/SqlDatabaseDocumentDelegate/" + QUuid::createUuid().toString();
-	if (!istd::CSystem::EnsurePathExists(tempFolder)){
+	QBuffer buffer(&data);
+	if (!buffer.open(QIODevice::WriteOnly)){
+		SendErrorMessage(0, "Failed to open QBuffer for writing");
 		return false;
 	}
 
-	int flags = ifile::IFilePersistence::QF_FILE | ifile::IFilePersistence::QF_SAVE;
+	int operationState = documentPersistencePtr->WriteToDevice(object, buffer, nullptr);
+	buffer.close();
 
-	QStringList supportedExts;
-	documentPersistencePtr->GetFileExtensions(supportedExts, &object, flags);
-
-	QString fileName = QUuid::createUuid().toString();
-	QString workingExtension;
-	for (const QString& ext : std::as_const(supportedExts)){
-		QString filePath = fileName + "." + ext;
-		if (documentPersistencePtr->IsOperationSupported(&object, &filePath, flags, false)){
-			workingExtension = ext;
-			break;
-		}
-	}
-
-	fileName += "." + workingExtension;
-
-	QString filePath = tempFolder + "/" + fileName;
-
-	int operationState = documentPersistencePtr->SaveToFile(object, filePath);
-	if (operationState != ifile::IFilePersistence::OS_OK){
-		istd::CSystem::RemoveDirectory(tempFolder);
-
+	if (operationState != ifile::IDeviceBasedPersistence::Successful){
 		return false;
 	}
-
-	QFile documentFile(filePath);
-	if (!documentFile.open(QFile::ReadOnly)){
-		istd::CSystem::RemoveDirectory(tempFolder);
-
-		return false;
-	}
-
-	data = documentFile.readAll();
-
-	documentFile.close();
-
-	istd::CSystem::RemoveDirectory(tempFolder);
 
 	return true;
 }
@@ -610,57 +580,28 @@ bool CSqlDatabaseDocumentDelegateLegacyComp::WriteDataToMemory(const QByteArray&
 
 bool CSqlDatabaseDocumentDelegateLegacyComp::ReadDataFromMemory(const QByteArray& typeId, const QByteArray& data, istd::IChangeable& object) const
 {
-	const ifile::IFilePersistence* documentPersistencePtr = FindDocumentPersistence(typeId);
+	const ifile::IDeviceBasedPersistence* documentPersistencePtr = FindDocumentPersistence(typeId);
 	if (documentPersistencePtr == nullptr){
 		SendErrorMessage(0, QString("Document data could not be read due no persistence was found for the type: %1").arg(qPrintable(typeId)));
 
 		return false;
 	}
 
-	QString tempFolder = QDir::tempPath() + "/ImtCore/SqlDatabaseDocumentDelegate/" + QUuid::createUuid().toString();
-
-	if (!istd::CSystem::EnsurePathExists(tempFolder)){
+	// Use copy to avoid const_cast. QByteArray uses copy-on-write, so this shares data until modified.
+	// QBuffer in ReadOnly mode doesn't modify the data, only tracks position internally.
+	QByteArray dataCopy = data;
+	QBuffer buffer(&dataCopy);
+	if (!buffer.open(QIODevice::ReadOnly)){
+		SendErrorMessage(0, "Failed to open QBuffer for reading");
 		return false;
 	}
 
-	int flags = ifile::IFilePersistence::QF_FILE | ifile::IFilePersistence::QF_SAVE;
+	int operationState = documentPersistencePtr->ReadFromDevice(object, buffer, nullptr);
+	buffer.close();
 
-	QStringList supportedExts;
-	documentPersistencePtr->GetFileExtensions(supportedExts, &object, flags);
-
-	QString fileName = QUuid::createUuid().toString();
-	QString workingExtension;
-	for (const QString& ext : std::as_const(supportedExts)){
-		QString filePath = fileName + "." + ext;
-		if (documentPersistencePtr->IsOperationSupported(&object, &filePath, flags, false)){
-			workingExtension = ext;
-			break;
-		}
-	}
-
-	fileName += "." + workingExtension;
-
-	QString filePath = tempFolder + "/" + fileName;
-
-	QFile documentFile(filePath);
-	if (!documentFile.open(QFile::WriteOnly)){
-		istd::CSystem::RemoveDirectory(tempFolder);
-
+	if (operationState != ifile::IDeviceBasedPersistence::Successful){
 		return false;
 	}
-
-	documentFile.write(data);
-
-	documentFile.close();
-
-	int operationState = documentPersistencePtr->LoadFromFile(object, filePath);
-	if (operationState != ifile::IFilePersistence::OS_OK){
-		istd::CSystem::RemoveDirectory(tempFolder);
-
-		return false;
-	}
-
-	istd::CSystem::RemoveDirectory(tempFolder);
 
 	return true;
 }
@@ -826,7 +767,7 @@ QByteArray CSqlDatabaseDocumentDelegateLegacyComp::CreateOperationDescriptionQue
 }
 
 
-const ifile::IFilePersistence* CSqlDatabaseDocumentDelegateLegacyComp::FindDocumentPersistence(const QByteArray& typeId) const
+const ifile::IDeviceBasedPersistence* CSqlDatabaseDocumentDelegateLegacyComp::FindDocumentPersistence(const QByteArray& typeId) const
 {
 	int persistenceIndex = -1;
 
