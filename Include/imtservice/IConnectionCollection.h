@@ -38,6 +38,10 @@ public:
 };
 
 
+typedef istd::TUniqueInterfacePtr<IConnectionCollection> IConnectionCollectionUniquePtr;
+typedef istd::TSharedInterfacePtr<IConnectionCollection> IConnectionCollectionSharedPtr;
+
+
 } // namespace imtservice
 
 
