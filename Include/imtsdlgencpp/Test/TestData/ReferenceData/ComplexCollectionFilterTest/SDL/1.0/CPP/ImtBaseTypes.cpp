@@ -8905,7 +8905,7 @@ CTimeRangeObject::CTimeRangeObject(QObject* parent): ::imtbase::CItemModelBase(p
 
 QVariant CTimeRangeObject::GetBegin()
 {
-	if (Version_1_0->Begin.has_value()){
+	if (Version_1_0 && Version_1_0->Begin){
 		return Version_1_0->Begin.value();
 	}
 
@@ -8928,7 +8928,7 @@ bool CTimeRangeObject::hasBegin()
 
 QVariant CTimeRangeObject::GetEnd()
 {
-	if (Version_1_0->End.has_value()){
+	if (Version_1_0 && Version_1_0->End){
 		return Version_1_0->End.value();
 	}
 
@@ -9122,7 +9122,7 @@ CSdlSizeObject::CSdlSizeObject(QObject* parent): ::imtbase::CItemModelBase(paren
 
 QVariant CSdlSizeObject::GetWidth()
 {
-	if (Version_1_0->width.has_value()){
+	if (Version_1_0 && Version_1_0->width){
 		return Version_1_0->width.value();
 	}
 
@@ -9145,7 +9145,7 @@ bool CSdlSizeObject::hasWidth()
 
 QVariant CSdlSizeObject::GetHeight()
 {
-	if (Version_1_0->height.has_value()){
+	if (Version_1_0 && Version_1_0->height){
 		return Version_1_0->height.value();
 	}
 
@@ -9339,7 +9339,7 @@ CSdlPointObject::CSdlPointObject(QObject* parent): ::imtbase::CItemModelBase(par
 
 QVariant CSdlPointObject::GetX()
 {
-	if (Version_1_0->x.has_value()){
+	if (Version_1_0 && Version_1_0->x){
 		return Version_1_0->x.value();
 	}
 
@@ -9362,7 +9362,7 @@ bool CSdlPointObject::hasX()
 
 QVariant CSdlPointObject::GetY()
 {
-	if (Version_1_0->y.has_value()){
+	if (Version_1_0 && Version_1_0->y){
 		return Version_1_0->y.value();
 	}
 
@@ -9568,7 +9568,7 @@ CParamTypeIdsObject::CParamTypeIdsObject(QObject* parent): ::imtbase::CItemModel
 
 QVariant CParamTypeIdsObject::GetUrlParam()
 {
-	if (Version_1_0->UrlParam.has_value()){
+	if (Version_1_0 && Version_1_0->UrlParam){
 		return Version_1_0->UrlParam.value();
 	}
 
@@ -9591,7 +9591,7 @@ bool CParamTypeIdsObject::hasUrlParam()
 
 QVariant CParamTypeIdsObject::GetIdParam()
 {
-	if (Version_1_0->IdParam.has_value()){
+	if (Version_1_0 && Version_1_0->IdParam){
 		return Version_1_0->IdParam.value();
 	}
 
@@ -9614,7 +9614,7 @@ bool CParamTypeIdsObject::hasIdParam()
 
 QVariant CParamTypeIdsObject::GetTextParam()
 {
-	if (Version_1_0->TextParam.has_value()){
+	if (Version_1_0 && Version_1_0->TextParam){
 		return Version_1_0->TextParam.value();
 	}
 
@@ -9637,7 +9637,7 @@ bool CParamTypeIdsObject::hasTextParam()
 
 QVariant CParamTypeIdsObject::GetTextView()
 {
-	if (Version_1_0->TextView.has_value()){
+	if (Version_1_0 && Version_1_0->TextView){
 		return Version_1_0->TextView.value();
 	}
 
@@ -9660,7 +9660,7 @@ bool CParamTypeIdsObject::hasTextView()
 
 QVariant CParamTypeIdsObject::GetSelectionParam()
 {
-	if (Version_1_0->SelectionParam.has_value()){
+	if (Version_1_0 && Version_1_0->SelectionParam){
 		return Version_1_0->SelectionParam.value();
 	}
 
@@ -9683,7 +9683,7 @@ bool CParamTypeIdsObject::hasSelectionParam()
 
 QVariant CParamTypeIdsObject::GetSchedulerParam()
 {
-	if (Version_1_0->SchedulerParam.has_value()){
+	if (Version_1_0 && Version_1_0->SchedulerParam){
 		return Version_1_0->SchedulerParam.value();
 	}
 
@@ -9706,7 +9706,7 @@ bool CParamTypeIdsObject::hasSchedulerParam()
 
 QVariant CParamTypeIdsObject::GetBackupSettings()
 {
-	if (Version_1_0->BackupSettings.has_value()){
+	if (Version_1_0 && Version_1_0->BackupSettings){
 		return Version_1_0->BackupSettings.value();
 	}
 
@@ -9729,7 +9729,7 @@ bool CParamTypeIdsObject::hasBackupSettings()
 
 QVariant CParamTypeIdsObject::GetDatabaseAccessSettings()
 {
-	if (Version_1_0->DatabaseAccessSettings.has_value()){
+	if (Version_1_0 && Version_1_0->DatabaseAccessSettings){
 		return Version_1_0->DatabaseAccessSettings.value();
 	}
 
@@ -9752,7 +9752,7 @@ bool CParamTypeIdsObject::hasDatabaseAccessSettings()
 
 QVariant CParamTypeIdsObject::GetParamsSet()
 {
-	if (Version_1_0->ParamsSet.has_value()){
+	if (Version_1_0 && Version_1_0->ParamsSet){
 		return Version_1_0->ParamsSet.value();
 	}
 
@@ -9775,7 +9775,7 @@ bool CParamTypeIdsObject::hasParamsSet()
 
 QVariant CParamTypeIdsObject::GetFileNameParam()
 {
-	if (Version_1_0->FileNameParam.has_value()){
+	if (Version_1_0 && Version_1_0->FileNameParam){
 		return Version_1_0->FileNameParam.value();
 	}
 
@@ -9798,7 +9798,7 @@ bool CParamTypeIdsObject::hasFileNameParam()
 
 QVariant CParamTypeIdsObject::GetIntegerParam()
 {
-	if (Version_1_0->IntegerParam.has_value()){
+	if (Version_1_0 && Version_1_0->IntegerParam){
 		return Version_1_0->IntegerParam.value();
 	}
 
@@ -9821,7 +9821,7 @@ bool CParamTypeIdsObject::hasIntegerParam()
 
 QVariant CParamTypeIdsObject::GetDoubleParam()
 {
-	if (Version_1_0->DoubleParam.has_value()){
+	if (Version_1_0 && Version_1_0->DoubleParam){
 		return Version_1_0->DoubleParam.value();
 	}
 
@@ -9844,7 +9844,7 @@ bool CParamTypeIdsObject::hasDoubleParam()
 
 QVariant CParamTypeIdsObject::GetPasswordParam()
 {
-	if (Version_1_0->PasswordParam.has_value()){
+	if (Version_1_0 && Version_1_0->PasswordParam){
 		return Version_1_0->PasswordParam.value();
 	}
 
@@ -9867,7 +9867,7 @@ bool CParamTypeIdsObject::hasPasswordParam()
 
 QVariant CParamTypeIdsObject::GetEnableableParam()
 {
-	if (Version_1_0->EnableableParam.has_value()){
+	if (Version_1_0 && Version_1_0->EnableableParam){
 		return Version_1_0->EnableableParam.value();
 	}
 
@@ -10135,7 +10135,7 @@ CUrlParamObject::CUrlParamObject(QObject* parent): ::imtbase::CItemModelBase(par
 
 QVariant CUrlParamObject::GetScheme()
 {
-	if (Version_1_0->scheme.has_value()){
+	if (Version_1_0 && Version_1_0->scheme){
 		return Version_1_0->scheme.value();
 	}
 
@@ -10158,7 +10158,7 @@ bool CUrlParamObject::hasScheme()
 
 QVariant CUrlParamObject::GetHost()
 {
-	if (Version_1_0->host.has_value()){
+	if (Version_1_0 && Version_1_0->host){
 		return Version_1_0->host.value();
 	}
 
@@ -10181,7 +10181,7 @@ bool CUrlParamObject::hasHost()
 
 QVariant CUrlParamObject::GetPort()
 {
-	if (Version_1_0->port.has_value()){
+	if (Version_1_0 && Version_1_0->port){
 		return Version_1_0->port.value();
 	}
 
@@ -10204,7 +10204,7 @@ bool CUrlParamObject::hasPort()
 
 QVariant CUrlParamObject::GetPath()
 {
-	if (Version_1_0->path.has_value()){
+	if (Version_1_0 && Version_1_0->path){
 		return Version_1_0->path.value();
 	}
 
@@ -10409,7 +10409,7 @@ CIdParamObject::CIdParamObject(QObject* parent): ::imtbase::CItemModelBase(paren
 
 QVariant CIdParamObject::GetId()
 {
-	if (Version_1_0->id.has_value()){
+	if (Version_1_0 && Version_1_0->id){
 		return Version_1_0->id.value();
 	}
 
@@ -10596,7 +10596,7 @@ CTextParamObject::CTextParamObject(QObject* parent): ::imtbase::CItemModelBase(p
 
 QVariant CTextParamObject::GetText()
 {
-	if (Version_1_0->text.has_value()){
+	if (Version_1_0 && Version_1_0->text){
 		return Version_1_0->text.value();
 	}
 
@@ -10783,7 +10783,7 @@ CEnableableParamObject::CEnableableParamObject(QObject* parent): ::imtbase::CIte
 
 QVariant CEnableableParamObject::GetValue()
 {
-	if (Version_1_0->value.has_value()){
+	if (Version_1_0 && Version_1_0->value){
 		return Version_1_0->value.value();
 	}
 
@@ -10970,7 +10970,7 @@ CIntegerParamObject::CIntegerParamObject(QObject* parent): ::imtbase::CItemModel
 
 QVariant CIntegerParamObject::GetValue()
 {
-	if (Version_1_0->value.has_value()){
+	if (Version_1_0 && Version_1_0->value){
 		return Version_1_0->value.value();
 	}
 
@@ -11157,7 +11157,7 @@ CDoubleParamObject::CDoubleParamObject(QObject* parent): ::imtbase::CItemModelBa
 
 QVariant CDoubleParamObject::GetValue()
 {
-	if (Version_1_0->value.has_value()){
+	if (Version_1_0 && Version_1_0->value){
 		return Version_1_0->value.value();
 	}
 
@@ -11347,7 +11347,7 @@ COptionObject::COptionObject(QObject* parent): ::imtbase::CItemModelBase(parent)
 
 QVariant COptionObject::GetId()
 {
-	if (Version_1_0->id.has_value()){
+	if (Version_1_0 && Version_1_0->id){
 		return Version_1_0->id.value();
 	}
 
@@ -11370,7 +11370,7 @@ bool COptionObject::hasId()
 
 QVariant COptionObject::GetName()
 {
-	if (Version_1_0->name.has_value()){
+	if (Version_1_0 && Version_1_0->name){
 		return Version_1_0->name.value();
 	}
 
@@ -11393,7 +11393,7 @@ bool COptionObject::hasName()
 
 QVariant COptionObject::GetDescription()
 {
-	if (Version_1_0->description.has_value()){
+	if (Version_1_0 && Version_1_0->description){
 		return Version_1_0->description.value();
 	}
 
@@ -11416,7 +11416,7 @@ bool COptionObject::hasDescription()
 
 QVariant COptionObject::GetEnabled()
 {
-	if (Version_1_0->enabled.has_value()){
+	if (Version_1_0 && Version_1_0->enabled){
 		return Version_1_0->enabled.value();
 	}
 
@@ -11623,7 +11623,7 @@ COptionsListObject::COptionsListObject(QObject* parent): ::imtbase::CItemModelBa
 
 QVariant COptionsListObject::GetTotalCount()
 {
-	if (Version_1_0->totalCount.has_value()){
+	if (Version_1_0 && Version_1_0->totalCount){
 		return Version_1_0->totalCount.value();
 	}
 
@@ -11646,7 +11646,7 @@ bool COptionsListObject::hasTotalCount()
 
 QVariant COptionsListObject::GetOffset()
 {
-	if (Version_1_0->offset.has_value()){
+	if (Version_1_0 && Version_1_0->offset){
 		return Version_1_0->offset.value();
 	}
 
@@ -11669,7 +11669,7 @@ bool COptionsListObject::hasOffset()
 
 QVariant COptionsListObject::GetOptions()
 {
-	if (Version_1_0->options.has_value()){
+	if (Version_1_0 && Version_1_0->options){
 		if (!m_optionsQObjectPtr.isValid()){
 			m_optionsQObjectPtr = CreateObject("options");
 			auto itemPtr = m_optionsQObjectPtr.value<sdl::imtbase::ImtBaseTypes::COptionObjectList*>();
@@ -11909,7 +11909,7 @@ CSelectionParamObject::CSelectionParamObject(QObject* parent): ::imtbase::CItemM
 
 QVariant CSelectionParamObject::GetSelectedIndex()
 {
-	if (Version_1_0->selectedIndex.has_value()){
+	if (Version_1_0 && Version_1_0->selectedIndex){
 		return Version_1_0->selectedIndex.value();
 	}
 
@@ -11932,7 +11932,7 @@ bool CSelectionParamObject::hasSelectedIndex()
 
 QVariant CSelectionParamObject::GetConstraints()
 {
-	if (Version_1_0->constraints.has_value()){
+	if (Version_1_0 && Version_1_0->constraints){
 		if (!m_constraintsQObjectPtr.isValid()){
 			m_constraintsQObjectPtr = CreateObject("constraints");
 			auto itemPtr = m_constraintsQObjectPtr.value<sdl::imtbase::ImtBaseTypes::COptionsListObject*>();
@@ -12159,7 +12159,7 @@ CSchedulerParamObject::CSchedulerParamObject(QObject* parent): ::imtbase::CItemM
 
 QVariant CSchedulerParamObject::GetStartTime()
 {
-	if (Version_1_0->startTime.has_value()){
+	if (Version_1_0 && Version_1_0->startTime){
 		return Version_1_0->startTime.value();
 	}
 
@@ -12182,7 +12182,7 @@ bool CSchedulerParamObject::hasStartTime()
 
 QVariant CSchedulerParamObject::GetInterval()
 {
-	if (Version_1_0->interval.has_value()){
+	if (Version_1_0 && Version_1_0->interval){
 		return Version_1_0->interval.value();
 	}
 
@@ -12376,7 +12376,7 @@ CBackupSettingsObject::CBackupSettingsObject(QObject* parent): ::imtbase::CItemM
 
 QVariant CBackupSettingsObject::GetSchedulerParam()
 {
-	if (Version_1_0->schedulerParam.has_value()){
+	if (Version_1_0 && Version_1_0->schedulerParam){
 		if (!m_schedulerParamQObjectPtr.isValid()){
 			m_schedulerParamQObjectPtr = CreateObject("schedulerParam");
 			auto itemPtr = m_schedulerParamQObjectPtr.value<sdl::imtbase::ImtBaseTypes::CSchedulerParamObject*>();
@@ -12429,7 +12429,7 @@ void CBackupSettingsObject::ResetSchedulerParam()
 
 QVariant CBackupSettingsObject::GetFolderPath()
 {
-	if (Version_1_0->folderPath.has_value()){
+	if (Version_1_0 && Version_1_0->folderPath){
 		return Version_1_0->folderPath.value();
 	}
 
@@ -12630,7 +12630,7 @@ CDatabaseAccessSettingsObject::CDatabaseAccessSettingsObject(QObject* parent): :
 
 QVariant CDatabaseAccessSettingsObject::GetDbName()
 {
-	if (Version_1_0->dbName.has_value()){
+	if (Version_1_0 && Version_1_0->dbName){
 		return Version_1_0->dbName.value();
 	}
 
@@ -12653,7 +12653,7 @@ bool CDatabaseAccessSettingsObject::hasDbName()
 
 QVariant CDatabaseAccessSettingsObject::GetHost()
 {
-	if (Version_1_0->host.has_value()){
+	if (Version_1_0 && Version_1_0->host){
 		return Version_1_0->host.value();
 	}
 
@@ -12676,7 +12676,7 @@ bool CDatabaseAccessSettingsObject::hasHost()
 
 QVariant CDatabaseAccessSettingsObject::GetPort()
 {
-	if (Version_1_0->port.has_value()){
+	if (Version_1_0 && Version_1_0->port){
 		return Version_1_0->port.value();
 	}
 
@@ -12699,7 +12699,7 @@ bool CDatabaseAccessSettingsObject::hasPort()
 
 QVariant CDatabaseAccessSettingsObject::GetDbPath()
 {
-	if (Version_1_0->dbPath.has_value()){
+	if (Version_1_0 && Version_1_0->dbPath){
 		return Version_1_0->dbPath.value();
 	}
 
@@ -12722,7 +12722,7 @@ bool CDatabaseAccessSettingsObject::hasDbPath()
 
 QVariant CDatabaseAccessSettingsObject::GetUsername()
 {
-	if (Version_1_0->username.has_value()){
+	if (Version_1_0 && Version_1_0->username){
 		return Version_1_0->username.value();
 	}
 
@@ -12745,7 +12745,7 @@ bool CDatabaseAccessSettingsObject::hasUsername()
 
 QVariant CDatabaseAccessSettingsObject::GetPassword()
 {
-	if (Version_1_0->password.has_value()){
+	if (Version_1_0 && Version_1_0->password){
 		return Version_1_0->password.value();
 	}
 
@@ -12963,7 +12963,7 @@ CFileNameParamObject::CFileNameParamObject(QObject* parent): ::imtbase::CItemMod
 
 QVariant CFileNameParamObject::GetPathType()
 {
-	if (Version_1_0->pathType.has_value()){
+	if (Version_1_0 && Version_1_0->pathType){
 		return Version_1_0->pathType.value();
 	}
 
@@ -12986,7 +12986,7 @@ bool CFileNameParamObject::hasPathType()
 
 QVariant CFileNameParamObject::GetPath()
 {
-	if (Version_1_0->path.has_value()){
+	if (Version_1_0 && Version_1_0->path){
 		return Version_1_0->path.value();
 	}
 
@@ -13183,7 +13183,7 @@ CParamsSetObject::CParamsSetObject(QObject* parent): ::imtbase::CItemModelBase(p
 
 QVariant CParamsSetObject::GetParamIds()
 {
-	if (Version_1_0->paramIds.has_value()){
+	if (Version_1_0 && Version_1_0->paramIds){
 		QList<QString> tempParamIdsList;
 		for (const auto& tempValue: Version_1_0->paramIds.value()){
 			tempParamIdsList << *tempValue;
@@ -13215,7 +13215,7 @@ bool CParamsSetObject::hasParamIds()
 
 QVariant CParamsSetObject::GetParamTypeIds()
 {
-	if (Version_1_0->paramTypeIds.has_value()){
+	if (Version_1_0 && Version_1_0->paramTypeIds){
 		QList<QString> tempParamTypeIdsList;
 		for (const auto& tempValue: Version_1_0->paramTypeIds.value()){
 			tempParamTypeIdsList << *tempValue;
@@ -13247,7 +13247,7 @@ bool CParamsSetObject::hasParamTypeIds()
 
 QVariant CParamsSetObject::GetParamNames()
 {
-	if (Version_1_0->paramNames.has_value()){
+	if (Version_1_0 && Version_1_0->paramNames){
 		QList<QString> tempParamNamesList;
 		for (const auto& tempValue: Version_1_0->paramNames.value()){
 			tempParamNamesList << *tempValue;
@@ -13279,7 +13279,7 @@ bool CParamsSetObject::hasParamNames()
 
 QVariant CParamsSetObject::GetParamDescriptions()
 {
-	if (Version_1_0->paramDescriptions.has_value()){
+	if (Version_1_0 && Version_1_0->paramDescriptions){
 		QList<QString> tempParamDescriptionsList;
 		for (const auto& tempValue: Version_1_0->paramDescriptions.value()){
 			tempParamDescriptionsList << *tempValue;
@@ -13311,7 +13311,7 @@ bool CParamsSetObject::hasParamDescriptions()
 
 QVariant CParamsSetObject::GetParameters()
 {
-	if (Version_1_0->parameters.has_value()){
+	if (Version_1_0 && Version_1_0->parameters){
 		QList<QString> tempParametersList;
 		for (const auto& tempValue: Version_1_0->parameters.value()){
 			tempParametersList << *tempValue;
@@ -13535,7 +13535,7 @@ CMimeTypeObject::CMimeTypeObject(QObject* parent): ::imtbase::CItemModelBase(par
 
 QVariant CMimeTypeObject::GetType()
 {
-	if (Version_1_0->type.has_value()){
+	if (Version_1_0 && Version_1_0->type){
 		return Version_1_0->type.value();
 	}
 
@@ -13558,7 +13558,7 @@ bool CMimeTypeObject::hasType()
 
 QVariant CMimeTypeObject::GetTree()
 {
-	if (Version_1_0->tree.has_value()){
+	if (Version_1_0 && Version_1_0->tree){
 		QList<QString> tempTreeList;
 		for (const auto& tempValue: Version_1_0->tree.value()){
 			tempTreeList << *tempValue;
@@ -13590,7 +13590,7 @@ bool CMimeTypeObject::hasTree()
 
 QVariant CMimeTypeObject::GetSubType()
 {
-	if (Version_1_0->subType.has_value()){
+	if (Version_1_0 && Version_1_0->subType){
 		return Version_1_0->subType.value();
 	}
 
@@ -13613,7 +13613,7 @@ bool CMimeTypeObject::hasSubType()
 
 QVariant CMimeTypeObject::GetSuffix()
 {
-	if (Version_1_0->suffix.has_value()){
+	if (Version_1_0 && Version_1_0->suffix){
 		return Version_1_0->suffix.value();
 	}
 
@@ -13636,7 +13636,7 @@ bool CMimeTypeObject::hasSuffix()
 
 QVariant CMimeTypeObject::GetParameters()
 {
-	if (Version_1_0->parameters.has_value()){
+	if (Version_1_0 && Version_1_0->parameters){
 		QList<QString> tempParametersList;
 		for (const auto& tempValue: Version_1_0->parameters.value()){
 			tempParametersList << *tempValue;
