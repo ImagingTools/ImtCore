@@ -42,10 +42,7 @@ imtgql::IGqlContextUniquePtr CGqlContextCreatorComp::CreateGqlContext(
 	gqlContextPtr->SetHeaders(headers);
 	gqlContextPtr->SetProductId(productId);
 
-	istd::IChangeableUniquePtr clonedContextPtr = gqlContextPtr->CloneMe();
-	imtgql::IGqlContextUniquePtr castedContextPtr;
-	castedContextPtr.MoveCastedPtr(clonedContextPtr);
-	imtgql::CGqlRequestContextManager::SetContext(castedContextPtr.PopInterfacePtr());
+	imtgql::CGqlRequestContextManager::SetContext(dynamic_cast<imtgql::IGqlContext*>(gqlContextPtr.GetPtr()));
 
 	if (m_userCollectionCompPtr.IsValid() && !userId.isEmpty()){
 		imtbase::IObjectCollection::DataPtr userDataPtr;
