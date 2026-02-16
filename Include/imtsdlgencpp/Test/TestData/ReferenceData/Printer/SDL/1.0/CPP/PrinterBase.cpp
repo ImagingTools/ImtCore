@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include "PrinterBase.h"
 
 
@@ -2051,7 +2050,7 @@ CPrinterSpecificationBaseObject::CPrinterSpecificationBaseObject(QObject* parent
 
 QVariant CPrinterSpecificationBaseObject::GetName()
 {
-	if (Version_1_0->name.has_value()){
+	if (Version_1_0 && Version_1_0->name){
 		return Version_1_0->name.value();
 	}
 
@@ -2238,7 +2237,7 @@ CLinkObject::CLinkObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 
 QVariant CLinkObject::GetLink()
 {
-	if (Version_1_0->link.has_value()){
+	if (Version_1_0 && Version_1_0->link){
 		return Version_1_0->link.value();
 	}
 
@@ -2428,7 +2427,7 @@ CPrinterBaseObject::CPrinterBaseObject(QObject* parent): ::imtbase::CItemModelBa
 
 QVariant CPrinterBaseObject::GetName()
 {
-	if (Version_1_0->name.has_value()){
+	if (Version_1_0 && Version_1_0->name){
 		return Version_1_0->name.value();
 	}
 
@@ -2451,7 +2450,7 @@ bool CPrinterBaseObject::hasName()
 
 QVariant CPrinterBaseObject::GetSpecification()
 {
-	if (Version_1_0->specification.has_value()){
+	if (Version_1_0 && Version_1_0->specification){
 		if (m_specificationQObjectPtr.isValid()){
 			if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>((Version_1_0->specification).GetPtr())){
 				CPrinterSpecificationBaseObject *newObjectPtr = new CPrinterSpecificationBaseObject(this);
@@ -2515,7 +2514,7 @@ void CPrinterBaseObject::ResetSpecification()
 
 QVariant CPrinterBaseObject::GetSimpleTest()
 {
-	if (Version_1_0->simpleTest.has_value()){
+	if (Version_1_0 && Version_1_0->simpleTest){
 		if (m_simpleTestQObjectPtr.isValid()){
 			if (const QString* val = std::get_if<QString>((Version_1_0->simpleTest).GetPtr())){
 				m_simpleTestQObjectPtr = QVariant::fromValue(val);
@@ -2575,7 +2574,7 @@ void CPrinterBaseObject::ResetSimpleTest()
 
 QVariant CPrinterBaseObject::GetMixedTest()
 {
-	if (Version_1_0->mixedTest.has_value()){
+	if (Version_1_0 && Version_1_0->mixedTest){
 		if (m_mixedTestQObjectPtr.isValid()){
 			if (const QString* val = std::get_if<QString>((Version_1_0->mixedTest).GetPtr())){
 				m_mixedTestQObjectPtr = QVariant::fromValue(val);
@@ -2819,7 +2818,7 @@ CPrinterListObject::CPrinterListObject(QObject* parent): ::imtbase::CItemModelBa
 
 QVariant CPrinterListObject::GetData()
 {
-	if (Version_1_0->data.has_value()){
+	if (Version_1_0 && Version_1_0->data){
 		if (!m_dataQObjectPtr.isValid()){
 			m_dataQObjectPtr = CreateObject("data");
 			auto itemPtr = m_dataQObjectPtr.value<sdl::modsdl::PrinterBase::CPrinterBaseObjectList*>();

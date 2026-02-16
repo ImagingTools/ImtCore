@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include "ComplexCollectionFilter.h"
 
 
@@ -3381,7 +3380,7 @@ CTimeFilterObject::CTimeFilterObject(QObject* parent): ::imtbase::CItemModelBase
 
 QVariant CTimeFilterObject::GetTimeRange()
 {
-	if (Version_1_0->timeRange.has_value()){
+	if (Version_1_0 && Version_1_0->timeRange){
 		if (!m_timeRangeQObjectPtr.isValid()){
 			m_timeRangeQObjectPtr = CreateObject("timeRange");
 			auto itemPtr = m_timeRangeQObjectPtr.value<sdl::imtbase::ImtBaseTypes::CTimeRangeObject*>();
@@ -3434,7 +3433,7 @@ void CTimeFilterObject::ResetTimeRange()
 
 QVariant CTimeFilterObject::GetTimeUnit()
 {
-	if (Version_1_0->timeUnit.has_value()){
+	if (Version_1_0 && Version_1_0->timeUnit){
 		return Version_1_0->timeUnit.value();
 	}
 
@@ -3457,7 +3456,7 @@ bool CTimeFilterObject::hasTimeUnit()
 
 QVariant CTimeFilterObject::GetInterpretationMode()
 {
-	if (Version_1_0->interpretationMode.has_value()){
+	if (Version_1_0 && Version_1_0->interpretationMode){
 		return Version_1_0->interpretationMode.value();
 	}
 
@@ -3480,7 +3479,7 @@ bool CTimeFilterObject::hasInterpretationMode()
 
 QVariant CTimeFilterObject::GetUnitMultiplier()
 {
-	if (Version_1_0->unitMultiplier.has_value()){
+	if (Version_1_0 && Version_1_0->unitMultiplier){
 		return Version_1_0->unitMultiplier.value();
 	}
 
@@ -3689,7 +3688,7 @@ CFieldSortingInfoObject::CFieldSortingInfoObject(QObject* parent): ::imtbase::CI
 
 QVariant CFieldSortingInfoObject::GetFieldId()
 {
-	if (Version_1_0->fieldId.has_value()){
+	if (Version_1_0 && Version_1_0->fieldId){
 		return Version_1_0->fieldId.value();
 	}
 
@@ -3712,7 +3711,7 @@ bool CFieldSortingInfoObject::hasFieldId()
 
 QVariant CFieldSortingInfoObject::GetSortingOrder()
 {
-	if (Version_1_0->sortingOrder.has_value()){
+	if (Version_1_0 && Version_1_0->sortingOrder){
 		return Version_1_0->sortingOrder.value();
 	}
 
@@ -3908,7 +3907,7 @@ CFieldFilterObject::CFieldFilterObject(QObject* parent): ::imtbase::CItemModelBa
 
 QVariant CFieldFilterObject::GetFieldId()
 {
-	if (Version_1_0->fieldId.has_value()){
+	if (Version_1_0 && Version_1_0->fieldId){
 		return Version_1_0->fieldId.value();
 	}
 
@@ -3931,7 +3930,7 @@ bool CFieldFilterObject::hasFieldId()
 
 QVariant CFieldFilterObject::GetFilterValue()
 {
-	if (Version_1_0->filterValue.has_value()){
+	if (Version_1_0 && Version_1_0->filterValue){
 		return Version_1_0->filterValue.value();
 	}
 
@@ -3954,7 +3953,7 @@ bool CFieldFilterObject::hasFilterValue()
 
 QVariant CFieldFilterObject::GetFilterValueType()
 {
-	if (Version_1_0->filterValueType.has_value()){
+	if (Version_1_0 && Version_1_0->filterValueType){
 		sdl::imtbase::ComplexCollectionFilter::ValueType valueType = Version_1_0->filterValueType.value();
 		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::imtbase::ComplexCollectionFilter::ValueType>();
 		QString retval = metaEnum.valueToKey((int)valueType);
@@ -3986,7 +3985,7 @@ bool CFieldFilterObject::hasFilterValueType()
 
 QVariant CFieldFilterObject::GetFilterOperations()
 {
-	if (Version_1_0->filterOperations.has_value()){
+	if (Version_1_0 && Version_1_0->filterOperations){
 		
 	}
 
@@ -4193,7 +4192,7 @@ CGroupFilterObject::CGroupFilterObject(QObject* parent): ::imtbase::CItemModelBa
 
 QVariant CGroupFilterObject::GetFieldFilters()
 {
-	if (Version_1_0->fieldFilters.has_value()){
+	if (Version_1_0 && Version_1_0->fieldFilters){
 		if (!m_fieldFiltersQObjectPtr.isValid()){
 			m_fieldFiltersQObjectPtr = CreateObject("fieldFilters");
 			auto itemPtr = m_fieldFiltersQObjectPtr.value<sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList*>();
@@ -4253,7 +4252,7 @@ QVariant CGroupFilterObject::createFieldFiltersArrayElement(const QVariant& v)
 
 QVariant CGroupFilterObject::GetGroupFilters()
 {
-	if (Version_1_0->groupFilters.has_value()){
+	if (Version_1_0 && Version_1_0->groupFilters){
 		if (!m_groupFiltersQObjectPtr.isValid()){
 			m_groupFiltersQObjectPtr = CreateObject("groupFilters");
 			auto itemPtr = m_groupFiltersQObjectPtr.value<sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList*>();
@@ -4313,7 +4312,7 @@ QVariant CGroupFilterObject::createGroupFiltersArrayElement(const QVariant& v)
 
 QVariant CGroupFilterObject::GetLogicalOperation()
 {
-	if (Version_1_0->logicalOperation.has_value()){
+	if (Version_1_0 && Version_1_0->logicalOperation){
 		sdl::imtbase::ComplexCollectionFilter::LogicalOperation valueType = Version_1_0->logicalOperation.value();
 		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::imtbase::ComplexCollectionFilter::LogicalOperation>();
 		QString retval = metaEnum.valueToKey((int)valueType);
@@ -4530,7 +4529,7 @@ CComplexCollectionFilterObject::CComplexCollectionFilterObject(QObject* parent):
 
 QVariant CComplexCollectionFilterObject::GetSortingInfo()
 {
-	if (Version_1_0->sortingInfo.has_value()){
+	if (Version_1_0 && Version_1_0->sortingInfo){
 		if (!m_sortingInfoQObjectPtr.isValid()){
 			m_sortingInfoQObjectPtr = CreateObject("sortingInfo");
 			auto itemPtr = m_sortingInfoQObjectPtr.value<sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList*>();
@@ -4590,7 +4589,7 @@ QVariant CComplexCollectionFilterObject::createSortingInfoArrayElement(const QVa
 
 QVariant CComplexCollectionFilterObject::GetFieldsFilter()
 {
-	if (Version_1_0->fieldsFilter.has_value()){
+	if (Version_1_0 && Version_1_0->fieldsFilter){
 		if (!m_fieldsFilterQObjectPtr.isValid()){
 			m_fieldsFilterQObjectPtr = CreateObject("fieldsFilter");
 			auto itemPtr = m_fieldsFilterQObjectPtr.value<sdl::imtbase::ComplexCollectionFilter::CGroupFilterObject*>();
@@ -4643,7 +4642,7 @@ void CComplexCollectionFilterObject::ResetFieldsFilter()
 
 QVariant CComplexCollectionFilterObject::GetTimeFilter()
 {
-	if (Version_1_0->timeFilter.has_value()){
+	if (Version_1_0 && Version_1_0->timeFilter){
 		if (!m_timeFilterQObjectPtr.isValid()){
 			m_timeFilterQObjectPtr = CreateObject("timeFilter");
 			auto itemPtr = m_timeFilterQObjectPtr.value<sdl::imtbase::ComplexCollectionFilter::CTimeFilterObject*>();
@@ -4696,7 +4695,7 @@ void CComplexCollectionFilterObject::ResetTimeFilter()
 
 QVariant CComplexCollectionFilterObject::GetDistinctFields()
 {
-	if (Version_1_0->distinctFields.has_value()){
+	if (Version_1_0 && Version_1_0->distinctFields){
 		QList<QString> tempDistinctFieldsList;
 		for (const auto& tempValue: Version_1_0->distinctFields.value()){
 			tempDistinctFieldsList << *tempValue;

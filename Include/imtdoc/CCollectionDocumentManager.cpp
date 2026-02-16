@@ -206,29 +206,28 @@ QByteArray CCollectionDocumentManager::OpenDocument(const QByteArray& userId, co
 
 IDocumentManager::OperationStatus CCollectionDocumentManager::GetDocumentName(const QByteArray& userId, const QByteArray& documentId, QString& documentName) const
 {
-	OperationStatus retVal;
 
 	QMutexLocker locker(&m_mutex);
 
-	if (!ValidateInputParams(userId, documentId, retVal)){
-		return retVal;
+	OperationStatus validationStatus;
+	if (!ValidateInputParams(userId, documentId, validationStatus)){
+		return validationStatus;
 	}
 
 	documentName = m_userDocuments[userId][documentId].name;
 
-	return retVal;
+	return OS_OK;
 }
 
 
 IDocumentManager::OperationStatus CCollectionDocumentManager::SetDocumentName(const QByteArray& userId, const QByteArray& documentId, const QString& documentName)
 {
-	OperationStatus retVal;
-
 	WorkingDocument* workingDocumentPtr = nullptr;
 	{
 		QMutexLocker locker(&m_mutex);
-		if (!ValidateInputParams(userId, documentId, retVal)){
-			return retVal;
+		OperationStatus validationStatus;
+		if (!ValidateInputParams(userId, documentId, validationStatus)){
+			return validationStatus;
 		}
 
 		workingDocumentPtr = &m_userDocuments[userId][documentId];
@@ -293,12 +292,10 @@ const istd::IChangeable* CCollectionDocumentManager::GetDocumentPtr(const QByteA
 
 IDocumentManager::OperationStatus CCollectionDocumentManager::GetDocumentData(const QByteArray& userId, const QByteArray& documentId, istd::IChangeableSharedPtr& documentPtr) const
 {
-	OperationStatus retVal = OS_FAILED;
-
 	QMutexLocker locker(&m_mutex);
-
-	if (!ValidateInputParams(userId, documentId, retVal)){
-		return retVal;
+	OperationStatus validationStatus;
+	if (!ValidateInputParams(userId, documentId, validationStatus)){
+		return validationStatus;
 	}
 
 	WorkingDocument& workingDocument = m_userDocuments[userId][documentId];
@@ -312,45 +309,43 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::GetDocumentData(co
 		return OS_FAILED;
 	}
 
-	return retVal;
+	return OS_OK;
 }
 
 
 IDocumentManager::OperationStatus CCollectionDocumentManager::SetDocumentData(const QByteArray& userId, const QByteArray& documentId, const istd::IChangeable& document)
 {
-	OperationStatus retVal;
-
+	
 	WorkingDocument* workingDocumentPtr = nullptr;
 	{
 		QMutexLocker locker(&m_mutex);
-		if (!ValidateInputParams(userId, documentId, retVal)){
-			return retVal;
+		OperationStatus validationStatus;
+		if (!ValidateInputParams(userId, documentId, validationStatus)){
+			return validationStatus;
 		}
 
 		workingDocumentPtr = &m_userDocuments[userId][documentId];
 	}
 
-	bool res = workingDocumentPtr->objectPtr->CopyFrom(document);
+	bool isCopySuccessful = workingDocumentPtr->objectPtr->CopyFrom(document);
 
-	return res ? OS_OK : OS_FAILED;
+	return isCopySuccessful ? OS_OK : OS_FAILED;
 }
 
 
 IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
 	const QByteArray& userId, const QByteArray& documentId, const QString& documentName)
 {
-	OperationStatus retVal;
-
 	imtbase::IObjectCollection* collectionPtr = GetCollection();
 	if (collectionPtr == nullptr) {
 		return OS_FAILED;
 	}
-
 	WorkingDocument* workingDocumentPtr = nullptr;
 	{
 		QMutexLocker locker(&m_mutex);
-		if (!ValidateInputParams(userId, documentId, retVal)){
-			return retVal;
+		OperationStatus validationStatus;
+		if (!ValidateInputParams(userId, documentId, validationStatus)){
+			return validationStatus;
 		}
 
 		workingDocumentPtr = &m_userDocuments[userId][documentId];
@@ -466,18 +461,16 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
 IDocumentManager::OperationStatus CCollectionDocumentManager::CloseDocument(
 	const QByteArray& userId, const QByteArray& documentId)
 {
-	OperationStatus retVal;
-
 	QByteArray typeId;
 	QByteArray objectId;
 	QString name;
 	bool isDirty = false;
-
 	WorkingDocument* workingDocumentPtr = nullptr;
 	{
 		QMutexLocker locker(&m_mutex);
-		if (!ValidateInputParams(userId, documentId, retVal)){
-			return retVal;
+		OperationStatus validationStatus;
+		if (!ValidateInputParams(userId, documentId, validationStatus)){
+			return validationStatus;
 		}
 
 		workingDocumentPtr = &m_userDocuments[userId][documentId];
@@ -529,12 +522,10 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::GetDocumentUndoMan
 {
 	undoManagerPtr = nullptr;
 
-	OperationStatus retVal;
-
 	QMutexLocker locker(&m_mutex);
-
-	if (!ValidateInputParams(userId, documentId, retVal)){
-		return retVal;
+	OperationStatus validationStatus;
+	if (!ValidateInputParams(userId, documentId, validationStatus)){
+		return validationStatus;
 	}
 
 	undoManagerPtr = m_userDocuments[userId][documentId].undoManagerPtr.GetPtr();
@@ -550,9 +541,9 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::RegisterDocumentOb
 	{
 		QMutexLocker locker(&m_mutex);
 
-		OperationStatus retVal;
-		if (!ValidateInputParams(userId, documentId, retVal)){
-			return retVal;
+		OperationStatus validationStatus;
+		if (!ValidateInputParams(userId, documentId, validationStatus)){
+			return validationStatus;
 		}
 
 		objectPtr = m_userDocuments[userId][documentId].objectPtr;
@@ -567,7 +558,9 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::RegisterDocumentOb
 		return OS_FAILED;
 	}
 
-	return modelPtr->AttachObserver(&observer) ? OS_OK : OS_FAILED;
+	bool isObserverAttached = modelPtr->AttachObserver(&observer);
+
+	return isObserverAttached ? OS_OK : OS_FAILED;
 }
 
 
@@ -578,9 +571,9 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::UnregisterDocument
 	{
 		QMutexLocker locker(&m_mutex);
 
-		OperationStatus retVal;
-		if (!ValidateInputParams(userId, documentId, retVal)){
-			return retVal;
+		OperationStatus validationStatus;
+		if (!ValidateInputParams(userId, documentId, validationStatus)){
+			return validationStatus;
 		}
 
 		objectPtr = m_userDocuments[userId][documentId].objectPtr;

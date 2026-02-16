@@ -233,6 +233,10 @@ class Item extends QtObject {
         
     }
 
+    SLOT_objectNameChanged(oldValue, newValue){
+        this.__DOM.setAttribute('objectName', newValue)
+    }
+
     SLOT_focusChanged(oldValue, newValue){
         if(newValue){
             let tree = this.__getTree()

@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include "ComplexUnion2.h"
 
 
@@ -15270,7 +15269,7 @@ CResultObject::CResultObject(QObject* parent): ::imtbase::CItemModelBase(parent)
 
 QVariant CResultObject::GetAreaResult()
 {
-	if (Version_1_0->AreaResult.has_value()){
+	if (Version_1_0 && Version_1_0->AreaResult){
 		sdl::complextest::ComplexUnion1::StatusCode valueType = Version_1_0->AreaResult.value();
 		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::ComplexUnion1::StatusCode>();
 		QString retval = metaEnum.valueToKey((int)valueType);
@@ -15302,7 +15301,7 @@ bool CResultObject::hasAreaResult()
 
 QVariant CResultObject::GetExpectedMinValue()
 {
-	if (Version_1_0->ExpectedMinValue.has_value()){
+	if (Version_1_0 && Version_1_0->ExpectedMinValue){
 		return Version_1_0->ExpectedMinValue.value();
 	}
 
@@ -15325,7 +15324,7 @@ bool CResultObject::hasExpectedMinValue()
 
 QVariant CResultObject::GetExpectedMaxValue()
 {
-	if (Version_1_0->ExpectedMaxValue.has_value()){
+	if (Version_1_0 && Version_1_0->ExpectedMaxValue){
 		return Version_1_0->ExpectedMaxValue.value();
 	}
 
@@ -15348,7 +15347,7 @@ bool CResultObject::hasExpectedMaxValue()
 
 QVariant CResultObject::GetMeasuredValue()
 {
-	if (Version_1_0->MeasuredValue.has_value()){
+	if (Version_1_0 && Version_1_0->MeasuredValue){
 		return Version_1_0->MeasuredValue.value();
 	}
 
@@ -15371,7 +15370,7 @@ bool CResultObject::hasMeasuredValue()
 
 QVariant CResultObject::GetMinMeasuredValue()
 {
-	if (Version_1_0->MinMeasuredValue.has_value()){
+	if (Version_1_0 && Version_1_0->MinMeasuredValue){
 		return Version_1_0->MinMeasuredValue.value();
 	}
 
@@ -15394,7 +15393,7 @@ bool CResultObject::hasMinMeasuredValue()
 
 QVariant CResultObject::GetMaxMeasuredValue()
 {
-	if (Version_1_0->MaxMeasuredValue.has_value()){
+	if (Version_1_0 && Version_1_0->MaxMeasuredValue){
 		return Version_1_0->MaxMeasuredValue.value();
 	}
 
@@ -15417,7 +15416,7 @@ bool CResultObject::hasMaxMeasuredValue()
 
 QVariant CResultObject::GetMeanMeasuredValue()
 {
-	if (Version_1_0->MeanMeasuredValue.has_value()){
+	if (Version_1_0 && Version_1_0->MeanMeasuredValue){
 		return Version_1_0->MeanMeasuredValue.value();
 	}
 
@@ -15440,7 +15439,7 @@ bool CResultObject::hasMeanMeasuredValue()
 
 QVariant CResultObject::GetMeasurementType()
 {
-	if (Version_1_0->MeasurementType.has_value()){
+	if (Version_1_0 && Version_1_0->MeasurementType){
 		sdl::complextest::ComplexUnion1::MeasurementType valueType = Version_1_0->MeasurementType.value();
 		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::ComplexUnion1::MeasurementType>();
 		QString retval = metaEnum.valueToKey((int)valueType);
@@ -15472,7 +15471,7 @@ bool CResultObject::hasMeasurementType()
 
 QVariant CResultObject::GetMeasurementUnit()
 {
-	if (Version_1_0->MeasurementUnit.has_value()){
+	if (Version_1_0 && Version_1_0->MeasurementUnit){
 		sdl::complextest::ComplexUnion1::MeasurementUnit valueType = Version_1_0->MeasurementUnit.value();
 		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::ComplexUnion1::MeasurementUnit>();
 		QString retval = metaEnum.valueToKey((int)valueType);
@@ -15504,7 +15503,7 @@ bool CResultObject::hasMeasurementUnit()
 
 QVariant CResultObject::GetLength()
 {
-	if (Version_1_0->Length.has_value()){
+	if (Version_1_0 && Version_1_0->Length){
 		return Version_1_0->Length.value();
 	}
 
@@ -15527,7 +15526,7 @@ bool CResultObject::hasLength()
 
 QVariant CResultObject::GetErrorType()
 {
-	if (Version_1_0->ErrorType.has_value()){
+	if (Version_1_0 && Version_1_0->ErrorType){
 		sdl::complextest::ComplexUnion1::ErrorCode valueType = Version_1_0->ErrorType.value();
 		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::ComplexUnion1::ErrorCode>();
 		QString retval = metaEnum.valueToKey((int)valueType);
@@ -15559,7 +15558,7 @@ bool CResultObject::hasErrorType()
 
 QVariant CResultObject::GetGeometry()
 {
-	if (Version_1_0->Geometry.has_value()){
+	if (Version_1_0 && Version_1_0->Geometry){
 		if (!m_geometryQObjectPtr.isValid()){
 			m_geometryQObjectPtr = CreateObject("Geometry");
 			auto itemPtr = m_geometryQObjectPtr.value<sdl::complextest::ComplexUnion1::CGeometryObject*>();
@@ -15849,7 +15848,7 @@ CAreaObject::CAreaObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 
 QVariant CAreaObject::GetAreaName()
 {
-	if (Version_1_0->AreaName.has_value()){
+	if (Version_1_0 && Version_1_0->AreaName){
 		return Version_1_0->AreaName.value();
 	}
 
@@ -15872,7 +15871,7 @@ bool CAreaObject::hasAreaName()
 
 QVariant CAreaObject::GetStatus()
 {
-	if (Version_1_0->Status.has_value()){
+	if (Version_1_0 && Version_1_0->Status){
 		sdl::complextest::ComplexUnion1::StatusCode valueType = Version_1_0->Status.value();
 		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::ComplexUnion1::StatusCode>();
 		QString retval = metaEnum.valueToKey((int)valueType);
@@ -15904,7 +15903,7 @@ bool CAreaObject::hasStatus()
 
 QVariant CAreaObject::GetIconPosition()
 {
-	if (Version_1_0->IconPosition.has_value()){
+	if (Version_1_0 && Version_1_0->IconPosition){
 		if (!m_iconPositionQObjectPtr.isValid()){
 			m_iconPositionQObjectPtr = CreateObject("IconPosition");
 			auto itemPtr = m_iconPositionQObjectPtr.value<sdl::complextest::ComplexUnion1::CPointObject*>();
@@ -15957,7 +15956,7 @@ void CAreaObject::ResetIconPosition()
 
 QVariant CAreaObject::GetErrorType()
 {
-	if (Version_1_0->ErrorType.has_value()){
+	if (Version_1_0 && Version_1_0->ErrorType){
 		sdl::complextest::ComplexUnion1::ErrorCode valueType = Version_1_0->ErrorType.value();
 		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::ComplexUnion1::ErrorCode>();
 		QString retval = metaEnum.valueToKey((int)valueType);
@@ -15989,7 +15988,7 @@ bool CAreaObject::hasErrorType()
 
 QVariant CAreaObject::GetResults()
 {
-	if (Version_1_0->Results.has_value()){
+	if (Version_1_0 && Version_1_0->Results){
 		if (!m_resultsQObjectPtr.isValid()){
 			m_resultsQObjectPtr = CreateObject("Results");
 			auto itemPtr = m_resultsQObjectPtr.value<sdl::complextest::ComplexUnion2::CResultObjectList*>();
@@ -16245,7 +16244,7 @@ CAnalyzerObject::CAnalyzerObject(QObject* parent): ::imtbase::CItemModelBase(par
 
 QVariant CAnalyzerObject::GetAnalyzerName()
 {
-	if (Version_1_0->AnalyzerName.has_value()){
+	if (Version_1_0 && Version_1_0->AnalyzerName){
 		return Version_1_0->AnalyzerName.value();
 	}
 
@@ -16268,7 +16267,7 @@ bool CAnalyzerObject::hasAnalyzerName()
 
 QVariant CAnalyzerObject::GetAnalyzerResult()
 {
-	if (Version_1_0->AnalyzerResult.has_value()){
+	if (Version_1_0 && Version_1_0->AnalyzerResult){
 		sdl::complextest::ComplexUnion1::StatusCode valueType = Version_1_0->AnalyzerResult.value();
 		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::ComplexUnion1::StatusCode>();
 		QString retval = metaEnum.valueToKey((int)valueType);
@@ -16300,7 +16299,7 @@ bool CAnalyzerObject::hasAnalyzerResult()
 
 QVariant CAnalyzerObject::GetAreas()
 {
-	if (Version_1_0->Areas.has_value()){
+	if (Version_1_0 && Version_1_0->Areas){
 		if (!m_areasQObjectPtr.isValid()){
 			m_areasQObjectPtr = CreateObject("Areas");
 			auto itemPtr = m_areasQObjectPtr.value<sdl::complextest::ComplexUnion2::CAreaObjectList*>();
@@ -16543,7 +16542,7 @@ CInspectionObject::CInspectionObject(QObject* parent): ::imtbase::CItemModelBase
 
 QVariant CInspectionObject::GetID()
 {
-	if (Version_1_0->ID.has_value()){
+	if (Version_1_0 && Version_1_0->ID){
 		return Version_1_0->ID.value();
 	}
 
@@ -16566,7 +16565,7 @@ bool CInspectionObject::hasID()
 
 QVariant CInspectionObject::GetTypeID()
 {
-	if (Version_1_0->TypeID.has_value()){
+	if (Version_1_0 && Version_1_0->TypeID){
 		return Version_1_0->TypeID.value();
 	}
 
@@ -16589,7 +16588,7 @@ bool CInspectionObject::hasTypeID()
 
 QVariant CInspectionObject::GetName()
 {
-	if (Version_1_0->Name.has_value()){
+	if (Version_1_0 && Version_1_0->Name){
 		return Version_1_0->Name.value();
 	}
 
@@ -16612,7 +16611,7 @@ bool CInspectionObject::hasName()
 
 QVariant CInspectionObject::GetStatus()
 {
-	if (Version_1_0->Status.has_value()){
+	if (Version_1_0 && Version_1_0->Status){
 		sdl::complextest::ComplexUnion1::StatusCode valueType = Version_1_0->Status.value();
 		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::ComplexUnion1::StatusCode>();
 		QString retval = metaEnum.valueToKey((int)valueType);
@@ -16644,7 +16643,7 @@ bool CInspectionObject::hasStatus()
 
 QVariant CInspectionObject::GetAnalyzers()
 {
-	if (Version_1_0->Analyzers.has_value()){
+	if (Version_1_0 && Version_1_0->Analyzers){
 		if (!m_analyzersQObjectPtr.isValid()){
 			m_analyzersQObjectPtr = CreateObject("Analyzers");
 			auto itemPtr = m_analyzersQObjectPtr.value<sdl::complextest::ComplexUnion2::CAnalyzerObjectList*>();
@@ -16901,7 +16900,7 @@ CProductOverviewObject::CProductOverviewObject(QObject* parent): ::imtbase::CIte
 
 QVariant CProductOverviewObject::GetProductID()
 {
-	if (Version_1_0->ProductID.has_value()){
+	if (Version_1_0 && Version_1_0->ProductID){
 		return Version_1_0->ProductID.value();
 	}
 
@@ -16924,7 +16923,7 @@ bool CProductOverviewObject::hasProductID()
 
 QVariant CProductOverviewObject::GetName()
 {
-	if (Version_1_0->Name.has_value()){
+	if (Version_1_0 && Version_1_0->Name){
 		return Version_1_0->Name.value();
 	}
 
@@ -16947,7 +16946,7 @@ bool CProductOverviewObject::hasName()
 
 QVariant CProductOverviewObject::GetStatus()
 {
-	if (Version_1_0->Status.has_value()){
+	if (Version_1_0 && Version_1_0->Status){
 		sdl::complextest::ComplexUnion1::StatusCode valueType = Version_1_0->Status.value();
 		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::ComplexUnion1::StatusCode>();
 		QString retval = metaEnum.valueToKey((int)valueType);
@@ -16979,7 +16978,7 @@ bool CProductOverviewObject::hasStatus()
 
 QVariant CProductOverviewObject::GetPartSerialNumber()
 {
-	if (Version_1_0->PartSerialNumber.has_value()){
+	if (Version_1_0 && Version_1_0->PartSerialNumber){
 		return Version_1_0->PartSerialNumber.value();
 	}
 
@@ -17002,7 +17001,7 @@ bool CProductOverviewObject::hasPartSerialNumber()
 
 QVariant CProductOverviewObject::GetTimestamp()
 {
-	if (Version_1_0->Timestamp.has_value()){
+	if (Version_1_0 && Version_1_0->Timestamp){
 		return Version_1_0->Timestamp.value();
 	}
 
@@ -17025,7 +17024,7 @@ bool CProductOverviewObject::hasTimestamp()
 
 QVariant CProductOverviewObject::GetProductImage()
 {
-	if (Version_1_0->ProductImage.has_value()){
+	if (Version_1_0 && Version_1_0->ProductImage){
 		return Version_1_0->ProductImage.value();
 	}
 
@@ -17048,7 +17047,7 @@ bool CProductOverviewObject::hasProductImage()
 
 QVariant CProductOverviewObject::GetInspections()
 {
-	if (Version_1_0->Inspections.has_value()){
+	if (Version_1_0 && Version_1_0->Inspections){
 		if (!m_inspectionsQObjectPtr.isValid()){
 			m_inspectionsQObjectPtr = CreateObject("Inspections");
 			auto itemPtr = m_inspectionsQObjectPtr.value<sdl::complextest::ComplexUnion2::CInspectionObjectList*>();
@@ -17312,7 +17311,7 @@ CLocalizedTextObject::CLocalizedTextObject(QObject* parent): ::imtbase::CItemMod
 
 QVariant CLocalizedTextObject::GetText()
 {
-	if (Version_1_0->text.has_value()){
+	if (Version_1_0 && Version_1_0->text){
 		return Version_1_0->text.value();
 	}
 
@@ -17335,7 +17334,7 @@ bool CLocalizedTextObject::hasText()
 
 QVariant CLocalizedTextObject::GetLocale()
 {
-	if (Version_1_0->locale.has_value()){
+	if (Version_1_0 && Version_1_0->locale){
 		return Version_1_0->locale.value();
 	}
 
@@ -17530,7 +17529,7 @@ CCoordinatesObject::CCoordinatesObject(QObject* parent): ::imtbase::CItemModelBa
 
 QVariant CCoordinatesObject::GetX()
 {
-	if (Version_1_0->x.has_value()){
+	if (Version_1_0 && Version_1_0->x){
 		return Version_1_0->x.value();
 	}
 
@@ -17553,7 +17552,7 @@ bool CCoordinatesObject::hasX()
 
 QVariant CCoordinatesObject::GetY()
 {
-	if (Version_1_0->y.has_value()){
+	if (Version_1_0 && Version_1_0->y){
 		return Version_1_0->y.value();
 	}
 
@@ -17576,7 +17575,7 @@ bool CCoordinatesObject::hasY()
 
 QVariant CCoordinatesObject::GetZ()
 {
-	if (Version_1_0->z.has_value()){
+	if (Version_1_0 && Version_1_0->z){
 		return Version_1_0->z.value();
 	}
 
@@ -17776,7 +17775,7 @@ CExtendedMetaDataObject::CExtendedMetaDataObject(QObject* parent): ::imtbase::CI
 
 QVariant CExtendedMetaDataObject::GetKey()
 {
-	if (Version_1_0->key.has_value()){
+	if (Version_1_0 && Version_1_0->key){
 		return Version_1_0->key.value();
 	}
 
@@ -17799,7 +17798,7 @@ bool CExtendedMetaDataObject::hasKey()
 
 QVariant CExtendedMetaDataObject::GetValue()
 {
-	if (Version_1_0->value.has_value()){
+	if (Version_1_0 && Version_1_0->value){
 		if (m_valueQObjectPtr.isValid()){
 			if (const CCoordinates* val = std::get_if<CCoordinates>((Version_1_0->value).GetPtr())){
 				CCoordinatesObject *newObjectPtr = new CCoordinatesObject(this);
@@ -18050,7 +18049,7 @@ CResultMetaDataObject::CResultMetaDataObject(QObject* parent): ::imtbase::CItemM
 
 QVariant CResultMetaDataObject::GetResultId()
 {
-	if (Version_1_0->resultId.has_value()){
+	if (Version_1_0 && Version_1_0->resultId){
 		return Version_1_0->resultId.value();
 	}
 
@@ -18073,7 +18072,7 @@ bool CResultMetaDataObject::hasResultId()
 
 QVariant CResultMetaDataObject::GetCreationTime()
 {
-	if (Version_1_0->creationTime.has_value()){
+	if (Version_1_0 && Version_1_0->creationTime){
 		return Version_1_0->creationTime.value();
 	}
 
@@ -18096,7 +18095,7 @@ bool CResultMetaDataObject::hasCreationTime()
 
 QVariant CResultMetaDataObject::GetPartId()
 {
-	if (Version_1_0->partId.has_value()){
+	if (Version_1_0 && Version_1_0->partId){
 		return Version_1_0->partId.value();
 	}
 
@@ -18119,7 +18118,7 @@ bool CResultMetaDataObject::hasPartId()
 
 QVariant CResultMetaDataObject::GetProductId()
 {
-	if (Version_1_0->productId.has_value()){
+	if (Version_1_0 && Version_1_0->productId){
 		return Version_1_0->productId.value();
 	}
 
@@ -18142,7 +18141,7 @@ bool CResultMetaDataObject::hasProductId()
 
 QVariant CResultMetaDataObject::GetName()
 {
-	if (Version_1_0->name.has_value()){
+	if (Version_1_0 && Version_1_0->name){
 		return Version_1_0->name.value();
 	}
 
@@ -18165,7 +18164,7 @@ bool CResultMetaDataObject::hasName()
 
 QVariant CResultMetaDataObject::GetClassification()
 {
-	if (Version_1_0->classification.has_value()){
+	if (Version_1_0 && Version_1_0->classification){
 		return Version_1_0->classification.value();
 	}
 
@@ -18188,7 +18187,7 @@ bool CResultMetaDataObject::hasClassification()
 
 QVariant CResultMetaDataObject::GetDescription()
 {
-	if (Version_1_0->description.has_value()){
+	if (Version_1_0 && Version_1_0->description){
 		if (!m_descriptionQObjectPtr.isValid()){
 			m_descriptionQObjectPtr = CreateObject("description");
 			auto itemPtr = m_descriptionQObjectPtr.value<sdl::complextest::ComplexUnion2::CLocalizedTextObject*>();
@@ -18241,7 +18240,7 @@ void CResultMetaDataObject::ResetDescription()
 
 QVariant CResultMetaDataObject::GetExtendedMetaData()
 {
-	if (Version_1_0->extendedMetaData.has_value()){
+	if (Version_1_0 && Version_1_0->extendedMetaData){
 		if (!m_extendedMetaDataQObjectPtr.isValid()){
 			m_extendedMetaDataQObjectPtr = CreateObject("extendedMetaData");
 			auto itemPtr = m_extendedMetaDataQObjectPtr.value<sdl::complextest::ComplexUnion2::CExtendedMetaDataObjectList*>();
@@ -18517,7 +18516,7 @@ COverallResultValuesObject::COverallResultValuesObject(QObject* parent): ::imtba
 
 QVariant COverallResultValuesObject::GetName()
 {
-	if (Version_1_0->name.has_value()){
+	if (Version_1_0 && Version_1_0->name){
 		return Version_1_0->name.value();
 	}
 
@@ -18540,7 +18539,7 @@ bool COverallResultValuesObject::hasName()
 
 QVariant COverallResultValuesObject::GetValueId()
 {
-	if (Version_1_0->valueId.has_value()){
+	if (Version_1_0 && Version_1_0->valueId){
 		return Version_1_0->valueId.value();
 	}
 
@@ -18563,7 +18562,7 @@ bool COverallResultValuesObject::hasValueId()
 
 QVariant COverallResultValuesObject::GetMeasuredValue()
 {
-	if (Version_1_0->measuredValue.has_value()){
+	if (Version_1_0 && Version_1_0->measuredValue){
 		return Version_1_0->measuredValue.value();
 	}
 
@@ -18586,7 +18585,7 @@ bool COverallResultValuesObject::hasMeasuredValue()
 
 QVariant COverallResultValuesObject::GetLowLimit()
 {
-	if (Version_1_0->lowLimit.has_value()){
+	if (Version_1_0 && Version_1_0->lowLimit){
 		return Version_1_0->lowLimit.value();
 	}
 
@@ -18609,7 +18608,7 @@ bool COverallResultValuesObject::hasLowLimit()
 
 QVariant COverallResultValuesObject::GetHighLimit()
 {
-	if (Version_1_0->highLimit.has_value()){
+	if (Version_1_0 && Version_1_0->highLimit){
 		return Version_1_0->highLimit.value();
 	}
 
@@ -18822,7 +18821,7 @@ CUnionTestingTypeObject::CUnionTestingTypeObject(QObject* parent): ::imtbase::CI
 
 QVariant CUnionTestingTypeObject::GetSimpleUnion()
 {
-	if (Version_1_0->simpleUnion.has_value()){
+	if (Version_1_0 && Version_1_0->simpleUnion){
 		if (m_simpleUnionQObjectPtr.isValid()){
 			if (const double* val = std::get_if<double>((Version_1_0->simpleUnion).GetPtr())){
 				m_simpleUnionQObjectPtr = QVariant::fromValue(val);
@@ -18888,7 +18887,7 @@ void CUnionTestingTypeObject::ResetSimpleUnion()
 
 QVariant CUnionTestingTypeObject::GetComplexUnion()
 {
-	if (Version_1_0->complexUnion.has_value()){
+	if (Version_1_0 && Version_1_0->complexUnion){
 		if (m_complexUnionQObjectPtr.isValid()){
 			if (const CCDMResultVarString* val = std::get_if<CCDMResultVarString>((Version_1_0->complexUnion).GetPtr())){
 				CCDMResultVarStringObject *newObjectPtr = new CCDMResultVarStringObject(this);
@@ -18952,7 +18951,7 @@ void CUnionTestingTypeObject::ResetComplexUnion()
 
 QVariant CUnionTestingTypeObject::GetMixedUnion()
 {
-	if (Version_1_0->mixedUnion.has_value()){
+	if (Version_1_0 && Version_1_0->mixedUnion){
 		if (m_mixedUnionQObjectPtr.isValid()){
 			if (const CCoordinates* val = std::get_if<CCoordinates>((Version_1_0->mixedUnion).GetPtr())){
 				CCoordinatesObject *newObjectPtr = new CCoordinatesObject(this);
@@ -19206,7 +19205,7 @@ CCDMResultVarRecursiveObject::CCDMResultVarRecursiveObject(QObject* parent): ::i
 
 QVariant CCDMResultVarRecursiveObject::GetDataModelTitle()
 {
-	if (Version_1_0->dataModelTitle.has_value()){
+	if (Version_1_0 && Version_1_0->dataModelTitle){
 		return Version_1_0->dataModelTitle.value();
 	}
 
@@ -19229,7 +19228,7 @@ bool CCDMResultVarRecursiveObject::hasDataModelTitle()
 
 QVariant CCDMResultVarRecursiveObject::GetDataModelVersion()
 {
-	if (Version_1_0->dataModelVersion.has_value()){
+	if (Version_1_0 && Version_1_0->dataModelVersion){
 		return Version_1_0->dataModelVersion.value();
 	}
 
@@ -19252,7 +19251,7 @@ bool CCDMResultVarRecursiveObject::hasDataModelVersion()
 
 QVariant CCDMResultVarRecursiveObject::GetResultMetaData()
 {
-	if (Version_1_0->resultMetaData.has_value()){
+	if (Version_1_0 && Version_1_0->resultMetaData){
 		if (!m_resultMetaDataQObjectPtr.isValid()){
 			m_resultMetaDataQObjectPtr = CreateObject("resultMetaData");
 			auto itemPtr = m_resultMetaDataQObjectPtr.value<sdl::complextest::ComplexUnion2::CResultMetaDataObject*>();
@@ -19305,7 +19304,7 @@ void CCDMResultVarRecursiveObject::ResetResultMetaData()
 
 QVariant CCDMResultVarRecursiveObject::GetResultContent()
 {
-	if (Version_1_0->resultContent.has_value()){
+	if (Version_1_0 && Version_1_0->resultContent){
 		if (!m_resultContentQObjectPtr.isValid()){
 			m_resultContentQObjectPtr = CreateObject("resultContent");
 			auto itemPtr = m_resultContentQObjectPtr.value<sdl::complextest::ComplexUnion2::CCDMResultUnionTypeObjectList*>();
@@ -19358,7 +19357,7 @@ void CCDMResultVarRecursiveObject::ResetResultContent()
 
 QVariant CCDMResultVarRecursiveObject::GetOverallResultValues()
 {
-	if (Version_1_0->overallResultValues.has_value()){
+	if (Version_1_0 && Version_1_0->overallResultValues){
 		if (!m_overallResultValuesQObjectPtr.isValid()){
 			m_overallResultValuesQObjectPtr = CreateObject("overallResultValues");
 			auto itemPtr = m_overallResultValuesQObjectPtr.value<sdl::complextest::ComplexUnion2::COverallResultValuesObjectList*>();
@@ -19619,7 +19618,7 @@ CCDMResultVarStringObject::CCDMResultVarStringObject(QObject* parent): ::imtbase
 
 QVariant CCDMResultVarStringObject::GetDataModelTitle()
 {
-	if (Version_1_0->dataModelTitle.has_value()){
+	if (Version_1_0 && Version_1_0->dataModelTitle){
 		return Version_1_0->dataModelTitle.value();
 	}
 
@@ -19642,7 +19641,7 @@ bool CCDMResultVarStringObject::hasDataModelTitle()
 
 QVariant CCDMResultVarStringObject::GetDataModelVersion()
 {
-	if (Version_1_0->dataModelVersion.has_value()){
+	if (Version_1_0 && Version_1_0->dataModelVersion){
 		return Version_1_0->dataModelVersion.value();
 	}
 
@@ -19665,7 +19664,7 @@ bool CCDMResultVarStringObject::hasDataModelVersion()
 
 QVariant CCDMResultVarStringObject::GetResultMetaData()
 {
-	if (Version_1_0->resultMetaData.has_value()){
+	if (Version_1_0 && Version_1_0->resultMetaData){
 		if (!m_resultMetaDataQObjectPtr.isValid()){
 			m_resultMetaDataQObjectPtr = CreateObject("resultMetaData");
 			auto itemPtr = m_resultMetaDataQObjectPtr.value<sdl::complextest::ComplexUnion2::CResultMetaDataObject*>();
@@ -19718,7 +19717,7 @@ void CCDMResultVarStringObject::ResetResultMetaData()
 
 QVariant CCDMResultVarStringObject::GetResultContent()
 {
-	if (Version_1_0->resultContent.has_value()){
+	if (Version_1_0 && Version_1_0->resultContent){
 		QList<QString> tempResultContentList;
 		for (const auto& tempValue: Version_1_0->resultContent.value()){
 			tempResultContentList << *tempValue;
@@ -19750,7 +19749,7 @@ bool CCDMResultVarStringObject::hasResultContent()
 
 QVariant CCDMResultVarStringObject::GetOverallResultValues()
 {
-	if (Version_1_0->overallResultValues.has_value()){
+	if (Version_1_0 && Version_1_0->overallResultValues){
 		if (!m_overallResultValuesQObjectPtr.isValid()){
 			m_overallResultValuesQObjectPtr = CreateObject("overallResultValues");
 			auto itemPtr = m_overallResultValuesQObjectPtr.value<sdl::complextest::ComplexUnion2::COverallResultValuesObjectList*>();
@@ -20008,7 +20007,7 @@ CCDMResultObject::CCDMResultObject(QObject* parent): ::imtbase::CItemModelBase(p
 
 QVariant CCDMResultObject::GetDataModelTitle()
 {
-	if (Version_1_0->dataModelTitle.has_value()){
+	if (Version_1_0 && Version_1_0->dataModelTitle){
 		return Version_1_0->dataModelTitle.value();
 	}
 
@@ -20031,7 +20030,7 @@ bool CCDMResultObject::hasDataModelTitle()
 
 QVariant CCDMResultObject::GetDataModelVersion()
 {
-	if (Version_1_0->dataModelVersion.has_value()){
+	if (Version_1_0 && Version_1_0->dataModelVersion){
 		return Version_1_0->dataModelVersion.value();
 	}
 
@@ -20054,7 +20053,7 @@ bool CCDMResultObject::hasDataModelVersion()
 
 QVariant CCDMResultObject::GetResultMetaData()
 {
-	if (Version_1_0->resultMetaData.has_value()){
+	if (Version_1_0 && Version_1_0->resultMetaData){
 		if (!m_resultMetaDataQObjectPtr.isValid()){
 			m_resultMetaDataQObjectPtr = CreateObject("resultMetaData");
 			auto itemPtr = m_resultMetaDataQObjectPtr.value<sdl::complextest::ComplexUnion2::CResultMetaDataObject*>();
@@ -20107,7 +20106,7 @@ void CCDMResultObject::ResetResultMetaData()
 
 QVariant CCDMResultObject::GetResultContent()
 {
-	if (Version_1_0->resultContent.has_value()){
+	if (Version_1_0 && Version_1_0->resultContent){
 		if (!m_resultContentQObjectPtr.isValid()){
 			m_resultContentQObjectPtr = CreateObject("resultContent");
 			auto itemPtr = m_resultContentQObjectPtr.value<sdl::complextest::ComplexUnion2::CCDMResultUnionTypeObjectList*>();
@@ -20160,7 +20159,7 @@ void CCDMResultObject::ResetResultContent()
 
 QVariant CCDMResultObject::GetOverallResultValues()
 {
-	if (Version_1_0->overallResultValues.has_value()){
+	if (Version_1_0 && Version_1_0->overallResultValues){
 		if (!m_overallResultValuesQObjectPtr.isValid()){
 			m_overallResultValuesQObjectPtr = CreateObject("overallResultValues");
 			auto itemPtr = m_overallResultValuesQObjectPtr.value<sdl::complextest::ComplexUnion2::COverallResultValuesObjectList*>();
@@ -20417,7 +20416,7 @@ CPointsInCoordinateFormatObject::CPointsInCoordinateFormatObject(QObject* parent
 
 QVariant CPointsInCoordinateFormatObject::GetPointAsCoordinates()
 {
-	if (Version_1_0->pointAsCoordinates.has_value()){
+	if (Version_1_0 && Version_1_0->pointAsCoordinates){
 		return Version_1_0->pointAsCoordinates.value();
 	}
 
@@ -20606,7 +20605,7 @@ CCollectionViewParamsTestObject::CCollectionViewParamsTestObject(QObject* parent
 
 QVariant CCollectionViewParamsTestObject::GetCount()
 {
-	if (Version_1_0->count.has_value()){
+	if (Version_1_0 && Version_1_0->count){
 		return Version_1_0->count.value();
 	}
 
@@ -20629,7 +20628,7 @@ bool CCollectionViewParamsTestObject::hasCount()
 
 QVariant CCollectionViewParamsTestObject::GetOffset()
 {
-	if (Version_1_0->offset.has_value()){
+	if (Version_1_0 && Version_1_0->offset){
 		return Version_1_0->offset.value();
 	}
 
@@ -20652,7 +20651,7 @@ bool CCollectionViewParamsTestObject::hasOffset()
 
 QVariant CCollectionViewParamsTestObject::GetFilterModel()
 {
-	if (Version_1_0->filterModel.has_value()){
+	if (Version_1_0 && Version_1_0->filterModel){
 		if (!m_filterModelQObjectPtr.isValid()){
 			m_filterModelQObjectPtr = CreateObject("filterModel");
 			auto itemPtr = m_filterModelQObjectPtr.value<sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObject*>();

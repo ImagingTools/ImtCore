@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include "UnionTest.h"
 
 
@@ -2625,7 +2624,7 @@ CCoordsObject::CCoordsObject(QObject* parent): ::imtbase::CItemModelBase(parent)
 
 QVariant CCoordsObject::GetX()
 {
-	if (Version_1_0->X.has_value()){
+	if (Version_1_0 && Version_1_0->X){
 		return Version_1_0->X.value();
 	}
 
@@ -2648,7 +2647,7 @@ bool CCoordsObject::hasX()
 
 QVariant CCoordsObject::GetY()
 {
-	if (Version_1_0->Y.has_value()){
+	if (Version_1_0 && Version_1_0->Y){
 		return Version_1_0->Y.value();
 	}
 
@@ -2841,7 +2840,7 @@ CPrinterSpecificationBaseObject::CPrinterSpecificationBaseObject(QObject* parent
 
 QVariant CPrinterSpecificationBaseObject::GetName()
 {
-	if (Version_1_0->name.has_value()){
+	if (Version_1_0 && Version_1_0->name){
 		return Version_1_0->name.value();
 	}
 
@@ -3030,7 +3029,7 @@ CLinkObject::CLinkObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 
 QVariant CLinkObject::GetLink()
 {
-	if (Version_1_0->link.has_value()){
+	if (Version_1_0 && Version_1_0->link){
 		return Version_1_0->link.value();
 	}
 
@@ -3053,7 +3052,7 @@ bool CLinkObject::hasLink()
 
 QVariant CLinkObject::GetStatus()
 {
-	if (Version_1_0->status.has_value()){
+	if (Version_1_0 && Version_1_0->status){
 		sdl::modsdl::UnionTest::LinkStatus valueType = Version_1_0->status.value();
 		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::modsdl::UnionTest::LinkStatus>();
 		QString retval = metaEnum.valueToKey((int)valueType);
@@ -3085,7 +3084,7 @@ bool CLinkObject::hasStatus()
 
 QVariant CLinkObject::GetStatusList()
 {
-	if (Version_1_0->statusList.has_value()){
+	if (Version_1_0 && Version_1_0->statusList){
 		
 	}
 
@@ -3287,7 +3286,7 @@ CPrinterBaseObject::CPrinterBaseObject(QObject* parent): ::imtbase::CItemModelBa
 
 QVariant CPrinterBaseObject::GetName()
 {
-	if (Version_1_0->name.has_value()){
+	if (Version_1_0 && Version_1_0->name){
 		return Version_1_0->name.value();
 	}
 
@@ -3310,7 +3309,7 @@ bool CPrinterBaseObject::hasName()
 
 QVariant CPrinterBaseObject::GetLinkList()
 {
-	if (Version_1_0->linkList.has_value()){
+	if (Version_1_0 && Version_1_0->linkList){
 		if (!m_linkListQObjectPtr.isValid()){
 			m_linkListQObjectPtr = CreateObject("linkList");
 			auto itemPtr = m_linkListQObjectPtr.value<sdl::modsdl::UnionTest::CLinkObjectList*>();
@@ -3370,7 +3369,7 @@ QVariant CPrinterBaseObject::createLinkListArrayElement(const QVariant& v)
 
 QVariant CPrinterBaseObject::GetSpecification()
 {
-	if (Version_1_0->specification.has_value()){
+	if (Version_1_0 && Version_1_0->specification){
 		if (m_specificationQObjectPtr.isValid()){
 			if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>((Version_1_0->specification).GetPtr())){
 				CPrinterSpecificationBaseObject *newObjectPtr = new CPrinterSpecificationBaseObject(this);
@@ -3446,7 +3445,7 @@ void CPrinterBaseObject::ResetSpecification()
 
 QVariant CPrinterBaseObject::GetSpecificationList()
 {
-	if (Version_1_0->specificationList.has_value()){
+	if (Version_1_0 && Version_1_0->specificationList){
 		if (!m_specificationListQObjectPtr.isValid()){
 			m_specificationListQObjectPtr = CreateObject("specificationList");
 			auto itemPtr = m_specificationListQObjectPtr.value<sdl::modsdl::UnionTest::CPrinterSpecificationObjectList*>();

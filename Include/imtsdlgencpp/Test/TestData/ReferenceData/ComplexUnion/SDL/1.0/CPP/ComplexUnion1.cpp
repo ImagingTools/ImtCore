@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include "ComplexUnion1.h"
 
 
@@ -1475,7 +1474,7 @@ CPointObject::CPointObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 
 QVariant CPointObject::GetX()
 {
-	if (Version_1_0->X.has_value()){
+	if (Version_1_0 && Version_1_0->X){
 		return Version_1_0->X.value();
 	}
 
@@ -1498,7 +1497,7 @@ bool CPointObject::hasX()
 
 QVariant CPointObject::GetY()
 {
-	if (Version_1_0->Y.has_value()){
+	if (Version_1_0 && Version_1_0->Y){
 		return Version_1_0->Y.value();
 	}
 
@@ -1695,7 +1694,7 @@ CGeometryObject::CGeometryObject(QObject* parent): ::imtbase::CItemModelBase(par
 
 QVariant CGeometryObject::GetGeometryType()
 {
-	if (Version_1_0->GeometryType.has_value()){
+	if (Version_1_0 && Version_1_0->GeometryType){
 		sdl::complextest::ComplexUnion1::GeometryType valueType = Version_1_0->GeometryType.value();
 		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::ComplexUnion1::GeometryType>();
 		QString retval = metaEnum.valueToKey((int)valueType);
@@ -1727,7 +1726,7 @@ bool CGeometryObject::hasGeometryType()
 
 QVariant CGeometryObject::GetRadius()
 {
-	if (Version_1_0->Radius.has_value()){
+	if (Version_1_0 && Version_1_0->Radius){
 		return Version_1_0->Radius.value();
 	}
 
@@ -1750,7 +1749,7 @@ bool CGeometryObject::hasRadius()
 
 QVariant CGeometryObject::GetPoints()
 {
-	if (Version_1_0->Points.has_value()){
+	if (Version_1_0 && Version_1_0->Points){
 		if (!m_pointsQObjectPtr.isValid()){
 			m_pointsQObjectPtr = CreateObject("Points");
 			auto itemPtr = m_pointsQObjectPtr.value<sdl::complextest::ComplexUnion1::CPointObjectList*>();
@@ -1810,7 +1809,7 @@ QVariant CGeometryObject::createPointsArrayElement(const QVariant& v)
 
 QVariant CGeometryObject::GetRequiredPoints()
 {
-	if (Version_1_0->RequiredPoints.has_value()){
+	if (Version_1_0 && Version_1_0->RequiredPoints){
 		if (!m_requiredPointsQObjectPtr.isValid()){
 			m_requiredPointsQObjectPtr = CreateObject("RequiredPoints");
 			auto itemPtr = m_requiredPointsQObjectPtr.value<sdl::complextest::ComplexUnion1::CPointObjectList*>();
@@ -1870,7 +1869,7 @@ QVariant CGeometryObject::createRequiredPointsArrayElement(const QVariant& v)
 
 QVariant CGeometryObject::GetOptionalPoints()
 {
-	if (Version_1_0->OptionalPoints.has_value()){
+	if (Version_1_0 && Version_1_0->OptionalPoints){
 		if (!m_optionalPointsQObjectPtr.isValid()){
 			m_optionalPointsQObjectPtr = CreateObject("OptionalPoints");
 			auto itemPtr = m_optionalPointsQObjectPtr.value<sdl::complextest::ComplexUnion1::CPointObjectList*>();
