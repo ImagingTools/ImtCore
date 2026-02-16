@@ -9,6 +9,7 @@ class QObject extends QBaseObject {
         objectName: {type:String, value:''},
 
         parentChanged: {type:Signal, args:[]},
+        objectNameChanged: {type:Signal, args:[]},
 
         JQDestruction: {type:Signal, args:[]},
     }
