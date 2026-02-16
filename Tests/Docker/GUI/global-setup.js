@@ -107,7 +107,7 @@ module.exports = async (config) => {
 
         console.log(`✓ Created ${storageState} for ${username}`);
       } catch (error) {
-        console.error(`✗ Failed to authenticate ${username}:`, error.message);
+        console.error(`✗ Failed to authenticate ${username}.`);
         console.error(`  Make sure the application is running at: ${baseURL}`);
         console.error(`  And that the authorization page structure matches the loginPaths configuration.`);
         
