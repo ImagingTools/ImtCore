@@ -206,13 +206,14 @@ QtObject {
 		saved already. The value is stored in \l _defaultValues using a composite
 		key derived from the target object and property name.
 
-		For object-type values, the method handles cloning appropriately:
+		For stored values, the behavior depends on the value type:
 		\list
-		\li Objects with \c toString() method: stores the string representation
-		\li Other objects: performs deep clone via JSON serialization
-		\li Primitive values: stored directly via JSON round-trip
+		\li Primitive JavaScript types (number, string, boolean, null): stored via JSON round-trip and restored as-is.
+		\li Plain JSON-serializable objects and arrays: stored as deep-cloned structures via JSON serialization.
+		\li Other object values (including QML object references or types that only provide \c toString()): stored using their string representation and restored as a string value, not as the original object.
 		\endlist
 
+		\note Non-JSON-serializable objects and QML object references cannot be restored as their original objects; only their string representation is preserved.
 		\param {QtObject} target - The QML object whose property value should be saved.
 		\param {string} prop - The name of the property to save.
 
