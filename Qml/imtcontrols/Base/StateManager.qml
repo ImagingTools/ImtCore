@@ -271,8 +271,17 @@ QtObject {
 	function _resetTargets() {
 		for (let key in _defaultValues) {
 			let data = _defaultValues[key]
-			if (data && data.target) {
-				data.target[data.prop] = data.value
+			if (data && data.target && data.prop !== undefined) {
+				try {
+					// Only attempt to restore if the property still exists on the target
+					if (data.prop in data.target) {
+						data.target[data.prop] = data.value
+					}
+				} catch (e) {
+					// Target may have been destroyed or become invalid; skip restoring
+					console.warn('StateManager: Failed to restore property "' +
+					             data.prop + '" on target during reset:', e)
+				}
 			}
 		}
 		_defaultValues = ({})
