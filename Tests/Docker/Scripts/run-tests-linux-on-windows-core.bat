@@ -73,15 +73,24 @@ echo.
 REM Build volume mount arguments for application directories
 set VOLUME_MOUNTS=
 
-REM Always mount ImtCore entrypoint script from ImtCore
-set IMTCORE_ENTRYPOINT=%IMTCORE_DIR%\Tests\Docker\entrypoint.sh
-if exist "%IMTCORE_ENTRYPOINT%" (
-  set VOLUME_MOUNTS=%VOLUME_MOUNTS% -v "%IMTCORE_ENTRYPOINT%:/app/entrypoint.sh:ro"
-  echo [DEBUG] Mounting ImtCore entrypoint from: %IMTCORE_ENTRYPOINT%
+REM Get ImtCore Docker directory (parent of Scripts folder where this script is located)
+set IMTCORE_DOCKER_DIR=%~dp0..
+for %%i in ("%IMTCORE_DOCKER_DIR%") do set IMTCORE_DOCKER_DIR=%%~fi
+
+REM Check that entrypoint.sh exists
+if not exist "%IMTCORE_DOCKER_DIR%\entrypoint.sh" (
+    echo ERROR: ImtCore entrypoint not found at: %IMTCORE_DOCKER_DIR%\entrypoint.sh
+    exit /b 1
 )
 
+echo [DEBUG] Mounting ImtCore Docker directory from: %IMTCORE_DOCKER_DIR%
+
+REM Always mount ImtCore entrypoint script from ImtCore
+set IMTCORE_ENTRYPOINT=%IMTCORE_DOCKER_DIR%\entrypoint.sh
+set VOLUME_MOUNTS=%VOLUME_MOUNTS% -v "%IMTCORE_ENTRYPOINT%:/app/entrypoint.sh:ro"
+
 REM Always mount ImtCore GUI utilities (utils.js, playwright.config.js, etc.) from ImtCore
-set IMTCORE_GUI_DIR=%IMTCORE_DIR%\Tests\Docker\GUI
+set IMTCORE_GUI_DIR=%IMTCORE_DOCKER_DIR%\GUI
 if exist "%IMTCORE_GUI_DIR%" (
   set VOLUME_MOUNTS=%VOLUME_MOUNTS% -v "%IMTCORE_GUI_DIR%:/app/tests/GUI:ro"
   echo [DEBUG] Mounting ImtCore GUI utilities from: %IMTCORE_GUI_DIR%
@@ -129,7 +138,7 @@ docker run -d ^
   -e CI=true ^
   %VOLUME_MOUNTS% ^
   "%IMAGE_NAME%" ^
-  -lc "sleep infinity"
+  -c "sleep infinity"
 
 if errorlevel 1 (
   echo ERROR: Failed to start container
@@ -140,11 +149,11 @@ docker ps -a --filter "name=%CONTAINER_NAME%"
 
 echo.
 echo [DEBUG] Container mounted directories:
-docker exec "%CONTAINER_NAME%" sh -lc "echo '--- /app/startup ---'; ls -la /app/startup 2>/dev/null || echo '(empty)'; echo '--- /app/tests/GUI ---'; ls -la /app/tests/GUI 2>/dev/null || echo '(empty)'; echo '--- /app/tests/API ---'; ls -la /app/tests/API 2>/dev/null || echo '(empty)'"
+docker exec "%CONTAINER_NAME%" sh -c "echo '--- /app/startup ---'; ls -la /app/startup 2>/dev/null || echo '(empty)'; echo '--- /app/tests/GUI ---'; ls -la /app/tests/GUI 2>/dev/null || echo '(empty)'; echo '--- /app/tests/API ---'; ls -la /app/tests/API 2>/dev/null || echo '(empty)'"
 
 echo.
 echo Running tests (entrypoint)...
-docker exec "%CONTAINER_NAME%" sh -lc "export PAUSE_BEFORE_TESTS=false; /app/entrypoint.sh"
+docker exec "%CONTAINER_NAME%" bash /app/entrypoint.sh
 set EXIT_CODE=%ERRORLEVEL%
 echo [DEBUG] Test run exit code: %EXIT_CODE%
 
