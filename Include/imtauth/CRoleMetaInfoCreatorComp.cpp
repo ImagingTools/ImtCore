@@ -22,7 +22,7 @@ bool CRoleMetaInfoCreatorComp::CreateMetaInfo(
 			const QByteArray& typeId,
 			idoc::MetaInfoPtr& metaInfoPtr) const
 {
-		if (m_objectTypeIdsAttrPtr.FindValue(typeId) < 0){
+	if (m_objectTypeIdsAttrPtr.FindValue(typeId) < 0){
 		return false;
 	}
 
