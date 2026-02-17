@@ -15,8 +15,10 @@ namespace imtlicgql
 
 // protected methods
 
-bool CFeatureMetaInfoDelegateComp::FillRepresentation(QJsonObject& representation, const idoc::IDocumentMetaInfo& metaInfo) const
+bool CFeatureMetaInfoDelegateComp::FillRepresentation(QJsonObject& representation, const idoc::IDocumentMetaInfo& metaInfo, const QByteArray& typeId) const
 {
+	Q_UNUSED(typeId);
+	
 	QByteArray featureId = metaInfo.GetMetaInfo(imtlic::IFeatureInfo::MIT_FEATURE_ID).toByteArray();
 	representation["FeatureId"] = QString(featureId);
 	
@@ -36,8 +38,10 @@ bool CFeatureMetaInfoDelegateComp::FillRepresentation(QJsonObject& representatio
 }
 
 
-bool CFeatureMetaInfoDelegateComp::FillMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const QJsonObject& representation) const
+bool CFeatureMetaInfoDelegateComp::FillMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const QJsonObject& representation, const QByteArray& typeId) const
 {
+	Q_UNUSED(typeId);
+	
 	if (representation.contains("FeatureId")){
 		metaInfo.SetMetaInfo(imtlic::IFeatureInfo::MIT_FEATURE_ID, representation.value("FeatureId"));
 	}

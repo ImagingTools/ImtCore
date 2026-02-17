@@ -15,8 +15,10 @@ namespace imtauthgql
 
 // protected methods
 
-bool CGroupMetaInfoDelegateComp::FillRepresentation(QJsonObject& representation, const idoc::IDocumentMetaInfo& metaInfo) const
+bool CGroupMetaInfoDelegateComp::FillRepresentation(QJsonObject& representation, const idoc::IDocumentMetaInfo& metaInfo, const QByteArray& typeId) const
 {
+	Q_UNUSED(typeId);
+	
 	QByteArray id = metaInfo.GetMetaInfo(imtauth::IUserGroupInfo::MIT_ID).toByteArray();
 	representation["GroupId"] = QString(id);
 	
@@ -30,8 +32,10 @@ bool CGroupMetaInfoDelegateComp::FillRepresentation(QJsonObject& representation,
 }
 
 
-bool CGroupMetaInfoDelegateComp::FillMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const QJsonObject& representation) const
+bool CGroupMetaInfoDelegateComp::FillMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const QJsonObject& representation, const QByteArray& typeId) const
 {
+	Q_UNUSED(typeId);
+	
 	if (representation.contains("GroupId")){
 		metaInfo.SetMetaInfo(imtauth::IUserGroupInfo::MIT_ID, representation.value("GroupId"));
 	}
