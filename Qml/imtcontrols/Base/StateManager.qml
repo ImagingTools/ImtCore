@@ -219,43 +219,42 @@ QtObject {
 	 */
 	function _saveDefault(target, prop) {
 		let key = target.toString() + '<.>' + prop
+		if (key in _defaultValues) {
+			return
+		}
 
-		if (!(key in _defaultValues)) {
-			let value = target[prop]
-			let storedValue = value
+		let value = target[prop]
+		let storedValue = value
 
-			// Guard against undefined and handle JSON-serializable values via deep clone
-			if (value !== undefined) {
-				let json
-				try {
-					json = JSON.stringify(value)
-				} catch (e) {
-					json = undefined
+		// Guard against undefined and handle JSON-serializable values via deep clone
+		if (value !== undefined) {
+			let json
+			try {json = JSON.stringify(value)} 
+			catch (e) {json = undefined}
+
+			if (json !== undefined) {
+				// JSON-serializable: deep-clone via JSON round-trip
+				try {storedValue = JSON.parse(json)} 
+				catch (e) {
+					// If JSON parsing fails, fall back to original value
+					storedValue = value
 				}
-
-				if (json !== undefined) {
-					// JSON-serializable: deep-clone via JSON round-trip
-					try {
-						storedValue = JSON.parse(json)
-					} catch (e) {
-						// If JSON parsing fails, fall back to original value
-						storedValue = value
-					}
-				} else {
-					// Non-JSON-serializable values (e.g., QML objects)
-					if (typeof value === "object" && value !== null && value.toString) {
-						storedValue = value.toString()
-					} else {
-						storedValue = value
-					}
+			} 
+			else {
+				// Non-JSON-serializable values (e.g., QML objects)
+				if (typeof value === "object" && value !== null && value.toString) {
+					storedValue = value.toString()
+				} 
+				else {
+					storedValue = value
 				}
 			}
+		}
 
-			_defaultValues[key] = {
-				target: target,
-				prop: prop,
-				value: storedValue
-			}
+		_defaultValues[key] = {
+			target: target,
+			prop: prop,
+			value: storedValue
 		}
 	}
 
