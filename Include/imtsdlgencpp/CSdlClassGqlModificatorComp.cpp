@@ -482,7 +482,7 @@ bool CSdlClassGqlModificatorComp::AddContainerListAccessCode(
 		stream << QStringLiteral("ElementsCount = ");
 		stream << GetContainerObjectVariableName();
 		stream << QStringLiteral(".GetObjectsCount(\"");
-		stream << GetDecapitalizedValue(field.GetId());
+		stream << field.GetId();
 		stream << QStringLiteral("\");");
 
 		result.listVariableName = '*' + GetDecapitalizedValue(field.GetId()) + QStringLiteral("DataObjectPtr");
