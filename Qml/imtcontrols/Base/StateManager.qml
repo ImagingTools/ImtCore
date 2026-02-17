@@ -277,10 +277,10 @@ QtObject {
 					if (data.prop in data.target) {
 						data.target[data.prop] = data.value
 					}
-				} catch (e) {
+				} 
+				catch (e) {
 					// Target may have been destroyed or become invalid; skip restoring
-					console.warn('StateManager: Failed to restore property "' +
-					             data.prop + '" on target during reset:', e)
+					console.warn('StateManager: Failed to restore property "' + data.prop + '" on target during reset:', e)
 				}
 			}
 		}
