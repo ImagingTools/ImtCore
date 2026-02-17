@@ -147,12 +147,12 @@ QtObject {
 		If the current \l state is \c null, empty, or not found in \l states, all targets
 		are restored to defaults and \l state is set to an empty string.
 
-		\sa restoreDefaults(), state	 
+		\sa restoreDefaults(), state
 	 */
 	onStateChanged: {
 		_resetTargets()
 
-		if (!state || !states[state]) {
+		if (!state || !states[state] || state === '') {
 			return
 		}
 
@@ -167,7 +167,9 @@ QtObject {
 
 			for (let prop in change.properties) {
 				_saveDefault(target, prop)
-				if (prop in target) {
+
+				// ensure the property exists on the target object before setting it
+				if (target[prop] !== undefined && prop in target) {
 					target[prop] = change.properties[prop]
 				}
 			}
@@ -183,7 +185,7 @@ QtObject {
 		this method, the \l state property will be set to an empty string.
 	 */
 	function restoreDefaults() {
-		_resetTargets()
+		state = ''
 	}
 
 	/*!
@@ -225,38 +227,46 @@ QtObject {
 				// Guard against undefined and other non-JSON-serializable values
 				if (value === undefined) {
 					storedValue = value
-				} else {
+				} 
+				else {
 					const json = JSON.stringify(value)
 					if (json === undefined) {
 						// Fallback: store value directly if it cannot be JSON-serialized
-			// Try to preserve structure for JSON-serializable values (including plain
-			// objects/arrays). Fall back to string representation for non-serializable
-			// or QML object references.
-			if (value === null || typeof value !== "object") {
-				// Primitive types (number, string, boolean, null, etc.)
-				try {
-					storedValue = JSON.parse(JSON.stringify(value))
-				} catch (e) {
-					// Fallback: store the value as-is if JSON round-trip fails
-					storedValue = value
-				}
-			} else {
-				// Objects/arrays/QML objects
-				try {
-					storedValue = JSON.parse(JSON.stringify(value))
-				} catch (e) {
-					if (value.toString) {
-						storedValue = value.toString()
-					} else {
-						storedValue = value
+						// Try to preserve structure for JSON-serializable values (including plain
+						// objects/arrays). Fall back to string representation for non-serializable
+						// or QML object references.
+						if (value === null || typeof value !== "object") {
+							// Primitive types (number, string, boolean, null, etc.)
+							try {
+								storedValue = JSON.parse(JSON.stringify(value))
+							} 
+							catch (e) {
+								// Fallback: store the value as-is if JSON round-trip fails
+								storedValue = value
+							}
+						}
+						else {
+							// Objects/arrays/QML objects
+							try {
+								storedValue = JSON.parse(JSON.stringify(value))
+							}
+							catch (e) {
+								if (value.toString) {
+									storedValue = value.toString()
+								}
+								else {
+									storedValue = value
+								}
+							}
+						}
+
+						_defaultValues[key] = {
+							target: target,
+							prop: prop,
+							value: storedValue
+						}
 					}
 				}
-			}
-
-			_defaultValues[key] = {
-				target: target,
-				prop: prop,
-				value: storedValue
 			}
 		}
 	}
