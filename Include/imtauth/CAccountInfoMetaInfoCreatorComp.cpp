@@ -23,20 +23,7 @@ bool CAccountInfoMetaInfoCreatorComp::CreateMetaInfo(
 			const QByteArray& typeId,
 			idoc::MetaInfoPtr& metaInfoPtr) const
 {
-		if (!m_objectTypeIdsAttrPtr.IsValid()){
-		return false;
-	}
-
-	bool isSupported = false;
-	int count = m_objectTypeIdsAttrPtr.GetCount();
-	for (int i = 0; i < count; i++){
-		if (m_objectTypeIdsAttrPtr[i] == typeId){
-			isSupported = true;
-			break;
-		}
-	}
-
-	if (!isSupported){
+		if (m_objectTypeIdsAttrPtr.FindValue(typeId) < 0){
 		return false;
 	}
 
