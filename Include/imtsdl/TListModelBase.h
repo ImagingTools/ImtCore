@@ -181,12 +181,15 @@ void TListModelBase<ModelDataType, ModelObjectDataType>::insert(int index, Model
 template <class ModelDataType, class ModelObjectDataType>
 QVariant TListModelBase<ModelDataType, ModelObjectDataType>::GetOrCreateCachedObject(int index) const
 {
+	if (!this->Version_1_0){
+		this->Version_1_0.emplace();
+	}
 	QVariant retVal;
 	if (this->m_objectDataTypeMap.contains(index)){
 		retVal = QVariant::fromValue(this->m_objectDataTypeMap[index]);
 	}
 	else{
-		ModelObjectDataType* newItem = new ModelObjectDataType();
+		auto* newItem = new ModelObjectDataType();
 		newItem->Version_1_0 = this->Version_1_0->at(index);
 		this->m_objectDataTypeMap.insert(index, QVariant::fromValue(newItem));
 		retVal = QVariant::fromValue(newItem);
