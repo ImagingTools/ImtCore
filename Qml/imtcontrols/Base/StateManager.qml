@@ -153,6 +153,10 @@ QtObject {
 		_resetTargets()
 
 		if (!state || !states[state] || state === '') {
+			// Normalize invalid state values to an empty string, as documented.
+			if (state !== '') {
+				state = ''
+			}
 			return
 		}
 
