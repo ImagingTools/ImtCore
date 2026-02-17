@@ -222,7 +222,18 @@ QtObject {
 				storedValue = value.toString()
 			}
 			else {
-				storedValue = JSON.parse(JSON.stringify(value))
+				// Guard against undefined and other non-JSON-serializable values
+				if (value === undefined) {
+					storedValue = value
+				} else {
+					const json = JSON.stringify(value)
+					if (json === undefined) {
+						// Fallback: store value directly if it cannot be JSON-serialized
+						storedValue = value
+					} else {
+						storedValue = JSON.parse(json)
+					}
+				}
 			}
 
 			_defaultValues[key] = {
