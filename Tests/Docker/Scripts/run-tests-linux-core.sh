@@ -60,15 +60,24 @@ echo ""
 # Build volume mount arguments for application directories
 VOLUME_MOUNTS=""
 
-# Always mount ImtCore entrypoint script from ImtCore
-IMTCORE_ENTRYPOINT="$IMTCORE_DIR/Tests/Docker/entrypoint.sh"
-if [ -f "$IMTCORE_ENTRYPOINT" ]; then
-    VOLUME_MOUNTS="$VOLUME_MOUNTS -v '$IMTCORE_ENTRYPOINT:/app/entrypoint.sh:ro'"
-    echo "[DEBUG] Mounting ImtCore entrypoint from: $IMTCORE_ENTRYPOINT"
+# Get ImtCore Docker directory (parent of Scripts folder where this script is located)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+IMTCORE_DOCKER_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+# Validate ImtCore entrypoint exists
+if [ ! -f "$IMTCORE_DOCKER_DIR/entrypoint.sh" ]; then
+    echo "ERROR: ImtCore entrypoint not found at: $IMTCORE_DOCKER_DIR/entrypoint.sh"
+    exit 1
 fi
 
+echo "[DEBUG] Mounting ImtCore Docker directory from: $IMTCORE_DOCKER_DIR"
+
+# Always mount ImtCore entrypoint script from ImtCore
+IMTCORE_ENTRYPOINT="$IMTCORE_DOCKER_DIR/entrypoint.sh"
+VOLUME_MOUNTS="$VOLUME_MOUNTS -v '$IMTCORE_ENTRYPOINT:/app/entrypoint.sh:ro'"
+
 # Always mount ImtCore GUI utilities (utils.js, playwright.config.js, etc.) from ImtCore
-IMTCORE_GUI_DIR="$IMTCORE_DIR/Tests/Docker/GUI"
+IMTCORE_GUI_DIR="$IMTCORE_DOCKER_DIR/GUI"
 if [ -d "$IMTCORE_GUI_DIR" ]; then
     VOLUME_MOUNTS="$VOLUME_MOUNTS -v '$IMTCORE_GUI_DIR:/app/tests/GUI:ro'"
     echo "[DEBUG] Mounting ImtCore GUI utilities from: $IMTCORE_GUI_DIR"
@@ -116,7 +125,7 @@ eval docker run -d \
   -e CI=true \
   $VOLUME_MOUNTS \
   "$IMAGE_NAME" \
-  -lc "sleep infinity"
+  -c "sleep infinity"
 
 if [ $? -ne 0 ]; then
     echo "ERROR: Failed to start container"
@@ -127,7 +136,7 @@ docker ps -a --filter "name=$CONTAINER_NAME"
 
 echo ""
 echo "[DEBUG] Container mounted directories:"
-docker exec "$CONTAINER_NAME" sh -lc "
+docker exec "$CONTAINER_NAME" sh -c "
   echo '--- /app/startup ---'; 
   ls -la /app/startup 2>/dev/null || echo '(empty)'; 
   echo '--- /app/tests/GUI ---'; 
@@ -139,7 +148,7 @@ docker exec "$CONTAINER_NAME" sh -lc "
 echo ""
 echo "Running tests (entrypoint)..."
 set +e  # Don't exit on error, we want to capture the exit code
-docker exec "$CONTAINER_NAME" sh -lc "export PAUSE_BEFORE_TESTS=false; /app/entrypoint.sh"
+docker exec "$CONTAINER_NAME" bash /app/entrypoint.sh
 EXIT_CODE=$?
 set -e
 

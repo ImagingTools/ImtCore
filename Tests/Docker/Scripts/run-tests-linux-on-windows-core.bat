@@ -5,6 +5,14 @@ REM Applications should use a wrapper script that sets environment variables and
 
 setlocal enabledelayedexpansion
 
+REM Auto-detect IMTCORE_DIR from script location if not set
+if "%IMTCORE_DIR%"=="" (
+  set "SCRIPT_DIR=%~dp0"
+  REM Script is in Tests\Docker\Scripts, so go up 3 levels to get ImtCore root
+  for %%I in ("!SCRIPT_DIR!..\..\..") do set "IMTCORE_DIR=%%~fI"
+  echo [DEBUG] Auto-detected IMTCORE_DIR: !IMTCORE_DIR!
+)
+
 REM Generate unique container name if not provided
 if "%CONTAINER_NAME%"=="" set CONTAINER_NAME=myapp-tests-%RANDOM%%RANDOM%
 
@@ -22,6 +30,7 @@ echo ==========================================
 echo.
 echo [DEBUG] Script path : %~f0
 echo [DEBUG] Current dir : %CD%
+echo [DEBUG] IMTCORE_DIR : %IMTCORE_DIR%
 echo [DEBUG] Container   : %CONTAINER_NAME%
 echo [DEBUG] Image       : %IMAGE_NAME%
 echo [DEBUG] BASE_URL    : %BASE_URL%
@@ -73,11 +82,14 @@ echo.
 REM Build volume mount arguments for application directories
 set VOLUME_MOUNTS=
 
-REM Always mount ImtCore entrypoint script from ImtCore
-set IMTCORE_ENTRYPOINT=%IMTCORE_DIR%\Tests\Docker\entrypoint.sh
-if exist "%IMTCORE_ENTRYPOINT%" (
-  set VOLUME_MOUNTS=%VOLUME_MOUNTS% -v "%IMTCORE_ENTRYPOINT%:/app/entrypoint.sh:ro"
-  echo [DEBUG] Mounting ImtCore entrypoint from: %IMTCORE_ENTRYPOINT%
+REM Always mount ImtCore Docker directory (contains entrypoint.sh and other scripts)
+set IMTCORE_DOCKER_DIR=%IMTCORE_DIR%\Tests\Docker
+if exist "%IMTCORE_DOCKER_DIR%" (
+  set VOLUME_MOUNTS=%VOLUME_MOUNTS% -v "%IMTCORE_DOCKER_DIR%:/app/imtcore-docker:ro"
+  echo [DEBUG] Mounting ImtCore Docker directory from: %IMTCORE_DOCKER_DIR%
+) else (
+  echo ERROR: ImtCore Docker directory not found: %IMTCORE_DOCKER_DIR%
+  exit /b 1
 )
 
 REM Always mount ImtCore GUI utilities (utils.js, playwright.config.js, etc.) from ImtCore
@@ -87,9 +99,9 @@ if exist "%IMTCORE_GUI_DIR%" (
   echo [DEBUG] Mounting ImtCore GUI utilities from: %IMTCORE_GUI_DIR%
 )
 
-REM Mount application-specific test directories if they exist
+REM Mount application-specific GUI tests to a separate directory to avoid read-only conflict
 if exist "Tests\GUI" (
-  set VOLUME_MOUNTS=%VOLUME_MOUNTS% -v "%CD%\Tests\GUI:/app/tests/GUI/app:ro"
+  set VOLUME_MOUNTS=%VOLUME_MOUNTS% -v "%CD%\Tests\GUI:/app/tests/GUI-app:ro"
   echo [DEBUG] Mounting application GUI tests from: Tests\GUI
 )
 
@@ -140,11 +152,15 @@ docker ps -a --filter "name=%CONTAINER_NAME%"
 
 echo.
 echo [DEBUG] Container mounted directories:
-docker exec "%CONTAINER_NAME%" sh -lc "echo '--- /app/startup ---'; ls -la /app/startup 2>/dev/null || echo '(empty)'; echo '--- /app/tests/GUI ---'; ls -la /app/tests/GUI 2>/dev/null || echo '(empty)'; echo '--- /app/tests/API ---'; ls -la /app/tests/API 2>/dev/null || echo '(empty)'"
+docker exec "%CONTAINER_NAME%" sh -lc "echo '--- /app/imtcore-docker ---'; ls -la /app/imtcore-docker 2>/dev/null || echo '(empty)'; echo '--- /app/startup ---'; ls -la /app/startup 2>/dev/null || echo '(empty)'; echo '--- /app/tests/GUI ---'; ls -la /app/tests/GUI 2>/dev/null || echo '(empty)'; echo '--- /app/tests/GUI-app ---'; ls -la /app/tests/GUI-app 2>/dev/null || echo '(empty)'; echo '--- /app/tests/API ---'; ls -la /app/tests/API 2>/dev/null || echo '(empty)'"
+
+echo.
+echo Preparing entrypoint script (normalizing CRLF and BOM)...
+docker exec "%CONTAINER_NAME%" sh -c "cp /app/imtcore-docker/entrypoint.sh /app/entrypoint.sh && sed -i '1s/^\xEF\xBB\xBF//' /app/entrypoint.sh && sed -i 's/\r$//' /app/entrypoint.sh && chmod +x /app/entrypoint.sh"
 
 echo.
 echo Running tests (entrypoint)...
-docker exec "%CONTAINER_NAME%" sh -lc "export PAUSE_BEFORE_TESTS=false; /app/entrypoint.sh"
+docker exec "%CONTAINER_NAME%" sh -lc "export PAUSE_BEFORE_TESTS=false; /bin/bash /app/entrypoint.sh"
 set EXIT_CODE=%ERRORLEVEL%
 echo [DEBUG] Test run exit code: %EXIT_CODE%
 
