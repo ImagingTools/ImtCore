@@ -130,7 +130,7 @@ docker run -d ^
   -e DATABASE_URL=%DATABASE_URL% ^
   -e TEST_USERS=%TEST_USERS% ^
   -e UPDATE_SNAPSHOTS=%UPDATE_SNAPSHOTS% ^
-  -e CI=true ^
+  -e CI=false ^
   %VOLUME_MOUNTS% ^
   %IMAGE_NAME% ^
   /c "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -NoProfile -Command Start-Sleep -Seconds 3600"
