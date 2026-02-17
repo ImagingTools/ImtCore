@@ -15,7 +15,14 @@ IMetaInfoCreator::TypeIds CObjectMetaInfoCreatorCompBase::GetSupportedTypeIds() 
 {
 	TypeIds retVal;
 
-	retVal.push_back(*m_objectTypeIdAttrPtr);
+	if (!m_objectTypeIdsAttrPtr.IsValid()){
+		return retVal;
+	}
+
+	int count = m_objectTypeIdsAttrPtr.GetCount();
+	for (int i = 0; i < count; i++){
+		retVal.push_back(m_objectTypeIdsAttrPtr[i]);
+	}
 	
 	return retVal;
 }
