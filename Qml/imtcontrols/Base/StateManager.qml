@@ -2,7 +2,7 @@ import QtQuick
 
 /*!
 	\qmltype StateManager
-	\inqmlmodule imtcontrols.Base
+	\inqmlmodule imtcontrols
 	\inherits QtObject
 	\brief A lightweight state management component for QML applications.
 
@@ -24,7 +24,7 @@ import QtQuick
 
 	\qml
 	import QtQuick
-	import imtcontrols.Base
+	import imtcontrols 1.0
 
 	Rectangle {
 		id: root
