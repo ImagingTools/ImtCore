@@ -257,7 +257,10 @@ QtObject {
 	function _resetTargets() {
 		for (let key in _defaultValues) {
 			let data = _defaultValues[key]
-			data.target[data.prop] = data.value
+			if (data && data.target) {
+				data.target[data.prop] = data.value
+			}
 		}
+		_defaultValues = ({})
 	}
 }
