@@ -23,7 +23,7 @@ bool CUserMetaInfoCreatorComp::CreateMetaInfo(
 			const QByteArray& typeId,
 			idoc::MetaInfoPtr& metaInfoPtr) const
 {
-	if (typeId != *m_objectTypeIdAttrPtr){
+	if (m_objectTypeIdsAttrPtr.FindValue(typeId) < 0){
 		return false;
 	}
 
