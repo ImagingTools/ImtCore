@@ -2060,6 +2060,10 @@ QVariant CPrinterSpecificationBaseObject::GetName()
 
 void CPrinterSpecificationBaseObject::SetName(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->name = v.value<QString>();
 	nameChanged();
 }
@@ -2067,7 +2071,7 @@ void CPrinterSpecificationBaseObject::SetName(const QVariant& v)
 
 bool CPrinterSpecificationBaseObject::hasName()
 {
-	 return Version_1_0->name.HasValue();
+	 return Version_1_0 && Version_1_0->name.HasValue();
 }
 
 
@@ -2219,13 +2223,16 @@ QVariant sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObjectList::getData(
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObject*>();
-	if (itemPtr == nullptr) return QVariant();
+	if (itemPtr == nullptr){
+		return QVariant();
+	}
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
-		if (nameId == "m_name"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->name.value());
-		}
+	if (nameId == "m_name"){
+		return QVariant::fromValue(Version_1_0->at(index)->name.value());
+	}
+
 	return QVariant();
 }
 CLinkObject::CLinkObject(QObject* parent): ::imtbase::CItemModelBase(parent){
@@ -2247,6 +2254,10 @@ QVariant CLinkObject::GetLink()
 
 void CLinkObject::SetLink(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->link = v.value<QString>().toUtf8();
 	linkChanged();
 }
@@ -2254,7 +2265,7 @@ void CLinkObject::SetLink(const QVariant& v)
 
 bool CLinkObject::hasLink()
 {
-	 return Version_1_0->link.HasValue();
+	 return Version_1_0 && Version_1_0->link.HasValue();
 }
 
 
@@ -2406,13 +2417,16 @@ QVariant sdl::modsdl::PrinterBase::CLinkObjectList::getData(const QString& nameI
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::modsdl::PrinterBase::CLinkObject*>();
-	if (itemPtr == nullptr) return QVariant();
+	if (itemPtr == nullptr){
+		return QVariant();
+	}
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
-		if (nameId == "m_link"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->link.value());
-		}
+	if (nameId == "m_link"){
+		return QVariant::fromValue(Version_1_0->at(index)->link.value());
+	}
+
 	return QVariant();
 }
 CPrinterBaseObject::CPrinterBaseObject(QObject* parent): ::imtbase::CItemModelBase(parent){
@@ -2437,6 +2451,10 @@ QVariant CPrinterBaseObject::GetName()
 
 void CPrinterBaseObject::SetName(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->name = v.value<QString>();
 	nameChanged();
 }
@@ -2444,7 +2462,7 @@ void CPrinterBaseObject::SetName(const QVariant& v)
 
 bool CPrinterBaseObject::hasName()
 {
-	 return Version_1_0->name.HasValue();
+	 return Version_1_0 && Version_1_0->name.HasValue();
 }
 
 
@@ -2472,6 +2490,10 @@ QVariant CPrinterBaseObject::GetSpecification()
 
 void CPrinterBaseObject::SetSpecification(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	if (v.isValid()){
 		if (const CPrinterSpecificationBaseObject* val = v.value<const CPrinterSpecificationBaseObject*>()){
 			*Version_1_0->specification = *val;
@@ -2491,14 +2513,16 @@ void CPrinterBaseObject::SetSpecification(const QVariant& v)
 
 bool CPrinterBaseObject::hasSpecification()
 {
-	 return Version_1_0->specification.HasValue();
+	 return Version_1_0 && Version_1_0->specification.HasValue();
 }
 
 
 void CPrinterBaseObject::emplaceSpecification()
 {
+	if(!Version_1_0){
+		Version_1_0.emplace();
+	}
 	Version_1_0->specification.emplace();
-
 }
 
 
@@ -2532,6 +2556,10 @@ QVariant CPrinterBaseObject::GetSimpleTest()
 
 void CPrinterBaseObject::SetSimpleTest(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	if (v.isValid()){
 		if (const QString* val = v.value<const QString*>()){
 			*Version_1_0->simpleTest = *val;
@@ -2551,14 +2579,16 @@ void CPrinterBaseObject::SetSimpleTest(const QVariant& v)
 
 bool CPrinterBaseObject::hasSimpleTest()
 {
-	 return Version_1_0->simpleTest.HasValue();
+	 return Version_1_0 && Version_1_0->simpleTest.HasValue();
 }
 
 
 void CPrinterBaseObject::emplaceSimpleTest()
 {
+	if(!Version_1_0){
+		Version_1_0.emplace();
+	}
 	Version_1_0->simpleTest.emplace();
-
 }
 
 
@@ -2594,6 +2624,10 @@ QVariant CPrinterBaseObject::GetMixedTest()
 
 void CPrinterBaseObject::SetMixedTest(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	if (v.isValid()){
 		if (const QString* val = v.value<const QString*>()){
 			*Version_1_0->mixedTest = *val;
@@ -2613,14 +2647,16 @@ void CPrinterBaseObject::SetMixedTest(const QVariant& v)
 
 bool CPrinterBaseObject::hasMixedTest()
 {
-	 return Version_1_0->mixedTest.HasValue();
+	 return Version_1_0 && Version_1_0->mixedTest.HasValue();
 }
 
 
 void CPrinterBaseObject::emplaceMixedTest()
 {
+	if(!Version_1_0){
+		Version_1_0.emplace();
+	}
 	Version_1_0->mixedTest.emplace();
-
 }
 
 
@@ -2791,22 +2827,25 @@ QVariant sdl::modsdl::PrinterBase::CPrinterBaseObjectList::getData(const QString
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::modsdl::PrinterBase::CPrinterBaseObject*>();
-	if (itemPtr == nullptr) return QVariant();
+	if (itemPtr == nullptr){
+		return QVariant();
+	}
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
-		if (nameId == "m_name"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->name.value());
-		}
-		if (nameId == "m_specification"){
-			return itemPtr->GetSpecification();
-		}
-		if (nameId == "m_simpleTest"){
-			return itemPtr->GetSimpleTest();
-		}
-		if (nameId == "m_mixedTest"){
-			return itemPtr->GetMixedTest();
-		}
+	if (nameId == "m_name"){
+		return QVariant::fromValue(Version_1_0->at(index)->name.value());
+	}
+	if (nameId == "m_specification"){
+		return itemPtr->GetSpecification();
+	}
+	if (nameId == "m_simpleTest"){
+		return itemPtr->GetSimpleTest();
+	}
+	if (nameId == "m_mixedTest"){
+		return itemPtr->GetMixedTest();
+	}
+
 	return QVariant();
 }
 CPrinterListObject::CPrinterListObject(QObject* parent): ::imtbase::CItemModelBase(parent){
@@ -2833,6 +2872,10 @@ QVariant CPrinterListObject::GetData()
 
 void CPrinterListObject::SetData(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	if (v.isValid()){
 		sdl::modsdl::PrinterBase::CPrinterBaseObjectList* itemPtr = v.value<sdl::modsdl::PrinterBase::CPrinterBaseObjectList*>();
 		if (itemPtr != nullptr)  Version_1_0->data = itemPtr->Version_1_0;
@@ -2848,14 +2891,16 @@ void CPrinterListObject::SetData(const QVariant& v)
 
 bool CPrinterListObject::hasData()
 {
-	 return Version_1_0->data.HasValue();
+	 return Version_1_0 && Version_1_0->data.HasValue();
 }
 
 
 void CPrinterListObject::emplaceData()
 {
+	if(!Version_1_0){
+		Version_1_0.emplace();
+	}
 	Version_1_0->data.emplace();
-
 }
 
 
@@ -3027,13 +3072,16 @@ QVariant sdl::modsdl::PrinterBase::CPrinterListObjectList::getData(const QString
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::modsdl::PrinterBase::CPrinterListObject*>();
-	if (itemPtr == nullptr) return QVariant();
+	if (itemPtr == nullptr){
+		return QVariant();
+	}
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
-		if (nameId == "m_data"){
-			return itemPtr->GetData();
-		}
+	if (nameId == "m_data"){
+		return itemPtr->GetData();
+	}
+
 	return QVariant();
 }
 

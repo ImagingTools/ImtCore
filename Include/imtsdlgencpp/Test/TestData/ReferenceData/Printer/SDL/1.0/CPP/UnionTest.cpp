@@ -2634,6 +2634,10 @@ QVariant CCoordsObject::GetX()
 
 void CCoordsObject::SetX(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->X = v.value<double>();
 	xChanged();
 }
@@ -2641,7 +2645,7 @@ void CCoordsObject::SetX(const QVariant& v)
 
 bool CCoordsObject::hasX()
 {
-	 return Version_1_0->X.HasValue();
+	 return Version_1_0 && Version_1_0->X.HasValue();
 }
 
 
@@ -2657,6 +2661,10 @@ QVariant CCoordsObject::GetY()
 
 void CCoordsObject::SetY(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->Y = v.value<double>();
 	yChanged();
 }
@@ -2664,7 +2672,7 @@ void CCoordsObject::SetY(const QVariant& v)
 
 bool CCoordsObject::hasY()
 {
-	 return Version_1_0->Y.HasValue();
+	 return Version_1_0 && Version_1_0->Y.HasValue();
 }
 
 
@@ -2819,16 +2827,19 @@ QVariant sdl::modsdl::UnionTest::CCoordsObjectList::getData(const QString& nameI
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::modsdl::UnionTest::CCoordsObject*>();
-	if (itemPtr == nullptr) return QVariant();
+	if (itemPtr == nullptr){
+		return QVariant();
+	}
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
-		if (nameId == "m_x"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->X.value());
-		}
-		if (nameId == "m_y"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->Y.value());
-		}
+	if (nameId == "m_x"){
+		return QVariant::fromValue(Version_1_0->at(index)->X.value());
+	}
+	if (nameId == "m_y"){
+		return QVariant::fromValue(Version_1_0->at(index)->Y.value());
+	}
+
 	return QVariant();
 }
 CPrinterSpecificationBaseObject::CPrinterSpecificationBaseObject(QObject* parent): ::imtbase::CItemModelBase(parent){
@@ -2850,6 +2861,10 @@ QVariant CPrinterSpecificationBaseObject::GetName()
 
 void CPrinterSpecificationBaseObject::SetName(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->name = v.value<QString>();
 	nameChanged();
 }
@@ -2857,7 +2872,7 @@ void CPrinterSpecificationBaseObject::SetName(const QVariant& v)
 
 bool CPrinterSpecificationBaseObject::hasName()
 {
-	 return Version_1_0->name.HasValue();
+	 return Version_1_0 && Version_1_0->name.HasValue();
 }
 
 
@@ -3009,13 +3024,16 @@ QVariant sdl::modsdl::UnionTest::CPrinterSpecificationBaseObjectList::getData(co
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::modsdl::UnionTest::CPrinterSpecificationBaseObject*>();
-	if (itemPtr == nullptr) return QVariant();
+	if (itemPtr == nullptr){
+		return QVariant();
+	}
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
-		if (nameId == "m_name"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->name.value());
-		}
+	if (nameId == "m_name"){
+		return QVariant::fromValue(Version_1_0->at(index)->name.value());
+	}
+
 	return QVariant();
 }
 CLinkObject::CLinkObject(QObject* parent): ::imtbase::CItemModelBase(parent){
@@ -3039,6 +3057,10 @@ QVariant CLinkObject::GetLink()
 
 void CLinkObject::SetLink(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->link = v.value<QString>().toUtf8();
 	linkChanged();
 }
@@ -3046,7 +3068,7 @@ void CLinkObject::SetLink(const QVariant& v)
 
 bool CLinkObject::hasLink()
 {
-	 return Version_1_0->link.HasValue();
+	 return Version_1_0 && Version_1_0->link.HasValue();
 }
 
 
@@ -3066,6 +3088,10 @@ QVariant CLinkObject::GetStatus()
 
 void CLinkObject::SetStatus(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->status.emplace();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::modsdl::UnionTest::LinkStatus>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
@@ -3078,7 +3104,7 @@ void CLinkObject::SetStatus(const QVariant& v)
 
 bool CLinkObject::hasStatus()
 {
-	 return Version_1_0->status.HasValue();
+	 return Version_1_0 && Version_1_0->status.HasValue();
 }
 
 
@@ -3094,6 +3120,10 @@ QVariant CLinkObject::GetStatusList()
 
 void CLinkObject::SetStatusList(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	
 	statusListChanged();
 }
@@ -3101,7 +3131,7 @@ void CLinkObject::SetStatusList(const QVariant& v)
 
 bool CLinkObject::hasStatusList()
 {
-	 return Version_1_0->statusList.HasValue();
+	 return Version_1_0 && Version_1_0->statusList.HasValue();
 }
 
 
@@ -3259,19 +3289,22 @@ QVariant sdl::modsdl::UnionTest::CLinkObjectList::getData(const QString& nameId,
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::modsdl::UnionTest::CLinkObject*>();
-	if (itemPtr == nullptr) return QVariant();
+	if (itemPtr == nullptr){
+		return QVariant();
+	}
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
-		if (nameId == "m_link"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->link.value());
-		}
-		if (nameId == "m_status"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->status.value());
-		}
-		if (nameId == "m_statusList"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->statusList.value());
-		}
+	if (nameId == "m_link"){
+		return QVariant::fromValue(Version_1_0->at(index)->link.value());
+	}
+	if (nameId == "m_status"){
+		return QVariant::fromValue(Version_1_0->at(index)->status.value());
+	}
+	if (nameId == "m_statusList"){
+		return QVariant::fromValue(Version_1_0->at(index)->statusList.value());
+	}
+
 	return QVariant();
 }
 CPrinterBaseObject::CPrinterBaseObject(QObject* parent): ::imtbase::CItemModelBase(parent){
@@ -3296,6 +3329,10 @@ QVariant CPrinterBaseObject::GetName()
 
 void CPrinterBaseObject::SetName(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->name = v.value<QString>();
 	nameChanged();
 }
@@ -3303,7 +3340,7 @@ void CPrinterBaseObject::SetName(const QVariant& v)
 
 bool CPrinterBaseObject::hasName()
 {
-	 return Version_1_0->name.HasValue();
+	 return Version_1_0 && Version_1_0->name.HasValue();
 }
 
 
@@ -3324,6 +3361,10 @@ QVariant CPrinterBaseObject::GetLinkList()
 
 void CPrinterBaseObject::SetLinkList(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	if (v.isValid()){
 		sdl::modsdl::UnionTest::CLinkObjectList* itemPtr = v.value<sdl::modsdl::UnionTest::CLinkObjectList*>();
 		if (itemPtr != nullptr)  Version_1_0->linkList = itemPtr->Version_1_0;
@@ -3339,14 +3380,16 @@ void CPrinterBaseObject::SetLinkList(const QVariant& v)
 
 bool CPrinterBaseObject::hasLinkList()
 {
-	 return Version_1_0->linkList.HasValue();
+	 return Version_1_0 && Version_1_0->linkList.HasValue();
 }
 
 
 void CPrinterBaseObject::emplaceLinkList()
 {
+	if(!Version_1_0){
+		Version_1_0.emplace();
+	}
 	Version_1_0->linkList.emplace();
-
 }
 
 
@@ -3397,6 +3440,10 @@ QVariant CPrinterBaseObject::GetSpecification()
 
 void CPrinterBaseObject::SetSpecification(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	if (v.isValid()){
 		if (const CPrinterSpecificationBaseObject* val = v.value<const CPrinterSpecificationBaseObject*>()){
 			*Version_1_0->specification = *val;
@@ -3422,14 +3469,16 @@ void CPrinterBaseObject::SetSpecification(const QVariant& v)
 
 bool CPrinterBaseObject::hasSpecification()
 {
-	 return Version_1_0->specification.HasValue();
+	 return Version_1_0 && Version_1_0->specification.HasValue();
 }
 
 
 void CPrinterBaseObject::emplaceSpecification()
 {
+	if(!Version_1_0){
+		Version_1_0.emplace();
+	}
 	Version_1_0->specification.emplace();
-
 }
 
 
@@ -3460,6 +3509,10 @@ QVariant CPrinterBaseObject::GetSpecificationList()
 
 void CPrinterBaseObject::SetSpecificationList(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	if (v.isValid()){
 		sdl::modsdl::UnionTest::CPrinterSpecificationObjectList* itemPtr = v.value<sdl::modsdl::UnionTest::CPrinterSpecificationObjectList*>();
 		if (itemPtr != nullptr)  Version_1_0->specificationList = itemPtr->Version_1_0;
@@ -3475,14 +3528,16 @@ void CPrinterBaseObject::SetSpecificationList(const QVariant& v)
 
 bool CPrinterBaseObject::hasSpecificationList()
 {
-	 return Version_1_0->specificationList.HasValue();
+	 return Version_1_0 && Version_1_0->specificationList.HasValue();
 }
 
 
 void CPrinterBaseObject::emplaceSpecificationList()
 {
+	if(!Version_1_0){
+		Version_1_0.emplace();
+	}
 	Version_1_0->specificationList.emplace();
-
 }
 
 
@@ -3659,22 +3714,25 @@ QVariant sdl::modsdl::UnionTest::CPrinterBaseObjectList::getData(const QString& 
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::modsdl::UnionTest::CPrinterBaseObject*>();
-	if (itemPtr == nullptr) return QVariant();
+	if (itemPtr == nullptr){
+		return QVariant();
+	}
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
-		if (nameId == "m_name"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->name.value());
-		}
-		if (nameId == "m_linkList"){
-			return itemPtr->GetLinkList();
-		}
-		if (nameId == "m_specification"){
-			return itemPtr->GetSpecification();
-		}
-		if (nameId == "m_specificationList"){
-			return itemPtr->GetSpecificationList();
-		}
+	if (nameId == "m_name"){
+		return QVariant::fromValue(Version_1_0->at(index)->name.value());
+	}
+	if (nameId == "m_linkList"){
+		return itemPtr->GetLinkList();
+	}
+	if (nameId == "m_specification"){
+		return itemPtr->GetSpecification();
+	}
+	if (nameId == "m_specificationList"){
+		return itemPtr->GetSpecificationList();
+	}
+
 	return QVariant();
 }
 
