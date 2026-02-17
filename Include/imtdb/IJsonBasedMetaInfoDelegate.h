@@ -67,15 +67,16 @@ namespace imtdb
  * metaInfo->SetValue("priority", "high");
  * metaInfo->SetValue("category", "bug-fix");
  * 
+ * QByteArray typeId = "MyDocumentType";
  * QByteArray json;
- * if (delegate->ToJsonRepresentation(*metaInfo, json)) {
+ * if (delegate->ToJsonRepresentation(*metaInfo, json, typeId)) {
  *     // Store json in database JSONB column
  * }
  * 
  * // Deserialize metadata from database
  * QByteArray storedJson = ...; // from database
  * auto loadedMetaInfo = acf::CreateComponent<CDocumentMetaInfoComp>();
- * if (delegate->FromJsonRepresentation(storedJson, *loadedMetaInfo)) {
+ * if (delegate->FromJsonRepresentation(storedJson, *loadedMetaInfo, typeId)) {
  *     QString priority = loadedMetaInfo->GetValue("priority").toString();
  * }
  * @endcode
