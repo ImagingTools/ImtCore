@@ -212,29 +212,41 @@ if [ "$#" -eq 0 ] || [ "$1" = "echo" ]; then
         EXIT_CODE=0
 
         if [ "$GUI_TESTS_FOUND" = true ]; then
-            echo -e "${YELLOW}Preparing Playwright dependencies...${NC}"
-            if [ -f "/app/tests/package.json" ]; then
-                if [ -f "/app/tests/package-lock.json" ]; then
-                    (cd /app/tests && npm ci) || EXIT_CODE=$?
-                else
-                    (cd /app/tests && npm install) || EXIT_CODE=$?
-                fi
+            # Check if node_modules already exist (pre-installed in image)
+            if [ -d "/modules/node_modules/playwright" ]; then
+                echo -e "${GREEN}✓ Using pre-installed Playwright from /modules${NC}"
             else
-                echo -e "${RED}No /app/tests/package.json found. Cannot install @playwright/test.${NC}"
-                EXIT_CODE=1
+                echo -e "${YELLOW}Preparing Playwright dependencies...${NC}"
+                if [ -f "/app/tests/package.json" ]; then
+                    if [ -f "/app/tests/package-lock.json" ]; then
+                        (cd /app/tests && npm ci) || EXIT_CODE=$?
+                    else
+                        (cd /app/tests && npm install) || EXIT_CODE=$?
+                    fi
+                elif [ -f "/app/tests/GUI/package.json" ]; then
+                    if [ -f "/app/tests/GUI/package-lock.json" ]; then
+                        (cd /app/tests/GUI && npm ci) || EXIT_CODE=$?
+                    else
+                        (cd /app/tests/GUI && npm install) || EXIT_CODE=$?
+                    fi
+                else
+                    echo -e "${RED}No /app/tests/package.json or /app/tests/GUI/package.json found. Cannot install @playwright/test.${NC}"
+                    EXIT_CODE=1
+                fi
             fi
 
             if [ "$EXIT_CODE" -eq 0 ]; then
                 echo -e "${YELLOW}Running Playwright tests...${NC}"
+                cd /app/tests/GUI
                 
-                # Build playwright command with optional --update-snapshots flag
-                PLAYWRIGHT_CMD="npx playwright test"
+                # Use pre-installed playwright directly, not npx (avoids version conflicts)
+                PLAYWRIGHT_CMD="playwright test"
                 if [ "${UPDATE_SNAPSHOTS:-false}" = "true" ]; then
                     echo -e "${YELLOW}UPDATE_SNAPSHOTS=true -> updating reference screenshots${NC}"
                     PLAYWRIGHT_CMD="$PLAYWRIGHT_CMD --update-snapshots"
                 fi
                 
-                (cd /app/tests && $PLAYWRIGHT_CMD) || EXIT_CODE=$?
+                $PLAYWRIGHT_CMD || EXIT_CODE=$?
             fi
         fi
 
