@@ -23,7 +23,20 @@ bool CPersonalAccessTokenMetaInfoCreatorComp::CreateMetaInfo(
 			const QByteArray& typeId,
 			idoc::MetaInfoPtr& metaInfoPtr) const
 {
-	if (typeId != *m_objectTypeIdAttrPtr){
+		if (!m_objectTypeIdsAttrPtr.IsValid()){
+		return false;
+	}
+
+	bool isSupported = false;
+	int count = m_objectTypeIdsAttrPtr.GetCount();
+	for (int i = 0; i < count; i++){
+		if (m_objectTypeIdsAttrPtr[i] == typeId){
+			isSupported = true;
+			break;
+		}
+	}
+
+	if (!isSupported){
 		return false;
 	}
 
