@@ -167,7 +167,7 @@ QtObject {
 
 			for (let prop in change.properties) {
 				_saveDefault(target, prop)
-				if (target[prop] !== undefined){
+				if (prop in target) {
 					target[prop] = change.properties[prop]
 				}
 			}
