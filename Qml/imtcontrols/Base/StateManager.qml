@@ -218,55 +218,39 @@ QtObject {
 
 		if (!(key in _defaultValues)) {
 			let value = target[prop]
-			let storedValue
+			let storedValue = value
 
-			if (typeof value === 'object' && value !== null && value.toString) {
-				storedValue = value.toString()
-			}
-			else {
-				// Guard against undefined and other non-JSON-serializable values
-				if (value === undefined) {
-					storedValue = value
-				} 
-				else {
-					const json = JSON.stringify(value)
-					if (json === undefined) {
-						// Fallback: store value directly if it cannot be JSON-serialized
-						// Try to preserve structure for JSON-serializable values (including plain
-						// objects/arrays). Fall back to string representation for non-serializable
-						// or QML object references.
-						if (value === null || typeof value !== "object") {
-							// Primitive types (number, string, boolean, null, etc.)
-							try {
-								storedValue = JSON.parse(JSON.stringify(value))
-							} 
-							catch (e) {
-								// Fallback: store the value as-is if JSON round-trip fails
-								storedValue = value
-							}
-						}
-						else {
-							// Objects/arrays/QML objects
-							try {
-								storedValue = JSON.parse(JSON.stringify(value))
-							}
-							catch (e) {
-								if (value.toString) {
-									storedValue = value.toString()
-								}
-								else {
-									storedValue = value
-								}
-							}
-						}
+			// Guard against undefined and handle JSON-serializable values via deep clone
+			if (value !== undefined) {
+				let json
+				try {
+					json = JSON.stringify(value)
+				} catch (e) {
+					json = undefined
+				}
 
-						_defaultValues[key] = {
-							target: target,
-							prop: prop,
-							value: storedValue
-						}
+				if (json !== undefined) {
+					// JSON-serializable: deep-clone via JSON round-trip
+					try {
+						storedValue = JSON.parse(json)
+					} catch (e) {
+						// If JSON parsing fails, fall back to original value
+						storedValue = value
+					}
+				} else {
+					// Non-JSON-serializable values (e.g., QML objects)
+					if (typeof value === "object" && value !== null && value.toString) {
+						storedValue = value.toString()
+					} else {
+						storedValue = value
 					}
 				}
+			}
+
+			_defaultValues[key] = {
+				target: target,
+				prop: prop,
+				value: storedValue
 			}
 		}
 	}
