@@ -135,12 +135,43 @@ QtObject {
 
 	/*!
 		\internal
-		\brief Signal handler triggered when the state property changes.
+		\brief Signal handler triggered when the state property changes. Transitions to the specified state.
 
-		\details Automatically calls setState() to apply the new state configuration.
+		\details This method performs the following operations:
+		\list 1
+		\li Resets all previously modified targets to their default values
+		\li If the current \l state is valid, applies all property changes defined for that state
+		\li Updates the \l state property to reflect the new state
+		\endlist
+
+		If the current \l state is \c null, empty, or not found in \l states, all targets
+		are restored to defaults and \l state is set to an empty string.
+
+		\sa restoreDefaults(), state	 
 	 */
 	onStateChanged: {
-		setState(state)
+		_resetTargets()
+
+		if (!state || !states[state]) {
+			return
+		}
+
+		let stateData = states[state]
+		for (let i = 0; i < stateData.length; i++) {
+			let change = stateData[i]
+			let target = change.target
+			if (target === null || target === undefined) {
+				console.warn('StateManager: Target is null or undefined for state "' + state + '"')
+				continue
+			}
+
+			for (let prop in change.properties) {
+				_saveDefault(target, prop)
+				if (target[prop] !== undefined){
+					target[prop] = change.properties[prop]
+				}
+			}
+		}
 	}
 
 	/*!
@@ -150,51 +181,9 @@ QtObject {
 		\details This method resets all target objects to their default property values
 		that were captured before any state changes were applied. After calling
 		this method, the \l state property will be set to an empty string.
-
-		\sa setState()
 	 */
 	function restoreDefaults() {
-		setState(null)
-	}
-
-	/*!
-		\qmlmethod void StateManager::setState(string | null stateName)
-		\brief Transitions to the specified state.
-
-		\details This method performs the following operations:
-		\list 1
-		\li Resets all previously modified targets to their default values
-		\li If \a stateName is valid, applies all property changes defined for that state
-		\li Updates the \l state property to reflect the new state
-		\endlist
-
-		If \a stateName is \c null, empty, or not found in \l states, all targets
-		are restored to defaults and \l state is set to an empty string.
-
-		\param {string | null} stateName - The name of the state to activate, or \c null to restore defaults.
-
-		\sa restoreDefaults(), state
-	 */
-	function setState(stateName) {
 		_resetTargets()
-
-		if (!stateName || !states[stateName]) {
-			state = ''
-			return
-		}
-
-		var stateData = states[stateName]
-		for (var i = 0; i < stateData.length; i++) {
-			var change = stateData[i]
-			var target = change.target
-
-			for (var prop in change.properties) {
-				_saveDefault(target, prop)
-				target[prop] = change.properties[prop]
-			}
-		}
-
-		state = stateName
 	}
 
 	/*!
@@ -223,11 +212,11 @@ QtObject {
 		\sa _resetTargets(), _defaultValues
 	 */
 	function _saveDefault(target, prop) {
-		var key = target.toString() + "_" + prop
+		let key = target.toString() + '<.>' + prop
 
 		if (!(key in _defaultValues)) {
-			var value = target[prop]
-			var storedValue
+			let value = target[prop]
+			let storedValue
 
 			if (typeof value === 'object' && value !== null && value.toString) {
 				storedValue = value.toString()
@@ -255,8 +244,8 @@ QtObject {
 		\sa _saveDefault(), _defaultValues
 	 */
 	function _resetTargets() {
-		for (var key in _defaultValues) {
-			var data = _defaultValues[key]
+		for (let key in _defaultValues) {
+			let data = _defaultValues[key]
 			data.target[data.prop] = data.value
 		}
 	}
