@@ -15,8 +15,10 @@ namespace imtlicgql
 
 // protected methods
 
-bool CProductMetaInfoDelegateComp::FillRepresentation(QJsonObject& representation, const idoc::IDocumentMetaInfo& metaInfo) const
+bool CProductMetaInfoDelegateComp::FillRepresentation(QJsonObject& representation, const idoc::IDocumentMetaInfo& metaInfo, const QByteArray& typeId) const
 {
+	Q_UNUSED(typeId);
+	
 	QByteArray productId = metaInfo.GetMetaInfo(imtlic::IProductInfo::MIT_PRODUCT_ID).toByteArray();
 	representation["ProductId"] = QString(productId);
 	
@@ -33,8 +35,10 @@ bool CProductMetaInfoDelegateComp::FillRepresentation(QJsonObject& representatio
 }
 
 
-bool CProductMetaInfoDelegateComp::FillMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const QJsonObject& representation) const
+bool CProductMetaInfoDelegateComp::FillMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const QJsonObject& representation, const QByteArray& typeId) const
 {
+	Q_UNUSED(typeId);
+	
 	if (representation.contains("ProductId")){
 		metaInfo.SetMetaInfo(imtlic::IProductInfo::MIT_PRODUCT_ID, representation.value("ProductId"));
 	}

@@ -13,10 +13,10 @@ namespace imtdb
 
 // reimplemented (imtdb::IJsonBasedMetaInfoDelegate)
 
-bool CJsonBasedMetaInfoDelegateComp::ToJsonRepresentation(const idoc::IDocumentMetaInfo& metaInfo, QByteArray& json) const
+bool CJsonBasedMetaInfoDelegateComp::ToJsonRepresentation(const idoc::IDocumentMetaInfo& metaInfo, QByteArray& json, const QByteArray& typeId) const
 {
 	QJsonObject object;
-	if (FillRepresentation(object, metaInfo)){
+	if (FillRepresentation(object, metaInfo, typeId)){
 		QJsonDocument document(object);
 		json = document.toJson(QJsonDocument::Compact);
 		
@@ -27,13 +27,13 @@ bool CJsonBasedMetaInfoDelegateComp::ToJsonRepresentation(const idoc::IDocumentM
 }
 
 
-bool CJsonBasedMetaInfoDelegateComp::FromJsonRepresentation(const QByteArray& json, idoc::IDocumentMetaInfo& metaInfo) const
+bool CJsonBasedMetaInfoDelegateComp::FromJsonRepresentation(const QByteArray& json, idoc::IDocumentMetaInfo& metaInfo, const QByteArray& typeId) const
 {
 	QJsonParseError error;
 	QJsonDocument document = QJsonDocument::fromJson(json, &error);
 	if (document.isObject() && error.error == QJsonParseError::NoError){
 		QJsonObject object = document.object();
-		if (FillMetaInfo(metaInfo, object)){
+		if (FillMetaInfo(metaInfo, object, typeId)){
 			return true;
 		}
 	}
