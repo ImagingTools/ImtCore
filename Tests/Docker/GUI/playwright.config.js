@@ -1,16 +1,11 @@
 // @ts-check
 const { defineConfig } = require('@playwright/test');
+const fs = require('fs');
+const path = require('path');
 
-/**
- * Parse TEST_USERS environment variable
- * Format: "user1:pass1,user2:pass2,user3:pass3"
- * Returns: [{username: "user1", password: "pass1"}, ...]
- */
 function parseTestUsers() {
   const testUsers = process.env.TEST_USERS || '';
-  if (!testUsers) {
-    return [];
-  }
+  if (!testUsers) return [];
 
   return testUsers.split(',').map(userPass => {
     const [username, password] = userPass.trim().split(':');
@@ -21,42 +16,63 @@ function parseTestUsers() {
   });
 }
 
-/**
- * Playwright configuration with dynamic multi-user support
- *
- * Features:
- * - Dynamically generates "authorized-user0", "authorized-user1", etc. projects based on TEST_USERS
- * - Each user gets their own storageState file
- * - Screenshots automatically include user info via project name
- * - Single "guest" project for non-authenticated tests
- */
+const users = parseTestUsers();
+const appDir = path.join(__dirname, 'app');
+const guestDir = path.join(__dirname, 'app', 'guest');
+const authorizedDir = path.join(__dirname, 'app', 'authorized');
+
+const hasGuest = fs.existsSync(guestDir);
+const hasAuthorized = fs.existsSync(authorizedDir);
+
+console.log('App dir:', appDir);
+console.log('Guest dir exists:', hasGuest);
+console.log('Authorized dir exists:', hasAuthorized);
+console.log('Users:', users.length);
+
+const projects = [];
+
+if (hasAuthorized && users.length > 0) {
+  users.forEach((user, index) => {
+    projects.push({
+      name: `authorized-user${index}`,
+      testDir: authorizedDir,
+      use: {
+        storageState: `storageState-user${index}.json`,
+      },
+    });
+  });
+}
+
+if (hasGuest) {
+  projects.push({
+    name: 'guest',
+    testDir: guestDir,
+    use: {},
+  });
+}
+
+if (projects.length === 0) {
+  projects.push({
+    name: 'default',
+    testDir: appDir,
+    use: {},
+  });
+}
+
+console.log('Projects:', projects.map(p => p.name).join(', '));
+
 module.exports = defineConfig({
-  testDir: './GUI',
+  // НЕ указываем testDir на верхнем уровне - только в projects
+  
+  globalSetup: (hasAuthorized && users.length > 0) 
+    ? require.resolve('./global-setup') 
+    : undefined,
 
-  /* Global setup (login + storageState for each user) */
-  globalSetup: require.resolve('./global-setup'),
-
-  /* Maximum time one test can run for */
   timeout: 30 * 1000,
-
-  /* Test timeout for assertions */
-  expect: {
-    timeout: 5000,
-  },
-
-  /* Run tests in files in parallel */
+  expect: { timeout: 5000 },
   fullyParallel: true,
+  retries: 0,
 
-  /* Fail the build on CI if you accidentally left test.only in the source code */
-  forbidOnly: !!process.env.CI,
-
-  /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
-
-  /* Opt out of parallel tests on CI */
-  workers: process.env.CI ? 1 : undefined,
-
-  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
     ['html', { outputFolder: 'playwright-report' }],
     ['json', { outputFile: 'test-results/playwright-results.json' }],
@@ -64,53 +80,18 @@ module.exports = defineConfig({
     ['list'],
   ],
 
-  /* Shared settings for all the projects below. */
   use: {
-    /* Base URL to use in actions like `await page.goto('/')` */
     baseURL: process.env.BASE_URL || 'http://host.docker.internal:7776',
-
-    /* Viewport (global-setup.js should read this from config) */
     viewport: {
       width: Number(process.env.VIEWPORT_WIDTH || 1400),
       height: Number(process.env.VIEWPORT_HEIGHT || 800),
     },
-
-    /* Collect trace when retrying the failed test */
     trace: 'on-first-retry',
-
-    /* Screenshot on failure */
     screenshot: 'only-on-failure',
-
-    /* Video on failure */
     video: 'retain-on-failure',
-
-    /* Navigation timeout */
     navigationTimeout: 15 * 1000,
-
-    /* Action timeout */
     actionTimeout: 10 * 1000,
   },
 
-  /* Configure projects dynamically based on TEST_USERS */
-  projects: [
-    // Generate authorized projects for each user
-    ...parseTestUsers().map((user, index) => ({
-      name: `authorized-user${index}`,
-      testMatch: /authorized\/.*\.test\.js/,
-      use: {
-        storageState: `storageState-user${index}.json`,
-        // Store user info in project metadata for access in tests
-        userIndex: index,
-        username: user.username,
-        password: user.password,
-      },
-    })),
-    
-    // Guest project (no authentication)
-    {
-      name: 'guest',
-      testIgnore: /authorized\/.*\.test\.js/,
-      use: {},
-    },
-  ],
+  projects: projects,
 });

@@ -244,7 +244,9 @@ if errorlevel 1 (
 echo Running Playwright tests...
 cd /d C:\app\tests\GUI
 
-set PLAYWRIGHT_CMD=npx playwright test
+REM Use pre-installed playwright directly, not npx (avoids version conflicts)
+set PLAYWRIGHT_CMD=playwright test
+
 if "!UPDATE_SNAPSHOTS!"=="true" (
     echo UPDATE_SNAPSHOTS=true - updating reference screenshots
     set PLAYWRIGHT_CMD=!PLAYWRIGHT_CMD! --update-snapshots

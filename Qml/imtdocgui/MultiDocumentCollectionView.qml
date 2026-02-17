@@ -182,7 +182,8 @@ Item {
 			if (typeOperation === EDocumentOperationEnum.s_documentClosed){
 				tabView.removeTab(documentId)
 			}
-			else if (typeOperation === EDocumentOperationEnum.s_documentOpened || typeOperation === EDocumentOperationEnum.s_documentSaved){
+			else if (typeOperation === EDocumentOperationEnum.s_documentOpened ||
+					typeOperation === EDocumentOperationEnum.s_documentSaved){
 				workspaceView.documentManager.setDocumentName(documentId, documentName)
 			}
 		}
@@ -253,7 +254,7 @@ Item {
 			tabView.addTab(documentId, "", stackViewComp, "", "", false)
 
 			tabView.currentIndex = tabView.tabModel.count - 1
-
+			workspaceView.updateTabName(documentId)
 			workspaceView.stopLoading(documentId)
 		}
 
@@ -434,7 +435,6 @@ Item {
 			function onCommandActivated(commandId){
 				let viewTypeIds = Object.keys(itemViewTypes)
 				if (!viewTypeIds.includes(commandId)){
-					console.error("Unable to command handle. Error: Command-ID: '" + commandId + "' does not found")
 					return
 				}
 

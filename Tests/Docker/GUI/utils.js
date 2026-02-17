@@ -20,11 +20,10 @@ const defaultConfig = {
     maxDiffPixelRatio: 0,
   },
 
-  // Пути для логина лучше задавать снаружи (в тесте/проекте), потому что objectName у всех разные
-  loginPaths: {
-    username: null, // e.g. ["LoginForm", "UsernameInput"]
-    password: null, // e.g. ["LoginForm", "PasswordInput"]
-    submit: null,   // e.g. ["LoginForm", "LoginButton"]
+loginPaths: {
+    username: ['AuthorizationPage', 'LoginInput'],
+    password: ['AuthorizationPage', 'PasswordInput'],
+    submit: ['AuthorizationPage', 'LoginButton'],
   },
 };
 
