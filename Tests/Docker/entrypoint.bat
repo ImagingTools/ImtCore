@@ -242,6 +242,11 @@ if errorlevel 1 (
 
 :RUN_PLAYWRIGHT
 echo Running Playwright tests...
+
+REM Set NODE_PATH so tests can require('utils') directly
+set "NODE_PATH=C:\app\tests\GUI;!NODE_PATH!"
+echo NODE_PATH set to: !NODE_PATH!
+
 cd /d C:\app\tests\GUI
 
 REM Use pre-installed playwright directly, not npx (avoids version conflicts)
