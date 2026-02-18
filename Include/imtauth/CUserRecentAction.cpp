@@ -226,7 +226,8 @@ bool CUserRecentAction::CopyFrom(const IChangeable& object, CompatibilityMode /*
 		}
 
 		if (!m_actionDataPtr.IsValid()){
-			m_actionDataPtr = m_actionDataFactory(m_actionTypeInfo.id);
+			iser::ISerializableSharedPtr actionDataPtr = m_actionDataFactory(m_actionTypeInfo.id);
+			m_actionDataPtr = actionDataPtr;
 		}
 
 		if (sourcePtr->m_actionDataPtr.IsValid()){
