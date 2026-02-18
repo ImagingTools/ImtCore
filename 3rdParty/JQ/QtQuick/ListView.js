@@ -555,6 +555,8 @@ class ListView extends Flickable {
 
         if (this.orientation === ListView.Horizontal) {
             this.__updateView([])
+        } else {
+            this.contentItem.width = newValue
         }
     }
 
@@ -563,6 +565,8 @@ class ListView extends Flickable {
 
         if (this.orientation === ListView.Vertical) {
             this.__updateView([])
+        } else {
+            this.contentItem.height = newValue
         }
     }
 
