@@ -82,15 +82,21 @@ void CUserRecentAction::SetTimestamp(const QDateTime& timestamp)
 }
 
 
-const iprm::IParamsSet* CUserRecentAction::GetParams() const
+iser::ISerializableSharedPtr CUserRecentAction::GetActionData() const
 {
-	return m_paramsPtr.GetPtr();
+	return m_actionDataPtr;
 }
 
 
-void CUserRecentAction::SetParams(iprm::IParamsSet* paramsPtr)
+void CUserRecentAction::SetActionData(const iser::ISerializableSharedPtr& actionDataPtr)
 {
-	m_paramsPtr.SetPtr(paramsPtr);
+	m_actionDataPtr = actionDataPtr;
+}
+
+
+void CUserRecentAction::SetActionDataFactory(const ActionDataFactoryFunction& factory)
+{
+	m_actionDataFactory = factory;
 }
 
 
@@ -184,6 +190,19 @@ bool CUserRecentAction::Serialize(iser::IArchive &archive)
 		m_targetInfo = targetInfo;
 	}
 
+	static iser::CArchiveTag paramsTag("ActionData", "Action Data", iser::CArchiveTag::TT_GROUP);
+	if (retVal && archive.BeginTag(paramsTag)){
+		if (m_actionDataFactory && !archive.IsStoring() && !m_actionDataPtr.IsValid()){
+			m_actionDataPtr = m_actionDataFactory(m_actionTypeInfo.id);
+		}
+		
+		if (m_actionDataPtr.IsValid()){
+			retVal = retVal && m_actionDataPtr->Serialize(archive);
+		}
+		
+		retVal = retVal && archive.EndTag(paramsTag);
+	}
+
 	return retVal;
 }
 
@@ -200,6 +219,20 @@ bool CUserRecentAction::CopyFrom(const IChangeable& object, CompatibilityMode /*
 		m_actionTypeInfo = sourcePtr->m_actionTypeInfo;
 		m_targetInfo = sourcePtr->m_targetInfo;
 		m_timestamp = sourcePtr->m_timestamp;
+		m_actionDataFactory = sourcePtr->m_actionDataFactory;
+
+		if (m_actionDataPtr.IsValid()){
+			m_actionDataPtr.Reset();
+		}
+
+		if (!m_actionDataPtr.IsValid()){
+			m_actionDataPtr = m_actionDataFactory(m_actionTypeInfo.id);
+		}
+
+		if (sourcePtr->m_actionDataPtr.IsValid()){
+			m_actionDataPtr->ResetData();
+			m_actionDataPtr->CopyFrom(*sourcePtr->m_actionDataPtr);
+		}
 
 		return true;
 	}
@@ -250,6 +283,10 @@ bool CUserRecentAction::ResetData(CompatibilityMode /*mode*/)
 	m_actionTypeInfo.id.clear();
 	m_actionTypeInfo.name.clear();
 	m_actionTypeInfo.description.clear();
+
+	if (m_actionDataPtr.IsValid()){
+		m_actionDataPtr->ResetData();
+	}
 
 	return true;
 }

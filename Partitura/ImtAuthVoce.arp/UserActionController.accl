@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5423" Description="ACF"/>
-            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5715" Description="ACF"/>
+            <Version Id="1" Number="2274" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -12,6 +12,7 @@
         <Element ComponentName="UserActionCollectionController" X="550" Y="225" Note=""/>
         <Element ComponentName="UserActionManager" X="225" Y="425" Note=""/>
         <Element ComponentName="UserActionSqlRepository" X="550" Y="425" Note=""/>
+        <Element ComponentName="UserRecentAction" X="225" Y="550" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>
