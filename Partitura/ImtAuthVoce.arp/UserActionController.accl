@@ -12,7 +12,7 @@
         <Element ComponentName="UserActionCollectionController" X="550" Y="225" Note=""/>
         <Element ComponentName="UserActionManager" X="225" Y="425" Note=""/>
         <Element ComponentName="UserActionSqlRepository" X="550" Y="425" Note=""/>
-        <Element ComponentName="UserRecentAction" X="225" Y="550" Note=""/>
+        <Element ComponentName="UserRecentAction" X="350" Y="550" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

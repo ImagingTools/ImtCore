@@ -18,7 +18,6 @@ void CUserRecentActionComp::OnComponentCreated()
 		SetActionDataFactory([this](const QByteArray& actionTypeId) -> iser::ISerializableSharedPtr {
 			int index = m_actionTypeIdsAttrPtr.FindValue(actionTypeId);
 			if (index < 0){
-				Q_ASSERT(false);
 				return nullptr;
 			}
 
