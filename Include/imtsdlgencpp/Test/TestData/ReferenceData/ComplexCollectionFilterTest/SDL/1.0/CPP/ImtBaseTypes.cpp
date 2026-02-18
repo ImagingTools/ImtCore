@@ -13458,7 +13458,12 @@ void CParamsSetObject::SetParamIds(const QVariant& v)
 		Version_1_0.emplace();
 	}
 
-	Version_1_0->paramIds->clear(); 
+	if (!Version_1_0->paramIds){
+		Version_1_0->paramIds.emplace();
+	}
+	else{
+		Version_1_0->paramIds->clear();
+	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
 		istd::TSharedNullable<QByteArray> value(tempValue.toUtf8());
 		Version_1_0->paramIds->append(value);
@@ -13494,7 +13499,12 @@ void CParamsSetObject::SetParamTypeIds(const QVariant& v)
 		Version_1_0.emplace();
 	}
 
-	Version_1_0->paramTypeIds->clear(); 
+	if (!Version_1_0->paramTypeIds){
+		Version_1_0->paramTypeIds.emplace();
+	}
+	else{
+		Version_1_0->paramTypeIds->clear();
+	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
 		istd::TSharedNullable<QByteArray> value(tempValue.toUtf8());
 		Version_1_0->paramTypeIds->append(value);
@@ -13530,7 +13540,12 @@ void CParamsSetObject::SetParamNames(const QVariant& v)
 		Version_1_0.emplace();
 	}
 
-	Version_1_0->paramNames->clear(); 
+	if (!Version_1_0->paramNames){
+		Version_1_0->paramNames.emplace();
+	}
+	else{
+		Version_1_0->paramNames->clear();
+	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
 		istd::TSharedNullable<QString> value(tempValue);
 		Version_1_0->paramNames->append(value);
@@ -13566,7 +13581,12 @@ void CParamsSetObject::SetParamDescriptions(const QVariant& v)
 		Version_1_0.emplace();
 	}
 
-	Version_1_0->paramDescriptions->clear(); 
+	if (!Version_1_0->paramDescriptions){
+		Version_1_0->paramDescriptions.emplace();
+	}
+	else{
+		Version_1_0->paramDescriptions->clear();
+	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
 		istd::TSharedNullable<QString> value(tempValue);
 		Version_1_0->paramDescriptions->append(value);
@@ -13602,7 +13622,12 @@ void CParamsSetObject::SetParameters(const QVariant& v)
 		Version_1_0.emplace();
 	}
 
-	Version_1_0->parameters->clear(); 
+	if (!Version_1_0->parameters){
+		Version_1_0->parameters.emplace();
+	}
+	else{
+		Version_1_0->parameters->clear();
+	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
 		istd::TSharedNullable<QString> value(tempValue);
 		Version_1_0->parameters->append(value);
@@ -13860,7 +13885,12 @@ void CMimeTypeObject::SetTree(const QVariant& v)
 		Version_1_0.emplace();
 	}
 
-	Version_1_0->tree->clear(); 
+	if (!Version_1_0->tree){
+		Version_1_0->tree.emplace();
+	}
+	else{
+		Version_1_0->tree->clear();
+	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
 		istd::TSharedNullable<QString> value(tempValue);
 		Version_1_0->tree->append(value);
@@ -13950,7 +13980,12 @@ void CMimeTypeObject::SetParameters(const QVariant& v)
 		Version_1_0.emplace();
 	}
 
-	Version_1_0->parameters->clear(); 
+	if (!Version_1_0->parameters){
+		Version_1_0->parameters.emplace();
+	}
+	else{
+		Version_1_0->parameters->clear();
+	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
 		istd::TSharedNullable<QString> value(tempValue);
 		Version_1_0->parameters->append(value);
