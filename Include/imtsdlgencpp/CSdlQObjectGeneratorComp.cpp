@@ -604,7 +604,32 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 		
 		FeedStreamHorizontally(stream);
 		if (isArray && !isCustom){
-			stream << versionStructVariableName << QStringLiteral("->") << field.GetId() << QStringLiteral("->clear(); ");
+			stream << QStringLiteral("if (!");
+			stream << versionStructVariableName;
+			stream << QStringLiteral("->") << field.GetId();
+			stream << QStringLiteral("){");
+			FeedStream(stream, 1, false);
+			
+			FeedStreamHorizontally(stream, 2);
+			stream << versionStructVariableName;
+			stream << QStringLiteral("->") << field.GetId();
+			stream << QStringLiteral(".emplace();");
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream, 1);
+			stream << '}';
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream, 1);
+			stream << QStringLiteral("else{");
+			FeedStream(stream, 1, false);
+			
+			FeedStreamHorizontally(stream, 2);
+			stream << versionStructVariableName << QStringLiteral("->") << field.GetId() << QStringLiteral("->clear();");
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream, 1);
+			stream << '}';
 			FeedStream(stream, 1, false);
 
 			FeedStreamHorizontally(stream);
