@@ -26,8 +26,9 @@ public:
 	virtual void SetTargetInfo(TargetInfo targetInfo) override;
 	virtual QDateTime GetTimestamp() const override;
 	virtual void SetTimestamp(const QDateTime& timestamp) override;
-	virtual const iprm::IParamsSet* GetParams() const override;
-	virtual void SetParams(iprm::IParamsSet* paramsPtr) override;
+	virtual iser::ISerializableSharedPtr GetActionData() const override;
+	virtual void SetActionData(const iser::ISerializableSharedPtr& actionDataPtr) override;
+	virtual void SetActionDataFactory(const ActionDataFactoryFunction& factory) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -43,7 +44,8 @@ private:
 	ActionTypeInfo m_actionTypeInfo;
 	TargetInfo m_targetInfo;
 	QDateTime m_timestamp;
-	istd::TSharedInterfacePtr<iprm::IParamsSet> m_paramsPtr;
+	iser::ISerializableSharedPtr m_actionDataPtr;
+	ActionDataFactoryFunction m_actionDataFactory;
 };
 
 

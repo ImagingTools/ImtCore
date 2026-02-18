@@ -29,6 +29,8 @@ public:
 		MIT_ACTION_TYPE_DESCRIPTION
 	};
 
+	typedef std::function<iser::ISerializableSharedPtr(const QByteArray& actionTypeId)> ActionDataFactoryFunction;
+
 	struct TargetInfo
 	{
 		TargetInfo(
@@ -122,9 +124,15 @@ public:
 	virtual QDateTime GetTimestamp() const = 0;
 	virtual void SetTimestamp(const QDateTime& timestamp) = 0;
 
-	virtual const iprm::IParamsSet* GetParams() const = 0;
-	virtual void SetParams(iprm::IParamsSet* paramsPtr) = 0;
+	virtual iser::ISerializableSharedPtr GetActionData() const = 0;
+	virtual void SetActionData(const iser::ISerializableSharedPtr& actionDataPtr) = 0;
+
+	virtual void SetActionDataFactory(const ActionDataFactoryFunction& factory) = 0;
 };
+
+
+typedef istd::TUniqueInterfacePtr<IUserRecentAction> IUserActionInfoUniquePtr;
+typedef istd::TSharedInterfacePtr<IUserRecentAction> IUserActionInfoSharedPtr;
 
 
 } // namespace imtauth
