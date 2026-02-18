@@ -20055,7 +20055,12 @@ void CCDMResultVarStringObject::SetResultContent(const QVariant& v)
 		Version_1_0.emplace();
 	}
 
-	Version_1_0->resultContent->clear(); 
+	if (!Version_1_0->resultContent){
+		Version_1_0->resultContent.emplace();
+	}
+	else{
+		Version_1_0->resultContent->clear();
+	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
 		istd::TSharedNullable<QString> value(tempValue);
 		Version_1_0->resultContent->append(value);
