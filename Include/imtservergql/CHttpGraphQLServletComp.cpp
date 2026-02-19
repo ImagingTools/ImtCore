@@ -131,7 +131,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 		shared.MoveCastedPtr(gqlContextPtr);
 		m_lastRequest.SetGqlContext(shared);
 	}
-	else if (!headers.isEmpty()){
+	else{
 		Q_ASSERT(false);
 	}
 
