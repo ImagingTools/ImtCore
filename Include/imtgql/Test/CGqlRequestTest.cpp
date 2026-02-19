@@ -539,6 +539,240 @@ void CGqlRequestTest::ParseComplexTest()
 }
 
 
+void CGqlRequestTest::ParseQueryWithVariables()
+{
+	const char* queryWithVariables = R"(
+	{
+		"query": "query TestQuery { TestQuery { Field } }",
+		"variables": {
+			"var1": "value1",
+			"var2": 123,
+			"var3": true
+		}
+	}
+	)";
+
+	qsizetype errorPosition = -1;
+	imtgql::CGqlRequest request;
+	bool retVal = request.ParseQuery(queryWithVariables, errorPosition);
+
+	QVERIFY(retVal);
+	QVERIFY(errorPosition < 0);
+
+	const imtgql::CGqlParamObject& vars = request.GetVariables();
+	QVERIFY(vars.GetParamArgumentValue("var1").toString() == "value1");
+	QVERIFY(vars.GetParamArgumentValue("var2").toInt() == 123);
+	QVERIFY(vars.GetParamArgumentValue("var3").toBool() == true);
+}
+
+
+void CGqlRequestTest::ParseQueryWithOperationName()
+{
+	const char* queryWithOperationName = R"(
+	{
+		"query": "mutation StartSession($input: DeviceIdInput!) { BeginMeasurementSession(input: $input) { __typename id } }",
+		"operationName": "StartSession",
+		"variables": {
+			"input": {
+				"id": "X-Rite i1Pro 2 SN-Virtual-1234#Agent-2"
+			}
+		}
+	}
+	)";
+
+	qsizetype errorPosition = -1;
+	imtgql::CGqlRequest request;
+	bool retVal = request.ParseQuery(queryWithOperationName, errorPosition);
+
+	QVERIFY(retVal);
+	QVERIFY(errorPosition < 0);
+
+	const imtgql::CGqlParamObject& vars = request.GetVariables();
+	const imtgql::CGqlParamObject* inputPtr = vars.GetParamArgumentObjectPtr("input");
+	QVERIFY(inputPtr != nullptr);
+	QCOMPARE(inputPtr->GetParamArgumentValue("id").toString(),
+			 QString("X-Rite i1Pro 2 SN-Virtual-1234#Agent-2"));
+
+	// // Objects
+	const imtgql::CGqlParamObject* rootInput = request.GetParamObject("input");
+	QVERIFY(rootInput != nullptr);
+	QCOMPARE(rootInput->GetParamArgumentValue("id").toString(),
+			 QString("X-Rite i1Pro 2 SN-Virtual-1234#Agent-2"));
+}
+
+
+void CGqlRequestTest::ParseStartPatchMeasurement()
+{
+	const char* payload = R"(
+	{
+	  "query": "mutation StartPatchMeasurement($input: BeginMeasuringPatchInput!) { BeginMeasuringPatch(input: $input) { __typename id } }",
+	  "operationName": "StartPatchMeasurement",
+	  "variables": {
+		"input": {
+		  "sessionId": "S:4fe8fe7c-afc7-436a-8021-7c4021e7d652#D:X-Rite i1Pro 2 SN-Virtual-1234#A:Agent-2",
+		  "fieldIndex": 1,
+		  "rowIndex": 2,
+		  "patchIndex": 8
+		}
+	  }
+	}
+	)";
+
+	qsizetype errorPosition = -1;
+	imtgql::CGqlRequest request;
+	bool retVal = request.ParseQuery(payload, errorPosition);
+
+	QVERIFY(retVal);
+	QVERIFY(errorPosition < 0);
+
+	const imtgql::CGqlParamObject& vars = request.GetVariables();
+	const imtgql::CGqlParamObject* inputPtr = vars.GetParamArgumentObjectPtr("input");
+	QVERIFY(inputPtr != nullptr);
+
+	QCOMPARE(inputPtr->GetParamArgumentValue("sessionId").toString(),
+			 QStringLiteral("S:4fe8fe7c-afc7-436a-8021-7c4021e7d652#D:X-Rite i1Pro 2 SN-Virtual-1234#A:Agent-2"));
+	QCOMPARE(inputPtr->GetParamArgumentValue("fieldIndex").toInt(), 1);
+	QCOMPARE(inputPtr->GetParamArgumentValue("rowIndex").toInt(), 2);
+	QCOMPARE(inputPtr->GetParamArgumentValue("patchIndex").toInt(), 8);
+
+	// Objects
+	const imtgql::CGqlParamObject* rootInput = request.GetParamObject("input");
+	QVERIFY(rootInput != nullptr);
+	QCOMPARE(rootInput->GetParamArgumentValue("sessionId").toString(),
+			 QStringLiteral("S:4fe8fe7c-afc7-436a-8021-7c4021e7d652#D:X-Rite i1Pro 2 SN-Virtual-1234#A:Agent-2"));
+	QCOMPARE(rootInput->GetParamArgumentValue("fieldIndex").toInt(), 1);
+	QCOMPARE(rootInput->GetParamArgumentValue("rowIndex").toInt(), 2);
+	QCOMPARE(rootInput->GetParamArgumentValue("patchIndex").toInt(), 8);
+}
+
+
+void CGqlRequestTest::ParseStartPatchMeasurementComplex()
+{
+	const char* payload = R"(
+	{
+	  "query": "mutation StartPatchMeasurement($input: BeginMeasuringPatchInput!) { BeginMeasuringPatch(input: $input) { __typename id } }",
+	  "operationName": "StartPatchMeasurement",
+	  "variables": {
+		"input": {
+		  "sessionId": {
+			"id": "S:4fe8fe7c-afc7-436a-8021-7c4021e7d652#D:X-Rite i1Pro 2 SN-Virtual-1234#A:Agent-2"
+		  },
+		  "array": [
+			{ "test": 3 },
+			{ "test1": 4 }
+		  ],
+		  "fieldIndex": 1,
+		  "rowIndex": 2,
+		  "patchIndex": 8
+		}
+	  }
+	}
+	)";
+
+	qsizetype errorPosition = -1;
+	imtgql::CGqlRequest request;
+	bool retVal = request.ParseQuery(payload, errorPosition);
+
+	QVERIFY(retVal);
+	QVERIFY(errorPosition < 0);
+
+	const imtgql::CGqlParamObject& vars = request.GetVariables();
+	const imtgql::CGqlParamObject* inputPtr = vars.GetParamArgumentObjectPtr("input");
+	QVERIFY(inputPtr != nullptr);
+
+	const imtgql::CGqlParamObject* sessionPtr = inputPtr->GetParamArgumentObjectPtr("sessionId");
+	QVERIFY(inputPtr != nullptr);
+	QCOMPARE(sessionPtr->GetParamArgumentValue("id").toString(),
+			 QStringLiteral("S:4fe8fe7c-afc7-436a-8021-7c4021e7d652#D:X-Rite i1Pro 2 SN-Virtual-1234#A:Agent-2"));
+
+	const QList<const imtgql::CGqlParamObject *> arrayListPtr = inputPtr->GetParamArgumentObjectPtrList("array");
+	QVERIFY(!arrayListPtr.isEmpty());
+	QCOMPARE(arrayListPtr.size(), 2);
+	QVERIFY(arrayListPtr[0] != nullptr);
+	QCOMPARE(arrayListPtr[0]->GetParamArgumentValue("test").toInt(), 3);
+	QVERIFY(arrayListPtr[1] != nullptr);
+	QCOMPARE(arrayListPtr[1]->GetParamArgumentValue("test1").toInt(), 4);
+
+	QCOMPARE(inputPtr->GetParamArgumentValue("fieldIndex").toInt(), 1);
+	QCOMPARE(inputPtr->GetParamArgumentValue("rowIndex").toInt(), 2);
+	QCOMPARE(inputPtr->GetParamArgumentValue("patchIndex").toInt(), 8);
+}
+
+
+void CGqlRequestTest::TestVariableObjectList()
+{
+	const char* payload = R"(
+	{
+	  "query": "mutation BulkUpdate($items: [ItemInput!]!) { updateItems(input: $items) { success } }",
+	  "operationName": "BulkUpdate",
+	  "variables": {
+		"items": [
+		  { "code": 101, "status": "active" },
+		  { "code": 102, "status": "pending" }
+		]
+	  }
+	}
+	)";
+
+	imtgql::CGqlRequest request;
+	qsizetype errorPos = -1;
+	bool success = request.ParseQuery(payload, errorPos);
+
+	QVERIFY(success);
+	QVERIFY(errorPos < 0);
+
+	const imtgql::CGqlParamObject& vars = request.GetVariables();
+	QVERIFY(vars.IsObjectList("items"));
+	QCOMPARE(vars.GetObjectsCount("items"), 2);
+
+	const imtgql::CGqlParamObject& params = request.GetParams();
+	QVERIFY(params.IsObjectList("input"));
+	QCOMPARE(params.GetObjectsCount("input"), 2);
+
+	const imtgql::CGqlParamObject* item1 = params.GetParamArgumentObjectPtr("input", 0);
+	const imtgql::CGqlParamObject* item2 = params.GetParamArgumentObjectPtr("input", 1);
+	QVERIFY(item1 != nullptr);
+	QVERIFY(item2 != nullptr);
+
+	QCOMPARE(item1->GetParamArgumentValue("code").toInt(), 101);
+	QCOMPARE(item1->GetParamArgumentValue("status").toString(), QStringLiteral("active"));
+	QCOMPARE(item2->GetParamArgumentValue("code").toInt(), 102);
+	QCOMPARE(item2->GetParamArgumentValue("status").toString(), QStringLiteral("pending"));
+}
+
+
+void CGqlRequestTest::TestVariablePrimitivesAndLists()
+{
+	const char* payload = R"(
+	{
+	  "query": "query GetDevices($id: ID!, $tags: [String]) { brand(ownerId: $id, filter: $tags) { name } }",
+	  "variables": {
+		"id": "S::X-Rite i1Pro 2 SN-Virtual-6509#A:Agent",
+		"tags": ["dev", "X-Rite i1Pro2"]
+	  }
+	}
+	)";
+
+	imtgql::CGqlRequest request;
+	qsizetype errorPos = -1;
+	bool success = request.ParseQuery(payload, errorPos);
+
+	QVERIFY(success);
+	QVERIFY(errorPos < 0);
+
+	const imtgql::CGqlParamObject& params = request.GetParams();
+	QCOMPARE(params.GetParamArgumentValue("ownerId").toString(),
+			 QStringLiteral("S::X-Rite i1Pro 2 SN-Virtual-6509#A:Agent"));
+	QVariant filterVar = params.GetParamArgumentValue("filter");
+	QVERIFY(filterVar.typeId() == QMetaType::QVariantList);
+
+	QVariantList filterList = filterVar.toList();
+	QCOMPARE(filterList.size(), 2);
+	QCOMPARE(filterList.at(0).toString(), QStringLiteral("dev"));
+	QCOMPARE(filterList.at(1).toString(), QStringLiteral("X-Rite i1Pro2"));
+}
+
+
 void CGqlRequestTest::cleanupTestCase()
 {
 }

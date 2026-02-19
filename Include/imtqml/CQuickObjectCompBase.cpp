@@ -118,7 +118,7 @@ QQuickItem* CQuickObjectCompBase::CreateItem(QQmlEngine* enginePtr) const
 			qmlFilePath.prepend(QStringLiteral("qrc"));
 		}
 
-		// endure, the file is existing. Remove first 'qml', because file access from resource MUST start from '/:'
+		// ensure, the file is exists. Remove first 'qml', because file access from resource MUST start from '/:'
 		QFile qmlFile((QString(QString(qmlFilePath.data() + 3, qmlFilePath.size() - 3))));		
 		if (!qmlFile.exists()){
 			Q_ASSERT_X(false, __func__, QString("Unable to find file '%1'").arg(qmlFilePath + ' ' + qmlFile.fileName()).toLocal8Bit());
