@@ -131,8 +131,10 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 		shared.MoveCastedPtr(gqlContextPtr);
 		m_lastRequest.SetGqlContext(shared);
 	}
-	else{
-		Q_ASSERT(false);
+	else if (!headers.isEmpty()){
+		gqlContextPtr = new imtgql::CGqlContext();
+		gqlContextPtr->SetHeaders(headers);
+		m_lastRequest.SetGqlContext(gqlContextPtr);
 	}
 
 	QByteArray responseData;
