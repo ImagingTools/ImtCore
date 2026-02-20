@@ -420,7 +420,7 @@ inline bool CCuboid::Intersects(const CCuboid& other) const
 	// Two cuboids intersect if they overlap in all three dimensions
 	bool xOverlap = (GetLeft() <= other.GetRight()) && (GetRight() >= other.GetLeft());
 	bool yOverlap = (GetBottom() <= other.GetTop()) && (GetTop() >= other.GetBottom());
-	bool zOverlap = (GetFar() <= other.GetNear()) && (GetNear() >= other.GetFar());
+	bool zOverlap = (GetNear() <= other.GetFar()) && (GetFar() >= other.GetNear());
 	
 	return xOverlap && yOverlap && zOverlap;
 }
@@ -431,7 +431,7 @@ inline bool CCuboid::Contains(const i3d::CVector3d& point) const
 	// Check if point is within all three ranges
 	bool xContained = (point.GetX() >= GetLeft()) && (point.GetX() <= GetRight());
 	bool yContained = (point.GetY() >= GetBottom()) && (point.GetY() <= GetTop());
-	bool zContained = (point.GetZ() >= GetFar()) && (point.GetZ() <= GetNear());
+	bool zContained = (point.GetZ() >= GetNear()) && (point.GetZ() <= GetFar());
 	
 	return xContained && yContained && zContained;
 }
