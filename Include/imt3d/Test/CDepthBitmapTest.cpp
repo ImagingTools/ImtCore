@@ -130,7 +130,7 @@ void CDepthBitmapTest::testGetCalibration3d()
 {
 	imt3d::CDepthBitmap bitmap;
 	
-	// Initially, calibration should be nullptr
+	// Initially, calibration instance exists but may contain default data
 	const imt3d::IImage3dCalibration* calibration = bitmap.GetCalibration3d();
 	QVERIFY(calibration != nullptr);
 	
@@ -170,7 +170,7 @@ void CDepthBitmapTest::testGetReferenceBitmap()
 {
 	imt3d::CDepthBitmap bitmap;
 	
-	// Initially, reference bitmap should be nullptr
+	// Initially, reference bitmap instance exists but is empty
 	const iimg::IBitmap* referenceBitmap = bitmap.GetReferenceBitmap();
 	QVERIFY(referenceBitmap != nullptr);
 	QVERIFY(referenceBitmap->GetImageSize().GetX() == 0);
@@ -193,7 +193,7 @@ void CDepthBitmapTest::testResetReferenceBitmap()
 	
 	QVERIFY(depthBitmap.GetReferenceBitmap() != nullptr);
 	
-	// Reset the reference bitmap
+	// Reset the reference bitmap (produces an empty bitmap object rather than nullptr)
 	depthBitmap.ResetReferenceBitmap();
 	
 	QVERIFY(depthBitmap.GetReferenceBitmap() != nullptr);
