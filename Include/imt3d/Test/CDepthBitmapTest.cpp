@@ -25,8 +25,8 @@ void CDepthBitmapTest::testDefaultConstructor()
 	imt3d::CDepthBitmap bitmap;
 	
 	QVERIFY(bitmap.IsEmpty());
-	QCOMPARE(bitmap.GetSize().GetX(), 0);
-	QCOMPARE(bitmap.GetSize().GetY(), 0);
+	QCOMPARE(bitmap.GetImageSize().GetX(), 0);
+	QCOMPARE(bitmap.GetImageSize().GetY(), 0);
 }
 
 
@@ -41,8 +41,8 @@ void CDepthBitmapTest::testCreateDepthBitmap()
 	
 	QVERIFY(result);
 	QVERIFY(!bitmap.IsEmpty());
-	QCOMPARE(bitmap.GetSize().GetX(), 640);
-	QCOMPARE(bitmap.GetSize().GetY(), 480);
+	QCOMPARE(bitmap.GetImageSize().GetX(), 640);
+	QCOMPARE(bitmap.GetImageSize().GetY(), 480);
 	QCOMPARE(bitmap.GetDepthRange().GetMinValue(), 0.0);
 	QCOMPARE(bitmap.GetDepthRange().GetMaxValue(), 100.0);
 }
@@ -87,7 +87,7 @@ void CDepthBitmapTest::testGetSize()
 	istd::CIndex2d size(800, 600);
 	bitmap.CreateDepthBitmap(depthRange, size);
 	
-	istd::CIndex2d retrievedSize = bitmap.GetSize();
+	istd::CIndex2d retrievedSize = bitmap.GetImageSize();
 	QCOMPARE(retrievedSize.GetX(), 800);
 	QCOMPARE(retrievedSize.GetY(), 600);
 }
@@ -103,8 +103,8 @@ void CDepthBitmapTest::testBitmapProperties()
 	
 	// Verify bitmap properties after creation
 	QVERIFY(!bitmap.IsEmpty());
-	QCOMPARE(bitmap.GetSize().GetX(), 10);
-	QCOMPARE(bitmap.GetSize().GetY(), 10);
+	QCOMPARE(bitmap.GetImageSize().GetX(), 10);
+	QCOMPARE(bitmap.GetImageSize().GetY(), 10);
 	QCOMPARE(bitmap.GetPixelFormat(), iimg::IBitmap::PF_FLOAT32);
 }
 
@@ -223,8 +223,8 @@ void CDepthBitmapTest::testSerialization()
 	QVERIFY(deserializeResult);
 	
 	// Verify
-	QCOMPARE(deserialized.GetSize().GetX(), 100);
-	QCOMPARE(deserialized.GetSize().GetY(), 100);
+	QCOMPARE(deserialized.GetImageSize().GetX(), 100);
+	QCOMPARE(deserialized.GetImageSize().GetY(), 100);
 	QCOMPARE(deserialized.GetDepthRange().GetMinValue(), 0.0);
 	QCOMPARE(deserialized.GetDepthRange().GetMaxValue(), 255.0);
 }
@@ -241,8 +241,8 @@ void CDepthBitmapTest::testCopyFrom()
 	bool copyResult = destination.CopyFrom(source);
 	QVERIFY(copyResult);
 	
-	QCOMPARE(destination.GetSize().GetX(), 50);
-	QCOMPARE(destination.GetSize().GetY(), 50);
+	QCOMPARE(destination.GetImageSize().GetX(), 50);
+	QCOMPARE(destination.GetImageSize().GetY(), 50);
 	QCOMPARE(destination.GetDepthRange().GetMinValue(), 0.0);
 	QCOMPARE(destination.GetDepthRange().GetMaxValue(), 100.0);
 }
@@ -281,8 +281,8 @@ void CDepthBitmapTest::testCloneMe()
 	
 	imt3d::CDepthBitmap* clonedBitmap = dynamic_cast<imt3d::CDepthBitmap*>(&(*clonedPtr));
 	QVERIFY(clonedBitmap != nullptr);
-	QCOMPARE(clonedBitmap->GetSize().GetX(), 80);
-	QCOMPARE(clonedBitmap->GetSize().GetY(), 60);
+	QCOMPARE(clonedBitmap->GetImageSize().GetX(), 80);
+	QCOMPARE(clonedBitmap->GetImageSize().GetY(), 60);
 }
 
 
@@ -299,8 +299,8 @@ void CDepthBitmapTest::testResetData()
 	QVERIFY(resetResult);
 	
 	QVERIFY(bitmap.IsEmpty());
-	QCOMPARE(bitmap.GetSize().GetX(), 0);
-	QCOMPARE(bitmap.GetSize().GetY(), 0);
+	QCOMPARE(bitmap.GetImageSize().GetX(), 0);
+	QCOMPARE(bitmap.GetImageSize().GetY(), 0);
 }
 
 
