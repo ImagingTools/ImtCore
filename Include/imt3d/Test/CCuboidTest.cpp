@@ -195,13 +195,13 @@ void CCuboidTest::testCornerPoints()
 	i3d::CVector3d lbn = cuboid.GetLeftBottomNear();
 	QCOMPARE(lbn.X(), 0.0);
 	QCOMPARE(lbn.Y(), 5.0);
-	QCOMPARE(lbn.Z(), 30.0);
+	QCOMPARE(lbn.Z(), 20.0);  // near value
 	
 	// Test right-top-far corner
 	i3d::CVector3d rtf = cuboid.GetRightTopFar();
 	QCOMPARE(rtf.X(), 10.0);
 	QCOMPARE(rtf.Y(), 15.0);
-	QCOMPARE(rtf.Z(), 20.0);
+	QCOMPARE(rtf.Z(), 30.0);  // far value
 	
 	// Test setting corner points
 	i3d::CVector3d newCorner(1.0, 6.0, 25.0);
@@ -209,7 +209,7 @@ void CCuboidTest::testCornerPoints()
 	
 	QCOMPARE(cuboid.GetLeft(), 1.0);
 	QCOMPARE(cuboid.GetBottom(), 6.0);
-	QCOMPARE(cuboid.GetFar(), 25.0);
+	QCOMPARE(cuboid.GetNear(), 25.0);  // SetLeftBottomNear sets near value
 }
 
 
