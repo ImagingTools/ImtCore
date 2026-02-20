@@ -8,6 +8,17 @@ QT = testlib
 CONFIG += testcase
 CONFIG += console
 
+# For non-shadow build use lib directory inside source tree:
+isEmpty(IMTCOREDIRBUILD){
+	LIBS += -L$$OUT_PWD/../../../Lib/$$COMPILER_DIR
+	LIBS += -L$$PWD/../../Lib/$$COMPILER_DIR
+}
+
+# Set lib directory for shadow build:
+!isEmpty(IMTCOREDIRBUILD){
+	LIBS += -L$$IMTCOREDIRBUILD/Lib/$$COMPILER_DIR
+}
+
 LIBS += -liser -listd -litest
 
 DESTDIR = $$OUT_PWD/../../../../Bin/$$COMPILER_DIR/Tests
