@@ -114,7 +114,7 @@ void CWebSocketRequest::SetBody(const QByteArray &body)
 		m_type = MT_START;
 	}
 	if (object.value("type") == "subscribe"){
-		m_type = MT_START;
+		m_type = MT_SUBSCRIBE;
 	}
 	if (object.value("type") == "start_ack"){
 		m_type = MT_START_ACK;

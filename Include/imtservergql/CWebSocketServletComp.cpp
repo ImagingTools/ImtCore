@@ -42,6 +42,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::ProcessRequest(const imtrest::I
 			return KeepAliveAcknowledge(request);
 
 		case imtrest::CWebSocketRequest::MT_START:
+		case imtrest::CWebSocketRequest::MT_SUBSCRIBE:
 			return RegisterSubscription(request);
 
 		case imtrest::CWebSocketRequest::MT_STOP:
@@ -122,19 +123,33 @@ imtrest::ConstResponsePtr CWebSocketServletComp::ProcessGqlRequest(const imtrest
 
 imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtrest::IRequest& request) const
 {
-	const imtrest::CWebSocketRequest* webSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&request);
-	imtgql::CGqlRequest gqlRequest;
+	const auto* webSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&request);
 	QByteArray body = request.GetBody();
-	QJsonDocument document = QJsonDocument::fromJson(body);
-	QJsonObject object = document.object();
-	if (object.value("payload").toObject().contains("data")){
-		body = object.value("payload").toObject().value("data").toString().toUtf8();
-	}
-	else{
-		body = document["payload"].toObject().value("query").toString().toUtf8();
-		body = QByteArray("{\"query\": \"") + body + QByteArray("\"}");
+	const QJsonDocument document = QJsonDocument::fromJson(body);
+	if (document.isNull() || !document.isObject()) {
+		QString errorMessage = QString("Error when parsing JSON request for command Id: '%1'").arg(request.GetCommandId());
+		return CreateErrorResponse(errorMessage.toUtf8(), request);
 	}
 
+	const QJsonObject rootObject = document.object();
+	const QJsonValue payloadValue = rootObject.value(QStringLiteral("payload"));
+
+	if (payloadValue.isObject()) {
+		const QJsonObject payloadObject = payloadValue.toObject();
+
+		if (payloadObject.contains(QStringLiteral("data"))) {
+			body = payloadObject.value(QStringLiteral("data")).toString().toUtf8();
+		}
+		else {
+			body = QJsonDocument(payloadObject).toJson(QJsonDocument::Compact);
+		}
+	}
+	else if (payloadValue.isString()) {
+		body = payloadValue.toString().toUtf8();
+	}
+
+
+	imtgql::CGqlRequest gqlRequest;
 	qsizetype errorPosition;
 	if (!gqlRequest.ParseQuery(body, errorPosition)){
 		QString errorMessage = QString("Error when parsing request: '%1'; Error position: '%2'")
@@ -155,7 +170,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	else{
 		gqlContextPtr = new imtgql::CGqlContext();
 	}
-	QJsonObject headers = object.value("headers").toObject();
+	QJsonObject headers = rootObject.value("headers").toObject();
 	for (QString& key: headers.keys()){
 		gqlHeaders.insert(key.toUtf8().toLower(), headers.value(key).toString().toUtf8());
 	}
@@ -184,10 +199,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	if (subscriberControllerPtr != nullptr){
 		QString errorMessage;
 		if (subscriberControllerPtr->RegisterSubscription(webSocketRequest->GetRequestId(), gqlRequest, request, errorMessage)){
-			QByteArray data = QString(R"({"type": "start_ack","id": "%1"})")
-						.arg(QString(webSocketRequest->GetRequestId())).toUtf8();
-
-			return CreateDataResponse(data, request);
+			return imtrest::ConstResponsePtr();
 		}
 	}
 	else{
@@ -214,7 +226,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::UnregisterSubscription(const im
 		if (controllerPtr != nullptr){
 			QByteArray subscriptionId = webSocketRequest->GetRequestId();
 			if (controllerPtr->UnregisterSubscription(subscriptionId)){
-				QByteArray data = QString(R"({"type": "stop","id": "%1"})").arg(QString(subscriptionId)).toUtf8();
+				QByteArray data = QString(R"({"type": "complete","id": "%1"})").arg(QString(subscriptionId)).toUtf8();
 				return CreateDataResponse(data, request);
 			}
 		}

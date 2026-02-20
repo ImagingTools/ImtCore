@@ -124,8 +124,11 @@ bool CGqlPublisherCompBase::PushDataToSubscriber(
 		return false;
 	}
 
+	const auto* wsRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&networkRequest);
+	const bool isSubscribe = wsRequest && (wsRequest->GetMethodType() == imtrest::CWebSocketRequest::MT_SUBSCRIBE);
+
 	QString typeId = "data";
-	if (!useAwsStyle){
+	if (!useAwsStyle || isSubscribe){
 		typeId = "next";
 	}
 

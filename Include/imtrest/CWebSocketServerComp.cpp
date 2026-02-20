@@ -382,7 +382,7 @@ void CWebSocketServerComp::OnTimeout()
 					webSocketPtr->sendTextMessage(QString(R"({"type": "ping"})"));
 				}
 				else{
-					webSocketPtr->sendTextMessage(QString(R"({"type": "keep_alive"})"));
+					webSocketPtr->sendTextMessage(QString(R"({"type": "ka"})"));
 				}
 
 				sendedSockets.append(webSocketPtr);
