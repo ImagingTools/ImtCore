@@ -482,3 +482,7 @@ imtsdlgencpptest.depends = imtsdlgencpp imtsdl imtbase
 SUBDIRS += imtsdlgenqmltest
 imtsdlgenqmltest.file = ../../Include/imtsdlgenqml/Test/QMake/imtsdlgenqmltest.pro
 imtsdlgenqmltest.depends = imtsdlgenqml imtsdl imtbase
+
+SUBDIRS += imt3dtest
+imt3dtest.file = ../../Include/imt3d/Test/QMake/imt3dTest.pro
+imt3dtest.depends = imt3d
