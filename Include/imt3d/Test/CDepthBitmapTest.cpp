@@ -130,7 +130,7 @@ void CDepthBitmapTest::testGetCalibration3d()
 {
 	imt3d::CDepthBitmap bitmap;
 	
-	// Initially, calibration object exists but may be empty
+	// Initially, calibration instance exists but may contain default data
 	const imt3d::IImage3dCalibration* calibration = bitmap.GetCalibration3d();
 	QVERIFY(calibration != nullptr);
 	
@@ -170,10 +170,11 @@ void CDepthBitmapTest::testGetReferenceBitmap()
 {
 	imt3d::CDepthBitmap bitmap;
 	
-	// Initially, reference bitmap object exists but is empty
+	// Initially, reference bitmap instance exists but is empty
 	const iimg::IBitmap* referenceBitmap = bitmap.GetReferenceBitmap();
 	QVERIFY(referenceBitmap != nullptr);
-	QVERIFY(referenceBitmap->IsEmpty());
+	QVERIFY(referenceBitmap->GetImageSize().GetX() == 0);
+	QVERIFY(referenceBitmap->GetImageSize().GetY() == 0);
 }
 
 
@@ -192,11 +193,12 @@ void CDepthBitmapTest::testResetReferenceBitmap()
 	
 	QVERIFY(depthBitmap.GetReferenceBitmap() != nullptr);
 	
-	// Reset the reference bitmap
+	// Reset the reference bitmap (produces an empty bitmap object rather than nullptr)
 	depthBitmap.ResetReferenceBitmap();
 	
 	QVERIFY(depthBitmap.GetReferenceBitmap() != nullptr);
-	QVERIFY(depthBitmap.GetReferenceBitmap()->IsEmpty());
+	QCOMPARE(depthBitmap.GetReferenceBitmap()->GetImageSize().GetX(), 0);
+	QCOMPARE(depthBitmap.GetReferenceBitmap()->GetImageSize().GetY(), 0);
 }
 
 
@@ -277,7 +279,7 @@ void CDepthBitmapTest::testCloneMe()
 	istd::IChangeableUniquePtr clonedPtr = original.CloneMe();
 	QVERIFY(clonedPtr);
 	
-	imt3d::CDepthBitmap* clonedBitmap = dynamic_cast<imt3d::CDepthBitmap*>(clonedPtr.get());
+	imt3d::CDepthBitmap* clonedBitmap = dynamic_cast<imt3d::CDepthBitmap*>(&(*clonedPtr));
 	QVERIFY(clonedBitmap != nullptr);
 	QCOMPARE(clonedBitmap->GetImageSize().GetX(), 80);
 	QCOMPARE(clonedBitmap->GetImageSize().GetY(), 60);

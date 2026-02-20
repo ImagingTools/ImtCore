@@ -281,7 +281,7 @@ void CPointCloud3dTest::testCloneMe()
 	istd::IChangeableUniquePtr clonedPtr = original.CloneMe();
 	QVERIFY(clonedPtr);
 	
-	imt3d::CPointCloud3d* clonedCloud = dynamic_cast<imt3d::CPointCloud3d*>(clonedPtr.get());
+	imt3d::CPointCloud3d* clonedCloud = dynamic_cast<imt3d::CPointCloud3d*>(&(*clonedPtr));
 	QVERIFY(clonedCloud != nullptr);
 	
 	QCOMPARE(clonedCloud->GetPointsCount(), 1);
@@ -315,5 +315,3 @@ void CPointCloud3dTest::cleanupTestCase()
 
 
 I_ADD_TEST(CPointCloud3dTest);
-
-
