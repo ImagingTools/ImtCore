@@ -819,7 +819,7 @@ bool CGeometry::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 
 		return false;
 	}
-	const qsizetype pointsElementsCount = gqlObject.GetObjectsCount("points");
+	const qsizetype pointsElementsCount = gqlObject.GetObjectsCount("Points");
 	Points = imtsdl::TElementList<CPoint::V1_0>();
 	for (qsizetype pointsIndex = 0; pointsIndex < pointsElementsCount; ++pointsIndex){
 		const ::imtgql::CGqlParamObject* pointsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Points", pointsIndex);
@@ -841,7 +841,7 @@ bool CGeometry::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 
 		return false;
 	}
-	const qsizetype requiredPointsElementsCount = gqlObject.GetObjectsCount("requiredPoints");
+	const qsizetype requiredPointsElementsCount = gqlObject.GetObjectsCount("RequiredPoints");
 	if (requiredPointsElementsCount <= 0){
 	I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' is empty").arg(__FILE__, QString::number(__LINE__), "RequiredPoints").toLocal8Bit().constData();)
 
@@ -867,7 +867,7 @@ bool CGeometry::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 		OptionalPoints.emplace();
 	}
 	if (gqlObject.ContainsParam("OptionalPoints") && (gqlObject.GetObjectsCount("OptionalPoints") > 0)){
-		const qsizetype optionalPointsElementsCount = gqlObject.GetObjectsCount("optionalPoints");
+		const qsizetype optionalPointsElementsCount = gqlObject.GetObjectsCount("OptionalPoints");
 		OptionalPoints = imtsdl::TElementList<CPoint::V1_0>();
 		for (qsizetype optionalPointsIndex = 0; optionalPointsIndex < optionalPointsElementsCount; ++optionalPointsIndex){
 			const ::imtgql::CGqlParamObject* optionalPointsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("OptionalPoints", optionalPointsIndex);
@@ -917,7 +917,7 @@ bool CGeometry::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 		Points.emplace();
 	}
 	if (gqlObject.ContainsParam("Points") && (gqlObject.GetObjectsCount("Points") > 0)){
-		const qsizetype pointsElementsCount = gqlObject.GetObjectsCount("points");
+		const qsizetype pointsElementsCount = gqlObject.GetObjectsCount("Points");
 		Points = imtsdl::TElementList<CPoint::V1_0>();
 		for (qsizetype pointsIndex = 0; pointsIndex < pointsElementsCount; ++pointsIndex){
 			const ::imtgql::CGqlParamObject* pointsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Points", pointsIndex);
@@ -936,7 +936,7 @@ bool CGeometry::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 	}
 
 	if (gqlObject.ContainsParam("RequiredPoints") && (gqlObject.GetObjectsCount("RequiredPoints") > 0)){
-		const qsizetype requiredPointsElementsCount = gqlObject.GetObjectsCount("requiredPoints");
+		const qsizetype requiredPointsElementsCount = gqlObject.GetObjectsCount("RequiredPoints");
 		if (requiredPointsElementsCount <= 0){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' is empty").arg(__FILE__, QString::number(__LINE__), "RequiredPoints").toLocal8Bit().constData();)
 
@@ -963,7 +963,7 @@ bool CGeometry::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 		OptionalPoints.emplace();
 	}
 	if (gqlObject.ContainsParam("OptionalPoints") && (gqlObject.GetObjectsCount("OptionalPoints") > 0)){
-		const qsizetype optionalPointsElementsCount = gqlObject.GetObjectsCount("optionalPoints");
+		const qsizetype optionalPointsElementsCount = gqlObject.GetObjectsCount("OptionalPoints");
 		OptionalPoints = imtsdl::TElementList<CPoint::V1_0>();
 		for (qsizetype optionalPointsIndex = 0; optionalPointsIndex < optionalPointsElementsCount; ++optionalPointsIndex){
 			const ::imtgql::CGqlParamObject* optionalPointsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("OptionalPoints", optionalPointsIndex);
@@ -1474,7 +1474,7 @@ CPointObject::CPointObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 
 QVariant CPointObject::GetX()
 {
-	if (Version_1_0->X.has_value()){
+	if (Version_1_0 && Version_1_0->X){
 		return Version_1_0->X.value();
 	}
 
@@ -1484,6 +1484,10 @@ QVariant CPointObject::GetX()
 
 void CPointObject::SetX(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->X = v.value<double>();
 	xChanged();
 }
@@ -1491,13 +1495,13 @@ void CPointObject::SetX(const QVariant& v)
 
 bool CPointObject::hasX()
 {
-	 return Version_1_0->X.HasValue();
+	 return Version_1_0 && Version_1_0->X.HasValue();
 }
 
 
 QVariant CPointObject::GetY()
 {
-	if (Version_1_0->Y.has_value()){
+	if (Version_1_0 && Version_1_0->Y){
 		return Version_1_0->Y.value();
 	}
 
@@ -1507,6 +1511,10 @@ QVariant CPointObject::GetY()
 
 void CPointObject::SetY(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->Y = v.value<double>();
 	yChanged();
 }
@@ -1514,7 +1522,7 @@ void CPointObject::SetY(const QVariant& v)
 
 bool CPointObject::hasY()
 {
-	 return Version_1_0->Y.HasValue();
+	 return Version_1_0 && Version_1_0->Y.HasValue();
 }
 
 
@@ -1669,16 +1677,19 @@ QVariant sdl::complextest::ComplexUnion1::CPointObjectList::getData(const QStrin
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::complextest::ComplexUnion1::CPointObject*>();
-	if (itemPtr == nullptr) return QVariant();
+	if (itemPtr == nullptr){
+		return QVariant();
+	}
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
-		if (nameId == "m_x"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->X.value());
-		}
-		if (nameId == "m_y"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->Y.value());
-		}
+	if (nameId == "m_x"){
+		return QVariant::fromValue(Version_1_0->at(index)->X.value());
+	}
+	if (nameId == "m_y"){
+		return QVariant::fromValue(Version_1_0->at(index)->Y.value());
+	}
+
 	return QVariant();
 }
 CGeometryObject::CGeometryObject(QObject* parent): ::imtbase::CItemModelBase(parent){
@@ -1694,7 +1705,7 @@ CGeometryObject::CGeometryObject(QObject* parent): ::imtbase::CItemModelBase(par
 
 QVariant CGeometryObject::GetGeometryType()
 {
-	if (Version_1_0->GeometryType.has_value()){
+	if (Version_1_0 && Version_1_0->GeometryType){
 		sdl::complextest::ComplexUnion1::GeometryType valueType = Version_1_0->GeometryType.value();
 		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::ComplexUnion1::GeometryType>();
 		QString retval = metaEnum.valueToKey((int)valueType);
@@ -1708,6 +1719,10 @@ QVariant CGeometryObject::GetGeometryType()
 
 void CGeometryObject::SetGeometryType(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->GeometryType.emplace();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::ComplexUnion1::GeometryType>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
@@ -1720,13 +1735,13 @@ void CGeometryObject::SetGeometryType(const QVariant& v)
 
 bool CGeometryObject::hasGeometryType()
 {
-	 return Version_1_0->GeometryType.HasValue();
+	 return Version_1_0 && Version_1_0->GeometryType.HasValue();
 }
 
 
 QVariant CGeometryObject::GetRadius()
 {
-	if (Version_1_0->Radius.has_value()){
+	if (Version_1_0 && Version_1_0->Radius){
 		return Version_1_0->Radius.value();
 	}
 
@@ -1736,6 +1751,10 @@ QVariant CGeometryObject::GetRadius()
 
 void CGeometryObject::SetRadius(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->Radius = v.value<double>();
 	radiusChanged();
 }
@@ -1743,13 +1762,13 @@ void CGeometryObject::SetRadius(const QVariant& v)
 
 bool CGeometryObject::hasRadius()
 {
-	 return Version_1_0->Radius.HasValue();
+	 return Version_1_0 && Version_1_0->Radius.HasValue();
 }
 
 
 QVariant CGeometryObject::GetPoints()
 {
-	if (Version_1_0->Points.has_value()){
+	if (Version_1_0 && Version_1_0->Points){
 		if (!m_pointsQObjectPtr.isValid()){
 			m_pointsQObjectPtr = CreateObject("Points");
 			auto itemPtr = m_pointsQObjectPtr.value<sdl::complextest::ComplexUnion1::CPointObjectList*>();
@@ -1764,6 +1783,10 @@ QVariant CGeometryObject::GetPoints()
 
 void CGeometryObject::SetPoints(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	if (v.isValid()){
 		sdl::complextest::ComplexUnion1::CPointObjectList* itemPtr = v.value<sdl::complextest::ComplexUnion1::CPointObjectList*>();
 		if (itemPtr != nullptr)  Version_1_0->Points = itemPtr->Version_1_0;
@@ -1779,14 +1802,16 @@ void CGeometryObject::SetPoints(const QVariant& v)
 
 bool CGeometryObject::hasPoints()
 {
-	 return Version_1_0->Points.HasValue();
+	 return Version_1_0 && Version_1_0->Points.HasValue();
 }
 
 
 void CGeometryObject::emplacePoints()
 {
+	if(!Version_1_0){
+		Version_1_0.emplace();
+	}
 	Version_1_0->Points.emplace();
-
 }
 
 
@@ -1809,7 +1834,7 @@ QVariant CGeometryObject::createPointsArrayElement(const QVariant& v)
 
 QVariant CGeometryObject::GetRequiredPoints()
 {
-	if (Version_1_0->RequiredPoints.has_value()){
+	if (Version_1_0 && Version_1_0->RequiredPoints){
 		if (!m_requiredPointsQObjectPtr.isValid()){
 			m_requiredPointsQObjectPtr = CreateObject("RequiredPoints");
 			auto itemPtr = m_requiredPointsQObjectPtr.value<sdl::complextest::ComplexUnion1::CPointObjectList*>();
@@ -1824,6 +1849,10 @@ QVariant CGeometryObject::GetRequiredPoints()
 
 void CGeometryObject::SetRequiredPoints(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	if (v.isValid()){
 		sdl::complextest::ComplexUnion1::CPointObjectList* itemPtr = v.value<sdl::complextest::ComplexUnion1::CPointObjectList*>();
 		if (itemPtr != nullptr)  Version_1_0->RequiredPoints = itemPtr->Version_1_0;
@@ -1839,14 +1868,16 @@ void CGeometryObject::SetRequiredPoints(const QVariant& v)
 
 bool CGeometryObject::hasRequiredPoints()
 {
-	 return Version_1_0->RequiredPoints.HasValue();
+	 return Version_1_0 && Version_1_0->RequiredPoints.HasValue();
 }
 
 
 void CGeometryObject::emplaceRequiredPoints()
 {
+	if(!Version_1_0){
+		Version_1_0.emplace();
+	}
 	Version_1_0->RequiredPoints.emplace();
-
 }
 
 
@@ -1869,7 +1900,7 @@ QVariant CGeometryObject::createRequiredPointsArrayElement(const QVariant& v)
 
 QVariant CGeometryObject::GetOptionalPoints()
 {
-	if (Version_1_0->OptionalPoints.has_value()){
+	if (Version_1_0 && Version_1_0->OptionalPoints){
 		if (!m_optionalPointsQObjectPtr.isValid()){
 			m_optionalPointsQObjectPtr = CreateObject("OptionalPoints");
 			auto itemPtr = m_optionalPointsQObjectPtr.value<sdl::complextest::ComplexUnion1::CPointObjectList*>();
@@ -1884,6 +1915,10 @@ QVariant CGeometryObject::GetOptionalPoints()
 
 void CGeometryObject::SetOptionalPoints(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	if (v.isValid()){
 		sdl::complextest::ComplexUnion1::CPointObjectList* itemPtr = v.value<sdl::complextest::ComplexUnion1::CPointObjectList*>();
 		if (itemPtr != nullptr)  Version_1_0->OptionalPoints = itemPtr->Version_1_0;
@@ -1899,14 +1934,16 @@ void CGeometryObject::SetOptionalPoints(const QVariant& v)
 
 bool CGeometryObject::hasOptionalPoints()
 {
-	 return Version_1_0->OptionalPoints.HasValue();
+	 return Version_1_0 && Version_1_0->OptionalPoints.HasValue();
 }
 
 
 void CGeometryObject::emplaceOptionalPoints()
 {
+	if(!Version_1_0){
+		Version_1_0.emplace();
+	}
 	Version_1_0->OptionalPoints.emplace();
-
 }
 
 
@@ -2096,25 +2133,28 @@ QVariant sdl::complextest::ComplexUnion1::CGeometryObjectList::getData(const QSt
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::complextest::ComplexUnion1::CGeometryObject*>();
-	if (itemPtr == nullptr) return QVariant();
+	if (itemPtr == nullptr){
+		return QVariant();
+	}
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
-		if (nameId == "m_geometryType"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->GeometryType.value());
-		}
-		if (nameId == "m_radius"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->Radius.value());
-		}
-		if (nameId == "m_points"){
-			return itemPtr->GetPoints();
-		}
-		if (nameId == "m_requiredPoints"){
-			return itemPtr->GetRequiredPoints();
-		}
-		if (nameId == "m_optionalPoints"){
-			return itemPtr->GetOptionalPoints();
-		}
+	if (nameId == "m_geometryType"){
+		return QVariant::fromValue(Version_1_0->at(index)->GeometryType.value());
+	}
+	if (nameId == "m_radius"){
+		return QVariant::fromValue(Version_1_0->at(index)->Radius.value());
+	}
+	if (nameId == "m_points"){
+		return itemPtr->GetPoints();
+	}
+	if (nameId == "m_requiredPoints"){
+		return itemPtr->GetRequiredPoints();
+	}
+	if (nameId == "m_optionalPoints"){
+		return itemPtr->GetOptionalPoints();
+	}
+
 	return QVariant();
 }
 } // namespace sdl::complextest::ComplexUnion1

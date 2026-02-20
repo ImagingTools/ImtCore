@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtgui/CStandardPopupWidgetFactoryComp.h>
 
 
@@ -13,13 +14,13 @@ namespace imtgui
 
 // reimplemented (istd::TIFactory)
 
-IPopupWidget* CStandardPopupWidgetFactoryComp::CreateInstance(const QByteArray& keyId) const
+istd::TUniqueInterfacePtr<IPopupWidget> CStandardPopupWidgetFactoryComp::CreateInstance(const QByteArray& keyId) const
 {
 	if (keyId.isEmpty()){
-		return new CStandardPopupWidget();
+		return istd::TUniqueInterfacePtr<IPopupWidget>(new CStandardPopupWidget());
 	}
 
-	return nullptr;
+	return istd::TUniqueInterfacePtr<IPopupWidget>();
 }
 
 

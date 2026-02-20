@@ -5,6 +5,13 @@ if(WIN32)
 endif()
 
 function(imtcore_generate_tests pathToClassTest)
+
+	if (NOT BUILD_TESTING)
+		message(STATUS "Testing is disabled, skipping test generation for ${pathToClassTest}")
+
+		return()
+	endif()
+
 	set(PYTHONEXE "$ENV{PYTHONEXE}")
 	
 	if(PYTHONEXE STREQUAL "")

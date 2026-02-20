@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtservergql/CGqlContextCreatorComp.h>
 
 
@@ -25,7 +26,7 @@ imtgql::IGqlContextUniquePtr CGqlContextCreatorComp::CreateGqlContext(
 			const QByteArray& productId,
 			const QByteArray& userId,
 			const imtgql::IGqlContext::Headers& headers,
-			QString& errorMessage) const
+			QString& /*errorMessage*/) const
 {
 	if (!m_gqlContextFactCompPtr.IsValid()){
 		return nullptr;
@@ -41,7 +42,7 @@ imtgql::IGqlContextUniquePtr CGqlContextCreatorComp::CreateGqlContext(
 	gqlContextPtr->SetHeaders(headers);
 	gqlContextPtr->SetProductId(productId);
 
-	imtgql::CGqlRequestContextManager::SetContext(dynamic_cast<imtgql::IGqlContext*>(gqlContextPtr->CloneMe().PopInterfacePtr()));
+	imtgql::CGqlRequestContextManager::SetContext(dynamic_cast<imtgql::IGqlContext*>(gqlContextPtr.GetPtr()));
 
 	if (m_userCollectionCompPtr.IsValid() && !userId.isEmpty()){
 		imtbase::IObjectCollection::DataPtr userDataPtr;

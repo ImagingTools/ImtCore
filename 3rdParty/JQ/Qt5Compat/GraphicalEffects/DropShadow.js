@@ -57,10 +57,16 @@ class DropShadow extends Item {
     }
 
     __updateShadow(){
-        if(this.source && this.visible){
-            let rgba = Color.getRGBA(this.__proxy, 'color', this.__self.constructor.meta.color)
+        if(this.visible){
+            if(this.source){
+                let rgba = Color.getRGBA(this.__proxy, 'color', this.__self.constructor.meta.color)
+                this.source.__setDOMStyle({
+                    boxShadow: `${this.horizontalOffset}px ${this.verticalOffset}px ${this.radius}px ${this.spread}px rgba(${rgba.r},${rgba.g},${rgba.b},${this.color === 'transparent' ? 0 : rgba.a * this.opacity})`
+                })
+            }
+        } else {
             this.source.__setDOMStyle({
-                boxShadow: `${this.horizontalOffset}px ${this.verticalOffset}px ${this.radius}px ${this.spread}px rgba(${rgba.r},${rgba.g},${rgba.b},${this.color === 'transparent' ? 0 : rgba.a * this.opacity})`
+                boxShadow: `unset`
             })
         }
     }

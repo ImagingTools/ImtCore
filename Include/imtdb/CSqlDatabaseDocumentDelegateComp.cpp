@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtdb/CSqlDatabaseDocumentDelegateComp.h>
 
 
@@ -488,7 +489,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateMetaInfoQuery(const QSq
 		idoc::MetaInfoPtr metaInfoPtr = CreateObjectMetaInfo(typeId);
 		if (metaInfoPtr.IsValid()){
 			if (m_jsonBasedMetaInfoDelegateCompPtr.IsValid()){
-				if (!m_jsonBasedMetaInfoDelegateCompPtr->ToJsonRepresentation(*metaInfoPtr.GetPtr(), metaInfoRepresentation)){
+				if (!m_jsonBasedMetaInfoDelegateCompPtr->ToJsonRepresentation(*metaInfoPtr.GetPtr(), metaInfoRepresentation, typeId)){
 					SendErrorMessage(0, "Meta information could not be converted to the JSON-based representation");
 
 					return QByteArray();
@@ -865,7 +866,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 	if (useMetaData && m_metaInfoCreatorCompPtr.IsValid() && m_jsonBasedMetaInfoDelegateCompPtr.IsValid()){
 		idoc::MetaInfoPtr metaInfoPtr;
 		if (m_metaInfoCreatorCompPtr->CreateMetaInfo(&object, typeId, metaInfoPtr) && metaInfoPtr.IsValid()){
-			if (!m_jsonBasedMetaInfoDelegateCompPtr->ToJsonRepresentation(*metaInfoPtr.GetPtr(), metaInfoRepresentation)){
+			if (!m_jsonBasedMetaInfoDelegateCompPtr->ToJsonRepresentation(*metaInfoPtr.GetPtr(), metaInfoRepresentation, typeId)){
 				SendWarningMessage(0, QString("Unable to create meta info representation for the object '%1' from the table '%2'").arg(objectId, GetTableName()));
 			}
 		}
@@ -1139,8 +1140,9 @@ bool CSqlDatabaseDocumentDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRec
 {
 	if (record.contains(s_dataMetaInfoColumn)){
 		QByteArray metaInfoRepresentation = record.value(qPrintable(s_dataMetaInfoColumn)).toByteArray();
+		QByteArray typeId = record.value(qPrintable(s_typeIdColumn)).toByteArray();
 		if (m_jsonBasedMetaInfoDelegateCompPtr.IsValid()){
-			return m_jsonBasedMetaInfoDelegateCompPtr->FromJsonRepresentation(metaInfoRepresentation, metaInfo);
+			return m_jsonBasedMetaInfoDelegateCompPtr->FromJsonRepresentation(metaInfoRepresentation, metaInfo, typeId);
 		}
 	}
 

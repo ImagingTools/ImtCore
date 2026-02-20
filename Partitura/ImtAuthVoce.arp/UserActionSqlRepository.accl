@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5430" Description="ACF"/>
-            <Version Id="1" Number="2253" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5715" Description="ACF"/>
+            <Version Id="1" Number="2274" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -14,7 +14,6 @@
         <Element ComponentName="UserActionDatabaseDelegate" X="575" Y="100" Note=""/>
         <Element ComponentName="UserActionMetaInfoCreator" X="125" Y="525" Note=""/>
         <Element ComponentName="UserActionMetaInfoDelegate" X="825" Y="525" Note=""/>
-        <Element ComponentName="UserRecentAction" X="950" Y="100" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

@@ -447,7 +447,7 @@ class ListView extends Flickable {
                 return
             }
 
-            if (length === 0) return
+            if (length === 0 && this.__items.length === 0) return
 
             JQApplication.beginUpdate()
             JQApplication.updateLater(this)
@@ -555,6 +555,8 @@ class ListView extends Flickable {
 
         if (this.orientation === ListView.Horizontal) {
             this.__updateView([])
+        } else {
+            this.contentItem.width = newValue
         }
     }
 
@@ -563,6 +565,8 @@ class ListView extends Flickable {
 
         if (this.orientation === ListView.Vertical) {
             this.__updateView([])
+        } else {
+            this.contentItem.height = newValue
         }
     }
 

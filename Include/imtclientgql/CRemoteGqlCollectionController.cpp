@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtclientgql/CRemoteGqlCollectionController.h>
 
 
@@ -494,10 +495,7 @@ bool CRemoteGqlCollectionController::SetElementEnabled(const Id& /*elementId*/, 
 
 imtbase::IObjectCollection::DataPtr CRemoteGqlCollectionController::CreateObjectInstance(const QByteArray& typeId) const
 {
-	istd::IChangeable* objPtr = BaseClass::CreateInstance(typeId);
-	return DataPtr(objPtr, [objPtr](){
-		return objPtr;
-	});
+	return BaseClass::CreateInstance(typeId);
 }
 
 

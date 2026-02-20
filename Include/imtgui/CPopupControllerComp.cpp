@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
  #include <imtgui/CPopupControllerComp.h>
 
 
@@ -218,9 +219,9 @@ void CPopupControllerComp::CalculatePopupAreaFromScreen()
 
 QByteArray CPopupControllerComp::CreatePopupItem(const MessagePtr& messagePtr, int timeout, bool isClosingOnMouseClickAllowed, QWidget* contentWidgetPtr)
 {
-	istd::TDelPtr<IPopupWidget> popupWidgetPtr;
+	istd::TUniqueInterfacePtr<IPopupWidget> popupWidgetPtr;
 	if (m_popupWidgetFactoryCompPtr.IsValid()){
-		popupWidgetPtr.SetPtr(m_popupWidgetFactoryCompPtr->CreateInstance());
+		popupWidgetPtr = m_popupWidgetFactoryCompPtr->CreateInstance();
 
 	}
 	else{
