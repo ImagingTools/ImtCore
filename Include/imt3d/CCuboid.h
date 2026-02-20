@@ -88,6 +88,16 @@ public:
 	bool IsValid() const;
 
 	/**
+		Check if this cuboid intersects with another cuboid.
+	*/
+	bool Intersects(const CCuboid& other) const;
+
+	/**
+		Check if this cuboid contains a point.
+	*/
+	bool Contains(const i3d::CVector3d& point) const;
+
+	/**
 		Get empty cuboid with all values set to 0.0.
 	*/
 	static const imt3d::CCuboid& GetEmpty();
@@ -319,9 +329,9 @@ inline double CCuboid::GetDepth() const
 inline i3d::CVector3d CCuboid::GetCenterPoint()
 {
 	return i3d::CVector3d(
-				(m_horizontalRange.GetMaxValue() - m_horizontalRange.GetMinValue()) / 2,
-				(m_verticalRange.GetMaxValue() - m_verticalRange.GetMinValue()) / 2,
-				(m_depthRange.GetMaxValue() - m_depthRange.GetMinValue()) / 2);
+				(m_horizontalRange.GetMaxValue() + m_horizontalRange.GetMinValue()) / 2.0,
+				(m_verticalRange.GetMaxValue() + m_verticalRange.GetMinValue()) / 2.0,
+				(m_depthRange.GetMaxValue() + m_depthRange.GetMinValue()) / 2.0);
 }
 
 
@@ -402,6 +412,28 @@ inline void CCuboid::SetDeepRange(const istd::CRange& range)
 inline bool CCuboid::IsValid() const
 {
 	return (m_horizontalRange.GetLength() > I_BIG_EPSILON) && (m_verticalRange.GetLength() > I_BIG_EPSILON) && (m_depthRange.GetLength() > I_BIG_EPSILON);
+}
+
+
+inline bool CCuboid::Intersects(const CCuboid& other) const
+{
+	// Two cuboids intersect if they overlap in all three dimensions
+	bool xOverlap = (GetLeft() <= other.GetRight()) && (GetRight() >= other.GetLeft());
+	bool yOverlap = (GetBottom() <= other.GetTop()) && (GetTop() >= other.GetBottom());
+	bool zOverlap = (GetFar() <= other.GetNear()) && (GetNear() >= other.GetFar());
+	
+	return xOverlap && yOverlap && zOverlap;
+}
+
+
+inline bool CCuboid::Contains(const i3d::CVector3d& point) const
+{
+	// Check if point is within all three ranges
+	bool xContained = (point.GetX() >= GetLeft()) && (point.GetX() <= GetRight());
+	bool yContained = (point.GetY() >= GetBottom()) && (point.GetY() <= GetTop());
+	bool zContained = (point.GetZ() >= GetFar()) && (point.GetZ() <= GetNear());
+	
+	return xContained && yContained && zContained;
 }
 
 
