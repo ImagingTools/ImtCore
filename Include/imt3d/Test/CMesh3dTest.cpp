@@ -234,7 +234,7 @@ void CMesh3dTest::testCloneMe()
 	istd::IChangeableUniquePtr clonedPtr = original.CloneMe();
 	QVERIFY(clonedPtr);
 	
-	imt3d::CMesh3d* clonedMesh = dynamic_cast<imt3d::CMesh3d*>(clonedPtr.operator->());
+	imt3d::CMesh3d* clonedMesh = dynamic_cast<imt3d::CMesh3d*>(&(*clonedPtr));
 	QVERIFY(clonedMesh != nullptr);
 	QCOMPARE(clonedMesh->GetPointsCount(), 1);
 }
@@ -263,4 +263,3 @@ void CMesh3dTest::cleanupTestCase()
 
 
 I_ADD_TEST(CMesh3dTest);
-

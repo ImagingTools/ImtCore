@@ -217,7 +217,7 @@ void CPosition3dTest::testCloneMe()
 	istd::IChangeableUniquePtr clonedPtr = original.CloneMe();
 	QVERIFY(clonedPtr);
 	
-	imt3d::CPosition3d* clonedPosition = dynamic_cast<imt3d::CPosition3d*>(clonedPtr.operator->());
+	imt3d::CPosition3d* clonedPosition = dynamic_cast<imt3d::CPosition3d*>(&(*clonedPtr));
 	QVERIFY(clonedPosition != nullptr);
 	
 	QCOMPARE(clonedPosition->GetPosition().GetX(), 12.0);
@@ -249,4 +249,3 @@ void CPosition3dTest::cleanupTestCase()
 
 
 I_ADD_TEST(CPosition3dTest);
-

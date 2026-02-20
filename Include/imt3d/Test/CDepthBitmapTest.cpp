@@ -279,7 +279,7 @@ void CDepthBitmapTest::testCloneMe()
 	istd::IChangeableUniquePtr clonedPtr = original.CloneMe();
 	QVERIFY(clonedPtr);
 	
-	imt3d::CDepthBitmap* clonedBitmap = dynamic_cast<imt3d::CDepthBitmap*>(clonedPtr.operator->());
+	imt3d::CDepthBitmap* clonedBitmap = dynamic_cast<imt3d::CDepthBitmap*>(&(*clonedPtr));
 	QVERIFY(clonedBitmap != nullptr);
 	QCOMPARE(clonedBitmap->GetSize().GetX(), 80);
 	QCOMPARE(clonedBitmap->GetSize().GetY(), 60);
@@ -310,4 +310,3 @@ void CDepthBitmapTest::cleanupTestCase()
 
 
 I_ADD_TEST(CDepthBitmapTest);
-
