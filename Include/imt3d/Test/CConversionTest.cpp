@@ -66,8 +66,8 @@ void CConversionTest::testConvertPointCloudToDepthBitmap()
 	QVERIFY(result);
 	QVERIFY(!depthBitmap.IsEmpty());
 	// The depth bitmap should have the same grid size as the point cloud
-	QCOMPARE(depthBitmap.GetSize().GetX(), 2);
-	QCOMPARE(depthBitmap.GetSize().GetY(), 2);
+	QCOMPARE(depthBitmap.GetImageSize().GetX(), 2);
+	QCOMPARE(depthBitmap.GetImageSize().GetY(), 2);
 }
 
 
@@ -77,5 +77,4 @@ void CConversionTest::cleanupTestCase()
 
 
 I_ADD_TEST(CConversionTest);
-
 
