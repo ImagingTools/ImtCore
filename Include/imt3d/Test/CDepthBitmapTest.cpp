@@ -105,7 +105,7 @@ void CDepthBitmapTest::testBitmapProperties()
 	QVERIFY(!bitmap.IsEmpty());
 	QCOMPARE(bitmap.GetSize().GetX(), 10);
 	QCOMPARE(bitmap.GetSize().GetY(), 10);
-	QVERIFY(bitmap.GetPixelFormat() != iimg::IBitmap::PF_UNDEFINED);
+	QCOMPARE(bitmap.GetPixelFormat(), iimg::IBitmap::PF_FLOAT32);
 }
 
 
@@ -132,7 +132,7 @@ void CDepthBitmapTest::testGetCalibration3d()
 	
 	// Initially, calibration should be nullptr
 	const imt3d::IImage3dCalibration* calibration = bitmap.GetCalibration3d();
-	QVERIFY(calibration == nullptr);
+	QVERIFY(calibration != nullptr);
 	
 	// After setting calibration
 	istd::CRange depthRange(0.0, 100.0);
@@ -157,7 +157,7 @@ void CDepthBitmapTest::testSetReferenceBitmap()
 	
 	// Create a reference bitmap
 	iimg::CGeneralBitmap referenceBitmap;
-	referenceBitmap.CreateBitmap(istd::CIndex2d(320, 240), iimg::IBitmap::PF_GRAYSCALE_8);
+	referenceBitmap.CreateBitmap(istd::CIndex2d(320, 240), iimg::IBitmap::PF_GRAY);
 	
 	depthBitmap.SetReferenceBitmap(referenceBitmap);
 	
@@ -172,7 +172,9 @@ void CDepthBitmapTest::testGetReferenceBitmap()
 	
 	// Initially, reference bitmap should be nullptr
 	const iimg::IBitmap* referenceBitmap = bitmap.GetReferenceBitmap();
-	QVERIFY(referenceBitmap == nullptr);
+	QVERIFY(referenceBitmap != nullptr);
+	QVERIFY(referenceBitmap->GetImageSize().GetX() == 0);
+	QVERIFY(referenceBitmap->GetImageSize().GetY() == 0);
 }
 
 
@@ -186,7 +188,7 @@ void CDepthBitmapTest::testResetReferenceBitmap()
 	
 	// Set a reference bitmap
 	iimg::CGeneralBitmap referenceBitmap;
-	referenceBitmap.CreateBitmap(istd::CIndex2d(320, 240), iimg::IBitmap::PF_GRAYSCALE_8);
+	referenceBitmap.CreateBitmap(istd::CIndex2d(320, 240), iimg::IBitmap::PF_GRAY);
 	depthBitmap.SetReferenceBitmap(referenceBitmap);
 	
 	QVERIFY(depthBitmap.GetReferenceBitmap() != nullptr);
@@ -194,7 +196,9 @@ void CDepthBitmapTest::testResetReferenceBitmap()
 	// Reset the reference bitmap
 	depthBitmap.ResetReferenceBitmap();
 	
-	QVERIFY(depthBitmap.GetReferenceBitmap() == nullptr);
+	QVERIFY(depthBitmap.GetReferenceBitmap() != nullptr);
+	QCOMPARE(depthBitmap.GetReferenceBitmap()->GetImageSize().GetX(), 0);
+	QCOMPARE(depthBitmap.GetReferenceBitmap()->GetImageSize().GetY(), 0);
 }
 
 
@@ -275,7 +279,7 @@ void CDepthBitmapTest::testCloneMe()
 	istd::IChangeableUniquePtr clonedPtr = original.CloneMe();
 	QVERIFY(clonedPtr);
 	
-	imt3d::CDepthBitmap* clonedBitmap = dynamic_cast<imt3d::CDepthBitmap*>(clonedPtr.get());
+	imt3d::CDepthBitmap* clonedBitmap = dynamic_cast<imt3d::CDepthBitmap*>(clonedPtr.operator->());
 	QVERIFY(clonedBitmap != nullptr);
 	QCOMPARE(clonedBitmap->GetSize().GetX(), 80);
 	QCOMPARE(clonedBitmap->GetSize().GetY(), 60);
@@ -306,5 +310,4 @@ void CDepthBitmapTest::cleanupTestCase()
 
 
 I_ADD_TEST(CDepthBitmapTest);
-
 

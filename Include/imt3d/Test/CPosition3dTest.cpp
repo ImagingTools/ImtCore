@@ -24,9 +24,9 @@ void CPosition3dTest::testDefaultConstructor()
 	imt3d::CPosition3d position;
 	
 	QVERIFY(position.IsEmpty());
-	QCOMPARE(position.GetPosition().X(), 0.0);
-	QCOMPARE(position.GetPosition().Y(), 0.0);
-	QCOMPARE(position.GetPosition().Z(), 0.0);
+	QCOMPARE(position.GetPosition().GetX(), 0.0);
+	QCOMPARE(position.GetPosition().GetY(), 0.0);
+	QCOMPARE(position.GetPosition().GetZ(), 0.0);
 }
 
 
@@ -36,9 +36,9 @@ void CPosition3dTest::testConstructorWithPosition()
 	imt3d::CPosition3d position(vec);
 	
 	QVERIFY(!position.IsEmpty());
-	QCOMPARE(position.GetPosition().X(), 1.0);
-	QCOMPARE(position.GetPosition().Y(), 2.0);
-	QCOMPARE(position.GetPosition().Z(), 3.0);
+	QCOMPARE(position.GetPosition().GetX(), 1.0);
+	QCOMPARE(position.GetPosition().GetY(), 2.0);
+	QCOMPARE(position.GetPosition().GetZ(), 3.0);
 }
 
 
@@ -48,9 +48,9 @@ void CPosition3dTest::testGetPosition()
 	imt3d::CPosition3d position(vec);
 	
 	const i3d::CVector3d& retrievedPos = position.GetPosition();
-	QCOMPARE(retrievedPos.X(), 5.5);
-	QCOMPARE(retrievedPos.Y(), 10.5);
-	QCOMPARE(retrievedPos.Z(), 15.5);
+	QCOMPARE(retrievedPos.GetX(), 5.5);
+	QCOMPARE(retrievedPos.GetY(), 10.5);
+	QCOMPARE(retrievedPos.GetZ(), 15.5);
 }
 
 
@@ -61,9 +61,9 @@ void CPosition3dTest::testSetPosition()
 	
 	position.SetPosition(newPos);
 	
-	QCOMPARE(position.GetPosition().X(), 7.0);
-	QCOMPARE(position.GetPosition().Y(), 8.0);
-	QCOMPARE(position.GetPosition().Z(), 9.0);
+	QCOMPARE(position.GetPosition().GetX(), 7.0);
+	QCOMPARE(position.GetPosition().GetY(), 8.0);
+	QCOMPARE(position.GetPosition().GetZ(), 9.0);
 }
 
 
@@ -75,9 +75,9 @@ void CPosition3dTest::testTranslate()
 	i3d::CVector3d translation(5.0, 10.0, 15.0);
 	position.Translate(translation);
 	
-	QCOMPARE(position.GetPosition().X(), 6.0);
-	QCOMPARE(position.GetPosition().Y(), 12.0);
-	QCOMPARE(position.GetPosition().Z(), 18.0);
+	QCOMPARE(position.GetPosition().GetX(), 6.0);
+	QCOMPARE(position.GetPosition().GetY(), 12.0);
+	QCOMPARE(position.GetPosition().GetZ(), 18.0);
 }
 
 
@@ -90,14 +90,14 @@ void CPosition3dTest::testGetTranslated()
 	imt3d::CPosition3d translated = position.GetTranslated(translation);
 	
 	// Original should be unchanged
-	QCOMPARE(position.GetPosition().X(), 1.0);
-	QCOMPARE(position.GetPosition().Y(), 2.0);
-	QCOMPARE(position.GetPosition().Z(), 3.0);
+	QCOMPARE(position.GetPosition().GetX(), 1.0);
+	QCOMPARE(position.GetPosition().GetY(), 2.0);
+	QCOMPARE(position.GetPosition().GetZ(), 3.0);
 	
 	// Translated should have new values
-	QCOMPARE(translated.GetPosition().X(), 6.0);
-	QCOMPARE(translated.GetPosition().Y(), 12.0);
-	QCOMPARE(translated.GetPosition().Z(), 18.0);
+	QCOMPARE(translated.GetPosition().GetX(), 6.0);
+	QCOMPARE(translated.GetPosition().GetY(), 12.0);
+	QCOMPARE(translated.GetPosition().GetZ(), 18.0);
 }
 
 
@@ -118,9 +118,9 @@ void CPosition3dTest::testGetCenter()
 	imt3d::CPosition3d position(vec);
 	
 	i3d::CVector3d center = position.GetCenter();
-	QCOMPARE(center.X(), 10.0);
-	QCOMPARE(center.Y(), 20.0);
-	QCOMPARE(center.Z(), 30.0);
+	QCOMPARE(center.GetX(), 10.0);
+	QCOMPARE(center.GetY(), 20.0);
+	QCOMPARE(center.GetZ(), 30.0);
 }
 
 
@@ -132,9 +132,9 @@ void CPosition3dTest::testMoveCenterTo()
 	i3d::CVector3d newCenter(20.0, 25.0, 30.0);
 	position.MoveCenterTo(newCenter);
 	
-	QCOMPARE(position.GetPosition().X(), 20.0);
-	QCOMPARE(position.GetPosition().Y(), 25.0);
-	QCOMPARE(position.GetPosition().Z(), 30.0);
+	QCOMPARE(position.GetPosition().GetX(), 20.0);
+	QCOMPARE(position.GetPosition().GetY(), 25.0);
+	QCOMPARE(position.GetPosition().GetZ(), 30.0);
 }
 
 
@@ -173,9 +173,9 @@ void CPosition3dTest::testSerialization()
 	QVERIFY(deserializeResult);
 	
 	// Verify
-	QCOMPARE(deserialized.GetPosition().X(), 11.5);
-	QCOMPARE(deserialized.GetPosition().Y(), 22.5);
-	QCOMPARE(deserialized.GetPosition().Z(), 33.5);
+	QCOMPARE(deserialized.GetPosition().GetX(), 11.5);
+	QCOMPARE(deserialized.GetPosition().GetY(), 22.5);
+	QCOMPARE(deserialized.GetPosition().GetZ(), 33.5);
 }
 
 
@@ -188,9 +188,9 @@ void CPosition3dTest::testCopyFrom()
 	bool copyResult = destination.CopyFrom(source);
 	QVERIFY(copyResult);
 	
-	QCOMPARE(destination.GetPosition().X(), 1.0);
-	QCOMPARE(destination.GetPosition().Y(), 2.0);
-	QCOMPARE(destination.GetPosition().Z(), 3.0);
+	QCOMPARE(destination.GetPosition().GetX(), 1.0);
+	QCOMPARE(destination.GetPosition().GetY(), 2.0);
+	QCOMPARE(destination.GetPosition().GetZ(), 3.0);
 }
 
 
@@ -217,12 +217,12 @@ void CPosition3dTest::testCloneMe()
 	istd::IChangeableUniquePtr clonedPtr = original.CloneMe();
 	QVERIFY(clonedPtr);
 	
-	imt3d::CPosition3d* clonedPosition = dynamic_cast<imt3d::CPosition3d*>(clonedPtr.get());
+	imt3d::CPosition3d* clonedPosition = dynamic_cast<imt3d::CPosition3d*>(clonedPtr.operator->());
 	QVERIFY(clonedPosition != nullptr);
 	
-	QCOMPARE(clonedPosition->GetPosition().X(), 12.0);
-	QCOMPARE(clonedPosition->GetPosition().Y(), 13.0);
-	QCOMPARE(clonedPosition->GetPosition().Z(), 14.0);
+	QCOMPARE(clonedPosition->GetPosition().GetX(), 12.0);
+	QCOMPARE(clonedPosition->GetPosition().GetY(), 13.0);
+	QCOMPARE(clonedPosition->GetPosition().GetZ(), 14.0);
 }
 
 
@@ -237,9 +237,9 @@ void CPosition3dTest::testResetData()
 	QVERIFY(resetResult);
 	
 	QVERIFY(position.IsEmpty());
-	QCOMPARE(position.GetPosition().X(), 0.0);
-	QCOMPARE(position.GetPosition().Y(), 0.0);
-	QCOMPARE(position.GetPosition().Z(), 0.0);
+	QCOMPARE(position.GetPosition().GetX(), 0.0);
+	QCOMPARE(position.GetPosition().GetY(), 0.0);
+	QCOMPARE(position.GetPosition().GetZ(), 0.0);
 }
 
 
@@ -249,5 +249,4 @@ void CPosition3dTest::cleanupTestCase()
 
 
 I_ADD_TEST(CPosition3dTest);
-
 
