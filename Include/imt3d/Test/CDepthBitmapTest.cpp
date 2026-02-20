@@ -157,7 +157,7 @@ void CDepthBitmapTest::testSetReferenceBitmap()
 	
 	// Create a reference bitmap
 	iimg::CGeneralBitmap referenceBitmap;
-	referenceBitmap.CreateBitmap(istd::CIndex2d(320, 240), iimg::IBitmap::PF_GRAY);
+	referenceBitmap.CreateBitmap(iimg::IBitmap::PF_GRAY, istd::CIndex2d(320, 240));
 	
 	depthBitmap.SetReferenceBitmap(referenceBitmap);
 	
@@ -188,7 +188,7 @@ void CDepthBitmapTest::testResetReferenceBitmap()
 	
 	// Set a reference bitmap
 	iimg::CGeneralBitmap referenceBitmap;
-	referenceBitmap.CreateBitmap(istd::CIndex2d(320, 240), iimg::IBitmap::PF_GRAY);
+	referenceBitmap.CreateBitmap(iimg::IBitmap::PF_GRAY, istd::CIndex2d(320, 240));
 	depthBitmap.SetReferenceBitmap(referenceBitmap);
 	
 	QVERIFY(depthBitmap.GetReferenceBitmap() != nullptr);
