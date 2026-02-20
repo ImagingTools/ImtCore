@@ -93,7 +93,7 @@ void CDepthBitmapTest::testGetSize()
 }
 
 
-void CDepthBitmapTest::testGetPixelValue()
+void CDepthBitmapTest::testBitmapProperties()
 {
 	imt3d::CDepthBitmap bitmap;
 	
@@ -101,10 +101,11 @@ void CDepthBitmapTest::testGetPixelValue()
 	istd::CIndex2d size(10, 10);
 	bitmap.CreateDepthBitmap(depthRange, size);
 	
-	// After creation, pixels should be initialized
-	// Note: We can't easily set pixel values without more complex bitmap operations
-	// Just verify we can call GetPixelValue without crashing
-	QVERIFY(bitmap.GetSize().GetX() == 10);
+	// Verify bitmap properties after creation
+	QVERIFY(!bitmap.IsEmpty());
+	QCOMPARE(bitmap.GetSize().GetX(), 10);
+	QCOMPARE(bitmap.GetSize().GetY(), 10);
+	QVERIFY(bitmap.GetPixelFormat() != iimg::IBitmap::PF_UNDEFINED);
 }
 
 

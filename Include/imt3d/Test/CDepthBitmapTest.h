@@ -28,7 +28,7 @@ private slots:
 	void testGetDepthRange();
 	void testSetDepthRange();
 	void testGetSize();
-	void testGetPixelValue();
+	void testBitmapProperties();
 	void testSetCalibration3d();
 	void testGetCalibration3d();
 	void testSetReferenceBitmap();
