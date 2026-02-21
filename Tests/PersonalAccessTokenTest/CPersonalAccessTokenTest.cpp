@@ -5,6 +5,9 @@
 #include <QtCore/QDebug>
 #include <QtCore/QThread>
 
+// ACF includes
+#include <itest/CStandardTestExecutor.h>
+
 
 namespace imtauthtest
 {
@@ -299,3 +302,4 @@ void CPersonalAccessTokenTest::testDeleteToken()
 
 } // namespace imtauthtest
 
+I_ADD_TEST(imtauthtest::CPersonalAccessTokenTest);
