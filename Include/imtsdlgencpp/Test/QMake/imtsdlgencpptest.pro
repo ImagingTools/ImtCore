@@ -1,14 +1,10 @@
 TARGET = imtsdlgencpptest
 
-include($(ACFCONFIGDIR)/QMake/ApplicationConfig.pri)
+include($(ACFCONFIGDIR)/QMake/TestConfig.pri)
 include($$PWD/../../../../Config/QMake/ImtCore.pri)
 
 LIBS += -L../../../../Lib/$$COMPILER_DIR
-LIBS += -lImtSdlGenCppPck -limtsdlgencpp -limtsdl -limtbase -litest
-
-QT += core testlib widgets
-
-CONFIG += console
+LIBS += -limtsdlgencpp -limtsdlgenqml -limtsdl -limtbase -litest
 
 # Set configuration of custom builds:
 # ARX Compiler:
