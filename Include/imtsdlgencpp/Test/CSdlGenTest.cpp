@@ -14,7 +14,7 @@
 #include <iprm/CParamsSet.h>
 
 // generated includes
-#include <GeneratedFiles/ImtSdlGenTest/CImtSdlGenTest.h>
+#include <GeneratedFiles/imtsdlgencpptest/CImtSdlGenTest.h>
 
 
 namespace imtsdlgentest

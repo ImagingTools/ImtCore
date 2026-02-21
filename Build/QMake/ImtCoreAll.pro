@@ -138,6 +138,9 @@ imtapp.depends = imtappsdl
 SUBDIRS += imtmail
 imtmail.file = ../../Include/imtmail/QMake/imtmail.pro
 
+SUBDIRS += imtmdbx
+imtmdbx.file = ../../Include/imtmdbx/QMake/imtmdbx.pro
+
 SUBDIRS += imtauth
 imtauth.file = ../../Include/imtauth/QMake/imtauth.pro
 
