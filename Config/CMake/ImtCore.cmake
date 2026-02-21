@@ -22,12 +22,13 @@ function(imtcore_generate_tests pathToClassTest)
 		endif()
 	endif()
 	
-	set(GENERATE_H_TESTS_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../CGenerateTest.h)
+	set(GENERATE_H_TESTS_FILE ${CMAKE_CURRENT_BINARY_DIR}/CGenerateTest.h)
 
 	add_custom_command(
 		OUTPUT ${GENERATE_H_TESTS_FILE}
 		PRE_BUILD
 		COMMAND ${PYTHONEXE} ${IMTCOREDIR}/Tests/Scripts/CGenerateTests.py ${pathToClassTest}
+		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 		COMMENT
 		"Generate tests for Partitura ImtCore")
 
