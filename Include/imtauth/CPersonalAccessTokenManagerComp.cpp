@@ -7,6 +7,9 @@
 #include <QtCore/QRandomGenerator>
 #include <QtCore/QUuid>
 
+// ACF includes
+#include <istd/CChangeNotifier.h>
+
 // ImtCore includes
 #include <imtauth/IPersonalAccessToken.h>
 
@@ -33,6 +36,9 @@ IPersonalAccessTokenManager::TokenCreationResult CPersonalAccessTokenManagerComp
 		SendErrorMessage(0, "Token collection or factory not configured", "CPersonalAccessTokenManagerComp");
 		return result;
 	}
+
+	// Notify observers that the manager state will change
+	istd::CChangeNotifier changeNotifier(this);
 
 	// Generate unique token ID
 	QByteArray tokenId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
@@ -217,6 +223,9 @@ bool CPersonalAccessTokenManagerComp::RevokeToken(const QByteArray& tokenId)
 		return false;
 	}
 
+	// Notify observers that the manager state will change
+	istd::CChangeNotifier changeNotifier(this);
+
 	tokenPtr->SetRevoked(true);
 
 	if (!m_tokenCollectionCompPtr->SetObjectData(tokenId, *tokenPtr)){
@@ -259,6 +268,9 @@ bool CPersonalAccessTokenManagerComp::DeleteToken(const QByteArray& tokenId)
 		SendErrorMessage(0, "Token collection not configured", "CPersonalAccessTokenManagerComp");
 		return false;
 	}
+
+	// Notify observers that the manager state will change
+	istd::CChangeNotifier changeNotifier(this);
 
 	if (!m_tokenCollectionCompPtr->RemoveElements({tokenId})){
 		SendErrorMessage(0, QString("Failed to delete token '%1'").arg(QString::fromUtf8(tokenId)), "CPersonalAccessTokenManagerComp");

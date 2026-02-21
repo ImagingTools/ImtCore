@@ -225,6 +225,11 @@ I_EXPORT_COMPONENT(
 			"Personal access token manager",
 			"Personal Access Token Manager");
 
+I_EXPORT_COMPONENT(
+			PersonalAccessTokenMetaInfoCreator,
+			"Personal access token meta info creator",
+			"Personal Access Token Meta Info Creator");
+
 
 } // namespace ImtAuthPck
 
