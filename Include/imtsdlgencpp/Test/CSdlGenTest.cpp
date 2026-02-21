@@ -13,8 +13,8 @@
 #include <itest/CStandardTestExecutor.h>
 #include <iprm/CParamsSet.h>
 
-// generated includes
-#include <GeneratedFiles/imtsdlgencpptest/CImtSdlGenTest.h>
+// ImtCore includes
+#include <GeneratedFiles/ImtSdlGenTest/CImtSdlGenTest.h>
 
 
 namespace imtsdlgentest
