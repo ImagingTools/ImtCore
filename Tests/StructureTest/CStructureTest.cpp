@@ -10,6 +10,11 @@
 // #include <imtauth/CAccountInfoMetaInfo.h>
 // #include <imtauth/IAccountInfo.h>
 
+// Partitura test registrations for StructureTest
+const char partituraStructureTest[] = "StructureTest";
+typedef CStructurePartituraTestBaseRegister<partituraStructureTest> partituraStructureTestClass;
+I_ADD_TEST(partituraStructureTestClass);
+
 
 // void CStructureTest::initTestCase()
 // {
