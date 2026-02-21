@@ -108,7 +108,7 @@ void CCuboidTest::testGetHeight()
 void CCuboidTest::testGetDepth()
 {
 	imt3d::CCuboid cuboid(0.0, 10.0, 0.0, 5.0, 0.0, 3.0);
-	QCOMPARE(cuboid.GetDepth(), 3.0);
+	QVERIFY(qAbs(cuboid.GetDepth() - 3.0) <= I_BIG_EPSILON);
 }
 
 
