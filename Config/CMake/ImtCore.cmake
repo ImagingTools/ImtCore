@@ -24,9 +24,11 @@ function(imtcore_generate_tests pathToClassTest)
 	
 	set(GENERATE_H_TESTS_FILE ${CMAKE_CURRENT_BINARY_DIR}/CGenerateTest.h)
 
+	# Ensure output directory exists
+	file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+
 	add_custom_command(
 		OUTPUT ${GENERATE_H_TESTS_FILE}
-		PRE_BUILD
 		COMMAND ${PYTHONEXE} ${IMTCOREDIR}/Tests/Scripts/CGenerateTests.py ${pathToClassTest}
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 		COMMENT
@@ -35,6 +37,8 @@ function(imtcore_generate_tests pathToClassTest)
 	add_custom_target(
 		GenereteTestHandler${PROJECT_NAME} ALL
 		DEPENDS ${GENERATE_H_TESTS_FILE})
+
+	add_dependencies(${PROJECT_NAME} GenereteTestHandler${PROJECT_NAME})
 
 	target_sources(${PROJECT_NAME} PRIVATE ${GENERATE_H_TESTS_FILE})
 endfunction(imtcore_generate_tests)
