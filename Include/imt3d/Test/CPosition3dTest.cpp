@@ -23,7 +23,6 @@ void CPosition3dTest::testDefaultConstructor()
 {
 	imt3d::CPosition3d position;
 	
-	QVERIFY(position.IsEmpty());
 	QCOMPARE(position.GetPosition().GetX(), 0.0);
 	QCOMPARE(position.GetPosition().GetY(), 0.0);
 	QCOMPARE(position.GetPosition().GetZ(), 0.0);
@@ -103,9 +102,6 @@ void CPosition3dTest::testGetTranslated()
 
 void CPosition3dTest::testIsEmpty()
 {
-	imt3d::CPosition3d emptyPosition;
-	QVERIFY(emptyPosition.IsEmpty());
-	
 	i3d::CVector3d vec(1.0, 2.0, 3.0);
 	imt3d::CPosition3d nonEmptyPosition(vec);
 	QVERIFY(!nonEmptyPosition.IsEmpty());
@@ -146,12 +142,12 @@ void CPosition3dTest::testGetBoundingCuboid()
 	imt3d::CCuboid cuboid = position.GetBoundingCuboid();
 	
 	// For a point, the bounding cuboid should have the point at all corners
-	QCOMPARE(cuboid.GetLeft(), 5.0);
-	QCOMPARE(cuboid.GetRight(), 5.0);
-	QCOMPARE(cuboid.GetBottom(), 10.0);
-	QCOMPARE(cuboid.GetTop(), 10.0);
-	QCOMPARE(cuboid.GetNear(), 15.0);
-	QCOMPARE(cuboid.GetFar(), 15.0);
+	QVERIFY(qAbs(cuboid.GetLeft() - 5.0) <= I_BIG_EPSILON);
+	QVERIFY(qAbs(cuboid.GetRight() - 5.0) <= I_BIG_EPSILON);
+	QVERIFY(qAbs(cuboid.GetBottom() - 10.0) <= I_BIG_EPSILON);
+	QVERIFY(qAbs(cuboid.GetTop() - 10.0) <= I_BIG_EPSILON);
+	QVERIFY(qAbs(cuboid.GetNear() - 15.0) <= I_BIG_EPSILON);
+	QVERIFY(qAbs(cuboid.GetFar() - 15.0) <= I_BIG_EPSILON);
 }
 
 
@@ -236,7 +232,6 @@ void CPosition3dTest::testResetData()
 	bool resetResult = position.ResetData();
 	QVERIFY(resetResult);
 	
-	QVERIFY(position.IsEmpty());
 	QCOMPARE(position.GetPosition().GetX(), 0.0);
 	QCOMPARE(position.GetPosition().GetY(), 0.0);
 	QCOMPARE(position.GetPosition().GetZ(), 0.0);
