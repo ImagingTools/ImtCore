@@ -9,10 +9,6 @@
 #include <itest/CStandardTestExecutor.h>
 
 
-namespace imtauthtest
-{
-
-
 void CPersonalAccessTokenTest::initTestCase()
 {
 	// Paths to test component accessor and config
@@ -300,6 +296,6 @@ void CPersonalAccessTokenTest::testDeleteToken()
 }
 
 
-} // namespace imtauthtest
+I_ADD_TEST(CPersonalAccessTokenTest);
 
-I_ADD_TEST(imtauthtest::CPersonalAccessTokenTest);
+
