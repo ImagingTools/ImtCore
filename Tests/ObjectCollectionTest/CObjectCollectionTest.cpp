@@ -11,7 +11,7 @@
 #include <imtauth/CAccountInfoMetaInfo.h>
 #include <imtauth/IAccountInfo.h>
 
-#include <GeneratedFiles/ObjectCollectionTest/CGenerateTest.h>
+#include <ObjectCollectionTest/CGenerateTest.h>
 
 
 void CObjectCollectionTest::initTestCase()

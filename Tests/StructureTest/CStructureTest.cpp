@@ -9,7 +9,7 @@
 // #include <imtauth/CAccountInfo.h>
 // #include <imtauth/CAccountInfoMetaInfo.h>
 // #include <imtauth/IAccountInfo.h>
-#include <GeneratedFiles/StructureTest/CGenerateTest.h>
+#include <StructureTest/CGenerateTest.h>
 
 
 // void CStructureTest::initTestCase()
