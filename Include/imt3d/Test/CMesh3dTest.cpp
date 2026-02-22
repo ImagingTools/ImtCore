@@ -216,13 +216,15 @@ void CMesh3dTest::testIsEqual()
 	mesh1.CreateMesh(imt3d::IPointsBasedObject::PF_XYZ_32, 1, vertices, indices);
 	mesh2.CreateMesh(imt3d::IPointsBasedObject::PF_XYZ_32, 1, vertices, indices);
 	
-	QVERIFY(mesh1.IsEqual(mesh2));
+	bool check1 = mesh1.IsEqual(mesh2);
+	QVERIFY(check1);
 	
 	// Modify mesh2
 	float moreVertices[] = { 4.0f, 5.0f, 6.0f };
 	mesh2.InsertData(1, moreVertices, indices);
 	
-	QVERIFY(!mesh1.IsEqual(mesh2));
+	bool check2 = mesh1.IsEqual(mesh2);
+	QVERIFY(!check2);
 }
 
 

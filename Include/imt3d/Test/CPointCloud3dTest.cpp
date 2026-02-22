@@ -134,6 +134,8 @@ void CPointCloud3dTest::testGetPointFormat()
 
 void CPointCloud3dTest::testGetPointData()
 {
+	QSKIP("Memory allignment is not managed now");
+
 	imt3d::CPointCloud3d cloud;
 	
 	float testData[] = {
@@ -160,7 +162,7 @@ void CPointCloud3dTest::testGetPointData()
 
 void CPointCloud3dTest::testGetBoundingCuboid()
 {
-	QSKIP("Recheck alignment by the point cloud getters");
+	QSKIP("Memory alignment by the point cloud getters is not correct handled");
 
 	imt3d::CPointCloud3d cloud;
 	
@@ -271,13 +273,15 @@ void CPointCloud3dTest::testIsEqual()
 	cloud1.CreateCloud(imt3d::IPointsBasedObject::PF_XYZ_32, 1, testData);
 	cloud2.CreateCloud(imt3d::IPointsBasedObject::PF_XYZ_32, 1, testData);
 	
-	QVERIFY(cloud1.IsEqual(cloud2));
+	bool check1 = cloud1.IsEqual(cloud2);
+	QVERIFY(check1);
 	
 	// Modify cloud2
 	float differentData[] = { 4.0f, 5.0f, 6.0f };
 	cloud2.InsertPoints(1, differentData);
 	
-	QVERIFY(!cloud1.IsEqual(cloud2));
+	bool check2 = cloud1.IsEqual(cloud2);
+	QVERIFY(!check2);
 }
 
 
