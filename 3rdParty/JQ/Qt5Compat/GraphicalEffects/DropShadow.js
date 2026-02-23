@@ -25,27 +25,27 @@ class DropShadow extends Item {
 
     SLOT_visibleChanged(oldValue, newValue){
         super.SLOT_visibleChanged()
-        this.__updateShadow()
+        JQApplication.updateLater(this)
     }
 
     SLOT_colorChanged(oldValue, newValue){
-        this.__updateShadow()
+        JQApplication.updateLater(this)
     }
 
     SLOT_horizontalOffsetChanged(oldValue, newValue){
-        this.__updateShadow()
+        JQApplication.updateLater(this)
     }
 
     SLOT_verticalOffsetChanged(oldValue, newValue){
-        this.__updateShadow()
+        JQApplication.updateLater(this)
     }
 
     SLOT_radiusChanged(oldValue, newValue){
-        this.__updateShadow()
+        JQApplication.updateLater(this)
     }
 
     SLOT_samplesChanged(oldValue, newValue){
-        this.__updateShadow()
+        JQApplication.updateLater(this)
     }
 
     SLOT_spreadChanged(oldValue, newValue){
@@ -53,7 +53,7 @@ class DropShadow extends Item {
     }
 
     SLOT_sourceChanged(oldValue, newValue){
-        this.__updateShadow()
+        JQApplication.updateLater(this)
     }
 
     __updateShadow(){
@@ -69,6 +69,11 @@ class DropShadow extends Item {
                 boxShadow: `unset`
             })
         }
+    }
+
+    __endUpdate(){
+        super.__endUpdate()
+        this.__updateShadow()
     }
 }
 
