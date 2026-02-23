@@ -71,6 +71,8 @@ class Repeater extends Item {
             this.__proxy.itemRemoved(r)
             if(r) r.destroy()
         }
+
+        this.count = 0
     }
 
     __createItem(index) {

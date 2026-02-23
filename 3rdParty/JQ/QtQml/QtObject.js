@@ -37,7 +37,9 @@ class QtObject extends QObject {
 
         if(properties.model){
             let keys = Object.keys(properties.model)
-            if(keys.length === 1 && !(properties.model[keys[0]] instanceof QObject)){
+            if(properties.modelData){
+                obj.JQAbstractModelData = properties.modelData
+            } else if(keys.length === 1 && !(properties.model[keys[0]] instanceof QObject)){
                 obj.JQAbstractModelData = properties.model[keys[0]]
             }
             obj.JQAbstractModel = properties.model

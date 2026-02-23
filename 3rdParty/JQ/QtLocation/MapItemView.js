@@ -57,6 +57,8 @@ class MapItemView extends QtObject {
         for(let r of removed){
             if(r) r.destroy()
         }
+
+        this.count = 0
     }
 
     __createItem(model){
