@@ -51,6 +51,13 @@ RUN set -eux; \
       libxrender1 \
       libxss1 \
       libxtst6 \
+      libegl1 \
+      libgl1-mesa-glx \
+      libgles2 \
+      libglx-mesa0 \
+      libopengl0 \
+      libglvnd0 \
+      libxkbcommon0 \
     ; \
     rm -rf /var/lib/apt/lists/*
 
@@ -92,6 +99,7 @@ WORKDIR /app/tests
 COPY Tests/Docker/GUI/package.json /modules/package.json
 RUN cd /modules && \
     npm install && \
+    npm install -g newman && \
     npx playwright install chromium --with-deps && \
     rm package.json && \
     echo 'export PATH="/modules/node_modules/.bin:$PATH"' >> /etc/profile && \
@@ -128,4 +136,4 @@ ENV CI=true
 
 # Default entrypoint (will be overridden to use mounted script)
 ENTRYPOINT ["sh"]
-CMD [] 
+CMD []
