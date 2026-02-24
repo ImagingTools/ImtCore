@@ -132,49 +132,16 @@ bool CGqlExtSchemaParser::ExtractDocumentTypeFromCurrentEntry(CSdlDocumentType& 
 
 		keyword = keyword.trimmed();
 
-		// fill reference type
+		// notify, that the reference type doesn't supported yet
 		if (keyword == QByteArrayLiteral("ref")){
 			QByteArray typeRefName;
 			retVal = retVal && MoveToNextReadableSymbol() && ReadToDelimeterOrSpace("", typeRefName);
 			if (typeRefName.isEmpty()){
 				SendLogMessage(
-							istd::IInformationProvider::IC_ERROR,
+							istd::IInformationProvider::IC_WARNING,
 							0,
-							QString("Reference for '%1' at %2").arg(documentType.GetName(), QString::number(m_lastReadLine + 1)),
+							QString("Reference doesn't supported yet. It will be ignored. And removed in the next version. Found for '%1' at %2").arg(documentType.GetName(), QString::number(m_lastReadLine + 1)),
 							__func__);
-				
-				return false;
-			}
-
-
-			std::unique_ptr<CSdlEntryBase> foundEntryPtr;
-			auto foundIterator = std::find_if(m_sdlTypes.cbegin(), m_sdlTypes.cend(), [&typeRefName](const CSdlType& type){
-				return (type.GetName() == typeRefName);
-			});
-			if (foundIterator != m_sdlTypes.cend()){
-				CSdlType type = *foundIterator;
-				documentType.SetReferenceType(type);
-				foundEntryPtr = std::make_unique<CSdlType>(type);
-			}
-			else { // check if a union
-				auto foundUnionIterator = std::find_if(m_unions.cbegin(), m_unions.cend(), [&typeRefName](const CSdlUnion& aUnion){
-					return (aUnion.GetName() == typeRefName);
-				});
-				if (foundUnionIterator != m_unions.cend()){
-					CSdlUnion vUinon = *foundUnionIterator;
-					documentType.SetReferenceType(vUinon);
-					foundEntryPtr = std::make_unique<CSdlUnion>(vUinon);
-				}
-			}
-
-			if (!foundEntryPtr){
-				SendLogMessage(
-							istd::IInformationProvider::IC_ERROR,
-							0,
-							QString("Unable to find type '%1' at %2").arg(typeRefName, QString::number(m_lastReadLine + 1)),
-							__func__);
-
-				return false;
 			}
 		}
 		// extract operations
@@ -287,18 +254,6 @@ bool CGqlExtSchemaParser::ValidateSchema()
 {
 	if (!BaseClass::ValidateSchema()){
 		return false;
-	}
-
-	// all document types MUST have a reference
-	for (const CSdlDocumentType& sdlDocumentType: m_documentTypes){
-		if (sdlDocumentType.GetReferenceType().GetName().isEmpty()){
-			SendLogMessage(
-				istd::IInformationProvider::IC_ERROR,
-				0,
-				QString("Document type '%1' does not have a reference! define 'ref' for it.").arg(sdlDocumentType.GetName()),
-				"ValidateDocumentSchema");
-			return false;
-		}
 	}
 
 	/// \todo don't use a suffix. Instead, define it elsewhere... like \c s_sdlNamespacePrefix

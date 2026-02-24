@@ -1,4 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+
+#include "imtsdl/CSdlEntryBase.h"
 #include <imtsdlgencpp/CSdlGenTools.h>
 
 
@@ -12,11 +14,14 @@
 #include <iprm/TParamsPtr.h>
 
 // ImtCore includes
+#include <imtsdl/CSdlTools.h>
 #include <imtsdl/CSdlField.h>
 #include <imtsdl/CSdlType.h>
 #include <imtsdl/CSdlEnum.h>
 #include <imtsdl/CSdlRequest.h>
 #include <imtsdl/CSdlDocumentType.h>
+#include <memory>
+#include <optional>
 
 
 namespace imtsdlgencpp
@@ -533,6 +538,58 @@ QString CSdlGenTools::GetQObjectTypeName(const imtsdl::CSdlField& sdlField,
 QString CSdlGenTools::GetTempVariableWrappedValue(const QString& variableName)
 {
 	return QStringLiteral("t_%1").arg(imtsdl::CSdlTools::GetDecapitalizedValue(variableName));
+}
+
+std::shared_ptr<imtsdl::CSdlEntryBase> CSdlGenTools::GetCollectionReferenceForDocument(
+			const imtsdl::CSdlDocumentType& documentType,
+			const imtsdl::SdlTypeList& typeList,
+			const imtsdl::SdlUnionList& unionList,
+			imtsdl::CSdlDocumentType::OperationType operationType)
+{
+	using namespace imtsdl;
+
+	if (!documentType.HasRequest(operationType)) {
+		return {};
+	}
+
+	CSdlRequest request = documentType.GetRequest(operationType);
+	std::optional<CSdlField> fieldForType;
+	switch (operationType) {
+		case CSdlDocumentType::OT_GET:
+		case CSdlDocumentType::OT_LIST:
+		case CSdlDocumentType::OT_INSERT:
+		case CSdlDocumentType::OT_UPDATE:
+		
+		case CSdlDocumentType::OT_GET_VIEW:
+		case CSdlDocumentType::OT_DELETE:
+		case CSdlDocumentType::OT_UPDATE_COLLECTION:
+		case CSdlDocumentType::OT_RENAME:
+		case CSdlDocumentType::OT_SET_DESCRIPTION:
+		case CSdlDocumentType::OT_HEADERS:
+		case CSdlDocumentType::OT_INFO:
+		case CSdlDocumentType::OT_METAINFO:
+		case CSdlDocumentType::OT_DATAMETAINFO:
+		case CSdlDocumentType::OT_ELEMENTS_COUNT:
+		case CSdlDocumentType::OT_ELEMENT_IDS:
+		case CSdlDocumentType::OT_ELEMENT_HISTORY:
+		case CSdlDocumentType::OT_IMPORT:
+		case CSdlDocumentType::OT_EXPORT:
+		default:
+			qWarning() << "Operation type not implemented";
+			break;
+		}
+
+	if (!fieldForType){
+		return {};
+	}
+
+	auto typeForField =  CSdlTools::GetSdlTypeOrEnumOrUnionForField(
+		*fieldForType,
+		typeList,
+		{},
+		unionList);
+
+	return typeForField;
 }
 
 

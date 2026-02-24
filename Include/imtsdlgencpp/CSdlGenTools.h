@@ -9,6 +9,7 @@
 #include <imtsdl/ISdlUnionListProvider.h>
 #include <imtsdl/CSdlTools.h>
 #include <imtsdl/CSdlField.h>
+#include <imtsdl/CSdlDocumentType.h>
 
 
 class QTextStream;
@@ -111,14 +112,27 @@ public:
 				const imtsdl::SdlRequestList& requestList,
 				const QString& className);
 
-	[[nodiscard]] static QString GetQObjectTypeName(const imtsdl::CSdlField& sdlField,
-									  const imtsdl::SdlTypeList& typeList,
-									  const imtsdl::SdlEnumList& enumList,
-									  const imtsdl::SdlUnionList& unionList,
-									  bool withPointer = true,
-									  bool treatArrayAsElement = false);
+	[[nodiscard]] static QString GetQObjectTypeName(
+				const imtsdl::CSdlField& sdlField,
+				const imtsdl::SdlTypeList& typeList,
+				const imtsdl::SdlEnumList& enumList,
+				const imtsdl::SdlUnionList& unionList,
+				bool withPointer = true,
+				bool treatArrayAsElement = false);
 
 	[[nodiscard]] static QString GetTempVariableWrappedValue(const QString& variableName);
+
+	[[nodiscard]] static std::shared_ptr<imtsdl::CSdlEntryBase> GetCollectionReferenceForDocument(
+				const imtsdl::CSdlDocumentType& documentType,
+				const imtsdl::SdlTypeList& typeList,
+				const imtsdl::SdlUnionList& unionList,
+				imtsdl::CSdlDocumentType::OperationType operationType);
+
+	[[nodiscard]] static QString GetCollectionReferenceName(
+				const imtsdl::CSdlDocumentType& documentType,
+				const imtsdl::SdlTypeList& typeList,
+				const imtsdl::SdlUnionList& unionList,
+				imtsdl::CSdlDocumentType::OperationType operationType);
 };
 
 
@@ -133,6 +147,21 @@ inline QString CSdlGenTools::GetSdlEntryVersion(const SdlEntryClass& entry, bool
 inline QString CSdlGenTools::GetTempVariableWrappedValue(const imtsdl::CSdlField& sdlField)
 {
 	return GetTempVariableWrappedValue(sdlField.GetId());
+}
+
+inline QString CSdlGenTools::GetCollectionReferenceName(
+			const imtsdl::CSdlDocumentType& documentType,
+			const imtsdl::SdlTypeList& typeList,
+			const imtsdl::SdlUnionList& unionList,
+			imtsdl::CSdlDocumentType::OperationType operationType)
+{
+	auto refEntry = GetCollectionReferenceForDocument(documentType, typeList, unionList, operationType);
+	if (refEntry)
+	{
+		return refEntry->GetName();
+	}
+
+	return {};
 }
 
 

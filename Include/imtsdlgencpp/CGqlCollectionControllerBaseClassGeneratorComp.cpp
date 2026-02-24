@@ -1,4 +1,9 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+#include "imtsdl/CSdlTools.h"
+#include "imtsdl/CSdlType.h"
+#include "imtsdl/CSdlUnion.h"
+#include "imtsdlgencpp/CSdlGenTools.h"
+#include <QtCore/qassert.h>
 #include <imtsdlgencpp/CGqlCollectionControllerBaseClassGeneratorComp.h>
 
 
@@ -409,22 +414,27 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodsForDocument(
 	stream << QStringLiteral(" methods");
 	FeedStream(stream, 1, false);
 
-	const QString documentClassName = sdlDocumentType.GetReferenceType().GetName();
-
 	const QMultiMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> operationsList = sdlDocumentType.GetOperationsList();
 
 	QList<imtsdl::CSdlRequest> implementedGetRequests;
+
 #if QT_VERSION >= 0x050500 && QT_VERSION < 0x060000
 	QMapIterator operationsIter(operationsList);
 #else
 	QMultiMapIterator operationsIter(operationsList);
 #endif
+
+	imtsdl::SdlTypeList typeList = m_sdlTypeListCompPtr->GetSdlTypes(false);
+	imtsdl::SdlUnionList unionList = m_sdlUnionListCompPtr->GetUnions(false);
+
 	while (operationsIter.hasNext()){
 		auto operation = operationsIter.next();
 		const imtsdl::CSdlRequest& sdlRequest = operation.value();
 		imtsdl::CSdlDocumentType::OperationType operationType = operation.key();
 
-		if (	operationType == imtsdl::CSdlDocumentType::OT_GET ||
+		const QString documentClassName = CSdlGenTools::GetCollectionReferenceName(sdlDocumentType, typeList, unionList, operationType);
+
+		if (operationType == imtsdl::CSdlDocumentType::OT_GET ||
 			operationType == imtsdl::CSdlDocumentType::OT_LIST ||
 			operationType == imtsdl::CSdlDocumentType::OT_UPDATE ||
 			operationType == imtsdl::CSdlDocumentType::OT_INSERT)
@@ -434,7 +444,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodsForDocument(
 				implementedGetRequests << sdlRequest;
 			}
 		}
-		else if (	operationType != imtsdl::CSdlDocumentType::OT_UPDATE &&
+		else if (operationType != imtsdl::CSdlDocumentType::OT_UPDATE &&
 				 operationType != imtsdl::CSdlDocumentType::OT_INSERT &&
 				 operationType != imtsdl::CSdlDocumentType::OT_GET &&
 				 operationType != imtsdl::CSdlDocumentType::OT_LIST &&
@@ -468,6 +478,14 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(
 	structNameConverter.unionListProviderPtr = &*m_sdlUnionListCompPtr;
 	structNameConverter.addVersion = true;
 
+	imtsdl::SdlTypeList typeList = m_sdlTypeListCompPtr->GetSdlTypes(false);
+	imtsdl::SdlUnionList unionList = m_sdlUnionListCompPtr->GetUnions(false);
+	auto referenceType = CSdlGenTools::GetCollectionReferenceForDocument(sdlDocumentType, typeList, unionList, operationType);
+	QString documentClassName;
+	if (referenceType){
+		documentClassName = referenceType->GetName();
+	}
+
 	if (operationType == imtsdl::CSdlDocumentType::OT_GET ||
 		operationType == imtsdl::CSdlDocumentType::OT_LIST)
 	{
@@ -500,6 +518,8 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(
 			stream << QStringLiteral("& representationPayload");
 		}
 		else {
+			Q_ASSERT(referenceType);
+
 			stream << QStringLiteral("::imtbase::IObjectCollectionIterator& objectCollectionIterator,");
 			FeedStream(stream, 1, false);
 
@@ -511,8 +531,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(
 			stream << QStringLiteral("Request,");
 			FeedStream(stream, 1, false);
 
-			const imtsdl::CSdlEntryBase& referenceType = sdlDocumentType.GetReferenceType();
-			structNameConverter.sdlEntryPtr = &referenceType;
+			structNameConverter.sdlEntryPtr = referenceType.get();
 			structNameConverter.sdlFieldPtr = nullptr;
 
 			FeedStreamHorizontally(stream, hIndents + 3);
@@ -527,12 +546,13 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(
 		FeedStream(stream, 1, false);
 	}
 	else if (operationType == imtsdl::CSdlDocumentType::OT_INSERT){
+		Q_ASSERT(referenceType);
+
 		FeedStreamHorizontally(stream, hIndents);
 		stream << QStringLiteral("virtual istd::IChangeableUniquePtr CreateObjectFromRepresentation(");
 		FeedStream(stream, 1, false);
 
-		const imtsdl::CSdlEntryBase& referenceType = sdlDocumentType.GetReferenceType();
-		structNameConverter.sdlEntryPtr = &referenceType;
+		structNameConverter.sdlEntryPtr = referenceType.get();
 		structNameConverter.sdlFieldPtr = nullptr;
 
 		FeedStreamHorizontally(stream, hIndents + 3);
@@ -926,16 +946,21 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddCollectionMethodsImplFor
 
 	QMultiMap<imtsdl::CSdlDocumentType::OperationType, ImplGenerationInfo> requestInfoMultiMap;
 	QMultiMap requestMap(sdlDocumentType.GetOperationsList());
-	const QString typeClassName = sdlDocumentType.GetReferenceType().GetName();
+	imtsdl::SdlTypeList typeList = m_sdlTypeListCompPtr->GetSdlTypes(false);
+	imtsdl::SdlUnionList unionList = m_sdlUnionListCompPtr->GetUnions(false);
+
 	for (auto mapIter = requestMap.cbegin(); mapIter != requestMap.cend(); ++mapIter){
-		requestInfoMultiMap.insert(mapIter.key(), ImplGenerationInfo(mapIter.value(), typeClassName));
+		auto operationType = mapIter.key();
+		const QString typeClassName = CSdlGenTools::GetCollectionReferenceName(sdlDocumentType, typeList, unionList, operationType);
+		requestInfoMultiMap.insert(operationType, ImplGenerationInfo(mapIter.value(), typeClassName));
 	}
 
 	for (const imtsdl::CSdlDocumentType& documentType: sdlDocumentType.GetSubtypes()){
 		QMultiMap subtypeRequestMap(documentType.GetOperationsList());
-		const QString subtypeClassName = documentType.GetReferenceType().GetName();
 		for (auto mapIter = subtypeRequestMap.cbegin(); mapIter != subtypeRequestMap.cend(); ++mapIter){
-			requestInfoMultiMap.insert(mapIter.key(), ImplGenerationInfo(mapIter.value(), subtypeClassName));
+			auto operationType = mapIter.key();
+			const QString subtypeClassName = CSdlGenTools::GetCollectionReferenceName(documentType, typeList, unionList, operationType);
+			requestInfoMultiMap.insert(operationType, ImplGenerationInfo(mapIter.value(), subtypeClassName));
 		}
 	}
 	QList remainingOperations({
@@ -1136,19 +1161,24 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddSpecialMethodImplCodeFor
 
 	QMultiMap<imtsdl::CSdlDocumentType::OperationType, ImplGenerationInfo> requestInfoMultiMap;
 	QMultiMap requestMap(sdlDocumentType.GetOperationsList());
-	const QString typeClassName = sdlDocumentType.GetReferenceType().GetName();
+	imtsdl::SdlTypeList typeList = m_sdlTypeListCompPtr->GetSdlTypes(false);
+	imtsdl::SdlUnionList unionList = m_sdlUnionListCompPtr->GetUnions(false);
+
 	for (auto mapIter = requestMap.cbegin(); mapIter != requestMap.cend(); ++mapIter){
-		if (s_nonTrivialOperationMethodsMap.contains(mapIter.key())){
-			requestInfoMultiMap.insert(mapIter.key(), ImplGenerationInfo(mapIter.value(), typeClassName));
+		auto operationType = mapIter.key();
+		if (s_nonTrivialOperationMethodsMap.contains(operationType)){
+			const QString typeClassName = CSdlGenTools::GetCollectionReferenceName(sdlDocumentType, typeList, unionList, operationType);
+			requestInfoMultiMap.insert(operationType, ImplGenerationInfo(mapIter.value(), typeClassName));
 		}
 	}
 
 	for (const imtsdl::CSdlDocumentType& documentType: sdlDocumentType.GetSubtypes()){
 		QMultiMap subtypeRequestMap(documentType.GetOperationsList());
-		const QString subtypeClassName = documentType.GetReferenceType().GetName();
 		for (auto mapIter = subtypeRequestMap.cbegin(); mapIter != subtypeRequestMap.cend(); ++mapIter){
-			if (s_nonTrivialOperationMethodsMap.contains(mapIter.key())){
-				requestInfoMultiMap.insert(mapIter.key(), ImplGenerationInfo(mapIter.value(), subtypeClassName));
+			auto operationType = mapIter.key();
+			if (s_nonTrivialOperationMethodsMap.contains(operationType)){
+				const QString subtypeClassName = CSdlGenTools::GetCollectionReferenceName(documentType, typeList, unionList, operationType);
+				requestInfoMultiMap.insert(operationType, ImplGenerationInfo(mapIter.value(), subtypeClassName));
 			}
 		}
 	}
@@ -1244,9 +1274,17 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 		m_argumentParserCompPtr.GetPtr(),
 		false);
 
-	const imtsdl::CSdlEntryBase& referenceType = sdlDocumentType.GetReferenceType();
+	imtsdl::SdlTypeList typeList = m_sdlTypeListCompPtr->GetSdlTypes(false);
+	imtsdl::SdlUnionList unionList = m_sdlUnionListCompPtr->GetUnions(false);
+	auto referenceType = CSdlGenTools::GetCollectionReferenceForDocument(sdlDocumentType, typeList, unionList, operationType);
+	if (!referenceType){
+		SendErrorMessage(0, QString("Unable to get collection reference for document %1").arg(sdlDocumentType.GetName()));
+
+		return false;
+	}
+
 	CStructNamespaceConverter structNameConverter(
-		referenceType,
+		*referenceType,
 		sdlNamespace,
 		*m_sdlTypeListCompPtr,
 		*m_sdlEnumListCompPtr,
@@ -1443,7 +1481,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 		stream << GetInputExtractionStringForTypeName(
 			sdlRequestInfo.request,
 			sdlRequestInfo.containerClassName,
-			QStringLiteral("Version_") + GetSdlEntryVersion(referenceType, false),& isCorrect);
+			QStringLiteral("Version_") + GetSdlEntryVersion(*referenceType, false),& isCorrect);
 		stream << QStringLiteral(", newObjectId, errorMessage);");
 		FeedStream(stream, 1, false);
 		if (!isCorrect){
