@@ -1087,7 +1087,7 @@ QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 			FROM %2"%3" as root
 			LEFT JOIN (
 				SELECT DISTINCT ON ("%8")
-					"%8", "%6"
+					"%8", "%6", "%9"
 				FROM %2"%3"
 				WHERE %1 = 1
 				ORDER BY "%8", "%6" DESC
@@ -1102,7 +1102,8 @@ QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 						/*5*/ customColumns,
 						/*6*/ QString::fromUtf8(s_lastModifiedColumn),
 						/*7*/ QString::fromUtf8(s_addedColumn),
-						/*8*/ QString::fromUtf8(s_documentIdColumn)
+						/*8*/ QString::fromUtf8(s_documentIdColumn),
+						/*9*/ QString::fromUtf8(s_revisionInfoColumn)
 					);
 
 	return query;
