@@ -22,6 +22,12 @@ ElementView {
         }
     }
 
+    onValueChanged: {
+        if (spinBox){
+            spinBox.value = value
+        }
+    }
+
     onFromChanged: {
         if (spinBox){
             spinBox.from = from
@@ -42,7 +48,7 @@ ElementView {
 
     onReadOnlyChanged: {
         if (spinBox){
-            spinBox.readOnly = readOnly
+            spinBox.editable = !readOnly
         }
     }
 
