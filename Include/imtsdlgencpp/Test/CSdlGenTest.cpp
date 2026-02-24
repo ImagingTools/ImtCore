@@ -286,6 +286,20 @@ void CSdlGenTest::PrinterTest()
 }
 
 
+void CSdlGenTest::SubstrateSpecifications() 
+{
+	CImtSdlGenTest testSuite;
+	PrepareSuite(testSuite, m_tempOutputDir);
+	auto argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
+
+	argParserPtr->SetCppEnabled();
+	argParserPtr->SetGqlEnabled();
+	argParserPtr->SetQmlEnabled(false);
+
+	ExecuteTest(testSuite, "SubstrateSpecifications.sdl", "Substrates", "substratesdl");
+}
+
+
 void CSdlGenTest::cleanup() 
 {
 	m_isAllTestsPassed = m_isAllTestsPassed && !QTest::currentTestFailed();
