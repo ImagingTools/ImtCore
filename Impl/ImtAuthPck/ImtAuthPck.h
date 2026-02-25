@@ -48,6 +48,7 @@
 #include <imtauth/CUserActionManagerComp.h>
 #include <imtauth/CPersonalAccessToken.h>
 #include <imtauth/CPersonalAccessTokenManagerComp.h>
+#include <imtauth/CPersonalAccessTokenMetaInfoCreatorComp.h>
 #include <imtauth/CUserRecentActionComp.h>
 
 
@@ -136,6 +137,7 @@ typedef icomp::TModelCompWrap<
 						iser::ISerializable,
 						istd::IChangeable>> PersonalAccessToken;
 typedef imtauth::CPersonalAccessTokenManagerComp PersonalAccessTokenManager;
+typedef imtauth::CPersonalAccessTokenMetaInfoCreatorComp PersonalAccessTokenMetaInfoCreator;
 typedef icomp::TModelCompWrap<imtauth::CUserRecentActionComp> UserRecentAction;
 
 
