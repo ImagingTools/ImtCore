@@ -98,11 +98,35 @@ Rectangle{
 		requestPaint()
 	}
 
-	function validatator(pointsArg){
-		return validatorBase(pointsArg);
+	function validatorX(pointArg, nextPointArg, deltaArg, pointListArg, indexArg){
+		return validatorXBase(pointArg, nextPointArg, deltaArg, pointListArg, indexArg)
 	}
 
-	function validatorBase(pointsArg){
+	function validatorXBase(pointArg, nextPointArg, deltaArg, pointListArg, indexArg){
+		return (nextPointArg.x - pointArg.x > deltaArg)
+	}
+
+	function validatorY(pointArg, nextPointArg, deltaArg, pointListArg, indexArg){
+		return true;
+	}
+
+	function validatorYBase(pointArg, nextPointArg, deltaArg, pointListArg, indexArg){
+		return (nextPointArg.y - pointArg.y > deltaArg)
+	}
+
+	function getXCorrection(deltaArg, pointListArg, indexArg){
+		return deltaArg
+	}
+
+	function getYCorrection(deltaArg, pointListArg, indexArg){
+		return deltaArg
+	}
+
+	function getInvalidPoints(pointsArg){
+		return getInvalidPointsBase(pointsArg);
+	}
+
+	function getInvalidPointsBase(pointsArg){
 		let indexArr = []
 		let prevPoint
 		for(let i = 0; i < pointsArg.length; i++){
@@ -115,7 +139,7 @@ Rectangle{
 		return indexArr;
 	}
 
-	function validatorBaseBothDirection(pointsArg){
+	function getInvalidPointsBaseBothDirection(pointsArg){
 		let indexArr = []
 		for(let i = 0; i < pointsArg.length; i++){
 			let point = pointsArg[i]
@@ -147,7 +171,7 @@ Rectangle{
 				let screenPoint = shape.getScreenPosition(points[j])
 				screenPointArr.push(screenPoint)
 			}
-			let invalidIndexArr = validatator(screenPointArr)
+			let invalidIndexArr = getInvalidPoints(screenPointArr)
 			shape.invalidPointIndexArr = invalidIndexArr;
 			if(invalidIndexArr.length){
 				for(let k = 0; k < invalidIndexArr.length; k++){
@@ -155,6 +179,13 @@ Rectangle{
 				}
 			}
 		}
+	}
+
+	function getScreenPosition(logPosition){
+		let activeLayer  = graphicsView.getActiveLayer()
+		let matrix = LinearAlgebra.multiplyByMatrix3x3(graphicsView.viewMatrix.matrix, activeLayer.layerMatrix.matrix)
+		let screenPosition = LinearAlgebra.transformPoint2d(logPosition, matrix)
+		return screenPosition
 	}
 
 	function requestPaint() {
@@ -615,12 +646,14 @@ Rectangle{
 				}
 			}
 
+
+
 			function editPointsFunction(mouse){
 				let pointScreen = Qt.point(mouse.x, mouse.y)
 				if(graph.hasPointMovementControl){
-					let ok = true;
-					let margin_ = Style.marginXS
-					let delta = margin_
+					let okX = true;
+					let okY = true;
+					let delta = Style.marginXS
 					let prevPointScreen
 					let nextPointScreen
 					let isFirstPoint = (editNodeIndex == 0)
@@ -628,30 +661,49 @@ Rectangle{
 					if(!isFirstPoint && !isLastPoint){
 						prevPointScreen = getScreenPosition(points[editNodeIndex - 1])
 						nextPointScreen = getScreenPosition(points[editNodeIndex +1])
-						let okPrev = (pointScreen.x - prevPointScreen.x) > margin_
-						let okNext = (nextPointScreen.x - pointScreen.x) > margin_
-						ok = okPrev > margin_ && okNext
-						if(!ok){
-							if(!okPrev){
-								pointScreen.x = prevPointScreen.x + delta
+						let okPrevX = graph.validatorX(prevPointScreen, pointScreen, delta, points, editNodeIndex)
+						let okNextX = graph.validatorX(pointScreen, nextPointScreen, delta, points, editNodeIndex)
+						let okPrevY = graph.validatorY(pointScreen, prevPointScreen, delta, points, editNodeIndex)
+						let okNextY = graph.validatorY(nextPointScreen, pointScreen, delta, points, editNodeIndex)
+						okX = okPrevX && okNextX
+						okY = okPrevY && okNextY
+						if(!okX){
+							if(!okPrevX){
+								pointScreen.x = prevPointScreen.x + graph.getXCorrection(delta, points, editNodeIndex)
 							}
-							else if(!okNext){
-								pointScreen.x = nextPointScreen.x - delta
+							else if(!okNextX){
+								pointScreen.x = nextPointScreen.x - graph.getXCorrection(delta, points, editNodeIndex)
+							}
+						}
+						if(!okY){
+							if(!okPrevY){
+								pointScreen.y = prevPointScreen.y - graph.getYCorrection(delta, points, editNodeIndex)
+							}
+							else if(!okNextY){
+								pointScreen.y = nextPointScreen.y + graph.getYCorrection(delta, points, editNodeIndex)
 							}
 						}
 					}
 					else if(isFirstPoint){
 						nextPointScreen = getScreenPosition(points[editNodeIndex +1])
-						ok = (nextPointScreen.x - pointScreen.x) > margin_
-						if(!ok){
-							pointScreen.x = nextPointScreen.x - delta
+						okX = graph.validatorX(pointScreen, nextPointScreen, delta, points, editNodeIndex)
+						okY = graph.validatorY(nextPointScreen, pointScreen, delta, points, editNodeIndex)
+						if(!okX){
+							pointScreen.x = nextPointScreen.x - graph.getXCorrection(delta, points, editNodeIndex)
+						}
+						if(!okY){
+							pointScreen.y = nextPointScreen.y + graph.getYCorrection(delta, points, editNodeIndex)
 						}
 					}
 					else if(isLastPoint){
 						prevPointScreen = getScreenPosition(points[editNodeIndex - 1])
-						ok = (pointScreen.x - prevPointScreen.x) > margin_
-						if(!ok){
-							pointScreen.x = prevPointScreen.x + delta
+						okX = graph.validatorX(prevPointScreen, pointScreen, delta, points, editNodeIndex)
+						okY = graph.validatorY(pointScreen, prevPointScreen, delta, points, editNodeIndex)
+						if(!okX){
+							pointScreen.x = prevPointScreen.x + graph.getXCorrection(delta, points, editNodeIndex)
+						}
+						if(!okY){
+							pointScreen.y = prevPointScreen.y - graph.getYCorrection(delta, points, editNodeIndex)
 						}
 					}
 				}
