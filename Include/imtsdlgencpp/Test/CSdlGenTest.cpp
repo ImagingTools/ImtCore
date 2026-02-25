@@ -13,7 +13,7 @@
 #include <itest/CStandardTestExecutor.h>
 #include <iprm/CParamsSet.h>
 
-// generated includes
+// ImtCore includes
 #include <GeneratedFiles/ImtSdlGenTest/CImtSdlGenTest.h>
 
 
@@ -283,6 +283,20 @@ void CSdlGenTest::PrinterTest()
 
 		ExecuteTest(testSuite, "DigitalPrinter.sdl", "Printer", "modsdlsdl");
 	}
+}
+
+
+void CSdlGenTest::SubstrateSpecifications() 
+{
+	CImtSdlGenTest testSuite;
+	PrepareSuite(testSuite, m_tempOutputDir);
+	auto argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
+
+	argParserPtr->SetCppEnabled();
+	argParserPtr->SetGqlEnabled();
+	argParserPtr->SetQmlEnabled(false);
+
+	ExecuteTest(testSuite, "SubstrateSpecifications.sdl", "Substrates", "substratesdl");
 }
 
 

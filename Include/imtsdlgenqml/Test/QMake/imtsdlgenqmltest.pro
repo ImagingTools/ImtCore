@@ -1,10 +1,10 @@
 TARGET = imtsdlgenqmltest
 
-include($(ACFCONFIGDIR)/QMake/ApplicationConfig.pri)
+include($(ACFCONFIGDIR)/QMake/TestConfig.pri)
 include($$PWD/../../../../Config/QMake/ImtCore.pri)
 
 LIBS += -L../../../../Lib/$$COMPILER_DIR
-LIBS += -lImtSdlGenCppPck -limtsdlgenqml -limtsdlgencpp -limtsdl -limtbase -litest
+LIBS += -limtsdlgenqml -limtsdlgencpp -limtsdl -limtbase -litest
 
 QT += core testlib widgets
 

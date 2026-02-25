@@ -1067,7 +1067,7 @@ QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 {
 	QString schema;
 	if (m_tableSchemaAttrPtr.IsValid()){
-		schema = *m_tableSchemaAttrPtr + ".";
+		schema = *m_tableSchemaAttrPtr + '.';
 	}
 
 	Q_ASSERT(!(*m_tableNameAttrPtr).isEmpty());
@@ -1077,34 +1077,34 @@ QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 
 	QString customColumns = GetCustomColumnsQuery();
 	if (!customColumns.isEmpty()){
-		customColumns = ", " + customColumns;
+		customColumns = QStringLiteral(", ") + customColumns;
 	}
 
-	QString query = QString(R"(
+	QString query = QStringLiteral(R"(
 			SELECT
 				root.*,
-				root1."%5" as "%6" %4
-			FROM %1"%2" as root
-			LEFT JOIN LATERAL (
-				SELECT *
-				FROM %1"%2" AS root1
-				WHERE root."%7" = root1."%7" 
-					AND %0 = 1
-				ORDER BY root1."%5" DESC
-				LIMIT 1
-			) AS root1 ON true
-			%3
+				root1."%6" as "%7" %5
+			FROM %2"%3" as root
+			LEFT JOIN (
+				SELECT DISTINCT ON ("%8")
+					"%8", "%6", "%9"
+				FROM %2"%3"
+				WHERE %1 = 1
+				ORDER BY "%8", "%6" DESC
+			) AS root1 ON root1."%8" = root."%8"
+			%4
 		)")
 					.arg(
-						CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int, "root1"),
-						schema,
-						tableName,
-						joinTablesQuery.isEmpty() ? "" : QString::fromUtf8(joinTablesQuery),
-						customColumns,
-						qPrintable(s_lastModifiedColumn),
-						qPrintable(s_addedColumn),
-						qPrintable(s_documentIdColumn)
-						);
+						/*1*/ CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int),
+						/*2*/ schema,
+						/*3*/ tableName,
+						/*4*/ joinTablesQuery.isEmpty() ? QString() : QString::fromUtf8(joinTablesQuery),
+						/*5*/ customColumns,
+						/*6*/ QString::fromUtf8(s_lastModifiedColumn),
+						/*7*/ QString::fromUtf8(s_addedColumn),
+						/*8*/ QString::fromUtf8(s_documentIdColumn),
+						/*9*/ QString::fromUtf8(s_revisionInfoColumn)
+					);
 
 	return query;
 }
@@ -1570,8 +1570,8 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetObjectSelectionQuery(const QByte
 	QString documentFilterQuery;
 	if (paramsPtr != nullptr){
 		const iprm::IParamsSet::Ids paramIds = paramsPtr->GetParamIds();
-		if (paramIds.contains("DocumentFilter")){
-			iprm::TParamsPtr<imtcol::IDocumentCollectionFilter> documentFilterParamPtr(paramsPtr, "DocumentFilter");
+		if (paramIds.contains(QByteArrayLiteral("DocumentFilter"))){
+			iprm::TParamsPtr<imtcol::IDocumentCollectionFilter> documentFilterParamPtr(paramsPtr, QByteArrayLiteral("DocumentFilter"));
 			if (documentFilterParamPtr.IsValid()){
 				CreateDocumentCollectionFilterQuery(*documentFilterParamPtr.GetPtr(), documentFilterQuery);
 			}
@@ -1579,34 +1579,35 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetObjectSelectionQuery(const QByte
 	}
 
 	if (documentFilterQuery.isEmpty()){
-		documentFilterQuery = QString("(root.\"%0\" = 'Active')").arg(QString::fromUtf8(s_stateColumn));
+		documentFilterQuery = QStringLiteral(R"(root."%1" = 'Active')").arg(QString::fromUtf8(s_stateColumn));
 	}
 
 	QString schemaPrefix;
 	if (m_tableSchemaAttrPtr.IsValid()){
-		schemaPrefix = QString("%1.").arg(qPrintable(*m_tableSchemaAttrPtr));
+		schemaPrefix = QStringLiteral("%1.").arg(qPrintable(*m_tableSchemaAttrPtr));
 	}
 
-	return QString(R"(
+	return QStringLiteral(R"(
 			SELECT root.*, root1."TimeStamp" as "Added"
-			FROM %0 "%1" as root
-			LEFT JOIN LATERAL (
-				SELECT *
-				FROM %0 "%1" AS root1
-				WHERE root."%3" = root1."%3" 
-					AND %6 = 1
-				LIMIT 1
-			) AS root1 ON true
-			WHERE (%2) AND root."%3" = '%4' ORDER BY %5 DESC;)")
+			FROM %1 "%2" as root
+			LEFT JOIN (
+				SELECT DISTINCT ON ("%4")
+					"%4", "%5"
+				FROM %1 "%2"
+				WHERE %7 = 1
+				ORDER BY "%4", "%5" DESC
+			) AS root1 ON root1."%4" = root."%4"
+			WHERE (%3) AND root."%4" = '%6' ORDER BY %8 DESC;)")
 			.arg(
-				schemaPrefix,
-				QString::fromUtf8(*m_tableNameAttrPtr),
-				documentFilterQuery,
-				QString::fromUtf8(s_documentIdColumn),
-				QString::fromUtf8(objectId),
-				CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int, "root"),
-				CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int, "root1")
-				).toUtf8();
+				/*1*/ schemaPrefix,
+				/*2*/ QString::fromUtf8(*m_tableNameAttrPtr),
+				/*3*/ documentFilterQuery,
+				/*4*/ QString::fromUtf8(s_documentIdColumn),
+				/*5*/ QString::fromUtf8(s_lastModifiedColumn),
+				/*6*/ QString::fromUtf8(objectId),
+				/*7*/ CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int),
+				/*8*/ CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int, QStringLiteral("root"))
+			).toUtf8();
 }
 
 
@@ -1711,23 +1712,20 @@ bool CSqlDatabaseDocumentDelegateComp::IsArrayOperation(
 	const QString escapedField = QRegularExpression::escape(field);
 
 	static const QString operatorsPattern =
-		R"("%1"\s*(\?\&|\?\||\?|@>|<@))";
-
-	QRegularExpression reOperators(
-		operatorsPattern.arg(escapedField)
-	);
-
-	if (reOperators.match(query).hasMatch()){
+			R"("%1"\s*(\?\&|\?\||\?|@>|<@))";
+	QRegularExpression reOperators(operatorsPattern.arg(escapedField));
+	if (reOperators.match(query).hasMatch()) {
 		return true;
 	}
 
 	static const QString functionsPattern =
-		R"(jsonb_array_elements(_text)?\s*\(\s*"%1"\s*\))";
+				R"(jsonb_array_elements(_text)?\s*\(\s*"%1"\s*\))"
+				R"(|jsonb_array_length\s*\(\s*"%1"\s*\))";
 
 	QRegularExpression reFunctions(
-		functionsPattern.arg(escapedField),
-		QRegularExpression::CaseInsensitiveOption
-	);
+				functionsPattern.arg(escapedField),
+				QRegularExpression::CaseInsensitiveOption
+				);
 
 	return reFunctions.match(query).hasMatch();
 }

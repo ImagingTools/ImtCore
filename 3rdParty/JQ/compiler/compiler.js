@@ -969,13 +969,15 @@ class Instruction {
                         stat.value.add(`}`)
                     }
 
-                    break
+                    return stat
                 }
                 case 'break': {
-                    return 'break;'
+                    stat.value.add('break;')
+                    return stat
                 }
                 case 'continue': {
-                    return 'continue;'
+                    stat.value.add('continue;')
+                    return stat
                 }
                 case 'qmlaliasdef': {
                     stat.isCompute = true

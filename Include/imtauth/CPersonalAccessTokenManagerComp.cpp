@@ -304,7 +304,7 @@ QByteArray CPersonalAccessTokenManagerComp::GenerateRandomToken() const
 	}
 
 	// Convert to base64url for safe transmission
-	QByteArray token = "pat_" + randomData.toBase64(QByteArray::Base64UrlEncoding | QByteArray::OmitTrailingEquals);
+	QByteArray token = "imt_pat_" + randomData.toBase64(QByteArray::Base64UrlEncoding | QByteArray::OmitTrailingEquals);
 
 	return token;
 }

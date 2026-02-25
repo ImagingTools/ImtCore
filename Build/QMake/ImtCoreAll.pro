@@ -138,6 +138,9 @@ imtapp.depends = imtappsdl
 SUBDIRS += imtmail
 imtmail.file = ../../Include/imtmail/QMake/imtmail.pro
 
+SUBDIRS += imtmdbx
+imtmdbx.file = ../../Include/imtmdbx/QMake/imtmdbx.pro
+
 SUBDIRS += imtauth
 imtauth.file = ../../Include/imtauth/QMake/imtauth.pro
 
@@ -482,3 +485,7 @@ imtsdlgencpptest.depends = imtsdlgencpp imtsdl imtbase
 SUBDIRS += imtsdlgenqmltest
 imtsdlgenqmltest.file = ../../Include/imtsdlgenqml/Test/QMake/imtsdlgenqmltest.pro
 imtsdlgenqmltest.depends = imtsdlgenqml imtsdl imtbase
+
+SUBDIRS += imt3dtest
+imt3dtest.file = ../../Include/imt3d/Test/QMake/imt3dTest.pro
+imt3dtest.depends = imt3d

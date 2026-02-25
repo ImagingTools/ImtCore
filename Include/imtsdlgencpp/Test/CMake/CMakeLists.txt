@@ -12,6 +12,8 @@ include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Test)
+
 if(APPLE)
 	set(CMAKE_MACOSX_BUNDLE "off")
 endif()

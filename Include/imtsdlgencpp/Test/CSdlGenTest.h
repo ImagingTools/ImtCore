@@ -26,6 +26,7 @@ private Q_SLOTS:
 	void TestUnion();
 	void TestComplexUnion();
 	void PrinterTest();
+	void SubstrateSpecifications();
 
 	void cleanup();
 	void cleanupTestCase();

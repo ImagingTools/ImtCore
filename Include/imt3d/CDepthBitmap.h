@@ -71,6 +71,7 @@ public:
 	virtual const iimg::IBitmap* GetReferenceBitmap() const override;
 	virtual RobotTrajectory GetRobotTrajectory() const override;
 	virtual BaseCorrection GetBaseCorrection() const override;
+	istd::CIndex2d GetSize() const { return GetImageSize(); }
 
 	// reimplemented (iimg::IRasterImage)
 	virtual void ResetImage() override;
@@ -110,5 +111,4 @@ private:
 
 
 } // namespace imt3d
-
 
