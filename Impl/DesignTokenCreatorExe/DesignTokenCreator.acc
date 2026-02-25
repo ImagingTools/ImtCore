@@ -76,6 +76,7 @@
                     <AttributeInfo Id="DesignTokenProcessors" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
+                                <Value>Processors/FigmaTokenProcessor</Value>
                                 <Value>Processors/DesignTokenIconProcessor</Value>
                                 <Value>Processors/DesignTokenStyleSheetProcessor</Value>
                                 <Value>Processors/DesignTokenQrcUpdater</Value>
@@ -247,6 +248,24 @@
                             </AttributeInfoMap>
                         </Data>
                     </Element>
+                    <Element Id="FigmaTokenProcessor" PackageId="ImtDesignPck" ComponentId="FigmaTokenProcessor">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ArgumentsParser" Type="Reference" ExportId="ArgumentsParser">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
                 </ElementsList>
                 <EmbeddedRegistriesList/>
                 <ExportedInterfaces/>
@@ -257,6 +276,7 @@
                     <Component ExportedId="DesignTokenQrcUpdater" ComponentId="DesignTokenQrcUpdater"/>
                     <Component ExportedId="DesignTokenStyleSheetProcessor" ComponentId="DesignTokenStyleSheetProcessor"/>
                     <Component ExportedId="DesignTokenWebQrcGenerator" ComponentId="DesignTokenWebQrcGenerator"/>
+                    <Component ExportedId="FigmaTokenProcessor" ComponentId="FigmaTokenProcessor"/>
                 </ExportedComponents>
             </Data>
         </EmbeddedRegistry>
