@@ -182,10 +182,6 @@ Item {
 		}
 	}
 	
-	function setMetaInfoModel(metaInfoModel){
-		collectionMetaInfo.metaInfoModel = metaInfoModel;
-	}
-	
 	function onEdit(id, index){
 		if (container.commandsDelegate){
 			container.commandsDelegate.commandHandle("Edit");

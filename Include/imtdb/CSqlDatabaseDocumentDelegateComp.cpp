@@ -1712,23 +1712,20 @@ bool CSqlDatabaseDocumentDelegateComp::IsArrayOperation(
 	const QString escapedField = QRegularExpression::escape(field);
 
 	static const QString operatorsPattern =
-		R"("%1"\s*(\?\&|\?\||\?|@>|<@))";
-
-	QRegularExpression reOperators(
-		operatorsPattern.arg(escapedField)
-	);
-
-	if (reOperators.match(query).hasMatch()){
+			R"("%1"\s*(\?\&|\?\||\?|@>|<@))";
+	QRegularExpression reOperators(operatorsPattern.arg(escapedField));
+	if (reOperators.match(query).hasMatch()) {
 		return true;
 	}
 
 	static const QString functionsPattern =
-		R"(jsonb_array_elements(_text)?\s*\(\s*"%1"\s*\))";
+				R"(jsonb_array_elements(_text)?\s*\(\s*"%1"\s*\))"
+				R"(|jsonb_array_length\s*\(\s*"%1"\s*\))";
 
 	QRegularExpression reFunctions(
-		functionsPattern.arg(escapedField),
-		QRegularExpression::CaseInsensitiveOption
-	);
+				functionsPattern.arg(escapedField),
+				QRegularExpression::CaseInsensitiveOption
+				);
 
 	return reFunctions.match(query).hasMatch();
 }
