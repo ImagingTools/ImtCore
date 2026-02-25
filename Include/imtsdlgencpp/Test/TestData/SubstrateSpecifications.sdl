@@ -1,0 +1,109 @@
+schema {
+	namespace: substrate
+	version: 1.0
+
+	query: Query
+	mutation: Mutation
+}
+
+import {
+	"ImtBaseTypes.sdl"
+}
+
+input InputId {
+	id: ID!
+}
+
+type CollectionViewParamsTest {
+	count: Int
+	offset: Int
+}
+
+type SubstrateSpecificationDocumentTypeIds {
+	PaperID: ID
+	CardboardID: ID
+	FilmID: ID
+}
+
+input SubstrateSpecificationListInput {
+	viewParams: CollectionViewParamsTest
+}
+
+type SubstrateSpecificationListItem {
+	id: ID!
+	typeId: ID!
+	name: String!
+	materialId: ID
+	materialName: String
+	added: String
+	timeStamp: String
+	colorPreview: String
+}
+
+type SubstrateSpecificationListResponse{
+	items: [SubstrateSpecificationListItem]
+}
+
+type CardboardSubstrateSpecification {
+	color: String
+	grammage: Double
+}
+
+type PaperSubstrateSpecification {
+	grammage: Double
+	color: String
+	coatType: String
+}
+
+type FilmSubstrateSpecification {
+	transparency: Double
+	color: String
+	material: String
+}
+
+union SubstrateSpecificationDocument = CardboardSubstrateSpecification | PaperSubstrateSpecification | FilmSubstrateSpecification
+
+input SubstrateSpecificationInput {
+	id: ID!
+	name: String
+	description: String
+	item: SubstrateSpecificationDocument!
+	typeId: ID!
+}
+
+type SubstrateSpecificationDocumentMetaInfo {
+	materialId: ID
+	lab: String
+}
+
+
+type Query {
+	GetSubstrateSpecificationList (input: SubstrateSpecificationListInput): SubstrateSpecificationListResponse!
+	GetSubstrateSpecification (input: InputId): SubstrateSpecificationDocument!
+	GetOptionsList (input: CollectionViewParamsTest): OptionsList!
+}
+
+type Mutation {
+	InsertSubstrateSpecification (input: SubstrateSpecificationInput): InputId!
+	UpdateSubstrateSpecification (input: SubstrateSpecificationInput): InputId!
+}
+
+collectionSchema {
+	type SubstrateSpecification {
+		ref: SubstrateSpecificationListItem
+		operations {
+			list: GetSubstrateSpecificationList
+			getView: GetOptionsList
+		}
+		subtype SubstrateSpecification {
+			ref: SubstrateSpecificationDocument
+			operations {
+				get: GetSubstrateSpecification
+				update: UpdateSubstrateSpecification
+				insert: InsertSubstrateSpecification
+			}
+		}
+	}
+}
+
+

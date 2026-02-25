@@ -9,6 +9,7 @@ class QObject extends QBaseObject {
         objectName: {type:String, value:''},
 
         parentChanged: {type:Signal, args:[]},
+        objectNameChanged: {type:Signal, args:[]},
 
         JQDestruction: {type:Signal, args:[]},
     }
@@ -175,6 +176,11 @@ class QObject extends QBaseObject {
         this.__removeObjectName()
         super.__destroy()
         this.JQDestruction()
+    }
+
+    // for compatibility reasons, this will be removed in the future
+    $complete(){
+
     }
 }
 

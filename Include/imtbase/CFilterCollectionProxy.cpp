@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtbase/CFilterCollectionProxy.h>
 
 
@@ -153,10 +154,7 @@ istd::IChangeableUniquePtr CFilterCollectionProxy::CloneMe(CompatibilityMode mod
 
 istd::IChangeableUniquePtr CFilterCollectionProxy::CreateObjectInstance(const QByteArray& typeId) const
 {
-	istd::IChangeable* objPtr = BaseClass2::CreateInstance(typeId);
-	return istd::IChangeableUniquePtr(objPtr, [objPtr](){
-		return objPtr;
-	});
+	return BaseClass2::CreateInstance(typeId);
 }
 
 

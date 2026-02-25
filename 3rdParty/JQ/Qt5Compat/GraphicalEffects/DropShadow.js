@@ -25,27 +25,27 @@ class DropShadow extends Item {
 
     SLOT_visibleChanged(oldValue, newValue){
         super.SLOT_visibleChanged()
-        this.__updateShadow()
+        JQApplication.updateLater(this)
     }
 
     SLOT_colorChanged(oldValue, newValue){
-        this.__updateShadow()
+        JQApplication.updateLater(this)
     }
 
     SLOT_horizontalOffsetChanged(oldValue, newValue){
-        this.__updateShadow()
+        JQApplication.updateLater(this)
     }
 
     SLOT_verticalOffsetChanged(oldValue, newValue){
-        this.__updateShadow()
+        JQApplication.updateLater(this)
     }
 
     SLOT_radiusChanged(oldValue, newValue){
-        this.__updateShadow()
+        JQApplication.updateLater(this)
     }
 
     SLOT_samplesChanged(oldValue, newValue){
-        this.__updateShadow()
+        JQApplication.updateLater(this)
     }
 
     SLOT_spreadChanged(oldValue, newValue){
@@ -53,16 +53,27 @@ class DropShadow extends Item {
     }
 
     SLOT_sourceChanged(oldValue, newValue){
-        this.__updateShadow()
+        JQApplication.updateLater(this)
     }
 
     __updateShadow(){
-        if(this.source && this.visible){
-            let rgba = Color.getRGBA(this.__proxy, 'color', this.__self.constructor.meta.color)
+        if(this.visible){
+            if(this.source){
+                let rgba = Color.getRGBA(this.__proxy, 'color', this.__self.constructor.meta.color)
+                this.source.__setDOMStyle({
+                    boxShadow: `${this.horizontalOffset}px ${this.verticalOffset}px ${this.radius}px ${this.spread}px rgba(${rgba.r},${rgba.g},${rgba.b},${this.color === 'transparent' ? 0 : rgba.a * this.opacity})`
+                })
+            }
+        } else {
             this.source.__setDOMStyle({
-                boxShadow: `${this.horizontalOffset}px ${this.verticalOffset}px ${this.radius}px ${this.spread}px rgba(${rgba.r},${rgba.g},${rgba.b},${this.color === 'transparent' ? 0 : rgba.a * this.opacity})`
+                boxShadow: `unset`
             })
         }
+    }
+
+    __endUpdate(){
+        super.__endUpdate()
+        this.__updateShadow()
     }
 }
 

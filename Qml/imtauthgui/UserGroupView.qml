@@ -123,7 +123,7 @@ ViewBase {
 					}
 					
 					KeyNavigation.tab: descriptionInput;
-					KeyNavigation.backtab: rolesTable;
+					KeyNavigation.backtab: roleSelectableCollectionEditor;
 				}
 				
 				TextInputElementView {
@@ -136,7 +136,7 @@ ViewBase {
 						container.doUpdateModel();
 					}
 					
-					KeyNavigation.tab: parentGroupsTable;
+					KeyNavigation.tab: groupSelectableCollectionEditor;
 					KeyNavigation.backtab: nameInput;
 				}
 				

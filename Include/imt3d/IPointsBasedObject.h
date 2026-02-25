@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -46,7 +47,7 @@ public:
 		PF_UNDEFINED
 	};
 
-	I_DECLARE_ENUM(PointFormat, PF_XYZ_32, PF_XYZ_64, PF_XYZ_ABC_32, PF_XYZW_32, PF_XYZW_NORMAL_CURVATURE_32, PF_XYZW_NORMAL_RGBA_32, PF_XYZW_RGBA_32);
+	I_DECLARE_ENUM(PointFormat, PF_XYZ_32, PF_XYZ_64, PF_XYZ_ABC_32, PF_XYZW_32, PF_XYZW_NORMAL_CURVATURE_32, PF_XYZW_NORMAL_RGBA_32, PF_XYZW_RGBA_32, PF_UNDEFINED);
 
 #ifdef _MSC_VER
 #pragma warning(push)

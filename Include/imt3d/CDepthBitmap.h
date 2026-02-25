@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -70,6 +71,7 @@ public:
 	virtual const iimg::IBitmap* GetReferenceBitmap() const override;
 	virtual RobotTrajectory GetRobotTrajectory() const override;
 	virtual BaseCorrection GetBaseCorrection() const override;
+	istd::CIndex2d GetSize() const { return GetImageSize(); }
 
 	// reimplemented (iimg::IRasterImage)
 	virtual void ResetImage() override;
@@ -109,5 +111,4 @@ private:
 
 
 } // namespace imt3d
-
 

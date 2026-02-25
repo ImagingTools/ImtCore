@@ -1,9 +1,13 @@
 const { Item } = require('./Item')
-const { QColor, QBorder, QReal } = require('../utils/properties')
+const { QColor, QBorder, QReal, QInt } = require('../utils/properties')
 
 class Row extends Item {
+    static LeftToRight = 0
+    static RightToLeft = 1
+
     static defaultProperties = {
         spacing: { type: QReal, value: 0, changed: '$spacingChanged' },
+        layoutDirection: { type: QInt, value: Row.LeftToRight, changed: '$layoutDirectionChanged' },
     }
 
     constructor(parent,exCtx,exModel){
@@ -63,6 +67,11 @@ class Row extends Item {
     }
 
     $spacingChanged(){
+        this.updateGeometry()
+    }
+
+    $layoutDirectionChanged(){
+        // not implemented yet
         this.updateGeometry()
     }
    

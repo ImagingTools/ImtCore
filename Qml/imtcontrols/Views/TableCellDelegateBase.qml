@@ -301,7 +301,12 @@ Item {
 					val = delegateContainer.rowDelegate.dataModel.item[delegateContainer.sdlVarPrefix + key]
 				}
 				else if(delegateContainer.rowDelegate.modelData){
-					val = delegateContainer.rowDelegate.modelData[key];
+					if(typeof delegateContainer.rowDelegate.modelData == 'object'){
+						val = delegateContainer.rowDelegate.modelData[key];
+					}
+					else {
+						val = delegateContainer.rowDelegate.modelData;
+					}
 				}
 				else {
 					val = delegateContainer.rowDelegate.dataModel[key];

@@ -182,10 +182,6 @@ Item {
 		}
 	}
 	
-	function setMetaInfoModel(metaInfoModel){
-		collectionMetaInfo.metaInfoModel = metaInfoModel;
-	}
-	
 	function onEdit(id, index){
 		if (container.commandsDelegate){
 			container.commandsDelegate.commandHandle("Edit");
@@ -300,6 +296,18 @@ Item {
 			
 			function onEndUpdate(){
 				container.loading.stop();
+
+				if(root.visibleMetaInfo ){
+					let ids = container.selectionManager.selectedIds
+					if (root.dataController){
+						if (ids.length === 1){
+							collectionMetaInfo.startLoading()
+							root.dataController.getObjectMetaInfo(ids[0])
+						}
+					}
+					collectionMetaInfo.contentVisible = ids.length === 1;
+					additionalInformation.visible = root.visibleMetaInfo && ids.length === 0;
+				}
 			}
 
 			function onElementsRemoved(elementIds){

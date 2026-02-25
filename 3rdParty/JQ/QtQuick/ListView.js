@@ -167,6 +167,8 @@ class ListView extends Flickable {
         this.contentY = 0
 
         this.blockSignals(false)
+
+        this.count = 0
     }
 
     __getItemInfo(index) {
@@ -436,6 +438,7 @@ class ListView extends Flickable {
 
     __updateView(changeSet) {
         if (this.delegate && this.model && this.__completed) {
+            this.__updating = true
             let length = 0
             if (Array.isArray(this.model)) {
                 length = this.model.length
@@ -447,7 +450,7 @@ class ListView extends Flickable {
                 return
             }
 
-            if (length === 0) return
+            if (length === 0 && this.__items.length === 0) return
 
             JQApplication.beginUpdate()
             JQApplication.updateLater(this)
@@ -527,18 +530,19 @@ class ListView extends Flickable {
             if (countChanged) this.countChanged()
 
             JQApplication.endUpdate()
+            delete this.__updating
         }
     }
 
     SLOT_cacheBufferChanged(oldValue, newValue) {
-        this.__updateView([])
+        JQApplication.updateLater(this)
     }
 
     SLOT_contentXChanged(oldValue, newValue) {
         super.SLOT_contentXChanged(oldValue, newValue)
 
         if (this.orientation === ListView.Horizontal) {
-            this.__updateView([])
+            JQApplication.updateLater(this)
         }
     }
 
@@ -546,7 +550,7 @@ class ListView extends Flickable {
         super.SLOT_contentYChanged(oldValue, newValue)
 
         if (this.orientation === ListView.Vertical) {
-            this.__updateView([])
+            JQApplication.updateLater(this)
         }
     }
 
@@ -554,7 +558,9 @@ class ListView extends Flickable {
         super.SLOT_widthChanged(oldValue, newValue)
 
         if (this.orientation === ListView.Horizontal) {
-            this.__updateView([])
+            JQApplication.updateLater(this)
+        } else {
+            this.contentItem.width = newValue
         }
     }
 
@@ -562,7 +568,9 @@ class ListView extends Flickable {
         super.SLOT_heightChanged(oldValue, newValue)
 
         if (this.orientation === ListView.Vertical) {
-            this.__updateView([])
+            JQApplication.updateLater(this)
+        } else {
+            this.contentItem.height = newValue
         }
     }
 
@@ -586,7 +594,7 @@ class ListView extends Flickable {
             }
 
         }
-        this.__updateView([])
+        JQApplication.updateLater(this)
     }
 
     __updateGeometry() {
@@ -655,6 +663,7 @@ class ListView extends Flickable {
     }
 
     __endUpdate() {
+        if(!this.__updating) this.__updateView([])
         this.__updateGeometry()
         super.__endUpdate()
     }

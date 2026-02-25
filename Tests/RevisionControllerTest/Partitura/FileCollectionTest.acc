@@ -18,8 +18,12 @@
         <Element Id="AccountInfoMetaInfoCreator" PackageId="ImtAuthPck" ComponentId="AccountInfoMetaInfoCreator">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ObjectTypeId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="AccountInfo"/>
+                    <AttributeInfo Id="ObjectTypeIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>AccountInfo</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

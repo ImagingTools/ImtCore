@@ -24,6 +24,7 @@ MainWindow 1.0 ./Base/MainWindow.qml
 WrapItem 1.0 ./Base/WrapItem.qml
 IconProperties 1.0 ./Base/IconProperties.qml
 FontProperties 1.0 ./Base/FontProperties.qml
+StateManager 1.0 ./Base/StateManager.qml
 
 Action 1.0 ./Actions/Action.qml
 PopupMenuDelegate 1.0 ./Actions/PopupMenuDelegate.qml

@@ -1,0 +1,49 @@
+# Dockerfile for ImtCore test environment (Windows)
+# This container provides the base infrastructure for running tests.
+# Application-specific files (GUI tests, API tests, resources, startup scripts)
+# should be mounted via volume mounts when running the container.
+#
+# Note: Building Windows containers requires:
+# - Windows 10/11 Pro or Windows Server
+# - Docker Desktop with Windows containers enabled
+# - Hyper-V feature enabled
+
+# Use Windows Server Core
+FROM mcr.microsoft.com/windows/server:ltsc2022
+
+SHELL ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command"]
+
+# Install Chocolatey package manager
+RUN iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+
+# Install Node.js LTS and PostgreSQL via Chocolatey
+RUN choco install -y nodejs-lts
+RUN choco install -y postgresql16 --params '/Password:root'
+
+# Install node modules "globally" by adding them to PATH and NODE_PATH
+# This allows Playwright and Newman to be available system-wide
+RUN New-Item -ItemType Directory -Force -Path C:/modules
+COPY Tests/Docker/GUI/package.json C:/modules/package.json
+RUN cd C:/modules; \
+    npm install; \
+    npx playwright install chromium --with-deps; \
+    Remove-Item package.json;
+
+ENV PATH="C:\\modules\\node_modules\\.bin;${PATH}"
+ENV NODE_PATH="C:\\modules\\node_modules"
+
+# Note: All application files (GUI tests, API tests, resources, startup scripts, entrypoint)
+# should be mounted via -v volume mounts when running the container:
+# Example:
+#   docker run -v "%IMTCOREDIR%\Tests\Docker\entrypoint.bat:C:\app\entrypoint.bat" `
+#              -v "%IMTCOREDIR%\Tests\Docker\GUI:C:\app\tests\GUI" `
+#              -v "%cd%\Tests\GUI:C:\app\tests\GUI\app" `
+#              -v "%cd%\Tests\API:C:\app\tests\API" `
+#              -v "%cd%\Tests\Startup:C:\app\startup" `
+#              -v "%cd%\Tests\Resources:C:\app\resources" `
+#              -v "%cd%\test-results:C:\app\tests\test-results" `
+#              imtcore-tests:windows
+
+# Default entrypoint (will be overridden to use mounted script)
+ENTRYPOINT ["cmd"]
+CMD []

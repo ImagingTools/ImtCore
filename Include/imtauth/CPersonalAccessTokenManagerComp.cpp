@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauth/CPersonalAccessTokenManagerComp.h>
 
 
@@ -291,7 +292,7 @@ QByteArray CPersonalAccessTokenManagerComp::GenerateRandomToken() const
 	}
 
 	// Convert to base64url for safe transmission
-	QByteArray token = "pat_" + randomData.toBase64(QByteArray::Base64UrlEncoding | QByteArray::OmitTrailingEquals);
+	QByteArray token = "imt_pat_" + randomData.toBase64(QByteArray::Base64UrlEncoding | QByteArray::OmitTrailingEquals);
 
 	return token;
 }

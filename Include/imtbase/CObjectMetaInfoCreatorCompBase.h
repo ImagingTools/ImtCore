@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -21,7 +22,7 @@ public:
 
 	I_BEGIN_BASE_COMPONENT(CObjectMetaInfoCreatorCompBase);
 		I_REGISTER_INTERFACE(imtbase::IMetaInfoCreator);
-		I_ASSIGN(m_objectTypeIdAttrPtr, "ObjectTypeId", "Type-ID of the object supported by this meta info creator", true, "");
+		I_ASSIGN_MULTI_0(m_objectTypeIdsAttrPtr, "ObjectTypeIds", "Type-IDs of the objects supported by this meta info creator", true);
 	I_END_COMPONENT;
 
 protected:
@@ -29,7 +30,7 @@ protected:
 	virtual TypeIds GetSupportedTypeIds() const override;
 
 protected:
-	I_ATTR(QByteArray, m_objectTypeIdAttrPtr);
+	I_MULTIATTR(QByteArray, m_objectTypeIdsAttrPtr);
 };
 
 

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtdb/CSqlDatabaseObjectDelegateCompBase.h>
 
 
@@ -570,23 +571,24 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateSortQuery(
 	QByteArray columnId;
 	QByteArray sortOrder;
 
-	if (!collectionFilter.GetSortingInfoIds().isEmpty()){
-		columnId = collectionFilter.GetSortingInfoIds().first();
+	const QByteArrayList sortingInfoIds = collectionFilter.GetSortingInfoIds();
+	if (!sortingInfoIds.isEmpty()){
+		columnId = sortingInfoIds.first();
 	}
 
 	switch (collectionFilter.GetSortingOrder()){
 	case imtbase::ICollectionFilter::SO_ASC:
-		sortOrder = "ASC";
+		sortOrder = QByteArrayLiteral("ASC");
 		break;
 	case imtbase::ICollectionFilter::SO_DESC:
-		sortOrder = "DESC";
+		sortOrder = QByteArrayLiteral("DESC");
 		break;
 	default:
 		break;
 	}
 
 	if (!columnId.isEmpty() && !sortOrder.isEmpty()){
-		sortQuery = QString("ORDER BY \"%1\" %2").arg(qPrintable(columnId)).arg(qPrintable(sortOrder));
+		sortQuery = QStringLiteral(R"(ORDER BY "%1" %2)").arg(QString::fromUtf8(columnId), QString::fromUtf8((sortOrder)));
 	}
 
 	return true;

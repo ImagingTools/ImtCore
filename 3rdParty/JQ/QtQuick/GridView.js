@@ -139,6 +139,8 @@ class GridView extends Flickable {
         this.contentY = 0
 
         this.blockSignals(false)
+
+        this.count = 0
     }
 
     __createItem(index){
@@ -263,7 +265,7 @@ class GridView extends Flickable {
             return
         }
 
-        if(length === 0) return
+        // if(length === 0) return
 
         let columns = Math.trunc(this.width / this.cellWidth)
         if(columns <= 0) columns = 1

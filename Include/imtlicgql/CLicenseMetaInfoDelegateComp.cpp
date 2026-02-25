@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtlicgql/CLicenseMetaInfoDelegateComp.h>
 
 
@@ -14,8 +15,10 @@ namespace imtlicgql
 
 // protected methods
 
-bool CLicenseMetaInfoDelegateComp::FillRepresentation(QJsonObject& representation, const idoc::IDocumentMetaInfo& metaInfo) const
+bool CLicenseMetaInfoDelegateComp::FillRepresentation(QJsonObject& representation, const idoc::IDocumentMetaInfo& metaInfo, const QByteArray& typeId) const
 {
+	Q_UNUSED(typeId);
+	
 	QByteArray licenseId = metaInfo.GetMetaInfo(imtlic::ILicenseDefinition::MIT_LICENSE_ID).toByteArray();
 	representation["LicenseId"] = QString(licenseId);
 	
@@ -32,8 +35,10 @@ bool CLicenseMetaInfoDelegateComp::FillRepresentation(QJsonObject& representatio
 }
 
 
-bool CLicenseMetaInfoDelegateComp::FillMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const QJsonObject& representation) const
+bool CLicenseMetaInfoDelegateComp::FillMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const QJsonObject& representation, const QByteArray& typeId) const
 {
+	Q_UNUSED(typeId);
+	
 	if (representation.contains("LicenseId")){
 		metaInfo.SetMetaInfo(imtlic::ILicenseDefinition::MIT_LICENSE_ID, representation.value("LicenseId"));
 	}

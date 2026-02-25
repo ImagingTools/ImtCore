@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 
 #include <imtclientgql/CGqlObjectCollectionDelegateComp.h>
 
@@ -755,7 +756,10 @@ istd::TUniqueInterfacePtr<imtgql::IGqlRequest> CGqlObjectCollectionDelegateComp:
 	imtgql::CGqlRequest* requestPtr = new imtgql::CGqlRequest();
 	imtgql::IGqlContext* gqlContextPtr = imtgql::CGqlRequestContextManager::GetContext();
 	if (gqlContextPtr != nullptr){
-		requestPtr->SetGqlContext(dynamic_cast<imtgql::IGqlContext*>(gqlContextPtr->CloneMe().PopInterfacePtr()));
+		istd::IChangeableUniquePtr clonedPtr = gqlContextPtr->CloneMe();
+		imtgql::IGqlContextUniquePtr castedPtr;
+		castedPtr.MoveCastedPtr(clonedPtr);
+		requestPtr->SetGqlContext(imtgql::IGqlContextSharedPtr::CreateFromUnique(castedPtr));
 	}
 
 	if (!SdlRequest::SetupGqlRequest(*requestPtr, arguments)){

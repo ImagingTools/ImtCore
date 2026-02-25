@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -47,8 +48,8 @@ protected:
 
 protected:
 	QList<QByteArray> m_emptyFields;
-	QMap<QByteArray, istd::TSharedInterfacePtr<CGqlFieldObject>> m_objectFields; // map <fieldId, smart<CGqlFieldObject>>
-	QMap<QByteArray,  istd::TSharedInterfacePtr<CGqlFieldFragment>> m_fragmentFields; // map <typeId, smart<FieldFragment>>
+	QMap<QByteArray, std::shared_ptr<CGqlFieldObject>> m_objectFields; // map <fieldId, smart<CGqlFieldObject>>
+	QMap<QByteArray, std::shared_ptr<CGqlFieldFragment>> m_fragmentFields; // map <typeId, smart<FieldFragment>>
 	CGqlFieldObject* m_parentPtr;
 };
 

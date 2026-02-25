@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtsdlgencpp/CSdlQObjectGeneratorComp.h>
 
 
@@ -361,6 +362,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 
 	const QString sdlNamespace = GetNamespaceFromSchemaParams(sdlEntry.GetSchemaParams());
 	const imtsdl::SdlFieldList fieldList =  sdlTypePtr->GetFields();
+	const QString versionVariableName = QStringLiteral("Version_") + GetSdlEntryVersion(sdlEntry, false);
 
 	const QString className = QStringLiteral("C") + sdlEntry.GetName() + QStringLiteral("Object");
 	stream << className;
@@ -371,7 +373,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("Version_") + GetSdlEntryVersion(sdlEntry, false) << QStringLiteral(".emplace();");
+	stream << versionVariableName << QStringLiteral(".emplace();");
 	FeedStream(stream, 1, false);
 
 	FeedStream(stream, 1, false);
@@ -390,24 +392,26 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 		const QString convertedType = ConvertTypeOrEnumOrUnion(field, m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false), &isCustom, nullptr, &isArray, &isEnum, &isUnion);
 
 		// Getter implemented
-
 		std::shared_ptr<imtsdl::CSdlEntryBase> sdlEntryField  = FindEntryByName(field.GetType(), m_sdlTypeListCompPtr->GetSdlTypes(false), m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false));
 		if (isCustom && !sdlEntryField){
 			qFatal() <<  __func__ << "Invalid field: " << field.GetType();
 		}
 		QString typeName = GetQObjectTypeName(field, m_sdlTypeListCompPtr->GetSdlTypes(false), m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false));
-		// stream << typeName;
 		stream << QStringLiteral("QVariant");
 		stream << QStringLiteral(" C") << sdlEntry.GetName() << QStringLiteral("Object");
 		stream << QStringLiteral("::Get") << GetCapitalizedValue(field.GetId()) << QStringLiteral("()");
 		FeedStream(stream, 1, false);
+
 		stream << QStringLiteral("{");
 		FeedStream(stream, 1, false);
-		FeedStreamHorizontally(stream);
-		stream << QStringLiteral("if (Version_") + GetSdlEntryVersion(sdlEntry, false) << QStringLiteral("->") << field.GetId() << QStringLiteral(".has_value()){");
-		FeedStream(stream, 1, false);
-		FeedStreamHorizontally(stream, 2);
 
+		FeedStreamHorizontally(stream);
+		stream << QStringLiteral("if (");
+		stream << versionVariableName;
+		stream << QStringLiteral(" && ") << versionVariableName << QStringLiteral("->") << field.GetId() << QStringLiteral("){");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, 2);
 		QString fieldNameSpace;
 		if (sdlEntryField != nullptr){
 			fieldNameSpace = GetNamespaceFromSchemaParams(sdlEntryField->GetSchemaParams());
@@ -418,7 +422,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 
 			}
 			else{
-				stream << fieldNameSpace << QStringLiteral("::") << field.GetType() << QStringLiteral(" valueType = Version_") + GetSdlEntryVersion(sdlEntry, false) << QStringLiteral("->");
+				stream << fieldNameSpace << QStringLiteral("::") << field.GetType() << QStringLiteral(" valueType = ") << versionVariableName << QStringLiteral("->");
 				stream << field.GetId() << QStringLiteral(".value();");
 				FeedStream(stream, 1, false);
 				FeedStreamHorizontally(stream, 2);
@@ -441,7 +445,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 					FeedStream(stream, 1, false);
 
 					FeedStreamHorizontally(stream, 2);
-					stream << QStringLiteral("for (const auto& tempValue: Version_") + GetSdlEntryVersion(sdlEntry, false) << QStringLiteral("->");
+					stream << QStringLiteral("for (const auto& tempValue: ") << versionVariableName << QStringLiteral("->");
 					stream << field.GetId();
 					stream << QStringLiteral(".value()){");
 					FeedStream(stream, 1, false);
@@ -457,7 +461,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 					stream << QStringLiteral("return QVariant::fromValue(") << tempVariableName << QStringLiteral(");");
 				}
 				else {
-					stream << QStringLiteral("return Version_") + GetSdlEntryVersion(sdlEntry, false) << QStringLiteral("->") << field.GetId() << QStringLiteral(".value();");
+					stream << QStringLiteral("return ") << versionVariableName << QStringLiteral("->") << field.GetId() << QStringLiteral(".value();");
 				}
 			}
 			else{
@@ -509,7 +513,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 								FeedStream(stream, 1, false);
 
 								FeedStreamHorizontally(stream, 4);
-								stream << QStringLiteral("newObjectPtr->Version_") + GetSdlEntryVersion(sdlEntry, false) << QStringLiteral(" = val->Version_") + GetSdlEntryVersion(*sdlEntryField, false) << QStringLiteral(";");
+								stream << QStringLiteral("newObjectPtr->") << versionVariableName << QStringLiteral(" = val->") << versionVariableName << QStringLiteral(";");
 								FeedStream(stream, 1, false);
 								FeedStreamHorizontally(stream, 4);
 								stream << QStringLiteral("m_") << GetDecapitalizedValue(field.GetId());
@@ -546,7 +550,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 					FeedStream(stream, 1, false);
 
 					FeedStreamHorizontally(stream, 3);
-					stream << QStringLiteral("if (itemPtr != nullptr) itemPtr->Version_") << GetSdlEntryVersion(*sdlEntryField, false) << QStringLiteral(" = Version_") << GetSdlEntryVersion(*sdlEntryField, false) << QStringLiteral("->") << field.GetId() << ';';
+					stream << QStringLiteral("if (itemPtr != nullptr) itemPtr->") << versionVariableName << QStringLiteral(" = ") << versionVariableName << QStringLiteral("->") << field.GetId() << ';';
 					FeedStream(stream, 1, false);
 				}
 
@@ -578,14 +582,57 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 		stream << QStringLiteral("::Set") << GetCapitalizedValue(field.GetId());
 		stream << QStringLiteral("(const QVariant& v)");
 		FeedStream(stream, 1, false);
+
 		stream << QStringLiteral("{");
 		FeedStream(stream, 1, false);
+		const QString versionStructVariableName = QStringLiteral("Version_") + GetSdlEntryVersion(sdlEntry, false);
+		
+		FeedStreamHorizontally(stream);
+		stream << QStringLiteral("if (!");
+		stream << versionStructVariableName;
+		stream << QStringLiteral("){");
+		FeedStream(stream, 1, false);
+		
+		FeedStreamHorizontally(stream, 2);
+		stream << versionStructVariableName;
+		stream << QStringLiteral(".emplace();");
+		FeedStream(stream, 1, false);
+		
+		FeedStreamHorizontally(stream);
+		stream << '}';
+		FeedStream(stream, 2, false);
+		
 		FeedStreamHorizontally(stream);
 		if (isArray && !isCustom){
-			stream << QStringLiteral("Version_") << GetSdlEntryVersion(sdlEntry, false) << QStringLiteral("->") << field.GetId() << QStringLiteral("->clear(); ");
+			stream << QStringLiteral("if (!");
+			stream << versionStructVariableName;
+			stream << QStringLiteral("->") << field.GetId();
+			stream << QStringLiteral("){");
+			FeedStream(stream, 1, false);
+			
+			FeedStreamHorizontally(stream, 2);
+			stream << versionStructVariableName;
+			stream << QStringLiteral("->") << field.GetId();
+			stream << QStringLiteral(".emplace();");
 			FeedStream(stream, 1, false);
 
 			FeedStreamHorizontally(stream, 1);
+			stream << '}';
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream, 1);
+			stream << QStringLiteral("else{");
+			FeedStream(stream, 1, false);
+			
+			FeedStreamHorizontally(stream, 2);
+			stream << versionStructVariableName << QStringLiteral("->") << field.GetId() << QStringLiteral("->clear();");
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream, 1);
+			stream << '}';
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream);
 			stream << QStringLiteral("for (const auto& tempValue: v.value<") << typeName;
 			stream << QStringLiteral(">()){");
 			FeedStream(stream, 1, false);
@@ -601,10 +648,10 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 			FeedStream(stream, 1, false);
 
 			FeedStreamHorizontally(stream, 2);
-			stream << QStringLiteral("Version_") << GetSdlEntryVersion(sdlEntry, false) << QStringLiteral("->") << field.GetId() << QStringLiteral("->append(value);");
+			stream << versionStructVariableName << QStringLiteral("->") << field.GetId() << QStringLiteral("->append(value);");
 			FeedStream(stream, 1, false);
 
-			FeedStreamHorizontally(stream, 1);
+			FeedStreamHorizontally(stream);
 			stream << '}';
 			FeedStream(stream, 1, false);
 		}
@@ -613,28 +660,28 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 
 			}
 			else{
-				stream << QStringLiteral("Version_") << GetSdlEntryVersion(sdlEntry, false) << QStringLiteral("->") << field.GetId() << QStringLiteral(".emplace();");
+				stream << versionStructVariableName << QStringLiteral("->") << field.GetId() << QStringLiteral(".emplace();");
 				FeedStream(stream, 1, false);
-				FeedStreamHorizontally(stream, 1);
+				FeedStreamHorizontally(stream);
 				stream << QStringLiteral("QMetaEnum metaEnum = QMetaEnum::fromType<");
 				stream << fieldNameSpace << QStringLiteral("::") << field.GetType() << QStringLiteral(">();");
 				FeedStream(stream, 1, false);
-				FeedStreamHorizontally(stream, 1);
+				FeedStreamHorizontally(stream);
 				stream << QStringLiteral("int key = metaEnum.keyToValue(v.value<") << typeName << QStringLiteral(">().toUtf8());");
 				FeedStream(stream, 1, false);
-				FeedStreamHorizontally(stream, 1);
+				FeedStreamHorizontally(stream);
 				stream << QStringLiteral("if (key > -1){");
 				FeedStream(stream, 1, false);
 				FeedStreamHorizontally(stream, 2);
-				stream << QStringLiteral("Version_") << GetSdlEntryVersion(sdlEntry, false) << QStringLiteral("->") << field.GetId() << QStringLiteral(" = (");
+				stream << versionStructVariableName << QStringLiteral("->") << field.GetId() << QStringLiteral(" = (");
 				stream << fieldNameSpace << QStringLiteral("::") << field.GetType() << QStringLiteral(")key;");
 				FeedStream(stream, 1, false);
-				FeedStreamHorizontally(stream, 1);
+				FeedStreamHorizontally(stream);
 				stream << '}';
 			}
 		}
 		else if (!isCustom){
-			stream << QStringLiteral("Version_") << GetSdlEntryVersion(sdlEntry, false) << QStringLiteral("->") << field.GetId();
+			stream << versionStructVariableName << QStringLiteral("->") << field.GetId();
 			if (field.GetType() == "ID"){
 				stream << QStringLiteral(" = v.value<") << typeName << QStringLiteral(">().toUtf8();");
 			}
@@ -723,7 +770,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 			stream << QStringLiteral("}");
 			FeedStream(stream, 1, false);
 
-			FeedStreamHorizontally(stream, 1);
+			FeedStreamHorizontally(stream);
 			stream << QStringLiteral("m_") << GetDecapitalizedValue(field.GetId());
 			stream << QStringLiteral("QObjectPtr = v;");
 			FeedStream(stream, 1, false);
@@ -744,7 +791,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream);
-		stream << QStringLiteral(" return Version_") << GetSdlEntryVersion(sdlEntry, false) << QStringLiteral("->") << field.GetId() << QStringLiteral(".HasValue();");
+		stream << QStringLiteral(" return ") << versionStructVariableName << QStringLiteral(" && ") << versionStructVariableName << QStringLiteral("->") << field.GetId() << QStringLiteral(".HasValue();");
 		FeedStream(stream, 1, false);
 
 		stream << QStringLiteral("}");
@@ -759,10 +806,24 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 			FeedStream(stream, 1, false);
 
 			FeedStreamHorizontally(stream);
-			stream << QStringLiteral("Version_") << GetSdlEntryVersion(sdlEntry, false) << QStringLiteral("->") << field.GetId() << QStringLiteral(".emplace();");
+			stream << QStringLiteral("if(!");
+			stream << versionStructVariableName;
+			stream << QStringLiteral("){");
 			FeedStream(stream, 1, false);
 
+			FeedStreamHorizontally(stream, 2);
+			stream << versionStructVariableName;
+			stream << QStringLiteral(".emplace();");
 			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream, 1);
+			stream << '}';
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream);
+			stream << versionStructVariableName << QStringLiteral("->") << field.GetId() << QStringLiteral(".emplace();");
+			FeedStream(stream, 1, false);
+
 			stream << QStringLiteral("}");
 			FeedStream(stream, 3, false);
 
@@ -1044,7 +1105,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassListFile(QTextStream& stream, c
 	stream << '{';
 	FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 1);
+	FeedStreamHorizontally(stream);
 	stream << QStringLiteral("return true;");
 	FeedStream(stream, 1, false);
 
@@ -1056,7 +1117,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassListFile(QTextStream& stream, c
 	stream << '{';
 	FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 1);
+	FeedStreamHorizontally(stream);
 	stream << QStringLiteral("return rowCount();");
 	FeedStream(stream, 1, false);
 
@@ -1069,7 +1130,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassListFile(QTextStream& stream, c
 	stream << '{';
 	FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 1);
+	FeedStreamHorizontally(stream);
 	stream << QStringLiteral("return BaseClass::get(row);");
 	FeedStream(stream, 1, false);
 
@@ -1083,7 +1144,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassListFile(QTextStream& stream, c
 	stream << '{';
 	FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 1);
+	FeedStreamHorizontally(stream);
 	stream << QStringLiteral("BaseClass::append(item);");
 	FeedStream(stream, 1, false);
 
@@ -1097,16 +1158,16 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassListFile(QTextStream& stream, c
 	stream << '{';
 	FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 1);
+	FeedStreamHorizontally(stream);
 	stream << objectListClassNameWithNamespace << QStringLiteral("* retVal = new ");
 	stream << objectListClassNameWithNamespace << QStringLiteral("();");
 	FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 1);
+	FeedStreamHorizontally(stream);
 	stream << QStringLiteral("BaseClass::fromMe(retVal);");
 	FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 1);
+	FeedStreamHorizontally(stream);
 	stream << QStringLiteral("return retVal;");
 	FeedStream(stream, 1, false);
 
@@ -1120,7 +1181,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassListFile(QTextStream& stream, c
 	stream << '{';
 	FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 1);
+	FeedStreamHorizontally(stream);
 	stream << QStringLiteral("return BaseClass::toJson();");
 	FeedStream(stream, 1, false);
 
@@ -1134,7 +1195,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassListFile(QTextStream& stream, c
 	stream << '{';
 	FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 1);
+	FeedStreamHorizontally(stream);
 	stream << QStringLiteral("return BaseClass::toGraphQL();");
 	FeedStream(stream, 1, false);
 
@@ -1148,7 +1209,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassListFile(QTextStream& stream, c
 	stream << '{';
 	FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 1);
+	FeedStreamHorizontally(stream);
 	stream << QStringLiteral("append(item);");
 	FeedStream(stream, 1, false);
 
@@ -1162,7 +1223,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassListFile(QTextStream& stream, c
 	stream << '{';
 	FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 1);
+	FeedStreamHorizontally(stream);
 	stream << QStringLiteral("remove(index);");
 	FeedStream(stream, 1, false);
 
@@ -1176,7 +1237,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassListFile(QTextStream& stream, c
 	stream << '{';
 	FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 1);
+	FeedStreamHorizontally(stream);
 	stream << QStringLiteral("return BaseClass::isEqualWithModel(otherModelPtr);");
 	FeedStream(stream, 1, false);
 
@@ -1190,7 +1251,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassListFile(QTextStream& stream, c
 	stream << '{';
 	FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 1);
+	FeedStreamHorizontally(stream);
 	stream << QStringLiteral("return BaseClass::insert(index, item);");
 	FeedStream(stream, 1, false);
 
@@ -1204,7 +1265,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassListFile(QTextStream& stream, c
 	stream << '{';
 	FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 1);
+	FeedStreamHorizontally(stream);
 	stream << QStringLiteral("return BaseClass::remove(index);");
 	FeedStream(stream, 1, false);
 
@@ -1218,7 +1279,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassListFile(QTextStream& stream, c
 	stream << '{';
 	FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 1);
+	FeedStreamHorizontally(stream);
 	stream << QStringLiteral("return BaseClass::clear();");
 	FeedStream(stream, 1, false);
 
@@ -1231,19 +1292,27 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassListFile(QTextStream& stream, c
 	stream << '{';
 	FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 1);
+	FeedStreamHorizontally(stream);
 	stream << QStringLiteral("QVariant item = GetOrCreateCachedObject(index);");
 	FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 1);
+	FeedStreamHorizontally(stream);
 	stream << QStringLiteral("auto* itemPtr = item.value<") << modelObjectDataTypeName << QStringLiteral("*>();");
 	FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 1);
-	stream << QStringLiteral("if (itemPtr == nullptr) return QVariant();");
+	FeedStreamHorizontally(stream);
+	stream << QStringLiteral("if (itemPtr == nullptr){");
+	FeedStream(stream, 1, false);
+	
+	FeedStreamHorizontally(stream, 2);
+	stream << QStringLiteral("return QVariant();");
 	FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 1);
+	FeedStreamHorizontally(stream);
+	stream << '}';
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream);
 	stream << QStringLiteral("if (nameId == \"item\" && Version_") << GetSdlEntryVersion(sdlEntry, false) << QStringLiteral(".has_value() && index >= 0 && index < Version_") << GetSdlEntryVersion(sdlEntry, false) << QStringLiteral("->count()){");
 	FeedStream(stream, 1, false);
 
@@ -1251,36 +1320,38 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassListFile(QTextStream& stream, c
 	stream << QStringLiteral("return QVariant::fromValue(item);");
 	FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 1);
+	FeedStreamHorizontally(stream);
 	stream << QStringLiteral("}");
 	FeedStream(stream, 1, false);
 
 	for (const imtsdl::CSdlField& field: fieldList){
 		const QString convertedType = ConvertTypeOrEnumOrUnion(field, m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false), &isCustom, nullptr, &isArray, &isEnum, &isUnion);
 
-		FeedStreamHorizontally(stream, 2);
+		FeedStreamHorizontally(stream);
 		stream << QStringLiteral("if (nameId == \"m_") << GetDecapitalizedValue(field.GetId());
 		stream << QStringLiteral("\"){");
 		FeedStream(stream, 1, false);
 
 		if (!isCustom || isEnum){
-			FeedStreamHorizontally(stream, 3);
-			stream << QStringLiteral("return QVariant::fromValue(Version_") << GetSdlEntryVersion(sdlEntry, false) << QStringLiteral(".GetPtr()->at(index)->");
+			FeedStreamHorizontally(stream, 2);
+			stream << QStringLiteral("return QVariant::fromValue(Version_") << GetSdlEntryVersion(sdlEntry, false) << QStringLiteral("->at(index)->");
 			stream << field.GetId() << QStringLiteral(".value());");
 			FeedStream(stream, 1, false);
 		}
 		else{
-			FeedStreamHorizontally(stream, 3);
+			FeedStreamHorizontally(stream, 2);
 			stream << QStringLiteral("return itemPtr->Get");
 			stream << GetCapitalizedValue(field.GetId()) << QStringLiteral("();");
 			FeedStream(stream, 1, false);
 		}
 
-		FeedStreamHorizontally(stream, 2);
+		FeedStreamHorizontally(stream);
 		stream << QStringLiteral("}");
 		FeedStream(stream, 1, false);
 	}
-	FeedStreamHorizontally(stream, 1);
+
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream);
 	stream << QStringLiteral("return QVariant();");
 	FeedStream(stream, 1, false);
 
