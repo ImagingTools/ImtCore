@@ -806,6 +806,11 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 			FeedStream(stream, 1, false);
 
 			FeedStreamHorizontally(stream);
+			stream << QStringLiteral("Reset");
+			stream << GetCapitalizedValue(field.GetId()) << QStringLiteral("();");
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream);
 			stream << QStringLiteral("if(!");
 			stream << versionStructVariableName;
 			stream << QStringLiteral("){");

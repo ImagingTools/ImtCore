@@ -2519,6 +2519,7 @@ bool CPrinterBaseObject::hasSpecification()
 
 void CPrinterBaseObject::emplaceSpecification()
 {
+	ResetSpecification();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
@@ -2585,6 +2586,7 @@ bool CPrinterBaseObject::hasSimpleTest()
 
 void CPrinterBaseObject::emplaceSimpleTest()
 {
+	ResetSimpleTest();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
@@ -2653,6 +2655,7 @@ bool CPrinterBaseObject::hasMixedTest()
 
 void CPrinterBaseObject::emplaceMixedTest()
 {
+	ResetMixedTest();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
@@ -2897,6 +2900,7 @@ bool CPrinterListObject::hasData()
 
 void CPrinterListObject::emplaceData()
 {
+	ResetData();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
