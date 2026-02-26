@@ -17,6 +17,19 @@ RUN set -eux; \
       gnupg \
       lsb-release \
       xdg-utils \
+      # OpenGL/Mesa full stack
+      libegl1 \
+      libegl-mesa0 \
+      libgl1 \
+      libgl1-mesa-glx \
+      libgl1-mesa-dri \
+      libgles2 \
+      libglvnd0 \
+      libglx0 \
+      libglx-mesa0 \
+      libopengl0 \
+      mesa-utils \
+      mesa-vulkan-drivers \
       # GUI/Browser testing dependencies (for Playwright)
       fonts-liberation \
       libappindicator3-1 \
@@ -27,6 +40,7 @@ RUN set -eux; \
       libcairo2 \
       libcups2 \
       libdbus-1-3 \
+      libdrm2 \
       libexpat1 \
       libfontconfig1 \
       libgbm1 \
@@ -41,16 +55,32 @@ RUN set -eux; \
       libx11-6 \
       libx11-xcb1 \
       libxcb1 \
+      libxcb-dri3-0 \
+      libxcb-glx0 \
+      libxcb-present0 \
+      libxcb-randr0 \
+      libxcb-render0 \
+      libxcb-shape0 \
+      libxcb-shm0 \
+      libxcb-sync1 \
+      libxcb-xfixes0 \
       libxcomposite1 \
       libxcursor1 \
       libxdamage1 \
       libxext6 \
       libxfixes3 \
       libxi6 \
+      libxinerama1 \
+      libxkbcommon0 \
+      libxkbcommon-x11-0 \
       libxrandr2 \
       libxrender1 \
+      libxshmfence1 \
       libxss1 \
       libxtst6 \
+      libxxf86vm1 \
+      # Virtual framebuffer for headless rendering
+      xvfb \
     ; \
     rm -rf /var/lib/apt/lists/*
 
@@ -87,16 +117,26 @@ RUN fc-cache -f -v
 # Set working directory
 WORKDIR /app/tests
 
-# Install node modules "globally" in a shared location
-# This allows Playwright and Newman to be available system-wide
-COPY Tests/Docker/GUI/package.json /modules/package.json
-RUN cd /modules && \
-    npm install && \
+# Install node modules in a shared location (/modules)
+# This includes Playwright, Newman, and all dependencies
+RUN mkdir -p /modules && \
+    cd /modules && \
+    npm init -y && \
+    npm install \
+      @playwright/test \
+      newman \
+      newman-reporter-htmlextra \
+    && \
     npx playwright install chromium --with-deps && \
-    rm package.json && \
+    # Verify installations
+    echo "Verifying installations..." && \
+    ./node_modules/.bin/newman --version && \
+    ./node_modules/.bin/playwright --version && \
+    # Setup PATH in profile
     echo 'export PATH="/modules/node_modules/.bin:$PATH"' >> /etc/profile && \
     echo 'export NODE_PATH="/modules/node_modules:$NODE_PATH"' >> /etc/profile
 
+# Set PATH and NODE_PATH environment variables
 ENV PATH="/modules/node_modules/.bin:$PATH"
 ENV NODE_PATH="/modules/node_modules:$NODE_PATH"
 
@@ -119,7 +159,7 @@ RUN mkdir -p \
 #              -v "$(pwd)/Tests/API:/app/tests/API:ro" \
 #              -v "$(pwd)/Tests/Startup:/app/startup:ro" \
 #              -v "$(pwd)/Tests/Resources:/app/resources:ro" \
-#              -v "$(pwd)/test-results:/app/tests/test-results" \
+#              -v "$(pwd)/Tests/test-results:/app/tests/test-results" \
 #              imtcore-tests:linux
 
 # Environment variables (can be overridden at runtime)
@@ -128,4 +168,4 @@ ENV CI=true
 
 # Default entrypoint (will be overridden to use mounted script)
 ENTRYPOINT ["sh"]
-CMD [] 
+CMD []
