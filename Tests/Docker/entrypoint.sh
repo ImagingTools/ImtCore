@@ -228,16 +228,46 @@ if [ "$#" -eq 0 ] || [ "$1" = "echo" ]; then
             if [ -d "/modules/node_modules/@playwright/test" ]; then
                 echo -e "${GREEN}✓ Using pre-installed Playwright from /modules${NC}"
             else
-                echo -e "${RED}✗ Playwright not found in /modules/node_modules${NC}"
-                EXIT_CODE=1
+                echo -e "${YELLOW}Playwright not found in /modules, checking for local package.json...${NC}"
+                
+                # Find package.json location
+                PACKAGE_DIR=""
+                if [ -f "/app/tests/GUI/package.json" ]; then
+                    PACKAGE_DIR="/app/tests/GUI"
+                elif [ -f "/app/tests/package.json" ]; then
+                    PACKAGE_DIR="/app/tests"
+                fi
+                
+                if [ -z "$PACKAGE_DIR" ]; then
+                    echo -e "${RED}✗ No package.json found in /app/tests or /app/tests/GUI. Cannot install dependencies.${NC}"
+                    EXIT_CODE=1
+                else
+                    echo -e "${YELLOW}Installing dependencies from $PACKAGE_DIR...${NC}"
+                    cd "$PACKAGE_DIR"
+                    if [ -f "package-lock.json" ]; then
+                        npm ci || EXIT_CODE=$?
+                    else
+                        npm install || EXIT_CODE=$?
+                    fi
+                    
+                    if [ "$EXIT_CODE" -ne 0 ]; then
+                        echo -e "${RED}✗ npm install failed${NC}"
+                    else
+                        echo -e "${GREEN}✓ Dependencies installed successfully${NC}"
+                        # Update NODE_PATH to prioritize local node_modules
+                        export NODE_PATH="$PACKAGE_DIR/node_modules:${NODE_PATH:-}"
+                        echo -e "${GREEN}✓ Local node_modules added to NODE_PATH${NC}"
+                    fi
+                fi
             fi
 
             if [ "$EXIT_CODE" -eq 0 ]; then
                 echo -e "${YELLOW}Running Playwright tests...${NC}"
                 
-                # Set NODE_PATH so tests can require('utils') directly
+                # Add GUI directory to NODE_PATH for utils.js and other test utilities
+                # (this adds to any existing NODE_PATH set during dependency installation)
                 export NODE_PATH="/app/tests/GUI:${NODE_PATH:-}"
-                echo -e "${GREEN}✓ NODE_PATH set to: $NODE_PATH${NC}"
+                echo -e "${GREEN}✓ Final NODE_PATH: $NODE_PATH${NC}"
                 
                 # Build playwright command with optional --update-snapshots flag
                 PLAYWRIGHT_CMD="npx playwright test --output=/app/tests/test-results/playwright-output"

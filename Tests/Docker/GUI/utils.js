@@ -1,3 +1,5 @@
+const { expect } = require('@playwright/test');
+
 const defaultConfig = {
   baseUrl: process.env.BASE_URL || 'http://localhost:3000',
 
@@ -210,6 +212,16 @@ async function clearMasks(page) {
   });
 }
 
+async function checkScreenshot(page, filename, masks = [], config = defaultConfig) {
+  try {
+    await applyMasks(page, masks);
+    await waitForPageStability(page, config);
+    await expect(page).toHaveScreenshot(filename, config.screenshot);
+  } finally {
+    await clearMasks(page);
+  }
+}
+
 async function login(page, username, password, config = defaultConfig, loginPaths = {}) {
   const paths = { ...config.loginPaths, ...loginPaths };
 
@@ -296,6 +308,7 @@ module.exports = {
   delay,
   reloadPage,
   clickAt,
+  checkScreenshot,
   login,
   parseTestUsers,
   runWithEachUser,
@@ -307,6 +320,4 @@ module.exports = {
   selectComboBox,
   fillTextInput,
   clickOnButton,
-  applyMasks,
-  clearMasks,
 };
