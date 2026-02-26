@@ -89,6 +89,16 @@ if [ "${START_POSTGRESQL:-false}" = "true" ]; then
         echo -e "${YELLOW}Setting postgres password...${NC}"
         su - postgres -c "$PG_BIN_DIR/psql -c \"ALTER USER postgres WITH PASSWORD '${POSTGRES_PASSWORD}';\""
 
+        # --- Проверка пароля PostgreSQL ---
+        echo -e "${YELLOW}Checking PostgreSQL password...${NC}"
+        if ! su - postgres -c "PGPASSWORD=root $PG_BIN_DIR/psql -U postgres -h 127.0.0.1 -d postgres -c 'SELECT 1;' > /dev/null 2>&1"; then
+            echo -e "${RED}✗ PostgreSQL password check failed!${NC}"
+            echo -e "${RED}Ensure POSTGRES_PASSWORD is set correctly and the server is running.${NC}"
+            exit 1
+        else
+            echo -e "${GREEN}✓ PostgreSQL password 'root' is valid${NC}"
+        fi
+
         # NOTE:
         # Removed database creation logic because it caused interactive password prompts
         # and "su: Authentication failure" in some environments.
