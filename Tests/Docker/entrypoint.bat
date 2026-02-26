@@ -17,6 +17,12 @@ if exist "C:\Program Files\nodejs" set "PATH=C:\Program Files\nodejs;!PATH!"
 REM Add pre-installed node_modules binaries to PATH
 if exist "C:\modules\node_modules\.bin" set "PATH=C:\modules\node_modules\.bin;!PATH!"
 
+REM IMPORTANT:
+REM Do NOT set NODE_PATH to C:\modules\node_modules here.
+REM NODE_PATH can cause Node to resolve @playwright/test from unexpected locations
+REM when tests are mounted under C:\app, leading to duplicate installations.
+set "NODE_PATH="
+
 REM Add PostgreSQL to PATH if found (needed for startup scripts even if not starting PG)
 for /d %%P in ("C:\Program Files\PostgreSQL\*") do (
     set "PATH=%%P\bin;!PATH!"
@@ -110,10 +116,13 @@ REM Set password
 echo Setting postgres password
 "!PG_BIN!\psql.exe" -U postgres -c "ALTER USER postgres WITH PASSWORD '!POSTGRES_PASSWORD!';" >nul 2>&1
 
-REM Create test database if specified
+REM NOTE:
+REM Removed automatic CREATE DATABASE logic because it can fail or require interactive auth
+REM depending on container/pg_hba configuration.
+REM If you need DB creation, add a custom startup script in C:\app\startup.
 if defined POSTGRES_DB (
-    echo Creating database: !POSTGRES_DB!
-    "!PG_BIN!\psql.exe" -U postgres -c "CREATE DATABASE !POSTGRES_DB!" >nul 2>&1
+    echo [INFO] POSTGRES_DB is set to !POSTGRES_DB!, but automatic database creation is disabled in entrypoint.bat
+    echo [INFO] Create the database in a custom startup script under C:\app\startup if needed.
 )
 
 echo [OK] PostgreSQL initialized
@@ -212,8 +221,8 @@ if !GUI_TESTS_FOUND! equ 0 goto SKIP_GUI_TESTS
 set EXIT_CODE=0
 
 REM Verify pre-installed Playwright exists
-if not exist "C:\modules\node_modules\playwright" (
-    echo [ERROR] Playwright not found in C:\modules\node_modules\playwright
+if not exist "C:\modules\node_modules\@playwright\test" (
+    echo [ERROR] @playwright/test not found in C:\modules\node_modules
     echo [ERROR] The Docker image may not have been built correctly.
     set EXIT_CODE=1
     goto END_TESTS
@@ -221,16 +230,25 @@ if not exist "C:\modules\node_modules\playwright" (
 
 echo [OK] Using pre-installed Playwright from C:\modules
 
-:RUN_PLAYWRIGHT
 echo Running Playwright tests...
 cd /d C:\app\tests\GUI
 
-REM Use pre-installed playwright directly, not npx (avoids version conflicts)
-set PLAYWRIGHT_CMD=playwright test
+REM Allow require('utils') by pointing NODE_PATH only to GUI folder (not to C:\modules)
+set "NODE_PATH=C:\app\tests\GUI"
+
+REM Use Playwright binary from C:\modules explicitly
+set "PLAYWRIGHT_BIN=C:\modules\node_modules\.bin\playwright.cmd"
+if not exist "!PLAYWRIGHT_BIN!" (
+    echo [ERROR] Playwright CLI not found: !PLAYWRIGHT_BIN!
+    set EXIT_CODE=1
+    goto END_TESTS
+)
+
+set "PLAYWRIGHT_CMD="!PLAYWRIGHT_BIN!" test"
 
 if "!UPDATE_SNAPSHOTS!"=="true" (
     echo UPDATE_SNAPSHOTS=true - updating reference screenshots
-    set PLAYWRIGHT_CMD=!PLAYWRIGHT_CMD! --update-snapshots
+    set "PLAYWRIGHT_CMD=!PLAYWRIGHT_CMD! --update-snapshots"
 )
 
 call !PLAYWRIGHT_CMD!
