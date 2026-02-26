@@ -1,7 +1,7 @@
 const { expect } = require('@playwright/test');
 
 const defaultConfig = {
-  baseUrl: process.env.BASE_URL || 'http://localhost:7778',
+  baseUrl: process.env.BASE_URL || 'http://localhost:3000',
 
   timeouts: {
     delay: 500,
@@ -20,7 +20,7 @@ const defaultConfig = {
     maxDiffPixelRatio: 0,
   },
 
-loginPaths: {
+  loginPaths: {
     username: ['AuthorizationPage', 'LoginInput'],
     password: ['AuthorizationPage', 'PasswordInput'],
     submit: ['AuthorizationPage', 'LoginButton'],
@@ -125,7 +125,6 @@ async function fillTextInput(page, text, path, config = defaultConfig) {
 
   await clickAt(page, rect.x + rect.width / 2, rect.y + rect.height / 2, config);
 
-  // очистка + ввод (можно поменять стратегию)
   await page.keyboard.press('Control+A');
   await page.keyboard.press('Backspace');
   await page.keyboard.type(text);
@@ -146,14 +145,12 @@ async function applyMasks(page, masks = []) {
     throw new Error('masks must be an array');
   }
 
-  // Build all rects first (so we inject once)
   const rects = [];
   for (const mask of masks) {
     if (!mask) continue;
 
     let rect = null;
 
-    // by path
     if (mask.path) {
       const locator = page.locator(createStrPath(mask.path));
       await locator.waitFor({ timeout: 3000 });
@@ -169,7 +166,6 @@ async function applyMasks(page, masks = []) {
       }
     }
 
-    // by coords
     if (!rect && mask.x !== undefined) {
       rect = { x: mask.x, y: mask.y, width: mask.width, height: mask.height };
     }
@@ -187,9 +183,7 @@ async function applyMasks(page, masks = []) {
     });
   }
 
-  // Inject all masks in one evaluate
   await page.evaluate(({ rects }) => {
-    // remove old masks
     document.querySelectorAll('div[data-mask="true"]').forEach(m => m.remove());
 
     for (const r of rects) {
@@ -219,7 +213,6 @@ async function clearMasks(page) {
 }
 
 async function checkScreenshot(page, filename, masks = [], config = defaultConfig) {
-  // ensure masks are cleared even if screenshot assertion fails
   try {
     await applyMasks(page, masks);
     await waitForPageStability(page, config);
@@ -246,11 +239,6 @@ async function login(page, username, password, config = defaultConfig, loginPath
   await clickOnButton(page, paths.submit, config);
 }
 
-/**
- * Parse TEST_USERS environment variable
- * Format: "user1:pass1,user2:pass2,user3:pass3"
- * Returns: [{username: "user1", password: "pass1"}, ...]
- */
 function parseTestUsers() {
   const testUsers = process.env.TEST_USERS || '';
   if (!testUsers) {
@@ -266,14 +254,6 @@ function parseTestUsers() {
   });
 }
 
-/**
- * Run a test function with each user from TEST_USERS
- * Example:
- *   await runWithEachUser(page, async (page, user) => {
- *     await login(page, user.username, user.password, config, loginPaths);
- *     // run your test...
- *   });
- */
 async function runWithEachUser(page, testFn, config = defaultConfig, loginPaths = {}) {
   const users = parseTestUsers();
   
@@ -287,33 +267,17 @@ async function runWithEachUser(page, testFn, config = defaultConfig, loginPaths 
   }
 }
 
-/**
- * Get user-specific screenshot filename
- * Uses testInfo.project.name to automatically append user info to screenshot names
- * 
- * Example:
- *   const filename = getUserScreenshotName(testInfo, 'homepage.png');
- *   // Returns: 'homepage-user0.png' for authorized-user0 project
- *   // Returns: 'homepage.png' for guest project
- * 
- * @param {import('@playwright/test').TestInfo} testInfo - Test info from Playwright
- * @param {string} baseFilename - Base screenshot filename (e.g., 'homepage.png')
- * @returns {string} - User-specific filename
- */
 function getUserScreenshotName(testInfo, baseFilename) {
   const projectName = testInfo.project.name;
   
-  // Extract user index from project name (e.g., 'authorized-user0' -> 'user0')
   const match = projectName.match(/^authorized-user(\d+)$/);
   
   if (!match) {
-    // Not an authorized project or guest project - use base filename as-is
     return baseFilename;
   }
   
   const userIndex = match[1];
   
-  // Insert user info before file extension
   const lastDot = baseFilename.lastIndexOf('.');
   if (lastDot === -1) {
     return `${baseFilename}-user${userIndex}`;
@@ -324,12 +288,6 @@ function getUserScreenshotName(testInfo, baseFilename) {
   return `${nameWithoutExt}-user${userIndex}${ext}`;
 }
 
-/**
- * Get current user info from testInfo (for use in tests)
- * 
- * @param {import('@playwright/test').TestInfo} testInfo - Test info from Playwright
- * @returns {{userIndex: number, username: string, password: string} | null}
- */
 function getUserInfoFromTest(testInfo) {
   const project = testInfo.project;
   const use = project.use;

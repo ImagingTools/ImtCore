@@ -3,9 +3,13 @@
 # Handles startup sequence: PostgreSQL -> Custom Apps -> Tests
 #
 # This script allows users to customize the startup sequence by adding
-# their own initialization scripts in /app/custom-apps/
+# their own initialization scripts in /app/startup/
 
 set -e
+
+# Ensure global npm modules are in PATH (newman, playwright, etc.)
+export PATH="/modules/node_modules/.bin:$PATH"
+export NODE_PATH="/modules/node_modules:${NODE_PATH:-}"
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -16,6 +20,12 @@ NC='\033[0m' # No Color
 echo -e "${GREEN}========================================${NC}"
 echo -e "${GREEN}Starting Test Environment${NC}"
 echo -e "${GREEN}========================================${NC}"
+
+# Debug: show PATH and verify tools are available
+echo -e "${YELLOW}[DEBUG] PATH: $PATH${NC}"
+echo -e "${YELLOW}[DEBUG] NODE_PATH: $NODE_PATH${NC}"
+which newman && echo -e "${GREEN}✓ newman found: $(which newman)${NC}" || echo -e "${RED}✗ newman not found${NC}"
+which npx && echo -e "${GREEN}✓ npx found: $(which npx)${NC}" || echo -e "${RED}✗ npx not found${NC}"
 
 # Function to wait for a service to be ready
 wait_for_service() {
@@ -69,8 +79,6 @@ if [ "${START_POSTGRESQL:-false}" = "true" ]; then
         fi
 
         # Ensure PostgreSQL listens on TCP (localhost at minimum)
-        # NOTE: with network_mode: host, listen_addresses='*' exposes postgres on the host network.
-        # If you don't want that, change '*' to 'localhost'.
         if ! grep -q "^listen_addresses=" /var/lib/postgresql/data/postgresql.conf 2>/dev/null; then
             su - postgres -c "echo \"listen_addresses='localhost'\" >> /var/lib/postgresql/data/postgresql.conf" || true
         fi
@@ -178,6 +186,9 @@ echo -e "${GREEN}========================================${NC}"
 
 cd /app/tests
 
+# Ensure test-results directory exists
+mkdir -p /app/tests/test-results
+
 if [ "${PAUSE_BEFORE_TESTS:-false}" = "true" ]; then
     echo -e "${YELLOW}PAUSE_BEFORE_TESTS=true -> pausing before running tests.${NC}"
     echo -e "${YELLOW}Attach with: docker compose exec tests sh${NC}"
@@ -200,7 +211,6 @@ if [ "$#" -eq 0 ] || [ "$1" = "echo" ]; then
     fi
 
     # Check for API tests (Postman/Newman)
-    # We'll detect collections + environments separately.
     if [ -d "/app/tests/API" ] && [ "$(ls -A /app/tests/API 2>/dev/null)" ]; then
         if find /app/tests/API -type f -name "*collection*.json" | grep -q .; then
             API_TESTS_FOUND=true
@@ -213,28 +223,42 @@ if [ "$#" -eq 0 ] || [ "$1" = "echo" ]; then
 
         if [ "$GUI_TESTS_FOUND" = true ]; then
             echo -e "${YELLOW}Preparing Playwright dependencies...${NC}"
-            if [ -f "/app/tests/package.json" ]; then
-                if [ -f "/app/tests/package-lock.json" ]; then
-                    (cd /app/tests && npm ci) || EXIT_CODE=$?
-                else
-                    (cd /app/tests && npm install) || EXIT_CODE=$?
-                fi
+            
+            # Check if node_modules already exist (pre-installed in image)
+            if [ -d "/modules/node_modules/@playwright/test" ]; then
+                echo -e "${GREEN}✓ Using pre-installed Playwright from /modules${NC}"
             else
-                echo -e "${RED}No /app/tests/package.json found. Cannot install @playwright/test.${NC}"
+                echo -e "${RED}✗ Playwright not found in /modules/node_modules${NC}"
                 EXIT_CODE=1
             fi
 
             if [ "$EXIT_CODE" -eq 0 ]; then
                 echo -e "${YELLOW}Running Playwright tests...${NC}"
                 
+                # Set NODE_PATH so tests can require('utils') directly
+                export NODE_PATH="/app/tests/GUI:${NODE_PATH:-}"
+                echo -e "${GREEN}✓ NODE_PATH set to: $NODE_PATH${NC}"
+                
                 # Build playwright command with optional --update-snapshots flag
-                PLAYWRIGHT_CMD="npx playwright test"
+                PLAYWRIGHT_CMD="npx playwright test --output=/app/tests/test-results/playwright-output"
                 if [ "${UPDATE_SNAPSHOTS:-false}" = "true" ]; then
                     echo -e "${YELLOW}UPDATE_SNAPSHOTS=true -> updating reference screenshots${NC}"
                     PLAYWRIGHT_CMD="$PLAYWRIGHT_CMD --update-snapshots"
                 fi
                 
-                (cd /app/tests && $PLAYWRIGHT_CMD) || EXIT_CODE=$?
+                (cd /app/tests/GUI && $PLAYWRIGHT_CMD) || EXIT_CODE=$?
+                
+                # Copy Playwright report to test-results
+                if [ -d "/app/tests/GUI/playwright-report" ]; then
+                    echo -e "${YELLOW}Copying Playwright report to test-results...${NC}"
+                    cp -r /app/tests/GUI/playwright-report /app/tests/test-results/
+                fi
+                
+                # Copy test-results from GUI folder if exists
+                if [ -d "/app/tests/GUI/test-results" ]; then
+                    echo -e "${YELLOW}Copying Playwright test-results...${NC}"
+                    cp -r /app/tests/GUI/test-results/* /app/tests/test-results/ 2>/dev/null || true
+                fi
             fi
         fi
 
@@ -249,12 +273,24 @@ if [ "$#" -eq 0 ] || [ "$1" = "echo" ]; then
                 echo -e "${YELLOW}Using environment: $(basename "$ENV_FILE")${NC}"
             fi
 
+            # Run newman collections with reporters
             while IFS= read -r -d '' collection; do
-                echo -e "${YELLOW}Running collection: $(basename "$collection")${NC}"
+                COLLECTION_NAME="$(basename "$collection" .json)"
+                echo -e "${YELLOW}Running collection: ${COLLECTION_NAME}${NC}"
                 # shellcheck disable=SC2086
-                newman run "$collection" $ENV_OPT || EXIT_CODE=$?
+                newman run "$collection" $ENV_OPT \
+                    --reporters cli,json,htmlextra \
+                    --reporter-json-export "/app/tests/test-results/newman-${COLLECTION_NAME}.json" \
+                    --reporter-htmlextra-export "/app/tests/test-results/newman-${COLLECTION_NAME}.html" \
+                    || EXIT_CODE=$?
             done < <(find /app/tests/API -type f -name "*collection*.json" -print0)
         fi
+
+        echo -e "${GREEN}========================================${NC}"
+        echo -e "${GREEN}Test results saved to: /app/tests/test-results/${NC}"
+        echo -e "${YELLOW}Contents:${NC}"
+        ls -la /app/tests/test-results/ || true
+        echo -e "${GREEN}========================================${NC}"
 
         exit $EXIT_CODE
     else
