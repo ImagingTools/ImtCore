@@ -15642,6 +15642,7 @@ bool CResultObject::hasGeometry()
 
 void CResultObject::emplaceGeometry()
 {
+	ResetGeometry();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
@@ -16004,6 +16005,7 @@ bool CAreaObject::hasIconPosition()
 
 void CAreaObject::emplaceIconPosition()
 {
+	ResetIconPosition();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
@@ -16099,6 +16101,7 @@ bool CAreaObject::hasResults()
 
 void CAreaObject::emplaceResults()
 {
+	ResetResults();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
@@ -16427,6 +16430,7 @@ bool CAnalyzerObject::hasAreas()
 
 void CAnalyzerObject::emplaceAreas()
 {
+	ResetAreas();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
@@ -16796,6 +16800,7 @@ bool CInspectionObject::hasAnalyzers()
 
 void CInspectionObject::emplaceAnalyzers()
 {
+	ResetAnalyzers();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
@@ -17233,6 +17238,7 @@ bool CProductOverviewObject::hasInspections()
 
 void CProductOverviewObject::emplaceInspections()
 {
+	ResetInspections();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
@@ -18044,6 +18050,7 @@ bool CExtendedMetaDataObject::hasValue()
 
 void CExtendedMetaDataObject::emplaceValue()
 {
+	ResetValue();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
@@ -18445,6 +18452,7 @@ bool CResultMetaDataObject::hasDescription()
 
 void CResultMetaDataObject::emplaceDescription()
 {
+	ResetDescription();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
@@ -18504,6 +18512,7 @@ bool CResultMetaDataObject::hasExtendedMetaData()
 
 void CResultMetaDataObject::emplaceExtendedMetaData()
 {
+	ResetExtendedMetaData();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
@@ -19130,6 +19139,7 @@ bool CUnionTestingTypeObject::hasSimpleUnion()
 
 void CUnionTestingTypeObject::emplaceSimpleUnion()
 {
+	ResetSimpleUnion();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
@@ -19200,6 +19210,7 @@ bool CUnionTestingTypeObject::hasComplexUnion()
 
 void CUnionTestingTypeObject::emplaceComplexUnion()
 {
+	ResetComplexUnion();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
@@ -19280,6 +19291,7 @@ bool CUnionTestingTypeObject::hasMixedUnion()
 
 void CUnionTestingTypeObject::emplaceMixedUnion()
 {
+	ResetMixedUnion();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
@@ -19576,6 +19588,7 @@ bool CCDMResultVarRecursiveObject::hasResultMetaData()
 
 void CCDMResultVarRecursiveObject::emplaceResultMetaData()
 {
+	ResetResultMetaData();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
@@ -19635,6 +19648,7 @@ bool CCDMResultVarRecursiveObject::hasResultContent()
 
 void CCDMResultVarRecursiveObject::emplaceResultContent()
 {
+	ResetResultContent();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
@@ -19694,6 +19708,7 @@ bool CCDMResultVarRecursiveObject::hasOverallResultValues()
 
 void CCDMResultVarRecursiveObject::emplaceOverallResultValues()
 {
+	ResetOverallResultValues();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
@@ -20018,6 +20033,7 @@ bool CCDMResultVarStringObject::hasResultMetaData()
 
 void CCDMResultVarStringObject::emplaceResultMetaData()
 {
+	ResetResultMetaData();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
@@ -20118,6 +20134,7 @@ bool CCDMResultVarStringObject::hasOverallResultValues()
 
 void CCDMResultVarStringObject::emplaceOverallResultValues()
 {
+	ResetOverallResultValues();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
@@ -20439,6 +20456,7 @@ bool CCDMResultObject::hasResultMetaData()
 
 void CCDMResultObject::emplaceResultMetaData()
 {
+	ResetResultMetaData();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
@@ -20498,6 +20516,7 @@ bool CCDMResultObject::hasResultContent()
 
 void CCDMResultObject::emplaceResultContent()
 {
+	ResetResultContent();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
@@ -20557,6 +20576,7 @@ bool CCDMResultObject::hasOverallResultValues()
 
 void CCDMResultObject::emplaceOverallResultValues()
 {
+	ResetOverallResultValues();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
@@ -21073,6 +21093,7 @@ bool CCollectionViewParamsTestObject::hasFilterModel()
 
 void CCollectionViewParamsTestObject::emplaceFilterModel()
 {
+	ResetFilterModel();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
