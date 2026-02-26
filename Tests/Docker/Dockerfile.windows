@@ -22,12 +22,11 @@ RUN choco install -y postgresql16 --params '/Password:root'
 
 # Install node modules "globally" by adding them to PATH and NODE_PATH
 # This allows Playwright and Newman to be available system-wide
-RUN New-Item -ItemType Directory -Force -Path C:/modules
-COPY Tests/Docker/GUI/package.json C:/modules/package.json
-RUN cd C:/modules; \
-    npm install; \
-    npx playwright install chromium --with-deps; \
-    Remove-Item package.json;
+RUN New-Item -ItemType Directory -Force -Path C:/modules; \
+    cd C:/modules; \
+    npm init -y; \
+    npm install @playwright/test newman newman-reporter-htmlextra; \
+    npx playwright install chromium --with-deps;
 
 ENV PATH="C:\\modules\\node_modules\\.bin;${PATH}"
 ENV NODE_PATH="C:\\modules\\node_modules"

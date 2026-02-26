@@ -224,50 +224,21 @@ if [ "$#" -eq 0 ] || [ "$1" = "echo" ]; then
         if [ "$GUI_TESTS_FOUND" = true ]; then
             echo -e "${YELLOW}Preparing Playwright dependencies...${NC}"
             
-            # Check if node_modules already exist (pre-installed in image)
-            if [ -d "/modules/node_modules/@playwright/test" ]; then
-                echo -e "${GREEN}✓ Using pre-installed Playwright from /modules${NC}"
+            # Verify pre-installed Playwright exists
+            if [ ! -d "/modules/node_modules/@playwright/test" ]; then
+                echo -e "${RED}✗ Playwright not found in /modules/node_modules/@playwright/test${NC}"
+                echo -e "${RED}✗ The Docker image may not have been built correctly.${NC}"
+                EXIT_CODE=1
             else
-                echo -e "${YELLOW}Playwright not found in /modules, checking for local package.json...${NC}"
-                
-                # Find package.json location
-                PACKAGE_DIR=""
-                if [ -f "/app/tests/GUI/package.json" ]; then
-                    PACKAGE_DIR="/app/tests/GUI"
-                elif [ -f "/app/tests/package.json" ]; then
-                    PACKAGE_DIR="/app/tests"
-                fi
-                
-                if [ -z "$PACKAGE_DIR" ]; then
-                    echo -e "${RED}✗ No package.json found in /app/tests or /app/tests/GUI. Cannot install dependencies.${NC}"
-                    EXIT_CODE=1
-                else
-                    echo -e "${YELLOW}Installing dependencies from $PACKAGE_DIR...${NC}"
-                    cd "$PACKAGE_DIR"
-                    if [ -f "package-lock.json" ]; then
-                        npm ci || EXIT_CODE=$?
-                    else
-                        npm install || EXIT_CODE=$?
-                    fi
-                    
-                    if [ "$EXIT_CODE" -ne 0 ]; then
-                        echo -e "${RED}✗ npm install failed${NC}"
-                    else
-                        echo -e "${GREEN}✓ Dependencies installed successfully${NC}"
-                        # Update NODE_PATH to prioritize local node_modules
-                        export NODE_PATH="$PACKAGE_DIR/node_modules:${NODE_PATH:-}"
-                        echo -e "${GREEN}✓ Local node_modules added to NODE_PATH${NC}"
-                    fi
-                fi
+                echo -e "${GREEN}✓ Using pre-installed Playwright from /modules${NC}"
             fi
 
             if [ "$EXIT_CODE" -eq 0 ]; then
                 echo -e "${YELLOW}Running Playwright tests...${NC}"
                 
                 # Add GUI directory to NODE_PATH for utils.js and other test utilities
-                # (this adds to any existing NODE_PATH set during dependency installation)
                 export NODE_PATH="/app/tests/GUI:${NODE_PATH:-}"
-                echo -e "${GREEN}✓ Final NODE_PATH: $NODE_PATH${NC}"
+                echo -e "${GREEN}✓ NODE_PATH configured: $NODE_PATH${NC}"
                 
                 # Build playwright command with optional --update-snapshots flag
                 PLAYWRIGHT_CMD="npx playwright test --output=/app/tests/test-results/playwright-output"

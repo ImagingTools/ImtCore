@@ -211,34 +211,15 @@ if !GUI_TESTS_FOUND! equ 0 goto SKIP_GUI_TESTS
 
 set EXIT_CODE=0
 
-REM Find package.json location
-set PACKAGE_DIR=
-if exist "C:\app\tests\GUI\package.json" set PACKAGE_DIR=C:\app\tests\GUI
-if exist "C:\app\tests\package.json" set PACKAGE_DIR=C:\app\tests
-
-REM Check if node_modules already exist (pre-installed in image)
-if exist "C:\modules\node_modules\playwright" (
-    echo [OK] Using pre-installed Playwright from C:\modules
-    goto RUN_PLAYWRIGHT
-)
-
-if not defined PACKAGE_DIR (
-    echo No package.json found in C:\app\tests or C:\app\tests\GUI. Cannot install dependencies.
+REM Verify pre-installed Playwright exists
+if not exist "C:\modules\node_modules\playwright" (
+    echo [ERROR] Playwright not found in C:\modules\node_modules\playwright
+    echo [ERROR] The Docker image may not have been built correctly.
     set EXIT_CODE=1
     goto END_TESTS
 )
 
-echo Installing dependencies from !PACKAGE_DIR!...
-cd /d "!PACKAGE_DIR!"
-if exist "package-lock.json" (
-    call npm ci
-) else (
-    call npm install
-)
-if errorlevel 1 (
-    set EXIT_CODE=!ERRORLEVEL!
-    goto END_TESTS
-)
+echo [OK] Using pre-installed Playwright from C:\modules
 
 :RUN_PLAYWRIGHT
 echo Running Playwright tests...
