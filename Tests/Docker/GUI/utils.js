@@ -1,5 +1,3 @@
-const { expect } = require('@playwright/test');
-
 const defaultConfig = {
   baseUrl: process.env.BASE_URL || 'http://localhost:3000',
 
@@ -212,10 +210,13 @@ async function clearMasks(page) {
   });
 }
 
-async function checkScreenshot(page, filename, masks = [], config = defaultConfig) {
+async function checkScreenshot(page, filename, masks = [], config = defaultConfig, expect) {
   try {
     await applyMasks(page, masks);
     await waitForPageStability(page, config);
+    if (!expect) {
+      throw new Error('expect must be passed to checkScreenshot. Import it from @playwright/test in your test file.');
+    }
     await expect(page).toHaveScreenshot(filename, config.screenshot);
   } finally {
     await clearMasks(page);

@@ -18,7 +18,7 @@ Common Playwright test utilities that are automatically available in the test co
 - `fillTextInput(page, selector, text)` - Fill text input
 - `selectComboBox(page, selector, value)` - Select from dropdown
 - `waitForPageStability(page)` - Wait for DOM to stabilize
-- `checkScreenshot(page, name, options)` - Screenshot comparison with masking
+- `checkScreenshot(page, name, masks, config, expect)` - Screenshot comparison with masking (requires expect from @playwright/test)
 - `reloadPage(page)` - Reload page and wait
 - `delay(ms)` - Sleep utility
 
@@ -32,17 +32,19 @@ Common Playwright test utilities that are automatically available in the test co
 
 **Basic Test:**
 ```javascript
+const { test, expect } = require('@playwright/test');
 const { login, checkScreenshot, waitForPageStability } = require('../GUI/utils.js');
 
 test('login test', async ({ page }) => {
   await login(page, 'user@example.com', 'password');
   await waitForPageStability(page);
-  await checkScreenshot(page, 'dashboard');
+  await checkScreenshot(page, 'dashboard', [], undefined, expect);
 });
 ```
 
 **Multi-User Test with Dynamic Projects:**
 ```javascript
+const { test, expect } = require('@playwright/test');
 const { getUserScreenshotName, getUserInfoFromTest } = require('../GUI/utils.js');
 
 // Test runs automatically for each user (authorized-user0, authorized-user1, etc.)
