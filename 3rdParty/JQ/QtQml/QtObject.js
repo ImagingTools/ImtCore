@@ -35,11 +35,13 @@ class QtObject extends QObject {
     static create(parent = null, properties = {}){
         let obj = super.create(parent, properties)
 
+        let isModelChanged = properties.model || properties.modelData
+
         if(properties.model){
             let keys = Object.keys(properties.model)
             if(properties.modelData){
                 obj.JQAbstractModelData = properties.modelData
-            } else if(keys.length === 1 && !(properties.model[keys[0]] instanceof QObject)){
+            } else if(keys.length === 1){
                 obj.JQAbstractModelData = properties.model[keys[0]]
             }
             obj.JQAbstractModel = properties.model
@@ -58,7 +60,7 @@ class QtObject extends QObject {
             // obj.JQAbstractModelData = ()=>{return obj.parent ? obj.parent.JQAbstractModelData : undefined}
         }
 
-        if(obj.parent){
+        if(obj.parent && !isModelChanged){
             PropertyAuto.setAuto(obj.__self, 'JQAbstractModel', obj.parent.JQAbstractModel, obj.constructor.meta.JQAbstractModel)
             PropertyAuto.setAuto(obj.__self, 'JQAbstractModelData', obj.parent.JQAbstractModelData, obj.constructor.meta.JQAbstractModelData)
         }
