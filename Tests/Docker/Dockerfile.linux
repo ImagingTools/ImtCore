@@ -128,6 +128,7 @@ RUN mkdir -p /modules && \
       newman-reporter-htmlextra \
     && \
     npx playwright install chromium --with-deps && \
+    rm -f package.json && \
     # Verify installations
     echo "Verifying installations..." && \
     ./node_modules/.bin/newman --version && \
