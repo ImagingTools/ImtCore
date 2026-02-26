@@ -5126,6 +5126,10 @@ QVariant CInputIdObject::GetId()
 
 void CInputIdObject::SetId(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->id = v.value<QString>().toUtf8();
 	idChanged();
 }
@@ -5133,7 +5137,7 @@ void CInputIdObject::SetId(const QVariant& v)
 
 bool CInputIdObject::hasId()
 {
-	 return Version_1_0->id.HasValue();
+	 return Version_1_0 && Version_1_0->id.HasValue();
 }
 
 
@@ -5285,13 +5289,16 @@ QVariant sdl::substrate::SubstrateSpecifications::CInputIdObjectList::getData(co
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::substrate::SubstrateSpecifications::CInputIdObject*>();
-	if (itemPtr == nullptr) return QVariant();
+	if (itemPtr == nullptr){
+		return QVariant();
+	}
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
-		if (nameId == "m_id"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->id.value());
-		}
+	if (nameId == "m_id"){
+		return QVariant::fromValue(Version_1_0->at(index)->id.value());
+	}
+
 	return QVariant();
 }
 CCollectionViewParamsTestObject::CCollectionViewParamsTestObject(QObject* parent): ::imtbase::CItemModelBase(parent){
@@ -5314,6 +5321,10 @@ QVariant CCollectionViewParamsTestObject::GetCount()
 
 void CCollectionViewParamsTestObject::SetCount(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->count = v.value<int>();
 	countChanged();
 }
@@ -5321,7 +5332,7 @@ void CCollectionViewParamsTestObject::SetCount(const QVariant& v)
 
 bool CCollectionViewParamsTestObject::hasCount()
 {
-	 return Version_1_0->count.HasValue();
+	 return Version_1_0 && Version_1_0->count.HasValue();
 }
 
 
@@ -5337,6 +5348,10 @@ QVariant CCollectionViewParamsTestObject::GetOffset()
 
 void CCollectionViewParamsTestObject::SetOffset(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->offset = v.value<int>();
 	offsetChanged();
 }
@@ -5344,7 +5359,7 @@ void CCollectionViewParamsTestObject::SetOffset(const QVariant& v)
 
 bool CCollectionViewParamsTestObject::hasOffset()
 {
-	 return Version_1_0->offset.HasValue();
+	 return Version_1_0 && Version_1_0->offset.HasValue();
 }
 
 
@@ -5499,16 +5514,19 @@ QVariant sdl::substrate::SubstrateSpecifications::CCollectionViewParamsTestObjec
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::substrate::SubstrateSpecifications::CCollectionViewParamsTestObject*>();
-	if (itemPtr == nullptr) return QVariant();
+	if (itemPtr == nullptr){
+		return QVariant();
+	}
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
-		if (nameId == "m_count"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->count.value());
-		}
-		if (nameId == "m_offset"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->offset.value());
-		}
+	if (nameId == "m_count"){
+		return QVariant::fromValue(Version_1_0->at(index)->count.value());
+	}
+	if (nameId == "m_offset"){
+		return QVariant::fromValue(Version_1_0->at(index)->offset.value());
+	}
+
 	return QVariant();
 }
 CSubstrateSpecificationDocumentTypeIdsObject::CSubstrateSpecificationDocumentTypeIdsObject(QObject* parent): ::imtbase::CItemModelBase(parent){
@@ -5532,6 +5550,10 @@ QVariant CSubstrateSpecificationDocumentTypeIdsObject::GetPaperID()
 
 void CSubstrateSpecificationDocumentTypeIdsObject::SetPaperID(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->PaperID = v.value<QString>().toUtf8();
 	paperIDChanged();
 }
@@ -5539,7 +5561,7 @@ void CSubstrateSpecificationDocumentTypeIdsObject::SetPaperID(const QVariant& v)
 
 bool CSubstrateSpecificationDocumentTypeIdsObject::hasPaperID()
 {
-	 return Version_1_0->PaperID.HasValue();
+	 return Version_1_0 && Version_1_0->PaperID.HasValue();
 }
 
 
@@ -5555,6 +5577,10 @@ QVariant CSubstrateSpecificationDocumentTypeIdsObject::GetCardboardID()
 
 void CSubstrateSpecificationDocumentTypeIdsObject::SetCardboardID(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->CardboardID = v.value<QString>().toUtf8();
 	cardboardIDChanged();
 }
@@ -5562,7 +5588,7 @@ void CSubstrateSpecificationDocumentTypeIdsObject::SetCardboardID(const QVariant
 
 bool CSubstrateSpecificationDocumentTypeIdsObject::hasCardboardID()
 {
-	 return Version_1_0->CardboardID.HasValue();
+	 return Version_1_0 && Version_1_0->CardboardID.HasValue();
 }
 
 
@@ -5578,6 +5604,10 @@ QVariant CSubstrateSpecificationDocumentTypeIdsObject::GetFilmID()
 
 void CSubstrateSpecificationDocumentTypeIdsObject::SetFilmID(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->FilmID = v.value<QString>().toUtf8();
 	filmIDChanged();
 }
@@ -5585,7 +5615,7 @@ void CSubstrateSpecificationDocumentTypeIdsObject::SetFilmID(const QVariant& v)
 
 bool CSubstrateSpecificationDocumentTypeIdsObject::hasFilmID()
 {
-	 return Version_1_0->FilmID.HasValue();
+	 return Version_1_0 && Version_1_0->FilmID.HasValue();
 }
 
 
@@ -5743,19 +5773,22 @@ QVariant sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumen
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentTypeIdsObject*>();
-	if (itemPtr == nullptr) return QVariant();
+	if (itemPtr == nullptr){
+		return QVariant();
+	}
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
-		if (nameId == "m_paperID"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->PaperID.value());
-		}
-		if (nameId == "m_cardboardID"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->CardboardID.value());
-		}
-		if (nameId == "m_filmID"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->FilmID.value());
-		}
+	if (nameId == "m_paperID"){
+		return QVariant::fromValue(Version_1_0->at(index)->PaperID.value());
+	}
+	if (nameId == "m_cardboardID"){
+		return QVariant::fromValue(Version_1_0->at(index)->CardboardID.value());
+	}
+	if (nameId == "m_filmID"){
+		return QVariant::fromValue(Version_1_0->at(index)->FilmID.value());
+	}
+
 	return QVariant();
 }
 CSubstrateSpecificationListInputObject::CSubstrateSpecificationListInputObject(QObject* parent): ::imtbase::CItemModelBase(parent){
@@ -5782,6 +5815,10 @@ QVariant CSubstrateSpecificationListInputObject::GetViewParams()
 
 void CSubstrateSpecificationListInputObject::SetViewParams(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	if (v.isValid()){
 		sdl::substrate::SubstrateSpecifications::CCollectionViewParamsTestObject* itemPtr = v.value<sdl::substrate::SubstrateSpecifications::CCollectionViewParamsTestObject*>();
 		if (itemPtr != nullptr)  Version_1_0->viewParams = itemPtr->Version_1_0;
@@ -5797,14 +5834,16 @@ void CSubstrateSpecificationListInputObject::SetViewParams(const QVariant& v)
 
 bool CSubstrateSpecificationListInputObject::hasViewParams()
 {
-	 return Version_1_0->viewParams.HasValue();
+	 return Version_1_0 && Version_1_0->viewParams.HasValue();
 }
 
 
 void CSubstrateSpecificationListInputObject::emplaceViewParams()
 {
+	if(!Version_1_0){
+		Version_1_0.emplace();
+	}
 	Version_1_0->viewParams.emplace();
-
 }
 
 
@@ -5969,13 +6008,16 @@ QVariant sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListInp
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListInputObject*>();
-	if (itemPtr == nullptr) return QVariant();
+	if (itemPtr == nullptr){
+		return QVariant();
+	}
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
-		if (nameId == "m_viewParams"){
-			return itemPtr->GetViewParams();
-		}
+	if (nameId == "m_viewParams"){
+		return itemPtr->GetViewParams();
+	}
+
 	return QVariant();
 }
 CSubstrateSpecificationListItemObject::CSubstrateSpecificationListItemObject(QObject* parent): ::imtbase::CItemModelBase(parent){
@@ -6004,6 +6046,10 @@ QVariant CSubstrateSpecificationListItemObject::GetId()
 
 void CSubstrateSpecificationListItemObject::SetId(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->id = v.value<QString>().toUtf8();
 	idChanged();
 }
@@ -6011,7 +6057,7 @@ void CSubstrateSpecificationListItemObject::SetId(const QVariant& v)
 
 bool CSubstrateSpecificationListItemObject::hasId()
 {
-	 return Version_1_0->id.HasValue();
+	 return Version_1_0 && Version_1_0->id.HasValue();
 }
 
 
@@ -6027,6 +6073,10 @@ QVariant CSubstrateSpecificationListItemObject::GetTypeId()
 
 void CSubstrateSpecificationListItemObject::SetTypeId(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->typeId = v.value<QString>().toUtf8();
 	typeIdChanged();
 }
@@ -6034,7 +6084,7 @@ void CSubstrateSpecificationListItemObject::SetTypeId(const QVariant& v)
 
 bool CSubstrateSpecificationListItemObject::hasTypeId()
 {
-	 return Version_1_0->typeId.HasValue();
+	 return Version_1_0 && Version_1_0->typeId.HasValue();
 }
 
 
@@ -6050,6 +6100,10 @@ QVariant CSubstrateSpecificationListItemObject::GetName()
 
 void CSubstrateSpecificationListItemObject::SetName(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->name = v.value<QString>();
 	nameChanged();
 }
@@ -6057,7 +6111,7 @@ void CSubstrateSpecificationListItemObject::SetName(const QVariant& v)
 
 bool CSubstrateSpecificationListItemObject::hasName()
 {
-	 return Version_1_0->name.HasValue();
+	 return Version_1_0 && Version_1_0->name.HasValue();
 }
 
 
@@ -6073,6 +6127,10 @@ QVariant CSubstrateSpecificationListItemObject::GetMaterialId()
 
 void CSubstrateSpecificationListItemObject::SetMaterialId(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->materialId = v.value<QString>().toUtf8();
 	materialIdChanged();
 }
@@ -6080,7 +6138,7 @@ void CSubstrateSpecificationListItemObject::SetMaterialId(const QVariant& v)
 
 bool CSubstrateSpecificationListItemObject::hasMaterialId()
 {
-	 return Version_1_0->materialId.HasValue();
+	 return Version_1_0 && Version_1_0->materialId.HasValue();
 }
 
 
@@ -6096,6 +6154,10 @@ QVariant CSubstrateSpecificationListItemObject::GetMaterialName()
 
 void CSubstrateSpecificationListItemObject::SetMaterialName(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->materialName = v.value<QString>();
 	materialNameChanged();
 }
@@ -6103,7 +6165,7 @@ void CSubstrateSpecificationListItemObject::SetMaterialName(const QVariant& v)
 
 bool CSubstrateSpecificationListItemObject::hasMaterialName()
 {
-	 return Version_1_0->materialName.HasValue();
+	 return Version_1_0 && Version_1_0->materialName.HasValue();
 }
 
 
@@ -6119,6 +6181,10 @@ QVariant CSubstrateSpecificationListItemObject::GetAdded()
 
 void CSubstrateSpecificationListItemObject::SetAdded(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->added = v.value<QString>();
 	addedChanged();
 }
@@ -6126,7 +6192,7 @@ void CSubstrateSpecificationListItemObject::SetAdded(const QVariant& v)
 
 bool CSubstrateSpecificationListItemObject::hasAdded()
 {
-	 return Version_1_0->added.HasValue();
+	 return Version_1_0 && Version_1_0->added.HasValue();
 }
 
 
@@ -6142,6 +6208,10 @@ QVariant CSubstrateSpecificationListItemObject::GetTimeStamp()
 
 void CSubstrateSpecificationListItemObject::SetTimeStamp(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->timeStamp = v.value<QString>();
 	timeStampChanged();
 }
@@ -6149,7 +6219,7 @@ void CSubstrateSpecificationListItemObject::SetTimeStamp(const QVariant& v)
 
 bool CSubstrateSpecificationListItemObject::hasTimeStamp()
 {
-	 return Version_1_0->timeStamp.HasValue();
+	 return Version_1_0 && Version_1_0->timeStamp.HasValue();
 }
 
 
@@ -6165,6 +6235,10 @@ QVariant CSubstrateSpecificationListItemObject::GetColorPreview()
 
 void CSubstrateSpecificationListItemObject::SetColorPreview(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->colorPreview = v.value<QString>();
 	colorPreviewChanged();
 }
@@ -6172,7 +6246,7 @@ void CSubstrateSpecificationListItemObject::SetColorPreview(const QVariant& v)
 
 bool CSubstrateSpecificationListItemObject::hasColorPreview()
 {
-	 return Version_1_0->colorPreview.HasValue();
+	 return Version_1_0 && Version_1_0->colorPreview.HasValue();
 }
 
 
@@ -6345,34 +6419,37 @@ QVariant sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListIte
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListItemObject*>();
-	if (itemPtr == nullptr) return QVariant();
+	if (itemPtr == nullptr){
+		return QVariant();
+	}
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
-		if (nameId == "m_id"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->id.value());
-		}
-		if (nameId == "m_typeId"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->typeId.value());
-		}
-		if (nameId == "m_name"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->name.value());
-		}
-		if (nameId == "m_materialId"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->materialId.value());
-		}
-		if (nameId == "m_materialName"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->materialName.value());
-		}
-		if (nameId == "m_added"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->added.value());
-		}
-		if (nameId == "m_timeStamp"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->timeStamp.value());
-		}
-		if (nameId == "m_colorPreview"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->colorPreview.value());
-		}
+	if (nameId == "m_id"){
+		return QVariant::fromValue(Version_1_0->at(index)->id.value());
+	}
+	if (nameId == "m_typeId"){
+		return QVariant::fromValue(Version_1_0->at(index)->typeId.value());
+	}
+	if (nameId == "m_name"){
+		return QVariant::fromValue(Version_1_0->at(index)->name.value());
+	}
+	if (nameId == "m_materialId"){
+		return QVariant::fromValue(Version_1_0->at(index)->materialId.value());
+	}
+	if (nameId == "m_materialName"){
+		return QVariant::fromValue(Version_1_0->at(index)->materialName.value());
+	}
+	if (nameId == "m_added"){
+		return QVariant::fromValue(Version_1_0->at(index)->added.value());
+	}
+	if (nameId == "m_timeStamp"){
+		return QVariant::fromValue(Version_1_0->at(index)->timeStamp.value());
+	}
+	if (nameId == "m_colorPreview"){
+		return QVariant::fromValue(Version_1_0->at(index)->colorPreview.value());
+	}
+
 	return QVariant();
 }
 CSubstrateSpecificationListResponseObject::CSubstrateSpecificationListResponseObject(QObject* parent): ::imtbase::CItemModelBase(parent){
@@ -6399,6 +6476,10 @@ QVariant CSubstrateSpecificationListResponseObject::GetItems()
 
 void CSubstrateSpecificationListResponseObject::SetItems(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	if (v.isValid()){
 		sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListItemObjectList* itemPtr = v.value<sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListItemObjectList*>();
 		if (itemPtr != nullptr)  Version_1_0->items = itemPtr->Version_1_0;
@@ -6414,14 +6495,16 @@ void CSubstrateSpecificationListResponseObject::SetItems(const QVariant& v)
 
 bool CSubstrateSpecificationListResponseObject::hasItems()
 {
-	 return Version_1_0->items.HasValue();
+	 return Version_1_0 && Version_1_0->items.HasValue();
 }
 
 
 void CSubstrateSpecificationListResponseObject::emplaceItems()
 {
+	if(!Version_1_0){
+		Version_1_0.emplace();
+	}
 	Version_1_0->items.emplace();
-
 }
 
 
@@ -6593,13 +6676,16 @@ QVariant sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListRes
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListResponseObject*>();
-	if (itemPtr == nullptr) return QVariant();
+	if (itemPtr == nullptr){
+		return QVariant();
+	}
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
-		if (nameId == "m_items"){
-			return itemPtr->GetItems();
-		}
+	if (nameId == "m_items"){
+		return itemPtr->GetItems();
+	}
+
 	return QVariant();
 }
 CCardboardSubstrateSpecificationObject::CCardboardSubstrateSpecificationObject(QObject* parent): ::imtbase::CItemModelBase(parent){
@@ -6622,6 +6708,10 @@ QVariant CCardboardSubstrateSpecificationObject::GetColor()
 
 void CCardboardSubstrateSpecificationObject::SetColor(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->color = v.value<QString>();
 	colorChanged();
 }
@@ -6629,7 +6719,7 @@ void CCardboardSubstrateSpecificationObject::SetColor(const QVariant& v)
 
 bool CCardboardSubstrateSpecificationObject::hasColor()
 {
-	 return Version_1_0->color.HasValue();
+	 return Version_1_0 && Version_1_0->color.HasValue();
 }
 
 
@@ -6645,6 +6735,10 @@ QVariant CCardboardSubstrateSpecificationObject::GetGrammage()
 
 void CCardboardSubstrateSpecificationObject::SetGrammage(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->grammage = v.value<double>();
 	grammageChanged();
 }
@@ -6652,7 +6746,7 @@ void CCardboardSubstrateSpecificationObject::SetGrammage(const QVariant& v)
 
 bool CCardboardSubstrateSpecificationObject::hasGrammage()
 {
-	 return Version_1_0->grammage.HasValue();
+	 return Version_1_0 && Version_1_0->grammage.HasValue();
 }
 
 
@@ -6807,16 +6901,19 @@ QVariant sdl::substrate::SubstrateSpecifications::CCardboardSubstrateSpecificati
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::substrate::SubstrateSpecifications::CCardboardSubstrateSpecificationObject*>();
-	if (itemPtr == nullptr) return QVariant();
+	if (itemPtr == nullptr){
+		return QVariant();
+	}
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
-		if (nameId == "m_color"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->color.value());
-		}
-		if (nameId == "m_grammage"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->grammage.value());
-		}
+	if (nameId == "m_color"){
+		return QVariant::fromValue(Version_1_0->at(index)->color.value());
+	}
+	if (nameId == "m_grammage"){
+		return QVariant::fromValue(Version_1_0->at(index)->grammage.value());
+	}
+
 	return QVariant();
 }
 CPaperSubstrateSpecificationObject::CPaperSubstrateSpecificationObject(QObject* parent): ::imtbase::CItemModelBase(parent){
@@ -6840,6 +6937,10 @@ QVariant CPaperSubstrateSpecificationObject::GetGrammage()
 
 void CPaperSubstrateSpecificationObject::SetGrammage(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->grammage = v.value<double>();
 	grammageChanged();
 }
@@ -6847,7 +6948,7 @@ void CPaperSubstrateSpecificationObject::SetGrammage(const QVariant& v)
 
 bool CPaperSubstrateSpecificationObject::hasGrammage()
 {
-	 return Version_1_0->grammage.HasValue();
+	 return Version_1_0 && Version_1_0->grammage.HasValue();
 }
 
 
@@ -6863,6 +6964,10 @@ QVariant CPaperSubstrateSpecificationObject::GetColor()
 
 void CPaperSubstrateSpecificationObject::SetColor(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->color = v.value<QString>();
 	colorChanged();
 }
@@ -6870,7 +6975,7 @@ void CPaperSubstrateSpecificationObject::SetColor(const QVariant& v)
 
 bool CPaperSubstrateSpecificationObject::hasColor()
 {
-	 return Version_1_0->color.HasValue();
+	 return Version_1_0 && Version_1_0->color.HasValue();
 }
 
 
@@ -6886,6 +6991,10 @@ QVariant CPaperSubstrateSpecificationObject::GetCoatType()
 
 void CPaperSubstrateSpecificationObject::SetCoatType(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->coatType = v.value<QString>();
 	coatTypeChanged();
 }
@@ -6893,7 +7002,7 @@ void CPaperSubstrateSpecificationObject::SetCoatType(const QVariant& v)
 
 bool CPaperSubstrateSpecificationObject::hasCoatType()
 {
-	 return Version_1_0->coatType.HasValue();
+	 return Version_1_0 && Version_1_0->coatType.HasValue();
 }
 
 
@@ -7051,19 +7160,22 @@ QVariant sdl::substrate::SubstrateSpecifications::CPaperSubstrateSpecificationOb
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::substrate::SubstrateSpecifications::CPaperSubstrateSpecificationObject*>();
-	if (itemPtr == nullptr) return QVariant();
+	if (itemPtr == nullptr){
+		return QVariant();
+	}
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
-		if (nameId == "m_grammage"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->grammage.value());
-		}
-		if (nameId == "m_color"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->color.value());
-		}
-		if (nameId == "m_coatType"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->coatType.value());
-		}
+	if (nameId == "m_grammage"){
+		return QVariant::fromValue(Version_1_0->at(index)->grammage.value());
+	}
+	if (nameId == "m_color"){
+		return QVariant::fromValue(Version_1_0->at(index)->color.value());
+	}
+	if (nameId == "m_coatType"){
+		return QVariant::fromValue(Version_1_0->at(index)->coatType.value());
+	}
+
 	return QVariant();
 }
 CFilmSubstrateSpecificationObject::CFilmSubstrateSpecificationObject(QObject* parent): ::imtbase::CItemModelBase(parent){
@@ -7087,6 +7199,10 @@ QVariant CFilmSubstrateSpecificationObject::GetTransparency()
 
 void CFilmSubstrateSpecificationObject::SetTransparency(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->transparency = v.value<double>();
 	transparencyChanged();
 }
@@ -7094,7 +7210,7 @@ void CFilmSubstrateSpecificationObject::SetTransparency(const QVariant& v)
 
 bool CFilmSubstrateSpecificationObject::hasTransparency()
 {
-	 return Version_1_0->transparency.HasValue();
+	 return Version_1_0 && Version_1_0->transparency.HasValue();
 }
 
 
@@ -7110,6 +7226,10 @@ QVariant CFilmSubstrateSpecificationObject::GetColor()
 
 void CFilmSubstrateSpecificationObject::SetColor(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->color = v.value<QString>();
 	colorChanged();
 }
@@ -7117,7 +7237,7 @@ void CFilmSubstrateSpecificationObject::SetColor(const QVariant& v)
 
 bool CFilmSubstrateSpecificationObject::hasColor()
 {
-	 return Version_1_0->color.HasValue();
+	 return Version_1_0 && Version_1_0->color.HasValue();
 }
 
 
@@ -7133,6 +7253,10 @@ QVariant CFilmSubstrateSpecificationObject::GetMaterial()
 
 void CFilmSubstrateSpecificationObject::SetMaterial(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->material = v.value<QString>();
 	materialChanged();
 }
@@ -7140,7 +7264,7 @@ void CFilmSubstrateSpecificationObject::SetMaterial(const QVariant& v)
 
 bool CFilmSubstrateSpecificationObject::hasMaterial()
 {
-	 return Version_1_0->material.HasValue();
+	 return Version_1_0 && Version_1_0->material.HasValue();
 }
 
 
@@ -7298,19 +7422,22 @@ QVariant sdl::substrate::SubstrateSpecifications::CFilmSubstrateSpecificationObj
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::substrate::SubstrateSpecifications::CFilmSubstrateSpecificationObject*>();
-	if (itemPtr == nullptr) return QVariant();
+	if (itemPtr == nullptr){
+		return QVariant();
+	}
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
-		if (nameId == "m_transparency"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->transparency.value());
-		}
-		if (nameId == "m_color"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->color.value());
-		}
-		if (nameId == "m_material"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->material.value());
-		}
+	if (nameId == "m_transparency"){
+		return QVariant::fromValue(Version_1_0->at(index)->transparency.value());
+	}
+	if (nameId == "m_color"){
+		return QVariant::fromValue(Version_1_0->at(index)->color.value());
+	}
+	if (nameId == "m_material"){
+		return QVariant::fromValue(Version_1_0->at(index)->material.value());
+	}
+
 	return QVariant();
 }
 CSubstrateSpecificationInputObject::CSubstrateSpecificationInputObject(QObject* parent): ::imtbase::CItemModelBase(parent){
@@ -7336,6 +7463,10 @@ QVariant CSubstrateSpecificationInputObject::GetId()
 
 void CSubstrateSpecificationInputObject::SetId(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->id = v.value<QString>().toUtf8();
 	idChanged();
 }
@@ -7343,7 +7474,7 @@ void CSubstrateSpecificationInputObject::SetId(const QVariant& v)
 
 bool CSubstrateSpecificationInputObject::hasId()
 {
-	 return Version_1_0->id.HasValue();
+	 return Version_1_0 && Version_1_0->id.HasValue();
 }
 
 
@@ -7359,6 +7490,10 @@ QVariant CSubstrateSpecificationInputObject::GetName()
 
 void CSubstrateSpecificationInputObject::SetName(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->name = v.value<QString>();
 	nameChanged();
 }
@@ -7366,7 +7501,7 @@ void CSubstrateSpecificationInputObject::SetName(const QVariant& v)
 
 bool CSubstrateSpecificationInputObject::hasName()
 {
-	 return Version_1_0->name.HasValue();
+	 return Version_1_0 && Version_1_0->name.HasValue();
 }
 
 
@@ -7382,6 +7517,10 @@ QVariant CSubstrateSpecificationInputObject::GetDescription()
 
 void CSubstrateSpecificationInputObject::SetDescription(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->description = v.value<QString>();
 	descriptionChanged();
 }
@@ -7389,7 +7528,7 @@ void CSubstrateSpecificationInputObject::SetDescription(const QVariant& v)
 
 bool CSubstrateSpecificationInputObject::hasDescription()
 {
-	 return Version_1_0->description.HasValue();
+	 return Version_1_0 && Version_1_0->description.HasValue();
 }
 
 
@@ -7422,6 +7561,10 @@ QVariant CSubstrateSpecificationInputObject::GetItem()
 
 void CSubstrateSpecificationInputObject::SetItem(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	if (v.isValid()){
 		if (const CCardboardSubstrateSpecificationObject* val = v.value<const CCardboardSubstrateSpecificationObject*>()){
 			*Version_1_0->item = *val;
@@ -7444,14 +7587,16 @@ void CSubstrateSpecificationInputObject::SetItem(const QVariant& v)
 
 bool CSubstrateSpecificationInputObject::hasItem()
 {
-	 return Version_1_0->item.HasValue();
+	 return Version_1_0 && Version_1_0->item.HasValue();
 }
 
 
 void CSubstrateSpecificationInputObject::emplaceItem()
 {
+	if(!Version_1_0){
+		Version_1_0.emplace();
+	}
 	Version_1_0->item.emplace();
-
 }
 
 
@@ -7477,6 +7622,10 @@ QVariant CSubstrateSpecificationInputObject::GetTypeId()
 
 void CSubstrateSpecificationInputObject::SetTypeId(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->typeId = v.value<QString>().toUtf8();
 	typeIdChanged();
 }
@@ -7484,7 +7633,7 @@ void CSubstrateSpecificationInputObject::SetTypeId(const QVariant& v)
 
 bool CSubstrateSpecificationInputObject::hasTypeId()
 {
-	 return Version_1_0->typeId.HasValue();
+	 return Version_1_0 && Version_1_0->typeId.HasValue();
 }
 
 
@@ -7648,25 +7797,28 @@ QVariant sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationInputOb
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationInputObject*>();
-	if (itemPtr == nullptr) return QVariant();
+	if (itemPtr == nullptr){
+		return QVariant();
+	}
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
-		if (nameId == "m_id"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->id.value());
-		}
-		if (nameId == "m_name"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->name.value());
-		}
-		if (nameId == "m_description"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->description.value());
-		}
-		if (nameId == "m_item"){
-			return itemPtr->GetItem();
-		}
-		if (nameId == "m_typeId"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->typeId.value());
-		}
+	if (nameId == "m_id"){
+		return QVariant::fromValue(Version_1_0->at(index)->id.value());
+	}
+	if (nameId == "m_name"){
+		return QVariant::fromValue(Version_1_0->at(index)->name.value());
+	}
+	if (nameId == "m_description"){
+		return QVariant::fromValue(Version_1_0->at(index)->description.value());
+	}
+	if (nameId == "m_item"){
+		return itemPtr->GetItem();
+	}
+	if (nameId == "m_typeId"){
+		return QVariant::fromValue(Version_1_0->at(index)->typeId.value());
+	}
+
 	return QVariant();
 }
 CSubstrateSpecificationDocumentMetaInfoObject::CSubstrateSpecificationDocumentMetaInfoObject(QObject* parent): ::imtbase::CItemModelBase(parent){
@@ -7689,6 +7841,10 @@ QVariant CSubstrateSpecificationDocumentMetaInfoObject::GetMaterialId()
 
 void CSubstrateSpecificationDocumentMetaInfoObject::SetMaterialId(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->materialId = v.value<QString>().toUtf8();
 	materialIdChanged();
 }
@@ -7696,7 +7852,7 @@ void CSubstrateSpecificationDocumentMetaInfoObject::SetMaterialId(const QVariant
 
 bool CSubstrateSpecificationDocumentMetaInfoObject::hasMaterialId()
 {
-	 return Version_1_0->materialId.HasValue();
+	 return Version_1_0 && Version_1_0->materialId.HasValue();
 }
 
 
@@ -7712,6 +7868,10 @@ QVariant CSubstrateSpecificationDocumentMetaInfoObject::GetLab()
 
 void CSubstrateSpecificationDocumentMetaInfoObject::SetLab(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->lab = v.value<QString>();
 	labChanged();
 }
@@ -7719,7 +7879,7 @@ void CSubstrateSpecificationDocumentMetaInfoObject::SetLab(const QVariant& v)
 
 bool CSubstrateSpecificationDocumentMetaInfoObject::hasLab()
 {
-	 return Version_1_0->lab.HasValue();
+	 return Version_1_0 && Version_1_0->lab.HasValue();
 }
 
 
@@ -7874,16 +8034,19 @@ QVariant sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumen
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentMetaInfoObject*>();
-	if (itemPtr == nullptr) return QVariant();
+	if (itemPtr == nullptr){
+		return QVariant();
+	}
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
-		if (nameId == "m_materialId"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->materialId.value());
-		}
-		if (nameId == "m_lab"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->lab.value());
-		}
+	if (nameId == "m_materialId"){
+		return QVariant::fromValue(Version_1_0->at(index)->materialId.value());
+	}
+	if (nameId == "m_lab"){
+		return QVariant::fromValue(Version_1_0->at(index)->lab.value());
+	}
+
 	return QVariant();
 }
 
