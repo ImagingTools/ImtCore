@@ -4,9 +4,44 @@ This directory contains utilities and helpers for GUI testing with Playwright.
 
 ## Files
 
+### playwright-utils.js
+
+**Primary module for Playwright tests** - Import this in your test files.
+
+This module combines all utilities from `utils.js` with Playwright-specific functionality like screenshot assertions. It safely handles the `@playwright/test` import without causing module resolution conflicts.
+
+#### Usage in Tests
+
+**Import from playwright-utils.js in your test files:**
+
+```javascript
+const { test } = require('@playwright/test');
+const { login, checkScreenshot, waitForPageStability } = require('./playwright-utils');
+
+test('login test', async ({ page }) => {
+  await login(page, 'user@example.com', 'password');
+  await waitForPageStability(page);
+  await checkScreenshot(page, 'dashboard.png');
+});
+```
+
+**Multi-User Test:**
+```javascript
+const { test } = require('@playwright/test');
+const { getUserScreenshotName, getUserInfoFromTest, checkScreenshot } = require('./playwright-utils');
+
+test('dashboard test', async ({ page }, testInfo) => {
+  const userInfo = getUserInfoFromTest(testInfo);
+  console.log(`Testing with user: ${userInfo.username}`);
+  
+  const screenshotName = getUserScreenshotName(testInfo, 'dashboard.png');
+  await checkScreenshot(page, screenshotName);
+});
+```
+
 ### utils.js
 
-Common Playwright test utilities that are automatically available in the test container at `/app/tests/GUI/utils.js`.
+Core utility functions without Playwright dependencies. This module can be safely imported by configuration files and setup scripts.
 
 #### Available Functions
 
@@ -18,9 +53,10 @@ Common Playwright test utilities that are automatically available in the test co
 - `fillTextInput(page, selector, text)` - Fill text input
 - `selectComboBox(page, selector, value)` - Select from dropdown
 - `waitForPageStability(page)` - Wait for DOM to stabilize
-- `checkScreenshot(page, name, options)` - Screenshot comparison with masking
 - `reloadPage(page)` - Reload page and wait
 - `delay(ms)` - Sleep utility
+- `applyMasks(page, masks)` - Apply visual masks to hide dynamic content
+- `clearMasks(page)` - Remove applied masks
 
 **Multi-User Testing:**
 - `parseTestUsers()` - Parse TEST_USERS environment variable into array
@@ -28,35 +64,7 @@ Common Playwright test utilities that are automatically available in the test co
 - `getUserScreenshotName(testInfo, baseFilename)` - Get user-specific screenshot filename
 - `getUserInfoFromTest(testInfo)` - Get current user info from testInfo
 
-#### Usage in Tests
-
-**Basic Test:**
-```javascript
-const { login, checkScreenshot, waitForPageStability } = require('../GUI/utils.js');
-
-test('login test', async ({ page }) => {
-  await login(page, 'user@example.com', 'password');
-  await waitForPageStability(page);
-  await checkScreenshot(page, 'dashboard');
-});
-```
-
-**Multi-User Test with Dynamic Projects:**
-```javascript
-const { getUserScreenshotName, getUserInfoFromTest } = require('../GUI/utils.js');
-
-// Test runs automatically for each user (authorized-user0, authorized-user1, etc.)
-test('dashboard test', async ({ page }, testInfo) => {
-  // Get current user info
-  const userInfo = getUserInfoFromTest(testInfo);
-  console.log(`Testing with user: ${userInfo.username}`);
-  
-  // Screenshots automatically include user in filename
-  const screenshotName = getUserScreenshotName(testInfo, 'dashboard.png');
-  await page.screenshot({ path: screenshotName });
-  // Creates: dashboard-user0.png, dashboard-user1.png, etc.
-});
-```
+**Note:** `checkScreenshot()` is available in `playwright-utils.js`, not in this module.
 
 ### playwright.config.js
 
