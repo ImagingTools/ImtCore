@@ -211,12 +211,12 @@ async function clearMasks(page) {
 }
 
 async function checkScreenshot(page, filename, masks = [], config = defaultConfig, expect) {
+  if (!expect) {
+    throw new Error('expect must be passed to checkScreenshot. Import it from @playwright/test in your test file.');
+  }
   try {
     await applyMasks(page, masks);
     await waitForPageStability(page, config);
-    if (!expect) {
-      throw new Error('expect must be passed to checkScreenshot. Import it from @playwright/test in your test file.');
-    }
     await expect(page).toHaveScreenshot(filename, config.screenshot);
   } finally {
     await clearMasks(page);

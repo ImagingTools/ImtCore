@@ -18,7 +18,7 @@ Common Playwright test utilities that are automatically available in the test co
 - `fillTextInput(page, selector, text)` - Fill text input
 - `selectComboBox(page, selector, value)` - Select from dropdown
 - `waitForPageStability(page)` - Wait for DOM to stabilize
-- `checkScreenshot(page, name, masks, config, expect)` - Screenshot comparison with masking (requires expect from @playwright/test)
+- `checkScreenshot(page, filename, masks, config, expect)` - Screenshot comparison with masking (requires expect from @playwright/test)
 - `reloadPage(page)` - Reload page and wait
 - `delay(ms)` - Sleep utility
 
