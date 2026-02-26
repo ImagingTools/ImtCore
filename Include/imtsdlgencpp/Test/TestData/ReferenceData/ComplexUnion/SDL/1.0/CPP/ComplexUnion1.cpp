@@ -1808,6 +1808,7 @@ bool CGeometryObject::hasPoints()
 
 void CGeometryObject::emplacePoints()
 {
+	ResetPoints();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
@@ -1874,6 +1875,7 @@ bool CGeometryObject::hasRequiredPoints()
 
 void CGeometryObject::emplaceRequiredPoints()
 {
+	ResetRequiredPoints();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
@@ -1940,6 +1942,7 @@ bool CGeometryObject::hasOptionalPoints()
 
 void CGeometryObject::emplaceOptionalPoints()
 {
+	ResetOptionalPoints();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}

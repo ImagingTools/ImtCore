@@ -5840,6 +5840,7 @@ bool CSubstrateSpecificationListInputObject::hasViewParams()
 
 void CSubstrateSpecificationListInputObject::emplaceViewParams()
 {
+	ResetViewParams();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
@@ -6501,6 +6502,7 @@ bool CSubstrateSpecificationListResponseObject::hasItems()
 
 void CSubstrateSpecificationListResponseObject::emplaceItems()
 {
+	ResetItems();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
@@ -7593,6 +7595,7 @@ bool CSubstrateSpecificationInputObject::hasItem()
 
 void CSubstrateSpecificationInputObject::emplaceItem()
 {
+	ResetItem();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
