@@ -210,19 +210,6 @@ async function clearMasks(page) {
   });
 }
 
-async function checkScreenshot(page, filename, masks = [], config = defaultConfig, expect) {
-  if (!expect) {
-    throw new Error('expect must be passed to checkScreenshot. Import it from @playwright/test in your test file.');
-  }
-  try {
-    await applyMasks(page, masks);
-    await waitForPageStability(page, config);
-    await expect(page).toHaveScreenshot(filename, config.screenshot);
-  } finally {
-    await clearMasks(page);
-  }
-}
-
 async function login(page, username, password, config = defaultConfig, loginPaths = {}) {
   const paths = { ...config.loginPaths, ...loginPaths };
 
@@ -309,7 +296,6 @@ module.exports = {
   delay,
   reloadPage,
   clickAt,
-  checkScreenshot,
   login,
   parseTestUsers,
   runWithEachUser,
@@ -321,4 +307,6 @@ module.exports = {
   selectComboBox,
   fillTextInput,
   clickOnButton,
+  applyMasks,
+  clearMasks,
 };
