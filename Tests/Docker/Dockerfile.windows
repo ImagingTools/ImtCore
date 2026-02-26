@@ -26,7 +26,8 @@ RUN New-Item -ItemType Directory -Force -Path C:/modules; \
     cd C:/modules; \
     npm init -y; \
     npm install @playwright/test newman newman-reporter-htmlextra; \
-    npx playwright install chromium --with-deps;
+    npx playwright install chromium --with-deps; \
+    Remove-Item package.json;
 
 ENV PATH="C:\\modules\\node_modules\\.bin;${PATH}"
 ENV NODE_PATH="C:\\modules\\node_modules"
