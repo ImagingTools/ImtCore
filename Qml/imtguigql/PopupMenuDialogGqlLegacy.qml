@@ -43,6 +43,7 @@ Item {
 	property int elementsCount: -1;
 	property int pauseDuration: 500;
 	property real contentHeight: itemBody.height;
+	property bool pinned: true;
 
 
 	onElementsCountChanged: {
