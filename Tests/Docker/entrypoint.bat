@@ -72,8 +72,8 @@ if exist "!PG_DATA!\postmaster.pid" (
     )
 )
 
-echo Starting PostgreSQL...
-"!PG_BIN!\pg_ctl.exe" -D "!PG_DATA!" -l "!PG_LOG!" start -w -t 60
+echo Starting PostgreSQL with max_connections=300...
+"!PG_BIN!\pg_ctl.exe" -D "!PG_DATA!" -l "!PG_LOG!" -o "-c max_connections=300" start -w -t 60
 
 if errorlevel 1 (
     echo [ERROR] PostgreSQL failed to start. Log contents:

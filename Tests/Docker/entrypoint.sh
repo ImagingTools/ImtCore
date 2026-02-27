@@ -81,8 +81,9 @@ if [ "${START_POSTGRESQL:-false}" = "true" ]; then
             su - postgres -c "$PG_BIN_DIR/initdb -D /var/lib/postgresql/data"
         fi
 
-        echo -e "${YELLOW}Starting PostgreSQL...${NC}"
-        su - postgres -c "$PG_BIN_DIR/pg_ctl -D /var/lib/postgresql/data -l /var/log/postgresql/postgresql.log start"
+        echo -e "${YELLOW}Starting PostgreSQL with max_connections=300...${NC}"
+        # Added -o '-c max_connections=300' here
+        su - postgres -c "$PG_BIN_DIR/pg_ctl -D /var/lib/postgresql/data -l /var/log/postgresql/postgresql.log -o '-c max_connections=300' start"
 
         wait_for_service "PostgreSQL" "su - postgres -c \"$PG_BIN_DIR/psql -c 'SELECT 1'\""
 
