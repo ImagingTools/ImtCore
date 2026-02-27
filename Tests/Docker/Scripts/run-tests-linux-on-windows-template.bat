@@ -36,10 +36,11 @@ if "%IMTCOREDIR%"=="" (
   set SCRIPT_DIR=%~dp0
   REM Go up to application root (assuming script is in App\Tests\)
   for %%I in ("%SCRIPT_DIR%..") do set APP_ROOT=%%~fI
-  REM Assume ImtCore is at same level as application
-  if exist "%APP_ROOT%\..\ImtCore\Tests\Docker\Scripts\run-tests-linux-on-windows-core.bat" (
-    for %%I in ("%APP_ROOT%\..\ImtCore") do set IMTCOREDIR=%%~fI
-  ) else (
+  REM Try common relative locations (same level or higher)
+  for %%I in ("%APP_ROOT%\..\ImtCore" "%APP_ROOT%\..\..\ImtCore" "%APP_ROOT%\..\..\..\ImtCore") do (
+    if "%IMTCOREDIR%"=="" if exist "%%~fI\Tests\Docker\Scripts\run-tests-linux-on-windows-core.bat" set IMTCOREDIR=%%~fI
+  )
+  if "%IMTCOREDIR%"=="" (
     echo ERROR: IMTCOREDIR environment variable is not set and ImtCore not found at expected location.
     echo Please either:
     echo   1. Set IMTCOREDIR environment variable: set IMTCOREDIR=C:\path\to\ImtCore
