@@ -268,7 +268,7 @@ QByteArray CAddressElementDatabaseDelegateComp::GetSelectionQuery(const QByteArr
 
 		iprm::TParamsPtr<imtbase::ICollectionFilter> collectionFilterParamPtr(paramsPtr, "Filter");
 		if (collectionFilterParamPtr.IsValid()){
-			textFilter = collectionFilterParamPtr->GetTextFilter();
+			//textFilter = collectionFilterParamPtr->GetTextFilter();
 			if (!CreateSortQuery(*collectionFilterParamPtr, sortQuery)){
 				return QByteArray();
 			}
