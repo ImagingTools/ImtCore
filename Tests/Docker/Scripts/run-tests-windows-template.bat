@@ -33,7 +33,7 @@ REM ==========================================
 REM Determine ImtCore directory
 if not defined IMTCOREDIR (
     REM If IMTCOREDIR is not set, assume ImtCore is at ..\..\ImtCore
-    set "IMTCOREDIR=%~dp0..\..\ImtCore"
+    for %%A in ("%~dp0..\..\ImtCore") do set "IMTCOREDIR=%%~fA"
 )
 
 REM Validate ImtCore path
