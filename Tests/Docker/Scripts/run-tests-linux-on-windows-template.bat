@@ -39,7 +39,7 @@ if not defined IMTCOREDIR (
   REM Assume ImtCore is at the same level as the application
   set IMTCORE_CANDIDATE=%APP_ROOT%\..\ImtCore
   if exist "%IMTCORE_CANDIDATE%\Tests\Docker\Scripts\run-tests-linux-on-windows-core.bat" (
-    set IMTCOREDIR=%IMTCORE_CANDIDATE%
+    if not defined IMTCOREDIR set IMTCOREDIR=%IMTCORE_CANDIDATE%
   ) else (
     echo ERROR: IMTCOREDIR environment variable is not set and ImtCore not found at expected location.
     echo Please either:
