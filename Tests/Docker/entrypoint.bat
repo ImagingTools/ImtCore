@@ -17,11 +17,9 @@ if exist "C:\Program Files\nodejs" set "PATH=C:\Program Files\nodejs;!PATH!"
 REM Add pre-installed node_modules binaries to PATH
 if exist "C:\modules\node_modules\.bin" set "PATH=C:\modules\node_modules\.bin;!PATH!"
 
-REM IMPORTANT:
-REM Do NOT set NODE_PATH to C:\modules\node_modules here.
-REM NODE_PATH can cause Node to resolve @playwright/test from unexpected locations
-REM when tests are mounted under C:\app, leading to duplicate installations.
-set "NODE_PATH="
+REM Set NODE_PATH to include global modules so scripts can find them
+REM We will append specific test directories to this later
+set "NODE_PATH=C:\modules\node_modules"
 
 REM Add PostgreSQL to PATH if found (needed for startup scripts even if not starting PG)
 for /d %%P in ("C:\Program Files\PostgreSQL\*") do (
@@ -233,28 +231,8 @@ echo [OK] Using pre-installed Playwright from C:\modules
 echo Running Playwright tests...
 cd /d C:\app\tests\GUI
 
-REM Prevent accidental duplicate Playwright installations under mounted tests
-set NODE_MODULES_LINK_EXISTS=
-for /f "delims=" %%L in ('dir /AL /B "C:\app\tests\GUI" 2^>nul ^| findstr /I /C:"node_modules"') do set NODE_MODULES_LINK_EXISTS=1
-if not defined NODE_MODULES_LINK_EXISTS if exist "C:\app\tests\GUI\node_modules\@playwright\test" (
-    echo [ERROR] Found @playwright/test under C:\app\tests\GUI\node_modules (duplicate install).
-    echo [ERROR] Remove local node_modules from mounted tests to avoid version conflicts.
-    set EXIT_CODE=1
-    goto END_TESTS
-)
-
-REM Link pre-installed node_modules for Playwright resolution
-if not exist "C:\app\tests\GUI\node_modules" (
-    mklink /J "C:\app\tests\GUI\node_modules" "C:\modules\node_modules" >nul
-    if errorlevel 1 (
-        echo [ERROR] Failed to link C:\app\tests\GUI\node_modules to C:\modules\node_modules
-        set EXIT_CODE=1
-        goto END_TESTS
-    )
-)
-
-REM Allow require('utils') by pointing NODE_PATH only to GUI folder (not to C:\modules)
-set "NODE_PATH=C:\app\tests\GUI"
+REM Allow require('utils') by pointing NODE_PATH to both global modules AND GUI folder
+set "NODE_PATH=C:\modules\node_modules;C:\app\tests\GUI"
 
 REM Use Playwright binary from C:\modules explicitly
 set "PLAYWRIGHT_BIN=C:\modules\node_modules\.bin\playwright.cmd"
@@ -264,12 +242,30 @@ if not exist "!PLAYWRIGHT_BIN!" (
     goto END_TESTS
 )
 
-set "PLAYWRIGHT_CMD="!PLAYWRIGHT_BIN!" test"
+REM Define output variables for reports
+REM This forces reports to go to the mounted volume C:\app\tests\test-results
+REM instead of the default folder inside GUI (which is mounted from ImtCore)
+set "PLAYWRIGHT_HTML_REPORT=C:\app\tests\test-results\playwright-report"
+set "PLAYWRIGHT_JSON_OUTPUT_FILE=C:\app\tests\test-results\playwright-results.json"
+set "PLAYWRIGHT_JUNIT_OUTPUT_FILE=C:\app\tests\test-results\playwright-junit.xml"
+
+REM Pass these as env vars is not enough because playwright.config.js might ignore them
+REM so we also pass them as command line arguments where possible, or rely on config to read envs.
+REM The standard playwright.config.js in ImtCore DOES read env vars if configured,
+REM but let's override via CLI arguments to be sure.
+
+set "PLAYWRIGHT_CMD=!PLAYWRIGHT_BIN! test --reporter=list,html,json,junit"
+
+REM Note: Playwright CLI doesn't easily accept output paths for specific reporters via flags mixed with comma-separated list.
+REM It relies on env vars usually. So we export them.
 
 if "!UPDATE_SNAPSHOTS!"=="true" (
     echo UPDATE_SNAPSHOTS=true - updating reference screenshots
     set "PLAYWRIGHT_CMD=!PLAYWRIGHT_CMD! --update-snapshots"
 )
+
+echo Executing: !PLAYWRIGHT_CMD!
+echo Reports will be saved to: C:\app\tests\test-results
 
 call !PLAYWRIGHT_CMD!
 if errorlevel 1 set EXIT_CODE=!ERRORLEVEL!
