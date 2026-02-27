@@ -45,10 +45,10 @@ iser::ISerializable* CDelegatedParamsSetComp::GetEditableParameter(const QByteAr
 bool CDelegatedParamsSetComp::Serialize(iser::IArchive& archive)
 {
 	if (m_paramsSetCompPtr.IsValid()){
-		return false;
+		return m_paramsSetCompPtr->Serialize(archive);
 	}
 
-	return m_paramsSetCompPtr->Serialize(archive);
+	return true;
 }
 
 
