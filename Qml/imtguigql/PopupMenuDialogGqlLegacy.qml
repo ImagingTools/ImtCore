@@ -109,7 +109,22 @@ Item {
 		itemsModel.updateModel(0);
 	}
 
+	Component.onCompleted: {
+		Events.subscribeEvent("AppSizeChanged", onAppSizeChanged);
+	}
 
+	Component.onDestruction: {
+		Events.unSubscribeEvent("AppSizeChanged", onAppSizeChanged);
+	}
+
+
+	function onAppSizeChanged(parameters){
+		onBackgroundClicked();
+	}
+
+	function onBackgroundClicked(events){
+		popupMenuContainer.finished('', -1);
+	}
 
 	TreeItemModel{
 		id: modelFilter;
