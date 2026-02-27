@@ -233,6 +233,26 @@ echo [OK] Using pre-installed Playwright from C:\modules
 echo Running Playwright tests...
 cd /d C:\app\tests\GUI
 
+REM Prevent accidental duplicate Playwright installations under mounted tests
+set NODE_MODULES_LINK=
+for /f "delims=" %%L in ('dir /AL /B "C:\app\tests\GUI" 2^>nul ^| findstr /I /C:"node_modules"') do set NODE_MODULES_LINK=1
+if not defined NODE_MODULES_LINK if exist "C:\app\tests\GUI\node_modules\@playwright\test" (
+    echo [ERROR] Found @playwright/test under C:\app\tests\GUI\node_modules (duplicate install).
+    echo [ERROR] Remove local node_modules from mounted tests to avoid version conflicts.
+    set EXIT_CODE=1
+    goto END_TESTS
+)
+
+REM Link pre-installed node_modules for Playwright resolution
+if not exist "C:\app\tests\GUI\node_modules" (
+    mklink /J "C:\app\tests\GUI\node_modules" "C:\modules\node_modules" >nul
+    if errorlevel 1 (
+        echo [ERROR] Failed to link C:\app\tests\GUI\node_modules to C:\modules\node_modules
+        set EXIT_CODE=1
+        goto END_TESTS
+    )
+)
+
 REM Allow require('utils') by pointing NODE_PATH only to GUI folder (not to C:\modules)
 set "NODE_PATH=C:\app\tests\GUI"
 
