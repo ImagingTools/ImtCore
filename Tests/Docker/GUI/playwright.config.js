@@ -72,8 +72,8 @@ module.exports = defineConfig({
 
   timeout: 30 * 1000,
   expect: { timeout: 5000 },
-  fullyParallel: true,
   retries: 0,
+  workers: 4,
 
   reporter: [
     ['html', { outputFolder: process.env.PLAYWRIGHT_HTML_REPORT || 'playwright-report' }],

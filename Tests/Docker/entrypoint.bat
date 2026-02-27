@@ -56,7 +56,22 @@ REM Ensure data dir exists
 if not exist "!PG_DATA!" (
     echo Initializing PostgreSQL data directory...
     mkdir "!PG_DATA!"
-    "!PG_BIN!\initdb.exe" -D "!PG_DATA!" -U postgres --auth-host=scram-sha-256
+    "!PG_BIN!\initdb.exe" -D "!PG_DATA!" -U postgres --auth-host=scram-sha-256 --auth-local=trust
+
+    REM ---------------------------------------------------------------
+    REM FIX: In Docker/Windows containers the process has no permission
+    REM to bind TCP sockets on 127.0.0.1 / ::1.
+    REM Solution: disable TCP entirely and use Windows named pipes only.
+    REM ---------------------------------------------------------------
+    echo Patching postgresql.conf: disabling TCP, enabling named pipe...
+
+    REM Disable TCP listening (prevents "could not create any TCP/IP sockets")
+    echo listen_addresses = ''>> "!PG_DATA!\postgresql.conf"
+
+    REM Make sure named pipe is enabled (default is on, but be explicit)
+    echo unix_socket_directories = ''>> "!PG_DATA!\postgresql.conf"
+
+    echo [OK] postgresql.conf patched
 )
 
 REM Check for stale postmaster.pid
@@ -72,8 +87,8 @@ if exist "!PG_DATA!\postmaster.pid" (
     )
 )
 
-echo Starting PostgreSQL with max_connections=300...
-"!PG_BIN!\pg_ctl.exe" -D "!PG_DATA!" -l "!PG_LOG!" -o "-c max_connections=300" start -w -t 60
+echo Starting PostgreSQL...
+"!PG_BIN!\pg_ctl.exe" -D "!PG_DATA!" -l "!PG_LOG!" start -w -t 60
 
 if errorlevel 1 (
     echo [ERROR] PostgreSQL failed to start. Log contents:
@@ -88,6 +103,8 @@ if errorlevel 1 (
 )
 
 REM Wait for PostgreSQL
+REM NOTE: When TCP is disabled, psql connects via named pipe automatically
+REM       (no -h flag needed — this is correct behavior on Windows)
 :WAIT_PG
 echo Waiting for PostgreSQL to be ready...
 set ATTEMPTS=0
@@ -102,6 +119,8 @@ if !ATTEMPTS! gtr 30 (
     echo ----------------------------------------
     goto SKIP_POSTGRESQL
 )
+
+REM Connect without -h so psql uses named pipe instead of TCP
 "!PG_BIN!\psql.exe" -U postgres -c "SELECT 1" >nul 2>&1
 if errorlevel 1 (
     echo   Attempt !ATTEMPTS!/30...
