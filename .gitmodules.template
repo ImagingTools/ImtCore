@@ -1,0 +1,51 @@
+[submodule "3rdParty/EJ"]
+	path = 3rdParty/EJ
+	url = https://github.com/ImagingTools/ImtCore-3rdParty-EJ.git
+[submodule "3rdParty/JQ"]
+	path = 3rdParty/JQ
+	url = https://github.com/ImagingTools/ImtCore-3rdParty-JQ.git
+[submodule "3rdParty/JQML"]
+	path = 3rdParty/JQML
+	url = https://github.com/ImagingTools/ImtCore-3rdParty-JQML.git
+[submodule "3rdParty/JQML2"]
+	path = 3rdParty/JQML2
+	url = https://github.com/ImagingTools/ImtCore-3rdParty-JQML2.git
+[submodule "3rdParty/QXlsx"]
+	path = 3rdParty/QXlsx
+	url = https://github.com/ImagingTools/ImtCore-3rdParty-QXlsx.git
+[submodule "3rdParty/WebCompiler"]
+	path = 3rdParty/WebCompiler
+	url = https://github.com/ImagingTools/ImtCore-3rdParty-WebCompiler.git
+[submodule "3rdParty/boost"]
+	path = 3rdParty/boost
+	url = https://github.com/ImagingTools/ImtCore-3rdParty-boost.git
+[submodule "3rdParty/icu"]
+	path = 3rdParty/icu
+	url = https://github.com/ImagingTools/ImtCore-3rdParty-icu.git
+[submodule "3rdParty/libmdbx"]
+	path = 3rdParty/libmdbx
+	url = https://github.com/ImagingTools/ImtCore-3rdParty-libmdbx.git
+[submodule "3rdParty/mongoc"]
+	path = 3rdParty/mongoc
+	url = https://github.com/ImagingTools/ImtCore-3rdParty-mongoc.git
+[submodule "3rdParty/mongocxx"]
+	path = 3rdParty/mongocxx
+	url = https://github.com/ImagingTools/ImtCore-3rdParty-mongocxx.git
+[submodule "3rdParty/nodejs"]
+	path = 3rdParty/nodejs
+	url = https://github.com/ImagingTools/ImtCore-3rdParty-nodejs.git
+[submodule "3rdParty/openssl"]
+	path = 3rdParty/openssl
+	url = https://github.com/ImagingTools/ImtCore-3rdParty-openssl.git
+[submodule "3rdParty/pybind11"]
+	path = 3rdParty/pybind11
+	url = https://github.com/ImagingTools/ImtCore-3rdParty-pybind11.git
+[submodule "3rdParty/quazip"]
+	path = 3rdParty/quazip
+	url = https://github.com/ImagingTools/ImtCore-3rdParty-quazip.git
+[submodule "3rdParty/zlib"]
+	path = 3rdParty/zlib
+	url = https://github.com/ImagingTools/ImtCore-3rdParty-zlib.git
+[submodule "3rdParty/zstd"]
+	path = 3rdParty/zstd
+	url = https://github.com/ImagingTools/ImtCore-3rdParty-zstd.git

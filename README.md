@@ -302,7 +302,23 @@ export PYTHONEXE=/usr/bin/python3
 
 After cloning the repository for the first time, follow these steps:
 
-### 1. Install Git LFS
+### 1. Clone with Submodules
+
+This repository uses git submodules for third-party dependencies. When cloning, use the `--recurse-submodules` flag:
+
+```bash
+git clone --recurse-submodules https://github.com/ImagingTools/ImtCore.git
+```
+
+If you already cloned the repository without submodules, initialize them:
+
+```bash
+git submodule update --init --recursive
+```
+
+**Note**: The `3rdParty` directory contains 17 third-party libraries managed as git submodules. For information about the migration from a monolithic directory to submodules, see [MIGRATION_3RDPARTY_TO_SUBMODULES.md](MIGRATION_3RDPARTY_TO_SUBMODULES.md).
+
+### 2. Install Git LFS
 
 This repository uses Git LFS (Large File Storage) for binary files in the `3rdParty` directory. If you encounter issues with LFS files, ensure Git LFS is installed:
 
@@ -339,7 +355,7 @@ If you cloned the repository before installing Git LFS, pull the LFS files:
 git lfs pull
 ```
 
-### 2. Install Git Hooks
+### 3. Install Git Hooks
 
 To automatically update version files after each `git pull`, install the post-merge hook:
 
@@ -359,7 +375,7 @@ bash InstallHooks.sh
 
 This will install a hook that automatically runs the `UpdateVersion` script after each merge/pull operation.
 
-### 3. Update Version Files (Manual)
+### 4. Update Version Files (Manual)
 
 If you need to manually update version files (for example, after switching branches or making local changes):
 
