@@ -32,17 +32,8 @@ REM ==========================================
 
 REM Determine ImtCore directory
 if not defined IMTCOREDIR (
-    REM If IMTCOREDIR is not set, assume ImtCore is at the same level as the application
-    for %%A in ("%~dp0..\..\ImtCore") do (
-        if exist "%%~fA\Tests\Docker\Scripts\run-tests-windows-core.bat" set "IMTCOREDIR=%%~fA"
-    )
-    if not defined IMTCOREDIR (
-        echo ERROR: IMTCOREDIR environment variable is not set and ImtCore not found at expected location.
-        echo Please either:
-        echo   1. Set IMTCOREDIR environment variable: set IMTCOREDIR=C:\path\to\ImtCore
-        echo   2. Place ImtCore at the same level as your application directory
-        exit /b 1
-    )
+    REM If IMTCOREDIR is not set, assume ImtCore is at ..\..\ImtCore
+    set "IMTCOREDIR=%~dp0..\..\ImtCore"
 )
 
 REM Validate ImtCore path
