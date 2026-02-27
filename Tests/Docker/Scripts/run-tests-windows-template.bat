@@ -41,6 +41,7 @@ set CORE_SCRIPT_PATH=%IMTCOREDIR%\Tests\Docker\Scripts\run-tests-windows-core.ba
 if not exist "%CORE_SCRIPT_PATH%" (
     echo ERROR: Cannot find core script at: %CORE_SCRIPT_PATH%
     echo Please ensure IMTCOREDIR points to a valid ImtCore directory.
+    echo Expected fallback location: %~dp0..\..\ImtCore
     exit /b 1
 )
 

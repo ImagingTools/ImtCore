@@ -40,6 +40,7 @@ REM Validate ImtCore path
 if not exist "%IMTCOREDIR%\Tests\Docker\Scripts\run-tests-linux-on-windows-core.bat" (
   echo ERROR: Cannot find core script at: %IMTCOREDIR%\Tests\Docker\Scripts\run-tests-linux-on-windows-core.bat
   echo Please ensure IMTCOREDIR points to a valid ImtCore directory.
+  echo Expected fallback location: %~dp0..\..\ImtCore
   exit /b 1
 )
 

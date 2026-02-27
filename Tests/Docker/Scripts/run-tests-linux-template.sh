@@ -41,7 +41,7 @@ if [ -z "$IMTCOREDIR" ]; then
     echo "ERROR: IMTCOREDIR environment variable is not set and ImtCore not found at expected location."
     echo "Please either:"
     echo "  1. Set IMTCOREDIR environment variable: export IMTCOREDIR=/path/to/ImtCore"
-    echo "  2. Place ImtCore at the same level as your application directory"
+    echo "  2. Place ImtCore at ../../ImtCore relative to this script"
     exit 1
 fi
 
