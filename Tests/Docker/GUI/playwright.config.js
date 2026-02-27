@@ -38,6 +38,10 @@ if (hasAuthorized && users.length > 0) {
       testDir: authorizedDir,
       use: {
         storageState: `storageState-user${index}.json`,
+        // Fix: Pass credentials to project config so global-setup can read them
+        username: user.username,
+        password: user.password,
+        userIndex: index,
       },
     });
   });
@@ -62,8 +66,6 @@ if (projects.length === 0) {
 console.log('Projects:', projects.map(p => p.name).join(', '));
 
 module.exports = defineConfig({
-  // НЕ указываем testDir на верхнем уровне - только в projects
-  
   globalSetup: (hasAuthorized && users.length > 0) 
     ? require.resolve('./global-setup') 
     : undefined,
@@ -74,9 +76,9 @@ module.exports = defineConfig({
   retries: 0,
 
   reporter: [
-    ['html', { outputFolder: 'playwright-report' }],
-    ['json', { outputFile: 'test-results/playwright-results.json' }],
-    ['junit', { outputFile: 'test-results/playwright-junit.xml' }],
+    ['html', { outputFolder: process.env.PLAYWRIGHT_HTML_REPORT || 'playwright-report' }],
+    ['json', { outputFile: process.env.PLAYWRIGHT_JSON_OUTPUT_FILE || 'test-results/playwright-results.json' }],
+    ['junit', { outputFile: process.env.PLAYWRIGHT_JUNIT_OUTPUT_FILE || 'test-results/playwright-junit.xml' }],
     ['list'],
   ],
 
