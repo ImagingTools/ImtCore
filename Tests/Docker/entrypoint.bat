@@ -234,9 +234,9 @@ echo Running Playwright tests...
 cd /d C:\app\tests\GUI
 
 REM Prevent accidental duplicate Playwright installations under mounted tests
-set NODE_MODULES_LINK=
-for /f "delims=" %%L in ('dir /AL /B "C:\app\tests\GUI" 2^>nul ^| findstr /I /C:"node_modules"') do set NODE_MODULES_LINK=1
-if not defined NODE_MODULES_LINK if exist "C:\app\tests\GUI\node_modules\@playwright\test" (
+set NODE_MODULES_LINK_EXISTS=
+for /f "delims=" %%L in ('dir /AL /B "C:\app\tests\GUI" 2^>nul ^| findstr /I /C:"node_modules"') do set NODE_MODULES_LINK_EXISTS=1
+if not defined NODE_MODULES_LINK_EXISTS if exist "C:\app\tests\GUI\node_modules\@playwright\test" (
     echo [ERROR] Found @playwright/test under C:\app\tests\GUI\node_modules (duplicate install).
     echo [ERROR] Remove local node_modules from mounted tests to avoid version conflicts.
     set EXIT_CODE=1
