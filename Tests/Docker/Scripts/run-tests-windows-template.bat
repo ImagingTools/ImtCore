@@ -32,23 +32,8 @@ REM ==========================================
 
 REM Determine ImtCore directory
 if not defined IMTCOREDIR (
-    REM If IMTCOREDIR is not set, assume ImtCore is at the same level as the application
-    set SCRIPT_DIR=%~dp0
-    REM Go up to application root (assuming script is in App\Tests\)
-    for %%A in ("%SCRIPT_DIR%..") do set APP_ROOT=%%~fA
-    REM Assume ImtCore is at same level as application
-    for %%A in ("%APP_ROOT%..") do set PARENT_DIR=%%~fA
-    set IMTCORE_CANDIDATE=%PARENT_DIR%\ImtCore
-    
-    if exist "%IMTCORE_CANDIDATE%\Tests\Docker\Scripts\run-tests-windows-core.bat" (
-        set IMTCOREDIR=%IMTCORE_CANDIDATE%
-    ) else (
-        echo ERROR: IMTCOREDIR environment variable is not set and ImtCore not found at expected location.
-        echo Please either:
-        echo   1. Set IMTCOREDIR environment variable: set IMTCOREDIR=C:\path\to\ImtCore
-        echo   2. Place ImtCore at the same level as your application directory
-        exit /b 1
-    )
+    REM If IMTCOREDIR is not set, assume ImtCore is at ..\..\ImtCore
+    for %%A in ("%~dp0..\..\ImtCore") do set "IMTCOREDIR=%%~fA"
 )
 
 REM Validate ImtCore path
@@ -56,6 +41,7 @@ set CORE_SCRIPT_PATH=%IMTCOREDIR%\Tests\Docker\Scripts\run-tests-windows-core.ba
 if not exist "%CORE_SCRIPT_PATH%" (
     echo ERROR: Cannot find core script at: %CORE_SCRIPT_PATH%
     echo Please ensure IMTCOREDIR points to a valid ImtCore directory.
+    echo Expected fallback location: %~dp0..\..\ImtCore
     exit /b 1
 )
 

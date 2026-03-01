@@ -32,20 +32,17 @@ export TEST_USERS="test@example.com:testpassword"
 
 # Determine ImtCore directory
 if [ -z "$IMTCOREDIR" ]; then
-    # If IMTCOREDIR is not set, assume ImtCore is at the same level as the application
+    # If IMTCOREDIR is not set, assume ImtCore is at ../../ImtCore
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    # Go up to application root (assuming script is in App/Tests/)
-    APP_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-    # Assume ImtCore is at same level as application
-    IMTCOREDIR="$(cd "$APP_ROOT/../ImtCore" 2>/dev/null && pwd)"
-    
-    if [ -z "$IMTCOREDIR" ]; then
-        echo "ERROR: IMTCOREDIR environment variable is not set and ImtCore not found at expected location."
-        echo "Please either:"
-        echo "  1. Set IMTCOREDIR environment variable: export IMTCOREDIR=/path/to/ImtCore"
-        echo "  2. Place ImtCore at the same level as your application directory"
-        exit 1
-    fi
+    IMTCOREDIR="$(cd "$SCRIPT_DIR/../../ImtCore" 2>/dev/null && pwd)"
+fi
+
+if [ -z "$IMTCOREDIR" ]; then
+    echo "ERROR: IMTCOREDIR environment variable is not set and ImtCore not found at expected location."
+    echo "Please either:"
+    echo "  1. Set IMTCOREDIR environment variable: export IMTCOREDIR=/path/to/ImtCore"
+    echo "  2. Place ImtCore at ../../ImtCore relative to this script"
+    exit 1
 fi
 
 # Validate ImtCore path

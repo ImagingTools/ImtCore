@@ -17,7 +17,14 @@ if exist "C:\Program Files\nodejs" set "PATH=C:\Program Files\nodejs;!PATH!"
 REM Add pre-installed node_modules binaries to PATH
 if exist "C:\modules\node_modules\.bin" set "PATH=C:\modules\node_modules\.bin;!PATH!"
 
-REM Add PostgreSQL to PATH if found (needed for startup scripts even if not starting PG)
+REM Add global npm binaries to PATH (for newman)
+if exist "C:\Users\ContainerAdministrator\AppData\Roaming\npm" set "PATH=C:\Users\ContainerAdministrator\AppData\Roaming\npm;!PATH!"
+if exist "C:\Users\ContainerUser\AppData\Roaming\npm" set "PATH=C:\Users\ContainerUser\AppData\Roaming\npm;!PATH!"
+
+REM Set NODE_PATH to include global modules so scripts can find them
+set "NODE_PATH=C:\modules\node_modules"
+
+REM Add PostgreSQL to PATH if found
 for /d %%P in ("C:\Program Files\PostgreSQL\*") do (
     set "PATH=%%P\bin;!PATH!"
     set "PG_BIN=%%P\bin"
@@ -53,6 +60,16 @@ if not exist "!PG_DATA!" (
     echo Initializing PostgreSQL data directory...
     mkdir "!PG_DATA!"
     "!PG_BIN!\initdb.exe" -D "!PG_DATA!" -U postgres --auth-host=scram-sha-256
+
+    REM ---------------------------------------------------------------
+    REM FIX: In Docker/Windows containers the process has no permission
+    REM to bind TCP sockets on 127.0.0.1 / ::1.
+    REM Solution: disable TCP entirely and use Windows named pipes only.
+    REM ---------------------------------------------------------------
+    echo Patching postgresql.conf: disabling TCP, enabling named pipe...
+    echo listen_addresses = ''>> "!PG_DATA!\postgresql.conf"
+    echo unix_socket_directories = ''>> "!PG_DATA!\postgresql.conf"
+    echo [OK] postgresql.conf patched
 )
 
 REM Check for stale postmaster.pid
@@ -98,6 +115,7 @@ if !ATTEMPTS! gtr 30 (
     echo ----------------------------------------
     goto SKIP_POSTGRESQL
 )
+REM Connect without -h so psql uses named pipe instead of TCP
 "!PG_BIN!\psql.exe" -U postgres -c "SELECT 1" >nul 2>&1
 if errorlevel 1 (
     echo   Attempt !ATTEMPTS!/30...
@@ -110,10 +128,8 @@ REM Set password
 echo Setting postgres password
 "!PG_BIN!\psql.exe" -U postgres -c "ALTER USER postgres WITH PASSWORD '!POSTGRES_PASSWORD!';" >nul 2>&1
 
-REM Create test database if specified
 if defined POSTGRES_DB (
-    echo Creating database: !POSTGRES_DB!
-    "!PG_BIN!\psql.exe" -U postgres -c "CREATE DATABASE !POSTGRES_DB!" >nul 2>&1
+    echo [INFO] POSTGRES_DB is set to !POSTGRES_DB!, but automatic database creation is disabled in entrypoint.bat
 )
 
 echo [OK] PostgreSQL initialized
@@ -131,8 +147,6 @@ if not exist "C:\app\startup" goto SKIP_STARTUP
 
 echo Step 2: Running custom application scripts...
 echo Startup dir: C:\app\startup
-
-echo Listing C:\app\startup:
 dir /b "C:\app\startup" 2>nul
 
 REM Export path environment variables for startup scripts
@@ -141,13 +155,6 @@ set STARTUP_DIR=C:\app\startup
 set RESOURCES_DIR=C:\app\resources
 set TESTS_DIR=C:\app\tests
 
-echo Environment variables set for startup scripts:
-echo   APP_DIR=!APP_DIR!
-echo   STARTUP_DIR=!STARTUP_DIR!
-echo   RESOURCES_DIR=!RESOURCES_DIR!
-echo   TESTS_DIR=!TESTS_DIR!
-
-REM Count scripts
 set SCRIPT_COUNT=0
 for %%F in ("C:\app\startup\*.bat") do set /a SCRIPT_COUNT+=1
 
@@ -206,56 +213,65 @@ if exist "C:\app\tests\API" (
     )
 )
 
+REM Define target folder for reports (Must be the mounted volume)
+set "TARGET_RESULTS=C:\app\tests\test-results"
+if not exist "!TARGET_RESULTS!" mkdir "!TARGET_RESULTS!"
+
 REM Run GUI tests
 if !GUI_TESTS_FOUND! equ 0 goto SKIP_GUI_TESTS
 
 set EXIT_CODE=0
 
-REM Find package.json location
-set PACKAGE_DIR=
-if exist "C:\app\tests\GUI\package.json" set PACKAGE_DIR=C:\app\tests\GUI
-if exist "C:\app\tests\package.json" set PACKAGE_DIR=C:\app\tests
-
-REM Check if node_modules already exist (pre-installed in image)
-if exist "C:\modules\node_modules\playwright" (
-    echo [OK] Using pre-installed Playwright from C:\modules
-    goto RUN_PLAYWRIGHT
-)
-
-if not defined PACKAGE_DIR (
-    echo No package.json found in C:\app\tests or C:\app\tests\GUI. Cannot install dependencies.
+REM Verify pre-installed Playwright exists
+if not exist "C:\modules\node_modules\@playwright\test" (
+    echo [ERROR] @playwright/test not found in C:\modules\node_modules
     set EXIT_CODE=1
-    goto END_TESTS
+    goto AFTER_GUI_TESTS
 )
 
-echo Installing dependencies from !PACKAGE_DIR!...
-cd /d "!PACKAGE_DIR!"
-if exist "package-lock.json" (
-    call npm ci
-) else (
-    call npm install
-)
-if errorlevel 1 (
-    set EXIT_CODE=!ERRORLEVEL!
-    goto END_TESTS
-)
+echo [OK] Using pre-installed Playwright from C:\modules
 
-:RUN_PLAYWRIGHT
 echo Running Playwright tests...
 cd /d C:\app\tests\GUI
 
-REM Use pre-installed playwright directly, not npx (avoids version conflicts)
-set PLAYWRIGHT_CMD=playwright test
+set "NODE_PATH=C:\modules\node_modules;C:\app\tests\GUI"
+set "PLAYWRIGHT_BIN=C:\modules\node_modules\.bin\playwright.cmd"
+
+if not exist "!PLAYWRIGHT_BIN!" (
+    echo [ERROR] Playwright CLI not found: !PLAYWRIGHT_BIN!
+    set EXIT_CODE=1
+    goto AFTER_GUI_TESTS
+)
+
+REM --- CONFIGURATION THAT WORKS ---
+REM We rely on playwright.config.js for reporter paths.
+
+set "PLAYWRIGHT_CMD=!PLAYWRIGHT_BIN! test"
 
 if "!UPDATE_SNAPSHOTS!"=="true" (
     echo UPDATE_SNAPSHOTS=true - updating reference screenshots
-    set PLAYWRIGHT_CMD=!PLAYWRIGHT_CMD! --update-snapshots
+    set "PLAYWRIGHT_CMD=!PLAYWRIGHT_CMD! --update-snapshots"
 )
+
+echo Executing: !PLAYWRIGHT_CMD!
+echo Reports should appear in: !TARGET_RESULTS!
 
 call !PLAYWRIGHT_CMD!
 if errorlevel 1 set EXIT_CODE=!ERRORLEVEL!
 
-goto END_TESTS
+REM --- FINAL SYNC ---
+REM Sync any artifacts (screenshots/videos) that might have landed in local test-results
+REM This is still needed because screenshots location is determined by config, not CLI flags
+if exist "C:\app\tests\GUI\test-results" (
+    echo.
+    echo Syncing media artifacts from C:\app\tests\GUI\test-results to !TARGET_RESULTS!...
+    xcopy /E /I /Y "C:\app\tests\GUI\test-results" "!TARGET_RESULTS!" >nul
+)
+
+echo Test run complete.
+echo =======================================================
+
+:AFTER_GUI_TESTS
 
 :SKIP_GUI_TESTS
 
@@ -278,13 +294,17 @@ if defined ENV_FILE (
     echo Using environment: !ENV_FILE!
     for %%C in ("C:\app\tests\API\*collection*.json") do (
         echo Running collection: %%~nxC
-        call newman run "%%C" -e "!ENV_FILE!"
+        set "NEWMAN_JUNIT=!TARGET_RESULTS!\newman-%%~nC.xml"
+        set "NEWMAN_JSON=!TARGET_RESULTS!\newman-%%~nC.json"
+        call npx newman run "%%C" -e "!ENV_FILE!" -r cli,junit,json --reporter-junit-export "!NEWMAN_JUNIT!" --reporter-json-export "!NEWMAN_JSON!"
         if errorlevel 1 set EXIT_CODE=!ERRORLEVEL!
     )
 ) else (
     for %%C in ("C:\app\tests\API\*collection*.json") do (
         echo Running collection: %%~nxC
-        call newman run "%%C"
+        set "NEWMAN_JUNIT=!TARGET_RESULTS!\newman-%%~nC.xml"
+        set "NEWMAN_JSON=!TARGET_RESULTS!\newman-%%~nC.json"
+        call npx newman run "%%C" -r cli,junit,json --reporter-junit-export "!NEWMAN_JUNIT!" --reporter-json-export "!NEWMAN_JSON!"
         if errorlevel 1 set EXIT_CODE=!ERRORLEVEL!
     )
 )
