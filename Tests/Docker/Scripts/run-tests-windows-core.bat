@@ -71,6 +71,9 @@ if exist "%CD%\Tests\API" set VOLUME_MOUNTS=%VOLUME_MOUNTS% -v "%CD%\Tests\API:C
 if exist "%CD%\Tests\Startup" set VOLUME_MOUNTS=%VOLUME_MOUNTS% -v "%CD%\Tests\Startup:C:\app\startup"
 if exist "%CD%\Tests\Resources" set VOLUME_MOUNTS=%VOLUME_MOUNTS% -v "%CD%\Tests\Resources:C:\app\resources"
 
+REM Mount test-results to host (for Playwright + Newman)
+set VOLUME_MOUNTS=%VOLUME_MOUNTS% -v "%DEST_RESULTS_DIR%:C:\app\tests\test-results"
+
 echo Starting container...
 docker run -d ^
   --name %CONTAINER_NAME% ^

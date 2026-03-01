@@ -26,6 +26,7 @@ RUN New-Item -ItemType Directory -Force -Path C:/modules
 COPY Tests/Docker/GUI/package.json C:/modules/package.json
 RUN cd C:/modules; \
     npm install; \
+    npm install newman; \
     npx playwright install chromium --with-deps; \
     Remove-Item package.json;
 

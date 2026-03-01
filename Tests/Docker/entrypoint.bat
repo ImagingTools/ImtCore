@@ -17,11 +17,14 @@ if exist "C:\Program Files\nodejs" set "PATH=C:\Program Files\nodejs;!PATH!"
 REM Add pre-installed node_modules binaries to PATH
 if exist "C:\modules\node_modules\.bin" set "PATH=C:\modules\node_modules\.bin;!PATH!"
 
+REM Add global npm binaries to PATH (for newman)
+if exist "C:\Users\ContainerAdministrator\AppData\Roaming\npm" set "PATH=C:\Users\ContainerAdministrator\AppData\Roaming\npm;!PATH!"
+if exist "C:\Users\ContainerUser\AppData\Roaming\npm" set "PATH=C:\Users\ContainerUser\AppData\Roaming\npm;!PATH!"
+
 REM Set NODE_PATH to include global modules so scripts can find them
-REM We will append specific test directories to this later
 set "NODE_PATH=C:\modules\node_modules"
 
-REM Add PostgreSQL to PATH if found (needed for startup scripts even if not starting PG)
+REM Add PostgreSQL to PATH if found
 for /d %%P in ("C:\Program Files\PostgreSQL\*") do (
     set "PATH=%%P\bin;!PATH!"
     set "PG_BIN=%%P\bin"
@@ -56,7 +59,7 @@ REM Ensure data dir exists
 if not exist "!PG_DATA!" (
     echo Initializing PostgreSQL data directory...
     mkdir "!PG_DATA!"
-    "!PG_BIN!\initdb.exe" -D "!PG_DATA!" -U postgres --auth-host=scram-sha-256 --auth-local=trust
+    "!PG_BIN!\initdb.exe" -D "!PG_DATA!" -U postgres --auth-host=scram-sha-256
 
     REM ---------------------------------------------------------------
     REM FIX: In Docker/Windows containers the process has no permission
@@ -64,13 +67,8 @@ if not exist "!PG_DATA!" (
     REM Solution: disable TCP entirely and use Windows named pipes only.
     REM ---------------------------------------------------------------
     echo Patching postgresql.conf: disabling TCP, enabling named pipe...
-
-    REM Disable TCP listening (prevents "could not create any TCP/IP sockets")
     echo listen_addresses = ''>> "!PG_DATA!\postgresql.conf"
-
-    REM Make sure named pipe is enabled (default is on, but be explicit)
     echo unix_socket_directories = ''>> "!PG_DATA!\postgresql.conf"
-
     echo [OK] postgresql.conf patched
 )
 
@@ -103,8 +101,6 @@ if errorlevel 1 (
 )
 
 REM Wait for PostgreSQL
-REM NOTE: When TCP is disabled, psql connects via named pipe automatically
-REM       (no -h flag needed — this is correct behavior on Windows)
 :WAIT_PG
 echo Waiting for PostgreSQL to be ready...
 set ATTEMPTS=0
@@ -119,7 +115,6 @@ if !ATTEMPTS! gtr 30 (
     echo ----------------------------------------
     goto SKIP_POSTGRESQL
 )
-
 REM Connect without -h so psql uses named pipe instead of TCP
 "!PG_BIN!\psql.exe" -U postgres -c "SELECT 1" >nul 2>&1
 if errorlevel 1 (
@@ -133,13 +128,8 @@ REM Set password
 echo Setting postgres password
 "!PG_BIN!\psql.exe" -U postgres -c "ALTER USER postgres WITH PASSWORD '!POSTGRES_PASSWORD!';" >nul 2>&1
 
-REM NOTE:
-REM Removed automatic CREATE DATABASE logic because it can fail or require interactive auth
-REM depending on container/pg_hba configuration.
-REM If you need DB creation, add a custom startup script in C:\app\startup.
 if defined POSTGRES_DB (
     echo [INFO] POSTGRES_DB is set to !POSTGRES_DB!, but automatic database creation is disabled in entrypoint.bat
-    echo [INFO] Create the database in a custom startup script under C:\app\startup if needed.
 )
 
 echo [OK] PostgreSQL initialized
@@ -157,8 +147,6 @@ if not exist "C:\app\startup" goto SKIP_STARTUP
 
 echo Step 2: Running custom application scripts...
 echo Startup dir: C:\app\startup
-
-echo Listing C:\app\startup:
 dir /b "C:\app\startup" 2>nul
 
 REM Export path environment variables for startup scripts
@@ -167,13 +155,6 @@ set STARTUP_DIR=C:\app\startup
 set RESOURCES_DIR=C:\app\resources
 set TESTS_DIR=C:\app\tests
 
-echo Environment variables set for startup scripts:
-echo   APP_DIR=!APP_DIR!
-echo   STARTUP_DIR=!STARTUP_DIR!
-echo   RESOURCES_DIR=!RESOURCES_DIR!
-echo   TESTS_DIR=!TESTS_DIR!
-
-REM Count scripts
 set SCRIPT_COUNT=0
 for %%F in ("C:\app\startup\*.bat") do set /a SCRIPT_COUNT+=1
 
@@ -232,6 +213,10 @@ if exist "C:\app\tests\API" (
     )
 )
 
+REM Define target folder for reports (Must be the mounted volume)
+set "TARGET_RESULTS=C:\app\tests\test-results"
+if not exist "!TARGET_RESULTS!" mkdir "!TARGET_RESULTS!"
+
 REM Run GUI tests
 if !GUI_TESTS_FOUND! equ 0 goto SKIP_GUI_TESTS
 
@@ -240,9 +225,8 @@ set EXIT_CODE=0
 REM Verify pre-installed Playwright exists
 if not exist "C:\modules\node_modules\@playwright\test" (
     echo [ERROR] @playwright/test not found in C:\modules\node_modules
-    echo [ERROR] The Docker image may not have been built correctly.
     set EXIT_CODE=1
-    goto END_TESTS
+    goto AFTER_GUI_TESTS
 )
 
 echo [OK] Using pre-installed Playwright from C:\modules
@@ -250,33 +234,19 @@ echo [OK] Using pre-installed Playwright from C:\modules
 echo Running Playwright tests...
 cd /d C:\app\tests\GUI
 
-REM Allow require('utils') by pointing NODE_PATH to both global modules AND GUI folder
 set "NODE_PATH=C:\modules\node_modules;C:\app\tests\GUI"
-
-REM Use Playwright binary from C:\modules explicitly
 set "PLAYWRIGHT_BIN=C:\modules\node_modules\.bin\playwright.cmd"
+
 if not exist "!PLAYWRIGHT_BIN!" (
     echo [ERROR] Playwright CLI not found: !PLAYWRIGHT_BIN!
     set EXIT_CODE=1
-    goto END_TESTS
+    goto AFTER_GUI_TESTS
 )
 
-REM Define output variables for reports
-REM This forces reports to go to the mounted volume C:\app\tests\test-results
-REM instead of the default folder inside GUI (which is mounted from ImtCore)
-set "PLAYWRIGHT_HTML_REPORT=C:\app\tests\test-results\playwright-report"
-set "PLAYWRIGHT_JSON_OUTPUT_FILE=C:\app\tests\test-results\playwright-results.json"
-set "PLAYWRIGHT_JUNIT_OUTPUT_FILE=C:\app\tests\test-results\playwright-junit.xml"
+REM --- CONFIGURATION THAT WORKS ---
+REM We rely on playwright.config.js for reporter paths.
 
-REM Pass these as env vars is not enough because playwright.config.js might ignore them
-REM so we also pass them as command line arguments where possible, or rely on config to read envs.
-REM The standard playwright.config.js in ImtCore DOES read env vars if configured,
-REM but let's override via CLI arguments to be sure.
-
-set "PLAYWRIGHT_CMD=!PLAYWRIGHT_BIN! test --reporter=list,html,json,junit"
-
-REM Note: Playwright CLI doesn't easily accept output paths for specific reporters via flags mixed with comma-separated list.
-REM It relies on env vars usually. So we export them.
+set "PLAYWRIGHT_CMD=!PLAYWRIGHT_BIN! test"
 
 if "!UPDATE_SNAPSHOTS!"=="true" (
     echo UPDATE_SNAPSHOTS=true - updating reference screenshots
@@ -284,12 +254,24 @@ if "!UPDATE_SNAPSHOTS!"=="true" (
 )
 
 echo Executing: !PLAYWRIGHT_CMD!
-echo Reports will be saved to: C:\app\tests\test-results
+echo Reports should appear in: !TARGET_RESULTS!
 
 call !PLAYWRIGHT_CMD!
 if errorlevel 1 set EXIT_CODE=!ERRORLEVEL!
 
-goto END_TESTS
+REM --- FINAL SYNC ---
+REM Sync any artifacts (screenshots/videos) that might have landed in local test-results
+REM This is still needed because screenshots location is determined by config, not CLI flags
+if exist "C:\app\tests\GUI\test-results" (
+    echo.
+    echo Syncing media artifacts from C:\app\tests\GUI\test-results to !TARGET_RESULTS!...
+    xcopy /E /I /Y "C:\app\tests\GUI\test-results" "!TARGET_RESULTS!" >nul
+)
+
+echo Test run complete.
+echo =======================================================
+
+:AFTER_GUI_TESTS
 
 :SKIP_GUI_TESTS
 
@@ -312,13 +294,17 @@ if defined ENV_FILE (
     echo Using environment: !ENV_FILE!
     for %%C in ("C:\app\tests\API\*collection*.json") do (
         echo Running collection: %%~nxC
-        call newman run "%%C" -e "!ENV_FILE!"
+        set "NEWMAN_JUNIT=!TARGET_RESULTS!\newman-%%~nC.xml"
+        set "NEWMAN_JSON=!TARGET_RESULTS!\newman-%%~nC.json"
+        call npx newman run "%%C" -e "!ENV_FILE!" -r cli,junit,json --reporter-junit-export "!NEWMAN_JUNIT!" --reporter-json-export "!NEWMAN_JSON!"
         if errorlevel 1 set EXIT_CODE=!ERRORLEVEL!
     )
 ) else (
     for %%C in ("C:\app\tests\API\*collection*.json") do (
         echo Running collection: %%~nxC
-        call newman run "%%C"
+        set "NEWMAN_JUNIT=!TARGET_RESULTS!\newman-%%~nC.xml"
+        set "NEWMAN_JSON=!TARGET_RESULTS!\newman-%%~nC.json"
+        call npx newman run "%%C" -r cli,junit,json --reporter-junit-export "!NEWMAN_JUNIT!" --reporter-json-export "!NEWMAN_JSON!"
         if errorlevel 1 set EXIT_CODE=!ERRORLEVEL!
     )
 )
