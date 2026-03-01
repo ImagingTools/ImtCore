@@ -13,7 +13,6 @@ NC='\033[0m' # No Color
 
 # Configuration
 GITHUB_ORG="ImagingTools"
-REPO_PREFIX=""
 THIRD_PARTY_DIR="3rdParty"
 TEMP_DIR="/tmp/3rdparty-migration"
 
@@ -189,7 +188,6 @@ generate_add_submodules_script() {
 set -e
 
 GITHUB_ORG="ImagingTools"
-REPO_PREFIX=""
 
 # Libraries to add as submodules
 LIBRARIES=(

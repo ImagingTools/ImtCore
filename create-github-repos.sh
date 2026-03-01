@@ -13,7 +13,6 @@ NC='\033[0m' # No Color
 
 # Configuration
 GITHUB_ORG="ImagingTools"
-REPO_PREFIX=""
 VISIBILITY="public"  # Change to "private" if needed
 
 # List of libraries

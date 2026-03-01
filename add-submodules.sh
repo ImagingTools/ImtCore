@@ -6,7 +6,6 @@
 set -e
 
 GITHUB_ORG="ImagingTools"
-REPO_PREFIX=""
 
 # Libraries to add as submodules
 LIBRARIES=(
