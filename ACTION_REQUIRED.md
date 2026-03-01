@@ -46,23 +46,23 @@ gh auth login
 Create each repository manually at: https://github.com/organizations/ImagingTools/repositories/new
 
 Repository names:
-- `ImtCore-3rdParty-EJ`
-- `ImtCore-3rdParty-JQ`
-- `ImtCore-3rdParty-JQML`
-- `ImtCore-3rdParty-JQML2`
-- `ImtCore-3rdParty-QXlsx`
-- `ImtCore-3rdParty-WebCompiler`
-- `ImtCore-3rdParty-boost`
-- `ImtCore-3rdParty-icu`
-- `ImtCore-3rdParty-libmdbx`
-- `ImtCore-3rdParty-mongoc`
-- `ImtCore-3rdParty-mongocxx`
-- `ImtCore-3rdParty-nodejs`
-- `ImtCore-3rdParty-openssl`
-- `ImtCore-3rdParty-pybind11`
-- `ImtCore-3rdParty-quazip`
-- `ImtCore-3rdParty-zlib`
-- `ImtCore-3rdParty-zstd`
+- `EJ`
+- `JQ`
+- `JQML`
+- `JQML2`
+- `QXlsx`
+- `WebCompiler`
+- `boost`
+- `icu`
+- `libmdbx`
+- `mongoc`
+- `mongocxx`
+- `nodejs`
+- `openssl`
+- `pybind11`
+- `quazip`
+- `zlib`
+- `zstd`
 
 ### Step 2: Populate Repositories
 
@@ -77,7 +77,7 @@ cd /tmp/3rdparty-migration
 for lib in EJ JQ JQML JQML2 QXlsx WebCompiler boost icu libmdbx mongoc mongocxx nodejs openssl pybind11 quazip zlib zstd; do
     echo "Pushing $lib..."
     cd "$lib"
-    git remote add origin "https://github.com/ImagingTools/ImtCore-3rdParty-${lib}.git"
+    git remote add origin "https://github.com/ImagingTools/${lib}.git"
     git branch -M main
     git push -u origin main
     cd ..

@@ -13,7 +13,7 @@ NC='\033[0m' # No Color
 
 # Configuration
 GITHUB_ORG="ImagingTools"
-REPO_PREFIX="ImtCore-3rdParty"
+REPO_PREFIX=""
 VISIBILITY="public"  # Change to "private" if needed
 
 # List of libraries
@@ -92,7 +92,7 @@ check_gh_authenticated() {
 # Create a single repository
 create_repository() {
     local lib_name=$1
-    local repo_name="${REPO_PREFIX}-${lib_name}"
+    local repo_name="${lib_name}"
     local description="${DESCRIPTIONS[$lib_name]}"
     
     print_info "Creating repository: ${GITHUB_ORG}/${repo_name}"
@@ -126,7 +126,7 @@ create_all_repositories() {
     
     for lib in "${LIBRARIES[@]}"; do
         if create_repository "${lib}"; then
-            if gh repo view "${GITHUB_ORG}/${REPO_PREFIX}-${lib}" &> /dev/null; then
+            if gh repo view "${GITHUB_ORG}/${lib}" &> /dev/null; then
                 ((success_count++))
             else
                 ((skip_count++))
@@ -157,7 +157,7 @@ dry_run() {
     echo ""
     
     for lib in "${LIBRARIES[@]}"; do
-        repo_name="${REPO_PREFIX}-${lib}"
+        repo_name="${lib}"
         description="${DESCRIPTIONS[$lib]}"
         echo "  ${GITHUB_ORG}/${repo_name}"
         echo "    Description: ${description}"

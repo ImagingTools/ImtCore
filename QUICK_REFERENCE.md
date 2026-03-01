@@ -21,7 +21,7 @@
 cd /tmp/3rdparty-migration
 for lib in EJ JQ JQML JQML2 QXlsx WebCompiler boost icu libmdbx mongoc mongocxx nodejs openssl pybind11 quazip zlib zstd; do
     cd "$lib"
-    git remote add origin "https://github.com/ImagingTools/ImtCore-3rdParty-${lib}.git"
+    git remote add origin "https://github.com/ImagingTools/${lib}.git"
     git branch -M main
     git push -u origin main
     cd ..

@@ -44,7 +44,7 @@ You need to create 17 repositories under the `ImagingTools` organization. You ca
 For each library:
 
 1. Go to https://github.com/organizations/ImagingTools/repositories/new
-2. Repository name: `ImtCore-3rdParty-{LIBRARY_NAME}` (e.g., `ImtCore-3rdParty-EJ`)
+2. Repository name: `{LIBRARY_NAME}` (e.g., `EJ`)
 3. Description: "3rdParty dependency for ImtCore: {LIBRARY_NAME}"
 4. Visibility: Public or Private (based on your organization policy)
 5. Do NOT initialize with README, .gitignore, or license
@@ -59,23 +59,23 @@ If you have GitHub CLI installed:
 gh auth login
 
 # Create repositories
-gh repo create ImagingTools/ImtCore-3rdParty-EJ --public
-gh repo create ImagingTools/ImtCore-3rdParty-JQ --public
-gh repo create ImagingTools/ImtCore-3rdParty-JQML --public
-gh repo create ImagingTools/ImtCore-3rdParty-JQML2 --public
-gh repo create ImagingTools/ImtCore-3rdParty-QXlsx --public
-gh repo create ImagingTools/ImtCore-3rdParty-WebCompiler --public
-gh repo create ImagingTools/ImtCore-3rdParty-boost --public
-gh repo create ImagingTools/ImtCore-3rdParty-icu --public
-gh repo create ImagingTools/ImtCore-3rdParty-libmdbx --public
-gh repo create ImagingTools/ImtCore-3rdParty-mongoc --public
-gh repo create ImagingTools/ImtCore-3rdParty-mongocxx --public
-gh repo create ImagingTools/ImtCore-3rdParty-nodejs --public
-gh repo create ImagingTools/ImtCore-3rdParty-openssl --public
-gh repo create ImagingTools/ImtCore-3rdParty-pybind11 --public
-gh repo create ImagingTools/ImtCore-3rdParty-quazip --public
-gh repo create ImagingTools/ImtCore-3rdParty-zlib --public
-gh repo create ImagingTools/ImtCore-3rdParty-zstd --public
+gh repo create ImagingTools/EJ --public
+gh repo create ImagingTools/JQ --public
+gh repo create ImagingTools/JQML --public
+gh repo create ImagingTools/JQML2 --public
+gh repo create ImagingTools/QXlsx --public
+gh repo create ImagingTools/WebCompiler --public
+gh repo create ImagingTools/boost --public
+gh repo create ImagingTools/icu --public
+gh repo create ImagingTools/libmdbx --public
+gh repo create ImagingTools/mongoc --public
+gh repo create ImagingTools/mongocxx --public
+gh repo create ImagingTools/nodejs --public
+gh repo create ImagingTools/openssl --public
+gh repo create ImagingTools/pybind11 --public
+gh repo create ImagingTools/quazip --public
+gh repo create ImagingTools/zlib --public
+gh repo create ImagingTools/zstd --public
 ```
 
 ## Phase 3: Push Library Contents to GitHub
@@ -84,13 +84,13 @@ For each library, push the prepared repository to GitHub:
 
 ```bash
 cd /tmp/3rdparty-migration/EJ
-git remote add origin https://github.com/ImagingTools/ImtCore-3rdParty-EJ.git
+git remote add origin https://github.com/ImagingTools/EJ.git
 git branch -M main
 git push -u origin main
 cd ..
 
 cd /tmp/3rdparty-migration/JQ
-git remote add origin https://github.com/ImagingTools/ImtCore-3rdParty-JQ.git
+git remote add origin https://github.com/ImagingTools/JQ.git
 git branch -M main
 git push -u origin main
 cd ..
@@ -106,7 +106,7 @@ cd /tmp/3rdparty-migration
 for lib in EJ JQ JQML JQML2 QXlsx WebCompiler boost icu libmdbx mongoc mongocxx nodejs openssl pybind11 quazip zlib zstd; do
     echo "Pushing $lib..."
     cd "$lib"
-    git remote add origin "https://github.com/ImagingTools/ImtCore-3rdParty-${lib}.git"
+    git remote add origin "https://github.com/ImagingTools/${lib}.git"
     git branch -M main
     git push -u origin main
     cd ..
@@ -138,23 +138,23 @@ Now add all libraries as git submodules:
 cd /home/runner/work/ImtCore/ImtCore
 
 # Add each library as a submodule
-git submodule add https://github.com/ImagingTools/ImtCore-3rdParty-EJ.git 3rdParty/EJ
-git submodule add https://github.com/ImagingTools/ImtCore-3rdParty-JQ.git 3rdParty/JQ
-git submodule add https://github.com/ImagingTools/ImtCore-3rdParty-JQML.git 3rdParty/JQML
-git submodule add https://github.com/ImagingTools/ImtCore-3rdParty-JQML2.git 3rdParty/JQML2
-git submodule add https://github.com/ImagingTools/ImtCore-3rdParty-QXlsx.git 3rdParty/QXlsx
-git submodule add https://github.com/ImagingTools/ImtCore-3rdParty-WebCompiler.git 3rdParty/WebCompiler
-git submodule add https://github.com/ImagingTools/ImtCore-3rdParty-boost.git 3rdParty/boost
-git submodule add https://github.com/ImagingTools/ImtCore-3rdParty-icu.git 3rdParty/icu
-git submodule add https://github.com/ImagingTools/ImtCore-3rdParty-libmdbx.git 3rdParty/libmdbx
-git submodule add https://github.com/ImagingTools/ImtCore-3rdParty-mongoc.git 3rdParty/mongoc
-git submodule add https://github.com/ImagingTools/ImtCore-3rdParty-mongocxx.git 3rdParty/mongocxx
-git submodule add https://github.com/ImagingTools/ImtCore-3rdParty-nodejs.git 3rdParty/nodejs
-git submodule add https://github.com/ImagingTools/ImtCore-3rdParty-openssl.git 3rdParty/openssl
-git submodule add https://github.com/ImagingTools/ImtCore-3rdParty-pybind11.git 3rdParty/pybind11
-git submodule add https://github.com/ImagingTools/ImtCore-3rdParty-quazip.git 3rdParty/quazip
-git submodule add https://github.com/ImagingTools/ImtCore-3rdParty-zlib.git 3rdParty/zlib
-git submodule add https://github.com/ImagingTools/ImtCore-3rdParty-zstd.git 3rdParty/zstd
+git submodule add https://github.com/ImagingTools/EJ.git 3rdParty/EJ
+git submodule add https://github.com/ImagingTools/JQ.git 3rdParty/JQ
+git submodule add https://github.com/ImagingTools/JQML.git 3rdParty/JQML
+git submodule add https://github.com/ImagingTools/JQML2.git 3rdParty/JQML2
+git submodule add https://github.com/ImagingTools/QXlsx.git 3rdParty/QXlsx
+git submodule add https://github.com/ImagingTools/WebCompiler.git 3rdParty/WebCompiler
+git submodule add https://github.com/ImagingTools/boost.git 3rdParty/boost
+git submodule add https://github.com/ImagingTools/icu.git 3rdParty/icu
+git submodule add https://github.com/ImagingTools/libmdbx.git 3rdParty/libmdbx
+git submodule add https://github.com/ImagingTools/mongoc.git 3rdParty/mongoc
+git submodule add https://github.com/ImagingTools/mongocxx.git 3rdParty/mongocxx
+git submodule add https://github.com/ImagingTools/nodejs.git 3rdParty/nodejs
+git submodule add https://github.com/ImagingTools/openssl.git 3rdParty/openssl
+git submodule add https://github.com/ImagingTools/pybind11.git 3rdParty/pybind11
+git submodule add https://github.com/ImagingTools/quazip.git 3rdParty/quazip
+git submodule add https://github.com/ImagingTools/zlib.git 3rdParty/zlib
+git submodule add https://github.com/ImagingTools/zstd.git 3rdParty/zstd
 ```
 
 Or use the generated script:

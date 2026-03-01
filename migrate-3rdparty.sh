@@ -13,7 +13,7 @@ NC='\033[0m' # No Color
 
 # Configuration
 GITHUB_ORG="ImagingTools"
-REPO_PREFIX="ImtCore-3rdParty"
+REPO_PREFIX=""
 THIRD_PARTY_DIR="3rdParty"
 TEMP_DIR="/tmp/3rdparty-migration"
 
@@ -56,7 +56,7 @@ prepare_library_repo() {
     local lib_name=$1
     local lib_path="${THIRD_PARTY_DIR}/${lib_name}"
     local temp_repo="${TEMP_DIR}/${lib_name}"
-    local repo_name="${REPO_PREFIX}-${lib_name}"
+    local repo_name="${lib_name}"
     local repo_url="https://github.com/${GITHUB_ORG}/${repo_name}.git"
 
     print_info "Preparing ${lib_name}..."
@@ -129,7 +129,7 @@ to enable independent version control and easier dependency management.
 This repository is integrated into ImtCore as a git submodule:
 
 \`\`\`bash
-git submodule add https://github.com/${GITHUB_ORG}/${REPO_PREFIX}-${lib_name}.git 3rdParty/${lib_name}
+git submodule add https://github.com/${GITHUB_ORG}/${lib_name}.git 3rdParty/${lib_name}
 \`\`\`
 
 ## Updating
@@ -189,7 +189,7 @@ generate_add_submodules_script() {
 set -e
 
 GITHUB_ORG="ImagingTools"
-REPO_PREFIX="ImtCore-3rdParty"
+REPO_PREFIX=""
 
 # Libraries to add as submodules
 LIBRARIES=(
@@ -215,7 +215,7 @@ LIBRARIES=(
 echo "Adding submodules..."
 
 for lib in "${LIBRARIES[@]}"; do
-    repo_url="https://github.com/${GITHUB_ORG}/${REPO_PREFIX}-${lib}.git"
+    repo_url="https://github.com/${GITHUB_ORG}/${lib}.git"
     submodule_path="3rdParty/${lib}"
     
     echo "Adding ${lib}..."

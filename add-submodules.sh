@@ -6,7 +6,7 @@
 set -e
 
 GITHUB_ORG="ImagingTools"
-REPO_PREFIX="ImtCore-3rdParty"
+REPO_PREFIX=""
 
 # Libraries to add as submodules
 LIBRARIES=(
@@ -32,7 +32,7 @@ LIBRARIES=(
 echo "Adding submodules..."
 
 for lib in "${LIBRARIES[@]}"; do
-    repo_url="https://github.com/${GITHUB_ORG}/${REPO_PREFIX}-${lib}.git"
+    repo_url="https://github.com/${GITHUB_ORG}/${lib}.git"
     submodule_path="3rdParty/${lib}"
     
     echo "Adding ${lib}..."
