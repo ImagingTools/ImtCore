@@ -26,6 +26,12 @@ export TEST_USERS="test@example.com:testpassword"
 # Uncomment to enable:
 # export UPDATE_SNAPSHOTS="true"
 
+# Test selection (optional, default: run both GUI and API tests)
+# To run only GUI tests: export RUN_API_TESTS="false"
+# To run only API tests: export RUN_GUI_TESTS="false"
+# export RUN_GUI_TESTS="true"
+# export RUN_API_TESTS="true"
+
 # ==========================================
 # DO NOT MODIFY BELOW THIS LINE
 # ==========================================

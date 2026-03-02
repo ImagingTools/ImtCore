@@ -19,6 +19,16 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
+APP_DIR=/app
+STARTUP_DIR="$APP_DIR/startup"
+RESOURCES_DIR="$APP_DIR/resources"
+TESTS_DIR="$APP_DIR/tests"
+GUI_DIR="$TESTS_DIR/GUI"
+API_DIR="$TESTS_DIR/API"
+TEST_RESULTS_DIR="$TESTS_DIR/test-results"
+
+export APP_DIR STARTUP_DIR RESOURCES_DIR TESTS_DIR GUI_DIR API_DIR TEST_RESULTS_DIR
+
 echo -e "${GREEN}========================================${NC}"
 echo -e "${GREEN}Starting Test Environment${NC}"
 echo -e "${GREEN}========================================${NC}"
@@ -153,23 +163,36 @@ fi
 
 echo -e "${YELLOW}Auto-detecting tests...${NC}"
 
+RUN_GUI_TESTS="${RUN_GUI_TESTS:-true}"
+RUN_API_TESTS="${RUN_API_TESTS:-true}"
+
+echo -e "${YELLOW}RUN_GUI_TESTS=${RUN_GUI_TESTS}, RUN_API_TESTS=${RUN_API_TESTS}${NC}"
+
 GUI_TESTS_FOUND=false
 API_TESTS_FOUND=false
 
 # Check for GUI tests (Playwright)
-if [ -d "/app/tests/GUI" ] && [ "$(ls -A /app/tests/GUI 2>/dev/null)" ]; then
-    if find /app/tests/GUI -type f \( -name "*.spec.js" -o -name "*.spec.ts" -o -name "*.test.js" -o -name "*.test.ts" \) | grep -q .; then
-        GUI_TESTS_FOUND=true
-        echo -e "${GREEN}✓ Found Playwright tests in GUI folder${NC}"
+if [ "$RUN_GUI_TESTS" = "true" ]; then
+    if [ -d "$GUI_DIR" ] && [ "$(ls -A "$GUI_DIR" 2>/dev/null)" ]; then
+        if find "$GUI_DIR" -type f \( -name "*.spec.js" -o -name "*.spec.ts" -o -name "*.test.js" -o -name "*.test.ts" \) | grep -q .; then
+            GUI_TESTS_FOUND=true
+            echo -e "${GREEN}✓ Found Playwright tests in GUI folder${NC}"
+        fi
     fi
+else
+    echo -e "${YELLOW}RUN_GUI_TESTS=false - skipping Playwright tests${NC}"
 fi
 
 # Check for API tests (Postman/Newman)
-if [ -d "/app/tests/API" ] && [ "$(ls -A /app/tests/API 2>/dev/null)" ]; then
-    if find /app/tests/API -type f -name "*collection*.json" | grep -q .; then
-        API_TESTS_FOUND=true
-        echo -e "${GREEN}✓ Found Postman collections in API folder${NC}"
+if [ "$RUN_API_TESTS" = "true" ]; then
+    if [ -d "$API_DIR" ] && [ "$(ls -A "$API_DIR" 2>/dev/null)" ]; then
+        if find "$API_DIR" -type f -name "*collection*.json" | grep -q .; then
+            API_TESTS_FOUND=true
+            echo -e "${GREEN}✓ Found Postman collections in API folder${NC}"
+        fi
     fi
+else
+    echo -e "${YELLOW}RUN_API_TESTS=false - skipping Postman tests${NC}"
 fi
 
 EXIT_CODE=0
@@ -195,29 +218,29 @@ if [ "$GUI_TESTS_FOUND" = true ]; then
         echo -e "${YELLOW}Running Playwright tests...${NC}"
 
         # Make /modules-installed dependencies resolvable from the mounted test folder
-        # so that /app/tests/GUI/playwright.config.js can `require('@playwright/test')`.
-        if [ ! -e "/app/tests/GUI/node_modules" ]; then
-            ln -s /modules/node_modules /app/tests/GUI/node_modules
-            echo -e "${GREEN}✓ Linked /app/tests/GUI/node_modules -> /modules/node_modules${NC}"
+        # so that playwright.config.js can `require('@playwright/test')`.
+        if [ ! -e "$GUI_DIR/node_modules" ]; then
+            ln -s /modules/node_modules "$GUI_DIR/node_modules"
+            echo -e "${GREEN}✓ Linked $GUI_DIR/node_modules -> /modules/node_modules${NC}"
         fi
 
         # Only add GUI utilities path; do NOT add /modules to NODE_PATH
-        export NODE_PATH="/app/tests/GUI"
+        export NODE_PATH="$GUI_DIR"
         echo -e "${GREEN}✓ NODE_PATH set to: $NODE_PATH${NC}"
 
         PLAYWRIGHT_BIN="/modules/node_modules/.bin/playwright"
-        PLAYWRIGHT_CMD="$PLAYWRIGHT_BIN test --output=/app/tests/test-results/playwright-output"
+        PLAYWRIGHT_CMD="$PLAYWRIGHT_BIN test --output=$TEST_RESULTS_DIR/playwright-output"
 
-        (cd /app/tests/GUI && $PLAYWRIGHT_CMD) || EXIT_CODE=$?
+        (cd "$GUI_DIR" && $PLAYWRIGHT_CMD) || EXIT_CODE=$?
 
-        if [ -d "/app/tests/GUI/playwright-report" ]; then
+        if [ -d "$GUI_DIR/playwright-report" ]; then
             echo -e "${YELLOW}Copying Playwright report to test-results...${NC}"
-            cp -r /app/tests/GUI/playwright-report /app/tests/test-results/
+            cp -r "$GUI_DIR/playwright-report" "$TEST_RESULTS_DIR/"
         fi
 
-        if [ -d "/app/tests/GUI/test-results" ]; then
+        if [ -d "$GUI_DIR/test-results" ]; then
             echo -e "${YELLOW}Copying Playwright test-results...${NC}"
-            cp -r /app/tests/GUI/test-results/* /app/tests/test-results/ 2>/dev/null || true
+            cp -r "$GUI_DIR/test-results"/* "$TEST_RESULTS_DIR/" 2>/dev/null || true
         fi
     fi
 fi
@@ -226,20 +249,23 @@ if [ "$API_TESTS_FOUND" = true ]; then
     echo -e "${YELLOW}Running Postman tests...${NC}"
 
     ENV_OPT=""
-    ENV_FILE=$(find /app/tests/API -type f -iname "*environment*.json" 2>/dev/null | head -1 || true)
+    ENV_FILE=$(find "$API_DIR" -type f -iname "*environment*.json" 2>/dev/null | head -1 || true)
     if [ -n "$ENV_FILE" ]; then
         ENV_OPT="-e $ENV_FILE"
         echo -e "${GREEN}✓ Using environment: $ENV_FILE${NC}"
     fi
 
-    for collection in $(find /app/tests/API -type f -iname "*collection*.json" 2>/dev/null); do
+    for collection in $(find "$API_DIR" -type f -iname "*collection*.json" 2>/dev/null); do
         echo -e "${YELLOW}Running collection: $(basename "$collection")${NC}"
         newman run "$collection" $ENV_OPT || EXIT_CODE=$?
     done
 fi
 
-if [ "$GUI_TESTS_FOUND" = false ] && [ "$API_TESTS_FOUND" = false ]; then
-    echo -e "${YELLOW}No tests found in GUI or API folders${NC}"
+if [ "$RUN_GUI_TESTS" = "false" ] && [ "$RUN_API_TESTS" = "false" ]; then
+    echo -e "${YELLOW}RUN_GUI_TESTS and RUN_API_TESTS are false - skipping test execution${NC}"
+    EXIT_CODE=0
+elif [ "$GUI_TESTS_FOUND" = false ] && [ "$API_TESTS_FOUND" = false ]; then
+    echo -e "${YELLOW}No tests found in enabled GUI or API folders${NC}"
     EXIT_CODE=0
 fi
 

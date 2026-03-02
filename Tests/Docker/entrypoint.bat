@@ -21,6 +21,15 @@ REM Add global npm binaries to PATH (for newman)
 if exist "C:\Users\ContainerAdministrator\AppData\Roaming\npm" set "PATH=C:\Users\ContainerAdministrator\AppData\Roaming\npm;!PATH!"
 if exist "C:\Users\ContainerUser\AppData\Roaming\npm" set "PATH=C:\Users\ContainerUser\AppData\Roaming\npm;!PATH!"
 
+REM Export base directory variables for startup scripts and tests
+set "APP_DIR=C:\app"
+set "STARTUP_DIR=%APP_DIR%\startup"
+set "RESOURCES_DIR=%APP_DIR%\resources"
+set "TESTS_DIR=%APP_DIR%\tests"
+set "GUI_DIR=%TESTS_DIR%\GUI"
+set "API_DIR=%TESTS_DIR%\API"
+set "TEST_RESULTS_DIR=%TESTS_DIR%\test-results"
+
 REM Set NODE_PATH to include global modules so scripts can find them
 set "NODE_PATH=C:\modules\node_modules"
 
@@ -181,7 +190,7 @@ REM Step 3: Run tests or custom command
 echo Step 3: Starting tests...
 echo ========================================
 
-cd /d C:\app\tests
+cd /d "%TESTS_DIR%"
 
 if "!PAUSE_BEFORE_TESTS!"=="true" (
     echo PAUSE_BEFORE_TESTS=true - pausing before running tests.
@@ -192,29 +201,42 @@ if "!PAUSE_BEFORE_TESTS!"=="true" (
 REM Auto-detect tests
 echo Auto-detecting tests...
 
+if not defined RUN_GUI_TESTS set RUN_GUI_TESTS=true
+if not defined RUN_API_TESTS set RUN_API_TESTS=true
+
+echo RUN_GUI_TESTS=!RUN_GUI_TESTS!, RUN_API_TESTS=!RUN_API_TESTS!
+
 set GUI_TESTS_FOUND=0
 set API_TESTS_FOUND=0
 
 REM Check for GUI tests (Playwright)
-if exist "C:\app\tests\GUI" (
-    dir /s /b "C:\app\tests\GUI\*.spec.js" "C:\app\tests\GUI\*.spec.ts" "C:\app\tests\GUI\*.test.js" "C:\app\tests\GUI\*.test.ts" 2>nul | findstr . >nul
-    if not errorlevel 1 (
-        set GUI_TESTS_FOUND=1
-        echo [OK] Found Playwright tests in GUI folder
+if /I "!RUN_GUI_TESTS!"=="true" (
+    if exist "!GUI_DIR!" (
+        dir /s /b "!GUI_DIR!\*.spec.js" "!GUI_DIR!\*.spec.ts" "!GUI_DIR!\*.test.js" "!GUI_DIR!\*.test.ts" 2>nul | findstr . >nul
+        if not errorlevel 1 (
+            set GUI_TESTS_FOUND=1
+            echo [OK] Found Playwright tests in GUI folder
+        )
     )
+) else (
+    echo RUN_GUI_TESTS=false - skipping Playwright tests
 )
 
 REM Check for API tests (Postman/Newman)
-if exist "C:\app\tests\API" (
-    dir /s /b "C:\app\tests\API\*collection*.json" 2>nul | findstr . >nul
-    if not errorlevel 1 (
-        set API_TESTS_FOUND=1
-        echo [OK] Found Postman collections in API folder
+if /I "!RUN_API_TESTS!"=="true" (
+    if exist "!API_DIR!" (
+        dir /s /b "!API_DIR!\*collection*.json" 2>nul | findstr . >nul
+        if not errorlevel 1 (
+            set API_TESTS_FOUND=1
+            echo [OK] Found Postman collections in API folder
+        )
     )
+) else (
+    echo RUN_API_TESTS=false - skipping Postman tests
 )
 
 REM Define target folder for reports (Must be the mounted volume)
-set "TARGET_RESULTS=C:\app\tests\test-results"
+set "TARGET_RESULTS=%TEST_RESULTS_DIR%"
 if not exist "!TARGET_RESULTS!" mkdir "!TARGET_RESULTS!"
 
 REM Run GUI tests
@@ -232,9 +254,9 @@ if not exist "C:\modules\node_modules\@playwright\test" (
 echo [OK] Using pre-installed Playwright from C:\modules
 
 echo Running Playwright tests...
-cd /d C:\app\tests\GUI
+cd /d "!GUI_DIR!"
 
-set "NODE_PATH=C:\modules\node_modules;C:\app\tests\GUI"
+set "NODE_PATH=C:\modules\node_modules;!GUI_DIR!"
 set "PLAYWRIGHT_BIN=C:\modules\node_modules\.bin\playwright.cmd"
 
 if not exist "!PLAYWRIGHT_BIN!" (
@@ -262,10 +284,10 @@ if errorlevel 1 set EXIT_CODE=!ERRORLEVEL!
 REM --- FINAL SYNC ---
 REM Sync any artifacts (screenshots/videos) that might have landed in local test-results
 REM This is still needed because screenshots location is determined by config, not CLI flags
-if exist "C:\app\tests\GUI\test-results" (
+if exist "!GUI_DIR!\test-results" (
     echo.
-    echo Syncing media artifacts from C:\app\tests\GUI\test-results to !TARGET_RESULTS!...
-    xcopy /E /I /Y "C:\app\tests\GUI\test-results" "!TARGET_RESULTS!" >nul
+    echo Syncing media artifacts from !GUI_DIR!\test-results to !TARGET_RESULTS!...
+    xcopy /E /I /Y "!GUI_DIR!\test-results" "!TARGET_RESULTS!" >nul
 )
 
 echo Test run complete.
@@ -284,7 +306,7 @@ echo Running Postman tests...
 
 REM Find environment file
 set ENV_FILE=
-for /r "C:\app\tests\API" %%F in (*environment*.json) do (
+for /r "!API_DIR!" %%F in (*environment*.json) do (
     set "ENV_FILE=%%F"
     goto RUN_NEWMAN
 )
@@ -292,7 +314,7 @@ for /r "C:\app\tests\API" %%F in (*environment*.json) do (
 :RUN_NEWMAN
 if defined ENV_FILE (
     echo Using environment: !ENV_FILE!
-    for %%C in ("C:\app\tests\API\*collection*.json") do (
+    for %%C in ("!API_DIR!\*collection*.json") do (
         echo Running collection: %%~nxC
         set "NEWMAN_JUNIT=!TARGET_RESULTS!\newman-%%~nC.xml"
         set "NEWMAN_JSON=!TARGET_RESULTS!\newman-%%~nC.json"
@@ -300,7 +322,7 @@ if defined ENV_FILE (
         if errorlevel 1 set EXIT_CODE=!ERRORLEVEL!
     )
 ) else (
-    for %%C in ("C:\app\tests\API\*collection*.json") do (
+    for %%C in ("!API_DIR!\*collection*.json") do (
         echo Running collection: %%~nxC
         set "NEWMAN_JUNIT=!TARGET_RESULTS!\newman-%%~nC.xml"
         set "NEWMAN_JSON=!TARGET_RESULTS!\newman-%%~nC.json"
@@ -313,10 +335,19 @@ goto END_TESTS
 
 :SKIP_API_TESTS
 
-echo No tests found in GUI or API folders
+if !GUI_TESTS_FOUND! equ 1 goto END_TESTS
+if !API_TESTS_FOUND! equ 1 goto END_TESTS
+if /I "!RUN_GUI_TESTS!"=="true" goto NO_TESTS_FOUND
+if /I "!RUN_API_TESTS!"=="true" goto NO_TESTS_FOUND
+echo RUN_GUI_TESTS and RUN_API_TESTS are false - skipping test execution
+set EXIT_CODE=0
+goto END_TESTS
+
+:NO_TESTS_FOUND
+echo No tests found in enabled GUI or API folders
 echo To run tests:
-echo   - Copy Playwright tests to C:\app\tests\GUI\
-echo   - Copy Postman collections to C:\app\tests\API\
+echo   - Copy Playwright tests to !GUI_DIR!\
+echo   - Copy Postman collections to !API_DIR!\
 set EXIT_CODE=0
 
 :END_TESTS

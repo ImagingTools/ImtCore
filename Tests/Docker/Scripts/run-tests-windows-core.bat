@@ -14,6 +14,8 @@ set IMAGE_NAME=imtcore-tests:windows
 if not defined POSTGRES_PASSWORD set POSTGRES_PASSWORD=root
 if not defined POSTGRES_DB set POSTGRES_DB=test_db
 if defined POSTGRES_DB set DATABASE_URL=postgresql://postgres:%POSTGRES_PASSWORD%@localhost:5432/%POSTGRES_DB%
+if not defined RUN_GUI_TESTS set RUN_GUI_TESTS=true
+if not defined RUN_API_TESTS set RUN_API_TESTS=true
 
 echo ==========================================
 echo Running Windows containers on Windows
@@ -85,6 +87,8 @@ docker run -d ^
   -e DATABASE_URL=%DATABASE_URL% ^
   -e TEST_USERS=%TEST_USERS% ^
   -e UPDATE_SNAPSHOTS=%UPDATE_SNAPSHOTS% ^
+  -e RUN_GUI_TESTS=%RUN_GUI_TESTS% ^
+  -e RUN_API_TESTS=%RUN_API_TESTS% ^
   -e CI=false ^
   %VOLUME_MOUNTS% ^
   %IMAGE_NAME% ^

@@ -26,6 +26,12 @@ REM Set to "true" to update all reference screenshots (visual regression baselin
 REM Uncomment to enable:
 REM set UPDATE_SNAPSHOTS=true
 
+REM Test selection (optional, default: run both GUI and API tests)
+REM To run only GUI tests: set RUN_API_TESTS=false
+REM To run only API tests: set RUN_GUI_TESTS=false
+REM set RUN_GUI_TESTS=true
+REM set RUN_API_TESTS=true
+
 REM ==========================================
 REM DO NOT MODIFY BELOW THIS LINE
 REM ==========================================
