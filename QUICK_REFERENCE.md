@@ -6,6 +6,8 @@
 - [ ] Admin access to ImagingTools organization
 - [ ] Review ACTION_REQUIRED.md
 
+## Linux/macOS
+
 ## Step 1: Create Repositories (5 min)
 ```bash
 ./create-github-repos.sh create
@@ -60,12 +62,77 @@ ls -la 3rdParty/
 # Test build
 ```
 
+## Windows
+
+## Step 1: Create Repositories (5 min)
+```batch
+create-github-repos.bat create
+```
+
+## Step 2: Prepare Libraries (2 min)
+```batch
+migrate-3rdparty.bat prepare-all
+```
+
+## Step 3: Push to GitHub (10 min)
+```powershell
+cd $env:TEMP\3rdparty-migration
+foreach ($lib in @("EJ", "JQ", "JQML", "JQML2", "QXlsx", "WebCompiler", "boost", "icu", "libmdbx", "mongoc", "mongocxx", "nodejs", "openssl", "pybind11", "quazip", "zlib", "zstd")) {
+    cd $lib
+    git remote add origin "https://github.com/ImagingTools/$lib.git"
+    git branch -M main
+    git push -u origin main
+    cd ..
+}
+```
+
+## Step 4: Backup Original (1 min)
+```batch
+REM Use your preferred backup method (copy folder, 7-Zip, WinRAR, etc.)
+```
+
+## Step 5: Remove 3rdParty (1 min)
+```batch
+git rm -rf 3rdParty/
+git commit -m "Remove 3rdParty directory for submodule migration"
+```
+
+## Step 6: Add Submodules (2 min)
+```batch
+add-submodules.bat
+git submodule update --init --recursive
+```
+
+## Step 7: Commit & Push (1 min)
+```batch
+git add .gitmodules
+git commit -m "Convert 3rdParty libraries to git submodules"
+git push
+```
+
+## Step 8: Verify (5 min)
+```batch
+git submodule status
+dir 3rdParty\
+REM Test build
+```
+
 ## Total Time: ~30 minutes
 
 ## Rollback if Needed
+
+Linux/macOS:
 ```bash
 git rm -rf 3rdParty/ .gitmodules
 tar -xzf ~/3rdParty-backup-*.tar.gz
+git add 3rdParty/
+git commit -m "Rollback: Restore 3rdParty directory"
+```
+
+Windows:
+```batch
+git rm -rf 3rdParty/ .gitmodules
+REM Restore from your backup
 git add 3rdParty/
 git commit -m "Rollback: Restore 3rdParty directory"
 ```
@@ -74,6 +141,8 @@ git commit -m "Rollback: Restore 3rdParty directory"
 EJ, JQ, JQML, JQML2, QXlsx, WebCompiler, boost, icu, libmdbx, mongoc, mongocxx, nodejs, openssl, pybind11, quazip, zlib, zstd
 
 ## After Migration - Developer Instructions
+
+Linux/macOS:
 ```bash
 # New clones
 git clone --recurse-submodules https://github.com/ImagingTools/ImtCore.git
@@ -83,8 +152,26 @@ git pull
 git submodule update --init --recursive
 ```
 
+Windows:
+```batch
+REM New clones
+git clone --recurse-submodules https://github.com/ImagingTools/ImtCore.git
+
+REM Existing clones
+git pull
+git submodule update --init --recursive
+```
+
 ## Quick Help
+
+Linux/macOS:
 - List libraries: `./migrate-3rdparty.sh list`
 - Dry run: `./create-github-repos.sh dry-run`
 - Single library: `./migrate-3rdparty.sh prepare <library>`
-- Full docs: See STEP_BY_STEP_MIGRATION.md
+
+Windows:
+- List libraries: `migrate-3rdparty.bat list`
+- Dry run: `create-github-repos.bat dry-run`
+- Single library: `migrate-3rdparty.bat prepare <library>`
+
+Full docs: See STEP_BY_STEP_MIGRATION.md

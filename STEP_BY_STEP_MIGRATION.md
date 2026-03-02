@@ -12,14 +12,20 @@ This guide provides detailed instructions for migrating the 3rdParty libraries t
 
 ### Step 1.1: Run the Migration Script
 
-The `migrate-3rdparty.sh` script will prepare temporary git repositories for each library:
+The migration script will prepare temporary git repositories for each library:
 
+Linux/macOS:
 ```bash
 ./migrate-3rdparty.sh prepare-all
 ```
 
+Windows:
+```batch
+migrate-3rdparty.bat prepare-all
+```
+
 This will:
-- Create a temporary directory `/tmp/3rdparty-migration/`
+- Create a temporary directory (Linux: `/tmp/3rdparty-migration/`, Windows: `%TEMP%\3rdparty-migration\`)
 - Copy each library from `3rdParty/` to its own directory
 - Initialize a git repository for each
 - Create a basic README.md
@@ -29,8 +35,14 @@ This will:
 
 Check the prepared repositories:
 
+Linux/macOS:
 ```bash
 ls -la /tmp/3rdparty-migration/
+```
+
+Windows:
+```batch
+dir %TEMP%\3rdparty-migration\
 ```
 
 You should see 17 directories, one for each library.
@@ -54,6 +66,7 @@ For each library:
 
 If you have GitHub CLI installed:
 
+Linux/macOS:
 ```bash
 # Login if needed
 gh auth login
@@ -78,10 +91,48 @@ gh repo create ImagingTools/zlib --public
 gh repo create ImagingTools/zstd --public
 ```
 
+Windows:
+```batch
+# Login if needed
+gh auth login
+
+# Create repositories
+gh repo create ImagingTools/EJ --public
+gh repo create ImagingTools/JQ --public
+gh repo create ImagingTools/JQML --public
+gh repo create ImagingTools/JQML2 --public
+gh repo create ImagingTools/QXlsx --public
+gh repo create ImagingTools/WebCompiler --public
+gh repo create ImagingTools/boost --public
+gh repo create ImagingTools/icu --public
+gh repo create ImagingTools/libmdbx --public
+gh repo create ImagingTools/mongoc --public
+gh repo create ImagingTools/mongocxx --public
+gh repo create ImagingTools/nodejs --public
+gh repo create ImagingTools/openssl --public
+gh repo create ImagingTools/pybind11 --public
+gh repo create ImagingTools/quazip --public
+gh repo create ImagingTools/zlib --public
+gh repo create ImagingTools/zstd --public
+```
+
+### Option C: Automated Script
+
+Linux/macOS:
+```bash
+./create-github-repos.sh create
+```
+
+Windows:
+```batch
+create-github-repos.bat create
+```
+
 ## Phase 3: Push Library Contents to GitHub
 
 For each library, push the prepared repository to GitHub:
 
+Linux/macOS:
 ```bash
 cd /tmp/3rdparty-migration/EJ
 git remote add origin https://github.com/ImagingTools/EJ.git
@@ -98,8 +149,26 @@ cd ..
 # Repeat for all libraries...
 ```
 
+Windows:
+```batch
+cd %TEMP%\3rdparty-migration\EJ
+git remote add origin https://github.com/ImagingTools/EJ.git
+git branch -M main
+git push -u origin main
+cd ..
+
+cd %TEMP%\3rdparty-migration\JQ
+git remote add origin https://github.com/ImagingTools/JQ.git
+git branch -M main
+git push -u origin main
+cd ..
+
+# Repeat for all libraries...
+```
+
 Or use this loop:
 
+Linux/macOS:
 ```bash
 cd /tmp/3rdparty-migration
 
@@ -113,10 +182,25 @@ for lib in EJ JQ JQML JQML2 QXlsx WebCompiler boost icu libmdbx mongoc mongocxx 
 done
 ```
 
+Windows (PowerShell):
+```powershell
+cd $env:TEMP\3rdparty-migration
+
+foreach ($lib in @("EJ", "JQ", "JQML", "JQML2", "QXlsx", "WebCompiler", "boost", "icu", "libmdbx", "mongoc", "mongocxx", "nodejs", "openssl", "pybind11", "quazip", "zlib", "zstd")) {
+    Write-Host "Pushing $lib..."
+    cd $lib
+    git remote add origin "https://github.com/ImagingTools/$lib.git"
+    git branch -M main
+    git push -u origin main
+    cd ..
+}
+```
+
 ## Phase 4: Remove 3rdParty Directory from ImtCore
 
 **IMPORTANT: Make a backup first!**
 
+Linux/macOS:
 ```bash
 cd /home/runner/work/ImtCore/ImtCore
 
@@ -130,10 +214,25 @@ git rm -rf 3rdParty/
 git commit -m "Remove 3rdParty directory in preparation for submodule migration"
 ```
 
+Windows:
+```batch
+cd C:\path\to\ImtCore
+
+REM Create backup (use your preferred method)
+REM For example: Copy the folder or use 7-Zip, WinRAR, etc.
+
+REM Remove from git
+git rm -rf 3rdParty/
+
+REM Commit the removal
+git commit -m "Remove 3rdParty directory in preparation for submodule migration"
+```
+
 ## Phase 5: Add Submodules
 
 Now add all libraries as git submodules:
 
+Linux/macOS:
 ```bash
 cd /home/runner/work/ImtCore/ImtCore
 
@@ -157,14 +256,45 @@ git submodule add https://github.com/ImagingTools/zlib.git 3rdParty/zlib
 git submodule add https://github.com/ImagingTools/zstd.git 3rdParty/zstd
 ```
 
+Windows:
+```batch
+cd C:\path\to\ImtCore
+
+REM Add each library as a submodule
+git submodule add https://github.com/ImagingTools/EJ.git 3rdParty/EJ
+git submodule add https://github.com/ImagingTools/JQ.git 3rdParty/JQ
+git submodule add https://github.com/ImagingTools/JQML.git 3rdParty/JQML
+git submodule add https://github.com/ImagingTools/JQML2.git 3rdParty/JQML2
+git submodule add https://github.com/ImagingTools/QXlsx.git 3rdParty/QXlsx
+git submodule add https://github.com/ImagingTools/WebCompiler.git 3rdParty/WebCompiler
+git submodule add https://github.com/ImagingTools/boost.git 3rdParty/boost
+git submodule add https://github.com/ImagingTools/icu.git 3rdParty/icu
+git submodule add https://github.com/ImagingTools/libmdbx.git 3rdParty/libmdbx
+git submodule add https://github.com/ImagingTools/mongoc.git 3rdParty/mongoc
+git submodule add https://github.com/ImagingTools/mongocxx.git 3rdParty/mongocxx
+git submodule add https://github.com/ImagingTools/nodejs.git 3rdParty/nodejs
+git submodule add https://github.com/ImagingTools/openssl.git 3rdParty/openssl
+git submodule add https://github.com/ImagingTools/pybind11.git 3rdParty/pybind11
+git submodule add https://github.com/ImagingTools/quazip.git 3rdParty/quazip
+git submodule add https://github.com/ImagingTools/zlib.git 3rdParty/zlib
+git submodule add https://github.com/ImagingTools/zstd.git 3rdParty/zstd
+```
+
 Or use the generated script:
 
+Linux/macOS:
 ```bash
 ./add-submodules.sh
 ```
 
+Windows:
+```batch
+add-submodules.bat
+```
+
 ## Phase 6: Initialize and Verify Submodules
 
+Linux/macOS:
 ```bash
 # Initialize all submodules
 git submodule init
@@ -177,6 +307,21 @@ git submodule status
 
 # Verify directory structure
 ls -la 3rdParty/
+```
+
+Windows:
+```batch
+REM Initialize all submodules
+git submodule init
+
+REM Update all submodules
+git submodule update
+
+REM Check submodule status
+git submodule status
+
+REM Verify directory structure
+dir 3rdParty\
 ```
 
 ## Phase 7: Commit and Push

@@ -33,12 +33,22 @@ You need to create 17 new repositories under the `ImagingTools` organization:
 
 **Option A: Using GitHub CLI (Recommended)**
 
+Linux/macOS:
 ```bash
 # Ensure gh is installed and authenticated
 gh auth login
 
 # Create all repositories automatically
 ./create-github-repos.sh create
+```
+
+Windows:
+```batch
+# Ensure gh is installed and authenticated
+gh auth login
+
+# Create all repositories automatically
+create-github-repos.bat create
 ```
 
 **Option B: Manual Creation via GitHub Web Interface**
@@ -68,6 +78,7 @@ Repository names:
 
 Prepare and push each library to its repository:
 
+Linux/macOS:
 ```bash
 # Prepare all libraries (creates temp repos in /tmp/3rdparty-migration/)
 ./migrate-3rdparty.sh prepare-all
@@ -84,10 +95,28 @@ for lib in EJ JQ JQML JQML2 QXlsx WebCompiler boost icu libmdbx mongoc mongocxx 
 done
 ```
 
+Windows:
+```batch
+# Prepare all libraries (creates temp repos in %TEMP%\3rdparty-migration\)
+migrate-3rdparty.bat prepare-all
+
+# Push each library to GitHub
+cd %TEMP%\3rdparty-migration
+for %L in (EJ JQ JQML JQML2 QXlsx WebCompiler boost icu libmdbx mongoc mongocxx nodejs openssl pybind11 quazip zlib zstd) do (
+    echo Pushing %L...
+    cd %L
+    git remote add origin "https://github.com/ImagingTools/%L.git"
+    git branch -M main
+    git push -u origin main
+    cd ..
+)
+```
+
 ### Step 3: Convert to Submodules
 
 Once all repositories are created and populated:
 
+Linux/macOS:
 ```bash
 cd /home/runner/work/ImtCore/ImtCore
 
@@ -100,6 +129,29 @@ git commit -m "Remove 3rdParty directory in preparation for submodule migration"
 
 # Add submodules (using generated script)
 ./add-submodules.sh
+
+# Initialize and update
+git submodule update --init --recursive
+
+# Commit
+git add .gitmodules
+git commit -m "Convert 3rdParty libraries to git submodules"
+git push
+```
+
+Windows:
+```batch
+cd C:\path\to\ImtCore
+
+# Backup first!
+# (Use your preferred backup method or 7-Zip, WinRAR, etc.)
+
+# Remove 3rdParty directory
+git rm -rf 3rdParty/
+git commit -m "Remove 3rdParty directory in preparation for submodule migration"
+
+# Add submodules (using generated script)
+add-submodules.bat
 
 # Initialize and update
 git submodule update --init --recursive
