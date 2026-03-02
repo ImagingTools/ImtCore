@@ -19,6 +19,7 @@ DecoratorBase {
 	property bool moveToEnd: !baseElement ? false : baseElement.moveToEnd;
 	property bool isUpwards: !baseElement ? false: baseElement.isUpwards;
 	property bool modelLoading: false
+	property bool hasLoading: !baseElement ? false: baseElement.hasLoading;
 
 	property string dataProviderState: !baseElement ? "ready": baseElement.dataProviderState;
 
@@ -86,6 +87,9 @@ DecoratorBase {
 	}
 
 	function setLoadingAnimVisible(visible_){
+		if(!root.hasLoading){
+			return;
+		}
 		if(loadingAnimLoader.item){
 			loadingAnimLoader.item.visible = visible_
 		}
@@ -309,7 +313,7 @@ DecoratorBase {
 					visible: !root.modelLoading
 
 					onVisibleChanged: {
-						if(mSLoadingAnimLoader.item){
+						if(mSLoadingAnimLoader.item && root.hasLoading){
 							mSLoadingAnimLoader.item.visible = !visible
 						}
 					}
