@@ -151,6 +151,8 @@ The scripts handle everything automatically:
 - `POSTGRES_DB` - Database name
 - `TEST_USERNAME`, `TEST_PASSWORD` - Test credentials
 - `UPDATE_SNAPSHOTS` - Update Playwright reference screenshots (true/false, default: false)
+- `RUN_GUI_TESTS` - Run Playwright GUI tests (true/false, default: true)
+- `RUN_API_TESTS` - Run Postman API tests (true/false, default: true)
 
 **Updating Reference Screenshots:**
 
@@ -282,6 +284,9 @@ Startup scripts can use these predefined environment variables:
 | `STARTUP_DIR` | `/app/startup` | `C:\app\startup` |
 | `RESOURCES_DIR` | `/app/resources` | `C:\app\resources` |
 | `TESTS_DIR` | `/app/tests` | `C:\app\tests` |
+| `GUI_DIR` | `/app/tests/GUI` | `C:\app\tests\GUI` |
+| `API_DIR` | `/app/tests/API` | `C:\app\tests\API` |
+| `TEST_RESULTS_DIR` | `/app/tests/test-results` | `C:\app\tests\test-results` |
 
 **Example** (`01-setup-database.sh`):
 ```bash

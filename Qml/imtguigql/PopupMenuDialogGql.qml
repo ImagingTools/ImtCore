@@ -17,6 +17,8 @@ PopupMenuDialog {
 	property var comboDecorator: null;
 	property var textField_: null;
 
+	property bool hasLoading: true;
+
 	signal editSignal();
 	signal clearSignal();
 

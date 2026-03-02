@@ -166,6 +166,9 @@ class ListView extends Flickable {
         this.contentX = 0
         this.contentY = 0
 
+        this.contentItem.x = 0
+        this.contentItem.y = 0
+
         this.blockSignals(false)
 
         this.count = 0

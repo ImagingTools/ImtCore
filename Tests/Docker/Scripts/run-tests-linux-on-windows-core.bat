@@ -17,6 +17,8 @@ REM Set constants and defaults
 set IMAGE_NAME=imtcore-tests:linux
 if not defined POSTGRES_PASSWORD set POSTGRES_PASSWORD=root
 if not defined POSTGRES_DB set POSTGRES_DB=test_db
+if not defined RUN_GUI_TESTS set RUN_GUI_TESTS=true
+if not defined RUN_API_TESTS set RUN_API_TESTS=true
 
 REM Auto-construct DATABASE_URL
 if defined POSTGRES_DB (
@@ -38,6 +40,8 @@ echo [DEBUG] DATABASE_URL: %DATABASE_URL%
 echo [DEBUG] TEST_USERS: %TEST_USERS%
 if not defined UPDATE_SNAPSHOTS set UPDATE_SNAPSHOTS=false
 echo [DEBUG] UPDATE_SNAPSHOTS: %UPDATE_SNAPSHOTS%
+echo [DEBUG] RUN_GUI_TESTS: %RUN_GUI_TESTS%
+echo [DEBUG] RUN_API_TESTS: %RUN_API_TESTS%
 echo.
 
 REM Check if Docker is available
@@ -116,6 +120,8 @@ docker run -d ^
     -e DATABASE_URL=%DATABASE_URL% ^
     -e TEST_USERS=%TEST_USERS% ^
     -e UPDATE_SNAPSHOTS=%UPDATE_SNAPSHOTS% ^
+    -e RUN_GUI_TESTS=%RUN_GUI_TESTS% ^
+    -e RUN_API_TESTS=%RUN_API_TESTS% ^
     -e CI=true ^
     %VOLUME_MOUNTS% ^
     %IMAGE_NAME% ^
