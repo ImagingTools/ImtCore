@@ -245,8 +245,8 @@ class TextInput extends Item {
     }
 
     SLOT_focusChanged(oldValue, newValue){
-        super.SLOT_focusChanged()
-        if(this.focus){
+        super.SLOT_focusChanged(oldValue, newValue)
+        if(newValue){
             if(!(this.parent instanceof JQModules.QtQuick.FocusScope)){
                 this.activeFocus = true
             }
@@ -312,7 +312,7 @@ class TextInput extends Item {
     }
 
     SLOT_activeFocusChanged(oldValue, newValue){
-        if(!this.activeFocus){
+        if(!newValue){
             this.__impl.blur()
             this.editingFinished()
         }
