@@ -7,9 +7,11 @@
 
 set -e
 
-# Ensure global npm modules are in PATH (newman, playwright, etc.)
+# Use tools installed in /modules, but do NOT set NODE_PATH to /modules/node_modules
+# NODE_PATH can cause Node to resolve dependencies from unexpected locations,
+# leading to multiple @playwright/test copies and "test.beforeEach()" errors.
 export PATH="/modules/node_modules/.bin:$PATH"
-export NODE_PATH="/modules/node_modules:${NODE_PATH:-}"
+unset NODE_PATH
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -23,9 +25,10 @@ echo -e "${GREEN}========================================${NC}"
 
 # Debug: show PATH and verify tools are available
 echo -e "${YELLOW}[DEBUG] PATH: $PATH${NC}"
-echo -e "${YELLOW}[DEBUG] NODE_PATH: $NODE_PATH${NC}"
+echo -e "${YELLOW}[DEBUG] NODE_PATH: ${NODE_PATH:-<unset>}${NC}"
 which newman && echo -e "${GREEN}✓ newman found: $(which newman)${NC}" || echo -e "${RED}✗ newman not found${NC}"
 which npx && echo -e "${GREEN}✓ npx found: $(which npx)${NC}" || echo -e "${RED}✗ npx not found${NC}"
+which playwright && echo -e "${GREEN}✓ playwright found: $(which playwright)${NC}" || echo -e "${RED}✗ playwright not found${NC}"
 
 # Function to wait for a service to be ready
 wait_for_service() {
@@ -75,231 +78,169 @@ if [ "${START_POSTGRESQL:-false}" = "true" ]; then
         # Initialize PostgreSQL only if not initialized (PG_VERSION is the canonical marker)
         if [ ! -f "/var/lib/postgresql/data/PG_VERSION" ]; then
             echo -e "${YELLOW}Initializing PostgreSQL data directory...${NC}"
-            su - postgres -c "$PG_BIN_DIR/initdb -D /var/lib/postgresql/data --auth-host=scram-sha-256"
+            su - postgres -c "$PG_BIN_DIR/initdb -D /var/lib/postgresql/data"
         fi
 
-        # Ensure PostgreSQL listens on TCP (localhost at minimum)
-        if ! grep -q "^listen_addresses=" /var/lib/postgresql/data/postgresql.conf 2>/dev/null; then
-            su - postgres -c "echo \"listen_addresses='localhost'\" >> /var/lib/postgresql/data/postgresql.conf" || true
-        fi
+        echo -e "${YELLOW}Starting PostgreSQL with max_connections=300...${NC}"
+        # Added -o '-c max_connections=300' here
+        su - postgres -c "$PG_BIN_DIR/pg_ctl -D /var/lib/postgresql/data -l /var/log/postgresql/postgresql.log -o '-c max_connections=300' start"
 
-        # If postgres was not shut down cleanly, postmaster.pid can block startup.
-        if [ -f "/var/lib/postgresql/data/postmaster.pid" ]; then
-            OLD_PID="$(head -n 1 /var/lib/postgresql/data/postmaster.pid 2>/dev/null || true)"
-            if [ -n "$OLD_PID" ] && kill -0 "$OLD_PID" 2>/dev/null; then
-                echo -e "${YELLOW}PostgreSQL appears to be running already (pid=$OLD_PID). Skipping start.${NC}"
-            else
-                echo -e "${YELLOW}Found stale postmaster.pid (pid=$OLD_PID). Removing...${NC}"
-                rm -f /var/lib/postgresql/data/postmaster.pid
-                echo -e "${YELLOW}Starting PostgreSQL...${NC}"
-                su - postgres -c "$PG_BIN_DIR/pg_ctl -D /var/lib/postgresql/data -l /var/log/postgresql/postgresql.log start"
-            fi
+        wait_for_service "PostgreSQL" "su - postgres -c \"$PG_BIN_DIR/psql -c 'SELECT 1'\""
+
+        echo -e "${YELLOW}Setting postgres password...${NC}"
+        su - postgres -c "$PG_BIN_DIR/psql -c \"ALTER USER postgres WITH PASSWORD '${POSTGRES_PASSWORD}';\""
+
+        # --- Проверка пароля PostgreSQL ---
+        echo -e "${YELLOW}Checking PostgreSQL password...${NC}"
+        if ! su - postgres -c "PGPASSWORD=root $PG_BIN_DIR/psql -U postgres -h 127.0.0.1 -d postgres -c 'SELECT 1;' > /dev/null 2>&1"; then
+            echo -e "${RED}✗ PostgreSQL password check failed!${NC}"
+            echo -e "${RED}Ensure POSTGRES_PASSWORD is set correctly and the server is running.${NC}"
+            exit 1
         else
-            echo -e "${YELLOW}Starting PostgreSQL...${NC}"
-            su - postgres -c "$PG_BIN_DIR/pg_ctl -D /var/lib/postgresql/data -l /var/log/postgresql/postgresql.log start"
+            echo -e "${GREEN}✓ PostgreSQL password 'root' is valid${NC}"
         fi
 
-        # Wait for PostgreSQL to be ready (local socket)
-        wait_for_service "PostgreSQL" "su - postgres -c 'psql -c \"SELECT 1\"'"
-
-        # Set password for postgres user
-        echo -e "${YELLOW}Setting postgres password (default)${NC}"
-        su - postgres -c "psql -v ON_ERROR_STOP=1 -c \"ALTER USER postgres WITH PASSWORD '${POSTGRES_PASSWORD}';\""
-
-        # Create test database if specified
-        if [ -n "${POSTGRES_DB}" ]; then
-            echo -e "${YELLOW}Creating database: ${POSTGRES_DB}${NC}"
-            su - postgres -c "psql -c \"CREATE DATABASE ${POSTGRES_DB}\"" || echo "Database may already exist"
+        # NOTE:
+        # Removed database creation logic because it caused interactive password prompts
+        # and "su: Authentication failure" in some environments.
+        if [ -n "${POSTGRES_DB:-}" ]; then
+            echo -e "${YELLOW}POSTGRES_DB is set to '${POSTGRES_DB}', but automatic CREATE DATABASE is disabled in entrypoint.${NC}"
+            echo -e "${YELLOW}If you need the database to exist, create it in your own startup script under /app/startup/.${NC}"
         fi
+
+        echo -e "${GREEN}✓ PostgreSQL initialized${NC}"
     fi
 else
-    echo -e "${YELLOW}Step 1: PostgreSQL startup skipped (START_POSTGRESQL not set to true)${NC}"
+    echo -e "${YELLOW}Step 1: PostgreSQL startup skipped${NC}"
 fi
 
 # Step 2: Run custom application installers and startup scripts
-if [ -d "/app/startup" ]; then
+if [ -d "/app/startup" ] && [ "$(ls -A /app/startup 2>/dev/null)" ]; then
     echo -e "${YELLOW}Step 2: Running custom application scripts...${NC}"
     echo -e "${YELLOW}Startup dir: /app/startup${NC}"
-
-    echo -e "${YELLOW}Listing /app/startup:${NC}"
     ls -la /app/startup || true
 
-    # Export path environment variables for startup scripts
-    export APP_DIR="/app"
-    export STARTUP_DIR="/app/startup"
-    export RESOURCES_DIR="/app/resources"
-    export TESTS_DIR="/app/tests"
+    export APP_DIR=/app
+    export STARTUP_DIR=/app/startup
+    export RESOURCES_DIR=/app/resources
+    export TESTS_DIR=/app/tests
 
-    echo -e "${YELLOW}Environment variables set for startup scripts:${NC}"
-    echo -e "${YELLOW}  APP_DIR=$APP_DIR${NC}"
-    echo -e "${YELLOW}  STARTUP_DIR=$STARTUP_DIR${NC}"
-    echo -e "${YELLOW}  RESOURCES_DIR=$RESOURCES_DIR${NC}"
-    echo -e "${YELLOW}  TESTS_DIR=$TESTS_DIR${NC}"
-
-    # Normalize scripts copied from Windows to avoid UTF-8 BOM / CRLF issues
-    echo -e "${YELLOW}Normalizing .sh scripts (BOM/CRLF) and setting +x...${NC}"
-    shopt -s nullglob
-    STARTUP_SCRIPTS=(/app/startup/*.sh)
-    shopt -u nullglob
-
-    if [ ${#STARTUP_SCRIPTS[@]} -eq 0 ]; then
-        echo -e "${YELLOW}No startup scripts found: /app/startup/*.sh${NC}"
-    else
-        echo -e "${GREEN}Found ${#STARTUP_SCRIPTS[@]} startup script(s):${NC}"
-        for s in "${STARTUP_SCRIPTS[@]}"; do
-            echo -e "${GREEN}  - $(basename "$s")${NC}"
-        done
-
-        for f in "${STARTUP_SCRIPTS[@]}"; do
-            [ -f "$f" ] || continue
-
-            echo -e "${YELLOW}Preparing script: $(basename "$f")${NC}"
-
-            # Show first line to quickly spot wrong shebang/BOM
-            head -n 1 "$f" 2>/dev/null | sed 's/\r$//' || true
-
-            # Remove UTF-8 BOM if present (EF BB BF)
-            sed -i '1s/^\xEF\xBB\xBF//' "$f" || true
-
-            # Convert CRLF -> LF
-            sed -i 's/\r$//' "$f" || true
-
-            chmod +x "$f" || true
-        done
-
-        echo -e "${YELLOW}Executing startup scripts in lexicographic order...${NC}"
-        for startup_script in "${STARTUP_SCRIPTS[@]}"; do
-            echo -e "${YELLOW}Running startup script: $(basename "$startup_script")${NC}"
-            /bin/bash "$startup_script"
-            echo -e "${GREEN}Finished: $(basename "$startup_script") (exit=$?)${NC}"
-        done
-    fi
+    for script in /app/startup/*; do
+        if [ -f "$script" ]; then
+            echo -e "${YELLOW}Running startup script: $(basename "$script")${NC}"
+            case "$script" in
+                *.sh)  chmod +x "$script" 2>/dev/null || true; "$script" ;;
+                *.bash) chmod +x "$script" 2>/dev/null || true; bash "$script" ;;
+                *.py)  python3 "$script" ;;
+                *)     echo -e "${YELLOW}Skipping unknown script type: $script${NC}" ;;
+            esac
+        fi
+    done
 
     echo -e "${GREEN}✓ Custom applications initialized${NC}"
 else
-    echo -e "${YELLOW}Step 2: No custom applications to start (/app/startup not found)${NC}"
+    echo -e "${YELLOW}Step 2: No custom applications to start${NC}"
 fi
 
-# Step 3: Run tests or custom command
+# Step 3: Run tests
 echo -e "${YELLOW}Step 3: Starting tests...${NC}"
 echo -e "${GREEN}========================================${NC}"
 
-cd /app/tests
-
-# Ensure test-results directory exists
-mkdir -p /app/tests/test-results
-
 if [ "${PAUSE_BEFORE_TESTS:-false}" = "true" ]; then
-    echo -e "${YELLOW}PAUSE_BEFORE_TESTS=true -> pausing before running tests.${NC}"
-    echo -e "${YELLOW}Attach with: docker compose exec tests sh${NC}"
-    sleep infinity
+    echo -e "${YELLOW}PAUSE_BEFORE_TESTS=true - pausing before running tests.${NC}"
+    sleep 3600
 fi
 
-# If a command is provided, run it; otherwise, auto-detect tests
-if [ "$#" -eq 0 ] || [ "$1" = "echo" ]; then
-    echo -e "${YELLOW}Auto-detecting tests...${NC}"
+echo -e "${YELLOW}Auto-detecting tests...${NC}"
 
-    GUI_TESTS_FOUND=false
-    API_TESTS_FOUND=false
+GUI_TESTS_FOUND=false
+API_TESTS_FOUND=false
 
-    # Check for GUI tests (Playwright) - recursive, supports *.spec.* and *.test.*
-    if [ -d "/app/tests/GUI" ] && [ "$(ls -A /app/tests/GUI 2>/dev/null)" ]; then
-        if find /app/tests/GUI -type f \( -name "*.spec.js" -o -name "*.spec.ts" -o -name "*.test.js" -o -name "*.test.ts" \) | grep -q .; then
-            GUI_TESTS_FOUND=true
-            echo -e "${GREEN}✓ Found Playwright tests in GUI folder${NC}"
-        fi
+# Check for GUI tests (Playwright)
+if [ -d "/app/tests/GUI" ] && [ "$(ls -A /app/tests/GUI 2>/dev/null)" ]; then
+    if find /app/tests/GUI -type f \( -name "*.spec.js" -o -name "*.spec.ts" -o -name "*.test.js" -o -name "*.test.ts" \) | grep -q .; then
+        GUI_TESTS_FOUND=true
+        echo -e "${GREEN}✓ Found Playwright tests in GUI folder${NC}"
     fi
-
-    # Check for API tests (Postman/Newman)
-    if [ -d "/app/tests/API" ] && [ "$(ls -A /app/tests/API 2>/dev/null)" ]; then
-        if find /app/tests/API -type f -name "*collection*.json" | grep -q .; then
-            API_TESTS_FOUND=true
-            echo -e "${GREEN}✓ Found Postman collections in API folder${NC}"
-        fi
-    fi
-
-    if [ "$GUI_TESTS_FOUND" = true ] || [ "$API_TESTS_FOUND" = true ]; then
-        EXIT_CODE=0
-
-        if [ "$GUI_TESTS_FOUND" = true ]; then
-            echo -e "${YELLOW}Preparing Playwright dependencies...${NC}"
-            
-            # Check if node_modules already exist (pre-installed in image)
-            if [ -d "/modules/node_modules/@playwright/test" ]; then
-                echo -e "${GREEN}✓ Using pre-installed Playwright from /modules${NC}"
-            else
-                echo -e "${RED}✗ Playwright not found in /modules/node_modules${NC}"
-                EXIT_CODE=1
-            fi
-
-            if [ "$EXIT_CODE" -eq 0 ]; then
-                echo -e "${YELLOW}Running Playwright tests...${NC}"
-                
-                # Set NODE_PATH so tests can require('utils') directly
-                export NODE_PATH="/app/tests/GUI:${NODE_PATH:-}"
-                echo -e "${GREEN}✓ NODE_PATH set to: $NODE_PATH${NC}"
-                
-                # Build playwright command with optional --update-snapshots flag
-                PLAYWRIGHT_CMD="npx playwright test --output=/app/tests/test-results/playwright-output"
-                if [ "${UPDATE_SNAPSHOTS:-false}" = "true" ]; then
-                    echo -e "${YELLOW}UPDATE_SNAPSHOTS=true -> updating reference screenshots${NC}"
-                    PLAYWRIGHT_CMD="$PLAYWRIGHT_CMD --update-snapshots"
-                fi
-                
-                (cd /app/tests/GUI && $PLAYWRIGHT_CMD) || EXIT_CODE=$?
-                
-                # Copy Playwright report to test-results
-                if [ -d "/app/tests/GUI/playwright-report" ]; then
-                    echo -e "${YELLOW}Copying Playwright report to test-results...${NC}"
-                    cp -r /app/tests/GUI/playwright-report /app/tests/test-results/
-                fi
-                
-                # Copy test-results from GUI folder if exists
-                if [ -d "/app/tests/GUI/test-results" ]; then
-                    echo -e "${YELLOW}Copying Playwright test-results...${NC}"
-                    cp -r /app/tests/GUI/test-results/* /app/tests/test-results/ 2>/dev/null || true
-                fi
-            fi
-        fi
-
-        if [ "$API_TESTS_FOUND" = true ]; then
-            echo -e "${YELLOW}Running Postman tests...${NC}"
-
-            # Use first environment file if exists (optional)
-            ENV_OPT=""
-            ENV_FILE="$(find /app/tests/API -type f -name "*environment*.json" | head -n 1 || true)"
-            if [ -n "$ENV_FILE" ]; then
-                ENV_OPT="-e $ENV_FILE"
-                echo -e "${YELLOW}Using environment: $(basename "$ENV_FILE")${NC}"
-            fi
-
-            # Run newman collections with reporters
-            while IFS= read -r -d '' collection; do
-                COLLECTION_NAME="$(basename "$collection" .json)"
-                echo -e "${YELLOW}Running collection: ${COLLECTION_NAME}${NC}"
-                # shellcheck disable=SC2086
-                newman run "$collection" $ENV_OPT \
-                    --reporters cli,json,htmlextra \
-                    --reporter-json-export "/app/tests/test-results/newman-${COLLECTION_NAME}.json" \
-                    --reporter-htmlextra-export "/app/tests/test-results/newman-${COLLECTION_NAME}.html" \
-                    || EXIT_CODE=$?
-            done < <(find /app/tests/API -type f -name "*collection*.json" -print0)
-        fi
-
-        echo -e "${GREEN}========================================${NC}"
-        echo -e "${GREEN}Test results saved to: /app/tests/test-results/${NC}"
-        echo -e "${YELLOW}Contents:${NC}"
-        ls -la /app/tests/test-results/ || true
-        echo -e "${GREEN}========================================${NC}"
-
-        exit $EXIT_CODE
-    else
-        echo -e "${YELLOW}No tests found in GUI or API folders${NC}"
-        echo -e "${YELLOW}To run tests:${NC}"
-        echo -e "${YELLOW}  - Copy Playwright tests to /app/tests/GUI/${NC}"
-        echo -e "${YELLOW}  - Copy Postman collections to /app/tests/API/${NC}"
-        exit 0
-    fi
-else
-    exec "$@"
 fi
+
+# Check for API tests (Postman/Newman)
+if [ -d "/app/tests/API" ] && [ "$(ls -A /app/tests/API 2>/dev/null)" ]; then
+    if find /app/tests/API -type f -name "*collection*.json" | grep -q .; then
+        API_TESTS_FOUND=true
+        echo -e "${GREEN}✓ Found Postman collections in API folder${NC}"
+    fi
+fi
+
+EXIT_CODE=0
+
+if [ "$GUI_TESTS_FOUND" = true ]; then
+    echo -e "${YELLOW}Preparing Playwright dependencies...${NC}"
+
+    if [ ! -d "/modules/node_modules/@playwright/test" ]; then
+        echo -e "${RED}✗ @playwright/test not found in /modules/node_modules${NC}"
+        echo -e "${RED}✗ The Docker image may not have been built correctly.${NC}"
+        EXIT_CODE=1
+    fi
+
+    # Detect accidental local installations that can cause duplicate versions
+    if find /app -path "*/node_modules/@playwright/test" -type d 2>/dev/null | grep -q .; then
+        echo -e "${RED}✗ Found @playwright/test under /app/node_modules (duplicate install).${NC}"
+        echo -e "${RED}✗ Remove local node_modules from mounted tests to avoid version conflicts.${NC}"
+        find /app -path "*/node_modules/@playwright/test" -type d 2>/dev/null || true
+        EXIT_CODE=1
+    fi
+
+    if [ "$EXIT_CODE" -eq 0 ]; then
+        echo -e "${YELLOW}Running Playwright tests...${NC}"
+
+        # Make /modules-installed dependencies resolvable from the mounted test folder
+        # so that /app/tests/GUI/playwright.config.js can `require('@playwright/test')`.
+        if [ ! -e "/app/tests/GUI/node_modules" ]; then
+            ln -s /modules/node_modules /app/tests/GUI/node_modules
+            echo -e "${GREEN}✓ Linked /app/tests/GUI/node_modules -> /modules/node_modules${NC}"
+        fi
+
+        # Only add GUI utilities path; do NOT add /modules to NODE_PATH
+        export NODE_PATH="/app/tests/GUI"
+        echo -e "${GREEN}✓ NODE_PATH set to: $NODE_PATH${NC}"
+
+        PLAYWRIGHT_BIN="/modules/node_modules/.bin/playwright"
+        PLAYWRIGHT_CMD="$PLAYWRIGHT_BIN test --output=/app/tests/test-results/playwright-output"
+
+        (cd /app/tests/GUI && $PLAYWRIGHT_CMD) || EXIT_CODE=$?
+
+        if [ -d "/app/tests/GUI/playwright-report" ]; then
+            echo -e "${YELLOW}Copying Playwright report to test-results...${NC}"
+            cp -r /app/tests/GUI/playwright-report /app/tests/test-results/
+        fi
+
+        if [ -d "/app/tests/GUI/test-results" ]; then
+            echo -e "${YELLOW}Copying Playwright test-results...${NC}"
+            cp -r /app/tests/GUI/test-results/* /app/tests/test-results/ 2>/dev/null || true
+        fi
+    fi
+fi
+
+if [ "$API_TESTS_FOUND" = true ]; then
+    echo -e "${YELLOW}Running Postman tests...${NC}"
+
+    ENV_OPT=""
+    ENV_FILE=$(find /app/tests/API -type f -iname "*environment*.json" 2>/dev/null | head -1 || true)
+    if [ -n "$ENV_FILE" ]; then
+        ENV_OPT="-e $ENV_FILE"
+        echo -e "${GREEN}✓ Using environment: $ENV_FILE${NC}"
+    fi
+
+    for collection in $(find /app/tests/API -type f -iname "*collection*.json" 2>/dev/null); do
+        echo -e "${YELLOW}Running collection: $(basename "$collection")${NC}"
+        newman run "$collection" $ENV_OPT || EXIT_CODE=$?
+    done
+fi
+
+if [ "$GUI_TESTS_FOUND" = false ] && [ "$API_TESTS_FOUND" = false ]; then
+    echo -e "${YELLOW}No tests found in GUI or API folders${NC}"
+    EXIT_CODE=0
+fi
+
+exit $EXIT_CODE
