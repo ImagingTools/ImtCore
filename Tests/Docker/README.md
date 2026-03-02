@@ -8,50 +8,46 @@ Complete Docker test infrastructure for running GUI (Playwright) and API (Postma
 
 **Linux:**
 ```bash
-./Tests/Docker/Scripts/build-docker-linux.sh
+docker build -f Tests/Docker/Dockerfile.linux -t imtcore-tests:linux .
 ```
 
 **Windows:**
 ```powershell
-.\Tests\Docker\Scripts\build-docker-windows.bat
+docker build -f Tests\Docker\Dockerfile.windows -t imtcore-tests:windows .
 ```
 
 **Linux on Windows** (Docker Desktop in Linux mode):
 ```batch
-.\Tests\Docker\Scripts\build-docker-linux-on-windows.bat
-```
-Or use Git Bash/WSL:
-```bash
-./Tests/Docker/Scripts/build-docker-linux-on-windows.sh
+docker build -f Tests\Docker\Dockerfile.linux -t imtcore-tests:linux .
 ```
 
 ### 2. Run Tests (in your application repository)
 
-Copy the run script to your application repository and execute:
+Copy the template script to your application repository and execute:
 
 **Linux:**
 ```bash
-cp /path/to/ImtCore/Tests/Docker/Scripts/run-tests.sh .
+cp /path/to/ImtCore/Tests/Docker/Scripts/run-tests-linux-template.sh ./run-tests.sh
 chmod +x run-tests.sh
 ./run-tests.sh
 ```
 
 **Windows:**
 ```powershell
-Copy-Item "\path\to\ImtCore\Tests\Docker\Scripts\run-tests.bat" .
+Copy-Item "\path\to\ImtCore\Tests\Docker\Scripts\run-tests-windows-template.bat" .\run-tests.bat
 .\run-tests.bat
 ```
 
 **Linux on Windows** (Docker Desktop in Linux mode):
 ```batch
-copy C:\path\to\ImtCore\Tests\Docker\Scripts\run-tests-linux-on-windows.bat .
-.\run-tests-linux-on-windows.bat
+copy C:\path\to\ImtCore\Tests\Docker\Scripts\run-tests-linux-on-windows-template.bat run-tests.bat
+.\run-tests.bat
 ```
 Or use Git Bash/WSL:
 ```bash
-cp /path/to/ImtCore/Tests/Docker/Scripts/run-tests-linux-on-windows.sh .
-chmod +x run-tests-linux-on-windows.sh
-./run-tests-linux-on-windows.sh
+cp /path/to/ImtCore/Tests/Docker/Scripts/run-tests-linux-on-windows-template.sh ./run-tests.sh
+chmod +x run-tests.sh
+./run-tests.sh
 ```
 
 ## Features
@@ -68,15 +64,15 @@ chmod +x run-tests-linux-on-windows.sh
 
 ```
 Tests/Docker/
-├── Scripts/                            # All build and run scripts
-│   ├── build-docker-linux.sh           # Build script for Linux
-│   ├── build-docker-windows.bat        # Build script for Windows  
-│   ├── build-docker-linux-on-windows.bat  # Build Linux on Windows (native cmd)
-│   ├── build-docker-linux-on-windows.sh   # Build Linux on Windows (Git Bash/WSL)
-│   ├── run-tests.sh                    # Application test runner (Linux)
-│   ├── run-tests.bat                   # Application test runner (Windows)
-│   ├── run-tests-linux-on-windows.bat  # Test runner (Linux on Windows - native cmd)
-│   └── run-tests-linux-on-windows.sh   # Test runner (Linux on Windows - Git Bash/WSL)
+├── Scripts/                            # Core and template test runner scripts
+│   ├── run-tests-linux-core.sh         # Core Linux runner (ImtCore only)
+│   ├── run-tests-linux-template.sh     # Template Linux runner for apps
+│   ├── run-tests-linux-on-windows-core.bat  # Core Linux-on-Windows (cmd)
+│   ├── run-tests-linux-on-windows-core.sh   # Core Linux-on-Windows (bash/WSL)
+│   ├── run-tests-linux-on-windows-template.bat  # Template Linux-on-Windows (cmd)
+│   ├── run-tests-linux-on-windows-template.sh   # Template Linux-on-Windows (bash/WSL)
+│   ├── run-tests-windows-core.bat      # Core Windows runner (ImtCore only)
+│   └── run-tests-windows-template.bat  # Template Windows runner for apps
 ├── GUI/                                # GUI test utilities
 │   └── utils.js                        # Playwright utilities helper
 ├── API/                                # API test utilities (placeholder)
@@ -97,7 +93,7 @@ Tests/Fonts/
 
 From ImtCore repository root:
 ```bash
-./Tests/Docker/Scripts/build-docker-linux.sh
+docker build -f Tests/Docker/Dockerfile.linux -t imtcore-tests:linux .
 ```
 
 - Runs on Linux, macOS, Windows (via WSL 2)
@@ -108,7 +104,7 @@ From ImtCore repository root:
 
 From ImtCore repository root (PowerShell):
 ```powershell
-.\Tests\Docker\build-docker-windows.bat
+docker build -f Tests\Docker\Dockerfile.windows -t imtcore-tests:windows .
 ```
 
 - Requires Windows 10/11 Pro+ with Hyper-V
@@ -117,15 +113,8 @@ From ImtCore repository root (PowerShell):
 ### Linux on Windows
 
 From ImtCore repository root:
-
-**Command Prompt (Recommended):**
 ```batch
-.\Tests\Docker\build-docker-linux-on-windows.bat
-```
-
-**Git Bash or WSL:**
-```bash
-./Tests/Docker/Scripts/build-docker-linux-on-windows.sh
+docker build -f Tests\Docker\Dockerfile.linux -t imtcore-tests:linux .
 ```
 
 - Checks Docker Desktop is in Linux mode
@@ -189,14 +178,14 @@ $env:POSTGRES_DB="myapp_test"
 set BASE_URL=http://host.docker.internal:7776
 set START_POSTGRESQL=true
 set POSTGRES_DB=myapp_test
-.\run-tests-linux-on-windows.bat
+.\run-tests.bat
 ```
 Or with Git Bash/WSL:
 ```bash
 export BASE_URL="http://host.docker.internal:7776"
 export START_POSTGRESQL="true"
 export POSTGRES_DB="myapp_test"
-./run-tests-linux-on-windows.sh
+./run-tests.sh
 ```
 
 **Note:** When running Linux containers on Windows, use `host.docker.internal` to access services on the Windows host.
@@ -347,8 +336,8 @@ exit 1
 ### Permission Denied (Linux)
 
 ```bash
-chmod +x Tests/Docker/Scripts/build-docker-linux.sh
-chmod +x Tests/Docker/Scripts/run-tests.sh
+chmod +x Tests/Docker/Scripts/run-tests-linux-core.sh
+chmod +x Tests/Docker/Scripts/run-tests-linux-template.sh
 ```
 
 ## Platform Comparison
@@ -381,7 +370,7 @@ jobs:
           path: ImtCore
       
       - name: Build Docker image
-        run: cd ImtCore && ./Tests/Docker/Scripts/build-docker-linux.sh
+        run: cd ImtCore && docker build -f Tests/Docker/Dockerfile.linux -t imtcore-tests:linux .
       
       - name: Run tests
         run: ./run-tests.sh
@@ -391,15 +380,15 @@ jobs:
 
 **For ImtCore:**
 ```bash
-./Tests/Docker/Scripts/build-docker-linux.sh
+docker build -f Tests/Docker/Dockerfile.linux -t imtcore-tests:linux .
 ```
 
 **For Applications:**
-1. Copy `run-tests.sh` from ImtCore
+1. Copy the appropriate `run-tests-*-template.*` script from ImtCore
 2. Create `Tests/GUI/` with Playwright tests
 3. Create `Tests/API/` with Postman collections
 4. Create `Tests/Docker/Resources/` with resources
 5. Create `Tests/Docker/Startup/` with startup scripts
-6. Run `./run-tests.sh`
+6. Run `./run-tests.sh` (or `run-tests.bat` on Windows)
 
 Tests are auto-detected and executed. Results in `test-results/`.

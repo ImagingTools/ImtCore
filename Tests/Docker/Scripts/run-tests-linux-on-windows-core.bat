@@ -60,7 +60,8 @@ REM Check if image exists
 docker image inspect %IMAGE_NAME% >nul 2>&1
 if errorlevel 1 (
     echo ERROR: Docker image '%IMAGE_NAME%' not found
-    echo Please build the image first using build-docker-linux-on-windows.bat
+    echo Please build the image first using:
+    echo   docker build -f Tests\Docker\Dockerfile.linux -t %IMAGE_NAME% .
     exit /b 1
 )
 

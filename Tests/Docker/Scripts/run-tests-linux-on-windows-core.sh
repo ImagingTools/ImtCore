@@ -51,7 +51,8 @@ echo ""
 
 if ! docker image inspect "$IMAGE_NAME" &> /dev/null; then
     echo "ERROR: Docker image '$IMAGE_NAME' not found"
-    echo "Please build the image first using build-docker-linux-on-windows.sh"
+    echo "Please build the image first using:"
+    echo "  docker build -f Tests/Docker/Dockerfile.linux -t $IMAGE_NAME ."
     exit 1
 fi
 

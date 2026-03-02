@@ -1,6 +1,6 @@
 # Docker Test Scripts
 
-This directory contains scripts for building and running Docker-based tests across three different scenarios.
+This directory contains scripts for running Docker-based tests across three different scenarios.
 
 ## Supported Scenarios
 
@@ -10,16 +10,9 @@ This directory contains scripts for building and running Docker-based tests acro
 
 ## Structure
 
-The scripts are organized into three categories:
+The scripts are organized into two categories:
 
-### 1. Build Scripts
-Scripts for building Docker images in ImtCore:
-- `build-docker-linux.sh` - Build Linux container
-- `build-docker-windows.bat` - Build Windows container
-- `build-docker-linux-on-windows.bat` - Build Linux container on Windows (cmd)
-- `build-docker-linux-on-windows.sh` - Build Linux container on Windows (Git Bash/WSL)
-
-### 2. Core Test Runner Scripts (ImtCore only)
+### 1. Core Test Runner Scripts (ImtCore only)
 These scripts contain the core Docker orchestration logic and should **NOT** be copied to application repos:
 
 **Linux on Linux:**
@@ -32,16 +25,7 @@ These scripts contain the core Docker orchestration logic and should **NOT** be 
 **Windows on Windows:**
 - `run-tests-windows-core.bat` - Core logic for native Windows
 
-### 3. Template/Wrapper Scripts
-Two types of wrapper scripts:
-
-#### A. Wrappers for ImtCore development (call core scripts with defaults)
-- `run-tests-linux.sh` - Native Linux development
-- `run-tests-linux-on-windows.bat` - Linux on Windows (cmd)
-- `run-tests-linux-on-windows.sh` - Linux on Windows (bash)
-- `run-tests-windows.bat` - Native Windows development
-
-#### B. Templates for application repos (copy these to your app)
+### 2. Template Scripts for Application Repos
 - `run-tests-linux-template.sh` - **Template for Linux on Linux**
 - `run-tests-linux-on-windows-template.bat` - **Template for Linux on Windows (cmd)**
 - `run-tests-linux-on-windows-template.sh` - **Template for Linux on Windows (bash)**
