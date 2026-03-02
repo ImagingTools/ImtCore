@@ -14,9 +14,9 @@ echo Adding submodules...
 for %%L in (%LIBRARIES%) do (
     set "repo_url=https://github.com/%GITHUB_ORG%/%%L.git"
     set "submodule_path=3rdParty/%%L"
-ECHO is off.
+    
     echo Adding %%L...
-    git submodule add "^" "^"
+    git submodule add "!repo_url!" "!submodule_path!"
 )
 
 echo Initializing and updating submodules...
