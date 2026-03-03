@@ -135,6 +135,52 @@ bool CCollectionImportParam::Serialize(iser::IArchive& archive)
 }
 
 
+// reimplemented (istd::IChangeable)
+
+int CCollectionImportParam::GetSupportedOperations() const
+{
+	return SO_CLONE | SO_COPY | SO_RESET;
+}
+
+
+bool CCollectionImportParam::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
+{
+	auto sourcePtr = dynamic_cast<const CCollectionImportParam*>(&object);
+	if (sourcePtr != nullptr){
+		istd::CChangeNotifier notifier(this, &istd::IChangeable::GetAllChanges());
+
+		m_collectionId = sourcePtr->m_collectionId;
+		m_fileImportInfos = sourcePtr->m_fileImportInfos;
+
+		return true;
+	}
+
+	return false;
+}
+
+
+istd::IChangeableUniquePtr CCollectionImportParam::CloneMe(CompatibilityMode /*mode*/) const
+{
+	istd::IChangeableUniquePtr clonePtr(new CCollectionImportParam());
+	if (clonePtr->CopyFrom(*this)){
+		return clonePtr;
+	}
+
+	return nullptr;
+}
+
+
+bool CCollectionImportParam::ResetData(CompatibilityMode /*mode*/)
+{
+	istd::CChangeNotifier notifier(this);
+
+	m_collectionId.clear();
+	m_fileImportInfos.clear();
+
+	return true;
+}
+
+
 } // namespace imtcol
 
 
