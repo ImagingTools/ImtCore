@@ -10,16 +10,19 @@ defineTest(copyToWebDir) {
         # replace slashes in source path for Windows
         win32:file ~= s,/,\\,g
 
+        # Use newline separator instead of && to avoid cmd.exe parsing errors
+        # with extremely long command chains on Windows (nmake/jom/mingw-make)
         isEmpty(WEB_COMMAND){
 		}
 		else {
-		    WEB_COMMAND += &&
+		    WEB_COMMAND += $$escape_expand(\\n\\t)
 		}
 
         WEB_COMMAND +=  $$QMAKE_COPY_DIR $$shell_quote($$file) $$shell_quote($$dir)
 		}
 
     export(WEB_COMMAND)
+    return(true)
 }
 
 defineTest(copyFile) {
@@ -31,14 +34,17 @@ defineTest(copyFile) {
     # replace slashes in source path for Windows
 	win32:file ~= s,/,\\,g
 
+    # Use newline separator instead of && to avoid cmd.exe parsing errors
+    # with extremely long command chains on Windows (nmake/jom/mingw-make)
     isEmpty(WEB_COMMAND) {
 	}
 	else {
-	    WEB_COMMAND += &&
+	    WEB_COMMAND += $$escape_expand(\\n\\t)
 	}
 	WEB_COMMAND += $$QMAKE_COPY_FILE $$shell_quote($$file) $$shell_quote($$fileNew)
 
 	export(WEB_COMMAND)
+	return(true)
 }
 
 defineTest(compyleWeb) {
@@ -57,7 +63,16 @@ defineTest(compyleWeb) {
 		npmexe ~= s,/,\\,g
 	}
 
-WEB_COMMAND += && cd $$shell_quote($$buildwebdir) && $$npmexe  $$shell_quote($$dir)
+    # Split cd and compiler into separate command lines to avoid cmd.exe parsing errors
+    # with extremely long && chains on Windows (nmake/jom/mingw-make)
+    isEmpty(WEB_COMMAND) {
+    }
+    else {
+        WEB_COMMAND += $$escape_expand(\\n\\t)
+    }
+    WEB_COMMAND += cd $$shell_quote($$buildwebdir)
+    WEB_COMMAND += $$escape_expand(\\n\\t)
+    WEB_COMMAND += $$npmexe  $$shell_quote($$dir)
 
     copyFile($$buildwebdir/src/jqml.full.js, $$buildwebdir/Resources/jqml.$${resname}.js)
 
@@ -72,8 +87,12 @@ WEB_COMMAND += && cd $$shell_quote($$buildwebdir) && $$npmexe  $$shell_quote($$d
 	else{
 	    QMAKE_RCC = rcc
 	}
-	WEB_COMMAND += && $$[QT_INSTALL_BINS]/$$QMAKE_RCC -name $${TARGET}Web $${QRC_WEB_FILE} -o $${QRC_CPP_WEB_FILE}
+	
+	# Use newline separator instead of && to avoid cmd.exe parsing errors
+	WEB_COMMAND += $$escape_expand(\\n\\t)
+	WEB_COMMAND += $$[QT_INSTALL_BINS]/$$QMAKE_RCC -name $${TARGET}Web $${QRC_WEB_FILE} -o $${QRC_CPP_WEB_FILE}
 
 	export(WEB_COMMAND)
+	return(true)
 }
 
