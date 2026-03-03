@@ -65,9 +65,7 @@ win32{
 
 
 themes$${TARGET}.name = Theme Files
-# Use newline separator instead of && to avoid cmd.exe parsing errors
-# with long command chains on Windows (nmake/jom/mingw-make)
-themes$${TARGET}.commands = $${DESIGN_TOKEN_CREATOR_COMMAND} -W --ignore-errors $$escape_expand(\\n\\t) $${GENERATE_RESOURCE_COMMANDS} $$escape_expand(\\n\\t) $${GENERATE_THEME_RESOURCE_COMMANDS}
+themes$${TARGET}.commands = $${DESIGN_TOKEN_CREATOR_COMMAND} -W --ignore-errors && $${GENERATE_RESOURCE_COMMANDS} && $${GENERATE_THEME_RESOURCE_COMMANDS}
 themes$${TARGET}.input = THEME_FILES
 themes$${TARGET}.output = $${GENERATED_RESOURCE_OUTPUT}
 themes$${TARGET}.dependency_type = TYPE_C

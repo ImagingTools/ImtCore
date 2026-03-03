@@ -61,16 +61,12 @@ TEMPLATE_FILES ~= s,/,\\,g
 
 # DDL_OUTPUT_FILES_CPP = $$system($${DDL_CODE_CREATOR_COMMAND})
 
-# Run commands separately to avoid cmd.exe parsing errors with && chains
-system($${DDL_CODE_CREATOR_COMMAND})
-system($${GENERATE_RESOURCE_COMMANDS})
+system($${DDL_CODE_CREATOR_COMMAND} && $${GENERATE_RESOURCE_COMMANDS})
 
 DDL_OUTPUT_FILES_CPP = $$files($$DDL_CPP_OUTPUT_DIR/*, false)
 
 ddl$${TARGET}.name = DDL Files
-# Use newline separator instead of && to avoid cmd.exe parsing errors
-# with long command chains on Windows (nmake/jom/mingw-make)
-ddl$${TARGET}.commands = $${DDL_CODE_CREATOR_COMMAND} $$escape_expand(\\n\\t) $${GENERATE_RESOURCE_COMMANDS}
+ddl$${TARGET}.commands = $${DDL_CODE_CREATOR_COMMAND} && $${GENERATE_RESOURCE_COMMANDS}
 ddl$${TARGET}.input = INPUT_FIRST_FILE
 ddl$${TARGET}.output = $${GENERATED_RESOURCE_OUTPUT}
 ddl$${TARGET}.dependency_type = TYPE_C
