@@ -49,7 +49,7 @@ ICollectionImportParam::FileImportInfo* CCollectionImportParam::GetFileImportInf
 }
 
 
-bool CCollectionImportParam::InsertFileImportInfo(int index, const FileImportInfo& info)
+bool CCollectionImportParam::InsertFileImportInfo(const FileImportInfo& info, int index)
 {
 	istd::CChangeNotifier notifier(this, &istd::IChangeable::GetAnyChange());
 

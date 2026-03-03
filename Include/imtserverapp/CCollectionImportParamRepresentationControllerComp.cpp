@@ -88,7 +88,7 @@ bool CCollectionImportParamRepresentationControllerComp::GetDataModelFromSdlRepr
 			if (sdlFileImportInfo.proposedId){
 				fileImportInfo.proposedId = *sdlFileImportInfo.proposedId;
 			}
-			collectionImportParamPtr->InsertFileImportInfo(i, fileImportInfo);
+			collectionImportParamPtr->InsertFileImportInfo(fileImportInfo, i);
 		}
 	}
 
