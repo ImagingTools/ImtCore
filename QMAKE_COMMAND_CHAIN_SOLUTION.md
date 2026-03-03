@@ -103,3 +103,11 @@ The solution is targeted and surgical:
 - **WebCompiler.pri** needs newline separators due to dynamically accumulated long chains
 - **DesignTokenCreator.pri** and **DdlCodeCreator.pri** work fine with `&&` due to short fixed chains
 - This keeps code simple and maintainable while solving the actual problem
+
+## Summary of Changes
+1. **Reverted DesignTokenCreator.pri** - Changed from newline separators back to `&&` for 3-command chain
+2. **Reverted DdlCodeCreator.pri** - Changed from newline separators back to `&&` for 2-command chain
+3. **WebCompiler.pri** - Already correctly uses newline separators (no changes needed)
+4. **Documentation** - Created this comprehensive guide to explain when to use each pattern
+
+The key insight is that the Windows cmd.exe parsing issue only affects WebCompiler.pri due to its dynamic command accumulation in loops, not the other files with their short fixed chains.
