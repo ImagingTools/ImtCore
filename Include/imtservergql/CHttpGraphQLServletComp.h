@@ -26,7 +26,7 @@ public:
 	I_BEGIN_COMPONENT(CHttpGraphQLServletComp);
 		I_REGISTER_INTERFACE(imtgql::IGqlRequestProvider);
 		I_ASSIGN_MULTI_0(m_gqlRequestHandlerCompPtr, "GqlRequestHandler", "Handler for GraphQL-request", true);
-		I_ASSIGN(m_gqlContextCreatorCompPtr, "GqlContextCreator", "GraphQL-related context creator", false, "GqlContextCreator");
+		I_ASSIGN(m_gqlContextCreatorCompPtr, "GqlContextCreator", "GraphQL-related context creator", true, "GqlContextCreator");
 		I_ASSIGN(m_jwtSessionControllerCompPtr, "JwtSessionController", "JWT session controller", false, "JwtSessionController");
 		I_ASSIGN(m_patManagerCompPtr, "PersonalAccessTokenManager", "Personal Access Token manager", false, "PersonalAccessTokenManager");
 	I_END_COMPONENT;
