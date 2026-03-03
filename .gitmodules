@@ -1,51 +1,68 @@
 [submodule "3rdParty/EJ"]
 	path = 3rdParty/EJ
 	url = https://github.com/ImagingTools/EJ.git
+	branch = main
 [submodule "3rdParty/JQ"]
 	path = 3rdParty/JQ
 	url = https://github.com/ImagingTools/JQ.git
+	branch = main
 [submodule "3rdParty/JQML"]
 	path = 3rdParty/JQML
 	url = https://github.com/ImagingTools/JQML.git
+	branch = main
 [submodule "3rdParty/JQML2"]
 	path = 3rdParty/JQML2
 	url = https://github.com/ImagingTools/JQML2.git
+	branch = main
 [submodule "3rdParty/QXlsx"]
 	path = 3rdParty/QXlsx
 	url = https://github.com/ImagingTools/QXlsx.git
+	branch = main
 [submodule "3rdParty/WebCompiler"]
 	path = 3rdParty/WebCompiler
 	url = https://github.com/ImagingTools/WebCompiler.git
+	branch = main
 [submodule "3rdParty/boost"]
 	path = 3rdParty/boost
 	url = https://github.com/ImagingTools/boost.git
+	branch = main
 [submodule "3rdParty/icu"]
 	path = 3rdParty/icu
 	url = https://github.com/ImagingTools/icu.git
+	branch = main
 [submodule "3rdParty/libmdbx"]
 	path = 3rdParty/libmdbx
 	url = https://github.com/ImagingTools/libmdbx.git
+	branch = main
 [submodule "3rdParty/mongoc"]
 	path = 3rdParty/mongoc
 	url = https://github.com/ImagingTools/mongoc.git
+	branch = main
 [submodule "3rdParty/mongocxx"]
 	path = 3rdParty/mongocxx
 	url = https://github.com/ImagingTools/mongocxx.git
+	branch = main
 [submodule "3rdParty/nodejs"]
 	path = 3rdParty/nodejs
 	url = https://github.com/ImagingTools/nodejs.git
+	branch = main
 [submodule "3rdParty/openssl"]
 	path = 3rdParty/openssl
 	url = https://github.com/ImagingTools/openssl.git
+	branch = main
 [submodule "3rdParty/pybind11"]
 	path = 3rdParty/pybind11
 	url = https://github.com/ImagingTools/pybind11.git
+	branch = main
 [submodule "3rdParty/quazip"]
 	path = 3rdParty/quazip
 	url = https://github.com/ImagingTools/quazip.git
+	branch = main
 [submodule "3rdParty/zlib"]
 	path = 3rdParty/zlib
 	url = https://github.com/ImagingTools/zlib.git
+	branch = main
 [submodule "3rdParty/zstd"]
 	path = 3rdParty/zstd
 	url = https://github.com/ImagingTools/zstd.git
+	branch = main
