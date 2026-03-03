@@ -22,7 +22,7 @@ public:
 
 	virtual int GetFileCount() const override;
 	virtual FileImportInfo* GetFileImportInfo(int index) const override;
-	virtual bool InsertFileImportInfo(int index, const FileImportInfo& info) override;
+	virtual bool InsertFileImportInfo(int index = -1, const FileImportInfo& info) override;
 	virtual bool RemoveFileImportInfo(int index) override;
 
 	// reimplemented (iser::ISerializable)

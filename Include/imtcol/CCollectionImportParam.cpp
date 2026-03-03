@@ -51,13 +51,18 @@ ICollectionImportParam::FileImportInfo* CCollectionImportParam::GetFileImportInf
 
 bool CCollectionImportParam::InsertFileImportInfo(int index, const FileImportInfo& info)
 {
-	if (index < 0 || index > m_fileImportInfos.size()){
-		return false;
-	}
-
 	istd::CChangeNotifier notifier(this, &istd::IChangeable::GetAnyChange());
 
-	m_fileImportInfos.insert(index, info);
+	if (index < 0){
+		m_fileImportInfos.insert(0, info);
+	}
+	else if (index >= m_fileImportInfos.size()){
+		m_fileImportInfos.append(info);
+	}
+	else{
+		m_fileImportInfos.insert(index, info);
+	}
+
 	return true;
 }
 

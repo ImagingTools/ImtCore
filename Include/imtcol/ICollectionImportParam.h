@@ -29,7 +29,7 @@ public:
 
 	virtual int GetFileCount() const = 0;
 	virtual FileImportInfo* GetFileImportInfo(int index) const = 0;
-	virtual bool InsertFileImportInfo(int index, const FileImportInfo& info) = 0;
+	virtual bool InsertFileImportInfo(int index = -1, const FileImportInfo& info) = 0;
 	virtual bool RemoveFileImportInfo(int index) = 0;
 };
 
