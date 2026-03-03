@@ -65,14 +65,13 @@ defineTest(compyleWeb) {
 
     # Split cd and compiler into separate command lines to avoid cmd.exe parsing errors
     # with extremely long && chains on Windows (nmake/jom/mingw-make)
+    # Note: cd and subsequent commands must use && to run in the same shell
     isEmpty(WEB_COMMAND) {
     }
     else {
         WEB_COMMAND += $$escape_expand(\\n\\t)
     }
-    WEB_COMMAND += cd $$shell_quote($$buildwebdir)
-    WEB_COMMAND += $$escape_expand(\\n\\t)
-    WEB_COMMAND += $$npmexe  $$shell_quote($$dir)
+    WEB_COMMAND += cd $$shell_quote($$buildwebdir) && $$npmexe  $$shell_quote($$dir)
 
     copyFile($$buildwebdir/src/jqml.full.js, $$buildwebdir/Resources/jqml.$${resname}.js)
 
