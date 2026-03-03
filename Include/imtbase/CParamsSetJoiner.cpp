@@ -130,10 +130,6 @@ CParamsSetJoiner::ParamsInfoProviderJoiner::ParamsInfoProviderJoiner(const CPara
 
 const iprm::IParamInfo* CParamsSetJoiner::ParamsInfoProviderJoiner::GetParamInfo(const QByteArray& paramId) const
 {
-	if (m_joiner == nullptr){
-		return nullptr;
-	}
-
 	// Check if param belongs to m_paramsSet1
 	if (m_joiner->m_paramsSet1 != nullptr){
 		const iser::ISerializable* paramPtr = m_joiner->m_paramsSet1->GetParameter(paramId);
@@ -142,6 +138,7 @@ const iprm::IParamInfo* CParamsSetJoiner::ParamsInfoProviderJoiner::GetParamInfo
 			if (infoProviderPtr != nullptr){
 				return infoProviderPtr->GetParamInfo(paramId);
 			}
+			return nullptr;
 		}
 	}
 
@@ -153,6 +150,7 @@ const iprm::IParamInfo* CParamsSetJoiner::ParamsInfoProviderJoiner::GetParamInfo
 			if (infoProviderPtr != nullptr){
 				return infoProviderPtr->GetParamInfo(paramId);
 			}
+			return nullptr;
 		}
 	}
 
