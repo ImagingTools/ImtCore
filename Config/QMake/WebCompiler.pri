@@ -92,6 +92,8 @@ defineTest(compyleWeb) {
 	WEB_COMMAND += $$[QT_INSTALL_BINS]/$$QMAKE_RCC -name $${TARGET}Web $${QRC_WEB_FILE} -o $${QRC_CPP_WEB_FILE}
 
 	export(WEB_COMMAND)
+	export(QRC_WEB_FILE)
+	export(QRC_CPP_WEB_FILE)
 	return(true)
 }
 

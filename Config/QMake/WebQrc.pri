@@ -1,6 +1,6 @@
 
 GENERATE_RESOURCE_COMMANDS = $$WEB_COMMAND
-GENERATED_RESOURCE_OUTPUT = $${buildwebdir}/Resources/qrc_$${TARGET}Web.cpp
+GENERATED_RESOURCE_OUTPUT = $$QRC_CPP_WEB_FILE
 win32{
     GENERATED_RESOURCE_OUTPUT ~= s,/,\\,g
 }
@@ -14,5 +14,6 @@ generatedWebResources.commands = $$GENERATE_RESOURCE_COMMANDS
 generatedWebResources.input = GENERATED_RESOURCES
 generatedWebResources.variable_out = SOURCES
 generatedWebResources.dependency_type = TYPE_C
+generatedWebResources.depends = $$QRC_WEB_FILE
 QMAKE_EXTRA_COMPILERS += generatedWebResources
 
