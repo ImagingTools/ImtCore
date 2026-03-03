@@ -103,6 +103,26 @@ iser::ISerializable* CParamsSetJoiner::GetEditableParameter(const QByteArray& id
 }
 
 
+const iprm::IParamsInfoProvider* CParamsSetJoiner::GetParamsInfoProvider() const
+{
+	if (m_paramsSet1 != nullptr){
+		const iprm::IParamsInfoProvider* infoProviderPtr = m_paramsSet1->GetParamsInfoProvider();
+		if (infoProviderPtr != nullptr){
+			return infoProviderPtr;
+		}
+	}
+
+	if (m_paramsSet2 != nullptr){
+		const iprm::IParamsInfoProvider* infoProviderPtr = m_paramsSet2->GetParamsInfoProvider();
+		if (infoProviderPtr != nullptr){
+			return infoProviderPtr;
+		}
+	}
+
+	return nullptr;
+}
+
+
 // reimplement (iser::ISerializable)
 
 bool CParamsSetJoiner::Serialize(iser::IArchive& /*archive*/)

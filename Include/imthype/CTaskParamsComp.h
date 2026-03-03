@@ -27,6 +27,7 @@ public:
 	// reimplemented (iprm::IParamsSet)
 	virtual Ids GetParamIds(bool editableOnly = false) const override;
 	virtual const iser::ISerializable* GetParameter(const QByteArray& id) const override;
+	virtual const iprm::IParamsInfoProvider* GetParamsInfoProvider() const override;
 
 protected:
 	// reimplemented (icomp::CComponentBase)

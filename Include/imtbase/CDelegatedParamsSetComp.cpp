@@ -40,6 +40,16 @@ iser::ISerializable* CDelegatedParamsSetComp::GetEditableParameter(const QByteAr
 }
 
 
+const iprm::IParamsInfoProvider* CDelegatedParamsSetComp::GetParamsInfoProvider() const
+{
+	if (m_paramsSetCompPtr.IsValid()){
+		return m_paramsSetCompPtr->GetParamsInfoProvider();
+	}
+
+	return nullptr;
+}
+
+
 // reimplemented (iser::ISerializable)
 
 bool CDelegatedParamsSetComp::Serialize(iser::IArchive& archive)
