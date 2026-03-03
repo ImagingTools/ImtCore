@@ -24,6 +24,12 @@ Item {
 		}
 	}
 
+	onDocumentManagerChanged: {
+		if (documentManager){
+			documentManager.setDocumentManagerActiveView(workspaceView)
+		}
+	}
+
 	NavigableItem {
 		id: firstTabNavigation
 		forwardRest: false
