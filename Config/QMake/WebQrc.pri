@@ -5,6 +5,9 @@ win32{
     GENERATED_RESOURCE_OUTPUT ~= s,/,\\,g
 }
 
+# Add the QRC file to the project so it's tracked
+OTHER_FILES += $$QRC_WEB_FILE
+
 generatedWebResources.name = WebResources-Compiler
 arcCompiler.target = $${ARXC_OUTDIR}/C${QMAKE_FILE_BASE}.h
 generatedWebResources.CONFIG += no_link
