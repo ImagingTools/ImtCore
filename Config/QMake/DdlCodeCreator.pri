@@ -61,7 +61,9 @@ TEMPLATE_FILES ~= s,/,\\,g
 
 # DDL_OUTPUT_FILES_CPP = $$system($${DDL_CODE_CREATOR_COMMAND})
 
-system($${DDL_CODE_CREATOR_COMMAND} && $${GENERATE_RESOURCE_COMMANDS})
+# Run commands separately to avoid cmd.exe parsing errors with && chains
+system($${DDL_CODE_CREATOR_COMMAND})
+system($${GENERATE_RESOURCE_COMMANDS})
 
 DDL_OUTPUT_FILES_CPP = $$files($$DDL_CPP_OUTPUT_DIR/*, false)
 
