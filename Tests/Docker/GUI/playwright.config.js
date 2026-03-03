@@ -19,10 +19,10 @@ function parseTestUsers() {
 const users = parseTestUsers();
 const appDir = path.join(__dirname, 'app');
 const guestDir = path.join(__dirname, 'app', 'guest');
-const authorizedDir = path.join(__dirname, 'app', 'authorized');
+const authorizedRootDir = path.join(__dirname, 'app', 'authorized');
 
 const hasGuest = fs.existsSync(guestDir);
-const hasAuthorized = fs.existsSync(authorizedDir);
+const hasAuthorized = fs.existsSync(authorizedRootDir);
 
 console.log('App dir:', appDir);
 console.log('Guest dir exists:', hasGuest);
@@ -33,12 +33,12 @@ const projects = [];
 
 if (hasAuthorized && users.length > 0) {
   users.forEach((user, index) => {
+    const userDir = path.join(authorizedRootDir, user.username);
     projects.push({
-      name: `authorized-user${index}`,
-      testDir: authorizedDir,
+      name: `authorized-${user.username}`,
+      testDir: userDir,
       use: {
-        storageState: `storageState-user${index}.json`,
-        // Fix: Pass credentials to project config so global-setup can read them
+        storageState: `storageState-${user.username}.json`,
         username: user.username,
         password: user.password,
         userIndex: index,
@@ -71,7 +71,10 @@ module.exports = defineConfig({
     : undefined,
 
   timeout: 30 * 1000,
-  expect: { timeout: 5000 },
+  expect: { 
+    timeout: 5000,
+    snapshotPathTemplate: 'test-results/{projectName}/{testFileDir}/{testFileName}-snapshots/{arg}{ext}',
+  },
   retries: 0,
   workers: 4,
 

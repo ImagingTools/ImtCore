@@ -4,8 +4,8 @@ const { waitForPageStability, login } = require('./utils');
 /**
  * Global setup for Playwright tests with multi-user support
  * 
- * Creates separate storageState files for each user defined in the config.
- * Each authorized project (authorized-user0, authorized-user1, etc.) gets its own auth state.
+ * Creates separate storageState files for each user defined in TEST_USERS.
+ * Single authorized project is used.
  * 
  * DEFAULT CONFIGURATION:
  * Uses standard ImtCore authorization page structure:
@@ -19,6 +19,19 @@ const { waitForPageStability, login } = require('./utils');
  * 
  * Or copy this file to your application and modify the loginPaths object directly.
  */
+function parseTestUsers() {
+  const testUsers = process.env.TEST_USERS || '';
+  if (!testUsers) return [];
+
+  return testUsers.split(',').map(userPass => {
+    const [username, password] = userPass.trim().split(':');
+    if (!username || !password) {
+      throw new Error(`Invalid TEST_USERS format: "${userPass}". Expected "username:password"`);
+    }
+    return { username, password };
+  });
+}
+
 module.exports = async (config) => {
   // Get global settings
   const globalUse = config?.use || {};
@@ -43,13 +56,10 @@ module.exports = async (config) => {
     }
   }
 
-  // Find all authorized projects (skip guest project)
-  const authorizedProjects = config?.projects?.filter(p => 
-    p.name.startsWith('authorized-user')
-  ) || [];
+  const users = parseTestUsers();
 
-  if (authorizedProjects.length === 0) {
-    console.log('No authorized projects found. Skipping global setup.');
+  if (users.length === 0) {
+    console.log('No users found in TEST_USERS. Skipping global setup.');
     return;
   }
 
@@ -65,7 +75,7 @@ module.exports = async (config) => {
   }
 
   console.log('\n' + '='.repeat(70));
-  console.log(`🔐 Setting up authentication for ${authorizedProjects.length} user(s)`);
+  console.log(`🔐 Setting up authentication for ${users.length} user(s)`);
   console.log('='.repeat(70));
   console.log(`Base URL: ${baseURL}`);
   console.log(`Login paths configuration:`);
@@ -77,16 +87,10 @@ module.exports = async (config) => {
   const browser = await chromium.launch();
 
   try {
-    // Create storageState for each user
-    for (const project of authorizedProjects) {
-      const { username, password, storageState, userIndex } = project.use;
+    for (const [index, user] of users.entries()) {
+      const { username, password } = user;
 
-      if (!username || !password) {
-        console.warn(`Skipping ${project.name}: missing username or password`);
-        continue;
-      }
-
-      console.log(`Authenticating user${userIndex}: ${username}...`);
+      console.log(`Authenticating user${index}: ${username}...`);
 
       const context = await browser.newContext({ viewport });
       const page = await context.newPage();
@@ -103,6 +107,7 @@ module.exports = async (config) => {
 
         await waitForPageStability(page);
 
+        const storageState = `storageState-${username}.json`;
         await context.storageState({ path: `./${storageState}` });
 
         console.log(`✓ Created ${storageState} for ${username}`);
@@ -112,6 +117,7 @@ module.exports = async (config) => {
         console.error(`  And that the authorization page structure matches the loginPaths configuration.`);
         
         // Create empty storageState file so tests can run (as guest)
+        const storageState = `storageState-${username}.json`;
         await context.storageState({ path: `./${storageState}` });
         console.log(`  Created empty ${storageState} (tests will run as guest)`);
       }
