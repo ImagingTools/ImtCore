@@ -1276,7 +1276,18 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 
 	imtsdl::SdlTypeList typeList = m_sdlTypeListCompPtr->GetSdlTypes(false);
 	imtsdl::SdlUnionList unionList = m_sdlUnionListCompPtr->GetUnions(false);
-	auto referenceType = CSdlGenTools::GetCollectionReferenceForDocument(sdlDocumentType, typeList, unionList, operationType);
+	std::shared_ptr<imtsdl::CSdlEntryBase> referenceType;
+	if (sdlDocumentType.HasRequest(operationType)){
+		referenceType = CSdlGenTools::GetCollectionReferenceForDocument(sdlDocumentType, typeList, unionList, operationType);
+	}
+	else {
+		for (const auto& subType: sdlDocumentType.GetSubtypes()){
+			if (subType.HasRequest(operationType)){
+				referenceType = CSdlGenTools::GetCollectionReferenceForDocument(subType, typeList, unionList, operationType);
+				break;
+			}
+		}
+	}
 	if (!referenceType){
 		SendErrorMessage(0, QString("Unable to get collection reference for document %1").arg(sdlDocumentType.GetName()));
 
