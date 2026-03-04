@@ -3,7 +3,7 @@
 
 
 // ACF includes
-#include <istd/IChangeable.h>
+#include <iser/ISerializable.h>
 
 // ImtCore includes
 #include <imtauth/IPersonalAccessToken.h>
@@ -25,7 +25,7 @@ namespace imtauth
 
 	\ingroup Authorization
 */
-class IPersonalAccessTokenManager: virtual public istd::IChangeable
+class IPersonalAccessTokenManager: virtual public iser::ISerializable
 {
 public:
 	/**

@@ -89,7 +89,7 @@ typedef imtauthgql::CClientRequestRoleInfoProviderComp ClientRequestRoleInfoProv
 typedef imtauthgql::CClientRequestGroupInfoProviderComp ClientRequestGroupInfoProvider;
 typedef imtauthgql::CTokenBasedPermissionsProviderComp ClientRequestTokenBasedPermissionsProvider;
 typedef imtauthgql::CPersonalAccessTokenControllerComp PersonalAccessTokenController;
-typedef imtauthgql::CClientRequestPersonalAccessTokenManagerComp ClientRequestPersonalAccessTokenManager;
+typedef icomp::TModelCompWrap<imtauthgql::CClientRequestPersonalAccessTokenManagerComp> ClientRequestPersonalAccessTokenManager;
 
 
 } // namespace ImtAuthGqlPck

@@ -283,6 +283,14 @@ bool CPersonalAccessTokenManagerComp::DeleteToken(const QByteArray& tokenId)
 }
 
 
+// reimplemented (iser::ISerializable)
+
+bool CPersonalAccessTokenManagerComp::Serialize(iser::IArchive& /*archive*/)
+{
+	return true;
+}
+
+
 // private methods
 
 QByteArray CPersonalAccessTokenManagerComp::GenerateRandomToken() const

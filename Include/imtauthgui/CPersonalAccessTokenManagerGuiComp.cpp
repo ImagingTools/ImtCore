@@ -57,7 +57,11 @@ void CPersonalAccessTokenManagerGuiComp::UpdateModel() const
 void CPersonalAccessTokenManagerGuiComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
-	
+
+	if (!m_loginInfoProviderCompPtr.IsValid()){
+		Q_ASSERT(false);
+	}
+
 	// Connect signals
 	connect(TokenListWidget, &QListWidget::itemSelectionChanged, 
 			this, &CPersonalAccessTokenManagerGuiComp::OnTokenSelectionChanged);
@@ -73,9 +77,8 @@ void CPersonalAccessTokenManagerGuiComp::OnGuiCreated()
 	// Initialize button states
 	RevokeTokenButton->setEnabled(false);
 	DeleteTokenButton->setEnabled(false);
-	
-	// Load user ID from attribute or login component
-	m_currentUserId = m_loginCompPtr->GetLoggedUserId();
+
+	m_currentUserId = m_loginInfoProviderCompPtr->GetLoggedUserId();
 }
 
 
@@ -107,9 +110,13 @@ void CPersonalAccessTokenManagerGuiComp::RefreshTokenList()
 	if (managerPtr == nullptr) {
 		return;
 	}
+
+	if (!m_loginInfoProviderCompPtr.IsValid()){
+		Q_ASSERT(false);
+	}
 	
 	// Update user ID from attribute or login component
-	m_currentUserId = m_loginCompPtr->GetLoggedUserId();
+	m_currentUserId = m_loginInfoProviderCompPtr->GetLoggedUserId();
 
 	if (m_currentUserId.isEmpty()) {
 		TokenListWidget->clear();
@@ -117,7 +124,7 @@ void CPersonalAccessTokenManagerGuiComp::RefreshTokenList()
 		UserIdLabel->setText("User: <not logged in>");
 		return;
 	}
-	
+
 	// Get list of token IDs for the user
 	QByteArrayList tokenIds = managerPtr->GetTokenIds(m_currentUserId);
 	

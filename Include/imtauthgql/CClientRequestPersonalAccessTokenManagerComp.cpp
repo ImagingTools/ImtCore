@@ -286,5 +286,13 @@ bool CClientRequestPersonalAccessTokenManagerComp::DeleteToken(const QByteArray&
 }
 
 
+// reimplemented (iser::ISerializable)
+
+bool CClientRequestPersonalAccessTokenManagerComp::Serialize(iser::IArchive& /*archive*/)
+{
+	return true;
+}
+
+
 } // namespace imtauthgql
 

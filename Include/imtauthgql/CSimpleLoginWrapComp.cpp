@@ -6,6 +6,7 @@
 #include <iser/CJsonMemReadArchive.h>
 
 // ImtCore includes
+#include <imtbase/CCollectionInfo.h>
 #include <imtgql/CGqlRequest.h>
 #include <imtgql/CGqlContext.h>
 #include <imtqml/CGqlModel.h>
@@ -30,8 +31,8 @@ CSimpleLoginWrapComp::CSimpleLoginWrapComp()
 
 iauth::CUser* CSimpleLoginWrapComp::GetLoggedUser() const
 {
-	if (!m_loggedUserId.isEmpty() && m_userInfoPtr.IsValid()){
-		m_loggedUser.SetUserName(m_loggedUserId);
+	if (!m_loggedUserName.isEmpty() && m_userInfoPtr.IsValid()){
+		m_loggedUser.SetUserName(m_loggedUserName);
 		m_loggedUser.SetPassword(m_loggedUserPassword);
 
 		return &m_loggedUser;
@@ -77,12 +78,8 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 
 		m_loggedUserPassword = password.toUtf8();
 
-		QByteArray userId;
 		if (response.Version_1_0->userId){
-			userId = *response.Version_1_0->userId;
-		}
-		if (userId.isEmpty()){
-			return false;
+			m_loggedUserId = *response.Version_1_0->userId;
 		}
 
 		m_userInfoPtr.FromUnique(m_userInfoFactCompPtr.CreateInstance());
@@ -121,7 +118,7 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 			istd::CChangeNotifier notifier(this);
 			Q_UNUSED(notifier);
 
-			m_loggedUserId = *response.Version_1_0->username;
+			m_loggedUserName = *response.Version_1_0->username;
 		}
 
 		return true;
@@ -133,11 +130,11 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 
 bool CSimpleLoginWrapComp::Logout()
 {
-	if (!m_loggedUserId.isEmpty()){
+	if (!m_loggedUserName.isEmpty()){
 		istd::CChangeNotifier notifier(this);
 		Q_UNUSED(notifier);
 
-		m_loggedUserId.clear();
+		m_loggedUserName.clear();
 		m_loggedUserToken.clear();
 		m_loggedUserPassword.clear();
 		m_loggedUserRefreshToken.clear();
@@ -201,17 +198,17 @@ bool CSimpleLoginWrapComp::LoginWithRefreshToken(const QString& userName, const 
 		QByteArray userId;
 		if (response.Version_1_0->userSession->userId.has_value()){
 			userId = *response.Version_1_0->userSession->userId;
-			m_loggedUserId = userId;
+			m_loggedUserName = userId;
 		}
 		else{
 			// Fallback to username if userId not in response.
 			// This can occur when refreshing an older session token that
 			// was created before userId was added to the response.
 			// In such cases, the username parameter provides the login identifier.
-			m_loggedUserId = userName.toUtf8();
+			m_loggedUserName = userName.toUtf8();
 		}
 
-		m_userInfoPtr->SetId(m_loggedUserId);
+		m_userInfoPtr->SetId(m_loggedUserName);
 
 		if (response.Version_1_0->userSession->accessToken.has_value()){
 			m_loggedUserToken = *response.Version_1_0->userSession->accessToken;
@@ -296,6 +293,28 @@ void CSimpleLoginWrapComp::SetPermissions(const QByteArray& /*userId*/, const QB
 
 		m_userPermissionIds = permissions;
 	}
+}
+
+
+// reimplemented (imtauth::ILoginInfoProvider)
+
+QByteArray CSimpleLoginWrapComp::GetLoggedUserId() const
+{
+	return m_loggedUserId;
+}
+
+
+imtauth::IUserInfoUniquePtr CSimpleLoginWrapComp::GetLoggedUserInfo() const
+{
+	if (!m_userInfoPtr.IsValid()){
+		return nullptr;
+	}
+
+	imtauth::IUserInfoUniquePtr retVal;
+
+	retVal.MoveCastedPtr(m_userInfoPtr->CloneMe());
+
+	return retVal;
 }
 
 
