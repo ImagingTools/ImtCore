@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauth/CPersonalAccessTokenMetaInfoCreatorComp.h>
 
 
@@ -22,7 +23,7 @@ bool CPersonalAccessTokenMetaInfoCreatorComp::CreateMetaInfo(
 			const QByteArray& typeId,
 			idoc::MetaInfoPtr& metaInfoPtr) const
 {
-	if (typeId != *m_objectTypeIdAttrPtr){
+	if (m_objectTypeIdsAttrPtr.FindValue(typeId) < 0){
 		return false;
 	}
 

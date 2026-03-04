@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -84,6 +85,11 @@ private:
 	void UpdateLoginButtonsState();
 	void CheckMatchingPassword();
 	void ShowLoadingPage();
+	
+	// Helper methods for refresh token management
+	bool TryRestoreSessionWithRefreshToken(const QString& userName, const QByteArray& refreshToken);
+	void SaveRefreshTokenIfRememberMe(QSettings& settings) const;
+	void ClearRefreshTokenIfNeeded(QSettings& settings) const;
 
 private:
 	class LoginLog: public ilog::IMessageConsumer

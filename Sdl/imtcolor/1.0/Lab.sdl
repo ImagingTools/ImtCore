@@ -4,9 +4,9 @@ schema {
 }
 
 type Lab {
-	L: Double!
-	a: Double!
-	b: Double!
+	L: Float!
+	a: Float!
+	b: Float!
 }
 
 enum ObserverType {
@@ -30,21 +30,21 @@ type LabColor {
 }
 
 # type Rgb {
-# 	red: Double!
-# 	green: Double!
-# 	blue: Double!
+# 	red: Float!
+# 	green: Float!
+# 	blue: Float!
 # }
 
 # type Hsv {
-# 	hue: Double!
-# 	saturation: Double!
-# 	value: Double!
+# 	hue: Float!
+# 	saturation: Float!
+# 	value: Float!
 # }
 
 # type Cmyk {
-# 	cyan: Double!
-# 	magenta: Double!
-# 	yellow: Double!
-# 	black: Double!
+# 	cyan: Float!
+# 	magenta: Float!
+# 	yellow: Float!
+# 	black: Float!
 # }
 

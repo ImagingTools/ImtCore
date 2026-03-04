@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtgeo/CAddressElementDatabaseDelegateComp.h>
 
 
@@ -267,7 +268,7 @@ QByteArray CAddressElementDatabaseDelegateComp::GetSelectionQuery(const QByteArr
 
 		iprm::TParamsPtr<imtbase::ICollectionFilter> collectionFilterParamPtr(paramsPtr, "Filter");
 		if (collectionFilterParamPtr.IsValid()){
-			textFilter = collectionFilterParamPtr->GetTextFilter();
+			//textFilter = collectionFilterParamPtr->GetTextFilter();
 			if (!CreateSortQuery(*collectionFilterParamPtr, sortQuery)){
 				return QByteArray();
 			}

@@ -18,7 +18,7 @@ import json
 
 
 class ImtCoreConan(ConanFile):
-    name = "ImtCore"
+    name = "imtcore"
     settings = "os", "compiler", "build_type", "arch"
     options = {
         "qt_package": ["system", "conan"],
@@ -39,13 +39,11 @@ class ImtCoreConan(ConanFile):
     }
 
     description = "ImagingTools Core Framework"
-    url = "http://b035a0a.online-server.cloud/svn/ImtReleases/ImtCore"
-    license = "LGPL"
+    url = "https://github.com/ImagingTools/ImtCore"
+    license = "LicenseRef-ACF-Commercial", "LGPL-2.1-or-later"
     author = "ImagingTools"
-    topics = None
-    short_paths = True
+    topics = ("qt", "component-framework")
     exports_sources = ["patches/*"]
-    no_copy_source = False
     generators = "CMakeDeps"
     python_requires = "conantools/0.2.0@gmg/stable"
 
@@ -84,7 +82,9 @@ class ImtCoreConan(ConanFile):
 
         self.requires("quazip/[~1]@gmg/stable")
         self.requires("openssl/[~1.1]")
-        self.requires("AcfPublic/[~1]@gmg/stable")
+        self.requires("acf/[~1]@gmg/stable")
+        self.requires("acfsln/[~1]@gmg/stable")
+        self.requires("iacf/[~1]@gmg/stable")
         self.requires("zlib/1.2.11-r1@gmg/stable", override=True)
 
     def build_requirements(self):
@@ -193,7 +193,7 @@ class ImtCoreConan(ConanFile):
             var: val for var, val in env.items()
             if var.startswith('ACF') or var.startswith('IACF') or var.startswith('IMTCORE')})
 
-        # AcfPublic shall be both build_requires() and requires() dependency because of the Arxc compiler tool
+        # Acf shall be both build_requires() and requires() dependency because of the Arxc compiler tool
         # However, we want to make things simple and use only requires()
         if not can_run(self):
             self.output.error("Cross compiling may not be able to run Arxc")
@@ -209,8 +209,9 @@ class ImtCoreConan(ConanFile):
         cmake.build()
 
     def package_id(self):
-        # AcfPublic may break binary compatibility with any change in the version
-        self.info.requires['AcfPublic'].full_version_mode()
+        # Acf may break binary compatibility with any change in the version
+        self.info.requires['acf'].full_version_mode()
+        self.info.requires['acfsln'].full_version_mode()
         # qt may break binary compatibility with any change in the version
         # because of patches or repackaging
         self.info.requires['qt'].full_version_mode()
@@ -339,10 +340,13 @@ class ImtCoreConan(ConanFile):
         self.cpp_info.build_modules["cmake_find_package"] = cmakeModules
         self.cpp_info.build_modules["cmake_find_package_multi"] = cmakeModules
 
-        self.cpp_info.requires = ['quazip::quazip', 'openssl::openssl', 'AcfPublic::AcfPublic']
+        self.cpp_info.requires = ['quazip::quazip', 'openssl::openssl', 'acf::acf', 'acfsln::acfsln', 'iacf::iacf']
 
         qt_components = self.dependencies["qt"].cpp_info.components.keys()
         self.output.info(f"Qt components: {qt_components}")
         if len(qt_components) > 0:
             # some imt components require more qt libraries, but for conan generated cmake configs keep it minimal
             self.cpp_info.requires += ['qt::qtCore']
+
+        self.cpp_info.set_property("cmake_file_name", "ImtCore")
+        self.cpp_info.set_property("cmake_target_name", "ImtCore::ImtCore")

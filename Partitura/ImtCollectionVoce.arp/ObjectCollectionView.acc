@@ -73,7 +73,7 @@
                     <AttributeInfo Id="ImportSupported" Type="Boolean" ExportId="ImportSupported">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ObjectTypeId" Type="Id" ExportId="ObjectTypeId">
+                    <AttributeInfo Id="ObjectTypeIds" Type="Id[]" ExportId="ObjectTypeId">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="StatusIcons" Type="Reference" ExportId="StatusIcons">

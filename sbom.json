@@ -1,0 +1,190 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:7f8a9b2c-4d6e-4a5f-9c3d-1e2a3b4c5d6e",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-02-10T10:00:00Z",
+    "tools": [
+      {
+        "vendor": "ImagingTools GmbH",
+        "name": "ImtCore SBOM Generator",
+        "version": "1.0.0"
+      }
+    ],
+    "component": {
+      "type": "library",
+      "bom-ref": "pkg:github/ImagingTools/ImtCore",
+      "name": "ImtCore",
+      "description": "ImagingTools Core Library - A comprehensive framework for building imaging and document processing applications",
+      "version": "1.0.0-dev",
+      "licenses": [
+        {
+          "license": {
+            "id": "LGPL-2.1-or-later",
+            "name": "GNU Lesser General Public License v2.1 or later",
+            "url": "https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html"
+          }
+        },
+        {
+          "expression": "LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR Commercial"
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://imagingtools.github.io/ImtCore/"
+        },
+        {
+          "type": "vcs",
+          "url": "https://github.com/ImagingTools/ImtCore"
+        },
+        {
+          "type": "documentation",
+          "url": "https://imagingtools.github.io/ImtCore/"
+        },
+        {
+          "type": "issue-tracker",
+          "url": "https://github.com/ImagingTools/ImtCore/issues"
+        }
+      ]
+    }
+  },
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "pkg:github/ImagingTools/Acf",
+      "name": "ACF",
+      "version": "1.0.0",
+      "description": "Application Component Framework",
+      "licenses": [
+        {
+          "license": {
+            "id": "LGPL-2.1-or-later",
+            "name": "GNU Lesser General Public License v2.1 or later"
+          }
+        },
+        {
+          "expression": "LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR Commercial"
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://imagingtools.github.io/Acf/"
+        },
+        {
+          "type": "vcs",
+          "url": "https://github.com/ImagingTools/Acf"
+        }
+      ],
+      "properties": [
+        {
+          "name": "category",
+          "value": "runtime-dependency"
+        },
+        {
+          "name": "criticality",
+          "value": "required"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:generic/qt@6.8",
+      "name": "Qt",
+      "version": "6.8",
+      "description": "Cross-platform application framework",
+      "licenses": [
+        {
+          "license": {
+            "id": "LGPL-3.0-only",
+            "name": "GNU Lesser General Public License v3.0 only"
+          }
+        },
+        {
+          "expression": "LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only OR Commercial"
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://www.qt.io/"
+        },
+        {
+          "type": "documentation",
+          "url": "https://doc.qt.io/"
+        }
+      ],
+      "properties": [
+        {
+          "name": "category",
+          "value": "runtime-dependency"
+        },
+        {
+          "name": "criticality",
+          "value": "required"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:generic/stdcpp",
+      "name": "Standard C++ Library",
+      "description": "C++ Standard Library implementation",
+      "licenses": [
+        {
+          "license": {
+            "name": "Implementation-dependent",
+            "text": {
+              "content": "License depends on the C++ standard library implementation used (e.g., libstdc++, libc++)"
+            }
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "category",
+          "value": "runtime-dependency"
+        },
+        {
+          "name": "criticality",
+          "value": "required"
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "pkg:github/ImagingTools/ImtCore",
+      "dependsOn": [
+        "pkg:github/ImagingTools/Acf",
+        "pkg:generic/qt@6.8",
+        "pkg:generic/stdcpp"
+      ]
+    },
+    {
+      "ref": "pkg:github/ImagingTools/Acf",
+      "dependsOn": [
+        "pkg:generic/qt@6.8",
+        "pkg:generic/stdcpp"
+      ]
+    },
+    {
+      "ref": "pkg:generic/qt@6.8",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:generic/stdcpp",
+      "dependsOn": []
+    }
+  ],
+  "compositions": [
+    {
+      "aggregate": "complete",
+      "assemblies": [
+        "pkg:github/ImagingTools/ImtCore"
+      ]
+    }
+  ]
+}

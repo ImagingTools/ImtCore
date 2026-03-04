@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtbase/CDelegatedParamsSetComp.h>
 
 
@@ -39,15 +40,25 @@ iser::ISerializable* CDelegatedParamsSetComp::GetEditableParameter(const QByteAr
 }
 
 
+const iprm::IParamsInfoProvider* CDelegatedParamsSetComp::GetParamsInfoProvider() const
+{
+	if (m_paramsSetCompPtr.IsValid()){
+		return m_paramsSetCompPtr->GetParamsInfoProvider();
+	}
+
+	return nullptr;
+}
+
+
 // reimplemented (iser::ISerializable)
 
 bool CDelegatedParamsSetComp::Serialize(iser::IArchive& archive)
 {
 	if (m_paramsSetCompPtr.IsValid()){
-		return false;
+		return m_paramsSetCompPtr->Serialize(archive);
 	}
 
-	return m_paramsSetCompPtr->Serialize(archive);
+	return true;
 }
 
 

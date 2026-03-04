@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -44,6 +45,12 @@ public:
 	virtual void SetInUse(bool inUse) override;
 	virtual bool IsInternalUse() const override;
 	virtual void SetInternalUse(bool internalUse) override;
+	virtual bool IsMultiProduct() const override;
+	virtual void SetMultiProduct(bool isMulti) override;
+	virtual int GetProductCount() const override;
+	virtual void SetProductCount(int count) override;
+	virtual QByteArray GetParentInstanceId() const override;
+	virtual void SetParentInstanceId(const QByteArray& parentInstanceId) override;
 
 	// reimplemented (imtlic::ILicenseInfoProvider)
 	virtual const imtbase::ICollectionInfo& GetLicenseInstances() const override;
@@ -76,6 +83,9 @@ private:
 	bool m_internalUse;
 	LicenseInstances m_licenses;
 	imtbase::CCollectionInfo m_licenseContainerInfo;
+	bool m_isMultiProduct;
+	int m_productCount;
+	QByteArray m_parentInstanceId;
 };
 
 
@@ -83,5 +93,3 @@ typedef imtbase::TIdentifiableWrap<CProductInstanceInfo> CIdentifiableSoftwareIn
 
 
 } // namespace imtlic
-
-

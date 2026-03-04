@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtrest/CWebSocketServerComp.h>
 
 
@@ -381,7 +382,7 @@ void CWebSocketServerComp::OnTimeout()
 					webSocketPtr->sendTextMessage(QString(R"({"type": "ping"})"));
 				}
 				else{
-					webSocketPtr->sendTextMessage(QString(R"({"type": "keep_alive"})"));
+					webSocketPtr->sendTextMessage(QString(R"({"type": "ka"})"));
 				}
 
 				sendedSockets.append(webSocketPtr);

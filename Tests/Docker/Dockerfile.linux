@@ -1,0 +1,150 @@
+# Dockerfile for ImtCore test environment (Linux)
+# This container provides the base infrastructure for running tests.
+# Application-specific files (GUI tests, API tests, resources, startup scripts)
+# should be mounted via volume mounts when running the container.
+
+FROM debian:bookworm
+
+# Install base dependencies and tools
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+      wget \
+      ca-certificates \
+      curl \
+      gnupg \
+      lsb-release \
+      xdg-utils \
+      nodejs \
+      npm \
+      libegl1 \
+      libegl-mesa0 \
+      libgl1 \
+      libgl1-mesa-glx \
+      libgl1-mesa-dri \
+      libgles2 \
+      libglvnd0 \
+      libglx0 \
+      libglx-mesa0 \
+      libopengl0 \
+      mesa-utils \
+      mesa-vulkan-drivers \
+      fonts-liberation \
+      libappindicator3-1 \
+      libasound2 \
+      libatk-bridge2.0-0 \
+      libatk1.0-0 \
+      libc6 \
+      libcairo2 \
+      libcups2 \
+      libdbus-1-3 \
+      libdrm2 \
+      libexpat1 \
+      libfontconfig1 \
+      libgbm1 \
+      libgcc1 \
+      libglib2.0-0 \
+      libgtk-3-0 \
+      libnspr4 \
+      libnss3 \
+      libpango-1.0-0 \
+      libpangocairo-1.0-0 \
+      libstdc++6 \
+      libx11-6 \
+      libx11-xcb1 \
+      libxcb1 \
+      libxcb-dri3-0 \
+      libxcb-glx0 \
+      libxcb-present0 \
+      libxcb-randr0 \
+      libxcb-render0 \
+      libxcb-shape0 \
+      libxcb-shm0 \
+      libxcb-sync1 \
+      libxcb-xfixes0 \
+      libxcomposite1 \
+      libxcursor1 \
+      libxdamage1 \
+      libxext6 \
+      libxfixes3 \
+      libxi6 \
+      libxinerama1 \
+      libxkbcommon0 \
+      libxkbcommon-x11-0 \
+      libxrandr2 \
+      libxrender1 \
+      libxshmfence1 \
+      libxss1 \
+      libxtst6 \
+      libxxf86vm1 \
+      xvfb \
+    ; \
+    rm -rf /var/lib/apt/lists/*
+
+# Add PostgreSQL PGDG repo and install PostgreSQL 16 (server + client)
+RUN set -eux; \
+    install -d -m 0755 /etc/apt/keyrings; \
+    curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+      | gpg --dearmor -o /etc/apt/keyrings/postgresql.gpg; \
+    echo "deb [signed-by=/etc/apt/keyrings/postgresql.gpg] http://apt.postgresql.org/pub/repos/apt bookworm-pgdg main" \
+      > /etc/apt/sources.list.d/pgdg.list; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+      postgresql-16 \
+      postgresql-client-16 \
+      libpq5 \
+    ; \
+    rm -rf /var/lib/apt/lists/*
+
+# --- Configure PostgreSQL: user postgres password = root ---
+RUN set -eux; \
+    PG_VER=16; \
+    \
+    # Ensure password encryption is predictable (scram)
+    sed -i "s/^[#[:space:]]*password_encryption.*/password_encryption = scram-sha-256/" "/etc/postgresql/${PG_VER}/main/postgresql.conf" || true; \
+    \
+    # Ensure TCP auth on localhost requires a password
+    { \
+      echo "host all all 127.0.0.1/32 scram-sha-256"; \
+      echo "host all all ::1/128 scram-sha-256"; \
+    } >> "/etc/postgresql/${PG_VER}/main/pg_hba.conf"; \
+    \
+    # Start cluster, set password for postgres, stop cluster
+    pg_ctlcluster "${PG_VER}" main start; \
+    su - postgres -c "psql -v ON_ERROR_STOP=1 -d postgres -c \"ALTER USER postgres PASSWORD 'root';\""; \
+    pg_ctlcluster "${PG_VER}" main stop
+
+# Copy Verdana fonts (used by Playwright tests)
+COPY Tests/Fonts/verdana /usr/share/fonts/truetype/verdana
+
+# Rebuild font cache
+RUN fc-cache -f -v
+
+WORKDIR /app/tests
+
+RUN set -eux; \
+    mkdir -p /modules; \
+    cd /modules; \
+    npm init -y; \
+    npm install \
+      @playwright/test \
+      newman \
+      newman-reporter-htmlextra \
+    ; \
+    /modules/node_modules/.bin/playwright install chromium --with-deps; \
+    /modules/node_modules/.bin/newman --version; \
+    /modules/node_modules/.bin/playwright --version; \
+    echo 'export PATH="/modules/node_modules/.bin:$PATH"' >> /etc/profile
+
+ENV PATH="/modules/node_modules/.bin:$PATH"
+
+RUN mkdir -p \
+    /app/tests \
+    /app/tests/GUI \
+    /app/tests/API \
+    /app/tests/test-results \
+    /app/startup \
+    /app/resources
+
+ENTRYPOINT ["/bin/sh"]
+CMD ["-lc", "sleep infinity"]

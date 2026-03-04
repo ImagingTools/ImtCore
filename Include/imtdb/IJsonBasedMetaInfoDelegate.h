@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -66,15 +67,16 @@ namespace imtdb
  * metaInfo->SetValue("priority", "high");
  * metaInfo->SetValue("category", "bug-fix");
  * 
+ * QByteArray typeId = "MyDocumentType";
  * QByteArray json;
- * if (delegate->ToJsonRepresentation(*metaInfo, json)) {
+ * if (delegate->ToJsonRepresentation(*metaInfo, json, typeId)) {
  *     // Store json in database JSONB column
  * }
  * 
  * // Deserialize metadata from database
  * QByteArray storedJson = ...; // from database
  * auto loadedMetaInfo = acf::CreateComponent<CDocumentMetaInfoComp>();
- * if (delegate->FromJsonRepresentation(storedJson, *loadedMetaInfo)) {
+ * if (delegate->FromJsonRepresentation(storedJson, *loadedMetaInfo, typeId)) {
  *     QString priority = loadedMetaInfo->GetValue("priority").toString();
  * }
  * @endcode
@@ -96,10 +98,12 @@ public:
 	 * 
 	 * @param metaInfo The metadata object to serialize
 	 * @param[out] json Receives the JSON representation (UTF-8 encoded)
+	 * @param typeId The type identifier of the document being serialized
 	 * @return true if serialization succeeded, false on error
 	 * 
 	 * @note The JSON is compact (no formatting) for efficient storage
 	 * @note NULL or empty metadata may produce empty JSON object "{}"
+	 * @note The typeId parameter allows type-specific serialization logic
 	 * 
 	 * Example:
 	 * @code{.cpp}
@@ -108,13 +112,14 @@ public:
 	 * metaInfo->SetValue("tags", QStringList{"important", "reviewed"});
 	 * 
 	 * QByteArray json;
-	 * delegate->ToJsonRepresentation(*metaInfo, json);
+	 * QByteArray typeId = "MyDocumentType";
+	 * delegate->ToJsonRepresentation(*metaInfo, json, typeId);
 	 * // json contains: {"status":"active","tags":["important","reviewed"]}
 	 * @endcode
 	 * 
 	 * @see FromJsonRepresentation()
 	 */
-	virtual bool ToJsonRepresentation(const idoc::IDocumentMetaInfo& metaInfo, QByteArray& json) const = 0;
+	virtual bool ToJsonRepresentation(const idoc::IDocumentMetaInfo& metaInfo, QByteArray& json, const QByteArray& typeId) const = 0;
 
 	/**
 	 * @brief Creates metadata from JSON representation
@@ -125,18 +130,21 @@ public:
 	 * 
 	 * @param json The JSON byte array to parse (UTF-8 encoded)
 	 * @param[out] metaInfo Receives the deserialized metadata
+	 * @param typeId The type identifier of the document being deserialized
 	 * @return true if parsing and population succeeded, false on error
 	 * 
 	 * @note Invalid JSON returns false and leaves metaInfo unchanged
 	 * @note Missing fields in JSON result in absent fields in metaInfo
 	 * @note Extra fields in JSON may be ignored or cause errors depending on implementation
+	 * @note The typeId parameter allows type-specific deserialization logic
 	 * 
 	 * Example:
 	 * @code{.cpp}
 	 * QByteArray json = R"({"status":"active","priority":10})";
 	 * auto metaInfo = acf::CreateComponent<CDocumentMetaInfoComp>();
+	 * QByteArray typeId = "MyDocumentType";
 	 * 
-	 * if (delegate->FromJsonRepresentation(json, *metaInfo)) {
+	 * if (delegate->FromJsonRepresentation(json, *metaInfo, typeId)) {
 	 *     QString status = metaInfo->GetValue("status").toString();     // "active"
 	 *     int priority = metaInfo->GetValue("priority").toInt();        // 10
 	 * }
@@ -144,7 +152,7 @@ public:
 	 * 
 	 * @see ToJsonRepresentation()
 	 */
-	virtual bool FromJsonRepresentation(const QByteArray& json, idoc::IDocumentMetaInfo& metaInfo) const = 0;
+	virtual bool FromJsonRepresentation(const QByteArray& json, idoc::IDocumentMetaInfo& metaInfo, const QByteArray& typeId) const = 0;
 };
 
 

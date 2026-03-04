@@ -148,7 +148,7 @@ Item {
                     height: buttonsBlock.height/2 + mainRec.border.width/2;
                     iconSource: spinBox.icon;
                     rotation: 180
-                    enabled: !spinBox.baseElement ? true : spinBox.baseElement.value < spinBox.baseElement.to
+                    enabled: !spinBox.editable ? false : !spinBox.baseElement ? true : spinBox.baseElement.value < spinBox.baseElement.to
                     onClicked: {
                         if (spinBox.baseElement){
                             spinBox.baseElement.increase();
@@ -163,7 +163,7 @@ Item {
                     height: buttonsBlock.height/2 + mainRec.border.width/2;
                     
                     iconSource: spinBox.icon;
-                    enabled: !spinBox.baseElement ? true : spinBox.baseElement.value > spinBox.baseElement.from
+                    enabled: !spinBox.editable ? false : !spinBox.baseElement ? true : spinBox.baseElement.value > spinBox.baseElement.from
                     
                     onClicked: {
                         if (spinBox.baseElement){
@@ -209,6 +209,9 @@ Item {
         
         onWheel: {
             if (!spinBox.baseElement){
+                return
+            }
+            if(!spinBox.editable){
                 return
             }
             if(wheel.angleDelta.y > 0){

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -39,6 +40,9 @@ public:
 	virtual bool RevokeToken(const QByteArray& tokenId) override;
 	virtual bool UpdateLastUsedAt(const QByteArray& tokenId) override;
 	virtual bool DeleteToken(const QByteArray& tokenId) override;
+
+	// reimplemented (iser::ISerializable)
+	virtual bool Serialize(iser::IArchive& archive) override;
 
 private:
 	QByteArray GenerateRandomToken() const;

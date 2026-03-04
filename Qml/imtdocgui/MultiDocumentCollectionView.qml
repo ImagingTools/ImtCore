@@ -24,6 +24,12 @@ Item {
 		}
 	}
 
+	onDocumentManagerChanged: {
+		if (documentManager){
+			documentManager.setDocumentManagerActiveView(workspaceView)
+		}
+	}
+
 	NavigableItem {
 		id: firstTabNavigation
 		forwardRest: false
@@ -182,7 +188,8 @@ Item {
 			if (typeOperation === EDocumentOperationEnum.s_documentClosed){
 				tabView.removeTab(documentId)
 			}
-			else if (typeOperation === EDocumentOperationEnum.s_documentOpened || typeOperation === EDocumentOperationEnum.s_documentSaved){
+			else if (typeOperation === EDocumentOperationEnum.s_documentOpened ||
+					typeOperation === EDocumentOperationEnum.s_documentSaved){
 				workspaceView.documentManager.setDocumentName(documentId, documentName)
 			}
 		}
@@ -253,7 +260,7 @@ Item {
 			tabView.addTab(documentId, "", stackViewComp, "", "", false)
 
 			tabView.currentIndex = tabView.tabModel.count - 1
-
+			workspaceView.updateTabName(documentId)
 			workspaceView.stopLoading(documentId)
 		}
 
@@ -386,12 +393,14 @@ Item {
 			property string documentTypeId
 
 			property var itemViewTypes: ({}) // ViewTypeId -> Item
+			property var viewTypeIds: []
 
 			function initialize(id, typeId){
 				documentId = id
 				documentTypeId = typeId
-				
-				let viewTypeIds = workspaceView.documentManager.getSupportedDocumentViewTypeIds(documentTypeId)
+
+				viewTypeIds = workspaceView.documentManager.getSupportedDocumentViewTypeIds(documentTypeId)
+
 				for (let i = 0; i < viewTypeIds.length; ++i){
 					let viewComp = workspaceView.documentManager.getDocumentEditorFactory(documentTypeId, viewTypeIds[i])
 					addPage(viewComp)
@@ -402,7 +411,7 @@ Item {
 
 			onPageAdded: {
 				let comp = getComponent(index)
-				let viewTypeId = workspaceView.documentManager.getViewTypeIdByViewFactory(documentTypeId, comp)
+				let viewTypeId = viewTypeIds[index]
 
 				itemViewTypes[viewTypeId] = item
 

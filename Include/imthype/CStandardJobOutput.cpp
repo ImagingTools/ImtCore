@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+
 #include <imthype/CStandardJobOutput.h>
 
 
@@ -280,9 +282,9 @@ bool CStandardJobOutput::Serialize(iser::IArchive& archive)
 
 	bool retVal = true;
 
-	static iser::CArchiveTag processingInfoTag("ProcessingInfo", "Processing informations");
+	static iser::CArchiveTag processingInfoTag("ProcessingInfo", "Processing informations", iser::CArchiveTag::TT_GROUP);
 	retVal = retVal && archive.BeginTag(processingInfoTag);
-	retVal = m_processingInfo.Serialize(archive);
+	retVal = retVal && m_processingInfo.Serialize(archive);
 	retVal = retVal && archive.EndTag(processingInfoTag);
 
 	static iser::CArchiveTag jobNameTag("JobName", "Job name", iser::CArchiveTag::TT_LEAF);
@@ -290,9 +292,9 @@ bool CStandardJobOutput::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_jobName);
 	retVal = retVal && archive.EndTag(jobNameTag);
 
-	static iser::CArchiveTag outputTag("Output", "Processing output");
+	static iser::CArchiveTag outputTag("Output", "Processing output", iser::CArchiveTag::TT_GROUP);
 	retVal = retVal && archive.BeginTag(outputTag);
-	retVal = m_results.Serialize(archive);
+	retVal = retVal && m_results.Serialize(archive);
 	retVal = retVal && archive.EndTag(outputTag);
 
 	static iser::CArchiveTag executionLogTag("ExecutionLog", "Job execution log", iser::CArchiveTag::TT_GROUP);

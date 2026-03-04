@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtrest/CWebSocketThread.h>
 
 
@@ -137,7 +138,7 @@ void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 		webSocketRequest->SetBody(textMessage.toUtf8());
 
 		imtrest::CWebSocketRequest::MethodType methodType = webSocketRequest->GetMethodType();
-		if (methodType == CWebSocketRequest::MT_START){
+		if (methodType == CWebSocketRequest::MT_START || methodType == CWebSocketRequest::MT_SUBSCRIBE){
 			newRequestPtr.PopPtr();
 			webSocketRequest->setParent(m_socket);
 			if (m_server != nullptr){
@@ -245,7 +246,7 @@ void CWebSocketThread::OnError(QAbstractSocket::SocketError /*error*/)
 void CWebSocketThread::OnTimeout()
 {
 	if (m_socket->isValid()){
-		m_socket->sendTextMessage(QString(R"({"type": "keep_alive"})"));
+		m_socket->sendTextMessage(QString(R"({"type": "ka"})"));
 	}
 }
 

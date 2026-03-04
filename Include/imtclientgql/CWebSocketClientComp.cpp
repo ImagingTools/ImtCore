@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtclientgql/CWebSocketClientComp.h>
 
 
@@ -104,7 +105,6 @@ bool CWebSocketClientComp::SendResponse(imtrest::ConstResponsePtr& response) con
 		imtrest::IResponse::Headers headers = response->GetHeaders();
 		data = QString(R"({"type": "query_data","id": "%1","payload": %2})")
 				   .arg(qPrintable(headers.value("id"))).arg(qPrintable(body)).toUtf8();
-		qDebug() << "SendResponse" << data;
 	}
 
 	EmitSendTextMessage(data);

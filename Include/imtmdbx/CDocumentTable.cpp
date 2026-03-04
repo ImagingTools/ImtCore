@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtmdbx/CDocumentTable.h>
 
 
@@ -492,7 +493,7 @@ bool CDocumentTable::MoveToValue(const QByteArray& value)
 					std::string valueRead;
 					if (result.done){
 						valueRead = result.value.as_string();
-						ok = valueRead.data() == value;
+						ok = valueRead == value.toStdString();
 						if(ok){
 							break;
 						}

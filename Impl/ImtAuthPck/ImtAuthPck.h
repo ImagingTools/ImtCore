@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -43,11 +44,12 @@
 #include <imtauth/CUserMetaInfoCreatorComp.h>
 #include <imtauth/CGroupMetaInfoCreatorComp.h>
 #include <imtauth/CUserConnectionInfo.h>
-#include <imtauth/CUserRecentAction.h>
 #include <imtauth/CUserActionMetaInfoCreatorComp.h>
 #include <imtauth/CUserActionManagerComp.h>
 #include <imtauth/CPersonalAccessToken.h>
 #include <imtauth/CPersonalAccessTokenManagerComp.h>
+#include <imtauth/CPersonalAccessTokenMetaInfoCreatorComp.h>
+#include <imtauth/CUserRecentActionComp.h>
 
 
 namespace ImtAuthPck
@@ -126,13 +128,6 @@ typedef icomp::TModelCompWrap<
 						imtauth::IUserConnectionInfo,
 						iser::ISerializable,
 						istd::IChangeable>> UserConnectionInfo;
-typedef icomp::TModelCompWrap<
-			icomp::TMakeComponentWrap<
-						imtauth::CIdentifiableUserRecentAction,
-						imtauth::IUserRecentAction,
-						iser::IObject,
-						iser::ISerializable,
-						istd::IChangeable>> UserRecentAction;
 typedef imtauth::CUserActionMetaInfoCreatorComp UserActionMetaInfoCreator;
 typedef imtauth::CUserActionManagerComp UserActionManager;
 typedef icomp::TModelCompWrap<
@@ -142,6 +137,8 @@ typedef icomp::TModelCompWrap<
 						iser::ISerializable,
 						istd::IChangeable>> PersonalAccessToken;
 typedef imtauth::CPersonalAccessTokenManagerComp PersonalAccessTokenManager;
+typedef imtauth::CPersonalAccessTokenMetaInfoCreatorComp PersonalAccessTokenMetaInfoCreator;
+typedef icomp::TModelCompWrap<imtauth::CUserRecentActionComp> UserRecentAction;
 
 
 } // namespace ImtAuthPck

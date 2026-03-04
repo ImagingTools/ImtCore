@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include "ImtAuthPck.h"
 
 
@@ -223,6 +224,11 @@ I_EXPORT_COMPONENT(
 			PersonalAccessTokenManager,
 			"Personal access token manager",
 			"Personal Access Token Manager");
+
+I_EXPORT_COMPONENT(
+			PersonalAccessTokenMetaInfoCreator,
+			"Personal access token meta info creator",
+			"Personal Access Token Meta Info Creator");
 
 
 } // namespace ImtAuthPck

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtwidgets/CMenuPanelDelegate.h>
 
 
@@ -16,17 +17,17 @@ namespace imtwidgets
 // public methods
 
 CMenuPanelDelegate::CMenuPanelDelegate(QTreeView* menuPanelPtr)
-	: QStyledItemDelegate(menuPanelPtr),
-	  m_indent(0),
-	  m_height(0),
-	  m_iconSizeRatio(1),
-	  m_iconSizeHoverRatio(1),
-	  m_iconHeight(0),
-	  m_iconHeightHover(0),
-	  m_topPadding(0),
-	  m_leftPadding(0),
-	  m_rightPadding(0),
-	  m_iconToTextPadding(0)
+	:QStyledItemDelegate(menuPanelPtr),
+	m_indent(0),
+	m_height(0),
+	m_iconSizeRatio(1),
+	m_iconSizeHoverRatio(1),
+	m_iconHeight(0),
+	m_iconHeightHover(0),
+	m_topPadding(0),
+	m_leftPadding(0),
+	m_rightPadding(0),
+	m_iconToTextPadding(0)
 {
 }
 

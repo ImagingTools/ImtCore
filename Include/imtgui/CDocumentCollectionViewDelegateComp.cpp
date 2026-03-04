@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtgui/CDocumentCollectionViewDelegateComp.h>
 
 
@@ -621,6 +622,7 @@ ifile::IFilePersistence::OperationState CDocumentCollectionViewDelegateComp::Obj
 				QByteArray typeId = objectInfoPtr->typeId;
 
 				QString objectName = QFileInfo(filePath).completeBaseName();
+				objectName = objectName.replace("'", "''");
 
 				// If the object-ID is empty, we have to insert a new instance to the collection:
 				if (objectInfoPtr->uuid.isEmpty()){

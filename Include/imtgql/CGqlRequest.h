@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -35,6 +36,9 @@ public:
 
 	const CGqlFieldObject* GetFieldObject(const QByteArray& fieldId) const;
 	const CGqlParamObject* GetParamObject(const QByteArray& paramId) const;
+	const CGqlParamObject& GetVariables() const;
+	const QString& GetOperationName() const;
+
 
 	void SetProtocolVersion(const QByteArray& protocolVersion);
 
@@ -65,8 +69,8 @@ protected:
 	virtual QByteArray AddObjectFieldPart(const CGqlFieldObject& gqlObject) const;
 	virtual QByteArray AddObjectParamPart(const CGqlParamObject& gqlObject) const;
 	virtual QByteArray AddObjectParamValue(const QVariant& value) const;
-	virtual void ParceObjectFieldPart(CGqlFieldObject& gqlObject, const QJsonObject& object) const;
-	virtual void ParceObjectParamPart(CGqlParamObject& gqlObject, const QJsonObject& object) const;
+	virtual void ParseObjectFieldPart(CGqlFieldObject& gqlObject, const QJsonObject& object) const;
+	virtual void ParseObjectParamPart(CGqlParamObject& gqlObject, const QJsonObject& object) const;
 
 private:
 	void SetParseObject(const QByteArray& commandId);
@@ -79,6 +83,8 @@ protected:
 	RequestType m_requestType;
 	CGqlParamObject m_params;
 	CGqlFieldObject m_fields;
+	CGqlParamObject m_variables;
+	QString m_operationName;
 
 	bool m_startKey;
 	bool m_startValue;

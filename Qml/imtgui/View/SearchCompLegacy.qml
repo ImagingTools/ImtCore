@@ -200,11 +200,12 @@ Rectangle{
 			searchTextField.currentText = tempStr;//modelll.getData(searchContainer.valueName, index_) + addStrNew;
 
 
-			var parentIds__ = modelll.getData("parentIds",index_) !== undefined ? modelll.getData("parentIds", index_) : "";
+			var parentIds__ = modelll.getData("parentIds",index_) !== undefined ? modelll.getData("parentIds", index_) : modelll.getData("ParentIds",index_) !== undefined ? modelll.getData("ParentIds",index_) :"";
+
 			if(parentIds__ !== ""){
 				parentIds__ = parentIds__ + ",";
 			}
-			var addressId__ = modelll.getData("id", index_);
+			var addressId__ = modelll.getData("id", index_) !== undefined ? modelll.getData("id", index_) : modelll.getData("Id", index_) !== undefined ? modelll.getData("Id", index_) : "";
 			searchContainer.parentIds = parentIds__ + addressId__;
 			searchContainer.selectedText = searchTextField.currentText;
 			setPropertiesModel(searchContainer.propertyId, searchContainer.parentIds);

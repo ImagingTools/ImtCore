@@ -21,6 +21,8 @@ bool CDigitalPrinterSpecification::V1_0::operator==(const V1_0& other) const
 
 bool CDigitalPrinterSpecification::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
+	model.SetData("__typename", "DigitalPrinterSpecification", modelIndex);
+
 
 	if (base){
 		::imtbase::CTreeItemModel* baseNewModelPtr = model.AddTreeModel("base", modelIndex);
@@ -148,6 +150,8 @@ bool CDigitalPrinterSpecification::V1_0::WriteToGraphQlObject(::imtgql::CGqlPara
 		gqlObject.InsertParam("printingTechnology", QVariant(printingTechnologyStringValue));
 	}
 
+	gqlObject.InsertParam("__typename", QVariant("DigitalPrinterSpecification"));
+
 	return true;
 }
 
@@ -242,6 +246,8 @@ bool CDigitalPrinterSpecification::V1_0::WriteToJsonObject(QJsonObject& jsonObje
 		}
 		jsonObject["printingTechnology"] = QJsonValue::fromVariant(printingTechnologyStringValue);
 	}
+
+	jsonObject["__typename"] = "DigitalPrinterSpecification";
 
 	return true;
 }
@@ -557,6 +563,8 @@ bool CDigitalPrinter::V1_0::operator==(const V1_0& other) const
 
 bool CDigitalPrinter::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
+	model.SetData("__typename", "DigitalPrinter", modelIndex);
+
 
 	if (base){
 		::imtbase::CTreeItemModel* baseNewModelPtr = model.AddTreeModel("base", modelIndex);
@@ -684,6 +692,8 @@ bool CDigitalPrinter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlO
 		gqlObject.InsertParam("printingTechnology", QVariant(printingTechnologyStringValue));
 	}
 
+	gqlObject.InsertParam("__typename", QVariant("DigitalPrinter"));
+
 	return true;
 }
 
@@ -778,6 +788,8 @@ bool CDigitalPrinter::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		}
 		jsonObject["printingTechnology"] = QJsonValue::fromVariant(printingTechnologyStringValue);
 	}
+
+	jsonObject["__typename"] = "DigitalPrinter";
 
 	return true;
 }
@@ -1087,7 +1099,7 @@ CDigitalPrinterSpecificationObject::CDigitalPrinterSpecificationObject(QObject* 
 
 QVariant CDigitalPrinterSpecificationObject::GetBase()
 {
-	if (Version_1_0->base.has_value()){
+	if (Version_1_0 && Version_1_0->base){
 		if (!m_baseQObjectPtr.isValid()){
 			m_baseQObjectPtr = CreateObject("base");
 			auto itemPtr = m_baseQObjectPtr.value<sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObject*>();
@@ -1102,6 +1114,10 @@ QVariant CDigitalPrinterSpecificationObject::GetBase()
 
 void CDigitalPrinterSpecificationObject::SetBase(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	if (v.isValid()){
 		sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObject* itemPtr = v.value<sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObject*>();
 		if (itemPtr != nullptr)  Version_1_0->base = itemPtr->Version_1_0;
@@ -1117,14 +1133,17 @@ void CDigitalPrinterSpecificationObject::SetBase(const QVariant& v)
 
 bool CDigitalPrinterSpecificationObject::hasBase()
 {
-	 return Version_1_0->base.HasValue();
+	 return Version_1_0 && Version_1_0->base.HasValue();
 }
 
 
 void CDigitalPrinterSpecificationObject::emplaceBase()
 {
+	ResetBase();
+	if(!Version_1_0){
+		Version_1_0.emplace();
+	}
 	Version_1_0->base.emplace();
-
 }
 
 
@@ -1140,7 +1159,7 @@ void CDigitalPrinterSpecificationObject::ResetBase()
 
 QVariant CDigitalPrinterSpecificationObject::GetPrintingTechnology()
 {
-	if (Version_1_0->printingTechnology.has_value()){
+	if (Version_1_0 && Version_1_0->printingTechnology){
 		sdl::modsdl::DigitalPrinter::PrintingTechnology valueType = Version_1_0->printingTechnology.value();
 		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::modsdl::DigitalPrinter::PrintingTechnology>();
 		QString retval = metaEnum.valueToKey((int)valueType);
@@ -1154,6 +1173,10 @@ QVariant CDigitalPrinterSpecificationObject::GetPrintingTechnology()
 
 void CDigitalPrinterSpecificationObject::SetPrintingTechnology(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->printingTechnology.emplace();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::modsdl::DigitalPrinter::PrintingTechnology>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
@@ -1166,7 +1189,7 @@ void CDigitalPrinterSpecificationObject::SetPrintingTechnology(const QVariant& v
 
 bool CDigitalPrinterSpecificationObject::hasPrintingTechnology()
 {
-	 return Version_1_0->printingTechnology.HasValue();
+	 return Version_1_0 && Version_1_0->printingTechnology.HasValue();
 }
 
 
@@ -1324,16 +1347,19 @@ QVariant sdl::modsdl::DigitalPrinter::CDigitalPrinterSpecificationObjectList::ge
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::modsdl::DigitalPrinter::CDigitalPrinterSpecificationObject*>();
-	if (itemPtr == nullptr) return QVariant();
+	if (itemPtr == nullptr){
+		return QVariant();
+	}
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
-		if (nameId == "m_base"){
-			return itemPtr->GetBase();
-		}
-		if (nameId == "m_printingTechnology"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->printingTechnology.value());
-		}
+	if (nameId == "m_base"){
+		return itemPtr->GetBase();
+	}
+	if (nameId == "m_printingTechnology"){
+		return QVariant::fromValue(Version_1_0->at(index)->printingTechnology.value());
+	}
+
 	return QVariant();
 }
 CDigitalPrinterObject::CDigitalPrinterObject(QObject* parent): ::imtbase::CItemModelBase(parent){
@@ -1346,7 +1372,7 @@ CDigitalPrinterObject::CDigitalPrinterObject(QObject* parent): ::imtbase::CItemM
 
 QVariant CDigitalPrinterObject::GetBase()
 {
-	if (Version_1_0->base.has_value()){
+	if (Version_1_0 && Version_1_0->base){
 		if (!m_baseQObjectPtr.isValid()){
 			m_baseQObjectPtr = CreateObject("base");
 			auto itemPtr = m_baseQObjectPtr.value<sdl::modsdl::PrinterBase::CPrinterBaseObject*>();
@@ -1361,6 +1387,10 @@ QVariant CDigitalPrinterObject::GetBase()
 
 void CDigitalPrinterObject::SetBase(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	if (v.isValid()){
 		sdl::modsdl::PrinterBase::CPrinterBaseObject* itemPtr = v.value<sdl::modsdl::PrinterBase::CPrinterBaseObject*>();
 		if (itemPtr != nullptr)  Version_1_0->base = itemPtr->Version_1_0;
@@ -1376,14 +1406,17 @@ void CDigitalPrinterObject::SetBase(const QVariant& v)
 
 bool CDigitalPrinterObject::hasBase()
 {
-	 return Version_1_0->base.HasValue();
+	 return Version_1_0 && Version_1_0->base.HasValue();
 }
 
 
 void CDigitalPrinterObject::emplaceBase()
 {
+	ResetBase();
+	if(!Version_1_0){
+		Version_1_0.emplace();
+	}
 	Version_1_0->base.emplace();
-
 }
 
 
@@ -1399,7 +1432,7 @@ void CDigitalPrinterObject::ResetBase()
 
 QVariant CDigitalPrinterObject::GetPrintingTechnology()
 {
-	if (Version_1_0->printingTechnology.has_value()){
+	if (Version_1_0 && Version_1_0->printingTechnology){
 		sdl::modsdl::DigitalPrinter::PrintingTechnology valueType = Version_1_0->printingTechnology.value();
 		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::modsdl::DigitalPrinter::PrintingTechnology>();
 		QString retval = metaEnum.valueToKey((int)valueType);
@@ -1413,6 +1446,10 @@ QVariant CDigitalPrinterObject::GetPrintingTechnology()
 
 void CDigitalPrinterObject::SetPrintingTechnology(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->printingTechnology.emplace();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::modsdl::DigitalPrinter::PrintingTechnology>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
@@ -1425,7 +1462,7 @@ void CDigitalPrinterObject::SetPrintingTechnology(const QVariant& v)
 
 bool CDigitalPrinterObject::hasPrintingTechnology()
 {
-	 return Version_1_0->printingTechnology.HasValue();
+	 return Version_1_0 && Version_1_0->printingTechnology.HasValue();
 }
 
 
@@ -1583,16 +1620,19 @@ QVariant sdl::modsdl::DigitalPrinter::CDigitalPrinterObjectList::getData(const Q
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::modsdl::DigitalPrinter::CDigitalPrinterObject*>();
-	if (itemPtr == nullptr) return QVariant();
+	if (itemPtr == nullptr){
+		return QVariant();
+	}
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
-		if (nameId == "m_base"){
-			return itemPtr->GetBase();
-		}
-		if (nameId == "m_printingTechnology"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->printingTechnology.value());
-		}
+	if (nameId == "m_base"){
+		return itemPtr->GetBase();
+	}
+	if (nameId == "m_printingTechnology"){
+		return QVariant::fromValue(Version_1_0->at(index)->printingTechnology.value());
+	}
+
 	return QVariant();
 }
 } // namespace sdl::modsdl::DigitalPrinter

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtgui/CPopupController.h>
 
 
@@ -344,9 +345,9 @@ void CPopupController::CreatePopupItem(
 	bool isClosingOnMouseClickAllowed,
 	QWidget* contentWidgetPtr)
 {
-	istd::TDelPtr<IPopupWidget> popupWidgetPtr;
+	istd::TUniqueInterfacePtr<IPopupWidget> popupWidgetPtr;
 	if (m_widgetFactoryPtr != nullptr){
-		popupWidgetPtr.SetPtr(m_widgetFactoryPtr->CreateInstance());
+		popupWidgetPtr = m_widgetFactoryPtr->CreateInstance();
 	}
 	else{
 		popupWidgetPtr.SetPtr(new CStandardPopupWidget());

@@ -1,0 +1,114 @@
+name: Documentation and Statistics
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+  schedule:
+    # Run weekly on Monday at 00:00 UTC
+    - cron: '0 0 * * 1'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  generate-stats:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      
+      - name: Generate statistics
+        run: |
+          python3 scripts/generate_stats.py . stats.json
+      
+      - name: Create statistics page
+        run: |
+          mkdir -p stats-page
+          cp scripts/stats_template.html stats-page/index.html
+          cp stats.json stats-page/stats.json
+      
+      - name: Upload statistics artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: statistics
+          path: |
+            stats-page/
+            stats.json
+
+  deploy-combined:
+    runs-on: ubuntu-latest
+    needs: generate-stats
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Install Doxygen
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen graphviz
+      
+      - name: Generate Doxygen documentation
+        run: |
+          cd Docs
+          doxygen Doxyfile
+      
+      - name: Download statistics artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: statistics
+          path: statistics
+      
+      - name: Combine documentation and statistics
+        run: |
+          mkdir -p combined-docs
+          # Copy Doxygen documentation (generated at Docs/TechnicalDoc/html)
+          cp -r Docs/TechnicalDoc/html/* combined-docs/
+          # Add statistics page
+          mkdir -p combined-docs/stats
+          cp -r statistics/stats-page/* combined-docs/stats/
+          # Create redirect page for easy access
+          cat > combined-docs/stats.html << 'EOF'
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta http-equiv="refresh" content="0; url=stats/index.html">
+            <title>Redirecting to Statistics...</title>
+          </head>
+          <body>
+            <p>Redirecting to <a href="stats/index.html">statistics page</a>...</p>
+          </body>
+          </html>
+          EOF
+      
+      - name: Upload combined artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: 'combined-docs'
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: deploy-combined
+    
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

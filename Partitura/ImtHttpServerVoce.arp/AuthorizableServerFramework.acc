@@ -162,6 +162,12 @@
         <Element Id="UserActionController" PackageId="ImtAuthVoce" ComponentId="UserActionController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ActionDataFactories" Type="Factory[]" ExportId="ActionDataFactories">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ActionTypeIds" Type="Id[]" ExportId="ActionTypeIds">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

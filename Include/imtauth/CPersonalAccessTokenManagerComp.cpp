@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauth/CPersonalAccessTokenManagerComp.h>
 
 
@@ -5,6 +6,9 @@
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QRandomGenerator>
 #include <QtCore/QUuid>
+
+// ACF includes
+#include <istd/CChangeNotifier.h>
 
 // ImtCore includes
 #include <imtauth/IPersonalAccessToken.h>
@@ -32,6 +36,9 @@ IPersonalAccessTokenManager::TokenCreationResult CPersonalAccessTokenManagerComp
 		SendErrorMessage(0, "Token collection or factory not configured", "CPersonalAccessTokenManagerComp");
 		return result;
 	}
+
+	// Notify observers that the manager state will change
+	istd::CChangeNotifier changeNotifier(this);
 
 	// Generate unique token ID
 	QByteArray tokenId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
@@ -216,6 +223,9 @@ bool CPersonalAccessTokenManagerComp::RevokeToken(const QByteArray& tokenId)
 		return false;
 	}
 
+	// Notify observers that the manager state will change
+	istd::CChangeNotifier changeNotifier(this);
+
 	tokenPtr->SetRevoked(true);
 
 	if (!m_tokenCollectionCompPtr->SetObjectData(tokenId, *tokenPtr)){
@@ -259,6 +269,9 @@ bool CPersonalAccessTokenManagerComp::DeleteToken(const QByteArray& tokenId)
 		return false;
 	}
 
+	// Notify observers that the manager state will change
+	istd::CChangeNotifier changeNotifier(this);
+
 	if (!m_tokenCollectionCompPtr->RemoveElements({tokenId})){
 		SendErrorMessage(0, QString("Failed to delete token '%1'").arg(QString::fromUtf8(tokenId)), "CPersonalAccessTokenManagerComp");
 		return false;
@@ -266,6 +279,14 @@ bool CPersonalAccessTokenManagerComp::DeleteToken(const QByteArray& tokenId)
 
 	SendInfoMessage(0, QString("Deleted token '%1'").arg(QString::fromUtf8(tokenId)), "CPersonalAccessTokenManagerComp");
 
+	return true;
+}
+
+
+// reimplemented (iser::ISerializable)
+
+bool CPersonalAccessTokenManagerComp::Serialize(iser::IArchive& /*archive*/)
+{
 	return true;
 }
 
@@ -291,7 +312,7 @@ QByteArray CPersonalAccessTokenManagerComp::GenerateRandomToken() const
 	}
 
 	// Convert to base64url for safe transmission
-	QByteArray token = "pat_" + randomData.toBase64(QByteArray::Base64UrlEncoding | QByteArray::OmitTrailingEquals);
+	QByteArray token = "imt_pat_" + randomData.toBase64(QByteArray::Base64UrlEncoding | QByteArray::OmitTrailingEquals);
 
 	return token;
 }

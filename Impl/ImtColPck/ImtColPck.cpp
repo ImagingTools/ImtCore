@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include "ImtColPck.h"
 
 
@@ -33,6 +34,11 @@ I_EXPORT_COMPONENT(
 			CollectionHeadersProvider,
 			"Collection headers provider",
 			"Collection Headers Provider");
+
+I_EXPORT_COMPONENT(
+			CollectionImportParam,
+			"Collection import param",
+			"Collection Import Param");
 
 
 } // namespace ImtColPck

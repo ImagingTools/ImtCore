@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -223,6 +224,14 @@ protected:
 					\c ListAccessResult::toObjectTransformMethod		= ".toString()", bacause access by index returns \c QJsonValue, but we need a \c QString in case JSON if a \c field is string
 	 */
 	virtual bool AddContainerListAccessCode(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, quint16 horizontalIndents, ListAccessResult& result) const = 0;
+
+	/*!
+		\brief Writes code that writes the typename to an object
+		\code // example of C++ generated code
+			jsonObject["__typename"] = QStringLiteral("TypeName");
+		\endcode
+	*/
+	virtual void WriteTypenameToObjectCode(QTextStream& stream, const imtsdl::CSdlType& sdlType) const = 0;
 
 	virtual CSdlUnionConverter::ConversionType GetUnionScalarConversionType() const = 0;
 	virtual CSdlUnionConverter::ConversionType GetUnionArrayConversionType() const = 0;

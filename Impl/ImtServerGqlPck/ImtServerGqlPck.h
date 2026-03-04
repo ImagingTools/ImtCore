@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -39,6 +40,7 @@
 #include <imtservergql/CCollectionImportJobParamsFillerComp.h>
 #include <imtservergql/CCollectionDocumentManagerControllerComp.h>
 #include <imtservergql/CCollectionDocumentManagerPublisherComp.h>
+#include <imtservergql/CGqlContextCreatorComp.h>
 
 
 /**
@@ -80,6 +82,7 @@ typedef imtservergql::CCollectionImportControllerComp CollectionImportController
 typedef imtservergql::CCollectionImportJobParamsFillerComp CollectionImportJobParamsFiller;
 typedef imtservergql::CCollectionDocumentManagerControllerComp CollectionDocumentManagerController;
 typedef imtservergql::CCollectionDocumentManagerPublisherComp CollectionDocumentManagerPublisher;
+typedef imtservergql::CGqlContextCreatorComp GqlContextCreator;
 
 
 } // namespace ImtServerGqlPck

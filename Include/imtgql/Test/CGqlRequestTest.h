@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -25,6 +26,12 @@ private slots:
 	void ParseObjectQuery();
 	void ParseArrayQuery();
 	void ParseComplexTest();
+	void ParseQueryWithVariables();
+	void ParseQueryWithOperationName();
+	void ParseStartPatchMeasurement();
+	void ParseStartPatchMeasurementComplex();
+	void TestVariableObjectList();
+	void TestVariablePrimitivesAndLists();
 
 	void cleanupTestCase();
 

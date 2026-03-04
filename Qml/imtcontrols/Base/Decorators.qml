@@ -559,6 +559,7 @@ StyleComponents {
 
 			property var baseElement: null;
 			property bool checked: !baseElement ? false : baseElement.checked;
+			property bool readOnly: !baseElement ? false : baseElement.readOnly;
 
 			property int mainMargin: !baseElement ? 0 : Style.marginS;
 			property string text: !baseElement ? "" : baseElement.text == undefined ? "" : baseElement.text;
@@ -594,7 +595,7 @@ StyleComponents {
 				width: switchItem.height;
 				height: width;
 				radius: width;
-				color: !switchItem.baseElement ? "transparent" : switchItem.checked ? switchItem.baseElement.controlColorChecked :
+				color: switchItem.readOnly ? switchItem.baseElement.controlColor : !switchItem.baseElement ? "transparent" : switchItem.checked ? switchItem.baseElement.controlColorChecked :
 																					  switchItem.baseElement.controlColor;
 			}
 

@@ -352,10 +352,19 @@ QtObject {
 		__internal.openedDocuments[index].addView(viewTypeId, view)
 	}
 
+	function getDocumentManagerActiveView(){
+		return __internal.documentManagerActiveView
+	}
+
+	function setDocumentManagerActiveView(view){
+		__internal.documentManagerActiveView = view
+	}
+
 	property QtObject __internal: QtObject {
 		property var documentTypeEditors: ({}) // DocumentTypeId -> [{View Type 1}, {View Type 2}]
 		property var openedDocuments: [] // Array of objects {id, name, model, view, isDirty}
 		property var cachedDocumentNames: ({}) // DocumentId -> Name
+		property var documentManagerActiveView: null
 
 		property Component documentDataFactory: Component{ 
 			QtObject{

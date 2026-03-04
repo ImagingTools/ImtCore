@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -36,6 +37,7 @@ public:
 		MT_KEEP_ALIVE,
 		MT_KEEP_ALIVE_ACK,
 		MT_START,
+		MT_SUBSCRIBE,
 		MT_START_ACK,
 		MT_ERROR,
 		MT_DATA,

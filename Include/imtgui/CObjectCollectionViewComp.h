@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -241,12 +242,11 @@ protected:
 		return &component.m_commands;
 	}
 
-	class FocusDecorationFactory: public iwidgets::CFocusDecorator::GraphicsEffectFactory
+	class FocusDecorationFactory: public iwidgets::CFocusDecorator::IGraphicsEffectFactory
 	{
 	public:
 		// reimplemented (iGraphicsEffectFactory)
-		virtual QGraphicsEffect* CreateInstance(const QByteArray& keyId = "") const;
-		virtual KeyList GetFactoryKeys() const;
+		virtual std::unique_ptr<QGraphicsEffect> CreateEffect() const override;
 	};
 
 private:

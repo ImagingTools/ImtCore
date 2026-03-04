@@ -13,10 +13,6 @@
 #include <imtauth/IPersonalAccessTokenManager.h>
 
 
-namespace imtauthtest
-{
-
-
 /**
 	Test class for personal access token functionality.
 	Tests token creation, validation, revocation, and expiration.
@@ -43,8 +39,5 @@ private:
 	istd::TDelPtr<ipackage::CComponentAccessor> m_compositePtr;
 	imtauth::IPersonalAccessTokenManager* m_tokenManagerPtr;
 };
-
-
-} // namespace imtauthtest
 
 

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgui/CStandardLoginGuiComp.h>
 
 
@@ -155,9 +156,16 @@ void CStandardLoginGuiComp::OnRestoreSettings(const QSettings& settings)
 {
 	QString lastUser = settings.value("LastUser").toString();
 	bool isRememberMe = settings.value("RememberMe", false).toBool();
+	QByteArray refreshToken = settings.value("RefreshToken").toByteArray();
 
 	if (isRememberMe){
 		UserEdit->setText(lastUser);
+		
+		// Try to login with refresh token if available
+		if (TryRestoreSessionWithRefreshToken(lastUser, refreshToken)){
+			// Successfully logged in with refresh token
+			return;
+		}
 	}
 
 	RememberMe->setChecked(isRememberMe);
@@ -176,6 +184,12 @@ void CStandardLoginGuiComp::OnSaveSettings(QSettings& settings) const
 
 	settings.setValue("RememberMe", isRememberMe);
 	settings.setValue("LastUser", lastUser);
+	
+	// Save refresh token only if "Remember me" is checked
+	SaveRefreshTokenIfRememberMe(settings);
+	
+	// Clear refresh token if "Remember me" is not checked
+	ClearRefreshTokenIfNeeded(settings);
 }
 
 
@@ -329,6 +343,27 @@ void CStandardLoginGuiComp::CheckMatchingPassword()
 
 void CStandardLoginGuiComp::ShowLoadingPage()
 {
+}
+
+
+bool CStandardLoginGuiComp::TryRestoreSessionWithRefreshToken(const QString& /*userName*/, const QByteArray& /*refreshToken*/)
+{
+	return false;
+}
+
+
+void CStandardLoginGuiComp::SaveRefreshTokenIfRememberMe(QSettings& /*settings*/) const
+{
+}
+
+
+void CStandardLoginGuiComp::ClearRefreshTokenIfNeeded(QSettings& settings) const
+{
+	bool isRememberMe = RememberMe->isChecked();
+	
+	if (!isRememberMe){
+		settings.remove("RefreshToken");
+	}
 }
 
 

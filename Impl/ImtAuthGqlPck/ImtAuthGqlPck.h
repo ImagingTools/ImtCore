@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -42,6 +43,7 @@
 #include <imtauthgql/CClientRequestGroupInfoProviderComp.h>
 #include <imtauthgql/CTokenBasedPermissionsProviderComp.h>
 #include <imtauthgql/CPersonalAccessTokenControllerComp.h>
+#include <imtauthgql/CClientRequestPersonalAccessTokenManagerComp.h>
 
 
 /**
@@ -87,6 +89,7 @@ typedef imtauthgql::CClientRequestRoleInfoProviderComp ClientRequestRoleInfoProv
 typedef imtauthgql::CClientRequestGroupInfoProviderComp ClientRequestGroupInfoProvider;
 typedef imtauthgql::CTokenBasedPermissionsProviderComp ClientRequestTokenBasedPermissionsProvider;
 typedef imtauthgql::CPersonalAccessTokenControllerComp PersonalAccessTokenController;
+typedef icomp::TModelCompWrap<imtauthgql::CClientRequestPersonalAccessTokenManagerComp> ClientRequestPersonalAccessTokenManager;
 
 
 } // namespace ImtAuthGqlPck

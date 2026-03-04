@@ -21,6 +21,10 @@ endif()
 
 get_filename_component(IMTCOREDIR "../.." ABSOLUTE BASE_DIR ${CMAKE_CURRENT_LIST_DIR})
 
+if(NOT DEFINED IMTCOREDIR_BUILD)
+	set(IMTCOREDIR_BUILD "${IMTCOREDIR}")
+endif()
+
 include(${IMTCOREDIR}/Config/CMake/ImtCoreEnv.cmake)
 include(${IMTCOREDIR}/Config/CMake/PartituraUpgrade.cmake)
 if (NOT ANDROID)
@@ -28,10 +32,6 @@ if (NOT ANDROID)
 endif()
 
 message(VERBOSE "ImtCore ACFDIR_BUILD ${ACFDIR_BUILD}")
-
-if(NOT DEFINED IMTCOREDIR_BUILD)
-	set(IMTCOREDIR_BUILD "${IMTCOREDIR}")
-endif()
 
 set (INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Include")
 set (IMPL_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Impl")
@@ -88,14 +88,6 @@ add_dependencies(SdlCodeGenerator ImtSdlGenCppPck ImtSdlGenQmlPck ImtSdlPck)
 add_subdirectory("${INCLUDE_DIR}/imtoas/CMake" "${AUX_INCLUDE_DIR}/imtoas")
 add_subdirectory("${IMPL_DIR}/ImtOasPck/CMake" "${AUX_INCLUDE_DIR}/ImtOasPck")
 add_subdirectory("${IMPL_DIR}/OasCodeGeneratorExe/CMake" "${AUX_INCLUDE_DIR}/OasCodeGeneratorExe")
-
-#------ BaseTests ------
-if (NOT DEFINED BUILD_TESTING OR BUILD_TESTING)
-	add_subdirectory("${INCLUDE_DIR}/imtbase/Test/CMake" "${AUX_INCLUDE_DIR}/imtbase/Test")
-	add_subdirectory("${INCLUDE_DIR}/imtsdlgencpp/Test/CMake" "${AUX_INCLUDE_DIR}/ImtSdlGenCppTest")
-	add_subdirectory("${INCLUDE_DIR}/imtsdlgenqml/Test/CMake" "${AUX_INCLUDE_DIR}/ImtSdlGenQmlTest")
-endif()
-
 
 if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 	#-------- Sdl --------
@@ -175,6 +167,7 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 		add_subdirectory("${INCLUDE_DIR}/imt3d/CMake" "${AUX_INCLUDE_DIR}/imt3d")
 		add_subdirectory("${INCLUDE_DIR}/imt3dview/CMake" "${AUX_INCLUDE_DIR}/imt3dview")
 		add_subdirectory("${INCLUDE_DIR}/imt3dgui/CMake" "${AUX_INCLUDE_DIR}/imt3dgui")
+		add_subdirectory("${INCLUDE_DIR}/imt3d/Test/CMake" "${AUX_INCLUDE_DIR}/imt3d/Test")
 		add_dependencies(imt3dgui DesignTokenCreator)
 	endif()
 
@@ -372,28 +365,29 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 	endif()
 
 	#-------- Tests --------
-	if (NOT DEFINED BUILD_TESTING OR BUILD_TESTING)
-		add_subdirectory("${INCLUDE_DIR}/imttest/CMake" "${AUX_INCLUDE_DIR}/imttest")
+	add_subdirectory("${INCLUDE_DIR}/imtbase/Test/CMake" "${AUX_INCLUDE_DIR}/imtbase/Test")
+	add_subdirectory("${INCLUDE_DIR}/imtsdlgencpp/Test/CMake" "${AUX_INCLUDE_DIR}/ImtSdlGenCppTest")
+	add_subdirectory("${INCLUDE_DIR}/imtsdlgenqml/Test/CMake" "${AUX_INCLUDE_DIR}/ImtSdlGenQmlTest")
+	add_subdirectory("${INCLUDE_DIR}/imttest/CMake" "${AUX_INCLUDE_DIR}/imttest")
 
-		if(NOT DEFINED USE_QTDB OR USE_QTDB)
-			add_subdirectory("${IMPL_DIR}/ImtTestPck/CMake" "${AUX_INCLUDE_DIR}/ImtTestPck")
-			add_dependencies(ImtTestPck imtbase imtdb imttest)
-		endif()
-
-		if(DEFINED USE_MDBX AND USE_MDBX)
-			add_subdirectory("${INCLUDE_DIR}/imtmdbx/Test/CMake" "${AUX_INCLUDE_DIR}/imtmdbx/Test")
-		endif()
-
-		add_subdirectory("${INCLUDE_DIR}/imtgql/Test/CMake" "${AUX_INCLUDE_DIR}/imtgql/Test")
-		add_subdirectory("${INCLUDE_DIR}/imtgqltest/CMake" "${AUX_INCLUDE_DIR}/imtgqltest")
-
-		add_subdirectory("${TESTS_DIR}/ObjectCollectionTest/CMake" "${AUX_INCLUDE_DIR}/ObjectCollectionTest")
-		add_subdirectory("${TESTS_DIR}/FileCollectionTest/CMake" "${AUX_INCLUDE_DIR}/FileCollectionTest")
-		add_subdirectory("${TESTS_DIR}/RevisionControllerTest/CMake" "${AUX_INCLUDE_DIR}/RevisionControllerTest")
-		add_subdirectory("${TESTS_DIR}/StructureTest/CMake" "${AUX_INCLUDE_DIR}/StructureTest")
-		add_subdirectory("${TESTS_DIR}/PersonalAccessTokenTest/CMake" "${AUX_INCLUDE_DIR}/PersonalAccessTokenTest")
-		file(COPY ${TESTS_DIR}/Migrations DESTINATION ${TESTS_DIR}/../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
+	if(NOT DEFINED USE_QTDB OR USE_QTDB)
+		add_subdirectory("${IMPL_DIR}/ImtTestPck/CMake" "${AUX_INCLUDE_DIR}/ImtTestPck")
+		add_dependencies(ImtTestPck imtbase imtdb imttest)
 	endif()
+
+	if(DEFINED USE_MDBX AND USE_MDBX)
+		add_subdirectory("${INCLUDE_DIR}/imtmdbx/Test/CMake" "${AUX_INCLUDE_DIR}/imtmdbx/Test")
+	endif()
+
+	add_subdirectory("${INCLUDE_DIR}/imtgql/Test/CMake" "${AUX_INCLUDE_DIR}/imtgql/Test")
+	add_subdirectory("${INCLUDE_DIR}/imtgqltest/CMake" "${AUX_INCLUDE_DIR}/imtgqltest")
+	add_subdirectory("${TESTS_DIR}/ObjectCollectionTest/CMake" "${AUX_INCLUDE_DIR}/ObjectCollectionTest")
+	add_subdirectory("${TESTS_DIR}/FileCollectionTest/CMake" "${AUX_INCLUDE_DIR}/FileCollectionTest")
+	add_subdirectory("${TESTS_DIR}/RevisionControllerTest/CMake" "${AUX_INCLUDE_DIR}/RevisionControllerTest")
+	add_subdirectory("${TESTS_DIR}/StructureTest/CMake" "${AUX_INCLUDE_DIR}/StructureTest")
+	add_subdirectory("${TESTS_DIR}/PersonalAccessTokenTest/CMake" "${AUX_INCLUDE_DIR}/PersonalAccessTokenTest")
+
+	file(COPY ${TESTS_DIR}/Migrations DESTINATION ${TESTS_DIR}/../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
 
 endif() # NOT ONLYTOOLS
 

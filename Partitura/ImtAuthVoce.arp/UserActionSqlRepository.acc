@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5430" Description="ACF"/>
-            <Version Id="1" Number="2253" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5715" Description="ACF"/>
+            <Version Id="1" Number="2274" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -62,12 +62,8 @@
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DocumentFactories" Type="Factory[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>UserRecentAction</Value>
-                            </Values>
-                        </Data>
+                    <AttributeInfo Id="DocumentFactories" Type="Factory[]" ExportId="DocumentFactories">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="JsonBasedMetaInfoDelegate" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="UserActionMetaInfoDelegate"/>
@@ -111,8 +107,12 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ObjectTypeId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="UserAction"/>
+                    <AttributeInfo Id="ObjectTypeIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>UserAction</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
@@ -133,11 +133,6 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="UserRecentAction" PackageId="ImtAuthPck" ComponentId="UserRecentAction">
-            <Data IsEnabled="true" Flags="2">
-                <AttributeInfoMap/>
             </Data>
         </Element>
     </ElementsList>

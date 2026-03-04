@@ -1,16 +1,17 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
 /**
 \defgroup ImtCore ImagingTools Core SDK
-\mainpage
+\mainpage ImtCore - ImagingTools Core SDK
 \section Introduction
-ImagingTools Core SDK is an extension framework for ACF.
-The main goal of this framework is the implementation of components and interfaces using for realization of the business logic,
-which can find a general application in every software product.
+ImagingTools Core SDK is an extension framework for ACF (Application Component Framework).
+The main goal of this framework is the implementation of components and interfaces for realizing business logic
+that can find general application in every software product.
 
 \section LibraryOrganization Library Organization
-The ImtCore framework consists of 61 libraries organized in the Include/ directory.
+The ImtCore framework consists of 61 libraries organized in the Include/ directory, grouped into 13 technical domains.
 For a complete overview of all libraries, their purposes, and relationships, see:
 - Include/README.md - Complete library index with categorization
 - Docs/LibraryQuickReference.md - Quick lookup guide for finding the right library
@@ -23,6 +24,120 @@ Libraries are organized by suffix to indicate technical layers:
 - *gql: GraphQL API endpoints (e.g., imtauthgql)
 - *db: Database persistence layers (e.g., imtauthdb)
 - *qml: QML/JavaScript UI components (e.g., imtqml)
+
+\section TechnicalDomains Technical Domains
+
+The ImtCore SDK is organized into the following technical domains:
+
+\subsection CoreInfrastructure 1. Core Infrastructure (7 libraries)
+Foundation libraries providing base functionality used throughout the system.
+- imtbase - Core framework with collections, data structures, component management, plugin system
+- imtcore - Version information and top-level exports
+- imtcom - Server communication and connection management (\ref Include/imtcom/README.md)
+- imtcol - Collection management, filtering, and header providers
+- imttest - Testing utilities and helpers
+- imtfile - File I/O operations and management
+- imtzip - Compression and archive handling
+
+\subsection AuthenticationAuthorization 2. Authentication & Authorization (4 libraries)
+Complete authentication and authorization system with multiple persistence backends.
+- imtauth - Core authentication/authorization logic (users, roles, sessions, permissions)
+- imtauthdb - Authentication database persistence layer (SQLite, PostgreSQL)
+- imtauthgql - Authentication GraphQL API endpoints
+- imtauthgui - Authentication UI components (login, user management, role editors)
+
+\subsection DatabasePersistence 3. Database & Persistence (5 libraries)
+SQL and NoSQL database connectivity and management.
+- imtdb - Core SQL database functionality (PostgreSQL, SQLite, migrations, transactions)
+- imtdbgql - Database GraphQL API layer
+- imtdbgui - Database management UI components
+- imtmdbx - MDBX embedded database wrapper
+- imtmongo - MongoDB integration and utilities
+
+\subsection LicensingSystem 4. Licensing System (4 libraries)
+Software and hardware product license management. (\ref Include/imtlic/README.md, \ref Include/imtlicgql/README.md, \ref Include/imtlicdb/README.md)
+- imtlic - License management core (features, instances, validation)
+- imtlicdb - License database persistence
+- imtlicgql - License GraphQL API
+- imtlicgui - License management UI
+
+\subsection GraphQLAPIs 5. GraphQL APIs (8 libraries)
+GraphQL-based API layer for client-server communication.
+- imtgql - Core GraphQL request/response handling
+- imtclientgql - Client-side GraphQL operations and caching
+- imtservergql - Server-side GraphQL schema and resolvers (\ref Include/imtservergql/README.md)
+- imtguigql - UI integration with GraphQL
+- imtgqltest - GraphQL testing framework
+- Plus domain-specific GraphQL APIs: imtauthgql, imtlicgql, imtdbgql
+
+\subsection UserInterface 6. User Interface (16 libraries)
+Qt/QML-based user interface components and frameworks.
+
+Core UI Libraries (7):
+- imtgui - Core Qt GUI widgets and layouts
+- imtwidgets - Extended widget library
+- imtstyle - Theme and style management
+- imtqml - Core QML utilities and components
+- imtqml2d - 2D graphics and drawing in QML
+- imtstylecontrolsqml - QML style controls and themes
+- imtdesign - Design tokens and system components
+
+Domain-Specific GUI Libraries (9):
+- imt3dgui, imthypegui, imtauthgui, imtdbgui, imtlicgui, imtdevgui, imtloggui, imtreportgui
+
+\subsection Visualization3D 7. 3D & Visualization (6 libraries)
+2D/3D rendering, visualization, and hypermedia content.
+- imt3d - 3D engine core (shapes, transformations, scene graph)
+- imt3dgui - 3D GUI components and shapes
+- imt3dview - 3D viewport and camera controls
+- imthype - Hypermedia content rendering
+- imthypegui - Hypermedia UI components
+- imtgeo - Geographic/geospatial data handling
+
+\subsection ContentMedia 8. Content & Media (3 libraries)
+Document, image, and content management.
+- imtimg - Image processing and manipulation
+- imtdoc - Document handling and management
+- imtrepo - Repository and version control
+
+\subsection CommunicationIntegration 9. Communication & Integration (4 libraries)
+Network communication, email, and web services.
+- imthttp - HTTP client and server implementation
+- imtrest - REST API framework
+- imtmail - SMTP email client and message handling
+- imtservice - Service and daemon framework
+
+\subsection Security 10. Security (1 library)
+Cryptography and encryption services.
+- imtcrypt - Encryption services (AES, RSA, MD5, SSL/TLS)
+
+\subsection CodeGenerationSDL 11. Code Generation & SDL (5 libraries)
+Schema-driven development and code generation tools. See Docs/SDL_Documentation_Index.md for SDL documentation.
+- imtsdl - Schema Definition Language (SDL) core
+- imtsdlgencpp - SDL to C++ code generator
+- imtsdlgenqml - SDL to QML code generator
+- imtddl - Data Definition Language utilities
+- imtoas - OpenAPI Specification (OAS) schema support
+
+\subsection DevelopmentTools 12. Development Tools (4 libraries)
+Developer utilities and integrations.
+- imtdev - Development environment and plugin system
+- imtdevgui - Developer tools UI
+- imtpy - Python integration and bindings
+- imtej - Export and JSON format utilities
+
+\subsection ReportingLogging 13. Reporting & Logging (4 libraries)
+Logging, monitoring, and report generation.
+- imtlog - Logging framework and utilities
+- imtloggui - Logging UI and viewers
+- imtreport - Reporting engine and templates
+- imtreportgui - Report viewing and creation UI
+
+\subsection ApplicationFrameworks 14. Application Frameworks (3 libraries)
+High-level application scaffolding.
+- imtapp - Desktop application framework and settings
+- imtserverapp - Server application framework
+- imtupdate - Software update management
 
 \defgroup Collection Collection
 \section Motivation Motivation

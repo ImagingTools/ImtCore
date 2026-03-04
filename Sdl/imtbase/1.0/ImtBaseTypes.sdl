@@ -12,20 +12,20 @@ type TimeRange
 
 type SdlSize
 {
-	width: Double!
-	height: Double!
+	width: Float!
+	height: Float!
 }
 
 type SdlPoint
 {
-	x: Double!
-	y: Double!
+	x: Float!
+	y: Float!
 }
 
 type SdlRange
 {
-	from: Double!
-	to: Double!
+	from: Float!
+	to: Float!
 }
 
 type ParamTypeIds
@@ -47,13 +47,14 @@ type ParamTypeIds
 	PasswordParam: ID
 	EnableableParam: ID
 	ServerConnectionParam: ID
+	CollectionImportParam: ID
 }
 
 type UrlParam
 {
 	scheme: String
 	host: String
-	port: Integer
+	port: Int
 	path: String
 }
 
@@ -68,8 +69,8 @@ enum ProtocolType
 type ServerConnectionParam
 {
 	host: String
-	httpPort: Integer
-	wsPort: Integer
+	httpPort: Int
+	wsPort: Int
 	isSecure: Boolean
 }
 
@@ -90,24 +91,24 @@ type EnableableParam
 
 type IntegerParam
 {
-	value: Integer
+	value: Int
 }
 
 type ConstrainedIntegerParam
 {
-	value: Integer!
+	value: Int!
 	minValue: IntegerParam
 	maxValue: IntegerParam
 }
 
 type DoubleParam
 {
-	value: Double
+	value: Float
 }
 
 type ConstrainedDoubleParam
 {
-	value: Double!
+	value: Float!
 	minValue: DoubleParam
 	maxValue: DoubleParam
 }
@@ -122,21 +123,21 @@ type Option
 
 type OptionsList
 {
-	totalCount: Integer
-	offset: Integer
+	totalCount: Int
+	offset: Int
 	options: [Option]
 }
 
 type SelectionParam
 {
-	selectedIndex: Integer
+	selectedIndex: Int
 	constraints: OptionsList
 }
 
 type SchedulerParam
 {
 	startTime: String
-	interval: Integer
+	interval: Int
 }
 
 type BackupSettings
@@ -149,7 +150,7 @@ type DatabaseAccessSettings
 {
 	dbName: String
 	host: String
-	port: Integer
+	port: Int
 	dbPath: String
 	username: String
 	password: String
@@ -158,7 +159,7 @@ type DatabaseAccessSettings
 
 type FileNameParam
 {
-	pathType: Integer
+	pathType: Int
 	path: String
 }
 
@@ -182,6 +183,17 @@ type ObjectLink {
 	typeId: ID
 	name: String
 	url: UrlParam
+}
+
+type FileImportInfo {
+	filePath: String
+	objectTypeId: ID
+	proposedId: ID
+}
+
+type CollectionImportParam {
+	collectionId: ID
+	fileImportInfos: [FileImportInfo]
 }
 
 

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -28,7 +29,7 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (istd::TIFactory)
-	virtual ObjectInterface* CreateInstance(const QByteArray& keyId = "") const override;
+	virtual istd::TUniqueInterfacePtr<ObjectInterface> CreateInstance(const QByteArray& keyId = "") const override;
 
 	// reimplemented (istd::IFactoryInfo)
 	virtual istd::IFactoryInfo::KeyList GetFactoryKeys() const override;
@@ -42,9 +43,12 @@ private:
 // reimplemented (istd::TIFactory)
 
 template<typename ObjectInterface>
-ObjectInterface* TComponentFactoryComp<ObjectInterface>::CreateInstance(const QByteArray& /*keyId*/) const
+istd::TUniqueInterfacePtr<ObjectInterface> TComponentFactoryComp<ObjectInterface>::CreateInstance(const QByteArray& /*keyId*/) const
 {
-	return dynamic_cast<ObjectInterface*>(m_factCompPtr.CreateInstance().PopInterfacePtr());
+	auto componentPtr = m_factCompPtr.CreateInstance();
+	istd::TUniqueInterfacePtr<ObjectInterface> retVal;
+	retVal.MoveCastedPtr(componentPtr);
+	return retVal;
 }
 
 

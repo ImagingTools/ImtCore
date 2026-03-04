@@ -125,3 +125,17 @@ __pycache__/
 Thumbs.db
 Desktop.ini
 $RECYCLE.BIN/
+/Impl/DesignTokenCreatorExe/QMake/.qmake.stash
+*.stash
+*.filters
+*.vcxproj
+*.bak
+*.Debug
+*.Release
+*.imtbase
+*.imtddl
+*.imtdesign
+*.imtfile
+*.imtsdl
+*.imtsdlgencpp
+*.imtsdlgenqml

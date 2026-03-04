@@ -5,15 +5,11 @@ import imtbaseImtCollectionSdl 1.0
 
 BaseModel {
 	id: root
-	
-	Component {
-		id: headerInfoComp
-		HeaderInfo {
-		}
-	}
+
+	property Component headerInfoComp: Component {HeaderInfo {}}
 
 	function addHeader(id, name, filterable, sortable){
-		let headerObj = headerInfoComp.createObject(root)
+		let headerObj = root.headerInfoComp.createObject(root)
 		headerObj.m_id = id
 		headerObj.m_name = name
 

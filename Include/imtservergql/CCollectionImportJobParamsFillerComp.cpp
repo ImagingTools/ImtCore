@@ -1,11 +1,13 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtservergql/CCollectionImportJobParamsFillerComp.h>
 
 
 // ACF includes
 #include <iprm/TParamsPtr.h>
-#include <iprm/IParamsManager.h>
-#include <iprm/IIdParam.h>
-#include <ifile/IFileNameParam.h>
+
+// ImtCore includes
+#include <imtcol/ICollectionImportParam.h>
+#include <imtservergql/ICollectionImportController.h>
 
 
 namespace imtservergql
@@ -18,35 +20,21 @@ namespace imtservergql
 
 bool CCollectionImportJobParamsFillerComp::FillCollectionImportJobParams(const imtservergql::ICollectionImportController::SessionInfo& sessionInfo, iprm::IParamsSet& jobParams) const
 {
-	iprm::TEditableParamsPtr<iprm::IIdParam> collectionIdPtr(&jobParams, "CollectionId");
-	iprm::TEditableParamsPtr<iprm::IParamsManager> fileParamsListPtr(&jobParams, "FileParamsList");
-	if (!collectionIdPtr.IsValid() || !fileParamsListPtr.IsValid()){
+	iprm::TEditableParamsPtr<imtcol::ICollectionImportParam> collectionImportParamPtr(&jobParams, "CollectionImportParam");
+	if (!collectionImportParamPtr.IsValid()){
 		return false;
 	}
 
-	collectionIdPtr->SetId(sessionInfo.collectionId);
+	collectionImportParamPtr->SetCollectionId(sessionInfo.collectionId);
 
 	for (const ICollectionImportController::FileInfo& file : sessionInfo.files){
-		int index = fileParamsListPtr->InsertParamsSet();
-		if (index < 0){
-			return false;
-		}
+		imtcol::ICollectionImportParam::FileImportInfo info;
 
-		iprm::IParamsSet* fileParamsPtr = fileParamsListPtr->GetParamsSet(index);
-		Q_ASSERT(fileParamsPtr != nullptr);
+		info.filePath = file.path;
+		info.objectTypeId = file.objectTypeId;
+		info.proposedId = file.id;
 
-		iprm::TEditableParamsPtr<ifile::IFileNameParam> filePathPtr(fileParamsPtr, "FilePath");
-		iprm::TEditableParamsPtr<iprm::IIdParam> objectTypeIdPtr(fileParamsPtr, "ObjectTypeId");
-		iprm::TEditableParamsPtr<iprm::IIdParam> proposedIdPtr(fileParamsPtr, "ProposedId");
-
-		Q_ASSERT(
-			filePathPtr.IsValid() &&
-			objectTypeIdPtr.IsValid() &&
-			proposedIdPtr.IsValid());
-
-		filePathPtr->SetPath(file.path);
-		objectTypeIdPtr->SetId(file.objectTypeId);
-		proposedIdPtr->SetId(file.id);
+		collectionImportParamPtr->InsertFileImportInfo(info);
 	}
 
 	return true;
