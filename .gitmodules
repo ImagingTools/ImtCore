@@ -2,18 +2,6 @@
 	path = 3rdParty/EJ
 	url = https://github.com/ImagingTools/EJ.git
 	branch = main
-[submodule "3rdParty/JQ"]
-	path = 3rdParty/JQ
-	url = https://github.com/ImagingTools/JQ.git
-	branch = main
-[submodule "3rdParty/JQML"]
-	path = 3rdParty/JQML
-	url = https://github.com/ImagingTools/JQML.git
-	branch = main
-[submodule "3rdParty/JQML2"]
-	path = 3rdParty/JQML2
-	url = https://github.com/ImagingTools/JQML2.git
-	branch = main
 [submodule "3rdParty/QXlsx"]
 	path = 3rdParty/QXlsx
 	url = https://github.com/ImagingTools/QXlsx.git

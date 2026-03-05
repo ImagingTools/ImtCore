@@ -1,0 +1,178 @@
+const { Item } = require('./Item')
+const { QBool, QReal, QString, QVar } = require('../utils/properties')
+
+class Canvas extends Item {
+    static Immediate = 0
+    static Threaded = 1
+    static Cooperative = 2
+    static Image = 0
+
+    $cache = {}
+
+    static defaultProperties = {
+        available: { type: QBool, value: true },
+        canvasSize: { type: QBool, value: true },
+        context: { type: QVar, value: undefined },
+        renderStrategy: { type: QReal, value: Canvas.Immediate },
+        renderTarget: { type: QReal, value: Canvas.Image },
+        contextType: { type: QString, value: '' },
+
+    }
+
+    static defaultSignals = {
+        imageLoaded: { params: [] },
+		painted: { params: [] },
+		paint: { params: ['region'] },
+    }
+
+    createDom(tag = 'canvas', style){
+        if(this.parent && this.parent.$dom){
+            this.$dom = document.createElement('canvas')
+            this.parent.$dom.appendChild(this.$dom)
+            this.setStyle(style)
+            this.parent.addDomChild(this)
+            this.$dom.id = this.UID
+            this.$dom.classList.add(this.constructor.name)
+        }
+    }
+
+    $initCtx(ctx){
+        if(this.$init) return
+
+        ctx.text = (...args)=>{ctx.fillText(...args)}
+        ctx.roundedRect = (...args)=>{ctx.roundRect(...args)}
+        let originDrawImage = ctx.drawImage
+        let originCreatePattern = ctx.createPattern
+        ctx.drawImage = (...args)=>{
+            if(typeof args[0] === 'string'){
+                let path = rootPath+'/'+args[0].replaceAll('../','')
+                if(this.$cache[path]){
+                    args[0] = this.$cache[path]
+                    originDrawImage.call(ctx, ...args)
+                } else {
+                    let img = new OriginImage();
+                    img.onload = ()=>{
+                        args[0] = img
+                        originDrawImage.call(ctx, ...args)
+                        this.$cache[path] = img
+                        this.requestPaint()
+                        // img.remove()
+                    }
+                    img.onerror = ()=>{
+                        img.remove()
+                    }
+
+                    img.src = path.replaceAll('//','/')
+                }
+                
+            } else {
+                originDrawImage.call(ctx, ...args)
+            }
+            
+        }
+
+        ctx.createPattern = (...args)=>{
+            if(typeof args[0] === 'string'){
+                let path = rootPath+'/'+args[0].replaceAll('../','')
+                if(this.$cache[path]){
+                    args[0] = this.$cache[path]
+                    return originCreatePattern.call(ctx, ...args)
+                } else {
+                    let img = new OriginImage();
+                    img.onload = ()=>{
+                        args[0] = img
+                        this.$cache[path] = img
+                        this.requestPaint()
+                        return originCreatePattern.call(ctx, ...args)
+                    }
+                    img.onerror = ()=>{
+                        img.remove()
+                    }
+
+                    img.src = path.replaceAll('//','/')
+                }
+                
+            } else {
+                return originCreatePattern.call(ctx, ...args)
+            }
+            
+        }
+
+        this.$init = true
+    }
+
+    $widthChanged(){
+        super.$widthChanged()
+        this.getDom().setAttribute('width', this.getPropertyValue('width'))
+        if(this.getPropertyValue('width') > 0 && this.getPropertyValue('height') > 0 && this.$signals.paint) this.$signals.paint()
+    }
+    $heightChanged(){
+        super.$heightChanged()
+        this.getDom().setAttribute('height', this.getPropertyValue('height'))
+        if(this.getPropertyValue('width') > 0 && this.getPropertyValue('height') > 0 && this.$signals.paint) this.$signals.paint()
+    }
+
+    cancelRequestAnimationFrame(handle){
+
+    }
+    getContext(contextId, ...args){
+        let ctx = this.getDom().getContext(contextId)
+        this.$initCtx(ctx)
+        return ctx
+    }
+    isImageError(image){
+
+    }
+    isImageLoaded(image){
+
+    }
+    isImageLoading(image){
+
+    }
+    loadImage(image, sourceSize){
+        if(typeof image === 'string'){
+            let path = rootPath+'/'+image.replaceAll('../','')
+            if(!this.$cache[path]){
+                let img = sourceSize ? new OriginImage(sourceSize.width, sourceSize.height) : new OriginImage()
+                img.onload = ()=>{
+                    image = img
+                    this.$cache[path] = img
+                    if(this.$signals.imageLoaded) this.imageLoaded()
+                }
+                img.onerror = ()=>{
+                    img.remove()
+                }
+
+                img.src = path.replaceAll('//','/')
+            }
+            
+        }
+    }
+    markDirty(area){
+
+    }
+    requestAnimationFrame(callback){
+
+    }
+    requestPaint(){
+        if(this.getPropertyValue('width') > 0 && this.getPropertyValue('height') > 0 && this.$signals.paint) this.$signals.paint()
+    }
+    save(filename, imageSize){
+
+    }
+    toDataURL(mimeType){
+
+    }
+    unloadImage(image){
+
+    }
+
+    $destroy(){
+        for(let key in this.$cache){
+            this.$cache[key].remove()
+        }
+        super.$destroy()
+    }
+}
+
+module.exports.Canvas = Canvas

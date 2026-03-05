@@ -9,13 +9,10 @@ set "GITHUB_ORG=ImagingTools"
 set "VISIBILITY=public"
 
 :: List of libraries
-set "LIBRARIES=EJ JQ JQML JQML2 QXlsx WebCompiler boost icu libmdbx mongoc mongocxx nodejs openssl pybind11 quazip zlib zstd"
+set "LIBRARIES=EJ QXlsx WebCompiler boost icu libmdbx mongoc mongocxx nodejs openssl pybind11 quazip zlib zstd"
 
 :: Library descriptions
 set "DESC_EJ=Export library for ImtCore"
-set "DESC_JQ=Qt-based library for ImtCore"
-set "DESC_JQML=QML compiler for ImtCore"
-set "DESC_JQML2=QML compiler v2 for ImtCore"
 set "DESC_QXlsx=Excel file library for ImtCore"
 set "DESC_WebCompiler=Python-based web compiler for ImtCore"
 set "DESC_boost=Boost C++ libraries (v1.75.0) for ImtCore"

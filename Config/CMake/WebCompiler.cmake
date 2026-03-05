@@ -97,9 +97,9 @@ function(jqml_compile_web)
 		${QRC_WEB_FILE}
 		PRE_BUILD
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${buildwebdir}
-		COMMAND ${PYTHONEXE} ${IMTCOREDIR}/3rdParty/JQML/preparesources.py ${webdirs}
-		WORKING_DIRECTORY ${IMTCOREDIR}/3rdParty/JQML
-		COMMAND ${NODE_EXE} ${IMTCOREDIR}/3rdParty/JQML/Compiler/index.js ${buildwebdir}/src
+		COMMAND ${PYTHONEXE} ${IMTCOREDIR}/Tools/JQML/v1/preparesources.py ${webdirs}
+		WORKING_DIRECTORY ${IMTCOREDIR}/Tools/JQML/v1
+		COMMAND ${NODE_EXE} ${IMTCOREDIR}/Tools/JQML/v1/Compiler/index.js ${buildwebdir}/src
 		COMMENT "WEB COMPILER for ${PROJECT_NAME}"
 		)
 
@@ -187,9 +187,9 @@ function(jqml_compile_web2)
 		${buildwebdir}/Resources/jqml.${resname}.js
 		POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${buildwebdir}
-		COMMAND ${PYTHONEXE} ${IMTCOREDIR}/3rdParty/JQML2/preparesources.py ${webdirs}
-		WORKING_DIRECTORY ${IMTCOREDIR}/3rdParty/JQML2
-		COMMAND ${NODE_EXE} ${IMTCOREDIR}/3rdParty/JQML2/compiler/compiler.js ${buildwebdir}/src
+		COMMAND ${PYTHONEXE} ${IMTCOREDIR}/Tools/JQML/v2/preparesources.py ${webdirs}
+		WORKING_DIRECTORY ${IMTCOREDIR}/Tools/JQML/v2
+		COMMAND ${NODE_EXE} ${IMTCOREDIR}/Tools/JQML/v2/compiler/compiler.js ${buildwebdir}/src
 		COMMAND ${CMAKE_COMMAND} -E copy ${buildwebdir}/src/jqml.full.js ${buildwebdir}/Resources/jqml.${resname}.js
 		DEPENDS ${DEPEND_LIST} ${sdldependency}
 		COMMENT "WEB COMPILER for ${PROJECT_NAME}"
@@ -265,10 +265,10 @@ function(jq_compile_web)
 	endwhile()
 
 	message(VERBOSE "QRC_CPP_WEB_FILE ${QRC_CPP_WEB_FILE}")
-	list(APPEND webdirs_n ${IMTCOREDIR}/3rdParty/JQ/dist)
+	list(APPEND webdirs_n ${IMTCOREDIR}/Tools/JQML/v3/dist)
 	list(APPEND webdirs_n ${buildwebdir}/Resources)
 
-	message("PREPARE RESOURCES ${PYTHONEXE} ${IMTCOREDIR}/3rdParty/JQ/preparesources.py ${webdirs_n}")
+	message("PREPARE RESOURCES ${PYTHONEXE} ${IMTCOREDIR}/Tools/JQML/v3/preparesources.py ${webdirs_n}")
 
 	# HTML build
 	add_custom_command(
@@ -276,12 +276,12 @@ function(jq_compile_web)
 		${buildwebdir}/Resources/index.html
 		POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${buildwebdir}
-		COMMAND ${PYTHONEXE} ${IMTCOREDIR}/3rdParty/JQ/preparesources.py ${webdirs_n}
-		WORKING_DIRECTORY ${IMTCOREDIR}/3rdParty/JQ
+		COMMAND ${PYTHONEXE} ${IMTCOREDIR}/Tools/JQML/v3/preparesources.py ${webdirs_n}
+		WORKING_DIRECTORY ${IMTCOREDIR}/Tools/JQML/v3
 		COMMAND ${CMAKE_COMMAND} -E env
 		TARGETNAME=${TARGETNAME}
 		${NODE_EXE}
-		${IMTCOREDIR}/3rdParty/JQ/compiler/compiler.js
+		${IMTCOREDIR}/Tools/JQML/v3/compiler/compiler.js
 		-n index
 		-i ${appicon}
 		-o ${buildwebdir}/Resources/
@@ -296,11 +296,11 @@ function(jq_compile_web)
 		OUTPUT
 		${buildwebdir}/Resources/index.js
 		POST_BUILD
-		WORKING_DIRECTORY ${IMTCOREDIR}/3rdParty/JQ
+		WORKING_DIRECTORY ${IMTCOREDIR}/Tools/JQML/v3
 		COMMAND ${CMAKE_COMMAND} -E env
 		TARGETNAME=${TARGETNAME}
 		${NODE_EXE}
-		${IMTCOREDIR}/3rdParty/JQ/compiler/compiler.js
+		${IMTCOREDIR}/Tools/JQML/v3/compiler/compiler.js
 		-c ${inputjs}
 		-n index
 		-o ${buildwebdir}/Resources/
@@ -346,7 +346,7 @@ macro(getImtBaseQmlWebDirs webdirs buildwebdir useImtControlsStyle)
 		set(useImtControlsStyle TRUE)
 	endif()
 
-	list(APPEND ${webdirs} ${IMTCOREDIR}/3rdParty/JQML2/core/dist)
+	list(APPEND ${webdirs} ${IMTCOREDIR}/Tools/JQML/v2/core/dist)
 	list(APPEND ${webdirs} ${buildwebdir}/Resources)
 
 	list(APPEND ${webdirs} ${IMTCOREDIR}/Include/imtstylecontrolsqml/Qml/Fonts)
