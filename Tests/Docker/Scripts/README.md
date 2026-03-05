@@ -185,6 +185,8 @@ cd C:\path\to\Lisa\Tests
 | `TEST_USERNAME` | Test user username/email | - | `test@example.com` | `test@example.com` | `test@example.com` |
 | `TEST_PASSWORD` | Test user password | - | `testpassword` | `testpassword` | `testpassword` |
 | `IMAGE_NAME` | Docker image to use | varies | `imtcore-tests:linux` | `imtcore-tests:linux` | `imtcore-tests:windows` |
+| `RUN_GUI_TESTS` | Run Playwright GUI tests | `true` | `true` or `false` | `true` or `false` | `true` or `false` |
+| `RUN_API_TESTS` | Run Postman API tests | `true` | `true` or `false` | `true` or `false` | `true` or `false` |
 
 ### Key Differences by Scenario:
 

@@ -32,7 +32,7 @@ Common Playwright test utilities that are automatically available in the test co
 
 **Basic Test:**
 ```javascript
-const { login, checkScreenshot, waitForPageStability } = require('../GUI/utils.js');
+const { login, checkScreenshot, waitForPageStability } = require('utils');
 
 test('login test', async ({ page }) => {
   await login(page, 'user@example.com', 'password');
@@ -43,7 +43,7 @@ test('login test', async ({ page }) => {
 
 **Multi-User Test with Dynamic Projects:**
 ```javascript
-const { getUserScreenshotName, getUserInfoFromTest } = require('../GUI/utils.js');
+const { getUserScreenshotName, getUserInfoFromTest } = require('utils');
 
 // Test runs automatically for each user (authorized-user0, authorized-user1, etc.)
 test('dashboard test', async ({ page }, testInfo) => {

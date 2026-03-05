@@ -11882,6 +11882,7 @@ bool COptionsListObject::hasOptions()
 
 void COptionsListObject::emplaceOptions()
 {
+	ResetOptions();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
@@ -12158,6 +12159,7 @@ bool CSelectionParamObject::hasConstraints()
 
 void CSelectionParamObject::emplaceConstraints()
 {
+	ResetConstraints();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
@@ -12622,6 +12624,7 @@ bool CBackupSettingsObject::hasSchedulerParam()
 
 void CBackupSettingsObject::emplaceSchedulerParam()
 {
+	ResetSchedulerParam();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}

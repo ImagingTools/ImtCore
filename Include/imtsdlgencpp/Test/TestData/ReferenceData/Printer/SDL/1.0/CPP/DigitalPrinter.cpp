@@ -1139,6 +1139,7 @@ bool CDigitalPrinterSpecificationObject::hasBase()
 
 void CDigitalPrinterSpecificationObject::emplaceBase()
 {
+	ResetBase();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
@@ -1411,6 +1412,7 @@ bool CDigitalPrinterObject::hasBase()
 
 void CDigitalPrinterObject::emplaceBase()
 {
+	ResetBase();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}

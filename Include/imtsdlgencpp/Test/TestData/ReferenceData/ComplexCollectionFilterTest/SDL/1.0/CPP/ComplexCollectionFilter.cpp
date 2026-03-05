@@ -3420,6 +3420,7 @@ bool CTimeFilterObject::hasTimeRange()
 
 void CTimeFilterObject::emplaceTimeRange()
 {
+	ResetTimeRange();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
@@ -4283,6 +4284,7 @@ bool CGroupFilterObject::hasFieldFilters()
 
 void CGroupFilterObject::emplaceFieldFilters()
 {
+	ResetFieldFilters();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
@@ -4349,6 +4351,7 @@ bool CGroupFilterObject::hasGroupFilters()
 
 void CGroupFilterObject::emplaceGroupFilters()
 {
+	ResetGroupFilters();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
@@ -4639,6 +4642,7 @@ bool CComplexCollectionFilterObject::hasSortingInfo()
 
 void CComplexCollectionFilterObject::emplaceSortingInfo()
 {
+	ResetSortingInfo();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
@@ -4705,6 +4709,7 @@ bool CComplexCollectionFilterObject::hasFieldsFilter()
 
 void CComplexCollectionFilterObject::emplaceFieldsFilter()
 {
+	ResetFieldsFilter();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
@@ -4764,6 +4769,7 @@ bool CComplexCollectionFilterObject::hasTimeFilter()
 
 void CComplexCollectionFilterObject::emplaceTimeFilter()
 {
+	ResetTimeFilter();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}

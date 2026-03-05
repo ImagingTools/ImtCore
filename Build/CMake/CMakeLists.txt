@@ -373,6 +373,12 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 	if(NOT DEFINED USE_QTDB OR USE_QTDB)
 		add_subdirectory("${IMPL_DIR}/ImtTestPck/CMake" "${AUX_INCLUDE_DIR}/ImtTestPck")
 		add_dependencies(ImtTestPck imtbase imtdb imttest)
+
+		add_subdirectory("${TESTS_DIR}/ObjectCollectionTest/CMake" "${AUX_INCLUDE_DIR}/ObjectCollectionTest")
+		add_dependencies(ImtCoreObjectCollectionTest imtbase imtauth imtdb imttest)
+
+		add_subdirectory("${TESTS_DIR}/StructureTest/CMake" "${AUX_INCLUDE_DIR}/StructureTest")
+		add_dependencies(StructureTest imtbase imtauth imtdb imttest)
 	endif()
 
 	if(DEFINED USE_MDBX AND USE_MDBX)
@@ -380,12 +386,19 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 	endif()
 
 	add_subdirectory("${INCLUDE_DIR}/imtgql/Test/CMake" "${AUX_INCLUDE_DIR}/imtgql/Test")
+	add_dependencies(imtGqlTest imtbase imtgql imtbasesdl)
+
 	add_subdirectory("${INCLUDE_DIR}/imtgqltest/CMake" "${AUX_INCLUDE_DIR}/imtgqltest")
-	add_subdirectory("${TESTS_DIR}/ObjectCollectionTest/CMake" "${AUX_INCLUDE_DIR}/ObjectCollectionTest")
+	add_dependencies(imtgqltest imtcom imtrest imtbase)
+
 	add_subdirectory("${TESTS_DIR}/FileCollectionTest/CMake" "${AUX_INCLUDE_DIR}/FileCollectionTest")
+	add_dependencies(ImtCoreFileCollectionTest imtbase imtauth imtrepo)
+
 	add_subdirectory("${TESTS_DIR}/RevisionControllerTest/CMake" "${AUX_INCLUDE_DIR}/RevisionControllerTest")
-	add_subdirectory("${TESTS_DIR}/StructureTest/CMake" "${AUX_INCLUDE_DIR}/StructureTest")
+	add_dependencies(ImtCoreRevisionControllerTest imtauth imtbase)
+
 	add_subdirectory("${TESTS_DIR}/PersonalAccessTokenTest/CMake" "${AUX_INCLUDE_DIR}/PersonalAccessTokenTest")
+	add_dependencies(PersonalAccessTokenTest imtbase imtauth)
 
 	file(COPY ${TESTS_DIR}/Migrations DESTINATION ${TESTS_DIR}/../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
 

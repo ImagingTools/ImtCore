@@ -40,6 +40,12 @@ const iser::ISerializable* CTaskParamsComp::GetParameter(const QByteArray& id) c
 }
 
 
+const iprm::IParamsInfoProvider* CTaskParamsComp::GetParamsInfoProvider() const
+{
+	return BaseClass::GetParamsInfoProvider();
+}
+
+
 // protected methods
 
 // reimplemented (icomp::CComponentBase)

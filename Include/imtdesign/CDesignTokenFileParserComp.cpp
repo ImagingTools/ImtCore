@@ -327,8 +327,9 @@ bool CDesignTokenFileParserComp::GetColorPalette(const QByteArray& designSchemaI
 	if(designSchemaId.isEmpty() && !m_colorPalettes.isEmpty()){
 		palette = m_colorPalettes.first();
 	}
-
-	palette = m_colorPalettes[designSchemaId];
+	else{
+		palette = m_colorPalettes[designSchemaId];
+	}
 
 	return true;
 }
@@ -376,9 +377,9 @@ QByteArray CDesignTokenFileParserComp::GetIconColor(const QByteArray& styleName,
 		return coloramtsMap->colorList[CDesignTokenStyleUtils::s_onActiveColorParamName].toByteArray();
 	case IS_ON_SELECTED:
 		return coloramtsMap->colorList[CDesignTokenStyleUtils::s_onSelectedColorParamName].toByteArray();
+	default:
+		return QByteArray();
 	}
-
-	return QByteArray();
 }
 
 

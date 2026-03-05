@@ -3386,6 +3386,7 @@ bool CPrinterBaseObject::hasLinkList()
 
 void CPrinterBaseObject::emplaceLinkList()
 {
+	ResetLinkList();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
@@ -3475,6 +3476,7 @@ bool CPrinterBaseObject::hasSpecification()
 
 void CPrinterBaseObject::emplaceSpecification()
 {
+	ResetSpecification();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}
@@ -3534,6 +3536,7 @@ bool CPrinterBaseObject::hasSpecificationList()
 
 void CPrinterBaseObject::emplaceSpecificationList()
 {
+	ResetSpecificationList();
 	if(!Version_1_0){
 		Version_1_0.emplace();
 	}

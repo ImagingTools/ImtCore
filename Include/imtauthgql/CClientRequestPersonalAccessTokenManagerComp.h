@@ -20,6 +20,7 @@ public:
 	typedef imtauthgql::CClientRequestManagerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CClientRequestPersonalAccessTokenManagerComp)
+		I_REGISTER_INTERFACE(iser::ISerializable);
 		I_REGISTER_INTERFACE(imtauth::IPersonalAccessTokenManager);
 		I_ASSIGN(m_tokenFactoryCompPtr, "PersonalAccessTokenFactory", "Personal access token factory", true, "PersonalAccessTokenFactory");
 	I_END_COMPONENT;
@@ -37,6 +38,9 @@ public:
 	virtual bool RevokeToken(const QByteArray& tokenId) override;
 	virtual bool UpdateLastUsedAt(const QByteArray& tokenId) override;
 	virtual bool DeleteToken(const QByteArray& tokenId) override;
+
+	// reimplemented (iser::ISerializable)
+	virtual bool Serialize(iser::IArchive& archive) override;
 
 private:
 	I_FACT(imtauth::IPersonalAccessToken, m_tokenFactoryCompPtr);

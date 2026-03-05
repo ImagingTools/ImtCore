@@ -47,6 +47,7 @@ type ParamTypeIds
 	PasswordParam: ID
 	EnableableParam: ID
 	ServerConnectionParam: ID
+	CollectionImportParam: ID
 }
 
 type UrlParam
@@ -182,6 +183,17 @@ type ObjectLink {
 	typeId: ID
 	name: String
 	url: UrlParam
+}
+
+type FileImportInfo {
+	filePath: String
+	objectTypeId: ID
+	proposedId: ID
+}
+
+type CollectionImportParam {
+	collectionId: ID
+	fileImportInfos: [FileImportInfo]
 }
 
 

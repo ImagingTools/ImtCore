@@ -140,6 +140,21 @@ I_EXPORT_COMPONENT(
 			"Server connection param representation controller",
 			"Server Connection Param Representation Controller");
 
+I_EXPORT_COMPONENT(
+			CollectionImportParamRepresentationController,
+			"Collection import param representation controller",
+			"Collection Import Param Representation Controller");
+
+I_EXPORT_COMPONENT(
+			IdParamRepresentationController,
+			"Id param representation controller",
+			"ID Param Representation Controller");
+
+I_EXPORT_COMPONENT(
+			ParamsRepresentationController,
+			"Params representation controller",
+			"Params Representation Controller");
+
 
 } // namespace ImtServerAppPck
 

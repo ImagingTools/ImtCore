@@ -493,7 +493,7 @@ bool CDocumentTable::MoveToValue(const QByteArray& value)
 					std::string valueRead;
 					if (result.done){
 						valueRead = result.value.as_string();
-						ok = valueRead.data() == value;
+						ok = valueRead == value.toStdString();
 						if(ok){
 							break;
 						}

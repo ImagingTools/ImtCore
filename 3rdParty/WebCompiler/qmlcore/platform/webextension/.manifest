@@ -1,4 +1,0 @@
-{
-	"requires": ["html5"],
-	"templates": ["*.html", "manifest.json"]
-}

@@ -26,11 +26,15 @@ RUN New-Item -ItemType Directory -Force -Path C:/modules
 COPY Tests/Docker/GUI/package.json C:/modules/package.json
 RUN cd C:/modules; \
     npm install; \
+    npm install newman; \
     npx playwright install chromium --with-deps; \
     Remove-Item package.json;
 
 ENV PATH="C:\\modules\\node_modules\\.bin;${PATH}"
-ENV NODE_PATH="C:\\modules\\node_modules"
+# IMPORTANT: Do NOT set global NODE_PATH to C:\modules\node_modules.
+# NODE_PATH can cause Node to resolve @playwright/test from unexpected locations,
+# leading to duplicate installations and "test.beforeEach()" errors.
+# ENV NODE_PATH="C:\\modules\\node_modules"
 
 # Note: All application files (GUI tests, API tests, resources, startup scripts, entrypoint)
 # should be mounted via -v volume mounts when running the container:

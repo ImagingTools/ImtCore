@@ -41,6 +41,9 @@ public:
 	virtual bool UpdateLastUsedAt(const QByteArray& tokenId) override;
 	virtual bool DeleteToken(const QByteArray& tokenId) override;
 
+	// reimplemented (iser::ISerializable)
+	virtual bool Serialize(iser::IArchive& archive) override;
+
 private:
 	QByteArray GenerateRandomToken() const;
 	QByteArray HashToken(const QByteArray& rawToken) const;

@@ -399,7 +399,7 @@ Rectangle {
 
 				MouseArea{
 					anchors.fill: registerUserText;
-
+					objectName: "RegisterUser"
 					cursorShape: Qt.PointingHandCursor;
 					hoverEnabled: true;
 					onClicked: {

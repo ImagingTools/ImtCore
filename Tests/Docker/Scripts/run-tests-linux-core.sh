@@ -12,6 +12,8 @@ CONTAINER_NAME="${CONTAINER_NAME:-imtcore-tests-$(date +%s)}"
 IMAGE_NAME="imtcore-tests:linux"
 POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-root}"
 POSTGRES_DB="${POSTGRES_DB:-test_db}"
+RUN_GUI_TESTS="${RUN_GUI_TESTS:-true}"
+RUN_API_TESTS="${RUN_API_TESTS:-true}"
 
 # Auto-construct DATABASE_URL
 DATABASE_URL="postgresql://postgres:${POSTGRES_PASSWORD}@localhost:5432/${POSTGRES_DB}"
@@ -30,6 +32,8 @@ echo "[DEBUG] POSTGRES_PASSWORD: $POSTGRES_PASSWORD"
 echo "[DEBUG] DATABASE_URL: $DATABASE_URL"
 echo "[DEBUG] TEST_USERS: $TEST_USERS"
 echo "[DEBUG] UPDATE_SNAPSHOTS: ${UPDATE_SNAPSHOTS:-false}"
+echo "[DEBUG] RUN_GUI_TESTS: $RUN_GUI_TESTS"
+echo "[DEBUG] RUN_API_TESTS: $RUN_API_TESTS"
 echo ""
 
 if ! command -v docker &> /dev/null; then
@@ -113,6 +117,8 @@ eval docker run -d \
   -e DATABASE_URL="$DATABASE_URL" \
   -e TEST_USERS="$TEST_USERS" \
   -e UPDATE_SNAPSHOTS="${UPDATE_SNAPSHOTS:-false}" \
+  -e RUN_GUI_TESTS="$RUN_GUI_TESTS" \
+  -e RUN_API_TESTS="$RUN_API_TESTS" \
   -e CI=true \
   $VOLUME_MOUNTS \
   "$IMAGE_NAME" \

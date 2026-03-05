@@ -19,10 +19,10 @@ function parseTestUsers() {
 const users = parseTestUsers();
 const appDir = path.join(__dirname, 'app');
 const guestDir = path.join(__dirname, 'app', 'guest');
-const authorizedDir = path.join(__dirname, 'app', 'authorized');
+const authorizedRootDir = path.join(__dirname, 'app', 'authorized');
 
 const hasGuest = fs.existsSync(guestDir);
-const hasAuthorized = fs.existsSync(authorizedDir);
+const hasAuthorized = fs.existsSync(authorizedRootDir);
 
 console.log('App dir:', appDir);
 console.log('Guest dir exists:', hasGuest);
@@ -33,11 +33,15 @@ const projects = [];
 
 if (hasAuthorized && users.length > 0) {
   users.forEach((user, index) => {
+    const userDir = path.join(authorizedRootDir, user.username);
     projects.push({
-      name: `authorized-user${index}`,
-      testDir: authorizedDir,
+      name: `authorized-${user.username}`,
+      testDir: userDir,
       use: {
-        storageState: `storageState-user${index}.json`,
+        storageState: `storageState-${user.username}.json`,
+        username: user.username,
+        password: user.password,
+        userIndex: index,
       },
     });
   });
@@ -62,21 +66,22 @@ if (projects.length === 0) {
 console.log('Projects:', projects.map(p => p.name).join(', '));
 
 module.exports = defineConfig({
-  // НЕ указываем testDir на верхнем уровне - только в projects
-  
   globalSetup: (hasAuthorized && users.length > 0) 
     ? require.resolve('./global-setup') 
     : undefined,
 
   timeout: 30 * 1000,
-  expect: { timeout: 5000 },
-  fullyParallel: true,
+  expect: { 
+    timeout: 5000,
+    snapshotPathTemplate: 'test-results/{projectName}/{testFileDir}/{testFileName}-snapshots/{arg}{ext}',
+  },
   retries: 0,
+  workers: 4,
 
   reporter: [
-    ['html', { outputFolder: 'playwright-report' }],
-    ['json', { outputFile: 'test-results/playwright-results.json' }],
-    ['junit', { outputFile: 'test-results/playwright-junit.xml' }],
+    ['html', { outputFolder: process.env.PLAYWRIGHT_HTML_REPORT || 'playwright-report' }],
+    ['json', { outputFile: process.env.PLAYWRIGHT_JSON_OUTPUT_FILE || 'test-results/playwright-results.json' }],
+    ['junit', { outputFile: process.env.PLAYWRIGHT_JUNIT_OUTPUT_FILE || 'test-results/playwright-junit.xml' }],
     ['list'],
   ],
 

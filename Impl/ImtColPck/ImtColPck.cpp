@@ -35,6 +35,11 @@ I_EXPORT_COMPONENT(
 			"Collection headers provider",
 			"Collection Headers Provider");
 
+I_EXPORT_COMPONENT(
+			CollectionImportParam,
+			"Collection import param",
+			"Collection Import Param");
+
 
 } // namespace ImtColPck
 

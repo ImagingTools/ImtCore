@@ -131,7 +131,7 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
 				if (filterModel != nullptr){
 					QByteArrayList filteringInfoIds;
 					for (int i = 0; i < filterModel->GetItemsCount(); i++){
-						QByteArray headerId = filterModel->GetData("Id", i).toByteArray();
+						QByteArray headerId = filterModel->GetData("id", i).toByteArray();
 						if (!headerId.isEmpty()){
 							filteringInfoIds << headerId;
 						}
