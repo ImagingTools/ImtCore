@@ -10,7 +10,7 @@ set "THIRD_PARTY_DIR=3rdParty"
 set "TEMP_DIR=%TEMP%\3rdparty-migration"
 
 :: List of libraries to migrate
-set "LIBRARIES=EJ JQ JQML JQML2 QXlsx WebCompiler boost icu libmdbx mongoc mongocxx nodejs openssl pybind11 quazip zlib zstd"
+set "LIBRARIES=EJ QXlsx WebCompiler boost icu libmdbx mongoc mongocxx nodejs openssl pybind11 quazip zlib zstd"
 
 :: Function to print colored output
 goto :main
@@ -193,7 +193,7 @@ goto :main
         echo set "GITHUB_ORG=ImagingTools"
         echo.
         echo :: Libraries to add as submodules
-        echo set "LIBRARIES=EJ JQ JQML JQML2 QXlsx WebCompiler boost icu libmdbx mongoc mongocxx nodejs openssl pybind11 quazip zlib zstd"
+        echo set "LIBRARIES=EJ QXlsx WebCompiler boost icu libmdbx mongoc mongocxx nodejs openssl pybind11 quazip zlib zstd"
         echo.
         echo echo Adding submodules...
         echo.

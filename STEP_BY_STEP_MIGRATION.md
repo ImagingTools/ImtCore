@@ -46,11 +46,11 @@ Windows:
 dir %TEMP%\3rdparty-migration\
 ```
 
-You should see 17 directories, one for each library.
+You should see 14 directories, one for each library.
 
 ## Phase 2: Create GitHub Repositories
 
-You need to create 17 repositories under the `ImagingTools` organization. You can do this via:
+You need to create 14 repositories under the `ImagingTools` organization. You can do this via:
 
 ### Option A: GitHub Web Interface
 
@@ -74,9 +74,6 @@ gh auth login
 
 # Create repositories
 gh repo create ImagingTools/EJ --public
-gh repo create ImagingTools/JQ --public
-gh repo create ImagingTools/JQML --public
-gh repo create ImagingTools/JQML2 --public
 gh repo create ImagingTools/QXlsx --public
 gh repo create ImagingTools/WebCompiler --public
 gh repo create ImagingTools/boost --public
@@ -99,9 +96,6 @@ gh auth login
 
 # Create repositories
 gh repo create ImagingTools/EJ --public
-gh repo create ImagingTools/JQ --public
-gh repo create ImagingTools/JQML --public
-gh repo create ImagingTools/JQML2 --public
 gh repo create ImagingTools/QXlsx --public
 gh repo create ImagingTools/WebCompiler --public
 gh repo create ImagingTools/boost --public
@@ -141,12 +135,6 @@ git branch -M main
 git push -u origin main
 cd ..
 
-cd /tmp/3rdparty-migration/JQ
-git remote add origin https://github.com/ImagingTools/JQ.git
-git branch -M main
-git push -u origin main
-cd ..
-
 # Repeat for all libraries...
 ```
 
@@ -154,12 +142,6 @@ Windows:
 ```batch
 cd %TEMP%\3rdparty-migration\EJ
 git remote add origin https://github.com/ImagingTools/EJ.git
-git branch -M main
-git push -u origin main
-cd ..
-
-cd %TEMP%\3rdparty-migration\JQ
-git remote add origin https://github.com/ImagingTools/JQ.git
 git branch -M main
 git push -u origin main
 cd ..
@@ -173,7 +155,7 @@ Linux/macOS:
 ```bash
 cd /tmp/3rdparty-migration
 
-for lib in EJ JQ JQML JQML2 QXlsx WebCompiler boost icu libmdbx mongoc mongocxx nodejs openssl pybind11 quazip zlib zstd; do
+for lib in EJ QXlsx WebCompiler boost icu libmdbx mongoc mongocxx nodejs openssl pybind11 quazip zlib zstd; do
     echo "Pushing $lib..."
     cd "$lib"
     git remote add origin "https://github.com/ImagingTools/${lib}.git"
@@ -187,7 +169,7 @@ Windows (PowerShell):
 ```powershell
 cd $env:TEMP\3rdparty-migration
 
-foreach ($lib in @("EJ", "JQ", "JQML", "JQML2", "QXlsx", "WebCompiler", "boost", "icu", "libmdbx", "mongoc", "mongocxx", "nodejs", "openssl", "pybind11", "quazip", "zlib", "zstd")) {
+foreach ($lib in @("EJ", "QXlsx", "WebCompiler", "boost", "icu", "libmdbx", "mongoc", "mongocxx", "nodejs", "openssl", "pybind11", "quazip", "zlib", "zstd")) {
     Write-Host "Pushing $lib..."
     cd $lib
     git remote add origin "https://github.com/ImagingTools/$lib.git"
@@ -239,9 +221,6 @@ cd /home/runner/work/ImtCore/ImtCore
 
 # Add each library as a submodule
 git submodule add https://github.com/ImagingTools/EJ.git 3rdParty/EJ
-git submodule add https://github.com/ImagingTools/JQ.git 3rdParty/JQ
-git submodule add https://github.com/ImagingTools/JQML.git 3rdParty/JQML
-git submodule add https://github.com/ImagingTools/JQML2.git 3rdParty/JQML2
 git submodule add https://github.com/ImagingTools/QXlsx.git 3rdParty/QXlsx
 git submodule add https://github.com/ImagingTools/WebCompiler.git 3rdParty/WebCompiler
 git submodule add https://github.com/ImagingTools/boost.git 3rdParty/boost
@@ -263,9 +242,6 @@ cd C:\path\to\ImtCore
 
 REM Add each library as a submodule
 git submodule add https://github.com/ImagingTools/EJ.git 3rdParty/EJ
-git submodule add https://github.com/ImagingTools/JQ.git 3rdParty/JQ
-git submodule add https://github.com/ImagingTools/JQML.git 3rdParty/JQML
-git submodule add https://github.com/ImagingTools/JQML2.git 3rdParty/JQML2
 git submodule add https://github.com/ImagingTools/QXlsx.git 3rdParty/QXlsx
 git submodule add https://github.com/ImagingTools/WebCompiler.git 3rdParty/WebCompiler
 git submodule add https://github.com/ImagingTools/boost.git 3rdParty/boost
@@ -334,11 +310,10 @@ git add .gitmodules
 # Commit the submodule configuration
 git commit -m "Convert 3rdParty libraries to git submodules
 
-All 17 third-party libraries have been moved to separate repositories
+All 14 third-party libraries have been moved to separate repositories
 and integrated as git submodules:
 
-- EJ, JQ, JQML, JQML2, QXlsx
-- WebCompiler
+- EJ, QXlsx, WebCompiler
 - boost, icu, libmdbx
 - mongoc, mongocxx
 - nodejs, openssl

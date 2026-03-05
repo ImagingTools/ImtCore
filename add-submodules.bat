@@ -7,7 +7,7 @@ setlocal enabledelayedexpansion
 set "GITHUB_ORG=ImagingTools"
 
 :: Libraries to add as submodules
-set "LIBRARIES=EJ JQ JQML JQML2 QXlsx WebCompiler boost icu libmdbx mongoc mongocxx nodejs openssl pybind11 quazip zlib zstd"
+set "LIBRARIES=EJ QXlsx WebCompiler boost icu libmdbx mongoc mongocxx nodejs openssl pybind11 quazip zlib zstd"
 
 echo Adding submodules...
 
