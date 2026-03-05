@@ -5,7 +5,7 @@ defineTest(prepareWebQml) {
 	buildwebdir = $$1
 	imtcoredir = $(IMTCOREDIR)
 
-	copyToWebDir($$imtcoredir/3rdParty/JQML2/Core/dist, $$buildwebdir/Resources)
+	copyToWebDir($$imtcoredir/Tools/JQML/v2/core/dist, $$buildwebdir/Resources)
 
 # copy project qml from to
 #	copyToWebDir($$PWD/../Qml, $$buildwebdir/src)
