@@ -18,33 +18,6 @@ namespace imtsdl
 
 // public methods
 
-const CSdlEntryBase& CSdlDocumentType::GetReferenceType() const
-{
-	if (!m_referenceType.GetName().isEmpty()){
-		return m_referenceType;
-	}
-
-	return m_referenceUnionType;
-}
-
-
-void CSdlDocumentType::SetReferenceType(const CSdlType& referenceType)
-{
-	if (m_referenceType != referenceType){
-		istd::CChangeNotifier notifier(this);
-		m_referenceType = referenceType;
-	}
-}
-
-
-void CSdlDocumentType::SetReferenceType(const CSdlUnion& referenceType)
-{
-	if (m_referenceUnionType != referenceType){
-		istd::CChangeNotifier notifier(this);
-		m_referenceUnionType = referenceType;
-	}
-}
-
 
 QMultiMap<CSdlDocumentType::OperationType, CSdlRequest> CSdlDocumentType::GetOperationsList() const
 {
@@ -119,8 +92,6 @@ bool CSdlDocumentType::operator==(const CSdlDocumentType& other) const
 {
 	return
 		m_name == other.m_name &&
-		m_referenceType == other.m_referenceType &&
-		m_referenceUnionType == other.m_referenceUnionType &&
 		m_operationsList == other.m_operationsList &&
 		m_subtypes == other.m_subtypes &&
 		GetSchemaParams().IsEqual(other.GetSchemaParams());
@@ -140,16 +111,6 @@ bool CSdlDocumentType::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.BeginTag(nameTag);
 	retVal = retVal && archive.Process(m_name);
 	retVal = retVal && archive.EndTag(nameTag);
-
-	iser::CArchiveTag referenceTag("Reference", "", iser::CArchiveTag::TT_GROUP);
-	retVal = retVal && archive.BeginTag(referenceTag);
-	retVal = retVal && m_referenceType.Serialize(archive);
-	retVal = retVal && archive.EndTag(referenceTag);
-
-	iser::CArchiveTag unionReferenceTag("UnionReference", "", iser::CArchiveTag::TT_GROUP);
-	retVal = retVal && archive.BeginTag(unionReferenceTag);
-	retVal = retVal && m_referenceUnionType.Serialize(archive);
-	retVal = retVal && archive.EndTag(unionReferenceTag);
 
 	retVal = retVal && SerializeOperationsList(archive, m_operationsList, "OperationList", "Operation", "Type", "Request");
 
