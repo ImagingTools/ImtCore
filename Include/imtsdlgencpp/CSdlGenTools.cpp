@@ -27,6 +27,39 @@
 namespace imtsdlgencpp
 {
 
+
+
+// static helpers
+namespace
+{
+
+std::optional<imtsdl::CSdlField> GetResponseFieldById(
+			const imtsdl::CSdlField& requestField,
+			const imtsdl::SdlTypeList& typeList,
+			const QString& fieldId)
+{
+	imtsdl::CSdlType responseType;
+	if (!imtsdl::CSdlTools::GetSdlTypeForField(requestField, typeList, responseType)){
+		return {};
+	}
+
+	const imtsdl::SdlFieldList responseFields = responseType.GetFields();
+	auto itemsField = std::find_if(responseFields.begin(), responseFields.end(),
+			[&fieldId](const imtsdl::CSdlField& field) {
+				return field.GetId() == fieldId;
+			});
+
+	if (itemsField == responseFields.end()){
+		return {};
+	}
+
+	return *itemsField;
+}
+
+} // namespace
+
+
+
 // public methods of embedded CStructNamespaceConverter class
 
 
@@ -540,6 +573,7 @@ QString CSdlGenTools::GetTempVariableWrappedValue(const QString& variableName)
 	return QStringLiteral("t_%1").arg(imtsdl::CSdlTools::GetDecapitalizedValue(variableName));
 }
 
+
 std::shared_ptr<imtsdl::CSdlEntryBase> CSdlGenTools::GetCollectionReferenceForDocument(
 			const imtsdl::CSdlDocumentType& documentType,
 			const imtsdl::SdlTypeList& typeList,
@@ -556,10 +590,16 @@ std::shared_ptr<imtsdl::CSdlEntryBase> CSdlGenTools::GetCollectionReferenceForDo
 	std::optional<CSdlField> fieldForType;
 	switch (operationType) {
 		case CSdlDocumentType::OT_GET:
-		case CSdlDocumentType::OT_LIST:
+			fieldForType = request.GetOutputArgument();
+			break;
+
+		case CSdlDocumentType::OT_LIST: 
+			fieldForType = GetResponseFieldById(request.GetOutputArgument(), typeList, QStringLiteral("items"));
+			break;
 		case CSdlDocumentType::OT_INSERT:
 		case CSdlDocumentType::OT_UPDATE:
-		
+			fieldForType = GetResponseFieldById(request.GetInputArguments().constFirst(), typeList, QStringLiteral("item"));
+			break;
 		case CSdlDocumentType::OT_GET_VIEW:
 		case CSdlDocumentType::OT_DELETE:
 		case CSdlDocumentType::OT_UPDATE_COLLECTION:
@@ -574,8 +614,9 @@ std::shared_ptr<imtsdl::CSdlEntryBase> CSdlGenTools::GetCollectionReferenceForDo
 		case CSdlDocumentType::OT_ELEMENT_HISTORY:
 		case CSdlDocumentType::OT_IMPORT:
 		case CSdlDocumentType::OT_EXPORT:
+			break;
 		default:
-			qWarning() << "Operation type not implemented";
+			qWarning() << "Operation type not implemented" << operationType;
 			break;
 		}
 
