@@ -594,9 +594,15 @@ std::shared_ptr<imtsdl::CSdlEntryBase> CSdlGenTools::GetCollectionReferenceForDo
 			fieldForType = GetResponseFieldById(request.GetOutputArgument(), typeList, QStringLiteral("items"));
 			break;
 		case CSdlDocumentType::OT_INSERT:
-		case CSdlDocumentType::OT_UPDATE:
-			fieldForType = GetResponseFieldById(request.GetInputArguments().constFirst(), typeList, QStringLiteral("item"));
+		case CSdlDocumentType::OT_UPDATE: {
+			const auto inputArgs = request.GetInputArguments();
+			if (inputArgs.isEmpty()) {
+				qWarning() << "No input arguments for operation type" << operationType;
+				break;
+			}
+			fieldForType = GetResponseFieldById(inputArgs.constFirst(), typeList, QStringLiteral("item"));
 			break;
+		}
 		case CSdlDocumentType::OT_GET_VIEW:
 		case CSdlDocumentType::OT_DELETE:
 		case CSdlDocumentType::OT_UPDATE_COLLECTION:
