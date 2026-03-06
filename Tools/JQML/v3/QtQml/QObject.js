@@ -66,6 +66,10 @@ class QObject extends QBaseObject {
 
     __children = []
 
+    hasOwnProperty(key){
+		return this.__self.constructor.meta[key] || super.hasOwnProperty(key)
+	}
+
     setParent(parent){
         this.__proxy.parent = parent
     }

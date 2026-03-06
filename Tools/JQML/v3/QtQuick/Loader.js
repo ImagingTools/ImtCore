@@ -43,7 +43,10 @@ class Loader extends Item {
 
     SLOT_sourceComponentChanged(oldValue, newValue){
         if(this.item) this.item.destroy()
-        if(!this.sourceComponent) return
+        if(!this.sourceComponent) {
+            this.item = null
+            return
+        }
 
         this.__updateProperty('visible')
         let item = this.sourceComponent.createObject(this, {}, true)
@@ -69,7 +72,10 @@ class Loader extends Item {
 
     SLOT_sourceChanged(oldValue, newValue){
         if(this.item) this.item.destroy()
-        if(!this.source) return
+        if(!this.source) {
+            this.item = null
+            return
+        }
 
         let path = this.source.replaceAll('qrc:/', '').replaceAll('.qml', '').split('/')
         let className = path[path.length-1]
