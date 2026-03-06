@@ -1,9 +1,4 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include "imtsdl/CSdlTools.h"
-#include "imtsdl/CSdlType.h"
-#include "imtsdl/CSdlUnion.h"
-#include "imtsdlgencpp/CSdlGenTools.h"
-#include <QtCore/qassert.h>
 #include <imtsdlgencpp/CGqlCollectionControllerBaseClassGeneratorComp.h>
 
 
