@@ -59,6 +59,7 @@ class Canvas extends Item {
 
         ctx.roundedRect = (...args)=>{ctx.roundRect(...args)}
         let originDrawImage = ctx.drawImage
+        let originCreatePattern = ctx.createPattern
         ctx.drawImage = (...args)=>{
             if(typeof args[0] === 'string'){
                 let path = JQApplication.rootPath+'/'+args[0].replaceAll('../','')
@@ -82,6 +83,33 @@ class Canvas extends Item {
                 
             } else {
                 originDrawImage.call(ctx, ...args)
+            }
+            
+        }
+
+        ctx.createPattern = (...args)=>{
+            if(typeof args[0] === 'string'){
+                let path = JQApplication.rootPath+'/'+args[0].replaceAll('../','')
+                if(this.__cache[path]){
+                    args[0] = this.__cache[path]
+                    originCreatePattern.call(ctx, ...args)
+                } else {
+                    let img = new Image();
+                    img.onload = ()=>{
+                        args[0] = img
+                        originCreatePattern.call(ctx, ...args)
+                        this.__cache[path] = img
+                        this.requestPaint()
+                    }
+                    img.onerror = ()=>{
+                        img.remove()
+                    }
+
+                    img.src = path.replaceAll('//','/')
+                }
+                
+            } else {
+                originCreatePattern.call(ctx, ...args)
             }
             
         }
@@ -119,7 +147,22 @@ class Canvas extends Item {
 
     }
     loadImage(image){
+        if(typeof image === 'string'){
+            let path = JQApplication.rootPath+'/'+image.replaceAll('../','')
+            if(!this.__cache[path]){
+                let img = sourceSize ? new Image(sourceSize.width, sourceSize.height) : new Image()
+                img.onload = ()=>{
+                    image = img
+                    this.__cache[path] = img
+                }
+                img.onerror = ()=>{
+                    img.remove()
+                }
 
+                img.src = path.replaceAll('//','/')
+            }
+            
+        }
     }
     markDirty(area){
 
