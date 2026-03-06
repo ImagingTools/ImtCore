@@ -9,27 +9,19 @@ class RegularExpressionValidator extends QtObject {
         regularExpressionChanged: { type:Signal, args:[] },
     })
 
-    $makeRegExp(regExp){
-        delete this.$matchRegex
-        delete this.$partialMatchRegex
+    SLOT_regularExpressionChanged(oldValue, newValue){
+        delete this.__matchRegex
+        delete this.__partialMatchRegex
 
-        if(regExp){
-            this.$matchRegex = regExp
-            this.$partialMatchRegex = this.$matchRegex.toPartialMatchRegex()
+        if(newValue){
+            this.__matchRegex = newValue
+            this.__partialMatchRegex = this.__matchRegex.toPartialMatchRegex()
         }
     }
 
-    $regularExpressionChanged(){
-        this.$makeRegExp(this.getPropertyValue('regularExpression'))
-    }
-
-    $regExpChanged(){
-        this.$makeRegExp(this.getPropertyValue('regExp'))
-    }
-
     validate(str){
-        if(this.$matchRegex){
-            let result = this.$matchRegex.exec(str)
+        if(this.__matchRegex){
+            let result = this.__matchRegex.exec(str)
             return result ? result[0] === str ? true : false : false
         } else {
             return true
@@ -39,8 +31,8 @@ class RegularExpressionValidator extends QtObject {
     hasPartialMatch(str){
         if(!str) return true
 
-        if(this.$partialMatchRegex){
-            let result = this.$partialMatchRegex.exec(str)
+        if(this.__partialMatchRegex){
+            let result = this.__partialMatchRegex.exec(str)
             return result ? result[0] === str ? true : false : false
         } else {
             return true

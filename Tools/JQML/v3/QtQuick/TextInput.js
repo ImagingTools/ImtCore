@@ -246,6 +246,22 @@ class TextInput extends Item {
         
     }
 
+    __checkValidator(){
+        if(this.validator){
+            if(this.validator.validate(this.text)){
+                this.acceptableInput = true
+            } else {
+                this.acceptableInput = false
+            }
+        } else {
+            this.acceptableInput = true
+        }
+    }
+
+    SLOT_validatorChanged(oldValue, newValue){
+        this.__checkValidator()
+    }
+
     SLOT_focusChanged(oldValue, newValue){
         super.SLOT_focusChanged(oldValue, newValue)
         if(newValue){
@@ -345,6 +361,8 @@ class TextInput extends Item {
             this.__impl.innerText = this.text
         }
 
+        this.__checkValidator()
+
         this.__updateGeometry()
     }
 
@@ -353,6 +371,14 @@ class TextInput extends Item {
         this.__setDOMStyle({
             color: `rgba(${rgba.r},${rgba.g},${rgba.b},${this.__proxy.color === 'transparent' ? 0 : rgba.a * this.opacity})`
         })
+    }
+
+    SLOT_visibleChanged(oldValue, newValue){
+        super.SLOT_visibleChanged(oldValue, newValue)
+
+        if(newValue && this.activeFocus){
+            this.__impl.focus()
+        }
     }
 
     onFontChanged(oldValue, newValue){

@@ -281,6 +281,14 @@ class TextEdit extends Item {
         })
     }
 
+    SLOT_visibleChanged(oldValue, newValue){
+        super.SLOT_visibleChanged(oldValue, newValue)
+        
+        if(newValue && this.activeFocus){
+            this.__impl.focus()
+        }
+    }
+
     onFontChanged(oldValue, newValue){
         this.__setDOMStyle({
             fontWeight: this.font.bold == true ? 'bold' : 'normal',
