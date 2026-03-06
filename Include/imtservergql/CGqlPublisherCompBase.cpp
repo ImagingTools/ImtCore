@@ -58,22 +58,23 @@ bool CGqlPublisherCompBase::RegisterSubscription(
 
 	QMutexLocker locker(&m_mutex);
 
-	for (RequestNetworks& requestNetworks: m_registeredSubscribers){
-		if (requestNetworks.gqlRequest.GetCommandId() == gqlRequest.GetCommandId()){
-			requestNetworks.networkRequests.insert(subscriptionId, &networkRequest);
-			webSocketRequest->RegisterRequestEventHandler(this);
-
-			return true;
+	// Duplicate check
+	for (const RequestNetworks& entry : m_registeredSubscribers) {
+		if (entry.networkRequests.contains(subscriptionId) && entry.networkRequests.value(subscriptionId) == &networkRequest) {
+			errorMessage = QStringLiteral("Subscription ID already in use.");
+			return false;
 		}
 	}
 
-	RequestNetworks requestNetworks;
-	requestNetworks.gqlRequest.CopyFrom(gqlRequest);
-	requestNetworks.networkRequests.insert(subscriptionId, &networkRequest);
-	m_registeredSubscribers.append(requestNetworks);
+
+	// To support unique variables per user, every subscription MUST have its own RequestNetworks entry.
+	RequestNetworks newEntry;
+	newEntry.gqlRequest.CopyFrom(gqlRequest);
+	newEntry.networkRequests.insert(subscriptionId, &networkRequest);
+
+	m_registeredSubscribers.append(newEntry);
 
 	webSocketRequest->RegisterRequestEventHandler(this);
-
 	return true;
 }
 
@@ -82,19 +83,12 @@ bool CGqlPublisherCompBase::UnregisterSubscription(const QByteArray& subscriptio
 {
 	QMutexLocker locker(&m_mutex);
 
-	for (int i = 0; i < m_registeredSubscribers.size(); i++){
-		RequestNetworks& requestNetworks = m_registeredSubscribers[i];
-		if (requestNetworks.networkRequests.contains(subscriptionId)){
-			requestNetworks.networkRequests.remove(subscriptionId);
-			
-			if (requestNetworks.networkRequests.isEmpty()){
-				m_registeredSubscribers.removeAt(i);
-			}
-			
+	for (int i = 0; i < m_registeredSubscribers.size(); ++i) {
+		if (m_registeredSubscribers[i].networkRequests.contains(subscriptionId)) {
+			m_registeredSubscribers.removeAt(i);
 			return true;
 		}
 	}
-
 	return false;
 }
 
@@ -165,21 +159,40 @@ bool CGqlPublisherCompBase::PushDataToSubscriber(
 
 bool CGqlPublisherCompBase::PublishData(const QByteArray& commandId, const QByteArray& data) const
 {
-	QMutexLocker locker(&m_mutex);
+	return PublishDataFiltered(commandId, data, nullptr);
+}
 
-	for (const RequestNetworks& requestNetworks: m_registeredSubscribers){
-		if (commandId == requestNetworks.gqlRequest.GetCommandId()){
-			for (auto it = requestNetworks.networkRequests.constBegin(); it != requestNetworks.networkRequests.constEnd(); ++it){
-				const imtrest::IRequest* networkRequestPtr = requestNetworks.networkRequests[it.key()];
-				if (networkRequestPtr != nullptr){
-					bool retVal = PushDataToSubscriber(it.key(), commandId, data, *networkRequestPtr);
-					if (!retVal){
-						QString message = QString("Unable to notify subscriber about the changes. Subscription-ID: '%1', '%2'").arg(qPrintable(commandId), qPrintable(data));
 
-						SendErrorMessage(0, message, "CGqlPublisherCompBase");
+bool CGqlPublisherCompBase::PublishDataFiltered(
+	const QByteArray& commandId,
+	const QByteArray& data,
+	std::function<bool(const imtgql::CGqlRequest&)> predicate) const
+{
+	struct Target { QByteArray id; const imtrest::IRequest* req; };
+	QList<Target> targets;
+
+	{
+		QMutexLocker locker(&m_mutex);
+		for (const auto& entry : m_registeredSubscribers) {
+			if (entry.gqlRequest.GetCommandId() == commandId) {
+
+				// Apply filtering (predicate) to this subscriber's unique variables
+				if (!predicate || predicate(entry.gqlRequest)) {
+					for (auto it = entry.networkRequests.constBegin(); it != entry.networkRequests.constEnd(); ++it) {
+						targets.append({it.key(), it.value()});
 					}
 				}
 			}
+		}
+	}
+
+	// push data to subscribers outside the lock to keep the server responsive
+	for (const auto& target : targets) {
+		bool retVal = PushDataToSubscriber(target.id, commandId, data, *target.req);
+
+		if (!retVal){
+			QString message = QString("Unable to notify subscriber about the changes. Subscription-ID: '%1', '%2'").arg(qPrintable(commandId), qPrintable(data));
+			SendErrorMessage(0, message, "CGqlPublisherCompBase");
 		}
 	}
 

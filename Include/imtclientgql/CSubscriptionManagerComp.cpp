@@ -408,10 +408,9 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::CreateErrorResponse(const QB
 
 	const imtrest::IProtocolEngine& engine = request.GetProtocolEngine();
 
-	QString body =
-		QString(R"({"id": "%1","type": "error","payload": {"errors": [{"errorType": "ProcessRequestError","message": "%2"}]}})")
-						.arg(object["id"].toString())
-						.arg(QString(errorMessage));
+	QString body = QString(R"({"id": "%1","type": "error","payload": [ {"message": "%2", "extensions": { "type": "Warning" }} ]})")
+					   .arg(object["id"].toString())
+					   .arg(errorMessage);
 
 	QByteArray responseTypeId("text/html; charset=utf-8");
 	imtrest::ConstResponsePtr responsePtr(

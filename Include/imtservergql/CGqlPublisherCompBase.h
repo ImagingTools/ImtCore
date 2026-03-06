@@ -46,6 +46,10 @@ public:
 protected:
 	virtual bool PushDataToSubscriber(const QByteArray& subscriptionId, const QByteArray& commandId, const QByteArray& data, const imtrest::IRequest& networkRequest, const bool useAwsStyle = true) const;
 	virtual bool PublishData(const QByteArray& commandId, const QByteArray& data) const;
+	virtual bool PublishDataFiltered(
+		const QByteArray& commandId,
+		const QByteArray& data,
+		std::function<bool(const imtgql::CGqlRequest&)> predicate) const;
 
 protected:
 	I_MULTIATTR(QByteArray, m_commandIdsAttrPtr);

@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtservergql/CHttpGraphQLServletComp.h>
 
+// Qt includes
+#include <QtCore/QScopeGuard>
 
 // ACF includes
 #include <iser/CJsonMemWriteArchive.h>
@@ -45,6 +47,11 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 	const HeadersMap& headers,
 	const imtrest::CHttpRequest& request) const
 {
+	// Ensure Clear() is called on every return path
+	auto cleanup = qScopeGuard([]() {
+		imtgql::CGqlRequestContextManager::Clear();
+	});
+
 	m_lastRequest.ResetData();
 
 	qsizetype errorPosition = -1;
@@ -59,18 +66,16 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 
 	const QByteArray gqlCommand = m_lastRequest.GetCommandId();
 
-	// set a protocol version to gql object
-	for (HeadersMap::const_iterator headerIter = headers.cbegin(); headerIter != headers.cend(); ++headerIter){
+	// Set protocol version - RFC 2616: 4.2 case-insensitive header comparison
+	for (HeadersMap::const_iterator headerIter = headers.cbegin(); headerIter != headers.cend(); ++headerIter) {
 		// find header. compare with lowercase. RFC 2616: 4.2
-		if (headerIter.key().toLower() == imtbase::s_protocolVersionHeaderId.toLower()){
+		if (headerIter.key().toLower() == imtbase::s_protocolVersionHeaderId.toLower()) {
 			const QByteArray& protocolVersion = *headerIter;
 			m_lastRequest.SetProtocolVersion(protocolVersion);
 
 			break;
 		}
 	}
-
-	bool isSuccessful = false;
 
 	QByteArray userId;
 	QByteArray accessToken = headers.value(QByteArrayLiteral("x-authentication-token"));
@@ -132,10 +137,11 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 		m_lastRequest.SetGqlContext(shared);
 	}
 	else{
-		Q_ASSERT(false);
+		// Q_ASSERT(false);
 	}
 
 	QByteArray responseData;
+	bool isSuccessful = false;
 
 	int dataControllersCount = m_gqlRequestHandlerCompPtr.GetCount();
 	for (int index = 0; index < dataControllersCount; index++){
@@ -144,72 +150,60 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 			continue;
 		}
 
-		isSuccessful = requestHandlerPtr->IsRequestSupported(m_lastRequest);
-		// unsupported request
-		if (!isSuccessful){
+		if (!requestHandlerPtr->IsRequestSupported(m_lastRequest)) {
+			// unsupported request
 			continue;
 		}
 
 		QString errorMessage;
 		QString errorType = QStringLiteral("Warning");
-		istd::TDelPtr<imtbase::CTreeItemModel> sourceItemModelPtr;
-		sourceItemModelPtr.SetPtr(requestHandlerPtr->CreateResponse(m_lastRequest, errorMessage));
+		istd::TDelPtr<imtbase::CTreeItemModel> sourceItemModelPtr(requestHandlerPtr->CreateResponse(m_lastRequest, errorMessage));
 
-		bool isError = false;
 		imtbase::CTreeItemModel rootModel;
+		bool isError = !sourceItemModelPtr.IsValid();
 
-		isError = !sourceItemModelPtr.IsValid();
-		if(!isError){
+		// Detect if result model itself contains an "errors" child
+		if (!isError) {
 			imtbase::CTreeItemModel* errorsModelPtr = sourceItemModelPtr->GetTreeItemModel(QByteArrayLiteral("errors"));
-			isError = errorsModelPtr != nullptr;
-
-			if (isError){
-				if (errorsModelPtr->ContainsKey(QByteArrayLiteral("message"))){
+			if (errorsModelPtr != nullptr) {
+				isError = true;
+				if (errorsModelPtr->ContainsKey(QByteArrayLiteral("message"))) {
 					errorMessage = errorsModelPtr->GetData(QByteArrayLiteral("message")).toString();
 				}
 
-				if (errorsModelPtr->ContainsKey(QByteArrayLiteral("type"))){
+				if (errorsModelPtr->ContainsKey(QByteArrayLiteral("type"))) {
 					errorType = errorsModelPtr->GetData(QByteArrayLiteral("type")).toString();
 				}
 			}
-			else{
-				imtbase::CTreeItemModel* dataModelPtr = rootModel.AddTreeModel(QByteArrayLiteral("data"));
+		}
 
-				imtbase::CTreeItemModel* sourceDataModelPtr = sourceItemModelPtr->GetTreeItemModel(QByteArrayLiteral("data"));
-				if (sourceDataModelPtr != nullptr){
-					dataModelPtr->SetExternTreeModel(gqlCommand, sourceDataModelPtr->CopyMe());
-				}
-				else{
-					dataModelPtr->SetExternTreeModel(gqlCommand, sourceItemModelPtr->CopyMe());
-				}
+		if (isError) {
+			responseData = BuildGqlErrorJson(gqlCommand, errorMessage, errorType);
+			isSuccessful = !responseData.isEmpty();
+		}
+		else {
+			// Success path remains manual for the "data" mapping
+			imtbase::CTreeItemModel rootModel;
+			auto* dataModelPtr = rootModel.AddTreeModel(QByteArrayLiteral("data"));
+			auto* sourceData = sourceItemModelPtr->GetTreeItemModel(QByteArrayLiteral("data"));
+
+			dataModelPtr->SetExternTreeModel(gqlCommand,
+											 sourceData ?
+												 sourceData->CopyMe() :
+												 sourceItemModelPtr->CopyMe());
+
+			iser::CJsonMemWriteArchive archive(nullptr, false);
+			if (rootModel.SerializeModel(archive)) {
+				responseData = archive.GetData();
+				isSuccessful = true;
 			}
-		}
-
-		if (isError){
-			imtbase::CTreeItemModel* errorsModelPtr = rootModel.AddTreeModel(QByteArrayLiteral("errors"));
-			imtbase::CTreeItemModel* errorItemModelPtr = errorsModelPtr->AddTreeModel(gqlCommand);
-
-			errorItemModelPtr->SetData(QByteArrayLiteral("message"), errorMessage);
-			errorItemModelPtr->SetData(QByteArrayLiteral("type"), errorType);
-		}
-
-		iser::CJsonMemWriteArchive archive(nullptr, false);
-
-		isSuccessful = rootModel.SerializeModel(archive);
-		if (isSuccessful){
-			responseData = archive.GetData();
 		}
 
 		break;
 	}
 
-	imtgql::CGqlRequestContextManager::Clear();
-
-	if (!isSuccessful){
-		SendErrorMessage(0, QStringLiteral("Invalid command request:'%1'").arg(QString(gqlCommand)), QStringLiteral("GraphQL - servlet"));
-
-		return CreateResponse(StatusCode::SC_BAD_REQUEST, responseData, request);
-	}
+	// If we have a GraphQL JSON response (Success OR Warning/Execution Error)
+	// We return 200 OK so the client can read the { data: null, errors: [...] } structure.
 	if (!responseData.isEmpty()){
 		return CreateResponse(
 			StatusCode::SC_OK,
@@ -218,8 +212,17 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 			QByteArrayLiteral("application/json; charset=utf-8"));
 	}
 
-	SendErrorMessage(0, QStringLiteral("Internal server error for command '%1'").arg(QString(gqlCommand)), QStringLiteral("GraphQL - servlet"));
+	// If no handler supported the request (isSuccessful is still false)
+	// or if the loop never ran/serialization failed.
+	if (!isSuccessful){
+		SendErrorMessage(0, QStringLiteral("Invalid command request:'%1'").arg(QString(gqlCommand)), QStringLiteral("GraphQL - servlet"));
 
+		 // Return 400 because this is a transport/routing failure, not a business logic error.
+		return GenerateError(StatusCode::SC_BAD_REQUEST, responseData, request);
+	}
+
+	// Fallback for unexpected internal state
+	SendErrorMessage(0, QStringLiteral("Internal server error for command '%1'").arg(QString(gqlCommand)), QStringLiteral("GraphQL - servlet"));
 	return GenerateError(StatusCode::SC_INTERNAL_SERVER_ERROR, QStringLiteral("Request is incorrect"), request);
 }
 
@@ -246,23 +249,63 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::CreateResponse(
 
 imtrest::ConstResponsePtr CHttpGraphQLServletComp::GenerateError(
 	const StatusCode& errorCode,
-	const QString& /*errorString*/,
+	const QString& errorString,
 	const imtrest::CHttpRequest& request) const
 {
-	const imtrest::IProtocolEngine& engine = request.GetProtocolEngine();
+	// Default type to "Error" for 400/500 codes.
+	QByteArray responseJson = BuildGqlErrorJson(QByteArray(), errorString, QStringLiteral("Error"));
 
-	int protocolErrorCode = 200;
-	QByteArray protocolErrorString;
-	engine.GetProtocolStatusCode(errorCode, protocolErrorCode, protocolErrorString);
-
-	QByteArray responseJson;
 	return imtrest::ConstResponsePtr(
-		engine.CreateResponse(
-			request,
-			errorCode,
-			responseJson,
-			QByteArray("application/json;charset=utf-8")).PopInterfacePtr());
+		request.GetProtocolEngine().CreateResponse(
+									   request,
+									   errorCode,
+									   responseJson,
+									   QByteArray("application/json;charset=utf-8")).PopInterfacePtr());
 }
+
+
+QByteArray CHttpGraphQLServletComp::BuildGqlErrorJson(
+	const QByteArray& gqlCommand,
+	const QString& message,
+	const QString& type) const
+{
+	imtbase::CTreeItemModel rootModel;
+
+	// { "data": null }
+	rootModel.SetData(QByteArrayLiteral("data"), QVariant());
+
+	imtbase::CTreeItemModel* errorsArr = rootModel.AddTreeModel(QByteArrayLiteral("errors"));
+	if (errorsArr) {
+		errorsArr->SetIsArray(true);
+
+		// Add a single error object to the errors array
+		int errIdx = errorsArr->InsertNewItem();
+		errorsArr->SetData(QByteArrayLiteral("message"), message, errIdx);
+
+		// path: [ "CommandName" ]
+		if (!gqlCommand.isEmpty()) {
+			imtbase::CTreeItemModel* pathArr = errorsArr->AddTreeModel(QByteArrayLiteral("path"), errIdx);
+			pathArr->SetIsArray(true);
+			pathArr->SetData(QByteArray(), QString::fromUtf8(gqlCommand), pathArr->InsertNewItem());
+		}
+
+		// extensions: { "type": "Warning/Error" }
+		imtbase::CTreeItemModel* ext = errorsArr->AddTreeModel(QByteArrayLiteral("extensions"), errIdx);
+		if (ext) {
+			ext->SetData(QByteArrayLiteral("type"), type, 0);
+		}
+	}
+
+	iser::CJsonMemWriteArchive archive(nullptr, false);
+	if (!rootModel.SerializeModel(archive)) {
+		// Serialization failure
+		return QByteArray();
+	}
+
+	return archive.GetData();
+}
+
+
 
 
 } // namespace imtservergql
