@@ -274,6 +274,13 @@ class TextEdit extends Item {
         this.__updateGeometry()
     }
 
+    SLOT_colorChanged(oldValue, newValue){
+        let rgba = Color.getRGBA(this.__proxy, 'color', this.__self.constructor.meta.color)
+        this.__setDOMStyle({
+            color: `rgba(${rgba.r},${rgba.g},${rgba.b},${this.__proxy.color === 'transparent' ? 0 : rgba.a * this.opacity})`
+        })
+    }
+
     onFontChanged(oldValue, newValue){
         this.__setDOMStyle({
             fontWeight: this.font.bold == true ? 'bold' : 'normal',

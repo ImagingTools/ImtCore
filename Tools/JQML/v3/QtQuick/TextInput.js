@@ -56,6 +56,7 @@ class TextInput extends Item {
         bottomPadding: { type: Real, value: 0},
         selectedText: { type: String, value: ''},
         selectByMouse: { type: Bool, value: true},
+        passwordCharacter: { type: String, value: ''},
 
         textChanged: {type:Signal, args:[]},
         colorChanged: {type:Signal, args:[]},
@@ -83,6 +84,7 @@ class TextInput extends Item {
         bottomPaddingChanged: {type:Signal, args:[]},
         selectedTextChanged: {type:Signal, args:[]},
         selectByMouseChanged: {type:Signal, args:[]},
+        passwordCharacterChanged: {type:Signal, args:[]},
 
         accepted: {type:Signal, args:[]},
         editingFinished: {type:Signal, args:[]},
@@ -325,7 +327,7 @@ class TextInput extends Item {
         }
 
         if(this.echoMode === TextInput.Password){
-            this.__impl.innerText = this.text.replaceAll(/./g, '*')
+            this.__impl.innerText = this.text.replaceAll(/./g, this.passwordCharacter.length ? this.passwordCharacter[0] : '●')
         } else {
             this.__impl.innerText = this.text
         }
@@ -338,12 +340,19 @@ class TextInput extends Item {
         }
 
         if(this.echoMode === TextInput.Password){
-            this.__impl.innerText = this.text.replaceAll(/./g, '*')
+            this.__impl.innerText = this.text.replaceAll(/./g, this.passwordCharacter.length ? this.passwordCharacter[0] : '●')
         } else {
             this.__impl.innerText = this.text
         }
 
         this.__updateGeometry()
+    }
+
+    SLOT_colorChanged(oldValue, newValue){
+        let rgba = Color.getRGBA(this.__proxy, 'color', this.__self.constructor.meta.color)
+        this.__setDOMStyle({
+            color: `rgba(${rgba.r},${rgba.g},${rgba.b},${this.__proxy.color === 'transparent' ? 0 : rgba.a * this.opacity})`
+        })
     }
 
     onFontChanged(oldValue, newValue){
