@@ -136,13 +136,11 @@ bool CGqlExtSchemaParser::ExtractDocumentTypeFromCurrentEntry(CSdlDocumentType& 
 		if (keyword == QByteArrayLiteral("ref")){
 			QByteArray typeRefName;
 			retVal = retVal && MoveToNextReadableSymbol() && ReadToDelimeterOrSpace("", typeRefName);
-			if (typeRefName.isEmpty()){
-				SendLogMessage(
-							istd::IInformationProvider::IC_WARNING,
-							0,
-							QString("Reference doesn't supported yet. It will be ignored. And removed in the next version. Found for '%1' at %2").arg(documentType.GetName(), QString::number(m_lastReadLine + 1)),
-							__func__);
-			}
+			SendLogMessage(
+						istd::IInformationProvider::IC_WARNING,
+						0,
+						QString("Reference is not supported yet; it will be ignored and removed in the next version. Found for '%1' at %2").arg(documentType.GetName(), QString::number(m_lastReadLine + 1)),
+						__func__);
 		}
 		// extract operations
 		else if (keyword == QByteArrayLiteral("operations")){
