@@ -2,6 +2,10 @@ const BaseObject = require("../QtBase/BaseObject")
 const Var = require("./Var")
 
 class Variant extends Var {
+    static getDefaultValue(){
+        return null
+    }
+
     static create(parent, meta){
         let obj = super.create(parent, meta)
 
