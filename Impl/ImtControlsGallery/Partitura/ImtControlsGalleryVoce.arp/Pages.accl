@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5437" Description="ACF"/>
+            <Version Id="1" Number="2255" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="ButtonsPage" X="150" Y="225" Note=""/>
+        <Element ComponentName="CanvasPage" X="900" Y="225" Note=""/>
+        <Element ComponentName="CollectionPage" X="950" Y="375" Note=""/>
+        <Element ComponentName="DialogsRepresentaitonPage" X="625" Y="225" Note=""/>
+        <Element ComponentName="GrVTestPage" X="125" Y="525" Note=""/>
+        <Element ComponentName="GraphicsViewPage" X="600" Y="375" Note=""/>
+        <Element ComponentName="GridViewPage" X="150" Y="100" Note=""/>
+        <Element ComponentName="IndicatorsPage" X="375" Y="225" Note=""/>
+        <Element ComponentName="InputsPage" X="125" Y="375" Note=""/>
+        <Element ComponentName="SdlTestPage" X="375" Y="525" Note=""/>
+        <Element ComponentName="TablePage" X="825" Y="100" Note=""/>
+        <Element ComponentName="TableTreeViewPage" X="375" Y="100" Note=""/>
+        <Element ComponentName="TestPage" X="1050" Y="100" Note=""/>
+        <Element ComponentName="TreeViewPage" X="600" Y="100" Note=""/>
+        <Element ComponentName="ViewsPage" X="375" Y="375" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

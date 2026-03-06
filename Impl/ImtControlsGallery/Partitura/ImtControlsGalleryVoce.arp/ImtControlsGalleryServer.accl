@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5446" Description="ACF"/>
+            <Version Id="1" Number="2256" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395267" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="ContactInfoDocCollectionManager" X="275" Y="700" Note=""/>
+        <Element ComponentName="ControlsGalleryHandlers" X="725" Y="150" Note=""/>
+        <Element ComponentName="ControlsGallerySettings" X="225" Y="525" Note=""/>
+        <Element ComponentName="DatabaseEngine" X="150" Y="175" Note=""/>
+        <Element ComponentName="HttpServerFramework" X="725" Y="375" Note=""/>
+        <Element ComponentName="ImtCoreLocalization" X="1025" Y="600" Note=""/>
+        <Element ComponentName="Migrations" X="425" Y="175" Note=""/>
+        <Element ComponentName="Repositories" X="1050" Y="375" Note=""/>
+        <Element ComponentName="Subscribers" X="650" Y="600" Note=""/>
+        <Element ComponentName="WebSocketServerFramework" X="400" Y="375" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries>
+        <EmbededRegistry Id="Migrations">
+            <PositionMap>
+                <Element ComponentName="CompositeMigrationController" X="550" Y="125" Note=""/>
+                <Element ComponentName="ObjectCollectionMigrationController" X="575" Y="425" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="Repositories">
+            <PositionMap>
+                <Element ComponentName="ContactInfoSqlRepository" X="575" Y="225" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="ContactInfoDocCollectionManager">
+            <PositionMap>
+                <Element ComponentName="CollectionDocumentManager" X="575" Y="325" Note=""/>
+                <Element ComponentName="CollectionDocumentManagerController" X="575" Y="225" Note=""/>
+                <Element ComponentName="CollectionDocumentManagerPublisher" X="800" Y="550" Note=""/>
+                <Element ComponentName="ContactInfo" X="150" Y="375" Note=""/>
+                <Element ComponentName="SerializedUndoManager" X="425" Y="650" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="Subscribers">
+            <PositionMap>
+                <Element ComponentName="ContactCollectionChangeNotifier" X="575" Y="350" Note=""/>
+                <Element ComponentName="SlaveSubscriberController" X="575" Y="125" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+    </EmbeddedRegistries>
+</Acf>

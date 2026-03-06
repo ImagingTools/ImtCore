@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5423" Description="ACF"/>
+            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="ClientApplication" X="525" Y="400" Note=""/>
+        <Element ComponentName="ControlsGalleryServer" X="350" Y="175" Note=""/>
+        <Element ComponentName="ImtCoreQmlInitializer" X="400" Y="500" Note=""/>
+        <Element ComponentName="LocalSettings" X="725" Y="175" Note=""/>
+        <Element ComponentName="VersionInfo" X="1025" Y="175" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

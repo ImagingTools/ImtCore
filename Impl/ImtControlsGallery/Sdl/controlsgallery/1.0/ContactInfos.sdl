@@ -1,0 +1,83 @@
+schema {
+	query: Query
+	mutation: Mutation
+	subscription: Subscription
+	namespace: controlsgallery
+	version: 1.0
+}
+
+import {
+	"../../../../../Sdl/imtbase/1.0/ImtCollection.sdl"
+}
+
+input ContactInfoListInput {
+	viewParams: CollectionViewParams
+}
+
+type ContactInfoItemData {
+	id: ID
+	typeId: ID
+	firstName: String
+	lastName: String
+	email: String
+	added: String
+	timeStamp: String
+}
+
+type ContactInfoListPayload {
+	items: [ContactInfoItemData]
+	notification: NotificationItem
+}
+
+enum GenderType {
+	DIVERSE
+	FEMALE
+	MALE
+}
+
+type ContactInfoData {
+	id: ID
+	firstName: String
+	lastName: String
+	birthday: String
+	genderType: GenderType
+	email: String
+}
+
+input ContactInfoInput {
+	id: ID!
+	item: ContactInfoData!
+}
+
+input GetContactInfoInput {
+	id: ID!
+}
+
+type Query {
+	ContactInfoList (input:ContactInfoInput): ContactInfoListPayload!
+	GetContactInfo (input: GetContactInfoInput): ContactInfoData!
+}
+
+type Mutation {
+	UpdateContactInfo (input: ContactInfoInput): UpdatedNotificationPayload!
+	AddContactInfo (input: ContactInfoInput): AddedNotificationPayload!
+}
+
+collectionSchema {
+	type ContactInfo {
+		ref: ContactInfoItemData
+		operations {
+			list: ContactInfoList
+		}
+		subtype ContactInfo {
+			ref: ContactInfoData
+			operations {
+				get: GetContactInfo
+				update: UpdateContactInfo
+				insert: AddContactInfo
+			}
+		}
+	}
+}
+
+

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5423" Description="ACF"/>
+            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="ContactDatabaseDelegate" X="575" Y="300" Note=""/>
+        <Element ComponentName="ContactInfo" X="975" Y="300" Note=""/>
+        <Element ComponentName="ContactInfoMetaInfoCreator" X="975" Y="550" Note=""/>
+        <Element ComponentName="ContactInfoMetaInfoDelegate" X="300" Y="450" Note=""/>
+        <Element ComponentName="ContactsCollection" X="575" Y="550" Note=""/>
+        <Element ComponentName="PostgresXPathExtractor" X="225" Y="300" Note=""/>
+        <Element ComponentName="Types" X="575" Y="75" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

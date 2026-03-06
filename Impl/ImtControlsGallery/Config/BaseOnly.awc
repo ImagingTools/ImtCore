@@ -1,0 +1,17 @@
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="1023" Number="328449" Description="Qt Framework"/>
+            <Version Id="0" Number="4016" Description="ACF"/>
+        </VersionInfos>
+    </AcfHeader>
+    <ConfigFiles>
+        <FilePath>$(IMTCOREDIR)/Config/BaseOnly.awc</FilePath>
+    </ConfigFiles>
+    <PackageDirs>
+        <Dir>../Partitura</Dir>
+    </PackageDirs>
+    <PackageFiles/>
+    <RegistryFiles>
+    </RegistryFiles>
+</Acf>
