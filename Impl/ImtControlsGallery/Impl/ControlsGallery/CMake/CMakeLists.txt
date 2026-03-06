@@ -48,8 +48,8 @@ if(WIN32)
 	windeploy(${PROJECT_NAME} "${listOptions}" "${files}")
 	unset(listOptions)
 
-	# file(COPY ${PROJECT_SOURCE_DIR}/../../../../3rdParty/openssl/1.1/lib/x64/libcrypto-1_1-x64.dll DESTINATION ${PROJECT_SOURCE_DIR}/../../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
-	# file(COPY ${PROJECT_SOURCE_DIR}/../../../../3rdParty/openssl/1.1/lib/x64/libssl-1_1-x64.dll DESTINATION ${PROJECT_SOURCE_DIR}/../../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
+	file(COPY ${IMTCOREDIR}/3rdParty/openssl/1.1/lib/x64/libcrypto-1_1-x64.dll DESTINATION ${IMTCOREDIR}/Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
+	file(COPY ${IMTCOREDIR}/3rdParty/openssl/1.1/lib/x64/libssl-1_1-x64.dll DESTINATION ${IMTCOREDIR}/Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
 endif()
 
 include(${IMTCOREDIR}/Config/CMake/OpenSSL.cmake)
