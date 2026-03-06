@@ -386,9 +386,9 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 		add_dependencies(StructureTest imtbase imtauth imtdb imttest)
 	endif()
 
-		if(DEFINED USE_MDBX AND USE_MDBX)
-			add_subdirectory("${INCLUDE_DIR}/imtmdbx/Test/CMake" "${AUX_INCLUDE_DIR}/imtmdbx/Test")
-		endif()
+	if(DEFINED USE_MDBX AND USE_MDBX)
+		add_subdirectory("${INCLUDE_DIR}/imtmdbx/Test/CMake" "${AUX_INCLUDE_DIR}/imtmdbx/Test")
+	endif()
 
 	add_subdirectory("${INCLUDE_DIR}/imtgql/Test/CMake" "${AUX_INCLUDE_DIR}/imtgql/Test")
 	add_dependencies(imtGqlTest imtbase imtgql imtbasesdl)
@@ -407,5 +407,6 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 
 	file(COPY ${TESTS_DIR}/Migrations DESTINATION ${TESTS_DIR}/../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
 
+	endif() # BUILD_TESTING
 endif() # NOT ONLYTOOLS
 
