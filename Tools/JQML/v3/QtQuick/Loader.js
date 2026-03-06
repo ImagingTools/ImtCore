@@ -65,6 +65,13 @@ class Loader extends Item {
     
             Geometry.setAuto(this.item.__self, 'width', this.width, this.item.__self.constructor.meta.width)
             Geometry.setAuto(this.item.__self, 'height', this.height, this.item.__self.constructor.meta.height)
+
+            if(this.__self.width__prevent){
+                this.item.width = ()=>{return this.width}
+            }
+            if(this.__self.height__prevent){
+                this.item.height = ()=>{return this.height}
+            }
         }
 
         this.loaded()
