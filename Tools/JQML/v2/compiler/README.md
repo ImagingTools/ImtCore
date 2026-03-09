@@ -170,7 +170,7 @@ at runtime.
 
 | Source token | Generated JavaScript |
 |-------------|---------------------|
-| `parent` | `el1.parent` |
+| `parent` | `elN.parent` |
 | QML `id` in same file | `inCtx.get('myId')` |
 | Known property/signal/method on current element | `elN.propName` |
 | Singleton (via `pragma Singleton`) | `inCtx.get('SingletonName')` |
@@ -184,7 +184,7 @@ All standard JavaScript constructs are handled:
 `binary`, `let`/`var`, `unary-prefix`, `unary-postfix`, `if`, `while`,
 `for`, `for-of`, `for-in`, `function`, `defun`, `object`, `block`, `stat`,
 `new`, `sub`, `array`, `regexp`, `switch`, `seq`, `try`, `break`,
-`continue`, `throw`.
+`continue`.
 
 `QAlias` properties receive special treatment: path segments are translated to
 `getStatement('segment')` chains for lazy property lookup.
@@ -193,7 +193,7 @@ All standard JavaScript constructs are handled:
 
 ## Stage 5 – Code Generation (`treeCompile`)
 
-`treeCompile(compiledFile, instructions, updatePrimaryList, updateList, step)`
+`treeCompile(compiledFile, instructions, updatePrimaryList, updateList, step, innerComponent)`
 is the recursive code emitter.  It writes lines into the global `code[]`
 array.
 
