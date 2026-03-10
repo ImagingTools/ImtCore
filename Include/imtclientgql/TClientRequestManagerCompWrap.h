@@ -5,6 +5,7 @@
 // Qt includes
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
+#include <QtCore/QJsonArray>
 
 // ACF includes
 #include <icomp/CComponentBase.h>
@@ -69,20 +70,25 @@ protected:
 			object = object.value("payload").toObject();
 		}
 
+		QJsonArray errorArr;
 		if (object.contains("errors")){
-			object = object.value("errors").toObject();
+			errorArr = object.value("errors").toArray();
 			isError = true;
 		}
 		else if (object.contains("data")){
 			object = object.value("data").toObject();
+
+			if (object.contains(request.GetCommandId())){
+				object = object.value(request.GetCommandId()).toObject();
+			}
 		}
 
-		if (object.contains(request.GetCommandId())){
-			object = object.value(request.GetCommandId()).toObject();
-		}
+		if (isError && !errorArr.isEmpty()){
+			QJsonValue errorObj = errorArr[0];
+			if (errorObj.isObject()){
+				errorMessage = errorObj.toObject().value("message").toString();
+			}
 
-		if (isError){
-			errorMessage = object.value("message").toString();
 			return response;
 		}
 

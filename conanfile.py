@@ -150,6 +150,13 @@ class ImtCoreConan(ConanFile):
         else:
             return str(self.dependencies["qt"].ref.version)
 
+    def _update_version(self):
+        script_name = "UpdateVersion.bat" if self.settings.os == "Windows" else "UpdateVersion.sh"
+        script_path = os.path.join(self.source_folder, "Build", "Git", script_name)
+        template = os.path.join(self.source_folder, "Partitura", "ImtCoreVoce.arp", "VersionInfo.acc.xtrsvn")
+
+        self.run(f"{script_path} {template}", cwd=self.source_folder)
+
     def generate(self):
         if self.options.qt_package == "conan":
             qtDir = str(self.dependencies["qt"].cpp_info.bindirs[0])
@@ -202,6 +209,8 @@ class ImtCoreConan(ConanFile):
             # On Linux we use VirtualRunEnv at build stage. This does not work with cross compiling
             runEnv = VirtualRunEnv(self)
             runEnv.generate(scope="build")
+
+        self._update_version()
 
     def build(self):
         cmake = CMake(self)

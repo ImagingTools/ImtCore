@@ -172,24 +172,27 @@ GqlRequest {
 				root.onError("Unable convert json ", json, " to object", "Warning");
 				return;
 			}
-			
+
 			if ("errors" in responseObj){
-				let errorsObject = responseObj["errors"];
-				if (root.gqlCommandId in errorsObject){
-					errorsObject = errorsObject[root.gqlCommandId]
+				let errorsArray = responseObj["errors"];
+				if (errorsArray && errorsArray.length > 0){
+					let firstError = errorsArray[0];
+					
+					let message = "";
+					if ("message" in firstError){
+						message = firstError["message"];
+					}
+					
+					let type = "";
+					if ("extensions" in firstError && firstError["extensions"] && "type" in firstError["extensions"]){
+						type = firstError["extensions"]["type"];
+					}
+					
+					root.onError(message, type);
 				}
-				
-				let message = ""
-				if ("message" in errorsObject){
-					message = errorsObject["message"];
+				else{
+					root.onError("Unknown error", "Error");
 				}
-				
-				let type;
-				if ("type" in errorsObject){
-					type = errorsObject["type"];
-				}
-				
-				root.onError(message, type);
 				
 				return;
 			}

@@ -70,8 +70,14 @@ bool CCompositeMigrationControllerComp::DoMigration(int& resultRevision, const i
 		inputRange.SetMaxValue(composedRange.GetMaxValue());
 	}
 
-	if (!composedRange.IsValid() || !inputRange.IsValid()){
+	// invalid migration schema
+	if (!composedRange.IsValid()){
 		return false;
+	}
+
+	// nothing new to migrate
+	if(!inputRange.IsValid()){
+		return true;
 	}
 
 	if (!(	composedRange.GetMinValue() <= inputRange.GetMinValue() &&
@@ -83,30 +89,32 @@ bool CCompositeMigrationControllerComp::DoMigration(int& resultRevision, const i
 
 	for (int i = 0; i < m_migrationControllersCompPtr.GetCount(); i++){
 		const imtdb::IMigrationController* migrationControllerPtr = m_migrationControllersCompPtr[i];
-		if (migrationControllerPtr != nullptr){
-			istd::CIntRange currentMigrationRange = migrationControllerPtr->GetMigrationRange();
+		if (migrationControllerPtr == nullptr){
+			continue;
+		}
 
-			int startRevision = inputRange.GetMinValue();
-			int stopRevision = inputRange.GetMaxValue();
+		istd::CIntRange currentMigrationRange = migrationControllerPtr->GetMigrationRange();
 
-			while (startRevision <= stopRevision){
-				istd::CIntRange checkRange(startRevision, stopRevision);
+		int startRevision = inputRange.GetMinValue();
+		int stopRevision = inputRange.GetMaxValue();
 
-				if (currentMigrationRange.Contains(checkRange)){
-					MigrationStep step;
-					step.from = checkRange.GetMinValue();
-					step.to = checkRange.GetMaxValue();
-					step.migrationControllerPtr = migrationControllerPtr;
+		while (startRevision <= stopRevision){
+			istd::CIntRange checkRange(startRevision, stopRevision);
 
-					steps.push_back(step);
+			if (currentMigrationRange.Contains(checkRange)){
+				MigrationStep step;
+				step.from = checkRange.GetMinValue();
+				step.to = checkRange.GetMaxValue();
+				step.migrationControllerPtr = migrationControllerPtr;
 
-					inputRange.SetMinValue(checkRange.GetMaxValue() + 1);
+				steps.push_back(step);
 
-					break;
-				}
+				inputRange.SetMinValue(checkRange.GetMaxValue() + 1);
 
-				stopRevision--;
+				break;
 			}
+
+			stopRevision--;
 		}
 	}
 
