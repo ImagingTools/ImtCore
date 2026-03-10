@@ -168,10 +168,14 @@ void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 		}
 		else {
 			if (methodType == CWebSocketRequest::MT_CONNECTION_INIT){
-				if (!clientId.isEmpty()){
-					m_server->RegisterSender(clientId, webSocketPtr);
+				QByteArray connectionId = clientId;
+				if (connectionId.isEmpty()){
+					connectionId = webSocketRequest->GetRequestId();
 				}
-				m_server->SetConnectionStatus(clientId);
+				if (!connectionId.isEmpty()){
+					m_server->RegisterSender(connectionId, webSocketPtr);
+				}
+				m_server->SetConnectionStatus(connectionId);
 			}
 
 			if (methodType == CWebSocketRequest::MT_QUERY){
@@ -290,5 +294,4 @@ void CWebSocketThread::OnSendTextMessage(const QByteArray& data) const
 
 
 } // namespace imtrest
-
 

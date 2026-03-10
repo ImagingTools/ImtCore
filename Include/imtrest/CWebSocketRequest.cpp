@@ -156,7 +156,13 @@ void CWebSocketRequest::SetBody(const QByteArray &body)
 		m_type = MT_KEEP_ALIVE_ACK;
 	}
 
-	m_queryId = m_requestId = object.value("id").toString().toUtf8();
+	const QString requestId = object.value("id").toString();
+	if (!requestId.isEmpty()){
+		m_queryId = m_requestId = requestId.toUtf8();
+	}
+	else{
+		m_queryId = m_requestId;
+	}
 	m_clientId = object.value("clientid").toString().toUtf8();
 }
 
@@ -258,5 +264,4 @@ bool CWebSocketRequest::ResetData(CompatibilityMode /*mode*/)
 
 
 } // namespace imtrest
-
 
