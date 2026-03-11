@@ -145,19 +145,19 @@ namespace imtservergql
 		case QMetaType::QColorSpace:
 			retVal = QByteArrayLiteral("ColorSpace");
 			break;
-			case QMetaType::QRect:
-			case QMetaType::QRectF:
+		case QMetaType::QRect:
+		case QMetaType::QRectF:
 			retVal = QByteArrayLiteral("Rect");
 			break;
-			case QMetaType::QLine:
-			case QMetaType::QLineF:
+		case QMetaType::QLine:
+		case QMetaType::QLineF:
 			retVal = QByteArrayLiteral("Line");
 			break;
 		case QMetaType::QStringList:
 			retVal = QByteArrayLiteral("string[]");
 			break;
 		case QMetaType::QVariantMap:
-		retVal = QByteArrayLiteral("VariantMap");
+			retVal = QByteArrayLiteral("VariantMap");
 			break;
 		case QMetaType::QVariantHash:
 			retVal = QByteArrayLiteral("QVariantHash");
