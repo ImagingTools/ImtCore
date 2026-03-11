@@ -343,6 +343,7 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
 	WorkingDocument* workingDocumentPtr = nullptr;
 	OperationStatus validationStatus = OS_OK;
 	WorkingDocument workingDocumentSnapshot;
+	istd::IChangeableSharedPtr documentSnapshotPtr;
 	{
 		QMutexLocker locker(&m_mutex);
 		if (!ValidateInputParams(userId, documentId, validationStatus)){
@@ -350,7 +351,18 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
 		}
 
 		workingDocumentPtr = &m_userDocuments[userId][documentId];
+
+		documentSnapshotPtr = CreateObject(workingDocumentPtr->typeId);
+		if (!documentSnapshotPtr.IsValid()){
+			return OS_FAILED;
+		}
+
+		if (!documentSnapshotPtr->CopyFrom(*workingDocumentPtr->objectPtr)){
+			return OS_FAILED;
+		}
+
 		workingDocumentSnapshot = *workingDocumentPtr;
+		workingDocumentSnapshot.objectPtr = documentSnapshotPtr;
 	}
 
 	if (!ValidateDocumentData(workingDocumentSnapshot, validationStatus)){
@@ -361,7 +373,7 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
 		// Create copy of the object
 		if (!documentName.isEmpty() && workingDocumentPtr->name != documentName){
 			QByteArray newObjectId = collectionPtr->InsertNewObject(
-				workingDocumentPtr->typeId, documentName, "", workingDocumentPtr->objectPtr.GetPtr());
+				workingDocumentPtr->typeId, documentName, "", documentSnapshotPtr.GetPtr());
 
 			if (newObjectId.isEmpty()){
 				return OS_FAILED;
@@ -397,7 +409,7 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
 		}
 
 		// Update object
-		bool res = collectionPtr->SetObjectData(workingDocumentPtr->objectId, *workingDocumentPtr->objectPtr);
+		bool res = collectionPtr->SetObjectData(workingDocumentPtr->objectId, *documentSnapshotPtr);
 
 		if (res){
 			workingDocumentPtr->isDirty = false;
@@ -430,7 +442,7 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
 
 	// Create new object
 	workingDocumentPtr->objectId =
-		collectionPtr->InsertNewObject(workingDocumentPtr->typeId, documentName, "", workingDocumentPtr->objectPtr.GetPtr());
+		collectionPtr->InsertNewObject(workingDocumentPtr->typeId, documentName, "", documentSnapshotPtr.GetPtr());
 
 	if (!workingDocumentPtr->objectId.isEmpty()){
 		workingDocumentPtr->name = documentName;

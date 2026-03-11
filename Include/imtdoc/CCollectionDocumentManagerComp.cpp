@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtdoc/CCollectionDocumentManagerComp.h>
 
+// ImtCore includes
+#include <imtbase/IValidationContext.h>
+
 
 namespace imtdoc
 {
@@ -54,8 +57,10 @@ bool CCollectionDocumentManagerComp::ValidateDocumentData(const WorkingDocument&
 	}
 
 	ilog::IMessageConsumer* logPtr = GetLogPtr();
+	// Validation context is optional; no dedicated context is available for collection documents here.
+	const imtbase::IValidationContext* validationContextPtr = nullptr;
 	istd::IInformationProvider::InformationCategory category =
-		validator->Validate(nullptr, *document.objectPtr, logPtr);
+		validator->Validate(validationContextPtr, *document.objectPtr, logPtr);
 	if (category == istd::IInformationProvider::IC_ERROR
 			|| category == istd::IInformationProvider::IC_CRITICAL){
 		status = OS_FAILED;
