@@ -56,7 +56,7 @@ namespace imtservergql
 /**
 	Returns the storage type ID of the value stored in the \c var.
 */
-[[nodiscard]]static QByteArray GetTypeIdOfVariant(const QVariant& var)
+[[nodiscard]] static QByteArray GetTypeIdOfVariant(const QVariant& var)
 {
 	int typeId = var.typeId();
 	QByteArray retVal;
