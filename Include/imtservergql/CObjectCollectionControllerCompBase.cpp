@@ -1599,11 +1599,11 @@ sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload CObjectCollectionControl
 	for (const int& infoType : metaInfoTypes){
 		sdl::imtbase::ImtBaseTypes::CParameter::V1_0 parameterInfo;
 		parameterInfo.id = metaInfo->GetMetaInfoId(infoType);
-		parameterInfo.typeId = GetTypeIdOfVariant(infoType);
 		parameterInfo.name = metaInfo->GetMetaInfoName(infoType);
 		parameterInfo.description = metaInfo->GetMetaInfoDescription(infoType);
-
+		
 		QVariant metaInfoValue = metaInfo->GetMetaInfo(infoType);
+		parameterInfo.typeId = GetTypeIdOfVariant(metaInfoValue);
 		parameterInfo.data = ConvertMetaInfoToString(infoType, metaInfoValue);
 
 		parameterInfos << parameterInfo;
