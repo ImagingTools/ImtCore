@@ -8,6 +8,7 @@
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
+#include <imtbase/IDataValidator.h>
 #include <imtdoc/CCollectionDocumentManager.h>
 
 
@@ -28,6 +29,7 @@ public:
 		I_ASSIGN(m_collectionCompPtr, "Collection", "Document collection containing related documents", true, "Collection");
 		I_ASSIGN(m_undoManagerFactPtr, "UndoManager", "Factory of the undo manager", false, "UndoManager");
 		I_ASSIGN_MULTI_0(m_objectFactListCompPtr, "ObjectFactories", "List of object factories related to registered type-IDs ('ObjectTypeIdList')", true);
+		I_ASSIGN_MULTI_0(m_documentValidatorCompPtr, "DocumentValidators", "List of document data validators related to registered type-IDs ('ObjectTypeIdList')", false);
 	I_END_COMPONENT
 
 protected:
@@ -36,9 +38,11 @@ protected:
 	virtual imtbase::IObjectCollection* GetCollection() const override;
 	virtual istd::IChangeableSharedPtr CreateObject(const QByteArray& typeId) const override;
 	virtual idoc::IUndoManagerSharedPtr CreateUndoManager() const override;
+	virtual bool ValidateDocumentData(const WorkingDocument& document, OperationStatus& status) const override;
 
 private:
 	int GetObjectFactoryIndex(const QByteArray& typeId) const;
+	const imtbase::IDataValidator* GetDocumentValidator(const QByteArray& typeId) const;
 
 private:
 	I_MULTIREF(imtdoc::IDocumentManagerEventHandler, m_handlerCompPtr);
@@ -46,9 +50,9 @@ private:
 	I_REF(imtbase::IObjectCollection, m_collectionCompPtr);
 	I_FACT(idoc::IUndoManager, m_undoManagerFactPtr);
 	I_MULTIFACT(istd::IChangeable, m_objectFactListCompPtr);
+	I_MULTIREF(imtbase::IDataValidator, m_documentValidatorCompPtr);
 };
 
 
 } // namespace imtdoc
-
 

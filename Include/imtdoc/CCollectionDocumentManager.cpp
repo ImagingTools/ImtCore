@@ -341,14 +341,18 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
 		return OS_FAILED;
 	}
 	WorkingDocument* workingDocumentPtr = nullptr;
+	OperationStatus validationStatus = OS_OK;
 	{
 		QMutexLocker locker(&m_mutex);
-		OperationStatus validationStatus;
 		if (!ValidateInputParams(userId, documentId, validationStatus)){
 			return validationStatus;
 		}
 
 		workingDocumentPtr = &m_userDocuments[userId][documentId];
+	}
+
+	if (!ValidateDocumentData(*workingDocumentPtr, validationStatus)){
+		return validationStatus;
 	}
 
 	if (!workingDocumentPtr->objectId.isEmpty()) {
@@ -636,6 +640,14 @@ void CCollectionDocumentManager::OnUpdate(imod::IModel* modelPtr, const istd::IC
 
 
 // protected methods
+
+bool CCollectionDocumentManager::ValidateDocumentData(const WorkingDocument& /*document*/, OperationStatus& status) const
+{
+	status = OS_OK;
+
+	return true;
+}
+
 
 bool CCollectionDocumentManager::ValidateInputParams(const QByteArray& userId, const QByteArray& documentId, OperationStatus& status) const
 {

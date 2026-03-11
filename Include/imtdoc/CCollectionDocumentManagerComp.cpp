@@ -39,6 +39,33 @@ idoc::IUndoManagerSharedPtr CCollectionDocumentManagerComp::CreateUndoManager() 
 }
 
 
+bool CCollectionDocumentManagerComp::ValidateDocumentData(const WorkingDocument& document, OperationStatus& status) const
+{
+	status = OS_OK;
+
+	if (!document.objectPtr.IsValid()){
+		status = OS_FAILED;
+		return false;
+	}
+
+	const imtbase::IDataValidator* validatorPtr = GetDocumentValidator(document.typeId);
+	if (validatorPtr == nullptr){
+		return true;
+	}
+
+	ilog::IMessageConsumer* logPtr = GetLogPtr();
+	istd::IInformationProvider::InformationCategory category =
+		validatorPtr->Validate(nullptr, *document.objectPtr, logPtr);
+	if (category == istd::IInformationProvider::IC_ERROR
+			|| category == istd::IInformationProvider::IC_CRITICAL){
+		status = OS_FAILED;
+		return false;
+	}
+
+	return true;
+}
+
+
 QList<imtdoc::IDocumentManagerEventHandler*> CCollectionDocumentManagerComp::GetDocumentManagerEventHandlers() const
 {
 	QList<imtdoc::IDocumentManagerEventHandler*> retVal;
@@ -70,6 +97,16 @@ int CCollectionDocumentManagerComp::GetObjectFactoryIndex(const QByteArray& type
 }
 
 
-} // namespace imtdoc
+const imtbase::IDataValidator* CCollectionDocumentManagerComp::GetDocumentValidator(const QByteArray& typeId) const
+{
+	int index = GetObjectFactoryIndex(typeId);
+	if ((index >= 0) && (index < m_documentValidatorCompPtr.GetCount())){
+		return m_documentValidatorCompPtr[index];
+	}
 
+	return nullptr;
+}
+
+
+} // namespace imtdoc
 

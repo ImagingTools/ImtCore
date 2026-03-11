@@ -54,6 +54,7 @@ protected:
 	struct WorkingDocument;
 
 	bool ValidateInputParams(const QByteArray& userId, const QByteArray& documentId, OperationStatus& status) const;
+	virtual bool ValidateDocumentData(const WorkingDocument& document, OperationStatus& status) const;
 	void OnUndoManagerChanged(int modelId);
 	int GetUndoManagerNextModelId(const QByteArray& userId);
 	WorkingDocument* FindDocument(const QByteArray& userId, const QByteArray& documentId);
@@ -103,5 +104,4 @@ private:
 
 
 } // namespace imtdoc
-
 

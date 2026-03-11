@@ -251,19 +251,18 @@ CDM::CDocumentOperationStatus CCollectionDocumentManagerControllerComp::OnSaveDo
 			break;
 		case imtdoc::IDocumentManager::OS_INVALID_USER_ID:
 			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidUserId;
+			errorMessage = "Invalid user-ID";
 			break;
 		case imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_ID:
 			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidDocumentId;
+			errorMessage = "Invalid document ID";
 			break;
 		case imtdoc::IDocumentManager::OS_FAILED:
 			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Failed;
+			errorMessage = "Failed to save document";
 			break;
 		default:
 			break;
-		}
-
-		if (status != imtdoc::IDocumentManager::OperationStatus::OS_OK){
-			errorMessage = "Unable to open document or create undo manager";
 		}
 	}
 
@@ -601,4 +600,3 @@ QByteArray CCollectionDocumentManagerControllerComp::GetUserId(const ::imtgql::C
 
 
 } // namespace imtservergql
-
