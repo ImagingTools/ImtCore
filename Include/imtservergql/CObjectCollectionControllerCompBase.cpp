@@ -58,231 +58,92 @@ namespace imtservergql
 */
 [[nodiscard]] static QByteArray GetTypeIdOfVariant(const QVariant& var)
 {
-	int typeId = var.typeId();
-	QByteArray retVal;
-	switch (typeId) {
-		case QMetaType::Void:
-			retVal = QByteArrayLiteral("Void");
-			break;
-		case QMetaType::Bool:
-			retVal = QByteArrayLiteral("bool");
-			break;
-		case QMetaType::Int:
-			retVal = QByteArrayLiteral("int");
-			break;
-		case QMetaType::UInt:
-			retVal = QByteArrayLiteral("uint");
-			break;
-		case QMetaType::Double:
-			retVal = QByteArrayLiteral("double");
-			break;
-		case QMetaType::QChar:
-		case QMetaType::Char:
-		case QMetaType::Char16:
-		case QMetaType::Char32:
-		case QMetaType::SChar:
-			retVal = QByteArrayLiteral("char");
-			break;
-		case QMetaType::QString:
-			retVal = QByteArrayLiteral("string");
-			break;
-		case QMetaType::QByteArray:
-			retVal = QByteArrayLiteral("byte[]");
-			break;
-		case QMetaType::Nullptr:
-			retVal = QByteArrayLiteral("null");
-			break;
-		case QMetaType::VoidStar:
-			retVal = QByteArrayLiteral("void*");
-			break;
-		case QMetaType::Long:
-			retVal = QByteArrayLiteral("long");
-			break;
-		case QMetaType::LongLong:
-			retVal = QByteArrayLiteral("longlong");
-			break;
-		case QMetaType::Short:
-			retVal = QByteArrayLiteral("short");
-			break;
-		case QMetaType::ULong:
-			retVal = QByteArrayLiteral("ulong");
-			break;
-		case QMetaType::ULongLong:
-			retVal = QByteArrayLiteral("ulonglong");
-			break;
-		case QMetaType::UShort:
-			retVal = QByteArrayLiteral("ushort");
-			break;
-		case QMetaType::UChar:
-			retVal = QByteArrayLiteral("uchar");
-			break;
-		case QMetaType::Float:
-			retVal = QByteArrayLiteral("float");
-			break;
-		case QMetaType::Float16:
-			retVal = QByteArrayLiteral("float16");
-			break;
-		case QMetaType::QDate:
-			retVal = QByteArrayLiteral("Date");
-			break;
-		case QMetaType::QSize:
-		case QMetaType::QSizeF:
-			retVal = QByteArrayLiteral("Size");
-			break;
-		case QMetaType::QTime:
-			retVal = QByteArrayLiteral("Time");
-			break;
-		case QMetaType::QVariantList:
-			retVal = QByteArrayLiteral("var[]");
-			break;
-		case QMetaType::QPolygon:
-		case QMetaType::QPolygonF:
-			retVal = QByteArrayLiteral("Polygon");
-			break;
-		case QMetaType::QColor:
-			retVal = QByteArrayLiteral("Color");
-			break;
-		case QMetaType::QColorSpace:
-			retVal = QByteArrayLiteral("ColorSpace");
-			break;
-		case QMetaType::QRect:
-		case QMetaType::QRectF:
-			retVal = QByteArrayLiteral("Rect");
-			break;
-		case QMetaType::QLine:
-		case QMetaType::QLineF:
-			retVal = QByteArrayLiteral("Line");
-			break;
-		case QMetaType::QStringList:
-			retVal = QByteArrayLiteral("string[]");
-			break;
-		case QMetaType::QVariantMap:
-			retVal = QByteArrayLiteral("VariantMap");
-			break;
-		case QMetaType::QVariantHash:
-			retVal = QByteArrayLiteral("QVariantHash");
-			break;
-		case QMetaType::QVariantPair:
-			retVal = QByteArrayLiteral("VariantPair");
-			break;
-		case QMetaType::QIcon:
-			retVal = QByteArrayLiteral("Icon");
-			break;
-		case QMetaType::QPen:
-			retVal = QByteArrayLiteral("Pen");
-			break;
-		case QMetaType::QPoint:
-		case QMetaType::QPointF:
-			retVal = QByteArrayLiteral("Point");
-			break;
-		case QMetaType::QUrl:
-			retVal = QByteArrayLiteral("Url");
-			break;
-		case QMetaType::QRegularExpression:
-			retVal = QByteArrayLiteral("RegExp");
-			break;
-		case QMetaType::QDateTime:
-			retVal = QByteArrayLiteral("DateTime");
-			break;
-		case QMetaType::QPalette:
-			retVal = QByteArrayLiteral("palette");
-			break;
-		case QMetaType::QFont:
-			retVal = QByteArrayLiteral("font");
-			break;
-		case QMetaType::QBrush:
-			retVal = QByteArrayLiteral("brush");
-			break;
-		case QMetaType::QRegion:
-			retVal = QByteArrayLiteral("region");
-			break;
-		case QMetaType::QBitArray:
-			retVal = QByteArrayLiteral("bit[]");
-			break;
-		case QMetaType::QImage:
-			retVal = QByteArrayLiteral("image");
-			break;
-		case QMetaType::QKeySequence:
-			retVal = QByteArrayLiteral("KeySeq");
-			break;
-		case QMetaType::QSizePolicy:
-			retVal = QByteArrayLiteral("SizePolicy");
-			break;
-		case QMetaType::QPixmap:
-			retVal = QByteArrayLiteral("Pixmap");
-			break;
-		case QMetaType::QLocale:
-			retVal = QByteArrayLiteral("Locale");
-			break;
-		case QMetaType::QBitmap:
-			retVal = QByteArrayLiteral("Bitmap");
-			break;
-		case QMetaType::QTransform:
-			retVal = QByteArrayLiteral("Transform");
-			break;
-		case QMetaType::QMatrix4x4:
-			retVal = QByteArrayLiteral("Matrix4x4");
-			break;
-		case QMetaType::QVector2D:
-			retVal = QByteArrayLiteral("Vector2D");
-			break;
-		case QMetaType::QVector3D:
-			retVal = QByteArrayLiteral("Vector3D");
-			break;
-		case QMetaType::QVector4D:
-			retVal = QByteArrayLiteral("Vector4D");
-			break;
-		case QMetaType::QQuaternion:
-			retVal = QByteArrayLiteral("Quaternion");
-			break;
-		case QMetaType::QEasingCurve:
-			retVal = QByteArrayLiteral("EasingCurve");
-			break;
-		case QMetaType::QJsonValue:
-			retVal = QByteArrayLiteral("JsonValue");
-			break;
-		case QMetaType::QJsonObject:
-			retVal = QByteArrayLiteral("JsonObject");
-			break;
-		case QMetaType::QJsonArray:
-			retVal = QByteArrayLiteral("JsonArray");
-			break;
-		case QMetaType::QJsonDocument:
-			retVal = QByteArrayLiteral("JsonDocument");
-			break;
-		case QMetaType::QCborValue:
-			retVal = QByteArrayLiteral("CborValue");
-			break;
-		case QMetaType::QCborArray:
-			retVal = QByteArrayLiteral("CborArray");
-			break;
-		case QMetaType::QCborMap:
-			retVal = QByteArrayLiteral("CborMap");
-			break;
-		case QMetaType::QCborSimpleType:
-			retVal = QByteArrayLiteral("CborSimpleType");
-			break;
-		case QMetaType::QModelIndex:
-			retVal = QByteArrayLiteral("ModelIndex");
-			break;
-		case QMetaType::QPersistentModelIndex:
-			retVal = QByteArrayLiteral("PersistentModelIndex");
-			break;
-		case QMetaType::QUuid:
-			retVal = QByteArrayLiteral("Uuid");
-			break;
-		case QMetaType::QByteArrayList:
-			retVal = QByteArrayLiteral("ByteArrayList");
-			break;
-		case QMetaType::QVariant:
-			retVal = QByteArrayLiteral("Variant");
-			break;
-		default:
-			retVal = var.typeName();
-			break;
-	}
+	static const QHash<int, QByteArray> typeIdMap = {
+		{ QMetaType::Void,                  QByteArrayLiteral("Void")                },
+		{ QMetaType::Bool,                  QByteArrayLiteral("bool")                },
+		{ QMetaType::Int,                   QByteArrayLiteral("int")                 },
+		{ QMetaType::UInt,                  QByteArrayLiteral("uint")                },
+		{ QMetaType::Double,                QByteArrayLiteral("double")              },
+		{ QMetaType::QChar,                 QByteArrayLiteral("char")                },
+		{ QMetaType::Char,                  QByteArrayLiteral("char")                },
+		{ QMetaType::Char16,                QByteArrayLiteral("char")                },
+		{ QMetaType::Char32,                QByteArrayLiteral("char")                },
+		{ QMetaType::SChar,                 QByteArrayLiteral("char")                },
+		{ QMetaType::QString,               QByteArrayLiteral("string")              },
+		{ QMetaType::QByteArray,            QByteArrayLiteral("byte[]")              },
+		{ QMetaType::Nullptr,               QByteArrayLiteral("null")                },
+		{ QMetaType::VoidStar,              QByteArrayLiteral("void*")               },
+		{ QMetaType::Long,                  QByteArrayLiteral("long")                },
+		{ QMetaType::LongLong,              QByteArrayLiteral("longlong")            },
+		{ QMetaType::Short,                 QByteArrayLiteral("short")               },
+		{ QMetaType::ULong,                 QByteArrayLiteral("ulong")               },
+		{ QMetaType::ULongLong,             QByteArrayLiteral("ulonglong")           },
+		{ QMetaType::UShort,                QByteArrayLiteral("ushort")              },
+		{ QMetaType::UChar,                 QByteArrayLiteral("uchar")               },
+		{ QMetaType::Float,                 QByteArrayLiteral("float")               },
+		{ QMetaType::Float16,               QByteArrayLiteral("float16")             },
+		{ QMetaType::QDate,                 QByteArrayLiteral("Date")                },
+		{ QMetaType::QSize,                 QByteArrayLiteral("Size")                },
+		{ QMetaType::QSizeF,                QByteArrayLiteral("Size")                },
+		{ QMetaType::QTime,                 QByteArrayLiteral("Time")                },
+		{ QMetaType::QVariantList,          QByteArrayLiteral("var[]")               },
+		{ QMetaType::QPolygon,              QByteArrayLiteral("Polygon")             },
+		{ QMetaType::QPolygonF,             QByteArrayLiteral("Polygon")             },
+		{ QMetaType::QColor,                QByteArrayLiteral("Color")               },
+		{ QMetaType::QColorSpace,           QByteArrayLiteral("ColorSpace")          },
+		{ QMetaType::QRect,                 QByteArrayLiteral("Rect")                },
+		{ QMetaType::QRectF,                QByteArrayLiteral("Rect")                },
+		{ QMetaType::QLine,                 QByteArrayLiteral("Line")                },
+		{ QMetaType::QLineF,                QByteArrayLiteral("Line")                },
+		{ QMetaType::QStringList,           QByteArrayLiteral("string[]")            },
+		{ QMetaType::QVariantMap,           QByteArrayLiteral("VariantMap")          },
+		{ QMetaType::QVariantHash,          QByteArrayLiteral("QVariantHash")        },
+		{ QMetaType::QVariantPair,          QByteArrayLiteral("VariantPair")         },
+		{ QMetaType::QIcon,                 QByteArrayLiteral("Icon")                },
+		{ QMetaType::QPen,                  QByteArrayLiteral("Pen")                 },
+		{ QMetaType::QPoint,                QByteArrayLiteral("Point")               },
+		{ QMetaType::QPointF,               QByteArrayLiteral("Point")               },
+		{ QMetaType::QUrl,                  QByteArrayLiteral("Url")                 },
+		{ QMetaType::QRegularExpression,    QByteArrayLiteral("RegExp")              },
+		{ QMetaType::QDateTime,             QByteArrayLiteral("DateTime")            },
+		{ QMetaType::QPalette,              QByteArrayLiteral("palette")             },
+		{ QMetaType::QFont,                 QByteArrayLiteral("font")                },
+		{ QMetaType::QBrush,                QByteArrayLiteral("brush")               },
+		{ QMetaType::QRegion,               QByteArrayLiteral("region")              },
+		{ QMetaType::QBitArray,             QByteArrayLiteral("bit[]")               },
+		{ QMetaType::QImage,                QByteArrayLiteral("image")               },
+		{ QMetaType::QKeySequence,          QByteArrayLiteral("KeySeq")              },
+		{ QMetaType::QSizePolicy,           QByteArrayLiteral("SizePolicy")          },
+		{ QMetaType::QPixmap,               QByteArrayLiteral("Pixmap")              },
+		{ QMetaType::QLocale,               QByteArrayLiteral("Locale")              },
+		{ QMetaType::QBitmap,               QByteArrayLiteral("Bitmap")              },
+		{ QMetaType::QTransform,            QByteArrayLiteral("Transform")           },
+		{ QMetaType::QMatrix4x4,            QByteArrayLiteral("Matrix4x4")           },
+		{ QMetaType::QVector2D,             QByteArrayLiteral("Vector2D")            },
+		{ QMetaType::QVector3D,             QByteArrayLiteral("Vector3D")            },
+		{ QMetaType::QVector4D,             QByteArrayLiteral("Vector4D")            },
+		{ QMetaType::QQuaternion,           QByteArrayLiteral("Quaternion")          },
+		{ QMetaType::QEasingCurve,          QByteArrayLiteral("EasingCurve")         },
+		{ QMetaType::QJsonValue,            QByteArrayLiteral("JsonValue")           },
+		{ QMetaType::QJsonObject,           QByteArrayLiteral("JsonObject")          },
+		{ QMetaType::QJsonArray,            QByteArrayLiteral("JsonArray")           },
+		{ QMetaType::QJsonDocument,         QByteArrayLiteral("JsonDocument")        },
+		{ QMetaType::QCborValue,            QByteArrayLiteral("CborValue")           },
+		{ QMetaType::QCborArray,            QByteArrayLiteral("CborArray")           },
+		{ QMetaType::QCborMap,              QByteArrayLiteral("CborMap")             },
+		{ QMetaType::QCborSimpleType,       QByteArrayLiteral("CborSimpleType")      },
+		{ QMetaType::QModelIndex,           QByteArrayLiteral("ModelIndex")          },
+		{ QMetaType::QPersistentModelIndex, QByteArrayLiteral("PersistentModelIndex") },
+		{ QMetaType::QUuid,                 QByteArrayLiteral("Uuid")                },
+		{ QMetaType::QByteArrayList,        QByteArrayLiteral("ByteArrayList")       },
+		{ QMetaType::QVariant,              QByteArrayLiteral("Variant")             },
+	};
 
-	return retVal;
+	const auto it = typeIdMap.constFind(var.typeId());
+	if (it != typeIdMap.constEnd()) {
+		return it.value();
+	}
+	return var.typeName();
 }
 
 
