@@ -48,14 +48,14 @@ bool CCollectionDocumentManagerComp::ValidateDocumentData(const WorkingDocument&
 		return false;
 	}
 
-	const imtbase::IDataValidator* validatorPtr = GetDocumentValidator(document.typeId);
-	if (validatorPtr == nullptr){
+	const imtbase::IDataValidator* validator = GetDocumentValidator(document.typeId);
+	if (validator == nullptr){
 		return true;
 	}
 
 	ilog::IMessageConsumer* logPtr = GetLogPtr();
 	istd::IInformationProvider::InformationCategory category =
-		validatorPtr->Validate(nullptr, *document.objectPtr, logPtr);
+		validator->Validate(nullptr, *document.objectPtr, logPtr);
 	if (category == istd::IInformationProvider::IC_ERROR
 			|| category == istd::IInformationProvider::IC_CRITICAL){
 		status = OS_FAILED;
@@ -109,4 +109,3 @@ const imtbase::IDataValidator* CCollectionDocumentManagerComp::GetDocumentValida
 
 
 } // namespace imtdoc
-
