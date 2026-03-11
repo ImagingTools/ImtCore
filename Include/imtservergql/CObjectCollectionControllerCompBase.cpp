@@ -1601,7 +1601,7 @@ sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload CObjectCollectionControl
 		parameterInfo.id = metaInfo->GetMetaInfoId(infoType);
 		parameterInfo.name = metaInfo->GetMetaInfoName(infoType);
 		parameterInfo.description = metaInfo->GetMetaInfoDescription(infoType);
-		
+
 		QVariant metaInfoValue = metaInfo->GetMetaInfo(infoType);
 		parameterInfo.typeId = GetTypeIdOfVariant(metaInfoValue);
 		parameterInfo.data = ConvertMetaInfoToString(infoType, metaInfoValue);
