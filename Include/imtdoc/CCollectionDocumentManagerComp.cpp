@@ -4,62 +4,6 @@
 // Qt includes
 #include <QtCore/QString>
 
-// ImtCore includes
-#include <imtbase/IValidationContext.h>
-
-
-namespace
-{
-
-
-class CValidationMessageCollector: public ilog::IMessageConsumer
-{
-public:
-	explicit CValidationMessageCollector(ilog::IMessageConsumer* targetPtr)
-		:m_targetPtr(targetPtr)
-	{
-	}
-
-	virtual bool IsMessageSupported(
-				int /*messageCategory*/,
-				int /*messageId*/,
-				const istd::IInformationProvider* /*messagePtr*/) const override
-	{
-		return true;
-	}
-
-	virtual void AddMessage(const MessagePtr& messagePtr) override
-	{
-		if (messagePtr == nullptr){
-			return;
-		}
-
-		istd::IInformationProvider::InformationCategory category = messagePtr->GetInformationCategory();
-		if ((category == istd::IInformationProvider::IC_ERROR
-				|| category == istd::IInformationProvider::IC_CRITICAL)
-				&& m_errorMessage.isEmpty()){
-			m_errorMessage = messagePtr->GetInformationDescription();
-		}
-
-		if (m_targetPtr != nullptr){
-			m_targetPtr->AddMessage(messagePtr);
-		}
-	}
-
-	QString GetErrorMessage() const
-	{
-		return m_errorMessage;
-	}
-
-private:
-	ilog::IMessageConsumer* m_targetPtr;
-	QString m_errorMessage;
-};
-
-
-} // namespace
-
-
 namespace imtdoc
 {
 
@@ -115,22 +59,16 @@ bool CCollectionDocumentManagerComp::ValidateDocumentData(
 		return false;
 	}
 
-	const imtbase::IDataValidator* validator = GetDocumentValidator(document.typeId);
+	const imtdoc::IDocumentValidator* validator = GetDocumentValidator(document.typeId);
 	if (validator == nullptr){
 		return true;
 	}
 
-	ilog::IMessageConsumer* logPtr = GetLogPtr();
-	CValidationMessageCollector messageCollector(logPtr);
-	// Validation context is optional; no dedicated context is available for collection documents here.
-	const imtbase::IValidationContext* validationContextPtr = nullptr;
-	istd::IInformationProvider::InformationCategory category =
-		validator->Validate(validationContextPtr, *document.objectPtr, &messageCollector);
-	if (category == istd::IInformationProvider::IC_ERROR
-			|| category == istd::IInformationProvider::IC_CRITICAL){
+	QString validatorMessage;
+	if (!validator->ValidateDocumentData(*document.objectPtr, validatorMessage)){
 		status = OS_FAILED;
 		if (errorMessagePtr != nullptr){
-			*errorMessagePtr = messageCollector.GetErrorMessage();
+			*errorMessagePtr = validatorMessage;
 		}
 		return false;
 	}
@@ -170,7 +108,7 @@ int CCollectionDocumentManagerComp::GetObjectFactoryIndex(const QByteArray& type
 }
 
 
-const imtbase::IDataValidator* CCollectionDocumentManagerComp::GetDocumentValidator(const QByteArray& typeId) const
+const imtdoc::IDocumentValidator* CCollectionDocumentManagerComp::GetDocumentValidator(const QByteArray& typeId) const
 {
 	int index = GetObjectFactoryIndex(typeId);
 	if ((index >= 0) && (index < m_documentValidatorCompPtr.GetCount())){

@@ -8,8 +8,8 @@
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
-#include <imtbase/IDataValidator.h>
 #include <imtdoc/CCollectionDocumentManager.h>
+#include <imtdoc/IDocumentValidator.h>
 
 
 namespace imtdoc
@@ -42,7 +42,7 @@ protected:
 
 private:
 	int GetObjectFactoryIndex(const QByteArray& typeId) const;
-	const imtbase::IDataValidator* GetDocumentValidator(const QByteArray& typeId) const;
+	const imtdoc::IDocumentValidator* GetDocumentValidator(const QByteArray& typeId) const;
 
 private:
 	I_MULTIREF(imtdoc::IDocumentManagerEventHandler, m_handlerCompPtr);
@@ -50,7 +50,7 @@ private:
 	I_REF(imtbase::IObjectCollection, m_collectionCompPtr);
 	I_FACT(idoc::IUndoManager, m_undoManagerFactPtr);
 	I_MULTIFACT(istd::IChangeable, m_objectFactListCompPtr);
-	I_MULTIREF(imtbase::IDataValidator, m_documentValidatorCompPtr);
+	I_MULTIREF(imtdoc::IDocumentValidator, m_documentValidatorCompPtr);
 };
 
 
