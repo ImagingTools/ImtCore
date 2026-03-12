@@ -30,6 +30,7 @@ public:
 		Validate document data.
 		\return		true if document is valid, false otherwise.
 		\param		errorMessage	output parameter with validation error description when return value is false.
+								When validation succeeds, the content of errorMessage is undefined.
 	*/
 	virtual bool ValidateDocumentData(const istd::IChangeable& document, QString& errorMessage) const = 0;
 };
