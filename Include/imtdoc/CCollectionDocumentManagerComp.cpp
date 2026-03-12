@@ -64,11 +64,11 @@ bool CCollectionDocumentManagerComp::ValidateDocumentData(
 		return true;
 	}
 
-	QString validatorMessage;
-	if (!validator->ValidateDocumentData(*document.objectPtr, validatorMessage)){
+	QString validationError;
+	if (!validator->ValidateDocumentData(*document.objectPtr, validationError)){
 		status = OS_FAILED;
 		if (errorMessagePtr != nullptr){
-			*errorMessagePtr = validatorMessage;
+			*errorMessagePtr = validationError;
 		}
 		return false;
 	}
