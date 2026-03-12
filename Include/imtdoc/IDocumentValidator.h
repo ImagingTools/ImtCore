@@ -29,7 +29,7 @@ public:
 	/**
 		Validate document data.
 		\return		true if document is valid, false otherwise.
-		\param		errorMessage	error message describing validation failure.
+		\param		errorMessage	output parameter with validation error description when return value is false.
 	*/
 	virtual bool ValidateDocumentData(const istd::IChangeable& document, QString& errorMessage) const = 0;
 };

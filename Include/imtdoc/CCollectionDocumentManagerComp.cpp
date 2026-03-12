@@ -59,13 +59,13 @@ bool CCollectionDocumentManagerComp::ValidateDocumentData(
 		return false;
 	}
 
-	const imtdoc::IDocumentValidator* validator = GetDocumentValidator(document.typeId);
-	if (validator == nullptr){
+	const imtdoc::IDocumentValidator* documentValidator = GetDocumentValidator(document.typeId);
+	if (documentValidator == nullptr){
 		return true;
 	}
 
 	QString validationError;
-	if (!validator->ValidateDocumentData(*document.objectPtr, validationError)){
+	if (!documentValidator->ValidateDocumentData(*document.objectPtr, validationError)){
 		status = OS_FAILED;
 		if (errorMessagePtr != nullptr){
 			*errorMessagePtr = validationError;
