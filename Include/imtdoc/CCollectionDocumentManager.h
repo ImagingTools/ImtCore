@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QtCore/QMutex>
+#include <QtCore/QString>
 
 // ACF includes
 #include <idoc/IDocumentManager.h>
@@ -43,6 +44,7 @@ public:
 		const QByteArray& userId, const QByteArray& documentId, idoc::IUndoManager*& undoManagerPtr) const override;
 	virtual OperationStatus RegisterDocumentObserver(const QByteArray& userId, const QByteArray& documentId, imod::IObserver& observer) override;
 	virtual OperationStatus UnregisterDocumentObserver(const QByteArray& userId, const QByteArray& documentId, imod::IObserver& observer) override;
+	QString GetLastErrorMessage() const;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -54,7 +56,7 @@ protected:
 	struct WorkingDocument;
 
 	bool ValidateInputParams(const QByteArray& userId, const QByteArray& documentId, OperationStatus& status) const;
-	virtual bool ValidateDocumentData(const WorkingDocument& document, OperationStatus& status) const;
+	virtual bool ValidateDocumentData(const WorkingDocument& document, OperationStatus& status, QString* errorMessagePtr) const;
 	void OnUndoManagerChanged(int modelId);
 	int GetUndoManagerNextModelId(const QByteArray& userId);
 	WorkingDocument* FindDocument(const QByteArray& userId, const QByteArray& documentId);
@@ -95,13 +97,14 @@ protected:
 	typedef QMap<QByteArray, WorkingDocument> WorkingDocumentList;
 	mutable QMap<QByteArray, WorkingDocumentList> m_userDocuments;
 	mutable QRecursiveMutex m_mutex;
+	QString m_lastErrorMessage;
 
 	UndoManagerObserver m_undoManagerObserver;
 
 private:
 	DocumentNotificationPtr CreateDocumentNotification(const QByteArray& userId, const QByteArray& documentId) const;
+	void SetLastErrorMessage(const QString& message);
 };
 
 
 } // namespace imtdoc
-

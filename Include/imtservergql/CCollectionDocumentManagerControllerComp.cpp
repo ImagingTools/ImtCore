@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtservergql/CCollectionDocumentManagerControllerComp.h>
 
+// ImtCore includes
+#include <imtdoc/CCollectionDocumentManager.h>
+
 
 namespace imtservergql
 {
@@ -259,7 +262,14 @@ CDM::CDocumentOperationStatus CCollectionDocumentManagerControllerComp::OnSaveDo
 			break;
 		case imtdoc::IDocumentManager::OS_FAILED:
 			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Failed;
-			errorMessage = "Failed to save document";
+			if (const auto* managerPtr =
+					dynamic_cast<const imtdoc::CCollectionDocumentManager*>(m_documentManagerCompPtr.GetPtr())){
+				QString validationMessage = managerPtr->GetLastErrorMessage();
+				errorMessage = validationMessage.isEmpty() ? "Failed to save document" : validationMessage;
+			}
+			else{
+				errorMessage = "Failed to save document";
+			}
 			break;
 		default:
 			break;
