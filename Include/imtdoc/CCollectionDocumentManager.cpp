@@ -370,7 +370,7 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
 	QString validationMessage;
 	if (!ValidateDocumentData(workingDocumentSnapshot, validationStatus, &validationMessage)){
 		if (validationMessage.isEmpty()){
-			validationMessage = QStringLiteral("Document data is invalid");
+			validationMessage = GetInvalidDocumentMessage();
 		}
 
 		SetLastErrorMessage(validationMessage);
@@ -675,6 +675,12 @@ bool CCollectionDocumentManager::ValidateDocumentData(
 	}
 
 	return true;
+}
+
+
+QString CCollectionDocumentManager::GetInvalidDocumentMessage()
+{
+	return QStringLiteral("Document data is invalid");
 }
 
 

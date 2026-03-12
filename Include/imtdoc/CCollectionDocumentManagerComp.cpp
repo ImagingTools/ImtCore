@@ -30,13 +30,15 @@ public:
 
 	virtual void AddMessage(const MessagePtr& messagePtr) override
 	{
-		if (messagePtr != nullptr){
-			istd::IInformationProvider::InformationCategory category = messagePtr->GetInformationCategory();
-			if ((category == istd::IInformationProvider::IC_ERROR
-					|| category == istd::IInformationProvider::IC_CRITICAL)
-					&& m_errorMessage.isEmpty()){
-				m_errorMessage = messagePtr->GetInformationDescription();
-			}
+		if (messagePtr == nullptr){
+			return;
+		}
+
+		istd::IInformationProvider::InformationCategory category = messagePtr->GetInformationCategory();
+		if ((category == istd::IInformationProvider::IC_ERROR
+				|| category == istd::IInformationProvider::IC_CRITICAL)
+				&& m_errorMessage.isEmpty()){
+			m_errorMessage = messagePtr->GetInformationDescription();
 		}
 
 		if (m_targetPtr != nullptr){
@@ -108,7 +110,7 @@ bool CCollectionDocumentManagerComp::ValidateDocumentData(
 	if (!document.objectPtr.IsValid()){
 		status = OS_FAILED;
 		if (errorMessagePtr != nullptr){
-			*errorMessagePtr = QStringLiteral("Document data is invalid");
+			*errorMessagePtr = CCollectionDocumentManager::GetInvalidDocumentMessage();
 		}
 		return false;
 	}
