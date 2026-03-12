@@ -30,7 +30,7 @@ public:
 		Validate document data.
 		\return		true if document is valid, false otherwise.
 		\param		errorMessage	output parameter with validation error description when return value is false.
-								When validation succeeds, errorMessage must be cleared.
+								When validation succeeds, implementations must clear errorMessage.
 		\note		Implementations must be thread-safe.
 	*/
 	virtual bool ValidateDocumentData(const istd::IChangeable& document, QString& errorMessage) const = 0;
