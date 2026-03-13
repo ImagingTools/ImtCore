@@ -880,7 +880,8 @@ void CSqlDatabaseDocumentDelegateComp::OnComponentCreated()
 	const QString resourcePath = ResolveCreateTableScriptPath(*m_databaseEngineCompPtr, scriptPath);
 	QFile scriptFile(resourcePath);
 	if (!scriptFile.open(QFile::ReadOnly)){
-		SendErrorMessage(0, QT_TR_NOOP(QString("Collection table creation script '%1'could not be loaded").arg(scriptFile.fileName())));
+		SendErrorMessage(0, QString::fromUtf8(QT_TR_NOOP("Collection table creation script '%1' could not be loaded"))
+							.arg(scriptFile.fileName()));
 		return;
 	}
 
@@ -906,10 +907,10 @@ void CSqlDatabaseDocumentDelegateComp::OnComponentCreated()
 					<< "\n\t| Error: " << sqlError
 					<< "\n\t| Query: " << createTableQuery;
 
-		SendErrorMessage(0, QT_TR_NOOP(QString("\n\t| Table could not be created"
-												"\n\t| Error: %1"
-												"\n\t| Query: %2")
-										.arg(sqlError.text(), qPrintable(createTableQuery))));
+		SendErrorMessage(0, QString::fromUtf8(QT_TR_NOOP("\n\t| Table could not be created"
+														"\n\t| Error: %1"
+														"\n\t| Query: %2"))
+								.arg(sqlError.text(), qPrintable(createTableQuery)));
 	}
 }
 
