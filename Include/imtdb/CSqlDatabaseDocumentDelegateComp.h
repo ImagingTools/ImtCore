@@ -147,6 +147,7 @@ public:
 	virtual void OnComponentCreated() override;
 
 protected:
+	virtual bool CreateTableIfNeeded() const;
 	virtual QByteArray PrepareInsertNewObjectQuery(
 				const QByteArray& typeId,
 				const QByteArray& objectId,
@@ -199,4 +200,3 @@ protected:
 
 
 Q_DECLARE_METATYPE(imtdb::RawSqlExpression);
-

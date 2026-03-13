@@ -853,28 +853,34 @@ void CSqlDatabaseDocumentDelegateComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
+	CreateTableIfNeeded();
+}
+
+
+bool CSqlDatabaseDocumentDelegateComp::CreateTableIfNeeded() const
+{
 	const bool autoCreateTable = m_autoCreateTableAttrPtr.IsValid() ? *m_autoCreateTableAttrPtr : false;
 	if (!autoCreateTable){
-		return;
+		return false;
 	}
 
 	if (!m_databaseEngineCompPtr.IsValid()){
-		return;
+		return false;
 	}
 
 	const QString tableName = QString::fromUtf8(GetTableName());
 	if (tableName.isEmpty()){
-		return;
+		return false;
 	}
 
 	if (TableExists(tableName)){
-		return;
+		return true;
 	}
 
 	const QByteArray scriptPath = m_createTableScriptPathAttrPtr.IsValid() ? *m_createTableScriptPathAttrPtr : QByteArray();
 	if (scriptPath.isEmpty()){
 		SendErrorMessage(0, QT_TR_NOOP("Table creation script path is empty"));
-		return;
+		return false;
 	}
 
 	const QString resourcePath = ResolveCreateTableScriptPath(*m_databaseEngineCompPtr, scriptPath);
@@ -882,7 +888,7 @@ void CSqlDatabaseDocumentDelegateComp::OnComponentCreated()
 	if (!scriptFile.open(QFile::ReadOnly)){
 		SendErrorMessage(0, QString::fromUtf8(QT_TR_NOOP("Collection table creation script '%1' could not be loaded"))
 							.arg(scriptFile.fileName()));
-		return;
+		return false;
 	}
 
 	QByteArray createTableQuery = scriptFile.readAll();
@@ -911,7 +917,10 @@ void CSqlDatabaseDocumentDelegateComp::OnComponentCreated()
 														"\n\t| Error: %1"
 														"\n\t| Query: %2"))
 								.arg(sqlError.text(), qPrintable(createTableQuery)));
+		return false;
 	}
+
+	return true;
 }
 
 
