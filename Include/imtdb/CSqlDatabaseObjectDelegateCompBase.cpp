@@ -619,11 +619,26 @@ bool CSqlDatabaseObjectDelegateCompBase::TableExists(const QString& tableName) c
 		return false;
 	}
 
-	QString tableExistsQuery = QString(R"(SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = '%1');)").arg(tableName);
+	QString driverId = m_databaseEngineCompPtr->GetDatabaseDriverId();
+	QString tableExistsQuery;
+
+	if (driverId == "QPSQL"){
+		tableExistsQuery = QString(
+								"SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = '%1');"
+								).arg(tableName);
+	}
+	else if (driverId == "QSQLITE"){
+		tableExistsQuery = QString(
+								"SELECT EXISTS (SELECT 1 FROM sqlite_master WHERE type='table' AND name='%1');"
+								).arg(tableName);
+	}
+	else{
+		return false;
+	}
 
 	QSqlError sqlError;
 	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(tableExistsQuery.toUtf8(), &sqlError);
-
+	
 	if (sqlError.type() != QSqlError::NoError){
 		return false;
 	}
@@ -632,12 +647,7 @@ bool CSqlDatabaseObjectDelegateCompBase::TableExists(const QString& tableName) c
 		return false;
 	}
 
-	QSqlRecord record = sqlQuery.record();
-	if (record.contains("exists")){
-		return record.value("exists").toBool();
-	}
-
-	return false;
+	return sqlQuery.value(0).toBool();
 }
 
 
