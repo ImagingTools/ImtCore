@@ -56,8 +56,8 @@ public:
 		I_REGISTER_INTERFACE(imtbase::IRevisionController);
 		I_REGISTER_INTERFACE(imtdb::IDependentMetaInfoController);
 		I_ASSIGN(m_useDataMetaInfoAttrPtr, "UseDataMetaInfo", "If true - documents will be searched and sorted by the 'DataMetaInfo' column,\n else - otherwise according to the contents of the 'Document' column", true, false);
-		I_ASSIGN(m_autoCreateTableAttrPtr, "AutoCreateTable", "Auto create collection table if it does not exist", true, false);
-		I_ASSIGN(m_createTableScriptPathAttrPtr, "CreateTableScriptPath", "QRC path or file name of SQL script used to create collection table", true, "CreateCollectionTable.sql");
+		I_ASSIGN(m_autoCreateTableAttrPtr, "AutoCreateTable", "Auto create collection table if it does not exist", false, false);
+		I_ASSIGN(m_createTableScriptPathAttrPtr, "CreateTableScriptPath", "QRC path or file name of SQL script used to create collection table", false, ":/SQL/Postgres/CreateCollectionTable.sql");
 		I_ASSIGN_MULTI_0(m_documentFactoriesCompPtr, "DocumentFactories", "Factory list used for creation of the new document instance according to the given type-ID", true);
 		I_ASSIGN(m_metaInfoCreatorCompPtr, "MetaInfoCreator", "Creator of metainformation of object data", false, "MetaInfoCreator");
 		I_ASSIGN(m_jsonBasedMetaInfoDelegateCompPtr, "JsonBasedMetaInfoDelegate", "Delegate for converting document metainfo to JSON representation", false, "JsonBasedMetaInfoDelegate");

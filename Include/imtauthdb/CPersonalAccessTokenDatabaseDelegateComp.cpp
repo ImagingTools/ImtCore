@@ -18,8 +18,6 @@
 namespace imtauthdb
 {
 
-namespace
-{
 
 QString GetSqlResourcePath(const imtdb::IDatabaseEngine& databaseEngine, const QString& fileName)
 {
@@ -29,12 +27,10 @@ QString GetSqlResourcePath(const imtdb::IDatabaseEngine& databaseEngine, const Q
 	return prefix + fileName;
 }
 
-} // namespace
-
 
 istd::IChangeableUniquePtr CPersonalAccessTokenDatabaseDelegateComp::CreateObjectFromRecord(
-	const QSqlRecord& record,
-	const iprm::IParamsSet* /*dataConfigurationPtr*/) const
+		const QSqlRecord& record,
+		const iprm::IParamsSet* /*dataConfigurationPtr*/) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return nullptr;
@@ -125,12 +121,12 @@ istd::IChangeableUniquePtr CPersonalAccessTokenDatabaseDelegateComp::CreateObjec
 
 
 imtdb::IDatabaseObjectDelegate::NewObjectQuery CPersonalAccessTokenDatabaseDelegateComp::CreateNewObjectQuery(
-	const QByteArray& typeId,
-	const QByteArray& proposedObjectId,
-	const QString& objectName,
-	const QString& objectDescription,
-	const istd::IChangeable* valuePtr,
-	const imtbase::IOperationContext* /*operationContextPtr*/) const
+			const QByteArray& typeId,
+			const QByteArray& proposedObjectId,
+			const QString& objectName,
+			const QString& objectDescription,
+			const istd::IChangeable* valuePtr,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	if (typeId.isEmpty() || (typeId != "PersonalAccessToken")){
 		return NewObjectQuery();
@@ -266,9 +262,9 @@ QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 
 QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateDeleteObjectsQuery(
-	const imtbase::IObjectCollection& /*collection*/,
-	const QByteArrayList& objectIds,
-	const imtbase::IOperationContext* /*operationContextPtr*/) const
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArrayList& objectIds,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	if (objectIds.isEmpty()){
 		return QByteArray();
@@ -291,19 +287,19 @@ QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateDeleteObjectsQuery(
 
 
 QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateDeleteObjectSetQuery(
-	const imtbase::IObjectCollection& /*collection*/,
-	const iprm::IParamsSet* /*paramsPtr*/,
-	const imtbase::IOperationContext* /*operationContextPtr*/) const
+			const imtbase::IObjectCollection& /*collection*/,
+			const iprm::IParamsSet* /*paramsPtr*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	return QByteArray();
 }
 
 
 QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateRenameObjectQuery(
-	const imtbase::IObjectCollection& /*collection*/,
-	const QByteArray& objectId,
-	const QString& newObjectName,
-	const imtbase::IOperationContext* /*operationContextPtr*/) const
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& objectId,
+			const QString& newObjectName,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	if (objectId.isEmpty() || newObjectName.isEmpty()){
 		return QByteArray();

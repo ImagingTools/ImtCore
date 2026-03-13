@@ -12,13 +12,3 @@ CREATE TABLE IF NOT EXISTS "PersonalAccessTokens"
     "ExpiresAt"  TEXT,
     "Revoked"    INTEGER NOT NULL DEFAULT 0
 );
-
--- Helpful indexes (optional)
-CREATE INDEX IF NOT EXISTS "IX_PersonalAccessTokens_UserId"
-    ON "PersonalAccessTokens" ("UserId");
-
-CREATE INDEX IF NOT EXISTS "IX_PersonalAccessTokens_Revoked"
-    ON "PersonalAccessTokens" ("Revoked");
-
-CREATE INDEX IF NOT EXISTS "IX_PersonalAccessTokens_ExpiresAt"
-    ON "PersonalAccessTokens" ("ExpiresAt");

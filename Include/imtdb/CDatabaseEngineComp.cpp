@@ -10,8 +10,6 @@
 namespace imtdb
 {
 
-namespace
-{
 
 QString GetSqlResourcePath(const QByteArray& databaseDriverId, const QString& fileName)
 {
@@ -19,8 +17,6 @@ QString GetSqlResourcePath(const QByteArray& databaseDriverId, const QString& fi
 	const QString prefix = isSqlite ? QStringLiteral(":/SQL/SQLite/") : QStringLiteral(":/SQL/Postgres/");
 	return prefix + fileName;
 }
-
-} // namespace
 
 
 // public methods
