@@ -857,7 +857,7 @@ void CSqlDatabaseDocumentDelegateComp::OnComponentCreated()
 }
 
 
-bool CSqlDatabaseDocumentDelegateComp::CreateTableIfNeeded() const
+bool CSqlDatabaseDocumentDelegateComp::CreateTableIfNeeded()
 {
 	const bool autoCreateTable = m_autoCreateTableAttrPtr.IsValid() ? *m_autoCreateTableAttrPtr : false;
 	if (!autoCreateTable){

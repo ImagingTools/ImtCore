@@ -147,7 +147,7 @@ public:
 	virtual void OnComponentCreated() override;
 
 protected:
-	virtual bool CreateTableIfNeeded() const;
+	virtual bool CreateTableIfNeeded();
 	virtual QByteArray PrepareInsertNewObjectQuery(
 				const QByteArray& typeId,
 				const QByteArray& objectId,
