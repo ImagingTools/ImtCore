@@ -5,9 +5,9 @@ FILE="../../Partitura/ImtCoreVoce.arp/VersionInfo.acc.xtrsvn"
 
 git fetch --prune --unshallow 2>/dev/null
 
-# Get revision count from origin/master or HEAD
-# Note: 'master' is hard-coded to match the Windows version behavior
-REV=$(git rev-list --count origin/master 2>/dev/null)
+# Get revision count from origin/main or HEAD
+# Note: 'main' is hard-coded to match the Windows version behavior
+REV=$(git rev-list --count origin/main 2>/dev/null)
 if [ -z "$REV" ]; then
     REV=$(git rev-list --count HEAD 2>/dev/null)
 fi
@@ -30,9 +30,21 @@ echo "Git revision: $REV (version: $REV_OFFSET), dirty: $DIRTY"
 echo "Processing file: $FILE"
 
 OUT="${FILE%.xtrsvn}"
+TMP="$OUT.tmp"
 
 # Replace placeholders: $WCREV$ with revision count, $WCMODS?1:0$ with dirty flag
 # REV and DIRTY are numeric values from git, so they are safe to use directly in sed
-sed -e "s/\\\$WCREV\\\$/$REV_OFFSET/g" -e "s/\\\$WCMODS?1:0\\\$/$DIRTY/g" "$FILE" > "$OUT"
+sed -e "s/\\\$WCREV\\\$/$REV_OFFSET/g" -e "s/\\\$WCMODS?1:0\\\$/$DIRTY/g" "$FILE" > "$TMP"
 
-echo "Wrote $OUT with WCREV=$REV_OFFSET and WCMODS=$DIRTY"
+if [ -f "$OUT" ]; then
+    if cmp -s "$TMP" "$OUT"; then
+        rm -f "$TMP"
+        echo "No changes in $OUT, file not rewritten."
+    else
+        mv -f "$TMP" "$OUT"
+        echo "Wrote $OUT with WCREV=$REV_OFFSET and WCMODS=$DIRTY"
+    fi
+else
+    mv -f "$TMP" "$OUT"
+    echo "Wrote $OUT with WCREV=$REV_OFFSET and WCMODS=$DIRTY"
+fi

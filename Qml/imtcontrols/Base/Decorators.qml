@@ -10,6 +10,7 @@ StyleComponents {
 	property string styleId: "StyleAcf"
 	menuPanelButtonDecorator: menuPanelButtonDecoratorComp
 	subMenuPanelButtonDecorator: subMenuPanelButtonDecoratorComp
+	menuPanelDecorator: Component{Item{}}
 	filterPanelDecorator: filterPanelDecoratorComp
 	// bottomPanelDecorator: bottomPanelDecoratorComp
 	topButtonDecorator: topButtonDecoratorComp
