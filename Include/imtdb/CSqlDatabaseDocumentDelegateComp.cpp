@@ -31,31 +31,6 @@
 namespace imtdb
 {
 
-
-namespace
-{
-
-QString GetSqlResourcePath(const imtdb::IDatabaseEngine& databaseEngine, const QString& fileName)
-{
-	const QByteArray databaseDriverId = databaseEngine.GetDatabaseDriverId();
-	const bool isSqlite = databaseDriverId.compare(QByteArrayLiteral("QSQLITE"), Qt::CaseInsensitive) == 0;
-	const QString prefix = isSqlite ? QStringLiteral(":/SQL/SQLite/") : QStringLiteral(":/SQL/Postgres/");
-	return prefix + fileName;
-}
-
-QString ResolveCreateTableScriptPath(const imtdb::IDatabaseEngine& databaseEngine, const QByteArray& scriptPath)
-{
-	const QString scriptPathStr = QString::fromUtf8(scriptPath);
-	if (scriptPathStr.startsWith(QStringLiteral(":/"))){
-		return scriptPathStr;
-	}
-
-	return GetSqlResourcePath(databaseEngine, scriptPathStr);
-}
-
-} // namespace
-
-
 const QByteArray CSqlDatabaseDocumentDelegateComp::s_idColumn = QByteArrayLiteral("Id");
 const QByteArray CSqlDatabaseDocumentDelegateComp::s_typeIdColumn = QByteArrayLiteral("TypeId");
 const QByteArray CSqlDatabaseDocumentDelegateComp::s_documentIdColumn = QByteArrayLiteral("DocumentId");
@@ -886,7 +861,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTableIfNeeded()
 		return false;
 	}
 
-	const QString resourcePath = ResolveCreateTableScriptPath(*m_databaseEngineCompPtr, scriptPath);
+	const QString resourcePath = QString::fromUtf8(scriptPath);
 	QFile scriptFile(resourcePath);
 	if (!scriptFile.open(QFile::ReadOnly)){
 		SendErrorMessage(0, QString::fromUtf8(QT_TR_NOOP("Collection table creation script '%1' could not be loaded"))
