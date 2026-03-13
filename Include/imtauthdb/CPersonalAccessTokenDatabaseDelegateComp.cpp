@@ -18,6 +18,19 @@
 namespace imtauthdb
 {
 
+namespace
+{
+
+QString GetSqlResourcePath(const imtdb::IDatabaseEngine& databaseEngine, const QString& fileName)
+{
+	const QByteArray databaseDriverId = databaseEngine.GetDatabaseDriverId();
+	const bool isSqlite = databaseDriverId.compare(QByteArrayLiteral("QSQLITE"), Qt::CaseInsensitive) == 0;
+	const QString prefix = isSqlite ? QStringLiteral(":/SQL/SQLite/") : QStringLiteral(":/SQL/Postgres/");
+	return prefix + fileName;
+}
+
+} // namespace
+
 
 istd::IChangeableUniquePtr CPersonalAccessTokenDatabaseDelegateComp::CreateObjectFromRecord(
 	const QSqlRecord& record,
@@ -337,7 +350,7 @@ void CPersonalAccessTokenDatabaseDelegateComp::OnComponentCreated()
 	if (m_databaseEngineCompPtr.IsValid()){
 		QString tableName = GetTableName();
 		if (!TableExists(tableName)){
-			QFile scriptFile(":/SQL/CreatePersonalAccessTokenTable.sql");
+			QFile scriptFile(GetSqlResourcePath(*m_databaseEngineCompPtr, QStringLiteral("CreatePersonalAccessTokenTable.sql")));
 			if (!scriptFile.open(QFile::ReadOnly)){
 				SendErrorMessage(0, QT_TR_NOOP(QString("Personal access tokens table creation script '%1'could not be loaded").arg(scriptFile.fileName())));
 				return;

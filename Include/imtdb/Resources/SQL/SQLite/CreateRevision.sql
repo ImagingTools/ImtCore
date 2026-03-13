@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS "Revisions" (
+    Revision INTEGER NOT NULL PRIMARY KEY,
+    CreationDate TEXT DEFAULT CURRENT_TIMESTAMP,
+    Description TEXT
+);
