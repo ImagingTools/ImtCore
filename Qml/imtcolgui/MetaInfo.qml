@@ -20,6 +20,8 @@ Rectangle {
 
 	Component.onCompleted: {
 		registerViewDelegate("Date", metaInfoViewDateDelegateComp)
+		registerViewDelegate("Time", metaInfoViewDateDelegateComp)
+		registerViewDelegate("DateTime", metaInfoViewDateDelegateComp)
 	}
 	
 	function startLoading(){

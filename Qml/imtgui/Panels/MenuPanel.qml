@@ -12,7 +12,7 @@ Rectangle {
 	clip: true;
 
 	color: Style.backgroundColor;
-	radius: Style.radiusL;
+	radius: Style.menuPanelRadius;
 
 	property string textColor: Style.textColor;
 	property string fontName: "Helvetica";
@@ -216,6 +216,47 @@ Rectangle {
 		}
 	}
 
+	ToolButton {
+		id: collapseButton;
+
+		anchors.top: parent.top
+		anchors.right: parent.right
+		anchors.topMargin: Style.marginXS
+		anchors.rightMargin: Style.marginXS
+
+		width: height;
+		height: Style.buttonHeightXXS - 2;
+		z:100
+
+		visible: Style.enableMenuPanelCollapse
+
+		iconSource: "../../../" + Style.getIconPath(collapseButton.expanded ? "Icons/Collapse" : "Icons/Expand", Icon.State.On, Icon.Mode.Normal);
+
+		property bool expanded: true
+		property real menuDefaultWidth: 0
+
+		//tooltipText: collapseButton.expanded ? qsTr("Collapse") : qsTr("Expand");
+
+		onClicked: {
+			if(collapseButton.expanded){
+				menuDefaultWidth = menuPanel.width
+				menuPanel.width = width + 2*anchors.rightMargin
+			}
+			else {
+				menuPanel.width = menuDefaultWidth
+			}
+			collapseButton.expanded = !collapseButton.expanded
+
+		}
+	}
+
+	Loader{
+		anchors.fill: parent
+		sourceComponent: Style.menuPanelDecorator//backgroundComp
+	}
+
+
+
 	Flickable{
 		id: allPagesFlick;
 
@@ -229,7 +270,7 @@ Rectangle {
 		contentWidth: allPagesColumn.width;
 		contentHeight:  allPagesColumn.height;
 
-		visible: topAlignmentColumn.y + topAlignmentColumn.height > bottomAlignmentColumn.y;
+		visible: !collapseButton.expanded ? false : topAlignmentColumn.y + topAlignmentColumn.height > bottomAlignmentColumn.y;
 
 		Column{
 			id: allPagesColumn;
@@ -249,7 +290,7 @@ Rectangle {
 
 		anchors.topMargin: Style.menuPanelTopMargin !==undefined ? Style.menuPanelTopMargin : !menuPanel.centered ? 0 : parent.height - bottomAlignmentColumn.height - height > 0 ? (parent.height - bottomAlignmentColumn.height - height)/2 : 0 ;
 
-		visible: !allPagesFlick.visible;
+		visible: !collapseButton.expanded ? false : !allPagesFlick.visible;
 
 		Repeater{
 			id: topAlignmentPages;
@@ -278,7 +319,7 @@ Rectangle {
 		anchors.right: menuPanel.right;
 		anchors.bottom: menuPanel.bottom;
 
-		visible: !allPagesFlick.visible;
+		visible: !collapseButton.expanded ? false : !allPagesFlick.visible;
 
 		Repeater{
 			id: bottomAlignmentPages;
