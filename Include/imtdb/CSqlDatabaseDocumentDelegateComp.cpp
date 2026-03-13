@@ -32,6 +32,30 @@ namespace imtdb
 {
 
 
+namespace
+{
+
+QString GetSqlResourcePath(const imtdb::IDatabaseEngine& databaseEngine, const QString& fileName)
+{
+	const QByteArray databaseDriverId = databaseEngine.GetDatabaseDriverId();
+	const bool isSqlite = databaseDriverId.compare(QByteArrayLiteral("QSQLITE"), Qt::CaseInsensitive) == 0;
+	const QString prefix = isSqlite ? QStringLiteral(":/SQL/SQLite/") : QStringLiteral(":/SQL/Postgres/");
+	return prefix + fileName;
+}
+
+QString ResolveCreateTableScriptPath(const imtdb::IDatabaseEngine& databaseEngine, const QByteArray& scriptPath)
+{
+	const QString scriptPathStr = QString::fromUtf8(scriptPath);
+	if (scriptPathStr.startsWith(QStringLiteral(":/"))){
+		return scriptPathStr;
+	}
+
+	return GetSqlResourcePath(databaseEngine, scriptPathStr);
+}
+
+} // namespace
+
+
 const QByteArray CSqlDatabaseDocumentDelegateComp::s_idColumn = QByteArrayLiteral("Id");
 const QByteArray CSqlDatabaseDocumentDelegateComp::s_typeIdColumn = QByteArrayLiteral("TypeId");
 const QByteArray CSqlDatabaseDocumentDelegateComp::s_documentIdColumn = QByteArrayLiteral("DocumentId");
@@ -820,6 +844,73 @@ bool CSqlDatabaseDocumentDelegateComp::ClearDependentMetaInfo(const MetaFieldCle
 	}
 
 	return true;
+}
+
+
+// reimplemented (icomp::CComponentBase)
+
+void CSqlDatabaseDocumentDelegateComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+
+	const bool autoCreateTable = m_autoCreateTableAttrPtr.IsValid() ? *m_autoCreateTableAttrPtr : false;
+	if (!autoCreateTable){
+		return;
+	}
+
+	if (!m_databaseEngineCompPtr.IsValid()){
+		return;
+	}
+
+	const QString tableName = QString::fromUtf8(GetTableName());
+	if (tableName.isEmpty()){
+		return;
+	}
+
+	if (TableExists(tableName)){
+		return;
+	}
+
+	const QByteArray scriptPath = m_createTableScriptPathAttrPtr.IsValid() ? *m_createTableScriptPathAttrPtr : QByteArray();
+	if (scriptPath.isEmpty()){
+		SendErrorMessage(0, QT_TR_NOOP("Table creation script path is empty"));
+		return;
+	}
+
+	const QString resourcePath = ResolveCreateTableScriptPath(*m_databaseEngineCompPtr, scriptPath);
+	QFile scriptFile(resourcePath);
+	if (!scriptFile.open(QFile::ReadOnly)){
+		SendErrorMessage(0, QT_TR_NOOP(QString("Collection table creation script '%1'could not be loaded").arg(scriptFile.fileName())));
+		return;
+	}
+
+	QByteArray createTableQuery = scriptFile.readAll();
+	scriptFile.close();
+
+	QByteArray tableScheme = GetTableScheme();
+	if (!tableScheme.isEmpty()){
+		createTableQuery.replace("${TableScheme}", tableScheme);
+	}
+	else{
+		createTableQuery.replace("${TableScheme}", "public");
+	}
+
+	createTableQuery.replace("${TableName}", tableName.toUtf8());
+
+	QSqlError sqlError;
+	m_databaseEngineCompPtr->ExecSqlQuery(createTableQuery, &sqlError);
+
+	if (sqlError.type() != QSqlError::NoError){
+		qCritical() << __FILE__ << __LINE__
+					<< "\n\t| Table could not be created"
+					<< "\n\t| Error: " << sqlError
+					<< "\n\t| Query: " << createTableQuery;
+
+		SendErrorMessage(0, QT_TR_NOOP(QString("\n\t| Table could not be created"
+												"\n\t| Error: %1"
+												"\n\t| Query: %2")
+										.arg(sqlError.text(), qPrintable(createTableQuery))));
+	}
 }
 
 
@@ -1732,5 +1823,3 @@ bool CSqlDatabaseDocumentDelegateComp::IsArrayOperation(
 
 
 } // namespace imtdb
-
-
