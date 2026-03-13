@@ -854,6 +854,7 @@ void CSqlDatabaseDocumentDelegateComp::OnComponentCreated()
 	BaseClass::OnComponentCreated();
 
 	if (!CreateTableIfNeeded()){
+		SendErrorMessage(0, QT_TR_NOOP("Collection table auto-creation failed"));
 		return;
 	}
 }
