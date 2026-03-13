@@ -854,7 +854,7 @@ void CSqlDatabaseDocumentDelegateComp::OnComponentCreated()
 	BaseClass::OnComponentCreated();
 
 	if (!CreateTableIfNeeded()){
-		SendWarningMessage(0, QT_TR_NOOP("Collection table auto-creation failed; component initialization was stopped"));
+		SendWarningMessage(0, QT_TR_NOOP("Collection table auto-creation failed; see previous errors. Component initialization was stopped"));
 		return;
 	}
 }
