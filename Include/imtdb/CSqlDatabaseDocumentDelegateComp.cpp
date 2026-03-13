@@ -853,7 +853,9 @@ void CSqlDatabaseDocumentDelegateComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	CreateTableIfNeeded();
+	if (!CreateTableIfNeeded()){
+		return;
+	}
 }
 
 
@@ -861,7 +863,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTableIfNeeded()
 {
 	const bool autoCreateTable = m_autoCreateTableAttrPtr.IsValid() ? *m_autoCreateTableAttrPtr : false;
 	if (!autoCreateTable){
-		return false;
+		return true;
 	}
 
 	if (!m_databaseEngineCompPtr.IsValid()){
