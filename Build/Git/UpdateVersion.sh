@@ -1,7 +1,8 @@
 #!/bin/bash
 
-cd "$(dirname "$0")"
-FILE="../../Partitura/ImtCoreVoce.arp/VersionInfo.acc.xtrsvn"
+cd "$(dirname "$0")/../.."
+FILE="Partitura/ImtCoreVoce.arp/VersionInfo.acc.xtrsvn"
+BACKUPDIR="$1"
 
 git fetch --prune --unshallow 2>/dev/null
 
@@ -32,6 +33,14 @@ echo "Processing file: $FILE"
 OUT="${FILE%.xtrsvn}"
 TMP="$OUT.tmp"
 
+if [ -n "$BACKUPDIR" ]; then
+    BACKUPFILE="$BACKUPDIR/$OUT"
+    if [ ! -f "$OUT" ] && [ -f "$BACKUPFILE" ]; then
+        cp -af "$BACKUPFILE" "$OUT"
+        echo "Restored $OUT from backup $BACKUPFILE"
+    fi
+fi
+
 # Replace placeholders: $WCREV$ with revision count, $WCMODS?1:0$ with dirty flag
 # REV and DIRTY are numeric values from git, so they are safe to use directly in sed
 sed -e "s/\\\$WCREV\\\$/$REV_OFFSET/g" -e "s/\\\$WCMODS?1:0\\\$/$DIRTY/g" "$FILE" > "$TMP"
@@ -47,4 +56,10 @@ if [ -f "$OUT" ]; then
 else
     mv -f "$TMP" "$OUT"
     echo "Wrote $OUT with WCREV=$REV_OFFSET and WCMODS=$DIRTY"
+fi
+
+if [ -n "$BACKUPDIR" ]; then
+    mkdir -p "$(dirname "$BACKUPFILE")"
+    cp -af "$OUT" "$BACKUPFILE"
+    echo "Backed up $OUT to $BACKUPFILE"
 fi
