@@ -57,8 +57,6 @@ bool CCollectionDocumentManagerComp::ValidateDocumentData(
 		return true;
 	}
 
-	// Reserve 170000000+ range for imtdoc validation warnings to avoid collisions with other message IDs.
-	constexpr int kValidationFailureWarningId = 170000000;
 	QString validationMessage;
 	if (!documentValidator->ValidateDocumentData(*document.objectPtr, validationMessage)){
 		status = OS_FAILED;
@@ -67,7 +65,7 @@ bool CCollectionDocumentManagerComp::ValidateDocumentData(
 				.arg(QString::fromUtf8(document.typeId), validationMessage));
 		}
 		else{
-			SendWarningMessage(kValidationFailureWarningId, QString("Document validation failed for type '%1'")
+			SendWarningMessage(kValidationFailureWithoutMessageWarningId, QString("Document validation failed for type '%1'")
 				.arg(QString::fromUtf8(document.typeId)));
 		}
 		return false;
