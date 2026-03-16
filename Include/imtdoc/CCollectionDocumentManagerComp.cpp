@@ -57,16 +57,16 @@ bool CCollectionDocumentManagerComp::ValidateDocumentData(
 		return true;
 	}
 
-	constexpr int kValidationWarningId = 0;
+	constexpr int kDefaultWarningMessageId = 0;
 	QString validationMessage;
 	if (!documentValidator->ValidateDocumentData(*document.objectPtr, validationMessage)){
 		status = OS_FAILED;
 		if (!validationMessage.isEmpty()){
-			SendWarningMessage(kValidationWarningId, QString("Document validation failed for type '%1': %2")
+			SendWarningMessage(kDefaultWarningMessageId, QString("Document validation failed for type '%1': %2")
 				.arg(QString::fromUtf8(document.typeId), validationMessage));
 		}
 		else{
-			SendWarningMessage(kValidationWarningId, QString("Document validation failed for type '%1'")
+			SendWarningMessage(kDefaultWarningMessageId, QString("Document validation failed for type '%1'")
 				.arg(QString::fromUtf8(document.typeId)));
 		}
 		return false;
