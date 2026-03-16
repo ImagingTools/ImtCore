@@ -57,6 +57,7 @@ bool CCollectionDocumentManagerComp::ValidateDocumentData(
 		return true;
 	}
 
+	// Dedicated warning message id for document validation failures.
 	constexpr int kValidationFailureWarningId = 170000000;
 	QString validationMessage;
 	if (!documentValidator->ValidateDocumentData(*document.objectPtr, validationMessage)){
