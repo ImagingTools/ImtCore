@@ -336,8 +336,6 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SetDocumentData(co
 IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
 	const QByteArray& userId, const QByteArray& documentId, const QString& documentName)
 {
-	SetLastErrorMessage(QString());
-
 	imtbase::IObjectCollection* collectionPtr = GetCollection();
 	if (collectionPtr == nullptr) {
 		return OS_FAILED;
@@ -367,14 +365,7 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
 		workingDocumentSnapshot.objectPtr = documentSnapshotPtr;
 	}
 
-	QString validationMessage;
-	if (!ValidateDocumentData(workingDocumentSnapshot, validationStatus, &validationMessage)){
-		if (validationMessage.isEmpty()){
-			validationMessage = GetInvalidDocumentMessage();
-		}
-
-		SetLastErrorMessage(validationMessage);
-
+	if (!ValidateDocumentData(workingDocumentSnapshot, validationStatus, nullptr)){
 		return validationStatus;
 	}
 
@@ -681,22 +672,6 @@ bool CCollectionDocumentManager::ValidateDocumentData(
 QString CCollectionDocumentManager::GetInvalidDocumentMessage()
 {
 	return QStringLiteral("Document data is invalid");
-}
-
-
-QString CCollectionDocumentManager::GetLastErrorMessage() const
-{
-	QMutexLocker locker(&m_mutex);
-
-	return m_lastErrorMessage;
-}
-
-
-void CCollectionDocumentManager::SetLastErrorMessage(const QString& message)
-{
-	QMutexLocker locker(&m_mutex);
-
-	m_lastErrorMessage = message;
 }
 
 

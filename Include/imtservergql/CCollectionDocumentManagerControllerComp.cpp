@@ -262,14 +262,7 @@ CDM::CDocumentOperationStatus CCollectionDocumentManagerControllerComp::OnSaveDo
 			break;
 		case imtdoc::IDocumentManager::OS_FAILED:
 			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Failed;
-			if (const auto* managerPtr =
-					dynamic_cast<const imtdoc::CCollectionDocumentManager*>(m_documentManagerCompPtr.GetPtr())){
-				QString validationMessage = managerPtr->GetLastErrorMessage();
-				errorMessage = validationMessage.isEmpty() ? "Failed to save document" : validationMessage;
-			}
-			else{
-				errorMessage = "Failed to save document";
-			}
+			errorMessage = "Failed to save document";
 			break;
 		default:
 			break;

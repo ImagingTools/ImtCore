@@ -44,8 +44,6 @@ public:
 		const QByteArray& userId, const QByteArray& documentId, idoc::IUndoManager*& undoManagerPtr) const override;
 	virtual OperationStatus RegisterDocumentObserver(const QByteArray& userId, const QByteArray& documentId, imod::IObserver& observer) override;
 	virtual OperationStatus UnregisterDocumentObserver(const QByteArray& userId, const QByteArray& documentId, imod::IObserver& observer) override;
-	QString GetLastErrorMessage() const;
-
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
 
@@ -98,13 +96,11 @@ protected:
 	typedef QMap<QByteArray, WorkingDocument> WorkingDocumentList;
 	mutable QMap<QByteArray, WorkingDocumentList> m_userDocuments;
 	mutable QRecursiveMutex m_mutex;
-	QString m_lastErrorMessage;
 
 	UndoManagerObserver m_undoManagerObserver;
 
 private:
 	DocumentNotificationPtr CreateDocumentNotification(const QByteArray& userId, const QByteArray& documentId) const;
-	void SetLastErrorMessage(const QString& message);
 };
 
 
