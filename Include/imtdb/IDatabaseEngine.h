@@ -106,6 +106,13 @@ public:
 	 * @see BeginTransaction(), FinishTransaction()
 	 */
 	virtual bool CancelTransaction() const = 0;
+
+	/**
+	 * @brief Returns the database driver identifier
+	 *
+	 * @return Database driver ID used by Qt (e.g., "QPSQL", "QSQLITE")
+	 */
+	virtual QByteArray GetDatabaseDriverId() const = 0;
 	
 	/**
 	 * @brief Executes a SQL query without parameters
@@ -213,5 +220,4 @@ public:
 
 
 } // namespace imtdb
-
 

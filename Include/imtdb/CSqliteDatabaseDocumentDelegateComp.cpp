@@ -325,7 +325,6 @@ QByteArray CSqliteDatabaseDocumentDelegateComp::GetObjectSelectionQuery(
 }
 
 
-
 } // namespace imtdb
 
 

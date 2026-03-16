@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5332" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6318" Description="ACF"/>
+            <Version Id="1" Number="2296" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -49,8 +49,8 @@
                     <AttributeInfo Id="SecretKeyParam" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Uuid"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="SessionCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SessionSqlRepository"/>
+                    <AttributeInfo Id="SessionCollection" Type="Reference" ExportId="SessionCollection">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SessionFactory" Type="Factory" ExportId="">
                         <Data IsEnabled="true" Value="SessionInfo"/>
@@ -63,24 +63,6 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
-        <Element Id="SessionSqlRepository" PackageId="ImtUserAdministrationVoce" ComponentId="SessionSqlRepository">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="Uuid" PackageId="BasePck" ComponentId="Uuid">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap/>
@@ -90,7 +72,6 @@
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
         <Interface InterfaceId="imtauth::IJwtSessionController" ComponentId="JwtSessionController"/>
-        <Interface InterfaceId="imtbase::IObjectCollection" ComponentId="SessionSqlRepository"/>
     </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>

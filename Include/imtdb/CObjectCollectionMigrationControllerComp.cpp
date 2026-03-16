@@ -10,6 +10,19 @@
 namespace imtdb
 {
 
+namespace
+{
+
+QString GetSqlResourcePath(const imtdb::IDatabaseEngine& databaseEngine, const QString& fileName)
+{
+	const QByteArray databaseDriverId = databaseEngine.GetDatabaseDriverId();
+	const bool isSqlite = databaseDriverId.compare(QByteArrayLiteral("QSQLITE"), Qt::CaseInsensitive) == 0;
+	const QString prefix = isSqlite ? QStringLiteral(":/SQL/SQLite/") : QStringLiteral(":/SQL/Postgres/");
+	return prefix + fileName;
+}
+
+} // namespace
+
 
 // protected methods
 
@@ -39,7 +52,7 @@ bool CObjectCollectionMigrationControllerComp::DoMigration(int& resultRevision, 
 		endIndex = subRange.GetMaxValue();
 	}
 
-	QFile scriptFile(":/SQL/CreateCollectionTable.sql");
+	QFile scriptFile(GetSqlResourcePath(*m_databaseEngineCompPtr, QStringLiteral("CreateCollectionTable.sql")));
 	if (!scriptFile.open(QFile::ReadOnly)){
 		SendErrorMessage(0, QT_TR_NOOP(QString("Collection table creation script '%1'could not be loaded").arg(scriptFile.fileName())));
 
@@ -94,5 +107,4 @@ bool CObjectCollectionMigrationControllerComp::DoMigration(int& resultRevision, 
 
 
 } // namespace imtdb
-
 

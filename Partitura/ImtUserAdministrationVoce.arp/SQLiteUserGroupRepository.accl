@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6318" Description="ACF"/>
+            <Version Id="1" Number="2296" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="Repository" X="575" Y="550" Note=""/>
+        <Element ComponentName="SqliteXPathExtractor" X="875" Y="225" Note=""/>
+        <Element ComponentName="Types" X="575" Y="125" Note=""/>
+        <Element ComponentName="UserGroupDatabaseDelegate" X="575" Y="325" Note=""/>
+        <Element ComponentName="UserGroupInfo" X="950" Y="325" Note=""/>
+        <Element ComponentName="UserGroupInfoProvider" X="925" Y="550" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

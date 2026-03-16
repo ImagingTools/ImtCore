@@ -67,6 +67,7 @@ public:
 	virtual bool BeginTransaction() const override;
 	virtual bool FinishTransaction() const override;
 	virtual bool CancelTransaction() const override;
+	virtual QByteArray GetDatabaseDriverId() const override;
 	virtual QSqlQuery ExecSqlQuery(const QByteArray& queryString, QSqlError* sqlError = nullptr, bool isForwardOnly = false) const override;
 	virtual QSqlQuery ExecSqlQuery(const QByteArray& queryString, const QVariantMap& bindValues, QSqlError* sqlError = nullptr, bool isForwardOnly = false) const override;
 	virtual QSqlQuery ExecSqlQueryFromFile(const QString& filePath, QSqlError* sqlError = nullptr, bool isForwardOnly = false) const override;
@@ -170,5 +171,4 @@ private:
 
 
 } // namespace imtdb
-
 
