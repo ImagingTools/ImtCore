@@ -225,6 +225,11 @@ I_EXPORT_COMPONENT(
 			"Application info delegator",
 			"Application Info Delegator");
 
+I_EXPORT_COMPONENT(
+			OrderedObjectCollectionProxy,
+			"Implementation of an ordered object collection facade",
+			"Object Data Model Collection Container Composition Order");
+
 
 } // namespace ImtCorePck
 

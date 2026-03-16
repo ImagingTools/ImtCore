@@ -49,6 +49,7 @@
 #include <imtbase/CDelegatedParamsSetComp.h>
 #include <imtbase/CApplicationInfoControllerComp.h>
 #include <imtbase/CApplicationInfoDelegatorComp.h>
+#include <imtbase/COrderedObjectCollectionProxy.h>
 
 
 /**
@@ -115,6 +116,15 @@ typedef icomp::TModelCompWrap<icomp::TMakeComponentWrap<imtbase::CCollectionFilt
 typedef icomp::TModelCompWrap<imtbase::CDelegatedParamsSetComp> DelegatedParamsSet;
 typedef icomp::TModelCompWrap<imtbase::CApplicationInfoControllerComp> ApplicationInfoController;
 typedef imtbase::CApplicationInfoDelegatorComp ApplicationInfoDelegator;
+typedef icomp::TModelCompWrap<
+			icomp::TMakeComponentWrap<
+						imtbase::COrderedObjectCollectionProxy,
+						imtbase::IOrderedObjectCollection,
+						imtbase::IObjectCollection,
+						imtbase::IObjectCollectionInfo,
+						imtbase::ICollectionInfo,
+						iser::ISerializable,
+						istd::IChangeable>> OrderedObjectCollectionProxy;
 
 
 } // namespace ImtCorePck

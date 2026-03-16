@@ -36,6 +36,11 @@ ipch/
 /Release/
 /RelWithDebInfo/
 /MinSizeRel/
+/Build/CMake/.vs/
+/Build/CMake/out/
+CMakeUserPresets.json
+CMakePresets.json
+
 # Build output in source directories
 **/obj/
 # Debug symbols and intermediates
@@ -101,7 +106,6 @@ conan.lock
 graph_info.json
 *conanbuildenv*.sh
 *conanrunenv*.sh
-CMakeUserPresets.json
 
 # Python artifacts (build scripts)
 __pycache__/
