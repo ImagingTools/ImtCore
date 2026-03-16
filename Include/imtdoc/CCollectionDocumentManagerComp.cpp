@@ -57,7 +57,7 @@ bool CCollectionDocumentManagerComp::ValidateDocumentData(
 		return true;
 	}
 
-	// Dedicated warning message id for document validation failures.
+	// Reserve 170000000+ range for imtdoc validation warnings to avoid collisions with other message IDs.
 	constexpr int kValidationFailureWarningId = 170000000;
 	QString validationMessage;
 	if (!documentValidator->ValidateDocumentData(*document.objectPtr, validationMessage)){
