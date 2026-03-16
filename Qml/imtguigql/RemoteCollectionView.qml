@@ -12,6 +12,7 @@ CollectionView {
 
 	property bool hasRemoteChanges: false;
 	property bool tableViewParamsStoredServer: true;
+	property bool showRemoteChangesAlert: true
 
 	property string gqlGetListCommandId: root.collectionId + "List";
 
@@ -93,7 +94,7 @@ CollectionView {
 	}
 
 	onHasRemoteChangesChanged: {
-		if (root.visible && hasRemoteChanges){
+		if (root.visible && hasRemoteChanges && showRemoteChangesAlert){
 			root.setAlertPanel(alertPanelComp)
 		}
 	}
@@ -105,7 +106,7 @@ CollectionView {
 	}
 
 	onVisibleChanged: {
-		if (hasRemoteChanges && visible){
+		if (hasRemoteChanges && visible && showRemoteChangesAlert){
 			root.setAlertPanel(alertPanelComp)
 		}
 		else{
