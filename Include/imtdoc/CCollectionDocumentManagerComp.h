@@ -41,7 +41,7 @@ protected:
 	virtual bool ValidateDocumentData(const WorkingDocument& document, OperationStatus& status) const override;
 
 private:
-	// Reserve 170000000+ range for imtdoc validation warnings to avoid collisions with other message IDs.
+	// Reserve 170000000-170000099 for imtdoc validation warnings to avoid collisions with other message IDs.
 	static constexpr int kValidationFailureWarningId = 170000000;
 	static constexpr int kValidationFailureWithoutMessageWarningId = 170000001;
 
