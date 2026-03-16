@@ -260,6 +260,10 @@ CDM::CDocumentOperationStatus CCollectionDocumentManagerControllerComp::OnSaveDo
 			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidDocumentId;
 			errorMessage = "Invalid document ID";
 			break;
+		case imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_DATA:
+			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidDocumentData;
+			errorMessage = "Document data is invalid";
+			break;
 		case imtdoc::IDocumentManager::OS_FAILED:
 			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Failed;
 			errorMessage = "Failed to save document";

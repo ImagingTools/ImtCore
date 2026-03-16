@@ -48,7 +48,7 @@ bool CCollectionDocumentManagerComp::ValidateDocumentData(
 	status = OS_OK;
 
 	if (!document.objectPtr.IsValid()){
-		status = OS_FAILED;
+		status = OS_INVALID_DOCUMENT_DATA;
 		return false;
 	}
 
@@ -59,7 +59,7 @@ bool CCollectionDocumentManagerComp::ValidateDocumentData(
 
 	QString validationMessage;
 	if (!documentValidator->ValidateDocumentData(*document.objectPtr, validationMessage)){
-		status = OS_FAILED;
+		status = OS_INVALID_DOCUMENT_DATA;
 		QString warningMessage = QString("Document validation failed for type '%1'")
 			.arg(QString::fromUtf8(document.typeId));
 		if (!validationMessage.isEmpty()){

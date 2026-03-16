@@ -364,6 +364,9 @@ inline CDM::CDocumentOperationStatus TCollectionDocumentManagerCompBase<Base, Co
 	case imtdoc::ICollectionDocumentManager::OS_INVALID_DOCUMENT_ID:
 		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidDocumentId;
 		break;
+	case imtdoc::ICollectionDocumentManager::OS_INVALID_DOCUMENT_DATA:
+		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidDocumentData;
+		break;
 	case imtdoc::ICollectionDocumentManager::OS_FAILED:
 		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Failed;
 		break;
@@ -371,8 +374,10 @@ inline CDM::CDocumentOperationStatus TCollectionDocumentManagerCompBase<Base, Co
 		break;
 	}
 
-	if (status != OperationStatus::OS_OK) {
-		errorMessage = "Unable to open document or create undo manager";
+	if (status == OperationStatus::OS_INVALID_DOCUMENT_DATA) {
+		errorMessage = "Document data is invalid";
+	} else if (status != OperationStatus::OS_OK) {
+		errorMessage = "Failed to save document";
 	}
 
 	return retVal;

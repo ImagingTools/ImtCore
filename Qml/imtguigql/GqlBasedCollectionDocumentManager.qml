@@ -254,6 +254,9 @@ DocumentManagerBase {
 					else if (m_status === "InvalidDocumentId"){
 						root.saveDocumentFailed(root.saveDocumentRequest.documentId, qsTr("Invalid document-ID"))
 					}
+					else if (m_status === "InvalidDocumentData"){
+						root.saveDocumentFailed(root.saveDocumentRequest.documentId, qsTr("Document data is invalid"))
+					}
 					else if (m_status === "Failed"){
 						root.saveDocumentFailed(root.saveDocumentRequest.documentId, qsTr("Save document failed"))
 					}

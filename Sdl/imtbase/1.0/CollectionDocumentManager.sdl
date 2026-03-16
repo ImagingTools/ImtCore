@@ -25,6 +25,7 @@ enum EDocumentOperationStatus {
 	Success
 	InvalidUserId
 	InvalidDocumentId
+	InvalidDocumentData
 	Failed
 }
 
