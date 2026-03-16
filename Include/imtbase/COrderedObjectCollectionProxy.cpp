@@ -21,36 +21,30 @@ namespace imtbase
 
 // public methods
 
-COrderedObjectCollectionProxy::COrderedObjectCollectionProxy(IObjectCollection* collectionPtr, bool takeOwnership)
-	:m_updateBridge(this, imod::CModelUpdateBridge::UF_SOURCE),
-	 m_hasCustomOrder(false)
+COrderedObjectCollectionProxy::COrderedObjectCollectionProxy()
+	:m_updateBridge(this, imod::CModelUpdateBridge::UF_SOURCE)
 {
-	Q_ASSERT(collectionPtr != nullptr);
-	
-	if (takeOwnership) {
-		m_collectionPtr.AdoptRawPtr(collectionPtr);
-	}
-	else {
-		m_collectionPtr.SetUnmanagedPtr(collectionPtr);
-	}
-	
-	AttachCollectionObserver();
+}
+
+
+COrderedObjectCollectionProxy::COrderedObjectCollectionProxy(IObjectCollection* collectionPtr, bool takeOwnership)
+	:m_updateBridge(this, imod::CModelUpdateBridge::UF_SOURCE)
+{
+	SetCollection(collectionPtr, takeOwnership);
 }
 
 
 COrderedObjectCollectionProxy::COrderedObjectCollectionProxy(IObjectCollectionUniquePtr&& collectionPtr)
-	:m_updateBridge(this, imod::CModelUpdateBridge::UF_SOURCE),
-	m_hasCustomOrder(false)
+	:m_updateBridge(this, imod::CModelUpdateBridge::UF_SOURCE)
 {
-	m_collectionPtr.TakeOver(collectionPtr);
+	SetCollection(std::move(collectionPtr));
 }
 
 
 COrderedObjectCollectionProxy::COrderedObjectCollectionProxy(const istd::TOptInterfacePtr<IObjectCollection>& collectionPtr)
-	:m_updateBridge(this, imod::CModelUpdateBridge::UF_SOURCE),
-	m_hasCustomOrder(false)
+	:m_updateBridge(this, imod::CModelUpdateBridge::UF_SOURCE)
 {
-	m_collectionPtr = collectionPtr;
+	SetCollection(collectionPtr);
 }
 
 
@@ -58,6 +52,55 @@ COrderedObjectCollectionProxy::~COrderedObjectCollectionProxy()
 {
 	// Ensure all models are properly detached before destruction
 	m_updateBridge.EnsureModelsDetached();
+}
+
+
+void COrderedObjectCollectionProxy::SetCollection(IObjectCollection* collectionPtr, bool takeOwnership)
+{
+	Q_ASSERT(collectionPtr != nullptr);
+
+	istd::CChangeNotifier notifier(this, &istd::IChangeable::GetAllChanges());
+
+	m_updateBridge.EnsureModelsDetached();
+	m_hasCustomOrder = false;
+	m_customOrder.clear();
+
+	if (takeOwnership){
+		m_collectionPtr.AdoptRawPtr(collectionPtr);
+	}
+	else{
+		m_collectionPtr.SetUnmanagedPtr(collectionPtr);
+	}
+
+	AttachCollectionObserver();
+}
+
+
+void COrderedObjectCollectionProxy::SetCollection(IObjectCollectionUniquePtr&& collectionPtr)
+{
+	istd::CChangeNotifier notifier(this, &istd::IChangeable::GetAllChanges());
+
+	m_updateBridge.EnsureModelsDetached();
+	m_hasCustomOrder = false;
+	m_customOrder.clear();
+
+	m_collectionPtr.TakeOver(collectionPtr);
+
+	AttachCollectionObserver();
+}
+
+
+void COrderedObjectCollectionProxy::SetCollection(const istd::TOptInterfacePtr<IObjectCollection>& collectionPtr)
+{
+	istd::CChangeNotifier notifier(this, &istd::IChangeable::GetAllChanges());
+
+	m_updateBridge.EnsureModelsDetached();
+	m_hasCustomOrder = false;
+	m_customOrder.clear();
+
+	m_collectionPtr = collectionPtr;
+
+	AttachCollectionObserver();
 }
 
 
