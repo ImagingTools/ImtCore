@@ -28,6 +28,7 @@ Dialog {
 				collectionId: root.collectionId
 				documentCollectionFilter: null
 				loadingDataAfterHeadersReceived: false
+				showRemoteChangesAlert: false
 				Component.onCompleted: {
 					root.collectionView = this
 				}
