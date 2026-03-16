@@ -57,8 +57,8 @@ bool CCollectionDocumentManagerComp::ValidateDocumentData(
 		return true;
 	}
 
-	QString validationMessage;
-	if (!documentValidator->ValidateDocumentData(*document.objectPtr, validationMessage)){
+	QString unusedValidationMessage;
+	if (!documentValidator->ValidateDocumentData(*document.objectPtr, unusedValidationMessage)){
 		status = OS_FAILED;
 		return false;
 	}
