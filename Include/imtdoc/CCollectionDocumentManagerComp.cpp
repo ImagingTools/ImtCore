@@ -57,7 +57,7 @@ bool CCollectionDocumentManagerComp::ValidateDocumentData(
 		return true;
 	}
 
-	constexpr int kValidationFailureWarningId = 0;
+	constexpr int kValidationFailureWarningId = 170000000;
 	QString validationMessage;
 	if (!documentValidator->ValidateDocumentData(*document.objectPtr, validationMessage)){
 		status = OS_FAILED;
