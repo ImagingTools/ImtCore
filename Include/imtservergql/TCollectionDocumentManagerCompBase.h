@@ -374,10 +374,23 @@ inline CDM::CDocumentOperationStatus TCollectionDocumentManagerCompBase<Base, Co
 		break;
 	}
 
-	if (status == OperationStatus::OS_INVALID_DOCUMENT_DATA) {
-		errorMessage = "Document data is invalid";
-	} else if (status != OperationStatus::OS_OK) {
-		errorMessage = "Failed to save document";
+	if (status != OperationStatus::OS_OK) {
+		switch (status) {
+		case imtdoc::ICollectionDocumentManager::OS_INVALID_USER_ID:
+			errorMessage = "Invalid user ID";
+			break;
+		case imtdoc::ICollectionDocumentManager::OS_INVALID_DOCUMENT_ID:
+			errorMessage = "Invalid document ID";
+			break;
+		case imtdoc::ICollectionDocumentManager::OS_INVALID_DOCUMENT_DATA:
+			errorMessage = "Document data is invalid";
+			break;
+		case imtdoc::ICollectionDocumentManager::OS_FAILED:
+			errorMessage = "Failed to save document";
+			break;
+		default:
+			break;
+		}
 	}
 
 	return retVal;
