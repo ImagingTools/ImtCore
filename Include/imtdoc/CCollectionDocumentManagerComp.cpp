@@ -60,13 +60,14 @@ bool CCollectionDocumentManagerComp::ValidateDocumentData(
 	QString validationMessage;
 	if (!documentValidator->ValidateDocumentData(*document.objectPtr, validationMessage)){
 		status = OS_FAILED;
+		QString warningMessage = QString("Document validation failed for type '%1'")
+			.arg(QString::fromUtf8(document.typeId));
 		if (!validationMessage.isEmpty()){
-			SendWarningMessage(kValidationFailureWarningId, QString("Document validation failed for type '%1': %2")
-				.arg(QString::fromUtf8(document.typeId), validationMessage));
+			warningMessage = QString("%1: %2").arg(warningMessage, validationMessage);
+			SendWarningMessage(kValidationFailureWarningId, warningMessage);
 		}
 		else{
-			SendWarningMessage(kValidationFailureWithoutMessageWarningId, QString("Document validation failed for type '%1'")
-				.arg(QString::fromUtf8(document.typeId)));
+			SendWarningMessage(kValidationFailureWithoutMessageWarningId, warningMessage);
 		}
 		return false;
 	}
