@@ -43,12 +43,19 @@ idoc::IUndoManagerSharedPtr CCollectionDocumentManagerComp::CreateUndoManager() 
 
 bool CCollectionDocumentManagerComp::ValidateDocumentData(
 	const WorkingDocument& document,
-	OperationStatus& status) const
+	OperationStatus& status,
+	QString* errorMessage) const
 {
 	status = OS_OK;
+	if (errorMessage != nullptr) {
+		errorMessage->clear();
+	}
 
 	if (!document.objectPtr.IsValid()){
 		status = OS_INVALID_DOCUMENT_DATA;
+		if (errorMessage != nullptr) {
+			*errorMessage = GetInvalidDocumentMessage();
+		}
 		return false;
 	}
 
@@ -60,6 +67,9 @@ bool CCollectionDocumentManagerComp::ValidateDocumentData(
 	QString validationMessage;
 	if (!documentValidator->ValidateDocumentData(*document.objectPtr, validationMessage)){
 		status = OS_INVALID_DOCUMENT_DATA;
+		if (errorMessage != nullptr) {
+			*errorMessage = validationMessage.isEmpty() ? GetInvalidDocumentMessage() : validationMessage;
+		}
 		QString warningMessage = QString("Document validation failed for type '%1'")
 			.arg(QString::fromUtf8(document.typeId));
 		if (!validationMessage.isEmpty()){

@@ -151,7 +151,11 @@ public:
 	/**
 		Save document with the given user-ID and document-ID
 	*/
-	virtual OperationStatus SaveDocument(const QByteArray& userId, const QByteArray& documentId, const QString& documentName) = 0;
+		virtual OperationStatus SaveDocument(
+			const QByteArray& userId,
+			const QByteArray& documentId,
+			const QString& documentName = QString(),
+			QString* errorMessage = nullptr) = 0;
 
 	/**
 		Close document with the given user-ID and document-ID

@@ -245,20 +245,26 @@ DocumentManagerBase {
 		sdlObjectComp: Component {
 			DocumentOperationStatus {
 				onFinished: {
+					let statusMessage = function(defaultMessage){
+						if (m_message !== undefined && m_message !== "") {
+							return m_message
+						}
+						return defaultMessage
+					}
 					if (m_status === "Success"){
 						root.documentSaved(root.saveDocumentRequest.documentId)
 					}
 					else if (m_status === "InvalidUserId"){
-						root.saveDocumentFailed(root.saveDocumentRequest.documentId, qsTr("Invalid user-ID"))
+						root.saveDocumentFailed(root.saveDocumentRequest.documentId, statusMessage(qsTr("Invalid user-ID")))
 					}
 					else if (m_status === "InvalidDocumentId"){
-						root.saveDocumentFailed(root.saveDocumentRequest.documentId, qsTr("Invalid document-ID"))
+						root.saveDocumentFailed(root.saveDocumentRequest.documentId, statusMessage(qsTr("Invalid document-ID")))
 					}
 					else if (m_status === "InvalidDocumentData"){
-						root.saveDocumentFailed(root.saveDocumentRequest.documentId, qsTr("Document data is invalid"))
+						root.saveDocumentFailed(root.saveDocumentRequest.documentId, statusMessage(qsTr("Document data is invalid")))
 					}
 					else if (m_status === "Failed"){
-						root.saveDocumentFailed(root.saveDocumentRequest.documentId, qsTr("Save document failed"))
+						root.saveDocumentFailed(root.saveDocumentRequest.documentId, statusMessage(qsTr("Save document failed")))
 					}
 				}
 			}

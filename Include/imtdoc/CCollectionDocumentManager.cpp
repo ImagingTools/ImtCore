@@ -334,7 +334,10 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SetDocumentData(co
 
 
 IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
-	const QByteArray& userId, const QByteArray& documentId, const QString& documentName)
+	const QByteArray& userId,
+	const QByteArray& documentId,
+	const QString& documentName,
+	QString* errorMessage)
 {
 	imtbase::IObjectCollection* collectionPtr = GetCollection();
 	if (collectionPtr == nullptr) {
@@ -365,7 +368,11 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
 		workingDocumentSnapshot.objectPtr = documentSnapshotPtr;
 	}
 
-	if (!ValidateDocumentData(workingDocumentSnapshot, validationStatus)){
+	QString validationMessage;
+	if (!ValidateDocumentData(workingDocumentSnapshot, validationStatus, &validationMessage)){
+		if (errorMessage != nullptr) {
+			*errorMessage = validationMessage.isEmpty() ? GetInvalidDocumentMessage() : validationMessage;
+		}
 		return validationStatus;
 	}
 
@@ -657,9 +664,13 @@ void CCollectionDocumentManager::OnUpdate(imod::IModel* modelPtr, const istd::IC
 
 bool CCollectionDocumentManager::ValidateDocumentData(
 	const WorkingDocument& /*document*/,
-	OperationStatus& status) const
+	OperationStatus& status,
+	QString* errorMessage) const
 {
 	status = OS_OK;
+	if (errorMessage != nullptr) {
+		errorMessage->clear();
+	}
 
 	return true;
 }

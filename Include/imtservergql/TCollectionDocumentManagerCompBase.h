@@ -353,7 +353,12 @@ inline CDM::CDocumentOperationStatus TCollectionDocumentManagerCompBase<Base, Co
 
 	retVal.Version_1_0.emplace();
 
-	OperationStatus status = GetNonConstThis()->SaveDocument(userId, *documentId->id);
+	QString saveErrorMessage;
+	OperationStatus status = GetNonConstThis()->SaveDocument(
+		userId,
+		*documentId->id,
+		QString(),
+		&saveErrorMessage);
 	switch (status) {
 	case imtdoc::ICollectionDocumentManager::OS_OK:
 		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Success;
@@ -375,21 +380,26 @@ inline CDM::CDocumentOperationStatus TCollectionDocumentManagerCompBase<Base, Co
 	}
 
 	if (status != OperationStatus::OS_OK) {
+		QString responseMessage;
 		switch (status) {
 		case imtdoc::ICollectionDocumentManager::OS_INVALID_USER_ID:
-			errorMessage = "Invalid user ID";
+			responseMessage = "Invalid user ID";
 			break;
 		case imtdoc::ICollectionDocumentManager::OS_INVALID_DOCUMENT_ID:
-			errorMessage = "Invalid document ID";
+			responseMessage = "Invalid document ID";
 			break;
 		case imtdoc::ICollectionDocumentManager::OS_INVALID_DOCUMENT_DATA:
-			errorMessage = "Document data is invalid";
+			responseMessage = saveErrorMessage.isEmpty() ? "Document data is invalid" : saveErrorMessage;
 			break;
 		case imtdoc::ICollectionDocumentManager::OS_FAILED:
-			errorMessage = "Failed to save document";
+			responseMessage = "Failed to save document";
 			break;
 		default:
 			break;
+		}
+		if (!responseMessage.isEmpty()) {
+			retVal.Version_1_0->message = responseMessage;
+			errorMessage = responseMessage;
 		}
 	}
 

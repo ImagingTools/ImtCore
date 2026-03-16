@@ -247,29 +247,39 @@ CDM::CDocumentOperationStatus CCollectionDocumentManagerControllerComp::OnSaveDo
 	retVal.Version_1_0.emplace();
 
 	if (m_documentManagerCompPtr.IsValid()) {
-		imtdoc::IDocumentManager::OperationStatus status = m_documentManagerCompPtr->SaveDocument(userId, *saveDocumentInput->documentId, *saveDocumentInput->documentName);
+		QString saveErrorMessage;
+		imtdoc::IDocumentManager::OperationStatus status = m_documentManagerCompPtr->SaveDocument(
+			userId,
+			*saveDocumentInput->documentId,
+			*saveDocumentInput->documentName,
+			&saveErrorMessage);
+		QString responseMessage;
 		switch (status){
 		case imtdoc::IDocumentManager::OS_OK:
 			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Success;
 			break;
 		case imtdoc::IDocumentManager::OS_INVALID_USER_ID:
 			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidUserId;
-			errorMessage = "Invalid user-ID";
+			responseMessage = "Invalid user-ID";
 			break;
 		case imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_ID:
 			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidDocumentId;
-			errorMessage = "Invalid document ID";
+			responseMessage = "Invalid document ID";
 			break;
 		case imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_DATA:
 			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidDocumentData;
-			errorMessage = "Document data is invalid";
+			responseMessage = saveErrorMessage.isEmpty() ? "Document data is invalid" : saveErrorMessage;
 			break;
 		case imtdoc::IDocumentManager::OS_FAILED:
 			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Failed;
-			errorMessage = "Failed to save document";
+			responseMessage = "Failed to save document";
 			break;
 		default:
 			break;
+		}
+		if (!responseMessage.isEmpty()) {
+			retVal.Version_1_0->message = responseMessage;
+			errorMessage = responseMessage;
 		}
 	}
 
