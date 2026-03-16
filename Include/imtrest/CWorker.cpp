@@ -3,6 +3,7 @@
 
 
 // ImtCore includes
+#include <imtrest/imtrest.h>
 #include <imtrest/ISender.h>
 #include <imtrest/CWorkerThread.h>
 #include <imtrest/CWebSocketRequest.h>
@@ -32,7 +33,7 @@ void CWorker::ProcessRequest(const IRequest* request, const QByteArray& subComma
 	if (m_requestServletPtr.IsValid() && request != nullptr){
 		QMutexLocker lock(&m_processMutex);
 
-		QByteArray body = request->GetBody();
+		QByteArray body = MaskPasswordValues(request->GetBody());
 		if (body.size() > 100){
 			body.resize(100);
 			body += "...";

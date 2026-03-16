@@ -6,6 +6,7 @@
 #include <QtCore/QMutableListIterator>
 
 // ImtCore includes
+#include <imtrest/imtrest.h>
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/CWebSocketServerComp.h>
 #include <imtrest/CWebSocketRequest.h>
@@ -125,7 +126,10 @@ void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 		return;
 	}
 
-	QString message = QString("Web socket text message received: %1").arg(textMessage);
+	// Mask password values before logging to avoid exposing credentials
+	const QByteArray sanitizedBody = MaskPasswordValues(textMessage.toUtf8());
+	QString message = QString("Web socket text message received: %1")
+		.arg(QString::fromUtf8(sanitizedBody));
 	m_server->SendVerboseMessage(message, "CWebSocketServerComp");
 
 	imtrest::IRequestUniquePtr newRequestPtr = m_enginePtr->CreateRequest(*m_requestServerHandlerPtr);
