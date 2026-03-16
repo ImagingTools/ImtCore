@@ -54,7 +54,7 @@ protected:
 	struct WorkingDocument;
 
 	bool ValidateInputParams(const QByteArray& userId, const QByteArray& documentId, OperationStatus& status) const;
-	virtual bool ValidateDocumentData(const WorkingDocument& document, OperationStatus& status, QString* errorMessagePtr) const;
+	virtual bool ValidateDocumentData(const WorkingDocument& document, OperationStatus& status) const;
 	static QString GetInvalidDocumentMessage();
 	void OnUndoManagerChanged(int modelId);
 	int GetUndoManagerNextModelId(const QByteArray& userId);

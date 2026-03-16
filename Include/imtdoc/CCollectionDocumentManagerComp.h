@@ -38,7 +38,7 @@ protected:
 	virtual imtbase::IObjectCollection* GetCollection() const override;
 	virtual istd::IChangeableSharedPtr CreateObject(const QByteArray& typeId) const override;
 	virtual idoc::IUndoManagerSharedPtr CreateUndoManager() const override;
-	virtual bool ValidateDocumentData(const WorkingDocument& document, OperationStatus& status, QString* errorMessagePtr) const override;
+	virtual bool ValidateDocumentData(const WorkingDocument& document, OperationStatus& status) const override;
 
 private:
 	int GetObjectFactoryIndex(const QByteArray& typeId) const;

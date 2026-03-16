@@ -365,7 +365,7 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
 		workingDocumentSnapshot.objectPtr = documentSnapshotPtr;
 	}
 
-	if (!ValidateDocumentData(workingDocumentSnapshot, validationStatus, nullptr)){
+	if (!ValidateDocumentData(workingDocumentSnapshot, validationStatus)){
 		return validationStatus;
 	}
 
@@ -657,13 +657,9 @@ void CCollectionDocumentManager::OnUpdate(imod::IModel* modelPtr, const istd::IC
 
 bool CCollectionDocumentManager::ValidateDocumentData(
 	const WorkingDocument& /*document*/,
-	OperationStatus& status,
-	QString* errorMessagePtr) const
+	OperationStatus& status) const
 {
 	status = OS_OK;
-	if (errorMessagePtr != nullptr){
-		errorMessagePtr->clear();
-	}
 
 	return true;
 }

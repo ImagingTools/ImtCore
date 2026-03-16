@@ -43,19 +43,12 @@ idoc::IUndoManagerSharedPtr CCollectionDocumentManagerComp::CreateUndoManager() 
 
 bool CCollectionDocumentManagerComp::ValidateDocumentData(
 	const WorkingDocument& document,
-	OperationStatus& status,
-	QString* errorMessagePtr) const
+	OperationStatus& status) const
 {
 	status = OS_OK;
-	if (errorMessagePtr != nullptr){
-		errorMessagePtr->clear();
-	}
 
 	if (!document.objectPtr.IsValid()){
 		status = OS_FAILED;
-		if (errorMessagePtr != nullptr){
-			*errorMessagePtr = CCollectionDocumentManager::GetInvalidDocumentMessage();
-		}
 		return false;
 	}
 
@@ -67,9 +60,6 @@ bool CCollectionDocumentManagerComp::ValidateDocumentData(
 	QString validationMessage;
 	if (!documentValidator->ValidateDocumentData(*document.objectPtr, validationMessage)){
 		status = OS_FAILED;
-		if (errorMessagePtr != nullptr){
-			*errorMessagePtr = validationMessage;
-		}
 		return false;
 	}
 
