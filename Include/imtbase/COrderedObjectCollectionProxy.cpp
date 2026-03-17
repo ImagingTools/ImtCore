@@ -543,6 +543,13 @@ bool COrderedObjectCollectionProxy::Serialize(iser::IArchive& archive)
 
 	bool retVal = true;
 
+	if (m_collectionPtr.IsValid()){
+		iser::ISerializable* serializablePtr = dynamic_cast<iser::ISerializable*>(m_collectionPtr.GetPtr());
+		if (serializablePtr != nullptr){
+			retVal = serializablePtr->Serialize(archive);
+		}
+	}
+
 	// Serialize custom order flag
 	static iser::CArchiveTag hasCustomOrderTag("HasCustomOrder", "Flag indicating if custom order is active");
 	retVal = retVal && archive.BeginTag(hasCustomOrderTag);
@@ -586,14 +593,28 @@ int COrderedObjectCollectionProxy::GetSupportedOperations() const
 }
 
 
-bool COrderedObjectCollectionProxy::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
+bool COrderedObjectCollectionProxy::CopyFrom(const IChangeable& object, CompatibilityMode mode)
 {
 	const COrderedObjectCollectionProxy* otherPtr = dynamic_cast<const COrderedObjectCollectionProxy*>(&object);
 	if (otherPtr != nullptr){
+		istd::CChangeNotifier changeNotifier(this);
+
 		m_customOrder = otherPtr->m_customOrder;
 		m_hasCustomOrder = otherPtr->m_hasCustomOrder;
+
+		if (mode == CM_WITH_REFS){
+			if (otherPtr->m_collectionPtr.IsValid()){
+				if (!m_collectionPtr.IsValid()){
+					return false;
+				}
+
+				return m_collectionPtr->CopyFrom(*otherPtr->m_collectionPtr, mode);
+			}
+		}
+
 		return true;
 	}
+
 	return false;
 }
 
@@ -604,33 +625,35 @@ bool COrderedObjectCollectionProxy::IsEqual(const IChangeable& object) const
 	if (otherPtr != nullptr){
 		return (m_hasCustomOrder == otherPtr->m_hasCustomOrder) && (m_customOrder == otherPtr->m_customOrder);
 	}
+
 	return false;
 }
 
 
-istd::IChangeableUniquePtr COrderedObjectCollectionProxy::CloneMe(CompatibilityMode /*mode*/) const
+istd::IChangeableUniquePtr COrderedObjectCollectionProxy::CloneMe(CompatibilityMode mode) const
 {
-	if (!m_collectionPtr.IsValid()){
-		return istd::IChangeableUniquePtr();
-	}
-	
 	// Note: The clone always creates a non-owning proxy that shares the same collection pointer.
 	// This is intentional for the proxy pattern, where clones manage ordering independently
 	// but delegate data operations to the same collection.
 	COrderedObjectCollectionProxy* clonePtr = new COrderedObjectCollectionProxy(m_collectionPtr);
-	clonePtr->m_customOrder = m_customOrder;
-	clonePtr->m_hasCustomOrder = m_hasCustomOrder;
+	if (!clonePtr->CopyFrom(*this, mode)){
+		return nullptr;
+	}
 
 	return istd::IChangeableUniquePtr(clonePtr);
 }
 
 
-bool COrderedObjectCollectionProxy::ResetData(CompatibilityMode /*mode*/)
+bool COrderedObjectCollectionProxy::ResetData(CompatibilityMode mode)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
 	m_customOrder.clear();
 	m_hasCustomOrder = false;
+
+	if (mode == CM_WITH_REFS && m_collectionPtr.IsValid()){
+		return m_collectionPtr->ResetData(mode);
+	}
 
 	return true;
 }
@@ -643,6 +666,7 @@ imtbase::ICollectionInfo::Ids COrderedObjectCollectionProxy::GetCollectionElemen
 	if (!m_collectionPtr.IsValid()){
 		return Ids();
 	}
+
 	return m_collectionPtr->GetElementIds();
 }
 
