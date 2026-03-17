@@ -83,7 +83,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 	// Validate token based on prefix: pat_ for PAT tokens, otherwise JWT
 	if (!accessToken.isEmpty()){
 		// Check if token starts with "pat_" prefix and has content beyond the prefix
-		if (accessToken.size() > 4 && accessToken.startsWith("pat_")){
+		if (accessToken.size() > 8 && accessToken.startsWith("imt_pat_")){
 			// PAT token - validate with PAT manager
 			if (m_patManagerCompPtr.IsValid()){
 				QByteArray tokenId;
