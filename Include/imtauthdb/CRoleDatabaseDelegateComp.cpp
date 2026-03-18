@@ -77,7 +77,7 @@ QString CRoleDatabaseDelegateComp::CreateAdditionalFiltersQuery(const iprm::IPar
 					WHERE g."DocumentId" = '%1'
 					AND g."State" = 'Active'
 				
-					UNION ALL
+					UNION
 					SELECT child."DocumentId"
 					FROM "Roles" child
 					JOIN descendants d
@@ -97,5 +97,4 @@ QString CRoleDatabaseDelegateComp::CreateAdditionalFiltersQuery(const iprm::IPar
 
 
 } // namespace imtauthdb
-
 

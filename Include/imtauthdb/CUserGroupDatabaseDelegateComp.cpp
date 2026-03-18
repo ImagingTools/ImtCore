@@ -141,7 +141,7 @@ QString CUserGroupDatabaseDelegateComp::CreateAdditionalFiltersQuery(const iprm:
 					WHERE g."DocumentId" = '%1'
 					AND g."State" = 'Active'
 				
-					UNION ALL
+					UNION
 					SELECT child."DocumentId"
 					FROM "UserGroups" child
 					JOIN descendants d
@@ -162,5 +162,4 @@ QString CUserGroupDatabaseDelegateComp::CreateAdditionalFiltersQuery(const iprm:
 
 
 } // namespace imtauthdb
-
 

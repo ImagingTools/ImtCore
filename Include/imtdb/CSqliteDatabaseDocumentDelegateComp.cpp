@@ -84,12 +84,13 @@ QString CSqliteDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 				root1."TimeStamp" AS "Added" %4
 			FROM %1"%2" AS root
 			LEFT JOIN (
-				SELECT root1."DocumentId", root1."TimeStamp"
+				SELECT
+					root1."DocumentId",
+					MAX(root1."TimeStamp") AS "TimeStamp"
 				FROM %1"%2" AS root1
 				WHERE root1."RevisionInfo" IS NOT NULL
 				  AND CAST(json_extract(root1."RevisionInfo", '$.RevisionNumber') AS INTEGER) = 1
-				ORDER BY root1."TimeStamp" DESC
-				LIMIT 1
+				GROUP BY root1."DocumentId"
 			) AS root1
 			ON root1."DocumentId" = root."DocumentId"
 			%3
@@ -154,7 +155,7 @@ bool CSqliteDatabaseDocumentDelegateComp::CreatePaginationQuery(int offset, int 
 
 bool CSqliteDatabaseDocumentDelegateComp::CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery, const QString& /*fieldId*/) const
 {
-	QString addedStrQuery = QString(R"((SELECT "TimeStamp" FROM "%1" as temp WHERE %2 = 1 AND root."DocumentId" = temp."DocumentId" LIMIT 1))")
+	QString addedStrQuery = QString(R"((SELECT MAX("TimeStamp") FROM "%1" as temp WHERE %2 = 1 AND root."DocumentId" = temp."DocumentId"))")
 	.arg(
 		qPrintable(*m_tableNameAttrPtr),
 		CreateJsonExtractSql("RevisionInfo", "RevisionNumber", QMetaType::Int)
@@ -298,9 +299,15 @@ QByteArray CSqliteDatabaseDocumentDelegateComp::GetObjectSelectionQuery(
 			root.*,
 			root1."TimeStamp" AS "Added"
 		FROM %0 "%1" AS root
-		LEFT JOIN %0 "%1" AS root1
+		LEFT JOIN (
+			SELECT
+				root1."%3",
+				MAX(root1."%7") AS "%7"
+			FROM %0 "%1" AS root1
+			WHERE %6 = 1
+			GROUP BY root1."%3"
+		) AS root1
 			ON root1."%3" = root."%3"
-		   AND %6 = 1
 		WHERE (%2)
 		  AND root."%3" = '%4'
 		ORDER BY %5 DESC;
@@ -316,6 +323,7 @@ QByteArray CSqliteDatabaseDocumentDelegateComp::GetObjectSelectionQuery(
 					s_revisionNumberKey,
 					QMetaType::Int,
 					"root"),
+				QString::fromUtf8(s_lastModifiedColumn),
 				CreateJsonExtractSql(
 					s_revisionInfoColumn,
 					s_revisionNumberKey,
@@ -326,5 +334,3 @@ QByteArray CSqliteDatabaseDocumentDelegateComp::GetObjectSelectionQuery(
 
 
 } // namespace imtdb
-
-

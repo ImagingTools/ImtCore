@@ -851,10 +851,6 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTableIfNeeded()
 		return false;
 	}
 
-	if (TableExists(tableName)){
-		return true;
-	}
-
 	const QByteArray scriptPath = m_createTableScriptPathAttrPtr.IsValid() ? *m_createTableScriptPathAttrPtr : QByteArray();
 	if (scriptPath.isEmpty()){
 		SendErrorMessage(0, QT_TR_NOOP("Table creation script path is empty"));
@@ -1169,11 +1165,11 @@ QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 				root1."%6" as "%7" %5
 			FROM %2"%3" as root
 			LEFT JOIN (
-				SELECT DISTINCT ON ("%8")
-					"%8", "%6", "%9"
+				SELECT
+					"%8", MAX("%6") as "%6"
 				FROM %2"%3"
 				WHERE %1 = 1
-				ORDER BY "%8", "%6" DESC
+				GROUP BY "%8"
 			) AS root1 ON root1."%8" = root."%8"
 			%4
 		)")
@@ -1185,8 +1181,7 @@ QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 						/*5*/ customColumns,
 						/*6*/ QString::fromUtf8(s_lastModifiedColumn),
 						/*7*/ QString::fromUtf8(s_addedColumn),
-						/*8*/ QString::fromUtf8(s_documentIdColumn),
-						/*9*/ QString::fromUtf8(s_revisionInfoColumn)
+						/*8*/ QString::fromUtf8(s_documentIdColumn)
 					);
 
 	return query;
@@ -1601,7 +1596,7 @@ void CSqlDatabaseDocumentDelegateComp::SubstituteFieldIds(QString& query, bool /
 {
 	Q_ASSERT(!query.isEmpty());
 
-	const QRegularExpression regexp(
+	static const QRegularExpression regexp(
 		R"re((?=(?:[^']*'[^']*')*[^']*$)(?:(?<=\s)|(?<=\()|^)"([^"]+)"(?=(?:::[A-Za-z_][A-Za-z0-9_]*)?[\s=)\,]|$))re"
 	);
 
@@ -1674,11 +1669,11 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetObjectSelectionQuery(const QByte
 			SELECT root.*, root1."TimeStamp" as "Added"
 			FROM %1 "%2" as root
 			LEFT JOIN (
-				SELECT DISTINCT ON ("%4")
-					"%4", "%5"
+				SELECT
+					"%4", MAX("%5") as "%5"
 				FROM %1 "%2"
 				WHERE %7 = 1
-				ORDER BY "%4", "%5" DESC
+				GROUP BY "%4"
 			) AS root1 ON root1."%4" = root."%4"
 			WHERE (%3) AND root."%4" = '%6' ORDER BY %8 DESC;)")
 			.arg(
