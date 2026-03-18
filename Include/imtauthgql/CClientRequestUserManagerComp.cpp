@@ -20,7 +20,7 @@ QByteArrayList CClientRequestUserManagerComp::GetUserIds() const
 }
 
 
-QList<imtauth::IUserInfoSharedPtr> CClientRequestUserManagerComp::GetUserList() const
+QList<imtauth::IUserManager::User> CClientRequestUserManagerComp::GetUserList() const
 {
 	namespace userssdl = sdl::imtauth::Users;
 
@@ -41,46 +41,40 @@ QList<imtauth::IUserInfoSharedPtr> CClientRequestUserManagerComp::GetUserList() 
 		return {};
 	}
 
-	QList<imtauth::IUserInfoSharedPtr> result;
+	QList<imtauth::IUserManager::User> result;
 
 	for (const auto& item : payload.Version_1_0->items->ToList()){
-		if (!item.HasValue()){
-			continue;
+		imtauth::IUserManager::User user;
+
+		if (item.id){
+			user.uuid = *item.id;
 		}
 
-		imtauth::IUserInfoUniquePtr userInfoPtr = m_userFactoryCompPtr.CreateInstance();
-		if (!userInfoPtr.IsValid()){
-			continue;
+		if (item.name){
+			user.name = *item.name;
 		}
 
-		if (item->userId){
-			userInfoPtr->SetId(*item->userId);
+		if (item.systemName){
+			user.systemName = *item.systemName;
 		}
 
-		if (item->name){
-			userInfoPtr->SetName(*item->name);
+		if (item.mail){
+			user.email = *item.mail;
 		}
 
-		if (item->description){
-			userInfoPtr->SetDescription(*item->description);
+		if (item.userId){
+			user.login = *item.userId;
 		}
 
-		if (item->mail){
-			userInfoPtr->SetMail(*item->mail);
+		if (item.roles){
+			user.roleIds = (*item.roles).split(';');
 		}
 
-		if (item->systemId || item->systemName){
-			imtauth::IUserInfo::SystemInfo systemInfo;
-			if (item->systemId){
-				systemInfo.systemId = *item->systemId;
-			}
-			if (item->systemName){
-				systemInfo.systemName = *item->systemName;
-			}
-			userInfoPtr->AddToSystem(systemInfo);
+		if (item.groups){
+			user.groupIds = (*item.groups).split(';');
 		}
 
-		result << imtauth::IUserInfoSharedPtr::CreateFromUnique(userInfoPtr);
+		result << user;
 	}
 
 	return result;
