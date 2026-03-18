@@ -863,11 +863,6 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTableIfNeeded()
 		return false;
 	}
 
-	const bool tableExists = TableExists(tableName);
-	if (tableExists && !resourcePath.endsWith(QStringLiteral("/CreateCollectionTable.sql"))){
-		return true;
-	}
-
 	QFile scriptFile(resourcePath);
 	if (!scriptFile.open(QFile::ReadOnly)){
 		SendErrorMessage(0, QString::fromUtf8(QT_TR_NOOP("Collection table creation script '%1' could not be loaded"))
@@ -877,6 +872,24 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTableIfNeeded()
 
 	QByteArray createTableQuery = scriptFile.readAll();
 	scriptFile.close();
+
+	const bool tableExists = TableExists(tableName);
+	if (tableExists){
+		static const QRegularExpression indexStatementPattern(
+			QStringLiteral(R"(CREATE\s+INDEX\s+IF\s+NOT\s+EXISTS[\s\S]*?;)"),
+			QRegularExpression::CaseInsensitiveOption);
+		const QString createTableQueryText = QString::fromUtf8(createTableQuery);
+		QStringList indexStatements;
+		QRegularExpressionMatchIterator iterator = indexStatementPattern.globalMatch(createTableQueryText);
+		while (iterator.hasNext()){
+			indexStatements.append(iterator.next().captured(0));
+		}
+		if (indexStatements.isEmpty()){
+			return true;
+		}
+
+		createTableQuery = indexStatements.join(QStringLiteral("\n")).toUtf8();
+	}
 
 	QByteArray tableScheme = GetTableScheme();
 	if (!tableScheme.isEmpty()){

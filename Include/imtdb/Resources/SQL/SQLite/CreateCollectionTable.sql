@@ -17,8 +17,8 @@ CREATE INDEX IF NOT EXISTS "${TableName}RevisionNumberIndex"
     ON "${TableName}" (CAST(json_extract("RevisionInfo", '$.RevisionNumber') AS INTEGER));
 
 CREATE INDEX IF NOT EXISTS "${TableName}DocumentStateRevisionIndex"
-    ON "${TableName}" ("DocumentId", "State", CAST(json_extract("RevisionInfo", '$.RevisionNumber') AS INTEGER) DESC);
+    ON "${TableName}" ("DocumentId", "State", CAST(json_extract("RevisionInfo", '$.RevisionNumber') AS INTEGER));
 
 CREATE INDEX IF NOT EXISTS "${TableName}InitialRevisionTimeIndex"
-    ON "${TableName}" ("DocumentId", CAST(json_extract("RevisionInfo", '$.RevisionNumber') AS INTEGER), "TimeStamp" DESC)
+    ON "${TableName}" ("DocumentId", CAST(json_extract("RevisionInfo", '$.RevisionNumber') AS INTEGER), "TimeStamp")
     WHERE CAST(json_extract("RevisionInfo", '$.RevisionNumber') AS INTEGER) = 1;
