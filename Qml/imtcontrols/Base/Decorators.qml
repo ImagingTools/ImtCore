@@ -1184,7 +1184,7 @@ StyleComponents {
 
 						anchors.centerIn: circle;
 
-						height: circle.height - 8;
+						height: circle.height - 4;
 						width: height;
 						radius: width;
 						color: !radioButtonItem.baseElement ? "transparent" : radioButtonItem.baseElement.selectedColor;

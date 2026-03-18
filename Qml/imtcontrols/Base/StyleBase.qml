@@ -227,6 +227,7 @@ StyleComponents {
 	//Other sizes
 	property int sizePanelsHeight: 50;
 	property int headerHeight: 50;
+	property int menuPanelMinWidth: 26;
 
 	//Opacity
 	property real opacityFaint: 0.05
