@@ -37,7 +37,7 @@ CREATE INDEX IF NOT EXISTS "${TableName}DocumentStateRevisionIndex"
     ON ${TableScheme}."${TableName}" ("DocumentId", "State", (("RevisionInfo"->>'RevisionNumber')::int) DESC);
 
 CREATE INDEX IF NOT EXISTS "${TableName}InitialRevisionTimeIndex"
-    ON ${TableScheme}."${TableName}" ("DocumentId", "TimeStamp" DESC)
+    ON ${TableScheme}."${TableName}" ("DocumentId", (("RevisionInfo"->>'RevisionNumber')::int), "TimeStamp" DESC)
     WHERE (("RevisionInfo"->>'RevisionNumber')::int) = 1;
 
 CREATE INDEX IF NOT EXISTS "${TableName}DocumentGinIndex"

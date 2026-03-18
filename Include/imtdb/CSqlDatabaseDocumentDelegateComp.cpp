@@ -862,6 +862,12 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTableIfNeeded()
 		SendErrorMessage(0, QT_TR_NOOP("Table creation script path must point to a QRC resource"));
 		return false;
 	}
+
+	const bool tableExists = TableExists(tableName);
+	if (tableExists && !resourcePath.endsWith(QStringLiteral("/CreateCollectionTable.sql"))){
+		return true;
+	}
+
 	QFile scriptFile(resourcePath);
 	if (!scriptFile.open(QFile::ReadOnly)){
 		SendErrorMessage(0, QString::fromUtf8(QT_TR_NOOP("Collection table creation script '%1' could not be loaded"))
