@@ -546,7 +546,10 @@ bool COrderedObjectCollectionProxy::Serialize(iser::IArchive& archive)
 	if (m_collectionPtr.IsValid()){
 		iser::ISerializable* serializablePtr = dynamic_cast<iser::ISerializable*>(m_collectionPtr.GetPtr());
 		if (serializablePtr != nullptr){
-			retVal = serializablePtr->Serialize(archive);
+			static iser::CArchiveTag collectionTag("ObjectCollection", "Proxied object collection");
+			retVal = retVal && archive.BeginTag(collectionTag);
+			retVal = retVal && serializablePtr->Serialize(archive);
+			retVal = retVal && archive.EndTag(collectionTag);
 		}
 	}
 
