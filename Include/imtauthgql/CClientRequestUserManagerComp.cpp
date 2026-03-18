@@ -20,6 +20,73 @@ QByteArrayList CClientRequestUserManagerComp::GetUserIds() const
 }
 
 
+QList<imtauth::IUserInfoSharedPtr> CClientRequestUserManagerComp::GetUserList() const
+{
+	namespace userssdl = sdl::imtauth::Users;
+
+	userssdl::UsersListRequestArguments arguments;
+	arguments.input.Version_1_0.Emplace();
+
+	if (m_applicationInfoCompPtr.IsValid()){
+		arguments.input.Version_1_0->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
+	}
+
+	userssdl::CUsersListPayload payload;
+	bool ok = SendModelRequestInternal<userssdl::UsersListRequestArguments, userssdl::CUsersListPayload, userssdl::CUsersListGqlRequest>(arguments, payload);
+	if (!ok){
+		return {};
+	}
+
+	if (!payload.Version_1_0->items.HasValue()){
+		return {};
+	}
+
+	QList<imtauth::IUserInfoSharedPtr> result;
+
+	for (const auto& item : payload.Version_1_0->items->ToList()){
+		if (!item.HasValue()){
+			continue;
+		}
+
+		imtauth::IUserInfoUniquePtr userInfoPtr = m_userFactoryCompPtr.CreateInstance();
+		if (!userInfoPtr.IsValid()){
+			continue;
+		}
+
+		if (item->userId){
+			userInfoPtr->SetId(*item->userId);
+		}
+
+		if (item->name){
+			userInfoPtr->SetName(*item->name);
+		}
+
+		if (item->description){
+			userInfoPtr->SetDescription(*item->description);
+		}
+
+		if (item->mail){
+			userInfoPtr->SetMail(*item->mail);
+		}
+
+		if (item->systemId || item->systemName){
+			imtauth::IUserInfo::SystemInfo systemInfo;
+			if (item->systemId){
+				systemInfo.systemId = *item->systemId;
+			}
+			if (item->systemName){
+				systemInfo.systemName = *item->systemName;
+			}
+			userInfoPtr->AddToSystem(systemInfo);
+		}
+
+		result << imtauth::IUserInfoSharedPtr::CreateFromUnique(userInfoPtr);
+	}
+
+	return result;
+}
+
+
 QByteArray CClientRequestUserManagerComp::GetUserObjectId(const QByteArray& login) const
 {
 	namespace userssdl = sdl::imtauth::Users;
