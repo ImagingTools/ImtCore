@@ -15,14 +15,20 @@ namespace imtdb
 
 CSqlDatabaseObjectCollectionIterator::CSqlDatabaseObjectCollectionIterator(
 			QSqlQuery& sqlQuery,
-			ISqlDatabaseObjectDelegate* databaseDelegatePtr)
-	:m_currentIndex(-1)
+			ISqlDatabaseObjectDelegate* databaseDelegatePtr,
+			int elementsCount)
+	:m_elementsCount(elementsCount),
+	m_currentIndex(-1)
 {
 	while(sqlQuery.next()){
 		m_records.append(sqlQuery.record());
 	}
 
 	m_databaseDelegate = databaseDelegatePtr;
+
+	if (m_elementsCount < 0){
+		m_elementsCount = imtbase::narrow_cast<int>(m_records.size());
+	}
 }
 
 
@@ -33,6 +39,12 @@ QSqlRecord CSqlDatabaseObjectCollectionIterator::GetRecord()
 	}
 
 	return QSqlRecord();
+}
+
+
+void CSqlDatabaseObjectCollectionIterator::SetElementsCount(int elementsCount)
+{
+	m_elementsCount = elementsCount;
 }
 
 
@@ -110,6 +122,12 @@ idoc::MetaInfoPtr CSqlDatabaseObjectCollectionIterator::GetDataMetaInfo() const
 }
 
 
+int CSqlDatabaseObjectCollectionIterator::GetElementsCount() const
+{
+	return m_elementsCount;
+}
+
+
 idoc::MetaInfoPtr CSqlDatabaseObjectCollectionIterator::GetCollectionMetaInfo() const
 {
 	if (m_databaseDelegate == nullptr || m_currentIndex < 0 || m_currentIndex >= m_records.count()){
@@ -142,5 +160,3 @@ QVariant CSqlDatabaseObjectCollectionIterator::GetElementInfo(QByteArray infoId)
 
 
 } // namespace imtdb
-
-

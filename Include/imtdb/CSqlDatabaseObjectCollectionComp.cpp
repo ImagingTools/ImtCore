@@ -983,5 +983,3 @@ void CSqlDatabaseObjectCollectionComp::AddOperationContextToChangeSet(const imtb
 
 
 } // namespace imtdb
-
-

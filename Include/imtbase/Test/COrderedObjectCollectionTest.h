@@ -23,7 +23,7 @@ private slots:
 	void testRemoveItem();
 	void testGetOrderedItemIds();
 	void testDelegatedOperations();
+	void testIteratorElementsCount();
 	void testSerialization();
 };
-
 
