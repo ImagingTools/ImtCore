@@ -73,6 +73,12 @@ idoc::MetaInfoPtr CFileObjectCollectionIterator::GetDataMetaInfo() const
 }
 
 
+int CFileObjectCollectionIterator::GetElementsCount() const
+{
+	return m_fileObjectCollectionPtr != nullptr ? m_fileObjectCollectionPtr->GetElementsCount() : 0;
+}
+
+
 idoc::MetaInfoPtr CFileObjectCollectionIterator::GetCollectionMetaInfo() const
 {
 
@@ -93,5 +99,4 @@ QVariant CFileObjectCollectionIterator::GetElementInfo(QByteArray /*infoId*/) co
 
 
 } // namespace imtdb
-
 

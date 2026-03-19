@@ -22,9 +22,10 @@ class CSqlDatabaseObjectCollectionIterator: virtual public imtbase::IObjectColle
 {
 	typedef imtbase::IObjectCollection::DataPtr DataPtr;
 public:
-	CSqlDatabaseObjectCollectionIterator(QSqlQuery& sqlQuery, ISqlDatabaseObjectDelegate* databaseDelegate);
+	CSqlDatabaseObjectCollectionIterator(QSqlQuery& sqlQuery, ISqlDatabaseObjectDelegate* databaseDelegate, int elementsCount = -1);
 
 	QSqlRecord GetRecord();
+	void SetElementsCount(int elementsCount);
 
 	// reimplemented (imtbase::IObjectCollectionIterator)
 	virtual bool Next() const override;
@@ -33,6 +34,7 @@ public:
 	virtual QByteArray GetObjectTypeId() const override;
 	virtual bool GetObjectData(imtbase::IObjectCollection::DataPtr& dataPtr) const override;
 	virtual idoc::MetaInfoPtr GetDataMetaInfo() const override;
+	virtual int GetElementsCount() const override;
 	virtual idoc::MetaInfoPtr GetCollectionMetaInfo() const override;
 	virtual QVariant GetElementInfo(int infoType) const override;
 	virtual QVariant GetElementInfo(QByteArray infoId) const override;
@@ -40,10 +42,9 @@ private:
 	QList<QSqlRecord> m_records;
 	ISqlDatabaseObjectDelegate* m_databaseDelegate;
 
+	int m_elementsCount;
 	mutable int m_currentIndex;
 };
 
 
 } // namespace imtdb
-
-
