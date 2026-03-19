@@ -2101,16 +2101,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 		count = -1;
 	}
 
-	istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(
-		m_objectCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), offset, count, &filterParams));
-	if (objectCollectionIterator == nullptr){
-		errorMessage = QString("Object collection iterator creation failed");
-		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
-
-		return nullptr;
-	}
-
-	int elementsCount = objectCollectionIterator->GetElementsCount();
+	int elementsCount = m_objectCollectionCompPtr->GetElementsCount(&filterParams);
 
 	int pagesCount = std::ceil(elementsCount / (double)count);
 	if (pagesCount <= 0){
@@ -2120,6 +2111,15 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 	imtbase::CTreeItemModel* notificationModelPtr = dataModelPtr->AddTreeModel("notification");
 	notificationModelPtr->SetData("pagesCount", pagesCount);
 	notificationModelPtr->SetData("totalCount", elementsCount);
+
+	istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(
+		m_objectCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), offset, count, &filterParams));
+	if (objectCollectionIterator == nullptr){
+		errorMessage = QString("Object collection iterator creation failed");
+		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+
+		return nullptr;
+	}
 
 	imtbase::CTreeItemModel* itemsModelPtr = dataModelPtr->AddTreeModel("items");
 	itemsModelPtr->SetIsArray(true);
@@ -3248,4 +3248,5 @@ bool CObjectCollectionControllerCompBase::CreateUserActionLog(
 
 
 } // namespace imtservergql
+
 
