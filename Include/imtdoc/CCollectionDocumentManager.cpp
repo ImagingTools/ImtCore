@@ -90,6 +90,7 @@ QByteArray CCollectionDocumentManager::CreateNewDocument(const QByteArray& userI
 	documentPtr->objectPtr = objectPtr;
 	documentPtr->undoManagerPtr = undoManagerPtr;
 	documentPtr->isDirty = false;
+	documentPtr->name = GetDefaultDocumentName(retVal, *objectPtr);
 
 	InitializeDocumentObservers(*documentPtr, userId);
 
@@ -98,6 +99,7 @@ QByteArray CCollectionDocumentManager::CreateNewDocument(const QByteArray& userI
 		info.userId = userId;
 		info.documentId = retVal;
 		info.typeId = documentTypeId;
+		info.name = documentPtr->name;
 		info.isDirty = false;
 
 		istd::IChangeable::ChangeSet changeSet(CF_NEW_DOCUMENT_CREATED);
@@ -673,6 +675,14 @@ bool CCollectionDocumentManager::ValidateDocumentData(
 	}
 
 	return true;
+}
+
+
+QString CCollectionDocumentManager::GetDefaultDocumentName(
+	const QByteArray& /*documentId*/,
+	const istd::IChangeable& /*document*/) const
+{
+	return QString();
 }
 
 

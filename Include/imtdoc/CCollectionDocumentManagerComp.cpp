@@ -41,6 +41,18 @@ idoc::IUndoManagerSharedPtr CCollectionDocumentManagerComp::CreateUndoManager() 
 }
 
 
+QString CCollectionDocumentManagerComp::GetDefaultDocumentName(
+	const QByteArray& documentId,
+	const istd::IChangeable& document) const
+{
+	if (!m_documentNameProviderCompPtr.IsValid()){
+		return QString();
+	}
+
+	return m_documentNameProviderCompPtr->GetDefaultDocumentName(documentId, document);
+}
+
+
 bool CCollectionDocumentManagerComp::ValidateDocumentData(
 	const WorkingDocument& document,
 	OperationStatus& status,
