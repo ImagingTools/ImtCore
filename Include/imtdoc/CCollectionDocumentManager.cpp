@@ -378,18 +378,21 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
 		return validationStatus;
 	}
 
+	const QString actualDocumentName =
+		documentName.isEmpty() ? GetDefaultDocumentName(documentId, *documentSnapshotPtr) : documentName;
+
 	if (!workingDocumentPtr->objectId.isEmpty()) {
 		// Create copy of the object
-		if (!documentName.isEmpty() && workingDocumentPtr->name != documentName){
+		if (!actualDocumentName.isEmpty() && workingDocumentPtr->name != actualDocumentName){
 			QByteArray newObjectId = collectionPtr->InsertNewObject(
-				workingDocumentPtr->typeId, documentName, "", documentSnapshotPtr.GetPtr());
+				workingDocumentPtr->typeId, actualDocumentName, "", documentSnapshotPtr.GetPtr());
 
 			if (newObjectId.isEmpty()){
 				return OS_FAILED;
 			}
 
 			workingDocumentPtr->objectId = newObjectId;
-			workingDocumentPtr->name = documentName;
+			workingDocumentPtr->name = actualDocumentName;
 			workingDocumentPtr->isDirty = false;
 			workingDocumentPtr->undoManagerPtr->StoreDocumentState();
 
@@ -451,10 +454,10 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
 
 	// Create new object
 	workingDocumentPtr->objectId =
-		collectionPtr->InsertNewObject(workingDocumentPtr->typeId, documentName, "", documentSnapshotPtr.GetPtr());
+		collectionPtr->InsertNewObject(workingDocumentPtr->typeId, actualDocumentName, "", documentSnapshotPtr.GetPtr());
 
 	if (!workingDocumentPtr->objectId.isEmpty()){
-		workingDocumentPtr->name = documentName;
+		workingDocumentPtr->name = actualDocumentName;
 		workingDocumentPtr->isDirty = false;
 		workingDocumentPtr->undoManagerPtr->StoreDocumentState();
 
