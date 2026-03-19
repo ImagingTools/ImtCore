@@ -611,20 +611,7 @@ imtbase::IObjectCollectionIterator* CSqlDatabaseObjectCollectionComp::CreateObje
 			return nullptr;
 		}
 
-		CSqlDatabaseObjectCollectionIterator* iteratorPtr =
-			new CSqlDatabaseObjectCollectionIterator(sqlQuery, m_objectDelegateCompPtr.GetPtr());
-
-		if (count >= 0){
-			int loadedElementsCount = iteratorPtr->GetElementsCount();
-			if (loadedElementsCount < count){
-				iteratorPtr->SetElementsCount(offset + loadedElementsCount);
-			}
-			else{
-				iteratorPtr->SetElementsCount(GetElementsCount(selectionParamsPtr));
-			}
-		}
-
-		return iteratorPtr;
+		return new CSqlDatabaseObjectCollectionIterator(sqlQuery, m_objectDelegateCompPtr.GetPtr());
 	}
 
 	return nullptr;

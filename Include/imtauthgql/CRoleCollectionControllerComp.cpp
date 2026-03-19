@@ -310,7 +310,7 @@ bool CRoleCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (requestInfo.items.isTypeIdRequested){
-		representationObject.typeId = QByteArray(m_objectCollectionCompPtr->GetObjectTypeId(objectId));
+		representationObject.typeId = objectCollectionIterator.GetObjectTypeId();
 	}
 
 	if (requestInfo.items.isAddedRequested){
