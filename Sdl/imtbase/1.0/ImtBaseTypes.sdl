@@ -4,6 +4,11 @@ schema {
 }
 
 
+type StandardResponse
+{
+	message: String
+}
+
 type TimeRange
 {
 	Begin: String
