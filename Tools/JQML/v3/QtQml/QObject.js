@@ -102,8 +102,8 @@ class QObject extends QBaseObject {
     }
 
     __updatePrimaryProperties(){
-        for(let i = this.__children.length-1; i >= 0; i--){
-            this.__children[i].__updatePrimaryProperties()
+        for(let child of this.__children){
+            child.__updatePrimaryProperties()
         }
     }
 
@@ -149,8 +149,8 @@ class QObject extends QBaseObject {
 
         this.__prepareAliasProperties()
 
-        for(let i = this.__children.length-1; i >= 0; i--){
-            this.__children[i].__updateProperties()
+        for(let child of this.__children){
+            child.__updateProperties()
         }
 
         JQApplication.endUpdate()
