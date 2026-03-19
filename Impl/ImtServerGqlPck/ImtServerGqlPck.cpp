@@ -180,7 +180,11 @@ I_EXPORT_COMPONENT(
 			"GraphQL context creator",
 			"GraphQL GQL Context Creator");
 
+I_EXPORT_COMPONENT(
+			GqlContextCache,
+			"GraphQL context cache",
+			"GraphQL GQL Context Cache");
+
 \
 } // namespace ImtServerGqlPck
-
 

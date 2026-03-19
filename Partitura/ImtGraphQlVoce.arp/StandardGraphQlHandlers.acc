@@ -90,6 +90,11 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="GqlContextCache" PackageId="ImtServerGqlPck" ComponentId="GqlContextCache">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
         <Element Id="GraphQlRoot" PackageId="ImtServerGqlPck" ComponentId="GraphQLServlet">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -107,6 +112,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="GqlContextCreator" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="GqlContextCreator"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="GqlContextCache" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="GqlContextCache"/>
                     </AttributeInfo>
                     <AttributeInfo Id="GqlRequestHandler" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
