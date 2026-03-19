@@ -1,7 +1,14 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtservergql/CHttpGraphQLServletComp.h>
 
+#include <iterator>
+
 // Qt includes
+#include <QtCore/QCryptographicHash>
+#include <QtCore/QDateTime>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
+#include <QtCore/QReadWriteLock>
 #include <QtCore/QScopeGuard>
 
 // ACF includes
@@ -20,6 +27,190 @@
 
 namespace imtservergql
 {
+
+namespace
+{
+
+
+constexpr qint64 s_jwtContextCacheTtlMs = 5000;
+constexpr int s_jwtContextCacheLimit = 256;
+
+
+bool IsJwtToken(const QByteArray& token)
+{
+	return !token.isEmpty() && !token.startsWith("imt_pat_");
+}
+
+
+QByteArray GetTokenCacheKey(const QByteArray& token)
+{
+	return QCryptographicHash::hash(token, QCryptographicHash::Sha256);
+}
+
+
+qint64 GetJwtExpirationTimeMs(const QByteArray& token)
+{
+	QByteArrayList parts = token.split('.');
+	if (parts.size() != 3){
+		return 0;
+	}
+
+	QByteArray payload = QByteArray::fromBase64(parts[1], QByteArray::Base64UrlEncoding | QByteArray::OmitTrailingEquals);
+	QJsonParseError error;
+	QJsonDocument document = QJsonDocument::fromJson(payload, &error);
+	if (error.error != QJsonParseError::NoError || !document.isObject()){
+		return 0;
+	}
+
+	QJsonValue expValue = document.object().value("exp");
+	if (!expValue.isDouble()){
+		return 0;
+	}
+
+	qint64 expSecs = static_cast<qint64>(expValue.toDouble());
+	if (expSecs <= 0){
+		return 0;
+	}
+
+	return expSecs * 1000;
+}
+
+
+class CGqlContextCache
+{
+public:
+	static CGqlContextCache& Instance()
+	{
+		static CGqlContextCache instance;
+		return instance;
+	}
+
+	bool TryCreateRequestContext(
+				const QByteArray& token,
+				const QByteArray& productId,
+				const imtrest::CHttpServletCompBase::HeadersMap& headers,
+				imtgql::IGqlContextSharedPtr& gqlContextPtr) const
+	{
+		if (!IsJwtToken(token)){
+			return false;
+		}
+
+		CachedContextItem item;
+		{
+			QReadLocker locker(&m_lock);
+			auto itemIter = m_cacheItems.constFind(GetTokenCacheKey(token));
+			if (itemIter == m_cacheItems.cend()){
+				return false;
+			}
+
+			item = itemIter.value();
+		}
+
+		if (!item.prototypeContextPtr.IsValid() || item.expirationTimeMs <= QDateTime::currentMSecsSinceEpoch()){
+			Remove(token);
+			return false;
+		}
+
+		gqlContextPtr.MoveCastedPtr(item.prototypeContextPtr->CloneMe());
+		if (!gqlContextPtr.IsValid()){
+			Remove(token);
+			return false;
+		}
+
+		gqlContextPtr->SetToken(token);
+		gqlContextPtr->SetProductId(productId);
+		gqlContextPtr->SetHeaders(headers);
+
+		return true;
+	}
+
+	void Insert(const QByteArray& token, const imtgql::IGqlContext* gqlContextPtr) const
+	{
+		if (!IsJwtToken(token) || gqlContextPtr == nullptr){
+			return;
+		}
+
+		qint64 currentTimeMs = QDateTime::currentMSecsSinceEpoch();
+		qint64 expirationTimeMs = currentTimeMs + s_jwtContextCacheTtlMs;
+		qint64 jwtExpirationTimeMs = GetJwtExpirationTimeMs(token);
+		if (jwtExpirationTimeMs > 0 && jwtExpirationTimeMs < expirationTimeMs){
+			expirationTimeMs = jwtExpirationTimeMs;
+		}
+
+		if (expirationTimeMs <= currentTimeMs){
+			return;
+		}
+
+		imtgql::IGqlContextSharedPtr prototypeContextPtr;
+		prototypeContextPtr.MoveCastedPtr(gqlContextPtr->CloneMe());
+		if (!prototypeContextPtr.IsValid()){
+			return;
+		}
+
+		prototypeContextPtr->SetToken(QByteArray());
+		prototypeContextPtr->SetProductId(QByteArray());
+		prototypeContextPtr->SetHeaders(imtgql::IGqlContext::Headers());
+
+		QWriteLocker locker(&m_lock);
+		RemoveExpiredItems(currentTimeMs);
+		EnsureSpaceForOneMoreItem();
+		m_cacheItems.insert(GetTokenCacheKey(token), {prototypeContextPtr, expirationTimeMs, currentTimeMs});
+	}
+
+private:
+	struct CachedContextItem
+	{
+		imtgql::IGqlContextSharedPtr prototypeContextPtr;
+		qint64 expirationTimeMs = 0;
+		qint64 createdAtMs = 0;
+	};
+
+	void Remove(const QByteArray& token) const
+	{
+		QWriteLocker locker(&m_lock);
+		m_cacheItems.remove(GetTokenCacheKey(token));
+	}
+
+	void RemoveExpiredItems(qint64 currentTimeMs) const
+	{
+		for (auto itemIter = m_cacheItems.begin(); itemIter != m_cacheItems.end();){
+			if (!itemIter.value().prototypeContextPtr.IsValid() || itemIter.value().expirationTimeMs <= currentTimeMs){
+				itemIter = m_cacheItems.erase(itemIter);
+			}
+			else{
+				++itemIter;
+			}
+		}
+	}
+
+	void EnsureSpaceForOneMoreItem() const
+	{
+		while (m_cacheItems.size() >= s_jwtContextCacheLimit){
+			auto oldestIter = m_cacheItems.begin();
+			for (auto itemIter = std::next(m_cacheItems.begin()); itemIter != m_cacheItems.end(); ++itemIter){
+				if (itemIter.value().createdAtMs < oldestIter.value().createdAtMs){
+					oldestIter = itemIter;
+				}
+			}
+
+			m_cacheItems.erase(oldestIter);
+		}
+	}
+
+private:
+	mutable QMap<QByteArray, CachedContextItem> m_cacheItems;
+	mutable QReadWriteLock m_lock = QReadWriteLock(QReadWriteLock::Recursive);
+};
+
+
+void ApplyRequestContext(imtgql::CGqlRequest& gqlRequest, imtgql::IGqlContextSharedPtr gqlContextPtr)
+{
+	imtgql::CGqlRequestContextManager::SetContext(gqlContextPtr.GetPtr());
+	gqlRequest.SetGqlContext(gqlContextPtr);
+}
+
+
+} // namespace
 
 
 // protected methods
@@ -80,64 +271,72 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 	QByteArray userId;
 	QByteArray accessToken = headers.value(QByteArrayLiteral("x-authentication-token"));
 
-	// Validate token based on prefix: pat_ for PAT tokens, otherwise JWT
-	if (!accessToken.isEmpty()){
-		// Check if token starts with "pat_" prefix and has content beyond the prefix
-		if (accessToken.size() > 8 && accessToken.startsWith("imt_pat_")){
-			// PAT token - validate with PAT manager
-			if (m_patManagerCompPtr.IsValid()){
-				QByteArray tokenId;
-				QByteArrayList scopes;
-				if (!m_patManagerCompPtr->ValidateToken(accessToken, userId, tokenId, scopes)){
-					return CreateResponse(StatusCode::SC_FORBIDDEN, QByteArray(), request);
-				}
-
-				m_patManagerCompPtr->UpdateLastUsedAt(tokenId);
-			}
-			else{
-				return CreateResponse(StatusCode::SC_FORBIDDEN, QByteArray(), request);
-			}
-		}
-		else{
-			// JWT token - validate with JWT controller
-			if (m_jwtSessionControllerCompPtr.IsValid()){
-				using JwtState = imtauth::IJwtSessionController::JwtState;
-				JwtState state = m_jwtSessionControllerCompPtr->ValidateJwt(accessToken);
-				if (state == JwtState::JS_EXPIRED){
-					return CreateResponse(StatusCode::SC_UNAUTHORIZED, QByteArray(), request);
-				}
-				else if (state == JwtState::JS_INVALID){
-					return CreateResponse(StatusCode::SC_FORBIDDEN, QByteArray(), request);
-				}
-
-				userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(accessToken);
-			}
-		}
-	}
-
 	QByteArray productId;
 	if (headers.contains(imtbase::s_productIdHeaderId)){
 		productId = headers.value(imtbase::s_productIdHeaderId);
 	}
 
-	if (m_gqlContextCreatorCompPtr.IsValid()){
-		QString errorMessage;
-		imtgql::IGqlContextUniquePtr gqlContextPtr = m_gqlContextCreatorCompPtr->CreateGqlContext(accessToken, productId, userId, headers, errorMessage);
-		if (!gqlContextPtr.IsValid()){
-			SendCriticalMessage(
-						0,
-						QStringLiteral("Unable to create a GraphQL context for the access token '%1' for Command-ID: '%2'. Error: '%3'")
-											.arg(QString(accessToken), QString(gqlCommand), errorMessage),
-						QStringLiteral("GraphQL - servlet"));
-			return GenerateError(StatusCode::SC_INTERNAL_SERVER_ERROR, QStringLiteral("Request context is invalid"), request);
-		}
-
-		imtgql::IGqlContextSharedPtr shared;
-		shared.MoveCastedPtr(gqlContextPtr);
-		m_lastRequest.SetGqlContext(shared);
+	imtgql::IGqlContextSharedPtr cachedContextPtr;
+	if (CGqlContextCache::Instance().TryCreateRequestContext(accessToken, productId, headers, cachedContextPtr)){
+		ApplyRequestContext(m_lastRequest, cachedContextPtr);
 	}
 	else{
-		// Q_ASSERT(false);
+
+		// Validate token based on prefix: pat_ for PAT tokens, otherwise JWT
+		if (!accessToken.isEmpty()){
+			// Check if token starts with "pat_" prefix and has content beyond the prefix
+			if (accessToken.size() > 8 && accessToken.startsWith("imt_pat_")){
+				// PAT token - validate with PAT manager
+				if (m_patManagerCompPtr.IsValid()){
+					QByteArray tokenId;
+					QByteArrayList scopes;
+					if (!m_patManagerCompPtr->ValidateToken(accessToken, userId, tokenId, scopes)){
+						return CreateResponse(StatusCode::SC_FORBIDDEN, QByteArray(), request);
+					}
+
+					m_patManagerCompPtr->UpdateLastUsedAt(tokenId);
+				}
+				else{
+					return CreateResponse(StatusCode::SC_FORBIDDEN, QByteArray(), request);
+				}
+			}
+			else{
+				// JWT token - validate with JWT controller
+				if (m_jwtSessionControllerCompPtr.IsValid()){
+					using JwtState = imtauth::IJwtSessionController::JwtState;
+					JwtState state = m_jwtSessionControllerCompPtr->ValidateJwt(accessToken);
+					if (state == JwtState::JS_EXPIRED){
+						return CreateResponse(StatusCode::SC_UNAUTHORIZED, QByteArray(), request);
+					}
+					else if (state == JwtState::JS_INVALID){
+						return CreateResponse(StatusCode::SC_FORBIDDEN, QByteArray(), request);
+					}
+
+					userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(accessToken);
+				}
+			}
+		}
+
+		if (m_gqlContextCreatorCompPtr.IsValid()){
+			QString errorMessage;
+			imtgql::IGqlContextUniquePtr gqlContextPtr = m_gqlContextCreatorCompPtr->CreateGqlContext(accessToken, productId, userId, headers, errorMessage);
+			if (!gqlContextPtr.IsValid()){
+				SendCriticalMessage(
+							0,
+							QStringLiteral("Unable to create a GraphQL context for the access token '%1' for Command-ID: '%2'. Error: '%3'")
+												.arg(QString(accessToken), QString(gqlCommand), errorMessage),
+							QStringLiteral("GraphQL - servlet"));
+				return GenerateError(StatusCode::SC_INTERNAL_SERVER_ERROR, QStringLiteral("Request context is invalid"), request);
+			}
+
+			imtgql::IGqlContextSharedPtr shared;
+			shared.MoveCastedPtr(gqlContextPtr);
+			CGqlContextCache::Instance().Insert(accessToken, shared.GetPtr());
+			ApplyRequestContext(m_lastRequest, shared);
+		}
+		else{
+			// Q_ASSERT(false);
+		}
 	}
 
 	QByteArray responseData;
@@ -309,5 +508,3 @@ QByteArray CHttpGraphQLServletComp::BuildGqlErrorJson(
 
 
 } // namespace imtservergql
-
-
