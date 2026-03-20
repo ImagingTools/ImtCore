@@ -113,7 +113,7 @@ QByteArray CJobQueueManagerCompBase::InsertNewJobIntoQueue(
 
 			return QByteArray();
 		}
-		
+
 		jobTicket.SetParams(std::move(paramsPtr));
 	}
 
