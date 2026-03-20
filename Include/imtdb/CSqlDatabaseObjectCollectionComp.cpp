@@ -595,23 +595,49 @@ imtbase::IObjectCollectionIterator* CSqlDatabaseObjectCollectionComp::CreateObje
 			const iprm::IParamsSet* selectionParamsPtr) const
 {
 	if (m_objectDelegateCompPtr.IsValid() && m_dbEngineCompPtr.IsValid()){
-		QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(objectId, offset, count, selectionParamsPtr);
-		if (objectSelectionQuery.isEmpty()){
+		// Get the base query WITHOUT pagination (count=-1 means no OFFSET/FETCH)
+		QByteArray baseSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(objectId, 0, -1, selectionParamsPtr);
+		if (baseSelectionQuery.isEmpty()){
 			return nullptr;
 		}
 
+		// Wrap: add COUNT(*) OVER() and apply pagination on the outside
+		QString queryWithTotalCount = QStringLiteral(
+			"SELECT *, COUNT(*) OVER() AS \"TotalCount\" FROM (%1) AS _base")
+			.arg(QString::fromUtf8(baseSelectionQuery));
+
+		if (count > 0){
+			queryWithTotalCount += QStringLiteral(" OFFSET %1 ROWS FETCH NEXT %2 ROWS ONLY")
+				.arg(offset).arg(count);
+		}
+
 		QSqlError sqlError;
-		QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(objectSelectionQuery, &sqlError, true);
+		QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(queryWithTotalCount.toUtf8(), &sqlError, true);
 
 		if (sqlError.type() != QSqlError::NoError){
 			SendErrorMessage(0, sqlError.text(), "Database collection");
 
-			qDebug() << "SQL-error" << objectSelectionQuery;
+			qDebug() << "SQL-error" << queryWithTotalCount;
 
 			return nullptr;
 		}
 
-		return new CSqlDatabaseObjectCollectionIterator(sqlQuery, m_objectDelegateCompPtr.GetPtr());
+		// Extract totalCount from the first record
+		int totalCount = -1;
+		if (sqlQuery.first()){
+			QSqlRecord firstRecord = sqlQuery.record();
+			int fieldIndex = firstRecord.indexOf("TotalCount");
+			if (fieldIndex >= 0){
+				totalCount = firstRecord.value(fieldIndex).toInt();
+			}
+			sqlQuery.seek(-1); // Reset cursor before first record
+		}
+		else{
+			// Empty result set — totalCount = 0
+			totalCount = 0;
+		}
+
+		return new CSqlDatabaseObjectCollectionIterator(sqlQuery, m_objectDelegateCompPtr.GetPtr(), totalCount);
 	}
 
 	return nullptr;
