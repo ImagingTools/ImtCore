@@ -132,9 +132,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 			return GenerateError(StatusCode::SC_INTERNAL_SERVER_ERROR, QStringLiteral("Request context is invalid"), request);
 		}
 
-		imtgql::IGqlContextSharedPtr shared;
-		shared.MoveCastedPtr(gqlContextPtr);
-		m_lastRequest.SetGqlContext(shared);
+		m_lastRequest.SetGqlContext(std::move(gqlContextPtr));
 	}
 	else{
 		// Q_ASSERT(false);

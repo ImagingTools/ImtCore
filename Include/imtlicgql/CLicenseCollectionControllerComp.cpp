@@ -150,10 +150,7 @@ istd::IChangeableUniquePtr CLicenseCollectionControllerComp::CreateObjectFromRep
 		return nullptr;
 	}
 
-	istd::IChangeableUniquePtr retVal;
-	retVal.MoveCastedPtr<imtlic::ILicenseDefinition>(licenseInstancePtr);
-
-	return retVal;
+	return licenseInstancePtr;
 }
 
 

@@ -366,10 +366,7 @@ istd::IChangeableUniquePtr CUserGroupCollectionControllerComp::CreateObjectFromR
 		return nullptr;
 	}
 
-	istd::IChangeableUniquePtr retVal;
-	retVal.MoveCastedPtr<imtauth::IUserGroupInfo>(userGroupInstancePtr);
-
-	return retVal;
+	return userGroupInstancePtr;
 }
 
 
