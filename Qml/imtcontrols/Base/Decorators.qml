@@ -1246,7 +1246,9 @@ StyleComponents {
 
 				anchors.left: textAreaItem.left;
 				anchors.leftMargin: !textAreaItem.baseElement ? 0 : textAreaItem.baseElement.margin;
-				anchors.verticalCenter: textAreaItem.verticalCenter;
+				anchors.verticalCenter: !textAreaItem.baseElement ? undefined : textAreaItem.baseElement.placeHolderVerticalCentered ? textAreaItem.verticalCenter : undefined;
+				anchors.top: !textAreaItem.baseElement ? undefined : !textAreaItem.baseElement.placeHolderVerticalCentered ? textAreaItem.top : undefined;
+				anchors.topMargin: !textAreaItem.baseElement ? 0 : !textAreaItem.baseElement.placeHolderVerticalCentered ? textAreaItem.baseElement.margin : 0;
 
 
 				font.pixelSize: Style.fontSizeM;
