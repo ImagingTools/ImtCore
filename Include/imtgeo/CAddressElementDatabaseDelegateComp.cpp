@@ -90,10 +90,7 @@ istd::IChangeableUniquePtr CAddressElementDatabaseDelegateComp::CreateObjectFrom
 		adrElementInfoPtr->SetLongitude(lon);
 	}
 
-	istd::IChangeableUniquePtr retVal;
-	retVal.MoveCastedPtr<IAddressElementInfo>(adrElementInfoPtr);
-
-	return retVal;
+	return adrElementInfoPtr;
 }
 
 

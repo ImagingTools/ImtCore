@@ -47,7 +47,7 @@ istd::TUniqueInterfacePtr<ObjectInterface> TComponentFactoryComp<ObjectInterface
 {
 	auto componentPtr = m_factCompPtr.CreateInstance();
 	istd::TUniqueInterfacePtr<ObjectInterface> retVal;
-	retVal.MoveCastedPtr(componentPtr);
+	retVal.MoveCastedPtr(std::move(componentPtr));
 	return retVal;
 }
 

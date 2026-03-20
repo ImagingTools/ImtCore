@@ -152,10 +152,8 @@ ifile::IFilePersistence::OperationState CQmldirFilePersistenceComp::LoadFromFile
 		}
 	}
 
-	iser::ISerializableUniquePtr objectParamPtr;
-	objectParamPtr.MoveCastedPtr<iprm::IParamsManager>(objectEntriesManagerPtr);
-
-	paramsSetPtr->SetEditableParameter(QmldirModelParamIds::Objects, objectParamPtr);
+	iser::ISerializableUniquePtr objectParamPtr = std::move(objectEntriesManagerPtr);
+	paramsSetPtr->SetEditableParameter(QmldirModelParamIds::Objects,  objectParamPtr);
 
 	return OS_OK;
 }

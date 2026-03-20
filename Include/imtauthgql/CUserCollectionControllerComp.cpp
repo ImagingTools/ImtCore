@@ -569,10 +569,8 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateObjectFromRepres
 			break;
 		}
 	}
-	istd::IChangeableUniquePtr retVal;
-	retVal.MoveCastedPtr<imtauth::IUserInfo>(userInstancePtr);
 
-	return retVal;
+	return userInstancePtr;
 }
 
 

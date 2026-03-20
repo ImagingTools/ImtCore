@@ -374,10 +374,7 @@ istd::IChangeableUniquePtr CRoleCollectionControllerComp::CreateObjectFromRepres
 		return nullptr;
 	}
 
-	istd::IChangeableUniquePtr retVal;
-	retVal.MoveCastedPtr<imtauth::IRole>(roleInstancePtr);
-
-	return retVal;
+	return roleInstancePtr;
 }
 
 

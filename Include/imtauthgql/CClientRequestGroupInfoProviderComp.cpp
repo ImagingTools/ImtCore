@@ -58,7 +58,7 @@ imtauth::IUserGroupInfoSharedPtr CClientRequestGroupInfoProviderComp::GetUserGro
 	if (gqlContextPtr != nullptr){
 		istd::IChangeableUniquePtr clonedPtr = gqlContextPtr->CloneMe();
 		imtgql::IGqlContextUniquePtr castedPtr;
-		castedPtr.MoveCastedPtr(clonedPtr);
+		castedPtr.MoveCastedPtr(std::move(clonedPtr));
 		gqlRequest.SetGqlContext(imtgql::IGqlContextSharedPtr::CreateFromUnique(castedPtr));
 	}
 
