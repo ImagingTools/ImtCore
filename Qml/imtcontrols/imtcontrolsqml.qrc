@@ -142,6 +142,7 @@
                 <file alias="imtcontrols/Views/TableCellIconTextDelegate.qml">Views/TableCellIconTextDelegate.qml</file>
                 <file alias="imtcontrols/Views/TableCellText.qml">Views/TableCellText.qml</file>
                 <file alias="imtcontrols/Views/TableCellDelegateCheckable.qml">Views/TableCellDelegateCheckable.qml</file>
+                <file alias="imtcontrols/Views/TableCellDateDelegate.qml">Views/TableCellDateDelegate.qml</file>
                 <file alias="imtcontrols/Views/TableDelegate.qml">Views/TableDelegate.qml</file>
                 <file alias="imtcontrols/Views/TableRowDelegate.qml">Views/TableRowDelegate.qml</file>
                 <file alias="imtcontrols/Views/TableProperties.qml">Views/TableProperties.qml</file>
