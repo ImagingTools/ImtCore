@@ -179,6 +179,8 @@ Splitter 1.0 ./Views/Splitter.qml
 StackView 1.0 ./Views/StackView.qml
 Gallery 1.0 ./Views/Gallery.qml
 ExpandingContainer 1.0 ./Views/ExpandingContainer.qml
+CollapsibleRectangle 1.0 ./Views/CollapsibleRectangle.qml
+Title 1.0 ./Views/Title.qml
 TextInputCellContentComp 1.0 ./Views/TextInputCellContentComp.qml
 ComboBoxCellContentComp 1.0 ./Views/ComboBoxCellContentComp.qml
 SubMenuPanelButtonDecorator 1.0 ./Views/SubMenuPanelButtonDecorator.qml
