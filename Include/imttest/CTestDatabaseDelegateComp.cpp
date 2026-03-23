@@ -50,10 +50,7 @@ istd::IChangeableUniquePtr CTestDatabaseDelegateComp::CreateObjectFromRecord(con
 		testInfoPtr->SetTestDescription(testDescription);
 	}
 
-	istd::IChangeableUniquePtr retVal;
-	retVal.MoveCastedPtr<ITestInfo>(testInfoPtr);
-
-	return retVal;
+	return testInfoPtr;
 }
 
 

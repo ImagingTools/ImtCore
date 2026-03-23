@@ -42,7 +42,7 @@ IJobController::RequestStatus CJobControllerCompBase::BeginJob(const QByteArray&
 			}
 
 			JobInfoPtr jobPtr(new JobInfo);
-			jobPtr->paramsPtr.MoveCastedPtr(jobParamsPtr);
+			jobPtr->paramsPtr = std::move(jobParamsPtr);
 			jobPtr->status = IJobController::JS_IN_PROGRESS;
 
 			if (PrepareInputObjects(*jobPtr)){
