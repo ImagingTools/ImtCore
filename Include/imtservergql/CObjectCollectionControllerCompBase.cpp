@@ -2123,8 +2123,9 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 
 	imtbase::CTreeItemModel* itemsModelPtr = dataModelPtr->AddTreeModel("items");
 	itemsModelPtr->SetIsArray(true);
+	itemsModelPtr->SetUpdateEnabled(false);
+
 	while (objectCollectionIterator->Next()){
-		imtbase::IObjectCollection::DataPtr objectDataPtr;
 		int itemIndex = itemsModelPtr->InsertNewItem();
 		if (itemIndex >= 0){
 			if (!SetupGqlItem(gqlRequest, *itemsModelPtr, itemIndex, objectCollectionIterator.GetPtr(), errorMessage)){
