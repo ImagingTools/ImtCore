@@ -1,5 +1,6 @@
 const { ListModel } = require('./ListModel')
 const { QBool, QVar } = require('../utils/properties')
+const { Qt } = require('../utils/Qt')
 
 class BaseModel extends ListModel {
 	static defaultProperties = {
@@ -9,6 +10,7 @@ class BaseModel extends ListModel {
 
 	static defaultSignals = {
 		internalModelChanged: { params: ['name', 'sender'] },
+		finished: { params: [] },
 	}
 
 	getProperties(item){
@@ -207,6 +209,30 @@ class BaseModel extends ListModel {
 		}
 		
 		return retVal
+	}
+
+	createFromJson(json){
+		return this.fromJSON(json);
+	}
+
+	fromJSON(json){
+		this.clear()
+
+		let arr = JSON.parse(json)
+		for(let i = 0; i < arr.length; i++){
+			let sourceTypename
+			if (arr[i]['__typename']){
+				sourceTypename = arr[i]['__typename']
+			}
+			else {
+				continue
+			}
+			let obj = Qt.createComponent('', sourceTypename + ".qml", this).createObject(this)
+			obj.fromObject(arr[i])
+			this.addElement(obj)
+		}
+
+		this.finished()
 	}
 
 	addElement(element){
