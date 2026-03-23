@@ -42,13 +42,6 @@ imtbase::CTreeItemModel* CSdlCollectionControllerCompBase::ListObjects(
 		PrepareFilters(gqlRequest, *viewParamsGql, filterParams);
 	}
 
-	int elementsCount = m_objectCollectionCompPtr->GetElementsCount(&filterParams);
-
-	int pagesCount = std::ceil(elementsCount / (double)count);
-	if (pagesCount <= 0){
-		pagesCount = 1;
-	}
-
 	istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(m_objectCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), offset, count, &filterParams));
 	if (!objectCollectionIterator.IsValid()){
 		errorMessage = QString("Object collection iterator could not be created");
@@ -56,6 +49,15 @@ imtbase::CTreeItemModel* CSdlCollectionControllerCompBase::ListObjects(
 		SendCriticalMessage(0, errorMessage, "CSdlCollectionControllerCompBase");
 
 		return nullptr;
+	}
+
+	// GetElementsCount() returns the total count across all pages (from COUNT(*) OVER()),
+	// not just the number of records in the current page.
+	int elementsCount = objectCollectionIterator->GetElementsCount();
+
+	int pagesCount = std::ceil(elementsCount / (double)count);
+	if (pagesCount <= 0){
+		pagesCount = 1;
 	}
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());

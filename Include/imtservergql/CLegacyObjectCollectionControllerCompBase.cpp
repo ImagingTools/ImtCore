@@ -648,7 +648,18 @@ imtbase::CTreeItemModel* CLegacyObjectCollectionControllerCompBase::ListObjects(
 		count = -1;
 	}
 
-	int elementsCount = m_objectCollectionCompPtr->GetElementsCount(&filterParams);
+	istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(
+				m_objectCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), offset, count, &filterParams));
+	if (objectCollectionIterator == nullptr){
+		errorMessage = QString("Object collection iterator creation failed");
+		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
+
+		return nullptr;
+	}
+
+	// GetElementsCount() returns the total count across all pages (from COUNT(*) OVER()),
+	// not just the number of records in the current page.
+	int elementsCount = objectCollectionIterator->GetElementsCount();
 
 	int pagesCount = std::ceil(elementsCount / (double)count);
 	if (pagesCount <= 0){
@@ -658,15 +669,6 @@ imtbase::CTreeItemModel* CLegacyObjectCollectionControllerCompBase::ListObjects(
 	imtbase::CTreeItemModel* notificationModelPtr = dataModelPtr->AddTreeModel("notification");
 	notificationModelPtr->SetData("PagesCount", pagesCount);
 	notificationModelPtr->SetData("TotalCount", elementsCount);
-
-	istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(
-				m_objectCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), offset, count, &filterParams));
-	if (objectCollectionIterator == nullptr){
-		errorMessage = QString("Object collection iterator creation failed");
-		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
-
-		return nullptr;
-	}
 
 	imtbase::CTreeItemModel* itemsModelPtr = dataModelPtr->AddTreeModel("items");
 	while (objectCollectionIterator->Next()){
