@@ -29,7 +29,16 @@ imtauth::IRoleUniquePtr CRoleCollectionAdapterComp::GetRole(const QByteArray& ob
 {
 	if (m_roleCollectionCompPtr.IsValid()){
 		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_roleCollectionCompPtr->GetObjectData(objectId, dataPtr)){
+
+		auto cacheIt = m_roleCache.constFind(objectId);
+		if (cacheIt != m_roleCache.constEnd()){
+			dataPtr = cacheIt.value();
+		}
+		else if (m_roleCollectionCompPtr->GetObjectData(objectId, dataPtr)){
+			m_roleCache.insert(objectId, dataPtr);
+		}
+
+		if (dataPtr.IsValid()){
 			const IRole* rolePtr = dynamic_cast<const imtauth::IRole*>(dataPtr.GetPtr());
 			if (rolePtr != nullptr){
 				imtauth::IRoleUniquePtr roleInfoUniquePtr;

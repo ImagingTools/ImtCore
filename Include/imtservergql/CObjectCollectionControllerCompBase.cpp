@@ -2110,6 +2110,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 		return nullptr;
 	}
 
+	// GetElementsCount() returns the total count across all pages (from COUNT(*) OVER()),
+	// not just the number of records in the current page.
 	int elementsCount = objectCollectionIterator->GetElementsCount();
 
 	int pagesCount = std::ceil(elementsCount / (double)count);
