@@ -31,16 +31,7 @@ imtauth::IUserGroupInfoSharedPtr CUserGroupInfoProviderComp::GetUserGroup(const 
 {
 	if (m_userGroupCollectionCompPtr.IsValid()){
 		imtbase::IObjectCollection::DataPtr dataPtr;
-
-		auto cacheIt = m_groupCache.constFind(groupId);
-		if (cacheIt != m_groupCache.constEnd()){
-			dataPtr = cacheIt.value();
-		}
-		else if (m_userGroupCollectionCompPtr->GetObjectData(groupId, dataPtr, paramsPtr)){
-			m_groupCache.insert(groupId, dataPtr);
-		}
-
-		if (dataPtr.IsValid()){
+		if (m_userGroupCollectionCompPtr->GetObjectData(groupId, dataPtr, paramsPtr)){
 			IUserGroupInfoSharedPtr retVal;
 			retVal.SetCastedPtr(dataPtr);
 

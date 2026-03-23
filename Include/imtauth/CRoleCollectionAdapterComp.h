@@ -5,9 +5,6 @@
 // ACF includes
 #include <icomp/CComponentBase.h>
 
-// Qt includes
-#include <QHash>
-
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtauth/IRoleInfoProvider.h>
@@ -35,10 +32,6 @@ public:
 
 protected:
 	I_REF(imtbase::IObjectCollection, m_roleCollectionCompPtr);
-
-	// In-memory cache to avoid repeated DB queries for the same role.
-	// Roles are shared across many users, so caching avoids N*M individual lookups.
-	mutable QHash<QByteArray, imtbase::IObjectCollection::DataPtr> m_roleCache;
 };
 
 
