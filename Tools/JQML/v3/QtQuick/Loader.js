@@ -50,29 +50,30 @@ class Loader extends Item {
 
         this.__updateProperty('visible')
         let item = this.sourceComponent.createObject(this, {}, true)
-        this.item = item
 
-        if(this.item instanceof Item){
-            this.item.widthChanged.connect(()=>{
-                Geometry.setAuto(this.__self, 'width', this.item.width, this.__self.constructor.meta.width)
+        if(item instanceof Item){
+            item.widthChanged.connect(()=>{
+                Geometry.setAuto(this.__self, 'width', item.width, this.__self.constructor.meta.width)
             })
-            this.item.heightChanged.connect(()=>{
-                Geometry.setAuto(this.__self, 'height', this.item.height, this.__self.constructor.meta.height)
+            item.heightChanged.connect(()=>{
+                Geometry.setAuto(this.__self, 'height', item.height, this.__self.constructor.meta.height)
             })
     
-            Geometry.setAuto(this.__self, 'width', this.item.width, this.__self.constructor.meta.width)
-            Geometry.setAuto(this.__self, 'height', this.item.height, this.__self.constructor.meta.height)
+            Geometry.setAuto(this.__self, 'width', item.width, this.__self.constructor.meta.width)
+            Geometry.setAuto(this.__self, 'height', item.height, this.__self.constructor.meta.height)
     
-            Geometry.setAuto(this.item.__self, 'width', this.width, this.item.__self.constructor.meta.width)
-            Geometry.setAuto(this.item.__self, 'height', this.height, this.item.__self.constructor.meta.height)
+            Geometry.setAuto(item.__self, 'width', this.width, item.__self.constructor.meta.width)
+            Geometry.setAuto(item.__self, 'height', this.height, item.__self.constructor.meta.height)
 
             if(this.__self.width__prevent){
-                this.item.width = ()=>{return this.width}
+                item.width = ()=>{return this.width}
             }
             if(this.__self.height__prevent){
-                this.item.height = ()=>{return this.height}
+                item.height = ()=>{return this.height}
             }
         }
+
+        this.item = item
 
         this.loaded()
     }
@@ -109,30 +110,30 @@ class Loader extends Item {
 
         this.__updateProperty('visible')
         let item = cls.create(this)
-        this.item = item
-
-        if(this.item instanceof Item){
-            this.item.widthChanged.connect(()=>{
-                Geometry.setAuto(this.__self, 'width', this.item.width, this.__self.constructor.meta.width)
+        
+        if(item instanceof Item){
+            item.widthChanged.connect(()=>{
+                Geometry.setAuto(this.__self, 'width', item.width, this.__self.constructor.meta.width)
             })
-            this.item.heightChanged.connect(()=>{
-                Geometry.setAuto(this.__self, 'height', this.item.height, this.__self.constructor.meta.height)
+            item.heightChanged.connect(()=>{
+                Geometry.setAuto(this.__self, 'height', item.height, this.__self.constructor.meta.height)
             })
     
-            Geometry.setAuto(this.__self, 'width', this.item.width, this.__self.constructor.meta.width)
-            Geometry.setAuto(this.__self, 'height', this.item.height, this.__self.constructor.meta.height)
+            Geometry.setAuto(this.__self, 'width', item.width, this.__self.constructor.meta.width)
+            Geometry.setAuto(this.__self, 'height', item.height, this.__self.constructor.meta.height)
     
-            Geometry.setAuto(this.item.__self, 'width', this.width, this.item.__self.constructor.meta.width)
-            Geometry.setAuto(this.item.__self, 'height', this.height, this.item.__self.constructor.meta.height)
+            Geometry.setAuto(item.__self, 'width', this.width, item.__self.constructor.meta.width)
+            Geometry.setAuto(item.__self, 'height', this.height, item.__self.constructor.meta.height)
 
             if(this.__self.width__prevent){
-                this.item.width = ()=>{return this.width}
+                item.width = ()=>{return this.width}
             }
             if(this.__self.height__prevent){
-                this.item.height = ()=>{return this.height}
+                item.height = ()=>{return this.height}
             }
         }
         
+        this.item = item
 
         this.loaded()
     }
