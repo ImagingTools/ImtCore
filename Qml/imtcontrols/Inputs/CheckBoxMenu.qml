@@ -25,7 +25,7 @@ FocusScope{
 
     property color borderColor: checkBoxMenu.focus ? Style.iconColorOnSelected : Style.borderColor;
     property color backgroundColor: Style.baseColor;
-    property bool isColor: false;
+	property bool isColor: false;
     property int dialogsCountPrev: 1000;
     property int dialogsCount: ModalDialogManager.count;
 
@@ -314,10 +314,10 @@ FocusScope{
 					anchors.topMargin: Style.marginM;
 
                     width: parent.width;
-                    height: Style.size_TextFieldHeight;
+					height: Style.controlHeightM;
                     border.width: 1;
 					border.color: Style.grayColor;
-                    radius: Style.size_TextFieldRadius;
+					radius: Style.textFieldRadius;
 
                     visible: checkBoxMenu.hasSearch;
 
