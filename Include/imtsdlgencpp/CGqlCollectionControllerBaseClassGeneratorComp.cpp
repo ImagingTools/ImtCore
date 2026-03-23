@@ -156,8 +156,10 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(cons
 	FeedStream(ifStream, 1, false);
 
 	QList<imtsdl::CSdlDocumentType::OperationType> operationsList = sdlDocumentType.GetOperationsList().keys();
+	int listRequestCount = sdlDocumentType.GetOperationsList().values(imtsdl::CSdlDocumentType::OT_LIST).size();
 	for (const imtsdl::CSdlDocumentType& subtype : sdlDocumentType.GetSubtypes()){
 		operationsList << subtype.GetOperationsList().keys();
+		listRequestCount += subtype.GetOperationsList().values(imtsdl::CSdlDocumentType::OT_LIST).size();
 	}
 
 	// base class methods override definition
@@ -175,7 +177,16 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(cons
 
 	if (operationsList.contains(imtsdl::CSdlDocumentType::OT_LIST)){
 		FeedStreamHorizontally(ifStream, 1);
-		ifStream << QStringLiteral("virtual bool SetupGqlItem(const ::imtgql::CGqlRequest& gqlRequest, ::imtbase::CTreeItemModel& dataModel, int itemIndex,const ::imtbase::IObjectCollectionIterator* objectCollectionIterator, QString& errorMessage) const override;");
+		if (listRequestCount == 1){
+			ifStream << QStringLiteral("virtual ::imtservergql::CObjectCollectionControllerCompBase::GqlItemSetupContext CreateGqlItemSetupContext(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;");
+			FeedStream(ifStream, 1, false);
+
+			FeedStreamHorizontally(ifStream, 1);
+			ifStream << QStringLiteral("virtual bool SetupGqlItemWithContext(const ::imtgql::CGqlRequest& gqlRequest, const ::imtservergql::CObjectCollectionControllerCompBase::GqlItemSetupContext& setupContext, ::imtbase::CTreeItemModel& dataModel, int itemIndex,const ::imtbase::IObjectCollectionIterator* objectCollectionIterator, QString& errorMessage) const override;");
+		}
+		else{
+			ifStream << QStringLiteral("virtual bool SetupGqlItem(const ::imtgql::CGqlRequest& gqlRequest, ::imtbase::CTreeItemModel& dataModel, int itemIndex,const ::imtbase::IObjectCollectionIterator* objectCollectionIterator, QString& errorMessage) const override;");
+		}
 		FeedStream(ifStream, 1, false);
 		operationsList.removeAll(imtsdl::CSdlDocumentType::OT_LIST);
 	}
@@ -988,6 +999,119 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 	const bool skipCommandDispatch = operationType == imtsdl::CSdlDocumentType::OT_LIST
 		&& requestList.size() == 1;
 
+	if (skipCommandDispatch){
+		const ImplGenerationInfo& sdlRequest = requestList.constFirst();
+		const QString requestClassName = sdlRequest.request.GetName() + QStringLiteral("GqlRequest");
+
+		FeedStreamHorizontally(stream, hIndents);
+		stream << QStringLiteral("::imtservergql::CObjectCollectionControllerCompBase::GqlItemSetupContext ");
+		stream << className << QStringLiteral("::CreateGqlItemSetupContext(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents);
+		stream << '{';
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("const QByteArray commandId = gqlRequest.GetCommandId();");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("auto setupContext = std::make_shared<C") << requestClassName << QStringLiteral(">(gqlRequest, false);");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("if (!setupContext->IsValid()){");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents + 2);
+		stream << QStringLiteral("errorMessage = QString(\"Bad request. Unexpected request for command-ID: '%1'\").arg(qPrintable(commandId));");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents + 2);
+		stream << QStringLiteral("SendErrorMessage(0, errorMessage);");
+		FeedStream(stream, 2, false);
+
+		FeedStreamHorizontally(stream, hIndents + 2);
+		stream << QStringLiteral("return {};");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << '}';
+		FeedStream(stream, 2, false);
+
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("return setupContext;");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents);
+		stream << '}';
+		FeedStream(stream, 3, false);
+
+		FeedStreamHorizontally(stream, hIndents);
+		stream << QStringLiteral("bool ");
+		stream << className;
+		stream << QStringLiteral("::SetupGqlItemWithContext(const ::imtgql::CGqlRequest& gqlRequest, const ::imtservergql::CObjectCollectionControllerCompBase::GqlItemSetupContext& setupContext, ::imtbase::CTreeItemModel& dataModel, int itemIndex,const ::imtbase::IObjectCollectionIterator* objectCollectionIterator, QString& errorMessage) const");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents);
+		stream << '{';
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("Q_UNUSED(gqlRequest);");
+		FeedStream(stream, 2, false);
+
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("if (objectCollectionIterator == nullptr){");
+		FeedStream(stream, 1, false);
+
+		AddErrorReport(stream, QStringLiteral("Unable to create object iterator."), hIndents);
+
+		FeedStreamHorizontally(stream, hIndents + 2);
+		stream << QStringLiteral("return false;");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("}");
+		FeedStream(stream, 2, false);
+
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("const auto typedSetupContext = std::static_pointer_cast<const C") << requestClassName << QStringLiteral(">(setupContext);");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("if (!typedSetupContext){");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents + 2);
+		stream << QStringLiteral("errorMessage = QString(\"Internal error. Invalid request setup context for command-ID: '%1'\").arg(qPrintable(C") << requestClassName << QStringLiteral("::GetCommandId()));");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents + 2);
+		stream << QStringLiteral("SendErrorMessage(0, errorMessage);");
+		FeedStream(stream, 2, false);
+
+		FeedStreamHorizontally(stream, hIndents + 2);
+		stream << QStringLiteral("return false;");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("}");
+		FeedStream(stream, 2, false);
+
+		const bool isCorrect = AddImplCodeForRequest(stream, sdlRequest, operationType, sdlDocumentType, true, QStringLiteral("*typedSetupContext"), hIndents + 1);
+		if (!isCorrect){
+			return false;
+		}
+
+		FeedStreamHorizontally(stream, hIndents);
+		stream << '}';
+		FeedStream(stream, 3, false);
+
+		return true;
+	}
+
 	// declare method
 
 	// a) type
@@ -1088,7 +1212,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 	// create sections for expected command IDs
 	for (const ImplGenerationInfo& sdlRequest: requestList){
 		/// \todo do this for all versions
-		bool isCorrect = AddImplCodeForRequest(stream, sdlRequest, operationType, sdlDocumentType, skipCommandDispatch, hIndents + 1);
+		bool isCorrect = AddImplCodeForRequest(stream, sdlRequest, operationType, sdlDocumentType, skipCommandDispatch, QString(), hIndents + 1);
 		if (!isCorrect){
 			return false;
 		}
@@ -1270,6 +1394,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 			imtsdl::CSdlDocumentType::OperationType operationType,
 			const imtsdl::CSdlDocumentType& sdlDocumentType,
 			bool skipCommandDispatch,
+			const QString& requestObjectExpression,
 			uint hIndents) const
 {
 	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(
@@ -1321,6 +1446,11 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 	FeedStream(stream, 1, false);
 
 	const QString requestClassName = sdlRequestInfo.request.GetName() + QStringLiteral("GqlRequest");
+	const bool usePrecreatedRequestObject = !requestObjectExpression.isEmpty();
+	const QString gqlRequestObjectExpression =
+		!usePrecreatedRequestObject
+		? GetDecapitalizedValue(sdlRequestInfo.request.GetName()) + QStringLiteral("GqlRequest")
+		: requestObjectExpression;
 	const uint bodyIndent = hIndents + (skipCommandDispatch ? 0U : 1U);
 	const uint errorIndent = bodyIndent + 1U;
 
@@ -1334,19 +1464,21 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 		FeedStream(stream, 1, false);
 	}
 
-	// [1] create SDL request variable
-	FeedStreamHorizontally(stream, bodyIndent);
-	stream << 'C' <<  requestClassName;
-	stream << ' ' << GetDecapitalizedValue(requestClassName);
-	stream << QStringLiteral("(gqlRequest, ");
-	if (operationType == imtsdl::CSdlDocumentType::OT_UPDATE){
-		stream << QStringLiteral("true");
+	if (!usePrecreatedRequestObject){
+		// [1] create SDL request variable
+		FeedStreamHorizontally(stream, bodyIndent);
+		stream << 'C' <<  requestClassName;
+		stream << ' ' << GetDecapitalizedValue(requestClassName);
+		stream << QStringLiteral("(gqlRequest, ");
+		if (operationType == imtsdl::CSdlDocumentType::OT_UPDATE){
+			stream << QStringLiteral("true");
+		}
+		else {
+			stream << QStringLiteral("false");
+		}
+		stream << QStringLiteral(");");
+		FeedStream(stream, 1, false);
 	}
-	else {
-		stream << QStringLiteral("false");
-	}
-	stream << QStringLiteral(");");
-	FeedStream(stream, 1, false);
 
 	// GET
 	if (	operationType == imtsdl::CSdlDocumentType::OT_GET ||
@@ -1373,8 +1505,8 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 		else {
 			stream << QStringLiteral("*objectCollectionIterator, ");
 		}
-		stream << GetDecapitalizedValue(sdlRequestInfo.request.GetName());
-		stream << QStringLiteral("GqlRequest, representationObject, errorMessage);");
+		stream << gqlRequestObjectExpression;
+		stream << QStringLiteral(", representationObject, errorMessage);");
 		FeedStream(stream, 1, false);
 
 		// [1->2] checks validate

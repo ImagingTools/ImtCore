@@ -97,7 +97,7 @@ private:
 	void AddOperationMapPairs(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType) const;
 	bool AddCollectionMethodsImplForDocument(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType) const;
 	bool AddImplCodeForRequests(QTextStream& stream, imtsdl::CSdlDocumentType::OperationType operationType, const QList<ImplGenerationInfo>& requestList, const QString& className, const imtsdl::CSdlDocumentType& sdlDocumentType, uint hIndents = 0) const;
-	bool AddImplCodeForRequest(QTextStream& stream, const ImplGenerationInfo& sdlRequest, imtsdl::CSdlDocumentType::OperationType operationType, const imtsdl::CSdlDocumentType& sdlDocumentType, bool skipCommandDispatch = false, uint hIndents = 0) const;
+	bool AddImplCodeForRequest(QTextStream& stream, const ImplGenerationInfo& sdlRequest, imtsdl::CSdlDocumentType::OperationType operationType, const imtsdl::CSdlDocumentType& sdlDocumentType, bool skipCommandDispatch = false, const QString& requestObjectExpression = QString(), uint hIndents = 0) const;
 	void AddSpecialMethodImplCodeForDocument(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType) const;
 	void AddSpecialMethodImplCode(QTextStream& stream, imtsdl::CSdlDocumentType::OperationType operationType, const QList<ImplGenerationInfo>& requestList, const QString& className, uint hIndents = 1) const;
 	QString GetInputExtractionStringForTypeName(const imtsdl::CSdlRequest& sdlRequest, const QString& typeName, const QString& version = QString(), bool* okPtr = nullptr) const;

@@ -2127,10 +2127,15 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 	itemsModelPtr->SetIsArray(true);
 	itemsModelPtr->SetUpdateEnabled(false);
 
+	const GqlItemSetupContext setupContext = CreateGqlItemSetupContext(gqlRequest, errorMessage);
+	if (!errorMessage.isEmpty()){
+		return nullptr;
+	}
+
 	while (objectCollectionIterator->Next()){
 		int itemIndex = itemsModelPtr->InsertNewItem();
 		if (itemIndex >= 0){
-			if (!SetupGqlItem(gqlRequest, *itemsModelPtr, itemIndex, objectCollectionIterator.GetPtr(), errorMessage)){
+			if (!SetupGqlItemWithContext(gqlRequest, setupContext, *itemsModelPtr, itemIndex, objectCollectionIterator.GetPtr(), errorMessage)){
 				SendWarningMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 			}
 		}
@@ -2605,6 +2610,26 @@ imtbase::ICollectionInfo::Ids CObjectCollectionControllerCompBase::ExtractObject
 	}
 
 	return retVal;
+}
+
+
+CObjectCollectionControllerCompBase::GqlItemSetupContext CObjectCollectionControllerCompBase::CreateGqlItemSetupContext(
+			const imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
+{
+	return {};
+}
+
+
+bool CObjectCollectionControllerCompBase::SetupGqlItemWithContext(
+			const imtgql::CGqlRequest& gqlRequest,
+			const GqlItemSetupContext& /*setupContext*/,
+			imtbase::CTreeItemModel& model,
+			int itemIndex,
+			const imtbase::IObjectCollectionIterator* objectCollectionIterator,
+			QString& errorMessage) const
+{
+	return SetupGqlItem(gqlRequest, model, itemIndex, objectCollectionIterator, errorMessage);
 }
 
 
@@ -3251,5 +3276,4 @@ bool CObjectCollectionControllerCompBase::CreateUserActionLog(
 
 
 } // namespace imtservergql
-
 
