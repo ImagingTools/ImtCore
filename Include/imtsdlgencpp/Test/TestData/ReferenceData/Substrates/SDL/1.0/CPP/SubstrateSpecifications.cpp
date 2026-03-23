@@ -9034,34 +9034,24 @@ I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create object iterator.
 		return false;
 	}
 
-	const QByteArray commandId = gqlRequest.GetCommandId();
-
 	//GetSubstrateSpecificationList
-	if (commandId == CGetSubstrateSpecificationListGqlRequest::GetCommandId()){
-		CGetSubstrateSpecificationListGqlRequest getSubstrateSpecificationListGqlRequest(gqlRequest, false);
-		CSubstrateSpecificationListItem::V1_0 representationObject;
-		const bool isRepresentationCreated = CreateRepresentationFromObject(*objectCollectionIterator, getSubstrateSpecificationListGqlRequest, representationObject, errorMessage);
-		if (!isRepresentationCreated){
+	CGetSubstrateSpecificationListGqlRequest getSubstrateSpecificationListGqlRequest(gqlRequest, false);
+	CSubstrateSpecificationListItem::V1_0 representationObject;
+	const bool isRepresentationCreated = CreateRepresentationFromObject(*objectCollectionIterator, getSubstrateSpecificationListGqlRequest, representationObject, errorMessage);
+	if (!isRepresentationCreated){
 	I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create representation").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
-			return false;
-		}
-
-		const bool isRepresentationWritten = representationObject.WriteToModel(dataModel, itemIndex);
-		if (!isRepresentationWritten){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to Write TreeModel").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-
-		return true;
+		return false;
 	}
 
-	errorMessage = QString("Bad request. Unexpected command-ID: '%1'").arg(qPrintable(commandId));
+	const bool isRepresentationWritten = representationObject.WriteToModel(dataModel, itemIndex);
+	if (!isRepresentationWritten){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to Write TreeModel").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
-	SendErrorMessage(0, errorMessage);
+		return false;
+	}
 
-	return false;
+	return true;
 }
 
 
