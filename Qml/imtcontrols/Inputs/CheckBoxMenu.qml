@@ -62,6 +62,9 @@ FocusScope{
     signal menuCreated();
     signal changedSignal();
 
+	signal setAllSelected()
+	signal setAllNotSelected()
+
     Component.onCompleted: {
 
     }
@@ -102,6 +105,12 @@ FocusScope{
     function setText(model_, role_){
         let currText = "";
         let count = 0;
+		if(role_ == undefined){
+			role_ = "checkState"
+		}
+		if(model_ == undefined){
+			model_ = dataModel
+		}
         let itemsCount = model_.getItemsCount();
         if(!itemsCount){
             return;
@@ -129,7 +138,7 @@ FocusScope{
             id: popupMenuContainer;
 
 			width: checkBoxMenu.width;
-            height: checkBoxMenu.menuHeight;
+			height: Math.min(checkBoxMenu.menuHeight, listView.y + listView.contentHeight + Style.marginM);
 
             property Item root: null;
             property Item rootItem: null;
@@ -137,7 +146,8 @@ FocusScope{
             property TreeItemModel dataModel: TreeItemModel{};
             signal setCheckedSignal();
 
-            onDataModelChanged: {
+
+			onDataModelChanged: {
                 if(dataModel.getItemsCount()){
                     popupMenuContainer.setAllChecked();
                     popupMenuContainer.setCheckedSignal();
@@ -437,7 +447,7 @@ FocusScope{
             anchors.right: cbArrowIcon.left;
 			anchors.rightMargin: Style.marginM;
 
-            color: checkBoxMenu.fontColorTitle;
+			color: checkBoxMenu.currentText !== "" ? checkBoxMenu.fontColorTitle : Style.placeHolderTextColor;
             font.family: Style.fontFamily;
             font.pixelSize: checkBoxMenu.textSize;
 
