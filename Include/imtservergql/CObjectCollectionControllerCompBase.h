@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
+#include <memory>
+
 
 // ACF includes
 #include <iprm/CParamsSet.h>
@@ -219,6 +221,16 @@ protected:
 	virtual QVariant GetInputArgumentFromRequest(const imtgql::CGqlRequest& gqlRequest, const QString& argumentKey) const;
 	virtual imtbase::ICollectionInfo::Ids ExtractObjectIdsForRemoval(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 
+	using GqlItemSetupContext = std::shared_ptr<const void>;
+	virtual GqlItemSetupContext CreateGqlItemSetupContext(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual bool SetupGqlItemWithContext(
+			const imtgql::CGqlRequest& gqlRequest,
+			const GqlItemSetupContext& setupContext,
+			imtbase::CTreeItemModel& model,
+			int itemIndex,
+			const imtbase::IObjectCollectionIterator* objectCollectionIterator,
+			QString& errorMessage) const;
+
 	/**
 		Setup a GraphQL item at the given position in the model based on the information about an element in the object collection.
 	*/
@@ -368,5 +380,4 @@ protected:
 
 
 } // namespace imtservergql
-
 

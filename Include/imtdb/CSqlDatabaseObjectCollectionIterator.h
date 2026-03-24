@@ -39,11 +39,28 @@ public:
 	virtual QVariant GetElementInfo(int infoType) const override;
 	virtual QVariant GetElementInfo(QByteArray infoId) const override;
 private:
-	QList<QSqlRecord> m_records;
+	/**
+		Cached data extracted once per record in Next()/Previous()
+		to avoid repeated delegate calls and QSqlRecord field lookups.
+	*/
+	struct CachedRecordData
+	{
+		QByteArray objectId;
+		QByteArray objectTypeId;
+		idoc::MetaInfoPtr objectMetaInfo;
+		idoc::MetaInfoPtr collectionMetaInfo;
+		bool metaInfoResolved = false;
+	};
+
+	void ResolveCurrentCache() const;
+	void ResolveMetaInfoCache() const;
+
+	QVector<QSqlRecord> m_records;
 	ISqlDatabaseObjectDelegate* m_databaseDelegate;
 
 	int m_elementsCount;
 	mutable int m_currentIndex;
+	mutable CachedRecordData m_cache;
 };
 
 
