@@ -188,7 +188,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 			dataModelPtr->SetExternTreeModel(gqlCommand,
 											 sourceData ?
 												 sourceData :
-												 sourceItemModelPtr.GetPtr());
+												 sourceItemModelPtr.PopPtr());
 
 			iser::CJsonMemWriteArchive archive(nullptr, false);
 			if (rootModel.SerializeModel(archive)) {
