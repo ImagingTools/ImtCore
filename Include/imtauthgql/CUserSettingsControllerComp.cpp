@@ -56,12 +56,11 @@ imtbase::CTreeItemModel* CUserSettingsControllerComp::CreateRepresentationFromRe
 	languageIdParamPtr->SetId(languageId);
 	paramsPtr->SetEditableParameter("LanguageParam", languageIdParamPtr, true);
 
-	imtauth::IUserSettingsUniquePtr userSettingsPtr;
+	imtauth::IUserSettingsSharedPtr userSettingsPtr;
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!userId.isEmpty()){
 		if (m_userSettingsCollectionCompPtr->GetObjectData(userId, dataPtr)){
-			istd::IChangeableUniquePtr uniqueDataPtr = dataPtr.GetPtr();
-			userSettingsPtr.MoveCastedPtr<istd::IChangeable>(uniqueDataPtr);
+			userSettingsPtr = dataPtr.dynamicCast<imtauth::IUserSettings>();
 		}
 	}
 
@@ -137,11 +136,10 @@ bool CUserSettingsControllerComp::UpdateModelFromRepresentation(
 		return false;
 	}
 
-	imtauth::IUserSettingsUniquePtr userSettingsPtr;
+	imtauth::IUserSettingsSharedPtr userSettingsPtr;
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_userSettingsCollectionCompPtr->GetObjectData(userId, dataPtr)){
-		istd::IChangeableUniquePtr uniqueDataPtr = dataPtr.GetPtr();
-		userSettingsPtr.MoveCastedPtr<istd::IChangeable>(uniqueDataPtr);
+		userSettingsPtr = dataPtr.dynamicCast<imtauth::IUserSettings>();
 	}
 
 	if (!userSettingsPtr.IsValid()){

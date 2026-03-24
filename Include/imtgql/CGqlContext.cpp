@@ -119,7 +119,7 @@ void CGqlContext::SetUserInfo(const imtauth::IUserInfo* userInfoPtr)
 		if (userInfoPtr != nullptr){
 			istd::IChangeableUniquePtr clonedUserPtr = userInfoPtr->CloneMe();
 			if (clonedUserPtr.IsValid()){
-				m_userInfoPtr.MoveCastedPtr(clonedUserPtr);
+				m_userInfoPtr.MoveCastedPtr(std::move(clonedUserPtr));
 			}
 			else {
 				Q_ASSERT(false);

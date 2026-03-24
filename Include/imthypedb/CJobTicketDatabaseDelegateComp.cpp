@@ -123,10 +123,7 @@ istd::IChangeableUniquePtr CJobTicketDatabaseDelegateComp::CreateObjectFromRecor
 		}
 	}
 
-	istd::IChangeableUniquePtr retVal;
-	retVal.MoveCastedPtr(jobTicketPtr);
-
-	return retVal;
+	return jobTicketPtr;
 }
 
 
