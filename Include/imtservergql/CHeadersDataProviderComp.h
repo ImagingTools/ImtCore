@@ -29,7 +29,7 @@ public:
 protected:
 	// reimplemented (imtservergql::CGqlRepresentationControllerCompBase)
 	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
-	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual QJsonObject CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 private:
 	bool CheckHeaderPermission(const QByteArray& headerId, const imtgql::IGqlContext& gqlContext) const;

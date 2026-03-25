@@ -3,9 +3,11 @@
 
 // Qt includes
 #include <QtCore/QScopeGuard>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonArray>
 
 // ACF includes
-#include <iser/CJsonMemWriteArchive.h>
 #include <iprm/TParamsPtr.h>
 #include <iprm/ISelectionParam.h>
 #include <iprm/IOptionsList.h>
@@ -155,22 +157,21 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 
 		QString errorMessage;
 		QString errorType = QStringLiteral("Warning");
-		istd::TDelPtr<imtbase::CTreeItemModel> sourceItemModelPtr(requestHandlerPtr->CreateResponse(m_lastRequest, errorMessage));
+		QJsonObject sourceItemObj = requestHandlerPtr->CreateResponse(m_lastRequest, errorMessage);
 
-		imtbase::CTreeItemModel rootModel;
-		bool isError = !sourceItemModelPtr.IsValid();
+		bool isError = sourceItemObj.isEmpty();
 
 		// Detect if result model itself contains an "errors" child
 		if (!isError) {
-			imtbase::CTreeItemModel* errorsModelPtr = sourceItemModelPtr->GetTreeItemModel(QByteArrayLiteral("errors"));
-			if (errorsModelPtr != nullptr) {
+			if (sourceItemObj.contains(QStringLiteral("errors"))) {
 				isError = true;
-				if (errorsModelPtr->ContainsKey(QByteArrayLiteral("message"))) {
-					errorMessage = errorsModelPtr->GetData(QByteArrayLiteral("message")).toString();
+				QJsonObject errorsObj = sourceItemObj.value(QStringLiteral("errors")).toObject();
+				if (errorsObj.contains(QStringLiteral("message"))) {
+					errorMessage = errorsObj.value(QStringLiteral("message")).toString();
 				}
 
-				if (errorsModelPtr->ContainsKey(QByteArrayLiteral("type"))) {
-					errorType = errorsModelPtr->GetData(QByteArrayLiteral("type")).toString();
+				if (errorsObj.contains(QStringLiteral("type"))) {
+					errorType = errorsObj.value(QStringLiteral("type")).toString();
 				}
 			}
 		}
@@ -180,21 +181,19 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 			isSuccessful = !responseData.isEmpty();
 		}
 		else {
-			// Success path remains manual for the "data" mapping
-			imtbase::CTreeItemModel rootModel;
-			auto* dataModelPtr = rootModel.AddTreeModel(QByteArrayLiteral("data"));
-			auto* sourceData = sourceItemModelPtr->GetTreeItemModel(QByteArrayLiteral("data"));
+			// Success path: wrap source data under "data" → commandId
+			QJsonObject rootObj;
+			QJsonObject dataWrapperObj;
+			QJsonValue sourceData = sourceItemObj.contains(QStringLiteral("data"))
+				? sourceItemObj.value(QStringLiteral("data"))
+				: QJsonValue(sourceItemObj);
 
-			dataModelPtr->SetExternTreeModel(gqlCommand,
-											 sourceData ?
-												 sourceData :
-												 sourceItemModelPtr.PopPtr());
+			dataWrapperObj.insert(QString::fromUtf8(gqlCommand), sourceData);
+			rootObj.insert(QStringLiteral("data"), dataWrapperObj);
 
-			iser::CJsonMemWriteArchive archive(nullptr, false);
-			if (rootModel.SerializeModel(archive)) {
-				responseData = archive.GetData();
-				isSuccessful = true;
-			}
+			QJsonDocument doc(rootObj);
+			responseData = doc.toJson(QJsonDocument::Compact);
+			isSuccessful = true;
 		}
 
 		break;
@@ -267,40 +266,32 @@ QByteArray CHttpGraphQLServletComp::BuildGqlErrorJson(
 	const QString& message,
 	const QString& type) const
 {
-	imtbase::CTreeItemModel rootModel;
+	QJsonObject rootObj;
 
 	// { "data": null }
-	rootModel.SetData(QByteArrayLiteral("data"), QVariant());
+	rootObj.insert(QStringLiteral("data"), QJsonValue::Null);
 
-	imtbase::CTreeItemModel* errorsArr = rootModel.AddTreeModel(QByteArrayLiteral("errors"));
-	if (errorsArr) {
-		errorsArr->SetIsArray(true);
+	QJsonArray errorsArr;
+	QJsonObject errorObj;
+	errorObj.insert(QStringLiteral("message"), message);
 
-		// Add a single error object to the errors array
-		int errIdx = errorsArr->InsertNewItem();
-		errorsArr->SetData(QByteArrayLiteral("message"), message, errIdx);
-
-		// path: [ "CommandName" ]
-		if (!gqlCommand.isEmpty()) {
-			imtbase::CTreeItemModel* pathArr = errorsArr->AddTreeModel(QByteArrayLiteral("path"), errIdx);
-			pathArr->SetIsArray(true);
-			pathArr->SetData(QByteArray(), QString::fromUtf8(gqlCommand), pathArr->InsertNewItem());
-		}
-
-		// extensions: { "type": "Warning/Error" }
-		imtbase::CTreeItemModel* ext = errorsArr->AddTreeModel(QByteArrayLiteral("extensions"), errIdx);
-		if (ext) {
-			ext->SetData(QByteArrayLiteral("type"), type, 0);
-		}
+	// path: [ "CommandName" ]
+	if (!gqlCommand.isEmpty()) {
+		QJsonArray pathArr;
+		pathArr.append(QString::fromUtf8(gqlCommand));
+		errorObj.insert(QStringLiteral("path"), pathArr);
 	}
 
-	iser::CJsonMemWriteArchive archive(nullptr, false);
-	if (!rootModel.SerializeModel(archive)) {
-		// Serialization failure
-		return QByteArray();
-	}
+	// extensions: { "type": "Warning/Error" }
+	QJsonObject extObj;
+	extObj.insert(QStringLiteral("type"), type);
+	errorObj.insert(QStringLiteral("extensions"), extObj);
 
-	return archive.GetData();
+	errorsArr.append(errorObj);
+	rootObj.insert(QStringLiteral("errors"), errorsArr);
+
+	QJsonDocument doc(rootObj);
+	return doc.toJson(QJsonDocument::Compact);
 }
 
 
