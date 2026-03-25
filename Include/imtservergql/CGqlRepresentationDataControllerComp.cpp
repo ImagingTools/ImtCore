@@ -3,7 +3,6 @@
 
 
 // Qt includes
-#include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 
 // ACF include
@@ -11,10 +10,6 @@
 #include <iprm/CParamsSet.h>
 #include <iprm/CIdParam.h>
 #include <imod/TModelWrap.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-
 
 namespace imtservergql
 {
@@ -34,18 +29,14 @@ QJsonObject CGqlRepresentationDataControllerComp::CreateRepresentationFromReques
 		return QJsonObject();
 	}
 
-	imtbase::CTreeItemModel representationModel;
+	QJsonObject representationModel;
 
 	iprm::IParamsSetUniquePtr representationParamsPtr = CreateContextParams(gqlRequest);
 
 	bool result = m_representationControllerCompPtr->GetRepresentationFromDataModel(*m_dataModelCompPtr, representationModel, representationParamsPtr.GetPtr());
 	if (result){
 		QJsonObject rootObj;
-		QString jsonStr = representationModel.ToJson();
-		QJsonDocument doc = QJsonDocument::fromJson(jsonStr.toUtf8());
-		if (!doc.isNull() && doc.isObject()){
-			rootObj.insert(QStringLiteral("data"), doc.object());
-		}
+		rootObj.insert(QStringLiteral("data"), representationModel);
 		return rootObj;
 	}
 
@@ -67,11 +58,7 @@ bool CGqlRepresentationDataControllerComp::UpdateModelFromRepresentation(
 		return false;
 	}
 
-	imtbase::CTreeItemModel representationModel;
-	QJsonDocument doc(representation);
-	representationModel.CreateFromJson(doc.toJson(QJsonDocument::Compact));
-
-	bool retVal = m_representationControllerCompPtr->GetDataModelFromRepresentation(representationModel, *m_dataModelCompPtr);
+	bool retVal = m_representationControllerCompPtr->GetDataModelFromRepresentation(representation, *m_dataModelCompPtr);
 	if (!retVal){
 		SendErrorMessage(0, QString("Unable to get data model from representation. Command: %1.").arg(qPrintable(request.GetCommandId())));
 	}
@@ -159,5 +146,4 @@ iprm::IParamsSetUniquePtr CGqlRepresentationDataControllerComp::CreateContextPar
 
 
 } // namespace imtservergql
-
 

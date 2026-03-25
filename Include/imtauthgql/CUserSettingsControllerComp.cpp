@@ -90,10 +90,8 @@ QJsonObject CUserSettingsControllerComp::CreateRepresentationFromRequest(
 		return QJsonObject();
 	}
 
-	imtbase::CTreeItemModel treeModel;
-	imtbase::CTreeItemModel* dataModelPtr = treeModel.AddTreeModel("data");
-
-	bool result = m_userSettingsRepresentationControllerCompPtr->GetRepresentationFromDataModel(*paramSetPtr, *dataModelPtr, paramsPtr.GetPtr());
+	QJsonObject dataModel;
+	bool result = m_userSettingsRepresentationControllerCompPtr->GetRepresentationFromDataModel(*paramSetPtr, dataModel, paramsPtr.GetPtr());
 	if (!result){
 		errorMessage = QString("Unable to create representation for user settings.");
 		SendErrorMessage(0, errorMessage, "CUserSettingsControllerComp");
@@ -101,10 +99,9 @@ QJsonObject CUserSettingsControllerComp::CreateRepresentationFromRequest(
 		return QJsonObject();
 	}
 
-	QString jsonString = treeModel.ToJson();
-	QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonString.toUtf8());
-
-	return jsonDoc.object();
+	QJsonObject rootObj;
+	rootObj.insert(QStringLiteral("data"), dataModel);
+	return rootObj;
 }
 
 
@@ -163,11 +160,7 @@ bool CUserSettingsControllerComp::UpdateModelFromRepresentation(
 		return false;
 	}
 
-	imtbase::CTreeItemModel treeModel;
-	QJsonDocument jsonDoc(representation);
-	treeModel.CreateFromJson(jsonDoc.toJson());
-
-	bool retVal = m_userSettingsRepresentationControllerCompPtr->GetDataModelFromRepresentation(treeModel, *paramSetPtr);
+	bool retVal = m_userSettingsRepresentationControllerCompPtr->GetDataModelFromRepresentation(representation, *paramSetPtr);
 	if (retVal){
 		imtbase::ICollectionInfo::Ids collectionIds = m_userSettingsCollectionCompPtr->GetElementIds();
 		if (collectionIds.contains(userId)){
@@ -183,5 +176,4 @@ bool CUserSettingsControllerComp::UpdateModelFromRepresentation(
 
 
 } // namespace imtauthgql
-
 

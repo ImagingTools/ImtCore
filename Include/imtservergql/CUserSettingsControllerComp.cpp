@@ -90,8 +90,7 @@ QJsonObject CUserSettingsControllerComp::CreateRepresentationFromRequest(
 		return QJsonObject();
 	}
 
-	imtbase::CTreeItemModel dataModel;
-
+	QJsonObject dataModel;
 	bool result = m_userSettingsRepresentationControllerCompPtr->GetRepresentationFromDataModel(*paramSetPtr, dataModel, paramsPtr.GetPtr());
 	if (!result){
 		errorMessage = QString("Unable to create representation for user settings.");
@@ -101,8 +100,7 @@ QJsonObject CUserSettingsControllerComp::CreateRepresentationFromRequest(
 	}
 
 	QJsonObject rootObj;
-	QJsonDocument doc = QJsonDocument::fromJson(dataModel.ToJson().toUtf8());
-	rootObj.insert(QStringLiteral("data"), doc.object());
+	rootObj.insert(QStringLiteral("data"), dataModel);
 
 	return rootObj;
 }
@@ -163,12 +161,7 @@ bool CUserSettingsControllerComp::UpdateModelFromRepresentation(
 		return false;
 	}
 
-	// Convert QJsonObject to CTreeItemModel for the representation controller
-	QJsonDocument doc(representation);
-	imtbase::CTreeItemModel representationModel;
-	representationModel.CreateFromJson(doc.toJson(QJsonDocument::Compact));
-
-	bool retVal = m_userSettingsRepresentationControllerCompPtr->GetDataModelFromRepresentation(representationModel, *paramSetPtr);
+	bool retVal = m_userSettingsRepresentationControllerCompPtr->GetDataModelFromRepresentation(representation, *paramSetPtr);
 	if (retVal){
 		imtbase::ICollectionInfo::Ids collectionIds = m_userSettingsCollectionCompPtr->GetElementIds();
 		if (collectionIds.contains(userId)){
@@ -184,5 +177,4 @@ bool CUserSettingsControllerComp::UpdateModelFromRepresentation(
 
 
 } // namespace imtservergql
-
 

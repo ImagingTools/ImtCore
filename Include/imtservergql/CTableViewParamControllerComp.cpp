@@ -111,23 +111,30 @@ QJsonObject CTableViewParamControllerComp::CreateInternalResponse(
 			return QJsonObject();
 		}
 
-		imtbase::CTreeItemModel dataModel;
+		QJsonObject dataModel;
 		if (!m_tableViewParamRepresentationControllerCompPtr->GetRepresentationFromDataModel(*tableViewParamPtr, dataModel)){
 			return QJsonObject();
 		}
 
-		QJsonDocument doc = QJsonDocument::fromJson(dataModel.ToJson().toUtf8());
-		dataObj = doc.object();
+		dataObj = dataModel;
 	}
 	else if (gqlRequest.GetRequestType() == imtgql::IGqlRequest::RT_MUTATION){
 		QByteArray tableViewParamsJson = gqlInputParamPtr->GetParamArgumentValue("TableViewParams").toByteArray();
 
-		imtbase::CTreeItemModel tableViewParamRepresentation;
-		if (!tableViewParamRepresentation.CreateFromJson(tableViewParamsJson)){
-			errorMessage = QString("Unable to create response for GraphQL request with ID: '%1'. Invalid table view params json.").arg(qPrintable(commandId));
+		QJsonDocument doc = QJsonDocument::fromJson(tableViewParamsJson);
+		if (doc.isNull() || (!doc.isObject() && !doc.isArray())){
+			errorMessage = QString("Unable to process GraphQL request with ID: '%1'. Invalid table view params json.").arg(qPrintable(commandId));
 			SendErrorMessage(0, errorMessage, "imtservergql::CTableViewParamControllerComp");
 
 			return QJsonObject();
+		}
+		QJsonObject tableViewParamRepresentation;
+		if (doc.isObject()){
+			tableViewParamRepresentation = doc.object();
+		}
+		else{
+			// TableViewParams QML still sends the representation as a top-level array.
+			tableViewParamRepresentation.insert(QStringLiteral("items"), doc.array());
 		}
 
 		if (!paramSetPtr.IsValid()){
@@ -192,5 +199,3 @@ QJsonObject CTableViewParamControllerComp::CreateInternalResponse(
 
 
 } // namespace imtservergql
-
-
