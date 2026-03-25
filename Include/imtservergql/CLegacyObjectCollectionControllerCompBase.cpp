@@ -1116,18 +1116,18 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::ImportObject(const imtgql
 }
 
 
-imtbase::CTreeItemModel* CLegacyObjectCollectionControllerCompBase::ExportObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CLegacyObjectCollectionControllerCompBase::ExportObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CLegacyObjectCollectionControllerCompBase");
-		return nullptr;
+		return QJsonObject();
 	}
 
 	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
 		errorMessage = QT_TR_NOOP("Unable to import the object. GQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
-		return nullptr;
+		return QJsonObject();
 	}
 
 	QByteArray objectId = inputParamPtr->GetParamArgumentValue("id").toByteArray();
@@ -1143,21 +1143,21 @@ imtbase::CTreeItemModel* CLegacyObjectCollectionControllerCompBase::ExportObject
 		errorMessage = QString("Unable to export the object with ID: '%1'. Error: Object does not exists").arg(qPrintable(objectId));
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	int index = GetMimeTypeIndex(mimeType);
 	if (index < 0){
 		errorMessage = "Mime type is invalid at CLegacyObjectCollectionControllerCompBase";
-		return nullptr;
+		return QJsonObject();
 	}
 	if (index >= m_importExportObjectFactCompPtr.GetCount()){
 		errorMessage = "Import/Export object factory index out of range at CLegacyObjectCollectionControllerCompBase";
-		return nullptr;
+		return QJsonObject();
 	}
 	if (index >= m_filePersistenceCompPtr.GetCount()){
 		errorMessage = "File persistence index out of range at CLegacyObjectCollectionControllerCompBase";
-		return nullptr;
+		return QJsonObject();
 	}
 
 	imtbase::CMimeType mime;
@@ -1165,7 +1165,7 @@ imtbase::CTreeItemModel* CLegacyObjectCollectionControllerCompBase::ExportObject
 		errorMessage = QString("Unable to parse mime type");
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	QString extension = mime.GetSuffix();
@@ -1179,18 +1179,18 @@ imtbase::CTreeItemModel* CLegacyObjectCollectionControllerCompBase::ExportObject
 		errorMessage = QString("Unable to import object to the collection. Error: Object persistence instance is invalid");
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	if (!ConvertObject(*dataPtr.GetPtr(), *objectPersistenceInstancePtr.GetPtr())){
-		return nullptr;
+		return QJsonObject();
 	}
 
 	if (m_filePersistenceCompPtr[index]->SaveToFile(*objectPersistenceInstancePtr.GetPtr(), filePathTmp) != ifile::IFilePersistence::OS_OK){
 		errorMessage = QString("Unable to export the object with ID: '%1'. Error: Saving data to the file '%1' failed").arg(qPrintable(objectId)).arg(filePathTmp);
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	QFile file(filePathTmp);
@@ -1199,18 +1199,18 @@ imtbase::CTreeItemModel* CLegacyObjectCollectionControllerCompBase::ExportObject
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 		QFile::remove(filePathTmp);
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	QByteArray data = file.readAll();
 	file.close();
 	QFile::remove(filePathTmp);
 
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	rootModelPtr->SetData("fileData", data.toBase64());
-	rootModelPtr->SetData("fileName", fileName);
+	QJsonObject rootObj;
+	rootObj.insert(QStringLiteral("fileData"), QString::fromLatin1(data.toBase64()));
+	rootObj.insert(QStringLiteral("fileName"), fileName);
 
-	return rootModelPtr.PopPtr();
+	return rootObj;
 }
 
 
@@ -1246,8 +1246,7 @@ int CLegacyObjectCollectionControllerCompBase::GetMimeTypeIndex(const QString& m
 
 bool CLegacyObjectCollectionControllerCompBase::SetupGqlItem(
 		const imtgql::CGqlRequest& gqlRequest,
-		imtbase::CTreeItemModel& model,
-		int itemIndex,
+		QJsonObject& itemObj,
 		const QByteArray& collectionId,
 		QString& /*errorMessage*/) const
 {
@@ -1256,13 +1255,11 @@ bool CLegacyObjectCollectionControllerCompBase::SetupGqlItem(
 		return false;
 	}
 
-	bool retVal = true;
-
 	for (const QByteArray& informationId : informationIds){
 		QVariant elementInformation;
 
 		if(informationId == QByteArray("Id")){
-			elementInformation = QString(collectionId);
+			elementInformation = QString::fromLatin1(collectionId);
 		}
 		else if(informationId == QByteArray("Name")){
 			elementInformation = m_objectCollectionCompPtr->GetElementInfo(collectionId, imtbase::ICollectionInfo::EIT_NAME);
@@ -1292,17 +1289,16 @@ bool CLegacyObjectCollectionControllerCompBase::SetupGqlItem(
 			elementInformation = "";
 		}
 
-		retVal = retVal && model.SetData(informationId, elementInformation, itemIndex);
+		itemObj.insert(QString::fromUtf8(informationId.constData()), QJsonValue::fromVariant(elementInformation));
 	}
 
-	return retVal;
+	return true;
 }
 
 
 bool CLegacyObjectCollectionControllerCompBase::SetupGqlItem(
 		const imtgql::CGqlRequest& gqlRequest,
-		imtbase::CTreeItemModel& model,
-		int itemIndex,
+		QJsonObject& itemObj,
 		const imtbase::IObjectCollectionIterator* objectCollectionIterator,
 		QString&/*errorMessage*/) const
 {
@@ -1315,8 +1311,6 @@ bool CLegacyObjectCollectionControllerCompBase::SetupGqlItem(
 		return false;
 	}
 
-	bool retVal = true;
-
 	QByteArray collectionId = objectCollectionIterator->GetObjectId();
 
 	idoc::MetaInfoPtr elementMetaInfo = objectCollectionIterator->GetDataMetaInfo();
@@ -1325,7 +1319,7 @@ bool CLegacyObjectCollectionControllerCompBase::SetupGqlItem(
 		QVariant elementInformation;
 
 		if(informationId == QByteArray("Id")){
-			elementInformation = QString(collectionId);
+			elementInformation = QString::fromLatin1(collectionId);
 		}
 		else if(informationId == QByteArray("Name")){
 			elementInformation = objectCollectionIterator->GetElementInfo("Name");
@@ -1353,10 +1347,10 @@ bool CLegacyObjectCollectionControllerCompBase::SetupGqlItem(
 			elementInformation = "";
 		}
 
-		retVal = retVal && model.SetData(informationId, elementInformation, itemIndex);
+		itemObj.insert(QString::fromUtf8(informationId.constData()), QJsonValue::fromVariant(elementInformation));
 	}
 
-	return retVal;
+	return true;
 }
 
 
@@ -1403,7 +1397,7 @@ bool CLegacyObjectCollectionControllerCompBase::CreateRepresentationFromObject(
 			const istd::IChangeable& /*data*/,
 			const QByteArray& /*objectTypeId*/,
 			const imtgql::CGqlRequest& /*gqlRequest*/,
-			imtbase::CTreeItemModel& /*dataModel*/,
+			QJsonObject& /*dataObj*/,
 			QString& /*errorMessage*/) const
 {
 	return false;
@@ -1544,5 +1538,3 @@ istd::IChangeableUniquePtr CLegacyObjectCollectionControllerCompBase::CreateObje
 
 
 } // namespace imtservergql
-
-
