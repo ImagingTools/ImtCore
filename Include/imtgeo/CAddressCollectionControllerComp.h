@@ -2,6 +2,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QJsonObject>
+
 // ImtCore includes
 #include <imtservergql/CLegacyObjectCollectionControllerCompBase.h>
 
@@ -24,8 +27,8 @@ protected:
 
 	// reimplemented (imtservergql::CLegacyObjectCollectionControllerCompBase)
 	virtual QVariant GetObjectInformation(const QByteArray& informationId, const QByteArray& objectId) const override;
-	virtual imtbase::CTreeItemModel* GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-	virtual imtbase::CTreeItemModel* ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual QJsonObject GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual QJsonObject ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 };
 
 
