@@ -1680,7 +1680,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetObjectSelectionQuery(const QByte
 				WHERE %7 = 1
 				ORDER BY "%4", "%5" DESC
 			) AS root1 ON root1."%4" = root."%4"
-			WHERE (%3) AND root."%4" = '%6' ORDER BY %8 DESC;)")
+			WHERE (%3) AND root."%4" = '%6' ORDER BY %8 DESC)")
 			.arg(
 				/*1*/ schemaPrefix,
 				/*2*/ QString::fromUtf8(*m_tableNameAttrPtr),
