@@ -60,6 +60,12 @@ void CWebSocketThread::SetWebSocket(QWebSocket* webSocketPtr)
 }
 
 
+const QWebSocket* CWebSocketThread::GetWebSocket() const
+{
+	return m_socket;
+}
+
+
 void CWebSocketThread::SetSocketStatus(Status socketStatus)
 {
 	QMutexLocker lock(&m_statusMutex);
