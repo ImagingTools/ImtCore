@@ -58,44 +58,42 @@ public:
 	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
 
 	// reimplemented (imtservergql::CGqlRequestHandlerCompBase)
-	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual QJsonObject CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 protected:
 	virtual bool GetOperationFromRequest(const imtgql::CGqlRequest& gqlRequest, imtgql::CGqlParamObject& gqlObject, QString& errorMessage, int& operationType) const;
 	virtual QByteArray GetObjectIdFromInputParams(const QList<imtgql::CGqlParamObject>& inputParams) const;
-	virtual imtbase::CTreeItemModel* InsertNewNode(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* SetNodeName(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* SetNodeDescription(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* SetNodeMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* MoveNode(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* RemoveNode(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* InsertNewObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* MoveObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* RemoveObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* GetNodeCount(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* GetNodeIds(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* GetItemInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* GetObjectParentNodeIds(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* GetNodes(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* GetElements(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject InsertNewNode(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject SetNodeName(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject SetNodeDescription(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject SetNodeMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject MoveNode(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject RemoveNode(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject InsertNewObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject MoveObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject RemoveObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject GetNodeCount(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject GetNodeIds(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject GetItemInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject GetObjectParentNodeIds(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject GetNodes(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject GetElements(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 
 	/**
-		Setup a GraphQL item at the given position in the model based on the information about an node in the collection structure.
+		Setup a GraphQL item in the json object based on the information about a node in the collection structure.
 	*/
 	virtual bool SetupNodeItem(
 			const imtgql::CGqlRequest& gqlRequest,
-			imtbase::CTreeItemModel& model,
-			int itemIndex,
+			QJsonObject& itemObj,
 			const imtbase::IHierarchicalStructureIterator* collectionStructureIterator,
 			QString& errorMessage) const;
 
 	/**
-		Setup a GraphQL item at the given position in the model based on the information about an element in the object collection.
+		Setup a GraphQL item in the json object based on the information about an element in the object collection.
 	*/
 	virtual bool SetupObjectItem(
 			const imtgql::CGqlRequest& gqlRequest,
-			imtbase::CTreeItemModel& model,
-			int itemIndex,
+			QJsonObject& itemObj,
 			const imtbase::IObjectCollectionIterator* objectCollectionIterator,
 			QString& errorMessage) const;
 
