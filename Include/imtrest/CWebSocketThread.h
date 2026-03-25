@@ -51,6 +51,7 @@ public:
 
 	explicit CWebSocketThread(imtrest::CWebSocketServerComp *parent);
 	void SetWebSocket(QWebSocket* webSocketPtr);
+	const QWebSocket* GetWebSocket() const;
 	void SetSocketStatus(Status socketStatus);
 	Status GetSocketStatus();
 	QByteArray GetRequestId();
