@@ -8,7 +8,7 @@ namespace imtservergql
 
 // public methods
 
-imtbase::CTreeItemModel* CPermissibleGqlRequestHandlerComp::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CPermissibleGqlRequestHandlerComp::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if(CheckPermissions(gqlRequest, errorMessage)){
 		return CreateInternalResponse(gqlRequest, errorMessage);
@@ -26,7 +26,7 @@ imtbase::CTreeItemModel* CPermissibleGqlRequestHandlerComp::CreateResponse(const
 	errorMessage = QString("Invalid permissions for the user '%1'").arg(userName);
 	SendErrorMessage(0, errorMessage);
 
-	return nullptr;
+	return QJsonObject();
 }
 
 
@@ -70,11 +70,11 @@ bool CPermissibleGqlRequestHandlerComp::CheckPermissions(const imtgql::CGqlReque
 
 // reimplemented (imtservergql::CGqlRequestHandlerCompBase)
 
-imtbase::CTreeItemModel* CPermissibleGqlRequestHandlerComp::CreateInternalResponse(
+QJsonObject CPermissibleGqlRequestHandlerComp::CreateInternalResponse(
 			const imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
-	return nullptr;
+	return QJsonObject();
 }
 
 
