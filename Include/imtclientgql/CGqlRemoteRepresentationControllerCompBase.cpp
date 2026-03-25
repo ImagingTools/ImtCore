@@ -48,85 +48,89 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerCompBase::CreateTreeI
 			const imtgql::IGqlResponse& response) const
 {
 	istd::TDelPtr<imtbase::CTreeItemModel> retVal(new imtbase::CTreeItemModel());
-	QByteArray responseData = response.GetResponseData();
-	QJsonDocument document = QJsonDocument::fromJson(responseData);
-	if (document.isObject()){
-		QJsonObject dataObject = document.object();
 
-		imtgql::IGqlResponse::GqlRequestPtr requestPtr = response.GetOriginalRequest();
-		if (!requestPtr.IsValid()){
-			return nullptr;
-		}
+	const imtgql::IGqlResponse::GqlRequestPtr requestPtr = response.GetOriginalRequest();
+	if (!requestPtr.IsValid()){
+		return nullptr;
+	}
 
-		// --- Errors (new format: array) ---
-		if (dataObject.contains("errors")){
-			QJsonValue jsonValue = dataObject.value("errors");
-			if (jsonValue.isArray()){
-				QJsonArray errorArray = jsonValue.toArray();
+	const QByteArray responseData = response.GetResponseData();
+	const QJsonDocument document = QJsonDocument::fromJson(responseData);
+	if (!document.isObject()){
+		return retVal.PopPtr();
+	}
+
+	const QJsonObject rootObject = document.object();
+
+	QJsonObject resultObject;
+	bool hasResult = false;
+
+	// WebSocket / subscription payloads
+	const QJsonValue typeValue = rootObject.value(QStringLiteral("type"));
+	if (typeValue.isString() && typeValue.toString() == QStringLiteral("query_data")){
+		const QJsonValue payloadValue = rootObject.value(QStringLiteral("payload"));
+		if (payloadValue.isObject()){
+			const QJsonObject payloadObject = payloadValue.toObject();
+
+			const QJsonValue errorsValue = payloadObject.value(QStringLiteral("errors"));
+			if (errorsValue.isArray()){
+				const QJsonArray errorArray = errorsValue.toArray();
 				if (!errorArray.isEmpty()){
-					QJsonValue firstError = errorArray.first();
-					dataObject = QJsonObject();
-					dataObject.insert("errors", firstError);
-					document.setObject(dataObject);
-					QByteArray parserData = document.toJson(QJsonDocument::Compact);
-					retVal->CreateFromJson(parserData);
+					resultObject.insert(QStringLiteral("errors"), errorArray.at(0));
+					hasResult = true;
 				}
 			}
-		}
 
-		// --- Data ---
-		dataObject = document.object().value("data").toObject();
-		if (!dataObject.isEmpty()){
-			QJsonValue bodyValue = dataObject.value(requestPtr->GetCommandId());
-			if (!bodyValue.isNull()){
-				dataObject = QJsonObject();
-				dataObject.insert("data", bodyValue);
-				document.setObject(dataObject);
-				QByteArray parserData = document.toJson(QJsonDocument::Compact);
-				retVal->CreateFromJson(parserData);
-			}
-		}
-
-		// --- WebSocket / subscription payloads ---
-		if (document.object().value("type").toString() == "query_data"){
-			QJsonObject payloadObject = document.object().value("payload").toObject();
-
-			QJsonValue dataValue;
-			QString type = "data";
-
-			if (payloadObject.contains("data")){
-				QJsonObject payloadData = payloadObject.value("data").toObject();
-				dataValue = payloadData.value(commandId);
-			}
-
-			if (payloadObject.contains("errors")){
-				type = "errors";
-				QJsonValue payloadErrors = payloadObject.value("errors");
-
-				if (payloadErrors.isArray()){
-					QJsonArray errorArray = payloadErrors.toArray();
-					if (!errorArray.isEmpty()){
-						dataValue = errorArray.first();
+			if (!hasResult){
+				const QJsonValue dataValue = payloadObject.value(QStringLiteral("data"));
+				if (dataValue.isObject()){
+					const QJsonObject payloadData = dataValue.toObject();
+					const QJsonValue commandValue = payloadData.value(QString::fromUtf8(commandId));
+					if (!commandValue.isUndefined() && !commandValue.isNull()){
+						resultObject.insert(QStringLiteral("data"), commandValue);
+						hasResult = true;
 					}
 				}
 			}
+		}
+	}
+	else{
+		// Standard errors
+		const QJsonValue errorsValue = rootObject.value(QStringLiteral("errors"));
+		if (errorsValue.isArray()){
+			const QJsonArray errorArray = errorsValue.toArray();
+			if (!errorArray.isEmpty()){
+				resultObject.insert(QStringLiteral("errors"), errorArray.at(0));
+				hasResult = true;
+			}
+		}
 
-			if (!dataValue.isNull()){
-				QJsonObject newDataObject;
-				newDataObject.insert(type, dataValue);
-				document.setObject(newDataObject);
-				QByteArray parserData = document.toJson(QJsonDocument::Compact);
-				retVal->CreateFromJson(parserData);
+		// Standard data
+		if (!hasResult){
+			const QJsonValue dataValue = rootObject.value(QStringLiteral("data"));
+			if (dataValue.isObject()){
+				const QJsonObject dataObject = dataValue.toObject();
+				const QJsonValue bodyValue = dataObject.value(requestPtr->GetCommandId());
+				if (!bodyValue.isUndefined() && !bodyValue.isNull()){
+					resultObject.insert(QStringLiteral("data"), bodyValue);
+					hasResult = true;
+				}
 			}
 		}
-		else{
-			dataObject = document.object().value("payload").toObject();
-			if (!dataObject.isEmpty()){
-				document.setObject(dataObject);
-				QByteArray parserData = document.toJson(QJsonDocument::Compact);
-				retVal->CreateFromJson(parserData);
+
+		// Generic payload fallback
+		if (!hasResult){
+			const QJsonValue payloadValue = rootObject.value(QStringLiteral("payload"));
+			if (payloadValue.isObject()){
+				resultObject = payloadValue.toObject();
+				hasResult = !resultObject.isEmpty();
 			}
 		}
+	}
+
+	if (hasResult){
+		const QByteArray parserData = QJsonDocument(resultObject).toJson(QJsonDocument::Compact);
+		retVal->CreateFromJson(parserData);
 	}
 
 	return retVal.PopPtr();
