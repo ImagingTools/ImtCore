@@ -3467,3 +3467,148 @@ eval("{__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpa
 /******/ 	
 /******/ })()
 ;
+class Main extends JQModules.QtQuick.Item {
+static cachedComponents = {}
+
+                static meta = Object.assign({}, JQModules.QtQuick.Item.meta, {})
+
+                __removeObjectName(){removeObjectName('Main')}
+                __addObjectName(){addObjectName('Main')}
+
+                static create(parent,properties={},context={},isRoot=true){
+
+                let __root = this
+                let __context = JQContext.create()
+
+                let __el0 = super.create(parent,properties,context,false)
+
+                __el0.__MainContext = __context
+
+
+let __el1=(__root.cachedComponents['Main____el1'] || __root.cachedComponent('Main____el1',class  extends JQModules.QtQuick.Item {
+                static meta = Object.assign({}, JQModules.QtQuick.Item.meta, {})
+                static create(parent,properties={},context={},isRoot=true){
+                    let __el1 = super.create(parent,properties,context,isRoot)
+                    __el1.__MainContext = context
+                    
+return __el1}
+'SLOT_Component.completed'(){
+                        if(super['SLOT_Component.completed']) super['SLOT_Component.completed'](...arguments)
+                        if(!this.______el1) return
+                        let __self = this
+                        let [] = []
+                        try{JQApplication.beginUpdate();console.log(`onCompleted 2`)
+
+}finally{JQApplication.endUpdate()}}
+
+})).create(__el0,{JQAbstractModel:()=>{return __el0.JQAbstractModel}},__el0.__MainContext,false)
+let __el2=(__root.cachedComponents['Main____el2'] || __root.cachedComponent('Main____el2',class  extends JQModules.QtQuick.Item {
+                static meta = Object.assign({}, JQModules.QtQuick.Item.meta, {})
+                static create(parent,properties={},context={},isRoot=true){
+                    let __el2 = super.create(parent,properties,context,isRoot)
+                    __el2.__MainContext = context
+                    
+return __el2}
+'SLOT_Component.completed'(){
+                        if(super['SLOT_Component.completed']) super['SLOT_Component.completed'](...arguments)
+                        if(!this.______el2) return
+                        let __self = this
+                        let [] = []
+                        try{JQApplication.beginUpdate();console.log(`onCompleted 3`)
+
+}finally{JQApplication.endUpdate()}}
+
+})).create(__el1,{JQAbstractModel:()=>{return __el1.JQAbstractModel}},__el1.__MainContext,false)
+
+
+__el2.______el2=true
+
+let __el3=(__root.cachedComponents['Main____el3'] || __root.cachedComponent('Main____el3',class  extends JQModules.QtQuick.Item {
+                static meta = Object.assign({}, JQModules.QtQuick.Item.meta, {})
+                static create(parent,properties={},context={},isRoot=true){
+                    let __el3 = super.create(parent,properties,context,isRoot)
+                    __el3.__MainContext = context
+                    
+return __el3}
+'SLOT_Component.completed'(){
+                        if(super['SLOT_Component.completed']) super['SLOT_Component.completed'](...arguments)
+                        if(!this.______el3) return
+                        let __self = this
+                        let [] = []
+                        try{JQApplication.beginUpdate();console.log(`onCompleted 22`)
+
+}finally{JQApplication.endUpdate()}}
+
+})).create(__el1,{JQAbstractModel:()=>{return __el1.JQAbstractModel}},__el1.__MainContext,false)
+
+
+__el3.______el3=true
+
+
+
+__el1.______el1=true
+
+let __el4=(__root.cachedComponents['Main____el4'] || __root.cachedComponent('Main____el4',class  extends JQModules.QtQuick.Item {
+                static meta = Object.assign({}, JQModules.QtQuick.Item.meta, {})
+                static create(parent,properties={},context={},isRoot=true){
+                    let __el4 = super.create(parent,properties,context,isRoot)
+                    __el4.__MainContext = context
+                    
+return __el4}
+'SLOT_Component.completed'(){
+                        if(super['SLOT_Component.completed']) super['SLOT_Component.completed'](...arguments)
+                        if(!this.______el4) return
+                        let __self = this
+                        let [] = []
+                        try{JQApplication.beginUpdate();console.log(`onCompleted 11`)
+
+}finally{JQApplication.endUpdate()}}
+
+})).create(__el0,{JQAbstractModel:()=>{return __el0.JQAbstractModel}},__el0.__MainContext,false)
+
+
+__el4.______el4=true
+
+let __el5=(__root.cachedComponents['Main____el5'] || __root.cachedComponent('Main____el5',class  extends JQModules.QtQuick.Item {
+                static meta = Object.assign({}, JQModules.QtQuick.Item.meta, {})
+                static create(parent,properties={},context={},isRoot=true){
+                    let __el5 = super.create(parent,properties,context,isRoot)
+                    __el5.__MainContext = context
+                    
+return __el5}
+'SLOT_Component.completed'(){
+                        if(super['SLOT_Component.completed']) super['SLOT_Component.completed'](...arguments)
+                        if(!this.______el5) return
+                        let __self = this
+                        let [] = []
+                        try{JQApplication.beginUpdate();console.log(`onCompleted 111`)
+
+}finally{JQApplication.endUpdate()}}
+
+})).create(__el0,{JQAbstractModel:()=>{return __el0.JQAbstractModel}},__el0.__MainContext,false)
+
+
+__el5.______el5=true
+
+
+
+__el0.__Main____el0=true
+if(isRoot) {__el0.__updatePrimaryProperties();__el0.__updateProperties();__el0.__complete();__el0.__completeProperties()}
+return __el0
+}
+
+
+'SLOT_Component.completed'(){
+                        if(super['SLOT_Component.completed']) super['SLOT_Component.completed'](...arguments)
+                        if(!this.__Main____el0) return
+                        let __self = this
+                        let [] = []
+                        try{JQApplication.beginUpdate();console.log(`onCompleted 1`)
+
+}finally{JQApplication.endUpdate()}}
+
+
+}
+
+window.addEventListener('load', ()=>{console.time('build');JQApplication.rootPath='/';Main.create(JQApplication.root);console.timeEnd('build')})
+//# sourceMappingURL=./test/Test_Complete_Simple/test.js.map

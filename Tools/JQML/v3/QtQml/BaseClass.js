@@ -14,6 +14,12 @@ class Internal extends QtObject {
 		removed: { type: Var, value: null },
 		__typename: { type: String, value: '' },
 
+		isTransactionChanged: {type:Signal, args:[]},
+		countChangesChanged: {type:Signal, args:[]},
+		changeListChanged: {type:Signal, args:[]},
+		removedChanged: {type:Signal, args:[]},
+		__typenameChanged: {type:Signal, args:[]},
+
 		internalModelChanged: { type:Signal, args: ['name', 'sender'] },
     })
 
@@ -82,6 +88,10 @@ class BaseClass extends QtObject {
         enableNotifications: { type: Bool, value: true },
 		propertiesIsConnected: { type: Bool, value: false },
 		owner: { type: Var, value: null },
+
+		enableNotificationsChanged: {type:Signal, args:[]},
+		propertiesIsConnectedChanged: {type:Signal, args:[]},
+		ownerChanged: {type:Signal, args:[]},
 
 		modelChanged: { type:Signal, args: ['changeSet'] },
 		finished: { type:Signal, args: [] },

@@ -3467,3 +3467,150 @@ eval("{__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpa
 /******/ 	
 /******/ })()
 ;
+class Main extends JQModules.QtQuick.Item {
+static cachedComponents = {}
+
+                static meta = Object.assign({}, JQModules.QtQuick.Item.meta, {})
+
+                __removeObjectName(){removeObjectName('Main')}
+                __addObjectName(){addObjectName('Main')}
+
+                static create(parent,properties={},context={},isRoot=true){
+
+                let __root = this
+                let __context = JQContext.create()
+
+                let __el0 = super.create(parent,properties,context,false)
+
+                __el0.__MainContext = __context
+
+
+
+
+
+
+
+
+let __el1=(__root.cachedComponents['Main____el1'] || __root.cachedComponent('Main____el1',class  extends JQModules.QtQuick.Item {
+                static meta = Object.assign({}, JQModules.QtQuick.Item.meta, {})
+                static create(parent,properties={},context={},isRoot=true){
+                    let __el1 = super.create(parent,properties,context,isRoot)
+                    __el1.__MainContext = context
+                    
+
+
+
+return __el1}
+SLOT_widthChanged(){
+                        if(super.SLOT_widthChanged) super.SLOT_widthChanged(...arguments)
+                        if(!this.______el1) return
+                        let __self = this
+                        let [] = []
+                        try{JQApplication.beginUpdate();console.log(`onWidthChanged 1`)
+
+}finally{JQApplication.endUpdate()}}
+SLOT_heightChanged(){
+                        if(super.SLOT_heightChanged) super.SLOT_heightChanged(...arguments)
+                        if(!this.______el1) return
+                        let __self = this
+                        let [] = []
+                        try{JQApplication.beginUpdate();console.log(`onHeightChanged 1`)
+
+}finally{JQApplication.endUpdate()}}
+
+})).create(__el0,{JQAbstractModel:()=>{return __el0.JQAbstractModel}},__el0.__MainContext,false)
+let __el2=(__root.cachedComponents['Main____el2'] || __root.cachedComponent('Main____el2',class  extends JQModules.QtQuick.Item {
+                static meta = Object.assign({}, JQModules.QtQuick.Item.meta, {})
+                static create(parent,properties={},context={},isRoot=true){
+                    let __el2 = super.create(parent,properties,context,isRoot)
+                    __el2.__MainContext = context
+                    
+
+
+
+return __el2}
+SLOT_widthChanged(){
+                        if(super.SLOT_widthChanged) super.SLOT_widthChanged(...arguments)
+                        if(!this.______el2) return
+                        let __self = this
+                        let [] = []
+                        try{JQApplication.beginUpdate();console.log(`onWidthChanged 2`)
+
+}finally{JQApplication.endUpdate()}}
+SLOT_heightChanged(){
+                        if(super.SLOT_heightChanged) super.SLOT_heightChanged(...arguments)
+                        if(!this.______el2) return
+                        let __self = this
+                        let [] = []
+                        try{JQApplication.beginUpdate();console.log(`onHeightChanged 2`)
+
+}finally{JQApplication.endUpdate()}}
+
+})).create(__el1,{JQAbstractModel:()=>{return __el1.JQAbstractModel}},__el1.__MainContext,false)
+let __el3=(__root.cachedComponents['Main____el3'] || __root.cachedComponent('Main____el3',class  extends JQModules.QtQuick.Item {
+                static meta = Object.assign({}, JQModules.QtQuick.Item.meta, {})
+                static create(parent,properties={},context={},isRoot=true){
+                    let __el3 = super.create(parent,properties,context,isRoot)
+                    __el3.__MainContext = context
+                    
+
+
+
+return __el3}
+SLOT_widthChanged(){
+                        if(super.SLOT_widthChanged) super.SLOT_widthChanged(...arguments)
+                        if(!this.______el3) return
+                        let __self = this
+                        let [] = []
+                        try{JQApplication.beginUpdate();console.log(`onWidthChanged 3`)
+
+}finally{JQApplication.endUpdate()}}
+SLOT_heightChanged(){
+                        if(super.SLOT_heightChanged) super.SLOT_heightChanged(...arguments)
+                        if(!this.______el3) return
+                        let __self = this
+                        let [] = []
+                        try{JQApplication.beginUpdate();console.log(`onHeightChanged 3`)
+
+}finally{JQApplication.endUpdate()}}
+
+})).create(__el2,{JQAbstractModel:()=>{return __el2.JQAbstractModel}},__el2.__MainContext,false)
+
+__el3['anchors'].__properties['fill']=function(){return __el3.parent}
+__el3.__properties['anchors']='JQGroup'
+
+
+__el3.______el3=true
+
+
+__el2['anchors'].__properties['fill']=function(){return __el2.parent}
+__el2.__properties['anchors']='JQGroup'
+
+
+__el2.______el2=true
+
+
+__el1['anchors'].__properties['fill']=function(){return __el1.parent}
+__el1.__properties['anchors']='JQGroup'
+
+
+__el1.______el1=true
+
+
+__el0.width=100
+
+__el0.height=100
+
+
+__el0.__Main____el0=true
+if(isRoot) {__el0.__updatePrimaryProperties();__el0.__updateProperties();__el0.__complete();__el0.__completeProperties()}
+return __el0
+}
+
+
+
+
+}
+
+window.addEventListener('load', ()=>{console.time('build');JQApplication.rootPath='/';Main.create(JQApplication.root);console.timeEnd('build')})
+//# sourceMappingURL=./test/Test_Geometry_Anchors/test.js.map
