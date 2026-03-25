@@ -2,6 +2,10 @@
 #include <imtauthgql/CSessionModelSubscriberControllerComp.h>
 
 
+// Qt includes
+#include <QJsonArray>
+#include <QJsonDocument>
+
 // ImtCore includes
 #include <imtgql/IGqlRequestProvider.h>
 #include<imtrest/IProtocolEngine.h>
