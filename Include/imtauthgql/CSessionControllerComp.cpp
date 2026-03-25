@@ -2,6 +2,9 @@
 #include <imtauthgql/CSessionControllerComp.h>
 
 
+// Qt includes
+#include <QtCore/QJsonObject>
+
 // ImtCore includes
 #include <imtauth/ISession.h>
 
@@ -14,15 +17,14 @@ namespace imtauthgql
 
 // reimplemented (CObjectCollectionControllerCompBase)
 
-imtbase::CTreeItemModel* CSessionControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequest, QString& /*errorMessage*/) const
+QJsonObject CSessionControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequest, QString& /*errorMessage*/) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribure 'ObjectCollection' was not set", "CSessionControllerComp");
-		return nullptr;
+		return QJsonObject();
 	}
 
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
+	QJsonObject dataObj;
 
 	QByteArray sessionId = GetObjectIdFromInputParams(gqlRequest.GetParams());
 
@@ -33,12 +35,15 @@ imtbase::CTreeItemModel* CSessionControllerComp::GetObject(const imtgql::CGqlReq
 			QByteArray token = sessionInfoPtr->GetToken();
 			QByteArray userId = sessionInfoPtr->GetUserId();
 
-			dataModel->SetData("UserId", userId);
-			dataModel->SetData("Token", token);
+			dataObj.insert("UserId", QString::fromUtf8(userId));
+			dataObj.insert("Token", QString::fromUtf8(token));
 		}
 	}
 
-	return rootModelPtr.PopPtr();
+	QJsonObject rootObj;
+	rootObj.insert("data", dataObj);
+
+	return rootObj;
 }
 
 
