@@ -203,10 +203,10 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 	// We return 200 OK so the client can read the { data: null, errors: [...] } structure.
 	if (!responseData.isEmpty()){
 		return CreateResponse(
-			StatusCode::SC_OK,
-			responseData,
-			request,
-			QByteArrayLiteral("application/json; charset=utf-8"));
+					StatusCode::SC_OK,
+					responseData,
+					request,
+					QByteArrayLiteral("application/json; charset=utf-8"));;
 	}
 
 	// If no handler supported the request (isSuccessful is still false)
@@ -268,9 +268,6 @@ QByteArray CHttpGraphQLServletComp::BuildGqlErrorJson(
 {
 	QJsonObject rootObj;
 
-	// { "data": null }
-	rootObj.insert(QStringLiteral("data"), QJsonValue::Null);
-
 	QJsonArray errorsArr;
 	QJsonObject errorObj;
 	errorObj.insert(QStringLiteral("message"), message);
@@ -293,8 +290,6 @@ QByteArray CHttpGraphQLServletComp::BuildGqlErrorJson(
 	QJsonDocument doc(rootObj);
 	return doc.toJson(QJsonDocument::Compact);
 }
-
-
 
 
 } // namespace imtservergql
