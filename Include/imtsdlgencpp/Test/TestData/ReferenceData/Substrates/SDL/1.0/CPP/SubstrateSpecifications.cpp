@@ -104,7 +104,7 @@ bool CInputId::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 
 		return false;
 	}
-	jsonObject["id"] = QJsonValue::fromVariant(*id);
+	jsonObject["id"] = QString::fromUtf8(*id);
 
 	jsonObject["__typename"] = "InputId";
 
@@ -887,15 +887,15 @@ bool CSubstrateSpecificationDocumentTypeIds::V1_0::OptReadFromGraphQlObject(cons
 bool CSubstrateSpecificationDocumentTypeIds::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (PaperID){
-		jsonObject["PaperID"] = QJsonValue::fromVariant(*PaperID);
+		jsonObject["PaperID"] = QString::fromUtf8(*PaperID);
 	}
 
 	if (CardboardID){
-		jsonObject["CardboardID"] = QJsonValue::fromVariant(*CardboardID);
+		jsonObject["CardboardID"] = QString::fromUtf8(*CardboardID);
 	}
 
 	if (FilmID){
-		jsonObject["FilmID"] = QJsonValue::fromVariant(*FilmID);
+		jsonObject["FilmID"] = QString::fromUtf8(*FilmID);
 	}
 
 	jsonObject["__typename"] = "SubstrateSpecificationDocumentTypeIds";
@@ -1885,14 +1885,14 @@ bool CSubstrateSpecificationListItem::V1_0::WriteToJsonObject(QJsonObject& jsonO
 
 		return false;
 	}
-	jsonObject["id"] = QJsonValue::fromVariant(*id);
+	jsonObject["id"] = QString::fromUtf8(*id);
 
 	if (!typeId){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "typeId").toLocal8Bit().constData();)
 
 		return false;
 	}
-	jsonObject["typeId"] = QJsonValue::fromVariant(*typeId);
+	jsonObject["typeId"] = QString::fromUtf8(*typeId);
 
 	if (!name){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "name").toLocal8Bit().constData();)
@@ -1902,7 +1902,7 @@ bool CSubstrateSpecificationListItem::V1_0::WriteToJsonObject(QJsonObject& jsonO
 	jsonObject["name"] = QJsonValue::fromVariant(*name);
 
 	if (materialId){
-		jsonObject["materialId"] = QJsonValue::fromVariant(*materialId);
+		jsonObject["materialId"] = QString::fromUtf8(*materialId);
 	}
 
 	if (materialName){
@@ -4314,7 +4314,7 @@ bool CSubstrateSpecificationInput::V1_0::WriteToJsonObject(QJsonObject& jsonObje
 
 		return false;
 	}
-	jsonObject["id"] = QJsonValue::fromVariant(*id);
+	jsonObject["id"] = QString::fromUtf8(*id);
 
 	if (name){
 		jsonObject["name"] = QJsonValue::fromVariant(*name);
@@ -4363,7 +4363,7 @@ bool CSubstrateSpecificationInput::V1_0::WriteToJsonObject(QJsonObject& jsonObje
 
 		return false;
 	}
-	jsonObject["typeId"] = QJsonValue::fromVariant(*typeId);
+	jsonObject["typeId"] = QString::fromUtf8(*typeId);
 
 	jsonObject["__typename"] = "SubstrateSpecificationInput";
 
@@ -4834,7 +4834,7 @@ bool CSubstrateSpecificationDocumentMetaInfo::V1_0::OptReadFromGraphQlObject(con
 bool CSubstrateSpecificationDocumentMetaInfo::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (materialId){
-		jsonObject["materialId"] = QJsonValue::fromVariant(*materialId);
+		jsonObject["materialId"] = QString::fromUtf8(*materialId);
 	}
 
 	if (lab){

@@ -661,7 +661,7 @@ bool CFieldSortingInfo::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 
 		return false;
 	}
-	jsonObject["fieldId"] = QJsonValue::fromVariant(*fieldId);
+	jsonObject["fieldId"] = QString::fromUtf8(*fieldId);
 
 	if (!sortingOrder){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "sortingOrder").toLocal8Bit().constData();)
@@ -1419,7 +1419,7 @@ bool CFieldFilter::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 
 		return false;
 	}
-	jsonObject["fieldId"] = QJsonValue::fromVariant(*fieldId);
+	jsonObject["fieldId"] = QString::fromUtf8(*fieldId);
 
 	if (!filterValue){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "filterValue").toLocal8Bit().constData();)

@@ -1668,59 +1668,59 @@ bool CParamTypeIds::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObje
 bool CParamTypeIds::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (UrlParam){
-		jsonObject["UrlParam"] = QJsonValue::fromVariant(*UrlParam);
+		jsonObject["UrlParam"] = QString::fromUtf8(*UrlParam);
 	}
 
 	if (IdParam){
-		jsonObject["IdParam"] = QJsonValue::fromVariant(*IdParam);
+		jsonObject["IdParam"] = QString::fromUtf8(*IdParam);
 	}
 
 	if (TextParam){
-		jsonObject["TextParam"] = QJsonValue::fromVariant(*TextParam);
+		jsonObject["TextParam"] = QString::fromUtf8(*TextParam);
 	}
 
 	if (TextView){
-		jsonObject["TextView"] = QJsonValue::fromVariant(*TextView);
+		jsonObject["TextView"] = QString::fromUtf8(*TextView);
 	}
 
 	if (SelectionParam){
-		jsonObject["SelectionParam"] = QJsonValue::fromVariant(*SelectionParam);
+		jsonObject["SelectionParam"] = QString::fromUtf8(*SelectionParam);
 	}
 
 	if (SchedulerParam){
-		jsonObject["SchedulerParam"] = QJsonValue::fromVariant(*SchedulerParam);
+		jsonObject["SchedulerParam"] = QString::fromUtf8(*SchedulerParam);
 	}
 
 	if (BackupSettings){
-		jsonObject["BackupSettings"] = QJsonValue::fromVariant(*BackupSettings);
+		jsonObject["BackupSettings"] = QString::fromUtf8(*BackupSettings);
 	}
 
 	if (DatabaseAccessSettings){
-		jsonObject["DatabaseAccessSettings"] = QJsonValue::fromVariant(*DatabaseAccessSettings);
+		jsonObject["DatabaseAccessSettings"] = QString::fromUtf8(*DatabaseAccessSettings);
 	}
 
 	if (ParamsSet){
-		jsonObject["ParamsSet"] = QJsonValue::fromVariant(*ParamsSet);
+		jsonObject["ParamsSet"] = QString::fromUtf8(*ParamsSet);
 	}
 
 	if (FileNameParam){
-		jsonObject["FileNameParam"] = QJsonValue::fromVariant(*FileNameParam);
+		jsonObject["FileNameParam"] = QString::fromUtf8(*FileNameParam);
 	}
 
 	if (IntegerParam){
-		jsonObject["IntegerParam"] = QJsonValue::fromVariant(*IntegerParam);
+		jsonObject["IntegerParam"] = QString::fromUtf8(*IntegerParam);
 	}
 
 	if (DoubleParam){
-		jsonObject["DoubleParam"] = QJsonValue::fromVariant(*DoubleParam);
+		jsonObject["DoubleParam"] = QString::fromUtf8(*DoubleParam);
 	}
 
 	if (PasswordParam){
-		jsonObject["PasswordParam"] = QJsonValue::fromVariant(*PasswordParam);
+		jsonObject["PasswordParam"] = QString::fromUtf8(*PasswordParam);
 	}
 
 	if (EnableableParam){
-		jsonObject["EnableableParam"] = QJsonValue::fromVariant(*EnableableParam);
+		jsonObject["EnableableParam"] = QString::fromUtf8(*EnableableParam);
 	}
 
 	jsonObject["__typename"] = "ParamTypeIds";
@@ -2629,7 +2629,7 @@ bool CIdParam::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& g
 bool CIdParam::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (id){
-		jsonObject["id"] = QJsonValue::fromVariant(*id);
+		jsonObject["id"] = QString::fromUtf8(*id);
 	}
 
 	jsonObject["__typename"] = "IdParam";
@@ -4432,7 +4432,7 @@ bool COption::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 bool COption::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (id){
-		jsonObject["id"] = QJsonValue::fromVariant(*id);
+		jsonObject["id"] = QString::fromUtf8(*id);
 	}
 
 	if (name){
