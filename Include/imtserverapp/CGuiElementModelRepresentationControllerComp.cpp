@@ -137,9 +137,9 @@ bool CGuiElementModelRepresentationControllerComp::GetRepresentationFromDataMode
 	if (subElementsPtr != nullptr && m_representationControllerCompPtr.IsValid()){
 		QJsonObject subElementsObj;
 		if (m_representationControllerCompPtr->GetRepresentationFromDataModel(*subElementsPtr, subElementsObj, paramsPtr)
-			&& subElementsObj.contains(QStringLiteral("items"))
-			&& subElementsObj.value(QStringLiteral("items")).isArray()){
-			representation.insert(QStringLiteral("subElements"), subElementsObj.value(QStringLiteral("items")).toArray());
+			&& subElementsObj.contains(QStringLiteral("subElements"))
+			&& subElementsObj.value(QStringLiteral("subElements")).isArray()){
+			representation.insert(QStringLiteral("subElements"), subElementsObj.value(QStringLiteral("subElements")).toArray());
 		}
 	}
 

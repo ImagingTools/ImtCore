@@ -177,7 +177,7 @@ bool CGuiElementContainerRepresentationControllerComp::GetRepresentationFromData
 		itemsArray.append(itemObj);
 	}
 
-	representation.insert(QStringLiteral("items"), itemsArray);
+	representation.insert(QStringLiteral("subElements"), itemsArray);
 	return true;
 }
 
