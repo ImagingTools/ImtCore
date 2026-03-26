@@ -6,6 +6,7 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonValue>
 #include <QtCore/QJsonDocument>
+#include <QtCore/QJsonArray>
 
 // ACF includes
 #include <istd/TOptDelPtr.h>

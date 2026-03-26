@@ -6,6 +6,7 @@
 #include <QtCore/QJsonObject>
 
 // ImtCore includes
+#include <imtbase/CTreeItemModel.h>
 #include <imtlic/IProductInfo.h>
 #include <imtlic/CFeatureInfo.h>
 #include <imtservergql/CGqlRequestHandlerCompBase.h>

@@ -3,6 +3,7 @@
 
 
 // Qt includes
+#include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 
 // ACF include
