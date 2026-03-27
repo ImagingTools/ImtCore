@@ -49,12 +49,12 @@ CDM::CDocumentList CCollectionDocumentManagerControllerComp::OnGetOpenedDocument
 }
 
 
-CDM::CDocumentId CCollectionDocumentManagerControllerComp::OnCreateNewDocument(
+CDM::CDocumentInfo CCollectionDocumentManagerControllerComp::OnCreateNewDocument(
 			const CDM::CCreateNewDocumentGqlRequest& createNewDocumentRequest,
 			const::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	CDM::CDocumentId retVal;
+	CDM::CDocumentInfo retVal;
 
 	const auto& arguments = createNewDocumentRequest.GetRequestedArguments();
 
@@ -78,19 +78,36 @@ CDM::CDocumentId CCollectionDocumentManagerControllerComp::OnCreateNewDocument(
 			return retVal;
 		}
 
-		retVal.Version_1_0.emplace().id = documentId;
+		QString documentName;
+		m_documentManagerCompPtr->GetDocumentName(userId, documentId, documentName);
+
+		retVal.Version_1_0.emplace();
+		retVal.Version_1_0->documentId = documentId;
+		retVal.Version_1_0->documentName = documentName;
+		retVal.Version_1_0->objectTypeId = *documentTypeId->typeId;
+		retVal.Version_1_0->objectId = QByteArray();
+		retVal.Version_1_0->isDirty = false;
+		retVal.Version_1_0->hasNameProvider = false;
+
+		imtdoc::IDocumentManager::DocumentList list = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
+		for (const imtdoc::IDocumentManager::DocumentListItem& info : list){
+			if (info.documentId == documentId){
+				retVal.Version_1_0->hasNameProvider = info.hasNameProvider;
+				break;
+			}
+		}
 	}
 
 	return retVal;
 }
 
 
-CDM::CDocumentId CCollectionDocumentManagerControllerComp::OnOpenDocument(
+CDM::CDocumentInfo CCollectionDocumentManagerControllerComp::OnOpenDocument(
 			const CDM::COpenDocumentGqlRequest& openDocumentRequest,
 			const::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	CDM::CDocumentId retVal;
+	CDM::CDocumentInfo retVal;
 
 	const auto& arguments = openDocumentRequest.GetRequestedArguments();
 
@@ -116,7 +133,21 @@ CDM::CDocumentId CCollectionDocumentManagerControllerComp::OnOpenDocument(
 			return retVal;
 		}
 
-		retVal.Version_1_0.emplace().id = documentId;
+		retVal.Version_1_0.emplace();
+		retVal.Version_1_0->documentId = documentId;
+		retVal.Version_1_0->objectId = *objectId->id;
+		retVal.Version_1_0->isDirty = false;
+		retVal.Version_1_0->hasNameProvider = false;
+
+		imtdoc::IDocumentManager::DocumentList list = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
+		for (const imtdoc::IDocumentManager::DocumentListItem& info : list){
+			if (info.documentId == documentId){
+				retVal.Version_1_0->documentName = info.name;
+				retVal.Version_1_0->objectTypeId = info.typeId;
+				retVal.Version_1_0->hasNameProvider = info.hasNameProvider;
+				break;
+			}
+		}
 	}
 
 	return retVal;

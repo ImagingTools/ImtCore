@@ -199,9 +199,10 @@ DocumentManagerBase {
 		gqlCommandId: ImtbaseCollectionDocumentManagerSdlCommandIds.s_openDocument
 		requestType: 1
 		sdlObjectComp: Component {
-			DocumentId {
+			DocumentInfo {
 				onFinished: {
-					root.documentOpened(m_id, root.openDocumentRequest.typeId)
+					root.setAutoNamedTypeId(m_objectTypeId, m_hasNameProvider)
+					root.documentOpened(m_documentId, m_objectTypeId)
 				}
 			}
 		}
@@ -221,9 +222,10 @@ DocumentManagerBase {
 		gqlCommandId: ImtbaseCollectionDocumentManagerSdlCommandIds.s_createNewDocument
 		requestType: 1
 		sdlObjectComp: Component {
-			DocumentId {
+			DocumentInfo {
 				onFinished: {
-					root.documentCreated(m_id, root.createDocumentRequest.typeId)
+					root.setAutoNamedTypeId(m_objectTypeId, m_hasNameProvider)
+					root.documentCreated(m_documentId, m_objectTypeId)
 				}
 			}
 		}

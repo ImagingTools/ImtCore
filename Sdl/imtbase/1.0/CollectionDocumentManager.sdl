@@ -98,8 +98,8 @@ type Query {
 }
 
 type Mutation {
-	CreateNewDocument(input: DocumentTypeId): DocumentId!
-	OpenDocument(input: ObjectId): DocumentId!
+	CreateNewDocument(input: DocumentTypeId): DocumentInfo!
+	OpenDocument(input: ObjectId): DocumentInfo!
 	SetDocumentName(input: SetDocumentNameInput): DocumentOperationStatus!
 	SaveDocument(input: SaveDocumentInput): DocumentOperationStatus!
 	CloseDocument(input: DocumentId): DocumentOperationStatus!
