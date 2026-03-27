@@ -35,6 +35,21 @@ static std::function<bool(const CSdlEntryBase&)> CreateFindByNamePredicate(const
 }
 
 
+// Pre-built tab strings for common indent levels (shared across FeedStreamHorizontally/FeedLineHorizontally)
+static constexpr int s_maxPrebuiltTabs = 9;
+static const QString s_prebuiltTabs[s_maxPrebuiltTabs] = {
+	QString(),
+	QStringLiteral("\t"),
+	QStringLiteral("\t\t"),
+	QStringLiteral("\t\t\t"),
+	QStringLiteral("\t\t\t\t"),
+	QStringLiteral("\t\t\t\t\t"),
+	QStringLiteral("\t\t\t\t\t\t"),
+	QStringLiteral("\t\t\t\t\t\t\t"),
+	QStringLiteral("\t\t\t\t\t\t\t\t"),
+};
+
+
 // public static variables
 QString CSdlTools::s_sdlGlobalPrefix = QStringLiteral("sdl");
 
@@ -475,23 +490,9 @@ void CSdlTools::FeedStream(QTextStream& stream, uint lines, bool flush)
 void CSdlTools::FeedLineHorizontally(QString& line, uint indents, char indentDelimiter)
 {
 	// Fast path for common tab indentation
-	if (indentDelimiter == '\t'){
-		static const QString s_tabs[] = {
-			QString(),
-			QStringLiteral("\t"),
-			QStringLiteral("\t\t"),
-			QStringLiteral("\t\t\t"),
-			QStringLiteral("\t\t\t\t"),
-			QStringLiteral("\t\t\t\t\t"),
-			QStringLiteral("\t\t\t\t\t\t"),
-			QStringLiteral("\t\t\t\t\t\t\t"),
-			QStringLiteral("\t\t\t\t\t\t\t\t"),
-		};
-
-		if (indents < sizeof(s_tabs) / sizeof(s_tabs[0])){
-			line += s_tabs[indents];
-			return;
-		}
+	if (indentDelimiter == '\t' && indents < s_maxPrebuiltTabs){
+		line += s_prebuiltTabs[indents];
+		return;
 	}
 
 	for (uint i = 0; i < indents; ++i){
@@ -503,23 +504,9 @@ void CSdlTools::FeedLineHorizontally(QString& line, uint indents, char indentDel
 void CSdlTools::FeedStreamHorizontally(QTextStream& stream, uint indents, char indentDelimiter)
 {
 	// Fast path for common tab indentation (most common case)
-	if (indentDelimiter == '\t'){
-		static const QString s_tabs[] = {
-			QString(),
-			QStringLiteral("\t"),
-			QStringLiteral("\t\t"),
-			QStringLiteral("\t\t\t"),
-			QStringLiteral("\t\t\t\t"),
-			QStringLiteral("\t\t\t\t\t"),
-			QStringLiteral("\t\t\t\t\t\t"),
-			QStringLiteral("\t\t\t\t\t\t\t"),
-			QStringLiteral("\t\t\t\t\t\t\t\t"),
-		};
-
-		if (indents < sizeof(s_tabs) / sizeof(s_tabs[0])){
-			stream << s_tabs[indents];
-			return;
-		}
+	if (indentDelimiter == '\t' && indents < s_maxPrebuiltTabs){
+		stream << s_prebuiltTabs[indents];
+		return;
 	}
 
 	for (uint i = 0; i < indents; ++i){
