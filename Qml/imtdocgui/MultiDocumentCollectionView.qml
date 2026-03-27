@@ -173,9 +173,7 @@ Item {
 				let isDirty = documentInfo.m_isDirty
 				let hasNameProvider = documentInfo.m_hasNameProvider
 
-				if (hasNameProvider !== undefined){
-					workspaceView.documentManager.setAutoNamedTypeId(objectTypeId, hasNameProvider)
-				}
+				workspaceView.documentManager.setAutoNamedTypeId(objectTypeId, hasNameProvider)
 
 				if (objectId === ""){
 					workspaceView.documentManager.documentCreated(documentId, objectTypeId)
