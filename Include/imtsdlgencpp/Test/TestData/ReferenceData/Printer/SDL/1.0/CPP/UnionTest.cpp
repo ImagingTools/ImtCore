@@ -4158,7 +4158,7 @@ bool CPrinterCollectionControllerCompBase::GetOperationFromRequest(const ::imtgq
 }
 
 
-bool CPrinterCollectionControllerCompBase::CreateRepresentationFromObject(const istd::IChangeable& data, const QByteArray& objectTypeId, const ::imtgql::CGqlRequest& gqlRequest, ::imtbase::CTreeItemModel& dataModel, QString& errorMessage) const
+bool CPrinterCollectionControllerCompBase::CreateRepresentationFromObject(const istd::IChangeable& data, const QByteArray& objectTypeId, const ::imtgql::CGqlRequest& gqlRequest, QJsonObject& dataObj, QString& errorMessage) const
 {
 	Q_UNUSED(objectTypeId);
 
@@ -4176,22 +4176,24 @@ bool CPrinterCollectionControllerCompBase::CreateRepresentationFromObject(const 
 		}
 
 		if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>(&representationObject)){
-			if (!val->WriteToModel(dataModel)){
+			const bool isrepresentationObjectAdded = val->WriteToJsonObject(dataObj);
+			if (!isrepresentationObjectAdded){
 				return false;
 			}
-			dataModel.SetData("__typename", "PrinterSpecificationBase", 0);
+			dataObj["__typename"] = "PrinterSpecificationBase";
 		}
 		else if (const CLink* val = std::get_if<CLink>(&representationObject)){
-			if (!val->WriteToModel(dataModel)){
+			const bool isrepresentationObjectAdded = val->WriteToJsonObject(dataObj);
+			if (!isrepresentationObjectAdded){
 				return false;
 			}
-			dataModel.SetData("__typename", "Link", 0);
+			dataObj["__typename"] = "Link";
 		}
 		else if (const QString* val = std::get_if<QString>(&representationObject)){
-			dataModel.SetData("", *val);
+			dataObj["representationObject"] = QJsonValue::fromVariant(*val);
 		}
 		else if (const double* val = std::get_if<double>(&representationObject)){
-			dataModel.SetData("", *val);
+			dataObj["representationObject"] = QJsonValue::fromVariant(*val);
 		}
 
 		return true;
@@ -4216,11 +4218,11 @@ bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlR
 }
 
 
-::imtbase::CTreeItemModel* CGraphQlHandlerCompBase::CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CGraphQlHandlerCompBase::CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	const QByteArray commandId = gqlRequest.GetCommandId();
-	istd::TDelPtr<::imtbase::CTreeItemModel> modelPtr(new ::imtbase::CTreeItemModel);
-	::imtbase::CTreeItemModel* dataModelPtr = modelPtr->AddTreeModel("data");
+	QJsonObject modelObj;
+	QJsonObject dataModelObj;
 
 	// GetSpecifications
 	if (commandId == CGetSpecificationsGqlRequest::GetCommandId()){
@@ -4229,45 +4231,43 @@ bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlR
 			errorMessage = QString("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
 			SendErrorMessage(0, errorMessage);
 
-			return nullptr;
+			return QJsonObject();
 		}
 
 		PrinterSpecification replyPayload = OnGetSpecifications(getSpecificationsGqlRequest, gqlRequest, errorMessage);
 		if (!errorMessage.isEmpty()){
 			SendErrorMessage(0, QString("The derived call [OnGetSpecifications] returned an error: %1").arg(errorMessage));
 
-			return nullptr;
+			return QJsonObject();
 		}
 
 		if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>(&replyPayload)){
-			if (!val->WriteToModel(*dataModelPtr)){
-				return nullptr;
+			const bool isFieldAdded = val->WriteToJsonObject(dataModelObj);
+			if (!isFieldAdded){
+				return QJsonObject();
 			}
-			if(dataModelPtr != nullptr){
-				dataModelPtr->SetData("__typename", "PrinterSpecificationBase", 0);
-			}
+			dataModelObj["__typename"] = "PrinterSpecificationBase";
 		}
 		else if (const CLink* val = std::get_if<CLink>(&replyPayload)){
-			if (!val->WriteToModel(*dataModelPtr)){
-				return nullptr;
+			const bool isFieldAdded = val->WriteToJsonObject(dataModelObj);
+			if (!isFieldAdded){
+				return QJsonObject();
 			}
-			if(dataModelPtr != nullptr){
-				dataModelPtr->SetData("__typename", "Link", 0);
-			}
+			dataModelObj["__typename"] = "Link";
 		}
 		else if (const QString* val = std::get_if<QString>(&replyPayload)){
-			dataModelPtr->SetData("", *val);
+			dataModelObj["specification"] = QJsonValue::fromVariant(*val);
 		}
 		else if (const double* val = std::get_if<double>(&replyPayload)){
-			dataModelPtr->SetData("", *val);
+			dataModelObj["specification"] = QJsonValue::fromVariant(*val);
 		}
-		return modelPtr.PopPtr();
+		modelObj.insert(QStringLiteral("data"), dataModelObj); return modelObj;
 	}
 
 	errorMessage = QString("Bad request. Unexpected command-ID: '%1'").arg(qPrintable(commandId));
 	SendErrorMessage(0, errorMessage);
 
-	return nullptr;
+	return QJsonObject();
 }
 
 
