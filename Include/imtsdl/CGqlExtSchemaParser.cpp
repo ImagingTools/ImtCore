@@ -34,17 +34,18 @@ CGqlExtSchemaParser::CGqlExtSchemaParser(QIODevice& device): BaseClass(device)
 
 SdlDocumentTypeList CGqlExtSchemaParser::GetDocumentTypes(bool onlyLocal) const
 {
-	SdlDocumentTypeList retVal = m_documentTypes;
-	if (onlyLocal){
-		QMutableListIterator documentTypesIter(retVal);
-		while (documentTypesIter.hasNext()){
-			CSdlDocumentType& documentType = documentTypesIter.next();
-			if (documentType.IsExternal()){
-				documentTypesIter.remove();
+	if (m_documentTypesCacheDirty){
+		m_cachedAllDocumentTypes = m_documentTypes;
+		m_cachedLocalDocumentTypes.clear();
+		for (const CSdlDocumentType& documentType: std::as_const(m_documentTypes)){
+			if (!documentType.IsExternal()){
+				m_cachedLocalDocumentTypes << documentType;
 			}
 		}
+		m_documentTypesCacheDirty = false;
 	}
-	return retVal;
+
+	return onlyLocal ? m_cachedLocalDocumentTypes : m_cachedAllDocumentTypes;
 }
 
 
@@ -102,6 +103,7 @@ bool CGqlExtSchemaParser::ProcessCollectionSchema()
 		documentType.SetSchemaFilePath(m_originalSchemaFile);
 		documentType.SetSchemaParamsPtr(m_schemaParamsPtr);
 		m_documentTypes << documentType;
+		m_documentTypesCacheDirty = true;
 
 		retVal = retVal && MoveToNextReadableSymbol(&foundDelimiter);
 

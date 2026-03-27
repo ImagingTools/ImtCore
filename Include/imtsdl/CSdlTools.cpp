@@ -440,8 +440,26 @@ QString CSdlTools::QmlConvertType(const QString& sdlType, bool* isCustomPtr)
 
 void CSdlTools::FeedStream(QTextStream& stream, uint lines, bool flush)
 {
-	for (uint i = 0; i < lines; ++i){
-		stream << '\n';
+	// Use pre-built newline strings for common cases to avoid per-char loop overhead
+	static const QString s_oneNewline = QStringLiteral("\n");
+	static const QString s_twoNewlines = QStringLiteral("\n\n");
+	static const QString s_threeNewlines = QStringLiteral("\n\n\n");
+
+	switch (lines){
+		case 1:
+			stream << s_oneNewline;
+			break;
+		case 2:
+			stream << s_twoNewlines;
+			break;
+		case 3:
+			stream << s_threeNewlines;
+			break;
+		default:
+			for (uint i = 0; i < lines; ++i){
+				stream << '\n';
+			}
+			break;
 	}
 
 	if (flush){
@@ -460,6 +478,26 @@ void CSdlTools::FeedLineHorizontally(QString& line, uint indents, char indentDel
 
 void CSdlTools::FeedStreamHorizontally(QTextStream& stream, uint indents, char indentDelimiter)
 {
+	// Fast path for common tab indentation (most common case)
+	if (indentDelimiter == '\t'){
+		static const QString s_tabs[] = {
+			QString(),
+			QStringLiteral("\t"),
+			QStringLiteral("\t\t"),
+			QStringLiteral("\t\t\t"),
+			QStringLiteral("\t\t\t\t"),
+			QStringLiteral("\t\t\t\t\t"),
+			QStringLiteral("\t\t\t\t\t\t"),
+			QStringLiteral("\t\t\t\t\t\t\t"),
+			QStringLiteral("\t\t\t\t\t\t\t\t"),
+		};
+
+		if (indents < sizeof(s_tabs) / sizeof(s_tabs[0])){
+			stream << s_tabs[indents];
+			return;
+		}
+	}
+
 	for (uint i = 0; i < indents; ++i){
 		stream << indentDelimiter;
 	}
@@ -721,29 +759,23 @@ std::shared_ptr<CSdlEntryBase> CSdlTools::GetSdlTypeOrEnumOrUnionForField(
 	const SdlEnumList& enumList,
 	const SdlUnionList& unionList)
 {
-	std::shared_ptr<CSdlEntryBase> retVal;
-
-	std::shared_ptr<CSdlType> typePtr(new CSdlType);
-	const bool isType = GetSdlTypeForField(sdlField, typeList, *typePtr);
-	if (isType){
-		retVal = typePtr;
-	}
-	else{
-		std::shared_ptr<CSdlEnum> sdlEnumPtr(new CSdlEnum);
-		const bool isEnum = GetSdlEnumForField(sdlField, enumList, *sdlEnumPtr);
-		if (isEnum){
-			retVal = sdlEnumPtr;
-		}
-		else{
-			std::shared_ptr<CSdlUnion> sdlUnionPtr(new CSdlUnion);
-			const bool isUnion = GetSdlUnionForField(sdlField, unionList, *sdlUnionPtr);
-			if (isUnion){
-				retVal = sdlUnionPtr;
-			}
-		}
+	// Use stack-allocated objects for lookup, only allocate on heap when found
+	CSdlType typeResult;
+	if (GetSdlTypeForField(sdlField, typeList, typeResult)){
+		return std::make_shared<CSdlType>(std::move(typeResult));
 	}
 
-	return retVal;
+	CSdlEnum enumResult;
+	if (GetSdlEnumForField(sdlField, enumList, enumResult)){
+		return std::make_shared<CSdlEnum>(std::move(enumResult));
+	}
+
+	CSdlUnion unionResult;
+	if (GetSdlUnionForField(sdlField, unionList, unionResult)){
+		return std::make_shared<CSdlUnion>(std::move(unionResult));
+	}
+
+	return {};
 }
 
 

@@ -125,20 +125,18 @@ bool CGqlSchemaParser::SetSchemaName(const QString& schemaName) const
 
 SdlTypeList CGqlSchemaParser::GetSdlTypes(bool onlyLocal) const
 {
-	/// \todo optimize it (invert)
-	SdlTypeList retVal = m_sdlTypes;
-
-	if (onlyLocal){
-		QMutableListIterator typesIter(retVal);
-		while (typesIter.hasNext()){
-			CSdlType type = typesIter.next();
-			if (type.IsExternal()){
-				typesIter.remove();
+	if (m_typesCacheDirty){
+		m_cachedAllTypes = m_sdlTypes;
+		m_cachedLocalTypes.clear();
+		for (const CSdlType& type: std::as_const(m_sdlTypes)){
+			if (!type.IsExternal()){
+				m_cachedLocalTypes << type;
 			}
 		}
+		m_typesCacheDirty = false;
 	}
 
-	return retVal;
+	return onlyLocal ? m_cachedLocalTypes : m_cachedAllTypes;
 }
 
 
@@ -175,19 +173,18 @@ SdlFieldList CGqlSchemaParser::GetFields(const QString typeName) const
 
 SdlRequestList CGqlSchemaParser::GetRequests(bool onlyLocal) const
 {
-	/// \todo optimize it (invert)
-	SdlRequestList retVal = m_requests;
-	if (onlyLocal){
-		QMutableListIterator requestsIter(retVal);
-		while (requestsIter.hasNext()){
-			CSdlRequest request = requestsIter.next();
-			if (request.IsExternal()){
-				requestsIter.remove();
+	if (m_requestsCacheDirty){
+		m_cachedAllRequests = m_requests;
+		m_cachedLocalRequests.clear();
+		for (const CSdlRequest& request: std::as_const(m_requests)){
+			if (!request.IsExternal()){
+				m_cachedLocalRequests << request;
 			}
 		}
+		m_requestsCacheDirty = false;
 	}
 
-	return retVal;
+	return onlyLocal ? m_cachedLocalRequests : m_cachedAllRequests;
 }
 
 
@@ -195,20 +192,18 @@ SdlRequestList CGqlSchemaParser::GetRequests(bool onlyLocal) const
 
 SdlEnumList CGqlSchemaParser::GetEnums(bool onlyLocal) const
 {
-	/// \todo optimize it (invert)
-	SdlEnumList retVal = m_enums;
-
-	if (onlyLocal){
-		QMutableListIterator enumIter(retVal);
-		while (enumIter.hasNext()){
-			CSdlEnum enumType = enumIter.next();
-			if (enumType.IsExternal()){
-				enumIter.remove();
+	if (m_enumsCacheDirty){
+		m_cachedAllEnums = m_enums;
+		m_cachedLocalEnums.clear();
+		for (const CSdlEnum& enumType: std::as_const(m_enums)){
+			if (!enumType.IsExternal()){
+				m_cachedLocalEnums << enumType;
 			}
 		}
+		m_enumsCacheDirty = false;
 	}
 
-	return retVal;
+	return onlyLocal ? m_cachedLocalEnums : m_cachedAllEnums;
 }
 
 
@@ -216,20 +211,27 @@ SdlEnumList CGqlSchemaParser::GetEnums(bool onlyLocal) const
 
 SdlUnionList CGqlSchemaParser::GetUnions(bool onlyLocal) const
 {
-	/// \todo optimize it (invert)
-	SdlUnionList retVal = m_unions;
-
-	if (onlyLocal){
-		QMutableListIterator unionIter(retVal);
-		while (unionIter.hasNext()){
-			CSdlUnion unionType = unionIter.next();
-			if (unionType.IsExternal()){
-				unionIter.remove();
+	if (m_unionsCacheDirty){
+		m_cachedAllUnions = m_unions;
+		m_cachedLocalUnions.clear();
+		for (const CSdlUnion& unionType: std::as_const(m_unions)){
+			if (!unionType.IsExternal()){
+				m_cachedLocalUnions << unionType;
 			}
 		}
+		m_unionsCacheDirty = false;
 	}
 
-	return retVal;
+	return onlyLocal ? m_cachedLocalUnions : m_cachedAllUnions;
+}
+
+
+void CGqlSchemaParser::InvalidateAllCaches() const
+{
+	m_typesCacheDirty = true;
+	m_requestsCacheDirty = true;
+	m_enumsCacheDirty = true;
+	m_unionsCacheDirty = true;
 }
 
 
@@ -341,6 +343,7 @@ bool CGqlSchemaParser::ProcessType()
 	// maybe already added from another file
 	if (!m_sdlTypes.contains(sdlType)){
 		m_sdlTypes << sdlType;
+		m_typesCacheDirty = true;
 	}
 
 	return retVal;
@@ -391,6 +394,7 @@ bool CGqlSchemaParser::ProcessUnion()
 	currentUnion.SetSchemaParamsPtr(m_schemaParamsPtr);
 
 	m_unions.push_back(currentUnion);
+	m_unionsCacheDirty = true;
 
 	return retVal;
 }
@@ -440,6 +444,7 @@ bool CGqlSchemaParser::ProcessEnum()
 	}
 
 	m_enums << currentEnum;
+	m_enumsCacheDirty = true;
 
 	return retVal;
 }
@@ -659,6 +664,7 @@ bool CGqlSchemaParser::ProcessRequests(CSdlRequest::Type type)
 		}
 
 		m_requests << request;
+		m_requestsCacheDirty = true;
 
 		retVal = retVal && MoveToNextReadableSymbol(&foundDelimiter);
 	}
@@ -761,6 +767,7 @@ bool CGqlSchemaParser::ReadToDelimeter(const QByteArray& delimeters,
 	int cutToPos = -2;
 
 	QByteArray readString;
+	readString.reserve(64); // Pre-allocate for typical identifier/token lengths
 
 	if (!m_useLastReadChar){
 		m_stream >> m_lastReadChar;
@@ -829,7 +836,11 @@ bool CGqlSchemaParser::ReadToDelimeterOrSpace(const QByteArray& delimeters,
 			bool allowEmptyResult,
 			bool skipDelimeter)
 {
-	QByteArray newDelimeters = delimeters;
+	// Avoid rebuilding the extended delimiter array on every call
+	// by pre-appending whitespace characters once
+	QByteArray newDelimeters;
+	newDelimeters.reserve(delimeters.size() + 4);
+	newDelimeters.append(delimeters);
 	newDelimeters.append(' ');
 	newDelimeters.append('\n');
 	newDelimeters.append('\r');
@@ -883,27 +894,28 @@ bool CGqlSchemaParser::MoveToCharType(
 
 bool CGqlSchemaParser::MoveToNextReadableSymbol(char* foundDelimeterPtr, bool skipDelimeter)
 {
-	return MoveToCharType(QList<QChar::Category>()
-				<< QChar::Number_DecimalDigit
-				<< QChar::Number_Letter
-				<< QChar::Number_Other
-				<< QChar::Letter_Uppercase
-				<< QChar::Letter_Lowercase
-				<< QChar::Letter_Titlecase
-				<< QChar::Letter_Modifier
-				<< QChar::Letter_Other
-				<< QChar::Punctuation_Connector
-				<< QChar::Punctuation_Dash
-				<< QChar::Punctuation_Open
-				<< QChar::Punctuation_Close
-				<< QChar::Punctuation_InitialQuote
-				<< QChar::Punctuation_FinalQuote
-				<< QChar::Punctuation_Other
-				<< QChar::Symbol_Math
-				<< QChar::Symbol_Currency
-				<< QChar::Symbol_Modifier
-				<< QChar::Symbol_Other,
-						  foundDelimeterPtr, skipDelimeter);
+	static const QList<QChar::Category> s_readableCategories = {
+		QChar::Number_DecimalDigit,
+		QChar::Number_Letter,
+		QChar::Number_Other,
+		QChar::Letter_Uppercase,
+		QChar::Letter_Lowercase,
+		QChar::Letter_Titlecase,
+		QChar::Letter_Modifier,
+		QChar::Letter_Other,
+		QChar::Punctuation_Connector,
+		QChar::Punctuation_Dash,
+		QChar::Punctuation_Open,
+		QChar::Punctuation_Close,
+		QChar::Punctuation_InitialQuote,
+		QChar::Punctuation_FinalQuote,
+		QChar::Punctuation_Other,
+		QChar::Symbol_Math,
+		QChar::Symbol_Currency,
+		QChar::Symbol_Modifier,
+		QChar::Symbol_Other
+	};
+	return MoveToCharType(s_readableCategories, foundDelimeterPtr, skipDelimeter);
 }
 
 
@@ -925,13 +937,14 @@ bool CGqlSchemaParser::MoveAfterWord(const QString& word)
 		return false;
 	}
 
+	const QByteArray wordUtf8 = word.toUtf8();
 	QByteArray dummy;
 	bool isFound = false;
 	bool isRead = true;
 	do {
-		isRead = isRead && ReadToDelimeter(QByteArray(word.toUtf8()[0], 1), dummy, nullptr, false, false);
-		for (int i = 1; i < word.length(); ++i){
-			char expectedSymbol = word.toUtf8()[i];
+		isRead = isRead && ReadToDelimeter(QByteArray(wordUtf8[0], 1), dummy, nullptr, false, false);
+		for (int i = 1; i < wordUtf8.length(); ++i){
+			char expectedSymbol = wordUtf8[i];
 			char actualSymbol = ' ';
 			isRead = isRead && MoveToNextReadableSymbol(&actualSymbol, false);
 			if (expectedSymbol != actualSymbol){

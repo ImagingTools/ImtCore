@@ -55,6 +55,11 @@ protected:
 
 protected:
 	SdlDocumentTypeList m_documentTypes;
+
+	// Cached filtered results to avoid repeated list copies during code generation
+	mutable SdlDocumentTypeList m_cachedLocalDocumentTypes;
+	mutable SdlDocumentTypeList m_cachedAllDocumentTypes;
+	mutable bool m_documentTypesCacheDirty = true;
 };
 
 

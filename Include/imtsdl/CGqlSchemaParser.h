@@ -137,6 +137,22 @@ protected:
 	SdlEnumList m_enums;
 	SdlUnionList m_unions;
 
+	// Cached filtered results to avoid repeated list copies during code generation
+	mutable SdlTypeList m_cachedLocalTypes;
+	mutable SdlTypeList m_cachedAllTypes;
+	mutable SdlRequestList m_cachedLocalRequests;
+	mutable SdlRequestList m_cachedAllRequests;
+	mutable SdlEnumList m_cachedLocalEnums;
+	mutable SdlEnumList m_cachedAllEnums;
+	mutable SdlUnionList m_cachedLocalUnions;
+	mutable SdlUnionList m_cachedAllUnions;
+	mutable bool m_typesCacheDirty = true;
+	mutable bool m_requestsCacheDirty = true;
+	mutable bool m_enumsCacheDirty = true;
+	mutable bool m_unionsCacheDirty = true;
+
+	void InvalidateAllCaches() const;
+
 	/**
 		\brief saved schema parameters, declarated in .sdl file
 		\note this parameter is NEVER null

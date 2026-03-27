@@ -434,6 +434,7 @@ bool CGqlSchemaParserComp::ExtractTypesFromImport(const QStringList& importFiles
 				if (!m_sdlTypes.contains(copiedType)){
 					SendVerboseMessage(QString("'%1': Add SDL from import '%2'. Name:'%3' [%4]").arg(m_currentSchemaFilePath, schemaPath, copiedType.GetName(), paramId));
 					m_sdlTypes << copiedType;
+					m_typesCacheDirty = true;
 				}
 			}
 		}
@@ -465,6 +466,7 @@ bool CGqlSchemaParserComp::ExtractTypesFromImport(const QStringList& importFiles
 
 				CSdlRequest copiedRequest(*sdlRequestParam);
 				m_requests << copiedRequest;
+				m_requestsCacheDirty = true;
 			}
 		}
 
@@ -495,6 +497,7 @@ bool CGqlSchemaParserComp::ExtractTypesFromImport(const QStringList& importFiles
 
 				CSdlDocumentType copiedType(*sdlDocumentTypeParam);
 				m_documentTypes << copiedType;
+				m_documentTypesCacheDirty = true;
 			}
 		}
 
@@ -527,6 +530,7 @@ bool CGqlSchemaParserComp::ExtractTypesFromImport(const QStringList& importFiles
 				// it is ok if it already imported from another scheme
 				if (!m_enums.contains(copiedType)){
 					m_enums << copiedType;
+					m_enumsCacheDirty = true;
 				}
 			}
 		}
@@ -560,6 +564,7 @@ bool CGqlSchemaParserComp::ExtractTypesFromImport(const QStringList& importFiles
 				// it is ok if it already imported from another scheme
 				if (!m_unions.contains(copiedType)){
 					m_unions << copiedType;
+					m_unionsCacheDirty = true;
 				}
 			}
 		}
