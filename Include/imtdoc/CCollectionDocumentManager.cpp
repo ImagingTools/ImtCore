@@ -379,104 +379,68 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
 		return validationStatus;
 	}
 
-	QString resolvedDocumentName;
-	if (HasDocumentNameProvider(workingDocumentPtr->typeId) || documentName.isEmpty()){
-		resolvedDocumentName = GetDefaultDocumentName(workingDocumentPtr->typeId, documentId, *documentSnapshotPtr);
+	const QString resolvedDocumentName = (HasDocumentNameProvider(workingDocumentPtr->typeId) || documentName.isEmpty())
+		? GetDefaultDocumentName(workingDocumentPtr->typeId, documentId, *documentSnapshotPtr)
+		: documentName;
+
+	bool isSavedAs = false;
+
+	if (workingDocumentPtr->objectId.isEmpty()){
+		// Create new object
+		workingDocumentPtr->objectId = collectionPtr->InsertNewObject(
+			workingDocumentPtr->typeId, resolvedDocumentName, "", documentSnapshotPtr.GetPtr());
+
+		if (workingDocumentPtr->objectId.isEmpty()){
+			return OS_FAILED;
+		}
+
+		workingDocumentPtr->name = resolvedDocumentName;
+	}
+	else if (!resolvedDocumentName.isEmpty() && workingDocumentPtr->name != resolvedDocumentName){
+		// Save as: existing object with a new name
+		QByteArray newObjectId = collectionPtr->InsertNewObject(
+			workingDocumentPtr->typeId, resolvedDocumentName, "", documentSnapshotPtr.GetPtr());
+
+		if (newObjectId.isEmpty()){
+			return OS_FAILED;
+		}
+
+		workingDocumentPtr->objectId = newObjectId;
+		workingDocumentPtr->name = resolvedDocumentName;
+		isSavedAs = true;
 	}
 	else{
-		resolvedDocumentName = documentName;
+		// Update existing object
+		if (!collectionPtr->SetObjectData(workingDocumentPtr->objectId, *documentSnapshotPtr)){
+			return OS_FAILED;
+		}
 	}
 
-	if (!workingDocumentPtr->objectId.isEmpty()) {
-		// Create copy of the object
-		if (!resolvedDocumentName.isEmpty() && workingDocumentPtr->name != resolvedDocumentName){
-			QByteArray newObjectId = collectionPtr->InsertNewObject(
-				workingDocumentPtr->typeId, resolvedDocumentName, "", documentSnapshotPtr.GetPtr());
+	workingDocumentPtr->isDirty = false;
+	workingDocumentPtr->undoManagerPtr->StoreDocumentState();
 
-			if (newObjectId.isEmpty()){
-				return OS_FAILED;
-			}
-
-			workingDocumentPtr->objectId = newObjectId;
-			workingDocumentPtr->name = resolvedDocumentName;
-			workingDocumentPtr->isDirty = false;
-			workingDocumentPtr->undoManagerPtr->StoreDocumentState();
-
-			DocumentNotificationPtr notificationPtr = CreateDocumentNotification(userId, documentId);
-			Q_ASSERT(notificationPtr != nullptr);
-			if (notificationPtr != nullptr){
-				istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_SAVED_AS);
-				changeSet.SetChangeInfo(CN_DOCUMENT_SAVED_AS, QVariant::fromValue(*notificationPtr));
-				istd::CChangeNotifier notifier(this, &changeSet);
-			}
-
-			for (IDocumentManagerEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
-				if (handlerPtr != nullptr){
-					CDocumentSavedAsEvent event(
-						userId,
-						documentId,
-						workingDocumentPtr->typeId,
-						workingDocumentPtr->name,
-						ObjectIdToUrl(workingDocumentPtr->objectId),
-						workingDocumentPtr->isDirty);
-					handlerPtr->ProcessEvent(&event);
-				}
-			}
-
-			return OS_OK;
-		}
-
-		// Update object
-		bool res = collectionPtr->SetObjectData(workingDocumentPtr->objectId, *documentSnapshotPtr);
-
-		if (res){
-			workingDocumentPtr->isDirty = false;
-			workingDocumentPtr->undoManagerPtr->StoreDocumentState();
-
-			DocumentNotificationPtr notificationPtr = CreateDocumentNotification(userId, documentId);
-			Q_ASSERT(notificationPtr != nullptr);
-			if (notificationPtr != nullptr){
-				istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_SAVED);
-				changeSet.SetChangeInfo(CN_DOCUMENT_SAVED, QVariant::fromValue(*notificationPtr));
-				istd::CChangeNotifier notifier(this, &changeSet);
-			}
-
-			for (IDocumentManagerEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
-				if (handlerPtr != nullptr){
-					CDocumentSavedEvent event(
-						userId,
-						documentId,
-						workingDocumentPtr->typeId,
-						workingDocumentPtr->name,
-						ObjectIdToUrl(workingDocumentPtr->objectId),
-						workingDocumentPtr->isDirty);
-					handlerPtr->ProcessEvent(&event);
-				}
-			}
-		}
-
-		return res ? OS_OK : OS_FAILED;
+	DocumentNotificationPtr notificationPtr = CreateDocumentNotification(userId, documentId);
+	Q_ASSERT(notificationPtr != nullptr);
+	if (notificationPtr != nullptr){
+		int changeFlag = isSavedAs ? CF_DOCUMENT_SAVED_AS : CF_DOCUMENT_SAVED;
+		istd::IChangeable::ChangeSet changeSet(changeFlag);
+		changeSet.SetChangeInfo(isSavedAs ? CN_DOCUMENT_SAVED_AS : CN_DOCUMENT_SAVED, QVariant::fromValue(*notificationPtr));
+		istd::CChangeNotifier notifier(this, &changeSet);
 	}
 
-	// Create new object
-	workingDocumentPtr->objectId =
-		collectionPtr->InsertNewObject(workingDocumentPtr->typeId, resolvedDocumentName, "", documentSnapshotPtr.GetPtr());
-
-	if (!workingDocumentPtr->objectId.isEmpty()){
-		workingDocumentPtr->name = resolvedDocumentName;
-		workingDocumentPtr->isDirty = false;
-		workingDocumentPtr->undoManagerPtr->StoreDocumentState();
-
-		DocumentNotificationPtr notificationPtr = CreateDocumentNotification(userId, documentId);
-		Q_ASSERT(notificationPtr != nullptr);
-		if (notificationPtr != nullptr){
-			istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_SAVED);
-			changeSet.SetChangeInfo(CN_DOCUMENT_SAVED, QVariant::fromValue(*notificationPtr));
-			istd::CChangeNotifier notifier(this, &changeSet);
-		}
-
-		for (IDocumentManagerEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
-			if (handlerPtr != nullptr){
+	for (IDocumentManagerEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
+		if (handlerPtr != nullptr){
+			if (isSavedAs){
+				CDocumentSavedAsEvent event(
+					userId,
+					documentId,
+					workingDocumentPtr->typeId,
+					workingDocumentPtr->name,
+					ObjectIdToUrl(workingDocumentPtr->objectId),
+					workingDocumentPtr->isDirty);
+				handlerPtr->ProcessEvent(&event);
+			}
+			else{
 				CDocumentSavedEvent event(
 					userId,
 					documentId,
@@ -487,10 +451,9 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
 				handlerPtr->ProcessEvent(&event);
 			}
 		}
-
 	}
 
-	return workingDocumentPtr->objectId.isEmpty() ? OS_FAILED : OS_OK;
+	return OS_OK;
 }
 
 
