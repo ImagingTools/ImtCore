@@ -359,7 +359,7 @@ void CGqlHandlerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& strea
 					*m_sdlEnumListCompPtr,
 					*m_sdlUnionListCompPtr,
 					hIndents + 1,
-					CSdlUnionConverter::CT_MODEL_SCALAR,
+					CSdlUnionConverter::CT_JSON_SCALAR,
 					QStringLiteral("dataModelObj.insert("), //QString(),
 					QStringLiteral("dataModelObj"),
 					QStringLiteral("QJsonObject()"));
