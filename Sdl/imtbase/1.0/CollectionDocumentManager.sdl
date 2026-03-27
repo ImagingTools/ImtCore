@@ -32,6 +32,7 @@ enum EDocumentOperationStatus {
 type DocumentOperationStatus {
 	status: EDocumentOperationStatus!
 	message: String
+	documentName: String
 }
 
 type CollectionId {

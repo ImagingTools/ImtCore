@@ -172,16 +172,9 @@ DocumentManagerBase {
 		getUndoInfoRequest.send(documentIdInput)
 	}
 
-	function refreshDocumentName(documentId){
-		documentNameInput.m_id = documentId
-		documentNameInput.m_collectionId = collectionId
-		getDocumentNameRequest.send(documentNameInput)
-	}
-
 	property CollectionId collectionIdInput: CollectionId {}
 	property ObjectId objectIdInput: ObjectId {}
 	property DocumentId documentIdInput: DocumentId {}
-	property DocumentId documentNameInput: DocumentId {}
 	property SaveDocumentInput saveDocumentInput: SaveDocumentInput {}
 	property DocumentTypeId documentTypeIdInput: DocumentTypeId {}
 	property CollectionUndoRedoInput collectionUndoRedoInput: CollectionUndoRedoInput {}
@@ -193,21 +186,6 @@ DocumentManagerBase {
 			DocumentList {
 				onFinished: {
 					root.openedDocumentListReceived(m_documentList)
-				}
-			}
-		}
-
-		function getHeaders(){
-			return root.getHeaders()
-		}
-	}
-
-	property GqlSdlRequestSender getDocumentNameRequest: GqlSdlRequestSender {
-		gqlCommandId: ImtbaseCollectionDocumentManagerSdlCommandIds.s_getDocumentName
-		sdlObjectComp: Component {
-			DocumentInfo {
-				onFinished: {
-					root.setDocumentName(m_documentId, m_documentName)
 				}
 			}
 		}
@@ -280,7 +258,9 @@ DocumentManagerBase {
 					if (m_status === "Success"){
 						let docId = root.saveDocumentRequest.documentId
 						root.documentSaved(docId)
-						root.refreshDocumentName(docId)
+						if (m_documentName !== undefined && m_documentName !== "") {
+							root.setDocumentName(docId, m_documentName)
+						}
 					}
 					else if (m_status === "InvalidUserId"){
 						root.saveDocumentFailed(root.saveDocumentRequest.documentId, statusMessage(qsTr("Invalid user-ID")))

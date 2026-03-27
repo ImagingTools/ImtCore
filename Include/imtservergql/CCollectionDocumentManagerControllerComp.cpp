@@ -289,6 +289,12 @@ CDM::CDocumentOperationStatus CCollectionDocumentManagerControllerComp::OnSaveDo
 		switch (status){
 		case imtdoc::IDocumentManager::OS_OK:
 			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Success;
+			{
+				QString resolvedName;
+				if (m_documentManagerCompPtr->GetDocumentName(userId, *saveDocumentInput->documentId, resolvedName) == imtdoc::IDocumentManager::OS_OK){
+					retVal.Version_1_0->documentName = resolvedName;
+				}
+			}
 			break;
 		case imtdoc::IDocumentManager::OS_INVALID_USER_ID:
 			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidUserId;

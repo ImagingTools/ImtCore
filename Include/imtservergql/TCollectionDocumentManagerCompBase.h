@@ -390,6 +390,12 @@ inline CDM::CDocumentOperationStatus TCollectionDocumentManagerCompBase<Base, Co
 	switch (status) {
 	case imtdoc::ICollectionDocumentManager::OS_OK:
 		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Success;
+		{
+			QString resolvedName;
+			if (GetNonConstThis()->GetDocumentName(userId, *documentId->id, resolvedName) == OperationStatus::OS_OK){
+				retVal.Version_1_0->documentName = resolvedName;
+			}
+		}
 		break;
 	case imtdoc::ICollectionDocumentManager::OS_INVALID_USER_ID:
 		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidUserId;
