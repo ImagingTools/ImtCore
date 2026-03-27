@@ -202,6 +202,7 @@ DocumentManagerBase {
 			DocumentInfo {
 				onFinished: {
 					root.setAutoNamedTypeId(m_objectTypeId, m_hasNameProvider)
+					root.setDocumentName(m_documentId, m_documentName)
 					root.documentOpened(m_documentId, m_objectTypeId)
 				}
 			}
@@ -225,6 +226,7 @@ DocumentManagerBase {
 			DocumentInfo {
 				onFinished: {
 					root.setAutoNamedTypeId(m_objectTypeId, m_hasNameProvider)
+					root.setDocumentName(m_documentId, m_documentName)
 					root.documentCreated(m_documentId, m_objectTypeId)
 				}
 			}

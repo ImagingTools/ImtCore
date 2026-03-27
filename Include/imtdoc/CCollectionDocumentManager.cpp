@@ -379,8 +379,13 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
 		return validationStatus;
 	}
 
-	const QString resolvedDocumentName =
-		documentName.isEmpty() ? GetDefaultDocumentName(workingDocumentPtr->typeId, documentId, *documentSnapshotPtr) : documentName;
+	QString resolvedDocumentName;
+	if (HasDocumentNameProvider(workingDocumentPtr->typeId) || documentName.isEmpty()){
+		resolvedDocumentName = GetDefaultDocumentName(workingDocumentPtr->typeId, documentId, *documentSnapshotPtr);
+	}
+	else{
+		resolvedDocumentName = documentName;
+	}
 
 	if (!workingDocumentPtr->objectId.isEmpty()) {
 		// Create copy of the object

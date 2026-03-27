@@ -198,14 +198,12 @@ QtObject {
 			return
 		}
 
-		if (documentName.length === 0){
-			if (documentManager.hasDocumentNameProvider(documentTypeId)){
-				documentManager.saveDocument(documentId, documentName)
-			}
-			else{
-				_internal.saveRequested = true
-				documentManager.requestDocumentName(documentId, documentTypeId)
-			}
+		if (documentManager.hasDocumentNameProvider(documentTypeId)){
+			documentManager.saveDocument(documentId, "")
+		}
+		else if (documentName.length === 0){
+			_internal.saveRequested = true
+			documentManager.requestDocumentName(documentId, documentTypeId)
 		}
 		else{
 			documentManager.saveDocument(documentId, documentName)
