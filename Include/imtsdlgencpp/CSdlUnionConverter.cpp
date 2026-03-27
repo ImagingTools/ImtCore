@@ -327,6 +327,7 @@ void CSdlUnionConverter::WriteConversionFromUnion(
 				FeedStreamHorizontally(stream, hIndents + 1);
 				if (!customModelTarget.isEmpty()){
 					if (!addCommand.isEmpty()){
+						// addCommand inserts with empty key for primitive union members (equivalent of CTreeItemModel::SetData("", *val))
 						stream << addCommand << QStringLiteral("\"\", *val);");
 					}
 					else{

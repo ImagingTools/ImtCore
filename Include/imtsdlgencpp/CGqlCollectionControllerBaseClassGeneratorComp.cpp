@@ -775,7 +775,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddPayloadModelWriteCode(
 													 *m_sdlUnionListCompPtr,
 													 hIndents,
 													 CSdlUnionConverter::CT_JSON_SCALAR,
-													 QString(),
+													 QString(), // addCommand: empty, primitive union members use bracket notation via customModelTarget
 													 QStringLiteral("dataModelObj"),
 													 QStringLiteral("false"));
 	}
