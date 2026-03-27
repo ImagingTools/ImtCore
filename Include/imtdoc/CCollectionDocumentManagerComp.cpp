@@ -85,7 +85,7 @@ bool CCollectionDocumentManagerComp::ValidateDocumentData(
 	}
 
 	QString validationMessage;
-	if (!documentValidator->ValidateDocumentData(*document.objectPtr, validationMessage)){
+	if (!documentValidator->ValidateDocumentData(document.objectId, *document.objectPtr, validationMessage)){
 		status = OS_INVALID_DOCUMENT_DATA;
 		if (errorMessage != nullptr) {
 			*errorMessage = validationMessage.isEmpty() ? GetInvalidDocumentMessage() : validationMessage;
