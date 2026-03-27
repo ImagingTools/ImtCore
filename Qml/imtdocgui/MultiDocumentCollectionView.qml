@@ -13,8 +13,6 @@ Item {
 	property CollectionView collectionView: null
 	property DocumentManagerBase documentManager
 
-	property ObjectVisualStatusProvider visualStatusProvider: null
-
 	signal startLoading(string documentId)
 	signal stopLoading(string documentId)
 
@@ -52,50 +50,6 @@ Item {
 					workspaceView.documentManager.openDocument(documentTypeId, documentId)
 				}
 			}
-		}
-	}
-
-	function updateDocumentName(objectId, documentId){
-		if (!documentManager){
-			console.error("Unable to update document name for '"+documentId+"'. Error: Document manager is invalid")
-			return
-		}
-
-		if (!workspaceView.visualStatusProvider){
-			console.error("Unable to update document name for '"+documentId+"'. Error: Visual status provider is invalid")
-			return
-		}
-
-		let callbackOk = function(objectId2, icon, text, description){
-			if (objectId2 === objectId){
-				let documentName = text
-				if (documentName === ""){
-					documentName = workspaceView.documentManager.getDefaultDocumentName()
-				}
-
-				workspaceView.documentManager.setDocumentName(documentId, text)
-				workspaceView.visualStatusProvider.visualStatusReceived.disconnect(callbackOk)
-				workspaceView.visualStatusProvider.visualStatusReceiveFailed.disconnect(cbFailed)
-			}
-		}
-
-		let cbFailed = function(objectId2, errorMessage){
-			if (objectId2 === objectId){
-				let defaultName = workspaceView.documentManager.getDefaultDocumentName()
-				workspaceView.documentManager.setDocumentName(documentId, defaultName)
-				workspaceView.visualStatusProvider.visualStatusReceived.disconnect(callbackOk)
-				workspaceView.visualStatusProvider.visualStatusReceiveFailed.disconnect(cbFailed)
-			}
-		}
-
-		if (objectId === ""){
-			callbackOk("", "", "", "")
-		}
-		else{
-			let documentTypeId = documentManager.getDocumentTypeId(documentId)
-			workspaceView.visualStatusProvider.visualStatusReceived.connect(callbackOk)
-			workspaceView.visualStatusProvider.visualStatusReceiveFailed.connect(cbFailed)
-			workspaceView.visualStatusProvider.getVisualStatus(objectId, documentTypeId)
 		}
 	}
 

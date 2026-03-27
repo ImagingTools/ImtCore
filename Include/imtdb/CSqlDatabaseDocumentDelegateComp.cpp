@@ -530,6 +530,10 @@ imtbase::IRevisionController::RevisionInfoList CSqlDatabaseDocumentDelegateComp:
 		return imtbase::IRevisionController::RevisionInfoList();
 	}
 
+	if (objectId.isEmpty()){
+		return imtbase::IRevisionController::RevisionInfoList();
+	}
+
 	iprm::CParamsSet filterParams;
 	imtcol::CDocumentCollectionFilter documentFilter;
 	documentFilter.SetDocumentId(objectId);
