@@ -153,6 +153,9 @@ Item {
 		}
 
 		function onRequestDocumentName(documentId, documentTypeId){
+			if (workspaceView.documentManager && workspaceView.documentManager.hasDocumentNameProvider(documentTypeId)){
+				return
+			}
 			ModalDialogManager.openDialog(inputDialogComp, {documentId: documentId})
 		}
 
@@ -168,6 +171,11 @@ Item {
 				let documentName = documentInfo.m_documentName
 				let objectTypeId = documentInfo.m_objectTypeId
 				let isDirty = documentInfo.m_isDirty
+				let hasNameProvider = documentInfo.m_hasNameProvider
+
+				if (hasNameProvider !== undefined){
+					workspaceView.documentManager.setAutoNamedTypeId(objectTypeId, hasNameProvider)
+				}
 
 				if (objectId === ""){
 					workspaceView.documentManager.documentCreated(documentId, objectTypeId)

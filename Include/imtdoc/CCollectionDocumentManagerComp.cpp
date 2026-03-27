@@ -42,14 +42,22 @@ idoc::IUndoManagerSharedPtr CCollectionDocumentManagerComp::CreateUndoManager() 
 
 
 QString CCollectionDocumentManagerComp::GetDefaultDocumentName(
+	const QByteArray& typeId,
 	const QByteArray& documentId,
 	const istd::IChangeable& document) const
 {
-	if (!m_documentNameProviderCompPtr.IsValid()){
+	const imtdoc::IDocumentNameProvider* nameProviderPtr = GetDocumentNameProvider(typeId);
+	if (nameProviderPtr == nullptr){
 		return QString();
 	}
 
-	return m_documentNameProviderCompPtr->GetDefaultDocumentName(documentId, document);
+	return nameProviderPtr->GetDefaultDocumentName(documentId, document);
+}
+
+
+bool CCollectionDocumentManagerComp::HasDocumentNameProvider(const QByteArray& typeId) const
+{
+	return GetDocumentNameProvider(typeId) != nullptr;
 }
 
 
@@ -126,6 +134,17 @@ int CCollectionDocumentManagerComp::GetObjectFactoryIndex(const QByteArray& type
 	}
 
 	return -1;
+}
+
+
+const imtdoc::IDocumentNameProvider* CCollectionDocumentManagerComp::GetDocumentNameProvider(const QByteArray& typeId) const
+{
+	int index = GetObjectFactoryIndex(typeId);
+	if ((index >= 0) && (index < m_documentNameProviderCompPtr.GetCount())){
+		return m_documentNameProviderCompPtr[index];
+	}
+
+	return nullptr;
 }
 
 

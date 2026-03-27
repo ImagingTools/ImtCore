@@ -364,10 +364,19 @@ QtObject {
 		__internal.documentManagerActiveView = view
 	}
 
+	function setAutoNamedTypeId(typeId, hasProvider){
+		__internal.autoNamedTypeIds[typeId] = hasProvider
+	}
+
+	function hasDocumentNameProvider(typeId){
+		return typeId in __internal.autoNamedTypeIds && __internal.autoNamedTypeIds[typeId]
+	}
+
 	property QtObject __internal: QtObject {
 		property var documentTypeEditors: ({}) // DocumentTypeId -> [{View Type 1}, {View Type 2}]
 		property var openedDocuments: [] // Array of objects {id, name, model, view, isDirty}
 		property var cachedDocumentNames: ({}) // DocumentId -> Name
+		property var autoNamedTypeIds: ({}) // TypeId -> true for types with automatic name providers
 		property var documentManagerActiveView: null
 
 		property Component documentDataFactory: Component{ 

@@ -39,6 +39,7 @@ CDM::CDocumentList CCollectionDocumentManagerControllerComp::OnGetOpenedDocument
 			sdlInfo.Version_1_0->objectId = objectId;
 			sdlInfo.Version_1_0->objectTypeId = info.typeId;
 			sdlInfo.Version_1_0->isDirty = info.isDirty;
+			sdlInfo.Version_1_0->hasNameProvider = info.hasNameProvider;
 
 			retVal.Version_1_0->documentList->append(sdlInfo.Version_1_0);
 		}

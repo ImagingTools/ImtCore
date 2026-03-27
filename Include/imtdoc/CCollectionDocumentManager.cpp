@@ -55,6 +55,7 @@ IDocumentManager::DocumentList CCollectionDocumentManager::GetOpenedDocumentList
 			info.url = "collection:///" + workingDocument.objectId;
 			info.name = workingDocument.name;
 			info.isDirty = workingDocument.isDirty;
+			info.hasNameProvider = HasDocumentNameProvider(workingDocument.typeId);
 
 			list.append(info);
 		}
@@ -90,7 +91,7 @@ QByteArray CCollectionDocumentManager::CreateNewDocument(const QByteArray& userI
 	documentPtr->objectPtr = objectPtr;
 	documentPtr->undoManagerPtr = undoManagerPtr;
 	documentPtr->isDirty = false;
-	documentPtr->name = GetDefaultDocumentName(retVal, *objectPtr);
+	documentPtr->name = GetDefaultDocumentName(documentTypeId, retVal, *objectPtr);
 
 	InitializeDocumentObservers(*documentPtr, userId);
 
@@ -379,7 +380,7 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
 	}
 
 	const QString resolvedDocumentName =
-		documentName.isEmpty() ? GetDefaultDocumentName(documentId, *documentSnapshotPtr) : documentName;
+		documentName.isEmpty() ? GetDefaultDocumentName(workingDocumentPtr->typeId, documentId, *documentSnapshotPtr) : documentName;
 
 	if (!workingDocumentPtr->objectId.isEmpty()) {
 		// Create copy of the object
@@ -682,10 +683,17 @@ bool CCollectionDocumentManager::ValidateDocumentData(
 
 
 QString CCollectionDocumentManager::GetDefaultDocumentName(
+	const QByteArray& /*typeId*/,
 	const QByteArray& /*documentId*/,
 	const istd::IChangeable& /*document*/) const
 {
 	return QString();
+}
+
+
+bool CCollectionDocumentManager::HasDocumentNameProvider(const QByteArray& /*typeId*/) const
+{
+	return false;
 }
 
 

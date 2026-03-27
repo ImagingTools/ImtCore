@@ -54,6 +54,7 @@ type DocumentInfo {
 	objectTypeId: ID!
 	objectId: ID!
 	isDirty: Bool!
+	hasNameProvider: Bool!
 }
 
 type DocumentList {
