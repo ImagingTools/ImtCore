@@ -2,6 +2,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QJsonObject>
+
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtlic/IFeatureDependenciesProvider.h>
@@ -23,7 +26,7 @@ public:
 
 protected:
 	// reimplemented (imtservergql::CGqlRepresentationDataControllerComp)
-	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual QJsonObject CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 	// reimplemented (imtlic::IFeatureDependenciesProvider)
 	virtual QByteArrayList GetFeatureDependencies(const QByteArray& featureId) const override;

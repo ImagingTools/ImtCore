@@ -1,0 +1,2 @@
+child.width (начальное): 300
+child.height (начальное): 200

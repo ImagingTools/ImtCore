@@ -199,7 +199,8 @@ Item {
 			if (serverApplicationInfo){
 				context.appId = serverApplicationInfo.m_applicationId;
 				context.appName = serverApplicationInfo.m_applicationName;
-				
+				Style.logoIconName = serverApplicationInfo.m_logoIconName;
+
 				pageAboutProvider.serverVersion = serverApplicationInfo.m_version
 				
 				AuthorizationController.productId = serverApplicationInfo.m_applicationId

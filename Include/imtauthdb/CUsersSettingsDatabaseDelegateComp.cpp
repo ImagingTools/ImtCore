@@ -68,10 +68,7 @@ istd::IChangeableUniquePtr CUsersSettingsDatabaseDelegateComp::CreateObjectFromR
 		}
 	}
 
-	istd::IChangeableUniquePtr retVal;
-	retVal.MoveCastedPtr(userSettingsPtr);
-
-	return retVal;
+	return userSettingsPtr;
 }
 
 

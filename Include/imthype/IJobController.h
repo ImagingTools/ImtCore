@@ -3,7 +3,7 @@
 
 
 // ACF includes
-#include <istd/IPolymorphic.h>
+#include <iprm/IParamsSet.h>
 
 
 namespace imthype
@@ -36,6 +36,11 @@ public:
 	virtual JobStatus GetJobStatus(const QByteArray& jobId) const = 0;
 	
 	/**
+		Begin new job with given params
+	*/
+	virtual RequestStatus BeginJob(const QByteArray& jobId, const iprm::IParamsSet* jobParams) = 0;
+
+	/**
 		Cancel the execution of the job with given ID
 	*/
 	virtual RequestStatus CancelJob(const QByteArray& jobId) = 0;
@@ -45,6 +50,11 @@ public:
 		Getting result of the job with given ID will be unavailable
 	*/
 	virtual RequestStatus RemoveJob(const QByteArray& jobId) = 0;
+
+	/**
+		Get the result of the job execution with given ID. Non-null if the job was successfully completed
+	*/
+	virtual istd::IChangeableUniquePtr GetJobResult(const QByteArray& jobId) const = 0;
 };
 
 

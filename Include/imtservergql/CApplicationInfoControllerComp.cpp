@@ -2,6 +2,11 @@
 #include <imtservergql/CApplicationInfoControllerComp.h>
 
 
+// ACF includes
+#include <iprm/TParamsPtr.h>
+#include <iprm/ITextParam.h>
+
+
 namespace imtservergql
 {
 
@@ -10,19 +15,20 @@ namespace imtservergql
 
 // reimplemented (sdl::imtapp::Application::CGraphQlHandlerCompBase)
 
-sdl::imtapp::Application::CApplicationInfo CApplicationInfoControllerComp::OnGetApplicationInfo(
+CApplicationInfoControllerComp::ApplicationInfo CApplicationInfoControllerComp::OnGetApplicationInfo(
 			const sdl::imtapp::Application::CGetApplicationInfoGqlRequest& /*getApplicationInfoRequest*/,
 			const imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
 	if (!m_applicationInfoCompPtr.IsValid()){
-		errorMessage = QString("Unable to get an application info. Error: Component attribute 'm_applicationInfoCompPtr' was not set");
-		SendErrorMessage(0, errorMessage, "CApplicationInfoControllerComp");
+		errorMessage = QStringLiteral("Unable to get an application info. Error: Component reference 'ApplicationInfo' was not set");
+		SendErrorMessage(0, errorMessage, __func__);
 
-		return sdl::imtapp::Application::CApplicationInfo();
+		return {};
 	}
 
-	sdl::imtapp::Application::CApplicationInfo::V1_0 applicationInfo;
+	ApplicationInfo retVal;
+	ApplicationInfo::V1_0& applicationInfo = retVal.Version_1_0.Emplace();
 
 	const iser::IVersionInfo& versionInfo = m_applicationInfoCompPtr->GetVersionInfo();
 	int mainVersion = m_applicationInfoCompPtr->GetMainVersionId();
@@ -33,23 +39,45 @@ sdl::imtapp::Application::CApplicationInfo CApplicationInfoControllerComp::OnGet
 		applicationInfo.version = std::move(version);
 	}
 
-	QString appId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID);
-	applicationInfo.applicationId = std::move(appId);
+	using AppAttribute = ibase::IApplicationInfo::ApplicationAttribute;
+	using AppInfoMember = istd::TSharedNullable<QString> ApplicationInfo::V1_0::*;
 
-	QString appName = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_NAME);
-	applicationInfo.applicationName = std::move(appName);
+	const QHash<AppAttribute, QPair<QByteArray, AppInfoMember>> attributeHash = {
+		{ AppAttribute::AA_APPLICATION_ID,	 { QByteArrayLiteral("ApplicationInfo/ApplicationId"),	 &ApplicationInfo::V1_0::applicationId	 } },
+		{ AppAttribute::AA_APPLICATION_NAME, { QByteArrayLiteral("ApplicationInfo/ApplicationName"), &ApplicationInfo::V1_0::applicationName } },
+		{ AppAttribute::AA_APPLICATION_TYPE, { QByteArrayLiteral("ApplicationInfo/ApplicationType"), &ApplicationInfo::V1_0::applicationType } },
+		{ AppAttribute::AA_COMPANY_NAME,	 { QByteArrayLiteral("ApplicationInfo/CompanyName"),	 &ApplicationInfo::V1_0::companyName	 } },
+		{ AppAttribute::AA_PRODUCT_NAME,	 { QByteArrayLiteral("ApplicationInfo/ProductName"),	 &ApplicationInfo::V1_0::productName	 } },
+	};
 
-	QString productName = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_PRODUCT_NAME);
-	applicationInfo.productName = std::move(productName);
+	for (auto it = attributeHash.constBegin(); it != attributeHash.constEnd(); ++it) {
+		const QByteArray& paramName	= it.value().first;
+		AppInfoMember member		= it.value().second;
 
-	QString companyName = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_COMPANY_NAME);
-	applicationInfo.companyName = std::move(companyName);
+		/**
+			Set value from settings XML file if settings component is assigned and parameter is set in the file.
+			This allows to overwrite default application info attributes with values from settings file.
+		*/
+		if(m_applicationPreferencesCompPtr.IsValid()){
+			iprm::TParamsPtr<iprm::ITextParam> paramPtr(m_applicationPreferencesCompPtr.GetPtr(), paramName, false);
+			if (paramPtr.IsValid()){
+				applicationInfo.*member = paramPtr->GetText();
 
-	QString type = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_TYPE);
-	applicationInfo.applicationType = std::move(type);
+				continue;
+			}
+		}
 
-	sdl::imtapp::Application::CApplicationInfo retVal;
-	retVal.Version_1_0 = std::move(applicationInfo);
+		applicationInfo.*member = m_applicationInfoCompPtr->GetApplicationAttribute(it.key());
+	}
+
+	/**
+		Custom parameters may be added to application info as well.
+		For example, logo icon name parameter is used to display a different logo per client installation.
+	*/
+	iprm::TParamsPtr<iprm::ITextParam> logoIconNameParamPtr(m_applicationPreferencesCompPtr.GetPtr(), QByteArrayLiteral("Style/LogoIconName"), false);
+	if(logoIconNameParamPtr.IsValid()){
+		applicationInfo.logoIconName = logoIconNameParamPtr->GetText();
+	}
 
 	return retVal;
 }

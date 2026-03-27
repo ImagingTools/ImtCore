@@ -37,6 +37,7 @@ ControlBase {
     property bool fontBold: false;
 
     property real placeHolderOpacity: 1;
+	property bool placeHolderVerticalCentered: true;
 
     signal accepted();
     signal cancelled();

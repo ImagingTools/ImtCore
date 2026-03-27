@@ -8,6 +8,7 @@
 #include <QtTest/QtTest>
 
 // ACF includes
+#include <istd/TDelPtr.h>
 #include <istd/TComposedFactory.h>
 #include <istd/TSingleFactory.h>
 #include <itest/CStandardTestExecutor.h>
@@ -309,6 +310,25 @@ void COrderedObjectCollectionTest::testDelegatedOperations()
 	// Test GetElementsCount delegation
 	int count = orderedProxy.GetElementsCount();
 	QCOMPARE(count, 2);
+}
+
+
+void COrderedObjectCollectionTest::testIteratorElementsCount()
+{
+	imtbase::CObjectCollection baseCollection;
+	baseCollection.SetOperationFlags(imtbase::IObjectCollection::OF_ALL);
+
+	typedef istd::TSingleFactory<istd::IChangeable, CTestData> TestDataImpl;
+	baseCollection.RegisterFactory<TestDataImpl>("TestType");
+
+	baseCollection.InsertNewObject("TestType", "Item1", "Description1");
+	baseCollection.InsertNewObject("TestType", "Item2", "Description2");
+	baseCollection.InsertNewObject("TestType", "Item3", "Description3");
+
+	imtbase::COrderedObjectCollectionProxy orderedProxy(&baseCollection);
+	istd::TDelPtr<imtbase::IObjectCollectionIterator> iteratorPtr(orderedProxy.CreateObjectCollectionIterator());
+	QVERIFY(iteratorPtr.IsValid());
+	QCOMPARE(iteratorPtr->GetElementsCount(), orderedProxy.GetElementsCount());
 }
 
 

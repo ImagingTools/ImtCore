@@ -13,6 +13,7 @@ ControlBase {
 
 	property alias tooltipText: tooltip.text;
 	property alias tooltipItem: tooltip;
+	property alias mouseArea: ma;
 
 	property string borderColor: "";
 	property int radius: 0;

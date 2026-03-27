@@ -2,6 +2,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QJsonObject>
+
 // ImtCore includes
 #include <imtservergql/CObjectCollectionControllerCompBase.h>
 #include <imtlic/CFeatureInfo.h>
@@ -22,8 +25,8 @@ public:
 protected:
 	// reimplemented (imtservergql::CObjectCollectionControllerCompBase)
 	virtual istd::IChangeableUniquePtr CreateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QByteArray &objectId, QString& errorMessage) const override;
-	virtual imtbase::CTreeItemModel* GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-	virtual imtbase::CTreeItemModel* GetTreeItemModel(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual QJsonObject GetTreeItemModel(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual bool GetOperationFromRequest(const imtgql::CGqlRequest& gqlRequest, imtgql::CGqlParamObject& gqlObject, QString& errorMessage, int& operationType) const override;
 
 	bool CreateFeatureFromRepresentationModel(const imtbase::CTreeItemModel& representationModel, imtlic::CFeatureInfo& featureInfo, const QByteArray& objectId, QString& errorMessage) const;

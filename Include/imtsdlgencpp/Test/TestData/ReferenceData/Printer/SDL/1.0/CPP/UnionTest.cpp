@@ -1110,7 +1110,7 @@ bool CLink::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 
 		return false;
 	}
-	jsonObject["link"] = QJsonValue::fromVariant(*link);
+	jsonObject["link"] = QString::fromUtf8(*link);
 
 	if (status){
 		QString statusStringValue;

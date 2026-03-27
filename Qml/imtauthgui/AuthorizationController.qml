@@ -41,6 +41,12 @@ QtObject {
 	onRememberMeChanged: saveLoginSettings()
 	onLastUserChanged: saveLoginSettings()
 	onStoredRefreshTokenChanged: saveLoginSettings()
+
+	onProductIdChanged: {
+		if (Qt.platform.os !== "web" && productId !== ""){
+			userTokenProvider.authorizationGqlModel.SetProductId(productId)
+		}
+	}
 	
 	function loadLoginSettings() {
 		let rememberMeStr = LocalStorage.getItem("Login_rememberMe");

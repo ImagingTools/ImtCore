@@ -28,7 +28,7 @@ StyleComponents {
 	property real mainSize;
 
 	property string theme: "Light";
-
+	property string logoIconName;
 	property string language;//deprecated?
 
 	//Font properties
@@ -222,10 +222,12 @@ StyleComponents {
 	//Radius
 	property int textFieldRadius: 3;
 	property int comboBoxRadius: 3;
+	property int menuPanelRadius: radiusL;
 
 	//Other sizes
 	property int sizePanelsHeight: 50;
 	property int headerHeight: 50;
+	property int menuPanelMinWidth: 26;
 
 	//Opacity
 	property real opacityFaint: 0.05
@@ -343,6 +345,7 @@ StyleComponents {
 	//other parameters
 	property real maximumFlickVelocity: 75
 	property bool enableHoverEffect: true
+	property bool enableMenuPanelCollapse: false
 
 
 	function getIconPath(iconName, state, mode, extention /* = '.svg'*/){
@@ -409,6 +412,9 @@ StyleComponents {
 		}
 		if (sourceDecorators.subMenuPanelButtonDecorator){
 			styleContainer.subMenuPanelButtonDecorator = sourceDecorators.subMenuPanelButtonDecorator
+		}
+		if (sourceDecorators.menuPanelDecorator){
+			styleContainer.menuPanelDecorator = sourceDecorators.menuPanelDecorator
 		}
 		if (sourceDecorators.filterPanelDecorator){
 			styleContainer.filterPanelDecorator = sourceDecorators.filterPanelDecorator
@@ -596,7 +602,9 @@ StyleComponents {
 			styleContainer.errorTextColor = styleContainer.getThemeColor("ActiveColors", "ErrorText", dataSource);
 
 			styleContainer.imaginToolsAccentColor = dataSource.getData("ColorPalette").getData("ImaginTools Accent");
+
 		}
+
 	}
 
 	FontLoader{

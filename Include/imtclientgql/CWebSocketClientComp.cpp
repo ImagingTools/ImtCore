@@ -346,6 +346,9 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 				methodType == imtrest::CWebSocketRequest::MT_START ||
 				methodType == imtrest::CWebSocketRequest::MT_DATA){
 		responsePtr = m_clientRequestHandlerCompPtr->ProcessRequest(*webSocketRequest);
+		if (methodType == imtrest::CWebSocketRequest::MT_START){
+			m_startQueries.PushBack(webSocketRequest.PopPtr());
+		}
 	}
 	else{
 		if (methodType == imtrest::CWebSocketRequest::MT_QUERY && m_httpProtocolEngineCompPtr.IsValid() && m_serverRequestHandlerCompPtr.IsValid()){
@@ -375,10 +378,6 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 		QByteArray data = responsePtr->GetData();
 
 		webSocketPtr->sendTextMessage(data);
-
-		if (methodType == imtrest::CWebSocketRequest::MT_START){
-			m_startQueries.PushBack(webSocketRequest.PopPtr());
-		}
 	}
 }
 

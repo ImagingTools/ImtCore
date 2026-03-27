@@ -47,6 +47,11 @@ public:
 	*/
 	virtual idoc::MetaInfoPtr GetDataMetaInfo() const = 0;
 
+	/**
+		Get number of elements available for the iterator query.
+	*/
+	virtual int GetElementsCount() const = 0;
+
 	virtual idoc::MetaInfoPtr GetCollectionMetaInfo() const = 0;
 
 	/**
@@ -62,5 +67,4 @@ public:
 
 
 } // namespace imtbase
-
 

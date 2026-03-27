@@ -22,12 +22,10 @@ protected:
 	// reimplemented (imtserverapp::CGuiElementRepresentationControllerComp)
 	virtual bool SetupItemModel(
 				const imtserverapp::IGuiElementModel& guiElementModel,
-				imtbase::CTreeItemModel& representation,
-				int index,
+				QJsonObject& representation,
 				const iprm::IParamsSet* paramsPtr) const override;
 };
 
 
 } // namespace imtserverapp
-
 

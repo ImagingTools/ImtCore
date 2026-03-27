@@ -332,7 +332,13 @@ class TextInput extends Item {
     SLOT_activeFocusChanged(oldValue, newValue){
         if(!newValue){
             this.__impl.blur()
-            this.editingFinished()
+
+            if(this.validator){
+                if(this.validator.validate(this.text)) this.editingFinished()
+            } else {
+                this.editingFinished()
+            }
+            
         }
     }
 

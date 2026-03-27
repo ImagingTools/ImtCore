@@ -32,10 +32,12 @@ public Q_SLOTS:
 
 	static void SetGlobalAccessToken(const QString& accessToken);
 	static void SetRefreshToken(const QString& refreshToken);
+	static void SetProductId(const QString& productId);
 
 public:
 	static QString s_accessToken;
 	static QString s_refreshToken;
+	static QString s_productId;
 };
 
 

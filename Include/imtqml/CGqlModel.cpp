@@ -13,6 +13,7 @@ namespace imtqml
 
 QString CGqlModel::s_accessToken = QString();
 QString CGqlModel::s_refreshToken = QString();
+QString CGqlModel::s_productId = QString();
 
 
 CGqlModel::CGqlModel(QObject *parent)
@@ -42,12 +43,19 @@ bool CGqlModel::SetGqlQuery(QString query, QVariantMap headers)
 		QNetworkRequest networkRequest = QNetworkRequest(requestUrl);
 		networkRequest.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("application/x-www-form-urlencoded"));
 
+		QStringList keys = headers.keys();
+		for (QString& key: keys){
+			networkRequest.setRawHeader(key.toLatin1(), headers.value(key).toByteArray());
+		}
+
+		if (!s_productId.isEmpty()){
+			if (!networkRequest.hasRawHeader("productId")){
+				networkRequest.setRawHeader("productId", s_productId.toUtf8());
+			}
+		}
+
 		if (!s_accessToken.isEmpty()){
 			networkRequest.setRawHeader("x-authentication-token", s_accessToken.toUtf8());
-			QStringList keys = headers.keys();
-			for (QString& key: keys){
-				networkRequest.setRawHeader(key.toLatin1(), headers.value(key).toByteArray());
-			}
 		}
 
 		QString message = QString("Post to url '%1' query '%2'").arg(requestUrl.toString()).arg(query);
@@ -113,6 +121,14 @@ void CGqlModel::SetRefreshToken(const QString& refreshToken)
 {
 	if (s_refreshToken != refreshToken){
 		s_refreshToken = refreshToken;
+	}
+}
+
+
+void CGqlModel::SetProductId(const QString& productId)
+{
+	if (s_productId != productId){
+		s_productId = productId;
 	}
 }
 

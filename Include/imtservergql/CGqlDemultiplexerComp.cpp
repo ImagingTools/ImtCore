@@ -29,7 +29,7 @@ bool CGqlDemultiplexerComp::IsRequestSupported(const imtgql::CGqlRequest& gqlReq
 
 // reimplemented (imtservergql::CGqlRepresentationDataControllerComp)
 
-imtbase::CTreeItemModel* CGqlDemultiplexerComp::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CGqlDemultiplexerComp::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	for (int i = 0; i < m_gqlRequestHandlersCompPtr.GetCount(); i++){
 		const imtgql::IGqlRequestHandler* gqlRequestHahdlerPtr = m_gqlRequestHandlersCompPtr[i];
@@ -40,7 +40,7 @@ imtbase::CTreeItemModel* CGqlDemultiplexerComp::CreateResponse(const imtgql::CGq
 		}
 	}
 
-	return nullptr;
+	return QJsonObject();
 }
 
 

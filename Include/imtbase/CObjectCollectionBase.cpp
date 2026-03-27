@@ -1125,6 +1125,12 @@ idoc::MetaInfoPtr CObjectCollectionBase::CollectionIterator::GetDataMetaInfo() c
 }
 
 
+int CObjectCollectionBase::CollectionIterator::GetElementsCount() const
+{
+	return m_parent.GetElementsCount();
+}
+
+
 idoc::MetaInfoPtr CObjectCollectionBase::CollectionIterator::GetCollectionMetaInfo() const
 {
 	if (IsValid()){
@@ -1200,5 +1206,4 @@ QByteArray CObjectCollectionBase::CollectionIterator::GetObjectId(int index) con
 
 
 } // namespace imtbase
-
 

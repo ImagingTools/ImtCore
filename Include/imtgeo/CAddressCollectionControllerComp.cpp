@@ -2,6 +2,10 @@
 #include <imtgeo/CAddressCollectionControllerComp.h>
 
 
+// Qt includes
+#include <QJsonArray>
+#include <QJsonValue>
+
 // ACF includes
 #include <idoc/CStandardDocumentMetaInfo.h>
 #include <idoc/IDocumentMetaInfo.h>
@@ -38,34 +42,30 @@ QVariant CAddressCollectionControllerComp::GetObjectInformation(
 }
 
 
-imtbase::CTreeItemModel* CAddressCollectionControllerComp::GetMetaInfo(
+QJsonObject CAddressCollectionControllerComp::GetMetaInfo(
 	const imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& /*errorMessage*/) const
 {
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	return rootModelPtr.PopPtr();
+	return QJsonObject();
 }
 
 
-imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CAddressCollectionControllerComp::ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModel = nullptr;
-	imtbase::CTreeItemModel* itemsModel = nullptr;
-	imtbase::CTreeItemModel* notificationModel = nullptr;
+	QJsonObject rootObj;
+	QJsonObject dataObj;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
 	}
 
 	if (!errorMessage.isEmpty()){
-		imtbase::CTreeItemModel* errorsItemModel = rootModelPtr->AddTreeModel("errors");
-		errorsItemModel->SetData("message", errorMessage);
+		QJsonObject errorsObj;
+		errorsObj.insert(QStringLiteral("message"), QJsonValue::fromVariant(errorMessage));
+		rootObj.insert(QStringLiteral("errors"), errorsObj);
 	}
 	else {
-		dataModel = new imtbase::CTreeItemModel();
-		itemsModel = new imtbase::CTreeItemModel();
-		notificationModel = new imtbase::CTreeItemModel();
+		QJsonObject notificationObj;
 
 		const imtgql::CGqlParamObject* viewParamsGql = nullptr;
 		const imtgql::CGqlParamObject& inputParams = gqlRequest.GetParams();
@@ -176,12 +176,12 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
 			pagesCount = 1;
 		}
 
-		notificationModel->SetData("PagesCount", pagesCount);
+		notificationObj.insert(QStringLiteral("PagesCount"), QJsonValue::fromVariant(pagesCount));
 
 
 		imtdb::CSqlDatabaseObjectCollectionComp* objectCollectionCompPtr = dynamic_cast<imtdb::CSqlDatabaseObjectCollectionComp*>(m_objectCollectionCompPtr.GetPtr());
 		if (objectCollectionCompPtr == nullptr){
-			return nullptr;
+			return QJsonObject();
 
 		}
 		//        int countElement = objectCollectionCompPtr->GetElementsCount(&filterParams);
@@ -192,60 +192,59 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
 		istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(
 					objectCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), offset, count, &filterParams));
 
+		QJsonArray itemsArray;
+
 		if (objectCollectionIterator != nullptr){
 			while (objectCollectionIterator->Next()){
 				imtbase::IObjectCollection::DataPtr objectDataPtr;
 				if (objectCollectionIterator->GetObjectData(objectDataPtr)){
-					int itemIndex = itemsModel->InsertNewItem();
-					if (itemIndex >= 0){
+					QJsonObject itemObj;
 
-						const imtgeo::IAddressElementInfo* addressElementInfoPtr = nullptr;
-						const imtgeo::CPositionIdentifiable* addressPosition = nullptr;
-						addressElementInfoPtr = dynamic_cast<const imtgeo::IAddressElementInfo*>(objectDataPtr.GetPtr());
-						addressPosition = dynamic_cast<const imtgeo::CPositionIdentifiable*>(objectDataPtr.GetPtr());
+					const imtgeo::IAddressElementInfo* addressElementInfoPtr = nullptr;
+					const imtgeo::CPositionIdentifiable* addressPosition = nullptr;
+					addressElementInfoPtr = dynamic_cast<const imtgeo::IAddressElementInfo*>(objectDataPtr.GetPtr());
+					addressPosition = dynamic_cast<const imtgeo::CPositionIdentifiable*>(objectDataPtr.GetPtr());
 
-						QString fullAddress = addressElementInfoPtr->GetAddress();
-						QString name = addressElementInfoPtr->GetName();
-						QByteArray addressId = addressPosition->GetObjectUuid();
-						QByteArray typeAddressId = addressElementInfoPtr->GetAddressTypeId();
-						QList<QByteArray> parentsList = addressElementInfoPtr->GetParentIds();
-						QByteArray addressParentId = parentsList.isEmpty() ? QByteArray() : parentsList.last();
-						QString parentsStr = QString();
-						double lat = addressElementInfoPtr->GetLatitude();
-						double lon = addressElementInfoPtr->GetLongitude();
-						for (int i = 0; i < parentsList.count(); i++){
-							parentsStr.append(QString(parentsList.at(i)));
-							if (i < parentsList.count() - 1){
-								parentsStr.append(",");
-							}
+					QString fullAddress = addressElementInfoPtr->GetAddress();
+					QString name = addressElementInfoPtr->GetName();
+					QByteArray addressId = addressPosition->GetObjectUuid();
+					QByteArray typeAddressId = addressElementInfoPtr->GetAddressTypeId();
+					QList<QByteArray> parentsList = addressElementInfoPtr->GetParentIds();
+					QByteArray addressParentId = parentsList.isEmpty() ? QByteArray() : parentsList.last();
+					QString parentsStr = QString();
+					double lat = addressElementInfoPtr->GetLatitude();
+					double lon = addressElementInfoPtr->GetLongitude();
+					for (int i = 0; i < parentsList.count(); i++){
+						parentsStr.append(QString(parentsList.at(i)));
+						if (i < parentsList.count() - 1){
+							parentsStr.append(",");
 						}
-
-						itemsModel->SetData("FullAddress", fullAddress, itemIndex);
-						itemsModel->SetData("Id", addressId, itemIndex);
-						itemsModel->SetData("Name", name, itemIndex);
-						itemsModel->SetData("TypeId", typeAddressId, itemIndex);
-						itemsModel->SetData("ParentId", addressParentId, itemIndex);
-						itemsModel->SetData("ParentIds", parentsStr, itemIndex);
-						itemsModel->SetData("Latitude", lat, itemIndex);
-						itemsModel->SetData("Longitude", lon, itemIndex);
-
 					}
 
+					itemObj.insert(QStringLiteral("FullAddress"), QJsonValue::fromVariant(fullAddress));
+					itemObj.insert(QStringLiteral("Id"), QJsonValue::fromVariant(QVariant(addressId)));
+					itemObj.insert(QStringLiteral("Name"), QJsonValue::fromVariant(name));
+					itemObj.insert(QStringLiteral("TypeId"), QJsonValue::fromVariant(QVariant(typeAddressId)));
+					itemObj.insert(QStringLiteral("ParentId"), QJsonValue::fromVariant(QVariant(addressParentId)));
+					itemObj.insert(QStringLiteral("ParentIds"), QJsonValue::fromVariant(parentsStr));
+					itemObj.insert(QStringLiteral("Latitude"), QJsonValue::fromVariant(lat));
+					itemObj.insert(QStringLiteral("Longitude"), QJsonValue::fromVariant(lon));
+
+					itemsArray.append(itemObj);
 				}
 			}//while
 		}//ITERATOR
 
-		if ((itemsModel->GetItemsCount() == 0) && !parentIds.isEmpty() && filterText.isEmpty()){
-			notificationModel->SetData("Close", true);
+		if ((itemsArray.count() == 0) && !parentIds.isEmpty() && filterText.isEmpty()){
+			notificationObj.insert(QStringLiteral("Close"), QJsonValue::fromVariant(true));
 		}
 
-		itemsModel->SetIsArray(true);
-		dataModel->SetExternTreeModel("items", itemsModel);
-		dataModel->SetExternTreeModel("notification", notificationModel);
+		dataObj.insert(QStringLiteral("items"), itemsArray);
+		dataObj.insert(QStringLiteral("notification"), notificationObj);
 	}
-	rootModelPtr->SetExternTreeModel("data", dataModel);
+	rootObj.insert(QStringLiteral("data"), dataObj);
 
-	return rootModelPtr.PopPtr();
+	return rootObj;
 }
 
 

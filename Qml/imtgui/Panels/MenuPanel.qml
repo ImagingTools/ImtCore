@@ -12,7 +12,7 @@ Rectangle {
 	clip: true;
 
 	color: Style.backgroundColor;
-	radius: Style.radiusL;
+	radius: Style.menuPanelRadius;
 
 	property string textColor: Style.textColor;
 	property string fontName: "Helvetica";
@@ -38,17 +38,23 @@ Rectangle {
 	property int buttonHeight: -1;
 
 	property bool centered: Style.menuPanelCentered !== undefined ? Style.menuPanelCentered : false;
+	property bool collapsed: false
 
 	Component.onCompleted: {
 		Events.subscribeEvent("MenuModelRequest", menuPanel.onMenuModelRequest);
 		Events.subscribeEvent("UpdatePageVisualStatus", menuPanel.updateVisualStatus);
 		Events.subscribeEvent("ChangePage", menuPanel.setActivePage);
+		Events.subscribeEvent("CollapseMenu", menuPanel.setCollapsed);
+		Events.subscribeEvent("ExpandMenu", menuPanel.setCollapsed);
 	}
 
 	Component.onDestruction: {
 		Events.unSubscribeEvent("MenuModelRequest", menuPanel.onMenuModelRequest);
 		Events.unSubscribeEvent("UpdatePageVisualStatus", menuPanel.updateVisualStatus);
 		Events.unSubscribeEvent("ChangePage", menuPanel.setActivePage);
+		Events.unSubscribeEvent("CollapseMenu", menuPanel.setCollapsed);
+		Events.unSubscribeEvent("ExpandMenu", menuPanel.setCollapsed);
+
 	}
 
 	onActivePageIdChanged: {
@@ -57,6 +63,10 @@ Rectangle {
 			
 			NavigationController.push(activePageId)
 		}
+	}
+
+	onWidthChanged: {
+		Events.sendEvent("MenuWidthChanged", width)
 	}
 
 	Keys.onPressed: {
@@ -120,6 +130,10 @@ Rectangle {
 		allPages.model = 0;
 		topAlignmentPages.model = 0;
 		bottomAlignmentPages.model = 0;
+	}
+
+	function setCollapsed(stateArg){
+		collapsed = stateArg;
 	}
 
 	onModelChanged: {
@@ -215,6 +229,48 @@ Rectangle {
 			}
 		}
 	}
+
+	ToolButton {
+		id: collapseButton;
+
+		anchors.top: parent.top
+		anchors.right: parent.right
+		anchors.topMargin: Style.marginXS
+		anchors.rightMargin: Style.marginXS
+
+		width: height;
+		height: Style.buttonHeightXXS - 2;
+		z:100
+
+		visible: false//Style.enableMenuPanelCollapse && !collapsed
+
+		//iconSource: "../../../" + Style.getIconPath(!menuPanel.collapsed ? "Icons/Collapse" : "Icons/Expand", Icon.State.On, Icon.Mode.Normal);
+		iconSource: "../../../" + Style.getIconPath("Icons/Close" , Icon.State.On, Icon.Mode.Normal);
+
+		//tooltipText: !menuPanel.collapsed ? qsTr("Collapse") : qsTr("Expand");
+		property real menuDefaultWidth: 0
+		property bool collapsed: menuPanel.collapsed
+		onCollapsedChanged: {
+			if(collapsed){
+				menuDefaultWidth = menuPanel.width
+				menuPanel.width = Style.menuPanelMinWidth
+			}
+			else {
+				menuPanel.width = menuDefaultWidth
+			}
+		}
+		onClicked: {
+			//menuPanel.collapsed = !menuPanel.collapsed
+			menuPanel.collapsed = true
+		}
+	}
+
+	Loader{
+		anchors.fill: parent
+		sourceComponent: Style.menuPanelDecorator//backgroundComp
+	}
+
+
 
 	Flickable{
 		id: allPagesFlick;

@@ -4,8 +4,8 @@
   "description": "",
   "main": "compiler/compiler.js",
   "scripts": {
-    "build-core": "webpack --mode production --config webpack.config.js",
-    "build-core-dev": "webpack --mode development --config webpack.config.js",
+    "build-core": "webpack --mode production --config webpack.config.js && node ./test/index.js",
+    "build-core-dev": "webpack --mode development --config webpack.config.js && node ./test/index.js",
     "compile": "node ./compiler/compiler.js"
   },
   "author": "Artur Menshikov",
@@ -14,8 +14,10 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
+    "chromedriver": "^146.0.6",
     "commander": "^14.0.1",
     "ol": "^7.5.2",
+    "selenium-webdriver": "^4.41.0",
     "source-map-generator": "^0.8.0",
     "uglify-js": "^3.19.3"
   }

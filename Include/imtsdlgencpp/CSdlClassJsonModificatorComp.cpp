@@ -93,13 +93,32 @@ QString CSdlClassJsonModificatorComp::GetArrayContainerObjectVariableName() cons
 
 bool CSdlClassJsonModificatorComp::AddFieldValueWriteToObject(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, uint /*horizontalIndents*/) const
 {
+	bool isUnion = false;
+	const QString convertedType = ConvertTypeOrEnumOrUnion(
+		field,
+		m_sdlEnumListCompPtr->GetEnums(false),
+		m_sdlUnionListCompPtr->GetUnions(false),
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		&isUnion);
+
 	stream << GetContainerObjectVariableName();
 	stream << '[' << '"';
 	stream << field.GetId();
 	stream << '"' << ']' << ' ' << '=' << ' ';
-	stream << "QJsonValue::fromVariant(";
-	stream << variableName;
-	stream << ")";
+
+	if (convertedType == QStringLiteral("QByteArray") && !isUnion){
+		stream << QStringLiteral("QString::fromUtf8(");
+		stream << variableName;
+		stream << ')';
+	}
+	else{
+		stream << "QJsonValue::fromVariant(";
+		stream << variableName;
+		stream << ")";
+	}
 	stream << ';';
 
 	return true;
@@ -514,4 +533,3 @@ QString CSdlClassJsonModificatorComp::GetConvertEndForFieldString(const imtsdl::
 
 
 } // namespace imtsdlgencpp
-

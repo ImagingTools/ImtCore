@@ -54,43 +54,6 @@ class Flickable extends Item {
         obj.__DOM.classList.add('Flickable')
         obj.contentItem = Item.create(obj)
 
-        // obj.contentItem.AXChanged.blockSignal(true)
-        // obj.contentItem.AYChanged.blockSignal(true)
-        // obj.contentItem.AWidthChanged.blockSignal(true)
-        // obj.contentItem.AHeightChanged.blockSignal(true)
-
-        obj.contentItem.onXChanged=()=>{
-            if(-obj.contentItem.x > obj.contentWidth - obj.width){
-                obj.contentItem.__setDOMStyle({
-                    left: (obj.contentWidth - obj.width)+'px'
-                })
-            } else if(-obj.contentItem.x < obj.originX){
-                obj.contentItem.__setDOMStyle({
-                    left: obj.originX+'px'
-                })
-            } else {
-                obj.contentItem.__setDOMStyle({
-                    left: obj.contentItem.x+'px'
-                })
-            }
-        }
-    
-        obj.contentItem.onYChanged=()=>{
-            if(-obj.contentItem.y > obj.contentHeight - obj.height){
-                obj.contentItem.__setDOMStyle({
-                    top: (obj.contentHeight - obj.height)+'px'
-                })
-            } else if(-obj.contentItem.y < obj.originY){
-                obj.contentItem.__setDOMStyle({
-                    top: obj.originY+'px'
-                })
-            } else {
-                obj.contentItem.__setDOMStyle({
-                    top: obj.contentItem.y+'px'
-                })
-            }
-        }
-
         JQApplication.MouseController.add(obj)
         return obj
     }
@@ -119,6 +82,7 @@ class Flickable extends Item {
         } else {
             this.contentX = this.originX
         }
+        JQApplication.updateLater(this)
     }
 
     SLOT_heightChanged(oldValue, newValue){
@@ -133,16 +97,17 @@ class Flickable extends Item {
         } else {
             this.contentY = this.originY
         }
+        JQApplication.updateLater(this)
     }
 
     SLOT_contentWidthChanged(oldValue, newValue){
-        this.contentItem.width = this.contentWidth
-        if(this.contentWidth - this.width > 0){
+        this.contentItem.width = newValue
+        if(newValue - this.width > 0){
             if(this.contentX < this.originX){
                 this.contentX = this.originX
             }
-            if(this.contentX > this.contentWidth - this.width){
-                this.contentX = this.contentWidth - this.width
+            if(this.contentX > newValue - this.width){
+                this.contentX = newValue - this.width
             }
         } else {
             this.contentX = this.originX
@@ -150,17 +115,29 @@ class Flickable extends Item {
     }
 
     SLOT_contentHeightChanged(oldValue, newValue){
-        this.contentItem.height = this.contentHeight
-        if(this.contentHeight - this.height > 0){
+        this.contentItem.height = newValue
+        if(newValue - this.height > 0){
             if(this.contentY < this.originY){
                 this.contentY = this.originY
             }
-            if(this.contentY > this.contentHeight - this.height){
-                this.contentY = this.contentHeight - this.height
+            if(this.contentY > newValue - this.height){
+                this.contentY = newValue - this.height
             }
         } else {
             this.contentY = this.originY
         }
+    }
+
+    __updateGeometry(){
+        if(!this.__proxy.visible) return
+
+        Geometry.setAuto(this.contentItem.__self, 'width', this.width, this.contentItem.__self.constructor.meta.width)
+        Geometry.setAuto(this.contentItem.__self, 'height', this.height, this.contentItem.__self.constructor.meta.height)
+    }
+
+    __endUpdate(){
+        this.__updateGeometry()
+        super.__endUpdate()
     }
 
     __onMouseMove(mouse){

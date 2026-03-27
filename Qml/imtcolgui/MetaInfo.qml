@@ -20,6 +20,10 @@ Rectangle {
 
 	Component.onCompleted: {
 		registerViewDelegate("Date", metaInfoViewDateDelegateComp)
+		registerViewDelegate("Time", metaInfoViewDateDelegateComp)
+		registerViewDelegate("DateTime", metaInfoViewDateDelegateComp)
+		registerViewDelegate("StringList", metaInfoViewStringListDelegateComp)
+		registerViewDelegate("ByteArrayList", metaInfoViewStringListDelegateComp)
 	}
 	
 	function startLoading(){
@@ -37,6 +41,12 @@ Rectangle {
 	Component {
 		id: metaInfoViewDelegateBaseComp
 		MetaInfoTextDelegate {
+		}
+	}
+
+	Component {
+		id: metaInfoViewStringListDelegateComp
+		MetaInfoStringListDelegate {
 		}
 	}
 

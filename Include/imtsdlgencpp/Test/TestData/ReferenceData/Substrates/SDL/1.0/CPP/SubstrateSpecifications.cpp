@@ -104,7 +104,7 @@ bool CInputId::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 
 		return false;
 	}
-	jsonObject["id"] = QJsonValue::fromVariant(*id);
+	jsonObject["id"] = QString::fromUtf8(*id);
 
 	jsonObject["__typename"] = "InputId";
 
@@ -887,15 +887,15 @@ bool CSubstrateSpecificationDocumentTypeIds::V1_0::OptReadFromGraphQlObject(cons
 bool CSubstrateSpecificationDocumentTypeIds::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (PaperID){
-		jsonObject["PaperID"] = QJsonValue::fromVariant(*PaperID);
+		jsonObject["PaperID"] = QString::fromUtf8(*PaperID);
 	}
 
 	if (CardboardID){
-		jsonObject["CardboardID"] = QJsonValue::fromVariant(*CardboardID);
+		jsonObject["CardboardID"] = QString::fromUtf8(*CardboardID);
 	}
 
 	if (FilmID){
-		jsonObject["FilmID"] = QJsonValue::fromVariant(*FilmID);
+		jsonObject["FilmID"] = QString::fromUtf8(*FilmID);
 	}
 
 	jsonObject["__typename"] = "SubstrateSpecificationDocumentTypeIds";
@@ -1885,14 +1885,14 @@ bool CSubstrateSpecificationListItem::V1_0::WriteToJsonObject(QJsonObject& jsonO
 
 		return false;
 	}
-	jsonObject["id"] = QJsonValue::fromVariant(*id);
+	jsonObject["id"] = QString::fromUtf8(*id);
 
 	if (!typeId){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "typeId").toLocal8Bit().constData();)
 
 		return false;
 	}
-	jsonObject["typeId"] = QJsonValue::fromVariant(*typeId);
+	jsonObject["typeId"] = QString::fromUtf8(*typeId);
 
 	if (!name){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "name").toLocal8Bit().constData();)
@@ -1902,7 +1902,7 @@ bool CSubstrateSpecificationListItem::V1_0::WriteToJsonObject(QJsonObject& jsonO
 	jsonObject["name"] = QJsonValue::fromVariant(*name);
 
 	if (materialId){
-		jsonObject["materialId"] = QJsonValue::fromVariant(*materialId);
+		jsonObject["materialId"] = QString::fromUtf8(*materialId);
 	}
 
 	if (materialName){
@@ -4314,7 +4314,7 @@ bool CSubstrateSpecificationInput::V1_0::WriteToJsonObject(QJsonObject& jsonObje
 
 		return false;
 	}
-	jsonObject["id"] = QJsonValue::fromVariant(*id);
+	jsonObject["id"] = QString::fromUtf8(*id);
 
 	if (name){
 		jsonObject["name"] = QJsonValue::fromVariant(*name);
@@ -4363,7 +4363,7 @@ bool CSubstrateSpecificationInput::V1_0::WriteToJsonObject(QJsonObject& jsonObje
 
 		return false;
 	}
-	jsonObject["typeId"] = QJsonValue::fromVariant(*typeId);
+	jsonObject["typeId"] = QString::fromUtf8(*typeId);
 
 	jsonObject["__typename"] = "SubstrateSpecificationInput";
 
@@ -4834,7 +4834,7 @@ bool CSubstrateSpecificationDocumentMetaInfo::V1_0::OptReadFromGraphQlObject(con
 bool CSubstrateSpecificationDocumentMetaInfo::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (materialId){
-		jsonObject["materialId"] = QJsonValue::fromVariant(*materialId);
+		jsonObject["materialId"] = QString::fromUtf8(*materialId);
 	}
 
 	if (lab){
@@ -9026,42 +9026,56 @@ bool CSubstrateSpecificationCollectionControllerCompBase::UpdateObjectFromReques
 }
 
 
-bool CSubstrateSpecificationCollectionControllerCompBase::SetupGqlItem(const ::imtgql::CGqlRequest& gqlRequest, ::imtbase::CTreeItemModel& dataModel, int itemIndex,const ::imtbase::IObjectCollectionIterator* objectCollectionIterator, QString& errorMessage) const
+::imtservergql::CObjectCollectionControllerCompBase::GqlItemSetupContext CSubstrateSpecificationCollectionControllerCompBase::CreateGqlItemSetupContext(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
+	const QByteArray commandId = gqlRequest.GetCommandId();
+	auto setupContext = std::make_shared<CGetSubstrateSpecificationListGqlRequest>(gqlRequest, false);
+	if (!setupContext->IsValid()){
+		errorMessage = QString("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
+		SendErrorMessage(0, errorMessage);
+
+		return {};
+	}
+
+	return setupContext;
+}
+
+
+bool CSubstrateSpecificationCollectionControllerCompBase::SetupGqlItemWithContext(const ::imtgql::CGqlRequest& gqlRequest, const ::imtservergql::CObjectCollectionControllerCompBase::GqlItemSetupContext& setupContext, ::imtbase::CTreeItemModel& dataModel, int itemIndex,const ::imtbase::IObjectCollectionIterator* objectCollectionIterator, QString& errorMessage) const
+{
+	Q_UNUSED(gqlRequest);
+
 	if (objectCollectionIterator == nullptr){
 I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create object iterator.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 		return false;
 	}
 
-	const QByteArray commandId = gqlRequest.GetCommandId();
+	const auto typedSetupContext = std::static_pointer_cast<const CGetSubstrateSpecificationListGqlRequest>(setupContext);
+	if (!typedSetupContext){
+		errorMessage = QString("Internal error. Invalid request setup context for command-ID: '%1'").arg(qPrintable(CGetSubstrateSpecificationListGqlRequest::GetCommandId()));
+		SendErrorMessage(0, errorMessage);
 
-	//GetSubstrateSpecificationList
-	if (commandId == CGetSubstrateSpecificationListGqlRequest::GetCommandId()){
-		CGetSubstrateSpecificationListGqlRequest getSubstrateSpecificationListGqlRequest(gqlRequest, false);
-		CSubstrateSpecificationListItem::V1_0 representationObject;
-		const bool isRepresentationCreated = CreateRepresentationFromObject(*objectCollectionIterator, getSubstrateSpecificationListGqlRequest, representationObject, errorMessage);
-		if (!isRepresentationCreated){
-	I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create representation").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-
-		const bool isRepresentationWritten = representationObject.WriteToModel(dataModel, itemIndex);
-		if (!isRepresentationWritten){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to Write TreeModel").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-
-		return true;
+		return false;
 	}
 
-	errorMessage = QString("Bad request. Unexpected command-ID: '%1'").arg(qPrintable(commandId));
+	//GetSubstrateSpecificationList
+	CSubstrateSpecificationListItem::V1_0 representationObject;
+	const bool isRepresentationCreated = CreateRepresentationFromObject(*objectCollectionIterator, *typedSetupContext, representationObject, errorMessage);
+	if (!isRepresentationCreated){
+	I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create representation").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
-	SendErrorMessage(0, errorMessage);
+		return false;
+	}
 
-	return false;
+	const bool isRepresentationWritten = representationObject.WriteToModel(dataModel, itemIndex);
+	if (!isRepresentationWritten){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to Write TreeModel").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+
+		return false;
+	}
+
+	return true;
 }
 
 

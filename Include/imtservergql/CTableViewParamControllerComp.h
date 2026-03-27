@@ -2,6 +2,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QJsonObject>
+
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtserverapp/IRepresentationController.h>
@@ -28,7 +31,7 @@ public:
 
 protected:
 	// reimplemented (CGqlRequestHandlerCompBase)
-	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual QJsonObject CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 protected:
 	I_ATTR(QByteArray, m_pageViewParamsKeyAttrPtr);

@@ -20,6 +20,67 @@ QByteArrayList CClientRequestUserManagerComp::GetUserIds() const
 }
 
 
+QList<imtauth::IUserManager::User> CClientRequestUserManagerComp::GetUserList() const
+{
+	namespace userssdl = sdl::imtauth::Users;
+
+	userssdl::UsersListRequestArguments arguments;
+	arguments.input.Version_1_0.Emplace();
+
+	if (m_applicationInfoCompPtr.IsValid()){
+		arguments.input.Version_1_0->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
+	}
+
+	userssdl::CUsersListPayload payload;
+	bool ok = SendModelRequestInternal<userssdl::UsersListRequestArguments, userssdl::CUsersListPayload, userssdl::CUsersListGqlRequest>(arguments, payload);
+	if (!ok){
+		return {};
+	}
+
+	if (!payload.Version_1_0->items.HasValue()){
+		return {};
+	}
+
+	QList<imtauth::IUserManager::User> result;
+
+	for (const auto& item : payload.Version_1_0->items->ToList()){
+		imtauth::IUserManager::User user;
+
+		if (item.id){
+			user.uuid = *item.id;
+		}
+
+		if (item.name){
+			user.name = *item.name;
+		}
+
+		if (item.systemName){
+			user.systemName = *item.systemName;
+		}
+
+		if (item.mail){
+			user.email = *item.mail;
+		}
+
+		if (item.userId){
+			user.login = *item.userId;
+		}
+
+		if (item.roles){
+			user.roleIds = (*item.roles).split(';');
+		}
+
+		if (item.groups){
+			user.groupIds = (*item.groups).split(';');
+		}
+
+		result << user;
+	}
+
+	return result;
+}
+
+
 QByteArray CClientRequestUserManagerComp::GetUserObjectId(const QByteArray& login) const
 {
 	namespace userssdl = sdl::imtauth::Users;

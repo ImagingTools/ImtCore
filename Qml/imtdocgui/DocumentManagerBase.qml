@@ -52,6 +52,8 @@ QtObject {
 	// callback(undefined) - cancel, callback(false) - close, callback(true) - save and close
 	signal tryCloseDirtyDocument(string documentId, var callback)
 
+	signal documentViewRegistered(string typeId, string viewTypeId)
+
 	onDocumentSaved: {
 		setDocumentIsNew(documentId, false)
 	}
@@ -135,6 +137,8 @@ QtObject {
 		else{
 			__internal.documentTypeEditors[documentTypeId] = [obj]
 		}
+
+		documentViewRegistered(documentTypeId, viewTypeId)
 	}
 
 	function getDocumentEditorFactory(documentTypeId, viewTypeId){

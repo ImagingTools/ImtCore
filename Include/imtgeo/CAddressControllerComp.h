@@ -2,6 +2,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QJsonObject>
+
 // ImtCore includes
 #include <imtservergql/CObjectCollectionControllerCompBase.h>
 #include <imtgeo/IAddressElementInfo.h>
@@ -24,13 +27,13 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	virtual imtbase::CTreeItemModel* GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-	virtual imtbase::CTreeItemModel* InsertObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual QJsonObject GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual QJsonObject InsertObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual istd::IChangeableUniquePtr CreateObjectFromRequest(
 		const imtgql::CGqlRequest& gqlRequest,
 		QByteArray& objectId,
 		QString& errorMessage) const override;
-	virtual imtbase::CTreeItemModel* UpdateObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual QJsonObject UpdateObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 private:
 	I_FACT(imtgeo::IAddressElementInfo, m_addressInfoFactCompPtr);

@@ -32,11 +32,11 @@ class Repeater extends Item {
     __updatePrimaryProperties(){
         super.__updatePrimaryProperties()
         this.__updateProperty('delegate')
-        this.__initView(true)
+        this.__initView()
     }
 
     __complete(){
-        this.__initView(true)
+        this.__initView()
         super.__complete()
     }
 
@@ -98,8 +98,8 @@ class Repeater extends Item {
         return item
     }
 
-    __initView(isCompleted) {
-        if (this.delegate && this.model && isCompleted) {
+    __initView() {
+        if (this.delegate && this.model) {
             let length = 0
             if (Array.isArray(this.model)) {
                 length = this.model.length
@@ -135,7 +135,7 @@ class Repeater extends Item {
     }
 
     __updateView(changeSet) {
-        if (this.delegate && this.model && this.__completed) {
+        if (this.delegate && this.model) {
             let length = 0
             if (Array.isArray(this.model)) {
                 length = this.model.length

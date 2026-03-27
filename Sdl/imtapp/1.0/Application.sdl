@@ -11,6 +11,7 @@ type ApplicationInfo {
 	applicationId: String
 	applicationName: String
 	applicationType: String
+	logoIconName: String
 }
 
 input GetApplicationInfoInput {

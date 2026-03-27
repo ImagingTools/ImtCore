@@ -45,7 +45,7 @@ class ImtCoreConan(ConanFile):
     topics = ("qt", "component-framework")
     exports_sources = ["patches/*"]
     generators = "CMakeDeps"
-    python_requires = "conantools/0.2.0@gmg/stable"
+    python_requires = "conantools/0.2.4.rev.0@gmg/stable"
 
     @property
     def _gmgtools(self):
@@ -78,14 +78,14 @@ class ImtCoreConan(ConanFile):
 
     def requirements(self):
         if self.options.qt_package == "conan":
-            self.requires("qt/6.8.3-r0@gmg/system")
+            self.requires("qt/[>=6.8]@gmg/system")
 
         self.requires("quazip/[~1]@gmg/stable")
         self.requires("openssl/[~1.1]")
         self.requires("acf/[~1]@gmg/stable")
         self.requires("acfsln/[~1]@gmg/stable")
         self.requires("iacf/[~1]@gmg/stable")
-        self.requires("zlib/1.2.11-r1@gmg/stable", override=True)
+        self.requires("zlib/1.2.11.rev.3@gmg/stable", override=True)
 
     def build_requirements(self):
         if self.settings.os == "Linux":
@@ -153,9 +153,9 @@ class ImtCoreConan(ConanFile):
     def _update_version(self):
         script_name = "UpdateVersion.bat" if self.settings.os == "Windows" else "UpdateVersion.sh"
         script_path = os.path.join(self.source_folder, "Build", "Git", script_name)
-        template = os.path.join(self.source_folder, "Partitura", "ImtCoreVoce.arp", "VersionInfo.acc.xtrsvn")
+        backup_dir = os.path.join(self.build_folder, "xtrsvn-backups")
 
-        self.run(f"{script_path} {template}", cwd=self.source_folder)
+        self.run(f'"{script_path}" "{backup_dir}"', cwd=self.source_folder)
 
     def generate(self):
         if self.options.qt_package == "conan":

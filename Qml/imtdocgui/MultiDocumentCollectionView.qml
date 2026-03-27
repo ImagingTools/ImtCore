@@ -21,6 +21,7 @@ Item {
 	onCollectionViewChanged: {
 		if (collectionView){
 			collectionView.documentManager = documentManager
+			navigableItem.parentSegment = collectionView.collectionId
 		}
 	}
 
@@ -43,11 +44,12 @@ Item {
 	NavigableItem {
 		id: navigableItem
 		onActivated: {
+			console.log("navigableItem onActivated", paths)
 			if (workspaceView.documentManager){
 				if (restPath.length >= 1){
 					let documentTypeId = matchedPath
 					let documentId = restPath[0]
-					workspaceView.documentManager.openDocument(documentId, documentTypeId)
+					workspaceView.documentManager.openDocument(documentTypeId, documentId)
 				}
 			}
 		}
@@ -117,6 +119,10 @@ Item {
 		}
 	}
 
+	function setCurrentTabIndex(index){
+		tabView.currentIndex = index
+	}
+
 	Component {
 		id: inputDialogComp
 		InputDialog {
@@ -132,8 +138,19 @@ Item {
 	}
 
 	Connections {
+		target: workspaceView.collectionView
+		function onCollectionIdChanged(){
+			navigableItem.parentSegment = target.collectionId
+		}
+	}
+
+	Connections {
 		id: connections
 		target: workspaceView.documentManager
+
+		function onDocumentViewRegistered(documentTypeId, viewTypeId){
+			navigableItem.paths = target.getSupportedDocumentTypeIds()
+		}
 
 		function onRequestDocumentName(documentId, documentTypeId){
 			ModalDialogManager.openDialog(inputDialogComp, {documentId: documentId})

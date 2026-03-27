@@ -249,10 +249,7 @@ istd::IChangeableUniquePtr CProductCollectionControllerComp::CreateObjectFromRep
 		return nullptr;
 	}
 
-	istd::IChangeableUniquePtr retVal;
-	retVal.MoveCastedPtr<imtlic::IProductInfo>(productInstancePtr);
-
-	return retVal;
+	return productInstancePtr;
 }
 
 
