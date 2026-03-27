@@ -868,6 +868,9 @@ bool CGqlSchemaParser::MoveToCharType(
 			char* foundDelimeterPtr,
 			bool skipDelimeter)
 {
+	// Convert to QSet for O(1) lookup in the inner loop (significant for large schemas)
+	const QSet<QChar::Category> categorySet(categoryList.cbegin(), categoryList.cend());
+
 	QChar currentChar(m_lastReadChar);
 
 	while(!m_stream.atEnd()){
@@ -876,9 +879,9 @@ bool CGqlSchemaParser::MoveToCharType(
 			++m_lastReadLine;
 		}
 		QChar::Category currentCharCategoty = currentChar.category();
-		if (categoryList.contains(currentCharCategoty)){
+		if (categorySet.contains(currentCharCategoty)){
 			m_useLastReadChar = !skipDelimeter;
-			char foundChar = QString(currentChar).toUtf8()[0];
+			char foundChar = currentChar.toLatin1();
 			m_lastReadChar = foundChar;
 			if (foundDelimeterPtr != nullptr){
 				*foundDelimeterPtr = foundChar;

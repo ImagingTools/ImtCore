@@ -89,8 +89,12 @@ QString CSdlTools::OptListConvertTypeWithNamespace(
 			bool* isEnumPtr,
 			bool* isUnionPtr)
 {
+	// Fetch lists once to avoid repeated copies via return-by-value
+	const SdlEnumList enumList = enumProvider.GetEnums(false);
+	const SdlUnionList unionList = unionProvider.GetUnions(false);
+
 	bool _isCustom = false;
-	QString retVal = ConvertTypeOrEnumOrUnion(sdlField, enumProvider.GetEnums(false), unionProvider.GetUnions(false), &_isCustom, isComplexPtr, isArrayPtr, isEnumPtr, isUnionPtr);
+	QString retVal = ConvertTypeOrEnumOrUnion(sdlField, enumList, unionList, &_isCustom, isComplexPtr, isArrayPtr, isEnumPtr, isUnionPtr);
 	if (isCustomPtr != nullptr){
 		*isCustomPtr = _isCustom;
 	}
@@ -111,8 +115,8 @@ QString CSdlTools::OptListConvertTypeWithNamespace(
 		CSdlEnum enumForField;
 		CSdlUnion unionForField;
 		const bool isType = GetSdlTypeForField(sdlField, listProvider.GetSdlTypes(false), typeForField);
-		[[maybe_unused]] const bool isEnum = GetSdlEnumForField(sdlField, enumProvider.GetEnums(false), enumForField);
-		[[maybe_unused]] const bool isUnion = GetSdlUnionForField(sdlField, unionProvider.GetUnions(false), unionForField);
+		[[maybe_unused]] const bool isEnum = GetSdlEnumForField(sdlField, enumList, enumForField);
+		[[maybe_unused]] const bool isUnion = GetSdlUnionForField(sdlField, unionList, unionForField);
 
 		Q_ASSERT(isType || isEnum || isUnion);
 
@@ -470,6 +474,26 @@ void CSdlTools::FeedStream(QTextStream& stream, uint lines, bool flush)
 
 void CSdlTools::FeedLineHorizontally(QString& line, uint indents, char indentDelimiter)
 {
+	// Fast path for common tab indentation
+	if (indentDelimiter == '\t'){
+		static const QString s_tabs[] = {
+			QString(),
+			QStringLiteral("\t"),
+			QStringLiteral("\t\t"),
+			QStringLiteral("\t\t\t"),
+			QStringLiteral("\t\t\t\t"),
+			QStringLiteral("\t\t\t\t\t"),
+			QStringLiteral("\t\t\t\t\t\t"),
+			QStringLiteral("\t\t\t\t\t\t\t"),
+			QStringLiteral("\t\t\t\t\t\t\t\t"),
+		};
+
+		if (indents < sizeof(s_tabs) / sizeof(s_tabs[0])){
+			line += s_tabs[indents];
+			return;
+		}
+	}
+
 	for (uint i = 0; i < indents; ++i){
 		line += indentDelimiter;
 	}

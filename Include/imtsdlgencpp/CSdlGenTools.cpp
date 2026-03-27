@@ -487,7 +487,7 @@ QString CSdlGenTools::GetQObjectTypeName(const imtsdl::CSdlField& sdlField,
 			bool withPointer,
 			bool treatArrayAsElement)
 {
-	QString retVal = "";
+	QString retVal;
 	bool isArray = false;
 	bool isCustom = false;
 	bool isEnum = false;
@@ -505,32 +505,35 @@ QString CSdlGenTools::GetQObjectTypeName(const imtsdl::CSdlField& sdlField,
 		sdlNamespace = GetNamespaceFromSchemaParams(sdlEntryBase->GetSchemaParams());
 	}
 
+	// Cache field type to avoid repeated GetType() calls
+	const QString fieldType = sdlField.GetType();
+
 	if (!isCustom || isEnum){
 		// For primitive types and enums
 		if (isArray && !treatArrayAsElement){
 			retVal = QStringLiteral("QList<");
 		}
 
-		if (sdlField.GetType() == "String" || isEnum){
+		if (fieldType == QLatin1String("String") || isEnum){
 			retVal += QStringLiteral("QString");
 		}
-		else if (sdlField.GetType() == "Integer" || sdlField.GetType() == "Int"){
+		else if (fieldType == QLatin1String("Integer") || fieldType == QLatin1String("Int")){
 			retVal += QStringLiteral("int");
 		}
-		else if (sdlField.GetType() == "Double" || sdlField.GetType() == "Float"){
+		else if (fieldType == QLatin1String("Double") || fieldType == QLatin1String("Float")){
 			retVal += QStringLiteral("double");
 		}
-		else if (sdlField.GetType() == "Boolean" || sdlField.GetType() == "Bool"){
+		else if (fieldType == QLatin1String("Boolean") || fieldType == QLatin1String("Bool")){
 			retVal += QStringLiteral("bool");
 		}
-		else if (sdlField.GetType() == "LongLong" || sdlField.GetType() == "longLong"){
+		else if (fieldType == QLatin1String("LongLong") || fieldType == QLatin1String("longLong")){
 			retVal += QStringLiteral("int");
 		}
-		else if (sdlField.GetType() == "ID"){
+		else if (fieldType == QLatin1String("ID")){
 			retVal += QStringLiteral("QString");
 		}
 		else {
-			Q_ASSERT_X(false, "CSdlGenTools::GetQObjectTypeName", sdlField.GetType().toUtf8() + " field.GetType() not implemented");
+			Q_ASSERT_X(false, "CSdlGenTools::GetQObjectTypeName", fieldType.toUtf8() + " field.GetType() not implemented");
 		}
 
 		if (isArray && !treatArrayAsElement){
@@ -540,24 +543,24 @@ QString CSdlGenTools::GetQObjectTypeName(const imtsdl::CSdlField& sdlField,
 	else if(isArray && !treatArrayAsElement){
 		// For custom array types, return ObjectList
 		retVal = sdlNamespace;
-		retVal += QStringLiteral("::C") + sdlField.GetType();
+		retVal += QStringLiteral("::C") + fieldType;
 		retVal += QStringLiteral("ObjectList");
 
 		if (withPointer){
-			retVal += "*";
+			retVal += '*';
 		}
 	}
 	else if(isUnion){
-		retVal = "QVariant";
+		retVal = QStringLiteral("QVariant");
 	}
 	else{
 		// For custom non-array types, or when treating arrays as elements, return Object
 		retVal = sdlNamespace;
-		retVal += QStringLiteral("::C") + sdlField.GetType();
+		retVal += QStringLiteral("::C") + fieldType;
 		retVal += QStringLiteral("Object");
 
 		if (withPointer){
-			retVal += "*";
+			retVal += '*';
 		}
 	}
 
