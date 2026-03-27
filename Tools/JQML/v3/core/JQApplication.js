@@ -35,7 +35,10 @@ module.exports = {
                 application: {type:JQModules.QtQml.var, value:[]},
                 location: {type:JQModules.QtQml.var, value:window.location},
 
+                appNameChanged: {type:JQModules.QtQml.Signal, args:[]},
                 languageChanged: {type:JQModules.QtQml.Signal, args:[]},
+                applicationChanged: {type:JQModules.QtQml.Signal, args:[]},
+                locationChanged: {type:JQModules.QtQml.Signal, args:[]},
             }
 
             static create(...args){

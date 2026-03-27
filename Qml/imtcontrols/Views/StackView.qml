@@ -7,6 +7,7 @@ Item{
     property alias count: container.pagesModel.count
     property ListModel pagesModel: ListModel{}
     property bool adaptSizeToCurrentPage: false
+	property int defaultCurrentIndex: 0;
 
     signal pageAdded(int index, var item)
     signal pageRemoved(int index, var item)
@@ -43,7 +44,7 @@ Item{
 
         pagesModel.append({ "component": comp })
         if (currentIndex === -1)
-            setCurrentIndex(0)
+			setCurrentIndex(defaultCurrentIndex)
     }
 
     function removePage(index){
