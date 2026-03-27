@@ -732,7 +732,7 @@ public:
 
 	// reimplemented (::imtservergql::CPermissibleGqlRequestHandlerComp)
 	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
-	virtual ::imtbase::CTreeItemModel* CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual QJsonObject CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 protected:
 	// abstract methods

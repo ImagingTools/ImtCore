@@ -739,11 +739,6 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForSpecialReques
 
 	AddPayloadModelWriteCode(stream, sdlRequest, operationType, hIndents);
 
-	// [2->1] end of payload write to TreeModel checks
-	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << '}';
-	FeedStream(stream, 2, false);
-
 	// [1] return pop ptr
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << QStringLiteral("modelObj.insert(QStringLiteral(\"data\"), dataModelObj); return modelObj;");
@@ -779,9 +774,9 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddPayloadModelWriteCode(
 													 *m_sdlEnumListCompPtr,
 													 *m_sdlUnionListCompPtr,
 													 hIndents,
-													 CSdlUnionConverter::CT_MODEL_SCALAR,
-													 QString(),
-													 QString(),
+													 CSdlUnionConverter::CT_JSON_SCALAR,
+													 QString(), // addCommand: empty, primitive union members use bracket notation via customModelTarget
+													 QStringLiteral("dataModelObj"),
 													 QStringLiteral("false"));
 	}
 	else{
@@ -809,6 +804,11 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddPayloadModelWriteCode(
 		FeedStreamHorizontally(stream, hIndents + 2);
 		stream << QStringLiteral("return QJsonObject();");
 		FeedStream(stream, 1, false);
+
+		// [2->1] end of payload write to TreeModel checks
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << '}';
+		FeedStream(stream, 2, false);
 	}
 }
 
@@ -1544,8 +1544,8 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 														 *m_sdlEnumListCompPtr,
 														 *m_sdlUnionListCompPtr,
 														 bodyIndent,
-														 CSdlUnionConverter::CT_MODEL_SCALAR,
-														 modelVarName + QStringLiteral(".insert("), //QString(),
+														 CSdlUnionConverter::CT_JSON_SCALAR,
+														 QString(),
 														 modelVarName,
 														 QStringLiteral("false"));
 		}
