@@ -4176,15 +4176,15 @@ bool CPrinterCollectionControllerCompBase::CreateRepresentationFromObject(const 
 		}
 
 		if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>(&representationObject)){
-			const bool isrepresentationObjectAdded = val->WriteToJsonObject(dataObj);
-			if (!isrepresentationObjectAdded){
+			const bool isAdded = val->WriteToJsonObject(dataObj);
+			if (!isAdded){
 				return false;
 			}
 			dataObj["__typename"] = "PrinterSpecificationBase";
 		}
 		else if (const CLink* val = std::get_if<CLink>(&representationObject)){
-			const bool isrepresentationObjectAdded = val->WriteToJsonObject(dataObj);
-			if (!isrepresentationObjectAdded){
+			const bool isAdded = val->WriteToJsonObject(dataObj);
+			if (!isAdded){
 				return false;
 			}
 			dataObj["__typename"] = "Link";
@@ -4242,24 +4242,24 @@ QJsonObject CGraphQlHandlerCompBase::CreateInternalResponse(const ::imtgql::CGql
 		}
 
 		if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>(&replyPayload)){
-			const bool isFieldAdded = val->WriteToJsonObject(dataModelObj);
-			if (!isFieldAdded){
+			const bool isAdded = val->WriteToJsonObject(dataModelObj);
+			if (!isAdded){
 				return QJsonObject();
 			}
 			dataModelObj["__typename"] = "PrinterSpecificationBase";
 		}
 		else if (const CLink* val = std::get_if<CLink>(&replyPayload)){
-			const bool isFieldAdded = val->WriteToJsonObject(dataModelObj);
-			if (!isFieldAdded){
+			const bool isAdded = val->WriteToJsonObject(dataModelObj);
+			if (!isAdded){
 				return QJsonObject();
 			}
 			dataModelObj["__typename"] = "Link";
 		}
 		else if (const QString* val = std::get_if<QString>(&replyPayload)){
-			dataModelObj["specification"] = QJsonValue::fromVariant(*val);
+			dataModelObj.insert("", *val);
 		}
 		else if (const double* val = std::get_if<double>(&replyPayload)){
-			dataModelObj["specification"] = QJsonValue::fromVariant(*val);
+			dataModelObj.insert("", *val);
 		}
 		modelObj.insert(QStringLiteral("data"), dataModelObj); return modelObj;
 	}
