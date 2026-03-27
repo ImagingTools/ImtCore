@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtclientgql/CGqlRemoteRepresentationControllerComp.h>
 
+// Qt includes
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonDocument>
+
 // ImtCore includes
 #include <imtclientgql/IGqlClient.h>
 
@@ -13,7 +17,7 @@ namespace imtclientgql
 
 // reimplemented (imtservergql::CGqlRepresentationDataControllerComp)
 
-imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerComp::CreateInternalResponse(
+QJsonObject CGqlRemoteRepresentationControllerComp::CreateInternalResponse(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
@@ -21,7 +25,7 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerComp::CreateInternalR
 		errorMessage = QString("GraphQL-request is not supported").toUtf8();
 		SendErrorMessage(0, errorMessage, "CGqlRemoteRepresentationControllerComp");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	istd::TUniqueInterfacePtr<imtgql::CGqlRequest> gqlRequestPtr;
@@ -31,7 +35,7 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerComp::CreateInternalR
 		errorMessage = QString("GraphQL-request could not be copied").toUtf8();
 		SendErrorMessage(0, errorMessage, "CGqlRemoteRepresentationControllerComp");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	QByteArray productId;
@@ -51,7 +55,7 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerComp::CreateInternalR
 			errorMessage = QString("Creation of input parameters related to the GraphQL-request failed").toUtf8();
 			SendErrorMessage(0, errorMessage, "CGqlRemoteRepresentationControllerComp");
 
-			return nullptr;
+			return QJsonObject();
 		}
 
 		newInputParamPtr->InsertParam("productId", QVariant(productId));
@@ -69,14 +73,14 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerComp::CreateInternalR
 	if (requestPtr.IsValid()){
 		imtclientgql::IGqlClient::GqlResponsePtr responsePtr = m_apiClientCompPtr->SendRequest(requestPtr);
 		if (responsePtr.IsValid()){
-			return CreateTreeItemModelFromResponse(gqlRequest.GetCommandId(), *responsePtr);
+			return CreateJsonObjectFromResponse(gqlRequest.GetCommandId(), *responsePtr);
 		}
 	}
 
 	errorMessage = QString("Failed to create a network request to a remote server").toUtf8();
 	SendErrorMessage(0, errorMessage, "CGqlRemoteRepresentationControllerComp");
 
-	return nullptr;
+	return QJsonObject();
 }
 
 

@@ -21,13 +21,13 @@ bool CDelegatedRequestHandlerComp::IsRequestSupported(const imtgql::CGqlRequest&
 }
 
 
-imtbase::CTreeItemModel* CDelegatedRequestHandlerComp::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CDelegatedRequestHandlerComp::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (m_slaveRequestHandlerCompPtr.IsValid()){
 		return m_slaveRequestHandlerCompPtr->CreateResponse(gqlRequest, errorMessage);
 	}
 
-	return nullptr;
+	return QJsonObject();
 }
 
 

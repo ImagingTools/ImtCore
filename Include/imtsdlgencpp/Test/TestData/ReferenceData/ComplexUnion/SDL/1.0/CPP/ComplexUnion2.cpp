@@ -9977,7 +9977,7 @@ bool CResultMetaData::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 
 		return false;
 	}
-	jsonObject["resultId"] = QJsonValue::fromVariant(*resultId);
+	jsonObject["resultId"] = QString::fromUtf8(*resultId);
 
 	if (creationTime){
 		jsonObject["creationTime"] = QJsonValue::fromVariant(*creationTime);

@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtclientgql/CGqlRemoteRepresentationControllerCompBase.h>
 
+// Qt includes
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonDocument>
 
 // ImtCore includes
 #include <imtgql/CGqlResponse.h>
@@ -14,16 +17,16 @@ namespace imtclientgql
 
 // reimplemented (imtservergql::CGqlRepresentationDataControllerComp)
 
-imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerCompBase::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CGqlRemoteRepresentationControllerCompBase::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!IsRequestSupported(gqlRequest)){
-		return nullptr;
+		return QJsonObject();
 	}
 
 	if (!m_apiClientCompPtr.IsValid()){
 		SendCriticalMessage(0, "Component 'ApiClient' was not set. Check the component configuration");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	imtclientgql::IGqlClient::GqlRequestPtr requestPtr;
@@ -31,33 +34,31 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerCompBase::CreateInter
 	if (requestPtr.IsValid()){
 		imtclientgql::IGqlClient::GqlResponsePtr responsePtr = m_apiClientCompPtr->SendRequest(requestPtr);
 		if (responsePtr.IsValid()){
-			return CreateTreeItemModelFromResponse(gqlRequest.GetCommandId(), *responsePtr);
+			return CreateJsonObjectFromResponse(gqlRequest.GetCommandId(), *responsePtr);
 		}
 
 		errorMessage = QString("Command could not be processed by the remote server: '%1'").arg(qPrintable(requestPtr->GetCommandId()));
 	}
 
-	return nullptr;
+	return QJsonObject();
 }
 
 
 // private methods
 
-imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerCompBase::CreateTreeItemModelFromResponse(
+QJsonObject CGqlRemoteRepresentationControllerCompBase::CreateJsonObjectFromResponse(
 			const QByteArray& commandId,
 			const imtgql::IGqlResponse& response) const
 {
-	istd::TDelPtr<imtbase::CTreeItemModel> retVal(new imtbase::CTreeItemModel());
-
 	const imtgql::IGqlResponse::GqlRequestPtr requestPtr = response.GetOriginalRequest();
 	if (!requestPtr.IsValid()){
-		return nullptr;
+		return QJsonObject();
 	}
 
 	const QByteArray responseData = response.GetResponseData();
 	const QJsonDocument document = QJsonDocument::fromJson(responseData);
 	if (!document.isObject()){
-		return retVal.PopPtr();
+		return QJsonObject();
 	}
 
 	const QJsonObject rootObject = document.object();
@@ -128,12 +129,7 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerCompBase::CreateTreeI
 		}
 	}
 
-	if (hasResult){
-		const QByteArray parserData = QJsonDocument(resultObject).toJson(QJsonDocument::Compact);
-		retVal->CreateFromJson(parserData);
-	}
-
-	return retVal.PopPtr();
+	return resultObject;
 }
 
 

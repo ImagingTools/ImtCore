@@ -21,11 +21,10 @@ namespace imtserverapp
 
 bool CPageBasedGuiRepresentationControllerComp::SetupItemModel(
 			const imtserverapp::IGuiElementModel& guiElementModel,
-			imtbase::CTreeItemModel& representation,
-			int index,
+			QJsonObject& representation,
 			const iprm::IParamsSet* paramsPtr) const
 {
-	BaseClass::SetupItemModel(guiElementModel, representation, index, paramsPtr);
+	BaseClass::SetupItemModel(guiElementModel, representation, paramsPtr);
 
 	const imtqml::IPageGuiElementModel* pageGuiElementPtr = dynamic_cast<const imtqml::IPageGuiElementModel*>(&guiElementModel);
 	if (pageGuiElementPtr == nullptr){
@@ -35,13 +34,12 @@ bool CPageBasedGuiRepresentationControllerComp::SetupItemModel(
 	QString pageQmlItemFilePath = pageGuiElementPtr->GetPageQmlItemFilePath();
 	QString startSourceItem = pageGuiElementPtr->GetStartSourceItem();
 
-	representation.SetData("source", pageQmlItemFilePath, index);
-	representation.SetData("startItem", startSourceItem, index);
+	representation.insert(QStringLiteral("source"), pageQmlItemFilePath);
+	representation.insert(QStringLiteral("startItem"), startSourceItem);
 
 	return true;
 }
 
 
 } // namespace imtserverapp
-
 

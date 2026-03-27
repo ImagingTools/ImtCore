@@ -7,6 +7,9 @@
 #include <iprm/IIdParam.h>
 #include <iqt/iqt.h>
 
+// Qt includes
+#include <QtCore/QJsonArray>
+
 // ImtCore includes
 #include <imtauth/IUserInfo.h>
 #include <imtserverapp/IGuiElementContainer.h>
@@ -20,30 +23,26 @@ namespace imtserverapp
 
 bool CGuiElementRepresentationControllerComp::SetupItemModel(
 			const imtserverapp::IGuiElementModel& guiElementModel,
-			imtbase::CTreeItemModel& representation,
-			int index,
+			QJsonObject& representation,
 			const iprm::IParamsSet* paramsPtr) const
 {
 	if (!m_commandRepresentationControllerPtr.IsValid()){
 		return false;
 	}
 
-	imtbase::CTreeItemModel commandRepresentation;
+	QJsonObject commandRepresentation;
 	if (!m_commandRepresentationControllerPtr->GetRepresentationFromDataModel(guiElementModel, commandRepresentation, paramsPtr)){
 		return false;
 	}
 
-	if (!representation.CopyItemDataFromModel(index, &commandRepresentation)){
-		return false;
-	}
-
+	representation = commandRepresentation;
 	return true;
 }
 
 
 // reimplemented (imtserverapp::CObjectRepresentationControllerCompBase)
 
-bool CGuiElementRepresentationControllerComp::GetRepresentationFromValue(const istd::IChangeable& dataModel, imtbase::CTreeItemModel& representation, const iprm::IParamsSet* paramsPtr) const
+bool CGuiElementRepresentationControllerComp::GetRepresentationFromValue(const istd::IChangeable& dataModel, QJsonObject& representation, const iprm::IParamsSet* paramsPtr) const
 {
 	const imtserverapp::IGuiElementContainer* guiElementContainerPtr = dynamic_cast<const imtserverapp::IGuiElementContainer*>(&dataModel);
 	Q_ASSERT(guiElementContainerPtr != nullptr);
@@ -57,7 +56,8 @@ bool CGuiElementRepresentationControllerComp::GetRepresentationFromValue(const i
 		isAdmin = userInfoParamPtr->IsAdmin();
 	}
 
-	representation.Clear();
+	representation = QJsonObject();
+	QJsonArray itemsArray;
 
 	QByteArrayList elementIds = guiElementContainerPtr->GetElementIds();
 
@@ -78,11 +78,14 @@ bool CGuiElementRepresentationControllerComp::GetRepresentationFromValue(const i
 				}
 			}
 
-			int index = representation.InsertNewItem();
-			SetupItemModel(*guiElementPtr, representation, index, paramsPtr);
+			QJsonObject itemObj;
+			if (SetupItemModel(*guiElementPtr, itemObj, paramsPtr)){
+				itemsArray.append(itemObj);
+			}
 		}
 	}
 
+	representation.insert(QStringLiteral("items"), itemsArray);
 	return true;
 }
 
@@ -98,7 +101,7 @@ bool CGuiElementRepresentationControllerComp::IsModelSupported(const istd::IChan
 
 
 bool CGuiElementRepresentationControllerComp::GetDataModelFromRepresentation(
-			const imtbase::CTreeItemModel& /*representation*/,
+			const QJsonObject& /*representation*/,
 			istd::IChangeable& /*dataModel*/) const
 {
 	return true;
@@ -116,5 +119,3 @@ void CGuiElementRepresentationControllerComp::OnComponentCreated()
 
 
 } // namespace imtserverapp
-
-

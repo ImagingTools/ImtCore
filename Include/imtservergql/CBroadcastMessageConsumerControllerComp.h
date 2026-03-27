@@ -25,7 +25,7 @@ public:
 
 protected:
 	// reimplemented (imtservergql::CGqlRequestHandlerCompBase)
-	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual QJsonObject CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 protected:
 	I_REF(ilog::IMessageConsumer, m_messageConsumerCompPtr);

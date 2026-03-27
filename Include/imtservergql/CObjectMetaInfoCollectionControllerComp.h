@@ -4,6 +4,7 @@
 
 // ImtCore includes
 #include <imtservergql/CObjectCollectionControllerCompBase.h>
+#include <QtCore/QJsonObject>
 
 
 namespace imtservergql
@@ -20,10 +21,9 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	virtual imtbase::CTreeItemModel* ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual QJsonObject ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 };
 
 
 } // namespace imtservergql
-
 

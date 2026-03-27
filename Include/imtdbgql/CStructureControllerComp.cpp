@@ -11,6 +11,11 @@
 #include <imtbase/IHierarchicalStructureIterator.h>
 #include <imtgql/imtgql.h>
 
+// Qt includes
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonValue>
+
 
 namespace imtdbgql
 {
@@ -41,7 +46,7 @@ UNION SELECT "NodeId", 'Node' AS "TypeId", "Name", "Description", 0 AS "Size", "
 }
 
 
-imtbase::CTreeItemModel* CStructureControllerComp::GetElements(
+QJsonObject CStructureControllerComp::GetElements(
 	const imtgql::CGqlRequest& gqlRequest,
 	QString& errorMessage) const
 {
@@ -50,25 +55,23 @@ imtbase::CTreeItemModel* CStructureControllerComp::GetElements(
 
 		SendCriticalMessage(0, errorMessage);
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	const imtgql::CGqlParamObject& inputParams = gqlRequest.GetParams();
-
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-
-	imtbase::CTreeItemModel* dataModel = nullptr;
-	imtbase::CTreeItemModel* itemsModel = nullptr;
-	imtbase::CTreeItemModel* notificationModel = nullptr;
+	QJsonObject rootObj;
 
 	if (!errorMessage.isEmpty()){
-		imtbase::CTreeItemModel* errorsItemModel = rootModelPtr->AddTreeModel("errors");
-		errorsItemModel->SetData("message", errorMessage);
+		QJsonArray errorsArray;
+		QJsonObject errorObj;
+		errorObj.insert(QStringLiteral("message"), errorMessage);
+		errorsArray.append(errorObj);
+		rootObj.insert(QStringLiteral("errors"), errorsArray);
 	}
 	else{
-		dataModel = new imtbase::CTreeItemModel();
-		itemsModel = new imtbase::CTreeItemModel();
-		notificationModel = new imtbase::CTreeItemModel();
+		QJsonObject dataObj;
+		QJsonArray itemsArray;
+		QJsonObject notificationObj;
 
 		const imtgql::CGqlParamObject* inputObject = inputParams.GetParamArgumentObjectPtr("input");
 		iprm::CParamsSet filterParams;
@@ -103,38 +106,34 @@ imtbase::CTreeItemModel* CStructureControllerComp::GetElements(
 			SendErrorMessage(0, "Database query could not be created", "Database collection");
 		}
 
-		notificationModel->SetData("PagesCount", 0);
-		notificationModel->SetData("TotalCount", -1);
+		notificationObj.insert(QStringLiteral("PagesCount"), 0);
+		notificationObj.insert(QStringLiteral("TotalCount"), -1);
 
 		while (sqlQuery.next()){
-			int itemIndex = itemsModel->InsertNewItem();
+			QJsonObject itemObj;
 			QString id = sqlQuery.value("Id").toString();
 			QString name = sqlQuery.value("Name").toString();
 			QString description = sqlQuery.value("Name").toString();
 			QString typeId = sqlQuery.value("TypeId").toString();
 			bool hasChildren = sqlQuery.value("HasChildren").toBool();
 			int size = sqlQuery.value("Size").toInt();
-			itemsModel->SetData("Id", id, itemIndex);
-			itemsModel->SetData("Name", name, itemIndex);
-			itemsModel->SetData("Description", description, itemIndex);
-			itemsModel->SetData("TypeId", typeId, itemIndex);
-			itemsModel->SetData("Size", size, itemIndex);
-			itemsModel->SetData("HasChildren", hasChildren, itemIndex);
+			itemObj.insert(QStringLiteral("Id"), id);
+			itemObj.insert(QStringLiteral("Name"), name);
+			itemObj.insert(QStringLiteral("Description"), description);
+			itemObj.insert(QStringLiteral("TypeId"), typeId);
+			itemObj.insert(QStringLiteral("Size"), size);
+			itemObj.insert(QStringLiteral("HasChildren"), hasChildren);
+			itemsArray.append(itemObj);
 		}
 
-		itemsModel->SetIsArray(true);
-
-		dataModel->SetExternTreeModel("items", itemsModel);
-		dataModel->SetExternTreeModel("notification", notificationModel);
-		dataModel->SetData("selectIndex", selectIndex);
+		dataObj.insert(QStringLiteral("items"), itemsArray);
+		dataObj.insert(QStringLiteral("notification"), notificationObj);
+		dataObj.insert(QStringLiteral("selectIndex"), QString::fromUtf8(selectIndex.constData()));
+		rootObj.insert(QStringLiteral("data"), dataObj);
 	}
 
-	rootModelPtr->SetExternTreeModel("data", dataModel);
-
-	return rootModelPtr.PopPtr();
+	return rootObj;
 }
 
 
 } // namespace imtdbgql
-
-
