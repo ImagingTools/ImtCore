@@ -90,6 +90,7 @@ QByteArray CCollectionDocumentManager::CreateNewDocument(const QByteArray& userI
 	documentPtr->objectPtr = objectPtr;
 	documentPtr->undoManagerPtr = undoManagerPtr;
 	documentPtr->isDirty = false;
+	documentPtr->name = GetDefaultDocumentName(retVal, *objectPtr);
 
 	InitializeDocumentObservers(*documentPtr, userId);
 
@@ -98,6 +99,7 @@ QByteArray CCollectionDocumentManager::CreateNewDocument(const QByteArray& userI
 		info.userId = userId;
 		info.documentId = retVal;
 		info.typeId = documentTypeId;
+		info.name = documentPtr->name;
 		info.isDirty = false;
 
 		istd::IChangeable::ChangeSet changeSet(CF_NEW_DOCUMENT_CREATED);
@@ -334,35 +336,63 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SetDocumentData(co
 
 
 IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
-	const QByteArray& userId, const QByteArray& documentId, const QString& documentName)
+	const QByteArray& userId,
+	const QByteArray& documentId,
+	const QString& documentName,
+	QString* errorMessage)
 {
 	imtbase::IObjectCollection* collectionPtr = GetCollection();
 	if (collectionPtr == nullptr) {
 		return OS_FAILED;
 	}
 	WorkingDocument* workingDocumentPtr = nullptr;
+	OperationStatus validationStatus = OS_OK;
+	WorkingDocument workingDocumentSnapshot;
+	istd::IChangeableSharedPtr documentSnapshotPtr;
 	{
 		QMutexLocker locker(&m_mutex);
-		OperationStatus validationStatus;
 		if (!ValidateInputParams(userId, documentId, validationStatus)){
 			return validationStatus;
 		}
 
 		workingDocumentPtr = &m_userDocuments[userId][documentId];
+
+		documentSnapshotPtr = CreateObject(workingDocumentPtr->typeId);
+		if (!documentSnapshotPtr.IsValid()){
+			return OS_FAILED;
+		}
+
+		if (!documentSnapshotPtr->CopyFrom(*workingDocumentPtr->objectPtr)){
+			return OS_FAILED;
+		}
+
+		workingDocumentSnapshot = *workingDocumentPtr;
+		workingDocumentSnapshot.objectPtr = documentSnapshotPtr;
 	}
+
+	QString validationMessage;
+	if (!ValidateDocumentData(workingDocumentSnapshot, validationStatus, &validationMessage)){
+		if (errorMessage != nullptr) {
+			*errorMessage = validationMessage.isEmpty() ? GetInvalidDocumentMessage() : validationMessage;
+		}
+		return validationStatus;
+	}
+
+	const QString resolvedDocumentName =
+		documentName.isEmpty() ? GetDefaultDocumentName(documentId, *documentSnapshotPtr) : documentName;
 
 	if (!workingDocumentPtr->objectId.isEmpty()) {
 		// Create copy of the object
-		if (!documentName.isEmpty() && workingDocumentPtr->name != documentName){
+		if (!resolvedDocumentName.isEmpty() && workingDocumentPtr->name != resolvedDocumentName){
 			QByteArray newObjectId = collectionPtr->InsertNewObject(
-				workingDocumentPtr->typeId, documentName, "", workingDocumentPtr->objectPtr.GetPtr());
+				workingDocumentPtr->typeId, resolvedDocumentName, "", documentSnapshotPtr.GetPtr());
 
 			if (newObjectId.isEmpty()){
 				return OS_FAILED;
 			}
 
 			workingDocumentPtr->objectId = newObjectId;
-			workingDocumentPtr->name = documentName;
+			workingDocumentPtr->name = resolvedDocumentName;
 			workingDocumentPtr->isDirty = false;
 			workingDocumentPtr->undoManagerPtr->StoreDocumentState();
 
@@ -391,7 +421,7 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
 		}
 
 		// Update object
-		bool res = collectionPtr->SetObjectData(workingDocumentPtr->objectId, *workingDocumentPtr->objectPtr);
+		bool res = collectionPtr->SetObjectData(workingDocumentPtr->objectId, *documentSnapshotPtr);
 
 		if (res){
 			workingDocumentPtr->isDirty = false;
@@ -424,10 +454,10 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
 
 	// Create new object
 	workingDocumentPtr->objectId =
-		collectionPtr->InsertNewObject(workingDocumentPtr->typeId, documentName, "", workingDocumentPtr->objectPtr.GetPtr());
+		collectionPtr->InsertNewObject(workingDocumentPtr->typeId, resolvedDocumentName, "", documentSnapshotPtr.GetPtr());
 
 	if (!workingDocumentPtr->objectId.isEmpty()){
-		workingDocumentPtr->name = documentName;
+		workingDocumentPtr->name = resolvedDocumentName;
 		workingDocumentPtr->isDirty = false;
 		workingDocumentPtr->undoManagerPtr->StoreDocumentState();
 
@@ -636,6 +666,34 @@ void CCollectionDocumentManager::OnUpdate(imod::IModel* modelPtr, const istd::IC
 
 
 // protected methods
+
+bool CCollectionDocumentManager::ValidateDocumentData(
+	const WorkingDocument& /*document*/,
+	OperationStatus& status,
+	QString* errorMessage) const
+{
+	status = OS_OK;
+	if (errorMessage != nullptr) {
+		errorMessage->clear();
+	}
+
+	return true;
+}
+
+
+QString CCollectionDocumentManager::GetDefaultDocumentName(
+	const QByteArray& /*documentId*/,
+	const istd::IChangeable& /*document*/) const
+{
+	return QString();
+}
+
+
+QString CCollectionDocumentManager::GetInvalidDocumentMessage()
+{
+	return QStringLiteral("Document data is invalid");
+}
+
 
 bool CCollectionDocumentManager::ValidateInputParams(const QByteArray& userId, const QByteArray& documentId, OperationStatus& status) const
 {

@@ -205,7 +205,8 @@ Item {
 			if (typeOperation === EDocumentOperationEnum.s_documentClosed){
 				tabView.removeTab(documentId)
 			}
-			else if (typeOperation === EDocumentOperationEnum.s_documentOpened ||
+			else if (typeOperation === EDocumentOperationEnum.s_newDocumentCreated ||
+					typeOperation === EDocumentOperationEnum.s_documentOpened ||
 					typeOperation === EDocumentOperationEnum.s_documentSaved){
 				workspaceView.documentManager.setDocumentName(documentId, documentName)
 			}

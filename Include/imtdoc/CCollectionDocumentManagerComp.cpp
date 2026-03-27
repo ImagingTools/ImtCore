@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtdoc/CCollectionDocumentManagerComp.h>
 
+// Qt includes
+#include <QtCore/QString>
 
 namespace imtdoc
 {
@@ -39,6 +41,63 @@ idoc::IUndoManagerSharedPtr CCollectionDocumentManagerComp::CreateUndoManager() 
 }
 
 
+QString CCollectionDocumentManagerComp::GetDefaultDocumentName(
+	const QByteArray& documentId,
+	const istd::IChangeable& document) const
+{
+	if (!m_documentNameProviderCompPtr.IsValid()){
+		return QString();
+	}
+
+	return m_documentNameProviderCompPtr->GetDefaultDocumentName(documentId, document);
+}
+
+
+bool CCollectionDocumentManagerComp::ValidateDocumentData(
+	const WorkingDocument& document,
+	OperationStatus& status,
+	QString* errorMessage) const
+{
+	status = OS_OK;
+	if (errorMessage != nullptr) {
+		errorMessage->clear();
+	}
+
+	if (!document.objectPtr.IsValid()){
+		status = OS_INVALID_DOCUMENT_DATA;
+		if (errorMessage != nullptr) {
+			*errorMessage = GetInvalidDocumentMessage();
+		}
+		return false;
+	}
+
+	const imtdoc::IDocumentValidator* documentValidator = GetDocumentValidator(document.typeId);
+	if (documentValidator == nullptr){
+		return true;
+	}
+
+	QString validationMessage;
+	if (!documentValidator->ValidateDocumentData(*document.objectPtr, validationMessage)){
+		status = OS_INVALID_DOCUMENT_DATA;
+		if (errorMessage != nullptr) {
+			*errorMessage = validationMessage.isEmpty() ? GetInvalidDocumentMessage() : validationMessage;
+		}
+		QString warningMessage = QString("Document validation failed for type '%1'")
+			.arg(QString::fromUtf8(document.typeId));
+		if (!validationMessage.isEmpty()){
+			warningMessage = QString("%1: %2").arg(warningMessage, validationMessage);
+			SendWarningMessage(kValidationFailureWarningId, warningMessage);
+		}
+		else{
+			SendWarningMessage(kValidationFailureWithoutMessageWarningId, warningMessage);
+		}
+		return false;
+	}
+
+	return true;
+}
+
+
 QList<imtdoc::IDocumentManagerEventHandler*> CCollectionDocumentManagerComp::GetDocumentManagerEventHandlers() const
 {
 	QList<imtdoc::IDocumentManagerEventHandler*> retVal;
@@ -70,6 +129,15 @@ int CCollectionDocumentManagerComp::GetObjectFactoryIndex(const QByteArray& type
 }
 
 
+const imtdoc::IDocumentValidator* CCollectionDocumentManagerComp::GetDocumentValidator(const QByteArray& typeId) const
+{
+	int index = GetObjectFactoryIndex(typeId);
+	if ((index >= 0) && (index < m_documentValidatorCompPtr.GetCount())){
+		return m_documentValidatorCompPtr[index];
+	}
+
+	return nullptr;
+}
+
+
 } // namespace imtdoc
-
-

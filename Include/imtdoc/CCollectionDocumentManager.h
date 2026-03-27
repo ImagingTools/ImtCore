@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QtCore/QMutex>
+#include <QtCore/QString>
 
 // ACF includes
 #include <idoc/IDocumentManager.h>
@@ -37,13 +38,16 @@ public:
 	virtual const istd::IChangeable* GetDocumentPtr(const QByteArray& userId, const QByteArray& documentId) const override;
 	virtual OperationStatus GetDocumentData(const QByteArray& userId, const QByteArray& documentId, istd::IChangeableSharedPtr& documentPtr) const override;
 	virtual OperationStatus SetDocumentData(const QByteArray& userId, const QByteArray& documentId, const istd::IChangeable& document) override;
-	virtual OperationStatus SaveDocument(const QByteArray& userId, const QByteArray& documentId, const QString& documentName) override;
+	virtual OperationStatus SaveDocument(
+		const QByteArray& userId,
+		const QByteArray& documentId,
+		const QString& documentName = QString(),
+		QString* errorMessage = nullptr) override;
 	virtual OperationStatus CloseDocument(const QByteArray& userId, const QByteArray& documentId) override;
 	virtual OperationStatus GetDocumentUndoManager(
 		const QByteArray& userId, const QByteArray& documentId, idoc::IUndoManager*& undoManagerPtr) const override;
 	virtual OperationStatus RegisterDocumentObserver(const QByteArray& userId, const QByteArray& documentId, imod::IObserver& observer) override;
 	virtual OperationStatus UnregisterDocumentObserver(const QByteArray& userId, const QByteArray& documentId, imod::IObserver& observer) override;
-
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
 
@@ -54,6 +58,14 @@ protected:
 	struct WorkingDocument;
 
 	bool ValidateInputParams(const QByteArray& userId, const QByteArray& documentId, OperationStatus& status) const;
+	virtual QString GetDefaultDocumentName(
+		const QByteArray& documentId,
+		const istd::IChangeable& document) const;
+	virtual bool ValidateDocumentData(
+		const WorkingDocument& document,
+		OperationStatus& status,
+		QString* errorMessage = nullptr) const;
+	static QString GetInvalidDocumentMessage();
 	void OnUndoManagerChanged(int modelId);
 	int GetUndoManagerNextModelId(const QByteArray& userId);
 	WorkingDocument* FindDocument(const QByteArray& userId, const QByteArray& documentId);
@@ -103,5 +115,3 @@ private:
 
 
 } // namespace imtdoc
-
-

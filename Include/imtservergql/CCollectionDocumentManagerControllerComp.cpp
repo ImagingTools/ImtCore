@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtservergql/CCollectionDocumentManagerControllerComp.h>
 
+// ImtCore includes
+#include <imtdoc/CCollectionDocumentManager.h>
+
 
 namespace imtservergql
 {
@@ -244,26 +247,39 @@ CDM::CDocumentOperationStatus CCollectionDocumentManagerControllerComp::OnSaveDo
 	retVal.Version_1_0.emplace();
 
 	if (m_documentManagerCompPtr.IsValid()) {
-		imtdoc::IDocumentManager::OperationStatus status = m_documentManagerCompPtr->SaveDocument(userId, *saveDocumentInput->documentId, *saveDocumentInput->documentName);
+		QString saveErrorMessage;
+		imtdoc::IDocumentManager::OperationStatus status = m_documentManagerCompPtr->SaveDocument(
+			userId,
+			*saveDocumentInput->documentId,
+			*saveDocumentInput->documentName,
+			&saveErrorMessage);
+		QString responseMessage;
 		switch (status){
 		case imtdoc::IDocumentManager::OS_OK:
 			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Success;
 			break;
 		case imtdoc::IDocumentManager::OS_INVALID_USER_ID:
 			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidUserId;
+			responseMessage = "Invalid user-ID";
 			break;
 		case imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_ID:
 			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidDocumentId;
+			responseMessage = "Invalid document ID";
+			break;
+		case imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_DATA:
+			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidDocumentData;
+			responseMessage = saveErrorMessage.isEmpty() ? "Document data is invalid" : saveErrorMessage;
 			break;
 		case imtdoc::IDocumentManager::OS_FAILED:
 			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Failed;
+			responseMessage = "Failed to save document";
 			break;
 		default:
 			break;
 		}
-
-		if (status != imtdoc::IDocumentManager::OperationStatus::OS_OK){
-			errorMessage = "Unable to open document or create undo manager";
+		if (!responseMessage.isEmpty()) {
+			retVal.Version_1_0->message = responseMessage;
+			errorMessage = responseMessage;
 		}
 	}
 
@@ -601,4 +617,3 @@ QByteArray CCollectionDocumentManagerControllerComp::GetUserId(const ::imtgql::C
 
 
 } // namespace imtservergql
-

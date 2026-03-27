@@ -25,11 +25,13 @@ enum EDocumentOperationStatus {
 	Success
 	InvalidUserId
 	InvalidDocumentId
+	InvalidDocumentData
 	Failed
 }
 
 type DocumentOperationStatus {
 	status: EDocumentOperationStatus!
+	message: String
 }
 
 type CollectionId {
