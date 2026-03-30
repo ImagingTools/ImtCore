@@ -23,9 +23,7 @@ namespace imtdoc
 class IDocumentNameProvider: virtual public istd::IPolymorphic
 {
 public:
-	virtual QString GetDefaultDocumentName(
-		const QByteArray& documentId,
-		const istd::IChangeable& document) const = 0;
+	virtual QString GetDefaultDocumentName(const QByteArray& objectId, const istd::IChangeable& document) const = 0;
 };
 
 

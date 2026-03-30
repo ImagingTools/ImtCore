@@ -40,10 +40,7 @@ protected:
 	virtual imtbase::IObjectCollection* GetCollection() const override;
 	virtual istd::IChangeableSharedPtr CreateObject(const QByteArray& typeId) const override;
 	virtual idoc::IUndoManagerSharedPtr CreateUndoManager() const override;
-	virtual QString GetDefaultDocumentName(
-		const QByteArray& typeId,
-		const QByteArray& documentId,
-		const istd::IChangeable& document) const override;
+	virtual QString GetDefaultDocumentName(const WorkingDocument& document) const override;
 	virtual bool HasDocumentNameProvider(const QByteArray& typeId) const override;
 	virtual bool ValidateDocumentData(
 		const WorkingDocument& document,

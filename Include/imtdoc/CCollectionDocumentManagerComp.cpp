@@ -41,17 +41,14 @@ idoc::IUndoManagerSharedPtr CCollectionDocumentManagerComp::CreateUndoManager() 
 }
 
 
-QString CCollectionDocumentManagerComp::GetDefaultDocumentName(
-	const QByteArray& typeId,
-	const QByteArray& documentId,
-	const istd::IChangeable& document) const
+QString CCollectionDocumentManagerComp::GetDefaultDocumentName(const WorkingDocument& document) const
 {
-	const imtdoc::IDocumentNameProvider* nameProviderPtr = GetDocumentNameProvider(typeId);
+	const imtdoc::IDocumentNameProvider* nameProviderPtr = GetDocumentNameProvider(document.typeId);
 	if (nameProviderPtr == nullptr){
 		return QString();
 	}
 
-	return nameProviderPtr->GetDefaultDocumentName(documentId, document);
+	return nameProviderPtr->GetDefaultDocumentName(document.objectId, *document.objectPtr);
 }
 
 
