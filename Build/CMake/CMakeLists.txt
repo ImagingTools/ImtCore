@@ -206,6 +206,7 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 		add_subdirectory("${INCLUDE_DIR}/imtqml/CMake" "${AUX_INCLUDE_DIR}/imtqml")
 		add_dependencies(imtqml imtbasesdl)
 		add_subdirectory("${INCLUDE_DIR}/imtstylecontrolsqml/CMake" "${AUX_INCLUDE_DIR}/imtstylecontrolsqml")
+		add_subdirectory("${QML_DIR}/imtgeogui/CMake" "${AUX_INCLUDE_DIR}/imtgeoguiqml")
 	endif()
 
 	#-------- Packages --------
