@@ -266,10 +266,15 @@ QtObject {
 		}
 
 		function updateSiblingViewsForAllContexts(){
-			let allViews = root.registeredViews.slice()
+			let viewMap = {}
+			for (let i = 0; i < root.registeredViews.length; ++i){
+				let viewTypeId = root.registeredViews[i].viewTypeId || ""
+				viewMap[viewTypeId] = root.registeredViews[i]
+			}
+
 			for (let i = 0; i < root.registeredViews.length; ++i){
 				if (root.registeredViews[i].documentContext){
-					root.registeredViews[i].documentContext.siblingViews = allViews
+					root.registeredViews[i].documentContext.siblingViews = viewMap
 				}
 			}
 		}

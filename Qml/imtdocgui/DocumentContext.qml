@@ -11,16 +11,26 @@ QtObject {
 
 	property var documentManager: null
 	property var decorator: null
-	property var siblingViews: []
+	// viewTypeId -> view mapping
+	property var siblingViews: ({})
 
 	signal siblingViewDataBroadcast(var sourceView, string channel, var data)
 
-	function getSiblingViews(excludeView){
-		let result = []
+	function getSiblingView(viewTypeId){
+		if (viewTypeId in siblingViews){
+			return siblingViews[viewTypeId]
+		}
 
-		for (let i = 0; i < siblingViews.length; ++i){
-			if (siblingViews[i] !== excludeView){
-				result.push(siblingViews[i])
+		return null
+	}
+
+	function getSiblingViews(excludeView){
+		let result = {}
+		let keys = Object.keys(siblingViews)
+
+		for (let i = 0; i < keys.length; ++i){
+			if (siblingViews[keys[i]] !== excludeView){
+				result[keys[i]] = siblingViews[keys[i]]
 			}
 		}
 
