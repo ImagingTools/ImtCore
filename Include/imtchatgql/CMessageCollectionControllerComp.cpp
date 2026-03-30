@@ -5,7 +5,7 @@
 #include <QtCore/QUuid>
 
 // ImtCore includes
-#include <imtchat/IMessage.h>
+#include <imtchat/IChatMessage.h>
 
 
 namespace imtchatgql
@@ -27,9 +27,9 @@ bool CMessageCollectionControllerComp::CreateRepresentationFromObject(
 	const QByteArray objectId = objectCollectionIterator.GetObjectId();
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
-	const imtchat::IMessage* msgPtr = nullptr;
+	const imtchat::IChatMessage* msgPtr = nullptr;
 	if (objectCollectionIterator.GetObjectData(dataPtr)){
-		msgPtr = dynamic_cast<const imtchat::IMessage*>(dataPtr.GetPtr());
+		msgPtr = dynamic_cast<const imtchat::IChatMessage*>(dataPtr.GetPtr());
 	}
 
 	if (msgPtr == nullptr){
@@ -70,7 +70,7 @@ istd::IChangeableUniquePtr CMessageCollectionControllerComp::CreateObjectFromRep
 		return nullptr;
 	}
 
-	imtchat::IMessageUniquePtr msgPtr = m_messageFactCompPtr.CreateInstance();
+	imtchat::IChatMessageUniquePtr msgPtr = m_messageFactCompPtr.CreateInstance();
 	if (!msgPtr.IsValid()){
 		errorMessage = QStringLiteral("Failed to create message instance");
 		SendErrorMessage(0, errorMessage, "CMessageCollectionControllerComp");
@@ -91,9 +91,9 @@ bool CMessageCollectionControllerComp::CreateRepresentationFromObject(
 		sdl::imtchat::ImtChat::CMessageData::V1_0& representationPayload,
 		QString& errorMessage) const
 {
-	const imtchat::IMessage* msgPtr = dynamic_cast<const imtchat::IMessage*>(&data);
+	const imtchat::IChatMessage* msgPtr = dynamic_cast<const imtchat::IChatMessage*>(&data);
 	if (msgPtr == nullptr){
-		errorMessage = QStringLiteral("Object is not a valid IMessage");
+		errorMessage = QStringLiteral("Object is not a valid IChatMessage");
 		SendErrorMessage(0, errorMessage, "CMessageCollectionControllerComp");
 		return false;
 	}
@@ -117,9 +117,9 @@ bool CMessageCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 		istd::IChangeable& object,
 		QString& errorMessage) const
 {
-	imtchat::IMessage* msgPtr = dynamic_cast<imtchat::IMessage*>(&object);
+	imtchat::IChatMessage* msgPtr = dynamic_cast<imtchat::IChatMessage*>(&object);
 	if (msgPtr == nullptr){
-		errorMessage = QStringLiteral("Object is not a valid IMessage");
+		errorMessage = QStringLiteral("Object is not a valid IChatMessage");
 		SendErrorMessage(0, errorMessage, "CMessageCollectionControllerComp");
 		return false;
 	}
@@ -155,9 +155,9 @@ bool CMessageCollectionControllerComp::FillObjectFromRepresentation(
 		QByteArray& objectId,
 		QString& errorMessage) const
 {
-	imtchat::IMessage* msgPtr = dynamic_cast<imtchat::IMessage*>(&object);
+	imtchat::IChatMessage* msgPtr = dynamic_cast<imtchat::IChatMessage*>(&object);
 	if (msgPtr == nullptr){
-		errorMessage = QStringLiteral("Object is not a valid IMessage");
+		errorMessage = QStringLiteral("Object is not a valid IChatMessage");
 		SendErrorMessage(0, errorMessage, "CMessageCollectionControllerComp");
 		return false;
 	}

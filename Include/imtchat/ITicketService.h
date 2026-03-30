@@ -5,7 +5,7 @@
 #include <istd/IPolymorphic.h>
 
 // ImtCore includes
-#include <imtchat/ITicket.h>
+#include <imtchat/ISupportTicket.h>
 
 
 namespace imtchat
@@ -38,12 +38,12 @@ public:
 	virtual QByteArray CreateTicket(
 				const QString& title,
 				const QString& description,
-				ITicket::TicketType ticketType,
-				ITicket::TicketPriority priority,
+				ISupportTicket::TicketType ticketType,
+				ISupportTicket::TicketPriority priority,
 				const QByteArray& assigneeId = QByteArray(),
 				const QByteArray& conversationId = QByteArray(),
 				const QByteArray& messageId = QByteArray(),
-				ITicket::Environment environment = ITicket::ENV_PRODUCTION,
+				ISupportTicket::Environment environment = ISupportTicket::ENV_PRODUCTION,
 				const QStringList& tags = QStringList()) = 0;
 
 	/**
@@ -52,7 +52,7 @@ public:
 		\param ticket    New ticket data.
 		\return True on success.
 	*/
-	virtual bool UpdateTicket(const QByteArray& ticketId, const ITicket& ticket) = 0;
+	virtual bool UpdateTicket(const QByteArray& ticketId, const ISupportTicket& ticket) = 0;
 
 	/**
 		Retrieve ticket IDs matching optional filters.
@@ -71,7 +71,7 @@ public:
 		\param ticketId  Ticket to fetch.
 		\return Pointer to ticket data, or null if not found.
 	*/
-	virtual ITicketUniquePtr GetTicket(const QByteArray& ticketId) const = 0;
+	virtual ISupportTicketUniquePtr GetTicket(const QByteArray& ticketId) const = 0;
 };
 
 } // namespace imtchat

@@ -2,7 +2,7 @@
 #pragma once
 
 // ImtCore includes
-#include <imtchat/IMessage.h>
+#include <imtchat/IChatMessage.h>
 #include <GeneratedFiles/imtchatsdl/SDL/1.0/CPP/ImtChat.h>
 
 
@@ -50,7 +50,7 @@ private:
 				QString& errorMessage) const;
 
 protected:
-	I_FACT(imtchat::IMessage, m_messageFactCompPtr);
+	I_FACT(imtchat::IChatMessage, m_messageFactCompPtr);
 };
 
 

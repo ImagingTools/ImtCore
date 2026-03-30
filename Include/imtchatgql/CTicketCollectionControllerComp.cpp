@@ -5,7 +5,7 @@
 #include <QtCore/QUuid>
 
 // ImtCore includes
-#include <imtchat/ITicket.h>
+#include <imtchat/ISupportTicket.h>
 
 
 namespace imtchatgql
@@ -27,9 +27,9 @@ bool CTicketCollectionControllerComp::CreateRepresentationFromObject(
 	const QByteArray objectId = objectCollectionIterator.GetObjectId();
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
-	const imtchat::ITicket* ticketPtr = nullptr;
+	const imtchat::ISupportTicket* ticketPtr = nullptr;
 	if (objectCollectionIterator.GetObjectData(dataPtr)){
-		ticketPtr = dynamic_cast<const imtchat::ITicket*>(dataPtr.GetPtr());
+		ticketPtr = dynamic_cast<const imtchat::ISupportTicket*>(dataPtr.GetPtr());
 	}
 
 	if (ticketPtr == nullptr){
@@ -61,7 +61,7 @@ istd::IChangeableUniquePtr CTicketCollectionControllerComp::CreateObjectFromRepr
 		return nullptr;
 	}
 
-	imtchat::ITicketUniquePtr ticketPtr = m_ticketFactCompPtr.CreateInstance();
+	imtchat::ISupportTicketUniquePtr ticketPtr = m_ticketFactCompPtr.CreateInstance();
 	if (!ticketPtr.IsValid()){
 		errorMessage = QStringLiteral("Failed to create ticket instance");
 		SendErrorMessage(0, errorMessage, "CTicketCollectionControllerComp");
@@ -82,9 +82,9 @@ bool CTicketCollectionControllerComp::CreateRepresentationFromObject(
 		sdl::imtchat::ImtChat::CTicketData::V1_0& representationPayload,
 		QString& errorMessage) const
 {
-	const imtchat::ITicket* ticketPtr = dynamic_cast<const imtchat::ITicket*>(&data);
+	const imtchat::ISupportTicket* ticketPtr = dynamic_cast<const imtchat::ISupportTicket*>(&data);
 	if (ticketPtr == nullptr){
-		errorMessage = QStringLiteral("Object is not a valid ITicket");
+		errorMessage = QStringLiteral("Object is not a valid ISupportTicket");
 		SendErrorMessage(0, errorMessage, "CTicketCollectionControllerComp");
 		return false;
 	}
@@ -112,9 +112,9 @@ bool CTicketCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 		istd::IChangeable& object,
 		QString& errorMessage) const
 {
-	imtchat::ITicket* ticketPtr = dynamic_cast<imtchat::ITicket*>(&object);
+	imtchat::ISupportTicket* ticketPtr = dynamic_cast<imtchat::ISupportTicket*>(&object);
 	if (ticketPtr == nullptr){
-		errorMessage = QStringLiteral("Object is not a valid ITicket");
+		errorMessage = QStringLiteral("Object is not a valid ISupportTicket");
 		SendErrorMessage(0, errorMessage, "CTicketCollectionControllerComp");
 		return false;
 	}
@@ -150,9 +150,9 @@ bool CTicketCollectionControllerComp::FillObjectFromRepresentation(
 		QByteArray& objectId,
 		QString& errorMessage) const
 {
-	imtchat::ITicket* ticketPtr = dynamic_cast<imtchat::ITicket*>(&object);
+	imtchat::ISupportTicket* ticketPtr = dynamic_cast<imtchat::ISupportTicket*>(&object);
 	if (ticketPtr == nullptr){
-		errorMessage = QStringLiteral("Object is not a valid ITicket");
+		errorMessage = QStringLiteral("Object is not a valid ISupportTicket");
 		SendErrorMessage(0, errorMessage, "CTicketCollectionControllerComp");
 		return false;
 	}

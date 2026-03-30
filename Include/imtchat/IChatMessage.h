@@ -17,7 +17,7 @@ namespace imtchat
 
 	\ingroup imtchat
 */
-class IMessage: virtual public iser::ISerializable
+class IChatMessage: virtual public iser::ISerializable
 {
 public:
 	/**
@@ -92,14 +92,14 @@ public:
 	virtual void SetUpdatedAt(const QString& updatedAt) = 0;
 
 	/**
-		Get the JSON-serialized entity references array.
+		Get the list of entity reference IDs linked to this message.
 	*/
-	virtual QString GetEntityReferences() const = 0;
+	virtual QByteArrayList GetEntityReferences() const = 0;
 
 	/**
-		Set the entity references as a JSON string.
+		Set the entity reference IDs.
 	*/
-	virtual void SetEntityReferences(const QString& entityReferences) = 0;
+	virtual void SetEntityReferences(const QByteArrayList& entityReferences) = 0;
 
 	/**
 		Get the list of attachment IDs associated with this message.
@@ -112,6 +112,6 @@ public:
 	virtual void SetAttachmentIds(const QByteArrayList& attachmentIds) = 0;
 };
 
-typedef istd::TUniqueInterfacePtr<IMessage> IMessageUniquePtr;
+typedef istd::TUniqueInterfacePtr<IChatMessage> IChatMessageUniquePtr;
 
 } // namespace imtchat

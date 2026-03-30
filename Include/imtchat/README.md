@@ -21,8 +21,8 @@ messages, tickets, and entity references.
 | Interface         | Purpose                                        |
 |-------------------|------------------------------------------------|
 | `IConversation`   | Conversation data (id, name, type, participants) |
-| `IMessage`        | Message data (id, content, sender, status)     |
-| `ITicket`         | Ticket data (title, type, status, priority)    |
+| `IChatMessage`        | Message data (id, content, sender, status)     |
+| `ISupportTicket`         | Ticket data (title, type, status, priority)    |
 | `IEntityReference`| Reference to an external ImtCore entity       |
 | `IChatService`    | Chat operations (send, get, create, mark-read) |
 | `ITicketService`  | Ticket CRUD operations                         |
@@ -32,8 +32,8 @@ messages, tickets, and entity references.
 | Component             | Implements      |
 |-----------------------|-----------------|
 | `CConversationComp`   | `IConversation` |
-| `CMessageComp`        | `IMessage`      |
-| `CTicketComp`         | `ITicket`       |
+| `CMessageComp`        | `IChatMessage`      |
+| `CTicketComp`         | `ISupportTicket`       |
 
 ### Design Patterns
 

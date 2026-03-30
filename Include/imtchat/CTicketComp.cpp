@@ -12,7 +12,7 @@ namespace imtchat
 {
 
 
-// reimplemented (imtchat::ITicket)
+// reimplemented (imtchat::ISupportTicket)
 
 QByteArray CTicketComp::GetId() const
 {
@@ -50,7 +50,7 @@ void CTicketComp::SetDescription(const QString& description)
 }
 
 
-ITicket::TicketType CTicketComp::GetTicketType() const
+ISupportTicket::TicketType CTicketComp::GetTicketType() const
 {
 	return m_ticketType;
 }
@@ -62,7 +62,7 @@ void CTicketComp::SetTicketType(TicketType ticketType)
 }
 
 
-ITicket::TicketStatus CTicketComp::GetStatus() const
+ISupportTicket::TicketStatus CTicketComp::GetStatus() const
 {
 	return m_status;
 }
@@ -74,7 +74,7 @@ void CTicketComp::SetStatus(TicketStatus status)
 }
 
 
-ITicket::TicketPriority CTicketComp::GetPriority() const
+ISupportTicket::TicketPriority CTicketComp::GetPriority() const
 {
 	return m_priority;
 }
@@ -134,7 +134,7 @@ void CTicketComp::SetMessageId(const QByteArray& messageId)
 }
 
 
-ITicket::Environment CTicketComp::GetEnvironment() const
+ISupportTicket::Environment CTicketComp::GetEnvironment() const
 {
 	return m_environment;
 }
@@ -282,7 +282,7 @@ bool CTicketComp::Serialize(iser::IArchive& archive)
 
 bool CTicketComp::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
-	const ITicket* srcPtr = dynamic_cast<const ITicket*>(&object);
+	const ISupportTicket* srcPtr = dynamic_cast<const ISupportTicket*>(&object);
 	if (srcPtr == nullptr){
 		return false;
 	}
@@ -308,7 +308,7 @@ bool CTicketComp::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/
 
 bool CTicketComp::IsEqual(const IChangeable& object) const
 {
-	const ITicket* srcPtr = dynamic_cast<const ITicket*>(&object);
+	const ISupportTicket* srcPtr = dynamic_cast<const ISupportTicket*>(&object);
 	if (srcPtr == nullptr){
 		return false;
 	}

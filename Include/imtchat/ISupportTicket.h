@@ -17,7 +17,7 @@ namespace imtchat
 
 	\ingroup imtchat
 */
-class ITicket: virtual public iser::ISerializable
+class ISupportTicket: virtual public iser::ISerializable
 {
 public:
 	/**
@@ -233,6 +233,6 @@ public:
 	virtual void SetResolvedAt(const QString& resolvedAt) = 0;
 };
 
-typedef istd::TUniqueInterfacePtr<ITicket> ITicketUniquePtr;
+typedef istd::TUniqueInterfacePtr<ISupportTicket> ISupportTicketUniquePtr;
 
 } // namespace imtchat

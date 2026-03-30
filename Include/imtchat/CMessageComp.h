@@ -6,7 +6,7 @@
 #include <istd/IChangeable.h>
 
 // ImtCore includes
-#include <imtchat/IMessage.h>
+#include <imtchat/IChatMessage.h>
 
 
 namespace imtchat
@@ -15,18 +15,18 @@ namespace imtchat
 
 class CMessageComp:
 		public icomp::CComponentBase,
-		virtual public IMessage
+		virtual public IChatMessage
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CMessageComp)
-		I_REGISTER_INTERFACE(IMessage);
+		I_REGISTER_INTERFACE(IChatMessage);
 		I_REGISTER_INTERFACE(iser::ISerializable);
 		I_REGISTER_INTERFACE(istd::IChangeable);
 	I_END_COMPONENT
 
-	// reimplemented (imtchat::IMessage)
+	// reimplemented (imtchat::IChatMessage)
 	virtual QByteArray GetId() const override;
 	virtual void SetId(const QByteArray& id) override;
 	virtual QByteArray GetConversationId() const override;
@@ -41,8 +41,8 @@ public:
 	virtual void SetCreatedAt(const QString& createdAt) override;
 	virtual QString GetUpdatedAt() const override;
 	virtual void SetUpdatedAt(const QString& updatedAt) override;
-	virtual QString GetEntityReferences() const override;
-	virtual void SetEntityReferences(const QString& entityReferences) override;
+	virtual QByteArrayList GetEntityReferences() const override;
+	virtual void SetEntityReferences(const QByteArrayList& entityReferences) override;
 	virtual QByteArrayList GetAttachmentIds() const override;
 	virtual void SetAttachmentIds(const QByteArrayList& attachmentIds) override;
 
@@ -63,7 +63,7 @@ private:
 	int m_status = 0;
 	QString m_createdAt;
 	QString m_updatedAt;
-	QString m_entityReferences;
+	QByteArrayList m_entityReferences;
 	QByteArrayList m_attachmentIds;
 };
 

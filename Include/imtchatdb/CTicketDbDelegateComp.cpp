@@ -6,7 +6,7 @@
 #include <QtSql/QSqlRecord>
 
 // ImtCore includes
-#include <imtchat/ITicket.h>
+#include <imtchat/ISupportTicket.h>
 #include <imtdb/CDatabaseEngineComp.h>
 #include <imtdb/imtdb.h>
 
@@ -23,7 +23,7 @@ istd::IChangeableUniquePtr CTicketDbDelegateComp::CreateObjectFromRecord(
 		return nullptr;
 	}
 
-	istd::TUniqueInterfacePtr<imtchat::ITicket> ticketPtr = m_ticketFactCompPtr.CreateInstance();
+	istd::TUniqueInterfacePtr<imtchat::ISupportTicket> ticketPtr = m_ticketFactCompPtr.CreateInstance();
 	if (!ticketPtr.IsValid()){
 		return nullptr;
 	}
@@ -38,13 +38,13 @@ istd::IChangeableUniquePtr CTicketDbDelegateComp::CreateObjectFromRecord(
 		ticketPtr->SetDescription(record.value("Description").toString());
 	}
 	if (record.contains("TicketType")){
-		ticketPtr->SetTicketType(static_cast<imtchat::ITicket::TicketType>(record.value("TicketType").toInt()));
+		ticketPtr->SetTicketType(static_cast<imtchat::ISupportTicket::TicketType>(record.value("TicketType").toInt()));
 	}
 	if (record.contains("Status")){
-		ticketPtr->SetStatus(static_cast<imtchat::ITicket::TicketStatus>(record.value("Status").toInt()));
+		ticketPtr->SetStatus(static_cast<imtchat::ISupportTicket::TicketStatus>(record.value("Status").toInt()));
 	}
 	if (record.contains("Priority")){
-		ticketPtr->SetPriority(static_cast<imtchat::ITicket::TicketPriority>(record.value("Priority").toInt()));
+		ticketPtr->SetPriority(static_cast<imtchat::ISupportTicket::TicketPriority>(record.value("Priority").toInt()));
 	}
 	if (record.contains("AssigneeId")){
 		ticketPtr->SetAssigneeId(record.value("AssigneeId").toByteArray());
@@ -59,7 +59,7 @@ istd::IChangeableUniquePtr CTicketDbDelegateComp::CreateObjectFromRecord(
 		ticketPtr->SetMessageId(record.value("MessageId").toByteArray());
 	}
 	if (record.contains("Environment")){
-		ticketPtr->SetEnvironment(static_cast<imtchat::ITicket::Environment>(record.value("Environment").toInt()));
+		ticketPtr->SetEnvironment(static_cast<imtchat::ISupportTicket::Environment>(record.value("Environment").toInt()));
 	}
 	if (record.contains("Tags")){
 		const QString tagsStr = record.value("Tags").toString();
@@ -95,7 +95,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CTicketDbDelegateComp::CreateNewO
 		return NewObjectQuery();
 	}
 
-	const imtchat::ITicket* ticketPtr = dynamic_cast<const imtchat::ITicket*>(valuePtr);
+	const imtchat::ISupportTicket* ticketPtr = dynamic_cast<const imtchat::ISupportTicket*>(valuePtr);
 	if (ticketPtr == nullptr){
 		return NewObjectQuery();
 	}
@@ -156,7 +156,7 @@ QByteArray CTicketDbDelegateComp::CreateUpdateObjectQuery(
 		const imtbase::IOperationContext* /*operationContextPtr*/,
 		bool /*useExternDelegate*/) const
 {
-	const imtchat::ITicket* ticketPtr = dynamic_cast<const imtchat::ITicket*>(&object);
+	const imtchat::ISupportTicket* ticketPtr = dynamic_cast<const imtchat::ISupportTicket*>(&object);
 	if (ticketPtr == nullptr){
 		return QByteArray();
 	}

@@ -6,7 +6,7 @@
 
 // ImtCore includes
 #include <imtchat/IConversation.h>
-#include <imtchat/IMessage.h>
+#include <imtchat/IChatMessage.h>
 
 
 namespace imtchat

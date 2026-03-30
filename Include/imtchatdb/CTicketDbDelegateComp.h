@@ -2,7 +2,7 @@
 #pragma once
 
 // ImtCore includes
-#include <imtchat/ITicket.h>
+#include <imtchat/ISupportTicket.h>
 #include <imtdb/CSqlDatabaseObjectDelegateCompBase.h>
 
 
@@ -64,7 +64,7 @@ protected:
 	virtual bool SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const override;
 
 private:
-	I_FACT(imtchat::ITicket, m_ticketFactCompPtr);
+	I_FACT(imtchat::ISupportTicket, m_ticketFactCompPtr);
 };
 
 

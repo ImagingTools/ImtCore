@@ -6,7 +6,7 @@
 #include <QtSql/QSqlRecord>
 
 // ImtCore includes
-#include <imtchat/IMessage.h>
+#include <imtchat/IChatMessage.h>
 #include <imtdb/CDatabaseEngineComp.h>
 #include <imtdb/imtdb.h>
 
@@ -23,7 +23,7 @@ istd::IChangeableUniquePtr CMessageDbDelegateComp::CreateObjectFromRecord(
 		return nullptr;
 	}
 
-	istd::TUniqueInterfacePtr<imtchat::IMessage> msgPtr = m_messageFactCompPtr.CreateInstance();
+	istd::TUniqueInterfacePtr<imtchat::IChatMessage> msgPtr = m_messageFactCompPtr.CreateInstance();
 	if (!msgPtr.IsValid()){
 		return nullptr;
 	}
@@ -41,7 +41,17 @@ istd::IChangeableUniquePtr CMessageDbDelegateComp::CreateObjectFromRecord(
 		msgPtr->SetContent(record.value("Content").toString());
 	}
 	if (record.contains("EntityReferences")){
-		msgPtr->SetEntityReferences(record.value("EntityReferences").toString());
+		const QString entityRefStr = record.value("EntityReferences").toString();
+		QByteArrayList entityRefIds;
+		if (!entityRefStr.isEmpty()){
+			for (const QString& part : entityRefStr.split(',')){
+				const QString trimmed = part.trimmed();
+				if (!trimmed.isEmpty()){
+					entityRefIds.append(trimmed.toUtf8());
+				}
+			}
+		}
+		msgPtr->SetEntityReferences(entityRefIds);
 	}
 	if (record.contains("AttachmentIds")){
 		const QString attachStr = record.value("AttachmentIds").toString();
@@ -82,7 +92,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CMessageDbDelegateComp::CreateNew
 		return NewObjectQuery();
 	}
 
-	const imtchat::IMessage* msgPtr = dynamic_cast<const imtchat::IMessage*>(valuePtr);
+	const imtchat::IChatMessage* msgPtr = dynamic_cast<const imtchat::IChatMessage*>(valuePtr);
 	if (msgPtr == nullptr){
 		return NewObjectQuery();
 	}
@@ -92,8 +102,13 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CMessageDbDelegateComp::CreateNew
 		msgId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 	}
 
-	const QString entityRefs = msgPtr->GetEntityReferences();
-	const QString entityRefsSql = entityRefs.isEmpty() ? "NULL" : QString("'%1'").arg(entityRefs);
+	QString entityRefsStr;
+	const QByteArrayList entityRefIds = msgPtr->GetEntityReferences();
+	for (int i = 0; i < entityRefIds.size(); ++i){
+		if (i > 0) entityRefsStr += ",";
+		entityRefsStr += QString::fromUtf8(entityRefIds[i]);
+	}
+	const QString entityRefsSql = entityRefsStr.isEmpty() ? "NULL" : QString("'%1'").arg(entityRefsStr);
 
 	QString attachStr;
 	const QByteArrayList attachIds = msgPtr->GetAttachmentIds();
@@ -128,13 +143,18 @@ QByteArray CMessageDbDelegateComp::CreateUpdateObjectQuery(
 		const imtbase::IOperationContext* /*operationContextPtr*/,
 		bool /*useExternDelegate*/) const
 {
-	const imtchat::IMessage* msgPtr = dynamic_cast<const imtchat::IMessage*>(&object);
+	const imtchat::IChatMessage* msgPtr = dynamic_cast<const imtchat::IChatMessage*>(&object);
 	if (msgPtr == nullptr){
 		return QByteArray();
 	}
 
-	const QString entityRefs = msgPtr->GetEntityReferences();
-	const QString entityRefsSql = entityRefs.isEmpty() ? "NULL" : QString("'%1'").arg(entityRefs);
+	QString entityRefsStr;
+	const QByteArrayList entityRefIds = msgPtr->GetEntityReferences();
+	for (int i = 0; i < entityRefIds.size(); ++i){
+		if (i > 0) entityRefsStr += ",";
+		entityRefsStr += QString::fromUtf8(entityRefIds[i]);
+	}
+	const QString entityRefsSql = entityRefsStr.isEmpty() ? "NULL" : QString("'%1'").arg(entityRefsStr);
 
 	return QString(
 		"UPDATE \"Messages\" SET "

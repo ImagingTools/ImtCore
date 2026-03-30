@@ -12,7 +12,7 @@ namespace imtchat
 {
 
 
-// reimplemented (imtchat::IMessage)
+// reimplemented (imtchat::IChatMessage)
 
 QByteArray CMessageComp::GetId() const
 {
@@ -98,13 +98,13 @@ void CMessageComp::SetUpdatedAt(const QString& updatedAt)
 }
 
 
-QString CMessageComp::GetEntityReferences() const
+QByteArrayList CMessageComp::GetEntityReferences() const
 {
 	return m_entityReferences;
 }
 
 
-void CMessageComp::SetEntityReferences(const QString& entityReferences)
+void CMessageComp::SetEntityReferences(const QByteArrayList& entityReferences)
 {
 	m_entityReferences = entityReferences;
 }
@@ -165,10 +165,7 @@ bool CMessageComp::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_updatedAt);
 	retVal = retVal && archive.EndTag(updatedAtTag);
 
-	static iser::CArchiveTag entityReferencesTag("EntityReferences", "Entity references", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(entityReferencesTag);
-	retVal = retVal && archive.Process(m_entityReferences);
-	retVal = retVal && archive.EndTag(entityReferencesTag);
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_entityReferences, "EntityReferences", "EntityReference");
 
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_attachmentIds, "AttachmentIds", "AttachmentId");
 
@@ -180,7 +177,7 @@ bool CMessageComp::Serialize(iser::IArchive& archive)
 
 bool CMessageComp::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
-	const IMessage* srcPtr = dynamic_cast<const IMessage*>(&object);
+	const IChatMessage* srcPtr = dynamic_cast<const IChatMessage*>(&object);
 	if (srcPtr == nullptr){
 		return false;
 	}
@@ -200,7 +197,7 @@ bool CMessageComp::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*
 
 bool CMessageComp::IsEqual(const IChangeable& object) const
 {
-	const IMessage* srcPtr = dynamic_cast<const IMessage*>(&object);
+	const IChatMessage* srcPtr = dynamic_cast<const IChatMessage*>(&object);
 	if (srcPtr == nullptr){
 		return false;
 	}
