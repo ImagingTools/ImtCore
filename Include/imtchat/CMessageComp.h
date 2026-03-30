@@ -1,0 +1,70 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+#pragma once
+
+// ACF includes
+#include <icomp/CComponentBase.h>
+#include <istd/IChangeable.h>
+
+// ImtCore includes
+#include <imtchat/IMessage.h>
+
+
+namespace imtchat
+{
+
+
+class CMessageComp:
+		public icomp::CComponentBase,
+		virtual public IMessage
+{
+public:
+	typedef icomp::CComponentBase BaseClass;
+
+	I_BEGIN_COMPONENT(CMessageComp)
+		I_REGISTER_INTERFACE(IMessage);
+		I_REGISTER_INTERFACE(iser::ISerializable);
+		I_REGISTER_INTERFACE(istd::IChangeable);
+	I_END_COMPONENT
+
+	// reimplemented (imtchat::IMessage)
+	virtual QByteArray GetId() const override;
+	virtual void SetId(const QByteArray& id) override;
+	virtual QByteArray GetConversationId() const override;
+	virtual void SetConversationId(const QByteArray& conversationId) override;
+	virtual QByteArray GetSenderId() const override;
+	virtual void SetSenderId(const QByteArray& senderId) override;
+	virtual QString GetContent() const override;
+	virtual void SetContent(const QString& content) override;
+	virtual int GetStatus() const override;
+	virtual void SetStatus(int status) override;
+	virtual QString GetCreatedAt() const override;
+	virtual void SetCreatedAt(const QString& createdAt) override;
+	virtual QString GetUpdatedAt() const override;
+	virtual void SetUpdatedAt(const QString& updatedAt) override;
+	virtual QString GetEntityReferences() const override;
+	virtual void SetEntityReferences(const QString& entityReferences) override;
+	virtual QByteArrayList GetAttachmentIds() const override;
+	virtual void SetAttachmentIds(const QByteArrayList& attachmentIds) override;
+
+	// reimplemented (iser::ISerializable)
+	virtual bool Serialize(iser::IArchive& archive) override;
+
+	// reimplemented (istd::IChangeable)
+	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	virtual bool IsEqual(const IChangeable& object) const override;
+	virtual istd::IChangeableUniquePtr CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
+	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
+
+private:
+	QByteArray m_id;
+	QByteArray m_conversationId;
+	QByteArray m_senderId;
+	QString m_content;
+	int m_status = 0;
+	QString m_createdAt;
+	QString m_updatedAt;
+	QString m_entityReferences;
+	QByteArrayList m_attachmentIds;
+};
+
+} // namespace imtchat

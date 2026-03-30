@@ -1,0 +1,84 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+#pragma once
+
+// ACF includes
+#include <istd/IChangeable.h>
+
+// ImtCore includes
+#include <imtchat/IConversation.h>
+#include <imtchat/IMessage.h>
+
+
+namespace imtchat
+{
+
+
+/**
+	Service interface for chat operations.
+
+	Provides operations for sending and retrieving messages, managing
+	conversations, and marking messages as read.
+
+	\ingroup imtchat
+*/
+class IChatService: virtual public istd::IInterface
+{
+public:
+	/**
+		Send a message to a conversation.
+		\param conversationId  Target conversation ID.
+		\param content         Message text content.
+		\param entityRefsJson  Optional JSON-encoded entity references.
+		\param attachmentIds   Optional attachment IDs.
+		\return New message ID, or empty on failure.
+	*/
+	virtual QByteArray SendMessage(
+				const QByteArray& conversationId,
+				const QString& content,
+				const QString& entityRefsJson = QString(),
+				const QByteArrayList& attachmentIds = QByteArrayList()) = 0;
+
+	/**
+		Retrieve messages for a conversation.
+		\param conversationId  Conversation to query.
+		\param offset          Pagination offset.
+		\param limit           Maximum number of messages to return (-1 = all).
+		\return List of message IDs in chronological order.
+	*/
+	virtual QByteArrayList GetMessages(
+				const QByteArray& conversationId,
+				int offset = 0,
+				int limit = 50) const = 0;
+
+	/**
+		Create a new conversation.
+		\param name              Display name.
+		\param conversationType  Type (0 = Direct, 1 = Group, 2 = Channel, 3 = Support).
+		\param participantIds    Initial participant list.
+		\return New conversation ID, or empty on failure.
+	*/
+	virtual QByteArray CreateConversation(
+				const QString& name,
+				int conversationType,
+				const QByteArrayList& participantIds) = 0;
+
+	/**
+		Retrieve conversation IDs accessible to the current user.
+		\param offset  Pagination offset.
+		\param limit   Maximum number of conversations (-1 = all).
+		\return List of conversation IDs.
+	*/
+	virtual QByteArrayList GetConversations(int offset = 0, int limit = -1) const = 0;
+
+	/**
+		Mark a message as read for the current user.
+		\param conversationId  The conversation containing the message.
+		\param messageId       The message to mark as read.
+		\return True on success.
+	*/
+	virtual bool MarkMessageRead(
+				const QByteArray& conversationId,
+				const QByteArray& messageId) = 0;
+};
+
+} // namespace imtchat

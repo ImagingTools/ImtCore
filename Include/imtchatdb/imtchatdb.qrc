@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/SQL/Postgres">
+        <file alias="CreateConversationsTable.sql">Resources/SQL/Postgres/CreateConversationsTable.sql</file>
+        <file alias="CreateMessagesTable.sql">Resources/SQL/Postgres/CreateMessagesTable.sql</file>
+        <file alias="CreateMessageStatusTable.sql">Resources/SQL/Postgres/CreateMessageStatusTable.sql</file>
+        <file alias="CreateParticipantsTable.sql">Resources/SQL/Postgres/CreateParticipantsTable.sql</file>
+        <file alias="CreateTicketsTable.sql">Resources/SQL/Postgres/CreateTicketsTable.sql</file>
+    </qresource>
+    <qresource prefix="/SQL/SQLite">
+        <file alias="CreateConversationsTable.sql">Resources/SQL/SQLite/CreateConversationsTable.sql</file>
+        <file alias="CreateMessagesTable.sql">Resources/SQL/SQLite/CreateMessagesTable.sql</file>
+        <file alias="CreateMessageStatusTable.sql">Resources/SQL/SQLite/CreateMessageStatusTable.sql</file>
+        <file alias="CreateParticipantsTable.sql">Resources/SQL/SQLite/CreateParticipantsTable.sql</file>
+        <file alias="CreateTicketsTable.sql">Resources/SQL/SQLite/CreateTicketsTable.sql</file>
+    </qresource>
+</RCC>
