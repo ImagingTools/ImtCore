@@ -39,7 +39,7 @@ istd::IChangeableUniquePtr CConversationDbDelegateComp::CreateObjectFromRecord(
 		convPtr->SetName(record.value("Name").toString());
 	}
 	if (record.contains("ConversationType")){
-		convPtr->SetConversationType(record.value("ConversationType").toInt());
+		convPtr->SetConversationType(static_cast<imtchat::IConversation::ConversationType>(record.value("ConversationType").toInt()));
 	}
 	if (record.contains("Metadata")){
 		convPtr->SetMetadata(record.value("Metadata").toString());
@@ -82,7 +82,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CConversationDbDelegateComp::Crea
 		name = objectName;
 	}
 
-	const int conversationType = convPtr->GetConversationType();
+	const imtchat::IConversation::ConversationType conversationType = convPtr->GetConversationType();
 	const QString metadata = convPtr->GetMetadata();
 	const QString metadataSql = metadata.isEmpty() ? "NULL" : QString("'%1'").arg(metadata);
 

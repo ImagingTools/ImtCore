@@ -38,13 +38,13 @@ void CConversationComp::SetName(const QString& name)
 }
 
 
-int CConversationComp::GetConversationType() const
+IConversation::ConversationType CConversationComp::GetConversationType() const
 {
 	return m_conversationType;
 }
 
 
-void CConversationComp::SetConversationType(int conversationType)
+void CConversationComp::SetConversationType(IConversation::ConversationType conversationType)
 {
 	m_conversationType = conversationType;
 }
@@ -116,10 +116,7 @@ bool CConversationComp::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_name);
 	retVal = retVal && archive.EndTag(nameTag);
 
-	static iser::CArchiveTag conversationTypeTag("ConversationType", "Conversation type", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(conversationTypeTag);
-	retVal = retVal && archive.Process(m_conversationType);
-	retVal = retVal && archive.EndTag(conversationTypeTag);
+	retVal = retVal && I_SERIALIZE_ENUM(ConversationType, archive, m_conversationType);
 
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_participantIds, "ParticipantIds", "ParticipantId");
 
@@ -191,7 +188,7 @@ bool CConversationComp::ResetData(CompatibilityMode /*mode*/)
 {
 	m_id.clear();
 	m_name.clear();
-	m_conversationType = 0;
+	m_conversationType = IConversation::CT_DIRECT;
 	m_participantIds.clear();
 	m_createdAt.clear();
 	m_updatedAt.clear();

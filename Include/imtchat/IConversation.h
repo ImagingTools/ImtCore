@@ -21,6 +21,22 @@ class IConversation: virtual public iser::ISerializable
 {
 public:
 	/**
+		Conversation type — describes the kind of conversation.
+	*/
+	enum ConversationType
+	{
+		CT_DIRECT,
+		CT_GROUP,
+		CT_CHANNEL,
+		CT_SUPPORT
+	};
+	I_DECLARE_ENUM(ConversationType,
+				CT_DIRECT,
+				CT_GROUP,
+				CT_CHANNEL,
+				CT_SUPPORT);
+
+	/**
 		Get the unique conversation identifier.
 	*/
 	virtual QByteArray GetId() const = 0;
@@ -41,15 +57,14 @@ public:
 	virtual void SetName(const QString& name) = 0;
 
 	/**
-		Get the conversation type as integer (maps to ConversationType enum).
-		0 = Direct, 1 = Group, 2 = Channel, 3 = Support
+		Get the conversation type.
 	*/
-	virtual int GetConversationType() const = 0;
+	virtual ConversationType GetConversationType() const = 0;
 
 	/**
 		Set the conversation type.
 	*/
-	virtual void SetConversationType(int conversationType) = 0;
+	virtual void SetConversationType(ConversationType conversationType) = 0;
 
 	/**
 		Get the list of participant user IDs.

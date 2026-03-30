@@ -31,8 +31,8 @@ public:
 	virtual void SetId(const QByteArray& id) override;
 	virtual QString GetName() const override;
 	virtual void SetName(const QString& name) override;
-	virtual int GetConversationType() const override;
-	virtual void SetConversationType(int conversationType) override;
+	virtual IConversation::ConversationType GetConversationType() const override;
+	virtual void SetConversationType(IConversation::ConversationType conversationType) override;
 	virtual QByteArrayList GetParticipantIds() const override;
 	virtual void SetParticipantIds(const QByteArrayList& participantIds) override;
 	virtual QString GetCreatedAt() const override;
@@ -54,7 +54,7 @@ public:
 private:
 	QByteArray m_id;
 	QString m_name;
-	int m_conversationType = 0;
+	IConversation::ConversationType m_conversationType = IConversation::CT_DIRECT;
 	QByteArrayList m_participantIds;
 	QString m_createdAt;
 	QString m_updatedAt;
