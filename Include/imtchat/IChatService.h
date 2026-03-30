@@ -2,7 +2,7 @@
 #pragma once
 
 // ACF includes
-#include <istd/IChangeable.h>
+#include <istd/IPolymorphic.h>
 
 // ImtCore includes
 #include <imtchat/IConversation.h>
@@ -21,7 +21,7 @@ namespace imtchat
 
 	\ingroup imtchat
 */
-class IChatService: virtual public istd::IInterface
+class IChatService: virtual public istd::IPolymorphic
 {
 public:
 	/**

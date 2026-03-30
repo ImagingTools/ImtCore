@@ -2,7 +2,10 @@
 #include <imtchat/CConversationComp.h>
 
 // ACF includes
+#include <istd/CChangeNotifier.h>
 #include <iser/IArchive.h>
+#include <iser/CArchiveTag.h>
+#include <iser/CPrimitiveTypesSerializer.h>
 
 
 namespace imtchat
@@ -99,13 +102,43 @@ void CConversationComp::SetMetadata(const QString& metadata)
 
 bool CConversationComp::Serialize(iser::IArchive& archive)
 {
-	archive.Serialize(m_id, "id");
-	archive.Serialize(m_name, "name");
-	archive.Serialize(m_conversationType, "conversationType");
-	archive.Serialize(m_createdAt, "createdAt");
-	archive.Serialize(m_updatedAt, "updatedAt");
-	archive.Serialize(m_metadata, "metadata");
-	return archive.IsOk();
+	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
+
+	bool retVal = true;
+
+	static iser::CArchiveTag idTag("Id", "Id", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(idTag);
+	retVal = retVal && archive.Process(m_id);
+	retVal = retVal && archive.EndTag(idTag);
+
+	static iser::CArchiveTag nameTag("Name", "Name", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(nameTag);
+	retVal = retVal && archive.Process(m_name);
+	retVal = retVal && archive.EndTag(nameTag);
+
+	static iser::CArchiveTag conversationTypeTag("ConversationType", "Conversation type", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(conversationTypeTag);
+	retVal = retVal && archive.Process(m_conversationType);
+	retVal = retVal && archive.EndTag(conversationTypeTag);
+
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_participantIds, "ParticipantIds", "ParticipantId");
+
+	static iser::CArchiveTag createdAtTag("CreatedAt", "Created at", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(createdAtTag);
+	retVal = retVal && archive.Process(m_createdAt);
+	retVal = retVal && archive.EndTag(createdAtTag);
+
+	static iser::CArchiveTag updatedAtTag("UpdatedAt", "Updated at", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(updatedAtTag);
+	retVal = retVal && archive.Process(m_updatedAt);
+	retVal = retVal && archive.EndTag(updatedAtTag);
+
+	static iser::CArchiveTag metadataTag("Metadata", "Metadata", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(metadataTag);
+	retVal = retVal && archive.Process(m_metadata);
+	retVal = retVal && archive.EndTag(metadataTag);
+
+	return retVal;
 }
 
 
