@@ -365,7 +365,7 @@ class ListView extends Flickable {
 
     $modelChanged(){
         this.$disconnectModel()
-        this.$clear()
+		this.$clear(true)
 
         let model = this.getPropertyValue('model')
         let length = 0 
