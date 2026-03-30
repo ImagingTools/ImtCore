@@ -259,7 +259,6 @@ QtObject {
 			context.isNew = root.documentManager ? root.documentManager.documentIsNew(root.documentId) : true
 			context.documentManager = root.documentManager
 			context.decorator = root
-			context.siblingViews = root.registeredViews.slice()
 
 			view.documentContext = context
 
