@@ -1223,17 +1223,30 @@ idoc::MetaInfoPtr CSqlDatabaseDocumentDelegateComp::CreateObjectMetaInfo(const Q
 }
 
 
-bool CSqlDatabaseDocumentDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const
+bool CSqlDatabaseDocumentDelegateComp::SetObjectMetaInfoFromRecord(
+			const QSqlRecord& record,
+			idoc::IDocumentMetaInfo& metaInfo) const
 {
-	if (record.contains(s_dataMetaInfoColumn)){
-		QByteArray metaInfoRepresentation = record.value(qPrintable(s_dataMetaInfoColumn)).toByteArray();
-		QByteArray typeId = record.value(qPrintable(s_typeIdColumn)).toByteArray();
-		if (m_jsonBasedMetaInfoDelegateCompPtr.IsValid()){
-			return m_jsonBasedMetaInfoDelegateCompPtr->FromJsonRepresentation(metaInfoRepresentation, metaInfo, typeId);
-		}
+	if (!record.contains(s_dataMetaInfoColumn)){
+		return true;
 	}
 
-	return true;
+	if (!m_jsonBasedMetaInfoDelegateCompPtr.IsValid()){
+		return true;
+	}
+
+	const QByteArray metaInfoRepresentation = record.value(qPrintable(s_dataMetaInfoColumn)).toByteArray();
+	if (metaInfoRepresentation.isEmpty()){
+		return true;
+	}
+
+	const QByteArray typeId = record.value(qPrintable(s_typeIdColumn)).toByteArray();
+
+	return m_jsonBasedMetaInfoDelegateCompPtr->FromJsonRepresentation(
+				metaInfoRepresentation,
+				metaInfo,
+				typeId
+				);
 }
 
 

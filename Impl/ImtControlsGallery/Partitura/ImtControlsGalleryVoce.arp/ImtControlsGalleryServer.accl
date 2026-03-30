@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5446" Description="ACF"/>
-            <Version Id="1" Number="2256" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395267" Description="Qt Framework"/>
+            <Version Id="0" Number="6379" Description="ACF"/>
+            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
@@ -15,6 +15,7 @@
         <Element ComponentName="HttpServerFramework" X="725" Y="375" Note=""/>
         <Element ComponentName="ImtCoreLocalization" X="1025" Y="600" Note=""/>
         <Element ComponentName="Migrations" X="425" Y="175" Note=""/>
+        <Element ComponentName="ProductInfo" X="1075" Y="50" Note=""/>
         <Element ComponentName="Repositories" X="1050" Y="375" Note=""/>
         <Element ComponentName="Subscribers" X="650" Y="600" Note=""/>
         <Element ComponentName="WebSocketServerFramework" X="400" Y="375" Note=""/>
@@ -27,9 +28,10 @@
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>
-        <EmbededRegistry Id="Repositories">
+        <EmbededRegistry Id="Subscribers">
             <PositionMap>
-                <Element ComponentName="ContactInfoSqlRepository" X="575" Y="225" Note=""/>
+                <Element ComponentName="ContactCollectionChangeNotifier" X="575" Y="350" Note=""/>
+                <Element ComponentName="SlaveSubscriberController" X="575" Y="125" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>
@@ -43,10 +45,9 @@
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>
-        <EmbededRegistry Id="Subscribers">
+        <EmbededRegistry Id="Repositories">
             <PositionMap>
-                <Element ComponentName="ContactCollectionChangeNotifier" X="575" Y="350" Note=""/>
-                <Element ComponentName="SlaveSubscriberController" X="575" Y="125" Note=""/>
+                <Element ComponentName="ContactInfoSqlRepository" X="575" Y="225" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>
