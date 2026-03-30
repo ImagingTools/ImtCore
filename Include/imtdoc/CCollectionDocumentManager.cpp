@@ -31,7 +31,14 @@ namespace imtdoc
 
 CCollectionDocumentManager::CCollectionDocumentManager()
 	:m_undoManagerObserver(*this)
+	,m_isAlive(std::make_shared<std::atomic<bool>>(true))
 {
+}
+
+
+CCollectionDocumentManager::~CCollectionDocumentManager()
+{
+	m_isAlive->store(false);
 }
 
 
@@ -210,9 +217,28 @@ QByteArray CCollectionDocumentManager::OpenDocument(const QByteArray& userId, co
 	QObject* worker = new QObject();
 	worker->moveToThread(thread);
 
-	QObject::connect(thread, &QThread::started, worker, [this, collectionPtr, objectId, objectTypeId, userId, documentId, worker]() {
+	std::weak_ptr<std::atomic<bool>> aliveGuard(m_isAlive);
+	QObject::connect(thread, &QThread::started, worker, [this, aliveGuard, objectId, userId, documentId, worker]() {
+		auto isAlive = aliveGuard.lock();
+		if (!isAlive || !isAlive->load()) {
+			worker->deleteLater();
+			return;
+		}
+
+		imtbase::IObjectCollection* collPtr = GetCollection();
+		if (collPtr == nullptr) {
+			worker->deleteLater();
+			return;
+		}
+
 		imtbase::IObjectCollection::DataPtr dataPtr;
-		bool success = collectionPtr->GetObjectData(objectId, dataPtr);
+		bool success = collPtr->GetObjectData(objectId, dataPtr);
+
+		isAlive = aliveGuard.lock();
+		if (!isAlive || !isAlive->load()) {
+			worker->deleteLater();
+			return;
+		}
 
 		WorkingDocument* docPtr = nullptr;
 		{
@@ -229,12 +255,9 @@ QByteArray CCollectionDocumentManager::OpenDocument(const QByteArray& userId, co
 			OnDocumentDataLoaded(userId, documentId);
 		}
 		else if (docPtr != nullptr) {
-			// Loading failed - remove the document entry
-			QMutexLocker locker(&m_mutex);
-			m_userDocuments[userId].remove(documentId);
-			if (m_userDocuments[userId].isEmpty()) {
-				m_userDocuments.remove(userId);
-			}
+			// Loading failed - close the document and notify client
+			docPtr->isLoading = false;
+			CloseDocument(userId, documentId);
 		}
 
 		worker->deleteLater();

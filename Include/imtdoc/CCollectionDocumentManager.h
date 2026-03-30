@@ -7,6 +7,10 @@
 #include <QtCore/QString>
 #include <QtCore/QThread>
 
+// STL includes
+#include <atomic>
+#include <memory>
+
 // ACF includes
 #include <idoc/IDocumentManager.h>
 #include <idoc/IUndoManager.h>
@@ -29,6 +33,7 @@ class CCollectionDocumentManager:
 {
 public:
 	CCollectionDocumentManager();
+	virtual ~CCollectionDocumentManager();
 
 	// reimplemented (imtdoc::ICollectionDocumentManager)
 	virtual DocumentList GetOpenedDocumentList(const QByteArray& userId) const override;
@@ -110,6 +115,7 @@ protected:
 	mutable QRecursiveMutex m_mutex;
 
 	UndoManagerObserver m_undoManagerObserver;
+	std::shared_ptr<std::atomic<bool>> m_isAlive;
 
 private:
 	DocumentNotificationPtr CreateDocumentNotification(const QByteArray& userId, const QByteArray& documentId) const;
