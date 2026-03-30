@@ -11,50 +11,184 @@ namespace imtchat
 
 // reimplemented (imtchat::ITicket)
 
-QByteArray CTicketComp::GetId() const { return m_id; }
-void CTicketComp::SetId(const QByteArray& id) { m_id = id; }
+QByteArray CTicketComp::GetId() const
+{
+	return m_id;
+}
 
-QString CTicketComp::GetTitle() const { return m_title; }
-void CTicketComp::SetTitle(const QString& title) { m_title = title; }
 
-QString CTicketComp::GetDescription() const { return m_description; }
-void CTicketComp::SetDescription(const QString& description) { m_description = description; }
+void CTicketComp::SetId(const QByteArray& id)
+{
+	m_id = id;
+}
 
-int CTicketComp::GetTicketType() const { return m_ticketType; }
-void CTicketComp::SetTicketType(int ticketType) { m_ticketType = ticketType; }
 
-int CTicketComp::GetStatus() const { return m_status; }
-void CTicketComp::SetStatus(int status) { m_status = status; }
+QString CTicketComp::GetTitle() const
+{
+	return m_title;
+}
 
-int CTicketComp::GetPriority() const { return m_priority; }
-void CTicketComp::SetPriority(int priority) { m_priority = priority; }
 
-QByteArray CTicketComp::GetAssigneeId() const { return m_assigneeId; }
-void CTicketComp::SetAssigneeId(const QByteArray& assigneeId) { m_assigneeId = assigneeId; }
+void CTicketComp::SetTitle(const QString& title)
+{
+	m_title = title;
+}
 
-QByteArray CTicketComp::GetReporterId() const { return m_reporterId; }
-void CTicketComp::SetReporterId(const QByteArray& reporterId) { m_reporterId = reporterId; }
 
-QByteArray CTicketComp::GetConversationId() const { return m_conversationId; }
-void CTicketComp::SetConversationId(const QByteArray& conversationId) { m_conversationId = conversationId; }
+QString CTicketComp::GetDescription() const
+{
+	return m_description;
+}
 
-QByteArray CTicketComp::GetMessageId() const { return m_messageId; }
-void CTicketComp::SetMessageId(const QByteArray& messageId) { m_messageId = messageId; }
 
-int CTicketComp::GetEnvironment() const { return m_environment; }
-void CTicketComp::SetEnvironment(int environment) { m_environment = environment; }
+void CTicketComp::SetDescription(const QString& description)
+{
+	m_description = description;
+}
 
-QStringList CTicketComp::GetTags() const { return m_tags; }
-void CTicketComp::SetTags(const QStringList& tags) { m_tags = tags; }
 
-QString CTicketComp::GetCreatedAt() const { return m_createdAt; }
-void CTicketComp::SetCreatedAt(const QString& createdAt) { m_createdAt = createdAt; }
+int CTicketComp::GetTicketType() const
+{
+	return m_ticketType;
+}
 
-QString CTicketComp::GetUpdatedAt() const { return m_updatedAt; }
-void CTicketComp::SetUpdatedAt(const QString& updatedAt) { m_updatedAt = updatedAt; }
 
-QString CTicketComp::GetResolvedAt() const { return m_resolvedAt; }
-void CTicketComp::SetResolvedAt(const QString& resolvedAt) { m_resolvedAt = resolvedAt; }
+void CTicketComp::SetTicketType(int ticketType)
+{
+	m_ticketType = ticketType;
+}
+
+
+int CTicketComp::GetStatus() const
+{
+	return m_status;
+}
+
+
+void CTicketComp::SetStatus(int status)
+{
+	m_status = status;
+}
+
+
+int CTicketComp::GetPriority() const
+{
+	return m_priority;
+}
+
+
+void CTicketComp::SetPriority(int priority)
+{
+	m_priority = priority;
+}
+
+
+QByteArray CTicketComp::GetAssigneeId() const
+{
+	return m_assigneeId;
+}
+
+
+void CTicketComp::SetAssigneeId(const QByteArray& assigneeId)
+{
+	m_assigneeId = assigneeId;
+}
+
+
+QByteArray CTicketComp::GetReporterId() const
+{
+	return m_reporterId;
+}
+
+
+void CTicketComp::SetReporterId(const QByteArray& reporterId)
+{
+	m_reporterId = reporterId;
+}
+
+
+QByteArray CTicketComp::GetConversationId() const
+{
+	return m_conversationId;
+}
+
+
+void CTicketComp::SetConversationId(const QByteArray& conversationId)
+{
+	m_conversationId = conversationId;
+}
+
+
+QByteArray CTicketComp::GetMessageId() const
+{
+	return m_messageId;
+}
+
+
+void CTicketComp::SetMessageId(const QByteArray& messageId)
+{
+	m_messageId = messageId;
+}
+
+
+int CTicketComp::GetEnvironment() const
+{
+	return m_environment;
+}
+
+
+void CTicketComp::SetEnvironment(int environment)
+{
+	m_environment = environment;
+}
+
+
+QStringList CTicketComp::GetTags() const
+{
+	return m_tags;
+}
+
+
+void CTicketComp::SetTags(const QStringList& tags)
+{
+	m_tags = tags;
+}
+
+
+QString CTicketComp::GetCreatedAt() const
+{
+	return m_createdAt;
+}
+
+
+void CTicketComp::SetCreatedAt(const QString& createdAt)
+{
+	m_createdAt = createdAt;
+}
+
+
+QString CTicketComp::GetUpdatedAt() const
+{
+	return m_updatedAt;
+}
+
+
+void CTicketComp::SetUpdatedAt(const QString& updatedAt)
+{
+	m_updatedAt = updatedAt;
+}
+
+
+QString CTicketComp::GetResolvedAt() const
+{
+	return m_resolvedAt;
+}
+
+
+void CTicketComp::SetResolvedAt(const QString& resolvedAt)
+{
+	m_resolvedAt = resolvedAt;
+}
 
 
 // reimplemented (iser::ISerializable)
