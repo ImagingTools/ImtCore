@@ -259,7 +259,7 @@ QtObject {
 			context.isNew = root.documentManager ? root.documentManager.documentIsNew(root.documentId) : true
 			context.documentManager = root.documentManager
 			context.decorator = root
-			context.collectionView = root.documentManager ? root.documentManager.getDocumentManagerActiveView() : null
+			context.documentManagerView = root.documentManager ? root.documentManager.getDocumentManagerActiveView() : null
 
 			view.documentContext = context
 
