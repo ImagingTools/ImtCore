@@ -24,6 +24,8 @@ QtObject {
 			view.guiUpdated.connect(onGuiUpdated)
 			view.guiVisibleChanged.connect(onGuiVisibleChanged)
 
+			_internal.assignDocumentContext(view)
+
 			representationController.representationUpdated.connect(onRepresentationUpdated)
 			representationController.startUpdateRepresentation.connect(onStartUpdateRepresentation)
 
@@ -70,6 +72,10 @@ QtObject {
 					root.registeredViews[i].commandsController.setCommandIsEnabled("Redo", availableRedoSteps > 0)
 					root.registeredViews[i].commandsController.setCommandIsEnabled("Save", isDirty)
 				}
+
+				if (root.registeredViews[i].documentContext){
+					root.registeredViews[i].documentContext.isDirty = isDirty
+				}
 			}
 		}
 
@@ -89,6 +95,12 @@ QtObject {
 			}
 
 			root.documentName = newName
+
+			for (let i = 0; i < root.registeredViews.length; ++i){
+				if (root.registeredViews[i].documentContext){
+					root.registeredViews[i].documentContext.documentName = newName
+				}
+			}
 
 			if (root._internal.saveRequested){
 				root._internal.saveRequested = false
@@ -233,5 +245,34 @@ QtObject {
 	property QtObject _internal: QtObject {
 		property var requestUpdateViews: []
 		property bool saveRequested: false
+
+		property Component documentContextFactory: Component {
+			DocumentContext {}
+		}
+
+		function assignDocumentContext(view){
+			let context = documentContextFactory.createObject(root)
+			context.documentId = root.documentId
+			context.documentName = root.documentName
+			context.documentTypeId = root.documentTypeId
+			context.isDirty = root.documentManager ? root.documentManager.documentIsDirty(root.documentId) : false
+			context.isNew = root.documentManager ? root.documentManager.documentIsNew(root.documentId) : true
+			context.documentManager = root.documentManager
+			context.decorator = root
+			context.siblingViews = root.registeredViews.slice()
+
+			view.documentContext = context
+
+			updateSiblingViewsForAllContexts()
+		}
+
+		function updateSiblingViewsForAllContexts(){
+			let allViews = root.registeredViews.slice()
+			for (let i = 0; i < root.registeredViews.length; ++i){
+				if (root.registeredViews[i].documentContext){
+					root.registeredViews[i].documentContext.siblingViews = allViews
+				}
+			}
+		}
 	}
 }

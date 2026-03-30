@@ -11,6 +11,7 @@ Item {
 	property string viewTypeId
 	property string viewId
 	property var model: null
+	property var documentContext: null
 	
 	property Component commandsControllerComp: null;
 	property CommandsController commandsController: null;

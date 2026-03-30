@@ -24,6 +24,7 @@
 	<file alias="imtdocgui/DocumentDecorator.qml">DocumentDecorator.qml</file>
 	<file alias="imtdocgui/DocCollectionViewDelegate.qml">DocCollectionViewDelegate.qml</file>
 	<file alias="imtdocgui/DocumentRepresentationController.qml">DocumentRepresentationController.qml</file>
+	<file alias="imtdocgui/DocumentContext.qml">DocumentContext.qml</file>
 	<file alias="imtdocgui/DocumentRevisionDialog.qml">DocumentRevisionDialog.qml</file>
     </qresource>
     <qresource prefix="/"/>
