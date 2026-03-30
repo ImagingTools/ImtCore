@@ -50,15 +50,6 @@ public:
 	*/
 	virtual void SetDisplayName(const QString& displayName) = 0;
 
-	/**
-		Get a JSON string containing preview data for this reference.
-	*/
-	virtual QString GetPreviewData() const = 0;
-
-	/**
-		Set the preview data JSON string.
-	*/
-	virtual void SetPreviewData(const QString& previewData) = 0;
 };
 
 typedef istd::TUniqueInterfacePtr<IEntityReference> IEntityReferenceUniquePtr;

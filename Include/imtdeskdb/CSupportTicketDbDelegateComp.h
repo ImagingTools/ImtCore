@@ -2,20 +2,20 @@
 #pragma once
 
 // ImtCore includes
-#include <imtchat/ISupportTicket.h>
+#include <imtdesk/ISupportTicket.h>
 #include <imtdb/CSqlDatabaseObjectDelegateCompBase.h>
 
 
-namespace imtchatdb
+namespace imtdeskdb
 {
 
 
-class CTicketDbDelegateComp: public imtdb::CSqlDatabaseObjectDelegateCompBase
+class CSupportTicketDbDelegateComp: public imtdb::CSqlDatabaseObjectDelegateCompBase
 {
 public:
 	typedef imtdb::CSqlDatabaseObjectDelegateCompBase BaseClass;
 
-	I_BEGIN_COMPONENT(CTicketDbDelegateComp)
+	I_BEGIN_COMPONENT(CSupportTicketDbDelegateComp)
 		I_ASSIGN(m_ticketFactCompPtr, "TicketFactory", "Factory used for creation of new ticket instances", true, "TicketFactory");
 	I_END_COMPONENT
 
@@ -64,8 +64,8 @@ protected:
 	virtual bool SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const override;
 
 private:
-	I_FACT(imtchat::ISupportTicket, m_ticketFactCompPtr);
+	I_FACT(imtdesk::ISupportTicket, m_ticketFactCompPtr);
 };
 
 
-} // namespace imtchatdb
+} // namespace imtdeskdb

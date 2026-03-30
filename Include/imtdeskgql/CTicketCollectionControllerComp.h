@@ -2,56 +2,56 @@
 #pragma once
 
 // ImtCore includes
-#include <imtchat/ISupportTicket.h>
-#include <GeneratedFiles/imtchatsdl/SDL/1.0/CPP/ImtChat.h>
+#include <imtdesk/ISupportTicket.h>
+#include <GeneratedFiles/imtdesksdl/SDL/1.0/CPP/ImtDesk.h>
 
 
-namespace imtchatgql
+namespace imtdeskgql
 {
 
 
 class CTicketCollectionControllerComp:
-		public sdl::imtchat::ImtChat::CTicketCollectionControllerCompBase
+		public sdl::imtdesk::ImtDesk::CTicketCollectionControllerCompBase
 {
 public:
-	typedef sdl::imtchat::ImtChat::CTicketCollectionControllerCompBase BaseClass;
+	typedef sdl::imtdesk::ImtDesk::CTicketCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CTicketCollectionControllerComp);
 		I_ASSIGN(m_ticketFactCompPtr, "TicketFactory", "Factory for creating ticket instances", true, "TicketFactory");
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::imtchat::ImtChat::CTicketCollectionControllerCompBase)
+	// reimplemented (sdl::imtdesk::ImtDesk::CTicketCollectionControllerCompBase)
 	virtual bool CreateRepresentationFromObject(
 				const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-				const sdl::imtchat::ImtChat::CTicketsListGqlRequest& listRequest,
-				sdl::imtchat::ImtChat::CTicketItem::V1_0& representationObject,
+				const sdl::imtdesk::ImtDesk::CTicketsListGqlRequest& listRequest,
+				sdl::imtdesk::ImtDesk::CTicketItem::V1_0& representationObject,
 				QString& errorMessage) const override;
 	virtual istd::IChangeableUniquePtr CreateObjectFromRepresentation(
-				const sdl::imtchat::ImtChat::CTicketData::V1_0& dataRepresentation,
+				const sdl::imtdesk::ImtDesk::CTicketData::V1_0& dataRepresentation,
 				QByteArray& newObjectId,
 				QString& errorMessage) const override;
 	virtual bool CreateRepresentationFromObject(
 				const istd::IChangeable& data,
-				const sdl::imtchat::ImtChat::CTicketItemGqlRequest& itemRequest,
-				sdl::imtchat::ImtChat::CTicketData::V1_0& representationPayload,
+				const sdl::imtdesk::ImtDesk::CTicketItemGqlRequest& itemRequest,
+				sdl::imtdesk::ImtDesk::CTicketData::V1_0& representationPayload,
 				QString& errorMessage) const override;
 	virtual bool UpdateObjectFromRepresentationRequest(
 				const imtgql::CGqlRequest& rawGqlRequest,
-				const sdl::imtchat::ImtChat::CTicketUpdateGqlRequest& updateRequest,
+				const sdl::imtdesk::ImtDesk::CTicketUpdateGqlRequest& updateRequest,
 				istd::IChangeable& object,
 				QString& errorMessage) const override;
 
 private:
 	bool FillObjectFromRepresentation(
-				const sdl::imtchat::ImtChat::CTicketData::V1_0& representation,
+				const sdl::imtdesk::ImtDesk::CTicketData::V1_0& representation,
 				istd::IChangeable& object,
 				QByteArray& objectId,
 				QString& errorMessage) const;
 
 protected:
-	I_FACT(imtchat::ISupportTicket, m_ticketFactCompPtr);
+	I_FACT(imtdesk::ISupportTicket, m_ticketFactCompPtr);
 };
 
 
-} // namespace imtchatgql
+} // namespace imtdeskgql

@@ -12,7 +12,7 @@
 
 	The \b imtchatdb module provides SQL database persistence for the imtchat
 	domain model. It implements database delegate components that handle
-	conversation, message, ticket, participant, and message-status storage
+	conversation, message, participant, and message-status storage
 	in PostgreSQL or SQLite databases.
 
 	\section imtchatdb_overview Overview
@@ -23,7 +23,6 @@
 	- Message storage with full-text search support (PostgreSQL)
 	- Per-user message delivery/read status tracking
 	- Conversation participant management
-	- Service Desk ticket CRUD operations
 
 	\section imtchatdb_delegates Database Delegates
 
@@ -33,10 +32,12 @@
 	| CMessageDbDelegateComp          | Messages                 |
 	| CMessageStatusDbDelegateComp    | MessageStatus            |
 	| CParticipantDbDelegateComp      | ConversationParticipants |
-	| CTicketDbDelegateComp           | Tickets                  |
 
 	\section imtchatdb_databases Supported Databases
 	- \b PostgreSQL — primary production database; uses UUID and JSONB types
 	- \b SQLite — embedded / offline database; uses TEXT for IDs and JSON
+
+	\section imtchatdb_related Related Modules
+	- \b imtdeskdb — Service Desk ticket persistence
 */
 namespace imtchatdb {}

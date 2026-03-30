@@ -25,40 +25,12 @@ enum MessageStatus {
 	Read
 }
 
-enum TicketType {
-	AccessRequest
-	SupportRequest
-	FeatureRequest
-	BugReport
-}
-
-enum TicketStatus {
-	Open
-	InProgress
-	Resolved
-	Closed
-}
-
-enum TicketPriority {
-	Low
-	Medium
-	High
-	Critical
-}
-
-enum Environment {
-	Development
-	Staging
-	Production
-}
-
 # --- Entity Reference ---
 
 type EntityReferenceData {
 	entityType: String!
 	entityId: ID!
 	displayName: String
-	previewData: String
 }
 
 # --- Conversation ---
@@ -163,79 +135,12 @@ input MessageMarkReadInput {
 	messageId: ID!
 }
 
-# --- Ticket ---
-
-type TicketItemData {
-	id: ID!
-	typeId: ID!
-	title: String!
-	ticketType: TicketType
-	status: TicketStatus
-	priority: TicketPriority
-	assigneeId: ID
-	createdAt: String
-}
-
-type TicketData {
-	id: ID!
-	title: String!
-	description: String
-	ticketType: TicketType
-	status: TicketStatus
-	priority: TicketPriority
-	assigneeId: ID
-	reporterId: ID
-	conversationId: ID
-	messageId: ID
-	environment: Environment
-	tags: [String]
-	createdAt: String
-	updatedAt: String
-	resolvedAt: String
-}
-
-input TicketsListInput {
-	viewParams: CollectionViewParams
-}
-
-type TicketsListPayload {
-	items: [TicketItemData]
-	notification: NotificationItem
-}
-
-input TicketItemInput {
-	id: ID!
-}
-
-input TicketCreateInput {
-	title: String!
-	description: String
-	ticketType: TicketType
-	priority: TicketPriority
-	assigneeId: ID
-	conversationId: ID
-	messageId: ID
-	environment: Environment
-	tags: [String]
-}
-
-input TicketDataInput {
-	id: ID!
-	item: TicketData!
-}
-
 # --- Subscription payloads ---
 
 type MessageStatusUpdate {
 	messageId: ID!
 	conversationId: ID!
 	status: MessageStatus!
-}
-
-type TicketStatusUpdate {
-	ticketId: ID!
-	status: TicketStatus!
-	assigneeId: ID
 }
 
 type TypingIndicator {
@@ -249,8 +154,6 @@ type Query {
 	ConversationItem (input: ConversationItemInput): ConversationData!
 	MessagesList (input: MessagesListInput): MessagesListPayload!
 	MessageItem (input: MessageItemInput): MessageData!
-	TicketsList (input: TicketsListInput): TicketsListPayload!
-	TicketItem (input: TicketItemInput): TicketData!
 }
 
 type Mutation {
@@ -259,14 +162,11 @@ type Mutation {
 	MessageSend (input: MessageSendInput): AddedNotificationPayload!
 	MessageUpdate (input: MessageDataInput): UpdatedNotificationPayload!
 	MessageMarkRead (input: MessageMarkReadInput): UpdatedNotificationPayload!
-	TicketCreate (input: TicketCreateInput): AddedNotificationPayload!
-	TicketUpdate (input: TicketDataInput): UpdatedNotificationPayload!
 }
 
 type Subscription {
 	OnNewMessage (conversationId: ID!): MessageData!
 	OnMessageStatusChanged (conversationId: ID!): MessageStatusUpdate!
-	OnTicketStatusChanged (ticketId: ID): TicketStatusUpdate!
 	OnTyping (conversationId: ID!): TypingIndicator!
 	OnConversationUpdated: ConversationItemData!
 }

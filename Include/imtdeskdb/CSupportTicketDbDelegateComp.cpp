@@ -1,21 +1,21 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include <imtchatdb/CTicketDbDelegateComp.h>
+#include <imtdeskdb/CSupportTicketDbDelegateComp.h>
 
 // Qt includes
 #include <QtCore/QUuid>
 #include <QtSql/QSqlRecord>
 
 // ImtCore includes
-#include <imtchat/ISupportTicket.h>
+#include <imtdesk/ISupportTicket.h>
 #include <imtdb/CDatabaseEngineComp.h>
 #include <imtdb/imtdb.h>
 
 
-namespace imtchatdb
+namespace imtdeskdb
 {
 
 
-istd::IChangeableUniquePtr CTicketDbDelegateComp::CreateObjectFromRecord(
+istd::IChangeableUniquePtr CSupportTicketDbDelegateComp::CreateObjectFromRecord(
 		const QSqlRecord& record,
 		const iprm::IParamsSet* /*dataConfigurationPtr*/) const
 {
@@ -23,7 +23,7 @@ istd::IChangeableUniquePtr CTicketDbDelegateComp::CreateObjectFromRecord(
 		return nullptr;
 	}
 
-	istd::TUniqueInterfacePtr<imtchat::ISupportTicket> ticketPtr = m_ticketFactCompPtr.CreateInstance();
+	istd::TUniqueInterfacePtr<imtdesk::ISupportTicket> ticketPtr = m_ticketFactCompPtr.CreateInstance();
 	if (!ticketPtr.IsValid()){
 		return nullptr;
 	}
@@ -38,13 +38,13 @@ istd::IChangeableUniquePtr CTicketDbDelegateComp::CreateObjectFromRecord(
 		ticketPtr->SetDescription(record.value("Description").toString());
 	}
 	if (record.contains("TicketType")){
-		ticketPtr->SetTicketType(static_cast<imtchat::ISupportTicket::TicketType>(record.value("TicketType").toInt()));
+		ticketPtr->SetTicketType(static_cast<imtdesk::ISupportTicket::TicketType>(record.value("TicketType").toInt()));
 	}
 	if (record.contains("Status")){
-		ticketPtr->SetStatus(static_cast<imtchat::ISupportTicket::TicketStatus>(record.value("Status").toInt()));
+		ticketPtr->SetStatus(static_cast<imtdesk::ISupportTicket::TicketStatus>(record.value("Status").toInt()));
 	}
 	if (record.contains("Priority")){
-		ticketPtr->SetPriority(static_cast<imtchat::ISupportTicket::TicketPriority>(record.value("Priority").toInt()));
+		ticketPtr->SetPriority(static_cast<imtdesk::ISupportTicket::TicketPriority>(record.value("Priority").toInt()));
 	}
 	if (record.contains("AssigneeId")){
 		ticketPtr->SetAssigneeId(record.value("AssigneeId").toByteArray());
@@ -59,7 +59,7 @@ istd::IChangeableUniquePtr CTicketDbDelegateComp::CreateObjectFromRecord(
 		ticketPtr->SetMessageId(record.value("MessageId").toByteArray());
 	}
 	if (record.contains("Environment")){
-		ticketPtr->SetEnvironment(static_cast<imtchat::ISupportTicket::Environment>(record.value("Environment").toInt()));
+		ticketPtr->SetEnvironment(static_cast<imtdesk::ISupportTicket::Environment>(record.value("Environment").toInt()));
 	}
 	if (record.contains("Tags")){
 		const QString tagsStr = record.value("Tags").toString();
@@ -83,7 +83,7 @@ istd::IChangeableUniquePtr CTicketDbDelegateComp::CreateObjectFromRecord(
 }
 
 
-imtdb::IDatabaseObjectDelegate::NewObjectQuery CTicketDbDelegateComp::CreateNewObjectQuery(
+imtdb::IDatabaseObjectDelegate::NewObjectQuery CSupportTicketDbDelegateComp::CreateNewObjectQuery(
 		const QByteArray& typeId,
 		const QByteArray& proposedObjectId,
 		const QString& objectName,
@@ -95,7 +95,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CTicketDbDelegateComp::CreateNewO
 		return NewObjectQuery();
 	}
 
-	const imtchat::ISupportTicket* ticketPtr = dynamic_cast<const imtchat::ISupportTicket*>(valuePtr);
+	const imtdesk::ISupportTicket* ticketPtr = dynamic_cast<const imtdesk::ISupportTicket*>(valuePtr);
 	if (ticketPtr == nullptr){
 		return NewObjectQuery();
 	}
@@ -149,14 +149,14 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CTicketDbDelegateComp::CreateNewO
 }
 
 
-QByteArray CTicketDbDelegateComp::CreateUpdateObjectQuery(
+QByteArray CSupportTicketDbDelegateComp::CreateUpdateObjectQuery(
 		const imtbase::IObjectCollection& /*collection*/,
 		const QByteArray& objectId,
 		const istd::IChangeable& object,
 		const imtbase::IOperationContext* /*operationContextPtr*/,
 		bool /*useExternDelegate*/) const
 {
-	const imtchat::ISupportTicket* ticketPtr = dynamic_cast<const imtchat::ISupportTicket*>(&object);
+	const imtdesk::ISupportTicket* ticketPtr = dynamic_cast<const imtdesk::ISupportTicket*>(&object);
 	if (ticketPtr == nullptr){
 		return QByteArray();
 	}
@@ -195,7 +195,7 @@ QByteArray CTicketDbDelegateComp::CreateUpdateObjectQuery(
 }
 
 
-QByteArray CTicketDbDelegateComp::CreateDeleteObjectsQuery(
+QByteArray CSupportTicketDbDelegateComp::CreateDeleteObjectsQuery(
 		const imtbase::IObjectCollection& /*collection*/,
 		const QByteArrayList& objectIds,
 		const imtbase::IOperationContext* /*operationContextPtr*/) const
@@ -216,7 +216,7 @@ QByteArray CTicketDbDelegateComp::CreateDeleteObjectsQuery(
 }
 
 
-QByteArray CTicketDbDelegateComp::CreateDeleteObjectSetQuery(
+QByteArray CSupportTicketDbDelegateComp::CreateDeleteObjectSetQuery(
 		const imtbase::IObjectCollection& /*collection*/,
 		const iprm::IParamsSet* /*paramsPtr*/,
 		const imtbase::IOperationContext* /*operationContextPtr*/) const
@@ -225,7 +225,7 @@ QByteArray CTicketDbDelegateComp::CreateDeleteObjectSetQuery(
 }
 
 
-QByteArray CTicketDbDelegateComp::CreateRenameObjectQuery(
+QByteArray CSupportTicketDbDelegateComp::CreateRenameObjectQuery(
 		const imtbase::IObjectCollection& /*collection*/,
 		const QByteArray& objectId,
 		const QString& newObjectName,
@@ -242,7 +242,7 @@ QByteArray CTicketDbDelegateComp::CreateRenameObjectQuery(
 }
 
 
-QByteArray CTicketDbDelegateComp::CreateDescriptionObjectQuery(
+QByteArray CSupportTicketDbDelegateComp::CreateDescriptionObjectQuery(
 		const imtbase::IObjectCollection& /*collection*/,
 		const QByteArray& objectId,
 		const QString& description,
@@ -259,7 +259,7 @@ QByteArray CTicketDbDelegateComp::CreateDescriptionObjectQuery(
 }
 
 
-void CTicketDbDelegateComp::OnComponentCreated()
+void CSupportTicketDbDelegateComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
@@ -295,13 +295,13 @@ void CTicketDbDelegateComp::OnComponentCreated()
 }
 
 
-idoc::MetaInfoPtr CTicketDbDelegateComp::CreateObjectMetaInfo(const QByteArray& typeId) const
+idoc::MetaInfoPtr CSupportTicketDbDelegateComp::CreateObjectMetaInfo(const QByteArray& typeId) const
 {
 	return BaseClass::CreateObjectMetaInfo(typeId);
 }
 
 
-bool CTicketDbDelegateComp::SetObjectMetaInfoFromRecord(
+bool CSupportTicketDbDelegateComp::SetObjectMetaInfoFromRecord(
 		const QSqlRecord& record,
 		idoc::IDocumentMetaInfo& metaInfo) const
 {
@@ -314,4 +314,4 @@ bool CTicketDbDelegateComp::SetObjectMetaInfoFromRecord(
 }
 
 
-} // namespace imtchatdb
+} // namespace imtdeskdb

@@ -5,7 +5,7 @@
 #include <iser/ISerializable.h>
 
 
-namespace imtchat
+namespace imtdesk
 {
 
 
@@ -15,7 +15,7 @@ namespace imtchat
 	Tickets can be linked to a conversation or a specific message, have
 	priorities, statuses, and may target a specific deployment environment.
 
-	\ingroup imtchat
+	\ingroup imtdesk
 */
 class ISupportTicket: virtual public iser::ISerializable
 {
@@ -235,4 +235,4 @@ public:
 
 typedef istd::TUniqueInterfacePtr<ISupportTicket> ISupportTicketUniquePtr;
 
-} // namespace imtchat
+} // namespace imtdesk

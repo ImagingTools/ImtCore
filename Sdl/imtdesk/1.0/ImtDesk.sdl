@@ -1,0 +1,123 @@
+schema {
+	query: Query
+	mutation: Mutation
+	subscription: Subscription
+	namespace: imtdesk
+	version: 1.0
+}
+
+import {
+	"../../../../ImtCore/Sdl/imtbase/1.0/ImtCollection.sdl"
+}
+
+# --- Enums ---
+
+enum TicketType {
+	AccessRequest
+	SupportRequest
+	FeatureRequest
+	BugReport
+}
+
+enum TicketStatus {
+	Open
+	InProgress
+	Resolved
+	Closed
+}
+
+enum TicketPriority {
+	Low
+	Medium
+	High
+	Critical
+}
+
+enum Environment {
+	Development
+	Staging
+	Production
+}
+
+# --- Ticket ---
+
+type TicketItemData {
+	id: ID!
+	typeId: ID!
+	title: String!
+	ticketType: TicketType
+	status: TicketStatus
+	priority: TicketPriority
+	assigneeId: ID
+	createdAt: String
+}
+
+type TicketData {
+	id: ID!
+	title: String!
+	description: String
+	ticketType: TicketType
+	status: TicketStatus
+	priority: TicketPriority
+	assigneeId: ID
+	reporterId: ID
+	conversationId: ID
+	messageId: ID
+	environment: Environment
+	tags: [String]
+	createdAt: String
+	updatedAt: String
+	resolvedAt: String
+}
+
+input TicketsListInput {
+	viewParams: CollectionViewParams
+}
+
+type TicketsListPayload {
+	items: [TicketItemData]
+	notification: NotificationItem
+}
+
+input TicketItemInput {
+	id: ID!
+}
+
+input TicketCreateInput {
+	title: String!
+	description: String
+	ticketType: TicketType
+	priority: TicketPriority
+	assigneeId: ID
+	conversationId: ID
+	messageId: ID
+	environment: Environment
+	tags: [String]
+}
+
+input TicketDataInput {
+	id: ID!
+	item: TicketData!
+}
+
+# --- Subscription payloads ---
+
+type TicketStatusUpdate {
+	ticketId: ID!
+	status: TicketStatus!
+	assigneeId: ID
+}
+
+type Query {
+	TicketsList (input: TicketsListInput): TicketsListPayload!
+	TicketItem (input: TicketItemInput): TicketData!
+}
+
+type Mutation {
+	TicketCreate (input: TicketCreateInput): AddedNotificationPayload!
+	TicketUpdate (input: TicketDataInput): UpdatedNotificationPayload!
+}
+
+type Subscription {
+	OnTicketStatusChanged (ticketId: ID): TicketStatusUpdate!
+}

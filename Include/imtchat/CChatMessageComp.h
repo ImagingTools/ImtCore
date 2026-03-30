@@ -13,14 +13,14 @@ namespace imtchat
 {
 
 
-class CMessageComp:
+class CChatMessageComp:
 		public icomp::CComponentBase,
 		virtual public IChatMessage
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
 
-	I_BEGIN_COMPONENT(CMessageComp)
+	I_BEGIN_COMPONENT(CChatMessageComp)
 		I_REGISTER_INTERFACE(IChatMessage);
 		I_REGISTER_INTERFACE(iser::ISerializable);
 		I_REGISTER_INTERFACE(istd::IChangeable);

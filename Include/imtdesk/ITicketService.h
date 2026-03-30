@@ -5,10 +5,10 @@
 #include <istd/IPolymorphic.h>
 
 // ImtCore includes
-#include <imtchat/ISupportTicket.h>
+#include <imtdesk/ISupportTicket.h>
 
 
-namespace imtchat
+namespace imtdesk
 {
 
 
@@ -17,7 +17,7 @@ namespace imtchat
 
 	Provides CRUD operations on Service Desk tickets.
 
-	\ingroup imtchat
+	\ingroup imtdesk
 */
 class ITicketService: virtual public istd::IPolymorphic
 {
@@ -74,4 +74,4 @@ public:
 	virtual ISupportTicketUniquePtr GetTicket(const QByteArray& ticketId) const = 0;
 };
 
-} // namespace imtchat
+} // namespace imtdesk

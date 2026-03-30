@@ -6,27 +6,27 @@
 #include <istd/IChangeable.h>
 
 // ImtCore includes
-#include <imtchat/ISupportTicket.h>
+#include <imtdesk/ISupportTicket.h>
 
 
-namespace imtchat
+namespace imtdesk
 {
 
 
-class CTicketComp:
+class CSupportTicketComp:
 		public icomp::CComponentBase,
 		virtual public ISupportTicket
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
 
-	I_BEGIN_COMPONENT(CTicketComp)
+	I_BEGIN_COMPONENT(CSupportTicketComp)
 		I_REGISTER_INTERFACE(ISupportTicket);
 		I_REGISTER_INTERFACE(iser::ISerializable);
 		I_REGISTER_INTERFACE(istd::IChangeable);
 	I_END_COMPONENT
 
-	// reimplemented (imtchat::ISupportTicket)
+	// reimplemented (imtdesk::ISupportTicket)
 	virtual QByteArray GetId() const override;
 	virtual void SetId(const QByteArray& id) override;
 	virtual QString GetTitle() const override;
@@ -85,4 +85,4 @@ private:
 	QString m_resolvedAt;
 };
 
-} // namespace imtchat
+} // namespace imtdesk

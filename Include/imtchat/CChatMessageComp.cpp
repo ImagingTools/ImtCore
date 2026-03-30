@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include <imtchat/CMessageComp.h>
+#include <imtchat/CChatMessageComp.h>
 
 // ACF includes
 #include <istd/CChangeNotifier.h>
@@ -14,109 +14,109 @@ namespace imtchat
 
 // reimplemented (imtchat::IChatMessage)
 
-QByteArray CMessageComp::GetId() const
+QByteArray CChatMessageComp::GetId() const
 {
 	return m_id;
 }
 
 
-void CMessageComp::SetId(const QByteArray& id)
+void CChatMessageComp::SetId(const QByteArray& id)
 {
 	m_id = id;
 }
 
 
-QByteArray CMessageComp::GetConversationId() const
+QByteArray CChatMessageComp::GetConversationId() const
 {
 	return m_conversationId;
 }
 
 
-void CMessageComp::SetConversationId(const QByteArray& conversationId)
+void CChatMessageComp::SetConversationId(const QByteArray& conversationId)
 {
 	m_conversationId = conversationId;
 }
 
 
-QByteArray CMessageComp::GetSenderId() const
+QByteArray CChatMessageComp::GetSenderId() const
 {
 	return m_senderId;
 }
 
 
-void CMessageComp::SetSenderId(const QByteArray& senderId)
+void CChatMessageComp::SetSenderId(const QByteArray& senderId)
 {
 	m_senderId = senderId;
 }
 
 
-QString CMessageComp::GetContent() const
+QString CChatMessageComp::GetContent() const
 {
 	return m_content;
 }
 
 
-void CMessageComp::SetContent(const QString& content)
+void CChatMessageComp::SetContent(const QString& content)
 {
 	m_content = content;
 }
 
 
-int CMessageComp::GetStatus() const
+int CChatMessageComp::GetStatus() const
 {
 	return m_status;
 }
 
 
-void CMessageComp::SetStatus(int status)
+void CChatMessageComp::SetStatus(int status)
 {
 	m_status = status;
 }
 
 
-QString CMessageComp::GetCreatedAt() const
+QString CChatMessageComp::GetCreatedAt() const
 {
 	return m_createdAt;
 }
 
 
-void CMessageComp::SetCreatedAt(const QString& createdAt)
+void CChatMessageComp::SetCreatedAt(const QString& createdAt)
 {
 	m_createdAt = createdAt;
 }
 
 
-QString CMessageComp::GetUpdatedAt() const
+QString CChatMessageComp::GetUpdatedAt() const
 {
 	return m_updatedAt;
 }
 
 
-void CMessageComp::SetUpdatedAt(const QString& updatedAt)
+void CChatMessageComp::SetUpdatedAt(const QString& updatedAt)
 {
 	m_updatedAt = updatedAt;
 }
 
 
-QByteArrayList CMessageComp::GetEntityReferences() const
+QByteArrayList CChatMessageComp::GetEntityReferences() const
 {
 	return m_entityReferences;
 }
 
 
-void CMessageComp::SetEntityReferences(const QByteArrayList& entityReferences)
+void CChatMessageComp::SetEntityReferences(const QByteArrayList& entityReferences)
 {
 	m_entityReferences = entityReferences;
 }
 
 
-QByteArrayList CMessageComp::GetAttachmentIds() const
+QByteArrayList CChatMessageComp::GetAttachmentIds() const
 {
 	return m_attachmentIds;
 }
 
 
-void CMessageComp::SetAttachmentIds(const QByteArrayList& attachmentIds)
+void CChatMessageComp::SetAttachmentIds(const QByteArrayList& attachmentIds)
 {
 	m_attachmentIds = attachmentIds;
 }
@@ -124,7 +124,7 @@ void CMessageComp::SetAttachmentIds(const QByteArrayList& attachmentIds)
 
 // reimplemented (iser::ISerializable)
 
-bool CMessageComp::Serialize(iser::IArchive& archive)
+bool CChatMessageComp::Serialize(iser::IArchive& archive)
 {
 	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
 
@@ -175,7 +175,7 @@ bool CMessageComp::Serialize(iser::IArchive& archive)
 
 // reimplemented (istd::IChangeable)
 
-bool CMessageComp::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
+bool CChatMessageComp::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
 	const IChatMessage* srcPtr = dynamic_cast<const IChatMessage*>(&object);
 	if (srcPtr == nullptr){
@@ -195,7 +195,7 @@ bool CMessageComp::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*
 }
 
 
-bool CMessageComp::IsEqual(const IChangeable& object) const
+bool CChatMessageComp::IsEqual(const IChangeable& object) const
 {
 	const IChatMessage* srcPtr = dynamic_cast<const IChatMessage*>(&object);
 	if (srcPtr == nullptr){
@@ -214,15 +214,15 @@ bool CMessageComp::IsEqual(const IChangeable& object) const
 }
 
 
-istd::IChangeableUniquePtr CMessageComp::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CChatMessageComp::CloneMe(CompatibilityMode mode) const
 {
-	istd::TUniqueInterfacePtr<CMessageComp> clonePtr(new CMessageComp());
+	istd::TUniqueInterfacePtr<CChatMessageComp> clonePtr(new CChatMessageComp());
 	clonePtr->CopyFrom(*this, mode);
 	return clonePtr;
 }
 
 
-bool CMessageComp::ResetData(CompatibilityMode /*mode*/)
+bool CChatMessageComp::ResetData(CompatibilityMode /*mode*/)
 {
 	m_id.clear();
 	m_conversationId.clear();

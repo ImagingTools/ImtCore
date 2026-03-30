@@ -12,18 +12,18 @@
 
 	The \b imtchat module provides the core domain model for the internal Service Desk
 	chat system embedded in the desktop application. It supports direct and group
-	messaging, entity references, and ticket management.
+	messaging, and entity references.
 
 	\section imtchat_overview Overview
 	- Personal messages (1:1 Direct conversations)
 	- Group chats and support channels
 	- Entity references: link any ImtCore entity in a message
-	- Service Desk tickets with priorities, statuses and assignees
 	- Real-time delivery via WebSocket subscriptions
 
 	\section imtchat_modules Related Modules
 	- \b imtchatdb — PostgreSQL/SQLite persistence
 	- \b imtchatgql — GraphQL API
 	- \b imtchatgui — QML user interface
+	- \b imtdesk — Service Desk ticketing domain model
 */
 namespace imtchat {}

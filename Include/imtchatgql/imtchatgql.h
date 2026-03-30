@@ -21,12 +21,11 @@
 	  ConversationCreate and ConversationUpdate mutations
 	- \b CMessageCollectionControllerComp — handles MessagesList / MessageItem queries,
 	  MessageSend, MessageUpdate and MessageMarkRead mutations
-	- \b CTicketCollectionControllerComp — handles TicketsList / TicketItem queries,
-	  TicketCreate and TicketUpdate mutations
 
 	\section imtchatgql_related Related Modules
 	- \b imtchat — domain model
 	- \b imtchatdb — database persistence
 	- \b imtchatgui — QML user interface
+	- \b imtdeskgql — Service Desk ticketing GraphQL API
 */
 namespace imtchatgql {}

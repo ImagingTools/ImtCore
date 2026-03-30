@@ -1,21 +1,21 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include <imtchatgql/CTicketCollectionControllerComp.h>
+#include <imtdeskgql/CTicketCollectionControllerComp.h>
 
 // Qt includes
 #include <QtCore/QUuid>
 
 // ImtCore includes
-#include <imtchat/ISupportTicket.h>
+#include <imtdesk/ISupportTicket.h>
 
 
-namespace imtchatgql
+namespace imtdeskgql
 {
 
 
 bool CTicketCollectionControllerComp::CreateRepresentationFromObject(
 		const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-		const sdl::imtchat::ImtChat::CTicketsListGqlRequest& listRequest,
-		sdl::imtchat::ImtChat::CTicketItem::V1_0& representationObject,
+		const sdl::imtdesk::ImtDesk::CTicketsListGqlRequest& listRequest,
+		sdl::imtdesk::ImtDesk::CTicketItem::V1_0& representationObject,
 		QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
@@ -27,9 +27,9 @@ bool CTicketCollectionControllerComp::CreateRepresentationFromObject(
 	const QByteArray objectId = objectCollectionIterator.GetObjectId();
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
-	const imtchat::ISupportTicket* ticketPtr = nullptr;
+	const imtdesk::ISupportTicket* ticketPtr = nullptr;
 	if (objectCollectionIterator.GetObjectData(dataPtr)){
-		ticketPtr = dynamic_cast<const imtchat::ISupportTicket*>(dataPtr.GetPtr());
+		ticketPtr = dynamic_cast<const imtdesk::ISupportTicket*>(dataPtr.GetPtr());
 	}
 
 	if (ticketPtr == nullptr){
@@ -51,7 +51,7 @@ bool CTicketCollectionControllerComp::CreateRepresentationFromObject(
 
 
 istd::IChangeableUniquePtr CTicketCollectionControllerComp::CreateObjectFromRepresentation(
-		const sdl::imtchat::ImtChat::CTicketData::V1_0& dataRepresentation,
+		const sdl::imtdesk::ImtDesk::CTicketData::V1_0& dataRepresentation,
 		QByteArray& newObjectId,
 		QString& errorMessage) const
 {
@@ -61,7 +61,7 @@ istd::IChangeableUniquePtr CTicketCollectionControllerComp::CreateObjectFromRepr
 		return nullptr;
 	}
 
-	imtchat::ISupportTicketUniquePtr ticketPtr = m_ticketFactCompPtr.CreateInstance();
+	imtdesk::ISupportTicketUniquePtr ticketPtr = m_ticketFactCompPtr.CreateInstance();
 	if (!ticketPtr.IsValid()){
 		errorMessage = QStringLiteral("Failed to create ticket instance");
 		SendErrorMessage(0, errorMessage, "CTicketCollectionControllerComp");
@@ -78,11 +78,11 @@ istd::IChangeableUniquePtr CTicketCollectionControllerComp::CreateObjectFromRepr
 
 bool CTicketCollectionControllerComp::CreateRepresentationFromObject(
 		const istd::IChangeable& data,
-		const sdl::imtchat::ImtChat::CTicketItemGqlRequest& itemRequest,
-		sdl::imtchat::ImtChat::CTicketData::V1_0& representationPayload,
+		const sdl::imtdesk::ImtDesk::CTicketItemGqlRequest& itemRequest,
+		sdl::imtdesk::ImtDesk::CTicketData::V1_0& representationPayload,
 		QString& errorMessage) const
 {
-	const imtchat::ISupportTicket* ticketPtr = dynamic_cast<const imtchat::ISupportTicket*>(&data);
+	const imtdesk::ISupportTicket* ticketPtr = dynamic_cast<const imtdesk::ISupportTicket*>(&data);
 	if (ticketPtr == nullptr){
 		errorMessage = QStringLiteral("Object is not a valid ISupportTicket");
 		SendErrorMessage(0, errorMessage, "CTicketCollectionControllerComp");
@@ -108,11 +108,11 @@ bool CTicketCollectionControllerComp::CreateRepresentationFromObject(
 
 bool CTicketCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 		const imtgql::CGqlRequest& /*rawGqlRequest*/,
-		const sdl::imtchat::ImtChat::CTicketUpdateGqlRequest& updateRequest,
+		const sdl::imtdesk::ImtDesk::CTicketUpdateGqlRequest& updateRequest,
 		istd::IChangeable& object,
 		QString& errorMessage) const
 {
-	imtchat::ISupportTicket* ticketPtr = dynamic_cast<imtchat::ISupportTicket*>(&object);
+	imtdesk::ISupportTicket* ticketPtr = dynamic_cast<imtdesk::ISupportTicket*>(&object);
 	if (ticketPtr == nullptr){
 		errorMessage = QStringLiteral("Object is not a valid ISupportTicket");
 		SendErrorMessage(0, errorMessage, "CTicketCollectionControllerComp");
@@ -139,18 +139,18 @@ bool CTicketCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 	ticketPtr->ResetData();
 	ticketPtr->SetId(objectId);
 
-	sdl::imtchat::ImtChat::CTicketData::V1_0 itemData = *arguments.input.Version_1_0->item;
+	sdl::imtdesk::ImtDesk::CTicketData::V1_0 itemData = *arguments.input.Version_1_0->item;
 	return FillObjectFromRepresentation(itemData, *ticketPtr, objectId, errorMessage);
 }
 
 
 bool CTicketCollectionControllerComp::FillObjectFromRepresentation(
-		const sdl::imtchat::ImtChat::CTicketData::V1_0& representation,
+		const sdl::imtdesk::ImtDesk::CTicketData::V1_0& representation,
 		istd::IChangeable& object,
 		QByteArray& objectId,
 		QString& errorMessage) const
 {
-	imtchat::ISupportTicket* ticketPtr = dynamic_cast<imtchat::ISupportTicket*>(&object);
+	imtdesk::ISupportTicket* ticketPtr = dynamic_cast<imtdesk::ISupportTicket*>(&object);
 	if (ticketPtr == nullptr){
 		errorMessage = QStringLiteral("Object is not a valid ISupportTicket");
 		SendErrorMessage(0, errorMessage, "CTicketCollectionControllerComp");
@@ -207,4 +207,4 @@ bool CTicketCollectionControllerComp::FillObjectFromRepresentation(
 }
 
 
-} // namespace imtchatgql
+} // namespace imtdeskgql

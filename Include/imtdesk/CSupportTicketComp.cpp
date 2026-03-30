@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include <imtchat/CTicketComp.h>
+#include <imtdesk/CSupportTicketComp.h>
 
 // ACF includes
 #include <istd/CChangeNotifier.h>
@@ -8,187 +8,187 @@
 #include <iser/CPrimitiveTypesSerializer.h>
 
 
-namespace imtchat
+namespace imtdesk
 {
 
 
-// reimplemented (imtchat::ISupportTicket)
+// reimplemented (imtdesk::ISupportTicket)
 
-QByteArray CTicketComp::GetId() const
+QByteArray CSupportTicketComp::GetId() const
 {
 	return m_id;
 }
 
 
-void CTicketComp::SetId(const QByteArray& id)
+void CSupportTicketComp::SetId(const QByteArray& id)
 {
 	m_id = id;
 }
 
 
-QString CTicketComp::GetTitle() const
+QString CSupportTicketComp::GetTitle() const
 {
 	return m_title;
 }
 
 
-void CTicketComp::SetTitle(const QString& title)
+void CSupportTicketComp::SetTitle(const QString& title)
 {
 	m_title = title;
 }
 
 
-QString CTicketComp::GetDescription() const
+QString CSupportTicketComp::GetDescription() const
 {
 	return m_description;
 }
 
 
-void CTicketComp::SetDescription(const QString& description)
+void CSupportTicketComp::SetDescription(const QString& description)
 {
 	m_description = description;
 }
 
 
-ISupportTicket::TicketType CTicketComp::GetTicketType() const
+ISupportTicket::TicketType CSupportTicketComp::GetTicketType() const
 {
 	return m_ticketType;
 }
 
 
-void CTicketComp::SetTicketType(TicketType ticketType)
+void CSupportTicketComp::SetTicketType(TicketType ticketType)
 {
 	m_ticketType = ticketType;
 }
 
 
-ISupportTicket::TicketStatus CTicketComp::GetStatus() const
+ISupportTicket::TicketStatus CSupportTicketComp::GetStatus() const
 {
 	return m_status;
 }
 
 
-void CTicketComp::SetStatus(TicketStatus status)
+void CSupportTicketComp::SetStatus(TicketStatus status)
 {
 	m_status = status;
 }
 
 
-ISupportTicket::TicketPriority CTicketComp::GetPriority() const
+ISupportTicket::TicketPriority CSupportTicketComp::GetPriority() const
 {
 	return m_priority;
 }
 
 
-void CTicketComp::SetPriority(TicketPriority priority)
+void CSupportTicketComp::SetPriority(TicketPriority priority)
 {
 	m_priority = priority;
 }
 
 
-QByteArray CTicketComp::GetAssigneeId() const
+QByteArray CSupportTicketComp::GetAssigneeId() const
 {
 	return m_assigneeId;
 }
 
 
-void CTicketComp::SetAssigneeId(const QByteArray& assigneeId)
+void CSupportTicketComp::SetAssigneeId(const QByteArray& assigneeId)
 {
 	m_assigneeId = assigneeId;
 }
 
 
-QByteArray CTicketComp::GetReporterId() const
+QByteArray CSupportTicketComp::GetReporterId() const
 {
 	return m_reporterId;
 }
 
 
-void CTicketComp::SetReporterId(const QByteArray& reporterId)
+void CSupportTicketComp::SetReporterId(const QByteArray& reporterId)
 {
 	m_reporterId = reporterId;
 }
 
 
-QByteArray CTicketComp::GetConversationId() const
+QByteArray CSupportTicketComp::GetConversationId() const
 {
 	return m_conversationId;
 }
 
 
-void CTicketComp::SetConversationId(const QByteArray& conversationId)
+void CSupportTicketComp::SetConversationId(const QByteArray& conversationId)
 {
 	m_conversationId = conversationId;
 }
 
 
-QByteArray CTicketComp::GetMessageId() const
+QByteArray CSupportTicketComp::GetMessageId() const
 {
 	return m_messageId;
 }
 
 
-void CTicketComp::SetMessageId(const QByteArray& messageId)
+void CSupportTicketComp::SetMessageId(const QByteArray& messageId)
 {
 	m_messageId = messageId;
 }
 
 
-ISupportTicket::Environment CTicketComp::GetEnvironment() const
+ISupportTicket::Environment CSupportTicketComp::GetEnvironment() const
 {
 	return m_environment;
 }
 
 
-void CTicketComp::SetEnvironment(Environment environment)
+void CSupportTicketComp::SetEnvironment(Environment environment)
 {
 	m_environment = environment;
 }
 
 
-QStringList CTicketComp::GetTags() const
+QStringList CSupportTicketComp::GetTags() const
 {
 	return m_tags;
 }
 
 
-void CTicketComp::SetTags(const QStringList& tags)
+void CSupportTicketComp::SetTags(const QStringList& tags)
 {
 	m_tags = tags;
 }
 
 
-QString CTicketComp::GetCreatedAt() const
+QString CSupportTicketComp::GetCreatedAt() const
 {
 	return m_createdAt;
 }
 
 
-void CTicketComp::SetCreatedAt(const QString& createdAt)
+void CSupportTicketComp::SetCreatedAt(const QString& createdAt)
 {
 	m_createdAt = createdAt;
 }
 
 
-QString CTicketComp::GetUpdatedAt() const
+QString CSupportTicketComp::GetUpdatedAt() const
 {
 	return m_updatedAt;
 }
 
 
-void CTicketComp::SetUpdatedAt(const QString& updatedAt)
+void CSupportTicketComp::SetUpdatedAt(const QString& updatedAt)
 {
 	m_updatedAt = updatedAt;
 }
 
 
-QString CTicketComp::GetResolvedAt() const
+QString CSupportTicketComp::GetResolvedAt() const
 {
 	return m_resolvedAt;
 }
 
 
-void CTicketComp::SetResolvedAt(const QString& resolvedAt)
+void CSupportTicketComp::SetResolvedAt(const QString& resolvedAt)
 {
 	m_resolvedAt = resolvedAt;
 }
@@ -196,7 +196,7 @@ void CTicketComp::SetResolvedAt(const QString& resolvedAt)
 
 // reimplemented (iser::ISerializable)
 
-bool CTicketComp::Serialize(iser::IArchive& archive)
+bool CSupportTicketComp::Serialize(iser::IArchive& archive)
 {
 	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
 
@@ -280,7 +280,7 @@ bool CTicketComp::Serialize(iser::IArchive& archive)
 
 // reimplemented (istd::IChangeable)
 
-bool CTicketComp::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
+bool CSupportTicketComp::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
 	const ISupportTicket* srcPtr = dynamic_cast<const ISupportTicket*>(&object);
 	if (srcPtr == nullptr){
@@ -306,7 +306,7 @@ bool CTicketComp::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/
 }
 
 
-bool CTicketComp::IsEqual(const IChangeable& object) const
+bool CSupportTicketComp::IsEqual(const IChangeable& object) const
 {
 	const ISupportTicket* srcPtr = dynamic_cast<const ISupportTicket*>(&object);
 	if (srcPtr == nullptr){
@@ -331,15 +331,15 @@ bool CTicketComp::IsEqual(const IChangeable& object) const
 }
 
 
-istd::IChangeableUniquePtr CTicketComp::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CSupportTicketComp::CloneMe(CompatibilityMode mode) const
 {
-	istd::TUniqueInterfacePtr<CTicketComp> clonePtr(new CTicketComp());
+	istd::TUniqueInterfacePtr<CSupportTicketComp> clonePtr(new CSupportTicketComp());
 	clonePtr->CopyFrom(*this, mode);
 	return clonePtr;
 }
 
 
-bool CTicketComp::ResetData(CompatibilityMode /*mode*/)
+bool CSupportTicketComp::ResetData(CompatibilityMode /*mode*/)
 {
 	m_id.clear();
 	m_title.clear();
@@ -360,4 +360,4 @@ bool CTicketComp::ResetData(CompatibilityMode /*mode*/)
 }
 
 
-} // namespace imtchat
+} // namespace imtdesk
