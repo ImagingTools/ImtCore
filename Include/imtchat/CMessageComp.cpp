@@ -2,7 +2,10 @@
 #include <imtchat/CMessageComp.h>
 
 // ACF includes
+#include <istd/CChangeNotifier.h>
 #include <iser/IArchive.h>
+#include <iser/CArchiveTag.h>
+#include <iser/CPrimitiveTypesSerializer.h>
 
 
 namespace imtchat
@@ -123,15 +126,53 @@ void CMessageComp::SetAttachmentIds(const QByteArrayList& attachmentIds)
 
 bool CMessageComp::Serialize(iser::IArchive& archive)
 {
-	archive.Serialize(m_id, "id");
-	archive.Serialize(m_conversationId, "conversationId");
-	archive.Serialize(m_senderId, "senderId");
-	archive.Serialize(m_content, "content");
-	archive.Serialize(m_status, "status");
-	archive.Serialize(m_createdAt, "createdAt");
-	archive.Serialize(m_updatedAt, "updatedAt");
-	archive.Serialize(m_entityReferences, "entityReferences");
-	return archive.IsOk();
+	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
+
+	bool retVal = true;
+
+	static iser::CArchiveTag idTag("Id", "Id", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(idTag);
+	retVal = retVal && archive.Process(m_id);
+	retVal = retVal && archive.EndTag(idTag);
+
+	static iser::CArchiveTag conversationIdTag("ConversationId", "Conversation id", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(conversationIdTag);
+	retVal = retVal && archive.Process(m_conversationId);
+	retVal = retVal && archive.EndTag(conversationIdTag);
+
+	static iser::CArchiveTag senderIdTag("SenderId", "Sender id", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(senderIdTag);
+	retVal = retVal && archive.Process(m_senderId);
+	retVal = retVal && archive.EndTag(senderIdTag);
+
+	static iser::CArchiveTag contentTag("Content", "Content", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(contentTag);
+	retVal = retVal && archive.Process(m_content);
+	retVal = retVal && archive.EndTag(contentTag);
+
+	static iser::CArchiveTag statusTag("Status", "Status", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(statusTag);
+	retVal = retVal && archive.Process(m_status);
+	retVal = retVal && archive.EndTag(statusTag);
+
+	static iser::CArchiveTag createdAtTag("CreatedAt", "Created at", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(createdAtTag);
+	retVal = retVal && archive.Process(m_createdAt);
+	retVal = retVal && archive.EndTag(createdAtTag);
+
+	static iser::CArchiveTag updatedAtTag("UpdatedAt", "Updated at", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(updatedAtTag);
+	retVal = retVal && archive.Process(m_updatedAt);
+	retVal = retVal && archive.EndTag(updatedAtTag);
+
+	static iser::CArchiveTag entityReferencesTag("EntityReferences", "Entity references", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(entityReferencesTag);
+	retVal = retVal && archive.Process(m_entityReferences);
+	retVal = retVal && archive.EndTag(entityReferencesTag);
+
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_attachmentIds, "AttachmentIds", "AttachmentId");
+
+	return retVal;
 }
 
 
