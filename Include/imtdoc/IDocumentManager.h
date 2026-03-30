@@ -45,6 +45,7 @@ public:
 		QUrl url;
 		QString name;
 		bool isDirty = false;
+		bool hasNameProvider = false;
 	};
 
 	struct DocumentListItem : public DocumentInfo

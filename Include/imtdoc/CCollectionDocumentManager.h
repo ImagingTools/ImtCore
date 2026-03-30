@@ -58,9 +58,8 @@ protected:
 	struct WorkingDocument;
 
 	bool ValidateInputParams(const QByteArray& userId, const QByteArray& documentId, OperationStatus& status) const;
-	virtual QString GetDefaultDocumentName(
-		const QByteArray& documentId,
-		const istd::IChangeable& document) const;
+	virtual QString GetDefaultDocumentName(const WorkingDocument& document) const;
+	virtual bool HasDocumentNameProvider(const QByteArray& typeId) const;
 	virtual bool ValidateDocumentData(
 		const WorkingDocument& document,
 		OperationStatus& status,

@@ -48,11 +48,11 @@ protected:
 		const typename Defs::GetOpenedDocumentListGqlRequest& getDocumentListRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	CDM::CDocumentId OnCreateNewDocument(
+	CDM::CDocumentInfo OnCreateNewDocument(
 		const typename Defs::CreateNewDocumentGqlRequest& createDocumentRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	CDM::CDocumentId OnOpenDocument(
+	CDM::CDocumentInfo OnOpenDocument(
 		const typename Defs::OpenDocumentGqlRequest& openDocumentRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
@@ -250,13 +250,13 @@ inline CDM::CDocumentList TCollectionDocumentManagerCompBase<Base, ColorCollecti
 }
 
 template<class Base, class ColorCollectionDocumentManagerDefs>
-inline CDM::CDocumentId TCollectionDocumentManagerCompBase<Base, ColorCollectionDocumentManagerDefs>::
+inline CDM::CDocumentInfo TCollectionDocumentManagerCompBase<Base, ColorCollectionDocumentManagerDefs>::
 	OnCreateNewDocument(
 		const typename Defs::CreateNewDocumentGqlRequest& createDocumentRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const
 {
-	CDM::CDocumentId retVal;
+	CDM::CDocumentInfo retVal;
 
 	const auto& arguments = createDocumentRequest.GetRequestedArguments();
 	const auto& info = createDocumentRequest.GetRequestInfo();
@@ -282,19 +282,33 @@ inline CDM::CDocumentId TCollectionDocumentManagerCompBase<Base, ColorCollection
 		return retVal;
 	}
 
-	retVal.Version_1_0.emplace().id = documentId;
+	retVal.Version_1_0.emplace();
+	retVal.Version_1_0->documentId = documentId;
+	retVal.Version_1_0->objectTypeId = *documentTypeId->typeId;
+	retVal.Version_1_0->objectId = QByteArray();
+	retVal.Version_1_0->isDirty = false;
+	retVal.Version_1_0->hasNameProvider = false;
+
+	DocumentList list = BaseClass2::GetOpenedDocumentList(userId);
+	for (const DocumentListItem& docInfo : list) {
+		if (docInfo.documentId == documentId) {
+			retVal.Version_1_0->documentName = docInfo.name;
+			retVal.Version_1_0->hasNameProvider = docInfo.hasNameProvider;
+			break;
+		}
+	}
 
 	return retVal;
 }
 
 
 template<class Base, class ColorCollectionDocumentManagerDefs>
-inline CDM::CDocumentId TCollectionDocumentManagerCompBase<Base, ColorCollectionDocumentManagerDefs>::OnOpenDocument(
+inline CDM::CDocumentInfo TCollectionDocumentManagerCompBase<Base, ColorCollectionDocumentManagerDefs>::OnOpenDocument(
 	const typename Defs::OpenDocumentGqlRequest& openDocumentRequest,
 	const ::imtgql::CGqlRequest& gqlRequest,
 	QString& errorMessage) const
 {
-	CDM::CDocumentId retVal;
+	CDM::CDocumentInfo retVal;
 
 	const auto& arguments = openDocumentRequest.GetRequestedArguments();
 	const auto& info = openDocumentRequest.GetRequestInfo();
@@ -320,7 +334,21 @@ inline CDM::CDocumentId TCollectionDocumentManagerCompBase<Base, ColorCollection
 		return retVal;
 	}
 
-	retVal.Version_1_0.emplace().id = documentId;
+	retVal.Version_1_0.emplace();
+	retVal.Version_1_0->documentId = documentId;
+	retVal.Version_1_0->objectId = *objectId->id;
+	retVal.Version_1_0->isDirty = false;
+	retVal.Version_1_0->hasNameProvider = false;
+
+	DocumentList list = BaseClass2::GetOpenedDocumentList(userId);
+	for (const DocumentListItem& docInfo : list) {
+		if (docInfo.documentId == documentId) {
+			retVal.Version_1_0->documentName = docInfo.name;
+			retVal.Version_1_0->objectTypeId = docInfo.typeId;
+			retVal.Version_1_0->hasNameProvider = docInfo.hasNameProvider;
+			break;
+		}
+	}
 
 	return retVal;
 }
@@ -362,6 +390,12 @@ inline CDM::CDocumentOperationStatus TCollectionDocumentManagerCompBase<Base, Co
 	switch (status) {
 	case imtdoc::ICollectionDocumentManager::OS_OK:
 		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Success;
+		{
+			QString resolvedName;
+			if (GetNonConstThis()->GetDocumentName(userId, *documentId->id, resolvedName) == OperationStatus::OS_OK){
+				retVal.Version_1_0->documentName = resolvedName;
+			}
+		}
 		break;
 	case imtdoc::ICollectionDocumentManager::OS_INVALID_USER_ID:
 		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidUserId;

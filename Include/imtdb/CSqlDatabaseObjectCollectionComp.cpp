@@ -945,6 +945,10 @@ QSqlRecord CSqlDatabaseObjectCollectionComp::GetObjectRecord(const QByteArray& o
 		return QSqlRecord();
 	}
 
+	if (objectId.isEmpty()){
+		return QSqlRecord();
+	}
+
 	QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(objectId);
 	if (!objectSelectionQuery.isEmpty()){
 		QSqlError sqlError;

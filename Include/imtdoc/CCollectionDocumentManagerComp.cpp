@@ -41,15 +41,20 @@ idoc::IUndoManagerSharedPtr CCollectionDocumentManagerComp::CreateUndoManager() 
 }
 
 
-QString CCollectionDocumentManagerComp::GetDefaultDocumentName(
-	const QByteArray& documentId,
-	const istd::IChangeable& document) const
+QString CCollectionDocumentManagerComp::GetDefaultDocumentName(const WorkingDocument& document) const
 {
-	if (!m_documentNameProviderCompPtr.IsValid()){
+	const imtdoc::IDocumentNameProvider* nameProviderPtr = GetDocumentNameProvider(document.typeId);
+	if (nameProviderPtr == nullptr){
 		return QString();
 	}
 
-	return m_documentNameProviderCompPtr->GetDefaultDocumentName(documentId, document);
+	return nameProviderPtr->GetDefaultDocumentName(document.objectId, *document.objectPtr);
+}
+
+
+bool CCollectionDocumentManagerComp::HasDocumentNameProvider(const QByteArray& typeId) const
+{
+	return GetDocumentNameProvider(typeId) != nullptr;
 }
 
 
@@ -77,7 +82,7 @@ bool CCollectionDocumentManagerComp::ValidateDocumentData(
 	}
 
 	QString validationMessage;
-	if (!documentValidator->ValidateDocumentData(*document.objectPtr, validationMessage)){
+	if (!documentValidator->ValidateDocumentData(document.objectId, *document.objectPtr, validationMessage)){
 		status = OS_INVALID_DOCUMENT_DATA;
 		if (errorMessage != nullptr) {
 			*errorMessage = validationMessage.isEmpty() ? GetInvalidDocumentMessage() : validationMessage;
@@ -126,6 +131,17 @@ int CCollectionDocumentManagerComp::GetObjectFactoryIndex(const QByteArray& type
 	}
 
 	return -1;
+}
+
+
+const imtdoc::IDocumentNameProvider* CCollectionDocumentManagerComp::GetDocumentNameProvider(const QByteArray& typeId) const
+{
+	int index = GetObjectFactoryIndex(typeId);
+	if ((index >= 0) && (index < m_documentNameProviderCompPtr.GetCount())){
+		return m_documentNameProviderCompPtr[index];
+	}
+
+	return nullptr;
 }
 
 

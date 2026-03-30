@@ -199,9 +199,11 @@ DocumentManagerBase {
 		gqlCommandId: ImtbaseCollectionDocumentManagerSdlCommandIds.s_openDocument
 		requestType: 1
 		sdlObjectComp: Component {
-			DocumentId {
+			DocumentInfo {
 				onFinished: {
-					root.documentOpened(m_id, root.openDocumentRequest.typeId)
+					root.setAutoNamedTypeId(m_objectTypeId, m_hasNameProvider)
+					root.setDocumentName(m_documentId, m_documentName)
+					root.documentOpened(m_documentId, m_objectTypeId)
 				}
 			}
 		}
@@ -221,9 +223,11 @@ DocumentManagerBase {
 		gqlCommandId: ImtbaseCollectionDocumentManagerSdlCommandIds.s_createNewDocument
 		requestType: 1
 		sdlObjectComp: Component {
-			DocumentId {
+			DocumentInfo {
 				onFinished: {
-					root.documentCreated(m_id, root.createDocumentRequest.typeId)
+					root.setAutoNamedTypeId(m_objectTypeId, m_hasNameProvider)
+					root.setDocumentName(m_documentId, m_documentName)
+					root.documentCreated(m_documentId, m_objectTypeId)
 				}
 			}
 		}
@@ -252,7 +256,11 @@ DocumentManagerBase {
 						return defaultMessage
 					}
 					if (m_status === "Success"){
-						root.documentSaved(root.saveDocumentRequest.documentId)
+						let docId = root.saveDocumentRequest.documentId
+						root.documentSaved(docId)
+						if (m_documentName !== undefined && m_documentName !== "") {
+							root.setDocumentName(docId, m_documentName)
+						}
 					}
 					else if (m_status === "InvalidUserId"){
 						root.saveDocumentFailed(root.saveDocumentRequest.documentId, statusMessage(qsTr("Invalid user-ID")))

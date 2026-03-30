@@ -55,6 +55,7 @@ IDocumentManager::DocumentList CCollectionDocumentManager::GetOpenedDocumentList
 			info.url = "collection:///" + workingDocument.objectId;
 			info.name = workingDocument.name;
 			info.isDirty = workingDocument.isDirty;
+			info.hasNameProvider = HasDocumentNameProvider(workingDocument.typeId);
 
 			list.append(info);
 		}
@@ -90,7 +91,7 @@ QByteArray CCollectionDocumentManager::CreateNewDocument(const QByteArray& userI
 	documentPtr->objectPtr = objectPtr;
 	documentPtr->undoManagerPtr = undoManagerPtr;
 	documentPtr->isDirty = false;
-	documentPtr->name = GetDefaultDocumentName(retVal, *objectPtr);
+	documentPtr->name = "";
 
 	InitializeDocumentObservers(*documentPtr, userId);
 
@@ -378,21 +379,24 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
 		return validationStatus;
 	}
 
-	const QString resolvedDocumentName =
-		documentName.isEmpty() ? GetDefaultDocumentName(documentId, *documentSnapshotPtr) : documentName;
-
+	QString resultDocumentName = documentName;
 	if (!workingDocumentPtr->objectId.isEmpty()) {
 		// Create copy of the object
-		if (!resolvedDocumentName.isEmpty() && workingDocumentPtr->name != resolvedDocumentName){
+		if (!resultDocumentName.isEmpty() && workingDocumentPtr->name != resultDocumentName){
 			QByteArray newObjectId = collectionPtr->InsertNewObject(
-				workingDocumentPtr->typeId, resolvedDocumentName, "", documentSnapshotPtr.GetPtr());
+				workingDocumentPtr->typeId, resultDocumentName, "", documentSnapshotPtr.GetPtr());
 
 			if (newObjectId.isEmpty()){
 				return OS_FAILED;
 			}
 
+			if (HasDocumentNameProvider(workingDocumentPtr->typeId)){
+				resultDocumentName = GetDefaultDocumentName(*workingDocumentPtr);
+				collectionPtr->SetElementName(newObjectId, resultDocumentName);
+			}
+
 			workingDocumentPtr->objectId = newObjectId;
-			workingDocumentPtr->name = resolvedDocumentName;
+			workingDocumentPtr->name = resultDocumentName;
 			workingDocumentPtr->isDirty = false;
 			workingDocumentPtr->undoManagerPtr->StoreDocumentState();
 
@@ -424,6 +428,11 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
 		bool res = collectionPtr->SetObjectData(workingDocumentPtr->objectId, *documentSnapshotPtr);
 
 		if (res){
+			if (HasDocumentNameProvider(workingDocumentPtr->typeId)){
+				workingDocumentPtr->name = GetDefaultDocumentName(*workingDocumentPtr);
+				collectionPtr->SetElementName(workingDocumentPtr->objectId, workingDocumentPtr->name);
+			}
+
 			workingDocumentPtr->isDirty = false;
 			workingDocumentPtr->undoManagerPtr->StoreDocumentState();
 
@@ -454,10 +463,15 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
 
 	// Create new object
 	workingDocumentPtr->objectId =
-		collectionPtr->InsertNewObject(workingDocumentPtr->typeId, resolvedDocumentName, "", documentSnapshotPtr.GetPtr());
+		collectionPtr->InsertNewObject(workingDocumentPtr->typeId, resultDocumentName, "", documentSnapshotPtr.GetPtr());
+
+	if (HasDocumentNameProvider(workingDocumentPtr->typeId)){
+		resultDocumentName = GetDefaultDocumentName(*workingDocumentPtr);
+		collectionPtr->SetElementName(workingDocumentPtr->objectId, resultDocumentName);
+	}
 
 	if (!workingDocumentPtr->objectId.isEmpty()){
-		workingDocumentPtr->name = resolvedDocumentName;
+		workingDocumentPtr->name = resultDocumentName;
 		workingDocumentPtr->isDirty = false;
 		workingDocumentPtr->undoManagerPtr->StoreDocumentState();
 
@@ -681,11 +695,15 @@ bool CCollectionDocumentManager::ValidateDocumentData(
 }
 
 
-QString CCollectionDocumentManager::GetDefaultDocumentName(
-	const QByteArray& /*documentId*/,
-	const istd::IChangeable& /*document*/) const
+QString CCollectionDocumentManager::GetDefaultDocumentName(const WorkingDocument& /*document*/) const
 {
 	return QString();
+}
+
+
+bool CCollectionDocumentManager::HasDocumentNameProvider(const QByteArray& /*typeId*/) const
+{
+	return false;
 }
 
 
