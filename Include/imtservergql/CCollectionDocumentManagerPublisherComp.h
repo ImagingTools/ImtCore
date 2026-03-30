@@ -43,6 +43,7 @@ protected:
 	virtual bool OnDocumentSaved(imtdoc::CEventBase* eventPtr) const;
 	virtual bool OnDocumentSavedAs(imtdoc::CEventBase* eventPtr) const;
 	virtual bool OnDocumentClosed(imtdoc::CEventBase* eventPtr) const;
+	virtual bool OnDocumentDataLoaded(imtdoc::CEventBase* eventPtr) const;
 
 protected:
 	void FillDocumentNotification(

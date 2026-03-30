@@ -19,6 +19,11 @@ DocumentManagerBase {
 			let documentId = data.getData("documentId")
 			let documentName = data.getData("documentName")
 			let operation = data.getData("documentOperation")
+
+			if (operation === "DocumentDataLoaded"){
+				root.setDocumentIsLoading(documentId, false)
+			}
+
 			root.documentManagerChanged(operation, objectId, documentId, documentName)
 		}
 	}
@@ -204,6 +209,9 @@ DocumentManagerBase {
 					root.setAutoNamedTypeId(m_objectTypeId, m_hasNameProvider)
 					root.setDocumentName(m_documentId, m_documentName)
 					root.documentOpened(m_documentId, m_objectTypeId)
+					if (m_isLoading !== undefined){
+						root.setDocumentIsLoading(m_documentId, m_isLoading)
+					}
 				}
 			}
 		}

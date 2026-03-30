@@ -5,6 +5,7 @@
 // Qt includes
 #include <QtCore/QMutex>
 #include <QtCore/QString>
+#include <QtCore/QThread>
 
 // ACF includes
 #include <idoc/IDocumentManager.h>
@@ -71,6 +72,7 @@ protected:
 	const WorkingDocument* FindDocument(const QByteArray& userId, const QByteArray& documentId) const;
 	bool FindDocument(int undoManagerModelId, QByteArray& outUserId, QByteArray& outDocumentId);
 	void InitializeDocumentObservers(WorkingDocument& document, const QByteArray& userId);
+	void OnDocumentDataLoaded(const QByteArray& userId, const QByteArray& documentId);
 	QUrl ObjectIdToUrl(const QByteArray& objectId);
 
 	virtual QList<imtdoc::IDocumentManagerEventHandler*> GetDocumentManagerEventHandlers() const;
@@ -87,6 +89,7 @@ protected:
 		istd::IChangeableSharedPtr objectPtr;
 		idoc::IUndoManagerSharedPtr undoManagerPtr;
 		bool isDirty;
+		bool isLoading = false;
 		int undoManagerModelId = -1;
 	};
 

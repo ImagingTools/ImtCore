@@ -45,6 +45,7 @@ QtObject {
 
 	// typeOperation: NewDocumentCreated, DocumentOpened, DocumentChanged, DocumentSaved, DocumentClosed
 	signal documentManagerChanged(string typeOperation, string objectId, string documentId, string documentName)
+	signal documentDataLoaded(string documentId)
 	signal startUpdateRepresentation(string documentId, var representation)
 	signal documentRepresentationUpdated(string documentId, var representation)
 	signal documentGuiUpdated(string documentId, var representation)
@@ -286,6 +287,28 @@ QtObject {
 		return __internal.openedDocuments[index].isDirty
 	}
 
+	function documentIsLoading(documentId){
+		let index = getDocumentIndexByDocumentId(documentId)
+		if (index < 0){
+			return false
+		}
+
+		return __internal.openedDocuments[index].isLoading
+	}
+
+	function setDocumentIsLoading(documentId, isLoading){
+		let index = getDocumentIndexByDocumentId(documentId)
+		if (index < 0){
+			return
+		}
+
+		__internal.openedDocuments[index].isLoading = isLoading
+
+		if (!isLoading){
+			documentDataLoaded(documentId)
+		}
+	}
+
 	function setDocumentIsDirty(documentId, isDirty){
 		let index = getDocumentIndexByDocumentId(documentId)
 		if (index < 0){
@@ -388,6 +411,7 @@ QtObject {
 				property string name
 				property bool isDirty: false
 				property bool isNew: true
+				property bool isLoading: false
 				property var views: ({})
 				property DocumentDecorator documentDecorator: DocumentDecorator {
 					documentId: documentData.id
