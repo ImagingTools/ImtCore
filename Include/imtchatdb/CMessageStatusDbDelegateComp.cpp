@@ -7,24 +7,11 @@
 
 // ImtCore includes
 #include <imtdb/CDatabaseEngineComp.h>
+#include <imtdb/imtdb.h>
 
 
 namespace imtchatdb
 {
-
-
-namespace
-{
-
-QString GetSqlResourcePath(const imtdb::IDatabaseEngine& databaseEngine, const QString& fileName)
-{
-	const QByteArray driverName = databaseEngine.GetDatabaseDriverId();
-	const bool isSqlite = driverName.compare(QByteArrayLiteral("QSQLITE"), Qt::CaseInsensitive) == 0;
-	const QString prefix = isSqlite ? QStringLiteral(":/SQL/SQLite/") : QStringLiteral(":/SQL/Postgres/");
-	return prefix + fileName;
-}
-
-} // anonymous namespace
 
 
 istd::IChangeableUniquePtr CMessageStatusDbDelegateComp::CreateObjectFromRecord(
@@ -160,7 +147,7 @@ void CMessageStatusDbDelegateComp::OnComponentCreated()
 		return;
 	}
 
-	QFile scriptFile(GetSqlResourcePath(*m_databaseEngineCompPtr, QStringLiteral("CreateMessageStatusTable.sql")));
+	QFile scriptFile(imtdb::GetSqlResourcePath(*m_databaseEngineCompPtr, QStringLiteral("CreateMessageStatusTable.sql")));
 	if (!scriptFile.open(QFile::ReadOnly)){
 		SendErrorMessage(0, QString("MessageStatus table creation script '%1' could not be loaded").arg(scriptFile.fileName()));
 		return;

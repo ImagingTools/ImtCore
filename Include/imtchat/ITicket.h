@@ -21,6 +21,68 @@ class ITicket: virtual public iser::ISerializable
 {
 public:
 	/**
+		Ticket type — describes the nature of the request.
+	*/
+	enum TicketType
+	{
+		TT_ACCESS_REQUEST,
+		TT_SUPPORT_REQUEST,
+		TT_FEATURE_REQUEST,
+		TT_BUG_REPORT
+	};
+	I_DECLARE_ENUM(TicketType,
+				TT_ACCESS_REQUEST,
+				TT_SUPPORT_REQUEST,
+				TT_FEATURE_REQUEST,
+				TT_BUG_REPORT);
+
+	/**
+		Ticket status — lifecycle stage of the ticket.
+	*/
+	enum TicketStatus
+	{
+		TS_OPEN,
+		TS_IN_PROGRESS,
+		TS_RESOLVED,
+		TS_CLOSED
+	};
+	I_DECLARE_ENUM(TicketStatus,
+				TS_OPEN,
+				TS_IN_PROGRESS,
+				TS_RESOLVED,
+				TS_CLOSED);
+
+	/**
+		Ticket priority — urgency level.
+	*/
+	enum TicketPriority
+	{
+		TP_LOW,
+		TP_MEDIUM,
+		TP_HIGH,
+		TP_CRITICAL
+	};
+	I_DECLARE_ENUM(TicketPriority,
+				TP_LOW,
+				TP_MEDIUM,
+				TP_HIGH,
+				TP_CRITICAL);
+
+	/**
+		Target deployment environment.
+	*/
+	enum Environment
+	{
+		ENV_DEVELOPMENT,
+		ENV_STAGING,
+		ENV_PRODUCTION
+	};
+	I_DECLARE_ENUM(Environment,
+				ENV_DEVELOPMENT,
+				ENV_STAGING,
+				ENV_PRODUCTION);
+
+	/**
 		Get the unique ticket identifier.
 	*/
 	virtual QByteArray GetId() const = 0;
@@ -51,37 +113,34 @@ public:
 	virtual void SetDescription(const QString& description) = 0;
 
 	/**
-		Get the ticket type as integer (maps to TicketType enum).
-		0 = AccessRequest, 1 = SupportRequest, 2 = FeatureRequest, 3 = BugReport
+		Get the ticket type.
 	*/
-	virtual int GetTicketType() const = 0;
+	virtual TicketType GetTicketType() const = 0;
 
 	/**
 		Set the ticket type.
 	*/
-	virtual void SetTicketType(int ticketType) = 0;
+	virtual void SetTicketType(TicketType ticketType) = 0;
 
 	/**
-		Get the ticket status as integer (maps to TicketStatus enum).
-		0 = Open, 1 = InProgress, 2 = Resolved, 3 = Closed
+		Get the ticket status.
 	*/
-	virtual int GetStatus() const = 0;
+	virtual TicketStatus GetStatus() const = 0;
 
 	/**
 		Set the ticket status.
 	*/
-	virtual void SetStatus(int status) = 0;
+	virtual void SetStatus(TicketStatus status) = 0;
 
 	/**
-		Get the ticket priority as integer (maps to TicketPriority enum).
-		0 = Low, 1 = Medium, 2 = High, 3 = Critical
+		Get the ticket priority.
 	*/
-	virtual int GetPriority() const = 0;
+	virtual TicketPriority GetPriority() const = 0;
 
 	/**
 		Set the ticket priority.
 	*/
-	virtual void SetPriority(int priority) = 0;
+	virtual void SetPriority(TicketPriority priority) = 0;
 
 	/**
 		Get the user ID of the assigned agent (may be empty).
@@ -124,15 +183,14 @@ public:
 	virtual void SetMessageId(const QByteArray& messageId) = 0;
 
 	/**
-		Get the target environment as integer (maps to Environment enum).
-		0 = Development, 1 = Staging, 2 = Production
+		Get the target deployment environment.
 	*/
-	virtual int GetEnvironment() const = 0;
+	virtual Environment GetEnvironment() const = 0;
 
 	/**
 		Set the target environment.
 	*/
-	virtual void SetEnvironment(int environment) = 0;
+	virtual void SetEnvironment(Environment environment) = 0;
 
 	/**
 		Get the tags associated with this ticket.

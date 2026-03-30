@@ -2,7 +2,7 @@
 #pragma once
 
 // ACF includes
-#include <istd/IChangeable.h>
+#include <istd/IPolymorphic.h>
 
 // ImtCore includes
 #include <imtchat/ITicket.h>
@@ -19,31 +19,31 @@ namespace imtchat
 
 	\ingroup imtchat
 */
-class ITicketService: virtual public istd::IInterface
+class ITicketService: virtual public istd::IPolymorphic
 {
 public:
 	/**
 		Create a new support ticket.
 		\param title          Short summary of the issue.
 		\param description    Detailed description.
-		\param ticketType     Type (0=AccessRequest, 1=SupportRequest, 2=FeatureRequest, 3=BugReport).
-		\param priority       Priority (0=Low, 1=Medium, 2=High, 3=Critical).
+		\param ticketType     Type of the ticket.
+		\param priority       Priority of the ticket.
 		\param assigneeId     Optional assignee user ID.
 		\param conversationId Optional linked conversation ID.
 		\param messageId      Optional triggering message ID.
-		\param environment    Target environment (0=Development, 1=Staging, 2=Production).
+		\param environment    Target deployment environment.
 		\param tags           Optional tag list.
 		\return New ticket ID, or empty on failure.
 	*/
 	virtual QByteArray CreateTicket(
 				const QString& title,
 				const QString& description,
-				int ticketType,
-				int priority,
+				ITicket::TicketType ticketType,
+				ITicket::TicketPriority priority,
 				const QByteArray& assigneeId = QByteArray(),
 				const QByteArray& conversationId = QByteArray(),
 				const QByteArray& messageId = QByteArray(),
-				int environment = 2,
+				ITicket::Environment environment = ITicket::ENV_PRODUCTION,
 				const QStringList& tags = QStringList()) = 0;
 
 	/**

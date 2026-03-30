@@ -50,37 +50,37 @@ void CTicketComp::SetDescription(const QString& description)
 }
 
 
-int CTicketComp::GetTicketType() const
+ITicket::TicketType CTicketComp::GetTicketType() const
 {
 	return m_ticketType;
 }
 
 
-void CTicketComp::SetTicketType(int ticketType)
+void CTicketComp::SetTicketType(TicketType ticketType)
 {
 	m_ticketType = ticketType;
 }
 
 
-int CTicketComp::GetStatus() const
+ITicket::TicketStatus CTicketComp::GetStatus() const
 {
 	return m_status;
 }
 
 
-void CTicketComp::SetStatus(int status)
+void CTicketComp::SetStatus(TicketStatus status)
 {
 	m_status = status;
 }
 
 
-int CTicketComp::GetPriority() const
+ITicket::TicketPriority CTicketComp::GetPriority() const
 {
 	return m_priority;
 }
 
 
-void CTicketComp::SetPriority(int priority)
+void CTicketComp::SetPriority(TicketPriority priority)
 {
 	m_priority = priority;
 }
@@ -134,13 +134,13 @@ void CTicketComp::SetMessageId(const QByteArray& messageId)
 }
 
 
-int CTicketComp::GetEnvironment() const
+ITicket::Environment CTicketComp::GetEnvironment() const
 {
 	return m_environment;
 }
 
 
-void CTicketComp::SetEnvironment(int environment)
+void CTicketComp::SetEnvironment(Environment environment)
 {
 	m_environment = environment;
 }
@@ -219,17 +219,17 @@ bool CTicketComp::Serialize(iser::IArchive& archive)
 
 	static iser::CArchiveTag ticketTypeTag("TicketType", "Ticket type", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(ticketTypeTag);
-	retVal = retVal && archive.Process(m_ticketType);
+	retVal = retVal && I_SERIALIZE_ENUM(TicketType, archive, m_ticketType);
 	retVal = retVal && archive.EndTag(ticketTypeTag);
 
 	static iser::CArchiveTag statusTag("Status", "Status", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(statusTag);
-	retVal = retVal && archive.Process(m_status);
+	retVal = retVal && I_SERIALIZE_ENUM(TicketStatus, archive, m_status);
 	retVal = retVal && archive.EndTag(statusTag);
 
 	static iser::CArchiveTag priorityTag("Priority", "Priority", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(priorityTag);
-	retVal = retVal && archive.Process(m_priority);
+	retVal = retVal && I_SERIALIZE_ENUM(TicketPriority, archive, m_priority);
 	retVal = retVal && archive.EndTag(priorityTag);
 
 	static iser::CArchiveTag assigneeIdTag("AssigneeId", "Assignee ID", iser::CArchiveTag::TT_LEAF);
@@ -254,7 +254,7 @@ bool CTicketComp::Serialize(iser::IArchive& archive)
 
 	static iser::CArchiveTag environmentTag("Environment", "Environment", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(environmentTag);
-	retVal = retVal && archive.Process(m_environment);
+	retVal = retVal && I_SERIALIZE_ENUM(Environment, archive, m_environment);
 	retVal = retVal && archive.EndTag(environmentTag);
 
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QStringList>(archive, m_tags, "Tags", "Tag");
@@ -344,14 +344,14 @@ bool CTicketComp::ResetData(CompatibilityMode /*mode*/)
 	m_id.clear();
 	m_title.clear();
 	m_description.clear();
-	m_ticketType = 0;
-	m_status = 0;
-	m_priority = 1;
+	m_ticketType = TT_ACCESS_REQUEST;
+	m_status = TS_OPEN;
+	m_priority = TP_MEDIUM;
 	m_assigneeId.clear();
 	m_reporterId.clear();
 	m_conversationId.clear();
 	m_messageId.clear();
-	m_environment = 2;
+	m_environment = ENV_PRODUCTION;
 	m_tags.clear();
 	m_createdAt.clear();
 	m_updatedAt.clear();

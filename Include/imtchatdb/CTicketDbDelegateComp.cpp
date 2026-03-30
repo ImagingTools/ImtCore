@@ -8,24 +8,11 @@
 // ImtCore includes
 #include <imtchat/ITicket.h>
 #include <imtdb/CDatabaseEngineComp.h>
+#include <imtdb/imtdb.h>
 
 
 namespace imtchatdb
 {
-
-
-namespace
-{
-
-QString GetSqlResourcePath(const imtdb::IDatabaseEngine& databaseEngine, const QString& fileName)
-{
-	const QByteArray driverName = databaseEngine.GetDatabaseDriverId();
-	const bool isSqlite = driverName.compare(QByteArrayLiteral("QSQLITE"), Qt::CaseInsensitive) == 0;
-	const QString prefix = isSqlite ? QStringLiteral(":/SQL/SQLite/") : QStringLiteral(":/SQL/Postgres/");
-	return prefix + fileName;
-}
-
-} // anonymous namespace
 
 
 istd::IChangeableUniquePtr CTicketDbDelegateComp::CreateObjectFromRecord(
@@ -51,13 +38,13 @@ istd::IChangeableUniquePtr CTicketDbDelegateComp::CreateObjectFromRecord(
 		ticketPtr->SetDescription(record.value("Description").toString());
 	}
 	if (record.contains("TicketType")){
-		ticketPtr->SetTicketType(record.value("TicketType").toInt());
+		ticketPtr->SetTicketType(static_cast<imtchat::ITicket::TicketType>(record.value("TicketType").toInt()));
 	}
 	if (record.contains("Status")){
-		ticketPtr->SetStatus(record.value("Status").toInt());
+		ticketPtr->SetStatus(static_cast<imtchat::ITicket::TicketStatus>(record.value("Status").toInt()));
 	}
 	if (record.contains("Priority")){
-		ticketPtr->SetPriority(record.value("Priority").toInt());
+		ticketPtr->SetPriority(static_cast<imtchat::ITicket::TicketPriority>(record.value("Priority").toInt()));
 	}
 	if (record.contains("AssigneeId")){
 		ticketPtr->SetAssigneeId(record.value("AssigneeId").toByteArray());
@@ -72,7 +59,7 @@ istd::IChangeableUniquePtr CTicketDbDelegateComp::CreateObjectFromRecord(
 		ticketPtr->SetMessageId(record.value("MessageId").toByteArray());
 	}
 	if (record.contains("Environment")){
-		ticketPtr->SetEnvironment(record.value("Environment").toInt());
+		ticketPtr->SetEnvironment(static_cast<imtchat::ITicket::Environment>(record.value("Environment").toInt()));
 	}
 	if (record.contains("Tags")){
 		const QString tagsStr = record.value("Tags").toString();
@@ -285,7 +272,7 @@ void CTicketDbDelegateComp::OnComponentCreated()
 		return;
 	}
 
-	QFile scriptFile(GetSqlResourcePath(*m_databaseEngineCompPtr, QStringLiteral("CreateTicketsTable.sql")));
+	QFile scriptFile(imtdb::GetSqlResourcePath(*m_databaseEngineCompPtr, QStringLiteral("CreateTicketsTable.sql")));
 	if (!scriptFile.open(QFile::ReadOnly)){
 		SendErrorMessage(0, QString("Tickets table creation script '%1' could not be loaded").arg(scriptFile.fileName()));
 		return;

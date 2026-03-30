@@ -14,46 +14,19 @@ Rectangle {
 	// value: integer matching TicketStatus or TicketPriority enum
 	property int value: 0
 
-	readonly property color badgeColor: {
-		if (badgeType === "priority") {
-			switch (value) {
-				case 0: return "#4CAF50";  // Low - green
-				case 1: return "#FF9800";  // Medium - orange
-				case 2: return "#F44336";  // High - red
-				case 3: return "#9C27B0";  // Critical - purple
-				default: return Style.textSecondaryColor;
-			}
-		} else {
-			// status
-			switch (value) {
-				case 0: return "#2196F3";  // Open - blue
-				case 1: return "#FF9800";  // InProgress - orange
-				case 2: return "#4CAF50";  // Resolved - green
-				case 3: return "#9E9E9E";  // Closed - grey
-				default: return Style.textSecondaryColor;
-			}
-		}
-	}
+	readonly property var badgeColors: badgeType === "priority"
+		? ["#4CAF50", "#FF9800", "#F44336", "#9C27B0"]
+		: ["#2196F3", "#FF9800", "#4CAF50", "#9E9E9E"]
 
-	readonly property string badgeLabel: {
-		if (badgeType === "priority") {
-			switch (value) {
-				case 0: return qsTr("Low");
-				case 1: return qsTr("Med");
-				case 2: return qsTr("High");
-				case 3: return qsTr("Crit");
-				default: return "?";
-			}
-		} else {
-			switch (value) {
-				case 0: return qsTr("Open");
-				case 1: return qsTr("Active");
-				case 2: return qsTr("Done");
-				case 3: return qsTr("Closed");
-				default: return "?";
-			}
-		}
-	}
+	readonly property var badgeLabels: badgeType === "priority"
+		? [qsTr("Low"), qsTr("Med"), qsTr("High"), qsTr("Crit")]
+		: [qsTr("Open"), qsTr("Active"), qsTr("Done"), qsTr("Closed")]
+
+	readonly property color badgeColor: (value >= 0 && value < badgeColors.length)
+		? badgeColors[value] : Style.textSecondaryColor
+
+	readonly property string badgeLabel: (value >= 0 && value < badgeLabels.length)
+		? badgeLabels[value] : "?"
 
 	width: badgeLabelText.implicitWidth + Style.paddingXS * 2 + 4
 	height: Style.badgeHeight
