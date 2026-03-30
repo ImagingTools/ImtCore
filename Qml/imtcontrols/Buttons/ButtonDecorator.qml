@@ -62,12 +62,28 @@ DecoratorBase {
 		}
 	}
 
+	function closeTooltip(){
+		console.log("closeTooltip", tooltip)
+		if(tooltip && tooltip.openST){
+			tooltip.closeTooltip();
+		}
+	}
+
 	onBaseElementChanged: {
 		if(baseElement){
 			baseElement.exited.connect(commonButtonDecorator.mouseExited);
 			baseElement.entered.connect(commonButtonDecorator.mouseEntered);
 			baseElement.positionChanged.connect(commonButtonDecorator.mousePositionChanged);
 			baseElement.closeTooltip.connect(commonButtonDecorator.closeTooltip);
+		}
+	}
+
+	Component.onDestruction: {
+		if(baseElement){
+			baseElement.exited.disconnect(commonButtonDecorator.mouseExited);
+			baseElement.entered.disconnect(commonButtonDecorator.mouseEntered);
+			baseElement.positionChanged.disconnect(commonButtonDecorator.mousePositionChanged);
+			baseElement.closeTooltip.disconnect(commonButtonDecorator.closeTooltip);
 		}
 	}
 
@@ -205,12 +221,6 @@ DecoratorBase {
 
 			visible: commonButtonDecorator.isMenuButton;
 
-		}
-	}
-
-	function closeTooltip(){
-		if(tooltip && tooltip.openST){
-			tooltip.closeTooltip();
 		}
 	}
 
