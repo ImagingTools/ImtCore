@@ -11,6 +11,7 @@ QtObject {
 
 	property var documentManager: null
 	property var decorator: null
+	property var collectionView: null
 	// viewTypeId -> view mapping
 	property var siblingViews: ({})
 }
