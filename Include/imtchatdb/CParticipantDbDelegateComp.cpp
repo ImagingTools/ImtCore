@@ -173,7 +173,7 @@ void CParticipantDbDelegateComp::OnComponentCreated()
 
 	QFile scriptFile(GetSqlResourcePath(*m_databaseEngineCompPtr, QStringLiteral("CreateParticipantsTable.sql")));
 	if (!scriptFile.open(QFile::ReadOnly)){
-		SendErrorMessage(0, QT_TR_NOOP(QString("ConversationParticipants table creation script '%1' could not be loaded").arg(scriptFile.fileName())));
+		SendErrorMessage(0, QString("ConversationParticipants table creation script '%1' could not be loaded").arg(scriptFile.fileName()));
 		return;
 	}
 
@@ -189,7 +189,7 @@ void CParticipantDbDelegateComp::OnComponentCreated()
 					<< "\n\t| ConversationParticipants table could not be created"
 					<< "\n\t| Error:" << sqlError
 					<< "\n\t| Query:" << query;
-		SendErrorMessage(0, QT_TR_NOOP(QString("ConversationParticipants table could not be created: %1").arg(sqlError.text())));
+		SendErrorMessage(0, QString("ConversationParticipants table could not be created: %1").arg(sqlError.text()));
 	}
 }
 

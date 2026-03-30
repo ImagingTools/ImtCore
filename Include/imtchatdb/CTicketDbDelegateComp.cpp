@@ -115,7 +115,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CTicketDbDelegateComp::CreateNewO
 
 	QByteArray ticketId = proposedObjectId;
 	if (ticketId.isEmpty()){
-		ticketId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+		ticketId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
 	}
 
 	QString title = ticketPtr->GetTitle();
@@ -287,7 +287,7 @@ void CTicketDbDelegateComp::OnComponentCreated()
 
 	QFile scriptFile(GetSqlResourcePath(*m_databaseEngineCompPtr, QStringLiteral("CreateTicketsTable.sql")));
 	if (!scriptFile.open(QFile::ReadOnly)){
-		SendErrorMessage(0, QT_TR_NOOP(QString("Tickets table creation script '%1' could not be loaded").arg(scriptFile.fileName())));
+		SendErrorMessage(0, QString("Tickets table creation script '%1' could not be loaded").arg(scriptFile.fileName()));
 		return;
 	}
 
@@ -303,7 +303,7 @@ void CTicketDbDelegateComp::OnComponentCreated()
 					<< "\n\t| Tickets table could not be created"
 					<< "\n\t| Error:" << sqlError
 					<< "\n\t| Query:" << query;
-		SendErrorMessage(0, QT_TR_NOOP(QString("Tickets table could not be created: %1").arg(sqlError.text())));
+		SendErrorMessage(0, QString("Tickets table could not be created: %1").arg(sqlError.text()));
 	}
 }
 

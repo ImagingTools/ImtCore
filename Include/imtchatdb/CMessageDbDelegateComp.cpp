@@ -229,7 +229,7 @@ void CMessageDbDelegateComp::OnComponentCreated()
 
 	QFile scriptFile(GetSqlResourcePath(*m_databaseEngineCompPtr, QStringLiteral("CreateMessagesTable.sql")));
 	if (!scriptFile.open(QFile::ReadOnly)){
-		SendErrorMessage(0, QT_TR_NOOP(QString("Messages table creation script '%1' could not be loaded").arg(scriptFile.fileName())));
+		SendErrorMessage(0, QString("Messages table creation script '%1' could not be loaded").arg(scriptFile.fileName()));
 		return;
 	}
 
@@ -245,7 +245,7 @@ void CMessageDbDelegateComp::OnComponentCreated()
 					<< "\n\t| Messages table could not be created"
 					<< "\n\t| Error:" << sqlError
 					<< "\n\t| Query:" << query;
-		SendErrorMessage(0, QT_TR_NOOP(QString("Messages table could not be created: %1").arg(sqlError.text())));
+		SendErrorMessage(0, QString("Messages table could not be created: %1").arg(sqlError.text()));
 	}
 }
 

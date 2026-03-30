@@ -162,7 +162,7 @@ void CMessageStatusDbDelegateComp::OnComponentCreated()
 
 	QFile scriptFile(GetSqlResourcePath(*m_databaseEngineCompPtr, QStringLiteral("CreateMessageStatusTable.sql")));
 	if (!scriptFile.open(QFile::ReadOnly)){
-		SendErrorMessage(0, QT_TR_NOOP(QString("MessageStatus table creation script '%1' could not be loaded").arg(scriptFile.fileName())));
+		SendErrorMessage(0, QString("MessageStatus table creation script '%1' could not be loaded").arg(scriptFile.fileName()));
 		return;
 	}
 
@@ -178,7 +178,7 @@ void CMessageStatusDbDelegateComp::OnComponentCreated()
 					<< "\n\t| MessageStatus table could not be created"
 					<< "\n\t| Error:" << sqlError
 					<< "\n\t| Query:" << query;
-		SendErrorMessage(0, QT_TR_NOOP(QString("MessageStatus table could not be created: %1").arg(sqlError.text())));
+		SendErrorMessage(0, QString("MessageStatus table could not be created: %1").arg(sqlError.text()));
 	}
 }
 

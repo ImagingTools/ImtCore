@@ -216,7 +216,7 @@ void CConversationDbDelegateComp::OnComponentCreated()
 
 	QFile scriptFile(GetSqlResourcePath(*m_databaseEngineCompPtr, QStringLiteral("CreateConversationsTable.sql")));
 	if (!scriptFile.open(QFile::ReadOnly)){
-		SendErrorMessage(0, QT_TR_NOOP(QString("Conversations table creation script '%1' could not be loaded").arg(scriptFile.fileName())));
+		SendErrorMessage(0, QString("Conversations table creation script '%1' could not be loaded").arg(scriptFile.fileName()));
 		return;
 	}
 
@@ -232,7 +232,7 @@ void CConversationDbDelegateComp::OnComponentCreated()
 					<< "\n\t| Conversations table could not be created"
 					<< "\n\t| Error:" << sqlError
 					<< "\n\t| Query:" << query;
-		SendErrorMessage(0, QT_TR_NOOP(QString("Conversations table could not be created: %1").arg(sqlError.text())));
+		SendErrorMessage(0, QString("Conversations table could not be created: %1").arg(sqlError.text()));
 	}
 }
 
