@@ -44,6 +44,32 @@ The workflow will **fail and block PR merges** if TeamCity builds fail. This ens
 
 This prevents merging broken code and maintains code quality standards.
 
+## Merge Blocking via Commit Status
+
+The workflow sets explicit **GitHub commit statuses** on every PR commit:
+
+| Status Context | Description |
+|----------------|-------------|
+| `TeamCity CI (windows)` | Windows build result |
+| `TeamCity CI (linux)` | Linux build result |
+
+Each status transitions through `pending` → `success` / `failure` and includes a direct link to the TeamCity build log.
+
+### Setting Up Required Status Checks (Branch Protection)
+
+To enforce that PRs cannot be merged until both TeamCity builds pass:
+
+1. Go to **Settings** → **Branches** → **Branch protection rules**
+2. Click **Add rule** (or edit the rule for `main` / `master`)
+3. Enable **Require status checks to pass before merging**
+4. Search for and add these status checks:
+   - `TeamCity CI (windows)`
+   - `TeamCity CI (linux)`
+5. (Optional) Enable **Require branches to be up to date before merging**
+6. Click **Save changes**
+
+Once configured, GitHub will show the status checks on every PR and block merging until both report `success`.
+
 ## Configuration
 
 ### Prerequisites

@@ -64,6 +64,22 @@ jobs:
           echo "TeamCity branchName: $TEAMCITY_BRANCH"
           echo "Commit: $COMMIT_SHA"
 
+      - name: Set pending commit status
+        uses: actions/github-script@v8
+        env:
+          COMMIT_SHA: ${{ env.COMMIT_SHA }}
+          PLATFORM: ${{ matrix.platform }}
+        with:
+          script: |
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: process.env.COMMIT_SHA,
+              state: 'pending',
+              context: `TeamCity CI (${process.env.PLATFORM})`,
+              description: 'TeamCity build queued…'
+            });
+
       - name: Trigger TeamCity Build (JSON)
         id: teamcity
         env:
@@ -301,17 +317,38 @@ jobs:
 
       - name: Report Build Status
         if: always() && steps.teamcity.outputs.build_id
-        shell: bash
-        run: |
-          BUILD_STATUS="${{ steps.wait_build.outputs.build_status || 'Unknown' }}"
-          BUILD_URL="${{ steps.wait_build.outputs.build_url || steps.teamcity.outputs.web_url }}"
-          PLATFORM="${{ matrix.platform }}"
+        uses: actions/github-script@v8
+        env:
+          BUILD_STATUS: ${{ steps.wait_build.outputs.build_status || 'Unknown' }}
+          BUILD_URL: ${{ steps.wait_build.outputs.build_url || steps.teamcity.outputs.web_url }}
+          COMMIT_SHA: ${{ env.COMMIT_SHA }}
+          PLATFORM: ${{ matrix.platform }}
+        with:
+          script: |
+            const status = process.env.BUILD_STATUS;
+            const buildUrl = process.env.BUILD_URL;
+            const sha = process.env.COMMIT_SHA;
+            const platform = process.env.PLATFORM;
 
-          echo "::notice title=TeamCity Build ($PLATFORM)::Status: $BUILD_STATUS - View logs: $BUILD_URL"
+            const state = status === 'SUCCESS' ? 'success' : 'failure';
+            const desc = status === 'SUCCESS'
+              ? 'TeamCity build succeeded'
+              : `TeamCity build failed (${status})`;
 
-          if [ "$BUILD_STATUS" != "SUCCESS" ] && [ "$BUILD_STATUS" != "Unknown" ]; then
-            echo "::warning title=TeamCity Build Failed ($PLATFORM)::Build failed with status: $BUILD_STATUS. Check logs at: $BUILD_URL"
-          fi
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: sha,
+              state: state,
+              target_url: buildUrl || undefined,
+              context: `TeamCity CI (${platform})`,
+              description: desc
+            });
+
+            core.notice(`TeamCity Build (${platform}): ${status} — ${buildUrl}`);
+            if (state === 'failure') {
+              core.warning(`TeamCity Build Failed (${platform}): ${status}. Logs: ${buildUrl}`);
+            }
 
   analyze-build-errors:
     name: Analyze Build Errors
