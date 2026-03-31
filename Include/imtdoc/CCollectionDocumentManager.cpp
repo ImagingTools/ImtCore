@@ -79,11 +79,6 @@ QByteArray CCollectionDocumentManager::CreateNewDocument(const QByteArray& userI
 {
 	QByteArray retVal;
 
-	istd::IChangeableSharedPtr objectPtr = CreateObject(documentTypeId);
-	if (!objectPtr.IsValid()) {
-		return retVal;
-	}
-
 	idoc::IUndoManagerSharedPtr undoManagerPtr = CreateUndoManager();
 	if (!undoManagerPtr.IsValid()) {
 		return retVal;
@@ -98,12 +93,10 @@ QByteArray CCollectionDocumentManager::CreateNewDocument(const QByteArray& userI
 	}
 
 	documentPtr->typeId = documentTypeId;
-	documentPtr->objectPtr = objectPtr;
 	documentPtr->undoManagerPtr = undoManagerPtr;
 	documentPtr->isDirty = false;
 	documentPtr->name = "";
-
-	InitializeDocumentObservers(*documentPtr, userId);
+	documentPtr->isLoading = true;
 
 	{
 		NewDocumentCreatedInfo info;
@@ -130,6 +123,56 @@ QByteArray CCollectionDocumentManager::CreateNewDocument(const QByteArray& userI
 			handlerPtr->ProcessEvent(&event);
 		}
 	}
+
+	// Create object asynchronously in a separate thread
+	QByteArray documentId = retVal;
+	QThread* thread = new QThread();
+	QObject* worker = new QObject();
+	worker->moveToThread(thread);
+
+	std::weak_ptr<std::atomic<bool>> aliveGuard(m_isAlive);
+	QObject::connect(thread, &QThread::started, worker, [this, aliveGuard, documentTypeId, userId, documentId, worker]() {
+		auto isAlive = aliveGuard.lock();
+		if (!isAlive || !isAlive->load()) {
+			worker->deleteLater();
+			return;
+		}
+
+		istd::IChangeableSharedPtr objectPtr = CreateObject(documentTypeId);
+
+		isAlive = aliveGuard.lock();
+		if (!isAlive || !isAlive->load()) {
+			worker->deleteLater();
+			return;
+		}
+
+		WorkingDocument* docPtr = nullptr;
+		{
+			QMutexLocker locker(&m_mutex);
+			docPtr = FindDocument(userId, documentId);
+		}
+
+		if (docPtr != nullptr && objectPtr.IsValid()) {
+			docPtr->objectPtr = objectPtr;
+			docPtr->isLoading = false;
+
+			InitializeDocumentObservers(*docPtr, userId);
+
+			OnDocumentDataLoaded(userId, documentId);
+		}
+		else if (docPtr != nullptr) {
+			// Creation failed - close the document and notify client
+			docPtr->isLoading = false;
+			CloseDocument(userId, documentId);
+		}
+
+		worker->deleteLater();
+	});
+
+	QObject::connect(worker, &QObject::destroyed, thread, &QThread::quit);
+	QObject::connect(thread, &QThread::finished, thread, &QObject::deleteLater);
+
+	thread->start();
 
 	return retVal;
 }

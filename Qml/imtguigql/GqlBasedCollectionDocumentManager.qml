@@ -211,8 +211,9 @@ DocumentManagerBase {
 				onFinished: {
 					root.setAutoNamedTypeId(m_objectTypeId, m_hasNameProvider)
 					root.setDocumentName(m_documentId, m_documentName)
-					root.documentOpened(m_documentId, m_objectTypeId)
+					root.__internal.createDocumentData(m_documentId, m_objectTypeId, false)
 					root.setDocumentIsLoading(m_documentId, true)
+					root.documentOpened(m_documentId, m_objectTypeId)
 				}
 			}
 		}
@@ -236,6 +237,8 @@ DocumentManagerBase {
 				onFinished: {
 					root.setAutoNamedTypeId(m_objectTypeId, m_hasNameProvider)
 					root.setDocumentName(m_documentId, m_documentName)
+					root.__internal.createDocumentData(m_documentId, m_objectTypeId, true)
+					root.setDocumentIsLoading(m_documentId, true)
 					root.documentCreated(m_documentId, m_objectTypeId)
 				}
 			}

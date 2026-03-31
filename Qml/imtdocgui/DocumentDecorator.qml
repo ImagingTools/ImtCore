@@ -26,6 +26,21 @@ QtObject {
 
 			representationController.representationUpdated.connect(onRepresentationUpdated)
 			representationController.startUpdateRepresentation.connect(onStartUpdateRepresentation)
+
+			if (updateRepresentation){
+				if (view.visible){
+					representationController.updateRepresentationFromDocument()
+				}
+				else{
+					if (!_internal.requestUpdateViews.includes(view)){
+						_internal.requestUpdateViews.push(view)
+					}
+				}
+			}
+			else{
+				representationController.startUpdateRepresentation(documentId, view.model)
+				representationController.representationUpdated(documentId, view.model)
+			}
 		}
 	}
 
