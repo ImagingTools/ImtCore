@@ -146,24 +146,23 @@ QByteArray CCollectionDocumentManager::CreateNewDocument(const QByteArray& userI
 			return;
 		}
 
-		WorkingDocument* docPtr = nullptr;
 		{
 			QMutexLocker locker(&m_mutex);
-			docPtr = FindDocument(userId, documentId);
-		}
+			WorkingDocument* docPtr = FindDocument(userId, documentId);
 
-		if (docPtr != nullptr && objectPtr.IsValid()) {
-			docPtr->objectPtr = objectPtr;
-			docPtr->isLoading = false;
+			if (docPtr != nullptr && objectPtr.IsValid()) {
+				docPtr->objectPtr = objectPtr;
+				docPtr->isLoading = false;
 
-			InitializeDocumentObservers(*docPtr, userId);
+				InitializeDocumentObservers(*docPtr, userId);
 
-			OnDocumentDataLoaded(userId, documentId);
-		}
-		else if (docPtr != nullptr) {
-			// Creation failed - close the document and notify client
-			docPtr->isLoading = false;
-			CloseDocument(userId, documentId);
+				OnDocumentDataLoaded(userId, documentId);
+			}
+			else if (docPtr != nullptr) {
+				// Creation failed - close the document and notify client
+				docPtr->isLoading = false;
+				CloseDocument(userId, documentId);
+			}
 		}
 
 		worker->deleteLater();
@@ -283,24 +282,23 @@ QByteArray CCollectionDocumentManager::OpenDocument(const QByteArray& userId, co
 			return;
 		}
 
-		WorkingDocument* docPtr = nullptr;
 		{
 			QMutexLocker locker(&m_mutex);
-			docPtr = FindDocument(userId, documentId);
-		}
+			WorkingDocument* docPtr = FindDocument(userId, documentId);
 
-		if (docPtr != nullptr && success && dataPtr.IsValid()) {
-			docPtr->objectPtr = dataPtr;
-			docPtr->isLoading = false;
+			if (docPtr != nullptr && success && dataPtr.IsValid()) {
+				docPtr->objectPtr = dataPtr;
+				docPtr->isLoading = false;
 
-			InitializeDocumentObservers(*docPtr, userId);
+				InitializeDocumentObservers(*docPtr, userId);
 
-			OnDocumentDataLoaded(userId, documentId);
-		}
-		else if (docPtr != nullptr) {
-			// Loading failed - close the document and notify client
-			docPtr->isLoading = false;
-			CloseDocument(userId, documentId);
+				OnDocumentDataLoaded(userId, documentId);
+			}
+			else if (docPtr != nullptr) {
+				// Loading failed - close the document and notify client
+				docPtr->isLoading = false;
+				CloseDocument(userId, documentId);
+			}
 		}
 
 		worker->deleteLater();
