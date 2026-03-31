@@ -11,12 +11,13 @@ permissions:
   contents: read
   statuses: write
   checks: write
+  pull-requests: write
+  issues: write
 
 jobs:
   trigger-teamcity:
     name: Trigger TeamCity Build
     runs-on: ubuntu-latest
-    if: ${{ matrix.run_on_push || github.event_name == 'pull_request' }}
     strategy:
       fail-fast: false
       matrix:
@@ -24,14 +25,12 @@ jobs:
         include:
           - platform: windows
             build_type: ${{ vars.TEAMCITY_BUILD_TYPE_WINDOWS }}
-            run_on_push: true
           - platform: linux
             build_type: ${{ vars.TEAMCITY_BUILD_TYPE_LINUX }}
-            run_on_push: false
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           # For PR: use head SHA to avoid TeamCity building default branch due to merge refs.
           ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
@@ -77,11 +76,22 @@ jobs:
         run: |
           set -euo pipefail
 
+          # Validate required configuration
+          if [ -z "${TEAMCITY_URL:-}" ] || [ -z "${TEAMCITY_TOKEN:-}" ] || [ -z "${TEAMCITY_BUILD_TYPE:-}" ]; then
+            echo "❌ Error: TeamCity configuration not found in repository variables"
+            echo "Please configure the following repository variables:"
+            echo "  - TEAMCITY_URL: Your TeamCity server URL (e.g., https://teamcity.example.com)"
+            echo "  - TEAMCITY_TOKEN: TeamCity access token with build trigger permissions"
+            echo "  - TEAMCITY_BUILD_TYPE_WINDOWS: TeamCity build configuration ID for Windows (e.g., ImtCore_Build_Windows)"
+            echo "  - TEAMCITY_BUILD_TYPE_LINUX: TeamCity build configuration ID for Linux (e.g., ImtCore_Build_Linux)"
+            exit 1
+          fi
+
           echo "Triggering TeamCity ${{ matrix.platform }} build: $TEAMCITY_BUILD_TYPE"
           echo "TeamCity branchName: $TEAMCITY_BRANCH"
           echo "Commit: $COMMIT_SHA"
 
-          # Формируем JSON корректно через jq, чтобы не было проблем с экранированием
+          # Use jq to construct JSON payload safely
           JSON_PAYLOAD=$(jq -n \
             --arg bt "$TEAMCITY_BUILD_TYPE" \
             --arg br "$TEAMCITY_BRANCH" \
@@ -122,8 +132,23 @@ jobs:
           echo "build_id=$BUILD_ID" >> "$GITHUB_OUTPUT"
           echo "web_url=$WEB_URL" >> "$GITHUB_OUTPUT"
 
+          # Save build ID to file for auto-fix workflow to access
+          echo "$BUILD_ID" > teamcity-build-id-${{ matrix.platform }}.txt
+          echo "$WEB_URL" > teamcity-build-url-${{ matrix.platform }}.txt
+
+      - name: Upload Build ID Artifact
+        if: steps.teamcity.outputs.build_id
+        uses: actions/upload-artifact@v7
+        with:
+          name: teamcity-build-info-${{ matrix.platform }}
+          path: |
+            teamcity-build-id-${{ matrix.platform }}.txt
+            teamcity-build-url-${{ matrix.platform }}.txt
+          retention-days: 1
+
       - name: Wait for TeamCity Build
         if: steps.teamcity.outputs.build_id
+        id: wait_build
         timeout-minutes: 90
         env:
           TEAMCITY_URL: ${{ vars.TEAMCITY_URL }}
@@ -145,6 +170,8 @@ jobs:
 
           QUEUED_ELAPSED=0
           RUNNING_ELAPSED=0
+          UNEXPECTED_STATE_COUNT=0
+          MAX_UNEXPECTED_STATES=3
 
           while true; do
             RESPONSE=$(curl --fail-with-body -sS \
@@ -164,29 +191,273 @@ jobs:
             fi
 
             if [ "$STATE" = "queued" ]; then
-              QUEUED_ELAPSED=$((QUEUED_ELAPSED + SLEEP_SECONDS))
               if [ "$QUEUED_ELAPSED" -ge "$MAX_QUEUED_SECONDS" ]; then
                 echo "❌ Timed out: build stayed queued for ${QUEUED_ELAPSED}s"
                 exit 1
               fi
+              sleep "$SLEEP_SECONDS"
+              QUEUED_ELAPSED=$((QUEUED_ELAPSED + SLEEP_SECONDS))
             elif [ "$STATE" = "running" ]; then
-              RUNNING_ELAPSED=$((RUNNING_ELAPSED + SLEEP_SECONDS))
               if [ "$RUNNING_ELAPSED" -ge "$MAX_RUNNING_SECONDS" ]; then
                 echo "❌ Timed out: build stayed running for ${RUNNING_ELAPSED}s"
                 exit 1
               fi
+              sleep "$SLEEP_SECONDS"
+              RUNNING_ELAPSED=$((RUNNING_ELAPSED + SLEEP_SECONDS))
             elif [ "$STATE" = "finished" ]; then
+              echo "build_status=$STATUS" >> "$GITHUB_OUTPUT"
+              echo "build_url=$WEB_URL" >> "$GITHUB_OUTPUT"
               if [ "$STATUS" = "SUCCESS" ]; then
                 echo "✅ Build SUCCESS"
                 exit 0
               else
                 echo "❌ Build FAILED (status=$STATUS)"
+                echo "::error title=TeamCity Build Failed (${{ matrix.platform }})::Build failed with status: $STATUS. Check logs below or at: $WEB_URL"
                 exit 1
               fi
             else
               echo "⚠️ Unexpected TeamCity state: '${STATE}'. Full response:"
               echo "$RESPONSE"
+              UNEXPECTED_STATE_COUNT=$((UNEXPECTED_STATE_COUNT + 1))
+              if [ "$UNEXPECTED_STATE_COUNT" -ge "$MAX_UNEXPECTED_STATES" ]; then
+                echo "❌ Encountered unexpected state $UNEXPECTED_STATE_COUNT times. Exiting."
+                exit 1
+              fi
+              sleep "$SLEEP_SECONDS"
             fi
-
-            sleep "$SLEEP_SECONDS"
           done
+
+      - name: Fetch Build Logs
+        if: always() && steps.teamcity.outputs.build_id
+        continue-on-error: true
+        env:
+          TEAMCITY_URL: ${{ vars.TEAMCITY_URL }}
+          TEAMCITY_TOKEN: ${{ vars.TEAMCITY_TOKEN }}
+          BUILD_ID: ${{ steps.teamcity.outputs.build_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          echo "📋 Fetching build log information for build $BUILD_ID..."
+
+          # Get build log download URL (using downloadBuildLog.html endpoint)
+          LOG_URL="$TEAMCITY_URL/downloadBuildLog.html?buildId=$BUILD_ID"
+          echo "Build log URL: $LOG_URL"
+
+          # Get last 100 lines of the build log
+          echo ""
+          echo "📄 Last 100 lines of build log:"
+          echo "================================"
+          curl -sS \
+            -H "Authorization: Bearer $TEAMCITY_TOKEN" \
+            -H "Accept: text/plain" \
+            "$LOG_URL" | tail -n 100
+          echo "================================"
+          echo ""
+
+          # Get build problems/errors if any
+          echo "🔍 Checking for build problems..."
+          PROBLEMS=$(curl -sS \
+            -H "Authorization: Bearer $TEAMCITY_TOKEN" \
+            -H "Accept: application/json" \
+            "$TEAMCITY_URL/app/rest/builds/id:$BUILD_ID/problemOccurrences?fields=problemOccurrence(id,type,identity,details)" || echo '{}')
+
+          PROBLEM_COUNT=$(echo "$PROBLEMS" | jq -r '.count // 0')
+          if [ "$PROBLEM_COUNT" -gt 0 ]; then
+            echo "⚠️ Found $PROBLEM_COUNT build problem(s):"
+            echo "$PROBLEMS" | jq -r '.problemOccurrence[]? | "- Type: \(.type // "Unknown"), Details: \(.details // .identity // "No details available")"'
+
+            # Export build problems for potential use by auto-fix workflow
+            echo "BUILD_PROBLEMS<<EOF" >> "$GITHUB_OUTPUT"
+            echo "$PROBLEMS" >> "$GITHUB_OUTPUT"
+            echo "EOF" >> "$GITHUB_OUTPUT"
+          else
+            echo "✓ No build problems found"
+          fi
+
+          # Get test failures if any
+          echo ""
+          echo "🧪 Checking for test failures..."
+          TESTS=$(curl -sS \
+            -H "Authorization: Bearer $TEAMCITY_TOKEN" \
+            -H "Accept: application/json" \
+            "$TEAMCITY_URL/app/rest/builds/id:$BUILD_ID/testOccurrences?status=FAILURE" || echo '{}')
+
+          TEST_COUNT=$(echo "$TESTS" | jq -r '.count // 0')
+          if [ "$TEST_COUNT" -gt 0 ]; then
+            echo "❌ Found $TEST_COUNT failed test(s):"
+            echo "$TESTS" | jq -r '.testOccurrence[]? | "- \(.name): \(.details // "No details")"'
+          else
+            echo "✓ No test failures found"
+          fi
+
+          echo ""
+          echo "📊 Build Summary:"
+          echo "- Build ID: $BUILD_ID"
+          echo "- Build URL: ${{ steps.wait_build.outputs.build_url || steps.teamcity.outputs.web_url }}"
+          echo "- Status: ${{ steps.wait_build.outputs.build_status || 'Unknown' }}"
+          echo "- Platform: ${{ matrix.platform }}"
+          echo "- Full logs: $TEAMCITY_URL/downloadBuildLog.html?buildId=$BUILD_ID"
+
+      - name: Report Build Status
+        if: always() && steps.teamcity.outputs.build_id
+        shell: bash
+        run: |
+          BUILD_STATUS="${{ steps.wait_build.outputs.build_status || 'Unknown' }}"
+          BUILD_URL="${{ steps.wait_build.outputs.build_url || steps.teamcity.outputs.web_url }}"
+          PLATFORM="${{ matrix.platform }}"
+
+          echo "::notice title=TeamCity Build ($PLATFORM)::Status: $BUILD_STATUS - View logs: $BUILD_URL"
+
+          if [ "$BUILD_STATUS" != "SUCCESS" ] && [ "$BUILD_STATUS" != "Unknown" ]; then
+            echo "::warning title=TeamCity Build Failed ($PLATFORM)::Build failed with status: $BUILD_STATUS. Check logs at: $BUILD_URL"
+          fi
+
+  analyze-build-errors:
+    name: Analyze Build Errors
+    runs-on: ubuntu-latest
+    needs: trigger-teamcity
+    if: always() && github.event_name == 'pull_request' && needs.trigger-teamcity.result == 'failure'
+    steps:
+      - name: Download Build Info Artifacts
+        uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          pattern: teamcity-build-info-*
+          merge-multiple: true
+          path: ./teamcity-artifacts
+
+      - name: Extract Build IDs
+        id: extract_ids
+        shell: bash
+        run: |
+          BUILD_IDS=""
+
+          if [ -d "./teamcity-artifacts" ]; then
+            echo "Artifacts directory found, extracting build IDs..."
+            ls -la ./teamcity-artifacts/ || true
+
+            shopt -s nullglob
+            for id_file in ./teamcity-artifacts/teamcity-build-id-*.txt; do
+              if [ -f "$id_file" ]; then
+                BUILD_ID=$(tr -d '[:space:]' < "$id_file")
+                if [ -n "$BUILD_ID" ]; then
+                  echo "Found build ID: $BUILD_ID (from $(basename "$id_file"))"
+                  BUILD_IDS="$BUILD_IDS $BUILD_ID"
+                fi
+              fi
+            done
+            shopt -u nullglob
+
+            BUILD_IDS=$(echo "$BUILD_IDS" | xargs)
+          else
+            echo "No artifacts directory found"
+          fi
+
+          echo "build_ids=$BUILD_IDS" >> "$GITHUB_OUTPUT"
+          echo "Build IDs to analyze: $BUILD_IDS"
+
+      - name: Fetch and Analyze Build Errors
+        id: analyze
+        if: steps.extract_ids.outputs.build_ids != ''
+        env:
+          TEAMCITY_URL: ${{ vars.TEAMCITY_URL }}
+          TEAMCITY_TOKEN: ${{ vars.TEAMCITY_TOKEN }}
+        shell: bash
+        run: |
+          BUILD_IDS='${{ steps.extract_ids.outputs.build_ids }}'
+
+          echo "Analyzing TeamCity build IDs: $BUILD_IDS"
+
+          ALL_ERRORS=""
+
+          # Fetch build logs from TeamCity
+          for BUILD_ID in $BUILD_IDS; do
+            echo "Fetching build log for build $BUILD_ID..."
+
+            BUILD_LOG=$(curl -sS \
+              -H "Authorization: Bearer $TEAMCITY_TOKEN" \
+              -H "Accept: text/plain" \
+              "$TEAMCITY_URL/downloadBuildLog.html?buildId=$BUILD_ID" 2>&1 | tail -n 500 || echo "")
+
+            if [ -n "$BUILD_LOG" ]; then
+              echo "Analyzing build log for errors..."
+
+              # Extract compilation errors
+              COMPILE_ERRORS=$(echo "$BUILD_LOG" | grep -iE "error[: ]|fatal[: ]" | head -n 50 || echo "")
+
+              # Extract linker errors
+              LINKER_ERRORS=$(echo "$BUILD_LOG" | grep -E "undefined reference|unresolved external|cannot find -l" | head -n 20 || echo "")
+
+              # Extract CMake errors
+              CMAKE_ERRORS=$(echo "$BUILD_LOG" | grep -E "CMake Error" | head -n 20 || echo "")
+
+              # Combine errors
+              if [ -n "$COMPILE_ERRORS" ]; then
+                ALL_ERRORS="${ALL_ERRORS}"$'\n\n'"=== Build $BUILD_ID - Compilation Errors ==="$'\n'"${COMPILE_ERRORS}"
+              fi
+              if [ -n "$LINKER_ERRORS" ]; then
+                ALL_ERRORS="${ALL_ERRORS}"$'\n\n'"=== Build $BUILD_ID - Linker Errors ==="$'\n'"${LINKER_ERRORS}"
+              fi
+              if [ -n "$CMAKE_ERRORS" ]; then
+                ALL_ERRORS="${ALL_ERRORS}"$'\n\n'"=== Build $BUILD_ID - CMake Errors ==="$'\n'"${CMAKE_ERRORS}"
+              fi
+
+              # If no specific errors found, include last 100 lines
+              if [ -z "$COMPILE_ERRORS" ] && [ -z "$LINKER_ERRORS" ] && [ -z "$CMAKE_ERRORS" ]; then
+                FALLBACK=$(echo "$BUILD_LOG" | tail -n 100)
+                ALL_ERRORS="${ALL_ERRORS}"$'\n\n'"=== Build $BUILD_ID - Last 100 lines ==="$'\n'"${FALLBACK}"
+              fi
+            fi
+          done
+
+          # Save errors to output
+          echo "ERRORS<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$ALL_ERRORS" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Post Error Analysis to PR
+        if: steps.analyze.outputs.ERRORS != ''
+        uses: actions/github-script@v8
+        env:
+          BUILD_ERRORS: ${{ steps.analyze.outputs.ERRORS }}
+          BUILD_IDS: ${{ steps.extract_ids.outputs.build_ids }}
+        with:
+          script: |
+            const errors = process.env.BUILD_ERRORS || '';
+            const buildIdsStr = process.env.BUILD_IDS || '';
+            const buildIds = buildIdsStr.trim().split(/\s+/).filter(id => id.length > 0);
+            const prNumber = context.payload.pull_request.number;
+
+            let body = '## 🔍 TeamCity Build Failed - Error Analysis\n\n';
+            body += '**Status:** TeamCity CI build failed ❌\n\n';
+            body += '### Build Errors\n\n';
+            body += '```\n' + errors.trim() + '\n```\n\n';
+
+            // Add TeamCity build links
+            if (buildIds.length > 0) {
+              body += '### TeamCity Build Links\n\n';
+              for (const buildId of buildIds) {
+                body += `- [Build ${buildId}](${{ vars.TEAMCITY_URL }}/viewLog.html?buildId=${buildId})\n`;
+              }
+              body += '\n';
+            }
+
+            body += '---\n\n';
+            body += '### 💡 Next Steps\n\n';
+            body += 'To get help fixing these errors, mention **@copilot** in a new comment below and ask for assistance.\n\n';
+            body += 'Example comment to copy:\n';
+            body += '```\n@copilot please analyze the build errors above and suggest fixes\n```\n\n';
+            body += '---\n\n';
+            body += `*Posted automatically by [TeamCity CI Workflow](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})*`;
+
+            // Post comment
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body: body
+            });
+
+            console.log(`Posted build error analysis to PR #${prNumber}`);
+
