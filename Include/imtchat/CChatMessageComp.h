@@ -35,8 +35,8 @@ public:
 	virtual void SetSenderId(const QByteArray& senderId) override;
 	virtual QString GetContent() const override;
 	virtual void SetContent(const QString& content) override;
-	virtual int GetStatus() const override;
-	virtual void SetStatus(int status) override;
+	virtual IChatMessage::MessageStatus GetStatus() const override;
+	virtual void SetStatus(IChatMessage::MessageStatus status) override;
 	virtual QString GetCreatedAt() const override;
 	virtual void SetCreatedAt(const QString& createdAt) override;
 	virtual QString GetUpdatedAt() const override;
@@ -60,7 +60,7 @@ private:
 	QByteArray m_conversationId;
 	QByteArray m_senderId;
 	QString m_content;
-	int m_status = 0;
+	int m_status = IChatMessage::MS_SENT;
 	QString m_createdAt;
 	QString m_updatedAt;
 	QByteArrayList m_entityReferences;

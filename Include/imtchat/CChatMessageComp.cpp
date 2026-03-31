@@ -62,13 +62,13 @@ void CChatMessageComp::SetContent(const QString& content)
 }
 
 
-int CChatMessageComp::GetStatus() const
+IChatMessage::MessageStatus CChatMessageComp::GetStatus() const
 {
-	return m_status;
+	return static_cast<IChatMessage::MessageStatus>(m_status);
 }
 
 
-void CChatMessageComp::SetStatus(int status)
+void CChatMessageComp::SetStatus(IChatMessage::MessageStatus status)
 {
 	m_status = status;
 }
@@ -150,10 +150,7 @@ bool CChatMessageComp::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_content);
 	retVal = retVal && archive.EndTag(contentTag);
 
-	static iser::CArchiveTag statusTag("Status", "Status", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(statusTag);
-	retVal = retVal && archive.Process(m_status);
-	retVal = retVal && archive.EndTag(statusTag);
+	retVal = retVal && I_SERIALIZE_ENUM(MessageStatus, archive, m_status);
 
 	static iser::CArchiveTag createdAtTag("CreatedAt", "Created at", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(createdAtTag);
@@ -228,7 +225,7 @@ bool CChatMessageComp::ResetData(CompatibilityMode /*mode*/)
 	m_conversationId.clear();
 	m_senderId.clear();
 	m_content.clear();
-	m_status = 0;
+	m_status = IChatMessage::MS_SENT;
 	m_createdAt.clear();
 	m_updatedAt.clear();
 	m_entityReferences.clear();

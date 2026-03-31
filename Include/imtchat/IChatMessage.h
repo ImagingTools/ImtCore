@@ -21,6 +21,20 @@ class IChatMessage: virtual public iser::ISerializable
 {
 public:
 	/**
+		Message delivery/read status.
+	*/
+	enum MessageStatus
+	{
+		MS_SENT,
+		MS_DELIVERED,
+		MS_READ
+	};
+	I_DECLARE_ENUM(MessageStatus,
+				MS_SENT,
+				MS_DELIVERED,
+				MS_READ);
+
+	/**
 		Get the unique message identifier.
 	*/
 	virtual QByteArray GetId() const = 0;
@@ -61,15 +75,14 @@ public:
 	virtual void SetContent(const QString& content) = 0;
 
 	/**
-		Get the delivery/read status as integer (maps to MessageStatus enum).
-		0 = Sent, 1 = Delivered, 2 = Read
+		Get the delivery/read status.
 	*/
-	virtual int GetStatus() const = 0;
+	virtual MessageStatus GetStatus() const = 0;
 
 	/**
 		Set the delivery/read status.
 	*/
-	virtual void SetStatus(int status) = 0;
+	virtual void SetStatus(MessageStatus status) = 0;
 
 	/**
 		Get the ISO 8601 creation timestamp.

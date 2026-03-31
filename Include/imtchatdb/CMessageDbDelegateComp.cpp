@@ -67,7 +67,7 @@ istd::IChangeableUniquePtr CMessageDbDelegateComp::CreateObjectFromRecord(
 		msgPtr->SetAttachmentIds(attachIds);
 	}
 	if (record.contains("Status")){
-		msgPtr->SetStatus(record.value("Status").toInt());
+		msgPtr->SetStatus(static_cast<imtchat::IChatMessage::MessageStatus>(record.value("Status").toInt()));
 	}
 	if (record.contains("CreatedAt")){
 		msgPtr->SetCreatedAt(record.value("CreatedAt").toString());
