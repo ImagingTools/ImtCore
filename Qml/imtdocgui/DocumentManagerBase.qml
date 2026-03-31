@@ -462,7 +462,7 @@ QtObject {
 					}
 
 					let representationController = representationControllerFactory.createObject(documentData)
-					representationController.documentId = Qt.binding(function() { return documentData.serverDocumentId || documentData.id })
+					representationController.documentId = Qt.binding(function() { return documentData.serverDocumentId !== "" ? documentData.serverDocumentId : documentData.id })
 					representationController.view = view
 					documentDecorator.registerView(view, representationController, !isNew && !isLoading)
 				}
