@@ -378,10 +378,7 @@ bool CSubscriptionManagerComp::SendRequestInternal(const imtgql::IGqlRequest& re
 		retVal = m_subscriptionSenderCompPtr->SendRequest(requestPtr);
 	}
 	else if (m_requestManagerCompPtr.IsValid()){
-		const imtrest::ISender* sender = m_requestManagerCompPtr->GetSender(clientId);
-		if (sender != nullptr){
-			retVal = sender->SendRequest(requestPtr);
-		}
+		retVal = m_requestManagerCompPtr->SendRequest(clientId, requestPtr);
 	}
 
 	return retVal;

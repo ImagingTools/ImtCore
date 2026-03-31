@@ -8,7 +8,7 @@
 
 // ImtCore includes
 #include <imtrest/IRequestServlet.h>
-#include <imtrest/ISender.h>
+#include <imtrest/ITransport.h>
 
 // Qt includes
 #include <QtWebSockets/QWebSocket>
