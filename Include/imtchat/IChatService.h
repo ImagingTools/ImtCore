@@ -26,16 +26,16 @@ class IChatService: virtual public istd::IPolymorphic
 public:
 	/**
 		Send a message to a conversation.
-		\param conversationId  Target conversation ID.
-		\param content         Message text content.
-		\param entityRefsJson  Optional JSON-encoded entity references.
-		\param attachmentIds   Optional attachment IDs.
+		\param conversationId    Target conversation ID.
+		\param content           Message text content.
+		\param entityReferences  Optional entity reference IDs.
+		\param attachmentIds     Optional attachment IDs.
 		\return New message ID, or empty on failure.
 	*/
 	virtual QByteArray SendMessage(
 				const QByteArray& conversationId,
 				const QString& content,
-				const QString& entityRefsJson = QString(),
+				const QByteArrayList& entityReferences = QByteArrayList(),
 				const QByteArrayList& attachmentIds = QByteArrayList()) = 0;
 
 	/**
