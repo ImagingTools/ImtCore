@@ -77,7 +77,7 @@ jobs:
               sha: process.env.COMMIT_SHA,
               state: 'pending',
               context: `TeamCity CI (${process.env.PLATFORM})`,
-              description: 'TeamCity build queued…'
+              description: 'TeamCity build queued...'
             });
 
       - name: Trigger TeamCity Build (JSON)
@@ -330,10 +330,17 @@ jobs:
             const sha = process.env.COMMIT_SHA;
             const platform = process.env.PLATFORM;
 
-            const state = status === 'SUCCESS' ? 'success' : 'failure';
-            const desc = status === 'SUCCESS'
-              ? 'TeamCity build succeeded'
-              : `TeamCity build failed (${status})`;
+            let state, desc;
+            if (status === 'SUCCESS') {
+              state = 'success';
+              desc = 'TeamCity build succeeded';
+            } else if (status === 'Unknown') {
+              state = 'error';
+              desc = 'TeamCity build status could not be determined';
+            } else {
+              state = 'failure';
+              desc = `TeamCity build failed (${status})`;
+            }
 
             await github.rest.repos.createCommitStatus({
               owner: context.repo.owner,
