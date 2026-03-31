@@ -5,6 +5,7 @@
 // ImtCore includes
 #include <imtchat/CChatMessageComp.h>
 #include <imtchat/CConversationComp.h>
+#include <imtchat/CChatServiceComp.h>
 
 
 /**
@@ -16,6 +17,7 @@ namespace ImtChatPck
 
 typedef imtchat::CChatMessageComp ChatMessage;
 typedef imtchat::CConversationComp Conversation;
+typedef imtchat::CChatServiceComp ChatService;
 
 
 } // namespace ImtChatPck

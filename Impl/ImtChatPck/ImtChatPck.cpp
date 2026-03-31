@@ -25,5 +25,10 @@ I_EXPORT_COMPONENT(
 			"Conversation component",
 			"Conversation");
 
+I_EXPORT_COMPONENT(
+			ChatService,
+			"Chat service component",
+			"Chat Service");
+
 
 } // namespace ImtChatPck
