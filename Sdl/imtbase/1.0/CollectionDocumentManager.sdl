@@ -19,6 +19,7 @@ enum EDocumentOperation{
 	DocumentSaved
 	DocumentSavedAs
 	DocumentClosed
+	DocumentDataLoaded
 }
 
 enum EDocumentOperationStatus {
@@ -54,8 +55,9 @@ type DocumentInfo {
 	documentName: String!
 	objectTypeId: ID!
 	objectId: ID!
-	isDirty: Bool!
-	hasNameProvider: Bool!
+	isDirty: Bool
+	hasNameProvider: Bool
+	isLoading: Bool
 }
 
 type DocumentList {
@@ -73,6 +75,7 @@ type DocumentManagerNotification {
 	documentName: String!
 	objectId: ID
 	isDirty: Bool
+	isLoading: Bool
 }
 
 type SetDocumentNameInput {

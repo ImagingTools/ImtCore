@@ -19,6 +19,14 @@ DocumentManagerBase {
 			let documentId = data.getData("documentId")
 			let documentName = data.getData("documentName")
 			let operation = data.getData("documentOperation")
+
+			if (operation === "DocumentDataLoaded"){
+				root.setDocumentIsLoading(documentId, false)
+			}
+			else if (operation === "DocumentClosed"){
+				root.documentClosed(documentId)
+			}
+
 			root.documentManagerChanged(operation, objectId, documentId, documentName)
 		}
 	}
@@ -203,6 +211,8 @@ DocumentManagerBase {
 				onFinished: {
 					root.setAutoNamedTypeId(m_objectTypeId, m_hasNameProvider)
 					root.setDocumentName(m_documentId, m_documentName)
+					root.__internal.createDocumentData(m_documentId, m_objectTypeId, false)
+					root.setDocumentIsLoading(m_documentId, true)
 					root.documentOpened(m_documentId, m_objectTypeId)
 				}
 			}
@@ -227,6 +237,8 @@ DocumentManagerBase {
 				onFinished: {
 					root.setAutoNamedTypeId(m_objectTypeId, m_hasNameProvider)
 					root.setDocumentName(m_documentId, m_documentName)
+					root.__internal.createDocumentData(m_documentId, m_objectTypeId, true)
+					root.setDocumentIsLoading(m_documentId, true)
 					root.documentCreated(m_documentId, m_objectTypeId)
 				}
 			}

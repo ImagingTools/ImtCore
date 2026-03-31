@@ -27,7 +27,8 @@ public:
 		CF_DOCUMENT_UNDO_CHANGED,
 		CF_DOCUMENT_SAVED,
 		CF_DOCUMENT_SAVED_AS,
-		CF_DOCUMENT_CLOSED
+		CF_DOCUMENT_CLOSED,
+		CF_DOCUMENT_DATA_LOADED
 	};
 
 	enum OperationStatus
@@ -46,6 +47,7 @@ public:
 		QString name;
 		bool isDirty = false;
 		bool hasNameProvider = false;
+		bool isLoading = false;
 	};
 
 	struct DocumentListItem : public DocumentInfo
@@ -100,6 +102,9 @@ public:
 
 	static const QByteArray CN_DOCUMENT_CLOSED;
 	typedef DocumentClosedNotification DocumentClosedInfo;
+
+	static const QByteArray CN_DOCUMENT_DATA_LOADED;
+	typedef DocumentNotification DocumentDataLoadedInfo;
 
 	/**
 		Get a list of open document instances for a given user-ID

@@ -150,6 +150,12 @@ Item {
 		}
 
 		function onDocumentGuiUpdated(documentId, representation){
+			if (!workspaceView.documentManager.documentIsLoading(documentId)){
+				workspaceView.stopLoading(documentId)
+			}
+		}
+
+		function onDocumentDataLoaded(documentId){
 			workspaceView.stopLoading(documentId)
 		}
 
@@ -189,6 +195,7 @@ Item {
 			tabView.addTab(documentId, "", stackViewComp, "", "", false)
 			tabView.currentIndex = tabView.tabModel.count - 1
 			workspaceView.updateTabName(documentId)
+			workspaceView.startLoading(documentId)
 		}
 
 		function onOpenDocumentFailed(documentId, message){
@@ -239,7 +246,7 @@ Item {
 
 			tabView.currentIndex = tabView.tabModel.count - 1
 			workspaceView.updateTabName(documentId)
-			workspaceView.stopLoading(documentId)
+			workspaceView.startLoading(documentId)
 		}
 
 		// Undo info signals
