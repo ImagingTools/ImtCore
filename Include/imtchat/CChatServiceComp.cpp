@@ -61,8 +61,6 @@ QByteArrayList CChatServiceComp::GetMessages(
 			int offset,
 			int limit) const
 {
-	Q_UNUSED(conversationId);
-
 	const imtbase::IObjectCollection* messageCollectionPtr = m_messageCollectionCompPtr.GetPtr();
 	if (messageCollectionPtr == nullptr){
 		return QByteArrayList();
@@ -73,7 +71,13 @@ QByteArrayList CChatServiceComp::GetMessages(
 	QByteArrayList result;
 	result.reserve(ids.size());
 	for (const auto& id: ids){
-		result.append(id);
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (messageCollectionPtr->GetObjectData(id, dataPtr)){
+			const IChatMessage* msgPtr = dynamic_cast<const IChatMessage*>(dataPtr.GetPtr());
+			if ((msgPtr != nullptr) && (msgPtr->GetConversationId() == conversationId)){
+				result.append(id);
+			}
+		}
 	}
 
 	return result;
@@ -145,8 +149,6 @@ bool CChatServiceComp::MarkMessageRead(
 			const QByteArray& conversationId,
 			const QByteArray& messageId)
 {
-	Q_UNUSED(conversationId);
-
 	imtbase::IObjectCollection* messageCollectionPtr = m_messageCollectionCompPtr.GetPtr();
 	if (messageCollectionPtr == nullptr){
 		return false;
@@ -159,6 +161,10 @@ bool CChatServiceComp::MarkMessageRead(
 
 	IChatMessage* chatMessagePtr = dynamic_cast<IChatMessage*>(dataPtr.GetPtr());
 	if (chatMessagePtr == nullptr){
+		return false;
+	}
+
+	if (chatMessagePtr->GetConversationId() != conversationId){
 		return false;
 	}
 
