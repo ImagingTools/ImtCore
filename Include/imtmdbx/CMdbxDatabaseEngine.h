@@ -18,6 +18,7 @@ class CMdbxDatabaseEngine: public IMdbxDatabaseEngine
 
 public:
 	CMdbxDatabaseEngine(const QString& path);
+
 	const QString GetDatabasePath();
 
 	// reimplemented (IMdbxDatabaseEngine)
@@ -29,4 +30,4 @@ private:
 };
 
 
-}//namespace imtmdbx
+} // namespace imtmdbx
