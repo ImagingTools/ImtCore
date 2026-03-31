@@ -155,6 +155,10 @@ Item {
 			}
 		}
 
+		function onDocumentDataLoaded(documentId){
+			workspaceView.stopLoading(documentId)
+		}
+
 		function onStartUpdateRepresentation(documentId, representation){
 			workspaceView.startLoading(documentId)
 		}
