@@ -150,7 +150,7 @@
         <Interface InterfaceId="imtclientgql::IGqlSubscriptionManager" ComponentId="SubscriptionManager"/>
         <Interface InterfaceId="imtcom::IConnectionStatusProvider" ComponentId="WebSocketServer"/>
         <Interface InterfaceId="imtrest::IProtocolEngine" ComponentId="WebSocketProtocolEngine"/>
-        <Interface InterfaceId="imtrest::IRequestManager" ComponentId="WebSocketServer"/>
+        <Interface InterfaceId="imtrest::IResponseDispatcher" ComponentId="WebSocketServer"/>
         <Interface InterfaceId="imtrest::IRequestServlet" ComponentId="WebSocketServlet"/>
         <Interface InterfaceId="imtrest::IServer" ComponentId="WebSocketServer"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="WebSocketServer"/>

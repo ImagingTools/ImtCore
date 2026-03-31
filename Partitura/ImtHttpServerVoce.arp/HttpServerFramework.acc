@@ -95,7 +95,7 @@
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
         <Interface InterfaceId="imtrest::IProtocolEngine" ComponentId="HttpProtocolEngine"/>
-        <Interface InterfaceId="imtrest::IRequestManager" ComponentId="TcpServer"/>
+        <Interface InterfaceId="imtrest::IResponseDispatcher" ComponentId="TcpServer"/>
         <Interface InterfaceId="imtrest::IServer" ComponentId="TcpServer"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="TcpServer"/>
     </ExportedInterfaces>
