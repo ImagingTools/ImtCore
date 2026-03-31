@@ -242,17 +242,6 @@ bool CSqliteDatabaseDocumentDelegateComp::CreateTimeFilterQuery(const imtbase::I
 }
 
 
-bool CSqliteDatabaseDocumentDelegateComp::CreateTextFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& textFilterQuery) const
-{
-	textFilterQuery = CComplexCollectionFilterConverter::CreateSqlFilterQuery(collectionFilter);
-	if (!textFilterQuery.isEmpty()){
-		SubstituteFieldIds(textFilterQuery, false);
-	}
-
-	return true;
-}
-
-
 bool CSqliteDatabaseDocumentDelegateComp::CreateObjectFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& filterQuery) const
 {
 	filterQuery = CComplexCollectionFilterConverter::CreateSqlFilterQuery(collectionFilter);
