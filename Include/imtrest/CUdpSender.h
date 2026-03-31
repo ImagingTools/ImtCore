@@ -22,7 +22,7 @@ public:
 
 	// reimplemented (ITransport)
 	virtual bool SendResponse(ConstResponsePtr& response) const override;
-	virtual bool SendRequest(ConstRequestPtr& reguest) const override;
+	virtual bool SendRequest(ConstRequestPtr& request) const override;
 
 Q_SIGNALS:
     void sended(QByteArray requestId) const;

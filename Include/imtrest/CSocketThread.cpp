@@ -148,7 +148,7 @@ bool CSocketThread::SendResponse(ConstResponsePtr& response) const
 }
 
 
-bool CSocketThread::SendRequest(ConstRequestPtr& /*reguest*/) const
+bool CSocketThread::SendRequest(ConstRequestPtr& /*request*/) const
 {
 	return false;
 }

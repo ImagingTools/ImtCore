@@ -54,7 +54,7 @@ bool CTcpSender::SendResponse(ConstResponsePtr& response) const
 }
 
 
-bool imtrest::CTcpSender::SendRequest(ConstRequestPtr& /*reguest*/) const
+bool imtrest::CTcpSender::SendRequest(ConstRequestPtr& /*request*/) const
 {
 	return false;
 }
