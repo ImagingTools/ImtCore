@@ -311,37 +311,6 @@ QtObject {
 		}
 	}
 
-	function setServerDocumentId(localId, serverDocId){
-		let index = getDocumentIndexByDocumentId(localId)
-		if (index < 0){
-			return
-		}
-
-		__internal.serverDocumentIdMap[localId] = serverDocId
-		__internal.localDocumentIdMap[serverDocId] = localId
-
-		let decorator = __internal.openedDocuments[index].documentDecorator
-		for (let i = 0; i < decorator.registeredRepresentation.length; ++i){
-			decorator.registeredRepresentation[i].documentId = serverDocId
-		}
-	}
-
-	function getServerDocumentId(localId){
-		if (localId in __internal.serverDocumentIdMap){
-			return __internal.serverDocumentIdMap[localId]
-		}
-
-		return localId
-	}
-
-	function getLocalDocumentId(serverDocId){
-		if (serverDocId in __internal.localDocumentIdMap){
-			return __internal.localDocumentIdMap[serverDocId]
-		}
-
-		return serverDocId
-	}
-
 	function setDocumentIsDirty(documentId, isDirty){
 		let index = getDocumentIndexByDocumentId(documentId)
 		if (index < 0){
@@ -434,8 +403,6 @@ QtObject {
 		property var cachedDocumentNames: ({}) // DocumentId -> Name
 		property var autoNamedTypeIds: ({}) // TypeId -> true for types with automatic name providers
 		property var documentManagerActiveView: null
-		property var serverDocumentIdMap: ({}) // localId -> serverDocumentId
-		property var localDocumentIdMap: ({}) // serverDocumentId -> localId
 
 		property Component documentDataFactory: Component{ 
 			QtObject{
@@ -478,10 +445,6 @@ QtObject {
 		}
 
 		function createDocumentData(id, typeId, isNew){
-			if (root.getDocumentIndexByDocumentId(id) >= 0){
-				return
-			}
-
 			let documentData = documentDataFactory.createObject(root)
 			documentData.id = id
 			documentData.typeId = typeId
