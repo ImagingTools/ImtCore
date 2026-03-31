@@ -55,9 +55,9 @@ type DocumentInfo {
 	documentName: String!
 	objectTypeId: ID!
 	objectId: ID!
-	isDirty: Bool!
-	hasNameProvider: Bool!
-	isLoading: Bool!
+	isDirty: Bool
+	hasNameProvider: Bool
+	isLoading: Bool
 }
 
 type DocumentList {
