@@ -305,8 +305,37 @@ QtObject {
 		__internal.openedDocuments[index].isLoading = isLoading
 
 		if (!isLoading){
+			let docData = __internal.openedDocuments[index]
+			docData.documentDecorator.updateRepresentationForAllViews()
 			documentDataLoaded(documentId)
 		}
+	}
+
+	function setServerDocumentId(localId, serverDocId){
+		let index = getDocumentIndexByDocumentId(localId)
+		if (index < 0){
+			return
+		}
+
+		__internal.openedDocuments[index].serverDocumentId = serverDocId
+		__internal.serverDocumentIdMap[localId] = serverDocId
+		__internal.localDocumentIdMap[serverDocId] = localId
+	}
+
+	function getServerDocumentId(localId){
+		if (localId in __internal.serverDocumentIdMap){
+			return __internal.serverDocumentIdMap[localId]
+		}
+
+		return localId
+	}
+
+	function getLocalDocumentId(serverDocId){
+		if (serverDocId in __internal.localDocumentIdMap){
+			return __internal.localDocumentIdMap[serverDocId]
+		}
+
+		return serverDocId
 	}
 
 	function setDocumentIsDirty(documentId, isDirty){
@@ -401,12 +430,15 @@ QtObject {
 		property var cachedDocumentNames: ({}) // DocumentId -> Name
 		property var autoNamedTypeIds: ({}) // TypeId -> true for types with automatic name providers
 		property var documentManagerActiveView: null
+		property var serverDocumentIdMap: ({}) // localId -> serverDocumentId
+		property var localDocumentIdMap: ({}) // serverDocumentId -> localId
 
 		property Component documentDataFactory: Component{ 
 			QtObject{
 				id: documentData
 
 				property string id
+				property string serverDocumentId: ""
 				property string typeId
 				property string name
 				property bool isDirty: false
@@ -430,9 +462,9 @@ QtObject {
 					}
 
 					let representationController = representationControllerFactory.createObject(documentData)
-					representationController.documentId = id
+					representationController.documentId = Qt.binding(function() { return documentData.serverDocumentId || documentData.id })
 					representationController.view = view
-					documentDecorator.registerView(view, representationController, !isNew)
+					documentDecorator.registerView(view, representationController, !isNew && !isLoading)
 				}
 
 				function addView(viewTypeId, view){

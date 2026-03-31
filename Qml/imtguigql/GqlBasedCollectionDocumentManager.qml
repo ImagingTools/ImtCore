@@ -20,11 +20,16 @@ DocumentManagerBase {
 			let documentName = data.getData("documentName")
 			let operation = data.getData("documentOperation")
 
+			let localDocId = root.getLocalDocumentId(documentId)
+
 			if (operation === "DocumentDataLoaded"){
-				root.setDocumentIsLoading(documentId, false)
+				root.setDocumentIsLoading(localDocId, false)
+			}
+			else if (operation === "DocumentClosed"){
+				root.documentClosed(localDocId)
 			}
 
-			root.documentManagerChanged(operation, objectId, documentId, documentName)
+			root.documentManagerChanged(operation, objectId, localDocId, documentName)
 		}
 	}
 
@@ -40,7 +45,8 @@ DocumentManagerBase {
 			let availableRedoSteps = data.getData("availableRedoSteps")
 			let isDirty = data.getData("isDirty")
 
-			root.undoInfoReceived(documentId, availableUndoSteps, availableRedoSteps, isDirty)
+			let localDocId = root.getLocalDocumentId(documentId)
+			root.undoInfoReceived(localDocId, availableUndoSteps, availableRedoSteps, isDirty)
 		}
 	}
 
@@ -65,7 +71,12 @@ DocumentManagerBase {
 	function openDocument(typeId, documentId){
 		startOpenDocument(documentId, typeId)
 
+		// Open the tab immediately before any server call
+		documentOpened(documentId, typeId)
+		setDocumentIsLoading(documentId, true)
+
 		openDocumentRequest.typeId = typeId
+		openDocumentRequest.objectId = documentId
 		objectIdInput.m_id = documentId
 		objectIdInput.m_collectionId = collectionId
 
@@ -85,7 +96,8 @@ DocumentManagerBase {
 	function saveDocument(documentId, documentName){
 		startSaveDocument(documentId)
 
-		saveDocumentInput.m_documentId = documentId
+		let serverDocId = getServerDocumentId(documentId)
+		saveDocumentInput.m_documentId = serverDocId
 		saveDocumentInput.m_documentName= documentName
 		saveDocumentInput.m_collectionId = collectionId
 		saveDocumentRequest.documentId = documentId
@@ -124,7 +136,8 @@ DocumentManagerBase {
 				// Close
 				startCloseDocument(documentId)
 
-				documentIdInput.m_id = documentId
+				let serverDocId = root.getServerDocumentId(documentId)
+				documentIdInput.m_id = serverDocId
 				documentIdInput.m_collectionId = collectionId
 				closeDocumentRequest.documentId = documentId
 		
@@ -143,7 +156,8 @@ DocumentManagerBase {
 	function doUndo(documentId, steps){
 		startUndo(documentId, steps)
 
-		undoRedoInput.m_documentId = documentId
+		let serverDocId = getServerDocumentId(documentId)
+		undoRedoInput.m_documentId = serverDocId
 		undoRedoInput.m_steps = steps
 		collectionUndoRedoInput.m_collectionId = collectionId
 		collectionUndoRedoInput.m_undoRedoInput = undoRedoInput
@@ -155,7 +169,8 @@ DocumentManagerBase {
 	function doRedo(documentId, steps){
 		startRedo(documentId, steps)
 
-		undoRedoInput.m_documentId = documentId
+		let serverDocId = getServerDocumentId(documentId)
+		undoRedoInput.m_documentId = serverDocId
 		undoRedoInput.m_steps = steps
 		collectionUndoRedoInput.m_collectionId = collectionId
 		collectionUndoRedoInput.m_undoRedoInput = undoRedoInput
@@ -171,7 +186,8 @@ DocumentManagerBase {
 	function getUndoInfo(documentId){
 		startUndoInfoReceive(documentId)
 
-		documentIdInput.m_id = documentId
+		let serverDocId = getServerDocumentId(documentId)
+		documentIdInput.m_id = serverDocId
 		documentIdInput.m_collectionId = collectionId
 
 		getUndoInfoRequest.send(documentIdInput)
@@ -206,24 +222,25 @@ DocumentManagerBase {
 		sdlObjectComp: Component {
 			DocumentInfo {
 				onFinished: {
+					let localId = root.openDocumentRequest.objectId
 					root.setAutoNamedTypeId(m_objectTypeId, m_hasNameProvider)
-					root.setDocumentName(m_documentId, m_documentName)
-					root.documentOpened(m_documentId, m_objectTypeId)
-					if (m_isLoading !== undefined){
-						root.setDocumentIsLoading(m_documentId, m_isLoading)
-					}
+					root.setServerDocumentId(localId, m_documentId)
+					root.setDocumentName(localId, m_documentName)
 				}
 			}
 		}
 
 		property string typeId
+		property string objectId
 
 		function getHeaders(){
 			return root.getHeaders()
 		}
 
 		function onError(message, type){
-			root.openDocumentFailed("", message)
+			let localId = root.openDocumentRequest.objectId
+			root.documentClosed(localId)
+			root.openDocumentFailed(localId, message)
 		}
 	}
 
@@ -409,7 +426,8 @@ DocumentManagerBase {
 		sdlObjectComp: Component {
 			UndoInfo {
 				onFinished: {
-					root.undoInfoReceived(m_documentId, m_availableUndoSteps, m_availableRedoSteps, m_isDirty)
+					let localDocId = root.getLocalDocumentId(m_documentId)
+					root.undoInfoReceived(localDocId, m_availableUndoSteps, m_availableRedoSteps, m_isDirty)
 				}
 			}
 		}
