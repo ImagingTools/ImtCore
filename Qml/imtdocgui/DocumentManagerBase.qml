@@ -63,6 +63,17 @@ QtObject {
 		setDocumentIsDirty(documentId, isDirty)
 	}
 
+	onStartCloseDocument: {
+		let index = getDocumentIndexByDocumentId(documentId)
+		if (index >= 0){
+			__internal.openedDocuments[index].isClosing = true
+		}
+	}
+
+	onDocumentClosed: {
+		__internal.removeDocumentData(documentId)
+	}
+
 	onDocumentCreated: {
 		__internal.createDocumentData(documentId, typeId, true)
 	}
@@ -302,10 +313,14 @@ QtObject {
 			return
 		}
 
-		__internal.openedDocuments[index].isLoading = isLoading
+		let docData = __internal.openedDocuments[index]
+		if (docData.isClosing){
+			return
+		}
+
+		docData.isLoading = isLoading
 
 		if (!isLoading){
-			let docData = __internal.openedDocuments[index]
 			if (!docData.isNew){
 				docData.documentDecorator.updateRepresentationForAllViews()
 			}
@@ -416,6 +431,7 @@ QtObject {
 				property bool isDirty: false
 				property bool isNew: true
 				property bool isLoading: false
+				property bool isClosing: false
 				property var views: ({})
 				property DocumentDecorator documentDecorator: DocumentDecorator {
 					documentId: documentData.id
@@ -466,6 +482,15 @@ QtObject {
 			documentData.isNew = isNew
 
 			openedDocuments.push(documentData)
+		}
+
+		function removeDocumentData(documentId){
+			let index = root.getDocumentIndexByDocumentId(documentId)
+			if (index < 0){
+				return
+			}
+
+			openedDocuments.splice(index, 1)
 		}
 	}
 }
