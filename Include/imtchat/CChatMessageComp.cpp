@@ -64,7 +64,7 @@ void CChatMessageComp::SetContent(const QString& content)
 
 IChatMessage::MessageStatus CChatMessageComp::GetStatus() const
 {
-	return static_cast<IChatMessage::MessageStatus>(m_status);
+	return m_status;
 }
 
 

@@ -60,7 +60,7 @@ private:
 	QByteArray m_conversationId;
 	QByteArray m_senderId;
 	QString m_content;
-	int m_status = IChatMessage::MS_SENT;
+	IChatMessage::MessageStatus m_status = IChatMessage::MS_SENT;
 	QString m_createdAt;
 	QString m_updatedAt;
 	QByteArrayList m_entityReferences;
