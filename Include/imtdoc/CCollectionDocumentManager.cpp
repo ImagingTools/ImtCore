@@ -3,6 +3,7 @@
 
 
 // Qt includes
+#include <QtCore/QCoreApplication>
 #include <QtCore/QUuid>
 #include <QtCore/QThread>
 
@@ -152,11 +153,6 @@ QByteArray CCollectionDocumentManager::CreateNewDocument(const QByteArray& userI
 
 			if (docPtr != nullptr && objectPtr.IsValid()) {
 				docPtr->objectPtr = objectPtr;
-				docPtr->isLoading = false;
-
-				InitializeDocumentObservers(*docPtr, userId);
-
-				OnDocumentDataLoaded(userId, documentId);
 			}
 			else if (docPtr != nullptr) {
 				// Creation failed - close the document and notify client
@@ -166,6 +162,25 @@ QByteArray CCollectionDocumentManager::CreateNewDocument(const QByteArray& userI
 		}
 
 		worker->deleteLater();
+	});
+
+	// Initialize observers and fire events in the main thread after background work completes
+	QObject::connect(thread, &QThread::finished, QCoreApplication::instance(), [this, aliveGuard, userId, documentId]() {
+		auto isAlive = aliveGuard.lock();
+		if (!isAlive || !isAlive->load()) {
+			return;
+		}
+
+		QMutexLocker locker(&m_mutex);
+		WorkingDocument* docPtr = FindDocument(userId, documentId);
+
+		if (docPtr != nullptr && docPtr->objectPtr.IsValid() && docPtr->isLoading) {
+			docPtr->isLoading = false;
+
+			InitializeDocumentObservers(*docPtr, userId);
+
+			OnDocumentDataLoaded(userId, documentId);
+		}
 	});
 
 	QObject::connect(worker, &QObject::destroyed, thread, &QThread::quit);
@@ -288,11 +303,6 @@ QByteArray CCollectionDocumentManager::OpenDocument(const QByteArray& userId, co
 
 			if (docPtr != nullptr && success && dataPtr.IsValid()) {
 				docPtr->objectPtr = dataPtr;
-				docPtr->isLoading = false;
-
-				InitializeDocumentObservers(*docPtr, userId);
-
-				OnDocumentDataLoaded(userId, documentId);
 			}
 			else if (docPtr != nullptr) {
 				// Loading failed - close the document and notify client
@@ -302,6 +312,25 @@ QByteArray CCollectionDocumentManager::OpenDocument(const QByteArray& userId, co
 		}
 
 		worker->deleteLater();
+	});
+
+	// Initialize observers and fire events in the main thread after background work completes
+	QObject::connect(thread, &QThread::finished, QCoreApplication::instance(), [this, aliveGuard, userId, documentId]() {
+		auto isAlive = aliveGuard.lock();
+		if (!isAlive || !isAlive->load()) {
+			return;
+		}
+
+		QMutexLocker locker(&m_mutex);
+		WorkingDocument* docPtr = FindDocument(userId, documentId);
+
+		if (docPtr != nullptr && docPtr->objectPtr.IsValid() && docPtr->isLoading) {
+			docPtr->isLoading = false;
+
+			InitializeDocumentObservers(*docPtr, userId);
+
+			OnDocumentDataLoaded(userId, documentId);
+		}
 	});
 
 	QObject::connect(worker, &QObject::destroyed, thread, &QThread::quit);
