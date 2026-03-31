@@ -71,9 +71,12 @@ DocumentManagerBase {
 	function openDocument(typeId, documentId){
 		startOpenDocument(documentId, typeId)
 
-		// Open the tab immediately before any server call
-		documentOpened(documentId, typeId)
+		// Create document data with isLoading=true before emitting documentOpened,
+		// so that onViewAdded sees isLoading and skips the representation request
+		__internal.createDocumentData(documentId, typeId, false)
 		setDocumentIsLoading(documentId, true)
+
+		documentOpened(documentId, typeId)
 
 		openDocumentRequest.typeId = typeId
 		openDocumentRequest.objectId = documentId

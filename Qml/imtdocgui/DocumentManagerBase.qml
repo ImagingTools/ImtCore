@@ -478,6 +478,10 @@ QtObject {
 		}
 
 		function createDocumentData(id, typeId, isNew){
+			if (root.getDocumentIndexByDocumentId(id) >= 0){
+				return
+			}
+
 			let documentData = documentDataFactory.createObject(root)
 			documentData.id = id
 			documentData.typeId = typeId
