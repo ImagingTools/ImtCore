@@ -306,7 +306,9 @@ QtObject {
 
 		if (!isLoading){
 			let docData = __internal.openedDocuments[index]
-			docData.documentDecorator.updateRepresentationForAllViews()
+			if (!docData.isNew){
+				docData.documentDecorator.updateRepresentationForAllViews()
+			}
 			documentDataLoaded(documentId)
 		}
 	}
