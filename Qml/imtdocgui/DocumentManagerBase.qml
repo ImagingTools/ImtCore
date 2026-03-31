@@ -317,9 +317,13 @@ QtObject {
 			return
 		}
 
-		__internal.openedDocuments[index].serverDocumentId = serverDocId
 		__internal.serverDocumentIdMap[localId] = serverDocId
 		__internal.localDocumentIdMap[serverDocId] = localId
+
+		let decorator = __internal.openedDocuments[index].documentDecorator
+		for (let i = 0; i < decorator.registeredRepresentation.length; ++i){
+			decorator.registeredRepresentation[i].documentId = serverDocId
+		}
 	}
 
 	function getServerDocumentId(localId){
@@ -438,7 +442,6 @@ QtObject {
 				id: documentData
 
 				property string id
-				property string serverDocumentId: ""
 				property string typeId
 				property string name
 				property bool isDirty: false
@@ -462,7 +465,7 @@ QtObject {
 					}
 
 					let representationController = representationControllerFactory.createObject(documentData)
-					representationController.documentId = Qt.binding(function() { return documentData.serverDocumentId !== "" ? documentData.serverDocumentId : documentData.id })
+					representationController.documentId = id
 					representationController.view = view
 					documentDecorator.registerView(view, representationController, !isNew && !isLoading)
 				}
