@@ -10,7 +10,7 @@ class IRequest;
 class IProtocolEngine;
 class IRequestServlet;
 class IResponse;
-class ISender;
+class ITransport;
 class ISubscriber;
 
 

@@ -6,7 +6,7 @@
 #include <QtNetwork/QUdpSocket>
 
 // ImtCore includes
-#include <imtrest/ISender.h>
+#include <imtrest/ITransport.h>
 #include <imtrest/CUdpRequest.h>
 
 
@@ -14,13 +14,13 @@ namespace imtrest
 {
 
 
-class CUdpSender: public QObject, virtual public ISender
+class CUdpSender: public QObject, virtual public ITransport
 {
 	Q_OBJECT
 public:
 	CUdpSender(CUdpRequest* request);
 
-	// reimplemented (ISender)
+	// reimplemented (ITransport)
 	virtual bool SendResponse(ConstResponsePtr& response) const override;
 	virtual bool SendRequest(ConstRequestPtr& reguest) const override;
 

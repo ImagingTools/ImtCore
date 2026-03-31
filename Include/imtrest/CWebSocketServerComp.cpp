@@ -105,18 +105,31 @@ void CWebSocketServerComp::SendVerboseMessage(const QString& message, const QStr
 }
 
 
-// reimplemented (icomp::IRequestManager)
+// reimplemented (imtrest::IResponseDispatcher)
 
-const ISender* CWebSocketServerComp::GetSender(const QByteArray& requestId) const
+bool CWebSocketServerComp::SendResponse(const QByteArray& requestId, ConstResponsePtr& response) const
 {
 	QReadLocker locker(&m_sendersLock);
 
 	CWebSocketSender* sender = m_senders.value(requestId).data();
 	if (sender != nullptr){
-		return sender;
+		return sender->SendResponse(response);
 	}
 
-	return nullptr;
+	return false;
+}
+
+
+bool CWebSocketServerComp::SendRequest(const QByteArray& requestId, ConstRequestPtr& request) const
+{
+	QReadLocker locker(&m_sendersLock);
+
+	CWebSocketSender* sender = m_senders.value(requestId).data();
+	if (sender != nullptr){
+		return sender->SendRequest(request);
+	}
+
+	return false;
 }
 
 

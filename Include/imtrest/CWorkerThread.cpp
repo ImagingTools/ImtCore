@@ -45,13 +45,13 @@ void CWorkerThread::SetRequestPtr(const IRequest* requestPtr)
 }
 
 
-const ISender* CWorkerThread::GetSender(const QByteArray& requestId)
+bool CWorkerThread::SendResponse(const QByteArray& requestId, ConstResponsePtr& response)
 {
 	if (m_workerManager == nullptr){
-		return nullptr;
+		return false;
 	}
 
-	return m_workerManager->GetSender(requestId);
+	return m_workerManager->SendResponse(requestId, response);
 }
 
 

@@ -8,7 +8,7 @@
 
 // ImtCore includes
 #include <imtrest/IRequestServlet.h>
-#include <imtrest/ISender.h>
+#include <imtrest/ITransport.h>
 #include <imtrest/CSocket.h>
 
 
@@ -20,7 +20,7 @@ class CMultiThreadServer;
 class CSocketThread:
 			public QThread,
 			virtual public IRequestServlet,
-			virtual public ISender
+			virtual public ITransport
 {
 	Q_OBJECT
 public:
@@ -51,7 +51,7 @@ public:
 	virtual bool IsCommandSupported(const QByteArray& commandId) const override;
 	virtual ConstResponsePtr ProcessRequest(const IRequest& request, const QByteArray& subCommandId = QByteArray()) const override;
 
-	// reimplemented (ISender)
+	// reimplemented (ITransport)
 	virtual bool SendResponse(ConstResponsePtr& response) const override;
 	virtual bool SendRequest(ConstRequestPtr& reguest) const override;
 

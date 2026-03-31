@@ -6,21 +6,21 @@
 #include <QtWebSockets/QtWebSockets>
 
 // ImtCore includes
-#include <imtrest/ISender.h>
+#include <imtrest/ITransport.h>
 
 
 namespace imtrest
 {
 
 
-class CWebSocketSender: public QObject, virtual public ISender
+class CWebSocketSender: public QObject, virtual public ITransport
 {
 	Q_OBJECT
 public:
 	CWebSocketSender(QWebSocket* webSocketPtr);
 	const QWebSocket* GetSocket() const;
 
-	// reimplemented (ISender)
+	// reimplemented (ITransport)
 	virtual bool SendResponse(ConstResponsePtr& response) const override;
 	virtual bool SendRequest(ConstRequestPtr& reguest) const override;
 

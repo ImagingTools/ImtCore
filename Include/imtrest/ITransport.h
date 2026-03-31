@@ -12,9 +12,9 @@ namespace imtrest
 
 
 /**
-	Interface describing transfer of the server response to the client.
+	Interface describing the transport layer for sending responses and requests to the client.
 */
-class ISender: virtual public istd::IPolymorphic
+class ITransport: virtual public istd::IPolymorphic
 {
 public:
 	/**
@@ -23,11 +23,11 @@ public:
 	*/
 	virtual bool SendResponse(ConstResponsePtr& response) const = 0;
 	/*!
-		Send a response to the client.
+		Send a request to the client.
 		The transfer should be realized over the socket instance provided by the request object.
 
 	*/
-	virtual bool SendRequest(ConstRequestPtr& reguest) const = 0;
+	virtual bool SendRequest(ConstRequestPtr& request) const = 0;
 };
 
 
