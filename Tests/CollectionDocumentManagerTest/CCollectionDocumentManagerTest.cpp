@@ -17,7 +17,6 @@ const QByteArray TEST_TYPE_ID_2 = "TestType2";
 const QByteArray TEST_OBJECT_ID = "testObject123";
 const QByteArray TEST_OBJECT_ID_2 = "testObject456";
 const QString TEST_DOC_NAME = "Test Document";
-const int ASYNC_WAIT_MS = 500;
 
 }
 
