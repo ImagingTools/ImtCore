@@ -288,6 +288,7 @@ inline CDM::CDocumentInfo TCollectionDocumentManagerCompBase<Base, ColorCollecti
 	retVal.Version_1_0->objectId = QByteArray();
 	retVal.Version_1_0->isDirty = false;
 	retVal.Version_1_0->hasNameProvider = false;
+	retVal.Version_1_0->isLoading = false;
 
 	DocumentList list = BaseClass2::GetOpenedDocumentList(userId);
 	for (const DocumentListItem& docInfo : list) {
@@ -339,6 +340,7 @@ inline CDM::CDocumentInfo TCollectionDocumentManagerCompBase<Base, ColorCollecti
 	retVal.Version_1_0->objectId = *objectId->id;
 	retVal.Version_1_0->isDirty = false;
 	retVal.Version_1_0->hasNameProvider = false;
+	retVal.Version_1_0->isLoading = true;
 
 	DocumentList list = BaseClass2::GetOpenedDocumentList(userId);
 	for (const DocumentListItem& docInfo : list) {
@@ -346,6 +348,7 @@ inline CDM::CDocumentInfo TCollectionDocumentManagerCompBase<Base, ColorCollecti
 			retVal.Version_1_0->documentName = docInfo.name;
 			retVal.Version_1_0->objectTypeId = docInfo.typeId;
 			retVal.Version_1_0->hasNameProvider = docInfo.hasNameProvider;
+			retVal.Version_1_0->isLoading = docInfo.isLoading;
 			break;
 		}
 	}

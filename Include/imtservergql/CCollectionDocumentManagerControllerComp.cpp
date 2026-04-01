@@ -88,6 +88,7 @@ CDM::CDocumentInfo CCollectionDocumentManagerControllerComp::OnCreateNewDocument
 		retVal.Version_1_0->objectId = QByteArray();
 		retVal.Version_1_0->isDirty = false;
 		retVal.Version_1_0->hasNameProvider = false;
+		retVal.Version_1_0->isLoading = false;
 
 		imtdoc::IDocumentManager::DocumentList list = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
 		for (const imtdoc::IDocumentManager::DocumentListItem& info : list){
@@ -138,6 +139,7 @@ CDM::CDocumentInfo CCollectionDocumentManagerControllerComp::OnOpenDocument(
 		retVal.Version_1_0->objectId = *objectId->id;
 		retVal.Version_1_0->isDirty = false;
 		retVal.Version_1_0->hasNameProvider = false;
+		retVal.Version_1_0->isLoading = true;
 
 		imtdoc::IDocumentManager::DocumentList list = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
 		for (const imtdoc::IDocumentManager::DocumentListItem& info : list){
@@ -145,6 +147,7 @@ CDM::CDocumentInfo CCollectionDocumentManagerControllerComp::OnOpenDocument(
 				retVal.Version_1_0->documentName = info.name;
 				retVal.Version_1_0->objectTypeId = info.typeId;
 				retVal.Version_1_0->hasNameProvider = info.hasNameProvider;
+				retVal.Version_1_0->isLoading = info.isLoading;
 				break;
 			}
 		}

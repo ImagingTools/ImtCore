@@ -7,7 +7,7 @@
 
 // ImtCore includes
 #include<imtrest/IProtocolEngine.h>
-#include<imtrest/ISender.h>
+#include<imtrest/ITransport.h>
 #include<imtrest/CWebSocketRequest.h>
 
 

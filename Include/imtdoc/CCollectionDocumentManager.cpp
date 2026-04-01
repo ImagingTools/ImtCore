@@ -3,7 +3,9 @@
 
 
 // Qt includes
+#include <QtCore/QCoreApplication>
 #include <QtCore/QUuid>
+#include <QtCore/QThread>
 
 // ACF includes
 #include <istd/CChangeNotifier.h>
@@ -14,6 +16,7 @@
 #include <imtdoc/CDocumentChangedEvent.h>
 #include <imtdoc/CDocumentClosedEvent.h>
 #include <imtdoc/CDocumentCreatedEvent.h>
+#include <imtdoc/CDocumentDataLoadedEvent.h>
 #include <imtdoc/CDocumentOpenedEvent.h>
 #include <imtdoc/CDocumentRenamedEvent.h>
 #include <imtdoc/CDocumentSavedAsEvent.h>
@@ -29,7 +32,14 @@ namespace imtdoc
 
 CCollectionDocumentManager::CCollectionDocumentManager()
 	:m_undoManagerObserver(*this)
+	,m_isAlive(std::make_shared<std::atomic<bool>>(true))
 {
+}
+
+
+CCollectionDocumentManager::~CCollectionDocumentManager()
+{
+	m_isAlive->store(false);
 }
 
 
@@ -56,6 +66,7 @@ IDocumentManager::DocumentList CCollectionDocumentManager::GetOpenedDocumentList
 			info.name = workingDocument.name;
 			info.isDirty = workingDocument.isDirty;
 			info.hasNameProvider = HasDocumentNameProvider(workingDocument.typeId);
+			info.isLoading = workingDocument.isLoading;
 
 			list.append(info);
 		}
@@ -68,11 +79,6 @@ IDocumentManager::DocumentList CCollectionDocumentManager::GetOpenedDocumentList
 QByteArray CCollectionDocumentManager::CreateNewDocument(const QByteArray& userId, const QByteArray& documentTypeId)
 {
 	QByteArray retVal;
-
-	istd::IChangeableSharedPtr objectPtr = CreateObject(documentTypeId);
-	if (!objectPtr.IsValid()) {
-		return retVal;
-	}
 
 	idoc::IUndoManagerSharedPtr undoManagerPtr = CreateUndoManager();
 	if (!undoManagerPtr.IsValid()) {
@@ -88,12 +94,10 @@ QByteArray CCollectionDocumentManager::CreateNewDocument(const QByteArray& userI
 	}
 
 	documentPtr->typeId = documentTypeId;
-	documentPtr->objectPtr = objectPtr;
 	documentPtr->undoManagerPtr = undoManagerPtr;
 	documentPtr->isDirty = false;
 	documentPtr->name = "";
-
-	InitializeDocumentObservers(*documentPtr, userId);
+	documentPtr->isLoading = true;
 
 	{
 		NewDocumentCreatedInfo info;
@@ -120,6 +124,69 @@ QByteArray CCollectionDocumentManager::CreateNewDocument(const QByteArray& userI
 			handlerPtr->ProcessEvent(&event);
 		}
 	}
+
+	// Create object asynchronously in a separate thread
+	QByteArray documentId = retVal;
+	QThread* thread = new QThread();
+	QObject* worker = new QObject();
+	worker->moveToThread(thread);
+
+	std::weak_ptr<std::atomic<bool>> aliveGuard(m_isAlive);
+	QObject::connect(thread, &QThread::started, worker, [this, aliveGuard, documentTypeId, userId, documentId, worker]() {
+		auto isAlive = aliveGuard.lock();
+		if (!isAlive || !isAlive->load()) {
+			worker->deleteLater();
+			return;
+		}
+
+		istd::IChangeableSharedPtr objectPtr = CreateObject(documentTypeId);
+
+		isAlive = aliveGuard.lock();
+		if (!isAlive || !isAlive->load()) {
+			worker->deleteLater();
+			return;
+		}
+
+		{
+			QMutexLocker locker(&m_mutex);
+			WorkingDocument* docPtr = FindDocument(userId, documentId);
+
+			if (docPtr != nullptr && objectPtr.IsValid()) {
+				docPtr->objectPtr = objectPtr;
+			}
+			else if (docPtr != nullptr) {
+				// Creation failed - close the document and notify client
+				docPtr->isLoading = false;
+				CloseDocument(userId, documentId);
+			}
+		}
+
+		worker->deleteLater();
+	});
+
+	// Initialize observers and fire events in the main thread after background work completes
+	QObject::connect(thread, &QThread::finished, QCoreApplication::instance(), [this, aliveGuard, userId, documentId]() {
+		auto isAlive = aliveGuard.lock();
+		if (!isAlive || !isAlive->load()) {
+			return;
+		}
+
+		QMutexLocker locker(&m_mutex);
+		WorkingDocument* docPtr = FindDocument(userId, documentId);
+
+		if (docPtr != nullptr && docPtr->objectPtr.IsValid() && docPtr->isLoading) {
+			docPtr->isLoading = false;
+
+			InitializeDocumentObservers(*docPtr, userId);
+
+			OnDocumentDataLoaded(userId, documentId);
+		}
+	});
+
+	QObject::connect(worker, &QObject::destroyed, thread, &QThread::quit);
+	QObject::connect(thread, &QThread::finished, thread, &QObject::deleteLater);
+
+	thread->start();
 
 	return retVal;
 }
@@ -154,54 +221,122 @@ QByteArray CCollectionDocumentManager::OpenDocument(const QByteArray& userId, co
 
 	QByteArray objectTypeId = collectionPtr->GetObjectTypeId(objectId);
 
-	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (!objectTypeId.isEmpty() && collectionPtr->GetObjectData(objectId, dataPtr)) {
-		if (dataPtr.IsValid()) {
-			retVal = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+	if (objectTypeId.isEmpty()) {
+		return retVal;
+	}
 
-			WorkingDocument* documentPtr = nullptr;
-			{
-				QMutexLocker locker(&m_mutex);
-				documentPtr = &m_userDocuments[userId][retVal];
-			}
+	retVal = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
-			documentPtr->objectId = objectId;
-			documentPtr->typeId = objectTypeId;
-			documentPtr->name = collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
-			documentPtr->objectPtr = dataPtr;
-			documentPtr->undoManagerPtr = undoManagerPtr;
-			documentPtr->isDirty = false;
+	WorkingDocument* documentPtr = nullptr;
+	{
+		QMutexLocker locker(&m_mutex);
+		documentPtr = &m_userDocuments[userId][retVal];
+	}
 
-			InitializeDocumentObservers(*documentPtr, userId);
+	documentPtr->objectId = objectId;
+	documentPtr->typeId = objectTypeId;
+	documentPtr->name = collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
+	documentPtr->undoManagerPtr = undoManagerPtr;
+	documentPtr->isDirty = false;
+	documentPtr->isLoading = true;
 
-			{
-				DocumentOpenedInfo info;
-				info.userId = userId;
-				info.documentId = retVal;
-				info.typeId = objectTypeId;
-				info.url = "collection:///" + objectId;
-				info.name = documentPtr->name;
-				info.isDirty = false;
+	{
+		DocumentOpenedInfo info;
+		info.userId = userId;
+		info.documentId = retVal;
+		info.typeId = objectTypeId;
+		info.url = "collection:///" + objectId;
+		info.name = documentPtr->name;
+		info.isDirty = false;
+		info.isLoading = true;
 
-				istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_OPENED);
-				changeSet.SetChangeInfo(CN_DOCUMENT_OPENED, QVariant::fromValue(info));
-				istd::CChangeNotifier notifier(this, &changeSet);
-			}
+		istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_OPENED);
+		changeSet.SetChangeInfo(CN_DOCUMENT_OPENED, QVariant::fromValue(info));
+		istd::CChangeNotifier notifier(this, &changeSet);
+	}
 
-			for (IDocumentManagerEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
-				if (handlerPtr != nullptr){
-					CDocumentOpenedEvent event(
-						userId,
-						retVal,
-						objectTypeId,
-						documentPtr->name,
-						ObjectIdToUrl(documentPtr->objectId),
-						documentPtr->isDirty);
-					handlerPtr->ProcessEvent(&event);
-				}
-			}
+	for (IDocumentManagerEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
+		if (handlerPtr != nullptr){
+			CDocumentOpenedEvent event(
+				userId,
+				retVal,
+				objectTypeId,
+				documentPtr->name,
+				ObjectIdToUrl(documentPtr->objectId),
+				documentPtr->isDirty);
+			handlerPtr->ProcessEvent(&event);
 		}
 	}
+
+	// Load document data asynchronously in a separate thread
+	QByteArray documentId = retVal;
+	QThread* thread = new QThread();
+	QObject* worker = new QObject();
+	worker->moveToThread(thread);
+
+	std::weak_ptr<std::atomic<bool>> aliveGuard(m_isAlive);
+	QObject::connect(thread, &QThread::started, worker, [this, aliveGuard, objectId, userId, documentId, worker]() {
+		auto isAlive = aliveGuard.lock();
+		if (!isAlive || !isAlive->load()) {
+			worker->deleteLater();
+			return;
+		}
+
+		imtbase::IObjectCollection* collPtr = GetCollection();
+		if (collPtr == nullptr) {
+			worker->deleteLater();
+			return;
+		}
+
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		bool success = collPtr->GetObjectData(objectId, dataPtr);
+
+		isAlive = aliveGuard.lock();
+		if (!isAlive || !isAlive->load()) {
+			worker->deleteLater();
+			return;
+		}
+
+		{
+			QMutexLocker locker(&m_mutex);
+			WorkingDocument* docPtr = FindDocument(userId, documentId);
+
+			if (docPtr != nullptr && success && dataPtr.IsValid()) {
+				docPtr->objectPtr = dataPtr;
+			}
+			else if (docPtr != nullptr) {
+				// Loading failed - close the document and notify client
+				docPtr->isLoading = false;
+				CloseDocument(userId, documentId);
+			}
+		}
+
+		worker->deleteLater();
+	});
+
+	// Initialize observers and fire events in the main thread after background work completes
+	QObject::connect(thread, &QThread::finished, QCoreApplication::instance(), [this, aliveGuard, userId, documentId]() {
+		auto isAlive = aliveGuard.lock();
+		if (!isAlive || !isAlive->load()) {
+			return;
+		}
+
+		QMutexLocker locker(&m_mutex);
+		WorkingDocument* docPtr = FindDocument(userId, documentId);
+
+		if (docPtr != nullptr && docPtr->objectPtr.IsValid() && docPtr->isLoading) {
+			docPtr->isLoading = false;
+
+			InitializeDocumentObservers(*docPtr, userId);
+
+			OnDocumentDataLoaded(userId, documentId);
+		}
+	});
+
+	QObject::connect(worker, &QObject::destroyed, thread, &QThread::quit);
+	QObject::connect(thread, &QThread::finished, thread, &QObject::deleteLater);
+
+	thread->start();
 
 	return retVal;
 }
@@ -289,7 +424,12 @@ const istd::IChangeable* CCollectionDocumentManager::GetDocumentPtr(const QByteA
 		return nullptr;
 	}
 
-	return m_userDocuments[userId][documentId].objectPtr.GetPtr();
+	const WorkingDocument& document = m_userDocuments[userId][documentId];
+	if (document.isLoading) {
+		return nullptr;
+	}
+
+	return document.objectPtr.GetPtr();
 }
 
 
@@ -302,6 +442,10 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::GetDocumentData(co
 	}
 
 	WorkingDocument& workingDocument = m_userDocuments[userId][documentId];
+
+	if (workingDocument.isLoading) {
+		return OS_FAILED;
+	}
 
 	documentPtr = CreateObject(workingDocument.typeId);
 	if (!documentPtr.IsValid()) {
@@ -328,6 +472,10 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SetDocumentData(co
 		}
 
 		workingDocumentPtr = &m_userDocuments[userId][documentId];
+	}
+
+	if (workingDocumentPtr->isLoading) {
+		return OS_FAILED;
 	}
 
 	bool isCopySuccessful = workingDocumentPtr->objectPtr->CopyFrom(document);
@@ -357,6 +505,10 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
 		}
 
 		workingDocumentPtr = &m_userDocuments[userId][documentId];
+
+		if (workingDocumentPtr->isLoading) {
+			return OS_FAILED;
+		}
 
 		documentSnapshotPtr = CreateObject(workingDocumentPtr->typeId);
 		if (!documentSnapshotPtr.IsValid()){
@@ -856,6 +1008,44 @@ void CCollectionDocumentManager::InitializeDocumentObservers(
 	document.undoManagerModelId = undoManagerModelId;
 	if (undoModelPtr != nullptr){
 		m_undoManagerObserver.RegisterModel(undoModelPtr, undoManagerModelId);
+	}
+}
+
+
+void CCollectionDocumentManager::OnDocumentDataLoaded(
+	const QByteArray& userId,
+	const QByteArray& documentId)
+{
+	WorkingDocument* documentPtr = FindDocument(userId, documentId);
+	if (documentPtr == nullptr) {
+		return;
+	}
+
+	{
+		DocumentDataLoadedInfo info;
+		info.userId = userId;
+		info.documentId = documentId;
+		info.typeId = documentPtr->typeId;
+		info.url = ObjectIdToUrl(documentPtr->objectId);
+		info.name = documentPtr->name;
+		info.isDirty = documentPtr->isDirty;
+
+		istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_DATA_LOADED);
+		changeSet.SetChangeInfo(CN_DOCUMENT_DATA_LOADED, QVariant::fromValue(info));
+		istd::CChangeNotifier notifier(this, &changeSet);
+	}
+
+	for (IDocumentManagerEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
+		if (handlerPtr != nullptr){
+			CDocumentDataLoadedEvent event(
+				userId,
+				documentId,
+				documentPtr->typeId,
+				documentPtr->name,
+				ObjectIdToUrl(documentPtr->objectId),
+				documentPtr->isDirty);
+			handlerPtr->ProcessEvent(&event);
+		}
 	}
 }
 

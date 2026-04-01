@@ -7,7 +7,7 @@
 
 // ImtCore includes
 #include<imtrest/IProtocolEngine.h>
-#include<imtrest/ISender.h>
+#include<imtrest/ITransport.h>
 #include<imtrest/CWebSocketRequest.h>
 
 
@@ -141,13 +141,7 @@ bool CGqlPublisherCompBase::PushDataToSubscriber(
 		return false;
 	}
 
-	const imtrest::ISender* sender = m_requestManagerCompPtr->GetSender(networkRequest.GetRequestId());
-	if (sender == nullptr){
-		SendErrorMessage(0, QString("Unable to send response to subscriber. Error: Cannot found sender for request ID '%1'").arg(qPrintable(networkRequest.GetRequestId())), "CGqlPublisherCompBase");
-		return false;
-	}
-
-	bool retVal = sender->SendResponse(responsePtr);
+	bool retVal = m_requestManagerCompPtr->SendResponse(networkRequest.GetRequestId(), responsePtr);
 	if (!retVal){
 		QString message = QString("Unable to send response to subscriber. Data: '%1'").arg(qPrintable(data));
 		SendErrorMessage(0, message, "CGqlPublisherCompBase");

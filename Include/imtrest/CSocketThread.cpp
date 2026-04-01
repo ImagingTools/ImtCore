@@ -7,7 +7,7 @@
 
 // ImtCore includes
 #include <imtrest/IProtocolEngine.h>
-#include <imtrest/ISender.h>
+#include <imtrest/ITransport.h>
 #include <imtrest/CMultiThreadServer.h>
 
 
@@ -138,7 +138,7 @@ ConstResponsePtr CSocketThread::ProcessRequest(const IRequest& request, const QB
 }
 
 
-// reimplemented (ISender)
+// reimplemented (ITransport)
 
 bool CSocketThread::SendResponse(ConstResponsePtr& response) const
 {
@@ -148,7 +148,7 @@ bool CSocketThread::SendResponse(ConstResponsePtr& response) const
 }
 
 
-bool CSocketThread::SendRequest(ConstRequestPtr& /*reguest*/) const
+bool CSocketThread::SendRequest(ConstRequestPtr& /*request*/) const
 {
 	return false;
 }

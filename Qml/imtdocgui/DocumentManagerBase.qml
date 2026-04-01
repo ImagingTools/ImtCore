@@ -45,6 +45,7 @@ QtObject {
 
 	// typeOperation: NewDocumentCreated, DocumentOpened, DocumentChanged, DocumentSaved, DocumentClosed
 	signal documentManagerChanged(string typeOperation, string objectId, string documentId, string documentName)
+	signal documentDataLoaded(string documentId)
 	signal startUpdateRepresentation(string documentId, var representation)
 	signal documentRepresentationUpdated(string documentId, var representation)
 	signal documentGuiUpdated(string documentId, var representation)
@@ -60,6 +61,17 @@ QtObject {
 
 	onUndoInfoReceived: {
 		setDocumentIsDirty(documentId, isDirty)
+	}
+
+	onStartCloseDocument: {
+		let index = getDocumentIndexByDocumentId(documentId)
+		if (index >= 0){
+			__internal.openedDocuments[index].isClosing = true
+		}
+	}
+
+	onDocumentClosed: {
+		__internal.removeDocumentData(documentId)
 	}
 
 	onDocumentCreated: {
@@ -286,6 +298,43 @@ QtObject {
 		return __internal.openedDocuments[index].isDirty
 	}
 
+	function documentIsLoading(documentId){
+		let index = getDocumentIndexByDocumentId(documentId)
+		if (index < 0){
+			return false
+		}
+
+		return __internal.openedDocuments[index].isLoading
+	}
+
+	function setDocumentIsLoading(documentId, isLoading){
+		let index = getDocumentIndexByDocumentId(documentId)
+		if (index < 0){
+			return
+		}
+
+		let docData = __internal.openedDocuments[index]
+		if (docData.isClosing){
+			return
+		}
+
+		docData.isLoading = isLoading
+
+		if (!isLoading){
+			if (!docData.isNew){
+				docData.documentDecorator.updateRepresentationForAllViews()
+			}
+			else{
+				let decorator = docData.documentDecorator
+				for (let i = 0; i < decorator.registeredViews.length; ++i){
+					decorator.registeredViews[i].setBlockingUpdateModel(false)
+					decorator.registeredViews[i].doUpdateGui()
+				}
+			}
+			documentDataLoaded(documentId)
+		}
+	}
+
 	function setDocumentIsDirty(documentId, isDirty){
 		let index = getDocumentIndexByDocumentId(documentId)
 		if (index < 0){
@@ -388,6 +437,8 @@ QtObject {
 				property string name
 				property bool isDirty: false
 				property bool isNew: true
+				property bool isLoading: false
+				property bool isClosing: false
 				property var views: ({})
 				property DocumentDecorator documentDecorator: DocumentDecorator {
 					documentId: documentData.id
@@ -408,7 +459,7 @@ QtObject {
 					let representationController = representationControllerFactory.createObject(documentData)
 					representationController.documentId = id
 					representationController.view = view
-					documentDecorator.registerView(view, representationController, !isNew)
+					documentDecorator.registerView(view, representationController, !isNew && !isLoading)
 				}
 
 				function addView(viewTypeId, view){
@@ -419,6 +470,10 @@ QtObject {
 		}
 
 		function createDocumentData(id, typeId, isNew){
+			if (root.getDocumentIndexByDocumentId(id) >= 0){
+				return
+			}
+
 			let documentData = documentDataFactory.createObject(root)
 			documentData.id = id
 			documentData.typeId = typeId
@@ -434,6 +489,15 @@ QtObject {
 			documentData.isNew = isNew
 
 			openedDocuments.push(documentData)
+		}
+
+		function removeDocumentData(documentId){
+			let index = root.getDocumentIndexByDocumentId(documentId)
+			if (index < 0){
+				return
+			}
+
+			openedDocuments.splice(index, 1)
 		}
 	}
 }
