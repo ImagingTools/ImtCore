@@ -1101,7 +1101,7 @@ void CCollectionDocumentManagerTest::ValidateInputParamsInvalidDocumentTest()
 
 void CCollectionDocumentManagerTest::ObjectIdToUrlTest()
 {
-	QUrl url = CTestableDocumentManager::ObjectIdToUrl("myObjectId");
+	QUrl url = m_managerPtr->ObjectIdToUrl("myObjectId");
 	QCOMPARE(url.toString(), QString("collection:///myObjectId"));
 	QCOMPARE(url.scheme(), QString("collection"));
 	QVERIFY2(url.host().isEmpty(), "URL host should be empty");
@@ -1196,3 +1196,6 @@ void CCollectionDocumentManagerTest::MultiUserIsolationTest()
 	QCOMPARE(status, imtdoc::IDocumentManager::OS_OK);
 	QCOMPARE(name, QString("User2 Doc"));
 }
+
+
+I_ADD_TEST(CCollectionDocumentManagerTest);

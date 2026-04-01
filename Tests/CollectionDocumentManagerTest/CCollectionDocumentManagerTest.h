@@ -12,6 +12,7 @@
 #include <idoc/IUndoManager.h>
 #include <idoc/IDocumentStateComparator.h>
 #include <istd/IChangeable.h>
+#include <itest/CStandardTestExecutor.h>
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
@@ -42,29 +43,10 @@ public:
 	void SetData(const QByteArray& data) { m_data = data; }
 
 	// reimplemented (imod::IModel)
-	virtual bool AttachObserver(imod::IObserver* observerPtr) override
-	{
-		if (observerPtr == nullptr || m_observers.contains(observerPtr)) {
-			return false;
-		}
-		m_observers.append(observerPtr);
-		return true;
-	}
-
-	virtual void DetachObserver(imod::IObserver* observerPtr) override
-	{
-		m_observers.removeAll(observerPtr);
-	}
-
-	virtual void DetachAllObservers() override
-	{
-		m_observers.clear();
-	}
-
-	virtual bool IsAttached(const imod::IObserver* observerPtr) const override
-	{
-		return m_observers.contains(const_cast<imod::IObserver*>(observerPtr));
-	}
+	virtual bool AttachObserver(imod::IObserver* /*observerPtr*/) override { return true; }
+	virtual void DetachObserver(imod::IObserver* /*observerPtr*/) override {}
+	virtual void DetachAllObservers() override {}
+	virtual bool IsAttached(const imod::IObserver* /*observerPtr*/) const override { return true; }
 
 	// reimplemented (istd::IChangeable)
 	virtual int GetSupportedOperations() const override { return SO_CLONE | SO_COPY | SO_COMPARE; }
@@ -606,6 +588,9 @@ class CMockObserver : public imod::IObserver
 public:
 	virtual void BeforeUpdate(imod::IModel* /*modelPtr*/) override {}
 	virtual void AfterUpdate(imod::IModel* /*modelPtr*/, const istd::IChangeable::ChangeSet& /*changeSet*/) override {}
+	bool IsModelAttached(const imod::IModel* modelPtr) const override { return true; }
+	bool OnModelAttached(imod::IModel* modelPtr, istd::IChangeable::ChangeSet& changeMask) override { return true; }
+	bool OnModelDetached(imod::IModel* modelPtr) override { return true; }
 };
 
 
