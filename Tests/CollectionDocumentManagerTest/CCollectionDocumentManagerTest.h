@@ -43,10 +43,29 @@ public:
 	void SetData(const QByteArray& data) { m_data = data; }
 
 	// reimplemented (imod::IModel)
-	virtual bool AttachObserver(imod::IObserver* /*observerPtr*/) override { return true; }
-	virtual void DetachObserver(imod::IObserver* /*observerPtr*/) override {}
-	virtual void DetachAllObservers() override {}
-	virtual bool IsAttached(const imod::IObserver* /*observerPtr*/) const override { return true; }
+	virtual bool AttachObserver(imod::IObserver* observerPtr) override
+	{
+		if (observerPtr == nullptr || m_observers.contains(observerPtr)) {
+			return false;
+		}
+		m_observers.append(observerPtr);
+		return true;
+	}
+
+	virtual void DetachObserver(imod::IObserver* observerPtr) override
+	{
+		m_observers.removeAll(observerPtr);
+	}
+
+	virtual void DetachAllObservers() override
+	{
+		m_observers.clear();
+	}
+
+	virtual bool IsAttached(const imod::IObserver* observerPtr) const override
+	{
+		return m_observers.contains(const_cast<imod::IObserver*>(observerPtr));
+	}
 
 	// reimplemented (istd::IChangeable)
 	virtual int GetSupportedOperations() const override { return SO_CLONE | SO_COPY | SO_COMPARE; }
@@ -84,6 +103,7 @@ public:
 
 private:
 	QByteArray m_data;
+	QList<imod::IObserver*> m_observers;
 };
 
 

@@ -206,7 +206,7 @@ void CCollectionDocumentManagerTest::CreateNewDocumentEventFiredTest()
 
 	bool foundCreatedEvent = false;
 	for (const auto& event : events) {
-		if (event.type == "DocumentCreated") {
+		if (event.type == "DocumentCreatedEvent") {
 			foundCreatedEvent = true;
 			QCOMPARE(event.userId, TEST_USER_ID);
 			QCOMPARE(event.documentTypeId, TEST_TYPE_ID);
@@ -316,7 +316,7 @@ void CCollectionDocumentManagerTest::OpenDocumentEventFiredTest()
 	const auto& events = m_managerPtr->GetMockEventHandler().GetEvents();
 	bool foundOpenedEvent = false;
 	for (const auto& event : events) {
-		if (event.type == "DocumentOpened") {
+		if (event.type == "DocumentOpenedEvent") {
 			foundOpenedEvent = true;
 			QCOMPARE(event.userId, TEST_USER_ID);
 			break;
@@ -468,7 +468,7 @@ void CCollectionDocumentManagerTest::SetDocumentNameEventFiredTest()
 	const auto& events = m_managerPtr->GetMockEventHandler().GetEvents();
 	bool foundRenameEvent = false;
 	for (const auto& event : events) {
-		if (event.type == "DocumentRenamed") {
+		if (event.type == "DocumentRenamedEvent") {
 			foundRenameEvent = true;
 			QCOMPARE(event.documentName, QString("NewName"));
 			break;
@@ -798,7 +798,7 @@ void CCollectionDocumentManagerTest::SaveDocumentEventFiredTest()
 	const auto& events = m_managerPtr->GetMockEventHandler().GetEvents();
 	bool foundSavedEvent = false;
 	for (const auto& event : events) {
-		if (event.type == "DocumentSaved") {
+		if (event.type == "DocumentSavedEvent") {
 			foundSavedEvent = true;
 			break;
 		}
@@ -821,7 +821,7 @@ void CCollectionDocumentManagerTest::SaveDocumentSaveAsEventFiredTest()
 	const auto& events = m_managerPtr->GetMockEventHandler().GetEvents();
 	bool foundSavedAsEvent = false;
 	for (const auto& event : events) {
-		if (event.type == "DocumentSavedAs") {
+		if (event.type == "DocumentSavedAsEvent") {
 			foundSavedAsEvent = true;
 			break;
 		}
@@ -871,7 +871,7 @@ void CCollectionDocumentManagerTest::CloseDocumentEventFiredTest()
 	const auto& events = m_managerPtr->GetMockEventHandler().GetEvents();
 	bool foundClosedEvent = false;
 	for (const auto& event : events) {
-		if (event.type == "DocumentClosed") {
+		if (event.type == "DocumentClosedEvent") {
 			foundClosedEvent = true;
 			QCOMPARE(event.userId, TEST_USER_ID);
 			break;
