@@ -55,10 +55,7 @@ void CStructureSubscriberControllerComp::OnUpdate(const istd::IChangeable::Chang
 
 			imtrest::ConstResponsePtr responsePtr(engine.CreateResponse(*networkRequest, imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId).PopInterfacePtr());
 			if (responsePtr.IsValid()){
-				const imtrest::ISender* sender = m_requestManagerCompPtr->GetSender(networkRequest->GetRequestId());
-				if (sender != nullptr){
-					sender->SendResponse(responsePtr);
-				}
+				m_requestManagerCompPtr->SendResponse(networkRequest->GetRequestId(), responsePtr);
 			}
 		}
 	}

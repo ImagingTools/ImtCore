@@ -5,6 +5,11 @@
 // Qt includes
 #include <QtCore/QMutex>
 #include <QtCore/QString>
+#include <QtCore/QThread>
+
+// STL includes
+#include <atomic>
+#include <memory>
 
 // ACF includes
 #include <idoc/IDocumentManager.h>
@@ -28,6 +33,7 @@ class CCollectionDocumentManager:
 {
 public:
 	CCollectionDocumentManager();
+	virtual ~CCollectionDocumentManager();
 
 	// reimplemented (imtdoc::ICollectionDocumentManager)
 	virtual DocumentList GetOpenedDocumentList(const QByteArray& userId) const override;
@@ -71,6 +77,7 @@ protected:
 	const WorkingDocument* FindDocument(const QByteArray& userId, const QByteArray& documentId) const;
 	bool FindDocument(int undoManagerModelId, QByteArray& outUserId, QByteArray& outDocumentId);
 	void InitializeDocumentObservers(WorkingDocument& document, const QByteArray& userId);
+	void OnDocumentDataLoaded(const QByteArray& userId, const QByteArray& documentId);
 	QUrl ObjectIdToUrl(const QByteArray& objectId);
 
 	virtual QList<imtdoc::IDocumentManagerEventHandler*> GetDocumentManagerEventHandlers() const;
@@ -87,6 +94,7 @@ protected:
 		istd::IChangeableSharedPtr objectPtr;
 		idoc::IUndoManagerSharedPtr undoManagerPtr;
 		bool isDirty;
+		bool isLoading = false;
 		int undoManagerModelId = -1;
 	};
 
@@ -107,6 +115,7 @@ protected:
 	mutable QRecursiveMutex m_mutex;
 
 	UndoManagerObserver m_undoManagerObserver;
+	std::shared_ptr<std::atomic<bool>> m_isAlive;
 
 private:
 	DocumentNotificationPtr CreateDocumentNotification(const QByteArray& userId, const QByteArray& documentId) const;

@@ -74,11 +74,17 @@ imtrest::ConstResponsePtr CWebSocketServletComp::ProcessRequest(const imtrest::I
 }
 
 
-// reimplemented (imtrest::IRequestManager)
+// reimplemented (imtrest::IResponseDispatcher)
 
-const imtrest::ISender* CWebSocketServletComp::GetSender(const QByteArray& /*requestId*/) const
+bool CWebSocketServletComp::SendResponse(const QByteArray& /*requestId*/, imtrest::ConstResponsePtr& /*response*/) const
 {
-	return nullptr;
+	return false;
+}
+
+
+bool CWebSocketServletComp::SendRequest(const QByteArray& /*requestId*/, imtrest::ConstRequestPtr& /*request*/) const
+{
+	return false;
 }
 
 

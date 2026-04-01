@@ -94,7 +94,7 @@ IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(GqlRequestPtr reque
 }
 
 
-// reimplemented (imtrest::ISender)
+// reimplemented (imtrest::ITransport)
 
 bool CWebSocketClientComp::SendResponse(imtrest::ConstResponsePtr& response) const
 {
@@ -122,11 +122,17 @@ bool CWebSocketClientComp::SendRequest(imtrest::ConstRequestPtr& request) const
 }
 
 
-// reimplemented (imtrest::IRequestManager)
+// reimplemented (imtrest::IResponseDispatcher)
 
-const imtrest::ISender* CWebSocketClientComp::GetSender(const QByteArray& /*requestId*/) const
+bool CWebSocketClientComp::SendResponse(const QByteArray& /*requestId*/, imtrest::ConstResponsePtr& response) const
 {
-	return this;
+	return SendResponse(response);
+}
+
+
+bool CWebSocketClientComp::SendRequest(const QByteArray& /*requestId*/, imtrest::ConstRequestPtr& request) const
+{
+	return SendRequest(request);
 }
 
 

@@ -30,13 +30,13 @@ IRequestServletPtr CWorkerManagerComp::CreateServlet()
 }
 
 
-const ISender* CWorkerManagerComp::GetSender(const QByteArray& requestId)
+bool CWorkerManagerComp::SendResponse(const QByteArray& requestId, ConstResponsePtr& response)
 {
 	if (!m_requestManagerCompPtr.IsValid()){
-		return nullptr;
+		return false;
 	}
 
-	return m_requestManagerCompPtr->GetSender(requestId);
+	return m_requestManagerCompPtr->SendResponse(requestId, response);
 }
 
 

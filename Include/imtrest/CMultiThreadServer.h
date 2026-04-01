@@ -12,7 +12,7 @@
 
 // ImtCore  includes
 #include <imtrest/CTcpServerComp.h>
-#include <imtrest/IRequestManager.h>
+#include <imtrest/IResponseDispatcher.h>
 #include <imtrest/CSocketThread.h>
 
 
@@ -27,7 +27,7 @@ class CMultiThreadServer :
 		public QTcpServer,
 #endif
 			virtual public ilog::CLoggerBase,
-			virtual public IRequestManager
+			virtual public IResponseDispatcher
 {
 	Q_OBJECT
 public:
@@ -56,8 +56,9 @@ public:
 	 */
 	void SetSslConfiguration(const QSslConfiguration& sslConfiguration);
 
-	// reimplemented (imtrest::IRequestManager)
-	virtual const ISender* GetSender(const QByteArray& requestId) const override;
+	// reimplemented (imtrest::IResponseDispatcher)
+	virtual bool SendResponse(const QByteArray& requestId, ConstResponsePtr& response) const override;
+	virtual bool SendRequest(const QByteArray& requestId, ConstRequestPtr& request) const override;
 
 Q_SIGNALS:
 	void NewThreadConnection(const IRequest* request, const QByteArray& subCommandId);

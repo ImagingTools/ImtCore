@@ -6,6 +6,7 @@
 #include <imtdoc/CDocumentChangedEvent.h>
 #include <imtdoc/CDocumentClosedEvent.h>
 #include <imtdoc/CDocumentCreatedEvent.h>
+#include <imtdoc/CDocumentDataLoadedEvent.h>
 #include <imtdoc/CDocumentOpenedEvent.h>
 #include <imtdoc/CDocumentRenamedEvent.h>
 #include <imtdoc/CDocumentSavedAsEvent.h>
@@ -59,6 +60,7 @@ bool CCollectionDocumentManagerPublisherComp::ProcessEvent(imtdoc::CEventBase* e
 	retVal = retVal || OnDocumentSaved(eventPtr);
 	retVal = retVal || OnDocumentSavedAs(eventPtr);
 	retVal = retVal || OnDocumentClosed(eventPtr);
+	retVal = retVal || OnDocumentDataLoaded(eventPtr);
 
 	return retVal;
 }
@@ -229,6 +231,25 @@ bool CCollectionDocumentManagerPublisherComp::OnDocumentClosed(imtdoc::CEventBas
 	sdlNotification.documentName.emplace();
 
 	PublishRepresentation(GetCommandId(), concreteEventPtr->GetUserId(), sdlNotification);
+
+	return true;
+}
+
+
+bool CCollectionDocumentManagerPublisherComp::OnDocumentDataLoaded(imtdoc::CEventBase* eventPtr) const
+{
+	imtdoc::CDocumentDataLoadedEvent* concreteEventPtr = dynamic_cast<imtdoc::CDocumentDataLoadedEvent*>(eventPtr);
+	if (concreteEventPtr == nullptr){
+		return false;
+	}
+
+	imtdoc::IDocumentManager::DocumentNotification notification;
+	FillDocumentNotification(concreteEventPtr, notification);
+
+	sdl::imtbase::CollectionDocumentManager::CDocumentManagerNotification::V1_0 sdlNotification;
+	FillSdlNotification(notification, CDM::EDocumentOperation::DocumentDataLoaded, sdlNotification);
+
+	PublishRepresentation(GetCommandId(), notification.userId, sdlNotification);
 
 	return true;
 }

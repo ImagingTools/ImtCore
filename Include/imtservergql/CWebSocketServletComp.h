@@ -4,7 +4,7 @@
 
 // ImtCore includes
 #include <imtrest/CHttpRootServletComp.h>
-#include <imtrest/IRequestManager.h>
+#include <imtrest/IResponseDispatcher.h>
 #include <imtgql/IGqlSubscriberController.h>
 #include <imtgql/IGqlRequestHandler.h>
 
@@ -16,7 +16,7 @@ namespace imtservergql
 class CWebSocketServletComp:
 			public ilog::CLoggerComponentBase,
 			virtual public imtrest::IRequestServlet,
-			virtual public imtrest::IRequestManager
+			virtual public imtrest::IResponseDispatcher
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
@@ -31,8 +31,9 @@ public:
 	virtual bool IsCommandSupported(const QByteArray& commandId) const override;
 	virtual imtrest::ConstResponsePtr ProcessRequest(const imtrest::IRequest& request, const QByteArray& subCommandId = QByteArray()) const override;
 
-	// reimplemented (imtrest::IRequestManager)
-	virtual const imtrest::ISender* GetSender(const QByteArray& requestId) const override;
+	// reimplemented (imtrest::IResponseDispatcher)
+	virtual bool SendResponse(const QByteArray& requestId, imtrest::ConstResponsePtr& response) const override;
+	virtual bool SendRequest(const QByteArray& requestId, imtrest::ConstRequestPtr& request) const override;
 
 protected:
 	virtual imtrest::ConstResponsePtr InitConnection(const imtrest::IRequest& request) const;
