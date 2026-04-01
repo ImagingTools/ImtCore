@@ -41,6 +41,12 @@ public:
 	QByteArray GetData() const { return m_data; }
 	void SetData(const QByteArray& data) { m_data = data; }
 
+	// reimplemented (imod::IModel)
+	virtual bool AttachObserver(imod::IObserver* /*observerPtr*/) override { return true; }
+	virtual void DetachObserver(imod::IObserver* /*observerPtr*/) override {}
+	virtual void DetachAllObservers() override {}
+	virtual bool IsAttached(const imod::IObserver* /*observerPtr*/) const override { return true; }
+
 	// reimplemented (istd::IChangeable)
 	virtual int GetSupportedOperations() const override { return SO_CLONE | SO_COPY | SO_COMPARE; }
 
@@ -55,9 +61,14 @@ public:
 		return true;
 	}
 
-	virtual istd::IChangeableUniquePtr CloneMe(CompatibilityMode /*mode*/ = CM_WITHOUT_REFS) const override
+	virtual istd::IChangeableUniquePtr CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override
 	{
-		return istd::IChangeableUniquePtr(new CMockDocumentObject(m_data));
+		istd::IChangeableUniquePtr clonePtr(new CMockDocumentObject);
+		if (clonePtr->CopyFrom(*this, mode)){
+			return clonePtr;
+		}
+	
+		return nullptr;
 	}
 
 	virtual bool IsEqual(const IChangeable& object) const override
@@ -93,31 +104,31 @@ public:
 	bool WasStateStored() const { return m_storedState; }
 	void ResetStoredFlag() { m_storedState = false; }
 
+	// reimplemented (imod::IModel)
+	virtual bool AttachObserver(imod::IObserver* /*observerPtr*/) override { return true; }
+	virtual void DetachObserver(imod::IObserver* /*observerPtr*/) override {}
+	virtual void DetachAllObservers() override {}
+	virtual bool IsAttached(const imod::IObserver* /*observerPtr*/) const override { return true; }
+
 	// reimplemented (idoc::IUndoManager)
-	virtual bool Undo() override { return true; }
-	virtual bool Redo() override { return true; }
+	virtual bool DoUndo(int steps = 1) override { return true; }
+	virtual bool DoRedo(int steps = 1) override { return true; }
 	virtual int GetAvailableUndoSteps() const override { return 0; }
 	virtual int GetAvailableRedoSteps() const override { return 0; }
-	virtual QStringList GetUndoLevelDescriptions() const override { return {}; }
-	virtual QStringList GetRedoLevelDescriptions() const override { return {}; }
+	virtual QString GetUndoLevelDescription(int stepIndex) const override { return QString(); }
+	virtual QString GetRedoLevelDescription(int stepIndex) const override { return QString(); }
+	virtual void ResetUndo() override {}
 
-	virtual void StoreDocumentState() override
-	{
-		m_storedState = true;
-	}
+	// reimplemented (idoc::IDocumentStateComparator)
+	virtual bool HasStoredDocumentState() const override { return true; }
+	virtual bool StoreDocumentState() override { return true; }
+	virtual bool RestoreDocumentState() override { return true; }
+	virtual DocumentChangeFlag GetDocumentChangeFlag() const override { return m_documentChangeFlag; }
 
-	virtual idoc::IDocumentStateComparator::DocumentChangeFlags GetDocumentChangeFlag() const override
-	{
-		return m_documentChangeFlag;
-	}
-
-	void SetDocumentChangeFlag(idoc::IDocumentStateComparator::DocumentChangeFlags flag)
-	{
-		m_documentChangeFlag = flag;
-	}
+	void SetDocumentChangeFlag(idoc::IDocumentStateComparator::DocumentChangeFlag flag){ m_documentChangeFlag = flag; }
 
 private:
-	idoc::IDocumentStateComparator::DocumentChangeFlags m_documentChangeFlag;
+	idoc::IDocumentStateComparator::DocumentChangeFlag m_documentChangeFlag;
 	bool m_storedState;
 };
 
@@ -259,8 +270,8 @@ public:
 	}
 
 	// reimplemented (imtbase::IObjectCollection)
-	virtual const IRevisionController* GetRevisionController() const override { return nullptr; }
-	virtual const ICollectionDataController* GetDataController() const override { return nullptr; }
+	virtual const imtbase::IRevisionController* GetRevisionController() const override { return nullptr; }
+	virtual const imtbase::ICollectionDataController* GetDataController() const override { return nullptr; }
 
 	virtual int GetOperationFlags(const Id& /*elementId*/ = Id()) const override
 	{
@@ -275,7 +286,7 @@ public:
 		const Id& proposedElementId = Id(),
 		const idoc::IDocumentMetaInfo* /*dataMetaInfoPtr*/ = nullptr,
 		const idoc::IDocumentMetaInfo* /*elementMetaInfoPtr*/ = nullptr,
-		const IOperationContext* /*operationContextPtr*/ = nullptr) override
+		const imtbase::IOperationContext* /*operationContextPtr*/ = nullptr) override
 	{
 		if (m_insertShouldFail) {
 			return QByteArray();
@@ -290,7 +301,7 @@ public:
 		entry.name = name;
 		entry.description = description;
 		if (defaultValuePtr != nullptr) {
-			entry.dataPtr = istd::IChangeableSharedPtr(defaultValuePtr->CloneMe().release());
+			entry.dataPtr = istd::IChangeableSharedPtr(defaultValuePtr->CloneMe().PopInterfacePtr());
 		}
 
 		m_objects[objectId] = entry;
@@ -300,7 +311,7 @@ public:
 	}
 
 	virtual bool RemoveElements(const Ids& elementIds,
-		const IOperationContext* /*operationContextPtr*/ = nullptr) override
+		const imtbase::IOperationContext* /*operationContextPtr*/ = nullptr) override
 	{
 		for (const auto& id : elementIds) {
 			m_objects.remove(id);
@@ -309,20 +320,20 @@ public:
 	}
 
 	virtual bool RemoveElementSet(const iprm::IParamsSet* /*selectionParamsPtr*/ = nullptr,
-		const IOperationContext* /*operationContextPtr*/ = nullptr) override
+		const imtbase::IOperationContext* /*operationContextPtr*/ = nullptr) override
 	{
 		m_objects.clear();
 		return true;
 	}
 
 	virtual bool RestoreObjects(const Ids& /*objectIds*/,
-		const IOperationContext* /*operationContextPtr*/ = nullptr) override
+		const imtbase::IOperationContext* /*operationContextPtr*/ = nullptr) override
 	{
 		return false;
 	}
 
 	virtual bool RestoreObjectSet(const iprm::IParamsSet* /*selectionParamsPtr*/ = nullptr,
-		const IOperationContext* /*operationContextPtr*/ = nullptr) override
+		const imtbase::IOperationContext* /*operationContextPtr*/ = nullptr) override
 	{
 		return false;
 	}
@@ -346,7 +357,7 @@ public:
 			return false;
 		}
 
-		dataPtr = istd::IChangeableSharedPtr(m_objects[objectId].dataPtr->CloneMe().release());
+		dataPtr = istd::IChangeableSharedPtr(m_objects[objectId].dataPtr->CloneMe().PopInterfacePtr());
 		return dataPtr.IsValid();
 	}
 
@@ -354,7 +365,7 @@ public:
 		const Id& objectId,
 		const istd::IChangeable& object,
 		CompatibilityMode /*mode*/ = CM_WITHOUT_REFS,
-		const IOperationContext* /*operationContextPtr*/ = nullptr) override
+		const imtbase::IOperationContext* /*operationContextPtr*/ = nullptr) override
 	{
 		if (m_setObjectDataShouldFail || !m_objects.contains(objectId)) {
 			return false;
@@ -364,7 +375,7 @@ public:
 			return m_objects[objectId].dataPtr->CopyFrom(object);
 		}
 
-		m_objects[objectId].dataPtr = istd::IChangeableSharedPtr(object.CloneMe().release());
+		m_objects[objectId].dataPtr = istd::IChangeableSharedPtr(object.CloneMe().PopInterfacePtr());
 		return m_objects[objectId].dataPtr.IsValid();
 	}
 
