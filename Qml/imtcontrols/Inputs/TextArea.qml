@@ -39,8 +39,6 @@ ControlBase {
     property real placeHolderOpacity: 1;
 	property bool placeHolderVerticalCentered: true;
 
-	property int editingFinishedInterval: 1000
-
     signal accepted();
     signal cancelled();
     signal textEdited();
@@ -120,7 +118,7 @@ ControlBase {
 
     Timer {
         id: editingFinishedTimer;
-		interval: containerTextArea.editingFinishedInterval;
+        interval: 1000;
 
         onTriggered: {
             containerTextArea.editingFinished();
