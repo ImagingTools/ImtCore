@@ -125,3 +125,20 @@ type Mutation {
 type Subscription {
 	OnTicketStatusChanged (input: TicketId): TicketStatusUpdate!
 }
+
+collectionSchema {
+	type Ticket {
+		ref: TicketItemData
+		operations {
+			list: TicketsList
+		}
+		subtype Ticket {
+			ref: TicketData
+			operations {
+				get: TicketItem
+				update: TicketUpdate
+				insert: TicketCreate
+			}
+		}
+	}
+}

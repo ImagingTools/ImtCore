@@ -174,3 +174,19 @@ type Subscription {
 	OnTyping (input: ConversationId): TypingIndicator!
 	OnConversationUpdated: ConversationItemData!
 }
+
+collectionSchema {
+	type Message {
+		ref: MessageItemData
+		operations {
+			list: MessagesList
+		}
+		subtype Message {
+			ref: MessageData
+			operations {
+				get: MessageItem
+				update: MessageUpdate
+			}
+		}
+	}
+}
