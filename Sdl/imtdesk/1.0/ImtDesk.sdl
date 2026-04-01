@@ -119,5 +119,5 @@ type Mutation {
 }
 
 type Subscription {
-	OnTicketStatusChanged (ticketId: ID): TicketStatusUpdate!
+	OnTicketStatusChanged (ticketId: ID!): TicketStatusUpdate!
 }
