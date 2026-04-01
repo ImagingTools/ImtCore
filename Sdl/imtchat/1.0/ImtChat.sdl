@@ -137,6 +137,10 @@ input MessageMarkReadInput {
 
 # --- Subscription payloads ---
 
+type ConversationId {
+	conversationId: ID!
+}
+
 type MessageStatusUpdate {
 	messageId: ID!
 	conversationId: ID!
@@ -165,8 +169,8 @@ type Mutation {
 }
 
 type Subscription {
-	OnNewMessage (conversationId: ID!): MessageData!
-	OnMessageStatusChanged (conversationId: ID!): MessageStatusUpdate!
-	OnTyping (conversationId: ID!): TypingIndicator!
+	OnNewMessage (input: ConversationId): MessageData!
+	OnMessageStatusChanged (input: ConversationId): MessageStatusUpdate!
+	OnTyping (input: ConversationId): TypingIndicator!
 	OnConversationUpdated: ConversationItemData!
 }

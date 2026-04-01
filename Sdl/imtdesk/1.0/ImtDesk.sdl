@@ -102,6 +102,10 @@ input TicketDataInput {
 
 # --- Subscription payloads ---
 
+type TicketId {
+	ticketId: ID!
+}
+
 type TicketStatusUpdate {
 	ticketId: ID!
 	status: TicketStatus!
@@ -119,5 +123,5 @@ type Mutation {
 }
 
 type Subscription {
-	OnTicketStatusChanged (ticketId: ID!): TicketStatusUpdate!
+	OnTicketStatusChanged (input: TicketId): TicketStatusUpdate!
 }
