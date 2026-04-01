@@ -22,8 +22,8 @@ QByteArray CChatServiceComp::SendMessage(
 		return QByteArray();
 	}
 
-	istd::IChangeableUniquePtr messagePtr(m_messageFactCompPtr->CreateInstance());
-	if (messagePtr.IsEmpty()){
+	istd::IChangeableUniquePtr messagePtr(m_messageFactCompPtr.CreateInstance());
+	if (!messagePtr.IsValid()){
 		return QByteArray();
 	}
 
@@ -94,8 +94,8 @@ QByteArray CChatServiceComp::CreateConversation(
 		return QByteArray();
 	}
 
-	istd::IChangeableUniquePtr conversationPtr(m_conversationFactCompPtr->CreateInstance());
-	if (conversationPtr.IsEmpty()){
+	istd::IChangeableUniquePtr conversationPtr(m_conversationFactCompPtr.CreateInstance());
+	if (!conversationPtr.IsValid()){
 		return QByteArray();
 	}
 
