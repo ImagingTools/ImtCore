@@ -175,18 +175,4 @@ type Subscription {
 	OnConversationUpdated: ConversationItemData!
 }
 
-collectionSchema {
-	type Message {
-		ref: MessageItemData
-		operations {
-			list: MessagesList
-		}
-		subtype Message {
-			ref: MessageData
-			operations {
-				get: MessageItem
-				update: MessageUpdate
-			}
-		}
-	}
-}
+
