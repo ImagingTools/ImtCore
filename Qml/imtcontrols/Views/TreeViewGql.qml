@@ -514,26 +514,27 @@ Rectangle{
 		treeViewGql.setContentWidth();
 	}
 
-
 	function setVisibleElements(visible, index){
-		//console.log("SET VISIBLE", visible, index);
+		// console.log("SET VISIBLE", visible, index);
 		let innerId = treeViewGql.model.getData("InnerId__", index);
 		let found = false;
-		let foundChangeCount = 0;
-
-		//for closed
-		let currClosedLevel = -1;
+		let currClosedLevel = -1; // for closed
 
 		for(let i = index + 1; i < treeViewGql.model.getItemsCount(); i++){
-			let branchIds = treeViewGql.model.isValidData("BranchIds__", i) ? treeViewGql.model.getData("BranchIds__", i) : "";
-			//console.log("branchIds:: ", branchIds)
-			let ok = false;
-			let arr = branchIds.split(",");
-			let arrCounter = 0;
+			let branchIds = treeViewGql.model.isValidData("BranchIds__", i) ? treeViewGql.model.getData("BranchIds__", i).split(",") : [];
 
-			//*****************for closed*************//
-			let openST = treeViewGql.model.getData("OpenState__", i);
+			// console.log("branchIds:: ", branchIds)
+			if(!branchIds.includes(String(innerId))){
+				if(found){
+					break;
+				}
+				continue;
+			}
+
+			found = true;
+
 			let level_curr = treeViewGql.model.getData("Level__", i);
+			let openST = treeViewGql.model.getData("OpenState__", i);
 
 			if(level_curr <= currClosedLevel){
 				currClosedLevel = -1;
@@ -542,44 +543,10 @@ Rectangle{
 				currClosedLevel = level_curr;
 			}
 
-			let ok_visible = true;
-			if(!visible){
-				ok_visible = true;
-			}
-			else if(currClosedLevel == -1){
-				ok_visible = true;
-			}
-			else if(level_curr > currClosedLevel && currClosedLevel >= 0){
-				ok_visible = false;
-			}
-			//*****************for closed*************//
+			let ok_visible = !visible || currClosedLevel === -1 || level_curr <= currClosedLevel;
 
-			for(let k = 0; k < arr.length; k++){
-				if(arr[k] == innerId){
-					ok = true;
-					if(!found){
-						found = true;
-						foundChangeCount = 1;
-					}
-					break;
-				}
-				arrCounter++;
-			}
-			if(arrCounter == arr.length && found){
-				foundChangeCount = 2;
-			}
-
-			if(foundChangeCount == 2){
-				//console.log("StopINdex::", i);
-				break;
-			}
-
-			//
-			if(ok){
-				treeViewGql.model.setData("Visible__", visible && ok_visible, i);
-				let coeff = visible ? 1 : -1;
-				listFrame.contentHeight += coeff * treeViewGql.delegateHeight;
-			}
+			treeViewGql.model.setData("Visible__", visible && ok_visible, i);
+			listFrame.contentHeight += visible ? treeViewGql.delegateHeight : -treeViewGql.delegateHeight;
 		}
 
 		treeViewGql.setContentWidth();
