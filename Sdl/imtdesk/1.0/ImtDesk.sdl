@@ -122,10 +122,6 @@ type Mutation {
 	TicketUpdate (input: TicketDataInput): UpdatedNotificationPayload!
 }
 
-type Subscription {
-	OnTicketStatusChanged (input: TicketId): TicketStatusUpdate!
-}
-
 collectionSchema {
 	type Ticket {
 		ref: TicketItemData

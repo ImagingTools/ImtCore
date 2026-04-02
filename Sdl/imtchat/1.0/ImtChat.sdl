@@ -168,13 +168,6 @@ type Mutation {
 	MessageMarkRead (input: MessageMarkReadInput): UpdatedNotificationPayload!
 }
 
-type Subscription {
-	OnNewMessage (input: ConversationId): MessageData!
-	OnMessageStatusChanged (input: ConversationId): MessageStatusUpdate!
-	OnTyping (input: ConversationId): TypingIndicator!
-	OnConversationUpdated: ConversationItemData!
-}
-
 collectionSchema {
 	type Conversation {
 		ref: ConversationItemData
