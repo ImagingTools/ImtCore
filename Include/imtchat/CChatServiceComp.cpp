@@ -11,79 +11,6 @@ namespace imtchat
 
 // reimplemented (imtchat::IChatService)
 
-QByteArray CChatServiceComp::SendMessage(
-			const QByteArray& conversationId,
-			const QString& content,
-			const QByteArrayList& entityReferences,
-			const QByteArrayList& attachmentIds)
-{
-	imtbase::IObjectCollection* messageCollectionPtr = m_messageCollectionCompPtr.GetPtr();
-	if (messageCollectionPtr == nullptr){
-		return QByteArray();
-	}
-
-	istd::IChangeableUniquePtr messagePtr(m_messageFactCompPtr.CreateInstance());
-	if (!messagePtr.IsValid()){
-		return QByteArray();
-	}
-
-	IChatMessage* chatMessagePtr = dynamic_cast<IChatMessage*>(messagePtr.GetPtr());
-	if (chatMessagePtr == nullptr){
-		return QByteArray();
-	}
-
-	QByteArray newId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
-
-	chatMessagePtr->SetId(newId);
-	chatMessagePtr->SetConversationId(conversationId);
-	chatMessagePtr->SetContent(content);
-	chatMessagePtr->SetStatus(IChatMessage::MS_SENT);
-	chatMessagePtr->SetEntityReferences(entityReferences);
-	chatMessagePtr->SetAttachmentIds(attachmentIds);
-
-	QByteArray objectId = messageCollectionPtr->InsertNewObject(
-				QByteArray(),
-				QString(),
-				QString(),
-				messagePtr.GetPtr(),
-				newId);
-
-	if (objectId.isEmpty()){
-		return QByteArray();
-	}
-
-	return objectId;
-}
-
-
-QByteArrayList CChatServiceComp::GetMessages(
-			const QByteArray& conversationId,
-			int offset,
-			int limit) const
-{
-	const imtbase::IObjectCollection* messageCollectionPtr = m_messageCollectionCompPtr.GetPtr();
-	if (messageCollectionPtr == nullptr){
-		return QByteArrayList();
-	}
-
-	imtbase::ICollectionInfo::Ids ids = messageCollectionPtr->GetElementIds(offset, limit);
-
-	QByteArrayList result;
-	result.reserve(ids.size());
-	for (const auto& id: ids){
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (messageCollectionPtr->GetObjectData(id, dataPtr)){
-			const IChatMessage* msgPtr = dynamic_cast<const IChatMessage*>(dataPtr.GetPtr());
-			if ((msgPtr != nullptr) && (msgPtr->GetConversationId() == conversationId)){
-				result.append(id);
-			}
-		}
-	}
-
-	return result;
-}
-
-
 QByteArray CChatServiceComp::CreateConversation(
 			const QString& name,
 			int conversationType,
@@ -142,35 +69,6 @@ QByteArrayList CChatServiceComp::GetConversations(int offset, int limit) const
 	}
 
 	return result;
-}
-
-
-bool CChatServiceComp::MarkMessageRead(
-			const QByteArray& conversationId,
-			const QByteArray& messageId)
-{
-	imtbase::IObjectCollection* messageCollectionPtr = m_messageCollectionCompPtr.GetPtr();
-	if (messageCollectionPtr == nullptr){
-		return false;
-	}
-
-	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (!messageCollectionPtr->GetObjectData(messageId, dataPtr)){
-		return false;
-	}
-
-	IChatMessage* chatMessagePtr = dynamic_cast<IChatMessage*>(dataPtr.GetPtr());
-	if (chatMessagePtr == nullptr){
-		return false;
-	}
-
-	if (chatMessagePtr->GetConversationId() != conversationId){
-		return false;
-	}
-
-	chatMessagePtr->SetStatus(IChatMessage::MS_READ);
-
-	return messageCollectionPtr->SetObjectData(messageId, *chatMessagePtr);
 }
 
 

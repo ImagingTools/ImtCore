@@ -6,7 +6,6 @@
 
 // ImtCore includes
 #include <imtchat/IConversation.h>
-#include <imtchat/IChatMessage.h>
 
 
 namespace imtchat
@@ -14,42 +13,15 @@ namespace imtchat
 
 
 /**
-	Service interface for chat operations.
+	Service interface for chat conversation management.
 
-	Provides operations for sending and retrieving messages, managing
-	conversations, and marking messages as read.
+	Provides operations for creating and retrieving conversations.
 
 	\ingroup imtchat
 */
 class IChatService: virtual public istd::IPolymorphic
 {
 public:
-	/**
-		Send a message to a conversation.
-		\param conversationId    Target conversation ID.
-		\param content           Message text content.
-		\param entityReferences  Optional entity reference IDs.
-		\param attachmentIds     Optional attachment IDs.
-		\return New message ID, or empty on failure.
-	*/
-	virtual QByteArray SendMessage(
-				const QByteArray& conversationId,
-				const QString& content,
-				const QByteArrayList& entityReferences = QByteArrayList(),
-				const QByteArrayList& attachmentIds = QByteArrayList()) = 0;
-
-	/**
-		Retrieve messages for a conversation.
-		\param conversationId  Conversation to query.
-		\param offset          Pagination offset.
-		\param limit           Maximum number of messages to return (-1 = all).
-		\return List of message IDs in chronological order.
-	*/
-	virtual QByteArrayList GetMessages(
-				const QByteArray& conversationId,
-				int offset = 0,
-				int limit = 50) const = 0;
-
 	/**
 		Create a new conversation.
 		\param name              Display name.
@@ -69,16 +41,6 @@ public:
 		\return List of conversation IDs.
 	*/
 	virtual QByteArrayList GetConversations(int offset = 0, int limit = -1) const = 0;
-
-	/**
-		Mark a message as read for the current user.
-		\param conversationId  The conversation containing the message.
-		\param messageId       The message to mark as read.
-		\return True on success.
-	*/
-	virtual bool MarkMessageRead(
-				const QByteArray& conversationId,
-				const QByteArray& messageId) = 0;
 };
 
 } // namespace imtchat
