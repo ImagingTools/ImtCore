@@ -583,22 +583,24 @@ Rectangle{
 		}
 
 		treeViewGql.setContentWidth();
-
 	}
 
 	function getVisibleCountInBranch(index){
 		let count_ = 0;
 		let level_ = treeViewGql.model.getData("Level__", index)
+
 		for(let i = index + 1; i < treeViewGql.model.getItemsCount(); i++){
 			let currLevel_ = treeViewGql.model.getData("Level__", i)
 			if(currLevel_ === level_){
 				break;
 			}
+
 			let currVisible_ = treeViewGql.model.getData("Visible__", i)
 			if(currVisible_){
 				count_++;
 			}
 		}
+
 		//console.log("VisibleCountInBranch:: ", count_);
 
 		return count_;
@@ -608,6 +610,7 @@ Rectangle{
 		//console.log("setContentWidth")
 		let maxWidth = 0;
 		let maxLevel_= 0;
+
 		for(let i = 0; i < treeViewGql.model.getItemsCount(); i++){
 			let visible = treeViewGql.model.getData("Visible__",i);
 			let level = !visible ? 0 : treeViewGql.model.getData("Level__",i);
@@ -621,11 +624,11 @@ Rectangle{
 		}
 
 		list.contentWidth = maxWidth;
-		if(list.contentWidth > list.width){
-			list.contentX = Math.min((maxLevel_-1) * treeViewGql.shift + list.originX, list.contentWidth - list.width + list.originX);
+		if(list.contentWidth <= list.width){
+			list.contentX = list.originX;
 		}
 		else {
-			list.contentX = list.originX;
+			list.contentX = Math.min((maxLevel_-1) * treeViewGql.shift + list.originX, list.contentWidth - list.width + list.originX);
 		}
 	}
 
@@ -662,31 +665,28 @@ Rectangle{
 		if(index < 0 || index >= treeViewGql.model.getItemsCount()){
 			return;
 		}
+
 		let maxContentY = list.contentHeight - list.height + list.originY;
 		if(maxContentY <= 0){
 			return;
 		}
+
 		let contentY__ = list.originY;
 		for(let i = 0; i < index; i++){
 			let isVisible = treeViewGql.model.getData("Visible__", i);
 			contentY__ += isVisible * treeViewGql.delegateHeight;
 		}
+
 		list.contentY = Math.min(contentY__, maxContentY);
 	}
 
 	function getIcon(type, isOpen){
-		let source = "";
-		let imageName = "";
+		let imageName = "Icons/New";
 		if(type == "Node"){
 			imageName = isOpen ? "Icons/FolderOpened" : "Icons/FolderClosed";
 		}
-		else if(type == "Doc"){
-			imageName = "Icons/New";
-		}
-		else {
-			imageName = "Icons/New";
-		}
-		source  =  "../../../" + Style.getIconPath(imageName, Icon.State.On, Icon.Mode.Normal);
+
+		let source = "../../../" + Style.getIconPath(imageName, Icon.State.On, Icon.Mode.Normal);
 
 		return source;
 	}
@@ -708,23 +708,21 @@ Rectangle{
 	}
 
 	function findParentIndex(index){
-		let foundIndex = -1;
 		let branchIds = treeViewGql.model.isValidData("BranchIds__", index) ? treeViewGql.model.getData("BranchIds__", index) : "";
 		if(branchIds == ""){
-			//console.log("FOUND_INDEX_ RETURN ", foundIndex);
 			return -1;
 		}
+
 		let arr = branchIds.split(",");
 		let parentId = arr[arr.length - 1];
-		for(let i = index - 1; i >=0; i--){
-			let innerId = treeViewGql.model.getData("InnerId__", i);
-			if(innerId == parentId){
-				foundIndex =  i;
-				break;
+
+		for(let foundIndex = index - 1; foundIndex >= 0; foundIndex--){
+			if(treeViewGql.model.getData("InnerId__", i) === parentId){
+				return foundIndex;
 			}
 		}
-		//console.log("FOUND_INDEX ", foundIndex);
-		return foundIndex;
+
+		return -1;
 	}
 
 	function findIndexById(id, nameId){
@@ -751,7 +749,7 @@ Rectangle{
 		visible: false;
 
 		font.family: Style.fontFamily;
-		font.pixelSize:  Style.fontSizeXL !==undefined ? Style.fontSizeXL : 18;//Style.fontSizeXL;
+		font.pixelSize:  Style.fontSizeXL !==undefined ? Style.fontSizeXL : 18;
 		color: Style.textColor;
 
 		property real sourceWidth: 0;
