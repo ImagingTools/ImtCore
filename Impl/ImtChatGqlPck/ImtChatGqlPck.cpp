@@ -20,10 +20,5 @@ I_EXPORT_COMPONENT(
 			"Conversation collection controller",
 			"Conversation Collection Controller");
 
-I_EXPORT_COMPONENT(
-			MessageCollectionController,
-			"Message collection controller",
-			"Message Collection Controller");
-
 
 } // namespace ImtChatGqlPck

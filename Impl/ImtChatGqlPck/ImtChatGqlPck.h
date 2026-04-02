@@ -4,7 +4,6 @@
 
 // ImtCore includes
 #include <imtchatgql/CConversationCollectionControllerComp.h>
-#include <imtchatgql/CMessageCollectionControllerComp.h>
 
 
 /**
@@ -15,7 +14,6 @@ namespace ImtChatGqlPck
 
 
 typedef imtchatgql::CConversationCollectionControllerComp ConversationCollectionController;
-typedef imtchatgql::CMessageCollectionControllerComp MessageCollectionController;
 
 
 } // namespace ImtChatGqlPck
