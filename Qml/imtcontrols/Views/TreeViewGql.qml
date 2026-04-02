@@ -10,7 +10,6 @@ Rectangle{
 
 	color: "transparent";
 
-
 	property int shift: Style.treeBranchOffset;
 	property int delegateWidth: Style.sizeHintXXS;
 	property int delegateHeight: Style.controlHeightL;
@@ -69,7 +68,6 @@ Rectangle{
 			scrollHoriz.indicatorColor = scrollIndicatorColor;
 			scrollVert.indicatorColor = scrollIndicatorColor;
 		}
-
 	}
 
 	Rectangle{
@@ -88,7 +86,7 @@ Rectangle{
 			height: list.height;
 
 			property real contentY: list.contentY;
-			property real originY: 0;//list.originY;
+			property real originY: 0; // list.originY;
 			property real contentWidth: list.contentWidth;
 			property real contentHeight: height;
 		}
@@ -135,20 +133,21 @@ Rectangle{
 						deleg.hover_.destroy();
 						deleg.hover_ = null;
 					}
+
 					if (additionalItem && typeof additionalItem.onRedraw === "function"){
 						additionalItem.onRedraw()
 					}
 				}
 
 				onAddItemWidthChanged: {
-					//console.log("addItemWidth:: ", addItemWidth)
+					// console.log("addItemWidth:: ", addItemWidth)
 				}
 
 				Component.onCompleted: {
 					if(treeViewGql.hasAddDelegInfo){
 						additionalItem =  treeViewGql.additionalDelegateComp.createObject(deleg);
 						deleg.addItemWidth = additionalItem.width;
-						//console.log("width::: ",deleg.width, list.width)
+						// console.log("width::: ",deleg.width, list.width)
 					}
 				}
 
@@ -227,6 +226,7 @@ Rectangle{
 							return
 						}
 
+						// if branch is not open - open it and request data if it was not requested before
 						if(!model.IsOpen__){
 							if(model.HasBranch__){
 								treeViewGql.setVisibleElements(true, model.index)
@@ -241,21 +241,24 @@ Rectangle{
 
 							treeViewGql.openBranch(model.index)
 							treeViewGql.openButtonClicked(model.index);
+
+							return
 						}
-						else if(model.IsOpen__){
-							//console.log(model.ChildrenCount__, treeViewGql._maxCountToClose)
-							let count_ = treeViewGql.getVisibleCountInBranch(model.index);
-							//let count_ = model.ChildrenCount__;
-							if(count_ > treeViewGql._maxCountToClose){
-								treeViewGql.deleteBranch(model.index);
-								treeViewGql.closeBranch(model.index);
-							}
-							else {
-								treeViewGql.model.setData("IsOpen__", false, model.index);
-								treeViewGql.model.setData("OpenState__", 0, model.index);
-								treeViewGql.setVisibleElements(false, model.index)
-								treeViewGql.closeBranch(model.index)
-							}
+
+						/// close branch or delete if count in branch is more than _maxCountToClose
+
+						// console.log(model.ChildrenCount__, treeViewGql._maxCountToClose)
+						let count_ = treeViewGql.getVisibleCountInBranch(model.index);
+						// let count_ = model.ChildrenCount__;
+						if(count_ > treeViewGql._maxCountToClose){
+							treeViewGql.deleteBranch(model.index);
+							treeViewGql.closeBranch(model.index);
+						}
+						else {
+							treeViewGql.model.setData("IsOpen__", false, model.index);
+							treeViewGql.model.setData("OpenState__", 0, model.index);
+							treeViewGql.setVisibleElements(false, model.index)
+							treeViewGql.closeBranch(model.index)
 						}
 					}
 
@@ -338,9 +341,9 @@ Rectangle{
 						treeViewGql.clicked(model.index);
 
 						if (mouse.button === Qt.RightButton){
-							console.log("TreeViewGqlDelegate onRightButtonMouseClicked");
+							// console.log("TreeViewGqlDelegate onRightButtonMouseClicked");
 
-							var point = mapToItem(null, this.mouseX, this.mouseY);
+							let point = mapToItem(null, this.mouseX, this.mouseY);
 							treeViewGql.rightButtonMouseClicked(point.x, point.y);
 						}
 					}
@@ -365,9 +368,9 @@ Rectangle{
 						sizeText.text = nameText.text;
 						toolTipPause.restart();
 					}
-				}//delegateMA
-			}//delegate
-		}//list
+				} // delegateMA
+			} // delegate
+		} // list
 
 		CustomScrollbar{
 			id: scrollVert;
@@ -401,7 +404,62 @@ Rectangle{
 			vertical: false;
 			targetItem: list;
 		}
-	}//listContainer
+	} // listContainer
+
+
+	Text{
+		id: sizeText;
+
+		anchors.bottom: parent.bottom;
+
+		visible: false;
+
+		font.family: Style.fontFamily;
+		font.pixelSize:  Style.fontSizeXL !==undefined ? Style.fontSizeXL : 18;
+		color: Style.textColor;
+
+		property real sourceWidth: 0;
+		property real toolTipX: 0;
+		property real toolTipY: 0;
+	}
+
+	PauseAnimation {
+		id: toolTipPause;
+
+		duration: 500;
+
+		onFinished:{
+			if(sizeText.text !== "" && sizeText.width > sizeText.sourceWidth){
+				if (!toolTip.openST){
+					toolTip.text = sizeText.text;
+					toolTip.openTooltip(sizeText.toolTipX, sizeText.toolTipY)
+				}
+			}
+		}
+	}
+
+	Timer {
+		id: timerToolTip;
+		interval: 3000;
+		onTriggered: {
+			toolTip.closeTooltip();
+		}
+	}
+
+	CustomTooltip {
+		id: toolTip;
+
+		text: "";
+		componentMinHeight: Style.controlHeightM;
+
+		function openTooltip(xX, yY){
+			open(xX, yY)
+
+			timerToolTip.restart();
+		}
+	}
+
+	// _________________FUNCTIONS__________________
 
 	function getModelItemsCount(model_){
 		return model_.getItemsCount();
@@ -514,6 +572,10 @@ Rectangle{
 		treeViewGql.setContentWidth();
 	}
 
+	/*
+		Shows or hides all child elements of the node at index.
+		Child nodes of a still-closed sub-node stay hidden.
+	*/
 	function setVisibleElements(visible, index){
 		// console.log("SET VISIBLE", visible, index);
 		let innerId = treeViewGql.model.getData("InnerId__", index);
@@ -707,58 +769,5 @@ Rectangle{
 		}
 		return foundIndex;
 	}
-
-	Text{
-		id: sizeText;
-
-		anchors.bottom: parent.bottom;
-
-		visible: false;
-
-		font.family: Style.fontFamily;
-		font.pixelSize:  Style.fontSizeXL !==undefined ? Style.fontSizeXL : 18;
-		color: Style.textColor;
-
-		property real sourceWidth: 0;
-		property real toolTipX: 0;
-		property real toolTipY: 0;
-	}
-
-	PauseAnimation {
-		id: toolTipPause;
-
-		duration: 500;
-
-		onFinished:{
-			if(sizeText.text !== "" && sizeText.width > sizeText.sourceWidth){
-				if (!toolTip.openST){
-					toolTip.text = sizeText.text;
-					toolTip.openTooltip(sizeText.toolTipX, sizeText.toolTipY)
-				}
-			}
-		}
-	}
-
-	Timer {
-		id: timerToolTip;
-		interval: 3000;
-		onTriggered: {
-			toolTip.closeTooltip();
-		}
-	}
-
-	CustomTooltip {
-		id: toolTip;
-
-		text: "";
-		componentMinHeight: Style.controlHeightM;
-
-		function openTooltip(xX, yY){
-			open(xX, yY)
-
-			timerToolTip.restart();
-		}
-	}
-
 }
 
