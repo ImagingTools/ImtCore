@@ -30,7 +30,6 @@ Rectangle{
     property string textColor: Style.textColor;
 
     property int _maxCountToClose: 10;
-    property int _deleteCounter: 0;
 
     property bool hasAddDelegInfo: false;
     property Component additionalDelegateComp: Component{Item{}}
@@ -467,57 +466,52 @@ Rectangle{
         treeViewGql.inserted(index);
     }
 
-    function deleteBranch(index){
-        //console.log("DELETE BRANCH", index);
-        if (index < 0){
-            treeViewGql.model.clear()
-            return
-        }
-        let deletionCompleted = false;
+	/**
+		Removes all descendants of the node at `index` from the model list and marks it closed.
+		Each node's BranchIds__ holds a full parent chain (built by \sa treeViewGql.insertTree),
+			any descendant at any depth carries the parent's InnerId__.
+		If the node is last at its level, the loop exhausts naturally; cleanup runs unconditionally.
+	*/
+	function deleteBranch(index){
+		if (index < 0){
+			treeViewGql.model.clear()
+			return
+		}
 
-        let innerId = treeViewGql.model.getData("InnerId__", index);
-        for(let i = index + 1; i < treeViewGql.model.getItemsCount(); i++){
-            let branchIds = treeViewGql.model.isValidData("BranchIds__", i) ? treeViewGql.model.getData("BranchIds__", i) : "";
-            //console.log("branchIds:: ", branchIds)
-            let ok = false;
-            let arr = branchIds.split(",");
-            for(let k = 0; k < arr.length; k++){
-                if(arr[k] == innerId){
-                    ok = true;
-                    break;
-                }
+		let innerId = treeViewGql.model.getData("InnerId__", index);
+		// console.log("inner id", innerId)
 
-            }//for k
+		let deletedCount = 0;
+		let i = index + 1;
+		while(i < treeViewGql.model.getItemsCount()){
+			let branchIds = treeViewGql.model.isValidData("BranchIds__", i) ? treeViewGql.model.getData("BranchIds__", i).split(",") : [];
+			// console.log("branchIds::", branchIds)
 
-            if(ok){
-                treeViewGql.model.removeItem(i);
-                treeViewGql._deleteCounter++;
-                listFrame.contentHeight -= treeViewGql.delegateHeight;
-                treeViewGql.deleteBranch(index);
-                break;
-            }
-            else {
-                deletionCompleted = true;
-                break;
-            }
+			if(!branchIds.includes(String(innerId))){
+				// not a child element: branch is fully processed
+				break;
+			}
+			else {
+				treeViewGql.model.removeItem(i);
+				listFrame.contentHeight -= treeViewGql.delegateHeight;
+				++deletedCount;
+			}
+		}
 
-        }//for i
+		/*
+			Shift selectedIndex back by removed item count to select correct node after deletion.
+			If the last selected node is deleted, it becomes -1 (no selection)
+		*/
+		if(treeViewGql.selectedIndex > index){
+			treeViewGql.selectedIndex -= deletedCount;
+		}
 
-        if(deletionCompleted){
-            //console.log("deletionCompleted", deletionCompleted)
-            if(treeViewGql.selectedIndex >=0 && treeViewGql.selectedIndex > index){
-                treeViewGql.selectedIndex -= treeViewGql._deleteCounter;
-            }
+		treeViewGql.model.setData("IsOpen__", false, index);
+		treeViewGql.model.setData("OpenState__", false, index);
+		treeViewGql.model.setData("HasBranch__", false, index);
+		treeViewGql.setContentWidth();
+	}
 
-            treeViewGql._deleteCounter = 0;
-
-            treeViewGql.model.setData("IsOpen__", false, index);
-            treeViewGql.model.setData("OpenState__", -1, index);
-            treeViewGql.model.setData("HasBranch__", false, index);
-
-            treeViewGql.setContentWidth();
-        }
-    }
 
     function setVisibleElements(visible, index){
         //console.log("SET VISIBLE", visible, index);
