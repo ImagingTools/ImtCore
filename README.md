@@ -30,7 +30,7 @@ SQL and NoSQL database connectivity and management.
 - **Documentation**: [Include/README.md - Database](Include/README.md#database--persistence-5-libraries)
 
 ### 4. Licensing System
-Software and hardware product license management with GraphQL APIs and database persistence.
+Software and hardware product license management with GraphQL API and database persistence.
 - **4 libraries**: imtlic, imtlicdb, imtlicgql, imtlicgui
 - **Documentation**: [License Management](#license-management) (below), [Include/imtlic/README.md](Include/imtlic/README.md), [LICENSING_ARCHITECTURE.md](LICENSING_ARCHITECTURE.md)
 
