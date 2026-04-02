@@ -549,7 +549,7 @@ Item {
 							}
 						}
 						if(model.ids == "Add"){
-							addressColumn.currentIndex = addressView.model.count - 1
+							addressColumn.currentIndex = addressView.count - 1
 							structureAddressesContainer.isEdit = false
 							structureAddressesContainer.addedItemAddressModel.clear()
 							structureAddressesContainer.addedItemAddressModel.insertNewItem()
