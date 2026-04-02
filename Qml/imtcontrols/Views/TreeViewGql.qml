@@ -9,31 +9,34 @@ Rectangle{
 	id: treeViewGql;
 
 	color: "transparent";
-	property TreeItemModel model: TreeItemModel{};
+
 
 	property int shift: Style.treeBranchOffset;
-	property string nameId: "name";
 	property int delegateWidth: Style.sizeHintXXS;
 	property int delegateHeight: Style.controlHeightL;
-	property alias delegate: list.delegate;
-	property bool hasSelection: false;
 	property int selectedIndex: -1;
 	property int scrollSize: 12;
+	property int _maxCountToClose: 10;
+
+	property string nameId: "name";
 	property string scrollBackgroundColor: "";
 	property string scrollIndicatorColor: "";
 
 	property string selectionColor: Style.selectedColor !== undefined ? Style.selectedColor : "lightsteelblue";
 	property string hoverColor: "lightsteelblue";
-	property real selectionOpacity: 1;
-	property real selectionRadius: 2;
 	property string selectedTextColor: Style.textColor;
 	property string textColor: Style.textColor;
 
-	property int _maxCountToClose: 10;
+	property real selectionRadius: 2;
+	property real selectionOpacity: 1;
 
 	property bool hasAddDelegInfo: false;
+	property bool hasSelection: false;
+
+	property TreeItemModel model: TreeItemModel{};
 	property Component additionalDelegateComp: Component{Item{}}
 
+	property alias delegate: list.delegate;
 	property alias reuseItems: list.reuseItems
 
 	signal requestSignal(int index);
@@ -50,7 +53,6 @@ Rectangle{
 
 	signal forcedOpen(int index);
 	signal inserted(int index);
-
 
 	onWidthChanged: {
 		list.contentX = list.originX;
@@ -89,7 +91,6 @@ Rectangle{
 			property real originY: 0;//list.originY;
 			property real contentWidth: list.contentWidth;
 			property real contentHeight: height;
-
 		}
 
 		ListView{
@@ -152,42 +153,45 @@ Rectangle{
 				}
 
 				onIsSelectedChanged: {
-					if(treeViewGql.hasSelection){
-						if(deleg.isSelected){
-							if(deleg.hover_){
-								deleg.hover_.destroy();
-								deleg.hover_ = null;
-							}
-							if(!deleg.selection_){
-								deleg.selection_ = selectionComp.createObject(deleg)
-								deleg.selection_.z = -1;
-							}
+					if(!treeViewGql.hasSelection){
+						return
+					}
+
+					if(!deleg.isSelected){
+						if(deleg.selection_){
+							deleg.selection_.destroy();
+							deleg.selection_ = null;
 						}
-						else {
-							if(deleg.selection_){
-								deleg.selection_.destroy();
-								deleg.selection_ = null;
-							}
+					}
+					else {
+						if(deleg.hover_){
+							deleg.hover_.destroy();
+							deleg.hover_ = null;
+						}
+						if(!deleg.selection_){
+							deleg.selection_ = selectionComp.createObject(deleg)
+							deleg.selection_.z = -1;
 						}
 					}
 				}
 
 				onIsHoveredChanged: {
-					if(treeViewGql.hasSelection && !deleg.isSelected){
-						if(deleg.isHovered){
-							if(!deleg.hover_){
-								deleg.hover_ = hoverComp.createObject(deleg)
-								deleg.hover_.z = -1;
-							}
-						}
-						else {
-							if(deleg.hover_){
-								deleg.hover_.destroy();
-								deleg.hover_ = null;
-							}
-						}
+					if(!treeViewGql.hasSelection || deleg.isSelected){
+						return
 					}
 
+					if(deleg.isHovered){
+						if(!deleg.hover_){
+							deleg.hover_ = hoverComp.createObject(deleg)
+							deleg.hover_.z = -1;
+						}
+					}
+					else {
+						if(deleg.hover_){
+							deleg.hover_.destroy();
+							deleg.hover_ = null;
+						}
+					}
 				}
 
 				Component{
@@ -219,36 +223,38 @@ Rectangle{
 					height: parent.height;
 
 					function openButtonClicked(){
-						if(model.hasChildren__){
-							if(!model.IsOpen__){
-								if(!model.HasBranch__){
-									treeViewGql.model.setData("HasBranch__", true, model.index);
-									treeViewGql.requestSignal(model.index)
-								}
-								else {
-									treeViewGql.setVisibleElements(true, model.index)
-								}
-								treeViewGql.model.setData("IsOpen__", true, model.index);
-								treeViewGql.model.setData("OpenState__", 1, model.index);
+						if(!model.hasChildren__){
+							return
+						}
 
-								treeViewGql.openBranch(model.index)
-								treeViewGql.openButtonClicked(model.index);
+						if(!model.IsOpen__){
+							if(model.HasBranch__){
+								treeViewGql.setVisibleElements(true, model.index)
 							}
-							else if(model.IsOpen__){
+							else {
+								treeViewGql.model.setData("HasBranch__", true, model.index);
+								treeViewGql.requestSignal(model.index)
+							}
 
-								//console.log(model.ChildrenCount__, treeViewGql._maxCountToClose)
-								let count_ = treeViewGql.getVisibleCountInBranch(model.index);
-								//let count_ = model.ChildrenCount__;
-								if(count_ <= treeViewGql._maxCountToClose){
-									treeViewGql.model.setData("IsOpen__", false, model.index);
-									treeViewGql.model.setData("OpenState__", 0, model.index);
-									treeViewGql.setVisibleElements(false, model.index)
-									treeViewGql.closeBranch(model.index)
-								}
-								else {
-									treeViewGql.deleteBranch(model.index);
-									treeViewGql.closeBranch(model.index);
-								}
+							treeViewGql.model.setData("IsOpen__", true, model.index);
+							treeViewGql.model.setData("OpenState__", 1, model.index);
+
+							treeViewGql.openBranch(model.index)
+							treeViewGql.openButtonClicked(model.index);
+						}
+						else if(model.IsOpen__){
+							//console.log(model.ChildrenCount__, treeViewGql._maxCountToClose)
+							let count_ = treeViewGql.getVisibleCountInBranch(model.index);
+							//let count_ = model.ChildrenCount__;
+							if(count_ > treeViewGql._maxCountToClose){
+								treeViewGql.deleteBranch(model.index);
+								treeViewGql.closeBranch(model.index);
+							}
+							else {
+								treeViewGql.model.setData("IsOpen__", false, model.index);
+								treeViewGql.model.setData("OpenState__", 0, model.index);
+								treeViewGql.setVisibleElements(false, model.index)
+								treeViewGql.closeBranch(model.index)
 							}
 						}
 					}
@@ -277,7 +283,7 @@ Rectangle{
 						anchors.left: openButton.right;
 						anchors.leftMargin: 8;
 
-						visible: true//model.typeId__ !== undefined;
+						visible: true
 						width: Style.iconSizeS;
 						height: width;
 						sourceSize.width: width;
@@ -302,7 +308,6 @@ Rectangle{
 
 						text: model[treeViewGql.nameId] !== undefined ? model[treeViewGql.nameId] : "";
 					}
-
 				}
 
 				MouseArea{
@@ -315,27 +320,31 @@ Rectangle{
 					hoverEnabled: visible;
 					cursorShape: Qt.PointingHandCursor;
 					onClicked: {
-						if(mouse.x > delegateContainer.x){
-							if(openButton.visible && mouse.x < openButton.width + 8 + delegateContainer.x){
-								delegateContainer.openButtonClicked();
-							}
-							else {
-								if (treeViewGql.selectedIndex !== model.index ){
-									treeViewGql.selectedIndex = model.index
-									treeViewGql.selectionChanged()
-								}
-								treeViewGql.clicked(model.index);
-
-								if (mouse.button === Qt.RightButton){
-									console.log("TreeViewGqlDelegate onRightButtonMouseClicked");
-
-									var point = mapToItem(null, this.mouseX, this.mouseY);
-									treeViewGql.rightButtonMouseClicked(point.x, point.y);
-								}
-							}
+						if(mouse.x <= delegateContainer.x){
+							return
 						}
 
+						if(openButton.visible && mouse.x < openButton.width + 8 + delegateContainer.x){
+							delegateContainer.openButtonClicked();
+
+							return
+						}
+
+						if (treeViewGql.selectedIndex !== model.index ){
+							treeViewGql.selectedIndex = model.index
+							treeViewGql.selectionChanged()
+						}
+
+						treeViewGql.clicked(model.index);
+
+						if (mouse.button === Qt.RightButton){
+							console.log("TreeViewGqlDelegate onRightButtonMouseClicked");
+
+							var point = mapToItem(null, this.mouseX, this.mouseY);
+							treeViewGql.rightButtonMouseClicked(point.x, point.y);
+						}
 					}
+
 					onDoubleClicked: {
 						if(mouse.x > openButton.width + 8 + delegateContainer.x){
 							treeViewGql.doubleClicked(model.index);
@@ -345,23 +354,19 @@ Rectangle{
 					onContainsMouseChanged: {
 						if (!containsMouse){
 							toolTip.closeTooltip();
-						}
-						else{
-							var point = mapToItem(null, mouseX - toolTip.componentWidth/2, -toolTip.componentHeight);
-							sizeText.toolTipX = point.x;
-							sizeText.toolTipY = point.y;
-							sizeText.sourceWidth = nameText.width;
-							sizeText.text = nameText.text;
-							toolTipPause.restart();
 
+							return;
 						}
+
+						let point = mapToItem(null, mouseX - toolTip.componentWidth/2, -toolTip.componentHeight);
+						sizeText.toolTipX = point.x;
+						sizeText.toolTipY = point.y;
+						sizeText.sourceWidth = nameText.width;
+						sizeText.text = nameText.text;
+						toolTipPause.restart();
 					}
-
 				}//delegateMA
-
 			}//delegate
-
-
 		}//list
 
 		CustomScrollbar{
@@ -373,7 +378,6 @@ Rectangle{
 			anchors.bottom: listFrame.bottom;
 
 			targetItem: listFrame;
-
 			secondSize: treeViewGql.scrollSize;
 
 			radius: secondSize;
@@ -383,7 +387,6 @@ Rectangle{
 			onContentYSignal:{
 				list.contentY = contentY;
 			}
-
 		}
 
 		CustomScrollbar{
@@ -409,7 +412,6 @@ Rectangle{
 	}
 
 	function insertTree(index, model_){
-
 		if(!model_ || !treeViewGql.getModelItemsCount(model_)){
 			return;
 		}
@@ -631,33 +633,29 @@ Rectangle{
 		if(index < 0){
 			return;
 		}
-		let isForcedOpen = false;
-		if(treeViewGql.model.getData("hasChildren__", index)){
-			if(treeViewGql.model.getData("OpenState__", index) !== 1){
-				if(!treeViewGql.model.getData("HasBranch__", index)){
-					treeViewGql.model.setData("HasBranch__", true, index);
-					treeViewGql.requestSignal(index)
-				}
-				else {
-					treeViewGql.setVisibleElements(true, index)
-					isForcedOpen = true;
-				}
-				treeViewGql.model.setData("IsOpen__", true, index);
-				treeViewGql.model.setData("OpenState__", 1, index);
 
-				treeViewGql.openBranch(index);
-			}
-			else {
-				isForcedOpen = true;
-			}
+		if(!treeViewGql.model.getData("hasChildren__", index)){
+			treeViewGql.forcedOpen(index);
+			return;
+		}
 
+		if(treeViewGql.model.getData("OpenState__", index) === 1){
+			treeViewGql.forcedOpen(index);
+			return;
 		}
-		else {
-			isForcedOpen = true;
-		}
-		if(isForcedOpen){
+
+		if(treeViewGql.model.getData("HasBranch__", index)){
+			treeViewGql.setVisibleElements(true, index);
 			treeViewGql.forcedOpen(index);
 		}
+		else {
+			treeViewGql.model.setData("HasBranch__", true, index);
+			treeViewGql.requestSignal(index);
+		}
+
+		treeViewGql.model.setData("IsOpen__", true, index);
+		treeViewGql.model.setData("OpenState__", 1, index);
+		treeViewGql.openBranch(index);
 	}
 
 	function moveToElement(index){
@@ -676,8 +674,6 @@ Rectangle{
 		list.contentY = Math.min(contentY__, maxContentY);
 	}
 
-	//
-
 	function getIcon(type, isOpen){
 		let source = "";
 		let imageName = "";
@@ -691,6 +687,7 @@ Rectangle{
 			imageName = "Icons/New";
 		}
 		source  =  "../../../" + Style.getIconPath(imageName, Icon.State.On, Icon.Mode.Normal);
+
 		return source;
 	}
 
@@ -702,7 +699,6 @@ Rectangle{
 		return selectedIndex;
 	}
 
-
 	function checkIsOpen(index){
 		return model.getData("IsOpen__", index);
 	}
@@ -710,7 +706,6 @@ Rectangle{
 	function checkHasChildren(index){
 		return model.getData("hasChildren__", index);
 	}
-
 
 	function findParentIndex(index){
 		let foundIndex = -1;
@@ -736,6 +731,7 @@ Rectangle{
 		if(nameId == undefined){
 			nameId = "id";
 		}
+
 		let foundIndex = -1;
 		for(let i = 0; i < treeViewGql.model.getItemsCount(); i++){
 			let id_curr = treeViewGql.model.isValidData(nameId, i) ? treeViewGql.model.getData(nameId, i) : "";
