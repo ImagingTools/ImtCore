@@ -15,7 +15,7 @@ namespace imtdeskgql
 bool CTicketCollectionControllerComp::CreateRepresentationFromObject(
 		const imtbase::IObjectCollectionIterator& objectCollectionIterator,
 		const sdl::imtdesk::ImtDesk::CTicketsListGqlRequest& listRequest,
-		sdl::imtdesk::ImtDesk::CTicketItem::V1_0& representationObject,
+		sdl::imtdesk::ImtDesk::CTicketItemData::V1_0& representationObject,
 		QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){

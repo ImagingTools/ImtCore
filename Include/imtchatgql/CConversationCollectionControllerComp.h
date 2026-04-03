@@ -25,7 +25,7 @@ protected:
 	virtual bool CreateRepresentationFromObject(
 				const imtbase::IObjectCollectionIterator& objectCollectionIterator,
 				const sdl::imtchat::ImtChat::CConversationsListGqlRequest& listRequest,
-				sdl::imtchat::ImtChat::CConversationItem::V1_0& representationObject,
+				sdl::imtchat::ImtChat::CConversationItemData::V1_0& representationObject,
 				QString& errorMessage) const override;
 	virtual istd::IChangeableUniquePtr CreateObjectFromRepresentation(
 				const sdl::imtchat::ImtChat::CConversationData::V1_0& dataRepresentation,

@@ -83,18 +83,6 @@ input TicketItemInput {
 	id: ID!
 }
 
-input TicketCreateInput {
-	title: String!
-	description: String
-	ticketType: TicketType
-	priority: TicketPriority
-	assigneeId: ID
-	conversationId: ID
-	messageId: ID
-	environment: Environment
-	tags: [String]
-}
-
 input TicketDataInput {
 	id: ID!
 	item: TicketData!
@@ -118,7 +106,7 @@ type Query {
 }
 
 type Mutation {
-	TicketCreate (input: TicketCreateInput): AddedNotificationPayload!
+	TicketCreate (input: TicketDataInput): AddedNotificationPayload!
 	TicketUpdate (input: TicketDataInput): UpdatedNotificationPayload!
 }
 

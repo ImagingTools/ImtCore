@@ -25,7 +25,7 @@ protected:
 	virtual bool CreateRepresentationFromObject(
 				const imtbase::IObjectCollectionIterator& objectCollectionIterator,
 				const sdl::imtdesk::ImtDesk::CTicketsListGqlRequest& listRequest,
-				sdl::imtdesk::ImtDesk::CTicketItem::V1_0& representationObject,
+				sdl::imtdesk::ImtDesk::CTicketItemData::V1_0& representationObject,
 				QString& errorMessage) const override;
 	virtual istd::IChangeableUniquePtr CreateObjectFromRepresentation(
 				const sdl::imtdesk::ImtDesk::CTicketData::V1_0& dataRepresentation,

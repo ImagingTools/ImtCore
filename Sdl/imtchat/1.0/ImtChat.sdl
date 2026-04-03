@@ -68,12 +68,6 @@ input ConversationItemInput {
 	id: ID!
 }
 
-input ConversationCreateInput {
-	name: String!
-	conversationType: ConversationType
-	participantIds: [ID]
-}
-
 input ConversationDataInput {
 	id: ID!
 	item: ConversationData!
@@ -161,7 +155,7 @@ type Query {
 }
 
 type Mutation {
-	ConversationCreate (input: ConversationCreateInput): AddedNotificationPayload!
+	ConversationCreate (input: ConversationDataInput): AddedNotificationPayload!
 	ConversationUpdate (input: ConversationDataInput): UpdatedNotificationPayload!
 	MessageSend (input: MessageSendInput): AddedNotificationPayload!
 	MessageUpdate (input: MessageDataInput): UpdatedNotificationPayload!

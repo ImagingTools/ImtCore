@@ -8,10 +8,13 @@ target_link_libraries(${PROJECT_NAME}
 	imtdeskgql
 	imtdesk
 	imtservergql
+	imtserverapp
 	imtgql
 	imtdb
 	imtcol
 	imtbasesdl
-	imtbase)
+	imtbase
+	iqt
+	i2d)
 
 include(${ACFDIR}/Config/CMake/AcfQt.cmake)

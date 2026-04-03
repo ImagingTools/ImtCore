@@ -17,7 +17,7 @@ namespace imtchatgql
 bool CConversationCollectionControllerComp::CreateRepresentationFromObject(
 		const imtbase::IObjectCollectionIterator& objectCollectionIterator,
 		const sdl::imtchat::ImtChat::CConversationsListGqlRequest& listRequest,
-		sdl::imtchat::ImtChat::CConversationItem::V1_0& representationObject,
+		sdl::imtchat::ImtChat::CConversationItemData::V1_0& representationObject,
 		QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
