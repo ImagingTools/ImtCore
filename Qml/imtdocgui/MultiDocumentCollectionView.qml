@@ -135,6 +135,7 @@ Item {
 				else{
 					workspaceView.documentManager.setDocumentName(documentId, documentName)
 					workspaceView.documentManager.documentOpened(documentId, objectTypeId)
+					workspaceView.documentManager.setDocumentObjectId(documentId, objectId)
 				}
 
 				workspaceView.documentManager.getUndoInfo(documentId)
@@ -196,6 +197,13 @@ Item {
 			tabView.currentIndex = tabView.tabModel.count - 1
 			workspaceView.updateTabName(documentId)
 			workspaceView.startLoading(documentId)
+		}
+
+		function onDocumentAlreadyOpened(documentId, typeId){
+			let index = tabView.getIndexById(documentId)
+			if (index >= 0){
+				tabView.currentIndex = index
+			}
 		}
 
 		function onOpenDocumentFailed(documentId, message){
