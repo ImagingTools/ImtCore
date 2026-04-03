@@ -13,6 +13,13 @@ QString SqlEncode(const QString& sqlQuery)
 }
 
 
+QString GetSqlResourcePath(const IDatabaseEngine& databaseEngine, const QString& fileName)
+{
+	const QByteArray driverName = databaseEngine.GetDatabaseDriverId();
+	const bool isSqlite = driverName.compare(QByteArrayLiteral("QSQLITE"), Qt::CaseInsensitive) == 0;
+	const QString prefix = isSqlite ? QStringLiteral(":/SQL/SQLite/") : QStringLiteral(":/SQL/Postgres/");
+	return prefix + fileName;
+}
+
+
 } // namespace imtdb
-
-
