@@ -29,11 +29,14 @@ Rectangle{
 		latitudeParam, longitudeParam,
 		typeIdParam, parentIdsParam];
 	property alias searchComp: searchComp
+	property alias searchCompModel: searchComp.model
 	property alias treeViewModel: treeView.model
 	property alias treeView: treeView
 	property alias treeLoading: treeLoading
+	property alias moveToAnim: moveToAnim
 	property Component addressTreeInputObjectComp: null
 	property Component addressTreeSdlObjectComp: null
+	property Component additionalDelegateComp: Component{Item{}}
 
 	property GqlSdlRequestSender addressTreeRequest : GqlSdlRequestSender {
 		property string parentIds: "";
@@ -64,6 +67,8 @@ Rectangle{
 	signal searchFinished(string itemId, int index)
 	signal treeClicked(int index)
 	signal treeViewSelectedIndexChanged(int index)
+	signal searchFieldClear();
+	signal treeViewInserted(int index);
 
 	Component.onCompleted: {
 		treeBody.addressTreeRequest.updateModel();
@@ -110,6 +115,22 @@ Rectangle{
 		let index = treeView.findIndexById(id);
 		treeView.indexToMove = index;
 		treeView.openFunc(index);
+	}
+
+	function openReaction(index){
+		if(treeBody.idsToOpen !== ""){
+			treeBody.removeFirstIdToOpen();
+			if(treeBody.idsToOpen !== ""){
+				treeBody.openNestedTree(treeBody.idsToOpen)
+			}
+			else {
+				treeView.selectedIndex = index;
+			}
+		}
+
+		if(treeView.indexToMove >= 0 && treeBody.idsToOpen == ""){
+			moveToAnim.restart();
+		}
 	}
 
 	function handleSubscription(dataModel){
@@ -171,6 +192,7 @@ Rectangle{
 			}
 
 			treeView.selectedIndex = -1;
+			treeBody.searchFieldClear();
 		}
 
 		onFinished: {
@@ -210,6 +232,7 @@ Rectangle{
 		selectionRadius: 4;
 		scrollIndicatorColor: Style.firstColor;
 		scrollBackgroundColor: "#ffffff";
+		additionalDelegateComp: treeBody.additionalDelegateComp
 
 		property int indexToMove: -1;
 
@@ -218,26 +241,12 @@ Rectangle{
 		}
 
 		onForcedOpen: {
-			openReaction(index);
+			treeBody.openReaction(index);
 		}
+
 		onInserted: {
-			openReaction(index);
-		}
-
-		function openReaction(index){
-			if(treeBody.idsToOpen !== ""){
-				treeBody.removeFirstIdToOpen();
-				if(treeBody.idsToOpen !== ""){
-					treeBody.openNestedTree(treeBody.idsToOpen)
-				}
-				else {
-					treeView.selectedIndex = index;
-				}
-			}
-
-			if(treeView.indexToMove >= 0 && treeBody.idsToOpen == ""){
-				moveToAnim.restart();
-			}
+			treeBody.openReaction(index);
+			treeBody.treeViewInserted(index)
 		}
 
 		function getOpenedIds(){

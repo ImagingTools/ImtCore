@@ -55,6 +55,8 @@ QtObject {
 
 	signal documentViewRegistered(string typeId, string viewTypeId)
 
+	signal documentAlreadyOpened(string documentId, string typeId)
+
 	onDocumentSaved: {
 		setDocumentIsNew(documentId, false)
 	}
@@ -256,6 +258,26 @@ QtObject {
 		return index >= 0
 	}
 
+	function setDocumentObjectId(documentId, objectId){
+		let index = getDocumentIndexByDocumentId(documentId)
+		if (index < 0){
+			return
+		}
+
+		__internal.openedDocuments[index].objectId = objectId
+	}
+
+	function getDocumentIdByObjectId(objectId){
+		for (let i = 0; i < __internal.openedDocuments.length; ++i){
+			let documentData = __internal.openedDocuments[i]
+			if (documentData.objectId === objectId){
+				return documentData.id
+			}
+		}
+
+		return ""
+	}
+
 	function getDocumentIndexByDocumentId(documentId){
 		for (let i = 0; i < __internal.openedDocuments.length; ++i){
 			let documentData = __internal.openedDocuments[i]
@@ -435,6 +457,7 @@ QtObject {
 				property string id
 				property string typeId
 				property string name
+				property string objectId: ""
 				property bool isDirty: false
 				property bool isNew: true
 				property bool isLoading: false

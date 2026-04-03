@@ -66,6 +66,12 @@ DocumentManagerBase {
 	}
 
 	function openDocument(typeId, documentId){
+		let existingDocumentId = getDocumentIdByObjectId(documentId)
+		if (existingDocumentId !== ""){
+			documentAlreadyOpened(existingDocumentId, typeId)
+			return
+		}
+
 		startOpenDocument(documentId, typeId)
 
 		openDocumentRequest.typeId = typeId
@@ -212,6 +218,7 @@ DocumentManagerBase {
 					root.setAutoNamedTypeId(m_objectTypeId, m_hasNameProvider)
 					root.setDocumentName(m_documentId, m_documentName)
 					root.__internal.createDocumentData(m_documentId, m_objectTypeId, false)
+					root.setDocumentObjectId(m_documentId, m_objectId)
 					root.setDocumentIsLoading(m_documentId, true)
 					root.documentOpened(m_documentId, m_objectTypeId)
 				}
