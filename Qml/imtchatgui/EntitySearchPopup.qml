@@ -107,10 +107,6 @@ Rectangle {
 				}
 			}
 
-			// states: State {
-			// 	name: "hovered"
-			// 	PropertyChanges { target: parent; color: Style.hoverColor }
-			// }
 		}
 
 		// "No results" placeholder

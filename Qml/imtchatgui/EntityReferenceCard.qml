@@ -17,7 +17,7 @@ Rectangle {
 
 	signal removeRequested()
 
-	width: compact ? compactRow.implicitWidth + Style.paddingS * 2 : Style.cardWidth
+	width: compact ? Style.chipWidth : Style.cardWidth
 	height: compact ? Style.chipHeight : Style.cardHeight
 	radius: Style.radiusS
 	color: Style.accentColorLight

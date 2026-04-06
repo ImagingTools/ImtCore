@@ -127,7 +127,7 @@ Rectangle {
 
 			delegate: Rectangle {
 				width: ticketListView.width
-				height: ticketItemContent.implicitHeight + Style.paddingS * 2
+				height: ticketItemContent.height + Style.paddingS * 2
 				color: model.id === ticketListPanelRoot.currentTicketId
 					? Style.selectedItemColor
 					: "transparent"

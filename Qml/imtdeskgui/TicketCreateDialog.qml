@@ -39,7 +39,7 @@ Rectangle {
 		id: dialogCard
 		anchors.centerIn: parent
 		width: Math.min(parent.width * 0.9, Style.dialogWidthM)
-		height: dialogColumn.implicitHeight + Style.paddingL * 2
+		height: dialogColumn.height + Style.paddingL * 2
 		radius: Style.radiusM
 		color: Style.backgroundColor
 
@@ -154,12 +154,6 @@ Rectangle {
 					ComboBox {
 						id: typeCombo
 						width: parent.width
-						// model: [
-						// 	qsTr("Access Request"),
-						// 	qsTr("Support Request"),
-						// 	qsTr("Feature Request"),
-						// 	qsTr("Bug Report")
-						// ]
 						currentIndex: 1
 					}
 				}
@@ -177,7 +171,6 @@ Rectangle {
 					ComboBox {
 						id: priorityCombo
 						width: parent.width
-						// model: [qsTr("Low"), qsTr("Medium"), qsTr("High"), qsTr("Critical")]
 						currentIndex: 1
 					}
 				}
@@ -197,7 +190,6 @@ Rectangle {
 				ComboBox {
 					id: environmentCombo
 					width: parent.width
-					// model: [qsTr("Development"), qsTr("Staging"), qsTr("Production")]
 					currentIndex: 2
 				}
 			}

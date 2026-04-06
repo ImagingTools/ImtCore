@@ -84,7 +84,7 @@ Rectangle {
 			// Description
 			Rectangle {
 				width: parent.width - Style.paddingL * 2
-				height: descText.implicitHeight + Style.paddingM * 2
+				height: descText.height + Style.paddingM * 2
 				color: Style.surfaceColor
 				radius: Style.radiusS
 
@@ -142,7 +142,7 @@ Rectangle {
 			}
 
 			// Tags
-			Flow {
+			Row {
 				visible: ticketViewRoot.tags.length > 0
 				width: parent.width - Style.paddingL * 2
 				spacing: Style.paddingXS
@@ -152,7 +152,7 @@ Rectangle {
 
 					Rectangle {
 						height: Style.chipHeight
-						width: tagText.implicitWidth + Style.paddingS * 2
+						width: Style.chipWidth
 						radius: height / 2
 						color: Style.tagBackgroundColor
 

@@ -156,7 +156,7 @@ Rectangle {
 					anchors.right: parent.right
 					anchors.rightMargin: Style.paddingS
 					anchors.verticalCenter: parent.verticalCenter
-					width: Math.max(Style.badgeSizeMin, unreadText.implicitWidth + Style.paddingXS * 2)
+					width: Style.badgeSizeMin
 					height: Style.badgeSizeMin
 					radius: height / 2
 					color: Style.accentColor

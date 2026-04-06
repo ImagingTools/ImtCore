@@ -34,7 +34,7 @@ Rectangle {
 		id: dialogCard
 		anchors.centerIn: parent
 		width: Math.min(parent.width * 0.9, Style.dialogWidthM)
-		height: dialogColumn.implicitHeight + Style.paddingL * 2
+		height: dialogColumn.height + Style.paddingL * 2
 		radius: Style.radiusM
 		color: Style.backgroundColor
 
@@ -182,7 +182,7 @@ Rectangle {
 	}
 
 	function submit() {
-		const convData = {
+		let convData = {
 			name: nameField.text.trim(),
 			conversationType: typeCombo.currentIndex,
 			participantIds: []

@@ -28,7 +28,7 @@ Rectangle {
 	readonly property string badgeLabel: (value >= 0 && value < badgeLabels.length)
 		? badgeLabels[value] : "?"
 
-	width: badgeLabelText.implicitWidth + Style.paddingXS * 2 + 4
+	width: Style.badgeWidthS
 	height: Style.badgeHeight
 	radius: height / 2
 	color: badgeColor

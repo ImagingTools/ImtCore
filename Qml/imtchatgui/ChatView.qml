@@ -96,8 +96,6 @@ Rectangle {
 				userName: chatViewContainer.typingUserName
 			}
 
-			ScrollBar.vertical: ScrollBar {}
-
 			Component.onCompleted: {
 				positionViewAtEnd();
 			}

@@ -9,7 +9,7 @@ Rectangle {
 	id: chatNotificationBannerRoot
 	objectName: "ChatNotificationBanner"
 	visible: false
-	height: visible ? bannerContent.implicitHeight + Style.paddingS * 2 : 0
+	height: visible ? Style.sizeS : 0
 	color: Style.accentColor
 	radius: Style.radiusS
 

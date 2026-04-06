@@ -21,7 +21,7 @@ Item {
 	signal createTicketRequested(string messageId, string content)
 
 	width: parent ? parent.width : 0
-	height: bubbleColumn.implicitHeight + Style.paddingS * 2
+	height: bubbleColumn.height + Style.paddingS * 2
 
 	Column {
 		id: bubbleColumn
@@ -32,7 +32,7 @@ Item {
 		anchors.top: parent.top
 		anchors.topMargin: Style.paddingXS
 		spacing: Style.paddingXS
-		width: Math.min(parent.width * 0.75, implicitWidth)
+		width: parent.width * 0.75
 
 		// Sender name (only for received messages)
 		Text {
@@ -46,8 +46,8 @@ Item {
 		// Message bubble
 		Rectangle {
 			id: bubble
-			width: Math.min(bubbleColumn.width, contentText.implicitWidth + Style.paddingM * 2)
-			height: contentText.implicitHeight + Style.paddingS * 2
+			width: bubbleColumn.width
+			height: contentText.height + Style.paddingS * 2
 			radius: Style.radiusS
 			color: messageBubbleRoot.isOwn ? Style.accentColor : Style.surfaceColor
 
@@ -62,38 +62,6 @@ Item {
 				color: messageBubbleRoot.isOwn ? "white" : Style.textPrimaryColor
 				wrapMode: Text.Wrap
 			}
-
-			// Context menu on right-click
-			MouseArea {
-				anchors.fill: parent
-				acceptedButtons: Qt.RightButton
-				onClicked: {
-					if (mouse.button === Qt.RightButton) {
-						contextMenu.popup();
-					}
-				}
-			}
-
-			// Menu {
-			// 	id: contextMenu
-
-			// 	MenuItem {
-			// 		text: qsTr("Create Ticket")
-			// 		onTriggered: {
-			// 			messageBubbleRoot.createTicketRequested(
-			// 				messageBubbleRoot.messageId,
-			// 				messageBubbleRoot.content
-			// 			);
-			// 		}
-			// 	}
-
-			// 	MenuItem {
-			// 		text: qsTr("Copy Text")
-			// 		onTriggered: {
-			// 			clipboard.setText(messageBubbleRoot.content);
-			// 		}
-			// 	}
-			// }
 		}
 
 		// Footer row: timestamp + status indicator
