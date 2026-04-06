@@ -84,7 +84,7 @@ Rectangle {
 				isOwn: model.isOwn || false
 				hasEntityRefs: model.hasEntityRefs || false
 
-				onCreateTicketRequested: function(msgId, msgContent) {
+				onCreateTicketRequested: {
 					chatViewContainer.ticketCreateRequested(msgId, msgContent);
 				}
 			}
@@ -111,7 +111,7 @@ Rectangle {
 			width: parent.width
 			conversationId: chatViewContainer.conversationId
 
-			onMessageReady: function(content, entityRefs, attachmentIds) {
+			onMessageReady: {
 				chatViewContainer.messageSent(content, entityRefs, attachmentIds);
 			}
 		}

@@ -72,9 +72,9 @@ Rectangle {
 			width: parent.width
 			height: Style.inputHeightS
 			placeholderText: qsTr("Search conversations...")
-			onSearchTextChanged: function(text) {
-				if (conversationsModel) {
-					conversationsModel.filterText = text;
+			onSearchTextChanged: {
+				if (chatPanelContainer.conversationsModel) {
+					chatPanelContainer.conversationsModel.filterText = text;
 				}
 			}
 		}

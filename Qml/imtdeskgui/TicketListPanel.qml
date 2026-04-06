@@ -107,8 +107,8 @@ Rectangle {
 						anchors.fill: parent
 						onClicked: {
 							ticketListPanelRoot.statusFilter = modelData.value;
-							if (ticketsModel) {
-								ticketsModel.statusFilter = modelData.value;
+							if (ticketListPanelRoot.ticketsModel) {
+								ticketListPanelRoot.ticketsModel.statusFilter = modelData.value;
 							}
 						}
 					}

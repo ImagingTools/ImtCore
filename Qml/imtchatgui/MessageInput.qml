@@ -156,7 +156,7 @@ Rectangle {
 		anchors.left: messageInputRoot.left
 		width: messageInputRoot.width * 0.6
 
-		onEntitySelected: function(entityType, entityId, displayName) {
+		onEntitySelected: {
 			let refs = messageInputRoot.pendingEntityRefs.slice();
 			refs.push({ entityType: entityType, entityId: entityId, displayName: displayName });
 			messageInputRoot.pendingEntityRefs = refs;
