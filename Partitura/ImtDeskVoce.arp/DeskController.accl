@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6379" Description="ACF"/>
+            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="CommandsController" X="575" Y="550" Note=""/>
+        <Element ComponentName="Conversation" X="800" Y="725" Note=""/>
+        <Element ComponentName="ConversationController" X="275" Y="300" Note=""/>
+        <Element ComponentName="Demultiplexer" X="575" Y="125" Note=""/>
+        <Element ComponentName="Ticket" X="325" Y="725" Note=""/>
+        <Element ComponentName="TicketController" X="900" Y="300" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>
