@@ -50,4 +50,12 @@ defineTest(prepareWebQml) {
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtlicsdl/SDL/1.0/QML/imtlicProductsSdl, $$buildwebdir/src/imtlicProductsSdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtlicsdl/SDL/1.0/QML/imtlicLicensesSdl, $$buildwebdir/src/imtlicLicensesSdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtappsdl/SDL/1.0/QML/imtappApplicationSdl, $$buildwebdir/src/imtappApplicationSdl)
+
+	copyToWebDir($$imtcoredir/Qml/imtdeskgui, $$buildwebdir/src/imtdeskgui)
+	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtdesksdl/SDL/1.0/QML/imtdeskImtDeskSdl, $$buildwebdir/src/imtdeskImtDeskSdl)
+	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtdesksdl/SDL/1.0/QML/imtdeskTicketCollectionDocumentManagerSdl, $$buildwebdir/src/imtdeskTicketCollectionDocumentManagerSdl)
+
+	copyToWebDir($$imtcoredir/Qml/imtchatgui, $$buildwebdir/src/imtchatgui)
+	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtchatsdl/SDL/1.0/QML/imtchatImtChatSdl, $$buildwebdir/src/imtchatImtChatSdl)
+	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtchatsdl/SDL/1.0/QML/imtchatConversationCollectionDocumentManagerSdl, $$buildwebdir/src/imtchatConversationCollectionDocumentManagerSdl)
 }

@@ -484,6 +484,28 @@ macro(getImtGeoQmlWebDirs webdirs buildwebdir)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtgeogui)
 endmacro(getImtGeoQmlWebDirs)
 
+macro(getImtDeskQmlWebDirs webdirs buildwebdir)
+	list(APPEND ${webdirs} ${IMTCOREDIR}/Qml/imtdeskgui)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtdeskgui)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtdesksdl/SDL/1.0/QML/imtdeskImtDeskSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtdeskImtDeskSdl)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtdesksdl/SDL/1.0/QML/imtdeskTicketCollectionDocumentManagerSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtdeskTicketCollectionDocumentManagerSdl)
+endmacro(getImtDeskQmlWebDirs)
+
+macro(getImtChatQmlWebDirs webdirs buildwebdir)
+	list(APPEND ${webdirs} ${IMTCOREDIR}/Qml/imtchatgui)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtchatgui)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtchatsdl/SDL/1.0/QML/imtchatImtChatSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtchatImtChatSdl)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtchatsdl/SDL/1.0/QML/imtchatConversationCollectionDocumentManagerSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtchatConversationCollectionDocumentManagerSdl)
+endmacro(getImtChatQmlWebDirs)
+
 macro(getImtCoreQmlWebDirs webdirs buildwebdir)
 	set(useImtControlsStyle TRUE)
 	if(${ARGC} GREATER 2)
@@ -494,4 +516,6 @@ macro(getImtCoreQmlWebDirs webdirs buildwebdir)
 	getImtLicQmlWebDirs(${webdirs} ${buildwebdir})
 	getImtAuthQmlWebDirs(${webdirs} ${buildwebdir})
 	getImtGeoQmlWebDirs(${webdirs} ${buildwebdir})
+	getImtDeskQmlWebDirs(${webdirs} ${buildwebdir})
+	getImtChatQmlWebDirs(${webdirs} ${buildwebdir})
 endmacro(getImtCoreQmlWebDirs)
