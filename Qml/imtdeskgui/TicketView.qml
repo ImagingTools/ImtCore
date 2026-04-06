@@ -190,7 +190,9 @@ Rectangle {
 
 					MouseArea {
 						anchors.fill: parent
-						onClicked: ticketViewRoot.statusChangeRequested(ticketViewRoot.status + 1)
+						onClicked: {
+							ticketViewRoot.statusChangeRequested(ticketViewRoot.status + 1)
+						}
 					}
 				}
 
@@ -212,7 +214,9 @@ Rectangle {
 
 					MouseArea {
 						anchors.fill: parent
-						onClicked: ticketViewRoot.conversationOpenRequested(ticketViewRoot.conversationId)
+						onClicked: {
+							ticketViewRoot.conversationOpenRequested(ticketViewRoot.conversationId)
+						}
 					}
 				}
 			}

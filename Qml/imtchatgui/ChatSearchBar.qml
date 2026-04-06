@@ -69,7 +69,9 @@ Rectangle {
 
 			MouseArea {
 				anchors.fill: parent
-				onClicked: textInput.text = ""
+				onClicked: {
+					textInput.text = ""
+				}
 			}
 		}
 	}

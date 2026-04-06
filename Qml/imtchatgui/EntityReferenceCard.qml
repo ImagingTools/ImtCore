@@ -55,7 +55,9 @@ Rectangle {
 
 			MouseArea {
 				anchors.fill: parent
-				onClicked: entityRefCardRoot.removeRequested()
+				onClicked: {
+					entityRefCardRoot.removeRequested()
+				}
 			}
 		}
 	}

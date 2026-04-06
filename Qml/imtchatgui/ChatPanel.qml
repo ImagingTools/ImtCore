@@ -58,7 +58,9 @@ Rectangle {
 
 					MouseArea {
 						anchors.fill: parent
-						onClicked: chatPanelContainer.newConversationRequested()
+						onClicked: {
+							chatPanelContainer.newConversationRequested()
+						}
 					}
 				}
 			}

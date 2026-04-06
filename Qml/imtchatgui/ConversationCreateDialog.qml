@@ -23,7 +23,9 @@ Rectangle {
 
 		MouseArea {
 			anchors.fill: parent
-			onClicked: conversationCreateDialogRoot.cancel()
+			onClicked: {
+				conversationCreateDialogRoot.cancel()
+			}
 		}
 	}
 
@@ -135,7 +137,9 @@ Rectangle {
 
 					MouseArea {
 						anchors.fill: parent
-						onClicked: conversationCreateDialogRoot.cancel()
+						onClicked: {
+							conversationCreateDialogRoot.cancel()
+						}
 					}
 				}
 
@@ -156,7 +160,9 @@ Rectangle {
 					MouseArea {
 						anchors.fill: parent
 						enabled: nameField.text.trim().length > 0
-						onClicked: conversationCreateDialogRoot.submit()
+						onClicked: {
+							conversationCreateDialogRoot.submit()
+						}
 					}
 				}
 			}

@@ -59,7 +59,9 @@ Rectangle {
 
 					MouseArea {
 						anchors.fill: parent
-						onClicked: ticketListPanelRoot.newTicketRequested()
+						onClicked: {
+							ticketListPanelRoot.newTicketRequested()
+						}
 					}
 				}
 			}

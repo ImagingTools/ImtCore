@@ -145,7 +145,9 @@ Rectangle {
 				MouseArea {
 					anchors.fill: parent
 					enabled: textField.text.trim().length > 0
-					onClicked: messageInputRoot.sendMessage()
+					onClicked: {
+						messageInputRoot.sendMessage()
+					}
 				}
 			}
 		}

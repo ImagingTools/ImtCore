@@ -77,7 +77,9 @@ Rectangle {
 
 			MouseArea {
 				anchors.fill: parent
-				onClicked: chatNotificationBannerRoot.dismiss()
+				onClicked: {
+					chatNotificationBannerRoot.dismiss()
+				}
 			}
 		}
 	}
@@ -93,7 +95,9 @@ Rectangle {
 	Timer {
 		id: autoDismissTimer
 		interval: 4000
-		onTriggered: chatNotificationBannerRoot.dismiss()
+		onTriggered: {
+			chatNotificationBannerRoot.dismiss()
+		}
 	}
 
 	function show(sender, preview, convId) {
