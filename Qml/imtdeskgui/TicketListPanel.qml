@@ -28,13 +28,11 @@ Rectangle {
 			color: Style.panelHeaderColor
 
 			Row {
-				anchors {
-					left: parent.left
-					right: parent.right
-					verticalCenter: parent.verticalCenter
-					leftMargin: Style.paddingM
-					rightMargin: Style.paddingS
-				}
+				anchors.left: parent.left
+				anchors.right: parent.right
+				anchors.verticalCenter: parent.verticalCenter
+				anchors.leftMargin: Style.paddingM
+				anchors.rightMargin: Style.paddingS
 
 				Text {
 					text: qsTr("Tickets")
@@ -134,13 +132,11 @@ Rectangle {
 
 				Column {
 					id: ticketItemContent
-					anchors {
-						left: parent.left
-						right: parent.right
-						verticalCenter: parent.verticalCenter
-						leftMargin: Style.paddingM
-						rightMargin: Style.paddingS
-					}
+					anchors.left: parent.left
+					anchors.right: parent.right
+					anchors.verticalCenter: parent.verticalCenter
+					anchors.leftMargin: Style.paddingM
+					anchors.rightMargin: Style.paddingS
 					spacing: Style.paddingXS
 
 					Row {

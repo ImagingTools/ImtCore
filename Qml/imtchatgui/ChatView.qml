@@ -31,13 +31,11 @@ Rectangle {
 			color: Style.panelHeaderColor
 
 			Row {
-				anchors {
-					left: parent.left
-					right: parent.right
-					verticalCenter: parent.verticalCenter
-					leftMargin: Style.paddingM
-					rightMargin: Style.paddingM
-				}
+				anchors.left: parent.left
+				anchors.right: parent.right
+				anchors.verticalCenter: parent.verticalCenter
+				anchors.leftMargin: Style.paddingM
+				anchors.rightMargin: Style.paddingM
 				spacing: Style.paddingS
 
 				Rectangle {
@@ -124,11 +122,9 @@ Rectangle {
 	// Notification banner overlay
 	ChatNotificationBanner {
 		id: notificationBanner
-		anchors {
-			top: parent.top
-			left: parent.left
-			right: parent.right
-		}
+		anchors.top: parent.top
+		anchors.left: parent.left
+		anchors.right: parent.right
 	}
 
 	function showNotification(senderName, preview) {

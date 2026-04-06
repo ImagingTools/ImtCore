@@ -25,14 +25,12 @@ Item {
 
 	Column {
 		id: bubbleColumn
-		anchors {
-			left: messageBubbleRoot.isOwn ? undefined : parent.left
-			right: messageBubbleRoot.isOwn ? parent.right : undefined
-			leftMargin: messageBubbleRoot.isOwn ? 0 : Style.paddingM
-			rightMargin: messageBubbleRoot.isOwn ? Style.paddingM : 0
-			top: parent.top
-			topMargin: Style.paddingXS
-		}
+		anchors.left: messageBubbleRoot.isOwn ? undefined : parent.left
+		anchors.right: messageBubbleRoot.isOwn ? parent.right : undefined
+		anchors.leftMargin: messageBubbleRoot.isOwn ? 0 : Style.paddingM
+		anchors.rightMargin: messageBubbleRoot.isOwn ? Style.paddingM : 0
+		anchors.top: parent.top
+		anchors.topMargin: Style.paddingXS
 		spacing: Style.paddingXS
 		width: Math.min(parent.width * 0.75, implicitWidth)
 
@@ -55,12 +53,10 @@ Item {
 
 			Text {
 				id: contentText
-				anchors {
-					left: parent.left
-					right: parent.right
-					top: parent.top
-					margins: Style.paddingM
-				}
+				anchors.left: parent.left
+				anchors.right: parent.right
+				anchors.top: parent.top
+				anchors.margins: Style.paddingM
 				text: messageBubbleRoot.content
 				font.pixelSize: Style.fontSizeS
 				color: messageBubbleRoot.isOwn ? "white" : Style.textPrimaryColor
@@ -102,10 +98,8 @@ Item {
 
 		// Footer row: timestamp + status indicator
 		Row {
-			anchors {
-				right: messageBubbleRoot.isOwn ? bubbleColumn.right : undefined
-				left: messageBubbleRoot.isOwn ? undefined : bubbleColumn.left
-			}
+			anchors.right: messageBubbleRoot.isOwn ? bubbleColumn.right : undefined
+			anchors.left: messageBubbleRoot.isOwn ? undefined : bubbleColumn.left
 			spacing: Style.paddingXS
 
 			Text {

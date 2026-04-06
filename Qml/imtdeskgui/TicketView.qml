@@ -90,12 +90,10 @@ Rectangle {
 
 				Text {
 					id: descText
-					anchors {
-						left: parent.left
-						right: parent.right
-						top: parent.top
-						margins: Style.paddingM
-					}
+					anchors.left: parent.left
+					anchors.right: parent.right
+					anchors.top: parent.top
+					anchors.margins: Style.paddingM
 					text: ticketViewRoot.description.length > 0
 						? ticketViewRoot.description
 						: qsTr("(No description provided)")

@@ -19,12 +19,10 @@ Rectangle {
 	signal typingStopped()
 
 	Column {
-		anchors {
-			left: parent.left
-			right: parent.right
-			top: parent.top
-			margins: Style.paddingS
-		}
+		anchors.left: parent.left
+		anchors.right: parent.right
+		anchors.top: parent.top
+		anchors.margins: Style.paddingS
 		spacing: Style.paddingXS
 
 		// Entity reference chips row
@@ -156,10 +154,8 @@ Rectangle {
 	// Entity search popup
 	EntitySearchPopup {
 		id: entitySearchPopup
-		anchors {
-			bottom: messageInputRoot.top
-			left: messageInputRoot.left
-		}
+		anchors.bottom: messageInputRoot.top
+		anchors.left: messageInputRoot.left
 		width: messageInputRoot.width * 0.6
 
 		onEntitySelected: function(entityType, entityId, displayName) {

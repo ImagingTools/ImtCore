@@ -43,12 +43,10 @@ Rectangle {
 
 		Column {
 			id: dialogColumn
-			anchors {
-				left: parent.left
-				right: parent.right
-				top: parent.top
-				margins: Style.paddingL
-			}
+			anchors.left: parent.left
+			anchors.right: parent.right
+			anchors.top: parent.top
+			anchors.margins: Style.paddingL
 			spacing: Style.paddingM
 
 			// Title
@@ -79,10 +77,8 @@ Rectangle {
 
 					TextInput {
 						id: titleField
-						anchors {
-							fill: parent
-							margins: Style.paddingS
-						}
+						anchors.fill: parent
+						anchors.margins: Style.paddingS
 						font.pixelSize: Style.fontSizeS
 						color: Style.textPrimaryColor
 						clip: true
@@ -120,10 +116,8 @@ Rectangle {
 
 					TextEdit {
 						id: descriptionField
-						anchors {
-							fill: parent
-							margins: Style.paddingS
-						}
+						anchors.fill: parent
+						anchors.margins: Style.paddingS
 						font.pixelSize: Style.fontSizeS
 						color: Style.textPrimaryColor
 						wrapMode: TextEdit.Wrap

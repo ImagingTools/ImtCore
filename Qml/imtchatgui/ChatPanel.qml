@@ -27,13 +27,11 @@ Rectangle {
 			color: Style.panelHeaderColor
 
 			Row {
-				anchors {
-					left: parent.left
-					right: parent.right
-					verticalCenter: parent.verticalCenter
-					leftMargin: Style.paddingM
-					rightMargin: Style.paddingS
-				}
+				anchors.left: parent.left
+				anchors.right: parent.right
+				anchors.verticalCenter: parent.verticalCenter
+				anchors.leftMargin: Style.paddingM
+				anchors.rightMargin: Style.paddingS
 
 				Text {
 					text: qsTr("Chats")
@@ -103,13 +101,11 @@ Rectangle {
 				}
 
 				Row {
-					anchors {
-						left: parent.left
-						right: parent.right
-						verticalCenter: parent.verticalCenter
-						leftMargin: Style.paddingM
-						rightMargin: Style.paddingS
-					}
+					anchors.left: parent.left
+					anchors.right: parent.right
+					anchors.verticalCenter: parent.verticalCenter
+					anchors.leftMargin: Style.paddingM
+					anchors.rightMargin: Style.paddingS
 					spacing: Style.paddingS
 
 					// Avatar placeholder
@@ -155,11 +151,9 @@ Rectangle {
 				// Unread badge
 				Rectangle {
 					visible: model.unreadCount > 0
-					anchors {
-						right: parent.right
-						rightMargin: Style.paddingS
-						verticalCenter: parent.verticalCenter
-					}
+					anchors.right: parent.right
+					anchors.rightMargin: Style.paddingS
+					anchors.verticalCenter: parent.verticalCenter
 					width: Math.max(Style.badgeSizeMin, unreadText.implicitWidth + Style.paddingXS * 2)
 					height: Style.badgeSizeMin
 					radius: height / 2

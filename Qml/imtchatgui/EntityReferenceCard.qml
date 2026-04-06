@@ -63,12 +63,10 @@ Rectangle {
 	// Full card mode (used in message body)
 	Column {
 		visible: !compact
-		anchors {
-			left: parent.left
-			right: parent.right
-			top: parent.top
-			margins: Style.paddingS
-		}
+		anchors.left: parent.left
+		anchors.right: parent.right
+		anchors.top: parent.top
+		anchors.margins: Style.paddingS
 		spacing: Style.paddingXS
 
 		Row {
