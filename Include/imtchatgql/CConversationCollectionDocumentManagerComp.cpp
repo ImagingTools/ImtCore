@@ -19,7 +19,7 @@ namespace imtchatgql
 
 sdl::imtchat::ImtChat::CConversationData CConversationCollectionDocumentManagerComp::OnGetConversationRepresentation(
 			const sdl::imtchat::ConversationCollectionDocumentManager::CGetConversationRepresentationGqlRequest& getConversationRepresentationRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::imtchat::ConversationCollectionDocumentManager::GetConversationRepresentationRequestArguments arguments = getConversationRepresentationRequest.GetRequestedArguments();
@@ -28,12 +28,14 @@ sdl::imtchat::ImtChat::CConversationData CConversationCollectionDocumentManagerC
 		return sdl::imtchat::ImtChat::CConversationData();
 	}
 
+	QByteArray userId = GetUserId(gqlRequest);
+
 	QByteArray objectId;
 	istd::IChangeableSharedPtr documentPtr;
 	if (arguments.input.Version_1_0->id){
 		objectId = *arguments.input.Version_1_0->id;
 
-		m_documentManagerCompPtr->GetDocumentData("", objectId, documentPtr);
+		m_documentManagerCompPtr->GetDocumentData(userId, objectId, documentPtr);
 	}
 
 	if (!documentPtr.IsValid()){
@@ -60,7 +62,7 @@ sdl::imtchat::ImtChat::CConversationData CConversationCollectionDocumentManagerC
 
 sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CConversationCollectionDocumentManagerComp::OnUpdateConversationFromRepresentation(
 			const sdl::imtchat::ConversationCollectionDocumentManager::CUpdateConversationFromRepresentationGqlRequest& updateConversationFromRepresentationRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::imtchat::ConversationCollectionDocumentManager::UpdateConversationFromRepresentationRequestArguments arguments = updateConversationFromRepresentationRequest.GetRequestedArguments();
@@ -83,8 +85,10 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CConversationC
 		convInfo = *arguments.input.Version_1_0->conversation;
 	}
 
+	QByteArray userId = GetUserId(gqlRequest);
+
 	istd::IChangeableSharedPtr documentPtr;
-	m_documentManagerCompPtr->GetDocumentData("", documentId, documentPtr);
+	m_documentManagerCompPtr->GetDocumentData(userId, documentId, documentPtr);
 	if (!documentPtr.IsValid()){
 		response.Version_1_0->status = sdl::imtbase::CollectionDocumentManager::EDocumentOperationStatus::InvalidDocumentId;
 		return response;

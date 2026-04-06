@@ -149,177 +149,180 @@ ViewBase {
 			width: 700
 			spacing: Style.marginXL
 
-			TextInputElementView {
-				id: titleInput
-
-				name: qsTr("Title")
-				placeHolderText: qsTr("Enter the ticket title")
-				textInputValidator: notEmptyRegexp
-				showErrorWhenInvalid: true
-
-				onEditingFinished: {
-					root.doUpdateModel()
-				}
-			}
-
-			RegularExpressionValidator {
-				id: notEmptyRegexp
-				regularExpression: /^(?!\s*$).+/;
-			}
-
-			TextInputElementView {
-				id: descriptionInput
-
-				name: qsTr("Description")
-				placeHolderText: qsTr("Describe the issue in detail")
-
-				onEditingFinished: {
-					root.doUpdateModel()
-				}
-			}
-
-			ComboBoxElementView {
-				id: ticketTypeCB
-				name: qsTr("Ticket Type")
-				currentIndex: 1
-				model: TreeItemModel {
-					Component.onCompleted: {
-						let index = insertNewItem()
-						setData("id", "AccessRequest", index)
-						setData("name", "Access Request", index)
-
-						index = insertNewItem()
-						setData("id", "SupportRequest", index)
-						setData("name", "Support Request", index)
-
-						index = insertNewItem()
-						setData("id", "FeatureRequest", index)
-						setData("name", "Feature Request", index)
-
-						index = insertNewItem()
-						setData("id", "BugReport", index)
-						setData("name", "Bug Report", index)
+			GroupElementView {
+				width: parent.width
+				TextInputElementView {
+					id: titleInput
+	
+					name: qsTr("Title")
+					placeHolderText: qsTr("Enter the ticket title")
+					textInputValidator: notEmptyRegexp
+					showErrorWhenInvalid: true
+	
+					onEditingFinished: {
+						root.doUpdateModel()
 					}
 				}
-
-				onCurrentIndexChanged: {
-					root.doUpdateModel()
+	
+				RegularExpressionValidator {
+					id: notEmptyRegexp
+					regularExpression: /^(?!\s*$).+/;
 				}
-			}
-
-			ComboBoxElementView {
-				id: statusCB
-				name: qsTr("Status")
-				currentIndex: 0
-				model: TreeItemModel {
-					Component.onCompleted: {
-						let index = insertNewItem()
-						setData("id", "Open", index)
-						setData("name", "Open", index)
-
-						index = insertNewItem()
-						setData("id", "InProgress", index)
-						setData("name", "In Progress", index)
-
-						index = insertNewItem()
-						setData("id", "Resolved", index)
-						setData("name", "Resolved", index)
-
-						index = insertNewItem()
-						setData("id", "Closed", index)
-						setData("name", "Closed", index)
+	
+				TextInputElementView {
+					id: descriptionInput
+	
+					name: qsTr("Description")
+					placeHolderText: qsTr("Describe the issue in detail")
+	
+					onEditingFinished: {
+						root.doUpdateModel()
 					}
 				}
-
-				onCurrentIndexChanged: {
-					root.doUpdateModel()
-				}
-			}
-
-			ComboBoxElementView {
-				id: priorityCB
-				name: qsTr("Priority")
-				currentIndex: 1
-				model: TreeItemModel {
-					Component.onCompleted: {
-						let index = insertNewItem()
-						setData("id", "Low", index)
-						setData("name", "Low", index)
-
-						index = insertNewItem()
-						setData("id", "Medium", index)
-						setData("name", "Medium", index)
-
-						index = insertNewItem()
-						setData("id", "High", index)
-						setData("name", "High", index)
-
-						index = insertNewItem()
-						setData("id", "Critical", index)
-						setData("name", "Critical", index)
+	
+				ComboBoxElementView {
+					id: ticketTypeCB
+					name: qsTr("Ticket Type")
+					currentIndex: 1
+					model: TreeItemModel {
+						Component.onCompleted: {
+							let index = insertNewItem()
+							setData("id", "AccessRequest", index)
+							setData("name", "Access Request", index)
+	
+							index = insertNewItem()
+							setData("id", "SupportRequest", index)
+							setData("name", "Support Request", index)
+	
+							index = insertNewItem()
+							setData("id", "FeatureRequest", index)
+							setData("name", "Feature Request", index)
+	
+							index = insertNewItem()
+							setData("id", "BugReport", index)
+							setData("name", "Bug Report", index)
+						}
+					}
+	
+					onCurrentIndexChanged: {
+						root.doUpdateModel()
 					}
 				}
-
-				onCurrentIndexChanged: {
-					root.doUpdateModel()
-				}
-			}
-
-			ComboBoxElementView {
-				id: environmentCB
-				name: qsTr("Environment")
-				currentIndex: 2
-				model: TreeItemModel {
-					Component.onCompleted: {
-						let index = insertNewItem()
-						setData("id", "Development", index)
-						setData("name", "Development", index)
-
-						index = insertNewItem()
-						setData("id", "Staging", index)
-						setData("name", "Staging", index)
-
-						index = insertNewItem()
-						setData("id", "Production", index)
-						setData("name", "Production", index)
+	
+				ComboBoxElementView {
+					id: statusCB
+					name: qsTr("Status")
+					currentIndex: 0
+					model: TreeItemModel {
+						Component.onCompleted: {
+							let index = insertNewItem()
+							setData("id", "Open", index)
+							setData("name", "Open", index)
+	
+							index = insertNewItem()
+							setData("id", "InProgress", index)
+							setData("name", "In Progress", index)
+	
+							index = insertNewItem()
+							setData("id", "Resolved", index)
+							setData("name", "Resolved", index)
+	
+							index = insertNewItem()
+							setData("id", "Closed", index)
+							setData("name", "Closed", index)
+						}
+					}
+	
+					onCurrentIndexChanged: {
+						root.doUpdateModel()
 					}
 				}
-
-				onCurrentIndexChanged: {
-					root.doUpdateModel()
+	
+				ComboBoxElementView {
+					id: priorityCB
+					name: qsTr("Priority")
+					currentIndex: 1
+					model: TreeItemModel {
+						Component.onCompleted: {
+							let index = insertNewItem()
+							setData("id", "Low", index)
+							setData("name", "Low", index)
+	
+							index = insertNewItem()
+							setData("id", "Medium", index)
+							setData("name", "Medium", index)
+	
+							index = insertNewItem()
+							setData("id", "High", index)
+							setData("name", "High", index)
+	
+							index = insertNewItem()
+							setData("id", "Critical", index)
+							setData("name", "Critical", index)
+						}
+					}
+	
+					onCurrentIndexChanged: {
+						root.doUpdateModel()
+					}
 				}
-			}
-
-			TextInputElementView {
-				id: assigneeIdInput
-
-				name: qsTr("Assignee ID")
-				placeHolderText: qsTr("Enter assignee user ID")
-
-				onEditingFinished: {
-					root.doUpdateModel()
+	
+				ComboBoxElementView {
+					id: environmentCB
+					name: qsTr("Environment")
+					currentIndex: 2
+					model: TreeItemModel {
+						Component.onCompleted: {
+							let index = insertNewItem()
+							setData("id", "Development", index)
+							setData("name", "Development", index)
+	
+							index = insertNewItem()
+							setData("id", "Staging", index)
+							setData("name", "Staging", index)
+	
+							index = insertNewItem()
+							setData("id", "Production", index)
+							setData("name", "Production", index)
+						}
+					}
+	
+					onCurrentIndexChanged: {
+						root.doUpdateModel()
+					}
 				}
-			}
-
-			TextInputElementView {
-				id: reporterIdInput
-
-				name: qsTr("Reporter ID")
-				placeHolderText: qsTr("Enter reporter user ID")
-
-				onEditingFinished: {
-					root.doUpdateModel()
+	
+				TextInputElementView {
+					id: assigneeIdInput
+	
+					name: qsTr("Assignee ID")
+					placeHolderText: qsTr("Enter assignee user ID")
+	
+					onEditingFinished: {
+						root.doUpdateModel()
+					}
 				}
-			}
-
-			TextInputElementView {
-				id: conversationIdInput
-
-				name: qsTr("Linked Conversation")
-				placeHolderText: qsTr("Conversation ID (links to Conversations page)")
-
-				onEditingFinished: {
-					root.doUpdateModel()
+	
+				TextInputElementView {
+					id: reporterIdInput
+	
+					name: qsTr("Reporter ID")
+					placeHolderText: qsTr("Enter reporter user ID")
+	
+					onEditingFinished: {
+						root.doUpdateModel()
+					}
+				}
+	
+				TextInputElementView {
+					id: conversationIdInput
+	
+					name: qsTr("Linked Conversation")
+					placeHolderText: qsTr("Conversation ID (links to Conversations page)")
+	
+					onEditingFinished: {
+						root.doUpdateModel()
+					}
 				}
 			}
 		}

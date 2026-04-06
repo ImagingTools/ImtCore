@@ -112,14 +112,14 @@
                     <AttributeInfo Id="OptionIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>SupportTicket</Value>
+                                <Value>Ticket</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="OptionNames" Type="Text[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>Support Ticket</Value>
+                                <Value>Ticket</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

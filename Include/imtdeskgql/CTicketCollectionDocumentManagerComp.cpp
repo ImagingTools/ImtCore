@@ -19,7 +19,7 @@ namespace imtdeskgql
 
 sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTicketRepresentation(
 			const sdl::imtdesk::TicketCollectionDocumentManager::CGetTicketRepresentationGqlRequest& getTicketRepresentationRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::imtdesk::TicketCollectionDocumentManager::GetTicketRepresentationRequestArguments arguments = getTicketRepresentationRequest.GetRequestedArguments();
@@ -28,12 +28,14 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 		return sdl::imtdesk::ImtDesk::CTicketData();
 	}
 
+	QByteArray userId = GetUserId(gqlRequest);
+
 	QByteArray objectId;
 	istd::IChangeableSharedPtr documentPtr;
 	if (arguments.input.Version_1_0->id){
 		objectId = *arguments.input.Version_1_0->id;
 
-		m_documentManagerCompPtr->GetDocumentData("", objectId, documentPtr);
+		m_documentManagerCompPtr->GetDocumentData(userId, objectId, documentPtr);
 	}
 
 	if (!documentPtr.IsValid()){
@@ -65,7 +67,7 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 
 sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollectionDocumentManagerComp::OnUpdateTicketFromRepresentation(
 			const sdl::imtdesk::TicketCollectionDocumentManager::CUpdateTicketFromRepresentationGqlRequest& updateTicketFromRepresentationRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::imtdesk::TicketCollectionDocumentManager::UpdateTicketFromRepresentationRequestArguments arguments = updateTicketFromRepresentationRequest.GetRequestedArguments();
@@ -88,8 +90,10 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 		ticketInfo = *arguments.input.Version_1_0->ticket;
 	}
 
+	QByteArray userId = GetUserId(gqlRequest);
+
 	istd::IChangeableSharedPtr documentPtr;
-	m_documentManagerCompPtr->GetDocumentData("", documentId, documentPtr);
+	m_documentManagerCompPtr->GetDocumentData(userId, documentId, documentPtr);
 	if (!documentPtr.IsValid()){
 		response.Version_1_0->status = sdl::imtbase::CollectionDocumentManager::EDocumentOperationStatus::InvalidDocumentId;
 		return response;

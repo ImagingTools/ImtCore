@@ -54,6 +54,9 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
+                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -116,13 +119,6 @@
         <Element Id="CommandsController" PackageId="ImtGraphQlVoce" ComponentId="CommandsController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="CenterAlignmentCommands" Type="Reference[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>TicketEditorCommand</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
                     <AttributeInfo Id="LeftAlignmentCommands" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
@@ -196,6 +192,9 @@
                     <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Tickets"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="CollectionName" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="Tickets"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="CollectionObjectFactory" Type="Factory[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
@@ -222,6 +221,11 @@
                     <AttributeInfo Id="ReplaceableFilterFields" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
+                                <Value>title</Value>
+                                <Value>ticketType</Value>
+                                <Value>status</Value>
+                                <Value>priority</Value>
+                                <Value>assigneeId</Value>
                                 <Value>createdAt</Value>
                             </Values>
                         </Data>
@@ -229,6 +233,11 @@
                     <AttributeInfo Id="ReplacementFilterFields" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
+                                <Value>Title</Value>
+                                <Value>TicketType</Value>
+                                <Value>Status</Value>
+                                <Value>Priority</Value>
+                                <Value>AssigneeId</Value>
                                 <Value>CreatedAt</Value>
                             </Values>
                         </Data>
@@ -272,36 +281,6 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="TicketEditorCommand" PackageId="ImtCoreVoce" ComponentId="Command">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="CommandId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="TicketEditor"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="IconPath" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value="Icons/Key"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="IsEnabled" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="true"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="IsVisible" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="true"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Name" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Ticket Editor"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Priority" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="1"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="TicketSqlRepository" PackageId="ImtDeskVoce" ComponentId="TicketSqlRepository">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -326,5 +305,7 @@
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="Demultiplexer"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="Demultiplexer"/>
     </ExportedInterfaces>
-    <ExportedComponents/>
+    <ExportedComponents>
+        <Component ExportedId="CollectionDocumentManagerPublisher" ComponentId="CollectionDocumentManager/CollectionDocumentManagerPublisher"/>
+    </ExportedComponents>
 </Acf>

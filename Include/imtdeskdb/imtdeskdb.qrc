@@ -1,6 +1,8 @@
 <RCC>
-    <qresource prefix="/imtdeskdb">
-        <file>Resources/SQL/Postgres/CreateTicketsTable.sql</file>
-        <file>Resources/SQL/SQLite/CreateTicketsTable.sql</file>
+    <qresource prefix="/SQL/Postgres">
+        <file alias="CreateTicketsTable.sql">Resources/SQL/Postgres/CreateTicketsTable.sql</file>
+    </qresource>
+    <qresource prefix="/SQL/SQLite">
+        <file alias="CreateTicketsTable.sql">Resources/SQL/SQLite/CreateTicketsTable.sql</file>
     </qresource>
 </RCC>

@@ -18,6 +18,7 @@ RemoteCollectionView {
 	gqlGetListCommandId: ImtchatImtChatSdlCommandIds.s_conversationsList
 
 	Component.onCompleted: {
+		console.log("ConversationCollectionView.qml onCompleted")
 		table.setSortingInfo(ConversationItemDataTypeMetaInfo.s_updatedAt, "DESC")
 	}
 

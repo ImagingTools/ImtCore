@@ -43,16 +43,13 @@
                         <Data IsEnabled="true" Value="4"/>
                     </AttributeInfo>
                     <AttributeInfo Id="CommandId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Undo"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="UndoPermissions">
-                        <Data IsEnabled="false"/>
+                        <Data IsEnabled="true" Value="Conversations"/>
                     </AttributeInfo>
                     <AttributeInfo Id="IconPath" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Icons/Undo"/>
+                        <Data IsEnabled="true" Value="Icons/Ok"/>
                     </AttributeInfo>
                     <AttributeInfo Id="IsEnabled" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="false"/>
+                        <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
                     <AttributeInfo Id="IsVisible" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
@@ -61,7 +58,7 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Name" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Undo"/>
+                        <Data IsEnabled="true" Value="Conversations"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Priority" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="10"/>
@@ -82,6 +79,9 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
@@ -130,16 +130,13 @@
                         <Data IsEnabled="true" Value="1"/>
                     </AttributeInfo>
                     <AttributeInfo Id="CommandId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Save"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="SavePermissions">
-                        <Data IsEnabled="false"/>
+                        <Data IsEnabled="true" Value="Tickets"/>
                     </AttributeInfo>
                     <AttributeInfo Id="IconPath" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Icons/Save"/>
+                        <Data IsEnabled="true" Value="Icons/Ok"/>
                     </AttributeInfo>
                     <AttributeInfo Id="IsEnabled" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="false"/>
+                        <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
                     <AttributeInfo Id="IsVisible" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
@@ -148,7 +145,7 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Name" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Save"/>
+                        <Data IsEnabled="true" Value="Tickets"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Priority" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="10"/>
@@ -171,6 +168,9 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -191,5 +191,8 @@
     <ExportedInterfaces>
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="Demultiplexer"/>
     </ExportedInterfaces>
-    <ExportedComponents/>
+    <ExportedComponents>
+        <Component ExportedId="ConversationPublisher" ComponentId="ConversationController/CollectionDocumentManagerPublisher"/>
+        <Component ExportedId="TicketPublisher" ComponentId="TicketController/CollectionDocumentManagerPublisher"/>
+    </ExportedComponents>
 </Acf>

@@ -102,5 +102,8 @@
         <Interface InterfaceId="istd::IChangeable" ComponentId="CollectionDocumentManager"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="CollectionDocumentManager"/>
     </ExportedInterfaces>
-    <ExportedComponents/>
+    <ExportedComponents>
+        <Component ExportedId="CollectionDocumentManager" ComponentId="CollectionDocumentManager"/>
+        <Component ExportedId="CollectionDocumentManagerPublisher" ComponentId="CollectionDocumentManagerPublisher"/>
+    </ExportedComponents>
 </Acf>

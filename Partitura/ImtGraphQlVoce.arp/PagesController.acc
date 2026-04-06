@@ -59,7 +59,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>Workspace</Value>
-                                <Value>Desk</Value>
+                                <Value>DeskPage</Value>
                                 <Value>SearchPage</Value>
                                 <Value>AdministrationPage</Value>
                             </Values>
@@ -91,7 +91,43 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="Desk" PackageId="ImtCoreVoce" ComponentId="SingleDocPage">
+        <Element Id="DeskPage" PackageId="ImtGraphQlVoce" ComponentId="MultiDocumentGqlCollectionPage">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Alignment" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="32"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CollectionViewQmlPath" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="qrc:/qml/imtdeskgui/TicketCollectionView.qml"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IconPath" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Icons/Dashboard"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsEnabled" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsVisible" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Tickets"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PageId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Tickets"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="DeskPage_" PackageId="ImtCoreVoce" ComponentId="SingleDocPage">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Alignment" Type="Integer" ExportId="">

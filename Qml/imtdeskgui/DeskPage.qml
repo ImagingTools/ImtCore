@@ -19,29 +19,47 @@ ViewBase {
 		stackView.addPage(conversationCollectionViewComp)
 
 		if (commandsController){
-			commandsController.setIsToggleable("Ticket", true)
-			commandsController.setToggled("Ticket", true)
-			commandsController.setIsToggleable("Conversation", true)
-			commandsController.setToggled("Conversation", false)
+			commandsController.setIsToggleable("Tickets", true)
+			commandsController.setToggled("Tickets", true)
+			commandsController.setIsToggleable("Conversations", true)
+			commandsController.setToggled("Conversations", false)
 		}
+
+		stackView.setCurrentIndex(0)
+	}
+
+	onCommandActivated: {
+		checkCurrentPage(commandId)
+	}
+
+	function checkCurrentPage(commandId){
+		if (commandId === "Tickets"){
+			stackView.setCurrentIndex(0)
+		}
+		else if (commandId === "Conversations"){
+			stackView.setCurrentIndex(1)
+		}
+
+		commandsController.setToggled("Tickets", commandId === "Tickets")
+		commandsController.setToggled("Conversations", commandId === "Conversations")
 	}
 
 	Component {
 		id: conversationCollectionViewComp
 		ConversationCollectionView {
+			anchors.fill: parent
 		}
 	}
 
 	Component {
 		id: ticketCollectionViewComp
 		TicketCollectionView {
+			anchors.fill: parent
 		}
 	}
 
 	StackView {
 		id: stackView
 		anchors.fill: parent
-		currentIndex: 0
-		adaptSizeToCurrentPage: true
 	}
 }
