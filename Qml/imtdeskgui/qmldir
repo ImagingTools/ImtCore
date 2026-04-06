@@ -1,5 +1,6 @@
 module imtdeskgui
 
+DeskPage 1.0 DeskPage.qml
 TicketBadge 1.0 TicketBadge.qml
 TicketCollectionView 1.0 TicketCollectionView.qml
 TicketCreateDialog 1.0 TicketCreateDialog.qml

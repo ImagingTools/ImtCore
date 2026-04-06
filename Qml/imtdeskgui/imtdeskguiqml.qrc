@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/qml">
 	    <file alias="imtdeskgui/qmldir">qmldir</file>
+		<file alias="imtdeskgui/DeskPage.qml">DeskPage.qml</file>
 		<file alias="imtdeskgui/TicketBadge.qml">TicketBadge.qml</file>
 		<file alias="imtdeskgui/TicketCollectionView.qml">TicketCollectionView.qml</file>
 		<file alias="imtdeskgui/TicketCreateDialog.qml">TicketCreateDialog.qml</file>
