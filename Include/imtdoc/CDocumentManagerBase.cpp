@@ -60,7 +60,7 @@ IDocumentManager::DocumentList CDocumentManagerBase::GetOpenedDocumentList(
 			DocumentListItem info;
 			info.documentId = id;
 			info.typeId = workingDocument.typeId;
-			info.url = "collection:///" + workingDocument.objectId;
+			info.url = workingDocument.url;
 			info.name = workingDocument.name;
 			info.isDirty = workingDocument.isDirty;
 			info.hasNameProvider = HasDocumentNameProvider(workingDocument.typeId);
@@ -214,45 +214,7 @@ IDocumentManager::OperationStatus CDocumentManagerBase::GetDocumentName(const QB
 
 IDocumentManager::OperationStatus CDocumentManagerBase::SetDocumentName(const QByteArray& userId, const QByteArray& documentId, const QString& documentName)
 {
-	WorkingDocument* workingDocumentPtr = nullptr;
-	{
-		QMutexLocker locker(&m_mutex);
-		OperationStatus validationStatus;
-		if (!ValidateInputParams(userId, documentId, validationStatus)){
-			return validationStatus;
-		}
-
-		workingDocumentPtr = &m_userDocuments[userId][documentId];
-	}
-
-	if (workingDocumentPtr->name == documentName){
-		return OS_OK;
-	}
-
-	workingDocumentPtr->name = documentName;
-
-	DocumentNotificationPtr notificationPtr = CreateDocumentNotification(userId, documentId);
-	Q_ASSERT(notificationPtr != nullptr);
-	if (notificationPtr != nullptr){
-		istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_RENAMED);
-		changeSet.SetChangeInfo(CN_DOCUMENT_RENAMED, QVariant::fromValue(*notificationPtr));
-		istd::CChangeNotifier notifier(this, &changeSet);
-	}
-
-	for (IDocumentManagerEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
-		if (handlerPtr != nullptr){
-			CDocumentRenamedEvent event(
-				userId,
-				documentId,
-				workingDocumentPtr->typeId,
-				workingDocumentPtr->name,
-				ObjectIdToUrl(workingDocumentPtr->objectId),
-				workingDocumentPtr->isDirty);
-			handlerPtr->ProcessEvent(&event);
-		}
-	}
-
-	return OS_OK;
+	return OS_FAILED;
 }
 
 

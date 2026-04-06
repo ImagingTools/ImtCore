@@ -88,6 +88,7 @@ protected:
 	{
 		QByteArray objectId;
 		QByteArray typeId;
+		QUrl url;
 		QString name;
 		istd::IChangeableSharedPtr objectPtr;
 		idoc::IUndoManagerSharedPtr undoManagerPtr;

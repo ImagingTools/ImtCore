@@ -67,6 +67,7 @@ QByteArray CCollectionDocumentManagerBase::OpenDocument(const QByteArray& userId
 
 	documentPtr->objectId = objectId;
 	documentPtr->typeId = objectTypeId;
+	documentPtr->url = url;
 	documentPtr->name = collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
 	documentPtr->undoManagerPtr = undoManagerPtr;
 	documentPtr->isDirty = false;
@@ -77,7 +78,7 @@ QByteArray CCollectionDocumentManagerBase::OpenDocument(const QByteArray& userId
 		info.userId = userId;
 		info.documentId = retVal;
 		info.typeId = objectTypeId;
-		info.url = "collection:///" + objectId;
+		info.url = url;
 		info.name = documentPtr->name;
 		info.isDirty = false;
 		info.isLoading = true;
@@ -240,6 +241,7 @@ IDocumentManager::OperationStatus CCollectionDocumentManagerBase::SaveDocument(
 	if (collectionPtr == nullptr) {
 		return OS_FAILED;
 	}
+
 	WorkingDocument* workingDocumentPtr = nullptr;
 	OperationStatus validationStatus = OS_OK;
 	WorkingDocument workingDocumentSnapshot;
