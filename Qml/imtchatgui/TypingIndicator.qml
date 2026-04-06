@@ -12,6 +12,16 @@ Item {
 	visible: false
 
 	property string userName: ""
+	property string dots: "."
+
+	Timer {
+		running: typingIndicatorRoot.visible
+		interval: 500
+		repeat: true
+		onTriggered: {
+			typingIndicatorRoot.dots = typingIndicatorRoot.dots.length >= 3 ? "." : typingIndicatorRoot.dots + ".";
+		}
+	}
 
 	Row {
 		anchors.left: parent.left
@@ -21,7 +31,7 @@ Item {
 
 		Text {
 			visible: typingIndicatorRoot.userName.length > 0
-			text: typingIndicatorRoot.userName + " " + qsTr("is typing") + dotsText.text
+			text: typingIndicatorRoot.userName + " " + qsTr("is typing") + typingIndicatorRoot.dots
 			font.pixelSize: Style.fontSizeXS
 			color: Style.textSecondaryColor
 			font.italic: true
@@ -29,28 +39,12 @@ Item {
 		}
 
 		Text {
-			id: dotsText
 			visible: typingIndicatorRoot.userName.length === 0
-			text: qsTr("typing") + dotsText.dots
+			text: qsTr("typing") + typingIndicatorRoot.dots
 			font.pixelSize: Style.fontSizeXS
 			color: Style.textSecondaryColor
 			font.italic: true
 			anchors.verticalCenter: parent.verticalCenter
-
-			property string dots: "."
-
-			Timer {
-				running: typingIndicatorRoot.visible
-				interval: 500
-				repeat: true
-				onTriggered: {
-					if (dotsText.dots.length >= 3) {
-						dotsText.dots = ".";
-					} else {
-						dotsText.dots += ".";
-					}
-				}
-			}
 		}
 	}
 }
