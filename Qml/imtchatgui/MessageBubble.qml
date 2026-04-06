@@ -74,26 +74,26 @@ Item {
 				}
 			}
 
-			Menu {
-				id: contextMenu
+			// Menu {
+			// 	id: contextMenu
 
-				MenuItem {
-					text: qsTr("Create Ticket")
-					onTriggered: {
-						messageBubbleRoot.createTicketRequested(
-							messageBubbleRoot.messageId,
-							messageBubbleRoot.content
-						);
-					}
-				}
+			// 	MenuItem {
+			// 		text: qsTr("Create Ticket")
+			// 		onTriggered: {
+			// 			messageBubbleRoot.createTicketRequested(
+			// 				messageBubbleRoot.messageId,
+			// 				messageBubbleRoot.content
+			// 			);
+			// 		}
+			// 	}
 
-				MenuItem {
-					text: qsTr("Copy Text")
-					onTriggered: {
-						clipboard.setText(messageBubbleRoot.content);
-					}
-				}
-			}
+			// 	MenuItem {
+			// 		text: qsTr("Copy Text")
+			// 		onTriggered: {
+			// 			clipboard.setText(messageBubbleRoot.content);
+			// 		}
+			// 	}
+			// }
 		}
 
 		// Footer row: timestamp + status indicator

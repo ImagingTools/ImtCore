@@ -42,10 +42,10 @@ Rectangle {
 					compact: true
 
 					onRemoveRequested: {
-						const refs = messageInputRoot.pendingEntityRefs.filter(
-							function(r) { return r.entityId !== modelData.entityId; }
-						);
-						messageInputRoot.pendingEntityRefs = refs;
+						// const refs = messageInputRoot.pendingEntityRefs.filter(
+						// 	function(r) { return r.entityId !== modelData.entityId; }
+						// );
+						// messageInputRoot.pendingEntityRefs = refs;
 					}
 				}
 			}

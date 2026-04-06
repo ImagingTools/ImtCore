@@ -154,12 +154,12 @@ Rectangle {
 					ComboBox {
 						id: typeCombo
 						width: parent.width
-						model: [
-							qsTr("Access Request"),
-							qsTr("Support Request"),
-							qsTr("Feature Request"),
-							qsTr("Bug Report")
-						]
+						// model: [
+						// 	qsTr("Access Request"),
+						// 	qsTr("Support Request"),
+						// 	qsTr("Feature Request"),
+						// 	qsTr("Bug Report")
+						// ]
 						currentIndex: 1
 					}
 				}
@@ -177,7 +177,7 @@ Rectangle {
 					ComboBox {
 						id: priorityCombo
 						width: parent.width
-						model: [qsTr("Low"), qsTr("Medium"), qsTr("High"), qsTr("Critical")]
+						// model: [qsTr("Low"), qsTr("Medium"), qsTr("High"), qsTr("Critical")]
 						currentIndex: 1
 					}
 				}
@@ -197,7 +197,7 @@ Rectangle {
 				ComboBox {
 					id: environmentCombo
 					width: parent.width
-					model: [qsTr("Development"), qsTr("Staging"), qsTr("Production")]
+					// model: [qsTr("Development"), qsTr("Staging"), qsTr("Production")]
 					currentIndex: 2
 				}
 			}
@@ -271,7 +271,7 @@ Rectangle {
 	}
 
 	function submitTicket() {
-		const ticketData = {
+		let ticketData = {
 			title: titleField.text.trim(),
 			description: descriptionField.text.trim(),
 			ticketType: typeCombo.currentIndex,

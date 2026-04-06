@@ -31,7 +31,7 @@ Rectangle {
 	signal conversationOpenRequested(string conversationId)
 	signal ticketClosed()
 
-	ScrollView {
+	Flickable {
 		anchors.fill: parent
 		clip: true
 

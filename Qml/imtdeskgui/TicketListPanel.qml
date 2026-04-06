@@ -193,8 +193,6 @@ Rectangle {
 					}
 				}
 			}
-
-			ScrollBar.vertical: ScrollBar {}
 		}
 	}
 }
