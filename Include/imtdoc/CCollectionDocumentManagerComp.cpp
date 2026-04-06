@@ -11,11 +11,7 @@ namespace imtdoc
 
 imtbase::IObjectCollection* CCollectionDocumentManagerComp::GetCollection() const
 {
-if (m_collectionCompPtr.IsValid()){
-return m_collectionCompPtr.GetPtr();
-}
-
-return nullptr;
+return m_collectionCompPtr.IsValid() ? m_collectionCompPtr.GetPtr() : nullptr;
 }
 
 
