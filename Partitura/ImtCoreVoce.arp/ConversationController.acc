@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5423" Description="ACF"/>
-            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6379" Description="ACF"/>
+            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -124,6 +124,9 @@
                                 <Value>Conversation</Value>
                             </Values>
                         </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ConversationFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="Conversation"/>
                     </AttributeInfo>
                     <AttributeInfo Id="HeadersProvider" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="CollectionHeadersProvider"/>

@@ -2,19 +2,21 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6381" Description="ACF"/>
-            <Version Id="1" Number="2348" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395266" Description="Qt Framework"/>
+            <Version Id="0" Number="6379" Description="ACF"/>
+            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="ApplicationInfoController" X="225" Y="400" Note=""/>
         <Element ComponentName="AuthorizationOptions" X="425" Y="275" Note=""/>
+        <Element ComponentName="ConversationController" X="250" Y="650" Note=""/>
         <Element ComponentName="Demultiplexer" X="600" Y="75" Note=""/>
         <Element ComponentName="PagesController" X="1000" Y="500" Note=""/>
         <Element ComponentName="PermissionsController" X="150" Y="150" Note=""/>
         <Element ComponentName="ProfileController" X="725" Y="500" Note=""/>
         <Element ComponentName="SlaveDemultiplexer" X="1050" Y="150" Note=""/>
+        <Element ComponentName="TicketController" X="625" Y="650" Note=""/>
         <Element ComponentName="UserSettings" X="500" Y="450" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>

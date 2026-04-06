@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6381" Description="ACF"/>
-            <Version Id="1" Number="2348" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395266" Description="Qt Framework"/>
+            <Version Id="0" Number="6379" Description="ACF"/>
+            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -43,6 +43,27 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="ConversationController" PackageId="ImtCoreVoce" ComponentId="ConversationController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CollectionDocumentManager" Type="Reference" ExportId="ConversationDocumentManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ConversationCollection" Type="Reference" ExportId="ConversationCollection">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="Demultiplexer" PackageId="ImtServerGqlPck" ComponentId="GraphQLDemultiplexer">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -59,6 +80,8 @@
                                 <Value>ApplicationInfoController</Value>
                                 <Value>UserSettings</Value>
                                 <Value>SlaveDemultiplexer</Value>
+                                <Value>ConversationController</Value>
+                                <Value>TicketController</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -159,6 +182,27 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="TicketController" PackageId="ImtCoreVoce" ComponentId="TicketController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CollectionDocumentManager" Type="Reference" ExportId="TicketDocumentManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TicketCollection" Type="Reference" ExportId="TicketCollection">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
