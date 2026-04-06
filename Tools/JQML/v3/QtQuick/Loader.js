@@ -41,101 +41,144 @@ class Loader extends Item {
         super.__complete()
     }
 
+    'SLOT_Component.completed'(){
+        if(this.__lazyItem){
+            this.item = this.__lazyItem
+            this.status = Loader.Ready
+            this.loaded()
+        }
+        
+    }
+
     SLOT_sourceComponentChanged(oldValue, newValue){
-        if(this.item) this.item.destroy()
-        if(!this.sourceComponent) {
-            this.item = null
-            return
+        delete this.__lazyItem
+        this.status = Loader.Loading
+        if(this.item) {
+            this.item.destroy()
         }
 
-        this.__updateProperty('visible')
-        let item = this.sourceComponent.createObject(this, {}, true)
+        if(newValue){
+            this.__updateProperty('visible')
+            let item = this.sourceComponent.createObject(this, {}, true)
 
-        if(item instanceof Item){
-            item.widthChanged.connect(()=>{
+            if(item instanceof Item){
+                item.widthChanged.connect(()=>{
+                    Geometry.setAuto(this.__self, 'width', item.width, this.__self.constructor.meta.width)
+                })
+                item.heightChanged.connect(()=>{
+                    Geometry.setAuto(this.__self, 'height', item.height, this.__self.constructor.meta.height)
+                })
+        
                 Geometry.setAuto(this.__self, 'width', item.width, this.__self.constructor.meta.width)
-            })
-            item.heightChanged.connect(()=>{
                 Geometry.setAuto(this.__self, 'height', item.height, this.__self.constructor.meta.height)
-            })
-    
-            Geometry.setAuto(this.__self, 'width', item.width, this.__self.constructor.meta.width)
-            Geometry.setAuto(this.__self, 'height', item.height, this.__self.constructor.meta.height)
-    
-            Geometry.setAuto(item.__self, 'width', this.width, item.__self.constructor.meta.width)
-            Geometry.setAuto(item.__self, 'height', this.height, item.__self.constructor.meta.height)
+        
+                Geometry.setAuto(item.__self, 'width', this.width, item.__self.constructor.meta.width)
+                Geometry.setAuto(item.__self, 'height', this.height, item.__self.constructor.meta.height)
 
-            if(this.__self.width__prevent){
-                item.width = ()=>{return this.width}
+                if(this.__self.width__prevent){
+                    item.width = ()=>{return this.width}
+                }
+                if(this.__self.height__prevent){
+                    item.height = ()=>{return this.height}
+                }
             }
-            if(this.__self.height__prevent){
-                item.height = ()=>{return this.height}
+
+            if(item){
+                if(this.__completed){
+                    this.item = item
+                    this.status = Loader.Ready
+                    this.loaded()
+                } else {
+                    this.__lazyItem = item
+                }
+                
+                
+            } else {
+                this.status = Loader.Error
             }
+
+        } else {
+            this.item = null
+            this.status = Loader.Null
         }
 
-        this.item = item
-
-        this.loaded()
+        
     }
 
     SLOT_sourceChanged(oldValue, newValue){
+        delete this.__lazyItem
+        this.status = Loader.Loading
         if(this.item) this.item.destroy()
-        if(!this.source) {
-            this.item = null
-            return
-        }
 
-        let path = this.source.replaceAll('qrc:/', '').replaceAll('.qml', '').split('/')
-        let className = path[path.length-1]
+        if(newValue){
+            let path = this.source.replaceAll('qrc:/', '').replaceAll('.qml', '').split('/')
+            let className = path[path.length-1]
 
-        let cls = null
-        try {
-            cls = eval(className)
-        } catch (error) {
-            while(path.length){
-                if(cls){
-                    let name = path.shift()
-                    if(name in cls){
-                        cls = cls[name]
+            let cls = null
+            try {
+                cls = eval(className)
+            } catch (error) {
+                while(path.length){
+                    if(cls){
+                        let name = path.shift()
+                        if(name in cls){
+                            cls = cls[name]
+                        }
+                    } else {
+                        cls = JQModules[path.shift()]
                     }
-                } else {
-                    cls = JQModules[path.shift()]
                 }
             }
-        }
 
-        // let source = this.source.split('/').pop().replaceAll('.qml', '')
+            // let source = this.source.split('/').pop().replaceAll('.qml', '')
 
-        // let cls = eval(source)
+            // let cls = eval(source)
 
-        this.__updateProperty('visible')
-        let item = cls.create(this)
+            this.__updateProperty('visible')
+            let item = cls.create(this)
+            
+            if(item instanceof Item){
+                item.widthChanged.connect(()=>{
+                    Geometry.setAuto(this.__self, 'width', item.width, this.__self.constructor.meta.width)
+                })
+                item.heightChanged.connect(()=>{
+                    Geometry.setAuto(this.__self, 'height', item.height, this.__self.constructor.meta.height)
+                })
         
-        if(item instanceof Item){
-            item.widthChanged.connect(()=>{
                 Geometry.setAuto(this.__self, 'width', item.width, this.__self.constructor.meta.width)
-            })
-            item.heightChanged.connect(()=>{
                 Geometry.setAuto(this.__self, 'height', item.height, this.__self.constructor.meta.height)
-            })
-    
-            Geometry.setAuto(this.__self, 'width', item.width, this.__self.constructor.meta.width)
-            Geometry.setAuto(this.__self, 'height', item.height, this.__self.constructor.meta.height)
-    
-            Geometry.setAuto(item.__self, 'width', this.width, item.__self.constructor.meta.width)
-            Geometry.setAuto(item.__self, 'height', this.height, item.__self.constructor.meta.height)
-
-            if(this.__self.width__prevent){
-                item.width = ()=>{return this.width}
-            }
-            if(this.__self.height__prevent){
-                item.height = ()=>{return this.height}
-            }
-        }
         
-        this.item = item
+                Geometry.setAuto(item.__self, 'width', this.width, item.__self.constructor.meta.width)
+                Geometry.setAuto(item.__self, 'height', this.height, item.__self.constructor.meta.height)
 
-        this.loaded()
+                if(this.__self.width__prevent){
+                    item.width = ()=>{return this.width}
+                }
+                if(this.__self.height__prevent){
+                    item.height = ()=>{return this.height}
+                }
+            }
+            
+            if(item){
+                if(this.__completed){
+                    this.item = item
+                    this.status = Loader.Ready
+                    this.loaded()
+                } else {
+                    this.__lazyItem = item
+                }
+                
+                
+            } else {
+                this.status = Loader.Error
+            }
+
+        } else {
+            this.item = null
+            this.status = Loader.Null
+        }
+
+        
     }
 
     SLOT_widthChanged(oldValue, newValue){

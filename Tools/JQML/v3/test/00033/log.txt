@@ -1,0 +1,5 @@
+DynamicItem.onCompleted
+onItemChanged
+Загружено: Динамический элемент
+onLoaded
+Loader.onCompleted
