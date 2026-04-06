@@ -105,41 +105,51 @@ Rectangle {
 				}
 			}
 
-			// Metadata grid
-			// Grid {
-			// 	width: parent.width - Style.paddingL * 2
-			// 	columns: 2
-			// 	columnSpacing: Style.paddingL
-			// 	rowSpacing: Style.paddingS
+			// Metadata
+			Column {
+				width: parent.width - Style.paddingL * 2
+				spacing: Style.paddingS
 
-			// 	Text { text: qsTr("Type:"); font.pixelSize: Style.fontSizeXS; color: Style.textSecondaryColor }
-			// 	Text {
-			// 		text: ticketTypeLabel(ticketViewRoot.ticketType)
-			// 		font.pixelSize: Style.fontSizeXS
-			// 		color: Style.textPrimaryColor
-			// 	}
+				Row {
+					spacing: Style.paddingL
+					Text { text: qsTr("Type:"); font.pixelSize: Style.fontSizeXS; color: Style.textSecondaryColor }
+					Text {
+						text: ticketTypeLabel(ticketViewRoot.ticketType)
+						font.pixelSize: Style.fontSizeXS
+						color: Style.textPrimaryColor
+					}
+				}
 
-			// 	Text { text: qsTr("Environment:"); font.pixelSize: Style.fontSizeXS; color: Style.textSecondaryColor }
-			// 	Text {
-			// 		text: environmentLabel(ticketViewRoot.environment)
-			// 		font.pixelSize: Style.fontSizeXS
-			// 		color: Style.textPrimaryColor
-			// 	}
+				Row {
+					spacing: Style.paddingL
+					Text { text: qsTr("Environment:"); font.pixelSize: Style.fontSizeXS; color: Style.textSecondaryColor }
+					Text {
+						text: environmentLabel(ticketViewRoot.environment)
+						font.pixelSize: Style.fontSizeXS
+						color: Style.textPrimaryColor
+					}
+				}
 
-			// 	Text { text: qsTr("Reporter:"); font.pixelSize: Style.fontSizeXS; color: Style.textSecondaryColor }
-			// 	Text {
-			// 		text: ticketViewRoot.reporterName || ticketViewRoot.reporterId || "—"
-			// 		font.pixelSize: Style.fontSizeXS
-			// 		color: Style.textPrimaryColor
-			// 	}
+				Row {
+					spacing: Style.paddingL
+					Text { text: qsTr("Reporter:"); font.pixelSize: Style.fontSizeXS; color: Style.textSecondaryColor }
+					Text {
+						text: ticketViewRoot.reporterName || ticketViewRoot.reporterId || "—"
+						font.pixelSize: Style.fontSizeXS
+						color: Style.textPrimaryColor
+					}
+				}
 
-			// 	Text { text: qsTr("Assignee:"); font.pixelSize: Style.fontSizeXS; color: Style.textSecondaryColor }
-			// 	Text {
-			// 		text: ticketViewRoot.assigneeName || ticketViewRoot.assigneeId || qsTr("Unassigned")
-			// 		font.pixelSize: Style.fontSizeXS
-			// 		color: Style.textPrimaryColor
-			// 	}
-			// }
+				Row {
+					spacing: Style.paddingL
+					Text { text: qsTr("Assignee:"); font.pixelSize: Style.fontSizeXS; color: Style.textSecondaryColor }
+					Text {
+						text: ticketViewRoot.assigneeName || ticketViewRoot.assigneeId || qsTr("Unassigned")
+						font.pixelSize: Style.fontSizeXS
+						color: Style.textPrimaryColor
+					}
+				}
+			}
 
 			// Tags
 			Row {
