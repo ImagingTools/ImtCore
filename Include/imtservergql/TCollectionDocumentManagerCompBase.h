@@ -10,7 +10,7 @@
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtgql/CGqlRequest.h>
-#include <imtdoc/CCollectionDocumentManager.h>
+#include <imtdoc/CCollectionDocumentManagerBase.h>
 #include <imtbasesdl/SDL/1.0/CPP/DocumentManager.h>
 #include <imtbasesdl/SDL/1.0/CPP/UndoManager.h>
 
@@ -24,11 +24,11 @@ namespace UM = sdl::imtbase::UndoManager;
 
 
 template<class Base, class ColorCollectionDocumentManagerDefs>
-class TCollectionDocumentManagerCompBase : public Base, public imtdoc::CCollectionDocumentManager
+class TCollectionDocumentManagerCompBase : public Base, public imtdoc::CCollectionDocumentManagerBase
 {
 public:
 	typedef Base BaseClass;
-	typedef imtdoc::CCollectionDocumentManager BaseClass2;
+	typedef imtdoc::CCollectionDocumentManagerBase BaseClass2;
 	typedef ColorCollectionDocumentManagerDefs Defs;
 
 	I_BEGIN_BASE_COMPONENT(TCollectionDocumentManagerCompBase)
@@ -81,11 +81,11 @@ protected:
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
 
-	imtdoc::CCollectionDocumentManager* GetNonConstThis() const;
+	imtdoc::CCollectionDocumentManagerBase* GetNonConstThis() const;
 	int GetObjectFactoryIndex(const QByteArray& typeId) const;
 	QByteArray GetUserId(const ::imtgql::CGqlRequest& gqlRequest) const;
 
-	// reimplemented (imtdoc::CCollectionDocumentManager)
+	// reimplemented (imtdoc::CCollectionDocumentManagerBase)
 	virtual imtbase::IObjectCollection* GetCollection() const override;
 	virtual istd::IChangeableSharedPtr CreateObject(const QByteArray& typeId) const override;
 	virtual idoc::IUndoManagerSharedPtr CreateUndoManager() const override;
@@ -120,11 +120,11 @@ inline void TCollectionDocumentManagerCompBase<Base, ColorCollectionDocumentMana
 // protected methods
 
 template<class Base, class ColorCollectionDocumentManagerDefs>
-inline imtdoc::CCollectionDocumentManager* TCollectionDocumentManagerCompBase<
+inline imtdoc::CCollectionDocumentManagerBase* TCollectionDocumentManagerCompBase<
 	Base,
 	ColorCollectionDocumentManagerDefs>::GetNonConstThis() const
 {
-	return const_cast<CCollectionDocumentManager*>(dynamic_cast<const CCollectionDocumentManager*>(this));
+	return const_cast<imtdoc::CCollectionDocumentManagerBase*>(dynamic_cast<const imtdoc::CCollectionDocumentManagerBase*>(this));
 }
 
 
@@ -159,7 +159,7 @@ inline QByteArray TCollectionDocumentManagerCompBase<Base, ColorCollectionDocume
 }
 
 
-// reimplemented (imtdoc::CCollectionDocumentManager)
+// reimplemented (imtdoc::CCollectionDocumentManagerBase)
 
 template<class Base, class ColorCollectionDocumentManagerDefs>
 inline imtbase::IObjectCollection* TCollectionDocumentManagerCompBase<Base, ColorCollectionDocumentManagerDefs>::
