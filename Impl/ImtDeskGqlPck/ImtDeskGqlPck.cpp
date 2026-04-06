@@ -20,5 +20,10 @@ I_EXPORT_COMPONENT(
 			"Ticket collection controller",
 			"Ticket Collection Controller");
 
+I_EXPORT_COMPONENT(
+			TicketCollectionDocumentManager,
+			"Ticket collection document manager",
+			"Ticket Collection Document Manager");
+
 
 } // namespace ImtDeskGqlPck

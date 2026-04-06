@@ -1,0 +1,150 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+#include <imtdeskgql/CTicketCollectionDocumentManagerComp.h>
+
+
+// ACF includes
+#include <istd/CChangeGroup.h>
+
+// ImtCore includes
+#include <imtdesk/ISupportTicket.h>
+
+
+namespace imtdeskgql
+{
+
+
+// protected methods
+
+// reimplemented (CGraphQlHandlerCompBase)
+
+sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTicketRepresentation(
+			const sdl::imtdesk::TicketCollectionDocumentManager::CGetTicketRepresentationGqlRequest& getTicketRepresentationRequest,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& errorMessage) const
+{
+	sdl::imtdesk::TicketCollectionDocumentManager::GetTicketRepresentationRequestArguments arguments = getTicketRepresentationRequest.GetRequestedArguments();
+	if (!arguments.input.Version_1_0){
+		Q_ASSERT(false);
+		return sdl::imtdesk::ImtDesk::CTicketData();
+	}
+
+	QByteArray objectId;
+	istd::IChangeableSharedPtr documentPtr;
+	if (arguments.input.Version_1_0->id){
+		objectId = *arguments.input.Version_1_0->id;
+
+		m_documentManagerCompPtr->GetDocumentData("", objectId, documentPtr);
+	}
+
+	if (!documentPtr.IsValid()){
+		return sdl::imtdesk::ImtDesk::CTicketData();
+	}
+
+	imtdesk::ISupportTicket* ticketPtr = dynamic_cast<imtdesk::ISupportTicket*>(documentPtr.GetPtr());
+	if (ticketPtr == nullptr){
+		return sdl::imtdesk::ImtDesk::CTicketData();
+	}
+
+	sdl::imtdesk::ImtDesk::CTicketData response;
+	response.Version_1_0.Emplace();
+
+	response.Version_1_0->id = ticketPtr->GetId();
+	response.Version_1_0->title = ticketPtr->GetTitle();
+	response.Version_1_0->description = ticketPtr->GetDescription();
+	response.Version_1_0->assigneeId = ticketPtr->GetAssigneeId();
+	response.Version_1_0->reporterId = ticketPtr->GetReporterId();
+	response.Version_1_0->conversationId = ticketPtr->GetConversationId();
+	response.Version_1_0->messageId = ticketPtr->GetMessageId();
+	response.Version_1_0->createdAt = ticketPtr->GetCreatedAt();
+	response.Version_1_0->updatedAt = ticketPtr->GetUpdatedAt();
+	response.Version_1_0->resolvedAt = ticketPtr->GetResolvedAt();
+
+	return response;
+}
+
+
+sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollectionDocumentManagerComp::OnUpdateTicketFromRepresentation(
+			const sdl::imtdesk::TicketCollectionDocumentManager::CUpdateTicketFromRepresentationGqlRequest& updateTicketFromRepresentationRequest,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& errorMessage) const
+{
+	sdl::imtdesk::TicketCollectionDocumentManager::UpdateTicketFromRepresentationRequestArguments arguments = updateTicketFromRepresentationRequest.GetRequestedArguments();
+	if (!arguments.input.Version_1_0){
+		Q_ASSERT(false);
+		return sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus();
+	}
+
+	sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus response;
+	response.Version_1_0.Emplace();
+	response.Version_1_0->status = sdl::imtbase::CollectionDocumentManager::EDocumentOperationStatus::Failed;
+
+	QByteArray documentId;
+	if (arguments.input.Version_1_0->documentId){
+		documentId = *arguments.input.Version_1_0->documentId;
+	}
+
+	sdl::imtdesk::ImtDesk::CTicketData::V1_0 ticketInfo;
+	if (arguments.input.Version_1_0->ticket){
+		ticketInfo = *arguments.input.Version_1_0->ticket;
+	}
+
+	istd::IChangeableSharedPtr documentPtr;
+	m_documentManagerCompPtr->GetDocumentData("", documentId, documentPtr);
+	if (!documentPtr.IsValid()){
+		response.Version_1_0->status = sdl::imtbase::CollectionDocumentManager::EDocumentOperationStatus::InvalidDocumentId;
+		return response;
+	}
+
+	imtdesk::ISupportTicket* ticketPtr = dynamic_cast<imtdesk::ISupportTicket*>(documentPtr.GetPtr());
+	if (ticketPtr == nullptr){
+		response.Version_1_0->status = sdl::imtbase::CollectionDocumentManager::EDocumentOperationStatus::InvalidDocumentId;
+		return response;
+	}
+
+	istd::CChangeGroup changeGroup(ticketPtr);
+
+	if (ticketInfo.title){
+		ticketPtr->SetTitle(*ticketInfo.title);
+	}
+
+	if (ticketInfo.description){
+		ticketPtr->SetDescription(*ticketInfo.description);
+	}
+
+	if (ticketInfo.assigneeId){
+		ticketPtr->SetAssigneeId(*ticketInfo.assigneeId);
+	}
+
+	if (ticketInfo.reporterId){
+		ticketPtr->SetReporterId(*ticketInfo.reporterId);
+	}
+
+	if (ticketInfo.conversationId){
+		ticketPtr->SetConversationId(*ticketInfo.conversationId);
+	}
+
+	if (ticketInfo.messageId){
+		ticketPtr->SetMessageId(*ticketInfo.messageId);
+	}
+
+	if (ticketInfo.createdAt){
+		ticketPtr->SetCreatedAt(*ticketInfo.createdAt);
+	}
+
+	if (ticketInfo.updatedAt){
+		ticketPtr->SetUpdatedAt(*ticketInfo.updatedAt);
+	}
+
+	if (ticketInfo.resolvedAt){
+		ticketPtr->SetResolvedAt(*ticketInfo.resolvedAt);
+	}
+
+	m_documentManagerCompPtr->SetDocumentData("", documentId, *ticketPtr);
+
+	response.Version_1_0->status = sdl::imtbase::CollectionDocumentManager::EDocumentOperationStatus::Success;
+
+	return response;
+}
+
+
+} // namespace imtdeskgql

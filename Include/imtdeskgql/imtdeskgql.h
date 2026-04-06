@@ -19,6 +19,8 @@
 
 	- \b CTicketCollectionControllerComp — handles TicketsList / TicketItem queries,
 	  TicketCreate and TicketUpdate mutations
+	- \b CTicketCollectionDocumentManagerComp — handles GetTicketRepresentation query,
+	  UpdateTicketFromRepresentation mutation for the document editor
 
 	\section imtdeskgql_related Related Modules
 	- \b imtdesk — domain model
