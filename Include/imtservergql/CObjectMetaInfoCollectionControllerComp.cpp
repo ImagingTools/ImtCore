@@ -5,6 +5,10 @@
 // std includes
 #include <cmath>
 
+// Qt includes
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonObject>
+
 // ImtCore includes
 #include <imtbase/CCollectionFilter.h>
 
@@ -18,25 +22,24 @@ namespace imtservergql
 // protected methods
 
 
-imtbase::CTreeItemModel* CObjectMetaInfoCollectionControllerComp::ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CObjectMetaInfoCollectionControllerComp::ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModel = nullptr;
-	imtbase::CTreeItemModel* itemsModel = nullptr;
-	imtbase::CTreeItemModel* notificationModel = nullptr;
+	QJsonObject rootObj;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QObject::tr("Internal error").toUtf8();
+		errorMessage = QObject::tr("Internal error");
+		QJsonArray errorsArray;
+		QJsonObject errorObj;
+		errorObj.insert(QStringLiteral("message"), errorMessage);
+		errorsArray.append(errorObj);
+		rootObj.insert(QStringLiteral("errors"), errorsArray);
+		return rootObj;
 	}
 
-	if (!errorMessage.isEmpty()){
-		imtbase::CTreeItemModel* errorsItemModel = rootModelPtr->AddTreeModel("errors");
-		errorsItemModel->SetData("message", errorMessage);
-	}
-	else{
-		dataModel = new imtbase::CTreeItemModel();
-		itemsModel = new imtbase::CTreeItemModel();
-		notificationModel = new imtbase::CTreeItemModel();
+	if (errorMessage.isEmpty()){
+		QJsonObject dataObj;
+		QJsonArray itemsArray;
+		QJsonObject notificationObj;
 
 		const imtgql::CGqlParamObject* viewParamsGql = nullptr;
 		QList<imtgql::CGqlParamObject> inputParams;
@@ -95,18 +98,14 @@ imtbase::CTreeItemModel* CObjectMetaInfoCollectionControllerComp::ListObjects(co
 			pagesCount = 1;
 		}
 
-		notificationModel->SetData("PagesCount", pagesCount);
-
-		itemsModel->SetIsArray(true);
-		dataModel->SetExternTreeModel("items", itemsModel);
-		dataModel->SetExternTreeModel("notification", notificationModel);
+		notificationObj.insert(QStringLiteral("PagesCount"), pagesCount);
+		dataObj.insert(QStringLiteral("items"), itemsArray);
+		dataObj.insert(QStringLiteral("notification"), notificationObj);
+		rootObj.insert(QStringLiteral("data"), dataObj);
 	}
-	rootModelPtr->SetExternTreeModel("data", dataModel);
 
-	return rootModelPtr.PopPtr();
+	return rootObj;
 }
 
 
 } // namespace imtservergql
-
-

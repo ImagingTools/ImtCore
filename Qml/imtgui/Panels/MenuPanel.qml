@@ -38,17 +38,23 @@ Rectangle {
 	property int buttonHeight: -1;
 
 	property bool centered: Style.menuPanelCentered !== undefined ? Style.menuPanelCentered : false;
+	property bool collapsed: false
 
 	Component.onCompleted: {
 		Events.subscribeEvent("MenuModelRequest", menuPanel.onMenuModelRequest);
 		Events.subscribeEvent("UpdatePageVisualStatus", menuPanel.updateVisualStatus);
 		Events.subscribeEvent("ChangePage", menuPanel.setActivePage);
+		Events.subscribeEvent("CollapseMenu", menuPanel.setCollapsed);
+		Events.subscribeEvent("ExpandMenu", menuPanel.setCollapsed);
 	}
 
 	Component.onDestruction: {
 		Events.unSubscribeEvent("MenuModelRequest", menuPanel.onMenuModelRequest);
 		Events.unSubscribeEvent("UpdatePageVisualStatus", menuPanel.updateVisualStatus);
 		Events.unSubscribeEvent("ChangePage", menuPanel.setActivePage);
+		Events.unSubscribeEvent("CollapseMenu", menuPanel.setCollapsed);
+		Events.unSubscribeEvent("ExpandMenu", menuPanel.setCollapsed);
+
 	}
 
 	onActivePageIdChanged: {
@@ -57,6 +63,10 @@ Rectangle {
 			
 			NavigationController.push(activePageId)
 		}
+	}
+
+	onWidthChanged: {
+		Events.sendEvent("MenuWidthChanged", width)
 	}
 
 	Keys.onPressed: {
@@ -120,6 +130,10 @@ Rectangle {
 		allPages.model = 0;
 		topAlignmentPages.model = 0;
 		bottomAlignmentPages.model = 0;
+	}
+
+	function setCollapsed(stateArg){
+		collapsed = stateArg;
 	}
 
 	onModelChanged: {
@@ -228,25 +242,26 @@ Rectangle {
 		height: Style.buttonHeightXXS - 2;
 		z:100
 
-		visible: Style.enableMenuPanelCollapse
+		visible: false//Style.enableMenuPanelCollapse && !collapsed
 
-		iconSource: "../../../" + Style.getIconPath(collapseButton.expanded ? "Icons/Collapse" : "Icons/Expand", Icon.State.On, Icon.Mode.Normal);
+		//iconSource: "../../../" + Style.getIconPath(!menuPanel.collapsed ? "Icons/Collapse" : "Icons/Expand", Icon.State.On, Icon.Mode.Normal);
+		iconSource: "../../../" + Style.getIconPath("Icons/Close" , Icon.State.On, Icon.Mode.Normal);
 
-		property bool expanded: true
+		//tooltipText: !menuPanel.collapsed ? qsTr("Collapse") : qsTr("Expand");
 		property real menuDefaultWidth: 0
-
-		//tooltipText: collapseButton.expanded ? qsTr("Collapse") : qsTr("Expand");
-
-		onClicked: {
-			if(collapseButton.expanded){
+		property bool collapsed: menuPanel.collapsed
+		onCollapsedChanged: {
+			if(collapsed){
 				menuDefaultWidth = menuPanel.width
-				menuPanel.width = width + 2*anchors.rightMargin
+				menuPanel.width = Style.menuPanelMinWidth
 			}
 			else {
 				menuPanel.width = menuDefaultWidth
 			}
-			collapseButton.expanded = !collapseButton.expanded
-
+		}
+		onClicked: {
+			//menuPanel.collapsed = !menuPanel.collapsed
+			menuPanel.collapsed = true
 		}
 	}
 
@@ -270,7 +285,7 @@ Rectangle {
 		contentWidth: allPagesColumn.width;
 		contentHeight:  allPagesColumn.height;
 
-		visible: !collapseButton.expanded ? false : topAlignmentColumn.y + topAlignmentColumn.height > bottomAlignmentColumn.y;
+		visible: topAlignmentColumn.y + topAlignmentColumn.height > bottomAlignmentColumn.y;
 
 		Column{
 			id: allPagesColumn;
@@ -290,7 +305,7 @@ Rectangle {
 
 		anchors.topMargin: Style.menuPanelTopMargin !==undefined ? Style.menuPanelTopMargin : !menuPanel.centered ? 0 : parent.height - bottomAlignmentColumn.height - height > 0 ? (parent.height - bottomAlignmentColumn.height - height)/2 : 0 ;
 
-		visible: !collapseButton.expanded ? false : !allPagesFlick.visible;
+		visible: !allPagesFlick.visible;
 
 		Repeater{
 			id: topAlignmentPages;
@@ -319,7 +334,7 @@ Rectangle {
 		anchors.right: menuPanel.right;
 		anchors.bottom: menuPanel.bottom;
 
-		visible: !collapseButton.expanded ? false : !allPagesFlick.visible;
+		visible: !allPagesFlick.visible;
 
 		Repeater{
 			id: bottomAlignmentPages;

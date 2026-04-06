@@ -30,5 +30,6 @@
 		<file alias="imtcolgui/MetaInfoViewDelegateBase.qml">MetaInfoViewDelegateBase.qml</file>
 		<file alias="imtcolgui/MetaInfoTextDelegate.qml">MetaInfoTextDelegate.qml</file>
 		<file alias="imtcolgui/MetaInfoDateDelegate.qml">MetaInfoDateDelegate.qml</file>
+		<file alias="imtcolgui/MetaInfoStringListDelegate.qml">MetaInfoStringListDelegate.qml</file>
     </qresource>
 </RCC>

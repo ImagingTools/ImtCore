@@ -170,7 +170,29 @@ CollectionViewCommandsDelegateBase{
 			documentManager.createDocument(documentTypeId)
 		}
 	}
-	
+
+	function onRevision(){
+		if (!collectionView){
+			console.error("Unable to get revision documents. Error: Collection view is invalid")
+			return
+		}
+
+		let elementsModel = collectionView.table.elements;
+		if (!elementsModel){
+			console.error("Unable to get revisions for document. Error: Elements for collection view is invalid");
+			return;
+		}
+
+		let indexes = collectionView.table.getSelectedIndexes();
+		if (indexes.length > 0){
+			let index = indexes[0];
+			if (elementsModel.containsKey("id", index)){
+				let documentId = elementsModel.getData("id", index);
+				ModalDialogManager.openDialog(documentRevisionDialogComp, {"documentId": documentId});
+			}
+		}
+	}
+
 	Component{
 		id: selectTypeIdDialogComp
 		
@@ -262,6 +284,13 @@ CollectionViewCommandsDelegateBase{
 					}
 				}
 			}
+		}
+	}
+
+	Component {
+		id: documentRevisionDialogComp;
+		DocumentRevisionDialog {
+			collectionId: commandsDelegate.collectionId
 		}
 	}
 }

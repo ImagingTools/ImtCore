@@ -324,10 +324,7 @@ istd::IChangeableUniquePtr CFeatureCollectionControllerComp::CreateObjectFromRep
 		return nullptr;
 	}
 
-	istd::IChangeableUniquePtr retVal;
-	retVal.MoveCastedPtr<imtlic::IFeatureInfo>(featureInstancePtr);
-
-	return retVal;
+	return featureInstancePtr;
 }
 
 

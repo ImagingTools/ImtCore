@@ -114,9 +114,7 @@ istd::IChangeableUniquePtr CPersonalAccessTokenDatabaseDelegateComp::CreateObjec
 		tokenPtr->SetRevoked(revoked);
 	}
 
-	istd::IChangeableUniquePtr retVal;
-	retVal.MoveCastedPtr<imtauth::IPersonalAccessToken>(tokenPtr);
-	return retVal;
+	return tokenPtr;
 }
 
 

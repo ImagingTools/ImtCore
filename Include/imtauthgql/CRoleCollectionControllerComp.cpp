@@ -310,7 +310,7 @@ bool CRoleCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (requestInfo.items.isTypeIdRequested){
-		representationObject.typeId = QByteArray(m_objectCollectionCompPtr->GetObjectTypeId(objectId));
+		representationObject.typeId = objectCollectionIterator.GetObjectTypeId();
 	}
 
 	if (requestInfo.items.isAddedRequested){
@@ -374,10 +374,7 @@ istd::IChangeableUniquePtr CRoleCollectionControllerComp::CreateObjectFromRepres
 		return nullptr;
 	}
 
-	istd::IChangeableUniquePtr retVal;
-	retVal.MoveCastedPtr<imtauth::IRole>(roleInstancePtr);
-
-	return retVal;
+	return roleInstancePtr;
 }
 
 

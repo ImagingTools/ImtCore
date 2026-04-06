@@ -113,7 +113,7 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="UserCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="Repository"/>
+                        <Data IsEnabled="true" Value="CachedObjectCollection"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

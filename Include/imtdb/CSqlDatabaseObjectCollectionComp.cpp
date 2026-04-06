@@ -594,27 +594,64 @@ imtbase::IObjectCollectionIterator* CSqlDatabaseObjectCollectionComp::CreateObje
 			int count,
 			const iprm::IParamsSet* selectionParamsPtr) const
 {
-	if (m_objectDelegateCompPtr.IsValid() && m_dbEngineCompPtr.IsValid()){
-		QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(objectId, offset, count, selectionParamsPtr);
-		if (objectSelectionQuery.isEmpty()){
-			return nullptr;
-		}
-
-		QSqlError sqlError;
-		QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(objectSelectionQuery, &sqlError, true);
-
-		if (sqlError.type() != QSqlError::NoError){
-			SendErrorMessage(0, sqlError.text(), "Database collection");
-
-			qDebug() << "SQL-error" << objectSelectionQuery;
-
-			return nullptr;
-		}
-
-		return new CSqlDatabaseObjectCollectionIterator(sqlQuery, m_objectDelegateCompPtr.GetPtr());
+	if (!m_objectDelegateCompPtr.IsValid() || !m_dbEngineCompPtr.IsValid()){
+		return nullptr;
 	}
 
-	return nullptr;
+	QByteArray baseSelectionQuery =
+			m_objectDelegateCompPtr->GetSelectionQuery(objectId, 0, -1, selectionParamsPtr);
+
+	if (baseSelectionQuery.isEmpty()){
+		return nullptr;
+	}
+
+	QString queryWithTotalCount = QStringLiteral(
+										"SELECT *, COUNT(*) OVER() AS \"TotalCount\" FROM (%1) AS _base")
+										.arg(QString::fromUtf8(baseSelectionQuery));
+
+	const QByteArray driverId = m_dbEngineCompPtr->GetDatabaseDriverId();
+	const bool isSQLite = (driverId == "QSQLITE");
+
+	if (count > 0){
+		if (isSQLite){
+			queryWithTotalCount += QStringLiteral(" LIMIT %1 OFFSET %2")
+									.arg(count)
+									.arg(qMax(0, offset));
+		}
+		else{
+			queryWithTotalCount += QStringLiteral(" OFFSET %1 ROWS FETCH NEXT %2 ROWS ONLY")
+									.arg(qMax(0, offset))
+									.arg(count);
+		}
+	}
+	else if (offset > 0 && isSQLite){
+		queryWithTotalCount += QStringLiteral(" LIMIT -1 OFFSET %1")
+								.arg(offset);
+	}
+	
+	QSqlError sqlError;
+	QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(queryWithTotalCount.toUtf8(), &sqlError, true);
+
+	if (sqlError.type() != QSqlError::NoError){
+		SendErrorMessage(0, sqlError.text(), "Database collection");
+		qDebug() << "SQL-error" << queryWithTotalCount;
+		return nullptr;
+	}
+
+	int totalCount = 0;
+	if (sqlQuery.first()){
+		const QSqlRecord firstRecord = sqlQuery.record();
+		const int fieldIndex = firstRecord.indexOf("TotalCount");
+		if (fieldIndex >= 0){
+			totalCount = firstRecord.value(fieldIndex).toInt();
+		}
+		sqlQuery.seek(-1);
+	}
+
+	return new CSqlDatabaseObjectCollectionIterator(
+				sqlQuery,
+				m_objectDelegateCompPtr.GetPtr(),
+				totalCount);
 }
 
 
@@ -919,6 +956,10 @@ QSqlRecord CSqlDatabaseObjectCollectionComp::GetObjectRecord(const QByteArray& o
 		return QSqlRecord();
 	}
 
+	if (objectId.isEmpty()){
+		return QSqlRecord();
+	}
+
 	QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(objectId);
 	if (!objectSelectionQuery.isEmpty()){
 		QSqlError sqlError;
@@ -983,5 +1024,3 @@ void CSqlDatabaseObjectCollectionComp::AddOperationContextToChangeSet(const imtb
 
 
 } // namespace imtdb
-
-

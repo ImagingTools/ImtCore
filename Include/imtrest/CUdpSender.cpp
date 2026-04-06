@@ -41,7 +41,7 @@ bool CUdpSender::SendResponse(ConstResponsePtr& response) const
 }
 
 
-bool imtrest::CUdpSender::SendRequest(ConstRequestPtr& /*reguest*/) const
+bool imtrest::CUdpSender::SendRequest(ConstRequestPtr& /*request*/) const
 {
 	return false;
 }

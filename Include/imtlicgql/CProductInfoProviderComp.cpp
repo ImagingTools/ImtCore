@@ -2,6 +2,12 @@
 #include <imtlicgql/CProductInfoProviderComp.h>
 
 
+// Qt includes
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonValue>
+
+
 namespace imtlicgql
 {
 
@@ -16,26 +22,30 @@ bool CProductInfoProviderComp::IsRequestSupported(const imtgql::CGqlRequest& /*g
 }
 
 
-imtbase::CTreeItemModel* CProductInfoProviderComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CProductInfoProviderComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+	QJsonObject rootObj;
+	QJsonArray productsArray;
 
 	for (int i = 0; i < m_productIdsAttrPtr.GetCount(); i++){
-		int index = rootModelPtr->InsertNewItem();
+		QJsonObject productObj;
 
-		rootModelPtr->SetData("id", m_productIdsAttrPtr[i], index);
-		rootModelPtr->SetData("name", m_productNamesAttrPtr[i], index);
+		productObj.insert(QStringLiteral("id"), QJsonValue::fromVariant(m_productIdsAttrPtr[i]));
+		productObj.insert(QStringLiteral("name"), QJsonValue::fromVariant(m_productNamesAttrPtr[i]));
 
 		imtgql::IGqlRequestHandler* representationDataProvider = m_permissionsProviderCompPtr[i];
 		if (representationDataProvider != nullptr){
-			imtbase::CTreeItemModel* permissionsModelPtr = representationDataProvider->CreateResponse(gqlRequest, errorMessage);
-			if (permissionsModelPtr != nullptr){
-				rootModelPtr->SetExternTreeModel("permissions", permissionsModelPtr, i);
+			QJsonObject permissionsObj = representationDataProvider->CreateResponse(gqlRequest, errorMessage);
+			if (!permissionsObj.isEmpty()){
+				productObj.insert(QStringLiteral("permissions"), permissionsObj);
 			}
 		}
+
+		productsArray.append(productObj);
 	}
 
-	return rootModelPtr.PopPtr();
+	rootObj.insert(QStringLiteral("data"), productsArray);
+	return rootObj;
 }
 
 

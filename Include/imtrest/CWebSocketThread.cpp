@@ -61,6 +61,12 @@ void CWebSocketThread::SetWebSocket(QWebSocket* webSocketPtr)
 }
 
 
+const QWebSocket* CWebSocketThread::GetWebSocket() const
+{
+	return m_socket;
+}
+
+
 void CWebSocketThread::SetSocketStatus(Status socketStatus)
 {
 	QMutexLocker lock(&m_statusMutex);
@@ -236,8 +242,13 @@ void CWebSocketThread::OnWebSocketBinaryMessage(const QByteArray& dataMessage)
 }
 
 
-void CWebSocketThread::OnError(QAbstractSocket::SocketError /*error*/)
+void CWebSocketThread::OnError(QAbstractSocket::SocketError error)
 {
+	if (error == QAbstractSocket::RemoteHostClosedError) {
+		// This is a normal disconnect. Let the 'disconnected()' signal handle the cleanup.
+		return;
+	}
+
 	QWebSocket* webSocketPtr = dynamic_cast<QWebSocket*>(sender());
 	if (webSocketPtr != nullptr && m_server != nullptr){
 		QString errorMessage = QString("Web socket server error: '%1'").arg(webSocketPtr->errorString());

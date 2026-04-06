@@ -8,7 +8,7 @@
 
 // ImtCore includes
 #include <imtrest/IRequestServlet.h>
-#include <imtrest/ISender.h>
+#include <imtrest/ITransport.h>
 
 // Qt includes
 #include <QtWebSockets/QWebSocket>
@@ -51,6 +51,7 @@ public:
 
 	explicit CWebSocketThread(imtrest::CWebSocketServerComp *parent);
 	void SetWebSocket(QWebSocket* webSocketPtr);
+	const QWebSocket* GetWebSocket() const;
 	void SetSocketStatus(Status socketStatus);
 	Status GetSocketStatus();
 	QByteArray GetRequestId();

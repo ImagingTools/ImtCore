@@ -134,6 +134,7 @@ TableCellTextWithTooltipDelegate 1.0 ./Views/TableCellTextWithTooltipDelegate.qm
 TableCellRowNumberDelegate 1.0 ./Views/TableCellRowNumberDelegate.qml
 TableCellIconTextDelegate 1.0 ./Views/TableCellIconTextDelegate.qml
 TableCellDelegateCheckable 1.0 ./Views/TableCellDelegateCheckable.qml
+TableCellDateDelegate 1.0 ./Views/TableCellDateDelegate.qml
 TableDelegate 1.0 ./Views/TableDelegate.qml
 TableRowDelegateBase 1.0 ./Views/TableRowDelegateBase.qml
 TablePainterRowDelegateBase 1.0 ./Views/TablePainterRowDelegateBase.qml
@@ -179,6 +180,8 @@ Splitter 1.0 ./Views/Splitter.qml
 StackView 1.0 ./Views/StackView.qml
 Gallery 1.0 ./Views/Gallery.qml
 ExpandingContainer 1.0 ./Views/ExpandingContainer.qml
+CollapsibleRectangle 1.0 ./Views/CollapsibleRectangle.qml
+Title 1.0 ./Views/Title.qml
 TextInputCellContentComp 1.0 ./Views/TextInputCellContentComp.qml
 ComboBoxCellContentComp 1.0 ./Views/ComboBoxCellContentComp.qml
 SubMenuPanelButtonDecorator 1.0 ./Views/SubMenuPanelButtonDecorator.qml

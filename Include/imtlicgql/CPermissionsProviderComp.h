@@ -2,7 +2,11 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QJsonObject>
+
 // ImtCore includes
+#include <imtbase/CTreeItemModel.h>
 #include <imtlic/IProductInfo.h>
 #include <imtlic/CFeatureInfo.h>
 #include <imtservergql/CGqlRequestHandlerCompBase.h>
@@ -29,7 +33,7 @@ protected:
 				QString& errorMessage) const;
 
 	// reimplemented (imtservergql::CGqlRequestHandlerCompBase)
-	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual QJsonObject CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 protected:
 	I_REF(imtlic::IProductInfo, m_productInfoCompPtr);

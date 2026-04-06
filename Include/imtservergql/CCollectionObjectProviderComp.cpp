@@ -2,6 +2,10 @@
 #include <imtservergql/CCollectionObjectProviderComp.h>
 
 
+// Qt includes
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
+
 // ACF includes
 #include <iser/CJsonMemWriteArchive.h>
 
@@ -12,17 +16,14 @@ namespace imtservergql
 
 // reimplemented (imtgql::CCGqlRepresentationControllerCompBase)
 
-imtbase::CTreeItemModel* CCollectionObjectProviderComp::CreateInternalResponse(
+QJsonObject CCollectionObjectProviderComp::CreateInternalResponse(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CCollectionObjectProviderComp");
-		return nullptr;
+		return QJsonObject();
 	}
-
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
 
 	QByteArray objectId;
 
@@ -40,7 +41,7 @@ imtbase::CTreeItemModel* CCollectionObjectProviderComp::CreateInternalResponse(
 
 			SendErrorMessage(0, errorMessage);
 
-			return nullptr;
+			return QJsonObject();
 		}
 
 		QByteArray json;
@@ -51,27 +52,30 @@ imtbase::CTreeItemModel* CCollectionObjectProviderComp::CreateInternalResponse(
 
 				SendErrorMessage(0, errorMessage);
 
-				return nullptr;
+				return QJsonObject();
 			}
 
 			json = archive.GetData();
 		}
 
-		if (!dataModelPtr->CreateFromJson(json)){
-			errorMessage = QString("Tree item model creation from JSON failed").toUtf8();
+		QJsonDocument doc = QJsonDocument::fromJson(json);
+		if (doc.isNull() || !doc.isObject()){
+			errorMessage = QString("JSON object creation from serialized data failed").toUtf8();
 			SendErrorMessage(0, errorMessage);
 
-			return nullptr;
+			return QJsonObject();
 		}
+
+		QJsonObject rootObj;
+		rootObj.insert(QStringLiteral("data"), doc.object());
+		return rootObj;
 	}
 	else{
 		errorMessage = QString("Object with the ID '%1' doesn't exist").arg(qPrintable(objectId)).toUtf8();
 		SendErrorMessage(0, errorMessage);
 
-		return nullptr;
+		return QJsonObject();
 	}
-
-	return rootModelPtr.PopPtr();
 }
 
 

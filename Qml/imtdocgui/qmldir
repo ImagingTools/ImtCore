@@ -24,3 +24,5 @@ MultiDocumentCollectionView 1.0 MultiDocumentCollectionView.qml
 DocumentDecorator 1.0 DocumentDecorator.qml
 DocCollectionViewDelegate 1.0 DocCollectionViewDelegate.qml
 DocumentRepresentationController 1.0 DocumentRepresentationController.qml
+DocumentRevisionDialog 1.0 DocumentRevisionDialog.qml
+DocumentRevisionDialog 1.0 DocumentRevisionDialog.qml

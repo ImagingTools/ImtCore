@@ -14,8 +14,8 @@
 
 // ImtCore includes
 #include <imtcom/IConnectionStatusProvider.h>
-#include <imtrest/ISender.h>
-#include <imtrest/IRequestManager.h>
+#include <imtrest/ITransport.h>
+#include <imtrest/IResponseDispatcher.h>
 #include <imtrest/IRequestServlet.h>
 #include <imtrest/IProtocolEngine.h>
 #include <imtgql/CGqlRequest.h>
@@ -44,7 +44,7 @@ public:
 		I_REGISTER_INTERFACE(IGqlClient);
 		I_REGISTER_INTERFACE(imtrest::IRequestServlet);
 		I_ASSIGN(m_subscriptionSenderCompPtr, "SubscriptionSender", "Subscription sender", false, "SubscriptionSender");
-		I_ASSIGN(m_requestManagerCompPtr, "RequestManager", "Request manager for sending a request", false, "RequestManager");
+		I_ASSIGN(m_requestManagerCompPtr, "RequestManager", "Response dispatcher for sending a request", false, "RequestManager");
 		I_ASSIGN(m_engineCompPtr, "ProtocolEngine", "Protocol engine for subscription", true, "ProtocolEngine");
 		I_ASSIGN(m_connectionStatusProviderCompPtr, "WebLoginStatus", "Web login status", false, "WebLoginStatus");
 		I_ASSIGN_TO(m_connectionStatusProviderModelCompPtr, m_connectionStatusProviderCompPtr, true);
@@ -78,8 +78,8 @@ private:
 	virtual imtrest::ConstResponsePtr CreateErrorResponse(const QByteArray& errorMessage, const imtrest::IRequest& request) const;
 
 private:
-	I_REF(imtrest::ISender, m_subscriptionSenderCompPtr);
-	I_REF(imtrest::IRequestManager, m_requestManagerCompPtr);
+	I_REF(imtrest::ITransport, m_subscriptionSenderCompPtr);
+	I_REF(imtrest::IResponseDispatcher, m_requestManagerCompPtr);
 	I_REF(imtcom::IConnectionStatusProvider, m_connectionStatusProviderCompPtr);
 	I_REF(imod::IModel, m_connectionStatusProviderModelCompPtr);
 	I_REF(imtrest::IProtocolEngine, m_engineCompPtr);

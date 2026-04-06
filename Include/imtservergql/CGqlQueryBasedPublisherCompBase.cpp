@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtservergql/CGqlQueryBasedPublisherCompBase.h>
 
-
-// ACF includes
-#include<istd/TDelPtr.h>
+// Qt includes
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
 
 // ImtCore includes
 #include<imtrest/IProtocolEngine.h>
-#include<imtrest/ISender.h>
+#include<imtrest/ITransport.h>
 #include<imtrest/CWebSocketRequest.h>
 
 
@@ -34,23 +34,24 @@ bool CGqlQueryBasedPublisherCompBase::Publish(bool useAwsStyle)
 		clonedRequest.SetCommandId(*m_requestHandlerCommandIdAtrPtr);
 
 		QString errorMessage;
-		istd::TDelPtr<imtbase::CTreeItemModel> resultModelPtr = m_requestHandlerCompPtr->CreateResponse(clonedRequest, errorMessage);
-		if (!resultModelPtr.IsValid()){
+		QJsonObject resultObj = m_requestHandlerCompPtr->CreateResponse(clonedRequest, errorMessage);
+		if (resultObj.isEmpty()){
 			errorMessage = QString("Unable to send response to the subscribers result model is invalid");
 			SendErrorMessage(0, errorMessage, "CGqlQueryBasedPublisherCompBase");
 
 			return false;
 		}
 
-		imtbase::CTreeItemModel* dataModelPtr = resultModelPtr->GetTreeItemModel("data");
-		if (dataModelPtr == nullptr){
+		QJsonObject dataObj = resultObj.value(QStringLiteral("data")).toObject();
+		if (dataObj.isEmpty()){
 			errorMessage = QString("Unable to send response to the subscribers result model is invalid");
 			SendErrorMessage(0, errorMessage, "CGqlQueryBasedPublisherCompBase");
 
 			return false;
 		}
 
-		QByteArray data =  dataModelPtr->ToJson().toUtf8();
+		QJsonDocument doc(dataObj);
+		QByteArray data = doc.toJson(QJsonDocument::Compact);
 
 		for (const QByteArray& id: requestNetworks.networkRequests.keys()){
 			const imtrest::IRequest* networkRequestPtr = requestNetworks.networkRequests[id];

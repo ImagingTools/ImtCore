@@ -19,17 +19,21 @@ enum EDocumentOperation{
 	DocumentSaved
 	DocumentSavedAs
 	DocumentClosed
+	DocumentDataLoaded
 }
 
 enum EDocumentOperationStatus {
 	Success
 	InvalidUserId
 	InvalidDocumentId
+	InvalidDocumentData
 	Failed
 }
 
 type DocumentOperationStatus {
 	status: EDocumentOperationStatus!
+	message: String
+	documentName: String
 }
 
 type CollectionId {
@@ -51,7 +55,9 @@ type DocumentInfo {
 	documentName: String!
 	objectTypeId: ID!
 	objectId: ID!
-	isDirty: Bool!
+	isDirty: Bool
+	hasNameProvider: Bool
+	isLoading: Bool
 }
 
 type DocumentList {
@@ -69,6 +75,7 @@ type DocumentManagerNotification {
 	documentName: String!
 	objectId: ID
 	isDirty: Bool
+	isLoading: Bool
 }
 
 type SetDocumentNameInput {
@@ -95,8 +102,8 @@ type Query {
 }
 
 type Mutation {
-	CreateNewDocument(input: DocumentTypeId): DocumentId!
-	OpenDocument(input: ObjectId): DocumentId!
+	CreateNewDocument(input: DocumentTypeId): DocumentInfo!
+	OpenDocument(input: ObjectId): DocumentInfo!
 	SetDocumentName(input: SetDocumentNameInput): DocumentOperationStatus!
 	SaveDocument(input: SaveDocumentInput): DocumentOperationStatus!
 	CloseDocument(input: DocumentId): DocumentOperationStatus!

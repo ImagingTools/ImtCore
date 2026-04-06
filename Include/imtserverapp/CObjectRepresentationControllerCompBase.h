@@ -36,7 +36,7 @@ public:
 protected:
 	virtual bool GetRepresentationFromValue(
 				const istd::IChangeable& dataModel,
-				imtbase::CTreeItemModel& representation,
+				QJsonObject& representation,
 				const iprm::IParamsSet* paramsPtr = nullptr) const = 0;
 	virtual bool CheckPermissions(const imtauth::IUserInfo::FeatureIds& userPermissions, const QByteArray& paramId) const;
 
@@ -44,7 +44,7 @@ protected:
 	virtual QByteArray GetModelId() const override;
 	virtual bool GetRepresentationFromDataModel(
 				const istd::IChangeable& dataModel,
-				imtbase::CTreeItemModel& representation,
+				QJsonObject& representation,
 				const iprm::IParamsSet* paramsPtr = nullptr) const override;
 
 protected:
@@ -59,5 +59,4 @@ protected:
 
 
 } // namespace imtserverapp
-
 

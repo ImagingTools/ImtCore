@@ -26,6 +26,7 @@ public:
 
 	// reimplemented (imtauth::IUserManager)
 	virtual QByteArrayList GetUserIds() const override;
+	virtual QList<User> GetUserList() const override;
 	virtual QByteArray GetUserObjectId(const QByteArray& login) const override;
 	virtual imtauth::IUserInfoUniquePtr GetUser(const QByteArray& userId) const override;
 	virtual bool RemoveUser(const QByteArray& userId) override;

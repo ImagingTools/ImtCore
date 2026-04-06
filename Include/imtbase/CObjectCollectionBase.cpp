@@ -841,6 +841,8 @@ bool CObjectCollectionBase::CopyFrom(const IChangeable& object, CompatibilityMod
 					targetLock.relock();
 					if (targetObjectInfoPtr->dataPtr->CopyFrom(*dataPtr, sourceObjectInfo.copyMode)){
 						targetObjectInfoPtr->copyMode = sourceObjectInfo.copyMode;
+						targetObjectInfoPtr->name = sourceObjectInfo.name;
+						targetObjectInfoPtr->description = sourceObjectInfo.description;
 					}
 					else{
 						return false;
@@ -1125,6 +1127,12 @@ idoc::MetaInfoPtr CObjectCollectionBase::CollectionIterator::GetDataMetaInfo() c
 }
 
 
+int CObjectCollectionBase::CollectionIterator::GetElementsCount() const
+{
+	return m_parent.GetElementsCount();
+}
+
+
 idoc::MetaInfoPtr CObjectCollectionBase::CollectionIterator::GetCollectionMetaInfo() const
 {
 	if (IsValid()){
@@ -1200,5 +1208,4 @@ QByteArray CObjectCollectionBase::CollectionIterator::GetObjectId(int index) con
 
 
 } // namespace imtbase
-
 

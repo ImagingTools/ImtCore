@@ -9977,7 +9977,7 @@ bool CResultMetaData::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 
 		return false;
 	}
-	jsonObject["resultId"] = QJsonValue::fromVariant(*resultId);
+	jsonObject["resultId"] = QString::fromUtf8(*resultId);
 
 	if (creationTime){
 		jsonObject["creationTime"] = QJsonValue::fromVariant(*creationTime);
@@ -22359,11 +22359,11 @@ bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlR
 }
 
 
-::imtbase::CTreeItemModel* CGraphQlHandlerCompBase::CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CGraphQlHandlerCompBase::CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	const QByteArray commandId = gqlRequest.GetCommandId();
-	istd::TDelPtr<::imtbase::CTreeItemModel> modelPtr(new ::imtbase::CTreeItemModel);
-	::imtbase::CTreeItemModel* dataModelPtr = modelPtr->AddTreeModel("data");
+	QJsonObject modelObj;
+	QJsonObject dataModelObj;
 
 	// GetLastProductionResults
 	if (commandId == CGetLastProductionResultsGqlRequest::GetCommandId()){
@@ -22372,25 +22372,25 @@ bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlR
 			errorMessage = QString("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
 			SendErrorMessage(0, errorMessage);
 
-			return nullptr;
+			return QJsonObject();
 		}
 
 		CProductOverview replyPayload = OnGetLastProductionResults(getLastProductionResultsGqlRequest, gqlRequest, errorMessage);
 		if (!errorMessage.isEmpty()){
 			SendErrorMessage(0, QString("The derived call [OnGetLastProductionResults] returned an error: %1").arg(errorMessage));
 
-			return nullptr;
+			return QJsonObject();
 		}
 
-		const bool isModelCreated = replyPayload.WriteToModel(*dataModelPtr);
+		const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);
 		if (!isModelCreated){
 			errorMessage = QString("Internal error. Unable to create response for command-ID: '%1'").arg(qPrintable(commandId));
 			SendCriticalMessage(0, errorMessage);
 
-			return nullptr;
+			return QJsonObject();
 		}
 
-		return modelPtr.PopPtr();
+		modelObj.insert(QStringLiteral("data"), dataModelObj); return modelObj;
 	}
 
 	// GetLastProductionResultsCDM
@@ -22400,31 +22400,31 @@ bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlR
 			errorMessage = QString("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
 			SendErrorMessage(0, errorMessage);
 
-			return nullptr;
+			return QJsonObject();
 		}
 
 		CCDMResult replyPayload = OnGetLastProductionResultsCDM(getLastProductionResultsCDMGqlRequest, gqlRequest, errorMessage);
 		if (!errorMessage.isEmpty()){
 			SendErrorMessage(0, QString("The derived call [OnGetLastProductionResultsCDM] returned an error: %1").arg(errorMessage));
 
-			return nullptr;
+			return QJsonObject();
 		}
 
-		const bool isModelCreated = replyPayload.WriteToModel(*dataModelPtr);
+		const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);
 		if (!isModelCreated){
 			errorMessage = QString("Internal error. Unable to create response for command-ID: '%1'").arg(qPrintable(commandId));
 			SendCriticalMessage(0, errorMessage);
 
-			return nullptr;
+			return QJsonObject();
 		}
 
-		return modelPtr.PopPtr();
+		modelObj.insert(QStringLiteral("data"), dataModelObj); return modelObj;
 	}
 
 	errorMessage = QString("Bad request. Unexpected command-ID: '%1'").arg(qPrintable(commandId));
 	SendErrorMessage(0, errorMessage);
 
-	return nullptr;
+	return QJsonObject();
 }
 
 

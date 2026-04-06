@@ -105,18 +105,31 @@ void CWebSocketServerComp::SendVerboseMessage(const QString& message, const QStr
 }
 
 
-// reimplemented (icomp::IRequestManager)
+// reimplemented (imtrest::IResponseDispatcher)
 
-const ISender* CWebSocketServerComp::GetSender(const QByteArray& requestId) const
+bool CWebSocketServerComp::SendResponse(const QByteArray& requestId, ConstResponsePtr& response) const
 {
 	QReadLocker locker(&m_sendersLock);
 
 	CWebSocketSender* sender = m_senders.value(requestId).data();
 	if (sender != nullptr){
-		return sender;
+		return sender->SendResponse(response);
 	}
 
-	return nullptr;
+	return false;
+}
+
+
+bool CWebSocketServerComp::SendRequest(const QByteArray& requestId, ConstRequestPtr& request) const
+{
+	QReadLocker locker(&m_sendersLock);
+
+	CWebSocketSender* sender = m_senders.value(requestId).data();
+	if (sender != nullptr){
+		return sender->SendRequest(request);
+	}
+
+	return false;
 }
 
 
@@ -367,26 +380,24 @@ void CWebSocketServerComp::OnSocketDisconnected()
 void CWebSocketServerComp::OnTimeout()
 {
 	QList<QWebSocket*> sendedSockets;
-	for (const QByteArray& key: m_senders.keys()){
-		if (!m_senders[key].isNull()){
-			QWebSocket* webSocketPtr = const_cast<QWebSocket*>(m_senders[key]->GetSocket());
-			if (webSocketPtr != nullptr && !sendedSockets.contains(webSocketPtr)){
-				QString subProtocolId;
+	for (CWebSocketThread* webSocketThread: m_webSocketThreadList) {
+		QWebSocket* webSocketPtr = const_cast<QWebSocket*>(webSocketThread->GetWebSocket());
+		if (webSocketPtr != nullptr && !sendedSockets.contains(webSocketPtr)){
+			QString subProtocolId;
 
-			#if QT_VERSION >= QT_VERSION_CHECK(6, 4, 0)
-				subProtocolId = webSocketPtr->subprotocol();
-			#endif
+		#if QT_VERSION >= QT_VERSION_CHECK(6, 4, 0)
+			subProtocolId = webSocketPtr->subprotocol();
+		#endif
 
-				if (subProtocolId == "graphql-transport-ws"){
-					//optional ToDo: Remember send ping and disconnect websocket if no pong is received
-					webSocketPtr->sendTextMessage(QString(R"({"type": "ping"})"));
-				}
-				else{
-					webSocketPtr->sendTextMessage(QString(R"({"type": "ka"})"));
-				}
-
-				sendedSockets.append(webSocketPtr);
+			if (subProtocolId == "graphql-transport-ws"){
+				//optional ToDo: Remember send ping and disconnect websocket if no pong is received
+				webSocketPtr->sendTextMessage(QString(R"({"type": "ping"})"));
 			}
+			else{
+				webSocketPtr->sendTextMessage(QString(R"({"type": "ka"})"));
+			}
+
+			sendedSockets.append(webSocketPtr);
 		}
 	}
 }

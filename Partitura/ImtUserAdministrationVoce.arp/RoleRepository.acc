@@ -74,7 +74,7 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="RoleCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PostgresDatabaseObjectCollection"/>
+                        <Data IsEnabled="true" Value="PostgresDatabaseObjectCollection/CachedObjectCollection"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

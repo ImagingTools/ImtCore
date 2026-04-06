@@ -8,7 +8,7 @@
 
 // ImtCore includes
 #include <imtrest/IProtocolEngine.h>
-#include <imtrest/ISender.h>
+#include <imtrest/ITransport.h>
 
 
 namespace imtrest
@@ -80,19 +80,33 @@ void CMultiThreadServer::SetSslConfiguration(const QSslConfiguration& sslConfigu
 }
 
 
-// reimplemented (imtrest::IRequestManager)
+// reimplemented (imtrest::IResponseDispatcher)
 
-const ISender* CMultiThreadServer::GetSender(const QByteArray& requestId) const
+bool CMultiThreadServer::SendResponse(const QByteArray& requestId, ConstResponsePtr& response) const
 {
 	QReadLocker threadListLock(&m_threadSocketListGuard);
 
 	for (CSocketThread* socket : m_threadSocketList){
 		if (socket->GetRequestId() == requestId){
-			return socket;
+			return socket->SendResponse(response);
 		}
 	}
 
-	return nullptr;
+	return false;
+}
+
+
+bool CMultiThreadServer::SendRequest(const QByteArray& requestId, ConstRequestPtr& request) const
+{
+	QReadLocker threadListLock(&m_threadSocketListGuard);
+
+	for (CSocketThread* socket : m_threadSocketList){
+		if (socket->GetRequestId() == requestId){
+			return socket->SendRequest(request);
+		}
+	}
+
+	return false;
 }
 
 

@@ -51,15 +51,15 @@ ControlBase {
         if(!autoExclusive){
             checked = !checked;
         }
-        else if(!checked){
-            checked = true;
-        }
-        if(checked){
-            let obj = {}
-            obj["Self"] = this;
-            obj["Parent"] = this.parent;
-            Events.sendEvent("RadioButtonUnchecked", obj);
-        }
+		else if(!checked){
+			checked = true;
+		}
+		if(checked){
+			let obj = {}
+			obj["Self"] = this;
+			obj["Parent"] = this.parent;
+			Events.sendEvent("RadioButtonUnchecked", obj);
+		}
 
     }
 
@@ -67,7 +67,7 @@ ControlBase {
         if(autoExclusive){
             var self_ = object_["Self"];
             var parent_ = object_["Parent"];
-            if(customRadioButton !== self_ && customRadioButton.parent == parent_ && checked){
+			if(customRadioButton !== self_ && customRadioButton.parent == parent_ && checked){
                 checked = false;
             }
         }
