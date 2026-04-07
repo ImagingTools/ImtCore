@@ -53,7 +53,7 @@ Rectangle {
 
 			// Title
 			Text {
-				text: qsTr("Create Support Ticket")
+				text: qsTr("New Issue")
 				font.pixelSize: Style.fontSizeL
 				font.bold: true
 				color: Style.textPrimaryColor
@@ -127,7 +127,7 @@ Rectangle {
 
 						Text {
 							anchors.fill: parent
-							text: qsTr("Describe the issue in detail...")
+							text: qsTr("Add a description...")
 							color: Style.textPlaceholderColor
 							font.pixelSize: Style.fontSizeS
 							visible: descriptionField.text.length === 0
@@ -194,6 +194,45 @@ Rectangle {
 				}
 			}
 
+			// Milestone ID field
+			Column {
+				width: parent.width
+				spacing: Style.paddingXS
+
+				Text {
+					text: qsTr("Milestone")
+					font.pixelSize: Style.fontSizeXS
+					color: Style.textSecondaryColor
+				}
+
+				Rectangle {
+					width: parent.width
+					height: Style.inputHeightM
+					radius: Style.radiusS
+					color: Style.inputBackgroundColor
+					border.color: milestoneField.activeFocus ? Style.accentColor : Style.separatorColor
+
+					TextInput {
+						id: milestoneField
+						anchors.fill: parent
+						anchors.margins: Style.paddingS
+						font.pixelSize: Style.fontSizeS
+						color: Style.textPrimaryColor
+						clip: true
+						verticalAlignment: TextInput.AlignVCenter
+
+						Text {
+							anchors.fill: parent
+							text: qsTr("Milestone ID (optional)")
+							color: Style.textPlaceholderColor
+							font.pixelSize: Style.fontSizeS
+							verticalAlignment: Text.AlignVCenter
+							visible: milestoneField.text.length === 0
+						}
+					}
+				}
+			}
+
 			// Buttons
 			Row {
 				anchors.right: parent.right
@@ -225,11 +264,11 @@ Rectangle {
 					width: Style.buttonWidthM
 					height: Style.buttonHeightM
 					radius: Style.radiusS
-					color: titleField.text.trim().length > 0 ? Style.accentColor : Style.disabledColor
+					color: titleField.text.trim().length > 0 ? "#1a7f37" : Style.disabledColor
 
 					Text {
 						anchors.centerIn: parent
-						text: qsTr("Create Ticket")
+						text: qsTr("Submit new issue")
 						font.pixelSize: Style.fontSizeS
 						color: "white"
 						font.bold: true
@@ -259,6 +298,7 @@ Rectangle {
 		visible = false;
 		titleField.text = "";
 		descriptionField.text = "";
+		milestoneField.text = "";
 		cancelled();
 	}
 
@@ -269,6 +309,7 @@ Rectangle {
 			ticketType: typeCombo.currentIndex,
 			priority: priorityCombo.currentIndex,
 			environment: environmentCombo.currentIndex,
+			milestoneId: milestoneField.text.trim(),
 			messageId: linkedMessageId,
 			conversationId: linkedConversationId
 		};
@@ -277,5 +318,6 @@ Rectangle {
 		visible = false;
 		titleField.text = "";
 		descriptionField.text = "";
+		milestoneField.text = "";
 	}
 }
