@@ -55,11 +55,11 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 	response.Version_1_0->number = ticketPtr->GetNumber();
 	response.Version_1_0->title = ticketPtr->GetTitle();
 	response.Version_1_0->description = ticketPtr->GetDescription();
-	response.Version_1_0->assigneeIds = ticketPtr->GetAssigneeIds();
+	response.Version_1_0->assigneeIds.Emplace().FromList(ticketPtr->GetAssigneeIds());
 	response.Version_1_0->reporterId = ticketPtr->GetReporterId();
 	response.Version_1_0->conversationId = ticketPtr->GetConversationId();
 	response.Version_1_0->messageId = ticketPtr->GetMessageId();
-	response.Version_1_0->labelIds = ticketPtr->GetLabelIds();
+	response.Version_1_0->labelIds.Emplace().FromList(ticketPtr->GetLabelIds());
 	response.Version_1_0->milestoneId = ticketPtr->GetMilestoneId();
 	response.Version_1_0->locked = ticketPtr->IsLocked();
 	response.Version_1_0->lockReason = ticketPtr->GetLockReason();
@@ -128,7 +128,7 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 	}
 
 	if (ticketInfo.assigneeIds){
-		ticketPtr->SetAssigneeIds(*ticketInfo.assigneeIds);
+		ticketPtr->SetAssigneeIds(ticketInfo.assigneeIds->ToList());
 	}
 
 	if (ticketInfo.reporterId){
@@ -144,7 +144,7 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 	}
 
 	if (ticketInfo.labelIds){
-		ticketPtr->SetLabelIds(*ticketInfo.labelIds);
+		ticketPtr->SetLabelIds(ticketInfo.labelIds->ToList());
 	}
 
 	if (ticketInfo.milestoneId){

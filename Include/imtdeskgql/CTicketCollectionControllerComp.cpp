@@ -6,6 +6,7 @@
 
 // ImtCore includes
 #include <imtdesk/ISupportTicket.h>
+#include <imtdeskgql/imtdeskgql.h>
 
 
 namespace imtdeskgql
@@ -56,7 +57,7 @@ bool CTicketCollectionControllerComp::CreateRepresentationFromObject(
 		break;
 	}
 
-	representationObject.stateReason = GetSdlTypeFromStateReason(ticketPtr->GetStateReason());
+	representationObject.stateReason = imtdeskgql::GetSdlTypeFromStateReason(ticketPtr->GetStateReason());
 
 	imtdesk::ISupportTicket::TicketPriority ticketPriority = ticketPtr->GetPriority();
 	switch (ticketPriority){
@@ -130,7 +131,7 @@ bool CTicketCollectionControllerComp::CreateRepresentationFromObject(
 	representationPayload.number = ticketPtr->GetNumber();
 	representationPayload.title = ticketPtr->GetTitle();
 	representationPayload.description = ticketPtr->GetDescription();
-	representationPayload.assigneeIds = ticketPtr->GetAssigneeIds();
+	representationPayload.assigneeIds.Emplace().FromList(ticketPtr->GetAssigneeIds());
 	representationPayload.reporterId = ticketPtr->GetReporterId();
 	representationPayload.conversationId = ticketPtr->GetConversationId();
 	representationPayload.messageId = ticketPtr->GetMessageId();
@@ -269,7 +270,7 @@ bool CTicketCollectionControllerComp::FillObjectFromRepresentation(
 	}
 
 	if (representation.stateReason){
-		ticketPtr->SetStateReason(GetStateReasonFromSdlType(*representation.stateReason));
+		ticketPtr->SetStateReason(imtdeskgql::GetStateReasonFromSdlType(*representation.stateReason));
 	}
 
 	return true;
