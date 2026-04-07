@@ -400,7 +400,7 @@ bool CRemoteStandardLoginGuiComp::TryRestoreSessionWithRefreshToken(const QStrin
 }
 
 
-void CRemoteStandardLoginGuiComp::SaveRefreshTokenIfRememberMe(QSettings& settings) const
+void CRemoteStandardLoginGuiComp::SaveRefreshTokenIfRememberMe(QSettings& /*settings*/) const
 {
 }
 

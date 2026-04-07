@@ -63,7 +63,7 @@ DecoratorBase {
 	}
 
 	function closeTooltip(){
-		console.log("closeTooltip", tooltip)
+		//console.log("closeTooltip", tooltip)
 		if(tooltip && tooltip.openST){
 			tooltip.closeTooltip();
 		}

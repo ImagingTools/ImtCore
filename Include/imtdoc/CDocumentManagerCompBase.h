@@ -34,15 +34,15 @@ public:
 
 protected:
 	// reimplemented (imtdoc::CDocumentManagerBase)
-	virtual QList<imtdoc::IDocumentManagerEventHandler*> GetDocumentManagerEventHandlers() const override;
-	virtual istd::IChangeableSharedPtr CreateObject(const QByteArray& typeId) const override;
-	virtual idoc::IUndoManagerSharedPtr CreateUndoManager() const override;
 	virtual QString GetDefaultDocumentName(const WorkingDocument& document) const override;
 	virtual bool HasDocumentNameProvider(const QByteArray& typeId) const override;
 	virtual bool ValidateDocumentData(
 		const WorkingDocument& document,
 		OperationStatus& status,
 		QString* errorMessage = nullptr) const override;
+	virtual QList<imtdoc::IDocumentManagerEventHandler*> GetDocumentManagerEventHandlers() const override;
+	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId) const override;
+	virtual idoc::IUndoManagerUniquePtr CreateUndoManager() const override;
 
 private:
 	// Reserve 170000000-170000099 for imtdoc validation warnings to avoid collisions with other message IDs.
