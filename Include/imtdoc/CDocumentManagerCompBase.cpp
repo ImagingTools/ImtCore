@@ -14,25 +14,6 @@ namespace imtdoc
 
 // reimplemented (imtdoc::CDocumentManagerBase)
 
-istd::IChangeableSharedPtr CDocumentManagerCompBase::CreateObject(const QByteArray& typeId) const
-{
-	int index = GetObjectFactoryIndex(typeId);
-	if (index >= 0){
-		return m_objectFactListCompPtr.CreateInstance(index);
-	}
-
-	Q_ASSERT_X(false, "CDocumentManagerCompBase::CreateObject", qPrintable(QString("Factory not found for the type: '%1'").arg(qPrintable(typeId))));
-
-	return nullptr;
-}
-
-
-idoc::IUndoManagerSharedPtr CDocumentManagerCompBase::CreateUndoManager() const
-{
-	return m_undoManagerFactPtr.CreateInstance();
-}
-
-
 QString CDocumentManagerCompBase::GetDefaultDocumentName(const WorkingDocument& document) const
 {
 	const imtdoc::IDocumentNameProvider* nameProviderPtr = GetDocumentNameProvider(document.typeId);
@@ -108,6 +89,31 @@ QList<imtdoc::IDocumentManagerEventHandler*> CDocumentManagerCompBase::GetDocume
 	}
 
 	return retVal;
+}
+
+
+istd::IChangeableUniquePtr CDocumentManagerCompBase::CreateObject(const QByteArray& typeId) const
+{
+	int index = GetObjectFactoryIndex(typeId);
+	if (index >= 0 && m_objectFactListCompPtr[index] != nullptr){
+		return m_objectFactListCompPtr.CreateInstance(index);
+	}
+
+	Q_ASSERT_X(false, "CDocumentManagerCompBase::CreateObject", qPrintable(QString("Factory not found for the type: '%1'").arg(qPrintable(typeId))));
+
+	return nullptr;
+}
+
+
+idoc::IUndoManagerUniquePtr CDocumentManagerCompBase::CreateUndoManager() const
+{
+	if (m_undoManagerFactPtr.IsValid()){
+		return m_undoManagerFactPtr.CreateInstance();
+	}
+
+	Q_ASSERT_X(false, "CDocumentManagerCompBase::CreateUndoManager", qPrintable(QString("Factory not found")));
+
+	return nullptr;
 }
 
 
