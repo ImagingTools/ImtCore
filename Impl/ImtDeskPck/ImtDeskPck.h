@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtdesk/CSupportTicketComp.h>
+#include <imtdesk/CTicketDocumentNameProviderComp.h>
 
 
 /**
@@ -17,6 +18,7 @@ namespace ImtDeskPck
 
 
 typedef icomp::TModelCompWrap<imtdesk::CSupportTicketComp> SupportTicket;
+typedef imtdesk::CTicketDocumentNameProviderComp TicketDocumentNameProvider;
 
 
 } // namespace ImtDeskPck

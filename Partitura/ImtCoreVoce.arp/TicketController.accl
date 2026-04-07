@@ -18,6 +18,7 @@
         <Element ComponentName="SupportTicket" X="1000" Y="750" Note=""/>
         <Element ComponentName="TicketCollectionController" X="1025" Y="550" Note=""/>
         <Element ComponentName="TicketCollectionDocumentManager" X="775" Y="450" Note=""/>
+        <Element ComponentName="TicketDocumentNameProvider" X="1000" Y="625" Note=""/>
         <Element ComponentName="TicketSqlRepository" X="275" Y="725" Note=""/>
         <Element ComponentName="TicketsChangeNotifier" X="200" Y="75" Note=""/>
     </PositionMap>
