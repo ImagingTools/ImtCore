@@ -59,6 +59,9 @@ imtrest::ConstResponsePtr CWebSocketServletComp::ProcessRequest(const imtrest::I
 			SendErrorMessage(0, "Data request", "CWebSocketServletComp");
 			return imtrest::ConstResponsePtr();
 
+		case imtrest::CWebSocketRequest::MT_COMPLETE:
+			return imtrest::ConstResponsePtr();
+
 		default:{
 			QByteArray errorMessage = QString("Method type not correct: %1").arg(webSocketRequest->GetMethodType()).toUtf8();
 			return CreateErrorResponse(errorMessage, request);

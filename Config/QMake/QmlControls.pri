@@ -37,6 +37,8 @@ defineTest(prepareWebQml) {
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseProgressManagerSdl, $$buildwebdir/src/imtbaseProgressManagerSdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseDocumentIdFilterSdl, $$buildwebdir/src/imtbaseDocumentIdFilterSdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseMimeTypeSdl, $$buildwebdir/src/imtbaseMimeTypeSdl)
+	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imt2dsdl/SDL/1.0/QML/imt2dGeometrySdl, $$buildwebdir/src/imt2dGeometrySdl)
+	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imt2dsdl/SDL/1.0/QML/imt2dPaintSystemSdl, $$buildwebdir/src/imt2dPaintSystemSdl)
 
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthGroupsSdl, $$buildwebdir/src/imtauthGroupsSdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthRolesSdl, $$buildwebdir/src/imtauthRolesSdl)
@@ -45,6 +47,7 @@ defineTest(prepareWebQml) {
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthAuthorizationOptionsSdl, $$buildwebdir/src/imtauthAuthorizationOptionsSdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthProfileSdl, $$buildwebdir/src/imtauthProfileSdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthSessionsSdl, $$buildwebdir/src/imtauthSessionsSdl)
+	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthPersonalAccessTokensSdl, $$buildwebdir/src/imtauthPersonalAccessTokensSdl)
 	
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtlicsdl/SDL/1.0/QML/imtlicFeaturesSdl, $$buildwebdir/src/imtlicFeaturesSdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtlicsdl/SDL/1.0/QML/imtlicProductsSdl, $$buildwebdir/src/imtlicProductsSdl)
