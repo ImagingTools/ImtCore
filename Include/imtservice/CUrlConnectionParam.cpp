@@ -135,14 +135,7 @@ bool CUrlConnectionParam::CopyFrom(const IChangeable& object, CompatibilityMode 
 		m_externConnectionList.clear();
 
 		for (const QSharedPointer<IncomingConnectionParam>& connectionParamPtr : sourcePtr->m_externConnectionList){
-			QSharedPointer<IncomingConnectionParam> newParam = QSharedPointer<IncomingConnectionParam>::create();
-			newParam->description = connectionParamPtr->description;
-			newParam->host = connectionParamPtr->host;
-			newParam->wsPort = connectionParamPtr->wsPort;
-			newParam->httpPort = connectionParamPtr->httpPort;
-			newParam->id = connectionParamPtr->id;
-
-			m_externConnectionList << newParam;
+			m_externConnectionList << QSharedPointer<IncomingConnectionParam>::create(*connectionParamPtr);
 		}
 
 		return true;
