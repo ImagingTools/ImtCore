@@ -22,7 +22,11 @@ QByteArray CConversationComp::GetId() const
 
 void CConversationComp::SetId(const QByteArray& id)
 {
-	m_id = id;
+	if (m_id != id){
+		istd::CChangeNotifier notifier(this);
+
+		m_id = id;
+	}
 }
 
 
@@ -34,7 +38,11 @@ QString CConversationComp::GetName() const
 
 void CConversationComp::SetName(const QString& name)
 {
-	m_name = name;
+	if (m_name != name){
+		istd::CChangeNotifier notifier(this);
+
+		m_name = name;
+	}
 }
 
 
@@ -46,7 +54,11 @@ IConversation::ConversationType CConversationComp::GetConversationType() const
 
 void CConversationComp::SetConversationType(IConversation::ConversationType conversationType)
 {
-	m_conversationType = conversationType;
+	if (m_conversationType != conversationType){
+		istd::CChangeNotifier notifier(this);
+
+		m_conversationType = conversationType;
+	}
 }
 
 
@@ -58,7 +70,11 @@ QByteArrayList CConversationComp::GetParticipantIds() const
 
 void CConversationComp::SetParticipantIds(const QByteArrayList& participantIds)
 {
-	m_participantIds = participantIds;
+	if (m_participantIds != participantIds){
+		istd::CChangeNotifier notifier(this);
+
+		m_participantIds = participantIds;
+	}
 }
 
 
@@ -70,7 +86,11 @@ QString CConversationComp::GetCreatedAt() const
 
 void CConversationComp::SetCreatedAt(const QString& createdAt)
 {
-	m_createdAt = createdAt;
+	if (m_createdAt != createdAt){
+		istd::CChangeNotifier notifier(this);
+
+		m_createdAt = createdAt;
+	}
 }
 
 
@@ -82,7 +102,11 @@ QString CConversationComp::GetUpdatedAt() const
 
 void CConversationComp::SetUpdatedAt(const QString& updatedAt)
 {
-	m_updatedAt = updatedAt;
+	if (m_updatedAt != updatedAt){
+		istd::CChangeNotifier notifier(this);
+
+		m_updatedAt = updatedAt;
+	}
 }
 
 
@@ -94,7 +118,11 @@ QString CConversationComp::GetMetadata() const
 
 void CConversationComp::SetMetadata(const QString& metadata)
 {
-	m_metadata = metadata;
+	if (m_metadata != metadata){
+		istd::CChangeNotifier notifier(this);
+
+		m_metadata = metadata;
+	}
 }
 
 
@@ -148,6 +176,8 @@ bool CConversationComp::CopyFrom(const IChangeable& object, CompatibilityMode /*
 		return false;
 	}
 
+	istd::CChangeNotifier notifier(this);
+
 	m_id = srcPtr->GetId();
 	m_name = srcPtr->GetName();
 	m_conversationType = srcPtr->GetConversationType();
@@ -186,6 +216,8 @@ istd::IChangeableUniquePtr CConversationComp::CloneMe(CompatibilityMode mode) co
 
 bool CConversationComp::ResetData(CompatibilityMode /*mode*/)
 {
+	istd::CChangeNotifier notifier(this);
+
 	m_id.clear();
 	m_name.clear();
 	m_conversationType = IConversation::CT_DIRECT;

@@ -22,7 +22,11 @@ QByteArray CSupportTicketComp::GetId() const
 
 void CSupportTicketComp::SetId(const QByteArray& id)
 {
-	m_id = id;
+	if (m_id != id){
+		istd::CChangeNotifier notifier(this);
+
+		m_id = id;
+	}
 }
 
 
@@ -34,7 +38,11 @@ QString CSupportTicketComp::GetTitle() const
 
 void CSupportTicketComp::SetTitle(const QString& title)
 {
-	m_title = title;
+	if (m_title != title){
+		istd::CChangeNotifier notifier(this);
+
+		m_title = title;
+	}
 }
 
 
@@ -46,7 +54,11 @@ QString CSupportTicketComp::GetDescription() const
 
 void CSupportTicketComp::SetDescription(const QString& description)
 {
-	m_description = description;
+	if (m_description != description){
+		istd::CChangeNotifier notifier(this);
+
+		m_description = description;
+	}
 }
 
 
@@ -58,7 +70,11 @@ ISupportTicket::TicketType CSupportTicketComp::GetTicketType() const
 
 void CSupportTicketComp::SetTicketType(TicketType ticketType)
 {
-	m_ticketType = ticketType;
+	if (m_ticketType != ticketType){
+		istd::CChangeNotifier notifier(this);
+
+		m_ticketType = ticketType;
+	}
 }
 
 
@@ -70,7 +86,11 @@ ISupportTicket::TicketStatus CSupportTicketComp::GetStatus() const
 
 void CSupportTicketComp::SetStatus(TicketStatus status)
 {
-	m_status = status;
+	if (m_status != status){
+		istd::CChangeNotifier notifier(this);
+
+		m_status = status;
+	}
 }
 
 
@@ -82,7 +102,11 @@ ISupportTicket::TicketPriority CSupportTicketComp::GetPriority() const
 
 void CSupportTicketComp::SetPriority(TicketPriority priority)
 {
-	m_priority = priority;
+	if (m_priority != priority){
+		istd::CChangeNotifier notifier(this);
+
+		m_priority = priority;
+	}
 }
 
 
@@ -94,7 +118,11 @@ QByteArray CSupportTicketComp::GetAssigneeId() const
 
 void CSupportTicketComp::SetAssigneeId(const QByteArray& assigneeId)
 {
-	m_assigneeId = assigneeId;
+	if (m_assigneeId != assigneeId){
+		istd::CChangeNotifier notifier(this);
+
+		m_assigneeId = assigneeId;
+	}
 }
 
 
@@ -106,7 +134,11 @@ QByteArray CSupportTicketComp::GetReporterId() const
 
 void CSupportTicketComp::SetReporterId(const QByteArray& reporterId)
 {
-	m_reporterId = reporterId;
+	if (m_reporterId != reporterId){
+		istd::CChangeNotifier notifier(this);
+
+		m_reporterId = reporterId;
+	}
 }
 
 
@@ -118,7 +150,11 @@ QByteArray CSupportTicketComp::GetConversationId() const
 
 void CSupportTicketComp::SetConversationId(const QByteArray& conversationId)
 {
-	m_conversationId = conversationId;
+	if (m_conversationId != conversationId){
+		istd::CChangeNotifier notifier(this);
+
+		m_conversationId = conversationId;
+	}
 }
 
 
@@ -130,7 +166,11 @@ QByteArray CSupportTicketComp::GetMessageId() const
 
 void CSupportTicketComp::SetMessageId(const QByteArray& messageId)
 {
-	m_messageId = messageId;
+	if (m_messageId != messageId){
+		istd::CChangeNotifier notifier(this);
+
+		m_messageId = messageId;
+	}
 }
 
 
@@ -142,7 +182,11 @@ ISupportTicket::Environment CSupportTicketComp::GetEnvironment() const
 
 void CSupportTicketComp::SetEnvironment(Environment environment)
 {
-	m_environment = environment;
+	if (m_environment != environment){
+		istd::CChangeNotifier notifier(this);
+
+		m_environment = environment;
+	}
 }
 
 
@@ -154,7 +198,11 @@ QStringList CSupportTicketComp::GetTags() const
 
 void CSupportTicketComp::SetTags(const QStringList& tags)
 {
-	m_tags = tags;
+	if (m_tags != tags){
+		istd::CChangeNotifier notifier(this);
+
+		m_tags = tags;
+	}
 }
 
 
@@ -166,7 +214,11 @@ QString CSupportTicketComp::GetCreatedAt() const
 
 void CSupportTicketComp::SetCreatedAt(const QString& createdAt)
 {
-	m_createdAt = createdAt;
+	if (m_createdAt != createdAt){
+		istd::CChangeNotifier notifier(this);
+
+		m_createdAt = createdAt;
+	}
 }
 
 
@@ -178,7 +230,11 @@ QString CSupportTicketComp::GetUpdatedAt() const
 
 void CSupportTicketComp::SetUpdatedAt(const QString& updatedAt)
 {
-	m_updatedAt = updatedAt;
+	if (m_updatedAt != updatedAt){
+		istd::CChangeNotifier notifier(this);
+
+		m_updatedAt = updatedAt;
+	}
 }
 
 
@@ -190,7 +246,11 @@ QString CSupportTicketComp::GetResolvedAt() const
 
 void CSupportTicketComp::SetResolvedAt(const QString& resolvedAt)
 {
-	m_resolvedAt = resolvedAt;
+	if (m_resolvedAt != resolvedAt){
+		istd::CChangeNotifier notifier(this);
+
+		m_resolvedAt = resolvedAt;
+	}
 }
 
 
@@ -287,6 +347,8 @@ bool CSupportTicketComp::CopyFrom(const IChangeable& object, CompatibilityMode /
 		return false;
 	}
 
+	istd::CChangeNotifier notifier(this);
+
 	m_id = srcPtr->GetId();
 	m_title = srcPtr->GetTitle();
 	m_description = srcPtr->GetDescription();
@@ -341,6 +403,8 @@ istd::IChangeableUniquePtr CSupportTicketComp::CloneMe(CompatibilityMode mode) c
 
 bool CSupportTicketComp::ResetData(CompatibilityMode /*mode*/)
 {
+	istd::CChangeNotifier notifier(this);
+
 	m_id.clear();
 	m_title.clear();
 	m_description.clear();
