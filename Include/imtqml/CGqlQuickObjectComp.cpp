@@ -80,7 +80,7 @@ void CGqlQuickObjectComp::OnServerConnectionParamChanged(const istd::IChangeable
 }
 
 
-void CGqlQuickObjectComp::OnApplicationInfoChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const imtbase::IApplicationInfoController* /*applicationInfoControllerPtr*/)
+void CGqlQuickObjectComp::OnApplicationInfoChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const ibase::IApplicationInfo* /*applicationInfoControllerPtr*/)
 {
 	SetBaseUrl();
 }

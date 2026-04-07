@@ -17,6 +17,9 @@
 #include <imtdb/CDatabaseAccessSettings.h>
 #include <imtdb/IMigrationController.h>
 
+// std includes
+#include <set>
+
 
 namespace imtdb
 {
@@ -167,6 +170,9 @@ private:
 	imtbase::TModelUpdateBinder<imtdb::IDatabaseLoginSettings, CDatabaseEngineComp> m_databaseAccessObserver;
 
 	imod::TModelWrap<imtdb::CDatabaseAccessSettings> m_workingAccessSettings;
+
+	mutable std::mutex m_connectedThreadsMutex;
+	mutable std::set<quintptr> m_connectedThreads;
 };
 
 
