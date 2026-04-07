@@ -93,6 +93,7 @@ type MessageData {
 	content: String!
 	entityReferences: [EntityReferenceData]
 	attachmentIds: [ID]
+	reactions: [String]
 	createdAt: String
 	updatedAt: String
 	status: MessageStatus

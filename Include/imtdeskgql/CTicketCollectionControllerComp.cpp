@@ -49,18 +49,14 @@ bool CTicketCollectionControllerComp::CreateRepresentationFromObject(
 	case imtdesk::ISupportTicket::TS_OPEN:
 		representationObject.status = sdl::imtdesk::ImtDesk::TicketStatus::Open;
 		break;
-	case imtdesk::ISupportTicket::TS_IN_PROGRESS:
-		representationObject.status = sdl::imtdesk::ImtDesk::TicketStatus::InProgress;
-		break;
-	case imtdesk::ISupportTicket::TS_RESOLVED:
-		representationObject.status = sdl::imtdesk::ImtDesk::TicketStatus::Resolved;
-		break;
 	case imtdesk::ISupportTicket::TS_CLOSED:
 		representationObject.status = sdl::imtdesk::ImtDesk::TicketStatus::Closed;
 		break;
 	default:
 		break;
 	}
+
+	representationObject.stateReason = GetSdlTypeFromStateReason(ticketPtr->GetStateReason());
 
 	imtdesk::ISupportTicket::TicketPriority ticketPriority = ticketPtr->GetPriority();
 	switch (ticketPriority){
@@ -78,7 +74,11 @@ bool CTicketCollectionControllerComp::CreateRepresentationFromObject(
 		break;
 	}
 
-	representationObject.assigneeId = ticketPtr->GetAssigneeId();
+	representationObject.assigneeIds = ticketPtr->GetAssigneeIds();
+	representationObject.labelIds = ticketPtr->GetLabelIds();
+	representationObject.milestoneId = ticketPtr->GetMilestoneId();
+	representationObject.locked = ticketPtr->IsLocked();
+	representationObject.number = ticketPtr->GetNumber();
 	representationObject.createdAt = ticketPtr->GetCreatedAt();
 
 	return true;
@@ -127,14 +127,20 @@ bool CTicketCollectionControllerComp::CreateRepresentationFromObject(
 	Q_UNUSED(itemRequest);
 
 	representationPayload.id = ticketPtr->GetId();
+	representationPayload.number = ticketPtr->GetNumber();
 	representationPayload.title = ticketPtr->GetTitle();
 	representationPayload.description = ticketPtr->GetDescription();
-	representationPayload.assigneeId = ticketPtr->GetAssigneeId();
+	representationPayload.assigneeIds = ticketPtr->GetAssigneeIds();
 	representationPayload.reporterId = ticketPtr->GetReporterId();
 	representationPayload.conversationId = ticketPtr->GetConversationId();
 	representationPayload.messageId = ticketPtr->GetMessageId();
+	representationPayload.labelIds = ticketPtr->GetLabelIds();
+	representationPayload.milestoneId = ticketPtr->GetMilestoneId();
+	representationPayload.locked = ticketPtr->IsLocked();
+	representationPayload.lockReason = ticketPtr->GetLockReason();
 	representationPayload.createdAt = ticketPtr->GetCreatedAt();
 	representationPayload.updatedAt = ticketPtr->GetUpdatedAt();
+	representationPayload.closedAt = ticketPtr->GetClosedAt();
 	representationPayload.resolvedAt = ticketPtr->GetResolvedAt();
 
 	return true;
@@ -210,8 +216,8 @@ bool CTicketCollectionControllerComp::FillObjectFromRepresentation(
 		ticketPtr->SetDescription(*representation.description);
 	}
 
-	if (representation.assigneeId){
-		ticketPtr->SetAssigneeId(*representation.assigneeId);
+	if (representation.assigneeIds){
+		ticketPtr->SetAssigneeIds(*representation.assigneeIds);
 	}
 
 	if (representation.reporterId){
@@ -236,6 +242,34 @@ bool CTicketCollectionControllerComp::FillObjectFromRepresentation(
 
 	if (representation.resolvedAt){
 		ticketPtr->SetResolvedAt(*representation.resolvedAt);
+	}
+
+	if (representation.closedAt){
+		ticketPtr->SetClosedAt(*representation.closedAt);
+	}
+
+	if (representation.labelIds){
+		ticketPtr->SetLabelIds(*representation.labelIds);
+	}
+
+	if (representation.milestoneId){
+		ticketPtr->SetMilestoneId(*representation.milestoneId);
+	}
+
+	if (representation.locked){
+		ticketPtr->SetLocked(*representation.locked);
+	}
+
+	if (representation.lockReason){
+		ticketPtr->SetLockReason(*representation.lockReason);
+	}
+
+	if (representation.number){
+		ticketPtr->SetNumber(*representation.number);
+	}
+
+	if (representation.stateReason){
+		ticketPtr->SetStateReason(GetStateReasonFromSdlType(*representation.stateReason));
 	}
 
 	return true;

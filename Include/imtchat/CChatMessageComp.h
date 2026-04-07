@@ -45,6 +45,8 @@ public:
 	virtual void SetEntityReferences(const QByteArrayList& entityReferences) override;
 	virtual QByteArrayList GetAttachmentIds() const override;
 	virtual void SetAttachmentIds(const QByteArrayList& attachmentIds) override;
+	virtual QStringList GetReactions() const override;
+	virtual void SetReactions(const QStringList& reactions) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -65,6 +67,7 @@ private:
 	QString m_updatedAt;
 	QByteArrayList m_entityReferences;
 	QByteArrayList m_attachmentIds;
+	QStringList m_reactions;
 };
 
 } // namespace imtchat

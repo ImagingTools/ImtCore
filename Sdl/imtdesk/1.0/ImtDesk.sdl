@@ -21,9 +21,14 @@ enum TicketType {
 
 enum TicketStatus {
 	Open
-	InProgress
-	Resolved
 	Closed
+}
+
+enum StateReason {
+	None
+	Completed
+	NotPlanned
+	Reopened
 }
 
 enum TicketPriority {
@@ -39,34 +44,72 @@ enum Environment {
 	Production
 }
 
+# --- Label ---
+
+type LabelData {
+	id: ID!
+	name: String!
+	color: String!
+	description: String
+}
+
+# --- Milestone ---
+
+enum MilestoneState {
+	Open
+	Closed
+}
+
+type MilestoneData {
+	id: ID!
+	title: String!
+	description: String
+	state: MilestoneState
+	dueOn: String
+	createdAt: String
+	closedAt: String
+}
+
 # --- Ticket ---
 
 type TicketItemData {
 	id: ID!
 	typeId: ID!
+	number: Int
 	title: String!
 	ticketType: TicketType
 	status: TicketStatus
+	stateReason: StateReason
 	priority: TicketPriority
-	assigneeId: ID
+	assigneeIds: [ID]
+	labelIds: [ID]
+	milestoneId: ID
+	locked: Boolean
 	createdAt: String
 }
 
 type TicketData {
 	id: ID!
+	number: Int
 	title: String!
 	description: String
 	ticketType: TicketType
 	status: TicketStatus
+	stateReason: StateReason
 	priority: TicketPriority
-	assigneeId: ID
+	assigneeIds: [ID]
 	reporterId: ID
 	conversationId: ID
 	messageId: ID
 	environment: Environment
 	tags: [String]
+	labelIds: [ID]
+	milestoneId: ID
+	locked: Boolean
+	lockReason: String
 	createdAt: String
 	updatedAt: String
+	closedAt: String
 	resolvedAt: String
 }
 

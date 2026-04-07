@@ -16,7 +16,7 @@ Rectangle {
 	property int ticketType: 1
 	property int status: 0
 	property int priority: 1
-	property string assigneeId: ""
+	property var assigneeIds: []
 	property string assigneeName: ""
 	property string reporterId: ""
 	property string reporterName: ""
@@ -27,7 +27,7 @@ Rectangle {
 	property var tags: []
 
 	signal statusChangeRequested(int newStatus)
-	signal assigneeChangeRequested(string newAssigneeId)
+	signal assigneeChangeRequested(var newAssigneeIds)
 	signal conversationOpenRequested(string conversationId)
 	signal ticketClosed()
 
@@ -144,7 +144,7 @@ Rectangle {
 					spacing: Style.paddingL
 					Text { text: qsTr("Assignee:"); font.pixelSize: Style.fontSizeXS; color: Style.textSecondaryColor }
 					Text {
-						text: ticketViewRoot.assigneeName || ticketViewRoot.assigneeId || qsTr("Unassigned")
+						text: ticketViewRoot.assigneeName || (ticketViewRoot.assigneeIds.length > 0 ? ticketViewRoot.assigneeIds[0] : "") || qsTr("Unassigned")
 						font.pixelSize: Style.fontSizeXS
 						color: Style.textPrimaryColor
 					}

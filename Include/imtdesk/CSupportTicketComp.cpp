@@ -95,6 +95,22 @@ void CSupportTicketComp::SetStatus(TicketStatus status)
 }
 
 
+ISupportTicket::StateReason CSupportTicketComp::GetStateReason() const
+{
+	return m_stateReason;
+}
+
+
+void CSupportTicketComp::SetStateReason(StateReason stateReason)
+{
+	if (m_stateReason != stateReason){
+		istd::CChangeNotifier notifier(this);
+
+		m_stateReason = stateReason;
+	}
+}
+
+
 ISupportTicket::TicketPriority CSupportTicketComp::GetPriority() const
 {
 	return m_priority;
@@ -111,18 +127,18 @@ void CSupportTicketComp::SetPriority(TicketPriority priority)
 }
 
 
-QByteArray CSupportTicketComp::GetAssigneeId() const
+QByteArrayList CSupportTicketComp::GetAssigneeIds() const
 {
-	return m_assigneeId;
+	return m_assigneeIds;
 }
 
 
-void CSupportTicketComp::SetAssigneeId(const QByteArray& assigneeId)
+void CSupportTicketComp::SetAssigneeIds(const QByteArrayList& assigneeIds)
 {
-	if (m_assigneeId != assigneeId){
+	if (m_assigneeIds != assigneeIds){
 		istd::CChangeNotifier notifier(this);
 
-		m_assigneeId = assigneeId;
+		m_assigneeIds = assigneeIds;
 	}
 }
 
@@ -207,6 +223,86 @@ void CSupportTicketComp::SetTags(const QStringList& tags)
 }
 
 
+QByteArrayList CSupportTicketComp::GetLabelIds() const
+{
+	return m_labelIds;
+}
+
+
+void CSupportTicketComp::SetLabelIds(const QByteArrayList& labelIds)
+{
+	if (m_labelIds != labelIds){
+		istd::CChangeNotifier notifier(this);
+
+		m_labelIds = labelIds;
+	}
+}
+
+
+QByteArray CSupportTicketComp::GetMilestoneId() const
+{
+	return m_milestoneId;
+}
+
+
+void CSupportTicketComp::SetMilestoneId(const QByteArray& milestoneId)
+{
+	if (m_milestoneId != milestoneId){
+		istd::CChangeNotifier notifier(this);
+
+		m_milestoneId = milestoneId;
+	}
+}
+
+
+bool CSupportTicketComp::IsLocked() const
+{
+	return m_locked;
+}
+
+
+void CSupportTicketComp::SetLocked(bool locked)
+{
+	if (m_locked != locked){
+		istd::CChangeNotifier notifier(this);
+
+		m_locked = locked;
+	}
+}
+
+
+QString CSupportTicketComp::GetLockReason() const
+{
+	return m_lockReason;
+}
+
+
+void CSupportTicketComp::SetLockReason(const QString& lockReason)
+{
+	if (m_lockReason != lockReason){
+		istd::CChangeNotifier notifier(this);
+
+		m_lockReason = lockReason;
+	}
+}
+
+
+int CSupportTicketComp::GetNumber() const
+{
+	return m_number;
+}
+
+
+void CSupportTicketComp::SetNumber(int number)
+{
+	if (m_number != number){
+		istd::CChangeNotifier notifier(this);
+
+		m_number = number;
+	}
+}
+
+
 QString CSupportTicketComp::GetCreatedAt() const
 {
 	return m_createdAt;
@@ -235,6 +331,22 @@ void CSupportTicketComp::SetUpdatedAt(const QString& updatedAt)
 		istd::CChangeNotifier notifier(this);
 
 		m_updatedAt = updatedAt;
+	}
+}
+
+
+QString CSupportTicketComp::GetClosedAt() const
+{
+	return m_closedAt;
+}
+
+
+void CSupportTicketComp::SetClosedAt(const QString& closedAt)
+{
+	if (m_closedAt != closedAt){
+		istd::CChangeNotifier notifier(this);
+
+		m_closedAt = closedAt;
 	}
 }
 
@@ -288,15 +400,17 @@ bool CSupportTicketComp::Serialize(iser::IArchive& archive)
 	retVal = retVal && I_SERIALIZE_ENUM(TicketStatus, archive, m_status);
 	retVal = retVal && archive.EndTag(statusTag);
 
+	static iser::CArchiveTag stateReasonTag("StateReason", "State reason", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(stateReasonTag);
+	retVal = retVal && I_SERIALIZE_ENUM(StateReason, archive, m_stateReason);
+	retVal = retVal && archive.EndTag(stateReasonTag);
+
 	static iser::CArchiveTag priorityTag("Priority", "Priority", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(priorityTag);
 	retVal = retVal && I_SERIALIZE_ENUM(TicketPriority, archive, m_priority);
 	retVal = retVal && archive.EndTag(priorityTag);
 
-	static iser::CArchiveTag assigneeIdTag("AssigneeId", "Assignee ID", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(assigneeIdTag);
-	retVal = retVal && archive.Process(m_assigneeId);
-	retVal = retVal && archive.EndTag(assigneeIdTag);
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_assigneeIds, "AssigneeIds", "AssigneeId");
 
 	static iser::CArchiveTag reporterIdTag("ReporterId", "Reporter ID", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(reporterIdTag);
@@ -320,6 +434,28 @@ bool CSupportTicketComp::Serialize(iser::IArchive& archive)
 
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QStringList>(archive, m_tags, "Tags", "Tag");
 
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_labelIds, "LabelIds", "LabelId");
+
+	static iser::CArchiveTag milestoneIdTag("MilestoneId", "Milestone ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(milestoneIdTag);
+	retVal = retVal && archive.Process(m_milestoneId);
+	retVal = retVal && archive.EndTag(milestoneIdTag);
+
+	static iser::CArchiveTag lockedTag("Locked", "Locked", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(lockedTag);
+	retVal = retVal && archive.Process(m_locked);
+	retVal = retVal && archive.EndTag(lockedTag);
+
+	static iser::CArchiveTag lockReasonTag("LockReason", "Lock reason", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(lockReasonTag);
+	retVal = retVal && archive.Process(m_lockReason);
+	retVal = retVal && archive.EndTag(lockReasonTag);
+
+	static iser::CArchiveTag numberTag("Number", "Number", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(numberTag);
+	retVal = retVal && archive.Process(m_number);
+	retVal = retVal && archive.EndTag(numberTag);
+
 	static iser::CArchiveTag createdAtTag("CreatedAt", "Created at", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(createdAtTag);
 	retVal = retVal && archive.Process(m_createdAt);
@@ -329,6 +465,11 @@ bool CSupportTicketComp::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.BeginTag(updatedAtTag);
 	retVal = retVal && archive.Process(m_updatedAt);
 	retVal = retVal && archive.EndTag(updatedAtTag);
+
+	static iser::CArchiveTag closedAtTag("ClosedAt", "Closed at", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(closedAtTag);
+	retVal = retVal && archive.Process(m_closedAt);
+	retVal = retVal && archive.EndTag(closedAtTag);
 
 	static iser::CArchiveTag resolvedAtTag("ResolvedAt", "Resolved at", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(resolvedAtTag);
@@ -355,15 +496,22 @@ bool CSupportTicketComp::CopyFrom(const IChangeable& object, CompatibilityMode /
 	m_description = srcPtr->GetDescription();
 	m_ticketType = srcPtr->GetTicketType();
 	m_status = srcPtr->GetStatus();
+	m_stateReason = srcPtr->GetStateReason();
 	m_priority = srcPtr->GetPriority();
-	m_assigneeId = srcPtr->GetAssigneeId();
+	m_assigneeIds = srcPtr->GetAssigneeIds();
 	m_reporterId = srcPtr->GetReporterId();
 	m_conversationId = srcPtr->GetConversationId();
 	m_messageId = srcPtr->GetMessageId();
 	m_environment = srcPtr->GetEnvironment();
 	m_tags = srcPtr->GetTags();
+	m_labelIds = srcPtr->GetLabelIds();
+	m_milestoneId = srcPtr->GetMilestoneId();
+	m_locked = srcPtr->IsLocked();
+	m_lockReason = srcPtr->GetLockReason();
+	m_number = srcPtr->GetNumber();
 	m_createdAt = srcPtr->GetCreatedAt();
 	m_updatedAt = srcPtr->GetUpdatedAt();
+	m_closedAt = srcPtr->GetClosedAt();
 	m_resolvedAt = srcPtr->GetResolvedAt();
 
 	return true;
@@ -382,15 +530,22 @@ bool CSupportTicketComp::IsEqual(const IChangeable& object) const
 		&& m_description == srcPtr->GetDescription()
 		&& m_ticketType == srcPtr->GetTicketType()
 		&& m_status == srcPtr->GetStatus()
+		&& m_stateReason == srcPtr->GetStateReason()
 		&& m_priority == srcPtr->GetPriority()
-		&& m_assigneeId == srcPtr->GetAssigneeId()
+		&& m_assigneeIds == srcPtr->GetAssigneeIds()
 		&& m_reporterId == srcPtr->GetReporterId()
 		&& m_conversationId == srcPtr->GetConversationId()
 		&& m_messageId == srcPtr->GetMessageId()
 		&& m_environment == srcPtr->GetEnvironment()
 		&& m_tags == srcPtr->GetTags()
+		&& m_labelIds == srcPtr->GetLabelIds()
+		&& m_milestoneId == srcPtr->GetMilestoneId()
+		&& m_locked == srcPtr->IsLocked()
+		&& m_lockReason == srcPtr->GetLockReason()
+		&& m_number == srcPtr->GetNumber()
 		&& m_createdAt == srcPtr->GetCreatedAt()
 		&& m_updatedAt == srcPtr->GetUpdatedAt()
+		&& m_closedAt == srcPtr->GetClosedAt()
 		&& m_resolvedAt == srcPtr->GetResolvedAt();
 }
 
@@ -415,15 +570,22 @@ bool CSupportTicketComp::ResetData(CompatibilityMode /*mode*/)
 	m_description.clear();
 	m_ticketType = TT_ACCESS_REQUEST;
 	m_status = TS_OPEN;
+	m_stateReason = SR_NONE;
 	m_priority = TP_MEDIUM;
-	m_assigneeId.clear();
+	m_assigneeIds.clear();
 	m_reporterId.clear();
 	m_conversationId.clear();
 	m_messageId.clear();
 	m_environment = ENV_PRODUCTION;
 	m_tags.clear();
+	m_labelIds.clear();
+	m_milestoneId.clear();
+	m_locked = false;
+	m_lockReason.clear();
+	m_number = 0;
 	m_createdAt.clear();
 	m_updatedAt.clear();
+	m_closedAt.clear();
 	m_resolvedAt.clear();
 
 	return true;

@@ -158,6 +158,22 @@ void CChatMessageComp::SetAttachmentIds(const QByteArrayList& attachmentIds)
 }
 
 
+QStringList CChatMessageComp::GetReactions() const
+{
+	return m_reactions;
+}
+
+
+void CChatMessageComp::SetReactions(const QStringList& reactions)
+{
+	if (m_reactions != reactions){
+		istd::CChangeNotifier notifier(this);
+
+		m_reactions = reactions;
+	}
+}
+
+
 // reimplemented (iser::ISerializable)
 
 bool CChatMessageComp::Serialize(iser::IArchive& archive)
@@ -202,6 +218,8 @@ bool CChatMessageComp::Serialize(iser::IArchive& archive)
 
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_attachmentIds, "AttachmentIds", "AttachmentId");
 
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QStringList>(archive, m_reactions, "Reactions", "Reaction");
+
 	return retVal;
 }
 
@@ -226,6 +244,7 @@ bool CChatMessageComp::CopyFrom(const IChangeable& object, CompatibilityMode /*m
 	m_updatedAt = srcPtr->GetUpdatedAt();
 	m_entityReferences = srcPtr->GetEntityReferences();
 	m_attachmentIds = srcPtr->GetAttachmentIds();
+	m_reactions = srcPtr->GetReactions();
 	return true;
 }
 
@@ -245,7 +264,8 @@ bool CChatMessageComp::IsEqual(const IChangeable& object) const
 		&& m_createdAt == srcPtr->GetCreatedAt()
 		&& m_updatedAt == srcPtr->GetUpdatedAt()
 		&& m_entityReferences == srcPtr->GetEntityReferences()
-		&& m_attachmentIds == srcPtr->GetAttachmentIds();
+		&& m_attachmentIds == srcPtr->GetAttachmentIds()
+		&& m_reactions == srcPtr->GetReactions();
 }
 
 
@@ -270,6 +290,7 @@ bool CChatMessageComp::ResetData(CompatibilityMode /*mode*/)
 	m_updatedAt.clear();
 	m_entityReferences.clear();
 	m_attachmentIds.clear();
+	m_reactions.clear();
 	return true;
 }
 

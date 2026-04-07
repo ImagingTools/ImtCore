@@ -38,20 +38,32 @@ public:
 				TT_BUG_REPORT);
 
 	/**
-		Ticket status — lifecycle stage of the ticket.
+		Ticket status — follows GitHub Issues pattern (Open / Closed).
 	*/
 	enum TicketStatus
 	{
 		TS_OPEN,
-		TS_IN_PROGRESS,
-		TS_RESOLVED,
 		TS_CLOSED
 	};
 	I_DECLARE_ENUM(TicketStatus,
 				TS_OPEN,
-				TS_IN_PROGRESS,
-				TS_RESOLVED,
 				TS_CLOSED);
+
+	/**
+		State reason — why the ticket was closed (like GitHub state_reason).
+	*/
+	enum StateReason
+	{
+		SR_NONE,
+		SR_COMPLETED,
+		SR_NOT_PLANNED,
+		SR_REOPENED
+	};
+	I_DECLARE_ENUM(StateReason,
+				SR_NONE,
+				SR_COMPLETED,
+				SR_NOT_PLANNED,
+				SR_REOPENED);
 
 	/**
 		Ticket priority — urgency level.
@@ -134,6 +146,16 @@ public:
 	virtual void SetStatus(TicketStatus status) = 0;
 
 	/**
+		Get the state reason (why the ticket was closed).
+	*/
+	virtual StateReason GetStateReason() const = 0;
+
+	/**
+		Set the state reason.
+	*/
+	virtual void SetStateReason(StateReason stateReason) = 0;
+
+	/**
 		Get the ticket priority.
 	*/
 	virtual TicketPriority GetPriority() const = 0;
@@ -144,14 +166,14 @@ public:
 	virtual void SetPriority(TicketPriority priority) = 0;
 
 	/**
-		Get the user ID of the assigned agent (may be empty).
+		Get the list of assigned user IDs (supports multiple assignees like GitHub).
 	*/
-	virtual QByteArray GetAssigneeId() const = 0;
+	virtual QByteArrayList GetAssigneeIds() const = 0;
 
 	/**
-		Set the assignee user ID.
+		Set the list of assigned user IDs.
 	*/
-	virtual void SetAssigneeId(const QByteArray& assigneeId) = 0;
+	virtual void SetAssigneeIds(const QByteArrayList& assigneeIds) = 0;
 
 	/**
 		Get the user ID of the reporter who created the ticket.
@@ -204,6 +226,56 @@ public:
 	virtual void SetTags(const QStringList& tags) = 0;
 
 	/**
+		Get the list of label IDs (structured labels with color/description).
+	*/
+	virtual QByteArrayList GetLabelIds() const = 0;
+
+	/**
+		Set the list of label IDs.
+	*/
+	virtual void SetLabelIds(const QByteArrayList& labelIds) = 0;
+
+	/**
+		Get the milestone ID (may be empty).
+	*/
+	virtual QByteArray GetMilestoneId() const = 0;
+
+	/**
+		Set the milestone ID.
+	*/
+	virtual void SetMilestoneId(const QByteArray& milestoneId) = 0;
+
+	/**
+		Get whether the ticket is locked.
+	*/
+	virtual bool IsLocked() const = 0;
+
+	/**
+		Set the locked state.
+	*/
+	virtual void SetLocked(bool locked) = 0;
+
+	/**
+		Get the lock reason (e.g. "resolved", "off-topic", "too heated", "spam").
+	*/
+	virtual QString GetLockReason() const = 0;
+
+	/**
+		Set the lock reason.
+	*/
+	virtual void SetLockReason(const QString& lockReason) = 0;
+
+	/**
+		Get the human-readable ticket number (like GitHub #123).
+	*/
+	virtual int GetNumber() const = 0;
+
+	/**
+		Set the ticket number.
+	*/
+	virtual void SetNumber(int number) = 0;
+
+	/**
 		Get the ISO 8601 creation timestamp.
 	*/
 	virtual QString GetCreatedAt() const = 0;
@@ -222,6 +294,16 @@ public:
 		Set the last-update timestamp.
 	*/
 	virtual void SetUpdatedAt(const QString& updatedAt) = 0;
+
+	/**
+		Get the ISO 8601 closed timestamp (empty if not closed).
+	*/
+	virtual QString GetClosedAt() const = 0;
+
+	/**
+		Set the closed timestamp.
+	*/
+	virtual void SetClosedAt(const QString& closedAt) = 0;
 
 	/**
 		Get the ISO 8601 resolution timestamp (empty if not resolved).

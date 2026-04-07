@@ -24,9 +24,11 @@ ViewBase {
 
 		assigneeIdInput.currentIndex = -1
 		if (assigneeIdInput.model){
+			let assigneeIds = ticketData.m_assigneeIds || []
+			let firstAssignee = assigneeIds.length > 0 ? assigneeIds[0] : ""
 			for (let i = 0; i < assigneeIdInput.model.getItemsCount(); i++){
 				let userId = assigneeIdInput.model.getData("id", i)
-				if (ticketData.m_assigneeId === userId){
+				if (firstAssignee === userId){
 					assigneeIdInput.currentIndex = i
 					break
 				}
@@ -108,10 +110,10 @@ ViewBase {
 		ticketData.m_description = descriptionInput.text
 
 		if (assigneeIdInput.model && assigneeIdInput.currentIndex >= 0){
-			ticketData.m_assigneeId = assigneeIdInput.model.getData("id", assigneeIdInput.currentIndex)
+			ticketData.m_assigneeIds = [assigneeIdInput.model.getData("id", assigneeIdInput.currentIndex)]
 		}
 		else{
-			ticketData.m_assigneeId = ""
+			ticketData.m_assigneeIds = []
 		}
 
 		if (reporterIdInput.model && reporterIdInput.currentIndex >= 0){

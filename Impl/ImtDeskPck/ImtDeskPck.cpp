@@ -21,6 +21,16 @@ I_EXPORT_COMPONENT(
 			"Support Ticket");
 
 I_EXPORT_COMPONENT(
+			Label,
+			"Label component",
+			"Label");
+
+I_EXPORT_COMPONENT(
+			Milestone,
+			"Milestone component",
+			"Milestone");
+
+I_EXPORT_COMPONENT(
 			TicketDocumentNameProvider,
 			"Ticket document name provider",
 			"Ticket Document Name Provider");

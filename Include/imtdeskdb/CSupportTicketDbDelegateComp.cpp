@@ -43,11 +43,21 @@ istd::IChangeableUniquePtr CSupportTicketDbDelegateComp::CreateObjectFromRecord(
 	if (record.contains("Status")){
 		ticketPtr->SetStatus(static_cast<imtdesk::ISupportTicket::TicketStatus>(record.value("Status").toInt()));
 	}
+	if (record.contains("StateReason")){
+		ticketPtr->SetStateReason(static_cast<imtdesk::ISupportTicket::StateReason>(record.value("StateReason").toInt()));
+	}
 	if (record.contains("Priority")){
 		ticketPtr->SetPriority(static_cast<imtdesk::ISupportTicket::TicketPriority>(record.value("Priority").toInt()));
 	}
-	if (record.contains("AssigneeId")){
-		ticketPtr->SetAssigneeId(record.value("AssigneeId").toByteArray());
+	if (record.contains("AssigneeIds")){
+		const QString assigneesStr = record.value("AssigneeIds").toString();
+		QByteArrayList assigneeIds;
+		if (!assigneesStr.isEmpty()){
+			for (const QString& s : assigneesStr.split(',')){
+				assigneeIds.append(s.trimmed().toUtf8());
+			}
+		}
+		ticketPtr->SetAssigneeIds(assigneeIds);
 	}
 	if (record.contains("ReporterId")){
 		ticketPtr->SetReporterId(record.value("ReporterId").toByteArray());
@@ -69,11 +79,36 @@ istd::IChangeableUniquePtr CSupportTicketDbDelegateComp::CreateObjectFromRecord(
 		}
 		ticketPtr->SetTags(tags);
 	}
+	if (record.contains("LabelIds")){
+		const QString labelsStr = record.value("LabelIds").toString();
+		QByteArrayList labelIds;
+		if (!labelsStr.isEmpty()){
+			for (const QString& s : labelsStr.split(',')){
+				labelIds.append(s.trimmed().toUtf8());
+			}
+		}
+		ticketPtr->SetLabelIds(labelIds);
+	}
+	if (record.contains("MilestoneId")){
+		ticketPtr->SetMilestoneId(record.value("MilestoneId").toByteArray());
+	}
+	if (record.contains("Locked")){
+		ticketPtr->SetLocked(record.value("Locked").toBool());
+	}
+	if (record.contains("LockReason")){
+		ticketPtr->SetLockReason(record.value("LockReason").toString());
+	}
+	if (record.contains("Number")){
+		ticketPtr->SetNumber(record.value("Number").toInt());
+	}
 	if (record.contains("CreatedAt")){
 		ticketPtr->SetCreatedAt(record.value("CreatedAt").toString());
 	}
 	if (record.contains("UpdatedAt")){
 		ticketPtr->SetUpdatedAt(record.value("UpdatedAt").toString());
+	}
+	if (record.contains("ClosedAt")){
+		ticketPtr->SetClosedAt(record.value("ClosedAt").toString());
 	}
 	if (record.contains("ResolvedAt")){
 		ticketPtr->SetResolvedAt(record.value("ResolvedAt").toString());
@@ -110,39 +145,67 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSupportTicketDbDelegateComp::Cre
 		title = objectName;
 	}
 
-	const QString assigneeId = QString::fromUtf8(ticketPtr->GetAssigneeId());
+	// Build assigneeIds as comma-separated string
+	QStringList assigneeStrs;
+	for (const QByteArray& aid : ticketPtr->GetAssigneeIds()){
+		assigneeStrs.append(QString::fromUtf8(aid));
+	}
+	const QString assigneeIdsStr = assigneeStrs.join(',');
+
 	const QString reporterId = QString::fromUtf8(ticketPtr->GetReporterId());
 	const QString conversationId = QString::fromUtf8(ticketPtr->GetConversationId());
 	const QString messageId = QString::fromUtf8(ticketPtr->GetMessageId());
+	const QString milestoneId = QString::fromUtf8(ticketPtr->GetMilestoneId());
 	const QString resolvedAt = ticketPtr->GetResolvedAt();
+	const QString closedAt = ticketPtr->GetClosedAt();
 
-	const QString assigneeSql = assigneeId.isEmpty() ? "NULL" : QString("'%1'").arg(assigneeId);
+	const QString assigneesSql = assigneeIdsStr.isEmpty() ? "NULL" : QString("'%1'").arg(assigneeIdsStr);
 	const QString convSql = conversationId.isEmpty() ? "NULL" : QString("'%1'").arg(conversationId);
 	const QString msgSql = messageId.isEmpty() ? "NULL" : QString("'%1'").arg(messageId);
+	const QString milestoneSql = milestoneId.isEmpty() ? "NULL" : QString("'%1'").arg(milestoneId);
 	const QString resolvedSql = resolvedAt.isEmpty() ? "NULL" : QString("'%1'").arg(resolvedAt);
+	const QString closedSql = closedAt.isEmpty() ? "NULL" : QString("'%1'").arg(closedAt);
 
 	const QString tagsStr = ticketPtr->GetTags().join(',');
 	const QString tagsSql = tagsStr.isEmpty() ? "NULL" : QString("'%1'").arg(tagsStr);
 
+	// Build labelIds as comma-separated string
+	QStringList labelStrs;
+	for (const QByteArray& lid : ticketPtr->GetLabelIds()){
+		labelStrs.append(QString::fromUtf8(lid));
+	}
+	const QString labelIdsStr = labelStrs.join(',');
+	const QString labelsSql = labelIdsStr.isEmpty() ? "NULL" : QString("'%1'").arg(labelIdsStr);
+
+	const QString lockReasonSql = ticketPtr->GetLockReason().isEmpty() ? "NULL" : QString("'%1'").arg(ticketPtr->GetLockReason());
+
 	NewObjectQuery retVal;
 	retVal.query = QString(
 		"INSERT INTO \"Tickets\" "
-		"(\"Id\", \"Title\", \"Description\", \"TicketType\", \"Status\", \"Priority\", "
-		"\"AssigneeId\", \"ReporterId\", \"ConversationId\", \"MessageId\", \"Environment\", \"Tags\", \"ResolvedAt\") "
-		"VALUES('%1', '%2', '%3', %4, %5, %6, %7, '%8', %9, %10, %11, %12, %13);")
+		"(\"Id\", \"Title\", \"Description\", \"TicketType\", \"Status\", \"StateReason\", \"Priority\", "
+		"\"AssigneeIds\", \"ReporterId\", \"ConversationId\", \"MessageId\", \"Environment\", "
+		"\"Tags\", \"LabelIds\", \"MilestoneId\", \"Locked\", \"LockReason\", "
+		"\"ResolvedAt\", \"ClosedAt\") "
+		"VALUES('%1', '%2', '%3', %4, %5, %6, %7, %8, '%9', %10, %11, %12, %13, %14, %15, %16, %17, %18, %19);")
 		.arg(QString::fromUtf8(ticketId))
 		.arg(title)
 		.arg(ticketPtr->GetDescription())
 		.arg(ticketPtr->GetTicketType())
 		.arg(ticketPtr->GetStatus())
+		.arg(ticketPtr->GetStateReason())
 		.arg(ticketPtr->GetPriority())
-		.arg(assigneeSql)
+		.arg(assigneesSql)
 		.arg(reporterId)
 		.arg(convSql)
 		.arg(msgSql)
 		.arg(ticketPtr->GetEnvironment())
 		.arg(tagsSql)
+		.arg(labelsSql)
+		.arg(milestoneSql)
+		.arg(ticketPtr->IsLocked() ? "TRUE" : "FALSE")
+		.arg(lockReasonSql)
 		.arg(resolvedSql)
+		.arg(closedSql)
 		.toUtf8();
 
 	return retVal;
@@ -161,12 +224,32 @@ QByteArray CSupportTicketDbDelegateComp::CreateUpdateObjectQuery(
 		return QByteArray();
 	}
 
-	const QString assigneeId = QString::fromUtf8(ticketPtr->GetAssigneeId());
+	// Build assigneeIds as comma-separated string
+	QStringList assigneeStrs;
+	for (const QByteArray& aid : ticketPtr->GetAssigneeIds()){
+		assigneeStrs.append(QString::fromUtf8(aid));
+	}
+	const QString assigneeIdsStr = assigneeStrs.join(',');
+
 	const QString resolvedAt = ticketPtr->GetResolvedAt();
-	const QString assigneeSql = assigneeId.isEmpty() ? "NULL" : QString("'%1'").arg(assigneeId);
+	const QString closedAt = ticketPtr->GetClosedAt();
+	const QString milestoneId = QString::fromUtf8(ticketPtr->GetMilestoneId());
+	const QString assigneesSql = assigneeIdsStr.isEmpty() ? "NULL" : QString("'%1'").arg(assigneeIdsStr);
 	const QString resolvedSql = resolvedAt.isEmpty() ? "NULL" : QString("'%1'").arg(resolvedAt);
+	const QString closedSql = closedAt.isEmpty() ? "NULL" : QString("'%1'").arg(closedAt);
+	const QString milestoneSql = milestoneId.isEmpty() ? "NULL" : QString("'%1'").arg(milestoneId);
 	const QString tagsStr = ticketPtr->GetTags().join(',');
 	const QString tagsSql = tagsStr.isEmpty() ? "NULL" : QString("'%1'").arg(tagsStr);
+
+	// Build labelIds as comma-separated string
+	QStringList labelStrs;
+	for (const QByteArray& lid : ticketPtr->GetLabelIds()){
+		labelStrs.append(QString::fromUtf8(lid));
+	}
+	const QString labelIdsStr = labelStrs.join(',');
+	const QString labelsSql = labelIdsStr.isEmpty() ? "NULL" : QString("'%1'").arg(labelIdsStr);
+
+	const QString lockReasonSql = ticketPtr->GetLockReason().isEmpty() ? "NULL" : QString("'%1'").arg(ticketPtr->GetLockReason());
 
 	return QString(
 		"UPDATE \"Tickets\" SET "
@@ -174,22 +257,34 @@ QByteArray CSupportTicketDbDelegateComp::CreateUpdateObjectQuery(
 		"\"Description\"='%2', "
 		"\"TicketType\"=%3, "
 		"\"Status\"=%4, "
-		"\"Priority\"=%5, "
-		"\"AssigneeId\"=%6, "
-		"\"Environment\"=%7, "
-		"\"Tags\"=%8, "
-		"\"ResolvedAt\"=%9, "
+		"\"StateReason\"=%5, "
+		"\"Priority\"=%6, "
+		"\"AssigneeIds\"=%7, "
+		"\"Environment\"=%8, "
+		"\"Tags\"=%9, "
+		"\"LabelIds\"=%10, "
+		"\"MilestoneId\"=%11, "
+		"\"Locked\"=%12, "
+		"\"LockReason\"=%13, "
+		"\"ResolvedAt\"=%14, "
+		"\"ClosedAt\"=%15, "
 		"\"UpdatedAt\"=NOW() "
-		"WHERE \"Id\"='%10';")
+		"WHERE \"Id\"='%16';")
 		.arg(ticketPtr->GetTitle())
 		.arg(ticketPtr->GetDescription())
 		.arg(ticketPtr->GetTicketType())
 		.arg(ticketPtr->GetStatus())
+		.arg(ticketPtr->GetStateReason())
 		.arg(ticketPtr->GetPriority())
-		.arg(assigneeSql)
+		.arg(assigneesSql)
 		.arg(ticketPtr->GetEnvironment())
 		.arg(tagsSql)
+		.arg(labelsSql)
+		.arg(milestoneSql)
+		.arg(ticketPtr->IsLocked() ? "TRUE" : "FALSE")
+		.arg(lockReasonSql)
 		.arg(resolvedSql)
+		.arg(closedSql)
 		.arg(QString::fromUtf8(objectId))
 		.toUtf8();
 }

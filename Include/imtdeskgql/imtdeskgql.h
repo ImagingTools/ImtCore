@@ -78,10 +78,6 @@ imtdesk::ISupportTicket::TicketStatus GetStatusTypeFromSdlType(sdl::imtdesk::Imt
 	switch(sdlTicketStatus){
 	case sdl::imtdesk::ImtDesk::TicketStatus::Open:
 		return imtdesk::ISupportTicket::TicketStatus::TS_OPEN;
-	case sdl::imtdesk::ImtDesk::TicketStatus::InProgress:
-		return imtdesk::ISupportTicket::TicketStatus::TS_IN_PROGRESS;
-	case sdl::imtdesk::ImtDesk::TicketStatus::Resolved:
-		return imtdesk::ISupportTicket::TicketStatus::TS_RESOLVED;
 	case sdl::imtdesk::ImtDesk::TicketStatus::Closed:
 		return imtdesk::ISupportTicket::TicketStatus::TS_CLOSED;
 	}
@@ -95,15 +91,45 @@ sdl::imtdesk::ImtDesk::TicketStatus GetSdlTypeFromStatusType(imtdesk::ISupportTi
 	switch (ticketStatus){
 	case imtdesk::ISupportTicket::TS_OPEN:
 		return sdl::imtdesk::ImtDesk::TicketStatus::Open;
-	case imtdesk::ISupportTicket::TS_IN_PROGRESS:
-		return sdl::imtdesk::ImtDesk::TicketStatus::InProgress;
-	case imtdesk::ISupportTicket::TS_RESOLVED:
-		return sdl::imtdesk::ImtDesk::TicketStatus::Resolved;
 	case imtdesk::ISupportTicket::TS_CLOSED:
 		return sdl::imtdesk::ImtDesk::TicketStatus::Closed;
 	}
 
 	return sdl::imtdesk::ImtDesk::TicketStatus::Open;
+}
+
+
+imtdesk::ISupportTicket::StateReason GetStateReasonFromSdlType(sdl::imtdesk::ImtDesk::StateReason sdlStateReason)
+{
+	switch(sdlStateReason){
+	case sdl::imtdesk::ImtDesk::StateReason::None:
+		return imtdesk::ISupportTicket::StateReason::SR_NONE;
+	case sdl::imtdesk::ImtDesk::StateReason::Completed:
+		return imtdesk::ISupportTicket::StateReason::SR_COMPLETED;
+	case sdl::imtdesk::ImtDesk::StateReason::NotPlanned:
+		return imtdesk::ISupportTicket::StateReason::SR_NOT_PLANNED;
+	case sdl::imtdesk::ImtDesk::StateReason::Reopened:
+		return imtdesk::ISupportTicket::StateReason::SR_REOPENED;
+	}
+
+	return imtdesk::ISupportTicket::StateReason::SR_NONE;
+}
+
+
+sdl::imtdesk::ImtDesk::StateReason GetSdlTypeFromStateReason(imtdesk::ISupportTicket::StateReason stateReason)
+{
+	switch (stateReason){
+	case imtdesk::ISupportTicket::SR_NONE:
+		return sdl::imtdesk::ImtDesk::StateReason::None;
+	case imtdesk::ISupportTicket::SR_COMPLETED:
+		return sdl::imtdesk::ImtDesk::StateReason::Completed;
+	case imtdesk::ISupportTicket::SR_NOT_PLANNED:
+		return sdl::imtdesk::ImtDesk::StateReason::NotPlanned;
+	case imtdesk::ISupportTicket::SR_REOPENED:
+		return sdl::imtdesk::ImtDesk::StateReason::Reopened;
+	}
+
+	return sdl::imtdesk::ImtDesk::StateReason::None;
 }
 
 

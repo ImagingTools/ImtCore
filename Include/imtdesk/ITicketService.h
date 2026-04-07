@@ -28,7 +28,7 @@ public:
 		\param description    Detailed description.
 		\param ticketType     Type of the ticket.
 		\param priority       Priority of the ticket.
-		\param assigneeId     Optional assignee user ID.
+		\param assigneeIds    Optional list of assignee user IDs.
 		\param conversationId Optional linked conversation ID.
 		\param messageId      Optional triggering message ID.
 		\param environment    Target deployment environment.
@@ -40,7 +40,7 @@ public:
 				const QString& description,
 				ISupportTicket::TicketType ticketType,
 				ISupportTicket::TicketPriority priority,
-				const QByteArray& assigneeId = QByteArray(),
+				const QByteArrayList& assigneeIds = QByteArrayList(),
 				const QByteArray& conversationId = QByteArray(),
 				const QByteArray& messageId = QByteArray(),
 				ISupportTicket::Environment environment = ISupportTicket::ENV_PRODUCTION,

@@ -52,18 +52,25 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 	response.Version_1_0.Emplace();
 
 	response.Version_1_0->id = ticketPtr->GetId();
+	response.Version_1_0->number = ticketPtr->GetNumber();
 	response.Version_1_0->title = ticketPtr->GetTitle();
 	response.Version_1_0->description = ticketPtr->GetDescription();
-	response.Version_1_0->assigneeId = ticketPtr->GetAssigneeId();
+	response.Version_1_0->assigneeIds = ticketPtr->GetAssigneeIds();
 	response.Version_1_0->reporterId = ticketPtr->GetReporterId();
 	response.Version_1_0->conversationId = ticketPtr->GetConversationId();
 	response.Version_1_0->messageId = ticketPtr->GetMessageId();
+	response.Version_1_0->labelIds = ticketPtr->GetLabelIds();
+	response.Version_1_0->milestoneId = ticketPtr->GetMilestoneId();
+	response.Version_1_0->locked = ticketPtr->IsLocked();
+	response.Version_1_0->lockReason = ticketPtr->GetLockReason();
 	response.Version_1_0->createdAt = ticketPtr->GetCreatedAt();
 	response.Version_1_0->updatedAt = ticketPtr->GetUpdatedAt();
+	response.Version_1_0->closedAt = ticketPtr->GetClosedAt();
 	response.Version_1_0->resolvedAt = ticketPtr->GetResolvedAt();
 	response.Version_1_0->ticketType = imtdeskgql::GetSdlTypeFromTicketType(ticketPtr->GetTicketType());
 	response.Version_1_0->priority = imtdeskgql::GetSdlTypeFromPriorityType(ticketPtr->GetPriority());
 	response.Version_1_0->status = imtdeskgql::GetSdlTypeFromStatusType(ticketPtr->GetStatus());
+	response.Version_1_0->stateReason = imtdeskgql::GetSdlTypeFromStateReason(ticketPtr->GetStateReason());
 	response.Version_1_0->environment = imtdeskgql::GetSdlTypeFromEnvironmentType(ticketPtr->GetEnvironment());
 
 	return response;
@@ -120,8 +127,8 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 		ticketPtr->SetDescription(*ticketInfo.description);
 	}
 
-	if (ticketInfo.assigneeId){
-		ticketPtr->SetAssigneeId(*ticketInfo.assigneeId);
+	if (ticketInfo.assigneeIds){
+		ticketPtr->SetAssigneeIds(*ticketInfo.assigneeIds);
 	}
 
 	if (ticketInfo.reporterId){
@@ -136,6 +143,26 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 		ticketPtr->SetMessageId(*ticketInfo.messageId);
 	}
 
+	if (ticketInfo.labelIds){
+		ticketPtr->SetLabelIds(*ticketInfo.labelIds);
+	}
+
+	if (ticketInfo.milestoneId){
+		ticketPtr->SetMilestoneId(*ticketInfo.milestoneId);
+	}
+
+	if (ticketInfo.locked){
+		ticketPtr->SetLocked(*ticketInfo.locked);
+	}
+
+	if (ticketInfo.lockReason){
+		ticketPtr->SetLockReason(*ticketInfo.lockReason);
+	}
+
+	if (ticketInfo.number){
+		ticketPtr->SetNumber(*ticketInfo.number);
+	}
+
 	if (ticketInfo.createdAt){
 		ticketPtr->SetCreatedAt(*ticketInfo.createdAt);
 	}
@@ -148,12 +175,20 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 		ticketPtr->SetResolvedAt(*ticketInfo.resolvedAt);
 	}
 
+	if (ticketInfo.closedAt){
+		ticketPtr->SetClosedAt(*ticketInfo.closedAt);
+	}
+
 	if (ticketInfo.ticketType){
 		ticketPtr->SetTicketType(imtdeskgql::GetTicketTypeFromSdlType(*ticketInfo.ticketType));
 	}
 
 	if (ticketInfo.status){
 		ticketPtr->SetStatus(imtdeskgql::GetStatusTypeFromSdlType(*ticketInfo.status));
+	}
+
+	if (ticketInfo.stateReason){
+		ticketPtr->SetStateReason(imtdeskgql::GetStateReasonFromSdlType(*ticketInfo.stateReason));
 	}
 
 	if (ticketInfo.environment){
