@@ -7,6 +7,10 @@
 #include <iprm/TParamsPtr.h>
 #include <iqt/iqt.h>
 
+// Qt includes
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonValue>
+
 // ImtCore includes
 #include <imtserverapp/IGuiElementContainer.h>
 #include <imtserverapp/IGuiElementModel.h>
@@ -40,7 +44,7 @@ bool CGuiElementModelRepresentationControllerComp::IsModelSupported(const istd::
 
 bool CGuiElementModelRepresentationControllerComp::GetRepresentationFromDataModel(
 			const istd::IChangeable& dataModel,
-			imtbase::CTreeItemModel& representation,
+			QJsonObject& representation,
 			const iprm::IParamsSet* paramsPtr) const
 {
 	Q_ASSERT(IsModelSupported(dataModel));
@@ -118,21 +122,24 @@ bool CGuiElementModelRepresentationControllerComp::GetRepresentationFromDataMode
 		elementName = elementNameTr;
 	}
 
-	representation.SetData("id", elementId);
-	representation.SetData("name", elementName);
-	representation.SetData("description", elementDescription);
-	representation.SetData("isEnabled", isEnabled);
-	representation.SetData("visible", isVisible);
-	representation.SetData("icon", elementPath);
-	representation.SetData("status", elementStatus);
-	representation.SetData("priority", priority);
-	representation.SetData("alignment", alignment);
-	representation.SetData("isToggled", false);
+	representation.insert(QStringLiteral("id"), QString::fromUtf8(elementId));
+	representation.insert(QStringLiteral("name"), elementName);
+	representation.insert(QStringLiteral("description"), elementDescription);
+	representation.insert(QStringLiteral("isEnabled"), isEnabled);
+	representation.insert(QStringLiteral("visible"), isVisible);
+	representation.insert(QStringLiteral("icon"), elementPath);
+	representation.insert(QStringLiteral("status"), elementStatus);
+	representation.insert(QStringLiteral("priority"), priority);
+	representation.insert(QStringLiteral("alignment"), alignment);
+	representation.insert(QStringLiteral("isToggled"), false);
 
 	const imtserverapp::IGuiElementContainer* subElementsPtr = guiElementPtr->GetSubElements();
 	if (subElementsPtr != nullptr && m_representationControllerCompPtr.IsValid()){
-		imtbase::CTreeItemModel* subElementsModelPtr = representation.AddTreeModel("subElements");
-		if (m_representationControllerCompPtr->GetRepresentationFromDataModel(*subElementsPtr, *subElementsModelPtr, paramsPtr)){
+		QJsonObject subElementsObj;
+		if (m_representationControllerCompPtr->GetRepresentationFromDataModel(*subElementsPtr, subElementsObj, paramsPtr)
+			&& subElementsObj.contains(QStringLiteral("subElements"))
+			&& subElementsObj.value(QStringLiteral("subElements")).isArray()){
+			representation.insert(QStringLiteral("subElements"), subElementsObj.value(QStringLiteral("subElements")).toArray());
 		}
 	}
 
@@ -141,7 +148,7 @@ bool CGuiElementModelRepresentationControllerComp::GetRepresentationFromDataMode
 
 
 bool CGuiElementModelRepresentationControllerComp::GetDataModelFromRepresentation(
-			const imtbase::CTreeItemModel& /*representation*/,
+			const QJsonObject& /*representation*/,
 			istd::IChangeable& /*dataModel*/) const
 {
 	return false;
@@ -149,5 +156,3 @@ bool CGuiElementModelRepresentationControllerComp::GetDataModelFromRepresentatio
 
 
 } // namespace imtserverapp
-
-

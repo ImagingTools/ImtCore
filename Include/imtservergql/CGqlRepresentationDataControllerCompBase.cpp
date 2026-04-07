@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtservergql/CGqlRepresentationDataControllerCompBase.h>
 
+// Qt includes
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
+
 
 namespace imtservergql
 {
@@ -8,17 +12,17 @@ namespace imtservergql
 
 // protected methods
 
-imtbase::CTreeItemModel* CGqlRepresentationControllerCompBase::CreateRepresentationFromRequest(
+QJsonObject CGqlRepresentationControllerCompBase::CreateRepresentationFromRequest(
 			const imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
-	return nullptr;
+	return QJsonObject();
 }
 
 
 bool CGqlRepresentationControllerCompBase::UpdateModelFromRepresentation(
 			const imtgql::CGqlRequest& /*request*/,
-			imtbase::CTreeItemModel* /*representationPtr*/) const
+			const QJsonObject& /*representation*/) const
 {
 	return false;
 }
@@ -26,7 +30,7 @@ bool CGqlRepresentationControllerCompBase::UpdateModelFromRepresentation(
 
 // reimplemented (imtservergql::CGqlRequestHandlerCompBase)
 
-imtbase::CTreeItemModel* CGqlRepresentationControllerCompBase::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CGqlRepresentationControllerCompBase::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	QByteArray commandId = gqlRequest.GetCommandId();
 
@@ -38,22 +42,23 @@ imtbase::CTreeItemModel* CGqlRepresentationControllerCompBase::CreateInternalRes
 	if (requestType == imtgql::IGqlRequest::RT_MUTATION){
 		const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 		if (inputParamPtr == nullptr){
-			return nullptr;
+			return QJsonObject();
 		}
 
 		QByteArray itemData = inputParamPtr->GetParamArgumentValue("Item").toByteArray();
 		if (!itemData.isEmpty()){
-			istd::TDelPtr<imtbase::CTreeItemModel> representationPtr(new imtbase::CTreeItemModel);
-			if (representationPtr->CreateFromJson(itemData)){
-				bool result = UpdateModelFromRepresentation(gqlRequest, representationPtr.GetPtr());
+			QJsonDocument doc = QJsonDocument::fromJson(itemData);
+			if (!doc.isNull() && doc.isObject()){
+				QJsonObject representation = doc.object();
+				bool result = UpdateModelFromRepresentation(gqlRequest, representation);
 				if (result){
-					return representationPtr.PopPtr();
+					return representation;
 				}
 			}
 		}
 	}
 
-	return nullptr;
+	return QJsonObject();
 }
 
 

@@ -6,20 +6,20 @@
 #include <QtNetwork/QAbstractSocket>
 
 // ImtCore includes
-#include <imtrest/ISender.h>
+#include <imtrest/ITransport.h>
 
 namespace imtrest
 {
 
 
-class CTcpSender: public QObject, virtual public ISender
+class CTcpSender: public QObject, virtual public ITransport
 {
 	Q_OBJECT
 public:
     CTcpSender(QAbstractSocket* tcpSocketPtr);
-	// reimplemented (ISender)
+	// reimplemented (ITransport)
 	virtual bool SendResponse(ConstResponsePtr& response) const override;
-	virtual bool SendRequest(ConstRequestPtr& reguest) const override;
+	virtual bool SendRequest(ConstRequestPtr& request) const override;
 
 protected:
     virtual bool WriteBody(const QByteArray& data, QAbstractSocket& socket) const;

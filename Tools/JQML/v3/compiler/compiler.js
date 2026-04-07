@@ -527,12 +527,7 @@ function compile(options){
                             return stat
                         }
 
-                        try {
-                            let obj = eval(tree[1])
-                            stat.value.add(new SourceNode(tree.info.line+1,tree.info.col,this.qmlFile.fileName,tree[1]))
-                            stat.dotObj = (typeof obj === 'object' || typeof obj === 'function') ? obj : null
-                            return stat
-                        } catch { }
+                        
 
                         let path = this.resolve(tree[1], stat.thisKey)
 
@@ -543,6 +538,12 @@ function compile(options){
                         } else if (tree[1] === 'context') {
                             stat.value.add(new SourceNode(tree.info.line+1,tree.info.col,this.qmlFile.fileName,'JSContext'))
                         } else {
+                            try {
+                                let obj = eval(tree[1])
+                                stat.value.add(new SourceNode(tree.info.line+1,tree.info.col,this.qmlFile.fileName,tree[1]))
+                                stat.dotObj = (typeof obj === 'object' || typeof obj === 'function') ? obj : null
+                                return stat
+                            } catch { }
                             console.log(`${this.qmlFile.fileName}:${tree.info.line + 1}:${tree.info.col + 1}: warning: ${tree[1]} is not founded`)
                             stat.value.add(new SourceNode(tree.info.line+1,tree.info.col,this.qmlFile.fileName,[stat.thisKey, '.',tree[1]]))
                         }
@@ -2110,7 +2111,8 @@ function compile(options){
     }
 }
 
-if(options.mode === 'js'){
+
+if(options.mode === 'js' || options.mode === 'html'){
     compile(options)
 }
 

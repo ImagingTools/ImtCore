@@ -5,6 +5,9 @@
 // Qt includes
 #include <QtCore/QString>
 
+// ImtCore includes
+#include <imtdb/IDatabaseEngine.h>
+
 
 /**
  * @namespace imtdb
@@ -134,6 +137,19 @@ static const QString DEFAULT_DATA_LITERAL	= QStringLiteral("DEFAULT");
  * @endcode
  */
 QString SqlEncode(const QString& sqlQuery);
+
+
+/**
+ * @brief Returns the resource path for an SQL script file based on the database driver.
+ *
+ * Selects between `:/SQL/SQLite/` and `:/SQL/Postgres/` prefixes depending on
+ * whether the engine uses the `QSQLITE` driver.
+ *
+ * @param databaseEngine  The database engine to query for the driver ID.
+ * @param fileName        The SQL script file name (e.g. "CreateUsersTable.sql").
+ * @return Full resource path to the SQL script.
+ */
+QString GetSqlResourcePath(const IDatabaseEngine& databaseEngine, const QString& fileName);
 
 
 } // namespace imtdb

@@ -55,14 +55,14 @@ bool CWebSocketSender::SendResponse(ConstResponsePtr& response) const
 }
 
 
-bool CWebSocketSender::SendRequest(ConstRequestPtr& reguest) const
+bool CWebSocketSender::SendRequest(ConstRequestPtr& request) const
 {
 	if (m_webSocketPtr != nullptr){
 		if (!m_webSocketPtr->isValid()){
 			return false;
 		}
 
-		const QByteArray& contentData = reguest->GetBody();
+		const QByteArray& contentData = request->GetBody();
 
 		emit SendTextMessage(contentData);
 

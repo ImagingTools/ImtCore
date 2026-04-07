@@ -2,6 +2,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QJsonObject>
+
 // ImtCore includes
 #include <imtservergql/CObjectCollectionControllerCompBase.h>
 #include <imtbase/ITreeModelWrittable.h>
@@ -19,10 +22,10 @@ public:
 	I_END_COMPONENT
 
 protected:
-	virtual imtbase::CTreeItemModel* ListObjects(
+	virtual QJsonObject ListObjects(
 				const imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual imtbase::CTreeItemModel* GetObject(
+	virtual QJsonObject GetObject(
 				const imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 

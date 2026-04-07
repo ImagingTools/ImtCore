@@ -20,7 +20,7 @@
 #include <imtrest/IRequest.h>
 #include <imtrest/IRequestServlet.h>
 #include <imtrest/IProtocolEngine.h>
-#include <imtrest/IRequestManager.h>
+#include <imtrest/IResponseDispatcher.h>
 #include <imtrest/IServer.h>
 #include <imtrest/CUdpRequest.h>
 
@@ -36,7 +36,7 @@ class CUdpServerComp:
 			public QObject,
 			public ibase::TRuntimeStatusHanderCompWrap<ilog::CLoggerComponentBase>,
 			private imod::CMultiModelDispatcherBase,
-			virtual public IRequestManager,
+			virtual public IResponseDispatcher,
 			virtual public IServer
 {
 	Q_OBJECT
@@ -45,7 +45,7 @@ public:
 	typedef imod::CMultiModelDispatcherBase BaseClass2;
 
 	I_BEGIN_COMPONENT(CUdpServerComp);
-		I_REGISTER_INTERFACE(IRequestManager)
+		I_REGISTER_INTERFACE(IResponseDispatcher)
 		I_REGISTER_INTERFACE(IServer)
 		I_ASSIGN(m_requestHandlerCompPtr, "RequestHandler", "Request handler registered for the server", true, "RequestHandler");
 		I_ASSIGN(m_protocolEngineCompPtr, "ProtocolEngine", "Protocol engine used in the server", true, "ProtocolEngine");
@@ -69,8 +69,9 @@ protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 
-	// reimplemented (icomp::IRequestManager)
-	virtual const ISender* GetSender(const QByteArray& requestId) const override;
+	// reimplemented (imtrest::IResponseDispatcher)
+	virtual bool SendResponse(const QByteArray& requestId, ConstResponsePtr& response) const override;
+	virtual bool SendRequest(const QByteArray& requestId, ConstRequestPtr& request) const override;
 
 	// reimplemented (imtrest::IServer)
 	virtual bool StartServer() override;

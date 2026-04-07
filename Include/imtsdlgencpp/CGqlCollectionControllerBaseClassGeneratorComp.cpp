@@ -182,10 +182,10 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(cons
 			FeedStream(ifStream, 1, false);
 
 			FeedStreamHorizontally(ifStream, 1);
-			ifStream << QStringLiteral("virtual bool SetupGqlItemWithContext(const ::imtgql::CGqlRequest& gqlRequest, const ::imtservergql::CObjectCollectionControllerCompBase::GqlItemSetupContext& setupContext, ::imtbase::CTreeItemModel& dataModel, int itemIndex,const ::imtbase::IObjectCollectionIterator* objectCollectionIterator, QString& errorMessage) const override;");
+			ifStream << QStringLiteral("virtual bool SetupGqlItemWithContext(const ::imtgql::CGqlRequest& gqlRequest, const ::imtservergql::CObjectCollectionControllerCompBase::GqlItemSetupContext& setupContext, QJsonObject& itemObj, const ::imtbase::IObjectCollectionIterator* objectCollectionIterator, QString& errorMessage) const override;");
 		}
 		else{
-			ifStream << QStringLiteral("virtual bool SetupGqlItem(const ::imtgql::CGqlRequest& gqlRequest, ::imtbase::CTreeItemModel& dataModel, int itemIndex,const ::imtbase::IObjectCollectionIterator* objectCollectionIterator, QString& errorMessage) const override;");
+			ifStream << QStringLiteral("virtual bool SetupGqlItem(const ::imtgql::CGqlRequest& gqlRequest, QJsonObject& itemObj, const ::imtbase::IObjectCollectionIterator* objectCollectionIterator, QString& errorMessage) const override;");
 		}
 		FeedStream(ifStream, 1, false);
 		operationsList.removeAll(imtsdl::CSdlDocumentType::OT_LIST);
@@ -193,7 +193,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(cons
 
 	if (operationsList.contains(imtsdl::CSdlDocumentType::OT_GET)){
 		FeedStreamHorizontally(ifStream, 1);
-		ifStream << QStringLiteral("virtual bool CreateRepresentationFromObject(const istd::IChangeable& data, const QByteArray& objectTypeId, const ::imtgql::CGqlRequest& gqlRequest, ::imtbase::CTreeItemModel& dataModel, QString& errorMessage) const override;");
+		ifStream << QStringLiteral("virtual bool CreateRepresentationFromObject(const istd::IChangeable& data, const QByteArray& objectTypeId, const ::imtgql::CGqlRequest& gqlRequest, QJsonObject& dataObj, QString& errorMessage) const override;");
 		FeedStream(ifStream, 1, false);
 		operationsList.removeAll(imtsdl::CSdlDocumentType::OT_GET);
 	}
@@ -214,7 +214,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(cons
 
 	if (operationsList.contains(imtsdl::CSdlDocumentType::OT_GET_VIEW)){
 		FeedStreamHorizontally(ifStream, 1);
-		ifStream << QStringLiteral("virtual ::imtbase::CTreeItemModel* CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;");
+		ifStream << QStringLiteral("virtual QJsonObject CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;");
 		FeedStream(ifStream, 1, false);
 		operationsList.removeAll(imtsdl::CSdlDocumentType::OT_GET_VIEW);
 	}
@@ -372,7 +372,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddBaseMethodDeclarationFor
 		return;
 	}
 
-	stream << QStringLiteral("::imtbase::CTreeItemModel* ");
+	stream << QStringLiteral("QJsonObject ");
 	if (!className.isEmpty()){
 		stream << className << ':' << ':';
 	}
@@ -689,7 +689,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForSpecialReques
 
 	// [2] return
 	FeedStreamHorizontally(stream, hIndents + 2);
-	stream << QStringLiteral("return nullptr;");
+	stream << QStringLiteral("return QJsonObject();");
 	FeedStream(stream, 1, false);
 
 	// [2->1] end of SDL request validate
@@ -729,7 +729,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForSpecialReques
 
 	// [2] return
 	FeedStreamHorizontally(stream, hIndents + 2);
-	stream << QStringLiteral("return nullptr;");
+	stream << QStringLiteral("return QJsonObject();");
 	FeedStream(stream, 1, false);
 
 	// [2->1] end of derived error checks
@@ -739,14 +739,9 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForSpecialReques
 
 	AddPayloadModelWriteCode(stream, sdlRequest, operationType, hIndents);
 
-	// [2->1] end of payload write to TreeModel checks
-	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << '}';
-	FeedStream(stream, 2, false);
-
 	// [1] return pop ptr
 	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("return modelPtr.PopPtr();");
+	stream << QStringLiteral("modelObj.insert(QStringLiteral(\"data\"), dataModelObj); return modelObj;");
 	FeedStream(stream, 1, false);
 
 	// end of section
@@ -779,15 +774,15 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddPayloadModelWriteCode(
 													 *m_sdlEnumListCompPtr,
 													 *m_sdlUnionListCompPtr,
 													 hIndents,
-													 CSdlUnionConverter::CT_MODEL_SCALAR,
-													 QString(),
-													 QString(),
+													 CSdlUnionConverter::CT_JSON_SCALAR,
+													 QString(), // addCommand: empty, primitive union members use bracket notation via customModelTarget
+													 QStringLiteral("dataModelObj"),
 													 QStringLiteral("false"));
 	}
 	else{
 		// [1] write payload variable in model and create variable, to check if it success
 		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("const bool isModelCreated = replyPayload.WriteToModel(*dataModelPtr);");
+		stream << QStringLiteral("const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);");
 		FeedStream(stream, 1, false);
 
 		// [1->2] check if payload write to TreeModel is failed
@@ -807,8 +802,13 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddPayloadModelWriteCode(
 
 		// [2] return
 		FeedStreamHorizontally(stream, hIndents + 2);
-		stream << QStringLiteral("return nullptr;");
+		stream << QStringLiteral("return QJsonObject();");
 		FeedStream(stream, 1, false);
+
+		// [2->1] end of payload write to TreeModel checks
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << '}';
+		FeedStream(stream, 2, false);
 	}
 }
 
@@ -1051,7 +1051,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 		FeedStreamHorizontally(stream, hIndents);
 		stream << QStringLiteral("bool ");
 		stream << className;
-		stream << QStringLiteral("::SetupGqlItemWithContext(const ::imtgql::CGqlRequest& gqlRequest, const ::imtservergql::CObjectCollectionControllerCompBase::GqlItemSetupContext& setupContext, ::imtbase::CTreeItemModel& dataModel, int itemIndex,const ::imtbase::IObjectCollectionIterator* objectCollectionIterator, QString& errorMessage) const");
+		stream << QStringLiteral("::SetupGqlItemWithContext(const ::imtgql::CGqlRequest& gqlRequest, const ::imtservergql::CObjectCollectionControllerCompBase::GqlItemSetupContext& setupContext, QJsonObject& itemObj, const ::imtbase::IObjectCollectionIterator* objectCollectionIterator, QString& errorMessage) const");
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream, hIndents);
@@ -1155,10 +1155,10 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 	// b) name and argset
 	switch (operationType){
 	case imtsdl::CSdlDocumentType::OT_LIST:
-		stream << QStringLiteral("SetupGqlItem(const ::imtgql::CGqlRequest& gqlRequest, ::imtbase::CTreeItemModel& dataModel, int itemIndex,const ::imtbase::IObjectCollectionIterator* objectCollectionIterator, QString& errorMessage) const");
+		stream << QStringLiteral("SetupGqlItem(const ::imtgql::CGqlRequest& gqlRequest, QJsonObject& itemObj, const ::imtbase::IObjectCollectionIterator* objectCollectionIterator, QString& errorMessage) const");
 		break;
 	case imtsdl::CSdlDocumentType::OT_GET:
-		stream << QStringLiteral("CreateRepresentationFromObject(const istd::IChangeable& data, const QByteArray& objectTypeId, const ::imtgql::CGqlRequest& gqlRequest, ::imtbase::CTreeItemModel& dataModel, QString& errorMessage) const");
+		stream << QStringLiteral("CreateRepresentationFromObject(const istd::IChangeable& data, const QByteArray& objectTypeId, const ::imtgql::CGqlRequest& gqlRequest, QJsonObject& dataObj, QString& errorMessage) const");
 		break;
 	case imtsdl::CSdlDocumentType::OT_INSERT:
 		stream << QStringLiteral("CreateObjectFromRequest(const ::imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& errorMessage) const");
@@ -1342,14 +1342,14 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddSpecialMethodImplCode(
 
 	/// create a carrier model GQL spec	\link https://spec.graphql.org/draft/#sec-Response-Format
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("istd::TDelPtr<::imtbase::CTreeItemModel> modelPtr(new ::imtbase::CTreeItemModel);");
+	stream << QStringLiteral("QJsonObject modelObj;");
 	FeedStream(stream, 1, false);
 
 	/// \todo add errors model and don't forget to fill it	\link https://spec.graphql.org/draft/#sec-Errors
 
 	// create dataModel - child of a carrier model
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("::imtbase::CTreeItemModel* dataModelPtr = modelPtr->AddTreeModel(\"data\");");
+	stream << QStringLiteral("QJsonObject dataModelObj;");
 	FeedStream(stream, 2, false);
 
 	for (const ImplGenerationInfo& requestInfo: requestList){
@@ -1379,7 +1379,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddSpecialMethodImplCode(
 
 		// return
 		FeedStreamHorizontally(stream, hIndents);
-		stream << QStringLiteral("return nullptr;");
+		stream << QStringLiteral("return QJsonObject();");
 		FeedStream(stream, 1, false);
 	}
 
@@ -1528,6 +1528,9 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 
 		imtsdl::CSdlUnion foundUnion;
 		const bool isUnion = GetSdlUnionForField(outputArgument, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
+		const QString modelVarName = (operationType == imtsdl::CSdlDocumentType::OT_LIST)
+			? QStringLiteral("itemObj")
+			: QStringLiteral("dataObj");
 		if (isUnion){
 			const static QString unionSourceVarName = QStringLiteral("&representationObject");
 			CSdlUnionConverter::WriteConversionFromUnion(stream,
@@ -1541,9 +1544,9 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 														 *m_sdlEnumListCompPtr,
 														 *m_sdlUnionListCompPtr,
 														 bodyIndent,
-														 CSdlUnionConverter::CT_MODEL_SCALAR,
-														 QStringLiteral("dataModel.SetData("), //QString(),
-														 QStringLiteral("dataModel"),
+														 CSdlUnionConverter::CT_JSON_SCALAR,
+														 QString(),
+														 modelVarName,
 														 QStringLiteral("false"));
 		}
 		else{
@@ -1551,11 +1554,8 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 			FeedStreamHorizontally(stream, bodyIndent);
 			stream << QStringLiteral("const bool isRepresentationWritten = ");
 
-			stream << QStringLiteral("representationObject.WriteToModel(dataModel");
-			// [-||-] add index for list
-			if (operationType == imtsdl::CSdlDocumentType::OT_LIST){
-				stream << QStringLiteral(", itemIndex");
-			}
+			stream << QStringLiteral("representationObject.WriteToJsonObject(");
+			stream << modelVarName;
 			stream << QStringLiteral(");");
 			FeedStream(stream, 1, false);
 

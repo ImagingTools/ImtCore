@@ -2,6 +2,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QJsonObject>
+
 // ImtCore includes
 #include <imtservergql/CGqlRequestHandlerCompBase.h>
 
@@ -20,7 +23,7 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (imtservergql::CGqlRepresentationDataControllerComp)
-	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual QJsonObject CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 private:
 	I_REF(imtgql::IGqlRequestHandler, m_productProviderCompPtr);

@@ -834,6 +834,8 @@ bool CObjectCollectionBase::CopyFrom(const IChangeable& object, CompatibilityMod
 					targetLock.relock();
 					if (targetObjectInfoPtr->dataPtr->CopyFrom(*dataPtr, sourceObjectInfo.copyMode)){
 						targetObjectInfoPtr->copyMode = sourceObjectInfo.copyMode;
+						targetObjectInfoPtr->name = sourceObjectInfo.name;
+						targetObjectInfoPtr->description = sourceObjectInfo.description;
 					}
 					else{
 						return false;

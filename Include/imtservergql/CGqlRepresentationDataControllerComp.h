@@ -28,11 +28,11 @@ public:
 
 protected:
 	// reimplemented (imtgql::IGqlRepresentationController)
-	virtual imtbase::CTreeItemModel* CreateRepresentationFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-	virtual bool UpdateModelFromRepresentation(const imtgql::CGqlRequest& request, imtbase::CTreeItemModel* representationPtr) const override;
+	virtual QJsonObject CreateRepresentationFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual bool UpdateModelFromRepresentation(const imtgql::CGqlRequest& request, const QJsonObject& representation) const override;
 
 	// reimplemented (imtservergql::CGqlRequestHandlerCompBase)
-	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual QJsonObject CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual iprm::IParamsSetUniquePtr CreateContextParams(const imtgql::CGqlRequest& gqlRequest) const override;
 
 protected:

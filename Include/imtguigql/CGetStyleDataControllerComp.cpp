@@ -4,6 +4,8 @@
 
 // Qt includes
 #include <QtCore/QFile>
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonDocument>
 
 // ACF includes
 #include <iprm/IOptionsList.h>
@@ -17,14 +19,14 @@ namespace imtguigql
 
 // reimplemented (imtservergql::CGqlRepresentationControllerCompBase)
 
-imtbase::CTreeItemModel* CGetStyleDataControllerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CGetStyleDataControllerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	const imtgql::CGqlParamObject* gqlInputParamPtr = gqlRequest.GetParamObject("input");
 	if (gqlInputParamPtr == nullptr){
 		errorMessage = QString("Unable to get style. GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "CGetStyleDataControllerComp");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	QString theme = gqlInputParamPtr->GetParamArgumentValue("theme").toString();
@@ -44,7 +46,7 @@ imtbase::CTreeItemModel* CGetStyleDataControllerComp::CreateInternalResponse(con
 		errorMessage = QString("Unable to get style. Theme is empty.");
 		SendErrorMessage(0, errorMessage, "CGetStyleDataControllerComp");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	QString prefix;
@@ -58,23 +60,30 @@ imtbase::CTreeItemModel* CGetStyleDataControllerComp::CreateInternalResponse(con
 		errorMessage = QString("Unable to open the style file. Error: '%1'.").arg(resource.errorString());
 		SendErrorMessage(0, errorMessage, "CGetStyleDataControllerComp");
 
-		return nullptr;
+		return QJsonObject();
 	}
-
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
-	imtbase::CTreeItemModel* sourceModelPtr = dataModelPtr->AddTreeModel("source");
-
-	dataModelPtr->SetData("theme", theme);
 
 	QByteArray resources = resource.readAll();
-	if (!sourceModelPtr->CreateFromJson(resources)){
-		SendWarningMessage(0, QString("Unable to create style model from file: '%1'").arg(pathToTheme), "CGetStyleDataControllerComp");
-	}
-
 	resource.close();
 
-	return rootModelPtr.PopPtr();
+	QJsonObject sourceObj;
+	QJsonParseError parseError;
+	QJsonDocument sourceDoc = QJsonDocument::fromJson(resources, &parseError);
+	if (parseError.error != QJsonParseError::NoError){
+		SendWarningMessage(0, QString("Unable to create style model from file: '%1'. Error: %2").arg(pathToTheme, parseError.errorString()), "CGetStyleDataControllerComp");
+	}
+	else{
+		sourceObj = sourceDoc.object();
+	}
+
+	QJsonObject dataObj;
+	dataObj.insert("theme", theme);
+	dataObj.insert("source", sourceObj);
+
+	QJsonObject rootObj;
+	rootObj.insert("data", dataObj);
+
+	return rootObj;
 }
 
 

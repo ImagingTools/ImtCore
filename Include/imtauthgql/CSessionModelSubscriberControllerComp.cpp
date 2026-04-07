@@ -2,6 +2,10 @@
 #include <imtauthgql/CSessionModelSubscriberControllerComp.h>
 
 
+// Qt includes
+#include <QJsonArray>
+#include <QJsonDocument>
+
 // ImtCore includes
 #include <imtgql/IGqlRequestProvider.h>
 #include<imtrest/IProtocolEngine.h>
@@ -60,10 +64,7 @@ void CSessionModelSubscriberControllerComp::OnSessionModelChanged(const istd::IC
 
 			imtrest::ConstResponsePtr responsePtr(engine.CreateResponse(*networkRequest, imtrest::IProtocolEngine::SC_OK, body, responseTypeId).PopInterfacePtr());
 			if (responsePtr.IsValid()){
-				const imtrest::ISender* sender = m_requestManagerCompPtr->GetSender(networkRequest->GetRequestId());
-				if (sender != nullptr){
-					sender->SendResponse(responsePtr);
-				}
+				m_requestManagerCompPtr->SendResponse(networkRequest->GetRequestId(), responsePtr);
 			}
 		}
 	}

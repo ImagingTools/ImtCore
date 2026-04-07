@@ -530,6 +530,10 @@ imtbase::IRevisionController::RevisionInfoList CSqlDatabaseDocumentDelegateComp:
 		return imtbase::IRevisionController::RevisionInfoList();
 	}
 
+	if (objectId.isEmpty()){
+		return imtbase::IRevisionController::RevisionInfoList();
+	}
+
 	iprm::CParamsSet filterParams;
 	imtcol::CDocumentCollectionFilter documentFilter;
 	documentFilter.SetDocumentId(objectId);
@@ -1219,17 +1223,30 @@ idoc::MetaInfoPtr CSqlDatabaseDocumentDelegateComp::CreateObjectMetaInfo(const Q
 }
 
 
-bool CSqlDatabaseDocumentDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const
+bool CSqlDatabaseDocumentDelegateComp::SetObjectMetaInfoFromRecord(
+			const QSqlRecord& record,
+			idoc::IDocumentMetaInfo& metaInfo) const
 {
-	if (record.contains(s_dataMetaInfoColumn)){
-		QByteArray metaInfoRepresentation = record.value(qPrintable(s_dataMetaInfoColumn)).toByteArray();
-		QByteArray typeId = record.value(qPrintable(s_typeIdColumn)).toByteArray();
-		if (m_jsonBasedMetaInfoDelegateCompPtr.IsValid()){
-			return m_jsonBasedMetaInfoDelegateCompPtr->FromJsonRepresentation(metaInfoRepresentation, metaInfo, typeId);
-		}
+	if (!record.contains(s_dataMetaInfoColumn)){
+		return true;
 	}
 
-	return true;
+	if (!m_jsonBasedMetaInfoDelegateCompPtr.IsValid()){
+		return true;
+	}
+
+	const QByteArray metaInfoRepresentation = record.value(qPrintable(s_dataMetaInfoColumn)).toByteArray();
+	if (metaInfoRepresentation.isEmpty()){
+		return true;
+	}
+
+	const QByteArray typeId = record.value(qPrintable(s_typeIdColumn)).toByteArray();
+
+	return m_jsonBasedMetaInfoDelegateCompPtr->FromJsonRepresentation(
+				metaInfoRepresentation,
+				metaInfo,
+				typeId
+				);
 }
 
 
@@ -1409,38 +1426,64 @@ bool CSqlDatabaseDocumentDelegateComp::CreateFilterQuery(const iprm::IParamsSet&
 }
 
 
-bool CSqlDatabaseDocumentDelegateComp::CreateTextFilterQuery(const imtbase::ICollectionFilter& collectionFilter, QString& textFilterQuery) const
+bool CSqlDatabaseDocumentDelegateComp::CreateTextFilterQuery(
+		const imtbase::ICollectionFilter& collectionFilter,
+		QString& textFilterQuery) const
 {
 	QByteArrayList filteringColumnIds = collectionFilter.GetFilteringInfoIds();
 	if (filteringColumnIds.isEmpty()){
 		return true;
 	}
 
-	QString textFilter = collectionFilter.GetTextFilter();
-	if (!textFilter.isEmpty()){
-		if (filteringColumnIds.contains(s_typeIdColumn)){
-			textFilterQuery += QString("%0\"%1\" ILIKE '%%2%'").arg(textFilterQuery.isEmpty() ? "" : " OR ", qPrintable(s_typeIdColumn), textFilter);
-			filteringColumnIds.removeOne(s_typeIdColumn);
+	const QString textFilter = collectionFilter.GetTextFilter();
+	if (textFilter.isEmpty()){
+		return true;
+	}
+
+	const QByteArray driverId = m_databaseEngineCompPtr->GetDatabaseDriverId().toUpper();
+	const bool isSQLite = (driverId == "QSQLITE");
+
+	QString escapedTextFilter = textFilter;
+	escapedTextFilter.replace("'", "''");
+
+	const QString likePattern = QString("%%1%").arg(escapedTextFilter);
+
+	auto appendTextCondition = [&](const QString& expression)
+	{
+		if (!textFilterQuery.isEmpty()){
+			textFilterQuery += " OR ";
 		}
 
-		if (filteringColumnIds.contains(s_nameColumn)){
-			textFilterQuery += QString("%0\"%1\" ILIKE '%%2%'").arg(textFilterQuery.isEmpty() ? "" : " OR ", qPrintable(s_nameColumn), textFilter);
-			filteringColumnIds.removeOne(s_nameColumn);
+		if (isSQLite){
+			textFilterQuery += QString("LOWER(%1) LIKE LOWER('%2')")
+				.arg(expression, likePattern);
 		}
+		else{
+			textFilterQuery += QString("%1 ILIKE '%2'")
+				.arg(expression, likePattern);
+		}
+	};
 
-		if (filteringColumnIds.contains(s_descriptionColumn)){
-			textFilterQuery += QString("%0\"%1\" ILIKE '%%2%'").arg(textFilterQuery.isEmpty() ? "" : " OR ", qPrintable(s_descriptionColumn), textFilter);
-			filteringColumnIds.removeOne(s_descriptionColumn);
-		}
+	if (filteringColumnIds.contains(s_typeIdColumn)){
+		appendTextCondition(QStringLiteral("\"%1\"").arg(QString::fromUtf8(s_typeIdColumn)));
+		filteringColumnIds.removeOne(s_typeIdColumn);
+	}
 
-		for (int i = 0; i < filteringColumnIds.count(); ++i){
-			textFilterQuery += QString("%0%1 ILIKE '%%2%'")
-								.arg(
-									textFilterQuery.isEmpty() ? "" : " OR ",
-									CreateJsonExtractSql(QString(R"(root."%1")").arg(qPrintable(s_dataMetaInfoColumn)), filteringColumnIds[i]),
-									textFilter
-									);
-		}
+	if (filteringColumnIds.contains(s_nameColumn)){
+		appendTextCondition(QStringLiteral("\"%1\"").arg(QString::fromUtf8(s_nameColumn)));
+		filteringColumnIds.removeOne(s_nameColumn);
+	}
+
+	if (filteringColumnIds.contains(s_descriptionColumn)){
+		appendTextCondition(QStringLiteral("\"%1\"").arg(QString::fromUtf8(s_descriptionColumn)));
+		filteringColumnIds.removeOne(s_descriptionColumn);
+	}
+
+	for (int i = 0; i < filteringColumnIds.count(); ++i){
+		appendTextCondition(
+			CreateJsonExtractSql(
+				QString(R"(root."%1")").arg(QString::fromUtf8(s_dataMetaInfoColumn)),
+				filteringColumnIds[i]));
 	}
 
 	return true;
@@ -1544,52 +1587,88 @@ bool CSqlDatabaseDocumentDelegateComp::CreateObjectFilterQuery(const imtbase::IC
 }
 
 
-bool CSqlDatabaseDocumentDelegateComp::CreateTextFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& textFilterQuery) const
+bool CSqlDatabaseDocumentDelegateComp::CreateTextFilterQuery(
+			const imtbase::IComplexCollectionFilter& collectionFilter,
+			QString& textFilterQuery) const
 {
 	textFilterQuery.clear();
 
-	bool useDataMeta = m_useDataMetaInfoAttrPtr.IsValid() ? *m_useDataMetaInfoAttrPtr : false;
-	QString jsonKey = useDataMeta ? s_dataMetaInfoColumn : s_documentColumn;
+	const bool useDataMeta = m_useDataMetaInfoAttrPtr.IsValid() ? *m_useDataMetaInfoAttrPtr : false;
+	const QString jsonKey = useDataMeta ? QString::fromUtf8(s_dataMetaInfoColumn) : QString::fromUtf8(s_documentColumn);
+
+	const QByteArray driverId = m_databaseEngineCompPtr->GetDatabaseDriverId().toUpper();
+	const bool isSQLite = (driverId == "QSQLITE");
 
 	QString textFilter = collectionFilter.GetTextFilter();
-	if (!textFilter.isEmpty()){
-		for (const imtbase::IComplexCollectionFilter::FieldInfo& info : collectionFilter.GetFields()){
-			if (info.metaInfo.flags & imtbase::IComplexCollectionFilter::SO_TEXT_FILTER){
-				if (!textFilterQuery.isEmpty()){
-					textFilterQuery += QStringLiteral(" OR ");
-				}
+	if (textFilter.isEmpty()){
+		return true;
+	}
 
-				if (info.metaInfo.type == imtbase::IComplexCollectionFilter::FT_SCALAR){
-					if (s_filterableColumns.contains(info.id)){
-						textFilterQuery += QStringLiteral(R"(root."%1" ILIKE '%%2%')").arg(QString::fromUtf8(info.id), textFilter);
-					}
-					else{
-						textFilterQuery += QStringLiteral(R"(%1 ILIKE '%%2%')")
-									.arg(
-										CreateJsonExtractSql(jsonKey, info.id, QMetaType::QString, "root"),
-										textFilter
-										);
-					}
-				}
-				else if (info.metaInfo.type == imtbase::IComplexCollectionFilter::FT_ARRAY){
-					QString expr = QString(
-						"EXISTS ("
-						"SELECT 1 "
-						"FROM jsonb_array_elements_text(%1) AS elem "
-						"WHERE %2"
-						")"
-					).arg(
-							CreateJsonExtractSql(jsonKey, info.id, QMetaType::QJsonArray, "root"),
-							QString("elem ILIKE '%%%1%%'").arg(textFilter)
-						);
+	textFilter.replace('\'', QLatin1String("''"));
+	const QString likePattern = QStringLiteral("%%%1%%").arg(textFilter);
 
-					textFilterQuery += expr;
-				}
-				else{
-					qWarning() << "Unable to create text filter: unsupported field type:" << info.id << info.metaInfo.type;
-					return false;
-				}
+	auto makeLikeCondition = [&](const QString& expression) -> QString
+	{
+		if (isSQLite){
+			return QStringLiteral("LOWER(%1) LIKE LOWER('%2')")
+				.arg(expression, likePattern);
+		}
+
+		return QStringLiteral("%1 ILIKE '%2'")
+			.arg(expression, likePattern);
+	};
+
+	for (const imtbase::IComplexCollectionFilter::FieldInfo& info : collectionFilter.GetFields()){
+		if (!(info.metaInfo.flags & imtbase::IComplexCollectionFilter::SO_TEXT_FILTER)){
+			continue;
+		}
+
+		if (!textFilterQuery.isEmpty()){
+			textFilterQuery += QStringLiteral(" OR ");
+		}
+
+		if (info.metaInfo.type == imtbase::IComplexCollectionFilter::FT_SCALAR){
+			if (s_filterableColumns.contains(info.id)){
+				textFilterQuery += makeLikeCondition(
+					QStringLiteral(R"(root."%1")").arg(QString::fromUtf8(info.id)));
 			}
+			else{
+				textFilterQuery += makeLikeCondition(
+					CreateJsonExtractSql(jsonKey, info.id, QMetaType::QString, "root"));
+			}
+		}
+		else if (info.metaInfo.type == imtbase::IComplexCollectionFilter::FT_ARRAY){
+			QString expr;
+			if (isSQLite){
+				expr = QStringLiteral(
+					"EXISTS ("
+					"SELECT 1 "
+					"FROM json_each(%1) AS elem "
+					"WHERE %2"
+					")")
+					.arg(
+						CreateJsonExtractSql(jsonKey, info.id, QMetaType::QJsonArray, "root"),
+						makeLikeCondition(QStringLiteral("elem.value"))
+					);
+			}
+			else{
+				expr = QStringLiteral(
+					"EXISTS ("
+					"SELECT 1 "
+					"FROM jsonb_array_elements_text(%1) AS elem "
+					"WHERE %2"
+					")")
+					.arg(
+						CreateJsonExtractSql(jsonKey, info.id, QMetaType::QJsonArray, "root"),
+						makeLikeCondition(QStringLiteral("elem"))
+					);
+			}
+
+			textFilterQuery += expr;
+		}
+		else{
+			qWarning() << "Unable to create text filter: unsupported field type:" << info.id << info.metaInfo.type;
+			return false;
 		}
 	}
 

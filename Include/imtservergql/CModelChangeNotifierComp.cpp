@@ -56,10 +56,7 @@ void CModelChangeNotifierComp::OnUpdate(const istd::IChangeable::ChangeSet& /*ch
 
 			imtrest::ConstResponsePtr responsePtr(engine.CreateResponse(*networkRequest, imtrest::IProtocolEngine::SC_OK, body, reponseTypeId).PopInterfacePtr());
 			if (responsePtr.IsValid()){
-				const imtrest::ISender* sender = m_requestManagerCompPtr->GetSender(networkRequest->GetRequestId());
-				if (sender != nullptr){
-					sender->SendResponse(responsePtr);
-				}
+				m_requestManagerCompPtr->SendResponse(networkRequest->GetRequestId(), responsePtr);
 			}
 		}
 	}

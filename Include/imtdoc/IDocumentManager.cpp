@@ -14,6 +14,7 @@ const QByteArray IDocumentManager::CN_DOCUMENT_UNDO_CHANGED = QByteArrayLiteral(
 const QByteArray IDocumentManager::CN_DOCUMENT_SAVED = QByteArrayLiteral("imtdoc:IDocumentManager::DocumentSaved");
 const QByteArray IDocumentManager::CN_DOCUMENT_SAVED_AS = QByteArrayLiteral("imtdoc:IDocumentManager::DocumentSavedAs");
 const QByteArray IDocumentManager::CN_DOCUMENT_CLOSED = QByteArrayLiteral("imtdoc:IDocumentManager::DocumentClosed");
+const QByteArray IDocumentManager::CN_DOCUMENT_DATA_LOADED = QByteArrayLiteral("imtdoc:IDocumentManager::DocumentDataLoaded");
 
 
 } // namespace imtdoc

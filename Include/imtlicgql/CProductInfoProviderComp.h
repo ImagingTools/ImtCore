@@ -2,6 +2,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QJsonObject>
+
 // ACF includes
 #include <icomp/CComponentBase.h>
 
@@ -28,7 +31,7 @@ public:
 protected:
 	// reimplemented (imtservergql::CGqlRepresentationDataControllerComp)
 	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
-	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual QJsonObject CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 protected:
 	I_MULTIATTR(QByteArray, m_productIdsAttrPtr);

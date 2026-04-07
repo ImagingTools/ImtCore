@@ -43,6 +43,7 @@ QtObject {
 
                     if(dataModelLocal.containsKey("PagesData")){
                         dataModelLocal = dataModelLocal.getData("PagesData");
+                        dataModelLocal = dataModelLocal.getData("items");
 
                         pagesProvider.pagesModel = dataModelLocal;
                     }

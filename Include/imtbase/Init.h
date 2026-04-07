@@ -82,6 +82,11 @@ public:
 		Q_INIT_RESOURCE(imtlicguiqml);
 	}
 
+	static void InitGeoQml()
+	{
+		Q_INIT_RESOURCE(imtgeoguiqml);
+	}
+
 	static void InitTheme()
 	{
 		Q_INIT_RESOURCE(imtguiTheme);

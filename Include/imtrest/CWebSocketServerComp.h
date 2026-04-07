@@ -17,7 +17,7 @@
 #include <imtrest/IRequestServlet.h>
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/ISubscriberEngine.h>
-#include <imtrest/IRequestManager.h>
+#include <imtrest/IResponseDispatcher.h>
 #include <imtrest/CWebSocketSender.h>
 #include <imtrest/IServer.h>
 #include <imtcom/IServerConnectionInterface.h>
@@ -40,7 +40,7 @@ class CWebSocketServerComp:
 			public QObject,
 			public ibase::TRuntimeStatusHanderCompWrap<ilog::CLoggerComponentBase>,
 			private imod::CMultiModelDispatcherBase,
-			virtual public IRequestManager,
+			virtual public IResponseDispatcher,
 			virtual public imtcom::IConnectionStatusProvider,
 			virtual public IServer
 {
@@ -50,7 +50,7 @@ public:
 	typedef imod::CMultiModelDispatcherBase BaseClass2;
 
 	I_BEGIN_COMPONENT(CWebSocketServerComp);
-		I_REGISTER_INTERFACE(IRequestManager)
+		I_REGISTER_INTERFACE(IResponseDispatcher)
 		I_REGISTER_INTERFACE(imtcom::IConnectionStatusProvider)
 		I_REGISTER_INTERFACE(IServer)
 		I_ASSIGN(m_requestServerHandlerCompPtr, "RequestServerHandler", "Request handler registered for the server", false, "RequestServerHandler");
@@ -91,8 +91,9 @@ public:
 	void RegisterSender(const QByteArray& clientId, QWebSocket* webSocketPtr);
 
 
-	// reimplemented (icomp::IRequestManager)
-	virtual const ISender* GetSender(const QByteArray& requestId) const override;
+	// reimplemented (imtrest::IResponseDispatcher)
+	virtual bool SendResponse(const QByteArray& requestId, ConstResponsePtr& response) const override;
+	virtual bool SendRequest(const QByteArray& requestId, ConstRequestPtr& request) const override;
 
 protected:
 	// reimplemented (imod::CMultiModelDispatcherBase)

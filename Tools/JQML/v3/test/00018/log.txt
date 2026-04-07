@@ -1,0 +1,2 @@
+Сигнал counterChanged сработал
+counter = 5

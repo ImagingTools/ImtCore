@@ -46,8 +46,5 @@ PageContainer {
 		id: documentManagerView_
 		anchors.fill: root
 		documentManager: root.documentManager
-		visualStatusProvider: GqlBasedObjectVisualStatusProvider {
-			collectionId: root.pageId
-		}
 	}
 }
