@@ -46,7 +46,7 @@
                         <Data IsEnabled="true" Value="Conversations"/>
                     </AttributeInfo>
                     <AttributeInfo Id="IconPath" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Icons/Ok"/>
+                        <Data IsEnabled="true" Value="Icons/Conversation"/>
                     </AttributeInfo>
                     <AttributeInfo Id="IsEnabled" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
@@ -153,7 +153,7 @@
                         <Data IsEnabled="true" Value="Tickets"/>
                     </AttributeInfo>
                     <AttributeInfo Id="IconPath" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Icons/Ok"/>
+                        <Data IsEnabled="true" Value="Icons/Ticket"/>
                     </AttributeInfo>
                     <AttributeInfo Id="IsEnabled" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
