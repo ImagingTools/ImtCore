@@ -81,7 +81,6 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>title</Value>
-                                <Value>ticketType</Value>
                                 <Value>status</Value>
                                 <Value>priority</Value>
                                 <Value>assigneeId</Value>
@@ -93,7 +92,6 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>Title</Value>
-                                <Value>Type</Value>
                                 <Value>Status</Value>
                                 <Value>Priority</Value>
                                 <Value>Assignee</Value>
@@ -105,7 +103,6 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>title</Value>
-                                <Value>ticketType</Value>
                                 <Value>status</Value>
                                 <Value>priority</Value>
                                 <Value>assigneeId</Value>

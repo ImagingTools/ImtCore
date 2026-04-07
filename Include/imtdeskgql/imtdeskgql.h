@@ -1,6 +1,14 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
+
+// ImtCore includes
+#include <imtdesk/ISupportTicket.h>
+
+// Generated includes
+#include <GeneratedFiles/imtdesksdl/SDL/1.0/CPP/TicketCollectionDocumentManager.h>
+
+
 /**
 	\file imtdeskgql.h
 	\brief Main header file for the imtdeskgql module - Service Desk GraphQL API Layer
@@ -27,4 +35,142 @@
 	- \b imtdeskdb — database persistence
 	- \b imtdeskgui — QML user interface
 */
-namespace imtdeskgql {}
+namespace imtdeskgql
+{
+
+
+imtdesk::ISupportTicket::TicketType GetTicketTypeFromSdlType(sdl::imtdesk::ImtDesk::TicketType sdlTicketType)
+{
+	switch(sdlTicketType){
+	case sdl::imtdesk::ImtDesk::TicketType::AccessRequest:
+		return imtdesk::ISupportTicket::TT_ACCESS_REQUEST;
+	case sdl::imtdesk::ImtDesk::TicketType::SupportRequest:
+		return imtdesk::ISupportTicket::TT_SUPPORT_REQUEST;
+	case sdl::imtdesk::ImtDesk::TicketType::FeatureRequest:
+		return imtdesk::ISupportTicket::TT_FEATURE_REQUEST;
+	case sdl::imtdesk::ImtDesk::TicketType::BugReport:
+		return imtdesk::ISupportTicket::TT_BUG_REPORT;
+	}
+
+	return imtdesk::ISupportTicket::TT_ACCESS_REQUEST;
+}
+
+
+sdl::imtdesk::ImtDesk::TicketType GetSdlTypeFromTicketType(imtdesk::ISupportTicket::TicketType ticketType)
+{
+	switch(ticketType){
+	case imtdesk::ISupportTicket::TT_ACCESS_REQUEST:
+		return sdl::imtdesk::ImtDesk::TicketType::AccessRequest;
+	case imtdesk::ISupportTicket::TT_SUPPORT_REQUEST:
+		return sdl::imtdesk::ImtDesk::TicketType::SupportRequest;
+	case imtdesk::ISupportTicket::TT_FEATURE_REQUEST:
+		return sdl::imtdesk::ImtDesk::TicketType::FeatureRequest;
+	case imtdesk::ISupportTicket::TT_BUG_REPORT:
+		return sdl::imtdesk::ImtDesk::TicketType::BugReport;
+	}
+
+	return sdl::imtdesk::ImtDesk::TicketType::AccessRequest;
+}
+
+
+imtdesk::ISupportTicket::TicketStatus GetStatusTypeFromSdlType(sdl::imtdesk::ImtDesk::TicketStatus sdlTicketStatus)
+{
+	switch(sdlTicketStatus){
+	case sdl::imtdesk::ImtDesk::TicketStatus::Open:
+		return imtdesk::ISupportTicket::TicketStatus::TS_OPEN;
+	case sdl::imtdesk::ImtDesk::TicketStatus::InProgress:
+		return imtdesk::ISupportTicket::TicketStatus::TS_IN_PROGRESS;
+	case sdl::imtdesk::ImtDesk::TicketStatus::Resolved:
+		return imtdesk::ISupportTicket::TicketStatus::TS_RESOLVED;
+	case sdl::imtdesk::ImtDesk::TicketStatus::Closed:
+		return imtdesk::ISupportTicket::TicketStatus::TS_CLOSED;
+	}
+
+	return imtdesk::ISupportTicket::TicketStatus::TS_OPEN;
+}
+
+
+sdl::imtdesk::ImtDesk::TicketStatus GetSdlTypeFromStatusType(imtdesk::ISupportTicket::TicketStatus ticketStatus)
+{
+	switch (ticketStatus){
+	case imtdesk::ISupportTicket::TS_OPEN:
+		return sdl::imtdesk::ImtDesk::TicketStatus::Open;
+	case imtdesk::ISupportTicket::TS_IN_PROGRESS:
+		return sdl::imtdesk::ImtDesk::TicketStatus::InProgress;
+	case imtdesk::ISupportTicket::TS_RESOLVED:
+		return sdl::imtdesk::ImtDesk::TicketStatus::Resolved;
+	case imtdesk::ISupportTicket::TS_CLOSED:
+		return sdl::imtdesk::ImtDesk::TicketStatus::Closed;
+	}
+
+	return sdl::imtdesk::ImtDesk::TicketStatus::Open;
+}
+
+
+imtdesk::ISupportTicket::Environment GetEnvironmentTypeFromSdlType(sdl::imtdesk::ImtDesk::Environment sdlEnvironmentStatus)
+{
+	switch (sdlEnvironmentStatus){
+	case sdl::imtdesk::ImtDesk::Environment::Development:
+		return imtdesk::ISupportTicket::Environment::ENV_DEVELOPMENT;
+	case sdl::imtdesk::ImtDesk::Environment::Staging:
+		return imtdesk::ISupportTicket::Environment::ENV_STAGING;
+	case sdl::imtdesk::ImtDesk::Environment::Production:
+		return imtdesk::ISupportTicket::Environment::ENV_PRODUCTION;
+	}
+
+	return imtdesk::ISupportTicket::Environment::ENV_DEVELOPMENT;
+}
+
+
+sdl::imtdesk::ImtDesk::Environment GetSdlTypeFromEnvironmentType(imtdesk::ISupportTicket::Environment environment)
+{
+	switch (environment){
+	case imtdesk::ISupportTicket::ENV_DEVELOPMENT:
+		return sdl::imtdesk::ImtDesk::Environment::Development;
+	case imtdesk::ISupportTicket::ENV_STAGING:
+		return sdl::imtdesk::ImtDesk::Environment::Staging;
+	case imtdesk::ISupportTicket::ENV_PRODUCTION:
+		return sdl::imtdesk::ImtDesk::Environment::Production;
+	}
+
+	return sdl::imtdesk::ImtDesk::Environment::Development;
+}
+
+
+imtdesk::ISupportTicket::TicketPriority GetPriorityTypeFromSdlType(sdl::imtdesk::ImtDesk::TicketPriority sdlTicketPriority)
+{
+	switch (sdlTicketPriority){
+	case sdl::imtdesk::ImtDesk::TicketPriority::Low:
+		return imtdesk::ISupportTicket::TicketPriority::TP_LOW;
+	case sdl::imtdesk::ImtDesk::TicketPriority::Medium:
+		return imtdesk::ISupportTicket::TicketPriority::TP_MEDIUM;
+	case sdl::imtdesk::ImtDesk::TicketPriority::High:
+		return imtdesk::ISupportTicket::TicketPriority::TP_HIGH;
+	case sdl::imtdesk::ImtDesk::TicketPriority::Critical:
+		return imtdesk::ISupportTicket::TicketPriority::TP_CRITICAL;
+	}
+
+	return imtdesk::ISupportTicket::TicketPriority::TP_LOW;
+}
+
+
+sdl::imtdesk::ImtDesk::TicketPriority GetSdlTypeFromPriorityType(imtdesk::ISupportTicket::TicketPriority ticketPriority)
+{
+	switch (ticketPriority){
+	case imtdesk::ISupportTicket::TP_LOW:
+		return sdl::imtdesk::ImtDesk::TicketPriority::Low;
+	case imtdesk::ISupportTicket::TP_MEDIUM:
+		return sdl::imtdesk::ImtDesk::TicketPriority::Medium;
+	case imtdesk::ISupportTicket::TP_HIGH:
+		return sdl::imtdesk::ImtDesk::TicketPriority::High;
+	case imtdesk::ISupportTicket::TP_CRITICAL:
+		return sdl::imtdesk::ImtDesk::TicketPriority::Critical;
+	}
+
+	return sdl::imtdesk::ImtDesk::TicketPriority::Low;
+}
+
+
+} // namespace imtdeskgql
+
+

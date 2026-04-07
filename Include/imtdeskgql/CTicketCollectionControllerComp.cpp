@@ -41,8 +41,43 @@ bool CTicketCollectionControllerComp::CreateRepresentationFromObject(
 	Q_UNUSED(listRequest);
 
 	representationObject.id = objectId;
-	representationObject.typeId = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
+	representationObject.typeId = objectCollectionIterator.GetObjectTypeId();
 	representationObject.title = ticketPtr->GetTitle();
+
+	imtdesk::ISupportTicket::TicketStatus ticketStatus = ticketPtr->GetStatus();
+	switch (ticketStatus){
+	case imtdesk::ISupportTicket::TS_OPEN:
+		representationObject.status = sdl::imtdesk::ImtDesk::TicketStatus::Open;
+		break;
+	case imtdesk::ISupportTicket::TS_IN_PROGRESS:
+		representationObject.status = sdl::imtdesk::ImtDesk::TicketStatus::InProgress;
+		break;
+	case imtdesk::ISupportTicket::TS_RESOLVED:
+		representationObject.status = sdl::imtdesk::ImtDesk::TicketStatus::Resolved;
+		break;
+	case imtdesk::ISupportTicket::TS_CLOSED:
+		representationObject.status = sdl::imtdesk::ImtDesk::TicketStatus::Closed;
+		break;
+	default:
+		break;
+	}
+
+	imtdesk::ISupportTicket::TicketPriority ticketPriority = ticketPtr->GetPriority();
+	switch (ticketPriority){
+	case imtdesk::ISupportTicket::TP_LOW:
+		representationObject.priority = sdl::imtdesk::ImtDesk::TicketPriority::Low;
+		break;
+	case imtdesk::ISupportTicket::TP_MEDIUM:
+		representationObject.priority = sdl::imtdesk::ImtDesk::TicketPriority::Medium;
+		break;
+	case imtdesk::ISupportTicket::TP_HIGH:
+		representationObject.priority = sdl::imtdesk::ImtDesk::TicketPriority::High;
+		break;
+	case imtdesk::ISupportTicket::TP_CRITICAL:
+		representationObject.priority = sdl::imtdesk::ImtDesk::TicketPriority::Critical;
+		break;
+	}
+
 	representationObject.assigneeId = ticketPtr->GetAssigneeId();
 	representationObject.createdAt = ticketPtr->GetCreatedAt();
 

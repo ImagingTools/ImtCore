@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtdesk/ISupportTicket.h>
+#include <imtdeskgql/imtdeskgql.h>
 
 
 namespace imtdeskgql
@@ -60,6 +61,10 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 	response.Version_1_0->createdAt = ticketPtr->GetCreatedAt();
 	response.Version_1_0->updatedAt = ticketPtr->GetUpdatedAt();
 	response.Version_1_0->resolvedAt = ticketPtr->GetResolvedAt();
+	response.Version_1_0->ticketType = imtdeskgql::GetSdlTypeFromTicketType(ticketPtr->GetTicketType());
+	response.Version_1_0->priority = imtdeskgql::GetSdlTypeFromPriorityType(ticketPtr->GetPriority());
+	response.Version_1_0->status = imtdeskgql::GetSdlTypeFromStatusType(ticketPtr->GetStatus());
+	response.Version_1_0->environment = imtdeskgql::GetSdlTypeFromEnvironmentType(ticketPtr->GetEnvironment());
 
 	return response;
 }
@@ -141,6 +146,22 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 
 	if (ticketInfo.resolvedAt){
 		ticketPtr->SetResolvedAt(*ticketInfo.resolvedAt);
+	}
+
+	if (ticketInfo.ticketType){
+		ticketPtr->SetTicketType(imtdeskgql::GetTicketTypeFromSdlType(*ticketInfo.ticketType));
+	}
+
+	if (ticketInfo.status){
+		ticketPtr->SetStatus(imtdeskgql::GetStatusTypeFromSdlType(*ticketInfo.status));
+	}
+
+	if (ticketInfo.environment){
+		ticketPtr->SetEnvironment(imtdeskgql::GetEnvironmentTypeFromSdlType(*ticketInfo.environment));
+	}
+
+	if (ticketInfo.priority){
+		ticketPtr->SetPriority(imtdeskgql::GetPriorityTypeFromSdlType(*ticketInfo.priority));
 	}
 
 	m_documentManagerCompPtr->SetDocumentData(userId, documentId, *ticketPtr);
