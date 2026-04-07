@@ -2,11 +2,12 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QUuid>
-
 // ACF includes
 #include <iser/ISerializable.h>
+
+// ImtCore includes
+#include <imtbase/TIdentifiableWrap.h>
+#include <imtservice/CIncomingConnectionParam.h>
 
 
 namespace imtservice
@@ -20,33 +21,7 @@ namespace imtservice
 class IServiceConnectionParam: virtual public iser::ISerializable
 {
 public:
-	struct IncomingConnectionParam
-	{
-		QByteArray id;
-		QString host = "localhost";
-		QString description;
-		int wsPort = -1;
-		int httpPort = -1;
-
-		IncomingConnectionParam()
-		{
-			id = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
-		}
-
-		bool operator==(const IncomingConnectionParam& other) const
-		{
-			return	(host == other.host) &&
-					(description == other.description) &&
-					(wsPort == other.wsPort) &&
-					(httpPort == other.httpPort) &&
-					(id == other.id);
-		}
-
-		bool operator!=(const IncomingConnectionParam& other) const
-		{
-			return !operator==(other);
-		}
-	};
+	typedef imtbase::TIdentifiableWrap<CIncomingConnectionParam> IncomingConnectionParam;
 
 	typedef QList<IncomingConnectionParam> IncomingConnectionList;
 

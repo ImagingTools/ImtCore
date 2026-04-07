@@ -28,7 +28,16 @@ CUrlConnectionParam::CUrlConnectionParam()
 
 void CUrlConnectionParam::AddExternConnection(const imtservice::IServiceConnectionParam::IncomingConnectionParam& externConnection)
 {
-	if (!m_externConnectionList.contains(externConnection)){
+	const QByteArray uuid = externConnection.GetObjectUuid();
+	bool alreadyExists = false;
+	for (const IncomingConnectionParam& existing : m_externConnectionList){
+		if (existing.GetObjectUuid() == uuid){
+			alreadyExists = true;
+			break;
+		}
+	}
+
+	if (!alreadyExists){
 		istd::CChangeNotifier changeNotifier(this);
 
 		m_externConnectionList << externConnection;
@@ -73,30 +82,7 @@ bool CUrlConnectionParam::Serialize(iser::IArchive& archive)
 			elementInfo = m_externConnectionList[i];
 		}
 
-		iser::CArchiveTag idTag("Id", "Id", iser::CArchiveTag::TT_LEAF, &objectTag);
-		retVal = retVal && archive.BeginTag(idTag);
-		retVal = retVal && archive.Process(elementInfo.id);
-		retVal = retVal && archive.EndTag(idTag);
-
-		iser::CArchiveTag descriptionTag("Description", "Connection description", iser::CArchiveTag::TT_LEAF, &objectTag);
-		retVal = retVal && archive.BeginTag(descriptionTag);
-		retVal = retVal && archive.Process(elementInfo.description);
-		retVal = retVal && archive.EndTag(descriptionTag);
-
-		iser::CArchiveTag hostTag("Host", "Host", iser::CArchiveTag::TT_LEAF, &objectTag);
-		retVal = retVal && archive.BeginTag(hostTag);
-		retVal = retVal && archive.Process(elementInfo.host);
-		retVal = retVal && archive.EndTag(hostTag);
-
-		iser::CArchiveTag  wsPortTag("WsPort", "Web Socket Port", iser::CArchiveTag::TT_LEAF, &objectTag);
-		retVal = retVal && archive.BeginTag(wsPortTag);
-		retVal = retVal && archive.Process(elementInfo.wsPort);
-		retVal = retVal && archive.EndTag(wsPortTag);
-
-		iser::CArchiveTag  httpPortTag("HttpPort", "Http Socket Port", iser::CArchiveTag::TT_LEAF, &objectTag);
-		retVal = retVal && archive.BeginTag(httpPortTag);
-		retVal = retVal && archive.Process(elementInfo.httpPort);
-		retVal = retVal && archive.EndTag(httpPortTag);
+		retVal = retVal && elementInfo.Serialize(archive);
 
 		retVal = retVal && archive.EndTag(objectTag);
 
@@ -129,11 +115,7 @@ bool CUrlConnectionParam::CopyFrom(const IChangeable& object, CompatibilityMode 
 
 		for (const IncomingConnectionParam& connectionParam : sourcePtr->m_externConnectionList){
 			IncomingConnectionParam newParam;
-			newParam.description = connectionParam.description;
-			newParam.host = connectionParam.host;
-			newParam.wsPort = connectionParam.wsPort;
-			newParam.httpPort = connectionParam.httpPort;
-			newParam.id = connectionParam.id;
+			newParam.CopyFrom(connectionParam);
 
 			m_externConnectionList << newParam;
 		}
