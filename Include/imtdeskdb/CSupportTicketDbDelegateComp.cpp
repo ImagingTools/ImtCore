@@ -301,6 +301,18 @@ idoc::MetaInfoPtr CSupportTicketDbDelegateComp::CreateObjectMetaInfo(const QByte
 }
 
 
+QString CSupportTicketDbDelegateComp::GetBaseSelectionQuery() const
+{
+	if (!m_tableSchemaAttrPtr.IsValid()){
+		return QString("SELECT * FROM \"%1\" WHERE \"IsActive\" = true").arg(qPrintable(*m_tableNameAttrPtr));
+	}
+
+	return QString("SELECT * FROM %0.\"%1\" WHERE \"IsActive\" = true")
+				.arg(qPrintable(*m_tableSchemaAttrPtr))
+				.arg(qPrintable(*m_tableNameAttrPtr));
+}
+
+
 bool CSupportTicketDbDelegateComp::SetObjectMetaInfoFromRecord(
 		const QSqlRecord& record,
 		idoc::IDocumentMetaInfo& metaInfo) const

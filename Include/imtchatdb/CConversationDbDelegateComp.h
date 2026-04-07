@@ -60,6 +60,7 @@ public:
 
 protected:
 	// reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
+	virtual QString GetBaseSelectionQuery() const override;
 	virtual idoc::MetaInfoPtr CreateObjectMetaInfo(const QByteArray& typeId) const override;
 	virtual bool SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const override;
 

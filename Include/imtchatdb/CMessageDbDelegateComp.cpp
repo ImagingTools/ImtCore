@@ -263,6 +263,18 @@ idoc::MetaInfoPtr CMessageDbDelegateComp::CreateObjectMetaInfo(const QByteArray&
 }
 
 
+QString CMessageDbDelegateComp::GetBaseSelectionQuery() const
+{
+	if (!m_tableSchemaAttrPtr.IsValid()){
+		return QString("SELECT * FROM \"%1\" WHERE \"IsActive\" = true").arg(qPrintable(*m_tableNameAttrPtr));
+	}
+
+	return QString("SELECT * FROM %0.\"%1\" WHERE \"IsActive\" = true")
+				.arg(qPrintable(*m_tableSchemaAttrPtr))
+				.arg(qPrintable(*m_tableNameAttrPtr));
+}
+
+
 bool CMessageDbDelegateComp::SetObjectMetaInfoFromRecord(
 		const QSqlRecord& record,
 		idoc::IDocumentMetaInfo& metaInfo) const
