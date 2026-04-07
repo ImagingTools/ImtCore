@@ -39,7 +39,7 @@ namespace imtdeskgql
 {
 
 
-imtdesk::ISupportTicket::TicketType GetTicketTypeFromSdlType(sdl::imtdesk::ImtDesk::TicketType sdlTicketType)
+inline imtdesk::ISupportTicket::TicketType GetTicketTypeFromSdlType(sdl::imtdesk::ImtDesk::TicketType sdlTicketType)
 {
 	switch(sdlTicketType){
 	case sdl::imtdesk::ImtDesk::TicketType::AccessRequest:
@@ -56,7 +56,7 @@ imtdesk::ISupportTicket::TicketType GetTicketTypeFromSdlType(sdl::imtdesk::ImtDe
 }
 
 
-sdl::imtdesk::ImtDesk::TicketType GetSdlTypeFromTicketType(imtdesk::ISupportTicket::TicketType ticketType)
+inline sdl::imtdesk::ImtDesk::TicketType GetSdlTypeFromTicketType(imtdesk::ISupportTicket::TicketType ticketType)
 {
 	switch(ticketType){
 	case imtdesk::ISupportTicket::TT_ACCESS_REQUEST:
@@ -73,7 +73,7 @@ sdl::imtdesk::ImtDesk::TicketType GetSdlTypeFromTicketType(imtdesk::ISupportTick
 }
 
 
-imtdesk::ISupportTicket::TicketStatus GetStatusTypeFromSdlType(sdl::imtdesk::ImtDesk::TicketStatus sdlTicketStatus)
+inline imtdesk::ISupportTicket::TicketStatus GetStatusTypeFromSdlType(sdl::imtdesk::ImtDesk::TicketStatus sdlTicketStatus)
 {
 	switch(sdlTicketStatus){
 	case sdl::imtdesk::ImtDesk::TicketStatus::Open:
@@ -86,7 +86,7 @@ imtdesk::ISupportTicket::TicketStatus GetStatusTypeFromSdlType(sdl::imtdesk::Imt
 }
 
 
-sdl::imtdesk::ImtDesk::TicketStatus GetSdlTypeFromStatusType(imtdesk::ISupportTicket::TicketStatus ticketStatus)
+inline sdl::imtdesk::ImtDesk::TicketStatus GetSdlTypeFromStatusType(imtdesk::ISupportTicket::TicketStatus ticketStatus)
 {
 	switch (ticketStatus){
 	case imtdesk::ISupportTicket::TS_OPEN:
@@ -99,7 +99,7 @@ sdl::imtdesk::ImtDesk::TicketStatus GetSdlTypeFromStatusType(imtdesk::ISupportTi
 }
 
 
-imtdesk::ISupportTicket::StateReason GetStateReasonFromSdlType(sdl::imtdesk::ImtDesk::StateReason sdlStateReason)
+inline imtdesk::ISupportTicket::StateReason GetStateReasonFromSdlType(sdl::imtdesk::ImtDesk::StateReason sdlStateReason)
 {
 	switch(sdlStateReason){
 	case sdl::imtdesk::ImtDesk::StateReason::None:
@@ -116,7 +116,7 @@ imtdesk::ISupportTicket::StateReason GetStateReasonFromSdlType(sdl::imtdesk::Imt
 }
 
 
-sdl::imtdesk::ImtDesk::StateReason GetSdlTypeFromStateReason(imtdesk::ISupportTicket::StateReason stateReason)
+inline sdl::imtdesk::ImtDesk::StateReason GetSdlTypeFromStateReason(imtdesk::ISupportTicket::StateReason stateReason)
 {
 	switch (stateReason){
 	case imtdesk::ISupportTicket::SR_NONE:
@@ -133,7 +133,7 @@ sdl::imtdesk::ImtDesk::StateReason GetSdlTypeFromStateReason(imtdesk::ISupportTi
 }
 
 
-imtdesk::ISupportTicket::Environment GetEnvironmentTypeFromSdlType(sdl::imtdesk::ImtDesk::Environment sdlEnvironmentStatus)
+inline imtdesk::ISupportTicket::Environment GetEnvironmentTypeFromSdlType(sdl::imtdesk::ImtDesk::Environment sdlEnvironmentStatus)
 {
 	switch (sdlEnvironmentStatus){
 	case sdl::imtdesk::ImtDesk::Environment::Development:
@@ -148,7 +148,7 @@ imtdesk::ISupportTicket::Environment GetEnvironmentTypeFromSdlType(sdl::imtdesk:
 }
 
 
-sdl::imtdesk::ImtDesk::Environment GetSdlTypeFromEnvironmentType(imtdesk::ISupportTicket::Environment environment)
+inline sdl::imtdesk::ImtDesk::Environment GetSdlTypeFromEnvironmentType(imtdesk::ISupportTicket::Environment environment)
 {
 	switch (environment){
 	case imtdesk::ISupportTicket::ENV_DEVELOPMENT:
@@ -163,7 +163,7 @@ sdl::imtdesk::ImtDesk::Environment GetSdlTypeFromEnvironmentType(imtdesk::ISuppo
 }
 
 
-imtdesk::ISupportTicket::TicketPriority GetPriorityTypeFromSdlType(sdl::imtdesk::ImtDesk::TicketPriority sdlTicketPriority)
+inline imtdesk::ISupportTicket::TicketPriority GetPriorityTypeFromSdlType(sdl::imtdesk::ImtDesk::TicketPriority sdlTicketPriority)
 {
 	switch (sdlTicketPriority){
 	case sdl::imtdesk::ImtDesk::TicketPriority::Low:
@@ -180,7 +180,7 @@ imtdesk::ISupportTicket::TicketPriority GetPriorityTypeFromSdlType(sdl::imtdesk:
 }
 
 
-sdl::imtdesk::ImtDesk::TicketPriority GetSdlTypeFromPriorityType(imtdesk::ISupportTicket::TicketPriority ticketPriority)
+inline sdl::imtdesk::ImtDesk::TicketPriority GetSdlTypeFromPriorityType(imtdesk::ISupportTicket::TicketPriority ticketPriority)
 {
 	switch (ticketPriority){
 	case imtdesk::ISupportTicket::TP_LOW:
