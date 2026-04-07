@@ -11,6 +11,7 @@
 
 // ImtCore includes
 #include <imtbase/imtbase.h>
+#include <imtcore/Version.h>
 
 
 namespace imtservice
@@ -63,6 +64,9 @@ bool CUrlConnectionParam::Serialize(iser::IArchive& archive)
 
 	retVal = retVal && BaseClass::Serialize(archive);
 
+	quint32 imtCoreVersion = 0;
+	archive.GetVersionInfo().GetVersionNumber(imtcore::VI_IMTCORE, imtCoreVersion);
+
 	int objectCount = imtbase::narrow_cast<int>(m_externConnectionList.count());
 	if (!archive.IsStoring()){
 		objectCount = 0;
@@ -82,7 +86,44 @@ bool CUrlConnectionParam::Serialize(iser::IArchive& archive)
 			elementInfo = m_externConnectionList[i];
 		}
 
-		retVal = retVal && elementInfo.Serialize(archive);
+		if (archive.IsStoring() || imtCoreVersion >= 20000){
+			retVal = retVal && elementInfo.Serialize(archive);
+		} else {
+			// old format: plain struct with "Id", "Host", "WsPort", "HttpPort" tags
+			QByteArray id;
+			QString host;
+			int wsPort = -1;
+			int httpPort = -1;
+
+			iser::CArchiveTag idTag("Id", "Id", iser::CArchiveTag::TT_LEAF);
+			retVal = retVal && archive.BeginTag(idTag);
+			retVal = retVal && archive.Process(id);
+			retVal = retVal && archive.EndTag(idTag);
+
+			iser::CArchiveTag hostTag("Host", "Host", iser::CArchiveTag::TT_LEAF);
+			retVal = retVal && archive.BeginTag(hostTag);
+			retVal = retVal && archive.Process(host);
+			retVal = retVal && archive.EndTag(hostTag);
+
+			iser::CArchiveTag wsPortTag("WsPort", "WsPort", iser::CArchiveTag::TT_LEAF);
+			retVal = retVal && archive.BeginTag(wsPortTag);
+			retVal = retVal && archive.Process(wsPort);
+			retVal = retVal && archive.EndTag(wsPortTag);
+
+			iser::CArchiveTag httpPortTag("HttpPort", "HttpPort", iser::CArchiveTag::TT_LEAF);
+			retVal = retVal && archive.BeginTag(httpPortTag);
+			retVal = retVal && archive.Process(httpPort);
+			retVal = retVal && archive.EndTag(httpPortTag);
+
+			if (retVal){
+				elementInfo.SetObjectUuid(id);
+				elementInfo.SetHost(host);
+				elementInfo.RegisterProtocol(imtcom::IServerConnectionInterface::PT_WEBSOCKET);
+				elementInfo.SetPort(imtcom::IServerConnectionInterface::PT_WEBSOCKET, wsPort);
+				elementInfo.RegisterProtocol(imtcom::IServerConnectionInterface::PT_HTTP);
+				elementInfo.SetPort(imtcom::IServerConnectionInterface::PT_HTTP, httpPort);
+			}
+		}
 
 		retVal = retVal && archive.EndTag(objectTag);
 
