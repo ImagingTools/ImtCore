@@ -32,7 +32,7 @@ class CDocumentManagerBase:
 {
 public:
 	CDocumentManagerBase();
-	virtual ~CDocumentManagerBase();
+	~CDocumentManagerBase();
 
 	// reimplemented (imtdoc::IDocumentManager)
 	virtual DocumentList GetOpenedDocumentList(const QByteArray& userId) const override;
@@ -53,35 +53,40 @@ public:
 		const QByteArray& userId, const QByteArray& documentId, idoc::IUndoManager*& undoManagerPtr) const override;
 	virtual OperationStatus RegisterDocumentObserver(const QByteArray& userId, const QByteArray& documentId, imod::IObserver& observer) override;
 	virtual OperationStatus UnregisterDocumentObserver(const QByteArray& userId, const QByteArray& documentId, imod::IObserver& observer) override;
+
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
-
-	// reimplemented (imod::CMultiModelObserverBase)
-	virtual void OnUpdate(imod::IModel* modelPtr, const istd::IChangeable::ChangeSet& changeSet) override;
 
 protected:
 	struct WorkingDocument;
 
 	bool ValidateInputParams(const QByteArray& userId, const QByteArray& documentId, OperationStatus& status) const;
+	int GetUndoManagerNextModelId(const QByteArray& userId);
+	void InitializeDocumentObservers(WorkingDocument& document, const QByteArray& userId);
+	WorkingDocument* FindDocument(const QByteArray& userId, const QByteArray& documentId);
+	const WorkingDocument* FindDocument(const QByteArray& userId, const QByteArray& documentId) const;
+	bool FindDocument(int undoManagerModelId, QByteArray& outUserId, QByteArray& outDocumentId);
+	QUrl ObjectIdToUrl(const QByteArray& objectId);
+	DocumentNotificationPtr CreateDocumentNotification(const QByteArray& userId, const QByteArray& documentId) const;
+
+	void OnDocumentDataLoaded(const QByteArray& userId, const QByteArray& documentId);
+	void OnUndoManagerChanged(int modelId);
+
 	virtual QString GetDefaultDocumentName(const WorkingDocument& document) const;
 	virtual bool HasDocumentNameProvider(const QByteArray& typeId) const;
 	virtual bool ValidateDocumentData(
 		const WorkingDocument& document,
 		OperationStatus& status,
 		QString* errorMessage = nullptr) const;
-	static QString GetInvalidDocumentMessage();
-	void OnUndoManagerChanged(int modelId);
-	int GetUndoManagerNextModelId(const QByteArray& userId);
-	WorkingDocument* FindDocument(const QByteArray& userId, const QByteArray& documentId);
-	const WorkingDocument* FindDocument(const QByteArray& userId, const QByteArray& documentId) const;
-	bool FindDocument(int undoManagerModelId, QByteArray& outUserId, QByteArray& outDocumentId);
-	void InitializeDocumentObservers(WorkingDocument& document, const QByteArray& userId);
-	void OnDocumentDataLoaded(const QByteArray& userId, const QByteArray& documentId);
-	QUrl ObjectIdToUrl(const QByteArray& objectId);
-
 	virtual QList<imtdoc::IDocumentManagerEventHandler*> GetDocumentManagerEventHandlers() const;
-	virtual istd::IChangeableSharedPtr CreateObject(const QByteArray& typeId) const = 0;
-	virtual idoc::IUndoManagerSharedPtr CreateUndoManager() const = 0;
+
+	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId) const = 0;
+	virtual idoc::IUndoManagerUniquePtr CreateUndoManager() const = 0;
+
+	static QString GetInvalidDocumentMessage();
+
+	// reimplemented (imod::CMultiModelObserverBase)
+	virtual void OnUpdate(imod::IModel* modelPtr, const istd::IChangeable::ChangeSet& changeSet) override;
 
 protected:
 	struct WorkingDocument
@@ -115,9 +120,6 @@ protected:
 
 	UndoManagerObserver m_undoManagerObserver;
 	std::shared_ptr<std::atomic<bool>> m_isAlive;
-
-protected:
-	DocumentNotificationPtr CreateDocumentNotification(const QByteArray& userId, const QByteArray& documentId) const;
 };
 
 
