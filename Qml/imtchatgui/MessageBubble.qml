@@ -17,8 +17,10 @@ Item {
 	property int status: 0  // 0=Sent, 1=Delivered, 2=Read
 	property bool isOwn: false
 	property bool hasEntityRefs: false
+	property var reactions: []
 
 	signal createTicketRequested(string messageId, string content)
+	signal reactionAdded(string messageId, string reaction)
 
 	width: parent ? parent.width : 0
 	height: bubbleColumn.height + Style.paddingS * 2
@@ -61,6 +63,31 @@ Item {
 				font.pixelSize: Style.fontSizeS
 				color: messageBubbleRoot.isOwn ? "white" : Style.textPrimaryColor
 				wrapMode: Text.Wrap
+			}
+		}
+
+		// Reactions row (like GitHub comment reactions: 👍 👎 ❤️ 🚀 etc.)
+		Row {
+			visible: messageBubbleRoot.reactions.length > 0
+			spacing: Style.paddingXS
+
+			Repeater {
+				model: messageBubbleRoot.reactions
+
+				Rectangle {
+					height: 24
+					width: reactionText.width + Style.paddingS * 2
+					radius: height / 2
+					color: Style.surfaceColor
+					border.color: Style.separatorColor
+
+					Text {
+						id: reactionText
+						anchors.centerIn: parent
+						text: modelData
+						font.pixelSize: Style.fontSizeXS
+					}
+				}
 			}
 		}
 

@@ -47,6 +47,9 @@ ViewBase {
 		}
 
 		conversationIdInput.text = ticketData.m_conversationId || ""
+		milestoneIdInput.text = ticketData.m_milestoneId || ""
+		lockReasonInput.text = ticketData.m_lockReason || ""
+		lockedCB.checked = ticketData.m_locked || false
 
 		ticketTypeCB.currentIndex = -1
 		if (ticketTypeCB.model){
@@ -74,6 +77,20 @@ ViewBase {
 		}
 		if (statusCB.currentIndex < 0){
 			statusCB.currentIndex = 0
+		}
+
+		stateReasonCB.currentIndex = -1
+		if (stateReasonCB.model){
+			for (let i = 0; i < stateReasonCB.model.getItemsCount(); i++){
+				let reasonId = stateReasonCB.model.getData("id", i)
+				if (ticketData.m_stateReason === reasonId){
+					stateReasonCB.currentIndex = i
+					break
+				}
+			}
+		}
+		if (stateReasonCB.currentIndex < 0){
+			stateReasonCB.currentIndex = 0
 		}
 
 		priorityCB.currentIndex = -1
@@ -124,6 +141,9 @@ ViewBase {
 		}
 
 		ticketData.m_conversationId = conversationIdInput.text
+		ticketData.m_milestoneId = milestoneIdInput.text
+		ticketData.m_locked = lockedCB.checked
+		ticketData.m_lockReason = lockReasonInput.text
 
 		if (ticketTypeCB.model && ticketTypeCB.currentIndex >= 0){
 			ticketData.m_ticketType = ticketTypeCB.model.getData("id", ticketTypeCB.currentIndex)
@@ -131,6 +151,10 @@ ViewBase {
 
 		if (statusCB.model && statusCB.currentIndex >= 0){
 			ticketData.m_status = statusCB.model.getData("id", statusCB.currentIndex)
+		}
+
+		if (stateReasonCB.model && stateReasonCB.currentIndex >= 0){
+			ticketData.m_stateReason = stateReasonCB.model.getData("id", stateReasonCB.currentIndex)
 		}
 
 		if (priorityCB.model && priorityCB.currentIndex >= 0){
@@ -253,21 +277,42 @@ ViewBase {
 							let index = insertNewItem()
 							setData("id", "Open", index)
 							setData("name", "Open", index)
-	
-							index = insertNewItem()
-							setData("id", "InProgress", index)
-							setData("name", "In Progress", index)
-	
-							index = insertNewItem()
-							setData("id", "Resolved", index)
-							setData("name", "Resolved", index)
-	
+
 							index = insertNewItem()
 							setData("id", "Closed", index)
 							setData("name", "Closed", index)
 						}
 					}
 	
+					onCurrentIndexChanged: {
+						root.doUpdateModel()
+					}
+				}
+
+				ComboBoxElementView {
+					id: stateReasonCB
+					name: qsTr("State Reason")
+					currentIndex: 0
+					model: TreeItemModel {
+						Component.onCompleted: {
+							let index = insertNewItem()
+							setData("id", "None", index)
+							setData("name", "None", index)
+
+							index = insertNewItem()
+							setData("id", "Completed", index)
+							setData("name", "Completed", index)
+
+							index = insertNewItem()
+							setData("id", "NotPlanned", index)
+							setData("name", "Not Planned", index)
+
+							index = insertNewItem()
+							setData("id", "Reopened", index)
+							setData("name", "Reopened", index)
+						}
+					}
+
 					onCurrentIndexChanged: {
 						root.doUpdateModel()
 					}
@@ -343,7 +388,7 @@ ViewBase {
 
 				ComboBoxElementView {
 					id: assigneeIdInput
-					name: qsTr("Assignee ID")
+					name: qsTr("Assignee")
 					onCurrentIndexChanged: {
 						root.doUpdateModel()
 					}
@@ -351,8 +396,19 @@ ViewBase {
 
 				ComboBoxElementView {
 					id: reporterIdInput
-					name: qsTr("Reporter ID")
+					name: qsTr("Reporter")
 					onCurrentIndexChanged: {
+						root.doUpdateModel()
+					}
+				}
+
+				TextInputElementView {
+					id: milestoneIdInput
+
+					name: qsTr("Milestone ID")
+					placeHolderText: qsTr("Milestone to track progress")
+
+					onEditingFinished: {
 						root.doUpdateModel()
 					}
 				}
@@ -361,8 +417,28 @@ ViewBase {
 					id: conversationIdInput
 	
 					name: qsTr("Linked Conversation")
-					placeHolderText: qsTr("Conversation ID (links to Conversations page)")
+					placeHolderText: qsTr("Conversation ID (links to Conversations tab)")
 	
+					onEditingFinished: {
+						root.doUpdateModel()
+					}
+				}
+
+				CheckBoxElementView {
+					id: lockedCB
+					name: qsTr("Locked")
+					onCheckedChanged: {
+						root.doUpdateModel()
+					}
+				}
+
+				TextInputElementView {
+					id: lockReasonInput
+
+					name: qsTr("Lock Reason")
+					placeHolderText: qsTr("Reason for locking this ticket")
+					visible: lockedCB.checked
+
 					onEditingFinished: {
 						root.doUpdateModel()
 					}

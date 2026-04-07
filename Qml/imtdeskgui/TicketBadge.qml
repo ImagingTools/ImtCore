@@ -9,24 +9,48 @@ Rectangle {
 	id: ticketBadgeRoot
 	objectName: "TicketBadge"
 
-	// badgeType: "status" | "priority"
+	// badgeType: "status" | "priority" | "stateReason" | "label"
 	property string badgeType: "status"
-	// value: integer matching TicketStatus or TicketPriority enum
+	// value: integer matching TicketStatus, TicketPriority, or StateReason enum
 	property int value: 0
+	// labelColor: hex color for label badges
+	property string labelColor: ""
+	// labelName: text for label badges
+	property string labelName: ""
 
-	readonly property var badgeColors: badgeType === "priority"
-		? ["#4CAF50", "#FF9800", "#F44336", "#9C27B0"]
-		: ["#2196F3", "#FF9800", "#4CAF50", "#9E9E9E"]
+	readonly property color badgeColor: {
+		if (badgeType === "label" && labelColor.length > 0) {
+			return labelColor
+		}
+		if (badgeType === "priority") {
+			let colors = ["#4CAF50", "#FF9800", "#F44336", "#9C27B0"]
+			return (value >= 0 && value < colors.length) ? colors[value] : Style.textSecondaryColor
+		}
+		if (badgeType === "stateReason") {
+			let colors = ["#9E9E9E", "#8957e5", "#9E9E9E", "#2196F3"]
+			return (value >= 0 && value < colors.length) ? colors[value] : Style.textSecondaryColor
+		}
+		// status: Open = green (#1a7f37), Closed = purple (#8957e5)
+		let colors = ["#1a7f37", "#8957e5"]
+		return (value >= 0 && value < colors.length) ? colors[value] : Style.textSecondaryColor
+	}
 
-	readonly property var badgeLabels: badgeType === "priority"
-		? [qsTr("Low"), qsTr("Med"), qsTr("High"), qsTr("Crit")]
-		: [qsTr("Open"), qsTr("Active"), qsTr("Done"), qsTr("Closed")]
-
-	readonly property color badgeColor: (value >= 0 && value < badgeColors.length)
-		? badgeColors[value] : Style.textSecondaryColor
-
-	readonly property string badgeLabel: (value >= 0 && value < badgeLabels.length)
-		? badgeLabels[value] : "?"
+	readonly property string badgeLabel: {
+		if (badgeType === "label") {
+			return labelName
+		}
+		if (badgeType === "priority") {
+			let labels = [qsTr("Low"), qsTr("Medium"), qsTr("High"), qsTr("Critical")]
+			return (value >= 0 && value < labels.length) ? labels[value] : "?"
+		}
+		if (badgeType === "stateReason") {
+			let labels = ["", qsTr("Completed"), qsTr("Not planned"), qsTr("Reopened")]
+			return (value >= 0 && value < labels.length) ? labels[value] : ""
+		}
+		// status: Open / Closed
+		let labels = [qsTr("Open"), qsTr("Closed")]
+		return (value >= 0 && value < labels.length) ? labels[value] : "?"
+	}
 
 	width: Style.badgeWidthS
 	height: Style.badgeHeight
