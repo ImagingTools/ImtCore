@@ -4,7 +4,6 @@
 // Qt includes
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonValue>
-#include <QtCore/QUuid>
 
 
 namespace imtservice
@@ -92,7 +91,6 @@ bool CUrlConnectionParamRepresentationController::GetRepresentationFromDataModel
 	for (const IServiceConnectionParam::IncomingConnectionParam& incomingConnection : incomingConnections){
 		QJsonObject itemObj;
 		itemObj.insert(QStringLiteral("Id"), QString::fromUtf8(incomingConnection.GetObjectUuid()));
-		itemObj.insert(QStringLiteral("Description"), incomingConnection.GetDescription());
 		externPortsArray.append(itemObj);
 	}
 	representation.insert(QStringLiteral("ExternPorts"), externPortsArray);
@@ -136,14 +134,6 @@ bool CUrlConnectionParamRepresentationController::GetDataModelFromRepresentation
 
 			if (itemObj.contains(QStringLiteral("Id"))){
 				incomingConnection.SetObjectUuid(itemObj.value(QStringLiteral("Id")).toVariant().toByteArray());
-			}
-
-			if (incomingConnection.GetObjectUuid().isEmpty()){
-				incomingConnection.SetObjectUuid(QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8());
-			}
-
-			if (itemObj.contains(QStringLiteral("Description"))){
-				incomingConnection.SetDescription(itemObj.value(QStringLiteral("Description")).toString());
 			}
 
 			urlConnectionParamPtr->AddExternConnection(incomingConnection);

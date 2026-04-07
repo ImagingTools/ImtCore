@@ -7,7 +7,7 @@
 
 // ImtCore includes
 #include <imtbase/TIdentifiableWrap.h>
-#include <imtservice/CIncomingConnectionParam.h>
+#include <imtcom/CServerConnectionInterfaceParam.h>
 
 
 namespace imtservice
@@ -21,7 +21,7 @@ namespace imtservice
 class IServiceConnectionParam: virtual public iser::ISerializable
 {
 public:
-	typedef imtbase::TIdentifiableWrap<CIncomingConnectionParam> IncomingConnectionParam;
+	typedef imtbase::TIdentifiableWrap<imtcom::CServerConnectionInterfaceParam> IncomingConnectionParam;
 
 	typedef QList<IncomingConnectionParam> IncomingConnectionList;
 
