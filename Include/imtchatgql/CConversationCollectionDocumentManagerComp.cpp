@@ -118,7 +118,7 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CConversationC
 		convPtr->SetUpdatedAt(*convInfo.updatedAt);
 	}
 
-	m_documentManagerCompPtr->SetDocumentData("", documentId, *convPtr);
+	m_documentManagerCompPtr->SetDocumentData(userId, documentId, *convPtr);
 
 	response.Version_1_0->status = sdl::imtbase::CollectionDocumentManager::EDocumentOperationStatus::Success;
 

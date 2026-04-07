@@ -12,6 +12,7 @@
         <Element ComponentName="Conversation" X="800" Y="725" Note=""/>
         <Element ComponentName="ConversationController" X="275" Y="300" Note=""/>
         <Element ComponentName="Demultiplexer" X="575" Y="125" Note=""/>
+        <Element ComponentName="SubscriberController" X="600" Y="300" Note=""/>
         <Element ComponentName="Ticket" X="325" Y="725" Note=""/>
         <Element ComponentName="TicketController" X="900" Y="300" Note=""/>
     </PositionMap>

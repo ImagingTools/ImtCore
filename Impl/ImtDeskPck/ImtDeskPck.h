@@ -2,6 +2,9 @@
 #pragma once
 
 
+// ACF includes
+#include <icomp/TModelCompWrap.h>
+
 // ImtCore includes
 #include <imtdesk/CSupportTicketComp.h>
 
@@ -13,7 +16,9 @@ namespace ImtDeskPck
 {
 
 
-typedef imtdesk::CSupportTicketComp SupportTicket;
+typedef icomp::TModelCompWrap<imtdesk::CSupportTicketComp> SupportTicket;
 
 
 } // namespace ImtDeskPck
+
+

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtchat/CConversationComp.h>
 
+
 // ACF includes
 #include <istd/CChangeNotifier.h>
 #include <iser/IArchive.h>
@@ -185,6 +186,7 @@ bool CConversationComp::CopyFrom(const IChangeable& object, CompatibilityMode /*
 	m_createdAt = srcPtr->GetCreatedAt();
 	m_updatedAt = srcPtr->GetUpdatedAt();
 	m_metadata = srcPtr->GetMetadata();
+
 	return true;
 }
 
@@ -209,8 +211,11 @@ bool CConversationComp::IsEqual(const IChangeable& object) const
 istd::IChangeableUniquePtr CConversationComp::CloneMe(CompatibilityMode mode) const
 {
 	istd::TUniqueInterfacePtr<CConversationComp> clonePtr(new CConversationComp());
-	clonePtr->CopyFrom(*this, mode);
-	return clonePtr;
+	if (clonePtr->CopyFrom(*this, mode)){
+		return clonePtr;
+	}
+
+	return nullptr;
 }
 
 
@@ -225,8 +230,11 @@ bool CConversationComp::ResetData(CompatibilityMode /*mode*/)
 	m_createdAt.clear();
 	m_updatedAt.clear();
 	m_metadata.clear();
+
 	return true;
 }
 
 
 } // namespace imtchat
+
+

@@ -2,6 +2,9 @@
 #pragma once
 
 
+// ACF includes
+#include <icomp/TModelCompWrap.h>
+
 // ImtCore includes
 #include <imtchat/CChatMessageComp.h>
 #include <imtchat/CConversationComp.h>
@@ -15,9 +18,11 @@ namespace ImtChatPck
 {
 
 
-typedef imtchat::CChatMessageComp ChatMessage;
-typedef imtchat::CConversationComp Conversation;
+typedef icomp::TModelCompWrap<imtchat::CChatMessageComp> ChatMessage;
+typedef icomp::TModelCompWrap<imtchat::CConversationComp> Conversation;
 typedef imtchat::CChatServiceComp ChatService;
 
 
 } // namespace ImtChatPck
+
+

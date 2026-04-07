@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
+
 // ACF includes
 #include <icomp/CComponentBase.h>
 #include <istd/IChangeable.h>
@@ -14,8 +15,8 @@ namespace imtchat
 
 
 class CConversationComp:
-		public icomp::CComponentBase,
-		virtual public IConversation
+			public icomp::CComponentBase,
+			virtual public IConversation
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
@@ -61,4 +62,7 @@ private:
 	QString m_metadata;
 };
 
+
 } // namespace imtchat
+
+

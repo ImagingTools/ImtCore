@@ -9,8 +9,7 @@ import imtdocgui 1.0
 import imtcolgui 1.0
 import imtdeskImtDeskSdl 1.0
 import imtdeskTicketCollectionDocumentManagerSdl 1.0
-import imtbaseCollectionDocumentManagerSdl 1.0
-import imtbaseUndoManagerSdl 1.0
+import imtauthUsersSdl 1.0
 
 ViewBase {
 	id: root
@@ -22,8 +21,29 @@ ViewBase {
 	function updateGui(){
 		titleInput.text = ticketData.m_title
 		descriptionInput.text = ticketData.m_description || ""
-		assigneeIdInput.text = ticketData.m_assigneeId || ""
-		reporterIdInput.text = ticketData.m_reporterId || ""
+
+		assigneeIdInput.currentIndex = -1
+		if (assigneeIdInput.model){
+			for (let i = 0; i < assigneeIdInput.model.getItemsCount(); i++){
+				let userId = assigneeIdInput.model.getData("id", i)
+				if (ticketData.m_assigneeId === userId){
+					assigneeIdInput.currentIndex = i
+					break
+				}
+			}
+		}
+
+		reporterIdInput.currentIndex = -1
+		if (reporterIdInput.model){
+			for (let i = 0; i < reporterIdInput.model.getItemsCount(); i++){
+				let userId = reporterIdInput.model.getData("id", i)
+				if (ticketData.m_reporterId === userId){
+					reporterIdInput.currentIndex = i
+					break
+				}
+			}
+		}
+
 		conversationIdInput.text = ticketData.m_conversationId || ""
 
 		ticketTypeCB.currentIndex = -1
@@ -86,8 +106,21 @@ ViewBase {
 	function updateModel(){
 		ticketData.m_title = titleInput.text
 		ticketData.m_description = descriptionInput.text
-		ticketData.m_assigneeId = assigneeIdInput.text
-		ticketData.m_reporterId = reporterIdInput.text
+
+		if (assigneeIdInput.model && assigneeIdInput.currentIndex >= 0){
+			ticketData.m_assigneeId = assigneeIdInput.model.getData("id", assigneeIdInput.currentIndex)
+		}
+		else{
+			ticketData.m_assigneeId = ""
+		}
+
+		if (reporterIdInput.model && reporterIdInput.currentIndex >= 0){
+			ticketData.m_reporterId = reporterIdInput.model.getData("id", reporterIdInput.currentIndex)
+		}
+		else{
+			ticketData.m_reporterId = ""
+		}
+
 		ticketData.m_conversationId = conversationIdInput.text
 
 		if (ticketTypeCB.model && ticketTypeCB.currentIndex >= 0){
@@ -286,34 +319,42 @@ ViewBase {
 							setData("name", "Production", index)
 						}
 					}
-	
+
 					onCurrentIndexChanged: {
 						root.doUpdateModel()
 					}
 				}
 	
-				TextInputElementView {
+				CollectionDataProvider {
+					id: userCollectionProvider
+					commandId: ImtauthUsersSdlCommandIds.s_usersList
+					fields: [UserDataInputTypeMetaInfo.s_id,UserDataInputTypeMetaInfo.s_typeId, UserDataInputTypeMetaInfo.s_name]
+					onCollectionModelChanged: {
+						assigneeIdInput.model = collectionModel
+						reporterIdInput.model = collectionModel
+						root.doUpdateGui()
+					}
+					Component.onCompleted: {
+						updateModel()
+					}
+				}
+
+				ComboBoxElementView {
 					id: assigneeIdInput
-	
 					name: qsTr("Assignee ID")
-					placeHolderText: qsTr("Enter assignee user ID")
-	
-					onEditingFinished: {
+					onCurrentIndexChanged: {
 						root.doUpdateModel()
 					}
 				}
-	
-				TextInputElementView {
+
+				ComboBoxElementView {
 					id: reporterIdInput
-	
 					name: qsTr("Reporter ID")
-					placeHolderText: qsTr("Enter reporter user ID")
-	
-					onEditingFinished: {
+					onCurrentIndexChanged: {
 						root.doUpdateModel()
 					}
 				}
-	
+
 				TextInputElementView {
 					id: conversationIdInput
 	

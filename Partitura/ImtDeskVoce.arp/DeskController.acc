@@ -123,6 +123,26 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="SubscriberController" PackageId="ImtServerGqlPck" ComponentId="SlaveSubscriberController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SubscriberController" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>ConversationController</Value>
+                                <Value>TicketController</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="Ticket" PackageId="ImtCoreVoce" ComponentId="Command">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -190,9 +210,7 @@
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="Demultiplexer"/>
+        <Interface InterfaceId="imtgql::IGqlSubscriberController" ComponentId="SubscriberController"/>
     </ExportedInterfaces>
-    <ExportedComponents>
-        <Component ExportedId="ConversationPublisher" ComponentId="ConversationController/CollectionDocumentManagerPublisher"/>
-        <Component ExportedId="TicketPublisher" ComponentId="TicketController/CollectionDocumentManagerPublisher"/>
-    </ExportedComponents>
+    <ExportedComponents/>
 </Acf>

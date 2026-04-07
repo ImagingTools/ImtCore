@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtdesk/CSupportTicketComp.h>
 
+
 // ACF includes
 #include <istd/CChangeNotifier.h>
 #include <iser/IArchive.h>
@@ -364,6 +365,7 @@ bool CSupportTicketComp::CopyFrom(const IChangeable& object, CompatibilityMode /
 	m_createdAt = srcPtr->GetCreatedAt();
 	m_updatedAt = srcPtr->GetUpdatedAt();
 	m_resolvedAt = srcPtr->GetResolvedAt();
+
 	return true;
 }
 
@@ -396,8 +398,11 @@ bool CSupportTicketComp::IsEqual(const IChangeable& object) const
 istd::IChangeableUniquePtr CSupportTicketComp::CloneMe(CompatibilityMode mode) const
 {
 	istd::TUniqueInterfacePtr<CSupportTicketComp> clonePtr(new CSupportTicketComp());
-	clonePtr->CopyFrom(*this, mode);
-	return clonePtr;
+	if (clonePtr->CopyFrom(*this, mode)){
+		return clonePtr;
+	}
+
+	return nullptr;
 }
 
 
@@ -420,6 +425,7 @@ bool CSupportTicketComp::ResetData(CompatibilityMode /*mode*/)
 	m_createdAt.clear();
 	m_updatedAt.clear();
 	m_resolvedAt.clear();
+
 	return true;
 }
 

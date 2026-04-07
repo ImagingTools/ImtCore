@@ -143,7 +143,7 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 		ticketPtr->SetResolvedAt(*ticketInfo.resolvedAt);
 	}
 
-	m_documentManagerCompPtr->SetDocumentData("", documentId, *ticketPtr);
+	m_documentManagerCompPtr->SetDocumentData(userId, documentId, *ticketPtr);
 
 	response.Version_1_0->status = sdl::imtbase::CollectionDocumentManager::EDocumentOperationStatus::Success;
 

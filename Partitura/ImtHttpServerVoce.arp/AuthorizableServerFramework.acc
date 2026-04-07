@@ -238,8 +238,7 @@
                                 <Value>SlaveSubscriberController</Value>
                                 <Value>PumaClientEngine</Value>
                                 <Value>UserActionController/UserActionCollectionChangeNotifier</Value>
-                                <Value>DeskController/TicketPublisher</Value>
-                                <Value>DeskController/ConversationPublisher</Value>
+                                <Value>DeskController</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
