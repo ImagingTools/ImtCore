@@ -87,11 +87,11 @@ bool CUrlConnectionParamRepresentationController::GetRepresentationFromDataModel
 	}
 
 	QJsonArray externPortsArray;
-	QList<IServiceConnectionParam::IncomingConnectionParam> incomingConnections = urlConnectionParamPtr->GetIncomingConnections();
-	for (const IServiceConnectionParam::IncomingConnectionParam& incomingConnection : incomingConnections){
+	QList<QSharedPointer<IServiceConnectionParam::IncomingConnectionParam>> incomingConnections = urlConnectionParamPtr->GetIncomingConnections();
+	for (const QSharedPointer<IServiceConnectionParam::IncomingConnectionParam>& incomingConnectionPtr : incomingConnections){
 		QJsonObject itemObj;
-		itemObj.insert(QStringLiteral("Id"), QString::fromUtf8(incomingConnection.id));
-		itemObj.insert(QStringLiteral("Description"), incomingConnection.description);
+		itemObj.insert(QStringLiteral("Id"), QString::fromUtf8(incomingConnectionPtr->id));
+		itemObj.insert(QStringLiteral("Description"), incomingConnectionPtr->description);
 		externPortsArray.append(itemObj);
 	}
 	representation.insert(QStringLiteral("ExternPorts"), externPortsArray);

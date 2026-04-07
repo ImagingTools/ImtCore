@@ -3,6 +3,7 @@
 
 
 // Qt includes
+#include <QtCore/QSharedPointer>
 #include <QtCore/QUuid>
 
 // ACF includes
@@ -48,9 +49,9 @@ public:
 		}
 	};
 
-	typedef QList<IncomingConnectionParam> IncomingConnectionList;
+	typedef QList<QSharedPointer<IncomingConnectionParam>> IncomingConnectionList;
 
-	virtual QList<IncomingConnectionParam> GetIncomingConnections() const = 0;
+	virtual QList<QSharedPointer<IncomingConnectionParam>> GetIncomingConnections() const = 0;
 };
 
 

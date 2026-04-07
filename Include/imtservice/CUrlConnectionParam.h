@@ -23,7 +23,7 @@ public:
 	void AddExternConnection(const imtservice::IServiceConnectionParam::IncomingConnectionParam& externConnection);
 
 	// reimplemented (imtservice::IServiceConnectionParam)
-	virtual QList<IncomingConnectionParam> GetIncomingConnections() const override;
+	virtual QList<QSharedPointer<IncomingConnectionParam>> GetIncomingConnections() const override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -34,7 +34,7 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
-	QList<IncomingConnectionParam> m_externConnectionList;
+	QList<QSharedPointer<IncomingConnectionParam>> m_externConnectionList;
 };
 
 

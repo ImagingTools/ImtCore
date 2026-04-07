@@ -28,17 +28,24 @@ CUrlConnectionParam::CUrlConnectionParam()
 
 void CUrlConnectionParam::AddExternConnection(const imtservice::IServiceConnectionParam::IncomingConnectionParam& externConnection)
 {
-	if (!m_externConnectionList.contains(externConnection)){
+	bool alreadyExists = false;
+	for (const QSharedPointer<IncomingConnectionParam>& ptr : m_externConnectionList) {
+		if (ptr && *ptr == externConnection) {
+			alreadyExists = true;
+			break;
+		}
+	}
+	if (!alreadyExists){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_externConnectionList << externConnection;
+		m_externConnectionList << QSharedPointer<IncomingConnectionParam>::create(externConnection);
 	}
 }
 
 
 // reimplemented (imtservice::IServiceConnectionParam)
 
-QList<imtservice::IServiceConnectionParam::IncomingConnectionParam> CUrlConnectionParam::GetIncomingConnections() const
+QList<QSharedPointer<imtservice::IServiceConnectionParam::IncomingConnectionParam>> CUrlConnectionParam::GetIncomingConnections() const
 {
 	return m_externConnectionList;
 }
@@ -70,7 +77,7 @@ bool CUrlConnectionParam::Serialize(iser::IArchive& archive)
 
 		IncomingConnectionParam elementInfo;
 		if (archive.IsStoring()){
-			elementInfo = m_externConnectionList[i];
+			elementInfo = *m_externConnectionList[i];
 		}
 
 		iser::CArchiveTag idTag("Id", "Id", iser::CArchiveTag::TT_LEAF, &objectTag);
@@ -101,7 +108,7 @@ bool CUrlConnectionParam::Serialize(iser::IArchive& archive)
 		retVal = retVal && archive.EndTag(objectTag);
 
 		if (retVal && !archive.IsStoring()){
-			m_externConnectionList.append(elementInfo);
+			m_externConnectionList.append(QSharedPointer<IncomingConnectionParam>::create(elementInfo));
 		}
 	}
 
@@ -127,13 +134,13 @@ bool CUrlConnectionParam::CopyFrom(const IChangeable& object, CompatibilityMode 
 
 		m_externConnectionList.clear();
 
-		for (const IncomingConnectionParam& connectionParam : sourcePtr->m_externConnectionList){
-			IncomingConnectionParam newParam;
-			newParam.description = connectionParam.description;
-			newParam.host = connectionParam.host;
-			newParam.wsPort = connectionParam.wsPort;
-			newParam.httpPort = connectionParam.httpPort;
-			newParam.id = connectionParam.id;
+		for (const QSharedPointer<IncomingConnectionParam>& connectionParamPtr : sourcePtr->m_externConnectionList){
+			QSharedPointer<IncomingConnectionParam> newParam = QSharedPointer<IncomingConnectionParam>::create();
+			newParam->description = connectionParamPtr->description;
+			newParam->host = connectionParamPtr->host;
+			newParam->wsPort = connectionParamPtr->wsPort;
+			newParam->httpPort = connectionParamPtr->httpPort;
+			newParam->id = connectionParamPtr->id;
 
 			m_externConnectionList << newParam;
 		}
