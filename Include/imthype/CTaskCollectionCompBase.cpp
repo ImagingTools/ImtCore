@@ -10,7 +10,6 @@
 #include <imtbase/imtbase.h>
 #include <imtbase/MetaTypes.h>
 #include <imthype/ITaskCollectionContext.h>
-#include <imthype/CTaskCollectionCompBase.h>
 #include <imthype/CTaskCollectionUpdateEvent.h>
 #include <imtcore/Version.h>
 
