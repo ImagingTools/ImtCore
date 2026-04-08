@@ -79,8 +79,9 @@ ViewBase {
 
 			editReporterCB.currentIndex = -1
 			if (editReporterCB.model) {
+				let repId = ticketData.m_reporterId || AuthorizationController.getUserId()
 				for (let i = 0; i < editReporterCB.model.getItemsCount(); i++) {
-					if (editReporterCB.model.getData("id", i) === ticketData.m_reporterId) {
+					if (editReporterCB.model.getData("id", i) === repId) {
 						editReporterCB.currentIndex = i
 						break
 					}
@@ -94,6 +95,7 @@ ViewBase {
 			ticketData.m_title = newTitleInput.text
 			ticketData.m_description = newDescriptionInput.text
 			ticketData.m_milestoneId = newMilestoneInput.text
+			ticketData.m_reporterId = AuthorizationController.getUserId()
 
 			if (newAssigneeCB.model && newAssigneeCB.currentIndex >= 0) {
 				ticketData.m_assigneeIds = [newAssigneeCB.model.getData("id", newAssigneeCB.currentIndex)]
@@ -737,7 +739,7 @@ ViewBase {
 				// Right: full sidebar
 				Column {
 					width: 260
-					spacing: 0
+					spacing: Style.spacingM
 
 					// Assignees
 					Column {
