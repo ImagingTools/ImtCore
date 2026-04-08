@@ -23,6 +23,7 @@ public:
 	I_BEGIN_COMPONENT(CTicketCollectionDocumentManagerComp)
 		I_ASSIGN(m_documentManagerCompPtr, "CollectionDocumentManager", "Collection document manager", false, "CollectionDocumentManager");
 		I_ASSIGN(m_ticketActionsCollectionCompPtr, "TicketActionsCollection", "Collection of ticket actions", false, "TicketActionsCollection");
+		I_ASSIGN(m_conversationCollectionCompPtr, "ConversationCollection", "Collection of conversations", false, "ConversationCollection");
 	I_END_COMPONENT
 
 protected:
@@ -38,6 +39,7 @@ protected:
 private:
 	I_REF(imtdoc::IDocumentManager, m_documentManagerCompPtr);
 	I_REF(imtbase::IObjectCollection, m_ticketActionsCollectionCompPtr);
+	I_REF(imtbase::IObjectCollection, m_conversationCollectionCompPtr);
 };
 
 

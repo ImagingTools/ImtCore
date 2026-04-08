@@ -75,47 +75,6 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 	response.Version_1_0->status = imtdeskgql::GetSdlTypeFromStatusType(ticketPtr->GetStatus());
 	response.Version_1_0->stateReason = imtdeskgql::GetSdlTypeFromStateReason(ticketPtr->GetStateReason());
 
-	// Populate activity items from ticket actions (ITicketAction collection)
-	// Messages/comments come from the Conversation (via ConversationId) and are
-	// merged at the QML/presentation level, not stored in the Ticket model.
-	if (m_ticketActionsCollectionCompPtr.IsValid()){
-		const QByteArray ticketId = ticketPtr->GetId();
-
-		// Build a filtered query using IIdParam for TicketId
-		CTicketIdParam ticketIdParam(ticketId);
-		iprm::CParamsSet filterParams;
-		filterParams.SetEditableParameter("TicketId", &ticketIdParam);
-
-		istd::TDelPtr<imtbase::IObjectCollectionIterator> actionsIterator(
-			m_ticketActionsCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), 0, -1, &filterParams));
-
-		if (actionsIterator.IsValid()){
-			while (actionsIterator->Next()){
-				imtbase::IObjectCollection::DataPtr dataPtr;
-				if (actionsIterator->GetObjectData(dataPtr)){
-					const imtdesk::ITicketAction* actionPtr = dynamic_cast<const imtdesk::ITicketAction*>(dataPtr.GetPtr());
-					if (actionPtr != nullptr){
-						const imtauth::IUserRecentAction::UserInfo userInfo = actionPtr->GetUserInfo();
-						const imtauth::IUserRecentAction::ActionTypeInfo actionTypeInfo = actionPtr->GetActionTypeInfo();
-
-						sdl::imtdesk::ImtDesk::CTicketActivityItem sdlItem;
-						sdlItem.Version_1_0.Emplace();
-						sdlItem.Version_1_0->itemType = sdl::imtdesk::ImtDesk::ActivityItemType::Action;
-						sdlItem.Version_1_0->userId = userInfo.id;
-						sdlItem.Version_1_0->userName = userInfo.name;
-						sdlItem.Version_1_0->timestamp = actionPtr->GetTimestamp().toString(Qt::ISODate);
-						sdlItem.Version_1_0->actionType = actionTypeInfo.name;
-						sdlItem.Version_1_0->actionDescription = actionTypeInfo.description;
-						if (!response.Version_1_0->activityItems.has_value()){
-							response.Version_1_0->activityItems.Emplace();
-						}
-						response.Version_1_0->activityItems->Append(sdlItem);
-					}
-				}
-			}
-		}
-	}
-
 	return response;
 }
 
@@ -237,18 +196,6 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 	if (ticketInfo.activityItems){
 		// Activity items of type Action are stored in the TicketActions collection
 		// (comments are managed through the Conversation and not stored here)
-		if (m_ticketActionsCollectionCompPtr.IsValid()){
-			for (int i = 0; i < ticketInfo.activityItems->GetSize(); ++i){
-				const sdl::imtdesk::ImtDesk::CTicketActivityItem& sdlItem = ticketInfo.activityItems->At(i);
-				if (!sdlItem.Version_1_0.has_value()){
-					continue;
-				}
-				if (sdlItem.Version_1_0->itemType && *sdlItem.Version_1_0->itemType == sdl::imtdesk::ImtDesk::ActivityItemType::Action){
-					// Creating ITicketAction objects is handled outside the ticket update
-					// The GQL layer exposes them for transport; persistence is via the TicketActions collection
-				}
-			}
-		}
 	}
 
 	m_documentManagerCompPtr->SetDocumentData(userId, documentId, *ticketPtr);

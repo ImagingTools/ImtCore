@@ -133,8 +133,6 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CTicketActionDbDelegateComp::Crea
 		.arg(actionDataSql)
 		.toUtf8();
 
-	retVal.objectId = actionId;
-
 	return retVal;
 }
 

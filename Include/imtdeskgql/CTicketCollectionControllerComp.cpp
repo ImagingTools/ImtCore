@@ -148,45 +148,6 @@ bool CTicketCollectionControllerComp::CreateRepresentationFromObject(
 	representationPayload.closedAt = ticketPtr->GetClosedAt();
 	representationPayload.resolvedAt = ticketPtr->GetResolvedAt();
 
-	// Populate activity items from ticket actions (ITicketAction collection)
-	if (m_ticketActionsCollectionCompPtr.IsValid()){
-		const QByteArray ticketId = ticketPtr->GetId();
-
-		// Build a filtered query using IIdParam for TicketId
-		CTicketIdParam ticketIdParam(ticketId);
-		iprm::CParamsSet filterParams;
-		filterParams.SetEditableParameter("TicketId", &ticketIdParam);
-
-		istd::TDelPtr<imtbase::IObjectCollectionIterator> actionsIterator(
-			m_ticketActionsCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), 0, -1, &filterParams));
-
-		if (actionsIterator.IsValid()){
-			while (actionsIterator->Next()){
-				imtbase::IObjectCollection::DataPtr dataPtr;
-				if (actionsIterator->GetObjectData(dataPtr)){
-					const imtdesk::ITicketAction* actionPtr = dynamic_cast<const imtdesk::ITicketAction*>(dataPtr.GetPtr());
-					if (actionPtr != nullptr){
-						const imtauth::IUserRecentAction::UserInfo userInfo = actionPtr->GetUserInfo();
-						const imtauth::IUserRecentAction::ActionTypeInfo actionTypeInfo = actionPtr->GetActionTypeInfo();
-
-						sdl::imtdesk::ImtDesk::CTicketActivityItem sdlItem;
-						sdlItem.Version_1_0.Emplace();
-						sdlItem.Version_1_0->itemType = sdl::imtdesk::ImtDesk::ActivityItemType::Action;
-						sdlItem.Version_1_0->userId = userInfo.id;
-						sdlItem.Version_1_0->userName = userInfo.name;
-						sdlItem.Version_1_0->timestamp = actionPtr->GetTimestamp().toString(Qt::ISODate);
-						sdlItem.Version_1_0->actionType = actionTypeInfo.name;
-						sdlItem.Version_1_0->actionDescription = actionTypeInfo.description;
-						if (!representationPayload.activityItems.has_value()){
-							representationPayload.activityItems.Emplace();
-						}
-						representationPayload.activityItems->Append(sdlItem);
-					}
-				}
-			}
-		}
-	}
-
 	return true;
 }
 
