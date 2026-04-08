@@ -8,6 +8,7 @@
 // ImtCore includes
 #include <imtdesk/CSupportTicketComp.h>
 #include <imtdesk/CLabelComp.h>
+#include <imtdesk/CTicketActionComp.h>
 #include <imtdesk/CTicketDocumentNameProviderComp.h>
 
 
@@ -20,6 +21,7 @@ namespace ImtDeskPck
 
 typedef icomp::TModelCompWrap<imtdesk::CSupportTicketComp> SupportTicket;
 typedef icomp::TModelCompWrap<imtdesk::CLabelComp> Label;
+typedef icomp::TModelCompWrap<imtdesk::CTicketActionComp> TicketAction;
 typedef imtdesk::CTicketDocumentNameProviderComp TicketDocumentNameProvider;
 
 

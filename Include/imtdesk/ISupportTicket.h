@@ -5,9 +5,6 @@
 // ACF includes
 #include <iser/ISerializable.h>
 
-// ImtCore includes
-#include <imtauth/CUserRecentAction.h>
-
 
 namespace imtdesk
 {
@@ -284,17 +281,6 @@ public:
 	*/
 	virtual void SetResolvedAt(const QString& resolvedAt) = 0;
 
-	/**
-		Get the list of recent user actions (stored as imtauth::CUserRecentAction).
-		Messages/comments are fetched via ConversationId; both sources are
-		merged into a unified timeline at the SDL/GQL level.
-	*/
-	virtual QList<imtauth::CUserRecentAction> GetRecentActions() const = 0;
-
-	/**
-		Set the list of recent user actions.
-	*/
-	virtual void SetRecentActions(const QList<imtauth::CUserRecentAction>& actions) = 0;
 };
 
 typedef istd::TUniqueInterfacePtr<ISupportTicket> ISupportTicketUniquePtr;

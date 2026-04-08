@@ -335,30 +335,6 @@ void CSupportTicketComp::SetResolvedAt(const QString& resolvedAt)
 }
 
 
-QList<imtauth::CUserRecentAction> CSupportTicketComp::GetRecentActions() const
-{
-	return m_recentActions;
-}
-
-
-void CSupportTicketComp::SetRecentActions(const QList<imtauth::CUserRecentAction>& actions)
-{
-	if (m_recentActions.size() != actions.size()){
-		istd::CChangeNotifier notifier(this);
-		m_recentActions = actions;
-		return;
-	}
-
-	for (int i = 0; i < actions.size(); ++i){
-		if (!m_recentActions[i].IsEqual(actions[i])){
-			istd::CChangeNotifier notifier(this);
-			m_recentActions = actions;
-			return;
-		}
-	}
-}
-
-
 // reimplemented (iser::ISerializable)
 
 bool CSupportTicketComp::Serialize(iser::IArchive& archive)
@@ -458,25 +434,6 @@ bool CSupportTicketComp::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_resolvedAt);
 	retVal = retVal && archive.EndTag(resolvedAtTag);
 
-	// Serialize recent actions (imtauth::CUserRecentAction)
-	{
-		int actionsCount = m_recentActions.size();
-		I_SERIALIZE(archive, actionsCount);
-		if (archive.IsStoring()){
-			for (int i = 0; i < actionsCount; ++i){
-				retVal = retVal && m_recentActions[i].Serialize(archive);
-			}
-		}
-		else {
-			m_recentActions.clear();
-			for (int i = 0; i < actionsCount; ++i){
-				imtauth::CUserRecentAction action;
-				retVal = retVal && action.Serialize(archive);
-				m_recentActions.append(action);
-			}
-		}
-	}
-
 	return retVal;
 }
 
@@ -512,13 +469,6 @@ bool CSupportTicketComp::CopyFrom(const IChangeable& object, CompatibilityMode /
 	m_updatedAt = srcPtr->GetUpdatedAt();
 	m_closedAt = srcPtr->GetClosedAt();
 	m_resolvedAt = srcPtr->GetResolvedAt();
-	m_recentActions.clear();
-	QList<imtauth::CUserRecentAction> srcActions = srcPtr->GetRecentActions();
-	for (const imtauth::CUserRecentAction& action : srcActions){
-		imtauth::CUserRecentAction copy;
-		copy.CopyFrom(action);
-		m_recentActions.append(copy);
-	}
 
 	return true;
 }
@@ -552,22 +502,7 @@ bool CSupportTicketComp::IsEqual(const IChangeable& object) const
 		&& m_closedAt == srcPtr->GetClosedAt()
 		&& m_resolvedAt == srcPtr->GetResolvedAt();
 
-	if (!result){
-		return false;
-	}
-
-	QList<imtauth::CUserRecentAction> srcActions = srcPtr->GetRecentActions();
-	if (m_recentActions.size() != srcActions.size()){
-		return false;
-	}
-
-	for (int i = 0; i < m_recentActions.size(); ++i){
-		if (!m_recentActions[i].IsEqual(srcActions[i])){
-			return false;
-		}
-	}
-
-	return true;
+	return result;
 }
 
 
@@ -606,7 +541,6 @@ bool CSupportTicketComp::ResetData(CompatibilityMode /*mode*/)
 	m_updatedAt.clear();
 	m_closedAt.clear();
 	m_resolvedAt.clear();
-	m_recentActions.clear();
 
 	return true;
 }

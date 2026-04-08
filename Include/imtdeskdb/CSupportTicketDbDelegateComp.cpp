@@ -7,7 +7,6 @@
 
 // ImtCore includes
 #include <imtdesk/ISupportTicket.h>
-#include <imtauth/CUserRecentAction.h>
 #include <imtdb/CDatabaseEngineComp.h>
 #include <imtdb/imtdb.h>
 
@@ -26,39 +25,6 @@ QString sqlEscape(const QString& s)
 	escaped.replace('\'', "''");
 	return escaped;
 }
-
-
-// Helper: build INSERT statements for TicketActions
-QByteArray BuildTicketActionsInsertQueries(const QByteArray& ticketId, const QList<imtauth::CUserRecentAction>& actions)
-{
-	QByteArray result;
-	for (const imtauth::CUserRecentAction& action : actions){
-		const QString actionId = QUuid::createUuid().toString(QUuid::WithoutBraces);
-		const QString userIdSql = action.GetUserInfo().id.isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(QString::fromUtf8(action.GetUserInfo().id)));
-		const QString userNameSql = action.GetUserInfo().name.isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(action.GetUserInfo().name));
-		const QString actionTypeIdSql = action.GetActionTypeInfo().id.isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(QString::fromUtf8(action.GetActionTypeInfo().id)));
-		const QString actionTypeNameSql = action.GetActionTypeInfo().name.isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(action.GetActionTypeInfo().name));
-		const QString actionTypeDescSql = action.GetActionTypeInfo().description.isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(action.GetActionTypeInfo().description));
-		const QString timestampSql = action.GetTimestamp().isValid() ? QString("'%1'").arg(action.GetTimestamp().toString(Qt::ISODate)) : "NULL";
-
-		result += QString(
-			"\nINSERT INTO \"TicketActions\" "
-			"(\"Id\", \"TicketId\", \"UserId\", \"UserName\", "
-			"\"ActionTypeId\", \"ActionTypeName\", \"ActionTypeDescription\", \"Timestamp\") "
-			"VALUES('%1', '%2', %3, %4, %5, %6, %7, %8);")
-			.arg(actionId)
-			.arg(QString::fromUtf8(ticketId))
-			.arg(userIdSql)
-			.arg(userNameSql)
-			.arg(actionTypeIdSql)
-			.arg(actionTypeNameSql)
-			.arg(actionTypeDescSql)
-			.arg(timestampSql)
-			.toUtf8();
-	}
-	return result;
-}
-
 
 } // anonymous namespace
 
@@ -156,69 +122,6 @@ istd::IChangeableUniquePtr CSupportTicketDbDelegateComp::CreateObjectFromRecord(
 		ticketPtr->SetResolvedAt(record.value("ResolvedAt").toString());
 	}
 
-	// Load user actions from TicketActions table
-	if (m_databaseEngineCompPtr.IsValid() && record.contains("Id")){
-		const QByteArray ticketId = record.value("Id").toByteArray();
-		const QString actionsQuery = QString("SELECT * FROM \"TicketActions\" WHERE \"TicketId\"='%1' ORDER BY \"Timestamp\" ASC;")
-			.arg(sqlEscape(QString::fromUtf8(ticketId)));
-
-		QSqlError actionsError;
-		QList<QSqlRecord> actionsRecords = m_databaseEngineCompPtr->ExecSqlQuery(actionsQuery.toUtf8(), &actionsError);
-
-		if (actionsError.type() == QSqlError::NoError){
-			QList<imtauth::CUserRecentAction> actions;
-			for (const QSqlRecord& actionRecord : actionsRecords){
-				imtauth::CUserRecentAction action;
-
-				imtauth::IUserRecentAction::UserInfo userInfo;
-				if (actionRecord.contains("UserId")){
-					userInfo.id = actionRecord.value("UserId").toByteArray();
-				}
-				if (actionRecord.contains("UserName")){
-					userInfo.name = actionRecord.value("UserName").toString();
-				}
-				action.SetUserInfo(userInfo);
-
-				imtauth::IUserRecentAction::ActionTypeInfo actionTypeInfo;
-				if (actionRecord.contains("ActionTypeId")){
-					actionTypeInfo.id = actionRecord.value("ActionTypeId").toByteArray();
-				}
-				if (actionRecord.contains("ActionTypeName")){
-					actionTypeInfo.name = actionRecord.value("ActionTypeName").toString();
-				}
-				if (actionRecord.contains("ActionTypeDescription")){
-					actionTypeInfo.description = actionRecord.value("ActionTypeDescription").toString();
-				}
-				action.SetActionTypeInfo(actionTypeInfo);
-
-				imtauth::IUserRecentAction::TargetInfo targetInfo;
-				if (actionRecord.contains("TargetId")){
-					targetInfo.id = actionRecord.value("TargetId").toByteArray();
-				}
-				if (actionRecord.contains("TargetTypeId")){
-					targetInfo.typeId = actionRecord.value("TargetTypeId").toByteArray();
-				}
-				if (actionRecord.contains("TargetTypeName")){
-					targetInfo.typeName = actionRecord.value("TargetTypeName").toString();
-				}
-				if (actionRecord.contains("TargetSource")){
-					targetInfo.source = actionRecord.value("TargetSource").toString();
-				}
-				if (actionRecord.contains("TargetName")){
-					targetInfo.name = actionRecord.value("TargetName").toString();
-				}
-				action.SetTargetInfo(targetInfo);
-
-				if (actionRecord.contains("Timestamp")){
-					action.SetTimestamp(QDateTime::fromString(actionRecord.value("Timestamp").toString(), Qt::ISODate));
-				}
-
-				actions.append(action);
-			}
-			ticketPtr->SetRecentActions(actions);
-		}
-	}
-
 	return ticketPtr;
 }
 
@@ -309,9 +212,6 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSupportTicketDbDelegateComp::Cre
 		.arg(closedSql)
 		.toUtf8();
 
-	// Insert user actions into TicketActions table
-	retVal.query += BuildTicketActionsInsertQueries(ticketId, ticketPtr->GetRecentActions());
-
 	return retVal;
 }
 
@@ -385,13 +285,6 @@ QByteArray CSupportTicketDbDelegateComp::CreateUpdateObjectQuery(
 		.arg(closedSql)
 		.arg(QString::fromUtf8(objectId))
 		.toUtf8();
-
-	// Replace user actions: delete existing, insert new
-	result += QString("\nDELETE FROM \"TicketActions\" WHERE \"TicketId\"='%1';")
-		.arg(QString::fromUtf8(objectId))
-		.toUtf8();
-
-	result += BuildTicketActionsInsertQueries(objectId, ticketPtr->GetRecentActions());
 
 	return result;
 }
@@ -494,24 +387,6 @@ void CSupportTicketDbDelegateComp::OnComponentCreated()
 					<< "\n\t| Error:" << sqlError
 					<< "\n\t| Query:" << query;
 		SendErrorMessage(0, QString("Tickets table could not be created: %1").arg(sqlError.text()));
-	}
-
-	// Create TicketActions table for storing user actions per ticket
-	QFile actionsScriptFile(imtdb::GetSqlResourcePath(*m_databaseEngineCompPtr, QStringLiteral("CreateTicketActionsTable.sql")));
-	if (actionsScriptFile.open(QFile::ReadOnly)){
-		QByteArray actionsQuery = actionsScriptFile.readAll();
-		actionsScriptFile.close();
-		actionsQuery.replace("${TableScheme}", "public");
-
-		QSqlError actionsError;
-		m_databaseEngineCompPtr->ExecSqlQuery(actionsQuery, &actionsError);
-
-		if (actionsError.type() != QSqlError::NoError){
-			qCritical() << __FILE__ << __LINE__
-						<< "\n\t| TicketActions table could not be created"
-						<< "\n\t| Error:" << actionsError
-						<< "\n\t| Query:" << actionsQuery;
-		}
 	}
 }
 

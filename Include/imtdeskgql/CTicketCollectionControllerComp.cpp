@@ -6,7 +6,7 @@
 
 // ImtCore includes
 #include <imtdesk/ISupportTicket.h>
-#include <imtauth/CUserRecentAction.h>
+#include <imtdesk/ITicketAction.h>
 #include <imtdeskgql/imtdeskgql.h>
 
 
@@ -143,22 +143,32 @@ bool CTicketCollectionControllerComp::CreateRepresentationFromObject(
 	representationPayload.closedAt = ticketPtr->GetClosedAt();
 	representationPayload.resolvedAt = ticketPtr->GetResolvedAt();
 
-	// Populate activity items from recent user actions (imtauth::CUserRecentAction)
-	{
-		const QList<imtauth::CUserRecentAction> actions = ticketPtr->GetRecentActions();
-		for (const imtauth::CUserRecentAction& action : actions){
-			sdl::imtdesk::ImtDesk::CTicketActivityItem sdlItem;
-			sdlItem.Version_1_0.Emplace();
-			sdlItem.Version_1_0->itemType = sdl::imtdesk::ImtDesk::ActivityItemType::Action;
-			sdlItem.Version_1_0->userId = action.GetUserInfo().id;
-			sdlItem.Version_1_0->userName = action.GetUserInfo().name;
-			sdlItem.Version_1_0->timestamp = action.GetTimestamp().toString(Qt::ISODate);
-			sdlItem.Version_1_0->actionType = action.GetActionTypeInfo().name;
-			sdlItem.Version_1_0->actionDescription = action.GetActionTypeInfo().description;
-			if (!representationPayload.activityItems.has_value()){
-				representationPayload.activityItems.Emplace();
+	// Populate activity items from ticket actions (ITicketAction collection)
+	if (m_ticketActionsCollectionCompPtr.IsValid()){
+		const QByteArray ticketId = ticketPtr->GetId();
+		imtbase::IObjectCollection::IteratorPtr iteratorPtr = m_ticketActionsCollectionCompPtr->CreateIterator();
+		if (iteratorPtr.IsValid()){
+			while (iteratorPtr->IsValid()){
+				imtbase::IObjectCollection::DataPtr dataPtr;
+				if (iteratorPtr->GetObjectData(dataPtr)){
+					const imtdesk::ITicketAction* actionPtr = dynamic_cast<const imtdesk::ITicketAction*>(dataPtr.GetPtr());
+					if (actionPtr != nullptr && actionPtr->GetTicketId() == ticketId){
+						sdl::imtdesk::ImtDesk::CTicketActivityItem sdlItem;
+						sdlItem.Version_1_0.Emplace();
+						sdlItem.Version_1_0->itemType = sdl::imtdesk::ImtDesk::ActivityItemType::Action;
+						sdlItem.Version_1_0->userId = actionPtr->GetUserId();
+						sdlItem.Version_1_0->userName = actionPtr->GetUserName();
+						sdlItem.Version_1_0->timestamp = actionPtr->GetTimestamp();
+						sdlItem.Version_1_0->actionType = actionPtr->GetActionTypeName();
+						sdlItem.Version_1_0->actionDescription = actionPtr->GetActionTypeDescription();
+						if (!representationPayload.activityItems.has_value()){
+							representationPayload.activityItems.Emplace();
+						}
+						representationPayload.activityItems->Append(sdlItem);
+					}
+				}
+				iteratorPtr->MoveNext();
 			}
-			representationPayload.activityItems->Append(sdlItem);
 		}
 	}
 
@@ -288,38 +298,9 @@ bool CTicketCollectionControllerComp::FillObjectFromRepresentation(
 	}
 
 	if (representation.activityItems){
-		QList<imtauth::CUserRecentAction> actionItems;
-		for (int i = 0; i < representation.activityItems->GetSize(); ++i){
-			const sdl::imtdesk::ImtDesk::CTicketActivityItem& sdlItem = representation.activityItems->At(i);
-			if (!sdlItem.Version_1_0.has_value()){
-				continue;
-			}
-			// Only process Action items — comments are managed through the Conversation
-			if (sdlItem.Version_1_0->itemType && *sdlItem.Version_1_0->itemType == sdl::imtdesk::ImtDesk::ActivityItemType::Action){
-				imtauth::CUserRecentAction action;
-				imtauth::IUserRecentAction::UserInfo userInfo;
-				if (sdlItem.Version_1_0->userId){
-					userInfo.id = *sdlItem.Version_1_0->userId;
-				}
-				if (sdlItem.Version_1_0->userName){
-					userInfo.name = *sdlItem.Version_1_0->userName;
-				}
-				action.SetUserInfo(userInfo);
-				if (sdlItem.Version_1_0->timestamp){
-					action.SetTimestamp(QDateTime::fromString(*sdlItem.Version_1_0->timestamp, Qt::ISODate));
-				}
-				imtauth::IUserRecentAction::ActionTypeInfo actionTypeInfo;
-				if (sdlItem.Version_1_0->actionType){
-					actionTypeInfo.name = *sdlItem.Version_1_0->actionType;
-				}
-				if (sdlItem.Version_1_0->actionDescription){
-					actionTypeInfo.description = *sdlItem.Version_1_0->actionDescription;
-				}
-				action.SetActionTypeInfo(actionTypeInfo);
-				actionItems.append(action);
-			}
-		}
-		ticketPtr->SetRecentActions(actionItems);
+		// Activity items of type Action are stored in the TicketActions collection
+		// independently from the ticket. The SDL transport layer carries them
+		// together for convenience, but they are persisted separately.
 	}
 
 	return true;
