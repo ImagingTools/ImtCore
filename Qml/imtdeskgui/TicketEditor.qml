@@ -17,7 +17,7 @@ ViewBase {
 	anchors.fill: parent
 
 	property TicketData ticketData: model
-	property bool isNewIssue: ticketData ? (ticketData.m_title === "" && ticketData.m_number === 0) : true
+	property bool isNewIssue: ticketData ? (ticketData.m_number === 0) : true
 
 	function updateGui(){
 		titleInput.text = ticketData.m_title
@@ -406,7 +406,7 @@ ViewBase {
 
 					ComboBoxElementView {
 						id: assigneeIdInput
-						name: qsTr("Assignees")
+						name: qsTr("Assignee")
 						onCurrentIndexChanged: {
 							root.doUpdateModel()
 						}
@@ -591,7 +591,7 @@ ViewBase {
 
 					CheckBoxElementView {
 						id: lockedCB
-						name: qsTr("Lock conversation")
+						name: qsTr("Lock issue")
 						onCheckedChanged: {
 							root.doUpdateModel()
 						}
