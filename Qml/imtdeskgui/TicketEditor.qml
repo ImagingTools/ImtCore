@@ -11,6 +11,7 @@ import imtcolgui 1.0
 import imtdeskImtDeskSdl 1.0
 import imtdeskTicketCollectionDocumentManagerSdl 1.0
 import imtauthUsersSdl 1.0
+import imtchatgui 1.0
 
 ViewBase {
 	id: root
@@ -19,6 +20,11 @@ ViewBase {
 
 	property TicketData ticketData: model
 	property bool isNewIssue: ticketData ? (ticketData.m_number === 0) : true
+
+	// Conversation thread data (populated from linked conversation messages)
+	property var commentMessages: []
+
+	signal commentSubmitted(string commentText)
 
 	// --- Helper: find ComboBox index by "id" field ---
 	function findComboIndex(combo, targetId, fallback) {
@@ -617,6 +623,283 @@ ViewBase {
 							placeHolderText: qsTr("Leave a comment")
 							onEditingFinished: {
 								root.doUpdateModel()
+							}
+						}
+					}
+
+					// ── Activity / Conversation thread (GitHub Issues-like) ──
+					Rectangle {
+						width: parent.width
+						height: 1
+						color: Style.borderColor
+					}
+
+					Column {
+						width: parent.width
+						spacing: Style.spacingS
+
+						Row {
+							width: parent.width
+							spacing: Style.spacingS
+
+							Text {
+								text: qsTr("Activity")
+								font.pixelSize: Style.fontSizeL
+								font.bold: true
+								color: Style.textColor
+								anchors.verticalCenter: parent.verticalCenter
+							}
+
+							Text {
+								text: conversationThread.count > 0
+									? "(" + conversationThread.count + ")"
+									: ""
+								font.pixelSize: Style.fontSizeS
+								color: Style.textSecondaryColor
+								anchors.verticalCenter: parent.verticalCenter
+							}
+						}
+
+						// Comment list
+						Column {
+							id: commentListCol
+							width: parent.width
+							spacing: Style.spacingS
+
+							Repeater {
+								id: conversationThread
+								model: root.commentMessages
+
+								// Each comment = avatar row + bubble + timestamp
+								Column {
+									width: commentListCol.width
+									spacing: Style.spacingXS
+
+									Row {
+										width: parent.width
+										spacing: Style.paddingS
+
+										// Avatar circle
+										Rectangle {
+											width: 32
+											height: 32
+											radius: 16
+											color: Style.accentColor
+
+											Text {
+												anchors.centerIn: parent
+												text: {
+													let n = modelData.senderName || ""
+													return n.length > 0 ? n.charAt(0).toUpperCase() : "?"
+												}
+												font.pixelSize: Style.fontSizeXS
+												color: "white"
+												font.bold: true
+											}
+										}
+
+										Column {
+											width: parent.width - 32 - Style.paddingS
+											spacing: Style.spacingXS
+
+											// Header: sender name + timestamp
+											Row {
+												spacing: Style.paddingS
+
+												Text {
+													text: modelData.senderName || qsTr("Unknown")
+													font.pixelSize: Style.fontSizeS
+													font.bold: true
+													color: Style.textColor
+												}
+
+												Text {
+													text: qsTr("commented") + " " + (modelData.createdAt || "")
+													font.pixelSize: Style.fontSizeXS
+													color: Style.textSecondaryColor
+												}
+											}
+
+											// Comment body
+											Rectangle {
+												width: parent.width
+												height: commentBodyText.height + Style.paddingM * 2
+												radius: Style.radiusS
+												color: Style.surfaceColor
+												border.color: Style.borderColor
+												border.width: 1
+
+												Text {
+													id: commentBodyText
+													anchors.left: parent.left
+													anchors.right: parent.right
+													anchors.top: parent.top
+													anchors.margins: Style.paddingM
+													text: modelData.content || modelData.contentPreview || ""
+													font.pixelSize: Style.fontSizeS
+													color: Style.textColor
+													wrapMode: Text.Wrap
+												}
+											}
+
+											// Reactions row
+											Row {
+												spacing: Style.paddingXS
+												visible: modelData.reactions ? modelData.reactions.length > 0 : false
+
+												Repeater {
+													model: modelData.reactions || []
+
+													Rectangle {
+														height: 22
+														width: emojiText.width + Style.paddingS * 2
+														radius: height / 2
+														color: Style.surfaceColor
+														border.color: Style.borderColor
+
+														Text {
+															id: emojiText
+															anchors.centerIn: parent
+															text: modelData
+															font.pixelSize: Style.fontSizeXS
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+
+						// "Write" input area (GitHub-like comment box)
+						Rectangle {
+							width: parent.width
+							height: 1
+							color: Style.borderColor
+							visible: !ticketData || !ticketData.m_locked
+						}
+
+						Column {
+							width: parent.width
+							spacing: Style.spacingS
+							visible: !ticketData || !ticketData.m_locked
+
+							Text {
+								text: qsTr("Add a comment")
+								font.pixelSize: Style.fontSizeS
+								font.bold: true
+								color: Style.textColor
+							}
+
+							Row {
+								width: parent.width
+								spacing: Style.paddingS
+
+								// Avatar for current user
+								Rectangle {
+									width: 32
+									height: 32
+									radius: 16
+									color: Style.accentColor
+									anchors.top: parent.top
+
+									Text {
+										anchors.centerIn: parent
+										text: "You"
+										font.pixelSize: 10
+										color: "white"
+										font.bold: true
+									}
+								}
+
+								Column {
+									width: parent.width - 32 - Style.paddingS
+									spacing: Style.spacingS
+
+									Rectangle {
+										width: parent.width
+										height: commentInputField.height + Style.paddingM * 2
+										radius: Style.radiusS
+										border.color: commentInputField.activeFocus
+											? Style.accentColor
+											: Style.borderColor
+										border.width: 1
+										color: Style.backgroundColor
+
+										TextInput {
+											id: commentInputField
+											anchors.left: parent.left
+											anchors.right: parent.right
+											anchors.top: parent.top
+											anchors.margins: Style.paddingM
+											height: 60
+											font.pixelSize: Style.fontSizeS
+											color: Style.textColor
+											wrapMode: TextInput.Wrap
+											clip: true
+
+											Text {
+												anchors.fill: parent
+												text: qsTr("Leave a comment")
+												color: Style.textPlaceholderColor
+												font.pixelSize: Style.fontSizeS
+												visible: commentInputField.text.length === 0
+											}
+										}
+									}
+
+									Row {
+										anchors.right: parent.right
+										spacing: Style.spacingS
+
+										Rectangle {
+											width: commentBtnText.width + Style.paddingM * 2
+											height: Style.buttonHeightM
+											radius: Style.radiusS
+											color: commentInputField.text.trim().length > 0
+												? "#1a7f37" : Style.disabledColor
+
+											Text {
+												id: commentBtnText
+												anchors.centerIn: parent
+												text: qsTr("Comment")
+												font.pixelSize: Style.fontSizeS
+												font.bold: true
+												color: "white"
+											}
+
+											MouseArea {
+												anchors.fill: parent
+												enabled: commentInputField.text.trim().length > 0
+												onClicked: {
+													root.commentSubmitted(commentInputField.text.trim())
+													commentInputField.text = ""
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+
+						// Lock notice
+						Row {
+							visible: ticketData && ticketData.m_locked
+							width: parent.width
+							spacing: Style.paddingS
+
+							Text {
+								text: "🔒"
+								font.pixelSize: Style.fontSizeM
+							}
+
+							Text {
+								text: qsTr("This conversation has been locked. Only collaborators can comment.")
+								font.pixelSize: Style.fontSizeS
+								color: Style.textSecondaryColor
+								wrapMode: Text.Wrap
+								width: parent.width - Style.fontSizeM - Style.paddingS
 							}
 						}
 					}
