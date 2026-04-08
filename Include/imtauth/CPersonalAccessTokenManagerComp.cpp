@@ -325,7 +325,7 @@ QByteArray CPersonalAccessTokenManagerComp::HashToken(const QByteArray& rawToken
 }
 
 
-QByteArray CPersonalAccessTokenManagerComp::ExtractTokenId(const QByteArray& rawToken) const
+QByteArray CPersonalAccessTokenManagerComp::ExtractTokenId(const QByteArray& /*rawToken*/) const
 {
 	// For now, we don't embed the ID in the token
 	// We search by hash instead

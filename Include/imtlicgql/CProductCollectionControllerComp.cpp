@@ -397,7 +397,7 @@ bool CProductCollectionControllerComp::FillObjectFromRepresentation(
 	}
 
 	if (productId.isEmpty()){
-		errorMessage = QT_TR_NOOP("Product Name cannot be empty");
+		errorMessage = QObject::tr("Product Name cannot be empty");
 		SendErrorMessage(0, errorMessage, "Product controller");
 
 		return false;
@@ -420,7 +420,7 @@ bool CProductCollectionControllerComp::FillObjectFromRepresentation(
 	if (!collectionIds.isEmpty()){
 		QByteArray id = collectionIds[0];
 		if (objectId != id){
-			errorMessage = QT_TR_NOOP(QString("Product '%1' already exists")).arg(qPrintable(productId));
+			errorMessage = QObject::tr("Product '%1' already exists").arg(qPrintable(productId));
 
 			return false;
 		}
@@ -435,7 +435,7 @@ bool CProductCollectionControllerComp::FillObjectFromRepresentation(
 		name = *productDataRepresentation.productName;
 	}
 	if (name.isEmpty()){
-		errorMessage = QT_TR_NOOP("Product Name is empty");
+		errorMessage = QObject::tr("Product Name is empty");
 		SendErrorMessage(0, errorMessage, "Product controller");
 
 		return false;
@@ -458,7 +458,7 @@ bool CProductCollectionControllerComp::FillObjectFromRepresentation(
 	if (!collectionIds2.isEmpty()){
 		QByteArray id = collectionIds2[0];
 		if (objectId != id){
-			errorMessage = QT_TR_NOOP(QString("Product name '%1' already exists, please rename")).arg(qPrintable(name));
+			errorMessage = QObject::tr("Product name '%1' already exists, please rename").arg(qPrintable(name));
 
 			return false;
 		}

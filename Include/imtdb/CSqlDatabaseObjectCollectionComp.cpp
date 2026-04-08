@@ -732,7 +732,9 @@ bool CSqlDatabaseObjectCollectionComp::SetElementName(const Id& elementId, const
 		return false;
 	}
 
-	QByteArray query = m_objectDelegateCompPtr->CreateRenameObjectQuery(*this, elementId, name, nullptr);
+	QString escapedName(name);
+	escapedName = escapedName.replace("'", "''");
+	QByteArray query = m_objectDelegateCompPtr->CreateRenameObjectQuery(*this, elementId, escapedName, nullptr);
 	if (query.isEmpty()){
 		SendErrorMessage(0, "Database query could not be created", "Database collection");
 
@@ -766,8 +768,9 @@ bool CSqlDatabaseObjectCollectionComp::SetElementDescription(const Id& elementId
 
 		return false;
 	}
-
-QByteArray query = m_objectDelegateCompPtr->CreateDescriptionObjectQuery(*this, elementId, description, nullptr);
+	QString escapedDescription(description);
+	escapedDescription = escapedDescription.replace("'", "''");
+	QByteArray query = m_objectDelegateCompPtr->CreateDescriptionObjectQuery(*this, elementId, escapedDescription, nullptr);
 	if (query.isEmpty()){
 		SendErrorMessage(0, "Database query could not be created", "Database collection");
 

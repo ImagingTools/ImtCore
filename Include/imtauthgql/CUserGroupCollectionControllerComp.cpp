@@ -54,7 +54,7 @@ bool CUserGroupCollectionControllerComp::FillObjectFromRepresentation(
 				if (collectionId != newObjectId){
 					QString currentUserGroupName = currentUserGroupInfoPtr->GetName();
 					if (currentUserGroupName == name){
-						errorMessage = QT_TR_NOOP(QString("Group Name '%1' already exists").arg(currentUserGroupName));
+						errorMessage = QObject::tr("Group Name '%1' already exists").arg(currentUserGroupName);
 						return false;
 					}
 				}
@@ -133,7 +133,7 @@ sdl::imtbase::ImtCollection::CVisualStatus CUserGroupCollectionControllerComp::O
 		languageId = gqlContextPtr->GetLanguageId();
 	}
 
-	QString translation = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QString(QT_TR_NOOP("Groups")).toUtf8(), languageId, "CRoleCollectionControllerComp");
+	QString translation = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QObject::tr("Groups").toUtf8(), languageId, "CRoleCollectionControllerComp");
 	response.Version_1_0->text = translation + QByteArrayLiteral(" / ") + *response.Version_1_0->text;
 
 	return response;

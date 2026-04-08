@@ -30,7 +30,7 @@ istd::IChangeableUniquePtr CFeatureControllerComp::CreateObjectFromRequest(
 			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QT_TR_NOOP("Internal error.");
+		errorMessage = QObject::tr("Internal error.");
 		SendErrorMessage(0, errorMessage, "Feature controller");
 
 		return nullptr;
@@ -38,7 +38,7 @@ istd::IChangeableUniquePtr CFeatureControllerComp::CreateObjectFromRequest(
 
 	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
-		errorMessage = QT_TR_NOOP("Unable to create object. GQL input params is invalid.");
+		errorMessage = QObject::tr("Unable to create object. GQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "Feature controller");
 
 		return nullptr;
@@ -51,7 +51,7 @@ istd::IChangeableUniquePtr CFeatureControllerComp::CreateObjectFromRequest(
 
 	QByteArray jsonItemData = inputParamPtr->GetParamArgumentValue("Item").toByteArray();
 	if (jsonItemData.isEmpty()){
-		errorMessage = QT_TR_NOOP("Unable to create object from empty json.");
+		errorMessage = QObject::tr("Unable to create object from empty json.");
 		SendErrorMessage(0, errorMessage, "Feature controller");
 
 		return nullptr;
@@ -59,7 +59,7 @@ istd::IChangeableUniquePtr CFeatureControllerComp::CreateObjectFromRequest(
 
 	imtbase::CTreeItemModel featureModel;
 	if (!featureModel.CreateFromJson(jsonItemData)){
-		errorMessage = QT_TR_NOOP(QString("Unable to create tree item model from json: %1.").arg(qPrintable(jsonItemData)));
+		errorMessage = QObject::tr("Unable to create tree item model from json: %1.").arg(qPrintable(jsonItemData));
 		SendErrorMessage(0, errorMessage, "Feature controller");
 
 		return nullptr;
@@ -103,7 +103,7 @@ QJsonObject CFeatureControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequ
 
 	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
-		errorMessage = QT_TR_NOOP("Unable to get object. GQL input params is invalid.");
+		errorMessage = QObject::tr("Unable to get object. GQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "Feature controller");
 
 		return QJsonObject();
@@ -145,7 +145,7 @@ QJsonObject CFeatureControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequ
 		}
 	}
 
-	errorMessage = QT_TR_NOOP(QString("Unable to get feature by ID: %1.").arg(qPrintable(objectId)));
+	errorMessage = QObject::tr("Unable to get feature by ID: %1.").arg(qPrintable(objectId));
 	SendErrorMessage(0, errorMessage, "Feature controller");
 
 	return QJsonObject();

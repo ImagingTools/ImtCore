@@ -51,7 +51,7 @@ bool CFeatureCollectionControllerComp::CreateFeatureFromRepresentationModel(
 	if (!collectionIds.isEmpty()){
 		QByteArray id = collectionIds[0];
 		if (rootFeatureId != id){
-			errorMessage = QT_TR_NOOP(QString("Feature-ID: '%1' already exists")).arg(qPrintable(featureId));
+			errorMessage = QObject::tr("Feature-ID: '%1' already exists").arg(qPrintable(featureId));
 			return false;
 		}
 	}

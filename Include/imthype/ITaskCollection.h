@@ -49,6 +49,16 @@ public:
 	virtual bool SetTaskInputId(const QByteArray& taskUuid, const QByteArray& inputId) = 0;
 
 	/**
+		Get sub ID of the task.
+	*/
+	virtual QByteArray GetTaskInputSubId(const QByteArray& taskUuid) const = 0;
+
+	/**
+		Set sub ID for the task.
+	*/
+	virtual bool SetTaskInputSubId(const QByteArray& taskUuid, const QByteArray& inputSubId) =0;
+
+	/**
 		Get access to the task instance.
 		\param taskId	Unique ID of the task.
 	*/
@@ -63,6 +73,12 @@ public:
 		Get available task inputs.
 	*/
 	virtual const imtbase::IObjectCollection* GetTaskInputs() const = 0;
+
+	/**
+		Generates and sets next available numbered id for the collection:taskId.
+		Returns -1 if failed.
+	*/
+	static int AssignNextNumberedTaskId(ITaskCollection& collection, const QByteArray& taskId);
 };
 
 

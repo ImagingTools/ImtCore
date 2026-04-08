@@ -304,7 +304,7 @@ bool CLicenseCollectionControllerComp::FillObjectFromRepresentation(
 	if (!collectionIds.isEmpty()){
 		QByteArray id = collectionIds[0];
 		if (newObjectId != id){
-			errorMessage = QT_TR_NOOP(QString("License-ID: '%1' already exists.")).arg(qPrintable(licenseId));
+			errorMessage = QObject::tr("License-ID: '%1' already exists.").arg(qPrintable(licenseId));
 
 			return false;
 		}

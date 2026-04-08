@@ -10,6 +10,7 @@
 #include <imtbase/imtbase.h>
 #include <imtbase/MetaTypes.h>
 #include <imthype/ITaskCollectionContext.h>
+#include <imthype/CTaskCollectionCompBase.h>
 #include <imthype/CTaskCollectionUpdateEvent.h>
 #include <imtcore/Version.h>
 
@@ -20,6 +21,37 @@ namespace imthype
 
 static QByteArray s_userDefinedTaskId = "CTaskCollectionCompBase::UserDefinedTaskId";
 static QByteArray s_taskInputId = "CTaskCollectionCompBase::TaskInputId";
+static QByteArray s_taskInputSubId = "CTaskCollectionCompBase::TaskInputSubId";
+
+
+// helper methods of ITaskCollection
+
+int ITaskCollection::AssignNextNumberedTaskId(ITaskCollection& collection, const QByteArray& taskId)
+{
+	int lastUserId = 0;
+
+	imtbase::IObjectCollection::Ids ids = collection.GetElementIds();
+	for (imtbase::IObjectCollection::Id id : ids) {
+		QByteArray userId = collection.GetUserTaskId(id);
+
+		bool isOk = false;
+		int convertedUserId = userId.toInt(&isOk);
+
+		if (isOk) {
+			if (convertedUserId > lastUserId) {
+				lastUserId = convertedUserId;
+			}
+		}
+	}
+
+	if (lastUserId >= 0) {
+		collection.SetUserTaskId(taskId, QByteArray(QString::number(lastUserId + 1).toUtf8()));
+		return lastUserId + 1;
+	}
+
+	// failed by some reason
+	return -1;
+}
 
 
 // public methods
@@ -92,6 +124,15 @@ QByteArray CTaskCollectionCompBase::GetTaskInputId(const QByteArray& taskUuid) c
 	return QByteArray();
 }
 
+QByteArray CTaskCollectionCompBase::GetTaskInputSubId(const QByteArray& taskUuid) const
+{
+	for (const Task& task : m_tasks){
+		if (task.uuid == taskUuid){
+			return task.inputSubId;
+		}
+	}
+	return QByteArray();
+}
 
 bool CTaskCollectionCompBase::SetTaskInputId(const QByteArray& taskUuid, const QByteArray& inputId)
 {
@@ -124,6 +165,39 @@ bool CTaskCollectionCompBase::SetTaskInputId(const QByteArray& taskUuid, const Q
 
 	return false;
 }
+
+bool CTaskCollectionCompBase::SetTaskInputSubId(const QByteArray& taskUuid, const QByteArray& inputSubId)
+{
+	// Set the new user-defined task-ID:
+	for (Task& task : m_tasks) {
+		if (task.uuid == taskUuid) {
+			if (task.inputSubId != inputSubId) {
+				istd::TSmartPtr<istd::IChangeable> eventPtr;
+				eventPtr.SetPtr(new imthype::CTaskCollectionUpdateEvent(
+					taskUuid,
+					imthype::CTaskCollectionUpdateEvent::UT_TASK_INPUT_SUB,
+					task.inputSubId,
+					inputSubId));
+
+				istd::IChangeable::ChangeSet changeSet(CF_OBJECT_DATA_CHANGED);
+				changeSet.SetChangeInfo(s_taskInputSubId, QVariant::fromValue<imtbase::IChangeablePtr>(eventPtr));
+				istd::CChangeNotifier changeNotifier(this, &changeSet);
+
+				task.inputSubId = inputSubId;
+
+				imthype::ITaskCollectionContext* contextPtr = QueryInterface<imthype::ITaskCollectionContext>(task.taskPtr.GetPtr());
+				if (contextPtr != nullptr) {
+					contextPtr->SetTaskInputSubId(inputSubId);
+				}
+			}
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
 
 
 const iinsp::ISupplier* CTaskCollectionCompBase::GetTask(const QByteArray& taskId) const
@@ -357,7 +431,7 @@ bool CTaskCollectionCompBase::GetObjectData(const QByteArray& objectId, DataPtr&
 				iinsp::ISupplierUniquePtr newInstancePtr = CreateTaskInstance(task.typeId);
 				if (newInstancePtr.IsValid()){
 					if (newInstancePtr->CopyFrom(*task.taskPtr)){
-						dataPtr = std::move(newInstancePtr);
+						dataPtr.MoveCastedPtr(newInstancePtr);
 
 						return true;
 					}
@@ -624,6 +698,7 @@ bool CTaskCollectionCompBase::CopyFrom(const IChangeable& object, CompatibilityM
 				newTask.description = sourceTask.description;
 				newTask.userDefinedTaskId = sourceTask.userDefinedTaskId;
 				newTask.inputId = sourceTask.inputId;
+				newTask.inputSubId = sourceTask.inputSubId;
 
 				newTask.taskPtr.TakeOver(newTaskPtr);
 				if (!newTask.taskPtr->CopyFrom(*sourceTask.taskPtr)){
@@ -634,6 +709,7 @@ bool CTaskCollectionCompBase::CopyFrom(const IChangeable& object, CompatibilityM
 				if (contextPtr != nullptr){
 					contextPtr->SetTaskId(newTask.uuid);
 					contextPtr->SetTaskInputId(newTask.inputId);
+					contextPtr->SetTaskInputSubId(newTask.inputSubId);
 				}
 
 				m_tasks.push_back(newTask);
@@ -716,15 +792,18 @@ bool CTaskCollectionCompBase::Serialize(iser::IArchive& archive)
 		retVal = retVal && archive.EndTag(taskEnabledTag);
 
 		retVal = retVal && archive.BeginTag(taskFlagsTag);
-		retVal = retVal && I_SERIALIZE_FLAG(OperationalFlags,archive, task.taskFlags);
+		retVal = retVal && I_SERIALIZE_FLAG(OperationalFlags, archive, task.taskFlags);
 		retVal = retVal && archive.EndTag(taskFlagsTag);
 
 		static const iser::CArchiveTag userDefinedTaskIdTag("TaskId", "User-defined ID of the task", iser::CArchiveTag::TT_LEAF, &taskTag);
 		static const iser::CArchiveTag inputIdTag("InputId", "Input-ID of the task", iser::CArchiveTag::TT_LEAF, &taskTag);
+		static const iser::CArchiveTag inputSubIdTag("InputSubId", "Input-Sub-ID of the task", iser::CArchiveTag::TT_LEAF, &taskTag);
 
 		retVal = retVal && archive.BeginTag(inputIdTag);
 		retVal = retVal && archive.Process(task.inputId);
 		retVal = retVal && archive.EndTag(inputIdTag);
+
+		retVal &= archive.ProcessTagIfExists(inputSubIdTag, task.inputSubId);
 
 		retVal = retVal && archive.BeginTag(userDefinedTaskIdTag);
 		retVal = retVal && archive.Process(task.userDefinedTaskId);
@@ -750,6 +829,7 @@ bool CTaskCollectionCompBase::Serialize(iser::IArchive& archive)
 				if (contextPtr != nullptr){
 					contextPtr->SetTaskId(task.uuid);
 					contextPtr->SetTaskInputId(task.inputId);
+					contextPtr->SetTaskInputSubId(task.inputSubId);
 				}
 			}
 			else{
@@ -764,6 +844,7 @@ bool CTaskCollectionCompBase::Serialize(iser::IArchive& archive)
 					if (contextPtr != nullptr){
 						contextPtr->SetTaskId(task.uuid);
 						contextPtr->SetTaskInputId(task.inputId);
+						contextPtr->SetTaskInputSubId(task.inputSubId);
 					}
 				}
 				else{
@@ -792,10 +873,12 @@ bool CTaskCollectionCompBase::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.EndTag(tasksTag);
 
 	iser::ISerializable* taskInputsSerializablePtr = dynamic_cast<iser::ISerializable*>(m_taskInputsCompPtr.GetPtr());
-	if (taskInputsSerializablePtr != nullptr){
-		retVal = retVal && archive.BeginTag(taskInputsTag);
-		retVal = retVal && taskInputsSerializablePtr->Serialize(archive);
-		retVal = retVal && archive.EndTag(taskInputsTag);
+	if (taskInputsSerializablePtr != nullptr) {
+		if (archive.CanProcessTag(taskInputsTag)) {
+			retVal = retVal && archive.BeginTag(taskInputsTag);
+			retVal = retVal && taskInputsSerializablePtr->Serialize(archive);
+			retVal = retVal && archive.EndTag(taskInputsTag);
+		}
 	}
 
 	return retVal;
@@ -947,6 +1030,22 @@ void CTaskCollectionCompBase::OnTaskInputsUpdated(const istd::IChangeable::Chang
 					for (const QByteArray& id : ids){
 						if (GetTaskInputId(id) == eventPtr->GetOldValue().toByteArray()){
 							SetTaskInputId(id, eventPtr->GetNewValue().toByteArray());
+						}
+					}
+				}
+			}
+		}
+	}
+	else if (changeInfoMap.contains(s_taskInputSubId)) {
+		QVariant var = changeSet.GetChangeInfo(s_taskInputSubId);
+		if (var.canConvert<imtbase::IChangeablePtr>()) {
+			imthype::CTaskCollectionUpdateEvent* eventPtr = dynamic_cast<imthype::CTaskCollectionUpdateEvent*>(var.value<imtbase::IChangeablePtr>().GetPtr());
+			if (eventPtr != nullptr) {
+				if (eventPtr != nullptr) {
+					imtbase::IObjectCollection::Ids ids = GetElementIds();
+					for (const QByteArray& id : ids) {
+						if (GetTaskInputSubId(id) == eventPtr->GetOldValue().toByteArray()) {
+							SetTaskInputSubId(id, eventPtr->GetNewValue().toByteArray());
 						}
 					}
 				}

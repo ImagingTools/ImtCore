@@ -79,7 +79,7 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 			const QByteArray& login,
 			QString& errorMessage) const
 {
-	errorMessage = QT_TR_NOOP(QString("Invalid login or password. Login: '%1'").arg(qPrintable(login)));
+	errorMessage = QObject::tr("Invalid login or password. Login: '%1'").arg(qPrintable(login));
 	SendErrorMessage(0, errorMessage, "imtgql::CAuthorizationControllerComp");
 
 	return sdl::imtauth::Authorization::CAuthorizationPayload();

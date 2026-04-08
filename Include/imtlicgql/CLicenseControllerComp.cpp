@@ -24,7 +24,7 @@ istd::IChangeableUniquePtr CLicenseControllerComp::CreateObjectFromRequest(
 			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QT_TR_NOOP("Internal error.");
+		errorMessage = QObject::tr("Internal error.");
 		SendErrorMessage(0, errorMessage, "License controller");
 
 		return nullptr;
@@ -32,7 +32,7 @@ istd::IChangeableUniquePtr CLicenseControllerComp::CreateObjectFromRequest(
 
 	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
-		errorMessage = QT_TR_NOOP("Unable to create object. GQL input params is invalid.");
+		errorMessage = QObject::tr("Unable to create object. GQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "License controller");
 
 		return nullptr;
@@ -45,7 +45,7 @@ istd::IChangeableUniquePtr CLicenseControllerComp::CreateObjectFromRequest(
 
 	QByteArray jsonItemData = inputParamPtr->GetParamArgumentValue("Item").toByteArray();
 	if (jsonItemData.isEmpty()){
-		errorMessage = QT_TR_NOOP("Unable to create object from empty json.");
+		errorMessage = QObject::tr("Unable to create object from empty json.");
 		SendErrorMessage(0, errorMessage, "License controller");
 
 		return nullptr;
@@ -53,7 +53,7 @@ istd::IChangeableUniquePtr CLicenseControllerComp::CreateObjectFromRequest(
 
 	imtbase::CTreeItemModel licenseModel;
 	if (!licenseModel.CreateFromJson(jsonItemData)){
-		errorMessage = QT_TR_NOOP(QString("Unable to create tree item model from json: %1.").arg(qPrintable(jsonItemData)));
+		errorMessage = QObject::tr("Unable to create tree item model from json: %1.").arg(qPrintable(jsonItemData));
 		SendErrorMessage(0, errorMessage, "License controller");
 
 		return nullptr;
@@ -70,7 +70,7 @@ istd::IChangeableUniquePtr CLicenseControllerComp::CreateObjectFromRequest(
 	}
 
 	if (licenseId.isEmpty()){
-		errorMessage = QT_TR_NOOP("Unable to create license with an empty License-ID.");
+		errorMessage = QObject::tr("Unable to create license with an empty License-ID.");
 		SendErrorMessage(0, errorMessage, "License controller");
 
 		return nullptr;
@@ -89,7 +89,7 @@ istd::IChangeableUniquePtr CLicenseControllerComp::CreateObjectFromRequest(
 	if (!collectionIds.isEmpty()){
 		QByteArray id = collectionIds[0];
 		if (objectId != id){
-			errorMessage = QT_TR_NOOP(QString("License-ID: %1 already exists.")).arg(qPrintable(licenseId));
+			errorMessage = QObject::tr("License-ID: %1 already exists.").arg(qPrintable(licenseId));
 
 			return nullptr;
 		}
@@ -168,7 +168,7 @@ QJsonObject CLicenseControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequ
 
 	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
-		errorMessage = QT_TR_NOOP("Unable to get object. GQL input params is invalid.");
+		errorMessage = QObject::tr("Unable to get object. GQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "License controller");
 
 		return QJsonObject();
@@ -204,7 +204,7 @@ QJsonObject CLicenseControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequ
 		}
 	}
 
-	errorMessage = QT_TR_NOOP(QString("Unable to get license by ID: %1.").arg(qPrintable(objectId)));
+	errorMessage = QObject::tr("Unable to get license by ID: %1.").arg(qPrintable(objectId));
 	SendErrorMessage(0, errorMessage, "License controller");
 
 	return QJsonObject();

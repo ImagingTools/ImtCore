@@ -3,6 +3,7 @@
 
 
 // Qt includes
+#include <QtWidgets/QDialog>
 #if QT_VERSION > 0x060000
 #include <QtGui/QRegularExpressionValidator>
 #endif
@@ -33,6 +34,7 @@ public:
 	I_BEGIN_COMPONENT(CTaskSettingsGuiComp);
 		I_ASSIGN(m_taskInputManagerGuiCompPtr, "TaskInputEditor", "Editor of task inputs", false, "TaskInputEditor");
 		I_ASSIGN_TO(m_taskInputManagerObserverCompPtr, m_taskInputManagerGuiCompPtr, true);
+		I_ASSIGN(m_showAcquisitionSubIdSettingAttrPtr, "ShowAcquisitionSubIdSetting", "Show on task settings dialog AcqSubId field (relevant for multi snap camera acquisitions)", false, false);
 	I_END_COMPONENT;
 
 	CTaskSettingsGuiComp();
@@ -55,6 +57,7 @@ private Q_SLOTS:
 	void on_TaskDescriptionEdit_editingFinished();
 	void on_TaskUserIdEdit_editingFinished();
 	void on_InputIdEdit_editingFinished();
+	void on_TriggerSelector_editingFinished();
 	void on_InputSelector_currentTextChanged(const QString& text);
 	void on_ActiveCheck_stateChanged(int state);
 	void on_ShowAcquisitionManagerButton_clicked();
@@ -66,11 +69,14 @@ private:
 private:
 	I_REF(iqtgui::IGuiObject, m_taskInputManagerGuiCompPtr);
 	I_REF(imod::IObserver, m_taskInputManagerObserverCompPtr);
+	I_ATTR(bool, m_showAcquisitionSubIdSettingAttrPtr);
 
 #if QT_VERSION > 0x060000
 	QRegularExpressionValidator m_taskNameValidator;
+	QRegularExpressionValidator m_triggerIdValidator;
 #else
 	QRegExpValidator m_taskNameValidator;
+	QRegExpValidator m_triggerIdValidator;
 #endif
 	mutable QByteArray m_taskId;
 

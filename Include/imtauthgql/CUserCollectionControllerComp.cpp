@@ -43,7 +43,7 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 	}
 
 	if (username.isEmpty()){
-		errorMessage = QT_TR_NOOP("Username can't be empty!");
+		errorMessage = QObject::tr("Username can't be empty!");
 		SendWarningMessage(0, errorMessage, "CUserCollectionControllerComp");
 
 		return false;
@@ -72,7 +72,7 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 				if (userObjectId != newObjectId){
 					QByteArray currentUsername = currentUserInfoPtr->GetId();
 					if (currentUsername.toLower() == username.toLower()){
-						errorMessage = QT_TR_NOOP("Username already exists");
+						errorMessage = QObject::tr("Username already exists");
 						SendWarningMessage(0, errorMessage, "imtauthgql::CUserControllerComp");
 
 						return false;
@@ -161,7 +161,7 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 		if (!userIds.isEmpty()){
 			QByteArray userObjectId = userIds[0];
 			if (newObjectId != userObjectId){
-				errorMessage = QT_TR_NOOP("Email already exists");
+				errorMessage = QObject::tr("Email already exists");
 				return false;
 			}
 		}
@@ -237,7 +237,7 @@ sdl::imtbase::ImtCollection::CVisualStatus CUserCollectionControllerComp::OnGetO
 		response.Version_1_0->text = "<no name>";
 	}
 
-	QString translation = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QString(QT_TR_NOOP("Users")).toUtf8(), languageId, "CUserCollectionControllerComp");
+	QString translation = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QObject::tr("Users").toUtf8(), languageId, "CUserCollectionControllerComp");
 	response.Version_1_0->text = translation + QByteArrayLiteral(" / ") + *response.Version_1_0->text;
 	return response;
 }
@@ -428,7 +428,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 		imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
 		for (imtauth::IUserInfo::SystemInfo& systemInfo : systemInfoList){
 			if (systemInfo.systemName.isEmpty()){
-				systemNameList << QT_TR_NOOP("Internal");
+				systemNameList << QObject::tr("Internal");
 			}
 			else{
 				systemNameList << systemInfo.systemName;

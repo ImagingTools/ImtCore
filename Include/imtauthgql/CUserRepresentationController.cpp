@@ -40,7 +40,7 @@ bool CUserRepresentationController::FillUserInfoFromRepresentation(
 	}
 
 	if (username.isEmpty()){
-		errorMessage = QT_TR_NOOP("Username can't be empty!");
+		errorMessage = QObject::tr("Username can't be empty!");
 		return false;
 	}
 
@@ -68,7 +68,7 @@ bool CUserRepresentationController::FillUserInfoFromRepresentation(
 					if (currentUserInfoPtr != nullptr){
 						QByteArray currentUsername = currentUserInfoPtr->GetId();
 						if (currentUsername.toLower() == username.toLower()){
-							errorMessage = QT_TR_NOOP("Username already exists");
+							errorMessage = QObject::tr("Username already exists");
 							return false;
 						}
 					}

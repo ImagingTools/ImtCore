@@ -45,14 +45,14 @@ ifile::IFilePersistence::OperationState CDeviceDataFilePersistenceComp::LoadFrom
 
 	imtdev::IDeviceDataProvider* dataProviderPtr = dynamic_cast<imtdev::IDeviceDataProvider*>(&data);
 	if (dataProviderPtr == nullptr){
-		SendCriticalMessage(0, QT_TR_NOOP("Wrong data object type"));
+		SendCriticalMessage(0, QObject::tr("Wrong data object type"));
 
 		return OS_FAILED;
 	}
 
 	iser::ISerializable* serializablePtr = dynamic_cast<iser::ISerializable*>(&data);
 	if (serializablePtr == nullptr){
-		SendCriticalMessage(0, QT_TR_NOOP("Wrong data object type. Serialization is not supported"));
+		SendCriticalMessage(0, QObject::tr("Wrong data object type. Serialization is not supported"));
 
 		return OS_FAILED;
 	}
@@ -60,7 +60,7 @@ ifile::IFilePersistence::OperationState CDeviceDataFilePersistenceComp::LoadFrom
 	QByteArray deviceDataBuffer;
 	bool retVal = m_deviceDataPersistenceCompPtr->ReadDataFromStorage(deviceDataBuffer, imtdev::IDeviceDataPersistence::ST_EEPROM, progressManagerPtr);
 	if (!retVal){
-		SendErrorMessage(0, QT_TR_NOOP("Reading of the device data failed"));
+		SendErrorMessage(0, QObject::tr("Reading of the device data failed"));
 
 		return OS_FAILED;
 	}
@@ -70,7 +70,7 @@ ifile::IFilePersistence::OperationState CDeviceDataFilePersistenceComp::LoadFrom
 
 		retVal = serializablePtr->Serialize(dataArchive);
 		if (!retVal){
-			SendErrorMessage(0, QT_TR_NOOP("Reading of the device data during deserialization failed"));
+			SendErrorMessage(0, QObject::tr("Reading of the device data during deserialization failed"));
 
 			return OS_FAILED;
 		}
@@ -80,7 +80,7 @@ ifile::IFilePersistence::OperationState CDeviceDataFilePersistenceComp::LoadFrom
 	if (metaInfoPtr != nullptr){
 		retVal = retVal && m_deviceDataPersistenceCompPtr->ReadDeviceMetaInfo(*metaInfoPtr);
 		if (!retVal){
-			SendErrorMessage(0, QT_TR_NOOP("Reading of the device meta-data failed"));
+			SendErrorMessage(0, QObject::tr("Reading of the device meta-data failed"));
 
 			return OS_FAILED;
 		}

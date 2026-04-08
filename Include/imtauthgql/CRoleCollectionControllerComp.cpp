@@ -90,8 +90,8 @@ bool CRoleCollectionControllerComp::FillObjectFromRepresentation(
 
 		for (const QByteArray& parentRoleId : parentRoles){
 			if (parentRoleId == objectId || !roleInfoPtr->IncludeRole(parentRoleId)){
-				errorMessage = QT_TR_NOOP(QString("Unable include role '%1' to the role '%2'. Check the dependencies between them.")
-											.arg(qPrintable(parentRoleId), qPrintable(roleId)));
+				errorMessage = QObject::tr("Unable include role '%1' to the role '%2'. Check the dependencies between them.")
+											.arg(qPrintable(parentRoleId), qPrintable(roleId));
 
 				return false;
 			}
@@ -165,7 +165,7 @@ sdl::imtbase::ImtCollection::CVisualStatus CRoleCollectionControllerComp::OnGetO
 
 	QString translation = iqt::GetTranslation(
 				m_translationManagerCompPtr.GetPtr(),
-				QString(QT_TR_NOOP("Roles")).toUtf8(),
+				QObject::tr("Roles").toUtf8(),
 				languageId,
 				"CRoleCollectionControllerComp");
 	response.Version_1_0->text = translation + QByteArrayLiteral(" / ") + *response.Version_1_0->text;
@@ -201,7 +201,7 @@ sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload CRoleCollectionControlle
 	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
 		const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(dataPtr.GetPtr());
 		if (roleInfoPtr == nullptr){
-			errorMessage = QT_TR_NOOP("Unable to get a role info");
+			errorMessage = QObject::tr("Unable to get a role info");
 			return response;
 		}
 

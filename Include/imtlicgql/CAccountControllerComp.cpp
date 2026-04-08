@@ -78,7 +78,7 @@ QJsonObject CAccountControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequ
 		}
 	}
 
-	errorMessage = QT_TR_NOOP(QString("Unable to get an account with ID: '%1'.").arg(qPrintable(accountId)));
+	errorMessage = QObject::tr("Unable to get an account with ID: '%1'.").arg(qPrintable(accountId));
 	SendErrorMessage(0, errorMessage, "CAccountControllerComp");
 
 	return QJsonObject();
@@ -116,7 +116,7 @@ istd::IChangeableUniquePtr CAccountControllerComp::CreateObjectFromInputParams(
 
 		imtauth::CIdentifiableCompanyInfo* companyInfoPtr = dynamic_cast<imtauth::CIdentifiableCompanyInfo*>(companyInstancePtr.GetPtr());
 		if (companyInfoPtr == nullptr){
-			errorMessage = QT_TR_NOOP("Unable to get an account info!");
+			errorMessage = QObject::tr("Unable to get an account info!");
 			SendErrorMessage(0, errorMessage, "CAccountControllerComp");
 
 			return nullptr;
@@ -135,7 +135,7 @@ istd::IChangeableUniquePtr CAccountControllerComp::CreateObjectFromInputParams(
 		}
 
 		if (name.isEmpty()){
-			errorMessage = QT_TR_NOOP("Account name can't be empty");
+			errorMessage = QObject::tr("Account name can't be empty");
 			SendErrorMessage(0, errorMessage, "CAccountControllerComp");
 
 			return nullptr;
@@ -150,7 +150,7 @@ istd::IChangeableUniquePtr CAccountControllerComp::CreateObjectFromInputParams(
 					if (collectionId != objectId){
 						QString currentName = accountInfoPtr->GetName();
 						if (currentName == name){
-							errorMessage = QT_TR_NOOP("Account Name already exists");
+							errorMessage = QObject::tr("Account Name already exists");
 							return nullptr;
 						}
 					}

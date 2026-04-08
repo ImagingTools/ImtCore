@@ -936,8 +936,10 @@ void CObjectCollectionViewDelegate::OnExport()
 
 			std::unique_ptr<ibase::IProgressLogger> progressLoggerPtr = exportProgress.StartProgressLogger(true);
 
-			for (int i = 0; i < m_selectedItemIds.count(); ++i){
-				QByteArray objectId = m_selectedItemIds[i];
+			const imtbase::ICollectionInfo::Ids exportItemIds = m_selectedItemIds;
+
+			for (int i = 0; i < exportItemIds.count(); ++i){
+				QByteArray objectId = exportItemIds[i];
 
 				QString exportFilePath = targetFolder + "/" + ComposeExportFilePath("", GetExportFileName(*m_collectionPtr, objectId));
 				if (fileExt.isEmpty()){
@@ -958,8 +960,12 @@ void CObjectCollectionViewDelegate::OnExport()
 					exportFilePath += "." + fileExt;
 				}
 
+				if (!ExportObject(objectId, exportFilePath)){
+//					QMessageBox::critical(m_parentGuiPtr ? m_parentGuiPtr->GetWidget() : nullptr, tr("Collection"), tr("Document could not be exported"));
+				}
+
 				if (progressLoggerPtr != nullptr){
-					progressLoggerPtr->OnProgress(double(i + 1) / m_selectedItemIds.size());
+					progressLoggerPtr->OnProgress(double(i + 1) / exportItemIds.size());
 					if (progressLoggerPtr->IsCanceled()){
 						break;
 					}
