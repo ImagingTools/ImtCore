@@ -5,17 +5,25 @@ CREATE TABLE IF NOT EXISTS "Tickets"
     "Description"    TEXT NOT NULL DEFAULT '',
     "TicketType"     INTEGER NOT NULL DEFAULT 0,
     "Status"         INTEGER NOT NULL DEFAULT 0,
+    "StateReason"    INTEGER NOT NULL DEFAULT 0,
     "Priority"       INTEGER NOT NULL DEFAULT 1,
-    "AssigneeId"     TEXT,
+    "AssigneeIds"    TEXT,
     "ReporterId"     TEXT NOT NULL,
     "ConversationId" TEXT,
     "MessageId"      TEXT,
     "Environment"    INTEGER NOT NULL DEFAULT 2,
     "Tags"           TEXT,
+    "LabelIds"       TEXT,
+    "MilestoneId"    TEXT,
+    "Locked"         INTEGER NOT NULL DEFAULT 0,
+    "LockReason"     TEXT,
+    "Number"         INTEGER,
     "CreatedAt"      TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "UpdatedAt"      TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "ClosedAt"       TEXT,
     "ResolvedAt"     TEXT,
     "IsActive"       INTEGER NOT NULL DEFAULT 1
 );
 CREATE INDEX IF NOT EXISTS "IX_Tickets_Status" ON "Tickets" ("Status");
 CREATE INDEX IF NOT EXISTS "IX_Tickets_Priority" ON "Tickets" ("Priority");
+CREATE INDEX IF NOT EXISTS "IX_Tickets_Number" ON "Tickets" ("Number");

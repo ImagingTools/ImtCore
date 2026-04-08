@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS "${TableScheme}"."Messages"
     "Content"          TEXT NOT NULL,
     "EntityReferences" JSONB,
     "AttachmentIds"    JSONB,
+    "Reactions"        JSONB,
     "Status"           INTEGER NOT NULL DEFAULT 0,
     "CreatedAt"        TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     "UpdatedAt"        TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),

@@ -69,6 +69,14 @@ istd::IChangeableUniquePtr CMessageDbDelegateComp::CreateObjectFromRecord(
 	if (record.contains("Status")){
 		msgPtr->SetStatus(static_cast<imtchat::IChatMessage::MessageStatus>(record.value("Status").toInt()));
 	}
+	if (record.contains("Reactions")){
+		const QString reactionsStr = record.value("Reactions").toString();
+		QStringList reactions;
+		if (!reactionsStr.isEmpty()){
+			reactions = reactionsStr.split(',');
+		}
+		msgPtr->SetReactions(reactions);
+	}
 	if (record.contains("CreatedAt")){
 		msgPtr->SetCreatedAt(record.value("CreatedAt").toString());
 	}
@@ -118,17 +126,21 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CMessageDbDelegateComp::CreateNew
 	}
 	const QString attachSql = attachStr.isEmpty() ? "NULL" : QString("'%1'").arg(attachStr);
 
+	const QString reactionsStr = msgPtr->GetReactions().join(',');
+	const QString reactionsSql = reactionsStr.isEmpty() ? "NULL" : QString("'%1'").arg(reactionsStr);
+
 	NewObjectQuery retVal;
 	retVal.query = QString(
 		"INSERT INTO \"Messages\" "
-		"(\"Id\", \"ConversationId\", \"SenderId\", \"Content\", \"EntityReferences\", \"AttachmentIds\", \"Status\") "
-		"VALUES('%1', '%2', '%3', '%4', %5, %6, %7);")
+		"(\"Id\", \"ConversationId\", \"SenderId\", \"Content\", \"EntityReferences\", \"AttachmentIds\", \"Reactions\", \"Status\") "
+		"VALUES('%1', '%2', '%3', '%4', %5, %6, %7, %8);")
 		.arg(QString::fromUtf8(msgId))
 		.arg(QString::fromUtf8(msgPtr->GetConversationId()))
 		.arg(QString::fromUtf8(msgPtr->GetSenderId()))
 		.arg(msgPtr->GetContent())
 		.arg(entityRefsSql)
 		.arg(attachSql)
+		.arg(reactionsSql)
 		.arg(msgPtr->GetStatus())
 		.toUtf8();
 
@@ -156,15 +168,20 @@ QByteArray CMessageDbDelegateComp::CreateUpdateObjectQuery(
 	}
 	const QString entityRefsSql = entityRefsStr.isEmpty() ? "NULL" : QString("'%1'").arg(entityRefsStr);
 
+	const QString reactionsStr = msgPtr->GetReactions().join(',');
+	const QString reactionsSql = reactionsStr.isEmpty() ? "NULL" : QString("'%1'").arg(reactionsStr);
+
 	return QString(
 		"UPDATE \"Messages\" SET "
 		"\"Content\"='%1', "
 		"\"EntityReferences\"=%2, "
-		"\"Status\"=%3, "
+		"\"Reactions\"=%3, "
+		"\"Status\"=%4, "
 		"\"UpdatedAt\"=NOW() "
-		"WHERE \"Id\"='%4';")
+		"WHERE \"Id\"='%5';")
 		.arg(msgPtr->GetContent())
 		.arg(entityRefsSql)
+		.arg(reactionsSql)
 		.arg(msgPtr->GetStatus())
 		.arg(QString::fromUtf8(objectId))
 		.toUtf8();
