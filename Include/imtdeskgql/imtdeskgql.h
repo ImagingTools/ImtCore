@@ -167,6 +167,31 @@ inline sdl::imtdesk::ImtDesk::TicketPriority GetSdlTypeFromPriorityType(imtdesk:
 }
 
 
+inline sdl::imtdesk::ImtDesk::ActivityItemType GetSdlActivityItemType(imtdesk::ISupportTicket::ActivityItemType type)
+{
+	switch (type){
+	case imtdesk::ISupportTicket::AIT_COMMENT:
+		return sdl::imtdesk::ImtDesk::ActivityItemType::Comment;
+	case imtdesk::ISupportTicket::AIT_ACTION:
+		return sdl::imtdesk::ImtDesk::ActivityItemType::Action;
+	default:
+		return sdl::imtdesk::ImtDesk::ActivityItemType::Comment;
+	}
+}
+
+inline imtdesk::ISupportTicket::ActivityItemType GetActivityItemTypeFromSdl(sdl::imtdesk::ImtDesk::ActivityItemType type)
+{
+	switch (type){
+	case sdl::imtdesk::ImtDesk::ActivityItemType::Comment:
+		return imtdesk::ISupportTicket::AIT_COMMENT;
+	case sdl::imtdesk::ImtDesk::ActivityItemType::Action:
+		return imtdesk::ISupportTicket::AIT_ACTION;
+	default:
+		return imtdesk::ISupportTicket::AIT_COMMENT;
+	}
+}
+
+
 } // namespace imtdeskgql
 
 

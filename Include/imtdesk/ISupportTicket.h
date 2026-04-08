@@ -280,6 +280,60 @@ public:
 		Set the resolution timestamp.
 	*/
 	virtual void SetResolvedAt(const QString& resolvedAt) = 0;
+
+	/**
+		Activity item type — comment or user action.
+	*/
+	enum ActivityItemType
+	{
+		AIT_COMMENT,
+		AIT_ACTION
+	};
+
+	/**
+		Represents a single entry in the ticket activity timeline.
+		Can be either a conversation comment or a user action record.
+	*/
+	struct ActivityItem
+	{
+		ActivityItemType itemType = AIT_COMMENT;
+		QByteArray userId;
+		QString userName;
+		QString timestamp;
+		// Comment fields
+		QString content;
+		QStringList reactions;
+		// Action fields
+		QString actionType;
+		QString actionDescription;
+
+		bool operator==(const ActivityItem& other) const
+		{
+			return itemType == other.itemType
+				&& userId == other.userId
+				&& userName == other.userName
+				&& timestamp == other.timestamp
+				&& content == other.content
+				&& reactions == other.reactions
+				&& actionType == other.actionType
+				&& actionDescription == other.actionDescription;
+		}
+
+		bool operator!=(const ActivityItem& other) const
+		{
+			return !(*this == other);
+		}
+	};
+
+	/**
+		Get the list of activity items (comments + actions) for the timeline.
+	*/
+	virtual QList<ActivityItem> GetActivityItems() const = 0;
+
+	/**
+		Set the activity items list.
+	*/
+	virtual void SetActivityItems(const QList<ActivityItem>& items) = 0;
 };
 
 typedef istd::TUniqueInterfacePtr<ISupportTicket> ISupportTicketUniquePtr;

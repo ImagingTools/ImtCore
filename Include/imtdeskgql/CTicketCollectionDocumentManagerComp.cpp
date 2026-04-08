@@ -71,6 +71,29 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 	response.Version_1_0->status = imtdeskgql::GetSdlTypeFromStatusType(ticketPtr->GetStatus());
 	response.Version_1_0->stateReason = imtdeskgql::GetSdlTypeFromStateReason(ticketPtr->GetStateReason());
 
+	// Populate activity items
+	{
+		const QList<imtdesk::ISupportTicket::ActivityItem> items = ticketPtr->GetActivityItems();
+		for (const imtdesk::ISupportTicket::ActivityItem& item : items){
+			sdl::imtdesk::ImtDesk::CTicketActivityItem sdlItem;
+			sdlItem.Version_1_0.Emplace();
+			sdlItem.Version_1_0->itemType = imtdeskgql::GetSdlActivityItemType(item.itemType);
+			sdlItem.Version_1_0->userId = item.userId;
+			sdlItem.Version_1_0->userName = item.userName;
+			sdlItem.Version_1_0->timestamp = item.timestamp;
+			sdlItem.Version_1_0->content = item.content;
+			if (!item.reactions.isEmpty()){
+				sdlItem.Version_1_0->reactions.Emplace().FromList(item.reactions);
+			}
+			sdlItem.Version_1_0->actionType = item.actionType;
+			sdlItem.Version_1_0->actionDescription = item.actionDescription;
+			if (!response.Version_1_0->activityItems.has_value()){
+				response.Version_1_0->activityItems.Emplace();
+			}
+			response.Version_1_0->activityItems->Append(sdlItem);
+		}
+	}
+
 	return response;
 }
 
@@ -187,6 +210,43 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 
 	if (ticketInfo.priority){
 		ticketPtr->SetPriority(imtdeskgql::GetPriorityTypeFromSdlType(*ticketInfo.priority));
+	}
+
+	if (ticketInfo.activityItems){
+		QList<imtdesk::ISupportTicket::ActivityItem> items;
+		for (int i = 0; i < ticketInfo.activityItems->GetSize(); ++i){
+			const sdl::imtdesk::ImtDesk::CTicketActivityItem& sdlItem = ticketInfo.activityItems->At(i);
+			if (!sdlItem.Version_1_0.has_value()){
+				continue;
+			}
+			imtdesk::ISupportTicket::ActivityItem item;
+			if (sdlItem.Version_1_0->itemType){
+				item.itemType = imtdeskgql::GetActivityItemTypeFromSdl(*sdlItem.Version_1_0->itemType);
+			}
+			if (sdlItem.Version_1_0->userId){
+				item.userId = *sdlItem.Version_1_0->userId;
+			}
+			if (sdlItem.Version_1_0->userName){
+				item.userName = *sdlItem.Version_1_0->userName;
+			}
+			if (sdlItem.Version_1_0->timestamp){
+				item.timestamp = *sdlItem.Version_1_0->timestamp;
+			}
+			if (sdlItem.Version_1_0->content){
+				item.content = *sdlItem.Version_1_0->content;
+			}
+			if (sdlItem.Version_1_0->reactions){
+				item.reactions = sdlItem.Version_1_0->reactions->ToList();
+			}
+			if (sdlItem.Version_1_0->actionType){
+				item.actionType = *sdlItem.Version_1_0->actionType;
+			}
+			if (sdlItem.Version_1_0->actionDescription){
+				item.actionDescription = *sdlItem.Version_1_0->actionDescription;
+			}
+			items.append(item);
+		}
+		ticketPtr->SetActivityItems(items);
 	}
 
 	m_documentManagerCompPtr->SetDocumentData(userId, documentId, *ticketPtr);
