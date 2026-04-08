@@ -237,7 +237,7 @@ sdl::imtbase::ImtCollection::CVisualStatus CUserCollectionControllerComp::OnGetO
 		response.Version_1_0->text = "<no name>";
 	}
 
-	QString translation = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QObject::tr("Users").toUtf8(), languageId, "CUserCollectionControllerComp");
+	QString translation = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Users"), languageId, "CUserCollectionControllerComp");
 	response.Version_1_0->text = translation + QByteArrayLiteral(" / ") + *response.Version_1_0->text;
 	return response;
 }
