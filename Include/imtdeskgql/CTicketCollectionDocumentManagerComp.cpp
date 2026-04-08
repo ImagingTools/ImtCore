@@ -95,14 +95,17 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 				if (actionsIterator->GetObjectData(dataPtr)){
 					const imtdesk::ITicketAction* actionPtr = dynamic_cast<const imtdesk::ITicketAction*>(dataPtr.GetPtr());
 					if (actionPtr != nullptr){
+						const imtauth::IUserRecentAction::UserInfo userInfo = actionPtr->GetUserInfo();
+						const imtauth::IUserRecentAction::ActionTypeInfo actionTypeInfo = actionPtr->GetActionTypeInfo();
+
 						sdl::imtdesk::ImtDesk::CTicketActivityItem sdlItem;
 						sdlItem.Version_1_0.Emplace();
 						sdlItem.Version_1_0->itemType = sdl::imtdesk::ImtDesk::ActivityItemType::Action;
-						sdlItem.Version_1_0->userId = actionPtr->GetUserId();
-						sdlItem.Version_1_0->userName = actionPtr->GetUserName();
-						sdlItem.Version_1_0->timestamp = actionPtr->GetTimestamp();
-						sdlItem.Version_1_0->actionType = actionPtr->GetActionTypeName();
-						sdlItem.Version_1_0->actionDescription = actionPtr->GetActionTypeDescription();
+						sdlItem.Version_1_0->userId = userInfo.id;
+						sdlItem.Version_1_0->userName = userInfo.name;
+						sdlItem.Version_1_0->timestamp = actionPtr->GetTimestamp().toString(Qt::ISODate);
+						sdlItem.Version_1_0->actionType = actionTypeInfo.name;
+						sdlItem.Version_1_0->actionDescription = actionTypeInfo.description;
 						if (!response.Version_1_0->activityItems.has_value()){
 							response.Version_1_0->activityItems.Emplace();
 						}

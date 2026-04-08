@@ -11,6 +11,7 @@
 
 // ImtCore includes
 #include <imtdesk/ITicketAction.h>
+#include <imtauth/IUserRecentAction.h>
 #include <imtdb/CDatabaseEngineComp.h>
 #include <imtdb/imtdb.h>
 
@@ -46,32 +47,33 @@ istd::IChangeableUniquePtr CTicketActionDbDelegateComp::CreateObjectFromRecord(
 		return nullptr;
 	}
 
-	if (record.contains("Id")){
-		actionPtr->SetId(record.value("Id").toByteArray());
-	}
 	if (record.contains("TicketId")){
 		actionPtr->SetTicketId(record.value("TicketId").toByteArray());
 	}
+
+	imtauth::IUserRecentAction::UserInfo userInfo;
 	if (record.contains("UserId")){
-		actionPtr->SetUserId(record.value("UserId").toByteArray());
+		userInfo.id = record.value("UserId").toByteArray();
 	}
 	if (record.contains("UserName")){
-		actionPtr->SetUserName(record.value("UserName").toString());
+		userInfo.name = record.value("UserName").toString();
 	}
+	actionPtr->SetUserInfo(userInfo);
+
+	imtauth::IUserRecentAction::ActionTypeInfo actionTypeInfo;
 	if (record.contains("ActionTypeId")){
-		actionPtr->SetActionTypeId(record.value("ActionTypeId").toByteArray());
+		actionTypeInfo.id = record.value("ActionTypeId").toByteArray();
 	}
 	if (record.contains("ActionTypeName")){
-		actionPtr->SetActionTypeName(record.value("ActionTypeName").toString());
+		actionTypeInfo.name = record.value("ActionTypeName").toString();
 	}
 	if (record.contains("ActionTypeDescription")){
-		actionPtr->SetActionTypeDescription(record.value("ActionTypeDescription").toString());
+		actionTypeInfo.description = record.value("ActionTypeDescription").toString();
 	}
+	actionPtr->SetActionTypeInfo(actionTypeInfo);
+
 	if (record.contains("Timestamp")){
-		actionPtr->SetTimestamp(record.value("Timestamp").toString());
-	}
-	if (record.contains("ActionData")){
-		actionPtr->SetActionData(record.value("ActionData").toString());
+		actionPtr->SetTimestamp(QDateTime::fromString(record.value("Timestamp").toString(), Qt::ISODate));
 	}
 
 	return actionPtr;
@@ -100,14 +102,18 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CTicketActionDbDelegateComp::Crea
 		actionId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
 	}
 
+	const imtauth::IUserRecentAction::UserInfo userInfo = actionPtr->GetUserInfo();
+	const imtauth::IUserRecentAction::ActionTypeInfo actionTypeInfo = actionPtr->GetActionTypeInfo();
+	const QDateTime timestamp = actionPtr->GetTimestamp();
+
 	const QString ticketIdSql = actionPtr->GetTicketId().isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(QString::fromUtf8(actionPtr->GetTicketId())));
-	const QString userIdSql = actionPtr->GetUserId().isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(QString::fromUtf8(actionPtr->GetUserId())));
-	const QString userNameSql = actionPtr->GetUserName().isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(actionPtr->GetUserName()));
-	const QString actionTypeIdSql = actionPtr->GetActionTypeId().isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(QString::fromUtf8(actionPtr->GetActionTypeId())));
-	const QString actionTypeNameSql = actionPtr->GetActionTypeName().isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(actionPtr->GetActionTypeName()));
-	const QString actionTypeDescSql = actionPtr->GetActionTypeDescription().isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(actionPtr->GetActionTypeDescription()));
-	const QString timestampSql = actionPtr->GetTimestamp().isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(actionPtr->GetTimestamp()));
-	const QString actionDataSql = actionPtr->GetActionData().isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(actionPtr->GetActionData()));
+	const QString userIdSql = userInfo.id.isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(QString::fromUtf8(userInfo.id)));
+	const QString userNameSql = userInfo.name.isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(userInfo.name));
+	const QString actionTypeIdSql = actionTypeInfo.id.isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(QString::fromUtf8(actionTypeInfo.id)));
+	const QString actionTypeNameSql = actionTypeInfo.name.isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(actionTypeInfo.name));
+	const QString actionTypeDescSql = actionTypeInfo.description.isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(actionTypeInfo.description));
+	const QString timestampSql = timestamp.isNull() ? "NULL" : QString("'%1'").arg(sqlEscape(timestamp.toString(Qt::ISODate)));
+	const QString actionDataSql = "NULL";
 
 	NewObjectQuery retVal;
 	retVal.query = QString(
@@ -145,13 +151,17 @@ QByteArray CTicketActionDbDelegateComp::CreateUpdateObjectQuery(
 		return QByteArray();
 	}
 
-	const QString userIdSql = actionPtr->GetUserId().isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(QString::fromUtf8(actionPtr->GetUserId())));
-	const QString userNameSql = actionPtr->GetUserName().isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(actionPtr->GetUserName()));
-	const QString actionTypeIdSql = actionPtr->GetActionTypeId().isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(QString::fromUtf8(actionPtr->GetActionTypeId())));
-	const QString actionTypeNameSql = actionPtr->GetActionTypeName().isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(actionPtr->GetActionTypeName()));
-	const QString actionTypeDescSql = actionPtr->GetActionTypeDescription().isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(actionPtr->GetActionTypeDescription()));
-	const QString timestampSql = actionPtr->GetTimestamp().isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(actionPtr->GetTimestamp()));
-	const QString actionDataSql = actionPtr->GetActionData().isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(actionPtr->GetActionData()));
+	const imtauth::IUserRecentAction::UserInfo userInfo = actionPtr->GetUserInfo();
+	const imtauth::IUserRecentAction::ActionTypeInfo actionTypeInfo = actionPtr->GetActionTypeInfo();
+	const QDateTime timestamp = actionPtr->GetTimestamp();
+
+	const QString userIdSql = userInfo.id.isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(QString::fromUtf8(userInfo.id)));
+	const QString userNameSql = userInfo.name.isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(userInfo.name));
+	const QString actionTypeIdSql = actionTypeInfo.id.isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(QString::fromUtf8(actionTypeInfo.id)));
+	const QString actionTypeNameSql = actionTypeInfo.name.isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(actionTypeInfo.name));
+	const QString actionTypeDescSql = actionTypeInfo.description.isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(actionTypeInfo.description));
+	const QString timestampSql = timestamp.isNull() ? "NULL" : QString("'%1'").arg(sqlEscape(timestamp.toString(Qt::ISODate)));
+	const QString actionDataSql = "NULL";
 
 	return QString(
 		"UPDATE \"TicketActions\" SET "
