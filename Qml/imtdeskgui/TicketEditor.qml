@@ -308,22 +308,14 @@ ViewBase {
 					width: 560
 					spacing: Style.marginM
 
-					// Header
-					Text {
-						text: qsTr("New Issue")
-						font.pixelSize: Style.fontSizeXL
-						font.bold: true
-						color: Style.textColor
-					}
-
 					// Title
 					Column {
 						width: parent.width
-						spacing: Style.paddingXS
+						spacing: Style.spacingS
 
 						Text {
 							text: qsTr("Add a title")
-							font.pixelSize: Style.fontSizeS
+							font.pixelSize: Style.fontSizeM
 							font.bold: true
 							color: Style.textColor
 						}
@@ -331,7 +323,7 @@ ViewBase {
 						CustomTextField {
 							id: newTitleInput
 							width: parent.width
-							height: 40
+							height: Style.controlHeightM
 							placeHolderText: qsTr("Title")
 							onEditingFinished: {
 								root.doUpdateModel()
@@ -342,45 +334,22 @@ ViewBase {
 					// Description
 					Column {
 						width: parent.width
-						spacing: Style.paddingXS
+						spacing: Style.spacingS
 
 						Text {
 							text: qsTr("Add a description")
-							font.pixelSize: Style.fontSizeS
+							font.pixelSize: Style.fontSizeM
 							font.bold: true
 							color: Style.textColor
 						}
 
-						CustomTextField {
+						TextEditCustom {
 							id: newDescriptionInput
 							width: parent.width
-							height: 200
+							isDinamicHeight: false
+							height: 300
 							placeHolderText: qsTr("Leave a comment")
 							onEditingFinished: {
-								root.doUpdateModel()
-							}
-						}
-					}
-
-					// Submit button
-					Rectangle {
-						width: newSubmitText.width + Style.paddingL * 2
-						height: Style.buttonHeightM
-						radius: Style.radiusS
-						color: "#1a7f37"
-
-						Text {
-							id: newSubmitText
-							anchors.centerIn: parent
-							text: qsTr("Submit new issue")
-							font.pixelSize: Style.fontSizeS
-							color: "white"
-							font.bold: true
-						}
-
-						MouseArea {
-							anchors.fill: parent
-							onClicked: {
 								root.doUpdateModel()
 							}
 						}
@@ -397,16 +366,16 @@ ViewBase {
 				// Right: sidebar
 				Column {
 					width: 260
-					spacing: 0
+					spacing: Style.spacingM
 
 					// Assignees
 					Column {
 						width: parent.width
-						spacing: Style.paddingXS
-
+						spacing: Style.spacingS
+						
 						Text {
 							text: qsTr("Assignees")
-							font.pixelSize: Style.fontSizeS
+							font.pixelSize: Style.fontSizeM
 							font.bold: true
 							color: Style.textColor
 						}
@@ -414,7 +383,7 @@ ViewBase {
 						ComboBox {
 							id: newAssigneeCB
 							width: parent.width
-							height: Style.buttonHeightM
+							height: Style.controlHeightM
 							onCurrentIndexChanged: {
 								root.doUpdateModel()
 							}
@@ -426,11 +395,11 @@ ViewBase {
 					// Type
 					Column {
 						width: parent.width
-						spacing: Style.paddingXS
+						spacing: Style.spacingS
 
 						Text {
 							text: qsTr("Type")
-							font.pixelSize: Style.fontSizeS
+							font.pixelSize: Style.fontSizeM
 							font.bold: true
 							color: Style.textColor
 						}
@@ -438,7 +407,7 @@ ViewBase {
 						ComboBox {
 							id: newTypeCB
 							width: parent.width
-							height: Style.buttonHeightM
+							height: Style.controlHeightM
 							currentIndex: 1
 							model: ticketTypeModel
 							onCurrentIndexChanged: {
@@ -452,11 +421,11 @@ ViewBase {
 					// Priority
 					Column {
 						width: parent.width
-						spacing: Style.paddingXS
+						spacing: Style.spacingS
 
 						Text {
 							text: qsTr("Priority")
-							font.pixelSize: Style.fontSizeS
+							font.pixelSize: Style.fontSizeM
 							font.bold: true
 							color: Style.textColor
 						}
@@ -464,7 +433,7 @@ ViewBase {
 						ComboBox {
 							id: newPriorityCB
 							width: parent.width
-							height: Style.buttonHeightM
+							height: Style.controlHeightM
 							currentIndex: 1
 							model: priorityModel
 							onCurrentIndexChanged: {
@@ -478,11 +447,11 @@ ViewBase {
 					// Milestone
 					Column {
 						width: parent.width
-						spacing: Style.paddingXS
+						spacing: Style.spacingS
 
 						Text {
 							text: qsTr("Milestone")
-							font.pixelSize: Style.fontSizeS
+							font.pixelSize: Style.fontSizeM
 							font.bold: true
 							color: Style.textColor
 						}
@@ -490,7 +459,7 @@ ViewBase {
 						CustomTextField {
 							id: newMilestoneInput
 							width: parent.width
-							height: 40
+							height: Style.controlHeightM
 							placeHolderText: qsTr("No milestone")
 							onEditingFinished: {
 								root.doUpdateModel()
@@ -503,11 +472,11 @@ ViewBase {
 					// Environment
 					Column {
 						width: parent.width
-						spacing: Style.paddingXS
+						spacing: Style.spacingS
 
 						Text {
 							text: qsTr("Environment")
-							font.pixelSize: Style.fontSizeS
+							font.pixelSize: Style.fontSizeM
 							font.bold: true
 							color: Style.textColor
 						}
@@ -515,7 +484,7 @@ ViewBase {
 						ComboBox {
 							id: newEnvironmentCB
 							width: parent.width
-							height: Style.buttonHeightM
+							height: Style.controlHeightM
 							currentIndex: 2
 							model: environmentModel
 							onCurrentIndexChanged: {
@@ -631,7 +600,7 @@ ViewBase {
 
 						Text {
 							text: qsTr("Title")
-							font.pixelSize: Style.fontSizeS
+							font.pixelSize: Style.fontSizeM
 							font.bold: true
 							color: Style.textColor
 						}
@@ -654,7 +623,7 @@ ViewBase {
 
 						Text {
 							text: qsTr("Description")
-							font.pixelSize: Style.fontSizeS
+							font.pixelSize: Style.fontSizeM
 							font.bold: true
 							color: Style.textColor
 						}
@@ -686,7 +655,7 @@ ViewBase {
 								id: editCloseCompText
 								anchors.centerIn: parent
 								text: qsTr("Close as completed")
-								font.pixelSize: Style.fontSizeS
+								font.pixelSize: Style.fontSizeM
 								color: "white"
 								font.bold: true
 							}
@@ -715,7 +684,7 @@ ViewBase {
 								id: editCloseNPText
 								anchors.centerIn: parent
 								text: qsTr("Close as not planned")
-								font.pixelSize: Style.fontSizeS
+								font.pixelSize: Style.fontSizeM
 								color: Style.textColor
 							}
 
@@ -741,7 +710,7 @@ ViewBase {
 								id: editReopenText
 								anchors.centerIn: parent
 								text: qsTr("Reopen issue")
-								font.pixelSize: Style.fontSizeS
+								font.pixelSize: Style.fontSizeM
 								color: "white"
 								font.bold: true
 							}
@@ -777,7 +746,7 @@ ViewBase {
 
 						Text {
 							text: qsTr("Assignees")
-							font.pixelSize: Style.fontSizeS
+							font.pixelSize: Style.fontSizeM
 							font.bold: true
 							color: Style.textColor
 						}
@@ -801,7 +770,7 @@ ViewBase {
 
 						Text {
 							text: qsTr("Type")
-							font.pixelSize: Style.fontSizeS
+							font.pixelSize: Style.fontSizeM
 							font.bold: true
 							color: Style.textColor
 						}
@@ -827,7 +796,7 @@ ViewBase {
 
 						Text {
 							text: qsTr("Priority")
-							font.pixelSize: Style.fontSizeS
+							font.pixelSize: Style.fontSizeM
 							font.bold: true
 							color: Style.textColor
 						}
@@ -853,7 +822,7 @@ ViewBase {
 
 						Text {
 							text: qsTr("Milestone")
-							font.pixelSize: Style.fontSizeS
+							font.pixelSize: Style.fontSizeM
 							font.bold: true
 							color: Style.textColor
 						}
@@ -878,7 +847,7 @@ ViewBase {
 
 						Text {
 							text: qsTr("Environment")
-							font.pixelSize: Style.fontSizeS
+							font.pixelSize: Style.fontSizeM
 							font.bold: true
 							color: Style.textColor
 						}
@@ -904,7 +873,7 @@ ViewBase {
 
 						Text {
 							text: qsTr("Reporter")
-							font.pixelSize: Style.fontSizeS
+							font.pixelSize: Style.fontSizeM
 							font.bold: true
 							color: Style.textColor
 						}
@@ -928,7 +897,7 @@ ViewBase {
 
 						Text {
 							text: qsTr("Linked Conversation")
-							font.pixelSize: Style.fontSizeS
+							font.pixelSize: Style.fontSizeM
 							font.bold: true
 							color: Style.textColor
 						}
@@ -968,7 +937,7 @@ ViewBase {
 
 						Text {
 							text: qsTr("Lock Reason")
-							font.pixelSize: Style.fontSizeS
+							font.pixelSize: Style.fontSizeM
 							font.bold: true
 							color: Style.textColor
 						}
@@ -993,7 +962,7 @@ ViewBase {
 
 						Text {
 							text: qsTr("Status")
-							font.pixelSize: Style.fontSizeS
+							font.pixelSize: Style.fontSizeM
 							font.bold: true
 							color: Style.textColor
 						}
@@ -1017,7 +986,7 @@ ViewBase {
 
 						Text {
 							text: qsTr("State Reason")
-							font.pixelSize: Style.fontSizeS
+							font.pixelSize: Style.fontSizeM
 							font.bold: true
 							color: Style.textColor
 						}
