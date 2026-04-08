@@ -559,31 +559,9 @@ ViewBase {
 					width: 560
 					spacing: Style.marginM
 
-					// Header: title + #number
-					Row {
-						width: parent.width
-						spacing: Style.paddingS
-
-						Text {
-							text: ticketData ? ticketData.m_title : ""
-							font.pixelSize: Style.fontSizeXL
-							font.bold: true
-							color: Style.textColor
-							wrapMode: Text.Wrap
-							width: parent.width - editNumberText.width - Style.paddingS
-						}
-
-						Text {
-							id: editNumberText
-							text: "#" + (ticketData ? ticketData.m_number : 0)
-							font.pixelSize: Style.fontSizeXL
-							color: Style.textSecondaryColor
-						}
-					}
-
 					// Status badges
 					Row {
-						spacing: Style.paddingXS
+						spacing: Style.spacingS
 
 						TicketBadge {
 							badgeType: "status"
@@ -600,7 +578,7 @@ ViewBase {
 					// Title edit
 					Column {
 						width: parent.width
-						spacing: Style.paddingXS
+						spacing: Style.spacingS
 
 						Text {
 							text: qsTr("Title")
@@ -612,7 +590,7 @@ ViewBase {
 						CustomTextField {
 							id: editTitleInput
 							width: parent.width
-							height: 40
+							height: Style.controlHeightM
 							placeHolderText: qsTr("Title")
 							onEditingFinished: {
 								root.doUpdateModel()
@@ -623,7 +601,7 @@ ViewBase {
 					// Description edit
 					Column {
 						width: parent.width
-						spacing: Style.paddingXS
+						spacing: Style.spacingS
 
 						Text {
 							text: qsTr("Description")
@@ -639,93 +617,6 @@ ViewBase {
 							placeHolderText: qsTr("Leave a comment")
 							onEditingFinished: {
 								root.doUpdateModel()
-							}
-						}
-					}
-
-					// Action buttons
-					Row {
-						spacing: Style.paddingS
-
-						// Close as completed (open issues)
-						Rectangle {
-							visible: editStatusCB.currentIndex === 0
-							width: editCloseCompText.width + Style.paddingL * 2
-							height: Style.buttonHeightM
-							radius: Style.radiusS
-							color: "#8957e5"
-
-							Text {
-								id: editCloseCompText
-								anchors.centerIn: parent
-								text: qsTr("Close as completed")
-								font.pixelSize: Style.fontSizeM
-								color: "white"
-								font.bold: true
-							}
-
-							MouseArea {
-								anchors.fill: parent
-								onClicked: {
-									editStatusCB.currentIndex = 1
-									editStateReasonCB.currentIndex = 1
-									root.doUpdateModel()
-								}
-							}
-						}
-
-						// Close as not planned (open issues)
-						Rectangle {
-							visible: editStatusCB.currentIndex === 0
-							width: editCloseNPText.width + Style.paddingL * 2
-							height: Style.buttonHeightM
-							radius: Style.radiusS
-							color: "transparent"
-							border.color: Style.borderColor
-							border.width: 1
-
-							Text {
-								id: editCloseNPText
-								anchors.centerIn: parent
-								text: qsTr("Close as not planned")
-								font.pixelSize: Style.fontSizeM
-								color: Style.textColor
-							}
-
-							MouseArea {
-								anchors.fill: parent
-								onClicked: {
-									editStatusCB.currentIndex = 1
-									editStateReasonCB.currentIndex = 2
-									root.doUpdateModel()
-								}
-							}
-						}
-
-						// Reopen (closed issues)
-						Rectangle {
-							visible: editStatusCB.currentIndex === 1
-							width: editReopenText.width + Style.paddingL * 2
-							height: Style.buttonHeightM
-							radius: Style.radiusS
-							color: "#1a7f37"
-
-							Text {
-								id: editReopenText
-								anchors.centerIn: parent
-								text: qsTr("Reopen issue")
-								font.pixelSize: Style.fontSizeM
-								color: "white"
-								font.bold: true
-							}
-
-							MouseArea {
-								anchors.fill: parent
-								onClicked: {
-									editStatusCB.currentIndex = 0
-									editStateReasonCB.currentIndex = 3
-									root.doUpdateModel()
-								}
 							}
 						}
 					}
@@ -746,7 +637,7 @@ ViewBase {
 					// Assignees
 					Column {
 						width: parent.width
-						spacing: Style.paddingXS
+						spacing: Style.spacingS
 
 						Text {
 							text: qsTr("Assignees")
@@ -770,7 +661,7 @@ ViewBase {
 					// Type
 					Column {
 						width: parent.width
-						spacing: Style.paddingXS
+						spacing: Style.spacingS
 
 						Text {
 							text: qsTr("Type")
@@ -796,7 +687,7 @@ ViewBase {
 					// Priority
 					Column {
 						width: parent.width
-						spacing: Style.paddingXS
+						spacing: Style.spacingS
 
 						Text {
 							text: qsTr("Priority")
@@ -822,7 +713,7 @@ ViewBase {
 					// Milestone
 					Column {
 						width: parent.width
-						spacing: Style.paddingXS
+						spacing: Style.spacingS
 
 						Text {
 							text: qsTr("Milestone")
@@ -834,7 +725,7 @@ ViewBase {
 						CustomTextField {
 							id: editMilestoneInput
 							width: parent.width
-							height: 40
+							height: Style.controlHeightM
 							placeHolderText: qsTr("No milestone")
 							onEditingFinished: {
 								root.doUpdateModel()
@@ -847,7 +738,7 @@ ViewBase {
 					// Environment
 					Column {
 						width: parent.width
-						spacing: Style.paddingXS
+						spacing: Style.spacingS
 
 						Text {
 							text: qsTr("Environment")
@@ -873,7 +764,7 @@ ViewBase {
 					// Reporter
 					Column {
 						width: parent.width
-						spacing: Style.paddingXS
+						spacing: Style.spacingS
 
 						Text {
 							text: qsTr("Reporter")
@@ -897,7 +788,7 @@ ViewBase {
 					// Linked Conversation
 					Column {
 						width: parent.width
-						spacing: Style.paddingXS
+						spacing: Style.spacingS
 
 						Text {
 							text: qsTr("Linked Conversation")
@@ -909,7 +800,7 @@ ViewBase {
 						CustomTextField {
 							id: editConversationInput
 							width: parent.width
-							height: 40
+							height: Style.controlHeightM
 							placeHolderText: qsTr("No conversation")
 							onEditingFinished: {
 								root.doUpdateModel()
@@ -936,7 +827,7 @@ ViewBase {
 					// Lock reason
 					Column {
 						width: parent.width
-						spacing: Style.paddingXS
+						spacing: Style.spacingS
 						visible: editLockedCB.checkState === Qt.Checked
 
 						Text {
@@ -949,7 +840,7 @@ ViewBase {
 						CustomTextField {
 							id: editLockReasonInput
 							width: parent.width
-							height: 40
+							height: Style.controlHeightM
 							placeHolderText: qsTr("Reason for locking")
 							onEditingFinished: {
 								root.doUpdateModel()
@@ -962,7 +853,7 @@ ViewBase {
 					// Status
 					Column {
 						width: parent.width
-						spacing: Style.paddingXS
+						spacing: Style.spacingS
 
 						Text {
 							text: qsTr("Status")
@@ -986,7 +877,7 @@ ViewBase {
 					// State Reason
 					Column {
 						width: parent.width
-						spacing: Style.paddingXS
+						spacing: Style.spacingS
 
 						Text {
 							text: qsTr("State Reason")

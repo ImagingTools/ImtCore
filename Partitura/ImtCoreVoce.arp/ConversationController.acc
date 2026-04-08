@@ -308,7 +308,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>ConversationChangeNotifier</Value>
-                                <Value>CollectionDocumentManager/CollectionDocumentManagerPublisher</Value>
+                                <Value>CollectionDocumentManager</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

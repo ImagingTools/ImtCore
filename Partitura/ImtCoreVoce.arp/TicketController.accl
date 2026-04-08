@@ -8,7 +8,8 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="BaseCollectionCommands" X="1025" Y="250" Note=""/>
+        <Element ComponentName="BaseCollectionCommands" X="1025" Y="100" Note=""/>
+        <Element ComponentName="CloseTicket" X="475" Y="350" Note=""/>
         <Element ComponentName="CollectionDocumentManager" X="650" Y="725" Note=""/>
         <Element ComponentName="CollectionHeadersProvider" X="650" Y="575" Note=""/>
         <Element ComponentName="CommandsController" X="200" Y="250" Note=""/>
