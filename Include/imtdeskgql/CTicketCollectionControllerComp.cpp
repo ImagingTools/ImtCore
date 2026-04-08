@@ -4,14 +4,43 @@
 // Qt includes
 #include <QtCore/QUuid>
 
+// ACF includes
+#include <istd/TDelPtr.h>
+#include <iprm/CParamsSet.h>
+#include <iprm/IIdParam.h>
+
 // ImtCore includes
 #include <imtdesk/ISupportTicket.h>
 #include <imtdesk/ITicketAction.h>
+#include <imtbase/IObjectCollectionIterator.h>
 #include <imtdeskgql/imtdeskgql.h>
 
 
 namespace imtdeskgql
 {
+
+
+namespace
+{
+
+// Simple IIdParam implementation for passing TicketId filter
+class CTicketIdParam: virtual public iprm::IIdParam
+{
+public:
+	CTicketIdParam(const QByteArray& id) : m_id(id) {}
+
+	// reimplemented (iprm::IIdParam)
+	virtual QByteArray GetId() const override { return m_id; }
+	virtual void SetId(const QByteArray& id) override { m_id = id; }
+
+	// reimplemented (iser::ISerializable)
+	virtual bool Serialize(iser::IArchive& /*archive*/) override { return true; }
+
+private:
+	QByteArray m_id;
+};
+
+} // anonymous namespace
 
 
 bool CTicketCollectionControllerComp::CreateRepresentationFromObject(
@@ -146,13 +175,21 @@ bool CTicketCollectionControllerComp::CreateRepresentationFromObject(
 	// Populate activity items from ticket actions (ITicketAction collection)
 	if (m_ticketActionsCollectionCompPtr.IsValid()){
 		const QByteArray ticketId = ticketPtr->GetId();
-		imtbase::IObjectCollection::IteratorPtr iteratorPtr = m_ticketActionsCollectionCompPtr->CreateIterator();
-		if (iteratorPtr.IsValid()){
-			while (iteratorPtr->IsValid()){
+
+		// Build a filtered query using IIdParam for TicketId
+		CTicketIdParam ticketIdParam(ticketId);
+		iprm::CParamsSet filterParams;
+		filterParams.SetEditableParameter("TicketId", &ticketIdParam);
+
+		istd::TDelPtr<imtbase::IObjectCollectionIterator> actionsIterator(
+			m_ticketActionsCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), 0, -1, &filterParams));
+
+		if (actionsIterator.IsValid()){
+			while (actionsIterator->Next()){
 				imtbase::IObjectCollection::DataPtr dataPtr;
-				if (iteratorPtr->GetObjectData(dataPtr)){
+				if (actionsIterator->GetObjectData(dataPtr)){
 					const imtdesk::ITicketAction* actionPtr = dynamic_cast<const imtdesk::ITicketAction*>(dataPtr.GetPtr());
-					if (actionPtr != nullptr && actionPtr->GetTicketId() == ticketId){
+					if (actionPtr != nullptr){
 						sdl::imtdesk::ImtDesk::CTicketActivityItem sdlItem;
 						sdlItem.Version_1_0.Emplace();
 						sdlItem.Version_1_0->itemType = sdl::imtdesk::ImtDesk::ActivityItemType::Action;
@@ -167,7 +204,6 @@ bool CTicketCollectionControllerComp::CreateRepresentationFromObject(
 						representationPayload.activityItems->Append(sdlItem);
 					}
 				}
-				iteratorPtr->MoveNext();
 			}
 		}
 	}
