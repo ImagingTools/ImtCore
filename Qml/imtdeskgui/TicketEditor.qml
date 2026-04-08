@@ -806,8 +806,8 @@ ViewBase {
 
 									Text {
 										anchors.centerIn: parent
-										text: "You"
-										font.pixelSize: 10
+										text: qsTr("You")
+										font.pixelSize: Style.fontSizeXS
 										color: "white"
 										font.bold: true
 									}
@@ -827,7 +827,7 @@ ViewBase {
 										border.width: 1
 										color: Style.backgroundColor
 
-										TextInput {
+										TextEdit {
 											id: commentInputField
 											anchors.left: parent.left
 											anchors.right: parent.right
@@ -836,7 +836,7 @@ ViewBase {
 											height: 60
 											font.pixelSize: Style.fontSizeS
 											color: Style.textColor
-											wrapMode: TextInput.Wrap
+											wrapMode: TextEdit.Wrap
 											clip: true
 
 											Text {
