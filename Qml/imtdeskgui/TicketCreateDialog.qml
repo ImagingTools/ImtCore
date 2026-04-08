@@ -176,63 +176,6 @@ Rectangle {
 				}
 			}
 
-			// Environment
-			Column {
-				width: parent.width
-				spacing: Style.paddingXS
-
-				Text {
-					text: qsTr("Environment")
-					font.pixelSize: Style.fontSizeXS
-					color: Style.textSecondaryColor
-				}
-
-				ComboBox {
-					id: environmentCombo
-					width: parent.width
-					currentIndex: 2
-				}
-			}
-
-			// Milestone ID field
-			Column {
-				width: parent.width
-				spacing: Style.paddingXS
-
-				Text {
-					text: qsTr("Milestone")
-					font.pixelSize: Style.fontSizeXS
-					color: Style.textSecondaryColor
-				}
-
-				Rectangle {
-					width: parent.width
-					height: Style.inputHeightM
-					radius: Style.radiusS
-					color: Style.inputBackgroundColor
-					border.color: milestoneField.activeFocus ? Style.accentColor : Style.separatorColor
-
-					TextInput {
-						id: milestoneField
-						anchors.fill: parent
-						anchors.margins: Style.paddingS
-						font.pixelSize: Style.fontSizeS
-						color: Style.textPrimaryColor
-						clip: true
-						verticalAlignment: TextInput.AlignVCenter
-
-						Text {
-							anchors.fill: parent
-							text: qsTr("Milestone ID (optional)")
-							color: Style.textPlaceholderColor
-							font.pixelSize: Style.fontSizeS
-							verticalAlignment: Text.AlignVCenter
-							visible: milestoneField.text.length === 0
-						}
-					}
-				}
-			}
-
 			// Buttons
 			Row {
 				anchors.right: parent.right
@@ -298,7 +241,6 @@ Rectangle {
 		visible = false;
 		titleField.text = "";
 		descriptionField.text = "";
-		milestoneField.text = "";
 		cancelled();
 	}
 
@@ -308,8 +250,6 @@ Rectangle {
 			description: descriptionField.text.trim(),
 			ticketType: typeCombo.currentIndex,
 			priority: priorityCombo.currentIndex,
-			environment: environmentCombo.currentIndex,
-			milestoneId: milestoneField.text.trim(),
 			messageId: linkedMessageId,
 			conversationId: linkedConversationId
 		};
@@ -318,6 +258,5 @@ Rectangle {
 		visible = false;
 		titleField.text = "";
 		descriptionField.text = "";
-		milestoneField.text = "";
 	}
 }

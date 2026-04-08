@@ -26,12 +26,9 @@ Rectangle {
 	property string createdAt: ""
 	property string updatedAt: ""
 	property string closedAt: ""
-	property int environment: 2
 	property var tags: []
 	property var labelIds: []
 	property var labels: []
-	property string milestoneId: ""
-	property string milestoneTitle: ""
 	property bool locked: false
 	property string lockReason: ""
 
@@ -184,16 +181,6 @@ Rectangle {
 
 				Row {
 					spacing: Style.paddingL
-					Text { text: qsTr("Environment:"); font.pixelSize: Style.fontSizeXS; color: Style.textSecondaryColor; width: 100 }
-					Text {
-						text: environmentLabel(ticketViewRoot.environment)
-						font.pixelSize: Style.fontSizeXS
-						color: Style.textPrimaryColor
-					}
-				}
-
-				Row {
-					spacing: Style.paddingL
 					Text { text: qsTr("Reporter:"); font.pixelSize: Style.fontSizeXS; color: Style.textSecondaryColor; width: 100 }
 					Text {
 						text: ticketViewRoot.reporterName || ticketViewRoot.reporterId || "—"
@@ -207,17 +194,6 @@ Rectangle {
 					Text { text: qsTr("Assignees:"); font.pixelSize: Style.fontSizeXS; color: Style.textSecondaryColor; width: 100 }
 					Text {
 						text: ticketViewRoot.assigneeName || (ticketViewRoot.assigneeIds.length > 0 ? ticketViewRoot.assigneeIds.join(", ") : "") || qsTr("No one assigned")
-						font.pixelSize: Style.fontSizeXS
-						color: Style.textPrimaryColor
-					}
-				}
-
-				Row {
-					visible: ticketViewRoot.milestoneTitle.length > 0
-					spacing: Style.paddingL
-					Text { text: qsTr("Milestone:"); font.pixelSize: Style.fontSizeXS; color: Style.textSecondaryColor; width: 100 }
-					Text {
-						text: ticketViewRoot.milestoneTitle
 						font.pixelSize: Style.fontSizeXS
 						color: Style.textPrimaryColor
 					}
@@ -385,12 +361,4 @@ Rectangle {
 		}
 	}
 
-	function environmentLabel(env) {
-		switch (env) {
-			case 0: return qsTr("Development");
-			case 1: return qsTr("Staging");
-			case 2: return qsTr("Production");
-			default: return qsTr("Unknown");
-		}
-	}
 }

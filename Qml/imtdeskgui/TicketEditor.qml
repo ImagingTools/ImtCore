@@ -44,8 +44,6 @@ ViewBase {
 			newDescriptionInput.text = ticketData.m_description || ""
 			newTypeCB.currentIndex = findComboIndex(newTypeCB, ticketData.m_ticketType, 1)
 			newPriorityCB.currentIndex = findComboIndex(newPriorityCB, ticketData.m_priority, 1)
-			newEnvironmentCB.currentIndex = findComboIndex(newEnvironmentCB, ticketData.m_environment, 2)
-			newMilestoneInput.text = ticketData.m_milestoneId || ""
 
 			newAssigneeCB.currentIndex = -1
 			if (newAssigneeCB.model) {
@@ -64,11 +62,8 @@ ViewBase {
 			editDescriptionInput.text = ticketData.m_description || ""
 			editTypeCB.currentIndex = findComboIndex(editTypeCB, ticketData.m_ticketType, 1)
 			editPriorityCB.currentIndex = findComboIndex(editPriorityCB, ticketData.m_priority, 1)
-			editEnvironmentCB.currentIndex = findComboIndex(editEnvironmentCB, ticketData.m_environment, 2)
 			editStatusCB.currentIndex = findComboIndex(editStatusCB, ticketData.m_status, 0)
 			editStateReasonCB.currentIndex = findComboIndex(editStateReasonCB, ticketData.m_stateReason, 0)
-			editMilestoneInput.text = ticketData.m_milestoneId || ""
-			editConversationInput.text = ticketData.m_conversationId || ""
 			editLockReasonInput.text = ticketData.m_lockReason || ""
 			editLockedCB.checkState = ticketData.m_locked ? Qt.Checked : Qt.Unchecked
 
@@ -102,7 +97,6 @@ ViewBase {
 		if (root.isNewIssue) {
 			ticketData.m_title = newTitleInput.text
 			ticketData.m_description = newDescriptionInput.text
-			ticketData.m_milestoneId = newMilestoneInput.text
 			ticketData.m_reporterId = AuthorizationController.getUserId()
 
 			if (newAssigneeCB.model && newAssigneeCB.currentIndex >= 0) {
@@ -118,15 +112,10 @@ ViewBase {
 			if (newPriorityCB.model && newPriorityCB.currentIndex >= 0) {
 				ticketData.m_priority = newPriorityCB.model.getData("id", newPriorityCB.currentIndex)
 			}
-			if (newEnvironmentCB.model && newEnvironmentCB.currentIndex >= 0) {
-				ticketData.m_environment = newEnvironmentCB.model.getData("id", newEnvironmentCB.currentIndex)
-			}
 		}
 		else {
 			ticketData.m_title = editTitleInput.text
 			ticketData.m_description = editDescriptionInput.text
-			ticketData.m_milestoneId = editMilestoneInput.text
-			ticketData.m_conversationId = editConversationInput.text
 			ticketData.m_locked = editLockedCB.checkState === Qt.Checked
 			ticketData.m_lockReason = editLockReasonInput.text
 
@@ -149,9 +138,6 @@ ViewBase {
 			}
 			if (editPriorityCB.model && editPriorityCB.currentIndex >= 0) {
 				ticketData.m_priority = editPriorityCB.model.getData("id", editPriorityCB.currentIndex)
-			}
-			if (editEnvironmentCB.model && editEnvironmentCB.currentIndex >= 0) {
-				ticketData.m_environment = editEnvironmentCB.model.getData("id", editEnvironmentCB.currentIndex)
 			}
 			if (editStatusCB.model && editStatusCB.currentIndex >= 0) {
 				ticketData.m_status = editStatusCB.model.getData("id", editStatusCB.currentIndex)
@@ -218,23 +204,6 @@ ViewBase {
 			index = insertNewItem()
 			setData("id", "Critical", index)
 			setData("name", "Critical", index)
-		}
-	}
-
-	TreeItemModel {
-		id: environmentModel
-		Component.onCompleted: {
-			let index = insertNewItem()
-			setData("id", "Development", index)
-			setData("name", "Development", index)
-
-			index = insertNewItem()
-			setData("id", "Staging", index)
-			setData("name", "Staging", index)
-
-			index = insertNewItem()
-			setData("id", "Production", index)
-			setData("name", "Production", index)
 		}
 	}
 
@@ -451,58 +420,6 @@ ViewBase {
 							}
 						}
 					}
-
-					Rectangle { width: parent.width; height: 1; color: Style.borderColor }
-
-					// Milestone
-					Column {
-						width: parent.width
-						spacing: Style.spacingS
-
-						Text {
-							text: qsTr("Milestone")
-							font.pixelSize: Style.fontSizeM
-							font.bold: true
-							color: Style.textColor
-						}
-
-						CustomTextField {
-							id: newMilestoneInput
-							width: parent.width
-							height: Style.controlHeightM
-							placeHolderText: qsTr("No milestone")
-							onEditingFinished: {
-								root.doUpdateModel()
-							}
-						}
-					}
-
-					Rectangle { width: parent.width; height: 1; color: Style.borderColor }
-
-					// Environment
-					Column {
-						width: parent.width
-						spacing: Style.spacingS
-
-						Text {
-							text: qsTr("Environment")
-							font.pixelSize: Style.fontSizeM
-							font.bold: true
-							color: Style.textColor
-						}
-
-						ComboBox {
-							id: newEnvironmentCB
-							width: parent.width
-							height: Style.controlHeightM
-							currentIndex: 2
-							model: environmentModel
-							onCurrentIndexChanged: {
-								root.doUpdateModel()
-							}
-						}
-					}
-				}
 			}
 		}
 	}
@@ -993,57 +910,6 @@ ViewBase {
 
 					Rectangle { width: parent.width; height: 1; color: Style.borderColor }
 
-					// Milestone
-					Column {
-						width: parent.width
-						spacing: Style.spacingS
-
-						Text {
-							text: qsTr("Milestone")
-							font.pixelSize: Style.fontSizeM
-							font.bold: true
-							color: Style.textColor
-						}
-
-						CustomTextField {
-							id: editMilestoneInput
-							width: parent.width
-							height: Style.controlHeightM
-							placeHolderText: qsTr("No milestone")
-							onEditingFinished: {
-								root.doUpdateModel()
-							}
-						}
-					}
-
-					Rectangle { width: parent.width; height: 1; color: Style.borderColor }
-
-					// Environment
-					Column {
-						width: parent.width
-						spacing: Style.spacingS
-
-						Text {
-							text: qsTr("Environment")
-							font.pixelSize: Style.fontSizeM
-							font.bold: true
-							color: Style.textColor
-						}
-
-						ComboBox {
-							id: editEnvironmentCB
-							width: parent.width
-							height: Style.buttonHeightM
-							currentIndex: 2
-							model: environmentModel
-							onCurrentIndexChanged: {
-								root.doUpdateModel()
-							}
-						}
-					}
-
-					Rectangle { width: parent.width; height: 1; color: Style.borderColor }
-
 					// Reporter
 					Column {
 						width: parent.width
@@ -1061,31 +927,6 @@ ViewBase {
 							width: parent.width
 							height: Style.buttonHeightM
 							onCurrentIndexChanged: {
-								root.doUpdateModel()
-							}
-						}
-					}
-
-					Rectangle { width: parent.width; height: 1; color: Style.borderColor }
-
-					// Linked Conversation
-					Column {
-						width: parent.width
-						spacing: Style.spacingS
-
-						Text {
-							text: qsTr("Linked Conversation")
-							font.pixelSize: Style.fontSizeM
-							font.bold: true
-							color: Style.textColor
-						}
-
-						CustomTextField {
-							id: editConversationInput
-							width: parent.width
-							height: Style.controlHeightM
-							placeHolderText: qsTr("No conversation")
-							onEditingFinished: {
 								root.doUpdateModel()
 							}
 						}
