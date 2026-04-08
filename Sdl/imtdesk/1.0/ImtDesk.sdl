@@ -38,12 +38,6 @@ enum TicketPriority {
 	Critical
 }
 
-enum Environment {
-	Development
-	Staging
-	Production
-}
-
 # --- Label ---
 
 type LabelData {
@@ -51,23 +45,6 @@ type LabelData {
 	name: String!
 	color: String!
 	description: String
-}
-
-# --- Milestone ---
-
-enum MilestoneState {
-	Open
-	Closed
-}
-
-type MilestoneData {
-	id: ID!
-	title: String!
-	description: String
-	state: MilestoneState
-	dueOn: String
-	createdAt: String
-	closedAt: String
 }
 
 # --- Ticket ---
@@ -83,7 +60,6 @@ type TicketItemData {
 	priority: TicketPriority
 	assigneeIds: [ID]
 	labelIds: [ID]
-	milestoneId: ID
 	locked: Boolean
 	createdAt: String
 }
@@ -101,10 +77,8 @@ type TicketData {
 	reporterId: ID
 	conversationId: ID
 	messageId: ID
-	environment: Environment
 	tags: [String]
 	labelIds: [ID]
-	milestoneId: ID
 	locked: Boolean
 	lockReason: String
 	createdAt: String

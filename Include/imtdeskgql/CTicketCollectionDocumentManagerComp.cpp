@@ -60,7 +60,6 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 	response.Version_1_0->conversationId = ticketPtr->GetConversationId();
 	response.Version_1_0->messageId = ticketPtr->GetMessageId();
 	response.Version_1_0->labelIds.Emplace().FromList(ticketPtr->GetLabelIds());
-	response.Version_1_0->milestoneId = ticketPtr->GetMilestoneId();
 	response.Version_1_0->locked = ticketPtr->IsLocked();
 	response.Version_1_0->lockReason = ticketPtr->GetLockReason();
 	response.Version_1_0->createdAt = ticketPtr->GetCreatedAt();
@@ -71,7 +70,6 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 	response.Version_1_0->priority = imtdeskgql::GetSdlTypeFromPriorityType(ticketPtr->GetPriority());
 	response.Version_1_0->status = imtdeskgql::GetSdlTypeFromStatusType(ticketPtr->GetStatus());
 	response.Version_1_0->stateReason = imtdeskgql::GetSdlTypeFromStateReason(ticketPtr->GetStateReason());
-	response.Version_1_0->environment = imtdeskgql::GetSdlTypeFromEnvironmentType(ticketPtr->GetEnvironment());
 
 	return response;
 }
@@ -147,10 +145,6 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 		ticketPtr->SetLabelIds(ticketInfo.labelIds->ToList());
 	}
 
-	if (ticketInfo.milestoneId){
-		ticketPtr->SetMilestoneId(*ticketInfo.milestoneId);
-	}
-
 	if (ticketInfo.locked){
 		ticketPtr->SetLocked(*ticketInfo.locked);
 	}
@@ -189,10 +183,6 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 
 	if (ticketInfo.stateReason){
 		ticketPtr->SetStateReason(imtdeskgql::GetStateReasonFromSdlType(*ticketInfo.stateReason));
-	}
-
-	if (ticketInfo.environment){
-		ticketPtr->SetEnvironment(imtdeskgql::GetEnvironmentTypeFromSdlType(*ticketInfo.environment));
 	}
 
 	if (ticketInfo.priority){

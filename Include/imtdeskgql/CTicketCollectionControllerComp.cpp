@@ -77,7 +77,6 @@ bool CTicketCollectionControllerComp::CreateRepresentationFromObject(
 
 	representationObject.assigneeIds.Emplace().FromList(ticketPtr->GetAssigneeIds());
 	representationObject.labelIds.Emplace().FromList(ticketPtr->GetLabelIds());
-	representationObject.milestoneId = ticketPtr->GetMilestoneId();
 	representationObject.locked = ticketPtr->IsLocked();
 	representationObject.number = ticketPtr->GetNumber();
 	representationObject.createdAt = ticketPtr->GetCreatedAt();
@@ -136,7 +135,6 @@ bool CTicketCollectionControllerComp::CreateRepresentationFromObject(
 	representationPayload.conversationId = ticketPtr->GetConversationId();
 	representationPayload.messageId = ticketPtr->GetMessageId();
 	representationPayload.labelIds.Emplace().FromList(ticketPtr->GetLabelIds());
-	representationPayload.milestoneId = ticketPtr->GetMilestoneId();
 	representationPayload.locked = ticketPtr->IsLocked();
 	representationPayload.lockReason = ticketPtr->GetLockReason();
 	representationPayload.createdAt = ticketPtr->GetCreatedAt();
@@ -251,10 +249,6 @@ bool CTicketCollectionControllerComp::FillObjectFromRepresentation(
 
 	if (representation.labelIds){
 		ticketPtr->SetLabelIds(representation.labelIds->ToList());
-	}
-
-	if (representation.milestoneId){
-		ticketPtr->SetMilestoneId(*representation.milestoneId);
 	}
 
 	if (representation.locked){

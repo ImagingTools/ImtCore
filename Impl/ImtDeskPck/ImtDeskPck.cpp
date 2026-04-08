@@ -26,11 +26,6 @@ I_EXPORT_COMPONENT(
 			"Label");
 
 I_EXPORT_COMPONENT(
-			Milestone,
-			"Milestone component",
-			"Milestone");
-
-I_EXPORT_COMPONENT(
 			TicketDocumentNameProvider,
 			"Ticket document name provider",
 			"Ticket Document Name Provider");

@@ -50,14 +50,10 @@ public:
 	virtual void SetConversationId(const QByteArray& conversationId) override;
 	virtual QByteArray GetMessageId() const override;
 	virtual void SetMessageId(const QByteArray& messageId) override;
-	virtual Environment GetEnvironment() const override;
-	virtual void SetEnvironment(Environment environment) override;
 	virtual QStringList GetTags() const override;
 	virtual void SetTags(const QStringList& tags) override;
 	virtual QByteArrayList GetLabelIds() const override;
 	virtual void SetLabelIds(const QByteArrayList& labelIds) override;
-	virtual QByteArray GetMilestoneId() const override;
-	virtual void SetMilestoneId(const QByteArray& milestoneId) override;
 	virtual bool IsLocked() const override;
 	virtual void SetLocked(bool locked) override;
 	virtual QString GetLockReason() const override;
@@ -94,10 +90,8 @@ private:
 	QByteArray m_reporterId;
 	QByteArray m_conversationId;
 	QByteArray m_messageId;
-	Environment m_environment = ENV_PRODUCTION;
 	QStringList m_tags;
 	QByteArrayList m_labelIds;
-	QByteArray m_milestoneId;
 	bool m_locked = false;
 	QString m_lockReason;
 	int m_number = 0;

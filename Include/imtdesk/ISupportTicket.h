@@ -14,7 +14,7 @@ namespace imtdesk
 	Interface representing a Service Desk support ticket.
 
 	Tickets can be linked to a conversation or a specific message, have
-	priorities, statuses, and may target a specific deployment environment.
+	priorities and statuses.
 
 	\ingroup imtdesk
 */
@@ -80,20 +80,6 @@ public:
 				TP_MEDIUM,
 				TP_HIGH,
 				TP_CRITICAL);
-
-	/**
-		Target deployment environment.
-	*/
-	enum Environment
-	{
-		ENV_DEVELOPMENT,
-		ENV_STAGING,
-		ENV_PRODUCTION
-	};
-	I_DECLARE_ENUM(Environment,
-				ENV_DEVELOPMENT,
-				ENV_STAGING,
-				ENV_PRODUCTION);
 
 	/**
 		Get the unique ticket identifier.
@@ -206,16 +192,6 @@ public:
 	virtual void SetMessageId(const QByteArray& messageId) = 0;
 
 	/**
-		Get the target deployment environment.
-	*/
-	virtual Environment GetEnvironment() const = 0;
-
-	/**
-		Set the target environment.
-	*/
-	virtual void SetEnvironment(Environment environment) = 0;
-
-	/**
 		Get the tags associated with this ticket.
 	*/
 	virtual QStringList GetTags() const = 0;
@@ -234,16 +210,6 @@ public:
 		Set the list of label IDs.
 	*/
 	virtual void SetLabelIds(const QByteArrayList& labelIds) = 0;
-
-	/**
-		Get the milestone ID (may be empty).
-	*/
-	virtual QByteArray GetMilestoneId() const = 0;
-
-	/**
-		Set the milestone ID.
-	*/
-	virtual void SetMilestoneId(const QByteArray& milestoneId) = 0;
 
 	/**
 		Get whether the ticket is locked.

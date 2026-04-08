@@ -31,7 +31,6 @@ public:
 		\param assigneeIds    Optional list of assignee user IDs.
 		\param conversationId Optional linked conversation ID.
 		\param messageId      Optional triggering message ID.
-		\param environment    Target deployment environment.
 		\param tags           Optional tag list.
 		\return New ticket ID, or empty on failure.
 	*/
@@ -43,7 +42,6 @@ public:
 				const QByteArrayList& assigneeIds = QByteArrayList(),
 				const QByteArray& conversationId = QByteArray(),
 				const QByteArray& messageId = QByteArray(),
-				ISupportTicket::Environment environment = ISupportTicket::ENV_PRODUCTION,
 				const QStringList& tags = QStringList()) = 0;
 
 	/**

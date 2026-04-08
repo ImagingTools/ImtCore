@@ -133,36 +133,6 @@ inline sdl::imtdesk::ImtDesk::StateReason GetSdlTypeFromStateReason(imtdesk::ISu
 }
 
 
-inline imtdesk::ISupportTicket::Environment GetEnvironmentTypeFromSdlType(sdl::imtdesk::ImtDesk::Environment sdlEnvironmentStatus)
-{
-	switch (sdlEnvironmentStatus){
-	case sdl::imtdesk::ImtDesk::Environment::Development:
-		return imtdesk::ISupportTicket::Environment::ENV_DEVELOPMENT;
-	case sdl::imtdesk::ImtDesk::Environment::Staging:
-		return imtdesk::ISupportTicket::Environment::ENV_STAGING;
-	case sdl::imtdesk::ImtDesk::Environment::Production:
-		return imtdesk::ISupportTicket::Environment::ENV_PRODUCTION;
-	}
-
-	return imtdesk::ISupportTicket::Environment::ENV_DEVELOPMENT;
-}
-
-
-inline sdl::imtdesk::ImtDesk::Environment GetSdlTypeFromEnvironmentType(imtdesk::ISupportTicket::Environment environment)
-{
-	switch (environment){
-	case imtdesk::ISupportTicket::ENV_DEVELOPMENT:
-		return sdl::imtdesk::ImtDesk::Environment::Development;
-	case imtdesk::ISupportTicket::ENV_STAGING:
-		return sdl::imtdesk::ImtDesk::Environment::Staging;
-	case imtdesk::ISupportTicket::ENV_PRODUCTION:
-		return sdl::imtdesk::ImtDesk::Environment::Production;
-	}
-
-	return sdl::imtdesk::ImtDesk::Environment::Development;
-}
-
-
 inline imtdesk::ISupportTicket::TicketPriority GetPriorityTypeFromSdlType(sdl::imtdesk::ImtDesk::TicketPriority sdlTicketPriority)
 {
 	switch (sdlTicketPriority){

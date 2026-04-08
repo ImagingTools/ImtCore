@@ -191,22 +191,6 @@ void CSupportTicketComp::SetMessageId(const QByteArray& messageId)
 }
 
 
-ISupportTicket::Environment CSupportTicketComp::GetEnvironment() const
-{
-	return m_environment;
-}
-
-
-void CSupportTicketComp::SetEnvironment(Environment environment)
-{
-	if (m_environment != environment){
-		istd::CChangeNotifier notifier(this);
-
-		m_environment = environment;
-	}
-}
-
-
 QStringList CSupportTicketComp::GetTags() const
 {
 	return m_tags;
@@ -235,22 +219,6 @@ void CSupportTicketComp::SetLabelIds(const QByteArrayList& labelIds)
 		istd::CChangeNotifier notifier(this);
 
 		m_labelIds = labelIds;
-	}
-}
-
-
-QByteArray CSupportTicketComp::GetMilestoneId() const
-{
-	return m_milestoneId;
-}
-
-
-void CSupportTicketComp::SetMilestoneId(const QByteArray& milestoneId)
-{
-	if (m_milestoneId != milestoneId){
-		istd::CChangeNotifier notifier(this);
-
-		m_milestoneId = milestoneId;
 	}
 }
 
@@ -427,19 +395,9 @@ bool CSupportTicketComp::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_messageId);
 	retVal = retVal && archive.EndTag(messageIdTag);
 
-	static iser::CArchiveTag environmentTag("Environment", "Environment", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(environmentTag);
-	retVal = retVal && I_SERIALIZE_ENUM(Environment, archive, m_environment);
-	retVal = retVal && archive.EndTag(environmentTag);
-
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QStringList>(archive, m_tags, "Tags", "Tag");
 
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_labelIds, "LabelIds", "LabelId");
-
-	static iser::CArchiveTag milestoneIdTag("MilestoneId", "Milestone ID", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(milestoneIdTag);
-	retVal = retVal && archive.Process(m_milestoneId);
-	retVal = retVal && archive.EndTag(milestoneIdTag);
 
 	static iser::CArchiveTag lockedTag("Locked", "Locked", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(lockedTag);
@@ -502,10 +460,8 @@ bool CSupportTicketComp::CopyFrom(const IChangeable& object, CompatibilityMode /
 	m_reporterId = srcPtr->GetReporterId();
 	m_conversationId = srcPtr->GetConversationId();
 	m_messageId = srcPtr->GetMessageId();
-	m_environment = srcPtr->GetEnvironment();
 	m_tags = srcPtr->GetTags();
 	m_labelIds = srcPtr->GetLabelIds();
-	m_milestoneId = srcPtr->GetMilestoneId();
 	m_locked = srcPtr->IsLocked();
 	m_lockReason = srcPtr->GetLockReason();
 	m_number = srcPtr->GetNumber();
@@ -536,10 +492,8 @@ bool CSupportTicketComp::IsEqual(const IChangeable& object) const
 		&& m_reporterId == srcPtr->GetReporterId()
 		&& m_conversationId == srcPtr->GetConversationId()
 		&& m_messageId == srcPtr->GetMessageId()
-		&& m_environment == srcPtr->GetEnvironment()
 		&& m_tags == srcPtr->GetTags()
 		&& m_labelIds == srcPtr->GetLabelIds()
-		&& m_milestoneId == srcPtr->GetMilestoneId()
 		&& m_locked == srcPtr->IsLocked()
 		&& m_lockReason == srcPtr->GetLockReason()
 		&& m_number == srcPtr->GetNumber()
@@ -576,10 +530,8 @@ bool CSupportTicketComp::ResetData(CompatibilityMode /*mode*/)
 	m_reporterId.clear();
 	m_conversationId.clear();
 	m_messageId.clear();
-	m_environment = ENV_PRODUCTION;
 	m_tags.clear();
 	m_labelIds.clear();
-	m_milestoneId.clear();
 	m_locked = false;
 	m_lockReason.clear();
 	m_number = 0;
