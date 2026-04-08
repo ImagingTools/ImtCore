@@ -18,10 +18,6 @@ namespace imtdeskgql
 {
 
 
-namespace imtdeskgql
-{
-
-
 // protected methods
 
 // reimplemented (CGraphQlHandlerCompBase)
