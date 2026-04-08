@@ -280,7 +280,7 @@ void CRemoteStandardLoginGuiComp::on_SuConfirmPasswordEdit_textEdited(const QStr
 void CRemoteStandardLoginGuiComp::OnSetSuPasswordFinished()
 {
 	SetSuPasswordThread::ThreadState state = m_setSuPasswordThread.GetState();
-	if (state != SetSuPasswordThread::ThreadState::TS_OK){
+	if (state == SetSuPasswordThread::ThreadState::TS_OK){
 		StackedWidget->setCurrentIndex(US_USER_PASSWORD_LOGIN);
 	}
 	else if (state == SetSuPasswordThread::ThreadState::TS_FAILED){
