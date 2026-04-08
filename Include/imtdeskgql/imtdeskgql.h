@@ -4,6 +4,7 @@
 
 // ImtCore includes
 #include <imtdesk/ISupportTicket.h>
+#include <iprm/IIdParam.h>
 
 // Generated includes
 #include <GeneratedFiles/imtdesksdl/SDL/1.0/CPP/TicketCollectionDocumentManager.h>
@@ -165,6 +166,27 @@ inline sdl::imtdesk::ImtDesk::TicketPriority GetSdlTypeFromPriorityType(imtdesk:
 
 	return sdl::imtdesk::ImtDesk::TicketPriority::Low;
 }
+
+
+/**
+	Simple IIdParam implementation for passing TicketId filter to
+	CreateObjectCollectionIterator when querying ITicketAction collections.
+*/
+class CTicketIdParam: virtual public iprm::IIdParam
+{
+public:
+	CTicketIdParam(const QByteArray& id = QByteArray()) : m_id(id) {}
+
+	// reimplemented (iprm::IIdParam)
+	virtual QByteArray GetId() const override { return m_id; }
+	virtual void SetId(const QByteArray& id) override { m_id = id; }
+
+	// reimplemented (iser::ISerializable)
+	virtual bool Serialize(iser::IArchive& /*archive*/) override { return true; }
+
+private:
+	QByteArray m_id;
+};
 
 
 } // namespace imtdeskgql

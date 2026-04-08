@@ -6,7 +6,6 @@
 #include <istd/CChangeGroup.h>
 #include <istd/TDelPtr.h>
 #include <iprm/CParamsSet.h>
-#include <iprm/IIdParam.h>
 
 // ImtCore includes
 #include <imtdesk/ISupportTicket.h>
@@ -17,29 +16,6 @@
 
 namespace imtdeskgql
 {
-
-
-namespace
-{
-
-// Simple IIdParam implementation for passing TicketId filter
-class CTicketIdParam: virtual public iprm::IIdParam
-{
-public:
-	CTicketIdParam(const QByteArray& id) : m_id(id) {}
-
-	// reimplemented (iprm::IIdParam)
-	virtual QByteArray GetId() const override { return m_id; }
-	virtual void SetId(const QByteArray& id) override { m_id = id; }
-
-	// reimplemented (iser::ISerializable)
-	virtual bool Serialize(iser::IArchive& /*archive*/) override { return true; }
-
-private:
-	QByteArray m_id;
-};
-
-} // anonymous namespace
 
 
 namespace imtdeskgql

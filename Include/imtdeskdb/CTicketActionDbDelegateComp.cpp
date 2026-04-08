@@ -116,7 +116,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CTicketActionDbDelegateComp::Crea
 		"\"ActionTypeId\", \"ActionTypeName\", \"ActionTypeDescription\", "
 		"\"Timestamp\", \"ActionData\") "
 		"VALUES('%1', %2, %3, %4, %5, %6, %7, %8, %9);")
-		.arg(QString::fromUtf8(actionId))
+		.arg(sqlEscape(QString::fromUtf8(actionId)))
 		.arg(ticketIdSql)
 		.arg(userIdSql)
 		.arg(userNameSql)
@@ -170,7 +170,7 @@ QByteArray CTicketActionDbDelegateComp::CreateUpdateObjectQuery(
 		.arg(actionTypeDescSql)
 		.arg(timestampSql)
 		.arg(actionDataSql)
-		.arg(QString::fromUtf8(objectId))
+		.arg(sqlEscape(QString::fromUtf8(objectId)))
 		.toUtf8();
 }
 
@@ -187,7 +187,7 @@ QByteArray CTicketActionDbDelegateComp::CreateDeleteObjectsQuery(
 	QString idsStr;
 	for (int i = 0; i < objectIds.size(); ++i){
 		if (i > 0) idsStr += ", ";
-		idsStr += QString("'%1'").arg(QString::fromUtf8(objectIds[i]));
+		idsStr += QString("'%1'").arg(sqlEscape(QString::fromUtf8(objectIds[i])));
 	}
 
 	return QString("DELETE FROM \"TicketActions\" WHERE \"Id\" IN (%1);")
