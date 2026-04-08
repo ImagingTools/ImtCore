@@ -21,8 +21,8 @@ ViewBase {
 	property TicketData ticketData: model
 	property bool isNewIssue: ticketData ? (ticketData.m_number === 0) : true
 
-	// Conversation thread data (populated from linked conversation messages)
-	property var commentMessages: []
+	// Unified activity timeline: comments + user actions (from ticketData.m_activityItems)
+	property var activityItems: ticketData ? (ticketData.m_activityItems || []) : []
 
 	signal commentSubmitted(string commentText)
 
@@ -568,8 +568,8 @@ ViewBase {
 							}
 
 							Text {
-								text: conversationThread.count > 0
-									? "(" + conversationThread.count + ")"
+								text: activityThread.count > 0
+									? "(" + activityThread.count + ")"
 									: ""
 								font.pixelSize: Style.fontSizeS
 								color: Style.textSecondaryColor
@@ -577,22 +577,59 @@ ViewBase {
 							}
 						}
 
-						// Comment list
+						// Unified activity timeline (comments + actions)
 						Column {
-							id: commentListCol
+							id: activityListCol
 							width: parent.width
 							spacing: Style.spacingS
 
 							Repeater {
-								id: conversationThread
-								model: root.commentMessages
+								id: activityThread
+								model: root.activityItems
 
-								// Each comment = avatar row + bubble + timestamp
+								// Each item = comment bubble OR action notice
 								Column {
-									width: commentListCol.width
+									width: activityListCol.width
 									spacing: Style.spacingXS
 
+									// --- Action item (e.g., "User closed ticket") ---
 									Row {
+										visible: modelData.itemType === "Action"
+										width: parent.width
+										spacing: Style.paddingS
+
+										// Action icon circle
+										Rectangle {
+											width: 32
+											height: 32
+											radius: 16
+											color: Style.textSecondaryColor
+
+											Text {
+												anchors.centerIn: parent
+												text: "⚡"
+												font.pixelSize: Style.fontSizeXS
+											}
+										}
+
+										Text {
+											width: parent.width - 32 - Style.paddingS
+											text: {
+												let who = modelData.userName || qsTr("Someone")
+												let action = modelData.actionDescription || modelData.actionType || ""
+												let when = modelData.timestamp || ""
+												return who + " " + action + " " + when
+											}
+											font.pixelSize: Style.fontSizeS
+											color: Style.textSecondaryColor
+											wrapMode: Text.Wrap
+											anchors.verticalCenter: parent.verticalCenter
+										}
+									}
+
+									// --- Comment item ---
+									Row {
+										visible: modelData.itemType !== "Action"
 										width: parent.width
 										spacing: Style.paddingS
 
@@ -606,7 +643,7 @@ ViewBase {
 											Text {
 												anchors.centerIn: parent
 												text: {
-													let n = modelData.senderName || ""
+													let n = modelData.userName || ""
 													return n.length > 0 ? n.charAt(0).toUpperCase() : "?"
 												}
 												font.pixelSize: Style.fontSizeXS
@@ -624,14 +661,14 @@ ViewBase {
 												spacing: Style.paddingS
 
 												Text {
-													text: modelData.senderName || qsTr("Unknown")
+													text: modelData.userName || qsTr("Unknown")
 													font.pixelSize: Style.fontSizeS
 													font.bold: true
 													color: Style.textColor
 												}
 
 												Text {
-													text: qsTr("commented") + " " + (modelData.createdAt || "")
+													text: qsTr("commented") + " " + (modelData.timestamp || "")
 													font.pixelSize: Style.fontSizeXS
 													color: Style.textSecondaryColor
 												}
@@ -640,19 +677,19 @@ ViewBase {
 											// Comment body
 											Rectangle {
 												width: parent.width
-												height: commentBodyText.height + Style.paddingM * 2
+												height: activityBodyText.height + Style.paddingM * 2
 												radius: Style.radiusS
 												color: Style.surfaceColor
 												border.color: Style.borderColor
 												border.width: 1
 
 												Text {
-													id: commentBodyText
+													id: activityBodyText
 													anchors.left: parent.left
 													anchors.right: parent.right
 													anchors.top: parent.top
 													anchors.margins: Style.paddingM
-													text: modelData.content || modelData.contentPreview || ""
+													text: modelData.content || ""
 													font.pixelSize: Style.fontSizeS
 													color: Style.textColor
 													wrapMode: Text.Wrap
@@ -669,13 +706,13 @@ ViewBase {
 
 													Rectangle {
 														height: 22
-														width: emojiText.width + Style.paddingS * 2
+														width: reactionEmojiText.width + Style.paddingS * 2
 														radius: height / 2
 														color: Style.surfaceColor
 														border.color: Style.borderColor
 
 														Text {
-															id: emojiText
+															id: reactionEmojiText
 															anchors.centerIn: parent
 															text: modelData
 															font.pixelSize: Style.fontSizeXS
