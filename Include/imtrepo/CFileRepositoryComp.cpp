@@ -266,12 +266,14 @@ bool CFileRepositoryComp::UpdateFile(
 		istd::CChangeNotifier changeNotifier(this, &changes);
 
 		bool indexUpdated = m_documentInfoCollectionCompPtr->SetObjectData(objectId, fileItemInfo);
-		if (indexUpdated){
+		if (!indexUpdated){
 			// TODO; Implement rollback logic!
 			SendErrorMessage(0, QObject::tr("File meta info could not be updated"));
 
 			return false;
 		}
+
+		return true;
 	}
 
 	SendErrorMessage(0, QObject::tr("File '%1' could not be copied to %2").arg(localFilePath).arg(targetFilePath));
