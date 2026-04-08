@@ -16,6 +16,53 @@ namespace imtdeskdb
 {
 
 
+namespace
+{
+
+// Helper: escape single quotes for SQL string literals
+QString sqlEscape(const QString& s)
+{
+	QString escaped = s;
+	escaped.replace('\'', "''");
+	return escaped;
+}
+
+
+// Helper: build INSERT statements for TicketActions
+QByteArray BuildTicketActionsInsertQueries(const QByteArray& ticketId, const QList<imtauth::CUserRecentAction>& actions)
+{
+	QByteArray result;
+	for (const imtauth::CUserRecentAction& action : actions){
+		const QString actionId = QUuid::createUuid().toString(QUuid::WithoutBraces);
+		const QString userIdSql = action.GetUserInfo().id.isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(QString::fromUtf8(action.GetUserInfo().id)));
+		const QString userNameSql = action.GetUserInfo().name.isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(action.GetUserInfo().name));
+		const QString actionTypeIdSql = action.GetActionTypeInfo().id.isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(QString::fromUtf8(action.GetActionTypeInfo().id)));
+		const QString actionTypeNameSql = action.GetActionTypeInfo().name.isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(action.GetActionTypeInfo().name));
+		const QString actionTypeDescSql = action.GetActionTypeInfo().description.isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(action.GetActionTypeInfo().description));
+		const QString timestampSql = action.GetTimestamp().isValid() ? QString("'%1'").arg(action.GetTimestamp().toString(Qt::ISODate)) : "NULL";
+
+		result += QString(
+			"\nINSERT INTO \"TicketActions\" "
+			"(\"Id\", \"TicketId\", \"UserId\", \"UserName\", "
+			"\"ActionTypeId\", \"ActionTypeName\", \"ActionTypeDescription\", \"Timestamp\") "
+			"VALUES('%1', '%2', %3, %4, %5, %6, %7, %8);")
+			.arg(actionId)
+			.arg(QString::fromUtf8(ticketId))
+			.arg(userIdSql)
+			.arg(userNameSql)
+			.arg(actionTypeIdSql)
+			.arg(actionTypeNameSql)
+			.arg(actionTypeDescSql)
+			.arg(timestampSql)
+			.toUtf8();
+	}
+	return result;
+}
+
+
+} // anonymous namespace
+
+
 istd::IChangeableUniquePtr CSupportTicketDbDelegateComp::CreateObjectFromRecord(
 		const QSqlRecord& record,
 		const iprm::IParamsSet* /*dataConfigurationPtr*/) const
@@ -113,7 +160,7 @@ istd::IChangeableUniquePtr CSupportTicketDbDelegateComp::CreateObjectFromRecord(
 	if (m_databaseEngineCompPtr.IsValid() && record.contains("Id")){
 		const QByteArray ticketId = record.value("Id").toByteArray();
 		const QString actionsQuery = QString("SELECT * FROM \"TicketActions\" WHERE \"TicketId\"='%1' ORDER BY \"Timestamp\" ASC;")
-			.arg(QString::fromUtf8(ticketId));
+			.arg(sqlEscape(QString::fromUtf8(ticketId)));
 
 		QSqlError actionsError;
 		QList<QSqlRecord> actionsRecords = m_databaseEngineCompPtr->ExecSqlQuery(actionsQuery.toUtf8(), &actionsError);
@@ -263,31 +310,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSupportTicketDbDelegateComp::Cre
 		.toUtf8();
 
 	// Insert user actions into TicketActions table
-	const QList<imtauth::CUserRecentAction> actions = ticketPtr->GetRecentActions();
-	for (const imtauth::CUserRecentAction& action : actions){
-		const QString actionId = QUuid::createUuid().toString(QUuid::WithoutBraces);
-		const QString userIdSql = action.GetUserInfo().id.isEmpty() ? "NULL" : QString("'%1'").arg(QString::fromUtf8(action.GetUserInfo().id));
-		const QString userNameSql = action.GetUserInfo().name.isEmpty() ? "NULL" : QString("'%1'").arg(action.GetUserInfo().name);
-		const QString actionTypeIdSql = action.GetActionTypeInfo().id.isEmpty() ? "NULL" : QString("'%1'").arg(QString::fromUtf8(action.GetActionTypeInfo().id));
-		const QString actionTypeNameSql = action.GetActionTypeInfo().name.isEmpty() ? "NULL" : QString("'%1'").arg(action.GetActionTypeInfo().name);
-		const QString actionTypeDescSql = action.GetActionTypeInfo().description.isEmpty() ? "NULL" : QString("'%1'").arg(action.GetActionTypeInfo().description);
-		const QString timestampSql = action.GetTimestamp().isValid() ? QString("'%1'").arg(action.GetTimestamp().toString(Qt::ISODate)) : "NULL";
-
-		retVal.query += QString(
-			"\nINSERT INTO \"TicketActions\" "
-			"(\"Id\", \"TicketId\", \"UserId\", \"UserName\", "
-			"\"ActionTypeId\", \"ActionTypeName\", \"ActionTypeDescription\", \"Timestamp\") "
-			"VALUES('%1', '%2', %3, %4, %5, %6, %7, %8);")
-			.arg(actionId)
-			.arg(QString::fromUtf8(ticketId))
-			.arg(userIdSql)
-			.arg(userNameSql)
-			.arg(actionTypeIdSql)
-			.arg(actionTypeNameSql)
-			.arg(actionTypeDescSql)
-			.arg(timestampSql)
-			.toUtf8();
-	}
+	retVal.query += BuildTicketActionsInsertQueries(ticketId, ticketPtr->GetRecentActions());
 
 	return retVal;
 }
@@ -368,31 +391,7 @@ QByteArray CSupportTicketDbDelegateComp::CreateUpdateObjectQuery(
 		.arg(QString::fromUtf8(objectId))
 		.toUtf8();
 
-	const QList<imtauth::CUserRecentAction> actions = ticketPtr->GetRecentActions();
-	for (const imtauth::CUserRecentAction& action : actions){
-		const QString actionId = QUuid::createUuid().toString(QUuid::WithoutBraces);
-		const QString userIdSql = action.GetUserInfo().id.isEmpty() ? "NULL" : QString("'%1'").arg(QString::fromUtf8(action.GetUserInfo().id));
-		const QString userNameSql = action.GetUserInfo().name.isEmpty() ? "NULL" : QString("'%1'").arg(action.GetUserInfo().name);
-		const QString actionTypeIdSql = action.GetActionTypeInfo().id.isEmpty() ? "NULL" : QString("'%1'").arg(QString::fromUtf8(action.GetActionTypeInfo().id));
-		const QString actionTypeNameSql = action.GetActionTypeInfo().name.isEmpty() ? "NULL" : QString("'%1'").arg(action.GetActionTypeInfo().name);
-		const QString actionTypeDescSql = action.GetActionTypeInfo().description.isEmpty() ? "NULL" : QString("'%1'").arg(action.GetActionTypeInfo().description);
-		const QString timestampSql = action.GetTimestamp().isValid() ? QString("'%1'").arg(action.GetTimestamp().toString(Qt::ISODate)) : "NULL";
-
-		result += QString(
-			"\nINSERT INTO \"TicketActions\" "
-			"(\"Id\", \"TicketId\", \"UserId\", \"UserName\", "
-			"\"ActionTypeId\", \"ActionTypeName\", \"ActionTypeDescription\", \"Timestamp\") "
-			"VALUES('%1', '%2', %3, %4, %5, %6, %7, %8);")
-			.arg(actionId)
-			.arg(QString::fromUtf8(objectId))
-			.arg(userIdSql)
-			.arg(userNameSql)
-			.arg(actionTypeIdSql)
-			.arg(actionTypeNameSql)
-			.arg(actionTypeDescSql)
-			.arg(timestampSql)
-			.toUtf8();
-	}
+	result += BuildTicketActionsInsertQueries(objectId, ticketPtr->GetRecentActions());
 
 	return result;
 }
