@@ -5,6 +5,10 @@
 #include <QtCore/QUuid>
 #include <QtSql/QSqlRecord>
 
+// ACF includes
+#include <iprm/TParamsPtr.h>
+#include <iprm/IIdParam.h>
+
 // ImtCore includes
 #include <imtchat/IChatMessage.h>
 #include <imtdb/CDatabaseEngineComp.h>
@@ -271,6 +275,26 @@ void CMessageDbDelegateComp::OnComponentCreated()
 					<< "\n\t| Query:" << query;
 		SendErrorMessage(0, QString("Messages table could not be created: %1").arg(sqlError.text()));
 	}
+}
+
+
+QString CMessageDbDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const
+{
+	iprm::IParamsSet::Ids paramIds = filterParams.GetParamIds();
+
+	if (paramIds.contains("ConversationId")){
+		iprm::TParamsPtr<iprm::IIdParam> idParamPtr(&filterParams, "ConversationId");
+		if (idParamPtr.IsValid()){
+			QByteArray conversationId = idParamPtr->GetId();
+			if (!conversationId.isEmpty()){
+				QString escaped = QString::fromUtf8(conversationId);
+				escaped.replace('\'', "''");
+				return QString("\"ConversationId\"='%1'").arg(escaped);
+			}
+		}
+	}
+
+	return QString();
 }
 
 

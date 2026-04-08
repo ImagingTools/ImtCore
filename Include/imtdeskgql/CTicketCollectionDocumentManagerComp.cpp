@@ -2,6 +2,9 @@
 #include <imtdeskgql/CTicketCollectionDocumentManagerComp.h>
 
 
+// Qt includes
+#include <QtCore/QUuid>
+
 // ACF includes
 #include <istd/CChangeGroup.h>
 #include <istd/TDelPtr.h>
@@ -9,7 +12,7 @@
 
 // ImtCore includes
 #include <imtdesk/ISupportTicket.h>
-#include <imtdesk/ITicketAction.h>
+#include <imtchat/IChatMessage.h>
 #include <imtbase/IObjectCollectionIterator.h>
 #include <imtdeskgql/imtdeskgql.h>
 
@@ -74,6 +77,50 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 	response.Version_1_0->priority = imtdeskgql::GetSdlTypeFromPriorityType(ticketPtr->GetPriority());
 	response.Version_1_0->status = imtdeskgql::GetSdlTypeFromStatusType(ticketPtr->GetStatus());
 	response.Version_1_0->stateReason = imtdeskgql::GetSdlTypeFromStateReason(ticketPtr->GetStateReason());
+
+	// Load messages from the Messages collection filtered by ConversationId
+	QByteArray conversationId = ticketPtr->GetConversationId();
+	if (!conversationId.isEmpty() && m_messageCollectionCompPtr.IsValid()){
+		CTicketIdParam conversationIdParam(conversationId);
+
+		iprm::CParamsSet paramsSet;
+		paramsSet.SetEditableParameter("ConversationId", &conversationIdParam);
+
+		istd::TDelPtr<imtbase::IObjectCollectionIterator> iteratorPtr(
+					m_messageCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), 0, -1, &paramsSet));
+
+		if (iteratorPtr.IsValid()){
+			response.Version_1_0->activityItems.Emplace();
+
+			while (iteratorPtr->Next()){
+				imtbase::IObjectCollection::DataPtr dataPtr;
+				if (iteratorPtr->GetObjectData(dataPtr)){
+					const imtchat::IChatMessage* msgPtr = dynamic_cast<const imtchat::IChatMessage*>(dataPtr.GetPtr());
+					if (msgPtr != nullptr){
+						sdl::imtdesk::ImtDesk::CTicketActivityItem::V1_0 itemData;
+						itemData.itemType = sdl::imtdesk::ImtDesk::ActivityItemType::Comment;
+						itemData.userId = msgPtr->GetSenderId();
+						itemData.timestamp = msgPtr->GetCreatedAt();
+						itemData.content = msgPtr->GetContent();
+
+						QStringList reactions = msgPtr->GetReactions();
+						if (!reactions.isEmpty()){
+							itemData.reactions.Emplace();
+							itemData.reactions->FromList(reactions);
+						}
+
+						istd::TSharedNullable<sdl::imtdesk::ImtDesk::CTicketActivityItem::V1_0> nullableItem;
+						nullableItem.Emplace(itemData);
+						response.Version_1_0->activityItems->append(nullableItem);
+					}
+				}
+			}
+
+			if (response.Version_1_0->activityItems->isEmpty()){
+				response.Version_1_0->activityItems.Reset();
+			}
+		}
+	}
 
 	return response;
 }
@@ -194,8 +241,48 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 	}
 
 	if (ticketInfo.activityItems){
-		// Activity items of type Action are stored in the TicketActions collection
-		// (comments are managed through the Conversation and not stored here)
+		// Comment-type activity items are saved as messages in the Messages collection
+		QByteArray conversationId = ticketPtr->GetConversationId();
+		if (!conversationId.isEmpty() && m_messageCollectionCompPtr.IsValid() && m_messageFactCompPtr.IsValid()){
+			imtbase::IObjectCollection* msgCollPtr = m_messageCollectionCompPtr.GetPtr();
+			if (msgCollPtr != nullptr){
+				for (const auto& sdlItem : *ticketInfo.activityItems){
+					if (!sdlItem){
+						continue;
+					}
+					if (sdlItem->itemType != sdl::imtdesk::ImtDesk::ActivityItemType::Comment){
+						continue;
+					}
+
+					imtchat::IChatMessageUniquePtr msgPtr = m_messageFactCompPtr.CreateInstance();
+					if (!msgPtr.IsValid()){
+						continue;
+					}
+
+					QByteArray newMsgId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+					msgPtr->SetId(newMsgId);
+					msgPtr->SetConversationId(conversationId);
+					msgPtr->SetStatus(imtchat::IChatMessage::MS_SENT);
+
+					if (sdlItem->userId){
+						msgPtr->SetSenderId(*sdlItem->userId);
+					}
+					if (sdlItem->content){
+						msgPtr->SetContent(*sdlItem->content);
+					}
+					if (sdlItem->reactions){
+						msgPtr->SetReactions(sdlItem->reactions->ToList());
+					}
+
+					msgCollPtr->InsertNewObject(
+								QByteArray("Message"),
+								QString(),
+								QString(),
+								msgPtr.GetPtr(),
+								newMsgId);
+				}
+			}
+		}
 	}
 
 	m_documentManagerCompPtr->SetDocumentData(userId, documentId, *ticketPtr);

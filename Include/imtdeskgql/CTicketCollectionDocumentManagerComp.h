@@ -5,6 +5,7 @@
 // ImtCore includes
 #include <imtdoc/IDocumentManager.h>
 #include <imtbase/IObjectCollection.h>
+#include <imtchat/IChatMessage.h>
 #include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentManager.h>
 
 // Generated includes
@@ -22,8 +23,8 @@ public:
 
 	I_BEGIN_COMPONENT(CTicketCollectionDocumentManagerComp)
 		I_ASSIGN(m_documentManagerCompPtr, "CollectionDocumentManager", "Collection document manager", false, "CollectionDocumentManager");
-		I_ASSIGN(m_ticketActionsCollectionCompPtr, "TicketActionsCollection", "Collection of ticket actions", false, "TicketActionsCollection");
-		I_ASSIGN(m_conversationCollectionCompPtr, "ConversationCollection", "Collection of conversations", false, "ConversationCollection");
+		I_ASSIGN(m_messageCollectionCompPtr, "MessageCollection", "Collection of chat messages", false, "MessageCollection");
+		I_ASSIGN(m_messageFactCompPtr, "MessageFactory", "Factory for creating chat message instances", false, "MessageFactory");
 	I_END_COMPONENT
 
 protected:
@@ -38,8 +39,8 @@ protected:
 
 private:
 	I_REF(imtdoc::IDocumentManager, m_documentManagerCompPtr);
-	I_REF(imtbase::IObjectCollection, m_ticketActionsCollectionCompPtr);
-	I_REF(imtbase::IObjectCollection, m_conversationCollectionCompPtr);
+	I_REF(imtbase::IObjectCollection, m_messageCollectionCompPtr);
+	I_FACT(imtchat::IChatMessage, m_messageFactCompPtr);
 };
 
 
