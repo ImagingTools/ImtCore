@@ -92,6 +92,8 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 		if (iteratorPtr.IsValid()){
 			response.Version_1_0->activityItems.Emplace();
 
+			QList<sdl::imtdesk::ImtDesk::CTicketActivityItem::V1_0> itemList;
+
 			while (iteratorPtr->Next()){
 				imtbase::IObjectCollection::DataPtr dataPtr;
 				if (iteratorPtr->GetObjectData(dataPtr)){
@@ -109,12 +111,12 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 							itemData.reactions->FromList(reactions);
 						}
 
-						istd::TSharedNullable<sdl::imtdesk::ImtDesk::CTicketActivityItem::V1_0> nullableItem;
-						nullableItem.Emplace(itemData);
-						response.Version_1_0->activityItems->append(nullableItem);
+						itemList << itemData;
 					}
 				}
 			}
+
+			response.Version_1_0->activityItems->FromList(itemList);
 
 			if (response.Version_1_0->activityItems->isEmpty()){
 				response.Version_1_0->activityItems.Reset();

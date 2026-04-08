@@ -732,31 +732,6 @@ ViewBase {
 														wrapMode: Text.Wrap
 													}
 												}
-												
-												// Reactions row
-												Row {
-													spacing: Style.paddingXS
-													visible: modelData.reactions ? modelData.reactions.length > 0 : false
-													
-													Repeater {
-														model: modelData.reactions || []
-														
-														Rectangle {
-															height: 22
-															width: reactionEmojiText.width + Style.paddingS * 2
-															radius: height / 2
-															color: Style.surfaceColor
-															border.color: Style.borderColor
-															
-															Text {
-																id: reactionEmojiText
-																anchors.centerIn: parent
-																text: modelData
-																font.pixelSize: Style.fontSizeXS
-															}
-														}
-													}
-												}
 											}
 										}
 									}
@@ -843,30 +818,14 @@ ViewBase {
 										Row {
 											anchors.right: parent.right
 											spacing: Style.spacingS
-											
-											Rectangle {
-												width: commentBtnText.width + Style.paddingM * 2
+
+											Button {
+												text: qsTr("Comment")
+												widthFromDecorator: true
 												height: Style.buttonHeightM
-												radius: Style.radiusS
-												color: commentInputField.text.trim().length > 0
-													   ? "#1a7f37" : Style.disabledColor
-												
-												Text {
-													id: commentBtnText
-													anchors.centerIn: parent
-													text: qsTr("Comment")
-													font.pixelSize: Style.fontSizeS
-													font.bold: true
-													color: "white"
-												}
-												
-												MouseArea {
-													anchors.fill: parent
-													enabled: commentInputField.text.trim().length > 0
-													onClicked: {
-														root.commentSubmitted(commentInputField.text.trim())
-														commentInputField.text = ""
-													}
+												onClicked: {
+													root.commentSubmitted(commentInputField.text.trim())
+													commentInputField.text = ""
 												}
 											}
 										}
