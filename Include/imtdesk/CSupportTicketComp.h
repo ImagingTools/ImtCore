@@ -70,6 +70,8 @@ public:
 	virtual void SetResolvedAt(const QString& resolvedAt) override;
 	virtual QList<ActivityItem> GetActivityItems() const override;
 	virtual void SetActivityItems(const QList<ActivityItem>& items) override;
+	virtual QList<imtauth::CUserRecentAction> GetRecentActions() const override;
+	virtual void SetRecentActions(const QList<imtauth::CUserRecentAction>& actions) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -102,6 +104,7 @@ private:
 	QString m_closedAt;
 	QString m_resolvedAt;
 	QList<ActivityItem> m_activityItems;
+	QList<imtauth::CUserRecentAction> m_recentActions;
 };
 
 

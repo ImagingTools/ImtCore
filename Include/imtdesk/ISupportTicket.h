@@ -5,6 +5,9 @@
 // ACF includes
 #include <iser/ISerializable.h>
 
+// ImtCore includes
+#include <imtauth/CUserRecentAction.h>
+
 
 namespace imtdesk
 {
@@ -334,6 +337,17 @@ public:
 		Set the activity items list.
 	*/
 	virtual void SetActivityItems(const QList<ActivityItem>& items) = 0;
+
+	/**
+		Get the list of recent user actions (stored as imtauth::CUserRecentAction).
+		Used as the source of truth for AIT_ACTION activity items in the timeline.
+	*/
+	virtual QList<imtauth::CUserRecentAction> GetRecentActions() const = 0;
+
+	/**
+		Set the list of recent user actions.
+	*/
+	virtual void SetRecentActions(const QList<imtauth::CUserRecentAction>& actions) = 0;
 };
 
 typedef istd::TUniqueInterfacePtr<ISupportTicket> ISupportTicketUniquePtr;

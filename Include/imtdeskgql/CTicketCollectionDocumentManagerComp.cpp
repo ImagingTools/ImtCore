@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtdesk/ISupportTicket.h>
+#include <imtauth/CUserRecentAction.h>
 #include <imtdeskgql/imtdeskgql.h>
 
 
@@ -71,7 +72,7 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 	response.Version_1_0->status = imtdeskgql::GetSdlTypeFromStatusType(ticketPtr->GetStatus());
 	response.Version_1_0->stateReason = imtdeskgql::GetSdlTypeFromStateReason(ticketPtr->GetStateReason());
 
-	// Populate activity items
+	// Populate activity items (comments from ActivityItem list)
 	{
 		const QList<imtdesk::ISupportTicket::ActivityItem> items = ticketPtr->GetActivityItems();
 		for (const imtdesk::ISupportTicket::ActivityItem& item : items){
@@ -87,6 +88,25 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 			}
 			sdlItem.Version_1_0->actionType = item.actionType;
 			sdlItem.Version_1_0->actionDescription = item.actionDescription;
+			if (!response.Version_1_0->activityItems.has_value()){
+				response.Version_1_0->activityItems.Emplace();
+			}
+			response.Version_1_0->activityItems->Append(sdlItem);
+		}
+	}
+
+	// Populate activity items from recent user actions (imtauth::CUserRecentAction)
+	{
+		const QList<imtauth::CUserRecentAction> actions = ticketPtr->GetRecentActions();
+		for (const imtauth::CUserRecentAction& action : actions){
+			sdl::imtdesk::ImtDesk::CTicketActivityItem sdlItem;
+			sdlItem.Version_1_0.Emplace();
+			sdlItem.Version_1_0->itemType = sdl::imtdesk::ImtDesk::ActivityItemType::Action;
+			sdlItem.Version_1_0->userId = action.GetUserInfo().id;
+			sdlItem.Version_1_0->userName = action.GetUserInfo().name;
+			sdlItem.Version_1_0->timestamp = action.GetTimestamp().toString(Qt::ISODate);
+			sdlItem.Version_1_0->actionType = action.GetActionTypeInfo().name;
+			sdlItem.Version_1_0->actionDescription = action.GetActionTypeInfo().description;
 			if (!response.Version_1_0->activityItems.has_value()){
 				response.Version_1_0->activityItems.Emplace();
 			}
@@ -213,40 +233,65 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 	}
 
 	if (ticketInfo.activityItems){
-		QList<imtdesk::ISupportTicket::ActivityItem> items;
+		QList<imtdesk::ISupportTicket::ActivityItem> commentItems;
+		QList<imtauth::CUserRecentAction> actionItems;
 		for (int i = 0; i < ticketInfo.activityItems->GetSize(); ++i){
 			const sdl::imtdesk::ImtDesk::CTicketActivityItem& sdlItem = ticketInfo.activityItems->At(i);
 			if (!sdlItem.Version_1_0.has_value()){
 				continue;
 			}
-			imtdesk::ISupportTicket::ActivityItem item;
+			imtdesk::ISupportTicket::ActivityItemType itemType = imtdesk::ISupportTicket::AIT_COMMENT;
 			if (sdlItem.Version_1_0->itemType){
-				item.itemType = imtdeskgql::GetActivityItemTypeFromSdl(*sdlItem.Version_1_0->itemType);
+				itemType = imtdeskgql::GetActivityItemTypeFromSdl(*sdlItem.Version_1_0->itemType);
 			}
-			if (sdlItem.Version_1_0->userId){
-				item.userId = *sdlItem.Version_1_0->userId;
+			if (itemType == imtdesk::ISupportTicket::AIT_ACTION){
+				// Store as CUserRecentAction
+				imtauth::CUserRecentAction action;
+				imtauth::IUserRecentAction::UserInfo userInfo;
+				if (sdlItem.Version_1_0->userId){
+					userInfo.id = *sdlItem.Version_1_0->userId;
+				}
+				if (sdlItem.Version_1_0->userName){
+					userInfo.name = *sdlItem.Version_1_0->userName;
+				}
+				action.SetUserInfo(userInfo);
+				if (sdlItem.Version_1_0->timestamp){
+					action.SetTimestamp(QDateTime::fromString(*sdlItem.Version_1_0->timestamp, Qt::ISODate));
+				}
+				imtauth::IUserRecentAction::ActionTypeInfo actionTypeInfo;
+				if (sdlItem.Version_1_0->actionType){
+					actionTypeInfo.name = *sdlItem.Version_1_0->actionType;
+				}
+				if (sdlItem.Version_1_0->actionDescription){
+					actionTypeInfo.description = *sdlItem.Version_1_0->actionDescription;
+				}
+				action.SetActionTypeInfo(actionTypeInfo);
+				actionItems.append(action);
 			}
-			if (sdlItem.Version_1_0->userName){
-				item.userName = *sdlItem.Version_1_0->userName;
+			else {
+				// Store as ActivityItem (comment)
+				imtdesk::ISupportTicket::ActivityItem item;
+				item.itemType = itemType;
+				if (sdlItem.Version_1_0->userId){
+					item.userId = *sdlItem.Version_1_0->userId;
+				}
+				if (sdlItem.Version_1_0->userName){
+					item.userName = *sdlItem.Version_1_0->userName;
+				}
+				if (sdlItem.Version_1_0->timestamp){
+					item.timestamp = *sdlItem.Version_1_0->timestamp;
+				}
+				if (sdlItem.Version_1_0->content){
+					item.content = *sdlItem.Version_1_0->content;
+				}
+				if (sdlItem.Version_1_0->reactions){
+					item.reactions = sdlItem.Version_1_0->reactions->ToList();
+				}
+				commentItems.append(item);
 			}
-			if (sdlItem.Version_1_0->timestamp){
-				item.timestamp = *sdlItem.Version_1_0->timestamp;
-			}
-			if (sdlItem.Version_1_0->content){
-				item.content = *sdlItem.Version_1_0->content;
-			}
-			if (sdlItem.Version_1_0->reactions){
-				item.reactions = sdlItem.Version_1_0->reactions->ToList();
-			}
-			if (sdlItem.Version_1_0->actionType){
-				item.actionType = *sdlItem.Version_1_0->actionType;
-			}
-			if (sdlItem.Version_1_0->actionDescription){
-				item.actionDescription = *sdlItem.Version_1_0->actionDescription;
-			}
-			items.append(item);
 		}
-		ticketPtr->SetActivityItems(items);
+		ticketPtr->SetActivityItems(commentItems);
+		ticketPtr->SetRecentActions(actionItems);
 	}
 
 	m_documentManagerCompPtr->SetDocumentData(userId, documentId, *ticketPtr);
