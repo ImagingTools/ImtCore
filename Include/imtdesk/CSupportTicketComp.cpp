@@ -520,8 +520,8 @@ bool CSupportTicketComp::Serialize(iser::IArchive& archive)
 		int actionsCount = m_recentActions.size();
 		I_SERIALIZE(archive, actionsCount);
 		if (archive.IsStoring()){
-			for (imtauth::CUserRecentAction& action : m_recentActions){
-				retVal = retVal && action.Serialize(archive);
+			for (int i = 0; i < actionsCount; ++i){
+				retVal = retVal && m_recentActions[i].Serialize(archive);
 			}
 		}
 		else {
@@ -589,7 +589,7 @@ bool CSupportTicketComp::IsEqual(const IChangeable& object) const
 		return false;
 	}
 
-	return m_id == srcPtr->GetId()
+	bool result = m_id == srcPtr->GetId()
 		&& m_title == srcPtr->GetTitle()
 		&& m_description == srcPtr->GetDescription()
 		&& m_ticketType == srcPtr->GetTicketType()
@@ -611,8 +611,22 @@ bool CSupportTicketComp::IsEqual(const IChangeable& object) const
 		&& m_resolvedAt == srcPtr->GetResolvedAt()
 		&& m_activityItems == srcPtr->GetActivityItems();
 
-	// Note: recentActions comparison is covered via the activityItems equality check
-	// since action items are derived from recentActions during SDL transport.
+	if (!result){
+		return false;
+	}
+
+	QList<imtauth::CUserRecentAction> srcActions = srcPtr->GetRecentActions();
+	if (m_recentActions.size() != srcActions.size()){
+		return false;
+	}
+
+	for (int i = 0; i < m_recentActions.size(); ++i){
+		if (!m_recentActions[i].IsEqual(srcActions[i])){
+			return false;
+		}
+	}
+
+	return true;
 }
 
 
