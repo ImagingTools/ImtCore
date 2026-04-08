@@ -19,161 +19,149 @@ ViewBase {
 	property TicketData ticketData: model
 	property bool isNewIssue: ticketData ? (ticketData.m_number === 0) : true
 
-	function updateGui(){
-		titleInput.text = ticketData.m_title
-		descriptionInput.text = ticketData.m_description || ""
-
-		assigneeCB.currentIndex = -1
-		if (assigneeCB.model){
-			let assigneeIds = ticketData.m_assigneeIds || []
-			let firstAssignee = assigneeIds.length > 0 ? assigneeIds[0] : ""
-			for (let i = 0; i < assigneeCB.model.getItemsCount(); i++){
-				let userId = assigneeCB.model.getData("id", i)
-				if (firstAssignee === userId){
-					assigneeCB.currentIndex = i
-					break
+	// --- Helper: find ComboBox index by "id" field ---
+	function findComboIndex(combo, targetId, fallback) {
+		if (combo.model) {
+			for (let i = 0; i < combo.model.getItemsCount(); i++) {
+				if (combo.model.getData("id", i) === targetId) {
+					return i
 				}
 			}
 		}
+		return fallback
+	}
 
-		reporterCB.currentIndex = -1
-		if (reporterCB.model){
-			for (let i = 0; i < reporterCB.model.getItemsCount(); i++){
-				let userId = reporterCB.model.getData("id", i)
-				if (ticketData.m_reporterId === userId){
-					reporterCB.currentIndex = i
-					break
+	function updateGui() {
+		if (root.isNewIssue) {
+			newTitleInput.text = ticketData.m_title || ""
+			newDescriptionInput.text = ticketData.m_description || ""
+			newTypeCB.currentIndex = findComboIndex(newTypeCB, ticketData.m_ticketType, 1)
+			newPriorityCB.currentIndex = findComboIndex(newPriorityCB, ticketData.m_priority, 1)
+			newEnvironmentCB.currentIndex = findComboIndex(newEnvironmentCB, ticketData.m_environment, 2)
+			newMilestoneInput.text = ticketData.m_milestoneId || ""
+
+			newAssigneeCB.currentIndex = -1
+			if (newAssigneeCB.model) {
+				let ids = ticketData.m_assigneeIds || []
+				let first = ids.length > 0 ? ids[0] : ""
+				for (let i = 0; i < newAssigneeCB.model.getItemsCount(); i++) {
+					if (newAssigneeCB.model.getData("id", i) === first) {
+						newAssigneeCB.currentIndex = i
+						break
+					}
 				}
 			}
 		}
+		else {
+			editTitleInput.text = ticketData.m_title || ""
+			editDescriptionInput.text = ticketData.m_description || ""
+			editTypeCB.currentIndex = findComboIndex(editTypeCB, ticketData.m_ticketType, 1)
+			editPriorityCB.currentIndex = findComboIndex(editPriorityCB, ticketData.m_priority, 1)
+			editEnvironmentCB.currentIndex = findComboIndex(editEnvironmentCB, ticketData.m_environment, 2)
+			editStatusCB.currentIndex = findComboIndex(editStatusCB, ticketData.m_status, 0)
+			editStateReasonCB.currentIndex = findComboIndex(editStateReasonCB, ticketData.m_stateReason, 0)
+			editMilestoneInput.text = ticketData.m_milestoneId || ""
+			editConversationInput.text = ticketData.m_conversationId || ""
+			editLockReasonInput.text = ticketData.m_lockReason || ""
+			editLockedCB.checkState = ticketData.m_locked ? Qt.Checked : Qt.Unchecked
 
-		conversationIdInput.text = ticketData.m_conversationId || ""
-		milestoneIdInput.text = ticketData.m_milestoneId || ""
-		lockReasonInput.text = ticketData.m_lockReason || ""
-		lockedCB.checkState = ticketData.m_locked ? Qt.Checked : Qt.Unchecked
-
-		ticketTypeCB.currentIndex = -1
-		if (ticketTypeCB.model){
-			for (let i = 0; i < ticketTypeCB.model.getItemsCount(); i++){
-				let typeId = ticketTypeCB.model.getData("id", i)
-				if (ticketData.m_ticketType === typeId){
-					ticketTypeCB.currentIndex = i
-					break
+			editAssigneeCB.currentIndex = -1
+			if (editAssigneeCB.model) {
+				let ids = ticketData.m_assigneeIds || []
+				let first = ids.length > 0 ? ids[0] : ""
+				for (let i = 0; i < editAssigneeCB.model.getItemsCount(); i++) {
+					if (editAssigneeCB.model.getData("id", i) === first) {
+						editAssigneeCB.currentIndex = i
+						break
+					}
 				}
 			}
-		}
-		if (ticketTypeCB.currentIndex < 0){
-			ticketTypeCB.currentIndex = 1
-		}
 
-		statusCB.currentIndex = -1
-		if (statusCB.model){
-			for (let i = 0; i < statusCB.model.getItemsCount(); i++){
-				let statusId = statusCB.model.getData("id", i)
-				if (ticketData.m_status === statusId){
-					statusCB.currentIndex = i
-					break
+			editReporterCB.currentIndex = -1
+			if (editReporterCB.model) {
+				for (let i = 0; i < editReporterCB.model.getItemsCount(); i++) {
+					if (editReporterCB.model.getData("id", i) === ticketData.m_reporterId) {
+						editReporterCB.currentIndex = i
+						break
+					}
 				}
 			}
-		}
-		if (statusCB.currentIndex < 0){
-			statusCB.currentIndex = 0
-		}
-
-		stateReasonCB.currentIndex = -1
-		if (stateReasonCB.model){
-			for (let i = 0; i < stateReasonCB.model.getItemsCount(); i++){
-				let reasonId = stateReasonCB.model.getData("id", i)
-				if (ticketData.m_stateReason === reasonId){
-					stateReasonCB.currentIndex = i
-					break
-				}
-			}
-		}
-		if (stateReasonCB.currentIndex < 0){
-			stateReasonCB.currentIndex = 0
-		}
-
-		priorityCB.currentIndex = -1
-		if (priorityCB.model){
-			for (let i = 0; i < priorityCB.model.getItemsCount(); i++){
-				let priorityId = priorityCB.model.getData("id", i)
-				if (ticketData.m_priority === priorityId){
-					priorityCB.currentIndex = i
-					break
-				}
-			}
-		}
-		if (priorityCB.currentIndex < 0){
-			priorityCB.currentIndex = 1
-		}
-
-		environmentCB.currentIndex = -1
-		if (environmentCB.model){
-			for (let i = 0; i < environmentCB.model.getItemsCount(); i++){
-				let envId = environmentCB.model.getData("id", i)
-				if (ticketData.m_environment === envId){
-					environmentCB.currentIndex = i
-					break
-				}
-			}
-		}
-		if (environmentCB.currentIndex < 0){
-			environmentCB.currentIndex = 2
 		}
 	}
 
-	function updateModel(){
-		ticketData.m_title = titleInput.text
-		ticketData.m_description = descriptionInput.text
+	function updateModel() {
+		if (root.isNewIssue) {
+			ticketData.m_title = newTitleInput.text
+			ticketData.m_description = newDescriptionInput.text
+			ticketData.m_milestoneId = newMilestoneInput.text
 
-		if (assigneeCB.model && assigneeCB.currentIndex >= 0){
-			ticketData.m_assigneeIds = [assigneeCB.model.getData("id", assigneeCB.currentIndex)]
-		}
-		else{
-			ticketData.m_assigneeIds = []
-		}
+			if (newAssigneeCB.model && newAssigneeCB.currentIndex >= 0) {
+				ticketData.m_assigneeIds = [newAssigneeCB.model.getData("id", newAssigneeCB.currentIndex)]
+			}
+			else {
+				ticketData.m_assigneeIds = []
+			}
 
-		if (reporterCB.model && reporterCB.currentIndex >= 0){
-			ticketData.m_reporterId = reporterCB.model.getData("id", reporterCB.currentIndex)
+			if (newTypeCB.model && newTypeCB.currentIndex >= 0) {
+				ticketData.m_ticketType = newTypeCB.model.getData("id", newTypeCB.currentIndex)
+			}
+			if (newPriorityCB.model && newPriorityCB.currentIndex >= 0) {
+				ticketData.m_priority = newPriorityCB.model.getData("id", newPriorityCB.currentIndex)
+			}
+			if (newEnvironmentCB.model && newEnvironmentCB.currentIndex >= 0) {
+				ticketData.m_environment = newEnvironmentCB.model.getData("id", newEnvironmentCB.currentIndex)
+			}
 		}
-		else{
-			ticketData.m_reporterId = ""
-		}
+		else {
+			ticketData.m_title = editTitleInput.text
+			ticketData.m_description = editDescriptionInput.text
+			ticketData.m_milestoneId = editMilestoneInput.text
+			ticketData.m_conversationId = editConversationInput.text
+			ticketData.m_locked = editLockedCB.checkState === Qt.Checked
+			ticketData.m_lockReason = editLockReasonInput.text
 
-		ticketData.m_conversationId = conversationIdInput.text
-		ticketData.m_milestoneId = milestoneIdInput.text
-		ticketData.m_locked = lockedCB.checkState === Qt.Checked
-		ticketData.m_lockReason = lockReasonInput.text
+			if (editAssigneeCB.model && editAssigneeCB.currentIndex >= 0) {
+				ticketData.m_assigneeIds = [editAssigneeCB.model.getData("id", editAssigneeCB.currentIndex)]
+			}
+			else {
+				ticketData.m_assigneeIds = []
+			}
 
-		if (ticketTypeCB.model && ticketTypeCB.currentIndex >= 0){
-			ticketData.m_ticketType = ticketTypeCB.model.getData("id", ticketTypeCB.currentIndex)
-		}
+			if (editReporterCB.model && editReporterCB.currentIndex >= 0) {
+				ticketData.m_reporterId = editReporterCB.model.getData("id", editReporterCB.currentIndex)
+			}
+			else {
+				ticketData.m_reporterId = ""
+			}
 
-		if (statusCB.model && statusCB.currentIndex >= 0){
-			ticketData.m_status = statusCB.model.getData("id", statusCB.currentIndex)
-		}
-
-		if (stateReasonCB.model && stateReasonCB.currentIndex >= 0){
-			ticketData.m_stateReason = stateReasonCB.model.getData("id", stateReasonCB.currentIndex)
-		}
-
-		if (priorityCB.model && priorityCB.currentIndex >= 0){
-			ticketData.m_priority = priorityCB.model.getData("id", priorityCB.currentIndex)
-		}
-
-		if (environmentCB.model && environmentCB.currentIndex >= 0){
-			ticketData.m_environment = environmentCB.model.getData("id", environmentCB.currentIndex)
+			if (editTypeCB.model && editTypeCB.currentIndex >= 0) {
+				ticketData.m_ticketType = editTypeCB.model.getData("id", editTypeCB.currentIndex)
+			}
+			if (editPriorityCB.model && editPriorityCB.currentIndex >= 0) {
+				ticketData.m_priority = editPriorityCB.model.getData("id", editPriorityCB.currentIndex)
+			}
+			if (editEnvironmentCB.model && editEnvironmentCB.currentIndex >= 0) {
+				ticketData.m_environment = editEnvironmentCB.model.getData("id", editEnvironmentCB.currentIndex)
+			}
+			if (editStatusCB.model && editStatusCB.currentIndex >= 0) {
+				ticketData.m_status = editStatusCB.model.getData("id", editStatusCB.currentIndex)
+			}
+			if (editStateReasonCB.model && editStateReasonCB.currentIndex >= 0) {
+				ticketData.m_stateReason = editStateReasonCB.model.getData("id", editStateReasonCB.currentIndex)
+			}
 		}
 	}
+
+	// --- Shared data providers and models ---
 
 	CollectionDataProvider {
 		id: userCollectionProvider
 		commandId: ImtauthUsersSdlCommandIds.s_usersList
 		fields: [UserDataInputTypeMetaInfo.s_id, UserDataInputTypeMetaInfo.s_typeId, UserDataInputTypeMetaInfo.s_name]
 		onCollectionModelChanged: {
-			assigneeCB.model = collectionModel
-			reporterCB.model = collectionModel
+			newAssigneeCB.model = collectionModel
+			editAssigneeCB.model = collectionModel
+			editReporterCB.model = collectionModel
 			root.doUpdateGui()
 		}
 		Component.onCompleted: {
@@ -181,43 +169,6 @@ ViewBase {
 		}
 	}
 
-	// Status model
-	TreeItemModel {
-		id: statusModel
-		Component.onCompleted: {
-			let index = insertNewItem()
-			setData("id", "Open", index)
-			setData("name", "Open", index)
-
-			index = insertNewItem()
-			setData("id", "Closed", index)
-			setData("name", "Closed", index)
-		}
-	}
-
-	// State reason model
-	TreeItemModel {
-		id: stateReasonModel
-		Component.onCompleted: {
-			let index = insertNewItem()
-			setData("id", "None", index)
-			setData("name", "None", index)
-
-			index = insertNewItem()
-			setData("id", "Completed", index)
-			setData("name", "Completed", index)
-
-			index = insertNewItem()
-			setData("id", "NotPlanned", index)
-			setData("name", "Not Planned", index)
-
-			index = insertNewItem()
-			setData("id", "Reopened", index)
-			setData("name", "Reopened", index)
-		}
-	}
-
-	// Ticket type model
 	TreeItemModel {
 		id: ticketTypeModel
 		Component.onCompleted: {
@@ -239,7 +190,6 @@ ViewBase {
 		}
 	}
 
-	// Priority model
 	TreeItemModel {
 		id: priorityModel
 		Component.onCompleted: {
@@ -261,7 +211,6 @@ ViewBase {
 		}
 	}
 
-	// Environment model
 	TreeItemModel {
 		id: environmentModel
 		Component.onCompleted: {
@@ -279,138 +228,149 @@ ViewBase {
 		}
 	}
 
-	CustomScrollbar {
-		id: scrollbar
-		z: parent.z + 1
-		anchors.right: parent.right
-		anchors.top: flickable.top
-		anchors.bottom: flickable.bottom
-		secondSize: Style.marginM
-		targetItem: flickable
-		visible: root.visible
+	TreeItemModel {
+		id: statusModel
+		Component.onCompleted: {
+			let index = insertNewItem()
+			setData("id", "Open", index)
+			setData("name", "Open", index)
+
+			index = insertNewItem()
+			setData("id", "Closed", index)
+			setData("name", "Closed", index)
+		}
 	}
 
-	CustomScrollbar {
-		id: scrollHoriz
-		z: parent.z + 1
-		anchors.left: flickable.left
-		anchors.right: flickable.right
-		anchors.bottom: flickable.bottom
-		secondSize: Style.marginM
-		vertical: false
-		targetItem: flickable
+	TreeItemModel {
+		id: stateReasonModel
+		Component.onCompleted: {
+			let index = insertNewItem()
+			setData("id", "None", index)
+			setData("name", "None", index)
+
+			index = insertNewItem()
+			setData("id", "Completed", index)
+			setData("name", "Completed", index)
+
+			index = insertNewItem()
+			setData("id", "NotPlanned", index)
+			setData("name", "Not Planned", index)
+
+			index = insertNewItem()
+			setData("id", "Reopened", index)
+			setData("name", "Reopened", index)
+		}
 	}
 
-	Flickable {
-		id: flickable
-		anchors.top: parent.top
-		anchors.topMargin: Style.marginXL
-		anchors.bottom: parent.bottom
-		anchors.bottomMargin: Style.marginXL
-		anchors.left: parent.left
-		anchors.leftMargin: Style.marginXL
-		anchors.right: scrollbar.left
-		anchors.rightMargin: Style.marginXL
-		contentWidth: mainRow.width
-		contentHeight: mainRow.height + Style.marginXL * 2
-		boundsBehavior: Flickable.StopAtBounds
-		clip: true
+	// ================================================================
+	// VIEW 1: CREATE NEW ISSUE (isNewIssue === true)
+	// Like GitHub's "New Issue" page — clean form, green Submit button
+	// ================================================================
 
-		Row {
-			id: mainRow
-			spacing: Style.marginXL
+	Item {
+		id: createView
+		visible: root.isNewIssue
+		anchors.fill: parent
 
-			// Left column: main content (title + description + action buttons)
-			Column {
-				id: mainContentColumn
-				width: 560
-				spacing: Style.marginM
+		CustomScrollbar {
+			id: createScrollV
+			z: parent.z + 1
+			anchors.right: parent.right
+			anchors.top: createFlick.top
+			anchors.bottom: createFlick.bottom
+			secondSize: Style.marginM
+			targetItem: createFlick
+			visible: createView.visible
+		}
 
-				// Header: "New Issue" or "Edit Issue #N"
-				Text {
-					text: root.isNewIssue ? qsTr("New Issue") : qsTr("Edit Issue #%1").arg(ticketData ? ticketData.m_number : 0)
-					font.pixelSize: Style.fontSizeXL
-					font.bold: true
-					color: Style.textColor
-				}
+		Flickable {
+			id: createFlick
+			anchors.top: parent.top
+			anchors.topMargin: Style.marginXL
+			anchors.bottom: parent.bottom
+			anchors.bottomMargin: Style.marginXL
+			anchors.left: parent.left
+			anchors.leftMargin: Style.marginXL
+			anchors.right: createScrollV.left
+			anchors.rightMargin: Style.marginXL
+			contentWidth: createRow.width
+			contentHeight: createRow.height + Style.marginXL * 2
+			boundsBehavior: Flickable.StopAtBounds
+			clip: true
 
-				// Status badges (existing issues only)
-				Row {
-					visible: !root.isNewIssue
-					spacing: Style.paddingXS
+			Row {
+				id: createRow
+				spacing: Style.marginXL
 
-					TicketBadge {
-						badgeType: "status"
-						value: statusCB.currentIndex
-					}
-
-					TicketBadge {
-						badgeType: "stateReason"
-						value: stateReasonCB.currentIndex
-						visible: stateReasonCB.currentIndex > 0
-					}
-				}
-
-				// Title input
+				// Left: main content
 				Column {
-					width: parent.width
-					spacing: Style.paddingXS
+					id: createMainCol
+					width: 560
+					spacing: Style.marginM
 
+					// Header
 					Text {
-						text: qsTr("Add a title")
-						font.pixelSize: Style.fontSizeS
+						text: qsTr("New Issue")
+						font.pixelSize: Style.fontSizeXL
 						font.bold: true
 						color: Style.textColor
 					}
 
-					CustomTextField {
-						id: titleInput
+					// Title
+					Column {
 						width: parent.width
-						height: 40
-						placeHolderText: qsTr("Title")
-						onEditingFinished: {
-							root.doUpdateModel()
+						spacing: Style.paddingXS
+
+						Text {
+							text: qsTr("Add a title")
+							font.pixelSize: Style.fontSizeS
+							font.bold: true
+							color: Style.textColor
+						}
+
+						CustomTextField {
+							id: newTitleInput
+							width: parent.width
+							height: 40
+							placeHolderText: qsTr("Title")
+							onEditingFinished: {
+								root.doUpdateModel()
+							}
 						}
 					}
-				}
 
-				// Description input
-				Column {
-					width: parent.width
-					spacing: Style.paddingXS
-
-					Text {
-						text: qsTr("Add a description")
-						font.pixelSize: Style.fontSizeS
-						font.bold: true
-						color: Style.textColor
-					}
-
-					CustomTextField {
-						id: descriptionInput
+					// Description
+					Column {
 						width: parent.width
-						height: 120
-						placeHolderText: qsTr("Leave a comment")
-						onEditingFinished: {
-							root.doUpdateModel()
+						spacing: Style.paddingXS
+
+						Text {
+							text: qsTr("Add a description")
+							font.pixelSize: Style.fontSizeS
+							font.bold: true
+							color: Style.textColor
+						}
+
+						CustomTextField {
+							id: newDescriptionInput
+							width: parent.width
+							height: 200
+							placeHolderText: qsTr("Leave a comment")
+							onEditingFinished: {
+								root.doUpdateModel()
+							}
 						}
 					}
-				}
 
-				// Action buttons row
-				Row {
-					spacing: Style.paddingS
-
-					// Submit new issue (new issues only)
+					// Submit button
 					Rectangle {
-						visible: root.isNewIssue
-						width: submitText.width + Style.paddingL * 2
+						width: newSubmitText.width + Style.paddingL * 2
 						height: Style.buttonHeightM
 						radius: Style.radiusS
 						color: "#1a7f37"
 
 						Text {
-							id: submitText
+							id: newSubmitText
 							anchors.centerIn: parent
 							text: qsTr("Submit new issue")
 							font.pixelSize: Style.fontSizeS
@@ -425,407 +385,652 @@ ViewBase {
 							}
 						}
 					}
+				}
 
-					// Close as completed (existing open issues)
-					Rectangle {
-						visible: !root.isNewIssue && statusCB.currentIndex === 0
-						width: closeCompletedText.width + Style.paddingL * 2
-						height: Style.buttonHeightM
-						radius: Style.radiusS
-						color: "#8957e5"
+				// Separator
+				Rectangle {
+					width: 1
+					height: createMainCol.height
+					color: Style.borderColor
+				}
+
+				// Right: sidebar
+				Column {
+					width: 260
+					spacing: 0
+
+					// Assignees
+					Column {
+						width: parent.width
+						spacing: Style.paddingXS
 
 						Text {
-							id: closeCompletedText
-							anchors.centerIn: parent
-							text: qsTr("Close as completed")
+							text: qsTr("Assignees")
 							font.pixelSize: Style.fontSizeS
-							color: "white"
 							font.bold: true
-						}
-
-						MouseArea {
-							anchors.fill: parent
-							onClicked: {
-								statusCB.currentIndex = 1
-								stateReasonCB.currentIndex = 1
-								root.doUpdateModel()
-							}
-						}
-					}
-
-					// Close as not planned (existing open issues)
-					Rectangle {
-						visible: !root.isNewIssue && statusCB.currentIndex === 0
-						width: closeNotPlannedText.width + Style.paddingL * 2
-						height: Style.buttonHeightM
-						radius: Style.radiusS
-						color: "transparent"
-						border.color: Style.borderColor
-						border.width: 1
-
-						Text {
-							id: closeNotPlannedText
-							anchors.centerIn: parent
-							text: qsTr("Close as not planned")
-							font.pixelSize: Style.fontSizeS
 							color: Style.textColor
 						}
 
-						MouseArea {
-							anchors.fill: parent
-							onClicked: {
-								statusCB.currentIndex = 1
-								stateReasonCB.currentIndex = 2
+						ComboBox {
+							id: newAssigneeCB
+							width: parent.width
+							height: Style.buttonHeightM
+							onCurrentIndexChanged: {
 								root.doUpdateModel()
 							}
 						}
 					}
 
-					// Reopen (existing closed issues)
-					Rectangle {
-						visible: !root.isNewIssue && statusCB.currentIndex === 1
-						width: reopenText.width + Style.paddingL * 2
-						height: Style.buttonHeightM
-						radius: Style.radiusS
-						color: "#1a7f37"
+					Rectangle { width: parent.width; height: 1; color: Style.borderColor }
+
+					// Type
+					Column {
+						width: parent.width
+						spacing: Style.paddingXS
 
 						Text {
-							id: reopenText
-							anchors.centerIn: parent
-							text: qsTr("Reopen issue")
+							text: qsTr("Type")
 							font.pixelSize: Style.fontSizeS
-							color: "white"
 							font.bold: true
+							color: Style.textColor
 						}
 
-						MouseArea {
-							anchors.fill: parent
-							onClicked: {
-								statusCB.currentIndex = 0
-								stateReasonCB.currentIndex = 3
+						ComboBox {
+							id: newTypeCB
+							width: parent.width
+							height: Style.buttonHeightM
+							currentIndex: 1
+							model: ticketTypeModel
+							onCurrentIndexChanged: {
+								root.doUpdateModel()
+							}
+						}
+					}
+
+					Rectangle { width: parent.width; height: 1; color: Style.borderColor }
+
+					// Priority
+					Column {
+						width: parent.width
+						spacing: Style.paddingXS
+
+						Text {
+							text: qsTr("Priority")
+							font.pixelSize: Style.fontSizeS
+							font.bold: true
+							color: Style.textColor
+						}
+
+						ComboBox {
+							id: newPriorityCB
+							width: parent.width
+							height: Style.buttonHeightM
+							currentIndex: 1
+							model: priorityModel
+							onCurrentIndexChanged: {
+								root.doUpdateModel()
+							}
+						}
+					}
+
+					Rectangle { width: parent.width; height: 1; color: Style.borderColor }
+
+					// Milestone
+					Column {
+						width: parent.width
+						spacing: Style.paddingXS
+
+						Text {
+							text: qsTr("Milestone")
+							font.pixelSize: Style.fontSizeS
+							font.bold: true
+							color: Style.textColor
+						}
+
+						CustomTextField {
+							id: newMilestoneInput
+							width: parent.width
+							height: 40
+							placeHolderText: qsTr("No milestone")
+							onEditingFinished: {
+								root.doUpdateModel()
+							}
+						}
+					}
+
+					Rectangle { width: parent.width; height: 1; color: Style.borderColor }
+
+					// Environment
+					Column {
+						width: parent.width
+						spacing: Style.paddingXS
+
+						Text {
+							text: qsTr("Environment")
+							font.pixelSize: Style.fontSizeS
+							font.bold: true
+							color: Style.textColor
+						}
+
+						ComboBox {
+							id: newEnvironmentCB
+							width: parent.width
+							height: Style.buttonHeightM
+							currentIndex: 2
+							model: environmentModel
+							onCurrentIndexChanged: {
 								root.doUpdateModel()
 							}
 						}
 					}
 				}
 			}
+		}
+	}
 
-			// Separator line
-			Rectangle {
-				width: 1
-				height: mainContentColumn.height
-				color: Style.borderColor
-			}
+	// ================================================================
+	// VIEW 2: EDIT EXISTING ISSUE (isNewIssue === false)
+	// Like GitHub's Issue detail page — header with #N, status badges,
+	// full sidebar, Close/Reopen action buttons
+	// ================================================================
 
-			// Right column: sidebar metadata
-			Column {
-				id: sidebarColumn
-				width: 260
-				spacing: 0
+	Item {
+		id: editView
+		visible: !root.isNewIssue
+		anchors.fill: parent
 
-				// Assignees section
+		CustomScrollbar {
+			id: editScrollV
+			z: parent.z + 1
+			anchors.right: parent.right
+			anchors.top: editFlick.top
+			anchors.bottom: editFlick.bottom
+			secondSize: Style.marginM
+			targetItem: editFlick
+			visible: editView.visible
+		}
+
+		CustomScrollbar {
+			id: editScrollH
+			z: parent.z + 1
+			anchors.left: editFlick.left
+			anchors.right: editFlick.right
+			anchors.bottom: editFlick.bottom
+			secondSize: Style.marginM
+			vertical: false
+			targetItem: editFlick
+		}
+
+		Flickable {
+			id: editFlick
+			anchors.top: parent.top
+			anchors.topMargin: Style.marginXL
+			anchors.bottom: parent.bottom
+			anchors.bottomMargin: Style.marginXL
+			anchors.left: parent.left
+			anchors.leftMargin: Style.marginXL
+			anchors.right: editScrollV.left
+			anchors.rightMargin: Style.marginXL
+			contentWidth: editRow.width
+			contentHeight: editRow.height + Style.marginXL * 2
+			boundsBehavior: Flickable.StopAtBounds
+			clip: true
+
+			Row {
+				id: editRow
+				spacing: Style.marginXL
+
+				// Left: main content
 				Column {
-					width: parent.width
-					spacing: Style.paddingXS
+					id: editMainCol
+					width: 560
+					spacing: Style.marginM
 
-					Text {
-						text: qsTr("Assignees")
-						font.pixelSize: Style.fontSizeS
-						font.bold: true
-						color: Style.textColor
+					// Header: title + #number
+					Row {
+						width: parent.width
+						spacing: Style.paddingS
+
+						Text {
+							text: ticketData ? ticketData.m_title : ""
+							font.pixelSize: Style.fontSizeXL
+							font.bold: true
+							color: Style.textColor
+							wrapMode: Text.Wrap
+							width: parent.width - editNumberText.width - Style.paddingS
+						}
+
+						Text {
+							id: editNumberText
+							text: "#" + (ticketData ? ticketData.m_number : 0)
+							font.pixelSize: Style.fontSizeXL
+							color: Style.textSecondaryColor
+						}
 					}
 
-					ComboBox {
-						id: assigneeCB
+					// Status badges
+					Row {
+						spacing: Style.paddingXS
+
+						TicketBadge {
+							badgeType: "status"
+							value: editStatusCB.currentIndex
+						}
+
+						TicketBadge {
+							badgeType: "stateReason"
+							value: editStateReasonCB.currentIndex
+							visible: editStateReasonCB.currentIndex > 0
+						}
+					}
+
+					// Title edit
+					Column {
 						width: parent.width
-						height: Style.buttonHeightM
-						onCurrentIndexChanged: {
-							root.doUpdateModel()
+						spacing: Style.paddingXS
+
+						Text {
+							text: qsTr("Title")
+							font.pixelSize: Style.fontSizeS
+							font.bold: true
+							color: Style.textColor
+						}
+
+						CustomTextField {
+							id: editTitleInput
+							width: parent.width
+							height: 40
+							placeHolderText: qsTr("Title")
+							onEditingFinished: {
+								root.doUpdateModel()
+							}
+						}
+					}
+
+					// Description edit
+					Column {
+						width: parent.width
+						spacing: Style.paddingXS
+
+						Text {
+							text: qsTr("Description")
+							font.pixelSize: Style.fontSizeS
+							font.bold: true
+							color: Style.textColor
+						}
+
+						CustomTextField {
+							id: editDescriptionInput
+							width: parent.width
+							height: 200
+							placeHolderText: qsTr("Leave a comment")
+							onEditingFinished: {
+								root.doUpdateModel()
+							}
+						}
+					}
+
+					// Action buttons
+					Row {
+						spacing: Style.paddingS
+
+						// Close as completed (open issues)
+						Rectangle {
+							visible: editStatusCB.currentIndex === 0
+							width: editCloseCompText.width + Style.paddingL * 2
+							height: Style.buttonHeightM
+							radius: Style.radiusS
+							color: "#8957e5"
+
+							Text {
+								id: editCloseCompText
+								anchors.centerIn: parent
+								text: qsTr("Close as completed")
+								font.pixelSize: Style.fontSizeS
+								color: "white"
+								font.bold: true
+							}
+
+							MouseArea {
+								anchors.fill: parent
+								onClicked: {
+									editStatusCB.currentIndex = 1
+									editStateReasonCB.currentIndex = 1
+									root.doUpdateModel()
+								}
+							}
+						}
+
+						// Close as not planned (open issues)
+						Rectangle {
+							visible: editStatusCB.currentIndex === 0
+							width: editCloseNPText.width + Style.paddingL * 2
+							height: Style.buttonHeightM
+							radius: Style.radiusS
+							color: "transparent"
+							border.color: Style.borderColor
+							border.width: 1
+
+							Text {
+								id: editCloseNPText
+								anchors.centerIn: parent
+								text: qsTr("Close as not planned")
+								font.pixelSize: Style.fontSizeS
+								color: Style.textColor
+							}
+
+							MouseArea {
+								anchors.fill: parent
+								onClicked: {
+									editStatusCB.currentIndex = 1
+									editStateReasonCB.currentIndex = 2
+									root.doUpdateModel()
+								}
+							}
+						}
+
+						// Reopen (closed issues)
+						Rectangle {
+							visible: editStatusCB.currentIndex === 1
+							width: editReopenText.width + Style.paddingL * 2
+							height: Style.buttonHeightM
+							radius: Style.radiusS
+							color: "#1a7f37"
+
+							Text {
+								id: editReopenText
+								anchors.centerIn: parent
+								text: qsTr("Reopen issue")
+								font.pixelSize: Style.fontSizeS
+								color: "white"
+								font.bold: true
+							}
+
+							MouseArea {
+								anchors.fill: parent
+								onClicked: {
+									editStatusCB.currentIndex = 0
+									editStateReasonCB.currentIndex = 3
+									root.doUpdateModel()
+								}
+							}
 						}
 					}
 				}
 
 				// Separator
 				Rectangle {
-					width: parent.width
-					height: 1
+					width: 1
+					height: editMainCol.height
 					color: Style.borderColor
 				}
 
-				// Type section
+				// Right: full sidebar
 				Column {
-					width: parent.width
-					spacing: Style.paddingXS
+					width: 260
+					spacing: 0
 
-					Text {
-						text: qsTr("Type")
-						font.pixelSize: Style.fontSizeS
-						font.bold: true
-						color: Style.textColor
-					}
-
-					ComboBox {
-						id: ticketTypeCB
+					// Assignees
+					Column {
 						width: parent.width
-						height: Style.buttonHeightM
-						currentIndex: 1
-						model: ticketTypeModel
-						onCurrentIndexChanged: {
-							root.doUpdateModel()
+						spacing: Style.paddingXS
+
+						Text {
+							text: qsTr("Assignees")
+							font.pixelSize: Style.fontSizeS
+							font.bold: true
+							color: Style.textColor
+						}
+
+						ComboBox {
+							id: editAssigneeCB
+							width: parent.width
+							height: Style.buttonHeightM
+							onCurrentIndexChanged: {
+								root.doUpdateModel()
+							}
 						}
 					}
-				}
 
-				// Separator
-				Rectangle {
-					width: parent.width
-					height: 1
-					color: Style.borderColor
-				}
+					Rectangle { width: parent.width; height: 1; color: Style.borderColor }
 
-				// Priority section
-				Column {
-					width: parent.width
-					spacing: Style.paddingXS
-
-					Text {
-						text: qsTr("Priority")
-						font.pixelSize: Style.fontSizeS
-						font.bold: true
-						color: Style.textColor
-					}
-
-					ComboBox {
-						id: priorityCB
+					// Type
+					Column {
 						width: parent.width
-						height: Style.buttonHeightM
-						currentIndex: 1
-						model: priorityModel
-						onCurrentIndexChanged: {
-							root.doUpdateModel()
+						spacing: Style.paddingXS
+
+						Text {
+							text: qsTr("Type")
+							font.pixelSize: Style.fontSizeS
+							font.bold: true
+							color: Style.textColor
+						}
+
+						ComboBox {
+							id: editTypeCB
+							width: parent.width
+							height: Style.buttonHeightM
+							currentIndex: 1
+							model: ticketTypeModel
+							onCurrentIndexChanged: {
+								root.doUpdateModel()
+							}
 						}
 					}
-				}
 
-				// Separator
-				Rectangle {
-					width: parent.width
-					height: 1
-					color: Style.borderColor
-				}
+					Rectangle { width: parent.width; height: 1; color: Style.borderColor }
 
-				// Milestone section
-				Column {
-					width: parent.width
-					spacing: Style.paddingXS
-
-					Text {
-						text: qsTr("Milestone")
-						font.pixelSize: Style.fontSizeS
-						font.bold: true
-						color: Style.textColor
-					}
-
-					CustomTextField {
-						id: milestoneIdInput
+					// Priority
+					Column {
 						width: parent.width
-						height: 40
-						placeHolderText: qsTr("No milestone")
-						onEditingFinished: {
-							root.doUpdateModel()
+						spacing: Style.paddingXS
+
+						Text {
+							text: qsTr("Priority")
+							font.pixelSize: Style.fontSizeS
+							font.bold: true
+							color: Style.textColor
+						}
+
+						ComboBox {
+							id: editPriorityCB
+							width: parent.width
+							height: Style.buttonHeightM
+							currentIndex: 1
+							model: priorityModel
+							onCurrentIndexChanged: {
+								root.doUpdateModel()
+							}
 						}
 					}
-				}
 
-				// Separator
-				Rectangle {
-					width: parent.width
-					height: 1
-					color: Style.borderColor
-				}
+					Rectangle { width: parent.width; height: 1; color: Style.borderColor }
 
-				// Environment section
-				Column {
-					width: parent.width
-					spacing: Style.paddingXS
-
-					Text {
-						text: qsTr("Environment")
-						font.pixelSize: Style.fontSizeS
-						font.bold: true
-						color: Style.textColor
-					}
-
-					ComboBox {
-						id: environmentCB
+					// Milestone
+					Column {
 						width: parent.width
-						height: Style.buttonHeightM
-						currentIndex: 2
-						model: environmentModel
-						onCurrentIndexChanged: {
-							root.doUpdateModel()
+						spacing: Style.paddingXS
+
+						Text {
+							text: qsTr("Milestone")
+							font.pixelSize: Style.fontSizeS
+							font.bold: true
+							color: Style.textColor
+						}
+
+						CustomTextField {
+							id: editMilestoneInput
+							width: parent.width
+							height: 40
+							placeHolderText: qsTr("No milestone")
+							onEditingFinished: {
+								root.doUpdateModel()
+							}
 						}
 					}
-				}
 
-				// Separator
-				Rectangle {
-					width: parent.width
-					height: 1
-					color: Style.borderColor
-				}
+					Rectangle { width: parent.width; height: 1; color: Style.borderColor }
 
-				// Reporter section
-				Column {
-					width: parent.width
-					spacing: Style.paddingXS
-
-					Text {
-						text: qsTr("Reporter")
-						font.pixelSize: Style.fontSizeS
-						font.bold: true
-						color: Style.textColor
-					}
-
-					ComboBox {
-						id: reporterCB
+					// Environment
+					Column {
 						width: parent.width
-						height: Style.buttonHeightM
-						onCurrentIndexChanged: {
-							root.doUpdateModel()
+						spacing: Style.paddingXS
+
+						Text {
+							text: qsTr("Environment")
+							font.pixelSize: Style.fontSizeS
+							font.bold: true
+							color: Style.textColor
+						}
+
+						ComboBox {
+							id: editEnvironmentCB
+							width: parent.width
+							height: Style.buttonHeightM
+							currentIndex: 2
+							model: environmentModel
+							onCurrentIndexChanged: {
+								root.doUpdateModel()
+							}
 						}
 					}
-				}
 
-				// Separator
-				Rectangle {
-					width: parent.width
-					height: 1
-					color: Style.borderColor
-				}
+					Rectangle { width: parent.width; height: 1; color: Style.borderColor }
 
-				// Linked Conversation section
-				Column {
-					width: parent.width
-					spacing: Style.paddingXS
-
-					Text {
-						text: qsTr("Linked Conversation")
-						font.pixelSize: Style.fontSizeS
-						font.bold: true
-						color: Style.textColor
-					}
-
-					CustomTextField {
-						id: conversationIdInput
+					// Reporter
+					Column {
 						width: parent.width
-						height: 40
-						placeHolderText: qsTr("No conversation")
-						onEditingFinished: {
-							root.doUpdateModel()
+						spacing: Style.paddingXS
+
+						Text {
+							text: qsTr("Reporter")
+							font.pixelSize: Style.fontSizeS
+							font.bold: true
+							color: Style.textColor
+						}
+
+						ComboBox {
+							id: editReporterCB
+							width: parent.width
+							height: Style.buttonHeightM
+							onCurrentIndexChanged: {
+								root.doUpdateModel()
+							}
 						}
 					}
-				}
 
-				// Separator
-				Rectangle {
-					width: parent.width
-					height: 1
-					color: Style.borderColor
-				}
+					Rectangle { width: parent.width; height: 1; color: Style.borderColor }
 
-				// Lock section
-				Row {
-					width: parent.width
-					spacing: Style.paddingS
+					// Linked Conversation
+					Column {
+						width: parent.width
+						spacing: Style.paddingXS
 
-					CheckBox {
-						id: lockedCB
-						text: qsTr("Lock issue")
-						onCheckStateChanged: {
-							root.doUpdateModel()
+						Text {
+							text: qsTr("Linked Conversation")
+							font.pixelSize: Style.fontSizeS
+							font.bold: true
+							color: Style.textColor
+						}
+
+						CustomTextField {
+							id: editConversationInput
+							width: parent.width
+							height: 40
+							placeHolderText: qsTr("No conversation")
+							onEditingFinished: {
+								root.doUpdateModel()
+							}
 						}
 					}
-				}
 
-				// Lock reason (visible when locked)
-				Column {
-					width: parent.width
-					spacing: Style.paddingXS
-					visible: lockedCB.checkState === Qt.Checked
+					Rectangle { width: parent.width; height: 1; color: Style.borderColor }
 
-					Text {
-						text: qsTr("Lock Reason")
-						font.pixelSize: Style.fontSizeS
-						font.bold: true
-						color: Style.textColor
-					}
-
-					CustomTextField {
-						id: lockReasonInput
+					// Lock issue
+					Row {
 						width: parent.width
-						height: 40
-						placeHolderText: qsTr("Reason for locking")
-						onEditingFinished: {
-							root.doUpdateModel()
+						spacing: Style.paddingS
+
+						CheckBox {
+							id: editLockedCB
+							text: qsTr("Lock issue")
+							onCheckStateChanged: {
+								root.doUpdateModel()
+							}
 						}
 					}
-				}
 
-				// Separator
-				Rectangle {
-					width: parent.width
-					height: 1
-					color: Style.borderColor
-					visible: !root.isNewIssue
-				}
-
-				// Status section (existing issues only)
-				Column {
-					width: parent.width
-					spacing: Style.paddingXS
-					visible: !root.isNewIssue
-
-					Text {
-						text: qsTr("Status")
-						font.pixelSize: Style.fontSizeS
-						font.bold: true
-						color: Style.textColor
-					}
-
-					ComboBox {
-						id: statusCB
+					// Lock reason
+					Column {
 						width: parent.width
-						height: Style.buttonHeightM
-						currentIndex: 0
-						model: statusModel
-						onCurrentIndexChanged: {
-							root.doUpdateModel()
+						spacing: Style.paddingXS
+						visible: editLockedCB.checkState === Qt.Checked
+
+						Text {
+							text: qsTr("Lock Reason")
+							font.pixelSize: Style.fontSizeS
+							font.bold: true
+							color: Style.textColor
+						}
+
+						CustomTextField {
+							id: editLockReasonInput
+							width: parent.width
+							height: 40
+							placeHolderText: qsTr("Reason for locking")
+							onEditingFinished: {
+								root.doUpdateModel()
+							}
 						}
 					}
-				}
 
-				// State reason section (existing issues only)
-				Column {
-					width: parent.width
-					spacing: Style.paddingXS
-					visible: !root.isNewIssue
+					Rectangle { width: parent.width; height: 1; color: Style.borderColor }
 
-					Text {
-						text: qsTr("State Reason")
-						font.pixelSize: Style.fontSizeS
-						font.bold: true
-						color: Style.textColor
+					// Status
+					Column {
+						width: parent.width
+						spacing: Style.paddingXS
+
+						Text {
+							text: qsTr("Status")
+							font.pixelSize: Style.fontSizeS
+							font.bold: true
+							color: Style.textColor
+						}
+
+						ComboBox {
+							id: editStatusCB
+							width: parent.width
+							height: Style.buttonHeightM
+							currentIndex: 0
+							model: statusModel
+							onCurrentIndexChanged: {
+								root.doUpdateModel()
+							}
+						}
 					}
 
-					ComboBox {
-						id: stateReasonCB
+					// State Reason
+					Column {
 						width: parent.width
-						height: Style.buttonHeightM
-						currentIndex: 0
-						model: stateReasonModel
-						onCurrentIndexChanged: {
-							root.doUpdateModel()
+						spacing: Style.paddingXS
+
+						Text {
+							text: qsTr("State Reason")
+							font.pixelSize: Style.fontSizeS
+							font.bold: true
+							color: Style.textColor
+						}
+
+						ComboBox {
+							id: editStateReasonCB
+							width: parent.width
+							height: Style.buttonHeightM
+							currentIndex: 0
+							model: stateReasonModel
+							onCurrentIndexChanged: {
+								root.doUpdateModel()
+							}
 						}
 					}
 				}
