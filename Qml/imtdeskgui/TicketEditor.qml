@@ -4,6 +4,7 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
 import imtgui 1.0
+import imtauthgui 1.0
 import imtguigql 1.0
 import imtdocgui 1.0
 import imtcolgui 1.0
@@ -91,6 +92,7 @@ ViewBase {
 	}
 
 	function updateModel() {
+		console.log("TicketEditor updateModel")
 		if (root.isNewIssue) {
 			ticketData.m_title = newTitleInput.text
 			ticketData.m_description = newDescriptionInput.text

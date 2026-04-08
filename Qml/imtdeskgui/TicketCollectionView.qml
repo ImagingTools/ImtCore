@@ -49,7 +49,13 @@ RemoteCollectionView {
 				DocumentRepresentationController {
 					id: root
 
-					representationModel: TicketData {}
+					representationModel: TicketData {
+						m_status: "Open"
+						m_ticketType: "SupportRequest"
+						m_priority: "Medium"
+						m_environment: "Production"
+						m_stateReason: "None"
+					}
 
 					function updateRepresentationFromDocument(){
 						startUpdateRepresentation(documentId, representationModel)
