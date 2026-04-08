@@ -50,7 +50,7 @@ ViewBase {
 		conversationIdInput.text = ticketData.m_conversationId || ""
 		milestoneIdInput.text = ticketData.m_milestoneId || ""
 		lockReasonInput.text = ticketData.m_lockReason || ""
-		lockedCB.checkState = (ticketData.m_locked || false) ? Qt.Checked : Qt.Unchecked
+		lockedCB.checkState = ticketData.m_locked ? Qt.Checked : Qt.Unchecked
 
 		ticketTypeCB.currentIndex = -1
 		if (ticketTypeCB.model){
