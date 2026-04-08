@@ -23,25 +23,25 @@ ViewBase {
 		titleInput.text = ticketData.m_title
 		descriptionInput.text = ticketData.m_description || ""
 
-		assigneeIdInput.currentIndex = -1
-		if (assigneeIdInput.model){
+		assigneeCB.currentIndex = -1
+		if (assigneeCB.model){
 			let assigneeIds = ticketData.m_assigneeIds || []
 			let firstAssignee = assigneeIds.length > 0 ? assigneeIds[0] : ""
-			for (let i = 0; i < assigneeIdInput.model.getItemsCount(); i++){
-				let userId = assigneeIdInput.model.getData("id", i)
+			for (let i = 0; i < assigneeCB.model.getItemsCount(); i++){
+				let userId = assigneeCB.model.getData("id", i)
 				if (firstAssignee === userId){
-					assigneeIdInput.currentIndex = i
+					assigneeCB.currentIndex = i
 					break
 				}
 			}
 		}
 
-		reporterIdInput.currentIndex = -1
-		if (reporterIdInput.model){
-			for (let i = 0; i < reporterIdInput.model.getItemsCount(); i++){
-				let userId = reporterIdInput.model.getData("id", i)
+		reporterCB.currentIndex = -1
+		if (reporterCB.model){
+			for (let i = 0; i < reporterCB.model.getItemsCount(); i++){
+				let userId = reporterCB.model.getData("id", i)
 				if (ticketData.m_reporterId === userId){
-					reporterIdInput.currentIndex = i
+					reporterCB.currentIndex = i
 					break
 				}
 			}
@@ -50,7 +50,7 @@ ViewBase {
 		conversationIdInput.text = ticketData.m_conversationId || ""
 		milestoneIdInput.text = ticketData.m_milestoneId || ""
 		lockReasonInput.text = ticketData.m_lockReason || ""
-		lockedCB.checked = ticketData.m_locked || false
+		lockedCB.checkState = (ticketData.m_locked || false) ? Qt.Checked : Qt.Unchecked
 
 		ticketTypeCB.currentIndex = -1
 		if (ticketTypeCB.model){
@@ -127,15 +127,15 @@ ViewBase {
 		ticketData.m_title = titleInput.text
 		ticketData.m_description = descriptionInput.text
 
-		if (assigneeIdInput.model && assigneeIdInput.currentIndex >= 0){
-			ticketData.m_assigneeIds = [assigneeIdInput.model.getData("id", assigneeIdInput.currentIndex)]
+		if (assigneeCB.model && assigneeCB.currentIndex >= 0){
+			ticketData.m_assigneeIds = [assigneeCB.model.getData("id", assigneeCB.currentIndex)]
 		}
 		else{
 			ticketData.m_assigneeIds = []
 		}
 
-		if (reporterIdInput.model && reporterIdInput.currentIndex >= 0){
-			ticketData.m_reporterId = reporterIdInput.model.getData("id", reporterIdInput.currentIndex)
+		if (reporterCB.model && reporterCB.currentIndex >= 0){
+			ticketData.m_reporterId = reporterCB.model.getData("id", reporterCB.currentIndex)
 		}
 		else{
 			ticketData.m_reporterId = ""
@@ -143,7 +143,7 @@ ViewBase {
 
 		ticketData.m_conversationId = conversationIdInput.text
 		ticketData.m_milestoneId = milestoneIdInput.text
-		ticketData.m_locked = lockedCB.checked
+		ticketData.m_locked = lockedCB.checkState === Qt.Checked
 		ticketData.m_lockReason = lockReasonInput.text
 
 		if (ticketTypeCB.model && ticketTypeCB.currentIndex >= 0){
@@ -172,8 +172,8 @@ ViewBase {
 		commandId: ImtauthUsersSdlCommandIds.s_usersList
 		fields: [UserDataInputTypeMetaInfo.s_id, UserDataInputTypeMetaInfo.s_typeId, UserDataInputTypeMetaInfo.s_name]
 		onCollectionModelChanged: {
-			assigneeIdInput.model = collectionModel
-			reporterIdInput.model = collectionModel
+			assigneeCB.model = collectionModel
+			reporterCB.model = collectionModel
 			root.doUpdateGui()
 		}
 		Component.onCompleted: {
@@ -181,9 +181,102 @@ ViewBase {
 		}
 	}
 
-	RegularExpressionValidator {
-		id: notEmptyRegexp
-		regularExpression: /^(?!\s*$).+/;
+	// Status model
+	TreeItemModel {
+		id: statusModel
+		Component.onCompleted: {
+			let index = insertNewItem()
+			setData("id", "Open", index)
+			setData("name", "Open", index)
+
+			index = insertNewItem()
+			setData("id", "Closed", index)
+			setData("name", "Closed", index)
+		}
+	}
+
+	// State reason model
+	TreeItemModel {
+		id: stateReasonModel
+		Component.onCompleted: {
+			let index = insertNewItem()
+			setData("id", "None", index)
+			setData("name", "None", index)
+
+			index = insertNewItem()
+			setData("id", "Completed", index)
+			setData("name", "Completed", index)
+
+			index = insertNewItem()
+			setData("id", "NotPlanned", index)
+			setData("name", "Not Planned", index)
+
+			index = insertNewItem()
+			setData("id", "Reopened", index)
+			setData("name", "Reopened", index)
+		}
+	}
+
+	// Ticket type model
+	TreeItemModel {
+		id: ticketTypeModel
+		Component.onCompleted: {
+			let index = insertNewItem()
+			setData("id", "AccessRequest", index)
+			setData("name", "Access Request", index)
+
+			index = insertNewItem()
+			setData("id", "SupportRequest", index)
+			setData("name", "Support Request", index)
+
+			index = insertNewItem()
+			setData("id", "FeatureRequest", index)
+			setData("name", "Feature Request", index)
+
+			index = insertNewItem()
+			setData("id", "BugReport", index)
+			setData("name", "Bug Report", index)
+		}
+	}
+
+	// Priority model
+	TreeItemModel {
+		id: priorityModel
+		Component.onCompleted: {
+			let index = insertNewItem()
+			setData("id", "Low", index)
+			setData("name", "Low", index)
+
+			index = insertNewItem()
+			setData("id", "Medium", index)
+			setData("name", "Medium", index)
+
+			index = insertNewItem()
+			setData("id", "High", index)
+			setData("name", "High", index)
+
+			index = insertNewItem()
+			setData("id", "Critical", index)
+			setData("name", "Critical", index)
+		}
+	}
+
+	// Environment model
+	TreeItemModel {
+		id: environmentModel
+		Component.onCompleted: {
+			let index = insertNewItem()
+			setData("id", "Development", index)
+			setData("name", "Development", index)
+
+			index = insertNewItem()
+			setData("id", "Staging", index)
+			setData("name", "Staging", index)
+
+			index = insertNewItem()
+			setData("id", "Production", index)
+			setData("name", "Production", index)
+		}
 	}
 
 	CustomScrollbar {
@@ -219,7 +312,7 @@ ViewBase {
 		anchors.right: scrollbar.left
 		anchors.rightMargin: Style.marginXL
 		contentWidth: mainRow.width
-		contentHeight: Math.max(mainRow.height + 2 * Style.marginXL + 100)
+		contentHeight: mainRow.height + Style.marginXL * 2
 		boundsBehavior: Flickable.StopAtBounds
 		clip: true
 
@@ -227,21 +320,21 @@ ViewBase {
 			id: mainRow
 			spacing: Style.marginXL
 
-			// Left: main content area (title + description)
+			// Left column: main content (title + description + action buttons)
 			Column {
 				id: mainContentColumn
-				width: 500
-				spacing: Style.marginL
+				width: 560
+				spacing: Style.marginM
 
-				// Header
+				// Header: "New Issue" or "Edit Issue #N"
 				Text {
 					text: root.isNewIssue ? qsTr("New Issue") : qsTr("Edit Issue #%1").arg(ticketData ? ticketData.m_number : 0)
-					font.pixelSize: Style.fontSizeL
+					font.pixelSize: Style.fontSizeXL
 					font.bold: true
-					color: Style.textPrimaryColor
+					color: Style.textColor
 				}
 
-				// Status badge row (visible only for existing issues)
+				// Status badges (existing issues only)
 				Row {
 					visible: !root.isNewIssue
 					spacing: Style.paddingXS
@@ -258,42 +351,84 @@ ViewBase {
 					}
 				}
 
-				GroupElementView {
+				// Title input
+				Column {
 					width: parent.width
+					spacing: Style.paddingXS
 
-					TextInputElementView {
-						id: titleInput
-
-						name: qsTr("Add a title")
-						placeHolderText: qsTr("Title")
-						textInputValidator: notEmptyRegexp
-						showErrorWhenInvalid: true
-
-						onEditingFinished: {
-							root.doUpdateModel()
-						}
+					Text {
+						text: qsTr("Add a title")
+						font.pixelSize: Style.fontSizeS
+						font.bold: true
+						color: Style.textColor
 					}
 
-					TextInputElementView {
-						id: descriptionInput
-
-						name: qsTr("Add a description")
-						placeHolderText: qsTr("Leave a comment")
-
+					CustomTextField {
+						id: titleInput
+						width: parent.width
+						height: 40
+						placeHolderText: qsTr("Title")
 						onEditingFinished: {
 							root.doUpdateModel()
 						}
 					}
 				}
 
-				// Status action buttons (visible only for existing issues)
+				// Description input
+				Column {
+					width: parent.width
+					spacing: Style.paddingXS
+
+					Text {
+						text: qsTr("Add a description")
+						font.pixelSize: Style.fontSizeS
+						font.bold: true
+						color: Style.textColor
+					}
+
+					CustomTextField {
+						id: descriptionInput
+						width: parent.width
+						height: 120
+						placeHolderText: qsTr("Leave a comment")
+						onEditingFinished: {
+							root.doUpdateModel()
+						}
+					}
+				}
+
+				// Action buttons row
 				Row {
-					visible: !root.isNewIssue
 					spacing: Style.paddingS
 
-					// Close as completed
+					// Submit new issue (new issues only)
 					Rectangle {
-						visible: statusCB.currentIndex === 0
+						visible: root.isNewIssue
+						width: submitText.width + Style.paddingL * 2
+						height: Style.buttonHeightM
+						radius: Style.radiusS
+						color: "#1a7f37"
+
+						Text {
+							id: submitText
+							anchors.centerIn: parent
+							text: qsTr("Submit new issue")
+							font.pixelSize: Style.fontSizeS
+							color: "white"
+							font.bold: true
+						}
+
+						MouseArea {
+							anchors.fill: parent
+							onClicked: {
+								root.doUpdateModel()
+							}
+						}
+					}
+
+					// Close as completed (existing open issues)
+					Rectangle {
+						visible: !root.isNewIssue && statusCB.currentIndex === 0
 						width: closeCompletedText.width + Style.paddingL * 2
 						height: Style.buttonHeightM
 						radius: Style.radiusS
@@ -303,7 +438,7 @@ ViewBase {
 							id: closeCompletedText
 							anchors.centerIn: parent
 							text: qsTr("Close as completed")
-							font.pixelSize: Style.fontSizeXS
+							font.pixelSize: Style.fontSizeS
 							color: "white"
 							font.bold: true
 						}
@@ -318,21 +453,22 @@ ViewBase {
 						}
 					}
 
-					// Close as not planned
+					// Close as not planned (existing open issues)
 					Rectangle {
-						visible: statusCB.currentIndex === 0
+						visible: !root.isNewIssue && statusCB.currentIndex === 0
 						width: closeNotPlannedText.width + Style.paddingL * 2
 						height: Style.buttonHeightM
 						radius: Style.radiusS
 						color: "transparent"
-						border.color: Style.textSecondaryColor
+						border.color: Style.borderColor
+						border.width: 1
 
 						Text {
 							id: closeNotPlannedText
 							anchors.centerIn: parent
 							text: qsTr("Close as not planned")
-							font.pixelSize: Style.fontSizeXS
-							color: Style.textSecondaryColor
+							font.pixelSize: Style.fontSizeS
+							color: Style.textColor
 						}
 
 						MouseArea {
@@ -345,9 +481,9 @@ ViewBase {
 						}
 					}
 
-					// Reopen
+					// Reopen (existing closed issues)
 					Rectangle {
-						visible: statusCB.currentIndex === 1
+						visible: !root.isNewIssue && statusCB.currentIndex === 1
 						width: reopenText.width + Style.paddingL * 2
 						height: Style.buttonHeightM
 						radius: Style.radiusS
@@ -357,7 +493,7 @@ ViewBase {
 							id: reopenText
 							anchors.centerIn: parent
 							text: qsTr("Reopen issue")
-							font.pixelSize: Style.fontSizeXS
+							font.pixelSize: Style.fontSizeS
 							color: "white"
 							font.bold: true
 						}
@@ -378,233 +514,317 @@ ViewBase {
 			Rectangle {
 				width: 1
 				height: mainContentColumn.height
-				color: Style.separatorColor
+				color: Style.borderColor
 			}
 
-			// Right: sidebar metadata
+			// Right column: sidebar metadata
 			Column {
 				id: sidebarColumn
-				width: 240
-				spacing: Style.paddingM
+				width: 260
+				spacing: 0
 
-				Text {
-					text: qsTr("Metadata")
-					font.pixelSize: Style.fontSizeS
-					font.bold: true
-					color: Style.textSecondaryColor
+				// Assignees section
+				Column {
+					width: parent.width
+					spacing: Style.paddingXS
+
+					Text {
+						text: qsTr("Assignees")
+						font.pixelSize: Style.fontSizeS
+						font.bold: true
+						color: Style.textColor
+					}
+
+					ComboBox {
+						id: assigneeCB
+						width: parent.width
+						height: Style.buttonHeightM
+						onCurrentIndexChanged: {
+							root.doUpdateModel()
+						}
+					}
 				}
 
 				// Separator
 				Rectangle {
 					width: parent.width
 					height: 1
-					color: Style.separatorColor
+					color: Style.borderColor
 				}
 
-				GroupElementView {
+				// Type section
+				Column {
 					width: parent.width
+					spacing: Style.paddingXS
 
-					ComboBoxElementView {
-						id: assigneeIdInput
-						name: qsTr("Assignee")
-						onCurrentIndexChanged: {
-							root.doUpdateModel()
-						}
+					Text {
+						text: qsTr("Type")
+						font.pixelSize: Style.fontSizeS
+						font.bold: true
+						color: Style.textColor
 					}
 
-					ComboBoxElementView {
+					ComboBox {
 						id: ticketTypeCB
-						name: qsTr("Type")
+						width: parent.width
+						height: Style.buttonHeightM
 						currentIndex: 1
-						model: TreeItemModel {
-							Component.onCompleted: {
-								let index = insertNewItem()
-								setData("id", "AccessRequest", index)
-								setData("name", "Access Request", index)
-
-								index = insertNewItem()
-								setData("id", "SupportRequest", index)
-								setData("name", "Support Request", index)
-
-								index = insertNewItem()
-								setData("id", "FeatureRequest", index)
-								setData("name", "Feature Request", index)
-
-								index = insertNewItem()
-								setData("id", "BugReport", index)
-								setData("name", "Bug Report", index)
-							}
-						}
-
+						model: ticketTypeModel
 						onCurrentIndexChanged: {
-							root.doUpdateModel()
-						}
-					}
-
-					ComboBoxElementView {
-						id: priorityCB
-						name: qsTr("Priority")
-						currentIndex: 1
-						model: TreeItemModel {
-							Component.onCompleted: {
-								let index = insertNewItem()
-								setData("id", "Low", index)
-								setData("name", "Low", index)
-
-								index = insertNewItem()
-								setData("id", "Medium", index)
-								setData("name", "Medium", index)
-
-								index = insertNewItem()
-								setData("id", "High", index)
-								setData("name", "High", index)
-
-								index = insertNewItem()
-								setData("id", "Critical", index)
-								setData("name", "Critical", index)
-							}
-						}
-
-						onCurrentIndexChanged: {
-							root.doUpdateModel()
-						}
-					}
-
-					TextInputElementView {
-						id: milestoneIdInput
-
-						name: qsTr("Milestone")
-						placeHolderText: qsTr("Milestone ID")
-
-						onEditingFinished: {
-							root.doUpdateModel()
-						}
-					}
-
-					ComboBoxElementView {
-						id: environmentCB
-						name: qsTr("Environment")
-						currentIndex: 2
-						model: TreeItemModel {
-							Component.onCompleted: {
-								let index = insertNewItem()
-								setData("id", "Development", index)
-								setData("name", "Development", index)
-
-								index = insertNewItem()
-								setData("id", "Staging", index)
-								setData("name", "Staging", index)
-
-								index = insertNewItem()
-								setData("id", "Production", index)
-								setData("name", "Production", index)
-							}
-						}
-
-						onCurrentIndexChanged: {
-							root.doUpdateModel()
-						}
-					}
-
-					ComboBoxElementView {
-						id: reporterIdInput
-						name: qsTr("Reporter")
-						onCurrentIndexChanged: {
-							root.doUpdateModel()
-						}
-					}
-
-					TextInputElementView {
-						id: conversationIdInput
-
-						name: qsTr("Linked Conversation")
-						placeHolderText: qsTr("Conversation ID")
-
-						onEditingFinished: {
 							root.doUpdateModel()
 						}
 					}
 				}
 
-				// Lock section separator
+				// Separator
 				Rectangle {
 					width: parent.width
 					height: 1
-					color: Style.separatorColor
+					color: Style.borderColor
 				}
 
-				// Hidden status/stateReason controls (used by action buttons)
-				ComboBoxElementView {
-					id: statusCB
-					name: qsTr("Status")
-					visible: !root.isNewIssue
-					currentIndex: 0
-					model: TreeItemModel {
-						Component.onCompleted: {
-							let index = insertNewItem()
-							setData("id", "Open", index)
-							setData("name", "Open", index)
-
-							index = insertNewItem()
-							setData("id", "Closed", index)
-							setData("name", "Closed", index)
-						}
-					}
-
-					onCurrentIndexChanged: {
-						root.doUpdateModel()
-					}
-				}
-
-				ComboBoxElementView {
-					id: stateReasonCB
-					name: qsTr("State Reason")
-					visible: !root.isNewIssue
-					currentIndex: 0
-					model: TreeItemModel {
-						Component.onCompleted: {
-							let index = insertNewItem()
-							setData("id", "None", index)
-							setData("name", "None", index)
-
-							index = insertNewItem()
-							setData("id", "Completed", index)
-							setData("name", "Completed", index)
-
-							index = insertNewItem()
-							setData("id", "NotPlanned", index)
-							setData("name", "Not Planned", index)
-
-							index = insertNewItem()
-							setData("id", "Reopened", index)
-							setData("name", "Reopened", index)
-						}
-					}
-
-					onCurrentIndexChanged: {
-						root.doUpdateModel()
-					}
-				}
-
-				GroupElementView {
+				// Priority section
+				Column {
 					width: parent.width
+					spacing: Style.paddingXS
 
-					CheckBoxElementView {
-						id: lockedCB
-						name: qsTr("Lock issue")
-						onCheckedChanged: {
+					Text {
+						text: qsTr("Priority")
+						font.pixelSize: Style.fontSizeS
+						font.bold: true
+						color: Style.textColor
+					}
+
+					ComboBox {
+						id: priorityCB
+						width: parent.width
+						height: Style.buttonHeightM
+						currentIndex: 1
+						model: priorityModel
+						onCurrentIndexChanged: {
 							root.doUpdateModel()
 						}
 					}
+				}
 
-					TextInputElementView {
-						id: lockReasonInput
+				// Separator
+				Rectangle {
+					width: parent.width
+					height: 1
+					color: Style.borderColor
+				}
 
-						name: qsTr("Lock Reason")
-						placeHolderText: qsTr("Reason for locking")
-						visible: lockedCB.checked
+				// Milestone section
+				Column {
+					width: parent.width
+					spacing: Style.paddingXS
 
+					Text {
+						text: qsTr("Milestone")
+						font.pixelSize: Style.fontSizeS
+						font.bold: true
+						color: Style.textColor
+					}
+
+					CustomTextField {
+						id: milestoneIdInput
+						width: parent.width
+						height: 40
+						placeHolderText: qsTr("No milestone")
 						onEditingFinished: {
+							root.doUpdateModel()
+						}
+					}
+				}
+
+				// Separator
+				Rectangle {
+					width: parent.width
+					height: 1
+					color: Style.borderColor
+				}
+
+				// Environment section
+				Column {
+					width: parent.width
+					spacing: Style.paddingXS
+
+					Text {
+						text: qsTr("Environment")
+						font.pixelSize: Style.fontSizeS
+						font.bold: true
+						color: Style.textColor
+					}
+
+					ComboBox {
+						id: environmentCB
+						width: parent.width
+						height: Style.buttonHeightM
+						currentIndex: 2
+						model: environmentModel
+						onCurrentIndexChanged: {
+							root.doUpdateModel()
+						}
+					}
+				}
+
+				// Separator
+				Rectangle {
+					width: parent.width
+					height: 1
+					color: Style.borderColor
+				}
+
+				// Reporter section
+				Column {
+					width: parent.width
+					spacing: Style.paddingXS
+
+					Text {
+						text: qsTr("Reporter")
+						font.pixelSize: Style.fontSizeS
+						font.bold: true
+						color: Style.textColor
+					}
+
+					ComboBox {
+						id: reporterCB
+						width: parent.width
+						height: Style.buttonHeightM
+						onCurrentIndexChanged: {
+							root.doUpdateModel()
+						}
+					}
+				}
+
+				// Separator
+				Rectangle {
+					width: parent.width
+					height: 1
+					color: Style.borderColor
+				}
+
+				// Linked Conversation section
+				Column {
+					width: parent.width
+					spacing: Style.paddingXS
+
+					Text {
+						text: qsTr("Linked Conversation")
+						font.pixelSize: Style.fontSizeS
+						font.bold: true
+						color: Style.textColor
+					}
+
+					CustomTextField {
+						id: conversationIdInput
+						width: parent.width
+						height: 40
+						placeHolderText: qsTr("No conversation")
+						onEditingFinished: {
+							root.doUpdateModel()
+						}
+					}
+				}
+
+				// Separator
+				Rectangle {
+					width: parent.width
+					height: 1
+					color: Style.borderColor
+				}
+
+				// Lock section
+				Row {
+					width: parent.width
+					spacing: Style.paddingS
+
+					CheckBox {
+						id: lockedCB
+						text: qsTr("Lock issue")
+						onCheckStateChanged: {
+							root.doUpdateModel()
+						}
+					}
+				}
+
+				// Lock reason (visible when locked)
+				Column {
+					width: parent.width
+					spacing: Style.paddingXS
+					visible: lockedCB.checkState === Qt.Checked
+
+					Text {
+						text: qsTr("Lock Reason")
+						font.pixelSize: Style.fontSizeS
+						font.bold: true
+						color: Style.textColor
+					}
+
+					CustomTextField {
+						id: lockReasonInput
+						width: parent.width
+						height: 40
+						placeHolderText: qsTr("Reason for locking")
+						onEditingFinished: {
+							root.doUpdateModel()
+						}
+					}
+				}
+
+				// Separator
+				Rectangle {
+					width: parent.width
+					height: 1
+					color: Style.borderColor
+					visible: !root.isNewIssue
+				}
+
+				// Status section (existing issues only)
+				Column {
+					width: parent.width
+					spacing: Style.paddingXS
+					visible: !root.isNewIssue
+
+					Text {
+						text: qsTr("Status")
+						font.pixelSize: Style.fontSizeS
+						font.bold: true
+						color: Style.textColor
+					}
+
+					ComboBox {
+						id: statusCB
+						width: parent.width
+						height: Style.buttonHeightM
+						currentIndex: 0
+						model: statusModel
+						onCurrentIndexChanged: {
+							root.doUpdateModel()
+						}
+					}
+				}
+
+				// State reason section (existing issues only)
+				Column {
+					width: parent.width
+					spacing: Style.paddingXS
+					visible: !root.isNewIssue
+
+					Text {
+						text: qsTr("State Reason")
+						font.pixelSize: Style.fontSizeS
+						font.bold: true
+						color: Style.textColor
+					}
+
+					ComboBox {
+						id: stateReasonCB
+						width: parent.width
+						height: Style.buttonHeightM
+						currentIndex: 0
+						model: stateReasonModel
+						onCurrentIndexChanged: {
 							root.doUpdateModel()
 						}
 					}
