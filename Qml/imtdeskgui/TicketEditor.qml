@@ -79,9 +79,9 @@ ViewBase {
 
 			editReporterCB.currentIndex = -1
 			if (editReporterCB.model) {
-				let repId = ticketData.m_reporterId || AuthorizationController.getUserId()
+				let reporterId = ticketData.m_reporterId || AuthorizationController.getUserId()
 				for (let i = 0; i < editReporterCB.model.getItemsCount(); i++) {
-					if (editReporterCB.model.getData("id", i) === repId) {
+					if (editReporterCB.model.getData("id", i) === reporterId) {
 						editReporterCB.currentIndex = i
 						break
 					}
