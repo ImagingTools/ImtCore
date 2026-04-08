@@ -306,6 +306,7 @@ bool CDocumentCollectionViewDelegateComp::OpenDocumentEditor(
 			break;
 		}
 	}
+
 	if (existingInfoPtr != nullptr){
 		const int count = m_documentManagerCompPtr->GetDocumentsCount();
 		for (int i = 0; i < count; i++){
@@ -313,6 +314,7 @@ bool CDocumentCollectionViewDelegateComp::OpenDocumentEditor(
 				istd::IPolymorphic* viewPtr = m_documentManagerCompPtr->GetViewFromIndex(i, 0);
 				if (viewPtr != nullptr){
 					m_documentManagerCompPtr->SetActiveView(viewPtr);
+					return true;
 				}
 			}
 		}
@@ -557,6 +559,7 @@ void CDocumentCollectionViewDelegateComp::FinishOpenDocumentAsync(
 	cleanupTemp();
 	QMessageBox::critical(nullptr, "", tr("Item \"%1\" could not be opened").arg(result.objectName));
 }
+
 
 // protected slots
 

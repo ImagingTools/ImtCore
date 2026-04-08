@@ -16,7 +16,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
-#include <imtdoc/CCollectionDocumentManager.h>
+#include <imtdoc/CCollectionDocumentManagerBase.h>
 #include <imtdoc/IDocumentManagerEventHandler.h>
 
 
@@ -498,7 +498,7 @@ private:
 	Concrete subclass of CCollectionDocumentManager for testing.
 	Provides mock implementations for the pure virtual methods.
 */
-class CTestableDocumentManager: public imtdoc::CCollectionDocumentManager
+class CTestableDocumentManager: public imtdoc::CCollectionDocumentManagerBase
 {
 public:
 	CTestableDocumentManager()
@@ -524,35 +524,35 @@ public:
 	void SetValidationErrorMessage(const QString& msg) { m_validationErrorMessage = msg; }
 
 	// Expose protected methods for testing
-	using CCollectionDocumentManager::FindDocument;
-	using CCollectionDocumentManager::ValidateInputParams;
-	using CCollectionDocumentManager::ObjectIdToUrl;
-	using CCollectionDocumentManager::m_userDocuments;
-	using CCollectionDocumentManager::m_mutex;
+	using imtdoc::CDocumentManagerBase::FindDocument;
+	using imtdoc::CDocumentManagerBase::ValidateInputParams;
+	using imtdoc::CDocumentManagerBase::ObjectIdToUrl;
+	using imtdoc::CDocumentManagerBase::m_userDocuments;
+	using imtdoc::CDocumentManagerBase::m_mutex;
 
 protected:
-	// reimplemented (CCollectionDocumentManager)
+	// reimplemented (CCollectionDocumentManagerBase)
 	virtual imtbase::IObjectCollection* GetCollection() const override
 	{
 		return m_collectionPtr;
 	}
 
-	virtual istd::IChangeableSharedPtr CreateObject(const QByteArray& /*typeId*/) const override
+	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& /*typeId*/) const override
 	{
 		if (m_createObjectShouldFail) {
-			return istd::IChangeableSharedPtr();
+			return istd::IChangeableUniquePtr();
 		}
 
-		return istd::IChangeableSharedPtr(new CMockDocumentObject());
+		return istd::IChangeableUniquePtr(new CMockDocumentObject());
 	}
 
-	virtual idoc::IUndoManagerSharedPtr CreateUndoManager() const override
+	virtual idoc::IUndoManagerUniquePtr CreateUndoManager() const override
 	{
 		if (m_createUndoManagerShouldFail) {
-			return idoc::IUndoManagerSharedPtr();
+			return idoc::IUndoManagerUniquePtr();
 		}
 
-		return idoc::IUndoManagerSharedPtr(new CMockUndoManager());
+		return idoc::IUndoManagerUniquePtr(new CMockUndoManager());
 	}
 
 	virtual QList<imtdoc::IDocumentManagerEventHandler*> GetDocumentManagerEventHandlers() const override

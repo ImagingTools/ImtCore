@@ -113,17 +113,17 @@ DecoratorBase {
 		let visibleCount = root.shownItemsCount;
 		let index		 = root.selectedIndex;
 
-		if(root.baseElement && root.selectedIndex >= 0){
-			if(down_){
-				let nextElementIndex = index + 1
-				if(nextElementIndex * itemHeight > contentY + visibleCount * itemHeight){
-					popupMenuListView.contentY = nextElementIndex * itemHeight - visibleCount * itemHeight
-				}
-			}
-			else{
-				if(index * itemHeight < contentY){
-					popupMenuListView.contentY = index * itemHeight
-				}
+		if(!root.baseElement || index < 0){
+			return
+		}
+
+		if(!down_ && index * itemHeight < contentY){
+			popupMenuListView.contentY = index * itemHeight
+		}
+		else if(down_){
+			let nextElementIndex = index + 1
+			if(nextElementIndex * itemHeight > contentY + visibleCount * itemHeight){
+				popupMenuListView.contentY = nextElementIndex * itemHeight - visibleCount * itemHeight
 			}
 		}
 	}
