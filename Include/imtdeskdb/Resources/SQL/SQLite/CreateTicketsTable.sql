@@ -17,13 +17,19 @@ CREATE TABLE IF NOT EXISTS "Tickets"
     "MilestoneId"    TEXT,
     "Locked"         INTEGER NOT NULL DEFAULT 0,
     "LockReason"     TEXT,
-    "Number"         INTEGER,
+    "Number"         INTEGER UNIQUE,
     "CreatedAt"      TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "UpdatedAt"      TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "ClosedAt"       TEXT,
-    "ResolvedAt"     TEXT,
-    "IsActive"       INTEGER NOT NULL DEFAULT 1
+    "ResolvedAt"     TEXT
 );
 CREATE INDEX IF NOT EXISTS "IX_Tickets_Status" ON "Tickets" ("Status");
 CREATE INDEX IF NOT EXISTS "IX_Tickets_Priority" ON "Tickets" ("Priority");
 CREATE INDEX IF NOT EXISTS "IX_Tickets_Number" ON "Tickets" ("Number");
+CREATE TRIGGER IF NOT EXISTS "TR_Tickets_AutoNumber"
+AFTER INSERT ON "Tickets"
+FOR EACH ROW
+WHEN NEW."Number" IS NULL
+BEGIN
+    UPDATE "Tickets" SET "Number" = (SELECT COALESCE(MAX("Number"), 0) + 1 FROM "Tickets") WHERE "Id" = NEW."Id";
+END;

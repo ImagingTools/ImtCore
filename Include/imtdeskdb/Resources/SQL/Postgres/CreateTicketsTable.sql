@@ -17,12 +17,11 @@ CREATE TABLE IF NOT EXISTS "${TableScheme}"."Tickets"
     "MilestoneId"    UUID,
     "Locked"         BOOLEAN NOT NULL DEFAULT FALSE,
     "LockReason"     TEXT,
-    "Number"         INTEGER,
+    "Number"         SERIAL NOT NULL UNIQUE,
     "CreatedAt"      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     "UpdatedAt"      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     "ClosedAt"       TIMESTAMP WITH TIME ZONE,
-    "ResolvedAt"     TIMESTAMP WITH TIME ZONE,
-    "IsActive"       BOOLEAN NOT NULL DEFAULT TRUE
+    "ResolvedAt"     TIMESTAMP WITH TIME ZONE
 );
 CREATE INDEX IF NOT EXISTS "IX_Tickets_Status" ON "${TableScheme}"."Tickets" ("Status");
 CREATE INDEX IF NOT EXISTS "IX_Tickets_Priority" ON "${TableScheme}"."Tickets" ("Priority");

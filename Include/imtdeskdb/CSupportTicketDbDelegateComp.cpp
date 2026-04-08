@@ -305,7 +305,7 @@ QByteArray CSupportTicketDbDelegateComp::CreateDeleteObjectsQuery(
 		idsStr += QString("'%1'").arg(QString::fromUtf8(objectIds[i]));
 	}
 
-	return QString("UPDATE \"Tickets\" SET \"IsActive\"=FALSE WHERE \"Id\" IN (%1);")
+	return QString("DELETE FROM \"Tickets\" WHERE \"Id\" IN (%1);")
 		.arg(idsStr)
 		.toUtf8();
 }
@@ -393,18 +393,6 @@ void CSupportTicketDbDelegateComp::OnComponentCreated()
 idoc::MetaInfoPtr CSupportTicketDbDelegateComp::CreateObjectMetaInfo(const QByteArray& typeId) const
 {
 	return BaseClass::CreateObjectMetaInfo(typeId);
-}
-
-
-QString CSupportTicketDbDelegateComp::GetBaseSelectionQuery() const
-{
-	if (!m_tableSchemaAttrPtr.IsValid()){
-		return QString("SELECT * FROM \"%1\" WHERE \"IsActive\" = true").arg(qPrintable(*m_tableNameAttrPtr));
-	}
-
-	return QString("SELECT * FROM %0.\"%1\" WHERE \"IsActive\" = true")
-				.arg(qPrintable(*m_tableSchemaAttrPtr))
-				.arg(qPrintable(*m_tableNameAttrPtr));
 }
 
 

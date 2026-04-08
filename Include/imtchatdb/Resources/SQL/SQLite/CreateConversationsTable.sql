@@ -5,7 +5,6 @@ CREATE TABLE IF NOT EXISTS "Conversations"
     "ConversationType" INTEGER NOT NULL DEFAULT 0,
     "Metadata"         TEXT,
     "CreatedAt"        TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "UpdatedAt"        TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "IsActive"         INTEGER NOT NULL DEFAULT 1
+    "UpdatedAt"        TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX IF NOT EXISTS "IX_Conversations_UpdatedAt" ON "Conversations" ("UpdatedAt");

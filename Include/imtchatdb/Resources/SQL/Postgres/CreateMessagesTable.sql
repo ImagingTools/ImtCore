@@ -9,8 +9,7 @@ CREATE TABLE IF NOT EXISTS "${TableScheme}"."Messages"
     "Reactions"        JSONB,
     "Status"           INTEGER NOT NULL DEFAULT 0,
     "CreatedAt"        TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    "UpdatedAt"        TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    "IsActive"         BOOLEAN NOT NULL DEFAULT TRUE
+    "UpdatedAt"        TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 CREATE INDEX IF NOT EXISTS "IX_Messages_ConversationId" ON "${TableScheme}"."Messages" ("ConversationId");
 CREATE INDEX IF NOT EXISTS "IX_Messages_SenderId" ON "${TableScheme}"."Messages" ("SenderId");

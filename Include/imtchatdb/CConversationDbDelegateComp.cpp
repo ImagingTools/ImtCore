@@ -146,7 +146,7 @@ QByteArray CConversationDbDelegateComp::CreateDeleteObjectsQuery(
 		idsStr += QString("'%1'").arg(QString::fromUtf8(objectIds[i]));
 	}
 
-	return QString("UPDATE \"Conversations\" SET \"IsActive\"=FALSE WHERE \"Id\" IN (%1);")
+	return QString("DELETE FROM \"Conversations\" WHERE \"Id\" IN (%1);")
 		.arg(idsStr)
 		.toUtf8();
 }
@@ -227,18 +227,6 @@ void CConversationDbDelegateComp::OnComponentCreated()
 idoc::MetaInfoPtr CConversationDbDelegateComp::CreateObjectMetaInfo(const QByteArray& typeId) const
 {
 	return BaseClass::CreateObjectMetaInfo(typeId);
-}
-
-
-QString CConversationDbDelegateComp::GetBaseSelectionQuery() const
-{
-	if (!m_tableSchemaAttrPtr.IsValid()){
-		return QString("SELECT * FROM \"%1\" WHERE \"IsActive\" = true").arg(qPrintable(*m_tableNameAttrPtr));
-	}
-
-	return QString("SELECT * FROM %0.\"%1\" WHERE \"IsActive\" = true")
-				.arg(qPrintable(*m_tableSchemaAttrPtr))
-				.arg(qPrintable(*m_tableNameAttrPtr));
 }
 
 

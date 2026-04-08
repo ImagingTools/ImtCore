@@ -9,7 +9,7 @@ message status, participants, and tickets using PostgreSQL or SQLite.
 ## Key Features
 
 - **Dual Database Support**: PostgreSQL (production) and SQLite (embedded/offline)
-- **Soft Deletes**: Conversations, Messages and Tickets use `IsActive` flag
+- **Hard Deletes**: Conversations, Messages and Tickets use actual `DELETE FROM`
 - **Upsert Patterns**: Message status uses conflict-safe upsert queries
 - **Full-Text Search**: PostgreSQL Messages table includes GIN index on `Content`
 - **JSONB Storage**: Entity references, attachment IDs and tags use JSONB (Postgres) / TEXT (SQLite)
@@ -21,7 +21,7 @@ message status, participants, and tickets using PostgreSQL or SQLite.
 
 | Component                       | Table                    | Notes                              |
 |---------------------------------|--------------------------|------------------------------------|
-| `CConversationDbDelegateComp`   | `Conversations`          | Soft delete via `IsActive`         |
+| `CConversationDbDelegateComp`   | `Conversations`          | Hard delete                        |
 | `CMessageDbDelegateComp`        | `Messages`               | GIN FTS index (PostgreSQL)         |
 | `CMessageStatusDbDelegateComp`  | `MessageStatus`          | Upsert per user                    |
 | `CParticipantDbDelegateComp`    | `ConversationParticipants` | Add/remove participant helpers   |
