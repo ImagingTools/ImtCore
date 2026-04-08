@@ -81,7 +81,7 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 	// Load messages from the Messages collection filtered by ConversationId
 	QByteArray conversationId = ticketPtr->GetConversationId();
 	if (!conversationId.isEmpty() && m_messageCollectionCompPtr.IsValid()){
-		CTicketIdParam conversationIdParam(conversationId);
+		CIdParam conversationIdParam(conversationId);
 
 		iprm::CParamsSet paramsSet;
 		paramsSet.SetEditableParameter("ConversationId", &conversationIdParam);

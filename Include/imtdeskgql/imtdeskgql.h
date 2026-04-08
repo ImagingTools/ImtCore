@@ -169,13 +169,13 @@ inline sdl::imtdesk::ImtDesk::TicketPriority GetSdlTypeFromPriorityType(imtdesk:
 
 
 /**
-	Simple IIdParam implementation for passing TicketId filter to
-	CreateObjectCollectionIterator when querying ITicketAction collections.
+	Simple IIdParam implementation for passing ID-based filters to
+	CreateObjectCollectionIterator (e.g. TicketId, ConversationId).
 */
-class CTicketIdParam: virtual public iprm::IIdParam
+class CIdParam: virtual public iprm::IIdParam
 {
 public:
-	CTicketIdParam(const QByteArray& id = QByteArray()) : m_id(id) {}
+	CIdParam(const QByteArray& id = QByteArray()) : m_id(id) {}
 
 	// reimplemented (iprm::IIdParam)
 	virtual QByteArray GetId() const override { return m_id; }
