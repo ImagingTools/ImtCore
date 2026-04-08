@@ -6,6 +6,7 @@
 
 // ImtCore includes
 #include <imtdesk/ISupportTicket.h>
+#include <imtauth/CUserRecentAction.h>
 #include <imtdeskgql/imtdeskgql.h>
 
 
@@ -142,22 +143,18 @@ bool CTicketCollectionControllerComp::CreateRepresentationFromObject(
 	representationPayload.closedAt = ticketPtr->GetClosedAt();
 	representationPayload.resolvedAt = ticketPtr->GetResolvedAt();
 
-	// Populate activity items
+	// Populate activity items from recent user actions (imtauth::CUserRecentAction)
 	{
-		const QList<imtdesk::ISupportTicket::ActivityItem> items = ticketPtr->GetActivityItems();
-		for (const imtdesk::ISupportTicket::ActivityItem& item : items){
+		const QList<imtauth::CUserRecentAction> actions = ticketPtr->GetRecentActions();
+		for (const imtauth::CUserRecentAction& action : actions){
 			sdl::imtdesk::ImtDesk::CTicketActivityItem sdlItem;
 			sdlItem.Version_1_0.Emplace();
-			sdlItem.Version_1_0->itemType = imtdeskgql::GetSdlActivityItemType(item.itemType);
-			sdlItem.Version_1_0->userId = item.userId;
-			sdlItem.Version_1_0->userName = item.userName;
-			sdlItem.Version_1_0->timestamp = item.timestamp;
-			sdlItem.Version_1_0->content = item.content;
-			if (!item.reactions.isEmpty()){
-				sdlItem.Version_1_0->reactions.Emplace().FromList(item.reactions);
-			}
-			sdlItem.Version_1_0->actionType = item.actionType;
-			sdlItem.Version_1_0->actionDescription = item.actionDescription;
+			sdlItem.Version_1_0->itemType = sdl::imtdesk::ImtDesk::ActivityItemType::Action;
+			sdlItem.Version_1_0->userId = action.GetUserInfo().id;
+			sdlItem.Version_1_0->userName = action.GetUserInfo().name;
+			sdlItem.Version_1_0->timestamp = action.GetTimestamp().toString(Qt::ISODate);
+			sdlItem.Version_1_0->actionType = action.GetActionTypeInfo().name;
+			sdlItem.Version_1_0->actionDescription = action.GetActionTypeInfo().description;
 			if (!representationPayload.activityItems.has_value()){
 				representationPayload.activityItems.Emplace();
 			}
@@ -291,40 +288,38 @@ bool CTicketCollectionControllerComp::FillObjectFromRepresentation(
 	}
 
 	if (representation.activityItems){
-		QList<imtdesk::ISupportTicket::ActivityItem> items;
+		QList<imtauth::CUserRecentAction> actionItems;
 		for (int i = 0; i < representation.activityItems->GetSize(); ++i){
 			const sdl::imtdesk::ImtDesk::CTicketActivityItem& sdlItem = representation.activityItems->At(i);
 			if (!sdlItem.Version_1_0.has_value()){
 				continue;
 			}
-			imtdesk::ISupportTicket::ActivityItem item;
-			if (sdlItem.Version_1_0->itemType){
-				item.itemType = imtdeskgql::GetActivityItemTypeFromSdl(*sdlItem.Version_1_0->itemType);
+			// Only process Action items — comments are managed through the Conversation
+			if (sdlItem.Version_1_0->itemType && *sdlItem.Version_1_0->itemType == sdl::imtdesk::ImtDesk::ActivityItemType::Action){
+				imtauth::CUserRecentAction action;
+				imtauth::IUserRecentAction::UserInfo userInfo;
+				if (sdlItem.Version_1_0->userId){
+					userInfo.id = *sdlItem.Version_1_0->userId;
+				}
+				if (sdlItem.Version_1_0->userName){
+					userInfo.name = *sdlItem.Version_1_0->userName;
+				}
+				action.SetUserInfo(userInfo);
+				if (sdlItem.Version_1_0->timestamp){
+					action.SetTimestamp(QDateTime::fromString(*sdlItem.Version_1_0->timestamp, Qt::ISODate));
+				}
+				imtauth::IUserRecentAction::ActionTypeInfo actionTypeInfo;
+				if (sdlItem.Version_1_0->actionType){
+					actionTypeInfo.name = *sdlItem.Version_1_0->actionType;
+				}
+				if (sdlItem.Version_1_0->actionDescription){
+					actionTypeInfo.description = *sdlItem.Version_1_0->actionDescription;
+				}
+				action.SetActionTypeInfo(actionTypeInfo);
+				actionItems.append(action);
 			}
-			if (sdlItem.Version_1_0->userId){
-				item.userId = *sdlItem.Version_1_0->userId;
-			}
-			if (sdlItem.Version_1_0->userName){
-				item.userName = *sdlItem.Version_1_0->userName;
-			}
-			if (sdlItem.Version_1_0->timestamp){
-				item.timestamp = *sdlItem.Version_1_0->timestamp;
-			}
-			if (sdlItem.Version_1_0->content){
-				item.content = *sdlItem.Version_1_0->content;
-			}
-			if (sdlItem.Version_1_0->reactions){
-				item.reactions = sdlItem.Version_1_0->reactions->ToList();
-			}
-			if (sdlItem.Version_1_0->actionType){
-				item.actionType = *sdlItem.Version_1_0->actionType;
-			}
-			if (sdlItem.Version_1_0->actionDescription){
-				item.actionDescription = *sdlItem.Version_1_0->actionDescription;
-			}
-			items.append(item);
 		}
-		ticketPtr->SetActivityItems(items);
+		ticketPtr->SetRecentActions(actionItems);
 	}
 
 	return true;

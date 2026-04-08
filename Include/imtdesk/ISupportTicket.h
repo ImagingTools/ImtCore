@@ -285,62 +285,9 @@ public:
 	virtual void SetResolvedAt(const QString& resolvedAt) = 0;
 
 	/**
-		Activity item type — comment or user action.
-	*/
-	enum ActivityItemType
-	{
-		AIT_COMMENT,
-		AIT_ACTION
-	};
-
-	/**
-		Represents a single entry in the ticket activity timeline.
-		Can be either a conversation comment or a user action record.
-	*/
-	struct ActivityItem
-	{
-		ActivityItemType itemType = AIT_COMMENT;
-		QByteArray userId;
-		QString userName;
-		QString timestamp;
-		// Comment fields
-		QString content;
-		QStringList reactions;
-		// Action fields
-		QString actionType;
-		QString actionDescription;
-
-		bool operator==(const ActivityItem& other) const
-		{
-			return itemType == other.itemType
-				&& userId == other.userId
-				&& userName == other.userName
-				&& timestamp == other.timestamp
-				&& content == other.content
-				&& reactions == other.reactions
-				&& actionType == other.actionType
-				&& actionDescription == other.actionDescription;
-		}
-
-		bool operator!=(const ActivityItem& other) const
-		{
-			return !(*this == other);
-		}
-	};
-
-	/**
-		Get the list of activity items (comments + actions) for the timeline.
-	*/
-	virtual QList<ActivityItem> GetActivityItems() const = 0;
-
-	/**
-		Set the activity items list.
-	*/
-	virtual void SetActivityItems(const QList<ActivityItem>& items) = 0;
-
-	/**
 		Get the list of recent user actions (stored as imtauth::CUserRecentAction).
-		Used as the source of truth for AIT_ACTION activity items in the timeline.
+		Messages/comments are fetched via ConversationId; both sources are
+		merged into a unified timeline at the SDL/GQL level.
 	*/
 	virtual QList<imtauth::CUserRecentAction> GetRecentActions() const = 0;
 

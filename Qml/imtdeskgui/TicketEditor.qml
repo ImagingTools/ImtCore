@@ -21,8 +21,45 @@ ViewBase {
 	property TicketData ticketData: model
 	property bool isNewIssue: ticketData ? (ticketData.m_number === 0) : true
 
-	// Unified activity timeline: comments + user actions (from ticketData.m_activityItems)
-	property var activityItems: ticketData ? (ticketData.m_activityItems || []) : []
+	// Conversation messages — populated externally from the linked conversation
+	property var commentMessages: []
+
+	// User actions from ticket (via SDL activityItems, only Action type)
+	property var ticketActions: ticketData ? (ticketData.m_activityItems || []) : []
+
+	// Unified activity timeline: merge conversation messages + user actions, sorted by timestamp
+	property var activityItems: {
+		var items = []
+
+		// Add conversation messages as Comment items
+		var msgs = root.commentMessages || []
+		for (var i = 0; i < msgs.length; i++) {
+			var msg = msgs[i]
+			items.push({
+				itemType: "Comment",
+				userId: msg.senderId || "",
+				userName: msg.senderName || "",
+				timestamp: msg.timestamp || "",
+				content: msg.content || "",
+				reactions: msg.reactions || []
+			})
+		}
+
+		// Add user actions from ticket
+		var actions = root.ticketActions || []
+		for (var j = 0; j < actions.length; j++) {
+			items.push(actions[j])
+		}
+
+		// Sort by timestamp (chronological)
+		items.sort(function(a, b) {
+			var ta = a.timestamp || ""
+			var tb = b.timestamp || ""
+			return ta < tb ? -1 : (ta > tb ? 1 : 0)
+		})
+
+		return items
+	}
 
 	signal commentSubmitted(string commentText)
 

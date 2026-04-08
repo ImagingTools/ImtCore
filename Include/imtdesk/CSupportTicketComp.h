@@ -68,8 +68,6 @@ public:
 	virtual void SetClosedAt(const QString& closedAt) override;
 	virtual QString GetResolvedAt() const override;
 	virtual void SetResolvedAt(const QString& resolvedAt) override;
-	virtual QList<ActivityItem> GetActivityItems() const override;
-	virtual void SetActivityItems(const QList<ActivityItem>& items) override;
 	virtual QList<imtauth::CUserRecentAction> GetRecentActions() const override;
 	virtual void SetRecentActions(const QList<imtauth::CUserRecentAction>& actions) override;
 
@@ -103,7 +101,6 @@ private:
 	QString m_updatedAt;
 	QString m_closedAt;
 	QString m_resolvedAt;
-	QList<ActivityItem> m_activityItems;
 	QList<imtauth::CUserRecentAction> m_recentActions;
 };
 

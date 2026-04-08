@@ -335,21 +335,6 @@ void CSupportTicketComp::SetResolvedAt(const QString& resolvedAt)
 }
 
 
-QList<ISupportTicket::ActivityItem> CSupportTicketComp::GetActivityItems() const
-{
-	return m_activityItems;
-}
-
-
-void CSupportTicketComp::SetActivityItems(const QList<ActivityItem>& items)
-{
-	if (m_activityItems != items){
-		istd::CChangeNotifier notifier(this);
-		m_activityItems = items;
-	}
-}
-
-
 QList<imtauth::CUserRecentAction> CSupportTicketComp::GetRecentActions() const
 {
 	return m_recentActions;
@@ -473,48 +458,6 @@ bool CSupportTicketComp::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_resolvedAt);
 	retVal = retVal && archive.EndTag(resolvedAtTag);
 
-	{
-		int count = m_activityItems.size();
-		I_SERIALIZE(archive, count);
-		if (archive.IsStoring()){
-			for (const ActivityItem& item : m_activityItems){
-				int type = item.itemType;
-				QByteArray userId = item.userId;
-				QString userName = item.userName;
-				QString timestamp = item.timestamp;
-				QString content = item.content;
-				QStringList reactions = item.reactions;
-				QString actionType = item.actionType;
-				QString actionDescription = item.actionDescription;
-				I_SERIALIZE(archive, type);
-				I_SERIALIZE(archive, userId);
-				I_SERIALIZE(archive, userName);
-				I_SERIALIZE(archive, timestamp);
-				I_SERIALIZE(archive, content);
-				I_SERIALIZE(archive, reactions);
-				I_SERIALIZE(archive, actionType);
-				I_SERIALIZE(archive, actionDescription);
-			}
-		}
-		else {
-			m_activityItems.clear();
-			for (int i = 0; i < count; ++i){
-				ActivityItem item;
-				int type = 0;
-				I_SERIALIZE(archive, type);
-				item.itemType = static_cast<ActivityItemType>(type);
-				I_SERIALIZE(archive, item.userId);
-				I_SERIALIZE(archive, item.userName);
-				I_SERIALIZE(archive, item.timestamp);
-				I_SERIALIZE(archive, item.content);
-				I_SERIALIZE(archive, item.reactions);
-				I_SERIALIZE(archive, item.actionType);
-				I_SERIALIZE(archive, item.actionDescription);
-				m_activityItems.append(item);
-			}
-		}
-	}
-
 	// Serialize recent actions (imtauth::CUserRecentAction)
 	{
 		int actionsCount = m_recentActions.size();
@@ -569,7 +512,6 @@ bool CSupportTicketComp::CopyFrom(const IChangeable& object, CompatibilityMode /
 	m_updatedAt = srcPtr->GetUpdatedAt();
 	m_closedAt = srcPtr->GetClosedAt();
 	m_resolvedAt = srcPtr->GetResolvedAt();
-	m_activityItems = srcPtr->GetActivityItems();
 	m_recentActions.clear();
 	QList<imtauth::CUserRecentAction> srcActions = srcPtr->GetRecentActions();
 	for (const imtauth::CUserRecentAction& action : srcActions){
@@ -608,8 +550,7 @@ bool CSupportTicketComp::IsEqual(const IChangeable& object) const
 		&& m_createdAt == srcPtr->GetCreatedAt()
 		&& m_updatedAt == srcPtr->GetUpdatedAt()
 		&& m_closedAt == srcPtr->GetClosedAt()
-		&& m_resolvedAt == srcPtr->GetResolvedAt()
-		&& m_activityItems == srcPtr->GetActivityItems();
+		&& m_resolvedAt == srcPtr->GetResolvedAt();
 
 	if (!result){
 		return false;
@@ -665,7 +606,6 @@ bool CSupportTicketComp::ResetData(CompatibilityMode /*mode*/)
 	m_updatedAt.clear();
 	m_closedAt.clear();
 	m_resolvedAt.clear();
-	m_activityItems.clear();
 	m_recentActions.clear();
 
 	return true;
