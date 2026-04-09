@@ -63,6 +63,43 @@ ViewBase {
 	
 	signal commentSubmitted(string commentText)
 	
+	function addComment(commentText) {
+		if (!commentText || commentText.length === 0)
+			return
+		
+		var userId = AuthorizationController.getUserId()
+		var userName = AuthorizationController.userTokenProvider.login || ""
+		var now = new Date().toISOString()
+		
+		// Add to ticketData.m_activityItems so the C++ handler persists it as a message
+		var newItem = {
+			itemType: "Comment",
+			userId: userId,
+			userName: userName,
+			timestamp: now,
+			content: commentText,
+			reactions: []
+		}
+		var items = ticketData ? (ticketData.m_activityItems || []) : []
+		items = items.concat([newItem])
+		if (ticketData) {
+			ticketData.m_activityItems = items
+		}
+		
+		// Add to local commentMessages for immediate display
+		var msgs = root.commentMessages || []
+		msgs = msgs.concat([{
+			senderId: userId,
+			senderName: userName,
+			timestamp: now,
+			content: commentText,
+			reactions: []
+		}])
+		root.commentMessages = msgs
+		
+		root.commentSubmitted(commentText)
+	}
+	
 	// --- Helper: find ComboBox index by "id" field ---
 	function findComboIndex(combo, targetId, fallback) {
 		if (combo.model) {
@@ -817,7 +854,7 @@ ViewBase {
 												widthFromDecorator: true
 												height: Style.buttonHeightM
 												onClicked: {
-													root.commentSubmitted(commentInputField.text.trim())
+													root.addComment(commentInputField.text.trim())
 													commentInputField.text = ""
 												}
 											}
