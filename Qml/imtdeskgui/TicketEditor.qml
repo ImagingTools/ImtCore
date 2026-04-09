@@ -20,6 +20,7 @@ ViewBase {
 	
 	property TicketData ticketData: model
 	property bool isNewIssue: ticketData ? (ticketData.m_number === 0) : true
+	property bool chatViewMode: false
 	
 	// Component factory for creating TicketActivityItem instances
 	property Component activityItemComp: Component { TicketActivityItem {} }
@@ -621,7 +622,7 @@ ViewBase {
 							}
 						}
 						
-						// ── Activity / Conversation thread (GitHub Issues-like) ──
+						// ── Activity / Conversation thread ──
 						Rectangle {
 							width: parent.width
 							height: 1
@@ -632,6 +633,7 @@ ViewBase {
 							width: parent.width
 							spacing: Style.spacingS
 							
+							// Header row with view mode toggle
 							Row {
 								width: parent.width
 								spacing: Style.spacingS
@@ -652,13 +654,64 @@ ViewBase {
 									color: Style.textSecondaryColor
 									anchors.verticalCenter: parent.verticalCenter
 								}
+								
+								Item { width: Style.spacingM; height: 1 }
+								
+								// View mode toggle buttons
+								Row {
+									anchors.verticalCenter: parent.verticalCenter
+									spacing: 1
+									
+									Rectangle {
+										width: 80
+										height: Style.buttonHeightS
+										radius: Style.radiusS
+										color: root.chatViewMode ? Style.baseColor : Style.accentColor
+										border.color: Style.borderColor
+										border.width: 1
+										
+										Text {
+											anchors.centerIn: parent
+											text: qsTr("Detail")
+											font.pixelSize: Style.fontSizeXS
+											color: root.chatViewMode ? Style.textColor : "white"
+										}
+										
+										MouseArea {
+											anchors.fill: parent
+											onClicked: root.chatViewMode = false
+										}
+									}
+									
+									Rectangle {
+										width: 80
+										height: Style.buttonHeightS
+										radius: Style.radiusS
+										color: root.chatViewMode ? Style.accentColor : Style.baseColor
+										border.color: Style.borderColor
+										border.width: 1
+										
+										Text {
+											anchors.centerIn: parent
+											text: qsTr("Chat")
+											font.pixelSize: Style.fontSizeXS
+											color: root.chatViewMode ? "white" : Style.textColor
+										}
+										
+										MouseArea {
+											anchors.fill: parent
+											onClicked: root.chatViewMode = true
+										}
+									}
+								}
 							}
 							
-							// Unified activity timeline (comments + actions)
+							// === Detail view (GitHub Issues-style timeline) ===
 							Column {
 								id: activityListCol
 								width: parent.width
 								spacing: Style.spacingS
+								visible: !root.chatViewMode
 								
 								Repeater {
 									id: activityThread
@@ -770,7 +823,92 @@ ViewBase {
 								}
 							}
 							
-							// "Write" input area (GitHub-like comment box)
+							// === Chat view (Telegram-style messenger) ===
+							Column {
+								id: chatViewCol
+								width: parent.width
+								spacing: Style.paddingXS
+								visible: root.chatViewMode
+								
+								Rectangle {
+									width: parent.width
+									height: chatMessagesCol.height + Style.paddingM * 2
+									radius: Style.radiusS
+									color: Style.backgroundColor
+									border.color: Style.borderColor
+									border.width: 1
+									
+									Column {
+										id: chatMessagesCol
+										anchors.left: parent.left
+										anchors.right: parent.right
+										anchors.top: parent.top
+										anchors.margins: Style.paddingM
+										spacing: Style.paddingS
+										
+										Repeater {
+											id: chatThread
+											model: root.ticketData ? root.ticketData.m_activityItems : null
+											
+											delegate: Item {
+												width: chatMessagesCol.width
+												height: chatBubbleCol.height + Style.paddingXS
+												visible: model.item.m_itemType !== "Action"
+												
+												property bool isOwnMessage: model.item.m_userId === AuthorizationController.getUserId()
+												
+												Column {
+													id: chatBubbleCol
+													anchors.right: isOwnMessage ? parent.right : undefined
+													anchors.left: isOwnMessage ? undefined : parent.left
+													width: parent.width * 0.75
+													spacing: Style.paddingXS
+													
+													// Sender name (received messages only)
+													Text {
+														visible: !isOwnMessage
+														text: model.item.m_userName || qsTr("Unknown")
+														font.pixelSize: Style.fontSizeXS
+														font.bold: true
+														color: Style.accentColor
+													}
+													
+													// Message bubble
+													Rectangle {
+														width: chatBubbleCol.width
+														height: chatBubbleText.height + Style.paddingS * 2
+														radius: Style.radiusS
+														color: isOwnMessage ? Style.accentColor : Style.surfaceColor
+														
+														Text {
+															id: chatBubbleText
+															anchors.left: parent.left
+															anchors.right: parent.right
+															anchors.top: parent.top
+															anchors.margins: Style.paddingS
+															text: model.item.m_content || ""
+															font.pixelSize: Style.fontSizeS
+															color: isOwnMessage ? "white" : Style.textColor
+															wrapMode: Text.Wrap
+														}
+													}
+													
+													// Timestamp
+													Text {
+														anchors.right: isOwnMessage ? chatBubbleCol.right : undefined
+														anchors.left: isOwnMessage ? undefined : chatBubbleCol.left
+														text: model.item.m_timestamp || ""
+														font.pixelSize: Style.fontSizeXS
+														color: Style.textSecondaryColor
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+							
+							// "Write" input area (shared between both view modes)
 							Rectangle {
 								width: parent.width
 								height: 1
@@ -788,19 +926,21 @@ ViewBase {
 									font.pixelSize: Style.fontSizeS
 									font.bold: true
 									color: Style.textColor
+									visible: !root.chatViewMode
 								}
 								
 								Row {
 									width: parent.width
 									spacing: Style.paddingS
 									
-									// Avatar for current user
+									// Avatar for current user (detail view only)
 									Rectangle {
 										width: 32
 										height: 32
 										radius: 16
 										color: Style.accentColor
 										anchors.top: parent.top
+										visible: !root.chatViewMode
 										
 										Text {
 											anchors.centerIn: parent
@@ -812,7 +952,9 @@ ViewBase {
 									}
 									
 									Column {
-										width: parent.width - 32 - Style.paddingS
+										width: root.chatViewMode
+											   ? parent.width
+											   : parent.width - 32 - Style.paddingS
 										spacing: Style.spacingS
 										
 										Rectangle {
@@ -831,15 +973,25 @@ ViewBase {
 												anchors.right: parent.right
 												anchors.top: parent.top
 												anchors.margins: Style.paddingM
-												height: 60
+												height: root.chatViewMode ? 40 : 60
 												font.pixelSize: Style.fontSizeS
 												color: Style.textColor
 												wrapMode: TextEdit.Wrap
 												clip: true
 												
+												Keys.onReturnPressed: {
+													if (!(event.modifiers & Qt.ShiftModifier) && root.chatViewMode) {
+														root.addComment(commentInputField.text.trim())
+														commentInputField.text = ""
+														event.accepted = true
+													}
+												}
+												
 												Text {
 													anchors.fill: parent
-													text: qsTr("Leave a comment")
+													text: root.chatViewMode
+														  ? qsTr("Write a message...")
+														  : qsTr("Leave a comment")
 													color: Style.textPlaceholderColor
 													font.pixelSize: Style.fontSizeS
 													visible: commentInputField.text.length === 0
@@ -852,7 +1004,7 @@ ViewBase {
 											spacing: Style.spacingS
 
 											Button {
-												text: qsTr("Comment")
+												text: root.chatViewMode ? qsTr("Send") : qsTr("Comment")
 												widthFromDecorator: true
 												height: Style.buttonHeightM
 												onClicked: {

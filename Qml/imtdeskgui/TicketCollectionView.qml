@@ -69,6 +69,33 @@ RemoteCollectionView {
 						updateTicketRequest.send(updateTicketInput)
 					}
 
+					// Subscription: listen for document changes from other clients
+					property SubscriptionClient ticketSubscription: SubscriptionClient {
+						gqlCommandId: "OnTicketsDocumentChanged"
+
+						onMessageReceived: {
+							let changedDocId = data.getData("documentId")
+							if (changedDocId === root.documentId){
+								root.updateRepresentationFromDocument()
+							}
+						}
+
+						function getHeaders(){
+							return {}
+						}
+					}
+
+					// Polling timer for message updates (messages bypass document change notifications)
+					property Timer messagePollingTimer: Timer {
+						interval: 5000
+						repeat: true
+						running: root.documentId !== ""
+
+						onTriggered: {
+							root.updateRepresentationFromDocument()
+						}
+					}
+
 					property DocumentId documentIdInput: DocumentId {}
 					property GqlSdlRequestSender getTicketRequest: GqlSdlRequestSender {
 						gqlCommandId: ImtdeskTicketCollectionDocumentManagerSdlCommandIds.s_getTicketRepresentation
