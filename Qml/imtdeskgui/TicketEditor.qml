@@ -21,57 +21,8 @@ ViewBase {
 	property TicketData ticketData: model
 	property bool isNewIssue: ticketData ? (ticketData.m_number === 0) : true
 	
-	// Conversation messages — populated externally from the linked conversation
-	property var commentMessages: []
-	
 	// Component factory for creating TicketActivityItem instances
 	property Component activityItemComp: Component { TicketActivityItem {} }
-	
-	// Unified activity timeline: merge conversation messages + user actions, sorted by timestamp
-	property var activityItems: {
-		var items = []
-		
-		// Add conversation messages as Comment items
-		var msgs = root.commentMessages || []
-		for (var i = 0; i < msgs.length; i++) {
-			var msg = msgs[i]
-			items.push({
-						   itemType: "Comment",
-						   userId: msg.senderId || "",
-						   userName: msg.senderName || "",
-						   timestamp: msg.timestamp || "",
-						   content: msg.content || "",
-						   reactions: msg.reactions || []
-					   })
-		}
-		
-		// Add user actions from ticket BaseModel
-		if (ticketData && ticketData.m_activityItems) {
-			var actModel = ticketData.m_activityItems
-			for (var j = 0; j < actModel.getItemsCount(); j++) {
-				var act = actModel.get(j).item
-				items.push({
-							   itemType: act.m_itemType || "",
-							   userId: act.m_userId || "",
-							   userName: act.m_userName || "",
-							   timestamp: act.m_timestamp || "",
-							   content: act.m_content || "",
-							   reactions: act.m_reactions || [],
-							   actionType: act.m_actionType || "",
-							   actionDescription: act.m_actionDescription || ""
-						   })
-			}
-		}
-		
-		// Sort by timestamp (chronological)
-		items.sort(function(a, b) {
-			var ta = a.timestamp || ""
-			var tb = b.timestamp || ""
-			return ta < tb ? -1 : (ta > tb ? 1 : 0)
-		})
-		
-		return items
-	}
 	
 	signal commentSubmitted(string commentText)
 	
@@ -102,18 +53,6 @@ ViewBase {
 		newItem.m_content = commentText
 		newItem.m_reactions = []
 		ticketData.m_activityItems.addElement(newItem)
-		
-		console.log("ticketData", ticketData.toJson())
-		// Add to local commentMessages for immediate display
-		var msgs = root.commentMessages || []
-		msgs = msgs.concat([{
-			senderId: userId,
-			senderName: userName,
-			timestamp: now,
-			content: commentText,
-			reactions: []
-		}])
-		root.commentMessages = msgs
 
 		setBlockingUpdateModel(false)
 		ticketData.modelChanged()
@@ -680,7 +619,7 @@ ViewBase {
 								
 								Repeater {
 									id: activityThread
-									model: root.activityItems
+									model: ticketData ? ticketData.m_activityItems : null
 									
 									// Each item = comment bubble OR action notice
 									Column {
@@ -689,7 +628,7 @@ ViewBase {
 										
 										// --- Action item (e.g., "User closed ticket") ---
 										Row {
-											visible: modelData.itemType === "Action"
+											visible: model.item.m_itemType === "Action"
 											width: parent.width
 											spacing: Style.paddingS
 											
@@ -709,7 +648,7 @@ ViewBase {
 											
 											Text {
 												width: parent.width - 32 - Style.paddingS
-												text: (modelData.userName || qsTr("Someone")) + " " + (modelData.actionDescription || modelData.actionType || "") + " " + (modelData.timestamp || "")
+												text: (model.item.m_userName || qsTr("Someone")) + " " + (model.item.m_actionDescription || model.item.m_actionType || "") + " " + (model.item.m_timestamp || "")
 												font.pixelSize: Style.fontSizeS
 												color: Style.textSecondaryColor
 												wrapMode: Text.Wrap
@@ -719,7 +658,7 @@ ViewBase {
 										
 										// --- Comment item ---
 										Row {
-											visible: modelData.itemType !== "Action"
+											visible: model.item.m_itemType !== "Action"
 											width: parent.width
 											spacing: Style.paddingS
 											
@@ -732,7 +671,7 @@ ViewBase {
 												
 												Text {
 													anchors.centerIn: parent
-													text: modelData.userName ? modelData.userName.charAt(0).toUpperCase() : "?"
+													text: model.item.m_userName ? model.item.m_userName.charAt(0).toUpperCase() : "?"
 													font.pixelSize: Style.fontSizeXS
 													color: "white"
 													font.bold: true
@@ -748,14 +687,14 @@ ViewBase {
 													spacing: Style.paddingS
 													
 													Text {
-														text: modelData.userName || qsTr("Unknown")
+														text: model.item.m_userName || qsTr("Unknown")
 														font.pixelSize: Style.fontSizeS
 														font.bold: true
 														color: Style.textColor
 													}
 													
 													Text {
-														text: qsTr("commented") + " " + (modelData.timestamp || "")
+														text: qsTr("commented") + " " + (model.item.m_timestamp || "")
 														font.pixelSize: Style.fontSizeXS
 														color: Style.textSecondaryColor
 													}
@@ -776,7 +715,7 @@ ViewBase {
 														anchors.right: parent.right
 														anchors.top: parent.top
 														anchors.margins: Style.paddingM
-														text: modelData.content || ""
+														text: model.item.m_content || ""
 														font.pixelSize: Style.fontSizeS
 														color: Style.textColor
 														wrapMode: Text.Wrap
