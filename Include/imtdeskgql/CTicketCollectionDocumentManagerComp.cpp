@@ -100,6 +100,7 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 					const imtchat::IChatMessage* msgPtr = dynamic_cast<const imtchat::IChatMessage*>(dataPtr.GetPtr());
 					if (msgPtr != nullptr){
 						sdl::imtdesk::ImtDesk::CTicketActivityItem::V1_0 itemData;
+						itemData.id = msgPtr->GetId();
 						itemData.itemType = sdl::imtdesk::ImtDesk::ActivityItemType::Comment;
 						itemData.userId = msgPtr->GetSenderId();
 						itemData.timestamp = msgPtr->GetCreatedAt();
@@ -253,6 +254,10 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 						continue;
 					}
 					if (sdlItem->itemType != sdl::imtdesk::ImtDesk::ActivityItemType::Comment){
+						continue;
+					}
+					// Skip items that already have an id — they are existing messages loaded from DB
+					if (sdlItem->id && !sdlItem->id->isEmpty()){
 						continue;
 					}
 

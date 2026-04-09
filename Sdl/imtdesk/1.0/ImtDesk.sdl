@@ -55,6 +55,7 @@ enum ActivityItemType {
 }
 
 type TicketActivityItem {
+	id: ID
 	itemType: ActivityItemType!
 	userId: ID
 	userName: String
