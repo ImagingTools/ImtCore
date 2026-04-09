@@ -24,8 +24,8 @@ ViewBase {
 	// Conversation messages — populated externally from the linked conversation
 	property var commentMessages: []
 	
-	// User actions from ticket (via SDL activityItems, only Action type)
-	property var ticketActions: ticketData ? (ticketData.m_activityItems || []) : []
+	// Component factory for creating TicketActivityItem instances
+	property Component activityItemComp: Component { TicketActivityItem {} }
 	
 	// Unified activity timeline: merge conversation messages + user actions, sorted by timestamp
 	property var activityItems: {
@@ -45,10 +45,22 @@ ViewBase {
 					   })
 		}
 		
-		// Add user actions from ticket
-		var actions = root.ticketActions || []
-		for (var j = 0; j < actions.length; j++) {
-			items.push(actions[j])
+		// Add user actions from ticket BaseModel
+		if (ticketData && ticketData.m_activityItems) {
+			var actModel = ticketData.m_activityItems
+			for (var j = 0; j < actModel.getItemsCount(); j++) {
+				var act = actModel.get(j).item
+				items.push({
+							   itemType: act.m_itemType || "",
+							   userId: act.m_userId || "",
+							   userName: act.m_userName || "",
+							   timestamp: act.m_timestamp || "",
+							   content: act.m_content || "",
+							   reactions: act.m_reactions || [],
+							   actionType: act.m_actionType || "",
+							   actionDescription: act.m_actionDescription || ""
+						   })
+			}
 		}
 		
 		// Sort by timestamp (chronological)
@@ -71,17 +83,14 @@ ViewBase {
 		var userName = AuthorizationController.userTokenProvider.login || ""
 		var now = new Date().toISOString()
 		
-		// Add to ticketData.m_activityItems so the C++ handler persists it as a message
-		var items = ticketData.m_activityItems || []
-		items = items.concat([{
-			itemType: "Comment",
-			userId: userId,
-			userName: userName,
-			timestamp: now,
-			content: commentText,
-			reactions: []
-		}])
-		ticketData.m_activityItems = items
+		// Create a TicketActivityItem via Component and add to BaseModel
+		var newItem = activityItemComp.createObject(root)
+		newItem.m_itemType = "Comment"
+		newItem.m_userId = userId
+		newItem.m_userName = userName
+		newItem.m_timestamp = now
+		newItem.m_content = commentText
+		ticketData.m_activityItems.addElement(newItem)
 		
 		// Add to local commentMessages for immediate display
 		var msgs = root.commentMessages || []
