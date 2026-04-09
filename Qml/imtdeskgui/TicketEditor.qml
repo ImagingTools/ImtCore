@@ -659,11 +659,14 @@ ViewBase {
 								
 								// View mode toggle buttons
 								Row {
+									id: viewModeToggle
 									anchors.verticalCenter: parent.verticalCenter
 									spacing: 1
 									
+									property int toggleButtonWidth: 80
+									
 									Rectangle {
-										width: 80
+										width: viewModeToggle.toggleButtonWidth
 										height: Style.buttonHeightS
 										radius: Style.radiusS
 										color: root.chatViewMode ? Style.baseColor : Style.accentColor
@@ -684,7 +687,7 @@ ViewBase {
 									}
 									
 									Rectangle {
-										width: 80
+										width: viewModeToggle.toggleButtonWidth
 										height: Style.buttonHeightS
 										radius: Style.radiusS
 										color: root.chatViewMode ? Style.accentColor : Style.baseColor

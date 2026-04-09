@@ -85,7 +85,10 @@ RemoteCollectionView {
 						}
 					}
 
-					// Polling timer for message updates (messages bypass document change notifications)
+					// Polling timer: messages are saved via IChatService::SendMessage() which does
+					// not trigger ticket document change notifications (to prevent infinite loops
+					// when multiple clients have the same ticket open). Polling provides
+					// near-real-time message visibility across clients.
 					property Timer messagePollingTimer: Timer {
 						interval: 5000
 						repeat: true
