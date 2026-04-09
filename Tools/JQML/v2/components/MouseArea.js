@@ -1,7 +1,7 @@
 const { Item } = require('./Item')
 const { QSignal } = require('../utils/signal')
 const { Qt } = require('../utils/Qt')
-const { QReal, QBool, QString, QInt } = require('../utils/properties')
+const { QReal, QBool, QString, QInt, QDrag } = require('../utils/properties')
 
 class MouseArea extends Item {
     static defaultProperties = {
@@ -16,7 +16,7 @@ class MouseArea extends Item {
         mouseX: { type: QReal, value: 0 },
         mouseY: { type: QReal, value: 0 },
         cursorShape: { type: QString, value: 'default' },
-
+        drag: { type: QDrag },
     }
 
     static defaultSignals = {

@@ -1,5 +1,5 @@
 const { QtObject } = require('./QtObject')
-const { QReal, QAnchors, QAnchorLine, QAutoGeometry, QBool, QInt, QProperty, QKeyNavigation, QVisible } = require('../utils/properties')
+const { QReal, QAnchors, QAnchorLine, QAutoGeometry, QBool, QInt, QProperty, QKeyNavigation, QVisible, QDrag } = require('../utils/properties')
 
 class Item extends QtObject {
     static defaultCSS = {
@@ -34,6 +34,7 @@ class Item extends QtObject {
         transformOrigin: { type: QProperty, value: Item.Center, changed: '$transformOriginChanged' },
         anchors: { type: QAnchors, changed: '$anchorsChanged' },
         KeyNavigation: { type: QKeyNavigation, changed: '$keyNavigationChanged' },
+        Drag: { type: QDrag },
 
         // override getProperty
         left: { type: QAnchorLine, value: QAnchorLine.Left},

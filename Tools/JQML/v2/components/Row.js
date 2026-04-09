@@ -43,7 +43,15 @@ class Row extends Item {
                             marginRight: `0`
                         })
                     }
+                } else {
+                    children[i].setStyle({
+                        marginRight: `0`
+                    })
                 }
+            } else {
+                children[i].setStyle({
+                    marginRight: `0`
+                })
             }
         }
 

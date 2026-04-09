@@ -1,4 +1,5 @@
 const { Qt } = require('./Qt')
+const { QDrag } = require('./properties')
 
 class MouseController {
     list = []
@@ -10,6 +11,7 @@ class MouseController {
     pressed = []
     oldList = []
     timestamp = 0
+    dropAreaList = []
 
     constructor(){
         window.addEventListener('mousemove', (e)=>{
@@ -43,6 +45,15 @@ class MouseController {
         })
     }
 
+    addDropArea(obj){
+        if(this.dropAreaList.indexOf(obj) < 0) this.dropAreaList.push(obj)
+    }
+
+    removeDropArea(obj){
+        let index = this.dropAreaList.indexOf(obj)
+        if(index >= 0) this.dropAreaList.splice(index, 1)
+    }
+
     add(obj){
         if(this.list.indexOf(obj) < 0) this.list.push(obj)
     }
@@ -50,6 +61,16 @@ class MouseController {
     remove(obj){
         let index = this.list.indexOf(obj)
         if(index >= 0) this.list.splice(index, 1)
+    }
+
+    getDropArea(x, y){
+        let elements = document.elementsFromPoint(x, y)
+
+        for(let element of elements){
+            if(element.id && UIDList[element.id] && UIDList[element.id].$droparea && UIDList[element.id].getPropertyValue('enabled') && UIDList[element.id].getPropertyValue('visible')){
+                return UIDList[element.id]
+            }
+        }
     }
 
     get(x, y){
@@ -349,6 +370,22 @@ class MouseController {
                 if(this.target.$signals.exited) {
                     this.target.$signals.exited()
                 }
+
+                let dragTarget = this.target.getProperty('drag').getPropertyValue('target')
+                if(dragTarget){
+                    let rectTarget = dragTarget.getDom().getBoundingClientRect()
+                    let dropArea = this.getDropArea(rectTarget.left, rectTarget.top) || this.getDropArea(rectTarget.left, rectTarget.bottom) ||
+                        this.getDropArea(rectTarget.right, rectTarget.top) || this.getDropArea(rectTarget.right, rectTarget.bottom)
+
+                    this.target.getProperty('drag').getProperty('active').reset(false)
+
+                    for(let _dropArea of this.dropAreaList){
+                        _dropArea.$exit(dragTarget)
+                    }
+
+                    if(dropArea) dropArea.$drop(dragTarget)
+                }
+                
                 
                 delete this.target.$entered
             }
@@ -437,6 +474,27 @@ class MouseController {
     
                 if((this.target.getPropertyValue('pressed') || this.target.getPropertyValue('hoverEnabled')) && this.target.$signals.positionChanged) this.target.$signals.positionChanged()
     
+                let dragProp = this.target.getProperty('drag')
+                dragProp.getProperty('active').reset(true)
+                let dragTarget = dragProp.getPropertyValue('target')
+                if(dragTarget){
+                    if(dragTarget.getPropertyValue('Drag').getPropertyValue('active')){
+                        if(dragProp.getPropertyValue('axis') === QDrag.XAndYAxis || dragProp.getPropertyValue('axis') === QDrag.XAxis) dragTarget.x -= dx
+                        if(dragProp.getPropertyValue('axis') === QDrag.XAndYAxis || dragProp.getPropertyValue('axis') === QDrag.YAxis) dragTarget.y -= dy
+                    }
+                    let rectTarget = dragTarget.getDom().getBoundingClientRect()
+                    let dropArea = this.getDropArea(rectTarget.left, rectTarget.top) || this.getDropArea(rectTarget.left, rectTarget.bottom) ||
+                        this.getDropArea(rectTarget.right, rectTarget.top) || this.getDropArea(rectTarget.right, rectTarget.bottom)
+
+                    if(dropArea) dropArea.$enterOrMove(dragTarget)
+
+                    for(let _dropArea of this.dropAreaList){
+                        if(dropArea !== _dropArea) _dropArea.$exit(dragTarget)
+                    }
+                }
+
+                
+                
                 if(inner.indexOf(this.target) >= 0){
                     this.target.getProperty('containsMouse').reset(true)
                 } else {

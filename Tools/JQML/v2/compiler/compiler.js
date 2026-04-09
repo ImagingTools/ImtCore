@@ -11,7 +11,7 @@ for(let componentName of listComponents){
 const listProperties = require('../utils/properties')
 
 const args = {
-    source: process.argv.length >= 3 ? process.argv[2] : 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\Bin\\web\\src',//'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQML2\\test\\qml',
+    source: process.argv.length >= 3 ? process.argv[2] : 'D:\\TEST',//'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQML2\\test\\qml',
     debug: 0
 }
 for(let _argv of process.argv.slice(2)){
@@ -272,7 +272,13 @@ function qmlprop(meta, instructions){
             }
         } 
     } else if (meta[1][0] === "dot"){
-        let name = meta[1].slice(1).join('.')
+        let _meta = meta[1].slice(1)
+        let name
+        if (_meta[0][0] === 'dot') {
+            name = _meta[0].slice(1).join('.') + '.' + _meta.slice(1).join('.')
+        } else {
+            name = _meta.join('.')
+        }
         instructions.propertiesNames.push(name)
         instructions.properties.push({
             name: name,
