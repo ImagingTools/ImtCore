@@ -22,6 +22,9 @@
         <Element ComponentName="TicketDocumentNameProvider" X="1000" Y="625" Note=""/>
         <Element ComponentName="TicketSqlRepository" X="275" Y="725" Note=""/>
         <Element ComponentName="TicketsChangeNotifier" X="200" Y="75" Note=""/>
+        <Element ComponentName="ChatMessage" X="1200" Y="750" Note=""/>
+        <Element ComponentName="ChatMessageSqlRepository" X="1200" Y="600" Note=""/>
+        <Element ComponentName="ChatService" X="1200" Y="450" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

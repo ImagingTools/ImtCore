@@ -2,9 +2,6 @@
 #include <imtdeskgql/CTicketCollectionDocumentManagerComp.h>
 
 
-// Qt includes
-#include <QtCore/QUuid>
-
 // ACF includes
 #include <istd/CChangeGroup.h>
 #include <istd/TDelPtr.h>
@@ -13,6 +10,7 @@
 // ImtCore includes
 #include <imtdesk/ISupportTicket.h>
 #include <imtchat/IChatMessage.h>
+#include <imtchat/IChatService.h>
 #include <imtchat/IConversation.h>
 #include <imtbase/IObjectCollectionIterator.h>
 #include <imtdeskgql/imtdeskgql.h>
@@ -245,72 +243,38 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 	}
 
 	// Auto-create a Conversation if the ticket does not have one yet
-	if (ticketPtr->GetConversationId().isEmpty()
-		&& m_conversationCollectionCompPtr.IsValid()
-		&& m_conversationFactCompPtr.IsValid()){
-		imtchat::IConversationUniquePtr convPtr = m_conversationFactCompPtr.CreateInstance();
-		if (convPtr.IsValid()){
-			QByteArray convId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
-			convPtr->SetId(convId);
-			convPtr->SetName(ticketPtr->GetTitle());
-			convPtr->SetConversationType(imtchat::IConversation::CT_SUPPORT);
-
-			m_conversationCollectionCompPtr->InsertNewObject(
-						QByteArray("Conversation"),
-						QString(),
-						QString(),
-						convPtr.GetPtr(),
-						convId);
-
+	if (ticketPtr->GetConversationId().isEmpty() && m_chatServiceCompPtr.IsValid()){
+		QByteArray convId = m_chatServiceCompPtr->CreateConversation(
+					ticketPtr->GetTitle(),
+					imtchat::IConversation::CT_SUPPORT,
+					QByteArrayList());
+		if (!convId.isEmpty()){
 			ticketPtr->SetConversationId(convId);
 		}
 	}
 
 	if (ticketInfo.activityItems){
-		// Comment-type activity items are saved as messages in the Messages collection
+		// Comment-type activity items are saved as messages via IChatService
 		QByteArray conversationId = ticketPtr->GetConversationId();
-		if (!conversationId.isEmpty() && m_messageCollectionCompPtr.IsValid() && m_messageFactCompPtr.IsValid()){
-			imtbase::IObjectCollection* msgCollPtr = m_messageCollectionCompPtr.GetPtr();
-			if (msgCollPtr != nullptr){
-				for (const auto& sdlItem : *ticketInfo.activityItems){
-					if (!sdlItem){
-						continue;
-					}
-					if (sdlItem->itemType != sdl::imtdesk::ImtDesk::ActivityItemType::Comment){
-						continue;
-					}
-					// Skip items that already have an id — they are existing messages loaded from DB
-					if (sdlItem->id && !sdlItem->id->isEmpty()){
-						continue;
-					}
-
-					imtchat::IChatMessageUniquePtr msgPtr = m_messageFactCompPtr.CreateInstance();
-					if (!msgPtr.IsValid()){
-						continue;
-					}
-
-					QByteArray newMsgId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
-					msgPtr->SetId(newMsgId);
-					msgPtr->SetConversationId(conversationId);
-					msgPtr->SetStatus(imtchat::IChatMessage::MS_SENT);
-
-					if (sdlItem->userId){
-						msgPtr->SetSenderId(*sdlItem->userId);
-					}
-					if (sdlItem->content){
-						msgPtr->SetContent(*sdlItem->content);
-					}
-					if (sdlItem->reactions){
-						msgPtr->SetReactions(sdlItem->reactions->ToList());
-					}
-
-					msgCollPtr->InsertNewObject(
-								QByteArray("Message"),
-								QString(),
-								QString(),
-								msgPtr.GetPtr(),
-								newMsgId);
+		if (!conversationId.isEmpty() && m_chatServiceCompPtr.IsValid()){
+			for (const auto& sdlItem : *ticketInfo.activityItems){
+				if (!sdlItem){
+					continue;
 				}
+				if (sdlItem->itemType != sdl::imtdesk::ImtDesk::ActivityItemType::Comment){
+					continue;
+				}
+				// Skip items that already have an id — they are existing messages loaded from DB
+				if (sdlItem->id && !sdlItem->id->isEmpty()){
+					continue;
+				}
+
+				QString content;
+				if (sdlItem->content){
+					content = *sdlItem->content;
+				}
+
+				m_chatServiceCompPtr->SendMessage(conversationId, content);
 			}
 		}
 	}

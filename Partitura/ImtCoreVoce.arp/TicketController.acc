@@ -315,11 +315,8 @@
                     <AttributeInfo Id="TicketFactory" Type="Factory" ExportId="">
                         <Data IsEnabled="true" Value="SupportTicket"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ConversationCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ConversationSqlRepository"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ConversationFactory" Type="Factory" ExportId="">
-                        <Data IsEnabled="true" Value="Conversation"/>
+                    <AttributeInfo Id="ChatService" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ChatService"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
@@ -343,16 +340,10 @@
                         <Data IsEnabled="true" Value="CollectionDocumentManager"/>
                     </AttributeInfo>
                     <AttributeInfo Id="MessageCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="MessageSqlRepository"/>
+                        <Data IsEnabled="true" Value="ChatMessageSqlRepository"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="MessageFactory" Type="Factory" ExportId="">
-                        <Data IsEnabled="true" Value="ChatMessage"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ConversationCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ConversationSqlRepository"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ConversationFactory" Type="Factory" ExportId="">
-                        <Data IsEnabled="true" Value="Conversation"/>
+                    <AttributeInfo Id="ChatService" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ChatService"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -393,6 +384,47 @@
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ChatMessage" PackageId="ImtChatPck" ComponentId="ChatMessage">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="ChatMessageSqlRepository" PackageId="ImtChatVoce" ComponentId="ChatMessageSqlRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ChatService" PackageId="ImtChatPck" ComponentId="ChatService">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="MessageCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ChatMessageSqlRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ConversationCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ConversationSqlRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MessageFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="ChatMessage"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ConversationFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="Conversation"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
