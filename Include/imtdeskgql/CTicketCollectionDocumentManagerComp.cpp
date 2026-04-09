@@ -276,7 +276,7 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 
 				QByteArray senderId = userId;
 				if (sdlItem->userId && !sdlItem->userId->isEmpty()){
-					senderId = sdlItem->userId->toUtf8();
+					senderId = *sdlItem->userId;
 				}
 
 				m_chatServiceCompPtr->SendMessage(conversationId, senderId, content);
