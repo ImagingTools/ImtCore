@@ -45,10 +45,14 @@ istd::IChangeableUniquePtr CConversationDbDelegateComp::CreateObjectFromRecord(
 		convPtr->SetMetadata(record.value("Metadata").toString());
 	}
 	if (record.contains("CreatedAt")){
-		convPtr->SetCreatedAt(record.value("CreatedAt").toString());
+		QVariant val = record.value("CreatedAt");
+		QDateTime dt = val.toDateTime();
+		convPtr->SetCreatedAt(dt.isValid() ? dt.toString(Qt::ISODate) : val.toString());
 	}
 	if (record.contains("UpdatedAt")){
-		convPtr->SetUpdatedAt(record.value("UpdatedAt").toString());
+		QVariant val = record.value("UpdatedAt");
+		QDateTime dt = val.toDateTime();
+		convPtr->SetUpdatedAt(dt.isValid() ? dt.toString(Qt::ISODate) : val.toString());
 	}
 
 	return convPtr;

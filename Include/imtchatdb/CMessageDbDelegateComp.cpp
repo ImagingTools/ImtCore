@@ -2,6 +2,7 @@
 #include <imtchatdb/CMessageDbDelegateComp.h>
 
 // Qt includes
+#include <QtCore/QDateTime>
 #include <QtCore/QUuid>
 #include <QtSql/QSqlRecord>
 
@@ -82,10 +83,14 @@ istd::IChangeableUniquePtr CMessageDbDelegateComp::CreateObjectFromRecord(
 		msgPtr->SetReactions(reactions);
 	}
 	if (record.contains("CreatedAt")){
-		msgPtr->SetCreatedAt(record.value("CreatedAt").toString());
+		QVariant val = record.value("CreatedAt");
+		QDateTime dt = val.toDateTime();
+		msgPtr->SetCreatedAt(dt.isValid() ? dt.toString(Qt::ISODate) : val.toString());
 	}
 	if (record.contains("UpdatedAt")){
-		msgPtr->SetUpdatedAt(record.value("UpdatedAt").toString());
+		QVariant val = record.value("UpdatedAt");
+		QDateTime dt = val.toDateTime();
+		msgPtr->SetUpdatedAt(dt.isValid() ? dt.toString(Qt::ISODate) : val.toString());
 	}
 
 	return msgPtr;
