@@ -460,9 +460,10 @@ ViewBase {
 				}
 			}
 		}
-		
-		// ================================================================
-		// VIEW 2: EDIT EXISTING ISSUE (isNewIssue === false)
+	}
+	
+	// ================================================================
+	// VIEW 2: EDIT EXISTING ISSUE (isNewIssue === false)
 		// Like GitHub's Issue detail page — header with #N, status badges,
 		// full sidebar, Close/Reopen action buttons
 		// ================================================================
@@ -1050,5 +1051,4 @@ ViewBase {
 				}
 			}
 		}
-	}
 }
