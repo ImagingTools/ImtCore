@@ -280,6 +280,7 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 	}
 
 	m_documentManagerCompPtr->SetDocumentData(userId, documentId, *ticketPtr);
+	m_documentManagerCompPtr->SaveDocument(userId, documentId);
 
 	response.Version_1_0->status = sdl::imtbase::CollectionDocumentManager::EDocumentOperationStatus::Success;
 

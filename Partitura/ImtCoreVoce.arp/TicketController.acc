@@ -28,6 +28,47 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="ChatMessage" PackageId="ImtChatPck" ComponentId="ChatMessage">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="ChatMessageSqlRepository" PackageId="ImtChatVoce" ComponentId="ChatMessageSqlRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ChatService" PackageId="ImtChatPck" ComponentId="ChatService">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ConversationCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ConversationSqlRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ConversationFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="Conversation"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MessageCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ChatMessageSqlRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MessageFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="ChatMessage"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="CloseTicket" PackageId="ImtCoreVoce" ComponentId="Command">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -193,6 +234,29 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="Conversation" PackageId="ImtChatPck" ComponentId="Conversation">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="ConversationSqlRepository" PackageId="ImtChatVoce" ComponentId="ConversationSqlRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="Demultiplexer" PackageId="ImtServerGqlPck" ComponentId="GraphQLDemultiplexer">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -259,6 +323,9 @@
         <Element Id="TicketCollectionController" PackageId="ImtDeskGqlPck" ComponentId="TicketCollectionController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ChatService" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ChatService"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Tickets"/>
                     </AttributeInfo>
@@ -315,9 +382,6 @@
                     <AttributeInfo Id="TicketFactory" Type="Factory" ExportId="">
                         <Data IsEnabled="true" Value="SupportTicket"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ChatService" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ChatService"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -336,17 +400,17 @@
         <Element Id="TicketCollectionDocumentManager" PackageId="ImtDeskGqlPck" ComponentId="TicketCollectionDocumentManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="CollectionDocumentManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="CollectionDocumentManager"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="MessageCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ChatMessageSqlRepository"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="ChatService" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ChatService"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="CollectionDocumentManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="CollectionDocumentManager"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MessageCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ChatMessageSqlRepository"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PermissionChecker" Type="Reference" ExportId="PermissionChecker">
                         <Data IsEnabled="false"/>
@@ -363,70 +427,6 @@
         <Element Id="TicketDocumentNameProvider" PackageId="ImtDeskPck" ComponentId="TicketDocumentNameProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap/>
-            </Data>
-        </Element>
-        <Element Id="Conversation" PackageId="ImtChatPck" ComponentId="Conversation">
-            <Data IsEnabled="true" Flags="2">
-                <AttributeInfoMap/>
-            </Data>
-        </Element>
-        <Element Id="ConversationSqlRepository" PackageId="ImtChatVoce" ComponentId="ConversationSqlRepository">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="ChatMessage" PackageId="ImtChatPck" ComponentId="ChatMessage">
-            <Data IsEnabled="true" Flags="2">
-                <AttributeInfoMap/>
-            </Data>
-        </Element>
-        <Element Id="ChatMessageSqlRepository" PackageId="ImtChatVoce" ComponentId="ChatMessageSqlRepository">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="ChatService" PackageId="ImtChatPck" ComponentId="ChatService">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="MessageCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ChatMessageSqlRepository"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ConversationCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ConversationSqlRepository"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="MessageFactory" Type="Factory" ExportId="">
-                        <Data IsEnabled="true" Value="ChatMessage"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ConversationFactory" Type="Factory" ExportId="">
-                        <Data IsEnabled="true" Value="Conversation"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="TicketSqlRepository" PackageId="ImtDeskVoce" ComponentId="TicketSqlRepository">

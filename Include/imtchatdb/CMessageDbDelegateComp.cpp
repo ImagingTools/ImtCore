@@ -100,7 +100,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CMessageDbDelegateComp::CreateNew
 		const istd::IChangeable* valuePtr,
 		const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	if (typeId.isEmpty() || typeId != "Message"){
+	if (typeId.isEmpty() || typeId != "ChatMessage"){
 		return NewObjectQuery();
 	}
 

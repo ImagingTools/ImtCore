@@ -9,22 +9,24 @@
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="BaseCollectionCommands" X="1025" Y="100" Note=""/>
+        <Element ComponentName="ChatMessage" X="1100" Y="700" Note=""/>
+        <Element ComponentName="ChatMessageSqlRepository" X="875" Y="275" Note=""/>
+        <Element ComponentName="ChatService" X="1125" Y="350" Note=""/>
         <Element ComponentName="CloseTicket" X="475" Y="350" Note=""/>
         <Element ComponentName="CollectionDocumentManager" X="650" Y="725" Note=""/>
         <Element ComponentName="CollectionHeadersProvider" X="650" Y="575" Note=""/>
         <Element ComponentName="CommandsController" X="200" Y="250" Note=""/>
+        <Element ComponentName="Conversation" X="0" Y="0" Note=""/>
+        <Element ComponentName="ConversationSqlRepository" X="0" Y="0" Note=""/>
         <Element ComponentName="Demultiplexer" X="550" Y="75" Note=""/>
         <Element ComponentName="SlaveSubscriberController" X="625" Y="200" Note=""/>
         <Element ComponentName="StandardDocumentCommands" X="225" Y="450" Note=""/>
         <Element ComponentName="SupportTicket" X="1000" Y="750" Note=""/>
-        <Element ComponentName="TicketCollectionController" X="1025" Y="550" Note=""/>
+        <Element ComponentName="TicketCollectionController" X="1050" Y="525" Note=""/>
         <Element ComponentName="TicketCollectionDocumentManager" X="775" Y="450" Note=""/>
-        <Element ComponentName="TicketDocumentNameProvider" X="1000" Y="625" Note=""/>
+        <Element ComponentName="TicketDocumentNameProvider" X="1050" Y="625" Note=""/>
         <Element ComponentName="TicketSqlRepository" X="275" Y="725" Note=""/>
         <Element ComponentName="TicketsChangeNotifier" X="200" Y="75" Note=""/>
-        <Element ComponentName="ChatMessage" X="1200" Y="750" Note=""/>
-        <Element ComponentName="ChatMessageSqlRepository" X="1200" Y="600" Note=""/>
-        <Element ComponentName="ChatService" X="1200" Y="450" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

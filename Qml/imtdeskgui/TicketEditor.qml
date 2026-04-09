@@ -78,15 +78,23 @@ ViewBase {
 	function addComment(commentText) {
 		if (!commentText || commentText.length === 0 || !ticketData)
 			return
-		
+
+		setBlockingUpdateModel(true)
 		var userId = AuthorizationController.getUserId()
 		var userName = AuthorizationController.userTokenProvider.login || ""
 		var now = new Date().toISOString()
 		
-		// Create a TicketActivityItem via Component and add to BaseModel
-		var newItem = activityItemComp.createObject(root)
-		if (!newItem)
+		if (!ticketData.hasActivityItems()){
+			ticketData.emplaceActivityItems()
+		}
+
+		let newItem = ticketData.createActivityItemsArrayElement()
+		if (!newItem){
+			setBlockingUpdateModel(false)
 			return
+		}
+
+		console.log("addComment", commentText)
 		newItem.m_itemType = "Comment"
 		newItem.m_userId = userId
 		newItem.m_userName = userName
@@ -95,6 +103,7 @@ ViewBase {
 		newItem.m_reactions = []
 		ticketData.m_activityItems.addElement(newItem)
 		
+		console.log("ticketData", ticketData.toJson())
 		// Add to local commentMessages for immediate display
 		var msgs = root.commentMessages || []
 		msgs = msgs.concat([{
@@ -105,7 +114,9 @@ ViewBase {
 			reactions: []
 		}])
 		root.commentMessages = msgs
-		
+
+		setBlockingUpdateModel(false)
+		ticketData.modelChanged()
 		root.commentSubmitted(commentText)
 	}
 	
