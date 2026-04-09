@@ -651,12 +651,7 @@ ViewBase {
 											
 											Text {
 												width: parent.width - 32 - Style.paddingS
-												text: {
-													let who = modelData.userName || qsTr("Someone")
-													let action = modelData.actionDescription || modelData.actionType || ""
-													let when = modelData.timestamp || ""
-													return who + " " + action + " " + when
-												}
+												text: (modelData.userName || qsTr("Someone")) + " " + (modelData.actionDescription || modelData.actionType || "") + " " + (modelData.timestamp || "")
 												font.pixelSize: Style.fontSizeS
 												color: Style.textSecondaryColor
 												wrapMode: Text.Wrap
@@ -679,10 +674,7 @@ ViewBase {
 												
 												Text {
 													anchors.centerIn: parent
-													text: {
-														let n = modelData.userName || ""
-														return n.length > 0 ? n.charAt(0).toUpperCase() : "?"
-													}
+													text: modelData.userName ? modelData.userName.charAt(0).toUpperCase() : "?"
 													font.pixelSize: Style.fontSizeXS
 													color: "white"
 													font.bold: true
