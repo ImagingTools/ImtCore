@@ -286,14 +286,9 @@ bool CTicketCollectionControllerComp::FillObjectFromRepresentation(
 		ticketPtr->SetStateReason(imtdeskgql::GetStateReasonFromSdlType(*representation.stateReason));
 	}
 
-	if (representation.activityItems){
-		// Activity items of type Action are stored in the TicketActions collection
-		// independently from the ticket. The SDL transport layer carries them
-		// together for convenience, but they are persisted separately.
-	}
-
 	return true;
 }
 
 
 } // namespace imtdeskgql
+

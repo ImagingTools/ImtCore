@@ -305,7 +305,7 @@ QByteArray CSupportTicketDbDelegateComp::CreateDeleteObjectsQuery(
 		idsStr += QString("'%1'").arg(QString::fromUtf8(objectIds[i]));
 	}
 
-	return QString("DELETE FROM \"TicketActions\" WHERE \"TicketId\" IN (%1);\n"
+	return QString("DELETE FROM \"Tickets\" WHERE \"Id\" IN (%1);\n"
 				 "DELETE FROM \"Tickets\" WHERE \"Id\" IN (%1);")
 		.arg(idsStr)
 		.toUtf8();
