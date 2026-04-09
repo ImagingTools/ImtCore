@@ -3,6 +3,7 @@
 
 // ImtCore includes
 #include <imtdesk/ISupportTicket.h>
+#include <imtchat/IConversation.h>
 #include <imtbase/IObjectCollection.h>
 #include <GeneratedFiles/imtdesksdl/SDL/1.0/CPP/ImtDesk.h>
 
@@ -20,6 +21,8 @@ public:
 	I_BEGIN_COMPONENT(CTicketCollectionControllerComp);
 		I_ASSIGN(m_ticketFactCompPtr, "TicketFactory", "Factory for creating ticket instances", true, "TicketFactory");
 		I_ASSIGN(m_ticketActionsCollectionCompPtr, "TicketActionsCollection", "Collection of ticket actions", false, "TicketActionsCollection");
+		I_ASSIGN(m_conversationCollectionCompPtr, "ConversationCollection", "Collection of conversations", false, "ConversationCollection");
+		I_ASSIGN(m_conversationFactCompPtr, "ConversationFactory", "Factory for creating conversation instances", false, "ConversationFactory");
 	I_END_COMPONENT;
 
 protected:
@@ -54,6 +57,8 @@ private:
 protected:
 	I_FACT(imtdesk::ISupportTicket, m_ticketFactCompPtr);
 	I_REF(imtbase::IObjectCollection, m_ticketActionsCollectionCompPtr);
+	I_REF(imtbase::IObjectCollection, m_conversationCollectionCompPtr);
+	I_FACT(imtchat::IConversation, m_conversationFactCompPtr);
 };
 
 

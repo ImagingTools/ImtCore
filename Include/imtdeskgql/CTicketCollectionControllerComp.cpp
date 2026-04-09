@@ -11,6 +11,7 @@
 // ImtCore includes
 #include <imtdesk/ISupportTicket.h>
 #include <imtdesk/ITicketAction.h>
+#include <imtchat/IConversation.h>
 #include <imtbase/IObjectCollectionIterator.h>
 #include <imtdeskgql/imtdeskgql.h>
 
@@ -111,6 +112,28 @@ istd::IChangeableUniquePtr CTicketCollectionControllerComp::CreateObjectFromRepr
 
 	if (!FillObjectFromRepresentation(dataRepresentation, *ticketPtr, newObjectId, errorMessage)){
 		return nullptr;
+	}
+
+	// Auto-create a Conversation for the new ticket if none was provided
+	if (ticketPtr->GetConversationId().isEmpty()
+		&& m_conversationCollectionCompPtr.IsValid()
+		&& m_conversationFactCompPtr.IsValid()){
+		imtchat::IConversationUniquePtr convPtr = m_conversationFactCompPtr.CreateInstance();
+		if (convPtr.IsValid()){
+			QByteArray convId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+			convPtr->SetId(convId);
+			convPtr->SetName(ticketPtr->GetTitle());
+			convPtr->SetConversationType(imtchat::IConversation::CT_SUPPORT);
+
+			m_conversationCollectionCompPtr->InsertNewObject(
+						QByteArray("Conversation"),
+						QString(),
+						QString(),
+						convPtr.GetPtr(),
+						convId);
+
+			ticketPtr->SetConversationId(convId);
+		}
 	}
 
 	return ticketPtr;
