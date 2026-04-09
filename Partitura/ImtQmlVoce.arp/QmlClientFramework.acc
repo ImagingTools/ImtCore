@@ -148,8 +148,8 @@
         <Element Id="MainWindow" PackageId="ImtQmlPck" ComponentId="QuickObject">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ApplicationInfoController" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ApplicationInfoDelegator"/>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApplicationInfo"/>
                     </AttributeInfo>
                     <AttributeInfo Id="BaseUrl" Type="String" ExportId="BaseUrl">
                         <Data IsEnabled="false"/>
