@@ -13,6 +13,7 @@ namespace imtchat
 
 QByteArray CChatServiceComp::SendMessage(
 			const QByteArray& conversationId,
+			const QByteArray& senderId,
 			const QString& content,
 			const QByteArrayList& entityReferences,
 			const QByteArrayList& attachmentIds)
@@ -36,6 +37,7 @@ QByteArray CChatServiceComp::SendMessage(
 
 	chatMessagePtr->SetId(newId);
 	chatMessagePtr->SetConversationId(conversationId);
+	chatMessagePtr->SetSenderId(senderId);
 	chatMessagePtr->SetContent(content);
 	chatMessagePtr->SetStatus(IChatMessage::MS_SENT);
 	chatMessagePtr->SetEntityReferences(entityReferences);

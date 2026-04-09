@@ -274,7 +274,12 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 					content = *sdlItem->content;
 				}
 
-				m_chatServiceCompPtr->SendMessage(conversationId, content);
+				QByteArray senderId = userId;
+				if (sdlItem->userId && !sdlItem->userId->isEmpty()){
+					senderId = sdlItem->userId->toUtf8();
+				}
+
+				m_chatServiceCompPtr->SendMessage(conversationId, senderId, content);
 			}
 		}
 	}

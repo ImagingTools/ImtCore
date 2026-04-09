@@ -27,6 +27,7 @@ public:
 	/**
 		Send a message to a conversation.
 		\param conversationId    Target conversation ID.
+		\param senderId          User ID of the message sender.
 		\param content           Message text content.
 		\param entityReferences  Optional entity reference IDs.
 		\param attachmentIds     Optional attachment IDs.
@@ -34,6 +35,7 @@ public:
 	*/
 	virtual QByteArray SendMessage(
 				const QByteArray& conversationId,
+				const QByteArray& senderId,
 				const QString& content,
 				const QByteArrayList& entityReferences = QByteArrayList(),
 				const QByteArrayList& attachmentIds = QByteArrayList()) = 0;
