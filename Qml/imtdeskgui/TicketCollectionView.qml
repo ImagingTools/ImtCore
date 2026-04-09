@@ -35,11 +35,7 @@ RemoteCollectionView {
 
 				TicketEditor {
 					id: ticketEditor
-					commandsControllerComp: Component {
-						GqlBasedCommandsController {
-							typeId: "Ticket"
-						}
-					}
+					commandsControllerComp: null
 				}
 			}
 

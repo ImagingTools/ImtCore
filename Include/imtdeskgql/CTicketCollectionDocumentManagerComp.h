@@ -26,6 +26,7 @@ public:
 	I_BEGIN_COMPONENT(CTicketCollectionDocumentManagerComp)
 		I_ASSIGN(m_documentManagerCompPtr, "CollectionDocumentManager", "Collection document manager", false, "CollectionDocumentManager");
 		I_ASSIGN(m_messageCollectionCompPtr, "MessageCollection", "Collection of chat messages", false, "MessageCollection");
+		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "Collection of users", true, "UserCollection");
 		I_ASSIGN(m_chatServiceCompPtr, "ChatService", "Chat service for message and conversation management", false, "ChatService");
 	I_END_COMPONENT
 
@@ -42,6 +43,7 @@ protected:
 private:
 	I_REF(imtdoc::IDocumentManager, m_documentManagerCompPtr);
 	I_REF(imtbase::IObjectCollection, m_messageCollectionCompPtr);
+	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
 	I_REF(imtchat::IChatService, m_chatServiceCompPtr);
 };
 

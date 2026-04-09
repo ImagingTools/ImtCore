@@ -102,6 +102,18 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 						itemData.id = msgPtr->GetId();
 						itemData.itemType = sdl::imtdesk::ImtDesk::ActivityItemType::Comment;
 						itemData.userId = msgPtr->GetSenderId();
+
+						itemData.userName = "";
+						imtbase::IObjectCollection::DataPtr dataPtr;
+						if (m_userCollectionCompPtr.IsValid()){
+							if (m_userCollectionCompPtr->GetObjectData(*itemData.userId, dataPtr)){
+								const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
+								if (userInfoPtr != nullptr){
+									itemData.userName = userInfoPtr->GetName();
+								}
+							}
+						}
+
 						itemData.timestamp = msgPtr->GetCreatedAt();
 						itemData.content = msgPtr->GetContent();
 

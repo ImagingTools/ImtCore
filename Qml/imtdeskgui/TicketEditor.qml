@@ -72,6 +72,7 @@ ViewBase {
 	}
 	
 	function updateGui() {
+		console.log("TicketEditor.qml updateGui", root.isNewIssue)
 		if (root.isNewIssue) {
 			newTitleInput.text = ticketData.m_title || ""
 			newDescriptionInput.text = ticketData.m_description || ""
@@ -122,6 +123,9 @@ ViewBase {
 					}
 				}
 			}
+			console.log("ticketData.m_activityItems", ticketData.m_activityItems.toJson())
+			activityThread.model = 0
+			activityThread.model = ticketData.m_activityItems
 		}
 	}
 	
@@ -354,15 +358,38 @@ ViewBase {
 							font.bold: true
 							color: Style.textColor
 						}
-						
-						TextEditCustom {
-							id: newDescriptionInput
+
+						Rectangle {
 							width: parent.width
-							isDinamicHeight: false
-							height: 300
-							placeHolderText: qsTr("Leave a comment")
-							onEditingFinished: {
-								root.doUpdateModel()
+							height: newDescriptionInput.height + Style.paddingM * 2
+							radius: Style.radiusS
+							border.color: newDescriptionInput.activeFocus
+										  ? Style.accentColor
+										  : Style.borderColor
+							border.width: 1
+							color: Style.baseColor
+
+							TextEdit {
+								id: newDescriptionInput
+								anchors.left: parent.left
+								anchors.right: parent.right
+								anchors.top: parent.top
+								anchors.margins: Style.paddingM
+								font.pixelSize: Style.fontSizeS
+								color: Style.textColor
+								wrapMode: TextEdit.Wrap
+								clip: true
+								onEditingFinished: {
+									root.doUpdateModel()
+								}
+	
+								Text {
+									anchors.fill: parent
+									text: qsTr("Leave a comment")
+									color: Style.textPlaceholderColor
+									font.pixelSize: Style.fontSizeS
+									visible: newDescriptionInput.text.length === 0
+								}
 							}
 						}
 					}
@@ -567,13 +594,29 @@ ViewBase {
 								color: Style.textColor
 							}
 							
-							CustomTextField {
-								id: editDescriptionInput
+							Rectangle {
 								width: parent.width
-								height: 200
-								placeHolderText: qsTr("Leave a comment")
-								onEditingFinished: {
-									root.doUpdateModel()
+								height: editDescriptionInput.height + Style.paddingM * 2
+								radius: Style.radiusS
+								border.color: editDescriptionInput.activeFocus
+											  ? Style.accentColor
+											  : Style.borderColor
+								border.width: 1
+								color: Style.baseColor
+	
+								TextEdit {
+									id: editDescriptionInput
+									anchors.left: parent.left
+									anchors.right: parent.right
+									anchors.top: parent.top
+									anchors.margins: Style.paddingM
+									font.pixelSize: Style.fontSizeS
+									color: Style.textColor
+									wrapMode: TextEdit.Wrap
+									clip: true
+									onEditingFinished: {
+										root.doUpdateModel()
+									}
 								}
 							}
 						}
@@ -619,10 +662,9 @@ ViewBase {
 								
 								Repeater {
 									id: activityThread
-									model: ticketData ? ticketData.m_activityItems : null
-									
+
 									// Each item = comment bubble OR action notice
-									Column {
+									delegate: Column {
 										width: activityListCol.width
 										spacing: Style.spacingXS
 										
@@ -664,17 +706,18 @@ ViewBase {
 											
 											// Avatar circle
 											Rectangle {
-												width: 32
-												height: 32
-												radius: 16
+												anchors.verticalCenter: parent.verticalCenter
+												width: 40
+												height: width
+												radius: width / 2
 												color: Style.accentColor
-												
+
 												Text {
 													anchors.centerIn: parent
 													text: model.item.m_userName ? model.item.m_userName.charAt(0).toUpperCase() : "?"
 													font.pixelSize: Style.fontSizeXS
-													color: "white"
-													font.bold: true
+													color: Style.textColor
+													font.family: Style.fontFamily
 												}
 											}
 											
@@ -732,13 +775,13 @@ ViewBase {
 								width: parent.width
 								height: 1
 								color: Style.borderColor
-								visible: !ticketData || !ticketData.m_locked
+								visible: !root.ticketData || !root.ticketData.m_locked
 							}
 							
 							Column {
 								width: parent.width
 								spacing: Style.spacingS
-								visible: !ticketData || !ticketData.m_locked
+								visible: !root.ticketData || !root.ticketData.m_locked
 								
 								Text {
 									text: qsTr("Add a comment")
@@ -780,7 +823,7 @@ ViewBase {
 														  ? Style.accentColor
 														  : Style.borderColor
 											border.width: 1
-											color: Style.backgroundColor
+											color: Style.baseColor
 											
 											TextEdit {
 												id: commentInputField
@@ -821,10 +864,10 @@ ViewBase {
 									}
 								}
 							}
-							
+
 							// Lock notice
 							Row {
-								visible: ticketData && ticketData.m_locked
+								visible: root.ticketData && root.ticketData.m_locked
 								width: parent.width
 								spacing: Style.paddingS
 								

@@ -77,6 +77,9 @@
                     <AttributeInfo Id="UserActionManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="UserActionController/UserActionManager"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaClientEngine/CachedUserCollection"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
