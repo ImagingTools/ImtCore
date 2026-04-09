@@ -64,7 +64,7 @@ ViewBase {
 	signal commentSubmitted(string commentText)
 	
 	function addComment(commentText) {
-		if (!commentText || commentText.length === 0)
+		if (!commentText || commentText.length === 0 || !ticketData)
 			return
 		
 		var userId = AuthorizationController.getUserId()
@@ -72,19 +72,16 @@ ViewBase {
 		var now = new Date().toISOString()
 		
 		// Add to ticketData.m_activityItems so the C++ handler persists it as a message
-		var newItem = {
+		var items = ticketData.m_activityItems || []
+		items = items.concat([{
 			itemType: "Comment",
 			userId: userId,
 			userName: userName,
 			timestamp: now,
 			content: commentText,
 			reactions: []
-		}
-		var items = ticketData ? (ticketData.m_activityItems || []) : []
-		items = items.concat([newItem])
-		if (ticketData) {
-			ticketData.m_activityItems = items
-		}
+		}])
+		ticketData.m_activityItems = items
 		
 		// Add to local commentMessages for immediate display
 		var msgs = root.commentMessages || []
