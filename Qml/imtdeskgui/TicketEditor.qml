@@ -85,11 +85,14 @@ ViewBase {
 		
 		// Create a TicketActivityItem via Component and add to BaseModel
 		var newItem = activityItemComp.createObject(root)
+		if (!newItem)
+			return
 		newItem.m_itemType = "Comment"
 		newItem.m_userId = userId
 		newItem.m_userName = userName
 		newItem.m_timestamp = now
 		newItem.m_content = commentText
+		newItem.m_reactions = []
 		ticketData.m_activityItems.addElement(newItem)
 		
 		// Add to local commentMessages for immediate display
