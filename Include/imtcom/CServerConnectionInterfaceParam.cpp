@@ -66,6 +66,22 @@ void CServerConnectionInterfaceParam::SetHost(const QString& host)
 }
 
 
+QString CServerConnectionInterfaceParam::GetPath() const
+{
+	return m_path;
+}
+
+
+void CServerConnectionInterfaceParam::SetPath(const QString& path)
+{
+	if (m_path != path){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_path = path;
+	}
+}
+
+
 int CServerConnectionInterfaceParam::GetPort(ProtocolType protocol) const
 {
 	if (m_interfaceMap.contains(protocol)){
@@ -119,6 +135,9 @@ bool CServerConnectionInterfaceParam::GetUrl(ProtocolType protocol, QUrl& url) c
 	url.setScheme(scheme);
 	url.setHost(m_host);
 	url.setPort(port);
+	if (!m_path.isEmpty()){
+		url.setPath(m_path);
+	}
 
 	return url.isValid();
 }
@@ -134,6 +153,11 @@ bool CServerConnectionInterfaceParam::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.BeginTag(hostTag);
 	retVal = retVal && archive.Process(m_host);
 	retVal = retVal && archive.EndTag(hostTag);
+
+	static iser::CArchiveTag pathTag("Path", "URL path component");
+	retVal = retVal && archive.BeginTag(pathTag);
+	retVal = retVal && archive.Process(m_path);
+	retVal = retVal && archive.EndTag(pathTag);
 
 	static iser::CArchiveTag connectionFlagsTag("ConnectionFlags", "Connection settings");
 	retVal = retVal && archive.BeginTag(connectionFlagsTag);
@@ -175,6 +199,7 @@ bool CServerConnectionInterfaceParam::CopyFrom(const IChangeable& object, Compat
 		m_interfaceMap = sourcePtr->m_interfaceMap;
 		m_connectionFlags = sourcePtr->m_connectionFlags;
 		m_host = sourcePtr->m_host;
+		m_path = sourcePtr->m_path;
 
 		return true;
 	}
@@ -190,6 +215,7 @@ bool CServerConnectionInterfaceParam::IsEqual(const IChangeable& object) const
 		bool retVal = m_interfaceMap == sourcePtr->m_interfaceMap;
 		retVal = retVal && m_connectionFlags == sourcePtr->m_connectionFlags;
 		retVal = retVal && m_host == sourcePtr->m_host;
+		retVal = retVal && m_path == sourcePtr->m_path;
 
 		return retVal;
 	}
@@ -216,6 +242,7 @@ bool CServerConnectionInterfaceParam::ResetData(CompatibilityMode /*mode*/)
 	m_interfaceMap.clear();
 	m_connectionFlags = CF_DEFAULT;
 	m_host.clear();
+	m_path.clear();
 
 	return true;
 }

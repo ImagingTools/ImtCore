@@ -148,6 +148,8 @@ public:
 	virtual void SetPort(ProtocolType protocol, int port) override;
 	virtual ProtocolTypes GetSupportedProtocols() const override;
 	virtual bool GetUrl(ProtocolType protocol, QUrl& url) const override;
+	virtual QString GetPath() const override;
+	virtual void SetPath(const QString& path) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -165,6 +167,7 @@ protected:
 
 	int m_connectionFlags = CF_DEFAULT;
 	QString m_host;
+	QString m_path;
 };
 
 
