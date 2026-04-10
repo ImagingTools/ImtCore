@@ -35,30 +35,7 @@ RemoteCollectionView {
 				id: ticketEditorComp
 
 				TicketEditor {
-					id: ticketEditor
 					commandsControllerComp: null
-
-					SubscriptionClient {
-						gqlCommandId: container.subscriptionCommandId
-						onMessageReceived: {
-							if (!data){
-								return
-							}
-
-							if (!ticketEditor.ticketData){
-								return
-							}
-
-							console.log("SubscriptionClient updateRepresentationFromDocument")
-							let itemId = data.getData("itemId")
-							let typeOperation = data.getData("typeOperation")
-							if (typeOperation === "updated" && itemId === ticketEditor.ticketData.m_id){
-								if (ticketEditor.representationController){
-									ticketEditor.representationController.updateRepresentationFromDocument()
-								}
-							}
-						}
-					}
 				}
 			}
 
