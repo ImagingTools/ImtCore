@@ -103,8 +103,9 @@ async function runTest(testFiles) {
             console.log(`${colors.green}[+] ${testFiles[fileUrl]}${colors.reset}`)
           } else {
             console.log(`${colors.red}[-] ${testFiles[fileUrl]}${colors.reset}`)
-            fs.writeFileSync(path.resolve(__dirname, `./${testFiles[fileUrl]}/output.txt`), messages.join('\n'), 'utf-8')
           }
+
+          fs.writeFileSync(path.resolve(__dirname, `./${testFiles[fileUrl]}/output.txt`), messages.join('\n'), 'utf-8')
           
 
           
