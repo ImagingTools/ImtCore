@@ -13,7 +13,7 @@ import imtdeskTicketCollectionDocumentManagerSdl 1.0
 import imtauthUsersSdl 1.0
 import imtchatgui 1.0
 
-ViewBase {
+DocumentViewBase {
 	id: root
 	
 	anchors.fill: parent
@@ -46,7 +46,6 @@ ViewBase {
 			return
 		}
 
-		console.log("addComment", commentText)
 		newItem.m_itemType = "Comment"
 		newItem.m_userId = userId
 		newItem.m_userName = userName
@@ -73,7 +72,6 @@ ViewBase {
 	}
 	
 	function updateGui() {
-		console.log("TicketEditor.qml updateGui", root.isNewIssue)
 		if (root.isNewIssue) {
 			newTitleInput.text = ticketData.m_title || ""
 			newDescriptionInput.text = ticketData.m_description || ""
@@ -124,14 +122,12 @@ ViewBase {
 					}
 				}
 			}
-			console.log("ticketData.m_activityItems", ticketData.m_activityItems.toJson())
 			activityThread.model = 0
 			activityThread.model = ticketData.m_activityItems
 		}
 	}
 	
 	function updateModel() {
-		console.log("TicketEditor updateModel")
 		if (root.isNewIssue) {
 			ticketData.m_title = newTitleInput.text
 			ticketData.m_description = newDescriptionInput.text
@@ -854,6 +850,7 @@ ViewBase {
 											model: root.ticketData ? root.ticketData.m_activityItems : null
 											
 											delegate: Item {
+												id: chatDelegate
 												width: chatMessagesCol.width
 												height: chatBubbleCol.height + Style.paddingXS
 												visible: model.item.m_itemType !== "Action"
@@ -862,14 +859,14 @@ ViewBase {
 												
 												Column {
 													id: chatBubbleCol
-													anchors.right: isOwnMessage ? parent.right : undefined
-													anchors.left: isOwnMessage ? undefined : parent.left
+													anchors.right: chatDelegate.isOwnMessage ? parent.right : undefined
+													anchors.left: chatDelegate.isOwnMessage ? undefined : parent.left
 													width: parent.width * 0.75
 													spacing: Style.paddingXS
 													
 													// Sender name (received messages only)
 													Text {
-														visible: !isOwnMessage
+														visible: !chatDelegate.isOwnMessage
 														text: model.item.m_userName || qsTr("Unknown")
 														font.pixelSize: Style.fontSizeXS
 														font.bold: true
@@ -881,7 +878,7 @@ ViewBase {
 														width: chatBubbleCol.width
 														height: chatBubbleText.height + Style.paddingS * 2
 														radius: Style.radiusS
-														color: isOwnMessage ? Style.accentColor : Style.surfaceColor
+														color: chatDelegate.isOwnMessage ? Style.accentColor : Style.surfaceColor
 														
 														Text {
 															id: chatBubbleText
@@ -891,15 +888,15 @@ ViewBase {
 															anchors.margins: Style.paddingS
 															text: model.item.m_content || ""
 															font.pixelSize: Style.fontSizeS
-															color: isOwnMessage ? "white" : Style.textColor
+															color: chatDelegate.isOwnMessage ? "white" : Style.textColor
 															wrapMode: Text.Wrap
 														}
 													}
 													
 													// Timestamp
 													Text {
-														anchors.right: isOwnMessage ? chatBubbleCol.right : undefined
-														anchors.left: isOwnMessage ? undefined : chatBubbleCol.left
+														anchors.right: chatDelegate.isOwnMessage ? chatBubbleCol.right : undefined
+														anchors.left: chatDelegate.isOwnMessage ? undefined : chatBubbleCol.left
 														text: model.item.m_timestamp || ""
 														font.pixelSize: Style.fontSizeXS
 														color: Style.textSecondaryColor

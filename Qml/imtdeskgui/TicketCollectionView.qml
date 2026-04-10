@@ -18,6 +18,7 @@ RemoteCollectionView {
 	gqlGetListCommandId: ImtdeskImtDeskSdlCommandIds.s_ticketsList
 
 	Component.onCompleted: {
+		console.log("TicketCollectionView.qml onCompleted", table)
 		table.setSortingInfo(TicketItemDataTypeMetaInfo.s_createdAt, "DESC")
 	}
 
@@ -36,6 +37,28 @@ RemoteCollectionView {
 				TicketEditor {
 					id: ticketEditor
 					commandsControllerComp: null
+
+					SubscriptionClient {
+						gqlCommandId: container.subscriptionCommandId
+						onMessageReceived: {
+							if (!data){
+								return
+							}
+
+							if (!ticketEditor.ticketData){
+								return
+							}
+
+							console.log("SubscriptionClient updateRepresentationFromDocument")
+							let itemId = data.getData("itemId")
+							let typeOperation = data.getData("typeOperation")
+							if (typeOperation === "updated" && itemId === ticketEditor.ticketData.m_id){
+								if (ticketEditor.representationController){
+									// ticketEditor.representationController.updateRepresentationFromDocument()
+								}
+							}
+						}
+					}
 				}
 			}
 
@@ -57,6 +80,8 @@ RemoteCollectionView {
 						startUpdateRepresentation(documentId, representationModel)
 
 						documentIdInput.m_id = documentId
+						documentIdInput.m_collectionId = container.collectionId
+
 						getTicketRequest.send(documentIdInput)
 					}
 
@@ -67,36 +92,6 @@ RemoteCollectionView {
 						updateTicketInput.m_ticket = representationModel
 
 						updateTicketRequest.send(updateTicketInput)
-					}
-
-					// Subscription: listen for document changes from other clients
-					property SubscriptionClient ticketSubscription: SubscriptionClient {
-						gqlCommandId: "OnTicketsDocumentChanged"
-
-						onMessageReceived: {
-							let changedDocId = data.getData("documentId")
-							if (changedDocId === root.documentId){
-								root.updateRepresentationFromDocument()
-							}
-						}
-
-						function getHeaders(){
-							return {}
-						}
-					}
-
-					// Polling timer: messages are saved via IChatService::SendMessage() which does
-					// not trigger ticket document change notifications (to prevent infinite loops
-					// when multiple clients have the same ticket open). Polling provides
-					// near-real-time message visibility across clients.
-					property Timer messagePollingTimer: Timer {
-						interval: 5000
-						repeat: true
-						running: root.documentId !== ""
-
-						onTriggered: {
-							root.updateRepresentationFromDocument()
-						}
 					}
 
 					property DocumentId documentIdInput: DocumentId {}

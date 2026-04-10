@@ -179,96 +179,76 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 		return response;
 	}
 
-	bool ticketChanged = false;
-
 	if (ticketInfo.title){
 		ticketPtr->SetTitle(*ticketInfo.title);
-		ticketChanged = true;
 	}
 
 	if (ticketInfo.description){
 		ticketPtr->SetDescription(*ticketInfo.description);
-		ticketChanged = true;
 	}
 
 	if (ticketInfo.assigneeIds){
 		ticketPtr->SetAssigneeIds(ticketInfo.assigneeIds->ToList());
-		ticketChanged = true;
 	}
 
 	if (ticketInfo.reporterId){
 		ticketPtr->SetReporterId(*ticketInfo.reporterId);
-		ticketChanged = true;
 	}
 
 	if (ticketInfo.conversationId){
 		ticketPtr->SetConversationId(*ticketInfo.conversationId);
-		ticketChanged = true;
 	}
 
 	if (ticketInfo.messageId){
 		ticketPtr->SetMessageId(*ticketInfo.messageId);
-		ticketChanged = true;
 	}
 
 	if (ticketInfo.labelIds){
 		ticketPtr->SetLabelIds(ticketInfo.labelIds->ToList());
-		ticketChanged = true;
 	}
 
 	if (ticketInfo.locked){
 		ticketPtr->SetLocked(*ticketInfo.locked);
-		ticketChanged = true;
 	}
 
 	if (ticketInfo.lockReason){
 		ticketPtr->SetLockReason(*ticketInfo.lockReason);
-		ticketChanged = true;
 	}
 
 	if (ticketInfo.number){
 		ticketPtr->SetNumber(*ticketInfo.number);
-		ticketChanged = true;
 	}
 
 	if (ticketInfo.createdAt){
 		ticketPtr->SetCreatedAt(*ticketInfo.createdAt);
-		ticketChanged = true;
 	}
 
 	if (ticketInfo.updatedAt){
 		ticketPtr->SetUpdatedAt(*ticketInfo.updatedAt);
-		ticketChanged = true;
 	}
 
 	if (ticketInfo.resolvedAt){
 		ticketPtr->SetResolvedAt(*ticketInfo.resolvedAt);
-		ticketChanged = true;
 	}
 
 	if (ticketInfo.closedAt){
 		ticketPtr->SetClosedAt(*ticketInfo.closedAt);
-		ticketChanged = true;
 	}
 
 	if (ticketInfo.ticketType){
 		ticketPtr->SetTicketType(imtdeskgql::GetTicketTypeFromSdlType(*ticketInfo.ticketType));
-		ticketChanged = true;
 	}
 
 	if (ticketInfo.status){
 		ticketPtr->SetStatus(imtdeskgql::GetStatusTypeFromSdlType(*ticketInfo.status));
-		ticketChanged = true;
 	}
 
 	if (ticketInfo.stateReason){
 		ticketPtr->SetStateReason(imtdeskgql::GetStateReasonFromSdlType(*ticketInfo.stateReason));
-		ticketChanged = true;
 	}
 
 	if (ticketInfo.priority){
 		ticketPtr->SetPriority(imtdeskgql::GetPriorityTypeFromSdlType(*ticketInfo.priority));
-		ticketChanged = true;
 	}
 
 	// Auto-create a Conversation if the ticket does not have one yet
@@ -279,7 +259,6 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 					QByteArrayList());
 		if (!convId.isEmpty()){
 			ticketPtr->SetConversationId(convId);
-			ticketChanged = true;
 		}
 	}
 
@@ -315,14 +294,8 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 		}
 	}
 
-	// Only save and notify if actual ticket fields changed.
-	// Messages are saved via IChatService above and do not affect the ticket document.
-	// This prevents false change notifications that cause infinite re-fetch loops
-	// when multiple clients have the same ticket open.
-	if (ticketChanged){
-		m_documentManagerCompPtr->SetDocumentData(userId, documentId, *ticketPtr);
-		m_documentManagerCompPtr->SaveDocument(userId, documentId);
-	}
+	m_documentManagerCompPtr->SetDocumentData(userId, documentId, *ticketPtr);
+	m_documentManagerCompPtr->SaveDocument(userId, documentId);
 
 	response.Version_1_0->status = sdl::imtbase::CollectionDocumentManager::EDocumentOperationStatus::Success;
 
