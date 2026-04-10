@@ -1,4 +1,6 @@
-Item.onWidthChanged 180
+Row.onWidthChanged 180
+Row.onHeightChanged 75
 Item.onHeightChanged 75
+Item.onWidthChanged 180
 Item.onCompleted
 Row.onCompleted

@@ -1,0 +1,10 @@
+innerRect.x (относительно container): 0
+innerRect.y (относительно container): 0
+innerRect.width: 300
+innerRect.height: 200
+container.x: 100
+container.y: 100
+Абсолютные координаты innerRect: 100 100
+container.width: 300
+container.height: 200
+Совпадение размеров? true
