@@ -54,7 +54,7 @@ RemoteCollectionView {
 							let typeOperation = data.getData("typeOperation")
 							if (typeOperation === "updated" && itemId === ticketEditor.ticketData.m_id){
 								if (ticketEditor.representationController){
-									// ticketEditor.representationController.updateRepresentationFromDocument()
+									ticketEditor.representationController.updateRepresentationFromDocument()
 								}
 							}
 						}
@@ -77,6 +77,7 @@ RemoteCollectionView {
 					}
 
 					function updateRepresentationFromDocument(){
+						console.log("start updateRepresentationFromDocument")
 						startUpdateRepresentation(documentId, representationModel)
 
 						documentIdInput.m_id = documentId
@@ -100,8 +101,10 @@ RemoteCollectionView {
 						sdlObjectComp: Component {
 							TicketData {
 								onFinished: {
+									console.log("onFinished TicketData")
 									root.representationModel.copyFrom(this)
 									root.representationUpdated(root.documentId, root.representationModel)
+									console.log("end updateRepresentationFromDocument")
 								}
 							}
 						}
