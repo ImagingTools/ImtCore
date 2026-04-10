@@ -35,7 +35,30 @@ RemoteCollectionView {
 				id: ticketEditorComp
 
 				TicketEditor {
+					id: ticketEditor
 					commandsControllerComp: null
+
+					SubscriptionClient {
+						gqlCommandId: container.subscriptionCommandId
+						onMessageReceived: {
+							if (!data){
+								return
+							}
+
+							if (!ticketEditor.ticketData){
+								return
+							}
+
+							console.log("SubscriptionClient updateRepresentationFromDocument")
+							let itemId = data.getData("itemId")
+							let typeOperation = data.getData("typeOperation")
+							if (typeOperation === "updated" && itemId === ticketEditor.ticketData.m_id){
+								if (ticketEditor.representationController){
+									ticketEditor.representationController.updateRepresentationFromDocument()
+								}
+							}
+						}
+					}
 				}
 			}
 
@@ -44,6 +67,14 @@ RemoteCollectionView {
 
 				DocumentRepresentationController {
 					id: root
+
+					// Re-entrancy guard: when two notifications arrive simultaneously
+					// (e.g. from DocumentDecorator and SubscriptionClient), the second
+					// call is deferred until the first completes, preventing
+					// setBlockingUpdateModel(false) from being called while copyFrom
+					// is still running inside the first request's onFinished handler.
+					property bool _updateInProgress: false
+					property bool _updatePending: false
 
 					representationModel: TicketData {
 						m_status: "Open"
@@ -54,6 +85,13 @@ RemoteCollectionView {
 					}
 
 					function updateRepresentationFromDocument(){
+						if (_updateInProgress) {
+							_updatePending = true
+							return
+						}
+						_updateInProgress = true
+						_updatePending = false
+
 						console.log("start updateRepresentationFromDocument")
 						startUpdateRepresentation(documentId, representationModel)
 
@@ -82,6 +120,11 @@ RemoteCollectionView {
 									root.representationModel.copyFrom(this)
 									root.representationUpdated(root.documentId, root.representationModel)
 									console.log("end updateRepresentationFromDocument")
+
+									root._updateInProgress = false
+									if (root._updatePending) {
+										root.updateRepresentationFromDocument()
+									}
 								}
 							}
 						}
