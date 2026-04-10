@@ -17,9 +17,24 @@ QtObject {
 	signal representationUpdated(string documentId, var representation)
 	signal updateRepresentationFailed(string documentId, string message)
 
+	// Re-entrancy guard: when two notifications arrive simultaneously
+	// (e.g. from DocumentDecorator and SubscriptionClient), the second
+	// call is deferred until the first completes, preventing
+	// setBlockingUpdateModel(false) from being called while copyFrom
+	// is still running inside the first request's onFinished handler.
 	function updateRepresentationFromDocument(){
+		if (__internal._updateInProgress) {
+			__internal._updatePending = true
+			return
+		}
+		__internal._updateInProgress = true
+		__internal._updatePending = false
+		_doUpdateRepresentationFromDocument()
+	}
+
+	function _doUpdateRepresentationFromDocument(){
 		startUpdateRepresentation(documentId, representationModel)
-		console.warn("updateRepresentationFromDocument() should be implemented in a subclass")
+		console.warn("_doUpdateRepresentationFromDocument() should be implemented in a subclass")
 		representationUpdated(documentId, representationModel)
 	}
 
@@ -34,6 +49,8 @@ QtObject {
 
 		property bool isRepresentationUpdatePending: false
 		property bool isDocumentUpdatePending: false
+		property bool _updateInProgress: false
+		property bool _updatePending: false
 
 		property Connections rootConnections: Connections {
 			target: root
@@ -51,6 +68,12 @@ QtObject {
 				}
 				else{
 					signalMonitor.isRepresentationUpdatePending = false
+				}
+
+				signalMonitor._updateInProgress = false
+				if (signalMonitor._updatePending) {
+					signalMonitor._updatePending = false
+					Qt.callLater(root.updateRepresentationFromDocument)
 				}
 			}
 
