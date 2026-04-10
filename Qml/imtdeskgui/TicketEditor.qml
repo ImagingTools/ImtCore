@@ -20,8 +20,6 @@ DocumentViewBase {
 	
 	property TicketData ticketData: model
 	property bool isNewIssue: ticketData ? (ticketData.m_number === 0) : true
-	property bool chatViewMode: false
-	
 	// Component factory for creating TicketActivityItem instances
 	property Component activityItemComp: Component { TicketActivityItem {} }
 	
@@ -496,23 +494,13 @@ DocumentViewBase {
 			CustomScrollbar {
 				id: editScrollV
 				z: parent.z + 1
-				anchors.right: parent.right
+				anchors.right: editSidebarSep.left
+				anchors.rightMargin: Style.marginM
 				anchors.top: editFlick.top
 				anchors.bottom: editFlick.bottom
 				secondSize: Style.marginM
 				targetItem: editFlick
 				visible: editView.visible
-			}
-			
-			CustomScrollbar {
-				id: editScrollH
-				z: parent.z + 1
-				anchors.left: editFlick.left
-				anchors.right: editFlick.right
-				anchors.bottom: editFlick.bottom
-				secondSize: Style.marginM
-				vertical: false
-				targetItem: editFlick
 			}
 			
 			Flickable {
@@ -524,20 +512,14 @@ DocumentViewBase {
 				anchors.left: parent.left
 				anchors.leftMargin: Style.marginXL
 				anchors.right: editScrollV.left
-				anchors.rightMargin: Style.marginXL
-				contentWidth: editRow.width
-				contentHeight: editRow.height + Style.marginXL * 2
+				anchors.rightMargin: Style.marginM
+				contentHeight: editMainCol.height + Style.marginXL * 2
 				boundsBehavior: Flickable.StopAtBounds
 				clip: true
 				
-				Row {
-					id: editRow
-					spacing: Style.marginXL
-					
-					// Left: main content
 					Column {
 						id: editMainCol
-						width: 560
+						width: editFlick.width
 						spacing: Style.marginM
 						
 						// Status badges
@@ -629,7 +611,6 @@ DocumentViewBase {
 							width: parent.width
 							spacing: Style.spacingS
 							
-							// Header row with view mode toggle
 							Row {
 								width: parent.width
 								spacing: Style.spacingS
@@ -650,67 +631,12 @@ DocumentViewBase {
 									color: Style.textSecondaryColor
 									anchors.verticalCenter: parent.verticalCenter
 								}
-								
-								Item { width: Style.spacingM; height: 1 }
-								
-								// View mode toggle buttons
-								Row {
-									id: viewModeToggle
-									anchors.verticalCenter: parent.verticalCenter
-									spacing: 1
-									
-									property int toggleButtonWidth: 80
-									
-									Rectangle {
-										width: viewModeToggle.toggleButtonWidth
-										height: Style.buttonHeightS
-										radius: Style.radiusS
-										color: root.chatViewMode ? Style.baseColor : Style.accentColor
-										border.color: Style.borderColor
-										border.width: 1
-										
-										Text {
-											anchors.centerIn: parent
-											text: qsTr("Detail")
-											font.pixelSize: Style.fontSizeXS
-											color: root.chatViewMode ? Style.textColor : "white"
-										}
-										
-										MouseArea {
-											anchors.fill: parent
-											onClicked: root.chatViewMode = false
-										}
-									}
-									
-									Rectangle {
-										width: viewModeToggle.toggleButtonWidth
-										height: Style.buttonHeightS
-										radius: Style.radiusS
-										color: root.chatViewMode ? Style.accentColor : Style.baseColor
-										border.color: Style.borderColor
-										border.width: 1
-										
-										Text {
-											anchors.centerIn: parent
-											text: qsTr("Chat")
-											font.pixelSize: Style.fontSizeXS
-											color: root.chatViewMode ? "white" : Style.textColor
-										}
-										
-										MouseArea {
-											anchors.fill: parent
-											onClicked: root.chatViewMode = true
-										}
-									}
-								}
 							}
 							
-							// === Detail view (GitHub Issues-style timeline) ===
 							Column {
 								id: activityListCol
 								width: parent.width
 								spacing: Style.spacingS
-								visible: !root.chatViewMode
 								
 								Repeater {
 									id: activityThread
@@ -822,92 +748,6 @@ DocumentViewBase {
 								}
 							}
 							
-							// === Chat view (Telegram-style messenger) ===
-							Column {
-								id: chatViewCol
-								width: parent.width
-								spacing: Style.paddingXS
-								visible: root.chatViewMode
-								
-								Rectangle {
-									width: parent.width
-									height: chatMessagesCol.height + Style.paddingM * 2
-									radius: Style.radiusS
-									color: Style.backgroundColor
-									border.color: Style.borderColor
-									border.width: 1
-									
-									Column {
-										id: chatMessagesCol
-										anchors.left: parent.left
-										anchors.right: parent.right
-										anchors.top: parent.top
-										anchors.margins: Style.paddingM
-										spacing: Style.paddingS
-										
-										Repeater {
-											id: chatThread
-											model: root.ticketData ? root.ticketData.m_activityItems : null
-											
-											delegate: Item {
-												id: chatDelegate
-												width: chatMessagesCol.width
-												height: chatBubbleCol.height + Style.paddingXS
-												visible: model.item.m_itemType !== "Action"
-												
-												property bool isOwnMessage: model.item.m_userId === AuthorizationController.getUserId()
-												
-												Column {
-													id: chatBubbleCol
-													anchors.right: chatDelegate.isOwnMessage ? parent.right : undefined
-													anchors.left: chatDelegate.isOwnMessage ? undefined : parent.left
-													width: parent.width * 0.75
-													spacing: Style.paddingXS
-													
-													// Sender name (received messages only)
-													Text {
-														visible: !chatDelegate.isOwnMessage
-														text: model.item.m_userName || qsTr("Unknown")
-														font.pixelSize: Style.fontSizeXS
-														font.bold: true
-														color: Style.accentColor
-													}
-													
-													// Message bubble
-													Rectangle {
-														width: chatBubbleCol.width
-														height: chatBubbleText.height + Style.paddingS * 2
-														radius: Style.radiusS
-														color: chatDelegate.isOwnMessage ? Style.accentColor : Style.surfaceColor
-														
-														Text {
-															id: chatBubbleText
-															anchors.left: parent.left
-															anchors.right: parent.right
-															anchors.top: parent.top
-															anchors.margins: Style.paddingS
-															text: model.item.m_content || ""
-															font.pixelSize: Style.fontSizeS
-															color: chatDelegate.isOwnMessage ? "white" : Style.textColor
-															wrapMode: Text.Wrap
-														}
-													}
-													
-													// Timestamp
-													Text {
-														anchors.right: chatDelegate.isOwnMessage ? chatBubbleCol.right : undefined
-														anchors.left: chatDelegate.isOwnMessage ? undefined : chatBubbleCol.left
-														text: model.item.m_timestamp || ""
-														font.pixelSize: Style.fontSizeXS
-														color: Style.textSecondaryColor
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-							
 							// "Write" input area (shared between both view modes)
 							Rectangle {
 								width: parent.width
@@ -926,21 +766,18 @@ DocumentViewBase {
 									font.pixelSize: Style.fontSizeS
 									font.bold: true
 									color: Style.textColor
-									visible: !root.chatViewMode
 								}
 								
 								Row {
 									width: parent.width
 									spacing: Style.paddingS
 									
-									// Avatar for current user (detail view only)
 									Rectangle {
 										width: 32
 										height: 32
 										radius: 16
 										color: Style.accentColor
 										anchors.top: parent.top
-										visible: !root.chatViewMode
 										
 										Text {
 											anchors.centerIn: parent
@@ -952,9 +789,7 @@ DocumentViewBase {
 									}
 									
 									Column {
-										width: root.chatViewMode
-											   ? parent.width
-											   : parent.width - 32 - Style.paddingS
+										width: parent.width - 32 - Style.paddingS
 										spacing: Style.spacingS
 										
 										Rectangle {
@@ -973,25 +808,15 @@ DocumentViewBase {
 												anchors.right: parent.right
 												anchors.top: parent.top
 												anchors.margins: Style.paddingM
-												height: root.chatViewMode ? 40 : 60
+												height: 60
 												font.pixelSize: Style.fontSizeS
 												color: Style.textColor
 												wrapMode: TextEdit.Wrap
 												clip: true
 												
-												Keys.onReturnPressed: {
-													if (!(event.modifiers & Qt.ShiftModifier) && root.chatViewMode) {
-														root.addComment(commentInputField.text.trim())
-														commentInputField.text = ""
-														event.accepted = true
-													}
-												}
-												
 												Text {
 													anchors.fill: parent
-													text: root.chatViewMode
-														  ? qsTr("Write a message...")
-														  : qsTr("Leave a comment")
+													text: qsTr("Leave a comment")
 													color: Style.textPlaceholderColor
 													font.pixelSize: Style.fontSizeS
 													visible: commentInputField.text.length === 0
@@ -1004,7 +829,7 @@ DocumentViewBase {
 											spacing: Style.spacingS
 
 											Button {
-												text: root.chatViewMode ? qsTr("Send") : qsTr("Comment")
+												text: qsTr("Comment")
 												widthFromDecorator: true
 												height: Style.buttonHeightM
 												onClicked: {
@@ -1038,205 +863,215 @@ DocumentViewBase {
 							}
 						}
 					}
+			}
+			
+			// Separator between left content and sidebar
+			Rectangle {
+				id: editSidebarSep
+				anchors.top: parent.top
+				anchors.topMargin: Style.marginXL
+				anchors.bottom: parent.bottom
+				anchors.bottomMargin: Style.marginXL
+				anchors.right: editSidebar.left
+				anchors.rightMargin: Style.marginXL
+				width: 1
+				color: Style.borderColor
+			}
+			
+			// Right: full sidebar (always visible, not scrollable)
+			Column {
+				id: editSidebar
+				anchors.top: parent.top
+				anchors.topMargin: Style.marginXL
+				anchors.right: parent.right
+				anchors.rightMargin: Style.marginXL
+				width: 260
+				spacing: Style.spacingM
+				
+				// Assignees
+				Column {
+					width: parent.width
+					spacing: Style.spacingS
 					
-					// Separator
-					Rectangle {
-						width: 1
-						height: editMainCol.height
-						color: Style.borderColor
+					Text {
+						text: qsTr("Assignees")
+						font.pixelSize: Style.fontSizeM
+						font.bold: true
+						color: Style.textColor
 					}
 					
-					// Right: full sidebar
-					Column {
-						width: 260
-						spacing: Style.spacingM
-						
-						// Assignees
-						Column {
-							width: parent.width
-							spacing: Style.spacingS
-							
-							Text {
-								text: qsTr("Assignees")
-								font.pixelSize: Style.fontSizeM
-								font.bold: true
-								color: Style.textColor
-							}
-							
-							ComboBox {
-								id: editAssigneeCB
-								width: parent.width
-								height: Style.buttonHeightM
-								onCurrentIndexChanged: {
-									root.doUpdateModel()
-								}
-							}
+					ComboBox {
+						id: editAssigneeCB
+						width: parent.width
+						height: Style.buttonHeightM
+						onCurrentIndexChanged: {
+							root.doUpdateModel()
 						}
-						
-						Rectangle { width: parent.width; height: 1; color: Style.borderColor }
-						
-						// Type
-						Column {
-							width: parent.width
-							spacing: Style.spacingS
-							
-							Text {
-								text: qsTr("Type")
-								font.pixelSize: Style.fontSizeM
-								font.bold: true
-								color: Style.textColor
-							}
-							
-							ComboBox {
-								id: editTypeCB
-								width: parent.width
-								height: Style.buttonHeightM
-								currentIndex: 1
-								model: ticketTypeModel
-								onCurrentIndexChanged: {
-									root.doUpdateModel()
-								}
-							}
+					}
+				}
+				
+				Rectangle { width: parent.width; height: 1; color: Style.borderColor }
+				
+				// Type
+				Column {
+					width: parent.width
+					spacing: Style.spacingS
+					
+					Text {
+						text: qsTr("Type")
+						font.pixelSize: Style.fontSizeM
+						font.bold: true
+						color: Style.textColor
+					}
+					
+					ComboBox {
+						id: editTypeCB
+						width: parent.width
+						height: Style.buttonHeightM
+						currentIndex: 1
+						model: ticketTypeModel
+						onCurrentIndexChanged: {
+							root.doUpdateModel()
 						}
-						
-						Rectangle { width: parent.width; height: 1; color: Style.borderColor }
-						
-						// Priority
-						Column {
-							width: parent.width
-							spacing: Style.spacingS
-							
-							Text {
-								text: qsTr("Priority")
-								font.pixelSize: Style.fontSizeM
-								font.bold: true
-								color: Style.textColor
-							}
-							
-							ComboBox {
-								id: editPriorityCB
-								width: parent.width
-								height: Style.buttonHeightM
-								currentIndex: 1
-								model: priorityModel
-								onCurrentIndexChanged: {
-									root.doUpdateModel()
-								}
-							}
+					}
+				}
+				
+				Rectangle { width: parent.width; height: 1; color: Style.borderColor }
+				
+				// Priority
+				Column {
+					width: parent.width
+					spacing: Style.spacingS
+					
+					Text {
+						text: qsTr("Priority")
+						font.pixelSize: Style.fontSizeM
+						font.bold: true
+						color: Style.textColor
+					}
+					
+					ComboBox {
+						id: editPriorityCB
+						width: parent.width
+						height: Style.buttonHeightM
+						currentIndex: 1
+						model: priorityModel
+						onCurrentIndexChanged: {
+							root.doUpdateModel()
 						}
-						
-						Rectangle { width: parent.width; height: 1; color: Style.borderColor }
-						
-						// Reporter
-						Column {
-							width: parent.width
-							spacing: Style.spacingS
-							
-							Text {
-								text: qsTr("Reporter")
-								font.pixelSize: Style.fontSizeM
-								font.bold: true
-								color: Style.textColor
-							}
-							
-							ComboBox {
-								id: editReporterCB
-								width: parent.width
-								height: Style.buttonHeightM
-								onCurrentIndexChanged: {
-									root.doUpdateModel()
-								}
-							}
+					}
+				}
+				
+				Rectangle { width: parent.width; height: 1; color: Style.borderColor }
+				
+				// Reporter
+				Column {
+					width: parent.width
+					spacing: Style.spacingS
+					
+					Text {
+						text: qsTr("Reporter")
+						font.pixelSize: Style.fontSizeM
+						font.bold: true
+						color: Style.textColor
+					}
+					
+					ComboBox {
+						id: editReporterCB
+						width: parent.width
+						height: Style.buttonHeightM
+						onCurrentIndexChanged: {
+							root.doUpdateModel()
 						}
-						
-						Rectangle { width: parent.width; height: 1; color: Style.borderColor }
-						
-						// Lock issue
-						Row {
-							width: parent.width
-							spacing: Style.paddingS
-							
-							CheckBox {
-								id: editLockedCB
-								text: qsTr("Lock issue")
-								onCheckStateChanged: {
-									root.doUpdateModel()
-								}
-							}
+					}
+				}
+				
+				Rectangle { width: parent.width; height: 1; color: Style.borderColor }
+				
+				// Lock issue
+				Row {
+					width: parent.width
+					spacing: Style.paddingS
+					
+					CheckBox {
+						id: editLockedCB
+						text: qsTr("Lock issue")
+						onCheckStateChanged: {
+							root.doUpdateModel()
 						}
-						
-						// Lock reason
-						Column {
-							width: parent.width
-							spacing: Style.spacingS
-							visible: editLockedCB.checkState === Qt.Checked
-							
-							Text {
-								text: qsTr("Lock Reason")
-								font.pixelSize: Style.fontSizeM
-								font.bold: true
-								color: Style.textColor
-							}
-							
-							CustomTextField {
-								id: editLockReasonInput
-								width: parent.width
-								height: Style.controlHeightM
-								placeHolderText: qsTr("Reason for locking")
-								onEditingFinished: {
-									root.doUpdateModel()
-								}
-							}
+					}
+				}
+				
+				// Lock reason
+				Column {
+					width: parent.width
+					spacing: Style.spacingS
+					visible: editLockedCB.checkState === Qt.Checked
+					
+					Text {
+						text: qsTr("Lock Reason")
+						font.pixelSize: Style.fontSizeM
+						font.bold: true
+						color: Style.textColor
+					}
+					
+					CustomTextField {
+						id: editLockReasonInput
+						width: parent.width
+						height: Style.controlHeightM
+						placeHolderText: qsTr("Reason for locking")
+						onEditingFinished: {
+							root.doUpdateModel()
 						}
-						
-						Rectangle { width: parent.width; height: 1; color: Style.borderColor }
-						
-						// Status
-						Column {
-							width: parent.width
-							spacing: Style.spacingS
-							
-							Text {
-								text: qsTr("Status")
-								font.pixelSize: Style.fontSizeM
-								font.bold: true
-								color: Style.textColor
-							}
-							
-							ComboBox {
-								id: editStatusCB
-								width: parent.width
-								height: Style.buttonHeightM
-								currentIndex: 0
-								model: statusModel
-								onCurrentIndexChanged: {
-									root.doUpdateModel()
-								}
-							}
+					}
+				}
+				
+				Rectangle { width: parent.width; height: 1; color: Style.borderColor }
+				
+				// Status
+				Column {
+					width: parent.width
+					spacing: Style.spacingS
+					
+					Text {
+						text: qsTr("Status")
+						font.pixelSize: Style.fontSizeM
+						font.bold: true
+						color: Style.textColor
+					}
+					
+					ComboBox {
+						id: editStatusCB
+						width: parent.width
+						height: Style.buttonHeightM
+						currentIndex: 0
+						model: statusModel
+						onCurrentIndexChanged: {
+							root.doUpdateModel()
 						}
-						
-						// State Reason
-						Column {
-							width: parent.width
-							spacing: Style.spacingS
-							
-							Text {
-								text: qsTr("State Reason")
-								font.pixelSize: Style.fontSizeM
-								font.bold: true
-								color: Style.textColor
-							}
-							
-							ComboBox {
-								id: editStateReasonCB
-								width: parent.width
-								height: Style.buttonHeightM
-								currentIndex: 0
-								model: stateReasonModel
-								onCurrentIndexChanged: {
-									root.doUpdateModel()
-								}
-							}
+					}
+				}
+				
+				// State Reason
+				Column {
+					width: parent.width
+					spacing: Style.spacingS
+					
+					Text {
+						text: qsTr("State Reason")
+						font.pixelSize: Style.fontSizeM
+						font.bold: true
+						color: Style.textColor
+					}
+					
+					ComboBox {
+						id: editStateReasonCB
+						width: parent.width
+						height: Style.buttonHeightM
+						currentIndex: 0
+						model: stateReasonModel
+						onCurrentIndexChanged: {
+							root.doUpdateModel()
 						}
 					}
 				}
