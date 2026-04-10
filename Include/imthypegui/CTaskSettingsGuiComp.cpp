@@ -169,11 +169,13 @@ void CTaskSettingsGuiComp::OnTryClose(bool* ignoredPtr)
 
 			*ignoredPtr = true;
 		}
-		QString trigger = TriggerSelector->text().trimmed();
-		if (m_triggerIdValidator.validate(trigger, pos) != QValidator::Acceptable) {
-			QMessageBox::critical(NULL, tr("Error"), tr("Acq-SubId must be a number"));
+		if (TriggerSelector->isVisible()){
+			QString trigger = TriggerSelector->text().trimmed();
+			if (m_triggerIdValidator.validate(trigger, pos) != QValidator::Acceptable) {
+				QMessageBox::critical(NULL, tr("Error"), tr("Acq-SubId must be a number"));
 
-			*ignoredPtr = true;
+				*ignoredPtr = true;
+			}
 		}
 	}
 }
