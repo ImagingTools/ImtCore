@@ -17,11 +17,6 @@ QtObject {
 	signal representationUpdated(string documentId, var representation)
 	signal updateRepresentationFailed(string documentId, string message)
 
-	// Re-entrancy guard: when two notifications arrive simultaneously
-	// (e.g. from DocumentDecorator and SubscriptionClient), the second
-	// call is deferred until the first completes, preventing
-	// setBlockingUpdateModel(false) from being called while copyFrom
-	// is still running inside the first request's onFinished handler.
 	function updateRepresentationFromDocument(){
 		if (__internal._updateInProgress) {
 			__internal._updatePending = true
@@ -73,7 +68,7 @@ QtObject {
 				signalMonitor._updateInProgress = false
 				if (signalMonitor._updatePending) {
 					signalMonitor._updatePending = false
-					Qt.callLater(root.updateRepresentationFromDocument)
+					root.updateRepresentationFromDocument()
 				}
 			}
 
