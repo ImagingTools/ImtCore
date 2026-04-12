@@ -14,5 +14,23 @@
     </PackageDirs>
     <PackageFiles/>
     <RegistryFiles>
+        <FilePath>../Impl/DdlCodeCreatorExe/DdlCodeCreator.acc</FilePath>
+        <FilePath>../Impl/DesignTokenCreatorExe/DesignTokenCreator.acc</FilePath>
+        <FilePath>../Impl/EagleView/EagleView.acc</FilePath>
+        <FilePath>../Impl/EagleView/VC/FileSubstitCopyApp.acc</FilePath>
+        <FilePath>../Impl/ImtControlsGallery/Impl/ControlsGallery/ControlsGallery.acc</FilePath>
+        <FilePath>../Impl/ImtControlsGallery/Impl/ControlsGallery/VC/FileSubstitCopyApp.acc</FilePath>
+        <FilePath>../Impl/ImtControlsGallery/Partitura/ImtControlsGalleryVoce.arp/ContactInfoController.acc</FilePath>
+        <FilePath>../Impl/ImtControlsGallery/Partitura/ImtControlsGalleryVoce.arp/ContactInfoSqlRepository.acc</FilePath>
+        <FilePath>../Impl/ImtControlsGallery/Partitura/ImtControlsGalleryVoce.arp/ControlsGalleryHandlers.acc</FilePath>
+        <FilePath>../Impl/ImtControlsGallery/Partitura/ImtControlsGalleryVoce.arp/ControlsGallerySettings.acc</FilePath>
+        <FilePath>../Impl/ImtControlsGallery/Partitura/ImtControlsGalleryVoce.arp/ImtControlsGalleryApplicationSettings.acc</FilePath>
+        <FilePath>../Impl/ImtControlsGallery/Partitura/ImtControlsGalleryVoce.arp/ImtControlsGalleryServer.acc</FilePath>
+        <FilePath>../Impl/ImtControlsGallery/Partitura/ImtControlsGalleryVoce.arp/Pages.acc</FilePath>
+        <FilePath>../Impl/ImtControlsGallery/Partitura/ImtControlsGalleryVoce.arp/RootDataController.acc</FilePath>
+        <FilePath>../Impl/ImtControlsGallery/Partitura/ImtControlsGalleryVoce.arp/VersionInfo.acc</FilePath>
+        <FilePath>../Impl/ImtCoreLoc/ImtCoreLoc.acc</FilePath>
+        <FilePath>../Impl/OasCodeGeneratorExe/OasCodeGeneratorExe.acc</FilePath>
+        <FilePath>../Impl/SdlCodeGeneratorExe/SdlCodeGenerator.acc</FilePath>
     </RegistryFiles>
 </Acf>
