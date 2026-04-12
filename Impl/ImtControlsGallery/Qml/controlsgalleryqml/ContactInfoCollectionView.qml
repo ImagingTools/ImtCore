@@ -98,7 +98,7 @@ RemoteCollectionView {
 
 					representationModel: EmailData {}
 
-					function _doUpdateRepresentationFromDocument(){
+					function updateRepresentationFromDocument(){
 						startUpdateRepresentation(documentId, representationModel)
 
 						documentIdInput.m_id = documentId
@@ -152,7 +152,7 @@ RemoteCollectionView {
 
 					representationModel: ContactInfoData {}
 
-					function _doUpdateRepresentationFromDocument(){
+					function updateRepresentationFromDocument(){
 						startUpdateRepresentation(documentId, representationModel)
 
 						documentIdInput.m_id = documentId

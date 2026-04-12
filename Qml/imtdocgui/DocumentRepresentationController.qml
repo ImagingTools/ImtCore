@@ -18,18 +18,8 @@ QtObject {
 	signal updateRepresentationFailed(string documentId, string message)
 
 	function updateRepresentationFromDocument(){
-		if (__internal._updateInProgress) {
-			__internal._updatePending = true
-			return
-		}
-		__internal._updateInProgress = true
-		__internal._updatePending = false
-		_doUpdateRepresentationFromDocument()
-	}
-
-	function _doUpdateRepresentationFromDocument(){
 		startUpdateRepresentation(documentId, representationModel)
-		console.warn("_doUpdateRepresentationFromDocument() should be implemented in a subclass")
+		console.warn("updateRepresentationFromDocument() should be implemented in a subclass")
 		representationUpdated(documentId, representationModel)
 	}
 
@@ -44,8 +34,6 @@ QtObject {
 
 		property bool isRepresentationUpdatePending: false
 		property bool isDocumentUpdatePending: false
-		property bool _updateInProgress: false
-		property bool _updatePending: false
 
 		property Connections rootConnections: Connections {
 			target: root
@@ -63,12 +51,6 @@ QtObject {
 				}
 				else{
 					signalMonitor.isRepresentationUpdatePending = false
-				}
-
-				signalMonitor._updateInProgress = false
-				if (signalMonitor._updatePending) {
-					signalMonitor._updatePending = false
-					root.updateRepresentationFromDocument()
 				}
 			}
 

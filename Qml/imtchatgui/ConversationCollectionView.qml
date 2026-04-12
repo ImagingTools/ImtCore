@@ -52,7 +52,7 @@ RemoteCollectionView {
 
 					representationModel: ConversationData {}
 
-					function _doUpdateRepresentationFromDocument(){
+					function updateRepresentationFromDocument(){
 						startUpdateRepresentation(documentId, representationModel)
 
 						documentIdInput.m_id = documentId
