@@ -26,7 +26,6 @@
         <FilePath>../Impl/ImtControlsGallery/Partitura/ImtControlsGalleryVoce.arp/ImtControlsGalleryServer.acc</FilePath>
         <FilePath>../Impl/ImtControlsGallery/Partitura/ImtControlsGalleryVoce.arp/Pages.acc</FilePath>
         <FilePath>../Impl/ImtControlsGallery/Partitura/ImtControlsGalleryVoce.arp/RootDataController.acc</FilePath>
-        <FilePath>../Impl/ImtControlsGallery/Partitura/ImtControlsGalleryVoce.arp/VersionInfo.acc</FilePath>
         <FilePath>../Impl/OasCodeGeneratorExe/OasCodeGeneratorExe.acc</FilePath>
         <FilePath>../Impl/SdlCodeGeneratorExe/SdlCodeGenerator.acc</FilePath>
     </RegistryFiles>
