@@ -420,7 +420,7 @@ DocumentViewBase {
 									delegate: Item {
 										id: commentDelegate
 										width: commentsListCol.width
-										height: commentBubbleCol.height
+										height: commentBubbleCol.implicitHeight
 										
 										readonly property bool isMe: model.item.m_userId === root.currentUserId
 
@@ -473,8 +473,8 @@ DocumentViewBase {
 											
 											// Comment body bubble
 											Rectangle {
-												width: Math.min(commentBubbleCol.width, commentBodyText.contentWidth + Style.paddingM * 2 + 2)
-												height: commentBodyText.height + Style.paddingM * 2
+												width: commentBubbleCol.width
+												height: commentBodyText.contentHeight + Style.paddingM * 2
 												radius: Style.radiusS
 												color: commentDelegate.isMe ? Style.imaginToolsAccentColor : Style.surfaceColor
 												border.color: commentDelegate.isMe ? Style.imaginToolsAccentColor : Style.borderColor
@@ -484,10 +484,9 @@ DocumentViewBase {
 												
 												Text {
 													id: commentBodyText
-													anchors.left: parent.left
-													anchors.right: parent.right
-													anchors.top: parent.top
-													anchors.margins: Style.paddingM
+													x: Style.paddingM
+													y: Style.paddingM
+													width: parent.width - Style.paddingM * 2
 													text: model.item.m_content || ""
 													font.pixelSize: Style.fontSizeM
 													color: commentDelegate.isMe ? "white" : Style.textColor
