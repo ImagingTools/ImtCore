@@ -44,6 +44,15 @@ RemoteCollectionView {
 					}
 					commandsPanelVisible: isNewIssue
 
+					onDocumentSaved: {
+						console.log("onDocumentSaved")
+						if (isNewIssue){
+							if (ticketEditor.representationController){
+								ticketEditor.representationController.updateRepresentationFromDocument()
+							}
+						}
+					}
+
 					SubscriptionClient {
 						gqlCommandId: container.subscriptionCommandId
 						onMessageReceived: {

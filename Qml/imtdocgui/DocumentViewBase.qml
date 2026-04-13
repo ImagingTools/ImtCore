@@ -14,5 +14,7 @@ ViewBase {
 	property DocumentManagerBase documentManager: null;
 	property Item documentManagerView: null;
 	property DocumentRepresentationController representationController: null;
+
+	signal documentSaved()
 }
 
