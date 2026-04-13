@@ -420,7 +420,7 @@ DocumentViewBase {
 									delegate: Item {
 										id: commentDelegate
 										width: commentsListCol.width
-										height: commentBubbleCol.implicitHeight
+										height: commentBubbleCol.height
 										
 										readonly property bool isMe: model.item.m_userId === root.currentUserId
 
@@ -443,14 +443,14 @@ DocumentViewBase {
 													width: 32
 													height: width
 													radius: width / 2
-													color: commentDelegate.isMe ? Style.imaginToolsAccentColor : Style.accentColor
+													color: Style.accentColor
 
 													Text {
 														anchors.centerIn: parent
 														text: model.item.m_userName ? model.item.m_userName.charAt(0).toUpperCase() : "?"
 														font.pixelSize: Style.fontSizeS
 														font.bold: true
-														color: "white"
+														color: Style.textColor
 														font.family: Style.fontFamily
 													}
 												}
@@ -476,8 +476,8 @@ DocumentViewBase {
 												width: commentBubbleCol.width
 												height: commentBodyText.contentHeight + Style.paddingM * 2
 												radius: Style.radiusS
-												color: commentDelegate.isMe ? Style.imaginToolsAccentColor : Style.surfaceColor
-												border.color: commentDelegate.isMe ? Style.imaginToolsAccentColor : Style.borderColor
+												color: Style.baseColor
+												border.color: Style.borderColor
 												border.width: 1
 												anchors.right: commentDelegate.isMe ? parent.right : undefined
 												anchors.left: commentDelegate.isMe ? undefined : parent.left
@@ -489,7 +489,7 @@ DocumentViewBase {
 													width: parent.width - Style.paddingM * 2
 													text: model.item.m_content || ""
 													font.pixelSize: Style.fontSizeM
-													color: commentDelegate.isMe ? "white" : Style.textColor
+													color: Style.textColor
 													wrapMode: Text.Wrap
 												}
 											}
