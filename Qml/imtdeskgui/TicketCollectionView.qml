@@ -10,6 +10,7 @@ import imtdeskImtDeskSdl 1.0
 import imtdeskTicketCollectionDocumentManagerSdl 1.0
 import imtbaseCollectionDocumentManagerSdl 1.0
 import imtbaseUndoManagerSdl 1.0
+import imtbaseComplexCollectionFilterSdl 1.0
 
 RemoteCollectionView {
 	id: container
@@ -21,6 +22,38 @@ RemoteCollectionView {
 	Component.onCompleted: {
 		table.setSortingInfo(TicketItemDataTypeMetaInfo.s_createdAt, "DESC")
 		table.nonSortableColumns = [TicketItemDataTypeMetaInfo.s_assignee]
+		registerFieldFilterDelegate("statusFilter", statusDelegateFilterComp)
+		registerFieldFilterDelegate("priorityFilter", priorityDelegateFilterComp)
+	}
+
+	Component {
+		id: statusDelegateFilterComp
+		FieldFilterDelegate {
+			name: qsTr("Status")
+			defaultFieldFilter.m_fieldId: "Status"
+			defaultFieldFilter.m_filterValueType: "Integer"
+
+			Component.onCompleted: {
+				createAndAddOption("0", qsTr("Open"), "", true)
+				createAndAddOption("1", qsTr("Closed"), "", true)
+			}
+		}
+	}
+
+	Component {
+		id: priorityDelegateFilterComp
+		FieldFilterDelegate {
+			name: qsTr("Priority")
+			defaultFieldFilter.m_fieldId: "Priority"
+			defaultFieldFilter.m_filterValueType: "Integer"
+
+			Component.onCompleted: {
+				createAndAddOption("0", qsTr("Low"), "", true)
+				createAndAddOption("1", qsTr("Medium"), "", true)
+				createAndAddOption("2", qsTr("High"), "", true)
+				createAndAddOption("3", qsTr("Critical"), "", true)
+			}
+		}
 	}
 
 	commandsDelegateComp: Component {
