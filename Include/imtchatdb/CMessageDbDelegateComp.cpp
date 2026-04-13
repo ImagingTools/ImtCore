@@ -20,6 +20,18 @@ namespace imtchatdb
 {
 
 
+namespace
+{
+
+// Helper: return current UTC timestamp in ISO 8601 with milliseconds
+QString utcNow()
+{
+	return QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
+}
+
+} // anonymous namespace
+
+
 istd::IChangeableUniquePtr CMessageDbDelegateComp::CreateObjectFromRecord(
 		const QSqlRecord& record,
 		const iprm::IParamsSet* /*dataConfigurationPtr*/) const
@@ -85,12 +97,12 @@ istd::IChangeableUniquePtr CMessageDbDelegateComp::CreateObjectFromRecord(
 	if (record.contains("CreatedAt")){
 		QVariant val = record.value("CreatedAt");
 		QDateTime dt = val.toDateTime();
-		msgPtr->SetCreatedAt(dt.isValid() ? dt.toString(Qt::ISODate) : val.toString());
+		msgPtr->SetCreatedAt(dt.isValid() ? dt.toString(Qt::ISODateWithMs) : val.toString());
 	}
 	if (record.contains("UpdatedAt")){
 		QVariant val = record.value("UpdatedAt");
 		QDateTime dt = val.toDateTime();
-		msgPtr->SetUpdatedAt(dt.isValid() ? dt.toString(Qt::ISODate) : val.toString());
+		msgPtr->SetUpdatedAt(dt.isValid() ? dt.toString(Qt::ISODateWithMs) : val.toString());
 	}
 
 	return msgPtr;
@@ -138,11 +150,13 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CMessageDbDelegateComp::CreateNew
 	const QString reactionsStr = msgPtr->GetReactions().join(',');
 	const QString reactionsSql = reactionsStr.isEmpty() ? "NULL" : QString("'%1'").arg(reactionsStr);
 
+	const QString nowUtc = utcNow();
+
 	NewObjectQuery retVal;
 	retVal.query = QString(
 		"INSERT INTO \"Messages\" "
-		"(\"Id\", \"ConversationId\", \"SenderId\", \"Content\", \"EntityReferences\", \"AttachmentIds\", \"Reactions\", \"Status\") "
-		"VALUES('%1', '%2', '%3', '%4', %5, %6, %7, %8);")
+		"(\"Id\", \"ConversationId\", \"SenderId\", \"Content\", \"EntityReferences\", \"AttachmentIds\", \"Reactions\", \"Status\", \"CreatedAt\", \"UpdatedAt\") "
+		"VALUES('%1', '%2', '%3', '%4', %5, %6, %7, %8, '%9', '%10');")
 		.arg(QString::fromUtf8(msgId))
 		.arg(QString::fromUtf8(msgPtr->GetConversationId()))
 		.arg(QString::fromUtf8(msgPtr->GetSenderId()))
@@ -151,6 +165,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CMessageDbDelegateComp::CreateNew
 		.arg(attachSql)
 		.arg(reactionsSql)
 		.arg(msgPtr->GetStatus())
+		.arg(nowUtc)
+		.arg(nowUtc)
 		.toUtf8();
 
 	return retVal;
@@ -186,12 +202,13 @@ QByteArray CMessageDbDelegateComp::CreateUpdateObjectQuery(
 		"\"EntityReferences\"=%2, "
 		"\"Reactions\"=%3, "
 		"\"Status\"=%4, "
-		"\"UpdatedAt\"=NOW() "
-		"WHERE \"Id\"='%5';")
+		"\"UpdatedAt\"='%5' "
+		"WHERE \"Id\"='%6';")
 		.arg(msgPtr->GetContent())
 		.arg(entityRefsSql)
 		.arg(reactionsSql)
 		.arg(msgPtr->GetStatus())
+		.arg(utcNow())
 		.arg(QString::fromUtf8(objectId))
 		.toUtf8();
 }

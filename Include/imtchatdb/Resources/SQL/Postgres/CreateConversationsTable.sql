@@ -4,8 +4,8 @@ CREATE TABLE IF NOT EXISTS "${TableScheme}"."Conversations"
     "Name"             TEXT NOT NULL,
     "ConversationType" INTEGER NOT NULL DEFAULT 0,
     "Metadata"         JSONB,
-    "CreatedAt"        TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    "UpdatedAt"        TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+    "CreatedAt"        TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
+    "UpdatedAt"        TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC')
 );
 CREATE INDEX IF NOT EXISTS "IX_Conversations_UpdatedAt" ON "${TableScheme}"."Conversations" ("UpdatedAt");
 CREATE INDEX IF NOT EXISTS "IX_Conversations_ConversationType" ON "${TableScheme}"."Conversations" ("ConversationType");
