@@ -137,8 +137,6 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>title</Value>
-                                <Value>status</Value>
-                                <Value>number</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
