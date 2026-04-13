@@ -276,8 +276,9 @@ DocumentViewBase {
 						width: editFlick.width
 						spacing: Style.marginM
 						
-						// Status badges
+						// Status badges (only for existing tickets)
 						Row {
+							visible: !root.isNewIssue
 							spacing: Style.spacingS
 							
 							TicketBadge {
@@ -365,12 +366,14 @@ DocumentViewBase {
 						
 						// ── Activity / Conversation thread ──
 						Rectangle {
+							visible: !root.isNewIssue
 							width: parent.width
 							height: 1
 							color: Style.borderColor
 						}
 						
 						Column {
+							visible: !root.isNewIssue
 							width: parent.width
 							spacing: Style.spacingS
 							
@@ -725,10 +728,11 @@ DocumentViewBase {
 					}
 				}
 				
-				Rectangle { width: parent.width; height: 1; color: Style.borderColor }
+				Rectangle { visible: !root.isNewIssue; width: parent.width; height: 1; color: Style.borderColor }
 				
-				// Reporter
+				// Reporter (only for existing tickets)
 				Column {
+					visible: !root.isNewIssue
 					width: parent.width
 					spacing: Style.spacingS
 					
@@ -749,10 +753,11 @@ DocumentViewBase {
 					}
 				}
 				
-				Rectangle { width: parent.width; height: 1; color: Style.borderColor }
+				Rectangle { visible: !root.isNewIssue; width: parent.width; height: 1; color: Style.borderColor }
 				
-				// Lock issue
+				// Lock issue (only for existing tickets)
 				Row {
+					visible: !root.isNewIssue
 					width: parent.width
 					spacing: Style.paddingS
 					
@@ -769,7 +774,7 @@ DocumentViewBase {
 				Column {
 					width: parent.width
 					spacing: Style.spacingS
-					visible: editLockedCB.checkState === Qt.Checked
+					visible: !root.isNewIssue && editLockedCB.checkState === Qt.Checked
 					
 					Text {
 						text: qsTr("Lock Reason")
@@ -789,10 +794,11 @@ DocumentViewBase {
 					}
 				}
 				
-				Rectangle { width: parent.width; height: 1; color: Style.borderColor }
+				Rectangle { visible: !root.isNewIssue; width: parent.width; height: 1; color: Style.borderColor }
 				
-				// Status
+				// Status (only for existing tickets)
 				Column {
+					visible: !root.isNewIssue
 					width: parent.width
 					spacing: Style.spacingS
 					
@@ -815,8 +821,9 @@ DocumentViewBase {
 					}
 				}
 				
-				// State Reason
+				// State Reason (only for existing tickets)
 				Column {
+					visible: !root.isNewIssue
 					width: parent.width
 					spacing: Style.spacingS
 					
