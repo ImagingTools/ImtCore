@@ -16,10 +16,11 @@ RemoteCollectionView {
 
 	collectionId: "Tickets"
 	gqlGetListCommandId: ImtdeskImtDeskSdlCommandIds.s_ticketsList
+	documentCollectionFilter: null
 
 	Component.onCompleted: {
 		table.setSortingInfo(TicketItemDataTypeMetaInfo.s_createdAt, "DESC")
-		table.nonSortableColumns = [TicketItemDataTypeMetaInfo.s_assigneeNames]
+		table.nonSortableColumns = [TicketItemDataTypeMetaInfo.s_assignee]
 	}
 
 	commandsDelegateComp: Component {
