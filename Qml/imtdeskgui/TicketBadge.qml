@@ -18,7 +18,7 @@ Rectangle {
 	// labelName: text for label badges
 	property string labelName: ""
 
-	readonly property color badgeColor: {
+	readonly property string badgeColor: {
 		if (badgeType === "label" && labelColor.length > 0) {
 			return labelColor
 		}
