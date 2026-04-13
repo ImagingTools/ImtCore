@@ -78,10 +78,9 @@
                     <AttributeInfo Id="DeviceRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="TicketSqlRepository"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DocumentManagerEventHandler" Type="Reference[]" ExportId="">
+                    <AttributeInfo Id="DocumentManagerEventHandlers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>CollectionDocumentManagerPublisher</Value>
                                 <Value>TicketCollectionDocumentManager</Value>
                             </Values>
                         </Data>
@@ -117,24 +116,6 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="CollectionDocumentManagerPublisher" PackageId="ImtServerGqlPck" ComponentId="CollectionDocumentManagerPublisher">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Tickets"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -269,7 +250,7 @@
                     <AttributeInfo Id="SubscriberController" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>CollectionDocumentManagerPublisher</Value>
+                                <Value>CollectionDocumentManager</Value>
                                 <Value>TicketsChangeNotifier</Value>
                             </Values>
                         </Data>

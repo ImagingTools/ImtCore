@@ -10,6 +10,8 @@
     <PositionMap>
         <Element ComponentName="CollectionDocumentManager" X="575" Y="300" Note=""/>
         <Element ComponentName="CollectionDocumentManagerController" X="550" Y="150" Note=""/>
+        <Element ComponentName="CollectionDocumentManagerPublisher" X="850" Y="600" Note=""/>
+        <Element ComponentName="EventHandlerDemultiplexer" X="950" Y="400" Note=""/>
         <Element ComponentName="SerializedUndoManager" X="300" Y="600" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
