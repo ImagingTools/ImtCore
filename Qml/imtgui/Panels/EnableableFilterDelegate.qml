@@ -58,6 +58,9 @@ Item {
 			}
 
 			if (checked){
+				if (filterDelegate.filterValue === ""){
+					return
+				}
 				var filter = filterDelegate.defaultFieldFilter.copyMe()
 				filter.m_filterValue = filterDelegate.filterValue
 				filterDelegate.collectionFilter.addFieldFilter(filter)
