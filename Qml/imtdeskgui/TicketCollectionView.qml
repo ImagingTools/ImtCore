@@ -29,6 +29,15 @@ RemoteCollectionView {
 		registerFieldFilterDelegate("reportedByMeFilter", reportedByMeDelegateFilterComp)
 	}
 
+	onHeadersChanged: {
+		table.setColumnContentById(TicketItemDataTypeMetaInfo.s_createdAt, createdAtCellDelegateComp)
+	}
+
+	Component {
+		id: createdAtCellDelegateComp
+		TableCellDateDelegate {}
+	}
+
 	Component {
 		id: statusDelegateFilterComp
 		FieldFilterDelegate {
