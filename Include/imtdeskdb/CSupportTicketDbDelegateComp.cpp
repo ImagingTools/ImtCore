@@ -2,6 +2,7 @@
 #include <imtdeskdb/CSupportTicketDbDelegateComp.h>
 
 // Qt includes
+#include <QtCore/QDateTime>
 #include <QtCore/QUuid>
 #include <QtSql/QSqlRecord>
 
@@ -110,16 +111,24 @@ istd::IChangeableUniquePtr CSupportTicketDbDelegateComp::CreateObjectFromRecord(
 		ticketPtr->SetNumber(record.value("Number").toInt());
 	}
 	if (record.contains("CreatedAt")){
-		ticketPtr->SetCreatedAt(record.value("CreatedAt").toString());
+		QVariant val = record.value("CreatedAt");
+		QDateTime dt = val.toDateTime();
+		ticketPtr->SetCreatedAt(dt.isValid() ? dt.toString(Qt::ISODate) : val.toString());
 	}
 	if (record.contains("UpdatedAt")){
-		ticketPtr->SetUpdatedAt(record.value("UpdatedAt").toString());
+		QVariant val = record.value("UpdatedAt");
+		QDateTime dt = val.toDateTime();
+		ticketPtr->SetUpdatedAt(dt.isValid() ? dt.toString(Qt::ISODate) : val.toString());
 	}
 	if (record.contains("ClosedAt")){
-		ticketPtr->SetClosedAt(record.value("ClosedAt").toString());
+		QVariant val = record.value("ClosedAt");
+		QDateTime dt = val.toDateTime();
+		ticketPtr->SetClosedAt(dt.isValid() ? dt.toString(Qt::ISODate) : val.toString());
 	}
 	if (record.contains("ResolvedAt")){
-		ticketPtr->SetResolvedAt(record.value("ResolvedAt").toString());
+		QVariant val = record.value("ResolvedAt");
+		QDateTime dt = val.toDateTime();
+		ticketPtr->SetResolvedAt(dt.isValid() ? dt.toString(Qt::ISODate) : val.toString());
 	}
 
 	return ticketPtr;
