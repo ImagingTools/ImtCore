@@ -75,11 +75,8 @@ type TicketItemData {
 	title: String!
 	ticketType: TicketType
 	status: TicketStatus
-	stateReason: StateReason
 	priority: TicketPriority
-	assigneeIds: [ID]
-	labelIds: [ID]
-	locked: Boolean
+	assignee: String
 	createdAt: String
 }
 

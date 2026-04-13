@@ -112,8 +112,8 @@ DocumentViewBase {
 				}
 			}
 		}
-		activityThread.model = 0
-		activityThread.model = ticketData.m_activityItems
+		// activityThread.model = 0
+		// activityThread.model = ticketData.m_activityItems
 	}
 	
 	function updateModel() {
@@ -351,7 +351,7 @@ DocumentViewBase {
 									anchors.right: parent.right
 									anchors.top: parent.top
 									anchors.margins: Style.paddingM
-									font.pixelSize: Style.fontSizeS
+									font.pixelSize: Style.fontSizeM
 									color: Style.textColor
 									height: 100
 									wrapMode: TextEdit.Wrap
@@ -364,7 +364,7 @@ DocumentViewBase {
 										anchors.fill: parent
 										text: qsTr("Enter the description")
 										color: Style.textPlaceholderColor
-										font.pixelSize: Style.fontSizeS
+										font.pixelSize: Style.fontSizeM
 										visible: editDescriptionInput.text.length === 0
 									}
 								}
@@ -400,7 +400,7 @@ DocumentViewBase {
 									text: activityThread.count > 0
 										  ? "(" + activityThread.count + ")"
 										  : ""
-									font.pixelSize: Style.fontSizeS
+									font.pixelSize: Style.fontSizeM
 									color: Style.textSecondaryColor
 									anchors.verticalCenter: parent.verticalCenter
 								}
@@ -413,6 +413,7 @@ DocumentViewBase {
 								
 								Repeater {
 									id: activityThread
+									model: root.ticketData ? root.ticketData.m_activityItems : 0
 
 									// Each item = comment bubble OR action notice
 									delegate: Column {
@@ -435,14 +436,14 @@ DocumentViewBase {
 												Text {
 													anchors.centerIn: parent
 													text: "⚡"
-													font.pixelSize: Style.fontSizeXS
+													font.pixelSize: Style.fontSizeM
 												}
 											}
 											
 											Text {
 												width: parent.width - 32 - Style.paddingS
 												text: (model.item.m_userName || qsTr("Someone")) + " " + (model.item.m_actionDescription || model.item.m_actionType || "") + " " + (model.item.m_timestamp || "")
-												font.pixelSize: Style.fontSizeS
+												font.pixelSize: Style.fontSizeM
 												color: Style.textSecondaryColor
 												wrapMode: Text.Wrap
 												anchors.verticalCenter: parent.verticalCenter
@@ -466,7 +467,7 @@ DocumentViewBase {
 												Text {
 													anchors.centerIn: parent
 													text: model.item.m_userName ? model.item.m_userName.charAt(0).toUpperCase() : "?"
-													font.pixelSize: Style.fontSizeS
+													font.pixelSize: Style.fontSizeM
 													font.bold: true
 													color: Style.textColor
 													font.family: Style.fontFamily
@@ -483,14 +484,14 @@ DocumentViewBase {
 													
 													Text {
 														text: model.item.m_userName || qsTr("Unknown")
-														font.pixelSize: Style.fontSizeS
+														font.pixelSize: Style.fontSizeM
 														font.bold: true
 														color: Style.textColor
 													}
 													
 													Text {
 														text: qsTr("commented") + " " + root.formatTimestamp(model.item.m_timestamp)
-														font.pixelSize: Style.fontSizeXS
+														font.pixelSize: Style.fontSizeM
 														color: Style.textSecondaryColor
 													}
 												}
@@ -511,7 +512,7 @@ DocumentViewBase {
 														anchors.top: parent.top
 														anchors.margins: Style.paddingM
 														text: model.item.m_content || ""
-														font.pixelSize: Style.fontSizeS
+														font.pixelSize: Style.fontSizeM
 														color: Style.textColor
 														wrapMode: Text.Wrap
 													}
@@ -537,7 +538,7 @@ DocumentViewBase {
 								
 								Text {
 									text: qsTr("Add a comment")
-									font.pixelSize: Style.fontSizeS
+									font.pixelSize: Style.fontSizeM
 									font.bold: true
 									color: Style.textColor
 								}
@@ -556,7 +557,7 @@ DocumentViewBase {
 										Text {
 											anchors.centerIn: parent
 											text: qsTr("You")
-											font.pixelSize: Style.fontSizeXS
+											font.pixelSize: Style.fontSizeM
 											color: "white"
 											font.bold: true
 										}
@@ -583,7 +584,7 @@ DocumentViewBase {
 												anchors.top: parent.top
 												anchors.margins: Style.paddingM
 												height: 60
-												font.pixelSize: Style.fontSizeS
+												font.pixelSize: Style.fontSizeM
 												color: Style.textColor
 												wrapMode: TextEdit.Wrap
 												clip: true
@@ -592,7 +593,7 @@ DocumentViewBase {
 													anchors.fill: parent
 													text: qsTr("Leave a comment")
 													color: Style.textPlaceholderColor
-													font.pixelSize: Style.fontSizeS
+													font.pixelSize: Style.fontSizeM
 													visible: commentInputField.text.length === 0
 												}
 											}

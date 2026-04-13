@@ -15,6 +15,7 @@
 #include <imtchat/IConversation.h>
 #include <imtbase/IObjectCollectionIterator.h>
 #include <imtdeskgql/imtdeskgql.h>
+#include <imtauth/imtauth.h>
 
 
 namespace imtdeskgql
@@ -65,8 +66,6 @@ bool CTicketCollectionControllerComp::CreateRepresentationFromObject(
 		break;
 	}
 
-	representationObject.stateReason = imtdeskgql::GetSdlTypeFromStateReason(ticketPtr->GetStateReason());
-
 	imtdesk::ISupportTicket::TicketPriority ticketPriority = ticketPtr->GetPriority();
 	switch (ticketPriority){
 	case imtdesk::ISupportTicket::TP_LOW:
@@ -83,9 +82,13 @@ bool CTicketCollectionControllerComp::CreateRepresentationFromObject(
 		break;
 	}
 
-	representationObject.assigneeIds.Emplace().FromList(ticketPtr->GetAssigneeIds());
-	representationObject.labelIds.Emplace().FromList(ticketPtr->GetLabelIds());
-	representationObject.locked = ticketPtr->IsLocked();
+	QByteArrayList assigneeIds = ticketPtr->GetAssigneeIds();
+	QStringList assigneeNames;
+	for (const QByteArray& userId : assigneeIds){
+		assigneeNames << imtauth::GetUserName(*m_userCollectionCompPtr, userId);
+	}
+	representationObject.assignee = assigneeNames.join(';');
+
 	representationObject.number = ticketPtr->GetNumber();
 	representationObject.createdAt = ticketPtr->GetCreatedAt();
 

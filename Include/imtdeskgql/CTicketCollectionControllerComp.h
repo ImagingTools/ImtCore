@@ -21,6 +21,7 @@ public:
 	I_BEGIN_COMPONENT(CTicketCollectionControllerComp);
 		I_ASSIGN(m_ticketFactCompPtr, "TicketFactory", "Factory for creating ticket instances", true, "TicketFactory");
 		I_ASSIGN(m_chatServiceCompPtr, "ChatService", "Chat service for message and conversation management", false, "ChatService");
+		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "Collection of users", true, "UserCollection");
 	I_END_COMPONENT;
 
 protected:
@@ -55,6 +56,7 @@ private:
 protected:
 	I_FACT(imtdesk::ISupportTicket, m_ticketFactCompPtr);
 	I_REF(imtchat::IChatService, m_chatServiceCompPtr);
+	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
 };
 
 

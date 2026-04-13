@@ -128,7 +128,8 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>title</Value>
-                                <Value>assigneeId</Value>
+                                <Value>status</Value>
+                                <Value>number</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -136,9 +137,10 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>title</Value>
+                                <Value>number</Value>
                                 <Value>status</Value>
                                 <Value>priority</Value>
-                                <Value>assigneeId</Value>
+                                <Value>assignee</Value>
                                 <Value>createdAt</Value>
                             </Values>
                         </Data>
@@ -147,9 +149,10 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>Title</Value>
+                                <Value>Number</Value>
                                 <Value>Status</Value>
                                 <Value>Priority</Value>
-                                <Value>Assignee</Value>
+                                <Value>Assignees</Value>
                                 <Value>Created</Value>
                             </Values>
                         </Data>
@@ -158,9 +161,9 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>title</Value>
+                                <Value>number</Value>
                                 <Value>status</Value>
                                 <Value>priority</Value>
-                                <Value>assigneeId</Value>
                                 <Value>createdAt</Value>
                             </Values>
                         </Data>
@@ -323,8 +326,8 @@
                                 <Value>ticketType</Value>
                                 <Value>status</Value>
                                 <Value>priority</Value>
-                                <Value>assigneeId</Value>
                                 <Value>createdAt</Value>
+                                <Value>number</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -335,8 +338,8 @@
                                 <Value>TicketType</Value>
                                 <Value>Status</Value>
                                 <Value>Priority</Value>
-                                <Value>AssigneeId</Value>
                                 <Value>CreatedAt</Value>
+                                <Value>Number</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -350,6 +353,9 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserActionManager" Type="Reference" ExportId="UserActionManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserCollection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">

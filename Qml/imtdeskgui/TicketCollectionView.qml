@@ -18,8 +18,8 @@ RemoteCollectionView {
 	gqlGetListCommandId: ImtdeskImtDeskSdlCommandIds.s_ticketsList
 
 	Component.onCompleted: {
-		console.log("TicketCollectionView.qml onCompleted", table)
 		table.setSortingInfo(TicketItemDataTypeMetaInfo.s_createdAt, "DESC")
+		table.nonSortableColumns = [TicketItemDataTypeMetaInfo.s_assigneeNames]
 	}
 
 	commandsDelegateComp: Component {
@@ -45,7 +45,6 @@ RemoteCollectionView {
 					commandsPanelVisible: isNewIssue
 
 					onDocumentSaved: {
-						console.log("onDocumentSaved")
 						if (isNewIssue){
 							if (ticketEditor.representationController){
 								ticketEditor.representationController.updateRepresentationFromDocument()
