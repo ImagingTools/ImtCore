@@ -32,11 +32,18 @@ RemoteCollectionView {
 			}
 
 			Component {
+				id: ticketGqlCommandsComp
+				GqlBasedCommandsController {
+					typeId: "Ticket"
+				}
+			}
+
+			Component {
 				id: ticketEditorComp
 
 				TicketEditor {
 					id: ticketEditor
-					commandsControllerComp: null
+					commandsControllerComp: ticketEditor.isNewIssue ? ticketGqlCommandsComp : null
 
 					SubscriptionClient {
 						gqlCommandId: container.subscriptionCommandId
