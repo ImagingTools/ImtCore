@@ -51,6 +51,10 @@ class Item extends QtObject {
         horizontalCenter: {type:AnchorLine, value: AnchorLine.HorizontalCenter},
         verticalCenter: {type:AnchorLine, value: AnchorLine.VerticalCenter},
 
+        AX: {type:Geometry, value:0, },
+        AY: {type:Geometry, value:0, },
+        AWidth: {type:Geometry, value:0, },
+        AHeight: {type:Geometry, value:0, },
         AXChanged: {type:SpecialSignal, args:[]},
         AYChanged: {type:SpecialSignal, args:[]},
         AWidthChanged: {type:SpecialSignal, args:[]},
@@ -142,6 +146,13 @@ class Item extends QtObject {
     //     super.__updatePrimaryProperties()
     //     this.__updateProperty('anchors')
     // }
+
+    __updateProperty(propName){
+        if(propName === 'width'){
+            this.__updateProperty('height')
+        }
+        super.__updateProperty(propName)
+    }
 
     __updateProperties(){
         if(this.parent){
@@ -306,12 +317,14 @@ class Item extends QtObject {
         this.__setDOMStyle({
             left: newValue+'px'
         })
+        Geometry.setAuto(this.__self, 'AX', newValue, this.__self.constructor.meta.AX)
     }
 
     SLOT_yChanged(oldValue, newValue){
         this.__setDOMStyle({
             top: newValue+'px'
         })
+        Geometry.setAuto(this.__self, 'AY', newValue, this.__self.constructor.meta.AY)
     }
 
     SLOT_enabledChanged(oldValue, newValue){
@@ -348,6 +361,7 @@ class Item extends QtObject {
             minWidth: newValue > 0 ? newValue + 'px' : '0px',
         })
         JQApplication.updateLater(this.parent)
+        Geometry.setAuto(this.__self, 'AWidth', newValue, this.__self.constructor.meta.AWidth)
     }
 
     SLOT_heightChanged(oldValue, newValue){
@@ -358,6 +372,39 @@ class Item extends QtObject {
             minHeight: newValue > 0 ? newValue + 'px' : '0px',
         })
         JQApplication.updateLater(this.parent)
+        Geometry.setAuto(this.__self, 'AHeight', newValue, this.__self.constructor.meta.AHeight)
+    }
+
+    SLOT_AXChanged(oldValue, newValue){
+        if(this.__self.AX__prevent){
+            this.x = newValue
+        } else {
+            Real.set(this.__self, 'x', newValue, this.__self.constructor.meta.x)
+        }
+    }
+
+    SLOT_AYChanged(oldValue, newValue){
+        if(this.__self.AY__prevent){
+            this.y = newValue
+        } else {
+            Real.set(this.__self, 'y', newValue, this.__self.constructor.meta.y)
+        }
+    }
+
+    SLOT_AWidthChanged(oldValue, newValue){
+        if(this.__self.AWidth__prevent){
+            this.width = newValue
+        } else {
+            Real.set(this.__self, 'width', newValue, this.__self.constructor.meta.width)
+        }
+    }
+
+    SLOT_AHeightChanged(oldValue, newValue){
+        if(this.__self.AHeight__prevent){
+            this.height = newValue
+        } else {
+            Real.set(this.__self, 'height', newValue, this.__self.constructor.meta.height)
+        }
     }
 
     SLOT_rotationChanged(oldValue, newValue){

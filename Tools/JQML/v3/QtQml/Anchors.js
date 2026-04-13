@@ -50,15 +50,15 @@ class Anchors extends GroupProperty {
         let self = this.__parent.__proxy
 
         if(self.parent === target){
-            self.x = ()=>{return this.__proxy.leftMargin}
-            self.y = ()=>{return this.__proxy.topMargin}
-            self.width = ()=>{return target.width - (this.__proxy.leftMargin + this.__proxy.rightMargin)}
-            self.height = ()=>{return target.height - (this.__proxy.topMargin + this.__proxy.bottomMargin)}
+            self.AX = ()=>{return this.__proxy.leftMargin}
+            self.AY = ()=>{return this.__proxy.topMargin}
+            self.AWidth = ()=>{return target.AWidth - (this.__proxy.leftMargin + this.__proxy.rightMargin)}
+            self.AHeight = ()=>{return target.AHeight - (this.__proxy.topMargin + this.__proxy.bottomMargin)}
         } else {
-            self.x = ()=>{return target.x + this.__proxy.leftMargin}
-            self.y = ()=>{return target.y + this.__proxy.topMargin}
-            self.width = ()=>{return target.width - (this.__proxy.leftMargin + this.__proxy.rightMargin)}
-            self.height = ()=>{return target.height - (this.__proxy.topMargin + this.__proxy.bottomMargin)}
+            self.AX = ()=>{return target.AX + this.__proxy.leftMargin}
+            self.AY = ()=>{return target.AY + this.__proxy.topMargin}
+            self.AWidth = ()=>{return target.AWidth - (this.__proxy.leftMargin + this.__proxy.rightMargin)}
+            self.AHeight = ()=>{return target.AHeight - (this.__proxy.topMargin + this.__proxy.bottomMargin)}
         }
     }
 
@@ -68,11 +68,11 @@ class Anchors extends GroupProperty {
 
         if(target){
             if(self.parent === target){
-                self.x = ()=>{return target.width / 2 - self.width / 2}
-                self.y = ()=>{return target.height / 2 - self.height / 2}
+                self.AX = ()=>{return target.AWidth / 2 - self.AWidth / 2}
+                self.AY = ()=>{return target.AHeight / 2 - self.AHeight / 2}
             } else {
-                self.x = ()=>{return target.x + target.width / 2 - self.width / 2}
-                self.y = ()=>{return target.y + target.height / 2 - self.height / 2}
+                self.AX = ()=>{return target.AX + target.AWidth / 2 - self.AWidth / 2}
+                self.AY = ()=>{return target.AY + target.AHeight / 2 - self.AHeight / 2}
             }
         }
         
@@ -95,19 +95,19 @@ class Anchors extends GroupProperty {
 
             if(self.parent === target){
                 if(targetFloat === AnchorLine.Left){
-                    self.x = ()=>{return -self.width / 2}
+                    self.AX = ()=>{return -self.AWidth / 2}
                 } else if(targetFloat === AnchorLine.Right){
-                    self.x = ()=>{return target.width - self.width / 2}
+                    self.AX = ()=>{return target.AWidth - self.AWidth / 2}
                 } else if(targetFloat === AnchorLine.HorizontalCenter){
-                    self.x = ()=>{return target.width / 2 - self.width / 2}
+                    self.AX = ()=>{return target.AWidth / 2 - self.AWidth / 2}
                 }
             } else {
                 if(targetFloat === AnchorLine.Left){
-                    self.x = ()=>{return target.x - self.width / 2}
+                    self.AX = ()=>{return target.AX - self.AWidth / 2}
                 } else if(targetFloat === AnchorLine.Right){
-                    self.x = ()=>{return target.x + target.width - self.width / 2}
+                    self.AX = ()=>{return target.AX + target.AWidth - self.AWidth / 2}
                 } else if(targetFloat === AnchorLine.HorizontalCenter){
-                    self.x = ()=>{return target.x + target.width / 2 - self.width / 2}
+                    self.AX = ()=>{return target.AX + target.AWidth / 2 - self.AWidth / 2}
                 }
             }
         }
@@ -123,19 +123,19 @@ class Anchors extends GroupProperty {
 
             if(self.parent === target){
                 if(targetFloat === AnchorLine.Top){
-                    self.y = ()=>{return -self.height / 2}
+                    self.AY = ()=>{return -self.AHeight / 2}
                 } else if(targetFloat === AnchorLine.Bottom){
-                    self.y = ()=>{return target.height - self.height / 2}
+                    self.AY = ()=>{return target.AHeight - self.AHeight / 2}
                 } else if(targetFloat === AnchorLine.VerticalCenter){
-                    self.y = ()=>{return target.height / 2 - self.height / 2}
+                    self.AY = ()=>{return target.AHeight / 2 - self.AHeight / 2}
                 }
             } else {
                 if(targetFloat === AnchorLine.Top){
-                    self.y = ()=>{return target.y - self.height / 2}
+                    self.AY = ()=>{return target.AY - self.AHeight / 2}
                 } else if(targetFloat === AnchorLine.Bottom){
-                    self.y = ()=>{return target.y + target.height - self.height / 2}
+                    self.AY = ()=>{return target.AY + target.AHeight - self.AHeight / 2}
                 } else if(targetFloat === AnchorLine.VerticalCenter){
-                    self.y = ()=>{return target.y + target.height / 2 - self.height / 2}
+                    self.AY = ()=>{return target.AY + target.AHeight / 2 - self.AHeight / 2}
                 }               
             }
         }
@@ -147,10 +147,10 @@ class Anchors extends GroupProperty {
                 let self = this.__parent.__proxy 
                 if(self){
                     if(this.__for_x === 2){
-                        self.x = self.x
-                        self.width = self.width
+                        self.AX = self.AX
+                        self.AWidth = self.AWidth
                     } else if(this.__for_x === 1){
-                        self.x = self.x
+                        self.AX = self.AX
                     }
                 }
                 this.left = null
@@ -171,10 +171,10 @@ class Anchors extends GroupProperty {
                 let self = this.__parent.__proxy 
                 if(self){
                     if(this.__for_x === 2){
-                        self.x = self.x
-                        self.width = self.width
+                        self.AX = self.AX
+                        self.AWidth = self.AWidth
                     } else if(this.__for_x === 1){
-                        self.x = self.x
+                        self.AX = self.AX
                     }
                 }
                 this.left = null
@@ -200,10 +200,10 @@ class Anchors extends GroupProperty {
                 let self = this.__parent.__proxy 
                 if(self){
                     if(this.__for_x === 2){
-                        self.x = self.x
-                        self.width = self.width
+                        self.AX = self.AX
+                        self.AWidth = self.AWidth
                     } else if(this.__for_x === 1){
-                        self.x = self.x
+                        self.AX = self.AX
                     }
                 }
                 this.right = null
@@ -224,10 +224,10 @@ class Anchors extends GroupProperty {
                 let self = this.__parent.__proxy 
                 if(self){
                     if(this.__for_x === 2){
-                        self.x = self.x
-                        self.width = self.width
+                        self.AX = self.AX
+                        self.AWidth = self.AWidth
                     } else if(this.__for_x === 1){
-                        self.x = self.x
+                        self.AX = self.AX
                     }
                 }
                 this.right = null
@@ -265,37 +265,37 @@ class Anchors extends GroupProperty {
 
             if(self.parent === left){
                 if(leftFloat === AnchorLine.Left){
-                    self.x = ()=>{return this.__proxy.leftMargin}
+                    self.AX = ()=>{return this.__proxy.leftMargin}
                 } else if(leftFloat === AnchorLine.Right){
-                    self.x = ()=>{return left.width + this.__proxy.leftMargin}
+                    self.AX = ()=>{return left.AWidth + this.__proxy.leftMargin}
                 } else if(leftFloat === AnchorLine.HorizontalCenter){
-                    self.x = ()=>{return left.width / 2 + this.__proxy.leftMargin}
+                    self.AX = ()=>{return left.AWidth / 2 + this.__proxy.leftMargin}
                 }
             } else {
                 if(leftFloat === AnchorLine.Left){
-                    self.x = ()=>{return left.x + this.__proxy.leftMargin}
+                    self.AX = ()=>{return left.AX + this.__proxy.leftMargin}
                 } else if(leftFloat === AnchorLine.Right){
-                    self.x = ()=>{return left.x + left.width + this.__proxy.leftMargin}
+                    self.AX = ()=>{return left.AX + left.AWidth + this.__proxy.leftMargin}
                 } else if(leftFloat === AnchorLine.HorizontalCenter){
-                    self.x = ()=>{return left.x + left.width / 2 + this.__proxy.leftMargin}
+                    self.AX = ()=>{return left.AX + left.AWidth / 2 + this.__proxy.leftMargin}
                 }
             }
 
             if(self.parent === right){
                 if(rightFloat === AnchorLine.Left){
-                    self.width = ()=>{return -this.__proxy.rightMargin - self.x}
+                    self.AWidth = ()=>{return -this.__proxy.rightMargin - self.AX}
                 } else if(rightFloat === AnchorLine.Right){
-                    self.width = ()=>{return right.width - this.__proxy.rightMargin - self.x}
+                    self.AWidth = ()=>{return right.AWidth - this.__proxy.rightMargin - self.AX}
                 } else if(rightFloat === AnchorLine.HorizontalCenter){
-                    self.width = ()=>{return right.width / 2 - this.__proxy.rightMargin - self.x}
+                    self.AWidth = ()=>{return right.AWidth / 2 - this.__proxy.rightMargin - self.AX}
                 }
             } else {
                 if(rightFloat === AnchorLine.Left){
-                    self.width = ()=>{return right.x - this.__proxy.rightMargin - self.x}
+                    self.AWidth = ()=>{return right.AX - this.__proxy.rightMargin - self.AX}
                 } else if(rightFloat === AnchorLine.Right){
-                    self.width = ()=>{return right.x + right.width - this.__proxy.rightMargin - self.x}
+                    self.AWidth = ()=>{return right.AX + right.AWidth - this.__proxy.rightMargin - self.AX}
                 } else if(rightFloat === AnchorLine.HorizontalCenter){
-                    self.width = ()=>{return right.x + right.width / 2 - this.__proxy.rightMargin - self.x}
+                    self.AWidth = ()=>{return right.AX + right.AWidth / 2 - this.__proxy.rightMargin - self.AX}
                 }
             }
         } else if(self && left){
@@ -306,19 +306,19 @@ class Anchors extends GroupProperty {
 
             if(self.parent === left){
                 if(leftFloat === AnchorLine.Left){
-                    self.x = ()=>{return this.__proxy.leftMargin}
+                    self.AX = ()=>{return this.__proxy.leftMargin}
                 } else if(leftFloat === AnchorLine.Right){
-                    self.x = ()=>{return left.width + this.__proxy.leftMargin}
+                    self.AX = ()=>{return left.AWidth + this.__proxy.leftMargin}
                 } else if(leftFloat === AnchorLine.HorizontalCenter){
-                    self.x = ()=>{return left.width / 2 + this.__proxy.leftMargin}
+                    self.AX = ()=>{return left.AWidth / 2 + this.__proxy.leftMargin}
                 }
             } else {
                 if(leftFloat === AnchorLine.Left){
-                    self.x = ()=>{return left.x + this.__proxy.leftMargin}
+                    self.AX = ()=>{return left.AX + this.__proxy.leftMargin}
                 } else if(leftFloat === AnchorLine.Right){
-                    self.x = ()=>{return left.x + left.width + this.__proxy.leftMargin}
+                    self.AX = ()=>{return left.AX + left.AWidth + this.__proxy.leftMargin}
                 } else if(leftFloat === AnchorLine.HorizontalCenter){
-                    self.x = ()=>{return left.x + left.width / 2 + this.__proxy.leftMargin}
+                    self.AX = ()=>{return left.AX + left.AWidth / 2 + this.__proxy.leftMargin}
                 }            
             }
         } else if(self && right){
@@ -329,19 +329,19 @@ class Anchors extends GroupProperty {
 
             if(self.parent === right){
                 if(rightFloat === AnchorLine.Left){
-                    self.x = ()=>{return -self.width - this.__proxy.rightMargin}
+                    self.AX = ()=>{return -self.AWidth - this.__proxy.rightMargin}
                 } else if(rightFloat === AnchorLine.Right){
-                    self.x = ()=>{return right.width - self.width - this.__proxy.rightMargin}
+                    self.AX = ()=>{return right.AWidth - self.AWidth - this.__proxy.rightMargin}
                 } else if(rightFloat === AnchorLine.HorizontalCenter){
-                    self.x = ()=>{return right.width / 2 - self.width - this.__proxy.rightMargin}
+                    self.AX = ()=>{return right.AWidth / 2 - self.AWidth - this.__proxy.rightMargin}
                 }
             } else {
                 if(rightFloat === AnchorLine.Left){
-                    self.x = ()=>{return right.x - self.width - this.__proxy.rightMargin}
+                    self.AX = ()=>{return right.AX - self.AWidth - this.__proxy.rightMargin}
                 } else if(rightFloat === AnchorLine.Right){
-                    self.x = ()=>{return right.x + right.width - self.width - this.__proxy.rightMargin}
+                    self.AX = ()=>{return right.AX + right.AWidth - self.AWidth - this.__proxy.rightMargin}
                 } else if(rightFloat === AnchorLine.HorizontalCenter){
-                    self.x = ()=>{return right.x + right.width / 2 - self.width - this.__proxy.rightMargin}
+                    self.AX = ()=>{return right.AX + right.AWidth / 2 - self.AWidth - this.__proxy.rightMargin}
                 }              
             }
         }
@@ -353,10 +353,10 @@ class Anchors extends GroupProperty {
                 let self = this.__parent.__proxy 
                 if(self){
                     if(this.__for_y === 2){
-                        self.y = self.y
-                        self.height = self.height
+                        self.AY = self.AY
+                        self.AHeight = self.AHeight
                     } else if(this.__for_y === 1){
-                        self.y = self.y
+                        self.AY = self.AY
                     }
                 }
                 this.top = null
@@ -377,10 +377,10 @@ class Anchors extends GroupProperty {
                 let self = this.__parent.__proxy
                 if(self){ 
                     if(this.__for_y === 2){
-                        self.y = self.y
-                        self.height = self.height
+                        self.AY = self.AY
+                        self.AHeight = self.AHeight
                     } else if(this.__for_y === 1){
-                        self.y = self.y
+                        self.AY = self.AY
                     }
                 }
                 this.top = null
@@ -408,10 +408,10 @@ class Anchors extends GroupProperty {
                 let self = this.__parent.__proxy 
                 if(self){
                     if(this.__for_y === 2){
-                        self.y = self.y
-                        self.height = self.height
+                        self.AY = self.AY
+                        self.AHeight = self.AHeight
                     } else if(this.__for_y === 1){
-                        self.y = self.y
+                        self.AY = self.AY
                     }
                 }
                 this.bottom = null
@@ -432,10 +432,10 @@ class Anchors extends GroupProperty {
                 let self = this.__parent.__proxy 
                 if(self){
                     if(this.__for_y === 2){
-                        self.y = self.y
-                        self.height = self.height
+                        self.AY = self.AY
+                        self.AHeight = self.AHeight
                     } else if(this.__for_y === 1){
-                        self.y = self.y
+                        self.AY = self.AY
                     }
                     this.bottom = null
                 }
@@ -472,37 +472,37 @@ class Anchors extends GroupProperty {
 
             if(self.parent === top){
                 if(topFloat === AnchorLine.Top){
-                    self.y = ()=>{return this.__proxy.topMargin}
+                    self.AY = ()=>{return this.__proxy.topMargin}
                 } else if(topFloat === AnchorLine.Bottom){
-                    self.y = ()=>{return top.height + this.__proxy.topMargin}
+                    self.AY = ()=>{return top.AHeight + this.__proxy.topMargin}
                 } else if(topFloat === AnchorLine.VerticalCenter){
-                    self.y = ()=>{return top.height / 2 + this.__proxy.topMargin}
+                    self.AY = ()=>{return top.AHeight / 2 + this.__proxy.topMargin}
                 }
             } else {
                 if(topFloat === AnchorLine.Top){
-                    self.y = ()=>{return top.y + this.__proxy.topMargin}
+                    self.AY = ()=>{return top.AY + this.__proxy.topMargin}
                 } else if(topFloat === AnchorLine.Bottom){
-                    self.y = ()=>{return top.y + top.height + this.__proxy.topMargin}
+                    self.AY = ()=>{return top.AY + top.AHeight + this.__proxy.topMargin}
                 } else if(topFloat === AnchorLine.VerticalCenter){
-                    self.y = ()=>{return top.y + top.height / 2 + this.__proxy.topMargin}
+                    self.AY = ()=>{return top.AY + top.AHeight / 2 + this.__proxy.topMargin}
                 }
             }
 
             if(self.parent === bottom){
                 if(bottomFloat === AnchorLine.Top){
-                    self.height = ()=>{return -this.__proxy.bottomMargin - self.y}
+                    self.AHeight = ()=>{return -this.__proxy.bottomMargin - self.AY}
                 } else if(bottomFloat === AnchorLine.Bottom){
-                    self.height = ()=>{return bottom.height - this.__proxy.bottomMargin - self.y}
+                    self.AHeight = ()=>{return bottom.AHeight - this.__proxy.bottomMargin - self.AY}
                 } else if(bottomFloat === AnchorLine.VerticalCenter){
-                    self.height = ()=>{return bottom.height / 2 - this.__proxy.bottomMargin - self.y}
+                    self.AHeight = ()=>{return bottom.AHeight / 2 - this.__proxy.bottomMargin - self.AY}
                 }
             } else {
                 if(bottomFloat === AnchorLine.Top){
-                    self.height = ()=>{return bottom.y - this.__proxy.bottomMargin - self.y}
+                    self.AHeight = ()=>{return bottom.AY - this.__proxy.bottomMargin - self.AY}
                 } else if(bottomFloat === AnchorLine.Bottom){
-                    self.height = ()=>{return bottom.y + bottom.height - this.__proxy.bottomMargin - self.y}
+                    self.AHeight = ()=>{return bottom.AY + bottom.AHeight - this.__proxy.bottomMargin - self.AY}
                 } else if(bottomFloat === AnchorLine.VerticalCenter){
-                    self.height = ()=>{return bottom.y + bottom.height / 2 - this.__proxy.bottomMargin - self.y}
+                    self.AHeight = ()=>{return bottom.AY + bottom.AHeight / 2 - this.__proxy.bottomMargin - self.AY}
                 }
             }
         } else if(self && top){
@@ -513,19 +513,19 @@ class Anchors extends GroupProperty {
 
             if(self.parent === top){
                 if(topFloat === AnchorLine.Top){
-                    self.y = ()=>{return this.__proxy.topMargin}
+                    self.AY = ()=>{return this.__proxy.topMargin}
                 } else if(topFloat === AnchorLine.Bottom){
-                    self.y = ()=>{return top.height + this.__proxy.topMargin}
+                    self.AY = ()=>{return top.AHeight + this.__proxy.topMargin}
                 } else if(topFloat === AnchorLine.VerticalCenter){
-                    self.y = ()=>{return top.height / 2 + this.__proxy.topMargin}
+                    self.AY = ()=>{return top.AHeight / 2 + this.__proxy.topMargin}
                 }
             } else {
                 if(topFloat === AnchorLine.Top){
-                    self.y = ()=>{return top.y + this.__proxy.topMargin}
+                    self.AY = ()=>{return top.AY + this.__proxy.topMargin}
                 } else if(topFloat === AnchorLine.Bottom){
-                    self.y = ()=>{return top.y + top.height + this.__proxy.topMargin}
+                    self.AY = ()=>{return top.AY + top.AHeight + this.__proxy.topMargin}
                 } else if(topFloat === AnchorLine.VerticalCenter){
-                    self.y = ()=>{return top.y + top.height / 2 + this.__proxy.topMargin}
+                    self.AY = ()=>{return top.AY + top.AHeight / 2 + this.__proxy.topMargin}
                 }               
             }
         } else if(self && bottom){
@@ -536,19 +536,19 @@ class Anchors extends GroupProperty {
 
             if(self.parent === bottom){
                 if(bottomFloat === AnchorLine.Top){
-                    self.y = ()=>{return -self.height - this.__proxy.bottomMargin}
+                    self.AY = ()=>{return -self.AHeight - this.__proxy.bottomMargin}
                 } else if(bottomFloat === AnchorLine.Bottom){
-                    self.y = ()=>{return bottom.height - self.height - this.__proxy.bottomMargin}
+                    self.AY = ()=>{return bottom.AHeight - self.AHeight - this.__proxy.bottomMargin}
                 } else if(bottomFloat === AnchorLine.VerticalCenter){
-                    self.y = ()=>{return bottom.height / 2 - self.height - this.__proxy.bottomMargin}
+                    self.AY = ()=>{return bottom.AHeight / 2 - self.AHeight - this.__proxy.bottomMargin}
                 }
             } else {
                 if(bottomFloat === AnchorLine.Top){
-                    self.y = ()=>{return bottom.y - self.height - this.__proxy.bottomMargin}
+                    self.AY = ()=>{return bottom.AY - self.AHeight - this.__proxy.bottomMargin}
                 } else if(bottomFloat === AnchorLine.Bottom){
-                    self.y = ()=>{return bottom.y + bottom.height - self.height - this.__proxy.bottomMargin}
+                    self.AY = ()=>{return bottom.AY + bottom.AHeight - self.AHeight - this.__proxy.bottomMargin}
                 } else if(bottomFloat === AnchorLine.VerticalCenter){
-                    self.y = ()=>{return bottom.y + bottom.height / 2 - self.height - this.__proxy.bottomMargin}
+                    self.AY = ()=>{return bottom.AY + bottom.AHeight / 2 - self.AHeight - this.__proxy.bottomMargin}
                 }               
             }
         }

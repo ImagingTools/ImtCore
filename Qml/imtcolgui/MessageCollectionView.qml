@@ -12,6 +12,7 @@ RemoteCollectionView {
 	
 	commandsControllerComp: null
 	table.enableAlternating: false
+	additionalFieldIds: ["category", "infoId"]
 
 	onHeadersChanged: {
 		if (log.table.headers.getItemsCount() > 0){
@@ -32,6 +33,8 @@ RemoteCollectionView {
 	dataControllerComp: Component { CollectionRepresentation {
 			collectionId: log.collectionId
 			gqlGetListCommandId: log.gqlGetListCommandId
+			additionalFieldIds: log.additionalFieldIds
+
 			function getHeaders(){
 				return log.getHeaders()
 			}

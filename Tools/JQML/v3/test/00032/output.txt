@@ -1,0 +1,4 @@
+Loader загружен. visible: true
+Геометрия placeholder не изменилась при загрузке.
+После скрытия item в Loader:
+visible: false

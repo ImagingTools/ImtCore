@@ -1,0 +1,6 @@
+Column.onWidthChanged 75
+Column.onHeightChanged 180
+Item.onHeightChanged 180
+Item.onWidthChanged 75
+Item.onCompleted
+Column.onCompleted

@@ -36,7 +36,7 @@ class CObjectCollectionBase:
 {
 public:
 	CObjectCollectionBase();
-	virtual ~CObjectCollectionBase();
+	virtual ~CObjectCollectionBase() = default;
 
 	// reimplemented (ICollectionDataController)
 	virtual const ifile::IFilePersistence* GetPersistenceForObjectType(const QByteArray& typeId) const override;
@@ -237,4 +237,5 @@ protected:
 
 
 } // namespace imtbase
+
 

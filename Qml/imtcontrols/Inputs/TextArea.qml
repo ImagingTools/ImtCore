@@ -10,7 +10,7 @@ ControlBase {
 
     property bool isDinamicHeight: true;
 
-    property alias text: textArea.text;
+	property string text: textArea.text;
     property alias textInputFocus: textArea.focus;
     property alias readOnly: textArea.readOnly;
     property alias horizontalAlignment: textArea.horizontalAlignment;
@@ -40,6 +40,7 @@ ControlBase {
 	property bool placeHolderVerticalCentered: true;
 
 	property int editingFinishedInterval: 1000
+	property bool notEmitEditingFinishedWhenFocusLost: false
 
     signal accepted();
     signal cancelled();
@@ -71,6 +72,10 @@ ControlBase {
             }
         }
     }
+
+	onTextChanged: {
+		textArea.text = text;
+	}
 
     function setFocus(value){
         //textArea.focus = value;
@@ -237,11 +242,14 @@ ControlBase {
             }
 
             onEditingFinished: {
-                containerTextArea.editingFinished();
+				if(!containerTextArea.notEmitEditingFinishedWhenFocusLost){
+					containerTextArea.editingFinished();
+				}
             }
 
 
             onTextChanged:  {
+				containerTextArea.text = text
                 containerTextArea.textEdited();
 
                 editingFinishedTimer.restart();

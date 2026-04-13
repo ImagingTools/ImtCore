@@ -34,13 +34,6 @@ CObjectCollectionBase::CObjectCollectionBase()
 
 }
 
-
-CObjectCollectionBase::~CObjectCollectionBase()
-{
-	RemoveAllObjects();
-}
-
-
 // reimplemented (ICollectionDataController)
 
 const ifile::IFilePersistence* CObjectCollectionBase::GetPersistenceForObjectType(const QByteArray& /*typeId*/) const
@@ -1208,4 +1201,5 @@ QByteArray CObjectCollectionBase::CollectionIterator::GetObjectId(int index) con
 
 
 } // namespace imtbase
+
 

@@ -444,8 +444,16 @@ bool CDatabaseEngineComp::EnsureDatabaseConnected(QSqlError* sqlError) const
 	QString databaseConnectionName = GetConnectionName();
 	QSqlDatabase databaseConnection = QSqlDatabase::database(databaseConnectionName);
 
-	QThread* threadPtr = QThread::currentThread();
-	connect(threadPtr, &QThread::finished, this, &CDatabaseEngineComp::OnThreadFinished, Qt::DirectConnection);
+	{
+		std::lock_guard lock(m_connectedThreadsMutex);
+		QThread* threadPtr = QThread::currentThread();
+		quintptr threadId = reinterpret_cast<quintptr>(QThread::currentThreadId());
+
+		if (m_connectedThreads.count(threadId) == 0) {
+			connect(threadPtr, &QThread::finished, this, &CDatabaseEngineComp::OnThreadFinished, Qt::DirectConnection);
+			m_connectedThreads.insert(threadId);
+		}
+	}
 
 	bool isOpened = databaseConnection.isOpen();
 	if (!isOpened){
