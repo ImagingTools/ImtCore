@@ -24,7 +24,11 @@ DocumentViewBase {
 	property Component activityItemComp: Component { TicketActivityItem {} }
 	
 	signal commentSubmitted(string commentText)
-	
+
+	onIsNewIssueChanged: {
+		doUpdateGui()
+	}
+
 	function addComment(commentText) {
 		if (!commentText || commentText.length === 0 || !ticketData)
 			return
@@ -374,13 +378,14 @@ DocumentViewBase {
 								color: Style.textColor
 								wrapMode: TextEdit.Wrap
 								clip: true
+								height: 100
 								onEditingFinished: {
 									root.doUpdateModel()
 								}
 	
 								Text {
 									anchors.fill: parent
-									text: qsTr("Leave a comment")
+									text: qsTr("Enter the description")
 									color: Style.textPlaceholderColor
 									font.pixelSize: Style.fontSizeS
 									visible: newDescriptionInput.text.length === 0
@@ -591,10 +596,19 @@ DocumentViewBase {
 									anchors.margins: Style.paddingM
 									font.pixelSize: Style.fontSizeS
 									color: Style.textColor
+									height: 100
 									wrapMode: TextEdit.Wrap
 									clip: true
 									onEditingFinished: {
 										root.doUpdateModel()
+									}
+									
+									Text {
+										anchors.fill: parent
+										text: qsTr("Enter the description")
+										color: Style.textPlaceholderColor
+										font.pixelSize: Style.fontSizeS
+										visible: editDescriptionInput.text.length === 0
 									}
 								}
 							}
