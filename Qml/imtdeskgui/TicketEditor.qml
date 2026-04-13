@@ -29,6 +29,13 @@ DocumentViewBase {
 		doUpdateGui()
 	}
 
+	function formatTimestamp(isoStr) {
+		if (!isoStr) return ""
+		var d = new Date(isoStr)
+		if (isNaN(d.getTime())) return isoStr
+		return d.toLocaleDateString(Qt.locale(), "d MMM yyyy") + " " + d.toLocaleTimeString(Qt.locale(), "HH:mm")
+	}
+
 	function addComment(commentText) {
 		if (!commentText || commentText.length === 0 || !ticketData)
 			return
@@ -459,14 +466,15 @@ DocumentViewBase {
 												Text {
 													anchors.centerIn: parent
 													text: model.item.m_userName ? model.item.m_userName.charAt(0).toUpperCase() : "?"
-													font.pixelSize: Style.fontSizeXS
+													font.pixelSize: Style.fontSizeS
+													font.bold: true
 													color: Style.textColor
 													font.family: Style.fontFamily
 												}
 											}
 											
 											Column {
-												width: parent.width - 32 - Style.paddingS
+												width: parent.width - 40 - Style.paddingS
 												spacing: Style.spacingXS
 												
 												// Header: sender name + timestamp
@@ -481,7 +489,7 @@ DocumentViewBase {
 													}
 													
 													Text {
-														text: qsTr("commented") + " " + (model.item.m_timestamp || "")
+														text: qsTr("commented") + " " + root.formatTimestamp(model.item.m_timestamp)
 														font.pixelSize: Style.fontSizeXS
 														color: Style.textSecondaryColor
 													}
@@ -594,13 +602,34 @@ DocumentViewBase {
 											anchors.right: parent.right
 											spacing: Style.spacingS
 
-											Button {
-												text: qsTr("Comment")
-												widthFromDecorator: true
+											Rectangle {
+												width: commentBtnText.contentWidth + Style.marginM * 2
 												height: Style.buttonHeightM
-												onClicked: {
-													root.addComment(commentInputField.text.trim())
-													commentInputField.text = ""
+												radius: Style.buttonRadius
+												color: commentBtnMa.pressed
+													   ? Qt.darker(Style.imaginToolsAccentColor, 1.2)
+													   : commentBtnMa.containsMouse
+														 ? Qt.lighter(Style.imaginToolsAccentColor, 1.1)
+														 : Style.imaginToolsAccentColor
+
+												Text {
+													id: commentBtnText
+													anchors.centerIn: parent
+													text: qsTr("Comment")
+													font.pixelSize: Style.fontSizeM
+													font.family: Style.fontFamily
+													color: "white"
+												}
+
+												MouseArea {
+													id: commentBtnMa
+													anchors.fill: parent
+													hoverEnabled: true
+													cursorShape: Qt.PointingHandCursor
+													onClicked: {
+														root.addComment(commentInputField.text.trim())
+														commentInputField.text = ""
+													}
 												}
 											}
 										}
