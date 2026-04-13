@@ -74,113 +74,72 @@ DocumentViewBase {
 	}
 	
 	function updateGui() {
-		if (root.isNewIssue) {
-			newTitleInput.text = ticketData.m_title || ""
-			newDescriptionInput.text = ticketData.m_description || ""
-			newTypeCB.currentIndex = findComboIndex(newTypeCB, ticketData.m_ticketType, 1)
-			newPriorityCB.currentIndex = findComboIndex(newPriorityCB, ticketData.m_priority, 1)
-			
-			newAssigneeCB.currentIndex = -1
-			if (newAssigneeCB.model) {
-				let ids = ticketData.m_assigneeIds || []
-				let first = ids.length > 0 ? ids[0] : ""
-				for (let i = 0; i < newAssigneeCB.model.getItemsCount(); i++) {
-					if (newAssigneeCB.model.getData("id", i) === first) {
-						newAssigneeCB.currentIndex = i
-						break
-					}
+		editTitleInput.text = ticketData.m_title || ""
+		editDescriptionInput.text = ticketData.m_description || ""
+		editTypeCB.currentIndex = findComboIndex(editTypeCB, ticketData.m_ticketType, 1)
+		editPriorityCB.currentIndex = findComboIndex(editPriorityCB, ticketData.m_priority, 1)
+		editStatusCB.currentIndex = findComboIndex(editStatusCB, ticketData.m_status, 0)
+		editStateReasonCB.currentIndex = findComboIndex(editStateReasonCB, ticketData.m_stateReason, 0)
+		editLockReasonInput.text = ticketData.m_lockReason || ""
+		editLockedCB.checkState = ticketData.m_locked ? Qt.Checked : Qt.Unchecked
+		
+		editAssigneeCB.currentIndex = -1
+		if (editAssigneeCB.model) {
+			let ids = ticketData.m_assigneeIds || []
+			let first = ids.length > 0 ? ids[0] : ""
+			for (let i = 0; i < editAssigneeCB.model.getItemsCount(); i++) {
+				if (editAssigneeCB.model.getData("id", i) === first) {
+					editAssigneeCB.currentIndex = i
+					break
 				}
 			}
 		}
-		else {
-			editTitleInput.text = ticketData.m_title || ""
-			editDescriptionInput.text = ticketData.m_description || ""
-			editTypeCB.currentIndex = findComboIndex(editTypeCB, ticketData.m_ticketType, 1)
-			editPriorityCB.currentIndex = findComboIndex(editPriorityCB, ticketData.m_priority, 1)
-			editStatusCB.currentIndex = findComboIndex(editStatusCB, ticketData.m_status, 0)
-			editStateReasonCB.currentIndex = findComboIndex(editStateReasonCB, ticketData.m_stateReason, 0)
-			editLockReasonInput.text = ticketData.m_lockReason || ""
-			editLockedCB.checkState = ticketData.m_locked ? Qt.Checked : Qt.Unchecked
-			
-			editAssigneeCB.currentIndex = -1
-			if (editAssigneeCB.model) {
-				let ids = ticketData.m_assigneeIds || []
-				let first = ids.length > 0 ? ids[0] : ""
-				for (let i = 0; i < editAssigneeCB.model.getItemsCount(); i++) {
-					if (editAssigneeCB.model.getData("id", i) === first) {
-						editAssigneeCB.currentIndex = i
-						break
-					}
+		
+		editReporterCB.currentIndex = -1
+		if (editReporterCB.model) {
+			let reporterId = ticketData.m_reporterId || AuthorizationController.getUserId()
+			for (let i = 0; i < editReporterCB.model.getItemsCount(); i++) {
+				if (editReporterCB.model.getData("id", i) === reporterId) {
+					editReporterCB.currentIndex = i
+					break
 				}
 			}
-			
-			editReporterCB.currentIndex = -1
-			if (editReporterCB.model) {
-				let reporterId = ticketData.m_reporterId || AuthorizationController.getUserId()
-				for (let i = 0; i < editReporterCB.model.getItemsCount(); i++) {
-					if (editReporterCB.model.getData("id", i) === reporterId) {
-						editReporterCB.currentIndex = i
-						break
-					}
-				}
-			}
-			activityThread.model = 0
-			activityThread.model = ticketData.m_activityItems
 		}
+		activityThread.model = 0
+		activityThread.model = ticketData.m_activityItems
 	}
 	
 	function updateModel() {
-		if (root.isNewIssue) {
-			ticketData.m_title = newTitleInput.text
-			ticketData.m_description = newDescriptionInput.text
-			ticketData.m_reporterId = AuthorizationController.getUserId()
-			
-			if (newAssigneeCB.model && newAssigneeCB.currentIndex >= 0) {
-				ticketData.m_assigneeIds = [newAssigneeCB.model.getData("id", newAssigneeCB.currentIndex)]
-			}
-			else {
-				ticketData.m_assigneeIds = []
-			}
-			
-			if (newTypeCB.model && newTypeCB.currentIndex >= 0) {
-				ticketData.m_ticketType = newTypeCB.model.getData("id", newTypeCB.currentIndex)
-			}
-			if (newPriorityCB.model && newPriorityCB.currentIndex >= 0) {
-				ticketData.m_priority = newPriorityCB.model.getData("id", newPriorityCB.currentIndex)
-			}
+		ticketData.m_title = editTitleInput.text
+		ticketData.m_description = editDescriptionInput.text
+		ticketData.m_locked = editLockedCB.checkState === Qt.Checked
+		ticketData.m_lockReason = editLockReasonInput.text
+		
+		if (editAssigneeCB.model && editAssigneeCB.currentIndex >= 0) {
+			ticketData.m_assigneeIds = [editAssigneeCB.model.getData("id", editAssigneeCB.currentIndex)]
 		}
 		else {
-			ticketData.m_title = editTitleInput.text
-			ticketData.m_description = editDescriptionInput.text
-			ticketData.m_locked = editLockedCB.checkState === Qt.Checked
-			ticketData.m_lockReason = editLockReasonInput.text
-			
-			if (editAssigneeCB.model && editAssigneeCB.currentIndex >= 0) {
-				ticketData.m_assigneeIds = [editAssigneeCB.model.getData("id", editAssigneeCB.currentIndex)]
-			}
-			else {
-				ticketData.m_assigneeIds = []
-			}
-			
-			if (editReporterCB.model && editReporterCB.currentIndex >= 0) {
-				ticketData.m_reporterId = editReporterCB.model.getData("id", editReporterCB.currentIndex)
-			}
-			else {
-				ticketData.m_reporterId = ""
-			}
-			
-			if (editTypeCB.model && editTypeCB.currentIndex >= 0) {
-				ticketData.m_ticketType = editTypeCB.model.getData("id", editTypeCB.currentIndex)
-			}
-			if (editPriorityCB.model && editPriorityCB.currentIndex >= 0) {
-				ticketData.m_priority = editPriorityCB.model.getData("id", editPriorityCB.currentIndex)
-			}
-			if (editStatusCB.model && editStatusCB.currentIndex >= 0) {
-				ticketData.m_status = editStatusCB.model.getData("id", editStatusCB.currentIndex)
-			}
-			if (editStateReasonCB.model && editStateReasonCB.currentIndex >= 0) {
-				ticketData.m_stateReason = editStateReasonCB.model.getData("id", editStateReasonCB.currentIndex)
-			}
+			ticketData.m_assigneeIds = []
+		}
+		
+		if (editReporterCB.model && editReporterCB.currentIndex >= 0) {
+			ticketData.m_reporterId = editReporterCB.model.getData("id", editReporterCB.currentIndex)
+		}
+		else {
+			ticketData.m_reporterId = root.isNewIssue ? AuthorizationController.getUserId() : ""
+		}
+		
+		if (editTypeCB.model && editTypeCB.currentIndex >= 0) {
+			ticketData.m_ticketType = editTypeCB.model.getData("id", editTypeCB.currentIndex)
+		}
+		if (editPriorityCB.model && editPriorityCB.currentIndex >= 0) {
+			ticketData.m_priority = editPriorityCB.model.getData("id", editPriorityCB.currentIndex)
+		}
+		if (editStatusCB.model && editStatusCB.currentIndex >= 0) {
+			ticketData.m_status = editStatusCB.model.getData("id", editStatusCB.currentIndex)
+		}
+		if (editStateReasonCB.model && editStateReasonCB.currentIndex >= 0) {
+			ticketData.m_stateReason = editStateReasonCB.model.getData("id", editStateReasonCB.currentIndex)
 		}
 	}
 	
@@ -191,7 +150,6 @@ DocumentViewBase {
 		commandId: ImtauthUsersSdlCommandIds.s_usersList
 		fields: [UserDataInputTypeMetaInfo.s_id, UserDataInputTypeMetaInfo.s_typeId, UserDataInputTypeMetaInfo.s_name]
 		onCollectionModelChanged: {
-			newAssigneeCB.model = collectionModel
 			editAssigneeCB.model = collectionModel
 			editReporterCB.model = collectionModel
 			root.doUpdateGui()
@@ -278,223 +236,14 @@ DocumentViewBase {
 	}
 	
 	// ================================================================
-	// VIEW 1: CREATE NEW ISSUE (isNewIssue === true)
-	// Like GitHub's "New Issue" page — clean form, green Submit button
+	// Ticket editor view — same layout for both new and existing tickets
+	// Left: scrollable content (title, description, activity)
+	// Right: fixed sidebar (assignees, type, priority, reporter, status, etc.)
 	// ================================================================
 	
 	Item {
-		id: createView
-		visible: root.isNewIssue
+		id: editView
 		anchors.fill: parent
-		
-		CustomScrollbar {
-			id: createScrollV
-			z: parent.z + 1
-			anchors.right: parent.right
-			anchors.top: createFlick.top
-			anchors.bottom: createFlick.bottom
-			secondSize: Style.marginM
-			targetItem: createFlick
-			visible: createView.visible
-		}
-		
-		Flickable {
-			id: createFlick
-			anchors.top: parent.top
-			anchors.topMargin: Style.marginXL
-			anchors.bottom: parent.bottom
-			anchors.bottomMargin: Style.marginXL
-			anchors.left: parent.left
-			anchors.leftMargin: Style.marginXL
-			anchors.right: createScrollV.left
-			anchors.rightMargin: Style.marginXL
-			contentWidth: createRow.width
-			contentHeight: createRow.height + Style.marginXL * 2
-			boundsBehavior: Flickable.StopAtBounds
-			clip: true
-			
-			Row {
-				id: createRow
-				spacing: Style.marginXL
-				
-				// Left: main content
-				Column {
-					id: createMainCol
-					width: 560
-					spacing: Style.marginM
-					
-					// Title
-					Column {
-						width: parent.width
-						spacing: Style.spacingS
-						
-						Text {
-							text: qsTr("Add a title")
-							font.pixelSize: Style.fontSizeM
-							font.bold: true
-							color: Style.textColor
-						}
-						
-						CustomTextField {
-							id: newTitleInput
-							width: parent.width
-							height: Style.controlHeightM
-							placeHolderText: qsTr("Title")
-							onEditingFinished: {
-								root.doUpdateModel()
-							}
-						}
-					}
-					
-					// Description
-					Column {
-						width: parent.width
-						spacing: Style.spacingS
-						
-						Text {
-							text: qsTr("Add a description")
-							font.pixelSize: Style.fontSizeM
-							font.bold: true
-							color: Style.textColor
-						}
-
-						Rectangle {
-							width: parent.width
-							height: newDescriptionInput.height + Style.paddingM * 2
-							radius: Style.radiusS
-							border.color: newDescriptionInput.activeFocus
-										  ? Style.accentColor
-										  : Style.borderColor
-							border.width: 1
-							color: Style.baseColor
-
-							TextEdit {
-								id: newDescriptionInput
-								anchors.left: parent.left
-								anchors.right: parent.right
-								anchors.top: parent.top
-								anchors.margins: Style.paddingM
-								font.pixelSize: Style.fontSizeS
-								color: Style.textColor
-								wrapMode: TextEdit.Wrap
-								clip: true
-								height: 100
-								onEditingFinished: {
-									root.doUpdateModel()
-								}
-	
-								Text {
-									anchors.fill: parent
-									text: qsTr("Enter the description")
-									color: Style.textPlaceholderColor
-									font.pixelSize: Style.fontSizeS
-									visible: newDescriptionInput.text.length === 0
-								}
-							}
-						}
-					}
-				}
-				
-				// Separator
-				Rectangle {
-					width: 1
-					height: createMainCol.height
-					color: Style.borderColor
-				}
-				
-				// Right: sidebar
-				Column {
-					width: 260
-					spacing: Style.spacingM
-					
-					// Assignees
-					Column {
-						width: parent.width
-						spacing: Style.spacingS
-						
-						Text {
-							text: qsTr("Assignees")
-							font.pixelSize: Style.fontSizeM
-							font.bold: true
-							color: Style.textColor
-						}
-						
-						ComboBox {
-							id: newAssigneeCB
-							width: parent.width
-							height: Style.controlHeightM
-							onCurrentIndexChanged: {
-								root.doUpdateModel()
-							}
-						}
-					}
-					
-					Rectangle { width: parent.width; height: 1; color: Style.borderColor }
-					
-					// Type
-					Column {
-						width: parent.width
-						spacing: Style.spacingS
-						
-						Text {
-							text: qsTr("Type")
-							font.pixelSize: Style.fontSizeM
-							font.bold: true
-							color: Style.textColor
-						}
-						
-						ComboBox {
-							id: newTypeCB
-							width: parent.width
-							height: Style.controlHeightM
-							currentIndex: 1
-							model: ticketTypeModel
-							onCurrentIndexChanged: {
-								root.doUpdateModel()
-							}
-						}
-					}
-					
-					Rectangle { width: parent.width; height: 1; color: Style.borderColor }
-					
-					// Priority
-					Column {
-						width: parent.width
-						spacing: Style.spacingS
-						
-						Text {
-							text: qsTr("Priority")
-							font.pixelSize: Style.fontSizeM
-							font.bold: true
-							color: Style.textColor
-						}
-						
-						ComboBox {
-							id: newPriorityCB
-							width: parent.width
-							height: Style.controlHeightM
-							currentIndex: 1
-							model: priorityModel
-							onCurrentIndexChanged: {
-								root.doUpdateModel()
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	
-	// ================================================================
-	// VIEW 2: EDIT EXISTING ISSUE (isNewIssue === false)
-		// Like GitHub's Issue detail page — header with #N, status badges,
-		// full sidebar, Close/Reopen action buttons
-		// ================================================================
-		
-		Item {
-			id: editView
-			visible: !root.isNewIssue
-			anchors.fill: parent
 			
 			CustomScrollbar {
 				id: editScrollV
