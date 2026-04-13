@@ -16,12 +16,8 @@
                     <AttributeInfo Id="Collection" Type="Reference" ExportId="DeviceRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DocumentManagerEventHandler" Type="Reference[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>CollectionDocumentManagerPublisher</Value>
-                            </Values>
-                        </Data>
+                    <AttributeInfo Id="DocumentManagerEventHandler" Type="Reference[]" ExportId="DocumentManagerEventHandler">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DocumentNameProviders" Type="Reference[]" ExportId="DocumentNameProviders">
                         <Data IsEnabled="false"/>
@@ -68,24 +64,6 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="CollectionDocumentManagerPublisher" PackageId="ImtServerGqlPck" ComponentId="CollectionDocumentManagerPublisher">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="CollectionId" Type="Id" ExportId="CollectionId">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="SerializedUndoManager" PackageId="BasePck" ComponentId="SerializedUndoManager">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap/>
@@ -96,9 +74,7 @@
     <ExportedInterfaces>
         <Interface InterfaceId="imod::IModel" ComponentId="CollectionDocumentManager"/>
         <Interface InterfaceId="imtdoc::IDocumentManager" ComponentId="CollectionDocumentManager"/>
-        <Interface InterfaceId="imtdoc::IDocumentManagerEventHandler" ComponentId="CollectionDocumentManagerPublisher"/>
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="CollectionDocumentManagerController"/>
-        <Interface InterfaceId="imtgql::IGqlSubscriberController" ComponentId="CollectionDocumentManagerPublisher"/>
         <Interface InterfaceId="istd::IChangeable" ComponentId="CollectionDocumentManager"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="CollectionDocumentManager"/>
     </ExportedInterfaces>

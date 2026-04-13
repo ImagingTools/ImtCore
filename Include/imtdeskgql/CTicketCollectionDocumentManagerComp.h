@@ -7,6 +7,7 @@
 #include <imtchat/IChatMessage.h>
 #include <imtchat/IChatService.h>
 #include <imtdoc/IDocumentManager.h>
+#include <imtdoc/IDocumentManagerEventHandler.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentManager.h>
 
@@ -18,12 +19,15 @@ namespace imtdeskgql
 {
 
 
-class CTicketCollectionDocumentManagerComp: public sdl::imtdesk::TicketCollectionDocumentManager::CGraphQlHandlerCompBase
+class CTicketCollectionDocumentManagerComp: 
+			public sdl::imtdesk::TicketCollectionDocumentManager::CGraphQlHandlerCompBase,
+			virtual public imtdoc::IDocumentManagerEventHandler
 {
 public:
 	typedef sdl::imtdesk::TicketCollectionDocumentManager::CGraphQlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CTicketCollectionDocumentManagerComp)
+		I_REGISTER_INTERFACE(imtdoc::IDocumentManagerEventHandler)
 		I_ASSIGN(m_documentManagerCompPtr, "CollectionDocumentManager", "Collection document manager", false, "CollectionDocumentManager");
 		I_ASSIGN(m_ticketCollectionCompPtr, "TicketCollection", "Ticket collection for refreshing DB-computed fields after save", false, "TicketCollection");
 		I_ASSIGN(m_messageCollectionCompPtr, "MessageCollection", "Collection of chat messages", false, "MessageCollection");
@@ -40,6 +44,9 @@ protected:
 				const sdl::imtdesk::TicketCollectionDocumentManager::CUpdateTicketFromRepresentationGqlRequest& updateTicketFromRepresentationRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+
+	// reimplemented (imtdoc::IDocumentManagerEventHandler)
+	virtual bool ProcessEvent(imtdoc::CEventBase* eventPtr) override;
 
 private:
 	I_REF(imtdoc::IDocumentManager, m_documentManagerCompPtr);

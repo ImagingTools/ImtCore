@@ -13,6 +13,7 @@
 #include <imtchat/IConversation.h>
 #include <imtbase/IObjectCollectionIterator.h>
 #include <imtdeskgql/imtdeskgql.h>
+#include <imtdoc/CDocumentSavedEvent.h>
 
 
 namespace imtdeskgql
@@ -51,27 +52,6 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 	imtdesk::ISupportTicket* ticketPtr = dynamic_cast<imtdesk::ISupportTicket*>(documentPtr.GetPtr());
 	if (ticketPtr == nullptr){
 		return sdl::imtdesk::ImtDesk::CTicketData();
-	}
-
-	// After SaveDocument, DB-computed fields (Number from SERIAL, CreatedAt/UpdatedAt
-	// from NOW()) may not be reflected in the document manager's in-memory model.
-	// If Number == 0, the ticket has been saved to DB but the computed Number hasn't
-	// been loaded back. Read from the collection (SQL-backed) and refresh.
-	if (ticketPtr->GetNumber() == 0 && m_ticketCollectionCompPtr.IsValid()){
-		imtbase::IObjectCollection::DataPtr collectionDataPtr;
-		if (m_ticketCollectionCompPtr->GetObjectData(objectId, collectionDataPtr)){
-			const imtdesk::ISupportTicket* dbTicketPtr = dynamic_cast<const imtdesk::ISupportTicket*>(collectionDataPtr.GetPtr());
-			if (dbTicketPtr != nullptr && dbTicketPtr->GetNumber() > 0){
-				ticketPtr->SetNumber(dbTicketPtr->GetNumber());
-				if (!dbTicketPtr->GetCreatedAt().isEmpty()){
-					ticketPtr->SetCreatedAt(dbTicketPtr->GetCreatedAt());
-				}
-				if (!dbTicketPtr->GetUpdatedAt().isEmpty()){
-					ticketPtr->SetUpdatedAt(dbTicketPtr->GetUpdatedAt());
-				}
-				m_documentManagerCompPtr->SetDocumentData(userId, objectId, *ticketPtr);
-			}
-		}
 	}
 
 	sdl::imtdesk::ImtDesk::CTicketData response;
@@ -330,4 +310,45 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 }
 
 
+// reimplemented (imtdoc::IDocumentManagerEventHandler)
+
+bool CTicketCollectionDocumentManagerComp::ProcessEvent(imtdoc::CEventBase* eventPtr)
+{
+	imtdoc::CDocumentSavedEvent* savedEventPtr = dynamic_cast<imtdoc::CDocumentSavedEvent*>(eventPtr);
+	if (savedEventPtr != nullptr){
+		QByteArray documentId = savedEventPtr->GetDocumentId();
+		QByteArray userId = savedEventPtr->GetUserId();
+		QByteArray objectId = savedEventPtr->GetDocumentUrl().toString().toUtf8().replace("collection:///", "");
+
+		imtbase::IObjectCollection::DataPtr collectionDataPtr;
+		const imtdesk::ISupportTicket* dbTicketPtr = nullptr;
+		if (m_ticketCollectionCompPtr->GetObjectData(objectId, collectionDataPtr)){
+			dbTicketPtr = dynamic_cast<const imtdesk::ISupportTicket*>(collectionDataPtr.GetPtr());
+		}
+	
+		istd::IChangeableSharedPtr documentPtr;
+		imtdesk::ISupportTicket* documentTicketPtr = nullptr;
+		if (m_documentManagerCompPtr->GetDocumentData(userId, documentId, documentPtr) == imtdoc::IDocumentManager::OS_OK){
+			documentTicketPtr = dynamic_cast<imtdesk::ISupportTicket*>(documentPtr.GetPtr());
+		}
+
+		if (dbTicketPtr != nullptr && documentTicketPtr != nullptr){
+			if (documentTicketPtr->GetNumber() == 0){
+				documentTicketPtr->SetId(dbTicketPtr->GetId());
+				documentTicketPtr->SetNumber(dbTicketPtr->GetNumber());
+				documentTicketPtr->SetUpdatedAt(dbTicketPtr->GetUpdatedAt());
+				documentTicketPtr->SetCreatedAt(dbTicketPtr->GetCreatedAt());
+	
+				m_documentManagerCompPtr->SetDocumentData(userId, documentId, *documentPtr);
+				m_documentManagerCompPtr->SaveDocument(userId, documentId);
+			}
+		}
+	}
+
+	return true;
+}
+
+
 } // namespace imtdeskgql
+
+
