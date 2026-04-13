@@ -24,6 +24,8 @@ RemoteCollectionView {
 		table.nonSortableColumns = [TicketItemDataTypeMetaInfo.s_assignee]
 		registerFieldFilterDelegate("statusFilter", statusDelegateFilterComp)
 		registerFieldFilterDelegate("priorityFilter", priorityDelegateFilterComp)
+		registerFieldFilterDelegate("assignedToMeFilter", assignedToMeDelegateFilterComp)
+		registerFieldFilterDelegate("reportedByMeFilter", reportedByMeDelegateFilterComp)
 	}
 
 	Component {
@@ -52,6 +54,34 @@ RemoteCollectionView {
 				createAndAddOption("1", qsTr("Medium"), "", true)
 				createAndAddOption("2", qsTr("High"), "", true)
 				createAndAddOption("3", qsTr("Critical"), "", true)
+			}
+		}
+	}
+
+	Component {
+		id: assignedToMeDelegateFilterComp
+		FieldFilterDelegate {
+			name: qsTr("Assigned to me")
+			defaultFieldFilter.m_fieldId: "AssigneeIds"
+			defaultFieldFilter.m_filterValueType: "String"
+			defaultFieldFilter.m_filterOperations: ["Contains"]
+
+			Component.onCompleted: {
+				var userId = AuthorizationController.getUserId()
+				createAndAddOption(userId, qsTr("Yes"), "", true)
+			}
+		}
+	}
+
+	Component {
+		id: reportedByMeDelegateFilterComp
+		FieldFilterDelegate {
+			name: qsTr("Reported by me")
+			defaultFieldFilter.m_fieldId: "ReporterId"
+
+			Component.onCompleted: {
+				var userId = AuthorizationController.getUserId()
+				createAndAddOption(userId, qsTr("Yes"), "", true)
 			}
 		}
 	}
