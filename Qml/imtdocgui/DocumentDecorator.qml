@@ -90,6 +90,7 @@ QtObject {
 		for (let i = 0; i < registeredViews.length; ++i){
 			if (registeredViews[i].model === representation){
 				registeredViews[i].setBlockingUpdateModel(true)
+				_internal.updateCounters[i]++
 				break
 			}
 		}
@@ -104,8 +105,12 @@ QtObject {
 
 		for (let i = 0; i < registeredViews.length; ++i){
 			if (registeredViews[i].model === representation){
-				registeredViews[i].setBlockingUpdateModel(false)
-				
+				_internal.updateCounters[i]--
+				if (_internal.updateCounters[i] <= 0){
+					_internal.updateCounters[i] = 0
+					registeredViews[i].setBlockingUpdateModel(false)
+				}
+
 				registeredViews[i].doUpdateGui()
 				break
 			}
@@ -155,6 +160,7 @@ QtObject {
 
 		registeredViews.push(view)
 		registeredRepresentation.push(representationController)
+		_internal.updateCounters.push(0)
 		
 		viewRegistered(view, representationController, updateRepr)
 	}
@@ -218,5 +224,6 @@ QtObject {
 	property QtObject _internal: QtObject {
 		property var requestUpdateViews: []
 		property bool saveRequested: false
+		property var updateCounters: []
 	}
 }

@@ -59,7 +59,7 @@ RemoteCollectionView {
 							let typeOperation = data.getData("typeOperation")
 							if (typeOperation === "updated" && itemId === ticketEditor.ticketData.m_id){
 								if (ticketEditor.representationController){
-									// ticketEditor.representationController.updateRepresentationFromDocument()
+									ticketEditor.representationController.updateRepresentationFromDocument()
 								}
 							}
 						}
