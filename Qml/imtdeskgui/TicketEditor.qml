@@ -20,8 +20,11 @@ DocumentViewBase {
 	
 	property TicketData ticketData: model
 	property bool isNewIssue: ticketData ? (ticketData.m_number === 0) : true
-	// Component factory for creating TicketActivityItem instances
-	property Component activityItemComp: Component { TicketActivityItem {} }
+	// Component factory for creating TicketComment instances
+	property Component commentComp: Component { TicketComment {} }
+	
+	// Current user ID for chat-style alignment
+	readonly property string currentUserId: AuthorizationController.getUserId()
 	
 	signal commentSubmitted(string commentText)
 
@@ -45,23 +48,22 @@ DocumentViewBase {
 		var userName = AuthorizationController.userTokenProvider.login || ""
 		var now = new Date().toISOString()
 		
-		if (!ticketData.hasActivityItems()){
-			ticketData.emplaceActivityItems()
+		if (!ticketData.hasComments()){
+			ticketData.emplaceComments()
 		}
 
-		let newItem = ticketData.createActivityItemsArrayElement()
+		let newItem = ticketData.createCommentsArrayElement()
 		if (!newItem){
 			setBlockingUpdateModel(false)
 			return
 		}
 
-		newItem.m_itemType = "Comment"
 		newItem.m_userId = userId
 		newItem.m_userName = userName
 		newItem.m_timestamp = now
 		newItem.m_content = commentText
 		newItem.m_reactions = []
-		ticketData.m_activityItems.addElement(newItem)
+		ticketData.m_comments.addElement(newItem)
 
 		setBlockingUpdateModel(false)
 		ticketData.modelChanged()
@@ -112,8 +114,8 @@ DocumentViewBase {
 				}
 			}
 		}
-		// activityThread.model = 0
-		// activityThread.model = ticketData.m_activityItems
+		// commentsThread.model = 0
+		// commentsThread.model = ticketData.m_comments
 	}
 	
 	function updateModel() {
@@ -371,7 +373,7 @@ DocumentViewBase {
 							}
 						}
 						
-						// ── Activity / Conversation thread ──
+						// ── Comments thread ──
 						Rectangle {
 							visible: !root.isNewIssue
 							width: parent.width
@@ -389,7 +391,7 @@ DocumentViewBase {
 								spacing: Style.spacingS
 								
 								Text {
-									text: qsTr("Activity")
+									text: qsTr("Comments")
 									font.pixelSize: Style.fontSizeL
 									font.bold: true
 									color: Style.textColor
@@ -397,8 +399,8 @@ DocumentViewBase {
 								}
 								
 								Text {
-									text: activityThread.count > 0
-										  ? "(" + activityThread.count + ")"
+									text: commentsThread.count > 0
+										  ? "(" + commentsThread.count + ")"
 										  : ""
 									font.pixelSize: Style.fontSizeM
 									color: Style.textSecondaryColor
@@ -407,115 +409,88 @@ DocumentViewBase {
 							}
 							
 							Column {
-								id: activityListCol
+								id: commentsListCol
 								width: parent.width
 								spacing: Style.spacingS
 								
 								Repeater {
-									id: activityThread
-									model: root.ticketData ? root.ticketData.m_activityItems : 0
+									id: commentsThread
+									model: root.ticketData ? root.ticketData.m_comments : 0
 
-									// Each item = comment bubble OR action notice
-									delegate: Column {
-										width: activityListCol.width
-										spacing: Style.spacingXS
+									delegate: Item {
+										width: commentsListCol.width
+										height: commentBubbleCol.height
 										
-										// --- Action item (e.g., "User closed ticket") ---
-										Row {
-											visible: model.item.m_itemType === "Action"
-											width: parent.width
-											spacing: Style.paddingS
-											
-											// Action icon circle
-											Rectangle {
-												width: 32
-												height: 32
-												radius: 16
-												color: Style.textSecondaryColor
-												
-												Text {
-													anchors.centerIn: parent
-													text: "⚡"
-													font.pixelSize: Style.fontSizeM
+										readonly property bool isMe: model.item.m_userId === root.currentUserId
+
+										Column {
+											id: commentBubbleCol
+											width: parent.width * 0.75
+											anchors.right: isMe ? parent.right : undefined
+											anchors.left: isMe ? undefined : parent.left
+											spacing: Style.spacingXS
+
+											// Header: sender name + timestamp
+											Row {
+												spacing: Style.paddingS
+												anchors.right: isMe ? parent.right : undefined
+												anchors.left: isMe ? undefined : parent.left
+												layoutDirection: isMe ? Qt.RightToLeft : Qt.LeftToRight
+
+												// Avatar circle
+												Rectangle {
+													width: 32
+													height: width
+													radius: width / 2
+													color: isMe ? Style.imaginToolsAccentColor : Style.accentColor
+
+													Text {
+														anchors.centerIn: parent
+														text: model.item.m_userName ? model.item.m_userName.charAt(0).toUpperCase() : "?"
+														font.pixelSize: Style.fontSizeS
+														font.bold: true
+														color: "white"
+														font.family: Style.fontFamily
+													}
 												}
-											}
-											
-											Text {
-												width: parent.width - 32 - Style.paddingS
-												text: (model.item.m_userName || qsTr("Someone")) + " " + (model.item.m_actionDescription || model.item.m_actionType || "") + " " + (model.item.m_timestamp || "")
-												font.pixelSize: Style.fontSizeM
-												color: Style.textSecondaryColor
-												wrapMode: Text.Wrap
-												anchors.verticalCenter: parent.verticalCenter
-											}
-										}
-										
-										// --- Comment item ---
-										Row {
-											visible: model.item.m_itemType !== "Action"
-											width: parent.width
-											spacing: Style.paddingS
-											
-											// Avatar circle
-											Rectangle {
-												anchors.verticalCenter: parent.verticalCenter
-												width: 40
-												height: width
-												radius: width / 2
-												color: Style.accentColor
 
 												Text {
-													anchors.centerIn: parent
-													text: model.item.m_userName ? model.item.m_userName.charAt(0).toUpperCase() : "?"
+													text: model.item.m_userName || qsTr("Unknown")
 													font.pixelSize: Style.fontSizeM
 													font.bold: true
 													color: Style.textColor
-													font.family: Style.fontFamily
+													anchors.verticalCenter: parent.verticalCenter
+												}
+
+												Text {
+													text: root.formatTimestamp(model.item.m_timestamp)
+													font.pixelSize: Style.fontSizeS
+													color: Style.textSecondaryColor
+													anchors.verticalCenter: parent.verticalCenter
 												}
 											}
 											
-											Column {
-												width: parent.width - 40 - Style.paddingS
-												spacing: Style.spacingXS
+											// Comment body bubble
+											Rectangle {
+												width: Math.min(commentBubbleCol.width, commentBodyText.contentWidth + Style.paddingM * 2 + 2)
+												height: commentBodyText.height + Style.paddingM * 2
+												radius: Style.radiusS
+												color: isMe ? Style.imaginToolsAccentColor : Style.surfaceColor
+												border.color: isMe ? Style.imaginToolsAccentColor : Style.borderColor
+												border.width: 1
+												anchors.right: isMe ? parent.right : undefined
+												anchors.left: isMe ? undefined : parent.left
 												
-												// Header: sender name + timestamp
-												Row {
-													spacing: Style.paddingS
-													
-													Text {
-														text: model.item.m_userName || qsTr("Unknown")
-														font.pixelSize: Style.fontSizeM
-														font.bold: true
-														color: Style.textColor
-													}
-													
-													Text {
-														text: qsTr("commented") + " " + root.formatTimestamp(model.item.m_timestamp)
-														font.pixelSize: Style.fontSizeM
-														color: Style.textSecondaryColor
-													}
-												}
-												
-												// Comment body
-												Rectangle {
-													width: parent.width
-													height: activityBodyText.height + Style.paddingM * 2
-													radius: Style.radiusS
-													color: Style.surfaceColor
-													border.color: Style.borderColor
-													border.width: 1
-													
-													Text {
-														id: activityBodyText
-														anchors.left: parent.left
-														anchors.right: parent.right
-														anchors.top: parent.top
-														anchors.margins: Style.paddingM
-														text: model.item.m_content || ""
-														font.pixelSize: Style.fontSizeM
-														color: Style.textColor
-														wrapMode: Text.Wrap
-													}
+												Text {
+													id: commentBodyText
+													anchors.left: parent.left
+													anchors.right: parent.right
+													anchors.top: parent.top
+													anchors.margins: Style.paddingM
+													text: model.item.m_content || ""
+													font.pixelSize: Style.fontSizeM
+													color: isMe ? "white" : Style.textColor
+													wrapMode: Text.Wrap
 												}
 											}
 										}

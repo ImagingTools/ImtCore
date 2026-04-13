@@ -89,18 +89,17 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 					m_messageCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), 0, -1, &paramsSet));
 
 		if (iteratorPtr.IsValid()){
-			response.Version_1_0->activityItems.Emplace();
+			response.Version_1_0->comments.Emplace();
 
-			QList<sdl::imtdesk::ImtDesk::CTicketActivityItem::V1_0> itemList;
+			QList<sdl::imtdesk::ImtDesk::CTicketComment::V1_0> itemList;
 
 			while (iteratorPtr->Next()){
 				imtbase::IObjectCollection::DataPtr dataPtr;
 				if (iteratorPtr->GetObjectData(dataPtr)){
 					const imtchat::IChatMessage* msgPtr = dynamic_cast<const imtchat::IChatMessage*>(dataPtr.GetPtr());
 					if (msgPtr != nullptr){
-						sdl::imtdesk::ImtDesk::CTicketActivityItem::V1_0 itemData;
+						sdl::imtdesk::ImtDesk::CTicketComment::V1_0 itemData;
 						itemData.id = msgPtr->GetId();
-						itemData.itemType = sdl::imtdesk::ImtDesk::ActivityItemType::Comment;
 						itemData.userId = msgPtr->GetSenderId();
 
 						itemData.userName = "";
@@ -128,10 +127,10 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 				}
 			}
 
-			response.Version_1_0->activityItems->FromList(itemList);
+			response.Version_1_0->comments->FromList(itemList);
 
-			if (response.Version_1_0->activityItems->isEmpty()){
-				response.Version_1_0->activityItems.Reset();
+			if (response.Version_1_0->comments->isEmpty()){
+				response.Version_1_0->comments.Reset();
 			}
 		}
 	}
@@ -263,16 +262,13 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 		}
 	}
 
-	if (ticketInfo.activityItems){
-		// Comment-type activity items are saved as messages via IChatService
+	if (ticketInfo.comments){
+		// Comments are saved as messages via IChatService
 		// Messages are NOT part of the ticket document — they don't trigger document change
 		QByteArray conversationId = ticketPtr->GetConversationId();
 		if (!conversationId.isEmpty() && m_chatServiceCompPtr.IsValid()){
-			for (const auto& sdlItem : *ticketInfo.activityItems){
+			for (const auto& sdlItem : *ticketInfo.comments){
 				if (!sdlItem){
-					continue;
-				}
-				if (sdlItem->itemType != sdl::imtdesk::ImtDesk::ActivityItemType::Comment){
 					continue;
 				}
 				// Skip items that already have an id — they are existing messages loaded from DB

@@ -47,23 +47,15 @@ type LabelData {
 	description: String
 }
 
-# --- Activity ---
+# --- Comment ---
 
-enum ActivityItemType {
-	Comment
-	Action
-}
-
-type TicketActivityItem {
+type TicketComment {
 	id: ID
-	itemType: ActivityItemType!
 	userId: ID
 	userName: String
 	timestamp: String
 	content: String
 	reactions: [String]
-	actionType: String
-	actionDescription: String
 }
 
 # --- Ticket ---
@@ -101,7 +93,7 @@ type TicketData {
 	updatedAt: String
 	closedAt: String
 	resolvedAt: String
-	activityItems: [TicketActivityItem]
+	comments: [TicketComment]
 }
 
 input TicketsListInput {
