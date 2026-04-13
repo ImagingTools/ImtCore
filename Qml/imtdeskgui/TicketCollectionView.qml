@@ -60,31 +60,23 @@ RemoteCollectionView {
 
 	Component {
 		id: assignedToMeDelegateFilterComp
-		FieldFilterDelegate {
+		EnableableFilterDelegate {
 			name: qsTr("Assigned to me")
 			defaultFieldFilter.m_fieldId: "AssigneeIds"
 			defaultFieldFilter.m_filterValueType: "String"
 			defaultFieldFilter.m_filterOperations: ["Contains"]
-
-			Component.onCompleted: {
-				var userId = AuthorizationController.getUserId()
-				createAndAddOption(userId, qsTr("Yes"), "", true)
-			}
+			filterValue: AuthorizationController.getUserId()
 		}
 	}
 
 	Component {
 		id: reportedByMeDelegateFilterComp
-		FieldFilterDelegate {
+		EnableableFilterDelegate {
 			name: qsTr("Reported by me")
 			defaultFieldFilter.m_fieldId: "ReporterId"
 			defaultFieldFilter.m_filterValueType: "String"
 			defaultFieldFilter.m_filterOperations: ["Equal"]
-
-			Component.onCompleted: {
-				var userId = AuthorizationController.getUserId()
-				createAndAddOption(userId, qsTr("Yes"), "", true)
-			}
+			filterValue: AuthorizationController.getUserId()
 		}
 	}
 

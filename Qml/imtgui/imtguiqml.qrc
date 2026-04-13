@@ -35,6 +35,7 @@
         <file alias="imtgui/Panels/TopRightPanel.qml">Panels/TopRightPanel.qml</file>
         <file alias="imtgui/Panels/TopRightPanelDecorator.qml">Panels/TopRightPanelDecorator.qml</file>
         <file alias="imtgui/Panels/CommandsPanel.qml">Panels/CommandsPanel.qml</file>
+        <file alias="imtgui/Panels/EnableableFilterDelegate.qml">Panels/EnableableFilterDelegate.qml</file>
         <file alias="imtgui/Panels/FieldFilterDelegate.qml">Panels/FieldFilterDelegate.qml</file>
         <file alias="imtgui/Panels/FilterDelegateBase.qml">Panels/FilterDelegateBase.qml</file>
         <file alias="imtgui/Panels/OptionsFilterDelegate.qml">Panels/OptionsFilterDelegate.qml</file>
