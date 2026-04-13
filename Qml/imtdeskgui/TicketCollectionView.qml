@@ -6,6 +6,7 @@ import imtcolgui 1.0
 import imtcontrols 1.0
 import imtguigql 1.0
 import imtdocgui 1.0
+import imtauthgui 1.0
 import imtdeskImtDeskSdl 1.0
 import imtdeskTicketCollectionDocumentManagerSdl 1.0
 import imtbaseCollectionDocumentManagerSdl 1.0
