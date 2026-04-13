@@ -78,6 +78,8 @@ RemoteCollectionView {
 		FieldFilterDelegate {
 			name: qsTr("Reported by me")
 			defaultFieldFilter.m_fieldId: "ReporterId"
+			defaultFieldFilter.m_filterValueType: "String"
+			defaultFieldFilter.m_filterOperations: ["Equal"]
 
 			Component.onCompleted: {
 				var userId = AuthorizationController.getUserId()
