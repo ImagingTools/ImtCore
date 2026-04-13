@@ -418,6 +418,7 @@ DocumentViewBase {
 									model: root.ticketData ? root.ticketData.m_comments : 0
 
 									delegate: Item {
+										id: commentDelegate
 										width: commentsListCol.width
 										height: commentBubbleCol.height
 										
@@ -426,23 +427,23 @@ DocumentViewBase {
 										Column {
 											id: commentBubbleCol
 											width: parent.width * 0.75
-											anchors.right: isMe ? parent.right : undefined
-											anchors.left: isMe ? undefined : parent.left
+											anchors.right: commentDelegate.isMe ? parent.right : undefined
+											anchors.left: commentDelegate.isMe ? undefined : parent.left
 											spacing: Style.spacingXS
 
 											// Header: sender name + timestamp
 											Row {
 												spacing: Style.paddingS
-												anchors.right: isMe ? parent.right : undefined
-												anchors.left: isMe ? undefined : parent.left
-												layoutDirection: isMe ? Qt.RightToLeft : Qt.LeftToRight
+												anchors.right: commentDelegate.isMe ? parent.right : undefined
+												anchors.left: commentDelegate.isMe ? undefined : parent.left
+												layoutDirection: commentDelegate.isMe ? Qt.RightToLeft : Qt.LeftToRight
 
 												// Avatar circle
 												Rectangle {
 													width: 32
 													height: width
 													radius: width / 2
-													color: isMe ? Style.imaginToolsAccentColor : Style.accentColor
+													color: commentDelegate.isMe ? Style.imaginToolsAccentColor : Style.accentColor
 
 													Text {
 														anchors.centerIn: parent
@@ -475,11 +476,11 @@ DocumentViewBase {
 												width: Math.min(commentBubbleCol.width, commentBodyText.contentWidth + Style.paddingM * 2 + 2)
 												height: commentBodyText.height + Style.paddingM * 2
 												radius: Style.radiusS
-												color: isMe ? Style.imaginToolsAccentColor : Style.surfaceColor
-												border.color: isMe ? Style.imaginToolsAccentColor : Style.borderColor
+												color: commentDelegate.isMe ? Style.imaginToolsAccentColor : Style.surfaceColor
+												border.color: commentDelegate.isMe ? Style.imaginToolsAccentColor : Style.borderColor
 												border.width: 1
-												anchors.right: isMe ? parent.right : undefined
-												anchors.left: isMe ? undefined : parent.left
+												anchors.right: commentDelegate.isMe ? parent.right : undefined
+												anchors.left: commentDelegate.isMe ? undefined : parent.left
 												
 												Text {
 													id: commentBodyText
@@ -489,7 +490,7 @@ DocumentViewBase {
 													anchors.margins: Style.paddingM
 													text: model.item.m_content || ""
 													font.pixelSize: Style.fontSizeM
-													color: isMe ? "white" : Style.textColor
+													color: commentDelegate.isMe ? "white" : Style.textColor
 													wrapMode: Text.Wrap
 												}
 											}
