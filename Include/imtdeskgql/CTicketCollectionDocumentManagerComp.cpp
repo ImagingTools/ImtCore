@@ -126,25 +126,26 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 						QByteArrayList attachmentIds = msgPtr->GetAttachmentIds();
 						if (!attachmentIds.isEmpty()){
 							itemData.attachments.Emplace();
-							QStringList attachmentStrings;
+							QList<sdl::imtdesk::ImtDesk::CAttachment::V1_0> attachmentList;
 							for (const QByteArray& aid : attachmentIds){
-								// Resolve attachment ID to data URL via IAttachmentStorage
+								sdl::imtdesk::ImtDesk::CAttachment::V1_0 att;
+								att.id = aid;
+								// Resolve attachment to preview data URL
 								if (m_attachmentStorageCompPtr.IsValid()){
 									QByteArray data;
 									QString fileName;
 									QString mimeType;
 									if (m_attachmentStorageCompPtr->GetAttachment(aid, data, fileName, mimeType)){
-										QString dataUrl = QString("data:%1;base64,%2")
+										att.fileName = fileName;
+										att.mimeType = mimeType;
+										att.preview = QString("data:%1;base64,%2")
 												.arg(mimeType)
 												.arg(QString::fromLatin1(data.toBase64()));
-										attachmentStrings << dataUrl;
-										continue;
 									}
 								}
-								// Fallback: pass the raw attachment ID
-								attachmentStrings << QString::fromUtf8(aid);
+								attachmentList << att;
 							}
-							itemData.attachments->FromList(attachmentStrings);
+							itemData.attachments->FromList(attachmentList);
 						}
 
 						QStringList reactions = msgPtr->GetReactions();
@@ -320,27 +321,37 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 				QByteArrayList attachmentIds;
 				if (sdlItem->attachments){
 					for (const auto& att : *sdlItem->attachments){
-						if (att){
-							QString attStr = *att;
-							// Check if the attachment is a data URL (base64-encoded binary)
-							if (attStr.startsWith("data:") && m_attachmentStorageCompPtr.IsValid()){
-								// Parse data URL: data:<mimeType>;base64,<data>
+						if (!att){
+							continue;
+						}
+						// New attachment: client sends base64 data in the 'data' field
+						if (att->data && !att->data->isEmpty() && m_attachmentStorageCompPtr.IsValid()){
+							QString dataStr = *att->data;
+							// Parse data URL: data:<mimeType>;base64,<data>
+							if (dataStr.startsWith("data:")){
 								const int dataPrefix = 5; // length of "data:"
-								int semiIdx = attStr.indexOf(';');
-								int commaIdx = attStr.indexOf(',');
+								int semiIdx = dataStr.indexOf(';');
+								int commaIdx = dataStr.indexOf(',');
 								if (semiIdx > dataPrefix && commaIdx > semiIdx){
-									QString mimeType = attStr.mid(dataPrefix, semiIdx - dataPrefix);
-									QByteArray base64Data = attStr.mid(commaIdx + 1).toLatin1();
+									QString mimeType = dataStr.mid(dataPrefix, semiIdx - dataPrefix);
+									QByteArray base64Data = dataStr.mid(commaIdx + 1).toLatin1();
 									QByteArray binaryData = QByteArray::fromBase64(base64Data);
 
-									// Derive file extension from mime type
-									int slashIdx = mimeType.indexOf('/');
-									QString ext = (slashIdx >= 0) ? mimeType.mid(slashIdx + 1) : "bin";
-									if (ext == "jpeg") ext = "jpg";
-									if (ext == "svg+xml") ext = "svg";
-									QString fileName = QString("attachment_%1.%2")
-											.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs).replace(':', '-'))
-											.arg(ext);
+									QString fileName;
+									if (att->fileName && !att->fileName->isEmpty()){
+										fileName = *att->fileName;
+									} else {
+										int slashIdx = mimeType.indexOf('/');
+										QString ext = (slashIdx >= 0) ? mimeType.mid(slashIdx + 1) : "bin";
+										if (ext == "jpeg") ext = "jpg";
+										if (ext == "svg+xml") ext = "svg";
+										fileName = QString("attachment_%1.%2")
+												.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs).replace(':', '-'))
+												.arg(ext);
+									}
+									if (att->mimeType && !att->mimeType->isEmpty()){
+										mimeType = *att->mimeType;
+									}
 
 									QByteArray storedId = m_attachmentStorageCompPtr->StoreAttachment(binaryData, fileName, mimeType);
 									if (!storedId.isEmpty()){
@@ -349,25 +360,28 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 									}
 								}
 							}
-							// Check if it's a file:// URL (local file — store its data)
-							if (attStr.startsWith("file://") && m_attachmentStorageCompPtr.IsValid()){
-								QUrl fileUrl(attStr);
+							// file:// URL (native desktop)
+							if (dataStr.startsWith("file://")){
+								QUrl fileUrl(dataStr);
 								QString localPath = fileUrl.toLocalFile();
 								QFile file(localPath);
 								if (file.open(QIODevice::ReadOnly)){
 									QByteArray binaryData = file.readAll();
 									file.close();
 									QFileInfo fileInfo(localPath);
-									QString fileName = fileInfo.fileName();
-									// Determine MIME type from extension
+									QString fileName = (att->fileName && !att->fileName->isEmpty()) ? *att->fileName : fileInfo.fileName();
 									QString ext = fileInfo.suffix().toLower();
 									QString mimeType = "application/octet-stream";
-									if (ext == "png") mimeType = "image/png";
-									else if (ext == "jpg" || ext == "jpeg") mimeType = "image/jpeg";
-									else if (ext == "gif") mimeType = "image/gif";
-									else if (ext == "bmp") mimeType = "image/bmp";
-									else if (ext == "svg") mimeType = "image/svg+xml";
-									else if (ext == "webp") mimeType = "image/webp";
+									if (att->mimeType && !att->mimeType->isEmpty()){
+										mimeType = *att->mimeType;
+									} else {
+										if (ext == "png") mimeType = "image/png";
+										else if (ext == "jpg" || ext == "jpeg") mimeType = "image/jpeg";
+										else if (ext == "gif") mimeType = "image/gif";
+										else if (ext == "bmp") mimeType = "image/bmp";
+										else if (ext == "svg") mimeType = "image/svg+xml";
+										else if (ext == "webp") mimeType = "image/webp";
+									}
 
 									QByteArray storedId = m_attachmentStorageCompPtr->StoreAttachment(binaryData, fileName, mimeType);
 									if (!storedId.isEmpty()){
@@ -376,8 +390,10 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 									}
 								}
 							}
-							// Fallback: treat as raw attachment ID
-							attachmentIds << att->toUtf8();
+						}
+						// Existing attachment: has an id
+						if (att->id && !att->id->isEmpty()){
+							attachmentIds << *att->id;
 						}
 					}
 				}

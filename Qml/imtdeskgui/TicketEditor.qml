@@ -81,8 +81,14 @@ DocumentViewBase {
 		newItem.m_timestamp = now
 		newItem.m_content = commentText || ""
 		newItem.m_reactions = []
-		if (attachmentsList && attachmentsList.length > 0)
-			newItem.m_attachments = attachmentsList.map(function(a) { return String(a) })
+		if (attachmentsList && attachmentsList.length > 0) {
+			newItem.emplaceAttachments()
+			for (var i = 0; i < attachmentsList.length; i++) {
+				var att = newItem.createAttachmentsArrayElement()
+				att.m_data = String(attachmentsList[i])
+				newItem.m_attachments.addElement(att)
+			}
+		}
 		ticketData.m_comments.addElement(newItem)
 		
 		setBlockingUpdateModel(false)
@@ -522,7 +528,8 @@ DocumentViewBase {
 											Repeater {
 												model: model.item.m_attachments || []
 												delegate: Image {
-													source: modelData
+													readonly property string imageUrl: model.item ? (model.item.m_preview || model.item.m_data || "") : ""
+													source: imageUrl
 													width: Math.min(width, bubbleContent.width)
 													fillMode: Image.PreserveAspectFit
 													asynchronous: true
@@ -546,7 +553,7 @@ DocumentViewBase {
 													
 													Text {
 														anchors.centerIn: parent
-														text: "📎 " + modelData
+														text: "📎 " + (model.item ? (model.item.m_fileName || "") : "")
 														font.pixelSize: Style.fontSizeS
 														color: Style.textSecondaryColor
 														visible: parent.status === Image.Error

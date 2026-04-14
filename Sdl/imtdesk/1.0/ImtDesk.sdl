@@ -47,6 +47,16 @@ type LabelData {
 	description: String
 }
 
+# --- Attachment ---
+
+type Attachment {
+	id: ID
+	fileName: String
+	mimeType: String
+	data: String
+	preview: String
+}
+
 # --- Comment ---
 
 type TicketComment {
@@ -55,7 +65,7 @@ type TicketComment {
 	userName: String
 	timestamp: String
 	content: String
-	attachments: [String]
+	attachments: [Attachment]
 	reactions: [String]
 }
 
