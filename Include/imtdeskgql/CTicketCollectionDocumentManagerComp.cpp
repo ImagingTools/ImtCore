@@ -305,7 +305,7 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 					}
 				}
 
-				m_chatServiceCompPtr->SendMessage(conversationId, senderId, content, QByteArrayList(), attachmentIds);
+				m_chatServiceCompPtr->SendMessage(conversationId, senderId, content, QByteArrayList() /*entityReferences*/, attachmentIds);
 			}
 		}
 	}
