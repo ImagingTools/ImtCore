@@ -130,7 +130,7 @@ DocumentViewBase {
 			}
 			reader.onerror = function() {
 				root.uploadsInProgress--
-				console.error("Failed to read attachment file")
+				console.error("Failed to read attachment file: " + fileName)
 			}
 		} else {
 			// Native: read file with FileIO and POST binary data
@@ -868,6 +868,7 @@ DocumentViewBase {
 									}
 									previewReader.onerror = function() {
 										// Upload without local preview
+										console.warn("Failed to generate preview for: " + fileName)
 										root.uploadAttachment(fileObj, fileName, "")
 									}
 								} else {
