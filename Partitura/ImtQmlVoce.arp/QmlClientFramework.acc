@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6154" Description="ACF"/>
-            <Version Id="1" Number="2274" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395778" Description="Qt Framework"/>
+            <Version Id="0" Number="6379" Description="ACF"/>
+            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -148,8 +148,8 @@
         <Element Id="MainWindow" PackageId="ImtQmlPck" ComponentId="QuickObject">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ApplicationInfoController" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ApplicationInfoDelegator"/>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApplicationInfo"/>
                     </AttributeInfo>
                     <AttributeInfo Id="BaseUrl" Type="String" ExportId="BaseUrl">
                         <Data IsEnabled="false"/>

@@ -432,9 +432,6 @@ Item {
 					if (item.documentTypeId !== undefined){
 						item.documentTypeId = stackView.documentTypeId
 					}
-					if (item.representationController !== undefined){
-						item.representationController = stackView.documentTypeId
-					}
 				}
 
 				workspaceView.documentManager.onViewInstanceCreated(documentId, item, viewTypeId)
