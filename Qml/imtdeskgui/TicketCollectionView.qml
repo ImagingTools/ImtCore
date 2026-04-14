@@ -31,11 +31,37 @@ RemoteCollectionView {
 
 	onHeadersChanged: {
 		table.setColumnContentById(TicketItemDataTypeMetaInfo.s_createdAt, createdAtCellDelegateComp)
+		table.setColumnContentById(TicketItemDataTypeMetaInfo.s_status, statusCellDelegateComp)
 	}
 
 	Component {
 		id: createdAtCellDelegateComp
 		TableCellDateDelegate {}
+	}
+
+	Component {
+		id: statusCellDelegateComp
+		TableCellDelegateBase {
+			id: statusDelegate
+
+			readonly property var _statusIndex: ({
+				"Open": 0,
+				"Closed": 1
+			})
+
+			onReused: {
+				var val = statusDelegate.getValue()
+				statusBadge.value = _statusIndex[val] !== undefined ? _statusIndex[val] : 0
+			}
+
+			TicketBadge {
+				id: statusBadge
+				badgeType: "status"
+				anchors.verticalCenter: parent.verticalCenter
+				anchors.left: parent.left
+				anchors.leftMargin: statusDelegate && statusDelegate.rowDelegate ? statusDelegate.rowDelegate.textLeftMargin : 0
+			}
+		}
 	}
 
 	Component {
