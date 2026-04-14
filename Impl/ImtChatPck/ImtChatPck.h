@@ -8,7 +8,9 @@
 // ImtCore includes
 #include <imtchat/CChatMessageComp.h>
 #include <imtchat/CConversationComp.h>
+#include <imtchat/CAttachmentComp.h>
 #include <imtchat/CChatServiceComp.h>
+#include <imtchat/CAttachmentStorageComp.h>
 
 
 /**
@@ -20,7 +22,9 @@ namespace ImtChatPck
 
 typedef icomp::TModelCompWrap<imtchat::CChatMessageComp> ChatMessage;
 typedef icomp::TModelCompWrap<imtchat::CConversationComp> Conversation;
+typedef icomp::TModelCompWrap<imtchat::CAttachmentComp> Attachment;
 typedef imtchat::CChatServiceComp ChatService;
+typedef imtchat::CAttachmentStorageComp AttachmentStorage;
 
 
 } // namespace ImtChatPck

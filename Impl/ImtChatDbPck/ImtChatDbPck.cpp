@@ -16,6 +16,11 @@ I_EXPORT_PACKAGE(
 			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
 
 I_EXPORT_COMPONENT(
+			AttachmentDbDelegate,
+			"Attachment database delegate",
+			"Attachment Database Delegate");
+
+I_EXPORT_COMPONENT(
 			ConversationDbDelegate,
 			"Conversation database delegate",
 			"Conversation Database Delegate");

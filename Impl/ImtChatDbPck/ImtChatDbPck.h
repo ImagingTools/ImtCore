@@ -3,6 +3,7 @@
 
 
 // ImtCore includes
+#include <imtchatdb/CAttachmentDbDelegateComp.h>
 #include <imtchatdb/CConversationDbDelegateComp.h>
 #include <imtchatdb/CMessageDbDelegateComp.h>
 #include <imtchatdb/CMessageStatusDbDelegateComp.h>
@@ -16,6 +17,7 @@ namespace ImtChatDbPck
 {
 
 
+typedef imtchatdb::CAttachmentDbDelegateComp AttachmentDbDelegate;
 typedef imtchatdb::CConversationDbDelegateComp ConversationDbDelegate;
 typedef imtchatdb::CMessageDbDelegateComp MessageDbDelegate;
 typedef imtchatdb::CMessageStatusDbDelegateComp MessageStatusDbDelegate;

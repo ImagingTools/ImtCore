@@ -6,6 +6,7 @@
 #include <imtdesk/ISupportTicket.h>
 #include <imtchat/IChatMessage.h>
 #include <imtchat/IChatService.h>
+#include <imtchat/IAttachmentStorage.h>
 #include <imtdoc/IDocumentManager.h>
 #include <imtdoc/IDocumentManagerEventHandler.h>
 #include <imtbase/IObjectCollection.h>
@@ -33,6 +34,7 @@ public:
 		I_ASSIGN(m_messageCollectionCompPtr, "MessageCollection", "Collection of chat messages", false, "MessageCollection");
 		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "Collection of users", true, "UserCollection");
 		I_ASSIGN(m_chatServiceCompPtr, "ChatService", "Chat service for message and conversation management", false, "ChatService");
+		I_ASSIGN(m_attachmentStorageCompPtr, "AttachmentStorage", "Storage service for binary attachments", true, "AttachmentStorage");
 	I_END_COMPONENT
 
 protected:
@@ -54,6 +56,7 @@ private:
 	I_REF(imtbase::IObjectCollection, m_messageCollectionCompPtr);
 	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
 	I_REF(imtchat::IChatService, m_chatServiceCompPtr);
+	I_REF(imtchat::IAttachmentStorage, m_attachmentStorageCompPtr);
 };
 
 
