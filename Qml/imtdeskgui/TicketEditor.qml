@@ -492,7 +492,7 @@ DocumentViewBase {
 									// Comment body bubble
 									Rectangle {
 										width: commentBubbleCol.width
-										height: bubbleContent.implicitHeight + Style.paddingM * 2
+										height: bubbleContent.height + Style.paddingM * 2
 										radius: Style.radiusS
 										color: Style.baseColor
 										border.color: Style.borderColor
@@ -523,7 +523,7 @@ DocumentViewBase {
 												model: model.item.m_attachments || []
 												delegate: Image {
 													source: modelData
-													width: Math.min(implicitWidth, bubbleContent.width)
+													width: Math.min(width, bubbleContent.width)
 													fillMode: Image.PreserveAspectFit
 													asynchronous: true
 													
