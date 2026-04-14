@@ -39,6 +39,18 @@ DocumentViewBase {
 		return d.toLocaleDateString(Qt.locale(), "d MMM yyyy") + " " + d.toLocaleTimeString(Qt.locale(), "HH:mm")
 	}
 
+	function formatCommentHtml(content) {
+		if (!content) return ""
+		return content
+			.replace(/&/g, "&amp;")
+			.replace(/</g, "&lt;")
+			.replace(/>/g, "&gt;")
+			.replace(/"/g, "&quot;")
+			.replace(/'/g, "&#39;")
+			.replace(/\\n/g, "<br>")
+			.replace(/\n/g, "<br>")
+	}
+
 	function addComment(commentText) {
 		if (!commentText || commentText.length === 0 || !ticketData)
 			return
@@ -486,7 +498,7 @@ DocumentViewBase {
 											y: Style.paddingM
 											width: parent.width - Style.paddingM * 2
 											textFormat: Text.StyledText
-											text: (model.item.m_content || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\\n/g, "<br>").replace(/\n/g, "<br>")
+											text: root.formatCommentHtml(model.item.m_content)
 											font.pixelSize: Style.fontSizeM
 											color: Style.textColor
 											wrapMode: Text.Wrap
