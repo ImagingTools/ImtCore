@@ -289,7 +289,7 @@ DocumentViewBase {
 					spacing: Style.spacingS
 					
 					Text {
-						text: "#" + (ticketData ? ticketData.m_number : "")
+						text: "#" + (root.ticketData ? root.ticketData.m_number : "")
 						font.pixelSize: Style.fontSizeL
 						font.bold: true
 						color: Style.textColor
@@ -472,7 +472,7 @@ DocumentViewBase {
 									// Comment body bubble
 									Rectangle {
 										width: commentBubbleCol.width
-										height: commentBodyText.contentHeight + Style.paddingM * 2
+										height: commentBodyText.height + Style.paddingM * 2
 										radius: Style.radiusS
 										color: Style.baseColor
 										border.color: Style.borderColor
@@ -531,7 +531,7 @@ DocumentViewBase {
 									anchors.centerIn: parent
 									text: qsTr("You")
 									font.pixelSize: Style.fontSizeM
-									color: "white"
+									color: Style.textColor
 									font.bold: true
 								}
 							}

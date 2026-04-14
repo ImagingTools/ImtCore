@@ -38,8 +38,8 @@ Rectangle {
 		: (_labelMap[badgeType] && value >= 0 && value < _labelMap[badgeType].length)
 			? _labelMap[badgeType][value] : "?"
 
-	width: Style.badgeWidthS
-	height: Style.badgeHeight
+	width: badgeLabelText.width + 2*Style.marginM
+	height: 30
 	radius: height / 2
 	color: badgeColor
 
@@ -47,7 +47,7 @@ Rectangle {
 		id: badgeLabelText
 		anchors.centerIn: parent
 		text: ticketBadgeRoot.badgeLabel
-		font.pixelSize: Style.fontSizeXS
+		font.pixelSize: Style.fontSizeM
 		color: "white"
 		font.bold: true
 	}
