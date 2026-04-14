@@ -55,6 +55,7 @@ type TicketComment {
 	userName: String
 	timestamp: String
 	content: String
+	attachments: [String]
 	reactions: [String]
 }
 

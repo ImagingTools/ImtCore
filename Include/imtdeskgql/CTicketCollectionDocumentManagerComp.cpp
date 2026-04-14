@@ -116,6 +116,16 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 						itemData.timestamp = msgPtr->GetCreatedAt();
 						itemData.content = msgPtr->GetContent();
 
+						QByteArrayList attachmentIds = msgPtr->GetAttachmentIds();
+						if (!attachmentIds.isEmpty()){
+							itemData.attachments.Emplace();
+							QStringList attachmentStrings;
+							for (const QByteArray& aid : attachmentIds){
+								attachmentStrings << QString::fromUtf8(aid);
+							}
+							itemData.attachments->FromList(attachmentStrings);
+						}
+
 						QStringList reactions = msgPtr->GetReactions();
 						if (!reactions.isEmpty()){
 							itemData.reactions.Emplace();
@@ -286,7 +296,16 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 					senderId = *sdlItem->userId;
 				}
 
-				m_chatServiceCompPtr->SendMessage(conversationId, senderId, content);
+				QByteArrayList attachmentIds;
+				if (sdlItem->attachments){
+					for (const auto& att : *sdlItem->attachments){
+						if (att){
+							attachmentIds << att->toUtf8();
+						}
+					}
+				}
+
+				m_chatServiceCompPtr->SendMessage(conversationId, senderId, content, QByteArrayList(), attachmentIds);
 			}
 		}
 	}

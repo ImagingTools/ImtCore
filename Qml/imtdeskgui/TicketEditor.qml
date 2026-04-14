@@ -12,6 +12,7 @@ import imtdeskImtDeskSdl 1.0
 import imtdeskTicketCollectionDocumentManagerSdl 1.0
 import imtauthUsersSdl 1.0
 import imtchatgui 1.0
+import Qt.labs.platform 1.1
 
 DocumentViewBase {
 	id: root
@@ -25,6 +26,9 @@ DocumentViewBase {
 	
 	// Current user ID for chat-style alignment
 	readonly property string currentUserId: AuthorizationController.getUserId()
+	
+	// Pending image attachments for comment being composed
+	property var pendingAttachments: []
 	
 	signal commentSubmitted(string commentText)
 	
@@ -51,8 +55,10 @@ DocumentViewBase {
 			.replace(/\n/g, "<br>")
 	}
 
-	function addComment(commentText) {
-		if (!commentText || commentText.length === 0 || !ticketData)
+	function addComment(commentText, attachmentsList) {
+		if ((!commentText || commentText.length === 0) && (!attachmentsList || attachmentsList.length === 0))
+			return
+		if (!ticketData)
 			return
 		
 		setBlockingUpdateModel(true)
@@ -73,8 +79,10 @@ DocumentViewBase {
 		newItem.m_userId = userId
 		newItem.m_userName = userName
 		newItem.m_timestamp = now
-		newItem.m_content = commentText
+		newItem.m_content = commentText || ""
 		newItem.m_reactions = []
+		if (attachmentsList && attachmentsList.length > 0)
+			newItem.m_attachments = attachmentsList
 		ticketData.m_comments.addElement(newItem)
 		
 		setBlockingUpdateModel(false)
@@ -484,7 +492,7 @@ DocumentViewBase {
 									// Comment body bubble
 									Rectangle {
 										width: commentBubbleCol.width
-										height: commentBodyText.contentHeight + Style.paddingM * 2
+										height: bubbleContent.implicitHeight + Style.paddingM * 2
 										radius: Style.radiusS
 										color: Style.baseColor
 										border.color: Style.borderColor
@@ -492,16 +500,61 @@ DocumentViewBase {
 										anchors.right: commentDelegate.isMe ? parent.right : undefined
 										anchors.left: commentDelegate.isMe ? undefined : parent.left
 										
-										Text {
-											id: commentBodyText
+										Column {
+											id: bubbleContent
 											x: Style.paddingM
 											y: Style.paddingM
 											width: parent.width - Style.paddingM * 2
-											textFormat: Text.StyledText
-											text: root.formatCommentHtml(model.item.m_content)
-											font.pixelSize: Style.fontSizeM
-											color: Style.textColor
-											wrapMode: Text.Wrap
+											spacing: Style.spacingS
+											
+											Text {
+												id: commentBodyText
+												width: parent.width
+												textFormat: Text.StyledText
+												text: root.formatCommentHtml(model.item.m_content)
+												font.pixelSize: Style.fontSizeM
+												color: Style.textColor
+												wrapMode: Text.Wrap
+												visible: text.length > 0
+											}
+											
+											// Attachment images
+											Repeater {
+												model: model.item.m_attachments || []
+												delegate: Image {
+													source: modelData
+													width: Math.min(implicitWidth, bubbleContent.width)
+													fillMode: Image.PreserveAspectFit
+													asynchronous: true
+													
+													Rectangle {
+														anchors.fill: parent
+														color: "transparent"
+														border.color: Style.borderColor
+														border.width: 1
+														radius: Style.radiusS
+														visible: parent.status === Image.Ready
+													}
+													
+													Text {
+														anchors.centerIn: parent
+														text: qsTr("Loading image...")
+														font.pixelSize: Style.fontSizeS
+														color: Style.textSecondaryColor
+														visible: parent.status === Image.Loading
+													}
+													
+													Text {
+														anchors.centerIn: parent
+														text: "📎 " + modelData
+														font.pixelSize: Style.fontSizeS
+														color: Style.textSecondaryColor
+														visible: parent.status === Image.Error
+														wrapMode: Text.Wrap
+														width: bubbleContent.width
+													}
+												}
+											}
 										}
 									}
 								}
@@ -585,9 +638,95 @@ DocumentViewBase {
 									}
 								}
 								
+								// Pending attachments preview
+								Flow {
+									width: parent.width
+									spacing: Style.spacingS
+									visible: root.pendingAttachments.length > 0
+									
+									Repeater {
+										model: root.pendingAttachments
+										delegate: Rectangle {
+											width: 80
+											height: 80
+											radius: Style.radiusS
+											border.color: Style.borderColor
+											border.width: 1
+											color: Style.baseColor
+											clip: true
+											
+											Image {
+												anchors.fill: parent
+												anchors.margins: 2
+												source: modelData
+												fillMode: Image.PreserveAspectCrop
+												asynchronous: true
+											}
+											
+											Rectangle {
+												anchors.top: parent.top
+												anchors.right: parent.right
+												anchors.margins: 2
+												width: 18
+												height: 18
+												radius: 9
+												color: Style.errorColor
+												
+												Text {
+													anchors.centerIn: parent
+													text: "✕"
+													font.pixelSize: 10
+													color: "white"
+												}
+												
+												MouseArea {
+													anchors.fill: parent
+													cursorShape: Qt.PointingHandCursor
+													onClicked: {
+														var arr = root.pendingAttachments.slice()
+														arr.splice(index, 1)
+														root.pendingAttachments = arr
+													}
+												}
+											}
+										}
+									}
+								}
+								
 								Row {
 									anchors.right: parent.right
 									spacing: Style.spacingS
+									
+									// Attach image button
+									Rectangle {
+										width: attachBtnContent.contentWidth + Style.marginM * 2
+										height: Style.buttonHeightM
+										radius: Style.buttonRadius
+										color: attachBtnMa.pressed
+											   ? Qt.darker(Style.borderColor, 1.1)
+											   : attachBtnMa.containsMouse
+												 ? Qt.lighter(Style.borderColor, 1.1)
+												 : Style.baseColor
+										border.color: Style.borderColor
+										border.width: 1
+										
+										Text {
+											id: attachBtnContent
+											anchors.centerIn: parent
+											text: "📎 " + qsTr("Attach")
+											font.pixelSize: Style.fontSizeM
+											font.family: Style.fontFamily
+											color: Style.textColor
+										}
+										
+										MouseArea {
+											id: attachBtnMa
+											anchors.fill: parent
+											hoverEnabled: true
+											cursorShape: Qt.PointingHandCursor
+											onClicked: attachImageDialog.open()
+										}
+									}
 									
 									Rectangle {
 										width: commentBtnText.contentWidth + Style.marginM * 2
@@ -614,12 +753,28 @@ DocumentViewBase {
 											hoverEnabled: true
 											cursorShape: Qt.PointingHandCursor
 											onClicked: {
-												root.addComment(commentInputField.text.trim())
+												root.addComment(commentInputField.text.trim(), root.pendingAttachments.slice())
 												commentInputField.text = ""
+												root.pendingAttachments = []
 											}
 										}
 									}
 								}
+							}
+						}
+						
+						// File dialog for image attachments
+						FileDialog {
+							id: attachImageDialog
+							title: qsTr("Attach image")
+							fileMode: FileDialog.OpenFile
+							nameFilters: [qsTr("Image files") + " (*.png *.jpg *.jpeg *.gif *.bmp *.svg *.webp)"]
+							
+							onAccepted: {
+								var filePath = attachImageDialog.file.toString()
+								var arr = root.pendingAttachments.slice()
+								arr.push(filePath)
+								root.pendingAttachments = arr
 							}
 						}
 					}
