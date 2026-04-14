@@ -2,7 +2,9 @@
 #include <imtchat/CAttachmentComp.h>
 
 // ACF includes
+#include <istd/CChangeNotifier.h>
 #include <iser/IArchive.h>
+#include <iser/CArchiveTag.h>
 
 
 namespace imtchat
@@ -16,59 +18,94 @@ QByteArray CAttachmentComp::GetId() const
 	return m_id;
 }
 
+
 void CAttachmentComp::SetId(const QByteArray& id)
 {
-	m_id = id;
+	if (m_id != id){
+		istd::CChangeNotifier notifier(this);
+
+		m_id = id;
+	}
 }
+
 
 QString CAttachmentComp::GetFileName() const
 {
 	return m_fileName;
 }
 
+
 void CAttachmentComp::SetFileName(const QString& fileName)
 {
-	m_fileName = fileName;
+	if (m_fileName != fileName){
+		istd::CChangeNotifier notifier(this);
+
+		m_fileName = fileName;
+	}
 }
+
 
 QString CAttachmentComp::GetMimeType() const
 {
 	return m_mimeType;
 }
 
+
 void CAttachmentComp::SetMimeType(const QString& mimeType)
 {
-	m_mimeType = mimeType;
+	if (m_mimeType != mimeType){
+		istd::CChangeNotifier notifier(this);
+
+		m_mimeType = mimeType;
+	}
 }
+
 
 QByteArray CAttachmentComp::GetData() const
 {
 	return m_data;
 }
 
+
 void CAttachmentComp::SetData(const QByteArray& data)
 {
-	m_data = data;
+	if (m_data != data){
+		istd::CChangeNotifier notifier(this);
+
+		m_data = data;
+	}
 }
+
 
 qint64 CAttachmentComp::GetFileSize() const
 {
 	return m_fileSize;
 }
 
+
 void CAttachmentComp::SetFileSize(qint64 fileSize)
 {
-	m_fileSize = fileSize;
+	if (m_fileSize != fileSize){
+		istd::CChangeNotifier notifier(this);
+
+		m_fileSize = fileSize;
+	}
 }
+
 
 QString CAttachmentComp::GetCreatedAt() const
 {
 	return m_createdAt;
 }
 
+
 void CAttachmentComp::SetCreatedAt(const QString& createdAt)
 {
-	m_createdAt = createdAt;
+	if (m_createdAt != createdAt){
+		istd::CChangeNotifier notifier(this);
+
+		m_createdAt = createdAt;
+	}
 }
 
 
@@ -76,13 +113,40 @@ void CAttachmentComp::SetCreatedAt(const QString& createdAt)
 
 bool CAttachmentComp::Serialize(iser::IArchive& archive)
 {
+	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
+
 	bool retVal = true;
-	retVal = retVal && archive.Process("Id", m_id);
-	retVal = retVal && archive.Process("FileName", m_fileName);
-	retVal = retVal && archive.Process("MimeType", m_mimeType);
-	retVal = retVal && archive.Process("Data", m_data);
-	retVal = retVal && archive.Process("FileSize", m_fileSize);
-	retVal = retVal && archive.Process("CreatedAt", m_createdAt);
+
+	static iser::CArchiveTag idTag("Id", "Id", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(idTag);
+	retVal = retVal && archive.Process(m_id);
+	retVal = retVal && archive.EndTag(idTag);
+
+	static iser::CArchiveTag fileNameTag("FileName", "File name", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(fileNameTag);
+	retVal = retVal && archive.Process(m_fileName);
+	retVal = retVal && archive.EndTag(fileNameTag);
+
+	static iser::CArchiveTag mimeTypeTag("MimeType", "MIME type", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(mimeTypeTag);
+	retVal = retVal && archive.Process(m_mimeType);
+	retVal = retVal && archive.EndTag(mimeTypeTag);
+
+	static iser::CArchiveTag dataTag("Data", "Binary data", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(dataTag);
+	retVal = retVal && archive.Process(m_data);
+	retVal = retVal && archive.EndTag(dataTag);
+
+	static iser::CArchiveTag fileSizeTag("FileSize", "File size", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(fileSizeTag);
+	retVal = retVal && archive.Process(m_fileSize);
+	retVal = retVal && archive.EndTag(fileSizeTag);
+
+	static iser::CArchiveTag createdAtTag("CreatedAt", "Created at", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(createdAtTag);
+	retVal = retVal && archive.Process(m_createdAt);
+	retVal = retVal && archive.EndTag(createdAtTag);
+
 	return retVal;
 }
 
@@ -96,6 +160,8 @@ bool CAttachmentComp::CopyFrom(const IChangeable& object, CompatibilityMode /*mo
 		return false;
 	}
 
+	istd::CChangeNotifier notifier(this);
+
 	m_id = sourcePtr->GetId();
 	m_fileName = sourcePtr->GetFileName();
 	m_mimeType = sourcePtr->GetMimeType();
@@ -106,6 +172,7 @@ bool CAttachmentComp::CopyFrom(const IChangeable& object, CompatibilityMode /*mo
 	return true;
 }
 
+
 bool CAttachmentComp::IsEqual(const IChangeable& object) const
 {
 	const IAttachment* otherPtr = dynamic_cast<const IAttachment*>(&object);
@@ -114,21 +181,26 @@ bool CAttachmentComp::IsEqual(const IChangeable& object) const
 	}
 
 	return m_id == otherPtr->GetId()
-			&& m_fileName == otherPtr->GetFileName()
-			&& m_mimeType == otherPtr->GetMimeType()
-			&& m_data == otherPtr->GetData()
-			&& m_fileSize == otherPtr->GetFileSize()
-			&& m_createdAt == otherPtr->GetCreatedAt();
+		&& m_fileName == otherPtr->GetFileName()
+		&& m_mimeType == otherPtr->GetMimeType()
+		&& m_data == otherPtr->GetData()
+		&& m_fileSize == otherPtr->GetFileSize()
+		&& m_createdAt == otherPtr->GetCreatedAt();
 }
+
 
 istd::IChangeableUniquePtr CAttachmentComp::CloneMe(CompatibilityMode mode) const
 {
-	Q_UNUSED(mode);
-	return nullptr;
+	istd::TUniqueInterfacePtr<CAttachmentComp> clonePtr(new CAttachmentComp());
+	clonePtr->CopyFrom(*this, mode);
+	return clonePtr;
 }
+
 
 bool CAttachmentComp::ResetData(CompatibilityMode /*mode*/)
 {
+	istd::CChangeNotifier notifier(this);
+
 	m_id.clear();
 	m_fileName.clear();
 	m_mimeType.clear();
