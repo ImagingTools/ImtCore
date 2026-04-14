@@ -330,21 +330,24 @@ void CMessageDbDelegateComp::OnComponentCreated()
 	// Create MessageAttachments junction table
 	if (!TableExists("MessageAttachments")){
 		QFile junctionScriptFile(imtdb::GetSqlResourcePath(*m_databaseEngineCompPtr, QStringLiteral("CreateMessageAttachmentsTable.sql")));
-		if (junctionScriptFile.open(QFile::ReadOnly)){
-			QByteArray junctionQuery = junctionScriptFile.readAll();
-			junctionScriptFile.close();
-			junctionQuery.replace("${TableScheme}", "public");
+		if (!junctionScriptFile.open(QFile::ReadOnly)){
+			SendErrorMessage(0, QString("MessageAttachments table creation script '%1' could not be loaded").arg(junctionScriptFile.fileName()));
+			return;
+		}
 
-			QSqlError junctionError;
-			m_databaseEngineCompPtr->ExecSqlQuery(junctionQuery, &junctionError);
+		QByteArray junctionQuery = junctionScriptFile.readAll();
+		junctionScriptFile.close();
+		junctionQuery.replace("${TableScheme}", "public");
 
-			if (junctionError.type() != QSqlError::NoError){
-				qCritical() << __FILE__ << __LINE__
-							<< "\n\t| MessageAttachments table could not be created"
-							<< "\n\t| Error:" << junctionError
-							<< "\n\t| Query:" << junctionQuery;
-				SendErrorMessage(0, QString("MessageAttachments table could not be created: %1").arg(junctionError.text()));
-			}
+		QSqlError junctionError;
+		m_databaseEngineCompPtr->ExecSqlQuery(junctionQuery, &junctionError);
+
+		if (junctionError.type() != QSqlError::NoError){
+			qCritical() << __FILE__ << __LINE__
+						<< "\n\t| MessageAttachments table could not be created"
+						<< "\n\t| Error:" << junctionError
+						<< "\n\t| Query:" << junctionQuery;
+			SendErrorMessage(0, QString("MessageAttachments table could not be created: %1").arg(junctionError.text()));
 		}
 	}
 }
