@@ -28,7 +28,10 @@ DocumentViewBase {
 	readonly property string currentUserId: AuthorizationController.getUserId()
 	
 	// Pending image attachments for comment being composed
+	// Each element: {id: "uuid.ext", preview: "localPreviewUrl"}
 	property var pendingAttachments: []
+	// Number of uploads currently in progress
+	property int uploadsInProgress: 0
 	
 	signal commentSubmitted(string commentText)
 	
@@ -84,8 +87,10 @@ DocumentViewBase {
 		if (attachmentsList && attachmentsList.length > 0) {
 			newItem.emplaceAttachments()
 			for (var i = 0; i < attachmentsList.length; i++) {
+				var attObj = attachmentsList[i]
 				var att = newItem.createAttachmentsArrayElement()
-				att.m_data = String(attachmentsList[i])
+				att.m_id = String(attObj.id || "")
+				att.m_preview = "../../files/" + String(attObj.id || "")
 				newItem.m_attachments.addElement(att)
 			}
 		}
@@ -94,6 +99,60 @@ DocumentViewBase {
 		setBlockingUpdateModel(false)
 		ticketData.modelChanged()
 		root.commentSubmitted(commentText)
+	}
+
+	// Upload attachment file to the server via HTTP POST.
+	// On success, adds {id, preview} to pendingAttachments.
+	function uploadAttachment(fileObj, fileName, localPreview) {
+		root.uploadsInProgress++
+
+		if (Qt.platform.os === "web") {
+			// Web: read binary data with FileReader and POST to /files/<name>
+			var reader = new FileReader()
+			reader.readAsArrayBuffer(fileObj)
+			reader.onload = function() {
+				var xhr = new XMLHttpRequest()
+				xhr.open("POST", "../../files/" + encodeURIComponent(fileName))
+				xhr.onreadystatechange = function() {
+					if (xhr.readyState === XMLHttpRequest.DONE) {
+						root.uploadsInProgress--
+						if (xhr.status === 200) {
+							var attachmentId = xhr.responseText.trim()
+							var arr = root.pendingAttachments.slice()
+							arr.push({id: attachmentId, preview: localPreview || ("../../files/" + attachmentId)})
+							root.pendingAttachments = arr
+						} else {
+							console.error("Attachment upload failed: " + xhr.status + " " + xhr.responseText)
+						}
+					}
+				}
+				xhr.send(reader.result)
+			}
+			reader.onerror = function() {
+				root.uploadsInProgress--
+				console.error("Failed to read attachment file")
+			}
+		} else {
+			// Native: read file with FileIO and POST binary data
+			attachmentFileIO.source = localPreview
+			var fileData = attachmentFileIO.read()
+			var xhr = new XMLHttpRequest()
+			xhr.open("POST", "../../files/" + encodeURIComponent(fileName))
+			xhr.onreadystatechange = function() {
+				if (xhr.readyState === XMLHttpRequest.DONE) {
+					root.uploadsInProgress--
+					if (xhr.status === 200) {
+						var attachmentId = xhr.responseText.trim()
+						var arr = root.pendingAttachments.slice()
+						arr.push({id: attachmentId, preview: localPreview || ("../../files/" + attachmentId)})
+						root.pendingAttachments = arr
+					} else {
+						console.error("Attachment upload failed: " + xhr.status + " " + xhr.responseText)
+					}
+				}
+			}
+			xhr.send(fileData)
+		}
 	}
 	
 	// --- Helper: find ComboBox index by "id" field ---
@@ -528,7 +587,7 @@ DocumentViewBase {
 											Repeater {
 												model: model.item.m_attachments || []
 												delegate: Image {
-													readonly property string imageUrl: model.item ? (model.item.m_preview || model.item.m_data || "") : ""
+													readonly property string imageUrl: model.item ? (model.item.m_preview || "") : ""
 													source: imageUrl
 													width: Math.min(width, bubbleContent.width)
 													fillMode: Image.PreserveAspectFit
@@ -649,7 +708,7 @@ DocumentViewBase {
 								Flow {
 									width: parent.width
 									spacing: Style.spacingS
-									visible: root.pendingAttachments.length > 0
+									visible: root.pendingAttachments.length > 0 || root.uploadsInProgress > 0
 									
 									Repeater {
 										model: root.pendingAttachments
@@ -665,7 +724,7 @@ DocumentViewBase {
 											Image {
 												anchors.fill: parent
 												anchors.margins: 2
-												source: modelData
+												source: modelData.preview || ""
 												fillMode: Image.PreserveAspectCrop
 												asynchronous: true
 											}
@@ -696,6 +755,23 @@ DocumentViewBase {
 													}
 												}
 											}
+										}
+									}
+									
+									// Upload in progress indicator
+									Rectangle {
+										width: 80
+										height: 80
+										radius: Style.radiusS
+										border.color: Style.borderColor
+										border.width: 1
+										color: Style.baseColor
+										visible: root.uploadsInProgress > 0
+										
+										Text {
+											anchors.centerIn: parent
+											text: "⏳"
+											font.pixelSize: Style.fontSizeL
 										}
 									}
 								}
@@ -758,8 +834,10 @@ DocumentViewBase {
 											id: commentBtnMa
 											anchors.fill: parent
 											hoverEnabled: true
-											cursorShape: Qt.PointingHandCursor
+											cursorShape: root.uploadsInProgress > 0 ? Qt.WaitCursor : Qt.PointingHandCursor
 											onClicked: {
+												if (root.uploadsInProgress > 0)
+													return
 												root.addComment(commentInputField.text.trim(), root.pendingAttachments.slice())
 												commentInputField.text = ""
 												root.pendingAttachments = []
@@ -779,26 +857,31 @@ DocumentViewBase {
 							
 							onAccepted: {
 								if (Qt.platform.os === "web") {
-									// Web: file is a JS File object — read binary content as data URL
+									// Web: file is a JS File object — upload binary data via HTTP POST
 									var fileObj = attachImageDialog.file
-									var reader = new FileReader()
-									reader.readAsDataURL(fileObj)
-									reader.onload = function() {
-										var arr = root.pendingAttachments.slice()
-										arr.push(reader.result)
-										root.pendingAttachments = arr
+									var fileName = fileObj.name || "attachment"
+									// Read as dataURL for local preview while upload is in progress
+									var previewReader = new FileReader()
+									previewReader.readAsDataURL(fileObj)
+									previewReader.onload = function() {
+										root.uploadAttachment(fileObj, fileName, previewReader.result)
 									}
-									reader.onerror = function() {
-										console.error("Failed to read attachment file")
+									previewReader.onerror = function() {
+										// Upload without local preview
+										root.uploadAttachment(fileObj, fileName, "")
 									}
 								} else {
-									// Native: file:// URL, C++ backend can read it locally
+									// Native: read file via FileIO and upload via HTTP POST
 									var filePath = String(attachImageDialog.file)
-									var arr = root.pendingAttachments.slice()
-									arr.push(filePath)
-									root.pendingAttachments = arr
+									var parts = filePath.replace("file:///", "").split("/")
+									var nativeFileName = parts.length > 0 ? parts[parts.length - 1] : "attachment"
+									root.uploadAttachment(null, nativeFileName, filePath)
 								}
 							}
+						}
+						
+						FileIO {
+							id: attachmentFileIO
 						}
 					}
 					

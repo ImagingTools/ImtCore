@@ -8,9 +8,6 @@
 
 // Qt includes
 #include <QtCore/QDateTime>
-#include <QtCore/QFile>
-#include <QtCore/QFileInfo>
-#include <QtCore/QUrl>
 
 // ImtCore includes
 #include <imtdesk/ISupportTicket.h>
@@ -130,17 +127,22 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 							for (const QByteArray& aid : attachmentIds){
 								sdl::imtdesk::ImtDesk::CAttachment::V1_0 att;
 								att.id = aid;
-								// Resolve attachment to preview data URL
+								// Return HTTP download URL — the client fetches the image
+								// via a separate GET request to the /files/ endpoint.
+								att.preview = QString("../../files/%1").arg(QString::fromUtf8(aid));
 								if (m_attachmentStorageCompPtr.IsValid()){
+									// Strip file extension from HTTP-facing ID to get storage UUID
+									QByteArray storageId = aid;
+									int dotIdx = storageId.lastIndexOf('.');
+									if (dotIdx > 0){
+										storageId = storageId.left(dotIdx);
+									}
 									QByteArray data;
 									QString fileName;
 									QString mimeType;
-									if (m_attachmentStorageCompPtr->GetAttachment(aid, data, fileName, mimeType)){
+									if (m_attachmentStorageCompPtr->GetAttachment(storageId, data, fileName, mimeType)){
 										att.fileName = fileName;
 										att.mimeType = mimeType;
-										att.preview = QString("data:%1;base64,%2")
-												.arg(mimeType)
-												.arg(QString::fromLatin1(data.toBase64()));
 									}
 								}
 								attachmentList << att;
@@ -324,76 +326,8 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 						if (!att){
 							continue;
 						}
-						// New attachment: client sends base64 data in the 'data' field
-						if (att->data && !att->data->isEmpty() && m_attachmentStorageCompPtr.IsValid()){
-							QString dataStr = *att->data;
-							// Parse data URL: data:<mimeType>;base64,<data>
-							if (dataStr.startsWith("data:")){
-								const int dataPrefix = 5; // length of "data:"
-								int semiIdx = dataStr.indexOf(';');
-								int commaIdx = dataStr.indexOf(',');
-								if (semiIdx > dataPrefix && commaIdx > semiIdx){
-									QString mimeType = dataStr.mid(dataPrefix, semiIdx - dataPrefix);
-									QByteArray base64Data = dataStr.mid(commaIdx + 1).toLatin1();
-									QByteArray binaryData = QByteArray::fromBase64(base64Data);
-
-									QString fileName;
-									if (att->fileName && !att->fileName->isEmpty()){
-										fileName = QFileInfo(*att->fileName).fileName().remove(QChar('\0'));
-									} else {
-										int slashIdx = mimeType.indexOf('/');
-										QString ext = (slashIdx >= 0) ? mimeType.mid(slashIdx + 1) : "bin";
-										if (ext == "jpeg") ext = "jpg";
-										if (ext == "svg+xml") ext = "svg";
-										fileName = QString("attachment_%1.%2")
-												.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs).replace(':', '-'))
-												.arg(ext);
-									}
-									if (att->mimeType && !att->mimeType->isEmpty()){
-										mimeType = *att->mimeType;
-									}
-
-									QByteArray storedId = m_attachmentStorageCompPtr->StoreAttachment(binaryData, fileName, mimeType);
-									if (!storedId.isEmpty()){
-										attachmentIds << storedId;
-										continue;
-									}
-								}
-							}
-							// file:// URL (native desktop)
-							if (dataStr.startsWith("file://")){
-								QUrl fileUrl(dataStr);
-								QString localPath = fileUrl.toLocalFile();
-								QFile file(localPath);
-								if (file.open(QIODevice::ReadOnly)){
-									QByteArray binaryData = file.readAll();
-									file.close();
-									QFileInfo fileInfo(localPath);
-									QString fileName = (att->fileName && !att->fileName->isEmpty())
-											? QFileInfo(*att->fileName).fileName().remove(QChar('\0'))
-											: fileInfo.fileName();
-									QString ext = fileInfo.suffix().toLower();
-									QString mimeType = "application/octet-stream";
-									if (att->mimeType && !att->mimeType->isEmpty()){
-										mimeType = *att->mimeType;
-									} else {
-										if (ext == "png") mimeType = "image/png";
-										else if (ext == "jpg" || ext == "jpeg") mimeType = "image/jpeg";
-										else if (ext == "gif") mimeType = "image/gif";
-										else if (ext == "bmp") mimeType = "image/bmp";
-										else if (ext == "svg") mimeType = "image/svg+xml";
-										else if (ext == "webp") mimeType = "image/webp";
-									}
-
-									QByteArray storedId = m_attachmentStorageCompPtr->StoreAttachment(binaryData, fileName, mimeType);
-									if (!storedId.isEmpty()){
-										attachmentIds << storedId;
-										continue;
-									}
-								}
-							}
-						}
-						// Existing attachment: has an id
+						// Attachments are pre-uploaded via HTTP — the client sends
+						// the attachment ID returned by the upload endpoint.
 						if (att->id && !att->id->isEmpty()){
 							attachmentIds << *att->id;
 						}

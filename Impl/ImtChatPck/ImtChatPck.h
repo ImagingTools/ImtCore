@@ -11,6 +11,7 @@
 #include <imtchat/CAttachmentComp.h>
 #include <imtchat/CChatServiceComp.h>
 #include <imtchat/CAttachmentStorageComp.h>
+#include <imtchat/CAttachmentBinaryDataProviderComp.h>
 
 
 /**
@@ -25,6 +26,7 @@ typedef icomp::TModelCompWrap<imtchat::CConversationComp> Conversation;
 typedef icomp::TModelCompWrap<imtchat::CAttachmentComp> Attachment;
 typedef imtchat::CChatServiceComp ChatService;
 typedef imtchat::CAttachmentStorageComp AttachmentStorage;
+typedef imtchat::CAttachmentBinaryDataProviderComp AttachmentBinaryDataProvider;
 
 
 } // namespace ImtChatPck
