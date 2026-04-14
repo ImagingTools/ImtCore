@@ -24,7 +24,11 @@ ControlBase {
 	property bool hasIcon: true;
 	property bool modal: false;
 
+	// For closing in Main dialog manager
+	property string uuid: ""
+	// Main dialog manager reference
 	property Item root: null;
+
 	property Item rootItem: null;
 
 	property ListModel buttonsModel: ListModel{};
