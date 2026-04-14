@@ -54,7 +54,10 @@ public:
 				const QByteArray& objectId,
 				const QString& description,
 				const imtbase::IOperationContext* operationContextPtr) const override;
-
+	virtual bool SetCollectionItemMetaInfoFromRecord(
+				const QSqlRecord& record,
+				idoc::IDocumentMetaInfo& metaInfo) const override;
+	
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 

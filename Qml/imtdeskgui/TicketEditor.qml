@@ -421,7 +421,7 @@ DocumentViewBase {
 					Column {
 						id: commentsListCol
 						width: parent.width
-						spacing: Style.spacingS
+						spacing: Style.spacingL
 						
 						Repeater {
 							id: commentsThread
@@ -430,7 +430,7 @@ DocumentViewBase {
 							delegate: Item {
 								id: commentDelegate
 								width: commentsListCol.width
-								height: commentBubbleCol.implicitHeight
+								height: commentBubbleCol.height
 								
 								readonly property bool isMe: model.item.m_userId === root.currentUserId
 								
