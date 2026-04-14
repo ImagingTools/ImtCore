@@ -283,10 +283,18 @@ DocumentViewBase {
 				width: editFlick.width
 				spacing: Style.marginM
 				
-				// Status badges (only for existing tickets)
+				// Ticket number + status badges (only for existing tickets)
 				Row {
 					visible: !root.isNewIssue
 					spacing: Style.spacingS
+					
+					Text {
+						text: "#" + (ticketData ? ticketData.m_number : "")
+						font.pixelSize: Style.fontSizeL
+						font.bold: true
+						color: Style.textColor
+						anchors.verticalCenter: parent.verticalCenter
+					}
 					
 					TicketBadge {
 						badgeType: "status"
