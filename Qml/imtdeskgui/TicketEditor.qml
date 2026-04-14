@@ -771,10 +771,23 @@ DocumentViewBase {
 							nameFilters: [qsTr("Image files") + " (*.png *.jpg *.jpeg *.gif *.bmp *.svg *.webp)"]
 							
 							onAccepted: {
-								var filePath = String(attachImageDialog.file)
-								var arr = root.pendingAttachments.slice()
-								arr.push(filePath)
-								root.pendingAttachments = arr
+								if (Qt.platform.os === "web") {
+									// Web: file is a JS File object — read binary content as data URL
+									var fileObj = attachImageDialog.file
+									var reader = new FileReader()
+									reader.readAsDataURL(fileObj)
+									reader.onload = function() {
+										var arr = root.pendingAttachments.slice()
+										arr.push(reader.result)
+										root.pendingAttachments = arr
+									}
+								} else {
+									// Native: file:// URL, C++ backend can read it locally
+									var filePath = String(attachImageDialog.file)
+									var arr = root.pendingAttachments.slice()
+									arr.push(filePath)
+									root.pendingAttachments = arr
+								}
 							}
 						}
 					}
