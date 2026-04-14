@@ -5,7 +5,6 @@ CREATE TABLE IF NOT EXISTS "Messages"
     "SenderId"         TEXT NOT NULL,
     "Content"          TEXT NOT NULL,
     "EntityReferences" TEXT,
-    "AttachmentIds"    TEXT,
     "Reactions"        TEXT,
     "Status"           INTEGER NOT NULL DEFAULT 0,
     "CreatedAt"        TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
