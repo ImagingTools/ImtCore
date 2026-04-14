@@ -339,7 +339,7 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 
 									QString fileName;
 									if (att->fileName && !att->fileName->isEmpty()){
-										fileName = *att->fileName;
+										fileName = QFileInfo(*att->fileName).fileName().remove(QChar('\0'));
 									} else {
 										int slashIdx = mimeType.indexOf('/');
 										QString ext = (slashIdx >= 0) ? mimeType.mid(slashIdx + 1) : "bin";
@@ -369,7 +369,9 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 									QByteArray binaryData = file.readAll();
 									file.close();
 									QFileInfo fileInfo(localPath);
-									QString fileName = (att->fileName && !att->fileName->isEmpty()) ? *att->fileName : fileInfo.fileName();
+									QString fileName = (att->fileName && !att->fileName->isEmpty())
+											? QFileInfo(*att->fileName).fileName().remove(QChar('\0'))
+											: fileInfo.fileName();
 									QString ext = fileInfo.suffix().toLower();
 									QString mimeType = "application/octet-stream";
 									if (att->mimeType && !att->mimeType->isEmpty()){
