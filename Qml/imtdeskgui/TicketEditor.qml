@@ -485,7 +485,7 @@ DocumentViewBase {
 											x: Style.paddingM
 											y: Style.paddingM
 											width: parent.width - Style.paddingM * 2
-											text: model.item.m_content || ""
+											text: (model.item.m_content || "").replace(/\\n/g, "\n")
 											font.pixelSize: Style.fontSizeM
 											color: Style.textColor
 											wrapMode: Text.Wrap
