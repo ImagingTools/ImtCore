@@ -781,6 +781,9 @@ DocumentViewBase {
 										arr.push(reader.result)
 										root.pendingAttachments = arr
 									}
+									reader.onerror = function() {
+										console.error("Failed to read attachment file")
+									}
 								} else {
 									// Native: file:// URL, C++ backend can read it locally
 									var filePath = String(attachImageDialog.file)
