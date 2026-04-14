@@ -9,6 +9,9 @@ Item {
 
     // Main dialog manager reference
     property Item root: null;
+	// For closing in Main dialog manager
+	property string uuid: ""
+
     property TreeItemModel model;
 
     property bool hiddenBackground: true;

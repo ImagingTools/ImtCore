@@ -143,6 +143,17 @@ Item {
 					for (let key in model.Parameters){
 						dialogLoader.item[key] = model.Parameters[key];
 					}
+
+					if (dialogLoader.item.uuid !==undefined){
+						if(dialogLoader.item.uuid == ""){
+							let uuid = UuidGenerator.generateUUID()
+							dialogLoader.item.uuid = uuid
+							ModalDialogManager.itemUuidList.push(uuid)
+						}
+						else {
+							ModalDialogManager.itemUuidList.push(dialogLoader.item.uuid)
+						}
+					}
 					
 					if (dialogLoader.item.centered){
 						dialogLoader.x = container.width/2 - dialogLoader.width/2;
