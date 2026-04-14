@@ -35,9 +35,8 @@ QByteArray CAttachmentStorageComp::StoreAttachment(
 	attachPtr->SetFileSize(data.size());
 	attachPtr->SetCreatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs));
 
-	imtbase::IObjectCollection::OperationResult result =
-			m_attachmentCollectionCompPtr->InsertObject("Attachment", attachId, fileName, QString(), attachPtr.GetPtr());
-	if (result != imtbase::IObjectCollection::OR_OK){
+	QByteArray result = m_attachmentCollectionCompPtr->InsertNewObject(QByteArrayLiteral("Attachment"), fileName, "", attachPtr.GetPtr(), attachId);
+	if (result.isEmpty()){
 		return QByteArray();
 	}
 
@@ -79,8 +78,7 @@ bool CAttachmentStorageComp::DeleteAttachment(const QByteArray& attachmentId)
 		return false;
 	}
 
-	return m_attachmentCollectionCompPtr->RemoveObjects(QByteArrayList() << attachmentId)
-			== imtbase::IObjectCollection::OR_OK;
+	return m_attachmentCollectionCompPtr->RemoveElements({attachmentId});
 }
 
 
