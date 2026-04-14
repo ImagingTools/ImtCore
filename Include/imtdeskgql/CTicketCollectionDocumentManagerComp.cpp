@@ -325,18 +325,21 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 							// Check if the attachment is a data URL (base64-encoded binary)
 							if (attStr.startsWith("data:") && m_attachmentStorageCompPtr.IsValid()){
 								// Parse data URL: data:<mimeType>;base64,<data>
+								const int dataPrefix = 5; // length of "data:"
 								int semiIdx = attStr.indexOf(';');
 								int commaIdx = attStr.indexOf(',');
-								if (semiIdx > 5 && commaIdx > semiIdx){
-									QString mimeType = attStr.mid(5, semiIdx - 5);
+								if (semiIdx > dataPrefix && commaIdx > semiIdx){
+									QString mimeType = attStr.mid(dataPrefix, semiIdx - dataPrefix);
 									QByteArray base64Data = attStr.mid(commaIdx + 1).toLatin1();
 									QByteArray binaryData = QByteArray::fromBase64(base64Data);
 
-									// Derive file name from mime type
-									QString ext = mimeType.mid(mimeType.indexOf('/') + 1);
+									// Derive file extension from mime type
+									int slashIdx = mimeType.indexOf('/');
+									QString ext = (slashIdx >= 0) ? mimeType.mid(slashIdx + 1) : "bin";
 									if (ext == "jpeg") ext = "jpg";
+									if (ext == "svg+xml") ext = "svg";
 									QString fileName = QString("attachment_%1.%2")
-											.arg(QDateTime::currentDateTimeUtc().toString("yyyyMMdd_HHmmsszzz"))
+											.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs).replace(':', '-'))
 											.arg(ext);
 
 									QByteArray storedId = m_attachmentStorageCompPtr->StoreAttachment(binaryData, fileName, mimeType);

@@ -90,9 +90,14 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CAttachmentDbDelegateComp::Create
 
 	const QString nowUtc = utcNow();
 
-	// Use parameterized-style insertion for binary data safety
-	// The binary data is encoded as hex for PostgreSQL BYTEA or as hex for SQLite BLOB
+	// Encode binary data as hex for PostgreSQL BYTEA / SQLite BLOB
 	const QByteArray hexData = attachPtr->GetData().toHex();
+
+	// Escape single quotes in user-supplied strings to prevent SQL injection
+	QString escapedFileName = attachPtr->GetFileName();
+	escapedFileName.replace('\'', "''");
+	QString escapedMimeType = attachPtr->GetMimeType();
+	escapedMimeType.replace('\'', "''");
 
 	NewObjectQuery retVal;
 	retVal.query = QString(
@@ -100,8 +105,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CAttachmentDbDelegateComp::Create
 		"(\"Id\", \"FileName\", \"MimeType\", \"Data\", \"FileSize\", \"CreatedAt\") "
 		"VALUES('%1', '%2', '%3', E'\\\\x%4', %5, '%6');")
 		.arg(QString::fromUtf8(attachId))
-		.arg(attachPtr->GetFileName())
-		.arg(attachPtr->GetMimeType())
+		.arg(escapedFileName)
+		.arg(escapedMimeType)
 		.arg(QString::fromUtf8(hexData))
 		.arg(attachPtr->GetFileSize())
 		.arg(nowUtc)
@@ -135,7 +140,9 @@ QByteArray CAttachmentDbDelegateComp::CreateDeleteObjectsQuery(
 	QString idsStr;
 	for (int i = 0; i < objectIds.size(); ++i){
 		if (i > 0) idsStr += ", ";
-		idsStr += QString("'%1'").arg(QString::fromUtf8(objectIds[i]));
+		QString escaped = QString::fromUtf8(objectIds[i]);
+		escaped.replace('\'', "''");
+		idsStr += QString("'%1'").arg(escaped);
 	}
 
 	return QString("DELETE FROM \"Attachments\" WHERE \"Id\" IN (%1);")
