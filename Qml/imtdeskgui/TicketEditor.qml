@@ -82,7 +82,7 @@ DocumentViewBase {
 		newItem.m_content = commentText || ""
 		newItem.m_reactions = []
 		if (attachmentsList && attachmentsList.length > 0)
-			newItem.m_attachments = attachmentsList
+			newItem.m_attachments = attachmentsList.map(function(a) { return String(a) })
 		ticketData.m_comments.addElement(newItem)
 		
 		setBlockingUpdateModel(false)
@@ -771,7 +771,7 @@ DocumentViewBase {
 							nameFilters: [qsTr("Image files") + " (*.png *.jpg *.jpeg *.gif *.bmp *.svg *.webp)"]
 							
 							onAccepted: {
-								var filePath = attachImageDialog.file.toString()
+								var filePath = String(attachImageDialog.file)
 								var arr = root.pendingAttachments.slice()
 								arr.push(filePath)
 								root.pendingAttachments = arr
