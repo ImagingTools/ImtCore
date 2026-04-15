@@ -589,7 +589,7 @@ DocumentViewBase {
 											Column {
 												width: parent.width
 												spacing: Style.spacingXS
-												visible: commentDelegate.dataModel.m_attachments ? true : false
+												visible: commentDelegate.dataModel.m_attachments
 												
 												Repeater {
 													model: commentDelegate.dataModel.m_attachments || []
@@ -614,8 +614,7 @@ DocumentViewBase {
 															cursorShape: Qt.PointingHandCursor
 															hoverEnabled: true
 															onClicked: {
-																var url = model.item.m_preview || ""
-																if (url) Qt.openUrlExternally(url)
+																if (model.item.m_preview) Qt.openUrlExternally(model.item.m_preview)
 															}
 														}
 													}
