@@ -697,7 +697,8 @@ DocumentViewBase {
 									Repeater {
 										model: root.pendingAttachments
 										delegate: Rectangle {
-											width: pendingFileLabel.contentWidth + pendingRemoveBtn.width + Style.paddingM * 3
+											readonly property real maxPillWidth: 250
+											width: Math.min(pendingFileLabel.implicitWidth + pendingRemoveBtn.width + Style.paddingM * 3, maxPillWidth)
 											height: Style.buttonHeightS
 											radius: Style.radiusS
 											border.color: Style.borderColor
@@ -708,6 +709,8 @@ DocumentViewBase {
 												id: pendingFileLabel
 												anchors.left: parent.left
 												anchors.leftMargin: Style.paddingM
+												anchors.right: pendingRemoveBtn.left
+												anchors.rightMargin: Style.paddingS
 												anchors.verticalCenter: parent.verticalCenter
 												text: "📎 " + (modelData.fileName || qsTr("attachment"))
 												font.pixelSize: Style.fontSizeS
@@ -718,8 +721,8 @@ DocumentViewBase {
 
 											Text {
 												id: pendingRemoveBtn
-												anchors.left: pendingFileLabel.right
-												anchors.leftMargin: Style.paddingS
+												anchors.right: parent.right
+												anchors.rightMargin: Style.paddingM
 												anchors.verticalCenter: parent.verticalCenter
 												text: "✕"
 												font.pixelSize: Style.fontSizeS
