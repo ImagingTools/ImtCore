@@ -45,15 +45,6 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="AttachmentBinaryDataProvider" PackageId="ImtChatPck" ComponentId="AttachmentBinaryDataProvider">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="AttachmentStorage" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="AttachmentStorage"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="ChatMessage" PackageId="ImtChatPck" ComponentId="ChatMessage">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap/>
@@ -519,7 +510,6 @@
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="Demultiplexer"/>
     </ExportedInterfaces>
     <ExportedComponents>
-        <Component ExportedId="BinaryDataProviders" ComponentId="AttachmentBinaryDataProvider"/>
-        <Component ExportedId="BinaryDataControllers" ComponentId="AttachmentBinaryDataProvider"/>
+        <Component ExportedId="AttachmentStorage" ComponentId="AttachmentStorage"/>
     </ExportedComponents>
 </Acf>

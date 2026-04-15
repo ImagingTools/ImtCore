@@ -8,6 +8,9 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
+        <Element ComponentName="Attachment" X="450" Y="425" Note=""/>
+        <Element ComponentName="AttachmentSqlRepository" X="475" Y="300" Note=""/>
+        <Element ComponentName="AttachmentStorage" X="450" Y="375" Note=""/>
         <Element ComponentName="ChatMessage" X="1100" Y="700" Note=""/>
         <Element ComponentName="ChatMessageSqlRepository" X="875" Y="275" Note=""/>
         <Element ComponentName="ChatService" X="1125" Y="350" Note=""/>

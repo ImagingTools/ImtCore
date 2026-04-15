@@ -278,6 +278,7 @@
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="PumaClientEngine"/>
     </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="AttachmentStorage" ComponentId="DeskController/AttachmentStorage"/>
         <Component ExportedId="CachedGroupCollection" ComponentId="PumaClientEngine/CachedGroupCollection"/>
         <Component ExportedId="CachedRoleCollection" ComponentId="PumaClientEngine/CachedRoleCollection"/>
         <Component ExportedId="CachedUserCollection" ComponentId="PumaClientEngine/CachedUserCollection"/>

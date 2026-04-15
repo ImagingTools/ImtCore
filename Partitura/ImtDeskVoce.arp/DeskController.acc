@@ -215,5 +215,7 @@
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="Demultiplexer"/>
         <Interface InterfaceId="imtgql::IGqlSubscriberController" ComponentId="SubscriberController"/>
     </ExportedInterfaces>
-    <ExportedComponents/>
+    <ExportedComponents>
+        <Component ExportedId="AttachmentStorage" ComponentId="TicketController/AttachmentStorage"/>
+    </ExportedComponents>
 </Acf>
