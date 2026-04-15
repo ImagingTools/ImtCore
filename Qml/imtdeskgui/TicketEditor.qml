@@ -586,20 +586,28 @@ DocumentViewBase {
 											// Attachment images
 											Repeater {
 												model: model.item.m_attachments || []
-												delegate: Image {
+												delegate: Item {
 													readonly property string imageUrl: model.item ? (model.item.m_preview || "") : ""
-													source: imageUrl
-													width: Math.min(width, bubbleContent.width)
-													fillMode: Image.PreserveAspectFit
-													asynchronous: true
+													width: bubbleContent.width
+													height: attImage.status === Image.Ready
+														? Math.max(attImage.implicitHeight * (width / Math.max(attImage.implicitWidth, 1)), 40)
+														: 200
 													
-													Rectangle {
+													Image {
+														id: attImage
+														source: parent.imageUrl
 														anchors.fill: parent
-														color: "transparent"
-														border.color: Style.borderColor
-														border.width: 1
-														radius: Style.radiusS
-														visible: parent.status === Image.Ready
+														fillMode: Image.PreserveAspectFit
+														asynchronous: true
+														
+														Rectangle {
+															anchors.fill: parent
+															color: "transparent"
+															border.color: Style.borderColor
+															border.width: 1
+															radius: Style.radiusS
+															visible: attImage.status === Image.Ready
+														}
 													}
 													
 													Text {
@@ -607,7 +615,7 @@ DocumentViewBase {
 														text: qsTr("Loading image...")
 														font.pixelSize: Style.fontSizeS
 														color: Style.textSecondaryColor
-														visible: parent.status === Image.Loading
+														visible: attImage.status === Image.Loading
 													}
 													
 													Text {
@@ -615,7 +623,7 @@ DocumentViewBase {
 														text: "📎 " + (model.item ? (model.item.m_fileName || "") : "")
 														font.pixelSize: Style.fontSizeS
 														color: Style.textSecondaryColor
-														visible: parent.status === Image.Error
+														visible: attImage.status === Image.Error
 														wrapMode: Text.Wrap
 														width: bubbleContent.width
 													}
