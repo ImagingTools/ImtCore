@@ -461,69 +461,6 @@
                     <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserCollection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="EntityTypeProviders" Type="MultiReference" ExportId="">
-                        <Data IsEnabled="true" Value="EntityTypeUser,EntityTypeLicense,EntityTypeProduct,EntityTypeTicket,EntityTypeRole"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="EntityTypeUser" PackageId="ImtDeskPck" ComponentId="EntityTypeProvider">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="EntityTypeId">
-                        <Data Value="User"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="EntityTypeName">
-                        <Data Value="User"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="EntityTypeLicense" PackageId="ImtDeskPck" ComponentId="EntityTypeProvider">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="EntityTypeId">
-                        <Data Value="License"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="EntityTypeName">
-                        <Data Value="License"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="EntityTypeProduct" PackageId="ImtDeskPck" ComponentId="EntityTypeProvider">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="EntityTypeId">
-                        <Data Value="Product"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="EntityTypeName">
-                        <Data Value="Product"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="EntityTypeTicket" PackageId="ImtDeskPck" ComponentId="EntityTypeProvider">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="EntityTypeId">
-                        <Data Value="Ticket"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="EntityTypeName">
-                        <Data Value="Ticket"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="EntityTypeRole" PackageId="ImtDeskPck" ComponentId="EntityTypeProvider">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="EntityTypeId">
-                        <Data Value="Role"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="EntityTypeName">
-                        <Data Value="Role"/>
-                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
