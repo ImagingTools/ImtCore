@@ -737,6 +737,11 @@ DocumentViewBase {
 													if (removed && removed.id) {
 														var xhr = new XMLHttpRequest()
 														xhr.open("DELETE", "../../files/" + encodeURIComponent(removed.id))
+														xhr.onreadystatechange = function() {
+															if (xhr.readyState === XMLHttpRequest.DONE && xhr.status !== 200) {
+																console.warn("Failed to delete attachment from server:", xhr.status, xhr.responseText)
+															}
+														}
 														xhr.send()
 													}
 												}
