@@ -1,2 +1,4 @@
+onWidthChanged 75
+onHeightChanged 180
 Item.onCompleted
 Column.onCompleted

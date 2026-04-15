@@ -95,6 +95,7 @@ Item {
 			else if (totalStatus == status.APP_SERVER_CONNECTION_ERROR){
 				internal.errorMessage = qsTr("Server connection error")
 				internal.loadingVisible = false
+				Events.sendEvent("ServerConnectionError");
 			}
 			else if (totalStatus == status.CONNECTION_SUCCESFUL){
 				thumbnailDecorator.stackView.clear();

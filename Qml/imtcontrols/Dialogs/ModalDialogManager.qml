@@ -14,10 +14,20 @@ Item {
 	property Item topItem: null;
 	property ListModel modalDialogModels: ListModel {}
 	property alias count: container.modalDialogModels.count;
+	property var itemUuidList: []
 	
 	property var dialogCallback: ({})
 	
+
+	Component.onCompleted: {
+		Events.subscribeEvent("ServerConnectionError", onServerConnectionError);
+	}
+
 	Component.onDestruction: {
+	}
+
+	Component.onDestruction: {
+		Events.unSubscribeEvent("ServerConnectionError", onServerConnectionError);
 		modalDialogModels.clear();
 	}
 	
@@ -54,6 +64,7 @@ Item {
 		
 		if (index >= 0 && index < modalDialogModels.count){
 			let c = modalDialogModels.get(index).Component;
+			itemUuidList.splice(index,1);
 			delete dialogCallback[c];
 			
 			modalDialogModels.remove(index);
@@ -65,13 +76,28 @@ Item {
 			let c = modalDialogModels.get(i).Component;
 			if (c && c === comp){
 				modalDialogModels.remove(i);
-				
+				itemUuidList.splice(i,1);
 				delete dialogCallback[c];
 				
 				return true;
 			}
 		}
 		
+		return false;
+	}
+	function closeByUuid(uuid){
+		for (let i = 0; i < itemUuidList.length; i++){
+			let uuidCurr = itemUuidList[i]
+			if(uuidCurr == uuid){
+				let c = modalDialogModels.get(i).Component;
+				modalDialogModels.remove(i);
+				delete dialogCallback[c];
+				itemUuidList.splice(i,1);
+				return true;
+			}
+
+		}
+
 		return false;
 	}
 	
@@ -102,13 +128,23 @@ Item {
 		openDialog(warningDialog, {"message": message});
 	}
 	
+	function onServerConnectionError(){
+		for (let i = 0; i < modalDialogModels.count; i++){
+			let c = modalDialogModels.get(i).Component;
+			modalDialogModels.remove(i);
+			itemUuidList.splice(i,1);
+			delete dialogCallback[c];
+			onServerConnectionError()
+		}
+	}
+
 	/*!
 		\qmlmethod void ModalDialogManager::showConfirmationDialog(string title, string message, var callback = undefined, bool choiceIsRequired = false)
 		\brief Opens the confirmation dialog.
-	
-		This method displays a confirmation dialog with a title, message, and optional callback to handle the result. 
+
+		This method displays a confirmation dialog with a title, message, and optional callback to handle the result.
 		It is used to prompt the user for confirmation (e.g., Yes/No, OK/Cancel).
-	
+
 		\param title The title text shown at the top of the dialog.
 		\param message The main message displayed in the body of the dialog.
 		\param callback (optional) A function that will be called with the result of the user’s choice.

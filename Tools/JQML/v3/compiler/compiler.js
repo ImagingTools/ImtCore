@@ -184,6 +184,13 @@ function compile(options){
             })
         }
         qmlpropdef(meta) {
+            // meta[1] - [default, required, readonly]
+            let modifiers = {
+                default: meta[1][0],
+                required: meta[1][1],
+                readonly: meta[1][2],
+            }
+
             let type = {
                 defaultValue: null,
                 getDefaultValue(){
@@ -210,6 +217,7 @@ function compile(options){
                     value: type.defaultValue,
                     signalName: meta[2] + 'Changed',
                     info: meta.info,
+                    modifiers: modifiers,
                 })
 
                 this.assignProperties.push({
@@ -248,6 +256,7 @@ function compile(options){
                     value: defaultValue,
                     signalName: meta[2] + 'Changed',
                     info: meta.info,
+                    modifiers: modifiers,
                 })
             }
 
@@ -1123,15 +1132,15 @@ function compile(options){
                     if (typeof defineProperty.value === 'object') {
                         if (_typeInfo.type instanceof QmlFile || _typeInfo.type.isAssignableFrom(QtQml.QObject)) {
                             if (typeInfo.typeBase.isAssignableFrom(JQModules.QtQml.SDLObject)) {
-                                meta.push(`${defineProperty.name}:{type:JQModules.QtQml.SDLProperty, typeTarget:${_typeInfo.path}},`)
+                                meta.push(`${defineProperty.name}:{type:JQModules.QtQml.SDLProperty, typeTarget:${_typeInfo.path}, modifiers: ${JSON.stringify(defineProperty.modifiers)}},`)
                             } else {
-                                meta.push(`${defineProperty.name}:{type:JQModules.QtQml.variant, typeTarget:${_typeInfo.path}},`)
+                                meta.push(`${defineProperty.name}:{type:JQModules.QtQml.variant, typeTarget:${_typeInfo.path}, modifiers: ${JSON.stringify(defineProperty.modifiers)}},`)
                             }
                         } else {
                             if (typeInfo.typeBase.isAssignableFrom(JQModules.QtQml.SDLObject)) {
-                                meta.push(`${defineProperty.name}:{type:JQModules.QtQml.SDLProperty},`)
+                                meta.push(`${defineProperty.name}:{type:JQModules.QtQml.SDLProperty, modifiers: ${JSON.stringify(defineProperty.modifiers)}},`)
                             } else {
-                                meta.push(`${defineProperty.name}:{type:${_typeInfo.path}},`)
+                                meta.push(`${defineProperty.name}:{type:${_typeInfo.path}, modifiers: ${JSON.stringify(defineProperty.modifiers)}},`)
                             }
                             
                         }
@@ -1140,24 +1149,24 @@ function compile(options){
 
                     if (typeof defineProperty.value === 'string') {
                         if (typeInfo.typeBase.isAssignableFrom(JQModules.QtQml.SDLObject)) {
-                            meta.push(`${defineProperty.name}:{type:JQModules.QtQml.SDLProperty, value:'${defineProperty.value}'},`)
+                            meta.push(`${defineProperty.name}:{type:JQModules.QtQml.SDLProperty, value:'${defineProperty.value}', modifiers: ${JSON.stringify(defineProperty.modifiers)}},`)
                         } else {
-                            meta.push(`${defineProperty.name}:{type:${_typeInfo.path}, value:'${defineProperty.value}'},`)
+                            meta.push(`${defineProperty.name}:{type:${_typeInfo.path}, value:'${defineProperty.value}', modifiers: ${JSON.stringify(defineProperty.modifiers)}},`)
                         }
                         
                     } else {
                         if (_typeInfo.type instanceof QmlFile || _typeInfo.type.isAssignableFrom(QtQml.QObject)) {
                             if (typeInfo.typeBase.isAssignableFrom(JQModules.QtQml.SDLObject)) {
-                                meta.push(`${defineProperty.name}:{type:JQModules.QtQml.SDLProperty, typeTarget:${_typeInfo.path}, value:${defineProperty.value}},`)
+                                meta.push(`${defineProperty.name}:{type:JQModules.QtQml.SDLProperty, typeTarget:${_typeInfo.path}, value:${defineProperty.value}, modifiers: ${JSON.stringify(defineProperty.modifiers)}},`)
                             } else {
-                                meta.push(`${defineProperty.name}:{type:JQModules.QtQml.variant, typeTarget:${_typeInfo.path}, value:${defineProperty.value}},`)
+                                meta.push(`${defineProperty.name}:{type:JQModules.QtQml.variant, typeTarget:${_typeInfo.path}, value:${defineProperty.value}, modifiers: ${JSON.stringify(defineProperty.modifiers)}},`)
                             }
                             
                         } else {
                             if (typeInfo.typeBase.isAssignableFrom(JQModules.QtQml.SDLObject)) {
-                                meta.push(`${defineProperty.name}:{type:JQModules.QtQml.SDLProperty, value:${defineProperty.value}},`)
+                                meta.push(`${defineProperty.name}:{type:JQModules.QtQml.SDLProperty, value:${defineProperty.value}, modifiers: ${JSON.stringify(defineProperty.modifiers)}},`)
                             } else {
-                                meta.push(`${defineProperty.name}:{type:${_typeInfo.path}, value:${defineProperty.value}},`)
+                                meta.push(`${defineProperty.name}:{type:${_typeInfo.path}, value:${defineProperty.value}, modifiers: ${JSON.stringify(defineProperty.modifiers)}},`)
                             }
                             
                         }

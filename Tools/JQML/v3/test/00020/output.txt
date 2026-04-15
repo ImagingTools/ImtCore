@@ -1,0 +1,3 @@
+Событие onWidthChanged: 250
+Событие onHeightChanged: 120
+Финальные размеры: 250 120

@@ -61,4 +61,5 @@ module.exports.listComponents = [
     'Flow',
     'BaseClass',
     'BaseModel',
+    'DropArea',
 ]

@@ -537,22 +537,22 @@ protected:
 		return m_collectionPtr;
 	}
 
-	virtual istd::IChangeableSharedPtr CreateObject(const QByteArray& /*typeId*/) const override
+	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& /*typeId*/) const override
 	{
 		if (m_createObjectShouldFail) {
-			return istd::IChangeableSharedPtr();
+			return istd::IChangeableUniquePtr();
 		}
 
-		return istd::IChangeableSharedPtr(new CMockDocumentObject());
+		return istd::IChangeableUniquePtr(new CMockDocumentObject());
 	}
 
-	virtual idoc::IUndoManagerSharedPtr CreateUndoManager() const override
+	virtual idoc::IUndoManagerUniquePtr CreateUndoManager() const override
 	{
 		if (m_createUndoManagerShouldFail) {
-			return idoc::IUndoManagerSharedPtr();
+			return idoc::IUndoManagerUniquePtr();
 		}
 
-		return idoc::IUndoManagerSharedPtr(new CMockUndoManager());
+		return idoc::IUndoManagerUniquePtr(new CMockUndoManager());
 	}
 
 	virtual QList<imtdoc::IDocumentManagerEventHandler*> GetDocumentManagerEventHandlers() const override
