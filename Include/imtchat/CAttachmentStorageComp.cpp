@@ -4,6 +4,8 @@
 // Qt includes
 #include <QtCore/QDateTime>
 #include <QtCore/QUuid>
+#include <QtSql/QSqlError>
+#include <QtSql/QSqlQuery>
 
 
 namespace imtchat
@@ -79,6 +81,40 @@ bool CAttachmentStorageComp::DeleteAttachment(const QByteArray& attachmentId)
 	}
 
 	return m_attachmentCollectionCompPtr->RemoveElements({attachmentId});
+}
+
+
+int CAttachmentStorageComp::CleanupOrphanedAttachments(int ttlMinutes)
+{
+	if (!m_databaseEngineCompPtr.IsValid()){
+		return -1;
+	}
+
+	// Compute the cutoff time in C++ so the query works for both PostgreSQL and SQLite
+	QString cutoffTime = QDateTime::currentDateTimeUtc().addSecs(-qint64(ttlMinutes) * 60).toString(Qt::ISODateWithMs);
+
+	// Delete attachments not referenced by any message and older than TTL
+	QByteArray query = QString(
+		"DELETE FROM \"Attachments\" "
+		"WHERE \"Id\" NOT IN (SELECT \"AttachmentId\" FROM \"MessageAttachments\") "
+		"AND \"CreatedAt\" < '%1';")
+		.arg(cutoffTime)
+		.toUtf8();
+
+	QSqlError sqlError;
+	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
+
+	if (sqlError.type() != QSqlError::NoError){
+		qWarning() << "CAttachmentStorageComp: orphan cleanup failed:" << sqlError.text();
+		return -1;
+	}
+
+	int deleted = sqlQuery.numRowsAffected();
+	if (deleted > 0){
+		qInfo() << "CAttachmentStorageComp: cleaned up" << deleted << "orphaned attachment(s) older than" << ttlMinutes << "minutes";
+	}
+
+	return deleted;
 }
 
 

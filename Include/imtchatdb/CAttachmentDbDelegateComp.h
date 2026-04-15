@@ -65,6 +65,8 @@ protected:
 
 private:
 	I_FACT(imtchat::IAttachment, m_attachmentFactCompPtr);
+
+	void CleanupOrphanedAttachments();
 };
 
 

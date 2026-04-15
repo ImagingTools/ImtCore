@@ -59,6 +59,18 @@ public:
 		\return true if the attachment was deleted.
 	*/
 	virtual bool DeleteAttachment(const QByteArray& attachmentId) = 0;
+
+	/**
+		Delete orphaned attachments that are not referenced by any message
+		and older than the specified time-to-live.
+
+		This handles the case when a user uploads files but never sends
+		the message, leaving unreferenced attachments in the database.
+
+		\param ttlMinutes Minimum age in minutes before an unreferenced attachment is eligible for deletion. Default is 1440 (24 hours).
+		\return Number of attachments deleted, or -1 on error.
+	*/
+	virtual int CleanupOrphanedAttachments(int ttlMinutes = 1440) = 0;
 };
 
 

@@ -190,6 +190,8 @@ void CAttachmentDbDelegateComp::OnComponentCreated()
 
 	const QString tableName = GetTableName();
 	if (TableExists(tableName)){
+		// Table already exists — run orphaned attachment cleanup
+		CleanupOrphanedAttachments();
 		return;
 	}
 
@@ -232,6 +234,38 @@ bool CAttachmentDbDelegateComp::SetObjectMetaInfoFromRecord(
 	Q_UNUSED(record);
 	Q_UNUSED(metaInfo);
 	return true;
+}
+
+
+void CAttachmentDbDelegateComp::CleanupOrphanedAttachments()
+{
+	if (!m_databaseEngineCompPtr.IsValid()){
+		return;
+	}
+
+	// Only clean up attachments not referenced by any message and older than 24 hours.
+	// This avoids deleting files that are still being uploaded or pending attachment to a message.
+	QString cutoffTime = QDateTime::currentDateTimeUtc().addSecs(-24 * 3600).toString(Qt::ISODateWithMs);
+
+	QByteArray query = QString(
+		"DELETE FROM \"Attachments\" "
+		"WHERE \"Id\" NOT IN (SELECT \"AttachmentId\" FROM \"MessageAttachments\") "
+		"AND \"CreatedAt\" < '%1';")
+		.arg(cutoffTime)
+		.toUtf8();
+
+	QSqlError sqlError;
+	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
+
+	if (sqlError.type() != QSqlError::NoError){
+		qWarning() << "CAttachmentDbDelegateComp: orphaned attachment cleanup failed:" << sqlError.text();
+		return;
+	}
+
+	int deleted = sqlQuery.numRowsAffected();
+	if (deleted > 0){
+		qInfo() << "CAttachmentDbDelegateComp: cleaned up" << deleted << "orphaned attachment(s)";
+	}
 }
 
 

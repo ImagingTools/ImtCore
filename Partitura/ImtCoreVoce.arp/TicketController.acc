@@ -42,6 +42,9 @@
                     <AttributeInfo Id="AttachmentFactory" Type="Factory" ExportId="">
                         <Data IsEnabled="true" Value="Attachment"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>

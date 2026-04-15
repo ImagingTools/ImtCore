@@ -729,9 +729,16 @@ DocumentViewBase {
 												anchors.verticalCenter: parent.verticalCenter
 												iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
 												onClicked: {
+													var removed = root.pendingAttachments[index]
 													var arr = root.pendingAttachments.slice()
 													arr.splice(index, 1)
 													root.pendingAttachments = arr
+													// Delete the uploaded file from the server
+													if (removed && removed.id) {
+														var xhr = new XMLHttpRequest()
+														xhr.open("DELETE", "../../files/" + encodeURIComponent(removed.id))
+														xhr.send()
+													}
 												}
 											}
 										}

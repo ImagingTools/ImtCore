@@ -8,6 +8,7 @@
 #include <imtchat/IAttachmentStorage.h>
 #include <imtchat/IAttachment.h>
 #include <imtbase/IObjectCollection.h>
+#include <imtdb/IDatabaseEngine.h>
 
 
 namespace imtchat
@@ -25,6 +26,7 @@ public:
 		I_REGISTER_INTERFACE(IAttachmentStorage);
 		I_ASSIGN(m_attachmentCollectionCompPtr, "AttachmentCollection", "Collection of attachments backed by SQL", true, "AttachmentCollection");
 		I_ASSIGN(m_attachmentFactCompPtr, "AttachmentFactory", "Factory for creating attachment objects", true, "AttachmentFactory");
+		I_ASSIGN(m_databaseEngineCompPtr, "DatabaseEngine", "Database engine for cleanup queries", false, "DatabaseEngine");
 	I_END_COMPONENT
 
 	// reimplemented (imtchat::IAttachmentStorage)
@@ -38,10 +40,12 @@ public:
 				QString& fileName,
 				QString& mimeType) const override;
 	virtual bool DeleteAttachment(const QByteArray& attachmentId) override;
+	virtual int CleanupOrphanedAttachments(int ttlMinutes = 1440) override;
 
 private:
 	I_REF(imtbase::IObjectCollection, m_attachmentCollectionCompPtr);
 	I_FACT(IAttachment, m_attachmentFactCompPtr);
+	I_REF(imtdb::IDatabaseEngine, m_databaseEngineCompPtr);
 };
 
 
