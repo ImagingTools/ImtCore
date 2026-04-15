@@ -507,6 +507,7 @@ DocumentViewBase {
 								height: commentBubbleCol.height
 								
 								readonly property bool isMe: model.item.m_userId === root.currentUserId
+								readonly property var dataModel: model.item
 								
 								Column {
 									id: commentBubbleCol
@@ -586,22 +587,25 @@ DocumentViewBase {
 											
 											// Attachment file links
 											Repeater {
-												model: model.item.m_attachments || []
+												model: commentDelegate.dataModel.m_attachments || []
 												delegate: Text {
-													readonly property string fileUrl: model.item ? (model.item.m_preview || "") : ""
-													readonly property string fileName: model.item ? (model.item.m_fileName || qsTr("attachment")) : qsTr("attachment")
+													property string fileUrl: model.item.m_preview
+													property string fileName: model.item.m_fileName
+
 													width: bubbleContent.width
 													text: "📎 <a href=\"" + fileUrl + "\">" + fileName + "</a>"
 													textFormat: Text.StyledText
 													font.pixelSize: Style.fontSizeS
 													color: Style.textSecondaryColor
 													wrapMode: Text.Wrap
-													onLinkActivated: function(link) { Qt.openUrlExternally(link) }
 
 													MouseArea {
 														anchors.fill: parent
-														acceptedButtons: Qt.NoButton
-														cursorShape: parent.hoveredLink ? Qt.PointingHandCursor : Qt.ArrowCursor
+														acceptedButtons: Qt.LeftButton
+														cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
+														onClicked: {
+															Qt.openUrlExternally(parent.fileUrl)
+														}
 													}
 												}
 											}
