@@ -117,14 +117,13 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 		}
 	}
 
-	// Populate available entity types from server registry
+	// Populate available entity types from registered providers (I_MULTIREF)
 	response.Version_1_0->entityTypes.Emplace();
 	QList<sdl::imtdesk::ImtDesk::CEntityType::V1_0> typeList;
-	QStringList typeNames = {"User", "License", "Product", "Ticket", "Role"};
-	for (const QString& tn : typeNames){
+	for (int i = 0; i < m_entityTypeProvidersCompPtr.GetCount(); ++i){
 		sdl::imtdesk::ImtDesk::CEntityType::V1_0 et;
-		et.id = tn;
-		et.name = tn;
+		et.id = m_entityTypeProvidersCompPtr[i]->GetEntityTypeId();
+		et.name = m_entityTypeProvidersCompPtr[i]->GetEntityTypeName();
 		typeList << et;
 	}
 	response.Version_1_0->entityTypes->FromList(typeList);

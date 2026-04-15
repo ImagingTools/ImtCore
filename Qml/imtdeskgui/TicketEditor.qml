@@ -574,7 +574,7 @@ DocumentViewBase {
 									spacing: Style.paddingXS
 									
 									Text {
-										text: modelData.displayName || modelData.entityId || ""
+										text: (modelData.entityType ? "[" + modelData.entityType + "] " : "") + (modelData.displayName || modelData.entityId || "")
 										font.pixelSize: Style.fontSizeS
 										color: Style.accentColor
 										font.underline: !!modelData.entityUrl
@@ -664,7 +664,7 @@ DocumentViewBase {
 							spacing: Style.spacingS
 							
 							Text {
-								text: qsTr("Add Entity Reference")
+								text: qsTr("Link Entity")
 								font.pixelSize: Style.fontSizeM
 								font.bold: true
 								color: Style.textColor
@@ -697,53 +697,17 @@ DocumentViewBase {
 									spacing: Style.spacingXS
 									
 									Text {
-										text: qsTr("Display Name")
+										text: qsTr("Entity ID")
 										font.pixelSize: Style.fontSizeS
 										color: Style.textColor
 									}
 									
 									CustomTextField {
-										id: refDisplayNameInput
+										id: refEntityIdInput
 										width: parent.width
 										height: Style.controlHeightM
-										placeHolderText: qsTr("Name")
+										placeHolderText: qsTr("Unique identifier")
 									}
-								}
-							}
-							
-							Column {
-								width: parent.width
-								spacing: Style.spacingXS
-								
-								Text {
-									text: qsTr("Entity ID")
-									font.pixelSize: Style.fontSizeS
-									color: Style.textColor
-								}
-								
-								CustomTextField {
-									id: refEntityIdInput
-									width: parent.width
-									height: Style.controlHeightM
-									placeHolderText: qsTr("Unique identifier")
-								}
-							}
-							
-							Column {
-								width: parent.width
-								spacing: Style.spacingXS
-								
-								Text {
-									text: qsTr("URL (optional)")
-									font.pixelSize: Style.fontSizeS
-									color: Style.textColor
-								}
-								
-								CustomTextField {
-									id: refEntityUrlInput
-									width: parent.width
-									height: Style.controlHeightM
-									placeHolderText: qsTr("Path to entity")
 								}
 							}
 							
@@ -775,9 +739,7 @@ DocumentViewBase {
 										cursorShape: Qt.PointingHandCursor
 										onClicked: {
 											entityRefDialog.visible = false
-											refDisplayNameInput.text = ""
 											refEntityIdInput.text = ""
-											refEntityUrlInput.text = ""
 										}
 									}
 								}
@@ -815,14 +777,12 @@ DocumentViewBase {
 											arr.push({
 												entityType: entityType,
 												entityId: refEntityIdInput.text.trim(),
-												displayName: refDisplayNameInput.text.trim(),
-												entityUrl: refEntityUrlInput.text.trim()
+												displayName: "",
+												entityUrl: ""
 											})
 											root.pendingEntityRefs = arr
 											entityRefDialog.visible = false
-											refDisplayNameInput.text = ""
 											refEntityIdInput.text = ""
-											refEntityUrlInput.text = ""
 											root.doUpdateModel()
 										}
 									}

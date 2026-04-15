@@ -30,5 +30,10 @@ I_EXPORT_COMPONENT(
 			"Ticket document name provider",
 			"Ticket Document Name Provider");
 
+I_EXPORT_COMPONENT(
+			EntityTypeProvider,
+			"Entity type provider",
+			"Entity Type Provider");
+
 
 } // namespace ImtDeskPck
