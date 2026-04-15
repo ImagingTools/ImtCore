@@ -504,7 +504,7 @@ DocumentViewBase {
 							delegate: Item {
 								id: commentDelegate
 								width: commentsListCol.width
-								height: commentBubbleCol.height
+								height: commentBubbleCol.implicitHeight
 								
 								readonly property bool isMe: model.item.m_userId === root.currentUserId
 								readonly property var dataModel: model.item
@@ -559,7 +559,7 @@ DocumentViewBase {
 									// Comment body bubble
 									Rectangle {
 										width: commentBubbleCol.width
-										height: bubbleContent.height + Style.paddingM * 2
+										height: bubbleContent.implicitHeight + Style.paddingM * 2
 										radius: Style.radiusS
 										color: Style.baseColor
 										border.color: Style.borderColor
@@ -586,25 +586,37 @@ DocumentViewBase {
 											}
 											
 											// Attachment file links
-											Repeater {
-												model: commentDelegate.dataModel.m_attachments || []
-												delegate: Text {
-													property string fileUrl: model.item.m_preview
-													property string fileName: model.item.m_fileName
-
-													width: bubbleContent.width
-													text: "📎 <a href=\"" + fileUrl + "\">" + fileName + "</a>"
-													textFormat: Text.StyledText
-													font.pixelSize: Style.fontSizeS
-													color: Style.textSecondaryColor
-													wrapMode: Text.Wrap
-
-													MouseArea {
-														anchors.fill: parent
-														acceptedButtons: Qt.LeftButton
-														cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
-														onClicked: {
-															Qt.openUrlExternally(parent.fileUrl)
+											Column {
+												width: parent.width
+												spacing: Style.spacingXS
+												visible: commentDelegate.dataModel.m_attachments ? true : false
+												
+												Repeater {
+													model: commentDelegate.dataModel.m_attachments || []
+													delegate: Item {
+														width: bubbleContent.width
+														height: attachLinkLabel.contentHeight + Style.paddingXS * 2
+														
+														Text {
+															id: attachLinkLabel
+															anchors.left: parent.left
+															anchors.right: parent.right
+															anchors.verticalCenter: parent.verticalCenter
+															text: "📎 " + (model.item.m_fileName || qsTr("attachment"))
+															font.pixelSize: Style.fontSizeS
+															font.underline: true
+															color: Style.accentColor
+															wrapMode: Text.Wrap
+														}
+														
+														MouseArea {
+															anchors.fill: parent
+															cursorShape: Qt.PointingHandCursor
+															hoverEnabled: true
+															onClicked: {
+																var url = model.item.m_preview || ""
+																if (url) Qt.openUrlExternally(url)
+															}
 														}
 													}
 												}
