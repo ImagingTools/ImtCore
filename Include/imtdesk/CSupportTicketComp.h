@@ -68,6 +68,8 @@ public:
 	virtual void SetClosedAt(const QString& closedAt) override;
 	virtual QString GetResolvedAt() const override;
 	virtual void SetResolvedAt(const QString& resolvedAt) override;
+	virtual QString GetEntityReferences() const override;
+	virtual void SetEntityReferences(const QString& entityReferences) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -99,6 +101,7 @@ private:
 	QString m_updatedAt;
 	QString m_closedAt;
 	QString m_resolvedAt;
+	QString m_entityReferences;
 };
 
 

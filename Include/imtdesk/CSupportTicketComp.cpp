@@ -335,6 +335,22 @@ void CSupportTicketComp::SetResolvedAt(const QString& resolvedAt)
 }
 
 
+QString CSupportTicketComp::GetEntityReferences() const
+{
+	return m_entityReferences;
+}
+
+
+void CSupportTicketComp::SetEntityReferences(const QString& entityReferences)
+{
+	if (m_entityReferences != entityReferences){
+		istd::CChangeNotifier notifier(this);
+
+		m_entityReferences = entityReferences;
+	}
+}
+
+
 // reimplemented (iser::ISerializable)
 
 bool CSupportTicketComp::Serialize(iser::IArchive& archive)
@@ -434,6 +450,11 @@ bool CSupportTicketComp::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_resolvedAt);
 	retVal = retVal && archive.EndTag(resolvedAtTag);
 
+	static iser::CArchiveTag entityReferencesTag("EntityReferences", "Entity references", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(entityReferencesTag);
+	retVal = retVal && archive.Process(m_entityReferences);
+	retVal = retVal && archive.EndTag(entityReferencesTag);
+
 	return retVal;
 }
 
@@ -469,6 +490,7 @@ bool CSupportTicketComp::CopyFrom(const IChangeable& object, CompatibilityMode /
 	m_updatedAt = srcPtr->GetUpdatedAt();
 	m_closedAt = srcPtr->GetClosedAt();
 	m_resolvedAt = srcPtr->GetResolvedAt();
+	m_entityReferences = srcPtr->GetEntityReferences();
 
 	return true;
 }
@@ -500,7 +522,8 @@ bool CSupportTicketComp::IsEqual(const IChangeable& object) const
 		&& m_createdAt == srcPtr->GetCreatedAt()
 		&& m_updatedAt == srcPtr->GetUpdatedAt()
 		&& m_closedAt == srcPtr->GetClosedAt()
-		&& m_resolvedAt == srcPtr->GetResolvedAt();
+		&& m_resolvedAt == srcPtr->GetResolvedAt()
+		&& m_entityReferences == srcPtr->GetEntityReferences();
 
 	return result;
 }
@@ -541,6 +564,7 @@ bool CSupportTicketComp::ResetData(CompatibilityMode /*mode*/)
 	m_updatedAt.clear();
 	m_closedAt.clear();
 	m_resolvedAt.clear();
+	m_entityReferences.clear();
 
 	return true;
 }

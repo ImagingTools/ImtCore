@@ -281,6 +281,17 @@ public:
 	*/
 	virtual void SetResolvedAt(const QString& resolvedAt) = 0;
 
+	/**
+		Get the serialized entity references (JSON array of objects with
+		entityType, entityId, displayName, entityUrl).
+	*/
+	virtual QString GetEntityReferences() const = 0;
+
+	/**
+		Set the serialized entity references.
+	*/
+	virtual void SetEntityReferences(const QString& entityReferences) = 0;
+
 };
 
 typedef istd::TUniqueInterfacePtr<ISupportTicket> ISupportTicketUniquePtr;

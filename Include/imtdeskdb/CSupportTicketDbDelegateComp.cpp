@@ -136,6 +136,9 @@ istd::IChangeableUniquePtr CSupportTicketDbDelegateComp::CreateObjectFromRecord(
 		QDateTime dt = val.toDateTime();
 		ticketPtr->SetResolvedAt(dt.isValid() ? dt.toString(Qt::ISODateWithMs) : val.toString());
 	}
+	if (record.contains("EntityReferences")){
+		ticketPtr->SetEntityReferences(record.value("EntityReferences").toString());
+	}
 
 	return ticketPtr;
 }
@@ -200,6 +203,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSupportTicketDbDelegateComp::Cre
 
 	const QString lockReasonSql = ticketPtr->GetLockReason().isEmpty() ? "NULL" : QString("'%1'").arg(ticketPtr->GetLockReason());
 
+	const QString entityRefsSql = ticketPtr->GetEntityReferences().isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(ticketPtr->GetEntityReferences()));
+
 	const QString nowUtc = utcNow();
 
 	NewObjectQuery retVal;
@@ -207,9 +212,9 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSupportTicketDbDelegateComp::Cre
 		"INSERT INTO \"Tickets\" "
 		"(\"Id\", \"Title\", \"Description\", \"TicketType\", \"Status\", \"StateReason\", \"Priority\", "
 		"\"AssigneeIds\", \"ReporterId\", \"ConversationId\", \"MessageId\", "
-		"\"Tags\", \"LabelIds\", \"Locked\", \"LockReason\", "
+		"\"Tags\", \"LabelIds\", \"Locked\", \"LockReason\", \"EntityReferences\", "
 		"\"ResolvedAt\", \"ClosedAt\", \"CreatedAt\", \"UpdatedAt\") "
-		"VALUES('%1', '%2', '%3', %4, %5, %6, %7, %8, '%9', %10, %11, %12, %13, %14, %15, %16, %17, '%18', '%19');")
+		"VALUES('%1', '%2', '%3', %4, %5, %6, %7, %8, '%9', %10, %11, %12, %13, %14, %15, %16, %17, %18, '%19', '%20');")
 		.arg(QString::fromUtf8(ticketId))
 		.arg(title)
 		.arg(ticketPtr->GetDescription())
@@ -225,6 +230,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSupportTicketDbDelegateComp::Cre
 		.arg(labelsSql)
 		.arg(ticketPtr->IsLocked() ? "TRUE" : "FALSE")
 		.arg(lockReasonSql)
+		.arg(entityRefsSql)
 		.arg(resolvedSql)
 		.arg(closedSql)
 		.arg(nowUtc)
@@ -272,6 +278,8 @@ QByteArray CSupportTicketDbDelegateComp::CreateUpdateObjectQuery(
 
 	const QString lockReasonSql = ticketPtr->GetLockReason().isEmpty() ? "NULL" : QString("'%1'").arg(ticketPtr->GetLockReason());
 
+	const QString entityRefsSql = ticketPtr->GetEntityReferences().isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(ticketPtr->GetEntityReferences()));
+
 	QByteArray result = QString(
 		"UPDATE \"Tickets\" SET "
 		"\"Title\"='%1', "
@@ -285,10 +293,11 @@ QByteArray CSupportTicketDbDelegateComp::CreateUpdateObjectQuery(
 		"\"LabelIds\"=%9, "
 		"\"Locked\"=%10, "
 		"\"LockReason\"=%11, "
-		"\"ResolvedAt\"=%12, "
-		"\"ClosedAt\"=%13, "
-		"\"UpdatedAt\"='%14' "
-		"WHERE \"Id\"='%15';")
+		"\"EntityReferences\"=%12, "
+		"\"ResolvedAt\"=%13, "
+		"\"ClosedAt\"=%14, "
+		"\"UpdatedAt\"='%15' "
+		"WHERE \"Id\"='%16';")
 		.arg(ticketPtr->GetTitle())
 		.arg(ticketPtr->GetDescription())
 		.arg(ticketPtr->GetTicketType())
@@ -300,6 +309,7 @@ QByteArray CSupportTicketDbDelegateComp::CreateUpdateObjectQuery(
 		.arg(labelsSql)
 		.arg(ticketPtr->IsLocked() ? "TRUE" : "FALSE")
 		.arg(lockReasonSql)
+		.arg(entityRefsSql)
 		.arg(resolvedSql)
 		.arg(closedSql)
 		.arg(utcNow())

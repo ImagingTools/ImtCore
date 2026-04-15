@@ -50,6 +50,16 @@ public:
 	*/
 	virtual void SetDisplayName(const QString& displayName) = 0;
 
+	/**
+		Get the URL path to navigate to the referenced entity.
+	*/
+	virtual QString GetEntityUrl() const = 0;
+
+	/**
+		Set the entity URL path.
+	*/
+	virtual void SetEntityUrl(const QString& entityUrl) = 0;
+
 };
 
 typedef istd::TUniqueInterfacePtr<IEntityReference> IEntityReferenceUniquePtr;

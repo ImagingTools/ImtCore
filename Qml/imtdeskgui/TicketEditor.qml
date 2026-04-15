@@ -32,6 +32,9 @@ DocumentViewBase {
 	property var pendingAttachments: []
 	// Number of uploads currently in progress
 	property int uploadsInProgress: 0
+	// Pending entity references for the ticket
+	// Each element: {entityType, entityId, displayName, entityUrl}
+	property var pendingEntityRefs: []
 	
 	signal commentSubmitted(string commentText)
 	
@@ -177,6 +180,26 @@ DocumentViewBase {
 		editStateReasonCB.currentIndex = findComboIndex(editStateReasonCB, ticketData.m_stateReason, 0)
 		editLockReasonInput.text = ticketData.m_lockReason || ""
 		editLockedCB.checkState = ticketData.m_locked ? Qt.Checked : Qt.Unchecked
+
+		// Load entity references from ticket data
+		var refs = []
+		if (ticketData.hasEntityReferences && ticketData.hasEntityReferences()) {
+			var entityRefs = ticketData.m_entityReferences
+			if (entityRefs) {
+				for (var r = 0; r < entityRefs.getElementsCount(); r++) {
+					var refItem = entityRefs.getElement(r)
+					if (refItem) {
+						refs.push({
+							entityType: String(refItem.m_entityType || ""),
+							entityId: String(refItem.m_entityId || ""),
+							displayName: String(refItem.m_displayName || ""),
+							entityUrl: String(refItem.m_entityUrl || "")
+						})
+					}
+				}
+			}
+		}
+		root.pendingEntityRefs = refs
 		
 		editAssigneeCB.currentIndex = -1
 		if (editAssigneeCB.model) {
@@ -233,6 +256,20 @@ DocumentViewBase {
 		}
 		if (editStateReasonCB.model && editStateReasonCB.currentIndex >= 0) {
 			ticketData.m_stateReason = editStateReasonCB.model.getData("id", editStateReasonCB.currentIndex)
+		}
+
+		// Save entity references to ticket data
+		if (root.pendingEntityRefs.length > 0) {
+			ticketData.emplaceEntityReferences()
+			for (var r = 0; r < root.pendingEntityRefs.length; r++) {
+				var ref = root.pendingEntityRefs[r]
+				var refItem = ticketData.createEntityReferencesArrayElement()
+				refItem.m_entityType = String(ref.entityType || "")
+				refItem.m_entityId = String(ref.entityId || "")
+				refItem.m_displayName = String(ref.displayName || "")
+				refItem.m_entityUrl = String(ref.entityUrl || "")
+				ticketData.m_entityReferences.addElement(refItem)
+			}
 		}
 	}
 	
@@ -325,6 +362,31 @@ DocumentViewBase {
 			index = insertNewItem()
 			setData("id", "Reopened", index)
 			setData("name", "Reopened", index)
+		}
+	}
+	
+	TreeItemModel {
+		id: entityTypeModel
+		Component.onCompleted: {
+			let index = insertNewItem()
+			setData("id", "User", index)
+			setData("name", "User", index)
+			
+			index = insertNewItem()
+			setData("id", "License", index)
+			setData("name", "License", index)
+			
+			index = insertNewItem()
+			setData("id", "Product", index)
+			setData("name", "Product", index)
+			
+			index = insertNewItem()
+			setData("id", "Ticket", index)
+			setData("name", "Ticket", index)
+			
+			index = insertNewItem()
+			setData("id", "Role", index)
+			setData("name", "Role", index)
 		}
 	}
 	
@@ -460,6 +522,334 @@ DocumentViewBase {
 								color: Style.textPlaceholderColor
 								font.pixelSize: Style.fontSizeM
 								visible: editDescriptionInput.text.length === 0
+							}
+						}
+					}
+				}
+				
+				// --- Entity References section ---
+				Column {
+					width: parent.width
+					spacing: Style.spacingS
+					
+					Row {
+						width: parent.width
+						spacing: Style.spacingS
+						
+						Text {
+							text: qsTr("Context")
+							font.pixelSize: Style.fontSizeM
+							font.bold: true
+							color: Style.textColor
+							anchors.verticalCenter: parent.verticalCenter
+						}
+						
+						Text {
+							text: root.pendingEntityRefs.length > 0
+								  ? "(" + root.pendingEntityRefs.length + ")"
+								  : ""
+							font.pixelSize: Style.fontSizeS
+							color: Style.textColor
+							anchors.verticalCenter: parent.verticalCenter
+						}
+					}
+					
+					// Existing entity references
+					Flow {
+						width: parent.width
+						spacing: Style.spacingS
+						visible: root.pendingEntityRefs.length > 0
+						
+						Repeater {
+							model: root.pendingEntityRefs
+							delegate: Rectangle {
+								readonly property real maxRefWidth: 300
+								width: Math.min(refLabelRow.implicitWidth + Style.paddingM * 2 + refRemoveBtn.width + Style.paddingS, maxRefWidth)
+								height: Style.buttonHeightS
+								radius: Style.radiusS
+								border.color: Style.accentColor
+								border.width: 1
+								color: Style.accentColorLight || Qt.lighter(Style.accentColor, 1.8)
+								
+								Row {
+									id: refLabelRow
+									anchors.left: parent.left
+									anchors.leftMargin: Style.paddingM
+									anchors.right: refRemoveBtn.left
+									anchors.rightMargin: Style.paddingS
+									anchors.verticalCenter: parent.verticalCenter
+									spacing: Style.paddingXS
+									
+									Text {
+										text: {
+											var t = (modelData.entityType || "").toLowerCase()
+											switch (t) {
+												case "user":    return "👤"
+												case "license": return "🔑"
+												case "product": return "📦"
+												case "ticket":  return "🎫"
+												case "role":    return "🎭"
+												default:        return "🔗"
+											}
+										}
+										font.pixelSize: Style.fontSizeS
+										anchors.verticalCenter: parent.verticalCenter
+									}
+									
+									Text {
+										text: modelData.displayName || modelData.entityId || ""
+										font.pixelSize: Style.fontSizeS
+										color: Style.accentColor
+										font.underline: !!modelData.entityUrl
+										elide: Text.ElideRight
+										maximumLineCount: 1
+										anchors.verticalCenter: parent.verticalCenter
+										
+										MouseArea {
+											anchors.fill: parent
+											cursorShape: modelData.entityUrl ? Qt.PointingHandCursor : Qt.ArrowCursor
+											onClicked: {
+												if (modelData.entityUrl) {
+													Qt.openUrlExternally(modelData.entityUrl)
+												}
+											}
+										}
+									}
+								}
+								
+								ToolButton {
+									id: refRemoveBtn
+									anchors.right: parent.right
+									anchors.rightMargin: Style.paddingXS
+									anchors.verticalCenter: parent.verticalCenter
+									iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+									onClicked: {
+										var arr = root.pendingEntityRefs.slice()
+										arr.splice(index, 1)
+										root.pendingEntityRefs = arr
+										root.doUpdateModel()
+									}
+								}
+							}
+						}
+					}
+					
+					// Add entity reference button
+					Rectangle {
+						width: addRefBtnContent.contentWidth + Style.marginM * 2
+						height: Style.buttonHeightM
+						radius: Style.buttonRadius
+						color: addRefBtnMa.pressed
+							   ? Qt.darker(Style.borderColor, 1.1)
+							   : addRefBtnMa.containsMouse
+								 ? Qt.lighter(Style.borderColor, 1.1)
+								 : Style.baseColor
+						border.color: Style.borderColor
+						border.width: 1
+						
+						Text {
+							id: addRefBtnContent
+							anchors.centerIn: parent
+							text: "🔗 " + qsTr("Link entity")
+							font.pixelSize: Style.fontSizeM
+							font.family: Style.fontFamily
+							color: Style.textColor
+						}
+						
+						MouseArea {
+							id: addRefBtnMa
+							anchors.fill: parent
+							hoverEnabled: true
+							cursorShape: Qt.PointingHandCursor
+							onClicked: {
+								entityRefDialog.visible = true
+							}
+						}
+					}
+					
+					// Inline entity reference entry form
+					Rectangle {
+						id: entityRefDialog
+						visible: false
+						width: parent.width
+						height: entityRefFormCol.height + Style.paddingM * 2
+						radius: Style.radiusS
+						border.color: Style.accentColor
+						border.width: 1
+						color: Style.baseColor
+						
+						Column {
+							id: entityRefFormCol
+							anchors.left: parent.left
+							anchors.right: parent.right
+							anchors.top: parent.top
+							anchors.margins: Style.paddingM
+							spacing: Style.spacingS
+							
+							Text {
+								text: qsTr("Add Entity Reference")
+								font.pixelSize: Style.fontSizeM
+								font.bold: true
+								color: Style.textColor
+							}
+							
+							Row {
+								width: parent.width
+								spacing: Style.spacingS
+								
+								Column {
+									width: (parent.width - Style.spacingS) / 2
+									spacing: Style.spacingXS
+									
+									Text {
+										text: qsTr("Entity Type")
+										font.pixelSize: Style.fontSizeS
+										color: Style.textColor
+									}
+									
+									ComboBox {
+										id: refTypeCB
+										width: parent.width
+										height: Style.buttonHeightM
+										model: entityTypeModel
+									}
+								}
+								
+								Column {
+									width: (parent.width - Style.spacingS) / 2
+									spacing: Style.spacingXS
+									
+									Text {
+										text: qsTr("Display Name")
+										font.pixelSize: Style.fontSizeS
+										color: Style.textColor
+									}
+									
+									CustomTextField {
+										id: refDisplayNameInput
+										width: parent.width
+										height: Style.controlHeightM
+										placeHolderText: qsTr("Name")
+									}
+								}
+							}
+							
+							Column {
+								width: parent.width
+								spacing: Style.spacingXS
+								
+								Text {
+									text: qsTr("Entity ID")
+									font.pixelSize: Style.fontSizeS
+									color: Style.textColor
+								}
+								
+								CustomTextField {
+									id: refEntityIdInput
+									width: parent.width
+									height: Style.controlHeightM
+									placeHolderText: qsTr("Unique identifier")
+								}
+							}
+							
+							Column {
+								width: parent.width
+								spacing: Style.spacingXS
+								
+								Text {
+									text: qsTr("URL (optional)")
+									font.pixelSize: Style.fontSizeS
+									color: Style.textColor
+								}
+								
+								CustomTextField {
+									id: refEntityUrlInput
+									width: parent.width
+									height: Style.controlHeightM
+									placeHolderText: qsTr("Path to entity")
+								}
+							}
+							
+							Row {
+								anchors.right: parent.right
+								spacing: Style.spacingS
+								
+								Rectangle {
+									width: cancelRefBtnText.contentWidth + Style.marginM * 2
+									height: Style.buttonHeightM
+									radius: Style.buttonRadius
+									color: cancelRefBtnMa.pressed
+										   ? Qt.darker(Style.borderColor, 1.1)
+										   : Style.baseColor
+									border.color: Style.borderColor
+									border.width: 1
+									
+									Text {
+										id: cancelRefBtnText
+										anchors.centerIn: parent
+										text: qsTr("Cancel")
+										font.pixelSize: Style.fontSizeM
+										color: Style.textColor
+									}
+									
+									MouseArea {
+										id: cancelRefBtnMa
+										anchors.fill: parent
+										cursorShape: Qt.PointingHandCursor
+										onClicked: {
+											entityRefDialog.visible = false
+											refDisplayNameInput.text = ""
+											refEntityIdInput.text = ""
+											refEntityUrlInput.text = ""
+										}
+									}
+								}
+								
+								Rectangle {
+									width: addRefConfirmBtnText.contentWidth + Style.marginM * 2
+									height: Style.buttonHeightM
+									radius: Style.buttonRadius
+									color: addRefConfirmMa.pressed
+										   ? Qt.darker(Style.imaginToolsAccentColor, 1.2)
+										   : addRefConfirmMa.containsMouse
+											 ? Qt.lighter(Style.imaginToolsAccentColor, 1.1)
+											 : Style.imaginToolsAccentColor
+									
+									Text {
+										id: addRefConfirmBtnText
+										anchors.centerIn: parent
+										text: qsTr("Add")
+										font.pixelSize: Style.fontSizeM
+										color: "white"
+									}
+									
+									MouseArea {
+										id: addRefConfirmMa
+										anchors.fill: parent
+										hoverEnabled: true
+										cursorShape: Qt.PointingHandCursor
+										onClicked: {
+											if (refEntityIdInput.text.trim().length === 0) return
+											var entityType = ""
+											if (refTypeCB.model && refTypeCB.currentIndex >= 0) {
+												entityType = refTypeCB.model.getData("id", refTypeCB.currentIndex)
+											}
+											var arr = root.pendingEntityRefs.slice()
+											arr.push({
+												entityType: entityType,
+												entityId: refEntityIdInput.text.trim(),
+												displayName: refDisplayNameInput.text.trim(),
+												entityUrl: refEntityUrlInput.text.trim()
+											})
+											root.pendingEntityRefs = arr
+											entityRefDialog.visible = false
+											refDisplayNameInput.text = ""
+											refEntityIdInput.text = ""
+											refEntityUrlInput.text = ""
+											root.doUpdateModel()
+										}
+									}
+								}
 							}
 						}
 					}

@@ -9,6 +9,9 @@
 // Qt includes
 #include <QtCore/QDateTime>
 #include <QtCore/QFileInfo>
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
 
 // ImtCore includes
 #include <imtdesk/ISupportTicket.h>
@@ -81,6 +84,30 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 	response.Version_1_0->priority = imtdeskgql::GetSdlTypeFromPriorityType(ticketPtr->GetPriority());
 	response.Version_1_0->status = imtdeskgql::GetSdlTypeFromStatusType(ticketPtr->GetStatus());
 	response.Version_1_0->stateReason = imtdeskgql::GetSdlTypeFromStateReason(ticketPtr->GetStateReason());
+
+	// Load entity references from the ticket's JSON field
+	QString entityRefsJson = ticketPtr->GetEntityReferences();
+	if (!entityRefsJson.isEmpty()){
+		QJsonDocument doc = QJsonDocument::fromJson(entityRefsJson.toUtf8());
+		if (doc.isArray()){
+			response.Version_1_0->entityReferences.Emplace();
+			QList<sdl::imtdesk::ImtDesk::CEntityReference::V1_0> refList;
+			QJsonArray arr = doc.array();
+			for (const QJsonValue& val : arr){
+				QJsonObject obj = val.toObject();
+				sdl::imtdesk::ImtDesk::CEntityReference::V1_0 ref;
+				ref.entityType = obj.value("entityType").toString();
+				ref.entityId = obj.value("entityId").toString().toUtf8();
+				ref.displayName = obj.value("displayName").toString();
+				ref.entityUrl = obj.value("entityUrl").toString();
+				refList << ref;
+			}
+			response.Version_1_0->entityReferences->FromList(refList);
+			if (response.Version_1_0->entityReferences->isEmpty()){
+				response.Version_1_0->entityReferences.Reset();
+			}
+		}
+	}
 
 	// Load messages from the Messages collection filtered by ConversationId
 	QByteArray conversationId = ticketPtr->GetConversationId();
@@ -283,6 +310,31 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 
 	if (ticketInfo.priority){
 		ticketPtr->SetPriority(imtdeskgql::GetPriorityTypeFromSdlType(*ticketInfo.priority));
+	}
+
+	// Save entity references as JSON in the ticket
+	if (ticketInfo.entityReferences){
+		QJsonArray arr;
+		for (const auto& ref : *ticketInfo.entityReferences){
+			if (!ref){
+				continue;
+			}
+			QJsonObject obj;
+			if (ref->entityType){
+				obj["entityType"] = *ref->entityType;
+			}
+			if (ref->entityId){
+				obj["entityId"] = QString::fromUtf8(*ref->entityId);
+			}
+			if (ref->displayName){
+				obj["displayName"] = *ref->displayName;
+			}
+			if (ref->entityUrl){
+				obj["entityUrl"] = *ref->entityUrl;
+			}
+			arr.append(obj);
+		}
+		ticketPtr->SetEntityReferences(QString::fromUtf8(QJsonDocument(arr).toJson(QJsonDocument::Compact)));
 	}
 
 	// Auto-create a Conversation if the ticket does not have one yet

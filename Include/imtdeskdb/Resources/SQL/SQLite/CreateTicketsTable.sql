@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS "Tickets"
     "LabelIds"       TEXT,
     "Locked"         INTEGER NOT NULL DEFAULT 0,
     "LockReason"     TEXT,
+    "EntityReferences" TEXT,
     "Number"         INTEGER UNIQUE,
     "CreatedAt"      TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "UpdatedAt"      TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
