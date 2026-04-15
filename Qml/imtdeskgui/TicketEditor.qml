@@ -181,6 +181,20 @@ DocumentViewBase {
 		editLockReasonInput.text = ticketData.m_lockReason || ""
 		editLockedCB.checkState = ticketData.m_locked ? Qt.Checked : Qt.Unchecked
 
+		// Populate entity type model from server-provided data
+		entityTypeModel.clear()
+		if (ticketData && ticketData.m_entityTypes) {
+			var types = ticketData.m_entityTypes
+			for (var t = 0; t < types.getElementsCount(); t++) {
+				var typeItem = types.getElement(t)
+				if (typeItem) {
+					var idx = entityTypeModel.insertNewItem()
+					entityTypeModel.setData("id", String(typeItem.m_id || ""), idx)
+					entityTypeModel.setData("name", String(typeItem.m_name || ""), idx)
+				}
+			}
+		}
+
 		// Load entity references from ticket data
 		var refs = []
 		if (ticketData.hasEntityReferences && ticketData.hasEntityReferences()) {
@@ -365,6 +379,9 @@ DocumentViewBase {
 		}
 	}
 	
+	TreeItemModel {
+		id: entityTypeModel
+	}
 	
 	// ================================================================
 	// Ticket editor view — same layout for both new and existing tickets
@@ -687,7 +704,7 @@ DocumentViewBase {
 										id: refTypeCB
 										width: parent.width
 										height: Style.buttonHeightM
-										model: ticketData && ticketData.m_entityTypes ? ticketData.m_entityTypes : null
+										model: entityTypeModel
 									}
 								}
 								
