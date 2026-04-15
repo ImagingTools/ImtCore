@@ -8,6 +8,7 @@
 
 // Qt includes
 #include <QtCore/QDateTime>
+#include <QtCore/QFileInfo>
 
 // ImtCore includes
 #include <imtdesk/ISupportTicket.h>
@@ -127,24 +128,23 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 							for (const QByteArray& aid : attachmentIds){
 								sdl::imtdesk::ImtDesk::CAttachment::V1_0 att;
 								att.id = aid;
-								// Return HTTP download URL — the client fetches the image
-								// via a separate GET request to the /files/ endpoint.
-								att.preview = QString("../../files/%1").arg(QString::fromUtf8(aid));
+								// Build HTTP download URL — aid is a pure UUID from the DB.
+								// Append file extension so the GET endpoint returns the correct MIME type.
+								QString httpUrl = QString("../../files/%1").arg(QString::fromUtf8(aid));
 								if (m_attachmentStorageCompPtr.IsValid()){
-									// Strip file extension from HTTP-facing ID to get storage UUID
-									QByteArray storageId = aid;
-									int dotIdx = storageId.lastIndexOf('.');
-									if (dotIdx > 0){
-										storageId = storageId.left(dotIdx);
-									}
 									QByteArray data;
 									QString fileName;
 									QString mimeType;
-									if (m_attachmentStorageCompPtr->GetAttachment(storageId, data, fileName, mimeType)){
+									if (m_attachmentStorageCompPtr->GetAttachment(aid, data, fileName, mimeType)){
 										att.fileName = fileName;
 										att.mimeType = mimeType;
+										QString ext = QFileInfo(fileName).suffix().toLower();
+										if (!ext.isEmpty()){
+											httpUrl = QString("../../files/%1.%2").arg(QString::fromUtf8(aid), ext);
+										}
 									}
 								}
+								att.preview = httpUrl;
 								attachmentList << att;
 							}
 							itemData.attachments->FromList(attachmentList);
@@ -327,9 +327,16 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 							continue;
 						}
 						// Attachments are pre-uploaded via HTTP — the client sends
-						// the attachment ID returned by the upload endpoint.
+						// the attachment ID returned by the upload endpoint (uuid.ext).
+						// Strip the file extension so the DB stores pure UUIDs
+						// matching the Attachments table Id column.
 						if (att->id && !att->id->isEmpty()){
-							attachmentIds << *att->id;
+							QByteArray attId = *att->id;
+							int dotIdx = attId.lastIndexOf('.');
+							if (dotIdx > 0){
+								attId = attId.left(dotIdx);
+							}
+							attachmentIds << attId;
 						}
 					}
 				}
