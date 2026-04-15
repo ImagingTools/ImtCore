@@ -10,6 +10,7 @@
 #include <imtdoc/IDocumentManager.h>
 #include <imtdoc/IDocumentManagerEventHandler.h>
 #include <imtbase/IObjectCollection.h>
+#include <imtdb/IDatabaseEngine.h>
 #include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentManager.h>
 
 // Generated includes
@@ -35,6 +36,7 @@ public:
 		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "Collection of users", true, "UserCollection");
 		I_ASSIGN(m_chatServiceCompPtr, "ChatService", "Chat service for message and conversation management", false, "ChatService");
 		I_ASSIGN(m_attachmentStorageCompPtr, "AttachmentStorage", "Storage service for binary attachments", true, "AttachmentStorage");
+		I_ASSIGN(m_databaseEngineCompPtr, "DatabaseEngine", "Database engine for direct entity reference writes", true, "DatabaseEngine");
 	I_END_COMPONENT
 
 protected:
@@ -57,6 +59,7 @@ private:
 	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
 	I_REF(imtchat::IChatService, m_chatServiceCompPtr);
 	I_REF(imtchat::IAttachmentStorage, m_attachmentStorageCompPtr);
+	I_REF(imtdb::IDatabaseEngine, m_databaseEngineCompPtr);
 };
 
 

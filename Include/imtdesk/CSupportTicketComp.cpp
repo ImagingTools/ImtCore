@@ -335,13 +335,13 @@ void CSupportTicketComp::SetResolvedAt(const QString& resolvedAt)
 }
 
 
-QString CSupportTicketComp::GetEntityReferences() const
+QByteArrayList CSupportTicketComp::GetEntityReferences() const
 {
 	return m_entityReferences;
 }
 
 
-void CSupportTicketComp::SetEntityReferences(const QString& entityReferences)
+void CSupportTicketComp::SetEntityReferences(const QByteArrayList& entityReferences)
 {
 	if (m_entityReferences != entityReferences){
 		istd::CChangeNotifier notifier(this);
@@ -450,10 +450,7 @@ bool CSupportTicketComp::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_resolvedAt);
 	retVal = retVal && archive.EndTag(resolvedAtTag);
 
-	static iser::CArchiveTag entityReferencesTag("EntityReferences", "Entity references", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(entityReferencesTag);
-	retVal = retVal && archive.Process(m_entityReferences);
-	retVal = retVal && archive.EndTag(entityReferencesTag);
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_entityReferences, "EntityReferences", "EntityReferenceId");
 
 	return retVal;
 }

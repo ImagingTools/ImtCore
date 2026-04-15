@@ -3,9 +3,6 @@
 
 // Qt includes
 #include <QtCore/QDateTime>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonDocument>
-#include <QtCore/QJsonObject>
 #include <QtCore/QUuid>
 #include <QtSql/QSqlError>
 #include <QtSql/QSqlQuery>
@@ -23,14 +20,6 @@ namespace imtdeskdb
 
 namespace
 {
-
-// Helper: escape single quotes for SQL string literals
-QString sqlEscape(const QString& s)
-{
-	QString escaped = s;
-	escaped.replace('\'', "''");
-	return escaped;
-}
 
 // Helper: return current UTC timestamp in ISO 8601 with milliseconds
 QString utcNow()
@@ -148,27 +137,20 @@ istd::IChangeableUniquePtr CSupportTicketDbDelegateComp::CreateObjectFromRecord(
 			QString escaped = QString::fromUtf8(ticketId);
 			escaped.replace('\'', "''");
 			QByteArray refQuery = QString(
-				"SELECT er.\"EntityType\", er.\"EntityId\", er.\"DisplayName\", er.\"EntityUrl\" "
+				"SELECT ter.\"EntityReferenceId\" "
 				"FROM \"TicketEntityReferences\" ter "
-				"JOIN \"EntityReferences\" er ON ter.\"EntityReferenceId\" = er.\"Id\" "
 				"WHERE ter.\"TicketId\"='%1' ORDER BY ter.\"CreatedAt\" ASC;")
 				.arg(escaped).toUtf8();
 
 			QSqlError sqlError;
 			QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(refQuery, &sqlError);
 			if (sqlError.type() == QSqlError::NoError){
-				QJsonArray refsArr;
+				QByteArrayList refIds;
 				while (sqlQuery.next()){
-					QSqlRecord r = sqlQuery.record();
-					QJsonObject obj;
-					obj["entityType"] = r.value("EntityType").toString();
-					obj["entityId"] = r.value("EntityId").toString();
-					obj["displayName"] = r.value("DisplayName").toString();
-					obj["entityUrl"] = r.value("EntityUrl").toString();
-					refsArr.append(obj);
+					refIds << sqlQuery.record().value("EntityReferenceId").toByteArray();
 				}
-				if (!refsArr.isEmpty()){
-					ticketPtr->SetEntityReferences(QString::fromUtf8(QJsonDocument(refsArr).toJson(QJsonDocument::Compact)));
+				if (!refIds.isEmpty()){
+					ticketPtr->SetEntityReferences(refIds);
 				}
 			}
 		}
@@ -269,34 +251,18 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSupportTicketDbDelegateComp::Cre
 		.arg(nowUtc)
 		.arg(nowUtc);
 
-	// INSERT into EntityReferences + TicketEntityReferences junction table
-	const QString entityRefsJson = ticketPtr->GetEntityReferences();
-	if (!entityRefsJson.isEmpty()){
-		QJsonDocument doc = QJsonDocument::fromJson(entityRefsJson.toUtf8());
-		if (doc.isArray()){
-			QJsonArray arr = doc.array();
-			for (const QJsonValue& val : arr){
-				QJsonObject obj = val.toObject();
-				QString refId = QUuid::createUuid().toString(QUuid::WithoutBraces);
-				combinedQuery += QString(
-					"\nINSERT INTO \"EntityReferences\" "
-					"(\"Id\", \"EntityType\", \"EntityId\", \"DisplayName\", \"EntityUrl\", \"CreatedAt\") "
-					"VALUES('%1', '%2', '%3', '%4', '%5', '%6');")
-					.arg(refId)
-					.arg(sqlEscape(obj.value("entityType").toString()))
-					.arg(sqlEscape(obj.value("entityId").toString()))
-					.arg(sqlEscape(obj.value("displayName").toString()))
-					.arg(sqlEscape(obj.value("entityUrl").toString()))
-					.arg(nowUtc);
-				combinedQuery += QString(
-					"\nINSERT INTO \"TicketEntityReferences\" "
-					"(\"TicketId\", \"EntityReferenceId\", \"CreatedAt\") "
-					"VALUES('%1', '%2', '%3');")
-					.arg(QString::fromUtf8(ticketId))
-					.arg(refId)
-					.arg(nowUtc);
-			}
-		}
+	// INSERT into TicketEntityReferences junction table using entity reference IDs
+	const QByteArrayList entityRefIds = ticketPtr->GetEntityReferences();
+	for (const QByteArray& refId : entityRefIds){
+		QString escapedRefId = QString::fromUtf8(refId);
+		escapedRefId.replace('\'', "''");
+		combinedQuery += QString(
+			"\nINSERT INTO \"TicketEntityReferences\" "
+			"(\"TicketId\", \"EntityReferenceId\", \"CreatedAt\") "
+			"VALUES('%1', '%2', '%3');")
+			.arg(QString::fromUtf8(ticketId))
+			.arg(escapedRefId)
+			.arg(nowUtc);
 	}
 
 	NewObjectQuery retVal;
@@ -380,38 +346,22 @@ QByteArray CSupportTicketDbDelegateComp::CreateUpdateObjectQuery(
 		.arg(nowUtc)
 		.arg(QString::fromUtf8(objectId));
 
-	// Delete old junction rows and re-insert entity references
+	// Delete old junction rows and re-insert entity references using IDs
 	combinedQuery += QString(
 		"\nDELETE FROM \"TicketEntityReferences\" WHERE \"TicketId\"='%1';")
 		.arg(QString::fromUtf8(objectId));
 
-	const QString entityRefsJson = ticketPtr->GetEntityReferences();
-	if (!entityRefsJson.isEmpty()){
-		QJsonDocument doc = QJsonDocument::fromJson(entityRefsJson.toUtf8());
-		if (doc.isArray()){
-			QJsonArray arr = doc.array();
-			for (const QJsonValue& val : arr){
-				QJsonObject obj = val.toObject();
-				QString refId = QUuid::createUuid().toString(QUuid::WithoutBraces);
-				combinedQuery += QString(
-					"\nINSERT INTO \"EntityReferences\" "
-					"(\"Id\", \"EntityType\", \"EntityId\", \"DisplayName\", \"EntityUrl\", \"CreatedAt\") "
-					"VALUES('%1', '%2', '%3', '%4', '%5', '%6');")
-					.arg(refId)
-					.arg(sqlEscape(obj.value("entityType").toString()))
-					.arg(sqlEscape(obj.value("entityId").toString()))
-					.arg(sqlEscape(obj.value("displayName").toString()))
-					.arg(sqlEscape(obj.value("entityUrl").toString()))
-					.arg(nowUtc);
-				combinedQuery += QString(
-					"\nINSERT INTO \"TicketEntityReferences\" "
-					"(\"TicketId\", \"EntityReferenceId\", \"CreatedAt\") "
-					"VALUES('%1', '%2', '%3');")
-					.arg(QString::fromUtf8(objectId))
-					.arg(refId)
-					.arg(nowUtc);
-			}
-		}
+	const QByteArrayList entityRefIds = ticketPtr->GetEntityReferences();
+	for (const QByteArray& refId : entityRefIds){
+		QString escapedRefId = QString::fromUtf8(refId);
+		escapedRefId.replace('\'', "''");
+		combinedQuery += QString(
+			"\nINSERT INTO \"TicketEntityReferences\" "
+			"(\"TicketId\", \"EntityReferenceId\", \"CreatedAt\") "
+			"VALUES('%1', '%2', '%3');")
+			.arg(QString::fromUtf8(objectId))
+			.arg(escapedRefId)
+			.arg(nowUtc);
 	}
 
 	return combinedQuery.toUtf8();

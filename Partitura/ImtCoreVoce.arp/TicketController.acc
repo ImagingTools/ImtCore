@@ -437,6 +437,9 @@
                     <AttributeInfo Id="CollectionDocumentManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="CollectionDocumentManager"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

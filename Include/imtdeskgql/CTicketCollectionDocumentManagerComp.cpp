@@ -9,9 +9,10 @@
 // Qt includes
 #include <QtCore/QDateTime>
 #include <QtCore/QFileInfo>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonDocument>
-#include <QtCore/QJsonObject>
+#include <QtCore/QUuid>
+#include <QtSql/QSqlError>
+#include <QtSql/QSqlQuery>
+#include <QtSql/QSqlRecord>
 
 // ImtCore includes
 #include <imtdesk/ISupportTicket.h>
@@ -85,27 +86,34 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 	response.Version_1_0->status = imtdeskgql::GetSdlTypeFromStatusType(ticketPtr->GetStatus());
 	response.Version_1_0->stateReason = imtdeskgql::GetSdlTypeFromStateReason(ticketPtr->GetStateReason());
 
-	// Load entity references from the ticket's JSON field
-	QString entityRefsJson = ticketPtr->GetEntityReferences();
-	if (!entityRefsJson.isEmpty()){
-		QJsonDocument doc = QJsonDocument::fromJson(entityRefsJson.toUtf8());
-		if (doc.isArray()){
-			response.Version_1_0->entityReferences.Emplace();
-			QList<sdl::imtdesk::ImtDesk::CEntityReference::V1_0> refList;
-			QJsonArray arr = doc.array();
-			for (const QJsonValue& val : arr){
-				QJsonObject obj = val.toObject();
+	// Load entity references by IDs from the EntityReferences table
+	QByteArrayList entityRefIds = ticketPtr->GetEntityReferences();
+	if (!entityRefIds.isEmpty() && m_databaseEngineCompPtr.IsValid()){
+		response.Version_1_0->entityReferences.Emplace();
+		QList<sdl::imtdesk::ImtDesk::CEntityReference::V1_0> refList;
+		for (const QByteArray& refId : entityRefIds){
+			QString escaped = QString::fromUtf8(refId);
+			escaped.replace('\'', "''");
+			QByteArray refQuery = QString(
+				"SELECT \"EntityType\", \"EntityId\", \"DisplayName\", \"EntityUrl\" "
+				"FROM \"EntityReferences\" WHERE \"Id\"='%1';")
+				.arg(escaped).toUtf8();
+
+			QSqlError sqlError;
+			QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(refQuery, &sqlError);
+			if (sqlError.type() == QSqlError::NoError && sqlQuery.next()){
+				QSqlRecord r = sqlQuery.record();
 				sdl::imtdesk::ImtDesk::CEntityReference::V1_0 ref;
-				ref.entityType = obj.value("entityType").toString();
-				ref.entityId = obj.value("entityId").toString().toUtf8();
-				ref.displayName = obj.value("displayName").toString();
-				ref.entityUrl = obj.value("entityUrl").toString();
+				ref.entityType = r.value("EntityType").toString();
+				ref.entityId = r.value("EntityId").toString().toUtf8();
+				ref.displayName = r.value("DisplayName").toString();
+				ref.entityUrl = r.value("EntityUrl").toString();
 				refList << ref;
 			}
-			response.Version_1_0->entityReferences->FromList(refList);
-			if (response.Version_1_0->entityReferences->isEmpty()){
-				response.Version_1_0->entityReferences.Reset();
-			}
+		}
+		response.Version_1_0->entityReferences->FromList(refList);
+		if (response.Version_1_0->entityReferences->isEmpty()){
+			response.Version_1_0->entityReferences.Reset();
 		}
 	}
 
@@ -324,29 +332,40 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 		ticketPtr->SetPriority(imtdeskgql::GetPriorityTypeFromSdlType(*ticketInfo.priority));
 	}
 
-	// Save entity references as JSON in the ticket
-	if (ticketInfo.entityReferences){
-		QJsonArray arr;
+	// Write entity references directly to EntityReferences + TicketEntityReferences tables
+	if (ticketInfo.entityReferences && m_databaseEngineCompPtr.IsValid()){
+		QByteArrayList newRefIds;
+		QString nowUtc = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
 		for (const auto& ref : *ticketInfo.entityReferences){
 			if (!ref){
 				continue;
 			}
-			QJsonObject obj;
-			if (ref->entityType){
-				obj["entityType"] = *ref->entityType;
+			QString refId = QUuid::createUuid().toString(QUuid::WithoutBraces);
+
+			auto sqlEscape = [](const QString& s) -> QString {
+				QString escaped = s;
+				escaped.replace('\'', "''");
+				return escaped;
+			};
+
+			QString entityType = ref->entityType ? sqlEscape(*ref->entityType) : QString();
+			QString entityId = ref->entityId ? sqlEscape(QString::fromUtf8(*ref->entityId)) : QString();
+			QString displayName = ref->displayName ? sqlEscape(*ref->displayName) : QString();
+			QString entityUrl = ref->entityUrl ? sqlEscape(*ref->entityUrl) : QString();
+
+			QByteArray insertQuery = QString(
+				"INSERT INTO \"EntityReferences\" "
+				"(\"Id\", \"EntityType\", \"EntityId\", \"DisplayName\", \"EntityUrl\", \"CreatedAt\") "
+				"VALUES('%1', '%2', '%3', '%4', '%5', '%6');")
+				.arg(refId, entityType, entityId, displayName, entityUrl, nowUtc).toUtf8();
+
+			QSqlError sqlError;
+			m_databaseEngineCompPtr->ExecSqlQuery(insertQuery, &sqlError);
+			if (sqlError.type() == QSqlError::NoError){
+				newRefIds << refId.toUtf8();
 			}
-			if (ref->entityId){
-				obj["entityId"] = QString::fromUtf8(*ref->entityId);
-			}
-			if (ref->displayName){
-				obj["displayName"] = *ref->displayName;
-			}
-			if (ref->entityUrl){
-				obj["entityUrl"] = *ref->entityUrl;
-			}
-			arr.append(obj);
 		}
-		ticketPtr->SetEntityReferences(QString::fromUtf8(QJsonDocument(arr).toJson(QJsonDocument::Compact)));
+		ticketPtr->SetEntityReferences(newRefIds);
 	}
 
 	// Auto-create a Conversation if the ticket does not have one yet

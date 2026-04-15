@@ -282,15 +282,14 @@ public:
 	virtual void SetResolvedAt(const QString& resolvedAt) = 0;
 
 	/**
-		Get the serialized entity references (JSON array of objects with
-		entityType, entityId, displayName, entityUrl).
+		Get the list of entity reference IDs linked to this ticket.
 	*/
-	virtual QString GetEntityReferences() const = 0;
+	virtual QByteArrayList GetEntityReferences() const = 0;
 
 	/**
-		Set the serialized entity references.
+		Set the entity reference IDs.
 	*/
-	virtual void SetEntityReferences(const QString& entityReferences) = 0;
+	virtual void SetEntityReferences(const QByteArrayList& entityReferences) = 0;
 
 };
 
