@@ -90,6 +90,7 @@ DocumentViewBase {
 				var attObj = attachmentsList[i]
 				var att = newItem.createAttachmentsArrayElement()
 				att.m_id = String(attObj.id || "")
+				att.m_fileName = String(attObj.fileName || "")
 				att.m_preview = "../../files/" + String(attObj.id || "")
 				newItem.m_attachments.addElement(att)
 			}
@@ -119,7 +120,7 @@ DocumentViewBase {
 						if (xhr.status === 200) {
 							var attachmentId = xhr.responseText.trim()
 							var arr = root.pendingAttachments.slice()
-							arr.push({id: attachmentId, preview: localPreview || ("../../files/" + attachmentId)})
+							arr.push({id: attachmentId, fileName: fileName, preview: localPreview || ("../../files/" + attachmentId)})
 							root.pendingAttachments = arr
 						} else {
 							console.error("Attachment upload failed: " + xhr.status + " " + xhr.responseText)
@@ -144,7 +145,7 @@ DocumentViewBase {
 					if (xhr.status === 200) {
 						var attachmentId = xhr.responseText.trim()
 						var arr = root.pendingAttachments.slice()
-						arr.push({id: attachmentId, preview: localPreview || ("../../files/" + attachmentId)})
+						arr.push({id: attachmentId, fileName: fileName, preview: localPreview || ("../../files/" + attachmentId)})
 						root.pendingAttachments = arr
 					} else {
 						console.error("Attachment upload failed: " + xhr.status + " " + xhr.responseText)
@@ -583,49 +584,24 @@ DocumentViewBase {
 												visible: text.length > 0
 											}
 											
-											// Attachment images
+											// Attachment file links
 											Repeater {
 												model: model.item.m_attachments || []
-												delegate: Item {
-													readonly property string imageUrl: model.item ? (model.item.m_preview || "") : ""
+												delegate: Text {
+													readonly property string fileUrl: model.item ? (model.item.m_preview || "") : ""
+													readonly property string fileName: model.item ? (model.item.m_fileName || qsTr("attachment")) : qsTr("attachment")
 													width: bubbleContent.width
-													height: attImage.status === Image.Ready
-														? Math.max(attImage.implicitHeight * (width / Math.max(attImage.implicitWidth, 1)), 40)
-														: 200
-													
-													Image {
-														id: attImage
-														source: parent.imageUrl
+													text: "📎 <a href=\"" + fileUrl + "\">" + fileName + "</a>"
+													textFormat: Text.StyledText
+													font.pixelSize: Style.fontSizeS
+													color: Style.textSecondaryColor
+													wrapMode: Text.Wrap
+													onLinkActivated: function(link) { Qt.openUrlExternally(link) }
+
+													MouseArea {
 														anchors.fill: parent
-														fillMode: Image.PreserveAspectFit
-														asynchronous: true
-														
-														Rectangle {
-															anchors.fill: parent
-															color: "transparent"
-															border.color: Style.borderColor
-															border.width: 1
-															radius: Style.radiusS
-															visible: attImage.status === Image.Ready
-														}
-													}
-													
-													Text {
-														anchors.centerIn: parent
-														text: qsTr("Loading image...")
-														font.pixelSize: Style.fontSizeS
-														color: Style.textSecondaryColor
-														visible: attImage.status === Image.Loading
-													}
-													
-													Text {
-														anchors.centerIn: parent
-														text: "📎 " + (model.item ? (model.item.m_fileName || "") : "")
-														font.pixelSize: Style.fontSizeS
-														color: Style.textSecondaryColor
-														visible: attImage.status === Image.Error
-														wrapMode: Text.Wrap
-														width: bubbleContent.width
+														acceptedButtons: Qt.NoButton
+														cursorShape: parent.hoveredLink ? Qt.PointingHandCursor : Qt.ArrowCursor
 													}
 												}
 											}
@@ -721,38 +697,34 @@ DocumentViewBase {
 									Repeater {
 										model: root.pendingAttachments
 										delegate: Rectangle {
-											width: 80
-											height: 80
+											width: pendingFileLabel.contentWidth + pendingRemoveBtn.width + Style.paddingM * 3
+											height: Style.buttonHeightS
 											radius: Style.radiusS
 											border.color: Style.borderColor
 											border.width: 1
 											color: Style.baseColor
-											clip: true
-											
-											Image {
-												anchors.fill: parent
-												anchors.margins: 2
-												source: modelData.preview || ""
-												fillMode: Image.PreserveAspectCrop
-												asynchronous: true
+
+											Text {
+												id: pendingFileLabel
+												anchors.left: parent.left
+												anchors.leftMargin: Style.paddingM
+												anchors.verticalCenter: parent.verticalCenter
+												text: "📎 " + (modelData.fileName || qsTr("attachment"))
+												font.pixelSize: Style.fontSizeS
+												color: Style.textColor
+												elide: Text.ElideMiddle
+												maximumLineCount: 1
 											}
-											
-											Rectangle {
-												anchors.top: parent.top
-												anchors.right: parent.right
-												anchors.margins: 2
-												width: 18
-												height: 18
-												radius: 9
+
+											Text {
+												id: pendingRemoveBtn
+												anchors.left: pendingFileLabel.right
+												anchors.leftMargin: Style.paddingS
+												anchors.verticalCenter: parent.verticalCenter
+												text: "✕"
+												font.pixelSize: Style.fontSizeS
 												color: Style.errorColor
-												
-												Text {
-													anchors.centerIn: parent
-													text: "✕"
-													font.pixelSize: 10
-													color: "white"
-												}
-												
+
 												MouseArea {
 													anchors.fill: parent
 													cursorShape: Qt.PointingHandCursor
@@ -768,8 +740,8 @@ DocumentViewBase {
 									
 									// Upload in progress indicator
 									Rectangle {
-										width: 80
-										height: 80
+										width: uploadingLabel.contentWidth + Style.paddingM * 2
+										height: Style.buttonHeightS
 										radius: Style.radiusS
 										border.color: Style.borderColor
 										border.width: 1
@@ -777,9 +749,11 @@ DocumentViewBase {
 										visible: root.uploadsInProgress > 0
 										
 										Text {
+											id: uploadingLabel
 											anchors.centerIn: parent
-											text: "⏳"
-											font.pixelSize: Style.fontSizeL
+											text: "⏳ " + qsTr("Uploading...")
+											font.pixelSize: Style.fontSizeS
+											color: Style.textSecondaryColor
 										}
 									}
 								}
