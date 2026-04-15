@@ -365,30 +365,6 @@ DocumentViewBase {
 		}
 	}
 	
-	TreeItemModel {
-		id: entityTypeModel
-		Component.onCompleted: {
-			let index = insertNewItem()
-			setData("id", "User", index)
-			setData("name", "User", index)
-			
-			index = insertNewItem()
-			setData("id", "License", index)
-			setData("name", "License", index)
-			
-			index = insertNewItem()
-			setData("id", "Product", index)
-			setData("name", "Product", index)
-			
-			index = insertNewItem()
-			setData("id", "Ticket", index)
-			setData("name", "Ticket", index)
-			
-			index = insertNewItem()
-			setData("id", "Role", index)
-			setData("name", "Role", index)
-		}
-	}
 	
 	// ================================================================
 	// Ticket editor view — same layout for both new and existing tickets
@@ -711,7 +687,7 @@ DocumentViewBase {
 										id: refTypeCB
 										width: parent.width
 										height: Style.buttonHeightM
-										model: entityTypeModel
+										model: ticketData && ticketData.m_entityTypes ? ticketData.m_entityTypes : null
 									}
 								}
 								

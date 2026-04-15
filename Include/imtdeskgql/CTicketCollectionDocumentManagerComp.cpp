@@ -109,6 +109,18 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 		}
 	}
 
+	// Populate available entity types from server registry
+	response.Version_1_0->entityTypes.Emplace();
+	QList<sdl::imtdesk::ImtDesk::CEntityType::V1_0> typeList;
+	QStringList typeNames = {"User", "License", "Product", "Ticket", "Role"};
+	for (const QString& tn : typeNames){
+		sdl::imtdesk::ImtDesk::CEntityType::V1_0 et;
+		et.id = tn;
+		et.name = tn;
+		typeList << et;
+	}
+	response.Version_1_0->entityTypes->FromList(typeList);
+
 	// Load messages from the Messages collection filtered by ConversationId
 	QByteArray conversationId = ticketPtr->GetConversationId();
 	if (!conversationId.isEmpty() && m_messageCollectionCompPtr.IsValid()){

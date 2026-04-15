@@ -2,9 +2,13 @@
     <qresource prefix="/SQL/Postgres">
         <file alias="CreateTicketsTable.sql">Resources/SQL/Postgres/CreateTicketsTable.sql</file>
         <file alias="CreateTicketActionsTable.sql">Resources/SQL/Postgres/CreateTicketActionsTable.sql</file>
+        <file alias="CreateEntityReferencesTable.sql">Resources/SQL/Postgres/CreateEntityReferencesTable.sql</file>
+        <file alias="CreateTicketEntityReferencesTable.sql">Resources/SQL/Postgres/CreateTicketEntityReferencesTable.sql</file>
     </qresource>
     <qresource prefix="/SQL/SQLite">
         <file alias="CreateTicketsTable.sql">Resources/SQL/SQLite/CreateTicketsTable.sql</file>
         <file alias="CreateTicketActionsTable.sql">Resources/SQL/SQLite/CreateTicketActionsTable.sql</file>
+        <file alias="CreateEntityReferencesTable.sql">Resources/SQL/SQLite/CreateEntityReferencesTable.sql</file>
+        <file alias="CreateTicketEntityReferencesTable.sql">Resources/SQL/SQLite/CreateTicketEntityReferencesTable.sql</file>
     </qresource>
 </RCC>

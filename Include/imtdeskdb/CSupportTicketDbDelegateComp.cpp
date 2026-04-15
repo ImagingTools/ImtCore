@@ -3,7 +3,12 @@
 
 // Qt includes
 #include <QtCore/QDateTime>
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
 #include <QtCore/QUuid>
+#include <QtSql/QSqlError>
+#include <QtSql/QSqlQuery>
 #include <QtSql/QSqlRecord>
 
 // ImtCore includes
@@ -136,8 +141,37 @@ istd::IChangeableUniquePtr CSupportTicketDbDelegateComp::CreateObjectFromRecord(
 		QDateTime dt = val.toDateTime();
 		ticketPtr->SetResolvedAt(dt.isValid() ? dt.toString(Qt::ISODateWithMs) : val.toString());
 	}
-	if (record.contains("EntityReferences")){
-		ticketPtr->SetEntityReferences(record.value("EntityReferences").toString());
+	// EntityReferences are loaded from the TicketEntityReferences junction table
+	if (m_databaseEngineCompPtr.IsValid() && record.contains("Id")){
+		QByteArray ticketId = record.value("Id").toByteArray();
+		if (!ticketId.isEmpty()){
+			QString escaped = QString::fromUtf8(ticketId);
+			escaped.replace('\'', "''");
+			QByteArray refQuery = QString(
+				"SELECT er.\"EntityType\", er.\"EntityId\", er.\"DisplayName\", er.\"EntityUrl\" "
+				"FROM \"TicketEntityReferences\" ter "
+				"JOIN \"EntityReferences\" er ON ter.\"EntityReferenceId\" = er.\"Id\" "
+				"WHERE ter.\"TicketId\"='%1' ORDER BY ter.\"CreatedAt\" ASC;")
+				.arg(escaped).toUtf8();
+
+			QSqlError sqlError;
+			QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(refQuery, &sqlError);
+			if (sqlError.type() == QSqlError::NoError){
+				QJsonArray refsArr;
+				while (sqlQuery.next()){
+					QSqlRecord r = sqlQuery.record();
+					QJsonObject obj;
+					obj["entityType"] = r.value("EntityType").toString();
+					obj["entityId"] = r.value("EntityId").toString();
+					obj["displayName"] = r.value("DisplayName").toString();
+					obj["entityUrl"] = r.value("EntityUrl").toString();
+					refsArr.append(obj);
+				}
+				if (!refsArr.isEmpty()){
+					ticketPtr->SetEntityReferences(QString::fromUtf8(QJsonDocument(refsArr).toJson(QJsonDocument::Compact)));
+				}
+			}
+		}
 	}
 
 	return ticketPtr;
@@ -203,18 +237,18 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSupportTicketDbDelegateComp::Cre
 
 	const QString lockReasonSql = ticketPtr->GetLockReason().isEmpty() ? "NULL" : QString("'%1'").arg(ticketPtr->GetLockReason());
 
-	const QString entityRefsSql = ticketPtr->GetEntityReferences().isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(ticketPtr->GetEntityReferences()));
-
 	const QString nowUtc = utcNow();
 
-	NewObjectQuery retVal;
-	retVal.query = QString(
+	QString combinedQuery;
+
+	// INSERT into Tickets table (without EntityReferences column — now in junction table)
+	combinedQuery += QString(
 		"INSERT INTO \"Tickets\" "
 		"(\"Id\", \"Title\", \"Description\", \"TicketType\", \"Status\", \"StateReason\", \"Priority\", "
 		"\"AssigneeIds\", \"ReporterId\", \"ConversationId\", \"MessageId\", "
-		"\"Tags\", \"LabelIds\", \"Locked\", \"LockReason\", \"EntityReferences\", "
+		"\"Tags\", \"LabelIds\", \"Locked\", \"LockReason\", "
 		"\"ResolvedAt\", \"ClosedAt\", \"CreatedAt\", \"UpdatedAt\") "
-		"VALUES('%1', '%2', '%3', %4, %5, %6, %7, %8, '%9', %10, %11, %12, %13, %14, %15, %16, %17, %18, '%19', '%20');")
+		"VALUES('%1', '%2', '%3', %4, %5, %6, %7, %8, '%9', %10, %11, %12, %13, %14, %15, %16, %17, '%18', '%19');")
 		.arg(QString::fromUtf8(ticketId))
 		.arg(title)
 		.arg(ticketPtr->GetDescription())
@@ -230,12 +264,43 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSupportTicketDbDelegateComp::Cre
 		.arg(labelsSql)
 		.arg(ticketPtr->IsLocked() ? "TRUE" : "FALSE")
 		.arg(lockReasonSql)
-		.arg(entityRefsSql)
 		.arg(resolvedSql)
 		.arg(closedSql)
 		.arg(nowUtc)
-		.arg(nowUtc)
-		.toUtf8();
+		.arg(nowUtc);
+
+	// INSERT into EntityReferences + TicketEntityReferences junction table
+	const QString entityRefsJson = ticketPtr->GetEntityReferences();
+	if (!entityRefsJson.isEmpty()){
+		QJsonDocument doc = QJsonDocument::fromJson(entityRefsJson.toUtf8());
+		if (doc.isArray()){
+			QJsonArray arr = doc.array();
+			for (const QJsonValue& val : arr){
+				QJsonObject obj = val.toObject();
+				QString refId = QUuid::createUuid().toString(QUuid::WithoutBraces);
+				combinedQuery += QString(
+					"\nINSERT INTO \"EntityReferences\" "
+					"(\"Id\", \"EntityType\", \"EntityId\", \"DisplayName\", \"EntityUrl\", \"CreatedAt\") "
+					"VALUES('%1', '%2', '%3', '%4', '%5', '%6');")
+					.arg(refId)
+					.arg(sqlEscape(obj.value("entityType").toString()))
+					.arg(sqlEscape(obj.value("entityId").toString()))
+					.arg(sqlEscape(obj.value("displayName").toString()))
+					.arg(sqlEscape(obj.value("entityUrl").toString()))
+					.arg(nowUtc);
+				combinedQuery += QString(
+					"\nINSERT INTO \"TicketEntityReferences\" "
+					"(\"TicketId\", \"EntityReferenceId\", \"CreatedAt\") "
+					"VALUES('%1', '%2', '%3');")
+					.arg(QString::fromUtf8(ticketId))
+					.arg(refId)
+					.arg(nowUtc);
+			}
+		}
+	}
+
+	NewObjectQuery retVal;
+	retVal.query = combinedQuery.toUtf8();
 
 	return retVal;
 }
@@ -278,9 +343,11 @@ QByteArray CSupportTicketDbDelegateComp::CreateUpdateObjectQuery(
 
 	const QString lockReasonSql = ticketPtr->GetLockReason().isEmpty() ? "NULL" : QString("'%1'").arg(ticketPtr->GetLockReason());
 
-	const QString entityRefsSql = ticketPtr->GetEntityReferences().isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(ticketPtr->GetEntityReferences()));
+	const QString nowUtc = utcNow();
 
-	QByteArray result = QString(
+	QString combinedQuery;
+
+	combinedQuery += QString(
 		"UPDATE \"Tickets\" SET "
 		"\"Title\"='%1', "
 		"\"Description\"='%2', "
@@ -293,11 +360,10 @@ QByteArray CSupportTicketDbDelegateComp::CreateUpdateObjectQuery(
 		"\"LabelIds\"=%9, "
 		"\"Locked\"=%10, "
 		"\"LockReason\"=%11, "
-		"\"EntityReferences\"=%12, "
-		"\"ResolvedAt\"=%13, "
-		"\"ClosedAt\"=%14, "
-		"\"UpdatedAt\"='%15' "
-		"WHERE \"Id\"='%16';")
+		"\"ResolvedAt\"=%12, "
+		"\"ClosedAt\"=%13, "
+		"\"UpdatedAt\"='%14' "
+		"WHERE \"Id\"='%15';")
 		.arg(ticketPtr->GetTitle())
 		.arg(ticketPtr->GetDescription())
 		.arg(ticketPtr->GetTicketType())
@@ -309,14 +375,46 @@ QByteArray CSupportTicketDbDelegateComp::CreateUpdateObjectQuery(
 		.arg(labelsSql)
 		.arg(ticketPtr->IsLocked() ? "TRUE" : "FALSE")
 		.arg(lockReasonSql)
-		.arg(entityRefsSql)
 		.arg(resolvedSql)
 		.arg(closedSql)
-		.arg(utcNow())
-		.arg(QString::fromUtf8(objectId))
-		.toUtf8();
+		.arg(nowUtc)
+		.arg(QString::fromUtf8(objectId));
 
-	return result;
+	// Delete old junction rows and re-insert entity references
+	combinedQuery += QString(
+		"\nDELETE FROM \"TicketEntityReferences\" WHERE \"TicketId\"='%1';")
+		.arg(QString::fromUtf8(objectId));
+
+	const QString entityRefsJson = ticketPtr->GetEntityReferences();
+	if (!entityRefsJson.isEmpty()){
+		QJsonDocument doc = QJsonDocument::fromJson(entityRefsJson.toUtf8());
+		if (doc.isArray()){
+			QJsonArray arr = doc.array();
+			for (const QJsonValue& val : arr){
+				QJsonObject obj = val.toObject();
+				QString refId = QUuid::createUuid().toString(QUuid::WithoutBraces);
+				combinedQuery += QString(
+					"\nINSERT INTO \"EntityReferences\" "
+					"(\"Id\", \"EntityType\", \"EntityId\", \"DisplayName\", \"EntityUrl\", \"CreatedAt\") "
+					"VALUES('%1', '%2', '%3', '%4', '%5', '%6');")
+					.arg(refId)
+					.arg(sqlEscape(obj.value("entityType").toString()))
+					.arg(sqlEscape(obj.value("entityId").toString()))
+					.arg(sqlEscape(obj.value("displayName").toString()))
+					.arg(sqlEscape(obj.value("entityUrl").toString()))
+					.arg(nowUtc);
+				combinedQuery += QString(
+					"\nINSERT INTO \"TicketEntityReferences\" "
+					"(\"TicketId\", \"EntityReferenceId\", \"CreatedAt\") "
+					"VALUES('%1', '%2', '%3');")
+					.arg(QString::fromUtf8(objectId))
+					.arg(refId)
+					.arg(nowUtc);
+			}
+		}
+	}
+
+	return combinedQuery.toUtf8();
 }
 
 
@@ -335,8 +433,9 @@ QByteArray CSupportTicketDbDelegateComp::CreateDeleteObjectsQuery(
 		idsStr += QString("'%1'").arg(QString::fromUtf8(objectIds[i]));
 	}
 
-	return QString("DELETE FROM \"Tickets\" WHERE \"Id\" IN (%1);\n"
-				 "DELETE FROM \"Tickets\" WHERE \"Id\" IN (%1);")
+	// Delete junction records first, then the tickets
+	return QString("DELETE FROM \"TicketEntityReferences\" WHERE \"TicketId\" IN (%1);\n"
+		"DELETE FROM \"Tickets\" WHERE \"Id\" IN (%1);")
 		.arg(idsStr)
 		.toUtf8();
 }
@@ -421,30 +520,77 @@ void CSupportTicketDbDelegateComp::OnComponentCreated()
 		return;
 	}
 
+	// Create Tickets table
 	const QString tableName = GetTableName();
-	if (TableExists(tableName)){
-		return;
+	if (!TableExists(tableName)){
+		QFile scriptFile(imtdb::GetSqlResourcePath(*m_databaseEngineCompPtr, QStringLiteral("CreateTicketsTable.sql")));
+		if (!scriptFile.open(QFile::ReadOnly)){
+			SendErrorMessage(0, QString("Tickets table creation script '%1' could not be loaded").arg(scriptFile.fileName()));
+			return;
+		}
+
+		QByteArray query = scriptFile.readAll();
+		scriptFile.close();
+		query.replace("${TableScheme}", "public");
+
+		QSqlError sqlError;
+		m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
+
+		if (sqlError.type() != QSqlError::NoError){
+			qCritical() << __FILE__ << __LINE__
+						<< "\n\t| Tickets table could not be created"
+						<< "\n\t| Error:" << sqlError
+						<< "\n\t| Query:" << query;
+			SendErrorMessage(0, QString("Tickets table could not be created: %1").arg(sqlError.text()));
+		}
 	}
 
-	QFile scriptFile(imtdb::GetSqlResourcePath(*m_databaseEngineCompPtr, QStringLiteral("CreateTicketsTable.sql")));
-	if (!scriptFile.open(QFile::ReadOnly)){
-		SendErrorMessage(0, QString("Tickets table creation script '%1' could not be loaded").arg(scriptFile.fileName()));
-		return;
+	// Create EntityReferences table
+	if (!TableExists("EntityReferences")){
+		QFile refScriptFile(imtdb::GetSqlResourcePath(*m_databaseEngineCompPtr, QStringLiteral("CreateEntityReferencesTable.sql")));
+		if (!refScriptFile.open(QFile::ReadOnly)){
+			SendErrorMessage(0, QString("EntityReferences table creation script '%1' could not be loaded").arg(refScriptFile.fileName()));
+			return;
+		}
+
+		QByteArray refQuery = refScriptFile.readAll();
+		refScriptFile.close();
+		refQuery.replace("${TableScheme}", "public");
+
+		QSqlError refError;
+		m_databaseEngineCompPtr->ExecSqlQuery(refQuery, &refError);
+
+		if (refError.type() != QSqlError::NoError){
+			qCritical() << __FILE__ << __LINE__
+						<< "\n\t| EntityReferences table could not be created"
+						<< "\n\t| Error:" << refError
+						<< "\n\t| Query:" << refQuery;
+			SendErrorMessage(0, QString("EntityReferences table could not be created: %1").arg(refError.text()));
+		}
 	}
 
-	QByteArray query = scriptFile.readAll();
-	scriptFile.close();
-	query.replace("${TableScheme}", "public");
+	// Create TicketEntityReferences junction table
+	if (!TableExists("TicketEntityReferences")){
+		QFile junctionScriptFile(imtdb::GetSqlResourcePath(*m_databaseEngineCompPtr, QStringLiteral("CreateTicketEntityReferencesTable.sql")));
+		if (!junctionScriptFile.open(QFile::ReadOnly)){
+			SendErrorMessage(0, QString("TicketEntityReferences table creation script '%1' could not be loaded").arg(junctionScriptFile.fileName()));
+			return;
+		}
 
-	QSqlError sqlError;
-	m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
+		QByteArray junctionQuery = junctionScriptFile.readAll();
+		junctionScriptFile.close();
+		junctionQuery.replace("${TableScheme}", "public");
 
-	if (sqlError.type() != QSqlError::NoError){
-		qCritical() << __FILE__ << __LINE__
-					<< "\n\t| Tickets table could not be created"
-					<< "\n\t| Error:" << sqlError
-					<< "\n\t| Query:" << query;
-		SendErrorMessage(0, QString("Tickets table could not be created: %1").arg(sqlError.text()));
+		QSqlError junctionError;
+		m_databaseEngineCompPtr->ExecSqlQuery(junctionQuery, &junctionError);
+
+		if (junctionError.type() != QSqlError::NoError){
+			qCritical() << __FILE__ << __LINE__
+						<< "\n\t| TicketEntityReferences table could not be created"
+						<< "\n\t| Error:" << junctionError
+						<< "\n\t| Query:" << junctionQuery;
+			SendErrorMessage(0, QString("TicketEntityReferences table could not be created: %1").arg(junctionError.text()));
+		}
 	}
 }
 

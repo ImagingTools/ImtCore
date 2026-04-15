@@ -47,6 +47,13 @@ type LabelData {
 	description: String
 }
 
+# --- Entity Type ---
+
+type EntityType {
+	id: String
+	name: String
+}
+
 # --- Entity Reference ---
 
 type EntityReference {
@@ -114,6 +121,7 @@ type TicketData {
 	closedAt: String
 	resolvedAt: String
 	entityReferences: [EntityReference]
+	entityTypes: [EntityType]
 	comments: [TicketComment]
 }
 

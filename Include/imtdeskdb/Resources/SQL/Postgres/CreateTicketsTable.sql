@@ -15,7 +15,6 @@ CREATE TABLE IF NOT EXISTS "${TableScheme}"."Tickets"
     "LabelIds"       TEXT,
     "Locked"         BOOLEAN NOT NULL DEFAULT FALSE,
     "LockReason"     TEXT,
-    "EntityReferences" JSONB,
     "Number"         SERIAL NOT NULL UNIQUE,
     "CreatedAt"      TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
     "UpdatedAt"      TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
