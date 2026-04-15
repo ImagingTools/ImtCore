@@ -24,9 +24,6 @@ Item {
 	}
 
 	Component.onDestruction: {
-	}
-
-	Component.onDestruction: {
 		Events.unSubscribeEvent("ServerConnectionError", onServerConnectionError);
 		modalDialogModels.clear();
 	}
