@@ -574,22 +574,6 @@ DocumentViewBase {
 									spacing: Style.paddingXS
 									
 									Text {
-										text: {
-											var t = (modelData.entityType || "").toLowerCase()
-											switch (t) {
-												case "user":    return "👤"
-												case "license": return "🔑"
-												case "product": return "📦"
-												case "ticket":  return "🎫"
-												case "role":    return "🎭"
-												default:        return "🔗"
-											}
-										}
-										font.pixelSize: Style.fontSizeS
-										anchors.verticalCenter: parent.verticalCenter
-									}
-									
-									Text {
 										text: modelData.displayName || modelData.entityId || ""
 										font.pixelSize: Style.fontSizeS
 										color: Style.accentColor
