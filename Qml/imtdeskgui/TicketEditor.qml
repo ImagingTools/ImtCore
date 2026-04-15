@@ -487,7 +487,7 @@ DocumentViewBase {
 								  ? "(" + commentsThread.count + ")"
 								  : ""
 							font.pixelSize: Style.fontSizeM
-							color: Style.textSecondaryColor
+							color: Style.textColor
 							anchors.verticalCenter: parent.verticalCenter
 						}
 					}
@@ -551,7 +551,7 @@ DocumentViewBase {
 										Text {
 											text: root.formatTimestamp(model.item.m_timestamp)
 											font.pixelSize: Style.fontSizeS
-											color: Style.textSecondaryColor
+											color: Style.textColor
 											anchors.verticalCenter: parent.verticalCenter
 										}
 									}
@@ -596,13 +596,12 @@ DocumentViewBase {
 													text: "📎 <a href=\"" + fileUrl + "\">" + fileName + "</a>"
 													textFormat: Text.StyledText
 													font.pixelSize: Style.fontSizeS
-													color: Style.textSecondaryColor
+													color: Style.linkColor
 													wrapMode: Text.Wrap
 
 													MouseArea {
 														anchors.fill: parent
-														acceptedButtons: Qt.LeftButton
-														cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
+														cursorShape: Qt.PointingHandCursor
 														onClicked: {
 															Qt.openUrlExternally(parent.fileUrl)
 														}
@@ -702,7 +701,7 @@ DocumentViewBase {
 										model: root.pendingAttachments
 										delegate: Rectangle {
 											readonly property real maxPillWidth: 250
-											width: Math.min(pendingFileLabel.implicitWidth + pendingRemoveBtn.width + Style.paddingM * 3, maxPillWidth)
+											width: Math.min(pendingFileLabel.contentWidth + pendingRemoveBtn.width + Style.paddingM * 3, maxPillWidth)
 											height: Style.buttonHeightS
 											radius: Style.radiusS
 											border.color: Style.borderColor
@@ -723,23 +722,16 @@ DocumentViewBase {
 												maximumLineCount: 1
 											}
 
-											Text {
+											ToolButton {
 												id: pendingRemoveBtn
 												anchors.right: parent.right
 												anchors.rightMargin: Style.paddingM
 												anchors.verticalCenter: parent.verticalCenter
-												text: "✕"
-												font.pixelSize: Style.fontSizeS
-												color: Style.errorColor
-
-												MouseArea {
-													anchors.fill: parent
-													cursorShape: Qt.PointingHandCursor
-													onClicked: {
-														var arr = root.pendingAttachments.slice()
-														arr.splice(index, 1)
-														root.pendingAttachments = arr
-													}
+												iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+												onClicked: {
+													var arr = root.pendingAttachments.slice()
+													arr.splice(index, 1)
+													root.pendingAttachments = arr
 												}
 											}
 										}
@@ -760,7 +752,7 @@ DocumentViewBase {
 											anchors.centerIn: parent
 											text: "⏳ " + qsTr("Uploading...")
 											font.pixelSize: Style.fontSizeS
-											color: Style.textSecondaryColor
+											color: Style.textColor
 										}
 									}
 								}
@@ -889,7 +881,7 @@ DocumentViewBase {
 						Text {
 							text: qsTr("This conversation has been locked. Only collaborators can comment.")
 							font.pixelSize: Style.fontSizeS
-							color: Style.textSecondaryColor
+							color: Style.textColor
 							wrapMode: Text.Wrap
 							width: parent.width - Style.fontSizeM - Style.paddingS
 						}
