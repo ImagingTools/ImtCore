@@ -374,8 +374,10 @@ class MouseController {
                 let dragTarget = this.target.getProperty('drag').getPropertyValue('target')
                 if(dragTarget){
                     let rectTarget = dragTarget.getDom().getBoundingClientRect()
-                    let dropArea = this.getDropArea(rectTarget.left, rectTarget.top) || this.getDropArea(rectTarget.left, rectTarget.bottom) ||
-                        this.getDropArea(rectTarget.right, rectTarget.top) || this.getDropArea(rectTarget.right, rectTarget.bottom)
+                    let hotX = dragTarget.getPropertyValue('Drag').getPropertyValue('hotSpot').getPropertyValue('x')
+                    let hotY = dragTarget.getPropertyValue('Drag').getPropertyValue('hotSpot').getPropertyValue('y')
+                    let dropArea = this.getDropArea(rectTarget.left+hotX, rectTarget.top+hotY) || this.getDropArea(rectTarget.left+hotX, rectTarget.bottom-hotY) ||
+                        this.getDropArea(rectTarget.right-hotX, rectTarget.top+hotY) || this.getDropArea(rectTarget.right-hotX, rectTarget.bottom-hotY)
 
                     this.target.getProperty('drag').getProperty('active').reset(false)
 
@@ -483,8 +485,10 @@ class MouseController {
                         if(dragProp.getPropertyValue('axis') === QDrag.XAndYAxis || dragProp.getPropertyValue('axis') === QDrag.YAxis) dragTarget.y -= dy
                     }
                     let rectTarget = dragTarget.getDom().getBoundingClientRect()
-                    let dropArea = this.getDropArea(rectTarget.left, rectTarget.top) || this.getDropArea(rectTarget.left, rectTarget.bottom) ||
-                        this.getDropArea(rectTarget.right, rectTarget.top) || this.getDropArea(rectTarget.right, rectTarget.bottom)
+                    let hotX = dragTarget.getPropertyValue('Drag').getPropertyValue('hotSpot').getPropertyValue('x')
+                    let hotY = dragTarget.getPropertyValue('Drag').getPropertyValue('hotSpot').getPropertyValue('y')
+                    let dropArea = this.getDropArea(rectTarget.left+hotX, rectTarget.top+hotY) || this.getDropArea(rectTarget.left+hotX, rectTarget.bottom-hotY) ||
+                        this.getDropArea(rectTarget.right-hotX, rectTarget.top+hotY) || this.getDropArea(rectTarget.right-hotX, rectTarget.bottom-hotY)
 
                     if(dropArea) dropArea.$enterOrMove(dragTarget)
 
