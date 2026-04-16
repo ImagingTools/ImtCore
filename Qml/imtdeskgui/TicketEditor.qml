@@ -414,9 +414,9 @@ DocumentViewBase {
 		readonly property real avatarSize: 34
 		readonly property real accentDividerHeight: 2
 		readonly property real badgeHeight: 22
-		readonly property string accentBgLight: Qt.rgba(accentColor.r, accentColor.g, accentColor.b, 0.15)
-		readonly property string accentBorderLight: Qt.rgba(accentColor.r, accentColor.g, accentColor.b, 0.35)
-		readonly property string accentBadgeBg: Qt.rgba(accentColor.r, accentColor.g, accentColor.b, 0.12)
+		readonly property string accentBgLight: "#DFECF9"
+		readonly property string accentBorderLight: "#B4D3F2"
+		readonly property string accentBadgeBg: "#E5F0FB"
 
 		// Page background
 		Rectangle {
@@ -531,6 +531,7 @@ DocumentViewBase {
 									height: Style.controlHeightM
 									placeHolderText: qsTr("Enter ticket title...")
 									onEditingFinished: root.doUpdateModel()
+									KeyNavigation.tab: editDescriptionInput
 								}
 							}
 
@@ -567,6 +568,8 @@ DocumentViewBase {
 										wrapMode: TextEdit.Wrap
 										clip: true
 										onEditingFinished: root.doUpdateModel()
+										KeyNavigation.tab: editTypeCB
+										KeyNavigation.backtab: editTitleInput
 
 										Text {
 											anchors.fill: parent
@@ -850,6 +853,8 @@ DocumentViewBase {
 										currentIndex: 1
 										model: ticketTypeModel
 										onCurrentIndexChanged: root.doUpdateModel()
+										KeyNavigation.tab: editPriorityCB
+										KeyNavigation.backtab: editDescriptionInput
 									}
 								}
 
@@ -871,6 +876,8 @@ DocumentViewBase {
 										currentIndex: 1
 										model: priorityModel
 										onCurrentIndexChanged: root.doUpdateModel()
+										KeyNavigation.tab: editAssigneeCB
+										KeyNavigation.backtab: editTypeCB
 									}
 								}
 							}
@@ -898,6 +905,8 @@ DocumentViewBase {
 										width: parent.width
 										height: Style.buttonHeightM
 										onCurrentIndexChanged: root.doUpdateModel()
+										KeyNavigation.tab: editReporterCB.visible ? editReporterCB : editStatusCB
+										KeyNavigation.backtab: editPriorityCB
 									}
 								}
 
@@ -918,6 +927,8 @@ DocumentViewBase {
 										width: parent.width
 										height: Style.buttonHeightM
 										onCurrentIndexChanged: root.doUpdateModel()
+										KeyNavigation.tab: editStatusCB
+										KeyNavigation.backtab: editAssigneeCB
 									}
 								}
 							}
@@ -946,6 +957,8 @@ DocumentViewBase {
 										currentIndex: 0
 										model: statusModel
 										onCurrentIndexChanged: root.doUpdateModel()
+										KeyNavigation.tab: editStateReasonCB
+										KeyNavigation.backtab: editReporterCB.visible ? editReporterCB : editAssigneeCB
 									}
 								}
 
@@ -967,6 +980,8 @@ DocumentViewBase {
 										currentIndex: 0
 										model: stateReasonModel
 										onCurrentIndexChanged: root.doUpdateModel()
+										KeyNavigation.tab: editLockedCB
+										KeyNavigation.backtab: editStatusCB
 									}
 								}
 							}
@@ -983,6 +998,8 @@ DocumentViewBase {
 									id: editLockedCB
 									text: qsTr("Lock issue")
 									onCheckStateChanged: root.doUpdateModel()
+									KeyNavigation.tab: editLockedCB.checkState === Qt.Checked ? editLockReasonInput : commentInputField
+									KeyNavigation.backtab: editStateReasonCB
 								}
 
 								Column {
@@ -1003,6 +1020,8 @@ DocumentViewBase {
 										height: Style.controlHeightM
 										placeHolderText: qsTr("Reason for locking")
 										onEditingFinished: root.doUpdateModel()
+										KeyNavigation.tab: commentInputField
+										KeyNavigation.backtab: editLockedCB
 									}
 								}
 							}
@@ -1034,11 +1053,14 @@ DocumentViewBase {
 			Rectangle {
 				id: chatHeader
 				anchors.top: parent.top
+				anchors.topMargin: 1
 				anchors.left: parent.left
+				anchors.leftMargin: 1
 				anchors.right: parent.right
+				anchors.rightMargin: 1
 				height: 52
 				color: editView.cardColor
-				radius: editView.cardRadius
+				radius: editView.cardRadius - 1
 
 				// Bottom edge square-off
 				Rectangle {
@@ -1118,6 +1140,11 @@ DocumentViewBase {
 				contentHeight: commentsMainCol.height + Style.spacingL
 				boundsBehavior: Flickable.StopAtBounds
 				clip: true
+
+				onContentHeightChanged: {
+					if (contentHeight > height)
+						contentY = contentHeight - height
+				}
 
 				Column {
 					id: commentsMainCol
@@ -1281,11 +1308,14 @@ DocumentViewBase {
 				id: addCommentSection
 				visible: !root.ticketData || !root.ticketData.m_locked
 				anchors.bottom: parent.bottom
+				anchors.bottomMargin: 1
 				anchors.left: parent.left
+				anchors.leftMargin: 1
 				anchors.right: parent.right
+				anchors.rightMargin: 1
 				height: addCommentInnerCol.height + editView.cardPadding * 2
 				color: editView.cardColor
-				radius: editView.cardRadius
+				radius: editView.cardRadius - 1
 
 				// Square-off top edge
 				Rectangle {
@@ -1333,6 +1363,7 @@ DocumentViewBase {
 							color: Style.textColor
 							wrapMode: TextEdit.Wrap
 							clip: true
+							KeyNavigation.backtab: editLockReasonInput.visible ? editLockReasonInput : editLockedCB
 
 							Text {
 								anchors.fill: parent
