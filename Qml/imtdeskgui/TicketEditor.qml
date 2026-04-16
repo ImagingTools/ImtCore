@@ -18,7 +18,8 @@ DocumentViewBase {
 	id: root
 	
 	anchors.fill: parent
-	
+	contentColor: Style.baseColor
+
 	property TicketData ticketData: model
 	property bool isNewIssue: ticketData ? (ticketData.m_number === 0) : true
 	// Component factory for creating TicketComment instances
@@ -772,9 +773,7 @@ DocumentViewBase {
 						}
 					}
 				}
-				
-				Rectangle { width: parent.width; height: 1; color: Style.borderColor }
-				
+
 				// Type
 				Column {
 					width: parent.width
@@ -798,9 +797,7 @@ DocumentViewBase {
 						}
 					}
 				}
-				
-				Rectangle { width: parent.width; height: 1; color: Style.borderColor }
-				
+
 				// Priority
 				Column {
 					width: parent.width
@@ -824,9 +821,7 @@ DocumentViewBase {
 						}
 					}
 				}
-				
-				Rectangle { visible: !root.isNewIssue; width: parent.width; height: 1; color: Style.borderColor }
-				
+
 				// Reporter (only for existing tickets)
 				Column {
 					visible: !root.isNewIssue
@@ -849,9 +844,7 @@ DocumentViewBase {
 						}
 					}
 				}
-				
-				Rectangle { visible: !root.isNewIssue; width: parent.width; height: 1; color: Style.borderColor }
-				
+
 				// Lock issue (only for existing tickets)
 				Row {
 					visible: !root.isNewIssue
@@ -890,9 +883,7 @@ DocumentViewBase {
 						}
 					}
 				}
-				
-				Rectangle { visible: !root.isNewIssue; width: parent.width; height: 1; color: Style.borderColor }
-				
+
 				// Status (only for existing tickets)
 				Column {
 					visible: !root.isNewIssue
@@ -1170,20 +1161,7 @@ DocumentViewBase {
 				anchors.right: commentsScrollV.left
 				anchors.rightMargin: Style.marginM
 				spacing: Style.spacingS
-				
-				Rectangle {
-					width: parent.width
-					height: 1
-					color: Style.borderColor
-				}
-				
-				Text {
-					text: qsTr("Add a comment")
-					font.pixelSize: Style.fontSizeM
-					font.bold: true
-					color: Style.textColor
-				}
-				
+
 				Row {
 					width: parent.width
 					spacing: Style.paddingS
