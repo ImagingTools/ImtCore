@@ -394,13 +394,17 @@ DocumentViewBase {
 	
 	// ================================================================
 	// Ticket editor view — same layout for both new and existing tickets
-	// Left: scrollable content (title, description, activity)
+	// Left: scrollable content (title, description, activity) with max-width centered
 	// Right: fixed sidebar (assignees, type, priority, reporter, status, etc.)
+	// Bottom: fixed "Add comment" input pinned below the scroll area
 	// ================================================================
 	
 	Item {
 		id: editView
 		anchors.fill: parent
+		
+		// Maximum width for the left content area
+		readonly property real contentMaxWidth: 800
 		
 		CustomScrollbar {
 			id: editScrollV
@@ -418,8 +422,10 @@ DocumentViewBase {
 			id: editFlick
 			anchors.top: parent.top
 			anchors.topMargin: Style.marginXL
-			anchors.bottom: parent.bottom
-			anchors.bottomMargin: Style.marginXL
+			anchors.bottom: addCommentSection.visible ? addCommentSection.top
+						: lockNoticeRow.visible ? lockNoticeRow.top
+						: parent.bottom
+			anchors.bottomMargin: Style.marginM
 			anchors.left: parent.left
 			anchors.leftMargin: Style.marginXL
 			anchors.right: editScrollV.left
@@ -430,7 +436,8 @@ DocumentViewBase {
 			
 			Column {
 				id: editMainCol
-				width: editFlick.width
+				width: Math.min(editFlick.width, editView.contentMaxWidth)
+				anchors.horizontalCenter: parent.horizontalCenter
 				spacing: Style.marginM
 				
 				// Ticket number + status badges (only for existing tickets)
@@ -908,261 +915,286 @@ DocumentViewBase {
 							}
 						}
 					}
-
-					Column {
-						width: parent.width
-						spacing: Style.spacingS
-						visible: !root.ticketData || !root.ticketData.m_locked
+				}
+			}
+		}
+		
+		// --- Fixed bottom: "Add comment" input, always visible below the scroll ---
+		Column {
+			id: addCommentSection
+			visible: !root.isNewIssue && (!root.ticketData || !root.ticketData.m_locked)
+			anchors.bottom: parent.bottom
+			anchors.bottomMargin: Style.marginXL
+			anchors.left: parent.left
+			anchors.leftMargin: Style.marginXL
+			anchors.right: editSidebarSep.left
+			anchors.rightMargin: Style.marginM + editScrollV.width + Style.marginM
+			spacing: Style.spacingS
+			
+			Rectangle {
+				width: parent.width
+				height: 1
+				color: Style.borderColor
+			}
+			
+			// Center-constrained inner content
+			Column {
+				width: Math.min(parent.width, editView.contentMaxWidth)
+				anchors.horizontalCenter: parent.horizontalCenter
+				spacing: Style.spacingS
+				
+				Text {
+					text: qsTr("Add a comment")
+					font.pixelSize: Style.fontSizeM
+					font.bold: true
+					color: Style.textColor
+				}
+				
+				Row {
+					width: parent.width
+					spacing: Style.paddingS
+					
+					Rectangle {
+						width: 32
+						height: 32
+						radius: 16
+						color: Style.baseColor
+						anchors.top: parent.top
 						
 						Text {
-							text: qsTr("Add a comment")
+							anchors.centerIn: parent
+							text: qsTr("You")
 							font.pixelSize: Style.fontSizeM
-							font.bold: true
 							color: Style.textColor
-						}
-						
-						Row {
-							width: parent.width
-							spacing: Style.paddingS
-							
-							Rectangle {
-								width: 32
-								height: 32
-								radius: 16
-								color: Style.baseColor
-								anchors.top: parent.top
-								
-								Text {
-									anchors.centerIn: parent
-									text: qsTr("You")
-									font.pixelSize: Style.fontSizeM
-									color: Style.textColor
-									font.bold: true
-								}
-							}
-							
-							Column {
-								width: parent.width - 32 - Style.paddingS
-								spacing: Style.spacingS
-								
-								Rectangle {
-									width: parent.width
-									height: commentInputField.height + Style.paddingM * 2
-									radius: Style.radiusS
-									border.color: commentInputField.activeFocus
-												  ? Style.imaginToolsAccentColor
-												  : Style.borderColor
-									border.width: 1
-									color: Style.baseColor
-									
-									TextEdit {
-										id: commentInputField
-										anchors.left: parent.left
-										anchors.right: parent.right
-										anchors.top: parent.top
-										anchors.margins: Style.paddingM
-										height: 60
-										font.pixelSize: Style.fontSizeM
-										color: Style.textColor
-										wrapMode: TextEdit.Wrap
-										clip: true
-										
-										Text {
-											anchors.fill: parent
-											text: qsTr("Leave a comment")
-											color: Style.textPlaceholderColor
-											font.pixelSize: Style.fontSizeM
-											visible: commentInputField.text.length === 0
-										}
-									}
-								}
-								
-								// Pending attachments preview
-								Flow {
-									width: parent.width
-									spacing: Style.spacingS
-									visible: root.pendingAttachments.length > 0 || root.uploadsInProgress > 0
-									
-									Repeater {
-										model: root.pendingAttachments
-										delegate: Rectangle {
-											readonly property real maxPillWidth: 250
-											width: Math.min(pendingFileLabel.contentWidth + pendingRemoveBtn.width + Style.paddingM * 3, maxPillWidth)
-											height: Style.buttonHeightS
-											radius: Style.radiusS
-											border.color: Style.borderColor
-											border.width: 1
-											color: Style.baseColor
-
-											Text {
-												id: pendingFileLabel
-												anchors.left: parent.left
-												anchors.leftMargin: Style.paddingM
-												anchors.right: pendingRemoveBtn.left
-												anchors.rightMargin: Style.paddingS
-												anchors.verticalCenter: parent.verticalCenter
-												text: "📎 " + (modelData.fileName || qsTr("attachment"))
-												font.pixelSize: Style.fontSizeS
-												color: Style.textColor
-												elide: Text.ElideMiddle
-												maximumLineCount: 1
-											}
-
-											ToolButton {
-												id: pendingRemoveBtn
-												anchors.right: parent.right
-												// anchors.rightMargin: Style.paddingM
-												anchors.verticalCenter: parent.verticalCenter
-												iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
-												decorator: 	Component {
-													ToolButtonDecorator {
-														color: "transparent"
-														icon.width: Style.iconSizeXS
-													}
-												}
-												onClicked: {
-													var removed = root.pendingAttachments[index]
-													var arr = root.pendingAttachments.slice()
-													arr.splice(index, 1)
-													root.pendingAttachments = arr
-													// Delete the uploaded file from the server
-													if (removed && removed.id) {
-														var xhr = new XMLHttpRequest()
-														xhr.open("DELETE", "../../files/" + encodeURIComponent(removed.id))
-														xhr.onreadystatechange = function() {
-															if (xhr.readyState === XMLHttpRequest.DONE && xhr.status !== 200) {
-																console.warn("Failed to delete attachment from server:", xhr.status, xhr.responseText)
-															}
-														}
-														xhr.send()
-													}
-												}
-											}
-										}
-									}
-									
-									// Upload in progress indicator
-									Rectangle {
-										width: uploadingLabel.contentWidth + Style.paddingM * 2
-										height: Style.buttonHeightS
-										radius: Style.radiusS
-										border.color: Style.borderColor
-										border.width: 1
-										color: Style.baseColor
-										visible: root.uploadsInProgress > 0
-										
-										Text {
-											id: uploadingLabel
-											anchors.centerIn: parent
-											text: "⏳ " + qsTr("Uploading...")
-											font.pixelSize: Style.fontSizeS
-											color: Style.textColor
-										}
-									}
-								}
-								
-								Row {
-									anchors.right: parent.right
-									spacing: Style.spacingS
-
-									ToolButton {
-										id: attachButton
-										tooltipText: qsTr("Attach file")
-										iconSource: Style.getIconPath("Icons/Attachment", Icon.State.On, Icon.Mode.Normal)
-										decorator: 	Component {
-											ToolButtonDecorator {
-												color: "transparent"
-											}
-										}
-
-										onClicked: {
-											attachImageDialog.open()
-										}
-									}
-									
-									Button {
-										id: commentButton
-										text: qsTr("Comment")
-										enabled: commentInputField.text !== ""
-										decorator: 	Component {
-											ButtonDecorator {
-												color: commentButton.enabled ? Style.imaginToolsAccentColor : Style.buttonColor
-												textColor: commentButton.enabled ? Style.baseColor : Style.inactiveTextColor
-												opacity: commentButton.hovered ? 0.85 : 1
-												border.width: 0
-											}
-										}
-
-										onClicked: {
-											if (root.uploadsInProgress > 0)
-												return
-											root.addComment(commentInputField.text.trim(), root.pendingAttachments.slice())
-											commentInputField.text = ""
-											root.pendingAttachments = []
-										}
-									}
-								}
-							}
-						}
-						
-						// File dialog for image attachments
-						FileDialog {
-							id: attachImageDialog
-							title: qsTr("Attach image")
-							fileMode: FileDialog.OpenFile
-							nameFilters: [qsTr("Image files") + " (*.png *.jpg *.jpeg *.gif *.bmp *.svg *.webp)"]
-							
-							onAccepted: {
-								if (Qt.platform.os === "web") {
-									// Web: file is a JS File object — upload binary data via HTTP POST
-									var fileObj = attachImageDialog.file
-									var fileName = fileObj.name || "attachment"
-									// Read as dataURL for local preview while upload is in progress
-									var previewReader = new FileReader()
-									previewReader.readAsDataURL(fileObj)
-									previewReader.onload = function() {
-										root.uploadAttachment(fileObj, fileName, previewReader.result)
-									}
-									previewReader.onerror = function() {
-										// Upload without local preview
-										console.warn("Failed to generate preview for: " + fileName)
-										root.uploadAttachment(fileObj, fileName, "")
-									}
-								} else {
-									// Native: read file via FileIO and upload via HTTP POST
-									var filePath = String(attachImageDialog.file)
-									var parts = filePath.replace("file:///", "").split("/")
-									var nativeFileName = parts.length > 0 ? parts[parts.length - 1] : "attachment"
-									root.uploadAttachment(null, nativeFileName, filePath)
-								}
-							}
-						}
-						
-						FileIO {
-							id: attachmentFileIO
+							font.bold: true
 						}
 					}
 					
-					// Lock notice
-					Row {
-						visible: root.ticketData && root.ticketData.m_locked
-						width: parent.width
-						spacing: Style.paddingS
+					Column {
+						width: parent.width - 32 - Style.paddingS
+						spacing: Style.spacingS
 						
-						Text {
-							text: "🔒"
-							font.pixelSize: Style.fontSizeM
+						Rectangle {
+							width: parent.width
+							height: commentInputField.height + Style.paddingM * 2
+							radius: Style.radiusS
+							border.color: commentInputField.activeFocus
+										  ? Style.imaginToolsAccentColor
+										  : Style.borderColor
+							border.width: 1
+							color: Style.baseColor
+							
+							TextEdit {
+								id: commentInputField
+								anchors.left: parent.left
+								anchors.right: parent.right
+								anchors.top: parent.top
+								anchors.margins: Style.paddingM
+								height: 60
+								font.pixelSize: Style.fontSizeM
+								color: Style.textColor
+								wrapMode: TextEdit.Wrap
+								clip: true
+								
+								Text {
+									anchors.fill: parent
+									text: qsTr("Leave a comment")
+									color: Style.textPlaceholderColor
+									font.pixelSize: Style.fontSizeM
+									visible: commentInputField.text.length === 0
+								}
+							}
 						}
 						
-						Text {
-							text: qsTr("This conversation has been locked. Only collaborators can comment.")
-							font.pixelSize: Style.fontSizeS
-							color: Style.textColor
-							wrapMode: Text.Wrap
-							width: parent.width - Style.fontSizeM - Style.paddingS
+						// Pending attachments preview
+						Flow {
+							width: parent.width
+							spacing: Style.spacingS
+							visible: root.pendingAttachments.length > 0 || root.uploadsInProgress > 0
+							
+							Repeater {
+								model: root.pendingAttachments
+								delegate: Rectangle {
+									readonly property real maxPillWidth: 250
+									width: Math.min(pendingFileLabel.contentWidth + pendingRemoveBtn.width + Style.paddingM * 3, maxPillWidth)
+									height: Style.buttonHeightS
+									radius: Style.radiusS
+									border.color: Style.borderColor
+									border.width: 1
+									color: Style.baseColor
+				
+									Text {
+										id: pendingFileLabel
+										anchors.left: parent.left
+										anchors.leftMargin: Style.paddingM
+										anchors.right: pendingRemoveBtn.left
+										anchors.rightMargin: Style.paddingS
+										anchors.verticalCenter: parent.verticalCenter
+										text: "📎 " + (modelData.fileName || qsTr("attachment"))
+										font.pixelSize: Style.fontSizeS
+										color: Style.textColor
+										elide: Text.ElideMiddle
+										maximumLineCount: 1
+									}
+				
+									ToolButton {
+										id: pendingRemoveBtn
+										anchors.right: parent.right
+										// anchors.rightMargin: Style.paddingM
+										anchors.verticalCenter: parent.verticalCenter
+										iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+										decorator: 	Component {
+											ToolButtonDecorator {
+												color: "transparent"
+												icon.width: Style.iconSizeXS
+											}
+										}
+										onClicked: {
+											var removed = root.pendingAttachments[index]
+											var arr = root.pendingAttachments.slice()
+											arr.splice(index, 1)
+											root.pendingAttachments = arr
+											// Delete the uploaded file from the server
+											if (removed && removed.id) {
+												var xhr = new XMLHttpRequest()
+												xhr.open("DELETE", "../../files/" + encodeURIComponent(removed.id))
+												xhr.onreadystatechange = function() {
+													if (xhr.readyState === XMLHttpRequest.DONE && xhr.status !== 200) {
+														console.warn("Failed to delete attachment from server:", xhr.status, xhr.responseText)
+													}
+												}
+												xhr.send()
+											}
+										}
+									}
+								}
+							}
+							
+							// Upload in progress indicator
+							Rectangle {
+								width: uploadingLabel.contentWidth + Style.paddingM * 2
+								height: Style.buttonHeightS
+								radius: Style.radiusS
+								border.color: Style.borderColor
+								border.width: 1
+								color: Style.baseColor
+								visible: root.uploadsInProgress > 0
+								
+								Text {
+									id: uploadingLabel
+									anchors.centerIn: parent
+									text: "⏳ " + qsTr("Uploading...")
+									font.pixelSize: Style.fontSizeS
+									color: Style.textColor
+								}
+							}
+						}
+						
+						Row {
+							anchors.right: parent.right
+							spacing: Style.spacingS
+				
+							ToolButton {
+								id: attachButton
+								tooltipText: qsTr("Attach file")
+								iconSource: Style.getIconPath("Icons/Attachment", Icon.State.On, Icon.Mode.Normal)
+								decorator: 	Component {
+									ToolButtonDecorator {
+										color: "transparent"
+									}
+								}
+				
+								onClicked: {
+									attachImageDialog.open()
+								}
+							}
+							
+							Button {
+								id: commentButton
+								text: qsTr("Comment")
+								enabled: commentInputField.text !== ""
+								decorator: 	Component {
+									ButtonDecorator {
+										color: commentButton.enabled ? Style.imaginToolsAccentColor : Style.buttonColor
+										textColor: commentButton.enabled ? Style.baseColor : Style.inactiveTextColor
+										opacity: commentButton.hovered ? 0.85 : 1
+										border.width: 0
+									}
+								}
+				
+								onClicked: {
+									if (root.uploadsInProgress > 0)
+										return
+									root.addComment(commentInputField.text.trim(), root.pendingAttachments.slice())
+									commentInputField.text = ""
+									root.pendingAttachments = []
+								}
+							}
 						}
 					}
 				}
+				
+				// File dialog for image attachments
+				FileDialog {
+					id: attachImageDialog
+					title: qsTr("Attach image")
+					fileMode: FileDialog.OpenFile
+					nameFilters: [qsTr("Image files") + " (*.png *.jpg *.jpeg *.gif *.bmp *.svg *.webp)"]
+					
+					onAccepted: {
+						if (Qt.platform.os === "web") {
+							// Web: file is a JS File object — upload binary data via HTTP POST
+							var fileObj = attachImageDialog.file
+							var fileName = fileObj.name || "attachment"
+							// Read as dataURL for local preview while upload is in progress
+							var previewReader = new FileReader()
+							previewReader.readAsDataURL(fileObj)
+							previewReader.onload = function() {
+								root.uploadAttachment(fileObj, fileName, previewReader.result)
+							}
+							previewReader.onerror = function() {
+								// Upload without local preview
+								console.warn("Failed to generate preview for: " + fileName)
+								root.uploadAttachment(fileObj, fileName, "")
+							}
+						} else {
+							// Native: read file via FileIO and upload via HTTP POST
+							var filePath = String(attachImageDialog.file)
+							var parts = filePath.replace("file:///", "").split("/")
+							var nativeFileName = parts.length > 0 ? parts[parts.length - 1] : "attachment"
+							root.uploadAttachment(null, nativeFileName, filePath)
+						}
+					}
+				}
+				
+				FileIO {
+					id: attachmentFileIO
+				}
+			}
+		}
+		
+		// Lock notice (fixed at bottom when ticket is locked)
+		Row {
+			id: lockNoticeRow
+			visible: !root.isNewIssue && root.ticketData && root.ticketData.m_locked
+			anchors.bottom: parent.bottom
+			anchors.bottomMargin: Style.marginXL
+			anchors.left: parent.left
+			anchors.leftMargin: Style.marginXL
+			width: Math.min(editFlick.width, editView.contentMaxWidth)
+			spacing: Style.paddingS
+			
+			Text {
+				text: "🔒"
+				font.pixelSize: Style.fontSizeM
+			}
+			
+			Text {
+				text: qsTr("This conversation has been locked. Only collaborators can comment.")
+				font.pixelSize: Style.fontSizeS
+				color: Style.textColor
+				wrapMode: Text.Wrap
+				width: parent.width - Style.fontSizeM - Style.paddingS
 			}
 		}
 		
