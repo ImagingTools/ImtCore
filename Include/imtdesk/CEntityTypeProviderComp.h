@@ -25,6 +25,8 @@ class CEntityTypeProviderComp:
 			virtual public IEntityTypeProvider
 {
 public:
+	typedef icomp::CComponentBase BaseClass;
+
 	I_BEGIN_COMPONENT(CEntityTypeProviderComp)
 		I_REGISTER_INTERFACE(IEntityTypeProvider)
 		I_ASSIGN(m_entityTypeIdAttrPtr, "EntityTypeId", "Unique identifier of the entity type", true, "");

@@ -185,12 +185,12 @@ DocumentViewBase {
 		entityTypeModel.clear()
 		if (ticketData && ticketData.m_entityTypes) {
 			var types = ticketData.m_entityTypes
-			for (var t = 0; t < types.getElementsCount(); t++) {
-				var typeItem = types.getElement(t)
+			for (var t = 0; t < types.count; t++) {
+				var typeItem = types.get(t).item
 				if (typeItem) {
 					var idx = entityTypeModel.insertNewItem()
-					entityTypeModel.setData("id", String(typeItem.m_id || ""), idx)
-					entityTypeModel.setData("name", String(typeItem.m_name || ""), idx)
+					entityTypeModel.setData("id", typeItem.m_id, idx)
+					entityTypeModel.setData("name", typeItem.m_name, idx)
 				}
 			}
 		}
@@ -200,8 +200,8 @@ DocumentViewBase {
 		if (ticketData.hasEntityReferences && ticketData.hasEntityReferences()) {
 			var entityRefs = ticketData.m_entityReferences
 			if (entityRefs) {
-				for (var r = 0; r < entityRefs.getElementsCount(); r++) {
-					var refItem = entityRefs.getElement(r)
+				for (var r = 0; r < entityRefs.count; r++) {
+					var refItem = entityRefs.get(r).item
 					if (refItem) {
 						refs.push({
 							entityType: String(refItem.m_entityType || ""),

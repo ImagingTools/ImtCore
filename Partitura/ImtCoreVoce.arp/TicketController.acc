@@ -263,6 +263,18 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="DevicesEntityTypeProvider" PackageId="ImtDeskPck" ComponentId="EntityTypeProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="EntityTypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Devices"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EntityTypeName" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Devices"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="EditorCommandsController" PackageId="ImtGraphQlVoce" ComponentId="CommandsController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -439,6 +451,13 @@
                     </AttributeInfo>
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EntityTypeProviders" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>DevicesEntityTypeProvider</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
