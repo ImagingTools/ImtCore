@@ -86,7 +86,7 @@ bool CUrlConnectionParam::Serialize(iser::IArchive& archive)
 			elementInfo = m_externConnectionList[i];
 		}
 
-		if (archive.IsStoring() || imtCoreVersion >= 20000){
+		if (archive.IsStoring() || imtCoreVersion >= 20596){
 			retVal = retVal && elementInfo.Serialize(archive);
 		} else {
 			// old format: plain struct with "Id", "Host", "WsPort", "HttpPort" tags

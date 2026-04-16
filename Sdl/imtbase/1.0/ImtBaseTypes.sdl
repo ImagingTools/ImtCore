@@ -75,6 +75,7 @@ type ServerConnectionParam
 {
 	host: String
 	httpPort: Int
+	httpPath: String
 	wsPort: Int
 	isSecure: Boolean
 }

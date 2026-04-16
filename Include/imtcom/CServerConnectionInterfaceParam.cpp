@@ -142,7 +142,13 @@ bool CServerConnectionInterfaceParam::GetUrl(ProtocolType protocol, QUrl& url) c
 	url.setPort(port);
 	const QString path = GetPath(protocol);
 	if (!path.isEmpty()){
-		url.setPath(path);
+		int queryStart = path.indexOf('?');
+		if (queryStart != -1) {
+			url.setPath(path.left(queryStart));
+			url.setQuery(path.mid(queryStart + 1));
+		} else {
+			url.setPath(path);
+		}
 	}
 
 	return url.isValid();
