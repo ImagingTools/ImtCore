@@ -1143,35 +1143,53 @@ class ImageController {
         } else {
             if(onLoaded) item.onLoaded.connect(onLoaded)
             if(onError) item.onError.connect(onError)
-            
-            item.status = 1
-            let xhr = new XMLHttpRequest()
-            xhr.onload = ()=>{
-                if(xhr.status === 200){
-                    let reader = new FileReader()
-                    reader.onloadend = ()=>{
-                        let img = new OriginImage()
-                        img.onload = ()=>{
-                            item.data = reader.result,
-                            item.width = img.naturalWidth,
-                            item.height = img.naturalHeight,
-                            img.remove()
 
-                            item.status = 2
-                            item.onLoaded(item)
-                        }
-                        img.src = reader.result
-                    }
-                    reader.readAsDataURL(xhr.response)
-                } else {
-                    item.status = -1
-                    item.onError()
+            item.status = 1
+
+            if(url.startsWith('data:image')){
+                let img = new OriginImage()
+                img.onload = ()=>{
+                    item.data = url,
+                    item.width = img.naturalWidth,
+                    item.height = img.naturalHeight,
+                    img.remove()
+
+                    item.status = 2
+                    item.onLoaded(item)
                 }
-                
+                img.src = url
+            } else {
+                let xhr = new XMLHttpRequest()
+                xhr.onload = ()=>{
+                    if(xhr.status === 200){
+                        let reader = new FileReader()
+                        reader.onloadend = ()=>{
+                            let img = new OriginImage()
+                            img.onload = ()=>{
+                                item.data = reader.result,
+                                item.width = img.naturalWidth,
+                                item.height = img.naturalHeight,
+                                img.remove()
+
+                                item.status = 2
+                                item.onLoaded(item)
+                            }
+                            img.src = reader.result
+                        }
+                        reader.readAsDataURL(xhr.response)
+                    } else {
+                        item.status = -1
+                        item.onError()
+                    }
+                    
+                }
+                xhr.open('GET', url)
+                xhr.responseType = 'blob'
+                xhr.send()
             }
-            xhr.open('GET', url)
-            xhr.responseType = 'blob'
-            xhr.send()
+            
+            
+            
         }
 
     }
