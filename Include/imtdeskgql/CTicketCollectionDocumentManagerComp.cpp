@@ -117,10 +117,18 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 				// Build ObjectLink for navigation
 				sdl::imtbase::ImtBaseTypes::CObjectLink::V1_0 entityLink;
 				entityLink.id = ref.entityId;
-				entityLink.typeId = ref.entityType ? QByteArray(ref.entityType->toUtf8()) : QByteArray();
 				entityLink.name = ref.displayName ? *ref.displayName : QString();
 
 				QString entityUrl = r.value("EntityUrl").toString();
+
+				// Extract typeId from path (format: collectionId/typeId/entityId)
+				QStringList pathParts = entityUrl.split('/');
+				if (pathParts.size() >= 2){
+					entityLink.typeId = pathParts[1].toUtf8();
+				} else {
+					entityLink.typeId = ref.entityType ? QByteArray(ref.entityType->toUtf8()) : QByteArray();
+				}
+
 				sdl::imtbase::ImtBaseTypes::CUrlParam::V1_0 urlParam;
 				urlParam.scheme = QStringLiteral("applink");
 				urlParam.host = applicationId;

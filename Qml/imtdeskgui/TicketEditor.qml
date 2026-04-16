@@ -33,7 +33,7 @@ DocumentViewBase {
 	// Number of uploads currently in progress
 	property int uploadsInProgress: 0
 	// Pending entity references for the ticket
-	// Each element: {entityType, entityId, displayName, entityLinkPath}
+	// Each element: {entityType, entityId, displayName, entityLinkPath, typeId}
 	property var pendingEntityRefs: []
 	
 	signal commentSubmitted(string commentText)
@@ -288,7 +288,7 @@ DocumentViewBase {
 				// Build ObjectLink with navigation path
 				refItem.emplaceEntityLink()
 				refItem.m_entityLink.m_id = String(ref.entityId || "")
-				refItem.m_entityLink.m_typeId = String(ref.entityType || "")
+				refItem.m_entityLink.m_typeId = String(ref.typeId || ref.entityType || "")
 				refItem.m_entityLink.m_name = String(ref.displayName || "")
 				refItem.m_entityLink.emplaceUrl()
 				refItem.m_entityLink.m_url.m_scheme = "applink"
@@ -725,25 +725,35 @@ DocumentViewBase {
 											}
 										}
 										if (!alreadyAttached) {
-											// Get display name from collection if available
+											// Get display name and typeId from collection if available
 											var displayName = ""
+											var typeId = ""
 											try {
 												var model = collectionView.collectionModel
 												if (model) {
 													for (var k = 0; k < model.getItemsCount(); k++) {
 														if (model.getData("id", k) === selectedIds[i]) {
 															displayName = model.getData("name", k) || ""
+															typeId = model.getData("typeId", k) || ""
 															break
 														}
 													}
 												}
 											} catch(e) {}
 											
+											// Build path as collectionId/typeId/entityId
+											var linkPath = entityRefDialogLoader.entityTypeId
+											if (typeId) {
+												linkPath += "/" + typeId
+											}
+											linkPath += "/" + selectedIds[i]
+											
 											arr.push({
 												entityType: entityRefDialogLoader.entityTypeId,
 												entityId: selectedIds[i],
 												displayName: displayName,
-												entityLinkPath: entityRefDialogLoader.entityTypeId + "/" + selectedIds[i]
+												entityLinkPath: linkPath,
+												typeId: typeId
 											})
 										}
 									}
