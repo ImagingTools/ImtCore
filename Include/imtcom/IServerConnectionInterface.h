@@ -305,6 +305,47 @@ public:
 		\endcode
 	*/
 	virtual bool GetUrl(ProtocolType protocol, QUrl& url) const = 0;
+
+	/**
+		\brief Get the URL path component for a specific protocol.
+		
+		Returns the path suffix that is appended to the URL when generating
+		connection URLs via GetUrl() for the given protocol. For example, a
+		path of "/api/v1" for PT_HTTP would produce URLs like
+		"http://host:9001/api/v1".
+		
+		An empty string means no path suffix is added to the URL for that protocol.
+		
+		\param protocol The protocol type (PT_HTTP, PT_WEBSOCKET, etc.).
+		\return URL path string (e.g. "/api/v1"), or empty string if not set.
+		\sa SetPath(), GetUrl(), ProtocolType
+	*/
+	virtual QString GetPath(ProtocolType protocol) const = 0;
+
+	/**
+		\brief Set the URL path component for a specific protocol.
+		
+		Configures the path suffix that is appended to the URL when generating
+		connection URLs via GetUrl() for the given protocol. This is useful when
+		a server exposes different APIs under different base paths per protocol.
+		
+		\param protocol The protocol type (PT_HTTP, PT_WEBSOCKET, etc.).
+		\param path URL path string (e.g. "/api/v1"). Pass an empty string to
+		            clear the path and produce bare host:port URLs.
+		\sa GetPath(), GetUrl(), ProtocolType
+		
+		\par Example:
+		\code{.cpp}
+		connection->SetHost("example.com");
+		connection->SetPort(IServerConnectionInterface::PT_HTTP, 8080);
+		connection->SetPath(IServerConnectionInterface::PT_HTTP, "/api/v2");
+		
+		QUrl url;
+		connection->GetUrl(IServerConnectionInterface::PT_HTTP, url);
+		// url = "http://example.com:8080/api/v2"
+		\endcode
+	*/
+	virtual void SetPath(ProtocolType protocol, const QString& path) = 0;
 };
 
 
