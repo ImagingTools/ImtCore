@@ -276,25 +276,23 @@ DocumentViewBase {
 			ticketData.m_stateReason = editStateReasonCB.model.getData("id", editStateReasonCB.currentIndex)
 		}
 
-		// Save entity references to ticket data
-		if (root.pendingEntityRefs.length > 0) {
-			ticketData.emplaceEntityReferences()
-			for (var r = 0; r < root.pendingEntityRefs.length; r++) {
-				var ref = root.pendingEntityRefs[r]
-				var refItem = ticketData.createEntityReferencesArrayElement()
-				refItem.m_entityType = String(ref.entityType || "")
-				refItem.m_entityId = String(ref.entityId || "")
-				refItem.m_displayName = String(ref.displayName || "")
-				// Build ObjectLink with navigation path
-				refItem.emplaceEntityLink()
-				refItem.m_entityLink.m_id = String(ref.entityId || "")
-				refItem.m_entityLink.m_typeId = String(ref.typeId || ref.entityType || "")
-				refItem.m_entityLink.m_name = String(ref.displayName || "")
-				refItem.m_entityLink.emplaceUrl()
-				refItem.m_entityLink.m_url.m_scheme = "applink"
-				refItem.m_entityLink.m_url.m_path = String(ref.entityLinkPath || "")
-				ticketData.m_entityReferences.addElement(refItem)
-			}
+		// Save entity references to ticket data (always emplace so deletions are sent as empty array)
+		ticketData.emplaceEntityReferences()
+		for (var r = 0; r < root.pendingEntityRefs.length; r++) {
+			var ref = root.pendingEntityRefs[r]
+			var refItem = ticketData.createEntityReferencesArrayElement()
+			refItem.m_entityType = String(ref.entityType || "")
+			refItem.m_entityId = String(ref.entityId || "")
+			refItem.m_displayName = String(ref.displayName || "")
+			// Build ObjectLink with navigation path
+			refItem.emplaceEntityLink()
+			refItem.m_entityLink.m_id = String(ref.entityId || "")
+			refItem.m_entityLink.m_typeId = String(ref.typeId || ref.entityType || "")
+			refItem.m_entityLink.m_name = String(ref.displayName || "")
+			refItem.m_entityLink.emplaceUrl()
+			refItem.m_entityLink.m_url.m_scheme = "applink"
+			refItem.m_entityLink.m_url.m_path = String(ref.entityLinkPath || "")
+			ticketData.m_entityReferences.addElement(refItem)
 		}
 	}
 	
