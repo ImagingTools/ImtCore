@@ -191,7 +191,6 @@ DocumentViewBase {
 					var idx = entityTypeModel.insertNewItem()
 					entityTypeModel.setData("id", typeItem.m_id, idx)
 					entityTypeModel.setData("name", typeItem.m_name, idx)
-					entityTypeModel.setData("collectionId", typeItem.m_collectionId || "", idx)
 				}
 			}
 		}
@@ -675,11 +674,10 @@ DocumentViewBase {
 								cursorShape: Qt.PointingHandCursor
 								onClicked: {
 									if (!refTypeCB.model || refTypeCB.currentIndex < 0) return
-									var collId = refTypeCB.model.getData("collectionId", refTypeCB.currentIndex)
-									if (!collId || collId.length === 0) return
-									entityRefDialogLoader.entityTypeId = refTypeCB.model.getData("id", refTypeCB.currentIndex)
+									var typeId = refTypeCB.model.getData("id", refTypeCB.currentIndex)
+									if (!typeId || typeId.length === 0) return
+									entityRefDialogLoader.entityTypeId = typeId
 									entityRefDialogLoader.entityTypeName = refTypeCB.model.getData("name", refTypeCB.currentIndex)
-									entityRefDialogLoader.collectionId = collId
 									ModalDialogManager.openDialog(entityRefDialogComp)
 								}
 							}
@@ -691,7 +689,6 @@ DocumentViewBase {
 						id: entityRefDialogLoader
 						property string entityTypeId: ""
 						property string entityTypeName: ""
-						property string collectionId: ""
 					}
 					
 					Component {
@@ -699,7 +696,7 @@ DocumentViewBase {
 						RemoteCollectionViewDialog {
 							id: entityRefDialog
 							title: qsTr("Select") + " " + entityRefDialogLoader.entityTypeName
-							collectionId: entityRefDialogLoader.collectionId
+							collectionId: entityRefDialogLoader.entityTypeId
 							
 							Component.onCompleted: {
 								addButton(Enums.apply, qsTr("Attach"), false)
@@ -746,7 +743,7 @@ DocumentViewBase {
 												entityType: entityRefDialogLoader.entityTypeId,
 												entityId: selectedIds[i],
 												displayName: displayName,
-												entityLinkPath: entityRefDialogLoader.collectionId + "/" + entityRefDialogLoader.entityTypeId + "/" + selectedIds[i]
+												entityLinkPath: entityRefDialogLoader.entityTypeId + "/" + entityRefDialogLoader.entityTypeId + "/" + selectedIds[i]
 											})
 										}
 									}

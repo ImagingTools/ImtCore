@@ -20,10 +20,4 @@ QString CEntityTypeProviderComp::GetEntityTypeName() const
 }
 
 
-QString CEntityTypeProviderComp::GetCollectionId() const
-{
-	return QString::fromUtf8(*m_collectionIdAttrPtr);
-}
-
-
 } // namespace imtdesk

@@ -23,7 +23,8 @@ class IEntityTypeProvider: virtual public istd::IPolymorphic
 {
 public:
 	/**
-		Get the unique identifier of the entity type (e.g. "User", "License").
+		Get the unique identifier of the entity type.
+		This ID also serves as the collection ID for browsing entities of this type.
 	*/
 	virtual QString GetEntityTypeId() const = 0;
 
@@ -31,11 +32,6 @@ public:
 		Get the human-readable name of the entity type.
 	*/
 	virtual QString GetEntityTypeName() const = 0;
-
-	/**
-		Get the collection ID used to browse entities of this type (e.g. "Users", "Licenses").
-	*/
-	virtual QString GetCollectionId() const = 0;
 };
 
 

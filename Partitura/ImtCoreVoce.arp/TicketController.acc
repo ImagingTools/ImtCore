@@ -272,9 +272,6 @@
                     <AttributeInfo Id="EntityTypeName" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Devices"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Devices"/>
-                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
