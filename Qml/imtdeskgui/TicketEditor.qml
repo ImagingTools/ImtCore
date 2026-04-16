@@ -424,16 +424,24 @@ DocumentViewBase {
 			color: editView.pageBgColor
 		}
 
-		// ==================== LEFT COLUMN ====================
+		// ==================== CENTERED CONTAINER ====================
 		Item {
-			id: leftColumn
+			id: panelsContainer
+			readonly property real totalMaxWidth: root.isNewIssue ? editView.contentMaxWidth : 1400
+			width: Math.min(parent.width - Style.marginXL * 2, totalMaxWidth)
+			anchors.horizontalCenter: parent.horizontalCenter
 			anchors.top: parent.top
 			anchors.topMargin: Style.marginXL
 			anchors.bottom: parent.bottom
 			anchors.bottomMargin: Style.marginXL
+
+		// ==================== LEFT COLUMN ====================
+		Item {
+			id: leftColumn
+			anchors.top: parent.top
+			anchors.bottom: parent.bottom
 			anchors.left: parent.left
-			anchors.leftMargin: Style.marginXL
-			width: root.isNewIssue ? parent.width - Style.marginXL * 2 : parent.width * 0.45 - Style.marginXL
+			width: root.isNewIssue ? parent.width : parent.width * 0.45
 
 			CustomScrollbar {
 				id: editScrollV
@@ -564,7 +572,7 @@ DocumentViewBase {
 										anchors.margins: Style.paddingM
 										font.pixelSize: Style.fontSizeM
 										color: Style.textColor
-										height: 100
+										height: Math.max(100, contentHeight)
 										wrapMode: TextEdit.Wrap
 										clip: true
 										onEditingFinished: root.doUpdateModel()
@@ -1036,13 +1044,9 @@ DocumentViewBase {
 			id: commentsPanel
 			visible: !root.isNewIssue
 			anchors.top: parent.top
-			anchors.topMargin: Style.marginXL
 			anchors.bottom: parent.bottom
-			anchors.bottomMargin: Style.marginXL
-			anchors.right: parent.right
-			anchors.rightMargin: Style.marginXL
 			anchors.left: leftColumn.right
-			anchors.leftMargin: Style.spacingL
+			anchors.right: parent.right
 			radius: editView.cardRadius
 			color: editView.cardColor
 			border.color: editView.cardBorderColor
@@ -1574,6 +1578,7 @@ DocumentViewBase {
 				}
 			}
 		}
+		} // panelsContainer
 	}
 }
 
