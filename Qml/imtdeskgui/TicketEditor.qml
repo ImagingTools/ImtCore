@@ -394,564 +394,619 @@ DocumentViewBase {
 	}
 	
 	// ================================================================
-	// Ticket editor view — same layout for both new and existing tickets
-	// Left: scrollable content (title, description, activity) with max-width centered
-	// Right: fixed sidebar (assignees, type, priority, reporter, status, etc.)
-	// Bottom: fixed "Add comment" input pinned below the scroll area
+	// Modern card-based layout: LEFT (details + metadata) + RIGHT (chat)
+	// Organized into 3 groups in a 2-column structure
 	// ================================================================
-	
+
 	Item {
 		id: editView
 		anchors.fill: parent
-		
-		// Maximum width for the left content area
+
+		// Layout constants
 		readonly property real contentMaxWidth: 800
-		
-		CustomScrollbar {
-			id: editScrollV
-			z: parent.z + 1
-			anchors.right: root.isNewIssue ? parent.right : editSidebarSep.left
-			anchors.rightMargin: root.isNewIssue ? Style.marginXL : Style.marginM
-			anchors.top: editFlick.top
-			anchors.bottom: editFlick.bottom
-			secondSize: Style.marginM
-			targetItem: editFlick
-			visible: editView.visible
+		readonly property real cardPadding: 20
+		readonly property real cardRadius: Style.radiusL
+		readonly property color cardColor: Style.baseColor
+		readonly property color cardBorderColor: Style.borderColor
+		readonly property color pageBgColor: Style.backgroundColor2
+		readonly property color accentColor: Style.imaginToolsAccentColor
+		readonly property color labelColor: Style.textColor
+		readonly property real fieldColWidth: function(pw) { return (pw - Style.spacingL) / 2 }
+
+		// Page background
+		Rectangle {
+			anchors.fill: parent
+			color: editView.pageBgColor
 		}
-		
-		Flickable {
-			id: editFlick
+
+		// ==================== LEFT COLUMN ====================
+		Item {
+			id: leftColumn
 			anchors.top: parent.top
-			anchors.topMargin: Style.marginXL
 			anchors.bottom: parent.bottom
-			anchors.bottomMargin: Style.marginM
 			anchors.left: parent.left
-			anchors.leftMargin: Style.marginXL
-			anchors.right: editScrollV.left
-			anchors.rightMargin: Style.marginM
-			contentHeight: editMainCol.height + Style.marginXL * 2
-			boundsBehavior: Flickable.StopAtBounds
-			clip: true
-			
-			Column {
-				id: editMainCol
-				width: Math.min(editFlick.width, editView.contentMaxWidth)
-				anchors.horizontalCenter: parent.horizontalCenter
-				spacing: Style.marginM
-				
-				// Ticket number + status badges (only for existing tickets)
-				Row {
-					visible: !root.isNewIssue
-					spacing: Style.spacingS
-					
-					Text {
-						text: "#" + (root.ticketData ? root.ticketData.m_number : "")
-						font.pixelSize: Style.fontSizeL
-						font.bold: true
-						color: Style.textColor
-						anchors.verticalCenter: parent.verticalCenter
-					}
-					
-					TicketBadge {
-						badgeType: "status"
-						value: editStatusCB.currentIndex
-					}
-					
-					TicketBadge {
-						badgeType: "stateReason"
-						value: editStateReasonCB.currentIndex
-						visible: editStateReasonCB.currentIndex > 0
-					}
-				}
-				
-				// Title edit
+			width: root.isNewIssue ? parent.width : parent.width * 0.45
+
+			CustomScrollbar {
+				id: editScrollV
+				z: parent.z + 1
+				anchors.right: parent.right
+				anchors.rightMargin: Style.spacingS
+				anchors.top: editFlick.top
+				anchors.bottom: editFlick.bottom
+				secondSize: Style.marginM
+				targetItem: editFlick
+				visible: editView.visible
+			}
+
+			Flickable {
+				id: editFlick
+				anchors.top: parent.top
+				anchors.bottom: parent.bottom
+				anchors.left: parent.left
+				anchors.right: editScrollV.left
+				anchors.margins: Style.marginXL
+				anchors.rightMargin: Style.spacingS
+				contentHeight: leftStack.height + Style.marginXL
+				boundsBehavior: Flickable.StopAtBounds
+				clip: true
+
 				Column {
-					width: parent.width
-					spacing: Style.spacingS
-					
-					Text {
-						text: qsTr("Title")
-						font.pixelSize: Style.fontSizeM
-						font.bold: true
-						color: Style.textColor
-					}
-					
-					CustomTextField {
-						id: editTitleInput
-						width: parent.width
-						height: Style.controlHeightM
-						placeHolderText: qsTr("Title")
-						onEditingFinished: {
-							root.doUpdateModel()
-						}
-					}
-				}
-				
-				// Description edit
-				Column {
-					width: parent.width
-					spacing: Style.spacingS
-					
-					Text {
-						text: qsTr("Description")
-						font.pixelSize: Style.fontSizeM
-						font.bold: true
-						color: Style.textColor
-					}
-					
+					id: leftStack
+					width: Math.min(editFlick.width, editView.contentMaxWidth)
+					anchors.horizontalCenter: parent.horizontalCenter
+					spacing: Style.spacingL
+
+					// ========================================
+					// CARD 1 — Ticket Details
+					// ========================================
 					Rectangle {
+						id: detailsCard
 						width: parent.width
-						height: editDescriptionInput.height + Style.paddingM * 2
-						radius: Style.radiusS
-						border.color: editDescriptionInput.activeFocus
-									  ? Style.imaginToolsAccentColor
-									  : Style.borderColor
+						height: detailsCardCol.height + editView.cardPadding * 2
+						radius: editView.cardRadius
+						color: editView.cardColor
+						border.color: editView.cardBorderColor
 						border.width: 1
-						color: Style.baseColor
-						
-						TextEdit {
-							id: editDescriptionInput
-							anchors.left: parent.left
-							anchors.right: parent.right
-							anchors.top: parent.top
-							anchors.margins: Style.paddingM
-							font.pixelSize: Style.fontSizeM
-							color: Style.textColor
-							height: 100
-							wrapMode: TextEdit.Wrap
-							clip: true
-							onEditingFinished: {
-								root.doUpdateModel()
-							}
-							
-							Text {
-								anchors.fill: parent
-								text: qsTr("Enter the description")
-								color: Style.textPlaceholderColor
-								font.pixelSize: Style.fontSizeM
-								visible: editDescriptionInput.text.length === 0
-							}
-						}
-					}
-				}
-				
-				// --- Entity References section ---
-				Column {
-					width: parent.width
-					spacing: Style.spacingS
-					
-					Row {
-						width: parent.width
-						spacing: Style.spacingS
-						
-						Text {
-							text: qsTr("Context")
-							font.pixelSize: Style.fontSizeM
-							font.bold: true
-							color: Style.textColor
-							anchors.verticalCenter: parent.verticalCenter
-						}
-						
-						Text {
-							text: root.pendingEntityRefs.length > 0
-								  ? "(" + root.pendingEntityRefs.length + ")"
-								  : ""
-							font.pixelSize: Style.fontSizeS
-							color: Style.textColor
-							anchors.verticalCenter: parent.verticalCenter
-						}
-					}
-					
-					// Existing entity references
-					Flow {
-						width: parent.width
-						spacing: Style.spacingS
-						visible: root.pendingEntityRefs.length > 0
-						
-						Repeater {
-							model: root.pendingEntityRefs
-							delegate: Rectangle {
-								readonly property real maxRefWidth: 300
-								width: Math.min(refLabelText.contentWidth + refRemoveBtn.width + 2*Style.paddingS, maxRefWidth)
-								height: Style.buttonHeightS
-								radius: Style.radiusS
-								border.color: Style.borderColor
-								border.width: 1
-								color: Style.baseColor
-								
+
+						Column {
+							id: detailsCardCol
+							x: editView.cardPadding
+							y: editView.cardPadding
+							width: parent.width - editView.cardPadding * 2
+							spacing: Style.spacingL
+
+							// Header row: ticket number + badges
+							Row {
+								width: parent.width
+								spacing: Style.spacingS
+
 								Text {
-									id: refLabelText
-									anchors.left: parent.left
-									anchors.leftMargin: Style.paddingS
+									text: root.isNewIssue ? qsTr("New Ticket") : "#" + (root.ticketData ? root.ticketData.m_number : "")
+									font.pixelSize: Style.fontSizeXL
+									font.bold: true
+									color: editView.accentColor
 									anchors.verticalCenter: parent.verticalCenter
-									text: (modelData.entityType ? "[" + modelData.entityType + "] " : "") + (modelData.displayName || modelData.entityId || "")
+								}
+
+								TicketBadge {
+									visible: !root.isNewIssue
+									badgeType: "status"
+									value: editStatusCB.currentIndex
+								}
+
+								TicketBadge {
+									visible: !root.isNewIssue && editStateReasonCB.currentIndex > 0
+									badgeType: "stateReason"
+									value: editStateReasonCB.currentIndex
+								}
+							}
+
+							// Accent divider
+							Rectangle { width: parent.width; height: 2; color: editView.accentColor; opacity: 0.15 }
+
+							// ---------- Title ----------
+							Column {
+								width: parent.width
+								spacing: Style.spacingXS
+
+								Text {
+									text: qsTr("TITLE")
 									font.pixelSize: Style.fontSizeS
-									color: Style.imaginToolsAccentColor
-									font.underline: modelData.entityLinkPath !== ""
-									elide: Text.ElideRight
-									maximumLineCount: 1
-									
-									MouseArea {
-										anchors.fill: parent
-										hoverEnabled: true
-										cursorShape: Qt.PointingHandCursor
-										onClicked: {
-											if (modelData.entityLinkPath){
-												NavigationController.navigate(modelData.entityLinkPath)
+									font.bold: true
+									color: editView.labelColor
+									opacity: 0.6
+								}
+
+								CustomTextField {
+									id: editTitleInput
+									width: parent.width
+									height: Style.controlHeightM
+									placeHolderText: qsTr("Enter ticket title...")
+									onEditingFinished: root.doUpdateModel()
+								}
+							}
+
+							// ---------- Description ----------
+							Column {
+								width: parent.width
+								spacing: Style.spacingXS
+
+								Text {
+									text: qsTr("DESCRIPTION")
+									font.pixelSize: Style.fontSizeS
+									font.bold: true
+									color: editView.labelColor
+									opacity: 0.6
+								}
+
+								Rectangle {
+									width: parent.width
+									height: editDescriptionInput.height + Style.paddingM * 2
+									radius: Style.radiusM
+									border.color: editDescriptionInput.activeFocus ? editView.accentColor : editView.cardBorderColor
+									border.width: editDescriptionInput.activeFocus ? 2 : 1
+									color: editView.pageBgColor
+
+									TextEdit {
+										id: editDescriptionInput
+										anchors.left: parent.left
+										anchors.right: parent.right
+										anchors.top: parent.top
+										anchors.margins: Style.paddingM
+										font.pixelSize: Style.fontSizeM
+										color: Style.textColor
+										height: 120
+										wrapMode: TextEdit.Wrap
+										clip: true
+										onEditingFinished: root.doUpdateModel()
+
+										Text {
+											anchors.fill: parent
+											text: qsTr("Describe the issue in detail...")
+											color: Style.textPlaceholderColor
+											font.pixelSize: Style.fontSizeM
+											visible: editDescriptionInput.text.length === 0
+										}
+									}
+								}
+							}
+
+							// ---------- Context / Entity References ----------
+							Column {
+								width: parent.width
+								spacing: Style.spacingS
+
+								Row {
+									width: parent.width
+									spacing: Style.spacingS
+
+									Text {
+										text: qsTr("CONTEXT")
+										font.pixelSize: Style.fontSizeS
+										font.bold: true
+										color: editView.labelColor
+										opacity: 0.6
+										anchors.verticalCenter: parent.verticalCenter
+									}
+
+									Rectangle {
+										visible: root.pendingEntityRefs.length > 0
+										width: refCountLabel.contentWidth + Style.paddingS * 2
+										height: 20
+										radius: 10
+										color: editView.accentColor
+										anchors.verticalCenter: parent.verticalCenter
+
+										Text {
+											id: refCountLabel
+											anchors.centerIn: parent
+											text: root.pendingEntityRefs.length
+											font.pixelSize: Style.fontSizeS - 1
+											font.bold: true
+											color: Style.baseColor
+										}
+									}
+								}
+
+								// Entity chips
+								Flow {
+									width: parent.width
+									spacing: Style.spacingS
+									visible: root.pendingEntityRefs.length > 0
+
+									Repeater {
+										model: root.pendingEntityRefs
+										delegate: Rectangle {
+											readonly property real maxRefWidth: 300
+											width: Math.min(refLabelText.contentWidth + refRemoveBtn.width + Style.paddingS * 3, maxRefWidth)
+											height: 30
+											radius: 15
+											color: Qt.rgba(editView.accentColor.r, editView.accentColor.g, editView.accentColor.b, 0.08)
+											border.color: Qt.rgba(editView.accentColor.r, editView.accentColor.g, editView.accentColor.b, 0.25)
+											border.width: 1
+
+											Text {
+												id: refLabelText
+												anchors.left: parent.left
+												anchors.leftMargin: Style.paddingS + 2
+												anchors.verticalCenter: parent.verticalCenter
+												text: (modelData.entityType ? "[" + modelData.entityType + "] " : "") + (modelData.displayName || modelData.entityId || "")
+												font.pixelSize: Style.fontSizeS
+												color: editView.accentColor
+												font.underline: modelData.entityLinkPath !== ""
+												elide: Text.ElideRight
+												maximumLineCount: 1
+
+												MouseArea {
+													anchors.fill: parent
+													hoverEnabled: true
+													cursorShape: Qt.PointingHandCursor
+													onClicked: {
+														if (modelData.entityLinkPath) {
+															NavigationController.navigate(modelData.entityLinkPath)
+														}
+													}
+												}
+											}
+
+											ToolButton {
+												id: refRemoveBtn
+												anchors.right: parent.right
+												anchors.verticalCenter: parent.verticalCenter
+												iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+												decorator: Component {
+													ToolButtonDecorator {
+														color: "transparent"
+														icon.width: Style.iconSizeXS
+													}
+												}
+												onClicked: {
+													var arr = root.pendingEntityRefs.slice()
+													arr.splice(index, 1)
+													root.pendingEntityRefs = arr
+													root.doUpdateModel()
+												}
 											}
 										}
 									}
 								}
-								
-								ToolButton {
-									id: refRemoveBtn
-									anchors.right: parent.right
-									anchors.verticalCenter: parent.verticalCenter
-									iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
-									decorator: 	Component {
-										ToolButtonDecorator {
-											color: "transparent"
-											icon.width: Style.iconSizeXS
+
+								// Entity type picker + Link button
+								Row {
+									width: parent.width
+									spacing: Style.spacingS
+
+									Column {
+										width: Math.min(200, parent.width * 0.4)
+										spacing: Style.spacingXS
+
+										Text {
+											text: qsTr("Entity Type")
+											font.pixelSize: Style.fontSizeS
+											color: editView.labelColor
+											opacity: 0.6
+										}
+
+										ComboBox {
+											id: refTypeCB
+											width: parent.width
+											height: Style.buttonHeightM
+											model: entityTypeModel
 										}
 									}
-									onClicked: {
-										var arr = root.pendingEntityRefs.slice()
-										console.log("arr1", arr)
-										arr.splice(index, 1)
-										
-										root.pendingEntityRefs = arr
-										console.log("arr2", arr)
-										root.doUpdateModel()
+
+									Rectangle {
+										width: addRefBtnContent.contentWidth + Style.marginM * 2
+										height: Style.buttonHeightM
+										radius: Style.radiusL
+										anchors.bottom: parent.bottom
+										color: addRefBtnMa.pressed
+											   ? Qt.darker(editView.accentColor, 1.15)
+											   : addRefBtnMa.containsMouse
+												 ? Qt.lighter(editView.accentColor, 1.1)
+												 : editView.accentColor
+
+										Text {
+											id: addRefBtnContent
+											anchors.centerIn: parent
+											text: "🔗 " + qsTr("Link entity")
+											font.pixelSize: Style.fontSizeM
+											font.family: Style.fontFamily
+											color: Style.baseColor
+										}
+
+										MouseArea {
+											id: addRefBtnMa
+											anchors.fill: parent
+											hoverEnabled: true
+											cursorShape: Qt.PointingHandCursor
+											onClicked: {
+												if (!refTypeCB.model || refTypeCB.currentIndex < 0) return
+												var typeId = refTypeCB.model.getData("id", refTypeCB.currentIndex)
+												if (!typeId || typeId.length === 0) return
+												entityRefDialogLoader.entityTypeId = typeId
+												entityRefDialogLoader.entityTypeName = refTypeCB.model.getData("name", refTypeCB.currentIndex)
+												ModalDialogManager.openDialog(entityRefDialogComp)
+											}
+										}
+									}
+								}
+
+								// Dialog helpers
+								QtObject {
+									id: entityRefDialogLoader
+									property string entityTypeId: ""
+									property string entityTypeName: ""
+								}
+
+								Component {
+									id: entityRefDialogComp
+									RemoteCollectionViewDialog {
+										id: entityRefDialog
+										title: qsTr("Select") + " " + entityRefDialogLoader.entityTypeName
+										collectionId: entityRefDialogLoader.entityTypeId
+
+										Component.onCompleted: {
+											addButton(Enums.apply, qsTr("Attach"), false)
+											addButton(Enums.cancel, qsTr("Cancel"), true)
+										}
+
+										onCollectionViewChanged: {
+											if (collectionView) {
+												collectionView.selectionChanged.connect(function(ids) {
+													entityRefDialog.setButtonEnabled(Enums.apply, ids.length > 0)
+												})
+											}
+										}
+
+										onFinished: {
+											if (buttonId === Enums.apply && collectionView) {
+												var arr = root.pendingEntityRefs.slice()
+												var mdl = collectionView.table.elements
+												let indexes = collectionView.table.getSelectedIndexes()
+												for (var i = 0; i < indexes.length; i++) {
+													let idx = indexes[i]
+													var displayName = mdl.getData("name", idx)
+													var typeId = mdl.getData("typeId", idx)
+													var elementId = mdl.getData("id", idx)
+													var linkPath = entityRefDialogLoader.entityTypeId
+													if (typeId) linkPath += "/" + typeId
+													linkPath += "/" + elementId
+													arr.push({
+														entityType: entityRefDialogLoader.entityTypeId,
+														entityId: elementId,
+														displayName: displayName,
+														entityLinkPath: linkPath,
+														typeId: typeId
+													})
+												}
+												root.pendingEntityRefs = arr
+												root.doUpdateModel()
+											}
+										}
 									}
 								}
 							}
 						}
 					}
-					
-					// Entity type selection + "Link entity" button row
-					Row {
+
+					// ========================================
+					// CARD 2 — Properties / Metadata
+					// ========================================
+					Rectangle {
+						id: propertiesCard
 						width: parent.width
-						spacing: Style.spacingS
-						
+						height: propsCardCol.height + editView.cardPadding * 2
+						radius: editView.cardRadius
+						color: editView.cardColor
+						border.color: editView.cardBorderColor
+						border.width: 1
+
 						Column {
-							width: Math.min(200, parent.width * 0.4)
-							spacing: Style.spacingXS
-							
+							id: propsCardCol
+							x: editView.cardPadding
+							y: editView.cardPadding
+							width: parent.width - editView.cardPadding * 2
+							spacing: Style.spacingL
+
 							Text {
-								text: qsTr("Entity Type")
+								text: qsTr("PROPERTIES")
 								font.pixelSize: Style.fontSizeS
-								color: Style.textColor
+								font.bold: true
+								color: editView.labelColor
+								opacity: 0.6
 							}
-							
-							ComboBox {
-								id: refTypeCB
+
+							Rectangle { width: parent.width; height: 2; color: editView.accentColor; opacity: 0.15 }
+
+							// Row 1: Type + Priority
+							Row {
 								width: parent.width
-								height: Style.buttonHeightM
-								model: entityTypeModel
-							}
-						}
-						
-						Rectangle {
-							width: addRefBtnContent.contentWidth + Style.marginM * 2
-							height: Style.buttonHeightM
-							radius: Style.buttonRadius
-							anchors.bottom: parent.bottom
-							color: addRefBtnMa.pressed
-								   ? Qt.darker(Style.borderColor, 1.1)
-								   : addRefBtnMa.containsMouse
-									 ? Qt.lighter(Style.borderColor, 1.1)
-									 : Style.baseColor
-							border.color: Style.borderColor
-							border.width: 1
-							
-							Text {
-								id: addRefBtnContent
-								anchors.centerIn: parent
-								text: "🔗 " + qsTr("Link entity")
-								font.pixelSize: Style.fontSizeM
-								font.family: Style.fontFamily
-								color: Style.textColor
-							}
-							
-							MouseArea {
-								id: addRefBtnMa
-								anchors.fill: parent
-								hoverEnabled: true
-								cursorShape: Qt.PointingHandCursor
-								onClicked: {
-									if (!refTypeCB.model || refTypeCB.currentIndex < 0) return
-									var typeId = refTypeCB.model.getData("id", refTypeCB.currentIndex)
-									if (!typeId || typeId.length === 0) return
-									entityRefDialogLoader.entityTypeId = typeId
-									entityRefDialogLoader.entityTypeName = refTypeCB.model.getData("name", refTypeCB.currentIndex)
-									ModalDialogManager.openDialog(entityRefDialogComp)
-								}
-							}
-						}
-					}
-					
-					// Entity reference collection dialog component
-					QtObject {
-						id: entityRefDialogLoader
-						property string entityTypeId: ""
-						property string entityTypeName: ""
-					}
-					
-					Component {
-						id: entityRefDialogComp
-						RemoteCollectionViewDialog {
-							id: entityRefDialog
-							title: qsTr("Select") + " " + entityRefDialogLoader.entityTypeName
-							collectionId: entityRefDialogLoader.entityTypeId
-							
-							Component.onCompleted: {
-								addButton(Enums.apply, qsTr("Attach"), false)
-								addButton(Enums.cancel, qsTr("Cancel"), true)
-							}
-							
-							onCollectionViewChanged: {
-								if (collectionView) {
-									collectionView.selectionChanged.connect(function(ids) {
-										entityRefDialog.setButtonEnabled(Enums.apply, ids.length > 0)
-									})
-								}
-							}
-							
-							onFinished: {
-								if (buttonId === Enums.apply && collectionView) {
-									var arr = root.pendingEntityRefs.slice()
-									var model = collectionView.table.elements
-									let indexes = collectionView.table.getSelectedIndexes()
-									for (var i = 0; i < indexes.length; i++) {
-										let index = indexes[i]
-										// Get display name and typeId from collection if available
-										var displayName = model.getData("name", index)
-										var typeId = model.getData("typeId", index)
-										var elementId = model.getData("id", index)
-	
-										// Build path as collectionId/typeId/entityId
-										var linkPath = entityRefDialogLoader.entityTypeId
-										if (typeId) {
-											linkPath += "/" + typeId
-										}
-										linkPath += "/" + elementId
+								spacing: Style.spacingL
 
-										arr.push({
-													 entityType: entityRefDialogLoader.entityTypeId,
-													 entityId: elementId,
-													 displayName: displayName,
-													 entityLinkPath: linkPath,
-													 typeId: typeId
-												 })
+								Column {
+									width: (parent.width - Style.spacingL) / 2
+									spacing: Style.spacingXS
+
+									Text {
+										text: qsTr("Type")
+										font.pixelSize: Style.fontSizeS
+										color: editView.labelColor
+										opacity: 0.6
 									}
-									root.pendingEntityRefs = arr
-									root.doUpdateModel()
+
+									ComboBox {
+										id: editTypeCB
+										width: parent.width
+										height: Style.buttonHeightM
+										currentIndex: 1
+										model: ticketTypeModel
+										onCurrentIndexChanged: root.doUpdateModel()
+									}
+								}
+
+								Column {
+									width: (parent.width - Style.spacingL) / 2
+									spacing: Style.spacingXS
+
+									Text {
+										text: qsTr("Priority")
+										font.pixelSize: Style.fontSizeS
+										color: editView.labelColor
+										opacity: 0.6
+									}
+
+									ComboBox {
+										id: editPriorityCB
+										width: parent.width
+										height: Style.buttonHeightM
+										currentIndex: 1
+										model: priorityModel
+										onCurrentIndexChanged: root.doUpdateModel()
+									}
 								}
 							}
-						}
-					}
-				}
-				
-				// Assignees
-				Column {
-					width: parent.width
-					spacing: Style.spacingS
-					
-					Text {
-						text: qsTr("Assignees")
-						font.pixelSize: Style.fontSizeM
-						font.bold: true
-						color: Style.textColor
-					}
-					
-					ComboBox {
-						id: editAssigneeCB
-						width: parent.width
-						height: Style.buttonHeightM
-						onCurrentIndexChanged: {
-							root.doUpdateModel()
-						}
-					}
-				}
 
-				// Type
-				Column {
-					width: parent.width
-					spacing: Style.spacingS
-					
-					Text {
-						text: qsTr("Type")
-						font.pixelSize: Style.fontSizeM
-						font.bold: true
-						color: Style.textColor
-					}
-					
-					ComboBox {
-						id: editTypeCB
-						width: parent.width
-						height: Style.buttonHeightM
-						currentIndex: 1
-						model: ticketTypeModel
-						onCurrentIndexChanged: {
-							root.doUpdateModel()
-						}
-					}
-				}
+							// Row 2: Assignees + Reporter
+							Row {
+								width: parent.width
+								spacing: Style.spacingL
 
-				// Priority
-				Column {
-					width: parent.width
-					spacing: Style.spacingS
-					
-					Text {
-						text: qsTr("Priority")
-						font.pixelSize: Style.fontSizeM
-						font.bold: true
-						color: Style.textColor
-					}
-					
-					ComboBox {
-						id: editPriorityCB
-						width: parent.width
-						height: Style.buttonHeightM
-						currentIndex: 1
-						model: priorityModel
-						onCurrentIndexChanged: {
-							root.doUpdateModel()
-						}
-					}
-				}
+								Column {
+									width: editReporterCB.visible
+										   ? (parent.width - Style.spacingL) / 2
+										   : parent.width
+									spacing: Style.spacingXS
 
-				// Reporter (only for existing tickets)
-				Column {
-					visible: !root.isNewIssue
-					width: parent.width
-					spacing: Style.spacingS
-					
-					Text {
-						text: qsTr("Reporter")
-						font.pixelSize: Style.fontSizeM
-						font.bold: true
-						color: Style.textColor
-					}
-					
-					ComboBox {
-						id: editReporterCB
-						width: parent.width
-						height: Style.buttonHeightM
-						onCurrentIndexChanged: {
-							root.doUpdateModel()
-						}
-					}
-				}
+									Text {
+										text: qsTr("Assignees")
+										font.pixelSize: Style.fontSizeS
+										color: editView.labelColor
+										opacity: 0.6
+									}
 
-				// Lock issue (only for existing tickets)
-				Row {
-					visible: !root.isNewIssue
-					width: parent.width
-					spacing: Style.paddingS
-					
-					CheckBox {
-						id: editLockedCB
-						text: qsTr("Lock issue")
-						onCheckStateChanged: {
-							root.doUpdateModel()
-						}
-					}
-				}
-				
-				// Lock reason
-				Column {
-					width: parent.width
-					spacing: Style.spacingS
-					visible: !root.isNewIssue && editLockedCB.checkState === Qt.Checked
-					
-					Text {
-						text: qsTr("Lock Reason")
-						font.pixelSize: Style.fontSizeM
-						font.bold: true
-						color: Style.textColor
-					}
-					
-					CustomTextField {
-						id: editLockReasonInput
-						width: parent.width
-						height: Style.controlHeightM
-						placeHolderText: qsTr("Reason for locking")
-						onEditingFinished: {
-							root.doUpdateModel()
-						}
-					}
-				}
+									ComboBox {
+										id: editAssigneeCB
+										width: parent.width
+										height: Style.buttonHeightM
+										onCurrentIndexChanged: root.doUpdateModel()
+									}
+								}
 
-				// Status (only for existing tickets)
-				Column {
-					visible: !root.isNewIssue
-					width: parent.width
-					spacing: Style.spacingS
-					
-					Text {
-						text: qsTr("Status")
-						font.pixelSize: Style.fontSizeM
-						font.bold: true
-						color: Style.textColor
-					}
-					
-					ComboBox {
-						id: editStatusCB
-						width: parent.width
-						height: Style.buttonHeightM
-						currentIndex: 0
-						model: statusModel
-						onCurrentIndexChanged: {
-							root.doUpdateModel()
-						}
-					}
-				}
-				
-				// State Reason (only for existing tickets)
-				Column {
-					visible: !root.isNewIssue
-					width: parent.width
-					spacing: Style.spacingS
-					
-					Text {
-						text: qsTr("State Reason")
-						font.pixelSize: Style.fontSizeM
-						font.bold: true
-						color: Style.textColor
-					}
-					
-					ComboBox {
-						id: editStateReasonCB
-						width: parent.width
-						height: Style.buttonHeightM
-						currentIndex: 0
-						model: stateReasonModel
-						onCurrentIndexChanged: {
-							root.doUpdateModel()
+								Column {
+									visible: !root.isNewIssue
+									width: (parent.width - Style.spacingL) / 2
+									spacing: Style.spacingXS
+
+									Text {
+										text: qsTr("Reporter")
+										font.pixelSize: Style.fontSizeS
+										color: editView.labelColor
+										opacity: 0.6
+									}
+
+									ComboBox {
+										id: editReporterCB
+										width: parent.width
+										height: Style.buttonHeightM
+										onCurrentIndexChanged: root.doUpdateModel()
+									}
+								}
+							}
+
+							// Row 3: Status + State Reason (existing tickets only)
+							Row {
+								visible: !root.isNewIssue
+								width: parent.width
+								spacing: Style.spacingL
+
+								Column {
+									width: (parent.width - Style.spacingL) / 2
+									spacing: Style.spacingXS
+
+									Text {
+										text: qsTr("Status")
+										font.pixelSize: Style.fontSizeS
+										color: editView.labelColor
+										opacity: 0.6
+									}
+
+									ComboBox {
+										id: editStatusCB
+										width: parent.width
+										height: Style.buttonHeightM
+										currentIndex: 0
+										model: statusModel
+										onCurrentIndexChanged: root.doUpdateModel()
+									}
+								}
+
+								Column {
+									width: (parent.width - Style.spacingL) / 2
+									spacing: Style.spacingXS
+
+									Text {
+										text: qsTr("State Reason")
+										font.pixelSize: Style.fontSizeS
+										color: editView.labelColor
+										opacity: 0.6
+									}
+
+									ComboBox {
+										id: editStateReasonCB
+										width: parent.width
+										height: Style.buttonHeightM
+										currentIndex: 0
+										model: stateReasonModel
+										onCurrentIndexChanged: root.doUpdateModel()
+									}
+								}
+							}
+
+							// Lock section (existing tickets only)
+							Column {
+								visible: !root.isNewIssue
+								width: parent.width
+								spacing: Style.spacingS
+
+								Rectangle { width: parent.width; height: 1; color: editView.cardBorderColor; opacity: 0.5 }
+
+								CheckBox {
+									id: editLockedCB
+									text: qsTr("Lock issue")
+									onCheckStateChanged: root.doUpdateModel()
+								}
+
+								Column {
+									width: parent.width
+									spacing: Style.spacingXS
+									visible: editLockedCB.checkState === Qt.Checked
+
+									Text {
+										text: qsTr("Lock Reason")
+										font.pixelSize: Style.fontSizeS
+										color: editView.labelColor
+										opacity: 0.6
+									}
+
+									CustomTextField {
+										id: editLockReasonInput
+										width: parent.width
+										height: Style.controlHeightM
+										placeHolderText: qsTr("Reason for locking")
+										onEditingFinished: root.doUpdateModel()
+									}
+								}
+							}
 						}
 					}
 				}
 			}
 		}
-		
-		// Separator between details and comments panel
+
+		// ==================== RIGHT COLUMN — Chat ====================
 		Rectangle {
-			id: editSidebarSep
-			visible: !root.isNewIssue
-			anchors.top: parent.top
-			anchors.topMargin: Style.marginXL
-			anchors.bottom: parent.bottom
-			anchors.bottomMargin: Style.marginXL
-			anchors.right: commentsPanel.left
-			anchors.rightMargin: Style.marginXL
-			width: 1
-			color: Style.borderColor
-		}
-		
-		// Right: comments panel
-		Item {
 			id: commentsPanel
 			visible: !root.isNewIssue
 			anchors.top: parent.top
@@ -960,142 +1015,197 @@ DocumentViewBase {
 			anchors.bottomMargin: Style.marginXL
 			anchors.right: parent.right
 			anchors.rightMargin: Style.marginXL
-			width: parent.width * 0.55
-			
+			anchors.left: leftColumn.right
+			anchors.leftMargin: Style.spacingL
+			radius: editView.cardRadius
+			color: editView.cardColor
+			border.color: editView.cardBorderColor
+			border.width: 1
+			clip: true
+
+			// Chat header
+			Rectangle {
+				id: chatHeader
+				anchors.top: parent.top
+				anchors.left: parent.left
+				anchors.right: parent.right
+				height: 52
+				color: editView.cardColor
+				radius: editView.cardRadius
+
+				// Bottom edge square-off
+				Rectangle {
+					anchors.left: parent.left
+					anchors.right: parent.right
+					anchors.bottom: parent.bottom
+					height: editView.cardRadius
+					color: editView.cardColor
+				}
+
+				Row {
+					anchors.verticalCenter: parent.verticalCenter
+					anchors.left: parent.left
+					anchors.leftMargin: editView.cardPadding
+					spacing: Style.spacingS
+
+					Text {
+						text: qsTr("Comments")
+						font.pixelSize: Style.fontSizeL
+						font.bold: true
+						color: Style.textColor
+						anchors.verticalCenter: parent.verticalCenter
+					}
+
+					Rectangle {
+						visible: commentsThread.count > 0
+						width: chatCountLabel.contentWidth + Style.paddingS * 2
+						height: 22
+						radius: 11
+						color: Qt.rgba(editView.accentColor.r, editView.accentColor.g, editView.accentColor.b, 0.12)
+						anchors.verticalCenter: parent.verticalCenter
+
+						Text {
+							id: chatCountLabel
+							anchors.centerIn: parent
+							text: commentsThread.count
+							font.pixelSize: Style.fontSizeS
+							font.bold: true
+							color: editView.accentColor
+						}
+					}
+				}
+
+				// Header bottom border
+				Rectangle {
+					anchors.bottom: parent.bottom
+					anchors.left: parent.left
+					anchors.right: parent.right
+					height: 1
+					color: editView.cardBorderColor
+				}
+			}
+
 			CustomScrollbar {
 				id: commentsScrollV
 				z: parent.z + 1
 				anchors.right: parent.right
+				anchors.rightMargin: 2
 				anchors.top: commentsFlick.top
 				anchors.bottom: commentsFlick.bottom
 				secondSize: Style.marginM
 				targetItem: commentsFlick
 				visible: commentsPanel.visible
 			}
-			
+
 			Flickable {
 				id: commentsFlick
-				anchors.top: parent.top
+				anchors.top: chatHeader.bottom
 				anchors.bottom: addCommentSection.visible ? addCommentSection.top
 							: lockNoticeRow.visible ? lockNoticeRow.top
 							: parent.bottom
-				anchors.bottomMargin: Style.marginM
+				anchors.bottomMargin: Style.spacingS
 				anchors.left: parent.left
 				anchors.right: commentsScrollV.left
-				anchors.rightMargin: Style.marginM
-				contentHeight: commentsMainCol.height + Style.marginXL * 2
+				anchors.rightMargin: Style.spacingS
+				anchors.leftMargin: editView.cardPadding
+				contentHeight: commentsMainCol.height + Style.spacingL
 				boundsBehavior: Flickable.StopAtBounds
 				clip: true
-				
+
 				Column {
 					id: commentsMainCol
 					width: parent.width
-					spacing: Style.marginM
-					
-					Row {
-						width: parent.width
-						spacing: Style.spacingS
-						
-						Text {
-							text: qsTr("Comments")
-							font.pixelSize: Style.fontSizeL
-							font.bold: true
-							color: Style.textColor
-							anchors.verticalCenter: parent.verticalCenter
-						}
-						
-						Text {
-							text: commentsThread.count > 0
-								  ? "(" + commentsThread.count + ")"
-								  : ""
-							font.pixelSize: Style.fontSizeM
-							color: Style.textColor
-							anchors.verticalCenter: parent.verticalCenter
-						}
-					}
-					
+					spacing: Style.spacingL
+					topPadding: Style.spacingL
+
 					Column {
 						id: commentsListCol
 						width: parent.width
 						spacing: Style.spacingL
-						
+
 						Repeater {
 							id: commentsThread
 							model: root.ticketData ? root.ticketData.m_comments : 0
-							
+
 							delegate: Item {
 								id: commentDelegate
 								width: commentsListCol.width
 								height: commentBubbleCol.height
-								
+
 								readonly property bool isMe: model.item.m_userId === root.currentUserId
 								readonly property var dataModel: model.item
-								
+
 								Column {
 									id: commentBubbleCol
-									width: parent.width * 0.75
+									width: parent.width * 0.82
 									anchors.right: commentDelegate.isMe ? parent.right : undefined
 									anchors.left: commentDelegate.isMe ? undefined : parent.left
 									spacing: Style.spacingXS
-									
-									// Header: sender name + timestamp
+
+									// Avatar + Name + Timestamp
 									Row {
-										spacing: Style.paddingS
+										spacing: Style.spacingS
 										anchors.right: commentDelegate.isMe ? parent.right : undefined
 										anchors.left: commentDelegate.isMe ? undefined : parent.left
 										layoutDirection: commentDelegate.isMe ? Qt.RightToLeft : Qt.LeftToRight
-										
-										// Avatar circle
+
 										Rectangle {
-											width: 32
-											height: width
-											radius: width / 2
-											color: Style.baseColor
-											
+											width: 34
+											height: 34
+											radius: 17
+											color: commentDelegate.isMe
+												   ? editView.accentColor
+												   : Style.borderColor
+
 											Text {
 												anchors.centerIn: parent
 												text: model.item.m_userName ? model.item.m_userName.charAt(0).toUpperCase() : "?"
 												font.pixelSize: Style.fontSizeS
 												font.bold: true
-												color: Style.textColor
+												color: commentDelegate.isMe ? Style.baseColor : Style.textColor
 												font.family: Style.fontFamily
 											}
 										}
-										
-										Text {
-											text: model.item.m_userName || qsTr("Unknown")
-											font.pixelSize: Style.fontSizeM
-											font.bold: true
-											color: Style.textColor
+
+										Column {
 											anchors.verticalCenter: parent.verticalCenter
-										}
-										
-										Text {
-											text: root.formatTimestamp(model.item.m_timestamp)
-											font.pixelSize: Style.fontSizeS
-											color: Style.textColor
-											anchors.verticalCenter: parent.verticalCenter
+											spacing: 1
+
+											Text {
+												text: commentDelegate.isMe ? qsTr("You") : (model.item.m_userName || qsTr("Unknown"))
+												font.pixelSize: Style.fontSizeM
+												font.bold: true
+												color: Style.textColor
+											}
+
+											Text {
+												text: root.formatTimestamp(model.item.m_timestamp)
+												font.pixelSize: Style.fontSizeS - 1
+												color: Style.inactiveTextColor
+											}
 										}
 									}
-									
-									// Comment body bubble
+
+									// Chat bubble
 									Rectangle {
 										width: commentBubbleCol.width
 										height: bubbleContent.height + Style.paddingM * 2
-										radius: Style.radiusS
-										color: Style.baseColor
-										border.color: Style.borderColor
+										radius: Style.radiusL
+										color: commentDelegate.isMe
+											   ? Qt.rgba(editView.accentColor.r, editView.accentColor.g, editView.accentColor.b, 0.08)
+											   : editView.pageBgColor
+										border.color: commentDelegate.isMe
+											   ? Qt.rgba(editView.accentColor.r, editView.accentColor.g, editView.accentColor.b, 0.2)
+											   : editView.cardBorderColor
 										border.width: 1
-										anchors.right: commentDelegate.isMe ? parent.right : undefined
-										anchors.left: commentDelegate.isMe ? undefined : parent.left
-										
+
 										Column {
 											id: bubbleContent
 											x: Style.paddingM
 											y: Style.paddingM
 											width: parent.width - Style.paddingM * 2
 											spacing: Style.spacingS
-											
+
 											Text {
 												id: commentBodyText
 												width: parent.width
@@ -1105,41 +1215,49 @@ DocumentViewBase {
 												color: Style.textColor
 												wrapMode: Text.Wrap
 												visible: text.length > 0
+												lineHeight: 1.4
 											}
-											
-											// Attachment file links
+
+											// Attachment cards
 											Repeater {
 												model: commentDelegate.dataModel.m_attachments || []
-												delegate: Row {
-													height: Style.controlHeightS
-													spacing: Style.spacingS
-													Image {
-														anchors.verticalCenter: parent.verticalCenter
-														width: Style.iconSizeS
-														height: width
-														source: Style.getIconPath("Icons/Attachment", Icon.State.On, Icon.Mode.Normal)
-														sourceSize.width: width
-														sourceSize.height: height
-													}
+												delegate: Rectangle {
+													width: attRow.width + Style.paddingM * 2
+													height: attRow.height + Style.paddingS * 2
+													radius: Style.radiusM
+													color: Style.baseColor
+													border.color: editView.cardBorderColor
+													border.width: 1
 
-													Text {
+													Row {
+														id: attRow
+														x: Style.paddingM
 														anchors.verticalCenter: parent.verticalCenter
-														width: bubbleContent.width
-														text: model.item.m_fileName
-														textFormat: Text.StyledText
-														font.pixelSize: Style.fontSizeS
-														color: Style.linkColor
-														wrapMode: Text.Wrap
-														font.underline: true
+														spacing: Style.spacingS
+
+														Image {
+															anchors.verticalCenter: parent.verticalCenter
+															width: Style.iconSizeS
+															height: width
+															source: Style.getIconPath("Icons/Attachment", Icon.State.On, Icon.Mode.Normal)
+															sourceSize.width: width
+															sourceSize.height: height
+														}
+
+														Text {
+															anchors.verticalCenter: parent.verticalCenter
+															text: model.item.m_fileName
+															font.pixelSize: Style.fontSizeS
+															color: Style.linkColor
+															font.underline: true
+														}
 													}
 
 													MouseArea {
 														anchors.fill: parent
 														hoverEnabled: true
 														cursorShape: Qt.PointingHandCursor
-														onClicked: {
-															Qt.openUrlExternally(model.item.m_preview)
-														}
+														onClicked: Qt.openUrlExternally(model.item.m_preview)
 													}
 												}
 											}
@@ -1151,191 +1269,205 @@ DocumentViewBase {
 					}
 				}
 			}
-			
-			// --- Fixed bottom: "Add comment" input ---
-			Column {
+
+			// ---- Fixed bottom: Add comment input ----
+			Rectangle {
 				id: addCommentSection
 				visible: !root.ticketData || !root.ticketData.m_locked
 				anchors.bottom: parent.bottom
 				anchors.left: parent.left
-				anchors.right: commentsScrollV.left
-				anchors.rightMargin: Style.marginM
-				spacing: Style.spacingS
+				anchors.right: parent.right
+				height: addCommentInnerCol.height + editView.cardPadding * 2
+				color: editView.cardColor
+				radius: editView.cardRadius
 
-				Row {
-					width: parent.width
-					spacing: Style.paddingS
-					
+				// Square-off top edge
+				Rectangle {
+					anchors.left: parent.left
+					anchors.right: parent.right
+					anchors.top: parent.top
+					height: editView.cardRadius
+					color: editView.cardColor
+				}
+
+				// Top border
+				Rectangle {
+					anchors.top: parent.top
+					anchors.left: parent.left
+					anchors.right: parent.right
+					height: 1
+					color: editView.cardBorderColor
+				}
+
+				Column {
+					id: addCommentInnerCol
+					anchors.left: parent.left
+					anchors.right: parent.right
+					anchors.bottom: parent.bottom
+					anchors.margins: editView.cardPadding
+					spacing: Style.spacingS
+
+					// Comment input with rounded border
 					Rectangle {
-						width: 32
-						height: 32
-						radius: 16
-						color: Style.baseColor
-						anchors.top: parent.top
-						
-						Text {
-							anchors.centerIn: parent
-							text: qsTr("You")
+						width: parent.width
+						height: commentInputField.height + Style.paddingM * 2
+						radius: Style.radiusL
+						border.color: commentInputField.activeFocus ? editView.accentColor : editView.cardBorderColor
+						border.width: commentInputField.activeFocus ? 2 : 1
+						color: editView.pageBgColor
+
+						TextEdit {
+							id: commentInputField
+							anchors.left: parent.left
+							anchors.right: parent.right
+							anchors.top: parent.top
+							anchors.margins: Style.paddingM
+							height: 50
 							font.pixelSize: Style.fontSizeM
 							color: Style.textColor
-							font.bold: true
+							wrapMode: TextEdit.Wrap
+							clip: true
+
+							Text {
+								anchors.fill: parent
+								text: qsTr("Write a comment...")
+								color: Style.textPlaceholderColor
+								font.pixelSize: Style.fontSizeM
+								visible: commentInputField.text.length === 0
+							}
 						}
 					}
-					
-					Column {
-						width: parent.width - 32 - Style.paddingS
+
+					// Pending attachments
+					Flow {
+						width: parent.width
 						spacing: Style.spacingS
-						
-						Rectangle {
-							width: parent.width
-							height: commentInputField.height + Style.paddingM * 2
-							radius: Style.radiusS
-							border.color: commentInputField.activeFocus
-										  ? Style.imaginToolsAccentColor
-										  : Style.borderColor
-							border.width: 1
-							color: Style.baseColor
-							
-							TextEdit {
-								id: commentInputField
-								anchors.left: parent.left
-								anchors.right: parent.right
-								anchors.top: parent.top
-								anchors.margins: Style.paddingM
-								height: 60
-								font.pixelSize: Style.fontSizeM
-								color: Style.textColor
-								wrapMode: TextEdit.Wrap
-								clip: true
-								
-								Text {
-									anchors.fill: parent
-									text: qsTr("Leave a comment")
-									color: Style.textPlaceholderColor
-									font.pixelSize: Style.fontSizeM
-									visible: commentInputField.text.length === 0
-								}
-							}
-						}
-						
-						// Pending attachments preview
-						Flow {
-							width: parent.width
-							spacing: Style.spacingS
-							visible: root.pendingAttachments.length > 0 || root.uploadsInProgress > 0
-							
-							Repeater {
-								model: root.pendingAttachments
-								delegate: Rectangle {
-									readonly property real maxPillWidth: 250
-									width: Math.min(pendingFileLabel.contentWidth + pendingRemoveBtn.width + Style.paddingM * 3, maxPillWidth)
-									height: Style.buttonHeightS
-									radius: Style.radiusS
-									border.color: Style.borderColor
-									border.width: 1
-									color: Style.baseColor
-				
-									Text {
-										id: pendingFileLabel
-										anchors.left: parent.left
-										anchors.leftMargin: Style.paddingM
-										anchors.right: pendingRemoveBtn.left
-										anchors.rightMargin: Style.paddingS
-										anchors.verticalCenter: parent.verticalCenter
-										text: "📎 " + (modelData.fileName || qsTr("attachment"))
-										font.pixelSize: Style.fontSizeS
-										color: Style.textColor
-										elide: Text.ElideMiddle
-										maximumLineCount: 1
-									}
-				
-									ToolButton {
-										id: pendingRemoveBtn
-										anchors.right: parent.right
-										anchors.verticalCenter: parent.verticalCenter
-										iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
-										decorator: 	Component {
-											ToolButtonDecorator {
-												color: "transparent"
-												icon.width: Style.iconSizeXS
-											}
-										}
-										onClicked: {
-											var removed = root.pendingAttachments[index]
-											var arr = root.pendingAttachments.slice()
-											arr.splice(index, 1)
-											root.pendingAttachments = arr
-											// Delete the uploaded file from the server
-											if (removed && removed.id) {
-												var xhr = new XMLHttpRequest()
-												xhr.open("DELETE", "../../files/" + encodeURIComponent(removed.id))
-												xhr.onreadystatechange = function() {
-													if (xhr.readyState === XMLHttpRequest.DONE && xhr.status !== 200) {
-														console.warn("Failed to delete attachment from server:", xhr.status, xhr.responseText)
-													}
-												}
-												xhr.send()
-											}
-										}
-									}
-								}
-							}
-							
-							// Upload in progress indicator
-							Rectangle {
-								width: uploadingLabel.contentWidth + Style.paddingM * 2
-								height: Style.buttonHeightS
-								radius: Style.radiusS
-								border.color: Style.borderColor
+						visible: root.pendingAttachments.length > 0 || root.uploadsInProgress > 0
+
+						Repeater {
+							model: root.pendingAttachments
+							delegate: Rectangle {
+								readonly property real maxPillWidth: 220
+								width: Math.min(pendingFileLabel.contentWidth + pendingRemoveBtn.width + Style.paddingM * 3, maxPillWidth)
+								height: 28
+								radius: 14
+								border.color: editView.cardBorderColor
 								border.width: 1
-								color: Style.baseColor
-								visible: root.uploadsInProgress > 0
-								
+								color: editView.pageBgColor
+
 								Text {
-									id: uploadingLabel
-									anchors.centerIn: parent
-									text: "⏳ " + qsTr("Uploading...")
+									id: pendingFileLabel
+									anchors.left: parent.left
+									anchors.leftMargin: Style.paddingM
+									anchors.right: pendingRemoveBtn.left
+									anchors.rightMargin: Style.paddingS
+									anchors.verticalCenter: parent.verticalCenter
+									text: "📎 " + (modelData.fileName || qsTr("attachment"))
 									font.pixelSize: Style.fontSizeS
 									color: Style.textColor
+									elide: Text.ElideMiddle
+									maximumLineCount: 1
+								}
+
+								ToolButton {
+									id: pendingRemoveBtn
+									anchors.right: parent.right
+									anchors.verticalCenter: parent.verticalCenter
+									iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+									decorator: Component {
+										ToolButtonDecorator {
+											color: "transparent"
+											icon.width: Style.iconSizeXS
+										}
+									}
+									onClicked: {
+										var removed = root.pendingAttachments[index]
+										var arr = root.pendingAttachments.slice()
+										arr.splice(index, 1)
+										root.pendingAttachments = arr
+										if (removed && removed.id) {
+											var xhr = new XMLHttpRequest()
+											xhr.open("DELETE", "../../files/" + encodeURIComponent(removed.id))
+											xhr.onreadystatechange = function() {
+												if (xhr.readyState === XMLHttpRequest.DONE && xhr.status !== 200) {
+													console.warn("Failed to delete attachment from server:", xhr.status, xhr.responseText)
+												}
+											}
+											xhr.send()
+										}
+									}
 								}
 							}
 						}
-						
-						Row {
-							anchors.right: parent.right
-							spacing: Style.spacingS
-				
-							ToolButton {
-								id: attachButton
-								tooltipText: qsTr("Attach file")
-								iconSource: Style.getIconPath("Icons/Attachment", Icon.State.On, Icon.Mode.Normal)
-								decorator: 	Component {
-									ToolButtonDecorator {
-										color: "transparent"
-									}
-								}
-				
-								onClicked: {
-									attachImageDialog.open()
-								}
+
+						// Upload spinner
+						Rectangle {
+							width: uploadingLabel.contentWidth + Style.paddingM * 2
+							height: 28
+							radius: 14
+							border.color: editView.cardBorderColor
+							border.width: 1
+							color: editView.pageBgColor
+							visible: root.uploadsInProgress > 0
+
+							Text {
+								id: uploadingLabel
+								anchors.centerIn: parent
+								text: "⏳ " + qsTr("Uploading...")
+								font.pixelSize: Style.fontSizeS
+								color: Style.textColor
 							}
-							
+						}
+					}
+
+					// Action row: attach + send
+					Row {
+						anchors.right: parent.right
+						spacing: Style.spacingS
+
+						ToolButton {
+							id: attachButton
+							tooltipText: qsTr("Attach file")
+							iconSource: Style.getIconPath("Icons/Attachment", Icon.State.On, Icon.Mode.Normal)
+							decorator: Component {
+								ToolButtonDecorator { color: "transparent" }
+							}
+							onClicked: attachImageDialog.open()
+						}
+
+						Rectangle {
+							width: sendBtnText.contentWidth + Style.marginXL * 2
+							height: Style.buttonHeightM
+							radius: Style.radiusL
+							color: commentButton.enabled
+								   ? (sendBtnMa.pressed ? Qt.darker(editView.accentColor, 1.15)
+									  : sendBtnMa.containsMouse ? Qt.lighter(editView.accentColor, 1.1)
+									  : editView.accentColor)
+								   : Style.buttonColor
+
+							Text {
+								id: sendBtnText
+								anchors.centerIn: parent
+								text: qsTr("Send")
+								font.pixelSize: Style.fontSizeM
+								font.bold: true
+								color: commentButton.enabled ? Style.baseColor : Style.inactiveTextColor
+							}
+
+							// Hidden functional Button for enabled state
 							Button {
 								id: commentButton
-								text: qsTr("Comment")
+								visible: false
 								enabled: commentInputField.text !== ""
-								decorator: 	Component {
-									ButtonDecorator {
-										color: commentButton.enabled ? Style.imaginToolsAccentColor : Style.buttonColor
-										textColor: commentButton.enabled ? Style.baseColor : Style.inactiveTextColor
-										opacity: commentButton.hovered ? 0.85 : 1
-										border.width: 0
-									}
-								}
-				
+							}
+
+							MouseArea {
+								id: sendBtnMa
+								anchors.fill: parent
+								hoverEnabled: true
+								cursorShape: commentButton.enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
 								onClicked: {
-									if (root.uploadsInProgress > 0)
-										return
+									if (!commentButton.enabled || root.uploadsInProgress > 0) return
 									root.addComment(commentInputField.text.trim(), root.pendingAttachments.slice())
 									commentInputField.text = ""
 									root.pendingAttachments = []
@@ -1344,32 +1476,28 @@ DocumentViewBase {
 						}
 					}
 				}
-				
-				// File dialog for image attachments
+
+				// File dialog
 				FileDialog {
 					id: attachImageDialog
 					title: qsTr("Attach image")
 					fileMode: FileDialog.OpenFile
 					nameFilters: [qsTr("Image files") + " (*.png *.jpg *.jpeg *.gif *.bmp *.svg *.webp)"]
-					
+
 					onAccepted: {
 						if (Qt.platform.os === "web") {
-							// Web: file is a JS File object — upload binary data via HTTP POST
 							var fileObj = attachImageDialog.file
 							var fileName = fileObj.name || "attachment"
-							// Read as dataURL for local preview while upload is in progress
 							var previewReader = new FileReader()
 							previewReader.readAsDataURL(fileObj)
 							previewReader.onload = function() {
 								root.uploadAttachment(fileObj, fileName, previewReader.result)
 							}
 							previewReader.onerror = function() {
-								// Upload without local preview
 								console.warn("Failed to generate preview for: " + fileName)
 								root.uploadAttachment(fileObj, fileName, "")
 							}
 						} else {
-							// Native: read file via FileIO and upload via HTTP POST
 							var filePath = String(attachImageDialog.file)
 							var parts = filePath.replace("file:///", "").split("/")
 							var nativeFileName = parts.length > 0 ? parts[parts.length - 1] : "attachment"
@@ -1377,30 +1505,32 @@ DocumentViewBase {
 						}
 					}
 				}
-				
+
 				FileIO {
 					id: attachmentFileIO
 				}
 			}
-			
-			// Lock notice (fixed at bottom when ticket is locked)
+
+			// Lock notice
 			Row {
 				id: lockNoticeRow
 				visible: root.ticketData && root.ticketData.m_locked
 				anchors.bottom: parent.bottom
+				anchors.bottomMargin: Style.paddingM
 				anchors.left: parent.left
-				width: parent.width
+				anchors.leftMargin: editView.cardPadding
+				width: parent.width - editView.cardPadding * 2
 				spacing: Style.paddingS
-				
+
 				Text {
 					text: "🔒"
 					font.pixelSize: Style.fontSizeM
 				}
-				
+
 				Text {
 					text: qsTr("This conversation has been locked. Only collaborators can comment.")
 					font.pixelSize: Style.fontSizeS
-					color: Style.textColor
+					color: Style.inactiveTextColor
 					wrapMode: Text.Wrap
 					width: parent.width - Style.fontSizeM - Style.paddingS
 				}
