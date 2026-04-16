@@ -414,8 +414,8 @@ DocumentViewBase {
 		readonly property real avatarSize: 34
 		readonly property real accentDividerHeight: 2
 		readonly property real badgeHeight: 22
-		readonly property string accentBgLight: Qt.rgba(accentColor.r, accentColor.g, accentColor.b, 0.08)
-		readonly property string accentBorderLight: Qt.rgba(accentColor.r, accentColor.g, accentColor.b, 0.2)
+		readonly property string accentBgLight: Qt.rgba(accentColor.r, accentColor.g, accentColor.b, 0.15)
+		readonly property string accentBorderLight: Qt.rgba(accentColor.r, accentColor.g, accentColor.b, 0.35)
 		readonly property string accentBadgeBg: Qt.rgba(accentColor.r, accentColor.g, accentColor.b, 0.12)
 
 		// Page background
@@ -428,9 +428,12 @@ DocumentViewBase {
 		Item {
 			id: leftColumn
 			anchors.top: parent.top
+			anchors.topMargin: Style.marginXL
 			anchors.bottom: parent.bottom
+			anchors.bottomMargin: Style.marginXL
 			anchors.left: parent.left
-			width: root.isNewIssue ? parent.width : parent.width * 0.45
+			anchors.leftMargin: Style.marginXL
+			width: root.isNewIssue ? parent.width - Style.marginXL * 2 : parent.width * 0.45 - Style.marginXL
 
 			CustomScrollbar {
 				id: editScrollV
@@ -450,9 +453,8 @@ DocumentViewBase {
 				anchors.bottom: parent.bottom
 				anchors.left: parent.left
 				anchors.right: editScrollV.left
-				anchors.margins: Style.marginXL
 				anchors.rightMargin: Style.spacingS
-				contentHeight: leftStack.height + Style.marginXL
+				contentHeight: leftStack.height + Style.spacingL
 				boundsBehavior: Flickable.StopAtBounds
 				clip: true
 
@@ -1021,7 +1023,7 @@ DocumentViewBase {
 			anchors.right: parent.right
 			anchors.rightMargin: Style.marginXL
 			anchors.left: leftColumn.right
-			anchors.leftMargin: Style.spacingL
+			anchors.leftMargin: Style.marginXL
 			radius: editView.cardRadius
 			color: editView.cardColor
 			border.color: editView.cardBorderColor
