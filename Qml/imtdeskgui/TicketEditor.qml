@@ -1040,7 +1040,6 @@ DocumentViewBase {
 									ToolButton {
 										id: pendingRemoveBtn
 										anchors.right: parent.right
-										// anchors.rightMargin: Style.paddingM
 										anchors.verticalCenter: parent.verticalCenter
 										iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
 										decorator: 	Component {
