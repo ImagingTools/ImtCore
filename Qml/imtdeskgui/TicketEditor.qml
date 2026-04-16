@@ -411,7 +411,12 @@ DocumentViewBase {
 		readonly property color pageBgColor: Style.backgroundColor2
 		readonly property color accentColor: Style.imaginToolsAccentColor
 		readonly property color labelColor: Style.textColor
-		readonly property real fieldColWidth: function(pw) { return (pw - Style.spacingL) / 2 }
+		readonly property real avatarSize: 34
+		readonly property real accentDividerHeight: 2
+		readonly property real badgeHeight: 22
+		readonly property color accentBgLight: Qt.rgba(accentColor.r, accentColor.g, accentColor.b, 0.08)
+		readonly property color accentBorderLight: Qt.rgba(accentColor.r, accentColor.g, accentColor.b, 0.2)
+		readonly property color accentBadgeBg: Qt.rgba(accentColor.r, accentColor.g, accentColor.b, 0.12)
 
 		// Page background
 		Rectangle {
@@ -503,7 +508,7 @@ DocumentViewBase {
 							}
 
 							// Accent divider
-							Rectangle { width: parent.width; height: 2; color: editView.accentColor; opacity: 0.15 }
+							Rectangle { width: parent.width; height: editView.accentDividerHeight; color: editView.accentColor; opacity: 0.15 }
 
 							// ---------- Title ----------
 							Column {
@@ -593,8 +598,8 @@ DocumentViewBase {
 									Rectangle {
 										visible: root.pendingEntityRefs.length > 0
 										width: refCountLabel.contentWidth + Style.paddingS * 2
-										height: 20
-										radius: 10
+										height: editView.badgeHeight - 2
+										radius: (editView.badgeHeight - 2) / 2
 										color: editView.accentColor
 										anchors.verticalCenter: parent.verticalCenter
 
@@ -622,8 +627,8 @@ DocumentViewBase {
 											width: Math.min(refLabelText.contentWidth + refRemoveBtn.width + Style.paddingS * 3, maxRefWidth)
 											height: 30
 											radius: 15
-											color: Qt.rgba(editView.accentColor.r, editView.accentColor.g, editView.accentColor.b, 0.08)
-											border.color: Qt.rgba(editView.accentColor.r, editView.accentColor.g, editView.accentColor.b, 0.25)
+											color: editView.accentBgLight
+											border.color: editView.accentBorderLight
 											border.width: 1
 
 											Text {
@@ -818,7 +823,7 @@ DocumentViewBase {
 								opacity: 0.6
 							}
 
-							Rectangle { width: parent.width; height: 2; color: editView.accentColor; opacity: 0.15 }
+							Rectangle { width: parent.width; height: editView.accentDividerHeight; color: editView.accentColor; opacity: 0.15 }
 
 							// Row 1: Type + Priority
 							Row {
@@ -1059,9 +1064,9 @@ DocumentViewBase {
 					Rectangle {
 						visible: commentsThread.count > 0
 						width: chatCountLabel.contentWidth + Style.paddingS * 2
-						height: 22
-						radius: 11
-						color: Qt.rgba(editView.accentColor.r, editView.accentColor.g, editView.accentColor.b, 0.12)
+						height: editView.badgeHeight
+						radius: editView.badgeHeight / 2
+						color: editView.accentBadgeBg
 						anchors.verticalCenter: parent.verticalCenter
 
 						Text {
@@ -1150,9 +1155,9 @@ DocumentViewBase {
 										layoutDirection: commentDelegate.isMe ? Qt.RightToLeft : Qt.LeftToRight
 
 										Rectangle {
-											width: 34
-											height: 34
-											radius: 17
+											width: editView.avatarSize
+											height: editView.avatarSize
+											radius: editView.avatarSize / 2
 											color: commentDelegate.isMe
 												   ? editView.accentColor
 												   : Style.borderColor
@@ -1192,10 +1197,10 @@ DocumentViewBase {
 										height: bubbleContent.height + Style.paddingM * 2
 										radius: Style.radiusL
 										color: commentDelegate.isMe
-											   ? Qt.rgba(editView.accentColor.r, editView.accentColor.g, editView.accentColor.b, 0.08)
+											   ? editView.accentBgLight
 											   : editView.pageBgColor
 										border.color: commentDelegate.isMe
-											   ? Qt.rgba(editView.accentColor.r, editView.accentColor.g, editView.accentColor.b, 0.2)
+											   ? editView.accentBorderLight
 											   : editView.cardBorderColor
 										border.width: 1
 
