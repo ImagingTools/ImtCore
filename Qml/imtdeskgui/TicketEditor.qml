@@ -1023,7 +1023,7 @@ DocumentViewBase {
 			anchors.right: parent.right
 			anchors.rightMargin: Style.marginXL
 			anchors.left: leftColumn.right
-			anchors.leftMargin: Style.marginXL
+			anchors.leftMargin: Style.spacingL
 			radius: editView.cardRadius
 			color: editView.cardColor
 			border.color: editView.cardBorderColor
