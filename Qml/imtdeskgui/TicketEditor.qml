@@ -743,7 +743,7 @@ DocumentViewBase {
 												entityType: entityRefDialogLoader.entityTypeId,
 												entityId: selectedIds[i],
 												displayName: displayName,
-												entityLinkPath: entityRefDialogLoader.entityTypeId + "/" + entityRefDialogLoader.entityTypeId + "/" + selectedIds[i]
+												entityLinkPath: entityRefDialogLoader.entityTypeId + "/" + selectedIds[i]
 											})
 										}
 									}
