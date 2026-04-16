@@ -554,7 +554,7 @@ DocumentViewBase {
 									radius: Style.radiusM
 									border.color: editDescriptionInput.activeFocus ? editView.accentColor : editView.cardBorderColor
 									border.width: editDescriptionInput.activeFocus ? 2 : 1
-									color: editView.pageBgColor
+									color: editView.cardColor
 
 									TextEdit {
 										id: editDescriptionInput
@@ -564,7 +564,7 @@ DocumentViewBase {
 										anchors.margins: Style.paddingM
 										font.pixelSize: Style.fontSizeM
 										color: Style.textColor
-										height: 120
+										height: 100
 										wrapMode: TextEdit.Wrap
 										clip: true
 										onEditingFinished: root.doUpdateModel()
@@ -574,7 +574,7 @@ DocumentViewBase {
 										Text {
 											anchors.fill: parent
 											text: qsTr("Describe the issue in detail...")
-											color: Style.textPlaceholderColor
+											color: Style.inactiveTextColor
 											font.pixelSize: Style.fontSizeM
 											visible: editDescriptionInput.text.length === 0
 										}
@@ -1351,7 +1351,7 @@ DocumentViewBase {
 						radius: Style.radiusL
 						border.color: commentInputField.activeFocus ? editView.accentColor : editView.cardBorderColor
 						border.width: commentInputField.activeFocus ? 2 : 1
-						color: editView.pageBgColor
+						color: editView.cardColor
 
 						TextEdit {
 							id: commentInputField
@@ -1369,7 +1369,7 @@ DocumentViewBase {
 							Text {
 								anchors.fill: parent
 								text: qsTr("Write a comment...")
-								color: Style.textPlaceholderColor
+								color: Style.inactiveTextColor
 								font.pixelSize: Style.fontSizeM
 								visible: commentInputField.text.length === 0
 							}
