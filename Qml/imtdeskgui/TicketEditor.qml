@@ -406,17 +406,17 @@ DocumentViewBase {
 		readonly property real contentMaxWidth: 800
 		readonly property real cardPadding: 20
 		readonly property real cardRadius: Style.radiusL
-		readonly property color cardColor: Style.baseColor
-		readonly property color cardBorderColor: Style.borderColor
-		readonly property color pageBgColor: Style.backgroundColor2
-		readonly property color accentColor: Style.imaginToolsAccentColor
-		readonly property color labelColor: Style.textColor
+		readonly property string cardColor: Style.baseColor
+		readonly property string cardBorderColor: Style.borderColor
+		readonly property string pageBgColor: Style.backgroundColor2
+		readonly property string accentColor: Style.imaginToolsAccentColor
+		readonly property string labelColor: Style.textColor
 		readonly property real avatarSize: 34
 		readonly property real accentDividerHeight: 2
 		readonly property real badgeHeight: 22
-		readonly property color accentBgLight: Qt.rgba(accentColor.r, accentColor.g, accentColor.b, 0.08)
-		readonly property color accentBorderLight: Qt.rgba(accentColor.r, accentColor.g, accentColor.b, 0.2)
-		readonly property color accentBadgeBg: Qt.rgba(accentColor.r, accentColor.g, accentColor.b, 0.12)
+		readonly property string accentBgLight: Qt.rgba(accentColor.r, accentColor.g, accentColor.b, 0.08)
+		readonly property string accentBorderLight: Qt.rgba(accentColor.r, accentColor.g, accentColor.b, 0.2)
+		readonly property string accentBadgeBg: Qt.rgba(accentColor.r, accentColor.g, accentColor.b, 0.12)
 
 		// Page background
 		Rectangle {
@@ -1121,7 +1121,6 @@ DocumentViewBase {
 					id: commentsMainCol
 					width: parent.width
 					spacing: Style.spacingL
-					topPadding: Style.spacingL
 
 					Column {
 						id: commentsListCol
