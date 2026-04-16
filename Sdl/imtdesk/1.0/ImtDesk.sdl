@@ -8,6 +8,7 @@ schema {
 
 import {
 	"../../../../ImtCore/Sdl/imtbase/1.0/ImtCollection.sdl"
+	"../../../../ImtCore/Sdl/imtbase/1.0/ImtBaseTypes.sdl"
 }
 
 # --- Enums ---
@@ -52,6 +53,7 @@ type LabelData {
 type EntityType {
 	id: String
 	name: String
+	collectionId: String
 }
 
 # --- Entity Reference ---
@@ -60,7 +62,7 @@ type EntityReference {
 	entityType: String
 	entityId: ID
 	displayName: String
-	entityUrl: String
+	entityLink: ObjectLink
 }
 
 # --- Attachment ---

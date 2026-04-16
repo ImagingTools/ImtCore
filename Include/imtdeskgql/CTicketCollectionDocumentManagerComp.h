@@ -14,6 +14,9 @@
 #include <imtdb/IDatabaseEngine.h>
 #include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentManager.h>
 
+// ACF includes
+#include <ibase/IApplicationInfo.h>
+
 // Generated includes
 #include <GeneratedFiles/imtdesksdl/SDL/1.0/CPP/TicketCollectionDocumentManager.h>
 
@@ -38,6 +41,7 @@ public:
 		I_ASSIGN(m_chatServiceCompPtr, "ChatService", "Chat service for message and conversation management", false, "ChatService");
 		I_ASSIGN(m_attachmentStorageCompPtr, "AttachmentStorage", "Storage service for binary attachments", true, "AttachmentStorage");
 		I_ASSIGN(m_databaseEngineCompPtr, "DatabaseEngine", "Database engine for direct entity reference writes", true, "DatabaseEngine");
+		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Application info for ObjectLink URL construction", true, "ApplicationInfo");
 		I_ASSIGN_MULTI_0(m_entityTypeProvidersCompPtr, "EntityTypeProviders", "Registered entity type providers", true);
 	I_END_COMPONENT
 
@@ -62,6 +66,7 @@ private:
 	I_REF(imtchat::IChatService, m_chatServiceCompPtr);
 	I_REF(imtchat::IAttachmentStorage, m_attachmentStorageCompPtr);
 	I_REF(imtdb::IDatabaseEngine, m_databaseEngineCompPtr);
+	I_REF(ibase::IApplicationInfo, m_applicationInfoCompPtr);
 	I_MULTIREF(imtdesk::IEntityTypeProvider, m_entityTypeProvidersCompPtr);
 };
 

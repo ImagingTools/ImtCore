@@ -31,6 +31,11 @@ public:
 		Get the human-readable name of the entity type.
 	*/
 	virtual QString GetEntityTypeName() const = 0;
+
+	/**
+		Get the collection ID used to browse entities of this type (e.g. "Users", "Licenses").
+	*/
+	virtual QString GetCollectionId() const = 0;
 };
 
 

@@ -91,6 +91,12 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 	if (!entityRefIds.isEmpty() && m_databaseEngineCompPtr.IsValid()){
 		response.Version_1_0->entityReferences.Emplace();
 		QList<sdl::imtdesk::ImtDesk::CEntityReference::V1_0> refList;
+
+		QString applicationId;
+		if (m_applicationInfoCompPtr.IsValid()){
+			applicationId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID);
+		}
+
 		for (const QByteArray& refId : entityRefIds){
 			QString escaped = QString::fromUtf8(refId);
 			escaped.replace('\'', "''");
@@ -107,7 +113,21 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 				ref.entityType = r.value("EntityType").toString();
 				ref.entityId = r.value("EntityId").toString().toUtf8();
 				ref.displayName = r.value("DisplayName").toString();
-				ref.entityUrl = r.value("EntityUrl").toString();
+
+				// Build ObjectLink for navigation
+				sdl::imtbase::ImtBaseTypes::CObjectLink::V1_0 entityLink;
+				entityLink.id = ref.entityId;
+				entityLink.typeId = ref.entityType ? QByteArray(ref.entityType->toUtf8()) : QByteArray();
+				entityLink.name = ref.displayName ? *ref.displayName : QString();
+
+				QString entityUrl = r.value("EntityUrl").toString();
+				sdl::imtbase::ImtBaseTypes::CUrlParam::V1_0 urlParam;
+				urlParam.scheme = QStringLiteral("applink");
+				urlParam.host = applicationId;
+				urlParam.path = entityUrl;
+				entityLink.url = urlParam;
+
+				ref.entityLink = entityLink;
 				refList << ref;
 			}
 		}
@@ -124,6 +144,7 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 		sdl::imtdesk::ImtDesk::CEntityType::V1_0 et;
 		et.id = m_entityTypeProvidersCompPtr[i]->GetEntityTypeId();
 		et.name = m_entityTypeProvidersCompPtr[i]->GetEntityTypeName();
+		et.collectionId = m_entityTypeProvidersCompPtr[i]->GetCollectionId();
 		typeList << et;
 	}
 	response.Version_1_0->entityTypes->FromList(typeList);
@@ -350,7 +371,12 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 			QString entityType = ref->entityType ? sqlEscape(*ref->entityType) : QString();
 			QString entityId = ref->entityId ? sqlEscape(QString::fromUtf8(*ref->entityId)) : QString();
 			QString displayName = ref->displayName ? sqlEscape(*ref->displayName) : QString();
-			QString entityUrl = ref->entityUrl ? sqlEscape(*ref->entityUrl) : QString();
+
+			// Extract navigation path from ObjectLink if available
+			QString entityUrl;
+			if (ref->entityLink && ref->entityLink->url && ref->entityLink->url->path){
+				entityUrl = sqlEscape(*ref->entityLink->url->path);
+			}
 
 			QByteArray insertQuery = QString(
 				"INSERT INTO \"EntityReferences\" "

@@ -29,15 +29,18 @@ public:
 		I_REGISTER_INTERFACE(IEntityTypeProvider)
 		I_ASSIGN(m_entityTypeIdAttrPtr, "EntityTypeId", "Unique identifier of the entity type", true, "");
 		I_ASSIGN(m_entityTypeNameAttrPtr, "EntityTypeName", "Human-readable name of the entity type", true, "");
+		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection ID for browsing entities of this type", true, "");
 	I_END_COMPONENT
 
 	// reimplemented (imtdesk::IEntityTypeProvider)
 	virtual QString GetEntityTypeId() const override;
 	virtual QString GetEntityTypeName() const override;
+	virtual QString GetCollectionId() const override;
 
 private:
 	I_ATTR(QByteArray, m_entityTypeIdAttrPtr);
 	I_ATTR(QByteArray, m_entityTypeNameAttrPtr);
+	I_ATTR(QByteArray, m_collectionIdAttrPtr);
 };
 
 

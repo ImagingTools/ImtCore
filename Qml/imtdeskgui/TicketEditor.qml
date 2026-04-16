@@ -33,7 +33,7 @@ DocumentViewBase {
 	// Number of uploads currently in progress
 	property int uploadsInProgress: 0
 	// Pending entity references for the ticket
-	// Each element: {entityType, entityId, displayName, entityUrl}
+	// Each element: {entityType, entityId, displayName, entityLinkPath}
 	property var pendingEntityRefs: []
 	
 	signal commentSubmitted(string commentText)
@@ -191,6 +191,7 @@ DocumentViewBase {
 					var idx = entityTypeModel.insertNewItem()
 					entityTypeModel.setData("id", String(typeItem.m_id || ""), idx)
 					entityTypeModel.setData("name", String(typeItem.m_name || ""), idx)
+					entityTypeModel.setData("collectionId", String(typeItem.m_collectionId || ""), idx)
 				}
 			}
 		}
@@ -203,11 +204,15 @@ DocumentViewBase {
 				for (var r = 0; r < entityRefs.getElementsCount(); r++) {
 					var refItem = entityRefs.getElement(r)
 					if (refItem) {
+						var linkPath = ""
+						if (refItem.m_entityLink && refItem.m_entityLink.m_url && refItem.m_entityLink.m_url.m_path) {
+							linkPath = String(refItem.m_entityLink.m_url.m_path)
+						}
 						refs.push({
 							entityType: String(refItem.m_entityType || ""),
 							entityId: String(refItem.m_entityId || ""),
 							displayName: String(refItem.m_displayName || ""),
-							entityUrl: String(refItem.m_entityUrl || "")
+							entityLinkPath: linkPath
 						})
 					}
 				}
@@ -281,7 +286,14 @@ DocumentViewBase {
 				refItem.m_entityType = String(ref.entityType || "")
 				refItem.m_entityId = String(ref.entityId || "")
 				refItem.m_displayName = String(ref.displayName || "")
-				refItem.m_entityUrl = String(ref.entityUrl || "")
+				// Build ObjectLink with navigation path
+				refItem.emplaceEntityLink()
+				refItem.m_entityLink.m_id = String(ref.entityId || "")
+				refItem.m_entityLink.m_typeId = String(ref.entityType || "")
+				refItem.m_entityLink.m_name = String(ref.displayName || "")
+				refItem.m_entityLink.emplaceUrl()
+				refItem.m_entityLink.m_url.m_scheme = "applink"
+				refItem.m_entityLink.m_url.m_path = String(ref.entityLinkPath || "")
 				ticketData.m_entityReferences.addElement(refItem)
 			}
 		}
@@ -577,17 +589,17 @@ DocumentViewBase {
 										text: (modelData.entityType ? "[" + modelData.entityType + "] " : "") + (modelData.displayName || modelData.entityId || "")
 										font.pixelSize: Style.fontSizeS
 										color: Style.accentColor
-										font.underline: !!modelData.entityUrl
+										font.underline: !!modelData.entityLinkPath
 										elide: Text.ElideRight
 										maximumLineCount: 1
 										anchors.verticalCenter: parent.verticalCenter
 										
 										MouseArea {
 											anchors.fill: parent
-											cursorShape: modelData.entityUrl ? Qt.PointingHandCursor : Qt.ArrowCursor
+											cursorShape: modelData.entityLinkPath ? Qt.PointingHandCursor : Qt.ArrowCursor
 											onClicked: {
-												if (modelData.entityUrl) {
-													Qt.openUrlExternally(modelData.entityUrl)
+												if (modelData.entityLinkPath) {
+													NavigationController.navigate(modelData.entityLinkPath)
 												}
 											}
 										}
@@ -611,181 +623,135 @@ DocumentViewBase {
 						}
 					}
 					
-					// Add entity reference button
-					Rectangle {
-						width: addRefBtnContent.contentWidth + Style.marginM * 2
-						height: Style.buttonHeightM
-						radius: Style.buttonRadius
-						color: addRefBtnMa.pressed
-							   ? Qt.darker(Style.borderColor, 1.1)
-							   : addRefBtnMa.containsMouse
-								 ? Qt.lighter(Style.borderColor, 1.1)
-								 : Style.baseColor
-						border.color: Style.borderColor
-						border.width: 1
+					// Entity type selection + "Link entity" button row
+					Row {
+						width: parent.width
+						spacing: Style.spacingS
 						
-						Text {
-							id: addRefBtnContent
-							anchors.centerIn: parent
-							text: "🔗 " + qsTr("Link entity")
-							font.pixelSize: Style.fontSizeM
-							font.family: Style.fontFamily
-							color: Style.textColor
+						Column {
+							width: Math.min(200, parent.width * 0.4)
+							spacing: Style.spacingXS
+							
+							Text {
+								text: qsTr("Entity Type")
+								font.pixelSize: Style.fontSizeS
+								color: Style.textColor
+							}
+							
+							ComboBox {
+								id: refTypeCB
+								width: parent.width
+								height: Style.buttonHeightM
+								model: entityTypeModel
+							}
 						}
 						
-						MouseArea {
-							id: addRefBtnMa
-							anchors.fill: parent
-							hoverEnabled: true
-							cursorShape: Qt.PointingHandCursor
-							onClicked: {
-								entityRefDialog.visible = true
+						Rectangle {
+							width: addRefBtnContent.contentWidth + Style.marginM * 2
+							height: Style.buttonHeightM
+							radius: Style.buttonRadius
+							anchors.bottom: parent.bottom
+							color: addRefBtnMa.pressed
+								   ? Qt.darker(Style.borderColor, 1.1)
+								   : addRefBtnMa.containsMouse
+									 ? Qt.lighter(Style.borderColor, 1.1)
+									 : Style.baseColor
+							border.color: Style.borderColor
+							border.width: 1
+							
+							Text {
+								id: addRefBtnContent
+								anchors.centerIn: parent
+								text: "🔗 " + qsTr("Link entity")
+								font.pixelSize: Style.fontSizeM
+								font.family: Style.fontFamily
+								color: Style.textColor
+							}
+							
+							MouseArea {
+								id: addRefBtnMa
+								anchors.fill: parent
+								hoverEnabled: true
+								cursorShape: Qt.PointingHandCursor
+								onClicked: {
+									if (!refTypeCB.model || refTypeCB.currentIndex < 0) return
+									var collId = refTypeCB.model.getData("collectionId", refTypeCB.currentIndex)
+									if (!collId || collId.length === 0) return
+									entityRefDialogLoader.entityTypeId = refTypeCB.model.getData("id", refTypeCB.currentIndex)
+									entityRefDialogLoader.entityTypeName = refTypeCB.model.getData("name", refTypeCB.currentIndex)
+									entityRefDialogLoader.collectionId = collId
+									ModalDialogManager.openDialog(entityRefDialogComp)
+								}
 							}
 						}
 					}
 					
-					// Inline entity reference entry form
-					Rectangle {
-						id: entityRefDialog
-						visible: false
-						width: parent.width
-						height: entityRefFormCol.height + Style.paddingM * 2
-						radius: Style.radiusS
-						border.color: Style.accentColor
-						border.width: 1
-						color: Style.baseColor
-						
-						Column {
-							id: entityRefFormCol
-							anchors.left: parent.left
-							anchors.right: parent.right
-							anchors.top: parent.top
-							anchors.margins: Style.paddingM
-							spacing: Style.spacingS
+					// Entity reference collection dialog component
+					QtObject {
+						id: entityRefDialogLoader
+						property string entityTypeId: ""
+						property string entityTypeName: ""
+						property string collectionId: ""
+					}
+					
+					Component {
+						id: entityRefDialogComp
+						RemoteCollectionViewDialog {
+							id: entityRefDialog
+							title: qsTr("Select") + " " + entityRefDialogLoader.entityTypeName
+							collectionId: entityRefDialogLoader.collectionId
 							
-							Text {
-								text: qsTr("Link Entity")
-								font.pixelSize: Style.fontSizeM
-								font.bold: true
-								color: Style.textColor
+							Component.onCompleted: {
+								addButton(Enums.apply, qsTr("Attach"), false)
+								addButton(Enums.cancel, qsTr("Cancel"), true)
 							}
 							
-							Row {
-								width: parent.width
-								spacing: Style.spacingS
-								
-								Column {
-									width: (parent.width - Style.spacingS) / 2
-									spacing: Style.spacingXS
-									
-									Text {
-										text: qsTr("Entity Type")
-										font.pixelSize: Style.fontSizeS
-										color: Style.textColor
-									}
-									
-									ComboBox {
-										id: refTypeCB
-										width: parent.width
-										height: Style.buttonHeightM
-										model: entityTypeModel
-									}
-								}
-								
-								Column {
-									width: (parent.width - Style.spacingS) / 2
-									spacing: Style.spacingXS
-									
-									Text {
-										text: qsTr("Entity ID")
-										font.pixelSize: Style.fontSizeS
-										color: Style.textColor
-									}
-									
-									CustomTextField {
-										id: refEntityIdInput
-										width: parent.width
-										height: Style.controlHeightM
-										placeHolderText: qsTr("Unique identifier")
-									}
+							onCollectionViewChanged: {
+								if (collectionView) {
+									collectionView.selectionChanged.connect(function(ids) {
+										entityRefDialog.setButtonEnabled(Enums.apply, ids.length > 0)
+									})
 								}
 							}
 							
-							Row {
-								anchors.right: parent.right
-								spacing: Style.spacingS
-								
-								Rectangle {
-									width: cancelRefBtnText.contentWidth + Style.marginM * 2
-									height: Style.buttonHeightM
-									radius: Style.buttonRadius
-									color: cancelRefBtnMa.pressed
-										   ? Qt.darker(Style.borderColor, 1.1)
-										   : Style.baseColor
-									border.color: Style.borderColor
-									border.width: 1
-									
-									Text {
-										id: cancelRefBtnText
-										anchors.centerIn: parent
-										text: qsTr("Cancel")
-										font.pixelSize: Style.fontSizeM
-										color: Style.textColor
-									}
-									
-									MouseArea {
-										id: cancelRefBtnMa
-										anchors.fill: parent
-										cursorShape: Qt.PointingHandCursor
-										onClicked: {
-											entityRefDialog.visible = false
-											refEntityIdInput.text = ""
-										}
-									}
-								}
-								
-								Rectangle {
-									width: addRefConfirmBtnText.contentWidth + Style.marginM * 2
-									height: Style.buttonHeightM
-									radius: Style.buttonRadius
-									color: addRefConfirmMa.pressed
-										   ? Qt.darker(Style.imaginToolsAccentColor, 1.2)
-										   : addRefConfirmMa.containsMouse
-											 ? Qt.lighter(Style.imaginToolsAccentColor, 1.1)
-											 : Style.imaginToolsAccentColor
-									
-									Text {
-										id: addRefConfirmBtnText
-										anchors.centerIn: parent
-										text: qsTr("Add")
-										font.pixelSize: Style.fontSizeM
-										color: "white"
-									}
-									
-									MouseArea {
-										id: addRefConfirmMa
-										anchors.fill: parent
-										hoverEnabled: true
-										cursorShape: Qt.PointingHandCursor
-										onClicked: {
-											if (refEntityIdInput.text.trim().length === 0) return
-											var entityType = ""
-											if (refTypeCB.model && refTypeCB.currentIndex >= 0) {
-												entityType = refTypeCB.model.getData("id", refTypeCB.currentIndex)
+							onFinished: {
+								if (buttonId === Enums.apply && collectionView) {
+									var selectedIds = collectionView.getSelectedIds()
+									var arr = root.pendingEntityRefs.slice()
+									for (var i = 0; i < selectedIds.length; i++) {
+										// Check if already attached
+										var alreadyAttached = false
+										for (var j = 0; j < arr.length; j++) {
+											if (arr[j].entityType === entityRefDialogLoader.entityTypeId && arr[j].entityId === selectedIds[i]) {
+												alreadyAttached = true
+												break
 											}
-											var arr = root.pendingEntityRefs.slice()
+										}
+										if (!alreadyAttached) {
+											// Get display name from collection if available
+											var displayName = ""
+											try {
+												var model = collectionView.collectionModel
+												if (model) {
+													for (var k = 0; k < model.getItemsCount(); k++) {
+														if (model.getData("id", k) === selectedIds[i]) {
+															displayName = model.getData("name", k) || ""
+															break
+														}
+													}
+												}
+											} catch(e) {}
+											
 											arr.push({
-												entityType: entityType,
-												entityId: refEntityIdInput.text.trim(),
-												displayName: "",
-												entityUrl: ""
+												entityType: entityRefDialogLoader.entityTypeId,
+												entityId: selectedIds[i],
+												displayName: displayName,
+												entityLinkPath: entityRefDialogLoader.collectionId + "/" + entityRefDialogLoader.entityTypeId + "/" + selectedIds[i]
 											})
-											root.pendingEntityRefs = arr
-											entityRefDialog.visible = false
-											refEntityIdInput.text = ""
-											root.doUpdateModel()
 										}
 									}
+									root.pendingEntityRefs = arr
+									root.doUpdateModel()
 								}
 							}
 						}
