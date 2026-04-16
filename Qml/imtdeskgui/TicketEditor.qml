@@ -500,7 +500,7 @@ DocumentViewBase {
 						height: editDescriptionInput.height + Style.paddingM * 2
 						radius: Style.radiusS
 						border.color: editDescriptionInput.activeFocus
-									  ? Style.accentColor
+									  ? Style.imaginToolsAccentColor
 									  : Style.borderColor
 						border.width: 1
 						color: Style.baseColor
@@ -568,38 +568,32 @@ DocumentViewBase {
 							model: root.pendingEntityRefs
 							delegate: Rectangle {
 								readonly property real maxRefWidth: 300
-								width: Math.min(refLabelRow.width + Style.paddingM * 2 + refRemoveBtn.width + Style.paddingS, maxRefWidth)
+								width: Math.min(refLabelText.contentWidth + refRemoveBtn.width + 2*Style.paddingS, maxRefWidth)
 								height: Style.buttonHeightS
 								radius: Style.radiusS
-								border.color: Style.accentColor
+								border.color: Style.borderColor
 								border.width: 1
-								color: Style.accentColorLight || Qt.lighter(Style.accentColor, 1.8)
+								color: Style.baseColor
 								
-								Row {
-									id: refLabelRow
+								Text {
+									id: refLabelText
 									anchors.left: parent.left
-									anchors.leftMargin: Style.paddingM
-									anchors.right: refRemoveBtn.left
-									anchors.rightMargin: Style.paddingS
+									anchors.leftMargin: Style.paddingS
 									anchors.verticalCenter: parent.verticalCenter
-									spacing: Style.paddingXS
+									text: (modelData.entityType ? "[" + modelData.entityType + "] " : "") + (modelData.displayName || modelData.entityId || "")
+									font.pixelSize: Style.fontSizeS
+									color: Style.imaginToolsAccentColor
+									font.underline: modelData.entityLinkPath !== ""
+									elide: Text.ElideRight
+									maximumLineCount: 1
 									
-									Text {
-										text: (modelData.entityType ? "[" + modelData.entityType + "] " : "") + (modelData.displayName || modelData.entityId || "")
-										font.pixelSize: Style.fontSizeS
-										color: Style.accentColor
-										font.underline: !!modelData.entityLinkPath
-										elide: Text.ElideRight
-										maximumLineCount: 1
-										anchors.verticalCenter: parent.verticalCenter
-										
-										MouseArea {
-											anchors.fill: parent
-											cursorShape: modelData.entityLinkPath ? Qt.PointingHandCursor : Qt.ArrowCursor
-											onClicked: {
-												if (modelData.entityLinkPath) {
-													NavigationController.navigate(modelData.entityLinkPath)
-												}
+									MouseArea {
+										anchors.fill: parent
+										hoverEnabled: true
+										cursorShape: Qt.PointingHandCursor
+										onClicked: {
+											if (modelData.entityLinkPath){
+												NavigationController.navigate(modelData.entityLinkPath)
 											}
 										}
 									}
@@ -608,13 +602,21 @@ DocumentViewBase {
 								ToolButton {
 									id: refRemoveBtn
 									anchors.right: parent.right
-									anchors.rightMargin: Style.paddingXS
 									anchors.verticalCenter: parent.verticalCenter
 									iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+									decorator: 	Component {
+										ToolButtonDecorator {
+											color: "transparent"
+											icon.width: Style.iconSizeXS
+										}
+									}
 									onClicked: {
 										var arr = root.pendingEntityRefs.slice()
+										console.log("arr1", arr)
 										arr.splice(index, 1)
+										
 										root.pendingEntityRefs = arr
+										console.log("arr2", arr)
 										root.doUpdateModel()
 									}
 								}
@@ -713,49 +715,30 @@ DocumentViewBase {
 							
 							onFinished: {
 								if (buttonId === Enums.apply && collectionView) {
-									var selectedIds = collectionView.getSelectedIds()
 									var arr = root.pendingEntityRefs.slice()
-									for (var i = 0; i < selectedIds.length; i++) {
-										// Check if already attached
-										var alreadyAttached = false
-										for (var j = 0; j < arr.length; j++) {
-											if (arr[j].entityType === entityRefDialogLoader.entityTypeId && arr[j].entityId === selectedIds[i]) {
-												alreadyAttached = true
-												break
-											}
+									var model = collectionView.table.elements
+									let indexes = collectionView.table.getSelectedIndexes()
+									for (var i = 0; i < indexes.length; i++) {
+										let index = indexes[i]
+										// Get display name and typeId from collection if available
+										var displayName = model.getData("name", index)
+										var typeId = model.getData("typeId", index)
+										var elementId = model.getData("id", index)
+	
+										// Build path as collectionId/typeId/entityId
+										var linkPath = entityRefDialogLoader.entityTypeId
+										if (typeId) {
+											linkPath += "/" + typeId
 										}
-										if (!alreadyAttached) {
-											// Get display name and typeId from collection if available
-											var displayName = ""
-											var typeId = ""
-											try {
-												var model = collectionView.collectionModel
-												if (model) {
-													for (var k = 0; k < model.getItemsCount(); k++) {
-														if (model.getData("id", k) === selectedIds[i]) {
-															displayName = model.getData("name", k) || ""
-															typeId = model.getData("typeId", k) || ""
-															break
-														}
-													}
-												}
-											} catch(e) {}
-											
-											// Build path as collectionId/typeId/entityId
-											var linkPath = entityRefDialogLoader.entityTypeId
-											if (typeId) {
-												linkPath += "/" + typeId
-											}
-											linkPath += "/" + selectedIds[i]
-											
-											arr.push({
-												entityType: entityRefDialogLoader.entityTypeId,
-												entityId: selectedIds[i],
-												displayName: displayName,
-												entityLinkPath: linkPath,
-												typeId: typeId
-											})
-										}
+										linkPath += "/" + elementId
+
+										arr.push({
+													 entityType: entityRefDialogLoader.entityTypeId,
+													 entityId: elementId,
+													 displayName: displayName,
+													 entityLinkPath: linkPath,
+													 typeId: typeId
+												 })
 									}
 									root.pendingEntityRefs = arr
 									root.doUpdateModel()
@@ -828,7 +811,7 @@ DocumentViewBase {
 											width: 32
 											height: width
 											radius: width / 2
-											color: Style.accentColor
+											color: Style.baseColor
 											
 											Text {
 												anchors.centerIn: parent
@@ -914,15 +897,7 @@ DocumentViewBase {
 							}
 						}
 					}
-					
-					// "Write" input area (shared between both view modes)
-					Rectangle {
-						width: parent.width
-						height: 1
-						color: Style.borderColor
-						visible: !root.ticketData || !root.ticketData.m_locked
-					}
-					
+
 					Column {
 						width: parent.width
 						spacing: Style.spacingS
@@ -943,7 +918,7 @@ DocumentViewBase {
 								width: 32
 								height: 32
 								radius: 16
-								color: Style.accentColor
+								color: Style.baseColor
 								anchors.top: parent.top
 								
 								Text {
@@ -964,7 +939,7 @@ DocumentViewBase {
 									height: commentInputField.height + Style.paddingM * 2
 									radius: Style.radiusS
 									border.color: commentInputField.activeFocus
-												  ? Style.accentColor
+												  ? Style.imaginToolsAccentColor
 												  : Style.borderColor
 									border.width: 1
 									color: Style.baseColor
@@ -1025,9 +1000,15 @@ DocumentViewBase {
 											ToolButton {
 												id: pendingRemoveBtn
 												anchors.right: parent.right
-												anchors.rightMargin: Style.paddingM
+												// anchors.rightMargin: Style.paddingM
 												anchors.verticalCenter: parent.verticalCenter
 												iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+												decorator: 	Component {
+													ToolButtonDecorator {
+														color: "transparent"
+														icon.width: Style.iconSizeXS
+													}
+												}
 												onClicked: {
 													var removed = root.pendingAttachments[index]
 													var arr = root.pendingAttachments.slice()
@@ -1072,69 +1053,41 @@ DocumentViewBase {
 								Row {
 									anchors.right: parent.right
 									spacing: Style.spacingS
-									
-									// Attach image button
-									Rectangle {
-										width: attachBtnContent.contentWidth + Style.marginM * 2
-										height: Style.buttonHeightM
-										radius: Style.buttonRadius
-										color: attachBtnMa.pressed
-											   ? Qt.darker(Style.borderColor, 1.1)
-											   : attachBtnMa.containsMouse
-												 ? Qt.lighter(Style.borderColor, 1.1)
-												 : Style.baseColor
-										border.color: Style.borderColor
-										border.width: 1
-										
-										Text {
-											id: attachBtnContent
-											anchors.centerIn: parent
-											text: "📎 " + qsTr("Attach")
-											font.pixelSize: Style.fontSizeM
-											font.family: Style.fontFamily
-											color: Style.textColor
+
+									ToolButton {
+										id: attachButton
+										tooltipText: qsTr("Attach file")
+										iconSource: "../../../" + Style.getIconPath("Icons/Attachment", Icon.State.On, Icon.Mode.Normal)
+										decorator: 	Component {
+											ToolButtonDecorator {
+												color: "transparent"
+											}
 										}
-										
-										MouseArea {
-											id: attachBtnMa
-											anchors.fill: parent
-											hoverEnabled: true
-											cursorShape: Qt.PointingHandCursor
-											onClicked: attachImageDialog.open()
+
+										onClicked: {
+											attachImageDialog.open()
 										}
 									}
 									
-									Rectangle {
-										width: commentBtnText.contentWidth + Style.marginM * 2
-										height: Style.buttonHeightM
-										radius: Style.buttonRadius
-										color: commentBtnMa.pressed
-											   ? Qt.darker(Style.imaginToolsAccentColor, 1.2)
-											   : commentBtnMa.containsMouse
-												 ? Qt.lighter(Style.imaginToolsAccentColor, 1.1)
-												 : Style.imaginToolsAccentColor
-										
-										Text {
-											id: commentBtnText
-											anchors.centerIn: parent
-											text: qsTr("Comment")
-											font.pixelSize: Style.fontSizeM
-											font.family: Style.fontFamily
-											color: "white"
-										}
-										
-										MouseArea {
-											id: commentBtnMa
-											anchors.fill: parent
-											hoverEnabled: true
-											cursorShape: root.uploadsInProgress > 0 ? Qt.WaitCursor : Qt.PointingHandCursor
-											onClicked: {
-												if (root.uploadsInProgress > 0)
-													return
-												root.addComment(commentInputField.text.trim(), root.pendingAttachments.slice())
-												commentInputField.text = ""
-												root.pendingAttachments = []
+									Button {
+										id: commentButton
+										text: qsTr("Comment")
+										enabled: commentInputField.text !== ""
+										decorator: 	Component {
+											ButtonDecorator {
+												color: commentButton.enabled ? Style.imaginToolsAccentColor : Style.buttonColor
+												textColor: commentButton.enabled ? Style.baseColor : Style.inactiveTextColor
+												opacity: commentButton.hovered ? 0.85 : 1
+												border.width: 0
 											}
+										}
+
+										onClicked: {
+											if (root.uploadsInProgress > 0)
+												return
+											root.addComment(commentInputField.text.trim(), root.pendingAttachments.slice())
+											commentInputField.text = ""
+											root.pendingAttachments = []
 										}
 									}
 								}
