@@ -7,12 +7,7 @@
 #include <iprm/CParamsSet.h>
 
 // Qt includes
-#include <QtCore/QDateTime>
 #include <QtCore/QFileInfo>
-#include <QtCore/QUuid>
-#include <QtSql/QSqlError>
-#include <QtSql/QSqlQuery>
-#include <QtSql/QSqlRecord>
 
 // ImtCore includes
 #include <imtdesk/ISupportTicket.h>
@@ -86,9 +81,9 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 	response.Version_1_0->status = imtdeskgql::GetSdlTypeFromStatusType(ticketPtr->GetStatus());
 	response.Version_1_0->stateReason = imtdeskgql::GetSdlTypeFromStateReason(ticketPtr->GetStateReason());
 
-	// Load entity references by IDs from the EntityReferences table
+	// Load entity references by IDs from the EntityReferences table via IEntityReferenceStorage
 	QByteArrayList entityRefIds = ticketPtr->GetEntityReferences();
-	if (!entityRefIds.isEmpty() && m_databaseEngineCompPtr.IsValid()){
+	if (!entityRefIds.isEmpty() && m_entityReferenceStorageCompPtr.IsValid()){
 		response.Version_1_0->entityReferences.Emplace();
 		QList<sdl::imtdesk::ImtDesk::CEntityReference::V1_0> refList;
 
@@ -98,46 +93,41 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 		}
 
 		for (const QByteArray& refId : entityRefIds){
-			QString escaped = QString::fromUtf8(refId);
-			escaped.replace('\'', "''");
-			QByteArray refQuery = QString(
-				"SELECT \"EntityType\", \"EntityId\", \"DisplayName\", \"EntityUrl\" "
-				"FROM \"EntityReferences\" WHERE \"Id\"='%1';")
-				.arg(escaped).toUtf8();
+			QString entityType;
+			QByteArray entityId;
+			QString displayName;
+			QString entityUrl;
 
-			QSqlError sqlError;
-			QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(refQuery, &sqlError);
-			if (sqlError.type() == QSqlError::NoError && sqlQuery.next()){
-				QSqlRecord r = sqlQuery.record();
-				sdl::imtdesk::ImtDesk::CEntityReference::V1_0 ref;
-				ref.entityType = r.value("EntityType").toString();
-				ref.entityId = r.value("EntityId").toString().toUtf8();
-				ref.displayName = r.value("DisplayName").toString();
-
-				// Build ObjectLink for navigation
-				sdl::imtbase::ImtBaseTypes::CObjectLink::V1_0 entityLink;
-				entityLink.id = ref.entityId;
-				entityLink.name = ref.displayName ? *ref.displayName : QString();
-
-				QString entityUrl = r.value("EntityUrl").toString();
-
-				// Extract typeId from path (format: collectionId/typeId/entityId)
-				QStringList pathParts = entityUrl.split('/');
-				if (pathParts.size() >= 2){
-					entityLink.typeId = pathParts[1].toUtf8();
-				} else {
-					entityLink.typeId = ref.entityType ? QByteArray(ref.entityType->toUtf8()) : QByteArray();
-				}
-
-				sdl::imtbase::ImtBaseTypes::CUrlParam::V1_0 urlParam;
-				urlParam.scheme = QStringLiteral("applink");
-				urlParam.host = applicationId;
-				urlParam.path = entityUrl;
-				entityLink.url = urlParam;
-
-				ref.entityLink = entityLink;
-				refList << ref;
+			if (!m_entityReferenceStorageCompPtr->GetEntityReference(refId, entityType, entityId, displayName, entityUrl)){
+				continue;
 			}
+
+			sdl::imtdesk::ImtDesk::CEntityReference::V1_0 ref;
+			ref.entityType = entityType;
+			ref.entityId = entityId;
+			ref.displayName = displayName;
+
+			// Build ObjectLink for navigation
+			sdl::imtbase::ImtBaseTypes::CObjectLink::V1_0 entityLink;
+			entityLink.id = ref.entityId;
+			entityLink.name = displayName;
+
+			// Extract typeId from path (format: collectionId/typeId/entityId)
+			QStringList pathParts = entityUrl.split('/');
+			if (pathParts.size() >= 2){
+				entityLink.typeId = pathParts[1].toUtf8();
+			} else {
+				entityLink.typeId = entityType.toUtf8();
+			}
+
+			sdl::imtbase::ImtBaseTypes::CUrlParam::V1_0 urlParam;
+			urlParam.scheme = QStringLiteral("applink");
+			urlParam.host = applicationId;
+			urlParam.path = entityUrl;
+			entityLink.url = urlParam;
+
+			ref.entityLink = entityLink;
+			refList << ref;
 		}
 		response.Version_1_0->entityReferences->FromList(refList);
 		if (response.Version_1_0->entityReferences->isEmpty()){
@@ -362,57 +352,34 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 		ticketPtr->SetPriority(imtdeskgql::GetPriorityTypeFromSdlType(*ticketInfo.priority));
 	}
 
-	// Write entity references directly to EntityReferences + TicketEntityReferences tables
-	if (ticketInfo.entityReferences && m_databaseEngineCompPtr.IsValid()){
+	// Write entity references via IEntityReferenceStorage (by analogy with Attachments)
+	if (ticketInfo.entityReferences && m_entityReferenceStorageCompPtr.IsValid()){
 		QByteArrayList newRefIds;
-		QString nowUtc = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
 		for (const auto& ref : *ticketInfo.entityReferences){
 			if (!ref){
 				continue;
 			}
-			QString refId = QUuid::createUuid().toString(QUuid::WithoutBraces);
 
-			auto sqlEscape = [](const QString& s) -> QString {
-				QString escaped = s;
-				escaped.replace('\'', "''");
-				return escaped;
-			};
-
-			QString entityType = ref->entityType ? sqlEscape(*ref->entityType) : QString();
-			QString entityId = ref->entityId ? sqlEscape(QString::fromUtf8(*ref->entityId)) : QString();
-			QString displayName = ref->displayName ? sqlEscape(*ref->displayName) : QString();
+			QString entityType = ref->entityType ? *ref->entityType : QString();
+			QByteArray entityId = ref->entityId ? *ref->entityId : QByteArray();
+			QString displayName = ref->displayName ? *ref->displayName : QString();
 
 			// Extract navigation path from ObjectLink if available
 			QString entityUrl;
 			if (ref->entityLink && ref->entityLink->url && ref->entityLink->url->path){
-				entityUrl = sqlEscape(*ref->entityLink->url->path);
+				entityUrl = *ref->entityLink->url->path;
 			}
 
-			QByteArray insertQuery = QString(
-				"INSERT INTO \"EntityReferences\" "
-				"(\"Id\", \"EntityType\", \"EntityId\", \"DisplayName\", \"EntityUrl\", \"CreatedAt\") "
-				"VALUES('%1', '%2', '%3', '%4', '%5', '%6');")
-				.arg(refId, entityType, entityId, displayName, entityUrl, nowUtc).toUtf8();
-
-			QSqlError sqlError;
-			m_databaseEngineCompPtr->ExecSqlQuery(insertQuery, &sqlError);
-			if (sqlError.type() == QSqlError::NoError){
-				newRefIds << refId.toUtf8();
+			QByteArray refId = m_entityReferenceStorageCompPtr->CreateEntityReference(entityType, entityId, displayName, entityUrl);
+			if (!refId.isEmpty()){
+				newRefIds << refId;
 			}
 		}
 		ticketPtr->SetEntityReferences(newRefIds);
 	}
 
-	// Auto-create a Conversation if the ticket does not have one yet
-	if (ticketPtr->GetConversationId().isEmpty() && m_chatServiceCompPtr.IsValid()){
-		QByteArray convId = m_chatServiceCompPtr->CreateConversation(
-					ticketPtr->GetTitle(),
-					imtchat::IConversation::CT_SUPPORT,
-					QByteArrayList());
-		if (!convId.isEmpty()){
-			ticketPtr->SetConversationId(convId);
-		}
-	}
+	// NOTE: Conversation is NOT created here — it is created in ProcessEvent
+	// after the ticket is saved and assigned a number in the database.
 
 	if (ticketInfo.comments){
 		// Comments are saved as messages via IChatService
@@ -507,6 +474,17 @@ bool CTicketCollectionDocumentManagerComp::ProcessEvent(imtdoc::CEventBase* even
 				documentTicketPtr->SetNumber(dbTicketPtr->GetNumber());
 				documentTicketPtr->SetUpdatedAt(dbTicketPtr->GetUpdatedAt());
 				documentTicketPtr->SetCreatedAt(dbTicketPtr->GetCreatedAt());
+
+				// Create a Conversation now that the ticket has been saved and assigned a number
+				if (documentTicketPtr->GetConversationId().isEmpty() && m_chatServiceCompPtr.IsValid()){
+					QByteArray convId = m_chatServiceCompPtr->CreateConversation(
+								documentTicketPtr->GetTitle(),
+								imtchat::IConversation::CT_SUPPORT,
+								QByteArrayList());
+					if (!convId.isEmpty()){
+						documentTicketPtr->SetConversationId(convId);
+					}
+				}
 	
 				m_documentManagerCompPtr->SetDocumentData(userId, documentId, *documentPtr);
 				m_documentManagerCompPtr->SaveDocument(userId, documentId);

@@ -5,13 +5,13 @@
 // ImtCore includes
 #include <imtdesk/ISupportTicket.h>
 #include <imtdesk/IEntityTypeProvider.h>
+#include <imtdesk/IEntityReferenceStorage.h>
 #include <imtchat/IChatMessage.h>
 #include <imtchat/IChatService.h>
 #include <imtchat/IAttachmentStorage.h>
 #include <imtdoc/IDocumentManager.h>
 #include <imtdoc/IDocumentManagerEventHandler.h>
 #include <imtbase/IObjectCollection.h>
-#include <imtdb/IDatabaseEngine.h>
 #include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentManager.h>
 
 // ACF includes
@@ -40,7 +40,7 @@ public:
 		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "Collection of users", true, "UserCollection");
 		I_ASSIGN(m_chatServiceCompPtr, "ChatService", "Chat service for message and conversation management", false, "ChatService");
 		I_ASSIGN(m_attachmentStorageCompPtr, "AttachmentStorage", "Storage service for binary attachments", true, "AttachmentStorage");
-		I_ASSIGN(m_databaseEngineCompPtr, "DatabaseEngine", "Database engine for direct entity reference writes", true, "DatabaseEngine");
+		I_ASSIGN(m_entityReferenceStorageCompPtr, "EntityReferenceStorage", "Storage service for entity references", true, "EntityReferenceStorage");
 		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Application info for ObjectLink URL construction", true, "ApplicationInfo");
 		I_ASSIGN_MULTI_0(m_entityTypeProvidersCompPtr, "EntityTypeProviders", "Registered entity type providers", false);
 	I_END_COMPONENT
@@ -65,7 +65,7 @@ private:
 	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
 	I_REF(imtchat::IChatService, m_chatServiceCompPtr);
 	I_REF(imtchat::IAttachmentStorage, m_attachmentStorageCompPtr);
-	I_REF(imtdb::IDatabaseEngine, m_databaseEngineCompPtr);
+	I_REF(imtdesk::IEntityReferenceStorage, m_entityReferenceStorageCompPtr);
 	I_REF(ibase::IApplicationInfo, m_applicationInfoCompPtr);
 	I_MULTIREF(imtdesk::IEntityTypeProvider, m_entityTypeProvidersCompPtr);
 };

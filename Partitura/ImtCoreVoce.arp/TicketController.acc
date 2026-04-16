@@ -48,6 +48,15 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="EntityReferenceStorage" PackageId="ImtDeskDbPck" ComponentId="EntityReferenceStorage">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="ChatMessage" PackageId="ImtChatPck" ComponentId="ChatMessage">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap/>
@@ -449,8 +458,8 @@
                     <AttributeInfo Id="CollectionDocumentManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="CollectionDocumentManager"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="EntityReferenceStorage" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="EntityReferenceStorage"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
                         <Data IsEnabled="false"/>
