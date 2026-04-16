@@ -601,7 +601,7 @@ DocumentViewBase {
 									id: refRemoveBtn
 									anchors.right: parent.right
 									anchors.verticalCenter: parent.verticalCenter
-									iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+									iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
 									decorator: 	Component {
 										ToolButtonDecorator {
 											color: "transparent"
@@ -869,22 +869,35 @@ DocumentViewBase {
 											// Attachment file links
 											Repeater {
 												model: commentDelegate.dataModel.m_attachments || []
-												delegate: Text {
-													property string fileUrl: model.item.m_preview
-													property string fileName: model.item.m_fileName
+												delegate: Row {
+													height: Style.controlHeightS
+													spacing: Style.spacingS
+													Image {
+														anchors.verticalCenter: parent.verticalCenter
+														width: Style.iconSizeS
+														height: width
+														source: Style.getIconPath("Icons/Attachment", Icon.State.On, Icon.Mode.Normal)
+														sourceSize.width: width
+														sourceSize.height: height
+													}
 
-													width: bubbleContent.width
-													text: "📎 <a href=\"" + fileUrl + "\">" + fileName + "</a>"
-													textFormat: Text.StyledText
-													font.pixelSize: Style.fontSizeS
-													color: Style.linkColor
-													wrapMode: Text.Wrap
+													Text {
+														anchors.verticalCenter: parent.verticalCenter
+														width: bubbleContent.width
+														text: model.item.m_fileName
+														textFormat: Text.StyledText
+														font.pixelSize: Style.fontSizeS
+														color: Style.linkColor
+														wrapMode: Text.Wrap
+														font.underline: true
+													}
 
 													MouseArea {
 														anchors.fill: parent
+														hoverEnabled: true
 														cursorShape: Qt.PointingHandCursor
 														onClicked: {
-															Qt.openUrlExternally(parent.fileUrl)
+															Qt.openUrlExternally(model.item.m_preview)
 														}
 													}
 												}
@@ -1000,7 +1013,7 @@ DocumentViewBase {
 												anchors.right: parent.right
 												// anchors.rightMargin: Style.paddingM
 												anchors.verticalCenter: parent.verticalCenter
-												iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+												iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
 												decorator: 	Component {
 													ToolButtonDecorator {
 														color: "transparent"
@@ -1055,7 +1068,7 @@ DocumentViewBase {
 									ToolButton {
 										id: attachButton
 										tooltipText: qsTr("Attach file")
-										iconSource: "../../../" + Style.getIconPath("Icons/Attachment", Icon.State.On, Icon.Mode.Normal)
+										iconSource: Style.getIconPath("Icons/Attachment", Icon.State.On, Icon.Mode.Normal)
 										decorator: 	Component {
 											ToolButtonDecorator {
 												color: "transparent"
