@@ -409,8 +409,8 @@ DocumentViewBase {
 		CustomScrollbar {
 			id: editScrollV
 			z: parent.z + 1
-			anchors.right: editSidebarSep.left
-			anchors.rightMargin: Style.marginM
+			anchors.right: root.isNewIssue ? parent.right : editSidebarSep.left
+			anchors.rightMargin: root.isNewIssue ? Style.marginXL : Style.marginM
 			anchors.top: editFlick.top
 			anchors.bottom: editFlick.bottom
 			secondSize: Style.marginM
@@ -422,9 +422,7 @@ DocumentViewBase {
 			id: editFlick
 			anchors.top: parent.top
 			anchors.topMargin: Style.marginXL
-			anchors.bottom: addCommentSection.visible ? addCommentSection.top
-						: lockNoticeRow.visible ? lockNoticeRow.top
-						: parent.bottom
+			anchors.bottom: parent.bottom
 			anchors.bottomMargin: Style.marginM
 			anchors.left: parent.left
 			anchors.leftMargin: Style.marginXL
@@ -753,10 +751,255 @@ DocumentViewBase {
 					}
 				}
 				
+				// Assignees
+				Column {
+					width: parent.width
+					spacing: Style.spacingS
+					
+					Text {
+						text: qsTr("Assignees")
+						font.pixelSize: Style.fontSizeM
+						font.bold: true
+						color: Style.textColor
+					}
+					
+					ComboBox {
+						id: editAssigneeCB
+						width: parent.width
+						height: Style.buttonHeightM
+						onCurrentIndexChanged: {
+							root.doUpdateModel()
+						}
+					}
+				}
+				
+				Rectangle { width: parent.width; height: 1; color: Style.borderColor }
+				
+				// Type
+				Column {
+					width: parent.width
+					spacing: Style.spacingS
+					
+					Text {
+						text: qsTr("Type")
+						font.pixelSize: Style.fontSizeM
+						font.bold: true
+						color: Style.textColor
+					}
+					
+					ComboBox {
+						id: editTypeCB
+						width: parent.width
+						height: Style.buttonHeightM
+						currentIndex: 1
+						model: ticketTypeModel
+						onCurrentIndexChanged: {
+							root.doUpdateModel()
+						}
+					}
+				}
+				
+				Rectangle { width: parent.width; height: 1; color: Style.borderColor }
+				
+				// Priority
+				Column {
+					width: parent.width
+					spacing: Style.spacingS
+					
+					Text {
+						text: qsTr("Priority")
+						font.pixelSize: Style.fontSizeM
+						font.bold: true
+						color: Style.textColor
+					}
+					
+					ComboBox {
+						id: editPriorityCB
+						width: parent.width
+						height: Style.buttonHeightM
+						currentIndex: 1
+						model: priorityModel
+						onCurrentIndexChanged: {
+							root.doUpdateModel()
+						}
+					}
+				}
+				
+				Rectangle { visible: !root.isNewIssue; width: parent.width; height: 1; color: Style.borderColor }
+				
+				// Reporter (only for existing tickets)
 				Column {
 					visible: !root.isNewIssue
 					width: parent.width
 					spacing: Style.spacingS
+					
+					Text {
+						text: qsTr("Reporter")
+						font.pixelSize: Style.fontSizeM
+						font.bold: true
+						color: Style.textColor
+					}
+					
+					ComboBox {
+						id: editReporterCB
+						width: parent.width
+						height: Style.buttonHeightM
+						onCurrentIndexChanged: {
+							root.doUpdateModel()
+						}
+					}
+				}
+				
+				Rectangle { visible: !root.isNewIssue; width: parent.width; height: 1; color: Style.borderColor }
+				
+				// Lock issue (only for existing tickets)
+				Row {
+					visible: !root.isNewIssue
+					width: parent.width
+					spacing: Style.paddingS
+					
+					CheckBox {
+						id: editLockedCB
+						text: qsTr("Lock issue")
+						onCheckStateChanged: {
+							root.doUpdateModel()
+						}
+					}
+				}
+				
+				// Lock reason
+				Column {
+					width: parent.width
+					spacing: Style.spacingS
+					visible: !root.isNewIssue && editLockedCB.checkState === Qt.Checked
+					
+					Text {
+						text: qsTr("Lock Reason")
+						font.pixelSize: Style.fontSizeM
+						font.bold: true
+						color: Style.textColor
+					}
+					
+					CustomTextField {
+						id: editLockReasonInput
+						width: parent.width
+						height: Style.controlHeightM
+						placeHolderText: qsTr("Reason for locking")
+						onEditingFinished: {
+							root.doUpdateModel()
+						}
+					}
+				}
+				
+				Rectangle { visible: !root.isNewIssue; width: parent.width; height: 1; color: Style.borderColor }
+				
+				// Status (only for existing tickets)
+				Column {
+					visible: !root.isNewIssue
+					width: parent.width
+					spacing: Style.spacingS
+					
+					Text {
+						text: qsTr("Status")
+						font.pixelSize: Style.fontSizeM
+						font.bold: true
+						color: Style.textColor
+					}
+					
+					ComboBox {
+						id: editStatusCB
+						width: parent.width
+						height: Style.buttonHeightM
+						currentIndex: 0
+						model: statusModel
+						onCurrentIndexChanged: {
+							root.doUpdateModel()
+						}
+					}
+				}
+				
+				// State Reason (only for existing tickets)
+				Column {
+					visible: !root.isNewIssue
+					width: parent.width
+					spacing: Style.spacingS
+					
+					Text {
+						text: qsTr("State Reason")
+						font.pixelSize: Style.fontSizeM
+						font.bold: true
+						color: Style.textColor
+					}
+					
+					ComboBox {
+						id: editStateReasonCB
+						width: parent.width
+						height: Style.buttonHeightM
+						currentIndex: 0
+						model: stateReasonModel
+						onCurrentIndexChanged: {
+							root.doUpdateModel()
+						}
+					}
+				}
+			}
+		}
+		
+		// Separator between details and comments panel
+		Rectangle {
+			id: editSidebarSep
+			visible: !root.isNewIssue
+			anchors.top: parent.top
+			anchors.topMargin: Style.marginXL
+			anchors.bottom: parent.bottom
+			anchors.bottomMargin: Style.marginXL
+			anchors.right: commentsPanel.left
+			anchors.rightMargin: Style.marginXL
+			width: 1
+			color: Style.borderColor
+		}
+		
+		// Right: comments panel
+		Item {
+			id: commentsPanel
+			visible: !root.isNewIssue
+			anchors.top: parent.top
+			anchors.topMargin: Style.marginXL
+			anchors.bottom: parent.bottom
+			anchors.bottomMargin: Style.marginXL
+			anchors.right: parent.right
+			anchors.rightMargin: Style.marginXL
+			width: parent.width * 0.55
+			
+			CustomScrollbar {
+				id: commentsScrollV
+				z: parent.z + 1
+				anchors.right: parent.right
+				anchors.top: commentsFlick.top
+				anchors.bottom: commentsFlick.bottom
+				secondSize: Style.marginM
+				targetItem: commentsFlick
+				visible: commentsPanel.visible
+			}
+			
+			Flickable {
+				id: commentsFlick
+				anchors.top: parent.top
+				anchors.bottom: addCommentSection.visible ? addCommentSection.top
+							: lockNoticeRow.visible ? lockNoticeRow.top
+							: parent.bottom
+				anchors.bottomMargin: Style.marginM
+				anchors.left: parent.left
+				anchors.right: commentsScrollV.left
+				anchors.rightMargin: Style.marginM
+				contentHeight: commentsMainCol.height + Style.marginXL * 2
+				boundsBehavior: Flickable.StopAtBounds
+				clip: true
+				
+				Column {
+					id: commentsMainCol
+					width: parent.width
+					spacing: Style.marginM
 					
 					Row {
 						width: parent.width
@@ -917,31 +1160,22 @@ DocumentViewBase {
 					}
 				}
 			}
-		}
-		
-		// --- Fixed bottom: "Add comment" input, always visible below the scroll ---
-		Column {
-			id: addCommentSection
-			visible: !root.isNewIssue && (!root.ticketData || !root.ticketData.m_locked)
-			anchors.bottom: parent.bottom
-			anchors.bottomMargin: Style.marginXL
-			anchors.left: parent.left
-			anchors.leftMargin: Style.marginXL
-			anchors.right: editSidebarSep.left
-			anchors.rightMargin: Style.marginM + editScrollV.width + Style.marginM
-			spacing: Style.spacingS
 			
-			Rectangle {
-				width: parent.width
-				height: 1
-				color: Style.borderColor
-			}
-			
-			// Center-constrained inner content
+			// --- Fixed bottom: "Add comment" input ---
 			Column {
-				width: Math.min(parent.width, editView.contentMaxWidth)
-				anchors.horizontalCenter: parent.horizontalCenter
+				id: addCommentSection
+				visible: !root.ticketData || !root.ticketData.m_locked
+				anchors.bottom: parent.bottom
+				anchors.left: parent.left
+				anchors.right: commentsScrollV.left
+				anchors.rightMargin: Style.marginM
 				spacing: Style.spacingS
+				
+				Rectangle {
+					width: parent.width
+					height: 1
+					color: Style.borderColor
+				}
 				
 				Text {
 					text: qsTr("Add a comment")
@@ -1170,245 +1404,27 @@ DocumentViewBase {
 					id: attachmentFileIO
 				}
 			}
-		}
-		
-		// Lock notice (fixed at bottom when ticket is locked)
-		Row {
-			id: lockNoticeRow
-			visible: !root.isNewIssue && root.ticketData && root.ticketData.m_locked
-			anchors.bottom: parent.bottom
-			anchors.bottomMargin: Style.marginXL
-			anchors.left: parent.left
-			anchors.leftMargin: Style.marginXL
-			width: Math.min(editFlick.width, editView.contentMaxWidth)
-			spacing: Style.paddingS
 			
-			Text {
-				text: "🔒"
-				font.pixelSize: Style.fontSizeM
-			}
-			
-			Text {
-				text: qsTr("This conversation has been locked. Only collaborators can comment.")
-				font.pixelSize: Style.fontSizeS
-				color: Style.textColor
-				wrapMode: Text.Wrap
-				width: parent.width - Style.fontSizeM - Style.paddingS
-			}
-		}
-		
-		// Separator between left content and sidebar
-		Rectangle {
-			id: editSidebarSep
-			anchors.top: parent.top
-			anchors.topMargin: Style.marginXL
-			anchors.bottom: parent.bottom
-			anchors.bottomMargin: Style.marginXL
-			anchors.right: editSidebar.left
-			anchors.rightMargin: Style.marginXL
-			width: 1
-			color: Style.borderColor
-		}
-		
-		// Right: full sidebar (always visible, not scrollable)
-		Column {
-			id: editSidebar
-			anchors.top: parent.top
-			anchors.topMargin: Style.marginXL
-			anchors.right: parent.right
-			anchors.rightMargin: Style.marginXL
-			width: 260
-			spacing: Style.spacingM
-			
-			// Assignees
-			Column {
-				width: parent.width
-				spacing: Style.spacingS
-				
-				Text {
-					text: qsTr("Assignees")
-					font.pixelSize: Style.fontSizeM
-					font.bold: true
-					color: Style.textColor
-				}
-				
-				ComboBox {
-					id: editAssigneeCB
-					width: parent.width
-					height: Style.buttonHeightM
-					onCurrentIndexChanged: {
-						root.doUpdateModel()
-					}
-				}
-			}
-			
-			Rectangle { width: parent.width; height: 1; color: Style.borderColor }
-			
-			// Type
-			Column {
-				width: parent.width
-				spacing: Style.spacingS
-				
-				Text {
-					text: qsTr("Type")
-					font.pixelSize: Style.fontSizeM
-					font.bold: true
-					color: Style.textColor
-				}
-				
-				ComboBox {
-					id: editTypeCB
-					width: parent.width
-					height: Style.buttonHeightM
-					currentIndex: 1
-					model: ticketTypeModel
-					onCurrentIndexChanged: {
-						root.doUpdateModel()
-					}
-				}
-			}
-			
-			Rectangle { width: parent.width; height: 1; color: Style.borderColor }
-			
-			// Priority
-			Column {
-				width: parent.width
-				spacing: Style.spacingS
-				
-				Text {
-					text: qsTr("Priority")
-					font.pixelSize: Style.fontSizeM
-					font.bold: true
-					color: Style.textColor
-				}
-				
-				ComboBox {
-					id: editPriorityCB
-					width: parent.width
-					height: Style.buttonHeightM
-					currentIndex: 1
-					model: priorityModel
-					onCurrentIndexChanged: {
-						root.doUpdateModel()
-					}
-				}
-			}
-			
-			Rectangle { visible: !root.isNewIssue; width: parent.width; height: 1; color: Style.borderColor }
-			
-			// Reporter (only for existing tickets)
-			Column {
-				visible: !root.isNewIssue
-				width: parent.width
-				spacing: Style.spacingS
-				
-				Text {
-					text: qsTr("Reporter")
-					font.pixelSize: Style.fontSizeM
-					font.bold: true
-					color: Style.textColor
-				}
-				
-				ComboBox {
-					id: editReporterCB
-					width: parent.width
-					height: Style.buttonHeightM
-					onCurrentIndexChanged: {
-						root.doUpdateModel()
-					}
-				}
-			}
-			
-			Rectangle { visible: !root.isNewIssue; width: parent.width; height: 1; color: Style.borderColor }
-			
-			// Lock issue (only for existing tickets)
+			// Lock notice (fixed at bottom when ticket is locked)
 			Row {
-				visible: !root.isNewIssue
+				id: lockNoticeRow
+				visible: root.ticketData && root.ticketData.m_locked
+				anchors.bottom: parent.bottom
+				anchors.left: parent.left
 				width: parent.width
 				spacing: Style.paddingS
 				
-				CheckBox {
-					id: editLockedCB
-					text: qsTr("Lock issue")
-					onCheckStateChanged: {
-						root.doUpdateModel()
-					}
+				Text {
+					text: "🔒"
+					font.pixelSize: Style.fontSizeM
 				}
-			}
-			
-			// Lock reason
-			Column {
-				width: parent.width
-				spacing: Style.spacingS
-				visible: !root.isNewIssue && editLockedCB.checkState === Qt.Checked
 				
 				Text {
-					text: qsTr("Lock Reason")
-					font.pixelSize: Style.fontSizeM
-					font.bold: true
+					text: qsTr("This conversation has been locked. Only collaborators can comment.")
+					font.pixelSize: Style.fontSizeS
 					color: Style.textColor
-				}
-				
-				CustomTextField {
-					id: editLockReasonInput
-					width: parent.width
-					height: Style.controlHeightM
-					placeHolderText: qsTr("Reason for locking")
-					onEditingFinished: {
-						root.doUpdateModel()
-					}
-				}
-			}
-			
-			Rectangle { visible: !root.isNewIssue; width: parent.width; height: 1; color: Style.borderColor }
-			
-			// Status (only for existing tickets)
-			Column {
-				visible: !root.isNewIssue
-				width: parent.width
-				spacing: Style.spacingS
-				
-				Text {
-					text: qsTr("Status")
-					font.pixelSize: Style.fontSizeM
-					font.bold: true
-					color: Style.textColor
-				}
-				
-				ComboBox {
-					id: editStatusCB
-					width: parent.width
-					height: Style.buttonHeightM
-					currentIndex: 0
-					model: statusModel
-					onCurrentIndexChanged: {
-						root.doUpdateModel()
-					}
-				}
-			}
-			
-			// State Reason (only for existing tickets)
-			Column {
-				visible: !root.isNewIssue
-				width: parent.width
-				spacing: Style.spacingS
-				
-				Text {
-					text: qsTr("State Reason")
-					font.pixelSize: Style.fontSizeM
-					font.bold: true
-					color: Style.textColor
-				}
-				
-				ComboBox {
-					id: editStateReasonCB
-					width: parent.width
-					height: Style.buttonHeightM
-					currentIndex: 0
-					model: stateReasonModel
-					onCurrentIndexChanged: {
-						root.doUpdateModel()
-					}
+					wrapMode: Text.Wrap
+					width: parent.width - Style.fontSizeM - Style.paddingS
 				}
 			}
 		}
