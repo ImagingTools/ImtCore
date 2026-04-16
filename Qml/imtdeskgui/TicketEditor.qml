@@ -568,7 +568,7 @@ DocumentViewBase {
 							model: root.pendingEntityRefs
 							delegate: Rectangle {
 								readonly property real maxRefWidth: 300
-								width: Math.min(refLabelRow.implicitWidth + Style.paddingM * 2 + refRemoveBtn.width + Style.paddingS, maxRefWidth)
+								width: Math.min(refLabelRow.width + Style.paddingM * 2 + refRemoveBtn.width + Style.paddingS, maxRefWidth)
 								height: Style.buttonHeightS
 								radius: Style.radiusS
 								border.color: Style.accentColor

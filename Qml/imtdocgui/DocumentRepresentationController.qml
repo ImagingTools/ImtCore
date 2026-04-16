@@ -28,47 +28,4 @@ QtObject {
 		console.warn("updateDocumentFromRepresentation() should be implemented in a subclass")
 		documentUpdated(documentId)
 	}
-
-	property QtObject __internal: QtObject {
-		id: signalMonitor
-
-		property bool isRepresentationUpdatePending: false
-		property bool isDocumentUpdatePending: false
-
-		property Connections rootConnections: Connections {
-			target: root
-
-			function onStartUpdateRepresentation(documentId, representation){
-				signalMonitor.isRepresentationUpdatePending = true
-			}
-
-			function onRepresentationUpdated(documentId, representation){
-				if (!signalMonitor.isRepresentationUpdatePending){
-					console.error(
-								"representationUpdated() called for document '" + root.documentId +
-								"' before startUpdateRepresentation(). Possible logic error."
-								)
-				}
-				else{
-					signalMonitor.isRepresentationUpdatePending = false
-				}
-			}
-
-			function onStartUpdateDocument(documentId){
-				signalMonitor.isDocumentUpdatePending = true
-			}
-
-			function onDocumentUpdated(documentId){
-				if (!signalMonitor.isDocumentUpdatePending){
-					console.error(
-								"documentUpdated() called for document '" + root.documentId +
-								"' before startUpdateDocument(). Possible logic error."
-								)
-				}
-				else{
-					signalMonitor.isDocumentUpdatePending = false
-				}
-			}
-		}
-	}
 }
