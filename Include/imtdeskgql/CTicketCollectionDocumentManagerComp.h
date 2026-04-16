@@ -42,7 +42,7 @@ public:
 		I_ASSIGN(m_attachmentStorageCompPtr, "AttachmentStorage", "Storage service for binary attachments", true, "AttachmentStorage");
 		I_ASSIGN(m_databaseEngineCompPtr, "DatabaseEngine", "Database engine for direct entity reference writes", true, "DatabaseEngine");
 		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Application info for ObjectLink URL construction", true, "ApplicationInfo");
-		I_ASSIGN_MULTI_0(m_entityTypeProvidersCompPtr, "EntityTypeProviders", "Registered entity type providers", true);
+		I_ASSIGN_MULTI_0(m_entityTypeProvidersCompPtr, "EntityTypeProviders", "Registered entity type providers", false);
 	I_END_COMPONENT
 
 protected:

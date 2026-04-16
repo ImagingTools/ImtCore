@@ -137,17 +137,19 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 		}
 	}
 
-	// Populate available entity types from registered providers (I_MULTIREF)
-	response.Version_1_0->entityTypes.Emplace();
-	QList<sdl::imtdesk::ImtDesk::CEntityType::V1_0> typeList;
-	for (int i = 0; i < m_entityTypeProvidersCompPtr.GetCount(); ++i){
-		sdl::imtdesk::ImtDesk::CEntityType::V1_0 et;
-		et.id = m_entityTypeProvidersCompPtr[i]->GetEntityTypeId();
-		et.name = m_entityTypeProvidersCompPtr[i]->GetEntityTypeName();
-		et.collectionId = m_entityTypeProvidersCompPtr[i]->GetCollectionId();
-		typeList << et;
+	if (m_entityTypeProvidersCompPtr.IsValid()){
+		// Populate available entity types from registered providers (I_MULTIREF)
+		response.Version_1_0->entityTypes.Emplace();
+		QList<sdl::imtdesk::ImtDesk::CEntityType::V1_0> typeList;
+		for (int i = 0; i < m_entityTypeProvidersCompPtr.GetCount(); ++i){
+			sdl::imtdesk::ImtDesk::CEntityType::V1_0 et;
+			et.id = m_entityTypeProvidersCompPtr[i]->GetEntityTypeId();
+			et.name = m_entityTypeProvidersCompPtr[i]->GetEntityTypeName();
+			et.collectionId = m_entityTypeProvidersCompPtr[i]->GetCollectionId();
+			typeList << et;
+		}
+		response.Version_1_0->entityTypes->FromList(typeList);
 	}
-	response.Version_1_0->entityTypes->FromList(typeList);
 
 	// Load messages from the Messages collection filtered by ConversationId
 	QByteArray conversationId = ticketPtr->GetConversationId();
