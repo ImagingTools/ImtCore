@@ -94,7 +94,7 @@ class Property extends BaseObject {
             }
 
             if(!found){
-                let connectionObj = Signal.get(target, name + 'Changed').connect(()=>{
+                let connectionObj = target.constructor.meta[name + 'Changed'].type.get(target, name + 'Changed').connect(()=>{
                     if(!link.target[link.name+'__updating']){
                         link.target[link.name+'__updating'] = true
                         link.meta.type.set(link.target, link.name, link.func, link.meta)
@@ -148,7 +148,7 @@ class Property extends BaseObject {
         let currentValue = name in target ? target[name] : ('value' in meta ? meta.value : meta.type.getDefaultValue())
 
         if(oldValue !== currentValue){
-            Signal.get(target, name + 'Changed')(oldValue, currentValue)
+            target.constructor.meta[name + 'Changed'].type.get(target, name + 'Changed')(oldValue, currentValue)
         }
 
         return true
@@ -161,9 +161,13 @@ class Property extends BaseObject {
      * @param {Object} meta
      */
     static reset(target, name, value, meta){
+        if(target.constructor.meta[name].modifiers && target.constructor.meta[name].modifiers.readonly && (!target.__properties || !target.__properties[name])) {
+            throw `Cannot assign to read-only property "${name}"`
+        }
+            
         if(target.__depends[name]){
             for(let connectionObj of target.__depends[name]){
-                Signal.removeConnection(connectionObj)
+                target.constructor.meta[name + 'Changed'].type.removeConnection(connectionObj)
             }
             delete target.__depends[name]
         }

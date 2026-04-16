@@ -13,9 +13,14 @@ Item {
 	width: itemWidth;
 	height: filterField.height + itemBody.height;
 
-	property var model;
 	//property TreeItemModel model: TreeItemModel{};
+	property var model;
+
+	// For closing in Main dialog manager
+	property string uuid: ""
+	// Main dialog manager reference
 	property Item root: null;
+
 	property Item rootItem: null;
 
 	property int itemWidth: Style.sizeHintXXS;

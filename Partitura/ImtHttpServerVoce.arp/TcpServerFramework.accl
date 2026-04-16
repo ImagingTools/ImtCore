@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6381" Description="ACF"/>
+            <Version Id="1" Number="2350" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395520" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="TcpProtocolEngine" X="300" Y="600" Note=""/>
+        <Element ComponentName="TcpServer" X="650" Y="600" Note=""/>
+        <Element ComponentName="WorkerManager" X="650" Y="450" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

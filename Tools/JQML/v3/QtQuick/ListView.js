@@ -52,6 +52,7 @@ class ListView extends Flickable {
         countChanged: { type: Signal, args: [] },
         contentWidthChanged: { type: Signal, args: [] },
         contentHeightChanged: { type: Signal, args: [] },
+        reuseItemsChanged: { type: Signal, args: [] },
     })
 
     __items = []

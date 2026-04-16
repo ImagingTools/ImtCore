@@ -1134,6 +1134,88 @@ class QModelData {
     }
 }
 
+class QDrag extends ComplexObject {
+    static None = 0
+    static Automatic = 1
+    static Internal = 2
+
+    static XAxis = 0
+    static YAxis = 1
+    static XAndYAxis = 2
+
+    static defaultProperties = {
+        active: { type: QBool, value: false, changed: 'mainChanged' },
+        dragType: { type: QInt, value: QDrag.Internal, changed: 'mainChanged' },
+        hotSpot: { type: QPoint, changed: 'mainChanged' },
+        imageSource: { type: QVar, value: undefined, changed: 'mainChanged' },
+        imageSourceSize: { type: QSourceSize, value: 0, changed: 'mainChanged' },
+        keys: { type: QString, value: '', changed: 'mainChanged' },
+        mimeData: { type: QVar, value: null, changed: 'mainChanged' },
+        proposedAction: { type: QInt, value: QDrag.None, changed: 'mainChanged' },
+        source: { type: QVar, value: null, changed: 'mainChanged' },
+        supportedActions: { type: QReal, value: 0, changed: 'mainChanged' },
+        target: { type: QReal, value: 0, changed: 'mainChanged' },
+        
+        
+        axis: { type: QInt, value: QDrag.XAndYAxis, changed: 'mainChanged' },
+        filterChildren: { type: QBool, value: false, changed: 'mainChanged' },
+        maximumX: { type: QReal, value: 0, changed: 'mainChanged' },
+        maximumY: { type: QReal, value: 0, changed: 'mainChanged' },
+        minimumX: { type: QReal, value: 0, changed: 'mainChanged' },
+        minimumY: { type: QReal, value: 0, changed: 'mainChanged' },
+        smoothed: { type: QBool, value: false, changed: 'mainChanged' },
+        target: { type: QVar, value: null, changed: 'mainChanged' },
+        threshold: { type: QReal, value: 0, changed: 'mainChanged' },
+    }
+
+    None = QDrag.None
+    Automatic = QDrag.Automatic
+    Internal = QDrag.Internal
+
+    XAxis = QDrag.XAxis
+    YAxis = QDrag.YAxis
+    XAndYAxis = QDrag.XAndYAxis
+
+    mainChanged(){
+        this.getNotify()()
+    }
+
+    getNotify(){
+        if(!this.notify) this.notify = new QSignal()
+        return this.notify
+    }
+
+    updateOnce(){
+        if(!this.completed) this.update()
+    }
+
+    update(){
+        this.completed = true
+
+        if(this.$properties.active) this.$properties.active.update()
+        if(this.$properties.dragType) this.$properties.dragType.update()
+        if(this.$properties.hotSpot) this.$properties.hotSpot.update()
+        if(this.$properties.imageSource) this.$properties.imageSource.update()
+        if(this.$properties.imageSourceSize) this.$properties.imageSourceSize.update()
+        if(this.$properties.keys) this.$properties.keys.update()
+        if(this.$properties.mimeData) this.$properties.mimeData.update()
+        if(this.$properties.proposedAction) this.$properties.proposedAction.update()
+        if(this.$properties.source) this.$properties.source.update()
+        if(this.$properties.supportedActions) this.$properties.supportedActions.update()
+        if(this.$properties.target) this.$properties.target.update()
+
+        if(this.$properties.axis) this.$properties.axis.update()
+        if(this.$properties.filterChildren) this.$properties.filterChildren.update()
+        if(this.$properties.maximumX) this.$properties.maximumX.update()
+        if(this.$properties.maximumY) this.$properties.maximumY.update()
+        if(this.$properties.minimumX) this.$properties.minimumX.update()
+        if(this.$properties.minimumY) this.$properties.minimumY.update()
+        if(this.$properties.smoothed) this.$properties.smoothed.update()
+        if(this.$properties.target) this.$properties.target.update()
+        if(this.$properties.threshold) this.$properties.threshold.update()
+    }
+}
+
 module.exports.QGeometry = QGeometry
 module.exports.QAutoGeometry = QAutoGeometry
 module.exports.QAlias = QAlias
@@ -1160,6 +1242,7 @@ module.exports.QPoint = QPoint
 module.exports.QSourceSize = QSourceSize
 module.exports.QKeyNavigation = QKeyNavigation
 module.exports.MapGestureArea = MapGestureArea
+module.exports.QDrag = QDrag
 
 
 module.exports.QVariant = QVariant

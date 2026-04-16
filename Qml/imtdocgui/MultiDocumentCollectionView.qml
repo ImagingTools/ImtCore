@@ -10,6 +10,7 @@ import imtbaseCollectionDocumentManagerSdl 1.0
 Item {
 	id: workspaceView
 
+	property bool showStandardLoading: true
 	property CollectionView collectionView: null
 	property DocumentManagerBase documentManager
 
@@ -476,6 +477,7 @@ Item {
 				z: parent.z + 1
 				anchors.fill: parent
 				visible: false
+				opacity: workspaceView.showStandardLoading ? 1 : 0
 
 				background.opacity: 0
 			}

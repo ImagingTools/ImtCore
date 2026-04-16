@@ -353,8 +353,10 @@ module.exports = {
         this.root.__complete()
 
         window.addEventListener('resize', ()=>{
+            this.beginUpdate()
             this.root.width = window.innerWidth
             this.root.height = window.innerHeight
+            this.endUpdate()
         })
 
         window.addEventListener('load', ()=>{

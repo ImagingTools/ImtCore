@@ -43,7 +43,15 @@ class Column extends Item {
                             marginBottom: `0`
                         })
                     }
+                } else {
+                    children[i].setStyle({
+                        marginBottom: `0`
+                    })
                 }
+            } else {
+                children[i].setStyle({
+                    marginBottom: `0`
+                })
             }
         }
 

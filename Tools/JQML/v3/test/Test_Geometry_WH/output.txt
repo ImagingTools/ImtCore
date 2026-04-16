@@ -1,9 +1,9 @@
-onWidthChanged 1
-onWidthChanged 2
-onWidthChanged 3
 onHeightChanged 1
 onHeightChanged 2
 onHeightChanged 3
+onWidthChanged 1
+onWidthChanged 2
+onWidthChanged 3
 onSizeHChanged 3
 onSizeWChanged 3
 onSizeHChanged 2
