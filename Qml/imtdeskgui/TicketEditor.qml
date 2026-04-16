@@ -1142,8 +1142,9 @@ DocumentViewBase {
 				clip: true
 
 				onContentHeightChanged: {
-					if (contentHeight > height)
-						contentY = contentHeight - height
+					var maxY = contentHeight - height
+					if (maxY > 0 && (contentY >= maxY - 50 || contentY <= 0))
+						contentY = maxY
 				}
 
 				Column {
