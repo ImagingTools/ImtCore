@@ -2,7 +2,7 @@
 import QtQuick 2.15
 import Acf 1.0
 import com.imtcore.imtqml 1.0
-import imtcontrols 1.0
+import imtcontrols 1.0 as ImtContr
 import imtgui 1.0
 import imtauthgui 1.0
 import imtguigql 1.0
@@ -446,7 +446,7 @@ DocumentViewBase {
 			anchors.left: parent.left
 			width: root.isNewIssue ? parent.width : parent.width * 0.45
 
-			CustomScrollbar {
+			ImtContr.CustomScrollbar {
 				id: editScrollV
 				z: parent.z + 1
 				anchors.right: parent.right
@@ -536,7 +536,7 @@ DocumentViewBase {
 									opacity: 0.6
 								}
 
-								CustomTextField {
+								ImtContr.CustomTextField {
 									id: editTitleInput
 									width: parent.width
 									height: Style.controlHeightM
@@ -671,13 +671,13 @@ DocumentViewBase {
 												}
 											}
 
-											ToolButton {
+											ImtContr.ToolButton {
 												id: refRemoveBtn
 												anchors.right: parent.right
 												anchors.verticalCenter: parent.verticalCenter
 												iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
 												decorator: Component {
-													ToolButtonDecorator {
+													ImtContr.ToolButtonDecorator {
 														color: "transparent"
 														icon.width: Style.iconSizeXS
 													}
@@ -695,7 +695,7 @@ DocumentViewBase {
 
 								// Blue link to add context via dialog
 								Text {
-									text: qsTr("+ Add context")
+									text: qsTr("Add context")
 									font.pixelSize: Style.fontSizeM
 									font.underline: true
 									color: editView.accentColor
@@ -720,7 +720,7 @@ DocumentViewBase {
 								// Step 1 dialog: pick entity type then browse collection
 								Component {
 									id: contextPickerDialogComp
-									Dialog {
+									ImtContr.Dialog {
 										id: ctxPickerDialog
 										title: qsTr("Add Context")
 										canMove: false
@@ -739,7 +739,6 @@ DocumentViewBase {
 											Column {
 												width: parent ? parent.width : 400
 												spacing: Style.spacingL
-												padding: Style.paddingL
 
 												Text {
 													text: qsTr("Select entity type to browse:")
@@ -747,7 +746,7 @@ DocumentViewBase {
 													color: Style.textColor
 												}
 
-												ComboBox {
+												ImtContr.ComboBox {
 													id: ctxTypeCB
 													width: parent.width - Style.paddingL * 2
 													height: Style.buttonHeightM
@@ -871,7 +870,7 @@ DocumentViewBase {
 										opacity: 0.6
 									}
 
-									ComboBox {
+									ImtContr.ComboBox {
 										id: editTypeCB
 										width: parent.width
 										height: Style.buttonHeightM
@@ -894,7 +893,7 @@ DocumentViewBase {
 										opacity: 0.6
 									}
 
-									ComboBox {
+									ImtContr.ComboBox {
 										id: editPriorityCB
 										width: parent.width
 										height: Style.buttonHeightM
@@ -919,7 +918,7 @@ DocumentViewBase {
 									opacity: 0.6
 								}
 
-								ComboBox {
+								ImtContr.ComboBox {
 									id: editAssigneeCB
 									width: parent.width
 									height: Style.buttonHeightM
@@ -930,7 +929,7 @@ DocumentViewBase {
 							}
 
 							// Hidden Reporter (data still tracked for model)
-							ComboBox {
+							ImtContr.ComboBox {
 								id: editReporterCB
 								visible: false
 								width: 0
@@ -955,7 +954,7 @@ DocumentViewBase {
 										opacity: 0.6
 									}
 
-									ComboBox {
+									ImtContr.ComboBox {
 										id: editStatusCB
 										width: parent.width
 										height: Style.buttonHeightM
@@ -978,7 +977,7 @@ DocumentViewBase {
 										opacity: 0.6
 									}
 
-									ComboBox {
+									ImtContr.ComboBox {
 										id: editStateReasonCB
 										width: parent.width
 										height: Style.buttonHeightM
@@ -999,7 +998,7 @@ DocumentViewBase {
 
 								Rectangle { width: parent.width; height: 1; color: editView.cardBorderColor; opacity: 0.5 }
 
-								CheckBox {
+								ImtContr.CheckBox {
 									id: editLockedCB
 									text: qsTr("Lock issue")
 									onCheckStateChanged: root.doUpdateModel()
@@ -1019,7 +1018,7 @@ DocumentViewBase {
 										opacity: 0.6
 									}
 
-									CustomTextField {
+									ImtContr.CustomTextField {
 										id: editLockReasonInput
 										width: parent.width
 										height: Style.controlHeightM
@@ -1115,7 +1114,7 @@ DocumentViewBase {
 				}
 			}
 
-			CustomScrollbar {
+			ImtContr.CustomScrollbar {
 				id: commentsScrollV
 				z: parent.z + 1
 				anchors.right: parent.right
@@ -1412,13 +1411,13 @@ DocumentViewBase {
 									maximumLineCount: 1
 								}
 
-								ToolButton {
+								ImtContr.ToolButton {
 									id: pendingRemoveBtn
 									anchors.right: parent.right
 									anchors.verticalCenter: parent.verticalCenter
 									iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
 									decorator: Component {
-										ToolButtonDecorator {
+										ImtContr.ToolButtonDecorator {
 											color: "transparent"
 											icon.width: Style.iconSizeXS
 										}
@@ -1468,12 +1467,12 @@ DocumentViewBase {
 						anchors.right: parent.right
 						spacing: Style.spacingS
 
-						ToolButton {
+						ImtContr.ToolButton {
 							id: attachButton
 							tooltipText: qsTr("Attach file")
 							iconSource: Style.getIconPath("Icons/Attachment", Icon.State.On, Icon.Mode.Normal)
 							decorator: Component {
-								ToolButtonDecorator { color: "transparent" }
+								ImtContr.ToolButtonDecorator { color: "transparent" }
 							}
 							onClicked: attachImageDialog.open()
 						}
@@ -1498,7 +1497,7 @@ DocumentViewBase {
 							}
 
 							// Hidden functional Button for enabled state
-							Button {
+							ImtContr.Button {
 								id: commentButton
 								visible: false
 								enabled: (commentInputField.text !== "" || root.pendingAttachments.length > 0) && root.uploadsInProgress === 0
