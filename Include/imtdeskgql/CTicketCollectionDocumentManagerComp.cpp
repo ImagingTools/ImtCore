@@ -244,6 +244,30 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 							itemData.reactions->FromList(reactions);
 						}
 
+						// Reply-to context
+						QByteArray replyToId = msgPtr->GetReplyToId();
+						if (!replyToId.isEmpty()){
+							itemData.replyToId = replyToId;
+							// Resolve reply-to content and user name from the referenced message
+							imtbase::IObjectCollection::DataPtr replyDataPtr;
+							if (m_messageCollectionCompPtr.IsValid() && m_messageCollectionCompPtr->GetObjectData(replyToId, replyDataPtr)){
+								const imtchat::IChatMessage* replyMsgPtr = dynamic_cast<const imtchat::IChatMessage*>(replyDataPtr.GetPtr());
+								if (replyMsgPtr != nullptr){
+									itemData.replyToContent = replyMsgPtr->GetContent();
+									QByteArray replySenderId = replyMsgPtr->GetSenderId();
+									if (m_userCollectionCompPtr.IsValid()){
+										imtbase::IObjectCollection::DataPtr replyUserDataPtr;
+										if (m_userCollectionCompPtr->GetObjectData(replySenderId, replyUserDataPtr)){
+											const imtauth::IUserInfo* replyUserInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(replyUserDataPtr.GetPtr());
+											if (replyUserInfoPtr != nullptr){
+												itemData.replyToUserName = replyUserInfoPtr->GetName();
+											}
+										}
+									}
+								}
+							}
+						}
+
 						itemList << itemData;
 					}
 				}
@@ -469,7 +493,12 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 					}
 				}
 
-				m_chatServiceCompPtr->SendMessage(conversationId, senderId, content, QByteArrayList() /*entityReferences*/, attachmentIds);
+				QByteArray replyToId;
+				if (sdlItem->replyToId && !sdlItem->replyToId->isEmpty()){
+					replyToId = *sdlItem->replyToId;
+				}
+
+				m_chatServiceCompPtr->SendMessage(conversationId, senderId, content, QByteArrayList() /*entityReferences*/, attachmentIds, replyToId);
 			}
 		}
 	}

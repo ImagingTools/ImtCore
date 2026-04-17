@@ -133,6 +133,16 @@ public:
 		Set the reactions.
 	*/
 	virtual void SetReactions(const QStringList& reactions) = 0;
+
+	/**
+		Get the ID of the message this message is replying to.
+	*/
+	virtual QByteArray GetReplyToId() const = 0;
+
+	/**
+		Set the reply-to message ID.
+	*/
+	virtual void SetReplyToId(const QByteArray& replyToId) = 0;
 };
 
 typedef istd::TUniqueInterfacePtr<IChatMessage> IChatMessageUniquePtr;

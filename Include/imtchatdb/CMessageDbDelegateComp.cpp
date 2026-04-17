@@ -120,6 +120,9 @@ istd::IChangeableUniquePtr CMessageDbDelegateComp::CreateObjectFromRecord(
 		QDateTime dt = val.toDateTime();
 		msgPtr->SetUpdatedAt(dt.isValid() ? dt.toString(Qt::ISODateWithMs) : val.toString());
 	}
+	if (record.contains("ReplyToId")){
+		msgPtr->SetReplyToId(record.value("ReplyToId").toByteArray());
+	}
 
 	return msgPtr;
 }
@@ -158,6 +161,9 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CMessageDbDelegateComp::CreateNew
 	const QString reactionsStr = msgPtr->GetReactions().join(',');
 	const QString reactionsSql = reactionsStr.isEmpty() ? "NULL" : QString("'%1'").arg(reactionsStr);
 
+	const QByteArray replyToId = msgPtr->GetReplyToId();
+	const QString replyToIdSql = replyToId.isEmpty() ? "NULL" : QString("'%1'").arg(QString::fromUtf8(replyToId));
+
 	const QString nowUtc = utcNow();
 
 	QString combinedQuery;
@@ -165,8 +171,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CMessageDbDelegateComp::CreateNew
 	// INSERT into Messages table (without AttachmentIds column)
 	combinedQuery += QString(
 		"INSERT INTO \"Messages\" "
-		"(\"Id\", \"ConversationId\", \"SenderId\", \"Content\", \"EntityReferences\", \"Reactions\", \"Status\", \"CreatedAt\", \"UpdatedAt\") "
-		"VALUES('%1', '%2', '%3', '%4', %5, %6, %7, '%8', '%9');")
+		"(\"Id\", \"ConversationId\", \"SenderId\", \"Content\", \"EntityReferences\", \"Reactions\", \"Status\", \"ReplyToId\", \"CreatedAt\", \"UpdatedAt\") "
+		"VALUES('%1', '%2', '%3', '%4', %5, %6, %7, %8, '%9', '%10');")
 		.arg(QString::fromUtf8(msgId))
 		.arg(QString::fromUtf8(msgPtr->GetConversationId()))
 		.arg(QString::fromUtf8(msgPtr->GetSenderId()))
@@ -174,6 +180,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CMessageDbDelegateComp::CreateNew
 		.arg(entityRefsSql)
 		.arg(reactionsSql)
 		.arg(msgPtr->GetStatus())
+		.arg(replyToIdSql)
 		.arg(nowUtc)
 		.arg(nowUtc);
 
@@ -349,6 +356,15 @@ void CMessageDbDelegateComp::OnComponentCreated()
 						<< "\n\t| Query:" << junctionQuery;
 			SendErrorMessage(0, QString("MessageAttachments table could not be created: %1").arg(junctionError.text()));
 		}
+	}
+
+	// Add ReplyToId column to existing Messages tables (migration)
+	{
+		QSqlError migrError;
+		m_databaseEngineCompPtr->ExecSqlQuery(
+			"ALTER TABLE \"Messages\" ADD COLUMN \"ReplyToId\" TEXT;",
+			&migrError);
+		// Ignore errors (column may already exist)
 	}
 }
 

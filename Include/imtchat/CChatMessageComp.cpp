@@ -174,6 +174,22 @@ void CChatMessageComp::SetReactions(const QStringList& reactions)
 }
 
 
+QByteArray CChatMessageComp::GetReplyToId() const
+{
+	return m_replyToId;
+}
+
+
+void CChatMessageComp::SetReplyToId(const QByteArray& replyToId)
+{
+	if (m_replyToId != replyToId){
+		istd::CChangeNotifier notifier(this);
+
+		m_replyToId = replyToId;
+	}
+}
+
+
 // reimplemented (iser::ISerializable)
 
 bool CChatMessageComp::Serialize(iser::IArchive& archive)
@@ -220,6 +236,11 @@ bool CChatMessageComp::Serialize(iser::IArchive& archive)
 
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QStringList>(archive, m_reactions, "Reactions", "Reaction");
 
+	static iser::CArchiveTag replyToIdTag("ReplyToId", "Reply to message id", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(replyToIdTag);
+	retVal = retVal && archive.Process(m_replyToId);
+	retVal = retVal && archive.EndTag(replyToIdTag);
+
 	return retVal;
 }
 
@@ -245,6 +266,7 @@ bool CChatMessageComp::CopyFrom(const IChangeable& object, CompatibilityMode /*m
 	m_entityReferences = srcPtr->GetEntityReferences();
 	m_attachmentIds = srcPtr->GetAttachmentIds();
 	m_reactions = srcPtr->GetReactions();
+	m_replyToId = srcPtr->GetReplyToId();
 	return true;
 }
 
@@ -265,7 +287,8 @@ bool CChatMessageComp::IsEqual(const IChangeable& object) const
 		&& m_updatedAt == srcPtr->GetUpdatedAt()
 		&& m_entityReferences == srcPtr->GetEntityReferences()
 		&& m_attachmentIds == srcPtr->GetAttachmentIds()
-		&& m_reactions == srcPtr->GetReactions();
+		&& m_reactions == srcPtr->GetReactions()
+		&& m_replyToId == srcPtr->GetReplyToId();
 }
 
 
@@ -291,6 +314,7 @@ bool CChatMessageComp::ResetData(CompatibilityMode /*mode*/)
 	m_entityReferences.clear();
 	m_attachmentIds.clear();
 	m_reactions.clear();
+	m_replyToId.clear();
 	return true;
 }
 

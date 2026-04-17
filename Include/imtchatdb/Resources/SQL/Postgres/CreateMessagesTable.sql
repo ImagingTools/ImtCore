@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS "${TableScheme}"."Messages"
     "EntityReferences" JSONB,
     "Reactions"        JSONB,
     "Status"           INTEGER NOT NULL DEFAULT 0,
+    "ReplyToId"        UUID,
     "CreatedAt"        TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
     "UpdatedAt"        TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC')
 );

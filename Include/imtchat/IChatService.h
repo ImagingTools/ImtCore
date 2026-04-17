@@ -31,6 +31,7 @@ public:
 		\param content           Message text content.
 		\param entityReferences  Optional entity reference IDs.
 		\param attachmentIds     Optional attachment IDs.
+		\param replyToId         Optional ID of the message being replied to.
 		\return New message ID, or empty on failure.
 	*/
 	virtual QByteArray SendMessage(
@@ -38,7 +39,8 @@ public:
 				const QByteArray& senderId,
 				const QString& content,
 				const QByteArrayList& entityReferences = QByteArrayList(),
-				const QByteArrayList& attachmentIds = QByteArrayList()) = 0;
+				const QByteArrayList& attachmentIds = QByteArrayList(),
+				const QByteArray& replyToId = QByteArray()) = 0;
 
 	/**
 		Retrieve messages for a conversation.

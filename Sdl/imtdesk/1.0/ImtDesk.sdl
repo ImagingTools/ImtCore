@@ -84,6 +84,9 @@ type TicketComment {
 	content: String
 	attachments: [Attachment]
 	reactions: [String]
+	replyToId: ID
+	replyToContent: String
+	replyToUserName: String
 }
 
 # --- Ticket ---

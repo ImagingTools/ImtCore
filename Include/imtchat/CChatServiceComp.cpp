@@ -16,7 +16,8 @@ QByteArray CChatServiceComp::SendMessage(
 			const QByteArray& senderId,
 			const QString& content,
 			const QByteArrayList& entityReferences,
-			const QByteArrayList& attachmentIds)
+			const QByteArrayList& attachmentIds,
+			const QByteArray& replyToId)
 {
 	imtbase::IObjectCollection* messageCollectionPtr = m_messageCollectionCompPtr.GetPtr();
 	if (messageCollectionPtr == nullptr){
@@ -42,6 +43,7 @@ QByteArray CChatServiceComp::SendMessage(
 	chatMessagePtr->SetStatus(IChatMessage::MS_SENT);
 	chatMessagePtr->SetEntityReferences(entityReferences);
 	chatMessagePtr->SetAttachmentIds(attachmentIds);
+	chatMessagePtr->SetReplyToId(replyToId);
 
 	QByteArray objectId = messageCollectionPtr->InsertNewObject(
 				QByteArray("ChatMessage"),

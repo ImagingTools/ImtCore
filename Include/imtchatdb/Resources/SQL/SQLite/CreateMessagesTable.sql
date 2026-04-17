@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS "Messages"
     "EntityReferences" TEXT,
     "Reactions"        TEXT,
     "Status"           INTEGER NOT NULL DEFAULT 0,
+    "ReplyToId"        TEXT,
     "CreatedAt"        TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "UpdatedAt"        TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
