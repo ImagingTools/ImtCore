@@ -38,6 +38,8 @@ DocumentViewBase {
 	property var pendingEntityRefs: []
 	// Force chat scroll to bottom after sending a message
 	property bool _forceScrollToBottom: false
+	// Track whether entity refs changed to avoid unnecessary emplace calls
+	property bool _entityRefsChanged: false
 	
 	signal commentSubmitted(string commentText)
 	
@@ -222,6 +224,7 @@ DocumentViewBase {
 			}
 		}
 		root.pendingEntityRefs = refs
+		root._entityRefsChanged = true
 		
 		editAssigneeCB.currentIndex = -1
 		if (editAssigneeCB.model) {
@@ -280,23 +283,26 @@ DocumentViewBase {
 			ticketData.m_stateReason = editStateReasonCB.model.getData("id", editStateReasonCB.currentIndex)
 		}
 
-		// Save entity references to ticket data (always emplace so deletions are sent as empty array)
-		ticketData.emplaceEntityReferences()
-		for (var r = 0; r < root.pendingEntityRefs.length; r++) {
-			var ref = root.pendingEntityRefs[r]
-			var refItem = ticketData.createEntityReferencesArrayElement()
-			refItem.m_entityType = String(ref.entityType || "")
-			refItem.m_entityId = String(ref.entityId || "")
-			refItem.m_displayName = String(ref.displayName || "")
-			// Build ObjectLink with navigation path
-			refItem.emplaceEntityLink()
-			refItem.m_entityLink.m_id = String(ref.entityId || "")
-			refItem.m_entityLink.m_typeId = String(ref.typeId || ref.entityType || "")
-			refItem.m_entityLink.m_name = String(ref.displayName || "")
-			refItem.m_entityLink.emplaceUrl()
-			refItem.m_entityLink.m_url.m_scheme = "applink"
-			refItem.m_entityLink.m_url.m_path = String(ref.entityLinkPath || "")
-			ticketData.m_entityReferences.addElement(refItem)
+		// Save entity references to ticket data only when they actually changed
+		if (root._entityRefsChanged) {
+			root._entityRefsChanged = false
+			ticketData.emplaceEntityReferences()
+			for (var r = 0; r < root.pendingEntityRefs.length; r++) {
+				var ref = root.pendingEntityRefs[r]
+				var refItem = ticketData.createEntityReferencesArrayElement()
+				refItem.m_entityType = String(ref.entityType || "")
+				refItem.m_entityId = String(ref.entityId || "")
+				refItem.m_displayName = String(ref.displayName || "")
+				// Build ObjectLink with navigation path
+				refItem.emplaceEntityLink()
+				refItem.m_entityLink.m_id = String(ref.entityId || "")
+				refItem.m_entityLink.m_typeId = String(ref.typeId || ref.entityType || "")
+				refItem.m_entityLink.m_name = String(ref.displayName || "")
+				refItem.m_entityLink.emplaceUrl()
+				refItem.m_entityLink.m_url.m_scheme = "applink"
+				refItem.m_entityLink.m_url.m_path = String(ref.entityLinkPath || "")
+				ticketData.m_entityReferences.addElement(refItem)
+			}
 		}
 	}
 	
@@ -628,6 +634,25 @@ DocumentViewBase {
 											color: Style.baseColor
 										}
 									}
+
+									Item { width: Style.spacingS; height: 1 }
+
+									Text {
+										text: "+ " + qsTr("Add context")
+										font.pixelSize: Style.fontSizeS
+										font.bold: true
+										color: editView.accentColor
+										anchors.verticalCenter: parent.verticalCenter
+
+										MouseArea {
+											anchors.fill: parent
+											hoverEnabled: true
+											cursorShape: Qt.PointingHandCursor
+											onClicked: {
+												ModalDialogManager.openDialog(contextPickerDialogComp)
+											}
+										}
+									}
 								}
 
 								// Entity chips
@@ -686,27 +711,10 @@ DocumentViewBase {
 													var arr = root.pendingEntityRefs.slice()
 													arr.splice(index, 1)
 													root.pendingEntityRefs = arr
+													root._entityRefsChanged = true
 													root.doUpdateModel()
 												}
 											}
-										}
-									}
-								}
-
-								// Blue link to add context via dialog
-								Text {
-									text: qsTr("Add context")
-									anchors.right: parent.right
-									font.pixelSize: Style.fontSizeM
-									font.underline: true
-									color: editView.accentColor
-
-									MouseArea {
-										anchors.fill: parent
-										hoverEnabled: true
-										cursorShape: Qt.PointingHandCursor
-										onClicked: {
-											ModalDialogManager.openDialog(contextPickerDialogComp)
 										}
 									}
 								}
@@ -716,16 +724,16 @@ DocumentViewBase {
 									id: contextPickerDialogComp
 									Dialog {
 										id: ctxDialog
-										title: qsTr("Add Context")
+										title: qsTr("Link Entity to Ticket")
 										canMove: false
-										width: ModalDialogManager.activeView.width - 100
-										height: ModalDialogManager.activeView.height - 100
+										width: Math.min(ModalDialogManager.activeView.width - 80, 900)
+										height: ModalDialogManager.activeView.height - 80
 
 										property string selectedEntityTypeId: ""
 										property RemoteCollectionView collectionView: null
 
 										Component.onCompleted: {
-											addButton(Enums.apply, qsTr("Attach"), false)
+											addButton(Enums.apply, qsTr("Attach Selected"), false)
 											addButton(Enums.cancel, qsTr("Cancel"), true)
 											setButtonEnabled(Enums.apply, false)
 											// Pre-select first entity type
@@ -746,51 +754,73 @@ DocumentViewBase {
 												Column {
 													id: ctxContentCol
 													anchors.fill: parent
+													anchors.margins: Style.paddingM
 													spacing: Style.spacingM
 
-													Row {
+													// Entity type selector row
+													Rectangle {
 														width: parent.width
-														height: Style.buttonHeightM
-														spacing: Style.spacingM
+														height: ctxTypeRow.height + Style.paddingM * 2
+														radius: Style.radiusM
+														color: editView.accentBadgeBg
+														border.color: editView.accentBorderLight
+														border.width: 1
 
-														Text {
-															text: qsTr("Entity type:")
-															font.pixelSize: Style.fontSizeM
-															color: Style.textColor
-															anchors.verticalCenter: parent.verticalCenter
-														}
+														Row {
+															id: ctxTypeRow
+															anchors.centerIn: parent
+															spacing: Style.spacingM
 
-														ComboBox {
-															id: ctxTypeCB
-															width: 250
-															height: Style.buttonHeightM
-															onCurrentIndexChanged: {
-																if (entityTypeModel.getItemsCount() > currentIndex) {
-																	ctxDialog.selectedEntityTypeId = entityTypeModel.getData("id", currentIndex)
-																	ctxDialog.setButtonEnabled(Enums.apply, false)
+															Text {
+																text: qsTr("Entity Type")
+																font.pixelSize: Style.fontSizeM
+																font.bold: true
+																color: Style.textColor
+																anchors.verticalCenter: parent.verticalCenter
+															}
+
+															ComboBox {
+																id: ctxTypeCB
+																width: 280
+																height: Style.buttonHeightM
+																onCurrentIndexChanged: {
+																	if (entityTypeModel.getItemsCount() > currentIndex) {
+																		ctxDialog.selectedEntityTypeId = entityTypeModel.getData("id", currentIndex)
+																		ctxDialog.setButtonEnabled(Enums.apply, false)
+																	}
 																}
 															}
 														}
 													}
 
+													// Collection browser
 													Item {
 														width: parent.width
-														height: parent.height - Style.buttonHeightM - Style.spacingM
+														height: parent.height - ctxTypeRow.height - Style.paddingM * 2 - Style.spacingM * 2
 
-														RemoteCollectionView {
+														Rectangle {
 															anchors.fill: parent
-															commandsControllerComp: null
-															visibleMetaInfo: false
-															commandsDelegateComp: null
-															collectionId: ctxDialog.selectedEntityTypeId
-															documentCollectionFilter: null
-															loadingDataAfterHeadersReceived: false
-															showRemoteChangesAlert: false
-															Component.onCompleted: {
-																ctxDialog.collectionView = this
-															}
-															onSelectionChanged: {
-																ctxDialog.setButtonEnabled(Enums.apply, ids.length > 0)
+															radius: Style.radiusM
+															color: "transparent"
+															border.color: Style.borderColor
+															border.width: 1
+
+															RemoteCollectionView {
+																anchors.fill: parent
+																anchors.margins: 1
+																commandsControllerComp: null
+																visibleMetaInfo: false
+																commandsDelegateComp: null
+																collectionId: ctxDialog.selectedEntityTypeId
+																documentCollectionFilter: null
+																loadingDataAfterHeadersReceived: false
+																showRemoteChangesAlert: false
+																Component.onCompleted: {
+																	ctxDialog.collectionView = this
+																}
+																onSelectionChanged: {
+																	ctxDialog.setButtonEnabled(Enums.apply, ids.length > 0)
+																}
 															}
 														}
 													}
@@ -820,6 +850,7 @@ DocumentViewBase {
 													})
 												}
 												root.pendingEntityRefs = arr
+												root._entityRefsChanged = true
 												root.doUpdateModel()
 											}
 										}
