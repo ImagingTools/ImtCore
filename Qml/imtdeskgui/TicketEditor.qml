@@ -477,15 +477,16 @@ DocumentViewBase {
 			anchors.bottom: parent.bottom
 			anchors.bottomMargin: Style.marginXL
 			
-			// ==================== TOP ROW: Title/Desc/Context + Properties ====================
+			// ==================== TOP ROW: Title/Desc + Properties (independent heights) ====================
 			Item {
 				id: topRow
 				anchors.top: parent.top
 				anchors.left: parent.left
 				anchors.right: parent.right
-				height: Math.max(detailsCard.height, propertiesCard.height)
+				// Height = only detailsCard (Title/Desc). Properties is independent and may extend below.
+				height: detailsCard.height
 				
-				// LEFT: Title + Description + Context (combined)
+				// LEFT: Title + Description (Context moved to Properties card)
 				Item {
 					id: leftTopWrapper
 					anchors.left: parent.left
@@ -670,288 +671,6 @@ DocumentViewBase {
 								}
 							}
 							
-							// ---------- Context / Entity References (merged into details card) ----------
-							Rectangle { width: parent.width; height: 1; color: editView.cardBorderColor; opacity: 0.4 }
-							
-							Column {
-								id: contextCardCol
-								width: parent.width
-								spacing: Style.spacingS
-								
-								Item {
-									width: parent.width
-									height: Math.max(contextLabelText.height, addContextBtn.height)
-									
-									Row {
-										anchors.left: parent.left
-										anchors.verticalCenter: parent.verticalCenter
-										spacing: Style.spacingS
-										
-										Text {
-											id: contextLabelText
-											text: qsTr("Context")
-											font.pixelSize: Style.fontSizeM
-											font.bold: true
-											color: editView.sectionLabelColor
-											anchors.verticalCenter: parent.verticalCenter
-										}
-										
-										Rectangle {
-											visible: root.pendingEntityRefs.length > 0
-											width: refCountLabel.contentWidth + Style.paddingS * 2
-											height: editView.badgeHeight - 2
-											radius: (editView.badgeHeight - 2) / 2
-											color: editView.accentColor
-											anchors.verticalCenter: parent.verticalCenter
-											
-											Text {
-												id: refCountLabel
-												anchors.centerIn: parent
-												text: root.pendingEntityRefs.length
-												font.pixelSize: Style.fontSizeM - 1
-												font.bold: true
-												color: Style.baseColor
-											}
-										}
-									}
-									
-									Text {
-										id: addContextBtn
-										anchors.right: parent.right
-										anchors.verticalCenter: parent.verticalCenter
-										visible: root.canEdit
-										text: "+ " + qsTr("Add context")
-										font.pixelSize: Style.fontSizeM
-										font.bold: true
-										color: editView.accentColor
-										
-										MouseArea {
-											anchors.fill: parent
-											hoverEnabled: true
-											cursorShape: Qt.PointingHandCursor
-											onClicked: {
-												ModalDialogManager.openDialog(contextPickerDialogComp)
-											}
-										}
-									}
-								}
-								
-								// Entity chips (tags-style)
-								Flow {
-									width: parent.width
-									spacing: Style.spacingXS
-									visible: root.pendingEntityRefs.length > 0
-									
-									Repeater {
-										model: root.pendingEntityRefs
-										delegate: Rectangle {
-											readonly property real maxRefWidth: 260
-											width: Math.min(refLabelText.contentWidth + refRemoveBtn.width + Style.paddingS * 3, maxRefWidth)
-											height: 28
-											radius: 14
-											color: editView.accentBgLight
-											border.color: editView.accentBorderLight
-											border.width: 1
-											
-											Text {
-												id: refLabelText
-												anchors.left: parent.left
-												anchors.leftMargin: Style.paddingS + 2
-												anchors.verticalCenter: parent.verticalCenter
-												text: (modelData.entityType ? "[" + modelData.entityType + "] " : "") + (modelData.displayName || modelData.entityId || "")
-												font.pixelSize: Style.fontSizeM
-												color: editView.accentColor
-												font.underline: modelData.entityLinkPath !== ""
-												elide: Text.ElideRight
-												maximumLineCount: 1
-												
-												MouseArea {
-													anchors.fill: parent
-													hoverEnabled: true
-													cursorShape: Qt.PointingHandCursor
-													onClicked: {
-														if (modelData.entityLinkPath) {
-															NavigationController.navigate(modelData.entityLinkPath)
-														}
-													}
-												}
-											}
-											
-											ToolButton {
-												id: refRemoveBtn
-												visible: root.canEdit
-												anchors.right: parent.right
-												anchors.verticalCenter: parent.verticalCenter
-												iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
-												decorator: Component {
-													ToolButtonDecorator {
-														color: "transparent"
-														icon.width: Style.iconSizeXS
-													}
-												}
-												onClicked: {
-													var arr = root.pendingEntityRefs.slice()
-													arr.splice(index, 1)
-													root.pendingEntityRefs = arr
-													root._entityRefsChanged = true
-													root.doUpdateModel()
-												}
-											}
-										}
-									}
-								}
-								
-								// Empty context placeholder
-								Text {
-									visible: root.pendingEntityRefs.length === 0
-									width: parent.width
-									text: qsTr("No linked entities. Click \"+ Add context\" to attach entities to this ticket.")
-									font.pixelSize: Style.fontSizeM
-									color: Style.inactiveTextColor
-									wrapMode: Text.WordWrap
-								}
-								
-								// Single dialog: entity type ComboBox + RemoteCollectionView
-								Component {
-									id: contextPickerDialogComp
-									Dialog {
-										id: ctxDialog
-										title: qsTr("Link Entity to Ticket")
-										canMove: false
-										width: Math.min(ModalDialogManager.activeView.width - 80, 900)
-										height: ModalDialogManager.activeView.height - 80
-										
-										property string selectedEntityTypeId: ""
-										property RemoteCollectionView collectionView: null
-										
-										Component.onCompleted: {
-											addButton(Enums.apply, qsTr("Attach Selected"), false)
-											addButton(Enums.cancel, qsTr("Cancel"), true)
-											setButtonEnabled(Enums.apply, false)
-											// Pre-select first entity type
-											if (entityTypeModel.getItemsCount() > 0) {
-												selectedEntityTypeId = entityTypeModel.getData("id", 0)
-											}
-										}
-										
-										contentComp: Component {
-											Item {
-												width: ctxDialog.width
-												height: ctxDialog.height - 100
-												
-												Component.onCompleted: {
-													ctxTypeCB.model = entityTypeModel
-													if (entityTypeModel.getItemsCount() > 0) {
-														ctxTypeCB.currentIndex = 0
-													}
-												}
-												
-												Column {
-													id: ctxContentCol
-													anchors.fill: parent
-													anchors.margins: Style.paddingM
-													spacing: Style.spacingM
-													
-													// Entity type selector row
-													Rectangle {
-														width: parent.width
-														height: ctxTypeRow.height + Style.paddingM * 2
-														radius: Style.radiusM
-														color: editView.accentBadgeBg
-														border.color: editView.accentBorderLight
-														border.width: 1
-														
-														Row {
-															id: ctxTypeRow
-															anchors.centerIn: parent
-															spacing: Style.spacingM
-															
-															Text {
-																text: qsTr("Entity type")
-																font.pixelSize: Style.fontSizeM
-																font.bold: true
-																color: Style.textColor
-																anchors.verticalCenter: parent.verticalCenter
-															}
-															
-															ComboBox {
-																id: ctxTypeCB
-																width: 280
-																height: Style.buttonHeightM
-																onCurrentIndexChanged: {
-																	if (entityTypeModel.getItemsCount() > currentIndex) {
-																		ctxDialog.selectedEntityTypeId = entityTypeModel.getData("id", currentIndex)
-																		ctxDialog.setButtonEnabled(Enums.apply, false)
-																	}
-																}
-															}
-														}
-													}
-													
-													// Collection browser
-													Item {
-														width: parent.width
-														height: parent.height - ctxTypeRow.height - Style.paddingM * 2 - Style.spacingM * 2
-														
-														Rectangle {
-															anchors.fill: parent
-															radius: Style.radiusM
-															color: "transparent"
-															border.color: Style.borderColor
-															border.width: 1
-															
-															RemoteCollectionView {
-																anchors.fill: parent
-																anchors.margins: 1
-																commandsControllerComp: null
-																visibleMetaInfo: false
-																commandsDelegateComp: null
-																collectionId: ctxDialog.selectedEntityTypeId
-																documentCollectionFilter: null
-																loadingDataAfterHeadersReceived: false
-																showRemoteChangesAlert: false
-																Component.onCompleted: {
-																	ctxDialog.collectionView = this
-																}
-																onSelectionChanged: {
-																	ctxDialog.setButtonEnabled(Enums.apply, selectedIds.length > 0)
-																}
-															}
-														}
-													}
-												}
-											}
-										}
-										
-										onFinished: {
-											if (buttonId === Enums.apply && collectionView) {
-												var arr = root.pendingEntityRefs.slice()
-												var mdl = collectionView.table.elements
-												let indexes = collectionView.table.getSelectedIndexes()
-												for (var i = 0; i < indexes.length; i++) {
-													let idx = indexes[i]
-													var displayName = mdl.getData("name", idx)
-													var typeId = mdl.getData("typeId", idx)
-													var elementId = mdl.getData("id", idx)
-													var linkPath = selectedEntityTypeId
-													if (typeId) linkPath += "/" + typeId
-													linkPath += "/" + elementId
-													arr.push({
-																 entityType: selectedEntityTypeId,
-																 entityId: elementId,
-																 displayName: displayName,
-																 entityLinkPath: linkPath,
-																 typeId: typeId
-															 })
-												}
-												root.pendingEntityRefs = arr
-												root._entityRefsChanged = true
-												root.doUpdateModel()
-											}
-										}
-									}
-								}
-							}
 						}
 					}
 					
@@ -1280,6 +999,288 @@ DocumentViewBase {
 								onCurrentIndexChanged: root.doUpdateModel()
 							}
 							
+							// ---------- Context / Entity References (in properties card) ----------
+							Rectangle { width: parent.width; height: 1; color: editView.cardBorderColor; opacity: 0.4 }
+							
+							Column {
+								id: contextCardCol
+								width: parent.width
+								spacing: Style.spacingS
+								
+								Item {
+									width: parent.width
+									height: Math.max(contextLabelText.height, addContextBtn.height)
+									
+									Row {
+										anchors.left: parent.left
+										anchors.verticalCenter: parent.verticalCenter
+										spacing: Style.spacingS
+										
+										Text {
+											id: contextLabelText
+											text: qsTr("Context")
+											font.pixelSize: Style.fontSizeM
+											font.bold: true
+											color: editView.sectionLabelColor
+											anchors.verticalCenter: parent.verticalCenter
+										}
+										
+										Rectangle {
+											visible: root.pendingEntityRefs.length > 0
+											width: refCountLabel.contentWidth + Style.paddingS * 2
+											height: editView.badgeHeight - 2
+											radius: (editView.badgeHeight - 2) / 2
+											color: editView.accentColor
+											anchors.verticalCenter: parent.verticalCenter
+											
+											Text {
+												id: refCountLabel
+												anchors.centerIn: parent
+												text: root.pendingEntityRefs.length
+												font.pixelSize: Style.fontSizeM - 1
+												font.bold: true
+												color: Style.baseColor
+											}
+										}
+									}
+									
+									Text {
+										id: addContextBtn
+										anchors.right: parent.right
+										anchors.verticalCenter: parent.verticalCenter
+										visible: root.canEdit
+										text: "+ " + qsTr("Add context")
+										font.pixelSize: Style.fontSizeM
+										font.bold: true
+										color: editView.accentColor
+										
+										MouseArea {
+											anchors.fill: parent
+											hoverEnabled: true
+											cursorShape: Qt.PointingHandCursor
+											onClicked: {
+												ModalDialogManager.openDialog(contextPickerDialogComp)
+											}
+										}
+									}
+								}
+								
+								// Entity chips (tags-style)
+								Flow {
+									width: parent.width
+									spacing: Style.spacingXS
+									visible: root.pendingEntityRefs.length > 0
+									
+									Repeater {
+										model: root.pendingEntityRefs
+										delegate: Rectangle {
+											readonly property real maxRefWidth: 260
+											width: Math.min(refLabelText.contentWidth + refRemoveBtn.width + Style.paddingS * 3, maxRefWidth)
+											height: 28
+											radius: 14
+											color: editView.accentBgLight
+											border.color: editView.accentBorderLight
+											border.width: 1
+											
+											Text {
+												id: refLabelText
+												anchors.left: parent.left
+												anchors.leftMargin: Style.paddingS + 2
+												anchors.verticalCenter: parent.verticalCenter
+												text: (modelData.entityType ? "[" + modelData.entityType + "] " : "") + (modelData.displayName || modelData.entityId || "")
+												font.pixelSize: Style.fontSizeM
+												color: editView.accentColor
+												font.underline: modelData.entityLinkPath !== ""
+												elide: Text.ElideRight
+												maximumLineCount: 1
+												
+												MouseArea {
+													anchors.fill: parent
+													hoverEnabled: true
+													cursorShape: Qt.PointingHandCursor
+													onClicked: {
+														if (modelData.entityLinkPath) {
+															NavigationController.navigate(modelData.entityLinkPath)
+														}
+													}
+												}
+											}
+											
+											ToolButton {
+												id: refRemoveBtn
+												visible: root.canEdit
+												anchors.right: parent.right
+												anchors.verticalCenter: parent.verticalCenter
+												iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+												decorator: Component {
+													ToolButtonDecorator {
+														color: "transparent"
+														icon.width: Style.iconSizeXS
+													}
+												}
+												onClicked: {
+													var arr = root.pendingEntityRefs.slice()
+													arr.splice(index, 1)
+													root.pendingEntityRefs = arr
+													root._entityRefsChanged = true
+													root.doUpdateModel()
+												}
+											}
+										}
+									}
+								}
+								
+								// Empty context placeholder
+								Text {
+									visible: root.pendingEntityRefs.length === 0
+									width: parent.width
+									text: qsTr("No linked entities. Click \"+ Add context\" to attach entities to this ticket.")
+									font.pixelSize: Style.fontSizeM
+									color: Style.inactiveTextColor
+									wrapMode: Text.WordWrap
+								}
+								
+								// Single dialog: entity type ComboBox + RemoteCollectionView
+								Component {
+									id: contextPickerDialogComp
+									Dialog {
+										id: ctxDialog
+										title: qsTr("Link Entity to Ticket")
+										canMove: false
+										width: Math.min(ModalDialogManager.activeView.width - 80, 900)
+										height: ModalDialogManager.activeView.height - 80
+										
+										property string selectedEntityTypeId: ""
+										property RemoteCollectionView collectionView: null
+										
+										Component.onCompleted: {
+											addButton(Enums.apply, qsTr("Attach Selected"), false)
+											addButton(Enums.cancel, qsTr("Cancel"), true)
+											setButtonEnabled(Enums.apply, false)
+											// Pre-select first entity type
+											if (entityTypeModel.getItemsCount() > 0) {
+												selectedEntityTypeId = entityTypeModel.getData("id", 0)
+											}
+										}
+										
+										contentComp: Component {
+											Item {
+												width: ctxDialog.width
+												height: ctxDialog.height - 100
+												
+												Component.onCompleted: {
+													ctxTypeCB.model = entityTypeModel
+													if (entityTypeModel.getItemsCount() > 0) {
+														ctxTypeCB.currentIndex = 0
+													}
+												}
+												
+												Column {
+													id: ctxContentCol
+													anchors.fill: parent
+													anchors.margins: Style.paddingM
+													spacing: Style.spacingM
+													
+													// Entity type selector row
+													Rectangle {
+														width: parent.width
+														height: ctxTypeRow.height + Style.paddingM * 2
+														radius: Style.radiusM
+														color: editView.accentBadgeBg
+														border.color: editView.accentBorderLight
+														border.width: 1
+														
+														Row {
+															id: ctxTypeRow
+															anchors.centerIn: parent
+															spacing: Style.spacingM
+															
+															Text {
+																text: qsTr("Entity type")
+																font.pixelSize: Style.fontSizeM
+																font.bold: true
+																color: Style.textColor
+																anchors.verticalCenter: parent.verticalCenter
+															}
+															
+															ComboBox {
+																id: ctxTypeCB
+																width: 280
+																height: Style.buttonHeightM
+																onCurrentIndexChanged: {
+																	if (entityTypeModel.getItemsCount() > currentIndex) {
+																		ctxDialog.selectedEntityTypeId = entityTypeModel.getData("id", currentIndex)
+																		ctxDialog.setButtonEnabled(Enums.apply, false)
+																	}
+																}
+															}
+														}
+													}
+													
+													// Collection browser
+													Item {
+														width: parent.width
+														height: parent.height - ctxTypeRow.height - Style.paddingM * 2 - Style.spacingM * 2
+														
+														Rectangle {
+															anchors.fill: parent
+															radius: Style.radiusM
+															color: "transparent"
+															border.color: Style.borderColor
+															border.width: 1
+															
+															RemoteCollectionView {
+																anchors.fill: parent
+																anchors.margins: 1
+																commandsControllerComp: null
+																visibleMetaInfo: false
+																commandsDelegateComp: null
+																collectionId: ctxDialog.selectedEntityTypeId
+																documentCollectionFilter: null
+																loadingDataAfterHeadersReceived: false
+																showRemoteChangesAlert: false
+																Component.onCompleted: {
+																	ctxDialog.collectionView = this
+																}
+																onSelectionChanged: {
+																	ctxDialog.setButtonEnabled(Enums.apply, selectedIds.length > 0)
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+										
+										onFinished: {
+											if (buttonId === Enums.apply && collectionView) {
+												var arr = root.pendingEntityRefs.slice()
+												var mdl = collectionView.table.elements
+												let indexes = collectionView.table.getSelectedIndexes()
+												for (var i = 0; i < indexes.length; i++) {
+													let idx = indexes[i]
+													var displayName = mdl.getData("name", idx)
+													var typeId = mdl.getData("typeId", idx)
+													var elementId = mdl.getData("id", idx)
+													var linkPath = selectedEntityTypeId
+													if (typeId) linkPath += "/" + typeId
+													linkPath += "/" + elementId
+													arr.push({
+																 entityType: selectedEntityTypeId,
+																 entityId: elementId,
+																 displayName: displayName,
+																 entityLinkPath: linkPath,
+																 typeId: typeId
+															 })
+												}
+												root.pendingEntityRefs = arr
+												root._entityRefsChanged = true
+												root.doUpdateModel()
+											}
+										}
+									}
+								}
+							}
 							// Lock section (existing tickets only, reporter/admin only)
 							Column {
 								visible: !root.isNewIssue && root.canLock
