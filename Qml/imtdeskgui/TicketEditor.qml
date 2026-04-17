@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 import QtQuick 2.15
-import Qt5Compat.GraphicalEffects 6.0
-import QtGraphicalEffects 1.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
@@ -21,7 +19,7 @@ DocumentViewBase {
 	
 	anchors.fill: parent
 	contentColor: Style.baseColor
-	
+
 	property TicketData ticketData: model
 	property bool isNewIssue: ticketData ? (ticketData.m_number === 0) : true
 	// Component factory for creating TicketComment instances
@@ -48,8 +46,6 @@ DocumentViewBase {
 	property bool _forceScrollToBottom: false
 	// Track whether entity refs changed to avoid unnecessary emplace calls
 	property bool _entityRefsChanged: false
-	// Title inline-edit toggle
-	property bool _titleEditing: false
 	
 	signal commentSubmitted(string commentText)
 	
@@ -63,19 +59,19 @@ DocumentViewBase {
 		if (isNaN(d.getTime())) return isoStr
 		return d.toLocaleDateString(Qt.locale(), "d MMM yyyy") + " " + d.toLocaleTimeString(Qt.locale(), "HH:mm")
 	}
-	
+
 	function formatCommentHtml(content) {
 		if (!content) return ""
 		return content
-		.replace(/&/g, "&amp;")
-		.replace(/</g, "&lt;")
-		.replace(/>/g, "&gt;")
-		.replace(/"/g, "&quot;")
-		.replace(/'/g, "&#39;")
-		.replace(/\\n/g, "<br>")
-		.replace(/\n/g, "<br>")
+			.replace(/&/g, "&amp;")
+			.replace(/</g, "&lt;")
+			.replace(/>/g, "&gt;")
+			.replace(/"/g, "&quot;")
+			.replace(/'/g, "&#39;")
+			.replace(/\\n/g, "<br>")
+			.replace(/\n/g, "<br>")
 	}
-	
+
 	function addComment(commentText, attachmentsList) {
 		if ((!commentText || commentText.length === 0) && (!attachmentsList || attachmentsList.length === 0))
 			return
@@ -120,12 +116,12 @@ DocumentViewBase {
 		ticketData.modelChanged()
 		root.commentSubmitted(commentText)
 	}
-	
+
 	// Upload attachment file to the server via HTTP POST.
 	// On success, adds {id, preview} to pendingAttachments.
 	function uploadAttachment(fileObj, fileName, localPreview) {
 		root.uploadsInProgress++
-		
+
 		if (Qt.platform.os === "web") {
 			// Web: read binary data with FileReader and POST to /files/<name>
 			var reader = new FileReader()
@@ -196,7 +192,7 @@ DocumentViewBase {
 		editStateReasonCB.currentIndex = findComboIndex(editStateReasonCB, ticketData.m_stateReason, 0)
 		editLockReasonInput.text = ticketData.m_lockReason || ""
 		editLockedCB.checkState = ticketData.m_locked ? Qt.Checked : Qt.Unchecked
-		
+
 		// Populate entity type model from server-provided data
 		entityTypeModel.clear()
 		if (ticketData && ticketData.m_entityTypes) {
@@ -210,7 +206,7 @@ DocumentViewBase {
 				}
 			}
 		}
-		
+
 		// Load entity references from ticket data
 		var refs = []
 		if (ticketData.hasEntityReferences && ticketData.hasEntityReferences()) {
@@ -224,11 +220,11 @@ DocumentViewBase {
 							linkPath = String(refItem.m_entityLink.m_url.m_path)
 						}
 						refs.push({
-									  entityType: String(refItem.m_entityType || ""),
-									  entityId: String(refItem.m_entityId || ""),
-									  displayName: String(refItem.m_displayName || ""),
-									  entityLinkPath: linkPath
-								  })
+							entityType: String(refItem.m_entityType || ""),
+							entityId: String(refItem.m_entityId || ""),
+							displayName: String(refItem.m_displayName || ""),
+							entityLinkPath: linkPath
+						})
 					}
 				}
 			}
@@ -292,7 +288,7 @@ DocumentViewBase {
 		if (editStateReasonCB.model && editStateReasonCB.currentIndex >= 0) {
 			ticketData.m_stateReason = editStateReasonCB.model.getData("id", editStateReasonCB.currentIndex)
 		}
-		
+
 		// Save entity references to ticket data only when they actually changed
 		if (root._entityRefsChanged) {
 			root._entityRefsChanged = false
@@ -416,11 +412,11 @@ DocumentViewBase {
 	// Modern SaaS-level 2-column layout: LEFT (3 cards) + RIGHT (chat)
 	// Chat dominates; left panel is compact and structured
 	// ================================================================
-	
+
 	Item {
 		id: editView
 		anchors.fill: parent
-		
+
 		// Layout constants
 		readonly property real contentMaxWidth: 800
 		readonly property real cardPadding: 16
@@ -440,13 +436,13 @@ DocumentViewBase {
 		readonly property string otherBubbleColor: "#F0F2F5"
 		readonly property string sectionLabelColor: "#8C95A6"
 		readonly property real columnGap: Style.spacingL
-		
+
 		// Page background
 		Rectangle {
 			anchors.fill: parent
 			color: editView.pageBgColor
 		}
-		
+
 		// ==================== CENTERED CONTAINER ====================
 		Item {
 			id: panelsContainer
@@ -457,567 +453,294 @@ DocumentViewBase {
 			anchors.topMargin: Style.marginXL
 			anchors.bottom: parent.bottom
 			anchors.bottomMargin: Style.marginXL
-			
-			// ==================== LEFT COLUMN (35-40%) ====================
-			Item {
-				id: leftColumn
+
+		// ==================== LEFT COLUMN (35-40%) ====================
+		Item {
+			id: leftColumn
+			anchors.top: parent.top
+			anchors.bottom: parent.bottom
+			anchors.left: parent.left
+			width: root.isNewIssue ? parent.width : parent.width * 0.38
+
+			CustomScrollbar {
+				id: editScrollV
+				z: parent.z + 1
+				anchors.right: parent.right
+				anchors.rightMargin: Style.spacingS
+				anchors.top: editFlick.top
+				anchors.bottom: editFlick.bottom
+				secondSize: Style.marginM
+				targetItem: editFlick
+				visible: editView.visible
+			}
+
+			Flickable {
+				id: editFlick
 				anchors.top: parent.top
 				anchors.bottom: parent.bottom
 				anchors.left: parent.left
-				width: root.isNewIssue ? parent.width : parent.width * 0.38
-				
-				CustomScrollbar {
-					id: editScrollV
-					z: parent.z + 1
-					anchors.right: parent.right
-					anchors.rightMargin: Style.spacingS
-					anchors.top: editFlick.top
-					anchors.bottom: editFlick.bottom
-					secondSize: Style.marginM
-					targetItem: editFlick
-					visible: editView.visible
-				}
-				
-				Flickable {
-					id: editFlick
-					anchors.top: parent.top
-					anchors.bottom: parent.bottom
-					anchors.left: parent.left
-					anchors.right: editScrollV.left
-					anchors.rightMargin: root.isNewIssue ? Style.spacingS : 0
-					contentHeight: leftStack.height + Style.spacingL + 12 // extra padding for card shadow overflow
-					boundsBehavior: Flickable.StopAtBounds
-					clip: true
-					
-					Column {
-						id: leftStack
-						width: Math.min(editFlick.width, editView.contentMaxWidth)
-						anchors.horizontalCenter: parent.horizontalCenter
-						spacing: Style.spacingM
-						
-						// ========================================
-						// CARD 1 — Title + Description (compact)
-						// ========================================
-						DropShadow {
-							anchors.fill: detailsCard
-							horizontalOffset: 3
-							verticalOffset: 3
-							radius:  Style.radiusL
-							samples: 17
-							color: Style.shadowColor
-							spread: 0
-							source: detailsCard
-						}
-						
-						Rectangle {
-							id: detailsCard
-							width: parent.width
-							height: detailsCardCol.height + editView.cardPadding * 2
-							radius: editView.cardRadius
-							color: editView.cardColor
-							border.color: editView.cardBorderColor
-							border.width: 1
-							
-							Column {
-								id: detailsCardCol
-								x: editView.cardPadding
-								y: editView.cardPadding
-								width: parent.width - editView.cardPadding * 2
-								spacing: Style.spacingM
-								
-								// Inline title: "#N Title" + badges + Edit toggle
-								Item {
-									width: parent.width
-									height: Math.max(titleDisplayRow.height, titleEditRow.height, Style.controlHeightM)
-									
-									// ---- Display mode ----
-									Row {
-										id: titleDisplayRow
-										visible: !root._titleEditing && !root.isNewIssue
-										width: parent.width
-										spacing: Style.spacingS
-										anchors.verticalCenter: parent.verticalCenter
-										
-										Text {
-											text: "#" + (root.ticketData ? root.ticketData.m_number : "")
-											font.pixelSize: Style.fontSizeL
-											font.bold: true
-											color: editView.accentColor
-											anchors.verticalCenter: parent.verticalCenter
-										}
-										
-										Text {
-											id: titleDisplayText
-											text: editTitleInput.text || ""
-											font.pixelSize: Style.fontSizeL
-											font.bold: true
-											color: Style.textColor
-											elide: Text.ElideRight
-											maximumLineCount: 1
-											width: Math.max(10, parent.width - x - editBtnItem.width - badgesRow.width - Style.spacingS * 4)
-											anchors.verticalCenter: parent.verticalCenter
-										}
-										
-										Row {
-											id: badgesRow
-											spacing: Style.spacingXS
-											anchors.verticalCenter: parent.verticalCenter
-											
-											TicketBadge {
-												badgeType: "status"
-												value: editStatusCB.currentIndex
-											}
-											
-											TicketBadge {
-												visible: editStateReasonCB.currentIndex > 0
-												badgeType: "stateReason"
-												value: editStateReasonCB.currentIndex
-											}
-										}
-										
-										Item {
-											id: editBtnItem
-											width: 28
-											height: 28
-											visible: root.canEdit
-											anchors.verticalCenter: parent.verticalCenter
-											
-											Rectangle {
-												anchors.fill: parent
-												radius: 6
-												color: editBtnMa.containsMouse ? "#F0F2F5" : "transparent"
-											}
-											
-											Text {
-												anchors.centerIn: parent
-												text: "\u270E" // ✎ pencil icon
-												font.pixelSize: Style.fontSizeM
-											}
-											
-											MouseArea {
-												id: editBtnMa
-												anchors.fill: parent
-												hoverEnabled: true
-												cursorShape: Qt.PointingHandCursor
-												onClicked: {
-													root._titleEditing = true
-													editTitleInput.forceActiveFocus()
-												}
-											}
-										}
-									}
-									
-									// ---- Edit mode / New ticket ----
-									Row {
-										id: titleEditRow
-										visible: root._titleEditing || root.isNewIssue
-										width: parent.width
-										spacing: Style.spacingS
-										anchors.verticalCenter: parent.verticalCenter
-										
-										Text {
-											text: root.isNewIssue ? qsTr("New Ticket") : "#" + (root.ticketData ? root.ticketData.m_number : "")
-											font.pixelSize: Style.fontSizeL
-											font.bold: true
-											color: editView.accentColor
-											anchors.verticalCenter: parent.verticalCenter
-										}
-										
-										CustomTextField {
-											id: editTitleInput
-											width: parent.width - x - (confirmBtnItem.visible ? confirmBtnItem.width + Style.spacingS : 0)
-											height: Style.controlHeightM
-											placeHolderText: qsTr("Enter ticket title...")
-											readOnly: !root.canEdit
-											onEditingFinished: {
-												root.doUpdateModel()
-												if (root._titleEditing) root._titleEditing = false
-											}
-											KeyNavigation.tab: editDescriptionInput
-										}
-										
-										Item {
-											id: confirmBtnItem
-											width: 30
-											height: 30
-											visible: root._titleEditing && !root.isNewIssue
-											anchors.verticalCenter: parent.verticalCenter
-											
-											Rectangle {
-												anchors.fill: parent
-												radius: 6
-												color: confirmBtnMa.containsMouse ? "#E6F4EA" : "#F0F7F4"
-												border.color: "#34A853"
-												border.width: 1
-											}
-											
-											Text {
-												anchors.centerIn: parent
-												text: "\u2713" // ✓ checkmark icon
-												font.pixelSize: Style.fontSizeM
-												font.bold: true
-												color: "#34A853"
-											}
-											
-											MouseArea {
-												id: confirmBtnMa
-												anchors.fill: parent
-												hoverEnabled: true
-												cursorShape: Qt.PointingHandCursor
-												onClicked: {
-													root._titleEditing = false
-													root.doUpdateModel()
-												}
-											}
-										}
-									}
+				anchors.right: editScrollV.left
+				anchors.rightMargin: root.isNewIssue ? Style.spacingS : 0
+				contentHeight: leftStack.height + Style.spacingL
+				boundsBehavior: Flickable.StopAtBounds
+				clip: true
+
+				Column {
+					id: leftStack
+					width: Math.min(editFlick.width, editView.contentMaxWidth)
+					anchors.horizontalCenter: parent.horizontalCenter
+					spacing: Style.spacingM
+
+					// ========================================
+					// CARD 1 — Title + Description (compact)
+					// ========================================
+					Rectangle {
+						id: detailsCard
+						width: parent.width
+						height: detailsCardCol.height + editView.cardPadding * 2
+						radius: editView.cardRadius
+						color: editView.cardColor
+						border.color: editView.cardBorderColor
+						border.width: 1
+
+						Column {
+							id: detailsCardCol
+							x: editView.cardPadding
+							y: editView.cardPadding
+							width: parent.width - editView.cardPadding * 2
+							spacing: Style.spacingM
+
+							// Compact header: ticket number + badges
+							Row {
+								width: parent.width
+								spacing: Style.spacingS
+
+								Text {
+									text: root.isNewIssue ? qsTr("New Ticket") : "#" + (root.ticketData ? root.ticketData.m_number : "")
+									font.pixelSize: Style.fontSizeL
+									font.bold: true
+									color: editView.accentColor
+									anchors.verticalCenter: parent.verticalCenter
 								}
-								
-								// ---------- Description ----------
-								Column {
+
+								TicketBadge {
+									visible: !root.isNewIssue
+									badgeType: "status"
+									value: editStatusCB.currentIndex
+								}
+
+								TicketBadge {
+									visible: !root.isNewIssue && editStateReasonCB.currentIndex > 0
+									badgeType: "stateReason"
+									value: editStateReasonCB.currentIndex
+								}
+							}
+
+							// ---------- Title ----------
+							Column {
+								width: parent.width
+								spacing: 4
+
+								Text {
+									text: qsTr("Title")
+									font.pixelSize: Style.fontSizeS
+									font.bold: true
+									color: editView.sectionLabelColor
+								}
+
+								CustomTextField {
+									id: editTitleInput
 									width: parent.width
-									spacing: 4
-									
-									Text {
-										text: qsTr("Description")
-										font.pixelSize: Style.fontSizeS
-										font.bold: true
-										color: editView.sectionLabelColor
-									}
-									
-									Rectangle {
-										width: parent.width
-										height: editDescriptionInput.height + Style.paddingM * 2
-										radius: Style.radiusM
-										border.color: editDescriptionInput.activeFocus ? editView.accentColor : editView.cardBorderColor
-										border.width: editDescriptionInput.activeFocus ? 2 : 1
-										color: editDescriptionInput.activeFocus ? editView.cardColor : "#FAFBFC"
-										
-										TextEdit {
-											id: editDescriptionInput
-											anchors.left: parent.left
-											anchors.right: parent.right
-											anchors.top: parent.top
-											anchors.margins: Style.paddingM
+									height: Style.controlHeightM
+									placeHolderText: qsTr("Enter ticket title...")
+									readOnly: !root.canEdit
+									onEditingFinished: root.doUpdateModel()
+									KeyNavigation.tab: editDescriptionInput
+								}
+							}
+
+							// ---------- Description ----------
+							Column {
+								width: parent.width
+								spacing: 4
+
+								Text {
+									text: qsTr("Description")
+									font.pixelSize: Style.fontSizeS
+									font.bold: true
+									color: editView.sectionLabelColor
+								}
+
+								Rectangle {
+									width: parent.width
+									height: editDescriptionInput.height + Style.paddingM * 2
+									radius: Style.radiusM
+									border.color: editDescriptionInput.activeFocus ? editView.accentColor : editView.cardBorderColor
+									border.width: editDescriptionInput.activeFocus ? 2 : 1
+									color: editView.cardColor
+
+									TextEdit {
+										id: editDescriptionInput
+										anchors.left: parent.left
+										anchors.right: parent.right
+										anchors.top: parent.top
+										anchors.margins: Style.paddingM
+										font.pixelSize: Style.fontSizeM
+										color: Style.textColor
+										height: Math.max(80, contentHeight)
+										wrapMode: TextEdit.Wrap
+										clip: true
+										readOnly: !root.canEdit
+										onEditingFinished: root.doUpdateModel()
+										KeyNavigation.tab: editTypeCB
+										KeyNavigation.backtab: editTitleInput
+
+										Text {
+											anchors.fill: parent
+											text: qsTr("Describe the issue...")
+											color: Style.inactiveTextColor
 											font.pixelSize: Style.fontSizeM
-											color: Style.textColor
-											height: Math.max(80, contentHeight)
-											wrapMode: TextEdit.Wrap
-											clip: true
-											readOnly: !root.canEdit
-											onEditingFinished: root.doUpdateModel()
-											KeyNavigation.tab: editTypeCB
-											KeyNavigation.backtab: editTitleInput
-											
-											Text {
-												anchors.fill: parent
-												text: qsTr("Describe the issue...")
-												color: Style.inactiveTextColor
-												font.pixelSize: Style.fontSizeM
-												visible: editDescriptionInput.text.length === 0
-											}
+											visible: editDescriptionInput.text.length === 0
 										}
 									}
 								}
 							}
 						}
-						
-						DropShadow {
-							anchors.fill: contextCard
-							horizontalOffset: 3
-							verticalOffset: 3
-							radius:  Style.radiusL
-							samples: 17
-							color: Style.shadowColor
-							spread: 0
-							source: contextCard
-						}
-						
-						// ========================================
-						// CARD 2 — Context / Entity References
-						// ========================================
-						Rectangle {
-							id: contextCard
-							width: parent.width
-							height: contextCardCol.height + editView.cardPadding * 2
-							radius: editView.cardRadius
-							color: editView.cardColor
-							border.color: editView.cardBorderColor
-							border.width: 1
-							
-							Column {
-								id: contextCardCol
-								x: editView.cardPadding
-								y: editView.cardPadding
-								width: parent.width - editView.cardPadding * 2
-								spacing: Style.spacingS
-								
-								Item {
-									width: parent.width
-									height: Math.max(contextLabelText.height, addContextBtn.height)
-									
-									Row {
-										anchors.left: parent.left
-										anchors.verticalCenter: parent.verticalCenter
-										spacing: Style.spacingS
-										
-										Text {
-											id: contextLabelText
-											text: qsTr("Context")
-											font.pixelSize: Style.fontSizeM
-											font.bold: true
-											color: Style.textColor
-											anchors.verticalCenter: parent.verticalCenter
-										}
-										
-										Rectangle {
-											visible: root.pendingEntityRefs.length > 0
-											width: refCountLabel.contentWidth + Style.paddingS * 2
-											height: editView.badgeHeight - 2
-											radius: (editView.badgeHeight - 2) / 2
-											color: editView.accentColor
-											anchors.verticalCenter: parent.verticalCenter
-											
-											Text {
-												id: refCountLabel
-												anchors.centerIn: parent
-												text: root.pendingEntityRefs.length
-												font.pixelSize: Style.fontSizeS - 1
-												font.bold: true
-												color: Style.baseColor
-											}
-										}
-									}
-									
+					}
+
+					// ========================================
+					// CARD 2 — Context / Entity References
+					// ========================================
+					Rectangle {
+						id: contextCard
+						width: parent.width
+						height: contextCardCol.height + editView.cardPadding * 2
+						radius: editView.cardRadius
+						color: editView.cardColor
+						border.color: editView.cardBorderColor
+						border.width: 1
+
+						Column {
+							id: contextCardCol
+							x: editView.cardPadding
+							y: editView.cardPadding
+							width: parent.width - editView.cardPadding * 2
+							spacing: Style.spacingS
+
+							Item {
+								width: parent.width
+								height: Math.max(contextLabelText.height, addContextBtn.height)
+
+								Row {
+									anchors.left: parent.left
+									anchors.verticalCenter: parent.verticalCenter
+									spacing: Style.spacingS
+
 									Text {
-										id: addContextBtn
-										anchors.right: parent.right
-										anchors.verticalCenter: parent.verticalCenter
-										visible: root.canEdit
-										text: "+ " + qsTr("Add context")
-										font.pixelSize: Style.fontSizeS
+										id: contextLabelText
+										text: qsTr("Context")
+										font.pixelSize: Style.fontSizeM
 										font.bold: true
+										color: Style.textColor
+										anchors.verticalCenter: parent.verticalCenter
+									}
+
+									Rectangle {
+										visible: root.pendingEntityRefs.length > 0
+										width: refCountLabel.contentWidth + Style.paddingS * 2
+										height: editView.badgeHeight - 2
+										radius: (editView.badgeHeight - 2) / 2
 										color: editView.accentColor
-										
-										MouseArea {
-											anchors.fill: parent
-											hoverEnabled: true
-											cursorShape: Qt.PointingHandCursor
-											onClicked: {
-												ModalDialogManager.openDialog(contextPickerDialogComp)
-											}
+										anchors.verticalCenter: parent.verticalCenter
+
+										Text {
+											id: refCountLabel
+											anchors.centerIn: parent
+											text: root.pendingEntityRefs.length
+											font.pixelSize: Style.fontSizeS - 1
+											font.bold: true
+											color: Style.baseColor
 										}
 									}
 								}
-								
-								// Entity chips (tags-style)
-								Flow {
-									width: parent.width
-									spacing: Style.spacingXS
-									visible: root.pendingEntityRefs.length > 0
-									
-									Repeater {
-										model: root.pendingEntityRefs
-										delegate: Rectangle {
-											readonly property real maxRefWidth: 260
-											width: Math.min(refLabelText.contentWidth + refRemoveBtn.width + Style.paddingS * 3, maxRefWidth)
-											height: 28
-											radius: 14
-											color: editView.accentBgLight
-											border.color: editView.accentBorderLight
-											border.width: 1
-											
-											Text {
-												id: refLabelText
-												anchors.left: parent.left
-												anchors.leftMargin: Style.paddingS + 2
-												anchors.verticalCenter: parent.verticalCenter
-												text: (modelData.entityType ? "[" + modelData.entityType + "] " : "") + (modelData.displayName || modelData.entityId || "")
-												font.pixelSize: Style.fontSizeS
-												color: editView.accentColor
-												font.underline: modelData.entityLinkPath !== ""
-												elide: Text.ElideRight
-												maximumLineCount: 1
-												
-												MouseArea {
-													anchors.fill: parent
-													hoverEnabled: true
-													cursorShape: Qt.PointingHandCursor
-													onClicked: {
-														if (modelData.entityLinkPath) {
-															NavigationController.navigate(modelData.entityLinkPath)
-														}
-													}
-												}
-											}
-											
-											ToolButton {
-												id: refRemoveBtn
-												visible: root.canEdit
-												anchors.right: parent.right
-												anchors.verticalCenter: parent.verticalCenter
-												iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
-												decorator: Component {
-													ToolButtonDecorator {
-														color: "transparent"
-														icon.width: Style.iconSizeXS
-													}
-												}
-												onClicked: {
-													var arr = root.pendingEntityRefs.slice()
-													arr.splice(index, 1)
-													root.pendingEntityRefs = arr
-													root._entityRefsChanged = true
-													root.doUpdateModel()
-												}
-											}
-										}
-									}
-								}
-								
-								// Empty context placeholder
+
 								Text {
-									visible: root.pendingEntityRefs.length === 0
-									width: parent.width
-									text: qsTr("No linked entities. Click \"+ Add context\" to attach entities to this ticket.")
+									id: addContextBtn
+									anchors.right: parent.right
+									anchors.verticalCenter: parent.verticalCenter
+									visible: root.canEdit
+									text: "+ " + qsTr("Add context")
 									font.pixelSize: Style.fontSizeS
-									color: Style.inactiveTextColor
-									wrapMode: Text.WordWrap
+									font.bold: true
+									color: editView.accentColor
+
+									MouseArea {
+										anchors.fill: parent
+										hoverEnabled: true
+										cursorShape: Qt.PointingHandCursor
+										onClicked: {
+											ModalDialogManager.openDialog(contextPickerDialogComp)
+										}
+									}
 								}
-								
-								// Single dialog: entity type ComboBox + RemoteCollectionView
-								Component {
-									id: contextPickerDialogComp
-									Dialog {
-										id: ctxDialog
-										title: qsTr("Link Entity to Ticket")
-										canMove: false
-										width: Math.min(ModalDialogManager.activeView.width - 80, 900)
-										height: ModalDialogManager.activeView.height - 80
-										
-										property string selectedEntityTypeId: ""
-										property RemoteCollectionView collectionView: null
-										
-										Component.onCompleted: {
-											addButton(Enums.apply, qsTr("Attach Selected"), false)
-											addButton(Enums.cancel, qsTr("Cancel"), true)
-											setButtonEnabled(Enums.apply, false)
-											// Pre-select first entity type
-											if (entityTypeModel.getItemsCount() > 0) {
-												selectedEntityTypeId = entityTypeModel.getData("id", 0)
-											}
-										}
-										
-										contentComp: Component {
-											Item {
-												width: ctxDialog.width
-												height: ctxDialog.height - 100
-												
-												Component.onCompleted: {
-													ctxTypeCB.model = entityTypeModel
-													if (entityTypeModel.getItemsCount() > 0) {
-														ctxTypeCB.currentIndex = 0
-													}
-												}
-												
-												Column {
-													id: ctxContentCol
-													anchors.fill: parent
-													anchors.margins: Style.paddingM
-													spacing: Style.spacingM
-													
-													// Entity type selector row
-													Rectangle {
-														width: parent.width
-														height: ctxTypeRow.height + Style.paddingM * 2
-														radius: Style.radiusM
-														color: editView.accentBadgeBg
-														border.color: editView.accentBorderLight
-														border.width: 1
-														
-														Row {
-															id: ctxTypeRow
-															anchors.centerIn: parent
-															spacing: Style.spacingM
-															
-															Text {
-																text: qsTr("Entity type")
-																font.pixelSize: Style.fontSizeM
-																font.bold: true
-																color: Style.textColor
-																anchors.verticalCenter: parent.verticalCenter
-															}
-															
-															ComboBox {
-																id: ctxTypeCB
-																width: 280
-																height: Style.buttonHeightM
-																onCurrentIndexChanged: {
-																	if (entityTypeModel.getItemsCount() > currentIndex) {
-																		ctxDialog.selectedEntityTypeId = entityTypeModel.getData("id", currentIndex)
-																		ctxDialog.setButtonEnabled(Enums.apply, false)
-																	}
-																}
-															}
-														}
-													}
-													
-													// Collection browser
-													Item {
-														width: parent.width
-														height: parent.height - ctxTypeRow.height - Style.paddingM * 2 - Style.spacingM * 2
-														
-														Rectangle {
-															anchors.fill: parent
-															radius: Style.radiusM
-															color: "transparent"
-															border.color: Style.borderColor
-															border.width: 1
-															
-															RemoteCollectionView {
-																anchors.fill: parent
-																anchors.margins: 1
-																commandsControllerComp: null
-																visibleMetaInfo: false
-																commandsDelegateComp: null
-																collectionId: ctxDialog.selectedEntityTypeId
-																documentCollectionFilter: null
-																loadingDataAfterHeadersReceived: false
-																showRemoteChangesAlert: false
-																Component.onCompleted: {
-																	ctxDialog.collectionView = this
-																}
-																onSelectionChanged: {
-																	ctxDialog.setButtonEnabled(Enums.apply, selectedIds.length > 0)
-																}
-															}
-														}
+							}
+
+							// Entity chips (tags-style)
+							Flow {
+								width: parent.width
+								spacing: Style.spacingXS
+								visible: root.pendingEntityRefs.length > 0
+
+								Repeater {
+									model: root.pendingEntityRefs
+									delegate: Rectangle {
+										readonly property real maxRefWidth: 260
+										width: Math.min(refLabelText.contentWidth + refRemoveBtn.width + Style.paddingS * 3, maxRefWidth)
+										height: 28
+										radius: 14
+										color: editView.accentBgLight
+										border.color: editView.accentBorderLight
+										border.width: 1
+
+										Text {
+											id: refLabelText
+											anchors.left: parent.left
+											anchors.leftMargin: Style.paddingS + 2
+											anchors.verticalCenter: parent.verticalCenter
+											text: (modelData.entityType ? "[" + modelData.entityType + "] " : "") + (modelData.displayName || modelData.entityId || "")
+											font.pixelSize: Style.fontSizeS
+											color: editView.accentColor
+											font.underline: modelData.entityLinkPath !== ""
+											elide: Text.ElideRight
+											maximumLineCount: 1
+
+											MouseArea {
+												anchors.fill: parent
+												hoverEnabled: true
+												cursorShape: Qt.PointingHandCursor
+												onClicked: {
+													if (modelData.entityLinkPath) {
+														NavigationController.navigate(modelData.entityLinkPath)
 													}
 												}
 											}
 										}
-										
-										onFinished: {
-											if (buttonId === Enums.apply && collectionView) {
+
+										ToolButton {
+											id: refRemoveBtn
+											visible: root.canEdit
+											anchors.right: parent.right
+											anchors.verticalCenter: parent.verticalCenter
+											iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+											decorator: Component {
+												ToolButtonDecorator {
+													color: "transparent"
+													icon.width: Style.iconSizeXS
+												}
+											}
+											onClicked: {
 												var arr = root.pendingEntityRefs.slice()
-												var mdl = collectionView.table.elements
-												let indexes = collectionView.table.getSelectedIndexes()
-												for (var i = 0; i < indexes.length; i++) {
-													let idx = indexes[i]
-													var displayName = mdl.getData("name", idx)
-													var typeId = mdl.getData("typeId", idx)
-													var elementId = mdl.getData("id", idx)
-													var linkPath = selectedEntityTypeId
-													if (typeId) linkPath += "/" + typeId
-													linkPath += "/" + elementId
-													arr.push({
-																 entityType: selectedEntityTypeId,
-																 entityId: elementId,
-																 displayName: displayName,
-																 entityLinkPath: linkPath,
-																 typeId: typeId
-															 })
-												}
+												arr.splice(index, 1)
 												root.pendingEntityRefs = arr
 												root._entityRefsChanged = true
 												root.doUpdateModel()
@@ -1026,18 +749,158 @@ DocumentViewBase {
 									}
 								}
 							}
-						}
-					}
 
-					DropShadow {
-						anchors.fill: propertiesCard
-						horizontalOffset: 3
-						verticalOffset: 3
-						radius:  Style.radiusL
-						samples: 17
-						color: Style.shadowColor
-						spread: 0
-						source: propertiesCard
+							// Empty context placeholder
+							Text {
+								visible: root.pendingEntityRefs.length === 0
+								width: parent.width
+								text: qsTr("No linked entities. Click \"+ Add context\" to attach entities to this ticket.")
+								font.pixelSize: Style.fontSizeS
+								color: Style.inactiveTextColor
+								wrapMode: Text.WordWrap
+							}
+
+							// Single dialog: entity type ComboBox + RemoteCollectionView
+							Component {
+								id: contextPickerDialogComp
+								Dialog {
+									id: ctxDialog
+									title: qsTr("Link Entity to Ticket")
+									canMove: false
+									width: Math.min(ModalDialogManager.activeView.width - 80, 900)
+									height: ModalDialogManager.activeView.height - 80
+
+									property string selectedEntityTypeId: ""
+									property RemoteCollectionView collectionView: null
+
+									Component.onCompleted: {
+										addButton(Enums.apply, qsTr("Attach Selected"), false)
+										addButton(Enums.cancel, qsTr("Cancel"), true)
+										setButtonEnabled(Enums.apply, false)
+										// Pre-select first entity type
+										if (entityTypeModel.getItemsCount() > 0) {
+											selectedEntityTypeId = entityTypeModel.getData("id", 0)
+										}
+									}
+
+									contentComp: Component {
+										Item {
+											width: ctxDialog.width
+											height: ctxDialog.height - 100
+											
+											Component.onCompleted: {
+												ctxTypeCB.model = entityTypeModel
+												if (entityTypeModel.getItemsCount() > 0) {
+													ctxTypeCB.currentIndex = 0
+												}
+											}
+
+											Column {
+												id: ctxContentCol
+												anchors.fill: parent
+												anchors.margins: Style.paddingM
+												spacing: Style.spacingM
+
+												// Entity type selector row
+												Rectangle {
+													width: parent.width
+													height: ctxTypeRow.height + Style.paddingM * 2
+													radius: Style.radiusM
+													color: editView.accentBadgeBg
+													border.color: editView.accentBorderLight
+													border.width: 1
+
+													Row {
+														id: ctxTypeRow
+														anchors.centerIn: parent
+														spacing: Style.spacingM
+
+														Text {
+															text: qsTr("Entity type")
+															font.pixelSize: Style.fontSizeM
+															font.bold: true
+															color: Style.textColor
+															anchors.verticalCenter: parent.verticalCenter
+														}
+
+														ComboBox {
+															id: ctxTypeCB
+															width: 280
+															height: Style.buttonHeightM
+															onCurrentIndexChanged: {
+																if (entityTypeModel.getItemsCount() > currentIndex) {
+																	ctxDialog.selectedEntityTypeId = entityTypeModel.getData("id", currentIndex)
+																	ctxDialog.setButtonEnabled(Enums.apply, false)
+																}
+															}
+														}
+													}
+												}
+
+												// Collection browser
+												Item {
+													width: parent.width
+													height: parent.height - ctxTypeRow.height - Style.paddingM * 2 - Style.spacingM * 2
+
+													Rectangle {
+														anchors.fill: parent
+														radius: Style.radiusM
+														color: "transparent"
+														border.color: Style.borderColor
+														border.width: 1
+
+														RemoteCollectionView {
+															anchors.fill: parent
+															anchors.margins: 1
+															commandsControllerComp: null
+															visibleMetaInfo: false
+															commandsDelegateComp: null
+															collectionId: ctxDialog.selectedEntityTypeId
+															documentCollectionFilter: null
+															loadingDataAfterHeadersReceived: false
+															showRemoteChangesAlert: false
+															Component.onCompleted: {
+																ctxDialog.collectionView = this
+															}
+															onSelectionChanged: {
+																ctxDialog.setButtonEnabled(Enums.apply, selectedIds.length > 0)
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+
+									onFinished: {
+										if (buttonId === Enums.apply && collectionView) {
+											var arr = root.pendingEntityRefs.slice()
+											var mdl = collectionView.table.elements
+											let indexes = collectionView.table.getSelectedIndexes()
+											for (var i = 0; i < indexes.length; i++) {
+												let idx = indexes[i]
+												var displayName = mdl.getData("name", idx)
+												var typeId = mdl.getData("typeId", idx)
+												var elementId = mdl.getData("id", idx)
+												var linkPath = selectedEntityTypeId
+												if (typeId) linkPath += "/" + typeId
+												linkPath += "/" + elementId
+												arr.push({
+													entityType: selectedEntityTypeId,
+													entityId: elementId,
+													displayName: displayName,
+													entityLinkPath: linkPath,
+													typeId: typeId
+												})
+											}
+											root.pendingEntityRefs = arr
+											root._entityRefsChanged = true
+											root.doUpdateModel()
+										}
+									}
+								}
+							}
+						}
 					}
 
 					// ========================================
@@ -1051,36 +914,36 @@ DocumentViewBase {
 						color: editView.cardColor
 						border.color: editView.cardBorderColor
 						border.width: 1
-						
+
 						Column {
 							id: propsCardCol
 							x: editView.cardPadding
 							y: editView.cardPadding
 							width: parent.width - editView.cardPadding * 2
 							spacing: Style.spacingM
-							
+
 							Text {
 								text: qsTr("Properties")
 								font.pixelSize: Style.fontSizeM
 								font.bold: true
 								color: Style.textColor
 							}
-							
+
 							// Row 1: Type + Priority
 							Row {
 								width: parent.width
 								spacing: Style.spacingM
-								
+
 								Column {
 									width: (parent.width - Style.spacingM) / 2
 									spacing: 4
-									
+
 									Text {
 										text: qsTr("Type")
 										font.pixelSize: Style.fontSizeS
 										color: editView.sectionLabelColor
 									}
-									
+
 									ComboBox {
 										id: editTypeCB
 										width: parent.width
@@ -1093,17 +956,17 @@ DocumentViewBase {
 										KeyNavigation.backtab: editDescriptionInput
 									}
 								}
-								
+
 								Column {
 									width: (parent.width - Style.spacingM) / 2
 									spacing: 4
-									
+
 									Text {
 										text: qsTr("Priority")
 										font.pixelSize: Style.fontSizeS
 										color: editView.sectionLabelColor
 									}
-									
+
 									ComboBox {
 										id: editPriorityCB
 										width: parent.width
@@ -1117,18 +980,18 @@ DocumentViewBase {
 									}
 								}
 							}
-							
+
 							// Row 2: Assignees (full width)
 							Column {
 								width: parent.width
 								spacing: 4
-								
+
 								Text {
 									text: qsTr("Assignees")
 									font.pixelSize: Style.fontSizeS
 									color: editView.sectionLabelColor
 								}
-								
+
 								ComboBox {
 									id: editAssigneeCB
 									width: parent.width
@@ -1139,7 +1002,7 @@ DocumentViewBase {
 									KeyNavigation.backtab: editPriorityCB
 								}
 							}
-							
+
 							// Hidden Reporter (data still tracked for model)
 							ComboBox {
 								id: editReporterCB
@@ -1148,23 +1011,23 @@ DocumentViewBase {
 								height: 0
 								onCurrentIndexChanged: root.doUpdateModel()
 							}
-							
+
 							// Row 3: Status + State Reason (existing tickets only)
 							Row {
 								visible: !root.isNewIssue
 								width: parent.width
 								spacing: Style.spacingM
-								
+
 								Column {
 									width: (parent.width - Style.spacingM) / 2
 									spacing: 4
-									
+
 									Text {
 										text: qsTr("Status")
 										font.pixelSize: Style.fontSizeS
 										color: editView.sectionLabelColor
 									}
-									
+
 									ComboBox {
 										id: editStatusCB
 										width: parent.width
@@ -1177,17 +1040,17 @@ DocumentViewBase {
 										KeyNavigation.backtab: editAssigneeCB
 									}
 								}
-								
+
 								Column {
 									width: (parent.width - Style.spacingM) / 2
 									spacing: 4
-									
+
 									Text {
 										text: qsTr("State Reason")
 										font.pixelSize: Style.fontSizeS
 										color: editView.sectionLabelColor
 									}
-									
+
 									ComboBox {
 										id: editStateReasonCB
 										width: parent.width
@@ -1201,15 +1064,15 @@ DocumentViewBase {
 									}
 								}
 							}
-							
+
 							// Lock section (existing tickets only, reporter/admin only)
 							Column {
 								visible: !root.isNewIssue && root.canLock
 								width: parent.width
 								spacing: Style.spacingS
-								
+
 								Rectangle { width: parent.width; height: 1; color: editView.cardBorderColor; opacity: 0.4 }
-								
+
 								CheckBox {
 									id: editLockedCB
 									text: qsTr("Lock issue")
@@ -1218,18 +1081,18 @@ DocumentViewBase {
 									KeyNavigation.tab: editLockedCB.checkState === Qt.Checked ? editLockReasonInput : commentInputField
 									KeyNavigation.backtab: editStateReasonCB
 								}
-								
+
 								Column {
 									width: parent.width
 									spacing: 4
 									visible: editLockedCB.checkState === Qt.Checked
-									
+
 									Text {
 										text: qsTr("Lock Reason")
 										font.pixelSize: Style.fontSizeS
 										color: editView.sectionLabelColor
 									}
-									
+
 									CustomTextField {
 										id: editLockReasonInput
 										width: parent.width
@@ -1247,18 +1110,7 @@ DocumentViewBase {
 				}
 			}
 		}
-		
-		DropShadow {
-			anchors.fill: commentsPanel
-			horizontalOffset: 3
-			verticalOffset: 3
-			radius:  Style.radiusL
-			samples: 17
-			color: Style.shadowColor
-			spread: 0
-			source: commentsPanel
-		}
-		
+
 		// ==================== RIGHT COLUMN — Chat (62%) ====================
 		Rectangle {
 			id: commentsPanel
@@ -1273,7 +1125,7 @@ DocumentViewBase {
 			border.color: editView.accentBorderLight
 			border.width: 1
 			clip: true
-			
+
 			// Chat header
 			Rectangle {
 				id: chatHeader
@@ -1286,7 +1138,7 @@ DocumentViewBase {
 				height: 48
 				color: editView.accentBadgeBg
 				radius: editView.cardRadius - 1
-				
+
 				// Bottom edge square-off
 				Rectangle {
 					anchors.left: parent.left
@@ -1295,13 +1147,13 @@ DocumentViewBase {
 					height: editView.cardRadius
 					color: editView.accentBadgeBg
 				}
-				
+
 				Row {
 					anchors.verticalCenter: parent.verticalCenter
 					anchors.left: parent.left
 					anchors.leftMargin: editView.cardPadding
 					spacing: Style.spacingS
-					
+
 					Text {
 						text: qsTr("Comments")
 						font.pixelSize: Style.fontSizeM
@@ -1309,7 +1161,7 @@ DocumentViewBase {
 						color: editView.accentColor
 						anchors.verticalCenter: parent.verticalCenter
 					}
-					
+
 					Rectangle {
 						visible: commentsThread.count > 0
 						width: chatCountLabel.contentWidth + Style.paddingS * 2
@@ -1317,7 +1169,7 @@ DocumentViewBase {
 						radius: editView.badgeHeight / 2
 						color: editView.accentColor
 						anchors.verticalCenter: parent.verticalCenter
-						
+
 						Text {
 							id: chatCountLabel
 							anchors.centerIn: parent
@@ -1328,7 +1180,7 @@ DocumentViewBase {
 						}
 					}
 				}
-				
+
 				// Header bottom border
 				Rectangle {
 					anchors.bottom: parent.bottom
@@ -1338,7 +1190,7 @@ DocumentViewBase {
 					color: editView.accentBorderLight
 				}
 			}
-			
+
 			CustomScrollbar {
 				id: commentsScrollV
 				z: parent.z + 1
@@ -1350,27 +1202,27 @@ DocumentViewBase {
 				targetItem: commentsFlick
 				visible: commentsPanel.visible
 			}
-			
+
 			// Chat area with subtle tint
 			Rectangle {
 				anchors.top: chatHeader.bottom
 				anchors.bottom: addCommentSection.visible ? addCommentSection.top
-														  : lockNoticeRow.visible ? lockNoticeRow.top
-																				  : parent.bottom
+							: lockNoticeRow.visible ? lockNoticeRow.top
+							: parent.bottom
 				anchors.left: parent.left
 				anchors.leftMargin: 1
 				anchors.right: parent.right
 				anchors.rightMargin: 1
 				color: editView.chatBgColor
 			}
-			
+
 			Flickable {
 				id: commentsFlick
 				anchors.top: chatHeader.bottom
 				anchors.topMargin: Style.spacingS
 				anchors.bottom: addCommentSection.visible ? addCommentSection.top
-														  : lockNoticeRow.visible ? lockNoticeRow.top
-																				  : parent.bottom
+							: lockNoticeRow.visible ? lockNoticeRow.top
+							: parent.bottom
 				anchors.bottomMargin: Style.spacingS
 				anchors.left: parent.left
 				anchors.right: commentsScrollV.left
@@ -1379,7 +1231,7 @@ DocumentViewBase {
 				contentHeight: commentsMainCol.height + Style.spacingL
 				boundsBehavior: Flickable.StopAtBounds
 				clip: true
-				
+
 				onContentHeightChanged: {
 					var maxY = contentHeight - height
 					if (maxY > 0) {
@@ -1389,43 +1241,43 @@ DocumentViewBase {
 						}
 					}
 				}
-				
+
 				Column {
 					id: commentsMainCol
 					width: parent.width
 					spacing: Style.spacingM
-					
+
 					Column {
 						id: commentsListCol
 						width: parent.width
 						spacing: Style.spacingM
-						
+
 						Repeater {
 							id: commentsThread
 							model: root.ticketData ? root.ticketData.m_comments : 0
-							
+
 							delegate: Item {
 								id: commentDelegate
 								width: commentsListCol.width
 								height: commentBubbleCol.height + Style.spacingXS
-								
+
 								readonly property bool isMe: model.item.m_userId === root.currentUserId
 								readonly property var dataModel: model.item
-								
+
 								Column {
 									id: commentBubbleCol
 									width: parent.width * 0.85
 									anchors.right: commentDelegate.isMe ? parent.right : undefined
 									anchors.left: commentDelegate.isMe ? undefined : parent.left
 									spacing: 4
-									
+
 									// Avatar + Name + Timestamp
 									Row {
 										spacing: Style.spacingS
 										anchors.right: commentDelegate.isMe ? parent.right : undefined
 										anchors.left: commentDelegate.isMe ? undefined : parent.left
 										layoutDirection: commentDelegate.isMe ? Qt.RightToLeft : Qt.LeftToRight
-										
+
 										Rectangle {
 											width: editView.avatarSize
 											height: editView.avatarSize
@@ -1433,7 +1285,7 @@ DocumentViewBase {
 											color: commentDelegate.isMe
 												   ? editView.accentColor
 												   : "#C4CBD6"
-											
+
 											Text {
 												anchors.centerIn: parent
 												text: model.item.m_userName ? model.item.m_userName.charAt(0).toUpperCase() : "?"
@@ -1443,18 +1295,18 @@ DocumentViewBase {
 												font.family: Style.fontFamily
 											}
 										}
-										
+
 										Column {
 											anchors.verticalCenter: parent.verticalCenter
 											spacing: 1
-											
+
 											Text {
 												text: commentDelegate.isMe ? qsTr("You") : (model.item.m_userName || qsTr("Unknown"))
 												font.pixelSize: Style.fontSizeS
 												font.bold: true
 												color: Style.textColor
 											}
-											
+
 											Text {
 												text: root.formatTimestamp(model.item.m_timestamp)
 												font.pixelSize: Style.fontSizeS - 2
@@ -1462,7 +1314,7 @@ DocumentViewBase {
 											}
 										}
 									}
-									
+
 									// Chat bubble
 									Rectangle {
 										width: bubbleContent.width + Style.paddingM * 2
@@ -1474,16 +1326,22 @@ DocumentViewBase {
 											   ? editView.accentBgLight
 											   : editView.otherBubbleColor
 										border.color: commentDelegate.isMe
-													  ? editView.accentBorderLight
-													  : "#E1E5EB"
+											   ? editView.accentBorderLight
+											   : "#E1E5EB"
 										border.width: 1
-										
+
 										Column {
 											id: bubbleContent
 											x: Style.paddingM
 											y: Style.paddingM
-											width: Math.min(commentBubbleCol.width - Style.paddingM * 2, (commentBodyText.visible && commentBodyText.contentWidth > w) ? Math.min(commentBodyText.width, commentBubbleCol.width - Style.paddingM * 2) : Math.min(100, commentBubbleCol.width - Style.paddingM * 2))
+											width: Math.min(commentBubbleCol.width - Style.paddingM * 2, implicitBubbleWidth)
 											spacing: Style.spacingS
+
+											readonly property real implicitBubbleWidth: {
+												var w = 100
+												if (commentBodyText.visible && commentBodyText.implicitWidth > w) w = commentBodyText.implicitWidth
+												return Math.min(w, commentBubbleCol.width - Style.paddingM * 2)
+											}
 
 											Text {
 												id: commentBodyText
@@ -1496,7 +1354,7 @@ DocumentViewBase {
 												visible: text.length > 0
 												lineHeight: 1.45
 											}
-											
+
 											// Attachment cards
 											Repeater {
 												model: commentDelegate.dataModel.m_attachments || []
@@ -1507,13 +1365,13 @@ DocumentViewBase {
 													color: Style.baseColor
 													border.color: editView.cardBorderColor
 													border.width: 1
-													
+
 													Row {
 														id: attRow
 														x: Style.paddingM
 														anchors.verticalCenter: parent.verticalCenter
 														spacing: Style.spacingS
-														
+
 														Image {
 															anchors.verticalCenter: parent.verticalCenter
 															width: Style.iconSizeS
@@ -1522,7 +1380,7 @@ DocumentViewBase {
 															sourceSize.width: width
 															sourceSize.height: height
 														}
-														
+
 														Text {
 															anchors.verticalCenter: parent.verticalCenter
 															text: model.item.m_fileName
@@ -1531,7 +1389,7 @@ DocumentViewBase {
 															font.underline: true
 														}
 													}
-													
+
 													MouseArea {
 														anchors.fill: parent
 														hoverEnabled: true
@@ -1545,17 +1403,17 @@ DocumentViewBase {
 								}
 							}
 						}
-						
+
 						// Empty comments placeholder
 						Item {
 							visible: commentsThread.count === 0
 							width: parent.width
 							height: commentsFlick.height - Style.spacingL * 2
-							
+
 							Column {
 								anchors.centerIn: parent
 								spacing: Style.spacingS
-								
+
 								Text {
 									anchors.horizontalCenter: parent.horizontalCenter
 									text: qsTr("No comments yet")
@@ -1563,7 +1421,7 @@ DocumentViewBase {
 									font.bold: true
 									color: Style.inactiveTextColor
 								}
-								
+
 								Text {
 									anchors.horizontalCenter: parent.horizontalCenter
 									text: qsTr("Be the first to leave a comment.")
@@ -1575,7 +1433,7 @@ DocumentViewBase {
 					}
 				}
 			}
-			
+
 			// ---- Fixed bottom: Add comment input ----
 			Rectangle {
 				id: addCommentSection
@@ -1589,7 +1447,7 @@ DocumentViewBase {
 				height: addCommentInnerCol.height + editView.cardPadding + 12
 				color: editView.cardColor
 				radius: editView.cardRadius - 1
-				
+
 				// Square-off top edge
 				Rectangle {
 					anchors.left: parent.left
@@ -1598,7 +1456,7 @@ DocumentViewBase {
 					height: editView.cardRadius
 					color: editView.cardColor
 				}
-				
+
 				// Top border
 				Rectangle {
 					anchors.top: parent.top
@@ -1607,7 +1465,7 @@ DocumentViewBase {
 					height: 1
 					color: editView.cardBorderColor
 				}
-				
+
 				Column {
 					id: addCommentInnerCol
 					anchors.left: parent.left
@@ -1617,13 +1475,13 @@ DocumentViewBase {
 					anchors.rightMargin: editView.cardPadding
 					anchors.bottomMargin: 12
 					spacing: Style.spacingS
-					
+
 					// Pending attachments
 					Flow {
 						width: parent.width
 						spacing: Style.spacingS
 						visible: root.pendingAttachments.length > 0 || root.uploadsInProgress > 0
-						
+
 						Repeater {
 							model: root.pendingAttachments
 							delegate: Rectangle {
@@ -1634,7 +1492,7 @@ DocumentViewBase {
 								border.color: editView.cardBorderColor
 								border.width: 1
 								color: editView.pageBgColor
-								
+
 								Text {
 									id: pendingFileLabel
 									anchors.left: parent.left
@@ -1648,7 +1506,7 @@ DocumentViewBase {
 									elide: Text.ElideMiddle
 									maximumLineCount: 1
 								}
-								
+
 								ToolButton {
 									id: pendingRemoveBtn
 									anchors.right: parent.right
@@ -1679,7 +1537,7 @@ DocumentViewBase {
 								}
 							}
 						}
-						
+
 						// Upload spinner
 						Rectangle {
 							width: uploadingLabel.contentWidth + Style.paddingM * 2
@@ -1689,7 +1547,7 @@ DocumentViewBase {
 							border.width: 1
 							color: editView.pageBgColor
 							visible: root.uploadsInProgress > 0
-							
+
 							Text {
 								id: uploadingLabel
 								anchors.centerIn: parent
@@ -1699,12 +1557,12 @@ DocumentViewBase {
 							}
 						}
 					}
-					
+
 					// Input row: text field + actions
 					Row {
 						width: parent.width
 						spacing: Style.spacingS
-						
+
 						// Comment input with rounded border
 						Rectangle {
 							width: parent.width - attachButton.width - sendBtnRect.width - Style.spacingS * 2
@@ -1713,7 +1571,7 @@ DocumentViewBase {
 							border.color: commentInputField.activeFocus ? editView.accentColor : editView.cardBorderColor
 							border.width: commentInputField.activeFocus ? 2 : 1
 							color: editView.cardColor
-							
+
 							TextEdit {
 								id: commentInputField
 								anchors.left: parent.left
@@ -1729,7 +1587,7 @@ DocumentViewBase {
 								clip: true
 								verticalAlignment: TextEdit.AlignVCenter
 								KeyNavigation.backtab: editLockReasonInput.visible ? editLockReasonInput : editLockedCB
-								
+
 								Text {
 									anchors.fill: parent
 									anchors.topMargin: 8
@@ -1740,7 +1598,7 @@ DocumentViewBase {
 								}
 							}
 						}
-						
+
 						ToolButton {
 							id: attachButton
 							anchors.verticalCenter: parent.verticalCenter
@@ -1751,7 +1609,7 @@ DocumentViewBase {
 							}
 							onClicked: attachImageDialog.open()
 						}
-						
+
 						Rectangle {
 							id: sendBtnRect
 							width: sendBtnText.contentWidth + 28
@@ -1760,10 +1618,10 @@ DocumentViewBase {
 							anchors.verticalCenter: parent.verticalCenter
 							color: commentButton.enabled
 								   ? (sendBtnMa.pressed ? Qt.darker(editView.accentColor, 1.15)
-														: sendBtnMa.containsMouse ? Qt.lighter(editView.accentColor, 1.1)
-																				  : editView.accentColor)
+									  : sendBtnMa.containsMouse ? Qt.lighter(editView.accentColor, 1.1)
+									  : editView.accentColor)
 								   : "#D0D5DD"
-							
+
 							Text {
 								id: sendBtnText
 								anchors.centerIn: parent
@@ -1772,14 +1630,14 @@ DocumentViewBase {
 								font.bold: true
 								color: commentButton.enabled ? Style.baseColor : "#98A2B3"
 							}
-							
+
 							// Hidden functional Button for enabled state
 							Button {
 								id: commentButton
 								visible: false
 								enabled: (commentInputField.text !== "" || root.pendingAttachments.length > 0) && root.uploadsInProgress === 0
 							}
-							
+
 							MouseArea {
 								id: sendBtnMa
 								anchors.fill: parent
@@ -1795,14 +1653,14 @@ DocumentViewBase {
 						}
 					}
 				}
-				
+
 				// File dialog
 				FileDialog {
 					id: attachImageDialog
 					title: qsTr("Attach image")
 					fileMode: FileDialog.OpenFile
 					nameFilters: [qsTr("Image files") + " (*.png *.jpg *.jpeg *.gif *.bmp *.svg *.webp)"]
-					
+
 					onAccepted: {
 						if (Qt.platform.os === "web") {
 							var fileObj = attachImageDialog.file
@@ -1824,12 +1682,12 @@ DocumentViewBase {
 						}
 					}
 				}
-				
+
 				FileIO {
 					id: attachmentFileIO
 				}
 			}
-			
+
 			// Lock notice / read-only notice
 			Row {
 				id: lockNoticeRow
@@ -1840,24 +1698,24 @@ DocumentViewBase {
 				anchors.leftMargin: editView.cardPadding
 				width: parent.width - editView.cardPadding * 2
 				spacing: Style.paddingS
-				
+
 				Text {
 					text: "🔒"
 					font.pixelSize: Style.fontSizeM
 				}
-				
+
 				Text {
 					text: root.canEdit
-						  ? qsTr("This conversation has been locked. Only collaborators can comment.")
-						  : qsTr("You have read-only access to this ticket. Only the reporter, assignees, and administrators can edit.")
+						? qsTr("This conversation has been locked. Only collaborators can comment.")
+						: qsTr("You have read-only access to this ticket. Only the reporter, assignees, and administrators can edit.")
 					font.pixelSize: Style.fontSizeS
 					color: Style.inactiveTextColor
 					wrapMode: Text.Wrap
 					width: parent.width - Style.fontSizeM - Style.paddingS
 				}
 			}
+		}
 		} // panelsContainer
 	}
 }
-
 
