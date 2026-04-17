@@ -453,7 +453,7 @@ DocumentViewBase {
 		readonly property string bubbleColor: "#EEF2FB"
 		readonly property string otherBubbleColor: "#EEF2FB"
 		readonly property string sectionLabelColor: "#8C95A6"
-		readonly property string timestampColor: "#C67B7B"
+		readonly property string timestampColor: Style.inactiveTextColor
 		readonly property real columnGap: Style.spacingL
 
 		// Page background
@@ -653,7 +653,7 @@ DocumentViewBase {
 
 									Text {
 										text: qsTr("Description")
-										font.pixelSize: Style.fontSizeS
+										font.pixelSize: Style.fontSizeM
 										font.bold: true
 										color: editView.sectionLabelColor
 									}
@@ -760,7 +760,7 @@ DocumentViewBase {
 											id: refCountLabel
 											anchors.centerIn: parent
 											text: root.pendingEntityRefs.length
-											font.pixelSize: Style.fontSizeS - 1
+											font.pixelSize: Style.fontSizeM - 1
 											font.bold: true
 											color: Style.baseColor
 										}
@@ -773,7 +773,7 @@ DocumentViewBase {
 									anchors.verticalCenter: parent.verticalCenter
 									visible: root.canEdit
 									text: "+ " + qsTr("Add context")
-									font.pixelSize: Style.fontSizeS
+									font.pixelSize: Style.fontSizeM
 									font.bold: true
 									color: editView.accentColor
 
@@ -811,7 +811,7 @@ DocumentViewBase {
 											anchors.leftMargin: Style.paddingS + 2
 											anchors.verticalCenter: parent.verticalCenter
 											text: (modelData.entityType ? "[" + modelData.entityType + "] " : "") + (modelData.displayName || modelData.entityId || "")
-											font.pixelSize: Style.fontSizeS
+											font.pixelSize: Style.fontSizeM
 											color: editView.accentColor
 											font.underline: modelData.entityLinkPath !== ""
 											elide: Text.ElideRight
@@ -858,7 +858,7 @@ DocumentViewBase {
 								visible: root.pendingEntityRefs.length === 0
 								width: parent.width
 								text: qsTr("No linked entities. Click \"+ Add context\" to attach entities to this ticket.")
-								font.pixelSize: Style.fontSizeS
+								font.pixelSize: Style.fontSizeM
 								color: Style.inactiveTextColor
 								wrapMode: Text.WordWrap
 							}
@@ -1059,7 +1059,7 @@ DocumentViewBase {
 
 									Text {
 										text: qsTr("Type")
-										font.pixelSize: Style.fontSizeS
+										font.pixelSize: Style.fontSizeM
 										color: editView.sectionLabelColor
 									}
 
@@ -1082,7 +1082,7 @@ DocumentViewBase {
 
 									Text {
 										text: qsTr("Priority")
-										font.pixelSize: Style.fontSizeS
+										font.pixelSize: Style.fontSizeM
 										color: editView.sectionLabelColor
 									}
 
@@ -1112,7 +1112,7 @@ DocumentViewBase {
 									Text {
 										id: assigneesLabelText
 										text: qsTr("Assignees")
-										font.pixelSize: Style.fontSizeS
+										font.pixelSize: Style.fontSizeM
 										color: editView.sectionLabelColor
 										anchors.left: parent.left
 										anchors.verticalCenter: parent.verticalCenter
@@ -1124,7 +1124,7 @@ DocumentViewBase {
 										anchors.verticalCenter: parent.verticalCenter
 										visible: root.canEdit
 										text: "+ " + qsTr("Add")
-										font.pixelSize: Style.fontSizeS
+										font.pixelSize: Style.fontSizeM
 										font.bold: true
 										color: editView.accentColor
 
@@ -1158,7 +1158,7 @@ DocumentViewBase {
 												anchors.leftMargin: Style.paddingS + 2
 												anchors.verticalCenter: parent.verticalCenter
 												text: modelData.name || modelData.id
-												font.pixelSize: Style.fontSizeS
+												font.pixelSize: Style.fontSizeM
 												color: editView.accentColor
 												elide: Text.ElideRight
 												maximumLineCount: 1
@@ -1192,7 +1192,7 @@ DocumentViewBase {
 									visible: root.pendingAssignees.length === 0
 									width: parent.width
 									text: qsTr("No assignees. Click \"+ Add\" to assign users.")
-									font.pixelSize: Style.fontSizeS
+									font.pixelSize: Style.fontSizeM
 									color: Style.inactiveTextColor
 									wrapMode: Text.WordWrap
 								}
@@ -1305,7 +1305,7 @@ DocumentViewBase {
 
 									Text {
 										text: qsTr("Status")
-										font.pixelSize: Style.fontSizeS
+										font.pixelSize: Style.fontSizeM
 										color: editView.sectionLabelColor
 									}
 
@@ -1328,7 +1328,7 @@ DocumentViewBase {
 
 									Text {
 										text: qsTr("State Reason")
-										font.pixelSize: Style.fontSizeS
+										font.pixelSize: Style.fontSizeM
 										color: editView.sectionLabelColor
 									}
 
@@ -1370,7 +1370,7 @@ DocumentViewBase {
 
 									Text {
 										text: qsTr("Lock Reason")
-										font.pixelSize: Style.fontSizeS
+										font.pixelSize: Style.fontSizeM
 										color: editView.sectionLabelColor
 									}
 
@@ -1467,7 +1467,7 @@ DocumentViewBase {
 							id: chatCountLabel
 							anchors.centerIn: parent
 							text: commentsThread.count
-							font.pixelSize: Style.fontSizeS
+							font.pixelSize: Style.fontSizeM
 							font.bold: true
 							color: Style.baseColor
 						}
@@ -1657,14 +1657,14 @@ DocumentViewBase {
 
 													Text {
 														text: commentDelegate.isMe ? qsTr("You") : (model.item.m_userName || qsTr("Unknown"))
-														font.pixelSize: Style.fontSizeS
+														font.pixelSize: Style.fontSizeM
 														font.bold: true
 														color: Style.textColor
 													}
 
 													Text {
 														text: root.formatTimestamp(model.item.m_timestamp)
-														font.pixelSize: Style.fontSizeS - 1
+														font.pixelSize: Style.fontSizeM - 1
 														color: editView.timestampColor
 													}
 												}
@@ -1700,7 +1700,7 @@ DocumentViewBase {
 
 															Text {
 																text: model.item.m_replyToUserName || ""
-																font.pixelSize: Style.fontSizeS - 1
+																font.pixelSize: Style.fontSizeM - 1
 																font.bold: true
 																color: editView.accentColor
 																elide: Text.ElideRight
@@ -1708,7 +1708,7 @@ DocumentViewBase {
 
 															Text {
 																text: model.item.m_replyToContent || ""
-																font.pixelSize: Style.fontSizeS - 1
+																font.pixelSize: Style.fontSizeM - 1
 																color: Style.inactiveTextColor
 																elide: Text.ElideRight
 																maximumLineCount: 1
@@ -1762,28 +1762,28 @@ DocumentViewBase {
 													}
 												}
 											}
-										}
-									}
-
-									// Reply button
-									Text {
-										visible: root.canEdit
-										text: qsTr("Reply")
-										font.pixelSize: Style.fontSizeS - 1
-										color: Style.inactiveTextColor
-										x: Style.paddingM
-
-										MouseArea {
-											anchors.fill: parent
-											hoverEnabled: true
-											cursorShape: Qt.PointingHandCursor
-											onClicked: {
-												root._replyToMessage = {
-													id: model.item.m_id || "",
-													userName: model.item.m_userName || qsTr("Unknown"),
-													content: model.item.m_content || ""
+											
+											// Reply button
+											Text {
+												visible: root.canEdit
+												text: qsTr("Reply")
+												font.pixelSize: Style.fontSizeM
+												color: Style.inactiveTextColor
+												// x: Style.paddingM
+		
+												MouseArea {
+													anchors.fill: parent
+													hoverEnabled: true
+													cursorShape: Qt.PointingHandCursor
+													onClicked: {
+														root._replyToMessage = {
+															id: model.item.m_id || "",
+															userName: model.item.m_userName || qsTr("Unknown"),
+															content: model.item.m_content || ""
+														}
+														commentInputField.forceActiveFocus()
+													}
 												}
-												commentInputField.forceActiveFocus()
 											}
 										}
 									}
@@ -1812,7 +1812,7 @@ DocumentViewBase {
 								Text {
 									anchors.horizontalCenter: parent.horizontalCenter
 									text: qsTr("Be the first to leave a comment.")
-									font.pixelSize: Style.fontSizeS
+									font.pixelSize: Style.fontSizeM
 									color: Style.inactiveTextColor
 								}
 							}
@@ -1894,7 +1894,7 @@ DocumentViewBase {
 
 								Text {
 									text: root._replyToMessage ? root._replyToMessage.userName : ""
-									font.pixelSize: Style.fontSizeS
+									font.pixelSize: Style.fontSizeM
 									font.bold: true
 									color: editView.accentColor
 									elide: Text.ElideRight
@@ -1903,7 +1903,7 @@ DocumentViewBase {
 
 								Text {
 									text: root._replyToMessage ? root._replyToMessage.content : ""
-									font.pixelSize: Style.fontSizeS
+									font.pixelSize: Style.fontSizeM
 									color: Style.inactiveTextColor
 									elide: Text.ElideRight
 									width: parent.width
@@ -1952,7 +1952,7 @@ DocumentViewBase {
 									anchors.rightMargin: Style.paddingS
 									anchors.verticalCenter: parent.verticalCenter
 									text: "📎 " + (modelData.fileName || qsTr("attachment"))
-									font.pixelSize: Style.fontSizeS
+									font.pixelSize: Style.fontSizeM
 									color: Style.textColor
 									elide: Text.ElideMiddle
 									maximumLineCount: 1
@@ -2003,7 +2003,7 @@ DocumentViewBase {
 								id: uploadingLabel
 								anchors.centerIn: parent
 								text: "⏳ " + qsTr("Uploading...")
-								font.pixelSize: Style.fontSizeS
+								font.pixelSize: Style.fontSizeM
 								color: Style.textColor
 							}
 						}
@@ -2066,7 +2066,7 @@ DocumentViewBase {
 						Rectangle {
 							id: sendBtnRect
 							width: sendBtnText.contentWidth + 28
-							height: Style.buttonHeightM
+							height: inputFieldRect.height
 							radius: 20
 							anchors.verticalCenter: parent.verticalCenter
 							color: commentButton.enabled
@@ -2080,7 +2080,6 @@ DocumentViewBase {
 								anchors.centerIn: parent
 								text: root.uploadsInProgress > 0 ? qsTr("Uploading...") : qsTr("Send")
 								font.pixelSize: Style.fontSizeM
-								font.bold: true
 								color: commentButton.enabled ? Style.baseColor : "#98A2B3"
 							}
 
@@ -2162,7 +2161,7 @@ DocumentViewBase {
 					text: root.canEdit
 						? qsTr("This conversation has been locked. Only collaborators can comment.")
 						: qsTr("You have read-only access to this ticket. Only the reporter, assignees, and administrators can edit.")
-					font.pixelSize: Style.fontSizeS
+					font.pixelSize: Style.fontSizeM
 					color: Style.inactiveTextColor
 					wrapMode: Text.Wrap
 					width: parent.width - Style.fontSizeM - Style.paddingS
