@@ -604,45 +604,52 @@ DocumentViewBase {
 								width: parent.width
 								spacing: Style.spacingS
 
-								Row {
+								Item {
 									width: parent.width
-									spacing: Style.spacingS
+									height: Math.max(contextLabelText.height, addContextBtn.height)
 
-									Text {
-										text: qsTr("CONTEXT")
-										font.pixelSize: Style.fontSizeS
-										font.bold: true
-										color: editView.labelColor
-										opacity: 0.6
+									Row {
+										anchors.left: parent.left
 										anchors.verticalCenter: parent.verticalCenter
-									}
-
-									Rectangle {
-										visible: root.pendingEntityRefs.length > 0
-										width: refCountLabel.contentWidth + Style.paddingS * 2
-										height: editView.badgeHeight - 2
-										radius: (editView.badgeHeight - 2) / 2
-										color: editView.accentColor
-										anchors.verticalCenter: parent.verticalCenter
+										spacing: Style.spacingS
 
 										Text {
-											id: refCountLabel
-											anchors.centerIn: parent
-											text: root.pendingEntityRefs.length
-											font.pixelSize: Style.fontSizeS - 1
+											id: contextLabelText
+											text: qsTr("CONTEXT")
+											font.pixelSize: Style.fontSizeS
 											font.bold: true
-											color: Style.baseColor
+											color: editView.labelColor
+											opacity: 0.6
+											anchors.verticalCenter: parent.verticalCenter
+										}
+
+										Rectangle {
+											visible: root.pendingEntityRefs.length > 0
+											width: refCountLabel.contentWidth + Style.paddingS * 2
+											height: editView.badgeHeight - 2
+											radius: (editView.badgeHeight - 2) / 2
+											color: editView.accentColor
+											anchors.verticalCenter: parent.verticalCenter
+
+											Text {
+												id: refCountLabel
+												anchors.centerIn: parent
+												text: root.pendingEntityRefs.length
+												font.pixelSize: Style.fontSizeS - 1
+												font.bold: true
+												color: Style.baseColor
+											}
 										}
 									}
 
-									Item { width: Style.spacingS; height: 1 }
-
 									Text {
+										id: addContextBtn
+										anchors.right: parent.right
+										anchors.verticalCenter: parent.verticalCenter
 										text: "+ " + qsTr("Add context")
 										font.pixelSize: Style.fontSizeS
 										font.bold: true
 										color: editView.accentColor
-										anchors.verticalCenter: parent.verticalCenter
 
 										MouseArea {
 											anchors.fill: parent
@@ -719,6 +726,16 @@ DocumentViewBase {
 									}
 								}
 
+								// Empty context placeholder
+								Text {
+									visible: root.pendingEntityRefs.length === 0
+									width: parent.width
+									text: qsTr("No linked entities. Click \"+ Add context\" to attach entities to this ticket.")
+									font.pixelSize: Style.fontSizeS
+									color: Style.inactiveTextColor
+									wrapMode: Text.WordWrap
+								}
+
 								// Single dialog: entity type ComboBox + RemoteCollectionView
 								Component {
 									id: contextPickerDialogComp
@@ -749,6 +766,9 @@ DocumentViewBase {
 												
 												Component.onCompleted: {
 													ctxTypeCB.model = entityTypeModel
+													if (entityTypeModel.getItemsCount() > 0) {
+														ctxTypeCB.currentIndex = 0
+													}
 												}
 
 												Column {
@@ -1336,6 +1356,33 @@ DocumentViewBase {
 											}
 										}
 									}
+								}
+							}
+						}
+
+						// Empty comments placeholder
+						Item {
+							visible: commentsThread.count === 0
+							width: parent.width
+							height: commentsFlick.height - Style.spacingL * 2
+
+							Column {
+								anchors.centerIn: parent
+								spacing: Style.spacingS
+
+								Text {
+									anchors.horizontalCenter: parent.horizontalCenter
+									text: qsTr("No comments yet")
+									font.pixelSize: Style.fontSizeL
+									font.bold: true
+									color: Style.inactiveTextColor
+								}
+
+								Text {
+									anchors.horizontalCenter: parent.horizontalCenter
+									text: qsTr("Be the first to leave a comment.")
+									font.pixelSize: Style.fontSizeS
+									color: Style.inactiveTextColor
 								}
 							}
 						}
