@@ -485,7 +485,7 @@ DocumentViewBase {
 				anchors.left: parent.left
 				anchors.right: editScrollV.left
 				anchors.rightMargin: root.isNewIssue ? Style.spacingS : 0
-				contentHeight: leftStack.height + Style.spacingL + 12
+				contentHeight: leftStack.height + Style.spacingL + 12 // extra padding for card shadow overflow
 				boundsBehavior: Flickable.StopAtBounds
 				clip: true
 
@@ -587,7 +587,7 @@ DocumentViewBase {
 
 										Text {
 											anchors.centerIn: parent
-											text: "\u270E"
+											text: "\u270E" // ✎ pencil icon
 											font.pixelSize: Style.fontSizeM
 										}
 
@@ -650,7 +650,7 @@ DocumentViewBase {
 
 										Text {
 											anchors.centerIn: parent
-											text: "\u2713"
+											text: "\u2713" // ✓ checkmark icon
 											font.pixelSize: Style.fontSizeM
 											font.bold: true
 											color: "#34A853"
@@ -663,7 +663,7 @@ DocumentViewBase {
 											cursorShape: Qt.PointingHandCursor
 											onClicked: {
 												root._titleEditing = false
-												editTitleInput.editingFinished()
+												root.doUpdateModel()
 											}
 										}
 									}
