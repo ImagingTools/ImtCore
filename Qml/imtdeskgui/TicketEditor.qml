@@ -754,7 +754,7 @@ DocumentViewBase {
 							Text {
 								visible: root.pendingEntityRefs.length === 0
 								width: parent.width
-								text: qsTr("No linked entities.")
+								text: qsTr("No linked entities. Click \"+ Add context\" to attach entities to this ticket.")
 								font.pixelSize: Style.fontSizeS
 								color: Style.inactiveTextColor
 								wrapMode: Text.WordWrap
@@ -987,7 +987,7 @@ DocumentViewBase {
 								spacing: 4
 
 								Text {
-									text: qsTr("Assignee")
+									text: qsTr("Assignees")
 									font.pixelSize: Style.fontSizeS
 									color: editView.sectionLabelColor
 								}
