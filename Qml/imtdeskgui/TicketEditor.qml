@@ -575,11 +575,13 @@ DocumentViewBase {
 										color: titleEditBtnMa.containsMouse ? "#F0F2F5" : "transparent"
 										anchors.verticalCenter: parent.verticalCenter
 
-										Text {
+										Image {
 											anchors.centerIn: parent
-											text: "✎"
-											font.pixelSize: Style.fontSizeM
-											color: editView.accentColor
+											width: Style.iconSizeS
+											height: width
+											source: Style.getIconPath("Icons/Edit", Icon.State.On, Icon.Mode.Normal)
+											sourceSize.width: width
+											sourceSize.height: height
 										}
 
 										MouseArea {
@@ -608,7 +610,6 @@ DocumentViewBase {
 										height: Style.controlHeightM
 										placeHolderText: qsTr("Enter ticket title...")
 										readOnly: !root.canEdit
-										onEditingFinished: root.doUpdateModel()
 										KeyNavigation.tab: editDescriptionInput
 									}
 
@@ -621,12 +622,13 @@ DocumentViewBase {
 										color: titleConfirmBtnMa.containsMouse ? "#E6F4EA" : "#F0F2F5"
 										anchors.verticalCenter: parent.verticalCenter
 
-										Text {
+										Image {
 											anchors.centerIn: parent
-											text: "✓"
-											font.pixelSize: Style.fontSizeM
-											font.bold: true
-											color: "#34A853"
+											width: Style.iconSizeS
+											height: width
+											source: Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal)
+											sourceSize.width: width
+											sourceSize.height: height
 										}
 
 										MouseArea {
@@ -1218,7 +1220,7 @@ DocumentViewBase {
 													anchors.fill: parent
 													anchors.margins: Style.paddingM
 													clip: true
-													model: editAssigneeCB.model
+													model: userCollectionProvider.collectionModel
 													delegate: Rectangle {
 														width: assigneeListView.width
 														height: Style.buttonHeightM
