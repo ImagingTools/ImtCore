@@ -839,7 +839,7 @@ DocumentViewBase {
 																	ctxDialog.collectionView = this
 																}
 																onSelectionChanged: {
-																	ctxDialog.setButtonEnabled(Enums.apply, ids.length > 0)
+																	ctxDialog.setButtonEnabled(Enums.apply, selectedIds.length > 0)
 																}
 															}
 														}
