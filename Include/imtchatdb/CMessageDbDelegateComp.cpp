@@ -364,7 +364,14 @@ void CMessageDbDelegateComp::OnComponentCreated()
 		m_databaseEngineCompPtr->ExecSqlQuery(
 			"ALTER TABLE \"Messages\" ADD COLUMN \"ReplyToId\" TEXT;",
 			&migrError);
-		// Ignore errors (column may already exist)
+		// Ignore "duplicate column" errors — column may already exist from a previous run.
+		// Log any other errors as warnings.
+		if (migrError.type() != QSqlError::NoError){
+			QString errorText = migrError.databaseText().toLower();
+			if (!errorText.contains("duplicate") && !errorText.contains("already exists")){
+				qWarning() << "Messages.ReplyToId migration warning:" << migrError.text();
+			}
+		}
 	}
 }
 

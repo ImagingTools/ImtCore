@@ -1684,7 +1684,7 @@ DocumentViewBase {
 
 											// Reply-to indicator inside bubble
 											Rectangle {
-												visible: model.item.m_replyToId ? (model.item.m_replyToId.length > 0) : false
+												visible: (model.item.m_replyToId && model.item.m_replyToId.length > 0)
 												width: parent.width
 												height: replyBubbleCol.height + Style.paddingS
 												radius: Style.radiusM
@@ -1754,7 +1754,8 @@ DocumentViewBase {
 														id: attImagePreview
 														visible: {
 															var fn = String(model.item.m_fileName || "").toLowerCase()
-															return fn.endsWith(".png") || fn.endsWith(".jpg") || fn.endsWith(".jpeg") || fn.endsWith(".gif") || fn.endsWith(".webp") || fn.endsWith(".bmp") || fn.endsWith(".svg")
+															var imageExts = [".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp", ".svg"]
+															return imageExts.some(function(ext) { return fn.endsWith(ext) })
 														}
 														source: visible ? String(model.item.m_preview || "") : ""
 														width: Math.min(implicitWidth, bubbleContent.width - Style.paddingM)
@@ -2069,6 +2070,7 @@ DocumentViewBase {
 						// Comment input with rounded border
 						Rectangle {
 							width: parent.width - attachButton.width - sendBtnRect.width - Style.spacingS * 2
+							// Extra 4px accounts for the border width change on focus (1→2px on each side)
 							height: Math.max(40, commentInputField.contentHeight + Style.paddingS * 2 + 4)
 							radius: 20
 							border.color: commentInputField.activeFocus ? editView.accentColor : editView.cardBorderColor
