@@ -2,7 +2,7 @@
 import QtQuick 2.15
 import Acf 1.0
 import com.imtcore.imtqml 1.0
-import imtcontrols 1.0 as ImtContr
+import imtcontrols 1.0
 import imtgui 1.0
 import imtauthgui 1.0
 import imtguigql 1.0
@@ -446,7 +446,7 @@ DocumentViewBase {
 			anchors.left: parent.left
 			width: root.isNewIssue ? parent.width : parent.width * 0.45
 
-			ImtContr.CustomScrollbar {
+			CustomScrollbar {
 				id: editScrollV
 				z: parent.z + 1
 				anchors.right: parent.right
@@ -536,7 +536,7 @@ DocumentViewBase {
 									opacity: 0.6
 								}
 
-								ImtContr.CustomTextField {
+								CustomTextField {
 									id: editTitleInput
 									width: parent.width
 									height: Style.controlHeightM
@@ -671,13 +671,13 @@ DocumentViewBase {
 												}
 											}
 
-											ImtContr.ToolButton {
+											ToolButton {
 												id: refRemoveBtn
 												anchors.right: parent.right
 												anchors.verticalCenter: parent.verticalCenter
 												iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
 												decorator: Component {
-													ImtContr.ToolButtonDecorator {
+													ToolButtonDecorator {
 														color: "transparent"
 														icon.width: Style.iconSizeXS
 													}
@@ -696,6 +696,7 @@ DocumentViewBase {
 								// Blue link to add context via dialog
 								Text {
 									text: qsTr("Add context")
+									anchors.right: parent.right
 									font.pixelSize: Style.fontSizeM
 									font.underline: true
 									color: editView.accentColor
@@ -713,7 +714,7 @@ DocumentViewBase {
 								// Single dialog: entity type ComboBox + RemoteCollectionView
 								Component {
 									id: contextPickerDialogComp
-									ImtContr.Dialog {
+									Dialog {
 										id: ctxDialog
 										title: qsTr("Add Context")
 										canMove: false
@@ -737,6 +738,10 @@ DocumentViewBase {
 											Item {
 												width: ctxDialog.width
 												height: ctxDialog.height - 100
+												
+												Component.onCompleted: {
+													ctxTypeCB.model = entityTypeModel
+												}
 
 												Column {
 													id: ctxContentCol
@@ -755,11 +760,10 @@ DocumentViewBase {
 															anchors.verticalCenter: parent.verticalCenter
 														}
 
-														ImtContr.ComboBox {
+														ComboBox {
 															id: ctxTypeCB
 															width: 250
 															height: Style.buttonHeightM
-															model: entityTypeModel
 															onCurrentIndexChanged: {
 																if (entityTypeModel.getItemsCount() > currentIndex) {
 																	ctxDialog.selectedEntityTypeId = entityTypeModel.getData("id", currentIndex)
@@ -870,7 +874,7 @@ DocumentViewBase {
 										opacity: 0.6
 									}
 
-									ImtContr.ComboBox {
+									ComboBox {
 										id: editTypeCB
 										width: parent.width
 										height: Style.buttonHeightM
@@ -893,7 +897,7 @@ DocumentViewBase {
 										opacity: 0.6
 									}
 
-									ImtContr.ComboBox {
+									ComboBox {
 										id: editPriorityCB
 										width: parent.width
 										height: Style.buttonHeightM
@@ -918,7 +922,7 @@ DocumentViewBase {
 									opacity: 0.6
 								}
 
-								ImtContr.ComboBox {
+								ComboBox {
 									id: editAssigneeCB
 									width: parent.width
 									height: Style.buttonHeightM
@@ -929,7 +933,7 @@ DocumentViewBase {
 							}
 
 							// Hidden Reporter (data still tracked for model)
-							ImtContr.ComboBox {
+							ComboBox {
 								id: editReporterCB
 								visible: false
 								width: 0
@@ -954,7 +958,7 @@ DocumentViewBase {
 										opacity: 0.6
 									}
 
-									ImtContr.ComboBox {
+									ComboBox {
 										id: editStatusCB
 										width: parent.width
 										height: Style.buttonHeightM
@@ -977,7 +981,7 @@ DocumentViewBase {
 										opacity: 0.6
 									}
 
-									ImtContr.ComboBox {
+									ComboBox {
 										id: editStateReasonCB
 										width: parent.width
 										height: Style.buttonHeightM
@@ -998,7 +1002,7 @@ DocumentViewBase {
 
 								Rectangle { width: parent.width; height: 1; color: editView.cardBorderColor; opacity: 0.5 }
 
-								ImtContr.CheckBox {
+								CheckBox {
 									id: editLockedCB
 									text: qsTr("Lock issue")
 									onCheckStateChanged: root.doUpdateModel()
@@ -1018,7 +1022,7 @@ DocumentViewBase {
 										opacity: 0.6
 									}
 
-									ImtContr.CustomTextField {
+									CustomTextField {
 										id: editLockReasonInput
 										width: parent.width
 										height: Style.controlHeightM
@@ -1114,7 +1118,7 @@ DocumentViewBase {
 				}
 			}
 
-			ImtContr.CustomScrollbar {
+			CustomScrollbar {
 				id: commentsScrollV
 				z: parent.z + 1
 				anchors.right: parent.right
@@ -1411,13 +1415,13 @@ DocumentViewBase {
 									maximumLineCount: 1
 								}
 
-								ImtContr.ToolButton {
+								ToolButton {
 									id: pendingRemoveBtn
 									anchors.right: parent.right
 									anchors.verticalCenter: parent.verticalCenter
 									iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
 									decorator: Component {
-										ImtContr.ToolButtonDecorator {
+										ToolButtonDecorator {
 											color: "transparent"
 											icon.width: Style.iconSizeXS
 										}
@@ -1467,12 +1471,12 @@ DocumentViewBase {
 						anchors.right: parent.right
 						spacing: Style.spacingS
 
-						ImtContr.ToolButton {
+						ToolButton {
 							id: attachButton
 							tooltipText: qsTr("Attach file")
 							iconSource: Style.getIconPath("Icons/Attachment", Icon.State.On, Icon.Mode.Normal)
 							decorator: Component {
-								ImtContr.ToolButtonDecorator { color: "transparent" }
+								ToolButtonDecorator { color: "transparent" }
 							}
 							onClicked: attachImageDialog.open()
 						}
@@ -1497,7 +1501,7 @@ DocumentViewBase {
 							}
 
 							// Hidden functional Button for enabled state
-							ImtContr.Button {
+							Button {
 								id: commentButton
 								visible: false
 								enabled: (commentInputField.text !== "" || root.pendingAttachments.length > 0) && root.uploadsInProgress === 0
