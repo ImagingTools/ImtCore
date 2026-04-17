@@ -1195,19 +1195,22 @@ DocumentViewBase {
 									wrapMode: Text.WordWrap
 								}
 
-								// Assignee picker dialog
+								// Assignee picker dialog — RemoteCollectionView with Users collection
 								Component {
 									id: assigneePickerDialogComp
 									Dialog {
 										id: assigneeDialog
 										title: qsTr("Select Assignees")
 										canMove: false
-										width: Math.min(ModalDialogManager.activeView.width - 80, 500)
-										height: Math.min(ModalDialogManager.activeView.height - 80, 500)
+										width: Math.min(ModalDialogManager.activeView.width - 80, 900)
+										height: ModalDialogManager.activeView.height - 80
+
+										property RemoteCollectionView collectionView: null
 
 										Component.onCompleted: {
-											addButton(Enums.apply, qsTr("Apply"), false)
+											addButton(Enums.apply, qsTr("Attach Selected"), false)
 											addButton(Enums.cancel, qsTr("Cancel"), true)
+											setButtonEnabled(Enums.apply, false)
 										}
 
 										contentComp: Component {
@@ -1215,78 +1218,29 @@ DocumentViewBase {
 												width: assigneeDialog.width
 												height: assigneeDialog.height - 100
 
-												ListView {
-													id: assigneeListView
+												Rectangle {
 													anchors.fill: parent
 													anchors.margins: Style.paddingM
-													clip: true
-													model: userCollectionProvider.collectionModel
-													delegate: Rectangle {
-														width: assigneeListView.width
-														height: Style.buttonHeightM
-														radius: Style.radiusM
-														color: assigneeItemMa.containsMouse ? "#F5F7FA" : "transparent"
+													radius: Style.radiusM
+													color: "transparent"
+													border.color: Style.borderColor
+													border.width: 1
 
-														property string itemId: editAssigneeCB.model ? editAssigneeCB.model.getData("id", index) : ""
-														property string itemName: editAssigneeCB.model ? (editAssigneeCB.model.getData("name", index) || itemId) : ""
-														property bool isSelected: {
-															for (var i = 0; i < root.pendingAssignees.length; i++) {
-																if (root.pendingAssignees[i].id === itemId) return true
-															}
-															return false
+													RemoteCollectionView {
+														anchors.fill: parent
+														anchors.margins: 1
+														commandsControllerComp: null
+														visibleMetaInfo: false
+														commandsDelegateComp: null
+														collectionId: "Users"
+														documentCollectionFilter: null
+														loadingDataAfterHeadersReceived: false
+														showRemoteChangesAlert: false
+														Component.onCompleted: {
+															assigneeDialog.collectionView = this
 														}
-
-														Row {
-															anchors.fill: parent
-															anchors.leftMargin: Style.paddingM
-															spacing: Style.spacingS
-
-															Rectangle {
-																width: 20
-																height: 20
-																radius: 4
-																border.color: isSelected ? editView.accentColor : editView.cardBorderColor
-																border.width: 1
-																color: isSelected ? editView.accentColor : "transparent"
-																anchors.verticalCenter: parent.verticalCenter
-
-																Text {
-																	anchors.centerIn: parent
-																	text: "✓"
-																	font.pixelSize: 12
-																	font.bold: true
-																	color: Style.baseColor
-																	visible: isSelected
-																}
-															}
-
-															Text {
-																text: itemName
-																font.pixelSize: Style.fontSizeM
-																color: Style.textColor
-																anchors.verticalCenter: parent.verticalCenter
-															}
-														}
-
-														MouseArea {
-															id: assigneeItemMa
-															anchors.fill: parent
-															hoverEnabled: true
-															cursorShape: Qt.PointingHandCursor
-															onClicked: {
-																var arr = root.pendingAssignees.slice()
-																if (isSelected) {
-																	for (var i = 0; i < arr.length; i++) {
-																		if (arr[i].id === itemId) {
-																			arr.splice(i, 1)
-																			break
-																		}
-																	}
-																} else {
-																	arr.push({id: itemId, name: itemName})
-																}
-																root.pendingAssignees = arr
-															}
+														onSelectionChanged: {
+															assigneeDialog.setButtonEnabled(Enums.apply, selectedIds.length > 0)
 														}
 													}
 												}
@@ -1294,7 +1248,24 @@ DocumentViewBase {
 										}
 
 										onFinished: {
-											if (buttonId === Enums.apply) {
+											if (buttonId === Enums.apply && collectionView) {
+												var arr = root.pendingAssignees.slice()
+												var mdl = collectionView.table.elements
+												let indexes = collectionView.table.getSelectedIndexes()
+												for (var i = 0; i < indexes.length; i++) {
+													let idx = indexes[i]
+													var userId = mdl.getData("id", idx)
+													var userName = mdl.getData("name", idx) || userId
+													// Skip duplicates
+													var exists = false
+													for (var j = 0; j < arr.length; j++) {
+														if (arr[j].id === userId) { exists = true; break }
+													}
+													if (!exists) {
+														arr.push({id: userId, name: userName})
+													}
+												}
+												root.pendingAssignees = arr
 												root._assigneesChanged = true
 												root.doUpdateModel()
 											}
@@ -1552,14 +1523,22 @@ DocumentViewBase {
 				boundsBehavior: Flickable.StopAtBounds
 				clip: true
 
+				property bool _initialScrollDone: false
+
 				function scrollToBottom() {
 					var maxY = contentHeight - height
 					if (maxY > 0) {
 						contentY = maxY
+					} else {
+						contentY = 0
 					}
 				}
 
 				onContentHeightChanged: {
+					if (!_initialScrollDone) {
+						scrollToBottomTimer.restart()
+						return
+					}
 					var maxY = contentHeight - height
 					if (maxY > 0) {
 						if (root._forceScrollToBottom) {
@@ -1572,21 +1551,38 @@ DocumentViewBase {
 				}
 
 				onHeightChanged: {
+					if (!_initialScrollDone) {
+						scrollToBottomTimer.restart()
+						return
+					}
 					var maxY = contentHeight - height
 					if (maxY > 0 && contentY >= maxY - 80) {
 						contentY = maxY
 					}
 				}
 
-				Component.onCompleted: {
-					scrollToBottomTimer.start()
+				Connections {
+					target: commentsThread
+					function onCountChanged() {
+						if (!commentsFlick._initialScrollDone) {
+							scrollToBottomTimer.restart()
+						}
+					}
 				}
+
+				Component.onCompleted: scrollToBottomTimer.restart()
 
 				Timer {
 					id: scrollToBottomTimer
-					interval: 200
+					interval: 100
 					repeat: false
-					onTriggered: commentsFlick.scrollToBottom()
+					onTriggered: {
+						commentsFlick.scrollToBottom()
+						if (commentsFlick.contentHeight > 0 && commentsFlick.height > 0
+								&& commentsThread.count >= 0) {
+							commentsFlick._initialScrollDone = true
+						}
+					}
 				}
 
 				Column {
@@ -1745,74 +1741,46 @@ DocumentViewBase {
 												lineHeight: 1.45
 											}
 
-											// Attachment cards
+											// Attachment cards — simple filename links
 											Repeater {
 												model: commentDelegate.dataModel.m_attachments || []
-												delegate: Column {
-													spacing: Style.spacingXS
+												delegate: Rectangle {
+													width: attRow.width + Style.paddingM * 2
+													height: attRow.height + Style.paddingS * 2
+													radius: Style.radiusM
+													color: Style.baseColor
+													border.color: editView.cardBorderColor
+													border.width: 1
 
-													// Image preview for image attachments
-													Image {
-														id: attImagePreview
-														visible: {
-															var fn = String(model.item.m_fileName || "").toLowerCase()
-															var imageExts = [".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp", ".svg"]
-															return imageExts.some(function(ext) { return fn.endsWith(ext) })
+													Row {
+														id: attRow
+														x: Style.paddingM
+														anchors.verticalCenter: parent.verticalCenter
+														spacing: Style.spacingS
+
+														Image {
+															anchors.verticalCenter: parent.verticalCenter
+															width: Style.iconSizeS
+															height: width
+															source: Style.getIconPath("Icons/Attachment", Icon.State.On, Icon.Mode.Normal)
+															sourceSize.width: width
+															sourceSize.height: height
 														}
-														source: visible ? String(model.item.m_preview || "") : ""
-														width: Math.min(implicitWidth, bubbleContent.width - Style.paddingM)
-														height: visible ? (width * (implicitHeight / Math.max(1, implicitWidth))) : 0
-														fillMode: Image.PreserveAspectFit
-														asynchronous: true
 
-														MouseArea {
-															anchors.fill: parent
-															hoverEnabled: true
-															cursorShape: Qt.PointingHandCursor
-															onClicked: Qt.openUrlExternally(model.item.m_preview)
+														Text {
+															anchors.verticalCenter: parent.verticalCenter
+															text: model.item.m_fileName
+															font.pixelSize: Style.fontSizeS
+															color: Style.linkColor
+															font.underline: true
 														}
 													}
 
-													// File link for non-image or fallback
-													Rectangle {
-														visible: !attImagePreview.visible
-														width: attRow.width + Style.paddingM * 2
-														height: attRow.height + Style.paddingS * 2
-														radius: Style.radiusM
-														color: Style.baseColor
-														border.color: editView.cardBorderColor
-														border.width: 1
-
-														Row {
-															id: attRow
-															x: Style.paddingM
-															anchors.verticalCenter: parent.verticalCenter
-															spacing: Style.spacingS
-
-															Image {
-																anchors.verticalCenter: parent.verticalCenter
-																width: Style.iconSizeS
-																height: width
-																source: Style.getIconPath("Icons/Attachment", Icon.State.On, Icon.Mode.Normal)
-																sourceSize.width: width
-																sourceSize.height: height
-															}
-
-															Text {
-																anchors.verticalCenter: parent.verticalCenter
-																text: model.item.m_fileName
-																font.pixelSize: Style.fontSizeS
-																color: Style.linkColor
-																font.underline: true
-															}
-														}
-
-														MouseArea {
-															anchors.fill: parent
-															hoverEnabled: true
-															cursorShape: Qt.PointingHandCursor
-															onClicked: Qt.openUrlExternally(model.item.m_preview)
-														}
+													MouseArea {
+														anchors.fill: parent
+														hoverEnabled: true
+														cursorShape: Qt.PointingHandCursor
+														onClicked: Qt.openUrlExternally(model.item.m_preview)
 													}
 												}
 											}
