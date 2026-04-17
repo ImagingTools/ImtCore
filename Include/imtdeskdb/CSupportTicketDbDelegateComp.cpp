@@ -291,9 +291,14 @@ QByteArray CSupportTicketDbDelegateComp::CreateUpdateObjectQuery(
 	}
 	const QString assigneeIdsStr = assigneeStrs.join(',');
 
+	const QString reporterId = QString::fromUtf8(ticketPtr->GetReporterId());
+	const QString conversationId = QString::fromUtf8(ticketPtr->GetConversationId());
+	const QString messageId = QString::fromUtf8(ticketPtr->GetMessageId());
 	const QString resolvedAt = ticketPtr->GetResolvedAt();
 	const QString closedAt = ticketPtr->GetClosedAt();
 	const QString assigneesSql = assigneeIdsStr.isEmpty() ? "NULL" : QString("'%1'").arg(assigneeIdsStr);
+	const QString convSql = conversationId.isEmpty() ? "NULL" : QString("'%1'").arg(conversationId);
+	const QString msgSql = messageId.isEmpty() ? "NULL" : QString("'%1'").arg(messageId);
 	const QString resolvedSql = resolvedAt.isEmpty() ? "NULL" : QString("'%1'").arg(resolvedAt);
 	const QString closedSql = closedAt.isEmpty() ? "NULL" : QString("'%1'").arg(closedAt);
 	const QString tagsStr = ticketPtr->GetTags().join(',');
@@ -322,14 +327,17 @@ QByteArray CSupportTicketDbDelegateComp::CreateUpdateObjectQuery(
 		"\"StateReason\"=%5, "
 		"\"Priority\"=%6, "
 		"\"AssigneeIds\"=%7, "
-		"\"Tags\"=%8, "
-		"\"LabelIds\"=%9, "
-		"\"Locked\"=%10, "
-		"\"LockReason\"=%11, "
-		"\"ResolvedAt\"=%12, "
-		"\"ClosedAt\"=%13, "
-		"\"UpdatedAt\"='%14' "
-		"WHERE \"Id\"='%15';")
+		"\"ReporterId\"='%8', "
+		"\"ConversationId\"=%9, "
+		"\"MessageId\"=%10, "
+		"\"Tags\"=%11, "
+		"\"LabelIds\"=%12, "
+		"\"Locked\"=%13, "
+		"\"LockReason\"=%14, "
+		"\"ResolvedAt\"=%15, "
+		"\"ClosedAt\"=%16, "
+		"\"UpdatedAt\"='%17' "
+		"WHERE \"Id\"='%18';")
 		.arg(ticketPtr->GetTitle())
 		.arg(ticketPtr->GetDescription())
 		.arg(ticketPtr->GetTicketType())
@@ -337,6 +345,9 @@ QByteArray CSupportTicketDbDelegateComp::CreateUpdateObjectQuery(
 		.arg(ticketPtr->GetStateReason())
 		.arg(ticketPtr->GetPriority())
 		.arg(assigneesSql)
+		.arg(reporterId)
+		.arg(convSql)
+		.arg(msgSql)
 		.arg(tagsSql)
 		.arg(labelsSql)
 		.arg(ticketPtr->IsLocked() ? "TRUE" : "FALSE")
