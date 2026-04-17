@@ -710,87 +710,87 @@ DocumentViewBase {
 									}
 								}
 
-								// Dialog helpers
-								QtObject {
-									id: entityRefDialogLoader
-									property string entityTypeId: ""
-									property string entityTypeName: ""
-								}
-
-								// Step 1 dialog: pick entity type then browse collection
+								// Single dialog: entity type ComboBox + RemoteCollectionView
 								Component {
 									id: contextPickerDialogComp
 									ImtContr.Dialog {
-										id: ctxPickerDialog
+										id: ctxDialog
 										title: qsTr("Add Context")
 										canMove: false
-										width: 420
-										height: 200
+										width: ModalDialogManager.activeView.width - 100
+										height: ModalDialogManager.activeView.height - 100
 
-										property int selectedTypeIndex: 0
-
-										Component.onCompleted: {
-											addButton(Enums.apply, qsTr("Browse"), false)
-											addButton(Enums.cancel, qsTr("Cancel"), true)
-											setButtonEnabled(Enums.apply, entityTypeModel.getItemsCount() > 0)
-										}
-
-										contentComp: Component {
-											Column {
-												width: parent ? parent.width : 400
-												spacing: Style.spacingL
-
-												Text {
-													text: qsTr("Select entity type to browse:")
-													font.pixelSize: Style.fontSizeM
-													color: Style.textColor
-												}
-
-												ImtContr.ComboBox {
-													id: ctxTypeCB
-													width: parent.width - Style.paddingL * 2
-													height: Style.buttonHeightM
-													model: entityTypeModel
-													onCurrentIndexChanged: ctxPickerDialog.selectedTypeIndex = currentIndex
-												}
-											}
-										}
-
-										onFinished: {
-											if (buttonId === Enums.apply) {
-												var idx = selectedTypeIndex
-												if (idx < 0) idx = 0
-												if (entityTypeModel.getItemsCount() > idx) {
-													var typeId = entityTypeModel.getData("id", idx)
-													var typeName = entityTypeModel.getData("name", idx)
-													if (typeId && typeId.length > 0) {
-														entityRefDialogLoader.entityTypeId = typeId
-														entityRefDialogLoader.entityTypeName = typeName
-														ModalDialogManager.openDialog(entityRefDialogComp)
-													}
-												}
-											}
-										}
-									}
-								}
-
-								Component {
-									id: entityRefDialogComp
-									RemoteCollectionViewDialog {
-										id: entityRefDialog
-										title: qsTr("Select") + " " + entityRefDialogLoader.entityTypeName
-										collectionId: entityRefDialogLoader.entityTypeId
+										property string selectedEntityTypeId: ""
+										property RemoteCollectionView collectionView: null
 
 										Component.onCompleted: {
 											addButton(Enums.apply, qsTr("Attach"), false)
 											addButton(Enums.cancel, qsTr("Cancel"), true)
+											setButtonEnabled(Enums.apply, false)
+											// Pre-select first entity type
+											if (entityTypeModel.getItemsCount() > 0) {
+												selectedEntityTypeId = entityTypeModel.getData("id", 0)
+											}
 										}
 
-										onCollectionViewChanged: {
-											if (collectionView) {
-												collectionView.selectionChanged.connect(function(ids) {
-													entityRefDialog.setButtonEnabled(Enums.apply, ids.length > 0)
-												})
+										contentComp: Component {
+											Item {
+												width: ctxDialog.width
+												height: ctxDialog.height - 100
+
+												Column {
+													id: ctxContentCol
+													anchors.fill: parent
+													spacing: Style.spacingM
+
+													Row {
+														width: parent.width
+														height: Style.buttonHeightM
+														spacing: Style.spacingM
+
+														Text {
+															text: qsTr("Entity type:")
+															font.pixelSize: Style.fontSizeM
+															color: Style.textColor
+															anchors.verticalCenter: parent.verticalCenter
+														}
+
+														ImtContr.ComboBox {
+															id: ctxTypeCB
+															width: 250
+															height: Style.buttonHeightM
+															model: entityTypeModel
+															onCurrentIndexChanged: {
+																if (entityTypeModel.getItemsCount() > currentIndex) {
+																	ctxDialog.selectedEntityTypeId = entityTypeModel.getData("id", currentIndex)
+																	ctxDialog.setButtonEnabled(Enums.apply, false)
+																}
+															}
+														}
+													}
+
+													Item {
+														width: parent.width
+														height: parent.height - Style.buttonHeightM - Style.spacingM
+
+														RemoteCollectionView {
+															anchors.fill: parent
+															commandsControllerComp: null
+															visibleMetaInfo: false
+															commandsDelegateComp: null
+															collectionId: ctxDialog.selectedEntityTypeId
+															documentCollectionFilter: null
+															loadingDataAfterHeadersReceived: false
+															showRemoteChangesAlert: false
+															Component.onCompleted: {
+																ctxDialog.collectionView = this
+															}
+															onSelectionChanged: {
+																ctxDialog.setButtonEnabled(Enums.apply, ids.length > 0)
+															}
+														}
+													}
+												}
 											}
 										}
 
@@ -804,11 +804,11 @@ DocumentViewBase {
 													var displayName = mdl.getData("name", idx)
 													var typeId = mdl.getData("typeId", idx)
 													var elementId = mdl.getData("id", idx)
-													var linkPath = entityRefDialogLoader.entityTypeId
+													var linkPath = selectedEntityTypeId
 													if (typeId) linkPath += "/" + typeId
 													linkPath += "/" + elementId
 													arr.push({
-														entityType: entityRefDialogLoader.entityTypeId,
+														entityType: selectedEntityTypeId,
 														entityId: elementId,
 														displayName: displayName,
 														entityLinkPath: linkPath,
