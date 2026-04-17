@@ -1570,7 +1570,9 @@ DocumentViewBase {
 					}
 				}
 
-				Component.onCompleted: scrollToBottomTimer.restart()
+				Component.onCompleted: {
+					scrollToBottomTimer.restart()
+				}
 
 				Timer {
 					id: scrollToBottomTimer
