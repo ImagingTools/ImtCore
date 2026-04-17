@@ -455,6 +455,9 @@ DocumentViewBase {
 		readonly property string sectionLabelColor: "#8C95A6"
 		readonly property string timestampColor: Style.inactiveTextColor
 		readonly property real columnGap: Style.spacingL
+		// Fixed widths for top groups (left = Title/Desc/Context and Messages, right = Properties)
+		readonly property real detailsWidth: 700
+		readonly property real propertiesWidth: 320
 		
 		// Page background
 		Rectangle {
@@ -487,7 +490,8 @@ DocumentViewBase {
 					id: leftTopWrapper
 					anchors.left: parent.left
 					anchors.top: parent.top
-					width: parent.width * 0.58 - editView.columnGap / 2
+					readonly property real _propW: Math.min(editView.propertiesWidth, Math.max(220, parent.width * 0.4))
+					width: Math.min(editView.detailsWidth, Math.max(280, parent.width - _propW - editView.columnGap))
 					height: detailsCard.height
 					
 					Rectangle {
@@ -963,12 +967,13 @@ DocumentViewBase {
 					}
 				} // leftTopWrapper
 				
-				// RIGHT: Properties (top-right group)
+				// RIGHT: Properties (top-right group, narrow, attached to leftTopWrapper.right)
 				Item {
 					id: rightTopWrapper
-					anchors.right: parent.right
+					anchors.left: leftTopWrapper.right
+					anchors.leftMargin: editView.columnGap
 					anchors.top: parent.top
-					width: parent.width * 0.42 - editView.columnGap / 2
+					width: Math.min(editView.propertiesWidth, Math.max(220, parent.width - leftTopWrapper.width - editView.columnGap))
 					height: propertiesCard.height
 					
 					Rectangle {
@@ -994,13 +999,13 @@ DocumentViewBase {
 								color: Style.textColor
 							}
 							
-							// Row 1: Type + Priority
-							Row {
+							// Row 1: Type then Priority (stacked vertically in narrow Properties card)
+							Column {
 								width: parent.width
 								spacing: Style.spacingM
 								
 								Column {
-									width: (parent.width - Style.spacingM) / 2
+									width: parent.width
 									spacing: 4
 									
 									Text {
@@ -1023,7 +1028,7 @@ DocumentViewBase {
 								}
 								
 								Column {
-									width: (parent.width - Style.spacingM) / 2
+									width: parent.width
 									spacing: 4
 									
 									Text {
@@ -1331,7 +1336,7 @@ DocumentViewBase {
 				} // rightTopWrapper
 			} // topRow
 			
-			// ==================== BOTTOM: Chat (full width below topRow) ====================
+			// ==================== BOTTOM: Chat (same width as Title/Desc, below topRow) ====================
 			Rectangle {
 				id: commentsPanel
 				visible: !root.isNewIssue
@@ -1339,7 +1344,7 @@ DocumentViewBase {
 				anchors.topMargin: editView.columnGap
 				anchors.bottom: parent.bottom
 				anchors.left: parent.left
-				anchors.right: parent.right
+				width: leftTopWrapper.width
 				radius: editView.cardRadius
 				color: editView.cardColor
 				border.color: editView.cardBorderColor
