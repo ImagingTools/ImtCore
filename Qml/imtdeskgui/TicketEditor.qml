@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 import QtQuick 2.15
+import Qt5Compat.GraphicalEffects 6.0
+import QtGraphicalEffects 1.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
@@ -46,6 +48,13 @@ DocumentViewBase {
 	property bool _forceScrollToBottom: false
 	// Track whether entity refs changed to avoid unnecessary emplace calls
 	property bool _entityRefsChanged: false
+	// Title inline edit mode (display vs edit)
+	property bool _titleEditing: root.isNewIssue
+	// Pending assignees for multi-select
+	property var pendingAssignees: []
+	property bool _assigneesChanged: false
+	// Reply-to message context (null = not replying)
+	property var _replyToMessage: null
 	
 	signal commentSubmitted(string commentText)
 	
@@ -98,6 +107,12 @@ DocumentViewBase {
 		newItem.m_timestamp = now
 		newItem.m_content = commentText || ""
 		newItem.m_reactions = []
+		// Set replyToId if replying to a message
+		if (root._replyToMessage && root._replyToMessage.id) {
+			newItem.m_replyToId = String(root._replyToMessage.id)
+			newItem.m_replyToContent = String(root._replyToMessage.content || "")
+			newItem.m_replyToUserName = String(root._replyToMessage.userName || "")
+		}
 		if (attachmentsList && attachmentsList.length > 0) {
 			newItem.emplaceAttachments()
 			for (var i = 0; i < attachmentsList.length; i++) {
@@ -232,17 +247,24 @@ DocumentViewBase {
 		root.pendingEntityRefs = refs
 		root._entityRefsChanged = true
 		
-		editAssigneeCB.currentIndex = -1
-		if (editAssigneeCB.model) {
-			let ids = ticketData.m_assigneeIds || []
-			let first = ids.length > 0 ? ids[0] : ""
-			for (let i = 0; i < editAssigneeCB.model.getItemsCount(); i++) {
-				if (editAssigneeCB.model.getData("id", i) === first) {
-					editAssigneeCB.currentIndex = i
-					break
+		// Load assignees as array for multi-select
+		var assigns = []
+		var aIds = ticketData.m_assigneeIds || []
+		for (var a = 0; a < aIds.length; a++) {
+			var aId = aIds[a]
+			var aName = aId
+			if (editAssigneeCB.model) {
+				for (var ai = 0; ai < editAssigneeCB.model.getItemsCount(); ai++) {
+					if (editAssigneeCB.model.getData("id", ai) === aId) {
+						aName = editAssigneeCB.model.getData("name", ai) || aId
+						break
+					}
 				}
 			}
+			assigns.push({id: aId, name: aName})
 		}
+		root.pendingAssignees = assigns
+		root._assigneesChanged = false
 		
 		editReporterCB.currentIndex = -1
 		if (editReporterCB.model) {
@@ -262,12 +284,7 @@ DocumentViewBase {
 		ticketData.m_locked = editLockedCB.checkState === Qt.Checked
 		ticketData.m_lockReason = editLockReasonInput.text
 		
-		if (editAssigneeCB.model && editAssigneeCB.currentIndex >= 0) {
-			ticketData.m_assigneeIds = [editAssigneeCB.model.getData("id", editAssigneeCB.currentIndex)]
-		}
-		else {
-			ticketData.m_assigneeIds = []
-		}
+		ticketData.m_assigneeIds = root.pendingAssignees.map(function(a) { return a.id })
 		
 		if (editReporterCB.model && editReporterCB.currentIndex >= 0) {
 			ticketData.m_reporterId = editReporterCB.model.getData("id", editReporterCB.currentIndex)
@@ -494,124 +511,206 @@ DocumentViewBase {
 					// ========================================
 					// CARD 1 — Title + Description (compact)
 					// ========================================
-					Rectangle {
-						id: detailsCard
+					Item {
 						width: parent.width
-						height: detailsCardCol.height + editView.cardPadding * 2
-						radius: editView.cardRadius
-						color: editView.cardColor
-						border.color: editView.cardBorderColor
-						border.width: 1
+						height: detailsCard.height
 
-						Column {
-							id: detailsCardCol
-							x: editView.cardPadding
-							y: editView.cardPadding
-							width: parent.width - editView.cardPadding * 2
-							spacing: Style.spacingM
+						Rectangle {
+							id: detailsCard
+							width: parent.width
+							height: detailsCardCol.height + editView.cardPadding * 2
+							radius: editView.cardRadius
+							color: editView.cardColor
+							border.color: editView.cardBorderColor
+							border.width: 1
 
-							// Compact header: ticket number + badges
-							Row {
-								width: parent.width
-								spacing: Style.spacingS
-
-								Text {
-									text: root.isNewIssue ? qsTr("New Ticket") : "#" + (root.ticketData ? root.ticketData.m_number : "")
-									font.pixelSize: Style.fontSizeL
-									font.bold: true
-									color: editView.accentColor
-									anchors.verticalCenter: parent.verticalCenter
-								}
-
-								TicketBadge {
-									visible: !root.isNewIssue
-									badgeType: "status"
-									value: editStatusCB.currentIndex
-								}
-
-								TicketBadge {
-									visible: !root.isNewIssue && editStateReasonCB.currentIndex > 0
-									badgeType: "stateReason"
-									value: editStateReasonCB.currentIndex
-								}
-							}
-
-							// ---------- Title ----------
 							Column {
-								width: parent.width
-								spacing: 4
+								id: detailsCardCol
+								x: editView.cardPadding
+								y: editView.cardPadding
+								width: parent.width - editView.cardPadding * 2
+								spacing: Style.spacingM
 
-								Text {
-									text: qsTr("Title")
-									font.pixelSize: Style.fontSizeS
-									font.bold: true
-									color: editView.sectionLabelColor
-								}
-
-								CustomTextField {
-									id: editTitleInput
+								// Title display/edit row
+								Row {
+									id: titleDisplayRow
+									visible: !root._titleEditing
 									width: parent.width
-									height: Style.controlHeightM
-									placeHolderText: qsTr("Enter ticket title...")
-									readOnly: !root.canEdit
-									onEditingFinished: root.doUpdateModel()
-									KeyNavigation.tab: editDescriptionInput
-								}
-							}
+									spacing: Style.spacingS
 
-							// ---------- Description ----------
-							Column {
-								width: parent.width
-								spacing: 4
-
-								Text {
-									text: qsTr("Description")
-									font.pixelSize: Style.fontSizeS
-									font.bold: true
-									color: editView.sectionLabelColor
-								}
-
-								Rectangle {
-									width: parent.width
-									height: editDescriptionInput.height + Style.paddingM * 2
-									radius: Style.radiusM
-									border.color: editDescriptionInput.activeFocus ? editView.accentColor : editView.cardBorderColor
-									border.width: editDescriptionInput.activeFocus ? 2 : 1
-									color: editView.cardColor
-
-									TextEdit {
-										id: editDescriptionInput
-										anchors.left: parent.left
-										anchors.right: parent.right
-										anchors.top: parent.top
-										anchors.margins: Style.paddingM
-										font.pixelSize: Style.fontSizeM
+									Text {
+										text: root.isNewIssue ? qsTr("New Ticket") : "#" + (root.ticketData ? root.ticketData.m_number : "") + "  " + editTitleInput.text
+										font.pixelSize: Style.fontSizeL
+										font.bold: true
 										color: Style.textColor
-										height: Math.max(80, contentHeight)
-										wrapMode: TextEdit.Wrap
-										clip: true
-										readOnly: !root.canEdit
-										onEditingFinished: root.doUpdateModel()
-										KeyNavigation.tab: editTypeCB
-										KeyNavigation.backtab: editTitleInput
+										elide: Text.ElideRight
+										width: parent.width - titleEditBtn.width - titleBadgeRow.width - Style.spacingS * 3
+										anchors.verticalCenter: parent.verticalCenter
+									}
+
+									Row {
+										id: titleBadgeRow
+										spacing: Style.spacingXS
+										anchors.verticalCenter: parent.verticalCenter
+
+										TicketBadge {
+											visible: !root.isNewIssue
+											badgeType: "status"
+											value: editStatusCB.currentIndex
+										}
+
+										TicketBadge {
+											visible: !root.isNewIssue && editStateReasonCB.currentIndex > 0
+											badgeType: "stateReason"
+											value: editStateReasonCB.currentIndex
+										}
+									}
+
+									Rectangle {
+										id: titleEditBtn
+										visible: root.canEdit
+										width: 28
+										height: 28
+										radius: 14
+										color: titleEditBtnMa.containsMouse ? "#F0F2F5" : "transparent"
+										anchors.verticalCenter: parent.verticalCenter
 
 										Text {
-											anchors.fill: parent
-											text: qsTr("Describe the issue...")
-											color: Style.inactiveTextColor
+											anchors.centerIn: parent
+											text: "✎"
 											font.pixelSize: Style.fontSizeM
-											visible: editDescriptionInput.text.length === 0
+											color: editView.accentColor
+										}
+
+										MouseArea {
+											id: titleEditBtnMa
+											anchors.fill: parent
+											hoverEnabled: true
+											cursorShape: Qt.PointingHandCursor
+											onClicked: {
+												root._titleEditing = true
+												editTitleInput.forceActiveFocus()
+											}
 										}
 									}
 								}
+
+								// Title edit row
+								Row {
+									id: titleEditRow
+									visible: root._titleEditing
+									width: parent.width
+									spacing: Style.spacingS
+
+									CustomTextField {
+										id: editTitleInput
+										width: parent.width - titleConfirmBtn.width - Style.spacingS
+										height: Style.controlHeightM
+										placeHolderText: qsTr("Enter ticket title...")
+										readOnly: !root.canEdit
+										onEditingFinished: root.doUpdateModel()
+										KeyNavigation.tab: editDescriptionInput
+									}
+
+									Rectangle {
+										id: titleConfirmBtn
+										visible: !root.isNewIssue
+										width: 28
+										height: 28
+										radius: 14
+										color: titleConfirmBtnMa.containsMouse ? "#E6F4EA" : "#F0F2F5"
+										anchors.verticalCenter: parent.verticalCenter
+
+										Text {
+											anchors.centerIn: parent
+											text: "✓"
+											font.pixelSize: Style.fontSizeM
+											font.bold: true
+											color: "#34A853"
+										}
+
+										MouseArea {
+											id: titleConfirmBtnMa
+											anchors.fill: parent
+											hoverEnabled: true
+											cursorShape: Qt.PointingHandCursor
+											onClicked: {
+												root._titleEditing = false
+												root.doUpdateModel()
+											}
+										}
+									}
+								}
+
+								// ---------- Description ----------
+								Column {
+									width: parent.width
+									spacing: 4
+
+									Text {
+										text: qsTr("Description")
+										font.pixelSize: Style.fontSizeS
+										font.bold: true
+										color: editView.sectionLabelColor
+									}
+
+									Rectangle {
+										width: parent.width
+										height: editDescriptionInput.height + Style.paddingM * 2
+										radius: Style.radiusM
+										border.color: editDescriptionInput.activeFocus ? editView.accentColor : editView.cardBorderColor
+										border.width: editDescriptionInput.activeFocus ? 2 : 1
+										color: editDescriptionInput.activeFocus ? editView.cardColor : "#FAFBFC"
+
+										TextEdit {
+											id: editDescriptionInput
+											anchors.left: parent.left
+											anchors.right: parent.right
+											anchors.top: parent.top
+											anchors.margins: Style.paddingM
+											font.pixelSize: Style.fontSizeM
+											color: Style.textColor
+											height: Math.max(80, contentHeight)
+											wrapMode: TextEdit.Wrap
+											clip: true
+											readOnly: !root.canEdit
+											onEditingFinished: root.doUpdateModel()
+											KeyNavigation.tab: editTypeCB
+											KeyNavigation.backtab: editTitleInput
+
+											Text {
+												anchors.fill: parent
+												text: qsTr("Describe the issue...")
+												color: Style.inactiveTextColor
+												font.pixelSize: Style.fontSizeM
+												visible: editDescriptionInput.text.length === 0
+											}
+									}
+								}
 							}
+						}
+						}
+
+						DropShadow {
+							anchors.fill: detailsCard
+							z: detailsCard.z - 1
+							horizontalOffset: 3
+							verticalOffset: 3
+							radius: Style.radiusL
+							spread: 0
+							color: Style.shadowColor
+							source: detailsCard
 						}
 					}
 
 					// ========================================
 					// CARD 2 — Context / Entity References
 					// ========================================
-					Rectangle {
+					Item {
+						width: parent.width
+						height: contextCard.height
+
+						Rectangle {
 						id: contextCard
 						width: parent.width
 						height: contextCardCol.height + editView.cardPadding * 2
@@ -901,12 +1000,28 @@ DocumentViewBase {
 								}
 							}
 						}
+						}
+
+						DropShadow {
+							anchors.fill: contextCard
+							z: contextCard.z - 1
+							horizontalOffset: 3
+							verticalOffset: 3
+							radius: Style.radiusL
+							spread: 0
+							color: Style.shadowColor
+							source: contextCard
+						}
 					}
 
 					// ========================================
 					// CARD 3 — Properties / Metadata
 					// ========================================
-					Rectangle {
+					Item {
+						width: parent.width
+						height: propertiesCard.height
+
+						Rectangle {
 						id: propertiesCard
 						width: parent.width
 						height: propsCardCol.height + editView.cardPadding * 2
@@ -981,26 +1096,217 @@ DocumentViewBase {
 								}
 							}
 
-							// Row 2: Assignees (full width)
+							// Row 2: Assignees (multi-select with chips)
 							Column {
 								width: parent.width
 								spacing: 4
 
-								Text {
-									text: qsTr("Assignees")
-									font.pixelSize: Style.fontSizeS
-									color: editView.sectionLabelColor
+								Item {
+									width: parent.width
+									height: Math.max(assigneesLabelText.height, addAssigneeBtn.height)
+
+									Text {
+										id: assigneesLabelText
+										text: qsTr("Assignees")
+										font.pixelSize: Style.fontSizeS
+										color: editView.sectionLabelColor
+										anchors.left: parent.left
+										anchors.verticalCenter: parent.verticalCenter
+									}
+
+									Text {
+										id: addAssigneeBtn
+										anchors.right: parent.right
+										anchors.verticalCenter: parent.verticalCenter
+										visible: root.canEdit
+										text: "+ " + qsTr("Add")
+										font.pixelSize: Style.fontSizeS
+										font.bold: true
+										color: editView.accentColor
+
+										MouseArea {
+											anchors.fill: parent
+											hoverEnabled: true
+											cursorShape: Qt.PointingHandCursor
+											onClicked: ModalDialogManager.openDialog(assigneePickerDialogComp)
+										}
+									}
 								}
 
-								ComboBox {
-									id: editAssigneeCB
+								Flow {
 									width: parent.width
-									height: Style.buttonHeightM
-									enabled: root.canEdit
-									onCurrentIndexChanged: root.doUpdateModel()
-									KeyNavigation.tab: editStatusCB
-									KeyNavigation.backtab: editPriorityCB
+									spacing: Style.spacingXS
+									visible: root.pendingAssignees.length > 0
+
+									Repeater {
+										model: root.pendingAssignees
+										delegate: Rectangle {
+											width: Math.min(assigneeChipText.contentWidth + assigneeChipRemove.width + Style.paddingS * 3, 200)
+											height: 28
+											radius: 14
+											color: editView.accentBgLight
+											border.color: editView.accentBorderLight
+											border.width: 1
+
+											Text {
+												id: assigneeChipText
+												anchors.left: parent.left
+												anchors.leftMargin: Style.paddingS + 2
+												anchors.verticalCenter: parent.verticalCenter
+												text: modelData.name || modelData.id
+												font.pixelSize: Style.fontSizeS
+												color: editView.accentColor
+												elide: Text.ElideRight
+												maximumLineCount: 1
+											}
+
+											ToolButton {
+												id: assigneeChipRemove
+												visible: root.canEdit
+												anchors.right: parent.right
+												anchors.verticalCenter: parent.verticalCenter
+												iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+												decorator: Component {
+													ToolButtonDecorator {
+														color: "transparent"
+														icon.width: Style.iconSizeXS
+													}
+												}
+												onClicked: {
+													var arr = root.pendingAssignees.slice()
+													arr.splice(index, 1)
+													root.pendingAssignees = arr
+													root._assigneesChanged = true
+													root.doUpdateModel()
+												}
+											}
+										}
+									}
 								}
+
+								Text {
+									visible: root.pendingAssignees.length === 0
+									width: parent.width
+									text: qsTr("No assignees. Click \"+ Add\" to assign users.")
+									font.pixelSize: Style.fontSizeS
+									color: Style.inactiveTextColor
+									wrapMode: Text.WordWrap
+								}
+
+								// Assignee picker dialog
+								Component {
+									id: assigneePickerDialogComp
+									Dialog {
+										id: assigneeDialog
+										title: qsTr("Select Assignees")
+										canMove: false
+										width: Math.min(ModalDialogManager.activeView.width - 80, 500)
+										height: Math.min(ModalDialogManager.activeView.height - 80, 500)
+
+										Component.onCompleted: {
+											addButton(Enums.apply, qsTr("Apply"), false)
+											addButton(Enums.cancel, qsTr("Cancel"), true)
+										}
+
+										contentComp: Component {
+											Item {
+												width: assigneeDialog.width
+												height: assigneeDialog.height - 100
+
+												ListView {
+													id: assigneeListView
+													anchors.fill: parent
+													anchors.margins: Style.paddingM
+													clip: true
+													model: editAssigneeCB.model
+													delegate: Rectangle {
+														width: assigneeListView.width
+														height: Style.buttonHeightM
+														radius: Style.radiusM
+														color: assigneeItemMa.containsMouse ? "#F5F7FA" : "transparent"
+
+														property string itemId: editAssigneeCB.model ? editAssigneeCB.model.getData("id", index) : ""
+														property string itemName: editAssigneeCB.model ? (editAssigneeCB.model.getData("name", index) || itemId) : ""
+														property bool isSelected: {
+															for (var i = 0; i < root.pendingAssignees.length; i++) {
+																if (root.pendingAssignees[i].id === itemId) return true
+															}
+															return false
+														}
+
+														Row {
+															anchors.fill: parent
+															anchors.leftMargin: Style.paddingM
+															spacing: Style.spacingS
+
+															Rectangle {
+																width: 20
+																height: 20
+																radius: 4
+																border.color: isSelected ? editView.accentColor : editView.cardBorderColor
+																border.width: 1
+																color: isSelected ? editView.accentColor : "transparent"
+																anchors.verticalCenter: parent.verticalCenter
+
+																Text {
+																	anchors.centerIn: parent
+																	text: "✓"
+																	font.pixelSize: 12
+																	font.bold: true
+																	color: Style.baseColor
+																	visible: isSelected
+																}
+															}
+
+															Text {
+																text: itemName
+																font.pixelSize: Style.fontSizeM
+																color: Style.textColor
+																anchors.verticalCenter: parent.verticalCenter
+															}
+														}
+
+														MouseArea {
+															id: assigneeItemMa
+															anchors.fill: parent
+															hoverEnabled: true
+															cursorShape: Qt.PointingHandCursor
+															onClicked: {
+																var arr = root.pendingAssignees.slice()
+																if (isSelected) {
+																	for (var i = 0; i < arr.length; i++) {
+																		if (arr[i].id === itemId) {
+																			arr.splice(i, 1)
+																			break
+																		}
+																	}
+																} else {
+																	arr.push({id: itemId, name: itemName})
+																}
+																root.pendingAssignees = arr
+															}
+														}
+													}
+												}
+											}
+										}
+
+										onFinished: {
+											if (buttonId === Enums.apply) {
+												root._assigneesChanged = true
+												root.doUpdateModel()
+											}
+										}
+									}
+								}
+							}
+
+							// Hidden assignee ComboBox (data source for dialog)
+							ComboBox {
+								id: editAssigneeCB
+								visible: false
+								width: 0
+								height: 0
 							}
 
 							// Hidden Reporter (data still tracked for model)
@@ -1105,6 +1411,18 @@ DocumentViewBase {
 									}
 								}
 							}
+							}
+						}
+
+						DropShadow {
+							anchors.fill: propertiesCard
+							z: propertiesCard.z - 1
+							horizontalOffset: 3
+							verticalOffset: 3
+							radius: Style.radiusL
+							spread: 0
+							color: Style.shadowColor
+							source: propertiesCard
 						}
 					}
 				}
@@ -1232,14 +1550,41 @@ DocumentViewBase {
 				boundsBehavior: Flickable.StopAtBounds
 				clip: true
 
+				function scrollToBottom() {
+					var maxY = contentHeight - height
+					if (maxY > 0) {
+						contentY = maxY
+					}
+				}
+
 				onContentHeightChanged: {
 					var maxY = contentHeight - height
 					if (maxY > 0) {
-						if (root._forceScrollToBottom || contentY >= maxY - 50 || contentY <= 0) {
+						if (root._forceScrollToBottom) {
 							contentY = maxY
 							root._forceScrollToBottom = false
+						} else if (contentY >= maxY - 80 || contentY <= 0) {
+							contentY = maxY
 						}
 					}
+				}
+
+				onHeightChanged: {
+					var maxY = contentHeight - height
+					if (maxY > 0 && contentY >= maxY - 80) {
+						contentY = maxY
+					}
+				}
+
+				Component.onCompleted: {
+					scrollToBottomTimer.start()
+				}
+
+				Timer {
+					id: scrollToBottomTimer
+					interval: 200
+					repeat: false
+					onTriggered: commentsFlick.scrollToBottom()
 				}
 
 				Column {
@@ -1334,13 +1679,56 @@ DocumentViewBase {
 											id: bubbleContent
 											x: Style.paddingM
 											y: Style.paddingM
-											width: Math.min(commentBubbleCol.width - Style.paddingM * 2, implicitBubbleWidth)
+											width: commentBubbleCol.width - Style.paddingM * 2
 											spacing: Style.spacingS
 
-											readonly property real implicitBubbleWidth: {
-												var w = 100
-												if (commentBodyText.visible && commentBodyText.implicitWidth > w) w = commentBodyText.implicitWidth
-												return Math.min(w, commentBubbleCol.width - Style.paddingM * 2)
+											// Reply-to indicator inside bubble
+											Rectangle {
+												visible: model.item.m_replyToId ? (model.item.m_replyToId.length > 0) : false
+												width: parent.width
+												height: replyBubbleCol.height + Style.paddingS
+												radius: Style.radiusM
+												color: commentDelegate.isMe ? "#C8DCF0" : "#E5E8EC"
+
+												Column {
+													id: replyBubbleCol
+													x: Style.paddingS + 4
+													y: Style.paddingS / 2
+													width: parent.width - Style.paddingS * 2 - 4
+													spacing: 1
+
+													Row {
+														spacing: Style.spacingXS
+
+														Rectangle {
+															width: 2
+															height: parent.height
+															radius: 1
+															color: editView.accentColor
+														}
+
+														Column {
+															spacing: 1
+
+															Text {
+																text: model.item.m_replyToUserName || ""
+																font.pixelSize: Style.fontSizeS - 1
+																font.bold: true
+																color: editView.accentColor
+																elide: Text.ElideRight
+															}
+
+															Text {
+																text: model.item.m_replyToContent || ""
+																font.pixelSize: Style.fontSizeS - 1
+																color: Style.inactiveTextColor
+																elide: Text.ElideRight
+																maximumLineCount: 1
+																width: bubbleContent.width - Style.paddingS * 3
+															}
+														}
+													}
+												}
 											}
 
 											Text {
@@ -1358,45 +1746,96 @@ DocumentViewBase {
 											// Attachment cards
 											Repeater {
 												model: commentDelegate.dataModel.m_attachments || []
-												delegate: Rectangle {
-													width: attRow.width + Style.paddingM * 2
-													height: attRow.height + Style.paddingS * 2
-													radius: Style.radiusM
-													color: Style.baseColor
-													border.color: editView.cardBorderColor
-													border.width: 1
+												delegate: Column {
+													spacing: Style.spacingXS
 
-													Row {
-														id: attRow
-														x: Style.paddingM
-														anchors.verticalCenter: parent.verticalCenter
-														spacing: Style.spacingS
-
-														Image {
-															anchors.verticalCenter: parent.verticalCenter
-															width: Style.iconSizeS
-															height: width
-															source: Style.getIconPath("Icons/Attachment", Icon.State.On, Icon.Mode.Normal)
-															sourceSize.width: width
-															sourceSize.height: height
+													// Image preview for image attachments
+													Image {
+														id: attImagePreview
+														visible: {
+															var fn = String(model.item.m_fileName || "").toLowerCase()
+															return fn.endsWith(".png") || fn.endsWith(".jpg") || fn.endsWith(".jpeg") || fn.endsWith(".gif") || fn.endsWith(".webp") || fn.endsWith(".bmp") || fn.endsWith(".svg")
 														}
+														source: visible ? String(model.item.m_preview || "") : ""
+														width: Math.min(implicitWidth, bubbleContent.width - Style.paddingM)
+														height: visible ? (width * (implicitHeight / Math.max(1, implicitWidth))) : 0
+														fillMode: Image.PreserveAspectFit
+														asynchronous: true
 
-														Text {
-															anchors.verticalCenter: parent.verticalCenter
-															text: model.item.m_fileName
-															font.pixelSize: Style.fontSizeS
-															color: Style.linkColor
-															font.underline: true
+														MouseArea {
+															anchors.fill: parent
+															hoverEnabled: true
+															cursorShape: Qt.PointingHandCursor
+															onClicked: Qt.openUrlExternally(model.item.m_preview)
 														}
 													}
 
-													MouseArea {
-														anchors.fill: parent
-														hoverEnabled: true
-														cursorShape: Qt.PointingHandCursor
-														onClicked: Qt.openUrlExternally(model.item.m_preview)
+													// File link for non-image or fallback
+													Rectangle {
+														visible: !attImagePreview.visible
+														width: attRow.width + Style.paddingM * 2
+														height: attRow.height + Style.paddingS * 2
+														radius: Style.radiusM
+														color: Style.baseColor
+														border.color: editView.cardBorderColor
+														border.width: 1
+
+														Row {
+															id: attRow
+															x: Style.paddingM
+															anchors.verticalCenter: parent.verticalCenter
+															spacing: Style.spacingS
+
+															Image {
+																anchors.verticalCenter: parent.verticalCenter
+																width: Style.iconSizeS
+																height: width
+																source: Style.getIconPath("Icons/Attachment", Icon.State.On, Icon.Mode.Normal)
+																sourceSize.width: width
+																sourceSize.height: height
+															}
+
+															Text {
+																anchors.verticalCenter: parent.verticalCenter
+																text: model.item.m_fileName
+																font.pixelSize: Style.fontSizeS
+																color: Style.linkColor
+																font.underline: true
+															}
+														}
+
+														MouseArea {
+															anchors.fill: parent
+															hoverEnabled: true
+															cursorShape: Qt.PointingHandCursor
+															onClicked: Qt.openUrlExternally(model.item.m_preview)
+														}
 													}
 												}
+											}
+										}
+									}
+
+									// Reply button
+									Text {
+										visible: root.canEdit
+										text: qsTr("Reply")
+										font.pixelSize: Style.fontSizeS - 1
+										color: Style.inactiveTextColor
+										anchors.right: commentDelegate.isMe ? parent.right : undefined
+										anchors.left: commentDelegate.isMe ? undefined : parent.left
+
+										MouseArea {
+											anchors.fill: parent
+											hoverEnabled: true
+											cursorShape: Qt.PointingHandCursor
+											onClicked: {
+												root._replyToMessage = {
+													id: model.item.m_id || "",
+													userName: model.item.m_userName || qsTr("Unknown"),
+													content: model.item.m_content || ""
+												}
+												commentInputField.forceActiveFocus()
 											}
 										}
 									}
@@ -1475,6 +1914,70 @@ DocumentViewBase {
 					anchors.rightMargin: editView.cardPadding
 					anchors.bottomMargin: 12
 					spacing: Style.spacingS
+
+					// Reply-to indicator
+					Rectangle {
+						visible: root._replyToMessage !== null
+						width: parent.width
+						height: replyRow.height + Style.paddingS * 2
+						radius: Style.radiusM
+						color: editView.accentBadgeBg
+						border.color: editView.accentBorderLight
+						border.width: 1
+
+						Row {
+							id: replyRow
+							anchors.left: parent.left
+							anchors.right: replyCloseBtn.left
+							anchors.leftMargin: Style.paddingS
+							anchors.verticalCenter: parent.verticalCenter
+							spacing: Style.spacingXS
+
+							Rectangle {
+								width: 3
+								height: parent.height
+								radius: 1
+								color: editView.accentColor
+							}
+
+							Column {
+								width: parent.width - 3 - Style.spacingXS
+								spacing: 1
+
+								Text {
+									text: root._replyToMessage ? root._replyToMessage.userName : ""
+									font.pixelSize: Style.fontSizeS
+									font.bold: true
+									color: editView.accentColor
+									elide: Text.ElideRight
+									width: parent.width
+								}
+
+								Text {
+									text: root._replyToMessage ? root._replyToMessage.content : ""
+									font.pixelSize: Style.fontSizeS
+									color: Style.inactiveTextColor
+									elide: Text.ElideRight
+									width: parent.width
+									maximumLineCount: 1
+								}
+							}
+						}
+
+						ToolButton {
+							id: replyCloseBtn
+							anchors.right: parent.right
+							anchors.verticalCenter: parent.verticalCenter
+							iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+							decorator: Component {
+								ToolButtonDecorator {
+									color: "transparent"
+									icon.width: Style.iconSizeXS
+								}
+							}
+							onClicked: root._replyToMessage = null
+						}
+					}
 
 					// Pending attachments
 					Flow {
@@ -1566,7 +2069,7 @@ DocumentViewBase {
 						// Comment input with rounded border
 						Rectangle {
 							width: parent.width - attachButton.width - sendBtnRect.width - Style.spacingS * 2
-							height: commentInputField.height + Style.paddingS * 2
+							height: Math.max(40, commentInputField.contentHeight + Style.paddingS * 2 + 4)
 							radius: 20
 							border.color: commentInputField.activeFocus ? editView.accentColor : editView.cardBorderColor
 							border.width: commentInputField.activeFocus ? 2 : 1
@@ -1576,25 +2079,23 @@ DocumentViewBase {
 								id: commentInputField
 								anchors.left: parent.left
 								anchors.right: parent.right
-								anchors.top: parent.top
-								anchors.margins: Style.paddingS
+								anchors.verticalCenter: parent.verticalCenter
 								anchors.leftMargin: 14
 								anchors.rightMargin: 14
-								height: 36
+								height: Math.max(20, contentHeight)
 								font.pixelSize: Style.fontSizeM
 								color: Style.textColor
 								wrapMode: TextEdit.Wrap
 								clip: true
-								verticalAlignment: TextEdit.AlignVCenter
 								KeyNavigation.backtab: editLockReasonInput.visible ? editLockReasonInput : editLockedCB
 
 								Text {
 									anchors.fill: parent
-									anchors.topMargin: 8
 									text: qsTr("Write a comment...")
 									color: Style.inactiveTextColor
 									font.pixelSize: Style.fontSizeM
 									visible: commentInputField.text.length === 0
+									verticalAlignment: Text.AlignVCenter
 								}
 							}
 						}
@@ -1648,6 +2149,7 @@ DocumentViewBase {
 									root.addComment(commentInputField.text.trim(), root.pendingAttachments.slice())
 									commentInputField.text = ""
 									root.pendingAttachments = []
+									root._replyToMessage = null
 								}
 							}
 						}
@@ -1715,6 +2217,19 @@ DocumentViewBase {
 				}
 			}
 		}
+
+		DropShadow {
+			anchors.fill: commentsPanel
+			z: commentsPanel.z - 1
+			horizontalOffset: 3
+			verticalOffset: 3
+			radius: Style.radiusL
+			spread: 0
+			color: Style.shadowColor
+			source: commentsPanel
+			visible: commentsPanel.visible
+		}
+
 		} // panelsContainer
 	}
 }
