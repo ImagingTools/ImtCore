@@ -449,9 +449,11 @@ DocumentViewBase {
 		readonly property string accentBgLight: "#DFECF9"
 		readonly property string accentBorderLight: "#B4D3F2"
 		readonly property string accentBadgeBg: "#E5F0FB"
-		readonly property string chatBgColor: "#F8FAFD"
-		readonly property string otherBubbleColor: "#F0F2F5"
+		readonly property string chatBgColor: Style.baseColor
+		readonly property string bubbleColor: "#EEF2FB"
+		readonly property string otherBubbleColor: "#EEF2FB"
 		readonly property string sectionLabelColor: "#8C95A6"
+		readonly property string timestampColor: "#C67B7B"
 		readonly property real columnGap: Style.spacingL
 
 		// Page background
@@ -1413,7 +1415,7 @@ DocumentViewBase {
 			anchors.right: parent.right
 			radius: editView.cardRadius
 			color: editView.cardColor
-			border.color: editView.accentBorderLight
+			border.color: editView.cardBorderColor
 			border.width: 1
 			clip: true
 
@@ -1427,7 +1429,7 @@ DocumentViewBase {
 				anchors.right: parent.right
 				anchors.rightMargin: 1
 				height: 48
-				color: editView.accentBadgeBg
+				color: editView.cardColor
 				radius: editView.cardRadius - 1
 
 				// Bottom edge square-off
@@ -1436,7 +1438,7 @@ DocumentViewBase {
 					anchors.right: parent.right
 					anchors.bottom: parent.bottom
 					height: editView.cardRadius
-					color: editView.accentBadgeBg
+					color: editView.cardColor
 				}
 
 				Row {
@@ -1449,7 +1451,7 @@ DocumentViewBase {
 						text: qsTr("Comments")
 						font.pixelSize: Style.fontSizeM
 						font.bold: true
-						color: editView.accentColor
+						color: Style.textColor
 						anchors.verticalCenter: parent.verticalCenter
 					}
 
@@ -1478,7 +1480,7 @@ DocumentViewBase {
 					anchors.left: parent.left
 					anchors.right: parent.right
 					height: 1
-					color: editView.accentBorderLight
+					color: editView.cardBorderColor
 				}
 			}
 
@@ -1611,76 +1613,62 @@ DocumentViewBase {
 
 								Column {
 									id: commentBubbleCol
-									width: parent.width * 0.85
-									anchors.right: commentDelegate.isMe ? parent.right : undefined
-									anchors.left: commentDelegate.isMe ? undefined : parent.left
+									width: parent.width
 									spacing: 4
 
-									// Avatar + Name + Timestamp
-									Row {
-										spacing: Style.spacingS
-										anchors.right: commentDelegate.isMe ? parent.right : undefined
-										anchors.left: commentDelegate.isMe ? undefined : parent.left
-										layoutDirection: commentDelegate.isMe ? Qt.RightToLeft : Qt.LeftToRight
-
-										Rectangle {
-											width: editView.avatarSize
-											height: editView.avatarSize
-											radius: editView.avatarSize / 2
-											color: commentDelegate.isMe
-												   ? editView.accentColor
-												   : "#C4CBD6"
-
-											Text {
-												anchors.centerIn: parent
-												text: model.item.m_userName ? model.item.m_userName.charAt(0).toUpperCase() : "?"
-												font.pixelSize: Style.fontSizeM
-												font.bold: true
-												color: Style.baseColor
-												font.family: Style.fontFamily
-											}
-										}
-
-										Column {
-											anchors.verticalCenter: parent.verticalCenter
-											spacing: 1
-
-											Text {
-												text: commentDelegate.isMe ? qsTr("You") : (model.item.m_userName || qsTr("Unknown"))
-												font.pixelSize: Style.fontSizeS
-												font.bold: true
-												color: Style.textColor
-											}
-
-											Text {
-												text: root.formatTimestamp(model.item.m_timestamp)
-												font.pixelSize: Style.fontSizeS - 2
-												color: Style.inactiveTextColor
-											}
-										}
-									}
-
-									// Chat bubble
+									// Chat bubble (contains avatar + name + timestamp + content)
 									Rectangle {
-										width: bubbleContent.width + Style.paddingM * 2
+										width: parent.width
 										height: bubbleContent.height + Style.paddingM * 2
-										anchors.right: commentDelegate.isMe ? parent.right : undefined
-										anchors.left: commentDelegate.isMe ? undefined : parent.left
-										radius: 16
-										color: commentDelegate.isMe
-											   ? editView.accentBgLight
-											   : editView.otherBubbleColor
-										border.color: commentDelegate.isMe
-											   ? editView.accentBorderLight
-											   : "#E1E5EB"
-										border.width: 1
+										radius: 12
+										color: editView.bubbleColor
+										border.width: 0
 
 										Column {
 											id: bubbleContent
 											x: Style.paddingM
 											y: Style.paddingM
-											width: commentBubbleCol.width - Style.paddingM * 2
+											width: parent.width - Style.paddingM * 2
 											spacing: Style.spacingS
+
+											// Avatar + Name + Timestamp
+											Row {
+												spacing: Style.spacingS
+
+												Rectangle {
+													width: editView.avatarSize
+													height: editView.avatarSize
+													radius: editView.avatarSize / 2
+													color: editView.accentColor
+
+													Text {
+														anchors.centerIn: parent
+														text: model.item.m_userName ? model.item.m_userName.charAt(0).toUpperCase() : "?"
+														font.pixelSize: Style.fontSizeM
+														font.bold: true
+														color: Style.baseColor
+														font.family: Style.fontFamily
+													}
+												}
+
+												Column {
+													anchors.verticalCenter: parent.verticalCenter
+													spacing: 1
+
+													Text {
+														text: commentDelegate.isMe ? qsTr("You") : (model.item.m_userName || qsTr("Unknown"))
+														font.pixelSize: Style.fontSizeS
+														font.bold: true
+														color: Style.textColor
+													}
+
+													Text {
+														text: root.formatTimestamp(model.item.m_timestamp)
+														font.pixelSize: Style.fontSizeS - 1
+														color: editView.timestampColor
+													}
+												}
+											}
 
 											// Reply-to indicator inside bubble
 											Rectangle {
@@ -1688,7 +1676,7 @@ DocumentViewBase {
 												width: parent.width
 												height: replyBubbleCol.height + Style.paddingS
 												radius: Style.radiusM
-												color: commentDelegate.isMe ? "#C8DCF0" : "#E5E8EC"
+												color: "#D7DFEE"
 
 												Column {
 													id: replyBubbleCol
@@ -1743,46 +1731,34 @@ DocumentViewBase {
 												lineHeight: 1.45
 											}
 
-											// Attachment cards — simple filename links
+											// Attachments — inline links with paperclip icon
 											Repeater {
 												model: commentDelegate.dataModel.m_attachments || []
-												delegate: Rectangle {
-													width: attRow.width + Style.paddingM * 2
-													height: attRow.height + Style.paddingS * 2
-													radius: Style.radiusM
-													color: Style.baseColor
-													border.color: editView.cardBorderColor
-													border.width: 1
+												delegate: Row {
+													spacing: Style.spacingXS
 
-													Row {
-														id: attRow
-														x: Style.paddingM
+													Image {
 														anchors.verticalCenter: parent.verticalCenter
-														spacing: Style.spacingS
-
-														Image {
-															anchors.verticalCenter: parent.verticalCenter
-															width: Style.iconSizeS
-															height: width
-															source: Style.getIconPath("Icons/Attachment", Icon.State.On, Icon.Mode.Normal)
-															sourceSize.width: width
-															sourceSize.height: height
-														}
-
-														Text {
-															anchors.verticalCenter: parent.verticalCenter
-															text: model.item.m_fileName
-															font.pixelSize: Style.fontSizeS
-															color: Style.linkColor
-															font.underline: true
-														}
+														width: Style.iconSizeS
+														height: width
+														source: Style.getIconPath("Icons/Attachment", Icon.State.On, Icon.Mode.Normal)
+														sourceSize.width: width
+														sourceSize.height: height
 													}
 
-													MouseArea {
-														anchors.fill: parent
-														hoverEnabled: true
-														cursorShape: Qt.PointingHandCursor
-														onClicked: Qt.openUrlExternally(model.item.m_preview)
+													Text {
+														anchors.verticalCenter: parent.verticalCenter
+														text: model.item.m_fileName
+														font.pixelSize: Style.fontSizeM
+														color: Style.linkColor
+														font.underline: true
+
+														MouseArea {
+															anchors.fill: parent
+															hoverEnabled: true
+															cursorShape: Qt.PointingHandCursor
+															onClicked: Qt.openUrlExternally(model.item.m_preview)
+														}
 													}
 												}
 											}
@@ -1795,8 +1771,7 @@ DocumentViewBase {
 										text: qsTr("Reply")
 										font.pixelSize: Style.fontSizeS - 1
 										color: Style.inactiveTextColor
-										anchors.right: commentDelegate.isMe ? parent.right : undefined
-										anchors.left: commentDelegate.isMe ? undefined : parent.left
+										x: Style.paddingM
 
 										MouseArea {
 											anchors.fill: parent
@@ -2039,9 +2014,10 @@ DocumentViewBase {
 						width: parent.width
 						spacing: Style.spacingS
 
-						// Comment input with rounded border
+						// Comment input with rounded border and inline paperclip icon
 						Rectangle {
-							width: parent.width - attachButton.width - sendBtnRect.width - Style.spacingS * 2
+							id: inputFieldRect
+							width: parent.width - sendBtnRect.width - Style.spacingS
 							// Extra 4px accounts for the border width change on focus (1→2px on each side)
 							height: Math.max(40, commentInputField.contentHeight + Style.paddingS * 2 + 4)
 							radius: 20
@@ -2052,10 +2028,10 @@ DocumentViewBase {
 							TextEdit {
 								id: commentInputField
 								anchors.left: parent.left
-								anchors.right: parent.right
+								anchors.right: attachButton.left
 								anchors.verticalCenter: parent.verticalCenter
 								anchors.leftMargin: 14
-								anchors.rightMargin: 14
+								anchors.rightMargin: 4
 								height: Math.max(20, contentHeight)
 								font.pixelSize: Style.fontSizeM
 								color: Style.textColor
@@ -2072,17 +2048,19 @@ DocumentViewBase {
 									verticalAlignment: Text.AlignVCenter
 								}
 							}
-						}
 
-						ToolButton {
-							id: attachButton
-							anchors.verticalCenter: parent.verticalCenter
-							tooltipText: qsTr("Attach file")
-							iconSource: Style.getIconPath("Icons/Attachment", Icon.State.On, Icon.Mode.Normal)
-							decorator: Component {
-								ToolButtonDecorator { color: "transparent" }
+							ToolButton {
+								id: attachButton
+								anchors.right: parent.right
+								anchors.rightMargin: 6
+								anchors.verticalCenter: parent.verticalCenter
+								tooltipText: qsTr("Attach file")
+								iconSource: Style.getIconPath("Icons/Attachment", Icon.State.On, Icon.Mode.Normal)
+								decorator: Component {
+									ToolButtonDecorator { color: "transparent" }
+								}
+								onClicked: attachImageDialog.open()
 							}
-							onClicked: attachImageDialog.open()
 						}
 
 						Rectangle {
