@@ -13,6 +13,7 @@
 #include <imtdoc/IDocumentManagerEventHandler.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentManager.h>
+#include <imtauth/IUserGroupInfoProvider.h>
 
 // ACF includes
 #include <ibase/IApplicationInfo.h>
@@ -42,6 +43,7 @@ public:
 		I_ASSIGN(m_attachmentStorageCompPtr, "AttachmentStorage", "Storage service for binary attachments", true, "AttachmentStorage");
 		I_ASSIGN(m_entityReferenceStorageCompPtr, "EntityReferenceStorage", "Storage service for entity references", true, "EntityReferenceStorage");
 		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Application info for ObjectLink URL construction", true, "ApplicationInfo");
+		I_ASSIGN(m_userGroupInfoProviderCompPtr, "UserGroupInfoProvider", "User group info provider for permissions", true, "UserGroupInfoProvider");
 		I_ASSIGN_MULTI_0(m_entityTypeProvidersCompPtr, "EntityTypeProviders", "Registered entity type providers", false);
 	I_END_COMPONENT
 
@@ -59,6 +61,10 @@ protected:
 	virtual bool ProcessEvent(imtdoc::CEventBase* eventPtr) override;
 
 private:
+	bool IsUserAdmin(const imtgql::CGqlRequest& gqlRequest) const;
+	bool IsUserRelatedToTicket(const imtgql::CGqlRequest& gqlRequest, const imtdesk::ISupportTicket* ticketPtr, bool& isReporter, bool& isAssignee) const;
+	bool IsUserInSameGroupAsReporter(const imtgql::CGqlRequest& gqlRequest, const QByteArray& reporterId) const;
+
 	I_REF(imtdoc::IDocumentManager, m_documentManagerCompPtr);
 	I_REF(imtbase::IObjectCollection, m_ticketCollectionCompPtr);
 	I_REF(imtbase::IObjectCollection, m_messageCollectionCompPtr);
@@ -67,6 +73,7 @@ private:
 	I_REF(imtchat::IAttachmentStorage, m_attachmentStorageCompPtr);
 	I_REF(imtdesk::IEntityReferenceStorage, m_entityReferenceStorageCompPtr);
 	I_REF(ibase::IApplicationInfo, m_applicationInfoCompPtr);
+	I_REF(imtauth::IUserGroupInfoProvider, m_userGroupInfoProviderCompPtr);
 	I_MULTIREF(imtdesk::IEntityTypeProvider, m_entityTypeProvidersCompPtr);
 };
 

@@ -28,6 +28,12 @@ DocumentViewBase {
 	// Current user ID for chat-style alignment
 	readonly property string currentUserId: AuthorizationController.getUserId()
 	
+	// Permission flags from server
+	readonly property bool canEdit: isNewIssue || (ticketData ? (ticketData.m_canEdit === true) : false)
+	readonly property bool canLock: isNewIssue || (ticketData ? (ticketData.m_canLock === true) : false)
+	// Whether user is reporter (for lock-only access)
+	readonly property bool isReporter: ticketData ? (ticketData.m_reporterId === currentUserId) : false
+	
 	// Pending image attachments for comment being composed
 	// Each element: {id: "uuid.ext", preview: "localPreviewUrl"}
 	property var pendingAttachments: []
@@ -547,6 +553,7 @@ DocumentViewBase {
 									width: parent.width
 									height: Style.controlHeightM
 									placeHolderText: qsTr("Enter ticket title...")
+									readOnly: !root.canEdit
 									onEditingFinished: root.doUpdateModel()
 									KeyNavigation.tab: editDescriptionInput
 								}
@@ -584,6 +591,7 @@ DocumentViewBase {
 										height: Math.max(100, contentHeight)
 										wrapMode: TextEdit.Wrap
 										clip: true
+										readOnly: !root.canEdit
 										onEditingFinished: root.doUpdateModel()
 										KeyNavigation.tab: editTypeCB
 										KeyNavigation.backtab: editTitleInput
@@ -646,6 +654,7 @@ DocumentViewBase {
 										id: addContextBtn
 										anchors.right: parent.right
 										anchors.verticalCenter: parent.verticalCenter
+										visible: root.canEdit
 										text: "+ " + qsTr("Add context")
 										font.pixelSize: Style.fontSizeS
 										font.bold: true
@@ -705,6 +714,7 @@ DocumentViewBase {
 
 											ToolButton {
 												id: refRemoveBtn
+												visible: root.canEdit
 												anchors.right: parent.right
 												anchors.verticalCenter: parent.verticalCenter
 												iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
@@ -931,6 +941,7 @@ DocumentViewBase {
 										height: Style.buttonHeightM
 										currentIndex: 1
 										model: ticketTypeModel
+										enabled: root.canEdit
 										onCurrentIndexChanged: root.doUpdateModel()
 										KeyNavigation.tab: editPriorityCB
 										KeyNavigation.backtab: editDescriptionInput
@@ -954,6 +965,7 @@ DocumentViewBase {
 										height: Style.buttonHeightM
 										currentIndex: 1
 										model: priorityModel
+										enabled: root.canEdit
 										onCurrentIndexChanged: root.doUpdateModel()
 										KeyNavigation.tab: editAssigneeCB
 										KeyNavigation.backtab: editTypeCB
@@ -977,6 +989,7 @@ DocumentViewBase {
 									id: editAssigneeCB
 									width: parent.width
 									height: Style.buttonHeightM
+									enabled: root.canEdit
 									onCurrentIndexChanged: root.doUpdateModel()
 									KeyNavigation.tab: editStatusCB
 									KeyNavigation.backtab: editPriorityCB
@@ -1015,6 +1028,7 @@ DocumentViewBase {
 										height: Style.buttonHeightM
 										currentIndex: 0
 										model: statusModel
+										enabled: root.canEdit
 										onCurrentIndexChanged: root.doUpdateModel()
 										KeyNavigation.tab: editStateReasonCB
 										KeyNavigation.backtab: editAssigneeCB
@@ -1038,6 +1052,7 @@ DocumentViewBase {
 										height: Style.buttonHeightM
 										currentIndex: 0
 										model: stateReasonModel
+										enabled: root.canEdit
 										onCurrentIndexChanged: root.doUpdateModel()
 										KeyNavigation.tab: editLockedCB
 										KeyNavigation.backtab: editStatusCB
@@ -1045,9 +1060,9 @@ DocumentViewBase {
 								}
 							}
 
-							// Lock section (existing tickets only)
+							// Lock section (existing tickets only, reporter/admin only)
 							Column {
-								visible: !root.isNewIssue
+								visible: !root.isNewIssue && root.canLock
 								width: parent.width
 								spacing: Style.spacingS
 
@@ -1056,6 +1071,7 @@ DocumentViewBase {
 								CheckBox {
 									id: editLockedCB
 									text: qsTr("Lock issue")
+									enabled: root.canLock
 									onCheckStateChanged: root.doUpdateModel()
 									KeyNavigation.tab: editLockedCB.checkState === Qt.Checked ? editLockReasonInput : commentInputField
 									KeyNavigation.backtab: editStateReasonCB
@@ -1078,6 +1094,7 @@ DocumentViewBase {
 										width: parent.width
 										height: Style.controlHeightM
 										placeHolderText: qsTr("Reason for locking")
+										readOnly: !root.canLock
 										onEditingFinished: root.doUpdateModel()
 										KeyNavigation.tab: commentInputField
 										KeyNavigation.backtab: editLockedCB
@@ -1393,7 +1410,7 @@ DocumentViewBase {
 			// ---- Fixed bottom: Add comment input ----
 			Rectangle {
 				id: addCommentSection
-				visible: !root.ticketData || !root.ticketData.m_locked
+				visible: root.canEdit && (!root.ticketData || !root.ticketData.m_locked)
 				anchors.bottom: parent.bottom
 				anchors.bottomMargin: 1
 				anchors.left: parent.left
@@ -1635,10 +1652,10 @@ DocumentViewBase {
 				}
 			}
 
-			// Lock notice
+			// Lock notice / read-only notice
 			Row {
 				id: lockNoticeRow
-				visible: root.ticketData && root.ticketData.m_locked
+				visible: (root.ticketData && root.ticketData.m_locked) || (!root.isNewIssue && !root.canEdit)
 				anchors.bottom: parent.bottom
 				anchors.bottomMargin: Style.paddingM
 				anchors.left: parent.left
@@ -1652,7 +1669,9 @@ DocumentViewBase {
 				}
 
 				Text {
-					text: qsTr("This conversation has been locked. Only collaborators can comment.")
+					text: root.canEdit
+						? qsTr("This conversation has been locked. Only collaborators can comment.")
+						: qsTr("You have read-only access to this ticket. Only the reporter, assignees, and administrators can edit.")
 					font.pixelSize: Style.fontSizeS
 					color: Style.inactiveTextColor
 					wrapMode: Text.Wrap

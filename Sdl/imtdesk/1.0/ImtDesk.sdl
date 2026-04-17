@@ -124,6 +124,8 @@ type TicketData {
 	entityReferences: [EntityReference]
 	entityTypes: [EntityType]
 	comments: [TicketComment]
+	canEdit: Boolean
+	canLock: Boolean
 }
 
 input TicketsListInput {

@@ -18,6 +18,8 @@
 #include <imtbase/IObjectCollectionIterator.h>
 #include <imtdeskgql/imtdeskgql.h>
 #include <imtdoc/CDocumentSavedEvent.h>
+#include <imtauth/IUserGroupInfoProvider.h>
+#include <imtgql/IGqlContext.h>
 
 
 namespace imtdeskgql
@@ -80,6 +82,25 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 	response.Version_1_0->priority = imtdeskgql::GetSdlTypeFromPriorityType(ticketPtr->GetPriority());
 	response.Version_1_0->status = imtdeskgql::GetSdlTypeFromStatusType(ticketPtr->GetStatus());
 	response.Version_1_0->stateReason = imtdeskgql::GetSdlTypeFromStateReason(ticketPtr->GetStateReason());
+
+	// Determine permissions for the current user
+	bool isAdmin = IsUserAdmin(gqlRequest);
+	bool isReporter = false;
+	bool isAssignee = false;
+	IsUserRelatedToTicket(gqlRequest, ticketPtr, isReporter, isAssignee);
+	bool isSameGroup = IsUserInSameGroupAsReporter(gqlRequest, ticketPtr->GetReporterId());
+
+	// Visibility: user must be admin, reporter, assignee, or in the same group as the reporter
+	if (!isAdmin && !isReporter && !isAssignee && !isSameGroup){
+		errorMessage = QStringLiteral("Permission denied: you do not have access to this ticket");
+		return sdl::imtdesk::ImtDesk::CTicketData();
+	}
+
+	// canEdit: admin, reporter, or assignee can edit/comment
+	response.Version_1_0->canEdit = isAdmin || isReporter || isAssignee;
+
+	// canLock: only admin or reporter can lock/unlock the ticket
+	response.Version_1_0->canLock = isAdmin || isReporter;
 
 	// Load entity references by IDs from the EntityReferences table via IEntityReferenceStorage
 	QByteArrayList entityRefIds = ticketPtr->GetEntityReferences();
@@ -278,6 +299,28 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 	if (ticketPtr == nullptr){
 		response.Version_1_0->status = sdl::imtbase::CollectionDocumentManager::EDocumentOperationStatus::InvalidDocumentId;
 		return response;
+	}
+
+	// Permission check: only admin, reporter, or assignee can edit
+	bool isAdmin = IsUserAdmin(gqlRequest);
+	bool isReporter = false;
+	bool isAssignee = false;
+	IsUserRelatedToTicket(gqlRequest, ticketPtr, isReporter, isAssignee);
+
+	if (!isAdmin && !isReporter && !isAssignee){
+		errorMessage = QStringLiteral("Permission denied: you cannot edit this ticket");
+		response.Version_1_0->status = sdl::imtbase::CollectionDocumentManager::EDocumentOperationStatus::Failed;
+		return response;
+	}
+
+	// Lock permission: only admin or reporter can change lock state
+	if (ticketInfo.locked){
+		bool canLock = isAdmin || isReporter;
+		if (!canLock){
+			errorMessage = QStringLiteral("Permission denied: only the reporter can lock/unlock this ticket");
+			response.Version_1_0->status = sdl::imtbase::CollectionDocumentManager::EDocumentOperationStatus::Failed;
+			return response;
+		}
 	}
 
 	if (ticketInfo.title){
@@ -496,6 +539,103 @@ bool CTicketCollectionDocumentManagerComp::ProcessEvent(imtdoc::CEventBase* even
 }
 
 
+// private methods
+
+bool CTicketCollectionDocumentManagerComp::IsUserAdmin(const imtgql::CGqlRequest& gqlRequest) const
+{
+	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
+	if (contextPtr != nullptr){
+		const imtauth::IUserInfo* userInfoPtr = contextPtr->GetUserInfo();
+		if (userInfoPtr != nullptr){
+			return userInfoPtr->IsAdmin();
+		}
+	}
+	return false;
+}
+
+
+bool CTicketCollectionDocumentManagerComp::IsUserRelatedToTicket(
+		const imtgql::CGqlRequest& gqlRequest,
+		const imtdesk::ISupportTicket* ticketPtr,
+		bool& isReporter,
+		bool& isAssignee) const
+{
+	isReporter = false;
+	isAssignee = false;
+
+	QByteArray userId = GetUserId(gqlRequest);
+	if (userId.isEmpty() || ticketPtr == nullptr){
+		return false;
+	}
+
+	if (ticketPtr->GetReporterId() == userId){
+		isReporter = true;
+	}
+
+	QByteArrayList assigneeIds = ticketPtr->GetAssigneeIds();
+	if (assigneeIds.contains(userId)){
+		isAssignee = true;
+	}
+
+	return isReporter || isAssignee;
+}
+
+
+bool CTicketCollectionDocumentManagerComp::IsUserInSameGroupAsReporter(
+		const imtgql::CGqlRequest& gqlRequest,
+		const QByteArray& reporterId) const
+{
+	if (reporterId.isEmpty() || !m_userGroupInfoProviderCompPtr.IsValid()){
+		return false;
+	}
+
+	QByteArray userId = GetUserId(gqlRequest);
+	if (userId.isEmpty()){
+		return false;
+	}
+
+	// Get the reporter's user info from user collection to find their groups
+	QByteArrayList reporterGroups;
+	if (m_userCollectionCompPtr.IsValid()){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (m_userCollectionCompPtr->GetObjectData(reporterId, dataPtr)){
+			const imtauth::IUserInfo* reporterInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
+			if (reporterInfoPtr != nullptr){
+				reporterGroups = reporterInfoPtr->GetGroups();
+			}
+		}
+	}
+
+	if (reporterGroups.isEmpty()){
+		return false;
+	}
+
+	// Get current user's groups
+	QByteArrayList userGroups;
+	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
+	if (contextPtr != nullptr){
+		const imtauth::IUserInfo* userInfoPtr = contextPtr->GetUserInfo();
+		if (userInfoPtr != nullptr){
+			userGroups = userInfoPtr->GetGroups();
+		}
+	}
+
+	if (userGroups.isEmpty()){
+		return false;
+	}
+
+	// Check for any common group
+	for (const QByteArray& groupId : reporterGroups){
+		if (userGroups.contains(groupId)){
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
 } // namespace imtdeskgql
+
 
 
