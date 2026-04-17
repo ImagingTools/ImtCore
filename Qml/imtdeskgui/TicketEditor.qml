@@ -462,60 +462,33 @@ DocumentViewBase {
 			color: editView.pageBgColor
 		}
 
-		// ==================== CENTERED CONTAINER ====================
+		// ==================== LEFT-ALIGNED CONTAINER ====================
 		Item {
 			id: panelsContainer
-			readonly property real totalMaxWidth: root.isNewIssue ? editView.contentMaxWidth : 1500
-			width: Math.min(parent.width - Style.marginXL * 2, totalMaxWidth)
-			anchors.horizontalCenter: parent.horizontalCenter
+			anchors.left: parent.left
+			anchors.leftMargin: Style.marginXL
+			anchors.right: parent.right
+			anchors.rightMargin: Style.marginXL
 			anchors.top: parent.top
 			anchors.topMargin: Style.marginXL
 			anchors.bottom: parent.bottom
 			anchors.bottomMargin: Style.marginXL
 
-		// ==================== LEFT COLUMN (35-40%) ====================
+		// ==================== TOP ROW: Title/Desc/Context + Properties ====================
 		Item {
-			id: leftColumn
+			id: topRow
 			anchors.top: parent.top
-			anchors.bottom: parent.bottom
 			anchors.left: parent.left
-			width: root.isNewIssue ? parent.width : parent.width * 0.38
+			anchors.right: parent.right
+			height: Math.max(detailsCard.height, propertiesCard.height)
 
-			CustomScrollbar {
-				id: editScrollV
-				z: parent.z + 1
-				anchors.right: parent.right
-				anchors.rightMargin: Style.spacingS
-				anchors.top: editFlick.top
-				anchors.bottom: editFlick.bottom
-				secondSize: Style.marginM
-				targetItem: editFlick
-				visible: editView.visible
-			}
-
-			Flickable {
-				id: editFlick
-				anchors.top: parent.top
-				anchors.bottom: parent.bottom
+			// LEFT: Title + Description + Context (combined)
+			Item {
+				id: leftTopWrapper
 				anchors.left: parent.left
-				anchors.right: editScrollV.left
-				anchors.rightMargin: root.isNewIssue ? Style.spacingS : 0
-				contentHeight: leftStack.height + Style.spacingL
-				boundsBehavior: Flickable.StopAtBounds
-				clip: true
-
-				Column {
-					id: leftStack
-					width: Math.min(editFlick.width, editView.contentMaxWidth)
-					anchors.horizontalCenter: parent.horizontalCenter
-					spacing: Style.spacingM
-
-					// ========================================
-					// CARD 1 — Title + Description (compact)
-					// ========================================
-					Item {
-						width: parent.width
-						height: detailsCard.height
+				anchors.top: parent.top
+				width: parent.width * 0.58 - editView.columnGap / 2
+				height: detailsCard.height
 
 						Rectangle {
 							id: detailsCard
@@ -692,45 +665,16 @@ DocumentViewBase {
 									}
 								}
 							}
-						}
-						}
 
-						DropShadow {
-							anchors.fill: detailsCard
-							z: detailsCard.z - 1
-							horizontalOffset: 3
-							verticalOffset: 3
-							radius: Style.radiusL
-							spread: 0
-							color: Style.shadowColor
-							source: detailsCard
-						}
-					}
+							// ---------- Context / Entity References (merged into details card) ----------
+							Rectangle { width: parent.width; height: 1; color: editView.cardBorderColor; opacity: 0.4 }
 
-					// ========================================
-					// CARD 2 — Context / Entity References
-					// ========================================
-					Item {
-						width: parent.width
-						height: contextCard.height
+							Column {
+								id: contextCardCol
+								width: parent.width
+								spacing: Style.spacingS
 
-						Rectangle {
-						id: contextCard
-						width: parent.width
-						height: contextCardCol.height + editView.cardPadding * 2
-						radius: editView.cardRadius
-						color: editView.cardColor
-						border.color: editView.cardBorderColor
-						border.width: 1
-
-						Column {
-							id: contextCardCol
-							x: editView.cardPadding
-							y: editView.cardPadding
-							width: parent.width - editView.cardPadding * 2
-							spacing: Style.spacingS
-
-							Item {
+								Item {
 								width: parent.width
 								height: Math.max(contextLabelText.height, addContextBtn.height)
 
@@ -744,7 +688,7 @@ DocumentViewBase {
 										text: qsTr("Context")
 										font.pixelSize: Style.fontSizeM
 										font.bold: true
-										color: Style.textColor
+										color: editView.sectionLabelColor
 										anchors.verticalCenter: parent.verticalCenter
 									}
 
@@ -1005,24 +949,26 @@ DocumentViewBase {
 							}
 						}
 						}
+						}
 
 						DropShadow {
-							anchors.fill: contextCard
-							z: contextCard.z - 1
+							anchors.fill: detailsCard
+							z: detailsCard.z - 1
 							horizontalOffset: 3
 							verticalOffset: 3
 							radius: Style.radiusL
 							spread: 0
 							color: Style.shadowColor
-							source: contextCard
+							source: detailsCard
 						}
-					}
+					} // leftTopWrapper
 
-					// ========================================
-					// CARD 3 — Properties / Metadata
-					// ========================================
+					// RIGHT: Properties (top-right group)
 					Item {
-						width: parent.width
+						id: rightTopWrapper
+						anchors.right: parent.right
+						anchors.top: parent.top
+						width: parent.width * 0.42 - editView.columnGap / 2
 						height: propertiesCard.height
 
 						Rectangle {
@@ -1293,57 +1239,40 @@ DocumentViewBase {
 								onCurrentIndexChanged: root.doUpdateModel()
 							}
 
-							// Row 3: Status + State Reason (existing tickets only)
-							Row {
+							// Row 3: Status (full width, existing tickets only) — State Reason removed per UX request
+							Column {
 								visible: !root.isNewIssue
 								width: parent.width
-								spacing: Style.spacingM
+								spacing: 4
 
-								Column {
-									width: (parent.width - Style.spacingM) / 2
-									spacing: 4
-
-									Text {
-										text: qsTr("Status")
-										font.pixelSize: Style.fontSizeM
-										color: editView.sectionLabelColor
-									}
-
-									ComboBox {
-										id: editStatusCB
-										width: parent.width
-										height: Style.buttonHeightM
-										currentIndex: 0
-										model: statusModel
-										enabled: root.canEdit
-										onCurrentIndexChanged: root.doUpdateModel()
-										KeyNavigation.tab: editStateReasonCB
-										KeyNavigation.backtab: editAssigneeCB
-									}
+								Text {
+									text: qsTr("Status")
+									font.pixelSize: Style.fontSizeM
+									color: editView.sectionLabelColor
 								}
 
-								Column {
-									width: (parent.width - Style.spacingM) / 2
-									spacing: 4
-
-									Text {
-										text: qsTr("State Reason")
-										font.pixelSize: Style.fontSizeM
-										color: editView.sectionLabelColor
-									}
-
-									ComboBox {
-										id: editStateReasonCB
-										width: parent.width
-										height: Style.buttonHeightM
-										currentIndex: 0
-										model: stateReasonModel
-										enabled: root.canEdit
-										onCurrentIndexChanged: root.doUpdateModel()
-										KeyNavigation.tab: editLockedCB
-										KeyNavigation.backtab: editStatusCB
-									}
+								ComboBox {
+									id: editStatusCB
+									width: parent.width
+									height: Style.buttonHeightM
+									currentIndex: 0
+									model: statusModel
+									enabled: root.canEdit
+									onCurrentIndexChanged: root.doUpdateModel()
+									KeyNavigation.tab: editLockedCB
+									KeyNavigation.backtab: editAssigneeCB
 								}
+							}
+
+							// Hidden State Reason (data still tracked for model)
+							ComboBox {
+								id: editStateReasonCB
+								visible: false
+								width: 0
+								height: 0
+								currentIndex: 0
+								model: stateReasonModel
+								onCurrentIndexChanged: root.doUpdateModel()
 							}
 
 							// Lock section (existing tickets only, reporter/admin only)
@@ -1399,19 +1328,17 @@ DocumentViewBase {
 							color: Style.shadowColor
 							source: propertiesCard
 						}
-					}
-				}
-			}
-		}
+					} // rightTopWrapper
+		} // topRow
 
-		// ==================== RIGHT COLUMN — Chat (62%) ====================
+		// ==================== BOTTOM: Chat (full width below topRow) ====================
 		Rectangle {
 			id: commentsPanel
 			visible: !root.isNewIssue
-			anchors.top: parent.top
+			anchors.top: topRow.bottom
+			anchors.topMargin: editView.columnGap
 			anchors.bottom: parent.bottom
-			anchors.left: leftColumn.right
-			anchors.leftMargin: editView.columnGap
+			anchors.left: parent.left
 			anchors.right: parent.right
 			radius: editView.cardRadius
 			color: editView.cardColor
