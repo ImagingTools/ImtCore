@@ -772,7 +772,7 @@ DocumentViewBase {
 															spacing: Style.spacingM
 
 															Text {
-																text: qsTr("Entity Type")
+																text: qsTr("Entity type")
 																font.pixelSize: Style.fontSizeM
 																font.bold: true
 																color: Style.textColor
