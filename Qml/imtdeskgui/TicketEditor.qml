@@ -36,6 +36,8 @@ DocumentViewBase {
 	// Pending entity references for the ticket
 	// Each element: {entityType, entityId, displayName, entityLinkPath, typeId}
 	property var pendingEntityRefs: []
+	// Force chat scroll to bottom after sending a message
+	property bool _forceScrollToBottom: false
 	
 	signal commentSubmitted(string commentText)
 	
@@ -102,6 +104,7 @@ DocumentViewBase {
 		ticketData.m_comments.addElement(newItem)
 		
 		setBlockingUpdateModel(false)
+		root._forceScrollToBottom = true
 		ticketData.modelChanged()
 		root.commentSubmitted(commentText)
 	}
@@ -690,63 +693,19 @@ DocumentViewBase {
 									}
 								}
 
-								// Entity type picker + Link button
-								Row {
-									width: parent.width
-									spacing: Style.spacingS
+								// Blue link to add context via dialog
+								Text {
+									text: qsTr("+ Add context")
+									font.pixelSize: Style.fontSizeM
+									font.underline: true
+									color: editView.accentColor
 
-									Column {
-										width: Math.min(200, parent.width * 0.4)
-										spacing: Style.spacingXS
-
-										Text {
-											text: qsTr("Entity Type")
-											font.pixelSize: Style.fontSizeS
-											color: editView.labelColor
-											opacity: 0.6
-										}
-
-										ComboBox {
-											id: refTypeCB
-											width: parent.width
-											height: Style.buttonHeightM
-											model: entityTypeModel
-										}
-									}
-
-									Rectangle {
-										width: addRefBtnContent.contentWidth + Style.marginM * 2
-										height: Style.buttonHeightM
-										radius: Style.radiusL
-										anchors.bottom: parent.bottom
-										color: addRefBtnMa.pressed
-											   ? Qt.darker(editView.accentColor, 1.15)
-											   : addRefBtnMa.containsMouse
-												 ? Qt.lighter(editView.accentColor, 1.1)
-												 : editView.accentColor
-
-										Text {
-											id: addRefBtnContent
-											anchors.centerIn: parent
-											text: "🔗 " + qsTr("Link entity")
-											font.pixelSize: Style.fontSizeM
-											font.family: Style.fontFamily
-											color: Style.baseColor
-										}
-
-										MouseArea {
-											id: addRefBtnMa
-											anchors.fill: parent
-											hoverEnabled: true
-											cursorShape: Qt.PointingHandCursor
-											onClicked: {
-												if (!refTypeCB.model || refTypeCB.currentIndex < 0) return
-												var typeId = refTypeCB.model.getData("id", refTypeCB.currentIndex)
-												if (!typeId || typeId.length === 0) return
-												entityRefDialogLoader.entityTypeId = typeId
-												entityRefDialogLoader.entityTypeName = refTypeCB.model.getData("name", refTypeCB.currentIndex)
-												ModalDialogManager.openDialog(entityRefDialogComp)
-											}
+									MouseArea {
+										anchors.fill: parent
+										hoverEnabled: true
+										cursorShape: Qt.PointingHandCursor
+										onClicked: {
+											ModalDialogManager.openDialog(contextPickerDialogComp)
 										}
 									}
 								}
@@ -756,6 +715,64 @@ DocumentViewBase {
 									id: entityRefDialogLoader
 									property string entityTypeId: ""
 									property string entityTypeName: ""
+								}
+
+								// Step 1 dialog: pick entity type then browse collection
+								Component {
+									id: contextPickerDialogComp
+									Dialog {
+										id: ctxPickerDialog
+										title: qsTr("Add Context")
+										canMove: false
+										width: 420
+										height: 200
+
+										property int selectedTypeIndex: 0
+
+										Component.onCompleted: {
+											addButton(Enums.apply, qsTr("Browse"), false)
+											addButton(Enums.cancel, qsTr("Cancel"), true)
+											setButtonEnabled(Enums.apply, entityTypeModel.getItemsCount() > 0)
+										}
+
+										contentComp: Component {
+											Column {
+												width: parent ? parent.width : 400
+												spacing: Style.spacingL
+												padding: Style.paddingL
+
+												Text {
+													text: qsTr("Select entity type to browse:")
+													font.pixelSize: Style.fontSizeM
+													color: Style.textColor
+												}
+
+												ComboBox {
+													id: ctxTypeCB
+													width: parent.width - Style.paddingL * 2
+													height: Style.buttonHeightM
+													model: entityTypeModel
+													onCurrentIndexChanged: ctxPickerDialog.selectedTypeIndex = currentIndex
+												}
+											}
+										}
+
+										onFinished: {
+											if (buttonId === Enums.apply) {
+												var idx = selectedTypeIndex
+												if (idx < 0) idx = 0
+												if (entityTypeModel.getItemsCount() > idx) {
+													var typeId = entityTypeModel.getData("id", idx)
+													var typeName = entityTypeModel.getData("name", idx)
+													if (typeId && typeId.length > 0) {
+														entityRefDialogLoader.entityTypeId = typeId
+														entityRefDialogLoader.entityTypeName = typeName
+														ModalDialogManager.openDialog(entityRefDialogComp)
+													}
+												}
+											}
+										}
+									}
 								}
 
 								Component {
@@ -890,55 +907,35 @@ DocumentViewBase {
 								}
 							}
 
-							// Row 2: Assignees + Reporter
-							Row {
+							// Row 2: Assignees (full width)
+							Column {
 								width: parent.width
-								spacing: Style.spacingL
+								spacing: Style.spacingXS
 
-								Column {
-									width: editReporterCB.visible
-										   ? (parent.width - Style.spacingL) / 2
-										   : parent.width
-									spacing: Style.spacingXS
-
-									Text {
-										text: qsTr("Assignees")
-										font.pixelSize: Style.fontSizeS
-										color: editView.labelColor
-										opacity: 0.6
-									}
-
-									ComboBox {
-										id: editAssigneeCB
-										width: parent.width
-										height: Style.buttonHeightM
-										onCurrentIndexChanged: root.doUpdateModel()
-										KeyNavigation.tab: editReporterCB.visible ? editReporterCB : editStatusCB
-										KeyNavigation.backtab: editPriorityCB
-									}
+								Text {
+									text: qsTr("Assignees")
+									font.pixelSize: Style.fontSizeS
+									color: editView.labelColor
+									opacity: 0.6
 								}
 
-								Column {
-									visible: !root.isNewIssue
-									width: (parent.width - Style.spacingL) / 2
-									spacing: Style.spacingXS
-
-									Text {
-										text: qsTr("Reporter")
-										font.pixelSize: Style.fontSizeS
-										color: editView.labelColor
-										opacity: 0.6
-									}
-
-									ComboBox {
-										id: editReporterCB
-										width: parent.width
-										height: Style.buttonHeightM
-										onCurrentIndexChanged: root.doUpdateModel()
-										KeyNavigation.tab: editStatusCB
-										KeyNavigation.backtab: editAssigneeCB
-									}
+								ComboBox {
+									id: editAssigneeCB
+									width: parent.width
+									height: Style.buttonHeightM
+									onCurrentIndexChanged: root.doUpdateModel()
+									KeyNavigation.tab: editStatusCB
+									KeyNavigation.backtab: editPriorityCB
 								}
+							}
+
+							// Hidden Reporter (data still tracked for model)
+							ComboBox {
+								id: editReporterCB
+								visible: false
+								width: 0
+								height: 0
+								onCurrentIndexChanged: root.doUpdateModel()
 							}
 
 							// Row 3: Status + State Reason (existing tickets only)
@@ -966,7 +963,7 @@ DocumentViewBase {
 										model: statusModel
 										onCurrentIndexChanged: root.doUpdateModel()
 										KeyNavigation.tab: editStateReasonCB
-										KeyNavigation.backtab: editReporterCB.visible ? editReporterCB : editAssigneeCB
+										KeyNavigation.backtab: editAssigneeCB
 									}
 								}
 
@@ -1147,8 +1144,12 @@ DocumentViewBase {
 
 				onContentHeightChanged: {
 					var maxY = contentHeight - height
-					if (maxY > 0 && (contentY >= maxY - 50 || contentY <= 0))
-						contentY = maxY
+					if (maxY > 0) {
+						if (root._forceScrollToBottom || contentY >= maxY - 50 || contentY <= 0) {
+							contentY = maxY
+							root._forceScrollToBottom = false
+						}
+					}
 				}
 
 				Column {
@@ -1490,7 +1491,7 @@ DocumentViewBase {
 							Text {
 								id: sendBtnText
 								anchors.centerIn: parent
-								text: qsTr("Send")
+								text: root.uploadsInProgress > 0 ? qsTr("Uploading...") : qsTr("Send")
 								font.pixelSize: Style.fontSizeM
 								font.bold: true
 								color: commentButton.enabled ? Style.baseColor : Style.inactiveTextColor
@@ -1500,7 +1501,7 @@ DocumentViewBase {
 							Button {
 								id: commentButton
 								visible: false
-								enabled: commentInputField.text !== ""
+								enabled: (commentInputField.text !== "" || root.pendingAttachments.length > 0) && root.uploadsInProgress === 0
 							}
 
 							MouseArea {
@@ -1509,7 +1510,7 @@ DocumentViewBase {
 								hoverEnabled: true
 								cursorShape: commentButton.enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
 								onClicked: {
-									if (!commentButton.enabled || root.uploadsInProgress > 0) return
+									if (!commentButton.enabled) return
 									root.addComment(commentInputField.text.trim(), root.pendingAttachments.slice())
 									commentInputField.text = ""
 									root.pendingAttachments = []
