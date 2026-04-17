@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 import QtQuick 2.15
+import Qt5Compat.GraphicalEffects 6.0
+import QtGraphicalEffects 1.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
@@ -46,6 +48,8 @@ DocumentViewBase {
 	property bool _forceScrollToBottom: false
 	// Track whether entity refs changed to avoid unnecessary emplace calls
 	property bool _entityRefsChanged: false
+	// Title inline-edit toggle
+	property bool _titleEditing: false
 	
 	signal commentSubmitted(string commentText)
 	
@@ -481,7 +485,7 @@ DocumentViewBase {
 				anchors.left: parent.left
 				anchors.right: editScrollV.left
 				anchors.rightMargin: root.isNewIssue ? Style.spacingS : 0
-				contentHeight: leftStack.height + Style.spacingL
+				contentHeight: leftStack.height + Style.spacingL + 12
 				boundsBehavior: Flickable.StopAtBounds
 				clip: true
 
@@ -502,6 +506,14 @@ DocumentViewBase {
 						color: editView.cardColor
 						border.color: editView.cardBorderColor
 						border.width: 1
+						layer.enabled: true
+						layer.effect: DropShadow {
+							horizontalOffset: 0
+							verticalOffset: 2
+							radius: 8
+							samples: 17
+							color: "#1A000000"
+						}
 
 						Column {
 							id: detailsCardCol
@@ -510,52 +522,151 @@ DocumentViewBase {
 							width: parent.width - editView.cardPadding * 2
 							spacing: Style.spacingM
 
-							// Compact header: ticket number + badges
-							Row {
+							// Inline title: "#N Title" + badges + Edit toggle
+							Item {
 								width: parent.width
-								spacing: Style.spacingS
+								height: Math.max(titleDisplayRow.implicitHeight, titleEditRow.implicitHeight, Style.controlHeightM)
 
-								Text {
-									text: root.isNewIssue ? qsTr("New Ticket") : "#" + (root.ticketData ? root.ticketData.m_number : "")
-									font.pixelSize: Style.fontSizeL
-									font.bold: true
-									color: editView.accentColor
-									anchors.verticalCenter: parent.verticalCenter
-								}
-
-								TicketBadge {
-									visible: !root.isNewIssue
-									badgeType: "status"
-									value: editStatusCB.currentIndex
-								}
-
-								TicketBadge {
-									visible: !root.isNewIssue && editStateReasonCB.currentIndex > 0
-									badgeType: "stateReason"
-									value: editStateReasonCB.currentIndex
-								}
-							}
-
-							// ---------- Title ----------
-							Column {
-								width: parent.width
-								spacing: 4
-
-								Text {
-									text: qsTr("Title")
-									font.pixelSize: Style.fontSizeS
-									font.bold: true
-									color: editView.sectionLabelColor
-								}
-
-								CustomTextField {
-									id: editTitleInput
+								// ---- Display mode ----
+								Row {
+									id: titleDisplayRow
+									visible: !root._titleEditing && !root.isNewIssue
 									width: parent.width
-									height: Style.controlHeightM
-									placeHolderText: qsTr("Enter ticket title...")
-									readOnly: !root.canEdit
-									onEditingFinished: root.doUpdateModel()
-									KeyNavigation.tab: editDescriptionInput
+									spacing: Style.spacingS
+									anchors.verticalCenter: parent.verticalCenter
+
+									Text {
+										text: "#" + (root.ticketData ? root.ticketData.m_number : "")
+										font.pixelSize: Style.fontSizeL
+										font.bold: true
+										color: editView.accentColor
+										anchors.verticalCenter: parent.verticalCenter
+									}
+
+									Text {
+										id: titleDisplayText
+										text: editTitleInput.text || ""
+										font.pixelSize: Style.fontSizeL
+										font.bold: true
+										color: Style.textColor
+										elide: Text.ElideRight
+										maximumLineCount: 1
+										width: Math.max(10, parent.width - x - editBtnItem.width - badgesRow.width - Style.spacingS * 4)
+										anchors.verticalCenter: parent.verticalCenter
+									}
+
+									Row {
+										id: badgesRow
+										spacing: Style.spacingXS
+										anchors.verticalCenter: parent.verticalCenter
+
+										TicketBadge {
+											badgeType: "status"
+											value: editStatusCB.currentIndex
+										}
+
+										TicketBadge {
+											visible: editStateReasonCB.currentIndex > 0
+											badgeType: "stateReason"
+											value: editStateReasonCB.currentIndex
+										}
+									}
+
+									Item {
+										id: editBtnItem
+										width: 28
+										height: 28
+										visible: root.canEdit
+										anchors.verticalCenter: parent.verticalCenter
+
+										Rectangle {
+											anchors.fill: parent
+											radius: 6
+											color: editBtnMa.containsMouse ? "#F0F2F5" : "transparent"
+										}
+
+										Text {
+											anchors.centerIn: parent
+											text: "\u270E"
+											font.pixelSize: Style.fontSizeM
+										}
+
+										MouseArea {
+											id: editBtnMa
+											anchors.fill: parent
+											hoverEnabled: true
+											cursorShape: Qt.PointingHandCursor
+											onClicked: {
+												root._titleEditing = true
+												editTitleInput.forceActiveFocus()
+											}
+										}
+									}
+								}
+
+								// ---- Edit mode / New ticket ----
+								Row {
+									id: titleEditRow
+									visible: root._titleEditing || root.isNewIssue
+									width: parent.width
+									spacing: Style.spacingS
+									anchors.verticalCenter: parent.verticalCenter
+
+									Text {
+										text: root.isNewIssue ? qsTr("New Ticket") : "#" + (root.ticketData ? root.ticketData.m_number : "")
+										font.pixelSize: Style.fontSizeL
+										font.bold: true
+										color: editView.accentColor
+										anchors.verticalCenter: parent.verticalCenter
+									}
+
+									CustomTextField {
+										id: editTitleInput
+										width: parent.width - x - (confirmBtnItem.visible ? confirmBtnItem.width + Style.spacingS : 0)
+										height: Style.controlHeightM
+										placeHolderText: qsTr("Enter ticket title...")
+										readOnly: !root.canEdit
+										onEditingFinished: {
+											root.doUpdateModel()
+											if (root._titleEditing) root._titleEditing = false
+										}
+										KeyNavigation.tab: editDescriptionInput
+									}
+
+									Item {
+										id: confirmBtnItem
+										width: 30
+										height: 30
+										visible: root._titleEditing && !root.isNewIssue
+										anchors.verticalCenter: parent.verticalCenter
+
+										Rectangle {
+											anchors.fill: parent
+											radius: 6
+											color: confirmBtnMa.containsMouse ? "#E6F4EA" : "#F0F7F4"
+											border.color: "#34A853"
+											border.width: 1
+										}
+
+										Text {
+											anchors.centerIn: parent
+											text: "\u2713"
+											font.pixelSize: Style.fontSizeM
+											font.bold: true
+											color: "#34A853"
+										}
+
+										MouseArea {
+											id: confirmBtnMa
+											anchors.fill: parent
+											hoverEnabled: true
+											cursorShape: Qt.PointingHandCursor
+											onClicked: {
+												root._titleEditing = false
+												editTitleInput.editingFinished()
+											}
+										}
+									}
 								}
 							}
 
@@ -577,7 +688,7 @@ DocumentViewBase {
 									radius: Style.radiusM
 									border.color: editDescriptionInput.activeFocus ? editView.accentColor : editView.cardBorderColor
 									border.width: editDescriptionInput.activeFocus ? 2 : 1
-									color: editView.cardColor
+									color: editDescriptionInput.activeFocus ? editView.cardColor : "#FAFBFC"
 
 									TextEdit {
 										id: editDescriptionInput
@@ -619,6 +730,14 @@ DocumentViewBase {
 						color: editView.cardColor
 						border.color: editView.cardBorderColor
 						border.width: 1
+						layer.enabled: true
+						layer.effect: DropShadow {
+							horizontalOffset: 0
+							verticalOffset: 2
+							radius: 8
+							samples: 17
+							color: "#1A000000"
+						}
 
 						Column {
 							id: contextCardCol
@@ -914,6 +1033,14 @@ DocumentViewBase {
 						color: editView.cardColor
 						border.color: editView.cardBorderColor
 						border.width: 1
+						layer.enabled: true
+						layer.effect: DropShadow {
+							horizontalOffset: 0
+							verticalOffset: 2
+							radius: 8
+							samples: 17
+							color: "#1A000000"
+						}
 
 						Column {
 							id: propsCardCol
@@ -1125,6 +1252,14 @@ DocumentViewBase {
 			border.color: editView.accentBorderLight
 			border.width: 1
 			clip: true
+			layer.enabled: true
+			layer.effect: DropShadow {
+				horizontalOffset: 0
+				verticalOffset: 2
+				radius: 10
+				samples: 21
+				color: "#1A000000"
+			}
 
 			// Chat header
 			Rectangle {
