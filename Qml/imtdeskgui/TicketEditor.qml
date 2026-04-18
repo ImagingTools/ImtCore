@@ -664,6 +664,7 @@ DocumentViewBase {
 											font.pixelSize: Style.fontSizeM
 											color: Style.textColor
 											wrapMode: TextEdit.Wrap
+											textFormat: TextEdit.PlainText
 											readOnly: !root.canEdit
 											onEditingFinished: root.doUpdateModel()
 											KeyNavigation.tab: editTypeCB
@@ -1633,15 +1634,6 @@ DocumentViewBase {
 													}
 												}
 												
-												// Timestamp-only row for grouped (subsequent) messages from the same sender
-												Text {
-													visible: commentDelegate.isGroupedWithPrev
-													height: visible ? implicitHeight : 0
-													text: root.formatTimestamp(model.item.m_timestamp)
-													font.pixelSize: Style.fontSizeM - 1
-													color: editView.timestampColor
-												}
-												
 												// Reply-to indicator inside bubble (clickable to scroll to source)
 												Rectangle {
 													id: replyIndicator
@@ -2004,35 +1996,59 @@ DocumentViewBase {
 							// Comment input with rounded border and inline paperclip icon
 							Rectangle {
 								id: inputFieldRect
+								property int maxInputHeight: 120
 								width: parent.width - sendBtnRect.width - Style.spacingS
 								// Extra 4px accounts for the border width change on focus (1→2px on each side)
-								height: Math.max(40, commentInputField.contentHeight + Style.paddingS * 2 + 4)
+								height: Math.min(maxInputHeight, Math.max(40, commentInputField.contentHeight + Style.paddingS * 2 + 4))
 								radius: 20
 								border.color: commentInputField.activeFocus ? editView.accentColor : editView.cardBorderColor
 								border.width: commentInputField.activeFocus ? 2 : 1
 								color: editView.cardColor
 								
-								TextEdit {
-									id: commentInputField
+								Flickable {
+									id: commentInputFlick
 									anchors.left: parent.left
 									anchors.right: attachButton.left
-									anchors.verticalCenter: parent.verticalCenter
+									anchors.top: parent.top
+									anchors.bottom: parent.bottom
 									anchors.leftMargin: 14
 									anchors.rightMargin: 4
-									height: Math.max(20, contentHeight)
-									font.pixelSize: Style.fontSizeM
-									color: Style.textColor
-									wrapMode: TextEdit.Wrap
+									anchors.topMargin: 4
+									anchors.bottomMargin: 4
+									contentWidth: width
+									contentHeight: commentInputField.height
 									clip: true
-									KeyNavigation.backtab: editLockReasonInput.visible ? editLockReasonInput : editLockedCB
+									boundsBehavior: Flickable.StopAtBounds
 									
-									Text {
-										anchors.fill: parent
-										text: qsTr("Write a comment...")
-										color: Style.inactiveTextColor
+									TextEdit {
+										id: commentInputField
+										width: commentInputFlick.width
+										height: Math.max(commentInputFlick.height, contentHeight)
+										verticalAlignment: TextEdit.AlignVCenter
 										font.pixelSize: Style.fontSizeM
-										visible: commentInputField.text.length === 0
-										verticalAlignment: Text.AlignVCenter
+										color: Style.textColor
+										wrapMode: TextEdit.Wrap
+										textFormat: TextEdit.PlainText
+										KeyNavigation.backtab: editLockReasonInput.visible ? editLockReasonInput : editLockedCB
+										
+										onCursorRectangleChanged: {
+											var cy = cursorRectangle.y
+											var ch = cursorRectangle.height
+											if (cy < commentInputFlick.contentY) {
+												commentInputFlick.contentY = cy
+											} else if (cy + ch > commentInputFlick.contentY + commentInputFlick.height) {
+												commentInputFlick.contentY = cy + ch - commentInputFlick.height
+											}
+										}
+										
+										Text {
+											anchors.fill: parent
+											text: qsTr("Write a comment...")
+											color: Style.inactiveTextColor
+											font.pixelSize: Style.fontSizeM
+											visible: commentInputField.text.length === 0
+											verticalAlignment: Text.AlignVCenter
+										}
 									}
 								}
 								
@@ -2040,7 +2056,8 @@ DocumentViewBase {
 									id: attachButton
 									anchors.right: parent.right
 									anchors.rightMargin: 6
-									anchors.verticalCenter: parent.verticalCenter
+									anchors.bottom: parent.bottom
+									anchors.bottomMargin: Math.max(0, (40 - height) / 2)
 									tooltipText: qsTr("Attach file")
 									iconSource: Style.getIconPath("Icons/Attachment", Icon.State.On, Icon.Mode.Normal)
 									decorator: Component {
@@ -2053,9 +2070,9 @@ DocumentViewBase {
 							Rectangle {
 								id: sendBtnRect
 								width: sendBtnText.contentWidth + 28
-								height: inputFieldRect.height
+								height: 40
 								radius: 20
-								anchors.verticalCenter: parent.verticalCenter
+								anchors.bottom: parent.bottom
 								color: commentButton.enabled
 									   ? (sendBtnMa.pressed ? Qt.darker(editView.accentColor, 1.15)
 															: sendBtnMa.containsMouse ? Qt.lighter(editView.accentColor, 1.1)
