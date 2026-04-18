@@ -1605,7 +1605,7 @@ DocumentViewBase {
 								delegate: Item {
 									id: commentDelegate
 									width: commentsListCol.width
-									height: commentBubbleCol.height + (isGroupedWithPrev ? Style.spacingXS : Style.spacingL)
+									height: commentBubbleCol.height + (isGroupedWithPrev ? 2 : Style.spacingXXL)
 									
 									readonly property bool isMe: model.item.m_userId === root.currentUserId
 									readonly property var dataModel: model.item
