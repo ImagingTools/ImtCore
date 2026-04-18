@@ -573,6 +573,7 @@ DocumentViewBase {
 										hoverEnabled: true
 										cursorShape: Qt.PointingHandCursor
 										onClicked: {
+											editTitleInput.oldText = editTitleInput.text
 											root._titleEditing = true
 											editTitleInput.forceActiveFocus()
 										}
@@ -589,19 +590,58 @@ DocumentViewBase {
 								
 								CustomTextField {
 									id: editTitleInput
-									width: parent.width - titleConfirmBtn.width - Style.spacingS
+									width: parent.width - titleConfirmBtn.width - titleCloseBtn.width - 2*Style.spacingS
 									height: Style.controlHeightM
 									placeHolderText: qsTr("Enter ticket title...")
 									readOnly: !root.canEdit
 									KeyNavigation.tab: editDescriptionInput
+									onAccepted: {
+										root._titleEditing = false
+										root.doUpdateModel()
+									}
+									onCancelled: {
+										root._titleEditing = false
+									}
+									property string oldText
 								}
 								
 								Rectangle {
+									id: titleCloseBtn
+									visible: !root.isNewIssue
+									width: visible ? 28 : 0
+									height: width
+									radius: width/2
+									color: titleCloseBtn.containsMouse ? "#E6F4EA" : "#F0F2F5"
+									anchors.verticalCenter: parent.verticalCenter
+									
+									Image {
+										anchors.centerIn: parent
+										width: Style.iconSizeS
+										height: width
+										source: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+										sourceSize.width: width
+										sourceSize.height: height
+									}
+									
+									MouseArea {
+										id: titleCloseBtnMa
+										anchors.fill: parent
+										hoverEnabled: true
+										cursorShape: Qt.PointingHandCursor
+										onClicked: {
+											editTitleInput.text = editTitleInput.oldText
+											editTitleInput.oldText = ""
+											editTitleInput.cancelled()
+										}
+									}
+								}
+
+								Rectangle {
 									id: titleConfirmBtn
 									visible: !root.isNewIssue
-									width: 28
-									height: 28
-									radius: 14
+									width: visible ? 28 : 0
+									height: width
+									radius: width/2
 									color: titleConfirmBtnMa.containsMouse ? "#E6F4EA" : "#F0F2F5"
 									anchors.verticalCenter: parent.verticalCenter
 									
@@ -620,8 +660,7 @@ DocumentViewBase {
 										hoverEnabled: true
 										cursorShape: Qt.PointingHandCursor
 										onClicked: {
-											root._titleEditing = false
-											root.doUpdateModel()
+											editTitleInput.accepted()
 										}
 									}
 								}
@@ -664,7 +703,7 @@ DocumentViewBase {
 											font.pixelSize: Style.fontSizeM
 											color: Style.textColor
 											wrapMode: TextEdit.Wrap
-											textFormat: TextEdit.PlainText
+											// textFormat: TextEdit.PlainText
 											readOnly: !root.canEdit
 											onEditingFinished: root.doUpdateModel()
 											KeyNavigation.tab: editTypeCB
@@ -992,10 +1031,10 @@ DocumentViewBase {
 														commandsControllerComp: null
 														visibleMetaInfo: false
 														commandsDelegateComp: null
-														collectionId: "Users"
 														documentCollectionFilter: null
-														loadingDataAfterHeadersReceived: false
 														showRemoteChangesAlert: false
+														tableViewParamsStoredServer: false
+														collectionId: "Users"
 														Component.onCompleted: {
 															assigneeDialog.collectionView = this
 														}
@@ -1298,12 +1337,12 @@ DocumentViewBase {
 																commandsControllerComp: null
 																visibleMetaInfo: false
 																commandsDelegateComp: null
-																collectionId: ctxDialog.selectedEntityTypeId
 																documentCollectionFilter: null
-																loadingDataAfterHeadersReceived: false
 																showRemoteChangesAlert: false
+																tableViewParamsStoredServer: false
 																Component.onCompleted: {
 																	ctxDialog.collectionView = this
+																	collectionId = ctxDialog.selectedEntityTypeId
 																}
 																onSelectionChanged: {
 																	ctxDialog.setButtonEnabled(Enums.apply, selectedIds.length > 0)
@@ -2028,7 +2067,7 @@ DocumentViewBase {
 										font.pixelSize: Style.fontSizeM
 										color: Style.textColor
 										wrapMode: TextEdit.Wrap
-										textFormat: TextEdit.PlainText
+										// textFormat: TextEdit.PlainText
 										KeyNavigation.backtab: editLockReasonInput.visible ? editLockReasonInput : editLockedCB
 										
 										onCursorRectangleChanged: {
@@ -2058,7 +2097,6 @@ DocumentViewBase {
 									anchors.rightMargin: 6
 									anchors.bottom: parent.bottom
 									anchors.bottomMargin: Math.max(0, (40 - height) / 2)
-									tooltipText: qsTr("Attach file")
 									iconSource: Style.getIconPath("Icons/Attachment", Icon.State.On, Icon.Mode.Normal)
 									decorator: Component {
 										ToolButtonDecorator { color: "transparent" }
