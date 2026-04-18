@@ -51,45 +51,8 @@ bool CTicketCollectionControllerComp::CreateRepresentationFromObject(
 		return false;
 	}
 
-	// --- Visibility filter ---
-	// Get current user info from the request context manager
-	imtgql::IGqlContext* contextPtr = imtgql::CGqlRequestContextManager::GetContext();
-	if (contextPtr != nullptr){
-		const imtauth::IUserInfo* userInfoPtr = contextPtr->GetUserInfo();
-		if (userInfoPtr != nullptr && !userInfoPtr->IsAdmin()){
-			QByteArray userId = userInfoPtr->GetId();
-			bool isReporter = (ticketPtr->GetReporterId() == userId);
-			bool isAssignee = ticketPtr->GetAssigneeIds().contains(userId);
-
-			if (!isReporter && !isAssignee){
-				// Check if user is in the same group as the reporter
-				bool sameGroup = false;
-				QByteArray reporterId = ticketPtr->GetReporterId();
-				if (!reporterId.isEmpty() && m_userCollectionCompPtr.IsValid() && m_userGroupInfoProviderCompPtr.IsValid()){
-					QByteArrayList userGroups = userInfoPtr->GetGroups();
-					if (!userGroups.isEmpty()){
-						imtbase::IObjectCollection::DataPtr reporterDataPtr;
-						if (m_userCollectionCompPtr->GetObjectData(reporterId, reporterDataPtr)){
-							const imtauth::IUserInfo* reporterInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(reporterDataPtr.GetPtr());
-							if (reporterInfoPtr != nullptr){
-								QByteArrayList reporterGroups = reporterInfoPtr->GetGroups();
-								for (const QByteArray& gId : reporterGroups){
-									if (userGroups.contains(gId)){
-										sameGroup = true;
-										break;
-									}
-								}
-							}
-						}
-					}
-				}
-
-				if (!sameGroup){
-					return false; // Skip this ticket — user has no visibility
-				}
-			}
-		}
-	}
+	// Visibility filtering is intentionally not enforced server-side here (TODO: redesign).
+	// All tickets are visible to all users.
 
 	Q_UNUSED(listRequest);
 

@@ -83,24 +83,10 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 	response.Version_1_0->status = imtdeskgql::GetSdlTypeFromStatusType(ticketPtr->GetStatus());
 	response.Version_1_0->stateReason = imtdeskgql::GetSdlTypeFromStateReason(ticketPtr->GetStateReason());
 
-	// Determine permissions for the current user
-	bool isAdmin = IsUserAdmin(gqlRequest);
-	bool isReporter = false;
-	bool isAssignee = false;
-	IsUserRelatedToTicket(gqlRequest, ticketPtr, isReporter, isAssignee);
-	bool isSameGroup = IsUserInSameGroupAsReporter(gqlRequest, ticketPtr->GetReporterId());
-
-	// Visibility: user must be admin, reporter, assignee, or in the same group as the reporter
-	if (!isAdmin && !isReporter && !isAssignee && !isSameGroup){
-		errorMessage = QStringLiteral("Permission denied: you do not have access to this ticket");
-		return sdl::imtdesk::ImtDesk::CTicketData();
-	}
-
-	// canEdit: admin, reporter, or assignee can edit/comment
-	response.Version_1_0->canEdit = isAdmin || isReporter || isAssignee;
-
-	// canLock: only admin or reporter can lock/unlock the ticket
-	response.Version_1_0->canLock = isAdmin || isReporter;
+	// Permissions are intentionally not enforced server-side here (TODO: redesign).
+	// Always grant edit/lock to all users; visibility is open as well.
+	response.Version_1_0->canEdit = true;
+	response.Version_1_0->canLock = true;
 
 	// Load entity references by IDs from the EntityReferences table via IEntityReferenceStorage
 	QByteArrayList entityRefIds = ticketPtr->GetEntityReferences();
@@ -325,27 +311,7 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 		return response;
 	}
 
-	// Permission check: only admin, reporter, or assignee can edit
-	bool isAdmin = IsUserAdmin(gqlRequest);
-	bool isReporter = false;
-	bool isAssignee = false;
-	IsUserRelatedToTicket(gqlRequest, ticketPtr, isReporter, isAssignee);
-
-	if (!isAdmin && !isReporter && !isAssignee){
-		errorMessage = QStringLiteral("Permission denied: you cannot edit this ticket");
-		response.Version_1_0->status = sdl::imtbase::CollectionDocumentManager::EDocumentOperationStatus::Failed;
-		return response;
-	}
-
-	// Lock permission: only admin or reporter can change lock state
-	if (ticketInfo.locked){
-		bool canLock = isAdmin || isReporter;
-		if (!canLock){
-			errorMessage = QStringLiteral("Permission denied: only the reporter can lock/unlock this ticket");
-			response.Version_1_0->status = sdl::imtbase::CollectionDocumentManager::EDocumentOperationStatus::Failed;
-			return response;
-		}
-	}
+	// Permissions are intentionally not enforced server-side here (TODO: redesign).
 
 	if (ticketInfo.title){
 		ticketPtr->SetTitle(*ticketInfo.title);

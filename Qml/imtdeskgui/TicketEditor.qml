@@ -638,35 +638,66 @@ DocumentViewBase {
 								
 								Rectangle {
 									width: parent.width
-									height: editDescriptionInput.height + Style.paddingM * 2
+									height: Math.min(220, Math.max(50, editDescriptionInput.contentHeight)) + Style.paddingM * 2
 									radius: Style.radiusM
 									border.color: editDescriptionInput.activeFocus ? editView.accentColor : editView.cardBorderColor
 									border.width: editDescriptionInput.activeFocus ? 2 : 1
 									color: editDescriptionInput.activeFocus ? editView.cardColor : "#FAFBFC"
 									
-									TextEdit {
-										id: editDescriptionInput
-										anchors.left: parent.left
-										anchors.right: parent.right
-										anchors.top: parent.top
+									Flickable {
+										id: descriptionFlick
+										anchors.fill: parent
 										anchors.margins: Style.paddingM
-										font.pixelSize: Style.fontSizeM
-										color: Style.textColor
-										height: Math.max(50, contentHeight)
-										wrapMode: TextEdit.Wrap
+										anchors.rightMargin: Style.paddingM + Style.marginM
+										contentWidth: width
+										contentHeight: editDescriptionInput.height
 										clip: true
-										readOnly: !root.canEdit
-										onEditingFinished: root.doUpdateModel()
-										KeyNavigation.tab: editTypeCB
-										KeyNavigation.backtab: editTitleInput
+										boundsBehavior: Flickable.StopAtBounds
 										
-										Text {
-											anchors.fill: parent
-											text: qsTr("Describe the issue...")
-											color: Style.inactiveTextColor
+										TextEdit {
+											id: editDescriptionInput
+											width: descriptionFlick.width
+											height: Math.max(50, contentHeight)
 											font.pixelSize: Style.fontSizeM
-											visible: editDescriptionInput.text.length === 0
+											color: Style.textColor
+											wrapMode: TextEdit.Wrap
+											readOnly: !root.canEdit
+											onEditingFinished: root.doUpdateModel()
+											KeyNavigation.tab: editTypeCB
+											KeyNavigation.backtab: editTitleInput
+											
+											onCursorRectangleChanged: {
+												var cy = cursorRectangle.y
+												var ch = cursorRectangle.height
+												if (cy < descriptionFlick.contentY) {
+													descriptionFlick.contentY = cy
+												} else if (cy + ch > descriptionFlick.contentY + descriptionFlick.height) {
+													descriptionFlick.contentY = cy + ch - descriptionFlick.height
+												}
+											}
+											
+											Text {
+												anchors.fill: parent
+												text: qsTr("Describe the issue...")
+												color: Style.inactiveTextColor
+												font.pixelSize: Style.fontSizeM
+												visible: editDescriptionInput.text.length === 0
+											}
 										}
+									}
+									
+									CustomScrollbar {
+										id: descriptionScrollV
+										z: parent.z + 1
+										anchors.right: parent.right
+										anchors.rightMargin: 2
+										anchors.top: parent.top
+										anchors.bottom: parent.bottom
+										anchors.topMargin: 2
+										anchors.bottomMargin: 2
+										secondSize: Style.marginM
+										targetItem: descriptionFlick
+										visible: descriptionFlick.contentHeight > descriptionFlick.height
 									}
 								}
 							}
@@ -801,16 +832,40 @@ DocumentViewBase {
 								
 								Item {
 									width: parent.width
-									height: Math.max(assigneesLabelText.height, addAssigneeBtn.height)
+									height: Math.max(assigneesHeaderRow.height, addAssigneeBtn.height)
 									
-									Text {
-										id: assigneesLabelText
-										text: qsTr("Assignees")
-										font.pixelSize: Style.fontSizeM
-										font.bold: true
-										color: editView.sectionLabelColor
+									Row {
+										id: assigneesHeaderRow
 										anchors.left: parent.left
 										anchors.verticalCenter: parent.verticalCenter
+										spacing: Style.spacingS
+										
+										Text {
+											id: assigneesLabelText
+											text: qsTr("Assignees")
+											font.pixelSize: Style.fontSizeM
+											font.bold: true
+											color: editView.sectionLabelColor
+											anchors.verticalCenter: parent.verticalCenter
+										}
+										
+										Rectangle {
+											visible: root.pendingAssignees.length > 0
+											width: assigneeCountLabel.contentWidth + Style.paddingS * 2
+											height: editView.badgeHeight - 2
+											radius: (editView.badgeHeight - 2) / 2
+											color: editView.accentColor
+											anchors.verticalCenter: parent.verticalCenter
+											
+											Text {
+												id: assigneeCountLabel
+												anchors.centerIn: parent
+												text: root.pendingAssignees.length
+												font.pixelSize: Style.fontSizeM - 1
+												font.bold: true
+												color: Style.baseColor
+											}
+										}
 									}
 									
 									Text {
@@ -1460,6 +1515,19 @@ DocumentViewBase {
 						}
 					}
 					
+					function scrollToMessage(msgId) {
+						if (!msgId) return
+						for (var i = 0; i < commentsThread.count; i++) {
+							var item = commentsThread.itemAt(i)
+							if (item && item.dataModel && item.dataModel.m_id === msgId) {
+								var targetY = item.y
+								var maxY = Math.max(0, contentHeight - height)
+								contentY = Math.min(Math.max(0, targetY - 20), maxY)
+								return
+							}
+						}
+					}
+					
 					onContentHeightChanged: {
 						if (!_initialScrollDone) {
 							scrollToBottomTimer.restart()
@@ -1594,13 +1662,22 @@ DocumentViewBase {
 													}
 												}
 												
-												// Reply-to indicator inside bubble
+												// Reply-to indicator inside bubble (clickable to scroll to source)
 												Rectangle {
+													id: replyIndicator
 													visible: (model.item.m_replyToId && model.item.m_replyToId.length > 0)
 													width: parent.width
 													height: replyBubbleCol.height + Style.paddingS
 													radius: Style.radiusM
-													color: "#D7DFEE"
+													color: replyIndicatorMA.containsMouse ? "#C7D2E6" : "#D7DFEE"
+													
+													MouseArea {
+														id: replyIndicatorMA
+														anchors.fill: parent
+														hoverEnabled: true
+														cursorShape: Qt.PointingHandCursor
+														onClicked: commentsFlick.scrollToMessage(model.item.m_replyToId)
+													}
 													
 													Column {
 														id: replyBubbleCol
@@ -1859,32 +1936,35 @@ DocumentViewBase {
 							
 							Repeater {
 								model: root.pendingAttachments
-								delegate: Rectangle {
-									readonly property real maxPillWidth: 200
-									width: Math.min(pendingFileLabel.contentWidth + pendingRemoveBtn.width + Style.paddingM * 3, maxPillWidth)
-									height: 26
-									radius: 13
-									border.color: editView.cardBorderColor
-									border.width: 1
-									color: editView.pageBgColor
+								delegate: Row {
+									spacing: Style.spacingXS
+									
+									Image {
+										anchors.verticalCenter: parent.verticalCenter
+										width: Style.iconSizeS
+										height: width
+										source: Style.getIconPath("Icons/Attachment", Icon.State.On, Icon.Mode.Normal)
+										sourceSize.width: width
+										sourceSize.height: height
+									}
 									
 									Text {
-										id: pendingFileLabel
-										anchors.left: parent.left
-										anchors.leftMargin: Style.paddingM
-										anchors.right: pendingRemoveBtn.left
-										anchors.rightMargin: Style.paddingS
 										anchors.verticalCenter: parent.verticalCenter
-										text: "📎 " + (modelData.fileName || qsTr("attachment"))
+										text: modelData.fileName || qsTr("attachment")
 										font.pixelSize: Style.fontSizeM
-										color: Style.textColor
+										color: Style.linkColor
+										font.underline: true
 										elide: Text.ElideMiddle
-										maximumLineCount: 1
+										
+										MouseArea {
+											anchors.fill: parent
+											hoverEnabled: true
+											cursorShape: Qt.PointingHandCursor
+											onClicked: if (modelData.preview) Qt.openUrlExternally(modelData.preview)
+										}
 									}
 									
 									ToolButton {
-										id: pendingRemoveBtn
-										anchors.right: parent.right
 										anchors.verticalCenter: parent.verticalCenter
 										iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
 										decorator: Component {
