@@ -1605,15 +1605,17 @@ DocumentViewBase {
 								delegate: Item {
 									id: commentDelegate
 									width: commentsListCol.width
-									height: commentBubbleCol.height + (isGroupedWithPrev ? 2 : Style.spacingXXL)
+									height: commentBubbleCol.height + topGap
 									
 									readonly property bool isMe: model.item.m_userId === root.currentUserId
 									readonly property var dataModel: model.item
 									readonly property string _prevUserId: index > 0 && commentsThread.itemAt(index - 1) ? commentsThread.itemAt(index - 1).dataModel.m_userId : ""
 									readonly property bool isGroupedWithPrev: index > 0 && _prevUserId === model.item.m_userId && _prevUserId.length > 0
+									readonly property int topGap: index === 0 ? 0 : (isGroupedWithPrev ? 2 : Style.spacingXXL)
 									
 									Column {
 										id: commentBubbleCol
+										y: commentDelegate.topGap
 										width: parent.width
 										spacing: 4
 										
