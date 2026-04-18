@@ -484,7 +484,8 @@ DocumentViewBase {
 				anchors.left: parent.left
 				anchors.right: parent.right
 				// Height = only detailsCard (Title/Desc). Properties is independent and may extend below.
-				height: detailsCard.height
+				// For new tickets: stack properties below details (single left-aligned group), so include both heights.
+				height: root.isNewIssue ? (detailsCard.height + editView.columnGap + propertiesCard.height) : detailsCard.height
 				
 				// LEFT: Title + Description (Context moved to Properties card)
 				Item {
@@ -492,7 +493,9 @@ DocumentViewBase {
 					anchors.left: parent.left
 					anchors.top: parent.top
 					readonly property real _propW: Math.min(editView.propertiesWidth, Math.max(220, parent.width * 0.4))
-					width: Math.min(editView.detailsWidth, Math.max(280, parent.width - _propW - editView.columnGap))
+					width: root.isNewIssue
+						? Math.min(editView.detailsWidth, Math.max(280, parent.width))
+						: Math.min(editView.detailsWidth, Math.max(280, parent.width - _propW - editView.columnGap))
 					height: detailsCard.height
 					
 					Rectangle {
@@ -510,6 +513,14 @@ DocumentViewBase {
 							y: editView.cardPadding
 							width: parent.width - editView.cardPadding * 2
 							spacing: Style.spacingM
+							
+							// Title label
+							Text {
+								text: qsTr("Title")
+								font.pixelSize: Style.fontSizeM
+								font.bold: true
+								color: editView.sectionLabelColor
+							}
 							
 							// Title display/edit row
 							Row {
@@ -718,12 +729,16 @@ DocumentViewBase {
 				} // leftTopWrapper
 				
 				// RIGHT: Properties (top-right group, narrow, attached to leftTopWrapper.right)
+				// For new tickets: stacked below leftTopWrapper at same width, left-aligned (single group).
 				Item {
 					id: rightTopWrapper
-					anchors.left: leftTopWrapper.right
-					anchors.leftMargin: editView.columnGap
-					anchors.top: parent.top
-					width: Math.min(editView.propertiesWidth, Math.max(220, parent.width - leftTopWrapper.width - editView.columnGap))
+					anchors.left: root.isNewIssue ? parent.left : leftTopWrapper.right
+					anchors.leftMargin: root.isNewIssue ? 0 : editView.columnGap
+					anchors.top: root.isNewIssue ? leftTopWrapper.bottom : parent.top
+					anchors.topMargin: root.isNewIssue ? editView.columnGap : 0
+					width: root.isNewIssue
+						? leftTopWrapper.width
+						: Math.min(editView.propertiesWidth, Math.max(220, parent.width - leftTopWrapper.width - editView.columnGap))
 					height: propertiesCard.height
 					
 					Rectangle {
