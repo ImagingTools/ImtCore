@@ -1510,9 +1510,7 @@ DocumentViewBase {
 					contentHeight: commentsMainCol.height + Style.spacingL
 					boundsBehavior: Flickable.StopAtBounds
 					clip: true
-					
-					property bool _initialScrollDone: false
-					
+
 					function scrollToBottom() {
 						var maxY = contentHeight - height
 						if (maxY > 0) {
@@ -1534,60 +1532,18 @@ DocumentViewBase {
 							}
 						}
 					}
-					
+
 					onContentHeightChanged: {
-						if (!_initialScrollDone) {
-							scrollToBottomTimer.restart()
-							return
-						}
-						var maxY = contentHeight - height
-						if (maxY > 0) {
-							if (root._forceScrollToBottom) {
-								contentY = maxY
-								root._forceScrollToBottom = false
-							} else if (contentY >= maxY - 80 || contentY <= 0) {
-								contentY = maxY
-							}
-						}
+						scrollToBottom()
 					}
 					
 					onHeightChanged: {
-						if (!_initialScrollDone) {
-							scrollToBottomTimer.restart()
-							return
-						}
 						var maxY = contentHeight - height
 						if (maxY > 0 && contentY >= maxY - 80) {
 							contentY = maxY
 						}
 					}
-					
-					Connections {
-						target: commentsThread
-						function onCountChanged() {
-							if (!commentsFlick._initialScrollDone) {
-								scrollToBottomTimer.restart()
-							}
-						}
-					}
-					
-					Component.onCompleted: {
-						scrollToBottomTimer.restart()
-					}
-					
-					Timer {
-						id: scrollToBottomTimer
-						interval: 100
-						repeat: false
-						onTriggered: {
-							commentsFlick.scrollToBottom()
-							if (commentsFlick.contentHeight > 0 && commentsFlick.height > 0
-									&& commentsThread.count >= 0) {
-								commentsFlick._initialScrollDone = true
-							}
-						}
-					}
-					
+
 					Column {
 						id: commentsMainCol
 						width: parent.width
@@ -1863,9 +1819,12 @@ DocumentViewBase {
 					Rectangle {
 						anchors.top: parent.top
 						anchors.left: parent.left
+						anchors.leftMargin: Style.marginL
 						anchors.right: parent.right
+						anchors.rightMargin: Style.marginL
 						height: 1
 						color: editView.cardBorderColor
+						opacity: 0.4
 					}
 					
 					Column {
@@ -2169,10 +2128,14 @@ DocumentViewBase {
 					anchors.leftMargin: editView.cardPadding
 					width: parent.width - editView.cardPadding * 2
 					spacing: Style.paddingS
-					
-					Text {
-						text: "🔒"
-						font.pixelSize: Style.fontSizeM
+
+					Image {
+						anchors.verticalCenter: parent.verticalCenter
+						width: Style.iconSizeS
+						height: width
+						source: Style.getIconPath("Icons/Lock", Icon.State.On, Icon.Mode.Normal)
+						sourceSize.width: width
+						sourceSize.height: height
 					}
 					
 					Text {
