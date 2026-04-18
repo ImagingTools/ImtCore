@@ -150,7 +150,7 @@ DocumentViewBase {
 						if (xhr.status === 200) {
 							var attachmentId = xhr.responseText.trim()
 							var arr = root.pendingAttachments.slice()
-							arr.push({id: attachmentId, fileName: fileName, preview: localPreview || ("../../files/" + attachmentId)})
+							arr.push({id: attachmentId, fileName: fileName, preview: "../../files/" + attachmentId})
 							root.pendingAttachments = arr
 						} else {
 							console.error("Attachment upload failed: " + xhr.status + " " + xhr.responseText)
@@ -175,7 +175,7 @@ DocumentViewBase {
 					if (xhr.status === 200) {
 						var attachmentId = xhr.responseText.trim()
 						var arr = root.pendingAttachments.slice()
-						arr.push({id: attachmentId, fileName: fileName, preview: localPreview || ("../../files/" + attachmentId)})
+						arr.push({id: attachmentId, fileName: fileName, preview: "../../files/" + attachmentId})
 						root.pendingAttachments = arr
 					} else {
 						console.error("Attachment upload failed: " + xhr.status + " " + xhr.responseText)
@@ -1525,7 +1525,8 @@ DocumentViewBase {
 						for (var i = 0; i < commentsThread.count; i++) {
 							var item = commentsThread.itemAt(i)
 							if (item && item.dataModel && item.dataModel.m_id === msgId) {
-								var targetY = item.y
+								var pos = item.mapToItem(commentsFlick.contentItem, 0, 0)
+								var targetY = pos.y
 								var maxY = Math.max(0, contentHeight - height)
 								contentY = Math.min(Math.max(0, targetY - 20), maxY)
 								return
@@ -1590,7 +1591,7 @@ DocumentViewBase {
 												width: parent.width - Style.paddingM * 2
 												spacing: Style.spacingS
 												
-												// Avatar + Name + Timestamp — hidden when consecutive message from same sender
+												// Avatar + Name + Timestamp — for first message of group
 												Row {
 													spacing: Style.spacingS
 													visible: !commentDelegate.isGroupedWithPrev
@@ -1630,6 +1631,15 @@ DocumentViewBase {
 															color: editView.timestampColor
 														}
 													}
+												}
+												
+												// Timestamp-only row for grouped (subsequent) messages from the same sender
+												Text {
+													visible: commentDelegate.isGroupedWithPrev
+													height: visible ? implicitHeight : 0
+													text: root.formatTimestamp(model.item.m_timestamp)
+													font.pixelSize: Style.fontSizeM - 1
+													color: editView.timestampColor
 												}
 												
 												// Reply-to indicator inside bubble (clickable to scroll to source)
