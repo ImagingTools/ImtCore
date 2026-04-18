@@ -514,15 +514,7 @@ DocumentViewBase {
 							width: parent.width - editView.cardPadding * 2
 							spacing: Style.spacingM
 							
-							// Title label
-							Text {
-								text: qsTr("Title")
-								font.pixelSize: Style.fontSizeM
-								font.bold: true
-								color: editView.sectionLabelColor
-							}
-							
-							// Title display/edit row
+							// Title display/edit row — H1, page anchor
 							Row {
 								id: titleDisplayRow
 								visible: !root._titleEditing
@@ -531,7 +523,7 @@ DocumentViewBase {
 								
 								Text {
 									text: root.isNewIssue ? qsTr("New Ticket") : "#" + (root.ticketData ? root.ticketData.m_number : "") + "  " + editTitleInput.text
-									font.pixelSize: Style.fontSizeL
+									font.pixelSize: Style.fontSizeXXL
 									font.bold: true
 									color: Style.textColor
 									elide: Text.ElideRight
@@ -1613,10 +1605,12 @@ DocumentViewBase {
 								delegate: Item {
 									id: commentDelegate
 									width: commentsListCol.width
-									height: commentBubbleCol.height + Style.spacingXS
+									height: commentBubbleCol.height + (isGroupedWithPrev ? -Style.spacingS : Style.spacingXS)
 									
 									readonly property bool isMe: model.item.m_userId === root.currentUserId
 									readonly property var dataModel: model.item
+									readonly property string _prevUserId: index > 0 && commentsThread.itemAt(index - 1) ? commentsThread.itemAt(index - 1).dataModel.m_userId : ""
+									readonly property bool isGroupedWithPrev: index > 0 && _prevUserId === model.item.m_userId && _prevUserId.length > 0
 									
 									Column {
 										id: commentBubbleCol
@@ -1638,9 +1632,11 @@ DocumentViewBase {
 												width: parent.width - Style.paddingM * 2
 												spacing: Style.spacingS
 												
-												// Avatar + Name + Timestamp
+												// Avatar + Name + Timestamp — hidden when consecutive message from same sender
 												Row {
 													spacing: Style.spacingS
+													visible: !commentDelegate.isGroupedWithPrev
+													height: visible ? implicitHeight : 0
 													
 													Rectangle {
 														width: editView.avatarSize
