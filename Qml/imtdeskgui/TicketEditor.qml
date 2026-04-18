@@ -450,8 +450,8 @@ DocumentViewBase {
 		readonly property string accentBorderLight: "#B4D3F2"
 		readonly property string accentBadgeBg: "#E5F0FB"
 		readonly property string chatBgColor: Style.baseColor
-		readonly property string bubbleColor: "#EEF2FB"
-		readonly property string otherBubbleColor: "#EEF2FB"
+		readonly property string bubbleColor: "#DFECF9"
+		readonly property string otherBubbleColor: "#F1F3F7"
 		readonly property string sectionLabelColor: "#8C95A6"
 		readonly property string timestampColor: Style.inactiveTextColor
 		readonly property real columnGap: Style.spacingL
@@ -1605,7 +1605,7 @@ DocumentViewBase {
 								delegate: Item {
 									id: commentDelegate
 									width: commentsListCol.width
-									height: commentBubbleCol.height + (isGroupedWithPrev ? -Style.spacingS : Style.spacingXS)
+									height: commentBubbleCol.height + (isGroupedWithPrev ? Style.spacingXS : Style.spacingL)
 									
 									readonly property bool isMe: model.item.m_userId === root.currentUserId
 									readonly property var dataModel: model.item
@@ -1622,7 +1622,7 @@ DocumentViewBase {
 											width: parent.width
 											height: bubbleContent.height + Style.paddingM * 2
 											radius: 12
-											color: editView.bubbleColor
+											color: commentDelegate.isMe ? editView.bubbleColor : editView.otherBubbleColor
 											border.width: 0
 											
 											Column {
@@ -1636,13 +1636,13 @@ DocumentViewBase {
 												Row {
 													spacing: Style.spacingS
 													visible: !commentDelegate.isGroupedWithPrev
-													height: visible ? implicitHeight : 0
+													height: visible ? editView.avatarSize : 0
 													
 													Rectangle {
 														width: editView.avatarSize
 														height: editView.avatarSize
 														radius: editView.avatarSize / 2
-														color: editView.accentColor
+														color: commentDelegate.isMe ? editView.accentColor : "#9AA5B8"
 														
 														Text {
 															anchors.centerIn: parent
@@ -1655,8 +1655,9 @@ DocumentViewBase {
 													}
 													
 													Column {
-														anchors.verticalCenter: parent.verticalCenter
-														spacing: 1
+														anchors.top: parent.top
+														anchors.topMargin: 2
+														spacing: 2
 														
 														Text {
 															text: commentDelegate.isMe ? qsTr("You") : (model.item.m_userName || qsTr("Unknown"))
