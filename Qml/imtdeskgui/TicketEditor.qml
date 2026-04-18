@@ -713,7 +713,7 @@ DocumentViewBase {
 							
 							Text {
 								text: qsTr("Properties")
-								font.pixelSize: Style.fontSizeM
+								font.pixelSize: Style.fontSizeL
 								font.bold: true
 								color: Style.textColor
 							}
@@ -768,6 +768,30 @@ DocumentViewBase {
 										KeyNavigation.backtab: editTypeCB
 									}
 								}
+
+								Column {
+									visible: !root.isNewIssue
+									width: parent.width
+									spacing: 4
+									
+									Text {
+										text: qsTr("Status")
+										font.pixelSize: Style.fontSizeM
+										color: editView.sectionLabelColor
+									}
+									
+									ComboBox {
+										id: editStatusCB
+										width: parent.width
+										height: Style.buttonHeightM
+										currentIndex: 0
+										model: statusModel
+										enabled: root.canEdit
+										onCurrentIndexChanged: root.doUpdateModel()
+										KeyNavigation.tab: editLockedCB
+										KeyNavigation.backtab: editAssigneeCB
+									}
+								}
 							}
 							
 							// Row 2: Assignees (multi-select with chips)
@@ -783,6 +807,7 @@ DocumentViewBase {
 										id: assigneesLabelText
 										text: qsTr("Assignees")
 										font.pixelSize: Style.fontSizeM
+										font.bold: true
 										color: editView.sectionLabelColor
 										anchors.left: parent.left
 										anchors.verticalCenter: parent.verticalCenter
@@ -793,7 +818,7 @@ DocumentViewBase {
 										anchors.right: parent.right
 										anchors.verticalCenter: parent.verticalCenter
 										visible: root.canEdit
-										text: "+ " + qsTr("Add")
+										text: "+ " + qsTr("Add assignee")
 										font.pixelSize: Style.fontSizeM
 										font.bold: true
 										color: editView.accentColor
@@ -962,32 +987,7 @@ DocumentViewBase {
 								height: 0
 								onCurrentIndexChanged: root.doUpdateModel()
 							}
-							
-							// Row 3: Status (full width, existing tickets only) — State Reason removed per UX request
-							Column {
-								visible: !root.isNewIssue
-								width: parent.width
-								spacing: 4
-								
-								Text {
-									text: qsTr("Status")
-									font.pixelSize: Style.fontSizeM
-									color: editView.sectionLabelColor
-								}
-								
-								ComboBox {
-									id: editStatusCB
-									width: parent.width
-									height: Style.buttonHeightM
-									currentIndex: 0
-									model: statusModel
-									enabled: root.canEdit
-									onCurrentIndexChanged: root.doUpdateModel()
-									KeyNavigation.tab: editLockedCB
-									KeyNavigation.backtab: editAssigneeCB
-								}
-							}
-							
+
 							// Hidden State Reason (data still tracked for model)
 							ComboBox {
 								id: editStateReasonCB
@@ -1382,7 +1382,7 @@ DocumentViewBase {
 						
 						Text {
 							text: qsTr("Comments")
-							font.pixelSize: Style.fontSizeM
+							font.pixelSize: Style.fontSizeL
 							font.bold: true
 							color: Style.textColor
 							anchors.verticalCenter: parent.verticalCenter
@@ -1405,15 +1405,6 @@ DocumentViewBase {
 								color: Style.baseColor
 							}
 						}
-					}
-					
-					// Header bottom border
-					Rectangle {
-						anchors.bottom: parent.bottom
-						anchors.left: parent.left
-						anchors.right: parent.right
-						height: 1
-						color: editView.cardBorderColor
 					}
 				}
 				
