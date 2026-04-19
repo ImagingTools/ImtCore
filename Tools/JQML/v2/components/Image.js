@@ -41,7 +41,9 @@ class Image extends Item {
             return
         }
 
-        let url = (rootPath+'/'+this.getProperty('source').get().replaceAll('../','')).replaceAll('qrc:','').replaceAll('//','/')
+        let _source = this.getPropertyValue('source')
+
+        let url = _source.startsWith('data:image') ? _source : (rootPath+'/'+_source.replaceAll('../','')).replaceAll('qrc:','').replaceAll('//','/')
         this.$url = url
 
         this.getProperty('status').reset(Image.Loading)
