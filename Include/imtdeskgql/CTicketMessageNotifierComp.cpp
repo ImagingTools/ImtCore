@@ -7,6 +7,7 @@
 #include <QtCore/QJsonObject>
 
 // ImtCore includes
+#include <imtauth/IUserInfo.h>
 #include <imtchat/IChatMessage.h>
 #include <imtdesk/ISupportTicket.h>
 #include <imtdeskgql/TicketPermissions.h>
@@ -110,13 +111,29 @@ void CTicketMessageNotifierComp::OnUpdate(const istd::IChangeable::ChangeSet& ch
 
 	const QByteArray reporterId = ticketPtr->GetReporterId();
 	const QByteArrayList assigneeIds = ticketPtr->GetAssigneeIds();
+	const QByteArray senderId = messagePtr->GetSenderId();
+
+	// Resolve sender display name (best-effort; empty if unavailable).
+	QString senderUserName;
+	if (m_userCollectionCompPtr.IsValid() && !senderId.isEmpty()){
+		imtbase::IObjectCollection::DataPtr userDataPtr;
+		if (m_userCollectionCompPtr->GetObjectData(senderId, userDataPtr)){
+			const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(userDataPtr.GetPtr());
+			if (userInfoPtr != nullptr){
+				senderUserName = userInfoPtr->GetName();
+			}
+		}
+	}
 
 	// Build the JSON payload.
 	QJsonObject payload;
 	payload.insert(QStringLiteral("ticketId"), QString::fromUtf8(ticketId));
+	payload.insert(QStringLiteral("ticketNumber"), ticketPtr->GetNumber());
+	payload.insert(QStringLiteral("ticketTitle"), ticketPtr->GetTitle());
 	payload.insert(QStringLiteral("messageId"), QString::fromUtf8(messageId));
 	payload.insert(QStringLiteral("conversationId"), QString::fromUtf8(conversationId));
-	payload.insert(QStringLiteral("senderId"), QString::fromUtf8(messagePtr->GetSenderId()));
+	payload.insert(QStringLiteral("senderId"), QString::fromUtf8(senderId));
+	payload.insert(QStringLiteral("senderUserName"), senderUserName);
 	payload.insert(QStringLiteral("content"), messagePtr->GetContent());
 	payload.insert(QStringLiteral("createdAt"), messagePtr->GetCreatedAt());
 
@@ -125,16 +142,20 @@ void CTicketMessageNotifierComp::OnUpdate(const istd::IChangeable::ChangeSet& ch
 
 	const QByteArray commandId = m_commandIdAttrPtr.IsValid() ? *m_commandIdAttrPtr : QByteArray("OnTicketMessageReceived");
 
-	// Publish only to subscribers whose user is reporter / assignee / admin.
+	// Publish only to subscribers whose user is reporter / assignee / admin,
+	// excluding the sender itself (no need to notify yourself).
 	PublishDataFiltered(commandId, data, [&](const imtgql::CGqlRequest& subscriberRequest) -> bool {
 		const imtgql::IGqlContext* contextPtr = subscriberRequest.GetRequestContext();
 		if (contextPtr == nullptr){
 			return false;
 		}
+		const QByteArray userId = GetCurrentUserId(contextPtr);
+		if (!userId.isEmpty() && userId == senderId){
+			return false;
+		}
 		if (IsCurrentUserAdmin(contextPtr)){
 			return true;
 		}
-		const QByteArray userId = GetCurrentUserId(contextPtr);
 		if (userId.isEmpty()){
 			return false;
 		}

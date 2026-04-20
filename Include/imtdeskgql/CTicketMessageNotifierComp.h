@@ -31,8 +31,10 @@ namespace imtdeskgql
 	the parent ticket by scanning the ticket collection for a matching
 	conversationId, then publishes a JSON payload of the form
 
-	    { "ticketId": ..., "messageId": ..., "conversationId": ...,
-	      "senderId": ..., "content": ..., "createdAt": ... }
+	    { "ticketId": ..., "ticketNumber": ..., "ticketTitle": ...,
+	      "messageId": ..., "conversationId": ...,
+	      "senderId": ..., "senderUserName": ...,
+	      "content": ..., "createdAt": ... }
 
 	via CGqlPublisherCompBase::PublishDataFiltered.
 
