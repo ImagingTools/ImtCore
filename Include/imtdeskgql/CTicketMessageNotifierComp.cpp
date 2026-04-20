@@ -154,6 +154,11 @@ QByteArray CTicketMessageNotifierComp::FindTicketIdByConversationId(const QByteA
 		return QByteArray();
 	}
 
+	// NOTE: Linear scan over the ticket collection. This is invoked once per
+	// inserted chat message, which is typically infrequent. If ticket counts
+	// grow large, this should be replaced by a conversationId -> ticketId
+	// index maintained by the ticket repository (see the architecture
+	// discussion item in the PR description).
 	const imtbase::ICollectionInfo::Ids ids = m_ticketCollectionCompPtr->GetElementIds();
 	for (const QByteArray& id : std::as_const(ids)){
 		imtbase::IObjectCollection::DataPtr dataPtr;
