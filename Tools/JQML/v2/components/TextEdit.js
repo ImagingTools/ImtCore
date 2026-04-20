@@ -38,7 +38,7 @@ class TextEdit extends Item {
         cursorRectangle: { type: QVar, value: undefined },
         selectionStart: { type: QInt, value: 0 },
         selectionEnd: { type: QInt, value: 0 },
-        textFormat: { type: QInt, value: Text.AutoText, changed: '$textFormatChanged' },
+        textFormat: { type: QInt, value: TextEdit.AutoText, changed: '$textFormatChanged' },
     }
 
     static defaultSignals = {
