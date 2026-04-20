@@ -374,8 +374,10 @@ class MouseController {
                 let dragTarget = this.target.getProperty('drag').getPropertyValue('target')
                 if(dragTarget){
                     let rectTarget = dragTarget.getDom().getBoundingClientRect()
-                    let dropArea = this.getDropArea(rectTarget.left, rectTarget.top) || this.getDropArea(rectTarget.left, rectTarget.bottom) ||
-                        this.getDropArea(rectTarget.right, rectTarget.top) || this.getDropArea(rectTarget.right, rectTarget.bottom)
+                    let hotX = dragTarget.getPropertyValue('Drag').getPropertyValue('hotSpot').getPropertyValue('x')
+                    let hotY = dragTarget.getPropertyValue('Drag').getPropertyValue('hotSpot').getPropertyValue('y')
+                    let dropArea = this.getDropArea(rectTarget.left+hotX, rectTarget.top+hotY) || this.getDropArea(rectTarget.left+hotX, rectTarget.bottom-hotY) ||
+                        this.getDropArea(rectTarget.right-hotX, rectTarget.top+hotY) || this.getDropArea(rectTarget.right-hotX, rectTarget.bottom-hotY)
 
                     this.target.getProperty('drag').getProperty('active').reset(false)
 
@@ -483,8 +485,10 @@ class MouseController {
                         if(dragProp.getPropertyValue('axis') === QDrag.XAndYAxis || dragProp.getPropertyValue('axis') === QDrag.YAxis) dragTarget.y -= dy
                     }
                     let rectTarget = dragTarget.getDom().getBoundingClientRect()
-                    let dropArea = this.getDropArea(rectTarget.left, rectTarget.top) || this.getDropArea(rectTarget.left, rectTarget.bottom) ||
-                        this.getDropArea(rectTarget.right, rectTarget.top) || this.getDropArea(rectTarget.right, rectTarget.bottom)
+                    let hotX = dragTarget.getPropertyValue('Drag').getPropertyValue('hotSpot').getPropertyValue('x')
+                    let hotY = dragTarget.getPropertyValue('Drag').getPropertyValue('hotSpot').getPropertyValue('y')
+                    let dropArea = this.getDropArea(rectTarget.left+hotX, rectTarget.top+hotY) || this.getDropArea(rectTarget.left+hotX, rectTarget.bottom-hotY) ||
+                        this.getDropArea(rectTarget.right-hotX, rectTarget.top+hotY) || this.getDropArea(rectTarget.right-hotX, rectTarget.bottom-hotY)
 
                     if(dropArea) dropArea.$enterOrMove(dragTarget)
 
@@ -1139,35 +1143,53 @@ class ImageController {
         } else {
             if(onLoaded) item.onLoaded.connect(onLoaded)
             if(onError) item.onError.connect(onError)
-            
-            item.status = 1
-            let xhr = new XMLHttpRequest()
-            xhr.onload = ()=>{
-                if(xhr.status === 200){
-                    let reader = new FileReader()
-                    reader.onloadend = ()=>{
-                        let img = new OriginImage()
-                        img.onload = ()=>{
-                            item.data = reader.result,
-                            item.width = img.naturalWidth,
-                            item.height = img.naturalHeight,
-                            img.remove()
 
-                            item.status = 2
-                            item.onLoaded(item)
-                        }
-                        img.src = reader.result
-                    }
-                    reader.readAsDataURL(xhr.response)
-                } else {
-                    item.status = -1
-                    item.onError()
+            item.status = 1
+
+            if(url.startsWith('data:image')){
+                let img = new OriginImage()
+                img.onload = ()=>{
+                    item.data = url,
+                    item.width = img.naturalWidth,
+                    item.height = img.naturalHeight,
+                    img.remove()
+
+                    item.status = 2
+                    item.onLoaded(item)
                 }
-                
+                img.src = url
+            } else {
+                let xhr = new XMLHttpRequest()
+                xhr.onload = ()=>{
+                    if(xhr.status === 200){
+                        let reader = new FileReader()
+                        reader.onloadend = ()=>{
+                            let img = new OriginImage()
+                            img.onload = ()=>{
+                                item.data = reader.result,
+                                item.width = img.naturalWidth,
+                                item.height = img.naturalHeight,
+                                img.remove()
+
+                                item.status = 2
+                                item.onLoaded(item)
+                            }
+                            img.src = reader.result
+                        }
+                        reader.readAsDataURL(xhr.response)
+                    } else {
+                        item.status = -1
+                        item.onError()
+                    }
+                    
+                }
+                xhr.open('GET', url)
+                xhr.responseType = 'blob'
+                xhr.send()
             }
-            xhr.open('GET', url)
-            xhr.responseType = 'blob'
-            xhr.send()
+            
+            
+            
         }
 
     }
