@@ -19,6 +19,10 @@ namespace imtqml
 			\c imtqml::CRemoteFileController as \b com.imtcore.imtqml.1.0.RemoteFileController
 			\c imtqml::FileIO as \b com.imtcore.imtqml.1.0.FileIO
 			\c imtqml::CQmlProcess as \b com.imtcore.imtqml.1.0.Process
+			\c imtqml::CCollectionDataController as \b com.imtcore.imtqml.1.0.CollectionDataControllerBase
+			\c imtqml::CDocumentDataController as \b com.imtcore.imtqml.1.0.DocumentDataControllerBase
+			\c imtqml::CGqlBasedCollectionDataController as \b com.imtcore.imtqml.1.0.GqlBasedCollectionDataController
+			\c imtqml::CGqlDocumentDataController as \b com.imtcore.imtqml.1.0.GqlDocumentDataController
 		\a singletone types
 			\c imtqml::CNetworkEventInterceptor as \b com.imtcore.imtqml.1.0.NetworkEventInterceptor
 
@@ -47,6 +51,10 @@ public:
 		I_ASSIGN(m_registerFileIOAttrPtr, "RegisterFileIO", "If enabled, a FileIO will be registered for as QML type", true, true)
 		I_ASSIGN(m_registerCQmlProcessAttrPtr, "RegisterCQmlProcess", "If enabled, a CQmlProcess will be registered for as QML type", true, true)
 		I_ASSIGN(m_registerCNetworkEventInterceptorAttrPtr, "RegisterCNetworkEventInterceptor", "If enabled, a CNetworkEventInterceptor will be registered for as QML type", true, true)
+		I_ASSIGN(m_registerCCollectionDataControllerAttrPtr, "RegisterCCollectionDataController", "If enabled, a CCollectionDataController will be registered as QML type", true, true)
+		I_ASSIGN(m_registerCDocumentDataControllerAttrPtr, "RegisterCDocumentDataController", "If enabled, a CDocumentDataController will be registered as QML type", true, true)
+		I_ASSIGN(m_registerCGqlBasedCollectionDataControllerAttrPtr, "RegisterCGqlBasedCollectionDataController", "If enabled, a CGqlBasedCollectionDataController will be registered as QML type", true, true)
+		I_ASSIGN(m_registerCGqlDocumentDataControllerAttrPtr, "RegisterCGqlDocumentDataController", "If enabled, a CGqlDocumentDataController will be registered as QML type", true, true)
 	I_END_COMPONENT
 
 protected:
@@ -60,6 +68,10 @@ private:
 	I_ATTR(bool, m_registerFileIOAttrPtr);
 	I_ATTR(bool, m_registerCQmlProcessAttrPtr);
 	I_ATTR(bool, m_registerCNetworkEventInterceptorAttrPtr);
+	I_ATTR(bool, m_registerCCollectionDataControllerAttrPtr);
+	I_ATTR(bool, m_registerCDocumentDataControllerAttrPtr);
+	I_ATTR(bool, m_registerCGqlBasedCollectionDataControllerAttrPtr);
+	I_ATTR(bool, m_registerCGqlDocumentDataControllerAttrPtr);
 
 	static bool s_isInitialized;
 
