@@ -35,17 +35,17 @@ class CGqlBasedCollectionDataController: public CCollectionDataController
 
 	Q_PROPERTY(QVariantMap headers READ GetHeaders WRITE SetHeaders NOTIFY headersChanged)
 
-	Q_PROPERTY(QString getCollectionHeadersCommandId MEMBER m_getCollectionHeadersCommandId NOTIFY commandIdsChanged)
-	Q_PROPERTY(QString getObjectDataCommandId MEMBER m_getObjectDataCommandId NOTIFY commandIdsChanged)
-	Q_PROPERTY(QString insertNewObjectCommandId MEMBER m_insertNewObjectCommandId NOTIFY commandIdsChanged)
-	Q_PROPERTY(QString setObjectDataCommandId MEMBER m_setObjectDataCommandId NOTIFY commandIdsChanged)
-	Q_PROPERTY(QString removeElementsCommandId MEMBER m_removeElementsCommandId NOTIFY commandIdsChanged)
-	Q_PROPERTY(QString removeElementSetCommandId MEMBER m_removeElementSetCommandId NOTIFY commandIdsChanged)
-	Q_PROPERTY(QString restoreObjectsCommandId MEMBER m_restoreObjectsCommandId NOTIFY commandIdsChanged)
-	Q_PROPERTY(QString restoreObjectSetCommandId MEMBER m_restoreObjectSetCommandId NOTIFY commandIdsChanged)
-	Q_PROPERTY(QString setObjectNameCommandId MEMBER m_setObjectNameCommandId NOTIFY commandIdsChanged)
-	Q_PROPERTY(QString setObjectDescriptionCommandId MEMBER m_setObjectDescriptionCommandId NOTIFY commandIdsChanged)
-	Q_PROPERTY(QString createSubCollectionCommandId MEMBER m_createSubCollectionCommandId NOTIFY commandIdsChanged)
+	Q_PROPERTY(QString getCollectionHeadersCommandId MEMBER m_getCollectionHeadersCommandId NOTIFY getCollectionHeadersCommandIdChanged)
+	Q_PROPERTY(QString getObjectDataCommandId MEMBER m_getObjectDataCommandId NOTIFY getObjectDataCommandIdChanged)
+	Q_PROPERTY(QString insertNewObjectCommandId MEMBER m_insertNewObjectCommandId NOTIFY insertNewObjectCommandIdChanged)
+	Q_PROPERTY(QString setObjectDataCommandId MEMBER m_setObjectDataCommandId NOTIFY setObjectDataCommandIdChanged)
+	Q_PROPERTY(QString removeElementsCommandId MEMBER m_removeElementsCommandId NOTIFY removeElementsCommandIdChanged)
+	Q_PROPERTY(QString removeElementSetCommandId MEMBER m_removeElementSetCommandId NOTIFY removeElementSetCommandIdChanged)
+	Q_PROPERTY(QString restoreObjectsCommandId MEMBER m_restoreObjectsCommandId NOTIFY restoreObjectsCommandIdChanged)
+	Q_PROPERTY(QString restoreObjectSetCommandId MEMBER m_restoreObjectSetCommandId NOTIFY restoreObjectSetCommandIdChanged)
+	Q_PROPERTY(QString setObjectNameCommandId MEMBER m_setObjectNameCommandId NOTIFY setObjectNameCommandIdChanged)
+	Q_PROPERTY(QString setObjectDescriptionCommandId MEMBER m_setObjectDescriptionCommandId NOTIFY setObjectDescriptionCommandIdChanged)
+	Q_PROPERTY(QString createSubCollectionCommandId MEMBER m_createSubCollectionCommandId NOTIFY createSubCollectionCommandIdChanged)
 
 public:
 	typedef CCollectionDataController BaseClass;
@@ -77,7 +77,17 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 	void headersChanged(const QVariantMap& headers);
-	void commandIdsChanged();
+	void getCollectionHeadersCommandIdChanged(const QString& commandId);
+	void getObjectDataCommandIdChanged(const QString& commandId);
+	void insertNewObjectCommandIdChanged(const QString& commandId);
+	void setObjectDataCommandIdChanged(const QString& commandId);
+	void removeElementsCommandIdChanged(const QString& commandId);
+	void removeElementSetCommandIdChanged(const QString& commandId);
+	void restoreObjectsCommandIdChanged(const QString& commandId);
+	void restoreObjectSetCommandIdChanged(const QString& commandId);
+	void setObjectNameCommandIdChanged(const QString& commandId);
+	void setObjectDescriptionCommandIdChanged(const QString& commandId);
+	void createSubCollectionCommandIdChanged(const QString& commandId);
 
 private:
 	enum class OperationKind {

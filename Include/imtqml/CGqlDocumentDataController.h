@@ -32,9 +32,9 @@ class CGqlDocumentDataController: public CDocumentDataController
 
 	Q_PROPERTY(QVariantMap headers READ GetHeaders WRITE SetHeaders NOTIFY headersChanged)
 
-	Q_PROPERTY(QString gqlGetCommandId MEMBER m_gqlGetCommandId NOTIFY commandIdsChanged)
-	Q_PROPERTY(QString gqlAddCommandId MEMBER m_gqlAddCommandId NOTIFY commandIdsChanged)
-	Q_PROPERTY(QString gqlUpdateCommandId MEMBER m_gqlUpdateCommandId NOTIFY commandIdsChanged)
+	Q_PROPERTY(QString gqlGetCommandId MEMBER m_gqlGetCommandId NOTIFY gqlGetCommandIdChanged)
+	Q_PROPERTY(QString gqlAddCommandId MEMBER m_gqlAddCommandId NOTIFY gqlAddCommandIdChanged)
+	Q_PROPERTY(QString gqlUpdateCommandId MEMBER m_gqlUpdateCommandId NOTIFY gqlUpdateCommandIdChanged)
 
 public:
 	typedef CDocumentDataController BaseClass;
@@ -53,7 +53,9 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 	void headersChanged(const QVariantMap& headers);
-	void commandIdsChanged();
+	void gqlGetCommandIdChanged(const QString& commandId);
+	void gqlAddCommandIdChanged(const QString& commandId);
+	void gqlUpdateCommandIdChanged(const QString& commandId);
 
 private:
 	enum class OperationKind {
