@@ -5,6 +5,9 @@
 // std includes
 #include <functional>
 
+// ACF includes
+#include <istd/IPolymorphic.h>
+
 // Qt includes
 #include <QtCore/QString>
 #include <QtCore/QVariant>
@@ -33,24 +36,22 @@ namespace imtqml
 	callback exactly once on the GUI thread. An empty \c errorMessage
 	signals success.
 */
-class IDataModelBridge
+class IDataModelBridge: virtual public istd::IPolymorphic
 {
 public:
-	typedef std::function<void(QVariant /*model*/, QString /*errorMessage*/)> TGetModelCallback;
-	typedef std::function<void(QString /*errorMessage*/)> TSetModelCallback;
-
-	virtual ~IDataModelBridge() = default;
+	typedef std::function<void(QVariant /*model*/, QString /*errorMessage*/)> GetModelCallback;
+	typedef std::function<void(QString /*errorMessage*/)> SetModelCallback;
 
 	virtual void GetModel(
 			const QString& modelId,
 			const QVariantMap& parameters,
-			TGetModelCallback callback) = 0;
+			GetModelCallback callback) = 0;
 
 	virtual void SetModel(
 			const QString& modelId,
 			const QVariantMap& parameters,
 			const QVariant& model,
-			TSetModelCallback callback) = 0;
+			SetModelCallback callback) = 0;
 };
 
 

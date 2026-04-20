@@ -32,7 +32,7 @@ CDocumentManagerBridge::~CDocumentManagerBridge() = default;
 
 void CDocumentManagerBridge::GetOpenedDocumentList(
 		const QString& /*collectionId*/,
-		TDocumentListCallback callback)
+		DocumentListCallback callback)
 {
 	if (callback){
 		callback({}, c_notImplementedError);
@@ -44,10 +44,10 @@ void CDocumentManagerBridge::OpenDocument(
 		const QString& /*collectionId*/,
 		const QString& /*typeId*/,
 		const QString& /*documentId*/,
-		TDocumentCallback callback)
+		DocumentCallback callback)
 {
 	if (callback){
-		callback(FOpenedDocumentInfo{}, c_notImplementedError);
+		callback(OpenedDocumentInfo{}, c_notImplementedError);
 	}
 }
 
@@ -55,10 +55,10 @@ void CDocumentManagerBridge::OpenDocument(
 void CDocumentManagerBridge::CreateDocument(
 		const QString& /*collectionId*/,
 		const QString& /*typeId*/,
-		TDocumentCallback callback)
+		DocumentCallback callback)
 {
 	if (callback){
-		callback(FOpenedDocumentInfo{}, c_notImplementedError);
+		callback(OpenedDocumentInfo{}, c_notImplementedError);
 	}
 }
 
@@ -67,7 +67,7 @@ void CDocumentManagerBridge::SaveDocument(
 		const QString& /*collectionId*/,
 		const QString& /*documentId*/,
 		const QString& /*documentName*/,
-		TStatusCallback callback)
+		StatusCallback callback)
 {
 	if (callback){
 		callback(OS_FAILED, c_notImplementedError);
@@ -78,7 +78,7 @@ void CDocumentManagerBridge::SaveDocument(
 void CDocumentManagerBridge::CloseDocument(
 		const QString& /*collectionId*/,
 		const QString& /*documentId*/,
-		TVoidCallback callback)
+		VoidCallback callback)
 {
 	if (callback){
 		callback(c_notImplementedError);
@@ -90,7 +90,7 @@ void CDocumentManagerBridge::DoUndo(
 		const QString& /*collectionId*/,
 		const QString& /*documentId*/,
 		int /*steps*/,
-		TVoidCallback callback)
+		VoidCallback callback)
 {
 	if (callback){
 		callback(c_notImplementedError);
@@ -102,7 +102,7 @@ void CDocumentManagerBridge::DoRedo(
 		const QString& /*collectionId*/,
 		const QString& /*documentId*/,
 		int /*steps*/,
-		TVoidCallback callback)
+		VoidCallback callback)
 {
 	if (callback){
 		callback(c_notImplementedError);
@@ -113,7 +113,7 @@ void CDocumentManagerBridge::DoRedo(
 void CDocumentManagerBridge::ResetUndo(
 		const QString& /*collectionId*/,
 		const QString& /*documentId*/,
-		TVoidCallback callback)
+		VoidCallback callback)
 {
 	if (callback){
 		callback(c_notImplementedError);
@@ -124,7 +124,7 @@ void CDocumentManagerBridge::ResetUndo(
 void CDocumentManagerBridge::GetUndoInfo(
 		const QString& /*collectionId*/,
 		const QString& /*documentId*/,
-		TUndoInfoCallback callback)
+		UndoInfoCallback callback)
 {
 	if (callback){
 		callback(0, 0, false, c_notImplementedError);

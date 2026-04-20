@@ -47,13 +47,13 @@ public:
 	virtual void GetModel(
 			const QString& modelId,
 			const QVariantMap& parameters,
-			TGetModelCallback callback) override;
+			GetModelCallback callback) override;
 
 	virtual void SetModel(
 			const QString& modelId,
 			const QVariantMap& parameters,
 			const QVariant& model,
-			TSetModelCallback callback) override;
+			SetModelCallback callback) override;
 
 private:
 	I_REF(imtclientgql::IGqlClient, m_apiClientCompPtr);

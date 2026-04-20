@@ -5,6 +5,9 @@
 // std includes
 #include <functional>
 
+// ACF includes
+#include <istd/IPolymorphic.h>
+
 // Qt includes
 #include <QtCore/QString>
 #include <QtCore/QStringList>
@@ -31,24 +34,22 @@ namespace imtqml
 	callback exactly once on the GUI thread. An empty \c errorMessage
 	signals success.
 */
-class ICollectionDataBridge
+class ICollectionDataBridge: virtual public istd::IPolymorphic
 {
 public:
-	typedef std::function<void(QVariant /*payload*/, QString /*errorMessage*/)> TVariantCallback;
-	typedef std::function<void(QString /*objectId*/, QString /*errorMessage*/)> TIdCallback;
-	typedef std::function<void(QStringList /*objectIds*/, QString /*errorMessage*/)> TIdListCallback;
-	typedef std::function<void(QString /*errorMessage*/)> TVoidCallback;
-
-	virtual ~ICollectionDataBridge() = default;
+	typedef std::function<void(QVariant /*payload*/, QString /*errorMessage*/)> VariantCallback;
+	typedef std::function<void(QString /*objectId*/, QString /*errorMessage*/)> IdCallback;
+	typedef std::function<void(QStringList /*objectIds*/, QString /*errorMessage*/)> IdListCallback;
+	typedef std::function<void(QString /*errorMessage*/)> VoidCallback;
 
 	virtual void GetCollectionHeaders(
 			const QString& collectionId,
-			TVariantCallback callback) = 0;
+			VariantCallback callback) = 0;
 
 	virtual void GetObjectData(
 			const QString& collectionId,
 			const QString& objectId,
-			TVariantCallback callback) = 0;
+			VariantCallback callback) = 0;
 
 	virtual void InsertNewObject(
 			const QString& collectionId,
@@ -57,35 +58,35 @@ public:
 			const QString& description,
 			const QVariant& objectData,
 			const QString& objectId,
-			TIdCallback callback) = 0;
+			IdCallback callback) = 0;
 
 	virtual void SetObjectData(
 			const QString& collectionId,
 			const QString& objectId,
 			const QVariant& newObjectData,
-			TVoidCallback callback) = 0;
+			VoidCallback callback) = 0;
 
 	virtual void RemoveObjects(
 			const QString& collectionId,
 			const QStringList& objectIds,
-			TIdListCallback callback) = 0;
+			IdListCallback callback) = 0;
 
 	virtual void RestoreObjects(
 			const QString& collectionId,
 			const QStringList& objectIds,
-			TIdListCallback callback) = 0;
+			IdListCallback callback) = 0;
 
 	virtual void SetObjectName(
 			const QString& collectionId,
 			const QString& objectId,
 			const QString& name,
-			TVoidCallback callback) = 0;
+			VoidCallback callback) = 0;
 
 	virtual void SetObjectDescription(
 			const QString& collectionId,
 			const QString& objectId,
 			const QString& description,
-			TVoidCallback callback) = 0;
+			VoidCallback callback) = 0;
 };
 
 

@@ -2,6 +2,9 @@
 #pragma once
 
 
+// ACF includes
+#include <istd/IPolymorphic.h>
+
 // Qt includes
 #include <QtCore/QString>
 #include <QtCore/QStringList>
@@ -35,11 +38,9 @@ namespace imtqml
 	an already-destroyed controller MUST return \c nullptr / \c false
 	without crashing.
 */
-class IRepresentationControllerBridge
+class IRepresentationControllerBridge: virtual public istd::IPolymorphic
 {
 public:
-	virtual ~IRepresentationControllerBridge() = default;
-
 	/**
 		\brief Register \c controller under \c documentId. Replaces any
 		previous mapping for the same \c documentId.

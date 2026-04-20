@@ -32,7 +32,7 @@ CGqlCollectionManagerBridge::~CGqlCollectionManagerBridge() = default;
 
 void CGqlCollectionManagerBridge::GetCollectionHeaders(
 		const QString& /*collectionId*/,
-		TVariantCallback callback)
+		VariantCallback callback)
 {
 	if (callback){
 		callback(QVariant{}, c_notImplementedError);
@@ -43,7 +43,7 @@ void CGqlCollectionManagerBridge::GetCollectionHeaders(
 void CGqlCollectionManagerBridge::GetObjectData(
 		const QString& /*collectionId*/,
 		const QString& /*objectId*/,
-		TVariantCallback callback)
+		VariantCallback callback)
 {
 	if (callback){
 		callback(QVariant{}, c_notImplementedError);
@@ -58,7 +58,7 @@ void CGqlCollectionManagerBridge::InsertNewObject(
 		const QString& /*description*/,
 		const QVariant& /*objectData*/,
 		const QString& /*objectId*/,
-		TIdCallback callback)
+		IdCallback callback)
 {
 	if (callback){
 		callback(QString{}, c_notImplementedError);
@@ -70,7 +70,7 @@ void CGqlCollectionManagerBridge::SetObjectData(
 		const QString& /*collectionId*/,
 		const QString& /*objectId*/,
 		const QVariant& /*newObjectData*/,
-		TVoidCallback callback)
+		VoidCallback callback)
 {
 	if (callback){
 		callback(c_notImplementedError);
@@ -81,7 +81,7 @@ void CGqlCollectionManagerBridge::SetObjectData(
 void CGqlCollectionManagerBridge::RemoveObjects(
 		const QString& /*collectionId*/,
 		const QStringList& /*objectIds*/,
-		TIdListCallback callback)
+		IdListCallback callback)
 {
 	if (callback){
 		callback(QStringList{}, c_notImplementedError);
@@ -92,7 +92,7 @@ void CGqlCollectionManagerBridge::RemoveObjects(
 void CGqlCollectionManagerBridge::RestoreObjects(
 		const QString& /*collectionId*/,
 		const QStringList& /*objectIds*/,
-		TIdListCallback callback)
+		IdListCallback callback)
 {
 	if (callback){
 		callback(QStringList{}, c_notImplementedError);
@@ -104,7 +104,7 @@ void CGqlCollectionManagerBridge::SetObjectName(
 		const QString& /*collectionId*/,
 		const QString& /*objectId*/,
 		const QString& /*name*/,
-		TVoidCallback callback)
+		VoidCallback callback)
 {
 	if (callback){
 		callback(c_notImplementedError);
@@ -116,7 +116,7 @@ void CGqlCollectionManagerBridge::SetObjectDescription(
 		const QString& /*collectionId*/,
 		const QString& /*objectId*/,
 		const QString& /*description*/,
-		TVoidCallback callback)
+		VoidCallback callback)
 {
 	if (callback){
 		callback(c_notImplementedError);

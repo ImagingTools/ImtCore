@@ -45,51 +45,51 @@ public:
 	// reimplemented (IDocumentDataBridge)
 	virtual void GetOpenedDocumentList(
 			const QString& collectionId,
-			TDocumentListCallback callback) override;
+			DocumentListCallback callback) override;
 
 	virtual void OpenDocument(
 			const QString& collectionId,
 			const QString& typeId,
 			const QString& documentId,
-			TDocumentCallback callback) override;
+			DocumentCallback callback) override;
 
 	virtual void CreateDocument(
 			const QString& collectionId,
 			const QString& typeId,
-			TDocumentCallback callback) override;
+			DocumentCallback callback) override;
 
 	virtual void SaveDocument(
 			const QString& collectionId,
 			const QString& documentId,
 			const QString& documentName,
-			TStatusCallback callback) override;
+			StatusCallback callback) override;
 
 	virtual void CloseDocument(
 			const QString& collectionId,
 			const QString& documentId,
-			TVoidCallback callback) override;
+			VoidCallback callback) override;
 
 	virtual void DoUndo(
 			const QString& collectionId,
 			const QString& documentId,
 			int steps,
-			TVoidCallback callback) override;
+			VoidCallback callback) override;
 
 	virtual void DoRedo(
 			const QString& collectionId,
 			const QString& documentId,
 			int steps,
-			TVoidCallback callback) override;
+			VoidCallback callback) override;
 
 	virtual void ResetUndo(
 			const QString& collectionId,
 			const QString& documentId,
-			TVoidCallback callback) override;
+			VoidCallback callback) override;
 
 	virtual void GetUndoInfo(
 			const QString& collectionId,
 			const QString& documentId,
-			TUndoInfoCallback callback) override;
+			UndoInfoCallback callback) override;
 
 private:
 	I_REF(imtdoc::IDocumentManager, m_documentManagerCompPtr);

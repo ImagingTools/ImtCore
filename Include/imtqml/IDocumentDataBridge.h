@@ -5,6 +5,9 @@
 // std includes
 #include <functional>
 
+// ACF includes
+#include <istd/IPolymorphic.h>
+
 // Qt includes
 #include <QtCore/QList>
 #include <QtCore/QString>
@@ -39,10 +42,10 @@ namespace imtqml
 
 	An empty \c errorMessage in the callback signals success.
 */
-class IDocumentDataBridge
+class IDocumentDataBridge: virtual public istd::IPolymorphic
 {
 public:
-	struct FOpenedDocumentInfo
+	struct OpenedDocumentInfo
 	{
 		QString documentId;
 		QString typeId;
@@ -51,7 +54,7 @@ public:
 		bool hasNameProvider = false;
 	};
 
-	enum EOperationStatus
+	enum OperationStatus
 	{
 		OS_OK = 0,
 		OS_INVALID_USER_ID,
@@ -60,61 +63,59 @@ public:
 		OS_FAILED
 	};
 
-	typedef std::function<void(QList<FOpenedDocumentInfo>, QString /*errorMessage*/)> TDocumentListCallback;
-	typedef std::function<void(FOpenedDocumentInfo, QString /*errorMessage*/)> TDocumentCallback;
-	typedef std::function<void(QString /*errorMessage*/)> TVoidCallback;
-	typedef std::function<void(EOperationStatus, QString /*errorMessage*/)> TStatusCallback;
-	typedef std::function<void(int /*availableUndoSteps*/, int /*availableRedoSteps*/, bool /*isDirty*/, QString /*errorMessage*/)> TUndoInfoCallback;
-
-	virtual ~IDocumentDataBridge() = default;
+	typedef std::function<void(QList<OpenedDocumentInfo>, QString /*errorMessage*/)> DocumentListCallback;
+	typedef std::function<void(OpenedDocumentInfo, QString /*errorMessage*/)> DocumentCallback;
+	typedef std::function<void(QString /*errorMessage*/)> VoidCallback;
+	typedef std::function<void(OperationStatus, QString /*errorMessage*/)> StatusCallback;
+	typedef std::function<void(int /*availableUndoSteps*/, int /*availableRedoSteps*/, bool /*isDirty*/, QString /*errorMessage*/)> UndoInfoCallback;
 
 	virtual void GetOpenedDocumentList(
 			const QString& collectionId,
-			TDocumentListCallback callback) = 0;
+			DocumentListCallback callback) = 0;
 
 	virtual void OpenDocument(
 			const QString& collectionId,
 			const QString& typeId,
 			const QString& documentId,
-			TDocumentCallback callback) = 0;
+			DocumentCallback callback) = 0;
 
 	virtual void CreateDocument(
 			const QString& collectionId,
 			const QString& typeId,
-			TDocumentCallback callback) = 0;
+			DocumentCallback callback) = 0;
 
 	virtual void SaveDocument(
 			const QString& collectionId,
 			const QString& documentId,
 			const QString& documentName,
-			TStatusCallback callback) = 0;
+			StatusCallback callback) = 0;
 
 	virtual void CloseDocument(
 			const QString& collectionId,
 			const QString& documentId,
-			TVoidCallback callback) = 0;
+			VoidCallback callback) = 0;
 
 	virtual void DoUndo(
 			const QString& collectionId,
 			const QString& documentId,
 			int steps,
-			TVoidCallback callback) = 0;
+			VoidCallback callback) = 0;
 
 	virtual void DoRedo(
 			const QString& collectionId,
 			const QString& documentId,
 			int steps,
-			TVoidCallback callback) = 0;
+			VoidCallback callback) = 0;
 
 	virtual void ResetUndo(
 			const QString& collectionId,
 			const QString& documentId,
-			TVoidCallback callback) = 0;
+			VoidCallback callback) = 0;
 
 	virtual void GetUndoInfo(
 			const QString& collectionId,
 			const QString& documentId,
-			TUndoInfoCallback callback) = 0;
+			UndoInfoCallback callback) = 0;
 };
 
 

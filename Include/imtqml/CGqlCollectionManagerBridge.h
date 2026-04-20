@@ -47,12 +47,12 @@ public:
 	// reimplemented (ICollectionDataBridge)
 	virtual void GetCollectionHeaders(
 			const QString& collectionId,
-			TVariantCallback callback) override;
+			VariantCallback callback) override;
 
 	virtual void GetObjectData(
 			const QString& collectionId,
 			const QString& objectId,
-			TVariantCallback callback) override;
+			VariantCallback callback) override;
 
 	virtual void InsertNewObject(
 			const QString& collectionId,
@@ -61,35 +61,35 @@ public:
 			const QString& description,
 			const QVariant& objectData,
 			const QString& objectId,
-			TIdCallback callback) override;
+			IdCallback callback) override;
 
 	virtual void SetObjectData(
 			const QString& collectionId,
 			const QString& objectId,
 			const QVariant& newObjectData,
-			TVoidCallback callback) override;
+			VoidCallback callback) override;
 
 	virtual void RemoveObjects(
 			const QString& collectionId,
 			const QStringList& objectIds,
-			TIdListCallback callback) override;
+			IdListCallback callback) override;
 
 	virtual void RestoreObjects(
 			const QString& collectionId,
 			const QStringList& objectIds,
-			TIdListCallback callback) override;
+			IdListCallback callback) override;
 
 	virtual void SetObjectName(
 			const QString& collectionId,
 			const QString& objectId,
 			const QString& name,
-			TVoidCallback callback) override;
+			VoidCallback callback) override;
 
 	virtual void SetObjectDescription(
 			const QString& collectionId,
 			const QString& objectId,
 			const QString& description,
-			TVoidCallback callback) override;
+			VoidCallback callback) override;
 
 private:
 	I_REF(imtclientgql::IGqlClient, m_apiClientCompPtr);

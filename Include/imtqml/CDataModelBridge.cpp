@@ -33,7 +33,7 @@ CDataModelBridge::~CDataModelBridge() = default;
 void CDataModelBridge::GetModel(
 		const QString& /*modelId*/,
 		const QVariantMap& /*parameters*/,
-		TGetModelCallback callback)
+		GetModelCallback callback)
 {
 	if (callback){
 		callback(QVariant{}, c_notImplementedError);
@@ -45,7 +45,7 @@ void CDataModelBridge::SetModel(
 		const QString& /*modelId*/,
 		const QVariantMap& /*parameters*/,
 		const QVariant& /*model*/,
-		TSetModelCallback callback)
+		SetModelCallback callback)
 {
 	if (callback){
 		callback(c_notImplementedError);
