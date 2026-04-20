@@ -35,6 +35,39 @@ bool CLdapCredentialControllerComp::CheckCredential(const QByteArray& login, con
 
 	HANDLE  hUser;
 	result = LogonUser(qUtf16Printable(username), qUtf16Printable(domain), qUtf16Printable(password), LOGON32_LOGON_INTERACTIVE, LOGON32_PROVIDER_DEFAULT, &hUser);
+
+	if (result == 0){
+		DWORD errorCode = GetLastError();
+		LPWSTR messageBuffer = nullptr;
+		DWORD size = FormatMessageW(
+			FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+			NULL,
+			errorCode,
+			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+			(LPWSTR)&messageBuffer,
+			0,
+			NULL);
+
+		QString errorMessage = QString("LogonUser failed for user '%1' in domain '%2', error code: %3")
+			.arg(QString::fromUtf8(username), QString::fromUtf8(domain), QString::number(errorCode));
+
+		if (size > 0 && messageBuffer != nullptr){
+			errorMessage += QString(" - %1").arg(QString::fromWCharArray(messageBuffer).trimmed());
+		}
+
+		if (messageBuffer != nullptr){
+			LocalFree(messageBuffer);
+		}
+
+		const_cast<CLdapCredentialControllerComp*>(this)->SendLogMessage(
+			istd::IInformationProvider::IC_ERROR,
+			0,
+			errorMessage,
+			"CLdapCredentialControllerComp");
+	}
+	else {
+		CloseHandle(hUser);
+	}
 #endif
 
 	return result > 0;
