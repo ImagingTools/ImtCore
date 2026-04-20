@@ -12,6 +12,9 @@
 #include <imtqml/CGuiQuickWrapComp.h>
 #include <imtqml/CObserverQmlComp.h>
 #include <imtqml/CClientUserContextComp.h>
+#include <imtqml/CCollectionManagerBridge.h>
+#include <imtqml/CDataModelBridge.h>
+#include <imtqml/CDocumentManagerBridge.h>
 #include <imtqml/CGqlClientBridge.h>
 #include <imtqml/CGqlCollectionManagerBridge.h>
 #include <imtqml/CGqlDataModelBridge.h>
@@ -41,6 +44,9 @@ typedef imtqml::CGqlClientBridge GqlClientBridge;
 typedef imtqml::CGqlDocumentManagerBridge GqlDocumentManagerBridge;
 typedef imtqml::CGqlCollectionManagerBridge GqlCollectionManagerBridge;
 typedef imtqml::CGqlDataModelBridge GqlDataModelBridge;
+typedef imtqml::CDocumentManagerBridge DocumentManagerBridge;
+typedef imtqml::CCollectionManagerBridge CollectionManagerBridge;
+typedef imtqml::CDataModelBridge DataModelBridge;
 typedef imtqml::CRepresentationControllerBridge RepresentationControllerBridge;
 typedef imtqml::CPageGuiElementModelComp PageGuiElementModel;
 typedef icomp::TModelCompWrap<imtqml::CCommandsObserverQmlComp> CommandsObserverQml;
