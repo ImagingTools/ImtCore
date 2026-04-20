@@ -59,7 +59,7 @@ bool CLdapCredentialControllerComp::CheckCredential(const QByteArray& login, con
 			LocalFree(messageBuffer);
 		}
 
-		const_cast<CLdapCredentialControllerComp*>(this)->SendLogMessage(
+		SendLogMessage(
 			istd::IInformationProvider::IC_ERROR,
 			0,
 			errorMessage,
