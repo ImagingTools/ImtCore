@@ -46,6 +46,26 @@ I_EXPORT_COMPONENT(
 			"GraphQL QML Bridge ApiClient" IM_AUTHOR("Sergey Zastrovnyh"));
 
 I_EXPORT_COMPONENT(
+			GqlDocumentManagerBridge,
+			"GraphQL/SDL implementation of imtqml::IDocumentDataBridge - dispatches every CDocumentDataController request to imtclientgql::IGqlClient. Resolved through icomp; not exposed to QML.",
+			"GraphQL QML Bridge DocumentManager DataController");
+
+I_EXPORT_COMPONENT(
+			GqlCollectionManagerBridge,
+			"GraphQL/SDL implementation of imtqml::ICollectionDataBridge - dispatches every CCollectionDataController request to imtclientgql::IGqlClient. Resolved through icomp; not exposed to QML.",
+			"GraphQL QML Bridge CollectionManager DataController");
+
+I_EXPORT_COMPONENT(
+			GqlDataModelBridge,
+			"GraphQL/SDL implementation of imtqml::IDataModelBridge - dispatches every CDataModelController request to imtclientgql::IGqlClient. Resolved through icomp; not exposed to QML.",
+			"GraphQL QML Bridge DataModel DataController");
+
+I_EXPORT_COMPONENT(
+			RepresentationControllerBridge,
+			"Single transport-agnostic registry mapping documentId to its CDocumentRepresentationController. Resolved through icomp; not exposed to QML.",
+			"QML Bridge RepresentationController Registry");
+
+I_EXPORT_COMPONENT(
 			PageGuiElementModel,
 			"Page based model",
 			"Page Based Model");
