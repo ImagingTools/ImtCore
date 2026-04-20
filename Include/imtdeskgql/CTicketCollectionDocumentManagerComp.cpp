@@ -99,7 +99,7 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 			applicationId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID);
 		}
 
-		for (const QByteArray& refId : entityRefIds){
+		for (const QByteArray& refId : std::as_const(entityRefIds)){
 			QString entityType;
 			QByteArray entityId;
 			QString displayName;
@@ -199,7 +199,7 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 						if (!attachmentIds.isEmpty()){
 							itemData.attachments.Emplace();
 							QList<sdl::imtdesk::ImtDesk::CAttachment::V1_0> attachmentList;
-							for (const QByteArray& aid : attachmentIds){
+							for (const QByteArray& aid : std::as_const(attachmentIds)){
 								sdl::imtdesk::ImtDesk::CAttachment::V1_0 att;
 								att.id = aid;
 								// Build HTTP download URL — aid is a pure UUID from the DB.
@@ -558,7 +558,12 @@ bool CTicketCollectionDocumentManagerComp::IsUserRelatedToTicket(
 	isReporter = false;
 	isAssignee = false;
 
-	QByteArray userId = GetUserId(gqlRequest);
+	QByteArray userId;
+	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
+	if (contextPtr != nullptr){
+		userId = contextPtr->GetUserId();
+	}
+
 	if (userId.isEmpty() || ticketPtr == nullptr){
 		return false;
 	}
@@ -584,7 +589,12 @@ bool CTicketCollectionDocumentManagerComp::IsUserInSameGroupAsReporter(
 		return false;
 	}
 
-	QByteArray userId = GetUserId(gqlRequest);
+	QByteArray userId;
+	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
+	if (contextPtr != nullptr){
+		userId = contextPtr->GetUserId();
+	}
+
 	if (userId.isEmpty()){
 		return false;
 	}
@@ -607,7 +617,6 @@ bool CTicketCollectionDocumentManagerComp::IsUserInSameGroupAsReporter(
 
 	// Get current user's groups
 	QByteArrayList userGroups;
-	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
 	if (contextPtr != nullptr){
 		const imtauth::IUserInfo* userInfoPtr = contextPtr->GetUserInfo();
 		if (userInfoPtr != nullptr){
@@ -620,7 +629,7 @@ bool CTicketCollectionDocumentManagerComp::IsUserInSameGroupAsReporter(
 	}
 
 	// Check for any common group
-	for (const QByteArray& groupId : reporterGroups){
+	for (const QByteArray& groupId : std::as_const(reporterGroups)){
 		if (userGroups.contains(groupId)){
 			return true;
 		}
