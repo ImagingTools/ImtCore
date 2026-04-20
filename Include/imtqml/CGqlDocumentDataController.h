@@ -3,9 +3,14 @@
 
 
 // Qt includes
+#include <QtCore/QHash>
+#include <QtCore/QList>
 #include <QtCore/QObject>
+#include <QtCore/QPointer>
 #include <QtCore/QString>
+#include <QtCore/QStringList>
 #include <QtCore/QVariant>
+#include <QtQml/QJSValue>
 
 
 namespace imtqml
@@ -16,22 +21,27 @@ class CGqlClientBridge;
 
 
 /**
-	C++ analog of the QML \c GqlDocumentDataController
-	(see \c Qml/imtdocgui/GqlDocumentDataController.qml).
+	C++ analog of the QML \c GqlBasedCollectionDocumentManager
+	(see \c Qml/imtguigql/GqlBasedCollectionDocumentManager.qml) and
+	the underlying \c DocumentManagerBase
+	(see \c Qml/imtdocgui/DocumentManagerBase.qml).
 
 	\details
-	The controller is a thin \c QObject facade over the SDL-generated
-	request classes from \c Sdl/imtbase/1.0/CollectionDocumentManager.sdl
-	(\c CCreateNewDocumentGqlRequest, \c COpenDocumentGqlRequest,
-	\c CSaveDocumentGqlRequest). Every operation is dispatched
-	asynchronously through \c QtConcurrent::run via
-	\c CGqlClientBridge::SendSdlRequest(); resulting signals are always
-	re-emitted on the GUI thread via \c QMetaObject::invokeMethod with
-	\c Qt::QueuedConnection.
+	The controller mirrors the full public API of
+	\c DocumentManagerBase (signals, properties and \c Q_INVOKABLE
+	methods) plus the GraphQL transport layer of
+	\c GqlBasedCollectionDocumentManager. Every GQL operation is
+	dispatched asynchronously through \c QtConcurrent::run and uses the
+	SDL-generated request classes from
+	\c Sdl/imtbase/1.0/CollectionDocumentManager.sdl. Resulting signals
+	are always re-emitted on the GUI thread via
+	\c QMetaObject::invokeMethod with \c Qt::QueuedConnection.
 
-	A \c collectionId property is required because the
-	\c CollectionDocumentManager schema scopes every operation to a
-	collection.
+	\note Subscriptions (\c On<collectionId>DocumentChanged /
+	\c On<collectionId>UndoChanged) are not handled here — they should
+	be wired in QML via \c SubscriptionClient as in the QML manager.
+	\c IGqlClient does not currently expose a generic
+	subscription API.
 
 	The class is registered to QML by \c CStaticQmlTypeRegistratorComp
 	under \c com.imtcore.imtqml 1.0 as \c GqlDocumentDataController.
@@ -41,12 +51,9 @@ class CGqlDocumentDataController: public QObject
 	Q_OBJECT
 	Q_PROPERTY(QObject* apiClient READ GetApiClient WRITE SetApiClient NOTIFY apiClientChanged)
 	Q_PROPERTY(QString collectionId READ GetCollectionId WRITE SetCollectionId NOTIFY collectionIdChanged)
-	Q_PROPERTY(QString documentId READ GetDocumentId WRITE SetDocumentId NOTIFY documentIdChanged)
-	Q_PROPERTY(QString documentName READ GetDocumentName WRITE SetDocumentName NOTIFY documentNameChanged)
-	Q_PROPERTY(QString documentDescription READ GetDocumentDescription WRITE SetDocumentDescription NOTIFY documentDescriptionChanged)
-	Q_PROPERTY(QString typeId READ GetTypeId WRITE SetTypeId NOTIFY typeIdChanged)
-	Q_PROPERTY(bool hasRemoteChanges READ GetHasRemoteChanges WRITE SetHasRemoteChanges NOTIFY hasRemoteChangesChanged)
-	Q_PROPERTY(QVariant documentModel READ GetDocumentModel WRITE SetDocumentModel NOTIFY documentModelChanged)
+	Q_PROPERTY(QObject* documentManagerActiveView READ getDocumentManagerActiveView WRITE setDocumentManagerActiveView NOTIFY documentManagerActiveViewChanged)
+	Q_PROPERTY(QStringList supportedDocumentTypeIds READ getSupportedDocumentTypeIds NOTIFY documentTypeEditorsChanged)
+	Q_PROPERTY(QStringList openedDocumentIds READ getOpenedDocumentIds NOTIFY openedDocumentIdsChanged)
 
 public:
 	typedef QObject BaseClass;
@@ -60,60 +67,199 @@ public:
 	const QString& GetCollectionId() const;
 	void SetCollectionId(const QString& id);
 
-	const QString& GetDocumentId() const;
-	void SetDocumentId(const QString& id);
-
-	const QString& GetDocumentName() const;
-	void SetDocumentName(const QString& name);
-
-	const QString& GetDocumentDescription() const;
-	void SetDocumentDescription(const QString& description);
-
-	const QString& GetTypeId() const;
-	void SetTypeId(const QString& typeId);
-
-	bool GetHasRemoteChanges() const;
-	void SetHasRemoteChanges(bool value);
-
-	const QVariant& GetDocumentModel() const;
-	void SetDocumentModel(const QVariant& model);
-
 public Q_SLOTS:
-	QString getDocumentId() const;
-	QString getDocumentName() const;
-	QString getDocumentTypeId() const;
-	QVariant getDocumentModel() const;
-	QString getDocumentDescription() const;
+	// --- DocumentManagerBase: registration / introspection ---
 
-	void updateDocumentModel();
-	void insertDocument();
-	void saveDocument();
+	void registerDocumentViewData(
+			const QString& documentTypeId,
+			const QString& viewTypeId,
+			QObject* viewEditorComp,
+			QObject* representationControllerComp);
+
+	QObject* getDocumentEditorFactory(
+			const QString& documentTypeId,
+			const QString& viewTypeId = QString()) const;
+
+	QObject* getDocumentRepresentationControllerFactory(
+			const QString& documentTypeId,
+			const QString& viewTypeId = QString()) const;
+
+	QStringList getSupportedDocumentTypeIds() const;
+	QStringList getSupportedDocumentViewTypeIds(const QString& documentTypeId) const;
+	QString getViewTypeIdByViewFactory(
+			const QString& documentTypeId,
+			QObject* viewFactory) const;
+
+	// --- DocumentManagerBase: opened-document state ---
+
+	QStringList getOpenedDocumentIds() const;
+
+	bool documentIsOpened(const QString& documentId) const;
+	bool documentIsNew(const QString& documentId) const;
+	void setDocumentIsNew(const QString& documentId, bool isNew);
+
+	bool documentIsDirty(const QString& documentId) const;
+	void setDocumentIsDirty(const QString& documentId, bool isDirty);
+
+	bool documentIsLoading(const QString& documentId) const;
+	void setDocumentIsLoading(const QString& documentId, bool isLoading);
+
+	int getDocumentIndexByDocumentId(const QString& documentId) const;
+	QString getDocumentIdByObjectId(const QString& objectId) const;
+	QString getDocumentIdByView(QObject* view) const;
+	QString getDocumentTypeId(const QString& documentId) const;
+
+	void setDocumentObjectId(const QString& documentId, const QString& objectId);
+
+	void setDocumentName(const QString& documentId, const QString& name);
+	QString getDocumentName(const QString& documentId) const;
+
+	QString getDefaultDocumentName() const;
+
+	// --- DocumentManagerBase: views ---
+
+	QObject* getDocumentViewInstance(
+			const QString& documentId,
+			const QString& viewTypeId = QString()) const;
+	void onViewInstanceCreated(
+			const QString& documentId,
+			QObject* view,
+			const QString& viewTypeId = QString());
+
+	QObject* getDocumentManagerActiveView() const;
+	void setDocumentManagerActiveView(QObject* view);
+
+	/**
+		\brief Set the QML \c DocumentDecorator (or any \c QObject
+		exposing the same API) for an opened document. The decorator
+		is invoked from \c setDocumentIsLoading() to refresh views.
+
+		\details This entry point exists because \c DocumentDecorator
+		is a QML-only type; from QML the user can pass the decorator
+		instance to the C++ controller for the document of interest.
+	*/
+	void setDocumentDecorator(const QString& documentId, QObject* decorator);
+	QObject* getDocumentDecorator(const QString& documentId) const;
+
+	// --- DocumentManagerBase: name providers ---
+
+	void setAutoNamedTypeId(const QString& typeId, bool hasProvider);
+	bool hasDocumentNameProvider(const QString& typeId) const;
+
+	// --- GqlBasedCollectionDocumentManager: GQL transport ---
+
+	void getOpenedDocumentList();
+	void openDocument(const QString& typeId, const QString& documentId);
+	void createDocument(const QString& typeId);
+	void saveDocument(const QString& documentId, const QString& documentName = QString());
+	void closeDocument(const QString& documentId);
+	void doUndo(const QString& documentId, int steps = 1);
+	void doRedo(const QString& documentId, int steps = 1);
+	void resetUndo(const QString& documentId);
+	void getUndoInfo(const QString& documentId);
 
 Q_SIGNALS:
+	// --- Property NOTIFY ---
 	void apiClientChanged(QObject* apiClient);
 	void collectionIdChanged(const QString& collectionId);
-	void documentIdChanged(const QString& documentId);
-	void documentNameChanged(const QString& documentName);
-	void documentDescriptionChanged(const QString& documentDescription);
-	void typeIdChanged(const QString& typeId);
-	void hasRemoteChangesChanged(bool hasRemoteChanges);
-	void documentModelChanged();
+	void documentManagerActiveViewChanged();
+	void documentTypeEditorsChanged();
+	void openedDocumentIdsChanged();
 
-	void saved(const QString& id, const QString& name);
-	void error(const QString& message, const QString& type);
-	void modelChanged();
+	// --- Mirrored from DocumentManagerBase ---
+	void startGetOpenedDocumentList();
+	void openedDocumentListReceived(const QVariant& documentListInfo);
+	void openedDocumentListReceiveFailed(const QString& message);
+
+	void startOpenDocument(const QString& documentId, const QString& typeId);
+	void documentOpened(const QString& documentId, const QString& typeId);
+	void openDocumentFailed(const QString& documentId, const QString& message);
+
+	void startCloseDocument(const QString& documentId);
+	void documentClosed(const QString& documentId);
+	void closeDocumentFailed(const QString& documentId, const QString& message);
+
+	void startSaveDocument(const QString& documentId);
+	void saveDocumentFailed(const QString& documentId, const QString& message);
+	void documentSaved(const QString& documentId);
+
+	void startCreateDocument(const QString& typeId);
+	void createDocumentFailed(const QString& typeId, const QString& message);
+	void documentCreated(const QString& documentId, const QString& typeId);
+
+	void startUndo(const QString& documentId, int steps);
+	void undoDone(const QString& documentId);
+	void undoFailed(const QString& documentId, const QString& message);
+
+	void startRedo(const QString& documentId, int steps);
+	void redoDone(const QString& documentId);
+	void redoFailed(const QString& documentId, const QString& message);
+
+	void startResetUndo(const QString& documentId);
+	void resetUndoDone(const QString& documentId);
+	void resetUndoFailed(const QString& documentId, const QString& message);
+
+	void requestDocumentName(const QString& documentId, const QString& typeId);
+	void documentNameChanged(const QString& documentId, const QString& oldName, const QString& newName);
+	void documentIsDirtyChanged(const QString& documentId, bool isDirty);
+
+	void startUndoInfoReceive(const QString& documentId);
+	void undoInfoReceived(const QString& documentId, int availableUndoSteps, int availableRedoSteps, bool isDirty);
+	void undoInfoReceiveFailed(const QString& documentId, const QString& message);
+
+	void documentManagerChanged(
+			const QString& typeOperation,
+			const QString& objectId,
+			const QString& documentId,
+			const QString& documentName);
+	void documentDataLoaded(const QString& documentId);
+	void startUpdateRepresentation(const QString& documentId, const QVariant& representation);
+	void documentRepresentationUpdated(const QString& documentId, const QVariant& representation);
+	void documentGuiUpdated(const QString& documentId, const QVariant& representation);
+
+	void tryCloseDirtyDocument(const QString& documentId, const QJSValue& callback);
+
+	void documentViewRegistered(const QString& typeId, const QString& viewTypeId);
+
+	void documentAlreadyOpened(const QString& documentId, const QString& typeId);
 
 private:
+	struct FViewEntry
+	{
+		QString viewTypeId;
+		QPointer<QObject> viewEditorComp;
+		QPointer<QObject> representationControllerComp;
+	};
+
+	struct FOpenedDocument
+	{
+		QString id;
+		QString typeId;
+		QString name;
+		QString objectId;
+		bool isDirty = false;
+		bool isNew = true;
+		bool isLoading = false;
+		bool isClosing = false;
+		QHash<QString, QPointer<QObject>> views;
+		QPointer<QObject> documentDecorator;
+	};
+
 	CGqlClientBridge* ResolveBridge() const;
+
+	// Internal helpers (DocumentManagerBase __internal.*)
+	void CreateDocumentDataInternal(const QString& id, const QString& typeId, bool isNew);
+	void RemoveDocumentDataInternal(const QString& documentId);
+	int  IndexOfDocument(const QString& documentId) const;
 
 	QObject* m_apiClient = nullptr;
 	QString m_collectionId;
-	QString m_documentId;
-	QString m_documentName;
-	QString m_documentDescription;
-	QString m_typeId;
-	bool m_hasRemoteChanges = false;
-	QVariant m_documentModel;
+
+	QList<FOpenedDocument>             m_openedDocuments;
+	QHash<QString, QList<FViewEntry>>  m_documentTypeEditors;
+	QHash<QString, QString>            m_cachedDocumentNames;
+	QHash<QString, bool>               m_autoNamedTypeIds;
+	QPointer<QObject>                  m_documentManagerActiveView;
 };
 
 
