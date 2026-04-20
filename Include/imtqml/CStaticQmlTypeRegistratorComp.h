@@ -10,6 +10,9 @@ namespace imtqml
 {
 
 
+class CGqlClientBridge;
+
+
 /**
 	\brief This component registrates all types of the imtqml module for QQmlEngine.
 	\details Registers the following types:
@@ -19,12 +22,11 @@ namespace imtqml
 			\c imtqml::CRemoteFileController as \b com.imtcore.imtqml.1.0.RemoteFileController
 			\c imtqml::FileIO as \b com.imtcore.imtqml.1.0.FileIO
 			\c imtqml::CQmlProcess as \b com.imtcore.imtqml.1.0.Process
-			\c imtqml::CCollectionDataController as \b com.imtcore.imtqml.1.0.CollectionDataControllerBase
-			\c imtqml::CDocumentDataController as \b com.imtcore.imtqml.1.0.DocumentDataControllerBase
 			\c imtqml::CGqlBasedCollectionDataController as \b com.imtcore.imtqml.1.0.GqlBasedCollectionDataController
 			\c imtqml::CGqlDocumentDataController as \b com.imtcore.imtqml.1.0.GqlDocumentDataController
-		\a singletone types
+		\a singleton types
 			\c imtqml::CNetworkEventInterceptor as \b com.imtcore.imtqml.1.0.NetworkEventInterceptor
+			\c imtqml::CGqlClientBridge as \b com.imtcore.imtqml.1.0.GqlClientBridge
 
 	\sa imtqml::CGqlModel
 	\sa imtqml::CGqlRequest
@@ -32,7 +34,9 @@ namespace imtqml
 	\sa imtqml::FileIO
 	\sa imtqml::CQmlProcess
 	\sa imtqml::CNetworkEventInterceptor
-	\sa imtqml::CNetworkEventInterceptor::Instance()
+	\sa imtqml::CGqlClientBridge
+	\sa imtqml::CGqlBasedCollectionDataController
+	\sa imtqml::CGqlDocumentDataController
 
 	\note It is not appropriate to create multiple instances. Modules will be initialized only after first instance of this component has been created.
 	\note This component MUST be initialized \b before application loop will starts. I.e. BEFORE \c qApp->exec();
@@ -51,10 +55,9 @@ public:
 		I_ASSIGN(m_registerFileIOAttrPtr, "RegisterFileIO", "If enabled, a FileIO will be registered for as QML type", true, true)
 		I_ASSIGN(m_registerCQmlProcessAttrPtr, "RegisterCQmlProcess", "If enabled, a CQmlProcess will be registered for as QML type", true, true)
 		I_ASSIGN(m_registerCNetworkEventInterceptorAttrPtr, "RegisterCNetworkEventInterceptor", "If enabled, a CNetworkEventInterceptor will be registered for as QML type", true, true)
-		I_ASSIGN(m_registerCCollectionDataControllerAttrPtr, "RegisterCCollectionDataController", "If enabled, a CCollectionDataController will be registered as QML type", true, true)
-		I_ASSIGN(m_registerCDocumentDataControllerAttrPtr, "RegisterCDocumentDataController", "If enabled, a CDocumentDataController will be registered as QML type", true, true)
 		I_ASSIGN(m_registerCGqlBasedCollectionDataControllerAttrPtr, "RegisterCGqlBasedCollectionDataController", "If enabled, a CGqlBasedCollectionDataController will be registered as QML type", true, true)
 		I_ASSIGN(m_registerCGqlDocumentDataControllerAttrPtr, "RegisterCGqlDocumentDataController", "If enabled, a CGqlDocumentDataController will be registered as QML type", true, true)
+		I_ASSIGN(m_registerCGqlClientBridgeAttrPtr, "RegisterCGqlClientBridge", "If enabled, a CGqlClientBridge will be registered as QML singleton", true, true)
 	I_END_COMPONENT
 
 protected:
@@ -68,10 +71,9 @@ private:
 	I_ATTR(bool, m_registerFileIOAttrPtr);
 	I_ATTR(bool, m_registerCQmlProcessAttrPtr);
 	I_ATTR(bool, m_registerCNetworkEventInterceptorAttrPtr);
-	I_ATTR(bool, m_registerCCollectionDataControllerAttrPtr);
-	I_ATTR(bool, m_registerCDocumentDataControllerAttrPtr);
 	I_ATTR(bool, m_registerCGqlBasedCollectionDataControllerAttrPtr);
 	I_ATTR(bool, m_registerCGqlDocumentDataControllerAttrPtr);
+	I_ATTR(bool, m_registerCGqlClientBridgeAttrPtr);
 
 	static bool s_isInitialized;
 
@@ -80,8 +82,3 @@ private:
 
 
 } // namespace imtqml
-
-
-
-
-

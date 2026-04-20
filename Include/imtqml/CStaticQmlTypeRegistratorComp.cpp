@@ -3,13 +3,14 @@
 
 
 // Qt includes
-#include<QtQml/qqml.h>
+#include <QtQml/qqml.h>
+#include <QtQml/QQmlEngine>
+#include <QtQml/QJSEngine>
 
 // ImtCore includes
-#include <imtqml/CCollectionDataController.h>
-#include <imtqml/CDocumentDataController.h>
 #include <imtqml/CFileIO.h>
 #include <imtqml/CGqlBasedCollectionDataController.h>
+#include <imtqml/CGqlClientBridge.h>
 #include <imtqml/CGqlDocumentDataController.h>
 #include <imtqml/CGqlModel.h>
 #include <imtqml/CGqlRequest.h>
@@ -59,17 +60,26 @@ void CStaticQmlTypeRegistratorComp::OnComponentCreated()
 	if (!m_registerCNetworkEventInterceptorAttrPtr.IsValid() || *m_registerCNetworkEventInterceptorAttrPtr){
 		qmlRegisterSingletonInstance<imtqml::CNetworkEventInterceptor>("com.imtcore.imtqml", 1, 0, "NetworkEventInterceptor", imtqml::CNetworkEventInterceptor::Instance());
 	}
-	if (!m_registerCCollectionDataControllerAttrPtr.IsValid() || *m_registerCCollectionDataControllerAttrPtr){
-		qmlRegisterType<imtqml::CCollectionDataController>("com.imtcore.imtqml", 1, 0, "CollectionDataControllerBase");
-	}
-	if (!m_registerCDocumentDataControllerAttrPtr.IsValid() || *m_registerCDocumentDataControllerAttrPtr){
-		qmlRegisterType<imtqml::CDocumentDataController>("com.imtcore.imtqml", 1, 0, "DocumentDataControllerBase");
-	}
 	if (!m_registerCGqlBasedCollectionDataControllerAttrPtr.IsValid() || *m_registerCGqlBasedCollectionDataControllerAttrPtr){
 		qmlRegisterType<imtqml::CGqlBasedCollectionDataController>("com.imtcore.imtqml", 1, 0, "GqlBasedCollectionDataController");
 	}
 	if (!m_registerCGqlDocumentDataControllerAttrPtr.IsValid() || *m_registerCGqlDocumentDataControllerAttrPtr){
 		qmlRegisterType<imtqml::CGqlDocumentDataController>("com.imtcore.imtqml", 1, 0, "GqlDocumentDataController");
+	}
+	if (!m_registerCGqlClientBridgeAttrPtr.IsValid() || *m_registerCGqlClientBridgeAttrPtr){
+		// The bridge is created via icomp (so that the IGqlClient
+		// reference can be injected via I_REF). Expose the latest
+		// instance as a QML singleton via a callback so that the
+		// engine resolves it lazily, after icomp wiring has run.
+		qmlRegisterSingletonType<imtqml::CGqlClientBridge>(
+				"com.imtcore.imtqml", 1, 0, "GqlClientBridge",
+				[](QQmlEngine* /*engine*/, QJSEngine* /*scriptEngine*/) -> QObject* {
+					imtqml::CGqlClientBridge* instancePtr = imtqml::CGqlClientBridge::Instance();
+					if (instancePtr != nullptr){
+						QQmlEngine::setObjectOwnership(instancePtr, QQmlEngine::CppOwnership);
+					}
+					return instancePtr;
+				});
 	}
 }
 

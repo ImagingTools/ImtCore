@@ -2,75 +2,118 @@
 #pragma once
 
 
-// ImtCore includes
-#include <imtqml/CDocumentDataController.h>
+// Qt includes
+#include <QtCore/QObject>
+#include <QtCore/QString>
+#include <QtCore/QVariant>
 
 
 namespace imtqml
 {
 
 
-class CGqlRequest;
+class CGqlClientBridge;
 
 
 /**
 	C++ analog of the QML \c GqlDocumentDataController
-	(see \c Qml/imtdocgui/GqlDocumentDataController.qml and the related
-	\c Qml/imtguigql/GqlRequestDocumentDataController.qml).
+	(see \c Qml/imtdocgui/GqlDocumentDataController.qml).
 
-	The controller provides three GraphQL operations — \c get, \c add and
-	\c update — for a single document identified by \c documentId. The
-	GraphQL command identifiers are exposed as plain string properties so
-	they can be set once from QML or from a C++ subclass.
+	\details
+	The controller is a thin \c QObject facade over the SDL-generated
+	request classes from \c Sdl/imtbase/1.0/CollectionDocumentManager.sdl
+	(\c CCreateNewDocumentGqlRequest, \c COpenDocumentGqlRequest,
+	\c CSaveDocumentGqlRequest). Every operation is dispatched
+	asynchronously through \c QtConcurrent::run via
+	\c CGqlClientBridge::SendSdlRequest(); resulting signals are always
+	re-emitted on the GUI thread via \c QMetaObject::invokeMethod with
+	\c Qt::QueuedConnection.
+
+	A \c collectionId property is required because the
+	\c CollectionDocumentManager schema scopes every operation to a
+	collection.
 
 	The class is registered to QML by \c CStaticQmlTypeRegistratorComp
 	under \c com.imtcore.imtqml 1.0 as \c GqlDocumentDataController.
 */
-class CGqlDocumentDataController: public CDocumentDataController
+class CGqlDocumentDataController: public QObject
 {
 	Q_OBJECT
-
-	Q_PROPERTY(QVariantMap headers READ GetHeaders WRITE SetHeaders NOTIFY headersChanged)
-
-	Q_PROPERTY(QString gqlGetCommandId MEMBER m_gqlGetCommandId NOTIFY gqlGetCommandIdChanged)
-	Q_PROPERTY(QString gqlAddCommandId MEMBER m_gqlAddCommandId NOTIFY gqlAddCommandIdChanged)
-	Q_PROPERTY(QString gqlUpdateCommandId MEMBER m_gqlUpdateCommandId NOTIFY gqlUpdateCommandIdChanged)
+	Q_PROPERTY(QObject* apiClient READ GetApiClient WRITE SetApiClient NOTIFY apiClientChanged)
+	Q_PROPERTY(QString collectionId READ GetCollectionId WRITE SetCollectionId NOTIFY collectionIdChanged)
+	Q_PROPERTY(QString documentId READ GetDocumentId WRITE SetDocumentId NOTIFY documentIdChanged)
+	Q_PROPERTY(QString documentName READ GetDocumentName WRITE SetDocumentName NOTIFY documentNameChanged)
+	Q_PROPERTY(QString documentDescription READ GetDocumentDescription WRITE SetDocumentDescription NOTIFY documentDescriptionChanged)
+	Q_PROPERTY(QString typeId READ GetTypeId WRITE SetTypeId NOTIFY typeIdChanged)
+	Q_PROPERTY(bool hasRemoteChanges READ GetHasRemoteChanges WRITE SetHasRemoteChanges NOTIFY hasRemoteChangesChanged)
+	Q_PROPERTY(QVariant documentModel READ GetDocumentModel WRITE SetDocumentModel NOTIFY documentModelChanged)
 
 public:
-	typedef CDocumentDataController BaseClass;
+	typedef QObject BaseClass;
 
 	explicit CGqlDocumentDataController(QObject* parent = nullptr);
 	~CGqlDocumentDataController() override;
 
-	const QVariantMap& GetHeaders() const;
-	void SetHeaders(const QVariantMap& headers);
+	QObject* GetApiClient() const;
+	void SetApiClient(QObject* apiClient);
+
+	const QString& GetCollectionId() const;
+	void SetCollectionId(const QString& id);
+
+	const QString& GetDocumentId() const;
+	void SetDocumentId(const QString& id);
+
+	const QString& GetDocumentName() const;
+	void SetDocumentName(const QString& name);
+
+	const QString& GetDocumentDescription() const;
+	void SetDocumentDescription(const QString& description);
+
+	const QString& GetTypeId() const;
+	void SetTypeId(const QString& typeId);
+
+	bool GetHasRemoteChanges() const;
+	void SetHasRemoteChanges(bool value);
+
+	const QVariant& GetDocumentModel() const;
+	void SetDocumentModel(const QVariant& model);
 
 public Q_SLOTS:
-	// reimplemented (CDocumentDataController)
-	void updateDocumentModel() override;
-	void insertDocument() override;
-	void saveDocument() override;
+	QString getDocumentId() const;
+	QString getDocumentName() const;
+	QString getDocumentTypeId() const;
+	QVariant getDocumentModel() const;
+	QString getDocumentDescription() const;
+
+	void updateDocumentModel();
+	void insertDocument();
+	void saveDocument();
 
 Q_SIGNALS:
-	void headersChanged(const QVariantMap& headers);
-	void gqlGetCommandIdChanged(const QString& commandId);
-	void gqlAddCommandIdChanged(const QString& commandId);
-	void gqlUpdateCommandIdChanged(const QString& commandId);
+	void apiClientChanged(QObject* apiClient);
+	void collectionIdChanged(const QString& collectionId);
+	void documentIdChanged(const QString& documentId);
+	void documentNameChanged(const QString& documentName);
+	void documentDescriptionChanged(const QString& documentDescription);
+	void typeIdChanged(const QString& typeId);
+	void hasRemoteChangesChanged(bool hasRemoteChanges);
+	void documentModelChanged();
+
+	void saved(const QString& id, const QString& name);
+	void error(const QString& message, const QString& type);
+	void modelChanged();
 
 private:
-	enum class OperationKind {
-		Get,
-		Add,
-		Update,
-	};
+	CGqlClientBridge* ResolveBridge() const;
 
-	void Dispatch(OperationKind kind, const QString& operation, const QString& commandId, const QVariantMap& inputArgs, const QString& selection);
-	void HandleReplyState(OperationKind kind, const QString& commandId, CGqlRequest* request, const QString& state);
-
-	QVariantMap m_headers;
-	QString m_gqlGetCommandId;
-	QString m_gqlAddCommandId;
-	QString m_gqlUpdateCommandId;
+	QObject* m_apiClient = nullptr;
+	QString m_collectionId;
+	QString m_documentId;
+	QString m_documentName;
+	QString m_documentDescription;
+	QString m_typeId;
+	bool m_hasRemoteChanges = false;
+	QVariant m_documentModel;
 };
 
 

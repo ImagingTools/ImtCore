@@ -3,179 +3,45 @@
 
 
 // Qt includes
+#include <QtCore/QCoreApplication>
 #include <QtCore/QDebug>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonDocument>
-#include <QtCore/QJsonObject>
-#include <QtCore/QStringList>
+#include <QtCore/QPointer>
+#include <QtConcurrent/QtConcurrentRun>
 
 // ImtCore includes
-#include <imtqml/CGqlRequest.h>
+#include <imtqml/CGqlClientBridge.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/CollectionDocumentManager.h>
 
 
 namespace imtqml
 {
 
 
+namespace docmgr = sdl::imtbase::CollectionDocumentManager;
+
+
 namespace
 {
 
 
-bool ExtractError(const QJsonDocument& doc, QString& message, QString& type)
+template<class Fn>
+void PostToMainThread(Fn&& fn)
 {
-	if (!doc.isObject()) {
-		return false;
+	QCoreApplication* appPtr = QCoreApplication::instance();
+	if (appPtr == nullptr){
+		return;
 	}
-
-	const QJsonValue errorsValue = doc.object().value(QStringLiteral("errors"));
-	if (!errorsValue.isArray()) {
-		return false;
-	}
-
-	const QJsonArray errors = errorsValue.toArray();
-	if (errors.isEmpty()) {
-		message = QStringLiteral("Unknown error");
-		type = QStringLiteral("Error");
-		return true;
-	}
-
-	const QJsonObject first = errors.first().toObject();
-	message = first.value(QStringLiteral("message")).toString();
-	const QJsonObject extensions = first.value(QStringLiteral("extensions")).toObject();
-	type = extensions.value(QStringLiteral("type")).toString();
-	return true;
-}
-
-
-QVariantMap ExtractDataMap(const QJsonDocument& doc, const QString& commandId)
-{
-	if (!doc.isObject()) {
-		return {};
-	}
-	const QJsonValue dataValue = doc.object().value(QStringLiteral("data"));
-	if (!dataValue.isObject()) {
-		return {};
-	}
-	return dataValue.toObject().value(commandId).toVariant().toMap();
-}
-
-
-QString EscapeGqlString(const QString& s)
-{
-	QString out;
-	out.reserve(s.size() + 2);
-	out.append(QLatin1Char('"'));
-	for (QChar c : s) {
-		ushort u = c.unicode();
-		switch (u) {
-			case '"':  out.append(QLatin1String("\\\"")); break;
-			case '\\': out.append(QLatin1String("\\\\")); break;
-			case '\b': out.append(QLatin1String("\\b"));  break;
-			case '\f': out.append(QLatin1String("\\f"));  break;
-			case '\n': out.append(QLatin1String("\\n"));  break;
-			case '\r': out.append(QLatin1String("\\r"));  break;
-			case '\t': out.append(QLatin1String("\\t"));  break;
-			default:
-				if (u < 0x20) {
-					out.append(QStringLiteral("\\u%1").arg(u, 4, 16, QLatin1Char('0')));
-				} else {
-					out.append(c);
-				}
-				break;
-		}
-	}
-	out.append(QLatin1Char('"'));
-	return out;
-}
-
-
-QString ToGqlLiteral(const QVariant& value)
-{
-	if (!value.isValid() || value.isNull()) {
-		return QStringLiteral("null");
-	}
-
-	switch (static_cast<QMetaType::Type>(value.userType())) {
-		case QMetaType::Bool:
-			return value.toBool() ? QStringLiteral("true") : QStringLiteral("false");
-
-		case QMetaType::Int:
-		case QMetaType::UInt:
-		case QMetaType::LongLong:
-		case QMetaType::ULongLong:
-		case QMetaType::Short:
-		case QMetaType::UShort:
-		case QMetaType::Long:
-		case QMetaType::ULong:
-			return value.toString();
-
-		case QMetaType::Float:
-		case QMetaType::Double:
-			return QString::number(value.toDouble(), 'g', 17);
-
-		case QMetaType::QString:
-		case QMetaType::QByteArray:
-		case QMetaType::QChar:
-			return EscapeGqlString(value.toString());
-
-		case QMetaType::QVariantList:
-		case QMetaType::QStringList: {
-			const QVariantList list = value.toList();
-			QStringList parts;
-			parts.reserve(list.size());
-			for (const QVariant& item : list) {
-				parts.append(ToGqlLiteral(item));
-			}
-			return QLatin1Char('[') + parts.join(QLatin1Char(',')) + QLatin1Char(']');
-		}
-
-		case QMetaType::QVariantMap: {
-			const QVariantMap map = value.toMap();
-			QStringList parts;
-			parts.reserve(map.size());
-			for (auto it = map.constBegin(); it != map.constEnd(); ++it) {
-				parts.append(it.key() + QLatin1Char(':') + ToGqlLiteral(it.value()));
-			}
-			return QLatin1Char('{') + parts.join(QLatin1Char(',')) + QLatin1Char('}');
-		}
-
-		default:
-			break;
-	}
-
-	const QJsonDocument fallback = QJsonDocument::fromVariant(value);
-	if (!fallback.isNull()) {
-		return QString::fromUtf8(fallback.toJson(QJsonDocument::Compact));
-	}
-	return EscapeGqlString(value.toString());
-}
-
-
-QString BuildGqlRequest(
-			const QString& operation,
-			const QString& commandId,
-			const QVariantMap& inputArgs,
-			const QString& selection)
-{
-	QString args;
-	if (!inputArgs.isEmpty()) {
-		args = QStringLiteral("(input:") + ToGqlLiteral(QVariant(inputArgs)) + QLatin1Char(')');
-	}
-
-	const QString selectionPart = selection.isEmpty()
-			? QString()
-			: (QLatin1Char(' ') + selection);
-
-	return operation + QLatin1Char(' ') + commandId
-			+ QStringLiteral(" { ") + commandId + args + selectionPart + QStringLiteral(" }");
+	QMetaObject::invokeMethod(appPtr, std::forward<Fn>(fn), Qt::QueuedConnection);
 }
 
 
 } // namespace
 
 
+// public methods
+
 CGqlDocumentDataController::CGqlDocumentDataController(QObject* parent)
-	: BaseClass(parent)
+	:BaseClass(parent)
 {
 }
 
@@ -183,143 +49,349 @@ CGqlDocumentDataController::CGqlDocumentDataController(QObject* parent)
 CGqlDocumentDataController::~CGqlDocumentDataController() = default;
 
 
-const QVariantMap& CGqlDocumentDataController::GetHeaders() const
+QObject* CGqlDocumentDataController::GetApiClient() const
 {
-	return m_headers;
+	return m_apiClient;
 }
 
 
-void CGqlDocumentDataController::SetHeaders(const QVariantMap& headers)
+void CGqlDocumentDataController::SetApiClient(QObject* apiClient)
 {
-	if (m_headers != headers) {
-		m_headers = headers;
-		Q_EMIT headersChanged(m_headers);
+	if (m_apiClient != apiClient){
+		m_apiClient = apiClient;
+		Q_EMIT apiClientChanged(m_apiClient);
 	}
 }
 
 
-void CGqlDocumentDataController::HandleReplyState(OperationKind kind, const QString& commandId, CGqlRequest* request, const QString& state)
+const QString& CGqlDocumentDataController::GetCollectionId() const
 {
-	if (state != QLatin1String("Ready") && state != QLatin1String("Error")) {
-		return;
+	return m_collectionId;
+}
+
+
+void CGqlDocumentDataController::SetCollectionId(const QString& id)
+{
+	if (m_collectionId != id){
+		m_collectionId = id;
+		Q_EMIT collectionIdChanged(m_collectionId);
 	}
+}
 
-	const QString json = request->property("json").toString();
-	request->deleteLater();
 
-	if (state == QLatin1String("Error")) {
-		Q_EMIT error(QStringLiteral("Network error"), QStringLiteral("Critical"));
-		return;
+const QString& CGqlDocumentDataController::GetDocumentId() const
+{
+	return m_documentId;
+}
+
+
+void CGqlDocumentDataController::SetDocumentId(const QString& id)
+{
+	if (m_documentId != id){
+		m_documentId = id;
+		Q_EMIT documentIdChanged(m_documentId);
 	}
+}
 
-	QJsonParseError parseError{};
-	const QJsonDocument doc = QJsonDocument::fromJson(json.toUtf8(), &parseError);
-	if (parseError.error != QJsonParseError::NoError) {
-		Q_EMIT error(parseError.errorString(), QStringLiteral("Warning"));
-		return;
+
+const QString& CGqlDocumentDataController::GetDocumentName() const
+{
+	return m_documentName;
+}
+
+
+void CGqlDocumentDataController::SetDocumentName(const QString& name)
+{
+	if (m_documentName != name){
+		m_documentName = name;
+		Q_EMIT documentNameChanged(m_documentName);
 	}
+}
 
-	QString message;
-	QString type;
-	if (ExtractError(doc, message, type)) {
-		Q_EMIT error(message, type);
-		return;
+
+const QString& CGqlDocumentDataController::GetDocumentDescription() const
+{
+	return m_documentDescription;
+}
+
+
+void CGqlDocumentDataController::SetDocumentDescription(const QString& description)
+{
+	if (m_documentDescription != description){
+		m_documentDescription = description;
+		Q_EMIT documentDescriptionChanged(m_documentDescription);
 	}
+}
 
-	const QVariantMap payload = ExtractDataMap(doc, commandId);
 
-	switch (kind) {
-		case OperationKind::Get:
-			SetDocumentModel(payload);
-			break;
-		case OperationKind::Add:
-		case OperationKind::Update: {
-			const QString notificationKey = (kind == OperationKind::Add)
-					? QStringLiteral("addedNotification")
-					: QStringLiteral("updatedNotification");
-			const QVariantMap notification = payload.value(notificationKey).toMap();
+const QString& CGqlDocumentDataController::GetTypeId() const
+{
+	return m_typeId;
+}
 
-			const QString resultId = notification.contains(QStringLiteral("id"))
-					? notification.value(QStringLiteral("id")).toString()
-					: GetDocumentId();
-			const QString resultName = notification.value(QStringLiteral("name")).toString();
 
-			Q_EMIT saved(resultId, resultName);
-			break;
+void CGqlDocumentDataController::SetTypeId(const QString& typeId)
+{
+	if (m_typeId != typeId){
+		m_typeId = typeId;
+		Q_EMIT typeIdChanged(m_typeId);
+	}
+}
+
+
+bool CGqlDocumentDataController::GetHasRemoteChanges() const
+{
+	return m_hasRemoteChanges;
+}
+
+
+void CGqlDocumentDataController::SetHasRemoteChanges(bool value)
+{
+	if (m_hasRemoteChanges != value){
+		m_hasRemoteChanges = value;
+		Q_EMIT hasRemoteChangesChanged(m_hasRemoteChanges);
+	}
+}
+
+
+const QVariant& CGqlDocumentDataController::GetDocumentModel() const
+{
+	return m_documentModel;
+}
+
+
+void CGqlDocumentDataController::SetDocumentModel(const QVariant& model)
+{
+	if (m_documentModel != model){
+		m_documentModel = model;
+		Q_EMIT documentModelChanged();
+	}
+}
+
+
+// public slots
+
+QString CGqlDocumentDataController::getDocumentId() const
+{
+	return m_documentId;
+}
+
+
+QString CGqlDocumentDataController::getDocumentName() const
+{
+	return m_documentName;
+}
+
+
+QString CGqlDocumentDataController::getDocumentTypeId() const
+{
+	return m_typeId;
+}
+
+
+QVariant CGqlDocumentDataController::getDocumentModel() const
+{
+	return m_documentModel;
+}
+
+
+QString CGqlDocumentDataController::getDocumentDescription() const
+{
+	return m_documentDescription;
+}
+
+
+// private methods
+
+CGqlClientBridge* CGqlDocumentDataController::ResolveBridge() const
+{
+	if (m_apiClient != nullptr){
+		auto* bridge = qobject_cast<CGqlClientBridge*>(m_apiClient);
+		if (bridge != nullptr){
+			return bridge;
 		}
 	}
+	return CGqlClientBridge::Instance();
 }
 
 
-void CGqlDocumentDataController::Dispatch(
-			OperationKind kind,
-			const QString& operation,
-			const QString& commandId,
-			const QVariantMap& inputArgs,
-			const QString& selection)
-{
-	if (commandId.isEmpty()) {
-		const QString opName = (kind == OperationKind::Get)
-				? QStringLiteral("get")
-				: ((kind == OperationKind::Add)
-						? QStringLiteral("add")
-						: QStringLiteral("update"));
-		qWarning() << "CGqlDocumentDataController: missing GraphQL command id for" << opName;
-		Q_EMIT error(QStringLiteral("Missing GraphQL command id"), QStringLiteral("Critical"));
-		return;
-	}
-
-	auto* request = new CGqlRequest(this);
-	connect(request, &CGqlRequest::stateChanged,
-			this, [this, kind, commandId, request](const QString& state) {
-				HandleReplyState(kind, commandId, request, state);
-			});
-
-	const QString query = BuildGqlRequest(operation, commandId, inputArgs, selection);
-	if (!request->SetGqlQuery(query, m_headers)) {
-		qWarning() << "CGqlDocumentDataController: failed to send GraphQL request" << commandId;
-		Q_EMIT error(QStringLiteral("Failed to send request"), QStringLiteral("Critical"));
-		request->deleteLater();
-	}
-}
-
+// public slots: GQL operations
 
 void CGqlDocumentDataController::updateDocumentModel()
 {
-	QVariantMap input;
-	input.insert(QStringLiteral("id"), GetDocumentId());
-	input.insert(QStringLiteral("typeId"), GetTypeId());
+	CGqlClientBridge* bridge = ResolveBridge();
+	if (bridge == nullptr){
+		Q_EMIT error(QStringLiteral("GQL client bridge is not available"), QStringLiteral("BridgeUnavailable"));
+		return;
+	}
 
-	Dispatch(OperationKind::Get, QStringLiteral("query"),
-			m_gqlGetCommandId, input, QStringLiteral("{ item }"));
+	const QByteArray collectionId = m_collectionId.toUtf8();
+	const QByteArray documentId = m_documentId.toUtf8();
+	QPointer<CGqlDocumentDataController> self(this);
+
+	QtConcurrent::run([self, bridge, collectionId, documentId]{
+		docmgr::OpenDocumentRequestArguments arguments;
+		arguments.input.Version_1_0.Emplace();
+		arguments.input.Version_1_0->collectionId = collectionId;
+		arguments.input.Version_1_0->id = documentId;
+
+		docmgr::CDocumentInfo payload;
+		QString errorMessage;
+		bool ok = bridge->SendSdlRequest<
+				docmgr::OpenDocumentRequestArguments,
+				docmgr::CDocumentInfo,
+				docmgr::COpenDocumentGqlRequest>(arguments, payload, errorMessage);
+
+		if (!ok){
+			const QString msg = errorMessage.isEmpty() ? QStringLiteral("Failed to open document") : errorMessage;
+			PostToMainThread([self, msg]{
+				if (self){
+					Q_EMIT self->error(msg, QStringLiteral("OpenDocumentFailed"));
+				}
+			});
+			return;
+		}
+
+		QString resolvedName;
+		QString resolvedTypeId;
+		if (payload.Version_1_0->documentName.HasValue()){
+			resolvedName = *payload.Version_1_0->documentName;
+		}
+		if (payload.Version_1_0->objectTypeId.HasValue()){
+			resolvedTypeId = QString::fromUtf8(*payload.Version_1_0->objectTypeId);
+		}
+
+		PostToMainThread([self, resolvedName, resolvedTypeId]{
+			if (!self){
+				return;
+			}
+			self->SetDocumentName(resolvedName);
+			self->SetTypeId(resolvedTypeId);
+			Q_EMIT self->modelChanged();
+		});
+	});
 }
 
 
 void CGqlDocumentDataController::insertDocument()
 {
-	QVariantMap input;
-	input.insert(QStringLiteral("id"), GetDocumentId());
-	input.insert(QStringLiteral("item"), GetDocumentModel());
-	input.insert(QStringLiteral("typeId"), GetTypeId());
-	input.insert(QStringLiteral("name"), GetDocumentName());
-	input.insert(QStringLiteral("description"), GetDocumentDescription());
+	CGqlClientBridge* bridge = ResolveBridge();
+	if (bridge == nullptr){
+		Q_EMIT error(QStringLiteral("GQL client bridge is not available"), QStringLiteral("BridgeUnavailable"));
+		return;
+	}
 
-	Dispatch(OperationKind::Add, QStringLiteral("mutation"),
-			m_gqlAddCommandId, input, QStringLiteral("{ addedNotification { id name } }"));
+	const QByteArray collectionId = m_collectionId.toUtf8();
+	const QByteArray typeId = m_typeId.toUtf8();
+	QPointer<CGqlDocumentDataController> self(this);
+
+	QtConcurrent::run([self, bridge, collectionId, typeId]{
+		docmgr::CreateNewDocumentRequestArguments arguments;
+		arguments.input.Version_1_0.Emplace();
+		arguments.input.Version_1_0->collectionId = collectionId;
+		arguments.input.Version_1_0->typeId = typeId;
+
+		docmgr::CDocumentInfo payload;
+		QString errorMessage;
+		bool ok = bridge->SendSdlRequest<
+				docmgr::CreateNewDocumentRequestArguments,
+				docmgr::CDocumentInfo,
+				docmgr::CCreateNewDocumentGqlRequest>(arguments, payload, errorMessage);
+
+		if (!ok || !payload.Version_1_0->documentId.HasValue()){
+			const QString msg = errorMessage.isEmpty() ? QStringLiteral("Failed to create document") : errorMessage;
+			PostToMainThread([self, msg]{
+				if (self){
+					Q_EMIT self->error(msg, QStringLiteral("CreateNewDocumentFailed"));
+				}
+			});
+			return;
+		}
+
+		const QString newId = QString::fromUtf8(*payload.Version_1_0->documentId);
+		QString newName;
+		if (payload.Version_1_0->documentName.HasValue()){
+			newName = *payload.Version_1_0->documentName;
+		}
+
+		PostToMainThread([self, newId, newName]{
+			if (!self){
+				return;
+			}
+			self->SetDocumentId(newId);
+			if (!newName.isEmpty()){
+				self->SetDocumentName(newName);
+			}
+			Q_EMIT self->saved(newId, newName.isEmpty() ? self->GetDocumentName() : newName);
+		});
+	});
 }
 
 
 void CGqlDocumentDataController::saveDocument()
 {
-	QVariantMap input;
-	input.insert(QStringLiteral("id"), GetDocumentId());
-	input.insert(QStringLiteral("item"), GetDocumentModel());
-	input.insert(QStringLiteral("typeId"), GetTypeId());
-	input.insert(QStringLiteral("name"), GetDocumentName());
-	input.insert(QStringLiteral("description"), GetDocumentDescription());
+	CGqlClientBridge* bridge = ResolveBridge();
+	if (bridge == nullptr){
+		Q_EMIT error(QStringLiteral("GQL client bridge is not available"), QStringLiteral("BridgeUnavailable"));
+		return;
+	}
 
-	Dispatch(OperationKind::Update, QStringLiteral("mutation"),
-			m_gqlUpdateCommandId, input, QStringLiteral("{ updatedNotification { id name } }"));
+	const QByteArray collectionId = m_collectionId.toUtf8();
+	const QByteArray documentId = m_documentId.toUtf8();
+	const QString documentIdStr = m_documentId;
+	const QString documentName = m_documentName;
+	QPointer<CGqlDocumentDataController> self(this);
+
+	QtConcurrent::run([self, bridge, collectionId, documentId, documentIdStr, documentName]{
+		docmgr::SaveDocumentRequestArguments arguments;
+		arguments.input.Version_1_0.Emplace();
+		arguments.input.Version_1_0->collectionId = collectionId;
+		arguments.input.Version_1_0->documentId = documentId;
+		arguments.input.Version_1_0->documentName = documentName;
+
+		docmgr::CDocumentOperationStatus payload;
+		QString errorMessage;
+		bool ok = bridge->SendSdlRequest<
+				docmgr::SaveDocumentRequestArguments,
+				docmgr::CDocumentOperationStatus,
+				docmgr::CSaveDocumentGqlRequest>(arguments, payload, errorMessage);
+
+		if (!ok){
+			const QString msg = errorMessage.isEmpty() ? QStringLiteral("Failed to save document") : errorMessage;
+			PostToMainThread([self, msg]{
+				if (self){
+					Q_EMIT self->error(msg, QStringLiteral("SaveDocumentFailed"));
+				}
+			});
+			return;
+		}
+
+		const bool isSuccess = payload.Version_1_0->status.HasValue()
+				&& *payload.Version_1_0->status == docmgr::EDocumentOperationStatus::Success;
+		if (!isSuccess){
+			QString msg = QStringLiteral("Save document failed");
+			if (payload.Version_1_0->message.HasValue()){
+				msg = *payload.Version_1_0->message;
+			}
+			PostToMainThread([self, msg]{
+				if (self){
+					Q_EMIT self->error(msg, QStringLiteral("SaveDocumentFailed"));
+				}
+			});
+			return;
+		}
+
+		QString resolvedName = documentName;
+		if (payload.Version_1_0->documentName.HasValue()){
+			resolvedName = *payload.Version_1_0->documentName;
+		}
+
+		PostToMainThread([self, documentIdStr, resolvedName]{
+			if (self){
+				Q_EMIT self->saved(documentIdStr, resolvedName);
+			}
+		});
+	});
 }
 
 

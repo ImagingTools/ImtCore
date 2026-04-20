@@ -3,182 +3,88 @@
 
 
 // Qt includes
+#include <QtCore/QCoreApplication>
 #include <QtCore/QDebug>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonDocument>
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonValue>
+#include <QtCore/QPointer>
 #include <QtCore/QStringList>
+#include <QtConcurrent/QtConcurrentRun>
 
 // ImtCore includes
-#include <imtqml/CGqlRequest.h>
+#include <imtqml/CGqlClientBridge.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
 
 
 namespace imtqml
 {
 
 
+namespace imtcoll = sdl::imtbase::ImtCollection;
+
+
 namespace
 {
 
 
-bool ExtractError(const QJsonDocument& doc, QString& message, QString& type)
+/**
+	Schedule a callable on the GUI thread. The receiver is the global
+	\c QCoreApplication instance (essentially app-lifetime), so the post
+	itself never races with object destruction; the callable is expected
+	to validate the \c QPointer it captured before touching the
+	controller.
+*/
+template<class Fn>
+void PostToMainThread(Fn&& fn)
 {
-	if (!doc.isObject()) {
-		return false;
+	QCoreApplication* appPtr = QCoreApplication::instance();
+	if (appPtr == nullptr){
+		return;
 	}
-
-	const QJsonValue errorsValue = doc.object().value(QStringLiteral("errors"));
-	if (!errorsValue.isArray()) {
-		return false;
-	}
-
-	const QJsonArray errors = errorsValue.toArray();
-	if (errors.isEmpty()) {
-		message = QStringLiteral("Unknown error");
-		type = QStringLiteral("Error");
-		return true;
-	}
-
-	const QJsonObject first = errors.first().toObject();
-	message = first.value(QStringLiteral("message")).toString();
-	const QJsonObject extensions = first.value(QStringLiteral("extensions")).toObject();
-	type = extensions.value(QStringLiteral("type")).toString();
-	return true;
+	QMetaObject::invokeMethod(appPtr, std::forward<Fn>(fn), Qt::QueuedConnection);
 }
 
 
-QVariant ExtractData(const QJsonDocument& doc, const QString& commandId)
+QByteArrayList VariantToByteArrayList(const QVariant& value)
 {
-	if (!doc.isObject()) {
-		return QVariant();
-	}
-
-	const QJsonValue dataValue = doc.object().value(QStringLiteral("data"));
-	if (!dataValue.isObject()) {
-		return QVariant();
-	}
-
-	return dataValue.toObject().value(commandId).toVariant();
-}
-
-
-QString EscapeGqlString(const QString& s)
-{
-	QString out;
-	out.reserve(s.size() + 2);
-	out.append(QLatin1Char('"'));
-	for (QChar c : s) {
-		ushort u = c.unicode();
-		switch (u) {
-			case '"':  out.append(QLatin1String("\\\"")); break;
-			case '\\': out.append(QLatin1String("\\\\")); break;
-			case '\b': out.append(QLatin1String("\\b"));  break;
-			case '\f': out.append(QLatin1String("\\f"));  break;
-			case '\n': out.append(QLatin1String("\\n"));  break;
-			case '\r': out.append(QLatin1String("\\r"));  break;
-			case '\t': out.append(QLatin1String("\\t"));  break;
-			default:
-				if (u < 0x20) {
-					out.append(QStringLiteral("\\u%1").arg(u, 4, 16, QLatin1Char('0')));
-				} else {
-					out.append(c);
-				}
-				break;
+	QByteArrayList result;
+	if (value.canConvert<QVariantList>()){
+		const QVariantList list = value.toList();
+		result.reserve(list.size());
+		for (const QVariant& item : list){
+			result.append(item.toString().toUtf8());
 		}
 	}
-	out.append(QLatin1Char('"'));
-	return out;
+	else if (value.canConvert<QStringList>()){
+		const QStringList list = value.toStringList();
+		result.reserve(list.size());
+		for (const QString& item : list){
+			result.append(item.toUtf8());
+		}
+	}
+	else if (!value.toString().isEmpty()){
+		result.append(value.toString().toUtf8());
+	}
+	return result;
 }
 
 
-QString ToGqlLiteral(const QVariant& value)
+QVariantList ByteArrayListToVariantList(const QByteArrayList& list)
 {
-	if (!value.isValid() || value.isNull()) {
-		return QStringLiteral("null");
+	QVariantList result;
+	result.reserve(list.size());
+	for (const QByteArray& item : list){
+		result.append(QString::fromUtf8(item));
 	}
-
-	switch (static_cast<QMetaType::Type>(value.userType())) {
-		case QMetaType::Bool:
-			return value.toBool() ? QStringLiteral("true") : QStringLiteral("false");
-
-		case QMetaType::Int:
-		case QMetaType::UInt:
-		case QMetaType::LongLong:
-		case QMetaType::ULongLong:
-		case QMetaType::Short:
-		case QMetaType::UShort:
-		case QMetaType::Long:
-		case QMetaType::ULong:
-			return value.toString();
-
-		case QMetaType::Float:
-		case QMetaType::Double:
-			return QString::number(value.toDouble(), 'g', 17);
-
-		case QMetaType::QString:
-		case QMetaType::QByteArray:
-		case QMetaType::QChar:
-			return EscapeGqlString(value.toString());
-
-		case QMetaType::QVariantList:
-		case QMetaType::QStringList: {
-			const QVariantList list = value.toList();
-			QStringList parts;
-			parts.reserve(list.size());
-			for (const QVariant& item : list) {
-				parts.append(ToGqlLiteral(item));
-			}
-			return QLatin1Char('[') + parts.join(QLatin1Char(',')) + QLatin1Char(']');
-		}
-
-		case QMetaType::QVariantMap: {
-			const QVariantMap map = value.toMap();
-			QStringList parts;
-			parts.reserve(map.size());
-			for (auto it = map.constBegin(); it != map.constEnd(); ++it) {
-				parts.append(it.key() + QLatin1Char(':') + ToGqlLiteral(it.value()));
-			}
-			return QLatin1Char('{') + parts.join(QLatin1Char(',')) + QLatin1Char('}');
-		}
-
-		default:
-			break;
-	}
-
-	const QJsonDocument fallback = QJsonDocument::fromVariant(value);
-	if (!fallback.isNull()) {
-		return QString::fromUtf8(fallback.toJson(QJsonDocument::Compact));
-	}
-	return EscapeGqlString(value.toString());
-}
-
-
-QString BuildGqlRequest(
-			const QString& operation,
-			const QString& commandId,
-			const QVariantMap& inputArgs,
-			const QString& selection)
-{
-	QString args;
-	if (!inputArgs.isEmpty()) {
-		args = QStringLiteral("(input:") + ToGqlLiteral(QVariant(inputArgs)) + QLatin1Char(')');
-	}
-
-	const QString selectionPart = selection.isEmpty()
-			? QString()
-			: (QLatin1Char(' ') + selection);
-
-	return operation + QLatin1Char(' ') + commandId
-			+ QStringLiteral(" { ") + commandId + args + selectionPart + QStringLiteral(" }");
+	return result;
 }
 
 
 } // namespace
 
 
+// public methods
+
 CGqlBasedCollectionDataController::CGqlBasedCollectionDataController(QObject* parent)
-	: BaseClass(parent)
+	:BaseClass(parent)
 {
 }
 
@@ -186,196 +92,156 @@ CGqlBasedCollectionDataController::CGqlBasedCollectionDataController(QObject* pa
 CGqlBasedCollectionDataController::~CGqlBasedCollectionDataController() = default;
 
 
-const QVariantMap& CGqlBasedCollectionDataController::GetHeaders() const
+const QString& CGqlBasedCollectionDataController::GetCollectionId() const
 {
-	return m_headers;
+	return m_collectionId;
 }
 
 
-void CGqlBasedCollectionDataController::SetHeaders(const QVariantMap& headers)
+void CGqlBasedCollectionDataController::SetCollectionId(const QString& id)
 {
-	if (m_headers != headers) {
-		m_headers = headers;
-		Q_EMIT headersChanged(m_headers);
-	}
-}
-
-
-void CGqlBasedCollectionDataController::EmitFailure(OperationKind kind, const QString& message)
-{
-	switch (kind) {
-		case OperationKind::GetCollectionHeaders:
-			Q_EMIT collectionHeadersReceiveFailed(QVariant());
-			break;
-		case OperationKind::GetObjectData:
-			Q_EMIT objectReceiveFailed(message);
-			break;
-		case OperationKind::InsertNewObject:
-			Q_EMIT objectAddFailed(message);
-			break;
-		case OperationKind::SetObjectData:
-			Q_EMIT objectUpdateFailed(message);
-			break;
-		case OperationKind::RemoveElements:
-		case OperationKind::RemoveElementSet:
-			Q_EMIT removeObjectsFailed(message);
-			break;
-		case OperationKind::RestoreObjects:
-		case OperationKind::RestoreObjectSet:
-			Q_EMIT restoreObjectsFailed(message);
-			break;
-		case OperationKind::SetObjectName:
-			Q_EMIT objectRenameFailed(message);
-			break;
-		case OperationKind::SetObjectDescription:
-			Q_EMIT objectSetDescriptionFailed(message);
-			break;
-		case OperationKind::CreateSubCollection:
-			Q_EMIT subCollectionCreateFailed(message);
-			break;
+	if (m_collectionId != id){
+		m_collectionId = id;
+		Q_EMIT collectionIdChanged(m_collectionId);
 	}
 }
 
 
-void CGqlBasedCollectionDataController::HandleReplyState(const QString& state, PendingOperation context)
+QObject* CGqlBasedCollectionDataController::GetApiClient() const
 {
-	if (state != QLatin1String("Ready") && state != QLatin1String("Error")) {
-		return;
+	return m_apiClient;
+}
+
+
+void CGqlBasedCollectionDataController::SetApiClient(QObject* apiClient)
+{
+	if (m_apiClient != apiClient){
+		m_apiClient = apiClient;
+		Q_EMIT apiClientChanged(m_apiClient);
 	}
+}
 
-	const QString json = context.request->property("json").toString();
 
-	// Schedule destruction of the request irrespective of outcome.
-	context.request->deleteLater();
+// private methods
 
-	if (state == QLatin1String("Error")) {
-		EmitFailure(context.kind, QStringLiteral("Network error"));
-		return;
-	}
-
-	QJsonParseError parseError{};
-	const QJsonDocument doc = QJsonDocument::fromJson(json.toUtf8(), &parseError);
-	if (parseError.error != QJsonParseError::NoError) {
-		qWarning() << "CGqlBasedCollectionDataController: failed to parse response JSON:" << parseError.errorString();
-		EmitFailure(context.kind, parseError.errorString());
-		return;
-	}
-
-	QString message;
-	QString type;
-	if (ExtractError(doc, message, type)) {
-		EmitFailure(context.kind, message);
-		return;
-	}
-
-	const QVariant payload = ExtractData(doc, context.commandId);
-	const QVariantMap payloadMap = payload.toMap();
-
-	switch (context.kind) {
-		case OperationKind::GetCollectionHeaders:
-			Q_EMIT collectionHeadersReceived(payloadMap.value(QStringLiteral("headers")));
-			break;
-		case OperationKind::GetObjectData:
-			Q_EMIT objectReceived(payloadMap.value(QStringLiteral("objectData")));
-			break;
-		case OperationKind::InsertNewObject:
-			Q_EMIT objectAdded(payloadMap.value(QStringLiteral("objectId")).toString());
-			break;
-		case OperationKind::SetObjectData:
-			Q_EMIT objectUpdated(context.objectId);
-			break;
-		case OperationKind::RemoveElements:
-		case OperationKind::RemoveElementSet:
-			Q_EMIT objectsRemoved(context.objectIds);
-			break;
-		case OperationKind::RestoreObjects:
-		case OperationKind::RestoreObjectSet:
-			Q_EMIT objectsRestored(context.objectIds);
-			break;
-		case OperationKind::SetObjectName: {
-			const bool ok = payloadMap.value(QStringLiteral("success"), true).toBool();
-			if (ok) {
-				Q_EMIT objectRenamed(
-							payloadMap.value(QStringLiteral("objectId"), context.objectId).toString(),
-							payloadMap.value(QStringLiteral("name"), context.name).toString());
-			} else {
-				Q_EMIT objectRenameFailed(QString());
-			}
-			break;
+CGqlClientBridge* CGqlBasedCollectionDataController::ResolveBridge() const
+{
+	if (m_apiClient != nullptr){
+		auto* bridge = qobject_cast<CGqlClientBridge*>(m_apiClient);
+		if (bridge != nullptr){
+			return bridge;
 		}
-		case OperationKind::SetObjectDescription: {
-			const bool ok = payloadMap.value(QStringLiteral("success"), true).toBool();
-			if (ok) {
-				Q_EMIT objectDescriptionSetted(
-							payloadMap.value(QStringLiteral("objectId"), context.objectId).toString(),
-							payloadMap.value(QStringLiteral("description"), context.description).toString());
-			} else {
-				Q_EMIT objectSetDescriptionFailed(QString());
-			}
-			break;
-		}
-		case OperationKind::CreateSubCollection:
-			Q_EMIT subCollectionCreated(payloadMap.value(QStringLiteral("items")));
-			break;
 	}
+	return CGqlClientBridge::Instance();
 }
 
 
-void CGqlBasedCollectionDataController::Dispatch(
-			OperationKind kind,
-			const QString& operation,
-			const QString& commandId,
-			const QVariantMap& inputArgs,
-			const QString& selection,
-			PendingOperation context)
-{
-	if (commandId.isEmpty()) {
-		qWarning() << "CGqlBasedCollectionDataController: missing GraphQL command id for operation; aborting";
-		EmitFailure(kind, QStringLiteral("Missing GraphQL command id"));
-		return;
-	}
-
-	auto* request = new CGqlRequest(this);
-	context.kind = kind;
-	context.commandId = commandId;
-	context.request = request;
-
-	connect(request, &CGqlRequest::stateChanged,
-			this, [this, context](const QString& state) mutable {
-				HandleReplyState(state, context);
-			});
-
-	const QString query = BuildGqlRequest(operation, commandId, inputArgs, selection);
-	if (!request->SetGqlQuery(query, m_headers)) {
-		qWarning() << "CGqlBasedCollectionDataController: failed to send GraphQL request" << commandId;
-		EmitFailure(kind, QStringLiteral("Failed to send request"));
-		request->deleteLater();
-	}
-}
-
+// public slots
 
 void CGqlBasedCollectionDataController::getCollectionHeaders()
 {
-	QVariantMap input;
-	input.insert(QStringLiteral("collectionId"), GetCollectionId());
+	CGqlClientBridge* bridge = ResolveBridge();
+	if (bridge == nullptr){
+		Q_EMIT collectionHeadersReceiveFailed(QStringLiteral("GQL client bridge is not available"));
+		return;
+	}
 
-	Dispatch(OperationKind::GetCollectionHeaders, QStringLiteral("query"),
-			m_getCollectionHeadersCommandId, input,
-			QStringLiteral("{ headers }"), {});
+	const QByteArray collectionId = m_collectionId.toUtf8();
+	QPointer<CGqlBasedCollectionDataController> self(this);
+
+	QtConcurrent::run([self, bridge, collectionId]{
+		imtcoll::GetCollectionHeadersRequestArguments arguments;
+		arguments.input.Version_1_0.Emplace();
+		arguments.input.Version_1_0->collectionId = collectionId;
+
+		imtcoll::CGetCollectionHeadersPayload payload;
+		QString errorMessage;
+		bool ok = bridge->SendSdlRequest<
+				imtcoll::GetCollectionHeadersRequestArguments,
+				imtcoll::CGetCollectionHeadersPayload,
+				imtcoll::CGetCollectionHeadersGqlRequest>(arguments, payload, errorMessage);
+
+		if (!ok){
+			const QString msg = errorMessage.isEmpty() ? QStringLiteral("Failed to fetch collection headers") : errorMessage;
+			PostToMainThread([self, msg]{
+				if (self){
+					Q_EMIT self->collectionHeadersReceiveFailed(msg);
+				}
+			});
+			return;
+		}
+
+		QVariantList headers;
+		if (payload.Version_1_0->headers.HasValue()){
+			for (const auto& header : payload.Version_1_0->headers->ToList()){
+				QVariantMap entry;
+				if (header.id){
+					entry.insert(QStringLiteral("id"), QString::fromUtf8(*header.id));
+				}
+				if (header.name){
+					entry.insert(QStringLiteral("name"), *header.name);
+				}
+				if (header.filterable){
+					entry.insert(QStringLiteral("filterable"), *header.filterable);
+				}
+				if (header.sortable){
+					entry.insert(QStringLiteral("sortable"), *header.sortable);
+				}
+				headers.append(entry);
+			}
+		}
+
+		PostToMainThread([self, headers]{
+			if (self){
+				Q_EMIT self->collectionHeadersReceived(headers);
+			}
+		});
+	});
 }
 
 
 void CGqlBasedCollectionDataController::getObjectData(const QString& objectId)
 {
-	QVariantMap input;
-	input.insert(QStringLiteral("collectionId"), GetCollectionId());
-	input.insert(QStringLiteral("objectId"), objectId);
+	CGqlClientBridge* bridge = ResolveBridge();
+	if (bridge == nullptr){
+		Q_EMIT objectReceiveFailed(QStringLiteral("GQL client bridge is not available"));
+		return;
+	}
 
-	PendingOperation ctx;
-	ctx.objectId = objectId;
-	Dispatch(OperationKind::GetObjectData, QStringLiteral("query"),
-			m_getObjectDataCommandId, input,
-			QStringLiteral("{ objectData }"), ctx);
+	const QByteArray collectionId = m_collectionId.toUtf8();
+	const QByteArray objectIdUtf8 = objectId.toUtf8();
+	QPointer<CGqlBasedCollectionDataController> self(this);
+
+	QtConcurrent::run([self, bridge, collectionId, objectIdUtf8]{
+		imtcoll::GetObjectDataRequestArguments arguments;
+		arguments.input.Version_1_0.Emplace();
+		arguments.input.Version_1_0->collectionId = collectionId;
+		arguments.input.Version_1_0->objectId = objectIdUtf8;
+
+		imtcoll::CGetObjectDataPayload payload;
+		QString errorMessage;
+		bool ok = bridge->SendSdlRequest<
+				imtcoll::GetObjectDataRequestArguments,
+				imtcoll::CGetObjectDataPayload,
+				imtcoll::CGetObjectDataGqlRequest>(arguments, payload, errorMessage);
+
+		if (!ok || !payload.Version_1_0->objectData.HasValue()){
+			const QString msg = errorMessage.isEmpty() ? QStringLiteral("Failed to fetch object data") : errorMessage;
+			PostToMainThread([self, msg]{
+				if (self){
+					Q_EMIT self->objectReceiveFailed(msg);
+				}
+			});
+			return;
+		}
+
+		const QString objectData = *payload.Version_1_0->objectData;
+		PostToMainThread([self, objectData]{
+			if (self){
+				Q_EMIT self->objectReceived(objectData);
+			}
+		});
+	});
 }
 
 
@@ -386,140 +252,349 @@ void CGqlBasedCollectionDataController::insertNewObject(
 			const QVariant& objectData,
 			const QString& objectId)
 {
-	QVariantMap input;
-	input.insert(QStringLiteral("collectionId"), GetCollectionId());
-	input.insert(QStringLiteral("typeId"), typeId);
-	input.insert(QStringLiteral("name"), name);
-	input.insert(QStringLiteral("description"), description);
-	if (objectData.isValid()) {
-		input.insert(QStringLiteral("objectData"), objectData);
-	}
-	if (!objectId.isEmpty()) {
-		input.insert(QStringLiteral("proposedObjectId"), objectId);
+	CGqlClientBridge* bridge = ResolveBridge();
+	if (bridge == nullptr){
+		Q_EMIT objectAddFailed(QStringLiteral("GQL client bridge is not available"));
+		return;
 	}
 
-	PendingOperation ctx;
-	ctx.objectId = objectId;
-	Dispatch(OperationKind::InsertNewObject, QStringLiteral("mutation"),
-			m_insertNewObjectCommandId, input,
-			QStringLiteral("{ objectId }"), ctx);
+	const QByteArray collectionId = m_collectionId.toUtf8();
+	const QByteArray typeIdUtf8 = typeId.toUtf8();
+	const QString nameStr = name;
+	const QString descriptionStr = description;
+	const QString objectDataStr = objectData.isValid() ? objectData.toString() : QString();
+	const bool hasObjectData = objectData.isValid();
+	const QByteArray proposedObjectId = objectId.toUtf8();
+	QPointer<CGqlBasedCollectionDataController> self(this);
+
+	QtConcurrent::run([self, bridge, collectionId, typeIdUtf8, nameStr, descriptionStr, objectDataStr, hasObjectData, proposedObjectId]{
+		imtcoll::InsertNewObjectRequestArguments arguments;
+		arguments.input.Version_1_0.Emplace();
+		arguments.input.Version_1_0->collectionId = collectionId;
+		arguments.input.Version_1_0->typeId = typeIdUtf8;
+		arguments.input.Version_1_0->name = nameStr;
+		arguments.input.Version_1_0->description = descriptionStr;
+		if (hasObjectData){
+			arguments.input.Version_1_0->objectData = objectDataStr;
+		}
+		if (!proposedObjectId.isEmpty()){
+			arguments.input.Version_1_0->proposedObjectId = proposedObjectId;
+		}
+
+		imtcoll::CInsertNewObjectPayload payload;
+		QString errorMessage;
+		bool ok = bridge->SendSdlRequest<
+				imtcoll::InsertNewObjectRequestArguments,
+				imtcoll::CInsertNewObjectPayload,
+				imtcoll::CInsertNewObjectGqlRequest>(arguments, payload, errorMessage);
+
+		if (!ok || !payload.Version_1_0->objectId.HasValue()){
+			const QString msg = errorMessage.isEmpty() ? QStringLiteral("Failed to insert new object") : errorMessage;
+			PostToMainThread([self, msg]{
+				if (self){
+					Q_EMIT self->objectAddFailed(msg);
+				}
+			});
+			return;
+		}
+
+		const QString newId = QString::fromUtf8(*payload.Version_1_0->objectId);
+		PostToMainThread([self, newId]{
+			if (self){
+				Q_EMIT self->objectAdded(newId);
+			}
+		});
+	});
 }
 
 
 void CGqlBasedCollectionDataController::setObjectData(const QString& objectId, const QVariant& newObjectData)
 {
-	QVariantMap input;
-	input.insert(QStringLiteral("collectionId"), GetCollectionId());
-	input.insert(QStringLiteral("objectId"), objectId);
-	input.insert(QStringLiteral("objectData"), newObjectData);
+	CGqlClientBridge* bridge = ResolveBridge();
+	if (bridge == nullptr){
+		Q_EMIT objectUpdateFailed(QStringLiteral("GQL client bridge is not available"));
+		return;
+	}
 
-	PendingOperation ctx;
-	ctx.objectId = objectId;
-	Dispatch(OperationKind::SetObjectData, QStringLiteral("mutation"),
-			m_setObjectDataCommandId, input,
-			QStringLiteral("{ success }"), ctx);
+	const QByteArray collectionId = m_collectionId.toUtf8();
+	const QByteArray objectIdUtf8 = objectId.toUtf8();
+	const QString newObjectDataStr = newObjectData.toString();
+	const QString objectIdStr = objectId;
+	QPointer<CGqlBasedCollectionDataController> self(this);
+
+	QtConcurrent::run([self, bridge, collectionId, objectIdUtf8, newObjectDataStr, objectIdStr]{
+		imtcoll::SetObjectDataRequestArguments arguments;
+		arguments.input.Version_1_0.Emplace();
+		arguments.input.Version_1_0->collectionId = collectionId;
+		arguments.input.Version_1_0->objectId = objectIdUtf8;
+		arguments.input.Version_1_0->objectData = newObjectDataStr;
+
+		imtcoll::CSetObjectDataPayload payload;
+		QString errorMessage;
+		bool ok = bridge->SendSdlRequest<
+				imtcoll::SetObjectDataRequestArguments,
+				imtcoll::CSetObjectDataPayload,
+				imtcoll::CSetObjectDataGqlRequest>(arguments, payload, errorMessage);
+
+		const bool success = ok
+				&& payload.Version_1_0->success.HasValue()
+				&& *payload.Version_1_0->success;
+		if (!success){
+			const QString msg = errorMessage.isEmpty() ? QStringLiteral("Failed to set object data") : errorMessage;
+			PostToMainThread([self, msg]{
+				if (self){
+					Q_EMIT self->objectUpdateFailed(msg);
+				}
+			});
+			return;
+		}
+
+		PostToMainThread([self, objectIdStr]{
+			if (self){
+				Q_EMIT self->objectUpdated(objectIdStr);
+			}
+		});
+	});
 }
 
 
 void CGqlBasedCollectionDataController::removeObjects(const QVariant& objectIds)
 {
-	QVariantMap input;
-	input.insert(QStringLiteral("collectionId"), GetCollectionId());
-	input.insert(QStringLiteral("elementIds"), objectIds);
+	CGqlClientBridge* bridge = ResolveBridge();
+	if (bridge == nullptr){
+		Q_EMIT removeObjectsFailed(QStringLiteral("GQL client bridge is not available"));
+		return;
+	}
 
-	PendingOperation ctx;
-	ctx.objectIds = objectIds;
-	Dispatch(OperationKind::RemoveElements, QStringLiteral("mutation"),
-			m_removeElementsCommandId, input,
-			QStringLiteral("{ success }"), ctx);
+	const QByteArray collectionId = m_collectionId.toUtf8();
+	const QByteArrayList ids = VariantToByteArrayList(objectIds);
+	const QVariant idsVariant = ByteArrayListToVariantList(ids);
+	QPointer<CGqlBasedCollectionDataController> self(this);
+
+	QtConcurrent::run([self, bridge, collectionId, ids, idsVariant]{
+		imtcoll::RemoveElementsRequestArguments arguments;
+		arguments.input.Version_1_0.Emplace();
+		arguments.input.Version_1_0->collectionId = collectionId;
+		arguments.input.Version_1_0->elementIds.Emplace();
+		arguments.input.Version_1_0->elementIds->FromList(ids);
+
+		imtcoll::CRemoveElementsPayload payload;
+		QString errorMessage;
+		bool ok = bridge->SendSdlRequest<
+				imtcoll::RemoveElementsRequestArguments,
+				imtcoll::CRemoveElementsPayload,
+				imtcoll::CRemoveElementsGqlRequest>(arguments, payload, errorMessage);
+
+		const bool success = ok
+				&& payload.Version_1_0->success.HasValue()
+				&& *payload.Version_1_0->success;
+		if (!success){
+			const QString msg = errorMessage.isEmpty() ? QStringLiteral("Failed to remove elements") : errorMessage;
+			PostToMainThread([self, msg]{
+				if (self){
+					Q_EMIT self->removeObjectsFailed(msg);
+				}
+			});
+			return;
+		}
+
+		PostToMainThread([self, idsVariant]{
+			if (self){
+				Q_EMIT self->objectsRemoved(idsVariant);
+			}
+		});
+	});
 }
 
 
-void CGqlBasedCollectionDataController::removeObjectSet(const QVariant& selectionParams)
+void CGqlBasedCollectionDataController::removeObjectSet(const QVariant& /*selectionParams*/)
 {
-	QVariantMap input;
-	input.insert(QStringLiteral("collectionId"), GetCollectionId());
-	input.insert(QStringLiteral("selectionParams"), selectionParams);
-
-	PendingOperation ctx;
-	ctx.objectIds = QVariantList();
-	Dispatch(OperationKind::RemoveElementSet, QStringLiteral("mutation"),
-			m_removeElementSetCommandId, input,
-			QStringLiteral("{ success }"), ctx);
+	qWarning() << "CGqlBasedCollectionDataController::removeObjectSet:"
+				<< "ParamsSet-based selection is not supported by the SDL bridge";
+	Q_EMIT removeObjectsFailed(QStringLiteral("ParamsSet-based removal is not supported"));
 }
 
 
 void CGqlBasedCollectionDataController::restoreObjects(const QVariant& objectIds)
 {
-	QVariantMap input;
-	input.insert(QStringLiteral("collectionId"), GetCollectionId());
-	input.insert(QStringLiteral("objectIds"), objectIds);
+	CGqlClientBridge* bridge = ResolveBridge();
+	if (bridge == nullptr){
+		Q_EMIT restoreObjectsFailed(QStringLiteral("GQL client bridge is not available"));
+		return;
+	}
 
-	PendingOperation ctx;
-	ctx.objectIds = objectIds;
-	Dispatch(OperationKind::RestoreObjects, QStringLiteral("mutation"),
-			m_restoreObjectsCommandId, input,
-			QStringLiteral("{ success }"), ctx);
+	const QByteArray collectionId = m_collectionId.toUtf8();
+	const QByteArrayList ids = VariantToByteArrayList(objectIds);
+	const QVariant idsVariant = ByteArrayListToVariantList(ids);
+	QPointer<CGqlBasedCollectionDataController> self(this);
+
+	QtConcurrent::run([self, bridge, collectionId, ids, idsVariant]{
+		imtcoll::RestoreObjectsRequestArguments arguments;
+		arguments.input.Version_1_0.Emplace();
+		arguments.input.Version_1_0->collectionId = collectionId;
+		arguments.input.Version_1_0->objectIds.Emplace();
+		arguments.input.Version_1_0->objectIds->FromList(ids);
+
+		imtcoll::CRestoreObjectsPayload payload;
+		QString errorMessage;
+		bool ok = bridge->SendSdlRequest<
+				imtcoll::RestoreObjectsRequestArguments,
+				imtcoll::CRestoreObjectsPayload,
+				imtcoll::CRestoreObjectsGqlRequest>(arguments, payload, errorMessage);
+
+		const bool success = ok
+				&& payload.Version_1_0->success.HasValue()
+				&& *payload.Version_1_0->success;
+		if (!success){
+			const QString msg = errorMessage.isEmpty() ? QStringLiteral("Failed to restore objects") : errorMessage;
+			PostToMainThread([self, msg]{
+				if (self){
+					Q_EMIT self->restoreObjectsFailed(msg);
+				}
+			});
+			return;
+		}
+
+		PostToMainThread([self, idsVariant]{
+			if (self){
+				Q_EMIT self->objectsRestored(idsVariant);
+			}
+		});
+	});
 }
 
 
-void CGqlBasedCollectionDataController::restoreObjectSet(const QVariant& selectionParams)
+void CGqlBasedCollectionDataController::restoreObjectSet(const QVariant& /*selectionParams*/)
 {
-	QVariantMap input;
-	input.insert(QStringLiteral("collectionId"), GetCollectionId());
-	input.insert(QStringLiteral("selectionParams"), selectionParams);
-
-	PendingOperation ctx;
-	ctx.objectIds = QVariantList();
-	Dispatch(OperationKind::RestoreObjectSet, QStringLiteral("mutation"),
-			m_restoreObjectSetCommandId, input,
-			QStringLiteral("{ success }"), ctx);
+	qWarning() << "CGqlBasedCollectionDataController::restoreObjectSet:"
+				<< "ParamsSet-based selection is not supported by the SDL bridge";
+	Q_EMIT restoreObjectsFailed(QStringLiteral("ParamsSet-based restore is not supported"));
 }
 
 
 void CGqlBasedCollectionDataController::setObjectName(const QString& objectId, const QString& name)
 {
-	QVariantMap input;
-	input.insert(QStringLiteral("collectionId"), GetCollectionId());
-	input.insert(QStringLiteral("objectId"), objectId);
-	input.insert(QStringLiteral("name"), name);
+	CGqlClientBridge* bridge = ResolveBridge();
+	if (bridge == nullptr){
+		Q_EMIT objectRenameFailed(QStringLiteral("GQL client bridge is not available"));
+		return;
+	}
 
-	PendingOperation ctx;
-	ctx.objectId = objectId;
-	ctx.name = name;
-	Dispatch(OperationKind::SetObjectName, QStringLiteral("mutation"),
-			m_setObjectNameCommandId, input,
-			QStringLiteral("{ success objectId name }"), ctx);
+	const QByteArray collectionId = m_collectionId.toUtf8();
+	const QByteArray objectIdUtf8 = objectId.toUtf8();
+	const QString objectIdStr = objectId;
+	const QString nameStr = name;
+	QPointer<CGqlBasedCollectionDataController> self(this);
+
+	QtConcurrent::run([self, bridge, collectionId, objectIdUtf8, objectIdStr, nameStr]{
+		imtcoll::SetObjectNameRequestArguments arguments;
+		arguments.input.Version_1_0.Emplace();
+		arguments.input.Version_1_0->collectionId = collectionId;
+		arguments.input.Version_1_0->objectId = objectIdUtf8;
+		arguments.input.Version_1_0->name = nameStr;
+
+		imtcoll::CSetObjectNamePayload payload;
+		QString errorMessage;
+		bool ok = bridge->SendSdlRequest<
+				imtcoll::SetObjectNameRequestArguments,
+				imtcoll::CSetObjectNamePayload,
+				imtcoll::CSetObjectNameGqlRequest>(arguments, payload, errorMessage);
+
+		const bool success = ok
+				&& payload.Version_1_0->success.HasValue()
+				&& *payload.Version_1_0->success;
+		if (!success){
+			const QString msg = errorMessage.isEmpty() ? QStringLiteral("Failed to set object name") : errorMessage;
+			PostToMainThread([self, msg]{
+				if (self){
+					Q_EMIT self->objectRenameFailed(msg);
+				}
+			});
+			return;
+		}
+
+		QString resolvedId = objectIdStr;
+		QString resolvedName = nameStr;
+		if (payload.Version_1_0->objectId.HasValue()){
+			resolvedId = QString::fromUtf8(*payload.Version_1_0->objectId);
+		}
+		if (payload.Version_1_0->name.HasValue()){
+			resolvedName = *payload.Version_1_0->name;
+		}
+
+		PostToMainThread([self, resolvedId, resolvedName]{
+			if (self){
+				Q_EMIT self->objectRenamed(resolvedId, resolvedName);
+			}
+		});
+	});
 }
 
 
 void CGqlBasedCollectionDataController::setObjectDescription(const QString& objectId, const QString& description)
 {
-	QVariantMap input;
-	input.insert(QStringLiteral("collectionId"), GetCollectionId());
-	input.insert(QStringLiteral("objectId"), objectId);
-	input.insert(QStringLiteral("description"), description);
+	CGqlClientBridge* bridge = ResolveBridge();
+	if (bridge == nullptr){
+		Q_EMIT objectSetDescriptionFailed(QStringLiteral("GQL client bridge is not available"));
+		return;
+	}
 
-	PendingOperation ctx;
-	ctx.objectId = objectId;
-	ctx.description = description;
-	Dispatch(OperationKind::SetObjectDescription, QStringLiteral("mutation"),
-			m_setObjectDescriptionCommandId, input,
-			QStringLiteral("{ success objectId description }"), ctx);
+	const QByteArray collectionId = m_collectionId.toUtf8();
+	const QByteArray objectIdUtf8 = objectId.toUtf8();
+	const QString objectIdStr = objectId;
+	const QString descriptionStr = description;
+	QPointer<CGqlBasedCollectionDataController> self(this);
+
+	QtConcurrent::run([self, bridge, collectionId, objectIdUtf8, objectIdStr, descriptionStr]{
+		imtcoll::SetObjectDescriptionRequestArguments arguments;
+		arguments.input.Version_1_0.Emplace();
+		arguments.input.Version_1_0->collectionId = collectionId;
+		arguments.input.Version_1_0->objectId = objectIdUtf8;
+		arguments.input.Version_1_0->description = descriptionStr;
+
+		imtcoll::CSetObjectDescriptionPayload payload;
+		QString errorMessage;
+		bool ok = bridge->SendSdlRequest<
+				imtcoll::SetObjectDescriptionRequestArguments,
+				imtcoll::CSetObjectDescriptionPayload,
+				imtcoll::CSetObjectDescriptionGqlRequest>(arguments, payload, errorMessage);
+
+		const bool success = ok
+				&& payload.Version_1_0->success.HasValue()
+				&& *payload.Version_1_0->success;
+		if (!success){
+			const QString msg = errorMessage.isEmpty() ? QStringLiteral("Failed to set object description") : errorMessage;
+			PostToMainThread([self, msg]{
+				if (self){
+					Q_EMIT self->objectSetDescriptionFailed(msg);
+				}
+			});
+			return;
+		}
+
+		QString resolvedId = objectIdStr;
+		QString resolvedDescription = descriptionStr;
+		if (payload.Version_1_0->objectId.HasValue()){
+			resolvedId = QString::fromUtf8(*payload.Version_1_0->objectId);
+		}
+		if (payload.Version_1_0->description.HasValue()){
+			resolvedDescription = *payload.Version_1_0->description;
+		}
+
+		PostToMainThread([self, resolvedId, resolvedDescription]{
+			if (self){
+				Q_EMIT self->objectDescriptionSetted(resolvedId, resolvedDescription);
+			}
+		});
+	});
 }
 
 
-void CGqlBasedCollectionDataController::createSubCollection(int offset, int count, const QVariant& selectionParams)
+void CGqlBasedCollectionDataController::createSubCollection(int /*offset*/, int /*count*/, const QVariant& /*selectionParams*/)
 {
-	QVariantMap input;
-	input.insert(QStringLiteral("collectionId"), GetCollectionId());
-	input.insert(QStringLiteral("offset"), offset);
-	input.insert(QStringLiteral("count"), count);
-	input.insert(QStringLiteral("selectionParams"), selectionParams);
-
-	Dispatch(OperationKind::CreateSubCollection, QStringLiteral("query"),
-			m_createSubCollectionCommandId, input,
-			QStringLiteral("{ items }"), {});
+	qWarning() << "CGqlBasedCollectionDataController::createSubCollection:"
+				<< "ParamsSet-based sub-collections are not supported by the SDL bridge";
+	Q_EMIT subCollectionCreateFailed(QStringLiteral("ParamsSet-based sub-collections are not supported"));
 }
 
 
