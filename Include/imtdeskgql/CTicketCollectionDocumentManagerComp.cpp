@@ -17,6 +17,7 @@
 #include <imtchat/IConversation.h>
 #include <imtbase/IObjectCollectionIterator.h>
 #include <imtdeskgql/imtdeskgql.h>
+#include <imtdeskgql/TicketPermissions.h>
 #include <imtdoc/CDocumentSavedEvent.h>
 #include <imtauth/IUserGroupInfoProvider.h>
 #include <imtgql/IGqlContext.h>
@@ -83,10 +84,14 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 	response.Version_1_0->status = imtdeskgql::GetSdlTypeFromStatusType(ticketPtr->GetStatus());
 	response.Version_1_0->stateReason = imtdeskgql::GetSdlTypeFromStateReason(ticketPtr->GetStateReason());
 
-	// Permissions are intentionally not enforced server-side here (TODO: redesign).
-	// Always grant edit/lock to all users; visibility is open as well.
-	response.Version_1_0->canEdit = true;
-	response.Version_1_0->canLock = true;
+	// Permissions: visibility (admin / reporter / assignee / same-group as reporter).
+	if (!HasTicketVisibility(gqlRequest.GetRequestContext(), ticketPtr, m_userCollectionCompPtr.GetPtr(), m_userGroupInfoProviderCompPtr.GetPtr())){
+		errorMessage = QStringLiteral("Permission denied: you do not have access to this ticket");
+		return sdl::imtdesk::ImtDesk::CTicketData();
+	}
+
+	response.Version_1_0->canEdit = CanEditTicket(gqlRequest.GetRequestContext(), ticketPtr);
+	response.Version_1_0->canLock = CanLockTicket(gqlRequest.GetRequestContext(), ticketPtr);
 
 	// Load entity references by IDs from the EntityReferences table via IEntityReferenceStorage
 	QByteArrayList entityRefIds = ticketPtr->GetEntityReferences();
@@ -311,7 +316,21 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 		return response;
 	}
 
-	// Permissions are intentionally not enforced server-side here (TODO: redesign).
+	// Permission check: only admin, reporter, or assignee can edit
+	if (!CanEditTicket(gqlRequest.GetRequestContext(), ticketPtr)){
+		errorMessage = QStringLiteral("Permission denied: you cannot edit this ticket");
+		response.Version_1_0->status = sdl::imtbase::CollectionDocumentManager::EDocumentOperationStatus::Failed;
+		return response;
+	}
+
+	// Lock permission: only admin or reporter can change lock state
+	if (ticketInfo.locked){
+		if (*ticketInfo.locked != ticketPtr->IsLocked() && !CanLockTicket(gqlRequest.GetRequestContext(), ticketPtr)){
+			errorMessage = QStringLiteral("Permission denied: only the reporter can lock/unlock this ticket");
+			response.Version_1_0->status = sdl::imtbase::CollectionDocumentManager::EDocumentOperationStatus::Failed;
+			return response;
+		}
+	}
 
 	if (ticketInfo.title){
 		ticketPtr->SetTitle(*ticketInfo.title);
@@ -534,109 +553,6 @@ bool CTicketCollectionDocumentManagerComp::ProcessEvent(imtdoc::CEventBase* even
 }
 
 
-// private methods
-
-bool CTicketCollectionDocumentManagerComp::IsUserAdmin(const imtgql::CGqlRequest& gqlRequest) const
-{
-	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
-	if (contextPtr != nullptr){
-		const imtauth::IUserInfo* userInfoPtr = contextPtr->GetUserInfo();
-		if (userInfoPtr != nullptr){
-			return userInfoPtr->IsAdmin();
-		}
-	}
-	return false;
-}
-
-
-bool CTicketCollectionDocumentManagerComp::IsUserRelatedToTicket(
-		const imtgql::CGqlRequest& gqlRequest,
-		const imtdesk::ISupportTicket* ticketPtr,
-		bool& isReporter,
-		bool& isAssignee) const
-{
-	isReporter = false;
-	isAssignee = false;
-
-	QByteArray userId;
-	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
-	if (contextPtr != nullptr){
-		userId = contextPtr->GetUserId();
-	}
-
-	if (userId.isEmpty() || ticketPtr == nullptr){
-		return false;
-	}
-
-	if (ticketPtr->GetReporterId() == userId){
-		isReporter = true;
-	}
-
-	QByteArrayList assigneeIds = ticketPtr->GetAssigneeIds();
-	if (assigneeIds.contains(userId)){
-		isAssignee = true;
-	}
-
-	return isReporter || isAssignee;
-}
-
-
-bool CTicketCollectionDocumentManagerComp::IsUserInSameGroupAsReporter(
-		const imtgql::CGqlRequest& gqlRequest,
-		const QByteArray& reporterId) const
-{
-	if (reporterId.isEmpty() || !m_userGroupInfoProviderCompPtr.IsValid()){
-		return false;
-	}
-
-	QByteArray userId;
-	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
-	if (contextPtr != nullptr){
-		userId = contextPtr->GetUserId();
-	}
-
-	if (userId.isEmpty()){
-		return false;
-	}
-
-	// Get the reporter's user info from user collection to find their groups
-	QByteArrayList reporterGroups;
-	if (m_userCollectionCompPtr.IsValid()){
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_userCollectionCompPtr->GetObjectData(reporterId, dataPtr)){
-			const imtauth::IUserInfo* reporterInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
-			if (reporterInfoPtr != nullptr){
-				reporterGroups = reporterInfoPtr->GetGroups();
-			}
-		}
-	}
-
-	if (reporterGroups.isEmpty()){
-		return false;
-	}
-
-	// Get current user's groups
-	QByteArrayList userGroups;
-	if (contextPtr != nullptr){
-		const imtauth::IUserInfo* userInfoPtr = contextPtr->GetUserInfo();
-		if (userInfoPtr != nullptr){
-			userGroups = userInfoPtr->GetGroups();
-		}
-	}
-
-	if (userGroups.isEmpty()){
-		return false;
-	}
-
-	// Check for any common group
-	for (const QByteArray& groupId : std::as_const(reporterGroups)){
-		if (userGroups.contains(groupId)){
-			return true;
-		}
-	}
-
-	return false;
-}
 
 
 } // namespace imtdeskgql

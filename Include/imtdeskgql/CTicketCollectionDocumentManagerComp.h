@@ -61,10 +61,6 @@ protected:
 	virtual bool ProcessEvent(imtdoc::CEventBase* eventPtr) override;
 
 private:
-	bool IsUserAdmin(const imtgql::CGqlRequest& gqlRequest) const;
-	bool IsUserRelatedToTicket(const imtgql::CGqlRequest& gqlRequest, const imtdesk::ISupportTicket* ticketPtr, bool& isReporter, bool& isAssignee) const;
-	bool IsUserInSameGroupAsReporter(const imtgql::CGqlRequest& gqlRequest, const QByteArray& reporterId) const;
-
 	I_REF(imtdoc::IDocumentManager, m_documentManagerCompPtr);
 	I_REF(imtbase::IObjectCollection, m_ticketCollectionCompPtr);
 	I_REF(imtbase::IObjectCollection, m_messageCollectionCompPtr);

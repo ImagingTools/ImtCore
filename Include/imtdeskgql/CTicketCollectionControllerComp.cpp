@@ -15,6 +15,7 @@
 #include <imtchat/IConversation.h>
 #include <imtbase/IObjectCollectionIterator.h>
 #include <imtdeskgql/imtdeskgql.h>
+#include <imtdeskgql/TicketPermissions.h>
 #include <imtauth/imtauth.h>
 #include <imtgql/CGqlRequestContextManager.h>
 #include <imtgql/IGqlContext.h>
@@ -51,8 +52,14 @@ bool CTicketCollectionControllerComp::CreateRepresentationFromObject(
 		return false;
 	}
 
-	// Visibility filtering is intentionally not enforced server-side here (TODO: redesign).
-	// All tickets are visible to all users.
+	// Visibility filter: shared logic with the document manager (see TicketPermissions.h).
+	// Uses the thread-local request context populated by the GraphQL servlet.
+	imtgql::IGqlContext* contextPtr = imtgql::CGqlRequestContextManager::GetContext();
+	if (contextPtr != nullptr){
+		if (!HasTicketVisibility(contextPtr, ticketPtr, m_userCollectionCompPtr.GetPtr(), m_userGroupInfoProviderCompPtr.GetPtr())){
+			return false; // Skip this ticket — user has no visibility
+		}
+	}
 
 	Q_UNUSED(listRequest);
 
