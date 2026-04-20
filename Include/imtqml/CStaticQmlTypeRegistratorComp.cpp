@@ -8,8 +8,11 @@
 #include <QtQml/QJSEngine>
 
 // ImtCore includes
+#include <imtqml/CDataModelController.h>
+#include <imtqml/CDocumentRepresentationController.h>
 #include <imtqml/CFileIO.h>
 #include <imtqml/CGqlBasedCollectionDataController.h>
+#include <imtqml/CGqlBasedDataModelController.h>
 #include <imtqml/CGqlClientBridge.h>
 #include <imtqml/CGqlDocumentDataController.h>
 #include <imtqml/CGqlModel.h>
@@ -65,6 +68,15 @@ void CStaticQmlTypeRegistratorComp::OnComponentCreated()
 	}
 	if (!m_registerCGqlDocumentDataControllerAttrPtr.IsValid() || *m_registerCGqlDocumentDataControllerAttrPtr){
 		qmlRegisterType<imtqml::CGqlDocumentDataController>("com.imtcore.imtqml", 1, 0, "GqlDocumentDataController");
+	}
+	if (!m_registerCDocumentRepresentationControllerAttrPtr.IsValid() || *m_registerCDocumentRepresentationControllerAttrPtr){
+		qmlRegisterType<imtqml::CDocumentRepresentationController>("com.imtcore.imtqml", 1, 0, "DocumentRepresentationController");
+	}
+	if (!m_registerCDataModelControllerAttrPtr.IsValid() || *m_registerCDataModelControllerAttrPtr){
+		qmlRegisterType<imtqml::CDataModelController>("com.imtcore.imtqml", 1, 0, "DataModelController");
+	}
+	if (!m_registerCGqlBasedDataModelControllerAttrPtr.IsValid() || *m_registerCGqlBasedDataModelControllerAttrPtr){
+		qmlRegisterType<imtqml::CGqlBasedDataModelController>("com.imtcore.imtqml", 1, 0, "GqlBasedDataModelController");
 	}
 	if (!m_registerCGqlClientBridgeAttrPtr.IsValid() || *m_registerCGqlClientBridgeAttrPtr){
 		// The bridge is created via icomp (so that the IGqlClient

@@ -3,7 +3,11 @@
 
 
 // Qt includes
+#include <QtCore/QHash>
 #include <QtCore/QObject>
+#include <QtCore/QPointer>
+#include <QtCore/QString>
+#include <QtCore/QStringList>
 
 // ACF includes
 #include <icomp/CComponentBase.h>
@@ -98,6 +102,45 @@ public:
 		return true;
 	}
 
+	// --- Representation controller registry ---
+
+	/**
+		\brief Register a \c CDocumentRepresentationController under
+		the given \c documentId so it can later be looked up from
+		QML / C++ via \c getRepresentationController(). Registering
+		a different controller for the same \c documentId replaces
+		the previous mapping.
+
+		\details This is the central registry that lets a single
+		bridge component manage \c N representation controllers (per
+		reviewer feedback we keep using this very bridge instead of
+		introducing yet another component dedicated to that role).
+	*/
+	Q_INVOKABLE void registerRepresentationController(const QString& documentId, QObject* controller);
+
+	/**
+		\brief Remove the controller registered for \c documentId.
+		No-op if no entry exists.
+	*/
+	Q_INVOKABLE void unregisterRepresentationController(const QString& documentId);
+
+	/**
+		\brief Retrieve the controller currently registered for
+		\c documentId, or \c nullptr if none exists. Returned as
+		\c QObject* so it is usable from QML (cast back via
+		\c qobject_cast in C++ when needed).
+	*/
+	Q_INVOKABLE QObject* getRepresentationController(const QString& documentId) const;
+
+	/**
+		\brief All currently registered \c documentId keys.
+	*/
+	Q_INVOKABLE QStringList registeredRepresentationControllerIds() const;
+
+Q_SIGNALS:
+	void representationControllerRegistered(const QString& documentId, QObject* controller);
+	void representationControllerUnregistered(const QString& documentId);
+
 protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
@@ -105,6 +148,8 @@ protected:
 
 private:
 	static CGqlClientBridge* s_instancePtr;
+
+	QHash<QString, QPointer<QObject>> m_representationControllers;
 };
 
 

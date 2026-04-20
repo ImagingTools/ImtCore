@@ -24,6 +24,9 @@ class CGqlClientBridge;
 			\c imtqml::CQmlProcess as \b com.imtcore.imtqml.1.0.Process
 			\c imtqml::CGqlBasedCollectionDataController as \b com.imtcore.imtqml.1.0.GqlBasedCollectionDataController
 			\c imtqml::CGqlDocumentDataController as \b com.imtcore.imtqml.1.0.GqlDocumentDataController
+			\c imtqml::CDocumentRepresentationController as \b com.imtcore.imtqml.1.0.DocumentRepresentationController
+			\c imtqml::CDataModelController as \b com.imtcore.imtqml.1.0.DataModelController
+			\c imtqml::CGqlBasedDataModelController as \b com.imtcore.imtqml.1.0.GqlBasedDataModelController
 		\a singleton types
 			\c imtqml::CNetworkEventInterceptor as \b com.imtcore.imtqml.1.0.NetworkEventInterceptor
 			\c imtqml::CGqlClientBridge as \b com.imtcore.imtqml.1.0.GqlClientBridge
@@ -37,6 +40,9 @@ class CGqlClientBridge;
 	\sa imtqml::CGqlClientBridge
 	\sa imtqml::CGqlBasedCollectionDataController
 	\sa imtqml::CGqlDocumentDataController
+	\sa imtqml::CDocumentRepresentationController
+	\sa imtqml::CDataModelController
+	\sa imtqml::CGqlBasedDataModelController
 
 	\note It is not appropriate to create multiple instances. Modules will be initialized only after first instance of this component has been created.
 	\note This component MUST be initialized \b before application loop will starts. I.e. BEFORE \c qApp->exec();
@@ -58,6 +64,9 @@ public:
 		I_ASSIGN(m_registerCGqlBasedCollectionDataControllerAttrPtr, "RegisterCGqlBasedCollectionDataController", "If enabled, a CGqlBasedCollectionDataController will be registered as QML type", true, true)
 		I_ASSIGN(m_registerCGqlDocumentDataControllerAttrPtr, "RegisterCGqlDocumentDataController", "If enabled, a CGqlDocumentDataController will be registered as QML type", true, true)
 		I_ASSIGN(m_registerCGqlClientBridgeAttrPtr, "RegisterCGqlClientBridge", "If enabled, a CGqlClientBridge will be registered as QML singleton", true, true)
+		I_ASSIGN(m_registerCDocumentRepresentationControllerAttrPtr, "RegisterCDocumentRepresentationController", "If enabled, a CDocumentRepresentationController will be registered as QML type", true, true)
+		I_ASSIGN(m_registerCDataModelControllerAttrPtr, "RegisterCDataModelController", "If enabled, a CDataModelController will be registered as QML type", true, true)
+		I_ASSIGN(m_registerCGqlBasedDataModelControllerAttrPtr, "RegisterCGqlBasedDataModelController", "If enabled, a CGqlBasedDataModelController will be registered as QML type", true, true)
 	I_END_COMPONENT
 
 protected:
@@ -74,6 +83,9 @@ private:
 	I_ATTR(bool, m_registerCGqlBasedCollectionDataControllerAttrPtr);
 	I_ATTR(bool, m_registerCGqlDocumentDataControllerAttrPtr);
 	I_ATTR(bool, m_registerCGqlClientBridgeAttrPtr);
+	I_ATTR(bool, m_registerCDocumentRepresentationControllerAttrPtr);
+	I_ATTR(bool, m_registerCDataModelControllerAttrPtr);
+	I_ATTR(bool, m_registerCGqlBasedDataModelControllerAttrPtr);
 
 	static bool s_isInitialized;
 
