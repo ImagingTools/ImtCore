@@ -123,21 +123,6 @@ CGqlDocumentDataController::CGqlDocumentDataController(QObject* parent)
 CGqlDocumentDataController::~CGqlDocumentDataController() = default;
 
 
-QObject* CGqlDocumentDataController::GetApiClient() const
-{
-	return m_apiClient;
-}
-
-
-void CGqlDocumentDataController::SetApiClient(QObject* apiClient)
-{
-	if (m_apiClient != apiClient){
-		m_apiClient = apiClient;
-		Q_EMIT apiClientChanged(m_apiClient);
-	}
-}
-
-
 const QString& CGqlDocumentDataController::GetCollectionId() const
 {
 	return m_collectionId;
@@ -553,12 +538,6 @@ bool CGqlDocumentDataController::hasDocumentNameProvider(const QString& typeId) 
 
 CGqlClientBridge* CGqlDocumentDataController::ResolveBridge() const
 {
-	if (m_apiClient != nullptr){
-		auto* bridge = qobject_cast<CGqlClientBridge*>(m_apiClient);
-		if (bridge != nullptr){
-			return bridge;
-		}
-	}
 	return CGqlClientBridge::Instance();
 }
 

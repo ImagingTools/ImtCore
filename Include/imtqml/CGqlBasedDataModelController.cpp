@@ -49,21 +49,6 @@ CGqlBasedDataModelController::CGqlBasedDataModelController(QObject* parent)
 CGqlBasedDataModelController::~CGqlBasedDataModelController() = default;
 
 
-QObject* CGqlBasedDataModelController::GetApiClient() const
-{
-	return m_apiClient;
-}
-
-
-void CGqlBasedDataModelController::SetApiClient(QObject* apiClient)
-{
-	if (m_apiClient != apiClient){
-		m_apiClient = apiClient;
-		Q_EMIT apiClientChanged(m_apiClient);
-	}
-}
-
-
 const QVariantMap& CGqlBasedDataModelController::GetParameters() const
 {
 	return m_parameters;
@@ -193,12 +178,6 @@ bool CGqlBasedDataModelController::StoreModel(
 
 CGqlClientBridge* CGqlBasedDataModelController::ResolveBridge() const
 {
-	if (m_apiClient != nullptr){
-		auto* bridge = qobject_cast<CGqlClientBridge*>(m_apiClient);
-		if (bridge != nullptr){
-			return bridge;
-		}
-	}
 	return CGqlClientBridge::Instance();
 }
 

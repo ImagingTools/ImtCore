@@ -107,31 +107,10 @@ void CGqlBasedCollectionDataController::SetCollectionId(const QString& id)
 }
 
 
-QObject* CGqlBasedCollectionDataController::GetApiClient() const
-{
-	return m_apiClient;
-}
-
-
-void CGqlBasedCollectionDataController::SetApiClient(QObject* apiClient)
-{
-	if (m_apiClient != apiClient){
-		m_apiClient = apiClient;
-		Q_EMIT apiClientChanged(m_apiClient);
-	}
-}
-
-
 // private methods
 
 CGqlClientBridge* CGqlBasedCollectionDataController::ResolveBridge() const
 {
-	if (m_apiClient != nullptr){
-		auto* bridge = qobject_cast<CGqlClientBridge*>(m_apiClient);
-		if (bridge != nullptr){
-			return bridge;
-		}
-	}
 	return CGqlClientBridge::Instance();
 }
 

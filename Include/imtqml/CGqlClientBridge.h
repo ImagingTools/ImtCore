@@ -23,16 +23,17 @@ namespace imtqml
 
 /**
 	\brief icomp/QObject hybrid that exposes the imtclientgql GraphQL
-	pipeline to QML.
+	pipeline to the imtqml controllers.
 
 	\details
 	The bridge is created by icomp (so that the \c IGqlClient
-	reference can be injected via the standard \c I_REF mechanism) and
-	registered to QML as the singleton \c GqlClientBridge under the
-	\c com.imtcore.imtqml 1.0 import. The QML controllers (\c
-	GqlBasedCollectionDataController, \c GqlDocumentDataController) take
-	a \c QObject* property pointing at the singleton and forward every
-	GraphQL operation through \c SendSdlRequest().
+	reference can be injected via the standard \c I_REF mechanism)
+	and resolved internally by the controllers
+	(\c CGqlBasedCollectionDataController, \c CGqlDocumentDataController,
+	\c CGqlBasedDataModelController) through \c Instance(). The
+	bridge is intentionally NOT exposed to QML — controllers find it
+	on their own, so there is no \c apiClient property to wire from
+	QML.
 
 	\note Because \c TClientRequestManagerCompWrap::SendModelRequest is a
 	blocking call, callers MUST invoke \c SendSdlRequest() from a worker

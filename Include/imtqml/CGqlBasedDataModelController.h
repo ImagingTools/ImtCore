@@ -40,13 +40,13 @@ class CGqlClientBridge;
 	\c GqlBasedDataModelController.
 
 	\note Like every other GQL-based controller in this package, the
-	default API client is the \c GqlClientBridge singleton; an
-	alternative bridge can be supplied via \c apiClient.
+	API client used for SDL traffic is the \c CGqlClientBridge
+	singleton component, resolved internally from icomp; QML users
+	don't need to wire it explicitly.
 */
 class CGqlBasedDataModelController: public CDataModelController
 {
 	Q_OBJECT
-	Q_PROPERTY(QObject* apiClient READ GetApiClient WRITE SetApiClient NOTIFY apiClientChanged)
 	Q_PROPERTY(QVariantMap parameters READ GetParameters WRITE SetParameters NOTIFY parametersChanged)
 
 public:
@@ -54,9 +54,6 @@ public:
 
 	explicit CGqlBasedDataModelController(QObject* parent = nullptr);
 	~CGqlBasedDataModelController() override;
-
-	QObject* GetApiClient() const;
-	void SetApiClient(QObject* apiClient);
 
 	const QVariantMap& GetParameters() const;
 	void SetParameters(const QVariantMap& parameters);
@@ -67,7 +64,6 @@ public Q_SLOTS:
 	void setModel(const QVariant& model) override;
 
 Q_SIGNALS:
-	void apiClientChanged(QObject* apiClient);
 	void parametersChanged(const QVariantMap& parameters);
 
 protected:
@@ -112,14 +108,12 @@ protected:
 			QString& errorMessage) const;
 
 	/**
-		\brief Resolve the bridge to use for the next request:
-		\c apiClient (if it casts to \c CGqlClientBridge) or the
-		singleton instance.
+		\brief Resolve the bridge to use for the next request: the
+		singleton \c CGqlClientBridge instance created by icomp.
 	*/
 	CGqlClientBridge* ResolveBridge() const;
 
 private:
-	QObject* m_apiClient = nullptr;
 	QVariantMap m_parameters;
 };
 

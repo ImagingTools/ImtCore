@@ -10,9 +10,6 @@ namespace imtqml
 {
 
 
-class CGqlClientBridge;
-
-
 /**
 	\brief This component registrates all types of the imtqml module for QQmlEngine.
 	\details Registers the following types:
@@ -29,7 +26,6 @@ class CGqlClientBridge;
 			\c imtqml::CGqlBasedDataModelController as \b com.imtcore.imtqml.1.0.GqlBasedDataModelController
 		\a singleton types
 			\c imtqml::CNetworkEventInterceptor as \b com.imtcore.imtqml.1.0.NetworkEventInterceptor
-			\c imtqml::CGqlClientBridge as \b com.imtcore.imtqml.1.0.GqlClientBridge
 
 	\sa imtqml::CGqlModel
 	\sa imtqml::CGqlRequest
@@ -37,7 +33,6 @@ class CGqlClientBridge;
 	\sa imtqml::FileIO
 	\sa imtqml::CQmlProcess
 	\sa imtqml::CNetworkEventInterceptor
-	\sa imtqml::CGqlClientBridge
 	\sa imtqml::CGqlBasedCollectionDataController
 	\sa imtqml::CGqlDocumentDataController
 	\sa imtqml::CDocumentRepresentationController
@@ -63,7 +58,6 @@ public:
 		I_ASSIGN(m_registerCNetworkEventInterceptorAttrPtr, "RegisterCNetworkEventInterceptor", "If enabled, a CNetworkEventInterceptor will be registered for as QML type", true, true)
 		I_ASSIGN(m_registerCGqlBasedCollectionDataControllerAttrPtr, "RegisterCGqlBasedCollectionDataController", "If enabled, a CGqlBasedCollectionDataController will be registered as QML type", true, true)
 		I_ASSIGN(m_registerCGqlDocumentDataControllerAttrPtr, "RegisterCGqlDocumentDataController", "If enabled, a CGqlDocumentDataController will be registered as QML type", true, true)
-		I_ASSIGN(m_registerCGqlClientBridgeAttrPtr, "RegisterCGqlClientBridge", "If enabled, a CGqlClientBridge will be registered as QML singleton", true, true)
 		I_ASSIGN(m_registerCDocumentRepresentationControllerAttrPtr, "RegisterCDocumentRepresentationController", "If enabled, a CDocumentRepresentationController will be registered as QML type", true, true)
 		I_ASSIGN(m_registerCDataModelControllerAttrPtr, "RegisterCDataModelController", "If enabled, a CDataModelController will be registered as QML type", true, true)
 		I_ASSIGN(m_registerCGqlBasedDataModelControllerAttrPtr, "RegisterCGqlBasedDataModelController", "If enabled, a CGqlBasedDataModelController will be registered as QML type", true, true)
@@ -82,7 +76,6 @@ private:
 	I_ATTR(bool, m_registerCNetworkEventInterceptorAttrPtr);
 	I_ATTR(bool, m_registerCGqlBasedCollectionDataControllerAttrPtr);
 	I_ATTR(bool, m_registerCGqlDocumentDataControllerAttrPtr);
-	I_ATTR(bool, m_registerCGqlClientBridgeAttrPtr);
 	I_ATTR(bool, m_registerCDocumentRepresentationControllerAttrPtr);
 	I_ATTR(bool, m_registerCDataModelControllerAttrPtr);
 	I_ATTR(bool, m_registerCGqlBasedDataModelControllerAttrPtr);

@@ -13,7 +13,6 @@
 #include <imtqml/CFileIO.h>
 #include <imtqml/CGqlBasedCollectionDataController.h>
 #include <imtqml/CGqlBasedDataModelController.h>
-#include <imtqml/CGqlClientBridge.h>
 #include <imtqml/CGqlDocumentDataController.h>
 #include <imtqml/CGqlModel.h>
 #include <imtqml/CGqlRequest.h>
@@ -77,21 +76,6 @@ void CStaticQmlTypeRegistratorComp::OnComponentCreated()
 	}
 	if (!m_registerCGqlBasedDataModelControllerAttrPtr.IsValid() || *m_registerCGqlBasedDataModelControllerAttrPtr){
 		qmlRegisterType<imtqml::CGqlBasedDataModelController>("com.imtcore.imtqml", 1, 0, "GqlBasedDataModelController");
-	}
-	if (!m_registerCGqlClientBridgeAttrPtr.IsValid() || *m_registerCGqlClientBridgeAttrPtr){
-		// The bridge is created via icomp (so that the IGqlClient
-		// reference can be injected via I_REF). Expose the latest
-		// instance as a QML singleton via a callback so that the
-		// engine resolves it lazily, after icomp wiring has run.
-		qmlRegisterSingletonType<imtqml::CGqlClientBridge>(
-				"com.imtcore.imtqml", 1, 0, "GqlClientBridge",
-				[](QQmlEngine* /*engine*/, QJSEngine* /*scriptEngine*/) -> QObject* {
-					imtqml::CGqlClientBridge* instancePtr = imtqml::CGqlClientBridge::Instance();
-					if (instancePtr != nullptr){
-						QQmlEngine::setObjectOwnership(instancePtr, QQmlEngine::CppOwnership);
-					}
-					return instancePtr;
-				});
 	}
 }
 

@@ -49,7 +49,6 @@ class CGqlClientBridge;
 class CGqlDocumentDataController: public QObject
 {
 	Q_OBJECT
-	Q_PROPERTY(QObject* apiClient READ GetApiClient WRITE SetApiClient NOTIFY apiClientChanged)
 	Q_PROPERTY(QString collectionId READ GetCollectionId WRITE SetCollectionId NOTIFY collectionIdChanged)
 	Q_PROPERTY(QObject* documentManagerActiveView READ getDocumentManagerActiveView WRITE setDocumentManagerActiveView NOTIFY documentManagerActiveViewChanged)
 	Q_PROPERTY(QStringList supportedDocumentTypeIds READ getSupportedDocumentTypeIds NOTIFY documentTypeEditorsChanged)
@@ -60,9 +59,6 @@ public:
 
 	explicit CGqlDocumentDataController(QObject* parent = nullptr);
 	~CGqlDocumentDataController() override;
-
-	QObject* GetApiClient() const;
-	void SetApiClient(QObject* apiClient);
 
 	const QString& GetCollectionId() const;
 	void SetCollectionId(const QString& id);
@@ -160,7 +156,6 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 	// --- Property NOTIFY ---
-	void apiClientChanged(QObject* apiClient);
 	void collectionIdChanged(const QString& collectionId);
 	void documentManagerActiveViewChanged();
 	void documentTypeEditorsChanged();
@@ -252,7 +247,6 @@ private:
 	void RemoveDocumentDataInternal(const QString& documentId);
 	int  IndexOfDocument(const QString& documentId) const;
 
-	QObject* m_apiClient = nullptr;
 	QString m_collectionId;
 
 	QList<FOpenedDocument>             m_openedDocuments;

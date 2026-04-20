@@ -40,7 +40,6 @@ class CGqlBasedCollectionDataController: public QObject
 {
 	Q_OBJECT
 	Q_PROPERTY(QString collectionId READ GetCollectionId WRITE SetCollectionId NOTIFY collectionIdChanged)
-	Q_PROPERTY(QObject* apiClient READ GetApiClient WRITE SetApiClient NOTIFY apiClientChanged)
 
 public:
 	typedef QObject BaseClass;
@@ -50,9 +49,6 @@ public:
 
 	const QString& GetCollectionId() const;
 	void SetCollectionId(const QString& id);
-
-	QObject* GetApiClient() const;
-	void SetApiClient(QObject* apiClient);
 
 public Q_SLOTS:
 	void getCollectionHeaders();
@@ -74,7 +70,6 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 	void collectionIdChanged(const QString& collectionId);
-	void apiClientChanged(QObject* apiClient);
 
 	void collectionHeadersReceived(const QVariant& headersModel);
 	void collectionHeadersReceiveFailed(const QString& message);
@@ -107,7 +102,6 @@ private:
 	CGqlClientBridge* ResolveBridge() const;
 
 	QString m_collectionId;
-	QObject* m_apiClient = nullptr;
 };
 
 
