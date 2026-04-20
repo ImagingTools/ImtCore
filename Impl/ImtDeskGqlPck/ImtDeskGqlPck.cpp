@@ -25,5 +25,10 @@ I_EXPORT_COMPONENT(
 			"Ticket collection document manager",
 			"Ticket Collection Document Manager");
 
+I_EXPORT_COMPONENT(
+			TicketMessageNotifier,
+			"Ticket message subscription publisher (notifies ticket reporter/assignees about new messages)",
+			"Ticket Message Notifier");
+
 
 } // namespace ImtDeskGqlPck

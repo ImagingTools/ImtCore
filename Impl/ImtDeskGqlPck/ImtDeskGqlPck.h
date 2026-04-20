@@ -5,6 +5,7 @@
 // ImtCore includes
 #include <imtdeskgql/CTicketCollectionControllerComp.h>
 #include <imtdeskgql/CTicketCollectionDocumentManagerComp.h>
+#include <imtdeskgql/CTicketMessageNotifierComp.h>
 
 
 /**
@@ -16,6 +17,7 @@ namespace ImtDeskGqlPck
 
 typedef imtdeskgql::CTicketCollectionControllerComp TicketCollectionController;
 typedef imtdeskgql::CTicketCollectionDocumentManagerComp TicketCollectionDocumentManager;
+typedef imtdeskgql::CTicketMessageNotifierComp TicketMessageNotifier;
 
 
 } // namespace ImtDeskGqlPck
