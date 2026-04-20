@@ -41,6 +41,11 @@ I_EXPORT_COMPONENT(
 			"Client Localization QML-Engine");
 
 I_EXPORT_COMPONENT(
+			GqlClientBridge,
+			"Bridge that exposes the imtclientgql GraphQL pipeline (IGqlClient ApiClient) to QML controllers as a singleton",
+			"GraphQL QML Bridge ApiClient" IM_AUTHOR("Sergey Zastrovnyh"));
+
+I_EXPORT_COMPONENT(
 			PageGuiElementModel,
 			"Page based model",
 			"Page Based Model");
