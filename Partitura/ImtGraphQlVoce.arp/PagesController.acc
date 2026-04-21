@@ -23,7 +23,7 @@
                         <Data IsEnabled="true" Value="Icons/AdminPanel"/>
                     </AttributeInfo>
                     <AttributeInfo Id="IsVisible" Type="Boolean" ExportId="AdminPageVisible">
-                        <Data IsEnabled="false"/>
+                        <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -60,6 +60,7 @@
                             <Values>
                                 <Value>Workspace</Value>
                                 <Value>SearchPage</Value>
+                                <Value>DeskPage</Value>
                                 <Value>AdministrationPage</Value>
                             </Values>
                         </Data>
@@ -105,7 +106,7 @@
                     <AttributeInfo Id="IsEnabled" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="IsVisible" Type="Boolean" ExportId="">
+                    <AttributeInfo Id="IsVisible" Type="Boolean" ExportId="DeskPageVisible">
                         <Data IsEnabled="true" Value="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
