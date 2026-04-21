@@ -37,6 +37,7 @@ class CDataModelController: public QObject
 {
 	Q_OBJECT
 	Q_PROPERTY(QString modelId READ GetModelId WRITE SetModelId NOTIFY modelIdChanged)
+	Q_PROPERTY(QVariantMap parameters READ GetParameters WRITE SetParameters NOTIFY parametersChanged)
 	Q_PROPERTY(QVariant model READ GetModel NOTIFY modelChanged)
 	Q_PROPERTY(bool isLoading READ IsLoading NOTIFY isLoadingChanged)
 
@@ -49,6 +50,9 @@ public:
 	const QString& GetModelId() const;
 	void SetModelId(const QString& modelId);
 
+	const QVariantMap& GetParameters() const;
+	void SetParameters(const QVariantMap& parameters);
+
 	const QVariant& GetModel() const;
 	bool IsLoading() const;
 
@@ -58,8 +62,10 @@ public Q_SLOTS:
 		\c startGetModel(), then either \c modelReceived(model) or
 		\c getModelFailed(message) on the GUI thread once done.
 
-		The base implementation is a no-op stub; subclasses MUST
-		override and perform the actual work.
+		Delegates to the \c IDataModelBridge resolved via
+		\c CDataModelBridgeDemultiplexer::Instance(). If no bridge
+		is available or no delegate claims \c modelId, emits
+		\c getModelFailed with a descriptive message.
 	*/
 	virtual void getModel();
 
@@ -68,8 +74,10 @@ public Q_SLOTS:
 		\c startSetModel(model), then either \c modelSet() or
 		\c setModelFailed(message) on the GUI thread once done.
 
-		The base implementation is a no-op stub; subclasses MUST
-		override and perform the actual work.
+		Delegates to the \c IDataModelBridge resolved via
+		\c CDataModelBridgeDemultiplexer::Instance(). If no bridge
+		is available or no delegate claims \c modelId, emits
+		\c setModelFailed with a descriptive message.
 	*/
 	virtual void setModel(const QVariant& model);
 
@@ -88,6 +96,7 @@ protected:
 
 Q_SIGNALS:
 	void modelIdChanged(const QString& modelId);
+	void parametersChanged(const QVariantMap& parameters);
 	void modelChanged(const QVariant& model);
 	void isLoadingChanged(bool isLoading);
 
@@ -101,6 +110,7 @@ Q_SIGNALS:
 
 private:
 	QString m_modelId;
+	QVariantMap m_parameters;
 	QVariant m_model;
 	bool m_isLoading = false;
 };

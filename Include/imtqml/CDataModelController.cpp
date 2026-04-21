@@ -4,10 +4,27 @@
 
 // Qt includes
 #include <QtCore/QDebug>
+#include <QtCore/QPointer>
+
+// ImtCore includes
+#include <imtqml/CDataModelBridgeDemultiplexer.h>
+#include <imtqml/IDataModelBridge.h>
 
 
 namespace imtqml
 {
+
+
+namespace
+{
+
+QString NoBridgeError()
+{
+	return QStringLiteral("CDataModelController: no IDataModelBridge available "
+			"(CDataModelBridgeDemultiplexer component is not loaded)");
+}
+
+} // anonymous namespace
 
 
 // public methods
@@ -36,6 +53,21 @@ void CDataModelController::SetModelId(const QString& modelId)
 }
 
 
+const QVariantMap& CDataModelController::GetParameters() const
+{
+	return m_parameters;
+}
+
+
+void CDataModelController::SetParameters(const QVariantMap& parameters)
+{
+	if (m_parameters != parameters){
+		m_parameters = parameters;
+		Q_EMIT parametersChanged(m_parameters);
+	}
+}
+
+
 const QVariant& CDataModelController::GetModel() const
 {
 	return m_model;
@@ -53,19 +85,62 @@ bool CDataModelController::IsLoading() const
 void CDataModelController::getModel()
 {
 	Q_EMIT startGetModel();
-	qWarning() << "CDataModelController::getModel() should be implemented in a subclass"
-			   << "(modelId=" << m_modelId << ")";
-	Q_EMIT modelReceived(m_model);
+
+	IDataModelBridge* bridge = CDataModelBridgeDemultiplexer::Instance();
+	if (bridge == nullptr){
+		qWarning() << "CDataModelController::getModel():" << NoBridgeError()
+				<< "(modelId=" << m_modelId << ")";
+		Q_EMIT getModelFailed(NoBridgeError());
+		return;
+	}
+
+	SetIsLoading(true);
+	QPointer<CDataModelController> self(this);
+	const QString modelId = m_modelId;
+	bridge->GetModel(modelId, m_parameters,
+			[self, modelId](QVariant model, QString errorMessage){
+				if (self.isNull()){
+					return;
+				}
+				self->SetIsLoading(false);
+				if (!errorMessage.isEmpty()){
+					Q_EMIT self->getModelFailed(errorMessage);
+					return;
+				}
+				self->UpdateCachedModel(model);
+				Q_EMIT self->modelReceived(model);
+			});
 }
 
 
 void CDataModelController::setModel(const QVariant& model)
 {
 	Q_EMIT startSetModel(model);
-	qWarning() << "CDataModelController::setModel() should be implemented in a subclass"
-			   << "(modelId=" << m_modelId << ")";
-	UpdateCachedModel(model);
-	Q_EMIT modelSet();
+
+	IDataModelBridge* bridge = CDataModelBridgeDemultiplexer::Instance();
+	if (bridge == nullptr){
+		qWarning() << "CDataModelController::setModel():" << NoBridgeError()
+				<< "(modelId=" << m_modelId << ")";
+		Q_EMIT setModelFailed(NoBridgeError());
+		return;
+	}
+
+	SetIsLoading(true);
+	QPointer<CDataModelController> self(this);
+	const QString modelId = m_modelId;
+	bridge->SetModel(modelId, m_parameters, model,
+			[self, model](QString errorMessage){
+				if (self.isNull()){
+					return;
+				}
+				self->SetIsLoading(false);
+				if (!errorMessage.isEmpty()){
+					Q_EMIT self->setModelFailed(errorMessage);
+					return;
+				}
+				self->UpdateCachedModel(model);
+				Q_EMIT self->modelSet();
+			});
 }
 
 

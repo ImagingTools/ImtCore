@@ -26,6 +26,32 @@ QString NoDelegateError(const QString& modelId)
 } // anonymous namespace
 
 
+CDataModelBridgeDemultiplexer* CDataModelBridgeDemultiplexer::s_instancePtr = nullptr;
+
+
+CDataModelBridgeDemultiplexer::~CDataModelBridgeDemultiplexer()
+{
+	if (s_instancePtr == this){
+		s_instancePtr = nullptr;
+	}
+}
+
+
+CDataModelBridgeDemultiplexer* CDataModelBridgeDemultiplexer::Instance()
+{
+	return s_instancePtr;
+}
+
+
+// reimplemented (icomp::CComponentBase)
+
+void CDataModelBridgeDemultiplexer::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+	s_instancePtr = this;
+}
+
+
 // reimplemented (IDataModelBridge)
 
 bool CDataModelBridgeDemultiplexer::IsSupported(const QString& modelId) const

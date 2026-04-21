@@ -48,6 +48,25 @@ public:
 				"Per-model delegate bridges resolved by modelId", false);
 	I_END_COMPONENT;
 
+	~CDataModelBridgeDemultiplexer() override;
+
+	/**
+		\brief Returns the most recently created instance of this
+		bridge or \c nullptr if none exists.
+
+		\details Mirrors the lookup pattern used by
+		\c CDocumentManagerBridge::Instance() so a QML-facing controller
+		(\c CDataModelController) can resolve the bridge without
+		knowing about icomp. The instance is registered in
+		\c OnComponentCreated() and unregistered in the destructor.
+	*/
+	static CDataModelBridgeDemultiplexer* Instance();
+
+protected:
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
+
+public:
 	// reimplemented (IDataModelBridge)
 	virtual bool IsSupported(const QString& modelId) const override;
 
@@ -67,6 +86,8 @@ private:
 
 private:
 	I_MULTIREF(IDataModelBridge, m_modelDelegateCompPtr);
+
+	static CDataModelBridgeDemultiplexer* s_instancePtr;
 };
 
 
