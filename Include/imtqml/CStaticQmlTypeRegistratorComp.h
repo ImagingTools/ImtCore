@@ -21,6 +21,7 @@ namespace imtqml
 			\c imtqml::CQmlProcess as \b com.imtcore.imtqml.1.0.Process
 			\c imtqml::CGqlBasedCollectionDataController as \b com.imtcore.imtqml.1.0.GqlBasedCollectionDataController
 			\c imtqml::CGqlDocumentDataController as \b com.imtcore.imtqml.1.0.GqlDocumentDataController
+			\c imtqml::CDocumentDataController as \b com.imtcore.imtqml.1.0.DocumentDataController
 			\c imtqml::CDocumentRepresentationController as \b com.imtcore.imtqml.1.0.DocumentRepresentationController
 			\c imtqml::CDataModelController as \b com.imtcore.imtqml.1.0.DataModelController
 			\c imtqml::CGqlBasedDataModelController as \b com.imtcore.imtqml.1.0.GqlBasedDataModelController
@@ -35,6 +36,7 @@ namespace imtqml
 	\sa imtqml::CNetworkEventInterceptor
 	\sa imtqml::CGqlBasedCollectionDataController
 	\sa imtqml::CGqlDocumentDataController
+	\sa imtqml::CDocumentDataController
 	\sa imtqml::CDocumentRepresentationController
 	\sa imtqml::CDataModelController
 	\sa imtqml::CGqlBasedDataModelController
@@ -58,6 +60,7 @@ public:
 		I_ASSIGN(m_registerCNetworkEventInterceptorAttrPtr, "RegisterCNetworkEventInterceptor", "If enabled, a CNetworkEventInterceptor will be registered for as QML type", true, true)
 		I_ASSIGN(m_registerCGqlBasedCollectionDataControllerAttrPtr, "RegisterCGqlBasedCollectionDataController", "If enabled, a CGqlBasedCollectionDataController will be registered as QML type", true, true)
 		I_ASSIGN(m_registerCGqlDocumentDataControllerAttrPtr, "RegisterCGqlDocumentDataController", "If enabled, a CGqlDocumentDataController will be registered as QML type", true, true)
+		I_ASSIGN(m_registerCDocumentDataControllerAttrPtr, "RegisterCDocumentDataController", "If enabled, a CDocumentDataController will be registered as QML type", true, true)
 		I_ASSIGN(m_registerCDocumentRepresentationControllerAttrPtr, "RegisterCDocumentRepresentationController", "If enabled, a CDocumentRepresentationController will be registered as QML type", true, true)
 		I_ASSIGN(m_registerCDataModelControllerAttrPtr, "RegisterCDataModelController", "If enabled, a CDataModelController will be registered as QML type", true, true)
 		I_ASSIGN(m_registerCGqlBasedDataModelControllerAttrPtr, "RegisterCGqlBasedDataModelController", "If enabled, a CGqlBasedDataModelController will be registered as QML type", true, true)
@@ -76,6 +79,7 @@ private:
 	I_ATTR(bool, m_registerCNetworkEventInterceptorAttrPtr);
 	I_ATTR(bool, m_registerCGqlBasedCollectionDataControllerAttrPtr);
 	I_ATTR(bool, m_registerCGqlDocumentDataControllerAttrPtr);
+	I_ATTR(bool, m_registerCDocumentDataControllerAttrPtr);
 	I_ATTR(bool, m_registerCDocumentRepresentationControllerAttrPtr);
 	I_ATTR(bool, m_registerCDataModelControllerAttrPtr);
 	I_ATTR(bool, m_registerCGqlBasedDataModelControllerAttrPtr);

@@ -9,6 +9,7 @@
 
 // ImtCore includes
 #include <imtqml/CDataModelController.h>
+#include <imtqml/CDocumentDataController.h>
 #include <imtqml/CDocumentRepresentationController.h>
 #include <imtqml/CFileIO.h>
 #include <imtqml/CGqlBasedCollectionDataController.h>
@@ -67,6 +68,9 @@ void CStaticQmlTypeRegistratorComp::OnComponentCreated()
 	}
 	if (!m_registerCGqlDocumentDataControllerAttrPtr.IsValid() || *m_registerCGqlDocumentDataControllerAttrPtr){
 		qmlRegisterType<imtqml::CGqlDocumentDataController>("com.imtcore.imtqml", 1, 0, "GqlDocumentDataController");
+	}
+	if (!m_registerCDocumentDataControllerAttrPtr.IsValid() || *m_registerCDocumentDataControllerAttrPtr){
+		qmlRegisterType<imtqml::CDocumentDataController>("com.imtcore.imtqml", 1, 0, "DocumentDataController");
 	}
 	if (!m_registerCDocumentRepresentationControllerAttrPtr.IsValid() || *m_registerCDocumentRepresentationControllerAttrPtr){
 		qmlRegisterType<imtqml::CDocumentRepresentationController>("com.imtcore.imtqml", 1, 0, "DocumentRepresentationController");

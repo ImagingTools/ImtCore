@@ -82,10 +82,33 @@ const QString c_noManagerError = QStringLiteral(
 } // anonymous namespace
 
 
+CDocumentManagerBridge* CDocumentManagerBridge::s_instancePtr = nullptr;
+
+
 CDocumentManagerBridge::CDocumentManagerBridge() = default;
 
 
-CDocumentManagerBridge::~CDocumentManagerBridge() = default;
+CDocumentManagerBridge::~CDocumentManagerBridge()
+{
+	if (s_instancePtr == this){
+		s_instancePtr = nullptr;
+	}
+}
+
+
+CDocumentManagerBridge* CDocumentManagerBridge::Instance()
+{
+	return s_instancePtr;
+}
+
+
+// reimplemented (icomp::CComponentBase)
+
+void CDocumentManagerBridge::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+	s_instancePtr = this;
+}
 
 
 // reimplemented (IDocumentDataBridge)

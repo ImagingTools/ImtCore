@@ -42,6 +42,23 @@ public:
 	CDocumentManagerBridge();
 	~CDocumentManagerBridge() override;
 
+	/**
+		\brief Returns the most recently created instance of this
+		bridge or \c nullptr if none exists.
+
+		\details Mirrors the lookup pattern used by
+		\c CGqlClientBridge::Instance() so a QML-facing controller
+		(\c CDocumentDataController) can resolve the bridge without
+		knowing about icomp. The instance is registered in
+		\c OnComponentCreated() and unregistered in the destructor.
+	*/
+	static CDocumentManagerBridge* Instance();
+
+protected:
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
+
+public:
 	// reimplemented (IDocumentDataBridge)
 	virtual void GetOpenedDocumentList(
 			const QString& collectionId,
@@ -93,6 +110,8 @@ public:
 
 private:
 	I_REF(imtdoc::IDocumentManager, m_documentManagerCompPtr);
+
+	static CDocumentManagerBridge* s_instancePtr;
 };
 
 
