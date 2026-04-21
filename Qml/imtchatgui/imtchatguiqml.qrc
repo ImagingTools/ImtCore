@@ -1,0 +1,17 @@
+<RCC>
+    <qresource prefix="/qml">
+	    <file alias="imtchatgui/qmldir">qmldir</file>
+		<file alias="imtchatgui/ChatNotificationBanner.qml">ChatNotificationBanner.qml</file>
+		<file alias="imtchatgui/ChatPanel.qml">ChatPanel.qml</file>
+		<file alias="imtchatgui/ChatSearchBar.qml">ChatSearchBar.qml</file>
+		<file alias="imtchatgui/ChatView.qml">ChatView.qml</file>
+		<file alias="imtchatgui/ConversationCollectionView.qml">ConversationCollectionView.qml</file>
+		<file alias="imtchatgui/ConversationCreateDialog.qml">ConversationCreateDialog.qml</file>
+		<file alias="imtchatgui/ConversationEditor.qml">ConversationEditor.qml</file>
+		<file alias="imtchatgui/EntityReferenceCard.qml">EntityReferenceCard.qml</file>
+		<file alias="imtchatgui/EntitySearchPopup.qml">EntitySearchPopup.qml</file>
+		<file alias="imtchatgui/MessageBubble.qml">MessageBubble.qml</file>
+		<file alias="imtchatgui/MessageInput.qml">MessageInput.qml</file>
+		<file alias="imtchatgui/TypingIndicator.qml">TypingIndicator.qml</file>
+    </qresource>
+</RCC>

@@ -9,27 +9,37 @@ Rectangle {
 	id: ticketBadgeRoot
 	objectName: "TicketBadge"
 
-	// badgeType: "status" | "priority"
+	// badgeType: "status" | "priority" | "stateReason" | "label"
 	property string badgeType: "status"
-	// value: integer matching TicketStatus or TicketPriority enum
+	// value: integer matching TicketStatus, TicketPriority, or StateReason enum
 	property int value: 0
+	// labelColor: hex color for label badges
+	property string labelColor: ""
+	// labelName: text for label badges
+	property string labelName: ""
 
-	readonly property var badgeColors: badgeType === "priority"
-		? ["#4CAF50", "#FF9800", "#F44336", "#9C27B0"]
-		: ["#2196F3", "#FF9800", "#4CAF50", "#9E9E9E"]
+	readonly property var _colorMap: ({
+		"status":      ["#1a7f37", "#8957e5"],
+		"priority":    ["#4CAF50", "#FF9800", "#F44336", "#9C27B0"],
+		"stateReason": ["#9E9E9E", "#8957e5", "#9E9E9E", "#2196F3"]
+	})
 
-	readonly property var badgeLabels: badgeType === "priority"
-		? [qsTr("Low"), qsTr("Med"), qsTr("High"), qsTr("Crit")]
-		: [qsTr("Open"), qsTr("Active"), qsTr("Done"), qsTr("Closed")]
+	readonly property var _labelMap: ({
+		"status":      [qsTr("Open"), qsTr("Closed")],
+		"priority":    [qsTr("Low"), qsTr("Medium"), qsTr("High"), qsTr("Critical")],
+		"stateReason": ["", qsTr("Completed"), qsTr("Not planned"), qsTr("Reopened")]
+	})
 
-	readonly property color badgeColor: (value >= 0 && value < badgeColors.length)
-		? badgeColors[value] : Style.textSecondaryColor
+	readonly property string badgeColor: badgeType === "label" ? labelColor
+		: (_colorMap[badgeType] && value >= 0 && value < _colorMap[badgeType].length)
+			? _colorMap[badgeType][value] : Style.textSecondaryColor
 
-	readonly property string badgeLabel: (value >= 0 && value < badgeLabels.length)
-		? badgeLabels[value] : "?"
+	readonly property string badgeLabel: badgeType === "label" ? labelName
+		: (_labelMap[badgeType] && value >= 0 && value < _labelMap[badgeType].length)
+			? _labelMap[badgeType][value] : "?"
 
-	width: badgeLabelText.implicitWidth + Style.paddingXS * 2 + 4
-	height: Style.badgeHeight
+	width: badgeLabelText.width + 2*Style.marginM
+	height: 30
 	radius: height / 2
 	color: badgeColor
 
@@ -37,7 +47,7 @@ Rectangle {
 		id: badgeLabelText
 		anchors.centerIn: parent
 		text: ticketBadgeRoot.badgeLabel
-		font.pixelSize: Style.fontSizeXS
+		font.pixelSize: Style.fontSizeM
 		color: "white"
 		font.bold: true
 	}

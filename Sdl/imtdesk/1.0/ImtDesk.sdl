@@ -8,6 +8,7 @@ schema {
 
 import {
 	"../../../../ImtCore/Sdl/imtbase/1.0/ImtCollection.sdl"
+	"../../../../ImtCore/Sdl/imtbase/1.0/ImtBaseTypes.sdl"
 }
 
 # --- Enums ---
@@ -21,9 +22,14 @@ enum TicketType {
 
 enum TicketStatus {
 	Open
-	InProgress
-	Resolved
 	Closed
+}
+
+enum StateReason {
+	None
+	Completed
+	NotPlanned
+	Reopened
 }
 
 enum TicketPriority {
@@ -33,10 +39,54 @@ enum TicketPriority {
 	Critical
 }
 
-enum Environment {
-	Development
-	Staging
-	Production
+# --- Label ---
+
+type LabelData {
+	id: ID!
+	name: String!
+	color: String!
+	description: String
+}
+
+# --- Entity Type ---
+
+type EntityType {
+	id: String
+	name: String
+}
+
+# --- Entity Reference ---
+
+type EntityReference {
+	entityType: String
+	entityId: ID
+	displayName: String
+	entityLink: ObjectLink
+}
+
+# --- Attachment ---
+
+type Attachment {
+	id: ID
+	fileName: String
+	mimeType: String
+	data: String
+	preview: String
+}
+
+# --- Comment ---
+
+type TicketComment {
+	id: ID
+	userId: ID
+	userName: String
+	timestamp: String
+	content: String
+	attachments: [Attachment]
+	reactions: [String]
+	replyToId: ID
+	replyToContent: String
+	replyToUserName: String
 }
 
 # --- Ticket ---
@@ -44,30 +94,41 @@ enum Environment {
 type TicketItemData {
 	id: ID!
 	typeId: ID!
+	number: Int
 	title: String!
 	ticketType: TicketType
 	status: TicketStatus
 	priority: TicketPriority
-	assigneeId: ID
+	assignee: String
 	createdAt: String
 }
 
 type TicketData {
 	id: ID!
+	number: Int
 	title: String!
 	description: String
 	ticketType: TicketType
 	status: TicketStatus
+	stateReason: StateReason
 	priority: TicketPriority
-	assigneeId: ID
+	assigneeIds: [ID]
 	reporterId: ID
 	conversationId: ID
 	messageId: ID
-	environment: Environment
 	tags: [String]
+	labelIds: [ID]
+	locked: Boolean
+	lockReason: String
 	createdAt: String
 	updatedAt: String
+	closedAt: String
 	resolvedAt: String
+	entityReferences: [EntityReference]
+	entityTypes: [EntityType]
+	comments: [TicketComment]
+	canEdit: Boolean
+	canLock: Boolean
 }
 
 input TicketsListInput {

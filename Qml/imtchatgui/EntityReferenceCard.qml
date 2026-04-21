@@ -17,7 +17,7 @@ Rectangle {
 
 	signal removeRequested()
 
-	width: compact ? compactRow.implicitWidth + Style.paddingS * 2 : Style.cardWidth
+	width: compact ? Style.chipWidth : Style.cardWidth
 	height: compact ? Style.chipHeight : Style.cardHeight
 	radius: Style.radiusS
 	color: Style.accentColorLight
@@ -55,7 +55,9 @@ Rectangle {
 
 			MouseArea {
 				anchors.fill: parent
-				onClicked: entityRefCardRoot.removeRequested()
+				onClicked: {
+					entityRefCardRoot.removeRequested()
+				}
 			}
 		}
 	}
@@ -63,12 +65,10 @@ Rectangle {
 	// Full card mode (used in message body)
 	Column {
 		visible: !compact
-		anchors {
-			left: parent.left
-			right: parent.right
-			top: parent.top
-			margins: Style.paddingS
-		}
+		anchors.left: parent.left
+		anchors.right: parent.right
+		anchors.top: parent.top
+		anchors.margins: Style.paddingS
 		spacing: Style.paddingXS
 
 		Row {

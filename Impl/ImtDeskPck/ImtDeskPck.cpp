@@ -20,5 +20,20 @@ I_EXPORT_COMPONENT(
 			"Support ticket component",
 			"Support Ticket");
 
+I_EXPORT_COMPONENT(
+			Label,
+			"Label component",
+			"Label");
+
+I_EXPORT_COMPONENT(
+			TicketDocumentNameProvider,
+			"Ticket document name provider",
+			"Ticket Document Name Provider");
+
+I_EXPORT_COMPONENT(
+			EntityTypeProvider,
+			"Entity type provider",
+			"Entity Type Provider");
+
 
 } // namespace ImtDeskPck

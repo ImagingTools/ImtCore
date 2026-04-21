@@ -9,10 +9,9 @@ Rectangle {
 	id: chatNotificationBannerRoot
 	objectName: "ChatNotificationBanner"
 	visible: false
-	height: visible ? bannerContent.implicitHeight + Style.paddingS * 2 : 0
+	height: visible ? Style.sizeS : 0
 	color: Style.accentColor
 	radius: Style.radiusS
-	opacity: 0
 
 	property string senderName: ""
 	property string messagePreview: ""
@@ -20,19 +19,13 @@ Rectangle {
 
 	signal bannerTapped(string conversationId)
 
-	Behavior on opacity {
-		NumberAnimation { duration: 200 }
-	}
-
 	Row {
 		id: bannerContent
-		anchors {
-			left: parent.left
-			right: parent.right
-			verticalCenter: parent.verticalCenter
-			leftMargin: Style.paddingM
-			rightMargin: Style.paddingS
-		}
+		anchors.left: parent.left
+		anchors.right: parent.right
+		anchors.verticalCenter: parent.verticalCenter
+		anchors.leftMargin: Style.paddingM
+		anchors.rightMargin: Style.paddingS
 		spacing: Style.paddingS
 
 		// Avatar
@@ -84,7 +77,9 @@ Rectangle {
 
 			MouseArea {
 				anchors.fill: parent
-				onClicked: chatNotificationBannerRoot.dismiss()
+				onClicked: {
+					chatNotificationBannerRoot.dismiss()
+				}
 			}
 		}
 	}
@@ -100,7 +95,9 @@ Rectangle {
 	Timer {
 		id: autoDismissTimer
 		interval: 4000
-		onTriggered: chatNotificationBannerRoot.dismiss()
+		onTriggered: {
+			chatNotificationBannerRoot.dismiss()
+		}
 	}
 
 	function show(sender, preview, convId) {
@@ -108,20 +105,10 @@ Rectangle {
 		messagePreview = preview || "";
 		conversationId = convId || "";
 		visible = true;
-		opacity = 1.0;
 		autoDismissTimer.restart();
 	}
 
 	function dismiss() {
-		opacity = 0;
-		dismissTimer.start();
-	}
-
-	Timer {
-		id: dismissTimer
-		interval: 200
-		onTriggered: {
-			chatNotificationBannerRoot.visible = false;
-		}
+		visible = false;
 	}
 }

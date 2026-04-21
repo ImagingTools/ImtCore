@@ -12,60 +12,39 @@ Item {
 	visible: false
 
 	property string userName: ""
+	property string dots: "."
+
+	Timer {
+		running: typingIndicatorRoot.visible
+		interval: 500
+		repeat: true
+		onTriggered: {
+			typingIndicatorRoot.dots = typingIndicatorRoot.dots.length >= 3 ? "." : typingIndicatorRoot.dots + ".";
+		}
+	}
 
 	Row {
-		anchors {
-			left: parent.left
-			verticalCenter: parent.verticalCenter
-			leftMargin: Style.paddingM
-		}
+		anchors.left: parent.left
+		anchors.verticalCenter: parent.verticalCenter
+		anchors.leftMargin: Style.paddingM
 		spacing: Style.paddingXS
 
 		Text {
 			visible: typingIndicatorRoot.userName.length > 0
-			text: typingIndicatorRoot.userName + " " + qsTr("is typing")
+			text: typingIndicatorRoot.userName + " " + qsTr("is typing") + typingIndicatorRoot.dots
 			font.pixelSize: Style.fontSizeXS
 			color: Style.textSecondaryColor
 			font.italic: true
 			anchors.verticalCenter: parent.verticalCenter
 		}
 
-		// Animated dots
-		Row {
-			spacing: 3
+		Text {
+			visible: typingIndicatorRoot.userName.length === 0
+			text: qsTr("typing") + typingIndicatorRoot.dots
+			font.pixelSize: Style.fontSizeXS
+			color: Style.textSecondaryColor
+			font.italic: true
 			anchors.verticalCenter: parent.verticalCenter
-
-			Repeater {
-				model: 3
-
-				Rectangle {
-					id: dot
-					width: 6
-					height: 6
-					radius: 3
-					color: Style.textSecondaryColor
-
-					property real phase: index * 0.4
-
-					SequentialAnimation on opacity {
-						running: typingIndicatorRoot.visible
-						loops: Animation.Infinite
-
-						PauseAnimation { duration: dot.phase * 1000 }
-						NumberAnimation { from: 0.3; to: 1.0; duration: 400; easing.type: Easing.InOutSine }
-						NumberAnimation { from: 1.0; to: 0.3; duration: 400; easing.type: Easing.InOutSine }
-					}
-
-					SequentialAnimation on y {
-						running: typingIndicatorRoot.visible
-						loops: Animation.Infinite
-
-						PauseAnimation { duration: dot.phase * 1000 }
-						NumberAnimation { from: 0; to: -4; duration: 300; easing.type: Easing.OutQuad }
-						NumberAnimation { from: -4; to: 0; duration: 300; easing.type: Easing.InQuad }
-					}
-				}
-			}
 		}
 	}
 }

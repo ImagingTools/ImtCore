@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtdesk/CSupportTicketComp.h>
 
+
 // ACF includes
 #include <istd/CChangeNotifier.h>
 #include <iser/IArchive.h>
@@ -22,7 +23,11 @@ QByteArray CSupportTicketComp::GetId() const
 
 void CSupportTicketComp::SetId(const QByteArray& id)
 {
-	m_id = id;
+	if (m_id != id){
+		istd::CChangeNotifier notifier(this);
+
+		m_id = id;
+	}
 }
 
 
@@ -34,7 +39,11 @@ QString CSupportTicketComp::GetTitle() const
 
 void CSupportTicketComp::SetTitle(const QString& title)
 {
-	m_title = title;
+	if (m_title != title){
+		istd::CChangeNotifier notifier(this);
+
+		m_title = title;
+	}
 }
 
 
@@ -46,7 +55,11 @@ QString CSupportTicketComp::GetDescription() const
 
 void CSupportTicketComp::SetDescription(const QString& description)
 {
-	m_description = description;
+	if (m_description != description){
+		istd::CChangeNotifier notifier(this);
+
+		m_description = description;
+	}
 }
 
 
@@ -58,7 +71,11 @@ ISupportTicket::TicketType CSupportTicketComp::GetTicketType() const
 
 void CSupportTicketComp::SetTicketType(TicketType ticketType)
 {
-	m_ticketType = ticketType;
+	if (m_ticketType != ticketType){
+		istd::CChangeNotifier notifier(this);
+
+		m_ticketType = ticketType;
+	}
 }
 
 
@@ -70,7 +87,27 @@ ISupportTicket::TicketStatus CSupportTicketComp::GetStatus() const
 
 void CSupportTicketComp::SetStatus(TicketStatus status)
 {
-	m_status = status;
+	if (m_status != status){
+		istd::CChangeNotifier notifier(this);
+
+		m_status = status;
+	}
+}
+
+
+ISupportTicket::StateReason CSupportTicketComp::GetStateReason() const
+{
+	return m_stateReason;
+}
+
+
+void CSupportTicketComp::SetStateReason(StateReason stateReason)
+{
+	if (m_stateReason != stateReason){
+		istd::CChangeNotifier notifier(this);
+
+		m_stateReason = stateReason;
+	}
 }
 
 
@@ -82,19 +119,27 @@ ISupportTicket::TicketPriority CSupportTicketComp::GetPriority() const
 
 void CSupportTicketComp::SetPriority(TicketPriority priority)
 {
-	m_priority = priority;
+	if (m_priority != priority){
+		istd::CChangeNotifier notifier(this);
+
+		m_priority = priority;
+	}
 }
 
 
-QByteArray CSupportTicketComp::GetAssigneeId() const
+QByteArrayList CSupportTicketComp::GetAssigneeIds() const
 {
-	return m_assigneeId;
+	return m_assigneeIds;
 }
 
 
-void CSupportTicketComp::SetAssigneeId(const QByteArray& assigneeId)
+void CSupportTicketComp::SetAssigneeIds(const QByteArrayList& assigneeIds)
 {
-	m_assigneeId = assigneeId;
+	if (m_assigneeIds != assigneeIds){
+		istd::CChangeNotifier notifier(this);
+
+		m_assigneeIds = assigneeIds;
+	}
 }
 
 
@@ -106,7 +151,11 @@ QByteArray CSupportTicketComp::GetReporterId() const
 
 void CSupportTicketComp::SetReporterId(const QByteArray& reporterId)
 {
-	m_reporterId = reporterId;
+	if (m_reporterId != reporterId){
+		istd::CChangeNotifier notifier(this);
+
+		m_reporterId = reporterId;
+	}
 }
 
 
@@ -118,7 +167,11 @@ QByteArray CSupportTicketComp::GetConversationId() const
 
 void CSupportTicketComp::SetConversationId(const QByteArray& conversationId)
 {
-	m_conversationId = conversationId;
+	if (m_conversationId != conversationId){
+		istd::CChangeNotifier notifier(this);
+
+		m_conversationId = conversationId;
+	}
 }
 
 
@@ -130,19 +183,11 @@ QByteArray CSupportTicketComp::GetMessageId() const
 
 void CSupportTicketComp::SetMessageId(const QByteArray& messageId)
 {
-	m_messageId = messageId;
-}
+	if (m_messageId != messageId){
+		istd::CChangeNotifier notifier(this);
 
-
-ISupportTicket::Environment CSupportTicketComp::GetEnvironment() const
-{
-	return m_environment;
-}
-
-
-void CSupportTicketComp::SetEnvironment(Environment environment)
-{
-	m_environment = environment;
+		m_messageId = messageId;
+	}
 }
 
 
@@ -154,7 +199,75 @@ QStringList CSupportTicketComp::GetTags() const
 
 void CSupportTicketComp::SetTags(const QStringList& tags)
 {
-	m_tags = tags;
+	if (m_tags != tags){
+		istd::CChangeNotifier notifier(this);
+
+		m_tags = tags;
+	}
+}
+
+
+QByteArrayList CSupportTicketComp::GetLabelIds() const
+{
+	return m_labelIds;
+}
+
+
+void CSupportTicketComp::SetLabelIds(const QByteArrayList& labelIds)
+{
+	if (m_labelIds != labelIds){
+		istd::CChangeNotifier notifier(this);
+
+		m_labelIds = labelIds;
+	}
+}
+
+
+bool CSupportTicketComp::IsLocked() const
+{
+	return m_locked;
+}
+
+
+void CSupportTicketComp::SetLocked(bool locked)
+{
+	if (m_locked != locked){
+		istd::CChangeNotifier notifier(this);
+
+		m_locked = locked;
+	}
+}
+
+
+QString CSupportTicketComp::GetLockReason() const
+{
+	return m_lockReason;
+}
+
+
+void CSupportTicketComp::SetLockReason(const QString& lockReason)
+{
+	if (m_lockReason != lockReason){
+		istd::CChangeNotifier notifier(this);
+
+		m_lockReason = lockReason;
+	}
+}
+
+
+int CSupportTicketComp::GetNumber() const
+{
+	return m_number;
+}
+
+
+void CSupportTicketComp::SetNumber(int number)
+{
+	if (m_number != number){
+		istd::CChangeNotifier notifier(this);
+
+		m_number = number;
+	}
 }
 
 
@@ -166,7 +279,11 @@ QString CSupportTicketComp::GetCreatedAt() const
 
 void CSupportTicketComp::SetCreatedAt(const QString& createdAt)
 {
-	m_createdAt = createdAt;
+	if (m_createdAt != createdAt){
+		istd::CChangeNotifier notifier(this);
+
+		m_createdAt = createdAt;
+	}
 }
 
 
@@ -178,7 +295,27 @@ QString CSupportTicketComp::GetUpdatedAt() const
 
 void CSupportTicketComp::SetUpdatedAt(const QString& updatedAt)
 {
-	m_updatedAt = updatedAt;
+	if (m_updatedAt != updatedAt){
+		istd::CChangeNotifier notifier(this);
+
+		m_updatedAt = updatedAt;
+	}
+}
+
+
+QString CSupportTicketComp::GetClosedAt() const
+{
+	return m_closedAt;
+}
+
+
+void CSupportTicketComp::SetClosedAt(const QString& closedAt)
+{
+	if (m_closedAt != closedAt){
+		istd::CChangeNotifier notifier(this);
+
+		m_closedAt = closedAt;
+	}
 }
 
 
@@ -190,7 +327,27 @@ QString CSupportTicketComp::GetResolvedAt() const
 
 void CSupportTicketComp::SetResolvedAt(const QString& resolvedAt)
 {
-	m_resolvedAt = resolvedAt;
+	if (m_resolvedAt != resolvedAt){
+		istd::CChangeNotifier notifier(this);
+
+		m_resolvedAt = resolvedAt;
+	}
+}
+
+
+QByteArrayList CSupportTicketComp::GetEntityReferences() const
+{
+	return m_entityReferences;
+}
+
+
+void CSupportTicketComp::SetEntityReferences(const QByteArrayList& entityReferences)
+{
+	if (m_entityReferences != entityReferences){
+		istd::CChangeNotifier notifier(this);
+
+		m_entityReferences = entityReferences;
+	}
 }
 
 
@@ -227,15 +384,17 @@ bool CSupportTicketComp::Serialize(iser::IArchive& archive)
 	retVal = retVal && I_SERIALIZE_ENUM(TicketStatus, archive, m_status);
 	retVal = retVal && archive.EndTag(statusTag);
 
+	static iser::CArchiveTag stateReasonTag("StateReason", "State reason", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(stateReasonTag);
+	retVal = retVal && I_SERIALIZE_ENUM(StateReason, archive, m_stateReason);
+	retVal = retVal && archive.EndTag(stateReasonTag);
+
 	static iser::CArchiveTag priorityTag("Priority", "Priority", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(priorityTag);
 	retVal = retVal && I_SERIALIZE_ENUM(TicketPriority, archive, m_priority);
 	retVal = retVal && archive.EndTag(priorityTag);
 
-	static iser::CArchiveTag assigneeIdTag("AssigneeId", "Assignee ID", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(assigneeIdTag);
-	retVal = retVal && archive.Process(m_assigneeId);
-	retVal = retVal && archive.EndTag(assigneeIdTag);
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_assigneeIds, "AssigneeIds", "AssigneeId");
 
 	static iser::CArchiveTag reporterIdTag("ReporterId", "Reporter ID", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(reporterIdTag);
@@ -252,12 +411,24 @@ bool CSupportTicketComp::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_messageId);
 	retVal = retVal && archive.EndTag(messageIdTag);
 
-	static iser::CArchiveTag environmentTag("Environment", "Environment", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(environmentTag);
-	retVal = retVal && I_SERIALIZE_ENUM(Environment, archive, m_environment);
-	retVal = retVal && archive.EndTag(environmentTag);
-
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QStringList>(archive, m_tags, "Tags", "Tag");
+
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_labelIds, "LabelIds", "LabelId");
+
+	static iser::CArchiveTag lockedTag("Locked", "Locked", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(lockedTag);
+	retVal = retVal && archive.Process(m_locked);
+	retVal = retVal && archive.EndTag(lockedTag);
+
+	static iser::CArchiveTag lockReasonTag("LockReason", "Lock reason", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(lockReasonTag);
+	retVal = retVal && archive.Process(m_lockReason);
+	retVal = retVal && archive.EndTag(lockReasonTag);
+
+	static iser::CArchiveTag numberTag("Number", "Number", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(numberTag);
+	retVal = retVal && archive.Process(m_number);
+	retVal = retVal && archive.EndTag(numberTag);
 
 	static iser::CArchiveTag createdAtTag("CreatedAt", "Created at", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(createdAtTag);
@@ -269,10 +440,17 @@ bool CSupportTicketComp::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_updatedAt);
 	retVal = retVal && archive.EndTag(updatedAtTag);
 
+	static iser::CArchiveTag closedAtTag("ClosedAt", "Closed at", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(closedAtTag);
+	retVal = retVal && archive.Process(m_closedAt);
+	retVal = retVal && archive.EndTag(closedAtTag);
+
 	static iser::CArchiveTag resolvedAtTag("ResolvedAt", "Resolved at", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(resolvedAtTag);
 	retVal = retVal && archive.Process(m_resolvedAt);
 	retVal = retVal && archive.EndTag(resolvedAtTag);
+
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_entityReferences, "EntityReferences", "EntityReferenceId");
 
 	return retVal;
 }
@@ -287,21 +465,30 @@ bool CSupportTicketComp::CopyFrom(const IChangeable& object, CompatibilityMode /
 		return false;
 	}
 
+	istd::CChangeNotifier notifier(this);
+
 	m_id = srcPtr->GetId();
 	m_title = srcPtr->GetTitle();
 	m_description = srcPtr->GetDescription();
 	m_ticketType = srcPtr->GetTicketType();
 	m_status = srcPtr->GetStatus();
+	m_stateReason = srcPtr->GetStateReason();
 	m_priority = srcPtr->GetPriority();
-	m_assigneeId = srcPtr->GetAssigneeId();
+	m_assigneeIds = srcPtr->GetAssigneeIds();
 	m_reporterId = srcPtr->GetReporterId();
 	m_conversationId = srcPtr->GetConversationId();
 	m_messageId = srcPtr->GetMessageId();
-	m_environment = srcPtr->GetEnvironment();
 	m_tags = srcPtr->GetTags();
+	m_labelIds = srcPtr->GetLabelIds();
+	m_locked = srcPtr->IsLocked();
+	m_lockReason = srcPtr->GetLockReason();
+	m_number = srcPtr->GetNumber();
 	m_createdAt = srcPtr->GetCreatedAt();
 	m_updatedAt = srcPtr->GetUpdatedAt();
+	m_closedAt = srcPtr->GetClosedAt();
 	m_resolvedAt = srcPtr->GetResolvedAt();
+	m_entityReferences = srcPtr->GetEntityReferences();
+
 	return true;
 }
 
@@ -313,49 +500,69 @@ bool CSupportTicketComp::IsEqual(const IChangeable& object) const
 		return false;
 	}
 
-	return m_id == srcPtr->GetId()
+	bool result = m_id == srcPtr->GetId()
 		&& m_title == srcPtr->GetTitle()
 		&& m_description == srcPtr->GetDescription()
 		&& m_ticketType == srcPtr->GetTicketType()
 		&& m_status == srcPtr->GetStatus()
+		&& m_stateReason == srcPtr->GetStateReason()
 		&& m_priority == srcPtr->GetPriority()
-		&& m_assigneeId == srcPtr->GetAssigneeId()
+		&& m_assigneeIds == srcPtr->GetAssigneeIds()
 		&& m_reporterId == srcPtr->GetReporterId()
 		&& m_conversationId == srcPtr->GetConversationId()
 		&& m_messageId == srcPtr->GetMessageId()
-		&& m_environment == srcPtr->GetEnvironment()
 		&& m_tags == srcPtr->GetTags()
+		&& m_labelIds == srcPtr->GetLabelIds()
+		&& m_locked == srcPtr->IsLocked()
+		&& m_lockReason == srcPtr->GetLockReason()
+		&& m_number == srcPtr->GetNumber()
 		&& m_createdAt == srcPtr->GetCreatedAt()
 		&& m_updatedAt == srcPtr->GetUpdatedAt()
-		&& m_resolvedAt == srcPtr->GetResolvedAt();
+		&& m_closedAt == srcPtr->GetClosedAt()
+		&& m_resolvedAt == srcPtr->GetResolvedAt()
+		&& m_entityReferences == srcPtr->GetEntityReferences();
+
+	return result;
 }
 
 
 istd::IChangeableUniquePtr CSupportTicketComp::CloneMe(CompatibilityMode mode) const
 {
 	istd::TUniqueInterfacePtr<CSupportTicketComp> clonePtr(new CSupportTicketComp());
-	clonePtr->CopyFrom(*this, mode);
-	return clonePtr;
+	if (clonePtr->CopyFrom(*this, mode)){
+		return clonePtr;
+	}
+
+	return nullptr;
 }
 
 
 bool CSupportTicketComp::ResetData(CompatibilityMode /*mode*/)
 {
+	istd::CChangeNotifier notifier(this);
+
 	m_id.clear();
 	m_title.clear();
 	m_description.clear();
 	m_ticketType = TT_ACCESS_REQUEST;
 	m_status = TS_OPEN;
+	m_stateReason = SR_NONE;
 	m_priority = TP_MEDIUM;
-	m_assigneeId.clear();
+	m_assigneeIds.clear();
 	m_reporterId.clear();
 	m_conversationId.clear();
 	m_messageId.clear();
-	m_environment = ENV_PRODUCTION;
 	m_tags.clear();
+	m_labelIds.clear();
+	m_locked = false;
+	m_lockReason.clear();
+	m_number = 0;
 	m_createdAt.clear();
 	m_updatedAt.clear();
+	m_closedAt.clear();
 	m_resolvedAt.clear();
+	m_entityReferences.clear();
+
 	return true;
 }
 

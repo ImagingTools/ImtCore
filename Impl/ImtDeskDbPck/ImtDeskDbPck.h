@@ -4,6 +4,7 @@
 
 // ImtCore includes
 #include <imtdeskdb/CSupportTicketDbDelegateComp.h>
+#include <imtdeskdb/CEntityReferenceStorageComp.h>
 
 
 /**
@@ -14,6 +15,7 @@ namespace ImtDeskDbPck
 
 
 typedef imtdeskdb::CSupportTicketDbDelegateComp SupportTicketDbDelegate;
+typedef imtdeskdb::CEntityReferenceStorageComp EntityReferenceStorage;
 
 
 } // namespace ImtDeskDbPck

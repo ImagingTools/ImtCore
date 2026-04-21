@@ -20,6 +20,11 @@ I_EXPORT_COMPONENT(
 			"Collection-based document manager",
 			"Collection Document");
 
+I_EXPORT_COMPONENT(
+			DocumentManagerEventHandlerDemultiplexer,
+			"Document manager event handler demultiplexer",
+			"Document Manager Event Handler Demultiplexer");
+
 
 } // namespace ImtDocPck
 

@@ -99,7 +99,9 @@ void CCollectionDocumentManagerPublisherComp::PublishRepresentation(
 		}
 
 		if (commandId == networkRequest.gqlRequest.GetCommandId()){
-			PublishData(commandId, data);
+			for (auto it = networkRequest.networkRequests.constBegin(); it != networkRequest.networkRequests.constEnd(); ++it) {
+				PushDataToSubscriber(it.key(), commandId, data, *it.value());
+			}
 		}
 	}
 }

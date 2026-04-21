@@ -2,11 +2,33 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QString>
+
+// ImtCore includes
+#include <imtbase/IObjectCollection.h>
+#include <imtauth/IUserInfo.h>
+
+
 /**
 	Library containing interface and implementation related to user authentification and account management.
 */
 namespace imtauth
 {
+
+
+QString GetUserName(const imtbase::IObjectCollection& userCollection, const QByteArray& userId)
+{
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (userCollection.GetObjectData(userId, dataPtr)){
+		const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
+		if (userInfoPtr != nullptr){
+			return userInfoPtr->GetName();
+		}
+	}
+
+	return QString();
+}
 
 
 } // namespace imtauth

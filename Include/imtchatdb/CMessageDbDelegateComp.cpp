@@ -2,8 +2,15 @@
 #include <imtchatdb/CMessageDbDelegateComp.h>
 
 // Qt includes
+#include <QtCore/QDateTime>
 #include <QtCore/QUuid>
+#include <QtSql/QSqlError>
+#include <QtSql/QSqlQuery>
 #include <QtSql/QSqlRecord>
+
+// ACF includes
+#include <iprm/TParamsPtr.h>
+#include <iprm/IIdParam.h>
 
 // ImtCore includes
 #include <imtchat/IChatMessage.h>
@@ -13,6 +20,18 @@
 
 namespace imtchatdb
 {
+
+
+namespace
+{
+
+// Helper: return current UTC timestamp in ISO 8601 with milliseconds
+QString utcNow()
+{
+	return QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
+}
+
+} // anonymous namespace
 
 
 istd::IChangeableUniquePtr CMessageDbDelegateComp::CreateObjectFromRecord(
@@ -53,27 +72,56 @@ istd::IChangeableUniquePtr CMessageDbDelegateComp::CreateObjectFromRecord(
 		}
 		msgPtr->SetEntityReferences(entityRefIds);
 	}
-	if (record.contains("AttachmentIds")){
-		const QString attachStr = record.value("AttachmentIds").toString();
-		QByteArrayList attachIds;
-		if (!attachStr.isEmpty()){
-			for (const QString& part : attachStr.split(',')){
-				const QString trimmed = part.trimmed();
-				if (!trimmed.isEmpty()){
-					attachIds.append(trimmed.toUtf8());
+	// AttachmentIds are loaded from the MessageAttachments junction table
+	if (m_databaseEngineCompPtr.IsValid() && record.contains("Id")){
+		QByteArray messageId = record.value("Id").toByteArray();
+		if (!messageId.isEmpty()){
+			QString escaped = QString::fromUtf8(messageId);
+			escaped.replace('\'', "''");
+			QByteArray attachQuery = QString(
+				"SELECT \"AttachmentId\" FROM \"MessageAttachments\" WHERE \"MessageId\"='%1' ORDER BY \"CreatedAt\" ASC;")
+				.arg(escaped).toUtf8();
+
+			QSqlError sqlError;
+			QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(attachQuery, &sqlError);
+			if (sqlError.type() == QSqlError::NoError){
+				QByteArrayList attachIds;
+				while (sqlQuery.next()){
+					QSqlRecord r = sqlQuery.record();
+					if (r.contains("AttachmentId")){
+						QByteArray aid = r.value("AttachmentId").toByteArray();
+						if (!aid.isEmpty()){
+							attachIds.append(aid);
+						}
+					}
 				}
+				msgPtr->SetAttachmentIds(attachIds);
 			}
 		}
-		msgPtr->SetAttachmentIds(attachIds);
 	}
 	if (record.contains("Status")){
 		msgPtr->SetStatus(static_cast<imtchat::IChatMessage::MessageStatus>(record.value("Status").toInt()));
 	}
+	if (record.contains("Reactions")){
+		const QString reactionsStr = record.value("Reactions").toString();
+		QStringList reactions;
+		if (!reactionsStr.isEmpty()){
+			reactions = reactionsStr.split(',');
+		}
+		msgPtr->SetReactions(reactions);
+	}
 	if (record.contains("CreatedAt")){
-		msgPtr->SetCreatedAt(record.value("CreatedAt").toString());
+		QVariant val = record.value("CreatedAt");
+		QDateTime dt = val.toDateTime();
+		msgPtr->SetCreatedAt(dt.isValid() ? dt.toString(Qt::ISODateWithMs) : val.toString());
 	}
 	if (record.contains("UpdatedAt")){
-		msgPtr->SetUpdatedAt(record.value("UpdatedAt").toString());
+		QVariant val = record.value("UpdatedAt");
+		QDateTime dt = val.toDateTime();
+		msgPtr->SetUpdatedAt(dt.isValid() ? dt.toString(Qt::ISODateWithMs) : val.toString());
+	}
+	if (record.contains("ReplyToId")){
+		msgPtr->SetReplyToId(record.value("ReplyToId").toByteArray());
 	}
 
 	return msgPtr;
@@ -88,7 +136,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CMessageDbDelegateComp::CreateNew
 		const istd::IChangeable* valuePtr,
 		const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	if (typeId.isEmpty() || typeId != "Message"){
+	if (typeId.isEmpty() || typeId != "ChatMessage"){
 		return NewObjectQuery();
 	}
 
@@ -110,27 +158,51 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CMessageDbDelegateComp::CreateNew
 	}
 	const QString entityRefsSql = entityRefsStr.isEmpty() ? "NULL" : QString("'%1'").arg(entityRefsStr);
 
-	QString attachStr;
-	const QByteArrayList attachIds = msgPtr->GetAttachmentIds();
-	for (int i = 0; i < attachIds.size(); ++i){
-		if (i > 0) attachStr += ",";
-		attachStr += QString::fromUtf8(attachIds[i]);
-	}
-	const QString attachSql = attachStr.isEmpty() ? "NULL" : QString("'%1'").arg(attachStr);
+	const QString reactionsStr = msgPtr->GetReactions().join(',');
+	const QString reactionsSql = reactionsStr.isEmpty() ? "NULL" : QString("'%1'").arg(reactionsStr);
 
-	NewObjectQuery retVal;
-	retVal.query = QString(
+	const QByteArray replyToId = msgPtr->GetReplyToId();
+	const QString replyToIdSql = replyToId.isEmpty() ? "NULL" : QString("'%1'").arg(QString::fromUtf8(replyToId));
+
+	const QString nowUtc = utcNow();
+
+	QString combinedQuery;
+
+	// INSERT into Messages table (without AttachmentIds column)
+	combinedQuery += QString(
 		"INSERT INTO \"Messages\" "
-		"(\"Id\", \"ConversationId\", \"SenderId\", \"Content\", \"EntityReferences\", \"AttachmentIds\", \"Status\") "
-		"VALUES('%1', '%2', '%3', '%4', %5, %6, %7);")
+		"(\"Id\", \"ConversationId\", \"SenderId\", \"Content\", \"EntityReferences\", \"Reactions\", \"Status\", \"ReplyToId\", \"CreatedAt\", \"UpdatedAt\") "
+		"VALUES('%1', '%2', '%3', '%4', %5, %6, %7, %8, '%9', '%10');")
 		.arg(QString::fromUtf8(msgId))
 		.arg(QString::fromUtf8(msgPtr->GetConversationId()))
 		.arg(QString::fromUtf8(msgPtr->GetSenderId()))
 		.arg(msgPtr->GetContent())
 		.arg(entityRefsSql)
-		.arg(attachSql)
+		.arg(reactionsSql)
 		.arg(msgPtr->GetStatus())
-		.toUtf8();
+		.arg(replyToIdSql)
+		.arg(nowUtc)
+		.arg(nowUtc);
+
+	// INSERT into MessageAttachments junction table for each attachment
+	const QByteArrayList attachIds = msgPtr->GetAttachmentIds();
+	for (const QByteArray& attachId : attachIds){
+		if (attachId.isEmpty()){
+			continue;
+		}
+		QString escapedAttachId = QString::fromUtf8(attachId);
+		escapedAttachId.replace('\'', "''");
+		combinedQuery += QString(
+			"\nINSERT INTO \"MessageAttachments\" "
+			"(\"MessageId\", \"AttachmentId\", \"CreatedAt\") "
+			"VALUES('%1', '%2', '%3');")
+			.arg(QString::fromUtf8(msgId))
+			.arg(escapedAttachId)
+			.arg(nowUtc);
+	}
+
+	NewObjectQuery retVal;
+	retVal.query = combinedQuery.toUtf8();
 
 	return retVal;
 }
@@ -156,16 +228,22 @@ QByteArray CMessageDbDelegateComp::CreateUpdateObjectQuery(
 	}
 	const QString entityRefsSql = entityRefsStr.isEmpty() ? "NULL" : QString("'%1'").arg(entityRefsStr);
 
+	const QString reactionsStr = msgPtr->GetReactions().join(',');
+	const QString reactionsSql = reactionsStr.isEmpty() ? "NULL" : QString("'%1'").arg(reactionsStr);
+
 	return QString(
 		"UPDATE \"Messages\" SET "
 		"\"Content\"='%1', "
 		"\"EntityReferences\"=%2, "
-		"\"Status\"=%3, "
-		"\"UpdatedAt\"=NOW() "
-		"WHERE \"Id\"='%4';")
+		"\"Reactions\"=%3, "
+		"\"Status\"=%4, "
+		"\"UpdatedAt\"='%5' "
+		"WHERE \"Id\"='%6';")
 		.arg(msgPtr->GetContent())
 		.arg(entityRefsSql)
+		.arg(reactionsSql)
 		.arg(msgPtr->GetStatus())
+		.arg(utcNow())
 		.arg(QString::fromUtf8(objectId))
 		.toUtf8();
 }
@@ -186,7 +264,9 @@ QByteArray CMessageDbDelegateComp::CreateDeleteObjectsQuery(
 		idsStr += QString("'%1'").arg(QString::fromUtf8(objectIds[i]));
 	}
 
-	return QString("UPDATE \"Messages\" SET \"IsActive\"=FALSE WHERE \"Id\" IN (%1);")
+	// Delete junction records first, then the messages
+	return QString("DELETE FROM \"MessageAttachments\" WHERE \"MessageId\" IN (%1);\n"
+		"DELETE FROM \"Messages\" WHERE \"Id\" IN (%1);")
 		.arg(idsStr)
 		.toUtf8();
 }
@@ -229,31 +309,90 @@ void CMessageDbDelegateComp::OnComponentCreated()
 		return;
 	}
 
+	// Create Messages table
 	const QString tableName = GetTableName();
-	if (TableExists(tableName)){
-		return;
+	if (!TableExists(tableName)){
+		QFile scriptFile(imtdb::GetSqlResourcePath(*m_databaseEngineCompPtr, QStringLiteral("CreateMessagesTable.sql")));
+		if (!scriptFile.open(QFile::ReadOnly)){
+			SendErrorMessage(0, QString("Messages table creation script '%1' could not be loaded").arg(scriptFile.fileName()));
+			return;
+		}
+
+		QByteArray query = scriptFile.readAll();
+		scriptFile.close();
+		query.replace("${TableScheme}", "public");
+
+		QSqlError sqlError;
+		m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
+
+		if (sqlError.type() != QSqlError::NoError){
+			qCritical() << __FILE__ << __LINE__
+						<< "\n\t| Messages table could not be created"
+						<< "\n\t| Error:" << sqlError
+						<< "\n\t| Query:" << query;
+			SendErrorMessage(0, QString("Messages table could not be created: %1").arg(sqlError.text()));
+		}
 	}
 
-	QFile scriptFile(imtdb::GetSqlResourcePath(*m_databaseEngineCompPtr, QStringLiteral("CreateMessagesTable.sql")));
-	if (!scriptFile.open(QFile::ReadOnly)){
-		SendErrorMessage(0, QString("Messages table creation script '%1' could not be loaded").arg(scriptFile.fileName()));
-		return;
+	// Create MessageAttachments junction table
+	if (!TableExists("MessageAttachments")){
+		QFile junctionScriptFile(imtdb::GetSqlResourcePath(*m_databaseEngineCompPtr, QStringLiteral("CreateMessageAttachmentsTable.sql")));
+		if (!junctionScriptFile.open(QFile::ReadOnly)){
+			SendErrorMessage(0, QString("MessageAttachments table creation script '%1' could not be loaded").arg(junctionScriptFile.fileName()));
+			return;
+		}
+
+		QByteArray junctionQuery = junctionScriptFile.readAll();
+		junctionScriptFile.close();
+		junctionQuery.replace("${TableScheme}", "public");
+
+		QSqlError junctionError;
+		m_databaseEngineCompPtr->ExecSqlQuery(junctionQuery, &junctionError);
+
+		if (junctionError.type() != QSqlError::NoError){
+			qCritical() << __FILE__ << __LINE__
+						<< "\n\t| MessageAttachments table could not be created"
+						<< "\n\t| Error:" << junctionError
+						<< "\n\t| Query:" << junctionQuery;
+			SendErrorMessage(0, QString("MessageAttachments table could not be created: %1").arg(junctionError.text()));
+		}
 	}
 
-	QByteArray query = scriptFile.readAll();
-	scriptFile.close();
-	query.replace("${TableScheme}", "public");
-
-	QSqlError sqlError;
-	m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
-
-	if (sqlError.type() != QSqlError::NoError){
-		qCritical() << __FILE__ << __LINE__
-					<< "\n\t| Messages table could not be created"
-					<< "\n\t| Error:" << sqlError
-					<< "\n\t| Query:" << query;
-		SendErrorMessage(0, QString("Messages table could not be created: %1").arg(sqlError.text()));
+	// Add ReplyToId column to existing Messages tables (migration)
+	{
+		QSqlError migrError;
+		m_databaseEngineCompPtr->ExecSqlQuery(
+			"ALTER TABLE \"Messages\" ADD COLUMN \"ReplyToId\" TEXT;",
+			&migrError);
+		// Ignore "duplicate column" errors — column may already exist from a previous run.
+		// Log any other errors as warnings.
+		if (migrError.type() != QSqlError::NoError){
+			QString errorText = migrError.databaseText().toLower();
+			if (!errorText.contains("duplicate") && !errorText.contains("already exists")){
+				qWarning() << "Messages.ReplyToId migration warning:" << migrError.text();
+			}
+		}
 	}
+}
+
+
+QString CMessageDbDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const
+{
+	iprm::IParamsSet::Ids paramIds = filterParams.GetParamIds();
+
+	if (paramIds.contains("ConversationId")){
+		iprm::TParamsPtr<iprm::IIdParam> idParamPtr(&filterParams, "ConversationId");
+		if (idParamPtr.IsValid()){
+			QByteArray conversationId = idParamPtr->GetId();
+			if (!conversationId.isEmpty()){
+				QString escaped = QString::fromUtf8(conversationId);
+				escaped.replace('\'', "''");
+				return QString("\"ConversationId\"='%1'").arg(escaped);
+			}
+		}
+	}
+
+	return QString();
 }
 
 

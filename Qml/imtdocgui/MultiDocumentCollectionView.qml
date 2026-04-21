@@ -420,6 +420,21 @@ Item {
 					}
 				}
 
+				if (item.objectName === "DocumentViewBase"){
+					if (item.documentManagerView !== undefined){
+						item.documentManagerView = workspaceView
+					}
+					if (item.documentManager !== undefined){
+						item.documentManager = workspaceView.documentManager
+					}
+					if (item.documentId !== undefined){
+						item.documentId = stackView.documentId
+					}
+					if (item.documentTypeId !== undefined){
+						item.documentTypeId = stackView.documentTypeId
+					}
+				}
+
 				workspaceView.documentManager.onViewInstanceCreated(documentId, item, viewTypeId)
 			}
 

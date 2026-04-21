@@ -66,6 +66,12 @@ QtObject {
 			if (typeOperation === EDocumentOperationEnum.s_documentChanged){
 				root.updateRepresentationForAllViews()
 			}
+
+			if (typeOperation === EDocumentOperationEnum.s_documentSaved){
+				for (let i = 0; i < root.registeredViews.length; ++i){
+					root.registeredViews[i].documentSaved()
+				}
+			}
 		}
 
 		function onDocumentNameChanged(documentId, oldName, newName){
@@ -90,6 +96,7 @@ QtObject {
 		for (let i = 0; i < registeredViews.length; ++i){
 			if (registeredViews[i].model === representation){
 				registeredViews[i].setBlockingUpdateModel(true)
+				_internal.updateCounters[i] = _internal.updateCounters[i] + 1
 				break
 			}
 		}
@@ -104,8 +111,12 @@ QtObject {
 
 		for (let i = 0; i < registeredViews.length; ++i){
 			if (registeredViews[i].model === representation){
-				registeredViews[i].setBlockingUpdateModel(false)
-				
+				_internal.updateCounters[i] = _internal.updateCounters[i] - 1
+				if (_internal.updateCounters[i] <= 0){
+					_internal.updateCounters[i] = 0
+					registeredViews[i].setBlockingUpdateModel(false)
+				}
+
 				registeredViews[i].doUpdateGui()
 				break
 			}
@@ -155,6 +166,7 @@ QtObject {
 
 		registeredViews.push(view)
 		registeredRepresentation.push(representationController)
+		_internal.updateCounters.push(0)
 		
 		viewRegistered(view, representationController, updateRepr)
 	}
@@ -218,5 +230,6 @@ QtObject {
 	property QtObject _internal: QtObject {
 		property var requestUpdateViews: []
 		property bool saveRequested: false
+		property var updateCounters: []
 	}
 }

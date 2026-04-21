@@ -31,13 +31,11 @@ Rectangle {
 			color: Style.panelHeaderColor
 
 			Row {
-				anchors {
-					left: parent.left
-					right: parent.right
-					verticalCenter: parent.verticalCenter
-					leftMargin: Style.paddingM
-					rightMargin: Style.paddingM
-				}
+				anchors.left: parent.left
+				anchors.right: parent.right
+				anchors.verticalCenter: parent.verticalCenter
+				anchors.leftMargin: Style.paddingM
+				anchors.rightMargin: Style.paddingM
 				spacing: Style.paddingS
 
 				Rectangle {
@@ -86,7 +84,7 @@ Rectangle {
 				isOwn: model.isOwn || false
 				hasEntityRefs: model.hasEntityRefs || false
 
-				onCreateTicketRequested: function(msgId, msgContent) {
+				onCreateTicketRequested: {
 					chatViewContainer.ticketCreateRequested(msgId, msgContent);
 				}
 			}
@@ -97,8 +95,6 @@ Rectangle {
 				width: messagesListView.width
 				userName: chatViewContainer.typingUserName
 			}
-
-			ScrollBar.vertical: ScrollBar {}
 
 			Component.onCompleted: {
 				positionViewAtEnd();
@@ -115,7 +111,7 @@ Rectangle {
 			width: parent.width
 			conversationId: chatViewContainer.conversationId
 
-			onMessageReady: function(content, entityRefs, attachmentIds) {
+			onMessageReady: {
 				chatViewContainer.messageSent(content, entityRefs, attachmentIds);
 			}
 		}
@@ -124,11 +120,9 @@ Rectangle {
 	// Notification banner overlay
 	ChatNotificationBanner {
 		id: notificationBanner
-		anchors {
-			top: parent.top
-			left: parent.left
-			right: parent.right
-		}
+		anchors.top: parent.top
+		anchors.left: parent.left
+		anchors.right: parent.right
 	}
 
 	function showNotification(senderName, preview) {

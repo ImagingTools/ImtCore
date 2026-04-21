@@ -2,10 +2,16 @@
 #pragma once
 
 
+// ACF includes
+#include <icomp/TModelCompWrap.h>
+
 // ImtCore includes
 #include <imtchat/CChatMessageComp.h>
 #include <imtchat/CConversationComp.h>
+#include <imtchat/CAttachmentComp.h>
 #include <imtchat/CChatServiceComp.h>
+#include <imtchat/CAttachmentStorageComp.h>
+#include <imtchat/CAttachmentBinaryDataProviderComp.h>
 
 
 /**
@@ -15,9 +21,14 @@ namespace ImtChatPck
 {
 
 
-typedef imtchat::CChatMessageComp ChatMessage;
-typedef imtchat::CConversationComp Conversation;
+typedef icomp::TModelCompWrap<imtchat::CChatMessageComp> ChatMessage;
+typedef icomp::TModelCompWrap<imtchat::CConversationComp> Conversation;
+typedef icomp::TModelCompWrap<imtchat::CAttachmentComp> Attachment;
 typedef imtchat::CChatServiceComp ChatService;
+typedef imtchat::CAttachmentStorageComp AttachmentStorage;
+typedef imtchat::CAttachmentBinaryDataProviderComp AttachmentBinaryDataProvider;
 
 
 } // namespace ImtChatPck
+
+

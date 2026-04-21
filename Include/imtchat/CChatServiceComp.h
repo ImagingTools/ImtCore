@@ -33,9 +33,11 @@ public:
 	// reimplemented (imtchat::IChatService)
 	virtual QByteArray SendMessage(
 				const QByteArray& conversationId,
+				const QByteArray& senderId,
 				const QString& content,
 				const QByteArrayList& entityReferences = QByteArrayList(),
-				const QByteArrayList& attachmentIds = QByteArrayList()) override;
+				const QByteArrayList& attachmentIds = QByteArrayList(),
+				const QByteArray& replyToId = QByteArray()) override;
 	virtual QByteArrayList GetMessages(
 				const QByteArray& conversationId,
 				int offset = 0,
