@@ -59,7 +59,6 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>Workspace</Value>
-                                <Value>DeskPage</Value>
                                 <Value>SearchPage</Value>
                                 <Value>AdministrationPage</Value>
                             </Values>
