@@ -32,10 +32,6 @@ namespace imtqml
 
 	The class is registered to QML by \c CStaticQmlTypeRegistratorComp
 	under \c com.imtcore.imtqml 1.0 as \c DataModelController.
-
-	\sa CGqlBasedDataModelController — concrete subclass that ships
-	    with the asynchronous SDL transport on top of
-	    \c CGqlClientBridge.
 */
 class CDataModelController: public QObject
 {

@@ -12,7 +12,7 @@ namespace
 
 /**
 	\brief Stable diagnostic returned by every method until the SDL
-	transport is moved here from \c CGqlBasedDataModelController.
+	transport is wired in this bridge.
 */
 const QString c_notImplementedError = QStringLiteral(
 		"CGqlDataModelBridge: SDL transport not yet wired in this bridge - "

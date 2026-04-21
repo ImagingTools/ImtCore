@@ -12,7 +12,6 @@
 #include <imtqml/CDocumentDataController.h>
 #include <imtqml/CDocumentRepresentationController.h>
 #include <imtqml/CFileIO.h>
-#include <imtqml/CGqlBasedDataModelController.h>
 #include <imtqml/CGqlModel.h>
 #include <imtqml/CGqlRequest.h>
 #include <imtqml/CNetworkEventInterceptor.h>
@@ -69,9 +68,6 @@ void CStaticQmlTypeRegistratorComp::OnComponentCreated()
 	}
 	if (!m_registerCDataModelControllerAttrPtr.IsValid() || *m_registerCDataModelControllerAttrPtr){
 		qmlRegisterType<imtqml::CDataModelController>("com.imtcore.imtqml", 1, 0, "DataModelController");
-	}
-	if (!m_registerCGqlBasedDataModelControllerAttrPtr.IsValid() || *m_registerCGqlBasedDataModelControllerAttrPtr){
-		qmlRegisterType<imtqml::CGqlBasedDataModelController>("com.imtcore.imtqml", 1, 0, "GqlBasedDataModelController");
 	}
 }
 
