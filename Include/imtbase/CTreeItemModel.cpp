@@ -1051,7 +1051,7 @@ bool CTreeItemModel::ParseRecursive(const QJsonObject& jsonObject, int index)
 					retVal = retVal && treeItemModel->ParseRecursive(arrayValue.toObject(), childIndex);
 				}
 				else if (arrayValue.isArray()){
-					// Пока явно считаем неподдержанным случаем.
+					// Unsupported yet
 					retVal = false;
 				}
 				else{

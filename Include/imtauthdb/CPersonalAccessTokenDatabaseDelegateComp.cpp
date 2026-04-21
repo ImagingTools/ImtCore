@@ -346,7 +346,7 @@ void CPersonalAccessTokenDatabaseDelegateComp::OnComponentCreated()
 		if (!TableExists(tableName)){
 			QFile scriptFile(GetSqlResourcePath(*m_databaseEngineCompPtr, QStringLiteral("CreatePersonalAccessTokenTable.sql")));
 			if (!scriptFile.open(QFile::ReadOnly)){
-				SendErrorMessage(0, QT_TR_NOOP(QString("Personal access tokens table creation script '%1'could not be loaded").arg(scriptFile.fileName())));
+				SendErrorMessage(0, QObject::tr("Personal access tokens table creation script '%1'could not be loaded").arg(scriptFile.fileName()));
 				return;
 			}
 
@@ -365,10 +365,10 @@ void CPersonalAccessTokenDatabaseDelegateComp::OnComponentCreated()
 							<< "\n\t| Error: " << sqlError
 							<< "\n\t| Query: " << createTableQuery;
 	
-				SendErrorMessage(0, QT_TR_NOOP(QString("\n\t| Table could not be created"
+				SendErrorMessage(0, QObject::tr("\n\t| Table could not be created"
 														"\n\t| Error: %1"
 														 "\n\t| Query: %2")
-													.arg(sqlError.text(), qPrintable(createTableQuery))));
+													.arg(sqlError.text(), qPrintable(createTableQuery)));
 			}
 		}
 	}
