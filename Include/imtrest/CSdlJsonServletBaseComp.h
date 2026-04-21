@@ -60,7 +60,7 @@ bool CSdlJsonServletBaseComp::ReadRequestToSdlStruct(
 	const QByteArray requestBody = request.GetBody();
 	const QJsonDocument payloadDocument = QJsonDocument::fromJson(requestBody);
 	if (!payloadDocument.isObject()){
-		const QString baseErrorString = QT_TR_NOOP("The request is not a valid json object");
+		const QString baseErrorString = QObject::tr("The request is not a valid json object");
 		SendErrorMessage(0, baseErrorString + QString(": '%1'").arg(QString(requestBody)), __func__);
 
 		responsePtr = CreateDefaultErrorResponse(
@@ -76,7 +76,7 @@ bool CSdlJsonServletBaseComp::ReadRequestToSdlStruct(
 	const QJsonObject payloadObject = payloadDocument.object();
 	const bool isCreated = SdlClass::ReadFromJsonObject(out, payloadObject);
 	if (!isCreated){
-		const QString baseErrorString = QT_TR_NOOP("The request does not match the scheme");
+		const QString baseErrorString = QObject::tr("The request does not match the scheme");
 		SendErrorMessage(0, baseErrorString + QString(": '%1'").arg(QString(requestBody)), __func__);
 		responsePtr = CreateDefaultErrorResponse(
 			400,
@@ -103,7 +103,7 @@ bool CSdlJsonServletBaseComp::CreateResponseFromSdlStruct(
 	QJsonObject replyJson;
 	const bool isAdded = input.WriteToJsonObject(replyJson);
 	if (!isAdded){
-		QString baseErrorString = QT_TR_NOOP("Unable to convert reply to json");
+		QString baseErrorString = QObject::tr("Unable to convert reply to json");
 		SendCriticalMessage(0, baseErrorString, __func__);
 		Q_ASSERT_X(false, __func__, baseErrorString.toLocal8Bit());
 
