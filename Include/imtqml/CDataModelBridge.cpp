@@ -11,12 +11,16 @@ namespace
 
 
 /**
-	\brief Stable diagnostic returned by every method until in-process
-	model resolution is wired in this bridge.
+	\brief Diagnostic returned when no plugged delegate claims the
+	requested \c modelId.
 */
-const QString c_notImplementedError = QStringLiteral(
-		"CDataModelBridge: in-process data-model resolution "
-		"not yet wired in this bridge");
+QString NoDelegateError(const QString& modelId)
+{
+	return QStringLiteral(
+			"CDataModelBridge: no delegate bridge accepts modelId '%1' - "
+			"plug a per-model IDataModelBridge implementation into the "
+			"ModelDelegates slot").arg(modelId);
+}
 
 
 } // anonymous namespace
@@ -30,26 +34,54 @@ CDataModelBridge::~CDataModelBridge() = default;
 
 // reimplemented (IDataModelBridge)
 
+bool CDataModelBridge::CanHandle(const QString& modelId) const
+{
+	return FindDelegate(modelId) != nullptr;
+}
+
+
 void CDataModelBridge::GetModel(
-		const QString& /*modelId*/,
-		const QVariantMap& /*parameters*/,
+		const QString& modelId,
+		const QVariantMap& parameters,
 		GetModelCallback callback)
 {
-	if (callback){
-		callback(QVariant{}, c_notImplementedError);
+	IDataModelBridge* delegatePtr = FindDelegate(modelId);
+	if (delegatePtr == nullptr){
+		if (callback){
+			callback(QVariant{}, NoDelegateError(modelId));
+		}
+		return;
 	}
+	delegatePtr->GetModel(modelId, parameters, callback);
 }
 
 
 void CDataModelBridge::SetModel(
-		const QString& /*modelId*/,
-		const QVariantMap& /*parameters*/,
-		const QVariant& /*model*/,
+		const QString& modelId,
+		const QVariantMap& parameters,
+		const QVariant& model,
 		SetModelCallback callback)
 {
-	if (callback){
-		callback(c_notImplementedError);
+	IDataModelBridge* delegatePtr = FindDelegate(modelId);
+	if (delegatePtr == nullptr){
+		if (callback){
+			callback(NoDelegateError(modelId));
+		}
+		return;
 	}
+	delegatePtr->SetModel(modelId, parameters, model, callback);
+}
+
+
+IDataModelBridge* CDataModelBridge::FindDelegate(const QString& modelId) const
+{
+	for (int i = 0; i < m_modelDelegateCompPtr.GetCount(); ++i){
+		IDataModelBridge* delegatePtr = m_modelDelegateCompPtr[i];
+		if ((delegatePtr != nullptr) && (delegatePtr != this) && delegatePtr->CanHandle(modelId)){
+			return delegatePtr;
+		}
+	}
+	return nullptr;
 }
 
 

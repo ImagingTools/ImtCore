@@ -14,12 +14,23 @@ namespace imtqml
 
 
 /**
-	\brief In-process implementation of \c IDataModelBridge.
+	\brief Demultiplexing in-process implementation of
+	\c IDataModelBridge.
 
 	\details
-	An icomp component that resolves data models in-process — no
-	GraphQL transport involved. Intended for the server-side /
-	in-process scenario where a GraphQL client is not used.
+	\c CDataModelBridge does not serve any model on its own. Instead
+	it owns N delegate bridges (also \c IDataModelBridge instances)
+	connected via \c I_MULTIREF and routes every \c GetModel /
+	\c SetModel call to the first delegate that reports
+	\c CanHandle(modelId) for the requested \c modelId. This way one
+	bridge serves N model controllers in the in-process scenario —
+	per-model delegates simply implement \c IDataModelBridge,
+	override \c CanHandle to claim their \c modelId(s) and are
+	plugged into this demultiplexer through the
+	\c ModelDelegates icomp slot.
+
+	If no delegate accepts the \c modelId the request fails with a
+	descriptive error message.
 
 	\note Bridge is intentionally NOT exposed to QML — clients
 	(\c CDataModelController) resolve it through icomp.
@@ -33,12 +44,16 @@ public:
 
 	I_BEGIN_COMPONENT(CDataModelBridge);
 		I_REGISTER_INTERFACE(IDataModelBridge);
+		I_ASSIGN_MULTI_0(m_modelDelegateCompPtr, "ModelDelegates",
+				"Per-model delegate bridges resolved by modelId", false);
 	I_END_COMPONENT;
 
 	CDataModelBridge();
 	~CDataModelBridge() override;
 
 	// reimplemented (IDataModelBridge)
+	virtual bool CanHandle(const QString& modelId) const override;
+
 	virtual void GetModel(
 			const QString& modelId,
 			const QVariantMap& parameters,
@@ -49,6 +64,12 @@ public:
 			const QVariantMap& parameters,
 			const QVariant& model,
 			SetModelCallback callback) override;
+
+private:
+	IDataModelBridge* FindDelegate(const QString& modelId) const;
+
+private:
+	I_MULTIREF(IDataModelBridge, m_modelDelegateCompPtr);
 };
 
 

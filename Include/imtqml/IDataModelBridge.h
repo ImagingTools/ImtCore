@@ -24,13 +24,18 @@ namespace imtqml
 
 	\details
 	A concrete bridge knows how to map a \c modelId (plus an opaque
-	\c parameters map) to an actual fetch / store operation. Two
+	\c parameters map) to an actual fetch / store operation. Three
 	implementations are provided out of the box:
 
 	- \c CGqlDataModelBridge: forwards every call to an SDL-generated
 	  GraphQL request (the GUI-client scenario).
-	- \c CDataModelBridge: forwards every call to an in-process model
-	  provider (the server / in-process scenario).
+	- \c CDataModelBridge: a demultiplexer that owns N delegate
+	  bridges (also \c IDataModelBridge instances) connected via
+	  \c I_MULTIREF and routes each call to the first delegate that
+	  reports \c CanHandle for the given \c modelId — one bridge for
+	  N model controllers in the in-process scenario.
+	- Custom per-model controllers implementing \c IDataModelBridge
+	  and plugged into the demultiplexer as delegates.
 
 	All operations are asynchronous; implementations MUST invoke the
 	callback exactly once on the GUI thread. An empty \c errorMessage
@@ -41,6 +46,24 @@ class IDataModelBridge: virtual public istd::IPolymorphic
 public:
 	typedef std::function<void(QVariant /*model*/, QString /*errorMessage*/)> GetModelCallback;
 	typedef std::function<void(QString /*errorMessage*/)> SetModelCallback;
+
+	/**
+		\brief Returns \c true if this bridge is able to serve the
+		model identified by \c modelId.
+
+		\details
+		Used by \c CDataModelBridge (demultiplexer) to pick the right
+		delegate. The default implementation returns \c true so that
+		bridges that can serve every \c modelId (e.g. a GraphQL bridge
+		that simply forwards the request) do not need to override.
+		Per-model delegates should override and compare \c modelId
+		against the one(s) they own.
+	*/
+	virtual bool CanHandle(const QString& modelId) const
+	{
+		Q_UNUSED(modelId);
+		return true;
+	}
 
 	virtual void GetModel(
 			const QString& modelId,

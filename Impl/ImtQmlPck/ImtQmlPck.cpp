@@ -77,8 +77,8 @@ I_EXPORT_COMPONENT(
 
 I_EXPORT_COMPONENT(
 			DataModelBridge,
-			"In-process implementation of imtqml::IDataModelBridge for CDataModelController. Resolved through icomp; not exposed to QML.",
-			"In-Process QML Bridge DataModel DataController");
+			"Demultiplexing in-process implementation of imtqml::IDataModelBridge for CDataModelController - owns N delegate IDataModelBridge instances via I_MULTIREF (slot 'ModelDelegates') and routes each call to the first delegate that reports CanHandle(modelId). Resolved through icomp; not exposed to QML.",
+			"In-Process QML Bridge DataModel DataController Demultiplexer");
 
 I_EXPORT_COMPONENT(
 			PageGuiElementModel,
