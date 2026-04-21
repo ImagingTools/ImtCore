@@ -34,8 +34,12 @@ namespace imtqml
 	  \c I_MULTIREF and routes each call to the first delegate that
 	  reports \c IsSupported for the given \c modelId — one bridge for
 	  N model controllers in the in-process scenario.
-	- Custom per-model controllers implementing \c IDataModelBridge
-	  and plugged into the demultiplexer as delegates.
+	- \c CDataModelBridgeBase: a ready-to-extend base component
+	  implementing \c IDataModelBridge with a \c ModelId attribute
+	  and a default \c IsSupported that compares the requested
+	  \c modelId against the attribute value — concrete per-model
+	  bridges should inherit from this class and implement
+	  \c GetModel / \c SetModel.
 
 	All operations are asynchronous; implementations MUST invoke the
 	callback exactly once on the GUI thread. An empty \c errorMessage

@@ -25,8 +25,8 @@ class IDocumentDataBridge;
 	\c DocumentManagerBase / \c GqlBasedCollectionDocumentManager.
 
 	\details
-	The controller mirrors the public QML API of
-	\c CGqlDocumentDataController (signals, properties and
+	The controller mirrors the public QML API of the legacy
+	GraphQL-based document data controller (signals, properties and
 	\c Q_INVOKABLE methods) but does NOT perform any GraphQL/SDL work
 	itself. Every transport call is delegated to an
 	\c IDocumentDataBridge implementation resolved at runtime — by
@@ -35,10 +35,10 @@ class IDocumentDataBridge;
 
 	\note Bridge resolution currently uses
 	\c CDocumentManagerBridge::Instance() to keep parity with the
-	existing \c CGqlClientBridge lookup convention used by
-	\c CGqlDocumentDataController. The bridge is intentionally not
-	exposed to QML; users just write \c DocumentDataController
-	\c { collectionId: "X" } and the QML code remains transport-agnostic.
+	existing \c CGqlClientBridge lookup convention. The bridge is
+	intentionally not exposed to QML; users just write
+	\c DocumentDataController \c { collectionId: "X" } and the QML
+	code remains transport-agnostic.
 
 	The class is registered to QML by \c CStaticQmlTypeRegistratorComp
 	under \c com.imtcore.imtqml 1.0 as \c DocumentDataController.

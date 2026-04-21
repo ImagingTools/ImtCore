@@ -13,8 +13,9 @@
 // GraphQL ApiClient wiring for QML data controllers
 // -----------------------------------------------------------------------------
 //
-// The QML controllers from the imtqml module (GqlBasedCollectionDataController,
-// GqlDocumentDataController) need an IGqlClient instance to send GraphQL
+// The QML controllers from the imtqml module
+// (GqlBasedCollectionDataController.qml, GqlDocumentDataController.qml in
+// Qml/imtguigql) need an IGqlClient instance to send GraphQL
 // requests to the server. In the C++ world IGqlClient is provided by
 // imtclientgql::CApiClientComp; in QML the same instance is exposed as the
 // singleton "GqlClientBridge" (com.imtcore.imtqml 1.0).

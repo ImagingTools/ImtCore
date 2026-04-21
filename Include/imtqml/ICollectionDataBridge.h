@@ -23,10 +23,8 @@ namespace imtqml
 	operations exposed by \c CCollectionDataController.
 
 	\details
-	Two implementations are provided out of the box:
+	The default in-process implementation provided out of the box is:
 
-	- \c CGqlCollectionManagerBridge: dispatches every call as an
-	  SDL-generated GraphQL request through \c imtclientgql::IGqlClient.
 	- \c CCollectionManagerBridge: forwards every call directly to an
 	  \c imtbase::IObjectCollection (the in-process / server scenario).
 

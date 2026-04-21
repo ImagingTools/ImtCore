@@ -25,11 +25,8 @@ namespace imtqml
 	The controller (a QML-facing \c QObject) does not know how its
 	requests are actually serviced — that is delegated to an
 	implementation of this interface, resolved through icomp at runtime.
-	Two implementations are provided out of the box:
+	The default in-process implementation provided out of the box is:
 
-	- \c CGqlDocumentManagerBridge: serialises every call to an
-	  SDL-generated GraphQL request and forwards it through
-	  \c imtclientgql::IGqlClient (the GUI-client scenario).
 	- \c CDocumentManagerBridge: forwards every call directly to an
 	  \c imtdoc::IDocumentManager instance (the in-process / server
 	  scenario).

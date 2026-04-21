@@ -46,16 +46,6 @@ I_EXPORT_COMPONENT(
 			"GraphQL QML Bridge ApiClient" IM_AUTHOR("Sergey Zastrovnyh"));
 
 I_EXPORT_COMPONENT(
-			GqlDocumentManagerBridge,
-			"GraphQL/SDL implementation of imtqml::IDocumentDataBridge - dispatches every CDocumentDataController request to imtclientgql::IGqlClient. Resolved through icomp; not exposed to QML.",
-			"GraphQL QML Bridge DocumentManager DataController");
-
-I_EXPORT_COMPONENT(
-			GqlCollectionManagerBridge,
-			"GraphQL/SDL implementation of imtqml::ICollectionDataBridge - dispatches every CCollectionDataController request to imtclientgql::IGqlClient. Resolved through icomp; not exposed to QML.",
-			"GraphQL QML Bridge CollectionManager DataController");
-
-I_EXPORT_COMPONENT(
 			GqlDataModelBridge,
 			"GraphQL/SDL implementation of imtqml::IDataModelBridge - dispatches every CDataModelController request to imtclientgql::IGqlClient. Resolved through icomp; not exposed to QML.",
 			"GraphQL QML Bridge DataModel DataController");
@@ -79,6 +69,11 @@ I_EXPORT_COMPONENT(
 			DataModelBridge,
 			"Demultiplexing in-process implementation of imtqml::IDataModelBridge for CDataModelController - owns N delegate IDataModelBridge instances via I_MULTIREF (slot 'ModelDelegates') and routes each call to the first delegate that reports IsSupported(modelId). Resolved through icomp; not exposed to QML.",
 			"In-Process QML Bridge DataModel DataController Demultiplexer");
+
+I_EXPORT_COMPONENT(
+			DataModelBridgeBase,
+			"Base icomp component implementing imtqml::IDataModelBridge with a 'ModelId' attribute - intended to be inherited by per-model bridges that override GetModel/SetModel; default IsSupported compares the requested modelId against the ModelId attribute, so the bridge can be plugged into the DataModelBridge demultiplexer as a delegate. Resolved through icomp; not exposed to QML.",
+			"In-Process QML Bridge DataModel DataController Base");
 
 I_EXPORT_COMPONENT(
 			PageGuiElementModel,

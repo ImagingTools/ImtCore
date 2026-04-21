@@ -29,8 +29,7 @@ namespace imtqml
 	The bridge is created by icomp (so that the \c IGqlClient
 	reference can be injected via the standard \c I_REF mechanism)
 	and resolved internally by the controllers
-	(\c CGqlBasedCollectionDataController, \c CGqlDocumentDataController,
-	\c CGqlBasedDataModelController) through \c Instance(). The
+	(\c CGqlBasedDataModelController) through \c Instance(). The
 	bridge is intentionally NOT exposed to QML — controllers find it
 	on their own, so there is no \c apiClient property to wire from
 	QML.

@@ -20,9 +20,9 @@ namespace
 
 /**
 	\brief Schedule \a fn on the GUI thread via the global
-	\c QCoreApplication, mirroring \c CGqlDocumentManagerBridge so that
-	callbacks from this bridge always fire on the GUI thread regardless
-	of where the caller invoked the method from.
+	\c QCoreApplication, so that callbacks from this bridge always
+	fire on the GUI thread regardless of where the caller invoked
+	the method from.
 */
 template<class Fn>
 void PostToMainThread(Fn&& fn)

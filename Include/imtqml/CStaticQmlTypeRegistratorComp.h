@@ -19,8 +19,6 @@ namespace imtqml
 			\c imtqml::CRemoteFileController as \b com.imtcore.imtqml.1.0.RemoteFileController
 			\c imtqml::FileIO as \b com.imtcore.imtqml.1.0.FileIO
 			\c imtqml::CQmlProcess as \b com.imtcore.imtqml.1.0.Process
-			\c imtqml::CGqlBasedCollectionDataController as \b com.imtcore.imtqml.1.0.GqlBasedCollectionDataController
-			\c imtqml::CGqlDocumentDataController as \b com.imtcore.imtqml.1.0.GqlDocumentDataController
 			\c imtqml::CDocumentDataController as \b com.imtcore.imtqml.1.0.DocumentDataController
 			\c imtqml::CDocumentRepresentationController as \b com.imtcore.imtqml.1.0.DocumentRepresentationController
 			\c imtqml::CDataModelController as \b com.imtcore.imtqml.1.0.DataModelController
@@ -34,8 +32,6 @@ namespace imtqml
 	\sa imtqml::FileIO
 	\sa imtqml::CQmlProcess
 	\sa imtqml::CNetworkEventInterceptor
-	\sa imtqml::CGqlBasedCollectionDataController
-	\sa imtqml::CGqlDocumentDataController
 	\sa imtqml::CDocumentDataController
 	\sa imtqml::CDocumentRepresentationController
 	\sa imtqml::CDataModelController
@@ -58,8 +54,6 @@ public:
 		I_ASSIGN(m_registerFileIOAttrPtr, "RegisterFileIO", "If enabled, a FileIO will be registered for as QML type", true, true)
 		I_ASSIGN(m_registerCQmlProcessAttrPtr, "RegisterCQmlProcess", "If enabled, a CQmlProcess will be registered for as QML type", true, true)
 		I_ASSIGN(m_registerCNetworkEventInterceptorAttrPtr, "RegisterCNetworkEventInterceptor", "If enabled, a CNetworkEventInterceptor will be registered for as QML type", true, true)
-		I_ASSIGN(m_registerCGqlBasedCollectionDataControllerAttrPtr, "RegisterCGqlBasedCollectionDataController", "If enabled, a CGqlBasedCollectionDataController will be registered as QML type", true, true)
-		I_ASSIGN(m_registerCGqlDocumentDataControllerAttrPtr, "RegisterCGqlDocumentDataController", "If enabled, a CGqlDocumentDataController will be registered as QML type", true, true)
 		I_ASSIGN(m_registerCDocumentDataControllerAttrPtr, "RegisterCDocumentDataController", "If enabled, a CDocumentDataController will be registered as QML type", true, true)
 		I_ASSIGN(m_registerCDocumentRepresentationControllerAttrPtr, "RegisterCDocumentRepresentationController", "If enabled, a CDocumentRepresentationController will be registered as QML type", true, true)
 		I_ASSIGN(m_registerCDataModelControllerAttrPtr, "RegisterCDataModelController", "If enabled, a CDataModelController will be registered as QML type", true, true)
@@ -77,8 +71,6 @@ private:
 	I_ATTR(bool, m_registerFileIOAttrPtr);
 	I_ATTR(bool, m_registerCQmlProcessAttrPtr);
 	I_ATTR(bool, m_registerCNetworkEventInterceptorAttrPtr);
-	I_ATTR(bool, m_registerCGqlBasedCollectionDataControllerAttrPtr);
-	I_ATTR(bool, m_registerCGqlDocumentDataControllerAttrPtr);
 	I_ATTR(bool, m_registerCDocumentDataControllerAttrPtr);
 	I_ATTR(bool, m_registerCDocumentRepresentationControllerAttrPtr);
 	I_ATTR(bool, m_registerCDataModelControllerAttrPtr);

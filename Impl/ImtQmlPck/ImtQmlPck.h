@@ -15,10 +15,9 @@
 #include <imtqml/CCollectionManagerBridge.h>
 #include <imtqml/CDataModelBridgeDemultiplexer.h>
 #include <imtqml/CDocumentManagerBridge.h>
+#include <imtqml/CDataModelBridgeBase.h>
 #include <imtqml/CGqlClientBridge.h>
-#include <imtqml/CGqlCollectionManagerBridge.h>
 #include <imtqml/CGqlDataModelBridge.h>
-#include <imtqml/CGqlDocumentManagerBridge.h>
 #include <imtqml/CRepresentationControllerBridge.h>
 #include <imtqml/CPageGuiElementModelComp.h>
 #include <imtqml/CCommandsObserverQmlComp.h>
@@ -41,11 +40,10 @@ typedef imtqml::CGuiQuickWrapComp GuiQuickWrap;
 typedef imtqml::CObserverQmlComp ObserverQml;
 typedef imtqml::CClientUserContextComp ClientUserContext;
 typedef imtqml::CGqlClientBridge GqlClientBridge;
-typedef imtqml::CGqlDocumentManagerBridge GqlDocumentManagerBridge;
-typedef imtqml::CGqlCollectionManagerBridge GqlCollectionManagerBridge;
 typedef imtqml::CGqlDataModelBridge GqlDataModelBridge;
 typedef imtqml::CDocumentManagerBridge DocumentManagerBridge;
 typedef imtqml::CCollectionManagerBridge CollectionManagerBridge;
+typedef imtqml::CDataModelBridgeBase DataModelBridgeBase;
 typedef imtqml::CDataModelBridgeDemultiplexer DataModelBridge;
 typedef imtqml::CRepresentationControllerBridge RepresentationControllerBridge;
 typedef imtqml::CPageGuiElementModelComp PageGuiElementModel;
