@@ -39,20 +39,20 @@ void PostToMainThread(Fn&& fn)
 }
 
 
-IDocumentDataBridge::OperationStatus MapStatus(imtdoc::IDocumentManager::OperationStatus status)
+IDocumentManagerBridge::OperationStatus MapStatus(imtdoc::IDocumentManager::OperationStatus status)
 {
 	switch (status){
 		case imtdoc::IDocumentManager::OS_OK:
-			return IDocumentDataBridge::OS_OK;
+			return IDocumentManagerBridge::OS_OK;
 		case imtdoc::IDocumentManager::OS_INVALID_USER_ID:
-			return IDocumentDataBridge::OS_INVALID_USER_ID;
+			return IDocumentManagerBridge::OS_INVALID_USER_ID;
 		case imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_ID:
-			return IDocumentDataBridge::OS_INVALID_DOCUMENT_ID;
+			return IDocumentManagerBridge::OS_INVALID_DOCUMENT_ID;
 		case imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_DATA:
-			return IDocumentDataBridge::OS_INVALID_DOCUMENT_DATA;
+			return IDocumentManagerBridge::OS_INVALID_DOCUMENT_DATA;
 		case imtdoc::IDocumentManager::OS_FAILED:
 		default:
-			return IDocumentDataBridge::OS_FAILED;
+			return IDocumentManagerBridge::OS_FAILED;
 	}
 }
 
@@ -85,9 +85,6 @@ const QString c_noManagerError = QStringLiteral(
 CDocumentManagerBridge* CDocumentManagerBridge::s_instancePtr = nullptr;
 
 
-CDocumentManagerBridge::CDocumentManagerBridge() = default;
-
-
 CDocumentManagerBridge::~CDocumentManagerBridge()
 {
 	if (s_instancePtr == this){
@@ -111,7 +108,7 @@ void CDocumentManagerBridge::OnComponentCreated()
 }
 
 
-// reimplemented (IDocumentDataBridge)
+// reimplemented (IDocumentManagerBridge)
 
 void CDocumentManagerBridge::GetOpenedDocumentList(
 		const QString& /*collectionId*/,

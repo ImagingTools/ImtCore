@@ -24,11 +24,9 @@ namespace imtqml
 
 	\details
 	A concrete bridge knows how to map a \c modelId (plus an opaque
-	\c parameters map) to an actual fetch / store operation. Three
+	\c parameters map) to an actual fetch / store operation. Two
 	implementations are provided out of the box:
 
-	- \c CGqlDataModelBridge: forwards every call to an SDL-generated
-	  GraphQL request (the GUI-client scenario).
 	- \c CDataModelBridgeDemultiplexer: a demultiplexer that owns N delegate
 	  bridges (also \c IDataModelBridge instances) connected via
 	  \c I_MULTIREF and routes each call to the first delegate that

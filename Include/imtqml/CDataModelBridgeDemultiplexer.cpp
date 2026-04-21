@@ -26,12 +26,6 @@ QString NoDelegateError(const QString& modelId)
 } // anonymous namespace
 
 
-CDataModelBridgeDemultiplexer::CDataModelBridgeDemultiplexer() = default;
-
-
-CDataModelBridgeDemultiplexer::~CDataModelBridgeDemultiplexer() = default;
-
-
 // reimplemented (IDataModelBridge)
 
 bool CDataModelBridgeDemultiplexer::IsSupported(const QString& modelId) const

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include <imtqml/CDocumentDataController.h>
+#include <imtqml/CDocumentManagerController.h>
 
 
 // Qt includes
@@ -8,7 +8,7 @@
 
 // ImtCore includes
 #include <imtqml/CDocumentManagerBridge.h>
-#include <imtqml/IDocumentDataBridge.h>
+#include <imtqml/IDocumentManagerBridge.h>
 
 
 namespace imtqml
@@ -17,12 +17,12 @@ namespace imtqml
 
 // public methods
 
-CDocumentDataController::CDocumentDataController(QObject* parent)
+CDocumentManagerController::CDocumentManagerController(QObject* parent)
 	:BaseClass(parent)
 {
 	// Mirror QML behaviour: when collectionId becomes non-empty, fetch
 	// the opened-document list automatically.
-	connect(this, &CDocumentDataController::collectionIdChanged, this,
+	connect(this, &CDocumentManagerController::collectionIdChanged, this,
 			[this](const QString& id){
 				if (!id.isEmpty()){
 					getOpenedDocumentList();
@@ -31,46 +31,46 @@ CDocumentDataController::CDocumentDataController(QObject* parent)
 
 	// Mirror QML onDocumentSaved / onUndoInfoReceived / onStartCloseDocument /
 	// onDocumentClosed / onDocumentCreated / onDocumentOpened wiring.
-	connect(this, &CDocumentDataController::documentSaved, this,
+	connect(this, &CDocumentManagerController::documentSaved, this,
 			[this](const QString& documentId){
 				setDocumentIsNew(documentId, false);
 			});
-	connect(this, &CDocumentDataController::undoInfoReceived, this,
+	connect(this, &CDocumentManagerController::undoInfoReceived, this,
 			[this](const QString& documentId, int, int, bool isDirty){
 				setDocumentIsDirty(documentId, isDirty);
 			});
-	connect(this, &CDocumentDataController::startCloseDocument, this,
+	connect(this, &CDocumentManagerController::startCloseDocument, this,
 			[this](const QString& documentId){
 				int idx = IndexOfDocument(documentId);
 				if (idx >= 0){
 					m_openedDocuments[idx].isClosing = true;
 				}
 			});
-	connect(this, &CDocumentDataController::documentClosed, this,
+	connect(this, &CDocumentManagerController::documentClosed, this,
 			[this](const QString& documentId){
 				RemoveDocumentDataInternal(documentId);
 			});
-	connect(this, &CDocumentDataController::documentCreated, this,
+	connect(this, &CDocumentManagerController::documentCreated, this,
 			[this](const QString& documentId, const QString& typeId){
 				CreateDocumentDataInternal(documentId, typeId, true);
 			});
-	connect(this, &CDocumentDataController::documentOpened, this,
+	connect(this, &CDocumentManagerController::documentOpened, this,
 			[this](const QString& documentId, const QString& typeId){
 				CreateDocumentDataInternal(documentId, typeId, false);
 			});
 }
 
 
-CDocumentDataController::~CDocumentDataController() = default;
+CDocumentManagerController::~CDocumentManagerController() = default;
 
 
-const QString& CDocumentDataController::GetCollectionId() const
+const QString& CDocumentManagerController::GetCollectionId() const
 {
 	return m_collectionId;
 }
 
 
-void CDocumentDataController::SetCollectionId(const QString& id)
+void CDocumentManagerController::SetCollectionId(const QString& id)
 {
 	if (m_collectionId != id){
 		m_collectionId = id;
@@ -81,7 +81,7 @@ void CDocumentDataController::SetCollectionId(const QString& id)
 
 // --- DocumentManagerBase: registration / introspection ---
 
-void CDocumentDataController::registerDocumentViewData(
+void CDocumentManagerController::registerDocumentViewData(
 	const QString& documentTypeId,
 	const QString& viewTypeId,
 	QObject* viewEditorComp,
@@ -108,7 +108,7 @@ void CDocumentDataController::registerDocumentViewData(
 }
 
 
-QObject* CDocumentDataController::getDocumentEditorFactory(
+QObject* CDocumentManagerController::getDocumentEditorFactory(
 	const QString& documentTypeId,
 	const QString& viewTypeId) const
 {
@@ -125,7 +125,7 @@ QObject* CDocumentDataController::getDocumentEditorFactory(
 }
 
 
-QObject* CDocumentDataController::getDocumentRepresentationControllerFactory(
+QObject* CDocumentManagerController::getDocumentRepresentationControllerFactory(
 	const QString& documentTypeId,
 	const QString& viewTypeId) const
 {
@@ -142,13 +142,13 @@ QObject* CDocumentDataController::getDocumentRepresentationControllerFactory(
 }
 
 
-QStringList CDocumentDataController::getSupportedDocumentTypeIds() const
+QStringList CDocumentManagerController::getSupportedDocumentTypeIds() const
 {
 	return m_documentTypeEditors.keys();
 }
 
 
-QStringList CDocumentDataController::getSupportedDocumentViewTypeIds(
+QStringList CDocumentManagerController::getSupportedDocumentViewTypeIds(
 	const QString& documentTypeId) const
 {
 	QStringList result;
@@ -164,7 +164,7 @@ QStringList CDocumentDataController::getSupportedDocumentViewTypeIds(
 }
 
 
-QString CDocumentDataController::getViewTypeIdByViewFactory(
+QString CDocumentManagerController::getViewTypeIdByViewFactory(
 	const QString& documentTypeId,
 	QObject* viewFactory) const
 {
@@ -183,7 +183,7 @@ QString CDocumentDataController::getViewTypeIdByViewFactory(
 
 // --- DocumentManagerBase: opened-document state ---
 
-QStringList CDocumentDataController::getOpenedDocumentIds() const
+QStringList CDocumentManagerController::getOpenedDocumentIds() const
 {
 	QStringList result;
 	result.reserve(m_openedDocuments.size());
@@ -194,13 +194,13 @@ QStringList CDocumentDataController::getOpenedDocumentIds() const
 }
 
 
-bool CDocumentDataController::documentIsOpened(const QString& documentId) const
+bool CDocumentManagerController::documentIsOpened(const QString& documentId) const
 {
 	return IndexOfDocument(documentId) >= 0;
 }
 
 
-bool CDocumentDataController::documentIsNew(const QString& documentId) const
+bool CDocumentManagerController::documentIsNew(const QString& documentId) const
 {
 	int idx = IndexOfDocument(documentId);
 	if (idx < 0){
@@ -210,7 +210,7 @@ bool CDocumentDataController::documentIsNew(const QString& documentId) const
 }
 
 
-void CDocumentDataController::setDocumentIsNew(const QString& documentId, bool isNew)
+void CDocumentManagerController::setDocumentIsNew(const QString& documentId, bool isNew)
 {
 	int idx = IndexOfDocument(documentId);
 	if (idx < 0){
@@ -220,7 +220,7 @@ void CDocumentDataController::setDocumentIsNew(const QString& documentId, bool i
 }
 
 
-bool CDocumentDataController::documentIsDirty(const QString& documentId) const
+bool CDocumentManagerController::documentIsDirty(const QString& documentId) const
 {
 	int idx = IndexOfDocument(documentId);
 	if (idx < 0){
@@ -230,7 +230,7 @@ bool CDocumentDataController::documentIsDirty(const QString& documentId) const
 }
 
 
-void CDocumentDataController::setDocumentIsDirty(const QString& documentId, bool isDirty)
+void CDocumentManagerController::setDocumentIsDirty(const QString& documentId, bool isDirty)
 {
 	int idx = IndexOfDocument(documentId);
 	if (idx < 0){
@@ -241,7 +241,7 @@ void CDocumentDataController::setDocumentIsDirty(const QString& documentId, bool
 }
 
 
-bool CDocumentDataController::documentIsLoading(const QString& documentId) const
+bool CDocumentManagerController::documentIsLoading(const QString& documentId) const
 {
 	int idx = IndexOfDocument(documentId);
 	if (idx < 0){
@@ -251,7 +251,7 @@ bool CDocumentDataController::documentIsLoading(const QString& documentId) const
 }
 
 
-void CDocumentDataController::setDocumentIsLoading(const QString& documentId, bool isLoading)
+void CDocumentManagerController::setDocumentIsLoading(const QString& documentId, bool isLoading)
 {
 	int idx = IndexOfDocument(documentId);
 	if (idx < 0){
@@ -292,13 +292,13 @@ void CDocumentDataController::setDocumentIsLoading(const QString& documentId, bo
 }
 
 
-int CDocumentDataController::getDocumentIndexByDocumentId(const QString& documentId) const
+int CDocumentManagerController::getDocumentIndexByDocumentId(const QString& documentId) const
 {
 	return IndexOfDocument(documentId);
 }
 
 
-QString CDocumentDataController::getDocumentIdByObjectId(const QString& objectId) const
+QString CDocumentManagerController::getDocumentIdByObjectId(const QString& objectId) const
 {
 	for (const FOpenedDocument& doc : m_openedDocuments){
 		if (doc.objectId == objectId){
@@ -309,7 +309,7 @@ QString CDocumentDataController::getDocumentIdByObjectId(const QString& objectId
 }
 
 
-QString CDocumentDataController::getDocumentIdByView(QObject* view) const
+QString CDocumentManagerController::getDocumentIdByView(QObject* view) const
 {
 	for (const FOpenedDocument& doc : m_openedDocuments){
 		for (auto it = doc.views.constBegin(); it != doc.views.constEnd(); ++it){
@@ -322,7 +322,7 @@ QString CDocumentDataController::getDocumentIdByView(QObject* view) const
 }
 
 
-QString CDocumentDataController::getDocumentTypeId(const QString& documentId) const
+QString CDocumentManagerController::getDocumentTypeId(const QString& documentId) const
 {
 	int idx = IndexOfDocument(documentId);
 	if (idx < 0){
@@ -332,7 +332,7 @@ QString CDocumentDataController::getDocumentTypeId(const QString& documentId) co
 }
 
 
-void CDocumentDataController::setDocumentObjectId(const QString& documentId, const QString& objectId)
+void CDocumentManagerController::setDocumentObjectId(const QString& documentId, const QString& objectId)
 {
 	int idx = IndexOfDocument(documentId);
 	if (idx < 0){
@@ -342,7 +342,7 @@ void CDocumentDataController::setDocumentObjectId(const QString& documentId, con
 }
 
 
-void CDocumentDataController::setDocumentName(const QString& documentId, const QString& name)
+void CDocumentManagerController::setDocumentName(const QString& documentId, const QString& name)
 {
 	int idx = IndexOfDocument(documentId);
 	if (idx < 0){
@@ -355,7 +355,7 @@ void CDocumentDataController::setDocumentName(const QString& documentId, const Q
 }
 
 
-QString CDocumentDataController::getDocumentName(const QString& documentId) const
+QString CDocumentManagerController::getDocumentName(const QString& documentId) const
 {
 	int idx = IndexOfDocument(documentId);
 	if (idx < 0){
@@ -365,7 +365,7 @@ QString CDocumentDataController::getDocumentName(const QString& documentId) cons
 }
 
 
-QString CDocumentDataController::getDefaultDocumentName() const
+QString CDocumentManagerController::getDefaultDocumentName() const
 {
 	return tr("<no name>");
 }
@@ -373,7 +373,7 @@ QString CDocumentDataController::getDefaultDocumentName() const
 
 // --- DocumentManagerBase: views ---
 
-QObject* CDocumentDataController::getDocumentViewInstance(
+QObject* CDocumentManagerController::getDocumentViewInstance(
 	const QString& documentId,
 	const QString& viewTypeId) const
 {
@@ -398,7 +398,7 @@ QObject* CDocumentDataController::getDocumentViewInstance(
 }
 
 
-void CDocumentDataController::onViewInstanceCreated(
+void CDocumentManagerController::onViewInstanceCreated(
 	const QString& documentId,
 	QObject* view,
 	const QString& viewTypeId)
@@ -421,13 +421,13 @@ void CDocumentDataController::onViewInstanceCreated(
 }
 
 
-QObject* CDocumentDataController::getDocumentManagerActiveView() const
+QObject* CDocumentManagerController::getDocumentManagerActiveView() const
 {
 	return m_documentManagerActiveView.data();
 }
 
 
-void CDocumentDataController::setDocumentManagerActiveView(QObject* view)
+void CDocumentManagerController::setDocumentManagerActiveView(QObject* view)
 {
 	if (m_documentManagerActiveView.data() == view){
 		return;
@@ -437,7 +437,7 @@ void CDocumentDataController::setDocumentManagerActiveView(QObject* view)
 }
 
 
-void CDocumentDataController::setDocumentDecorator(const QString& documentId, QObject* decorator)
+void CDocumentManagerController::setDocumentDecorator(const QString& documentId, QObject* decorator)
 {
 	int idx = IndexOfDocument(documentId);
 	if (idx < 0){
@@ -447,7 +447,7 @@ void CDocumentDataController::setDocumentDecorator(const QString& documentId, QO
 }
 
 
-QObject* CDocumentDataController::getDocumentDecorator(const QString& documentId) const
+QObject* CDocumentManagerController::getDocumentDecorator(const QString& documentId) const
 {
 	int idx = IndexOfDocument(documentId);
 	if (idx < 0){
@@ -459,13 +459,13 @@ QObject* CDocumentDataController::getDocumentDecorator(const QString& documentId
 
 // --- DocumentManagerBase: name providers ---
 
-void CDocumentDataController::setAutoNamedTypeId(const QString& typeId, bool hasProvider)
+void CDocumentManagerController::setAutoNamedTypeId(const QString& typeId, bool hasProvider)
 {
 	m_autoNamedTypeIds.insert(typeId, hasProvider);
 }
 
 
-bool CDocumentDataController::hasDocumentNameProvider(const QString& typeId) const
+bool CDocumentManagerController::hasDocumentNameProvider(const QString& typeId) const
 {
 	const auto it = m_autoNamedTypeIds.constFind(typeId);
 	if (it == m_autoNamedTypeIds.constEnd()){
@@ -477,13 +477,13 @@ bool CDocumentDataController::hasDocumentNameProvider(const QString& typeId) con
 
 // --- private helpers ---
 
-IDocumentDataBridge* CDocumentDataController::ResolveBridge() const
+IDocumentManagerBridge* CDocumentManagerController::ResolveBridge() const
 {
 	return CDocumentManagerBridge::Instance();
 }
 
 
-void CDocumentDataController::CreateDocumentDataInternal(
+void CDocumentManagerController::CreateDocumentDataInternal(
 	const QString& id, const QString& typeId, bool isNew)
 {
 	if (IndexOfDocument(id) >= 0){
@@ -505,7 +505,7 @@ void CDocumentDataController::CreateDocumentDataInternal(
 }
 
 
-void CDocumentDataController::RemoveDocumentDataInternal(const QString& documentId)
+void CDocumentManagerController::RemoveDocumentDataInternal(const QString& documentId)
 {
 	int idx = IndexOfDocument(documentId);
 	if (idx < 0){
@@ -516,7 +516,7 @@ void CDocumentDataController::RemoveDocumentDataInternal(const QString& document
 }
 
 
-int CDocumentDataController::IndexOfDocument(const QString& documentId) const
+int CDocumentManagerController::IndexOfDocument(const QString& documentId) const
 {
 	for (int i = 0; i < m_openedDocuments.size(); ++i){
 		if (m_openedDocuments[i].id == documentId){
@@ -527,23 +527,23 @@ int CDocumentDataController::IndexOfDocument(const QString& documentId) const
 }
 
 
-// --- Transport (delegated to IDocumentDataBridge) ---
+// --- Transport (delegated to IDocumentManagerBridge) ---
 
 namespace
 {
 
 QString NoBridgeError()
 {
-	return QStringLiteral("CDocumentDataController: no IDocumentDataBridge available "
+	return QStringLiteral("CDocumentManagerController: no IDocumentManagerBridge available "
 			"(CDocumentManagerBridge component is not loaded)");
 }
 
 } // namespace
 
 
-void CDocumentDataController::getOpenedDocumentList()
+void CDocumentManagerController::getOpenedDocumentList()
 {
-	IDocumentDataBridge* bridge = ResolveBridge();
+	IDocumentManagerBridge* bridge = ResolveBridge();
 	if (bridge == nullptr){
 		Q_EMIT openedDocumentListReceiveFailed(NoBridgeError());
 		return;
@@ -551,9 +551,9 @@ void CDocumentDataController::getOpenedDocumentList()
 
 	Q_EMIT startGetOpenedDocumentList();
 
-	QPointer<CDocumentDataController> self(this);
+	QPointer<CDocumentManagerController> self(this);
 	bridge->GetOpenedDocumentList(m_collectionId,
-			[self](QList<IDocumentDataBridge::OpenedDocumentInfo> list, QString errorMessage){
+			[self](QList<IDocumentManagerBridge::OpenedDocumentInfo> list, QString errorMessage){
 				if (!self){
 					return;
 				}
@@ -577,7 +577,7 @@ void CDocumentDataController::getOpenedDocumentList()
 }
 
 
-void CDocumentDataController::openDocument(const QString& typeId, const QString& documentId)
+void CDocumentManagerController::openDocument(const QString& typeId, const QString& documentId)
 {
 	const QString existingDocumentId = getDocumentIdByObjectId(documentId);
 	if (!existingDocumentId.isEmpty()){
@@ -585,7 +585,7 @@ void CDocumentDataController::openDocument(const QString& typeId, const QString&
 		return;
 	}
 
-	IDocumentDataBridge* bridge = ResolveBridge();
+	IDocumentManagerBridge* bridge = ResolveBridge();
 	if (bridge == nullptr){
 		Q_EMIT openDocumentFailed(documentId, NoBridgeError());
 		return;
@@ -593,9 +593,9 @@ void CDocumentDataController::openDocument(const QString& typeId, const QString&
 
 	Q_EMIT startOpenDocument(documentId, typeId);
 
-	QPointer<CDocumentDataController> self(this);
+	QPointer<CDocumentManagerController> self(this);
 	bridge->OpenDocument(m_collectionId, typeId, documentId,
-			[self](IDocumentDataBridge::OpenedDocumentInfo info, QString errorMessage){
+			[self](IDocumentManagerBridge::OpenedDocumentInfo info, QString errorMessage){
 				if (!self){
 					return;
 				}
@@ -613,9 +613,9 @@ void CDocumentDataController::openDocument(const QString& typeId, const QString&
 }
 
 
-void CDocumentDataController::createDocument(const QString& typeId)
+void CDocumentManagerController::createDocument(const QString& typeId)
 {
-	IDocumentDataBridge* bridge = ResolveBridge();
+	IDocumentManagerBridge* bridge = ResolveBridge();
 	if (bridge == nullptr){
 		Q_EMIT createDocumentFailed(typeId, NoBridgeError());
 		return;
@@ -623,9 +623,9 @@ void CDocumentDataController::createDocument(const QString& typeId)
 
 	Q_EMIT startCreateDocument(typeId);
 
-	QPointer<CDocumentDataController> self(this);
+	QPointer<CDocumentManagerController> self(this);
 	bridge->CreateDocument(m_collectionId, typeId,
-			[self, typeId](IDocumentDataBridge::OpenedDocumentInfo info, QString errorMessage){
+			[self, typeId](IDocumentManagerBridge::OpenedDocumentInfo info, QString errorMessage){
 				if (!self){
 					return;
 				}
@@ -643,9 +643,9 @@ void CDocumentDataController::createDocument(const QString& typeId)
 }
 
 
-void CDocumentDataController::saveDocument(const QString& documentId, const QString& documentName)
+void CDocumentManagerController::saveDocument(const QString& documentId, const QString& documentName)
 {
-	IDocumentDataBridge* bridge = ResolveBridge();
+	IDocumentManagerBridge* bridge = ResolveBridge();
 	if (bridge == nullptr){
 		Q_EMIT saveDocumentFailed(documentId, NoBridgeError());
 		return;
@@ -654,13 +654,13 @@ void CDocumentDataController::saveDocument(const QString& documentId, const QStr
 	Q_EMIT startSaveDocument(documentId);
 
 	const QString resolvedName = documentName.isEmpty() ? getDocumentName(documentId) : documentName;
-	QPointer<CDocumentDataController> self(this);
+	QPointer<CDocumentManagerController> self(this);
 	bridge->SaveDocument(m_collectionId, documentId, resolvedName,
-			[self, documentId, resolvedName](IDocumentDataBridge::OperationStatus status, QString errorMessage){
+			[self, documentId, resolvedName](IDocumentManagerBridge::OperationStatus status, QString errorMessage){
 				if (!self){
 					return;
 				}
-				if (status == IDocumentDataBridge::OS_OK && errorMessage.isEmpty()){
+				if (status == IDocumentManagerBridge::OS_OK && errorMessage.isEmpty()){
 					if (!resolvedName.isEmpty()){
 						self->setDocumentName(documentId, resolvedName);
 					}
@@ -668,16 +668,16 @@ void CDocumentDataController::saveDocument(const QString& documentId, const QStr
 					return;
 				}
 				const QString msg = errorMessage.isEmpty()
-						? CDocumentDataController::tr("Save document failed")
+						? CDocumentManagerController::tr("Save document failed")
 						: errorMessage;
 				Q_EMIT self->saveDocumentFailed(documentId, msg);
 			});
 }
 
 
-void CDocumentDataController::closeDocument(const QString& documentId)
+void CDocumentManagerController::closeDocument(const QString& documentId)
 {
-	IDocumentDataBridge* bridge = ResolveBridge();
+	IDocumentManagerBridge* bridge = ResolveBridge();
 	if (bridge == nullptr){
 		Q_EMIT closeDocumentFailed(documentId, NoBridgeError());
 		return;
@@ -685,7 +685,7 @@ void CDocumentDataController::closeDocument(const QString& documentId)
 
 	Q_EMIT startCloseDocument(documentId);
 
-	QPointer<CDocumentDataController> self(this);
+	QPointer<CDocumentManagerController> self(this);
 	bridge->CloseDocument(m_collectionId, documentId,
 			[self, documentId](QString errorMessage){
 				if (!self){
@@ -700,9 +700,9 @@ void CDocumentDataController::closeDocument(const QString& documentId)
 }
 
 
-void CDocumentDataController::doUndo(const QString& documentId, int steps)
+void CDocumentManagerController::doUndo(const QString& documentId, int steps)
 {
-	IDocumentDataBridge* bridge = ResolveBridge();
+	IDocumentManagerBridge* bridge = ResolveBridge();
 	if (bridge == nullptr){
 		Q_EMIT undoFailed(documentId, NoBridgeError());
 		return;
@@ -710,7 +710,7 @@ void CDocumentDataController::doUndo(const QString& documentId, int steps)
 
 	Q_EMIT startUndo(documentId, steps);
 
-	QPointer<CDocumentDataController> self(this);
+	QPointer<CDocumentManagerController> self(this);
 	bridge->DoUndo(m_collectionId, documentId, steps,
 			[self, documentId](QString errorMessage){
 				if (!self){
@@ -725,9 +725,9 @@ void CDocumentDataController::doUndo(const QString& documentId, int steps)
 }
 
 
-void CDocumentDataController::doRedo(const QString& documentId, int steps)
+void CDocumentManagerController::doRedo(const QString& documentId, int steps)
 {
-	IDocumentDataBridge* bridge = ResolveBridge();
+	IDocumentManagerBridge* bridge = ResolveBridge();
 	if (bridge == nullptr){
 		Q_EMIT redoFailed(documentId, NoBridgeError());
 		return;
@@ -735,7 +735,7 @@ void CDocumentDataController::doRedo(const QString& documentId, int steps)
 
 	Q_EMIT startRedo(documentId, steps);
 
-	QPointer<CDocumentDataController> self(this);
+	QPointer<CDocumentManagerController> self(this);
 	bridge->DoRedo(m_collectionId, documentId, steps,
 			[self, documentId](QString errorMessage){
 				if (!self){
@@ -750,9 +750,9 @@ void CDocumentDataController::doRedo(const QString& documentId, int steps)
 }
 
 
-void CDocumentDataController::resetUndo(const QString& documentId)
+void CDocumentManagerController::resetUndo(const QString& documentId)
 {
-	IDocumentDataBridge* bridge = ResolveBridge();
+	IDocumentManagerBridge* bridge = ResolveBridge();
 	if (bridge == nullptr){
 		Q_EMIT resetUndoFailed(documentId, NoBridgeError());
 		return;
@@ -760,7 +760,7 @@ void CDocumentDataController::resetUndo(const QString& documentId)
 
 	Q_EMIT startResetUndo(documentId);
 
-	QPointer<CDocumentDataController> self(this);
+	QPointer<CDocumentManagerController> self(this);
 	bridge->ResetUndo(m_collectionId, documentId,
 			[self, documentId](QString errorMessage){
 				if (!self){
@@ -775,9 +775,9 @@ void CDocumentDataController::resetUndo(const QString& documentId)
 }
 
 
-void CDocumentDataController::getUndoInfo(const QString& documentId)
+void CDocumentManagerController::getUndoInfo(const QString& documentId)
 {
-	IDocumentDataBridge* bridge = ResolveBridge();
+	IDocumentManagerBridge* bridge = ResolveBridge();
 	if (bridge == nullptr){
 		Q_EMIT undoInfoReceiveFailed(documentId, NoBridgeError());
 		return;
@@ -785,7 +785,7 @@ void CDocumentDataController::getUndoInfo(const QString& documentId)
 
 	Q_EMIT startUndoInfoReceive(documentId);
 
-	QPointer<CDocumentDataController> self(this);
+	QPointer<CDocumentManagerController> self(this);
 	bridge->GetUndoInfo(m_collectionId, documentId,
 			[self, documentId](int undoSteps, int redoSteps, bool isDirty, QString errorMessage){
 				if (!self){

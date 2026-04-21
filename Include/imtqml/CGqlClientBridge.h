@@ -104,11 +104,11 @@ public:
 	// --- Representation controller registry ---
 
 	/**
-		\brief Register a \c CDocumentRepresentationController under
-		the given \c documentId so it can later be looked up from
-		QML / C++ via \c getRepresentationController(). Registering
-		a different controller for the same \c documentId replaces
-		the previous mapping.
+		\brief Register a representation controller under the given
+		\c documentId so it can later be looked up from QML / C++ via
+		\c getRepresentationController(). Registering a different
+		controller for the same \c documentId replaces the previous
+		mapping.
 
 		\details This is the central registry that lets a single
 		bridge component manage \c N representation controllers (per

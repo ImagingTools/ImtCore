@@ -6,12 +6,6 @@ namespace imtqml
 {
 
 
-CDataModelBridgeBase::CDataModelBridgeBase() = default;
-
-
-CDataModelBridgeBase::~CDataModelBridgeBase() = default;
-
-
 QString CDataModelBridgeBase::GetModelId() const
 {
 	if (!m_modelIdAttrPtr.IsValid()){

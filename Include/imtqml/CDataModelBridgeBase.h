@@ -55,9 +55,6 @@ public:
 				"Identifier of the data model served by this bridge", false, "");
 	I_END_COMPONENT;
 
-	CDataModelBridgeBase();
-	~CDataModelBridgeBase() override;
-
 	/**
 		\brief Returns the \c ModelId attribute value configured for
 		this bridge, or an empty string if the attribute was not

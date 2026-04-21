@@ -17,7 +17,7 @@ namespace imtqml
 {
 
 
-class IDocumentDataBridge;
+class IDocumentManagerBridge;
 
 
 /**
@@ -29,7 +29,7 @@ class IDocumentDataBridge;
 	GraphQL-based document data controller (signals, properties and
 	\c Q_INVOKABLE methods) but does NOT perform any GraphQL/SDL work
 	itself. Every transport call is delegated to an
-	\c IDocumentDataBridge implementation resolved at runtime — by
+	\c IDocumentManagerBridge implementation resolved at runtime — by
 	default to \c CDocumentManagerBridge (in-process, on top of
 	\c imtdoc::IDocumentManager).
 
@@ -37,13 +37,13 @@ class IDocumentDataBridge;
 	\c CDocumentManagerBridge::Instance() to keep parity with the
 	existing \c CGqlClientBridge lookup convention. The bridge is
 	intentionally not exposed to QML; users just write
-	\c DocumentDataController \c { collectionId: "X" } and the QML
+	\c DocumentManagerController \c { collectionId: "X" } and the QML
 	code remains transport-agnostic.
 
 	The class is registered to QML by \c CStaticQmlTypeRegistratorComp
-	under \c com.imtcore.imtqml 1.0 as \c DocumentDataController.
+	under \c com.imtcore.imtqml 1.0 as \c DocumentManagerController.
 */
-class CDocumentDataController: public QObject
+class CDocumentManagerController: public QObject
 {
 	Q_OBJECT
 	Q_PROPERTY(QString collectionId READ GetCollectionId WRITE SetCollectionId NOTIFY collectionIdChanged)
@@ -54,8 +54,8 @@ class CDocumentDataController: public QObject
 public:
 	typedef QObject BaseClass;
 
-	explicit CDocumentDataController(QObject* parent = nullptr);
-	~CDocumentDataController() override;
+	explicit CDocumentManagerController(QObject* parent = nullptr);
+	~CDocumentManagerController() override;
 
 	const QString& GetCollectionId() const;
 	void SetCollectionId(const QString& id);
@@ -130,7 +130,7 @@ public Q_SLOTS:
 	void setAutoNamedTypeId(const QString& typeId, bool hasProvider);
 	bool hasDocumentNameProvider(const QString& typeId) const;
 
-	// --- Transport (delegated to IDocumentDataBridge) ---
+	// --- Transport (delegated to IDocumentManagerBridge) ---
 
 	void getOpenedDocumentList();
 	void openDocument(const QString& typeId, const QString& documentId);
@@ -228,7 +228,7 @@ private:
 		QPointer<QObject> documentDecorator;
 	};
 
-	IDocumentDataBridge* ResolveBridge() const;
+	IDocumentManagerBridge* ResolveBridge() const;
 
 	void CreateDocumentDataInternal(const QString& id, const QString& typeId, bool isNew);
 	void RemoveDocumentDataInternal(const QString& documentId);
@@ -247,4 +247,4 @@ private:
 } // namespace imtqml
 
 
-Q_DECLARE_METATYPE(imtqml::CDocumentDataController*)
+Q_DECLARE_METATYPE(imtqml::CDocumentManagerController*)

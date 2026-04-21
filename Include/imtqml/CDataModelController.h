@@ -25,10 +25,10 @@ namespace imtqml
 	emits the matching success or failure signal on the GUI thread.
 
 	The base implementation is a no-op stub that mirrors the
-	convention used by \c CDocumentRepresentationController: it emits
-	the \c start* signal, logs a \c qWarning that the method should be
-	reimplemented in a subclass, and emits the success signal with the
-	currently cached \c model.
+	convention used by the controllers' start/success signal: it
+	emits the \c start* signal, logs a \c qWarning that the method
+	should be reimplemented in a subclass, and emits the success
+	signal with the currently cached \c model.
 
 	The class is registered to QML by \c CStaticQmlTypeRegistratorComp
 	under \c com.imtcore.imtqml 1.0 as \c DataModelController.

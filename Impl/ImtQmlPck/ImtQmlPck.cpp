@@ -46,24 +46,9 @@ I_EXPORT_COMPONENT(
 			"GraphQL QML Bridge ApiClient" IM_AUTHOR("Sergey Zastrovnyh"));
 
 I_EXPORT_COMPONENT(
-			GqlDataModelBridge,
-			"GraphQL/SDL implementation of imtqml::IDataModelBridge - dispatches every CDataModelController request to imtclientgql::IGqlClient. Resolved through icomp; not exposed to QML.",
-			"GraphQL QML Bridge DataModel DataController");
-
-I_EXPORT_COMPONENT(
-			RepresentationControllerBridge,
-			"Single transport-agnostic registry mapping documentId to its CDocumentRepresentationController. Resolved through icomp; not exposed to QML.",
-			"QML Bridge RepresentationController Registry");
-
-I_EXPORT_COMPONENT(
 			DocumentManagerBridge,
-			"In-process implementation of imtqml::IDocumentDataBridge - forwards every CDocumentDataController request directly to an injected imtdoc::IDocumentManager. Resolved through icomp; not exposed to QML.",
+			"In-process implementation of imtqml::IDocumentManagerBridge - forwards every CDocumentManagerController request directly to an injected imtdoc::IDocumentManager. Resolved through icomp; not exposed to QML.",
 			"In-Process QML Bridge DocumentManager DataController");
-
-I_EXPORT_COMPONENT(
-			CollectionManagerBridge,
-			"In-process implementation of imtqml::ICollectionDataBridge - forwards every CCollectionDataController request directly to an injected imtbase::IObjectCollection. Resolved through icomp; not exposed to QML.",
-			"In-Process QML Bridge CollectionManager DataController");
 
 I_EXPORT_COMPONENT(
 			DataModelBridge,

@@ -48,9 +48,6 @@ public:
 				"Per-model delegate bridges resolved by modelId", false);
 	I_END_COMPONENT;
 
-	CDataModelBridgeDemultiplexer();
-	~CDataModelBridgeDemultiplexer() override;
-
 	// reimplemented (IDataModelBridge)
 	virtual bool IsSupported(const QString& modelId) const override;
 

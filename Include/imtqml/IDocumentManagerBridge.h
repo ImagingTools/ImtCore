@@ -19,7 +19,7 @@ namespace imtqml
 
 /**
 	\brief Transport-agnostic abstract bridge for the document-management
-	operations exposed by \c CDocumentDataController.
+	operations exposed by \c CDocumentManagerController.
 
 	\details
 	The controller (a QML-facing \c QObject) does not know how its
@@ -39,7 +39,7 @@ namespace imtqml
 
 	An empty \c errorMessage in the callback signals success.
 */
-class IDocumentDataBridge: virtual public istd::IPolymorphic
+class IDocumentManagerBridge: virtual public istd::IPolymorphic
 {
 public:
 	struct OpenedDocumentInfo

@@ -7,7 +7,7 @@
 
 // ImtCore includes
 #include <imtdoc/IDocumentManager.h>
-#include <imtqml/IDocumentDataBridge.h>
+#include <imtqml/IDocumentManagerBridge.h>
 
 
 namespace imtqml
@@ -15,31 +15,30 @@ namespace imtqml
 
 
 /**
-	\brief In-process implementation of \c IDocumentDataBridge.
+	\brief In-process implementation of \c IDocumentManagerBridge.
 
 	\details
 	An icomp component that owns an \c I_REF to an
 	\c imtdoc::IDocumentManager and forwards every
-	\c IDocumentDataBridge call directly to it. Intended for the
+	\c IDocumentManagerBridge call directly to it. Intended for the
 	server-side / in-process scenario where a GraphQL client is not
 	used.
 
 	\note Bridge is intentionally NOT exposed to QML — clients
-	(\c CDocumentDataController) resolve it through icomp.
+	(\c CDocumentManagerController) resolve it through icomp.
 */
 class CDocumentManagerBridge:
 			public icomp::CComponentBase,
-			virtual public IDocumentDataBridge
+			virtual public IDocumentManagerBridge
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CDocumentManagerBridge);
-		I_REGISTER_INTERFACE(IDocumentDataBridge);
+		I_REGISTER_INTERFACE(IDocumentManagerBridge);
 		I_ASSIGN(m_documentManagerCompPtr, "DocumentManager", "In-process document manager", true, "DocumentManager");
 	I_END_COMPONENT;
 
-	CDocumentManagerBridge();
 	~CDocumentManagerBridge() override;
 
 	/**
@@ -48,7 +47,7 @@ public:
 
 		\details Mirrors the lookup pattern used by
 		\c CGqlClientBridge::Instance() so a QML-facing controller
-		(\c CDocumentDataController) can resolve the bridge without
+		(\c CDocumentManagerController) can resolve the bridge without
 		knowing about icomp. The instance is registered in
 		\c OnComponentCreated() and unregistered in the destructor.
 	*/
@@ -59,7 +58,7 @@ protected:
 	virtual void OnComponentCreated() override;
 
 public:
-	// reimplemented (IDocumentDataBridge)
+	// reimplemented (IDocumentManagerBridge)
 	virtual void GetOpenedDocumentList(
 			const QString& collectionId,
 			DocumentListCallback callback) override;
