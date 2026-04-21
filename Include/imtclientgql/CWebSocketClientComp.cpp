@@ -184,12 +184,12 @@ void CWebSocketClientComp::OnModelChanged(int modelId, const istd::IChangeable::
 void CWebSocketClientComp::OnSystemShutdown()
 {
 	disconnect(&m_webSocket, &QWebSocket::connected, this, &CWebSocketClientComp::OnWebSocketConnected);
-	m_refreshTimer.stop();
+
+	emit EmitStopTimer();
+
 	m_webSocket.disconnect();
 
-	m_webSocket.moveToThread(qApp->thread());
-
-	m_webSocket.close();
+	emit EmitWebSocketClose();
 
 	BaseClass2::UnregisterAllModels();
 }

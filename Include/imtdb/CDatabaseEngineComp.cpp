@@ -273,7 +273,7 @@ bool CDatabaseEngineComp::OpenDatabase() const
 bool CDatabaseEngineComp::CreateDatabase(int flags) const
 {
 	if ((*m_maintenanceDatabaseNameAttrPtr).isEmpty()){
-		SendCriticalMessage(0, QT_TR_NOOP("Maintenance database name was not set"));
+		SendCriticalMessage(0, QObject::tr("Maintenance database name was not set"));
 
 		return false;
 	}
@@ -523,7 +523,7 @@ bool CDatabaseEngineComp::EnsureDatabaseConsistency() const
 bool CDatabaseEngineComp::CreateDatabaseInstance() const
 {
 	if ((*m_maintenanceDatabaseNameAttrPtr).isEmpty()){
-		SendCriticalMessage(0, QT_TR_NOOP("Maintenance database name was not set"));
+		SendCriticalMessage(0, QObject::tr("Maintenance database name was not set"));
 
 		return false;
 	}
@@ -634,7 +634,7 @@ QString CDatabaseEngineComp::GetDatabasePath() const
 	}
 
 	if (!m_dbFilePathCompPtr.IsValid()){
-		SendErrorMessage(0, QT_TR_NOOP("Database file path incorrect"));
+		SendErrorMessage(0, QObject::tr("Database file path incorrect"));
 
 		return QString();
 	}
