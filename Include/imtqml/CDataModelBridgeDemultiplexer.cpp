@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include <imtqml/CDataModelBridge.h>
+#include <imtqml/CDataModelBridgeDemultiplexer.h>
 
 
 namespace imtqml
@@ -17,7 +17,7 @@ namespace
 QString NoDelegateError(const QString& modelId)
 {
 	return QStringLiteral(
-			"CDataModelBridge: no delegate bridge accepts modelId '%1' - "
+			"CDataModelBridgeDemultiplexer: no delegate bridge accepts modelId '%1' - "
 			"plug a per-model IDataModelBridge implementation into the "
 			"ModelDelegates slot").arg(modelId);
 }
@@ -26,21 +26,21 @@ QString NoDelegateError(const QString& modelId)
 } // anonymous namespace
 
 
-CDataModelBridge::CDataModelBridge() = default;
+CDataModelBridgeDemultiplexer::CDataModelBridgeDemultiplexer() = default;
 
 
-CDataModelBridge::~CDataModelBridge() = default;
+CDataModelBridgeDemultiplexer::~CDataModelBridgeDemultiplexer() = default;
 
 
 // reimplemented (IDataModelBridge)
 
-bool CDataModelBridge::IsSupported(const QString& modelId) const
+bool CDataModelBridgeDemultiplexer::IsSupported(const QString& modelId) const
 {
 	return FindDelegate(modelId) != nullptr;
 }
 
 
-void CDataModelBridge::GetModel(
+void CDataModelBridgeDemultiplexer::GetModel(
 		const QString& modelId,
 		const QVariantMap& parameters,
 		GetModelCallback callback)
@@ -56,7 +56,7 @@ void CDataModelBridge::GetModel(
 }
 
 
-void CDataModelBridge::SetModel(
+void CDataModelBridgeDemultiplexer::SetModel(
 		const QString& modelId,
 		const QVariantMap& parameters,
 		const QVariant& model,
@@ -73,7 +73,7 @@ void CDataModelBridge::SetModel(
 }
 
 
-IDataModelBridge* CDataModelBridge::FindDelegate(const QString& modelId) const
+IDataModelBridge* CDataModelBridgeDemultiplexer::FindDelegate(const QString& modelId) const
 {
 	for (int i = 0; i < m_modelDelegateCompPtr.GetCount(); ++i){
 		IDataModelBridge* delegatePtr = m_modelDelegateCompPtr[i];

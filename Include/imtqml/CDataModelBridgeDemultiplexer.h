@@ -18,10 +18,10 @@ namespace imtqml
 	\c IDataModelBridge.
 
 	\details
-	\c CDataModelBridge does not serve any model on its own. Instead
-	it owns N delegate bridges (also \c IDataModelBridge instances)
-	connected via \c I_MULTIREF and routes every \c GetModel /
-	\c SetModel call to the first delegate that reports
+	\c CDataModelBridgeDemultiplexer does not serve any model on its
+	own. Instead it owns N delegate bridges (also \c IDataModelBridge
+	instances) connected via \c I_MULTIREF and routes every
+	\c GetModel / \c SetModel call to the first delegate that reports
 	\c IsSupported(modelId) for the requested \c modelId. This way one
 	bridge serves N model controllers in the in-process scenario —
 	per-model delegates simply implement \c IDataModelBridge,
@@ -35,21 +35,21 @@ namespace imtqml
 	\note Bridge is intentionally NOT exposed to QML — clients
 	(\c CDataModelController) resolve it through icomp.
 */
-class CDataModelBridge:
+class CDataModelBridgeDemultiplexer:
 			public icomp::CComponentBase,
 			virtual public IDataModelBridge
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
 
-	I_BEGIN_COMPONENT(CDataModelBridge);
+	I_BEGIN_COMPONENT(CDataModelBridgeDemultiplexer);
 		I_REGISTER_INTERFACE(IDataModelBridge);
 		I_ASSIGN_MULTI_0(m_modelDelegateCompPtr, "ModelDelegates",
 				"Per-model delegate bridges resolved by modelId", false);
 	I_END_COMPONENT;
 
-	CDataModelBridge();
-	~CDataModelBridge() override;
+	CDataModelBridgeDemultiplexer();
+	~CDataModelBridgeDemultiplexer() override;
 
 	// reimplemented (IDataModelBridge)
 	virtual bool IsSupported(const QString& modelId) const override;

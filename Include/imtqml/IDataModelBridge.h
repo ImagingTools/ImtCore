@@ -29,7 +29,7 @@ namespace imtqml
 
 	- \c CGqlDataModelBridge: forwards every call to an SDL-generated
 	  GraphQL request (the GUI-client scenario).
-	- \c CDataModelBridge: a demultiplexer that owns N delegate
+	- \c CDataModelBridgeDemultiplexer: a demultiplexer that owns N delegate
 	  bridges (also \c IDataModelBridge instances) connected via
 	  \c I_MULTIREF and routes each call to the first delegate that
 	  reports \c IsSupported for the given \c modelId — one bridge for
@@ -52,7 +52,7 @@ public:
 		model identified by \c modelId.
 
 		\details
-		Used by \c CDataModelBridge (demultiplexer) to pick the right
+		Used by \c CDataModelBridgeDemultiplexer (demultiplexer) to pick the right
 		delegate. The default implementation returns \c true so that
 		bridges that can serve every \c modelId (e.g. a GraphQL bridge
 		that simply forwards the request) do not need to override.
