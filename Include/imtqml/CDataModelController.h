@@ -20,7 +20,7 @@ namespace imtqml
 	The class is intended to be the common base for every model
 	provider used from QML. It exposes two operations — \c getModel()
 	and \c setModel() — which are by contract \b asynchronous: each
-	operation first emits a \c startGet*/startSet* signal, then (after
+	operation first emits a \c startGet startSet* signal, then (after
 	the underlying transport finishes, possibly on a worker thread)
 	emits the matching success or failure signal on the GUI thread.
 
