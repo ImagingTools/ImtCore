@@ -51,6 +51,11 @@ I_EXPORT_COMPONENT(
 			"The QML file with SDL request data",
 			"Qml Request Generator")
 
+I_EXPORT_COMPONENT(
+			QmlCodeOperationGenerator,
+			"The QML typed operation wrapper per SDL function",
+			"Qml Operation Generator")
+
 
 } // namespace ImtSdlGenQmlPck
 

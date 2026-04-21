@@ -13,6 +13,7 @@
 #include <imtsdlgenqml/CQmldirFilePersistenceComp.h>
 #include <imtsdlgenqml/CQmlEnumGeneratorComp.h>
 #include <imtsdlgenqml/CQmlCodeRequestGeneratorComp.h>
+#include <imtsdlgenqml/CQmlCodeOperationGeneratorComp.h>
 
 
 /**
@@ -29,6 +30,7 @@ typedef imtsdlgenqml::CQmlCodeCommandIdGeneratorComp QmlCodeCommandIdGenerator;
 typedef imtsdlgenqml::CQmldirFilePersistenceComp QmldirFilePersistence;
 typedef imtsdlgenqml::CQmlEnumGeneratorComp QmlEnumGenerator;
 typedef imtsdlgenqml::CQmlCodeRequestGeneratorComp QmlCodeRequestGenerator;
+typedef imtsdlgenqml::CQmlCodeOperationGeneratorComp QmlCodeOperationGenerator;
 
 
 } // namespace ImtSdlGenQmlPck

@@ -1,0 +1,30 @@
+schema {
+	namespace: imttest
+	version: 1.0
+
+	query: Query
+	mutation: Mutation
+}
+
+type IdInput {
+	id: ID!
+}
+
+type CreateDocumentInput {
+	name: String!
+	description: String
+}
+
+type DocumentPayload {
+	id: ID!
+	name: String!
+	success: Boolean!
+}
+
+type Query {
+	GetDocument(input: IdInput): DocumentPayload!
+}
+
+type Mutation {
+	CreateDocument(input: CreateDocumentInput): DocumentPayload!
+}

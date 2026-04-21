@@ -22,6 +22,7 @@ private Q_SLOTS:
 	void initTestCase();
 
 	void TestComplexCollectionFilter();
+	void TestOperationGenerator();
 	void TestGenerationResultSerialization();
 	void TestGenerationResultFileOperations();
 	void TestAppendFoldersWithAutomaticTimestamp();

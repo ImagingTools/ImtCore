@@ -34,5 +34,6 @@
 	<file alias="imtguigql/GqlCollectionDocManagerPageView.qml">GqlCollectionDocManagerPageView.qml</file>
 	<file alias="imtguigql/RemoteCollectionViewDialog.qml">RemoteCollectionViewDialog.qml</file>
 	<file alias="imtguigql/SelectableCollectionEditor.qml">SelectableCollectionEditor.qml</file>
+	<file alias="imtguigql/SdlOperation.qml">SdlOperation.qml</file>
     </qresource>
 </RCC>

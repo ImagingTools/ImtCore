@@ -201,6 +201,35 @@ void CSdlGenQmlTest::TestComplexCollectionFilter()
 }
 
 
+void CSdlGenQmlTest::TestOperationGenerator()
+{
+	CImtSdlGenQmlTest testSuite;
+	PrepareSuite(testSuite, m_tempOutputDir);
+
+	auto argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
+	argParserPtr->SetCppEnabled(false);
+	argParserPtr->SetGqlEnabled();
+	argParserPtr->SetQmlEnabled();
+
+	// Run generation for a schema that has both Query and Mutation.
+	// Verifies that the operation generator completes without errors and
+	// produces Operation files alongside the existing ModelProvider/Controller
+	// files (backward compatibility).
+	ExecuteTest(testSuite, "OperationGeneratorTest.sdl");
+
+	// Additionally verify that the expected Operation files were created.
+	const QString outputDirFullPath =
+		argParserPtr->GetOutputDirectoryPath() + "/1.0/QML/imttestOperationGeneratorTestSdl";
+
+	QVERIFY(QFileInfo::exists(outputDirFullPath + "/GetDocumentOperation.qml"));
+	QVERIFY(QFileInfo::exists(outputDirFullPath + "/CreateDocumentOperation.qml"));
+
+	// The legacy ModelProvider / ModelController files must still exist.
+	QVERIFY(QFileInfo::exists(outputDirFullPath + "/GetDocumentModelProvider.qml"));
+	QVERIFY(QFileInfo::exists(outputDirFullPath + "/CreateDocumentModelController.qml"));
+}
+
+
 void CSdlGenQmlTest::TestGenerationResultSerialization()
 {
 	// Create a generation result object
