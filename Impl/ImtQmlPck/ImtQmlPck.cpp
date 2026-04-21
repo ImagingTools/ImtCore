@@ -66,6 +66,21 @@ I_EXPORT_COMPONENT(
 			"QML Bridge RepresentationController Registry");
 
 I_EXPORT_COMPONENT(
+			DocumentManagerBridge,
+			"In-process implementation of imtqml::IDocumentDataBridge - forwards every CDocumentDataController request directly to an injected imtdoc::IDocumentManager. Resolved through icomp; not exposed to QML.",
+			"In-Process QML Bridge DocumentManager DataController");
+
+I_EXPORT_COMPONENT(
+			CollectionManagerBridge,
+			"In-process implementation of imtqml::ICollectionDataBridge - forwards every CCollectionDataController request directly to an injected imtbase::IObjectCollection. Resolved through icomp; not exposed to QML.",
+			"In-Process QML Bridge CollectionManager DataController");
+
+I_EXPORT_COMPONENT(
+			DataModelBridge,
+			"In-process implementation of imtqml::IDataModelBridge for CDataModelController. Resolved through icomp; not exposed to QML.",
+			"In-Process QML Bridge DataModel DataController");
+
+I_EXPORT_COMPONENT(
 			PageGuiElementModel,
 			"Page based model",
 			"Page Based Model");
