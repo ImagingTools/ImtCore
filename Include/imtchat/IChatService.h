@@ -9,6 +9,9 @@
 #include <imtchat/IChatMessage.h>
 
 
+#undef SendMessage
+
+
 namespace imtchat
 {
 
