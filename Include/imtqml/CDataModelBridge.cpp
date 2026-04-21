@@ -34,7 +34,7 @@ CDataModelBridge::~CDataModelBridge() = default;
 
 // reimplemented (IDataModelBridge)
 
-bool CDataModelBridge::CanHandle(const QString& modelId) const
+bool CDataModelBridge::IsSupported(const QString& modelId) const
 {
 	return FindDelegate(modelId) != nullptr;
 }
@@ -77,7 +77,7 @@ IDataModelBridge* CDataModelBridge::FindDelegate(const QString& modelId) const
 {
 	for (int i = 0; i < m_modelDelegateCompPtr.GetCount(); ++i){
 		IDataModelBridge* delegatePtr = m_modelDelegateCompPtr[i];
-		if ((delegatePtr != nullptr) && (delegatePtr != this) && delegatePtr->CanHandle(modelId)){
+		if ((delegatePtr != nullptr) && (delegatePtr != this) && delegatePtr->IsSupported(modelId)){
 			return delegatePtr;
 		}
 	}

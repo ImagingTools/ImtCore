@@ -22,10 +22,10 @@ namespace imtqml
 	it owns N delegate bridges (also \c IDataModelBridge instances)
 	connected via \c I_MULTIREF and routes every \c GetModel /
 	\c SetModel call to the first delegate that reports
-	\c CanHandle(modelId) for the requested \c modelId. This way one
+	\c IsSupported(modelId) for the requested \c modelId. This way one
 	bridge serves N model controllers in the in-process scenario —
 	per-model delegates simply implement \c IDataModelBridge,
-	override \c CanHandle to claim their \c modelId(s) and are
+	override \c IsSupported to claim their \c modelId(s) and are
 	plugged into this demultiplexer through the
 	\c ModelDelegates icomp slot.
 
@@ -52,7 +52,7 @@ public:
 	~CDataModelBridge() override;
 
 	// reimplemented (IDataModelBridge)
-	virtual bool CanHandle(const QString& modelId) const override;
+	virtual bool IsSupported(const QString& modelId) const override;
 
 	virtual void GetModel(
 			const QString& modelId,

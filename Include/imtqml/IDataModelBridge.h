@@ -32,7 +32,7 @@ namespace imtqml
 	- \c CDataModelBridge: a demultiplexer that owns N delegate
 	  bridges (also \c IDataModelBridge instances) connected via
 	  \c I_MULTIREF and routes each call to the first delegate that
-	  reports \c CanHandle for the given \c modelId — one bridge for
+	  reports \c IsSupported for the given \c modelId — one bridge for
 	  N model controllers in the in-process scenario.
 	- Custom per-model controllers implementing \c IDataModelBridge
 	  and plugged into the demultiplexer as delegates.
@@ -59,7 +59,7 @@ public:
 		Per-model delegates should override and compare \c modelId
 		against the one(s) they own.
 	*/
-	virtual bool CanHandle(const QString& modelId) const
+	virtual bool IsSupported(const QString& modelId) const
 	{
 		Q_UNUSED(modelId);
 		return true;
