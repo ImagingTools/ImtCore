@@ -138,12 +138,6 @@ Item {
 		gqlCommandId: root.gqlCommandId
 		requestType:  root.requestType
 
-		onStateChanged: {
-			if (state === "Loading") {
-				root._setState("loading")
-			}
-		}
-
 		function onResult(data) {
 			if (root.result) {
 				root.result.fromObject(data)
