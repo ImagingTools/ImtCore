@@ -110,7 +110,7 @@ QString createVisibilityCondition(
 
 	QStringList visibilityConditions;
 	visibilityConditions << QString("\"ReporterId\"='%1'").arg(escapedUserId);
-	visibilityConditions << QString("(\"AssigneeIds\" IS NOT NULL AND (',' || \"AssigneeIds\" || ',') LIKE '%%,%1,%%' ESCAPE '\\\\')").arg(escapedUserIdForLike);
+	visibilityConditions << QString("(\"AssigneeIds\" IS NOT NULL AND (',' || \"AssigneeIds\" || ',') LIKE '%%,%1,%%' ESCAPE '\\')").arg(escapedUserIdForLike);
 	if (!reporterIdsForSameGroup.isEmpty()){
 		visibilityConditions << QString("\"ReporterId\" IN (%1)").arg(reporterIdsForSameGroup.join(", "));
 	}
@@ -144,7 +144,7 @@ QByteArray CSupportTicketDbDelegateComp::GetSelectionQuery(
 
 	const QString visibilityCondition = createVisibilityCondition(contextPtr, m_userCollectionCompPtr.GetPtr());
 	if (visibilityCondition.isEmpty()){
-		return QString("SELECT * FROM (%1) AS \"VisibleTickets\" WHERE 1=0")
+		return QString("SELECT * FROM (%1) AS \"__ImtTicketVisibilityQuery\" WHERE 1=0")
 				.arg(QString::fromUtf8(baseQuery)).toUtf8();
 	}
 
