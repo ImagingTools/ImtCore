@@ -2,14 +2,32 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5715" Description="ACF"/>
-            <Version Id="1" Number="2274" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6390" Description="ACF"/>
+            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Server framework for GraphQL-based implementations</Description>
     <Keywords>Web GraphQL Server HTTP</Keywords>
     <ElementsList>
+        <Element Id="AttachmentBinaryDataProvider" PackageId="ImtChatPck" ComponentId="AttachmentBinaryDataProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="AttachmentStorage" Type="Reference" ExportId="AttachmentStorage">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="DelegatedBinaryDataControllers" PackageId="ImtRestPck" ComponentId="DelegatedBinaryDataControllers">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="SlaveBinaryDataControllers" Type="Reference[]" ExportId="BinaryDataControllers">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="DelegatedBinaryDataProviders" PackageId="ImtRestPck" ComponentId="DelegatedBinaryDataProviders">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -34,15 +52,21 @@
         <Element Id="FileAccess" PackageId="ImtRestPck" ComponentId="HttpFileControllerServlet">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="BinaryDataControllers" Type="Reference[]" ExportId="BinaryDataControllers">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="BinaryDataControllers" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>AttachmentBinaryDataProvider</Value>
+                                <Value>DelegatedBinaryDataControllers</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="BinaryDataProviders" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>DelegatedBinaryDataProviders</Value>
+                                <Value>AttachmentBinaryDataProvider</Value>
                                 <Value>LogFileDataProvider</Value>
                                 <Value>ServerLogDataProvider</Value>
+                                <Value>DelegatedBinaryDataProviders</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
