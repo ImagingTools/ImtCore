@@ -14,6 +14,7 @@ class TextEdit extends Item {
     static WordWrap = 1
     static WrapAnywhere = 2
     static Wrap = 3
+    static WrapAtWordBoundaryOrAnywhere = 4
 
     static AutoText = 0
     static PlainText = 1
@@ -201,23 +202,53 @@ class TextEdit extends Item {
 
     $horizontalAlignmentChanged(){
         switch(this.getPropertyValue('horizontalAlignment')){
-            case Text.AlignLeft: this.setStyle({ justifyContent: 'flex-start' }); break;
-            case Text.AlignRight: this.setStyle({ justifyContent: 'flex-end' }); break;
-            case Text.AlignHCenter: this.setStyle({ justifyContent: 'center' }); break;
-            case Text.AlignJustify: this.setStyle({ justifyContent: 'normal' }); break;
+            case TextEdit.AlignLeft: this.setStyle({ justifyContent: 'flex-start' }); break;
+            case TextEdit.AlignRight: this.setStyle({ justifyContent: 'flex-end' }); break;
+            case TextEdit.AlignHCenter: this.setStyle({ justifyContent: 'center' }); break;
+            case TextEdit.AlignJustify: this.setStyle({ justifyContent: 'normal' }); break;
         }
     }
 
     $verticalAlignmentChanged(){
         switch(this.getPropertyValue('verticalAlignment')){
-            case Text.AlignTop: this.setStyle({ alignItems: 'flex-start' }); break;
-            case Text.AlignBottom: this.setStyle({ alignItems: 'flex-end' }); break;
-            case Text.AlignVCenter: this.setStyle({ alignItems: 'center' }); break;
+            case TextEdit.AlignTop: this.setStyle({ alignItems: 'flex-start' }); break;
+            case TextEdit.AlignBottom: this.setStyle({ alignItems: 'flex-end' }); break;
+            case TextEdit.AlignVCenter: this.setStyle({ alignItems: 'center' }); break;
         }
     }
 
     $wrapModeChanged(){
+        switch(this.getPropertyValue('wrapMode')){
+            case TextEdit.NoWrap:
+                this.$input.wrap = 'off'
+                this.$input.style.whiteSpace = 'pre'
+                this.$input.style.wordBreak = 'unset'
+                this.impl.style.whiteSpace = 'pre'
+                this.impl.style.wordBreak = 'unset'
+                break
+            case TextEdit.WrapAnywhere:
+                this.$input.wrap = 'soft'
+                this.$input.style.whiteSpace = 'pre-wrap'
+                this.$input.style.wordBreak = 'break-all'
+                this.impl.style.whiteSpace = 'pre-wrap'
+                this.impl.style.wordBreak = 'break-all'
+                break
+            case TextEdit.WordWrap:
+            case TextEdit.Wrap:
+            case TextEdit.WrapAtWordBoundaryOrAnywhere:
+            default:
+                this.$input.wrap = 'soft'
+                this.$input.style.whiteSpace = 'pre-wrap'
+                this.$input.style.wordBreak = 'break-word'
+                this.impl.style.whiteSpace = 'pre-wrap'
+                this.impl.style.wordBreak = 'break-word'
+                break
+        }
+        this.applyMetrics()
+    }
 
+    $textFormatChanged(){
+        this.applyMetrics()
     }
 
     $readOnlyChanged(){
@@ -272,28 +303,22 @@ class TextEdit extends Item {
     }
 
     applyMetrics(){
-        let isHTML = false
-        if(this.getPropertyValue('textFormat') === TextEdit.AutoText){
-            let regexp = /<[^<>]+>/g
-            if(this.getPropertyValue('text') && (regexp.test(this.getPropertyValue('text')) || this.getPropertyValue('text').indexOf('\n') >= 0)){
-                isHTML = true
-            } else {
-                isHTML = false
-            }
-        } else if(this.getPropertyValue('textFormat') === TextEdit.PlainText){
-            isHTML = false
-        } else {
-            isHTML = true
-        }
+        const text = this.getPropertyValue('text') || ''
+        let textMetrics = TextFontController.measureText(
+            text,
+            this.getProperty('font'),
+            this.getProperty('width').auto ? 0 : this.getProperty('width').get(),
+            this.getPropertyValue('textFormat'),
+            this.getPropertyValue('wrapMode'),
+            TextFontController.ElideNone
+        )
 
-        if(isHTML){
-            this.impl.innerHTML = this.getPropertyValue('text').replaceAll('\n', '<br>') + '.'
+        if(textMetrics.isHTML){
+            this.impl.innerHTML = text.replaceAll('\n', '<br>') + '.'
             this.updateGeometry()
 
         } else {
-            let textMetrics = TextFontController.measureText(this.getPropertyValue('text'), this.getProperty('font'), this.getProperty('width').auto ? 0 : this.getProperty('width').get(), this.getPropertyValue('wrapMode'))
-            
-            this.impl.innerHTML = this.getPropertyValue('text').replaceAll('\n', '<br>') + '.'
+            this.impl.innerText = text + '.'
             this.getProperty('width').setAuto(textMetrics.width)
             this.getProperty('height').setAuto(textMetrics.height)
 
