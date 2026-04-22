@@ -55,8 +55,19 @@ DocumentViewBase {
 	property bool _assigneesChanged: false
 	// Reply-to message context (null = not replying)
 	property var _replyToMessage: null
+	// Chat unread state / feedback
+	property int _lastKnownCommentCount: 0
+	property bool _commentsTrackingReady: false
+	property int _unreadMessagesCount: 0
+	property string _chatActionHint: ""
 	
 	signal commentSubmitted(string commentText)
+
+	onTicketDataChanged: {
+		_lastKnownCommentCount = (ticketData && ticketData.m_comments) ? ticketData.m_comments.count : 0
+		_commentsTrackingReady = false
+		_unreadMessagesCount = 0
+	}
 	
 	onIsNewIssueChanged: {
 		doUpdateGui()
@@ -87,6 +98,55 @@ DocumentViewBase {
 		return lower.endsWith(".png") || lower.endsWith(".jpg") || lower.endsWith(".jpeg")
 				|| lower.endsWith(".gif") || lower.endsWith(".bmp") || lower.endsWith(".webp")
 				|| lower.endsWith(".svg")
+	}
+
+	function copyTextToClipboard(text, successHint) {
+		if (!text || String(text).length === 0) return
+		chatClipboard.text = String(text)
+		root._chatActionHint = successHint || qsTr("Copied to clipboard")
+		chatHintTimer.restart()
+	}
+
+	function formatChatExportText() {
+		var lines = []
+		lines.push(qsTr("Comments export"))
+		lines.push("")
+		if (!ticketData || !ticketData.m_comments) {
+			lines.push(qsTr("No comments"))
+			return lines.join("\n")
+		}
+
+		for (var i = 0; i < ticketData.m_comments.count; i++) {
+			var wrapper = ticketData.m_comments.get(i)
+			var item = wrapper ? wrapper.item : null
+			if (!item) continue
+
+			var linePrefix = String(i + 1) + "."
+			lines.push(linePrefix + "\t" + root.formatTimestamp(item.m_timestamp) + "\t" + (item.m_userName || qsTr("Unknown")))
+			var contentText = String(item.m_content || "")
+			var contentLines = contentText.replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n")
+			if (contentLines.length === 0 || (contentLines.length === 1 && contentLines[0].length === 0)) {
+				lines.push("\t" + qsTr("Message") + "\t")
+			} else {
+				lines.push("\t" + qsTr("Message") + "\t" + contentLines[0])
+				for (var c = 1; c < contentLines.length; c++) {
+					lines.push("\t\t" + contentLines[c])
+				}
+			}
+
+			if (item.m_replyToId && item.m_replyToId.length > 0) {
+				lines.push("\t↳\t" + (item.m_replyToUserName || qsTr("Unknown")) + "\t" + (item.m_replyToContent || ""))
+			}
+
+			var attachments = item.m_attachments || []
+			for (var a = 0; a < attachments.length; a++) {
+				var att = attachments[a]
+				lines.push("\t" + qsTr("Attachment") + "\t" + (att.m_fileName || qsTr("file")) + "\t" + (att.m_preview || ""))
+			}
+			lines.push("")
+		}
+
+		return lines.join("\n")
 	}
 
 	function chatParticipants() {
@@ -353,6 +413,17 @@ DocumentViewBase {
 	}
 	
 	// --- Shared data providers and models ---
+
+	Clipboard {
+		id: chatClipboard
+	}
+
+	Timer {
+		id: chatHintTimer
+		interval: 2200
+		repeat: false
+		onTriggered: root._chatActionHint = ""
+	}
 	
 	CollectionDataProvider {
 		id: userCollectionProvider
@@ -1570,6 +1641,25 @@ DocumentViewBase {
 								}
 							}
 						}
+
+						Item {
+							width: parent.width - x
+							height: 1
+						}
+
+						Text {
+							text: qsTr("Export TXT")
+							font.pixelSize: Style.fontSizeM
+							color: editView.accentColor
+							anchors.verticalCenter: parent.verticalCenter
+
+							MouseArea {
+								anchors.fill: parent
+								hoverEnabled: true
+								cursorShape: Qt.PointingHandCursor
+								onClicked: root.copyTextToClipboard(root.formatChatExportText(), qsTr("Chat export copied"))
+							}
+						}
 					}
 				}
 				
@@ -1583,6 +1673,27 @@ DocumentViewBase {
 					secondSize: Style.marginM
 					targetItem: commentsFlick
 					visible: commentsPanel.visible
+				}
+
+				Rectangle {
+					visible: root._chatActionHint.length > 0
+					anchors.top: chatHeader.bottom
+					anchors.topMargin: Style.spacingS
+					anchors.horizontalCenter: parent.horizontalCenter
+					radius: Style.radiusL
+					height: 28
+					width: chatHintText.contentWidth + Style.paddingM * 2
+					color: "#30343A"
+					opacity: 0.9
+					z: 3
+
+					Text {
+						id: chatHintText
+						anchors.centerIn: parent
+						text: root._chatActionHint
+						font.pixelSize: Style.fontSizeM - 1
+						color: Style.baseColor
+					}
 				}
 				
 				// Chat area with subtle tint
@@ -1622,6 +1733,12 @@ DocumentViewBase {
 							contentY = 0
 						}
 					}
+
+					function isNearBottom(threshold) {
+						var edge = threshold === undefined ? 40 : threshold
+						var maxY = Math.max(0, contentHeight - height)
+						return maxY <= 0 || contentY >= maxY - edge
+					}
 					
 					function scrollToMessage(msgId) {
 						if (!msgId) return
@@ -1638,13 +1755,23 @@ DocumentViewBase {
 					}
 
 					onContentHeightChanged: {
-						scrollToBottom()
+						if (root._forceScrollToBottom || isNearBottom(80)) {
+							scrollToBottom()
+							root._unreadMessagesCount = 0
+							root._forceScrollToBottom = false
+						}
 					}
 					
 					onHeightChanged: {
 						var maxY = contentHeight - height
-						if (maxY > 0 && contentY >= maxY - 80) {
+						if (maxY > 0 && isNearBottom(80)) {
 							contentY = maxY
+						}
+					}
+
+					onContentYChanged: {
+						if (isNearBottom(30) && root._unreadMessagesCount !== 0) {
+							root._unreadMessagesCount = 0
 						}
 					}
 
@@ -1661,6 +1788,20 @@ DocumentViewBase {
 							Repeater {
 								id: commentsThread
 								model: root.ticketData ? root.ticketData.m_comments : 0
+								onCountChanged: {
+									if (!root._commentsTrackingReady) {
+										root._lastKnownCommentCount = count
+										root._commentsTrackingReady = true
+										return
+									}
+
+									if (count > root._lastKnownCommentCount
+											&& !commentsFlick.isNearBottom(40)
+											&& !root._forceScrollToBottom) {
+										root._unreadMessagesCount += (count - root._lastKnownCommentCount)
+									}
+									root._lastKnownCommentCount = count
+								}
 								
 								delegate: Item {
 									id: commentDelegate
@@ -1898,25 +2039,40 @@ DocumentViewBase {
 													}
 												}
 												
-												// Reply button
-												Text {
-													visible: root.canEdit
-													text: qsTr("Reply")
-													font.pixelSize: Style.fontSizeM
-													color: Style.inactiveTextColor
-													// x: Style.paddingM
-													
-													MouseArea {
-														anchors.fill: parent
-														hoverEnabled: true
-														cursorShape: Qt.PointingHandCursor
-														onClicked: {
-															root._replyToMessage = {
-																id: model.item.m_id || "",
-																userName: model.item.m_userName || qsTr("Unknown"),
-																content: model.item.m_content || ""
+												Row {
+													spacing: Style.spacingM
+
+													Text {
+														visible: root.canEdit
+														text: qsTr("Reply")
+														font.pixelSize: Style.fontSizeM
+														color: Style.inactiveTextColor
+
+														MouseArea {
+															anchors.fill: parent
+															hoverEnabled: true
+															cursorShape: Qt.PointingHandCursor
+															onClicked: {
+																root._replyToMessage = {
+																	id: model.item.m_id || "",
+																	userName: model.item.m_userName || qsTr("Unknown"),
+																	content: model.item.m_content || ""
+																}
+																commentInputField.forceActiveFocus()
 															}
-															commentInputField.forceActiveFocus()
+														}
+													}
+
+													Text {
+														text: qsTr("Copy")
+														font.pixelSize: Style.fontSizeM
+														color: Style.inactiveTextColor
+
+														MouseArea {
+															anchors.fill: parent
+															hoverEnabled: true
+															cursorShape: Qt.PointingHandCursor
+															onClicked: root.copyTextToClipboard(model.item.m_content || "", qsTr("Message copied"))
 														}
 													}
 												}
@@ -1950,6 +2106,51 @@ DocumentViewBase {
 										font.pixelSize: Style.fontSizeM
 										color: Style.inactiveTextColor
 									}
+								}
+							}
+						}
+					}
+				}
+
+				Rectangle {
+					visible: root._unreadMessagesCount > 0 && !commentsFlick.isNearBottom(24)
+					anchors.right: parent.right
+					anchors.rightMargin: editView.cardPadding
+					anchors.bottom: addCommentSection.visible ? addCommentSection.top
+																: lockNoticeRow.visible ? lockNoticeRow.top
+																						: parent.bottom
+					anchors.bottomMargin: Style.spacingM
+					radius: Style.radiusL
+					color: editView.accentColor
+					height: 34
+					width: unreadHintRow.width + Style.paddingM * 2
+					z: 2
+
+					Row {
+						id: unreadHintRow
+						anchors.centerIn: parent
+						spacing: Style.spacingS
+
+						Text {
+							text: qsTr("%1 unread").arg(root._unreadMessagesCount)
+							font.pixelSize: Style.fontSizeM
+							color: Style.baseColor
+							font.bold: true
+						}
+
+						Text {
+							text: qsTr("Jump")
+							font.pixelSize: Style.fontSizeM
+							color: Style.baseColor
+							font.bold: true
+
+							MouseArea {
+								anchors.fill: parent
+								hoverEnabled: true
+								cursorShape: Qt.PointingHandCursor
+								onClicked: {
+									commentsFlick.scrollToBottom()
+									root._unreadMessagesCount = 0
 								}
 							}
 						}
