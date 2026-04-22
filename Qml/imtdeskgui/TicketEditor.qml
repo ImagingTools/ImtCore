@@ -1655,8 +1655,23 @@ DocumentViewBase {
 						}
 
 						Item {
-							width: parent.width - x
+							width: Math.max(0, parent.width - x - exportTxt.contentWidth - participantsRow.width - Style.spacingS * 2)
 							height: 1
+						}
+
+						Text {
+							id: exportTxt
+							text: qsTr("Export TXT")
+							font.pixelSize: Style.fontSizeM
+							color: editView.accentColor
+							anchors.verticalCenter: parent.verticalCenter
+
+							MouseArea {
+								anchors.fill: parent
+								hoverEnabled: true
+								cursorShape: Qt.PointingHandCursor
+								onClicked: root.copyTextToClipboard(root.formatChatExportText(), qsTr("Chat export copied"))
+							}
 						}
 
 						Row {
@@ -1682,20 +1697,6 @@ DocumentViewBase {
 										color: Style.baseColor
 									}
 								}
-							}
-						}
-
-						Text {
-							text: qsTr("Export TXT")
-							font.pixelSize: Style.fontSizeM
-							color: editView.accentColor
-							anchors.verticalCenter: parent.verticalCenter
-
-							MouseArea {
-								anchors.fill: parent
-								hoverEnabled: true
-								cursorShape: Qt.PointingHandCursor
-								onClicked: root.copyTextToClipboard(root.formatChatExportText(), qsTr("Chat export copied"))
 							}
 						}
 					}
@@ -2013,83 +2014,21 @@ DocumentViewBase {
 
 													Repeater {
 														model: commentDelegate.dataModel.m_attachments || []
-														delegate: Rectangle {
-															readonly property bool isImage: root.isImageAttachment(model.item.m_fileName)
-															width: isImage ? editView.imageAttachmentWidth : Math.min(parent.width, editView.fileAttachmentMaxWidth)
-															height: isImage ? editView.imageAttachmentHeight : editView.fileAttachmentHeight
-															radius: Style.radiusM
-															color: activeFocus ? editView.focusedAttachmentBgColor : (isImage ? editView.imageAttachmentBgColor : editView.fileAttachmentBgColor)
-															border.color: activeFocus ? editView.accentColor : editView.cardBorderColor
-															border.width: activeFocus ? 2 : 1
-															clip: true
-															activeFocusOnTab: true
-
-															Image {
-																id: messageAttachmentImage
-																visible: parent.isImage
-																anchors.fill: parent
-																fillMode: Image.PreserveAspectCrop
-																source: model.item.m_preview || ""
-															}
-
-															Column {
-																visible: parent.isImage && messageAttachmentImage.status === Image.Error
-																anchors.centerIn: parent
-																spacing: 2
-
-																Image {
-																	anchors.horizontalCenter: parent.horizontalCenter
-																	width: Style.iconSizeS
-																	height: width
-																	source: Style.getIconPath("Icons/Attachment", Icon.State.On, Icon.Mode.Normal)
-																	sourceSize.width: width
-																	sourceSize.height: height
-																}
-
-																Text {
-																	text: qsTr("Preview unavailable")
-																	font.pixelSize: Style.fontSizeM - 2
-																	color: Style.inactiveTextColor
-																}
-															}
-
-															Row {
-																visible: !parent.isImage
-																anchors.fill: parent
-																anchors.margins: Style.paddingS
-																spacing: Style.spacingS
-
-																Image {
-																	width: Style.iconSizeS
-																	height: width
-																	source: Style.getIconPath("Icons/Attachment", Icon.State.On, Icon.Mode.Normal)
-																	sourceSize.width: width
-																	sourceSize.height: height
-																	anchors.verticalCenter: parent.verticalCenter
-																}
-
-																Text {
-																	width: parent.width - Style.iconSizeS - Style.spacingS
-																	anchors.verticalCenter: parent.verticalCenter
-																	text: model.item.m_fileName || qsTr("file")
-																	font.pixelSize: Style.fontSizeM
-																	color: Style.textColor
-																	elide: Text.ElideMiddle
-																}
-															}
+														delegate: Text {
+															readonly property string attachmentUrl: model.item.m_preview || ""
+															width: parent.width
+															font.pixelSize: Style.fontSizeM
+															font.underline: attachmentUrl.length > 0
+															elide: Text.ElideRight
+															color: attachmentUrl.length > 0 ? editView.accentColor : Style.textColor
+															text: model.item.m_fileName || qsTr("file")
 
 															MouseArea {
 																anchors.fill: parent
-																hoverEnabled: true
-																cursorShape: Qt.PointingHandCursor
-																onClicked: if (model.item.m_preview) Qt.openUrlExternally(model.item.m_preview)
-															}
-
-															Keys.onReturnPressed: {
-																if (model.item.m_preview) Qt.openUrlExternally(model.item.m_preview)
-															}
-															Keys.onEnterPressed: {
-																if (model.item.m_preview) Qt.openUrlExternally(model.item.m_preview)
+																enabled: parent.attachmentUrl.length > 0
+																hoverEnabled: enabled
+																cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+																onClicked: Qt.openUrlExternally(parent.attachmentUrl)
 															}
 														}
 													}
@@ -2511,7 +2450,7 @@ DocumentViewBase {
 								Button {
 									id: commentButton
 									visible: false
-									enabled: (commentInputField.text !== "" || root.pendingAttachments.length > 0) && root.uploadsInProgress === 0
+									enabled: commentInputField.text.trim().length > 0 && root.uploadsInProgress === 0
 								}
 								
 								MouseArea {
