@@ -493,7 +493,7 @@ DocumentViewBase {
 		readonly property string sectionLabelColor: "#8C95A6"
 		readonly property string timestampColor: Style.inactiveTextColor
 		readonly property real columnGap: Style.spacingL
-		readonly property real editButtonWidth: 54
+		readonly property real editButtonWidth: 72
 		readonly property real avatarOverlap: -8
 		readonly property real bubbleWidthRatio: 0.86
 		readonly property real bubbleMaxWidth: 680
@@ -1073,9 +1073,9 @@ DocumentViewBase {
 										if (buttonId === Enums.apply && collectionView) {
 											var arr = root.pendingEntityRefs.slice()
 											var mdl = collectionView.table.elements
-											let indexes = collectionView.table.getSelectedIndexes()
+											var indexes = collectionView.table.getSelectedIndexes()
 											for (var i = 0; i < indexes.length; i++) {
-												let idx = indexes[i]
+												var idx = indexes[i]
 												var displayName = mdl.getData("name", idx)
 												var typeId = mdl.getData("typeId", idx)
 												var elementId = mdl.getData("id", idx)
@@ -1895,8 +1895,8 @@ DocumentViewBase {
 															height: isImage ? editView.imageAttachmentHeight : editView.fileAttachmentHeight
 															radius: Style.radiusM
 															color: isImage ? "#EEF2F8" : "#F6F8FC"
-															border.color: editView.cardBorderColor
-															border.width: 1
+															border.color: activeFocus ? editView.accentColor : editView.cardBorderColor
+															border.width: activeFocus ? 2 : 1
 															clip: true
 
 															Image {
