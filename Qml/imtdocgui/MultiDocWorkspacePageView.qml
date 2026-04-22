@@ -7,7 +7,7 @@ import imtgui 1.0
 
 DocumentWorkspacePageView {
 	id: multiDocPageView
-	
+
 	documentManagerView: documentManagerView_
 	
 	onStartItemSourceCompChanged: {

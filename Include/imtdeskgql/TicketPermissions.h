@@ -29,34 +29,17 @@ namespace imtdeskgql
 
 
 /**
-Returns the current user ID extracted from the request context, or empty
-if the context or user info is not available.
-*/
-inline QByteArray GetCurrentUserId(const imtgql::IGqlContext* contextPtr)
-{
-if (contextPtr == nullptr){
-return QByteArray();
-}
-const imtauth::IUserInfo* userInfoPtr = contextPtr->GetUserInfo();
-if (userInfoPtr != nullptr){
-return userInfoPtr->GetId();
-}
-return contextPtr->GetUserId();
-}
-
-
-/**
 Returns true if the current user is an administrator.
 */
 inline bool IsCurrentUserAdmin(const imtgql::IGqlContext* contextPtr)
 {
-if (contextPtr != nullptr){
-const imtauth::IUserInfo* userInfoPtr = contextPtr->GetUserInfo();
-if (userInfoPtr != nullptr){
-return userInfoPtr->IsAdmin();
-}
-}
-return false;
+	if (contextPtr != nullptr){
+		const imtauth::IUserInfo* userInfoPtr = contextPtr->GetUserInfo();
+		if (userInfoPtr != nullptr){
+			return userInfoPtr->IsAdmin();
+		}
+	}
+	return false;
 }
 
 
@@ -66,28 +49,32 @@ given ticket. Returns true if the user is related to the ticket in either
 role; sets \a isReporter and \a isAssignee accordingly.
 */
 inline bool IsCurrentUserRelatedToTicket(
-const imtgql::IGqlContext* contextPtr,
-const imtdesk::ISupportTicket* ticketPtr,
-bool& isReporter,
-bool& isAssignee)
+		const imtgql::IGqlContext* contextPtr,
+		const imtdesk::ISupportTicket* ticketPtr,
+		bool& isReporter,
+		bool& isAssignee)
 {
-isReporter = false;
-isAssignee = false;
+	isReporter = false;
+	isAssignee = false;
 
-const QByteArray userId = GetCurrentUserId(contextPtr);
-if (userId.isEmpty() || ticketPtr == nullptr){
-return false;
-}
+	if (contextPtr == nullptr || ticketPtr == nullptr){
+		return false;
+	}
 
-if (ticketPtr->GetReporterId() == userId){
-isReporter = true;
-}
+	const QByteArray userId = contextPtr->GetUserId();
+	if (userId.isEmpty()){
+		return false;
+	}
 
-if (ticketPtr->GetAssigneeIds().contains(userId)){
-isAssignee = true;
-}
+	if (ticketPtr->GetReporterId() == userId){
+		isReporter = true;
+	}
 
-return isReporter || isAssignee;
+	if (ticketPtr->GetAssigneeIds().contains(userId)){
+		isAssignee = true;
+	}
+
+	return isReporter || isAssignee;
 }
 
 
@@ -97,49 +84,49 @@ reporter identified by \a reporterId. Requires a valid user collection
 (to look up the reporter's groups) and a user-group info provider.
 */
 inline bool IsCurrentUserInSameGroupAsReporter(
-const imtgql::IGqlContext* contextPtr,
-const QByteArray& reporterId,
-const imtbase::IObjectCollection* userCollectionPtr,
-const imtauth::IUserGroupInfoProvider* userGroupInfoProviderPtr)
+		const imtgql::IGqlContext* contextPtr,
+		const QByteArray& reporterId,
+		const imtbase::IObjectCollection* userCollectionPtr,
+		const imtauth::IUserGroupInfoProvider* userGroupInfoProviderPtr)
 {
-if (reporterId.isEmpty() || userCollectionPtr == nullptr || userGroupInfoProviderPtr == nullptr){
-return false;
-}
+	if (reporterId.isEmpty() || userCollectionPtr == nullptr || userGroupInfoProviderPtr == nullptr){
+		return false;
+	}
 
-if (contextPtr == nullptr){
-return false;
-}
+	if (contextPtr == nullptr){
+		return false;
+	}
 
-const imtauth::IUserInfo* userInfoPtr = contextPtr->GetUserInfo();
-if (userInfoPtr == nullptr){
-return false;
-}
+	const imtauth::IUserInfo* userInfoPtr = contextPtr->GetUserInfo();
+	if (userInfoPtr == nullptr){
+		return false;
+	}
 
-const QByteArrayList userGroups = userInfoPtr->GetGroups();
-if (userGroups.isEmpty()){
-return false;
-}
+	const QByteArrayList userGroups = userInfoPtr->GetGroups();
+	if (userGroups.isEmpty()){
+		return false;
+	}
 
-QByteArrayList reporterGroups;
-imtbase::IObjectCollection::DataPtr reporterDataPtr;
-if (userCollectionPtr->GetObjectData(reporterId, reporterDataPtr)){
-const imtauth::IUserInfo* reporterInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(reporterDataPtr.GetPtr());
-if (reporterInfoPtr != nullptr){
-reporterGroups = reporterInfoPtr->GetGroups();
-}
-}
+	QByteArrayList reporterGroups;
+	imtbase::IObjectCollection::DataPtr reporterDataPtr;
+	if (userCollectionPtr->GetObjectData(reporterId, reporterDataPtr)){
+		const imtauth::IUserInfo* reporterInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(reporterDataPtr.GetPtr());
+		if (reporterInfoPtr != nullptr){
+			reporterGroups = reporterInfoPtr->GetGroups();
+		}
+	}
 
-if (reporterGroups.isEmpty()){
-return false;
-}
+	if (reporterGroups.isEmpty()){
+		return false;
+	}
 
-for (const QByteArray& groupId : std::as_const(reporterGroups)){
-if (userGroups.contains(groupId)){
-return true;
-}
-}
+	for (const QByteArray& groupId : std::as_const(reporterGroups)){
+		if (userGroups.contains(groupId)){
+			return true;
+		}
+	}
 
-return false;
+	return false;
 }
 
 
@@ -148,27 +135,27 @@ Returns true if the current user can see the given ticket: admin, reporter,
 assignee, or a user in the same group as the reporter.
 */
 inline bool HasTicketVisibility(
-const imtgql::IGqlContext* contextPtr,
-const imtdesk::ISupportTicket* ticketPtr,
-const imtbase::IObjectCollection* userCollectionPtr,
-const imtauth::IUserGroupInfoProvider* userGroupInfoProviderPtr)
+		const imtgql::IGqlContext* contextPtr,
+		const imtdesk::ISupportTicket* ticketPtr,
+		const imtbase::IObjectCollection* userCollectionPtr,
+		const imtauth::IUserGroupInfoProvider* userGroupInfoProviderPtr)
 {
-if (ticketPtr == nullptr){
-return false;
-}
+	if (ticketPtr == nullptr){
+		return false;
+	}
 
-if (IsCurrentUserAdmin(contextPtr)){
-return true;
-}
+	if (IsCurrentUserAdmin(contextPtr)){
+		return true;
+	}
 
-bool isReporter = false;
-bool isAssignee = false;
-if (IsCurrentUserRelatedToTicket(contextPtr, ticketPtr, isReporter, isAssignee)){
-return true;
-}
+	bool isReporter = false;
+	bool isAssignee = false;
+	if (IsCurrentUserRelatedToTicket(contextPtr, ticketPtr, isReporter, isAssignee)){
+		return true;
+	}
 
-return IsCurrentUserInSameGroupAsReporter(
-contextPtr, ticketPtr->GetReporterId(), userCollectionPtr, userGroupInfoProviderPtr);
+	return IsCurrentUserInSameGroupAsReporter(
+			contextPtr, ticketPtr->GetReporterId(), userCollectionPtr, userGroupInfoProviderPtr);
 }
 
 
@@ -177,21 +164,21 @@ Returns true if the current user is allowed to edit the given ticket
 (admin, reporter, or assignee).
 */
 inline bool CanEditTicket(
-const imtgql::IGqlContext* contextPtr,
-const imtdesk::ISupportTicket* ticketPtr)
+		const imtgql::IGqlContext* contextPtr,
+		const imtdesk::ISupportTicket* ticketPtr)
 {
-if (ticketPtr == nullptr){
-return false;
-}
+	if (ticketPtr == nullptr){
+		return false;
+	}
 
-if (IsCurrentUserAdmin(contextPtr)){
-return true;
-}
+	if (IsCurrentUserAdmin(contextPtr)){
+		return true;
+	}
 
-bool isReporter = false;
-bool isAssignee = false;
-IsCurrentUserRelatedToTicket(contextPtr, ticketPtr, isReporter, isAssignee);
-return isReporter || isAssignee;
+	bool isReporter = false;
+	bool isAssignee = false;
+	IsCurrentUserRelatedToTicket(contextPtr, ticketPtr, isReporter, isAssignee);
+	return isReporter || isAssignee;
 }
 
 
@@ -200,21 +187,21 @@ Returns true if the current user is allowed to lock/unlock the given
 ticket (admin or reporter).
 */
 inline bool CanLockTicket(
-const imtgql::IGqlContext* contextPtr,
-const imtdesk::ISupportTicket* ticketPtr)
+		const imtgql::IGqlContext* contextPtr,
+		const imtdesk::ISupportTicket* ticketPtr)
 {
-if (ticketPtr == nullptr){
-return false;
-}
+	if (ticketPtr == nullptr){
+		return false;
+	}
 
-if (IsCurrentUserAdmin(contextPtr)){
-return true;
-}
+	if (IsCurrentUserAdmin(contextPtr)){
+		return true;
+	}
 
-bool isReporter = false;
-bool isAssignee = false;
-IsCurrentUserRelatedToTicket(contextPtr, ticketPtr, isReporter, isAssignee);
-return isReporter;
+	bool isReporter = false;
+	bool isAssignee = false;
+	IsCurrentUserRelatedToTicket(contextPtr, ticketPtr, isReporter, isAssignee);
+	return isReporter;
 }
 
 

@@ -8,26 +8,136 @@
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlRecord>
 
-// ImtCore includes
+// ACF includes
 #include <imtdesk/ISupportTicket.h>
 #include <imtdb/CDatabaseEngineComp.h>
 #include <imtdb/imtdb.h>
+#include <iprm/TParamsPtr.h>
+#include <imtauth/IUserGroupFilter.h>
+#include <imtauth/IUserInfo.h>
+#include <imtgql/CGqlRequestContextManager.h>
+#include <imtgql/IGqlContext.h>
 
 
 namespace imtdeskdb
 {
 
 
-namespace
-{
-
-// Helper: return current UTC timestamp in ISO 8601 with milliseconds
-QString utcNow()
+QString CSupportTicketDbDelegateComp::UtcNow() const
 {
 	return QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
 }
 
-} // anonymous namespace
+QString CSupportTicketDbDelegateComp::EscapeSql(const QString& value) const
+{
+	QString escaped = value;
+	escaped.replace('\'', "''");
+	return escaped;
+}
+
+QString CSupportTicketDbDelegateComp::EscapeSqlLikePattern(const QString& value) const
+{
+	QString escaped = value;
+	escaped.replace("\\", "\\\\");
+	escaped.replace("%", "\\%");
+	escaped.replace("_", "\\_");
+	escaped.replace('\'', "''");
+	return escaped;
+}
+
+bool CSupportTicketDbDelegateComp::IsSqliteDatabase() const
+{
+	return m_databaseEngineCompPtr.IsValid()
+			&& m_databaseEngineCompPtr->GetDatabaseDriverId().compare(
+				QByteArrayLiteral("QSQLITE"),
+				Qt::CaseInsensitive) == 0;
+}
+
+QString CSupportTicketDbDelegateComp::CreateVisibilityCondition(
+		const QByteArray& userId,
+		const QByteArrayList& currentUserGroups) const
+{
+	if (userId.isEmpty()){
+		return QString();
+	}
+
+	const QString escapedUserId = EscapeSql(QString::fromUtf8(userId));
+	const QString escapedUserIdForLike = EscapeSqlLikePattern(QString::fromUtf8(userId));
+	const QString assigneeLikePattern = QString("%%,%1,%%").arg(escapedUserIdForLike);
+	QStringList escapedCurrentUserGroups;
+	for (const QByteArray& groupId : currentUserGroups){
+		const QString escapedGroupId = EscapeSql(QString::fromUtf8(groupId));
+		if (!escapedGroupId.isEmpty()){
+			escapedCurrentUserGroups << QString("'%1'").arg(escapedGroupId);
+		}
+	}
+
+	QStringList visibilityConditions;
+	visibilityConditions << QString("\"ReporterId\"='%1'").arg(escapedUserId);
+	visibilityConditions << QString("(\"AssigneeIds\" IS NOT NULL AND (',' || \"AssigneeIds\" || ',') LIKE '%1' ESCAPE '\\')").arg(assigneeLikePattern);
+	if (!escapedCurrentUserGroups.isEmpty() && m_userCollectionCompPtr.IsValid()){
+		if (IsSqliteDatabase()){
+			const QString groupsInClause = escapedCurrentUserGroups.join(", ");
+			visibilityConditions << QString(
+				"(EXISTS (SELECT 1 FROM \"Users\" AS \"ReporterUser\" "
+				"JOIN json_each(\"ReporterUser\".\"Document\", '$.Groups') AS \"ReporterGroup\" "
+				"WHERE \"ReporterUser\".\"State\"='Active' "
+				"AND \"ReporterUser\".\"DocumentId\" = \"ReporterId\" "
+				"AND \"ReporterGroup\".\"value\" IN (%1)) "
+				"OR EXISTS (SELECT 1 FROM \"Users\" AS \"AssigneeUser\" "
+				"JOIN json_each(\"AssigneeUser\".\"Document\", '$.Groups') AS \"AssigneeGroup\" "
+				"WHERE \"AssigneeUser\".\"State\"='Active' "
+				"AND \"AssigneeIds\" IS NOT NULL "
+				"AND (',' || \"AssigneeIds\" || ',') LIKE ('%%,' || \"AssigneeUser\".\"DocumentId\" || ',%%') "
+				"AND \"AssigneeGroup\".\"value\" IN (%1)))").arg(groupsInClause);
+		}
+		else{
+			const QString groupsArray = QString("array[%1]").arg(escapedCurrentUserGroups.join(", "));
+			visibilityConditions << QString(
+				"(EXISTS (SELECT 1 FROM \"Users\" AS \"ReporterUser\" "
+				"WHERE \"ReporterUser\".\"State\"='Active' "
+				"AND \"ReporterUser\".\"DocumentId\"::text = \"ReporterId\" "
+				"AND (\"ReporterUser\".\"Document\"->'Groups' ?| %1)) "
+				"OR EXISTS (SELECT 1 FROM \"Users\" AS \"AssigneeUser\" "
+				"WHERE \"AssigneeUser\".\"State\"='Active' "
+				"AND \"AssigneeIds\" IS NOT NULL "
+				"AND (',' || \"AssigneeIds\" || ',') LIKE ('%%,' || \"AssigneeUser\".\"DocumentId\"::text || ',%%') "
+				"AND (\"AssigneeUser\".\"Document\"->'Groups' ?| %1)))").arg(groupsArray);
+		}
+	}
+
+	return QString("(%1)").arg(visibilityConditions.join(" OR "));
+}
+
+
+QByteArray CSupportTicketDbDelegateComp::GetSelectionQuery(
+		const QByteArray& objectId,
+		int offset,
+		int count,
+		const iprm::IParamsSet* paramsPtr) const
+{
+	QByteArray baseQuery = BaseClass::GetSelectionQuery(objectId, offset, count, paramsPtr);
+	if (baseQuery.isEmpty()){
+		return baseQuery;
+	}
+
+	iprm::TParamsPtr<imtauth::IUserGroupFilter> groupFilterParamPtr(paramsPtr, "GroupFilter");
+	if (!groupFilterParamPtr.IsValid()){
+		return baseQuery;
+	}
+
+	const QString visibilityCondition = CreateVisibilityCondition(
+				groupFilterParamPtr->GetUserId(),
+				groupFilterParamPtr->GetGroupIds());
+	if (visibilityCondition.isEmpty()){
+		return QString("SELECT * FROM (%1) AS \"FilteredTickets\" WHERE 1=0")
+				.arg(QString::fromUtf8(baseQuery)).toUtf8();
+	}
+
+	const QString baseQueryStr = QString::fromUtf8(baseQuery);
+	return QString("SELECT * FROM (%1) AS \"FilteredTickets\" WHERE %2")
+			.arg(baseQueryStr, visibilityCondition).toUtf8();
+}
 
 
 istd::IChangeableUniquePtr CSupportTicketDbDelegateComp::CreateObjectFromRecord(
@@ -194,7 +304,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSupportTicketDbDelegateComp::Cre
 	}
 	const QString assigneeIdsStr = assigneeStrs.join(',');
 
-	const QString reporterId = QString::fromUtf8(ticketPtr->GetReporterId());
+	QString reporterId = QString::fromUtf8(ticketPtr->GetReporterId());
 	const QString conversationId = QString::fromUtf8(ticketPtr->GetConversationId());
 	const QString messageId = QString::fromUtf8(ticketPtr->GetMessageId());
 	const QString resolvedAt = ticketPtr->GetResolvedAt();
@@ -212,14 +322,16 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSupportTicketDbDelegateComp::Cre
 	// Build labelIds as comma-separated string
 	QStringList labelStrs;
 	for (const QByteArray& lid : ticketPtr->GetLabelIds()){
-		labelStrs.append(QString::fromUtf8(lid));
+		labelStrs.append(EscapeSql(QString::fromUtf8(lid)));
 	}
 	const QString labelIdsStr = labelStrs.join(',');
 	const QString labelsSql = labelIdsStr.isEmpty() ? "NULL" : QString("'%1'").arg(labelIdsStr);
 
-	const QString lockReasonSql = ticketPtr->GetLockReason().isEmpty() ? "NULL" : QString("'%1'").arg(ticketPtr->GetLockReason());
+	const QString lockReasonSql = ticketPtr->GetLockReason().isEmpty()
+			? "NULL"
+			: QString("'%1'").arg(EscapeSql(ticketPtr->GetLockReason()));
 
-	const QString nowUtc = utcNow();
+	const QString nowUtc = UtcNow();
 
 	QString combinedQuery;
 
@@ -291,7 +403,6 @@ QByteArray CSupportTicketDbDelegateComp::CreateUpdateObjectQuery(
 	}
 	const QString assigneeIdsStr = assigneeStrs.join(',');
 
-	const QString reporterId = QString::fromUtf8(ticketPtr->GetReporterId());
 	const QString conversationId = QString::fromUtf8(ticketPtr->GetConversationId());
 	const QString messageId = QString::fromUtf8(ticketPtr->GetMessageId());
 	const QString resolvedAt = ticketPtr->GetResolvedAt();
@@ -307,14 +418,16 @@ QByteArray CSupportTicketDbDelegateComp::CreateUpdateObjectQuery(
 	// Build labelIds as comma-separated string
 	QStringList labelStrs;
 	for (const QByteArray& lid : ticketPtr->GetLabelIds()){
-		labelStrs.append(QString::fromUtf8(lid));
+		labelStrs.append(EscapeSql(QString::fromUtf8(lid)));
 	}
 	const QString labelIdsStr = labelStrs.join(',');
 	const QString labelsSql = labelIdsStr.isEmpty() ? "NULL" : QString("'%1'").arg(labelIdsStr);
 
-	const QString lockReasonSql = ticketPtr->GetLockReason().isEmpty() ? "NULL" : QString("'%1'").arg(ticketPtr->GetLockReason());
+	const QString lockReasonSql = ticketPtr->GetLockReason().isEmpty()
+			? "NULL"
+			: QString("'%1'").arg(EscapeSql(ticketPtr->GetLockReason()));
 
-	const QString nowUtc = utcNow();
+	const QString nowUtc = UtcNow();
 
 	QString combinedQuery;
 
@@ -327,17 +440,16 @@ QByteArray CSupportTicketDbDelegateComp::CreateUpdateObjectQuery(
 		"\"StateReason\"=%5, "
 		"\"Priority\"=%6, "
 		"\"AssigneeIds\"=%7, "
-		"\"ReporterId\"='%8', "
-		"\"ConversationId\"=%9, "
-		"\"MessageId\"=%10, "
-		"\"Tags\"=%11, "
-		"\"LabelIds\"=%12, "
-		"\"Locked\"=%13, "
-		"\"LockReason\"=%14, "
-		"\"ResolvedAt\"=%15, "
-		"\"ClosedAt\"=%16, "
-		"\"UpdatedAt\"='%17' "
-		"WHERE \"Id\"='%18';")
+		"\"ConversationId\"=%8, "
+		"\"MessageId\"=%9, "
+		"\"Tags\"=%10, "
+		"\"LabelIds\"=%11, "
+		"\"Locked\"=%12, "
+		"\"LockReason\"=%13, "
+		"\"ResolvedAt\"=%14, "
+		"\"ClosedAt\"=%15, "
+		"\"UpdatedAt\"='%16' "
+		"WHERE \"Id\"='%17';")
 		.arg(ticketPtr->GetTitle())
 		.arg(ticketPtr->GetDescription())
 		.arg(ticketPtr->GetTicketType())
@@ -345,7 +457,6 @@ QByteArray CSupportTicketDbDelegateComp::CreateUpdateObjectQuery(
 		.arg(ticketPtr->GetStateReason())
 		.arg(ticketPtr->GetPriority())
 		.arg(assigneesSql)
-		.arg(reporterId)
 		.arg(convSql)
 		.arg(msgSql)
 		.arg(tagsSql)
@@ -423,7 +534,7 @@ QByteArray CSupportTicketDbDelegateComp::CreateRenameObjectQuery(
 
 	return QString("UPDATE \"Tickets\" SET \"Title\"='%1', \"UpdatedAt\"='%2' WHERE \"Id\"='%3';")
 		.arg(newObjectName)
-		.arg(utcNow())
+		.arg(UtcNow())
 		.arg(QString::fromUtf8(objectId))
 		.toUtf8();
 }
@@ -441,7 +552,7 @@ QByteArray CSupportTicketDbDelegateComp::CreateDescriptionObjectQuery(
 
 	return QString("UPDATE \"Tickets\" SET \"Description\"='%1', \"UpdatedAt\"='%2' WHERE \"Id\"='%3';")
 		.arg(description)
-		.arg(utcNow())
+		.arg(UtcNow())
 		.arg(QString::fromUtf8(objectId))
 		.toUtf8();
 }

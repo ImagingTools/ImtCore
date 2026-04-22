@@ -55,8 +55,22 @@ DocumentViewBase {
 	property bool _assigneesChanged: false
 	// Reply-to message context (null = not replying)
 	property var _replyToMessage: null
+	// Chat unread state / feedback
+	property int _lastKnownCommentCount: 0
+	property bool _commentsTrackingReady: false
+	property int _unreadMessagesCount: 0
+	property string _chatActionHint: ""
+	readonly property int chatHintDurationMs: 2200
+	readonly property int chatHintHeightPx: 28
+	readonly property int unreadHintHeightPx: 34
 	
 	signal commentSubmitted(string commentText)
+
+	onTicketDataChanged: {
+		_lastKnownCommentCount = (ticketData && ticketData.m_comments) ? ticketData.m_comments.count : 0
+		_commentsTrackingReady = false
+		_unreadMessagesCount = 0
+	}
 	
 	onIsNewIssueChanged: {
 		doUpdateGui()
@@ -79,6 +93,105 @@ DocumentViewBase {
 		.replace(/'/g, "&#39;")
 		.replace(/\\n/g, "<br>")
 		.replace(/\n/g, "<br>")
+	}
+
+	function isImageAttachment(fileName) {
+		if (!fileName) return false
+		var lower = String(fileName).toLowerCase()
+		return lower.endsWith(".png") || lower.endsWith(".jpg") || lower.endsWith(".jpeg")
+				|| lower.endsWith(".gif") || lower.endsWith(".bmp") || lower.endsWith(".webp")
+				|| lower.endsWith(".svg")
+	}
+
+	function copyTextToClipboard(text, successHint) {
+		if (!text || String(text).length === 0) return
+		clipboardProxy.text = String(text)
+		clipboardProxy.selectAll()
+		clipboardProxy.copy()
+		clipboardProxy.select(0, 0)
+		root._chatActionHint = successHint || qsTr("Copied to clipboard")
+		chatHintTimer.restart()
+	}
+
+	function getCollectionCount(collection) {
+		if (!collection) return 0
+		if (collection.length !== undefined) return collection.length
+		if (collection.count !== undefined) return collection.count
+		return 0
+	}
+
+	function getCollectionItem(collection, index) {
+		if (!collection) return null
+		if (collection.length !== undefined) return collection[index]
+		if (collection.get) {
+			var wrapped = collection.get(index)
+			return wrapped && wrapped.item ? wrapped.item : wrapped
+		}
+		return null
+	}
+
+	function formatChatExportText() {
+		var tabSep = "\t"
+		var lines = []
+		lines.push(qsTr("Ticket Comments Export"))
+		if (ticketData && ticketData.m_number) {
+			lines.push(qsTr("Ticket #") + String(ticketData.m_number))
+		}
+		lines.push("")
+		if (!ticketData || !ticketData.m_comments) {
+			lines.push(qsTr("No comments"))
+			return lines.join("\n")
+		}
+
+		for (var i = 0; i < ticketData.m_comments.count; i++) {
+			var wrapper = ticketData.m_comments.get(i)
+			var item = wrapper ? wrapper.item : null
+			if (!item) continue
+
+			var linePrefix = String(i + 1) + "."
+			lines.push(linePrefix + tabSep + root.formatTimestamp(item.m_timestamp) + tabSep + (item.m_userName || qsTr("Unknown")))
+			var contentText = String(item.m_content || "")
+			var contentLines = contentText.replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n")
+			var isContentEmpty = contentLines.length === 0 || (contentLines.length === 1 && contentLines[0].length === 0)
+			if (isContentEmpty) {
+				lines.push(tabSep + qsTr("Message") + tabSep)
+			} else {
+				lines.push(tabSep + qsTr("Message") + tabSep + contentLines[0])
+				for (var c = 1; c < contentLines.length; c++) {
+					lines.push(tabSep + tabSep + contentLines[c])
+				}
+			}
+
+			if (item.m_replyToId && item.m_replyToId.length > 0) {
+				lines.push(tabSep + "↳" + tabSep + (item.m_replyToUserName || qsTr("Unknown")) + tabSep + (item.m_replyToContent || ""))
+			}
+
+			var attachments = item.m_attachments || []
+			var attachmentCount = root.getCollectionCount(attachments)
+			for (var a = 0; a < attachmentCount; a++) {
+				var att = root.getCollectionItem(attachments, a)
+				if (!att) continue
+				lines.push(tabSep + qsTr("Attachment") + tabSep + (att.m_fileName || qsTr("file")) + tabSep + (att.m_preview || ""))
+			}
+			lines.push("")
+		}
+
+		return lines.join("\n")
+	}
+
+	function chatParticipants() {
+		var out = []
+		var seen = {}
+		if (!ticketData || !ticketData.m_comments) return out
+		for (var i = 0; i < ticketData.m_comments.count; i++) {
+			var item = ticketData.m_comments.get(i).item
+			if (!item) continue
+			var uid = String(item.m_userId || "")
+			if (!uid || seen[uid]) continue
+			seen[uid] = true
+			out.push({ id: uid, name: String(item.m_userName || "") })
+		}
+		return out
 	}
 	
 	function addComment(commentText, attachmentsList) {
@@ -330,6 +443,21 @@ DocumentViewBase {
 	}
 	
 	// --- Shared data providers and models ---
+
+	TextEdit {
+		id: clipboardProxy
+		width: 0
+		height: 0
+		visible: false
+		readOnly: true
+	}
+
+	Timer {
+		id: chatHintTimer
+		interval: root.chatHintDurationMs
+		repeat: false
+		onTriggered: root._chatActionHint = ""
+	}
 	
 	CollectionDataProvider {
 		id: userCollectionProvider
@@ -452,9 +580,25 @@ DocumentViewBase {
 		readonly property string chatBgColor: Style.baseColor
 		readonly property string bubbleColor: "#DFECF9"
 		readonly property string otherBubbleColor: "#F1F3F7"
+		readonly property string myBubbleColor: "#EAF3FF"
 		readonly property string sectionLabelColor: "#8C95A6"
 		readonly property string timestampColor: Style.inactiveTextColor
 		readonly property real columnGap: Style.spacingL
+		readonly property real avatarOverlap: -8
+		readonly property int maxVisibleParticipants: 5
+		readonly property real bubbleWidthRatio: 0.86
+		readonly property real bubbleMaxWidth: 680
+		readonly property real imageAttachmentWidth: 132
+		readonly property real imageAttachmentHeight: 96
+		readonly property real fileAttachmentMaxWidth: 240
+		readonly property real fileAttachmentHeight: 44
+		readonly property string focusedAttachmentBgColor: "#ECF3FF"
+		readonly property string imageAttachmentBgColor: "#EEF2F8"
+		readonly property string fileAttachmentBgColor: "#F6F8FC"
+		readonly property string chatHintBgColor: editView.cardColor
+		readonly property int unreadResetThreshold: 30
+		readonly property int unreadDetectThreshold: 40
+		readonly property int autoStickBottomThreshold: 80
 		// Fixed widths for top groups (left = Title/Desc/Context and Messages, right = Properties)
 		readonly property real detailsWidth: 700
 		readonly property real propertiesWidth: 320
@@ -708,7 +852,7 @@ DocumentViewBase {
 											onEditingFinished: root.doUpdateModel()
 											KeyNavigation.tab: editTypeCB
 											KeyNavigation.backtab: editTitleInput
-											
+
 											onCursorRectangleChanged: {
 												var cy = cursorRectangle.y
 												var ch = cursorRectangle.height
@@ -1508,6 +1652,54 @@ DocumentViewBase {
 							}
 						}
 					}
+
+					Row {
+						anchors.right: parent.right
+						anchors.rightMargin: editView.cardPadding
+						anchors.verticalCenter: parent.verticalCenter
+						spacing: Style.spacingL
+						
+						Row {
+							id: participantsRow
+							anchors.verticalCenter: parent.verticalCenter
+							spacing: editView.avatarOverlap
+							
+							Repeater {
+								model: root.chatParticipants().slice(0, editView.maxVisibleParticipants)
+								delegate: Rectangle {
+									width: 26
+									height: 26
+									radius: 13
+									border.width: 2
+									border.color: editView.cardColor
+									color: modelData.id === root.currentUserId ? editView.accentColor : "#9AA5B8"
+									
+									Text {
+										anchors.centerIn: parent
+										text: modelData.name ? modelData.name.charAt(0).toUpperCase() : "?"
+										font.pixelSize: Style.fontSizeM - 1
+										font.bold: true
+										color: Style.baseColor
+									}
+								}
+							}
+						}
+						
+						ToolButton {
+							id: exportChatBtn
+							anchors.verticalCenter: parent.verticalCenter
+							iconSource: Style.getIconPath("Icons/Copy", Icon.State.On, Icon.Mode.Normal)
+							decorator: Component {
+								ToolButtonDecorator {
+									color: "transparent"
+									icon.width: Style.iconSizeM
+								}
+							}
+							onClicked: {
+								root.copyTextToClipboard(root.formatChatExportText(), qsTr("Chat export copied"))
+							}
+						}
+					}
 				}
 				
 				CustomScrollbar {
@@ -1520,6 +1712,29 @@ DocumentViewBase {
 					secondSize: Style.marginM
 					targetItem: commentsFlick
 					visible: commentsPanel.visible
+				}
+
+				Rectangle {
+					visible: root._chatActionHint.length > 0
+					anchors.top: chatHeader.bottom
+					anchors.topMargin: Style.spacingS
+					anchors.horizontalCenter: parent.horizontalCenter
+					radius: Style.radiusL
+					height: root.chatHintHeightPx
+					width: chatHintText.contentWidth + Style.paddingM * 2
+					color: editView.chatHintBgColor
+					border.color: editView.cardBorderColor
+					border.width: 1
+					opacity: 0.97
+					z: 3
+
+					Text {
+						id: chatHintText
+						anchors.centerIn: parent
+						text: root._chatActionHint
+						font.pixelSize: Style.fontSizeM - 1
+						color: Style.textColor
+					}
 				}
 				
 				// Chat area with subtle tint
@@ -1559,6 +1774,15 @@ DocumentViewBase {
 							contentY = 0
 						}
 					}
+
+					function isNearBottom(threshold) {
+						var pixelThreshold = threshold
+						if (pixelThreshold === undefined || pixelThreshold === null) {
+							pixelThreshold = editView.unreadDetectThreshold
+						}
+						var maxY = Math.max(0, contentHeight - height)
+						return maxY <= 0 || contentY >= maxY - pixelThreshold
+					}
 					
 					function scrollToMessage(msgId) {
 						if (!msgId) return
@@ -1575,13 +1799,23 @@ DocumentViewBase {
 					}
 
 					onContentHeightChanged: {
-						scrollToBottom()
+						if (root._forceScrollToBottom || isNearBottom(editView.autoStickBottomThreshold)) {
+							scrollToBottom()
+							root._unreadMessagesCount = 0
+							root._forceScrollToBottom = false
+						}
 					}
 					
 					onHeightChanged: {
 						var maxY = contentHeight - height
-						if (maxY > 0 && contentY >= maxY - 80) {
+						if (maxY > 0 && isNearBottom(editView.autoStickBottomThreshold)) {
 							contentY = maxY
+						}
+					}
+
+					onContentYChanged: {
+						if (isNearBottom(editView.unreadResetThreshold) && root._unreadMessagesCount !== 0) {
+							root._unreadMessagesCount = 0
 						}
 					}
 
@@ -1593,11 +1827,38 @@ DocumentViewBase {
 						Column {
 							id: commentsListCol
 							width: parent.width
-							spacing: Style.spacingM
+							spacing: Style.spacingS
 							
 							Repeater {
 								id: commentsThread
 								model: root.ticketData ? root.ticketData.m_comments : 0
+								onCountChanged: {
+									if (!root._commentsTrackingReady) {
+										root._lastKnownCommentCount = count
+										root._commentsTrackingReady = true
+										return
+									}
+
+									if (count > root._lastKnownCommentCount
+											&& !commentsFlick.isNearBottom(editView.unreadDetectThreshold)
+											&& !root._forceScrollToBottom) {
+										var unreadDelta = 0
+										var commentsModel = root.ticketData ? root.ticketData.m_comments : null
+										if (!commentsModel) {
+											root._lastKnownCommentCount = count
+											return
+										}
+										for (var msgIndex = root._lastKnownCommentCount; msgIndex < count; msgIndex++) {
+											var msgWrapper = commentsModel.get(msgIndex)
+											var msgItem = msgWrapper ? msgWrapper.item : null
+											if (msgItem && msgItem.m_userId !== root.currentUserId) {
+												unreadDelta++
+											}
+										}
+										root._unreadMessagesCount += unreadDelta
+									}
+									root._lastKnownCommentCount = count
+								}
 								
 								delegate: Item {
 									id: commentDelegate
@@ -1608,7 +1869,7 @@ DocumentViewBase {
 									readonly property var dataModel: model.item
 									readonly property string _prevUserId: index > 0 && commentsThread.itemAt(index - 1) ? commentsThread.itemAt(index - 1).dataModel.m_userId : ""
 									readonly property bool isGroupedWithPrev: index > 0 && _prevUserId === model.item.m_userId && _prevUserId.length > 0
-									readonly property int topGap: index === 0 ? 0 : (isGroupedWithPrev ? 2 : Style.spacingXXL)
+									readonly property int topGap: index === 0 ? 0 : (isGroupedWithPrev ? 2 : Style.spacingS)
 									
 									Column {
 										id: commentBubbleCol
@@ -1618,10 +1879,13 @@ DocumentViewBase {
 										
 										// Chat bubble (contains avatar + name + timestamp + content)
 										Rectangle {
-											width: parent.width
+											readonly property real maxBubbleWidth: Math.min(parent.width * editView.bubbleWidthRatio, editView.bubbleMaxWidth)
+											width: maxBubbleWidth
+											anchors.right: commentDelegate.isMe ? parent.right : undefined
+											anchors.left: commentDelegate.isMe ? undefined : parent.left
 											height: bubbleContent.height + Style.paddingM * 2
 											radius: 12
-											color: commentDelegate.isMe ? editView.bubbleColor : editView.otherBubbleColor
+											color: commentDelegate.isMe ? editView.myBubbleColor : editView.otherBubbleColor
 											border.width: 0
 											
 											Column {
@@ -1743,57 +2007,67 @@ DocumentViewBase {
 													lineHeight: 1.45
 												}
 												
-												// Attachments — inline links with paperclip icon
-												Repeater {
-													model: commentDelegate.dataModel.m_attachments || []
-													delegate: Row {
-														spacing: Style.spacingXS
-														
-														Image {
-															anchors.verticalCenter: parent.verticalCenter
-															width: Style.iconSizeS
-															height: width
-															source: Style.getIconPath("Icons/Attachment", Icon.State.On, Icon.Mode.Normal)
-															sourceSize.width: width
-															sourceSize.height: height
-														}
-														
-														Text {
-															anchors.verticalCenter: parent.verticalCenter
-															text: model.item.m_fileName
+												Flow {
+													width: parent.width
+													spacing: Style.spacingS
+													visible: commentDelegate.dataModel.m_attachments.count > 0
+
+													Repeater {
+														model: commentDelegate.dataModel.m_attachments || []
+														delegate: Text {
+															readonly property string attachmentUrl: model.item.m_preview || ""
+															width: parent.width
 															font.pixelSize: Style.fontSizeM
-															color: Style.linkColor
-															font.underline: true
-															
+															font.underline: attachmentUrl.length > 0
+															elide: Text.ElideRight
+															color: attachmentUrl.length > 0 ? editView.accentColor : Style.textColor
+															text: model.item.m_fileName || qsTr("file")
+
 															MouseArea {
 																anchors.fill: parent
-																hoverEnabled: true
-																cursorShape: Qt.PointingHandCursor
-																onClicked: Qt.openUrlExternally(model.item.m_preview)
+																enabled: parent.attachmentUrl.length > 0
+																hoverEnabled: enabled
+																cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+																onClicked: Qt.openUrlExternally(parent.attachmentUrl)
 															}
 														}
 													}
 												}
 												
-												// Reply button
-												Text {
-													visible: root.canEdit
-													text: qsTr("Reply")
-													font.pixelSize: Style.fontSizeM
-													color: Style.inactiveTextColor
-													// x: Style.paddingM
-													
-													MouseArea {
-														anchors.fill: parent
-														hoverEnabled: true
-														cursorShape: Qt.PointingHandCursor
-														onClicked: {
-															root._replyToMessage = {
-																id: model.item.m_id || "",
-																userName: model.item.m_userName || qsTr("Unknown"),
-																content: model.item.m_content || ""
+												Row {
+													spacing: Style.spacingM
+
+													Text {
+														visible: root.canEdit
+														text: qsTr("Reply")
+														font.pixelSize: Style.fontSizeM
+														color: Style.inactiveTextColor
+
+														MouseArea {
+															anchors.fill: parent
+															hoverEnabled: true
+															cursorShape: Qt.PointingHandCursor
+															onClicked: {
+																root._replyToMessage = {
+																	id: model.item.m_id || "",
+																	userName: model.item.m_userName || qsTr("Unknown"),
+																	content: model.item.m_content || ""
+																}
+																commentInputField.forceActiveFocus()
 															}
-															commentInputField.forceActiveFocus()
+														}
+													}
+
+													Text {
+														text: qsTr("Copy")
+														font.pixelSize: Style.fontSizeM
+														color: Style.inactiveTextColor
+
+														MouseArea {
+															anchors.fill: parent
+															hoverEnabled: true
+															cursorShape: Qt.PointingHandCursor
+															onClicked: root.copyTextToClipboard(model.item.m_content || "", qsTr("Message copied"))
 														}
 													}
 												}
@@ -1827,6 +2101,53 @@ DocumentViewBase {
 										font.pixelSize: Style.fontSizeM
 										color: Style.inactiveTextColor
 									}
+								}
+							}
+						}
+					}
+				}
+
+				Rectangle {
+					visible: root._unreadMessagesCount > 0 && !commentsFlick.isNearBottom(editView.unreadResetThreshold)
+					anchors.right: parent.right
+					anchors.rightMargin: editView.cardPadding
+					anchors.bottom: addCommentSection.visible ? addCommentSection.top
+																: lockNoticeRow.visible ? lockNoticeRow.top
+																						: parent.bottom
+					anchors.bottomMargin: Style.spacingM
+					radius: Style.radiusL
+					color: editView.accentColor
+					height: root.unreadHintHeightPx
+					width: unreadHintRow.width + Style.paddingM * 2
+					z: 2
+
+					Row {
+						id: unreadHintRow
+						anchors.centerIn: parent
+						spacing: Style.spacingS
+
+						Text {
+							text: root._unreadMessagesCount === 1
+									? qsTr("1 unread message")
+									: String(root._unreadMessagesCount) + qsTr(" unread messages")
+							font.pixelSize: Style.fontSizeM
+							color: Style.baseColor
+							font.bold: true
+						}
+
+						Text {
+							text: qsTr("Jump")
+							font.pixelSize: Style.fontSizeM
+							color: Style.baseColor
+							font.bold: true
+
+							MouseArea {
+								anchors.fill: parent
+								hoverEnabled: true
+								cursorShape: Qt.PointingHandCursor
+								onClicked: {
+									commentsFlick.scrollToBottom()
+									root._unreadMessagesCount = 0
 								}
 							}
 						}
@@ -2062,8 +2383,8 @@ DocumentViewBase {
 									TextEdit {
 										id: commentInputField
 										width: commentInputFlick.width
-										height: Math.max(commentInputFlick.height, contentHeight)
-										verticalAlignment: TextEdit.AlignVCenter
+										height: contentHeight
+										y: Math.max(0, (commentInputFlick.height - height) / 2)
 										font.pixelSize: Style.fontSizeM
 										color: Style.textColor
 										wrapMode: TextEdit.Wrap
@@ -2071,7 +2392,7 @@ DocumentViewBase {
 										KeyNavigation.backtab: editLockReasonInput.visible ? editLockReasonInput : editLockedCB
 										
 										onCursorRectangleChanged: {
-											var cy = cursorRectangle.y
+											var cy = cursorRectangle.y + y
 											var ch = cursorRectangle.height
 											if (cy < commentInputFlick.contentY) {
 												commentInputFlick.contentY = cy
@@ -2129,7 +2450,7 @@ DocumentViewBase {
 								Button {
 									id: commentButton
 									visible: false
-									enabled: (commentInputField.text !== "" || root.pendingAttachments.length > 0) && root.uploadsInProgress === 0
+									enabled: commentInputField.text.trim().length > 0 && root.uploadsInProgress === 0
 								}
 								
 								MouseArea {
@@ -2230,4 +2551,3 @@ DocumentViewBase {
 		} // panelsContainer
 	}
 }
-
