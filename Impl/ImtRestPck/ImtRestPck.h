@@ -22,6 +22,7 @@
 #include <imtrest/CTcpProtocolEngineComp.h>
 #include <imtrest/CDelegatedServletComp.h>
 #include <imtrest/CDelegatedBinaryDataProviderComp.h>
+#include <imtrest/CDelegatedBinaryDataControllerComp.h>
 #include <imtrest/CBinaryDataProviderComp.h>
 #include <imtrest/CIconDataProviderComp.h>
 #include <imtrest/CHttpFileUploadServletComp.h>
@@ -49,11 +50,11 @@ typedef imtrest::CWorkerManagerComp WorkerManaqer;
 typedef imtrest::CTcpProtocolEngineComp TcpProtocolEngine;
 typedef imtrest::CDelegatedServletComp DelegatedServlet;
 typedef imtrest::CDelegatedBinaryDataProviderComp DelegatedBinaryDataProviders;
+typedef imtrest::CDelegatedBinaryDataControllerComp DelegatedBinaryDataControllers;
 typedef imtrest::CBinaryDataProviderComp BinaryDataProvider;
 typedef imtrest::CIconDataProviderComp IconDataProvider;
 typedef imtrest::CHttpFileUploadServletComp HttpFileUploadServlet;
 typedef imtrest::CUdpServerComp UdpServer;
 
 } // namespace ImtRestPck
-
 
