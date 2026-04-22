@@ -110,10 +110,30 @@ DocumentViewBase {
 		chatHintTimer.restart()
 	}
 
+	function getCollectionCount(collection) {
+		if (!collection) return 0
+		if (collection.length !== undefined) return collection.length
+		if (collection.count !== undefined) return collection.count
+		return 0
+	}
+
+	function getCollectionItem(collection, index) {
+		if (!collection) return null
+		if (collection.length !== undefined) return collection[index]
+		if (collection.get) {
+			var wrapped = collection.get(index)
+			return wrapped && wrapped.item ? wrapped.item : wrapped
+		}
+		return null
+	}
+
 	function formatChatExportText() {
 		var tabSep = "\t"
 		var lines = []
-		lines.push(qsTr("Comments export"))
+		lines.push(qsTr("Ticket Comments Export"))
+		if (ticketData && ticketData.m_number) {
+			lines.push(qsTr("Ticket #%1").arg(ticketData.m_number))
+		}
 		lines.push("")
 		if (!ticketData || !ticketData.m_comments) {
 			lines.push(qsTr("No comments"))
@@ -129,7 +149,8 @@ DocumentViewBase {
 			lines.push(linePrefix + tabSep + root.formatTimestamp(item.m_timestamp) + tabSep + (item.m_userName || qsTr("Unknown")))
 			var contentText = String(item.m_content || "")
 			var contentLines = contentText.replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n")
-			if (contentLines.length === 0 || (contentLines.length === 1 && contentLines[0].length === 0)) {
+			var isContentEmpty = contentLines.length === 0 || (contentLines.length === 1 && contentLines[0].length === 0)
+			if (isContentEmpty) {
 				lines.push(tabSep + qsTr("Message") + tabSep)
 			} else {
 				lines.push(tabSep + qsTr("Message") + tabSep + contentLines[0])
@@ -143,9 +164,10 @@ DocumentViewBase {
 			}
 
 			var attachments = item.m_attachments || []
-			var attachmentCount = attachments.length !== undefined ? attachments.length : (attachments.count || 0)
+			var attachmentCount = root.getCollectionCount(attachments)
 			for (var a = 0; a < attachmentCount; a++) {
-				var att = attachments.length !== undefined ? attachments[a] : (attachments.get(a).item || attachments.get(a))
+				var att = root.getCollectionItem(attachments, a)
+				if (!att) continue
 				lines.push(tabSep + qsTr("Attachment") + tabSep + (att.m_fileName || qsTr("file")) + tabSep + (att.m_preview || ""))
 			}
 			lines.push("")
@@ -1746,7 +1768,10 @@ DocumentViewBase {
 					}
 
 					function isNearBottom(threshold) {
-						var edge = threshold === undefined ? editView.unreadDetectThreshold : threshold
+						var edge = threshold
+						if (edge === undefined || edge === null) {
+							edge = editView.unreadDetectThreshold
+						}
 						var maxY = Math.max(0, contentHeight - height)
 						return maxY <= 0 || contentY >= maxY - edge
 					}
@@ -1810,8 +1835,13 @@ DocumentViewBase {
 											&& !commentsFlick.isNearBottom(editView.unreadDetectThreshold)
 											&& !root._forceScrollToBottom) {
 										var unreadDelta = 0
+										var commentsModel = root.ticketData ? root.ticketData.m_comments : null
+										if (!commentsModel) {
+											root._lastKnownCommentCount = count
+											return
+										}
 										for (var msgIndex = root._lastKnownCommentCount; msgIndex < count; msgIndex++) {
-											var msgWrapper = root.ticketData.m_comments.get(msgIndex)
+											var msgWrapper = commentsModel.get(msgIndex)
 											var msgItem = msgWrapper ? msgWrapper.item : null
 											if (msgItem && msgItem.m_userId !== root.currentUserId) {
 												unreadDelta++
