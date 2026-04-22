@@ -43,6 +43,14 @@ QString CSupportTicketDbDelegateComp::EscapeSqlLikePattern(const QString& value)
 	return escaped;
 }
 
+bool CSupportTicketDbDelegateComp::IsSqliteDatabase() const
+{
+	return m_databaseEngineCompPtr.IsValid()
+			&& m_databaseEngineCompPtr->GetDatabaseDriverId().compare(
+				QByteArrayLiteral("QSQLITE"),
+				Qt::CaseInsensitive) == 0;
+}
+
 QString CSupportTicketDbDelegateComp::CreateVisibilityCondition(const imtgql::IGqlContext* contextPtr) const
 {
 	if (contextPtr == nullptr){
@@ -71,18 +79,35 @@ QString CSupportTicketDbDelegateComp::CreateVisibilityCondition(const imtgql::IG
 	QStringList visibilityConditions;
 	visibilityConditions << QString("\"ReporterId\"='%1'").arg(escapedUserId);
 	visibilityConditions << QString("(\"AssigneeIds\" IS NOT NULL AND (',' || \"AssigneeIds\" || ',') LIKE '%1' ESCAPE '\\')").arg(assigneeLikePattern);
-	if (!escapedCurrentUserGroups.isEmpty() && TableExists(QByteArrayLiteral("Users"))){
-		const QString groupsArray = QString("array[%1]").arg(escapedCurrentUserGroups.join(", "));
-		visibilityConditions << QString(
-			"(EXISTS (SELECT 1 FROM \"Users\" AS \"ReporterUser\" "
-			"WHERE \"ReporterUser\".\"State\"='Active' "
-			"AND \"ReporterUser\".\"DocumentId\"::text = \"ReporterId\" "
-			"AND (\"ReporterUser\".\"Document\"->'Groups' ?| %1)) "
-			"OR EXISTS (SELECT 1 FROM \"Users\" AS \"AssigneeUser\" "
-			"WHERE \"AssigneeUser\".\"State\"='Active' "
-			"AND \"AssigneeIds\" IS NOT NULL "
-			"AND (',' || \"AssigneeIds\" || ',') LIKE ('%%,' || \"AssigneeUser\".\"DocumentId\"::text || ',%%') "
-			"AND (\"AssigneeUser\".\"Document\"->'Groups' ?| %1)))").arg(groupsArray);
+	if (!escapedCurrentUserGroups.isEmpty() && m_userCollectionCompPtr.IsValid()){
+		if (IsSqliteDatabase()){
+			const QString groupsInClause = escapedCurrentUserGroups.join(", ");
+			visibilityConditions << QString(
+				"(EXISTS (SELECT 1 FROM \"Users\" AS \"ReporterUser\" "
+				"JOIN json_each(\"ReporterUser\".\"Document\", '$.Groups') AS \"ReporterGroup\" "
+				"WHERE \"ReporterUser\".\"State\"='Active' "
+				"AND \"ReporterUser\".\"DocumentId\" = \"ReporterId\" "
+				"AND \"ReporterGroup\".\"value\" IN (%1)) "
+				"OR EXISTS (SELECT 1 FROM \"Users\" AS \"AssigneeUser\" "
+				"JOIN json_each(\"AssigneeUser\".\"Document\", '$.Groups') AS \"AssigneeGroup\" "
+				"WHERE \"AssigneeUser\".\"State\"='Active' "
+				"AND \"AssigneeIds\" IS NOT NULL "
+				"AND (',' || \"AssigneeIds\" || ',') LIKE ('%%,' || \"AssigneeUser\".\"DocumentId\" || ',%%') "
+				"AND \"AssigneeGroup\".\"value\" IN (%1)))").arg(groupsInClause);
+		}
+		else{
+			const QString groupsArray = QString("array[%1]").arg(escapedCurrentUserGroups.join(", "));
+			visibilityConditions << QString(
+				"(EXISTS (SELECT 1 FROM \"Users\" AS \"ReporterUser\" "
+				"WHERE \"ReporterUser\".\"State\"='Active' "
+				"AND \"ReporterUser\".\"DocumentId\"::text = \"ReporterId\" "
+				"AND (\"ReporterUser\".\"Document\"->'Groups' ?| %1)) "
+				"OR EXISTS (SELECT 1 FROM \"Users\" AS \"AssigneeUser\" "
+				"WHERE \"AssigneeUser\".\"State\"='Active' "
+				"AND \"AssigneeIds\" IS NOT NULL "
+				"AND (',' || \"AssigneeIds\" || ',') LIKE ('%%,' || \"AssigneeUser\".\"DocumentId\"::text || ',%%') "
+				"AND (\"AssigneeUser\".\"Document\"->'Groups' ?| %1)))").arg(groupsArray);
+		}
 	}
 
 	return QString("(%1)").arg(visibilityConditions.join(" OR "));

@@ -78,6 +78,7 @@ private:
 	QString UtcNow() const;
 	QString EscapeSql(const QString& value) const;
 	QString EscapeSqlLikePattern(const QString& value) const;
+	bool IsSqliteDatabase() const;
 	QString CreateVisibilityCondition(const imtgql::IGqlContext* contextPtr) const;
 
 	I_FACT(imtdesk::ISupportTicket, m_ticketFactCompPtr);
