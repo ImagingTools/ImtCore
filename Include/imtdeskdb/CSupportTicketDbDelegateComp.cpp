@@ -305,12 +305,6 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSupportTicketDbDelegateComp::Cre
 	const QString assigneeIdsStr = assigneeStrs.join(',');
 
 	QString reporterId = QString::fromUtf8(ticketPtr->GetReporterId());
-	if (reporterId.isEmpty()){
-		const imtgql::IGqlContext* contextPtr = imtgql::CGqlRequestContextManager::GetContext();
-		if (contextPtr != nullptr){
-			reporterId = QString::fromUtf8(contextPtr->GetUserId());
-		}
-	}
 	const QString conversationId = QString::fromUtf8(ticketPtr->GetConversationId());
 	const QString messageId = QString::fromUtf8(ticketPtr->GetMessageId());
 	const QString resolvedAt = ticketPtr->GetResolvedAt();

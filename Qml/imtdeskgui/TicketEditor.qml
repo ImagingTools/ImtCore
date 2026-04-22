@@ -852,7 +852,7 @@ DocumentViewBase {
 											onEditingFinished: root.doUpdateModel()
 											KeyNavigation.tab: editTypeCB
 											KeyNavigation.backtab: editTitleInput
-											
+
 											onCursorRectangleChanged: {
 												var cy = cursorRectangle.y
 												var ch = cursorRectangle.height
@@ -1624,8 +1624,6 @@ DocumentViewBase {
 						anchors.verticalCenter: parent.verticalCenter
 						anchors.left: parent.left
 						anchors.leftMargin: editView.cardPadding
-						anchors.right: parent.right
-						anchors.rightMargin: editView.cardPadding
 						spacing: Style.spacingS
 						
 						Text {
@@ -1653,34 +1651,19 @@ DocumentViewBase {
 								color: Style.baseColor
 							}
 						}
+					}
 
-						// Item {
-						// 	width: Math.max(0, parent.width - x - exportTxt.contentWidth - participantsRow.width - Style.spacingS * 2)
-						// 	height: 1
-						// }
-
-						Text {
-							id: exportTxt
-							text: qsTr("Export TXT")
-							font.pixelSize: Style.fontSizeM
-							color: editView.accentColor
-							anchors.verticalCenter: parent.verticalCenter
-
-							MouseArea {
-								anchors.fill: parent
-								hoverEnabled: true
-								cursorShape: Qt.PointingHandCursor
-								onClicked: {
-									root.copyTextToClipboard(root.formatChatExportText(), qsTr("Chat export copied"))
-								}
-							}
-						}
-
+					Row {
+						anchors.right: parent.right
+						anchors.rightMargin: editView.cardPadding
+						anchors.verticalCenter: parent.verticalCenter
+						spacing: Style.spacingL
+						
 						Row {
 							id: participantsRow
 							anchors.verticalCenter: parent.verticalCenter
 							spacing: editView.avatarOverlap
-
+							
 							Repeater {
 								model: root.chatParticipants().slice(0, editView.maxVisibleParticipants)
 								delegate: Rectangle {
@@ -1690,7 +1673,7 @@ DocumentViewBase {
 									border.width: 2
 									border.color: editView.cardColor
 									color: modelData.id === root.currentUserId ? editView.accentColor : "#9AA5B8"
-
+									
 									Text {
 										anchors.centerIn: parent
 										text: modelData.name ? modelData.name.charAt(0).toUpperCase() : "?"
@@ -1699,6 +1682,21 @@ DocumentViewBase {
 										color: Style.baseColor
 									}
 								}
+							}
+						}
+						
+						ToolButton {
+							id: exportChatBtn
+							anchors.verticalCenter: parent.verticalCenter
+							iconSource: Style.getIconPath("Icons/Copy", Icon.State.On, Icon.Mode.Normal)
+							decorator: Component {
+								ToolButtonDecorator {
+									color: "transparent"
+									icon.width: Style.iconSizeM
+								}
+							}
+							onClicked: {
+								root.copyTextToClipboard(root.formatChatExportText(), qsTr("Chat export copied"))
 							}
 						}
 					}

@@ -16,7 +16,6 @@
 #include <imtchat/IConversation.h>
 #include <imtbase/IObjectCollectionIterator.h>
 #include <imtdeskgql/imtdeskgql.h>
-#include <imtdeskgql/TicketPermissions.h>
 #include <imtauth/imtauth.h>
 #include <imtgql/CGqlRequestContextManager.h>
 #include <imtgql/IGqlContext.h>
@@ -29,7 +28,7 @@ namespace imtdeskgql
 
 bool CTicketCollectionControllerComp::CreateRepresentationFromObject(
 		const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-		const sdl::imtdesk::ImtDesk::CTicketsListGqlRequest& listRequest,
+		const sdl::imtdesk::ImtDesk::CTicketsListGqlRequest& /*listRequest*/,
 		sdl::imtdesk::ImtDesk::CTicketItemData::V1_0& representationObject,
 		QString& errorMessage) const
 {
@@ -52,17 +51,6 @@ bool CTicketCollectionControllerComp::CreateRepresentationFromObject(
 		SendErrorMessage(0, errorMessage, "CTicketCollectionControllerComp");
 		return false;
 	}
-
-	// Visibility filter: shared logic with the document manager (see TicketPermissions.h).
-	// Uses the thread-local request context populated by the GraphQL servlet.
-	imtgql::IGqlContext* contextPtr = imtgql::CGqlRequestContextManager::GetContext();
-	if (contextPtr != nullptr){
-		if (!HasTicketVisibility(contextPtr, ticketPtr, m_userCollectionCompPtr.GetPtr(), m_userGroupInfoProviderCompPtr.GetPtr())){
-			return false; // Skip this ticket — user has no visibility
-		}
-	}
-
-	Q_UNUSED(listRequest);
 
 	representationObject.id = objectId;
 	representationObject.typeId = objectCollectionIterator.GetObjectTypeId();
