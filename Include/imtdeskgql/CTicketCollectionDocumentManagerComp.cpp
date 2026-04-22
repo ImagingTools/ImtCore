@@ -344,10 +344,6 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 		ticketPtr->SetAssigneeIds(ticketInfo.assigneeIds->ToList());
 	}
 
-	if (ticketInfo.reporterId){
-		ticketPtr->SetReporterId(*ticketInfo.reporterId);
-	}
-
 	if (ticketInfo.conversationId){
 		ticketPtr->SetConversationId(*ticketInfo.conversationId);
 	}
@@ -556,6 +552,5 @@ bool CTicketCollectionDocumentManagerComp::ProcessEvent(imtdoc::CEventBase* even
 
 
 } // namespace imtdeskgql
-
 
 
