@@ -846,7 +846,7 @@ DocumentViewBase {
 										text: qsTr("Context")
 										font.pixelSize: Style.fontSizeM
 										font.bold: true
-										color: Style.textColor
+										color: editView.sectionLabelColor
 										anchors.verticalCenter: parent.verticalCenter
 									}
 
