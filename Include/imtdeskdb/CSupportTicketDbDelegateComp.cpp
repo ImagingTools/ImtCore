@@ -44,10 +44,11 @@ QString escapeSql(const QString& value)
 
 QString escapeSqlLikePattern(const QString& value)
 {
-	QString escaped = escapeSql(value);
+	QString escaped = value;
 	escaped.replace("\\", "\\\\");
 	escaped.replace("%", "\\%");
 	escaped.replace("_", "\\_");
+	escaped.replace('\'', "''");
 	return escaped;
 }
 
@@ -66,6 +67,7 @@ QString createVisibilityCondition(
 
 	const QString escapedUserId = escapeSql(QString::fromUtf8(userId));
 	const QString escapedUserIdForLike = escapeSqlLikePattern(QString::fromUtf8(userId));
+	const QString assigneeLikePattern = QString("%%,%1,%%").arg(escapedUserIdForLike);
 	QStringList reporterIdsForSameGroup;
 
 	const imtauth::IUserInfo* currentUserInfoPtr = contextPtr->GetUserInfo();
@@ -110,7 +112,7 @@ QString createVisibilityCondition(
 
 	QStringList visibilityConditions;
 	visibilityConditions << QString("\"ReporterId\"='%1'").arg(escapedUserId);
-	visibilityConditions << QString("(\"AssigneeIds\" IS NOT NULL AND (',' || \"AssigneeIds\" || ',') LIKE '%%,%1,%%' ESCAPE '\\')").arg(escapedUserIdForLike);
+	visibilityConditions << QString("(\"AssigneeIds\" IS NOT NULL AND (',' || \"AssigneeIds\" || ',') LIKE '%1' ESCAPE '\\')").arg(assigneeLikePattern);
 	if (!reporterIdsForSameGroup.isEmpty()){
 		visibilityConditions << QString("\"ReporterId\" IN (%1)").arg(reporterIdsForSameGroup.join(", "));
 	}
@@ -144,12 +146,12 @@ QByteArray CSupportTicketDbDelegateComp::GetSelectionQuery(
 
 	const QString visibilityCondition = createVisibilityCondition(contextPtr, m_userCollectionCompPtr.GetPtr());
 	if (visibilityCondition.isEmpty()){
-		return QString("SELECT * FROM (%1) AS \"__ImtTicketVisibilityQuery\" WHERE 1=0")
+		return QString("SELECT * FROM (%1) AS \"FilteredTickets\" WHERE 1=0")
 				.arg(QString::fromUtf8(baseQuery)).toUtf8();
 	}
 
 	const QString baseQueryStr = QString::fromUtf8(baseQuery);
-	return QString("SELECT * FROM (%1) AS \"__ImtTicketVisibilityQuery\" WHERE %2")
+	return QString("SELECT * FROM (%1) AS \"FilteredTickets\" WHERE %2")
 			.arg(baseQueryStr, visibilityCondition).toUtf8();
 }
 
