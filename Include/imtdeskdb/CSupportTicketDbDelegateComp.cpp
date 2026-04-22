@@ -341,7 +341,9 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSupportTicketDbDelegateComp::Cre
 	const QString labelIdsStr = labelStrs.join(',');
 	const QString labelsSql = labelIdsStr.isEmpty() ? "NULL" : QString("'%1'").arg(labelIdsStr);
 
-	const QString lockReasonSql = ticketPtr->GetLockReason().isEmpty() ? "NULL" : QString("'%1'").arg(ticketPtr->GetLockReason());
+	const QString lockReasonSql = ticketPtr->GetLockReason().isEmpty()
+			? "NULL"
+			: QString("'%1'").arg(EscapeSql(ticketPtr->GetLockReason()));
 
 	const QString nowUtc = UtcNow();
 
@@ -435,7 +437,9 @@ QByteArray CSupportTicketDbDelegateComp::CreateUpdateObjectQuery(
 	const QString labelIdsStr = labelStrs.join(',');
 	const QString labelsSql = labelIdsStr.isEmpty() ? "NULL" : QString("'%1'").arg(labelIdsStr);
 
-	const QString lockReasonSql = ticketPtr->GetLockReason().isEmpty() ? "NULL" : QString("'%1'").arg(ticketPtr->GetLockReason());
+	const QString lockReasonSql = ticketPtr->GetLockReason().isEmpty()
+			? "NULL"
+			: QString("'%1'").arg(EscapeSql(ticketPtr->GetLockReason()));
 
 	const QString nowUtc = UtcNow();
 
