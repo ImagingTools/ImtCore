@@ -489,9 +489,18 @@ DocumentViewBase {
 		readonly property string chatBgColor: Style.baseColor
 		readonly property string bubbleColor: "#DFECF9"
 		readonly property string otherBubbleColor: "#F1F3F7"
+		readonly property string myBubbleColor: "#EAF3FF"
 		readonly property string sectionLabelColor: "#8C95A6"
 		readonly property string timestampColor: Style.inactiveTextColor
 		readonly property real columnGap: Style.spacingL
+		readonly property real editButtonWidth: 54
+		readonly property real avatarOverlap: -8
+		readonly property real bubbleWidthRatio: 0.86
+		readonly property real bubbleMaxWidth: 680
+		readonly property real imageAttachmentWidth: 132
+		readonly property real imageAttachmentHeight: 96
+		readonly property real fileAttachmentMaxWidth: 240
+		readonly property real fileAttachmentHeight: 44
 		// 2-column layout proportions: left 35–45%, right 55–65%
 		readonly property real leftColumnRatio: 0.4
 		readonly property real leftColumnMinWidth: 380
@@ -588,13 +597,14 @@ DocumentViewBase {
 								Rectangle {
 									id: titleEditBtn
 									visible: root.canEdit
-									width: 54
+									width: Math.max(editView.editButtonWidth, editLabel.contentWidth + Style.paddingS * 2)
 									height: 28
 									radius: 14
 									color: titleEditBtnMa.containsMouse ? "#F0F2F5" : "transparent"
 									anchors.verticalCenter: parent.verticalCenter
 
 									Text {
+										id: editLabel
 										anchors.centerIn: parent
 										text: qsTr("Edit")
 										font.pixelSize: Style.fontSizeM
@@ -832,7 +842,7 @@ DocumentViewBase {
 									Text {
 										id: contextLabelText
 										text: qsTr("Context")
-										font.pixelSize: Style.fontSizeL
+										font.pixelSize: Style.fontSizeM
 										font.bold: true
 										color: Style.textColor
 										anchors.verticalCenter: parent.verticalCenter
@@ -1610,7 +1620,7 @@ DocumentViewBase {
 
 						Row {
 							anchors.verticalCenter: parent.verticalCenter
-							spacing: -8
+							spacing: editView.avatarOverlap
 
 							Repeater {
 								model: root.chatParticipants().slice(0, 5)
@@ -1743,13 +1753,13 @@ DocumentViewBase {
 										
 										// Chat bubble (contains avatar + name + timestamp + content)
 										Rectangle {
-											readonly property real maxBubbleWidth: Math.min(parent.width * 0.82, 560)
+											readonly property real maxBubbleWidth: Math.min(parent.width * editView.bubbleWidthRatio, editView.bubbleMaxWidth)
 											width: maxBubbleWidth
 											anchors.right: commentDelegate.isMe ? parent.right : undefined
 											anchors.left: commentDelegate.isMe ? undefined : parent.left
 											height: bubbleContent.height + Style.paddingM * 2
 											radius: 12
-											color: commentDelegate.isMe ? "#EAF3FF" : editView.otherBubbleColor
+											color: commentDelegate.isMe ? editView.myBubbleColor : editView.otherBubbleColor
 											border.width: 0
 											
 											Column {
@@ -1881,8 +1891,8 @@ DocumentViewBase {
 														model: commentDelegate.dataModel.m_attachments || []
 														delegate: Rectangle {
 															readonly property bool isImage: root.isImageAttachment(model.item.m_fileName)
-															width: isImage ? 132 : Math.min(parent.width, 240)
-															height: isImage ? 96 : 44
+															width: isImage ? editView.imageAttachmentWidth : Math.min(parent.width, editView.fileAttachmentMaxWidth)
+															height: isImage ? editView.imageAttachmentHeight : editView.fileAttachmentHeight
 															radius: Style.radiusM
 															color: isImage ? "#EEF2F8" : "#F6F8FC"
 															border.color: editView.cardBorderColor
@@ -1890,10 +1900,32 @@ DocumentViewBase {
 															clip: true
 
 															Image {
+																id: messageAttachmentImage
 																visible: parent.isImage
 																anchors.fill: parent
 																fillMode: Image.PreserveAspectCrop
 																source: model.item.m_preview || ""
+															}
+
+															Column {
+																visible: parent.isImage && messageAttachmentImage.status === Image.Error
+																anchors.centerIn: parent
+																spacing: 2
+
+																Image {
+																	anchors.horizontalCenter: parent.horizontalCenter
+																	width: Style.iconSizeS
+																	height: width
+																	source: Style.getIconPath("Icons/Attachment", Icon.State.On, Icon.Mode.Normal)
+																	sourceSize.width: width
+																	sourceSize.height: height
+																}
+
+																Text {
+																	text: qsTr("Preview unavailable")
+																	font.pixelSize: Style.fontSizeM - 2
+																	color: Style.inactiveTextColor
+																}
 															}
 
 															Row {
@@ -1926,6 +1958,14 @@ DocumentViewBase {
 																hoverEnabled: true
 																cursorShape: Qt.PointingHandCursor
 																onClicked: if (model.item.m_preview) Qt.openUrlExternally(model.item.m_preview)
+															}
+
+															activeFocusOnTab: true
+															Keys.onReturnPressed: {
+																if (model.item.m_preview) Qt.openUrlExternally(model.item.m_preview)
+															}
+															Keys.onEnterPressed: {
+																if (model.item.m_preview) Qt.openUrlExternally(model.item.m_preview)
 															}
 														}
 													}
