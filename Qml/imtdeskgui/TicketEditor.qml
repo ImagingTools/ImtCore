@@ -60,6 +60,9 @@ DocumentViewBase {
 	property bool _commentsTrackingReady: false
 	property int _unreadMessagesCount: 0
 	property string _chatActionHint: ""
+	readonly property int chatHintDurationMs: 2200
+	readonly property int chatHintHeight: 28
+	readonly property int unreadHintHeight: 34
 	
 	signal commentSubmitted(string commentText)
 
@@ -422,7 +425,7 @@ DocumentViewBase {
 
 	Timer {
 		id: chatHintTimer
-		interval: 2200
+		interval: root.chatHintDurationMs
 		repeat: false
 		onTriggered: root._chatActionHint = ""
 	}
@@ -1687,7 +1690,7 @@ DocumentViewBase {
 					anchors.topMargin: Style.spacingS
 					anchors.horizontalCenter: parent.horizontalCenter
 					radius: Style.radiusL
-					height: 28
+					height: root.chatHintHeight
 					width: chatHintText.contentWidth + Style.paddingM * 2
 					color: editView.chatHintBgColor
 					opacity: 0.9
@@ -2136,7 +2139,7 @@ DocumentViewBase {
 					anchors.bottomMargin: Style.spacingM
 					radius: Style.radiusL
 					color: editView.accentColor
-					height: 34
+					height: root.unreadHintHeight
 					width: unreadHintRow.width + Style.paddingM * 2
 					z: 2
 
