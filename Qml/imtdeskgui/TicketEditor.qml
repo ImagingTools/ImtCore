@@ -1741,7 +1741,7 @@ DocumentViewBase {
 					}
 
 					function isNearBottom(threshold) {
-						var edge = threshold === undefined ? 40 : threshold
+						var edge = threshold === undefined ? editView.unreadDetectThreshold : threshold
 						var maxY = Math.max(0, contentHeight - height)
 						return maxY <= 0 || contentY >= maxY - edge
 					}
@@ -2146,7 +2146,9 @@ DocumentViewBase {
 						spacing: Style.spacingS
 
 						Text {
-							text: qsTr("%1 unread").arg(root._unreadMessagesCount)
+							text: root._unreadMessagesCount === 1
+									? qsTr("1 unread message")
+									: qsTr("%1 unread messages").arg(root._unreadMessagesCount)
 							font.pixelSize: Style.fontSizeM
 							color: Style.baseColor
 							font.bold: true
