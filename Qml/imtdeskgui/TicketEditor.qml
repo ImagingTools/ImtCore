@@ -503,6 +503,9 @@ DocumentViewBase {
 		readonly property real imageAttachmentHeight: 96
 		readonly property real fileAttachmentMaxWidth: 240
 		readonly property real fileAttachmentHeight: 44
+		readonly property string focusedAttachmentBgColor: "#ECF3FF"
+		readonly property string imageAttachmentBgColor: "#EEF2F8"
+		readonly property string fileAttachmentBgColor: "#F6F8FC"
 		// 2-column layout proportions: left 35–45%, right 55–65%
 		readonly property real leftColumnRatio: 0.4
 		readonly property real leftColumnMinWidth: 380
@@ -1075,9 +1078,9 @@ DocumentViewBase {
 										if (buttonId === Enums.apply && collectionView) {
 											var arr = root.pendingEntityRefs.slice()
 											var mdl = collectionView.table.elements
-											var indexes = collectionView.table.getSelectedIndexes()
+											let indexes = collectionView.table.getSelectedIndexes()
 											for (var i = 0; i < indexes.length; i++) {
-												var idx = indexes[i]
+												let idx = indexes[i]
 												var displayName = mdl.getData("name", idx)
 												var typeId = mdl.getData("typeId", idx)
 												var elementId = mdl.getData("id", idx)
@@ -1896,7 +1899,7 @@ DocumentViewBase {
 															width: isImage ? editView.imageAttachmentWidth : Math.min(parent.width, editView.fileAttachmentMaxWidth)
 															height: isImage ? editView.imageAttachmentHeight : editView.fileAttachmentHeight
 															radius: Style.radiusM
-															color: activeFocus ? "#ECF3FF" : (isImage ? "#EEF2F8" : "#F6F8FC")
+															color: activeFocus ? editView.focusedAttachmentBgColor : (isImage ? editView.imageAttachmentBgColor : editView.fileAttachmentBgColor)
 															border.color: activeFocus ? editView.accentColor : editView.cardBorderColor
 															border.width: activeFocus ? 2 : 1
 															clip: true
