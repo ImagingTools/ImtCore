@@ -2185,8 +2185,8 @@ DocumentViewBase {
 									TextEdit {
 										id: commentInputField
 										width: commentInputFlick.width
-										height: Math.max(commentInputFlick.height, contentHeight)
-										verticalAlignment: TextEdit.AlignVCenter
+										height: contentHeight
+										y: Math.max(0, (commentInputFlick.height - height) / 2)
 										font.pixelSize: Style.fontSizeM
 										color: Style.textColor
 										wrapMode: TextEdit.Wrap
@@ -2194,7 +2194,7 @@ DocumentViewBase {
 										KeyNavigation.backtab: editLockReasonInput.visible ? editLockReasonInput : editLockedCB
 										
 										onCursorRectangleChanged: {
-											var cy = cursorRectangle.y
+											var cy = cursorRectangle.y + y
 											var ch = cursorRectangle.height
 											if (cy < commentInputFlick.contentY) {
 												commentInputFlick.contentY = cy
