@@ -105,7 +105,10 @@ DocumentViewBase {
 
 	function copyTextToClipboard(text, successHint) {
 		if (!text || String(text).length === 0) return
-		chatClipboard.text = String(text)
+		clipboardProxy.text = String(text)
+		clipboardProxy.selectAll()
+		clipboardProxy.copy()
+		clipboardProxy.select(0, 0)
 		root._chatActionHint = successHint || qsTr("Copied to clipboard")
 		chatHintTimer.restart()
 	}
@@ -441,8 +444,10 @@ DocumentViewBase {
 	
 	// --- Shared data providers and models ---
 
-	Clipboard {
-		id: chatClipboard
+	TextEdit {
+		id: clipboardProxy
+		visible: false
+		readOnly: true
 	}
 
 	Timer {
