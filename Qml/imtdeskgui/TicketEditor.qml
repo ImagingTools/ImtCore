@@ -80,6 +80,43 @@ DocumentViewBase {
 		.replace(/\\n/g, "<br>")
 		.replace(/\n/g, "<br>")
 	}
+
+	function isImageAttachment(fileName) {
+		if (!fileName) return false
+		var lower = String(fileName).toLowerCase()
+		return lower.endsWith(".png") || lower.endsWith(".jpg") || lower.endsWith(".jpeg")
+				|| lower.endsWith(".gif") || lower.endsWith(".bmp") || lower.endsWith(".webp")
+				|| lower.endsWith(".svg")
+	}
+
+	function chatParticipants() {
+		var out = []
+		var seen = {}
+		if (!ticketData || !ticketData.m_comments) return out
+		for (var i = 0; i < ticketData.m_comments.count; i++) {
+			var item = ticketData.m_comments.get(i).item
+			if (!item) continue
+			var uid = String(item.m_userId || "")
+			if (!uid || seen[uid]) continue
+			seen[uid] = true
+			out.push({ id: uid, name: String(item.m_userName || "") })
+		}
+		return out
+	}
+
+	function priorityColor(priorityId) {
+		switch (String(priorityId || "")) {
+		case "Critical": return "#D92D20"
+		case "High": return "#F79009"
+		case "Medium": return "#1570EF"
+		case "Low": return "#12B76A"
+		default: return "#98A2B3"
+		}
+	}
+
+	function statusColor(statusId) {
+		return String(statusId || "") === "Closed" ? "#12B76A" : "#F79009"
+	}
 	
 	function addComment(commentText, attachmentsList) {
 		if ((!commentText || commentText.length === 0) && (!attachmentsList || attachmentsList.length === 0))
@@ -455,9 +492,10 @@ DocumentViewBase {
 		readonly property string sectionLabelColor: "#8C95A6"
 		readonly property string timestampColor: Style.inactiveTextColor
 		readonly property real columnGap: Style.spacingL
-		// Fixed widths for top groups (left = Title/Desc/Context and Messages, right = Properties)
-		readonly property real detailsWidth: 700
-		readonly property real propertiesWidth: 320
+		// 2-column layout proportions: left 35–45%, right 55–65%
+		readonly property real leftColumnRatio: 0.4
+		readonly property real leftColumnMinWidth: 380
+		readonly property real leftColumnMaxWidth: 760
 		
 		// Page background
 		Rectangle {
@@ -477,25 +515,23 @@ DocumentViewBase {
 			anchors.bottom: parent.bottom
 			anchors.bottomMargin: Style.marginXL
 			
-			// ==================== TOP ROW: Title/Desc + Properties (independent heights) ====================
+			// ==================== LEFT COLUMN: 3 CARDS ====================
 			Item {
 				id: topRow
 				anchors.top: parent.top
 				anchors.left: parent.left
-				anchors.right: parent.right
-				// Height = only detailsCard (Title/Desc). Properties is independent and may extend below.
-				// For new tickets: stack properties below details (single left-aligned group), so include both heights.
-				height: root.isNewIssue ? (detailsCard.height + editView.columnGap + propertiesCard.height) : detailsCard.height
+				anchors.bottom: parent.bottom
+				width: root.isNewIssue
+					? parent.width
+					: Math.max(editView.leftColumnMinWidth,
+							   Math.min(editView.leftColumnMaxWidth, parent.width * editView.leftColumnRatio))
 				
 				// LEFT: Title + Description (Context moved to Properties card)
 				Item {
 					id: leftTopWrapper
 					anchors.left: parent.left
 					anchors.top: parent.top
-					readonly property real _propW: Math.min(editView.propertiesWidth, Math.max(220, parent.width * 0.4))
-					width: root.isNewIssue
-						? Math.min(editView.detailsWidth, Math.max(280, parent.width))
-						: Math.min(editView.detailsWidth, Math.max(280, parent.width - _propW - editView.columnGap))
+					width: parent.width
 					height: detailsCard.height
 					
 					Rectangle {
@@ -552,19 +588,18 @@ DocumentViewBase {
 								Rectangle {
 									id: titleEditBtn
 									visible: root.canEdit
-									width: 28
+									width: 54
 									height: 28
 									radius: 14
 									color: titleEditBtnMa.containsMouse ? "#F0F2F5" : "transparent"
 									anchors.verticalCenter: parent.verticalCenter
-									
-									Image {
+
+									Text {
 										anchors.centerIn: parent
-										width: Style.iconSizeS
-										height: width
-										source: Style.getIconPath("Icons/Edit", Icon.State.On, Icon.Mode.Normal)
-										sourceSize.width: width
-										sourceSize.height: height
+										text: qsTr("Edit")
+										font.pixelSize: Style.fontSizeM
+										color: Style.textColor
+										font.bold: true
 									}
 									
 									MouseArea {
@@ -760,17 +795,320 @@ DocumentViewBase {
 					}
 				} // leftTopWrapper
 				
-				// RIGHT: Properties (top-right group, narrow, attached to leftTopWrapper.right)
-				// For new tickets: stacked below leftTopWrapper at same width, left-aligned (single group).
+				// MIDDLE: Context card
+				Item {
+					id: contextWrapper
+					anchors.left: parent.left
+					anchors.top: leftTopWrapper.bottom
+					anchors.topMargin: editView.columnGap
+					width: leftTopWrapper.width
+					height: contextCard.height
+
+					Rectangle {
+						id: contextCard
+						width: parent.width
+						height: contextCardCol.height + editView.cardPadding * 2
+						radius: editView.cardRadius
+						color: editView.cardColor
+						border.color: editView.cardBorderColor
+						border.width: 1
+
+						Column {
+							id: contextCardCol
+							x: editView.cardPadding
+							y: editView.cardPadding
+							width: parent.width - editView.cardPadding * 2
+							spacing: Style.spacingS
+
+							Item {
+								width: parent.width
+								height: Math.max(contextLabelText.height, addContextBtn.height)
+
+								Row {
+									anchors.left: parent.left
+									anchors.verticalCenter: parent.verticalCenter
+									spacing: Style.spacingS
+
+									Text {
+										id: contextLabelText
+										text: qsTr("Context")
+										font.pixelSize: Style.fontSizeL
+										font.bold: true
+										color: Style.textColor
+										anchors.verticalCenter: parent.verticalCenter
+									}
+
+									Rectangle {
+										visible: root.pendingEntityRefs.length > 0
+										width: refCountLabel.contentWidth + Style.paddingS * 2
+										height: editView.badgeHeight - 2
+										radius: (editView.badgeHeight - 2) / 2
+										color: editView.accentColor
+										anchors.verticalCenter: parent.verticalCenter
+
+										Text {
+											id: refCountLabel
+											anchors.centerIn: parent
+											text: root.pendingEntityRefs.length
+											font.pixelSize: Style.fontSizeM - 1
+											font.bold: true
+											color: Style.baseColor
+										}
+									}
+								}
+
+								Text {
+									id: addContextBtn
+									anchors.right: parent.right
+									anchors.verticalCenter: parent.verticalCenter
+									visible: root.canEdit
+									text: "+ " + qsTr("Add context")
+									font.pixelSize: Style.fontSizeM
+									font.bold: true
+									color: editView.accentColor
+
+									MouseArea {
+										anchors.fill: parent
+										hoverEnabled: true
+										cursorShape: Qt.PointingHandCursor
+										onClicked: {
+											ModalDialogManager.openDialog(contextPickerDialogComp)
+										}
+									}
+								}
+							}
+
+							Flow {
+								width: parent.width
+								spacing: Style.spacingXS
+								visible: root.pendingEntityRefs.length > 0
+
+								Repeater {
+									model: root.pendingEntityRefs
+									delegate: Rectangle {
+										readonly property real maxRefWidth: 260
+										width: Math.min(refLabelText.contentWidth + refRemoveBtn.width + Style.paddingS * 3, maxRefWidth)
+										height: 28
+										radius: 14
+										color: editView.accentBgLight
+										border.color: editView.accentBorderLight
+										border.width: 1
+
+										Text {
+											id: refLabelText
+											anchors.left: parent.left
+											anchors.leftMargin: Style.paddingS + 2
+											anchors.verticalCenter: parent.verticalCenter
+											text: (modelData.entityType ? "[" + modelData.entityType + "] " : "") + (modelData.displayName || modelData.entityId || "")
+											font.pixelSize: Style.fontSizeM
+											color: editView.accentColor
+											font.underline: modelData.entityLinkPath !== ""
+											elide: Text.ElideRight
+											maximumLineCount: 1
+
+											MouseArea {
+												anchors.fill: parent
+												hoverEnabled: true
+												cursorShape: Qt.PointingHandCursor
+												onClicked: {
+													if (modelData.entityLinkPath) {
+														NavigationController.navigate(modelData.entityLinkPath)
+													}
+												}
+											}
+										}
+
+										ToolButton {
+											id: refRemoveBtn
+											visible: root.canEdit
+											anchors.right: parent.right
+											anchors.verticalCenter: parent.verticalCenter
+											iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+											decorator: Component {
+												ToolButtonDecorator {
+													color: "transparent"
+													icon.width: Style.iconSizeXS
+												}
+											}
+											onClicked: {
+												var arr = root.pendingEntityRefs.slice()
+												arr.splice(index, 1)
+												root.pendingEntityRefs = arr
+												root._entityRefsChanged = true
+												root.doUpdateModel()
+											}
+										}
+									}
+								}
+							}
+
+							Text {
+								visible: root.pendingEntityRefs.length === 0
+								width: parent.width
+								text: qsTr("No linked entities. Click \"+ Add context\" to attach entities to this ticket.")
+								font.pixelSize: Style.fontSizeM
+								color: Style.inactiveTextColor
+								wrapMode: Text.WordWrap
+							}
+
+							Component {
+								id: contextPickerDialogComp
+								Dialog {
+									id: ctxDialog
+									title: qsTr("Link Entity to Ticket")
+									canMove: false
+									width: Math.min(ModalDialogManager.activeView.width - 80, 900)
+									height: ModalDialogManager.activeView.height - 80
+
+									property string selectedEntityTypeId: ""
+									property RemoteCollectionView collectionView: null
+
+									Component.onCompleted: {
+										addButton(Enums.apply, qsTr("Attach Selected"), false)
+										addButton(Enums.cancel, qsTr("Cancel"), true)
+										setButtonEnabled(Enums.apply, false)
+										if (entityTypeModel.getItemsCount() > 0) {
+											selectedEntityTypeId = entityTypeModel.getData("id", 0)
+										}
+									}
+
+									contentComp: Component {
+										Item {
+											width: ctxDialog.width
+											height: ctxDialog.height - 100
+
+											Component.onCompleted: {
+												ctxTypeCB.model = entityTypeModel
+												if (entityTypeModel.getItemsCount() > 0) {
+													ctxTypeCB.currentIndex = 0
+												}
+											}
+
+											Column {
+												id: ctxContentCol
+												anchors.fill: parent
+												anchors.margins: Style.paddingM
+												spacing: Style.spacingM
+
+												Rectangle {
+													width: parent.width
+													height: ctxTypeRow.height + Style.paddingM * 2
+													radius: Style.radiusM
+													color: editView.accentBadgeBg
+													border.color: editView.accentBorderLight
+													border.width: 1
+
+													Row {
+														id: ctxTypeRow
+														anchors.centerIn: parent
+														spacing: Style.spacingM
+
+														Text {
+															text: qsTr("Entity type")
+															font.pixelSize: Style.fontSizeM
+															font.bold: true
+															color: Style.textColor
+															anchors.verticalCenter: parent.verticalCenter
+														}
+
+														ComboBox {
+															id: ctxTypeCB
+															width: 280
+															height: Style.buttonHeightM
+															onCurrentIndexChanged: {
+																if (entityTypeModel.getItemsCount() > currentIndex) {
+																	ctxDialog.selectedEntityTypeId = entityTypeModel.getData("id", currentIndex)
+																	ctxDialog.setButtonEnabled(Enums.apply, false)
+																}
+															}
+														}
+													}
+												}
+
+												Item {
+													width: parent.width
+													height: parent.height - ctxTypeRow.height - Style.paddingM * 2 - Style.spacingM * 2
+
+													Rectangle {
+														anchors.fill: parent
+														radius: Style.radiusM
+														color: "transparent"
+														border.color: Style.borderColor
+														border.width: 1
+
+														RemoteCollectionView {
+															anchors.fill: parent
+															anchors.margins: 1
+															commandsControllerComp: null
+															visibleMetaInfo: false
+															commandsDelegateComp: null
+															documentCollectionFilter: null
+															showRemoteChangesAlert: false
+															tableViewParamsStoredServer: false
+															Component.onCompleted: {
+																ctxDialog.collectionView = this
+																collectionId = ctxDialog.selectedEntityTypeId
+															}
+															onSelectionChanged: {
+																ctxDialog.setButtonEnabled(Enums.apply, selectedIds.length > 0)
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+
+									onFinished: {
+										if (buttonId === Enums.apply && collectionView) {
+											var arr = root.pendingEntityRefs.slice()
+											var mdl = collectionView.table.elements
+											let indexes = collectionView.table.getSelectedIndexes()
+											for (var i = 0; i < indexes.length; i++) {
+												let idx = indexes[i]
+												var displayName = mdl.getData("name", idx)
+												var typeId = mdl.getData("typeId", idx)
+												var elementId = mdl.getData("id", idx)
+												var linkPath = selectedEntityTypeId
+												if (typeId) linkPath += "/" + typeId
+												linkPath += "/" + elementId
+												arr.push({
+															 entityType: selectedEntityTypeId,
+															 entityId: elementId,
+															 displayName: displayName,
+															 entityLinkPath: linkPath,
+															 typeId: typeId
+														 })
+											}
+											root.pendingEntityRefs = arr
+											root._entityRefsChanged = true
+											root.doUpdateModel()
+										}
+									}
+								}
+							}
+						}
+					}
+
+					DropShadow {
+						anchors.fill: contextCard
+						z: contextCard.z - 1
+						horizontalOffset: 3
+						verticalOffset: 3
+						radius: Style.radiusL
+						spread: 0
+						color: Style.shadowColor
+						source: contextCard
+					}
+				}
+
+				// BOTTOM: Properties card
 				Item {
 					id: rightTopWrapper
-					anchors.left: root.isNewIssue ? parent.left : leftTopWrapper.right
-					anchors.leftMargin: root.isNewIssue ? 0 : editView.columnGap
-					anchors.top: root.isNewIssue ? leftTopWrapper.bottom : parent.top
-					anchors.topMargin: root.isNewIssue ? editView.columnGap : 0
-					width: root.isNewIssue
-						? leftTopWrapper.width
-						: Math.min(editView.propertiesWidth, Math.max(220, parent.width - leftTopWrapper.width - editView.columnGap))
+					anchors.left: parent.left
+					anchors.top: contextWrapper.bottom
+					anchors.topMargin: editView.columnGap
+					width: leftTopWrapper.width
 					height: propertiesCard.height
 					
 					Rectangle {
@@ -845,6 +1183,23 @@ DocumentViewBase {
 										KeyNavigation.tab: editAssigneeCB
 										KeyNavigation.backtab: editTypeCB
 									}
+
+									Row {
+										spacing: Style.spacingXS
+										Rectangle {
+											width: 8
+											height: 8
+											radius: 4
+											color: root.priorityColor(editPriorityCB.model && editPriorityCB.currentIndex >= 0
+																	 ? editPriorityCB.model.getData("id", editPriorityCB.currentIndex) : "")
+											anchors.verticalCenter: parent.verticalCenter
+										}
+										Text {
+											text: qsTr("Priority level")
+											font.pixelSize: Style.fontSizeM - 1
+											color: Style.inactiveTextColor
+										}
+									}
 								}
 
 								Column {
@@ -868,6 +1223,30 @@ DocumentViewBase {
 										onCurrentIndexChanged: root.doUpdateModel()
 										KeyNavigation.tab: editLockedCB
 										KeyNavigation.backtab: editAssigneeCB
+									}
+
+									Rectangle {
+										width: statusBadgeText.contentWidth + Style.paddingS * 2
+										height: 22
+										radius: 11
+										color: root.statusColor(editStatusCB.model && editStatusCB.currentIndex >= 0
+																 ? editStatusCB.model.getData("id", editStatusCB.currentIndex) : "")
+										opacity: 0.15
+										border.width: 1
+										border.color: root.statusColor(editStatusCB.model && editStatusCB.currentIndex >= 0
+																		? editStatusCB.model.getData("id", editStatusCB.currentIndex) : "")
+
+										Text {
+											id: statusBadgeText
+											anchors.centerIn: parent
+											text: editStatusCB.model && editStatusCB.currentIndex >= 0
+												  ? editStatusCB.model.getData("name", editStatusCB.currentIndex)
+												  : qsTr("Unknown")
+											font.pixelSize: Style.fontSizeM - 1
+											font.bold: true
+											color: root.statusColor(editStatusCB.model && editStatusCB.currentIndex >= 0
+																	 ? editStatusCB.model.getData("id", editStatusCB.currentIndex) : "")
+										}
 									}
 								}
 							}
@@ -1101,288 +1480,7 @@ DocumentViewBase {
 								onCurrentIndexChanged: root.doUpdateModel()
 							}
 							
-							// ---------- Context / Entity References (in properties card) ----------
-							Rectangle { width: parent.width; height: 1; color: editView.cardBorderColor; opacity: 0.4 }
-							
-							Column {
-								id: contextCardCol
-								width: parent.width
-								spacing: Style.spacingS
-								
-								Item {
-									width: parent.width
-									height: Math.max(contextLabelText.height, addContextBtn.height)
-									
-									Row {
-										anchors.left: parent.left
-										anchors.verticalCenter: parent.verticalCenter
-										spacing: Style.spacingS
-										
-										Text {
-											id: contextLabelText
-											text: qsTr("Context")
-											font.pixelSize: Style.fontSizeM
-											font.bold: true
-											color: editView.sectionLabelColor
-											anchors.verticalCenter: parent.verticalCenter
-										}
-										
-										Rectangle {
-											visible: root.pendingEntityRefs.length > 0
-											width: refCountLabel.contentWidth + Style.paddingS * 2
-											height: editView.badgeHeight - 2
-											radius: (editView.badgeHeight - 2) / 2
-											color: editView.accentColor
-											anchors.verticalCenter: parent.verticalCenter
-											
-											Text {
-												id: refCountLabel
-												anchors.centerIn: parent
-												text: root.pendingEntityRefs.length
-												font.pixelSize: Style.fontSizeM - 1
-												font.bold: true
-												color: Style.baseColor
-											}
-										}
-									}
-									
-									Text {
-										id: addContextBtn
-										anchors.right: parent.right
-										anchors.verticalCenter: parent.verticalCenter
-										visible: root.canEdit
-										text: "+ " + qsTr("Add context")
-										font.pixelSize: Style.fontSizeM
-										font.bold: true
-										color: editView.accentColor
-										
-										MouseArea {
-											anchors.fill: parent
-											hoverEnabled: true
-											cursorShape: Qt.PointingHandCursor
-											onClicked: {
-												ModalDialogManager.openDialog(contextPickerDialogComp)
-											}
-										}
-									}
-								}
-								
-								// Entity chips (tags-style)
-								Flow {
-									width: parent.width
-									spacing: Style.spacingXS
-									visible: root.pendingEntityRefs.length > 0
-									
-									Repeater {
-										model: root.pendingEntityRefs
-										delegate: Rectangle {
-											readonly property real maxRefWidth: 260
-											width: Math.min(refLabelText.contentWidth + refRemoveBtn.width + Style.paddingS * 3, maxRefWidth)
-											height: 28
-											radius: 14
-											color: editView.accentBgLight
-											border.color: editView.accentBorderLight
-											border.width: 1
-											
-											Text {
-												id: refLabelText
-												anchors.left: parent.left
-												anchors.leftMargin: Style.paddingS + 2
-												anchors.verticalCenter: parent.verticalCenter
-												text: (modelData.entityType ? "[" + modelData.entityType + "] " : "") + (modelData.displayName || modelData.entityId || "")
-												font.pixelSize: Style.fontSizeM
-												color: editView.accentColor
-												font.underline: modelData.entityLinkPath !== ""
-												elide: Text.ElideRight
-												maximumLineCount: 1
-												
-												MouseArea {
-													anchors.fill: parent
-													hoverEnabled: true
-													cursorShape: Qt.PointingHandCursor
-													onClicked: {
-														if (modelData.entityLinkPath) {
-															NavigationController.navigate(modelData.entityLinkPath)
-														}
-													}
-												}
-											}
-											
-											ToolButton {
-												id: refRemoveBtn
-												visible: root.canEdit
-												anchors.right: parent.right
-												anchors.verticalCenter: parent.verticalCenter
-												iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
-												decorator: Component {
-													ToolButtonDecorator {
-														color: "transparent"
-														icon.width: Style.iconSizeXS
-													}
-												}
-												onClicked: {
-													var arr = root.pendingEntityRefs.slice()
-													arr.splice(index, 1)
-													root.pendingEntityRefs = arr
-													root._entityRefsChanged = true
-													root.doUpdateModel()
-												}
-											}
-										}
-									}
-								}
-								
-								// Empty context placeholder
-								Text {
-									visible: root.pendingEntityRefs.length === 0
-									width: parent.width
-									text: qsTr("No linked entities. Click \"+ Add context\" to attach entities to this ticket.")
-									font.pixelSize: Style.fontSizeM
-									color: Style.inactiveTextColor
-									wrapMode: Text.WordWrap
-								}
-								
-								// Single dialog: entity type ComboBox + RemoteCollectionView
-								Component {
-									id: contextPickerDialogComp
-									Dialog {
-										id: ctxDialog
-										title: qsTr("Link Entity to Ticket")
-										canMove: false
-										width: Math.min(ModalDialogManager.activeView.width - 80, 900)
-										height: ModalDialogManager.activeView.height - 80
-										
-										property string selectedEntityTypeId: ""
-										property RemoteCollectionView collectionView: null
-										
-										Component.onCompleted: {
-											addButton(Enums.apply, qsTr("Attach Selected"), false)
-											addButton(Enums.cancel, qsTr("Cancel"), true)
-											setButtonEnabled(Enums.apply, false)
-											// Pre-select first entity type
-											if (entityTypeModel.getItemsCount() > 0) {
-												selectedEntityTypeId = entityTypeModel.getData("id", 0)
-											}
-										}
-										
-										contentComp: Component {
-											Item {
-												width: ctxDialog.width
-												height: ctxDialog.height - 100
-												
-												Component.onCompleted: {
-													ctxTypeCB.model = entityTypeModel
-													if (entityTypeModel.getItemsCount() > 0) {
-														ctxTypeCB.currentIndex = 0
-													}
-												}
-												
-												Column {
-													id: ctxContentCol
-													anchors.fill: parent
-													anchors.margins: Style.paddingM
-													spacing: Style.spacingM
-													
-													// Entity type selector row
-													Rectangle {
-														width: parent.width
-														height: ctxTypeRow.height + Style.paddingM * 2
-														radius: Style.radiusM
-														color: editView.accentBadgeBg
-														border.color: editView.accentBorderLight
-														border.width: 1
-														
-														Row {
-															id: ctxTypeRow
-															anchors.centerIn: parent
-															spacing: Style.spacingM
-															
-															Text {
-																text: qsTr("Entity type")
-																font.pixelSize: Style.fontSizeM
-																font.bold: true
-																color: Style.textColor
-																anchors.verticalCenter: parent.verticalCenter
-															}
-															
-															ComboBox {
-																id: ctxTypeCB
-																width: 280
-																height: Style.buttonHeightM
-																onCurrentIndexChanged: {
-																	if (entityTypeModel.getItemsCount() > currentIndex) {
-																		ctxDialog.selectedEntityTypeId = entityTypeModel.getData("id", currentIndex)
-																		ctxDialog.setButtonEnabled(Enums.apply, false)
-																	}
-																}
-															}
-														}
-													}
-													
-													// Collection browser
-													Item {
-														width: parent.width
-														height: parent.height - ctxTypeRow.height - Style.paddingM * 2 - Style.spacingM * 2
-														
-														Rectangle {
-															anchors.fill: parent
-															radius: Style.radiusM
-															color: "transparent"
-															border.color: Style.borderColor
-															border.width: 1
-															
-															RemoteCollectionView {
-																anchors.fill: parent
-																anchors.margins: 1
-																commandsControllerComp: null
-																visibleMetaInfo: false
-																commandsDelegateComp: null
-																documentCollectionFilter: null
-																showRemoteChangesAlert: false
-																tableViewParamsStoredServer: false
-																Component.onCompleted: {
-																	ctxDialog.collectionView = this
-																	collectionId = ctxDialog.selectedEntityTypeId
-																}
-																onSelectionChanged: {
-																	ctxDialog.setButtonEnabled(Enums.apply, selectedIds.length > 0)
-																}
-															}
-														}
-													}
-												}
-											}
-										}
-										
-										onFinished: {
-											if (buttonId === Enums.apply && collectionView) {
-												var arr = root.pendingEntityRefs.slice()
-												var mdl = collectionView.table.elements
-												let indexes = collectionView.table.getSelectedIndexes()
-												for (var i = 0; i < indexes.length; i++) {
-													let idx = indexes[i]
-													var displayName = mdl.getData("name", idx)
-													var typeId = mdl.getData("typeId", idx)
-													var elementId = mdl.getData("id", idx)
-													var linkPath = selectedEntityTypeId
-													if (typeId) linkPath += "/" + typeId
-													linkPath += "/" + elementId
-													arr.push({
-																 entityType: selectedEntityTypeId,
-																 entityId: elementId,
-																 displayName: displayName,
-																 entityLinkPath: linkPath,
-																 typeId: typeId
-															 })
-												}
-												root.pendingEntityRefs = arr
-												root._entityRefsChanged = true
-												root.doUpdateModel()
-											}
-										}
-									}
-								}
-							}
+							// Context moved to separate card
 							// Lock section (existing tickets only, reporter/admin only)
 							Column {
 								visible: !root.isNewIssue && root.canLock
@@ -1439,15 +1537,15 @@ DocumentViewBase {
 				} // rightTopWrapper
 			} // topRow
 			
-			// ==================== BOTTOM: Chat (same width as Title/Desc, below topRow) ====================
+			// ==================== RIGHT COLUMN: CHAT (PRIMARY AREA) ====================
 			Rectangle {
 				id: commentsPanel
 				visible: !root.isNewIssue
-				anchors.top: topRow.bottom
-				anchors.topMargin: editView.columnGap
+				anchors.top: parent.top
 				anchors.bottom: parent.bottom
-				anchors.left: parent.left
-				width: leftTopWrapper.width
+				anchors.left: topRow.right
+				anchors.leftMargin: editView.columnGap
+				anchors.right: parent.right
 				radius: editView.cardRadius
 				color: editView.cardColor
 				border.color: editView.cardBorderColor
@@ -1480,6 +1578,8 @@ DocumentViewBase {
 						anchors.verticalCenter: parent.verticalCenter
 						anchors.left: parent.left
 						anchors.leftMargin: editView.cardPadding
+						anchors.right: parent.right
+						anchors.rightMargin: editView.cardPadding
 						spacing: Style.spacingS
 						
 						Text {
@@ -1505,6 +1605,31 @@ DocumentViewBase {
 								font.pixelSize: Style.fontSizeM
 								font.bold: true
 								color: Style.baseColor
+							}
+						}
+
+						Row {
+							anchors.verticalCenter: parent.verticalCenter
+							spacing: -8
+
+							Repeater {
+								model: root.chatParticipants().slice(0, 5)
+								delegate: Rectangle {
+									width: 26
+									height: 26
+									radius: 13
+									border.width: 2
+									border.color: editView.cardColor
+									color: modelData.id === root.currentUserId ? editView.accentColor : "#9AA5B8"
+
+									Text {
+										anchors.centerIn: parent
+										text: modelData.name ? modelData.name.charAt(0).toUpperCase() : "?"
+										font.pixelSize: Style.fontSizeM - 1
+										font.bold: true
+										color: Style.baseColor
+									}
+								}
 							}
 						}
 					}
@@ -1593,7 +1718,7 @@ DocumentViewBase {
 						Column {
 							id: commentsListCol
 							width: parent.width
-							spacing: Style.spacingM
+							spacing: Style.spacingS
 							
 							Repeater {
 								id: commentsThread
@@ -1608,7 +1733,7 @@ DocumentViewBase {
 									readonly property var dataModel: model.item
 									readonly property string _prevUserId: index > 0 && commentsThread.itemAt(index - 1) ? commentsThread.itemAt(index - 1).dataModel.m_userId : ""
 									readonly property bool isGroupedWithPrev: index > 0 && _prevUserId === model.item.m_userId && _prevUserId.length > 0
-									readonly property int topGap: index === 0 ? 0 : (isGroupedWithPrev ? 2 : Style.spacingXXL)
+									readonly property int topGap: index === 0 ? 0 : (isGroupedWithPrev ? 2 : Style.spacingS)
 									
 									Column {
 										id: commentBubbleCol
@@ -1618,10 +1743,13 @@ DocumentViewBase {
 										
 										// Chat bubble (contains avatar + name + timestamp + content)
 										Rectangle {
-											width: parent.width
+											readonly property real maxBubbleWidth: Math.min(parent.width * 0.82, 560)
+											width: maxBubbleWidth
+											anchors.right: commentDelegate.isMe ? parent.right : undefined
+											anchors.left: commentDelegate.isMe ? undefined : parent.left
 											height: bubbleContent.height + Style.paddingM * 2
 											radius: 12
-											color: commentDelegate.isMe ? editView.bubbleColor : editView.otherBubbleColor
+											color: commentDelegate.isMe ? "#EAF3FF" : editView.otherBubbleColor
 											border.width: 0
 											
 											Column {
@@ -1744,32 +1872,60 @@ DocumentViewBase {
 												}
 												
 												// Attachments — inline links with paperclip icon
-												Repeater {
-													model: commentDelegate.dataModel.m_attachments || []
-													delegate: Row {
-														spacing: Style.spacingXS
-														
-														Image {
-															anchors.verticalCenter: parent.verticalCenter
-															width: Style.iconSizeS
-															height: width
-															source: Style.getIconPath("Icons/Attachment", Icon.State.On, Icon.Mode.Normal)
-															sourceSize.width: width
-															sourceSize.height: height
-														}
-														
-														Text {
-															anchors.verticalCenter: parent.verticalCenter
-															text: model.item.m_fileName
-															font.pixelSize: Style.fontSizeM
-															color: Style.linkColor
-															font.underline: true
-															
+												Flow {
+													width: parent.width
+													spacing: Style.spacingS
+													visible: (commentDelegate.dataModel.m_attachments || []).length > 0
+
+													Repeater {
+														model: commentDelegate.dataModel.m_attachments || []
+														delegate: Rectangle {
+															readonly property bool isImage: root.isImageAttachment(model.item.m_fileName)
+															width: isImage ? 132 : Math.min(parent.width, 240)
+															height: isImage ? 96 : 44
+															radius: Style.radiusM
+															color: isImage ? "#EEF2F8" : "#F6F8FC"
+															border.color: editView.cardBorderColor
+															border.width: 1
+															clip: true
+
+															Image {
+																visible: parent.isImage
+																anchors.fill: parent
+																fillMode: Image.PreserveAspectCrop
+																source: model.item.m_preview || ""
+															}
+
+															Row {
+																visible: !parent.isImage
+																anchors.fill: parent
+																anchors.margins: Style.paddingS
+																spacing: Style.spacingS
+
+																Image {
+																	width: Style.iconSizeS
+																	height: width
+																	source: Style.getIconPath("Icons/Attachment", Icon.State.On, Icon.Mode.Normal)
+																	sourceSize.width: width
+																	sourceSize.height: height
+																	anchors.verticalCenter: parent.verticalCenter
+																}
+
+																Text {
+																	width: parent.width - Style.iconSizeS - Style.spacingS
+																	anchors.verticalCenter: parent.verticalCenter
+																	text: model.item.m_fileName || qsTr("file")
+																	font.pixelSize: Style.fontSizeM
+																	color: Style.textColor
+																	elide: Text.ElideMiddle
+																}
+															}
+
 															MouseArea {
 																anchors.fill: parent
 																hoverEnabled: true
 																cursorShape: Qt.PointingHandCursor
-																onClicked: Qt.openUrlExternally(model.item.m_preview)
+																onClicked: if (model.item.m_preview) Qt.openUrlExternally(model.item.m_preview)
 															}
 														}
 													}
@@ -2230,4 +2386,3 @@ DocumentViewBase {
 		} // panelsContainer
 	}
 }
-
