@@ -3,20 +3,15 @@
 
 // Qt includes
 #include <QtCore/QDateTime>
-#include <QtCore/QSet>
 #include <QtCore/QUuid>
 #include <QtSql/QSqlError>
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlRecord>
 
 // ACF includes
-#include <istd/TDelPtr.h>
-
-// ImtCore includes
 #include <imtdesk/ISupportTicket.h>
 #include <imtdb/CDatabaseEngineComp.h>
 #include <imtdb/imtdb.h>
-#include <imtbase/IObjectCollectionIterator.h>
 #include <imtauth/IUserInfo.h>
 #include <imtgql/CGqlRequestContextManager.h>
 #include <imtgql/IGqlContext.h>
@@ -62,44 +57,13 @@ QString CSupportTicketDbDelegateComp::CreateVisibilityCondition(const imtgql::IG
 	const QString escapedUserId = EscapeSql(QString::fromUtf8(userId));
 	const QString escapedUserIdForLike = EscapeSqlLikePattern(QString::fromUtf8(userId));
 	const QString assigneeLikePattern = QString("%%,%1,%%").arg(escapedUserIdForLike);
-	QStringList reporterIdsForSameGroup;
-
+	QStringList escapedCurrentUserGroups;
 	const imtauth::IUserInfo* currentUserInfoPtr = contextPtr->GetUserInfo();
-	if (currentUserInfoPtr != nullptr && m_userCollectionCompPtr.IsValid()){
-		const QByteArrayList currentUserGroups = currentUserInfoPtr->GetGroups();
-		if (!currentUserGroups.isEmpty()){
-			QSet<QByteArray> currentGroupsSet(currentUserGroups.begin(), currentUserGroups.end());
-			istd::TDelPtr<imtbase::IObjectCollectionIterator> usersIteratorPtr(
-				m_userCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), 0, -1, nullptr));
-			if (usersIteratorPtr.IsValid()){
-				while (usersIteratorPtr->Next()){
-					imtbase::IObjectCollection::DataPtr dataPtr;
-					if (!usersIteratorPtr->GetObjectData(dataPtr)){
-						continue;
-					}
-
-					const imtauth::IUserInfo* userInfoPtr =
-						dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
-					if (userInfoPtr == nullptr){
-						continue;
-					}
-
-					const QByteArrayList userGroups = userInfoPtr->GetGroups();
-					bool sameGroup = false;
-					for (const QByteArray& groupId : userGroups){
-						if (currentGroupsSet.contains(groupId)){
-							sameGroup = true;
-							break;
-						}
-					}
-
-					if (sameGroup){
-						const QString escapedReporterId = EscapeSql(QString::fromUtf8(userInfoPtr->GetId()));
-						if (!escapedReporterId.isEmpty()){
-							reporterIdsForSameGroup << QString("'%1'").arg(escapedReporterId);
-						}
-					}
-				}
+	if (currentUserInfoPtr != nullptr){
+		for (const QByteArray& groupId : currentUserInfoPtr->GetGroups()){
+			const QString escapedGroupId = EscapeSql(QString::fromUtf8(groupId));
+			if (!escapedGroupId.isEmpty()){
+				escapedCurrentUserGroups << QString("'%1'").arg(escapedGroupId);
 			}
 		}
 	}
@@ -107,8 +71,18 @@ QString CSupportTicketDbDelegateComp::CreateVisibilityCondition(const imtgql::IG
 	QStringList visibilityConditions;
 	visibilityConditions << QString("\"ReporterId\"='%1'").arg(escapedUserId);
 	visibilityConditions << QString("(\"AssigneeIds\" IS NOT NULL AND (',' || \"AssigneeIds\" || ',') LIKE '%1' ESCAPE '\\')").arg(assigneeLikePattern);
-	if (!reporterIdsForSameGroup.isEmpty()){
-		visibilityConditions << QString("\"ReporterId\" IN (%1)").arg(reporterIdsForSameGroup.join(", "));
+	if (!escapedCurrentUserGroups.isEmpty() && TableExists(QByteArrayLiteral("Users"))){
+		const QString groupsArray = QString("array[%1]").arg(escapedCurrentUserGroups.join(", "));
+		visibilityConditions << QString(
+			"(EXISTS (SELECT 1 FROM \"Users\" AS \"ReporterUser\" "
+			"WHERE \"ReporterUser\".\"State\"='Active' "
+			"AND \"ReporterUser\".\"DocumentId\"::text = \"ReporterId\" "
+			"AND (\"ReporterUser\".\"Document\"->'Groups' ?| %1)) "
+			"OR EXISTS (SELECT 1 FROM \"Users\" AS \"AssigneeUser\" "
+			"WHERE \"AssigneeUser\".\"State\"='Active' "
+			"AND \"AssigneeIds\" IS NOT NULL "
+			"AND (',' || \"AssigneeIds\" || ',') LIKE ('%%,' || \"AssigneeUser\".\"DocumentId\"::text || ',%%') "
+			"AND (\"AssigneeUser\".\"Document\"->'Groups' ?| %1)))").arg(groupsArray);
 	}
 
 	return QString("(%1)").arg(visibilityConditions.join(" OR "));
