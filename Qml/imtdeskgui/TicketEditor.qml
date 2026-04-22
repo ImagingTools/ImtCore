@@ -135,7 +135,7 @@ DocumentViewBase {
 		var lines = []
 		lines.push(qsTr("Ticket Comments Export"))
 		if (ticketData && ticketData.m_number) {
-			lines.push(qsTr("Ticket #%1").arg(ticketData.m_number))
+			lines.push(qsTr("Ticket #") + String(ticketData.m_number))
 		}
 		lines.push("")
 		if (!ticketData || !ticketData.m_comments) {
@@ -1654,10 +1654,10 @@ DocumentViewBase {
 							}
 						}
 
-						Item {
-							width: Math.max(0, parent.width - x - exportTxt.contentWidth - participantsRow.width - Style.spacingS * 2)
-							height: 1
-						}
+						// Item {
+						// 	width: Math.max(0, parent.width - x - exportTxt.contentWidth - participantsRow.width - Style.spacingS * 2)
+						// 	height: 1
+						// }
 
 						Text {
 							id: exportTxt
@@ -1670,7 +1670,9 @@ DocumentViewBase {
 								anchors.fill: parent
 								hoverEnabled: true
 								cursorShape: Qt.PointingHandCursor
-								onClicked: root.copyTextToClipboard(root.formatChatExportText(), qsTr("Chat export copied"))
+								onClicked: {
+									root.copyTextToClipboard(root.formatChatExportText(), qsTr("Chat export copied"))
+								}
 							}
 						}
 
@@ -2010,7 +2012,7 @@ DocumentViewBase {
 												Flow {
 													width: parent.width
 													spacing: Style.spacingS
-													visible: (commentDelegate.dataModel.m_attachments || []).length > 0
+													visible: commentDelegate.dataModel.m_attachments.count > 0
 
 													Repeater {
 														model: commentDelegate.dataModel.m_attachments || []
@@ -2129,7 +2131,7 @@ DocumentViewBase {
 						Text {
 							text: root._unreadMessagesCount === 1
 									? qsTr("1 unread message")
-									: qsTr("%1 unread messages").arg(root._unreadMessagesCount)
+									: String(root._unreadMessagesCount) + qsTr(" unread messages")
 							font.pixelSize: Style.fontSizeM
 							color: Style.baseColor
 							font.bold: true
