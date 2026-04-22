@@ -47,6 +47,10 @@ protected:
 				const sdl::imtdesk::ImtDesk::CTicketUpdateGqlRequest& updateRequest,
 				istd::IChangeable& object,
 				QString& errorMessage) const override;
+	virtual void SetAdditionalFilters(
+				const imtgql::CGqlRequest& gqlRequest,
+				const imtgql::CGqlParamObject& viewParamsGql,
+				iprm::CParamsSet* filterParamsPtr) const override;
 
 private:
 	bool FillObjectFromRepresentation(

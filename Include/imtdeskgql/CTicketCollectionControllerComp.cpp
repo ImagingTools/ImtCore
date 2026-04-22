@@ -9,6 +9,7 @@
 #include <iprm/CParamsSet.h>
 
 // ImtCore includes
+#include <imtauth/CUserGroupFilter.h>
 #include <imtdesk/ISupportTicket.h>
 #include <imtdesk/ITicketAction.h>
 #include <imtchat/IChatService.h>
@@ -218,6 +219,31 @@ bool CTicketCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 	return FillObjectFromRepresentation(itemData, *ticketPtr, objectId, errorMessage);
 }
 
+void CTicketCollectionControllerComp::SetAdditionalFilters(
+		const imtgql::CGqlRequest& gqlRequest,
+		const imtgql::CGqlParamObject& /*viewParamsGql*/,
+		iprm::CParamsSet* filterParamsPtr) const
+{
+	if (filterParamsPtr == nullptr){
+		return;
+	}
+
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr == nullptr){
+		return;
+	}
+
+	const imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
+	if (userInfoPtr == nullptr || userInfoPtr->IsAdmin()){
+		return;
+	}
+
+	istd::TDelPtr<imtauth::CUserGroupFilter> groupFilter = new imtauth::CUserGroupFilter();
+	groupFilter->SetUserId(gqlContextPtr->GetUserId());
+	groupFilter->SetGroupIds(userInfoPtr->GetGroups());
+	filterParamsPtr->SetEditableParameter("GroupFilter", groupFilter.PopPtr(), true);
+}
+
 
 bool CTicketCollectionControllerComp::FillObjectFromRepresentation(
 		const sdl::imtdesk::ImtDesk::CTicketData::V1_0& representation,
@@ -307,4 +333,3 @@ bool CTicketCollectionControllerComp::FillObjectFromRepresentation(
 
 
 } // namespace imtdeskgql
-

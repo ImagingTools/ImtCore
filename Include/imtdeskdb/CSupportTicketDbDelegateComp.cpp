@@ -12,6 +12,8 @@
 #include <imtdesk/ISupportTicket.h>
 #include <imtdb/CDatabaseEngineComp.h>
 #include <imtdb/imtdb.h>
+#include <iprm/TParamsPtr.h>
+#include <imtauth/IUserGroupFilter.h>
 #include <imtauth/IUserInfo.h>
 #include <imtgql/CGqlRequestContextManager.h>
 #include <imtgql/IGqlContext.h>
@@ -51,13 +53,10 @@ bool CSupportTicketDbDelegateComp::IsSqliteDatabase() const
 				Qt::CaseInsensitive) == 0;
 }
 
-QString CSupportTicketDbDelegateComp::CreateVisibilityCondition(const imtgql::IGqlContext* contextPtr) const
+QString CSupportTicketDbDelegateComp::CreateVisibilityCondition(
+		const QByteArray& userId,
+		const QByteArrayList& currentUserGroups) const
 {
-	if (contextPtr == nullptr){
-		return QString();
-	}
-
-	const QByteArray userId = contextPtr->GetUserId();
 	if (userId.isEmpty()){
 		return QString();
 	}
@@ -66,13 +65,10 @@ QString CSupportTicketDbDelegateComp::CreateVisibilityCondition(const imtgql::IG
 	const QString escapedUserIdForLike = EscapeSqlLikePattern(QString::fromUtf8(userId));
 	const QString assigneeLikePattern = QString("%%,%1,%%").arg(escapedUserIdForLike);
 	QStringList escapedCurrentUserGroups;
-	const imtauth::IUserInfo* currentUserInfoPtr = contextPtr->GetUserInfo();
-	if (currentUserInfoPtr != nullptr){
-		for (const QByteArray& groupId : currentUserInfoPtr->GetGroups()){
-			const QString escapedGroupId = EscapeSql(QString::fromUtf8(groupId));
-			if (!escapedGroupId.isEmpty()){
-				escapedCurrentUserGroups << QString("'%1'").arg(escapedGroupId);
-			}
+	for (const QByteArray& groupId : currentUserGroups){
+		const QString escapedGroupId = EscapeSql(QString::fromUtf8(groupId));
+		if (!escapedGroupId.isEmpty()){
+			escapedCurrentUserGroups << QString("'%1'").arg(escapedGroupId);
 		}
 	}
 
@@ -125,17 +121,14 @@ QByteArray CSupportTicketDbDelegateComp::GetSelectionQuery(
 		return baseQuery;
 	}
 
-	const imtgql::IGqlContext* contextPtr = imtgql::CGqlRequestContextManager::GetContext();
-	if (contextPtr == nullptr){
+	iprm::TParamsPtr<imtauth::IUserGroupFilter> groupFilterParamPtr(paramsPtr, "GroupFilter");
+	if (!groupFilterParamPtr.IsValid()){
 		return baseQuery;
 	}
 
-	const imtauth::IUserInfo* userInfoPtr = contextPtr->GetUserInfo();
-	if (userInfoPtr != nullptr && userInfoPtr->IsAdmin()){
-		return baseQuery;
-	}
-
-	const QString visibilityCondition = CreateVisibilityCondition(contextPtr);
+	const QString visibilityCondition = CreateVisibilityCondition(
+				groupFilterParamPtr->GetUserId(),
+				groupFilterParamPtr->GetGroupIds());
 	if (visibilityCondition.isEmpty()){
 		return QString("SELECT * FROM (%1) AS \"FilteredTickets\" WHERE 1=0")
 				.arg(QString::fromUtf8(baseQuery)).toUtf8();
