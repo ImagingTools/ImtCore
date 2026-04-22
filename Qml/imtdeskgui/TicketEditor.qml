@@ -597,7 +597,7 @@ DocumentViewBase {
 								Rectangle {
 									id: titleEditBtn
 									visible: root.canEdit
-									width: Math.max(editView.editButtonWidth, editLabel.contentWidth + Style.paddingS * 2)
+									width: Math.min(120, Math.max(editView.editButtonWidth, editLabel.contentWidth + Style.paddingS * 2))
 									height: 28
 									radius: 14
 									color: titleEditBtnMa.containsMouse ? "#F0F2F5" : "transparent"
