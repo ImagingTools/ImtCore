@@ -494,6 +494,8 @@ DocumentViewBase {
 		readonly property string timestampColor: Style.inactiveTextColor
 		readonly property real columnGap: Style.spacingL
 		readonly property real editButtonWidth: 72
+		readonly property real editButtonMaxWidth: 120
+		readonly property int maxVisibleParticipants: 5
 		readonly property real avatarOverlap: -8
 		readonly property real bubbleWidthRatio: 0.86
 		readonly property real bubbleMaxWidth: 680
@@ -597,7 +599,7 @@ DocumentViewBase {
 								Rectangle {
 									id: titleEditBtn
 									visible: root.canEdit
-									width: Math.min(120, Math.max(editView.editButtonWidth, editLabel.contentWidth + Style.paddingS * 2))
+									width: Math.min(editView.editButtonMaxWidth, Math.max(editView.editButtonWidth, editLabel.contentWidth + Style.paddingS * 2))
 									height: 28
 									radius: 14
 									color: titleEditBtnMa.containsMouse ? "#F0F2F5" : "transparent"
@@ -1623,7 +1625,7 @@ DocumentViewBase {
 							spacing: editView.avatarOverlap
 
 							Repeater {
-								model: root.chatParticipants().slice(0, 5)
+								model: root.chatParticipants().slice(0, editView.maxVisibleParticipants)
 								delegate: Rectangle {
 									width: 26
 									height: 26
@@ -1894,7 +1896,7 @@ DocumentViewBase {
 															width: isImage ? editView.imageAttachmentWidth : Math.min(parent.width, editView.fileAttachmentMaxWidth)
 															height: isImage ? editView.imageAttachmentHeight : editView.fileAttachmentHeight
 															radius: Style.radiusM
-															color: isImage ? "#EEF2F8" : "#F6F8FC"
+															color: activeFocus ? "#ECF3FF" : (isImage ? "#EEF2F8" : "#F6F8FC")
 															border.color: activeFocus ? editView.accentColor : editView.cardBorderColor
 															border.width: activeFocus ? 2 : 1
 															clip: true
