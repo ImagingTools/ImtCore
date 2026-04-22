@@ -446,6 +446,8 @@ DocumentViewBase {
 
 	TextEdit {
 		id: clipboardProxy
+		width: 0
+		height: 0
 		visible: false
 		readOnly: true
 	}
