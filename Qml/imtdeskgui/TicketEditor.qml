@@ -1654,6 +1654,11 @@ DocumentViewBase {
 							}
 						}
 
+						Item {
+							width: parent.width - x
+							height: 1
+						}
+
 						Row {
 							id: participantsRow
 							anchors.verticalCenter: parent.verticalCenter
@@ -1678,11 +1683,6 @@ DocumentViewBase {
 									}
 								}
 							}
-						}
-
-						Item {
-							width: parent.width - x
-							height: 1
 						}
 
 						Text {
