@@ -42,6 +42,15 @@ QString escapeSql(const QString& value)
 	return escaped;
 }
 
+QString escapeSqlLikePattern(const QString& value)
+{
+	QString escaped = escapeSql(value);
+	escaped.replace("\\", "\\\\");
+	escaped.replace("%", "\\%");
+	escaped.replace("_", "\\_");
+	return escaped;
+}
+
 QString createVisibilityCondition(
 		const imtgql::IGqlContext* contextPtr,
 		const imtbase::IObjectCollection* userCollectionPtr)
@@ -56,6 +65,7 @@ QString createVisibilityCondition(
 	}
 
 	const QString escapedUserId = escapeSql(QString::fromUtf8(userId));
+	const QString escapedUserIdForLike = escapeSqlLikePattern(QString::fromUtf8(userId));
 	QStringList reporterIdsForSameGroup;
 
 	const imtauth::IUserInfo* currentUserInfoPtr = contextPtr->GetUserInfo();
@@ -100,27 +110,12 @@ QString createVisibilityCondition(
 
 	QStringList visibilityConditions;
 	visibilityConditions << QString("\"ReporterId\"='%1'").arg(escapedUserId);
-	visibilityConditions << QString("(\"AssigneeIds\" IS NOT NULL AND (',' || \"AssigneeIds\" || ',') LIKE '%%,%1,%%')").arg(escapedUserId);
+	visibilityConditions << QString("(\"AssigneeIds\" IS NOT NULL AND (',' || \"AssigneeIds\" || ',') LIKE '%%,%1,%%' ESCAPE '\\\\')").arg(escapedUserIdForLike);
 	if (!reporterIdsForSameGroup.isEmpty()){
 		visibilityConditions << QString("\"ReporterId\" IN (%1)").arg(reporterIdsForSameGroup.join(", "));
 	}
 
 	return QString("(%1)").arg(visibilityConditions.join(" OR "));
-}
-
-QString appendWhereOrAnd(const QString& query, const QString& condition)
-{
-	if (condition.isEmpty()){
-		return query;
-	}
-
-	QString result = query;
-	if (result.contains(" WHERE ", Qt::CaseInsensitive)){
-		result += QString(" AND %1").arg(condition);
-	} else {
-		result += QString(" WHERE %1").arg(condition);
-	}
-	return result;
 }
 
 } // anonymous namespace
@@ -154,22 +149,7 @@ QByteArray CSupportTicketDbDelegateComp::GetSelectionQuery(
 	}
 
 	const QString baseQueryStr = QString::fromUtf8(baseQuery);
-
-	if (!objectId.isEmpty()){
-		return appendWhereOrAnd(baseQueryStr, visibilityCondition).toUtf8();
-	}
-
-	if (baseQueryStr.startsWith("(")){
-		int closingBracketPos = baseQueryStr.lastIndexOf(')');
-		if (closingBracketPos > 0){
-			QString innerQuery = baseQueryStr.mid(1, closingBracketPos - 1);
-			QString tail = baseQueryStr.mid(closingBracketPos + 1);
-			innerQuery = appendWhereOrAnd(innerQuery, visibilityCondition);
-			return QString("(%1)%2").arg(innerQuery, tail).toUtf8();
-		}
-	}
-
-	return QString("SELECT * FROM (%1) AS \"VisibleTickets\" WHERE %2")
+	return QString("SELECT * FROM (%1) AS \"__ImtTicketVisibilityQuery\" WHERE %2")
 			.arg(baseQueryStr, visibilityCondition).toUtf8();
 }
 
