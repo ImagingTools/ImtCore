@@ -56,11 +56,6 @@ I_EXPORT_COMPONENT(
 			"In-Process QML Bridge DataModel DataController Demultiplexer");
 
 I_EXPORT_COMPONENT(
-			DataModelBridgeBase,
-			"Base icomp component implementing imtqml::IDataModelBridge with a 'ModelId' attribute - intended to be inherited by per-model bridges that override GetModel/SetModel; default IsSupported compares the requested modelId against the ModelId attribute, so the bridge can be plugged into the DataModelBridge demultiplexer as a delegate. Resolved through icomp; not exposed to QML.",
-			"In-Process QML Bridge DataModel DataController Base");
-
-I_EXPORT_COMPONENT(
 			PageGuiElementModel,
 			"Page based model",
 			"Page Based Model");

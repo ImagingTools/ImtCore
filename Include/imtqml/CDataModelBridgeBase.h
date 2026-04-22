@@ -49,7 +49,7 @@ class CDataModelBridgeBase:
 public:
 	typedef icomp::CComponentBase BaseClass;
 
-	I_BEGIN_COMPONENT(CDataModelBridgeBase);
+	I_BEGIN_BASE_COMPONENT(CDataModelBridgeBase);
 		I_REGISTER_INTERFACE(IDataModelBridge);
 		I_ASSIGN(m_modelIdAttrPtr, "ModelId",
 				"Identifier of the data model served by this bridge", false, "");
