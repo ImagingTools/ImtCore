@@ -61,8 +61,8 @@ DocumentViewBase {
 	property int _unreadMessagesCount: 0
 	property string _chatActionHint: ""
 	readonly property int chatHintDurationMs: 2200
-	readonly property int chatHintHeight: 28
-	readonly property int unreadHintHeight: 34
+	readonly property int chatHintHeightPx: 28
+	readonly property int unreadHintHeightPx: 34
 	
 	signal commentSubmitted(string commentText)
 
@@ -566,7 +566,7 @@ DocumentViewBase {
 		readonly property string focusedAttachmentBgColor: "#ECF3FF"
 		readonly property string imageAttachmentBgColor: "#EEF2F8"
 		readonly property string fileAttachmentBgColor: "#F6F8FC"
-		readonly property string chatHintBgColor: Style.textColor
+		readonly property string chatHintBgColor: editView.cardColor
 		readonly property int unreadResetThreshold: 30
 		readonly property int unreadDetectThreshold: 40
 		readonly property int autoStickBottomThreshold: 80
@@ -1690,10 +1690,12 @@ DocumentViewBase {
 					anchors.topMargin: Style.spacingS
 					anchors.horizontalCenter: parent.horizontalCenter
 					radius: Style.radiusL
-					height: root.chatHintHeight
+					height: root.chatHintHeightPx
 					width: chatHintText.contentWidth + Style.paddingM * 2
 					color: editView.chatHintBgColor
-					opacity: 0.9
+					border.color: editView.cardBorderColor
+					border.width: 1
+					opacity: 0.97
 					z: 3
 
 					Text {
@@ -1701,7 +1703,7 @@ DocumentViewBase {
 						anchors.centerIn: parent
 						text: root._chatActionHint
 						font.pixelSize: Style.fontSizeM - 1
-						color: Style.baseColor
+						color: Style.textColor
 					}
 				}
 				
@@ -2139,7 +2141,7 @@ DocumentViewBase {
 					anchors.bottomMargin: Style.spacingM
 					radius: Style.radiusL
 					color: editView.accentColor
-					height: root.unreadHintHeight
+					height: root.unreadHintHeightPx
 					width: unreadHintRow.width + Style.paddingM * 2
 					z: 2
 
