@@ -1768,12 +1768,12 @@ DocumentViewBase {
 					}
 
 					function isNearBottom(threshold) {
-						var edge = threshold
-						if (edge === undefined || edge === null) {
-							edge = editView.unreadDetectThreshold
+						var pixelThreshold = threshold
+						if (pixelThreshold === undefined || pixelThreshold === null) {
+							pixelThreshold = editView.unreadDetectThreshold
 						}
 						var maxY = Math.max(0, contentHeight - height)
-						return maxY <= 0 || contentY >= maxY - edge
+						return maxY <= 0 || contentY >= maxY - pixelThreshold
 					}
 					
 					function scrollToMessage(msgId) {
