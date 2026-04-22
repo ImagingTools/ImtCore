@@ -304,7 +304,8 @@ class TextEdit extends Item {
 
     applyMetrics(){
         const text = this.getPropertyValue('text') || ''
-        let textMetrics = TextFontController.measureText(
+        this.impl.textContent = text
+        const textMetrics = TextFontController.measureText(
             text,
             this.getProperty('font'),
             this.getProperty('width').auto ? 0 : this.getProperty('width').get(),
@@ -312,25 +313,14 @@ class TextEdit extends Item {
             this.getPropertyValue('wrapMode'),
             TextFontController.ElideNone
         )
+        const height = Math.max(textMetrics.height, this.getProperty('font').getProperty('pixelSize').get())
 
-        if(textMetrics.isHTML){
-            this.impl.innerHTML = text.replaceAll('\n', '<br>') + '.'
-            this.updateGeometry()
-
-        } else {
-            this.impl.innerText = text + '.'
-            this.getProperty('width').setAuto(textMetrics.width)
-            this.getProperty('height').setAuto(textMetrics.height)
-
-            this.getProperty('contentWidth').reset(textMetrics.width)
-            this.getProperty('contentHeight').reset(textMetrics.height)
-            this.getProperty('paintedWidth').reset(textMetrics.width)
-            this.getProperty('paintedHeight').reset(textMetrics.height)
-            
-        }
-
-
-        
+        this.getProperty('width').setAuto(textMetrics.width)
+        this.getProperty('height').setAuto(height)
+        this.getProperty('contentWidth').reset(textMetrics.width)
+        this.getProperty('contentHeight').reset(height)
+        this.getProperty('paintedWidth').reset(textMetrics.width)
+        this.getProperty('paintedHeight').reset(height)
     }
 
     updateGeometry(){
