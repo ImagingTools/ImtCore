@@ -336,7 +336,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSupportTicketDbDelegateComp::Cre
 	// Build labelIds as comma-separated string
 	QStringList labelStrs;
 	for (const QByteArray& lid : ticketPtr->GetLabelIds()){
-		labelStrs.append(QString::fromUtf8(lid));
+		labelStrs.append(EscapeSql(QString::fromUtf8(lid)));
 	}
 	const QString labelIdsStr = labelStrs.join(',');
 	const QString labelsSql = labelIdsStr.isEmpty() ? "NULL" : QString("'%1'").arg(labelIdsStr);
@@ -432,7 +432,7 @@ QByteArray CSupportTicketDbDelegateComp::CreateUpdateObjectQuery(
 	// Build labelIds as comma-separated string
 	QStringList labelStrs;
 	for (const QByteArray& lid : ticketPtr->GetLabelIds()){
-		labelStrs.append(QString::fromUtf8(lid));
+		labelStrs.append(EscapeSql(QString::fromUtf8(lid)));
 	}
 	const QString labelIdsStr = labelStrs.join(',');
 	const QString labelsSql = labelIdsStr.isEmpty() ? "NULL" : QString("'%1'").arg(labelIdsStr);
