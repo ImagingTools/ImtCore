@@ -26,23 +26,19 @@ namespace imtdeskdb
 {
 
 
-namespace
-{
-
-// Helper: return current UTC timestamp in ISO 8601 with milliseconds
-QString utcNow()
+QString CSupportTicketDbDelegateComp::UtcNow() const
 {
 	return QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
 }
 
-QString escapeSql(const QString& value)
+QString CSupportTicketDbDelegateComp::EscapeSql(const QString& value) const
 {
 	QString escaped = value;
 	escaped.replace('\'', "''");
 	return escaped;
 }
 
-QString escapeSqlLikePattern(const QString& value)
+QString CSupportTicketDbDelegateComp::EscapeSqlLikePattern(const QString& value) const
 {
 	QString escaped = value;
 	escaped.replace("\\", "\\\\");
@@ -52,9 +48,7 @@ QString escapeSqlLikePattern(const QString& value)
 	return escaped;
 }
 
-QString createVisibilityCondition(
-		const imtgql::IGqlContext* contextPtr,
-		const imtbase::IObjectCollection* userCollectionPtr)
+QString CSupportTicketDbDelegateComp::CreateVisibilityCondition(const imtgql::IGqlContext* contextPtr) const
 {
 	if (contextPtr == nullptr){
 		return QString();
@@ -65,18 +59,18 @@ QString createVisibilityCondition(
 		return QString();
 	}
 
-	const QString escapedUserId = escapeSql(QString::fromUtf8(userId));
-	const QString escapedUserIdForLike = escapeSqlLikePattern(QString::fromUtf8(userId));
+	const QString escapedUserId = EscapeSql(QString::fromUtf8(userId));
+	const QString escapedUserIdForLike = EscapeSqlLikePattern(QString::fromUtf8(userId));
 	const QString assigneeLikePattern = QString("%%,%1,%%").arg(escapedUserIdForLike);
 	QStringList reporterIdsForSameGroup;
 
 	const imtauth::IUserInfo* currentUserInfoPtr = contextPtr->GetUserInfo();
-	if (currentUserInfoPtr != nullptr && userCollectionPtr != nullptr){
+	if (currentUserInfoPtr != nullptr && m_userCollectionCompPtr.IsValid()){
 		const QByteArrayList currentUserGroups = currentUserInfoPtr->GetGroups();
 		if (!currentUserGroups.isEmpty()){
 			QSet<QByteArray> currentGroupsSet(currentUserGroups.begin(), currentUserGroups.end());
 			istd::TDelPtr<imtbase::IObjectCollectionIterator> usersIteratorPtr(
-				userCollectionPtr->CreateObjectCollectionIterator(QByteArray(), 0, -1, nullptr));
+				m_userCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), 0, -1, nullptr));
 			if (usersIteratorPtr.IsValid()){
 				while (usersIteratorPtr->Next()){
 					imtbase::IObjectCollection::DataPtr dataPtr;
@@ -100,7 +94,7 @@ QString createVisibilityCondition(
 					}
 
 					if (sameGroup){
-						const QString escapedReporterId = escapeSql(QString::fromUtf8(userInfoPtr->GetId()));
+						const QString escapedReporterId = EscapeSql(QString::fromUtf8(userInfoPtr->GetId()));
 						if (!escapedReporterId.isEmpty()){
 							reporterIdsForSameGroup << QString("'%1'").arg(escapedReporterId);
 						}
@@ -119,8 +113,6 @@ QString createVisibilityCondition(
 
 	return QString("(%1)").arg(visibilityConditions.join(" OR "));
 }
-
-} // anonymous namespace
 
 
 QByteArray CSupportTicketDbDelegateComp::GetSelectionQuery(
@@ -144,7 +136,7 @@ QByteArray CSupportTicketDbDelegateComp::GetSelectionQuery(
 		return baseQuery;
 	}
 
-	const QString visibilityCondition = createVisibilityCondition(contextPtr, m_userCollectionCompPtr.GetPtr());
+	const QString visibilityCondition = CreateVisibilityCondition(contextPtr);
 	if (visibilityCondition.isEmpty()){
 		return QString("SELECT * FROM (%1) AS \"FilteredTickets\" WHERE 1=0")
 				.arg(QString::fromUtf8(baseQuery)).toUtf8();
@@ -351,7 +343,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSupportTicketDbDelegateComp::Cre
 
 	const QString lockReasonSql = ticketPtr->GetLockReason().isEmpty() ? "NULL" : QString("'%1'").arg(ticketPtr->GetLockReason());
 
-	const QString nowUtc = utcNow();
+	const QString nowUtc = UtcNow();
 
 	QString combinedQuery;
 
@@ -445,7 +437,7 @@ QByteArray CSupportTicketDbDelegateComp::CreateUpdateObjectQuery(
 
 	const QString lockReasonSql = ticketPtr->GetLockReason().isEmpty() ? "NULL" : QString("'%1'").arg(ticketPtr->GetLockReason());
 
-	const QString nowUtc = utcNow();
+	const QString nowUtc = UtcNow();
 
 	QString combinedQuery;
 
@@ -552,7 +544,7 @@ QByteArray CSupportTicketDbDelegateComp::CreateRenameObjectQuery(
 
 	return QString("UPDATE \"Tickets\" SET \"Title\"='%1', \"UpdatedAt\"='%2' WHERE \"Id\"='%3';")
 		.arg(newObjectName)
-		.arg(utcNow())
+		.arg(UtcNow())
 		.arg(QString::fromUtf8(objectId))
 		.toUtf8();
 }
@@ -570,7 +562,7 @@ QByteArray CSupportTicketDbDelegateComp::CreateDescriptionObjectQuery(
 
 	return QString("UPDATE \"Tickets\" SET \"Description\"='%1', \"UpdatedAt\"='%2' WHERE \"Id\"='%3';")
 		.arg(description)
-		.arg(utcNow())
+		.arg(UtcNow())
 		.arg(QString::fromUtf8(objectId))
 		.toUtf8();
 }

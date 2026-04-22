@@ -5,6 +5,7 @@
 #include <imtdesk/ISupportTicket.h>
 #include <imtdb/CSqlDatabaseObjectDelegateCompBase.h>
 #include <imtbase/IObjectCollection.h>
+#include <imtgql/IGqlContext.h>
 
 
 namespace imtdeskdb
@@ -74,6 +75,11 @@ protected:
 	virtual bool SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const override;
 
 private:
+	QString UtcNow() const;
+	QString EscapeSql(const QString& value) const;
+	QString EscapeSqlLikePattern(const QString& value) const;
+	QString CreateVisibilityCondition(const imtgql::IGqlContext* contextPtr) const;
+
 	I_FACT(imtdesk::ISupportTicket, m_ticketFactCompPtr);
 	I_FACT(imtbase::IObjectCollection, m_userCollectionCompPtr);
 };
