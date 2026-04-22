@@ -108,6 +108,7 @@ DocumentViewBase {
 	}
 
 	function formatChatExportText() {
+		var tabSep = "\t"
 		var lines = []
 		lines.push(qsTr("Comments export"))
 		lines.push("")
@@ -122,26 +123,27 @@ DocumentViewBase {
 			if (!item) continue
 
 			var linePrefix = String(i + 1) + "."
-			lines.push(linePrefix + "\t" + root.formatTimestamp(item.m_timestamp) + "\t" + (item.m_userName || qsTr("Unknown")))
+			lines.push(linePrefix + tabSep + root.formatTimestamp(item.m_timestamp) + tabSep + (item.m_userName || qsTr("Unknown")))
 			var contentText = String(item.m_content || "")
 			var contentLines = contentText.replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n")
 			if (contentLines.length === 0 || (contentLines.length === 1 && contentLines[0].length === 0)) {
-				lines.push("\t" + qsTr("Message") + "\t")
+				lines.push(tabSep + qsTr("Message") + tabSep)
 			} else {
-				lines.push("\t" + qsTr("Message") + "\t" + contentLines[0])
+				lines.push(tabSep + qsTr("Message") + tabSep + contentLines[0])
 				for (var c = 1; c < contentLines.length; c++) {
-					lines.push("\t\t" + contentLines[c])
+					lines.push(tabSep + tabSep + contentLines[c])
 				}
 			}
 
 			if (item.m_replyToId && item.m_replyToId.length > 0) {
-				lines.push("\t↳\t" + (item.m_replyToUserName || qsTr("Unknown")) + "\t" + (item.m_replyToContent || ""))
+				lines.push(tabSep + "↳" + tabSep + (item.m_replyToUserName || qsTr("Unknown")) + tabSep + (item.m_replyToContent || ""))
 			}
 
 			var attachments = item.m_attachments || []
-			for (var a = 0; a < attachments.length; a++) {
-				var att = attachments[a]
-				lines.push("\t" + qsTr("Attachment") + "\t" + (att.m_fileName || qsTr("file")) + "\t" + (att.m_preview || ""))
+			var attachmentCount = attachments.length !== undefined ? attachments.length : (attachments.count || 0)
+			for (var a = 0; a < attachmentCount; a++) {
+				var att = attachments.length !== undefined ? attachments[a] : (attachments.get(a).item || attachments.get(a))
+				lines.push(tabSep + qsTr("Attachment") + tabSep + (att.m_fileName || qsTr("file")) + tabSep + (att.m_preview || ""))
 			}
 			lines.push("")
 		}
@@ -561,6 +563,10 @@ DocumentViewBase {
 		readonly property string focusedAttachmentBgColor: "#ECF3FF"
 		readonly property string imageAttachmentBgColor: "#EEF2F8"
 		readonly property string fileAttachmentBgColor: "#F6F8FC"
+		readonly property string chatHintBgColor: Style.textColor
+		readonly property int unreadResetThreshold: 30
+		readonly property int unreadDetectThreshold: 40
+		readonly property int autoStickBottomThreshold: 80
 		// Fixed widths for top groups (left = Title/Desc/Context and Messages, right = Properties)
 		readonly property real detailsWidth: 700
 		readonly property real propertiesWidth: 320
@@ -1683,7 +1689,7 @@ DocumentViewBase {
 					radius: Style.radiusL
 					height: 28
 					width: chatHintText.contentWidth + Style.paddingM * 2
-					color: "#30343A"
+					color: editView.chatHintBgColor
 					opacity: 0.9
 					z: 3
 
@@ -1755,7 +1761,7 @@ DocumentViewBase {
 					}
 
 					onContentHeightChanged: {
-						if (root._forceScrollToBottom || isNearBottom(80)) {
+						if (root._forceScrollToBottom || isNearBottom(editView.autoStickBottomThreshold)) {
 							scrollToBottom()
 							root._unreadMessagesCount = 0
 							root._forceScrollToBottom = false
@@ -1764,13 +1770,13 @@ DocumentViewBase {
 					
 					onHeightChanged: {
 						var maxY = contentHeight - height
-						if (maxY > 0 && isNearBottom(80)) {
+						if (maxY > 0 && isNearBottom(editView.autoStickBottomThreshold)) {
 							contentY = maxY
 						}
 					}
 
 					onContentYChanged: {
-						if (isNearBottom(30) && root._unreadMessagesCount !== 0) {
+						if (isNearBottom(editView.unreadResetThreshold) && root._unreadMessagesCount !== 0) {
 							root._unreadMessagesCount = 0
 						}
 					}
@@ -1796,9 +1802,17 @@ DocumentViewBase {
 									}
 
 									if (count > root._lastKnownCommentCount
-											&& !commentsFlick.isNearBottom(40)
+											&& !commentsFlick.isNearBottom(editView.unreadDetectThreshold)
 											&& !root._forceScrollToBottom) {
-										root._unreadMessagesCount += (count - root._lastKnownCommentCount)
+										var unreadDelta = 0
+										for (var msgIndex = root._lastKnownCommentCount; msgIndex < count; msgIndex++) {
+											var msgWrapper = root.ticketData.m_comments.get(msgIndex)
+											var msgItem = msgWrapper ? msgWrapper.item : null
+											if (msgItem && msgItem.m_userId !== root.currentUserId) {
+												unreadDelta++
+											}
+										}
+										root._unreadMessagesCount += unreadDelta
 									}
 									root._lastKnownCommentCount = count
 								}
@@ -2113,7 +2127,7 @@ DocumentViewBase {
 				}
 
 				Rectangle {
-					visible: root._unreadMessagesCount > 0 && !commentsFlick.isNearBottom(24)
+					visible: root._unreadMessagesCount > 0 && !commentsFlick.isNearBottom(editView.unreadResetThreshold)
 					anchors.right: parent.right
 					anchors.rightMargin: editView.cardPadding
 					anchors.bottom: addCommentSection.visible ? addCommentSection.top
