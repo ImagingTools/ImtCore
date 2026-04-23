@@ -30,6 +30,9 @@ Dialog {
 
 	Component.onCompleted: {
 		addButton(Enums.cancel, qsTr("Close"), true)
+	}
+
+	onStarted: {
 		reloadTickets()
 	}
 
@@ -89,10 +92,8 @@ Dialog {
 							spacing: Style.marginS
 
 							Button {
-								width: Style.buttonWidthL
-								height: Style.controlHeightM
 								text: qsTr("Create")
-								enabled: ticketFields.titleText.trim().length > 0
+								enabled: ticketFields.titleText.length > 0
 								onClicked: {
 									root.createTicket(ticketFields.titleText, ticketFields.descriptionText)
 								}
@@ -224,6 +225,7 @@ Dialog {
 			return
 		}
 
+		console.log("appendTicketItems", itemsModel.toJson())
 		let count = 0
 		if (itemsModel.count !== undefined) {
 			count = itemsModel.count
