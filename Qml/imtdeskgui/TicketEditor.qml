@@ -95,6 +95,16 @@ DocumentViewBase {
 		.replace(/\n/g, "<br>")
 	}
 
+	function normalizeUserId(userId) {
+		if (userId === undefined || userId === null)
+			return ""
+		return String(userId).trim().replace(/[{}]/g, "").toLowerCase()
+	}
+
+	function isSameUserId(leftId, rightId) {
+		return normalizeUserId(leftId) === normalizeUserId(rightId)
+	}
+
 	function isImageAttachment(fileName) {
 		if (!fileName) return false
 		var lower = String(fileName).toLowerCase()
@@ -1851,7 +1861,10 @@ DocumentViewBase {
 										for (var msgIndex = root._lastKnownCommentCount; msgIndex < count; msgIndex++) {
 											var msgWrapper = commentsModel.get(msgIndex)
 											var msgItem = msgWrapper ? msgWrapper.item : null
-											if (msgItem && msgItem.m_userId !== root.currentUserId) {
+											var serverMessageId = msgItem && msgItem.m_id ? String(msgItem.m_id) : ""
+											if (msgItem
+													&& serverMessageId.length > 0
+													&& !root.isSameUserId(msgItem.m_userId, root.currentUserId)) {
 												unreadDelta++
 											}
 										}
@@ -1865,10 +1878,12 @@ DocumentViewBase {
 									width: commentsListCol.width
 									height: commentBubbleCol.height + topGap
 									
-									readonly property bool isMe: model.item.m_userId === root.currentUserId
+									readonly property bool isMe: root.isSameUserId(model.item.m_userId, root.currentUserId)
 									readonly property var dataModel: model.item
 									readonly property string _prevUserId: index > 0 && commentsThread.itemAt(index - 1) ? commentsThread.itemAt(index - 1).dataModel.m_userId : ""
-									readonly property bool isGroupedWithPrev: index > 0 && _prevUserId === model.item.m_userId && _prevUserId.length > 0
+									readonly property bool isGroupedWithPrev: index > 0
+																			  && _prevUserId.length > 0
+																			  && root.isSameUserId(_prevUserId, model.item.m_userId)
 									readonly property int topGap: index === 0 ? 0 : (isGroupedWithPrev ? 2 : Style.spacingS)
 									
 									Column {

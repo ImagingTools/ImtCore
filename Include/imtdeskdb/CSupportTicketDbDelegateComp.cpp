@@ -193,24 +193,6 @@ istd::IChangeableUniquePtr CSupportTicketDbDelegateComp::CreateObjectFromRecord(
 	if (record.contains("MessageId")){
 		ticketPtr->SetMessageId(record.value("MessageId").toByteArray());
 	}
-	if (record.contains("Tags")){
-		const QString tagsStr = record.value("Tags").toString();
-		QStringList tags;
-		if (!tagsStr.isEmpty()){
-			tags = tagsStr.split(',');
-		}
-		ticketPtr->SetTags(tags);
-	}
-	if (record.contains("LabelIds")){
-		const QString labelsStr = record.value("LabelIds").toString();
-		QByteArrayList labelIds;
-		if (!labelsStr.isEmpty()){
-			for (const QString& s : labelsStr.split(',')){
-				labelIds.append(s.trimmed().toUtf8());
-			}
-		}
-		ticketPtr->SetLabelIds(labelIds);
-	}
 	if (record.contains("Locked")){
 		ticketPtr->SetLocked(record.value("Locked").toBool());
 	}
@@ -310,22 +292,11 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSupportTicketDbDelegateComp::Cre
 	const QString resolvedAt = ticketPtr->GetResolvedAt();
 	const QString closedAt = ticketPtr->GetClosedAt();
 
-	const QString assigneesSql = assigneeIdsStr.isEmpty() ? "NULL" : QString("'%1'").arg(assigneeIdsStr);
+	const QString assigneesSql = assigneeIdsStr.isEmpty() ? "''" : QString("'%1'").arg(assigneeIdsStr);
 	const QString convSql = conversationId.isEmpty() ? "NULL" : QString("'%1'").arg(conversationId);
 	const QString msgSql = messageId.isEmpty() ? "NULL" : QString("'%1'").arg(messageId);
 	const QString resolvedSql = resolvedAt.isEmpty() ? "NULL" : QString("'%1'").arg(resolvedAt);
 	const QString closedSql = closedAt.isEmpty() ? "NULL" : QString("'%1'").arg(closedAt);
-
-	const QString tagsStr = ticketPtr->GetTags().join(',');
-	const QString tagsSql = tagsStr.isEmpty() ? "NULL" : QString("'%1'").arg(tagsStr);
-
-	// Build labelIds as comma-separated string
-	QStringList labelStrs;
-	for (const QByteArray& lid : ticketPtr->GetLabelIds()){
-		labelStrs.append(EscapeSql(QString::fromUtf8(lid)));
-	}
-	const QString labelIdsStr = labelStrs.join(',');
-	const QString labelsSql = labelIdsStr.isEmpty() ? "NULL" : QString("'%1'").arg(labelIdsStr);
 
 	const QString lockReasonSql = ticketPtr->GetLockReason().isEmpty()
 			? "NULL"
@@ -340,9 +311,9 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSupportTicketDbDelegateComp::Cre
 		"INSERT INTO \"Tickets\" "
 		"(\"Id\", \"Title\", \"Description\", \"TicketType\", \"Status\", \"StateReason\", \"Priority\", "
 		"\"AssigneeIds\", \"ReporterId\", \"ConversationId\", \"MessageId\", "
-		"\"Tags\", \"LabelIds\", \"Locked\", \"LockReason\", "
+		"\"Locked\", \"LockReason\", "
 		"\"ResolvedAt\", \"ClosedAt\", \"CreatedAt\", \"UpdatedAt\") "
-		"VALUES('%1', '%2', '%3', %4, %5, %6, %7, %8, '%9', %10, %11, %12, %13, %14, %15, %16, %17, '%18', '%19');")
+		"VALUES('%1', '%2', '%3', %4, %5, %6, %7, %8, '%9', %10, %11, %12, %13, %14, %15, '%16', '%17');")
 		.arg(QString::fromUtf8(ticketId))
 		.arg(title)
 		.arg(ticketPtr->GetDescription())
@@ -354,8 +325,6 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSupportTicketDbDelegateComp::Cre
 		.arg(reporterId)
 		.arg(convSql)
 		.arg(msgSql)
-		.arg(tagsSql)
-		.arg(labelsSql)
 		.arg(ticketPtr->IsLocked() ? "TRUE" : "FALSE")
 		.arg(lockReasonSql)
 		.arg(resolvedSql)
@@ -407,21 +376,11 @@ QByteArray CSupportTicketDbDelegateComp::CreateUpdateObjectQuery(
 	const QString messageId = QString::fromUtf8(ticketPtr->GetMessageId());
 	const QString resolvedAt = ticketPtr->GetResolvedAt();
 	const QString closedAt = ticketPtr->GetClosedAt();
-	const QString assigneesSql = assigneeIdsStr.isEmpty() ? "NULL" : QString("'%1'").arg(assigneeIdsStr);
+	const QString assigneesSql = assigneeIdsStr.isEmpty() ? "''" : QString("'%1'").arg(assigneeIdsStr);
 	const QString convSql = conversationId.isEmpty() ? "NULL" : QString("'%1'").arg(conversationId);
 	const QString msgSql = messageId.isEmpty() ? "NULL" : QString("'%1'").arg(messageId);
 	const QString resolvedSql = resolvedAt.isEmpty() ? "NULL" : QString("'%1'").arg(resolvedAt);
 	const QString closedSql = closedAt.isEmpty() ? "NULL" : QString("'%1'").arg(closedAt);
-	const QString tagsStr = ticketPtr->GetTags().join(',');
-	const QString tagsSql = tagsStr.isEmpty() ? "NULL" : QString("'%1'").arg(tagsStr);
-
-	// Build labelIds as comma-separated string
-	QStringList labelStrs;
-	for (const QByteArray& lid : ticketPtr->GetLabelIds()){
-		labelStrs.append(EscapeSql(QString::fromUtf8(lid)));
-	}
-	const QString labelIdsStr = labelStrs.join(',');
-	const QString labelsSql = labelIdsStr.isEmpty() ? "NULL" : QString("'%1'").arg(labelIdsStr);
 
 	const QString lockReasonSql = ticketPtr->GetLockReason().isEmpty()
 			? "NULL"
@@ -442,14 +401,12 @@ QByteArray CSupportTicketDbDelegateComp::CreateUpdateObjectQuery(
 		"\"AssigneeIds\"=%7, "
 		"\"ConversationId\"=%8, "
 		"\"MessageId\"=%9, "
-		"\"Tags\"=%10, "
-		"\"LabelIds\"=%11, "
-		"\"Locked\"=%12, "
-		"\"LockReason\"=%13, "
-		"\"ResolvedAt\"=%14, "
-		"\"ClosedAt\"=%15, "
-		"\"UpdatedAt\"='%16' "
-		"WHERE \"Id\"='%17';")
+		"\"Locked\"=%10, "
+		"\"LockReason\"=%11, "
+		"\"ResolvedAt\"=%12, "
+		"\"ClosedAt\"=%13, "
+		"\"UpdatedAt\"='%14' "
+		"WHERE \"Id\"='%15';")
 		.arg(ticketPtr->GetTitle())
 		.arg(ticketPtr->GetDescription())
 		.arg(ticketPtr->GetTicketType())
@@ -459,8 +416,6 @@ QByteArray CSupportTicketDbDelegateComp::CreateUpdateObjectQuery(
 		.arg(assigneesSql)
 		.arg(convSql)
 		.arg(msgSql)
-		.arg(tagsSql)
-		.arg(labelsSql)
 		.arg(ticketPtr->IsLocked() ? "TRUE" : "FALSE")
 		.arg(lockReasonSql)
 		.arg(resolvedSql)
@@ -638,6 +593,17 @@ void CSupportTicketDbDelegateComp::OnComponentCreated()
 						<< "\n\t| Error:" << junctionError
 						<< "\n\t| Query:" << junctionQuery;
 			SendErrorMessage(0, QString("TicketEntityReferences table could not be created: %1").arg(junctionError.text()));
+		}
+	}
+
+	// Normalize existing records: keep empty assignee list as empty string.
+	{
+		QSqlError migrationError;
+		m_databaseEngineCompPtr->ExecSqlQuery(
+			"UPDATE \"Tickets\" SET \"AssigneeIds\"='' WHERE \"AssigneeIds\" IS NULL;",
+			&migrationError);
+		if (migrationError.type() != QSqlError::NoError){
+			qWarning() << "Tickets.AssigneeIds normalization warning:" << migrationError.text();
 		}
 	}
 }

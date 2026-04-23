@@ -4,8 +4,6 @@ CREATE TABLE IF NOT EXISTS "${TableScheme}"."Messages"
     "ConversationId"   UUID NOT NULL,
     "SenderId"         UUID NOT NULL,
     "Content"          TEXT NOT NULL,
-    "EntityReferences" JSONB,
-    "Reactions"        JSONB,
     "Status"           INTEGER NOT NULL DEFAULT 0,
     "ReplyToId"        UUID,
     "CreatedAt"        TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
