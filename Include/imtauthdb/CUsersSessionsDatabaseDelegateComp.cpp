@@ -28,7 +28,7 @@ QByteArray CUsersSessionsDatabaseDelegateComp::GetSelectionQuery(
 {
 	if (!objectId.isEmpty()){
 		return QString("SELECT * FROM \"%1\" WHERE \"%2\" = '%3'")
-			.arg(qPrintable(*m_tableNameAttrPtr), qPrintable(*m_objectIdColumnAttrPtr), qPrintable(objectId)).toUtf8();
+			.arg(qPrintable(*m_tableNameAttrPtr), qPrintable(*m_objectIdColumnAttrPtr), SqlEncode(QString::fromUtf8(objectId))).toUtf8();
 	}
 
 	QString filterQuery;
@@ -102,7 +102,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUsersSessionsDatabaseDelegateCom
 	NewObjectQuery retVal;
 
 	retVal.query += QString("\nINSERT INTO \"UserSessions\" (\"Id\", \"RefreshToken\", \"UserId\", \"CreationDate\", \"ExpirationDate\") VALUES ('%0', '%1', '%2', '%3', '%4');")
-				.arg(qPrintable(proposedObjectId), qPrintable(token), qPrintable(userId), creationDate.toString(Qt::ISODate), expirationDate.toString(Qt::ISODate)).toUtf8();
+				.arg(SqlEncode(QString::fromUtf8(proposedObjectId)), SqlEncode(QString::fromUtf8(token)), SqlEncode(QString::fromUtf8(userId)), creationDate.toString(Qt::ISODate), expirationDate.toString(Qt::ISODate)).toUtf8();
 
 	return retVal;
 }
@@ -130,11 +130,11 @@ QByteArray CUsersSessionsDatabaseDelegateComp::CreateUpdateObjectQuery(
 	retVal += QString("\nUPDATE \"%0\" SET \"RefreshToken\" = '%1', \"CreationDate\" = '%2', \"ExpirationDate\" = '%3' WHERE \"%4\" = '%5'")
 				  .arg(
 					  qPrintable(*m_tableNameAttrPtr),
-					  qPrintable(token),
+					  SqlEncode(QString::fromUtf8(token)),
 					creationDate.toString(Qt::ISODate),
 					expirationDate.toString(Qt::ISODate),
 					qPrintable(*m_objectIdColumnAttrPtr),
-					qPrintable(objectId)).toUtf8();
+					SqlEncode(QString::fromUtf8(objectId))).toUtf8();
 
 	return retVal;
 }
@@ -157,7 +157,7 @@ QByteArray CUsersSessionsDatabaseDelegateComp::CreateDeleteObjectsQuery(
 	
 	QStringList quotedIds;
 	for (const QByteArray& objectId : objectIds){
-		quotedIds << QString("'%1'").arg(qPrintable(objectId));
+		quotedIds << QString("'%1'").arg(SqlEncode(QString::fromUtf8(objectId)));
 	}
 	
 	QString query = QString(
@@ -181,7 +181,7 @@ bool CUsersSessionsDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsSe
 			return false;
 		}
 
-		filterQuery += QString(R"( WHERE "RefreshToken" = '%1')").arg(textParamPtr->GetText());
+		filterQuery += QString(R"( WHERE "RefreshToken" = '%1')").arg(SqlEncode(textParamPtr->GetText()));
 
 		return true;
 	}

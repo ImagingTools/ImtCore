@@ -29,7 +29,7 @@ QByteArray CUsersSettingsDatabaseDelegateComp::GetSelectionQuery(
 		return QString("SELECT * FROM \"%1\" WHERE \"%2\" = '%3'")
 					.arg(qPrintable(*m_tableNameAttrPtr))
 					.arg(qPrintable(*m_objectIdColumnAttrPtr))
-					.arg(qPrintable(objectId))
+					.arg(SqlEncode(QString::fromUtf8(objectId)))
 					.toUtf8();
 	}
 
@@ -107,8 +107,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUsersSettingsDatabaseDelegateCom
 	NewObjectQuery retVal;
 
 	retVal.query += QString("\nINSERT INTO \"UserSettings\" (\"UserId\", \"Settings\") VALUES ('%1', '%2');")
-				.arg(qPrintable(userId))
-				.arg(qPrintable(data)).toUtf8();
+				.arg(SqlEncode(QString::fromUtf8(userId)))
+				.arg(SqlEncode(QString::fromUtf8(data))).toUtf8();
 
 	return retVal;
 }
@@ -125,7 +125,7 @@ QByteArray CUsersSettingsDatabaseDelegateComp::CreateDeleteObjectsQuery(
 
 	QStringList quotedIds;
 	for (const QByteArray& objectId : objectIds){
-		quotedIds << QString("'%1'").arg(qPrintable(objectId));
+		quotedIds << QString("'%1'").arg(SqlEncode(QString::fromUtf8(objectId)));
 	}
 
 	QString query = QString(
@@ -179,9 +179,9 @@ QByteArray CUsersSettingsDatabaseDelegateComp::CreateUpdateObjectQuery(
 	}
 
 	QByteArray retVal = QString("UPDATE \"UserSettings\" SET \"UserId\" ='%1', \"Settings\" = '%2' WHERE \"UserId\" ='%3';")
-			.arg(qPrintable(userId))
-			.arg(qPrintable(data))
-			.arg(qPrintable(objectId))
+			.arg(SqlEncode(QString::fromUtf8(userId)))
+			.arg(SqlEncode(QString::fromUtf8(data)))
+			.arg(SqlEncode(QString::fromUtf8(objectId)))
 			.toUtf8();
 
 	return retVal;
