@@ -6,6 +6,9 @@
 #include <imod/TModelWrap.h>
 #include <iprm/TParamsPtr.h>
 
+// ImtCore includes
+#include <imtdb/imtdb.h>
+
 
 namespace imtgeo
 {
@@ -128,8 +131,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CAddressElementDatabaseDelegateCo
 		.arg(qPrintable(proposedObjectId))
 		.arg(qPrintable(parents))
 		.arg(qPrintable(typeId))
-		.arg(name)
-		.arg(description)
+		.arg(imtdb::SqlEncode(name))
+		.arg(imtdb::SqlEncode(description))
 		.arg(lat)
 		.arg(lon)
 		.toUtf8();
@@ -211,9 +214,9 @@ QByteArray CAddressElementDatabaseDelegateComp::CreateUpdateObjectQuery(
 				.arg(qPrintable(adrId))
 				.arg(qPrintable(parents))
 				.arg(qPrintable(typeId))
-				.arg(adrName)
-				.arg(address)
-				.arg(description)
+				.arg(imtdb::SqlEncode(adrName))
+				.arg(imtdb::SqlEncode(address))
+				.arg(imtdb::SqlEncode(description))
 				.arg(lat)
 				.arg(lon)
 				.arg(qPrintable(objectId))
@@ -308,12 +311,12 @@ bool CAddressElementDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsS
 	}
 
 	if (parentIdsFilterParamPtr.IsValid() && parentIdsFilterParamPtr->GetTextFilter() != ""){
-		parentIdsFilterQuery = "'" + parentIdsFilterParamPtr->GetTextFilter() + "' <@ (\"ParentIds\")";
+		parentIdsFilterQuery = "'" + imtdb::SqlEncode(parentIdsFilterParamPtr->GetTextFilter()) + "' <@ (\"ParentIds\")";
 	}
 
 	if (parentIdFilterParamPtr.IsValid() ){
 		if(parentIdFilterParamPtr->GetTextFilter() != ""){
-			parentIdFilterQuery = QString(R"("ParentIds"->>(jsonb_array_length("ParentIds")-1))").append(" = ").append("'").append(parentIdFilterParamPtr->GetTextFilter().append("'"));
+			parentIdFilterQuery = QString(R"("ParentIds"->>(jsonb_array_length("ParentIds")-1))").append(" = ").append("'").append(imtdb::SqlEncode(parentIdFilterParamPtr->GetTextFilter()).append("'"));
 		}
 		else {
 			parentIdFilterQuery = QString(R"(jsonb_array_length("ParentIds") = 0)");
@@ -321,7 +324,7 @@ bool CAddressElementDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsS
 	}
 
 	if (typeIdFilterParamPtr.IsValid() && typeIdFilterParamPtr->GetTextFilter() != ""){
-		typeIdFilterQuery = "\"Type\" = '" + typeIdFilterParamPtr->GetTextFilter() + "'";
+		typeIdFilterQuery = "\"Type\" = '" + imtdb::SqlEncode(typeIdFilterParamPtr->GetTextFilter()) + "'";
 	}
 
 	if (!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty() || !parentIdsFilterQuery.isEmpty() || !parentIdFilterQuery.isEmpty()|| !typeIdFilterQuery.isEmpty()){
@@ -373,12 +376,13 @@ bool CAddressElementDatabaseDelegateComp::CreateTextFilterQuery(const imtbase::I
 
 	QString textFilter = collectionFilter.GetTextFilter();
 	if (!textFilter.isEmpty()){
-		textFilterQuery = QString("\"%1\" ILIKE '%2%'").arg(qPrintable(filteringColumnIds.first())).arg(textFilter);
+		QString encodedFilter = imtdb::SqlEncode(textFilter);
+		textFilterQuery = QString("\"%1\" ILIKE '%2%'").arg(qPrintable(filteringColumnIds.first())).arg(encodedFilter);
 
 		for (int i = 1; i < filteringColumnIds.count(); ++i){
 			textFilterQuery += " OR ";
 
-			textFilterQuery += QString("\"%1\" ILIKE '%2%'").arg(qPrintable(filteringColumnIds[i])).arg(textFilter);
+			textFilterQuery += QString("\"%1\" ILIKE '%2%'").arg(qPrintable(filteringColumnIds[i])).arg(encodedFilter);
 		}
 	}
 

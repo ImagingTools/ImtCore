@@ -495,7 +495,7 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateObjectFilterQuery(
 
 			QString value = textParamPtr->GetText();
 
-			filterQuery = QStringLiteral(R"("%1" = '%2')").arg(qPrintable(key)).arg(value);
+			filterQuery = QStringLiteral(R"("%1" = '%2')").arg(qPrintable(key)).arg(SqlEncode(value));
 		}
 	}
 
@@ -522,12 +522,13 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateTextFilterQuery(
 
 	QString textFilter = collectionFilter.GetTextFilter();
 	if (!textFilter.isEmpty()){
-		textFilterQuery = QStringLiteral(R"("%1" ILIKE '%%2%')").arg(qPrintable(filteringColumnIds.first())).arg(textFilter);
+		QString encodedFilter = SqlEncode(textFilter);
+		textFilterQuery = QStringLiteral(R"("%1" ILIKE '%%2%')").arg(qPrintable(filteringColumnIds.first())).arg(encodedFilter);
 
 		for (int i = 1; i < filteringColumnIds.count(); ++i){
 			textFilterQuery += QStringLiteral(" OR ");
 
-			textFilterQuery += QStringLiteral(R"("%1" ILIKE '%%2%')").arg(qPrintable(filteringColumnIds[i])).arg(textFilter);
+			textFilterQuery += QStringLiteral(R"("%1" ILIKE '%%2%')").arg(qPrintable(filteringColumnIds[i])).arg(encodedFilter);
 		}
 	}
 
@@ -541,13 +542,14 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateTextFilterQuery(const imtbase::IC
 
 	QString textFilter = collectionFilter.GetTextFilter();
 	if (!textFilter.isEmpty()){
+		QString encodedFilter = SqlEncode(textFilter);
 		for (const imtbase::IComplexCollectionFilter::FieldInfo& info : collectionFilter.GetFields()){
 			if (info.metaInfo.flags & imtbase::IComplexCollectionFilter::SO_TEXT_FILTER){
 				if (!textFilterQuery.isEmpty()){
 					textFilterQuery += QStringLiteral(" OR ");
 				}
 
-				textFilterQuery += QStringLiteral(R"("%1" ILIKE '%%2%')").arg(QString::fromUtf8(info.id), textFilter);
+				textFilterQuery += QStringLiteral(R"("%1" ILIKE '%%2%')").arg(QString::fromUtf8(info.id), encodedFilter);
 			}
 		}
 	}

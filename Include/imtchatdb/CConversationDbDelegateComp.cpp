@@ -105,7 +105,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CConversationDbDelegateComp::Crea
 		"(\"Id\", \"Name\", \"ConversationType\", \"CreatedAt\", \"UpdatedAt\") "
 		"VALUES('%1', '%2', %3, '%4', '%5');")
 		.arg(QString::fromUtf8(convId))
-		.arg(name)
+		.arg(imtdb::SqlEncode(name))
 		.arg(conversationType)
 		.arg(nowUtc)
 		.arg(nowUtc)
@@ -133,7 +133,7 @@ QByteArray CConversationDbDelegateComp::CreateUpdateObjectQuery(
 		"\"ConversationType\"=%2, "
 		"\"UpdatedAt\"='%3' "
 		"WHERE \"Id\"='%4';")
-		.arg(convPtr->GetName())
+		.arg(imtdb::SqlEncode(convPtr->GetName()))
 		.arg(convPtr->GetConversationType())
 		.arg(utcNow())
 		.arg(QString::fromUtf8(objectId))
@@ -182,7 +182,7 @@ QByteArray CConversationDbDelegateComp::CreateRenameObjectQuery(
 	}
 
 	return QString("UPDATE \"Conversations\" SET \"Name\"='%1', \"UpdatedAt\"='%2' WHERE \"Id\"='%3';")
-		.arg(newObjectName)
+		.arg(imtdb::SqlEncode(newObjectName))
 		.arg(utcNow())
 		.arg(QString::fromUtf8(objectId))
 		.toUtf8();

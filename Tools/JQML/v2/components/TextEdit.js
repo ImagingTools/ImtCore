@@ -52,7 +52,7 @@ class TextEdit extends Item {
 
         this.setStyle({
             fontSize: '14px',
-            fontFamily: 'Segoe UI',
+            fontFamily: 'Verdana',
             pointerEvents: 'auto',
             touchAction: 'auto',
         })
@@ -238,7 +238,7 @@ class TextEdit extends Item {
         this.setStyle({
             fontWeight: this.getProperty('font').getPropertyValue('bold') ? 'bold' : 'normal',
             fontSize: `${this.getProperty('font').getPropertyValue('pixelSize')}px`,
-            fontFamily: `${this.getProperty('font').getPropertyValue('family')}`,
+            fontFamily: `'${this.getProperty('font').getPropertyValue('family')}'`,
         })
         
         this.applyMetrics()

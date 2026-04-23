@@ -144,7 +144,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CMessageDbDelegateComp::CreateNew
 		.arg(QString::fromUtf8(msgId))
 		.arg(QString::fromUtf8(msgPtr->GetConversationId()))
 		.arg(QString::fromUtf8(msgPtr->GetSenderId()))
-		.arg(msgPtr->GetContent())
+		.arg(imtdb::SqlEncode(msgPtr->GetContent()))
 		.arg(msgPtr->GetStatus())
 		.arg(replyToIdSql)
 		.arg(nowUtc)
@@ -192,7 +192,7 @@ QByteArray CMessageDbDelegateComp::CreateUpdateObjectQuery(
 		"\"Status\"=%2, "
 		"\"UpdatedAt\"='%3' "
 		"WHERE \"Id\"='%4';")
-		.arg(msgPtr->GetContent())
+		.arg(imtdb::SqlEncode(msgPtr->GetContent()))
 		.arg(msgPtr->GetStatus())
 		.arg(utcNow())
 		.arg(QString::fromUtf8(objectId))

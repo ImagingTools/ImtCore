@@ -177,12 +177,12 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CPersonalAccessTokenDatabaseDeleg
 			"INSERT INTO \"PersonalAccessTokens\""
 			"(\"Id\", \"Name\", \"Description\", \"UserId\", \"TokenHash\", \"Scopes\", \"CreatedAt\", \"LastUsedAt\", \"ExpiresAt\", \"Revoked\") "
 			"VALUES('%1', '%2', '%3', '%4', '%5', '%6', %7, %8, %9, %10);")
-		.arg(QString::fromUtf8(tokenId))
-		.arg(name)
-		.arg(description)
-		.arg(userId)
-		.arg(tokenHash)
-		.arg(scopesStr)
+		.arg(SqlEncode(QString::fromUtf8(tokenId)))
+		.arg(SqlEncode(name))
+		.arg(SqlEncode(description))
+		.arg(SqlEncode(userId))
+		.arg(SqlEncode(tokenHash))
+		.arg(SqlEncode(scopesStr))
 		.arg(createdAtSql)
 		.arg(lastUsedAtSql)
 		.arg(expiresAtSql)
@@ -244,15 +244,15 @@ QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateUpdateObjectQuery(
 		"\"ExpiresAt\"=%7, "
 		"\"Revoked\"=%8 "
 		"WHERE \"Id\"='%9';")
-		.arg(name)
-		.arg(description)
-		.arg(userId)
-		.arg(tokenHash)
-		.arg(scopesStr)
+		.arg(SqlEncode(name))
+		.arg(SqlEncode(description))
+		.arg(SqlEncode(userId))
+		.arg(SqlEncode(tokenHash))
+		.arg(SqlEncode(scopesStr))
 		.arg(lastUsedAtSql)
 		.arg(expiresAtSql)
 		.arg(revokedSql)
-		.arg(QString::fromUtf8(objectId))
+		.arg(SqlEncode(QString::fromUtf8(objectId)))
 		.toUtf8();
 
 	return retVal;
@@ -273,7 +273,7 @@ QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateDeleteObjectsQuery(
 		if (i > 0){
 			idsStr += ", ";
 		}
-		idsStr += QString("'%1'").arg(QString::fromUtf8(objectIds[i]));
+		idsStr += QString("'%1'").arg(SqlEncode(QString::fromUtf8(objectIds[i])));
 	}
 
 	const QByteArray retVal = QString("DELETE FROM \"PersonalAccessTokens\" WHERE \"Id\" IN (%1);")
@@ -308,8 +308,8 @@ QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateRenameObjectQuery(
 			"UPDATE \"PersonalAccessTokens\" SET "
 			"\"Name\"='%1' "
 			"WHERE \"Id\"='%2';")
-		.arg(newObjectName)
-		.arg(QString::fromUtf8(objectId))
+		.arg(SqlEncode(newObjectName))
+		.arg(SqlEncode(QString::fromUtf8(objectId)))
 		.toUtf8();
 }
 
@@ -329,8 +329,8 @@ QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateDescriptionObjectQuer
 			"UPDATE \"PersonalAccessTokens\" SET "
 			"\"Description\"='%1' "
 			"WHERE \"Id\"='%2';")
-		.arg(description)
-		.arg(QString::fromUtf8(objectId))
+		.arg(SqlEncode(description))
+		.arg(SqlEncode(QString::fromUtf8(objectId)))
 		.toUtf8();
 }
 
