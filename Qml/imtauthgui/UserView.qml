@@ -6,6 +6,7 @@ import imtcontrols 1.0
 import imtauthUsersSdl 1.0
 import imtdocgui 1.0
 import imtguigql 1.0
+import imtdeskgui 1.0
 
 ViewBase {
 	id: container;
@@ -109,6 +110,23 @@ ViewBase {
 			}
 		}
 	}
+
+	function openContextTicketsDialog(){
+		if (!container.userData || !container.userData.m_id || container.userData.m_id === ""){
+			return
+		}
+
+		ModalDialogManager.openDialog(contextTicketsDialogComp, {
+											entityType: "Users",
+											entityId: container.userData.m_id,
+											entityDisplayName: container.userData.m_name || container.userData.m_username || container.userData.m_id
+										})
+	}
+
+	Component {
+		id: contextTicketsDialogComp
+		EntityContextTicketsDialog {}
+	}
 	
 	DocumentHistoryPanel {
 		id: historyPanel;
@@ -182,6 +200,21 @@ ViewBase {
 				id: headerGeneralGroup;
 				width: parent.width;
 				title: qsTr("General");
+			}
+
+			Row {
+				width: parent.width
+				spacing: Style.marginS
+
+				Button {
+					width: Style.buttonWidthXL
+					height: Style.controlHeightM
+					text: qsTr("Related tickets")
+					enabled: container.userData && container.userData.m_id && container.userData.m_id !== ""
+					onClicked: {
+						container.openContextTicketsDialog()
+					}
+				}
 			}
 			
 			UserGeneralEditor {
