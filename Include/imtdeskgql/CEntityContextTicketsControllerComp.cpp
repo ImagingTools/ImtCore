@@ -14,6 +14,7 @@
 #include <imtdeskgql/TicketPermissions.h>
 #include <imtbase/IObjectCollectionIterator.h>
 #include <imtgql/IGqlContext.h>
+#include <imtchat/IConversation.h>
 
 
 namespace
@@ -247,6 +248,26 @@ sdl::imtdesk::ImtDesk::CCreateEntityContextTicketPayload CEntityContextTicketsCo
 	if (createdId.isEmpty()){
 		errorMessage = QStringLiteral("Unable to create ticket");
 		return response;
+	}
+
+	// Create a conversation for the new ticket so messaging works
+	if (m_chatServiceCompPtr.IsValid()){
+		QByteArray convId = m_chatServiceCompPtr->CreateConversation(
+					title.trimmed(),
+					imtchat::IConversation::CT_SUPPORT,
+					QByteArrayList());
+		if (!convId.isEmpty()){
+			// Re-fetch the created ticket and set the conversation ID
+			imtbase::IObjectCollection::DataPtr createdDataPtr;
+			if (m_ticketCollectionCompPtr->GetData(createdId, createdDataPtr)){
+				imtdesk::ISupportTicket* createdTicketPtr = dynamic_cast<imtdesk::ISupportTicket*>(createdDataPtr.GetPtr());
+				if (createdTicketPtr != nullptr){
+					createdTicketPtr->SetConversationId(convId);
+					m_ticketCollectionCompPtr->InsertNewObject(
+								"Ticket", "", "", createdTicketPtr, createdId);
+				}
+			}
+		}
 	}
 
 	response.Version_1_0.Emplace();

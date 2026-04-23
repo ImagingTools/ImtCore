@@ -359,6 +359,9 @@
         <Element Id="EntityContextTicketsController" PackageId="ImtDeskGqlPck" ComponentId="EntityContextTicketsController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ChatService" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ChatService"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="EntityReferenceStorage" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="EntityReferenceStorage"/>
                     </AttributeInfo>

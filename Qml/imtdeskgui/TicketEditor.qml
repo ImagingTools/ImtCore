@@ -884,7 +884,7 @@ DocumentViewBase {
 									radius: Style.radiusM
 									border.color: editDescriptionInput.activeFocus ? editView.accentColor : editView.cardBorderColor
 									border.width: editDescriptionInput.activeFocus ? 2 : 1
-									color: editDescriptionInput.activeFocus ? editView.cardColor : "#FAFBFC"
+									color: "white"
 									
 									Flickable {
 										id: descriptionFlick
@@ -1153,6 +1153,8 @@ DocumentViewBase {
 												id: assigneeChipText
 												anchors.left: parent.left
 												anchors.leftMargin: Style.paddingS + 2
+												anchors.right: assigneeChipRemove.visible ? assigneeChipRemove.left : parent.right
+												anchors.rightMargin: 2
 												anchors.verticalCenter: parent.verticalCenter
 												text: modelData.name || modelData.id
 												font.pixelSize: Style.fontSizeM
@@ -1388,6 +1390,8 @@ DocumentViewBase {
 												id: refLabelText
 												anchors.left: parent.left
 												anchors.leftMargin: Style.paddingS + 2
+												anchors.right: refRemoveBtn.visible ? refRemoveBtn.left : parent.right
+												anchors.rightMargin: 2
 												anchors.verticalCenter: parent.verticalCenter
 												text: (modelData.entityType ? "[" + modelData.entityType + "] " : "") + (modelData.displayName || modelData.entityId || "")
 												font.pixelSize: Style.fontSizeM
@@ -1442,7 +1446,7 @@ DocumentViewBase {
 									wrapMode: Text.WordWrap
 								}
 								
-								// Single dialog: entity type ComboBox + RemoteCollectionView
+								// Context picker dialog: entity type ComboBox + StackView with per-entity RemoteCollectionView
 								Component {
 									id: contextPickerDialogComp
 									Dialog {
@@ -1453,13 +1457,19 @@ DocumentViewBase {
 										height: ModalDialogManager.activeView.height - 80
 										
 										property string selectedEntityTypeId: ""
-										property RemoteCollectionView collectionView: null
+										property var entityTypePages: ({})
+										
+										function getCurrentCollectionView() {
+											if (!ctxStackView) return null
+											var page = ctxStackView.currentPage()
+											if (!page) return null
+											return page.collectionView || null
+										}
 										
 										Component.onCompleted: {
 											addButton(Enums.apply, qsTr("Attach Selected"), false)
 											addButton(Enums.cancel, qsTr("Cancel"), true)
 											setButtonEnabled(Enums.apply, false)
-											// Pre-select first entity type
 											if (entityTypeModel.getItemsCount() > 0) {
 												selectedEntityTypeId = entityTypeModel.getData("id", 0)
 											}
@@ -1472,8 +1482,29 @@ DocumentViewBase {
 												
 												Component.onCompleted: {
 													ctxTypeCB.model = entityTypeModel
+													// Create a StackView page for each entity type
+													for (var i = 0; i < entityTypeModel.getItemsCount(); i++) {
+														ctxStackView.addPage(ctxEntityPageComp)
+													}
 													if (entityTypeModel.getItemsCount() > 0) {
 														ctxTypeCB.currentIndex = 0
+														ctxStackView.setCurrentIndex(0)
+													}
+												}
+												
+												Connections {
+													target: ctxStackView
+													function onPageAdded(index, item) {
+														if (item && index < entityTypeModel.getItemsCount()) {
+															var typeId = entityTypeModel.getData("id", index)
+															ctxDialog.entityTypePages[typeId] = index
+															item.collectionView.collectionId = typeId
+														}
+													}
+													function onCurrentPageChanged(item) {
+														if (item && item.collectionView) {
+															ctxDialog.setButtonEnabled(Enums.apply, item.collectionView.selectedIds.length > 0)
+														}
 													}
 												}
 												
@@ -1513,13 +1544,17 @@ DocumentViewBase {
 																	if (entityTypeModel.getItemsCount() > currentIndex) {
 																		ctxDialog.selectedEntityTypeId = entityTypeModel.getData("id", currentIndex)
 																		ctxDialog.setButtonEnabled(Enums.apply, false)
+																		var pageIdx = ctxDialog.entityTypePages[ctxDialog.selectedEntityTypeId]
+																		if (pageIdx !== undefined) {
+																			ctxStackView.setCurrentIndex(pageIdx)
+																		}
 																	}
 																}
 															}
 														}
 													}
 													
-													// Collection browser
+													// StackView with per-entity RemoteCollectionView pages
 													Item {
 														width: parent.width
 														height: parent.height - ctxTypeRow.height - Style.paddingM * 2 - Style.spacingM * 2
@@ -1531,20 +1566,31 @@ DocumentViewBase {
 															border.color: Style.borderColor
 															border.width: 1
 															
-															RemoteCollectionView {
+															StackView {
+																id: ctxStackView
 																anchors.fill: parent
 																anchors.margins: 1
-																commandsControllerComp: null
-																visibleMetaInfo: false
-																commandsDelegateComp: null
-																documentCollectionFilter: null
-																showRemoteChangesAlert: false
-																tableViewParamsStoredServer: false
-																collectionId: ctxDialog.selectedEntityTypeId
-																Component.onCompleted: {
-																	ctxDialog.collectionView = this
-																}
-																onSelectionChanged: {
+															}
+														}
+													}
+												}
+												
+												Component {
+													id: ctxEntityPageComp
+													Item {
+														property alias collectionView: pageCollView
+														
+														RemoteCollectionView {
+															id: pageCollView
+															anchors.fill: parent
+															commandsControllerComp: null
+															visibleMetaInfo: false
+															commandsDelegateComp: null
+															documentCollectionFilter: null
+															showRemoteChangesAlert: false
+															tableViewParamsStoredServer: false
+															onSelectionChanged: {
+																if (ctxStackView.currentPage() === pageCollView.parent) {
 																	ctxDialog.setButtonEnabled(Enums.apply, selectedIds.length > 0)
 																}
 															}
@@ -1555,10 +1601,11 @@ DocumentViewBase {
 										}
 										
 										onFinished: {
-											if (buttonId === Enums.apply && collectionView) {
+											var cv = getCurrentCollectionView()
+											if (buttonId === Enums.apply && cv) {
 												var arr = root.pendingEntityRefs.slice()
-												var mdl = collectionView.table.elements
-												let indexes = collectionView.table.getSelectedIndexes()
+												var mdl = cv.table.elements
+												let indexes = cv.table.getSelectedIndexes()
 												for (var i = 0; i < indexes.length; i++) {
 													let idx = indexes[i]
 													var displayName = mdl.getData("name", idx)

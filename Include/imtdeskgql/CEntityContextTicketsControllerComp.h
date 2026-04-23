@@ -6,6 +6,7 @@
 #include <imtdesk/ISupportTicket.h>
 #include <imtdesk/IEntityReferenceStorage.h>
 #include <imtauth/IUserGroupInfoProvider.h>
+#include <imtchat/IChatService.h>
 #include <GeneratedFiles/imtdesksdl/SDL/1.0/CPP/ImtDesk.h>
 
 
@@ -25,6 +26,7 @@ public:
 		I_ASSIGN(m_entityReferenceStorageCompPtr, "EntityReferenceStorage", "Storage service for entity references", true, "EntityReferenceStorage");
 		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "Collection of users", true, "UserCollection");
 		I_ASSIGN(m_userGroupInfoProviderCompPtr, "UserGroupInfoProvider", "User group info provider for permissions", true, "UserGroupInfoProvider");
+		I_ASSIGN(m_chatServiceCompPtr, "ChatService", "Chat service for conversation creation", false, "ChatService");
 	I_END_COMPONENT;
 
 protected:
@@ -44,6 +46,7 @@ private:
 	I_REF(imtdesk::IEntityReferenceStorage, m_entityReferenceStorageCompPtr);
 	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
 	I_REF(imtauth::IUserGroupInfoProvider, m_userGroupInfoProviderCompPtr);
+	I_REF(imtchat::IChatService, m_chatServiceCompPtr);
 };
 
 

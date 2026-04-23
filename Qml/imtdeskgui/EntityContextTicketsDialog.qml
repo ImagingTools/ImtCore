@@ -13,7 +13,7 @@ import imtdeskImtDeskSdl 1.0
 Dialog {
 	id: root
 
-	title: qsTr("Entity Tickets")
+	title: qsTr("Entity Tickets") + " — " + entityType + " / " + resolvedEntityDisplayName
 	canMove: false
 	width: Math.min(ModalDialogManager.activeView.width - 80, 980)
 	height: Math.min(ModalDialogManager.activeView.height - 80, 760)
@@ -59,36 +59,10 @@ Dialog {
 				anchors.fill: parent
 				anchors.margins: Style.marginL
 
-				// Context badge
-				Rectangle {
-					id: contextBadge
-					anchors.top: parent.top
-					anchors.left: parent.left
-					anchors.right: parent.right
-					height: contextBadgeText.height + Style.paddingS * 2
-					radius: Style.radiusS
-					color: "#DFECF9"
-					border.color: "#B4D3F2"
-					border.width: 1
-
-					Text {
-						id: contextBadgeText
-						anchors.left: parent.left
-						anchors.leftMargin: Style.paddingM
-						anchors.verticalCenter: parent.verticalCenter
-						width: parent.width - Style.paddingM * 2
-						text: qsTr("Context: ") + root.entityType + " / " + root.resolvedEntityDisplayName
-						font.pixelSize: Style.fontSizeM
-						color: Style.textColor
-						elide: Text.ElideRight
-					}
-				}
-
 				// Create ticket card (TicketEditor detailsCard style)
 				Item {
 					id: createCardWrapper
-					anchors.top: contextBadge.bottom
-					anchors.topMargin: Style.spacingL
+					anchors.top: parent.top
 					anchors.left: parent.left
 					anchors.right: parent.right
 					height: createCard.height
