@@ -140,10 +140,6 @@ type TicketsListPayload {
 	notification: NotificationItem
 }
 
-input TicketItemInput {
-	id: ID!
-}
-
 input TicketDataInput {
 	id: ID!
 	item: TicketData!
@@ -163,12 +159,6 @@ type TicketStatusUpdate {
 
 type Query {
 	TicketsList (input: TicketsListInput): TicketsListPayload!
-	TicketItem (input: TicketItemInput): TicketData!
-}
-
-type Mutation {
-	TicketCreate (input: TicketDataInput): AddedNotificationPayload!
-	TicketUpdate (input: TicketDataInput): UpdatedNotificationPayload!
 }
 
 collectionSchema {
@@ -176,14 +166,6 @@ collectionSchema {
 		ref: TicketItemData
 		operations {
 			list: TicketsList
-		}
-		subtype Ticket {
-			ref: TicketData
-			operations {
-				get: TicketItem
-				update: TicketUpdate
-				insert: TicketCreate
-			}
 		}
 	}
 }

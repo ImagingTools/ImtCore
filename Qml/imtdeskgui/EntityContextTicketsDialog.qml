@@ -6,6 +6,7 @@ import imtgui 1.0
 import imtcontrols 1.0
 import imtdocgui 1.0
 import imtguigql 1.0
+import imtdeskImtDeskSdl 1.0
 
 Dialog {
 	id: root
@@ -56,7 +57,7 @@ Dialog {
 
 				Text {
 					width: parent.width
-					text: qsTr("Context: %1 / %2").arg(root.entityType).arg(root.resolvedEntityDisplayName)
+					text: qsTr("Context: ") + root.entityType + "/" + root.resolvedEntityDisplayName
 					font.pixelSize: Style.fontSizeM
 					color: Style.textSecondaryColor
 					elide: Text.ElideRight
@@ -67,7 +68,7 @@ Dialog {
 					height: createCol.height + Style.marginM * 2
 					radius: Style.radiusM
 					color: Style.backgroundColor2
-					border.color: Style.separatorColor
+					border.color: Style.borderColor
 
 					Column {
 						id: createCol
@@ -95,8 +96,8 @@ Dialog {
 							width: parent.width
 							height: root.descriptionInputHeight
 							radius: Style.radiusS
-							color: Style.inputColor
-							border.color: Style.separatorColor
+							color: Style.baseColor
+							border.color: Style.borderColor
 
 							TextEdit {
 								id: descriptionInput
@@ -130,7 +131,7 @@ Dialog {
 					height: root.listContentHeight
 					radius: Style.radiusM
 					color: "transparent"
-					border.color: Style.separatorColor
+					border.color: Style.borderColor
 					border.width: 1
 
 					Item {
@@ -172,7 +173,7 @@ Dialog {
 									anchors.bottom: parent.bottom
 									width: parent.width
 									height: 1
-									color: Style.separatorColor
+									color: Style.borderColor
 									opacity: 0.5
 								}
 							}
@@ -328,7 +329,7 @@ Dialog {
 		function onError(message, type) {
 			root._resetTicketState()
 			root.loading = false
-			root.ticketsModel.clear()
+			ticketsModel.clear()
 			ModalDialogManager.showErrorDialog(message || qsTr("Failed to load tickets"))
 		}
 	}
@@ -354,7 +355,7 @@ Dialog {
 				if (root._matchCurrentEntity(refsModel)) {
 					let item = root._ticketPreviewById[root._currentDetailTicketId]
 					if (item) {
-						root.ticketsModel.append(item)
+						ticketsModel.append(item)
 					}
 				}
 			}
