@@ -209,38 +209,21 @@ Dialog {
 									}
 								}
 							}
-
-							// Create button row
-							Row {
-								anchors.right: parent.right
-								spacing: Style.spacingS
-
-								Rectangle {
-									width: createBtnText.contentWidth + Style.paddingL * 2
-									height: Style.controlHeightM
-									radius: Style.radiusM
-									color: editTitleInput.text.trim().length > 0
-									? root.accentColor
-									: Style.disabledColor
-
-									Text {
-										id: createBtnText
-										anchors.centerIn: parent
-										text: qsTr("Create Ticket")
-										font.pixelSize: Style.fontSizeM
-										font.bold: true
-										color: Style.baseColor
+							
+							Button {
+								id: createButton
+								text: qsTr("Create Ticket")
+								enabled: editTitleInput.text.trim().length > 0
+								decorator: Component {
+									ButtonDecorator {
+										color: createButton.enabled ? Style.imaginToolsAccentColor : Style.baseColor
+										textColor: createButton.enabled ? "white" : Style.inactiveTextColor
+										opacity: createButton.hovered ? 0.85 : 1
 									}
+								}
 
-									MouseArea {
-										anchors.fill: parent
-										hoverEnabled: true
-										cursorShape: editTitleInput.text.trim().length > 0 ? Qt.PointingHandCursor : Qt.ArrowCursor
-										enabled: editTitleInput.text.trim().length > 0
-										onClicked: {
-											root.createTicket(editTitleInput.text, editDescriptionInput.text)
-										}
-									}
+								onClicked: {
+									root.createTicket(editTitleInput.text, editDescriptionInput.text)
 								}
 							}
 						}
@@ -479,7 +462,8 @@ Dialog {
 		if (!ticketId) {
 			return
 		}
-		MainDocumentManager.openDocument("Tickets", ticketId, "Ticket")
+
+		NavigationController.navigate("Tickets/Ticket/" + ticketId)
 	}
 
 	function createTicket(title, description) {
@@ -573,12 +557,10 @@ Dialog {
 		sdlObjectComp: Component {
 			CreateEntityContextTicketPayload {
 				onFinished: {
-					let createdId = m_id ? String(m_id) : ""
 					root.clearInputFields()
 					root.reloadTickets()
-					if (createdId !== "") {
-						root.openTicket(createdId)
-					}
+
+					root.openTicket(m_id)
 				}
 			}
 		}

@@ -1188,7 +1188,7 @@ DocumentViewBase {
 								Text {
 									visible: root.pendingAssignees.length === 0
 									width: parent.width
-									text: qsTr("No assignees. Click \"+ Add\" to assign users.")
+									text: qsTr("No assignees")
 									font.pixelSize: Style.fontSizeM
 									color: Style.inactiveTextColor
 									wrapMode: Text.WordWrap
@@ -1431,12 +1431,12 @@ DocumentViewBase {
 										}
 									}
 								}
-								
+
 								// Empty context placeholder
 								Text {
 									visible: root.pendingEntityRefs.length === 0
 									width: parent.width
-									text: qsTr("No linked entities. Click \"+ Add context\" to attach entities to this ticket.")
+									text: qsTr("No linked entities")
 									font.pixelSize: Style.fontSizeM
 									color: Style.inactiveTextColor
 									wrapMode: Text.WordWrap
