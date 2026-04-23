@@ -420,7 +420,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateRenameObjectQuery(
 							schemaPrefix,
 							qPrintable(*m_tableNameAttrPtr),
 							qPrintable(s_nameColumn),
-							newObjectName,
+							SqlEncode(newObjectName),
 							qPrintable(s_documentIdColumn),
 							qPrintable(objectId)
 							).toUtf8();
@@ -444,7 +444,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateDescriptionObjectQuery(
 							schemaPrefix,
 							qPrintable(*m_tableNameAttrPtr),
 							qPrintable(s_descriptionColumn),
-							description,
+							SqlEncode(description),
 							qPrintable(s_documentIdColumn),
 							qPrintable(objectId)
 							).toUtf8();
@@ -1118,7 +1118,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateJsonBuildObjectQuery(const QV
 			revisionInfo += QStringLiteral("'%1', %2").arg(key, raw.sql);
 		}
 		else if (typeId == QMetaType::QString || typeId == QMetaType::QByteArray){
-			revisionInfo += QStringLiteral("'%1', '%2'").arg(key, value.toString());
+			revisionInfo += QStringLiteral("'%1', '%2'").arg(key, SqlEncode(value.toString()));
 		}
 		else if (typeId == QMetaType::Int){
 			revisionInfo += QStringLiteral("'%1', %2").arg(key).arg(value.toInt());
@@ -1260,7 +1260,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateObjectFilterQuery(const iprm::IPara
 		if (collectionFilterParamPtr.IsValid()){
 			QByteArray typeId = collectionFilterParamPtr->GetObjectTypeId();
 			if (!typeId.isEmpty()){
-				filterQuery = QString("\"%0\" = '%1'").arg(qPrintable(s_typeIdColumn), qPrintable(typeId)).toUtf8();
+				filterQuery = QString("\"%0\" = '%1'").arg(qPrintable(s_typeIdColumn), SqlEncode(QString::fromUtf8(typeId))).toUtf8();
 			}
 		}
 	}
@@ -1328,7 +1328,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateFilterQuery(const iprm::IParamsSet&
 		if (objectTypeIdFilterPtr.IsValid()){
 			QByteArray objectTypeId = objectTypeIdFilterPtr->GetObjectTypeId();
 			if (!objectTypeId.isEmpty()){
-				objectTypeIdQuery = QString("\"%0\" = '%1'").arg(qPrintable(s_typeIdColumn), qPrintable(objectTypeId)).toUtf8();
+				objectTypeIdQuery = QString("\"%0\" = '%1'").arg(qPrintable(s_typeIdColumn), SqlEncode(QString::fromUtf8(objectTypeId))).toUtf8();
 			}
 		}
 	}
@@ -1794,7 +1794,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateDocumentCollectionFilterQuery(
 	// DocumentId
 	QByteArray documentId = documentCollectionFilter.GetDocumentId();
 	if (!documentId.isEmpty()){
-		conditions << QString("root.\"%1\" = '%2'").arg(QString::fromUtf8(s_documentIdColumn), QString::fromUtf8(documentId));
+		conditions << QString("root.\"%1\" = '%2'").arg(QString::fromUtf8(s_documentIdColumn), SqlEncode(QString::fromUtf8(documentId)));
 	}
 
 	// Document States
@@ -1847,7 +1847,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateDocumentIdFilterQuery(
 	idStrings.reserve(documentIds.size());
 
 	for (const QByteArray& id : documentIds){
-		idStrings << QString("'%1'").arg(QString::fromUtf8(id));
+		idStrings << QString("'%1'").arg(SqlEncode(QString::fromUtf8(id)));
 	}
 
 	imtcol::IDocumentIdFilter::ConditionType conditionType = documentIdFilter.GetConditionType();

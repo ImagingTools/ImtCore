@@ -15,6 +15,12 @@ class TextEdit extends Item {
     static WrapAnywhere = 2
     static Wrap = 3
 
+    static AutoText = 0
+    static PlainText = 1
+    static StyledText = 2
+    static RichText = 3
+    static MarkdownText = 4
+
     static defaultProperties = {
         text: { type: QString, value: '', changed: '$textChanged' },
         color: { type: QColor, value: 'black', changed: '$colorChanged' },
@@ -32,6 +38,7 @@ class TextEdit extends Item {
         cursorRectangle: { type: QVar, value: undefined },
         selectionStart: { type: QInt, value: 0 },
         selectionEnd: { type: QInt, value: 0 },
+        textFormat: { type: QInt, value: TextEdit.AutoText, changed: '$textFormatChanged' },
     }
 
     static defaultSignals = {
@@ -266,14 +273,14 @@ class TextEdit extends Item {
 
     applyMetrics(){
         let isHTML = false
-        if(this.getPropertyValue('textFormat') === Text.AutoText){
+        if(this.getPropertyValue('textFormat') === TextEdit.AutoText){
             let regexp = /<[^<>]+>/g
             if(this.getPropertyValue('text') && (regexp.test(this.getPropertyValue('text')) || this.getPropertyValue('text').indexOf('\n') >= 0)){
                 isHTML = true
             } else {
                 isHTML = false
             }
-        } else if(this.getPropertyValue('textFormat') === Text.PlainText){
+        } else if(this.getPropertyValue('textFormat') === TextEdit.PlainText){
             isHTML = false
         } else {
             isHTML = true

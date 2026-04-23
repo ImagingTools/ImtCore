@@ -66,6 +66,27 @@ void CServerConnectionInterfaceParam::SetHost(const QString& host)
 }
 
 
+QString CServerConnectionInterfaceParam::GetPath(ProtocolType protocol) const
+{
+	return m_pathMap.value(protocol);
+}
+
+
+void CServerConnectionInterfaceParam::SetPath(ProtocolType protocol, const QString& path)
+{
+	if (m_pathMap.value(protocol) != path){
+		istd::CChangeNotifier changeNotifier(this);
+
+		if (path.isEmpty()){
+			m_pathMap.remove(protocol);
+		}
+		else{
+			m_pathMap[protocol] = path;
+		}
+	}
+}
+
+
 int CServerConnectionInterfaceParam::GetPort(ProtocolType protocol) const
 {
 	if (m_interfaceMap.contains(protocol)){
@@ -119,6 +140,16 @@ bool CServerConnectionInterfaceParam::GetUrl(ProtocolType protocol, QUrl& url) c
 	url.setScheme(scheme);
 	url.setHost(m_host);
 	url.setPort(port);
+	const QString path = GetPath(protocol);
+	if (!path.isEmpty()){
+		int queryStart = path.indexOf('?');
+		if (queryStart != -1) {
+			url.setPath(path.left(queryStart));
+			url.setQuery(path.mid(queryStart + 1));
+		} else {
+			url.setPath(path);
+		}
+	}
 
 	return url.isValid();
 }
@@ -154,6 +185,16 @@ bool CServerConnectionInterfaceParam::Serialize(iser::IArchive& archive)
 				"Port",
 				"List of interfaces");
 
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeAssociativeContainer<PathMap, ProtocolType>(
+				archive,
+				m_pathMap,
+				keySerializer,
+				"Paths",
+				"Path",
+				"Protocol",
+				"Value",
+				"List of URL paths per protocol");
+
 	return retVal;
 }
 
@@ -173,6 +214,7 @@ bool CServerConnectionInterfaceParam::CopyFrom(const IChangeable& object, Compat
 		istd::CChangeNotifier changeNotifier(this);
 
 		m_interfaceMap = sourcePtr->m_interfaceMap;
+		m_pathMap = sourcePtr->m_pathMap;
 		m_connectionFlags = sourcePtr->m_connectionFlags;
 		m_host = sourcePtr->m_host;
 
@@ -188,6 +230,7 @@ bool CServerConnectionInterfaceParam::IsEqual(const IChangeable& object) const
 	const CServerConnectionInterfaceParam* sourcePtr = dynamic_cast<const CServerConnectionInterfaceParam*>(&object);
 	if (sourcePtr != NULL){
 		bool retVal = m_interfaceMap == sourcePtr->m_interfaceMap;
+		retVal = retVal && m_pathMap == sourcePtr->m_pathMap;
 		retVal = retVal && m_connectionFlags == sourcePtr->m_connectionFlags;
 		retVal = retVal && m_host == sourcePtr->m_host;
 
@@ -214,6 +257,7 @@ bool CServerConnectionInterfaceParam::ResetData(CompatibilityMode /*mode*/)
 	istd::CChangeNotifier changeNotifier(this);
 
 	m_interfaceMap.clear();
+	m_pathMap.clear();
 	m_connectionFlags = CF_DEFAULT;
 	m_host.clear();
 

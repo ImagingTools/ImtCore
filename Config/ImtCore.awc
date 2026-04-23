@@ -14,5 +14,11 @@
     </PackageDirs>
     <PackageFiles/>
     <RegistryFiles>
+        <FilePath>../Impl/DdlCodeCreatorExe/DdlCodeCreator.acc</FilePath>
+        <FilePath>../Impl/DesignTokenCreatorExe/DesignTokenCreator.acc</FilePath>
+        <FilePath>../Impl/EagleView/EagleView.acc</FilePath>
+        <FilePath>../Impl/ImtControlsGallery/Impl/ControlsGallery/ControlsGallery.acc</FilePath>
+        <FilePath>../Impl/OasCodeGeneratorExe/OasCodeGeneratorExe.acc</FilePath>
+        <FilePath>../Impl/SdlCodeGeneratorExe/SdlCodeGenerator.acc</FilePath>
     </RegistryFiles>
 </Acf>

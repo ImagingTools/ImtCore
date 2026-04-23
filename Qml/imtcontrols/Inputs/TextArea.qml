@@ -190,11 +190,11 @@ ControlBase {
             id: textArea;
             objectName: "TextInput"
 
-            anchors.left: parent.left;
-            anchors.right: parent.right;
-            anchors.top: parent.top;
+			anchors.left: flick.left;
+			anchors.right: flick.right;
+			anchors.top: flick.top;
 
-            anchors.bottom: parent.bottom;
+			anchors.bottom: flick.bottom;
             anchors.bottomMargin: containerTextArea.margin;
 
             anchors.topMargin: containerTextArea.margin;

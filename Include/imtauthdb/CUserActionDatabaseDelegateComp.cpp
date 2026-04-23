@@ -53,7 +53,7 @@ QString CUserActionDatabaseDelegateComp::CreateAdditionalFiltersQuery(const iprm
 						array += ",";
 					}
 
-					array += "'" + groupIds[i] + "'";
+					array += "'" + SqlEncode(QString::fromUtf8(groupIds[i])) + "'";
 				}
 
 				array += "]";
@@ -61,7 +61,7 @@ QString CUserActionDatabaseDelegateComp::CreateAdditionalFiltersQuery(const iprm
 				filterQuery += QString(R"((users."Document"->'Groups' ?| %1))").arg(array);
 			}
 			else{
-				filterQuery += QString(R"(users."Document"->>'Id' = '%1')").arg(qPrintable(userId));
+				filterQuery += QString(R"(users."Document"->>'Id' = '%1')").arg(SqlEncode(QString::fromUtf8(userId)));
 			}
 		}
 	}

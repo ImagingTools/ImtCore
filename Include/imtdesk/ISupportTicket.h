@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
+
 // ACF includes
 #include <iser/ISerializable.h>
 
@@ -13,7 +14,7 @@ namespace imtdesk
 	Interface representing a Service Desk support ticket.
 
 	Tickets can be linked to a conversation or a specific message, have
-	priorities, statuses, and may target a specific deployment environment.
+	priorities and statuses.
 
 	\ingroup imtdesk
 */
@@ -37,20 +38,32 @@ public:
 				TT_BUG_REPORT);
 
 	/**
-		Ticket status — lifecycle stage of the ticket.
+		Ticket status — follows GitHub Issues pattern (Open / Closed).
 	*/
 	enum TicketStatus
 	{
 		TS_OPEN,
-		TS_IN_PROGRESS,
-		TS_RESOLVED,
 		TS_CLOSED
 	};
 	I_DECLARE_ENUM(TicketStatus,
 				TS_OPEN,
-				TS_IN_PROGRESS,
-				TS_RESOLVED,
 				TS_CLOSED);
+
+	/**
+		State reason — why the ticket was closed (like GitHub state_reason).
+	*/
+	enum StateReason
+	{
+		SR_NONE,
+		SR_COMPLETED,
+		SR_NOT_PLANNED,
+		SR_REOPENED
+	};
+	I_DECLARE_ENUM(StateReason,
+				SR_NONE,
+				SR_COMPLETED,
+				SR_NOT_PLANNED,
+				SR_REOPENED);
 
 	/**
 		Ticket priority — urgency level.
@@ -67,20 +80,6 @@ public:
 				TP_MEDIUM,
 				TP_HIGH,
 				TP_CRITICAL);
-
-	/**
-		Target deployment environment.
-	*/
-	enum Environment
-	{
-		ENV_DEVELOPMENT,
-		ENV_STAGING,
-		ENV_PRODUCTION
-	};
-	I_DECLARE_ENUM(Environment,
-				ENV_DEVELOPMENT,
-				ENV_STAGING,
-				ENV_PRODUCTION);
 
 	/**
 		Get the unique ticket identifier.
@@ -133,6 +132,16 @@ public:
 	virtual void SetStatus(TicketStatus status) = 0;
 
 	/**
+		Get the state reason (why the ticket was closed).
+	*/
+	virtual StateReason GetStateReason() const = 0;
+
+	/**
+		Set the state reason.
+	*/
+	virtual void SetStateReason(StateReason stateReason) = 0;
+
+	/**
 		Get the ticket priority.
 	*/
 	virtual TicketPriority GetPriority() const = 0;
@@ -143,14 +152,14 @@ public:
 	virtual void SetPriority(TicketPriority priority) = 0;
 
 	/**
-		Get the user ID of the assigned agent (may be empty).
+		Get the list of assigned user IDs (supports multiple assignees like GitHub).
 	*/
-	virtual QByteArray GetAssigneeId() const = 0;
+	virtual QByteArrayList GetAssigneeIds() const = 0;
 
 	/**
-		Set the assignee user ID.
+		Set the list of assigned user IDs.
 	*/
-	virtual void SetAssigneeId(const QByteArray& assigneeId) = 0;
+	virtual void SetAssigneeIds(const QByteArrayList& assigneeIds) = 0;
 
 	/**
 		Get the user ID of the reporter who created the ticket.
@@ -183,16 +192,6 @@ public:
 	virtual void SetMessageId(const QByteArray& messageId) = 0;
 
 	/**
-		Get the target deployment environment.
-	*/
-	virtual Environment GetEnvironment() const = 0;
-
-	/**
-		Set the target environment.
-	*/
-	virtual void SetEnvironment(Environment environment) = 0;
-
-	/**
 		Get the tags associated with this ticket.
 	*/
 	virtual QStringList GetTags() const = 0;
@@ -201,6 +200,46 @@ public:
 		Set the tags.
 	*/
 	virtual void SetTags(const QStringList& tags) = 0;
+
+	/**
+		Get the list of label IDs (structured labels with color/description).
+	*/
+	virtual QByteArrayList GetLabelIds() const = 0;
+
+	/**
+		Set the list of label IDs.
+	*/
+	virtual void SetLabelIds(const QByteArrayList& labelIds) = 0;
+
+	/**
+		Get whether the ticket is locked.
+	*/
+	virtual bool IsLocked() const = 0;
+
+	/**
+		Set the locked state.
+	*/
+	virtual void SetLocked(bool locked) = 0;
+
+	/**
+		Get the lock reason (e.g. "resolved", "off-topic", "too heated", "spam").
+	*/
+	virtual QString GetLockReason() const = 0;
+
+	/**
+		Set the lock reason.
+	*/
+	virtual void SetLockReason(const QString& lockReason) = 0;
+
+	/**
+		Get the human-readable ticket number (like GitHub #123).
+	*/
+	virtual int GetNumber() const = 0;
+
+	/**
+		Set the ticket number.
+	*/
+	virtual void SetNumber(int number) = 0;
 
 	/**
 		Get the ISO 8601 creation timestamp.
@@ -223,6 +262,16 @@ public:
 	virtual void SetUpdatedAt(const QString& updatedAt) = 0;
 
 	/**
+		Get the ISO 8601 closed timestamp (empty if not closed).
+	*/
+	virtual QString GetClosedAt() const = 0;
+
+	/**
+		Set the closed timestamp.
+	*/
+	virtual void SetClosedAt(const QString& closedAt) = 0;
+
+	/**
 		Get the ISO 8601 resolution timestamp (empty if not resolved).
 	*/
 	virtual QString GetResolvedAt() const = 0;
@@ -231,8 +280,22 @@ public:
 		Set the resolution timestamp.
 	*/
 	virtual void SetResolvedAt(const QString& resolvedAt) = 0;
+
+	/**
+		Get the list of entity reference IDs linked to this ticket.
+	*/
+	virtual QByteArrayList GetEntityReferences() const = 0;
+
+	/**
+		Set the entity reference IDs.
+	*/
+	virtual void SetEntityReferences(const QByteArrayList& entityReferences) = 0;
+
 };
 
 typedef istd::TUniqueInterfacePtr<ISupportTicket> ISupportTicketUniquePtr;
 
+
 } // namespace imtdesk
+
+

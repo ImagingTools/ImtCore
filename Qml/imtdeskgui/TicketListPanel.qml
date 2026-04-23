@@ -12,7 +12,7 @@ Rectangle {
 
 	property var ticketsModel: null
 	property string currentTicketId: ""
-	property int statusFilter: -1  // -1 = all
+	property int statusFilter: -1  // -1 = all, 0 = Open, 1 = Closed
 
 	signal ticketSelected(string ticketId)
 	signal newTicketRequested()
@@ -28,13 +28,11 @@ Rectangle {
 			color: Style.panelHeaderColor
 
 			Row {
-				anchors {
-					left: parent.left
-					right: parent.right
-					verticalCenter: parent.verticalCenter
-					leftMargin: Style.paddingM
-					rightMargin: Style.paddingS
-				}
+				anchors.left: parent.left
+				anchors.right: parent.right
+				anchors.verticalCenter: parent.verticalCenter
+				anchors.leftMargin: Style.paddingM
+				anchors.rightMargin: Style.paddingS
 
 				Text {
 					text: qsTr("Tickets")
@@ -61,13 +59,15 @@ Rectangle {
 
 					MouseArea {
 						anchors.fill: parent
-						onClicked: ticketListPanelRoot.newTicketRequested()
+						onClicked: {
+							ticketListPanelRoot.newTicketRequested()
+						}
 					}
 				}
 			}
 		}
 
-		// Status filter tabs
+		// Status filter tabs — GitHub Issues style: Open / Closed
 		Row {
 			width: parent.width
 			height: Style.tabBarHeight
@@ -76,12 +76,11 @@ Rectangle {
 				model: [
 					{ label: qsTr("All"),    value: -1 },
 					{ label: qsTr("Open"),   value: 0  },
-					{ label: qsTr("Active"), value: 1  },
-					{ label: qsTr("Closed"), value: 3  }
+					{ label: qsTr("Closed"), value: 1  }
 				]
 
 				Rectangle {
-					width: parent.width / 4
+					width: parent.width / 3
 					height: Style.tabBarHeight
 					color: "transparent"
 
@@ -107,8 +106,8 @@ Rectangle {
 						anchors.fill: parent
 						onClicked: {
 							ticketListPanelRoot.statusFilter = modelData.value;
-							if (ticketsModel) {
-								ticketsModel.statusFilter = modelData.value;
+							if (ticketListPanelRoot.ticketsModel) {
+								ticketListPanelRoot.ticketsModel.statusFilter = modelData.value;
 							}
 						}
 					}
@@ -127,25 +126,41 @@ Rectangle {
 
 			delegate: Rectangle {
 				width: ticketListView.width
-				height: ticketItemContent.implicitHeight + Style.paddingS * 2
+				height: ticketItemContent.height + Style.paddingS * 2
 				color: model.id === ticketListPanelRoot.currentTicketId
 					? Style.selectedItemColor
 					: "transparent"
 
 				Column {
 					id: ticketItemContent
-					anchors {
-						left: parent.left
-						right: parent.right
-						verticalCenter: parent.verticalCenter
-						leftMargin: Style.paddingM
-						rightMargin: Style.paddingS
-					}
+					anchors.left: parent.left
+					anchors.right: parent.right
+					anchors.verticalCenter: parent.verticalCenter
+					anchors.leftMargin: Style.paddingM
+					anchors.rightMargin: Style.paddingS
 					spacing: Style.paddingXS
 
 					Row {
 						width: parent.width
 						spacing: Style.paddingXS
+
+						// Status icon (colored dot)
+						Rectangle {
+							width: 10
+							height: 10
+							radius: 5
+							color: (model.status || 0) === 0 ? "#1a7f37" : "#8957e5"
+							anchors.verticalCenter: parent.verticalCenter
+						}
+
+						// Number
+						Text {
+							text: "#" + (model.number || "")
+							font.pixelSize: Style.fontSizeXS
+							color: Style.textSecondaryColor
+							anchors.verticalCenter: parent.verticalCenter
+							visible: (model.number || 0) > 0
+						}
 
 						Text {
 							text: model.title || ""
@@ -153,7 +168,7 @@ Rectangle {
 							font.bold: true
 							color: Style.textPrimaryColor
 							elide: Text.ElideRight
-							width: parent.width - priorityBadge.width - statusBadge.width - Style.paddingXS * 2
+							width: parent.width - priorityBadge.width - Style.paddingXS * 4 - 30
 							anchors.verticalCenter: parent.verticalCenter
 						}
 
@@ -161,13 +176,6 @@ Rectangle {
 							id: priorityBadge
 							badgeType: "priority"
 							value: model.priority || 1
-							anchors.verticalCenter: parent.verticalCenter
-						}
-
-						TicketBadge {
-							id: statusBadge
-							badgeType: "status"
-							value: model.status || 0
 							anchors.verticalCenter: parent.verticalCenter
 						}
 					}
@@ -195,8 +203,6 @@ Rectangle {
 					}
 				}
 			}
-
-			ScrollBar.vertical: ScrollBar {}
 		}
 	}
 }

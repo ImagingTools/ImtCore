@@ -90,8 +90,7 @@ bool CUrlConnectionParamRepresentationController::GetRepresentationFromDataModel
 	QList<IServiceConnectionParam::IncomingConnectionParam> incomingConnections = urlConnectionParamPtr->GetIncomingConnections();
 	for (const IServiceConnectionParam::IncomingConnectionParam& incomingConnection : incomingConnections){
 		QJsonObject itemObj;
-		itemObj.insert(QStringLiteral("Id"), QString::fromUtf8(incomingConnection.id));
-		itemObj.insert(QStringLiteral("Description"), incomingConnection.description);
+		itemObj.insert(QStringLiteral("Id"), QString::fromUtf8(incomingConnection.GetObjectUuid()));
 		externPortsArray.append(itemObj);
 	}
 	representation.insert(QStringLiteral("ExternPorts"), externPortsArray);
@@ -134,11 +133,7 @@ bool CUrlConnectionParamRepresentationController::GetDataModelFromRepresentation
 			IServiceConnectionParam::IncomingConnectionParam incomingConnection;
 
 			if (itemObj.contains(QStringLiteral("Id"))){
-				incomingConnection.id = itemObj.value(QStringLiteral("Id")).toVariant().toByteArray();
-			}
-
-			if (itemObj.contains(QStringLiteral("Description"))){
-				incomingConnection.description = itemObj.value(QStringLiteral("Description")).toString();
+				incomingConnection.SetObjectUuid(itemObj.value(QStringLiteral("Id")).toVariant().toByteArray());
 			}
 
 			urlConnectionParamPtr->AddExternConnection(incomingConnection);

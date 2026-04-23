@@ -291,6 +291,14 @@ SUBDIRS += imtlicguiqml
 imtlicguiqml.file = ../../Qml/imtlicgui/QMake/imtlicguiqml.pro
 imtlicguiqml.depends = imtlicsdl
 
+SUBDIRS += imtdeskguiqml
+imtdeskguiqml.file = ../../Qml/imtdeskgui/QMake/imtdeskguiqml.pro
+imtdeskguiqml.depends = imtdesksdl
+
+SUBDIRS += imtchatguiqml
+imtchatguiqml.file = ../../Qml/imtchatgui/QMake/imtchatguiqml.pro
+imtchatguiqml.depends = imtchatsdl
+
 
 ######### Component packages
 SUBDIRS += ImtCorePck

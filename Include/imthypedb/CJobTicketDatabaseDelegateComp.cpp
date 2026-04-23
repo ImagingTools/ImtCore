@@ -7,6 +7,9 @@
 #include <iser/CJsonMemReadArchive.h>
 #include <iser/CJsonMemWriteArchive.h>
 
+// ImtCore includes
+#include <imtdb/imtdb.h>
+
 
 namespace imthypedb
 {
@@ -191,13 +194,13 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CJobTicketDatabaseDelegateComp::C
 	retVal.query = QString("INSERT INTO \"JobTickets\"(\"Id\", \"TypeId\", \"Name\", \"ContextId\", \"Progress\", \"ProcessingStatus\", \"Params\", \"Results\", \"Input\", \"Added\") VALUES('%1', '%2', '%3', '%4', %5, %6, '%7', '%8', '%9', '%10');")
 				.arg(qPrintable(proposedObjectId))
 				.arg(qPrintable(typeId))
-				.arg(name)
+				.arg(imtdb::SqlEncode(name))
 				.arg(qPrintable(contextId))
 				.arg(progress)
 				.arg(static_cast<int>(processingStatus))
-				.arg(QString::fromUtf8(paramsData))
-				.arg(QString::fromUtf8(resultsData))
-				.arg(QString::fromUtf8(inputData))
+				.arg(imtdb::SqlEncode(QString::fromUtf8(paramsData)))
+				.arg(imtdb::SqlEncode(QString::fromUtf8(resultsData)))
+				.arg(imtdb::SqlEncode(QString::fromUtf8(inputData)))
 				.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs))
 				.toUtf8();
 	retVal.objectName = name;
@@ -296,13 +299,13 @@ QByteArray CJobTicketDatabaseDelegateComp::CreateUpdateObjectQuery(
 	QByteArray retVal = QString("UPDATE \"JobTickets\" SET \"TypeId\" = '%1', \"Name\" = '%3', \"ContextId\" = '%4', \"Progress\" = %5, \"ProcessingStatus\" = %6, \"Params\" = '%7', \"Results\" = '%8', \"Input\" = '%9', \"TimeStamp\" = '%10' WHERE \"Id\" ='%2';")
 				.arg(qPrintable(typeId))
 				.arg(qPrintable(objectId))
-				.arg(name)
+				.arg(imtdb::SqlEncode(name))
 				.arg(qPrintable(contextId))
 				.arg(progress)
 				.arg(static_cast<int>(processingStatus))
-				.arg(QString::fromUtf8(paramsData))
-				.arg(QString::fromUtf8(resultsData))
-				.arg(QString::fromUtf8(inputData))
+				.arg(imtdb::SqlEncode(QString::fromUtf8(paramsData)))
+				.arg(imtdb::SqlEncode(QString::fromUtf8(resultsData)))
+				.arg(imtdb::SqlEncode(QString::fromUtf8(inputData)))
 				.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs))
 				.toUtf8();
 
@@ -331,7 +334,7 @@ QByteArray CJobTicketDatabaseDelegateComp::CreateRenameObjectQuery(
 	}
 
 	QByteArray retVal = QString("UPDATE \"JobTickets\" SET \"Name\" = '%1', \"TimeStamp\" = '%3' WHERE \"Id\" = '%2';")
-			.arg(newObjectName)
+			.arg(imtdb::SqlEncode(newObjectName))
 			.arg(qPrintable(objectId))
 			.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs)).toLocal8Bit();
 

@@ -31,6 +31,7 @@ type EntityReferenceData {
 	entityType: String!
 	entityId: ID!
 	displayName: String
+	entityUrl: String
 }
 
 # --- Conversation ---
@@ -93,6 +94,7 @@ type MessageData {
 	content: String!
 	entityReferences: [EntityReferenceData]
 	attachmentIds: [ID]
+	reactions: [String]
 	createdAt: String
 	updatedAt: String
 	status: MessageStatus

@@ -3,6 +3,9 @@
 
 // ImtCore includes
 #include <imtdesk/ISupportTicket.h>
+#include <imtchat/IChatService.h>
+#include <imtbase/IObjectCollection.h>
+#include <imtauth/IUserGroupInfoProvider.h>
 #include <GeneratedFiles/imtdesksdl/SDL/1.0/CPP/ImtDesk.h>
 
 
@@ -18,6 +21,9 @@ public:
 
 	I_BEGIN_COMPONENT(CTicketCollectionControllerComp);
 		I_ASSIGN(m_ticketFactCompPtr, "TicketFactory", "Factory for creating ticket instances", true, "TicketFactory");
+		I_ASSIGN(m_chatServiceCompPtr, "ChatService", "Chat service for message and conversation management", false, "ChatService");
+		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "Collection of users", true, "UserCollection");
+		I_ASSIGN(m_userGroupInfoProviderCompPtr, "UserGroupInfoProvider", "User group info provider for permissions", true, "UserGroupInfoProvider");
 	I_END_COMPONENT;
 
 protected:
@@ -41,6 +47,10 @@ protected:
 				const sdl::imtdesk::ImtDesk::CTicketUpdateGqlRequest& updateRequest,
 				istd::IChangeable& object,
 				QString& errorMessage) const override;
+	virtual void SetAdditionalFilters(
+				const imtgql::CGqlRequest& gqlRequest,
+				const imtgql::CGqlParamObject& viewParamsGql,
+				iprm::CParamsSet* filterParamsPtr) const override;
 
 private:
 	bool FillObjectFromRepresentation(
@@ -51,6 +61,9 @@ private:
 
 protected:
 	I_FACT(imtdesk::ISupportTicket, m_ticketFactCompPtr);
+	I_REF(imtchat::IChatService, m_chatServiceCompPtr);
+	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
+	I_REF(imtauth::IUserGroupInfoProvider, m_userGroupInfoProviderCompPtr);
 };
 
 

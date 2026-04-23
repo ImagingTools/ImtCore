@@ -19,6 +19,18 @@ namespace imtchatdb
 {
 
 
+namespace
+{
+
+// Helper: return current UTC timestamp in ISO 8601 with milliseconds
+QString utcNow()
+{
+	return QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
+}
+
+} // anonymous namespace
+
+
 istd::IChangeableUniquePtr CConversationDbDelegateComp::CreateObjectFromRecord(
 		const QSqlRecord& record,
 		const iprm::IParamsSet* /*dataConfigurationPtr*/) const
@@ -41,14 +53,15 @@ istd::IChangeableUniquePtr CConversationDbDelegateComp::CreateObjectFromRecord(
 	if (record.contains("ConversationType")){
 		convPtr->SetConversationType(static_cast<imtchat::IConversation::ConversationType>(record.value("ConversationType").toInt()));
 	}
-	if (record.contains("Metadata")){
-		convPtr->SetMetadata(record.value("Metadata").toString());
-	}
 	if (record.contains("CreatedAt")){
-		convPtr->SetCreatedAt(record.value("CreatedAt").toString());
+		QVariant val = record.value("CreatedAt");
+		QDateTime dt = val.toDateTime();
+		convPtr->SetCreatedAt(dt.isValid() ? dt.toString(Qt::ISODateWithMs) : val.toString());
 	}
 	if (record.contains("UpdatedAt")){
-		convPtr->SetUpdatedAt(record.value("UpdatedAt").toString());
+		QVariant val = record.value("UpdatedAt");
+		QDateTime dt = val.toDateTime();
+		convPtr->SetUpdatedAt(dt.isValid() ? dt.toString(Qt::ISODateWithMs) : val.toString());
 	}
 
 	return convPtr;
@@ -83,18 +96,19 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CConversationDbDelegateComp::Crea
 	}
 
 	const imtchat::IConversation::ConversationType conversationType = convPtr->GetConversationType();
-	const QString metadata = convPtr->GetMetadata();
-	const QString metadataSql = metadata.isEmpty() ? "NULL" : QString("'%1'").arg(metadata);
+
+	const QString nowUtc = utcNow();
 
 	NewObjectQuery retVal;
 	retVal.query = QString(
 		"INSERT INTO \"Conversations\" "
-		"(\"Id\", \"Name\", \"ConversationType\", \"Metadata\") "
-		"VALUES('%1', '%2', %3, %4);")
+		"(\"Id\", \"Name\", \"ConversationType\", \"CreatedAt\", \"UpdatedAt\") "
+		"VALUES('%1', '%2', %3, '%4', '%5');")
 		.arg(QString::fromUtf8(convId))
-		.arg(name)
+		.arg(imtdb::SqlEncode(name))
 		.arg(conversationType)
-		.arg(metadataSql)
+		.arg(nowUtc)
+		.arg(nowUtc)
 		.toUtf8();
 
 	return retVal;
@@ -113,19 +127,15 @@ QByteArray CConversationDbDelegateComp::CreateUpdateObjectQuery(
 		return QByteArray();
 	}
 
-	const QString metadata = convPtr->GetMetadata();
-	const QString metadataSql = metadata.isEmpty() ? "NULL" : QString("'%1'").arg(metadata);
-
 	return QString(
 		"UPDATE \"Conversations\" SET "
 		"\"Name\"='%1', "
 		"\"ConversationType\"=%2, "
-		"\"Metadata\"=%3, "
-		"\"UpdatedAt\"=NOW() "
+		"\"UpdatedAt\"='%3' "
 		"WHERE \"Id\"='%4';")
-		.arg(convPtr->GetName())
+		.arg(imtdb::SqlEncode(convPtr->GetName()))
 		.arg(convPtr->GetConversationType())
-		.arg(metadataSql)
+		.arg(utcNow())
 		.arg(QString::fromUtf8(objectId))
 		.toUtf8();
 }
@@ -146,7 +156,7 @@ QByteArray CConversationDbDelegateComp::CreateDeleteObjectsQuery(
 		idsStr += QString("'%1'").arg(QString::fromUtf8(objectIds[i]));
 	}
 
-	return QString("UPDATE \"Conversations\" SET \"IsActive\"=FALSE WHERE \"Id\" IN (%1);")
+	return QString("DELETE FROM \"Conversations\" WHERE \"Id\" IN (%1);")
 		.arg(idsStr)
 		.toUtf8();
 }
@@ -171,8 +181,9 @@ QByteArray CConversationDbDelegateComp::CreateRenameObjectQuery(
 		return QByteArray();
 	}
 
-	return QString("UPDATE \"Conversations\" SET \"Name\"='%1', \"UpdatedAt\"=NOW() WHERE \"Id\"='%2';")
-		.arg(newObjectName)
+	return QString("UPDATE \"Conversations\" SET \"Name\"='%1', \"UpdatedAt\"='%2' WHERE \"Id\"='%3';")
+		.arg(imtdb::SqlEncode(newObjectName))
+		.arg(utcNow())
 		.arg(QString::fromUtf8(objectId))
 		.toUtf8();
 }

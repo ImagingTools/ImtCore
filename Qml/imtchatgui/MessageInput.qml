@@ -9,7 +9,7 @@ Rectangle {
 	id: messageInputRoot
 	objectName: "MessageInput"
 	color: Style.surfaceColor
-	height: inputRow.implicitHeight + Style.paddingS * 2
+	height: inputRow.height + Style.paddingS * 2
 
 	property string conversationId: ""
 	property var pendingEntityRefs: []
@@ -19,16 +19,14 @@ Rectangle {
 	signal typingStopped()
 
 	Column {
-		anchors {
-			left: parent.left
-			right: parent.right
-			top: parent.top
-			margins: Style.paddingS
-		}
+		anchors.left: parent.left
+		anchors.right: parent.right
+		anchors.top: parent.top
+		anchors.margins: Style.paddingS
 		spacing: Style.paddingXS
 
 		// Entity reference chips row
-		Flow {
+		Row {
 			id: entityRefChips
 			width: parent.width
 			spacing: Style.paddingXS
@@ -44,10 +42,6 @@ Rectangle {
 					compact: true
 
 					onRemoveRequested: {
-						const refs = messageInputRoot.pendingEntityRefs.filter(
-							function(r) { return r.entityId !== modelData.entityId; }
-						);
-						messageInputRoot.pendingEntityRefs = refs;
 					}
 				}
 			}
@@ -104,9 +98,9 @@ Rectangle {
 					}
 
 					// Check for @ or # trigger
-					const cursor = text.lastIndexOf('@', cursorPosition - 1);
-					const hashCursor = text.lastIndexOf('#', cursorPosition - 1);
-					const triggerPos = Math.max(cursor, hashCursor);
+					let cursor = text.lastIndexOf('@', cursorPosition - 1);
+					let hashCursor = text.lastIndexOf('#', cursorPosition - 1);
+					let triggerPos = Math.max(cursor, hashCursor);
 					if (triggerPos >= 0 && cursorPosition - triggerPos <= 20) {
 						entitySearchPopup.searchQuery = text.substring(triggerPos + 1, cursorPosition);
 						entitySearchPopup.triggerChar = text[triggerPos];
@@ -147,7 +141,9 @@ Rectangle {
 				MouseArea {
 					anchors.fill: parent
 					enabled: textField.text.trim().length > 0
-					onClicked: messageInputRoot.sendMessage()
+					onClicked: {
+						messageInputRoot.sendMessage()
+					}
 				}
 			}
 		}
@@ -156,27 +152,25 @@ Rectangle {
 	// Entity search popup
 	EntitySearchPopup {
 		id: entitySearchPopup
-		anchors {
-			bottom: messageInputRoot.top
-			left: messageInputRoot.left
-		}
+		anchors.bottom: messageInputRoot.top
+		anchors.left: messageInputRoot.left
 		width: messageInputRoot.width * 0.6
 
-		onEntitySelected: function(entityType, entityId, displayName) {
-			const refs = messageInputRoot.pendingEntityRefs.slice();
+		onEntitySelected: {
+			let refs = messageInputRoot.pendingEntityRefs.slice();
 			refs.push({ entityType: entityType, entityId: entityId, displayName: displayName });
 			messageInputRoot.pendingEntityRefs = refs;
 
 			// Remove the trigger text
-			const before = textField.text.substring(0, entitySearchPopup.triggerPos);
-			const after = textField.text.substring(textField.cursorPosition);
+			let before = textField.text.substring(0, entitySearchPopup.triggerPos);
+			let after = textField.text.substring(textField.cursorPosition);
 			textField.text = before + after;
 			entitySearchPopup.close();
 		}
 	}
 
 	function sendMessage() {
-		const trimmed = textField.text.trim();
+		let trimmed = textField.text.trim();
 		if (trimmed.length === 0) {
 			return;
 		}

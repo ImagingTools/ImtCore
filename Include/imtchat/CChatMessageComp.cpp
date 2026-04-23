@@ -22,7 +22,11 @@ QByteArray CChatMessageComp::GetId() const
 
 void CChatMessageComp::SetId(const QByteArray& id)
 {
-	m_id = id;
+	if (m_id != id){
+		istd::CChangeNotifier notifier(this);
+
+		m_id = id;
+	}
 }
 
 
@@ -34,7 +38,11 @@ QByteArray CChatMessageComp::GetConversationId() const
 
 void CChatMessageComp::SetConversationId(const QByteArray& conversationId)
 {
-	m_conversationId = conversationId;
+	if (m_conversationId != conversationId){
+		istd::CChangeNotifier notifier(this);
+
+		m_conversationId = conversationId;
+	}
 }
 
 
@@ -46,7 +54,11 @@ QByteArray CChatMessageComp::GetSenderId() const
 
 void CChatMessageComp::SetSenderId(const QByteArray& senderId)
 {
-	m_senderId = senderId;
+	if (m_senderId != senderId){
+		istd::CChangeNotifier notifier(this);
+
+		m_senderId = senderId;
+	}
 }
 
 
@@ -58,7 +70,11 @@ QString CChatMessageComp::GetContent() const
 
 void CChatMessageComp::SetContent(const QString& content)
 {
-	m_content = content;
+	if (m_content != content){
+		istd::CChangeNotifier notifier(this);
+
+		m_content = content;
+	}
 }
 
 
@@ -70,7 +86,11 @@ IChatMessage::MessageStatus CChatMessageComp::GetStatus() const
 
 void CChatMessageComp::SetStatus(IChatMessage::MessageStatus status)
 {
-	m_status = status;
+	if (m_status != status){
+		istd::CChangeNotifier notifier(this);
+
+		m_status = status;
+	}
 }
 
 
@@ -82,7 +102,11 @@ QString CChatMessageComp::GetCreatedAt() const
 
 void CChatMessageComp::SetCreatedAt(const QString& createdAt)
 {
-	m_createdAt = createdAt;
+	if (m_createdAt != createdAt){
+		istd::CChangeNotifier notifier(this);
+
+		m_createdAt = createdAt;
+	}
 }
 
 
@@ -94,7 +118,11 @@ QString CChatMessageComp::GetUpdatedAt() const
 
 void CChatMessageComp::SetUpdatedAt(const QString& updatedAt)
 {
-	m_updatedAt = updatedAt;
+	if (m_updatedAt != updatedAt){
+		istd::CChangeNotifier notifier(this);
+
+		m_updatedAt = updatedAt;
+	}
 }
 
 
@@ -106,7 +134,11 @@ QByteArrayList CChatMessageComp::GetEntityReferences() const
 
 void CChatMessageComp::SetEntityReferences(const QByteArrayList& entityReferences)
 {
-	m_entityReferences = entityReferences;
+	if (m_entityReferences != entityReferences){
+		istd::CChangeNotifier notifier(this);
+
+		m_entityReferences = entityReferences;
+	}
 }
 
 
@@ -118,7 +150,43 @@ QByteArrayList CChatMessageComp::GetAttachmentIds() const
 
 void CChatMessageComp::SetAttachmentIds(const QByteArrayList& attachmentIds)
 {
-	m_attachmentIds = attachmentIds;
+	if (m_attachmentIds != attachmentIds){
+		istd::CChangeNotifier notifier(this);
+
+		m_attachmentIds = attachmentIds;
+	}
+}
+
+
+QStringList CChatMessageComp::GetReactions() const
+{
+	return m_reactions;
+}
+
+
+void CChatMessageComp::SetReactions(const QStringList& reactions)
+{
+	if (m_reactions != reactions){
+		istd::CChangeNotifier notifier(this);
+
+		m_reactions = reactions;
+	}
+}
+
+
+QByteArray CChatMessageComp::GetReplyToId() const
+{
+	return m_replyToId;
+}
+
+
+void CChatMessageComp::SetReplyToId(const QByteArray& replyToId)
+{
+	if (m_replyToId != replyToId){
+		istd::CChangeNotifier notifier(this);
+
+		m_replyToId = replyToId;
+	}
 }
 
 
@@ -166,6 +234,13 @@ bool CChatMessageComp::Serialize(iser::IArchive& archive)
 
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_attachmentIds, "AttachmentIds", "AttachmentId");
 
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QStringList>(archive, m_reactions, "Reactions", "Reaction");
+
+	static iser::CArchiveTag replyToIdTag("ReplyToId", "Reply to message id", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(replyToIdTag);
+	retVal = retVal && archive.Process(m_replyToId);
+	retVal = retVal && archive.EndTag(replyToIdTag);
+
 	return retVal;
 }
 
@@ -179,6 +254,8 @@ bool CChatMessageComp::CopyFrom(const IChangeable& object, CompatibilityMode /*m
 		return false;
 	}
 
+	istd::CChangeNotifier notifier(this);
+
 	m_id = srcPtr->GetId();
 	m_conversationId = srcPtr->GetConversationId();
 	m_senderId = srcPtr->GetSenderId();
@@ -188,6 +265,8 @@ bool CChatMessageComp::CopyFrom(const IChangeable& object, CompatibilityMode /*m
 	m_updatedAt = srcPtr->GetUpdatedAt();
 	m_entityReferences = srcPtr->GetEntityReferences();
 	m_attachmentIds = srcPtr->GetAttachmentIds();
+	m_reactions = srcPtr->GetReactions();
+	m_replyToId = srcPtr->GetReplyToId();
 	return true;
 }
 
@@ -207,7 +286,9 @@ bool CChatMessageComp::IsEqual(const IChangeable& object) const
 		&& m_createdAt == srcPtr->GetCreatedAt()
 		&& m_updatedAt == srcPtr->GetUpdatedAt()
 		&& m_entityReferences == srcPtr->GetEntityReferences()
-		&& m_attachmentIds == srcPtr->GetAttachmentIds();
+		&& m_attachmentIds == srcPtr->GetAttachmentIds()
+		&& m_reactions == srcPtr->GetReactions()
+		&& m_replyToId == srcPtr->GetReplyToId();
 }
 
 
@@ -221,6 +302,8 @@ istd::IChangeableUniquePtr CChatMessageComp::CloneMe(CompatibilityMode mode) con
 
 bool CChatMessageComp::ResetData(CompatibilityMode /*mode*/)
 {
+	istd::CChangeNotifier notifier(this);
+
 	m_id.clear();
 	m_conversationId.clear();
 	m_senderId.clear();
@@ -230,6 +313,8 @@ bool CChatMessageComp::ResetData(CompatibilityMode /*mode*/)
 	m_updatedAt.clear();
 	m_entityReferences.clear();
 	m_attachmentIds.clear();
+	m_reactions.clear();
+	m_replyToId.clear();
 	return true;
 }
 

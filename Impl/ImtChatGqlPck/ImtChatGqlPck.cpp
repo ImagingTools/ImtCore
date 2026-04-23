@@ -20,5 +20,10 @@ I_EXPORT_COMPONENT(
 			"Conversation collection controller",
 			"Conversation Collection Controller");
 
+I_EXPORT_COMPONENT(
+			ConversationCollectionDocumentManager,
+			"Conversation collection document manager",
+			"Conversation Collection Document Manager");
+
 
 } // namespace ImtChatGqlPck

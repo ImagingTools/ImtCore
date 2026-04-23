@@ -30,5 +30,20 @@ I_EXPORT_COMPONENT(
 			"Chat service component",
 			"Chat Service");
 
+I_EXPORT_COMPONENT(
+			Attachment,
+			"Attachment data component",
+			"Attachment");
+
+I_EXPORT_COMPONENT(
+			AttachmentStorage,
+			"Attachment storage service component",
+			"Attachment Storage");
+
+I_EXPORT_COMPONENT(
+			AttachmentBinaryDataProvider,
+			"Binary data provider/controller for HTTP attachment upload/download",
+			"Attachment Binary Data Provider");
+
 
 } // namespace ImtChatPck

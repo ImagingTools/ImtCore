@@ -17,24 +17,24 @@ Item {
 	property int status: 0  // 0=Sent, 1=Delivered, 2=Read
 	property bool isOwn: false
 	property bool hasEntityRefs: false
+	property var reactions: []
 
 	signal createTicketRequested(string messageId, string content)
+	signal reactionAdded(string messageId, string reaction)
 
 	width: parent ? parent.width : 0
-	height: bubbleColumn.implicitHeight + Style.paddingS * 2
+	height: bubbleColumn.height + Style.paddingS * 2
 
 	Column {
 		id: bubbleColumn
-		anchors {
-			left: messageBubbleRoot.isOwn ? undefined : parent.left
-			right: messageBubbleRoot.isOwn ? parent.right : undefined
-			leftMargin: messageBubbleRoot.isOwn ? 0 : Style.paddingM
-			rightMargin: messageBubbleRoot.isOwn ? Style.paddingM : 0
-			top: parent.top
-			topMargin: Style.paddingXS
-		}
+		anchors.left: messageBubbleRoot.isOwn ? undefined : parent.left
+		anchors.right: messageBubbleRoot.isOwn ? parent.right : undefined
+		anchors.leftMargin: messageBubbleRoot.isOwn ? 0 : Style.paddingM
+		anchors.rightMargin: messageBubbleRoot.isOwn ? Style.paddingM : 0
+		anchors.top: parent.top
+		anchors.topMargin: Style.paddingXS
 		spacing: Style.paddingXS
-		width: Math.min(parent.width * 0.75, implicitWidth)
+		width: parent.width * 0.75
 
 		// Sender name (only for received messages)
 		Text {
@@ -48,53 +48,44 @@ Item {
 		// Message bubble
 		Rectangle {
 			id: bubble
-			width: Math.min(bubbleColumn.width, contentText.implicitWidth + Style.paddingM * 2)
-			height: contentText.implicitHeight + Style.paddingS * 2
+			width: bubbleColumn.width
+			height: contentText.height + Style.paddingS * 2
 			radius: Style.radiusS
 			color: messageBubbleRoot.isOwn ? Style.accentColor : Style.surfaceColor
 
 			Text {
 				id: contentText
-				anchors {
-					left: parent.left
-					right: parent.right
-					top: parent.top
-					margins: Style.paddingM
-				}
+				anchors.left: parent.left
+				anchors.right: parent.right
+				anchors.top: parent.top
+				anchors.margins: Style.paddingM
 				text: messageBubbleRoot.content
 				font.pixelSize: Style.fontSizeS
 				color: messageBubbleRoot.isOwn ? "white" : Style.textPrimaryColor
 				wrapMode: Text.Wrap
 			}
+		}
 
-			// Context menu on right-click
-			MouseArea {
-				anchors.fill: parent
-				acceptedButtons: Qt.RightButton
-				onClicked: {
-					if (mouse.button === Qt.RightButton) {
-						contextMenu.popup();
-					}
-				}
-			}
+		// Reactions row (like GitHub comment reactions: 👍 👎 ❤️ 🚀 etc.)
+		Row {
+			visible: messageBubbleRoot.reactions.length > 0
+			spacing: Style.paddingXS
 
-			Menu {
-				id: contextMenu
+			Repeater {
+				model: messageBubbleRoot.reactions
 
-				MenuItem {
-					text: qsTr("Create Ticket")
-					onTriggered: {
-						messageBubbleRoot.createTicketRequested(
-							messageBubbleRoot.messageId,
-							messageBubbleRoot.content
-						);
-					}
-				}
+				Rectangle {
+					height: 24
+					width: reactionText.width + Style.paddingS * 2
+					radius: height / 2
+					color: Style.surfaceColor
+					border.color: Style.separatorColor
 
-				MenuItem {
-					text: qsTr("Copy Text")
-					onTriggered: {
-						clipboard.setText(messageBubbleRoot.content);
+					Text {
+						id: reactionText
+						anchors.centerIn: parent
+						text: modelData
+						font.pixelSize: Style.fontSizeXS
 					}
 				}
 			}
@@ -102,10 +93,8 @@ Item {
 
 		// Footer row: timestamp + status indicator
 		Row {
-			anchors {
-				right: messageBubbleRoot.isOwn ? bubbleColumn.right : undefined
-				left: messageBubbleRoot.isOwn ? undefined : bubbleColumn.left
-			}
+			anchors.right: messageBubbleRoot.isOwn ? bubbleColumn.right : undefined
+			anchors.left: messageBubbleRoot.isOwn ? undefined : bubbleColumn.left
 			spacing: Style.paddingXS
 
 			Text {

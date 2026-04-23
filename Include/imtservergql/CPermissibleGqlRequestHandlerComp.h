@@ -27,6 +27,7 @@ public:
 
 protected:
 	virtual bool CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QByteArray GetUserId(const ::imtgql::CGqlRequest& gqlRequest) const;
 
 	// reimplemented (CGqlRequestHandlerCompBase)
 	virtual QJsonObject CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;

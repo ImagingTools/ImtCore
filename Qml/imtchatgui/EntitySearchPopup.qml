@@ -52,12 +52,10 @@ Rectangle {
 
 	ListView {
 		id: resultsListView
-		anchors {
-			left: parent.left
-			right: parent.right
-			top: parent.top
-			margins: Style.paddingXS
-		}
+		anchors.left: parent.left
+		anchors.right: parent.right
+		anchors.top: parent.top
+		anchors.margins: Style.paddingXS
 		height: contentHeight
 		model: entitySearchPopupRoot.searchResults
 		spacing: 2
@@ -69,12 +67,10 @@ Rectangle {
 			radius: Style.radiusXS
 
 			Row {
-				anchors {
-					left: parent.left
-					right: parent.right
-					verticalCenter: parent.verticalCenter
-					leftMargin: Style.paddingS
-				}
+				anchors.left: parent.left
+				anchors.right: parent.right
+				anchors.verticalCenter: parent.verticalCenter
+				anchors.leftMargin: Style.paddingS
 				spacing: Style.paddingS
 
 				Text {
@@ -111,10 +107,6 @@ Rectangle {
 				}
 			}
 
-			states: State {
-				name: "hovered"
-				PropertyChanges { target: parent; color: Style.hoverColor }
-			}
 		}
 
 		// "No results" placeholder

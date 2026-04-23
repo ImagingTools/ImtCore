@@ -27,13 +27,11 @@ Rectangle {
 			color: Style.panelHeaderColor
 
 			Row {
-				anchors {
-					left: parent.left
-					right: parent.right
-					verticalCenter: parent.verticalCenter
-					leftMargin: Style.paddingM
-					rightMargin: Style.paddingS
-				}
+				anchors.left: parent.left
+				anchors.right: parent.right
+				anchors.verticalCenter: parent.verticalCenter
+				anchors.leftMargin: Style.paddingM
+				anchors.rightMargin: Style.paddingS
 
 				Text {
 					text: qsTr("Chats")
@@ -60,7 +58,9 @@ Rectangle {
 
 					MouseArea {
 						anchors.fill: parent
-						onClicked: chatPanelContainer.newConversationRequested()
+						onClicked: {
+							chatPanelContainer.newConversationRequested()
+						}
 					}
 				}
 			}
@@ -72,9 +72,9 @@ Rectangle {
 			width: parent.width
 			height: Style.inputHeightS
 			placeholderText: qsTr("Search conversations...")
-			onSearchTextChanged: function(text) {
-				if (conversationsModel) {
-					conversationsModel.filterText = text;
+			onSearchTextChanged: {
+				if (chatPanelContainer.conversationsModel) {
+					chatPanelContainer.conversationsModel.filterText = text;
 				}
 			}
 		}
@@ -103,13 +103,11 @@ Rectangle {
 				}
 
 				Row {
-					anchors {
-						left: parent.left
-						right: parent.right
-						verticalCenter: parent.verticalCenter
-						leftMargin: Style.paddingM
-						rightMargin: Style.paddingS
-					}
+					anchors.left: parent.left
+					anchors.right: parent.right
+					anchors.verticalCenter: parent.verticalCenter
+					anchors.leftMargin: Style.paddingM
+					anchors.rightMargin: Style.paddingS
 					spacing: Style.paddingS
 
 					// Avatar placeholder
@@ -155,12 +153,10 @@ Rectangle {
 				// Unread badge
 				Rectangle {
 					visible: model.unreadCount > 0
-					anchors {
-						right: parent.right
-						rightMargin: Style.paddingS
-						verticalCenter: parent.verticalCenter
-					}
-					width: Math.max(Style.badgeSizeMin, unreadText.implicitWidth + Style.paddingXS * 2)
+					anchors.right: parent.right
+					anchors.rightMargin: Style.paddingS
+					anchors.verticalCenter: parent.verticalCenter
+					width: Style.badgeSizeMin
 					height: Style.badgeSizeMin
 					radius: height / 2
 					color: Style.accentColor
@@ -183,8 +179,6 @@ Rectangle {
 					}
 				}
 			}
-
-			ScrollBar.vertical: ScrollBar {}
 		}
 	}
 }

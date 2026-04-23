@@ -52,9 +52,11 @@ QtObject {
 
                 if (container.getModelQuery.containsKey("data")){
                     dataModelLocal = container.getModelQuery.getData("data");
-
                     if (dataModelLocal.containsKey("GetTableViewParams")){
                         dataModelLocal = dataModelLocal.getData("GetTableViewParams");
+						if(dataModelLocal.containsKey("items")){
+							dataModelLocal = dataModelLocal.getData("items")
+						}
                         container.tableViewParams.copyFromTreeModel(dataModelLocal);
                         container.updated();
                     }

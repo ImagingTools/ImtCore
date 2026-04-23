@@ -123,7 +123,7 @@ QByteArray CSqliteDatabaseDocumentDelegateComp::CreateJsonBuildObjectQuery(const
 			revisionInfo += QString("'%1', %2").arg(key, raw.sql);
 		}
 		else if (value.type() == QMetaType::QString || value.type() == QMetaType::QByteArray){
-			revisionInfo += QString("'%1', '%2'").arg(key, value.toString());
+			revisionInfo += QString("'%1', '%2'").arg(key, SqlEncode(value.toString()));
 		}
 		else if (value.type() == QMetaType::Int){
 			revisionInfo += QString("'%1', %2").arg(key).arg(value.toInt());

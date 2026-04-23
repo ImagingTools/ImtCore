@@ -4,12 +4,10 @@ CREATE TABLE IF NOT EXISTS "Messages"
     "ConversationId"   TEXT NOT NULL,
     "SenderId"         TEXT NOT NULL,
     "Content"          TEXT NOT NULL,
-    "EntityReferences" TEXT,
-    "AttachmentIds"    TEXT,
     "Status"           INTEGER NOT NULL DEFAULT 0,
+    "ReplyToId"        TEXT,
     "CreatedAt"        TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "UpdatedAt"        TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "IsActive"         INTEGER NOT NULL DEFAULT 1
+    "UpdatedAt"        TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX IF NOT EXISTS "IX_Messages_ConversationId" ON "Messages" ("ConversationId");
 CREATE INDEX IF NOT EXISTS "IX_Messages_SenderId" ON "Messages" ("SenderId");

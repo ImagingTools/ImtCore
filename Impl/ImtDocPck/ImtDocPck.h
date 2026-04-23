@@ -8,6 +8,7 @@
 
 // ImtCore includes
 #include <imtdoc/CCollectionDocumentManagerComp.h>
+#include <imtdoc/CDocumentManagerEventHandlerDemultiplexerComp.h>
 
 
 /**
@@ -18,6 +19,7 @@ namespace ImtDocPck
 
 
 typedef icomp::TModelCompWrap<imtdoc::CCollectionDocumentManagerComp> CollectionDocumentManager;
+typedef imtdoc::CDocumentManagerEventHandlerDemultiplexerComp DocumentManagerEventHandlerDemultiplexer;
 
 
 } // namespace ImtDocPck

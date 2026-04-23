@@ -22,7 +22,17 @@
 		"ImagingToolsGradient3": "#252730",
 		"ImagingToolsGradient4": "#202325",
 		"Red": "#FF4500",
-		"Green": "#00FF00"
+		"Green": "#00FF00",
+		"InformationCategoryNoneBackground": "#00ff00",
+		"InformationCategoryNoneForeground": "#ffffff",
+		"InformationCategoryInfoBackground": "#00ff00",
+		"InformationCategoryInfoForeground": "#ffffff",
+		"InformationCategoryWarningBackground": "#ffff00",
+		"InformationCategoryWarningForeground": "#ffffff",
+		"InformationCategoryErrorBackground": "#ff0000",
+		"InformationCategoryErrorForeground": "#ffffff",
+		"InformationCategoryCriticalBackground": "#c00000",
+		"InformationCategoryCriticalForeground": "#ffffff"
 	},
 	"Style": {
 		"Name": "Dark",

@@ -28,7 +28,9 @@ Rectangle {
 
 		MouseArea {
 			anchors.fill: parent
-			onClicked: ticketCreateDialogRoot.cancel()
+			onClicked: {
+				ticketCreateDialogRoot.cancel()
+			}
 		}
 	}
 
@@ -37,23 +39,21 @@ Rectangle {
 		id: dialogCard
 		anchors.centerIn: parent
 		width: Math.min(parent.width * 0.9, Style.dialogWidthM)
-		height: dialogColumn.implicitHeight + Style.paddingL * 2
+		height: dialogColumn.height + Style.paddingL * 2
 		radius: Style.radiusM
 		color: Style.backgroundColor
 
 		Column {
 			id: dialogColumn
-			anchors {
-				left: parent.left
-				right: parent.right
-				top: parent.top
-				margins: Style.paddingL
-			}
+			anchors.left: parent.left
+			anchors.right: parent.right
+			anchors.top: parent.top
+			anchors.margins: Style.paddingL
 			spacing: Style.paddingM
 
 			// Title
 			Text {
-				text: qsTr("Create Support Ticket")
+				text: qsTr("New Issue")
 				font.pixelSize: Style.fontSizeL
 				font.bold: true
 				color: Style.textPrimaryColor
@@ -79,10 +79,8 @@ Rectangle {
 
 					TextInput {
 						id: titleField
-						anchors {
-							fill: parent
-							margins: Style.paddingS
-						}
+						anchors.fill: parent
+						anchors.margins: Style.paddingS
 						font.pixelSize: Style.fontSizeS
 						color: Style.textPrimaryColor
 						clip: true
@@ -120,10 +118,8 @@ Rectangle {
 
 					TextEdit {
 						id: descriptionField
-						anchors {
-							fill: parent
-							margins: Style.paddingS
-						}
+						anchors.fill: parent
+						anchors.margins: Style.paddingS
 						font.pixelSize: Style.fontSizeS
 						color: Style.textPrimaryColor
 						wrapMode: TextEdit.Wrap
@@ -131,7 +127,7 @@ Rectangle {
 
 						Text {
 							anchors.fill: parent
-							text: qsTr("Describe the issue in detail...")
+							text: qsTr("Add a description...")
 							color: Style.textPlaceholderColor
 							font.pixelSize: Style.fontSizeS
 							visible: descriptionField.text.length === 0
@@ -158,12 +154,6 @@ Rectangle {
 					ComboBox {
 						id: typeCombo
 						width: parent.width
-						model: [
-							qsTr("Access Request"),
-							qsTr("Support Request"),
-							qsTr("Feature Request"),
-							qsTr("Bug Report")
-						]
 						currentIndex: 1
 					}
 				}
@@ -181,28 +171,8 @@ Rectangle {
 					ComboBox {
 						id: priorityCombo
 						width: parent.width
-						model: [qsTr("Low"), qsTr("Medium"), qsTr("High"), qsTr("Critical")]
 						currentIndex: 1
 					}
-				}
-			}
-
-			// Environment
-			Column {
-				width: parent.width
-				spacing: Style.paddingXS
-
-				Text {
-					text: qsTr("Environment")
-					font.pixelSize: Style.fontSizeXS
-					color: Style.textSecondaryColor
-				}
-
-				ComboBox {
-					id: environmentCombo
-					width: parent.width
-					model: [qsTr("Development"), qsTr("Staging"), qsTr("Production")]
-					currentIndex: 2
 				}
 			}
 
@@ -227,7 +197,9 @@ Rectangle {
 
 					MouseArea {
 						anchors.fill: parent
-						onClicked: ticketCreateDialogRoot.cancel()
+						onClicked: {
+							ticketCreateDialogRoot.cancel()
+						}
 					}
 				}
 
@@ -235,11 +207,11 @@ Rectangle {
 					width: Style.buttonWidthM
 					height: Style.buttonHeightM
 					radius: Style.radiusS
-					color: titleField.text.trim().length > 0 ? Style.accentColor : Style.disabledColor
+					color: titleField.text.trim().length > 0 ? "#1a7f37" : Style.disabledColor
 
 					Text {
 						anchors.centerIn: parent
-						text: qsTr("Create Ticket")
+						text: qsTr("Submit new issue")
 						font.pixelSize: Style.fontSizeS
 						color: "white"
 						font.bold: true
@@ -248,7 +220,9 @@ Rectangle {
 					MouseArea {
 						anchors.fill: parent
 						enabled: titleField.text.trim().length > 0
-						onClicked: ticketCreateDialogRoot.submitTicket()
+						onClicked: {
+							ticketCreateDialogRoot.submitTicket()
+						}
 					}
 				}
 			}
@@ -271,12 +245,11 @@ Rectangle {
 	}
 
 	function submitTicket() {
-		const ticketData = {
+		let ticketData = {
 			title: titleField.text.trim(),
 			description: descriptionField.text.trim(),
 			ticketType: typeCombo.currentIndex,
 			priority: priorityCombo.currentIndex,
-			environment: environmentCombo.currentIndex,
 			messageId: linkedMessageId,
 			conversationId: linkedConversationId
 		};

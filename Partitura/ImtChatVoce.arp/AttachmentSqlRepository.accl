@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6379" Description="ACF"/>
+            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList/>
+    <EmbeddedRegistriesList>
+        <EmbeddedRegistry RegistryId="AttachmentSqlRepository"/>
+    </EmbeddedRegistriesList>
+    <ExportedInterfaces/>
+    <ExportedComponents/>
+</Acf>

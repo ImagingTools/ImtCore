@@ -193,7 +193,7 @@ class TextInput extends Item {
                         data = buff.splice(this.selectionStart, this.selectionEnd-this.selectionStart)
                     }
                     this.text = buff.join('')
-                    this.select(this.selectionEnd-data.length, this.selectionEnd-data.length)
+                    this.select(this.selectionEnd, this.selectionEnd)
                     break
                 }
                 case 'deleteContentForward': {
@@ -365,6 +365,10 @@ class TextInput extends Item {
             this.__impl.innerText = this.text.replaceAll(/./g, this.passwordCharacter.length ? this.passwordCharacter[0] : '●')
         } else {
             this.__impl.innerText = this.text
+        }
+
+        if(this.activeFocus){
+            this.select(this.text.length-1, this.text.length)
         }
 
         this.__checkValidator()

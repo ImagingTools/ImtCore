@@ -23,7 +23,9 @@ Rectangle {
 
 		MouseArea {
 			anchors.fill: parent
-			onClicked: conversationCreateDialogRoot.cancel()
+			onClicked: {
+				conversationCreateDialogRoot.cancel()
+			}
 		}
 	}
 
@@ -32,18 +34,16 @@ Rectangle {
 		id: dialogCard
 		anchors.centerIn: parent
 		width: Math.min(parent.width * 0.9, Style.dialogWidthM)
-		height: dialogColumn.implicitHeight + Style.paddingL * 2
+		height: dialogColumn.height + Style.paddingL * 2
 		radius: Style.radiusM
 		color: Style.backgroundColor
 
 		Column {
 			id: dialogColumn
-			anchors {
-				left: parent.left
-				right: parent.right
-				top: parent.top
-				margins: Style.paddingL
-			}
+			anchors.left: parent.left
+			anchors.right: parent.right
+			anchors.top: parent.top
+			anchors.margins: Style.paddingL
 			spacing: Style.paddingM
 
 			Text {
@@ -73,10 +73,8 @@ Rectangle {
 
 					TextInput {
 						id: nameField
-						anchors {
-							fill: parent
-							margins: Style.paddingS
-						}
+						anchors.fill: parent
+						anchors.margins: Style.paddingS
 						font.pixelSize: Style.fontSizeS
 						color: Style.textPrimaryColor
 						clip: true
@@ -139,7 +137,9 @@ Rectangle {
 
 					MouseArea {
 						anchors.fill: parent
-						onClicked: conversationCreateDialogRoot.cancel()
+						onClicked: {
+							conversationCreateDialogRoot.cancel()
+						}
 					}
 				}
 
@@ -160,7 +160,9 @@ Rectangle {
 					MouseArea {
 						anchors.fill: parent
 						enabled: nameField.text.trim().length > 0
-						onClicked: conversationCreateDialogRoot.submit()
+						onClicked: {
+							conversationCreateDialogRoot.submit()
+						}
 					}
 				}
 			}
@@ -180,7 +182,7 @@ Rectangle {
 	}
 
 	function submit() {
-		const convData = {
+		let convData = {
 			name: nameField.text.trim(),
 			conversationType: typeCombo.currentIndex,
 			participantIds: []

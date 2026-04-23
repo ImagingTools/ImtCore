@@ -482,6 +482,13 @@ QtObject {
 					let representationController = representationControllerFactory.createObject(documentData)
 					representationController.documentId = id
 					representationController.view = view
+
+					if (view.objectName === "DocumentViewBase"){
+						if (view.representationController !== undefined){
+							view.representationController = representationController
+						}
+					}
+
 					documentDecorator.registerView(view, representationController, !isNew && !isLoading)
 				}
 

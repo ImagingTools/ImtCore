@@ -18,11 +18,9 @@ Rectangle {
 	signal searchTextChanged(string text)
 
 	Row {
-		anchors {
-			fill: parent
-			leftMargin: Style.paddingS
-			rightMargin: Style.paddingXS
-		}
+		anchors.fill: parent
+		anchors.leftMargin: Style.paddingS
+		anchors.rightMargin: Style.paddingXS
 		spacing: Style.paddingXS
 
 		// Search icon
@@ -71,7 +69,9 @@ Rectangle {
 
 			MouseArea {
 				anchors.fill: parent
-				onClicked: textInput.text = ""
+				onClicked: {
+					textInput.text = ""
+				}
 			}
 		}
 	}

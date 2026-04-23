@@ -68,6 +68,20 @@ bool CPermissibleGqlRequestHandlerComp::CheckPermissions(const imtgql::CGqlReque
 }
 
 
+QByteArray CPermissibleGqlRequestHandlerComp::GetUserId(const ::imtgql::CGqlRequest& gqlRequest) const
+{
+	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
+	if (contextPtr != nullptr){
+		const imtauth::IUserInfo* userInfoPtr = contextPtr->GetUserInfo();
+		if (userInfoPtr != nullptr){
+			return userInfoPtr->GetId();
+		}
+	}
+
+	return QByteArray();
+}
+
+
 // reimplemented (imtservergql::CGqlRequestHandlerCompBase)
 
 QJsonObject CPermissibleGqlRequestHandlerComp::CreateInternalResponse(

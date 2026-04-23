@@ -20,6 +20,8 @@ CollectionView {
 	property var additionalFieldIds: ["id", "name"]
 	property var requestedFields: []
 
+	property alias subscriptionCommandId: subscriptionClient.gqlCommandId
+
 	signal removed(string objectId)
 
 	commandsControllerComp: Component {
@@ -83,6 +85,7 @@ CollectionView {
 	}
 
 	Component.onCompleted: {
+		console.log("RemoteCollectionView.qml onCompleted", table)
 		table.setSortingInfo("timeStamp", "DESC")
 		table.saveWidth.connect(root.tableViewParamsAccepted)
 		Events.subscribeEvent("UpdateAllModels", root.receiveRemoteChanges);
@@ -212,6 +215,7 @@ CollectionView {
 		}
 
 		onMessageReceived: {
+			console.log("RemoteCollectionView.qml onMessageReceived", root.collectionId)
 			root.handleSubscription(data);
 		}
 	}

@@ -9,6 +9,7 @@
 
 // ACF includes
 #include <istd/CChangeNotifier.h>
+#include <istd/CChangeGroup.h>
 
 // ImtCore includes
 #include <imtdoc/CDocumentClosedEvent.h>
@@ -69,6 +70,7 @@ QByteArray CCollectionDocumentManagerBase::OpenDocument(const QByteArray& userId
 	documentPtr->typeId = objectTypeId;
 	documentPtr->url = url;
 	documentPtr->name = collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
+
 	documentPtr->undoManagerPtr = undoManagerPtr;
 	documentPtr->isDirty = false;
 	documentPtr->isLoading = true;
@@ -278,6 +280,8 @@ IDocumentManager::OperationStatus CCollectionDocumentManagerBase::SaveDocument(
 		}
 		return validationStatus;
 	}
+
+	istd::CChangeGroup changeGroup(collectionPtr);
 
 	QString resultDocumentName = documentName;
 	if (!workingDocumentPtr->objectId.isEmpty()) {

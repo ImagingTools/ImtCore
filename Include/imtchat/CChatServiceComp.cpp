@@ -13,9 +13,11 @@ namespace imtchat
 
 QByteArray CChatServiceComp::SendMessage(
 			const QByteArray& conversationId,
+			const QByteArray& senderId,
 			const QString& content,
 			const QByteArrayList& entityReferences,
-			const QByteArrayList& attachmentIds)
+			const QByteArrayList& attachmentIds,
+			const QByteArray& replyToId)
 {
 	imtbase::IObjectCollection* messageCollectionPtr = m_messageCollectionCompPtr.GetPtr();
 	if (messageCollectionPtr == nullptr){
@@ -36,13 +38,15 @@ QByteArray CChatServiceComp::SendMessage(
 
 	chatMessagePtr->SetId(newId);
 	chatMessagePtr->SetConversationId(conversationId);
+	chatMessagePtr->SetSenderId(senderId);
 	chatMessagePtr->SetContent(content);
 	chatMessagePtr->SetStatus(IChatMessage::MS_SENT);
 	chatMessagePtr->SetEntityReferences(entityReferences);
 	chatMessagePtr->SetAttachmentIds(attachmentIds);
+	chatMessagePtr->SetReplyToId(replyToId);
 
 	QByteArray objectId = messageCollectionPtr->InsertNewObject(
-				QByteArray(),
+				QByteArray("ChatMessage"),
 				QString(),
 				QString(),
 				messagePtr.GetPtr(),
@@ -112,7 +116,7 @@ QByteArray CChatServiceComp::CreateConversation(
 	convPtr->SetParticipantIds(participantIds);
 
 	QByteArray objectId = conversationCollectionPtr->InsertNewObject(
-				QByteArray(),
+				QByteArray("Conversation"),
 				name,
 				QString(),
 				conversationPtr.GetPtr(),

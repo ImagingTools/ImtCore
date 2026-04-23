@@ -20,5 +20,10 @@ I_EXPORT_COMPONENT(
 			"Support ticket database delegate",
 			"Support Ticket Database Delegate");
 
+I_EXPORT_COMPONENT(
+			EntityReferenceStorage,
+			"Entity reference storage",
+			"Entity Reference Storage");
+
 
 } // namespace ImtDeskDbPck
