@@ -340,6 +340,17 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 		ticketPtr->SetDescription(*ticketInfo.description);
 	}
 
+	// Reporter can be set only for new tickets.
+	// For existing tickets keep original reporter unchanged.
+	if (ticketPtr->GetReporterId().isEmpty()){
+		if (ticketInfo.reporterId && !ticketInfo.reporterId->isEmpty()){
+			ticketPtr->SetReporterId(*ticketInfo.reporterId);
+		}
+		else{
+			ticketPtr->SetReporterId(userId);
+		}
+	}
+
 	if (ticketInfo.assigneeIds){
 		ticketPtr->SetAssigneeIds(ticketInfo.assigneeIds->ToList());
 	}
@@ -552,5 +563,4 @@ bool CTicketCollectionDocumentManagerComp::ProcessEvent(imtdoc::CEventBase* even
 
 
 } // namespace imtdeskgql
-
 

@@ -409,11 +409,13 @@ DocumentViewBase {
 		
 		ticketData.m_assigneeIds = root.pendingAssignees.map(function(a) { return a.id })
 		
-		if (editReporterCB.model && editReporterCB.currentIndex >= 0) {
-			ticketData.m_reporterId = editReporterCB.model.getData("id", editReporterCB.currentIndex)
-		}
-		else {
-			ticketData.m_reporterId = root.isNewIssue ? AuthorizationController.getUserId() : ""
+		if (root.isNewIssue) {
+			if (editReporterCB.model && editReporterCB.currentIndex >= 0) {
+				ticketData.m_reporterId = editReporterCB.model.getData("id", editReporterCB.currentIndex)
+			}
+			else {
+				ticketData.m_reporterId = AuthorizationController.getUserId()
+			}
 		}
 		
 		if (editTypeCB.model && editTypeCB.currentIndex >= 0) {
