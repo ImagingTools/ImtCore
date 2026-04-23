@@ -887,7 +887,7 @@ DocumentViewBase {
 											font.pixelSize: Style.fontSizeM
 											color: Style.textColor
 											wrapMode: TextEdit.Wrap
-											// textFormat: TextEdit.PlainText
+											textFormat: TextEdit.PlainText
 											readOnly: !root.canEdit
 											onEditingFinished: root.doUpdateModel()
 											KeyNavigation.tab: editTypeCB
@@ -1524,9 +1524,9 @@ DocumentViewBase {
 																documentCollectionFilter: null
 																showRemoteChangesAlert: false
 																tableViewParamsStoredServer: false
+																collectionId: ctxDialog.selectedEntityTypeId
 																Component.onCompleted: {
 																	ctxDialog.collectionView = this
-																	collectionId = ctxDialog.selectedEntityTypeId
 																}
 																onSelectionChanged: {
 																	ctxDialog.setButtonEnabled(Enums.apply, selectedIds.length > 0)
@@ -2438,7 +2438,7 @@ DocumentViewBase {
 										font.pixelSize: Style.fontSizeM
 										color: Style.textColor
 										wrapMode: TextEdit.Wrap
-										// textFormat: TextEdit.PlainText
+										textFormat: TextEdit.PlainText
 										KeyNavigation.backtab: editLockReasonInput.visible ? editLockReasonInput : editLockedCB
 										
 										onCursorRectangleChanged: {
