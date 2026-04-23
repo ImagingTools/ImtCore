@@ -60,6 +60,7 @@ DocumentViewBase {
 	property bool _commentsTrackingReady: false
 	property int _unreadMessagesCount: 0
 	property string _chatActionHint: ""
+	property bool _exportChatCopiedState: false
 	readonly property int chatHintDurationMs: 2200
 	readonly property int chatHintHeightPx: 28
 	readonly property int unreadHintHeightPx: 34
@@ -469,6 +470,13 @@ DocumentViewBase {
 		interval: root.chatHintDurationMs
 		repeat: false
 		onTriggered: root._chatActionHint = ""
+	}
+
+	Timer {
+		id: exportChatBtnStateTimer
+		interval: 1500
+		repeat: false
+		onTriggered: root._exportChatCopiedState = false
 	}
 	
 	CollectionDataProvider {
@@ -1720,7 +1728,10 @@ DocumentViewBase {
 						ToolButton {
 							id: exportChatBtn
 							anchors.verticalCenter: parent.verticalCenter
-							iconSource: Style.getIconPath("Icons/Copy", Icon.State.On, Icon.Mode.Normal)
+							enabled: !root._exportChatCopiedState
+							iconSource: root._exportChatCopiedState
+										? Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal)
+										: Style.getIconPath("Icons/Copy", Icon.State.On, Icon.Mode.Normal)
 							decorator: Component {
 								ToolButtonDecorator {
 									color: "transparent"
@@ -1729,6 +1740,8 @@ DocumentViewBase {
 							}
 							onClicked: {
 								root.copyTextToClipboard(root.formatChatExportText(), qsTr("Chat export copied"))
+								root._exportChatCopiedState = true
+								exportChatBtnStateTimer.restart()
 							}
 						}
 					}
