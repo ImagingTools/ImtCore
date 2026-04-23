@@ -783,7 +783,7 @@ class QAnchorLine {
 class QFont extends ComplexObject {
     static defaultProperties = {
         bold: { type: QBool, value: false, changed: 'mainChanged' },
-        family: { type: QString, value: 'Segoe UI', changed: 'mainChanged' },
+        family: { type: QString, value: 'Verdana', changed: 'mainChanged' },
         italic: { type: QBool, value: false, changed: 'mainChanged' },
         underline: { type: QBool, value: false, changed: 'mainChanged' },
         pointSize: { type: QReal, value: 14/0.75, changed: 'mainChanged' },

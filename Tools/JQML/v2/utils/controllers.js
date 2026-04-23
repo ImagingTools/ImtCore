@@ -1005,7 +1005,7 @@ class TextFontController {
     }
 
     measureTextFast(text, font){
-        this.ctx.font = `${font.italic ? 'italic ' : ''}${font.bold ? 'bold ' : ''}${font.pixelSize}px ${font.family}`
+        this.ctx.font = `${font.italic ? 'italic ' : ''}${font.bold ? 'bold ' : ''}${font.pixelSize}px '${font.family}'`
         let textMetrics = this.ctx.measureText(text)
         
         return {
@@ -1042,7 +1042,7 @@ class TextFontController {
             return this.measureTextFast(text, font)
         }
 
-        this.container.style.fontFamily = font.family
+        this.container.style.fontFamily = `'${font.family}'`
         this.container.style.fontSize = font.pixelSize+'px'
         this.container.style.fontWeight = font.bold ? 'bold' : 'normal'
         this.container.style.fontStyle = font.italic ? 'italic' : 'normal'
@@ -1064,7 +1064,7 @@ class TextFontController {
 
         if(elide === TextFontController.ElideRight){
             this.content.style.textOverflow = 'ellipsis'
-            this.content.style.overflow = 'auto'
+            this.content.style.overflow = 'hidden'
         } else {
             this.content.style.textOverflow = 'unset'
             this.content.style.overflow = 'unset'
