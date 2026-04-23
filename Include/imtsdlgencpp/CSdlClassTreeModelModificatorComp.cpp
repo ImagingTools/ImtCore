@@ -406,7 +406,7 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(
 
 			bool hasComplexTypes = false;
 			for (const QString& unionType : foundUnion.GetTypes()){
-				if (FindEntryByName(unionType) != nullptr){
+				if (FindEntryByName(unionType, m_sdlTypeListCompPtr->GetSdlTypes(false), m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false)) != nullptr){
 					hasComplexTypes = true;
 					break;
 				}
@@ -476,7 +476,7 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(
 
 			bool hasComplexTypes = false;
 			for (const QString& unionType : foundUnion.GetTypes()){
-				if (FindEntryByName(unionType) != nullptr){
+				if (FindEntryByName(unionType, m_sdlTypeListCompPtr->GetSdlTypes(false), m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false)) != nullptr){
 					hasComplexTypes = true;
 					break;
 				}
