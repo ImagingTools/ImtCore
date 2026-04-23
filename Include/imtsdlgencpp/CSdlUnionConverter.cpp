@@ -101,7 +101,7 @@ void CSdlUnionConverter::WriteConversionFromUnion(
 			stream << QStringLiteral("else ");
 		}
 
-		stream << QStringLiteral("if (const ") << convertedType << QStringLiteral("* val = std::get_if<") << convertedType << QStringLiteral(">(");
+		stream << QStringLiteral("if (std::get_if<") << convertedType << QStringLiteral(">(");
 		stream << sourceVariableName;
 		stream << QStringLiteral(")){");
 
@@ -112,6 +112,12 @@ void CSdlUnionConverter::WriteConversionFromUnion(
 			stream << QStringLiteral("->InsertNewItem();");
 			FeedStream(stream, 1, false);
 		}
+
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("const ") << convertedType << QStringLiteral("* val = std::get_if<") << convertedType << QStringLiteral(">(");
+		stream << sourceVariableName;
+		stream << QStringLiteral(");");
+		FeedStream(stream, 1, false);
 
 		if (isCustom){
 			if (conversionType == CT_MODEL_ARRAY){

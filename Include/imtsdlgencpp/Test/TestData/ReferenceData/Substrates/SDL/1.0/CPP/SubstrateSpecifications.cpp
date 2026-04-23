@@ -3973,7 +3973,8 @@ bool CSubstrateSpecificationInput::V1_0::WriteToModel(::imtbase::CTreeItemModel&
 		return false;
 	}
 	QVariant itemVariantValue;
-		if (const CCardboardSubstrateSpecification* val = std::get_if<CCardboardSubstrateSpecification>(item.GetPtr())){
+		if (std::get_if<CCardboardSubstrateSpecification>(item.GetPtr())){
+			const CCardboardSubstrateSpecification* val = std::get_if<CCardboardSubstrateSpecification>(item.GetPtr());
 			if (!val->WriteToModel(*(model.AddTreeModel("item", modelIndex)), 0)){
 				return false;
 			}
@@ -3981,7 +3982,8 @@ bool CSubstrateSpecificationInput::V1_0::WriteToModel(::imtbase::CTreeItemModel&
 				model.GetTreeItemModel("item", modelIndex)->SetData("__typename", "CardboardSubstrateSpecification", 0);
 			}
 		}
-		else if (const CPaperSubstrateSpecification* val = std::get_if<CPaperSubstrateSpecification>(item.GetPtr())){
+		else if (std::get_if<CPaperSubstrateSpecification>(item.GetPtr())){
+			const CPaperSubstrateSpecification* val = std::get_if<CPaperSubstrateSpecification>(item.GetPtr());
 			if (!val->WriteToModel(*(model.AddTreeModel("item", modelIndex)), 0)){
 				return false;
 			}
@@ -3989,7 +3991,8 @@ bool CSubstrateSpecificationInput::V1_0::WriteToModel(::imtbase::CTreeItemModel&
 				model.GetTreeItemModel("item", modelIndex)->SetData("__typename", "PaperSubstrateSpecification", 0);
 			}
 		}
-		else if (const CFilmSubstrateSpecification* val = std::get_if<CFilmSubstrateSpecification>(item.GetPtr())){
+		else if (std::get_if<CFilmSubstrateSpecification>(item.GetPtr())){
+			const CFilmSubstrateSpecification* val = std::get_if<CFilmSubstrateSpecification>(item.GetPtr());
 			if (!val->WriteToModel(*(model.AddTreeModel("item", modelIndex)), 0)){
 				return false;
 			}
@@ -4037,7 +4040,7 @@ bool CSubstrateSpecificationInput::V1_0::ReadFromModel(const ::imtbase::CTreeIte
 
 		return false;
 	}
-	QString itemTypename = itemData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
+	QString itemTypename = model.GetTreeItemModel("item", modelIndex)->GetData("__typename").toString();
 	if (itemTypename == "CardboardSubstrateSpecification") {
 		CCardboardSubstrateSpecification itemConvert;
 		const bool isitemRead = itemConvert.ReadFromModel(*model.GetTreeItemModel("item", modelIndex)); 
@@ -4094,7 +4097,7 @@ bool CSubstrateSpecificationInput::V1_0::OptReadFromModel(const ::imtbase::CTree
 
 	QVariant itemData = model.GetData("item", modelIndex);
 	if (!itemData.isNull()){
-		QString itemTypename = itemData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
+		QString itemTypename = model.GetTreeItemModel("item", modelIndex)->GetData("__typename").toString();
 		if (itemTypename == "CardboardSubstrateSpecification") {
 			CCardboardSubstrateSpecification itemConvert;
 			const bool isitemRead = itemConvert.ReadFromModel(*model.GetTreeItemModel("item", modelIndex)); 
@@ -4153,19 +4156,22 @@ bool CSubstrateSpecificationInput::V1_0::WriteToGraphQlObject(::imtgql::CGqlPara
 		return false;
 	}
 	::imtgql::CGqlParamObject itemDataObject;
-	if (const CCardboardSubstrateSpecification* val = std::get_if<CCardboardSubstrateSpecification>(item.GetPtr())){
+	if (std::get_if<CCardboardSubstrateSpecification>(item.GetPtr())){
+		const CCardboardSubstrateSpecification* val = std::get_if<CCardboardSubstrateSpecification>(item.GetPtr());
 		if (!val->WriteToGraphQlObject(itemDataObject)){
 			return false;
 		}
 		itemDataObject.InsertParam("__typename", QVariant("CardboardSubstrateSpecification"));
 	}
-	else if (const CPaperSubstrateSpecification* val = std::get_if<CPaperSubstrateSpecification>(item.GetPtr())){
+	else if (std::get_if<CPaperSubstrateSpecification>(item.GetPtr())){
+		const CPaperSubstrateSpecification* val = std::get_if<CPaperSubstrateSpecification>(item.GetPtr());
 		if (!val->WriteToGraphQlObject(itemDataObject)){
 			return false;
 		}
 		itemDataObject.InsertParam("__typename", QVariant("PaperSubstrateSpecification"));
 	}
-	else if (const CFilmSubstrateSpecification* val = std::get_if<CFilmSubstrateSpecification>(item.GetPtr())){
+	else if (std::get_if<CFilmSubstrateSpecification>(item.GetPtr())){
+		const CFilmSubstrateSpecification* val = std::get_if<CFilmSubstrateSpecification>(item.GetPtr());
 		if (!val->WriteToGraphQlObject(itemDataObject)){
 			return false;
 		}
@@ -4329,7 +4335,8 @@ bool CSubstrateSpecificationInput::V1_0::WriteToJsonObject(QJsonObject& jsonObje
 
 		return false;
 	}
-	if (const CCardboardSubstrateSpecification* val = std::get_if<CCardboardSubstrateSpecification>(item.GetPtr())){
+	if (std::get_if<CCardboardSubstrateSpecification>(item.GetPtr())){
+		const CCardboardSubstrateSpecification* val = std::get_if<CCardboardSubstrateSpecification>(item.GetPtr());
 		QJsonObject itemJsonObject;
 		const bool isitemAdded = val->WriteToJsonObject(itemJsonObject);
 		if (!isitemAdded){
@@ -4338,7 +4345,8 @@ bool CSubstrateSpecificationInput::V1_0::WriteToJsonObject(QJsonObject& jsonObje
 		itemJsonObject["__typename"] = "CardboardSubstrateSpecification";
 		jsonObject["item"] = itemJsonObject;
 	}
-	else if (const CPaperSubstrateSpecification* val = std::get_if<CPaperSubstrateSpecification>(item.GetPtr())){
+	else if (std::get_if<CPaperSubstrateSpecification>(item.GetPtr())){
+		const CPaperSubstrateSpecification* val = std::get_if<CPaperSubstrateSpecification>(item.GetPtr());
 		QJsonObject itemJsonObject;
 		const bool isitemAdded = val->WriteToJsonObject(itemJsonObject);
 		if (!isitemAdded){
@@ -4347,7 +4355,8 @@ bool CSubstrateSpecificationInput::V1_0::WriteToJsonObject(QJsonObject& jsonObje
 		itemJsonObject["__typename"] = "PaperSubstrateSpecification";
 		jsonObject["item"] = itemJsonObject;
 	}
-	else if (const CFilmSubstrateSpecification* val = std::get_if<CFilmSubstrateSpecification>(item.GetPtr())){
+	else if (std::get_if<CFilmSubstrateSpecification>(item.GetPtr())){
+		const CFilmSubstrateSpecification* val = std::get_if<CFilmSubstrateSpecification>(item.GetPtr());
 		QJsonObject itemJsonObject;
 		const bool isitemAdded = val->WriteToJsonObject(itemJsonObject);
 		if (!isitemAdded){
@@ -8955,19 +8964,22 @@ bool CSubstrateSpecificationCollectionControllerCompBase::CreateRepresentationFr
 			return false;
 		}
 
-		if (const CCardboardSubstrateSpecification* val = std::get_if<CCardboardSubstrateSpecification>(&representationObject)){
+		if (std::get_if<CCardboardSubstrateSpecification>(&representationObject)){
+			const CCardboardSubstrateSpecification* val = std::get_if<CCardboardSubstrateSpecification>(&representationObject);
 			if (!val->WriteToModel(dataModel)){
 				return false;
 			}
 			dataModel.SetData("__typename", "CardboardSubstrateSpecification", 0);
 		}
-		else if (const CPaperSubstrateSpecification* val = std::get_if<CPaperSubstrateSpecification>(&representationObject)){
+		else if (std::get_if<CPaperSubstrateSpecification>(&representationObject)){
+			const CPaperSubstrateSpecification* val = std::get_if<CPaperSubstrateSpecification>(&representationObject);
 			if (!val->WriteToModel(dataModel)){
 				return false;
 			}
 			dataModel.SetData("__typename", "PaperSubstrateSpecification", 0);
 		}
-		else if (const CFilmSubstrateSpecification* val = std::get_if<CFilmSubstrateSpecification>(&representationObject)){
+		else if (std::get_if<CFilmSubstrateSpecification>(&representationObject)){
+			const CFilmSubstrateSpecification* val = std::get_if<CFilmSubstrateSpecification>(&representationObject);
 			if (!val->WriteToModel(dataModel)){
 				return false;
 			}
@@ -9191,7 +9203,8 @@ bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlR
 			return nullptr;
 		}
 
-		if (const CCardboardSubstrateSpecification* val = std::get_if<CCardboardSubstrateSpecification>(&replyPayload)){
+		if (std::get_if<CCardboardSubstrateSpecification>(&replyPayload)){
+			const CCardboardSubstrateSpecification* val = std::get_if<CCardboardSubstrateSpecification>(&replyPayload);
 			if (!val->WriteToModel(*dataModelPtr)){
 				return nullptr;
 			}
@@ -9199,7 +9212,8 @@ bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlR
 				dataModelPtr->SetData("__typename", "CardboardSubstrateSpecification", 0);
 			}
 		}
-		else if (const CPaperSubstrateSpecification* val = std::get_if<CPaperSubstrateSpecification>(&replyPayload)){
+		else if (std::get_if<CPaperSubstrateSpecification>(&replyPayload)){
+			const CPaperSubstrateSpecification* val = std::get_if<CPaperSubstrateSpecification>(&replyPayload);
 			if (!val->WriteToModel(*dataModelPtr)){
 				return nullptr;
 			}
@@ -9207,7 +9221,8 @@ bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlR
 				dataModelPtr->SetData("__typename", "PaperSubstrateSpecification", 0);
 			}
 		}
-		else if (const CFilmSubstrateSpecification* val = std::get_if<CFilmSubstrateSpecification>(&replyPayload)){
+		else if (std::get_if<CFilmSubstrateSpecification>(&replyPayload)){
+			const CFilmSubstrateSpecification* val = std::get_if<CFilmSubstrateSpecification>(&replyPayload);
 			if (!val->WriteToModel(*dataModelPtr)){
 				return nullptr;
 			}
