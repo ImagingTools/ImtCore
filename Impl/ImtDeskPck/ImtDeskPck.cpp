@@ -35,5 +35,10 @@ I_EXPORT_COMPONENT(
 			"Entity type provider",
 			"Entity Type Provider");
 
+I_EXPORT_COMPONENT(
+			DelegatedEntityTypeProvider,
+			"Delegated entity type provider",
+			"Delegated Entity Type Provider");
+
 
 } // namespace ImtDeskPck
