@@ -74,14 +74,13 @@ DocumentViewBase {
 		_lastKnownCommentCount = (ticketData && ticketData.m_comments) ? ticketData.m_comments.count : 0
 		_commentsTrackingReady = false
 		_unreadMessagesCount = 0
-		Qt.callLater(function() {
-			try {
-				commentsFlick.scrollToBottom()
-			}
-			catch (err) {
-				console.warn("TicketEditor: Failed to scroll to bottom after ticket refresh (commentsFlick may not be ready):", err)
-			}
-		})
+		_forceScrollToBottom = true
+		try {
+			commentsFlick.scrollToBottom()
+		}
+		catch (err) {
+			console.warn("TicketEditor: Failed to scroll to bottom after ticket refresh:", err)
+		}
 	}
 	
 	onIsNewIssueChanged: {
