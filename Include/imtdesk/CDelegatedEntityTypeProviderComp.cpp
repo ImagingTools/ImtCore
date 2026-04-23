@@ -10,7 +10,7 @@ namespace imtdesk
 
 QString CDelegatedEntityTypeProviderComp::GetEntityTypeId() const
 {
-	if (m_slaveEntityTypeProviderCompPtr.IsValid()){
+	if (m_slaveEntityTypeProviderCompPtr.IsValid()) {
 		return m_slaveEntityTypeProviderCompPtr->GetEntityTypeId();
 	}
 
@@ -20,7 +20,7 @@ QString CDelegatedEntityTypeProviderComp::GetEntityTypeId() const
 
 QString CDelegatedEntityTypeProviderComp::GetEntityTypeName() const
 {
-	if (m_slaveEntityTypeProviderCompPtr.IsValid()){
+	if (m_slaveEntityTypeProviderCompPtr.IsValid()) {
 		return m_slaveEntityTypeProviderCompPtr->GetEntityTypeName();
 	}
 
@@ -29,4 +29,3 @@ QString CDelegatedEntityTypeProviderComp::GetEntityTypeName() const
 
 
 } // namespace imtdesk
-
