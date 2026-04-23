@@ -35,6 +35,8 @@ DocumentViewBase {
 	readonly property bool canLock: isNewIssue || (ticketData ? (ticketData.m_canLock === true) : false)
 	// Whether user is reporter (for lock-only access)
 	readonly property bool isReporter: ticketData ? (ticketData.m_reporterId === currentUserId) : false
+	readonly property bool isSuperUser: AuthorizationController.loggedUserIsSuperuser()
+	readonly property bool canEditCoreTicketFields: (isNewIssue || isReporter || isSuperUser) && canEdit
 	
 	// Pending image attachments for comment being composed
 	// Each element: {id: "uuid.ext", preview: "localPreviewUrl"}
@@ -64,6 +66,7 @@ DocumentViewBase {
 	readonly property int chatHintDurationMs: 2200
 	readonly property int chatHintHeightPx: 28
 	readonly property int unreadHintHeightPx: 34
+	readonly property int minCommentInputHeightPx: Style.controlHeightM - 10
 	
 	signal commentSubmitted(string commentText)
 
@@ -71,6 +74,14 @@ DocumentViewBase {
 		_lastKnownCommentCount = (ticketData && ticketData.m_comments) ? ticketData.m_comments.count : 0
 		_commentsTrackingReady = false
 		_unreadMessagesCount = 0
+		Qt.callLater(function() {
+			try {
+				commentsFlick.scrollToBottom()
+			}
+			catch (err) {
+				console.warn("TicketEditor: Failed to scroll to bottom after ticket refresh (commentsFlick may not be ready):", err)
+			}
+		})
 	}
 	
 	onIsNewIssueChanged: {
@@ -715,7 +726,7 @@ DocumentViewBase {
 								
 								Rectangle {
 									id: titleEditBtn
-									visible: root.canEdit
+									visible: root.canEditCoreTicketFields
 									width: 28
 									height: 28
 									radius: 14
@@ -770,7 +781,13 @@ DocumentViewBase {
 										width: titleColumn.width
 										height: Style.controlHeightM
 										placeHolderText: qsTr("Enter ticket title...")
-										readOnly: !root.canEdit
+										readOnly: !root.canEditCoreTicketFields
+										onActiveFocusChanged: {
+											if (!activeFocus && root._titleEditing && !root.isNewIssue) {
+												editTitleInput.text = root.ticketData ? root.ticketData.m_title : editTitleInput.oldText
+												root._titleEditing = false
+											}
+										}
 										KeyNavigation.tab: editDescriptionInput
 										onAccepted: {
 											root._titleEditing = false
@@ -813,7 +830,7 @@ DocumentViewBase {
 										hoverEnabled: true
 										cursorShape: Qt.PointingHandCursor
 										onClicked: {
-											editTitleInput.text = editTitleInput.oldText
+											editTitleInput.text = root.ticketData ? root.ticketData.m_title : editTitleInput.oldText
 											editTitleInput.oldText = ""
 											editTitleInput.cancelled()
 										}
@@ -888,7 +905,7 @@ DocumentViewBase {
 											color: Style.textColor
 											wrapMode: TextEdit.Wrap
 											textFormat: TextEdit.PlainText
-											readOnly: !root.canEdit
+											readOnly: !root.canEditCoreTicketFields
 											onEditingFinished: root.doUpdateModel()
 											KeyNavigation.tab: editTypeCB
 											KeyNavigation.backtab: editTitleInput
@@ -1001,7 +1018,7 @@ DocumentViewBase {
 										height: Style.buttonHeightM
 										currentIndex: 1
 										model: ticketTypeModel
-										enabled: root.canEdit
+										enabled: root.canEditCoreTicketFields
 										onCurrentIndexChanged: root.doUpdateModel()
 										KeyNavigation.tab: editPriorityCB
 										KeyNavigation.backtab: editDescriptionInput
@@ -1024,7 +1041,7 @@ DocumentViewBase {
 										height: Style.buttonHeightM
 										currentIndex: 1
 										model: priorityModel
-										enabled: root.canEdit
+										enabled: root.canEditCoreTicketFields
 										onCurrentIndexChanged: root.doUpdateModel()
 										KeyNavigation.tab: editAssigneeCB
 										KeyNavigation.backtab: editTypeCB
@@ -1103,7 +1120,7 @@ DocumentViewBase {
 										id: addAssigneeBtn
 										anchors.right: parent.right
 										anchors.verticalCenter: parent.verticalCenter
-										visible: root.canEdit
+										visible: root.canEditCoreTicketFields
 										text: "+ " + qsTr("Add assignee")
 										font.pixelSize: Style.fontSizeM
 										font.bold: true
@@ -1147,7 +1164,7 @@ DocumentViewBase {
 											
 											ToolButton {
 												id: assigneeChipRemove
-												visible: root.canEdit
+												visible: root.canEditCoreTicketFields
 												anchors.right: parent.right
 												anchors.verticalCenter: parent.verticalCenter
 												iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
@@ -2414,7 +2431,7 @@ DocumentViewBase {
 								border.color: commentInputField.activeFocus ? editView.accentColor : editView.cardBorderColor
 								border.width: commentInputField.activeFocus ? 2 : 1
 								color: editView.cardColor
-								
+
 								Flickable {
 									id: commentInputFlick
 									anchors.left: parent.left
@@ -2433,7 +2450,7 @@ DocumentViewBase {
 									TextEdit {
 										id: commentInputField
 										width: commentInputFlick.width
-										height: contentHeight
+										height: Math.max(contentHeight, root.minCommentInputHeightPx)
 										y: Math.max(0, (commentInputFlick.height - height) / 2)
 										font.pixelSize: Style.fontSizeM
 										color: Style.textColor
