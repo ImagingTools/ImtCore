@@ -167,14 +167,14 @@ Rectangle {
 		prefillContent = prefill || "";
 		linkedMessageId = messageId || "";
 		linkedConversationId = conversationId || "";
-		ticketFields.descriptionText = prefillContent
+		ticketFields.descriptionText = prefillContent;
 		visible = true;
 		ticketFields.focusTitle();
 	}
 
 	function cancel() {
 		visible = false;
-		ticketFields.clearFields()
+		ticketFields.clearFields();
 		cancelled();
 	}
 
@@ -190,6 +190,6 @@ Rectangle {
 
 		ticketCreated(ticketData);
 		visible = false;
-		ticketFields.clearFields()
+		ticketFields.clearFields();
 	}
 }

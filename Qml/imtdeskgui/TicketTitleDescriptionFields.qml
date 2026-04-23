@@ -15,6 +15,7 @@ Column {
 	property string descriptionPlaceholderText: qsTr("Describe the issue...")
 	property int minDescriptionHeight: 96
 	property int maxDescriptionHeight: 220
+	readonly property int _descriptionInnerHeight: Math.min(root.maxDescriptionHeight, Math.max(root.minDescriptionHeight, descriptionInput.contentHeight))
 
 	width: parent ? parent.width : implicitWidth
 	spacing: Style.spacingM
@@ -61,11 +62,11 @@ Column {
 
 		Rectangle {
 			width: parent.width
-			height: Math.min(root.maxDescriptionHeight, Math.max(root.minDescriptionHeight, descriptionInput.contentHeight)) + Style.paddingM * 2
+			height: root._descriptionInnerHeight + Style.paddingM * 2
 			radius: Style.radiusM
 			border.color: descriptionInput.activeFocus ? Style.accentColor : Style.borderColor
 			border.width: descriptionInput.activeFocus ? 2 : 1
-			color: descriptionInput.activeFocus ? Style.backgroundColor : "#FAFBFC"
+			color: Style.backgroundColor
 
 			Flickable {
 				id: descriptionFlick
@@ -80,7 +81,7 @@ Column {
 				TextEdit {
 					id: descriptionInput
 					width: descriptionFlick.width
-					height: Math.max(root.minDescriptionHeight - Style.paddingM * 2, contentHeight)
+					height: Math.max(root._descriptionInnerHeight - Style.paddingM * 2, contentHeight)
 					font.pixelSize: Style.fontSizeM
 					color: Style.textColor
 					wrapMode: TextEdit.Wrap

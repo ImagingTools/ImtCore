@@ -78,7 +78,7 @@ Dialog {
 							width: parent.width
 							titleLabelText: qsTr("Title")
 							descriptionLabelText: qsTr("Description")
-							titlePlaceholderText: qsTr("Title")
+							titlePlaceholderText: qsTr("Brief summary of the issue")
 							descriptionPlaceholderText: qsTr("Describe the issue...")
 							minDescriptionHeight: Style.controlHeightM * 3
 							maxDescriptionHeight: Style.controlHeightM * 5
@@ -216,7 +216,7 @@ Dialog {
 	}
 
 	function clearInputFields() {
-		ticketFields.clearFields()
+		ticketFields.clearFields();
 	}
 
 	function appendTicketItems(itemsModel) {
