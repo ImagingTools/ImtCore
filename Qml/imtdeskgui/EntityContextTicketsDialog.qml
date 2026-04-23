@@ -108,7 +108,7 @@ Dialog {
 								text: qsTr("Create")
 								enabled: titleInput.text.trim().length > 0
 								onClicked: {
-									root.createTicket(titleInput.text.trim(), descriptionInput.text.trim())
+									root.createTicket(titleInput.text, descriptionInput.text)
 								}
 							}
 						}
@@ -201,14 +201,11 @@ Dialog {
 
 		loading = true
 		ticketsModel.clear()
-		ticketsListRequest.send({
-								  entityType: root.entityType,
-								  entityId: root.entityId,
-								  viewParams: {
-									  count: root.ticketsPageSize,
-									  offset: root.defaultOffset
-								  }
-							  })
+
+		entityContextTicketsInput.m_entityId = root.entityId
+		entityContextTicketsInput.m_entityType = root.entityType
+
+		ticketsListRequest.send(entityContextTicketsInput)
 	}
 
 	function openTicket(ticketId) {
@@ -223,13 +220,13 @@ Dialog {
 			return
 		}
 
-		createTicketRequest.send({
-								   entityType: root.entityType,
-								   entityId: root.entityId,
-								   entityDisplayName: root.resolvedEntityDisplayName,
-								   title: title,
-								   description: description
-							   })
+		createEntityContextTicketInput.m_entityId = root.entityId
+		createEntityContextTicketInput.m_entityType = root.entityType
+		createEntityContextTicketInput.m_entityDisplayName = root.resolvedEntityDisplayName
+		createEntityContextTicketInput.m_title = title
+		createEntityContextTicketInput.m_description = description
+
+		createTicketRequest.send(createEntityContextTicketInput)
 	}
 
 	function clearInputFields() {
@@ -265,6 +262,10 @@ Dialog {
 		}
 	}
 
+	EntityContextTicketsInput {
+		id: entityContextTicketsInput
+	}
+
 	GqlSdlRequestSender {
 		id: ticketsListRequest
 		gqlCommandId: ImtdeskImtDeskSdlCommandIds.s_entityContextTickets
@@ -285,7 +286,10 @@ Dialog {
 				ticketsModel.clear()
 			}
 		}
+	}
 
+	CreateEntityContextTicketInput {
+		id: createEntityContextTicketInput
 	}
 
 	GqlSdlRequestSender {
