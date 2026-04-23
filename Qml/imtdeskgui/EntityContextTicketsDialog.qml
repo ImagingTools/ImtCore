@@ -18,9 +18,23 @@ Dialog {
 	property string entityType: ""
 	property string entityId: ""
 	property string entityDisplayName: ""
+	readonly property bool hasValidEntityContext: entityType !== "" && entityId !== ""
+	readonly property string resolvedEntityDisplayName: entityDisplayName !== "" ? entityDisplayName : entityId
 
 	property bool loading: false
+	property int ticketsPageSize: 250
+	property int descriptionInputHeight: Style.controlHeightM * 3
+	property int listHeightPadding: 24
+	readonly property int defaultOffset: 0
+	readonly property string defaultTicketType: "SupportRequest"
+	readonly property string defaultTicketStatus: "Open"
+	readonly property string defaultTicketStateReason: "None"
+	readonly property string defaultTicketPriority: "Medium"
+	readonly property string defaultEntityLinkScheme: "applink"
+	readonly property string entityLinkPath: root.entityType + "/" + root.entityId
+	readonly property int listContentHeight: root.height - (createCol.height + Style.marginM * 4 + root.listHeightPadding)
 	property int _scanIndex: 0
+	property int _currentOffset: 0
 	property var _ticketQueue: []
 	property var _ticketPreviewById: ({})
 	property string _currentDetailTicketId: ""
@@ -42,7 +56,7 @@ Dialog {
 
 				Text {
 					width: parent.width
-					text: qsTr("Context: %1 / %2").arg(root.entityType).arg(root.entityDisplayName !== "" ? root.entityDisplayName : root.entityId)
+					text: qsTr("Context: %1 / %2").arg(root.entityType).arg(root.resolvedEntityDisplayName)
 					font.pixelSize: Style.fontSizeM
 					color: Style.textSecondaryColor
 					elide: Text.ElideRight
@@ -79,7 +93,7 @@ Dialog {
 
 						Rectangle {
 							width: parent.width
-							height: 92
+							height: root.descriptionInputHeight
 							radius: Style.radiusS
 							color: Style.inputColor
 							border.color: Style.separatorColor
@@ -113,7 +127,7 @@ Dialog {
 
 				Rectangle {
 					width: parent.width
-					height: parent.height - (createCol.height + Style.marginM * 4 + 24)
+					height: root.listContentHeight
 					radius: Style.radiusM
 					color: "transparent"
 					border.color: Style.separatorColor
@@ -139,7 +153,7 @@ Dialog {
 									anchors.leftMargin: Style.marginM
 									anchors.verticalCenter: parent.verticalCenter
 									width: parent.width - Style.marginM * 2
-									text: "#" + (model.number || "") + "  " + (model.title || "")
+									text: "#" + (model.number || "") + " " + (model.title || "")
 									font.pixelSize: Style.fontSizeM
 									color: Style.textColor
 									elide: Text.ElideRight
@@ -190,18 +204,16 @@ Dialog {
 	}
 
 	function reloadTickets() {
-		if (entityType === "" || entityId === "") {
+		if (!hasValidEntityContext) {
 			ticketsModel.clear()
 			return
 		}
 
+		_resetTicketState()
 		loading = true
-		_scanIndex = 0
-		_ticketQueue = []
-		_ticketPreviewById = ({})
-		_currentDetailTicketId = ""
+		_currentOffset = defaultOffset
 		ticketsModel.clear()
-		ticketsListRequest.send({})
+		ticketsListRequest.send({offset: _currentOffset})
 	}
 
 	function openTicket(ticketId) {
@@ -212,14 +224,27 @@ Dialog {
 	}
 
 	function createTicket(title, description) {
-		if (!title || entityType === "" || entityId === "") {
+		if (!title || !hasValidEntityContext) {
 			return
 		}
+		let ticketId = UuidGenerator.generateUUID()
 		createTicketRequest.send({
-								   id: UuidGenerator.generateUUID(),
+								   id: ticketId,
 								   title: title,
 								   description: description
 							   })
+	}
+
+	function clearInputFields() {
+		titleInput.text = ""
+		descriptionInput.text = ""
+	}
+
+	function _resetTicketState() {
+		_scanIndex = 0
+		_ticketQueue = []
+		_ticketPreviewById = {}
+		_currentDetailTicketId = ""
 	}
 
 	function _matchCurrentEntity(entityRefsModel) {
@@ -254,10 +279,11 @@ Dialog {
 
 		function createQueryParams(query, params) {
 			let input = Gql.GqlObject("input")
+			let offset = params && params.offset !== undefined ? params.offset : root.defaultOffset
 			input.fromObject({
 							 viewParams: {
-								 count: 1000,
-								 offset: 0
+								 count: root.ticketsPageSize,
+								 offset: offset
 							 }
 						 })
 			query.AddParam(input)
@@ -270,11 +296,11 @@ Dialog {
 		}
 
 		function onResult(data) {
-			root._ticketQueue = []
-			root._ticketPreviewById = ({})
+			let loadedCount = 0
 			if (data && data.containsKey("items")) {
 				let itemsModel = data.getData("items")
-				for (let i = 0; i < itemsModel.getItemsCount(); ++i) {
+				loadedCount = itemsModel.getItemsCount()
+				for (let i = 0; i < loadedCount; ++i) {
 					let tid = String(itemsModel.getData("id", i) || "")
 					if (tid === "") {
 						continue
@@ -283,10 +309,16 @@ Dialog {
 					root._ticketQueue.push(tid)
 					root._ticketPreviewById[tid] = {
 						id: tid,
-						number: itemsModel.getData("number", i),
+						number: String(itemsModel.getData("number", i) || ""),
 						title: String(itemsModel.getData("title", i) || "")
 					}
 				}
+			}
+
+			if (loadedCount >= root.ticketsPageSize) {
+				root._currentOffset += root.ticketsPageSize
+				ticketsListRequest.send({offset: root._currentOffset})
+				return
 			}
 
 			root._scanIndex = 0
@@ -294,11 +326,8 @@ Dialog {
 		}
 
 		function onError(message, type) {
+			root._resetTicketState()
 			root.loading = false
-			root._scanIndex = 0
-			root._ticketQueue = []
-			root._ticketPreviewById = ({})
-			root._currentDetailTicketId = ""
 			root.ticketsModel.clear()
 			ModalDialogManager.showErrorDialog(message || qsTr("Failed to load tickets"))
 		}
@@ -346,7 +375,7 @@ Dialog {
 		requestType: 1
 
 		function createQueryParams(query, params) {
-			let ticketId = String(params.id || UuidGenerator.generateUUID())
+			let ticketId = String(params.id)
 			let input = Gql.GqlObject("input")
 			input.fromObject({
 							 id: ticketId,
@@ -354,21 +383,21 @@ Dialog {
 								 id: ticketId,
 								 title: String(params.title || ""),
 								 description: String(params.description || ""),
-								 ticketType: "SupportRequest",
-								 status: "Open",
-								 stateReason: "None",
-								 priority: "Medium",
+								 ticketType: root.defaultTicketType,
+								 status: root.defaultTicketStatus,
+								 stateReason: root.defaultTicketStateReason,
+								 priority: root.defaultTicketPriority,
 								 entityReferences: [{
 									 entityType: root.entityType,
 									 entityId: root.entityId,
-									 displayName: root.entityDisplayName !== "" ? root.entityDisplayName : root.entityId,
+									 displayName: root.resolvedEntityDisplayName,
 									 entityLink: {
 										 id: root.entityId,
 										 typeId: root.entityType,
-										 name: root.entityDisplayName !== "" ? root.entityDisplayName : root.entityId,
+										 name: root.resolvedEntityDisplayName,
 										 url: {
-											 scheme: "applink",
-											 path: root.entityType + "/" + root.entityId
+											 scheme: root.defaultEntityLinkScheme,
+											 path: root.entityLinkPath
 										 }
 									 }
 								 }]
@@ -381,8 +410,7 @@ Dialog {
 		}
 
 		function onResult(data) {
-			titleInput.text = ""
-			descriptionInput.text = ""
+			root.clearInputFields()
 			root.reloadTickets()
 			if (data && data.containsKey("id")) {
 				let createdId = String(data.getData("id") || "")
@@ -390,6 +418,10 @@ Dialog {
 					root.openTicket(createdId)
 				}
 			}
+		}
+
+		function onError(message, type) {
+			ModalDialogManager.showErrorDialog(message || qsTr("Failed to create ticket"))
 		}
 	}
 }

@@ -20,6 +20,10 @@ ViewBase {
 	property alias passwordInputConfirm: userGeneralEditor.confirmPasswordInput;
 	
 	property bool isNew: true
+	readonly property bool hasValidUserId: container.userData && container.userData.m_id && container.userData.m_id !== ""
+	readonly property string contextEntityDisplayName: container.userData
+		? (container.userData.m_name || container.userData.m_username || container.userData.m_id)
+		: ""
 	
 	function updateGui(){
 		userGeneralEditor.updateGui();
@@ -112,14 +116,14 @@ ViewBase {
 	}
 
 	function openContextTicketsDialog(){
-		if (!container.userData || !container.userData.m_id || container.userData.m_id === ""){
+		if (!container.hasValidUserId){
 			return
 		}
 
 		ModalDialogManager.openDialog(contextTicketsDialogComp, {
 											entityType: "Users",
 											entityId: container.userData.m_id,
-											entityDisplayName: container.userData.m_name || container.userData.m_username || container.userData.m_id
+											entityDisplayName: container.contextEntityDisplayName
 										})
 	}
 
@@ -210,7 +214,7 @@ ViewBase {
 					width: Style.buttonWidthXL
 					height: Style.controlHeightM
 					text: qsTr("Related tickets")
-					enabled: container.userData && container.userData.m_id && container.userData.m_id !== ""
+					enabled: container.hasValidUserId
 					onClicked: {
 						container.openContextTicketsDialog()
 					}
