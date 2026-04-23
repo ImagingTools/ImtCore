@@ -6,6 +6,7 @@
 		<file alias="imtdeskgui/TicketCollectionView.qml">TicketCollectionView.qml</file>
 		<file alias="imtdeskgui/TicketCreateDialog.qml">TicketCreateDialog.qml</file>
 		<file alias="imtdeskgui/TicketEditor.qml">TicketEditor.qml</file>
+		<file alias="imtdeskgui/EntityContextTicketsDialog.qml">EntityContextTicketsDialog.qml</file>
 		<file alias="imtdeskgui/TicketListPanel.qml">TicketListPanel.qml</file>
 		<file alias="imtdeskgui/TicketView.qml">TicketView.qml</file>
     </qresource>

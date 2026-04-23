@@ -4,8 +4,6 @@ CREATE TABLE IF NOT EXISTS "Messages"
     "ConversationId"   TEXT NOT NULL,
     "SenderId"         TEXT NOT NULL,
     "Content"          TEXT NOT NULL,
-    "EntityReferences" TEXT,
-    "Reactions"        TEXT,
     "Status"           INTEGER NOT NULL DEFAULT 0,
     "ReplyToId"        TEXT,
     "CreatedAt"        TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,

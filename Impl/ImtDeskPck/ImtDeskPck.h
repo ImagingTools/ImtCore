@@ -11,6 +11,7 @@
 #include <imtdesk/CTicketActionComp.h>
 #include <imtdesk/CTicketDocumentNameProviderComp.h>
 #include <imtdesk/CEntityTypeProviderComp.h>
+#include <imtdesk/CDelegatedEntityTypeProviderComp.h>
 
 
 /**
@@ -25,8 +26,8 @@ typedef icomp::TModelCompWrap<imtdesk::CLabelComp> Label;
 typedef icomp::TModelCompWrap<imtdesk::CTicketActionComp> TicketAction;
 typedef imtdesk::CTicketDocumentNameProviderComp TicketDocumentNameProvider;
 typedef imtdesk::CEntityTypeProviderComp EntityTypeProvider;
+typedef imtdesk::CDelegatedEntityTypeProviderComp DelegatedEntityTypeProvider;
 
 
 } // namespace ImtDeskPck
-
 

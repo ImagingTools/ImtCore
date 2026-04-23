@@ -35,6 +35,8 @@ DocumentViewBase {
 	readonly property bool canLock: isNewIssue || (ticketData ? (ticketData.m_canLock === true) : false)
 	// Whether user is reporter (for lock-only access)
 	readonly property bool isReporter: ticketData ? (ticketData.m_reporterId === currentUserId) : false
+	readonly property bool isSuperUser: AuthorizationController.loggedUserIsSuperuser()
+	readonly property bool canEditCoreTicketFields: (isNewIssue || isReporter || isSuperUser) && canEdit
 	
 	// Pending image attachments for comment being composed
 	// Each element: {id: "uuid.ext", preview: "localPreviewUrl"}
@@ -60,9 +62,11 @@ DocumentViewBase {
 	property bool _commentsTrackingReady: false
 	property int _unreadMessagesCount: 0
 	property string _chatActionHint: ""
+	property bool _exportChatCopiedState: false
 	readonly property int chatHintDurationMs: 2200
 	readonly property int chatHintHeightPx: 28
 	readonly property int unreadHintHeightPx: 34
+	readonly property int minCommentInputHeightPx: Style.controlHeightM - 10
 	
 	signal commentSubmitted(string commentText)
 
@@ -70,6 +74,13 @@ DocumentViewBase {
 		_lastKnownCommentCount = (ticketData && ticketData.m_comments) ? ticketData.m_comments.count : 0
 		_commentsTrackingReady = false
 		_unreadMessagesCount = 0
+		_forceScrollToBottom = true
+		try {
+			commentsFlick.scrollToBottom()
+		}
+		catch (err) {
+			console.warn("TicketEditor: Failed to scroll to bottom after ticket refresh:", err)
+		}
 	}
 	
 	onIsNewIssueChanged: {
@@ -93,6 +104,16 @@ DocumentViewBase {
 		.replace(/'/g, "&#39;")
 		.replace(/\\n/g, "<br>")
 		.replace(/\n/g, "<br>")
+	}
+
+	function normalizeUserId(userId) {
+		if (userId === undefined || userId === null)
+			return ""
+		return String(userId).trim().replace(/[{}]/g, "").toLowerCase()
+	}
+
+	function isSameUserId(leftId, rightId) {
+		return normalizeUserId(leftId) === normalizeUserId(rightId)
 	}
 
 	function isImageAttachment(fileName) {
@@ -399,11 +420,13 @@ DocumentViewBase {
 		
 		ticketData.m_assigneeIds = root.pendingAssignees.map(function(a) { return a.id })
 		
-		if (editReporterCB.model && editReporterCB.currentIndex >= 0) {
-			ticketData.m_reporterId = editReporterCB.model.getData("id", editReporterCB.currentIndex)
-		}
-		else {
-			ticketData.m_reporterId = root.isNewIssue ? AuthorizationController.getUserId() : ""
+		if (root.isNewIssue) {
+			if (editReporterCB.model && editReporterCB.currentIndex >= 0) {
+				ticketData.m_reporterId = editReporterCB.model.getData("id", editReporterCB.currentIndex)
+			}
+			else {
+				ticketData.m_reporterId = AuthorizationController.getUserId()
+			}
 		}
 		
 		if (editTypeCB.model && editTypeCB.currentIndex >= 0) {
@@ -457,6 +480,13 @@ DocumentViewBase {
 		interval: root.chatHintDurationMs
 		repeat: false
 		onTriggered: root._chatActionHint = ""
+	}
+
+	Timer {
+		id: exportChatBtnStateTimer
+		interval: 1500
+		repeat: false
+		onTriggered: root._exportChatCopiedState = false
 	}
 	
 	CollectionDataProvider {
@@ -695,7 +725,7 @@ DocumentViewBase {
 								
 								Rectangle {
 									id: titleEditBtn
-									visible: root.canEdit
+									visible: root.canEditCoreTicketFields
 									width: 28
 									height: 28
 									radius: 14
@@ -732,23 +762,49 @@ DocumentViewBase {
 								width: parent.width
 								spacing: Style.spacingS
 								
-								CustomTextField {
-									id: editTitleInput
-									width: parent.width - titleConfirmBtn.width - titleCloseBtn.width - 2*Style.spacingS
-									height: Style.controlHeightM
-									placeHolderText: qsTr("Enter ticket title...")
-									readOnly: !root.canEdit
-									KeyNavigation.tab: editDescriptionInput
-									onAccepted: {
-										root._titleEditing = false
-										root.doUpdateModel()
+								Column {
+									id: titleColumn
+									width: root.isNewIssue ? parent.width : parent.width - titleConfirmBtn.width - titleCloseBtn.width - 2*Style.spacingS
+									spacing: 4
+
+									Text {
+										text: qsTr("Title")
+										font.pixelSize: Style.fontSizeM
+										font.bold: true
+										color: editView.sectionLabelColor
+										visible: root.isNewIssue
 									}
-									onCancelled: {
-										root._titleEditing = false
+									
+									CustomTextField {
+										id: editTitleInput
+										width: titleColumn.width
+										height: Style.controlHeightM
+										placeHolderText: qsTr("Enter ticket title...")
+										readOnly: !root.canEditCoreTicketFields
+										onActiveFocusChanged: {
+											if (!activeFocus && root._titleEditing && !root.isNewIssue) {
+												editTitleInput.text = root.ticketData ? root.ticketData.m_title : editTitleInput.oldText
+												root._titleEditing = false
+											}
+										}
+										KeyNavigation.tab: editDescriptionInput
+										onAccepted: {
+											root._titleEditing = false
+											root.doUpdateModel()
+										}
+										onCancelled: {
+											root._titleEditing = false
+										}
+										onEditingFinished: {
+											if (root.isNewIssue){
+												root.doUpdateModel()
+											}
+										}
+
+										property string oldText
 									}
-									property string oldText
 								}
-								
+
 								Rectangle {
 									id: titleCloseBtn
 									visible: !root.isNewIssue
@@ -773,7 +829,7 @@ DocumentViewBase {
 										hoverEnabled: true
 										cursorShape: Qt.PointingHandCursor
 										onClicked: {
-											editTitleInput.text = editTitleInput.oldText
+											editTitleInput.text = root.ticketData ? root.ticketData.m_title : editTitleInput.oldText
 											editTitleInput.oldText = ""
 											editTitleInput.cancelled()
 										}
@@ -847,8 +903,8 @@ DocumentViewBase {
 											font.pixelSize: Style.fontSizeM
 											color: Style.textColor
 											wrapMode: TextEdit.Wrap
-											// textFormat: TextEdit.PlainText
-											readOnly: !root.canEdit
+											textFormat: TextEdit.PlainText
+											readOnly: !root.canEditCoreTicketFields
 											onEditingFinished: root.doUpdateModel()
 											KeyNavigation.tab: editTypeCB
 											KeyNavigation.backtab: editTitleInput
@@ -961,7 +1017,7 @@ DocumentViewBase {
 										height: Style.buttonHeightM
 										currentIndex: 1
 										model: ticketTypeModel
-										enabled: root.canEdit
+										enabled: root.canEditCoreTicketFields
 										onCurrentIndexChanged: root.doUpdateModel()
 										KeyNavigation.tab: editPriorityCB
 										KeyNavigation.backtab: editDescriptionInput
@@ -984,7 +1040,7 @@ DocumentViewBase {
 										height: Style.buttonHeightM
 										currentIndex: 1
 										model: priorityModel
-										enabled: root.canEdit
+										enabled: root.canEditCoreTicketFields
 										onCurrentIndexChanged: root.doUpdateModel()
 										KeyNavigation.tab: editAssigneeCB
 										KeyNavigation.backtab: editTypeCB
@@ -1063,7 +1119,7 @@ DocumentViewBase {
 										id: addAssigneeBtn
 										anchors.right: parent.right
 										anchors.verticalCenter: parent.verticalCenter
-										visible: root.canEdit
+										visible: root.canEditCoreTicketFields
 										text: "+ " + qsTr("Add assignee")
 										font.pixelSize: Style.fontSizeM
 										font.bold: true
@@ -1107,7 +1163,7 @@ DocumentViewBase {
 											
 											ToolButton {
 												id: assigneeChipRemove
-												visible: root.canEdit
+												visible: root.canEditCoreTicketFields
 												anchors.right: parent.right
 												anchors.verticalCenter: parent.verticalCenter
 												iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
@@ -1484,9 +1540,9 @@ DocumentViewBase {
 																documentCollectionFilter: null
 																showRemoteChangesAlert: false
 																tableViewParamsStoredServer: false
+																collectionId: ctxDialog.selectedEntityTypeId
 																Component.onCompleted: {
 																	ctxDialog.collectionView = this
-																	collectionId = ctxDialog.selectedEntityTypeId
 																}
 																onSelectionChanged: {
 																	ctxDialog.setButtonEnabled(Enums.apply, selectedIds.length > 0)
@@ -1688,7 +1744,10 @@ DocumentViewBase {
 						ToolButton {
 							id: exportChatBtn
 							anchors.verticalCenter: parent.verticalCenter
-							iconSource: Style.getIconPath("Icons/Copy", Icon.State.On, Icon.Mode.Normal)
+							enabled: !root._exportChatCopiedState
+							iconSource: root._exportChatCopiedState
+										? Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal)
+										: Style.getIconPath("Icons/Copy", Icon.State.On, Icon.Mode.Normal)
 							decorator: Component {
 								ToolButtonDecorator {
 									color: "transparent"
@@ -1697,6 +1756,8 @@ DocumentViewBase {
 							}
 							onClicked: {
 								root.copyTextToClipboard(root.formatChatExportText(), qsTr("Chat export copied"))
+								root._exportChatCopiedState = true
+								exportChatBtnStateTimer.restart()
 							}
 						}
 					}
@@ -1851,7 +1912,10 @@ DocumentViewBase {
 										for (var msgIndex = root._lastKnownCommentCount; msgIndex < count; msgIndex++) {
 											var msgWrapper = commentsModel.get(msgIndex)
 											var msgItem = msgWrapper ? msgWrapper.item : null
-											if (msgItem && msgItem.m_userId !== root.currentUserId) {
+											var serverMessageId = msgItem && msgItem.m_id ? String(msgItem.m_id) : ""
+											if (msgItem
+													&& serverMessageId.length > 0
+													&& !root.isSameUserId(msgItem.m_userId, root.currentUserId)) {
 												unreadDelta++
 											}
 										}
@@ -1865,10 +1929,12 @@ DocumentViewBase {
 									width: commentsListCol.width
 									height: commentBubbleCol.height + topGap
 									
-									readonly property bool isMe: model.item.m_userId === root.currentUserId
+									readonly property bool isMe: root.isSameUserId(model.item.m_userId, root.currentUserId)
 									readonly property var dataModel: model.item
 									readonly property string _prevUserId: index > 0 && commentsThread.itemAt(index - 1) ? commentsThread.itemAt(index - 1).dataModel.m_userId : ""
-									readonly property bool isGroupedWithPrev: index > 0 && _prevUserId === model.item.m_userId && _prevUserId.length > 0
+									readonly property bool isGroupedWithPrev: index > 0
+																			  && _prevUserId.length > 0
+																			  && root.isSameUserId(_prevUserId, model.item.m_userId)
 									readonly property int topGap: index === 0 ? 0 : (isGroupedWithPrev ? 2 : Style.spacingS)
 									
 									Column {
@@ -2364,7 +2430,7 @@ DocumentViewBase {
 								border.color: commentInputField.activeFocus ? editView.accentColor : editView.cardBorderColor
 								border.width: commentInputField.activeFocus ? 2 : 1
 								color: editView.cardColor
-								
+
 								Flickable {
 									id: commentInputFlick
 									anchors.left: parent.left
@@ -2383,12 +2449,12 @@ DocumentViewBase {
 									TextEdit {
 										id: commentInputField
 										width: commentInputFlick.width
-										height: contentHeight
+										height: Math.max(contentHeight, root.minCommentInputHeightPx)
 										y: Math.max(0, (commentInputFlick.height - height) / 2)
 										font.pixelSize: Style.fontSizeM
 										color: Style.textColor
 										wrapMode: TextEdit.Wrap
-										// textFormat: TextEdit.PlainText
+										textFormat: TextEdit.PlainText
 										KeyNavigation.backtab: editLockReasonInput.visible ? editLockReasonInput : editLockedCB
 										
 										onCursorRectangleChanged: {

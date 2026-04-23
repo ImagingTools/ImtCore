@@ -71,6 +71,9 @@
                     <AttributeInfo Id="RequestManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="WebSocketServerFramework"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="TicketContextTypeProviders" Type="Reference[]" ExportId="TicketContextTypeProviders">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

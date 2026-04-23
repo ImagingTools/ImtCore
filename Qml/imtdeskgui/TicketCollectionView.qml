@@ -26,6 +26,7 @@ RemoteCollectionView {
 		registerFieldFilterDelegate("statusFilter", statusDelegateFilterComp)
 		registerFieldFilterDelegate("priorityFilter", priorityDelegateFilterComp)
 		registerFieldFilterDelegate("assignedToMeFilter", assignedToMeDelegateFilterComp)
+		registerFieldFilterDelegate("withoutAssigneesFilter", withoutAssigneesDelegateFilterComp)
 		registerFieldFilterDelegate("reportedByMeFilter", reportedByMeDelegateFilterComp)
 	}
 
@@ -92,10 +93,10 @@ RemoteCollectionView {
 
 			TicketBadge {
 				id: statusBadge
-				badgeType: "status"
 				anchors.verticalCenter: parent.verticalCenter
-				anchors.left: parent.left
-				anchors.leftMargin: statusDelegate && statusDelegate.rowDelegate ? statusDelegate.rowDelegate.textLeftMargin : 0
+				anchors.horizontalCenter: parent.horizontalCenter
+				height: 20
+				badgeType: "status"
 			}
 		}
 	}
@@ -138,6 +139,18 @@ RemoteCollectionView {
 			defaultFieldFilter.m_filterValueType: "String"
 			defaultFieldFilter.m_filterOperations: ["Contains"]
 			filterValue: AuthorizationController.getUserId()
+		}
+	}
+
+	Component {
+		id: withoutAssigneesDelegateFilterComp
+		EnableableFilterDelegate {
+			name: qsTr("Without assignees")
+			defaultFieldFilter.m_fieldId: "AssigneeIds"
+			defaultFieldFilter.m_filterValueType: "String"
+			defaultFieldFilter.m_filterOperations: ["Equal"]
+			filterValue: ""
+			allowEmptyFilterValue: true
 		}
 	}
 

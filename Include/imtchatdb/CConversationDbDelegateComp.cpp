@@ -53,9 +53,6 @@ istd::IChangeableUniquePtr CConversationDbDelegateComp::CreateObjectFromRecord(
 	if (record.contains("ConversationType")){
 		convPtr->SetConversationType(static_cast<imtchat::IConversation::ConversationType>(record.value("ConversationType").toInt()));
 	}
-	if (record.contains("Metadata")){
-		convPtr->SetMetadata(record.value("Metadata").toString());
-	}
 	if (record.contains("CreatedAt")){
 		QVariant val = record.value("CreatedAt");
 		QDateTime dt = val.toDateTime();
@@ -99,20 +96,17 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CConversationDbDelegateComp::Crea
 	}
 
 	const imtchat::IConversation::ConversationType conversationType = convPtr->GetConversationType();
-	const QString metadata = convPtr->GetMetadata();
-	const QString metadataSql = metadata.isEmpty() ? "NULL" : QString("'%1'").arg(metadata);
 
 	const QString nowUtc = utcNow();
 
 	NewObjectQuery retVal;
 	retVal.query = QString(
 		"INSERT INTO \"Conversations\" "
-		"(\"Id\", \"Name\", \"ConversationType\", \"Metadata\", \"CreatedAt\", \"UpdatedAt\") "
-		"VALUES('%1', '%2', %3, %4, '%5', '%6');")
+		"(\"Id\", \"Name\", \"ConversationType\", \"CreatedAt\", \"UpdatedAt\") "
+		"VALUES('%1', '%2', %3, '%4', '%5');")
 		.arg(QString::fromUtf8(convId))
 		.arg(name)
 		.arg(conversationType)
-		.arg(metadataSql)
 		.arg(nowUtc)
 		.arg(nowUtc)
 		.toUtf8();
@@ -133,19 +127,14 @@ QByteArray CConversationDbDelegateComp::CreateUpdateObjectQuery(
 		return QByteArray();
 	}
 
-	const QString metadata = convPtr->GetMetadata();
-	const QString metadataSql = metadata.isEmpty() ? "NULL" : QString("'%1'").arg(metadata);
-
 	return QString(
 		"UPDATE \"Conversations\" SET "
 		"\"Name\"='%1', "
 		"\"ConversationType\"=%2, "
-		"\"Metadata\"=%3, "
-		"\"UpdatedAt\"='%4' "
-		"WHERE \"Id\"='%5';")
+		"\"UpdatedAt\"='%3' "
+		"WHERE \"Id\"='%4';")
 		.arg(convPtr->GetName())
 		.arg(convPtr->GetConversationType())
-		.arg(metadataSql)
 		.arg(utcNow())
 		.arg(QString::fromUtf8(objectId))
 		.toUtf8();

@@ -332,12 +332,38 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 		}
 	}
 
+	const bool canEditCoreFields = CanLockTicket(gqlRequest.GetRequestContext(), ticketPtr)
+			|| ticketPtr->GetReporterId().isEmpty();
+	const bool titleChanged = ticketInfo.title && *ticketInfo.title != ticketPtr->GetTitle();
+	const bool descriptionChanged = ticketInfo.description && *ticketInfo.description != ticketPtr->GetDescription();
+	const bool assigneesChanged = ticketInfo.assigneeIds && ticketInfo.assigneeIds->ToList() != ticketPtr->GetAssigneeIds();
+	const bool ticketTypeChanged = ticketInfo.ticketType
+			&& imtdeskgql::GetTicketTypeFromSdlType(*ticketInfo.ticketType) != ticketPtr->GetTicketType();
+	const bool priorityChanged = ticketInfo.priority
+			&& imtdeskgql::GetPriorityTypeFromSdlType(*ticketInfo.priority) != ticketPtr->GetPriority();
+	if ((titleChanged || descriptionChanged || assigneesChanged || ticketTypeChanged || priorityChanged) && !canEditCoreFields){
+		errorMessage = QStringLiteral("Permission denied: only reporter or admin can edit ticket fields");
+		response.Version_1_0->status = sdl::imtbase::CollectionDocumentManager::EDocumentOperationStatus::Failed;
+		return response;
+	}
+
 	if (ticketInfo.title){
 		ticketPtr->SetTitle(*ticketInfo.title);
 	}
 
 	if (ticketInfo.description){
 		ticketPtr->SetDescription(*ticketInfo.description);
+	}
+
+	// Reporter can be set only for new tickets.
+	// For existing tickets keep original reporter unchanged.
+	if (ticketPtr->GetReporterId().isEmpty()){
+		if (ticketInfo.reporterId && !ticketInfo.reporterId->isEmpty()){
+			ticketPtr->SetReporterId(*ticketInfo.reporterId);
+		}
+		else{
+			ticketPtr->SetReporterId(userId);
+		}
 	}
 
 	if (ticketInfo.assigneeIds){
@@ -552,5 +578,3 @@ bool CTicketCollectionDocumentManagerComp::ProcessEvent(imtdoc::CEventBase* even
 
 
 } // namespace imtdeskgql
-
-
