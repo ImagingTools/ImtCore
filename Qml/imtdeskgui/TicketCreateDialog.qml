@@ -263,7 +263,7 @@ Rectangle {
 	}
 
 	function submitTicket() {
-		var ticketData = {
+		let ticketData = {
 			title: titleInput.text.trim(),
 			description: descriptionInput.text.trim(),
 			ticketType: typeCombo.currentIndex,

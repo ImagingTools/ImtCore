@@ -500,7 +500,9 @@ Dialog {
 		try {
 			editTitleInput.text = ""
 			editDescriptionInput.text = ""
-		} catch(e) {}
+		} catch(e) {
+			console.warn("EntityContextTicketsDialog: clearInputFields failed:", e)
+		}
 	}
 
 	function appendTicketItems(itemsModel) {
@@ -508,16 +510,16 @@ Dialog {
 			return
 		}
 
-		var count = 0
+		let count = 0
 		if (itemsModel.count !== undefined) {
 			count = itemsModel.count
 		} else if (itemsModel.getItemsCount !== undefined) {
 			count = itemsModel.getItemsCount()
 		}
 
-		for (var i = 0; i < count; ++i) {
-			var row = itemsModel.get !== undefined ? itemsModel.get(i) : null
-			var item = row && row.item ? row.item : row
+		for (let i = 0; i < count; ++i) {
+			let row = itemsModel.get !== undefined ? itemsModel.get(i) : null
+			let item = row && row.item ? row.item : row
 			if (!item || !item.m_id) {
 				continue
 			}
@@ -571,7 +573,7 @@ Dialog {
 		sdlObjectComp: Component {
 			CreateEntityContextTicketPayload {
 				onFinished: {
-					var createdId = m_id ? String(m_id) : ""
+					let createdId = m_id ? String(m_id) : ""
 					root.clearInputFields()
 					root.reloadTickets()
 					if (createdId !== "") {
