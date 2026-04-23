@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtdb/CComplexCollectionFilterConverter.h>
 
+#include <imtdb/imtdb.h>
+
 
 namespace imtdb
 {
@@ -136,8 +138,7 @@ QString CComplexCollectionFilterConverter::ProcessColumn(const imtbase::IComplex
 		}
 	}
 	else if (stringTypes.contains(filter.filterValue.typeId()) && stringOperations.contains(filter.filterOperation)){
-		QString filterValue = filter.filterValue.toString();
-		filterValue.replace('\'', QLatin1String("''"));
+		QString filterValue = SqlEncode(filter.filterValue.toString());
 		if (filter.filterOperation == imtbase::IComplexCollectionFilter::FO_CONTAINS){
 			filterValue.prepend("%");
 			filterValue.append("%");
@@ -208,7 +209,7 @@ QString CComplexCollectionFilterConverter::ProcessColumn(const imtbase::IComplex
 
 				QStringList likeConditions;
 				for (const QVariant& v : values){
-					QString pattern = v.toString().replace("'", "''");
+					QString pattern = SqlEncode(v.toString());
 					likeConditions << QString("elem ILIKE '%%%1%%'").arg(pattern);
 				}
 
@@ -286,7 +287,7 @@ QString CComplexCollectionFilterConverter::ToSqlArray(const QVariantList& values
 	QStringList parts;
 	for (const QVariant& v : values){
 		if (v.typeId() == QMetaType::QString || v.typeId() == QMetaType::QByteArray){
-			parts << QString("'%1'").arg(v.toString().replace("'", "''"));
+			parts << QString("'%1'").arg(SqlEncode(v.toString()));
 		}
 		else{
 			parts << v.toString();
