@@ -33,31 +33,10 @@ protected:
 				const sdl::imtdesk::ImtDesk::CTicketsListGqlRequest& listRequest,
 				sdl::imtdesk::ImtDesk::CTicketItemData::V1_0& representationObject,
 				QString& errorMessage) const override;
-	virtual istd::IChangeableUniquePtr CreateObjectFromRepresentation(
-				const sdl::imtdesk::ImtDesk::CTicketData::V1_0& dataRepresentation,
-				QByteArray& newObjectId,
-				QString& errorMessage) const override;
-	virtual bool CreateRepresentationFromObject(
-				const istd::IChangeable& data,
-				const sdl::imtdesk::ImtDesk::CTicketItemGqlRequest& itemRequest,
-				sdl::imtdesk::ImtDesk::CTicketData::V1_0& representationPayload,
-				QString& errorMessage) const override;
-	virtual bool UpdateObjectFromRepresentationRequest(
-				const imtgql::CGqlRequest& rawGqlRequest,
-				const sdl::imtdesk::ImtDesk::CTicketUpdateGqlRequest& updateRequest,
-				istd::IChangeable& object,
-				QString& errorMessage) const override;
 	virtual void SetAdditionalFilters(
 				const imtgql::CGqlRequest& gqlRequest,
 				const imtgql::CGqlParamObject& viewParamsGql,
 				iprm::CParamsSet* filterParamsPtr) const override;
-
-private:
-	bool FillObjectFromRepresentation(
-				const sdl::imtdesk::ImtDesk::CTicketData::V1_0& representation,
-				istd::IChangeable& object,
-				QByteArray& objectId,
-				QString& errorMessage) const;
 
 protected:
 	I_FACT(imtdesk::ISupportTicket, m_ticketFactCompPtr);

@@ -58,9 +58,9 @@
                     <AttributeInfo Id="GuiElementModels" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
+                                <Value>DeskPage</Value>
                                 <Value>Workspace</Value>
                                 <Value>SearchPage</Value>
-                                <Value>DeskPage</Value>
                                 <Value>AdministrationPage</Value>
                             </Values>
                         </Data>
@@ -95,13 +95,13 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Alignment" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="32"/>
+                        <Data IsEnabled="true" Value="64"/>
                     </AttributeInfo>
                     <AttributeInfo Id="CollectionViewQmlPath" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="qrc:/qml/imtdeskgui/TicketCollectionView.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="IconPath" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Icons/Ticket"/>
+                        <Data IsEnabled="true" Value="Icons/SupportDesk"/>
                     </AttributeInfo>
                     <AttributeInfo Id="IsEnabled" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
@@ -113,7 +113,7 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Name" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Tickets"/>
+                        <Data IsEnabled="true" Value="Support"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PageId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Tickets"/>

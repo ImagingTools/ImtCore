@@ -1,16 +1,19 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 import QtQuick 2.15
+import Qt5Compat.GraphicalEffects 6.0
+import QtGraphicalEffects 1.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtcontrols 1.0
 import imtdocgui 1.0
 import imtguigql 1.0
+import imtdeskImtDeskSdl 1.0
 
 Dialog {
 	id: root
 
-	title: qsTr("Entity Tickets")
+	title: qsTr("Entity Tickets") + " — " + entityType + " / " + resolvedEntityDisplayName
 	canMove: false
 	width: Math.min(ModalDialogManager.activeView.width - 80, 980)
 	height: Math.min(ModalDialogManager.activeView.height - 80, 760)
@@ -23,24 +26,24 @@ Dialog {
 
 	property bool loading: false
 	property int ticketsPageSize: 250
-	property int descriptionInputHeight: Style.controlHeightM * 3
-	property int listHeightPadding: 24
-	readonly property int defaultOffset: 0
-	readonly property string defaultTicketType: "SupportRequest"
-	readonly property string defaultTicketStatus: "Open"
-	readonly property string defaultTicketStateReason: "None"
-	readonly property string defaultTicketPriority: "Medium"
-	readonly property string defaultEntityLinkScheme: "applink"
-	readonly property string entityLinkPath: root.entityType + "/" + root.entityId
-	readonly property int listContentHeight: root.height - (createCol.height + Style.marginM * 4 + root.listHeightPadding)
-	property int _scanIndex: 0
-	property int _currentOffset: 0
-	property var _ticketQueue: []
-	property var _ticketPreviewById: ({})
-	property string _currentDetailTicketId: ""
+
+	// TicketEditor-matching design constants
+	readonly property real cardPadding: 16
+	readonly property real cardRadius: Style.radiusL
+	readonly property string cardColor: Style.baseColor
+	readonly property string cardBorderColor: Style.borderColor
+	readonly property string pageBgColor: Style.backgroundColor2
+	readonly property string accentColor: Style.imaginToolsAccentColor
+	readonly property string sectionLabelColor: "#8C95A6"
+
+	signal ticketCreated()
+	signal ticketCreateFailed(string message)
 
 	Component.onCompleted: {
 		addButton(Enums.cancel, qsTr("Close"), true)
+	}
+
+	onStarted: {
 		reloadTickets()
 	}
 
@@ -49,152 +52,385 @@ Dialog {
 			width: root.width
 			height: root.height - 100
 
-			Column {
+			// Page background matching TicketEditor
+			Rectangle {
 				anchors.fill: parent
-				anchors.margins: Style.marginM
-				spacing: Style.marginM
+				color: root.pageBgColor
+			}
 
-				Text {
-					width: parent.width
-					text: qsTr("Context: %1 / %2").arg(root.entityType).arg(root.resolvedEntityDisplayName)
-					font.pixelSize: Style.fontSizeM
-					color: Style.textSecondaryColor
-					elide: Text.ElideRight
+			Connections {
+				target: root
+				function onTicketCreated(){
+					editTitleInput.text = ""
+					editDescriptionInput.text = ""
+					popupContainer.addMessage("success", qsTr("Ticket successfully created"), true)
 				}
+			}
 
-				Rectangle {
-					width: parent.width
-					height: createCol.height + Style.marginM * 2
-					radius: Style.radiusM
-					color: Style.backgroundColor2
-					border.color: Style.separatorColor
+			Item {
+				anchors.fill: parent
+				anchors.margins: Style.marginL
 
-					Column {
-						id: createCol
-						anchors.left: parent.left
-						anchors.right: parent.right
-						anchors.top: parent.top
-						anchors.margins: Style.marginM
-						spacing: Style.marginS
+				// Create ticket card (TicketEditor detailsCard style)
+				Item {
+					id: createCardWrapper
+					anchors.top: parent.top
+					anchors.left: parent.left
+					anchors.right: parent.right
+					height: createCard.height
 
-						Text {
-							text: qsTr("Create ticket for this entity")
-							font.pixelSize: Style.fontSizeM
-							font.bold: true
-							color: Style.textColor
-						}
+					Rectangle {
+						id: createCard
+						width: parent.width
+						height: createCardCol.height + root.cardPadding * 2
+						radius: root.cardRadius
+						color: root.cardColor
+						border.color: root.cardBorderColor
+						border.width: 1
 
-						CustomTextField {
-							id: titleInput
-							width: parent.width
-							height: Style.controlHeightM
-							placeHolderText: qsTr("Title")
-						}
+						Column {
+							id: createCardCol
+							x: root.cardPadding
+							y: root.cardPadding
+							width: parent.width - root.cardPadding * 2
+							spacing: Style.spacingM
 
-						Rectangle {
-							width: parent.width
-							height: root.descriptionInputHeight
-							radius: Style.radiusS
-							color: Style.inputColor
-							border.color: Style.separatorColor
-
-							TextEdit {
-								id: descriptionInput
-								anchors.fill: parent
-								anchors.margins: Style.marginS
-								wrapMode: TextEdit.Wrap
-								font.pixelSize: Style.fontSizeM
+							Text {
+								text: qsTr("Create ticket for this entity")
+								font.pixelSize: Style.fontSizeL
+								font.bold: true
 								color: Style.textColor
 							}
-						}
 
-						Row {
-							anchors.right: parent.right
-							spacing: Style.marginS
-
-							Button {
-								width: Style.buttonWidthL
-								height: Style.controlHeightM
-								text: qsTr("Create")
-								enabled: titleInput.text.trim().length > 0
-								onClicked: {
-									root.createTicket(titleInput.text.trim(), descriptionInput.text.trim())
-								}
-							}
-						}
-					}
-				}
-
-				Rectangle {
-					width: parent.width
-					height: root.listContentHeight
-					radius: Style.radiusM
-					color: "transparent"
-					border.color: Style.separatorColor
-					border.width: 1
-
-					Item {
-						anchors.fill: parent
-						anchors.margins: 1
-
-						ListView {
-							id: ticketsListView
-							anchors.fill: parent
-							clip: true
-							model: ticketsModel
-
-							delegate: Rectangle {
-								width: ticketsListView.width
-								height: 48
-								color: mouseArea.containsMouse ? Style.backgroundColor2 : "transparent"
+							// Title
+							Column {
+								width: parent.width
+								spacing: 4
 
 								Text {
-									anchors.left: parent.left
-									anchors.leftMargin: Style.marginM
-									anchors.verticalCenter: parent.verticalCenter
-									width: parent.width - Style.marginM * 2
-									text: "#" + (model.number || "") + " " + (model.title || "")
+									text: qsTr("Title")
 									font.pixelSize: Style.fontSizeM
-									color: Style.textColor
-									elide: Text.ElideRight
+									font.bold: true
+									color: root.sectionLabelColor
 								}
 
-								MouseArea {
-									id: mouseArea
-									anchors.fill: parent
-									hoverEnabled: true
-									onClicked: {
-										root.openTicket(model.id)
-									}
+								CustomTextField {
+									id: editTitleInput
+									width: parent.width
+									height: Style.controlHeightM
+									placeHolderText: qsTr("Enter ticket title...")
+									KeyNavigation.tab: editDescriptionInput
+									KeyNavigation.backtab: editDescriptionInput
+								}
+							}
+
+							// Description
+							Column {
+								width: parent.width
+								spacing: 4
+
+								Text {
+									text: qsTr("Description")
+									font.pixelSize: Style.fontSizeM
+									font.bold: true
+									color: root.sectionLabelColor
 								}
 
 								Rectangle {
-									anchors.bottom: parent.bottom
 									width: parent.width
-									height: 1
-									color: Style.separatorColor
-									opacity: 0.5
+									height: Math.min(160, Math.max(60, editDescriptionInput.contentHeight)) + Style.paddingM * 2
+									radius: Style.radiusM
+									border.color: editDescriptionInput.activeFocus ? root.accentColor : root.cardBorderColor
+									border.width: editDescriptionInput.activeFocus ? 2 : 1
+									color: root.cardColor
+
+									Flickable {
+										id: descriptionFlick
+										anchors.fill: parent
+										anchors.margins: Style.paddingM
+										anchors.rightMargin: Style.paddingM + Style.marginM
+										contentWidth: width
+										contentHeight: editDescriptionInput.height
+										clip: true
+										boundsBehavior: Flickable.StopAtBounds
+
+										TextEdit {
+											id: editDescriptionInput
+											width: descriptionFlick.width
+											height: Math.max(60, contentHeight)
+											font.pixelSize: Style.fontSizeM
+											color: Style.textColor
+											wrapMode: TextEdit.Wrap
+											textFormat: TextEdit.PlainText
+											KeyNavigation.tab: editTitleInput
+											KeyNavigation.backtab: editTitleInput
+											onCursorRectangleChanged: {
+												var cy = cursorRectangle.y
+												var ch = cursorRectangle.height
+												if (cy < descriptionFlick.contentY) {
+													descriptionFlick.contentY = cy
+												} else if (cy + ch > descriptionFlick.contentY + descriptionFlick.height) {
+													descriptionFlick.contentY = cy + ch - descriptionFlick.height
+												}
+											}
+
+											Text {
+												anchors.fill: parent
+												text: qsTr("Describe the issue...")
+												color: Style.inactiveTextColor
+												font.pixelSize: Style.fontSizeM
+												visible: editDescriptionInput.text.length === 0
+											}
+										}
+									}
+
+									CustomScrollbar {
+										z: parent.z + 1
+										anchors.right: parent.right
+										anchors.rightMargin: 2
+										anchors.top: parent.top
+										anchors.bottom: parent.bottom
+										anchors.topMargin: 2
+										anchors.bottomMargin: 2
+										secondSize: Style.marginM
+										targetItem: descriptionFlick
+										visible: descriptionFlick.contentHeight > descriptionFlick.height
+									}
+								}
+							}
+							
+							Button {
+								id: createButton
+								anchors.right: parent.right
+								text: qsTr("Create Ticket")
+								enabled: editTitleInput.text.trim().length > 0
+								decorator: Component {
+									ButtonDecorator {
+										color: createButton.enabled ? Style.imaginToolsAccentColor : Style.baseColor
+										textColor: createButton.enabled ? "white" : Style.inactiveTextColor
+										opacity: createButton.hovered ? 0.85 : 1
+									}
+								}
+
+								onClicked: {
+									root.createTicket(editTitleInput.text, editDescriptionInput.text)
 								}
 							}
 						}
+					}
 
-						Text {
-							anchors.centerIn: parent
-							visible: !root.loading && ticketsModel.count === 0
-							text: qsTr("No tickets linked to this entity")
-							color: Style.inactiveTextColor
-							font.pixelSize: Style.fontSizeM
-						}
-
-						Text {
-							anchors.centerIn: parent
-							visible: root.loading
-							text: qsTr("Loading tickets...")
-							color: Style.inactiveTextColor
-							font.pixelSize: Style.fontSizeM
-						}
+					DropShadow {
+						anchors.fill: createCard
+						z: createCard.z - 1
+						horizontalOffset: 3
+						verticalOffset: 3
+						radius: Style.radiusL
+						spread: 0
+						color: Style.shadowColor
+						source: createCard
 					}
 				}
+
+				// Tickets list card (same card style)
+				Item {
+					id: listCardWrapper
+					anchors.top: createCardWrapper.bottom
+					anchors.topMargin: Style.spacingL
+					anchors.left: parent.left
+					anchors.right: parent.right
+					anchors.bottom: parent.bottom
+
+					Rectangle {
+						id: listCard
+						anchors.fill: parent
+						radius: root.cardRadius
+						color: root.cardColor
+						border.color: root.cardBorderColor
+						border.width: 1
+
+						Column {
+							id: listCardCol
+							anchors.fill: parent
+							anchors.margins: root.cardPadding
+							spacing: Style.spacingS
+
+							// Header row
+							Row {
+								id: listHeaderRow
+								width: parent.width
+								spacing: Style.spacingS
+
+								Text {
+									text: qsTr("Linked Tickets")
+									font.pixelSize: Style.fontSizeL
+									font.bold: true
+									color: Style.textColor
+									anchors.verticalCenter: parent.verticalCenter
+								}
+
+								Rectangle {
+									visible: ticketsModel.count > 0
+									width: ticketCountText.contentWidth + Style.paddingS * 2
+									height: 22
+									radius: 11
+									color: "#E5F0FB"
+									anchors.verticalCenter: parent.verticalCenter
+
+									Text {
+										id: ticketCountText
+										anchors.centerIn: parent
+										text: ticketsModel.count
+										font.pixelSize: Style.fontSizeM - 1
+										font.bold: true
+										color: root.accentColor
+									}
+								}
+							}
+
+							// Divider
+							Rectangle {
+								id: listDivider
+								width: parent.width
+								height: 1
+								color: root.cardBorderColor
+								opacity: 0.6
+							}
+
+							// ListView area
+							Item {
+								width: parent.width
+								height: parent.height - listHeaderRow.height - listDivider.height - Style.spacingS * 2
+
+								ListView {
+									id: ticketsListView
+									anchors.fill: parent
+									clip: true
+									model: ticketsModel
+
+									delegate: Rectangle {
+										width: ticketsListView.width
+										height: ticketDelegateCol.height + Style.paddingS * 2
+										color: ticketDelegateMa.containsMouse ? "#F6F8FC" : "transparent"
+										radius: Style.radiusS
+
+										Column {
+											id: ticketDelegateCol
+											anchors.left: parent.left
+											anchors.right: parent.right
+											anchors.verticalCenter: parent.verticalCenter
+											anchors.leftMargin: Style.paddingM
+											anchors.rightMargin: Style.paddingM
+											spacing: 2
+
+											Row {
+												width: parent.width
+												spacing: Style.spacingS
+
+												Text {
+													text: "#" + (model.number || "")
+													font.pixelSize: Style.fontSizeM
+													font.bold: true
+													color: root.accentColor
+												}
+
+												Text {
+													text: model.title || ""
+													font.pixelSize: Style.fontSizeM
+													color: Style.textColor
+													elide: Text.ElideRight
+													width: parent.width - 80
+												}
+											}
+
+											Row {
+												width: parent.width
+												spacing: Style.spacingM
+												visible: (model.status || "") !== "" || (model.priority || "") !== ""
+
+												Text {
+													visible: (model.status || "") !== ""
+													text: model.status || ""
+													font.pixelSize: Style.fontSizeS
+													color: root.sectionLabelColor
+												}
+
+												Text {
+													visible: (model.priority || "") !== ""
+													text: model.priority || ""
+													font.pixelSize: Style.fontSizeS
+													color: root.sectionLabelColor
+												}
+
+												Text {
+													visible: (model.assignee || "") !== ""
+													text: model.assignee || ""
+													font.pixelSize: Style.fontSizeS
+													color: root.sectionLabelColor
+													elide: Text.ElideRight
+													width: parent.width * 0.4
+												}
+											}
+										}
+
+										MouseArea {
+											id: ticketDelegateMa
+											anchors.fill: parent
+											hoverEnabled: true
+											cursorShape: Qt.PointingHandCursor
+											onClicked: {
+												root.openTicket(model.id)
+											}
+										}
+
+										Rectangle {
+											anchors.bottom: parent.bottom
+											anchors.left: parent.left
+											anchors.right: parent.right
+											anchors.leftMargin: Style.paddingM
+											anchors.rightMargin: Style.paddingM
+											height: 1
+											color: root.cardBorderColor
+											opacity: 0.3
+										}
+									}
+								}
+
+								Text {
+									anchors.centerIn: parent
+									visible: !root.loading && ticketsModel.count === 0
+									text: qsTr("No tickets linked to this entity")
+									color: Style.inactiveTextColor
+									font.pixelSize: Style.fontSizeM
+								}
+
+								Text {
+									anchors.centerIn: parent
+									visible: root.loading
+									text: qsTr("Loading tickets...")
+									color: Style.inactiveTextColor
+									font.pixelSize: Style.fontSizeM
+								}
+							}
+						}
+					}
+
+					DropShadow {
+						anchors.fill: listCard
+						z: listCard.z - 1
+						horizontalOffset: 3
+						verticalOffset: 3
+						radius: Style.radiusL
+						spread: 0
+						color: Style.shadowColor
+						source: listCard
+					}
+				}
+			}
+
+			PopupContainer {
+				id: popupContainer
+				anchors.right: parent.right
+				anchors.bottom: parent.bottom
 			}
 		}
 	}
@@ -209,219 +445,109 @@ Dialog {
 			return
 		}
 
-		_resetTicketState()
 		loading = true
-		_currentOffset = defaultOffset
 		ticketsModel.clear()
-		ticketsListRequest.send({offset: _currentOffset})
+
+		entityContextTicketsInput.m_entityId = root.entityId
+		entityContextTicketsInput.m_entityType = root.entityType
+
+		ticketsListRequest.send(entityContextTicketsInput)
 	}
 
 	function openTicket(ticketId) {
 		if (!ticketId) {
 			return
 		}
-		MainDocumentManager.openDocument("Tickets", ticketId, "Ticket")
+
+		NavigationController.navigate("Tickets/Ticket/" + ticketId)
 	}
 
 	function createTicket(title, description) {
 		if (!title || !hasValidEntityContext) {
 			return
 		}
-		let ticketId = UuidGenerator.generateUUID()
-		createTicketRequest.send({
-								   id: ticketId,
-								   title: title,
-								   description: description
-							   })
+
+		createEntityContextTicketInput.m_entityId = root.entityId
+		createEntityContextTicketInput.m_entityType = root.entityType
+		createEntityContextTicketInput.m_entityDisplayName = root.resolvedEntityDisplayName
+		createEntityContextTicketInput.m_title = title
+		createEntityContextTicketInput.m_description = description
+
+		createTicketRequest.send(createEntityContextTicketInput)
 	}
 
-	function clearInputFields() {
-		titleInput.text = ""
-		descriptionInput.text = ""
-	}
-
-	function _resetTicketState() {
-		_scanIndex = 0
-		_ticketQueue = []
-		_ticketPreviewById = {}
-		_currentDetailTicketId = ""
-	}
-
-	function _matchCurrentEntity(entityRefsModel) {
-		if (!entityRefsModel) {
-			return false
-		}
-
-		for (let i = 0; i < entityRefsModel.getItemsCount(); ++i) {
-			let refType = String(entityRefsModel.getData("entityType", i) || "")
-			let refId = String(entityRefsModel.getData("entityId", i) || "")
-			if (refType === root.entityType && refId === root.entityId) {
-				return true
-			}
-		}
-
-		return false
-	}
-
-	function _scanNextTicketDetails() {
-		if (_scanIndex >= _ticketQueue.length) {
-			loading = false
+	function appendTicketItems(itemsModel) {
+		if (!itemsModel) {
 			return
 		}
 
-		_currentDetailTicketId = _ticketQueue[_scanIndex]
-		ticketItemRequest.send({id: _currentDetailTicketId})
+		let count = 0
+		if (itemsModel.count !== undefined) {
+			count = itemsModel.count
+		} else if (itemsModel.getItemsCount !== undefined) {
+			count = itemsModel.getItemsCount()
+		}
+
+		for (let i = 0; i < count; ++i) {
+			let row = itemsModel.get !== undefined ? itemsModel.get(i) : null
+			let item = row && row.item ? row.item : row
+			if (!item || !item.m_id) {
+				continue
+			}
+
+			ticketsModel.append({
+				id: String(item.m_id),
+				number: item.m_number !== undefined ? String(item.m_number) : "",
+				title: item.m_title !== undefined ? String(item.m_title) : "",
+				status: item.m_status !== undefined ? String(item.m_status) : "",
+				priority: item.m_priority !== undefined ? String(item.m_priority) : "",
+				assignee: item.m_assignee !== undefined ? String(item.m_assignee) : ""
+			})
+		}
 	}
 
-	GqlRequestSender {
+	EntityContextTicketsInput {
+		id: entityContextTicketsInput
+	}
+
+	GqlSdlRequestSender {
 		id: ticketsListRequest
-		gqlCommandId: "TicketsList"
+		gqlCommandId: ImtdeskImtDeskSdlCommandIds.s_entityContextTickets
 
-		function createQueryParams(query, params) {
-			let input = Gql.GqlObject("input")
-			let offset = params && params.offset !== undefined ? params.offset : root.defaultOffset
-			input.fromObject({
-							 viewParams: {
-								 count: root.ticketsPageSize,
-								 offset: offset
-							 }
-						 })
-			query.AddParam(input)
-
-			let items = Gql.GqlObject("items")
-			items.InsertField("id")
-			items.InsertField("number")
-			items.InsertField("title")
-			query.AddField(items)
-		}
-
-		function onResult(data) {
-			let loadedCount = 0
-			if (data && data.containsKey("items")) {
-				let itemsModel = data.getData("items")
-				loadedCount = itemsModel.getItemsCount()
-				for (let i = 0; i < loadedCount; ++i) {
-					let tid = String(itemsModel.getData("id", i) || "")
-					if (tid === "") {
-						continue
-					}
-
-					root._ticketQueue.push(tid)
-					root._ticketPreviewById[tid] = {
-						id: tid,
-						number: String(itemsModel.getData("number", i) || ""),
-						title: String(itemsModel.getData("title", i) || "")
-					}
+		sdlObjectComp: Component {
+			EntityContextTicketsPayload {
+				onFinished: {
+					ticketsModel.clear()
+					root.appendTicketItems(m_items)
+					root.loading = false
 				}
 			}
-
-			if (loadedCount >= root.ticketsPageSize) {
-				root._currentOffset += root.ticketsPageSize
-				ticketsListRequest.send({offset: root._currentOffset})
-				return
-			}
-
-			root._scanIndex = 0
-			root._scanNextTicketDetails()
 		}
 
-		function onError(message, type) {
-			root._resetTicketState()
-			root.loading = false
-			root.ticketsModel.clear()
-			ModalDialogManager.showErrorDialog(message || qsTr("Failed to load tickets"))
+		onFinished: {
+			if (status < 0) {
+				root.loading = false
+				ticketsModel.clear()
+			}
 		}
 	}
 
-	GqlRequestSender {
-		id: ticketItemRequest
-		gqlCommandId: "TicketItem"
-
-		function createQueryParams(query, params) {
-			let input = Gql.GqlObject("input")
-			input.fromObject({id: params.id})
-			query.AddParam(input)
-
-			let refs = Gql.GqlObject("entityReferences")
-			refs.InsertField("entityType")
-			refs.InsertField("entityId")
-			query.AddField(refs)
-		}
-
-		function onResult(data) {
-			if (data && data.containsKey("entityReferences")) {
-				let refsModel = data.getData("entityReferences")
-				if (root._matchCurrentEntity(refsModel)) {
-					let item = root._ticketPreviewById[root._currentDetailTicketId]
-					if (item) {
-						root.ticketsModel.append(item)
-					}
-				}
-			}
-
-			root._scanIndex += 1
-			root._scanNextTicketDetails()
-		}
-
-		function onError(message, type) {
-			root._scanIndex += 1
-			root._scanNextTicketDetails()
-		}
+	CreateEntityContextTicketInput {
+		id: createEntityContextTicketInput
 	}
 
-	GqlRequestSender {
+	GqlSdlRequestSender {
 		id: createTicketRequest
-		gqlCommandId: "TicketCreate"
+		gqlCommandId: ImtdeskImtDeskSdlCommandIds.s_createEntityContextTicket
 		requestType: 1
 
-		function createQueryParams(query, params) {
-			let ticketId = String(params.id)
-			let input = Gql.GqlObject("input")
-			input.fromObject({
-							 id: ticketId,
-							 item: {
-								 id: ticketId,
-								 title: String(params.title || ""),
-								 description: String(params.description || ""),
-								 ticketType: root.defaultTicketType,
-								 status: root.defaultTicketStatus,
-								 stateReason: root.defaultTicketStateReason,
-								 priority: root.defaultTicketPriority,
-								 entityReferences: [{
-									 entityType: root.entityType,
-									 entityId: root.entityId,
-									 displayName: root.resolvedEntityDisplayName,
-									 entityLink: {
-										 id: root.entityId,
-										 typeId: root.entityType,
-										 name: root.resolvedEntityDisplayName,
-										 url: {
-											 scheme: root.defaultEntityLinkScheme,
-											 path: root.entityLinkPath
-										 }
-									 }
-								 }]
-							 }
-						 })
-			query.AddParam(input)
-
-			let idField = Gql.GqlObject("id")
-			query.AddField(idField)
-		}
-
-		function onResult(data) {
-			root.clearInputFields()
-			root.reloadTickets()
-			if (data && data.containsKey("id")) {
-				let createdId = String(data.getData("id") || "")
-				if (createdId !== "") {
-					root.openTicket(createdId)
+		sdlObjectComp: Component {
+			CreateEntityContextTicketPayload {
+				onFinished: {
+					root.ticketCreated()
+					root.reloadTickets()
 				}
 			}
-		}
-
-		function onError(message, type) {
-			ModalDialogManager.showErrorDialog(message || qsTr("Failed to create ticket"))
 		}
 	}
 }

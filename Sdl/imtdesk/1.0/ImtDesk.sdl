@@ -140,13 +140,32 @@ type TicketsListPayload {
 	notification: NotificationItem
 }
 
-input TicketItemInput {
-	id: ID!
-}
-
 input TicketDataInput {
 	id: ID!
 	item: TicketData!
+}
+
+input EntityContextTicketsInput {
+	entityType: String!
+	entityId: ID!
+	viewParams: CollectionViewParams
+}
+
+type EntityContextTicketsPayload {
+	items: [TicketItemData]
+	notification: NotificationItem
+}
+
+input CreateEntityContextTicketInput {
+	entityType: String!
+	entityId: ID!
+	entityDisplayName: String
+	title: String!
+	description: String
+}
+
+type CreateEntityContextTicketPayload {
+	id: ID
 }
 
 # --- Subscription payloads ---
@@ -163,12 +182,11 @@ type TicketStatusUpdate {
 
 type Query {
 	TicketsList (input: TicketsListInput): TicketsListPayload!
-	TicketItem (input: TicketItemInput): TicketData!
+	EntityContextTickets (input: EntityContextTicketsInput): EntityContextTicketsPayload!
 }
 
 type Mutation {
-	TicketCreate (input: TicketDataInput): AddedNotificationPayload!
-	TicketUpdate (input: TicketDataInput): UpdatedNotificationPayload!
+	CreateEntityContextTicket (input: CreateEntityContextTicketInput): CreateEntityContextTicketPayload!
 }
 
 collectionSchema {
@@ -176,14 +194,6 @@ collectionSchema {
 		ref: TicketItemData
 		operations {
 			list: TicketsList
-		}
-		subtype Ticket {
-			ref: TicketData
-			operations {
-				get: TicketItem
-				update: TicketUpdate
-				insert: TicketCreate
-			}
 		}
 	}
 }
