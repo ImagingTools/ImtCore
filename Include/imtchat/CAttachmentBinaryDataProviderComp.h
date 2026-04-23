@@ -34,7 +34,7 @@ public:
 	I_BEGIN_COMPONENT(CAttachmentBinaryDataProviderComp)
 		I_REGISTER_INTERFACE(imtrest::IBinaryDataProvider)
 		I_REGISTER_INTERFACE(imtrest::IBinaryDataController)
-		I_ASSIGN(m_attachmentStorageCompPtr, "AttachmentStorage", "Storage service for binary attachments", true, "AttachmentStorage");
+		I_ASSIGN(m_attachmentStorageCompPtr, "AttachmentStorage", "Storage service for binary attachments", false, "AttachmentStorage");
 	I_END_COMPONENT
 
 	// reimplemented (imtrest::IBinaryDataProvider)

@@ -23,6 +23,7 @@ Item {
 		m_filterOperations: ["Equal"]
 	}
 	property string filterValue: ""
+	property bool allowEmptyFilterValue: false
 
 	signal clearFilter(bool beQuiet)
 
@@ -58,7 +59,7 @@ Item {
 			}
 
 			if (checked){
-				if (filterDelegate.filterValue === ""){
+				if (!filterDelegate.allowEmptyFilterValue && filterDelegate.filterValue === ""){
 					return
 				}
 				var filter = filterDelegate.defaultFieldFilter.copyMe()

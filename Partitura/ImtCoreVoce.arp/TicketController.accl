@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6379" Description="ACF"/>
+            <Version Id="0" Number="6390" Description="ACF"/>
             <Version Id="1" Number="2306" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
@@ -20,8 +20,8 @@
         <Element ComponentName="Conversation" X="825" Y="375" Note=""/>
         <Element ComponentName="ConversationSqlRepository" X="150" Y="150" Note=""/>
         <Element ComponentName="Demultiplexer" X="550" Y="75" Note=""/>
-        <Element ComponentName="DevicesEntityTypeProvider" X="175" Y="575" Note=""/>
         <Element ComponentName="EditorCommandsController" X="225" Y="275" Note=""/>
+        <Element ComponentName="EntityReferenceStorage" X="0" Y="0" Note=""/>
         <Element ComponentName="SlaveSubscriberController" X="625" Y="200" Note=""/>
         <Element ComponentName="StandardCollectionCommands" X="1000" Y="150" Note=""/>
         <Element ComponentName="StandardDocumentCommands" X="225" Y="450" Note=""/>
@@ -29,6 +29,7 @@
         <Element ComponentName="TicketCollectionController" X="1050" Y="525" Note=""/>
         <Element ComponentName="TicketCollectionDocumentManager" X="775" Y="450" Note=""/>
         <Element ComponentName="TicketDocumentNameProvider" X="1050" Y="625" Note=""/>
+        <Element ComponentName="TicketMessageNotifier" X="0" Y="0" Note=""/>
         <Element ComponentName="TicketSqlRepository" X="275" Y="725" Note=""/>
         <Element ComponentName="TicketsChangeNotifier" X="200" Y="75" Note=""/>
     </PositionMap>

@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6318" Description="ACF"/>
-            <Version Id="1" Number="2296" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6390" Description="ACF"/>
+            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -581,6 +581,7 @@
         <Component ExportedId="CachedUserCollection" ComponentId="RemoteRepositories/CachedUserCollection"/>
         <Component ExportedId="GroupRemoteRepository" ComponentId="RemoteRepositories/GroupRemoteRepository"/>
         <Component ExportedId="RoleRemoteRepository" ComponentId="RemoteRepositories/RoleRemoteRepository"/>
+        <Component ExportedId="UserGroupInfoProvider" ComponentId="RemoteRepositories/UserGroupInfoProvider"/>
         <Component ExportedId="UserRemoteRepository" ComponentId="RemoteRepositories/UserRemoteRepository"/>
         <Component ExportedId="UserSessionRemoteRepository" ComponentId="RemoteRepositories/UserSessionRemoteRepository"/>
     </ExportedComponents>

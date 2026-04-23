@@ -3,7 +3,6 @@ CREATE TABLE IF NOT EXISTS "${TableScheme}"."Conversations"
     "Id"               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     "Name"             TEXT NOT NULL,
     "ConversationType" INTEGER NOT NULL DEFAULT 0,
-    "Metadata"         JSONB,
     "CreatedAt"        TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
     "UpdatedAt"        TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC')
 );

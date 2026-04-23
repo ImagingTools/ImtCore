@@ -59,19 +59,6 @@ istd::IChangeableUniquePtr CMessageDbDelegateComp::CreateObjectFromRecord(
 	if (record.contains("Content")){
 		msgPtr->SetContent(record.value("Content").toString());
 	}
-	if (record.contains("EntityReferences")){
-		const QString entityRefStr = record.value("EntityReferences").toString();
-		QByteArrayList entityRefIds;
-		if (!entityRefStr.isEmpty()){
-			for (const QString& part : entityRefStr.split(',')){
-				const QString trimmed = part.trimmed();
-				if (!trimmed.isEmpty()){
-					entityRefIds.append(trimmed.toUtf8());
-				}
-			}
-		}
-		msgPtr->SetEntityReferences(entityRefIds);
-	}
 	// AttachmentIds are loaded from the MessageAttachments junction table
 	if (m_databaseEngineCompPtr.IsValid() && record.contains("Id")){
 		QByteArray messageId = record.value("Id").toByteArray();
@@ -101,14 +88,6 @@ istd::IChangeableUniquePtr CMessageDbDelegateComp::CreateObjectFromRecord(
 	}
 	if (record.contains("Status")){
 		msgPtr->SetStatus(static_cast<imtchat::IChatMessage::MessageStatus>(record.value("Status").toInt()));
-	}
-	if (record.contains("Reactions")){
-		const QString reactionsStr = record.value("Reactions").toString();
-		QStringList reactions;
-		if (!reactionsStr.isEmpty()){
-			reactions = reactionsStr.split(',');
-		}
-		msgPtr->SetReactions(reactions);
 	}
 	if (record.contains("CreatedAt")){
 		QVariant val = record.value("CreatedAt");
@@ -150,17 +129,6 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CMessageDbDelegateComp::CreateNew
 		msgId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 	}
 
-	QString entityRefsStr;
-	const QByteArrayList entityRefIds = msgPtr->GetEntityReferences();
-	for (int i = 0; i < entityRefIds.size(); ++i){
-		if (i > 0) entityRefsStr += ",";
-		entityRefsStr += QString::fromUtf8(entityRefIds[i]);
-	}
-	const QString entityRefsSql = entityRefsStr.isEmpty() ? "NULL" : QString("'%1'").arg(entityRefsStr);
-
-	const QString reactionsStr = msgPtr->GetReactions().join(',');
-	const QString reactionsSql = reactionsStr.isEmpty() ? "NULL" : QString("'%1'").arg(reactionsStr);
-
 	const QByteArray replyToId = msgPtr->GetReplyToId();
 	const QString replyToIdSql = replyToId.isEmpty() ? "NULL" : QString("'%1'").arg(QString::fromUtf8(replyToId));
 
@@ -171,14 +139,12 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CMessageDbDelegateComp::CreateNew
 	// INSERT into Messages table (without AttachmentIds column)
 	combinedQuery += QString(
 		"INSERT INTO \"Messages\" "
-		"(\"Id\", \"ConversationId\", \"SenderId\", \"Content\", \"EntityReferences\", \"Reactions\", \"Status\", \"ReplyToId\", \"CreatedAt\", \"UpdatedAt\") "
-		"VALUES('%1', '%2', '%3', '%4', %5, %6, %7, %8, '%9', '%10');")
+		"(\"Id\", \"ConversationId\", \"SenderId\", \"Content\", \"Status\", \"ReplyToId\", \"CreatedAt\", \"UpdatedAt\") "
+		"VALUES('%1', '%2', '%3', '%4', %5, %6, '%7', '%8');")
 		.arg(QString::fromUtf8(msgId))
 		.arg(QString::fromUtf8(msgPtr->GetConversationId()))
 		.arg(QString::fromUtf8(msgPtr->GetSenderId()))
 		.arg(msgPtr->GetContent())
-		.arg(entityRefsSql)
-		.arg(reactionsSql)
 		.arg(msgPtr->GetStatus())
 		.arg(replyToIdSql)
 		.arg(nowUtc)
@@ -220,28 +186,13 @@ QByteArray CMessageDbDelegateComp::CreateUpdateObjectQuery(
 		return QByteArray();
 	}
 
-	QString entityRefsStr;
-	const QByteArrayList entityRefIds = msgPtr->GetEntityReferences();
-	for (int i = 0; i < entityRefIds.size(); ++i){
-		if (i > 0) entityRefsStr += ",";
-		entityRefsStr += QString::fromUtf8(entityRefIds[i]);
-	}
-	const QString entityRefsSql = entityRefsStr.isEmpty() ? "NULL" : QString("'%1'").arg(entityRefsStr);
-
-	const QString reactionsStr = msgPtr->GetReactions().join(',');
-	const QString reactionsSql = reactionsStr.isEmpty() ? "NULL" : QString("'%1'").arg(reactionsStr);
-
 	return QString(
 		"UPDATE \"Messages\" SET "
 		"\"Content\"='%1', "
-		"\"EntityReferences\"=%2, "
-		"\"Reactions\"=%3, "
-		"\"Status\"=%4, "
-		"\"UpdatedAt\"='%5' "
-		"WHERE \"Id\"='%6';")
+		"\"Status\"=%2, "
+		"\"UpdatedAt\"='%3' "
+		"WHERE \"Id\"='%4';")
 		.arg(msgPtr->GetContent())
-		.arg(entityRefsSql)
-		.arg(reactionsSql)
 		.arg(msgPtr->GetStatus())
 		.arg(utcNow())
 		.arg(QString::fromUtf8(objectId))
@@ -358,21 +309,6 @@ void CMessageDbDelegateComp::OnComponentCreated()
 		}
 	}
 
-	// Add ReplyToId column to existing Messages tables (migration)
-	{
-		QSqlError migrError;
-		m_databaseEngineCompPtr->ExecSqlQuery(
-			"ALTER TABLE \"Messages\" ADD COLUMN \"ReplyToId\" TEXT;",
-			&migrError);
-		// Ignore "duplicate column" errors — column may already exist from a previous run.
-		// Log any other errors as warnings.
-		if (migrError.type() != QSqlError::NoError){
-			QString errorText = migrError.databaseText().toLower();
-			if (!errorText.contains("duplicate") && !errorText.contains("already exists")){
-				qWarning() << "Messages.ReplyToId migration warning:" << migrError.text();
-			}
-		}
-	}
 }
 
 

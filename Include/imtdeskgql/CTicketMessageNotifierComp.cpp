@@ -149,7 +149,7 @@ void CTicketMessageNotifierComp::OnUpdate(const istd::IChangeable::ChangeSet& ch
 		if (contextPtr == nullptr){
 			return false;
 		}
-		const QByteArray userId = GetCurrentUserId(contextPtr);
+		const QByteArray userId = contextPtr->GetUserId();
 		if (!userId.isEmpty() && userId == senderId){
 			return false;
 		}
@@ -197,4 +197,3 @@ QByteArray CTicketMessageNotifierComp::FindTicketIdByConversationId(const QByteA
 
 
 } // namespace imtdeskgql
-

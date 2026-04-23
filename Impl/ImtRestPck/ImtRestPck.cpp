@@ -46,29 +46,29 @@ I_EXPORT_COMPONENT(
 			"HTTP File Template");
 
 I_EXPORT_COMPONENT(
-		HttpHtmlFolderBasedServlet,
-		"Generates HTML-document with list of objects for all the files and directories in the directory",
-		"HTTP File Dir Directory HTML");
+			HttpHtmlFolderBasedServlet,
+			"Generates HTML-document with list of objects for all the files and directories in the directory",
+			"HTTP File Dir Directory HTML");
 
 I_EXPORT_COMPONENT(
-		HttpRedirectServlet,
-		"Redirects to other command",
-		"HTTP Redirect");
+			HttpRedirectServlet,
+			"Redirects to other command",
+			"HTTP Redirect");
 
 I_EXPORT_COMPONENT(
-		HttpFileProviderBasedServlet,
-		"Returns file by name \n Note: name - is a part of commandID",
-		"FileProvider - based HTTP servlet");
+			HttpFileProviderBasedServlet,
+			"Returns file by name \n Note: name - is a part of commandID",
+			"FileProvider - based HTTP servlet");
 
 I_EXPORT_COMPONENT(
-		HttpFileControllerServlet,
-		"Edits file by name \n Note: name - is a part of commandID",
-		"FileProvider - based HTTP servlet");
+			HttpFileControllerServlet,
+			"Edits file by name \n Note: name - is a part of commandID",
+			"FileProvider - based HTTP servlet");
 
 I_EXPORT_COMPONENT(
-		WorkerManaqer,
-		"The manager of request handlers factory for multi-thread request server",
-		"REST HTTP Handler Request Factory");
+			WorkerManaqer,
+			"The manager of request handlers factory for multi-thread request server",
+			"REST HTTP Handler Request Factory");
 
 I_EXPORT_COMPONENT(
 			TcpProtocolEngine,
@@ -86,8 +86,6 @@ I_EXPORT_COMPONENT(
 			"Component for providing icon files (SVGs)",
 			"Icon File Provider");
 
-
-
 I_EXPORT_COMPONENT(
 			BinaryDataProvider,
 			"Binary data provider from folder",
@@ -99,14 +97,19 @@ I_EXPORT_COMPONENT(
 			"Delegator Data Binary Provider");
 
 I_EXPORT_COMPONENT(
+			DelegatedBinaryDataControllers,
+			"Delegated provider of a slave data controller",
+			"Delegator Data Binary Controller");
+
+I_EXPORT_COMPONENT(
 			HttpFileUploadServlet,
 			"Http temp file storage servlet",
 			"Http Servlet File");
 
 I_EXPORT_COMPONENT(
-	UdpServer,
-	"UDP-server",
-	"UDP Connection Server");
+			UdpServer,
+			"UDP-server",
+			"UDP Connection Server");
 
 } // namespace ImtRestPck
 
