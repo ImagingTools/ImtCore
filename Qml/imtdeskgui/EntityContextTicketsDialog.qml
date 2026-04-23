@@ -27,18 +27,7 @@ Dialog {
 	property int descriptionInputHeight: Style.controlHeightM * 3
 	property int listHeightPadding: 24
 	readonly property int defaultOffset: 0
-	readonly property string defaultTicketType: "SupportRequest"
-	readonly property string defaultTicketStatus: "Open"
-	readonly property string defaultTicketStateReason: "None"
-	readonly property string defaultTicketPriority: "Medium"
-	readonly property string defaultEntityLinkScheme: "applink"
-	readonly property string entityLinkPath: root.entityType + "/" + root.entityId
 	readonly property int listContentHeight: root.height - (createCol.height + Style.marginM * 4 + root.listHeightPadding)
-	property int _scanIndex: 0
-	property int _currentOffset: 0
-	property var _ticketQueue: []
-	property var _ticketPreviewById: ({})
-	property string _currentDetailTicketId: ""
 
 	Component.onCompleted: {
 		addButton(Enums.cancel, qsTr("Close"), true)
@@ -210,11 +199,16 @@ Dialog {
 			return
 		}
 
-		_resetTicketState()
 		loading = true
-		_currentOffset = defaultOffset
 		ticketsModel.clear()
-		ticketsListRequest.send({offset: _currentOffset})
+		ticketsListRequest.send({
+								  entityType: root.entityType,
+								  entityId: root.entityId,
+								  viewParams: {
+									  count: root.ticketsPageSize,
+									  offset: root.defaultOffset
+								  }
+							  })
 	}
 
 	function openTicket(ticketId) {
@@ -228,9 +222,11 @@ Dialog {
 		if (!title || !hasValidEntityContext) {
 			return
 		}
-		let ticketId = UuidGenerator.generateUUID()
+
 		createTicketRequest.send({
-								   id: ticketId,
+								   entityType: root.entityType,
+								   entityId: root.entityId,
+								   entityDisplayName: root.resolvedEntityDisplayName,
 								   title: title,
 								   description: description
 							   })
@@ -241,188 +237,74 @@ Dialog {
 		descriptionInput.text = ""
 	}
 
-	function _resetTicketState() {
-		_scanIndex = 0
-		_ticketQueue = []
-		_ticketPreviewById = {}
-		_currentDetailTicketId = ""
-	}
-
-	function _matchCurrentEntity(entityRefsModel) {
-		if (!entityRefsModel) {
-			return false
-		}
-
-		for (let i = 0; i < entityRefsModel.getItemsCount(); ++i) {
-			let refType = String(entityRefsModel.getData("entityType", i) || "")
-			let refId = String(entityRefsModel.getData("entityId", i) || "")
-			if (refType === root.entityType && refId === root.entityId) {
-				return true
-			}
-		}
-
-		return false
-	}
-
-	function _scanNextTicketDetails() {
-		if (_scanIndex >= _ticketQueue.length) {
-			loading = false
+	function appendTicketItems(itemsModel) {
+		if (!itemsModel) {
 			return
 		}
 
-		_currentDetailTicketId = _ticketQueue[_scanIndex]
-		ticketItemRequest.send({id: _currentDetailTicketId})
+		let count = 0
+		if (itemsModel.count !== undefined) {
+			count = itemsModel.count
+		}
+		else if (itemsModel.getItemsCount !== undefined) {
+			count = itemsModel.getItemsCount()
+		}
+
+		for (let i = 0; i < count; ++i) {
+			let row = itemsModel.get !== undefined ? itemsModel.get(i) : null
+			let item = row && row.item ? row.item : row
+			if (!item || !item.m_id) {
+				continue
+			}
+
+			ticketsModel.append({
+								  id: String(item.m_id),
+								  number: item.m_number !== undefined ? String(item.m_number) : "",
+								  title: item.m_title !== undefined ? String(item.m_title) : ""
+							  })
+		}
 	}
 
-	GqlRequestSender {
+	GqlSdlRequestSender {
 		id: ticketsListRequest
-		gqlCommandId: "TicketsList"
+		gqlCommandId: ImtdeskImtDeskSdlCommandIds.s_entityContextTickets
 
-		function createQueryParams(query, params) {
-			let input = Gql.GqlObject("input")
-			let offset = params && params.offset !== undefined ? params.offset : root.defaultOffset
-			input.fromObject({
-							 viewParams: {
-								 count: root.ticketsPageSize,
-								 offset: offset
-							 }
-						 })
-			query.AddParam(input)
-
-			let items = Gql.GqlObject("items")
-			items.InsertField("id")
-			items.InsertField("number")
-			items.InsertField("title")
-			query.AddField(items)
-		}
-
-		function onResult(data) {
-			let loadedCount = 0
-			if (data && data.containsKey("items")) {
-				let itemsModel = data.getData("items")
-				loadedCount = itemsModel.getItemsCount()
-				for (let i = 0; i < loadedCount; ++i) {
-					let tid = String(itemsModel.getData("id", i) || "")
-					if (tid === "") {
-						continue
-					}
-
-					root._ticketQueue.push(tid)
-					root._ticketPreviewById[tid] = {
-						id: tid,
-						number: String(itemsModel.getData("number", i) || ""),
-						title: String(itemsModel.getData("title", i) || "")
-					}
+		sdlObjectComp: Component {
+			EntityContextTicketsPayload {
+				onFinished: {
+					ticketsModel.clear()
+					root.appendTicketItems(m_items)
+					root.loading = false
 				}
 			}
+		}
 
-			if (loadedCount >= root.ticketsPageSize) {
-				root._currentOffset += root.ticketsPageSize
-				ticketsListRequest.send({offset: root._currentOffset})
-				return
+		onFinished: {
+			if (status < 0) {
+				root.loading = false
+				ticketsModel.clear()
 			}
-
-			root._scanIndex = 0
-			root._scanNextTicketDetails()
 		}
 
-		function onError(message, type) {
-			root._resetTicketState()
-			root.loading = false
-			ticketsModel.clear()
-			ModalDialogManager.showErrorDialog(message || qsTr("Failed to load tickets"))
-		}
 	}
 
-	GqlRequestSender {
-		id: ticketItemRequest
-		gqlCommandId: "TicketItem"
-
-		function createQueryParams(query, params) {
-			let input = Gql.GqlObject("input")
-			input.fromObject({id: params.id})
-			query.AddParam(input)
-
-			let refs = Gql.GqlObject("entityReferences")
-			refs.InsertField("entityType")
-			refs.InsertField("entityId")
-			query.AddField(refs)
-		}
-
-		function onResult(data) {
-			if (data && data.containsKey("entityReferences")) {
-				let refsModel = data.getData("entityReferences")
-				if (root._matchCurrentEntity(refsModel)) {
-					let item = root._ticketPreviewById[root._currentDetailTicketId]
-					if (item) {
-						ticketsModel.append(item)
-					}
-				}
-			}
-
-			root._scanIndex += 1
-			root._scanNextTicketDetails()
-		}
-
-		function onError(message, type) {
-			root._scanIndex += 1
-			root._scanNextTicketDetails()
-		}
-	}
-
-	GqlRequestSender {
+	GqlSdlRequestSender {
 		id: createTicketRequest
-		gqlCommandId: "TicketCreate"
+		gqlCommandId: ImtdeskImtDeskSdlCommandIds.s_createEntityContextTicket
 		requestType: 1
 
-		function createQueryParams(query, params) {
-			let ticketId = String(params.id)
-			let input = Gql.GqlObject("input")
-			input.fromObject({
-							 id: ticketId,
-							 item: {
-								 id: ticketId,
-								 title: String(params.title || ""),
-								 description: String(params.description || ""),
-								 ticketType: root.defaultTicketType,
-								 status: root.defaultTicketStatus,
-								 stateReason: root.defaultTicketStateReason,
-								 priority: root.defaultTicketPriority,
-								 entityReferences: [{
-									 entityType: root.entityType,
-									 entityId: root.entityId,
-									 displayName: root.resolvedEntityDisplayName,
-									 entityLink: {
-										 id: root.entityId,
-										 typeId: root.entityType,
-										 name: root.resolvedEntityDisplayName,
-										 url: {
-											 scheme: root.defaultEntityLinkScheme,
-											 path: root.entityLinkPath
-										 }
-									 }
-								 }]
-							 }
-						 })
-			query.AddParam(input)
-
-			let idField = Gql.GqlObject("id")
-			query.AddField(idField)
-		}
-
-		function onResult(data) {
-			root.clearInputFields()
-			root.reloadTickets()
-			if (data && data.containsKey("id")) {
-				let createdId = String(data.getData("id") || "")
-				if (createdId !== "") {
-					root.openTicket(createdId)
+		sdlObjectComp: Component {
+			CreateEntityContextTicketPayload {
+				onFinished: {
+					let createdId = m_id ? String(m_id) : ""
+					root.clearInputFields()
+					root.reloadTickets()
+					if (createdId !== "") {
+						root.openTicket(createdId)
+					}
 				}
 			}
 		}
 
-		function onError(message, type) {
-			ModalDialogManager.showErrorDialog(message || qsTr("Failed to create ticket"))
-		}
 	}
 }

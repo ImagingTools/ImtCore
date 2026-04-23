@@ -26,6 +26,11 @@ I_EXPORT_COMPONENT(
 			"Ticket Collection Document Manager");
 
 I_EXPORT_COMPONENT(
+			EntityContextTicketsController,
+			"Entity context tickets GraphQL controller",
+			"Entity Context Tickets Controller");
+
+I_EXPORT_COMPONENT(
 			TicketMessageNotifier,
 			"Ticket message subscription publisher (notifies ticket reporter/assignees about new messages)",
 			"Ticket Message Notifier");
