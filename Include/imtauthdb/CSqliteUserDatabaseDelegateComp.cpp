@@ -10,7 +10,6 @@
 
 // ImtCore includes
 #include <imtauth/IUserInfo.h>
-#include <imtdb/imtdb.h>
 
 
 namespace imtauthdb
@@ -182,7 +181,7 @@ bool CSqliteUserDatabaseDelegateComp::CreateObjectFilterQuery(const iprm::IParam
 			filterQuery += " AND ";
 		}
 		
-		filterQuery += QString(R"((('%1' = '' AND NOT root."Document" ? 'SystemInfos') OR EXISTS (SELECT 1 FROM jsonb_array_elements(root."Document"->'SystemInfos') as s WHERE s->>'SystemId' = '%1')))").arg(imtdb::SqlEncode(systemId));
+		filterQuery += QString(R"((('%1' = '' AND NOT root."Document" ? 'SystemInfos') OR EXISTS (SELECT 1 FROM jsonb_array_elements(root."Document"->'SystemInfos') as s WHERE s->>'SystemId' = '%1')))").arg(SqlEncode(systemId));
 	}
 	else{
 		return CreateObjectFilterQuery(filterParams, filterQuery);

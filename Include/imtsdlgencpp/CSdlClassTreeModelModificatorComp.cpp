@@ -404,11 +404,21 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(
 			imtsdl::CSdlUnion foundUnion;
 			[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
 
-			stream << QStringLiteral("QString ");
-			stream << GetDecapitalizedValue(field.GetId());
-			stream << QStringLiteral("Typename = ") << dataVarName;
-			stream << QStringLiteral(".value<::imtbase::CTreeItemModel*>()->GetData(\"__typename\").toString();");
-			FeedStream(stream, 1, false);
+			bool hasComplexTypes = false;
+			for (const QString& unionType : foundUnion.GetTypes()){
+				if (FindEntryByName(unionType, m_sdlTypeListCompPtr->GetSdlTypes(false), m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false)) != nullptr){
+					hasComplexTypes = true;
+					break;
+				}
+			}
+			if (hasComplexTypes){
+				stream << QStringLiteral("QString ");
+				stream << GetDecapitalizedValue(field.GetId());
+				stream << QStringLiteral("Typename = model.GetTreeItemModel(\"");
+				stream << field.GetId();
+				stream << QStringLiteral("\", modelIndex)->GetData(\"__typename\").toString();");
+				FeedStream(stream, 1, false);
+			}
 
 			WriteUnionConversionFromData(stream,
 				foundUnion,
@@ -464,12 +474,22 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(
 			imtsdl::CSdlUnion foundUnion;
 			[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
 
-			FeedStreamHorizontally(stream, 2);
-			stream << QStringLiteral("QString ");
-			stream << GetDecapitalizedValue(field.GetId());
-			stream << QStringLiteral("Typename = ") << dataVarName;
-			stream << QStringLiteral(".value<::imtbase::CTreeItemModel*>()->GetData(\"__typename\").toString();");
-			FeedStream(stream, 1, false);
+			bool hasComplexTypes = false;
+			for (const QString& unionType : foundUnion.GetTypes()){
+				if (FindEntryByName(unionType, m_sdlTypeListCompPtr->GetSdlTypes(false), m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false)) != nullptr){
+					hasComplexTypes = true;
+					break;
+				}
+			}
+			if (hasComplexTypes){
+				FeedStreamHorizontally(stream, 2);
+				stream << QStringLiteral("QString ");
+				stream << GetDecapitalizedValue(field.GetId());
+				stream << QStringLiteral("Typename = model.GetTreeItemModel(\"");
+				stream << field.GetId();
+				stream << QStringLiteral("\", modelIndex)->GetData(\"__typename\").toString();");
+				FeedStream(stream, 1, false);
+			}
 
 			WriteUnionConversionFromData(stream,
 				foundUnion,

@@ -741,16 +741,16 @@ bool CPrinterBase::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int mode
 		return false;
 	}
 	QVariant specificationVariantValue;
-		if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>(specification.GetPtr())){
-			if (!val->WriteToModel(*(model.AddTreeModel("specification", modelIndex)), 0)){
+		if (const CPrinterSpecificationBase* printerSpecificationBaseVal = std::get_if<CPrinterSpecificationBase>(specification.GetPtr())){
+			if (!printerSpecificationBaseVal->WriteToModel(*(model.AddTreeModel("specification", modelIndex)), 0)){
 				return false;
 			}
 			if(model.GetTreeItemModel("specification", modelIndex) != nullptr){
 				model.GetTreeItemModel("specification", modelIndex)->SetData("__typename", "PrinterSpecificationBase", 0);
 			}
 		}
-		else if (const CLink* val = std::get_if<CLink>(specification.GetPtr())){
-			if (!val->WriteToModel(*(model.AddTreeModel("specification", modelIndex)), 0)){
+		else if (const CLink* linkVal = std::get_if<CLink>(specification.GetPtr())){
+			if (!linkVal->WriteToModel(*(model.AddTreeModel("specification", modelIndex)), 0)){
 				return false;
 			}
 			if(model.GetTreeItemModel("specification", modelIndex) != nullptr){
@@ -765,11 +765,11 @@ bool CPrinterBase::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int mode
 		return false;
 	}
 	QVariant simpleTestVariantValue;
-		if (const QString* val = std::get_if<QString>(simpleTest.GetPtr())){
-			model.SetData("", *val);
+		if (const QString* stringVal = std::get_if<QString>(simpleTest.GetPtr())){
+			model.SetData("", *stringVal);
 		}
-		else if (const double* val = std::get_if<double>(simpleTest.GetPtr())){
-			model.SetData("", *val);
+		else if (const double* doubleVal = std::get_if<double>(simpleTest.GetPtr())){
+			model.SetData("", *doubleVal);
 		}
 
 
@@ -779,11 +779,11 @@ bool CPrinterBase::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int mode
 		return false;
 	}
 	QVariant mixedTestVariantValue;
-		if (const QString* val = std::get_if<QString>(mixedTest.GetPtr())){
-			model.SetData("", *val);
+		if (const QString* stringVal = std::get_if<QString>(mixedTest.GetPtr())){
+			model.SetData("", *stringVal);
 		}
-		else if (const CLink* val = std::get_if<CLink>(mixedTest.GetPtr())){
-			if (!val->WriteToModel(*(model.AddTreeModel("mixedTest", modelIndex)), 0)){
+		else if (const CLink* linkVal = std::get_if<CLink>(mixedTest.GetPtr())){
+			if (!linkVal->WriteToModel(*(model.AddTreeModel("mixedTest", modelIndex)), 0)){
 				return false;
 			}
 			if(model.GetTreeItemModel("mixedTest", modelIndex) != nullptr){
@@ -810,7 +810,7 @@ bool CPrinterBase::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 
 		return false;
 	}
-	QString specificationTypename = specificationData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
+	QString specificationTypename = model.GetTreeItemModel("specification", modelIndex)->GetData("__typename").toString();
 	if (specificationTypename == "PrinterSpecificationBase") {
 		CPrinterSpecificationBase specificationConvert;
 		const bool isspecificationRead = specificationConvert.ReadFromModel(*model.GetTreeItemModel("specification", modelIndex)); 
@@ -834,7 +834,6 @@ bool CPrinterBase::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 
 		return false;
 	}
-	QString simpleTestTypename = simpleTestData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
 	if (simpleTestData.canConvert<QString>()){
 		simpleTest = SimpleUnion(simpleTestData.value<QString>());
 	}
@@ -848,7 +847,7 @@ bool CPrinterBase::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 
 		return false;
 	}
-	QString mixedTestTypename = mixedTestData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
+	QString mixedTestTypename = model.GetTreeItemModel("mixedTest", modelIndex)->GetData("__typename").toString();
 	if (mixedTestData.canConvert<QString>()){
 		mixedTest = MixedUnion(mixedTestData.value<QString>());
 	}
@@ -874,7 +873,7 @@ bool CPrinterBase::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 
 	QVariant specificationData = model.GetData("specification", modelIndex);
 	if (!specificationData.isNull()){
-		QString specificationTypename = specificationData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
+		QString specificationTypename = model.GetTreeItemModel("specification", modelIndex)->GetData("__typename").toString();
 		if (specificationTypename == "PrinterSpecificationBase") {
 			CPrinterSpecificationBase specificationConvert;
 			const bool isspecificationRead = specificationConvert.ReadFromModel(*model.GetTreeItemModel("specification", modelIndex)); 
@@ -895,7 +894,6 @@ bool CPrinterBase::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 
 	QVariant simpleTestData = model.GetData("simpleTest", modelIndex);
 	if (!simpleTestData.isNull()){
-		QString simpleTestTypename = simpleTestData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
 		if (simpleTestData.canConvert<QString>()){
 			simpleTest = SimpleUnion(simpleTestData.value<QString>());
 		}
@@ -906,7 +904,7 @@ bool CPrinterBase::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 
 	QVariant mixedTestData = model.GetData("mixedTest", modelIndex);
 	if (!mixedTestData.isNull()){
-		QString mixedTestTypename = mixedTestData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
+		QString mixedTestTypename = model.GetTreeItemModel("mixedTest", modelIndex)->GetData("__typename").toString();
 		if (mixedTestData.canConvert<QString>()){
 			mixedTest = MixedUnion(mixedTestData.value<QString>());
 		}
@@ -936,14 +934,14 @@ bool CPrinterBase::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 		return false;
 	}
 	::imtgql::CGqlParamObject specificationDataObject;
-	if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>(specification.GetPtr())){
-		if (!val->WriteToGraphQlObject(specificationDataObject)){
+	if (const CPrinterSpecificationBase* printerSpecificationBaseVal = std::get_if<CPrinterSpecificationBase>(specification.GetPtr())){
+		if (!printerSpecificationBaseVal->WriteToGraphQlObject(specificationDataObject)){
 			return false;
 		}
 		specificationDataObject.InsertParam("__typename", QVariant("PrinterSpecificationBase"));
 	}
-	else if (const CLink* val = std::get_if<CLink>(specification.GetPtr())){
-		if (!val->WriteToGraphQlObject(specificationDataObject)){
+	else if (const CLink* linkVal = std::get_if<CLink>(specification.GetPtr())){
+		if (!linkVal->WriteToGraphQlObject(specificationDataObject)){
 			return false;
 		}
 		specificationDataObject.InsertParam("__typename", QVariant("Link"));
@@ -956,11 +954,11 @@ bool CPrinterBase::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 		return false;
 	}
 	::imtgql::CGqlParamObject simpleTestDataObject;
-	if (const QString* val = std::get_if<QString>(simpleTest.GetPtr())){
-		simpleTestDataObject.InsertParam("simpleTest", *val);
+	if (const QString* stringVal = std::get_if<QString>(simpleTest.GetPtr())){
+		simpleTestDataObject.InsertParam("simpleTest", *stringVal);
 	}
-	else if (const double* val = std::get_if<double>(simpleTest.GetPtr())){
-		simpleTestDataObject.InsertParam("simpleTest", *val);
+	else if (const double* doubleVal = std::get_if<double>(simpleTest.GetPtr())){
+		simpleTestDataObject.InsertParam("simpleTest", *doubleVal);
 	}
 	gqlObject.InsertParam("simpleTest", simpleTestDataObject);
 
@@ -970,11 +968,11 @@ bool CPrinterBase::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 		return false;
 	}
 	::imtgql::CGqlParamObject mixedTestDataObject;
-	if (const QString* val = std::get_if<QString>(mixedTest.GetPtr())){
-		mixedTestDataObject.InsertParam("mixedTest", *val);
+	if (const QString* stringVal = std::get_if<QString>(mixedTest.GetPtr())){
+		mixedTestDataObject.InsertParam("mixedTest", *stringVal);
 	}
-	else if (const CLink* val = std::get_if<CLink>(mixedTest.GetPtr())){
-		if (!val->WriteToGraphQlObject(mixedTestDataObject)){
+	else if (const CLink* linkVal = std::get_if<CLink>(mixedTest.GetPtr())){
+		if (!linkVal->WriteToGraphQlObject(mixedTestDataObject)){
 			return false;
 		}
 		mixedTestDataObject.InsertParam("__typename", QVariant("Link"));
@@ -1143,18 +1141,18 @@ bool CPrinterBase::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 
 		return false;
 	}
-	if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>(specification.GetPtr())){
+	if (const CPrinterSpecificationBase* printerSpecificationBaseVal = std::get_if<CPrinterSpecificationBase>(specification.GetPtr())){
 		QJsonObject specificationJsonObject;
-		const bool isspecificationAdded = val->WriteToJsonObject(specificationJsonObject);
+		const bool isspecificationAdded = printerSpecificationBaseVal->WriteToJsonObject(specificationJsonObject);
 		if (!isspecificationAdded){
 			return false;
 		}
 		specificationJsonObject["__typename"] = "PrinterSpecificationBase";
 		jsonObject["specification"] = specificationJsonObject;
 	}
-	else if (const CLink* val = std::get_if<CLink>(specification.GetPtr())){
+	else if (const CLink* linkVal = std::get_if<CLink>(specification.GetPtr())){
 		QJsonObject specificationJsonObject;
-		const bool isspecificationAdded = val->WriteToJsonObject(specificationJsonObject);
+		const bool isspecificationAdded = linkVal->WriteToJsonObject(specificationJsonObject);
 		if (!isspecificationAdded){
 			return false;
 		}
@@ -1168,17 +1166,17 @@ bool CPrinterBase::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 
 		return false;
 	}
-	if (const QString* val = std::get_if<QString>(simpleTest.GetPtr())){
+	if (const QString* stringVal = std::get_if<QString>(simpleTest.GetPtr())){
 		if (!simpleTest){
 			return false;
 		}
-		jsonObject["simpleTest"] = QJsonValue::fromVariant(*val);
+		jsonObject["simpleTest"] = QJsonValue::fromVariant(*stringVal);
 	}
-	else if (const double* val = std::get_if<double>(simpleTest.GetPtr())){
+	else if (const double* doubleVal = std::get_if<double>(simpleTest.GetPtr())){
 		if (!simpleTest){
 			return false;
 		}
-		jsonObject["simpleTest"] = QJsonValue::fromVariant(*val);
+		jsonObject["simpleTest"] = QJsonValue::fromVariant(*doubleVal);
 	}
 
 
@@ -1187,15 +1185,15 @@ bool CPrinterBase::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 
 		return false;
 	}
-	if (const QString* val = std::get_if<QString>(mixedTest.GetPtr())){
+	if (const QString* stringVal = std::get_if<QString>(mixedTest.GetPtr())){
 		if (!mixedTest){
 			return false;
 		}
-		jsonObject["mixedTest"] = QJsonValue::fromVariant(*val);
+		jsonObject["mixedTest"] = QJsonValue::fromVariant(*stringVal);
 	}
-	else if (const CLink* val = std::get_if<CLink>(mixedTest.GetPtr())){
+	else if (const CLink* linkVal = std::get_if<CLink>(mixedTest.GetPtr())){
 		QJsonObject mixedTestJsonObject;
-		const bool ismixedTestAdded = val->WriteToJsonObject(mixedTestJsonObject);
+		const bool ismixedTestAdded = linkVal->WriteToJsonObject(mixedTestJsonObject);
 		if (!ismixedTestAdded){
 			return false;
 		}

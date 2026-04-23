@@ -26,6 +26,7 @@
                                 <Value>ControlsGalleryServer/WebSocketServerFramework</Value>
                                 <Value>ControlsGalleryServer/DatabaseEngine</Value>
                                 <Value>ClientApplication/ObserverQml</Value>
+                                <Value>GqlClientBridge</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -79,6 +80,36 @@
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="VersionInfo"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="GqlClientBridge" PackageId="ImtQmlPck" ComponentId="GqlClientBridge">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApiClient"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ApiClient" PackageId="ImtClientGqlPck" ComponentId="ApiClient">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ProtocolEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="GraphQLClientEngine"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="GraphQLClientEngine" PackageId="ImtClientGqlPck" ComponentId="GraphQLClientEngine">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ClientApplication/ApplicationInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ServerConnectionInterface" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="LocalSettings/ServerConnectionInterfaceParam"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
