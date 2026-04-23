@@ -93,11 +93,10 @@ RemoteCollectionView {
 
 			TicketBadge {
 				id: statusBadge
-				badgeType: "status"
-				height: Math.max(22, statusDelegate.height - Style.paddingXS * 2)
 				anchors.verticalCenter: parent.verticalCenter
-				anchors.left: parent.left
-				anchors.leftMargin: statusDelegate && statusDelegate.rowDelegate ? statusDelegate.rowDelegate.textLeftMargin : 0
+				anchors.horizontalCenter: parent.horizontalCenter
+				height: 20
+				badgeType: "status"
 			}
 		}
 	}

@@ -744,23 +744,43 @@ DocumentViewBase {
 								width: parent.width
 								spacing: Style.spacingS
 								
-								CustomTextField {
-									id: editTitleInput
-									width: parent.width - titleConfirmBtn.width - titleCloseBtn.width - 2*Style.spacingS
-									height: Style.controlHeightM
-									placeHolderText: qsTr("Enter ticket title...")
-									readOnly: !root.canEdit
-									KeyNavigation.tab: editDescriptionInput
-									onAccepted: {
-										root._titleEditing = false
-										root.doUpdateModel()
+								Column {
+									id: titleColumn
+									width: root.isNewIssue ? parent.width : parent.width - titleConfirmBtn.width - titleCloseBtn.width - 2*Style.spacingS
+									spacing: 4
+
+									Text {
+										text: qsTr("Title")
+										font.pixelSize: Style.fontSizeM
+										font.bold: true
+										color: editView.sectionLabelColor
+										visible: root.isNewIssue
 									}
-									onCancelled: {
-										root._titleEditing = false
+									
+									CustomTextField {
+										id: editTitleInput
+										width: titleColumn.width
+										height: Style.controlHeightM
+										placeHolderText: qsTr("Enter ticket title...")
+										readOnly: !root.canEdit
+										KeyNavigation.tab: editDescriptionInput
+										onAccepted: {
+											root._titleEditing = false
+											root.doUpdateModel()
+										}
+										onCancelled: {
+											root._titleEditing = false
+										}
+										onEditingFinished: {
+											if (root.isNewIssue){
+												root.doUpdateModel()
+											}
+										}
+
+										property string oldText
 									}
-									property string oldText
 								}
-								
+
 								Rectangle {
 									id: titleCloseBtn
 									visible: !root.isNewIssue
