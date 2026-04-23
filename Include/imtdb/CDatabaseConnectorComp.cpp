@@ -93,7 +93,7 @@ bool CDatabaseConnectorComp::ConnectToDatabase(const IDatabaseLoginSettings& log
 				'%4',
 				'%5'
 			);
-		)").arg(*m_serverNameAttrPtr, SqlEncode(host), SqlEncode(name), SqlEncode(userName), SqlEncode(password), *m_schemaNameAttrPtr);
+		)").arg(*m_serverNameAttrPtr, SqlEncode(host), SqlEncode(name), SqlEncode(userName), SqlEncode(password), SqlEncode(*m_schemaNameAttrPtr));
 	
 	QSqlError sqlError;
 	m_databaseEngineCompPtr->ExecSqlQuery(query.toUtf8(), &sqlError);

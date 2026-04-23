@@ -168,7 +168,7 @@ QByteArray CTestDatabaseDelegateComp::CreateUpdateObjectQuery(
 		return QByteArray();
 	}
 	QByteArray testId = testInfoPtr->GetTestId();
-	QByteArray retVal = QString("UPDATE \"Tests\" SET \"Id\" = '%1' \"Name\" = '%2' WHERE \"Id\" ='%3';")
+	QByteArray retVal = QString("UPDATE \"Tests\" SET \"Id\" = '%1', \"Name\" = '%2' WHERE \"Id\" ='%3';")
 							.arg(qPrintable(testId))
 							.arg(imtdb::SqlEncode(testName))
 							.arg(qPrintable(objectId))
