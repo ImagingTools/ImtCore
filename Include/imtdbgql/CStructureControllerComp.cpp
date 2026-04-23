@@ -9,6 +9,7 @@
 
 // ImtCore includes
 #include <imtbase/IHierarchicalStructureIterator.h>
+#include <imtdb/imtdb.h>
 #include <imtgql/imtgql.h>
 
 // Qt includes
@@ -38,7 +39,7 @@ UNION SELECT "NodeId", 'Node' AS "TypeId", "Name", "Description", 0 AS "Size", "
 (SELECT count(*) FROM "Nodes" as nodes2 WHERE nodes."NodeId" = nodes2."ParentId") > 0
 	FROM public."Nodes" as nodes WHERE "ParentId" = '%1'
 	ORDER BY "IsNode" DESC, "Name";)"
-		).arg(parentNodeId).toUtf8();
+		).arg(imtdb::SqlEncode(parentNodeId)).toUtf8();
 
 	}
 

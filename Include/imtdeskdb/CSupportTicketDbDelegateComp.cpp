@@ -315,8 +315,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSupportTicketDbDelegateComp::Cre
 		"\"ResolvedAt\", \"ClosedAt\", \"CreatedAt\", \"UpdatedAt\") "
 		"VALUES('%1', '%2', '%3', %4, %5, %6, %7, %8, '%9', %10, %11, %12, %13, %14, %15, '%16', '%17');")
 		.arg(QString::fromUtf8(ticketId))
-		.arg(title)
-		.arg(ticketPtr->GetDescription())
+		.arg(EscapeSql(title))
+		.arg(EscapeSql(ticketPtr->GetDescription()))
 		.arg(ticketPtr->GetTicketType())
 		.arg(ticketPtr->GetStatus())
 		.arg(ticketPtr->GetStateReason())
@@ -407,8 +407,8 @@ QByteArray CSupportTicketDbDelegateComp::CreateUpdateObjectQuery(
 		"\"ClosedAt\"=%13, "
 		"\"UpdatedAt\"='%14' "
 		"WHERE \"Id\"='%15';")
-		.arg(ticketPtr->GetTitle())
-		.arg(ticketPtr->GetDescription())
+		.arg(EscapeSql(ticketPtr->GetTitle()))
+		.arg(EscapeSql(ticketPtr->GetDescription()))
 		.arg(ticketPtr->GetTicketType())
 		.arg(ticketPtr->GetStatus())
 		.arg(ticketPtr->GetStateReason())
@@ -488,7 +488,7 @@ QByteArray CSupportTicketDbDelegateComp::CreateRenameObjectQuery(
 	}
 
 	return QString("UPDATE \"Tickets\" SET \"Title\"='%1', \"UpdatedAt\"='%2' WHERE \"Id\"='%3';")
-		.arg(newObjectName)
+		.arg(EscapeSql(newObjectName))
 		.arg(UtcNow())
 		.arg(QString::fromUtf8(objectId))
 		.toUtf8();
@@ -506,7 +506,7 @@ QByteArray CSupportTicketDbDelegateComp::CreateDescriptionObjectQuery(
 	}
 
 	return QString("UPDATE \"Tickets\" SET \"Description\"='%1', \"UpdatedAt\"='%2' WHERE \"Id\"='%3';")
-		.arg(description)
+		.arg(EscapeSql(description))
 		.arg(UtcNow())
 		.arg(QString::fromUtf8(objectId))
 		.toUtf8();

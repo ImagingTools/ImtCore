@@ -13,6 +13,7 @@
 #include <imtauth/CPersonalAccessTokenMetaInfoCreatorComp.h>
 #include <imtauth/IPersonalAccessToken.h>
 #include <imtdb/CDatabaseEngineComp.h>
+#include <imtdb/imtdb.h>
 
 
 namespace imtauthdb
@@ -178,11 +179,11 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CPersonalAccessTokenDatabaseDeleg
 			"(\"Id\", \"Name\", \"Description\", \"UserId\", \"TokenHash\", \"Scopes\", \"CreatedAt\", \"LastUsedAt\", \"ExpiresAt\", \"Revoked\") "
 			"VALUES('%1', '%2', '%3', '%4', '%5', '%6', %7, %8, %9, %10);")
 		.arg(QString::fromUtf8(tokenId))
-		.arg(name)
-		.arg(description)
+		.arg(imtdb::SqlEncode(name))
+		.arg(imtdb::SqlEncode(description))
 		.arg(userId)
 		.arg(tokenHash)
-		.arg(scopesStr)
+		.arg(imtdb::SqlEncode(scopesStr))
 		.arg(createdAtSql)
 		.arg(lastUsedAtSql)
 		.arg(expiresAtSql)
@@ -244,11 +245,11 @@ QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateUpdateObjectQuery(
 		"\"ExpiresAt\"=%7, "
 		"\"Revoked\"=%8 "
 		"WHERE \"Id\"='%9';")
-		.arg(name)
-		.arg(description)
+		.arg(imtdb::SqlEncode(name))
+		.arg(imtdb::SqlEncode(description))
 		.arg(userId)
 		.arg(tokenHash)
-		.arg(scopesStr)
+		.arg(imtdb::SqlEncode(scopesStr))
 		.arg(lastUsedAtSql)
 		.arg(expiresAtSql)
 		.arg(revokedSql)
@@ -308,7 +309,7 @@ QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateRenameObjectQuery(
 			"UPDATE \"PersonalAccessTokens\" SET "
 			"\"Name\"='%1' "
 			"WHERE \"Id\"='%2';")
-		.arg(newObjectName)
+		.arg(imtdb::SqlEncode(newObjectName))
 		.arg(QString::fromUtf8(objectId))
 		.toUtf8();
 }
@@ -329,7 +330,7 @@ QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateDescriptionObjectQuer
 			"UPDATE \"PersonalAccessTokens\" SET "
 			"\"Description\"='%1' "
 			"WHERE \"Id\"='%2';")
-		.arg(description)
+		.arg(imtdb::SqlEncode(description))
 		.arg(QString::fromUtf8(objectId))
 		.toUtf8();
 }

@@ -7,6 +7,7 @@
 #include <iprm/ITextParam.h>
 
 // ImtCore includes
+#include <imtdb/imtdb.h>
 #include <imtlic/CFeatureInfo.h>
 #include <imtauth/CSessionInfo.h>
 #include <imtauth/CUserInfo.h>
@@ -181,7 +182,7 @@ bool CUsersSessionsDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsSe
 			return false;
 		}
 
-		filterQuery += QString(R"( WHERE "RefreshToken" = '%1')").arg(textParamPtr->GetText());
+		filterQuery += QString(R"( WHERE "RefreshToken" = '%1')").arg(imtdb::SqlEncode(textParamPtr->GetText()));
 
 		return true;
 	}

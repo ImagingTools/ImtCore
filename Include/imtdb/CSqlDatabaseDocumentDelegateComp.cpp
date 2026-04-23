@@ -420,7 +420,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateRenameObjectQuery(
 							schemaPrefix,
 							qPrintable(*m_tableNameAttrPtr),
 							qPrintable(s_nameColumn),
-							newObjectName,
+							SqlEncode(newObjectName),
 							qPrintable(s_documentIdColumn),
 							qPrintable(objectId)
 							).toUtf8();
@@ -444,7 +444,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateDescriptionObjectQuery(
 							schemaPrefix,
 							qPrintable(*m_tableNameAttrPtr),
 							qPrintable(s_descriptionColumn),
-							description,
+							SqlEncode(description),
 							qPrintable(s_documentIdColumn),
 							qPrintable(objectId)
 							).toUtf8();
@@ -1118,7 +1118,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateJsonBuildObjectQuery(const QV
 			revisionInfo += QStringLiteral("'%1', %2").arg(key, raw.sql);
 		}
 		else if (typeId == QMetaType::QString || typeId == QMetaType::QByteArray){
-			revisionInfo += QStringLiteral("'%1', '%2'").arg(key, value.toString());
+			revisionInfo += QStringLiteral("'%1', '%2'").arg(key, SqlEncode(value.toString()));
 		}
 		else if (typeId == QMetaType::Int){
 			revisionInfo += QStringLiteral("'%1', %2").arg(key).arg(value.toInt());

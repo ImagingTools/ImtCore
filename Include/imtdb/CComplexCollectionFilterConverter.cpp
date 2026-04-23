@@ -137,6 +137,7 @@ QString CComplexCollectionFilterConverter::ProcessColumn(const imtbase::IComplex
 	}
 	else if (stringTypes.contains(filter.filterValue.typeId()) && stringOperations.contains(filter.filterOperation)){
 		QString filterValue = filter.filterValue.toString();
+		filterValue.replace('\'', QLatin1String("''"));
 		if (filter.filterOperation == imtbase::IComplexCollectionFilter::FO_CONTAINS){
 			filterValue.prepend("%");
 			filterValue.append("%");
