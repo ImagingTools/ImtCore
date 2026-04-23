@@ -138,8 +138,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateLegac
 				.arg(qPrintable(*m_objectTypeIdColumnAttrPtr))
 				.arg(qPrintable(objectId))
 				.arg(qPrintable(typeId))
-				.arg(objectName)
-				.arg(objectDescription)
+				.arg(SqlEncode(objectName))
+				.arg(SqlEncode(objectDescription))
 				.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
 				.arg(qPrintable(revisionUuid))
 				.toUtf8();
@@ -175,7 +175,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateLegac
 
 				QString value = m_metaInfoTableDelegateCompPtr->ToTableRepresentation(data, columnId).toString();
 
-				tableValues.push_back("'" + value + "'");
+				tableValues.push_back("'" + SqlEncode(value) + "'");
 			}
 
 			// Insert new entry into the document' meta info table:
@@ -310,7 +310,7 @@ QByteArray CSqlDatabaseDocumentDelegateLegacyComp::CreateUpdateObjectQuery(
 
 					QString value = m_metaInfoTableDelegateCompPtr->ToTableRepresentation(data, columnId).toString();
 
-					tableValues.push_back("'" + value + "'");
+					tableValues.push_back("'" + SqlEncode(value) + "'");
 				}
 
 				retVal += QString("INSERT INTO \"%1\"(%2) VALUES(%3);")
@@ -334,7 +334,7 @@ QByteArray CSqlDatabaseDocumentDelegateLegacyComp::CreateRenameObjectQuery(
 {
 	QByteArray retVal = QString("UPDATE \"%1\" SET \"Name\" = '%2' WHERE \"%3\" = '%4';")
 				.arg(qPrintable(*m_tableNameAttrPtr))
-				.arg(newObjectName)
+				.arg(SqlEncode(newObjectName))
 				.arg(qPrintable(s_idColumn))
 				.arg(qPrintable(objectId))
 				.toUtf8();
