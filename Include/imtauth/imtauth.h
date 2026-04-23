@@ -17,7 +17,7 @@ namespace imtauth
 {
 
 
-QString GetUserName(const imtbase::IObjectCollection& userCollection, const QByteArray& userId)
+inline QString GetUserName(const imtbase::IObjectCollection& userCollection, const QByteArray& userId)
 {
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (userCollection.GetObjectData(userId, dataPtr)){
@@ -32,5 +32,4 @@ QString GetUserName(const imtbase::IObjectCollection& userCollection, const QByt
 
 
 } // namespace imtauth
-
 
