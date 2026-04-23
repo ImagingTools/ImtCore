@@ -36,6 +36,9 @@ Dialog {
 	readonly property string accentColor: Style.imaginToolsAccentColor
 	readonly property string sectionLabelColor: "#8C95A6"
 
+	signal ticketCreated()
+	signal ticketCreateFailed(string message)
+
 	Component.onCompleted: {
 		addButton(Enums.cancel, qsTr("Close"), true)
 	}
@@ -53,6 +56,15 @@ Dialog {
 			Rectangle {
 				anchors.fill: parent
 				color: root.pageBgColor
+			}
+
+			Connections {
+				target: root
+				function onTicketCreated(){
+					editTitleInput.text = ""
+					editDescriptionInput.text = ""
+					popupContainer.addMessage("success", qsTr("Ticket successfully created"), true)
+				}
 			}
 
 			Item {
@@ -107,6 +119,8 @@ Dialog {
 									width: parent.width
 									height: Style.controlHeightM
 									placeHolderText: qsTr("Enter ticket title...")
+									KeyNavigation.tab: editDescriptionInput
+									KeyNavigation.backtab: editDescriptionInput
 								}
 							}
 
@@ -128,7 +142,7 @@ Dialog {
 									radius: Style.radiusM
 									border.color: editDescriptionInput.activeFocus ? root.accentColor : root.cardBorderColor
 									border.width: editDescriptionInput.activeFocus ? 2 : 1
-									color: editDescriptionInput.activeFocus ? root.cardColor : "#FAFBFC"
+									color: root.cardColor
 
 									Flickable {
 										id: descriptionFlick
@@ -148,7 +162,8 @@ Dialog {
 											color: Style.textColor
 											wrapMode: TextEdit.Wrap
 											textFormat: TextEdit.PlainText
-
+											KeyNavigation.tab: editTitleInput
+											KeyNavigation.backtab: editTitleInput
 											onCursorRectangleChanged: {
 												var cy = cursorRectangle.y
 												var ch = cursorRectangle.height
@@ -186,6 +201,7 @@ Dialog {
 							
 							Button {
 								id: createButton
+								anchors.right: parent.right
 								text: qsTr("Create Ticket")
 								enabled: editTitleInput.text.trim().length > 0
 								decorator: Component {
@@ -410,6 +426,12 @@ Dialog {
 					}
 				}
 			}
+
+			PopupContainer {
+				id: popupContainer
+				anchors.right: parent.right
+				anchors.bottom: parent.bottom
+			}
 		}
 	}
 
@@ -452,15 +474,6 @@ Dialog {
 		createEntityContextTicketInput.m_description = description
 
 		createTicketRequest.send(createEntityContextTicketInput)
-	}
-
-	function clearInputFields() {
-		try {
-			editTitleInput.text = ""
-			editDescriptionInput.text = ""
-		} catch(e) {
-			console.warn("EntityContextTicketsDialog: clearInputFields failed:", e)
-		}
 	}
 
 	function appendTicketItems(itemsModel) {
@@ -531,10 +544,8 @@ Dialog {
 		sdlObjectComp: Component {
 			CreateEntityContextTicketPayload {
 				onFinished: {
-					root.clearInputFields()
+					root.ticketCreated()
 					root.reloadTickets()
-
-					root.openTicket(m_id)
 				}
 			}
 		}

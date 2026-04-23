@@ -259,12 +259,11 @@ sdl::imtdesk::ImtDesk::CCreateEntityContextTicketPayload CEntityContextTicketsCo
 		if (!convId.isEmpty()){
 			// Re-fetch the created ticket and set the conversation ID
 			imtbase::IObjectCollection::DataPtr createdDataPtr;
-			if (m_ticketCollectionCompPtr->GetData(createdId, createdDataPtr)){
+			if (m_ticketCollectionCompPtr->GetObjectData(ticketId, createdDataPtr)){
 				imtdesk::ISupportTicket* createdTicketPtr = dynamic_cast<imtdesk::ISupportTicket*>(createdDataPtr.GetPtr());
 				if (createdTicketPtr != nullptr){
 					createdTicketPtr->SetConversationId(convId);
-					m_ticketCollectionCompPtr->InsertNewObject(
-								"Ticket", "", "", createdTicketPtr, createdId);
+					m_ticketCollectionCompPtr->SetObjectData(ticketId, *createdTicketPtr);
 				}
 			}
 		}

@@ -63,7 +63,7 @@ DocumentViewBase {
 	property int _unreadMessagesCount: 0
 	property string _chatActionHint: ""
 	property bool _exportChatCopiedState: false
-	readonly property int chatHintDurationMs: 2200
+	readonly property int chatHintDurationMs: 2000
 	readonly property int chatHintHeightPx: 28
 	readonly property int unreadHintHeightPx: 34
 	readonly property int minCommentInputHeightPx: Style.controlHeightM - 10
@@ -484,7 +484,7 @@ DocumentViewBase {
 
 	Timer {
 		id: exportChatBtnStateTimer
-		interval: 1500
+		interval: 2000
 		repeat: false
 		onTriggered: root._exportChatCopiedState = false
 	}
@@ -1071,7 +1071,7 @@ DocumentViewBase {
 									}
 								}
 							}
-							
+						
 							// Row 2: Assignees (multi-select with chips)
 							Column {
 								width: parent.width
@@ -1237,6 +1237,7 @@ DocumentViewBase {
 														showRemoteChangesAlert: false
 														tableViewParamsStoredServer: false
 														collectionId: "Users"
+														headerRightClickEnabled: false
 														Component.onCompleted: {
 															assigneeDialog.collectionView = this
 														}
@@ -1503,7 +1504,8 @@ DocumentViewBase {
 													}
 													function onCurrentPageChanged(item) {
 														if (item && item.collectionView) {
-															ctxDialog.setButtonEnabled(Enums.apply, item.collectionView.selectedIds.length > 0)
+															let indexes = item.collectionView.table.getSelectedIndexes()
+															ctxDialog.setButtonEnabled(Enums.apply, indexes.length > 0)
 														}
 													}
 												}
@@ -1589,6 +1591,7 @@ DocumentViewBase {
 															documentCollectionFilter: null
 															showRemoteChangesAlert: false
 															tableViewParamsStoredServer: false
+															headerRightClickEnabled: false
 															onSelectionChanged: {
 																if (ctxStackView.currentPage() === pageCollView.parent) {
 																	ctxDialog.setButtonEnabled(Enums.apply, selectedIds.length > 0)
