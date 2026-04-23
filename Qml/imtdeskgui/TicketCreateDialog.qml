@@ -59,15 +59,98 @@ Rectangle {
 				color: Style.textPrimaryColor
 			}
 
-			TicketTitleDescriptionFields {
-				id: ticketFields
+			// Title field
+			Column {
 				width: parent.width
-				titleLabelText: qsTr("Title *")
-				descriptionLabelText: qsTr("Description")
-				titlePlaceholderText: qsTr("Brief summary of the issue")
-				descriptionPlaceholderText: qsTr("Add a description...")
-				minDescriptionHeight: 100
-				maxDescriptionHeight: 180
+				spacing: 4
+
+				Text {
+					text: qsTr("Title *")
+					font.pixelSize: Style.fontSizeM
+					font.bold: true
+					color: Style.textColor
+				}
+
+				CustomTextField {
+					id: titleInput
+					width: parent.width
+					height: Style.controlHeightM
+					placeHolderText: qsTr("Brief summary of the issue")
+				}
+			}
+
+			// Description field
+			Column {
+				width: parent.width
+				spacing: 4
+
+				Text {
+					text: qsTr("Description")
+					font.pixelSize: Style.fontSizeM
+					font.bold: true
+					color: Style.textColor
+				}
+
+				Rectangle {
+					width: parent.width
+					height: Math.min(180, Math.max(100, descriptionInput.contentHeight)) + Style.paddingM * 2
+					radius: Style.radiusM
+					border.color: descriptionInput.activeFocus ? Style.imaginToolsAccentColor : Style.borderColor
+					border.width: descriptionInput.activeFocus ? 2 : 1
+					color: descriptionInput.activeFocus ? Style.baseColor : "#FAFBFC"
+
+					Flickable {
+						id: descFlick
+						anchors.fill: parent
+						anchors.margins: Style.paddingM
+						anchors.rightMargin: Style.paddingM + Style.marginM
+						contentWidth: width
+						contentHeight: descriptionInput.height
+						clip: true
+						boundsBehavior: Flickable.StopAtBounds
+
+						TextEdit {
+							id: descriptionInput
+							width: descFlick.width
+							height: Math.max(100, contentHeight)
+							font.pixelSize: Style.fontSizeM
+							color: Style.textColor
+							wrapMode: TextEdit.Wrap
+							textFormat: TextEdit.PlainText
+
+							onCursorRectangleChanged: {
+								var cy = cursorRectangle.y
+								var ch = cursorRectangle.height
+								if (cy < descFlick.contentY) {
+									descFlick.contentY = cy
+								} else if (cy + ch > descFlick.contentY + descFlick.height) {
+									descFlick.contentY = cy + ch - descFlick.height
+								}
+							}
+
+							Text {
+								anchors.fill: parent
+								text: qsTr("Add a description...")
+								color: Style.inactiveTextColor
+								font.pixelSize: Style.fontSizeM
+								visible: descriptionInput.text.length === 0
+							}
+						}
+					}
+
+					CustomScrollbar {
+						z: parent.z + 1
+						anchors.right: parent.right
+						anchors.rightMargin: 2
+						anchors.top: parent.top
+						anchors.bottom: parent.bottom
+						anchors.topMargin: 2
+						anchors.bottomMargin: 2
+						secondSize: Style.marginM
+						targetItem: descFlick
+						visible: descFlick.contentHeight > descFlick.height
+					}
+				}
 			}
 
 			// Type + Priority row
@@ -141,7 +224,7 @@ Rectangle {
 					width: Style.buttonWidthM
 					height: Style.buttonHeightM
 					radius: Style.radiusS
-					color: ticketFields.titleText.trim().length > 0 ? "#1a7f37" : Style.disabledColor
+					color: titleInput.text.trim().length > 0 ? "#1a7f37" : Style.disabledColor
 
 					Text {
 						anchors.centerIn: parent
@@ -153,7 +236,7 @@ Rectangle {
 
 					MouseArea {
 						anchors.fill: parent
-						enabled: ticketFields.titleText.trim().length > 0
+						enabled: titleInput.text.trim().length > 0
 						onClicked: {
 							ticketCreateDialogRoot.submitTicket()
 						}
@@ -164,24 +247,25 @@ Rectangle {
 	}
 
 	function open(prefill, messageId, conversationId) {
-		prefillContent = prefill || "";
-		linkedMessageId = messageId || "";
-		linkedConversationId = conversationId || "";
-		ticketFields.descriptionText = prefillContent;
-		visible = true;
-		ticketFields.focusTitle();
+		ticketCreateDialogRoot.prefillContent = prefill || "";
+		ticketCreateDialogRoot.linkedMessageId = messageId || "";
+		ticketCreateDialogRoot.linkedConversationId = conversationId || "";
+		descriptionInput.text = ticketCreateDialogRoot.prefillContent;
+		ticketCreateDialogRoot.visible = true;
+		titleInput.forceActiveFocus();
 	}
 
 	function cancel() {
 		visible = false;
-		ticketFields.clearFields();
+		titleInput.text = "";
+		descriptionInput.text = "";
 		cancelled();
 	}
 
 	function submitTicket() {
-		let ticketData = {
-			title: ticketFields.titleText.trim(),
-			description: ticketFields.descriptionText.trim(),
+		var ticketData = {
+			title: titleInput.text.trim(),
+			description: descriptionInput.text.trim(),
 			ticketType: typeCombo.currentIndex,
 			priority: priorityCombo.currentIndex,
 			messageId: linkedMessageId,
@@ -190,6 +274,7 @@ Rectangle {
 
 		ticketCreated(ticketData);
 		visible = false;
-		ticketFields.clearFields();
+		titleInput.text = "";
+		descriptionInput.text = "";
 	}
 }
