@@ -24,7 +24,6 @@ Dialog {
 
 	property bool loading: false
 	property int ticketsPageSize: 250
-	property int descriptionInputHeight: Style.controlHeightM * 3
 	property int listHeightPadding: 24
 	readonly property int defaultOffset: 0
 	readonly property int listContentHeight: root.height - (createCol.height + Style.marginM * 4 + root.listHeightPadding)
@@ -74,28 +73,15 @@ Dialog {
 							color: Style.textColor
 						}
 
-						CustomTextField {
-							id: titleInput
+						TicketTitleDescriptionFields {
+							id: ticketFields
 							width: parent.width
-							height: Style.controlHeightM
-							placeHolderText: qsTr("Title")
-						}
-
-						Rectangle {
-							width: parent.width
-							height: root.descriptionInputHeight
-							radius: Style.radiusS
-							color: Style.baseColor
-							border.color: Style.borderColor
-
-							TextEdit {
-								id: descriptionInput
-								anchors.fill: parent
-								anchors.margins: Style.marginS
-								wrapMode: TextEdit.Wrap
-								font.pixelSize: Style.fontSizeM
-								color: Style.textColor
-							}
+							titleLabelText: qsTr("Title")
+							descriptionLabelText: qsTr("Description")
+							titlePlaceholderText: qsTr("Title")
+							descriptionPlaceholderText: qsTr("Describe the issue...")
+							minDescriptionHeight: Style.controlHeightM * 3
+							maxDescriptionHeight: Style.controlHeightM * 5
 						}
 
 						Row {
@@ -106,9 +92,9 @@ Dialog {
 								width: Style.buttonWidthL
 								height: Style.controlHeightM
 								text: qsTr("Create")
-								enabled: titleInput.text.trim().length > 0
+								enabled: ticketFields.titleText.trim().length > 0
 								onClicked: {
-									root.createTicket(titleInput.text, descriptionInput.text)
+									root.createTicket(ticketFields.titleText, ticketFields.descriptionText)
 								}
 							}
 						}
@@ -230,8 +216,7 @@ Dialog {
 	}
 
 	function clearInputFields() {
-		titleInput.text = ""
-		descriptionInput.text = ""
+		ticketFields.clearFields()
 	}
 
 	function appendTicketItems(itemsModel) {

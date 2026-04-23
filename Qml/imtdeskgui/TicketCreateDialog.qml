@@ -59,81 +59,15 @@ Rectangle {
 				color: Style.textPrimaryColor
 			}
 
-			// Title field
-			Column {
+			TicketTitleDescriptionFields {
+				id: ticketFields
 				width: parent.width
-				spacing: Style.paddingXS
-
-				Text {
-					text: qsTr("Title *")
-					font.pixelSize: Style.fontSizeXS
-					color: Style.textSecondaryColor
-				}
-
-				Rectangle {
-					width: parent.width
-					height: Style.inputHeightM
-					radius: Style.radiusS
-					color: Style.inputBackgroundColor
-					border.color: titleField.activeFocus ? Style.accentColor : Style.separatorColor
-
-					TextInput {
-						id: titleField
-						anchors.fill: parent
-						anchors.margins: Style.paddingS
-						font.pixelSize: Style.fontSizeS
-						color: Style.textPrimaryColor
-						clip: true
-						verticalAlignment: TextInput.AlignVCenter
-
-						Text {
-							anchors.fill: parent
-							text: qsTr("Brief summary of the issue")
-							color: Style.textPlaceholderColor
-							font.pixelSize: Style.fontSizeS
-							verticalAlignment: Text.AlignVCenter
-							visible: titleField.text.length === 0
-						}
-					}
-				}
-			}
-
-			// Description field
-			Column {
-				width: parent.width
-				spacing: Style.paddingXS
-
-				Text {
-					text: qsTr("Description")
-					font.pixelSize: Style.fontSizeXS
-					color: Style.textSecondaryColor
-				}
-
-				Rectangle {
-					width: parent.width
-					height: 100
-					radius: Style.radiusS
-					color: Style.inputBackgroundColor
-					border.color: descriptionField.activeFocus ? Style.accentColor : Style.separatorColor
-
-					TextEdit {
-						id: descriptionField
-						anchors.fill: parent
-						anchors.margins: Style.paddingS
-						font.pixelSize: Style.fontSizeS
-						color: Style.textPrimaryColor
-						wrapMode: TextEdit.Wrap
-						text: ticketCreateDialogRoot.prefillContent
-
-						Text {
-							anchors.fill: parent
-							text: qsTr("Add a description...")
-							color: Style.textPlaceholderColor
-							font.pixelSize: Style.fontSizeS
-							visible: descriptionField.text.length === 0
-						}
-					}
-				}
+				titleLabelText: qsTr("Title *")
+				descriptionLabelText: qsTr("Description")
+				titlePlaceholderText: qsTr("Brief summary of the issue")
+				descriptionPlaceholderText: qsTr("Add a description...")
+				minDescriptionHeight: 100
+				maxDescriptionHeight: 180
 			}
 
 			// Type + Priority row
@@ -207,7 +141,7 @@ Rectangle {
 					width: Style.buttonWidthM
 					height: Style.buttonHeightM
 					radius: Style.radiusS
-					color: titleField.text.trim().length > 0 ? "#1a7f37" : Style.disabledColor
+					color: ticketFields.titleText.trim().length > 0 ? "#1a7f37" : Style.disabledColor
 
 					Text {
 						anchors.centerIn: parent
@@ -219,7 +153,7 @@ Rectangle {
 
 					MouseArea {
 						anchors.fill: parent
-						enabled: titleField.text.trim().length > 0
+						enabled: ticketFields.titleText.trim().length > 0
 						onClicked: {
 							ticketCreateDialogRoot.submitTicket()
 						}
@@ -233,21 +167,21 @@ Rectangle {
 		prefillContent = prefill || "";
 		linkedMessageId = messageId || "";
 		linkedConversationId = conversationId || "";
+		ticketFields.descriptionText = prefillContent
 		visible = true;
-		titleField.forceActiveFocus();
+		ticketFields.focusTitle();
 	}
 
 	function cancel() {
 		visible = false;
-		titleField.text = "";
-		descriptionField.text = "";
+		ticketFields.clearFields()
 		cancelled();
 	}
 
 	function submitTicket() {
 		let ticketData = {
-			title: titleField.text.trim(),
-			description: descriptionField.text.trim(),
+			title: ticketFields.titleText.trim(),
+			description: ticketFields.descriptionText.trim(),
 			ticketType: typeCombo.currentIndex,
 			priority: priorityCombo.currentIndex,
 			messageId: linkedMessageId,
@@ -256,7 +190,6 @@ Rectangle {
 
 		ticketCreated(ticketData);
 		visible = false;
-		titleField.text = "";
-		descriptionField.text = "";
+		ticketFields.clearFields()
 	}
 }
