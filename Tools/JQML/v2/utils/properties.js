@@ -786,8 +786,8 @@ class QFont extends ComplexObject {
         family: { type: QString, value: 'Verdana', changed: 'mainChanged' },
         italic: { type: QBool, value: false, changed: 'mainChanged' },
         underline: { type: QBool, value: false, changed: 'mainChanged' },
-        pointSize: { type: QReal, value: 14/0.75, changed: 'mainChanged' },
-        pixelSize: { type: QReal, value: 14, changed: 'mainChanged' },
+        pointSize: { type: QReal, value: 12/0.75, changed: 'mainChanged' },
+        pixelSize: { type: QReal, value: 12, changed: 'mainChanged' },
     }
 
     mainChanged(){

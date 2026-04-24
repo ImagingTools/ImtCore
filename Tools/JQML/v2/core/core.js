@@ -395,7 +395,7 @@ window.onload = ()=>{
         :focus,:active{outline:none;}
         a:focus,a:active{outline:none;}
         nav,footer,header,aside{display:block;}
-        html,body{height:100%;width:100%;font-size:100%;line-height:1;font-size:14px;-ms-text-size-adjust:100%;-moz-text-size-adjust:100%;-webkit-text-size-adjust:100%;}
+        html,body{height:100%;width:100%;font-size:100%;font-size:12px;-ms-text-size-adjust:100%;-moz-text-size-adjust:100%;-webkit-text-size-adjust:100%;}
         input,button,textarea{font-family:inherit;}
         input::-ms-clear{display:none;}
         button{cursor:pointer;}
