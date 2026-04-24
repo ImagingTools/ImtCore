@@ -61,7 +61,7 @@ Rectangle {
 	property Component controlPanelComp: null
 	property Item controlPanelItem: null
 
-	property alias scaleCoeff: canvas.scaleCoeff;
+	property real scaleCoeff: canvas.scaleCoeff;
 	property alias deltaX: canvas.deltaX;
 	property alias deltaY: canvas.deltaY;
 	property alias viewMatrix: canvasMatrix;
@@ -143,6 +143,10 @@ Rectangle {
 		layerTools.canApplyViewTransform = false;
 		layerModel.push(layerTools);
 
+	}
+
+	onScaleCoeffChanged: {
+		canvas.scaleCoeff = scaleCoeff
 	}
 
 	Component.onDestruction: {
@@ -954,6 +958,7 @@ Rectangle {
 
 			onScaleCoeffChanged: {
 				//console.log("scaleCoeff:::", scaleCoeff)
+				graphicsView.scaleCoeff = scaleCoeff
 				requestPaintPause.restart();
 			}
 

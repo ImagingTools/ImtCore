@@ -223,7 +223,7 @@ ArcShape 1.0 ./GraphicsView/ArcShape.qml
 BezierCurveShape 1.0 ./GraphicsView/BezierCurveShape.qml
 QuadraticCurveShape 1.0 ./GraphicsView/QuadraticCurveShape.qml
 TextShape 1.0 ./GraphicsView/TextShape.qml
-ImageShape 1.0 ./GraphicsView/ImageShape.qml
+ImageShape2d 1.0 ./GraphicsView/ImageShape2d.qml
 CoordinateGridShape 1.0 ./GraphicsView/CoordinateGridShape.qml
 SegmentShape 1.0 ./GraphicsView/SegmentShape.qml
 DiskSegmentShape 1.0 ./GraphicsView/DiskSegmentShape.qml
