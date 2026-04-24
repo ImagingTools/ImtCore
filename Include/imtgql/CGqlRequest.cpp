@@ -530,6 +530,19 @@ bool CGqlRequest::ParseQuery(const QByteArray& query, qsizetype& errorPosition)
 			break;
 
 		default:
+			if (startBigText && startBackSlash){
+				switch (chr) {
+				case 'n': text.append('\n'); break;
+				case 'r': text.append('\r'); break;
+				case 't': text.append('\t'); break;
+				default:
+					text.append('\\');
+					text.append(chr);
+					break;
+				}
+				startBackSlash = false;
+				break;
+			}
 			if (!startText && !text.isEmpty()){
 				SetParseText(text);
 				text.clear();
