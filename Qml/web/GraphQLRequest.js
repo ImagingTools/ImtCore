@@ -236,9 +236,9 @@ var GqlRequest = function(requestType, commandId){
 						if (isString) {
 							value = value.replace(/\\/g,"\\\\\\\\")
 							value = value.replace(/\"/g,"\\\\\\\"")
-							value = value.replace(/\r/g,"\\\\r")
-							value = value.replace(/\n/g,"\\\\n")
-							value = value.replace(/\t/g,"\\\\t")
+							value = value.replace(/\r/g,"\\\\\\\\r")
+							value = value.replace(/\n/g,"\\\\\\\\n")
+							value = value.replace(/\t/g,"\\\\\\\\t")
 							retVal += "\\\""
 						}
 						
@@ -246,9 +246,9 @@ var GqlRequest = function(requestType, commandId){
 							let data = value.toGraphQL();
 							data = data.replace(/\\/g,"\\\\")
 							data = data.replace(/\"/g,"\\\"")
-							data = data.replace(/\r/g,"\\r")
-							data = data.replace(/\n/g,"\\n")
-							data = data.replace(/\t/g,"\\t")
+							data = data.replace(/\r/g,"\\\\r")
+							data = data.replace(/\n/g,"\\\\n")
+							data = data.replace(/\t/g,"\\\\t")
 							
 							retVal += data
 						}
