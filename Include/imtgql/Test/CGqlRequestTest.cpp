@@ -773,6 +773,38 @@ void CGqlRequestTest::TestVariablePrimitivesAndLists()
 }
 
 
+void CGqlRequestTest::ParseStringWithEscapeSequences()
+{
+	// Test that \n, \r, \t escape sequences inside GraphQL string literals
+	// are correctly decoded to actual control characters
+	const char* payload = R"(
+	{"query": "mutation UpdateTicket { UpdateTicket(input: {Description: \"Hello\\nWorld\", Title: \"Line1\\r\\nLine2\", Note: \"Tab\\there\"}) { RootField { Field } } }"}
+	)";
+
+	qsizetype errorPosition = -1;
+	imtgql::CGqlRequest request;
+	bool retVal = request.ParseQuery(payload, errorPosition);
+
+	QVERIFY(retVal);
+	QVERIFY(errorPosition < 0);
+
+	const imtgql::CGqlParamObject* inputPtr = request.GetParamObject("input");
+	QVERIFY(inputPtr != nullptr);
+
+	// \n should be decoded to actual newline (char 10)
+	QString description = inputPtr->GetParamArgumentValue("Description").toString();
+	QCOMPARE(description, QStringLiteral("Hello\nWorld"));
+
+	// \r\n should be decoded to actual CR+LF
+	QString title = inputPtr->GetParamArgumentValue("Title").toString();
+	QCOMPARE(title, QStringLiteral("Line1\r\nLine2"));
+
+	// \t should be decoded to actual tab (char 9)
+	QString note = inputPtr->GetParamArgumentValue("Note").toString();
+	QCOMPARE(note, QStringLiteral("Tab\there"));
+}
+
+
 void CGqlRequestTest::cleanupTestCase()
 {
 }

@@ -340,9 +340,9 @@ QtObject {
 
 							data = data.replace(/\\/g, "\\\\")
 							data = data.replace(/\"/g, "\\\"")
-							data = data.replace(/\r/g, "\\\\r")
-							data = data.replace(/\n/g, "\\\\n")
-							data = data.replace(/\t/g, "\\\\t")
+							data = data.replace(/\r/g, "\\r")
+							data = data.replace(/\n/g, "\\n")
+							data = data.replace(/\t/g, "\\t")
 
 							graphQL += "\"" + data + "\""
 						}
@@ -371,9 +371,9 @@ QtObject {
 
 					data = data.replace(/\\/g,"\\\\")
 					data = data.replace(/\"/g,"\\\"")
-					data = data.replace(/\r/g,"\\\\r")
-					data = data.replace(/\n/g,"\\\\n")
-					data = data.replace(/\t/g,"\\\\t")
+					data = data.replace(/\r/g,"\\r")
+					data = data.replace(/\n/g,"\\n")
+					data = data.replace(/\t/g,"\\t")
 
 					graphQL += '"'
 					graphQL += data

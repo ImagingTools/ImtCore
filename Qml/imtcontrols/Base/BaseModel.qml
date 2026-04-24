@@ -117,9 +117,9 @@ ListModel {
 
 								data = data.replace(/\\/g, "\\\\")
 								data = data.replace(/\"/g, "\\\"")
-								data = data.replace(/\r/g, "\\\\r")
-								data = data.replace(/\n/g, "\\\\n")
-								data = data.replace(/\t/g, "\\\\t")
+								data = data.replace(/\r/g, "\\r")
+								data = data.replace(/\n/g, "\\n")
+								data = data.replace(/\t/g, "\\t")
 
 								graphQL += "\"" + data + "\""
 							}
@@ -139,9 +139,9 @@ ListModel {
 					if(typeof value === 'string'){
 						value = value.replace(/\\/g, "\\\\")
 						value = value.replace(/\"/g, "\\\"")
-						value = value.replace(/\r/g, "\\\\r")
-						value = value.replace(/\n/g, "\\\\n")
-						value = value.replace(/\t/g, "\\\\t")
+						value = value.replace(/\r/g, "\\r")
+						value = value.replace(/\n/g, "\\n")
+						value = value.replace(/\t/g, "\\t")
 					}
 
 					if (value === undefined){

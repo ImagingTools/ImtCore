@@ -39,6 +39,13 @@ enum TicketPriority {
 	Critical
 }
 
+enum TicketAccessLevel {
+	FullAccess
+	LimitedAccess
+	CommentOnly
+	ViewOnly
+}
+
 # --- Label ---
 
 type LabelData {
@@ -116,7 +123,6 @@ type TicketData {
 	reporterId: ID
 	conversationId: ID
 	messageId: ID
-	tags: [String]
 	labelIds: [ID]
 	locked: Boolean
 	lockReason: String
@@ -127,8 +133,7 @@ type TicketData {
 	entityReferences: [EntityReference]
 	entityTypes: [EntityType]
 	comments: [TicketComment]
-	canEdit: Boolean
-	canLock: Boolean
+	accessLevel: TicketAccessLevel
 }
 
 input TicketsListInput {

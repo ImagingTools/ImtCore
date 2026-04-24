@@ -58,9 +58,9 @@
                     <AttributeInfo Id="GuiElementModels" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>DeskPage</Value>
                                 <Value>Workspace</Value>
                                 <Value>SearchPage</Value>
+                                <Value>DeskPage</Value>
                                 <Value>AdministrationPage</Value>
                             </Values>
                         </Data>

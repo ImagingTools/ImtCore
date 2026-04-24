@@ -26,6 +26,11 @@ QtObject {
 
 			representationController.representationUpdated.connect(onRepresentationUpdated)
 			representationController.startUpdateRepresentation.connect(onStartUpdateRepresentation)
+			representationController.updateRepresentationFailed.connect(onUpdateRepresentationFailed)
+
+			if (updateRepresentation){
+				representationController.updateRepresentationFromDocument()
+			}
 		}
 	}
 
@@ -125,6 +130,17 @@ QtObject {
 		documentManager.documentRepresentationUpdated(documentId, representation)
 	}
 
+	function onUpdateRepresentationFailed(documentId, message){
+		if (root.documentId !== documentId){
+			return
+		}
+
+		for (let i = 0; i < registeredViews.length; ++i){
+			_internal.updateCounters[i] = 0
+			registeredViews[i].setBlockingUpdateModel(false)
+		}
+	}
+
 	function onGuiUpdated(view, model){
 		if (registeredViews.includes(view)){
 			documentManager.documentGuiUpdated(documentId, model)
@@ -148,6 +164,7 @@ QtObject {
 
 	function onModelDataChanged(view, model){
 		if (registeredViews.includes(view)){
+			_internal.initiatingView = view
 			let index = registeredViews.indexOf(view)
 			registeredRepresentation[index].updateDocumentFromRepresentation()
 		}
@@ -208,7 +225,14 @@ QtObject {
 	}
 
 	function updateRepresentationForAllViews(){
+		let skipView = _internal.initiatingView
+		_internal.initiatingView = null
+
 		for (let i = 0; i < registeredViews.length; ++i){
+			if (registeredViews[i] === skipView){
+				continue
+			}
+
 			if (registeredViews[i].visible){
 				registeredRepresentation[i].updateRepresentationFromDocument()
 			}
@@ -231,5 +255,6 @@ QtObject {
 		property var requestUpdateViews: []
 		property bool saveRequested: false
 		property var updateCounters: []
+		property var initiatingView: null
 	}
 }

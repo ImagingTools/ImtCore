@@ -89,19 +89,8 @@ Rectangle {
 				}
 			}
 
-			// Typing indicator shown at the top (bottom of view due to BottomToTop)
-			footer: TypingIndicator {
-				visible: chatViewContainer.isTyping
-				width: messagesListView.width
-				userName: chatViewContainer.typingUserName
-			}
-
 			Component.onCompleted: {
 				positionViewAtEnd();
-			}
-
-			onCountChanged: {
-				Qt.callLater(positionViewAtEnd);
 			}
 		}
 
