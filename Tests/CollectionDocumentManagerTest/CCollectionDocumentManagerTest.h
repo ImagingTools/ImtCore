@@ -755,6 +755,7 @@ private slots:
 
 	// Single-copy mode tests
 	void SingleCopyOpenSameObjectByTwoUsersTest();
+	void SingleCopySecondUserGetsDataLoadedEventTest();
 	void SingleCopySetDocumentDataSharedTest();
 	void SingleCopyCloseOneUserTest();
 	void SingleCopyCloseBothUsersTest();

@@ -1225,6 +1225,48 @@ void CCollectionDocumentManagerTest::SingleCopyOpenSameObjectByTwoUsersTest()
 }
 
 
+void CCollectionDocumentManagerTest::SingleCopySecondUserGetsDataLoadedEventTest()
+{
+	m_managerPtr->SetSingleCopyMode(true);
+	m_managerPtr->GetMockCollection().AddObject(
+		TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME,
+		istd::IChangeableSharedPtr(new CMockDocumentObject("sharedData")));
+
+	// First user opens and waits for async load
+	QByteArray docId1 = OpenDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID, TEST_OBJECT_ID);
+	QVERIFY2(!docId1.isEmpty(), "First user should open document successfully");
+
+	// Clear events before second user opens
+	m_managerPtr->GetMockEventHandler().ClearEvents();
+
+	// Second user opens the same object (shared document already loaded)
+	QUrl url("collection:///" + QString::fromUtf8(TEST_OBJECT_ID));
+	QByteArray docId2 = m_managerPtr->OpenDocument(TEST_USER_ID_2, url);
+	QVERIFY2(!docId2.isEmpty(), "Second user should open document successfully");
+
+	// DocumentDataLoaded is deferred via QTimer::singleShot — process events
+	for (int i = 0; i < 20; ++i) {
+		QCoreApplication::processEvents();
+		QThread::msleep(10);
+	}
+
+	// Second user should have received DocumentDataLoaded event
+	int dataLoadedCount = m_managerPtr->GetMockEventHandler().CountEventsOfType("DocumentDataLoadedEvent");
+	QVERIFY2(dataLoadedCount >= 1, "DocumentDataLoaded event should be fired for second user joining shared document");
+
+	// Verify the event was for the second user
+	bool foundForUser2 = false;
+	for (const auto& event : m_managerPtr->GetMockEventHandler().GetEvents()) {
+		if (event.type == "DocumentDataLoadedEvent" && event.userId == TEST_USER_ID_2) {
+			foundForUser2 = true;
+			QCOMPARE(event.documentId, docId2);
+			break;
+		}
+	}
+	QVERIFY2(foundForUser2, "DocumentDataLoaded event should be for the second user");
+}
+
+
 void CCollectionDocumentManagerTest::SingleCopySetDocumentDataSharedTest()
 {
 	m_managerPtr->SetSingleCopyMode(true);

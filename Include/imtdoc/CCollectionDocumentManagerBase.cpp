@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QtCore/QCoreApplication>
+#include <QtCore/QTimer>
 #include <QtCore/QUuid>
 #include <QtCore/QThread>
 
@@ -104,7 +105,20 @@ QByteArray CCollectionDocumentManagerBase::OpenDocument(const QByteArray& userId
 			}
 
 			if (!shared.isLoading) {
-				OnDocumentDataLoaded(userId, retVal);
+				// Defer the notification to ensure the mutation response is sent
+				// to the client before the subscription notification arrives.
+				// Without this, the client receives DocumentDataLoaded before it
+				// knows the documentId from the mutation response and ignores it.
+				QByteArray deferredUserId = userId;
+				QByteArray deferredDocumentId = retVal;
+				std::weak_ptr<std::atomic<bool>> deferredAliveGuard(m_isAlive);
+				QTimer::singleShot(0, QCoreApplication::instance(), [this, deferredAliveGuard, deferredUserId, deferredDocumentId]() {
+					auto isAlive = deferredAliveGuard.lock();
+					if (!isAlive || !isAlive->load()) {
+						return;
+					}
+					OnDocumentDataLoaded(deferredUserId, deferredDocumentId);
+				});
 			}
 
 			return retVal;
