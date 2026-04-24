@@ -51,7 +51,7 @@ class TextEdit extends Item {
         super(parent,exCtx,exModel)
 
         this.setStyle({
-            fontSize: '14px',
+            fontSize: '12px',
             fontFamily: 'Verdana',
             pointerEvents: 'auto',
             touchAction: 'auto',

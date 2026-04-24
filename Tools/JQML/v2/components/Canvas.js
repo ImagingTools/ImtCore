@@ -45,7 +45,7 @@ class Canvas extends Item {
         let originCreatePattern = ctx.createPattern
         ctx.drawImage = (...args)=>{
             if(typeof args[0] === 'string'){
-                let path = rootPath+'/'+args[0].replaceAll('../','')
+                let path = args[0].startsWith('data:image') ? args[0] : (rootPath+'/'+args[0].replaceAll('../','')).replaceAll('//','/')
                 if(this.$cache[path]){
                     args[0] = this.$cache[path]
                     originDrawImage.call(ctx, ...args)
@@ -62,7 +62,7 @@ class Canvas extends Item {
                         img.remove()
                     }
 
-                    img.src = path.replaceAll('//','/')
+                    img.src = path
                 }
                 
             } else {
@@ -131,7 +131,8 @@ class Canvas extends Item {
     }
     loadImage(image, sourceSize){
         if(typeof image === 'string'){
-            let path = rootPath+'/'+image.replaceAll('../','')
+            let path = image.startsWith('data:image') ? image : (rootPath+'/'+image.replaceAll('../','')).replaceAll('//','/')
+            
             if(!this.$cache[path]){
                 let img = sourceSize ? new OriginImage(sourceSize.width, sourceSize.height) : new OriginImage()
                 img.onload = ()=>{
@@ -143,7 +144,7 @@ class Canvas extends Item {
                     img.remove()
                 }
 
-                img.src = path.replaceAll('//','/')
+                img.src = path
             }
             
         }
