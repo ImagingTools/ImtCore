@@ -102,6 +102,17 @@ protected:
 		int undoManagerModelId = -1;
 	};
 
+	struct SharedDocumentData
+	{
+		QByteArray typeId;
+		QString name;
+		istd::IChangeableSharedPtr objectPtr;
+		idoc::IUndoManagerSharedPtr undoManagerPtr;
+		int refCount = 0;
+		bool isLoading = false;
+		int undoManagerModelId = -1;
+	};
+
 	class UndoManagerObserver : public imod::CMultiModelDispatcherBase
 	{
 	public:
@@ -114,9 +125,17 @@ protected:
 		CDocumentManagerBase& m_parent;
 	};
 
+	virtual bool IsSingleCopyMode() const;
+
+	typedef QPair<QByteArray, QByteArray> UserDocumentPair;
+	typedef QList<UserDocumentPair> UserDocumentPairList;
+	UserDocumentPairList FindDocumentsByObjectId(const QByteArray& objectId) const;
+
 	typedef QMap<QByteArray, WorkingDocument> WorkingDocumentList;
 	mutable QMap<QByteArray, WorkingDocumentList> m_userDocuments;
 	mutable QRecursiveMutex m_mutex;
+
+	QMap<QByteArray, SharedDocumentData> m_sharedDocuments;
 
 	UndoManagerObserver m_undoManagerObserver;
 	std::shared_ptr<std::atomic<bool>> m_isAlive;
