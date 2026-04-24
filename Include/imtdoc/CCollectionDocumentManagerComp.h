@@ -20,7 +20,7 @@ public:
 	I_BEGIN_COMPONENT(CCollectionDocumentManagerComp)
 		I_REGISTER_INTERFACE(imtdoc::IDocumentManager)
 		I_ASSIGN(m_collectionCompPtr, "Collection", "Document collection containing related documents", true, "Collection");
-		I_ASSIGN(m_isSingleCopyModeAttrPtr, "IsSingleCopyMode", "When enabled, all users share a single copy of each document", true, false);
+		I_ASSIGN(m_isSingleCopyModeAttrPtr, "IsSingleCopyMode", "When enabled, all users share a single copy of each document", false, false);
 	I_END_COMPONENT
 
 protected:

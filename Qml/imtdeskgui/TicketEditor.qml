@@ -729,9 +729,9 @@ DocumentViewBase {
 								Rectangle {
 									id: titleEditBtn
 									visible: root.canEditCoreTicketFields
-									width: 28
-									height: 28
-									radius: 14
+									width: visible ? 28 : 0
+									height: width
+									radius: width / 2
 									color: titleEditBtnMa.containsMouse ? "#F0F2F5" : "transparent"
 									anchors.verticalCenter: parent.verticalCenter
 									
@@ -880,7 +880,7 @@ DocumentViewBase {
 									font.bold: true
 									color: editView.sectionLabelColor
 								}
-								
+
 								Rectangle {
 									width: parent.width
 									height: Math.min(220, Math.max(50, editDescriptionInput.contentHeight)) + Style.paddingM * 2
@@ -1020,7 +1020,7 @@ DocumentViewBase {
 										height: Style.buttonHeightM
 										currentIndex: 1
 										model: ticketTypeModel
-										enabled: root.canEditCoreTicketFields
+										changeable: root.canEditCoreTicketFields
 										onCurrentIndexChanged: root.doUpdateModel()
 										KeyNavigation.tab: editPriorityCB
 										KeyNavigation.backtab: editDescriptionInput
@@ -1043,7 +1043,7 @@ DocumentViewBase {
 										height: Style.buttonHeightM
 										currentIndex: 1
 										model: priorityModel
-										enabled: root.canEditCoreTicketFields
+										changeable: root.canEditCoreTicketFields
 										onCurrentIndexChanged: root.doUpdateModel()
 										KeyNavigation.tab: editAssigneeCB
 										KeyNavigation.backtab: editTypeCB
@@ -1067,7 +1067,7 @@ DocumentViewBase {
 										height: Style.buttonHeightM
 										currentIndex: 0
 										model: statusModel
-										enabled: root.canEdit
+										changeable: root.canEdit
 										onCurrentIndexChanged: root.doUpdateModel()
 										KeyNavigation.tab: editLockedCB
 										KeyNavigation.backtab: editAssigneeCB

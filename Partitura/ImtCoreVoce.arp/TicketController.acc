@@ -139,6 +139,9 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
+                    <AttributeInfo Id="IsSingleCopyMode" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -291,6 +294,36 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="EntityContextTicketsController" PackageId="ImtDeskGqlPck" ComponentId="EntityContextTicketsController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ChatService" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ChatService"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EntityReferenceStorage" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="EntityReferenceStorage"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TicketCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TicketSqlRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TicketFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="SupportTicket"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserCollection">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserGroupInfoProvider" Type="Reference" ExportId="UserGroupInfoProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="EntityReferenceStorage" PackageId="ImtDeskDbPck" ComponentId="EntityReferenceStorage">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -354,36 +387,6 @@
         <Element Id="SupportTicket" PackageId="ImtDeskPck" ComponentId="SupportTicket">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap/>
-            </Data>
-        </Element>
-        <Element Id="EntityContextTicketsController" PackageId="ImtDeskGqlPck" ComponentId="EntityContextTicketsController">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ChatService" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ChatService"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="EntityReferenceStorage" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="EntityReferenceStorage"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TicketCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="TicketSqlRepository"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TicketFactory" Type="Factory" ExportId="">
-                        <Data IsEnabled="true" Value="SupportTicket"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserCollection">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="UserGroupInfoProvider" Type="Reference" ExportId="UserGroupInfoProvider">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="TicketCollectionController" PackageId="ImtDeskGqlPck" ComponentId="TicketCollectionController">
