@@ -13,6 +13,8 @@
         "${IMTCOREDIR}/Qml/imtgui",
         "${IMTCOREDIR}/Qml/imtguigql",
         "${IMTCOREDIR}/Qml/imtlicgui",
+        "${IMTCOREDIR}/Qml/imtdeskgui",
+        "${IMTCOREDIR}/Qml/imtchatgui",
         "${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtappsdl/SDL/1.0/QML/imtappApplicationSdl",
         "${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtlicsdl/SDL/1.0/QML/imtlicFeaturesSdl",
         "${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtlicsdl/SDL/1.0/QML/imtlicProductsSdl",
@@ -43,7 +45,11 @@
         "${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtcolorsdl/SDL/1.0/QML/imtcolorRgbColorHexSdl",
         "${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtcolorsdl/SDL/1.0/QML/imtcolorLabSdl",
         "${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imt2dsdl/SDL/1.0/QML/imt2dGeometrySdl",
-        "${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imt2dsdl/SDL/1.0/QML/imt2dPaintSystemSdl"
+        "${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imt2dsdl/SDL/1.0/QML/imt2dPaintSystemSdl",
+        "${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtdesksdl/SDL/1.0/QML/imtdeskImtDeskSdl",
+        "${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtdesksdl/SDL/1.0/QML/imtdeskTicketCollectionDocumentManagerSdl",
+        "${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtchatsdl/SDL/1.0/QML/imtchatImtChatSdl",
+        "${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtchatsdl/SDL/1.0/QML/imtchatConversationCollectionDocumentManagerSdl"
     ],
     "output": "${IMTCOREDIR}/Bin/web/Resources/jqml.controlsgallery.js"
 }

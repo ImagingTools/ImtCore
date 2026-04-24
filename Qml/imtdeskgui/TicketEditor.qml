@@ -635,13 +635,7 @@ DocumentViewBase {
 		// Fixed widths for top groups (left = Title/Desc/Context and Messages, right = Properties)
 		readonly property real detailsWidth: 700
 		readonly property real propertiesWidth: 320
-		
-		// Page background
-		Rectangle {
-			anchors.fill: parent
-			color: editView.pageBgColor
-		}
-		
+
 		// ==================== LEFT-ALIGNED CONTAINER ====================
 		Item {
 			id: panelsContainer
@@ -949,17 +943,6 @@ DocumentViewBase {
 							}
 							
 						}
-					}
-					
-					DropShadow {
-						anchors.fill: detailsCard
-						z: detailsCard.z - 1
-						horizontalOffset: 3
-						verticalOffset: 3
-						radius: Style.radiusL
-						spread: 0
-						color: Style.shadowColor
-						source: detailsCard
 					}
 				} // leftTopWrapper
 				
@@ -1323,7 +1306,7 @@ DocumentViewBase {
 										anchors.left: parent.left
 										anchors.verticalCenter: parent.verticalCenter
 										spacing: Style.spacingS
-										
+									
 										Text {
 											id: contextLabelText
 											text: qsTr("Context")
@@ -1340,7 +1323,7 @@ DocumentViewBase {
 											radius: (editView.badgeHeight - 2) / 2
 											color: editView.accentColor
 											anchors.verticalCenter: parent.verticalCenter
-											
+									
 											Text {
 												id: refCountLabel
 												anchors.centerIn: parent
@@ -2650,23 +2633,11 @@ DocumentViewBase {
 						font.pixelSize: Style.fontSizeM
 						color: Style.inactiveTextColor
 						wrapMode: Text.Wrap
-						width: parent.width - Style.fontSizeM - Style.paddingS
+						width: parent.width - Style.fontSizM - Style.paddingS
 					}
 				}
 			}
-			
-			DropShadow {
-				anchors.fill: commentsPanel
-				z: commentsPanel.z - 1
-				horizontalOffset: 3
-				verticalOffset: 3
-				radius: Style.radiusL
-				spread: 0
-				color: Style.shadowColor
-				source: commentsPanel
-				visible: commentsPanel.visible
-			}
-			
+
 		} // panelsContainer
 	}
 }
