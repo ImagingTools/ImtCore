@@ -90,8 +90,8 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 		return sdl::imtdesk::ImtDesk::CTicketData();
 	}
 
-	response.Version_1_0->canEdit = CanEditTicket(gqlRequest.GetRequestContext(), ticketPtr);
-	response.Version_1_0->canLock = CanLockTicket(gqlRequest.GetRequestContext(), ticketPtr);
+	response.Version_1_0->accessLevel = GetTicketAccessLevel(
+			gqlRequest.GetRequestContext(), ticketPtr, m_userCollectionCompPtr.GetPtr(), m_userGroupInfoProviderCompPtr.GetPtr());
 
 	// Load entity references by IDs from the EntityReferences table via IEntityReferenceStorage
 	QByteArrayList entityRefIds = ticketPtr->GetEntityReferences();

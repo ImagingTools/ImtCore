@@ -9,6 +9,9 @@
 #include <imtauth/IUserGroupInfoProvider.h>
 #include <imtgql/IGqlContext.h>
 
+// Generated includes
+#include <GeneratedFiles/imtdesksdl/SDL/1.0/CPP/ImtDesk.h>
+
 
 /**
 \file TicketPermissions.h
@@ -202,6 +205,47 @@ inline bool CanLockTicket(
 	bool isAssignee = false;
 	IsCurrentUserRelatedToTicket(contextPtr, ticketPtr, isReporter, isAssignee);
 	return isReporter;
+}
+
+
+/**
+Computes the access level for the current user on the given ticket:
+- FullAccess: admin or reporter — can edit all fields, lock/unlock, comment
+- LimitedAccess: assignee — can change status, comment, add context; core fields are read-only
+- CommentOnly: same-group viewer — can view and leave comments, no field editing
+- ViewOnly: fallback — pure read-only, no editing at all
+*/
+inline sdl::imtdesk::ImtDesk::TicketAccessLevel GetTicketAccessLevel(
+		const imtgql::IGqlContext* contextPtr,
+		const imtdesk::ISupportTicket* ticketPtr,
+		const imtbase::IObjectCollection* userCollectionPtr,
+		const imtauth::IUserGroupInfoProvider* userGroupInfoProviderPtr)
+{
+	if (ticketPtr == nullptr){
+		return sdl::imtdesk::ImtDesk::TicketAccessLevel::ViewOnly;
+	}
+
+	if (IsCurrentUserAdmin(contextPtr)){
+		return sdl::imtdesk::ImtDesk::TicketAccessLevel::FullAccess;
+	}
+
+	bool isReporter = false;
+	bool isAssignee = false;
+	IsCurrentUserRelatedToTicket(contextPtr, ticketPtr, isReporter, isAssignee);
+
+	if (isReporter){
+		return sdl::imtdesk::ImtDesk::TicketAccessLevel::FullAccess;
+	}
+
+	if (isAssignee){
+		return sdl::imtdesk::ImtDesk::TicketAccessLevel::LimitedAccess;
+	}
+
+	if (IsCurrentUserInSameGroupAsReporter(contextPtr, ticketPtr->GetReporterId(), userCollectionPtr, userGroupInfoProviderPtr)){
+		return sdl::imtdesk::ImtDesk::TicketAccessLevel::CommentOnly;
+	}
+
+	return sdl::imtdesk::ImtDesk::TicketAccessLevel::ViewOnly;
 }
 
 
