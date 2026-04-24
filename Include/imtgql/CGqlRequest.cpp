@@ -535,6 +535,9 @@ bool CGqlRequest::ParseQuery(const QByteArray& query, qsizetype& errorPosition)
 				case 'n': text.append('\n'); break;
 				case 'r': text.append('\r'); break;
 				case 't': text.append('\t'); break;
+				case 'b': text.append('\b'); break;
+				case 'f': text.append('\f'); break;
+				// Note: \uXXXX (unicode) escape is not yet supported
 				default:
 					text.append('\\');
 					text.append(chr);
