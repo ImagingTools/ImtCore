@@ -916,7 +916,7 @@ DocumentViewBase {
 										anchors.right: parent.right
 										anchors.topMargin: Style.paddingS
 										anchors.rightMargin: Style.paddingS
-										width: Style.iconSizeXS
+										width: Style.iconSizeS
 										height: width
 										source: Style.getIconPath("Icons/Lock", Icon.State.On, Icon.Mode.Normal)
 										sourceSize.width: width
