@@ -59,7 +59,7 @@ class Text extends Item {
             textAlign: 'inherit',
             whiteSpace: 'pre',
             lineHeight: 'normal',
-            fontSize: '14px',
+            fontSize: '12px',
             fontFamily: 'Segoe UI',
         })
 

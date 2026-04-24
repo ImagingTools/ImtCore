@@ -54,7 +54,7 @@ class TextInput extends Item {
         super(parent,exCtx,exModel)
 
         this.setStyle({
-            fontSize: '14px',
+            fontSize: '12px',
             fontFamily: 'Segoe UI',
             pointerEvents: 'auto',
             touchAction: 'auto',
