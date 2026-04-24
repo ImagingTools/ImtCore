@@ -236,9 +236,9 @@ var GqlRequest = function(requestType, commandId){
 						if (isString) {
 							value = value.replace(/\\/g,"\\\\\\\\")
 							value = value.replace(/\"/g,"\\\\\\\"")
-							value = value.replace(/\r/g,"\\\\\\\\r")
-							value = value.replace(/\n/g,"\\\\\\\\n")
-							value = value.replace(/\t/g,"\\\\\\\\t")
+							value = value.replace(/\r/g,"\\\\r")
+							value = value.replace(/\n/g,"\\\\n")
+							value = value.replace(/\t/g,"\\\\t")
 							retVal += "\\\""
 						}
 						

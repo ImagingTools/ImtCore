@@ -509,6 +509,7 @@ public:
 		, m_defaultDocumentName()
 		, m_validateShouldFail(false)
 		, m_validationErrorMessage()
+		, m_singleCopyMode(false)
 	{
 	}
 
@@ -522,6 +523,7 @@ public:
 	void SetDefaultDocumentName(const QString& name) { m_defaultDocumentName = name; }
 	void SetValidateShouldFail(bool fail) { m_validateShouldFail = fail; }
 	void SetValidationErrorMessage(const QString& msg) { m_validationErrorMessage = msg; }
+	void SetSingleCopyMode(bool enabled) { m_singleCopyMode = enabled; }
 
 	// Expose protected methods for testing
 	using imtdoc::CDocumentManagerBase::FindDocument;
@@ -529,12 +531,18 @@ public:
 	using imtdoc::CDocumentManagerBase::ObjectIdToUrl;
 	using imtdoc::CDocumentManagerBase::m_userDocuments;
 	using imtdoc::CDocumentManagerBase::m_mutex;
+	using imtdoc::CDocumentManagerBase::m_sharedDocuments;
 
 protected:
 	// reimplemented (CCollectionDocumentManagerBase)
 	virtual imtbase::IObjectCollection* GetCollection() const override
 	{
 		return m_collectionPtr;
+	}
+
+	virtual bool IsSingleCopyMode() const override
+	{
+		return m_singleCopyMode;
 	}
 
 	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& /*typeId*/) const override
@@ -597,6 +605,7 @@ private:
 	QString m_defaultDocumentName;
 	bool m_validateShouldFail;
 	QString m_validationErrorMessage;
+	bool m_singleCopyMode;
 };
 
 
@@ -743,6 +752,15 @@ private slots:
 	// Multi-user scenario tests
 	void MultiUserCreateAndCloseTest();
 	void MultiUserIsolationTest();
+
+	// Single-copy mode tests
+	void SingleCopyOpenSameObjectByTwoUsersTest();
+	void SingleCopySecondUserGetsDataLoadedEventTest();
+	void SingleCopySetDocumentDataSharedTest();
+	void SingleCopyCloseOneUserTest();
+	void SingleCopyCloseBothUsersTest();
+	void SingleCopySaveUpdatesAllTest();
+	void SingleCopySetDocumentNameUpdatesAllTest();
 
 private:
 	/**

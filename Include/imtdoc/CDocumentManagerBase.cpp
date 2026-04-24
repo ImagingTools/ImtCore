@@ -314,9 +314,27 @@ IDocumentManager::OperationStatus CDocumentManagerBase::CloseDocument(
 		}
 
 		workingDocumentPtr = &m_userDocuments[userId][documentId];
-		imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(workingDocumentPtr->undoManagerPtr.GetPtr());
-		if (modelPtr != nullptr) {
-			modelPtr->DetachAllObservers();
+
+		bool isLastSharedUser = true;
+		if (IsSingleCopyMode() && !workingDocumentPtr->objectId.isEmpty()
+			&& m_sharedDocuments.contains(workingDocumentPtr->objectId)) {
+			SharedDocumentData& shared = m_sharedDocuments[workingDocumentPtr->objectId];
+			shared.refCount--;
+			isLastSharedUser = (shared.refCount <= 0);
+			if (isLastSharedUser) {
+				imod::IModel* undoModelPtr = dynamic_cast<imod::IModel*>(shared.undoManagerPtr.GetPtr());
+				if (undoModelPtr != nullptr && shared.undoManagerModelId >= 0) {
+					m_undoManagerObserver.UnregisterModel(shared.undoManagerModelId);
+				}
+				m_sharedDocuments.remove(workingDocumentPtr->objectId);
+			}
+		}
+
+		if (isLastSharedUser) {
+			imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(workingDocumentPtr->undoManagerPtr.GetPtr());
+			if (modelPtr != nullptr) {
+				modelPtr->DetachAllObservers();
+			}
 		}
 
 		typeId = workingDocumentPtr->typeId;
@@ -623,10 +641,49 @@ void CDocumentManagerBase::OnDocumentDataLoaded(
 
 void CDocumentManagerBase::OnUndoManagerChanged(int modelId)
 {
+	QMutexLocker locker(&m_mutex);
+
+	if (IsSingleCopyMode()) {
+		// Find the shared document by modelId
+		QByteArray sharedObjectId;
+		for (auto it = m_sharedDocuments.constBegin(); it != m_sharedDocuments.constEnd(); ++it) {
+			if (it.value().undoManagerModelId == modelId) {
+				sharedObjectId = it.key();
+				break;
+			}
+		}
+
+		if (!sharedObjectId.isEmpty()) {
+			UserDocumentPairList docs = FindDocumentsByObjectId(sharedObjectId);
+			for (const UserDocumentPair& pair : docs) {
+				WorkingDocument* documentPtr = FindDocument(pair.first, pair.second);
+				if (documentPtr == nullptr) {
+					continue;
+				}
+
+				documentPtr->isDirty = documentPtr->undoManagerPtr->GetDocumentChangeFlag() != idoc::IDocumentStateComparator::DCF_EQUAL;
+
+				for (IDocumentManagerEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
+					if (handlerPtr != nullptr){
+						CDocumentUndoRedoChangedEvent event(
+							pair.first,
+							pair.second,
+							documentPtr->typeId,
+							documentPtr->name,
+							ObjectIdToUrl(documentPtr->objectId),
+							documentPtr->isDirty,
+							*documentPtr->undoManagerPtr);
+						handlerPtr->ProcessEvent(&event);
+					}
+				}
+			}
+
+			return;
+		}
+	}
+
 	QByteArray userId;
 	QByteArray documentId;
-
-	QMutexLocker locker(&m_mutex);
 
 	if (!FindDocument(modelId, userId, documentId)){
 		Q_ASSERT(false);
@@ -697,6 +754,29 @@ QString CDocumentManagerBase::GetInvalidDocumentMessage()
 }
 
 
+bool CDocumentManagerBase::IsSingleCopyMode() const
+{
+	return false;
+}
+
+
+CDocumentManagerBase::UserDocumentPairList CDocumentManagerBase::FindDocumentsByObjectId(
+	const QByteArray& objectId) const
+{
+	UserDocumentPairList result;
+
+	for (auto userIt = m_userDocuments.constBegin(); userIt != m_userDocuments.constEnd(); ++userIt) {
+		for (auto docIt = userIt.value().constBegin(); docIt != userIt.value().constEnd(); ++docIt) {
+			if (docIt.value().objectId == objectId) {
+				result.append(qMakePair(userIt.key(), docIt.key()));
+			}
+		}
+	}
+
+	return result;
+}
+
+
 // reimplemented (imod::CMultiModelObserverBase)
 
 void CDocumentManagerBase::OnUpdate(imod::IModel* modelPtr, const istd::IChangeable::ChangeSet& changeSet)
@@ -723,7 +803,9 @@ void CDocumentManagerBase::OnUpdate(imod::IModel* modelPtr, const istd::IChangea
 					}
 				}
 
-				return;
+				if (!IsSingleCopyMode()) {
+					return;
+				}
 			}
 		}
 	}

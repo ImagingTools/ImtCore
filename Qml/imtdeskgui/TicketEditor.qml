@@ -30,13 +30,19 @@ DocumentViewBase {
 	// Current user ID for chat-style alignment
 	readonly property string currentUserId: AuthorizationController.getUserId()
 	
-	// Permission flags from server
-	readonly property bool canEdit: isNewIssue || (ticketData ? (ticketData.m_canEdit === true) : false)
-	readonly property bool canLock: isNewIssue || (ticketData ? (ticketData.m_canLock === true) : false)
-	// Whether user is reporter (for lock-only access)
-	readonly property bool isReporter: ticketData ? (ticketData.m_reporterId === currentUserId) : false
-	readonly property bool isSuperUser: AuthorizationController.loggedUserIsSuperuser()
-	readonly property bool canEditCoreTicketFields: (isNewIssue || isReporter || isSuperUser) && canEdit
+	// Permission flags derived from server-supplied accessLevel
+	// FullAccess: admin/reporter — can edit everything
+	// LimitedAccess: assignee — can change status, comment, add context
+	// CommentOnly: same-group viewer — can view and comment only
+	// ViewOnly: pure read-only
+	readonly property string accessLevel: {
+		if (root._removedFromAssignees) return "ViewOnly"
+		return isNewIssue ? "FullAccess" : (ticketData ? (ticketData.m_accessLevel || "ViewOnly") : "ViewOnly")
+	}
+	readonly property bool canEdit: accessLevel === "FullAccess" || accessLevel === "LimitedAccess"
+	readonly property bool canLock: accessLevel === "FullAccess"
+	readonly property bool canComment: accessLevel !== "ViewOnly"
+	readonly property bool canEditCoreTicketFields: isNewIssue || accessLevel === "FullAccess"
 	
 	// Pending image attachments for comment being composed
 	// Each element: {id: "uuid.ext", preview: "localPreviewUrl"}
@@ -46,8 +52,6 @@ DocumentViewBase {
 	// Pending entity references for the ticket
 	// Each element: {entityType, entityId, displayName, entityLinkPath, typeId}
 	property var pendingEntityRefs: []
-	// Force chat scroll to bottom after sending a message
-	property bool _forceScrollToBottom: false
 	// Track whether entity refs changed to avoid unnecessary emplace calls
 	property bool _entityRefsChanged: false
 	// Title inline edit mode (display vs edit)
@@ -57,24 +61,22 @@ DocumentViewBase {
 	property bool _assigneesChanged: false
 	// Reply-to message context (null = not replying)
 	property var _replyToMessage: null
-	// Chat unread state / feedback
-	property int _lastKnownCommentCount: 0
-	property bool _commentsTrackingReady: false
-	property int _unreadMessagesCount: 0
+	// Highlighted message (temporarily set when scrolling to a reply-to source)
+	property string _highlightedMessageId: ""
+	// Chat feedback
 	property string _chatActionHint: ""
 	property bool _exportChatCopiedState: false
 	readonly property int chatHintDurationMs: 2000
 	readonly property int chatHintHeightPx: 28
-	readonly property int unreadHintHeightPx: 34
 	readonly property int minCommentInputHeightPx: Style.controlHeightM - 10
+	
+	// Track assignee removal: when user is removed from assignees, switch to readOnly
+	property bool _removedFromAssignees: false
 	
 	signal commentSubmitted(string commentText)
 
 	onTicketDataChanged: {
-		_lastKnownCommentCount = (ticketData && ticketData.m_comments) ? ticketData.m_comments.count : 0
-		_commentsTrackingReady = false
-		_unreadMessagesCount = 0
-		_forceScrollToBottom = true
+		descriptionAutoSaveTimer.stop()
 		try {
 			commentsFlick.scrollToBottom()
 		}
@@ -261,7 +263,6 @@ DocumentViewBase {
 		ticketData.m_comments.addElement(newItem)
 		
 		setBlockingUpdateModel(false)
-		root._forceScrollToBottom = true
 		ticketData.modelChanged()
 		root.commentSubmitted(commentText)
 	}
@@ -333,6 +334,9 @@ DocumentViewBase {
 	}
 	
 	function updateGui() {
+		// Stop updating GUI if user was removed from assignees (readOnly, no new data)
+		if (root._removedFromAssignees) return
+		
 		editTitleInput.text = ticketData.m_title || ""
 		editDescriptionInput.text = ticketData.m_description || ""
 		editTypeCB.currentIndex = findComboIndex(editTypeCB, ticketData.m_ticketType, 1)
@@ -382,6 +386,17 @@ DocumentViewBase {
 		root._entityRefsChanged = true
 		
 		// Load assignees as array for multi-select
+		// First, check if current user was previously an assignee (for removal detection)
+		var wasAssignee = false
+		if (!root.isNewIssue) {
+			for (var prev = 0; prev < root.pendingAssignees.length; prev++) {
+				if (root.isSameUserId(root.pendingAssignees[prev].id, root.currentUserId)) {
+					wasAssignee = true
+					break
+				}
+			}
+		}
+		
 		var assigns = []
 		var aIds = ticketData.m_assigneeIds || []
 		for (var a = 0; a < aIds.length; a++) {
@@ -399,6 +414,24 @@ DocumentViewBase {
 		}
 		root.pendingAssignees = assigns
 		root._assigneesChanged = false
+		
+		// Detect assignee removal: if user was an assignee but no longer is, show notification and go readOnly
+		if (wasAssignee) {
+			var stillAssignee = false
+			for (var sa = 0; sa < assigns.length; sa++) {
+				if (root.isSameUserId(assigns[sa].id, root.currentUserId)) {
+					stillAssignee = true
+					break
+				}
+			}
+			if (!stillAssignee) {
+				root._removedFromAssignees = true
+				PopupManager.addWarningMessage(
+					qsTr("You have been removed from the assignees of this ticket. The view is now read-only."),
+					true
+				)
+			}
+		}
 		
 		editReporterCB.currentIndex = -1
 		if (editReporterCB.model) {
@@ -626,19 +659,10 @@ DocumentViewBase {
 		readonly property string imageAttachmentBgColor: "#EEF2F8"
 		readonly property string fileAttachmentBgColor: "#F6F8FC"
 		readonly property string chatHintBgColor: editView.cardColor
-		readonly property int unreadResetThreshold: 30
-		readonly property int unreadDetectThreshold: 40
-		readonly property int autoStickBottomThreshold: 80
 		// Fixed widths for top groups (left = Title/Desc/Context and Messages, right = Properties)
 		readonly property real detailsWidth: 700
 		readonly property real propertiesWidth: 320
-		
-		// Page background
-		Rectangle {
-			anchors.fill: parent
-			color: editView.pageBgColor
-		}
-		
+
 		// ==================== LEFT-ALIGNED CONTAINER ====================
 		Item {
 			id: panelsContainer
@@ -726,9 +750,9 @@ DocumentViewBase {
 								Rectangle {
 									id: titleEditBtn
 									visible: root.canEditCoreTicketFields
-									width: 28
-									height: 28
-									radius: 14
+									width: visible ? 28 : 0
+									height: width
+									radius: width / 2
 									color: titleEditBtnMa.containsMouse ? "#F0F2F5" : "transparent"
 									anchors.verticalCenter: parent.verticalCenter
 									
@@ -877,14 +901,28 @@ DocumentViewBase {
 									font.bold: true
 									color: editView.sectionLabelColor
 								}
-								
+
 								Rectangle {
 									width: parent.width
 									height: Math.min(220, Math.max(50, editDescriptionInput.contentHeight)) + Style.paddingM * 2
 									radius: Style.radiusM
 									border.color: editDescriptionInput.activeFocus ? editView.accentColor : editView.cardBorderColor
 									border.width: editDescriptionInput.activeFocus ? 2 : 1
-									color: "white"
+									color: root.canEditCoreTicketFields ? "white" : Style.alternateBaseColor
+
+									Image {
+										z: 2
+										anchors.top: parent.top
+										anchors.right: parent.right
+										anchors.topMargin: Style.paddingS
+										anchors.rightMargin: Style.paddingS
+										width: Style.iconSizeS
+										height: width
+										source: Style.getIconPath("Icons/Lock", Icon.State.On, Icon.Mode.Normal)
+										sourceSize.width: width
+										sourceSize.height: height
+										visible: !root.canEditCoreTicketFields
+									}
 									
 									Flickable {
 										id: descriptionFlick
@@ -908,6 +946,19 @@ DocumentViewBase {
 											onEditingFinished: root.doUpdateModel()
 											KeyNavigation.tab: editTypeCB
 											KeyNavigation.backtab: editTitleInput
+
+											onTextChanged: {
+												if (!root.guiIsBlocked()) {
+													descriptionAutoSaveTimer.restart()
+												}
+											}
+
+											Timer {
+												id: descriptionAutoSaveTimer
+												interval: 1000
+												repeat: false
+												onTriggered: root.doUpdateModel()
+											}
 
 											onCursorRectangleChanged: {
 												var cy = cursorRectangle.y
@@ -946,17 +997,6 @@ DocumentViewBase {
 							}
 							
 						}
-					}
-					
-					DropShadow {
-						anchors.fill: detailsCard
-						z: detailsCard.z - 1
-						horizontalOffset: 3
-						verticalOffset: 3
-						radius: Style.radiusL
-						spread: 0
-						color: Style.shadowColor
-						source: detailsCard
 					}
 				} // leftTopWrapper
 				
@@ -1017,7 +1057,7 @@ DocumentViewBase {
 										height: Style.buttonHeightM
 										currentIndex: 1
 										model: ticketTypeModel
-										enabled: root.canEditCoreTicketFields
+										changeable: root.canEditCoreTicketFields
 										onCurrentIndexChanged: root.doUpdateModel()
 										KeyNavigation.tab: editPriorityCB
 										KeyNavigation.backtab: editDescriptionInput
@@ -1040,7 +1080,7 @@ DocumentViewBase {
 										height: Style.buttonHeightM
 										currentIndex: 1
 										model: priorityModel
-										enabled: root.canEditCoreTicketFields
+										changeable: root.canEditCoreTicketFields
 										onCurrentIndexChanged: root.doUpdateModel()
 										KeyNavigation.tab: editAssigneeCB
 										KeyNavigation.backtab: editTypeCB
@@ -1064,7 +1104,7 @@ DocumentViewBase {
 										height: Style.buttonHeightM
 										currentIndex: 0
 										model: statusModel
-										enabled: root.canEdit
+										changeable: root.canEdit
 										onCurrentIndexChanged: root.doUpdateModel()
 										KeyNavigation.tab: editLockedCB
 										KeyNavigation.backtab: editAssigneeCB
@@ -1320,7 +1360,7 @@ DocumentViewBase {
 										anchors.left: parent.left
 										anchors.verticalCenter: parent.verticalCenter
 										spacing: Style.spacingS
-										
+									
 										Text {
 											id: contextLabelText
 											text: qsTr("Context")
@@ -1337,7 +1377,7 @@ DocumentViewBase {
 											radius: (editView.badgeHeight - 2) / 2
 											color: editView.accentColor
 											anchors.verticalCenter: parent.verticalCenter
-											
+									
 											Text {
 												id: refCountLabel
 												anchors.centerIn: parent
@@ -1885,15 +1925,6 @@ DocumentViewBase {
 							contentY = 0
 						}
 					}
-
-					function isNearBottom(threshold) {
-						var pixelThreshold = threshold
-						if (pixelThreshold === undefined || pixelThreshold === null) {
-							pixelThreshold = editView.unreadDetectThreshold
-						}
-						var maxY = Math.max(0, contentHeight - height)
-						return maxY <= 0 || contentY >= maxY - pixelThreshold
-					}
 					
 					function scrollToMessage(msgId) {
 						if (!msgId) return
@@ -1904,30 +1935,21 @@ DocumentViewBase {
 								var targetY = pos.y
 								var maxY = Math.max(0, contentHeight - height)
 								contentY = Math.min(Math.max(0, targetY - 20), maxY)
+								root._highlightedMessageId = msgId
+								highlightClearTimer.restart()
 								return
 							}
 						}
 					}
 
-					onContentHeightChanged: {
-						if (root._forceScrollToBottom || isNearBottom(editView.autoStickBottomThreshold)) {
-							scrollToBottom()
-							root._unreadMessagesCount = 0
-							root._forceScrollToBottom = false
-						}
-					}
-					
-					onHeightChanged: {
-						var maxY = contentHeight - height
-						if (maxY > 0 && isNearBottom(editView.autoStickBottomThreshold)) {
-							contentY = maxY
-						}
+					Timer {
+						id: highlightClearTimer
+						interval: 1500
+						onTriggered: root._highlightedMessageId = ""
 					}
 
-					onContentYChanged: {
-						if (isNearBottom(editView.unreadResetThreshold) && root._unreadMessagesCount !== 0) {
-							root._unreadMessagesCount = 0
-						}
+					onContentHeightChanged: {
+						scrollToBottom()
 					}
 
 					Column {
@@ -1943,36 +1965,6 @@ DocumentViewBase {
 							Repeater {
 								id: commentsThread
 								model: root.ticketData ? root.ticketData.m_comments : 0
-								onCountChanged: {
-									if (!root._commentsTrackingReady) {
-										root._lastKnownCommentCount = count
-										root._commentsTrackingReady = true
-										return
-									}
-
-									if (count > root._lastKnownCommentCount
-											&& !commentsFlick.isNearBottom(editView.unreadDetectThreshold)
-											&& !root._forceScrollToBottom) {
-										var unreadDelta = 0
-										var commentsModel = root.ticketData ? root.ticketData.m_comments : null
-										if (!commentsModel) {
-											root._lastKnownCommentCount = count
-											return
-										}
-										for (var msgIndex = root._lastKnownCommentCount; msgIndex < count; msgIndex++) {
-											var msgWrapper = commentsModel.get(msgIndex)
-											var msgItem = msgWrapper ? msgWrapper.item : null
-											var serverMessageId = msgItem && msgItem.m_id ? String(msgItem.m_id) : ""
-											if (msgItem
-													&& serverMessageId.length > 0
-													&& !root.isSameUserId(msgItem.m_userId, root.currentUserId)) {
-												unreadDelta++
-											}
-										}
-										root._unreadMessagesCount += unreadDelta
-									}
-									root._lastKnownCommentCount = count
-								}
 								
 								delegate: Item {
 									id: commentDelegate
@@ -1995,14 +1987,25 @@ DocumentViewBase {
 										
 										// Chat bubble (contains avatar + name + timestamp + content)
 										Rectangle {
+											id: chatBubbleRect
 											readonly property real maxBubbleWidth: Math.min(parent.width * editView.bubbleWidthRatio, editView.bubbleMaxWidth)
+											readonly property bool isHighlighted: root._highlightedMessageId.length > 0 && commentDelegate.dataModel.m_id === root._highlightedMessageId
 											width: maxBubbleWidth
 											anchors.right: commentDelegate.isMe ? parent.right : undefined
 											anchors.left: commentDelegate.isMe ? undefined : parent.left
 											height: bubbleContent.height + Style.paddingM * 2
 											radius: 12
 											color: commentDelegate.isMe ? editView.myBubbleColor : editView.otherBubbleColor
-											border.width: 0
+											border.width: isHighlighted ? 2 : 0
+											border.color: editView.accentColor
+
+											// Highlight overlay when scrolling to a reply-to source
+											Rectangle {
+												anchors.fill: parent
+												radius: parent.radius
+												color: editView.accentColor
+												opacity: chatBubbleRect.isHighlighted ? 0.15 : 0.0
+											}
 											
 											Column {
 												id: bubbleContent
@@ -2154,7 +2157,7 @@ DocumentViewBase {
 													spacing: Style.spacingM
 
 													Text {
-														visible: root.canEdit
+														visible: root.canComment
 														text: qsTr("Reply")
 														font.pixelSize: Style.fontSizeM
 														color: Style.inactiveTextColor
@@ -2223,57 +2226,11 @@ DocumentViewBase {
 					}
 				}
 
-				Rectangle {
-					visible: root._unreadMessagesCount > 0 && !commentsFlick.isNearBottom(editView.unreadResetThreshold)
-					anchors.right: parent.right
-					anchors.rightMargin: editView.cardPadding
-					anchors.bottom: addCommentSection.visible ? addCommentSection.top
-																: lockNoticeRow.visible ? lockNoticeRow.top
-																						: parent.bottom
-					anchors.bottomMargin: Style.spacingM
-					radius: Style.radiusL
-					color: editView.accentColor
-					height: root.unreadHintHeightPx
-					width: unreadHintRow.width + Style.paddingM * 2
-					z: 2
-
-					Row {
-						id: unreadHintRow
-						anchors.centerIn: parent
-						spacing: Style.spacingS
-
-						Text {
-							text: root._unreadMessagesCount === 1
-									? qsTr("1 unread message")
-									: String(root._unreadMessagesCount) + qsTr(" unread messages")
-							font.pixelSize: Style.fontSizeM
-							color: Style.baseColor
-							font.bold: true
-						}
-
-						Text {
-							text: qsTr("Jump")
-							font.pixelSize: Style.fontSizeM
-							color: Style.baseColor
-							font.bold: true
-
-							MouseArea {
-								anchors.fill: parent
-								hoverEnabled: true
-								cursorShape: Qt.PointingHandCursor
-								onClicked: {
-									commentsFlick.scrollToBottom()
-									root._unreadMessagesCount = 0
-								}
-							}
-						}
-					}
-				}
 				
 				// ---- Fixed bottom: Add comment input ----
 				Rectangle {
 					id: addCommentSection
-					visible: root.canEdit && (!root.ticketData || !root.ticketData.m_locked)
+					visible: root.canComment && (!root.ticketData || !root.ticketData.m_locked)
 					anchors.bottom: parent.bottom
 					anchors.bottomMargin: 1
 					anchors.left: parent.left
@@ -2623,7 +2580,7 @@ DocumentViewBase {
 				// Lock notice / read-only notice
 				Row {
 					id: lockNoticeRow
-					visible: (root.ticketData && root.ticketData.m_locked) || (!root.isNewIssue && !root.canEdit)
+					visible: (root.ticketData && root.ticketData.m_locked) || (!root.isNewIssue && !root.canComment)
 					anchors.bottom: parent.bottom
 					anchors.bottomMargin: Style.paddingM
 					anchors.left: parent.left
@@ -2641,29 +2598,17 @@ DocumentViewBase {
 					}
 					
 					Text {
-						text: root.canEdit
+						text: root.canComment
 							  ? qsTr("This conversation has been locked. Only collaborators can comment.")
 							  : qsTr("You have read-only access to this ticket. Only the reporter, assignees, and administrators can edit.")
 						font.pixelSize: Style.fontSizeM
 						color: Style.inactiveTextColor
 						wrapMode: Text.Wrap
-						width: parent.width - Style.fontSizeM - Style.paddingS
+						width: parent.width - Style.fontSizM - Style.paddingS
 					}
 				}
 			}
-			
-			DropShadow {
-				anchors.fill: commentsPanel
-				z: commentsPanel.z - 1
-				horizontalOffset: 3
-				verticalOffset: 3
-				radius: Style.radiusL
-				spread: 0
-				color: Style.shadowColor
-				source: commentsPanel
-				visible: commentsPanel.visible
-			}
-			
+
 		} // panelsContainer
 	}
 }

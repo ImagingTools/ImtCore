@@ -1198,4 +1198,207 @@ void CCollectionDocumentManagerTest::MultiUserIsolationTest()
 }
 
 
+// ======================================================================
+// Single-copy mode tests
+// ======================================================================
+
+void CCollectionDocumentManagerTest::SingleCopyOpenSameObjectByTwoUsersTest()
+{
+	m_managerPtr->SetSingleCopyMode(true);
+	m_managerPtr->GetMockCollection().AddObject(
+		TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME,
+		istd::IChangeableSharedPtr(new CMockDocumentObject("sharedData")));
+
+	QByteArray docId1 = OpenDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID, TEST_OBJECT_ID);
+	QVERIFY2(!docId1.isEmpty(), "First user should open document successfully");
+
+	QByteArray docId2 = OpenDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID_2, TEST_OBJECT_ID);
+	QVERIFY2(!docId2.isEmpty(), "Second user should open document successfully");
+	QVERIFY2(docId1 != docId2, "Different users should get different document IDs");
+
+	// Both users should see the same data
+	const istd::IChangeable* ptr1 = m_managerPtr->GetDocumentPtr(TEST_USER_ID, docId1);
+	const istd::IChangeable* ptr2 = m_managerPtr->GetDocumentPtr(TEST_USER_ID_2, docId2);
+	QVERIFY2(ptr1 != nullptr, "First user's document pointer should be valid");
+	QVERIFY2(ptr2 != nullptr, "Second user's document pointer should be valid");
+	QVERIFY2(ptr1 == ptr2, "Both users should share the same document object pointer");
+}
+
+
+void CCollectionDocumentManagerTest::SingleCopySecondUserGetsDataLoadedEventTest()
+{
+	m_managerPtr->SetSingleCopyMode(true);
+	m_managerPtr->GetMockCollection().AddObject(
+		TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME,
+		istd::IChangeableSharedPtr(new CMockDocumentObject("sharedData")));
+
+	// First user opens and waits for async load
+	QByteArray docId1 = OpenDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID, TEST_OBJECT_ID);
+	QVERIFY2(!docId1.isEmpty(), "First user should open document successfully");
+
+	// Clear events before second user opens
+	m_managerPtr->GetMockEventHandler().ClearEvents();
+
+	// Second user opens the same object (shared document already loaded)
+	QUrl url("collection:///" + QString::fromUtf8(TEST_OBJECT_ID));
+	QByteArray docId2 = m_managerPtr->OpenDocument(TEST_USER_ID_2, url);
+	QVERIFY2(!docId2.isEmpty(), "Second user should open document successfully");
+
+	// DocumentDataLoaded is deferred via QTimer::singleShot — process events
+	for (int i = 0; i < 20; ++i) {
+		QCoreApplication::processEvents();
+		QThread::msleep(10);
+	}
+
+	// Second user should have received DocumentDataLoaded event
+	int dataLoadedCount = m_managerPtr->GetMockEventHandler().CountEventsOfType("DocumentDataLoadedEvent");
+	QVERIFY2(dataLoadedCount >= 1, "DocumentDataLoaded event should be fired for second user joining shared document");
+
+	// Verify the event was for the second user
+	bool foundForUser2 = false;
+	for (const auto& event : m_managerPtr->GetMockEventHandler().GetEvents()) {
+		if (event.type == "DocumentDataLoadedEvent" && event.userId == TEST_USER_ID_2) {
+			foundForUser2 = true;
+			QCOMPARE(event.documentId, docId2);
+			break;
+		}
+	}
+	QVERIFY2(foundForUser2, "DocumentDataLoaded event should be for the second user");
+}
+
+
+void CCollectionDocumentManagerTest::SingleCopySetDocumentDataSharedTest()
+{
+	m_managerPtr->SetSingleCopyMode(true);
+	m_managerPtr->GetMockCollection().AddObject(
+		TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME,
+		istd::IChangeableSharedPtr(new CMockDocumentObject("original")));
+
+	QByteArray docId1 = OpenDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID, TEST_OBJECT_ID);
+	QByteArray docId2 = OpenDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID_2, TEST_OBJECT_ID);
+
+	// User 1 modifies the document
+	CMockDocumentObject newData("modified");
+	auto status = m_managerPtr->SetDocumentData(TEST_USER_ID, docId1, newData);
+	QCOMPARE(status, imtdoc::IDocumentManager::OS_OK);
+
+	// User 2 should see the modification (shared objectPtr)
+	const istd::IChangeable* ptr2 = m_managerPtr->GetDocumentPtr(TEST_USER_ID_2, docId2);
+	QVERIFY2(ptr2 != nullptr, "Second user's document pointer should be valid");
+	const CMockDocumentObject* mockPtr2 = dynamic_cast<const CMockDocumentObject*>(ptr2);
+	QVERIFY2(mockPtr2 != nullptr, "Should be able to cast to CMockDocumentObject");
+	QCOMPARE(mockPtr2->GetData(), QByteArray("modified"));
+}
+
+
+void CCollectionDocumentManagerTest::SingleCopyCloseOneUserTest()
+{
+	m_managerPtr->SetSingleCopyMode(true);
+	m_managerPtr->GetMockCollection().AddObject(
+		TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME,
+		istd::IChangeableSharedPtr(new CMockDocumentObject("sharedData")));
+
+	QByteArray docId1 = OpenDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID, TEST_OBJECT_ID);
+	QByteArray docId2 = OpenDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID_2, TEST_OBJECT_ID);
+
+	// Close first user's document
+	auto status = m_managerPtr->CloseDocument(TEST_USER_ID, docId1);
+	QCOMPARE(status, imtdoc::IDocumentManager::OS_OK);
+
+	// First user should have no documents
+	auto list1 = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
+	QVERIFY2(list1.isEmpty(), "First user should have no documents after closing");
+
+	// Second user should still have the document
+	auto list2 = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID_2);
+	QCOMPARE(list2.size(), 1);
+
+	// Second user's document should still be accessible
+	const istd::IChangeable* ptr2 = m_managerPtr->GetDocumentPtr(TEST_USER_ID_2, docId2);
+	QVERIFY2(ptr2 != nullptr, "Second user's document pointer should still be valid after first user closes");
+
+	// Shared document data should still exist
+	QVERIFY2(m_managerPtr->m_sharedDocuments.contains(TEST_OBJECT_ID),
+		"Shared document data should still exist while one user has it open");
+}
+
+
+void CCollectionDocumentManagerTest::SingleCopyCloseBothUsersTest()
+{
+	m_managerPtr->SetSingleCopyMode(true);
+	m_managerPtr->GetMockCollection().AddObject(
+		TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME,
+		istd::IChangeableSharedPtr(new CMockDocumentObject("sharedData")));
+
+	QByteArray docId1 = OpenDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID, TEST_OBJECT_ID);
+	QByteArray docId2 = OpenDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID_2, TEST_OBJECT_ID);
+
+	m_managerPtr->CloseDocument(TEST_USER_ID, docId1);
+	m_managerPtr->CloseDocument(TEST_USER_ID_2, docId2);
+
+	// Both users should have no documents
+	QVERIFY2(m_managerPtr->GetOpenedDocumentList(TEST_USER_ID).isEmpty(),
+		"First user should have no documents");
+	QVERIFY2(m_managerPtr->GetOpenedDocumentList(TEST_USER_ID_2).isEmpty(),
+		"Second user should have no documents");
+
+	// Shared document data should be cleaned up
+	QVERIFY2(!m_managerPtr->m_sharedDocuments.contains(TEST_OBJECT_ID),
+		"Shared document data should be cleaned up after all users close");
+}
+
+
+void CCollectionDocumentManagerTest::SingleCopySaveUpdatesAllTest()
+{
+	m_managerPtr->SetSingleCopyMode(true);
+	m_managerPtr->GetMockCollection().AddObject(
+		TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME,
+		istd::IChangeableSharedPtr(new CMockDocumentObject("sharedData")));
+
+	QByteArray docId1 = OpenDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID, TEST_OBJECT_ID);
+	QByteArray docId2 = OpenDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID_2, TEST_OBJECT_ID);
+
+	m_managerPtr->GetMockEventHandler().ClearEvents();
+
+	// User 1 saves the document
+	auto status = m_managerPtr->SaveDocument(TEST_USER_ID, docId1);
+	QCOMPARE(status, imtdoc::IDocumentManager::OS_OK);
+
+	// Both users should see the document as not dirty
+	auto list1 = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
+	auto list2 = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID_2);
+	QCOMPARE(list1.size(), 1);
+	QCOMPARE(list2.size(), 1);
+	QVERIFY2(!list1[0].isDirty, "First user's document should not be dirty after save");
+	QVERIFY2(!list2[0].isDirty, "Second user's document should not be dirty after shared save");
+
+	// Both users should have received save events
+	int savedEventCount = m_managerPtr->GetMockEventHandler().CountEventsOfType("DocumentSavedEvent");
+	QVERIFY2(savedEventCount >= 2, "Save events should be fired for all users sharing the document");
+}
+
+
+void CCollectionDocumentManagerTest::SingleCopySetDocumentNameUpdatesAllTest()
+{
+	m_managerPtr->SetSingleCopyMode(true);
+	m_managerPtr->GetMockCollection().AddObject(
+		TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME,
+		istd::IChangeableSharedPtr(new CMockDocumentObject("sharedData")));
+
+	QByteArray docId1 = OpenDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID, TEST_OBJECT_ID);
+	QByteArray docId2 = OpenDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID_2, TEST_OBJECT_ID);
+
+	QString newName = "Renamed Shared Document";
+	auto status = m_managerPtr->SetDocumentName(TEST_USER_ID, docId1, newName);
+	QCOMPARE(status, imtdoc::IDocumentManager::OS_OK);
+
+	// Both users should see the new name
+	QString name1, name2;
+	m_managerPtr->GetDocumentName(TEST_USER_ID, docId1, name1);
+	m_managerPtr->GetDocumentName(TEST_USER_ID_2, docId2, name2);
+	QCOMPARE(name1, newName);
+	QCOMPARE(name2, newName);
+}
+
+
 I_ADD_TEST(CCollectionDocumentManagerTest);

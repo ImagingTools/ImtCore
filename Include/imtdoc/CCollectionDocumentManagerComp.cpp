@@ -15,4 +15,12 @@ return m_collectionCompPtr.IsValid() ? m_collectionCompPtr.GetPtr() : nullptr;
 }
 
 
+// reimplemented (imtdoc::CDocumentManagerBase)
+
+bool CCollectionDocumentManagerComp::IsSingleCopyMode() const
+{
+	return m_isSingleCopyModeAttrPtr.IsValid() && *m_isSingleCopyModeAttrPtr;
+}
+
+
 } // namespace imtdoc
