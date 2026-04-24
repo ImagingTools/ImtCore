@@ -74,6 +74,7 @@ DocumentViewBase {
 	signal commentSubmitted(string commentText)
 
 	onTicketDataChanged: {
+		descriptionAutoSaveTimer.stop()
 		try {
 			commentsFlick.scrollToBottom()
 		}
@@ -1924,10 +1925,6 @@ DocumentViewBase {
 					}
 
 					onContentHeightChanged: {
-						scrollToBottom()
-					}
-					
-					onHeightChanged: {
 						scrollToBottom()
 					}
 
