@@ -35,7 +35,10 @@ DocumentViewBase {
 	// LimitedAccess: assignee — can change status, comment, add context
 	// CommentOnly: same-group viewer — can view and comment only
 	// ViewOnly: pure read-only
-	readonly property string accessLevel: isNewIssue ? "FullAccess" : (ticketData ? (ticketData.m_accessLevel || "ViewOnly") : "ViewOnly")
+	readonly property string accessLevel: {
+		if (root._removedFromAssignees) return "ViewOnly"
+		return isNewIssue ? "FullAccess" : (ticketData ? (ticketData.m_accessLevel || "ViewOnly") : "ViewOnly")
+	}
 	readonly property bool canEdit: accessLevel === "FullAccess" || accessLevel === "LimitedAccess"
 	readonly property bool canLock: accessLevel === "FullAccess"
 	readonly property bool canComment: accessLevel !== "ViewOnly"
@@ -49,8 +52,6 @@ DocumentViewBase {
 	// Pending entity references for the ticket
 	// Each element: {entityType, entityId, displayName, entityLinkPath, typeId}
 	property var pendingEntityRefs: []
-	// Force chat scroll to bottom after sending a message
-	property bool _forceScrollToBottom: false
 	// Track whether entity refs changed to avoid unnecessary emplace calls
 	property bool _entityRefsChanged: false
 	// Title inline edit mode (display vs edit)
@@ -60,24 +61,19 @@ DocumentViewBase {
 	property bool _assigneesChanged: false
 	// Reply-to message context (null = not replying)
 	property var _replyToMessage: null
-	// Chat unread state / feedback
-	property int _lastKnownCommentCount: 0
-	property bool _commentsTrackingReady: false
-	property int _unreadMessagesCount: 0
+	// Chat feedback
 	property string _chatActionHint: ""
 	property bool _exportChatCopiedState: false
 	readonly property int chatHintDurationMs: 2000
 	readonly property int chatHintHeightPx: 28
-	readonly property int unreadHintHeightPx: 34
 	readonly property int minCommentInputHeightPx: Style.controlHeightM - 10
+	
+	// Track assignee removal: when user is removed from assignees, switch to readOnly
+	property bool _removedFromAssignees: false
 	
 	signal commentSubmitted(string commentText)
 
 	onTicketDataChanged: {
-		_lastKnownCommentCount = (ticketData && ticketData.m_comments) ? ticketData.m_comments.count : 0
-		_commentsTrackingReady = false
-		_unreadMessagesCount = 0
-		_forceScrollToBottom = true
 		try {
 			commentsFlick.scrollToBottom()
 		}
@@ -264,7 +260,6 @@ DocumentViewBase {
 		ticketData.m_comments.addElement(newItem)
 		
 		setBlockingUpdateModel(false)
-		root._forceScrollToBottom = true
 		ticketData.modelChanged()
 		root.commentSubmitted(commentText)
 	}
@@ -336,6 +331,9 @@ DocumentViewBase {
 	}
 	
 	function updateGui() {
+		// Stop updating GUI if user was removed from assignees (readOnly, no new data)
+		if (root._removedFromAssignees) return
+		
 		editTitleInput.text = ticketData.m_title || ""
 		editDescriptionInput.text = ticketData.m_description || ""
 		editTypeCB.currentIndex = findComboIndex(editTypeCB, ticketData.m_ticketType, 1)
@@ -385,6 +383,17 @@ DocumentViewBase {
 		root._entityRefsChanged = true
 		
 		// Load assignees as array for multi-select
+		// First, check if current user was previously an assignee (for removal detection)
+		var wasAssignee = false
+		if (!root.isNewIssue) {
+			for (var prev = 0; prev < root.pendingAssignees.length; prev++) {
+				if (root.isSameUserId(root.pendingAssignees[prev].id, root.currentUserId)) {
+					wasAssignee = true
+					break
+				}
+			}
+		}
+		
 		var assigns = []
 		var aIds = ticketData.m_assigneeIds || []
 		for (var a = 0; a < aIds.length; a++) {
@@ -402,6 +411,24 @@ DocumentViewBase {
 		}
 		root.pendingAssignees = assigns
 		root._assigneesChanged = false
+		
+		// Detect assignee removal: if user was an assignee but no longer is, show notification and go readOnly
+		if (wasAssignee) {
+			var stillAssignee = false
+			for (var sa = 0; sa < assigns.length; sa++) {
+				if (root.isSameUserId(assigns[sa].id, root.currentUserId)) {
+					stillAssignee = true
+					break
+				}
+			}
+			if (!stillAssignee) {
+				root._removedFromAssignees = true
+				PopupManager.addWarningMessage(
+					qsTr("You have been removed from the assignees of this ticket. The view is now read-only."),
+					true
+				)
+			}
+		}
 		
 		editReporterCB.currentIndex = -1
 		if (editReporterCB.model) {
@@ -629,9 +656,6 @@ DocumentViewBase {
 		readonly property string imageAttachmentBgColor: "#EEF2F8"
 		readonly property string fileAttachmentBgColor: "#F6F8FC"
 		readonly property string chatHintBgColor: editView.cardColor
-		readonly property int unreadResetThreshold: 30
-		readonly property int unreadDetectThreshold: 40
-		readonly property int autoStickBottomThreshold: 80
 		// Fixed widths for top groups (left = Title/Desc/Context and Messages, right = Properties)
 		readonly property real detailsWidth: 700
 		readonly property real propertiesWidth: 320
@@ -905,6 +929,19 @@ DocumentViewBase {
 											onEditingFinished: root.doUpdateModel()
 											KeyNavigation.tab: editTypeCB
 											KeyNavigation.backtab: editTitleInput
+
+											onTextChanged: {
+												if (!root.guiIsBlocked()) {
+													descriptionAutoSaveTimer.restart()
+												}
+											}
+
+											Timer {
+												id: descriptionAutoSaveTimer
+												interval: 1000
+												repeat: false
+												onTriggered: root.doUpdateModel()
+											}
 
 											onCursorRectangleChanged: {
 												var cy = cursorRectangle.y
@@ -1871,15 +1908,6 @@ DocumentViewBase {
 							contentY = 0
 						}
 					}
-
-					function isNearBottom(threshold) {
-						var pixelThreshold = threshold
-						if (pixelThreshold === undefined || pixelThreshold === null) {
-							pixelThreshold = editView.unreadDetectThreshold
-						}
-						var maxY = Math.max(0, contentHeight - height)
-						return maxY <= 0 || contentY >= maxY - pixelThreshold
-					}
 					
 					function scrollToMessage(msgId) {
 						if (!msgId) return
@@ -1896,24 +1924,11 @@ DocumentViewBase {
 					}
 
 					onContentHeightChanged: {
-						if (root._forceScrollToBottom || isNearBottom(editView.autoStickBottomThreshold)) {
-							scrollToBottom()
-							root._unreadMessagesCount = 0
-							root._forceScrollToBottom = false
-						}
+						scrollToBottom()
 					}
 					
 					onHeightChanged: {
-						var maxY = contentHeight - height
-						if (maxY > 0 && isNearBottom(editView.autoStickBottomThreshold)) {
-							contentY = maxY
-						}
-					}
-
-					onContentYChanged: {
-						if (isNearBottom(editView.unreadResetThreshold) && root._unreadMessagesCount !== 0) {
-							root._unreadMessagesCount = 0
-						}
+						scrollToBottom()
 					}
 
 					Column {
@@ -1929,36 +1944,6 @@ DocumentViewBase {
 							Repeater {
 								id: commentsThread
 								model: root.ticketData ? root.ticketData.m_comments : 0
-								onCountChanged: {
-									if (!root._commentsTrackingReady) {
-										root._lastKnownCommentCount = count
-										root._commentsTrackingReady = true
-										return
-									}
-
-									if (count > root._lastKnownCommentCount
-											&& !commentsFlick.isNearBottom(editView.unreadDetectThreshold)
-											&& !root._forceScrollToBottom) {
-										var unreadDelta = 0
-										var commentsModel = root.ticketData ? root.ticketData.m_comments : null
-										if (!commentsModel) {
-											root._lastKnownCommentCount = count
-											return
-										}
-										for (var msgIndex = root._lastKnownCommentCount; msgIndex < count; msgIndex++) {
-											var msgWrapper = commentsModel.get(msgIndex)
-											var msgItem = msgWrapper ? msgWrapper.item : null
-											var serverMessageId = msgItem && msgItem.m_id ? String(msgItem.m_id) : ""
-											if (msgItem
-													&& serverMessageId.length > 0
-													&& !root.isSameUserId(msgItem.m_userId, root.currentUserId)) {
-												unreadDelta++
-											}
-										}
-										root._unreadMessagesCount += unreadDelta
-									}
-									root._lastKnownCommentCount = count
-								}
 								
 								delegate: Item {
 									id: commentDelegate
@@ -2209,52 +2194,6 @@ DocumentViewBase {
 					}
 				}
 
-				Rectangle {
-					visible: root._unreadMessagesCount > 0 && !commentsFlick.isNearBottom(editView.unreadResetThreshold)
-					anchors.right: parent.right
-					anchors.rightMargin: editView.cardPadding
-					anchors.bottom: addCommentSection.visible ? addCommentSection.top
-																: lockNoticeRow.visible ? lockNoticeRow.top
-																						: parent.bottom
-					anchors.bottomMargin: Style.spacingM
-					radius: Style.radiusL
-					color: editView.accentColor
-					height: root.unreadHintHeightPx
-					width: unreadHintRow.width + Style.paddingM * 2
-					z: 2
-
-					Row {
-						id: unreadHintRow
-						anchors.centerIn: parent
-						spacing: Style.spacingS
-
-						Text {
-							text: root._unreadMessagesCount === 1
-									? qsTr("1 unread message")
-									: String(root._unreadMessagesCount) + qsTr(" unread messages")
-							font.pixelSize: Style.fontSizeM
-							color: Style.baseColor
-							font.bold: true
-						}
-
-						Text {
-							text: qsTr("Jump")
-							font.pixelSize: Style.fontSizeM
-							color: Style.baseColor
-							font.bold: true
-
-							MouseArea {
-								anchors.fill: parent
-								hoverEnabled: true
-								cursorShape: Qt.PointingHandCursor
-								onClicked: {
-									commentsFlick.scrollToBottom()
-									root._unreadMessagesCount = 0
-								}
-							}
-						}
-					}
-				}
 				
 				// ---- Fixed bottom: Add comment input ----
 				Rectangle {
