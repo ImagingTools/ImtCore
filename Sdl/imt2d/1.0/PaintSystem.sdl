@@ -9,15 +9,15 @@ import {
 }
 
 type Brush {
+	alpha: Integer # 0-255
 	color: RgbColorHex!
-	alpha: Int # 0-255
 }
 
 type Pen {
+	alpha: Integer # 0-255
 	color: RgbColorHex!
 	width: Int
 	brush: Brush
-	alpha: Int # 0-255
 }
 
 type Painter {
