@@ -332,6 +332,9 @@ QtObject {
 	function setDocumentIsLoading(documentId, isLoading){
 		let index = getDocumentIndexByDocumentId(documentId)
 		if (index < 0){
+			if (!isLoading){
+				__internal.pendingDataLoaded[documentId] = true
+			}
 			return
 		}
 
@@ -341,6 +344,14 @@ QtObject {
 		}
 
 		docData.isLoading = isLoading
+
+		if (isLoading){
+			if (documentId in __internal.pendingDataLoaded){
+				delete __internal.pendingDataLoaded[documentId]
+				docData.isLoading = false
+				isLoading = false
+			}
+		}
 
 		if (!isLoading){
 			if (!docData.isNew){
@@ -447,6 +458,7 @@ QtObject {
 		property var documentTypeEditors: ({}) // DocumentTypeId -> [{View Type 1}, {View Type 2}]
 		property var openedDocuments: [] // Array of objects {id, name, model, view, isDirty}
 		property var cachedDocumentNames: ({}) // DocumentId -> Name
+		property var pendingDataLoaded: ({}) // DocumentId -> true for early DocumentDataLoaded notifications
 		property var autoNamedTypeIds: ({}) // TypeId -> true for types with automatic name providers
 		property var documentManagerActiveView: null
 
@@ -527,6 +539,7 @@ QtObject {
 				return
 			}
 
+			delete pendingDataLoaded[documentId]
 			openedDocuments.splice(index, 1)
 		}
 	}
