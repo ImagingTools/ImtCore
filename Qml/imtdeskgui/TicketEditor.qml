@@ -30,13 +30,16 @@ DocumentViewBase {
 	// Current user ID for chat-style alignment
 	readonly property string currentUserId: AuthorizationController.getUserId()
 	
-	// Permission flags from server
-	readonly property bool canEdit: isNewIssue || (ticketData ? (ticketData.m_canEdit === true) : false)
-	readonly property bool canLock: isNewIssue || (ticketData ? (ticketData.m_canLock === true) : false)
-	// Whether user is reporter (for lock-only access)
-	readonly property bool isReporter: ticketData ? (ticketData.m_reporterId === currentUserId) : false
-	readonly property bool isSuperUser: AuthorizationController.loggedUserIsSuperuser()
-	readonly property bool canEditCoreTicketFields: (isNewIssue || isReporter || isSuperUser) && canEdit
+	// Permission flags derived from server-supplied accessLevel
+	// FullAccess: admin/reporter — can edit everything
+	// LimitedAccess: assignee — can change status, comment, add context
+	// CommentOnly: same-group viewer — can view and comment only
+	// ViewOnly: pure read-only
+	readonly property string accessLevel: isNewIssue ? "FullAccess" : (ticketData ? (ticketData.m_accessLevel || "ViewOnly") : "ViewOnly")
+	readonly property bool canEdit: accessLevel === "FullAccess" || accessLevel === "LimitedAccess"
+	readonly property bool canLock: accessLevel === "FullAccess"
+	readonly property bool canComment: accessLevel !== "ViewOnly"
+	readonly property bool canEditCoreTicketFields: isNewIssue || accessLevel === "FullAccess"
 	
 	// Pending image attachments for comment being composed
 	// Each element: {id: "uuid.ext", preview: "localPreviewUrl"}
@@ -2154,7 +2157,7 @@ DocumentViewBase {
 													spacing: Style.spacingM
 
 													Text {
-														visible: root.canEdit
+														visible: root.canComment
 														text: qsTr("Reply")
 														font.pixelSize: Style.fontSizeM
 														color: Style.inactiveTextColor
@@ -2273,7 +2276,7 @@ DocumentViewBase {
 				// ---- Fixed bottom: Add comment input ----
 				Rectangle {
 					id: addCommentSection
-					visible: root.canEdit && (!root.ticketData || !root.ticketData.m_locked)
+					visible: root.canComment && (!root.ticketData || !root.ticketData.m_locked)
 					anchors.bottom: parent.bottom
 					anchors.bottomMargin: 1
 					anchors.left: parent.left
@@ -2623,7 +2626,7 @@ DocumentViewBase {
 				// Lock notice / read-only notice
 				Row {
 					id: lockNoticeRow
-					visible: (root.ticketData && root.ticketData.m_locked) || (!root.isNewIssue && !root.canEdit)
+					visible: (root.ticketData && root.ticketData.m_locked) || (!root.isNewIssue && !root.canComment)
 					anchors.bottom: parent.bottom
 					anchors.bottomMargin: Style.paddingM
 					anchors.left: parent.left
@@ -2641,7 +2644,7 @@ DocumentViewBase {
 					}
 					
 					Text {
-						text: root.canEdit
+						text: root.canComment
 							  ? qsTr("This conversation has been locked. Only collaborators can comment.")
 							  : qsTr("You have read-only access to this ticket. Only the reporter, assignees, and administrators can edit.")
 						font.pixelSize: Style.fontSizeM
