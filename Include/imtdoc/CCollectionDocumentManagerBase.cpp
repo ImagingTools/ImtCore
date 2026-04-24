@@ -606,7 +606,6 @@ IDocumentManager::OperationStatus CCollectionDocumentManagerBase::SaveDocument(
 					}
 				}
 			}
-			}
 		}
 
 		return res ? OS_OK : OS_FAILED;
