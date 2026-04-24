@@ -299,13 +299,7 @@ QtObject {
 				if (value === undefined){
 					value = null
 				}
-				let safeValue = this[key]
-				if (typeof safeValue === 'string'){
-					safeValue = safeValue.replace(/\\/g, '\u005C\u005C')
-					safeValue = safeValue.replace(/\"/g,'\u005C"')
-				}
-
-				json += '"' + this.getJSONKeyForProperty(key) + '":' + (typeof this[key] === 'string' ? '"' + safeValue + '"' : value)
+				json += '"' + this.getJSONKeyForProperty(key) + '":' + (typeof this[key] === 'string' ? JSON.stringify(this[key]) : value)
 			}
 		}
 		json +='}'
@@ -340,9 +334,9 @@ QtObject {
 
 							data = data.replace(/\\/g, "\\\\")
 							data = data.replace(/\"/g, "\\\"")
-							data = data.replace(/\r/g, "\\\\r")
-							data = data.replace(/\n/g, "\\\\n")
-							data = data.replace(/\t/g, "\\\\t")
+							data = data.replace(/\r/g, "\\r")
+							data = data.replace(/\n/g, "\\n")
+							data = data.replace(/\t/g, "\\t")
 
 							graphQL += "\"" + data + "\""
 						}
@@ -371,9 +365,9 @@ QtObject {
 
 					data = data.replace(/\\/g,"\\\\")
 					data = data.replace(/\"/g,"\\\"")
-					data = data.replace(/\r/g,"\\\\r")
-					data = data.replace(/\n/g,"\\\\n")
-					data = data.replace(/\t/g,"\\\\t")
+					data = data.replace(/\r/g,"\\r")
+					data = data.replace(/\n/g,"\\n")
+					data = data.replace(/\t/g,"\\t")
 
 					graphQL += '"'
 					graphQL += data
@@ -391,7 +385,7 @@ QtObject {
 	function fromJSON(json){
 		let obj;
 		try {
-			obj = JSON.parse(escapeSpecialChars(json));
+			obj = JSON.parse(json);
 		} catch (e){
 			console.error(e);
 			return false;

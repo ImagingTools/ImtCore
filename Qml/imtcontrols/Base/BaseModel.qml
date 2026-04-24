@@ -74,13 +74,7 @@ ListModel {
 					if (value === undefined){
 						value = null
 					}
-					let safeValue = item[key]
-					if (typeof safeValue === 'string'){
-						safeValue = safeValue.replace(/\\/g, '\u005C\u005C')
-						safeValue = safeValue.replace(/\"/g,'\u005C"')
-					}
-
-					json += '"' + item.getJSONKeyForProperty(key) + '":' + (typeof item[key] === 'string' ? '"' + safeValue + '"' : value)
+					json += '"' + item.getJSONKeyForProperty(key) + '":' + (typeof item[key] === 'string' ? JSON.stringify(item[key]) : value)
 				}
 				if(j < list.length - 1) json += ','
 			}
@@ -117,9 +111,9 @@ ListModel {
 
 								data = data.replace(/\\/g, "\\\\")
 								data = data.replace(/\"/g, "\\\"")
-								data = data.replace(/\r/g, "\\\\r")
-								data = data.replace(/\n/g, "\\\\n")
-								data = data.replace(/\t/g, "\\\\t")
+								data = data.replace(/\r/g, "\\r")
+								data = data.replace(/\n/g, "\\n")
+								data = data.replace(/\t/g, "\\t")
 
 								graphQL += "\"" + data + "\""
 							}
@@ -139,9 +133,9 @@ ListModel {
 					if(typeof value === 'string'){
 						value = value.replace(/\\/g, "\\\\")
 						value = value.replace(/\"/g, "\\\"")
-						value = value.replace(/\r/g, "\\\\r")
-						value = value.replace(/\n/g, "\\\\n")
-						value = value.replace(/\t/g, "\\\\t")
+						value = value.replace(/\r/g, "\\r")
+						value = value.replace(/\n/g, "\\n")
+						value = value.replace(/\t/g, "\\t")
 					}
 
 					if (value === undefined){
