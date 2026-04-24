@@ -26,6 +26,11 @@ QtObject {
 
 			representationController.representationUpdated.connect(onRepresentationUpdated)
 			representationController.startUpdateRepresentation.connect(onStartUpdateRepresentation)
+			representationController.updateRepresentationFailed.connect(onUpdateRepresentationFailed)
+
+			if (updateRepresentation){
+				representationController.updateRepresentationFromDocument()
+			}
 		}
 	}
 
@@ -123,6 +128,17 @@ QtObject {
 		}
 
 		documentManager.documentRepresentationUpdated(documentId, representation)
+	}
+
+	function onUpdateRepresentationFailed(documentId, message){
+		if (root.documentId !== documentId){
+			return
+		}
+
+		for (let i = 0; i < registeredViews.length; ++i){
+			_internal.updateCounters[i] = 0
+			registeredViews[i].setBlockingUpdateModel(false)
+		}
 	}
 
 	function onGuiUpdated(view, model){
