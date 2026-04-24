@@ -9,12 +9,16 @@ BoundingBox {
 	id: polygonShape;
 
 	property string color: "transparent";
+	property string borderColor: "transparent";
+	property real brashAlpha: 1
+	property real penAlpha: 1
+
 
 	function draw(ctx, transformMatrixArg){
 
 		let params = getParams()
 		ctx.fillStyle = params.color !== undefined ? params.color : polygonShape.color;
-		ctx.strokeStyle = isSelected ? DesignScheme.selectionColor : params.borderColor !== undefined ? params.borderColor :  polygonShape.color;
+		ctx.strokeStyle = isSelected ? DesignScheme.selectionColor : params.borderColor !== undefined ? params.borderColor :  polygonShape.boderColor;
 		ctx.lineWidth = isSelected ? DesignScheme.selectionLineWidth : params.lineWidth !== undefined ? params.lineWidth : 1
 		ctx.beginPath()
 		for(let i = 0;i < points.length; i++){

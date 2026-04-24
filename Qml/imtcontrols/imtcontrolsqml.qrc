@@ -211,7 +211,7 @@
                 <file alias="imtcontrols/GraphicsView/BezierCurveShape.qml">GraphicsView/BezierCurveShape.qml</file>
                 <file alias="imtcontrols/GraphicsView/QuadraticCurveShape.qml">GraphicsView/QuadraticCurveShape.qml</file>
                 <file alias="imtcontrols/GraphicsView/TextShape.qml">GraphicsView/TextShape.qml</file>
-                <file alias="imtcontrols/GraphicsView/ImageShape.qml">GraphicsView/ImageShape.qml</file>
+                <file alias="imtcontrols/GraphicsView/ImageShape2d.qml">GraphicsView/ImageShape2d.qml</file>
                 <file alias="imtcontrols/GraphicsView/CoordinateGridShape.qml">GraphicsView/CoordinateGridShape.qml</file>
                 <file alias="imtcontrols/GraphicsView/PolygonParams.qml">GraphicsView/PolygonParams.qml</file>
                 <file alias="imtcontrols/GraphicsView/RectangleParams.qml">GraphicsView/RectangleParams.qml</file>
