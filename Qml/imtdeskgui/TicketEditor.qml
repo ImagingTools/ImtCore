@@ -908,7 +908,21 @@ DocumentViewBase {
 									radius: Style.radiusM
 									border.color: editDescriptionInput.activeFocus ? editView.accentColor : editView.cardBorderColor
 									border.width: editDescriptionInput.activeFocus ? 2 : 1
-									color: "white"
+									color: root.canEditCoreTicketFields ? "white" : Style.alternateBaseColor
+
+									Image {
+										z: parent.z + 2
+										anchors.top: parent.top
+										anchors.right: parent.right
+										anchors.topMargin: Style.paddingS
+										anchors.rightMargin: Style.paddingS
+										width: Style.iconSizeXS
+										height: width
+										source: Style.getIconPath("Icons/Lock", Icon.State.On, Icon.Mode.Normal)
+										sourceSize.width: width
+										sourceSize.height: height
+										visible: !root.canEditCoreTicketFields
+									}
 									
 									Flickable {
 										id: descriptionFlick
