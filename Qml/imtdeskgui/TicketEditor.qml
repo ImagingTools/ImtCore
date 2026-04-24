@@ -911,7 +911,7 @@ DocumentViewBase {
 									color: root.canEditCoreTicketFields ? "white" : Style.alternateBaseColor
 
 									Image {
-										z: parent.z + 2
+										z: 2
 										anchors.top: parent.top
 										anchors.right: parent.right
 										anchors.topMargin: Style.paddingS
