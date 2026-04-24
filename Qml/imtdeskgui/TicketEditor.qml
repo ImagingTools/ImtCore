@@ -1991,10 +1991,6 @@ DocumentViewBase {
 												radius: parent.radius
 												color: editView.accentColor
 												opacity: chatBubbleRect.isHighlighted ? 0.15 : 0.0
-
-												Behavior on opacity {
-													NumberAnimation { duration: 600 }
-												}
 											}
 											
 											Column {
