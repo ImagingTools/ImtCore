@@ -61,6 +61,8 @@ DocumentViewBase {
 	property bool _assigneesChanged: false
 	// Reply-to message context (null = not replying)
 	property var _replyToMessage: null
+	// Highlighted message (temporarily set when scrolling to a reply-to source)
+	property string _highlightedMessageId: ""
 	// Chat feedback
 	property string _chatActionHint: ""
 	property bool _exportChatCopiedState: false
@@ -1919,9 +1921,17 @@ DocumentViewBase {
 								var targetY = pos.y
 								var maxY = Math.max(0, contentHeight - height)
 								contentY = Math.min(Math.max(0, targetY - 20), maxY)
+								root._highlightedMessageId = msgId
+								highlightClearTimer.restart()
 								return
 							}
 						}
+					}
+
+					Timer {
+						id: highlightClearTimer
+						interval: 1500
+						onTriggered: root._highlightedMessageId = ""
 					}
 
 					onContentHeightChanged: {
@@ -1963,14 +1973,29 @@ DocumentViewBase {
 										
 										// Chat bubble (contains avatar + name + timestamp + content)
 										Rectangle {
+											id: chatBubbleRect
 											readonly property real maxBubbleWidth: Math.min(parent.width * editView.bubbleWidthRatio, editView.bubbleMaxWidth)
+											readonly property bool isHighlighted: root._highlightedMessageId.length > 0 && commentDelegate.dataModel.m_id === root._highlightedMessageId
 											width: maxBubbleWidth
 											anchors.right: commentDelegate.isMe ? parent.right : undefined
 											anchors.left: commentDelegate.isMe ? undefined : parent.left
 											height: bubbleContent.height + Style.paddingM * 2
 											radius: 12
 											color: commentDelegate.isMe ? editView.myBubbleColor : editView.otherBubbleColor
-											border.width: 0
+											border.width: isHighlighted ? 2 : 0
+											border.color: editView.accentColor
+
+											// Highlight overlay when scrolling to a reply-to source
+											Rectangle {
+												anchors.fill: parent
+												radius: parent.radius
+												color: editView.accentColor
+												opacity: chatBubbleRect.isHighlighted ? 0.15 : 0.0
+
+												Behavior on opacity {
+													NumberAnimation { duration: 600 }
+												}
+											}
 											
 											Column {
 												id: bubbleContent

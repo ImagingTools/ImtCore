@@ -148,6 +148,7 @@ QtObject {
 
 	function onModelDataChanged(view, model){
 		if (registeredViews.includes(view)){
+			_internal.initiatingView = view
 			let index = registeredViews.indexOf(view)
 			registeredRepresentation[index].updateDocumentFromRepresentation()
 		}
@@ -208,7 +209,14 @@ QtObject {
 	}
 
 	function updateRepresentationForAllViews(){
+		let skipView = _internal.initiatingView
+		_internal.initiatingView = null
+
 		for (let i = 0; i < registeredViews.length; ++i){
+			if (registeredViews[i] === skipView){
+				continue
+			}
+
 			if (registeredViews[i].visible){
 				registeredRepresentation[i].updateRepresentationFromDocument()
 			}
@@ -231,5 +239,6 @@ QtObject {
 		property var requestUpdateViews: []
 		property bool saveRequested: false
 		property var updateCounters: []
+		property var initiatingView: null
 	}
 }
