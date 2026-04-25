@@ -73,7 +73,7 @@ Popup {
 
         width: root.width
         spacing: Style.marginXS
-        padding: Style.marginM
+        property int padding: Style.marginM
 
         CustomTextField {
             id: searchField
@@ -261,7 +261,7 @@ Popup {
 
     function applyPreselectedItems(){
         let selected = ({})
-        let selectedItems = ({})
+        let selectedItemsMap = ({})
         let values = root.preselectedItems || []
         for (let i = 0; i < values.length; ++i){
             let value = values[i]
@@ -270,10 +270,10 @@ Popup {
                 continue
             }
             selected[id] = true
-            selectedItems[id] = typeof value === "object" ? value : ({"id": id})
+            selectedItemsMap[id] = typeof value === "object" ? value : ({"id": id})
         }
         root._selectedById = selected
-        root._selectedItemsById = selectedItems
+        root._selectedItemsById = selectedItemsMap
         root.selectionChanged(selectedItems())
     }
 
