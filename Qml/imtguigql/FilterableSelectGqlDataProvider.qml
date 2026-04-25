@@ -5,24 +5,6 @@ import imtcontrols 1.0
 import imtcolgui 1.0
 import imtguigql 1.0
 
-/*!
-	\qmltype FilterableSelectGqlDataProvider
-	\inqmlmodule imtguigql
-	\brief GQL-based data provider for FilterableSelectPopup using SDL structures.
-
-	Extends FilterableSelectDataProvider and implements fetchItems() using
-	GqlRequestSender with the GetSelectableItems query, following the
-	CollectionDataProvider pattern for constructing viewParams.
-
-	Usage:
-	\code
-	FilterableSelectGqlDataProvider {
-		collectionId: "UsersCollection"
-		fields: ["id", "name", "description"]
-		textFilteringInfoIds: ["name"]
-	}
-	\endcode
-*/
 FilterableSelectDataProvider {
 	id: root
 
@@ -31,15 +13,18 @@ FilterableSelectDataProvider {
 		return {}
 	}
 
+	// Fields to get from server
+	property var fields: ["id", "name"]
+
 	property GqlRequestSender itemsRequest: GqlRequestSender {
 		requestType: 0
 		gqlCommandId: "GetSelectableItems"
 
 		function createQueryParams(query){
 			var viewParams = Gql.GqlObject("viewParams")
-			viewParams.InsertField("offset", root.offset)
-			viewParams.InsertField("count", root.count)
-			viewParams.InsertField("filterModel", root.filter)
+			viewParams.InsertField("offset", root.__offset)
+			viewParams.InsertField("count", root.__count)
+			viewParams.InsertField("filterModel", root.__filter)
 
 			var inputParams = Gql.GqlObject("input")
 			inputParams.InsertField("collectionId", root.collectionId)
@@ -59,19 +44,23 @@ FilterableSelectDataProvider {
 		}
 
 		function onResult(data){
-			root.collectionModel = data.getData("items")
-			root.state = "Ready"
-			root.modelUpdated(data)
+			root.listObjectsReceived(data)
 		}
 
 		function onError(message, type){
-			root.state = "Ready"
-			root.failed(message)
+			root.listObjectsReceiveFailed(message)
 		}
 	}
 
-	function fetchItems(){
-		root.state = "Loading"
+	// Internal state for last request params
+	property int __offset: 0
+	property int __count: 20
+	property var __filter: null
+
+	function getSelectableItems(count, offset, filter){
+		root.__offset = offset || 0
+		root.__count = count || 20
+		root.__filter = filter || null
 		itemsRequest.send()
 	}
 }

@@ -5,64 +5,21 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
 
-/*!
-	\qmltype FilterableSelectPopup
-	\inqmlmodule imtcolgui
-	\brief A GitHub-style filterable select popup with server-side search and pagination.
-
-	Provides an overlay popup with text filtering (debounced), offset-based pagination,
-	single/multi select by id, injectable delegate, keyboard navigation, and loading/empty states.
-
-	The popup uses an abstract data provider (FilterableSelectDataProvider) that must
-	be set via the \l dataProvider property. For GQL-backed data use
-	FilterableSelectGqlDataProvider from imtguigql.
-
-	Usage:
-	\code
-	FilterableSelectPopup {
-		id: selectPopup
-
-		dataProvider: FilterableSelectGqlDataProvider {
-			collectionId: "UsersCollection"
-			fields: ["id", "name", "description"]
-			textFilteringInfoIds: ["name"]
-		}
-
-		multiSelect: true
-		preselectedIds: ["id-1", "id-2"]
-
-		delegate: Component {
-			PopupMenuDelegate {
-				text: model.name
-			}
-		}
-
-		onItemSelected: function(itemId, index) {
-			console.log("Selected:", itemId)
-		}
-	}
-	\endcode
-*/
 Item {
 	id: root
 
 	width: itemWidth
 	height: filterField.height + itemBody.height + (footerItem.visible ? footerItem.height : 0)
 
-	// --- Abstract Data Provider ---
-	/*!
-		\qmlproperty QtObject FilterableSelectPopup::dataProvider
-		\brief The data provider for loading selectable items.
-
-		Must expose: collectionModel (TreeItemModel), state (string "Ready"/"Loading"/etc.),
-		updateModel(offset), applyTextFilter(text), resetAndFetch(), fetchNextPage(),
-		endListReached (bool).
-	*/
+	// --- Data Controller (dependency injection) ---
 	property QtObject dataProvider: null
 
 	// --- Configuration ---
 	property int pageCount: 20
 	property int debounceInterval: 300
+
+	// Fields to which text filter will be applied
+	property var textFilteringInfoIds: ["name"]
 
 	// --- Visual ---
 	property int itemWidth: Style.sizeHintXXS
@@ -83,6 +40,7 @@ Item {
 	property bool hoverBlocked: true
 	property bool endListStatus: false
 	property string filterText: ""
+	property bool isLoading: false
 
 	// --- Dialog manager refs ---
 	property string uuid: ""
@@ -119,17 +77,27 @@ Item {
 
 	// --- Internal ---
 	property var _selectedIds: ({})
+	property int _currentOffset: 0
+
+	property CollectionFilter _filter: CollectionFilter {}
 
 	Component.onCompleted: {
 		Events.subscribeEvent("AppSizeChanged", onAppSizeChanged)
-		applyPreselectedIds()
-		if (root.dataProvider){
-			root.dataProvider.updateModel(0)
+
+		if (textFilteringInfoIds && typeof textFilteringInfoIds === 'object' && textFilteringInfoIds.length > 0){
+			_filter.setFilteringInfoIds(textFilteringInfoIds)
 		}
+
+		applyPreselectedIds()
+		requestItems(0)
 	}
 
 	Component.onDestruction: {
 		Events.unSubscribeEvent("AppSizeChanged", onAppSizeChanged)
+
+		if (_filter){
+			_filter.destroy()
+		}
 	}
 
 	function onAppSizeChanged(){
@@ -147,6 +115,17 @@ Item {
 		if (root_){
 			root_.closeDialog()
 		}
+	}
+
+	// --- Data fetch ---
+	function requestItems(offset){
+		if (!root.dataProvider){
+			return
+		}
+
+		root._currentOffset = offset
+		root.isLoading = true
+		root.dataProvider.getSelectableItems(root.pageCount, offset, root._filter)
 	}
 
 	// --- Selection Management ---
@@ -213,35 +192,37 @@ Item {
 	Connections {
 		target: root.dataProvider
 
-		onModelUpdated: {
-			if (!root.dataProvider){
-				return
-			}
+		onListObjectsReceived: {
+			root.isLoading = false
 
-			if (root.dataProvider.offset === 0){
-				root.model = root.dataProvider.collectionModel
+			let newItems = listObjects ? listObjects.getData("items") : null
+
+			if (root._currentOffset === 0){
+				root.model = newItems
 				root.endListStatus = false
 				root.selectedIndex = -1
 			}
 			else {
-				let newItems = root.dataProvider.collectionModel
 				if (!newItems || newItems.getItemsCount() <= 0){
 					root.endListStatus = true
 				}
 				else {
-					for (let i = 0; i < newItems.getItemsCount(); i++){
-						let index_ = root.model.insertNewItem()
-						newItems.copyItemDataToModel(i, root.model, index_)
+					if (root.model){
+						for (let i = 0; i < newItems.getItemsCount(); i++){
+							let index_ = root.model.insertNewItem()
+							newItems.copyItemDataToModel(i, root.model, index_)
+						}
 					}
 				}
 			}
 
-			if (root.dataProvider.collectionModel){
-				root.dataProvider.collectionModel.refresh()
+			if (root.model){
+				root.model.refresh()
 			}
 		}
 
-		onFailed: {
+		onListObjectsReceiveFailed: {
+			root.isLoading = false
 			ModalDialogManager.showErrorDialog(message)
 		}
 	}
@@ -252,11 +233,8 @@ Item {
 
 		duration: root.debounceInterval
 		onFinished: {
-			if (root.dataProvider){
-				root.dataProvider.filter.setTextFilter(filterField.text)
-				root.dataProvider.offset = 0
-				root.dataProvider.updateModel(0)
-			}
+			root._filter.setTextFilter(filterField.text)
+			root.requestItems(0)
 		}
 	}
 
@@ -330,7 +308,7 @@ Item {
 			height: 50
 			radius: parent.radius
 			color: parent.color
-			visible: root.model ? root.model.getItemsCount() === 0 && root.dataProvider && root.dataProvider.state.toLowerCase() === "ready" : !root.dataProvider
+			visible: root.model ? root.model.getItemsCount() === 0 && !root.isLoading : !root.dataProvider
 
 			Text {
 				anchors.centerIn: parent
@@ -346,7 +324,7 @@ Item {
 			anchors.fill: parent
 			opacity: 0.5
 			color: "transparent"
-			visible: root.dataProvider ? root.dataProvider.state.toLowerCase() !== "ready" : false
+			visible: root.isLoading
 
 			Text {
 				anchors.centerIn: parent
@@ -398,7 +376,7 @@ Item {
 
 		width: root.itemWidth
 		height: visible ? 30 : 0
-		visible: !root.endListStatus && root.model && root.model.getItemsCount() > 0 && root.dataProvider && root.dataProvider.state.toLowerCase() !== "ready"
+		visible: !root.endListStatus && root.model && root.model.getItemsCount() > 0 && root.isLoading
 
 		Text {
 			anchors.centerIn: parent
@@ -424,18 +402,13 @@ Item {
 
 	// --- Infinite scroll ---
 	function requestNextBatch(){
-		if (!root.dataProvider || root.endListStatus){
-			return
-		}
-		if (root.dataProvider.state.toLowerCase() !== "ready"){
+		if (!root.dataProvider || root.endListStatus || root.isLoading){
 			return
 		}
 
-		// Only fetch next page if the current batch returned items beyond the current offset,
-		// meaning the server still has more data to offer
-		let currentCount = root.dataProvider.collectionModel ? root.dataProvider.collectionModel.getItemsCount() : 0
-		if (currentCount > 0 && currentCount > root.dataProvider.offset){
-			root.dataProvider.updateModel(root.dataProvider.offset + root.dataProvider.count)
+		let currentCount = root.model ? root.model.getItemsCount() : 0
+		if (currentCount > 0){
+			root.requestItems(currentCount)
 		}
 	}
 
