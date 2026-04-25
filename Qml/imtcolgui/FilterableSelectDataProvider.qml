@@ -38,12 +38,7 @@ CollectionDataProvider {
 	}
 
 	function applyTextFilter(text){
-		if (root.filter.hasTextFilter()){
-			root.filter.m_textFilter.m_text = text
-		}
-		else {
-			root.filter.setTextFilter(text)
-		}
+		root.filter.setTextFilter(text)
 	}
 
 	function resetAndFetch(){
