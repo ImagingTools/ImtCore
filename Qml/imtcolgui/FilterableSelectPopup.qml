@@ -298,7 +298,7 @@ Item {
 			z: filterField.z + 1
 
 			decorator: Component { IconButtonDecorator {} }
-			iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+			iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
 
 			visible: filterField.text !== ""
 			enabled: visible
@@ -317,11 +317,9 @@ Item {
 		anchors.left: parent.left
 
 		width: root.itemWidth
-		height: {
-			if (errorItem.visible) return errorItem.height
-			if (noDataItem.visible) return noDataItem.height
-			return popupListView.height
-		}
+		height: errorItem.visible ? errorItem.height
+				: noDataItem.visible ? noDataItem.height
+				: popupListView.height
 		radius: Style.buttonRadius
 
 		color: Style.baseColor
@@ -401,11 +399,8 @@ Item {
 			property int itemCount: root.dataProvider ? root.dataProvider.items.length : 0
 
 			width: root.itemWidth
-			height: {
-				if (!itemCount) return 0
-				let visibleCount = root.maxVisibleItems === -1 ? itemCount : Math.min(root.maxVisibleItems, itemCount)
-				return visibleCount * root.itemHeight
-			}
+			height: itemCount === 0 ? 0
+					: (root.maxVisibleItems === -1 ? itemCount : Math.min(root.maxVisibleItems, itemCount)) * root.itemHeight
 
 			boundsBehavior: Flickable.StopAtBounds
 			clip: true
