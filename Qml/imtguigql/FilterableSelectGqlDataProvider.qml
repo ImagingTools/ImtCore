@@ -40,6 +40,9 @@ FilterableSelectDataProvider {
 		if (filter){
 			viewParams.m_filterModel = filter
 		}
+		else {
+			viewParams.m_filterModel = null
+		}
 
 		getSelectableItemsRequest.send(getSelectableItemsInput)
 	}

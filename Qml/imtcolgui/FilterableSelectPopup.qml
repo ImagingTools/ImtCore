@@ -116,8 +116,8 @@ Item {
 	MouseArea {
 		id: backgroundOverlay
 
-		parent: root.parent
-		anchors.fill: parent ? parent : undefined
+		parent: root.parent ? root.parent : root
+		anchors.fill: parent
 		z: root.z - 1
 		visible: root.visible
 		enabled: root.visible
