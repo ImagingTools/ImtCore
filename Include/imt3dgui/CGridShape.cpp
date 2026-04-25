@@ -101,10 +101,18 @@ void CGridShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& /*chang
 
 // reimplement (imt3dgui::CShape3dBase)
 
-void CGridShape::DrawShapeGl(QOpenGLShaderProgram& /*program*/, QOpenGLFunctions& functions)
+imt3dview::EPrimitiveType CGridShape::GetPrimitiveType() const
 {
-	functions.glLineWidth(1.0f);
-	functions.glDrawElements(GL_LINES, m_indices.count(), GL_UNSIGNED_INT, 0);
+	return imt3dview::PT_LINES;
+}
+
+
+void CGridShape::FillMaterial(imt3dview::SMaterial& material) const
+{
+	BaseClass::FillMaterial(material);
+	material.colorMode = imt3dview::SMaterial::CM_SOLID;
+	material.solidColor = GetColor();
+	material.lineWidth = 1.0f;
 }
 
 

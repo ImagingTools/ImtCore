@@ -202,18 +202,26 @@ void CPointCloudShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& c
 }
 
 
-void CPointCloudShape::DrawShapeGl(QOpenGLShaderProgram& program, QOpenGLFunctions& functions)
+imt3dview::EPrimitiveType CPointCloudShape::GetPrimitiveType() const
 {
-	program.setUniformValue("usePointSize", true);
-	program.setUniformValue("pointSize", m_pointSize);
+	return imt3dview::PT_POINTS;
+}
 
-	functions.glDrawElements(GL_POINTS, m_indices.size(), GL_UNSIGNED_INT, (GLuint*)0);
+
+void CPointCloudShape::FillMaterial(imt3dview::SMaterial& material) const
+{
+	BaseClass::FillMaterial(material);
+	if (material.colorMode == imt3dview::SMaterial::CM_SOLID){
+		material.solidColor = m_color;
+	}
+	material.usePointSize = true;
+	material.pointSize = m_pointSize;
 }
 
 
 // reimplemented (imt3dview::IDrawable)
 
-void CPointCloudShape::Draw(QPainter& painter)
+void CPointCloudShape::DrawOverlay(QPainter& painter)
 {
 	imt3d::IPointCloud3d* pointCloudPtr = dynamic_cast<imt3d::IPointCloud3d*>(GetObservedModel());
 	if (!pointCloudPtr){

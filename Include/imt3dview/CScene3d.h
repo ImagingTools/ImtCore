@@ -33,9 +33,9 @@ public:
 	virtual void RemoveShapeFromScene(imt3dview::IScene3dItem* objectPtr) override;
 
 	// reimplemented (imt3dview::IDrawable)
-	virtual void SetContext(QOpenGLContext* contextPtr) override;
-	virtual void DrawGl(QOpenGLShaderProgram& program) override;
-	virtual void Draw(QPainter& painter) override;
+	virtual void OnAttachBackend(imt3dview::IRenderBackend* backendPtr) override;
+	virtual void Render(imt3dview::IRenderBackend& backend) override;
+	virtual void DrawOverlay(QPainter& painter) override;
 
 private:
 	struct ShapeInfo
@@ -65,7 +65,7 @@ private:
 	typedef QMap<QByteArray, ShapeInfoPtr> Shapes;
 	Shapes m_shapes;
 
-	QOpenGLContext* m_contextPtr;
+	imt3dview::IRenderBackend* m_backendPtr;
 	int m_nextModelId;
 	imt3dview::IScene3dCamera* m_cameraPtr;
 };

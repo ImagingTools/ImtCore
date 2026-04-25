@@ -130,19 +130,22 @@ void CAxisShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet & /*chan
 }
 
 
-void CAxisShape::DrawShapeGl(QOpenGLShaderProgram& /*program*/, QOpenGLFunctions& functions)
+imt3dview::EPrimitiveType CAxisShape::GetPrimitiveType() const
 {
-	double lineWidth = m_axisConfigs[AT_X].lineWidth;
+	return imt3dview::PT_LINES;
+}
 
-	functions.glLineWidth(lineWidth);
 
-	functions.glDrawElements(GL_LINES, m_indices.count(), GL_UNSIGNED_INT, 0);
+void CAxisShape::FillMaterial(imt3dview::SMaterial& material) const
+{
+	BaseClass::FillMaterial(material);
+	material.lineWidth = static_cast<float>(m_axisConfigs.value(AT_X).lineWidth);
 }
 
 
 // reimplement (imt3dgui::IDrawable)
 
-void CAxisShape::Draw(QPainter& painter)
+void CAxisShape::DrawOverlay(QPainter& painter)
 {
 	if (!IsVisible()){
 		return;

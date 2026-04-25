@@ -23,8 +23,6 @@ CRulerShape::CRulerShape()
 	:m_slaveShapePtr(nullptr),
 	m_movingVertexIndex(-1)
 {
-	m_vertexBuffer.setUsagePattern(QOpenGLBuffer::StreamDraw);
-
 	std::vector<imt3d::IPointsBasedObject::PointXyzwRgba32> vertices;
 	// line vertices
 	imt3d::IPointsBasedObject::PointXyzwRgba32 a;
@@ -172,23 +170,55 @@ void CRulerShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& /*chan
 
 // reimplement (imt3dgui::CShape3dBase)
 
-void CRulerShape::DrawShapeGl(QOpenGLShaderProgram& program, QOpenGLFunctions& functions)
+imt3dview::EPrimitiveType CRulerShape::GetPrimitiveType() const
 {
-	// draw line
-	GLuint* offsetPtr = (GLuint*)0;
-
-	functions.glLineWidth(4.0f);
-	functions.glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, offsetPtr);
-
-	// draw points
-	program.setUniformValue("usePointSize", true);
-	program.setUniformValue("pointSize", 12.0f);
-
-	functions.glDrawElements(GL_POINTS, 2, GL_UNSIGNED_INT, offsetPtr + 2);
+	// Default; the actual primitive used per sub-pass is set in Render()
+	return imt3dview::PT_LINES;
 }
 
 
-void CRulerShape::Draw(QPainter& painter)
+void CRulerShape::FillMaterial(imt3dview::SMaterial& material) const
+{
+	BaseClass::FillMaterial(material);
+}
+
+
+void CRulerShape::Render(imt3dview::IRenderBackend& backend)
+{
+	if (!m_isVisible ||
+				!m_geometry ||
+				m_pointsDataPtr == nullptr ||
+				m_pointsDataPtr->GetData() == nullptr ||
+				m_pointsDataPtr->IsEmpty() ||
+				m_indices.size() < 4){
+		return;
+	}
+
+	imt3dview::SDrawCommand command;
+	command.geometry = m_geometry;
+	command.modelMatrix = GetModelMatrix();
+
+	FillMaterial(command.material);
+
+	// draw line (first 2 indices)
+	command.primitive = imt3dview::PT_LINES;
+	command.indexCount = 2;
+	command.indexOffset = 0;
+	command.material.lineWidth = 4.0f;
+	command.material.usePointSize = false;
+	backend.Draw(command);
+
+	// draw points (next 2 indices)
+	command.primitive = imt3dview::PT_POINTS;
+	command.indexCount = 2;
+	command.indexOffset = 2;
+	command.material.usePointSize = true;
+	command.material.pointSize = 12.0f;
+	backend.Draw(command);
+}
+
+
+void CRulerShape::DrawOverlay(QPainter& painter)
 {
 	if (!IsVisible() || !m_slaveShapePtr){
 		return;
