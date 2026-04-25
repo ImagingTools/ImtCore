@@ -141,7 +141,13 @@ class Model extends Node3D {
         if(!src) return ''
         if(src.startsWith('data:') || src.startsWith('http://') || src.startsWith('https://')) return src
         let root = (typeof rootPath !== 'undefined') ? rootPath : ''
-        return (root + '/' + src.replace(/\.\.\//g, '')).replace(/\/+/g, '/')
+        let safeSrc = src
+        let prev
+        do {
+            prev = safeSrc
+            safeSrc = safeSrc.replace(/\.\.\//g, '')
+        } while (safeSrc !== prev)
+        return (root + '/' + safeSrc).replace(/\/+/g, '/')
     }
 
     $disposeMesh(m){
