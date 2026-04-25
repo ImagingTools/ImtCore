@@ -15,16 +15,51 @@ FocusScope {
 
     property bool checkable: false;
 
-    property alias rowDelegate: listView.delegate;
+    property alias rowDelegate: flick.delegate;
     property alias background: backgroundLoader.sourceComponent;
 
+    // Optional header/footer rendered inside the virtualized list (Qt-style).
+    property alias headerComponent: flick.header;
+    property alias footerComponent: flick.footer;
+
+    // Optional section grouping (delegates to ListView.section.*).
+    property alias sectionProperty: flick.section.property;
+    property alias sectionCriteria: flick.section.criteria;
+    property alias sectionDelegate: flick.section.delegate;
+
+    // Animations for add/remove/displaced — opt-in by assigning a Transition.
+    property alias addTransition: flick.add;
+    property alias removeTransition: flick.remove;
+    property alias displacedTransition: flick.displaced;
+    property alias addDisplacedTransition: flick.addDisplaced;
+    property alias removeDisplacedTransition: flick.removeDisplaced;
+
+    // Public ListView-style API (previously not exposed).
+    property alias currentIndex: flick.currentIndex;
+    property alias currentItem: flick.currentItem;
+    property alias cacheBuffer: flick.cacheBuffer;
+    property alias keyNavigationWraps: flick.keyNavigationWraps;
+    property alias reuseItems: flick.reuseItems;
+
+    function positionViewAtIndex(index, mode){
+        flick.positionViewAtIndex(index, mode === undefined ? ListView.Visible : mode);
+    }
+
+    function positionViewAtBeginning(){
+        flick.positionViewAtBeginning();
+    }
+
+    function positionViewAtEnd(){
+        flick.positionViewAtEnd();
+    }
+
     property int columnCount:repeater.count;
-    property int rowCount: listView.count;
+    property int rowCount: flick.count;
 
 	property int rowItemHeight: Style.controlHeightM;
 	property int headerHeight: Style.tableHeaderHeight;
 
-    property alias contentHeight: bodyColumn.height;
+    property alias contentHeight: flick.contentHeight;
 
     property var rowModel: ListModel {};
 
@@ -245,11 +280,11 @@ FocusScope {
     }
 
     function getRootItemByIndex(index){
-        if (index < 0 || index >= listView.count){
+        if (index < 0 || index >= flick.count){
             return null;
         }
 
-        return listView.itemAt(index);
+        return flick.itemAtIndex(index);
     }
 
     FocusScope {
@@ -334,7 +369,13 @@ FocusScope {
 
     property alias flickable: flick;
 
-    Flickable {
+    // Virtualized list of top-level rows. Replaces the previous
+    // Flickable + Column + Repeater combination so that delegates are
+    // created lazily as they enter the viewport. ListView itself is a
+    // Flickable, so the public `flickable`/`tableListView` aliases (and
+    // the existing CustomScrollbar binding to `targetItem: flick`) keep
+    // working unchanged.
+    ListView {
         id: flick;
 
         anchors.top: headerItem.bottom;
@@ -342,25 +383,23 @@ FocusScope {
 
         width: parent.width;
 
-        contentWidth: bodyColumn.width;
-        contentHeight: bodyColumn.height;
+        model: tableViewRoot.rowModel;
+        delegate: TableViewItemDelegateBase {
+            root: tableViewRoot;
+        }
 
         boundsBehavior: Flickable.StopAtBounds;
+        clip: true;
+        keyNavigationEnabled: true;
+        highlightFollowsCurrentItem: true;
+        // High default cacheBuffer keeps every delegate alive (legacy behaviour
+        // of the previous Repeater implementation, on which getItemsDataAsList()
+        // and check-state iteration rely). Consumers handling large datasets
+        // can opt in to virtualization by lowering `cacheBuffer` — e.g.
+        // `cacheBuffer: 0` to only keep visible delegates.
+        cacheBuffer: 1000000;
 
         visible: tableViewRoot.contentVisible;
-
-        Column {
-            id: bodyColumn;
-            width: parent.width;
-
-            Repeater {
-                id: listView;
-                model: tableViewRoot.rowModel;
-                delegate: TableViewItemDelegateBase {
-                    root: tableViewRoot;
-                }
-            }
-        }
     }
 
     CustomScrollbar {
