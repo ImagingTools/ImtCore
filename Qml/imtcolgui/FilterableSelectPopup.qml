@@ -8,6 +8,9 @@ import imtcontrols 1.0
 Item {
 	id: root
 
+	visible: false
+	z: 1000
+
 	width: itemWidth
 	height: filterField.height + itemBody.height + (footerItem.visible ? footerItem.height : 0)
 
@@ -42,10 +45,6 @@ Item {
 	property string filterText: ""
 	property bool isLoading: false
 
-	// --- Dialog manager refs ---
-	property string uuid: ""
-	property Item root_: null
-
 	// --- Injectable delegate ---
 	property Component delegate: Component {
 		PopupMenuDelegate {
@@ -73,7 +72,8 @@ Item {
 	// --- Signals ---
 	signal itemSelected(string itemId, int index)
 	signal selectionChanged(var selectedIds)
-	signal finished(string commandId, int index)
+	signal opened()
+	signal closed()
 
 	// --- Internal ---
 	property var _selectedIds: ({})
@@ -81,35 +81,49 @@ Item {
 
 	property CollectionFilter _filter: CollectionFilter {}
 
-	Component.onCompleted: {
-		Events.subscribeEvent("AppSizeChanged", onAppSizeChanged)
+	function open(){
+		if (root.visible){
+			return
+		}
 
 		if (textFilteringInfoIds && typeof textFilteringInfoIds === 'object' && textFilteringInfoIds.length > 0){
 			_filter.setFilteringInfoIds(textFilteringInfoIds)
 		}
 
 		applyPreselectedIds()
+
+		root.model = null
+		root.endListStatus = false
+		root.selectedIndex = -1
+		root.filterText = ""
+		filterField.text = ""
+
+		root.visible = true
+		root.opened()
 		requestItems(0)
 	}
 
-	Component.onDestruction: {
-		Events.unSubscribeEvent("AppSizeChanged", onAppSizeChanged)
-	}
-
-	function onAppSizeChanged(){
-		onBackgroundClicked()
-	}
-
-	function onBackgroundClicked(){
-		root.finished('', -1)
-		if (root_){
-			root_.closeDialog()
-		}
-	}
-
 	function close(){
-		if (root_){
-			root_.closeDialog()
+		if (!root.visible){
+			return
+		}
+
+		root.visible = false
+		root.closed()
+	}
+
+	// --- Background overlay to close on outside click ---
+	MouseArea {
+		id: backgroundOverlay
+
+		parent: root.parent
+		anchors.fill: parent ? parent : undefined
+		z: root.z - 1
+		visible: root.visible
+		enabled: root.visible
+
+		onClicked: {
+			root.close()
 		}
 	}
 
@@ -170,7 +184,7 @@ Item {
 		root.selectionChanged(getSelectedIds())
 
 		if (!root.multiSelect){
-			root.finished(id, index)
+			root.close()
 		}
 	}
 
@@ -191,22 +205,20 @@ Item {
 		onListObjectsReceived: {
 			root.isLoading = false
 
-			let newItems = listObjects ? listObjects.getData("items") : null
-
 			if (root._currentOffset === 0){
-				root.model = newItems
+				root.model = listObjects
 				root.endListStatus = false
 				root.selectedIndex = -1
 			}
 			else {
-				if (!newItems || newItems.getItemsCount() <= 0){
+				if (!listObjects || listObjects.getItemsCount() <= 0){
 					root.endListStatus = true
 				}
 				else {
 					if (root.model){
-						for (let i = 0; i < newItems.getItemsCount(); i++){
+						for (let i = 0; i < listObjects.getItemsCount(); i++){
 							let index_ = root.model.insertNewItem()
-							newItems.copyItemDataToModel(i, root.model, index_)
+							listObjects.copyItemDataToModel(i, root.model, index_)
 						}
 					}
 				}
@@ -219,7 +231,6 @@ Item {
 
 		onListObjectsReceiveFailed: {
 			root.isLoading = false
-			ModalDialogManager.showErrorDialog(message)
 		}
 	}
 
@@ -415,15 +426,15 @@ Item {
 
 	Shortcut {
 		sequence: "Escape"
-		enabled: true
+		enabled: root.visible
 		onActivated: {
-			root.onBackgroundClicked()
+			root.close()
 		}
 	}
 
 	Shortcut {
 		sequence: "Return"
-		enabled: !filterField.textInputFocus
+		enabled: root.visible && !filterField.textInputFocus
 		onActivated: {
 			if (root.selectedIndex >= 0 && root.model){
 				let id = root.model.getData(root.idKey, root.selectedIndex)
@@ -434,7 +445,7 @@ Item {
 
 	Shortcut {
 		sequence: "Up"
-		enabled: true
+		enabled: root.visible
 		onActivated: {
 			if (filterField.textInputFocus){
 				root.setTextFocus(false)
@@ -449,7 +460,7 @@ Item {
 
 	Shortcut {
 		sequence: "Down"
-		enabled: true
+		enabled: root.visible
 		onActivated: {
 			if (filterField.textInputFocus){
 				root.setTextFocus(false)
