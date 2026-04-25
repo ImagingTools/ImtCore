@@ -15,6 +15,13 @@ FocusScope {
     property bool widthFromDecorator: false;
     property bool heightFromDecorator: false;
 
+    // Padding system – mirrors QtQuick.Controls.Control
+    property real padding: 0
+    property real topPadding: padding
+    property real bottomPadding: padding
+    property real leftPadding: padding
+    property real rightPadding: padding
+
     onDecoratorChanged: {
         decoratorChangedFunc();
     }

@@ -21,6 +21,8 @@ ControlBase {
 	property bool tristate: false;
 
 	property int checkState: Qt.Unchecked;
+	// Convenience alias matching QtQuick.Controls.CheckBox
+	property bool checked: checkState === Qt.Checked
 
 	property string checkIndicator: "image";
 
@@ -32,6 +34,23 @@ ControlBase {
 	property bool isLeftText: false;
 
 	property int mainMargin: Style.marginS;
+
+	// ButtonGroup support
+	property var buttonGroup: null
+
+	signal clicked()
+	signal toggled()
+
+	// Accessibility
+	Accessible.role: Accessible.CheckBox
+	Accessible.name: text
+	Accessible.checkable: true
+	Accessible.checked: checked
+
+	onCheckedChanged: {
+		if (buttonGroup !== null)
+			buttonGroup._onButtonChecked(checkBox)
+	}
 
 	function nextCheckState(){
 		if(!tristate){
@@ -69,7 +88,11 @@ ControlBase {
 		visible: checkBox.isActive;
 
 		onClicked: {
+			let prevState = checkBox.checkState
 			checkBox.nextCheckState();
+			checkBox.clicked()
+			if (checkBox.checkState !== prevState)
+				checkBox.toggled()
 		}
 
 		onPressed: {
@@ -97,5 +120,4 @@ ControlBase {
 		fitToTextWidth: true;
 	}
 }
-
 

@@ -26,7 +26,16 @@ ControlBase {
     property alias tooltipText: tooltip.text;
     property alias tooltipItem: tooltip;
 
-    signal clicked();
+	// Accessibility
+	Accessible.role: Accessible.RadioButton
+	Accessible.name: text
+	Accessible.checkable: true
+	Accessible.checked: checked
+
+	signal clicked();
+	signal toggled();
+	signal pressed();
+	signal released();
 
     Component.onCompleted: {
         Events.subscribeEvent("RadioButtonUnchecked", customRadioButton.onRadioButtonUnchecked)
@@ -45,6 +54,10 @@ ControlBase {
 
     onClicked: {
         clickedFuntion();
+    }
+
+    onCheckedChanged: {
+        toggled()
     }
 
     function clickedFuntion(){
@@ -88,9 +101,14 @@ ControlBase {
         }
 
         onPressed: {
+            customRadioButton.pressed();
             if(tooltip.text !== ""){
                 tooltip.closeTooltip();
             }
+        }
+
+        onReleased: {
+            customRadioButton.released();
         }
 
         onPositionChanged: {

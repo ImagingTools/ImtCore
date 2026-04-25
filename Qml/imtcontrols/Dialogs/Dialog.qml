@@ -42,10 +42,29 @@ ControlBase {
 	property bool canMove: true;
 	property bool canResize: false;
 	property bool decoratorVisible: !decorator_ ? true: decorator_.visible;
-	property bool escapeEnabled: true;
+
+	// Close policy – mirrors QtQuick.Controls.Popup.
+	// Combine flags with |.
+	// NoAutoClose=0, CloseOnEscape=1, CloseOnPressOutside=2, CloseOnPressOutsideParent=4
+	property int closePolicy: Dialog.CloseOnEscape
+
+	enum ClosePolicyFlag {
+		NoAutoClose               = 0,
+		CloseOnEscape             = 1,
+		CloseOnPressOutside       = 2,
+		CloseOnPressOutsideParent = 4
+	}
+
+	property bool escapeEnabled: !!(closePolicy & Dialog.CloseOnEscape);
 
 	property bool closeAfterPause: false;
 	property int displayDuration: 2000;
+
+	// Standard buttons – a bitmask of Enums.ButtonType values.
+	// When set, buttons are automatically added to buttonsModel.
+	property int standardButtons: Enums.noButton
+
+	onStandardButtonsChanged: _applyStandardButtons()
 
 	property Component topPanelComp: Style.topPanelDialogDecorator;
 	property Component topPanelDefault: Component{TopPanelDialog{}};
@@ -69,6 +88,37 @@ ControlBase {
 	LocalizationEvent {
 		onLocalizationChanged: {
 			dialogContainer.onLocalizationChanged(langId)
+		}
+	}
+
+	function _applyStandardButtons(){
+		buttonsModel.clear();
+		// Ordered list of standard button definitions [id, label]
+		let defs = [
+			[Enums.ok,              qsTr("OK")],
+			[Enums.open,            qsTr("Open")],
+			[Enums.save,            qsTr("Save")],
+			[Enums.saveAll,         qsTr("Save All")],
+			[Enums.yes,             qsTr("Yes")],
+			[Enums.yesToAll,        qsTr("Yes to All")],
+			[Enums.no,              qsTr("No")],
+			[Enums.noToAll,         qsTr("No to All")],
+			[Enums.apply,           qsTr("Apply")],
+			[Enums.reset,           qsTr("Reset")],
+			[Enums.restoreDefaults, qsTr("Restore Defaults")],
+			[Enums.discard,         qsTr("Discard")],
+			[Enums.abort,           qsTr("Abort")],
+			[Enums.retry,           qsTr("Retry")],
+			[Enums.ignore,          qsTr("Ignore")],
+			[Enums.close,           qsTr("Close")],
+			[Enums.cancel,          qsTr("Cancel")],
+			[Enums.help,            qsTr("Help")]
+		]
+		for (let i = 0; i < defs.length; i++) {
+			let id   = defs[i][0]
+			let name = defs[i][1]
+			if (standardButtons & id)
+				addButton(id, name, true)
 		}
 	}
 

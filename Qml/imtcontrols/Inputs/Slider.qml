@@ -34,6 +34,11 @@ ControlBase {
 	property real from: 0.0;
 	property real to: 1.0;
 	property real value: position * (to - from) + from;
+	property real stepSize: 0.0;
+	property bool live: true;
+	property bool pressed: ma.pressed;
+
+	signal moved();
 
 	property int majorTickInterval: 0;
 	property int minorTickInterval: 0;
@@ -54,6 +59,13 @@ ControlBase {
 
 	property bool marginsChanged: false
 	property bool hasTooltip: false;
+
+	// Accessibility
+	Accessible.role: Accessible.Slider
+	Accessible.name: tooltipText
+	Accessible.minimumValue: from
+	Accessible.maximumValue: to
+	Accessible.value: value
 
 	Component.onCompleted: {
 		correctPositionParams();
@@ -97,6 +109,13 @@ ControlBase {
 	onValueChanged: {
 		position = (value - from)/(to - from)
 		controlRecX = position * (mainSize - controlWidth)
+	}
+
+	function _snapValue(rawValue) {
+		if (stepSize <= 0.0)
+			return rawValue;
+		let snapped = Math.round((rawValue - from) / stepSize) * stepSize + from;
+		return Math.max(from, Math.min(to, snapped));
 	}
 
 	onWidthChanged: {
@@ -236,7 +255,9 @@ ControlBase {
 				}
 
 				slider.position = slider.controlRecX/(slider._backgroundWidth);
-				slider.value = slider.position * (slider.to - slider.from) + slider.from;
+				let rawValue = slider.position * (slider.to - slider.from) + slider.from;
+				slider.value = slider._snapValue(rawValue);
+				slider.moved();
 			// }
 
 
@@ -275,7 +296,9 @@ ControlBase {
 				if(slider.position < 0.00001){
 					slider.position = 0.
 				}
-				slider.value = slider.position * (slider.to - slider.from) + slider.from;
+				let rawVal = slider.position * (slider.to - slider.from) + slider.from;
+				slider.value = slider._snapValue(rawVal);
+				slider.moved();
 			}
 
 			else if(!slider.hasIndicator && slider.hasTooltip){

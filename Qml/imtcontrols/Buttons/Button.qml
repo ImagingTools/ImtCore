@@ -20,6 +20,13 @@ ControlBase {
 	property bool checkable: false;
 	property bool checked: false;
 	property bool enabled: true;
+	property bool flat: false;
+	property bool highlighted: false;
+
+	// Auto-repeat support – mirrors QtQuick.Controls.AbstractButton
+	property bool autoRepeat: false;
+	property int autoRepeatDelay: 300;
+	property int autoRepeatInterval: 100;
 
 	property bool isMenuButton: false;
 
@@ -39,6 +46,8 @@ ControlBase {
 	signal positionChanged(real mouseX, real mouseY);
 	signal toggled();
 	signal closeTooltip();
+	signal pressAndHold();
+	signal canceled();
 
 	QtObject {
 		id: _private
@@ -75,6 +84,24 @@ ControlBase {
 		}
 	}
 
+	// Accessibility – mirrors QtQuick.Controls.AbstractButton
+	Accessible.role: Accessible.Button
+	Accessible.name: text
+	Accessible.description: tooltipText
+	Accessible.checkable: checkable
+	Accessible.checked: checked
+	Accessible.onPressAction: { if (enabled) _private.onClicked() }
+
+	// Auto-repeat timer
+	Timer {
+		id: autoRepeatTimer
+		repeat: true
+		onTriggered: {
+			if (baseButton.autoRepeat && baseButton.down)
+				_private.onClicked()
+		}
+	}
+
 	MouseArea{
 		id: ma;
 		objectName: "MouseArea"
@@ -86,6 +113,7 @@ ControlBase {
 		enabled: baseButton.enabled;
 		hoverEnabled: enabled;
 		cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
+		pressAndHoldInterval: baseButton.autoRepeatDelay
 
 		onClicked: {
 			if (baseButton.enabled){
@@ -100,11 +128,24 @@ ControlBase {
 		onPressed: {
 			baseButton.down = true
 			baseButton.pressed();
+			if (baseButton.autoRepeat) {
+				autoRepeatTimer.interval = baseButton.autoRepeatDelay
+				autoRepeatTimer.restart()
+			}
 		}
 
 		onReleased: {
 			baseButton.down = false
+			autoRepeatTimer.stop()
 			baseButton.released();
+		}
+
+		onPressAndHold: {
+			baseButton.pressAndHold();
+			if (baseButton.autoRepeat) {
+				autoRepeatTimer.interval = baseButton.autoRepeatInterval
+				autoRepeatTimer.restart()
+			}
 		}
 
 		onEntered: {
@@ -118,6 +159,7 @@ ControlBase {
 				baseButton.exited(mouseX, mouseY);
 				baseButton.down = false
 			}
+			autoRepeatTimer.stop()
 		}
 
 		onPositionChanged: {
@@ -128,6 +170,8 @@ ControlBase {
 
 		onCanceled: {
 			baseButton.down = false
+			autoRepeatTimer.stop()
+			baseButton.canceled()
 		}
 	}
 }
