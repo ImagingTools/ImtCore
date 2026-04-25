@@ -5,6 +5,7 @@
 #include <cmath>
 
 // Qt includes
+#include <QtCore/QDebug>
 #include <QtCore/QElapsedTimer>
 #include <QtGui/QMouseEvent>
 
@@ -323,6 +324,7 @@ void COpenGLWidget::initializeGL()
 
 	m_backend.SetContext(QOpenGLWidget::context());
 	if (!m_backend.Initialize()){
+		qDebug() << "COpenGLWidget: render backend failed to initialize";
 		return;
 	}
 
