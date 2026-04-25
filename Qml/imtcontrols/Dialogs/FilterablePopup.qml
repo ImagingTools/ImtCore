@@ -22,7 +22,9 @@ Popup {
     property int maxPopupHeight: searchField.height + Math.max(1, maxVisibleItems) * itemHeight + footer.height + 2 * Style.marginM
     property bool multiSelect: false
     property string idKey: "id"
+    property var fallbackIdKeys: ["m_id", "Id"]
     property string textKey: "name"
+    property var fallbackTextKeys: ["title", "name", "id"]
     property string placeholderText: qsTr("Filter")
     property string emptyText: qsTr("No items found")
     property var preselectedItems: []
@@ -158,7 +160,7 @@ Popup {
                 }
 
                 onContentYChanged: {
-                    if (contentY + height >= contentHeight - root.itemHeight){
+                    if (!root.loading && root.hasMore && contentY + height >= contentHeight - root.itemHeight){
                         root.fetchNextPage()
                     }
                 }
@@ -222,7 +224,7 @@ Popup {
                 anchors.leftMargin: Style.marginM
                 anchors.right: selectionMark.left
                 anchors.verticalCenter: parent.verticalCenter
-                text: item ? (item[root.textKey] || item.title || item.name || item.id || "") : ""
+                text: root.displayText(item)
                 color: Style.textColor
                 font.pixelSize: Style.fontSizeM
                 elide: Text.ElideRight
@@ -248,16 +250,38 @@ Popup {
         root.open()
     }
 
+    function displayText(item){
+        if (!item){
+            return ""
+        }
+
+        let value = item[root.textKey]
+        if (value !== undefined && value !== null && value !== ""){
+            return String(value)
+        }
+
+        for (let i = 0; i < root.fallbackTextKeys.length; ++i){
+            value = item[root.fallbackTextKeys[i]]
+            if (value !== undefined && value !== null && value !== ""){
+                return String(value)
+            }
+        }
+
+        return ""
+    }
+
     function itemId(item){
         if (!item){
             return ""
         }
         let value = item[root.idKey]
-        if (value === undefined && root.idKey !== "m_id"){
-            value = item.m_id
-        }
-        if (value === undefined && root.idKey !== "Id"){
-            value = item.Id
+        if (value === undefined || value === null){
+            for (let i = 0; i < root.fallbackIdKeys.length; ++i){
+                value = item[root.fallbackIdKeys[i]]
+                if (value !== undefined && value !== null){
+                    break
+                }
+            }
         }
         return value === undefined || value === null ? "" : String(value)
     }
