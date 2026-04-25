@@ -28,15 +28,15 @@ public:
 	COpenGLGeometryResource(const imt3dview::VertexLayout& layout);
 	virtual ~COpenGLGeometryResource();
 
-	const imt3dview::VertexLayout& GetLayout() const { return m_layout; }
+	const imt3dview::VertexLayout& GetLayout() const;
 
-	QOpenGLBuffer& GetVertexBuffer() { return m_vertexBuffer; }
-	QOpenGLBuffer& GetIndexBuffer() { return m_indexBuffer; }
+	QOpenGLBuffer& GetVertexBuffer();
+	QOpenGLBuffer& GetIndexBuffer();
 
-	int GetIndexCount() const { return m_indexCount; }
-	void SetIndexCount(int count) { m_indexCount = count; }
+	int GetIndexCount() const;
+	void SetIndexCount(int count);
 
-	bool IsCreated() const { return m_vertexBuffer.isCreated() && m_indexBuffer.isCreated(); }
+	bool IsCreated() const;
 
 	bool Create();
 	void Destroy();

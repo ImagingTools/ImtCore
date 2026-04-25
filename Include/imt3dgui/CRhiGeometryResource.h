@@ -45,20 +45,20 @@ public:
 
 	bool IsCreated() const;
 
-	QRhiBuffer* GetVertexBuffer() const { return m_vertexBuffer; }
-	QRhiBuffer* GetIndexBuffer()  const { return m_indexBuffer; }
+	QRhiBuffer* GetVertexBuffer() const;
+	QRhiBuffer* GetIndexBuffer() const;
 
-	const imt3dview::VertexLayout& GetSourceLayout() const { return m_sourceLayout; }
+	const imt3dview::VertexLayout& GetSourceLayout() const;
 
-	int  GetIndexCount() const      { return m_indexCount; }
-	void SetIndexCount(int n)       { m_indexCount = n; }
+	int GetIndexCount() const;
+	void SetIndexCount(int n);
 
 private:
-	QRhi*                    m_rhi;
+	QRhi* m_rhi;
 	imt3dview::VertexLayout m_sourceLayout;
-	QRhiBuffer*              m_vertexBuffer = nullptr;
-	QRhiBuffer*              m_indexBuffer  = nullptr;
-	int                      m_indexCount   = 0;
+	QRhiBuffer* m_vertexBuffer = nullptr;
+	QRhiBuffer* m_indexBuffer = nullptr;
+	int m_indexCount = 0;
 };
 
 

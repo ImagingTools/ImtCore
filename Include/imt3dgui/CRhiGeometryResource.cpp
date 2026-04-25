@@ -75,4 +75,34 @@ bool CRhiGeometryResource::IsCreated() const
 }
 
 
+QRhiBuffer* CRhiGeometryResource::GetVertexBuffer() const
+{
+	return m_vertexBuffer;
+}
+
+
+QRhiBuffer* CRhiGeometryResource::GetIndexBuffer() const
+{
+	return m_indexBuffer;
+}
+
+
+const imt3dview::VertexLayout& CRhiGeometryResource::GetSourceLayout() const
+{
+	return m_sourceLayout;
+}
+
+
+int CRhiGeometryResource::GetIndexCount() const
+{
+	return m_indexCount;
+}
+
+
+void CRhiGeometryResource::SetIndexCount(int n)
+{
+	m_indexCount = n;
+}
+
+
 } // namespace imt3dgui

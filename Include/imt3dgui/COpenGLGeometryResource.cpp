@@ -25,6 +25,42 @@ COpenGLGeometryResource::~COpenGLGeometryResource()
 }
 
 
+const imt3dview::VertexLayout& COpenGLGeometryResource::GetLayout() const
+{
+	return m_layout;
+}
+
+
+QOpenGLBuffer& COpenGLGeometryResource::GetVertexBuffer()
+{
+	return m_vertexBuffer;
+}
+
+
+QOpenGLBuffer& COpenGLGeometryResource::GetIndexBuffer()
+{
+	return m_indexBuffer;
+}
+
+
+int COpenGLGeometryResource::GetIndexCount() const
+{
+	return m_indexCount;
+}
+
+
+void COpenGLGeometryResource::SetIndexCount(int count)
+{
+	m_indexCount = count;
+}
+
+
+bool COpenGLGeometryResource::IsCreated() const
+{
+	return m_vertexBuffer.isCreated() && m_indexBuffer.isCreated();
+}
+
+
 bool COpenGLGeometryResource::Create()
 {
 	if (!m_vertexBuffer.isCreated()){

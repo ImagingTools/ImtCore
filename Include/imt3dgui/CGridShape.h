@@ -40,7 +40,7 @@ protected:
 	virtual void FillMaterial(imt3dview::Material& material) const override;
 
 	// reimplement (imt3dgui::IShape3d)
-	virtual QVector3D GetColor() const override { return QVector3D(0.5, 0.5, 0.5); }
+	virtual QVector3D GetColor() const override;
 
 private:
 	typedef std::vector<imt3d::CPointCloud3d::PointXyz32> Vertices;

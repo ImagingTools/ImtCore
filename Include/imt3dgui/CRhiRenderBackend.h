@@ -121,11 +121,7 @@ private:
 		QRhiGraphicsPipeline::Topology topology;
 		bool cullFace;
 
-		bool operator<(const PipelineKey& o) const
-		{
-			if (topology != o.topology) return topology < o.topology;
-			return (!cullFace && o.cullFace);
-		}
+		bool operator<(const PipelineKey& o) const;
 	};
 
 	// std140-compatible GlobalUBO layout (176 bytes).

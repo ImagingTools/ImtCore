@@ -273,6 +273,14 @@ void CShape3dBase::DrawOverlay(QPainter& /*painter*/)
 }
 
 
+// reimplement (IShape3d)
+
+QVector3D CShape3dBase::GetColor() const
+{
+	return QVector3D();
+}
+
+
 // protected methods
 
 void CShape3dBase::FillMaterial(imt3dview::Material& material) const

@@ -29,6 +29,15 @@ CRhiRenderBackend::~CRhiRenderBackend()
 }
 
 
+bool CRhiRenderBackend::PipelineKey::operator<(const PipelineKey& o) const
+{
+	if (topology != o.topology){
+		return topology < o.topology;
+	}
+	return (!cullFace && o.cullFace);
+}
+
+
 void CRhiRenderBackend::SetRhiContext(
 			QRhi* rhi,
 			QRhiRenderTarget* renderTarget,

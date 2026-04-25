@@ -69,7 +69,7 @@ public:
 
 protected:
 	// reimplement (IShape3d)
-	virtual QVector3D GetColor() const override { return QVector3D(); }
+	virtual QVector3D GetColor() const override;
 
 protected:
 	// to be implemented in descendants

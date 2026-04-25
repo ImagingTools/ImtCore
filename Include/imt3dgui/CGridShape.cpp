@@ -97,6 +97,14 @@ void CGridShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& /*chang
 }
 
 
+// reimplement (imt3dgui::IShape3d)
+
+QVector3D CGridShape::GetColor() const
+{
+	return QVector3D(0.5, 0.5, 0.5);
+}
+
+
 // protected methods
 
 // reimplement (imt3dgui::CShape3dBase)
