@@ -134,17 +134,22 @@ Item{
     }
 
     // Replace the current top page with a new component.
+    // Uses a _replacePending flag so onCurrentIndexChanged handlers are not
+    // triggered while the model swap is in progress.
+    property bool _replacePending: false
+
     function replace(comp) {
         if (!comp)
             return null
         let replaceIndex = currentIndex >= 0 ? currentIndex : 0
+        _replacePending = true
         pagesModel.set(replaceIndex, { "component": comp })
-        // Re-trigger navigation so the new loader is picked up.
-        let prevIndex = currentIndex
-        currentIndex = -1
-        setCurrentIndex(prevIndex)
-        let loader = repeater.itemAt(currentIndex)
-        return loader ? loader.item : null
+        _replacePending = false
+        // Notify via currentPageChanged so dependent code updates.
+        let loader = repeater.itemAt(replaceIndex)
+        let newItem = loader ? loader.item : null
+        currentPageChanged(newItem)
+        return newItem
     }
 
     // Get the item at the given stack index (0 = bottom, depth-1 = top).

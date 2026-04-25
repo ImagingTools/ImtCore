@@ -90,6 +90,8 @@ ControlBase {
 		onClicked: {
 			let prevState = checkBox.checkState
 			checkBox.nextCheckState();
+			// clicked() is emitted unconditionally (matching Qt AbstractButton
+			// behaviour). toggled() is emitted only when the state actually changes.
 			checkBox.clicked()
 			if (checkBox.checkState !== prevState)
 				checkBox.toggled()

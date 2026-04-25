@@ -93,6 +93,8 @@ ControlBase {
 
 	function _applyStandardButtons(){
 		buttonsModel.clear();
+		if (standardButtons === Enums.noButton)
+			return
 		// Ordered list of standard button definitions [id, label]
 		let defs = [
 			[Enums.ok,              qsTr("OK")],

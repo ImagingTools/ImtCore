@@ -116,9 +116,7 @@ ControlBase {
 			return rawValue;
 		let snapped = Math.round((rawValue - from) / stepSize) * stepSize + from;
 		return Math.max(from, Math.min(to, snapped));
-	}
-
-	onWidthChanged: {
+	}	onWidthChanged: {
 		controlRecX = position * (mainSize - controlWidth)
 	}
 

@@ -44,9 +44,7 @@ QtObject {
             button.buttonGroup = buttonGroup
 
         // Enforce exclusivity for any already-checked button.
-        let isChecked = (button.checkState !== undefined && button.checkState === Qt.Checked) ||
-                        (button.checkState === undefined && button.checked === true)
-        if (exclusive && isChecked)
+        if (exclusive && _isButtonChecked(button))
             _onButtonChecked(button)
     }
 
@@ -74,11 +72,7 @@ QtObject {
         if (!exclusive)
             return
 
-        let isChecked = (button.checkState !== undefined)
-                            ? (button.checkState === Qt.Checked)
-                            : (button.checked === true)
-
-        if (isChecked) {
+        if (_isButtonChecked(button)) {
             checkedButton = button
             // Uncheck every other registered button.
             for (let i = 0; i < buttons.length; i++) {
@@ -97,5 +91,12 @@ QtObject {
             if (checkedButton === button)
                 checkedButton = null
         }
+    }
+
+    // Returns true when the button is in a checked state.
+    function _isButtonChecked(button) {
+        if (button.checkState !== undefined)
+            return button.checkState === Qt.Checked
+        return button.checked === true
     }
 }

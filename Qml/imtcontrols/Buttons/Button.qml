@@ -129,8 +129,10 @@ ControlBase {
 			baseButton.down = true
 			baseButton.pressed();
 			if (baseButton.autoRepeat) {
-				autoRepeatTimer.interval = baseButton.autoRepeatDelay
-				autoRepeatTimer.restart()
+				// Start the hold-detection timer; first auto-repeat fires
+				// in onPressAndHold after autoRepeatDelay ms.
+				autoRepeatTimer.interval = baseButton.autoRepeatInterval
+				autoRepeatTimer.stop()
 			}
 		}
 
@@ -143,6 +145,8 @@ ControlBase {
 		onPressAndHold: {
 			baseButton.pressAndHold();
 			if (baseButton.autoRepeat) {
+				// First auto-repeat click now, then repeat at autoRepeatInterval.
+				_private.onClicked()
 				autoRepeatTimer.interval = baseButton.autoRepeatInterval
 				autoRepeatTimer.restart()
 			}
