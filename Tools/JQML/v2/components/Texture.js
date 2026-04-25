@@ -28,7 +28,13 @@ class Texture extends QtObject {
         if(!src) return ''
         if(src.startsWith('data:') || src.startsWith('http://') || src.startsWith('https://')) return src
         let root = (typeof rootPath !== 'undefined') ? rootPath : ''
-        return (root + '/' + src.replace(/\.\.\//g, '')).replace(/\/+/g, '/')
+        let safeSrc = src
+        let previous
+        do {
+            previous = safeSrc
+            safeSrc = safeSrc.replace(/\.\.\//g, '')
+        } while (safeSrc !== previous)
+        return (root + '/' + safeSrc).replace(/\/+/g, '/')
     }
 
     $build(THREE){
