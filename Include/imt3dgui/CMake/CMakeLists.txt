@@ -45,11 +45,13 @@ if(TARGET Qt6::ShaderTools)
     )
 
     # Generate a .qrc that embeds the compiled QSB files under :/RhiShaders/.
+    # Uses plain filenames — rcc resolves them relative to the .qrc location,
+    # which is _rhi_shader_outdir (same directory as the .qsb outputs).
     set(_rhi_qrc "${_rhi_shader_outdir}/imt3dgui_rhi_shaders.qrc")
     file(WRITE "${_rhi_qrc}"
         "<RCC>\n<qresource prefix=\"/RhiShaders\">\n"
-        "  <file alias=\"vshader_rhi.vert.qsb\">${_rhi_vert_qsb}</file>\n"
-        "  <file alias=\"fshader_rhi.frag.qsb\">${_rhi_frag_qsb}</file>\n"
+        "  <file alias=\"vshader_rhi.vert.qsb\">vshader_rhi.vert.qsb</file>\n"
+        "  <file alias=\"fshader_rhi.frag.qsb\">fshader_rhi.frag.qsb</file>\n"
         "</qresource>\n</RCC>\n"
     )
 
