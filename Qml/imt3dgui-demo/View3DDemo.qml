@@ -20,7 +20,6 @@ Item {
         clearColor: "#202020"
 
         environment: SceneEnvironment {
-            id: sceneEnv
             backgroundMode: 0      // Color
             clearColor: "#202830"
             antialiasingMode: 2    // MSAA
