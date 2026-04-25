@@ -25,6 +25,12 @@ FilterableSelectDataProvider {
 			}
 		}
 
+		onFinished: {
+			if (status === -1){
+				root.listObjectsReceiveFailed(qsTr("Failed to load items"))
+			}
+		}
+
 		function getHeaders(){
 			return root.getHeaders()
 		}

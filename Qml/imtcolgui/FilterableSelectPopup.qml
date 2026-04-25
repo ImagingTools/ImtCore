@@ -21,29 +21,16 @@ Item {
 	property int pageCount: 20
 	property int debounceInterval: 300
 
-	// Fields to which text filter will be applied
-	property var textFilteringInfoIds: ["name"]
-
 	// --- Visual ---
 	property int itemWidth: Style.sizeHintXXS
 	property int itemHeight: Style.controlHeightM
 	property int maxVisibleItems: 8
 	property int textSize: Style.fontSizeM
 	property string fontColor: Style.textColor
-	property string idKey: "id"
-	property string nameKey: "name"
 
 	// --- Selection ---
 	property bool multiSelect: false
 	property var preselectedIds: []
-
-	// --- State ---
-	property var model: null
-	property int selectedIndex: -1
-	property bool hoverBlocked: true
-	property bool endListStatus: false
-	property string filterText: ""
-	property bool isLoading: false
 
 	// --- Injectable delegate ---
 	property Component delegate: Component {
@@ -53,18 +40,17 @@ Item {
 			textSize: root.textSize
 			fontColor: root.fontColor
 
-			text: model[root.nameKey] || ""
+			text: model.name || ""
 
-			selected: root.selectedIndex === model.index
-			highlighted: root.isItemSelected(model[root.idKey])
+			selected: __internal.selectedIndex === model.index
+			highlighted: root.isItemSelected(model.id)
 
 			onClicked: {
-				let resultId = model[root.idKey] || model.id || ""
-				root.toggleSelection(resultId, model.index)
+				root.toggleSelection(model.id || "", model.index)
 			}
 
 			onEntered: {
-				root.selectedIndex = model.index
+				__internal.selectedIndex = model.index
 			}
 		}
 	}
@@ -75,28 +61,41 @@ Item {
 	signal opened()
 	signal closed()
 
-	// --- Internal ---
-	property var _selectedIds: ({})
-	property int _currentOffset: 0
+	// --- Internal state ---
+	property QtObject __internal: QtObject {
+		property var selectedIds: ({})
+		property int currentOffset: 0
+		property var model: null
+		property int selectedIndex: -1
+		property bool hoverBlocked: true
+		property bool endListStatus: false
+		property bool isLoading: false
+		property bool hasError: false
+		property string errorMessage: ""
+	}
 
-	property CollectionFilter _filter: CollectionFilter {}
+	property CollectionFilter __filter: CollectionFilter {}
 
+	// --- Public API ---
 	function open(){
 		if (root.visible){
 			return
 		}
 
-		if (textFilteringInfoIds && typeof textFilteringInfoIds === 'object' && textFilteringInfoIds.length > 0){
-			_filter.setFilteringInfoIds(textFilteringInfoIds)
-		}
+		__internal.selectedIds = ({})
+		__internal.currentOffset = 0
+		__internal.model = null
+		__internal.selectedIndex = -1
+		__internal.hoverBlocked = true
+		__internal.endListStatus = false
+		__internal.isLoading = false
+		__internal.hasError = false
+		__internal.errorMessage = ""
+
+		__filter.clearAllFilters(true)
+		filterField.text = ""
 
 		applyPreselectedIds()
-
-		root.model = null
-		root.endListStatus = false
-		root.selectedIndex = -1
-		root.filterText = ""
-		filterField.text = ""
 
 		root.visible = true
 		root.opened()
@@ -110,6 +109,89 @@ Item {
 
 		root.visible = false
 		root.closed()
+	}
+
+	function isItemSelected(itemId){
+		return itemId !== undefined && itemId !== null && __internal.selectedIds[String(itemId)] === true
+	}
+
+	function toggleSelection(itemId, index){
+		if (itemId === undefined || itemId === null || itemId === ""){
+			return
+		}
+
+		let id = String(itemId)
+		let selected = ({})
+		for (let key in __internal.selectedIds){
+			selected[key] = __internal.selectedIds[key]
+		}
+
+		if (root.multiSelect){
+			if (selected[id]){
+				delete selected[id]
+			}
+			else {
+				selected[id] = true
+			}
+		}
+		else {
+			selected = ({})
+			selected[id] = true
+		}
+
+		__internal.selectedIds = selected
+		root.itemSelected(id, index)
+		root.selectionChanged(getSelectedIds())
+
+		if (!root.multiSelect){
+			root.close()
+		}
+	}
+
+	function getSelectedIds(){
+		let result = []
+		for (let id in __internal.selectedIds){
+			if (__internal.selectedIds[id]){
+				result.push(id)
+			}
+		}
+		return result
+	}
+
+	// --- Internal helpers ---
+	function applyPreselectedIds(){
+		let selected = ({})
+		let ids = root.preselectedIds || []
+		for (let i = 0; i < ids.length; ++i){
+			let id = String(ids[i])
+			if (id !== ""){
+				selected[id] = true
+			}
+		}
+		__internal.selectedIds = selected
+	}
+
+	function requestItems(offset){
+		if (!root.dataProvider){
+			return
+		}
+
+		__internal.currentOffset = offset
+		__internal.isLoading = true
+		__internal.hasError = false
+		__internal.errorMessage = ""
+		root.dataProvider.getSelectableItems(root.pageCount, offset, root.__filter)
+	}
+
+	function requestNextBatch(){
+		if (!root.dataProvider || __internal.endListStatus || __internal.isLoading){
+			return
+		}
+
+		let currentCount = __internal.model ? __internal.model.getItemsCount() : 0
+		if (currentCount > 0){
+			requestItems(currentCount)
+		}
 	}
 
 	// --- Background overlay to close on outside click ---
@@ -127,110 +209,42 @@ Item {
 		}
 	}
 
-	// --- Data fetch ---
-	function requestItems(offset){
-		if (!root.dataProvider){
-			return
-		}
-
-		root._currentOffset = offset
-		root.isLoading = true
-		root.dataProvider.getSelectableItems(root.pageCount, offset, root._filter)
-	}
-
-	// --- Selection Management ---
-	function applyPreselectedIds(){
-		let selected = ({})
-		let ids = root.preselectedIds || []
-		for (let i = 0; i < ids.length; ++i){
-			let id = String(ids[i])
-			if (id !== ""){
-				selected[id] = true
-			}
-		}
-		root._selectedIds = selected
-	}
-
-	function isItemSelected(itemId){
-		return itemId !== undefined && itemId !== null && root._selectedIds[String(itemId)] === true
-	}
-
-	function toggleSelection(itemId, index){
-		if (itemId === undefined || itemId === null || itemId === ""){
-			return
-		}
-
-		let id = String(itemId)
-		let selected = ({})
-		for (let key in root._selectedIds){
-			selected[key] = root._selectedIds[key]
-		}
-
-		if (root.multiSelect){
-			if (selected[id]){
-				delete selected[id]
-			}
-			else {
-				selected[id] = true
-			}
-		}
-		else {
-			selected = ({})
-			selected[id] = true
-		}
-
-		root._selectedIds = selected
-		root.itemSelected(id, index)
-		root.selectionChanged(getSelectedIds())
-
-		if (!root.multiSelect){
-			root.close()
-		}
-	}
-
-	function getSelectedIds(){
-		let result = []
-		for (let id in root._selectedIds){
-			if (root._selectedIds[id]){
-				result.push(id)
-			}
-		}
-		return result
-	}
-
 	// --- Data provider connection ---
 	Connections {
 		target: root.dataProvider
 
 		onListObjectsReceived: {
-			root.isLoading = false
+			__internal.isLoading = false
+			__internal.hasError = false
 
-			if (root._currentOffset === 0){
-				root.model = listObjects
-				root.endListStatus = false
-				root.selectedIndex = -1
+			if (__internal.currentOffset === 0){
+				__internal.model = listObjects
+				__internal.endListStatus = false
+				__internal.selectedIndex = -1
 			}
 			else {
 				if (!listObjects || listObjects.getItemsCount() <= 0){
-					root.endListStatus = true
+					__internal.endListStatus = true
 				}
 				else {
-					if (root.model){
+					if (__internal.model){
 						for (let i = 0; i < listObjects.getItemsCount(); i++){
-							let index_ = root.model.insertNewItem()
-							listObjects.copyItemDataToModel(i, root.model, index_)
+							let index_ = __internal.model.insertNewItem()
+							listObjects.copyItemDataToModel(i, __internal.model, index_)
 						}
 					}
 				}
 			}
 
-			if (root.model){
-				root.model.refresh()
+			if (__internal.model){
+				__internal.model.refresh()
 			}
 		}
 
 		onListObjectsReceiveFailed: {
-			root.isLoading = false
+			__internal.isLoading = false
+			__internal.hasError = true
+			__internal.errorMessage = message || qsTr("Failed to load items")
 		}
 	}
 
@@ -240,7 +254,7 @@ Item {
 
 		duration: root.debounceInterval
 		onFinished: {
-			root._filter.setTextFilter(filterField.text)
+			root.__filter.setTextFilter(filterField.text)
 			root.requestItems(0)
 		}
 	}
@@ -260,8 +274,7 @@ Item {
 		placeHolderText: qsTr("Filter...")
 
 		onTextChanged: {
-			root.filterText = text
-			root.selectedIndex = -1
+			__internal.selectedIndex = -1
 			debounce.stop()
 			debounce.start()
 		}
@@ -301,7 +314,9 @@ Item {
 		anchors.left: parent.left
 
 		width: root.itemWidth
-		height: !noDataItem.visible * popupListView.height + noDataItem.height * noDataItem.visible
+		height: !noDataItem.visible * !errorItem.visible * popupListView.height
+				+ noDataItem.height * noDataItem.visible
+				+ errorItem.height * errorItem.visible
 		radius: Style.buttonRadius
 
 		color: Style.baseColor
@@ -315,7 +330,8 @@ Item {
 			height: 50
 			radius: parent.radius
 			color: parent.color
-			visible: root.model ? root.model.getItemsCount() === 0 && !root.isLoading : !root.dataProvider
+			visible: !__internal.hasError
+					&& (__internal.model ? __internal.model.getItemsCount() === 0 && !__internal.isLoading : !root.dataProvider)
 
 			Text {
 				anchors.centerIn: parent
@@ -326,12 +342,36 @@ Item {
 		}
 
 		Rectangle {
+			id: errorItem
+
+			width: parent.width
+			height: 50
+			radius: parent.radius
+			color: parent.color
+			visible: __internal.hasError && !__internal.isLoading
+
+			Text {
+				anchors.centerIn: parent
+				font.pixelSize: root.textSize
+				color: Style.errorColor
+				text: __internal.errorMessage || qsTr("Error loading items")
+			}
+
+			MouseArea {
+				anchors.fill: parent
+				onClicked: {
+					root.requestItems(__internal.currentOffset)
+				}
+			}
+		}
+
+		Rectangle {
 			id: loadingOverlay
 
 			anchors.fill: parent
 			opacity: 0.5
 			color: "transparent"
-			visible: root.isLoading
+			visible: __internal.isLoading
 
 			Text {
 				anchors.centerIn: parent
@@ -352,7 +392,7 @@ Item {
 
 			boundsBehavior: Flickable.StopAtBounds
 			clip: true
-			model: root.model
+			model: __internal.model
 
 			delegate: root.delegate
 
@@ -366,10 +406,10 @@ Item {
 		MouseArea {
 			anchors.fill: parent
 			hoverEnabled: true
-			visible: root.hoverBlocked
+			visible: __internal.hoverBlocked
 
 			onPositionChanged: {
-				root.hoverBlocked = false
+				__internal.hoverBlocked = false
 			}
 		}
 	}
@@ -383,7 +423,7 @@ Item {
 
 		width: root.itemWidth
 		height: visible ? 30 : 0
-		visible: !root.endListStatus && root.model && root.model.getItemsCount() > 0 && root.isLoading
+		visible: !__internal.endListStatus && __internal.model && __internal.model.getItemsCount() > 0 && __internal.isLoading
 
 		Text {
 			anchors.centerIn: parent
@@ -407,23 +447,7 @@ Item {
 		source: itemBody
 	}
 
-	// --- Infinite scroll ---
-	function requestNextBatch(){
-		if (!root.dataProvider || root.endListStatus || root.isLoading){
-			return
-		}
-
-		let currentCount = root.model ? root.model.getItemsCount() : 0
-		if (currentCount > 0){
-			root.requestItems(currentCount)
-		}
-	}
-
 	// --- Keyboard navigation ---
-	function setTextFocus(focus){
-		filterField.setFocus(focus)
-	}
-
 	Shortcut {
 		sequence: "Escape"
 		enabled: root.visible
@@ -436,9 +460,9 @@ Item {
 		sequence: "Return"
 		enabled: root.visible && !filterField.textInputFocus
 		onActivated: {
-			if (root.selectedIndex >= 0 && root.model){
-				let id = root.model.getData(root.idKey, root.selectedIndex)
-				root.toggleSelection(id, root.selectedIndex)
+			if (__internal.selectedIndex >= 0 && __internal.model){
+				let id = __internal.model.getData("id", __internal.selectedIndex)
+				root.toggleSelection(id, __internal.selectedIndex)
 			}
 		}
 	}
@@ -448,12 +472,12 @@ Item {
 		enabled: root.visible
 		onActivated: {
 			if (filterField.textInputFocus){
-				root.setTextFocus(false)
+				filterField.setFocus(false)
 			}
-			root.hoverBlocked = true
-			if (root.selectedIndex > 0){
-				root.selectedIndex--
-				root.contentYCorrection(false)
+			__internal.hoverBlocked = true
+			if (__internal.selectedIndex > 0){
+				__internal.selectedIndex--
+				contentYCorrection(false)
 			}
 		}
 	}
@@ -463,25 +487,25 @@ Item {
 		enabled: root.visible
 		onActivated: {
 			if (filterField.textInputFocus){
-				root.setTextFocus(false)
+				filterField.setFocus(false)
 			}
-			root.hoverBlocked = true
-			if (root.model && root.selectedIndex < root.model.getItemsCount() - 1){
-				root.selectedIndex++
-				root.contentYCorrection(true)
+			__internal.hoverBlocked = true
+			if (__internal.model && __internal.selectedIndex < __internal.model.getItemsCount() - 1){
+				__internal.selectedIndex++
+				contentYCorrection(true)
 			}
-			else if (root.model && root.selectedIndex === root.model.getItemsCount() - 1){
+			else if (__internal.model && __internal.selectedIndex === __internal.model.getItemsCount() - 1){
 				root.requestNextBatch()
 			}
 		}
 	}
 
 	function contentYCorrection(down_){
-		if (root.selectedIndex >= 0){
+		if (__internal.selectedIndex >= 0){
 			let contentY = popupListView.contentY
 			let itemH = root.itemHeight
 			let visibleCount = root.maxVisibleItems
-			let index = root.selectedIndex
+			let index = __internal.selectedIndex
 
 			if (down_){
 				if ((index + 1) * itemH > contentY + visibleCount * itemH){
