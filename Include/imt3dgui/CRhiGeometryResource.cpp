@@ -25,8 +25,11 @@ bool CRhiGeometryResource::Create(int vertexCount, int indexCount)
 {
 	Destroy();
 
+	// Zero counts are valid for shapes that haven't received data yet
+	// (e.g. placeholder created during OnAttachBackend before the first
+	// UpdateGeometry call). IsCreated() will return false until real data arrives.
 	if (vertexCount <= 0 || indexCount <= 0){
-		return false;
+		return true;
 	}
 
 	m_vertexBuffer = m_rhi->newBuffer(

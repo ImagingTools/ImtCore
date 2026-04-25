@@ -48,6 +48,8 @@ void main()
     } else if (draw.colorMode == 1) {
         fragColor = draw.itemColor.xyz;
     } else {
+        // Defensive fallback: unknown colorMode renders black so misconfiguration
+        // is immediately visible during development.
         fragColor = vec3(0.0, 0.0, 0.0);
     }
 

@@ -349,7 +349,7 @@ QByteArray CRhiRenderBackend::ConvertToCanonical(
 				vertexCount * CRhiGeometryResource::s_canonicalStride,
 				Qt::Uninitialized);
 
-	const char* srcBytes_ = static_cast<const char*>(src);
+	const char* srcPtr    = static_cast<const char*>(src);
 	float*      dstFloats = reinterpret_cast<float*>(dst.data());
 
 	// Locate attribute offsets within the source layout.
@@ -366,7 +366,7 @@ QByteArray CRhiRenderBackend::ConvertToCanonical(
 	}
 
 	for (int v = 0; v < vertexCount; ++v){
-		const char* vSrc = srcBytes_ + v * layout.stride;
+		const char* vSrc = srcPtr + v * layout.stride;
 		float*      vDst = dstFloats + v * 9;
 
 		// Position — always expected to be present.
