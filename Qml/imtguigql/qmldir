@@ -33,3 +33,4 @@ GqlBasedCollectionDocumentManager 1.0 GqlBasedCollectionDocumentManager.qml
 GqlCollectionDocManagerPageView 1.0 GqlCollectionDocManagerPageView.qml
 RemoteCollectionViewDialog 1.0 RemoteCollectionViewDialog.qml
 SelectableCollectionEditor 1.0 SelectableCollectionEditor.qml
+FilterableSelectPopup 1.0 FilterableSelectPopup.qml

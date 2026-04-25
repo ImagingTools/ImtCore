@@ -63,7 +63,6 @@
                 <file alias="imtcontrols/Dialogs/ProgressDialogManager.qml">Dialogs/ProgressDialogManager.qml</file>
                 <file alias="imtcontrols/Dialogs/ModalDialogManager.qml">Dialogs/ModalDialogManager.qml</file>
                 <file alias="imtcontrols/Dialogs/PopupMenuDialog.qml">Dialogs/PopupMenuDialog.qml</file>
-                <file alias="imtcontrols/Dialogs/FilterablePopup.qml">Dialogs/FilterablePopup.qml</file>
                 <file alias="imtcontrols/Dialogs/PopupDecorator.qml">Dialogs/PopupDecorator.qml</file>
                 <file alias="imtcontrols/Dialogs/PopupDecoratorGql.qml">Dialogs/PopupDecoratorGql.qml</file>
                 <file alias="imtcontrols/Dialogs/PopupItemDelegateDecorator.qml">Dialogs/PopupItemDelegateDecorator.qml</file>
@@ -119,8 +118,6 @@
                 <file alias="imtcontrols/Models/MailRegExpValidator.qml">Models/MailRegExpValidator.qml</file>
                 <file alias="imtcontrols/Models/SortFilterProxyModel.qml">Models/SortFilterProxyModel.qml</file>
                 <file alias="imtcontrols/Models/DataModelProvider.qml">Models/DataModelProvider.qml</file>
-                <file alias="imtcontrols/Models/FilterableSelectDataProvider.qml">Models/FilterableSelectDataProvider.qml</file>
-                <file alias="imtcontrols/Models/RestEntityDataProvider.qml">Models/RestEntityDataProvider.qml</file>
                 <file alias="imtcontrols/Models/DataModelController.qml">Models/DataModelController.qml</file>
                 <file alias="imtcontrols/Models/OptionManager.qml">Models/OptionManager.qml</file>
                 <file alias="imtcontrols/Models/OptionsListAdapter.qml">Models/OptionsListAdapter.qml</file>

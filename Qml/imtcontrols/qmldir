@@ -65,7 +65,6 @@ MessageDialogBody 1.0 ./Dialogs/MessageDialogBody.qml
 MessagePopup 1.0 ./Dialogs/MessagePopup.qml
 ProgressDialogManager 1.0 ./Dialogs/ProgressDialogManager.qml
 PopupMenuDialog 1.0 ./Dialogs/PopupMenuDialog.qml
-FilterablePopup 1.0 ./Dialogs/FilterablePopup.qml
 PopupDecorator 1.0 ./Dialogs/PopupDecorator.qml
 PopupDecoratorGql 1.0 ./Dialogs/PopupDecoratorGql.qml
 PopupItemDelegateDecorator 1.0 ./Dialogs/PopupItemDelegateDecorator.qml
@@ -121,8 +120,6 @@ MailRegExpValidator 1.0 Models/MailRegExpValidator.qml
 SortFilterProxyModel 1.0 Models/SortFilterProxyModel.qml
 DataModelController 1.0 Models/DataModelController.qml
 DataModelProvider 1.0 Models/DataModelProvider.qml
-FilterableSelectDataProvider 1.0 Models/FilterableSelectDataProvider.qml
-RestEntityDataProvider 1.0 Models/RestEntityDataProvider.qml
 OptionManager 1.0 Models/OptionManager.qml
 OptionsListAdapter 1.0 Models/OptionsListAdapter.qml
 OptionsListManager 1.0 Models/OptionsListManager.qml
