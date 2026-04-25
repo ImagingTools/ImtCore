@@ -78,6 +78,7 @@ Popup {
         CustomTextField {
             id: searchField
 
+            x: parent.padding
             width: parent.width - 2 * parent.padding
             height: Style.controlHeightM
             placeHolderText: root.placeholderText
@@ -103,6 +104,7 @@ Popup {
         }
 
         Item {
+            x: parent.padding
             width: parent.width - 2 * parent.padding
             height: Math.min(Math.max(itemsModel.count, 1), root.maxVisibleItems) * root.itemHeight
 
@@ -174,6 +176,7 @@ Popup {
         Item {
             id: footer
 
+            x: parent.padding
             width: parent.width - 2 * parent.padding
             height: visible ? Style.controlHeightM : 0
             visible: root.loading || root.errorMessage !== ""
@@ -270,7 +273,14 @@ Popup {
                 continue
             }
             selected[id] = true
-            selectedItemsMap[id] = typeof value === "object" ? value : ({"id": id})
+            if (typeof value === "object"){
+                selectedItemsMap[id] = value
+            }
+            else {
+                let selectedItem = ({})
+                selectedItem[root.idKey] = id
+                selectedItemsMap[id] = selectedItem
+            }
         }
         root._selectedById = selected
         root._selectedItemsById = selectedItemsMap
@@ -290,14 +300,22 @@ Popup {
         return id !== "" && root._selectedById[id] === true
     }
 
+    function cloneMap(source){
+        let result = ({})
+        for (let key in source){
+            result[key] = source[key]
+        }
+        return result
+    }
+
     function toggleItem(item){
         let id = itemId(item)
         if (id === ""){
             return
         }
 
-        let selected = root._selectedById
-        let selectedItemsMap = root._selectedItemsById
+        let selected = cloneMap(root._selectedById)
+        let selectedItemsMap = cloneMap(root._selectedItemsById)
 
         if (root.multiSelect){
             if (selected[id]){
@@ -350,7 +368,16 @@ Popup {
         root.loading = true
         let requestSerial = serial
         let params = {"filter": root.filter, "cursor": cursor, "limit": root.pageLimit}
-        let result = root.dataProvider.fetch(params)
+        let result = null
+        try {
+            result = root.dataProvider.fetch(params)
+        }
+        catch (error){
+            root.loading = false
+            root.errorMessage = String(error)
+            root.fetchFailed(root.errorMessage)
+            return
+        }
 
         if (!result || !result.then){
             root.loading = false
