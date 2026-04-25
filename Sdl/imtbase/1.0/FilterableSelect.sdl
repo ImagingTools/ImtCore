@@ -10,7 +10,7 @@ import {
 
 # --- Filterable Select ---
 # Reusable types for GitHub-style filterable select popups.
-# Provides server-side text filtering and cursor-based pagination
+# Provides server-side text filtering and offset-based pagination
 # for large datasets (10k+ items).
 
 type SelectableItemData {
@@ -21,25 +21,16 @@ type SelectableItemData {
 	color: String
 }
 
-input FilterableSelectInput {
+input GetSelectableItemsInput {
 	collectionId: ID!
 	viewParams: CollectionViewParams
 }
 
-type FilterableSelectPayload {
+type GetSelectableItemsPayload {
 	items: [SelectableItemData]
 	notification: NotificationItem
 }
 
 type Query {
-	FilterableSelectList (input: FilterableSelectInput): FilterableSelectPayload!
-}
-
-collectionSchema {
-	type FilterableSelect {
-		ref: SelectableItemData
-		operations {
-			list: FilterableSelectList
-		}
-	}
+	GetSelectableItems (input: GetSelectableItemsInput): GetSelectableItemsPayload!
 }

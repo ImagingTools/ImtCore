@@ -4,16 +4,18 @@ import QtGraphicalEffects 1.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
-import imtcolgui 1.0
 
 /*!
 	\qmltype FilterableSelectPopup
 	\inqmlmodule imtguigql
 	\brief A GitHub-style filterable select popup with server-side search and pagination.
 
-	Extends Item to provide an overlay popup with text filtering (debounced),
-	server-side pagination via CollectionDataProvider, single/multi select by id,
-	injectable delegate, keyboard navigation, and loading/empty states.
+	Provides an overlay popup with text filtering (debounced), offset-based pagination,
+	single/multi select by id, injectable delegate, keyboard navigation, and loading/empty states.
+
+	The popup uses an abstract data provider that must be set via the \l dataProvider property.
+	Use FilterableSelectGqlDataProvider for GQL-backed data, or implement a custom
+	provider with the same interface (collectionModel, state, updateModel, setCustomInputParams).
 
 	The popup is opened via ModalDialogManager and uses the existing decorator/popup
 	infrastructure of the framework.
@@ -22,9 +24,13 @@ import imtcolgui 1.0
 	\code
 	FilterableSelectPopup {
 		id: selectPopup
-		commandId: "FilterableSelectList"
-		fields: ["id", "name", "description"]
-		textFilteringInfoIds: ["name"]
+
+		dataProvider: FilterableSelectGqlDataProvider {
+			commandId: "GetSelectableItems"
+			fields: ["id", "name", "description"]
+			textFilteringInfoIds: ["name"]
+		}
+
 		multiSelect: true
 		preselectedIds: ["id-1", "id-2"]
 
@@ -34,7 +40,7 @@ import imtcolgui 1.0
 			}
 		}
 
-		onItemSelected: function(itemId, itemIndex) {
+		onItemSelected: function(itemId, index) {
 			console.log("Selected:", itemId)
 		}
 	}
@@ -46,12 +52,18 @@ Item {
 	width: itemWidth
 	height: filterField.height + itemBody.height + (footerItem.visible ? footerItem.height : 0)
 
+	// --- Abstract Data Provider ---
+	/*!
+		\qmlproperty QtObject FilterableSelectPopup::dataProvider
+		\brief The data provider for loading selectable items.
+
+		Must expose: collectionModel (TreeItemModel), state (string "Ready"/"Loading"/etc.),
+		updateModel(offset), applyTextFilter(text), resetAndFetch(), fetchNextPage(),
+		endListReached (bool).
+	*/
+	property QtObject dataProvider: null
+
 	// --- Configuration ---
-	property string commandId: ""
-	property var fields: ["id", "name"]
-	property var textFilteringInfoIds: ["name"]
-	property string sortByField: "name"
-	property string orderType: "ASC"
 	property int pageCount: 20
 	property int debounceInterval: 300
 
@@ -114,7 +126,9 @@ Item {
 	Component.onCompleted: {
 		Events.subscribeEvent("AppSizeChanged", onAppSizeChanged)
 		applyPreselectedIds()
-		dataProvider.updateModel(0)
+		if (root.dataProvider){
+			root.dataProvider.updateModel(0)
+		}
 	}
 
 	Component.onDestruction: {
@@ -198,25 +212,22 @@ Item {
 		return result
 	}
 
-	// --- Data Provider ---
-	FilterableSelectDataProvider {
-		id: dataProvider
+	// --- Data provider connection ---
+	Connections {
+		target: root.dataProvider
 
-		commandId: root.commandId
-		fields: root.fields
-		textFilteringInfoIds: root.textFilteringInfoIds
-		sortByField: root.sortByField
-		orderType: root.orderType
-		count: root.pageCount
+		onModelUpdated: {
+			if (!root.dataProvider){
+				return
+			}
 
-		onFilterableModelUpdated: {
-			if (dataProvider.offset === 0){
-				root.model = dataProvider.collectionModel
+			if (root.dataProvider.offset === 0){
+				root.model = root.dataProvider.collectionModel
 				root.endListStatus = false
 				root.selectedIndex = -1
 			}
 			else {
-				let newItems = dataProvider.collectionModel
+				let newItems = root.dataProvider.collectionModel
 				if (!newItems || newItems.getItemsCount() <= 0){
 					root.endListStatus = true
 				}
@@ -228,12 +239,12 @@ Item {
 				}
 			}
 
-			if (dataProvider.collectionModel){
-				dataProvider.collectionModel.refresh()
+			if (root.dataProvider.collectionModel){
+				root.dataProvider.collectionModel.refresh()
 			}
 		}
 
-		onFilterableModelFailed: {
+		onFailed: {
 			ModalDialogManager.showErrorDialog(message)
 		}
 	}
@@ -244,8 +255,11 @@ Item {
 
 		duration: root.debounceInterval
 		onFinished: {
-			dataProvider.applyTextFilter(filterField.text)
-			dataProvider.resetAndFetch()
+			if (root.dataProvider){
+				root.dataProvider.filter.setTextFilter(filterField.text)
+				root.dataProvider.offset = 0
+				root.dataProvider.updateModel(0)
+			}
 		}
 	}
 
@@ -319,7 +333,7 @@ Item {
 			height: 50
 			radius: parent.radius
 			color: parent.color
-			visible: root.model ? root.model.getItemsCount() === 0 && dataProvider.state.toLowerCase() === "ready" : true
+			visible: root.model ? root.model.getItemsCount() === 0 && root.dataProvider && root.dataProvider.state.toLowerCase() === "ready" : !root.dataProvider
 
 			Text {
 				anchors.centerIn: parent
@@ -335,7 +349,7 @@ Item {
 			anchors.fill: parent
 			opacity: 0.5
 			color: "transparent"
-			visible: dataProvider.state.toLowerCase() !== "ready"
+			visible: root.dataProvider ? root.dataProvider.state.toLowerCase() !== "ready" : false
 
 			Text {
 				anchors.centerIn: parent
@@ -387,7 +401,7 @@ Item {
 
 		width: root.itemWidth
 		height: visible ? 30 : 0
-		visible: !root.endListStatus && root.model && root.model.getItemsCount() > 0 && dataProvider.state.toLowerCase() !== "ready"
+		visible: !root.endListStatus && root.model && root.model.getItemsCount() > 0 && root.dataProvider && root.dataProvider.state.toLowerCase() !== "ready"
 
 		Text {
 			anchors.centerIn: parent
@@ -413,11 +427,17 @@ Item {
 
 	// --- Infinite scroll ---
 	function requestNextBatch(){
-		if (root.endListStatus || dataProvider.state.toLowerCase() !== "ready"){
+		if (!root.dataProvider || root.endListStatus){
+			return
+		}
+		if (root.dataProvider.state.toLowerCase() !== "ready"){
 			return
 		}
 
-		dataProvider.fetchNextPage()
+		let currentCount = root.dataProvider.collectionModel ? root.dataProvider.collectionModel.getItemsCount() : 0
+		if (currentCount > 0 && currentCount > root.dataProvider.offset){
+			root.dataProvider.updateModel(root.dataProvider.offset + root.dataProvider.count)
+		}
 	}
 
 	// --- Keyboard navigation ---

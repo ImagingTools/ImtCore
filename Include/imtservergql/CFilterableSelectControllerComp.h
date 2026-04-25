@@ -11,21 +11,24 @@ namespace imtservergql
 
 
 class CFilterableSelectControllerComp:
-		public sdl::imtbase::FilterableSelect::CFilterableSelectCollectionControllerCompBase
+		public sdl::imtbase::FilterableSelect::CGraphQlHandlerCompBase
 {
 public:
-	typedef sdl::imtbase::FilterableSelect::CFilterableSelectCollectionControllerCompBase BaseClass;
+	typedef sdl::imtbase::FilterableSelect::CGraphQlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CFilterableSelectControllerComp);
+		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection providing selectable items", true, "ObjectCollection");
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::imtbase::FilterableSelect::CFilterableSelectCollectionControllerCompBase)
-	virtual bool CreateRepresentationFromObject(
-				const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-				const sdl::imtbase::FilterableSelect::CFilterableSelectListGqlRequest& listRequest,
-				sdl::imtbase::FilterableSelect::CSelectableItemData::V1_0& representationObject,
+	// reimplemented (sdl::imtbase::FilterableSelect::CGraphQlHandlerCompBase)
+	virtual sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload OnGetSelectableItems(
+				const sdl::imtbase::FilterableSelect::CGetSelectableItemsGqlRequest& getSelectableItemsRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+
+private:
+	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
 };
 
 

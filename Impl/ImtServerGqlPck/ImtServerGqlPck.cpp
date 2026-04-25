@@ -180,6 +180,11 @@ I_EXPORT_COMPONENT(
 			"GraphQL context creator",
 			"GraphQL GQL Context Creator");
 
+I_EXPORT_COMPONENT(
+			FilterableSelectController,
+			"Filterable select items controller",
+			"Filterable Select Controller");
+
 \
 } // namespace ImtServerGqlPck
 
