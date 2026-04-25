@@ -28,9 +28,9 @@ namespace imt3dgui
 
 // static members — identical values to COpenGLWidget
 
-const float     CRhiWidget::s_verticalAngle = 45.0f;
-const float     CRhiWidget::s_nearPlane     = 0.1f;
-const float     CRhiWidget::s_farPlane      = 100.0f;
+const float CRhiWidget::s_verticalAngle = 45.0f;
+const float CRhiWidget::s_nearPlane = 0.1f;
+const float CRhiWidget::s_farPlane = 100.0f;
 const QVector3D CRhiWidget::s_lightPosition(1.2f, 1.0f, 2.0f);
 const QVector3D CRhiWidget::s_lightColor(1.0f, 1.0f, 1.0f);
 
@@ -350,7 +350,7 @@ void CRhiWidget::render(QRhiCommandBuffer* cb)
 				cb,
 				renderTarget()->renderPassDescriptor());
 
-	const imt3dview::SSceneState state = BuildSceneState();
+	const imt3dview::SceneState state = BuildSceneState();
 	m_backend.BeginFrame(state);
 	m_scene.Render(m_backend);
 	m_backend.EndFrame();
@@ -636,25 +636,31 @@ void CRhiWidget::MouseMoveSelection(QMouseEvent& e)
 }
 
 
-imt3dview::SSceneState CRhiWidget::BuildSceneState() const
+imt3dview::SceneState CRhiWidget::BuildSceneState() const
 {
-	imt3dview::SSceneState state;
+	imt3dview::SceneState state;
 
 	if (m_cameraPtr){
 		state.cameraPosition = m_cameraPtr->GetPosition();
-		state.viewMatrix     = m_cameraPtr->GetViewMatrix();
+		state.viewMatrix = m_cameraPtr->GetViewMatrix();
 	}
 
 	state.projectionMatrix = GetProjectionMatrix();
-	state.viewport         = rect();
-	state.lightPosition    = s_lightPosition;
-	state.lightColor       = s_lightColor;
-	state.clearColor       = m_backgroundColor;
+	state.viewport = rect();
+	state.lightPosition = s_lightPosition;
+	state.lightColor = s_lightColor;
+	state.clearColor = m_backgroundColor;
 
-	int hints = imt3dview::SSceneState::RH_NONE;
-	if (m_renderHints & RH_ANTIALIASING){ hints |= imt3dview::SSceneState::RH_ANTIALIASING; }
-	if (m_renderHints & RH_CULLFACE)    { hints |= imt3dview::SSceneState::RH_CULLFACE; }
-	if (m_renderHints & RH_BLEND)       { hints |= imt3dview::SSceneState::RH_BLEND; }
+	int hints = imt3dview::SceneState::RH_NONE;
+	if (m_renderHints & RH_ANTIALIASING){
+		hints |= imt3dview::SceneState::RH_ANTIALIASING;
+	}
+	if (m_renderHints & RH_CULLFACE){
+		hints |= imt3dview::SceneState::RH_CULLFACE;
+	}
+	if (m_renderHints & RH_BLEND){
+		hints |= imt3dview::SceneState::RH_BLEND;
+	}
 	state.renderHints = hints;
 
 	return state;
@@ -663,9 +669,9 @@ imt3dview::SSceneState CRhiWidget::BuildSceneState() const
 
 QMatrix4x4 CRhiWidget::GetProjectionMatrix() const
 {
-	const float w           = static_cast<float>(width());
-	const float h           = static_cast<float>(height());
-	const float aspectRatio = w / (h > 0.0f ? h : 1.0f);
+	float w = static_cast<float>(width());
+	float h = static_cast<float>(height());
+	float aspectRatio = w / (h > 0.0f ? h : 1.0f);
 
 	QMatrix4x4 projection;
 	projection.setToIdentity();
@@ -701,7 +707,7 @@ void CRhiWidget::GetFovRect(float aspectRatio, float nearPlane, float& outWidth,
 {
 	const float fovY = s_verticalAngle * static_cast<float>(M_PI) / 180.0f;
 	outHeight = 2.0f * nearPlane * std::tan(fovY / 2.0f);
-	outWidth  = outHeight * aspectRatio;
+	outWidth = outHeight * aspectRatio;
 }
 
 

@@ -18,8 +18,8 @@
 #include <imt3dgui/IShape3d.h>
 #include <imt3dview/IRenderBackend.h>
 #include <imt3dview/IRenderResource.h>
-#include <imt3dview/SDrawCommand.h>
-#include <imt3dview/SMaterial.h>
+#include <imt3dview/DrawCommand.h>
+#include <imt3dview/Material.h>
 
 
 namespace imt3dgui
@@ -78,14 +78,14 @@ protected:
 	/**
 		Backend-neutral primitive type for this shape (Triangles, Lines, Points, ...).
 	*/
-	virtual imt3dview::EPrimitiveType GetPrimitiveType() const = 0;
+	virtual imt3dview::PrimitiveType GetPrimitiveType() const = 0;
 
 	/**
 		Fill in shape-specific material/uniform settings (line width, point size,
 		color mode, lighting, ...). The base implementation seeds default colorMode
 		and the GetColor()/HasNormals defaults; subclasses may further customize.
 	*/
-	virtual void FillMaterial(imt3dview::SMaterial& material) const;
+	virtual void FillMaterial(imt3dview::Material& material) const;
 
 protected:
 	void UpdateGeometry(const istd::IChangeable::ChangeSet& changeSet);

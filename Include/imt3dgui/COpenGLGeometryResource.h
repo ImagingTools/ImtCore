@@ -11,7 +11,7 @@
 
 // ImtCore includes
 #include <imt3dview/IRenderResource.h>
-#include <imt3dview/SVertexLayout.h>
+#include <imt3dview/VertexLayout.h>
 
 
 namespace imt3dgui
@@ -25,10 +25,10 @@ namespace imt3dgui
 class COpenGLGeometryResource: public imt3dview::IRenderResource
 {
 public:
-	COpenGLGeometryResource(const imt3dview::SVertexLayout& layout);
+	COpenGLGeometryResource(const imt3dview::VertexLayout& layout);
 	virtual ~COpenGLGeometryResource();
 
-	const imt3dview::SVertexLayout& GetLayout() const { return m_layout; }
+	const imt3dview::VertexLayout& GetLayout() const { return m_layout; }
 
 	QOpenGLBuffer& GetVertexBuffer() { return m_vertexBuffer; }
 	QOpenGLBuffer& GetIndexBuffer() { return m_indexBuffer; }
@@ -42,7 +42,7 @@ public:
 	void Destroy();
 
 private:
-	imt3dview::SVertexLayout m_layout;
+	imt3dview::VertexLayout m_layout;
 	QOpenGLBuffer m_vertexBuffer;
 	QOpenGLBuffer m_indexBuffer;
 	int m_indexCount;

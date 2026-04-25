@@ -65,16 +65,16 @@ void CWireShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& /*chang
 }
 
 
-imt3dview::EPrimitiveType CWireShape::GetPrimitiveType() const
+imt3dview::PrimitiveType CWireShape::GetPrimitiveType() const
 {
 	return imt3dview::PT_LINES;
 }
 
 
-void CWireShape::FillMaterial(imt3dview::SMaterial& material) const
+void CWireShape::FillMaterial(imt3dview::Material& material) const
 {
 	BaseClass::FillMaterial(material);
-	if (material.colorMode == imt3dview::SMaterial::CM_SOLID){
+	if (material.colorMode == imt3dview::Material::CM_SOLID){
 		material.solidColor = m_color;
 	}
 	material.lineWidth = 1.0f;

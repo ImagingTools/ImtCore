@@ -8,7 +8,7 @@
 
 // ImtCore includes
 #include <imt3dgui/COpenGLGeometryResource.h>
-#include <imt3dview/SSceneState.h>
+#include <imt3dview/SceneState.h>
 
 
 namespace imt3dgui
@@ -82,7 +82,7 @@ void COpenGLRenderBackend::Shutdown()
 }
 
 
-void COpenGLRenderBackend::BeginFrame(const imt3dview::SSceneState& sceneState)
+void COpenGLRenderBackend::BeginFrame(const imt3dview::SceneState& sceneState)
 {
 	if (!m_isInitialized || m_programPtr == nullptr || !m_programPtr->isLinked()){
 		return;
@@ -119,7 +119,7 @@ void COpenGLRenderBackend::EndFrame()
 }
 
 
-imt3dview::IRenderResourcePtr COpenGLRenderBackend::CreateGeometry(const imt3dview::SVertexLayout& layout)
+imt3dview::IRenderResourcePtr COpenGLRenderBackend::CreateGeometry(const imt3dview::VertexLayout& layout)
 {
 	auto geometry = std::make_shared<COpenGLGeometryResource>(layout);
 	if (!geometry->Create()){
@@ -169,7 +169,7 @@ void COpenGLRenderBackend::RefreshVertices(
 }
 
 
-void COpenGLRenderBackend::Draw(const imt3dview::SDrawCommand& command)
+void COpenGLRenderBackend::Draw(const imt3dview::DrawCommand& command)
 {
 	if (!m_isInitialized || m_programPtr == nullptr || !m_programPtr->isLinked()){
 		return;
@@ -230,7 +230,7 @@ void COpenGLRenderBackend::ApplyRenderHints(int renderHints)
 	functions->glEnable(GL_DEPTH_TEST);
 	functions->glDepthFunc(GL_LEQUAL);
 
-	if (renderHints & imt3dview::SSceneState::RH_ANTIALIASING){
+	if (renderHints & imt3dview::SceneState::RH_ANTIALIASING){
 		functions->glEnable(GL_LINE_SMOOTH);
 		functions->glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 		functions->glEnable(GL_POINT_SMOOTH);
@@ -243,7 +243,7 @@ void COpenGLRenderBackend::ApplyRenderHints(int renderHints)
 		functions->glHint(GL_POINT_SMOOTH_HINT, GL_DONT_CARE);
 	}
 
-	if (renderHints & imt3dview::SSceneState::RH_BLEND){
+	if (renderHints & imt3dview::SceneState::RH_BLEND){
 		functions->glEnable(GL_BLEND);
 		functions->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
@@ -252,7 +252,7 @@ void COpenGLRenderBackend::ApplyRenderHints(int renderHints)
 		functions->glBlendFunc(GL_SRC_ALPHA, GL_ZERO);
 	}
 
-	if (renderHints & imt3dview::SSceneState::RH_CULLFACE){
+	if (renderHints & imt3dview::SceneState::RH_CULLFACE){
 		functions->glCullFace(GL_BACK);
 		functions->glFrontFace(GL_CCW);
 	}
@@ -262,11 +262,11 @@ void COpenGLRenderBackend::ApplyRenderHints(int renderHints)
 }
 
 
-void COpenGLRenderBackend::ApplyAttributeBindings(const imt3dview::SVertexLayout& layout)
+void COpenGLRenderBackend::ApplyAttributeBindings(const imt3dview::VertexLayout& layout)
 {
 	const int stride = layout.stride;
 
-	for (const imt3dview::SVertexAttribute& attr : layout.attributes){
+	for (const imt3dview::VertexAttribute& attr : layout.attributes){
 		const char* name = nullptr;
 		switch (attr.attribute){
 		case imt3dview::VA_POSITION: name = "pointPosition"; break;
@@ -300,13 +300,13 @@ void COpenGLRenderBackend::DisableAttributes()
 }
 
 
-void COpenGLRenderBackend::ApplyMaterial(const imt3dview::SMaterial& material)
+void COpenGLRenderBackend::ApplyMaterial(const imt3dview::Material& material)
 {
 	switch (material.colorMode){
-	case imt3dview::SMaterial::CM_PER_VERTEX:
+	case imt3dview::Material::CM_PER_VERTEX:
 		m_programPtr->setUniformValue("colorMode", 0);
 		break;
-	case imt3dview::SMaterial::CM_SOLID:
+	case imt3dview::Material::CM_SOLID:
 	default:
 		m_programPtr->setUniformValue("colorMode", 1);
 		m_programPtr->setUniformValue("itemColor", material.solidColor);
@@ -321,7 +321,7 @@ void COpenGLRenderBackend::ApplyMaterial(const imt3dview::SMaterial& material)
 }
 
 
-GLenum COpenGLRenderBackend::ToGlPrimitive(imt3dview::EPrimitiveType type)
+GLenum COpenGLRenderBackend::ToGlPrimitive(imt3dview::PrimitiveType type)
 {
 	switch (type){
 	case imt3dview::PT_TRIANGLES:  return GL_TRIANGLES;

@@ -170,14 +170,14 @@ void CRulerShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& /*chan
 
 // reimplement (imt3dgui::CShape3dBase)
 
-imt3dview::EPrimitiveType CRulerShape::GetPrimitiveType() const
+imt3dview::PrimitiveType CRulerShape::GetPrimitiveType() const
 {
 	// Default; the actual primitive used per sub-pass is set in Render()
 	return imt3dview::PT_LINES;
 }
 
 
-void CRulerShape::FillMaterial(imt3dview::SMaterial& material) const
+void CRulerShape::FillMaterial(imt3dview::Material& material) const
 {
 	BaseClass::FillMaterial(material);
 }
@@ -194,7 +194,7 @@ void CRulerShape::Render(imt3dview::IRenderBackend& backend)
 		return;
 	}
 
-	imt3dview::SDrawCommand command;
+	imt3dview::DrawCommand command;
 	command.geometry = m_geometry;
 	command.modelMatrix = GetModelMatrix();
 

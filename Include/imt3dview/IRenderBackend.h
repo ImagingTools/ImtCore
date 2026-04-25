@@ -11,9 +11,9 @@
 
 // ImtCore includes
 #include <imt3dview/IRenderResource.h>
-#include <imt3dview/SDrawCommand.h>
-#include <imt3dview/SSceneState.h>
-#include <imt3dview/SVertexLayout.h>
+#include <imt3dview/DrawCommand.h>
+#include <imt3dview/SceneState.h>
+#include <imt3dview/VertexLayout.h>
 
 
 namespace imt3dview
@@ -43,7 +43,7 @@ public:
 	/**
 		Begin a frame: clear, apply scene-wide state and global uniforms.
 	*/
-	virtual void BeginFrame(const SSceneState& sceneState) = 0;
+	virtual void BeginFrame(const SceneState& sceneState) = 0;
 
 	/**
 		Finish a frame.
@@ -53,7 +53,7 @@ public:
 	/**
 		Create a new geometry resource for the given vertex layout.
 	*/
-	virtual IRenderResourcePtr CreateGeometry(const SVertexLayout& layout) = 0;
+	virtual IRenderResourcePtr CreateGeometry(const VertexLayout& layout) = 0;
 
 	/**
 		Upload vertex data and indices into a previously created geometry resource.
@@ -76,7 +76,7 @@ public:
 	/**
 		Issue a single draw call: bind geometry, set per-draw uniforms, draw primitives.
 	*/
-	virtual void Draw(const SDrawCommand& command) = 0;
+	virtual void Draw(const DrawCommand& command) = 0;
 
 	/**
 		Explicitly destroy a backend-owned resource. Optional; releasing the last shared_ptr

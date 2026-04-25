@@ -202,16 +202,16 @@ void CPointCloudShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& c
 }
 
 
-imt3dview::EPrimitiveType CPointCloudShape::GetPrimitiveType() const
+imt3dview::PrimitiveType CPointCloudShape::GetPrimitiveType() const
 {
 	return imt3dview::PT_POINTS;
 }
 
 
-void CPointCloudShape::FillMaterial(imt3dview::SMaterial& material) const
+void CPointCloudShape::FillMaterial(imt3dview::Material& material) const
 {
 	BaseClass::FillMaterial(material);
-	if (material.colorMode == imt3dview::SMaterial::CM_SOLID){
+	if (material.colorMode == imt3dview::Material::CM_SOLID){
 		material.solidColor = m_color;
 	}
 	material.usePointSize = true;

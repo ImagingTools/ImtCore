@@ -131,7 +131,7 @@ private:
 	void MousePressSelection(QMouseEvent& e);
 	void MouseMoveView(QMouseEvent& e);
 	void MouseMoveSelection(QMouseEvent& e);
-	imt3dview::SSceneState BuildSceneState() const;
+	imt3dview::SceneState BuildSceneState() const;
 	QMatrix4x4 GetProjectionMatrix() const;
 	static void GetFovRect(float aspectRatio, float nearPlane, float& width, float& height);
 

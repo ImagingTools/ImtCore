@@ -11,9 +11,9 @@ namespace imt3dview
 
 
 /**
-	Backend-neutral primitive type used by SDrawCommand.
+	Backend-neutral primitive type used by DrawCommand.
 */
-enum EPrimitiveType
+enum PrimitiveType
 {
 	PT_TRIANGLES = 0,
 	PT_LINES,
@@ -27,15 +27,15 @@ enum EPrimitiveType
 	Aggregates the per-shape state previously set inline in CShape3dBase::DrawGl
 	and the subclass-specific DrawShapeGl methods.
 */
-struct SMaterial
+struct Material
 {
-	enum EColorMode
+	enum ColorMode
 	{
 		CM_PER_VERTEX = 0,	// pointColor attribute
 		CM_SOLID = 1		// itemColor uniform
 	};
 
-	EColorMode colorMode = CM_SOLID;
+	ColorMode colorMode = CM_SOLID;
 	QVector3D solidColor;
 	float pointSize = 1.0f;
 	float lineWidth = 1.0f;

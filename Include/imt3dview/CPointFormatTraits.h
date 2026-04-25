@@ -4,7 +4,7 @@
 
 // ImtCore includes
 #include <imt3d/IPointsBasedObject.h>
-#include <imt3dview/SVertexLayout.h>
+#include <imt3dview/VertexLayout.h>
 
 
 namespace imt3dview
@@ -13,7 +13,7 @@ namespace imt3dview
 
 /**
 	Centralized mapping from imt3d::IPointsBasedObject::PointFormat to a backend-neutral
-	SVertexLayout. Replaces the duplicated switch-by-PointFormat blocks that used to live
+	VertexLayout. Replaces the duplicated switch-by-PointFormat blocks that used to live
 	in CShape3dBase::DrawGl.
 */
 class CPointFormatTraits
@@ -22,7 +22,7 @@ public:
 	/**
 		Build a vertex layout describing the interleaved point format.
 	*/
-	static SVertexLayout BuildLayout(imt3d::IPointsBasedObject::PointFormat format);
+	static VertexLayout BuildLayout(imt3d::IPointsBasedObject::PointFormat format);
 
 	/**
 		True if the given point format carries per-vertex normal data.

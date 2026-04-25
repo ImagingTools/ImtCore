@@ -7,7 +7,7 @@
 
 // ImtCore includes
 #include <imt3dview/IRenderResource.h>
-#include <imt3dview/SMaterial.h>
+#include <imt3dview/Material.h>
 
 
 namespace imt3dview
@@ -18,13 +18,13 @@ namespace imt3dview
 	Backend-neutral description of a single draw call. Built by IScene3dItem::Render
 	and consumed by IRenderBackend::Draw.
 */
-struct SDrawCommand
+struct DrawCommand
 {
 	IRenderResourcePtr geometry;
-	EPrimitiveType primitive = PT_TRIANGLES;
+	PrimitiveType primitive = PT_TRIANGLES;
 	int indexCount = 0;
 	int indexOffset = 0;
-	SMaterial material;
+	Material material;
 	QMatrix4x4 modelMatrix;
 };
 

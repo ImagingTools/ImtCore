@@ -18,9 +18,9 @@ namespace imt3dview
 	Replaces the global GL uniforms previously set inline in COpenGLWidget::SetGlUniformValues
 	and the GL flags previously set in COpenGLWidget::SetGlFlags.
 */
-struct SSceneState
+struct SceneState
 {
-	enum ERenderHint
+	enum RenderHint
 	{
 		RH_NONE = 0,
 		RH_ANTIALIASING = 0x1,

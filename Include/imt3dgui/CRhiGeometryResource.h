@@ -7,7 +7,7 @@
 
 // ImtCore includes
 #include <imt3dview/IRenderResource.h>
-#include <imt3dview/SVertexLayout.h>
+#include <imt3dview/VertexLayout.h>
 
 
 namespace imt3dgui
@@ -16,7 +16,7 @@ namespace imt3dgui
 
 /**
 	Qt RHI geometry resource: a pair of QRhiBuffer objects (vertex + index) together
-	with the source SVertexLayout (kept so that CRhiRenderBackend can convert from the
+	with the source VertexLayout (kept so that CRhiRenderBackend can convert from the
 	original format to the canonical upload format on demand).
 
 	The vertex buffer always stores data in the **canonical 9-float** interleaved format:
@@ -33,7 +33,7 @@ public:
 	// Total size of one canonical vertex in bytes (9 floats × 4 bytes).
 	static constexpr int s_canonicalStride = 9 * sizeof(float);
 
-	explicit CRhiGeometryResource(QRhi* rhi, const imt3dview::SVertexLayout& sourceLayout);
+	explicit CRhiGeometryResource(QRhi* rhi, const imt3dview::VertexLayout& sourceLayout);
 	~CRhiGeometryResource() override;
 
 	// Allocate / reallocate GPU buffers for the given counts.
@@ -48,14 +48,14 @@ public:
 	QRhiBuffer* GetVertexBuffer() const { return m_vertexBuffer; }
 	QRhiBuffer* GetIndexBuffer()  const { return m_indexBuffer; }
 
-	const imt3dview::SVertexLayout& GetSourceLayout() const { return m_sourceLayout; }
+	const imt3dview::VertexLayout& GetSourceLayout() const { return m_sourceLayout; }
 
 	int  GetIndexCount() const      { return m_indexCount; }
 	void SetIndexCount(int n)       { m_indexCount = n; }
 
 private:
 	QRhi*                    m_rhi;
-	imt3dview::SVertexLayout m_sourceLayout;
+	imt3dview::VertexLayout m_sourceLayout;
 	QRhiBuffer*              m_vertexBuffer = nullptr;
 	QRhiBuffer*              m_indexBuffer  = nullptr;
 	int                      m_indexCount   = 0;

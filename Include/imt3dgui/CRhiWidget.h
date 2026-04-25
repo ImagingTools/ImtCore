@@ -53,8 +53,8 @@ public:
 	enum RenderHint
 	{
 		RH_ANTIALIASING = 0x1,
-		RH_CULLFACE     = 0x2,
-		RH_BLEND        = 0x4
+		RH_CULLFACE = 0x2,
+		RH_BLEND = 0x4
 	};
 
 	I_DECLARE_FLAGS(RenderHints, RH_ANTIALIASING, RH_CULLFACE, RH_BLEND);
@@ -126,39 +126,39 @@ private:
 	void MousePressSelection(QMouseEvent& e);
 	void MouseMoveView(QMouseEvent& e);
 	void MouseMoveSelection(QMouseEvent& e);
-	imt3dview::SSceneState BuildSceneState() const;
+	imt3dview::SceneState BuildSceneState() const;
 	QMatrix4x4 GetProjectionMatrix() const;
 	static void GetFovRect(float aspectRatio, float nearPlane, float& width, float& height);
 
 private:
 	QPoint m_mouseClickPosition;
 	QPoint m_prevMousePosition;
-	QRect  m_selectionRect;
+	QRect m_selectionRect;
 
-	imt3dgui::ISceneEventHandler* m_eventHandlerPtr  = nullptr;
-	imt3dview::CScene3d           m_scene;
-	imt3dgui::CRhiRenderBackend   m_backend;
-	imt3dview::IScene3dCamera*    m_cameraPtr         = nullptr;
+	imt3dgui::ISceneEventHandler* m_eventHandlerPtr = nullptr;
+	imt3dview::CScene3d m_scene;
+	imt3dgui::CRhiRenderBackend m_backend;
+	imt3dview::IScene3dCamera* m_cameraPtr = nullptr;
 
-	QTimer            m_timer;
+	QTimer m_timer;
 	QVariantAnimation m_cameraRotationAnimation;
 	QVariantAnimation m_cameraPositionAnimation;
 
-	int            m_renderHints   = 0;
-	ViewMode       m_viewMode      = VM_VIEW;
-	SelectionMode  m_selectionMode = SM_POINT;
-	RotationMode   m_rotationMode  = RTM_FREE;
+	int m_renderHints = 0;
+	ViewMode m_viewMode = VM_VIEW;
+	SelectionMode m_selectionMode = SM_POINT;
+	RotationMode m_rotationMode = RTM_FREE;
 	ProjectionMode m_projectionMode = PM_PERSPECTIVE;
 
 	QColor m_backgroundColor{ Qt::black };
 
 	bool m_backendReady = false;
 
-	static const float      s_verticalAngle;
-	static const float      s_nearPlane;
-	static const float      s_farPlane;
-	static const QVector3D  s_lightPosition;
-	static const QVector3D  s_lightColor;
+	static const float s_verticalAngle;
+	static const float s_nearPlane;
+	static const float s_farPlane;
+	static const QVector3D s_lightPosition;
+	static const QVector3D s_lightColor;
 };
 
 

@@ -255,7 +255,7 @@ void CShape3dBase::Render(imt3dview::IRenderBackend& backend)
 		return;
 	}
 
-	imt3dview::SDrawCommand command;
+	imt3dview::DrawCommand command;
 	command.geometry = m_geometry;
 	command.primitive = GetPrimitiveType();
 	command.indexCount = m_indices.size();
@@ -275,13 +275,13 @@ void CShape3dBase::DrawOverlay(QPainter& /*painter*/)
 
 // protected methods
 
-void CShape3dBase::FillMaterial(imt3dview::SMaterial& material) const
+void CShape3dBase::FillMaterial(imt3dview::Material& material) const
 {
 	if (m_pointsDataPtr != nullptr && imt3dview::CPointFormatTraits::HasColor(m_pointsDataPtr->GetPointFormat())){
-		material.colorMode = imt3dview::SMaterial::CM_PER_VERTEX;
+		material.colorMode = imt3dview::Material::CM_PER_VERTEX;
 	}
 	else{
-		material.colorMode = imt3dview::SMaterial::CM_SOLID;
+		material.colorMode = imt3dview::Material::CM_SOLID;
 		material.solidColor = GetColor();
 	}
 
@@ -362,7 +362,7 @@ void CShape3dBase::CreateGeometry()
 
 	// (re)create the backend resource if format changed or it doesn't yet exist
 	if (!m_geometry || m_geometryFormat != pointFormat){
-		imt3dview::SVertexLayout layout = imt3dview::CPointFormatTraits::BuildLayout(pointFormat);
+		imt3dview::VertexLayout layout = imt3dview::CPointFormatTraits::BuildLayout(pointFormat);
 		// fall back to the actual stride reported by the points object in case of unknown formats
 		if (layout.stride == 0){
 			layout.stride = m_pointsDataPtr->GetPointBytesSize();

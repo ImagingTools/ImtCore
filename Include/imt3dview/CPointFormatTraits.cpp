@@ -8,14 +8,14 @@ namespace imt3dview
 
 // public methods
 
-SVertexLayout CPointFormatTraits::BuildLayout(imt3d::IPointsBasedObject::PointFormat format)
+VertexLayout CPointFormatTraits::BuildLayout(imt3d::IPointsBasedObject::PointFormat format)
 {
-	SVertexLayout layout;
+	VertexLayout layout;
 
 	switch (format){
 	case imt3d::IPointsBasedObject::PF_XYZ_32:
 		{
-			SVertexAttribute pos;
+			VertexAttribute pos;
 			pos.attribute = VA_POSITION;
 			pos.type = AT_FLOAT_32;
 			pos.componentCount = 3;
@@ -27,7 +27,7 @@ SVertexLayout CPointFormatTraits::BuildLayout(imt3d::IPointsBasedObject::PointFo
 
 	case imt3d::IPointsBasedObject::PF_XYZ_64:
 		{
-			SVertexAttribute pos;
+			VertexAttribute pos;
 			pos.attribute = VA_POSITION;
 			pos.type = AT_FLOAT_64;
 			pos.componentCount = 3;
@@ -39,7 +39,7 @@ SVertexLayout CPointFormatTraits::BuildLayout(imt3d::IPointsBasedObject::PointFo
 
 	case imt3d::IPointsBasedObject::PF_XYZ_ABC_32:
 		{
-			SVertexAttribute pos;
+			VertexAttribute pos;
 			pos.attribute = VA_POSITION;
 			pos.type = AT_FLOAT_32;
 			pos.componentCount = 3;
@@ -51,7 +51,7 @@ SVertexLayout CPointFormatTraits::BuildLayout(imt3d::IPointsBasedObject::PointFo
 
 	case imt3d::IPointsBasedObject::PF_XYZW_32:
 		{
-			SVertexAttribute pos;
+			VertexAttribute pos;
 			pos.attribute = VA_POSITION;
 			pos.type = AT_FLOAT_32;
 			pos.componentCount = 3;
@@ -63,14 +63,14 @@ SVertexLayout CPointFormatTraits::BuildLayout(imt3d::IPointsBasedObject::PointFo
 
 	case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32:
 		{
-			SVertexAttribute pos;
+			VertexAttribute pos;
 			pos.attribute = VA_POSITION;
 			pos.type = AT_FLOAT_32;
 			pos.componentCount = 3;
 			pos.offset = 0;
 			layout.attributes.push_back(pos);
 
-			SVertexAttribute normal;
+			VertexAttribute normal;
 			normal.attribute = VA_NORMAL;
 			normal.type = AT_FLOAT_32;
 			normal.componentCount = 3;
@@ -83,21 +83,21 @@ SVertexLayout CPointFormatTraits::BuildLayout(imt3d::IPointsBasedObject::PointFo
 
 	case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32:
 		{
-			SVertexAttribute pos;
+			VertexAttribute pos;
 			pos.attribute = VA_POSITION;
 			pos.type = AT_FLOAT_32;
 			pos.componentCount = 3;
 			pos.offset = 0;
 			layout.attributes.push_back(pos);
 
-			SVertexAttribute normal;
+			VertexAttribute normal;
 			normal.attribute = VA_NORMAL;
 			normal.type = AT_FLOAT_32;
 			normal.componentCount = 3;
 			normal.offset = 4 * sizeof(float);
 			layout.attributes.push_back(normal);
 
-			SVertexAttribute color;
+			VertexAttribute color;
 			color.attribute = VA_COLOR;
 			color.type = AT_FLOAT_32;
 			color.componentCount = 3;
@@ -110,14 +110,14 @@ SVertexLayout CPointFormatTraits::BuildLayout(imt3d::IPointsBasedObject::PointFo
 
 	case imt3d::IPointsBasedObject::PF_XYZW_RGBA_32:
 		{
-			SVertexAttribute pos;
+			VertexAttribute pos;
 			pos.attribute = VA_POSITION;
 			pos.type = AT_FLOAT_32;
 			pos.componentCount = 3;
 			pos.offset = 0;
 			layout.attributes.push_back(pos);
 
-			SVertexAttribute color;
+			VertexAttribute color;
 			color.attribute = VA_COLOR;
 			color.type = AT_FLOAT_32;
 			color.componentCount = 3;

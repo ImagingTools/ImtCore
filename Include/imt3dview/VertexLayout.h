@@ -13,7 +13,7 @@ namespace imt3dview
 /**
 	Logical vertex attribute slots that the standard ImtCore shading pipeline understands.
 */
-enum EVertexAttribute
+enum VertexAttributeSlot
 {
 	VA_POSITION = 0,
 	VA_NORMAL,
@@ -24,7 +24,7 @@ enum EVertexAttribute
 /**
 	Component data type within a vertex attribute.
 */
-enum EAttrType
+enum AttrType
 {
 	AT_FLOAT_32 = 0,
 	AT_FLOAT_64,
@@ -35,10 +35,10 @@ enum EAttrType
 /**
 	Single attribute within a vertex layout.
 */
-struct SVertexAttribute
+struct VertexAttribute
 {
-	EVertexAttribute attribute = VA_POSITION;
-	EAttrType type = AT_FLOAT_32;
+	VertexAttributeSlot attribute = VA_POSITION;
+	AttrType type = AT_FLOAT_32;
 	int componentCount = 0;
 	int offset = 0;
 };
@@ -47,9 +47,9 @@ struct SVertexAttribute
 /**
 	Backend-neutral description of an interleaved vertex format.
 */
-struct SVertexLayout
+struct VertexLayout
 {
-	std::vector<SVertexAttribute> attributes;
+	std::vector<VertexAttribute> attributes;
 	int stride = 0;
 };
 

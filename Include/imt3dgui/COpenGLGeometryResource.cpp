@@ -8,7 +8,7 @@ namespace imt3dgui
 
 // public methods
 
-COpenGLGeometryResource::COpenGLGeometryResource(const imt3dview::SVertexLayout& layout)
+COpenGLGeometryResource::COpenGLGeometryResource(const imt3dview::VertexLayout& layout)
 	:m_layout(layout),
 	m_vertexBuffer(QOpenGLBuffer::VertexBuffer),
 	m_indexBuffer(QOpenGLBuffer::IndexBuffer),

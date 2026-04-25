@@ -507,7 +507,7 @@ void COpenGLWidget::OnCameraPositionAnimation(const QVariant& value)
 
 void COpenGLWidget::PaintGl()
 {
-	imt3dview::SSceneState sceneState = BuildSceneState();
+	imt3dview::SceneState sceneState = BuildSceneState();
 
 	m_backend.BeginFrame(sceneState);
 	m_scene.Render(m_backend);
@@ -642,9 +642,9 @@ void COpenGLWidget::MouseMoveSelection(QMouseEvent& e)
 }
 
 
-imt3dview::SSceneState COpenGLWidget::BuildSceneState() const
+imt3dview::SceneState COpenGLWidget::BuildSceneState() const
 {
-	imt3dview::SSceneState state;
+	imt3dview::SceneState state;
 
 	if (m_cameraPtr){
 		state.cameraPosition = m_cameraPtr->GetPosition();
@@ -657,15 +657,15 @@ imt3dview::SSceneState COpenGLWidget::BuildSceneState() const
 	state.lightColor = s_lightColor;
 	state.clearColor = m_backgroundColor;
 
-	int hints = imt3dview::SSceneState::RH_NONE;
+	int hints = imt3dview::SceneState::RH_NONE;
 	if (m_renderHints & RH_ANTIALIASING){
-		hints |= imt3dview::SSceneState::RH_ANTIALIASING;
+		hints |= imt3dview::SceneState::RH_ANTIALIASING;
 	}
 	if (m_renderHints & RH_CULLFACE){
-		hints |= imt3dview::SSceneState::RH_CULLFACE;
+		hints |= imt3dview::SceneState::RH_CULLFACE;
 	}
 	if (m_renderHints & RH_BLEND){
-		hints |= imt3dview::SSceneState::RH_BLEND;
+		hints |= imt3dview::SceneState::RH_BLEND;
 	}
 	state.renderHints = hints;
 

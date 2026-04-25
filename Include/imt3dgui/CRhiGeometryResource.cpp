@@ -8,7 +8,7 @@ namespace imt3dgui
 
 // public methods
 
-CRhiGeometryResource::CRhiGeometryResource(QRhi* rhi, const imt3dview::SVertexLayout& sourceLayout)
+CRhiGeometryResource::CRhiGeometryResource(QRhi* rhi, const imt3dview::VertexLayout& sourceLayout)
 	:m_rhi(rhi),
 	m_sourceLayout(sourceLayout)
 {

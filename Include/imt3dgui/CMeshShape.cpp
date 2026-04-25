@@ -205,16 +205,16 @@ void CMeshShape::DrawOverlay(QPainter& painter)
 }
 
 
-imt3dview::EPrimitiveType CMeshShape::GetPrimitiveType() const
+imt3dview::PrimitiveType CMeshShape::GetPrimitiveType() const
 {
 	return imt3dview::PT_TRIANGLES;
 }
 
 
-void CMeshShape::FillMaterial(imt3dview::SMaterial& material) const
+void CMeshShape::FillMaterial(imt3dview::Material& material) const
 {
 	BaseClass::FillMaterial(material);
-	if (material.colorMode == imt3dview::SMaterial::CM_SOLID){
+	if (material.colorMode == imt3dview::Material::CM_SOLID){
 		material.solidColor = m_color;
 	}
 }

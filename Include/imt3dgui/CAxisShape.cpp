@@ -130,13 +130,13 @@ void CAxisShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet & /*chan
 }
 
 
-imt3dview::EPrimitiveType CAxisShape::GetPrimitiveType() const
+imt3dview::PrimitiveType CAxisShape::GetPrimitiveType() const
 {
 	return imt3dview::PT_LINES;
 }
 
 
-void CAxisShape::FillMaterial(imt3dview::SMaterial& material) const
+void CAxisShape::FillMaterial(imt3dview::Material& material) const
 {
 	BaseClass::FillMaterial(material);
 	material.lineWidth = static_cast<float>(m_axisConfigs.value(AT_X).lineWidth);

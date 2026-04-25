@@ -25,8 +25,8 @@ namespace imt3dgui
 	OpenGL implementation of imt3dview::IRenderBackend.
 
 	Owns the QOpenGLShaderProgram (loaded from `:/Shaders/vshader.glsl` and
-	`:/Shaders/fshader.glsl`) and translates backend-neutral SDrawCommand /
-	SSceneState data into Qt OpenGL calls.
+	`:/Shaders/fshader.glsl`) and translates backend-neutral DrawCommand /
+	SceneState data into Qt OpenGL calls.
 */
 class COpenGLRenderBackend: public imt3dview::IRenderBackend
 {
@@ -43,9 +43,9 @@ public:
 	// reimplemented (imt3dview::IRenderBackend)
 	virtual bool Initialize() override;
 	virtual void Shutdown() override;
-	virtual void BeginFrame(const imt3dview::SSceneState& sceneState) override;
+	virtual void BeginFrame(const imt3dview::SceneState& sceneState) override;
 	virtual void EndFrame() override;
-	virtual imt3dview::IRenderResourcePtr CreateGeometry(const imt3dview::SVertexLayout& layout) override;
+	virtual imt3dview::IRenderResourcePtr CreateGeometry(const imt3dview::VertexLayout& layout) override;
 	virtual void UpdateGeometry(
 				imt3dview::IRenderResource& resource,
 				const void* vertexData,
@@ -56,16 +56,16 @@ public:
 				imt3dview::IRenderResource& resource,
 				const void* vertexData,
 				size_t vertexBytes) override;
-	virtual void Draw(const imt3dview::SDrawCommand& command) override;
+	virtual void Draw(const imt3dview::DrawCommand& command) override;
 	virtual void DestroyResource(imt3dview::IRenderResource& resource) override;
 
 private:
 	void ApplyRenderHints(int renderHints);
-	void ApplyAttributeBindings(const imt3dview::SVertexLayout& layout);
+	void ApplyAttributeBindings(const imt3dview::VertexLayout& layout);
 	void DisableAttributes();
-	void ApplyMaterial(const imt3dview::SMaterial& material);
+	void ApplyMaterial(const imt3dview::Material& material);
 
-	static GLenum ToGlPrimitive(imt3dview::EPrimitiveType type);
+	static GLenum ToGlPrimitive(imt3dview::PrimitiveType type);
 
 private:
 	QOpenGLContext* m_contextPtr;

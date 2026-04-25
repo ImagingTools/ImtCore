@@ -9,7 +9,7 @@
 
 // ImtCore includes
 #include <imt3dgui/CRhiGeometryResource.h>
-#include <imt3dview/SSceneState.h>
+#include <imt3dview/SceneState.h>
 
 
 namespace imt3dgui
@@ -35,10 +35,10 @@ void CRhiRenderBackend::SetRhiContext(
 			QRhiCommandBuffer* commandBuffer,
 			QRhiRenderPassDescriptor* renderPassDescriptor)
 {
-	m_rhi           = rhi;
-	m_renderTarget  = renderTarget;
+	m_rhi = rhi;
+	m_renderTarget = renderTarget;
 	m_commandBuffer = commandBuffer;
-	m_rpDesc        = renderPassDescriptor;
+	m_rpDesc = renderPassDescriptor;
 }
 
 
@@ -53,7 +53,7 @@ bool CRhiRenderBackend::Initialize()
 	}
 
 	// Load pre-compiled QSB shaders (produced by qt_add_shaders at build time).
-	m_vertexShader   = LoadShader(":/RhiShaders/vshader_rhi.vert.qsb");
+	m_vertexShader = LoadShader(":/RhiShaders/vshader_rhi.vert.qsb");
 	m_fragmentShader = LoadShader(":/RhiShaders/fshader_rhi.frag.qsb");
 	if (!m_vertexShader.isValid() || !m_fragmentShader.isValid()){
 		qDebug() << "CRhiRenderBackend::Initialize: failed to load RHI shaders from Qt resources";
@@ -107,20 +107,23 @@ void CRhiRenderBackend::Shutdown()
 	}
 	m_pipelines.clear();
 
-	delete m_srb;      m_srb      = nullptr;
-	delete m_globalUbo; m_globalUbo = nullptr;
-	delete m_drawUbo;  m_drawUbo  = nullptr;
+	delete m_srb;
+	m_srb = nullptr;
+	delete m_globalUbo;
+	m_globalUbo = nullptr;
+	delete m_drawUbo;
+	m_drawUbo = nullptr;
 
 	m_pendingDraws.clear();
 	m_pendingUploads.clear();
-	m_vertexShader   = QShader();
+	m_vertexShader = QShader();
 	m_fragmentShader = QShader();
 
 	m_initialized = false;
 }
 
 
-void CRhiRenderBackend::BeginFrame(const imt3dview::SSceneState& sceneState)
+void CRhiRenderBackend::BeginFrame(const imt3dview::SceneState& sceneState)
 {
 	m_sceneState = sceneState;
 	m_pendingDraws.clear();
@@ -201,7 +204,7 @@ void CRhiRenderBackend::EndFrame()
 				static_cast<float>(vp.height())));
 
 	const bool cullFace =
-		m_sceneState.renderHints & imt3dview::SSceneState::RH_CULLFACE;
+		m_sceneState.renderHints & imt3dview::SceneState::RH_CULLFACE;
 
 	// Issue draw calls.
 	for (int i = 0; i < effectiveDrawCount; ++i){
@@ -252,7 +255,7 @@ void CRhiRenderBackend::EndFrame()
 
 
 imt3dview::IRenderResourcePtr CRhiRenderBackend::CreateGeometry(
-			const imt3dview::SVertexLayout& layout)
+			const imt3dview::VertexLayout& layout)
 {
 	if (m_rhi == nullptr){
 		return {};
@@ -273,7 +276,7 @@ void CRhiRenderBackend::UpdateGeometry(
 		return;
 	}
 
-	const imt3dview::SVertexLayout& layout = geometry->GetSourceLayout();
+	const imt3dview::VertexLayout& layout = geometry->GetSourceLayout();
 	const int vertexCount =
 		(layout.stride > 0)
 			? static_cast<int>(vertexBytes) / layout.stride
@@ -286,9 +289,9 @@ void CRhiRenderBackend::UpdateGeometry(
 	geometry->SetIndexCount(static_cast<int>(indexCount));
 
 	PendingUpload upload;
-	upload.geometry   = geometry;
+	upload.geometry = geometry;
 	upload.vertexData = ConvertToCanonical(vertexData, vertexBytes, layout);
-	upload.indexData  = QByteArray(
+	upload.indexData = QByteArray(
 				reinterpret_cast<const char*>(indices),
 				static_cast<qsizetype>(indexCount * sizeof(quint32)));
 	upload.vertexOnly = false;
@@ -307,7 +310,7 @@ void CRhiRenderBackend::RefreshVertices(
 	}
 
 	PendingUpload upload;
-	upload.geometry   = geometry;
+	upload.geometry = geometry;
 	upload.vertexData = ConvertToCanonical(
 				vertexData, vertexBytes, geometry->GetSourceLayout());
 	upload.vertexOnly = true;
@@ -315,7 +318,7 @@ void CRhiRenderBackend::RefreshVertices(
 }
 
 
-void CRhiRenderBackend::Draw(const imt3dview::SDrawCommand& command)
+void CRhiRenderBackend::Draw(const imt3dview::DrawCommand& command)
 {
 	if (!m_initialized){
 		return;
@@ -338,7 +341,7 @@ void CRhiRenderBackend::DestroyResource(imt3dview::IRenderResource& resource)
 QByteArray CRhiRenderBackend::ConvertToCanonical(
 			const void* src,
 			size_t srcBytes,
-			const imt3dview::SVertexLayout& layout)
+			const imt3dview::VertexLayout& layout)
 {
 	if (layout.stride <= 0 || src == nullptr || srcBytes == 0){
 		return {};
@@ -349,19 +352,19 @@ QByteArray CRhiRenderBackend::ConvertToCanonical(
 				vertexCount * CRhiGeometryResource::s_canonicalStride,
 				Qt::Uninitialized);
 
-	const char* srcPtr    = static_cast<const char*>(src);
-	float*      dstFloats = reinterpret_cast<float*>(dst.data());
+	const char* srcPtr = static_cast<const char*>(src);
+	float* dstFloats = reinterpret_cast<float*>(dst.data());
 
 	// Locate attribute offsets within the source layout.
-	int posOffset    = -1;
+	int posOffset = -1;
 	int normalOffset = -1;
-	int colorOffset  = -1;
+	int colorOffset = -1;
 
-	for (const imt3dview::SVertexAttribute& attr : layout.attributes){
+	for (const imt3dview::VertexAttribute& attr : layout.attributes){
 		switch (attr.attribute){
-		case imt3dview::VA_POSITION: posOffset    = attr.offset; break;
+		case imt3dview::VA_POSITION: posOffset = attr.offset; break;
 		case imt3dview::VA_NORMAL:   normalOffset = attr.offset; break;
-		case imt3dview::VA_COLOR:    colorOffset  = attr.offset; break;
+		case imt3dview::VA_COLOR:    colorOffset = attr.offset; break;
 		}
 	}
 
@@ -500,27 +503,27 @@ QRhiGraphicsPipeline* CRhiRenderBackend::GetOrCreatePipeline(const PipelineKey& 
 
 
 void CRhiRenderBackend::FillGlobalUbo(
-			const imt3dview::SSceneState& state,
+			const imt3dview::SceneState& state,
 			GlobalUboData& out) const
 {
 	// QMatrix4x4 is stored column-major; memcpy gives the correct std140 representation.
 	memcpy(out.viewMatrix, state.viewMatrix.constData(), sizeof(out.viewMatrix));
 	memcpy(out.projMatrix, state.projectionMatrix.constData(), sizeof(out.projMatrix));
 
-	out.viewPosition[0]  = state.cameraPosition.x();
-	out.viewPosition[1]  = state.cameraPosition.y();
-	out.viewPosition[2]  = state.cameraPosition.z();
-	out.viewPosition[3]  = 0.0f;
+	out.viewPosition[0] = state.cameraPosition.x();
+	out.viewPosition[1] = state.cameraPosition.y();
+	out.viewPosition[2] = state.cameraPosition.z();
+	out.viewPosition[3] = 0.0f;
 
 	out.lightPosition[0] = state.lightPosition.x();
 	out.lightPosition[1] = state.lightPosition.y();
 	out.lightPosition[2] = state.lightPosition.z();
 	out.lightPosition[3] = 0.0f;
 
-	out.lightColor[0]    = state.lightColor.x();
-	out.lightColor[1]    = state.lightColor.y();
-	out.lightColor[2]    = state.lightColor.z();
-	out.lightColor[3]    = 0.0f;
+	out.lightColor[0] = state.lightColor.x();
+	out.lightColor[1] = state.lightColor.y();
+	out.lightColor[2] = state.lightColor.z();
+	out.lightColor[3] = 0.0f;
 }
 
 
@@ -528,7 +531,7 @@ void CRhiRenderBackend::FillDrawUbo(
 			const PendingDraw& pd,
 			DrawUboData& out) const
 {
-	const imt3dview::SDrawCommand& cmd = pd.command;
+	const imt3dview::DrawCommand& cmd = pd.command;
 
 	memcpy(out.modelMatrix, cmd.modelMatrix.constData(), sizeof(out.modelMatrix));
 
@@ -538,14 +541,14 @@ void CRhiRenderBackend::FillDrawUbo(
 	out.itemColor[3] = 0.0f;
 
 	out.colorMode =
-		(cmd.material.colorMode == imt3dview::SMaterial::CM_PER_VERTEX) ? 0 : 1;
-	out.useNormals   = cmd.material.useNormals   ? 1 : 0;
+		(cmd.material.colorMode == imt3dview::Material::CM_PER_VERTEX) ? 0 : 1;
+	out.useNormals = cmd.material.useNormals ? 1 : 0;
 	out.usePointSize = cmd.material.usePointSize ? 1 : 0;
-	out.pointSize    = cmd.material.pointSize;
+	out.pointSize = cmd.material.pointSize;
 }
 
 
-QRhiGraphicsPipeline::Topology CRhiRenderBackend::ToRhiTopology(imt3dview::EPrimitiveType pt)
+QRhiGraphicsPipeline::Topology CRhiRenderBackend::ToRhiTopology(imt3dview::PrimitiveType pt)
 {
 	switch (pt){
 	case imt3dview::PT_LINES:      return QRhiGraphicsPipeline::Lines;
