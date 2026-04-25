@@ -1,5 +1,7 @@
+// CubeMapTexture - 6-image cube map for skyboxes / IBL.
+// source is a comma-separated list of 6 URLs (px, nx, py, ny, pz, nz).
 import QtQuick 2.15
-import QtQuick3D 6.5 as QQ3D
 
-QQ3D.CubeMapTexture {
+QtObject {
+    property string source: ""
 }

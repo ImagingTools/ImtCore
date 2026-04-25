@@ -113,10 +113,15 @@ single `requestAnimationFrame`. Idle scenes don't burn CPU/GPU. A
 
 ## Desktop module
 
-`Qml/imt3dgui/` provides QML wrapper components that re-export QtQuick3D
-under the same names that the JQML web runtime understands. Apps written
-against `import imt3dgui 1.0` therefore compile to both worlds without any
-source-level changes.
+`Qml/imt3dgui/` provides pure-QML wrapper components (property-bag
+`QtObject`/`Item` types) that expose the same property API that the JQML web
+runtime understands.  Apps written against `import imt3dgui 1.0` therefore
+compile to both worlds without any source-level changes.
+
+On the desktop the actual 3D rendering is handled by the C++ backend
+(`CRhiWidget` / `COpenGLWidget`).  The QML types serve as a declarative
+scene-description layer and do **not** depend on the GPL-licensed QtQuick3D
+module.
 
 A small demo lives under `Qml/imt3dgui-demo/View3DDemo.qml`.
 
@@ -124,8 +129,8 @@ A small demo lives under `Qml/imt3dgui-demo/View3DDemo.qml`.
 
 - **Materials per submesh.** A `Model` currently applies only `materials[0]`
   to all submeshes; per-submesh assignment is a future iteration.
-- **Tone mapping / IBL fidelity.** Look matches Qt Quick 3D *approximately*;
-  exact pixel parity with QtQuick3D's QSSG renderer is out of scope.
+- **Tone mapping / IBL fidelity.** Look matches the JQML web backend *approximately*;
+  exact pixel parity with any particular 3D engine is out of scope.
 - **WebGPU.** Three.js' `WebGPURenderer` is API-compatible and can replace
   `WebGLRenderer` later.
 - **`pick()` on lights/cameras.** Only nodes with a hit-testable `THREE.Mesh`

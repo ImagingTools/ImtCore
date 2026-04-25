@@ -3,7 +3,7 @@
  *
  * Renders a red cube under a directional light, viewed by a perspective
  * camera tilted slightly downward. The same QML compiles to:
- *   - QtQuick3D on desktop (via the imt3dgui QML module)
+ *   - the desktop (via the imt3dgui pure-QML module)
  *   - three.js on the web   (via the JQML compiler & web runtime)
  */
 import QtQuick 2.15
@@ -20,10 +20,11 @@ Item {
         clearColor: "#202020"
 
         environment: SceneEnvironment {
-            backgroundMode: SceneEnvironment.Color
+            id: sceneEnv
+            backgroundMode: 0      // Color
             clearColor: "#202830"
-            antialiasingMode: SceneEnvironment.MSAA
-            antialiasingQuality: SceneEnvironment.High
+            antialiasingMode: 2    // MSAA
+            antialiasingQuality: 1 // High
         }
 
         camera: PerspectiveCamera {
@@ -55,9 +56,9 @@ Item {
             eulerRotation: Qt.vector3d(0, _spin, 0)
 
             // Drive the rotation through a full vector3d binding so the same
-            // QML works on the desktop (QtQuick3D) and on the web (JQML +
-            // three.js); animating sub-properties (e.g. `eulerRotation.y`)
-            // is a Qt-only QML feature not supported by the JQML compiler.
+            // QML works on the desktop and on the web (JQML + three.js);
+            // animating sub-properties (e.g. `eulerRotation.y`) is a Qt-only
+            // QML feature not supported by the JQML compiler.
             property real _spin: 0
             NumberAnimation on _spin {
                 from: 0; to: 360
