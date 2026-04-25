@@ -6,28 +6,63 @@ import imtcolgui 1.0
 import imtguigql 1.0
 import imtbaseFilterableSelectSdl 1.0
 
+/*!
+	\qmltype FilterableSelectGqlDataProvider
+	\inqmlmodule imtguigql
+	\brief GQL-based implementation of FilterableSelectDataProvider.
+
+	Uses GqlSdlRequestSender with SDL-generated types to fetch selectable items.
+	Normalizes SDL response objects to plain JS { id, title, description, icon, color }
+	before passing to the base provider.
+
+	\sa FilterableSelectDataProvider
+*/
 FilterableSelectDataProvider {
 	id: root
 
-	// HTTP headers
 	function getHeaders(){
 		return {}
 	}
 
+	property QtObject __gql: QtObject {
+		property int pendingRequestId: 0
+	}
+
 	property GetSelectableItemsInput getSelectableItemsInput: GetSelectableItemsInput {}
+	property CollectionFilter __filter: CollectionFilter {}
+
 	property GqlSdlRequestSender getSelectableItemsRequest: GqlSdlRequestSender {
 		gqlCommandId: ImtbaseFilterableSelectSdlCommandIds.s_getSelectableItems
 		sdlObjectComp: Component {
 			GetSelectableItemsPayload {
 				onFinished: {
-					root.listObjectsReceived(m_items)
+					let rid = root.__gql.pendingRequestId
+					let normalized = []
+					if (m_items){
+						let count = m_items.getItemsCount()
+						for (let i = 0; i < count; i++){
+							let id = m_items.getData("id", i)
+							let name = m_items.getData("name", i)
+							let desc = m_items.getData("description", i)
+							let icon = m_items.getData("icon", i)
+							let color = m_items.getData("color", i)
+							normalized.push({
+								id: id || "",
+								title: name || "",
+								description: desc || "",
+								icon: icon || "",
+								color: color || ""
+							})
+						}
+					}
+					root.onRequestSuccess(rid, normalized)
 				}
 			}
 		}
 
 		onFinished: {
 			if (status === -1){
-				root.listObjectsReceiveFailed(qsTr("Failed to load items"))
+				root.onRequestError(root.__gql.pendingRequestId, qsTr("Failed to load items"), "GQL_ERROR")
 			}
 		}
 
@@ -36,15 +71,19 @@ FilterableSelectDataProvider {
 		}
 	}
 
-	function getSelectableItems(count, offset, filter){
+	function executeRequest(requestId, count, offset, filter){
+		__gql.pendingRequestId = requestId
+
 		getSelectableItemsInput.m_collectionId = root.collectionId
 
 		var viewParams = getSelectableItemsInput.m_viewParams
 		viewParams.m_offset = offset || 0
 		viewParams.m_count = count || 20
 
-		if (filter){
-			viewParams.m_filterModel = filter
+		__filter.clearAllFilters(true)
+		if (filter && filter !== ""){
+			__filter.setTextFilter(filter)
+			viewParams.m_filterModel = __filter
 		}
 		else {
 			viewParams.m_filterModel = null

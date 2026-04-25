@@ -5,6 +5,26 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
 
+/*!
+	\qmltype FilterableSelectPopup
+	\inqmlmodule imtcolgui
+	\brief Reusable filterable select popup for large remote datasets.
+
+	Pure UI component — all data fetching, pagination and normalization are handled
+	by the injected \c dataProvider (FilterableSelectDataProvider).
+	The popup works only with normalized JS objects \c { id, title, ... }.
+
+	Supports:
+	- Debounced server-side search (300ms default)
+	- Infinite scroll via dataProvider.fetchMore()
+	- Single and multi selection (id-based, independent from visible dataset)
+	- Injectable delegate component with explicit roles (\c idRole, \c textRole)
+	- Keyboard navigation (↑↓ Enter Escape)
+	- Error display with click-to-retry
+	- Split loading states (initial vs page loading)
+
+	\sa FilterableSelectDataProvider, FilterableSelectGqlDataProvider
+*/
 Item {
 	id: root
 
@@ -18,8 +38,11 @@ Item {
 	property QtObject dataProvider: null
 
 	// --- Configuration ---
-	property int pageCount: 20
 	property int debounceInterval: 300
+
+	// --- Delegate roles ---
+	property string idRole: "id"
+	property string textRole: "title"
 
 	// --- Visual ---
 	property int itemWidth: Style.sizeHintXXS
@@ -40,17 +63,17 @@ Item {
 			textSize: root.textSize
 			fontColor: root.fontColor
 
-			text: model.name || ""
+			text: __internal.getItemText(model.index)
 
-			selected: __internal.selectedIndex === model.index
-			highlighted: root.isItemSelected(model.id)
+			selected: __internal.focusedIndex === model.index
+			highlighted: root.isItemSelected(__internal.getItemId(model.index))
 
 			onClicked: {
-				root.toggleSelection(model.id || "", model.index)
+				root.toggleSelection(__internal.getItemId(model.index), model.index)
 			}
 
 			onEntered: {
-				__internal.selectedIndex = model.index
+				__internal.focusedIndex = model.index
 			}
 		}
 	}
@@ -64,17 +87,37 @@ Item {
 	// --- Internal state ---
 	property QtObject __internal: QtObject {
 		property var selectedIds: ({})
-		property int currentOffset: 0
-		property var model: null
-		property int selectedIndex: -1
+		property int focusedIndex: -1
 		property bool hoverBlocked: true
-		property bool endListStatus: false
-		property bool isLoading: false
-		property bool hasError: false
-		property string errorMessage: ""
-	}
+		property var listModel: null
 
-	property CollectionFilter __filter: CollectionFilter {}
+		function getItemId(index){
+			if (!root.dataProvider || index < 0 || index >= root.dataProvider.items.length){
+				return ""
+			}
+			return String(root.dataProvider.items[index][root.idRole] || "")
+		}
+
+		function getItemText(index){
+			if (!root.dataProvider || index < 0 || index >= root.dataProvider.items.length){
+				return ""
+			}
+			return String(root.dataProvider.items[index][root.textRole] || "")
+		}
+
+		function rebuildModel(){
+			if (!root.dataProvider){
+				return
+			}
+			let items = root.dataProvider.items || []
+			if (!__internal.listModel){
+				__internal.listModel = items
+			}
+			else {
+				__internal.listModel = items
+			}
+		}
+	}
 
 	// --- Public API ---
 	function open(){
@@ -83,23 +126,20 @@ Item {
 		}
 
 		__internal.selectedIds = ({})
-		__internal.currentOffset = 0
-		__internal.model = null
-		__internal.selectedIndex = -1
+		__internal.focusedIndex = -1
 		__internal.hoverBlocked = true
-		__internal.endListStatus = false
-		__internal.isLoading = false
-		__internal.hasError = false
-		__internal.errorMessage = ""
+		__internal.listModel = []
 
-		__filter.clearAllFilters(true)
 		filterField.text = ""
 
 		applyPreselectedIds()
 
 		root.visible = true
 		root.opened()
-		requestItems(0)
+
+		if (root.dataProvider){
+			root.dataProvider.fetch("")
+		}
 	}
 
 	function close(){
@@ -112,7 +152,7 @@ Item {
 	}
 
 	function isItemSelected(itemId){
-		return itemId !== undefined && itemId !== null && __internal.selectedIds[String(itemId)] === true
+		return itemId !== undefined && itemId !== null && itemId !== "" && __internal.selectedIds[String(itemId)] === true
 	}
 
 	function toggleSelection(itemId, index){
@@ -171,29 +211,6 @@ Item {
 		__internal.selectedIds = selected
 	}
 
-	function requestItems(offset){
-		if (!root.dataProvider){
-			return
-		}
-
-		__internal.currentOffset = offset
-		__internal.isLoading = true
-		__internal.hasError = false
-		__internal.errorMessage = ""
-		root.dataProvider.getSelectableItems(root.pageCount, offset, root.__filter)
-	}
-
-	function requestNextBatch(){
-		if (!root.dataProvider || __internal.endListStatus || __internal.isLoading){
-			return
-		}
-
-		let currentCount = __internal.model ? __internal.model.getItemsCount() : 0
-		if (currentCount > 0){
-			requestItems(currentCount)
-		}
-	}
-
 	// --- Background overlay to close on outside click ---
 	MouseArea {
 		id: backgroundOverlay
@@ -213,38 +230,8 @@ Item {
 	Connections {
 		target: root.dataProvider
 
-		onListObjectsReceived: {
-			__internal.isLoading = false
-			__internal.hasError = false
-
-			if (__internal.currentOffset === 0){
-				__internal.model = listObjects
-				__internal.endListStatus = false
-				__internal.selectedIndex = -1
-			}
-			else {
-				if (!listObjects || listObjects.getItemsCount() <= 0){
-					__internal.endListStatus = true
-				}
-				else {
-					if (__internal.model){
-						for (let i = 0; i < listObjects.getItemsCount(); i++){
-							let index_ = __internal.model.insertNewItem()
-							listObjects.copyItemDataToModel(i, __internal.model, index_)
-						}
-					}
-				}
-			}
-
-			if (__internal.model){
-				__internal.model.refresh()
-			}
-		}
-
-		onListObjectsReceiveFailed: {
-			__internal.isLoading = false
-			__internal.hasError = true
-			__internal.errorMessage = message || qsTr("Failed to load items")
+		onDataChanged: {
+			__internal.rebuildModel()
 		}
 	}
 
@@ -254,8 +241,10 @@ Item {
 
 		duration: root.debounceInterval
 		onFinished: {
-			root.__filter.setTextFilter(filterField.text)
-			root.requestItems(0)
+			if (root.dataProvider){
+				__internal.focusedIndex = -1
+				root.dataProvider.fetch(filterField.text)
+			}
 		}
 	}
 
@@ -274,7 +263,7 @@ Item {
 		placeHolderText: qsTr("Filter...")
 
 		onTextChanged: {
-			__internal.selectedIndex = -1
+			__internal.focusedIndex = -1
 			debounce.stop()
 			debounce.start()
 		}
@@ -314,9 +303,11 @@ Item {
 		anchors.left: parent.left
 
 		width: root.itemWidth
-		height: !noDataItem.visible * !errorItem.visible * popupListView.height
-				+ noDataItem.height * noDataItem.visible
-				+ errorItem.height * errorItem.visible
+		height: {
+			if (errorItem.visible) return errorItem.height
+			if (noDataItem.visible) return noDataItem.height
+			return popupListView.height
+		}
 		radius: Style.buttonRadius
 
 		color: Style.baseColor
@@ -330,8 +321,10 @@ Item {
 			height: 50
 			radius: parent.radius
 			color: parent.color
-			visible: !__internal.hasError
-					&& (__internal.model ? __internal.model.getItemsCount() === 0 && !__internal.isLoading : !root.dataProvider)
+			visible: root.dataProvider
+					&& !root.dataProvider.isInitialLoading
+					&& !root.dataProvider.error
+					&& root.dataProvider.items.length === 0
 
 			Text {
 				anchors.centerIn: parent
@@ -348,19 +341,26 @@ Item {
 			height: 50
 			radius: parent.radius
 			color: parent.color
-			visible: __internal.hasError && !__internal.isLoading
+			visible: root.dataProvider
+					&& root.dataProvider.error !== null
+					&& !root.dataProvider.isInitialLoading
+					&& !root.dataProvider.isPageLoading
 
 			Text {
 				anchors.centerIn: parent
 				font.pixelSize: root.textSize
 				color: Style.errorColor
-				text: __internal.errorMessage || qsTr("Error loading items")
+				text: root.dataProvider && root.dataProvider.error
+					? (root.dataProvider.error.message || qsTr("Error loading items"))
+					: qsTr("Error loading items")
 			}
 
 			MouseArea {
 				anchors.fill: parent
 				onClicked: {
-					root.requestItems(__internal.currentOffset)
+					if (root.dataProvider){
+						root.dataProvider.retry()
+					}
 				}
 			}
 		}
@@ -371,7 +371,7 @@ Item {
 			anchors.fill: parent
 			opacity: 0.5
 			color: "transparent"
-			visible: __internal.isLoading
+			visible: root.dataProvider && root.dataProvider.isInitialLoading
 
 			Text {
 				anchors.centerIn: parent
@@ -384,21 +384,28 @@ Item {
 		ListView {
 			id: popupListView
 
+			property int itemCount: root.dataProvider ? root.dataProvider.items.length : 0
+
 			width: root.itemWidth
-			height: !count ? 0 :
-					(root.maxVisibleItems == -1 || root.maxVisibleItems > popupListView.count) ?
-						popupListView.count * root.itemHeight :
-						root.maxVisibleItems * root.itemHeight
+			height: {
+				if (!itemCount) return 0
+				let visibleCount = (root.maxVisibleItems === -1 || root.maxVisibleItems > itemCount)
+					? itemCount
+					: root.maxVisibleItems
+				return visibleCount * root.itemHeight
+			}
 
 			boundsBehavior: Flickable.StopAtBounds
 			clip: true
-			model: __internal.model
+			model: popupListView.itemCount
 
 			delegate: root.delegate
 
 			onContentYChanged: {
-				if (contentHeight - contentY - popupListView.height <= root.itemHeight){
-					root.requestNextBatch()
+				if (contentHeight > 0 && contentHeight - contentY - popupListView.height <= root.itemHeight){
+					if (root.dataProvider){
+						root.dataProvider.fetchMore()
+					}
 				}
 			}
 		}
@@ -423,7 +430,9 @@ Item {
 
 		width: root.itemWidth
 		height: visible ? 30 : 0
-		visible: !__internal.endListStatus && __internal.model && __internal.model.getItemsCount() > 0 && __internal.isLoading
+		visible: root.dataProvider
+				&& root.dataProvider.isPageLoading
+				&& root.dataProvider.items.length > 0
 
 		Text {
 			anchors.centerIn: parent
@@ -460,9 +469,9 @@ Item {
 		sequence: "Return"
 		enabled: root.visible && !filterField.textInputFocus
 		onActivated: {
-			if (__internal.selectedIndex >= 0 && __internal.model){
-				let id = __internal.model.getData("id", __internal.selectedIndex)
-				root.toggleSelection(id, __internal.selectedIndex)
+			if (__internal.focusedIndex >= 0){
+				let id = __internal.getItemId(__internal.focusedIndex)
+				root.toggleSelection(id, __internal.focusedIndex)
 			}
 		}
 	}
@@ -475,8 +484,8 @@ Item {
 				filterField.setFocus(false)
 			}
 			__internal.hoverBlocked = true
-			if (__internal.selectedIndex > 0){
-				__internal.selectedIndex--
+			if (__internal.focusedIndex > 0){
+				__internal.focusedIndex--
 				contentYCorrection(false)
 			}
 		}
@@ -490,22 +499,23 @@ Item {
 				filterField.setFocus(false)
 			}
 			__internal.hoverBlocked = true
-			if (__internal.model && __internal.selectedIndex < __internal.model.getItemsCount() - 1){
-				__internal.selectedIndex++
+			let itemCount = root.dataProvider ? root.dataProvider.items.length : 0
+			if (__internal.focusedIndex < itemCount - 1){
+				__internal.focusedIndex++
 				contentYCorrection(true)
 			}
-			else if (__internal.model && __internal.selectedIndex === __internal.model.getItemsCount() - 1){
-				root.requestNextBatch()
+			else if (__internal.focusedIndex === itemCount - 1 && root.dataProvider){
+				root.dataProvider.fetchMore()
 			}
 		}
 	}
 
 	function contentYCorrection(down_){
-		if (__internal.selectedIndex >= 0){
+		if (__internal.focusedIndex >= 0){
 			let contentY = popupListView.contentY
 			let itemH = root.itemHeight
 			let visibleCount = root.maxVisibleItems
-			let index = __internal.selectedIndex
+			let index = __internal.focusedIndex
 
 			if (down_){
 				if ((index + 1) * itemH > contentY + visibleCount * itemH){
