@@ -17,8 +17,12 @@ public:
 	typedef sdl::imtbase::FilterableSelect::CGraphQlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CFilterableSelectControllerComp);
+		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection ID to match incoming requests", true, "");
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection providing selectable items", true, "ObjectCollection");
 	I_END_COMPONENT;
+
+	// reimplemented (imtgql::IGqlRequestHandler)
+	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
 
 protected:
 	// reimplemented (sdl::imtbase::FilterableSelect::CGraphQlHandlerCompBase)
@@ -28,6 +32,7 @@ protected:
 				QString& errorMessage) const override;
 
 private:
+	I_ATTR(QByteArray, m_collectionIdAttrPtr);
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
 };
 

@@ -185,7 +185,7 @@ I_EXPORT_COMPONENT(
 			"Filterable select items controller",
 			"Filterable Select Controller");
 
-\
+
 } // namespace ImtServerGqlPck
 
 

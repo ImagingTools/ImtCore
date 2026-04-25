@@ -7,18 +7,15 @@ import imtcontrols 1.0
 
 /*!
 	\qmltype FilterableSelectPopup
-	\inqmlmodule imtguigql
+	\inqmlmodule imtcolgui
 	\brief A GitHub-style filterable select popup with server-side search and pagination.
 
 	Provides an overlay popup with text filtering (debounced), offset-based pagination,
 	single/multi select by id, injectable delegate, keyboard navigation, and loading/empty states.
 
-	The popup uses an abstract data provider that must be set via the \l dataProvider property.
-	Use FilterableSelectGqlDataProvider for GQL-backed data, or implement a custom
-	provider with the same interface (collectionModel, state, updateModel, setCustomInputParams).
-
-	The popup is opened via ModalDialogManager and uses the existing decorator/popup
-	infrastructure of the framework.
+	The popup uses an abstract data provider (FilterableSelectDataProvider) that must
+	be set via the \l dataProvider property. For GQL-backed data use
+	FilterableSelectGqlDataProvider from imtguigql.
 
 	Usage:
 	\code
@@ -26,7 +23,7 @@ import imtcontrols 1.0
 		id: selectPopup
 
 		dataProvider: FilterableSelectGqlDataProvider {
-			commandId: "GetSelectableItems"
+			collectionId: "UsersCollection"
 			fields: ["id", "name", "description"]
 			textFilteringInfoIds: ["name"]
 		}
