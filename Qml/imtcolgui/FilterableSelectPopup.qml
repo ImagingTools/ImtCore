@@ -63,13 +63,13 @@ Item {
 			textSize: root.textSize
 			fontColor: root.fontColor
 
-			text: __internal.getItemText(model.index)
+			text: root.getItemText(model.index)
 
 			selected: __internal.focusedIndex === model.index
-			highlighted: root.isItemSelected(__internal.getItemId(model.index))
+			highlighted: root.isItemSelected(root.getItemId(model.index))
 
 			onClicked: {
-				root.toggleSelection(__internal.getItemId(model.index), model.index)
+				root.toggleSelection(root.getItemId(model.index), model.index)
 			}
 
 			onEntered: {
@@ -84,33 +84,46 @@ Item {
 	signal opened()
 	signal closed()
 
+	// --- Delegate helpers (public, use in custom delegates) ---
+
+	/*!
+		Returns the id of the item at the given index using the configured \c idRole.
+		\param index The index in the dataProvider.items array.
+	*/
+	function getItemId(index){
+		if (!root.dataProvider || index < 0 || index >= root.dataProvider.items.length){
+			return ""
+		}
+		return String(root.dataProvider.items[index][root.idRole] || "")
+	}
+
+	/*!
+		Returns the display text of the item at the given index using the configured \c textRole.
+		\param index The index in the dataProvider.items array.
+	*/
+	function getItemText(index){
+		if (!root.dataProvider || index < 0 || index >= root.dataProvider.items.length){
+			return ""
+		}
+		return String(root.dataProvider.items[index][root.textRole] || "")
+	}
+
+	/*!
+		Returns the full item object at the given index (for custom delegates needing extra fields).
+		\param index The index in the dataProvider.items array.
+	*/
+	function getItem(index){
+		if (!root.dataProvider || index < 0 || index >= root.dataProvider.items.length){
+			return null
+		}
+		return root.dataProvider.items[index]
+	}
+
 	// --- Internal state ---
 	property QtObject __internal: QtObject {
 		property var selectedIds: ({})
 		property int focusedIndex: -1
 		property bool hoverBlocked: true
-		property var listModel: null
-
-		function getItemId(index){
-			if (!root.dataProvider || index < 0 || index >= root.dataProvider.items.length){
-				return ""
-			}
-			return String(root.dataProvider.items[index][root.idRole] || "")
-		}
-
-		function getItemText(index){
-			if (!root.dataProvider || index < 0 || index >= root.dataProvider.items.length){
-				return ""
-			}
-			return String(root.dataProvider.items[index][root.textRole] || "")
-		}
-
-		function rebuildModel(){
-			if (!root.dataProvider){
-				return
-			}
-			__internal.listModel = root.dataProvider.items || []
-		}
 	}
 
 	// --- Public API ---
@@ -122,7 +135,6 @@ Item {
 		__internal.selectedIds = ({})
 		__internal.focusedIndex = -1
 		__internal.hoverBlocked = true
-		__internal.listModel = []
 
 		filterField.text = ""
 
@@ -223,9 +235,13 @@ Item {
 	// --- Data provider connection ---
 	Connections {
 		target: root.dataProvider
+		enabled: root.dataProvider !== null
 
 		onDataChanged: {
-			__internal.rebuildModel()
+			let itemCount = root.dataProvider ? root.dataProvider.items.length : 0
+			if (__internal.focusedIndex >= itemCount){
+				__internal.focusedIndex = itemCount > 0 ? itemCount - 1 : -1
+			}
 		}
 	}
 
@@ -263,7 +279,11 @@ Item {
 		}
 
 		onAccepted: {
-			root.close()
+			debounce.stop()
+			if (root.dataProvider){
+				__internal.focusedIndex = -1
+				root.dataProvider.fetch(filterField.text)
+			}
 		}
 
 		Button {
@@ -462,7 +482,7 @@ Item {
 		enabled: root.visible && !filterField.textInputFocus
 		onActivated: {
 			if (__internal.focusedIndex >= 0){
-				let id = __internal.getItemId(__internal.focusedIndex)
+				let id = root.getItemId(__internal.focusedIndex)
 				root.toggleSelection(id, __internal.focusedIndex)
 			}
 		}
@@ -506,7 +526,9 @@ Item {
 		if (__internal.focusedIndex >= 0){
 			let contentY = popupListView.contentY
 			let itemH = root.itemHeight
-			let visibleCount = root.maxVisibleItems
+			let itemCount = root.dataProvider ? root.dataProvider.items.length : 0
+			let visibleCount = root.maxVisibleItems === -1 ? itemCount : Math.min(root.maxVisibleItems, itemCount)
+			if (visibleCount <= 0) return
 			let index = __internal.focusedIndex
 
 			if (down_){
