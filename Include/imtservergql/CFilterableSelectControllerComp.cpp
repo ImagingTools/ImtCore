@@ -5,6 +5,9 @@
 #include <istd/TDelPtr.h>
 #include <iprm/CParamsSet.h>
 
+// Qt includes
+#include <cmath>
+
 // ImtCore includes
 #include <imtbase/IObjectCollectionIterator.h>
 #include <imtbase/ICollectionInfo.h>
@@ -78,8 +81,15 @@ sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectCont
 
 	response.Version_1_0->items = itemsList;
 
+	int elementsCount = iteratorPtr->GetElementsCount();
+	int pagesCount = (count > 0) ? static_cast<int>(std::ceil(elementsCount / static_cast<double>(count))) : 1;
+	if (pagesCount <= 0){
+		pagesCount = 1;
+	}
+
 	sdl::imtbase::ImtCollection::CNotificationItem::V1_0 notification;
-	notification.pagesCount = iteratorPtr->GetElementsCount();
+	notification.pagesCount = pagesCount;
+	notification.totalCount = elementsCount;
 	response.Version_1_0->notification = notification;
 
 	return response;

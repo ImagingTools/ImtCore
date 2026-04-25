@@ -434,6 +434,8 @@ Item {
 			return
 		}
 
+		// Only fetch next page if the current batch returned items beyond the current offset,
+		// meaning the server still has more data to offer
 		let currentCount = root.dataProvider.collectionModel ? root.dataProvider.collectionModel.getItemsCount() : 0
 		if (currentCount > 0 && currentCount > root.dataProvider.offset){
 			root.dataProvider.updateModel(root.dataProvider.offset + root.dataProvider.count)
