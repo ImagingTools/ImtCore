@@ -1,0 +1,21 @@
+module imt3dgui
+
+View3D 1.0 View3D.qml
+Node3D 1.0 Node3D.qml
+Model 1.0 Model.qml
+
+PerspectiveCamera 1.0 PerspectiveCamera.qml
+OrthographicCamera 1.0 OrthographicCamera.qml
+
+DirectionalLight 1.0 DirectionalLight.qml
+PointLight 1.0 PointLight.qml
+SpotLight 1.0 SpotLight.qml
+AmbientLight 1.0 AmbientLight.qml
+
+PrincipledMaterial 1.0 PrincipledMaterial.qml
+DefaultMaterial 1.0 DefaultMaterial.qml
+
+Texture 1.0 Texture.qml
+CubeMapTexture 1.0 CubeMapTexture.qml
+
+SceneEnvironment 1.0 SceneEnvironment.qml

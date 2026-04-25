@@ -18,5 +18,13 @@
   },
   "dependencies": {
     "ol": "^7.3.0"
+  },
+  "peerDependencies": {
+    "three": "^0.170.0"
+  },
+  "peerDependenciesMeta": {
+    "three": {
+      "optional": true
+    }
   }
 }

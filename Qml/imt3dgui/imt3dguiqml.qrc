@@ -1,0 +1,19 @@
+<RCC>
+    <qresource prefix="/qml">
+        <file alias="imt3dgui/qmldir">qmldir</file>
+        <file alias="imt3dgui/View3D.qml">View3D.qml</file>
+        <file alias="imt3dgui/Node3D.qml">Node3D.qml</file>
+        <file alias="imt3dgui/Model.qml">Model.qml</file>
+        <file alias="imt3dgui/PerspectiveCamera.qml">PerspectiveCamera.qml</file>
+        <file alias="imt3dgui/OrthographicCamera.qml">OrthographicCamera.qml</file>
+        <file alias="imt3dgui/DirectionalLight.qml">DirectionalLight.qml</file>
+        <file alias="imt3dgui/PointLight.qml">PointLight.qml</file>
+        <file alias="imt3dgui/SpotLight.qml">SpotLight.qml</file>
+        <file alias="imt3dgui/AmbientLight.qml">AmbientLight.qml</file>
+        <file alias="imt3dgui/PrincipledMaterial.qml">PrincipledMaterial.qml</file>
+        <file alias="imt3dgui/DefaultMaterial.qml">DefaultMaterial.qml</file>
+        <file alias="imt3dgui/Texture.qml">Texture.qml</file>
+        <file alias="imt3dgui/CubeMapTexture.qml">CubeMapTexture.qml</file>
+        <file alias="imt3dgui/SceneEnvironment.qml">SceneEnvironment.qml</file>
+    </qresource>
+</RCC>
