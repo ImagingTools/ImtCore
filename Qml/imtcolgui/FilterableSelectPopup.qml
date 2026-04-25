@@ -109,13 +109,7 @@ Item {
 			if (!root.dataProvider){
 				return
 			}
-			let items = root.dataProvider.items || []
-			if (!__internal.listModel){
-				__internal.listModel = items
-			}
-			else {
-				__internal.listModel = items
-			}
+			__internal.listModel = root.dataProvider.items || []
 		}
 	}
 
@@ -389,9 +383,7 @@ Item {
 			width: root.itemWidth
 			height: {
 				if (!itemCount) return 0
-				let visibleCount = (root.maxVisibleItems === -1 || root.maxVisibleItems > itemCount)
-					? itemCount
-					: root.maxVisibleItems
+				let visibleCount = root.maxVisibleItems === -1 ? itemCount : Math.min(root.maxVisibleItems, itemCount)
 				return visibleCount * root.itemHeight
 			}
 
