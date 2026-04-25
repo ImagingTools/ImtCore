@@ -62,6 +62,11 @@ I_EXPORT_COMPONENT(
 			"3D-wire shape",
 			"3D Shape Wire");
 
+I_EXPORT_COMPONENT(
+			RhiRenderBackend,
+			"Qt RHI render backend for 3D scenes",
+			"3D Render Backend RHI");
+
 } // namespace Imt3dGuiPck
 
 
