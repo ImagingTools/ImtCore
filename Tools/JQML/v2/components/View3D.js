@@ -24,7 +24,7 @@ class View3D extends Item {
         camera:        { type: QVar,   value: undefined, changed: '$cameraChanged' },
         environment:   { type: QVar,   value: undefined, changed: '$environmentChanged' },
         importScene:   { type: QVar,   value: undefined },
-        renderMode:    { type: QReal,  value: View3D.InlineMode },
+        renderMode:    { type: QReal,  value: 0 /* View3D.InlineMode */ },
         // diagnostics
         ready3D:       { type: QBool,  value: false, changed: '$ready3DChanged' },
         // background fallback when no environment is set
@@ -103,8 +103,10 @@ class View3D extends Item {
         View3D.$threePromise = p.then((mod)=>{
             // both `import('three')` (ESM) and webpack interop produce { ... } where
             // the named exports live; some CDNs put them on .default
-            let THREE = (mod && (mod.Scene || mod.WebGLRenderer)) ? mod : (mod && mod.default ? mod.default : mod)
-            return THREE
+            if(!mod) return null
+            if(mod.Scene || mod.WebGLRenderer) return mod
+            if(mod.default) return mod.default
+            return mod
         }).catch((err)=>{
             console.warn('[View3D] three.js dynamic import failed:', err)
             return null

@@ -28,11 +28,16 @@ class SceneEnvironment extends QtObject {
 
     static defaultProperties = {
         clearColor:        { type: QColor, value: '#000000ff', changed: '$envChanged' },
-        backgroundMode:    { type: QReal,  value: SceneEnvironment.Color, changed: '$envChanged' },
+        // backgroundMode: 0=Color, 1=SkyBox, 2=Transparent (literals to avoid
+        // dependency on static field initialization order)
+        backgroundMode:    { type: QReal,  value: 0, changed: '$envChanged' },
         lightProbe:        { type: QVar,   value: undefined,   changed: '$envChanged' },
-        tonemapMode:       { type: QReal,  value: SceneEnvironment.TonemapModeLinear, changed: '$envChanged' },
-        antialiasingMode:  { type: QReal,  value: SceneEnvironment.NoAA, changed: '$envChanged' },
-        antialiasingQuality:{ type: QReal, value: SceneEnvironment.Medium, changed: '$envChanged' },
+        // tonemapMode: 0=NoTonemap, 1=Linear, 2=Aces, 3=Filmic
+        tonemapMode:       { type: QReal,  value: 1, changed: '$envChanged' },
+        // antialiasingMode: 0=NoAA, 1=SSAA, 2=MSAA
+        antialiasingMode:  { type: QReal,  value: 0, changed: '$envChanged' },
+        // antialiasingQuality: 0=Medium, 1=High, 2=VeryHigh
+        antialiasingQuality:{ type: QReal, value: 0, changed: '$envChanged' },
     }
 
     $applyToScene(THREE, scene, renderer){

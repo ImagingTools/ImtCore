@@ -17,8 +17,11 @@ class Texture extends QtObject {
 
     static defaultProperties = {
         source:      { type: QString, value: '',  changed: '$reload' },
-        tilingModeHorizontal: { type: QReal, value: Texture.ClampToEdge, changed: '$applyTiling' },
-        tilingModeVertical:   { type: QReal, value: Texture.ClampToEdge, changed: '$applyTiling' },
+        // tilingMode constants (ClampToEdge=0, MirroredRepeat=1, Repeat=2);
+        // use literal 0 here so this initializer does not depend on the
+        // ordering of static field initialization.
+        tilingModeHorizontal: { type: QReal, value: 0, changed: '$applyTiling' },
+        tilingModeVertical:   { type: QReal, value: 0, changed: '$applyTiling' },
     }
 
     $resolveUrl(src){
