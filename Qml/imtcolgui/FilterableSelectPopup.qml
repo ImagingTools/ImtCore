@@ -94,10 +94,6 @@ Item {
 
 	Component.onDestruction: {
 		Events.unSubscribeEvent("AppSizeChanged", onAppSizeChanged)
-
-		if (_filter){
-			_filter.destroy()
-		}
 	}
 
 	function onAppSizeChanged(){
