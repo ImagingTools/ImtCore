@@ -20,7 +20,7 @@ Item{
 
     onCurrentPageChanged: {
         itemConnections.target = null
-		currentItem = item
+        currentItem = item
 
         if (item && adaptSizeToCurrentPage){
             width = item.width

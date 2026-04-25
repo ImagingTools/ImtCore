@@ -47,7 +47,7 @@ ControlBase {
 	Accessible.checkable: true
 	Accessible.checked: checked
 
-	onCheckedChanged: {
+	onCheckStateChanged: {
 		if (buttonGroup !== null)
 			buttonGroup._onButtonChecked(checkBox)
 	}

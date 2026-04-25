@@ -55,7 +55,7 @@ ControlBase {
 		CloseOnPressOutsideParent = 4
 	}
 
-	property bool escapeEnabled: !!(closePolicy & Dialog.CloseOnEscape);
+	property bool escapeEnabled: (closePolicy & Dialog.CloseOnEscape) !== 0;
 
 	property bool closeAfterPause: false;
 	property int displayDuration: 2000;

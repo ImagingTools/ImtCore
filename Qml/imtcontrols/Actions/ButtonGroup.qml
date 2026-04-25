@@ -7,12 +7,12 @@ import imtcontrols 1.0
 //
 // Usage:
 //   ButtonGroup { id: myGroup }
-//   RadioButton { text: "A"; buttonGroup: myGroup }
-//   RadioButton { text: "B"; buttonGroup: myGroup }
+//   CheckBox { text: "A"; buttonGroup: myGroup }
+//   CheckBox { text: "B"; buttonGroup: myGroup }
 //
 // Buttons can also be registered manually:
 //   ButtonGroup { id: myGroup }
-//   CheckBox { id: cbA; onCheckedChanged: if(checked) myGroup.addButton(cbA) }
+//   CheckBox { id: cbA; Component.onCompleted: myGroup.addButton(cbA) }
 
 QtObject {
     id: buttonGroup
@@ -24,83 +24,78 @@ QtObject {
     // when exclusive = false).
     property var checkedButton: null
 
-    // The list of registered button objects.
+    // The registered button objects. Reassignment triggers QML change
+    // notifications so bindings on 'buttons' update correctly.
     property var buttons: []
 
-    // Emitted whenever any button in the group is clicked.
+    // Emitted whenever a button in the group emits its clicked() signal.
     signal clicked(var button)
 
     // Register a button with this group.
-    // Buttons that expose a 'buttonGroup' property (CheckBox, RadioButton
-    // derivates) set it directly; this function handles the reverse side.
     function addButton(button) {
         if (!button || buttons.indexOf(button) !== -1)
             return
 
-        buttons.push(button)
+        // Reassign so QML property-change notification fires.
+        buttons = buttons.concat([button])
 
-        // Wire up state tracking.
-        _connectButton(button)
+        // Tell the button which group it belongs to (CheckBox, RadioButton etc.)
+        if (button.buttonGroup !== undefined && button.buttonGroup !== buttonGroup)
+            button.buttonGroup = buttonGroup
+
+        // Enforce exclusivity for any already-checked button.
+        let isChecked = (button.checkState !== undefined && button.checkState === Qt.Checked) ||
+                        (button.checkState === undefined && button.checked === true)
+        if (exclusive && isChecked)
+            _onButtonChecked(button)
     }
 
     // Remove a button from the group.
     function removeButton(button) {
         let idx = buttons.indexOf(button)
-        if (idx !== -1) {
-            buttons.splice(idx, 1)
-            _disconnectButton(button)
-        }
+        if (idx === -1)
+            return
+
+        let arr = buttons.slice()
+        arr.splice(idx, 1)
+        buttons = arr
+
+        if (button.buttonGroup !== undefined && button.buttonGroup === buttonGroup)
+            button.buttonGroup = null
+
+        if (checkedButton === button)
+            checkedButton = null
     }
 
-    // Called by buttons that own a buttonGroup property when their checked
-    // state changes (see CheckBox.qml).
+    // Called by buttons when their checkState changes (see CheckBox.qml
+    // onCheckStateChanged).  Do not call directly – use the buttonGroup
+    // property on the button instead.
     function _onButtonChecked(button) {
         if (!exclusive)
             return
 
-        if (button.checked || button.checkState === Qt.Checked) {
+        let isChecked = (button.checkState !== undefined)
+                            ? (button.checkState === Qt.Checked)
+                            : (button.checked === true)
+
+        if (isChecked) {
             checkedButton = button
-            // Uncheck every other button in the group.
+            // Uncheck every other registered button.
             for (let i = 0; i < buttons.length; i++) {
                 let b = buttons[i]
-                if (b !== button) {
-                    if (b.checkState !== undefined) {
+                if (b === button)
+                    continue
+                if (b.checkState !== undefined) {
+                    if (b.checkState !== Qt.Unchecked)
                         b.checkState = Qt.Unchecked
-                    } else if (b.checked !== undefined) {
+                } else if (b.checked !== undefined) {
+                    if (b.checked)
                         b.checked = false
-                    }
                 }
             }
         } else {
-            // If the previously-checked button just became unchecked reset the
-            // tracking property.
             if (checkedButton === button)
                 checkedButton = null
         }
-    }
-
-    // Internal helpers ---------------------------------------------------
-
-    function _connectButton(button) {
-        // Use Qt.binding if available; otherwise fall back to signal connections.
-        if (button.onClickedChanged !== undefined) {
-            button.clicked.connect(function() { buttonGroup.clicked(button) })
-        }
-        // Register with the button so it knows its group.
-        if (button.buttonGroup !== undefined)
-            button.buttonGroup = buttonGroup
-
-        // If already checked and exclusive, enforce exclusivity now.
-        let isChecked = (button.checked === true) ||
-                        (button.checkState !== undefined && button.checkState === Qt.Checked)
-        if (exclusive && isChecked)
-            _onButtonChecked(button)
-    }
-
-    function _disconnectButton(button) {
-        if (button.buttonGroup !== undefined && button.buttonGroup === buttonGroup)
-            button.buttonGroup = null
-        if (checkedButton === button)
-            checkedButton = null
     }
 }
