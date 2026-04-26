@@ -22,9 +22,12 @@ import imtgui 1.0
 	- Single and multi selection (delegated to dataProvider)
 	- Preselected IDs resolved via dataProvider.setPreselectedIds()
 	- Injectable delegate component with explicit roles (\c idRole, \c textRole)
-	- Keyboard navigation (↑↓ Enter Escape)
+	- Keyboard navigation (↑↓ Enter Space Escape Tab)
 	- Error display with click-to-retry
 	- Split loading states (initial vs page loading)
+	- Optional CheckBox selection mode (\c showCheckBox)
+	- Optional separator lines between delegates (\c showSeparator)
+	- Customizable filter placeholder text (\c filterPlaceholder)
 
 	\sa FilterableSelectDataProvider, FilterableSelectGqlDataProvider
 */
@@ -58,6 +61,12 @@ PopupView {
 	// --- CheckBox mode ---
 	property bool showCheckBox: false
 
+	// --- Separator between delegates ---
+	property bool showSeparator: false
+
+	// --- Filter field placeholder ---
+	property string filterPlaceholder: qsTr("Filter...")
+
 	// --- Injectable delegate ---
 	property Component delegate: Component {
 		PopupMenuDelegate {
@@ -80,6 +89,7 @@ PopupView {
 			}
 
 			Row {
+				z: 10
 				anchors.verticalCenter: parent.verticalCenter
 				anchors.left: parent.left
 				anchors.leftMargin: Style.marginM
@@ -103,11 +113,20 @@ PopupView {
 				}
 
 				Text {
+					z: 10
 					anchors.verticalCenter: parent.verticalCenter
 					font.pixelSize: root.textSize
 					color: root.fontColor
 					text: root.getItemText(model.index)
 				}
+			}
+
+			Rectangle {
+				anchors.bottom: parent.bottom
+				width: parent.width
+				height: 1
+				color: Style.borderColor
+				visible: root.showSeparator
 			}
 		}
 	}
@@ -173,6 +192,9 @@ PopupView {
 			root.dataProvider.setPreselectedIds(root.preselectedIds)
 			root.dataProvider.fetch("")
 		}
+
+		filterField.setFocus(true)
+		filterField.forceActiveFocus()
 	}
 
 	function closePopup(){
@@ -279,7 +301,7 @@ PopupView {
 				margin: Style.marginM
 				textSize: root.textSize
 				fontColor: root.fontColor
-				placeHolderText: qsTr("Filter...")
+				placeHolderText: root.filterPlaceholder
 
 				onTextChanged: {
 					root.__internal.focusedIndex = -1
@@ -392,6 +414,7 @@ PopupView {
 
 					anchors.right: popupListView.right
 					anchors.bottom: popupListView.bottom
+					anchors.rightMargin: background.radius / 2
 
 					secondSize: 8
 					targetItem: popupListView
@@ -482,6 +505,46 @@ PopupView {
 			if (root.__internal.focusedIndex >= 0){
 				var id = root.getItemId(root.__internal.focusedIndex)
 				root.handleItemClick(id, root.__internal.focusedIndex)
+			}
+		}
+	}
+
+	Shortcut {
+		sequence: "Space"
+		enabled: !filterField.textInputFocus
+		onActivated: {
+			if (root.__internal.focusedIndex >= 0){
+				var id = root.getItemId(root.__internal.focusedIndex)
+				root.handleItemClick(id, root.__internal.focusedIndex)
+			}
+		}
+	}
+
+	Shortcut {
+		sequence: "Tab"
+		onActivated: {
+			if (filterField.textInputFocus){
+				filterField.setFocus(false)
+				root.__internal.hoverBlocked = true
+				var count = root.dataProvider ? root.dataProvider.items.length : 0
+				if (root.__internal.focusedIndex < 0 && count > 0){
+					root.__internal.focusedIndex = 0
+				}
+			} else {
+				filterField.setFocus(true)
+				filterField.forceActiveFocus()
+				root.__internal.focusedIndex = -1
+			}
+		}
+	}
+
+	Shortcut {
+		sequence: "Shift+Tab"
+		onActivated: {
+			if (!filterField.textInputFocus){
+				filterField.setFocus(true)
+				filterField.forceActiveFocus()
+				root.__internal.focusedIndex = -1
 			}
 		}
 	}
