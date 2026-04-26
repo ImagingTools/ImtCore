@@ -401,6 +401,7 @@ PopupView {
 
 						MouseArea {
 							anchors.fill: parent
+							hoverEnabled: true
 							cursorShape: Qt.PointingHandCursor
 							onClicked: {
 								if (root.dataProvider){
@@ -421,7 +422,7 @@ PopupView {
 
 						model: root.__internal.selectedItemsCount
 
-						Item {
+						delegate: Item {
 							width: selectedGroup.width
 							height: root.itemHeight
 
