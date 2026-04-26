@@ -42,7 +42,7 @@ PopupView {
 	property QtObject dataProvider: null
 
 	// --- Configuration ---
-	property int debounceInterval: 300
+	property int debounceInterval: 500
 
 	// --- Delegate roles ---
 	property string idRole: "id"
@@ -329,6 +329,7 @@ PopupView {
 				width: parent.width
 				height: Style.controlHeightM
 				margin: Style.marginM
+				textFieldRightMargin: clearButton.width + Style.marginM + Style.marginXS
 				textSize: root.textSize
 				fontColor: root.fontColor
 				placeHolderText: root.filterPlaceholder
@@ -407,6 +408,8 @@ PopupView {
 								if (root.dataProvider){
 									root.dataProvider.clearSelection()
 								}
+								filterField.setFocus(true)
+								filterField.forceActiveFocus()
 							}
 						}
 					}
@@ -450,6 +453,8 @@ PopupView {
 										if (si){
 											root.__handleRemoveSelectedItem(si[root.idRole])
 										}
+										filterField.setFocus(true)
+										filterField.forceActiveFocus()
 									}
 								}
 
@@ -484,6 +489,8 @@ PopupView {
 									if (si){
 										root.__handleRemoveSelectedItem(si[root.idRole])
 									}
+									filterField.setFocus(true)
+									filterField.forceActiveFocus()
 								}
 							}
 
@@ -667,6 +674,17 @@ PopupView {
 
 	Shortcut {
 		sequence: "Return"
+		enabled: !filterField.textInputFocus
+		onActivated: {
+			if (root.__internal.focusedIndex >= 0){
+				var id = root.getItemId(root.__internal.focusedIndex)
+				root.handleItemClick(id, root.__internal.focusedIndex)
+			}
+		}
+	}
+
+	Shortcut {
+		sequence: "Enter"
 		enabled: !filterField.textInputFocus
 		onActivated: {
 			if (root.__internal.focusedIndex >= 0){
