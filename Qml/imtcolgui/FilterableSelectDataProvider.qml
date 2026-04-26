@@ -118,17 +118,44 @@ QtObject {
 	}
 
 	/*!
-		Returns the resolved data cache map. May be partial — not all selected IDs
-		are guaranteed to have resolved data.
+		Returns an array of resolved item objects for currently selected IDs.
+		May be partial — not all selected IDs are guaranteed to have resolved data.
+		Only returns items whose ID is in \c selectedIds (source of truth).
 	*/
 	function getSelectedItems(){
 		var result = []
-		for (var k in __internal.selectedItems){
-			if (__internal.selectedItems[k]){
+		for (var k in __internal.selectedIds){
+			if (__internal.selectedIds[k] && __internal.selectedItems[k]){
 				result.push(__internal.selectedItems[k])
 			}
 		}
 		return result
+	}
+
+	/*!
+		Returns the number of currently selected IDs.
+	*/
+	function getSelectedCount(){
+		var count = 0
+		for (var k in __internal.selectedIds){
+			if (__internal.selectedIds[k]){
+				count++
+			}
+		}
+		return count
+	}
+
+	/*!
+		Returns true if any selected ID does not yet have resolved item data
+		in the selectedItems cache. Useful for UI to show placeholders.
+	*/
+	function hasUnresolvedItems(){
+		for (var k in __internal.selectedIds){
+			if (__internal.selectedIds[k] && !__internal.selectedItems[k]){
+				return true
+			}
+		}
+		return false
 	}
 
 	/*!
@@ -205,8 +232,9 @@ QtObject {
 
 	/*!
 		Sets preselected IDs and resolves their data.
-		Populates selectedIds immediately. For items already in selectedItems cache,
-		keeps them. For missing items, calls \c fetchByIds() to resolve from server.
+		Populates selectedIds immediately. Cleans stale entries from selectedItems,
+		keeping only items that match the new selection. For missing items,
+		calls \c fetchByIds() to resolve from server.
 		\param ids Array of item IDs to preselect.
 	*/
 	function setPreselectedIds(ids){
@@ -220,10 +248,19 @@ QtObject {
 		}
 		__internal.selectedIds = selected
 
+		// Clean stale entries from selectedItems — keep only items in new selection
+		var cleanedItems = ({})
+		for (var j in __internal.selectedItems){
+			if (selected[j] && __internal.selectedItems[j]){
+				cleanedItems[j] = __internal.selectedItems[j]
+			}
+		}
+		__internal.selectedItems = cleanedItems
+
 		// Find IDs that are not yet resolved in selectedItems
 		var missingIds = []
 		for (var k in selected){
-			if (!__internal.selectedItems[k]){
+			if (!cleanedItems[k]){
 				missingIds.push(k)
 			}
 		}
