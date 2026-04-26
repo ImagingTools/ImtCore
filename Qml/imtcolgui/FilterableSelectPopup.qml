@@ -395,7 +395,6 @@ PopupView {
 	// --- Keyboard navigation ---
 	Shortcut {
 		sequence: "Escape"
-		enabled: true
 		onActivated: {
 			root.closePopup()
 		}
@@ -414,7 +413,6 @@ PopupView {
 
 	Shortcut {
 		sequence: "Up"
-		enabled: true
 		onActivated: {
 			if (filterField.textInputFocus){
 				filterField.setFocus(false)
@@ -429,7 +427,6 @@ PopupView {
 
 	Shortcut {
 		sequence: "Down"
-		enabled: true
 		onActivated: {
 			if (filterField.textInputFocus){
 				filterField.setFocus(false)
