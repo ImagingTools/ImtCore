@@ -348,7 +348,8 @@ PopupView {
 				ListView {
 					id: popupListView
 
-					property int itemCount: 0
+					// Managed imperatively via onDataChanged signal handler
+				property int itemCount: 0
 
 					width: parent.width
 					height: itemCount === 0 ? 0
