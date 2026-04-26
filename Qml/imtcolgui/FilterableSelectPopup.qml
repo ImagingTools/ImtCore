@@ -127,6 +127,7 @@ PopupView {
 				height: 1
 				color: Style.borderColor
 				visible: root.showSeparator
+				opacity: 0.4
 			}
 		}
 	}
@@ -283,14 +284,14 @@ PopupView {
 		id: body
 
 		anchors.fill: parent
-		anchors.margins: Style.marginL
+		anchors.margins: Style.marginM
 
 		// --- Content column ---
 		Column {
 			id: contentColumn
 
 			width: parent.width
-			spacing: Style.marginS
+			spacing: Style.marginM
 
 			// --- Search Field ---
 			CustomTextField {
@@ -302,6 +303,7 @@ PopupView {
 				textSize: root.textSize
 				fontColor: root.fontColor
 				placeHolderText: root.filterPlaceholder
+				radius: Style.radiusL
 
 				onTextChanged: {
 					root.__internal.focusedIndex = -1
@@ -412,9 +414,8 @@ PopupView {
 
 					z: 100
 
-					anchors.right: popupListView.right
-					anchors.bottom: popupListView.bottom
-					anchors.rightMargin: background.radius / 2
+					anchors.right: parent.right
+					anchors.bottom: parent.bottom
 
 					secondSize: 8
 					targetItem: popupListView

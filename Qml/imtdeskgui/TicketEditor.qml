@@ -1266,6 +1266,7 @@ DocumentViewBase {
 										textRole: "title"
 										itemWidth: 280
 										showCheckBox: true
+										showSeparator: true
 										
 										onSelectionChanged: {
 											var arr = []
