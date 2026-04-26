@@ -31,8 +31,8 @@ import imtgui 1.0
 PopupView {
 	id: root
 
-	width: itemWidth
-	height: filterField.height + itemBody.height + (footerItem.visible ? footerItem.height : 0)
+	width: itemWidth + 2 * Style.marginM
+	height: contentColumn.height + 2 * Style.marginM
 
 	// --- Data Controller (dependency injection) ---
 	property QtObject dataProvider: null
@@ -127,6 +127,7 @@ PopupView {
 	function started(){
 		root.__internal.focusedIndex = -1
 		root.__internal.hoverBlocked = true
+		popupListView.itemCount = 0
 
 		filterField.text = ""
 
@@ -163,9 +164,10 @@ PopupView {
 		enabled: root.dataProvider !== null
 
 		function onDataChanged() {
-			var itemCount = root.dataProvider ? root.dataProvider.items.length : 0
-			if (root.__internal.focusedIndex >= itemCount){
-				root.__internal.focusedIndex = itemCount > 0 ? itemCount - 1 : -1
+			var count = root.dataProvider ? root.dataProvider.items.length : 0
+			popupListView.itemCount = count
+			if (root.__internal.focusedIndex >= count){
+				root.__internal.focusedIndex = count > 0 ? count - 1 : -1
 			}
 		}
 
@@ -212,180 +214,188 @@ PopupView {
 		onPositionChanged: {}
 	}
 
-	// --- Content column ---
-	Column {
-		id: contentColumn
+	// --- Body with margins (following TimeFilterParamView pattern) ---
+	Item {
+		id: body
 
-		width: parent.width
+		anchors.fill: parent
+		anchors.margins: Style.marginM
 
-		// --- Search Field ---
-		CustomTextField {
-			id: filterField
+		// --- Content column ---
+		Column {
+			id: contentColumn
 
-			width: root.itemWidth
-			height: Style.controlHeightM
-			margin: Style.marginM
-			textSize: root.textSize
-			fontColor: root.fontColor
-			placeHolderText: qsTr("Filter...")
+			width: parent.width
 
-			onTextChanged: {
-				root.__internal.focusedIndex = -1
-				debounce.stop()
-				debounce.start()
-			}
+			// --- Search Field ---
+			CustomTextField {
+				id: filterField
 
-			onAccepted: {
-				debounce.stop()
-				if (root.dataProvider){
+				width: parent.width
+				height: Style.controlHeightM
+				margin: Style.marginM
+				textSize: root.textSize
+				fontColor: root.fontColor
+				placeHolderText: qsTr("Filter...")
+
+				onTextChanged: {
 					root.__internal.focusedIndex = -1
-					root.dataProvider.fetch(filterField.text)
+					debounce.stop()
+					debounce.start()
+				}
+
+				onAccepted: {
+					debounce.stop()
+					if (root.dataProvider){
+						root.__internal.focusedIndex = -1
+						root.dataProvider.fetch(filterField.text)
+					}
+				}
+
+				Button {
+					id: clearButton
+
+					anchors.verticalCenter: filterField.verticalCenter
+					anchors.right: filterField.right
+					anchors.rightMargin: Style.marginXS
+
+					width: height
+					height: 12
+					z: filterField.z + 1
+
+					decorator: Component { IconButtonDecorator {} }
+					iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+
+					visible: filterField.text !== ""
+					enabled: visible
+
+					onClicked: {
+						filterField.text = ""
+					}
 				}
 			}
 
-			Button {
-				id: clearButton
-
-				anchors.verticalCenter: filterField.verticalCenter
-				anchors.right: filterField.right
-				anchors.rightMargin: Style.marginXS
-
-				width: height
-				height: 12
-				z: filterField.z + 1
-
-				decorator: Component { IconButtonDecorator {} }
-				iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
-
-				visible: filterField.text !== ""
-				enabled: visible
-
-				onClicked: {
-					filterField.text = ""
-				}
-			}
-		}
-
-		// --- List Body ---
-		Item {
-			id: itemBody
-
-			width: root.itemWidth
-			height: errorItem.visible ? errorItem.height
-					: noDataItem.visible ? noDataItem.height
-					: popupListView.height
-
+			// --- List Body ---
 			Item {
-				id: noDataItem
+				id: itemBody
 
 				width: parent.width
-				height: 50
-				visible: root.dataProvider
-						&& !root.dataProvider.isInitialLoading
-						&& !root.dataProvider.error
-						&& root.dataProvider.items.length === 0
+				height: errorItem.visible ? errorItem.height
+						: noDataItem.visible ? noDataItem.height
+						: popupListView.height
 
-				Text {
-					anchors.centerIn: parent
-					font.pixelSize: root.textSize
-					color: root.fontColor
-					text: qsTr("No items found")
+				Item {
+					id: noDataItem
+
+					width: parent.width
+					height: 50
+					visible: root.dataProvider
+							&& !root.dataProvider.isInitialLoading
+							&& !root.dataProvider.error
+							&& root.dataProvider.items.length === 0
+
+					Text {
+						anchors.centerIn: parent
+						font.pixelSize: root.textSize
+						color: root.fontColor
+						text: qsTr("No items found")
+					}
 				}
-			}
 
-			Item {
-				id: errorItem
+				Item {
+					id: errorItem
 
-				width: parent.width
-				height: 50
-				visible: root.dataProvider
-						&& root.dataProvider.error !== null
-						&& !root.dataProvider.isInitialLoading
-						&& !root.dataProvider.isPageLoading
+					width: parent.width
+					height: 50
+					visible: root.dataProvider
+							&& root.dataProvider.error !== null
+							&& !root.dataProvider.isInitialLoading
+							&& !root.dataProvider.isPageLoading
 
-				Text {
-					anchors.centerIn: parent
-					font.pixelSize: root.textSize
-					color: Style.errorColor
-					text: root.dataProvider && root.dataProvider.error
-						? (root.dataProvider.error.message || qsTr("Error loading items"))
-						: qsTr("Error loading items")
+					Text {
+						anchors.centerIn: parent
+						font.pixelSize: root.textSize
+						color: Style.errorColor
+						text: root.dataProvider && root.dataProvider.error
+							? (root.dataProvider.error.message || qsTr("Error loading items"))
+							: qsTr("Error loading items")
+					}
+
+					MouseArea {
+						anchors.fill: parent
+						onClicked: {
+							if (root.dataProvider){
+								root.dataProvider.retry()
+							}
+						}
+					}
+				}
+
+				Item {
+					id: loadingOverlay
+
+					anchors.fill: parent
+					visible: root.dataProvider && root.dataProvider.isInitialLoading
+
+					Text {
+						anchors.centerIn: parent
+						color: Style.textColor
+						font.pixelSize: Style.fontSizeM
+						text: qsTr("Loading...")
+					}
+				}
+
+				ListView {
+					id: popupListView
+
+					property int itemCount: 0
+
+					width: parent.width
+					height: itemCount === 0 ? 0
+							: (root.maxVisibleItems === -1 ? itemCount : Math.min(root.maxVisibleItems, itemCount)) * root.itemHeight
+
+					boundsBehavior: Flickable.StopAtBounds
+					clip: true
+					model: popupListView.itemCount
+
+					delegate: root.delegate
+
+					onContentYChanged: {
+						if (contentHeight > 0 && contentHeight - contentY - popupListView.height <= root.itemHeight){
+							if (root.dataProvider){
+								root.dataProvider.fetchMore()
+							}
+						}
+					}
 				}
 
 				MouseArea {
 					anchors.fill: parent
-					onClicked: {
-						if (root.dataProvider){
-							root.dataProvider.retry()
-						}
+					hoverEnabled: true
+					visible: root.__internal.hoverBlocked
+
+					onPositionChanged: {
+						root.__internal.hoverBlocked = false
 					}
 				}
 			}
 
+			// --- Footer (loading more) ---
 			Item {
-				id: loadingOverlay
+				id: footerItem
 
-				anchors.fill: parent
-				visible: root.dataProvider && root.dataProvider.isInitialLoading
+				width: parent.width
+				height: visible ? 30 : 0
+				visible: root.dataProvider
+						&& root.dataProvider.isPageLoading
+						&& root.dataProvider.items.length > 0
 
 				Text {
 					anchors.centerIn: parent
-					color: Style.textColor
-					font.pixelSize: Style.fontSizeM
-					text: qsTr("Loading...")
+					color: Style.placeHolderTextColor
+					font.pixelSize: Style.fontSizeS
+					text: qsTr("Loading more...")
 				}
-			}
-
-			ListView {
-				id: popupListView
-
-				property int itemCount: root.dataProvider ? root.dataProvider.items.length : 0
-
-				width: root.itemWidth
-				height: itemCount === 0 ? 0
-						: (root.maxVisibleItems === -1 ? itemCount : Math.min(root.maxVisibleItems, itemCount)) * root.itemHeight
-
-				boundsBehavior: Flickable.StopAtBounds
-				clip: true
-				model: popupListView.itemCount
-
-				delegate: root.delegate
-
-				onContentYChanged: {
-					if (contentHeight > 0 && contentHeight - contentY - popupListView.height <= root.itemHeight){
-						if (root.dataProvider){
-							root.dataProvider.fetchMore()
-						}
-					}
-				}
-			}
-
-			MouseArea {
-				anchors.fill: parent
-				hoverEnabled: true
-				visible: root.__internal.hoverBlocked
-
-				onPositionChanged: {
-					root.__internal.hoverBlocked = false
-				}
-			}
-		}
-
-		// --- Footer (loading more) ---
-		Item {
-			id: footerItem
-
-			width: root.itemWidth
-			height: visible ? 30 : 0
-			visible: root.dataProvider
-					&& root.dataProvider.isPageLoading
-					&& root.dataProvider.items.length > 0
-
-			Text {
-				anchors.centerIn: parent
-				color: Style.placeHolderTextColor
-				font.pixelSize: Style.fontSizeS
-				text: qsTr("Loading more...")
 			}
 		}
 	}
