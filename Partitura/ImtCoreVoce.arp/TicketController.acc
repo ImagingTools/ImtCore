@@ -255,6 +255,7 @@
                                 <Value>TicketCollectionDocumentManager</Value>
                                 <Value>CollectionDocumentManager</Value>
                                 <Value>EditorCommandsController</Value>
+                                <Value>UserFilterableSelectController</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -589,6 +590,18 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="UserFilterableSelectController" PackageId="ImtServerGqlPck" ComponentId="FilterableSelectController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Users"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="UserCollection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>

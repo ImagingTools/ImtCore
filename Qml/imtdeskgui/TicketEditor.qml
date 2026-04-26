@@ -1082,7 +1082,7 @@ DocumentViewBase {
 										model: priorityModel
 										changeable: root.canEditCoreTicketFields
 										onCurrentIndexChanged: root.doUpdateModel()
-										KeyNavigation.tab: editAssigneeCB
+										KeyNavigation.tab: editStatusCB
 										KeyNavigation.backtab: editTypeCB
 									}
 								}
@@ -1107,7 +1107,7 @@ DocumentViewBase {
 										changeable: root.canEdit
 										onCurrentIndexChanged: root.doUpdateModel()
 										KeyNavigation.tab: editLockedCB
-										KeyNavigation.backtab: editAssigneeCB
+										KeyNavigation.backtab: editPriorityCB
 									}
 								}
 							}
@@ -1169,7 +1169,7 @@ DocumentViewBase {
 											anchors.fill: parent
 											hoverEnabled: true
 											cursorShape: Qt.PointingHandCursor
-											onClicked: ModalDialogManager.openDialog(assigneePickerDialogComp)
+											onClicked: assigneeSelectPopup.open()
 										}
 									}
 								}
@@ -1236,87 +1236,51 @@ DocumentViewBase {
 									wrapMode: Text.WordWrap
 								}
 								
-								// Assignee picker dialog — RemoteCollectionView with Users collection
-								Component {
-									id: assigneePickerDialogComp
-									Dialog {
-										id: assigneeDialog
-										title: qsTr("Select Assignees")
-										canMove: false
-										width: Math.min(ModalDialogManager.activeView.width - 80, 900)
-										height: ModalDialogManager.activeView.height - 80
-										
-										property RemoteCollectionView collectionView: null
-										
-										Component.onCompleted: {
-											addButton(Enums.apply, qsTr("Attach Selected"), false)
-											addButton(Enums.cancel, qsTr("Cancel"), true)
-											setButtonEnabled(Enums.apply, false)
-										}
-										
-										contentComp: Component {
-											Item {
-												width: assigneeDialog.width
-												height: assigneeDialog.height - 100
-												
-												Rectangle {
-													anchors.fill: parent
-													anchors.margins: Style.paddingM
-													radius: Style.radiusM
-													color: "transparent"
-													border.color: Style.borderColor
-													border.width: 1
-													
-													RemoteCollectionView {
-														anchors.fill: parent
-														anchors.margins: 1
-														commandsControllerComp: null
-														visibleMetaInfo: false
-														commandsDelegateComp: null
-														documentCollectionFilter: null
-														showRemoteChangesAlert: false
-														tableViewParamsStoredServer: false
-														collectionId: "Users"
-														headerRightClickEnabled: false
-														Component.onCompleted: {
-															assigneeDialog.collectionView = this
-														}
-														onSelectionChanged: {
-															assigneeDialog.setButtonEnabled(Enums.apply, selectedIds.length > 0)
-														}
-													}
+								// Assignee picker popup — FilterableSelectPopup with Users collection
+								FilterableSelectPopup {
+									id: assigneeSelectPopup
+									
+									dataProvider: FilterableSelectGqlDataProvider {
+										collectionId: "Users"
+									}
+									
+									multiSelect: true
+									preselectedIds: root.pendingAssignees.map(function(a) { return a.id })
+									idRole: "id"
+									textRole: "title"
+									
+									itemWidth: 280
+									
+									onSelectionChanged: {
+										var arr = []
+										for (var i = 0; i < selectedIds.length; i++) {
+											var sid = selectedIds[i]
+											var sname = sid
+											// Try to get name from visible items
+											for (var j = 0; j < assigneeSelectPopup.dataProvider.items.length; j++) {
+												var item = assigneeSelectPopup.dataProvider.items[j]
+												if (String(item.id) === sid) {
+													sname = item.title || sid
+													break
 												}
 											}
-										}
-										
-										onFinished: {
-											if (buttonId === Enums.apply && collectionView) {
-												var arr = root.pendingAssignees.slice()
-												var mdl = collectionView.table.elements
-												let indexes = collectionView.table.getSelectedIndexes()
-												for (var i = 0; i < indexes.length; i++) {
-													let idx = indexes[i]
-													var userId = mdl.getData("id", idx)
-													var userName = mdl.getData("name", idx) || userId
-													// Skip duplicates
-													var exists = false
-													for (var j = 0; j < arr.length; j++) {
-														if (arr[j].id === userId) { exists = true; break }
-													}
-													if (!exists) {
-														arr.push({id: userId, name: userName})
-													}
+											// Try to keep name from existing pendingAssignees
+											for (var k = 0; k < root.pendingAssignees.length; k++) {
+												if (root.pendingAssignees[k].id === sid) {
+													sname = root.pendingAssignees[k].name || sname
+													break
 												}
-												root.pendingAssignees = arr
-												root._assigneesChanged = true
-												root.doUpdateModel()
 											}
+											arr.push({id: sid, name: sname})
 										}
+										root.pendingAssignees = arr
+										root._assigneesChanged = true
+										root.doUpdateModel()
 									}
 								}
 							}
 							
-							// Hidden assignee ComboBox (data source for dialog)
+							// Hidden assignee ComboBox (data source for name resolution)
 							ComboBox {
 								id: editAssigneeCB
 								visible: false
