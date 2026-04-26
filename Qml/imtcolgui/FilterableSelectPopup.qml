@@ -202,8 +202,7 @@ PopupView {
 
 		root.__rebuildSelectedGroup()
 
-		filterField.setFocus(true)
-		filterField.forceActiveFocus()
+		root.__focusFilter()
 	}
 
 	function closePopup(){
@@ -241,6 +240,11 @@ PopupView {
 		// When removing, toggleItem only needs the ID (item is already selected,
 		// so __removeFromSelection uses only the ID, not the item object)
 		root.dataProvider.toggleItem(String(itemId), null)
+	}
+
+	function __focusFilter(){
+		filterField.setFocus(true)
+		filterField.forceActiveFocus()
 	}
 
 	// --- Data provider connection ---
@@ -408,8 +412,7 @@ PopupView {
 								if (root.dataProvider){
 									root.dataProvider.clearSelection()
 								}
-								filterField.setFocus(true)
-								filterField.forceActiveFocus()
+								root.__focusFilter()
 							}
 						}
 					}
@@ -453,8 +456,7 @@ PopupView {
 										if (si){
 											root.__handleRemoveSelectedItem(si[root.idRole])
 										}
-										filterField.setFocus(true)
-										filterField.forceActiveFocus()
+										root.__focusFilter()
 									}
 								}
 
@@ -489,8 +491,7 @@ PopupView {
 									if (si){
 										root.__handleRemoveSelectedItem(si[root.idRole])
 									}
-									filterField.setFocus(true)
-									filterField.forceActiveFocus()
+									root.__focusFilter()
 								}
 							}
 
@@ -683,6 +684,7 @@ PopupView {
 		}
 	}
 
+	// Enter key (numpad) — same behavior as Return for delegate selection
 	Shortcut {
 		sequence: "Enter"
 		enabled: !filterField.textInputFocus
@@ -716,8 +718,7 @@ PopupView {
 					root.__internal.focusedIndex = 0
 				}
 			} else {
-				filterField.setFocus(true)
-				filterField.forceActiveFocus()
+				root.__focusFilter()
 				root.__internal.focusedIndex = -1
 			}
 		}
@@ -727,8 +728,7 @@ PopupView {
 		sequence: "Shift+Tab"
 		onActivated: {
 			if (!filterField.textInputFocus){
-				filterField.setFocus(true)
-				filterField.forceActiveFocus()
+				root.__focusFilter()
 				root.__internal.focusedIndex = -1
 			}
 		}
