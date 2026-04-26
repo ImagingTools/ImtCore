@@ -1169,7 +1169,13 @@ DocumentViewBase {
 											anchors.fill: parent
 											hoverEnabled: true
 											cursorShape: Qt.PointingHandCursor
-											onClicked: assigneeSelectPopup.open()
+											onClicked: {
+												var ids = []
+												for (var i = 0; i < root.pendingAssignees.length; i++)
+													ids.push(root.pendingAssignees[i].id)
+												assigneeSelectPopup.preselectedIds = ids
+												assigneeSelectPopup.open()
+											}
 										}
 									}
 								}
@@ -1245,7 +1251,7 @@ DocumentViewBase {
 									}
 									
 									multiSelect: true
-									preselectedIds: root.pendingAssignees.map(function(a) { return a.id })
+									preselectedIds: []
 									idRole: "id"
 									textRole: "title"
 									
