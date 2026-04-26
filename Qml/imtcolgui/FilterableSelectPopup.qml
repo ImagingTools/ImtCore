@@ -31,8 +31,8 @@ import imtgui 1.0
 PopupView {
 	id: root
 
-	width: itemWidth + 2 * Style.marginM
-	height: contentColumn.height + 2 * Style.marginM
+	width: itemWidth + 2 * Style.marginL
+	height: contentColumn.height + 2 * Style.marginL
 
 	// --- Data Controller (dependency injection) ---
 	property QtObject dataProvider: null
@@ -55,6 +55,9 @@ PopupView {
 	property var preselectedIds: []
 	property var knownItems: []
 
+	// --- CheckBox mode ---
+	property bool showCheckBox: false
+
 	// --- Injectable delegate ---
 	property Component delegate: Component {
 		PopupMenuDelegate {
@@ -63,10 +66,10 @@ PopupView {
 
 			isSeparator: false
 
-			text: root.getItemText(model.index)
+			text: root.showCheckBox ? "" : root.getItemText(model.index)
 
 			selected: root.__internal.focusedIndex === model.index
-			highlighted: root.dataProvider ? root.dataProvider.isItemSelected(root.getItemId(model.index)) : false
+			highlighted: !root.showCheckBox && root.dataProvider ? root.dataProvider.isItemSelected(root.getItemId(model.index)) : false
 
 			onClicked: {
 				root.handleItemClick(root.getItemId(model.index), model.index)
@@ -74,6 +77,37 @@ PopupView {
 
 			onEntered: {
 				root.__internal.focusedIndex = model.index
+			}
+
+			Row {
+				anchors.verticalCenter: parent.verticalCenter
+				anchors.left: parent.left
+				anchors.leftMargin: Style.marginM
+				spacing: Style.marginS
+				visible: root.showCheckBox
+
+				CheckBox {
+					id: delegateCheckBox
+
+					width: Style.controlHeightS
+					height: Style.controlHeightS
+					mainMargin: Style.marginL
+					borderColor: Style.grayColor
+					anchors.verticalCenter: parent.verticalCenter
+
+					checkState: root.dataProvider && root.dataProvider.isItemSelected(root.getItemId(model.index)) ? Qt.Checked : Qt.Unchecked
+
+					function nextCheckState() {
+						root.handleItemClick(root.getItemId(model.index), model.index)
+					}
+				}
+
+				Text {
+					anchors.verticalCenter: parent.verticalCenter
+					font.pixelSize: root.textSize
+					color: root.fontColor
+					text: root.getItemText(model.index)
+				}
 			}
 		}
 	}
@@ -174,6 +208,14 @@ PopupView {
 		function onSelectionChanged(){
 			root.selectionChanged(root.dataProvider.getSelectedIds())
 		}
+
+		function onIsInitialLoadingChanged(){
+			if (root.dataProvider && root.dataProvider.isInitialLoading){
+				loadingOverlay.start()
+			} else {
+				loadingOverlay.stop()
+			}
+		}
 	}
 
 	// --- Debounce Timer ---
@@ -219,13 +261,14 @@ PopupView {
 		id: body
 
 		anchors.fill: parent
-		anchors.margins: Style.marginM
+		anchors.margins: Style.marginL
 
 		// --- Content column ---
 		Column {
 			id: contentColumn
 
 			width: parent.width
+			spacing: Style.marginS
 
 			// --- Search Field ---
 			CustomTextField {
@@ -280,7 +323,8 @@ PopupView {
 				id: itemBody
 
 				width: parent.width
-				height: errorItem.visible ? errorItem.height
+				height: loadingOverlay.visible ? loadingOverlay.height
+						: errorItem.visible ? errorItem.height
 						: noDataItem.visible ? noDataItem.height
 						: popupListView.height
 
@@ -331,18 +375,26 @@ PopupView {
 					}
 				}
 
-				Item {
+				Loading {
 					id: loadingOverlay
 
-					anchors.fill: parent
-					visible: root.dataProvider && root.dataProvider.isInitialLoading
+					width: parent.width
+					height: root.maxVisibleItems > 0 ? root.maxVisibleItems * root.itemHeight : 100
+					visible: false
+					indicatorSize: 30
+					background.color: "transparent"
+				}
 
-					Text {
-						anchors.centerIn: parent
-						color: Style.textColor
-						font.pixelSize: Style.fontSizeM
-						text: qsTr("Loading...")
-					}
+				CustomScrollbar {
+					id: scrollbar
+
+					z: 100
+
+					anchors.right: popupListView.right
+					anchors.bottom: popupListView.bottom
+
+					secondSize: 8
+					targetItem: popupListView
 				}
 
 				ListView {
