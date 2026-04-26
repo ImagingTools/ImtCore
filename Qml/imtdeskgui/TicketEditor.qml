@@ -1275,7 +1275,7 @@ DocumentViewBase {
 										for (var i = 0; i < selectedIds.length; i++) {
 											var selectedId = selectedIds[i]
 											var selectedName = dp ? dp.getSelectedItemText(selectedId) : ""
-											if (!selectedName || selectedName === "")
+											if (!selectedName)
 												selectedName = selectedId
 											arr.push({id: selectedId, name: selectedName})
 										}
