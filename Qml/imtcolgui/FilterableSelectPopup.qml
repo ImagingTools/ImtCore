@@ -49,7 +49,7 @@ PopupView {
 
 	// --- Visual ---
 	property int itemWidth: Style.sizeHintXXS
-	property int itemHeight: Style.controlHeightM
+	property int itemHeight: Style.controlHeightL
 	property int maxVisibleItems: 8
 	property int textSize: Style.fontSizeM
 	property string fontColor: Style.textColor
@@ -99,9 +99,9 @@ PopupView {
 				CheckBox {
 					id: delegateCheckBox
 
-					width: Style.controlHeightS
-					height: Style.controlHeightS
-					mainMargin: Style.marginL
+					width: Style.itemSizeS
+					height: Style.itemSizeS
+					mainMargin: Style.marginM
 					borderColor: Style.grayColor
 					anchors.verticalCenter: parent.verticalCenter
 
