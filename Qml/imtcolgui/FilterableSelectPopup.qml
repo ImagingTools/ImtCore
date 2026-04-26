@@ -238,14 +238,9 @@ PopupView {
 		if (!root.dataProvider || !itemId){
 			return
 		}
-		var item = null
-		for (var i = 0; i < root.__internal.selectedItemsList.length; i++){
-			if (String(root.__internal.selectedItemsList[i].id) === String(itemId)){
-				item = root.__internal.selectedItemsList[i]
-				break
-			}
-		}
-		root.dataProvider.toggleItem(String(itemId), item)
+		// When removing, toggleItem only needs the ID (item is already selected,
+		// so __removeFromSelection uses only the ID, not the item object)
+		root.dataProvider.toggleItem(String(itemId), null)
 	}
 
 	// --- Data provider connection ---
@@ -430,6 +425,9 @@ PopupView {
 							width: selectedGroup.width
 							height: root.itemHeight
 
+							property var __selItem: model.index >= 0 && model.index < root.__internal.selectedItemsList.length
+								? root.__internal.selectedItemsList[model.index] : null
+
 							Row {
 								anchors.verticalCenter: parent.verticalCenter
 								anchors.left: parent.left
@@ -447,9 +445,9 @@ PopupView {
 									visible: root.showCheckBox
 									checkState: Qt.Checked
 									function nextCheckState() {
-										var selItem = root.__internal.selectedItemsList[model.index]
-										if (selItem){
-											root.__handleRemoveSelectedItem(selItem[root.idRole])
+										var si = parent.parent.__selItem
+										if (si){
+											root.__handleRemoveSelectedItem(si[root.idRole])
 										}
 									}
 								}
@@ -459,8 +457,8 @@ PopupView {
 									font.pixelSize: root.textSize
 									color: root.fontColor
 									text: {
-										var selItem = root.__internal.selectedItemsList[model.index]
-										return selItem ? String(selItem[root.textRole] || "") : ""
+										var si = parent.parent.__selItem
+										return si ? String(si[root.textRole] || "") : ""
 									}
 									elide: Text.ElideRight
 									width: parent.width - parent.spacing - (root.showCheckBox ? Style.itemSizeS + parent.spacing : 0)
@@ -481,9 +479,9 @@ PopupView {
 								iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
 
 								onClicked: {
-									var selItem = root.__internal.selectedItemsList[model.index]
-									if (selItem){
-										root.__handleRemoveSelectedItem(selItem[root.idRole])
+									var si = parent.__selItem
+									if (si){
+										root.__handleRemoveSelectedItem(si[root.idRole])
 									}
 								}
 							}
