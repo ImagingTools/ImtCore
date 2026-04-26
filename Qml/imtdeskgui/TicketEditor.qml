@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-import QtQuick 2.15
+import QtQuick 2.12
 import Qt5Compat.GraphicalEffects 6.0
 import QtGraphicalEffects 1.12
 import Acf 1.0
@@ -14,7 +14,7 @@ import imtdeskImtDeskSdl 1.0
 import imtdeskTicketCollectionDocumentManagerSdl 1.0
 import imtauthUsersSdl 1.0
 import imtchatgui 1.0
-import Qt.labs.platform 1.1
+import Qt.labs.platform 1.1 as QLP
 
 DocumentViewBase {
 	id: root
@@ -1453,7 +1453,7 @@ DocumentViewBase {
 									color: Style.inactiveTextColor
 									wrapMode: Text.WordWrap
 								}
-								
+							
 								// Context picker dialog: entity type ComboBox + StackView with per-entity RemoteCollectionView
 								Component {
 									id: contextPickerDialogComp
@@ -2511,10 +2511,10 @@ DocumentViewBase {
 					}
 					
 					// File dialog
-					FileDialog {
+					QLP.FileDialog {
 						id: attachImageDialog
 						title: qsTr("Attach image")
-						fileMode: FileDialog.OpenFile
+						fileMode: QLP.FileDialog.OpenFile
 						nameFilters: [qsTr("Image files") + " (*.png *.jpg *.jpeg *.gif *.bmp *.svg *.webp)"]
 						
 						onAccepted: {
