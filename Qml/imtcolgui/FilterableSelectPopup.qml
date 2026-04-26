@@ -60,8 +60,6 @@ PopupView {
 		PopupMenuDelegate {
 			width: root.itemWidth
 			height: root.itemHeight
-			textSize: root.textSize
-			fontColor: root.fontColor
 
 			text: root.getItemText(model.index)
 
