@@ -10,17 +10,16 @@ import imtcontrols 1.0
 	\inqmlmodule imtcolgui
 	\brief Reusable filterable select popup for large remote datasets.
 
-	Pure UI component — all data fetching, pagination and normalization are handled
-	by the injected \c dataProvider (FilterableSelectDataProvider).
+	Pure UI component — all data fetching, pagination, normalization and selection
+	are handled by the injected \c dataProvider (FilterableSelectDataProvider).
 	The popup works only with normalized JS objects \c { id, title, ... }.
+	Selection state lives entirely in the DataProvider.
 
 	Supports:
 	- Debounced server-side search (300ms default)
 	- Infinite scroll via dataProvider.fetchMore()
-	- Single and multi selection (id-based, independent from visible dataset)
-	- Persistent selectedItems map: selected items remain accessible even when
-	  not in the current visible dataset (pagination/filtering)
-	- Preselected IDs resolved via dataProvider.fetchByIds() for items not yet loaded
+	- Single and multi selection (delegated to dataProvider)
+	- Preselected IDs resolved via dataProvider.setPreselectedIds()
 	- Injectable delegate component with explicit roles (\c idRole, \c textRole)
 	- Keyboard navigation (↑↓ Enter Escape)
 	- Error display with click-to-retry
@@ -55,7 +54,6 @@ Item {
 	property string fontColor: Style.textColor
 
 	// --- Selection ---
-	property bool multiSelect: false
 	property var preselectedIds: []
 
 	// --- Injectable delegate ---
@@ -69,10 +67,10 @@ Item {
 			text: root.getItemText(model.index)
 
 			selected: __internal.focusedIndex === model.index
-			highlighted: root.isItemSelected(root.getItemId(model.index))
+			highlighted: root.dataProvider ? root.dataProvider.isItemSelected(root.getItemId(model.index)) : false
 
 			onClicked: {
-				root.toggleSelection(root.getItemId(model.index), model.index)
+				root.handleItemClick(root.getItemId(model.index), model.index)
 			}
 
 			onEntered: {
@@ -122,33 +120,8 @@ Item {
 		return root.dataProvider.items[index]
 	}
 
-	// --- Selected items API ---
-
-	/*!
-		Returns the display text for a selected item by its ID.
-		Resolves from dataProvider.selectedItems which persists across pagination/filtering.
-		\param id The item ID.
-	*/
-	function getSelectedItemText(id){
-		if (!root.dataProvider){
-			return ""
-		}
-		return root.dataProvider.getSelectedItemText(id)
-	}
-
-	/*!
-		Returns an array of all selected item objects from the persistent selectedItems map.
-	*/
-	function getSelectedItems(){
-		if (!root.dataProvider){
-			return []
-		}
-		return root.dataProvider.getSelectedItems()
-	}
-
-	// --- Internal state ---
+	// --- Internal state (UI-only) ---
 	property QtObject __internal: QtObject {
-		property var selectedIds: ({})
 		property int focusedIndex: -1
 		property bool hoverBlocked: true
 	}
@@ -159,13 +132,14 @@ Item {
 			return
 		}
 
-		__internal.selectedIds = ({})
 		__internal.focusedIndex = -1
 		__internal.hoverBlocked = true
 
 		filterField.text = ""
 
-		applyPreselectedIds()
+		if (root.dataProvider){
+			root.dataProvider.setPreselectedIds(root.preselectedIds)
+		}
 
 		root.visible = true
 		root.opened()
@@ -184,93 +158,16 @@ Item {
 		root.closed()
 	}
 
-	function isItemSelected(itemId){
-		return itemId !== undefined && itemId !== null && itemId !== "" && __internal.selectedIds[String(itemId)] === true
-	}
-
-	function toggleSelection(itemId, index){
-		if (itemId === undefined || itemId === null || itemId === ""){
+	function handleItemClick(itemId, index){
+		if (!root.dataProvider || itemId === ""){
 			return
 		}
+		var item = root.getItem(index)
+		root.dataProvider.toggleItem(itemId, item)
+		root.itemSelected(itemId, index)
 
-		var id = String(itemId)
-		var selected = ({})
-		for (var key in __internal.selectedIds){
-			selected[key] = __internal.selectedIds[key]
-		}
-
-		if (root.multiSelect){
-			if (selected[id]){
-				delete selected[id]
-				if (root.dataProvider){
-					root.dataProvider.removeSelectedItem(id)
-				}
-			}
-			else {
-				selected[id] = true
-				if (root.dataProvider){
-					var item = root.getItem(index)
-					if (item){
-						root.dataProvider.addSelectedItem(id, item)
-					}
-				}
-			}
-		}
-		else {
-			selected = ({})
-			selected[id] = true
-			if (root.dataProvider){
-				root.dataProvider.clearSelectedItems()
-				var singleItem = root.getItem(index)
-				if (singleItem){
-					root.dataProvider.addSelectedItem(id, singleItem)
-				}
-			}
-		}
-
-		__internal.selectedIds = selected
-		root.itemSelected(id, index)
-		root.selectionChanged(getSelectedIds())
-
-		if (!root.multiSelect){
+		if (!root.dataProvider.multiSelect){
 			root.close()
-		}
-	}
-
-	function getSelectedIds(){
-		var result = []
-		for (var id in __internal.selectedIds){
-			if (__internal.selectedIds[id]){
-				result.push(id)
-			}
-		}
-		return result
-	}
-
-	// --- Internal helpers ---
-	function applyPreselectedIds(){
-		var selected = ({})
-		var ids = root.preselectedIds || []
-		for (var i = 0; i < ids.length; i++){
-			var id = String(ids[i])
-			if (id !== ""){
-				selected[id] = true
-			}
-		}
-		__internal.selectedIds = selected
-
-		// Resolve missing items via fetchByIds
-		if (root.dataProvider && ids.length > 0){
-			var missingIds = []
-			for (var j = 0; j < ids.length; j++){
-				var sid = String(ids[j])
-				if (sid !== "" && !root.dataProvider.getSelectedItemText(sid)){
-					missingIds.push(sid)
-				}
-			}
-			if (missingIds.length > 0){
-				root.dataProvider.fetchByIds(missingIds)
-			}
 		}
 	}
 
@@ -301,9 +198,8 @@ Item {
 			}
 		}
 
-		onSelectedItemsResolved: {
-			// Preselected items have been resolved — emit signal for consumers
-			root.selectionChanged(root.getSelectedIds())
+		onSelectionChanged: {
+			root.selectionChanged(root.dataProvider.getSelectedIds())
 		}
 	}
 
@@ -540,7 +436,7 @@ Item {
 		onActivated: {
 			if (__internal.focusedIndex >= 0){
 				var id = root.getItemId(__internal.focusedIndex)
-				root.toggleSelection(id, __internal.focusedIndex)
+				root.handleItemClick(id, __internal.focusedIndex)
 			}
 		}
 	}

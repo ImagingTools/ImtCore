@@ -5,15 +5,18 @@ import com.imtcore.imtqml 1.0
 /*!
 	\qmltype FilterableSelectDataProvider
 	\inqmlmodule imtcolgui
-	\brief Abstract data provider for FilterableSelectPopup.
+	\brief Abstract data provider for FilterableSelectPopup — SINGLE SOURCE OF TRUTH for data and selection.
 
-	Manages request lifecycle, pagination, data normalization and race condition protection.
-	UI receives only normalized JS objects and state signals — no backend coupling.
+	Manages request lifecycle, pagination, data normalization, race condition protection
+	and the complete selection state. UI receives only normalized JS objects
+	and reads selection via the provider API — no backend coupling.
+
+	Selection model:
+	- \c selectedIds defines WHAT is selected (source of truth)
+	- \c selectedItems defines WHAT DATA is available for selected IDs (resolved cache, may be partial)
+
 	Subclasses must override \c executeRequest() and \c executeFetchByIds()
 	to implement concrete data fetching.
-
-	Maintains a persistent \c selectedItems map that stores full item objects for
-	all selected IDs, independent from the current visible dataset (pagination/filtering).
 
 	\sa FilterableSelectPopup, FilterableSelectGqlDataProvider
 */
@@ -23,21 +26,23 @@ QtObject {
 	// --- Configuration ---
 	property string collectionId
 	property int pageSize: 20
+	property bool multiSelect: false
 
-	// --- Public read-only state ---
+	// --- Public read-only state (data) ---
 	readonly property var items: __internal.items
 	readonly property bool isInitialLoading: __internal.isInitialLoading
 	readonly property bool isPageLoading: __internal.isPageLoading
 	readonly property bool hasMore: __internal.hasMore
 	readonly property var error: __internal.error
-	readonly property var selectedItems: __internal.selectedItems
 
-	// --- Signals for UI ---
+	// --- Signals ---
 	signal dataChanged()
 	signal errorOccurred(var error)
-	signal selectedItemsResolved()
+	signal selectionChanged()
 
-	// --- Public API ---
+	// =============================================
+	// DATA FETCHING API
+	// =============================================
 
 	/*!
 		Fetches the first page. Clears all existing data.
@@ -86,61 +91,44 @@ QtObject {
 		}
 	}
 
-	/*!
-		Fetches specific items by their IDs for resolving preselected items
-		that are not in the current visible dataset.
-		\param ids Array of item IDs to fetch.
-	*/
-	function fetchByIds(ids){
-		if (!ids || ids.length === 0){
-			return
-		}
-
-		__internal.fetchByIdsRequestId++
-		root.executeFetchByIds(__internal.fetchByIdsRequestId, ids)
-	}
-
-	// --- Selection management ---
+	// =============================================
+	// SELECTION API — SINGLE SOURCE OF TRUTH
+	// =============================================
 
 	/*!
-		Stores a full item object in the selectedItems map.
+		Returns whether the given item ID is currently selected.
 		\param id Item ID.
-		\param item Full normalized item object { id, title, ... }.
 	*/
-	function addSelectedItem(id, item){
-		if (!id || id === "" || !item){
-			return
-		}
-		var updated = ({})
-		for (var k in __internal.selectedItems){
-			updated[k] = __internal.selectedItems[k]
-		}
-		updated[String(id)] = item
-		__internal.selectedItems = updated
+	function isItemSelected(id){
+		var sid = String(id || "")
+		return sid !== "" && __internal.selectedIds[sid] === true
 	}
 
 	/*!
-		Removes an item from the selectedItems map.
-		\param id Item ID to remove.
+		Returns an array of all selected item IDs.
 	*/
-	function removeSelectedItem(id){
-		if (!id || id === ""){
-			return
-		}
-		var updated = ({})
-		for (var k in __internal.selectedItems){
-			if (k !== String(id)){
-				updated[k] = __internal.selectedItems[k]
+	function getSelectedIds(){
+		var result = []
+		for (var k in __internal.selectedIds){
+			if (__internal.selectedIds[k]){
+				result.push(k)
 			}
 		}
-		__internal.selectedItems = updated
+		return result
 	}
 
 	/*!
-		Clears all selected items.
+		Returns the resolved data cache map. May be partial — not all selected IDs
+		are guaranteed to have resolved data.
 	*/
-	function clearSelectedItems(){
-		__internal.selectedItems = ({})
+	function getSelectedItems(){
+		var result = []
+		for (var k in __internal.selectedItems){
+			if (__internal.selectedItems[k]){
+				result.push(__internal.selectedItems[k])
+			}
+		}
+		return result
 	}
 
 	/*!
@@ -158,28 +146,123 @@ QtObject {
 	}
 
 	/*!
-		Returns an array of all selected item objects.
+		Toggles the selection state of an item.
+		In multiSelect mode: adds if not selected, removes if selected.
+		In single-select mode: replaces the selection.
+		\param id Item ID.
+		\param item Full normalized item object { id, title, ... } for the data cache.
 	*/
-	function getSelectedItems(){
-		var result = []
-		for (var k in __internal.selectedItems){
-			if (__internal.selectedItems[k]){
-				result.push(__internal.selectedItems[k])
+	function toggleItem(id, item){
+		var sid = String(id || "")
+		if (sid === ""){
+			return
+		}
+
+		if (root.multiSelect){
+			if (__internal.selectedIds[sid]){
+				__removeFromSelection(sid)
+			}
+			else {
+				__addToSelection(sid, item)
 			}
 		}
-		return result
+		else {
+			root.setSingleSelection(sid, item)
+		}
 	}
 
-	// --- Protected: subclass must override ---
+	/*!
+		Sets a single selection, replacing any previous selection.
+		\param id Item ID.
+		\param item Full normalized item object.
+	*/
+	function setSingleSelection(id, item){
+		var sid = String(id || "")
+		if (sid === ""){
+			return
+		}
+
+		var newIds = ({})
+		newIds[sid] = true
+		__internal.selectedIds = newIds
+
+		var newItems = ({})
+		if (item){
+			newItems[sid] = item
+		}
+		__internal.selectedItems = newItems
+		root.selectionChanged()
+	}
+
+	/*!
+		Clears the entire selection (both IDs and data cache).
+	*/
+	function clearSelection(){
+		__internal.selectedIds = ({})
+		__internal.selectedItems = ({})
+		root.selectionChanged()
+	}
+
+	/*!
+		Sets preselected IDs and resolves their data.
+		Populates selectedIds immediately. For items already in selectedItems cache,
+		keeps them. For missing items, calls \c fetchByIds() to resolve from server.
+		\param ids Array of item IDs to preselect.
+	*/
+	function setPreselectedIds(ids){
+		var selected = ({})
+		var list = ids || []
+		for (var i = 0; i < list.length; i++){
+			var sid = String(list[i])
+			if (sid !== ""){
+				selected[sid] = true
+			}
+		}
+		__internal.selectedIds = selected
+
+		// Find IDs that are not yet resolved in selectedItems
+		var missingIds = []
+		for (var k in selected){
+			if (!__internal.selectedItems[k]){
+				missingIds.push(k)
+			}
+		}
+
+		if (missingIds.length > 0){
+			__internal.fetchByIdsRequestId++
+			root.executeFetchByIds(__internal.fetchByIdsRequestId, missingIds)
+		}
+		else {
+			root.selectionChanged()
+		}
+	}
+
+	/*!
+		Pre-populates the data cache for a known item without changing selection state.
+		Useful when caller already has item data (e.g. from a previous session).
+		\param id Item ID.
+		\param item Full normalized item object.
+	*/
+	function addKnownItem(id, item){
+		if (!id || id === "" || !item){
+			return
+		}
+		var updated = ({})
+		for (var k in __internal.selectedItems){
+			updated[k] = __internal.selectedItems[k]
+		}
+		updated[String(id)] = item
+		__internal.selectedItems = updated
+	}
+
+	// =============================================
+	// PROTECTED — subclass must override
+	// =============================================
 
 	/*!
 		Override in subclass to perform actual data fetching.
 		When results arrive, call \c onRequestSuccess(requestId, items).
 		On error, call \c onRequestError(requestId, message, code).
-		\param requestId Unique request identifier — must be passed back to response handler.
-		\param count Number of items to fetch.
-		\param offset Offset for pagination.
-		\param filter Text filter string.
 	*/
 	function executeRequest(requestId, count, offset, filter){
 		console.warn("executeRequest() should be implemented in a subclass")
@@ -190,15 +273,15 @@ QtObject {
 		Override in subclass to fetch specific items by IDs.
 		When results arrive, call \c onFetchByIdsSuccess(requestId, items).
 		On error, call \c onFetchByIdsError(requestId, message).
-		\param requestId Unique request identifier.
-		\param ids Array of item IDs to fetch.
 	*/
 	function executeFetchByIds(requestId, ids){
 		console.warn("executeFetchByIds() should be implemented in a subclass")
 		root.onFetchByIdsSuccess(requestId, [])
 	}
 
-	// --- Protected: called by subclass on response ---
+	// =============================================
+	// PROTECTED — called by subclass on response
+	// =============================================
 
 	/*!
 		Called by subclass when request completes successfully.
@@ -262,7 +345,7 @@ QtObject {
 
 	/*!
 		Called by subclass when fetchByIds completes successfully.
-		Merges resolved items into selectedItems map.
+		Merges resolved items into selectedItems data cache.
 		\param requestId Must match the requestId from executeFetchByIds.
 		\param resolvedItems Array of normalized JS objects.
 	*/
@@ -285,7 +368,7 @@ QtObject {
 		}
 
 		__internal.selectedItems = updated
-		root.selectedItemsResolved()
+		root.selectionChanged()
 	}
 
 	/*!
@@ -297,11 +380,55 @@ QtObject {
 		if (requestId !== __internal.fetchByIdsRequestId){
 			return
 		}
-		// Silent failure — selectedItems stays unchanged, IDs remain unresolved
+		// Emit selectionChanged even on failure so UI updates with partial data
+		root.selectionChanged()
+	}
+
+	// =============================================
+	// PRIVATE
+	// =============================================
+
+	function __addToSelection(sid, item){
+		var updatedIds = ({})
+		for (var k in __internal.selectedIds){
+			updatedIds[k] = __internal.selectedIds[k]
+		}
+		updatedIds[sid] = true
+		__internal.selectedIds = updatedIds
+
+		if (item){
+			var updatedItems = ({})
+			for (var j in __internal.selectedItems){
+				updatedItems[j] = __internal.selectedItems[j]
+			}
+			updatedItems[sid] = item
+			__internal.selectedItems = updatedItems
+		}
+		root.selectionChanged()
+	}
+
+	function __removeFromSelection(sid){
+		var updatedIds = ({})
+		for (var k in __internal.selectedIds){
+			if (k !== sid){
+				updatedIds[k] = __internal.selectedIds[k]
+			}
+		}
+		__internal.selectedIds = updatedIds
+
+		var updatedItems = ({})
+		for (var j in __internal.selectedItems){
+			if (j !== sid){
+				updatedItems[j] = __internal.selectedItems[j]
+			}
+		}
+		__internal.selectedItems = updatedItems
+		root.selectionChanged()
 	}
 
 	// --- Private state ---
 	property QtObject __internal: QtObject {
+		// Data state
 		property var items: []
 		property var knownIds: ({})
 		property int requestId: 0
@@ -312,6 +439,8 @@ QtObject {
 		property bool isPageLoading: false
 		property bool hasMore: true
 		property var error: null
+		// Selection state
+		property var selectedIds: ({})
 		property var selectedItems: ({})
 	}
 }

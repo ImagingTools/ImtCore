@@ -1170,21 +1170,22 @@ DocumentViewBase {
 											hoverEnabled: true
 											cursorShape: Qt.PointingHandCursor
 											onClicked: {
-												var ids = []
-												for (var i = 0; i < root.pendingAssignees.length; i++)
-													ids.push(root.pendingAssignees[i].id)
-												assigneeSelectPopup.preselectedIds = ids
-												// Pre-populate known assignee data into dataProvider
-												if (assigneeSelectPopup.dataProvider) {
-													assigneeSelectPopup.dataProvider.clearSelectedItems()
+												var dp = assigneeSelectPopup.dataProvider
+												if (dp) {
+													// Pre-populate known item data into the cache
 													for (var j = 0; j < root.pendingAssignees.length; j++) {
 														var assignee = root.pendingAssignees[j]
-														assigneeSelectPopup.dataProvider.addSelectedItem(
+														dp.addKnownItem(
 															assignee.id,
 															{ id: assignee.id, title: assignee.name || assignee.id }
 														)
 													}
 												}
+												// Set preselected IDs (provider resolves missing items)
+												var ids = []
+												for (var i = 0; i < root.pendingAssignees.length; i++)
+													ids.push(root.pendingAssignees[i].id)
+												assigneeSelectPopup.preselectedIds = ids
 												assigneeSelectPopup.open()
 											}
 										}
@@ -1259,9 +1260,9 @@ DocumentViewBase {
 									
 									dataProvider: FilterableSelectGqlDataProvider {
 										collectionId: "Users"
+										multiSelect: true
 									}
 									
-									multiSelect: true
 									preselectedIds: []
 									idRole: "id"
 									textRole: "title"
@@ -1269,10 +1270,13 @@ DocumentViewBase {
 									itemWidth: 280
 									
 									onSelectionChanged: {
+										var dp = assigneeSelectPopup.dataProvider
 										var arr = []
 										for (var i = 0; i < selectedIds.length; i++) {
 											var selectedId = selectedIds[i]
-											var selectedName = assigneeSelectPopup.getSelectedItemText(selectedId) || selectedId
+											var selectedName = dp ? dp.getSelectedItemText(selectedId) : ""
+											if (!selectedName || selectedName === "")
+												selectedName = selectedId
 											arr.push({id: selectedId, name: selectedName})
 										}
 										root.pendingAssignees = arr
