@@ -28,6 +28,7 @@ import imtgui 1.0
 	- Optional CheckBox selection mode (\c showCheckBox)
 	- Optional separator lines between delegates (\c showSeparator)
 	- Customizable filter placeholder text (\c filterPlaceholder)
+	- Optional selected items group at top with "Clear all" button (\c showSelectedGroup)
 
 	\sa FilterableSelectDataProvider, FilterableSelectGqlDataProvider
 */
@@ -66,6 +67,9 @@ PopupView {
 
 	// --- Filter field placeholder ---
 	property string filterPlaceholder: qsTr("Filter...")
+
+	// --- Selected items group at top ---
+	property bool showSelectedGroup: false
 
 	// --- Injectable delegate ---
 	property Component delegate: Component {
@@ -175,6 +179,8 @@ PopupView {
 	property QtObject __internal: QtObject {
 		property int focusedIndex: -1
 		property bool hoverBlocked: true
+		property var selectedItemsList: []
+		property int selectedItemsCount: 0
 	}
 
 	// --- Lifecycle (called by ModalDialogManager via DialogManagerView) ---
@@ -193,6 +199,8 @@ PopupView {
 			root.dataProvider.setPreselectedIds(root.preselectedIds)
 			root.dataProvider.fetch("")
 		}
+
+		root.__rebuildSelectedGroup()
 
 		filterField.setFocus(true)
 		filterField.forceActiveFocus()
@@ -215,6 +223,31 @@ PopupView {
 		}
 	}
 
+	function __rebuildSelectedGroup(){
+		if (!root.showSelectedGroup || !root.dataProvider){
+			root.__internal.selectedItemsList = []
+			root.__internal.selectedItemsCount = 0
+			return
+		}
+		var items = root.dataProvider.getSelectedItems()
+		root.__internal.selectedItemsList = items
+		root.__internal.selectedItemsCount = items.length
+	}
+
+	function __handleRemoveSelectedItem(itemId){
+		if (!root.dataProvider || !itemId){
+			return
+		}
+		var item = null
+		for (var i = 0; i < root.__internal.selectedItemsList.length; i++){
+			if (String(root.__internal.selectedItemsList[i].id) === String(itemId)){
+				item = root.__internal.selectedItemsList[i]
+				break
+			}
+		}
+		root.dataProvider.toggleItem(String(itemId), item)
+	}
+
 	// --- Data provider connection ---
 	Connections {
 		target: root.dataProvider
@@ -230,6 +263,7 @@ PopupView {
 
 		function onSelectionChanged(){
 			root.selectionChanged(root.dataProvider.getSelectedIds())
+			root.__rebuildSelectedGroup()
 		}
 
 		function onIsInitialLoadingChanged(){
@@ -339,6 +373,139 @@ PopupView {
 					onClicked: {
 						filterField.text = ""
 					}
+				}
+			}
+
+			// --- Selected items group ---
+			Column {
+				id: selectedGroup
+
+				width: parent.width
+				visible: root.showSelectedGroup && root.__internal.selectedItemsCount > 0
+				spacing: 0
+
+				// Header row: "Selected (N)" + "Clear all"
+				Item {
+					width: parent.width
+					height: Style.controlHeightS
+
+					Text {
+						anchors.left: parent.left
+						anchors.verticalCenter: parent.verticalCenter
+						font.pixelSize: Style.fontSizeS
+						color: Style.placeHolderTextColor
+						text: qsTr("Selected") + " (" + root.__internal.selectedItemsCount + ")"
+					}
+
+					Text {
+						anchors.right: parent.right
+						anchors.verticalCenter: parent.verticalCenter
+						font.pixelSize: Style.fontSizeS
+						color: Style.linkColor
+						text: qsTr("Clear all")
+
+						MouseArea {
+							anchors.fill: parent
+							cursorShape: Qt.PointingHandCursor
+							onClicked: {
+								if (root.dataProvider){
+									root.dataProvider.clearSelection()
+								}
+							}
+						}
+					}
+				}
+
+				// Selected items list
+				Column {
+					width: parent.width
+					spacing: 0
+
+					Repeater {
+						id: selectedItemsRepeater
+
+						model: root.__internal.selectedItemsCount
+
+						Item {
+							width: selectedGroup.width
+							height: root.itemHeight
+
+							Row {
+								anchors.verticalCenter: parent.verticalCenter
+								anchors.left: parent.left
+								anchors.leftMargin: Style.marginM
+								anchors.right: removeBtn.left
+								anchors.rightMargin: Style.marginS
+								spacing: Style.marginS
+
+								CheckBox {
+									width: Style.itemSizeS
+									height: Style.itemSizeS
+									mainMargin: Style.marginM
+									borderColor: Style.grayColor
+									anchors.verticalCenter: parent.verticalCenter
+									visible: root.showCheckBox
+									checkState: Qt.Checked
+									function nextCheckState() {
+										var selItem = root.__internal.selectedItemsList[model.index]
+										if (selItem){
+											root.__handleRemoveSelectedItem(selItem[root.idRole])
+										}
+									}
+								}
+
+								Text {
+									anchors.verticalCenter: parent.verticalCenter
+									font.pixelSize: root.textSize
+									color: root.fontColor
+									text: {
+										var selItem = root.__internal.selectedItemsList[model.index]
+										return selItem ? String(selItem[root.textRole] || "") : ""
+									}
+									elide: Text.ElideRight
+									width: parent.width - parent.spacing - (root.showCheckBox ? Style.itemSizeS + parent.spacing : 0)
+								}
+							}
+
+							Button {
+								id: removeBtn
+
+								anchors.verticalCenter: parent.verticalCenter
+								anchors.right: parent.right
+								anchors.rightMargin: Style.marginM
+
+								width: Style.iconSizeXS
+								height: Style.iconSizeXS
+
+								decorator: Component { IconButtonDecorator {} }
+								iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+
+								onClicked: {
+									var selItem = root.__internal.selectedItemsList[model.index]
+									if (selItem){
+										root.__handleRemoveSelectedItem(selItem[root.idRole])
+									}
+								}
+							}
+
+							Rectangle {
+								anchors.bottom: parent.bottom
+								width: parent.width
+								height: 1
+								color: Style.borderColor
+								visible: root.showSeparator
+								opacity: 0.4
+							}
+						}
+					}
+				}
+
+				// Group separator line
+				Rectangle {
+					width: parent.width
+					height: 1
+					color: Style.borderColor
+					opacity: 0.6
 				}
 			}
 
