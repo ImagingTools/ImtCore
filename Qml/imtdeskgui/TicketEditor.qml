@@ -1253,25 +1253,23 @@ DocumentViewBase {
 									
 									onSelectionChanged: {
 										var arr = []
+										// Build lookup maps for O(1) name resolution
+										var providerNames = ({})
+										if (assigneeSelectPopup.dataProvider) {
+											for (var pi = 0; pi < assigneeSelectPopup.dataProvider.items.length; pi++) {
+												var pItem = assigneeSelectPopup.dataProvider.items[pi]
+												providerNames[String(pItem.id)] = pItem.title || ""
+											}
+										}
+										var pendingNames = ({})
+										for (var pk = 0; pk < root.pendingAssignees.length; pk++) {
+											pendingNames[root.pendingAssignees[pk].id] = root.pendingAssignees[pk].name || ""
+										}
+										
 										for (var i = 0; i < selectedIds.length; i++) {
-											var sid = selectedIds[i]
-											var sname = sid
-											// Try to get name from visible items
-											for (var j = 0; j < assigneeSelectPopup.dataProvider.items.length; j++) {
-												var item = assigneeSelectPopup.dataProvider.items[j]
-												if (String(item.id) === sid) {
-													sname = item.title || sid
-													break
-												}
-											}
-											// Try to keep name from existing pendingAssignees
-											for (var k = 0; k < root.pendingAssignees.length; k++) {
-												if (root.pendingAssignees[k].id === sid) {
-													sname = root.pendingAssignees[k].name || sname
-													break
-												}
-											}
-											arr.push({id: sid, name: sname})
+											var selectedId = selectedIds[i]
+											var selectedName = providerNames[selectedId] || pendingNames[selectedId] || selectedId
+											arr.push({id: selectedId, name: selectedName})
 										}
 										root.pendingAssignees = arr
 										root._assigneesChanged = true
