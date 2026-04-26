@@ -38,11 +38,11 @@ FilterableSelectDataProvider {
 		if (m_items){
 			var count = m_items.getItemsCount()
 			for (var i = 0; i < count; i++){
-				var id = m_items.getData("id", i)
-				var name = m_items.getData("name", i)
-				var desc = m_items.getData("description", i)
-				var icon = m_items.getData("icon", i)
-				var color = m_items.getData("color", i)
+				var id = m_items.getData("m_id", i)
+				var name = m_items.getData("m_name", i)
+				var desc = m_items.getData("m_description", i)
+				var icon = m_items.getData("m_icon", i)
+				var color = m_items.getData("m_color", i)
 				normalized.push({
 					id: id || "",
 					title: name || "",
