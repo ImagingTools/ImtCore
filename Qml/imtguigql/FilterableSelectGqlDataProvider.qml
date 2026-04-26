@@ -57,7 +57,11 @@ FilterableSelectDataProvider {
 
 	// --- Main list request ---
 	property GetSelectableItemsInput getSelectableItemsInput: GetSelectableItemsInput {}
-	property CollectionFilter __filter: CollectionFilter {}
+	property CollectionFilter __filter: CollectionFilter {
+		Component.onCompleted: {
+			setFilteringInfoIds(["Name", "Description"])
+		}
+	}
 
 	property GqlSdlRequestSender getSelectableItemsRequest: GqlSdlRequestSender {
 		gqlCommandId: ImtbaseFilterableSelectSdlCommandIds.s_getSelectableItems

@@ -12,6 +12,7 @@
 // ImtCore includes
 #include <imtbase/IObjectCollectionIterator.h>
 #include <imtbase/ICollectionInfo.h>
+#include <imtbase/CComplexCollectionFilter.h>
 #include <imtgql/CGqlRequest.h>
 
 
@@ -107,11 +108,17 @@ sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectCont
 		if (viewParams.count){
 			count = *viewParams.count;
 		}
+
+		if (viewParams.filterModel){
+			imtbase::CComplexCollectionFilter* complexFilterPtr = new imtbase::CComplexCollectionFilter();
+			if (m_complexCollectionFilterRepresentationController.GetDataModelFromSdlRepresentation(*complexFilterPtr, *viewParams.filterModel)){
+				filterParams.SetEditableParameter("ComplexFilter", complexFilterPtr, true);
+			}
+		}
 	}
 
 	istd::TDelPtr<imtbase::IObjectCollectionIterator> iteratorPtr(
 				m_objectCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), offset, count, &filterParams));
-	
 	if (!iteratorPtr.IsValid()){
 		errorMessage = QStringLiteral("Failed to create collection iterator");
 		SendErrorMessage(0, errorMessage, "CFilterableSelectControllerComp");
@@ -123,13 +130,16 @@ sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectCont
 		if (objectId.isEmpty()){
 			continue;
 		}
-		
+
 		sdl::imtbase::FilterableSelect::CSelectableItemData::V1_0 itemRepresentation;
 		itemRepresentation.id = objectId;
-		
+
 		QString name = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
 		itemRepresentation.name = name.isEmpty() ? QString::fromUtf8(objectId) : name;
-		
+
+		QString description = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+		itemRepresentation.description = description;
+
 		itemsList << itemRepresentation;
 	}
 

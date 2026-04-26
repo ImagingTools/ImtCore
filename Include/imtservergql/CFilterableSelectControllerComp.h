@@ -3,6 +3,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
+#include <imtserverapp/CComplexCollectionFilterRepresentationController.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/FilterableSelect.h>
 
 
@@ -30,6 +31,9 @@ protected:
 				const sdl::imtbase::FilterableSelect::CGetSelectableItemsGqlRequest& getSelectableItemsRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+
+private:
+	imtserverapp::CComplexCollectionFilterRepresentationController m_complexCollectionFilterRepresentationController;
 
 private:
 	I_ATTR(QByteArray, m_collectionIdAttrPtr);

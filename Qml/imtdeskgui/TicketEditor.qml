@@ -1267,6 +1267,7 @@ DocumentViewBase {
 										itemWidth: 280
 										showCheckBox: true
 										showSeparator: true
+										filterPlaceholder: qsTr("Type or choose a user")
 										
 										onSelectionChanged: {
 											var arr = []
