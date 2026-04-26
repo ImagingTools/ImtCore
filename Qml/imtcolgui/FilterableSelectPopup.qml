@@ -237,7 +237,7 @@ PopupView {
 
 		anchors.fill: parent
 		color: Style.baseColor
-		radius: Style.buttonRadius
+		radius: Style.radiusL
 		border.width: 1
 		border.color: Style.alternateBaseColor
 	}
@@ -460,9 +460,9 @@ PopupView {
 		anchors.fill: background
 		z: background.z - 1
 
-		horizontalOffset: 2
-		verticalOffset: 2
-		radius: Style.radiusM
+		horizontalOffset: 3
+		verticalOffset: 3
+		radius: Style.radiusL
 		color: Style.shadowColor
 		source: background
 	}
@@ -495,7 +495,7 @@ PopupView {
 			root.__internal.hoverBlocked = true
 			if (root.__internal.focusedIndex > 0){
 				root.__internal.focusedIndex--
-				contentYCorrection(false)
+				root.contentYCorrection(false)
 			}
 		}
 	}
@@ -510,7 +510,7 @@ PopupView {
 			var itemCount = root.dataProvider ? root.dataProvider.items.length : 0
 			if (root.__internal.focusedIndex < itemCount - 1){
 				root.__internal.focusedIndex++
-				contentYCorrection(true)
+				root.contentYCorrection(true)
 			}
 			else if (root.__internal.focusedIndex === itemCount - 1 && root.dataProvider){
 				root.dataProvider.fetchMore()
