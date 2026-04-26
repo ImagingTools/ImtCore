@@ -1170,23 +1170,21 @@ DocumentViewBase {
 											hoverEnabled: true
 											cursorShape: Qt.PointingHandCursor
 											onClicked: {
-												var dp = assigneeSelectPopup.dataProvider
-												if (dp) {
-													// Pre-populate known item data into the cache
-													for (var j = 0; j < root.pendingAssignees.length; j++) {
-														var assignee = root.pendingAssignees[j]
-														dp.addKnownItem(
-															assignee.id,
-															{ id: assignee.id, title: assignee.name || assignee.id }
-														)
-													}
+												var known = []
+												for (var j = 0; j < root.pendingAssignees.length; j++) {
+													var assignee = root.pendingAssignees[j]
+													known.push({ id: assignee.id, title: assignee.name || assignee.id })
 												}
-												// Set preselected IDs (provider resolves missing items)
 												var ids = []
 												for (var i = 0; i < root.pendingAssignees.length; i++)
 													ids.push(root.pendingAssignees[i].id)
-												assigneeSelectPopup.preselectedIds = ids
-												assigneeSelectPopup.open()
+												var point = addAssigneeBtn.mapToItem(null, 0, addAssigneeBtn.height)
+												ModalDialogManager.openDialog(assigneeSelectComp, {
+													"x": point.x,
+													"y": point.y,
+													"knownItems": known,
+													"preselectedIds": ids
+												})
 											}
 										}
 									}
@@ -1254,34 +1252,33 @@ DocumentViewBase {
 									wrapMode: Text.WordWrap
 								}
 								
-								// Assignee picker popup — FilterableSelectPopup with Users collection
-								FilterableSelectPopup {
-									id: assigneeSelectPopup
+								// Assignee picker Component — opened via ModalDialogManager
+								Component {
+									id: assigneeSelectComp
 									
-									dataProvider: FilterableSelectGqlDataProvider {
-										collectionId: "Users"
-										multiSelect: true
-									}
-									
-									preselectedIds: []
-									idRole: "id"
-									textRole: "title"
-									
-									itemWidth: 280
-									
-									onSelectionChanged: {
-										var dp = assigneeSelectPopup.dataProvider
-										var arr = []
-										for (var i = 0; i < selectedIds.length; i++) {
-											var selectedId = selectedIds[i]
-											var selectedName = dp ? dp.getSelectedItemText(selectedId) : ""
-											if (!selectedName)
-												selectedName = selectedId
-											arr.push({id: selectedId, name: selectedName})
+									FilterableSelectPopup {
+										dataProvider: FilterableSelectGqlDataProvider {
+											collectionId: "Users"
+											multiSelect: true
 										}
-										root.pendingAssignees = arr
-										root._assigneesChanged = true
-										root.doUpdateModel()
+										
+										idRole: "id"
+										textRole: "title"
+										itemWidth: 280
+										
+										onSelectionChanged: {
+											var arr = []
+											for (var i = 0; i < selectedIds.length; i++) {
+												var selId = selectedIds[i]
+												var selName = dataProvider ? dataProvider.getSelectedItemText(selId) : ""
+												if (!selName)
+													selName = selId
+												arr.push({id: selId, name: selName})
+											}
+											root.pendingAssignees = arr
+											root._assigneesChanged = true
+											root.doUpdateModel()
+										}
 									}
 								}
 							}

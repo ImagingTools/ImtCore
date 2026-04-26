@@ -31,9 +31,6 @@ import imtgui 1.0
 PopupView {
 	id: root
 
-	visible: false
-	z: 1000
-
 	width: itemWidth
 	height: filterField.height + itemBody.height + (footerItem.visible ? footerItem.height : 0)
 
@@ -56,6 +53,7 @@ PopupView {
 
 	// --- Selection ---
 	property var preselectedIds: []
+	property var knownItems: []
 
 	// --- Injectable delegate ---
 	property Component delegate: Component {
@@ -83,8 +81,6 @@ PopupView {
 	// --- Signals ---
 	signal itemSelected(string itemId, int index)
 	signal selectionChanged(var selectedIds)
-	signal opened()
-	signal closed()
 
 	// --- Delegate helpers (public, use in custom delegates) ---
 
@@ -127,36 +123,25 @@ PopupView {
 		property bool hoverBlocked: true
 	}
 
-	// --- Public API ---
-	function open(){
-		if (root.visible){
-			return
-		}
-
+	// --- Lifecycle (called by ModalDialogManager via DialogManagerView) ---
+	function started(){
 		root.__internal.focusedIndex = -1
 		root.__internal.hoverBlocked = true
 
 		filterField.text = ""
 
 		if (root.dataProvider){
+			for (var i = 0; i < root.knownItems.length; i++){
+				var item = root.knownItems[i]
+				root.dataProvider.addKnownItem(item.id, item)
+			}
 			root.dataProvider.setPreselectedIds(root.preselectedIds)
-		}
-
-		root.visible = true
-		root.opened()
-
-		if (root.dataProvider){
 			root.dataProvider.fetch("")
 		}
 	}
 
-	function close(){
-		if (!root.visible){
-			return
-		}
-
-		root.visible = false
-		root.closed()
+	function closePopup(){
+		ModalDialogManager.closeDialog()
 	}
 
 	function handleItemClick(itemId, index){
@@ -168,22 +153,7 @@ PopupView {
 		root.itemSelected(itemId, index)
 
 		if (!root.dataProvider.multiSelect){
-			root.close()
-		}
-	}
-
-	// --- Background overlay to close on outside click ---
-	MouseArea {
-		id: backgroundOverlay
-
-		parent: root.parent ? root.parent : root
-		anchors.fill: parent
-		z: root.z - 1
-		visible: root.visible
-		enabled: root.visible
-
-		onClicked: {
-			root.close()
+			root.closePopup()
 		}
 	}
 
@@ -425,15 +395,15 @@ PopupView {
 	// --- Keyboard navigation ---
 	Shortcut {
 		sequence: "Escape"
-		enabled: root.visible
+		enabled: true
 		onActivated: {
-			root.close()
+			root.closePopup()
 		}
 	}
 
 	Shortcut {
 		sequence: "Return"
-		enabled: root.visible && !filterField.textInputFocus
+		enabled: !filterField.textInputFocus
 		onActivated: {
 			if (root.__internal.focusedIndex >= 0){
 				var id = root.getItemId(root.__internal.focusedIndex)
@@ -444,7 +414,7 @@ PopupView {
 
 	Shortcut {
 		sequence: "Up"
-		enabled: root.visible
+		enabled: true
 		onActivated: {
 			if (filterField.textInputFocus){
 				filterField.setFocus(false)
@@ -459,7 +429,7 @@ PopupView {
 
 	Shortcut {
 		sequence: "Down"
-		enabled: root.visible
+		enabled: true
 		onActivated: {
 			if (filterField.textInputFocus){
 				filterField.setFocus(false)
