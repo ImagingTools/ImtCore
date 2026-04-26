@@ -1833,6 +1833,9 @@ bool CSqlDatabaseDocumentDelegateComp::CreateDocumentIdFilterQuery(
 {
 	const QByteArrayList documentIds = documentIdFilter.GetDocumentIds();
 	if (documentIds.isEmpty()){
+		// An empty document IDs list means the filter was not explicitly set
+		// (it is in its default state), so no document-ID restriction should apply.
+		// The caller skips adding the filter clause when documentIdFilterQuery is empty.
 		return false;
 	}
 
