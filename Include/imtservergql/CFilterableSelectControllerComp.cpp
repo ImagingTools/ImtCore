@@ -66,7 +66,7 @@ sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectCont
 	// ID-based fetch mode: when ids are provided, return only those specific items
 	if (arguments.input.Version_1_0->ids && !arguments.input.Version_1_0->ids->empty()){
 		const auto& requestedIds = *arguments.input.Version_1_0->ids;
-		for (int i = 0; i < requestedIds.size(); ++i){
+		for (size_t i = 0; i < requestedIds.size(); ++i){
 			QByteArray objectId = requestedIds[i].toByteArray();
 			if (objectId.isEmpty()){
 				continue;
@@ -87,7 +87,7 @@ sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectCont
 
 		sdl::imtbase::ImtCollection::CNotificationItem::V1_0 notification;
 		notification.pagesCount = 1;
-		notification.totalCount = itemsList.size();
+		notification.totalCount = static_cast<int>(itemsList.size());
 		response.Version_1_0->notification = notification;
 
 		return response;

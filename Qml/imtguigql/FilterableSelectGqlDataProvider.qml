@@ -32,6 +32,29 @@ FilterableSelectDataProvider {
 		property int pendingFetchByIdsRequestId: 0
 	}
 
+	// --- Shared normalization helper ---
+	function __normalizePayloadItems(m_items){
+		var normalized = []
+		if (m_items){
+			var count = m_items.getItemsCount()
+			for (var i = 0; i < count; i++){
+				var id = m_items.getData("id", i)
+				var name = m_items.getData("name", i)
+				var desc = m_items.getData("description", i)
+				var icon = m_items.getData("icon", i)
+				var color = m_items.getData("color", i)
+				normalized.push({
+					id: id || "",
+					title: name || "",
+					description: desc || "",
+					icon: icon || "",
+					color: color || ""
+				})
+			}
+		}
+		return normalized
+	}
+
 	// --- Main list request ---
 	property GetSelectableItemsInput getSelectableItemsInput: GetSelectableItemsInput {}
 	property CollectionFilter __filter: CollectionFilter {}
@@ -42,25 +65,7 @@ FilterableSelectDataProvider {
 			GetSelectableItemsPayload {
 				onFinished: {
 					var rid = root.__gql.pendingRequestId
-					var normalized = []
-					if (m_items){
-						var count = m_items.getItemsCount()
-						for (var i = 0; i < count; i++){
-							var id = m_items.getData("id", i)
-							var name = m_items.getData("name", i)
-							var desc = m_items.getData("description", i)
-							var icon = m_items.getData("icon", i)
-							var color = m_items.getData("color", i)
-							normalized.push({
-								id: id || "",
-								title: name || "",
-								description: desc || "",
-								icon: icon || "",
-								color: color || ""
-							})
-						}
-					}
-					root.onRequestSuccess(rid, normalized)
+					root.onRequestSuccess(rid, root.__normalizePayloadItems(m_items))
 				}
 			}
 		}
@@ -85,25 +90,7 @@ FilterableSelectDataProvider {
 			GetSelectableItemsPayload {
 				onFinished: {
 					var rid = root.__gql.pendingFetchByIdsRequestId
-					var normalized = []
-					if (m_items){
-						var count = m_items.getItemsCount()
-						for (var i = 0; i < count; i++){
-							var id = m_items.getData("id", i)
-							var name = m_items.getData("name", i)
-							var desc = m_items.getData("description", i)
-							var icon = m_items.getData("icon", i)
-							var color = m_items.getData("color", i)
-							normalized.push({
-								id: id || "",
-								title: name || "",
-								description: desc || "",
-								icon: icon || "",
-								color: color || ""
-							})
-						}
-					}
-					root.onFetchByIdsSuccess(rid, normalized)
+					root.onFetchByIdsSuccess(rid, root.__normalizePayloadItems(m_items))
 				}
 			}
 		}
