@@ -16,7 +16,7 @@ namespace imtcol
 // public methods
 
 CDocumentIdFilter::	CDocumentIdFilter()
-	:m_conditionType(CT_IN)
+	:m_conditionType(CT_NONE)
 {
 }
 
@@ -110,7 +110,7 @@ istd::IChangeableUniquePtr CDocumentIdFilter::CloneMe(CompatibilityMode /*mode*/
 bool CDocumentIdFilter::ResetData(CompatibilityMode /*mode*/)
 {
 	m_documentIds.clear();
-	m_conditionType = CT_IN;
+	m_conditionType = CT_NONE;
 
 	return true;
 }
