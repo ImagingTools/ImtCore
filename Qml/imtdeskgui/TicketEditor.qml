@@ -1174,6 +1174,17 @@ DocumentViewBase {
 												for (var i = 0; i < root.pendingAssignees.length; i++)
 													ids.push(root.pendingAssignees[i].id)
 												assigneeSelectPopup.preselectedIds = ids
+												// Pre-populate known assignee data into dataProvider
+												if (assigneeSelectPopup.dataProvider) {
+													assigneeSelectPopup.dataProvider.clearSelectedItems()
+													for (var j = 0; j < root.pendingAssignees.length; j++) {
+														var assignee = root.pendingAssignees[j]
+														assigneeSelectPopup.dataProvider.addSelectedItem(
+															assignee.id,
+															{ id: assignee.id, title: assignee.name || assignee.id }
+														)
+													}
+												}
 												assigneeSelectPopup.open()
 											}
 										}
@@ -1259,22 +1270,9 @@ DocumentViewBase {
 									
 									onSelectionChanged: {
 										var arr = []
-										// Build lookup maps for O(1) name resolution
-										var providerNames = ({})
-										if (assigneeSelectPopup.dataProvider) {
-											for (var pi = 0; pi < assigneeSelectPopup.dataProvider.items.length; pi++) {
-												var pItem = assigneeSelectPopup.dataProvider.items[pi]
-												providerNames[String(pItem.id)] = pItem.title || ""
-											}
-										}
-										var pendingNames = ({})
-										for (var pk = 0; pk < root.pendingAssignees.length; pk++) {
-											pendingNames[root.pendingAssignees[pk].id] = root.pendingAssignees[pk].name || ""
-										}
-										
 										for (var i = 0; i < selectedIds.length; i++) {
 											var selectedId = selectedIds[i]
-											var selectedName = providerNames[selectedId] || pendingNames[selectedId] || selectedId
+											var selectedName = assigneeSelectPopup.getSelectedItemText(selectedId) || selectedId
 											arr.push({id: selectedId, name: selectedName})
 										}
 										root.pendingAssignees = arr

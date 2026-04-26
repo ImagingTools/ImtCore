@@ -9,7 +9,11 @@ import com.imtcore.imtqml 1.0
 
 	Manages request lifecycle, pagination, data normalization and race condition protection.
 	UI receives only normalized JS objects and state signals — no backend coupling.
-	Subclasses must override \c executeRequest() to implement concrete data fetching.
+	Subclasses must override \c executeRequest() and \c executeFetchByIds()
+	to implement concrete data fetching.
+
+	Maintains a persistent \c selectedItems map that stores full item objects for
+	all selected IDs, independent from the current visible dataset (pagination/filtering).
 
 	\sa FilterableSelectPopup, FilterableSelectGqlDataProvider
 */
@@ -26,10 +30,12 @@ QtObject {
 	readonly property bool isPageLoading: __internal.isPageLoading
 	readonly property bool hasMore: __internal.hasMore
 	readonly property var error: __internal.error
+	readonly property var selectedItems: __internal.selectedItems
 
 	// --- Signals for UI ---
 	signal dataChanged()
 	signal errorOccurred(var error)
+	signal selectedItemsResolved()
 
 	// --- Public API ---
 
@@ -80,6 +86,90 @@ QtObject {
 		}
 	}
 
+	/*!
+		Fetches specific items by their IDs for resolving preselected items
+		that are not in the current visible dataset.
+		\param ids Array of item IDs to fetch.
+	*/
+	function fetchByIds(ids){
+		if (!ids || ids.length === 0){
+			return
+		}
+
+		__internal.fetchByIdsRequestId++
+		root.executeFetchByIds(__internal.fetchByIdsRequestId, ids)
+	}
+
+	// --- Selection management ---
+
+	/*!
+		Stores a full item object in the selectedItems map.
+		\param id Item ID.
+		\param item Full normalized item object { id, title, ... }.
+	*/
+	function addSelectedItem(id, item){
+		if (!id || id === "" || !item){
+			return
+		}
+		var updated = ({})
+		for (var k in __internal.selectedItems){
+			updated[k] = __internal.selectedItems[k]
+		}
+		updated[String(id)] = item
+		__internal.selectedItems = updated
+	}
+
+	/*!
+		Removes an item from the selectedItems map.
+		\param id Item ID to remove.
+	*/
+	function removeSelectedItem(id){
+		if (!id || id === ""){
+			return
+		}
+		var updated = ({})
+		for (var k in __internal.selectedItems){
+			if (k !== String(id)){
+				updated[k] = __internal.selectedItems[k]
+			}
+		}
+		__internal.selectedItems = updated
+	}
+
+	/*!
+		Clears all selected items.
+	*/
+	function clearSelectedItems(){
+		__internal.selectedItems = ({})
+	}
+
+	/*!
+		Returns the display text for a selected item by ID.
+		\param id Item ID.
+		\return Title string or empty string if not resolved.
+	*/
+	function getSelectedItemText(id){
+		var sid = String(id || "")
+		if (sid === ""){
+			return ""
+		}
+		var item = __internal.selectedItems[sid]
+		return item ? String(item.title || "") : ""
+	}
+
+	/*!
+		Returns an array of all selected item objects.
+	*/
+	function getSelectedItems(){
+		var result = []
+		for (var k in __internal.selectedItems){
+			if (__internal.selectedItems[k]){
+				result.push(__internal.selectedItems[k])
+			}
+		}
+		return result
+	}
+
 	// --- Protected: subclass must override ---
 
 	/*!
@@ -96,6 +186,18 @@ QtObject {
 		root.onRequestSuccess(requestId, [])
 	}
 
+	/*!
+		Override in subclass to fetch specific items by IDs.
+		When results arrive, call \c onFetchByIdsSuccess(requestId, items).
+		On error, call \c onFetchByIdsError(requestId, message).
+		\param requestId Unique request identifier.
+		\param ids Array of item IDs to fetch.
+	*/
+	function executeFetchByIds(requestId, ids){
+		console.warn("executeFetchByIds() should be implemented in a subclass")
+		root.onFetchByIdsSuccess(requestId, [])
+	}
+
 	// --- Protected: called by subclass on response ---
 
 	/*!
@@ -108,17 +210,17 @@ QtObject {
 			return
 		}
 
-		let newItems = rawItems || []
-		let merged = __internal.items.slice()
-		let ids = ({})
-		for (let k in __internal.knownIds){
+		var newItems = rawItems || []
+		var merged = __internal.items.slice()
+		var ids = ({})
+		for (var k in __internal.knownIds){
 			ids[k] = true
 		}
 
-		for (let i = 0; i < newItems.length; i++){
-			let item = newItems[i]
+		for (var i = 0; i < newItems.length; i++){
+			var item = newItems[i]
 			if (item && item.id !== undefined && item.id !== null){
-				let sid = String(item.id)
+				var sid = String(item.id)
 				if (!ids[sid]){
 					ids[sid] = true
 					merged.push(item)
@@ -158,16 +260,58 @@ QtObject {
 		root.errorOccurred(__internal.error)
 	}
 
+	/*!
+		Called by subclass when fetchByIds completes successfully.
+		Merges resolved items into selectedItems map.
+		\param requestId Must match the requestId from executeFetchByIds.
+		\param resolvedItems Array of normalized JS objects.
+	*/
+	function onFetchByIdsSuccess(requestId, resolvedItems){
+		if (requestId !== __internal.fetchByIdsRequestId){
+			return
+		}
+
+		var updated = ({})
+		for (var k in __internal.selectedItems){
+			updated[k] = __internal.selectedItems[k]
+		}
+
+		var items = resolvedItems || []
+		for (var i = 0; i < items.length; i++){
+			var item = items[i]
+			if (item && item.id !== undefined && item.id !== null){
+				updated[String(item.id)] = item
+			}
+		}
+
+		__internal.selectedItems = updated
+		root.selectedItemsResolved()
+	}
+
+	/*!
+		Called by subclass when fetchByIds fails.
+		\param requestId Must match the requestId from executeFetchByIds.
+		\param message Human-readable error text.
+	*/
+	function onFetchByIdsError(requestId, message){
+		if (requestId !== __internal.fetchByIdsRequestId){
+			return
+		}
+		// Silent failure — selectedItems stays unchanged, IDs remain unresolved
+	}
+
 	// --- Private state ---
 	property QtObject __internal: QtObject {
 		property var items: []
 		property var knownIds: ({})
 		property int requestId: 0
+		property int fetchByIdsRequestId: 0
 		property int currentOffset: 0
 		property string currentFilter: ""
 		property bool isInitialLoading: false
 		property bool isPageLoading: false
 		property bool hasMore: true
 		property var error: null
+		property var selectedItems: ({})
 	}
 }

@@ -61,6 +61,39 @@ sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectCont
 
 	response.Version_1_0.emplace();
 
+	imtsdl::TElementList<sdl::imtbase::FilterableSelect::CSelectableItemData::V1_0> itemsList;
+
+	// ID-based fetch mode: when ids are provided, return only those specific items
+	if (arguments.input.Version_1_0->ids && !arguments.input.Version_1_0->ids->empty()){
+		const auto& requestedIds = *arguments.input.Version_1_0->ids;
+		for (int i = 0; i < requestedIds.size(); ++i){
+			QByteArray objectId = requestedIds[i].toByteArray();
+			if (objectId.isEmpty()){
+				continue;
+			}
+
+			QString name = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
+			if (name.isEmpty()){
+				continue;
+			}
+
+			sdl::imtbase::FilterableSelect::CSelectableItemData::V1_0 itemRepresentation;
+			itemRepresentation.id = objectId;
+			itemRepresentation.name = name;
+			itemsList << itemRepresentation;
+		}
+
+		response.Version_1_0->items = itemsList;
+
+		sdl::imtbase::ImtCollection::CNotificationItem::V1_0 notification;
+		notification.pagesCount = 1;
+		notification.totalCount = itemsList.size();
+		response.Version_1_0->notification = notification;
+
+		return response;
+	}
+
+	// Normal paginated fetch mode
 	int offset = 0;
 	int count = -1;
 	iprm::CParamsSet filterParams;
@@ -83,8 +116,6 @@ sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectCont
 		SendErrorMessage(0, errorMessage, "CFilterableSelectControllerComp");
 		return response;
 	}
-
-	imtsdl::TElementList<sdl::imtbase::FilterableSelect::CSelectableItemData::V1_0> itemsList;
 
 	do {
 		const QByteArray objectId = iteratorPtr->GetObjectId();

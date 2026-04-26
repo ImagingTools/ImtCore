@@ -18,6 +18,9 @@ import imtcontrols 1.0
 	- Debounced server-side search (300ms default)
 	- Infinite scroll via dataProvider.fetchMore()
 	- Single and multi selection (id-based, independent from visible dataset)
+	- Persistent selectedItems map: selected items remain accessible even when
+	  not in the current visible dataset (pagination/filtering)
+	- Preselected IDs resolved via dataProvider.fetchByIds() for items not yet loaded
 	- Injectable delegate component with explicit roles (\c idRole, \c textRole)
 	- Keyboard navigation (↑↓ Enter Escape)
 	- Error display with click-to-retry
@@ -119,6 +122,30 @@ Item {
 		return root.dataProvider.items[index]
 	}
 
+	// --- Selected items API ---
+
+	/*!
+		Returns the display text for a selected item by its ID.
+		Resolves from dataProvider.selectedItems which persists across pagination/filtering.
+		\param id The item ID.
+	*/
+	function getSelectedItemText(id){
+		if (!root.dataProvider){
+			return ""
+		}
+		return root.dataProvider.getSelectedItemText(id)
+	}
+
+	/*!
+		Returns an array of all selected item objects from the persistent selectedItems map.
+	*/
+	function getSelectedItems(){
+		if (!root.dataProvider){
+			return []
+		}
+		return root.dataProvider.getSelectedItems()
+	}
+
 	// --- Internal state ---
 	property QtObject __internal: QtObject {
 		property var selectedIds: ({})
@@ -166,23 +193,39 @@ Item {
 			return
 		}
 
-		let id = String(itemId)
-		let selected = ({})
-		for (let key in __internal.selectedIds){
+		var id = String(itemId)
+		var selected = ({})
+		for (var key in __internal.selectedIds){
 			selected[key] = __internal.selectedIds[key]
 		}
 
 		if (root.multiSelect){
 			if (selected[id]){
 				delete selected[id]
+				if (root.dataProvider){
+					root.dataProvider.removeSelectedItem(id)
+				}
 			}
 			else {
 				selected[id] = true
+				if (root.dataProvider){
+					var item = root.getItem(index)
+					if (item){
+						root.dataProvider.addSelectedItem(id, item)
+					}
+				}
 			}
 		}
 		else {
 			selected = ({})
 			selected[id] = true
+			if (root.dataProvider){
+				root.dataProvider.clearSelectedItems()
+				var singleItem = root.getItem(index)
+				if (singleItem){
+					root.dataProvider.addSelectedItem(id, singleItem)
+				}
+			}
 		}
 
 		__internal.selectedIds = selected
@@ -195,8 +238,8 @@ Item {
 	}
 
 	function getSelectedIds(){
-		let result = []
-		for (let id in __internal.selectedIds){
+		var result = []
+		for (var id in __internal.selectedIds){
 			if (__internal.selectedIds[id]){
 				result.push(id)
 			}
@@ -206,15 +249,29 @@ Item {
 
 	// --- Internal helpers ---
 	function applyPreselectedIds(){
-		let selected = ({})
-		let ids = root.preselectedIds || []
-		for (let i = 0; i < ids.length; ++i){
-			let id = String(ids[i])
+		var selected = ({})
+		var ids = root.preselectedIds || []
+		for (var i = 0; i < ids.length; i++){
+			var id = String(ids[i])
 			if (id !== ""){
 				selected[id] = true
 			}
 		}
 		__internal.selectedIds = selected
+
+		// Resolve missing items via fetchByIds
+		if (root.dataProvider && ids.length > 0){
+			var missingIds = []
+			for (var j = 0; j < ids.length; j++){
+				var sid = String(ids[j])
+				if (sid !== "" && !root.dataProvider.getSelectedItemText(sid)){
+					missingIds.push(sid)
+				}
+			}
+			if (missingIds.length > 0){
+				root.dataProvider.fetchByIds(missingIds)
+			}
+		}
 	}
 
 	// --- Background overlay to close on outside click ---
@@ -238,10 +295,15 @@ Item {
 		enabled: root.dataProvider !== null
 
 		onDataChanged: {
-			let itemCount = root.dataProvider ? root.dataProvider.items.length : 0
+			var itemCount = root.dataProvider ? root.dataProvider.items.length : 0
 			if (__internal.focusedIndex >= itemCount){
 				__internal.focusedIndex = itemCount > 0 ? itemCount - 1 : -1
 			}
+		}
+
+		onSelectedItemsResolved: {
+			// Preselected items have been resolved — emit signal for consumers
+			root.selectionChanged(root.getSelectedIds())
 		}
 	}
 
@@ -477,7 +539,7 @@ Item {
 		enabled: root.visible && !filterField.textInputFocus
 		onActivated: {
 			if (__internal.focusedIndex >= 0){
-				let id = root.getItemId(__internal.focusedIndex)
+				var id = root.getItemId(__internal.focusedIndex)
 				root.toggleSelection(id, __internal.focusedIndex)
 			}
 		}
@@ -506,7 +568,7 @@ Item {
 				filterField.setFocus(false)
 			}
 			__internal.hoverBlocked = true
-			let itemCount = root.dataProvider ? root.dataProvider.items.length : 0
+			var itemCount = root.dataProvider ? root.dataProvider.items.length : 0
 			if (__internal.focusedIndex < itemCount - 1){
 				__internal.focusedIndex++
 				contentYCorrection(true)
@@ -519,12 +581,12 @@ Item {
 
 	function contentYCorrection(down_){
 		if (__internal.focusedIndex >= 0){
-			let contentY = popupListView.contentY
-			let itemH = root.itemHeight
-			let itemCount = root.dataProvider ? root.dataProvider.items.length : 0
-			let visibleCount = root.maxVisibleItems === -1 ? itemCount : Math.min(root.maxVisibleItems, itemCount)
+			var contentY = popupListView.contentY
+			var itemH = root.itemHeight
+			var itemCount = root.dataProvider ? root.dataProvider.items.length : 0
+			var visibleCount = root.maxVisibleItems === -1 ? itemCount : Math.min(root.maxVisibleItems, itemCount)
 			if (visibleCount <= 0) return
-			let index = __internal.focusedIndex
+			var index = __internal.focusedIndex
 
 			if (down_){
 				if ((index + 1) * itemH > contentY + visibleCount * itemH){

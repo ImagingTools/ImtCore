@@ -15,6 +15,9 @@ import imtbaseFilterableSelectSdl 1.0
 	Normalizes SDL response objects to plain JS { id, title, description, icon, color }
 	before passing to the base provider.
 
+	Also implements \c executeFetchByIds() for resolving preselected items
+	that are not in the current visible dataset.
+
 	\sa FilterableSelectDataProvider
 */
 FilterableSelectDataProvider {
@@ -26,8 +29,10 @@ FilterableSelectDataProvider {
 
 	property QtObject __gql: QtObject {
 		property int pendingRequestId: 0
+		property int pendingFetchByIdsRequestId: 0
 	}
 
+	// --- Main list request ---
 	property GetSelectableItemsInput getSelectableItemsInput: GetSelectableItemsInput {}
 	property CollectionFilter __filter: CollectionFilter {}
 
@@ -36,16 +41,16 @@ FilterableSelectDataProvider {
 		sdlObjectComp: Component {
 			GetSelectableItemsPayload {
 				onFinished: {
-					let rid = root.__gql.pendingRequestId
-					let normalized = []
+					var rid = root.__gql.pendingRequestId
+					var normalized = []
 					if (m_items){
-						let count = m_items.getItemsCount()
-						for (let i = 0; i < count; i++){
-							let id = m_items.getData("id", i)
-							let name = m_items.getData("name", i)
-							let desc = m_items.getData("description", i)
-							let icon = m_items.getData("icon", i)
-							let color = m_items.getData("color", i)
+						var count = m_items.getItemsCount()
+						for (var i = 0; i < count; i++){
+							var id = m_items.getData("id", i)
+							var name = m_items.getData("name", i)
+							var desc = m_items.getData("description", i)
+							var icon = m_items.getData("icon", i)
+							var color = m_items.getData("color", i)
 							normalized.push({
 								id: id || "",
 								title: name || "",
@@ -63,6 +68,49 @@ FilterableSelectDataProvider {
 		onFinished: {
 			if (status === -1){
 				root.onRequestError(root.__gql.pendingRequestId, qsTr("Failed to load items"), "GQL_ERROR")
+			}
+		}
+
+		function getHeaders(){
+			return root.getHeaders()
+		}
+	}
+
+	// --- FetchByIds request ---
+	property GetSelectableItemsInput __fetchByIdsInput: GetSelectableItemsInput {}
+
+	property GqlSdlRequestSender __fetchByIdsRequest: GqlSdlRequestSender {
+		gqlCommandId: ImtbaseFilterableSelectSdlCommandIds.s_getSelectableItems
+		sdlObjectComp: Component {
+			GetSelectableItemsPayload {
+				onFinished: {
+					var rid = root.__gql.pendingFetchByIdsRequestId
+					var normalized = []
+					if (m_items){
+						var count = m_items.getItemsCount()
+						for (var i = 0; i < count; i++){
+							var id = m_items.getData("id", i)
+							var name = m_items.getData("name", i)
+							var desc = m_items.getData("description", i)
+							var icon = m_items.getData("icon", i)
+							var color = m_items.getData("color", i)
+							normalized.push({
+								id: id || "",
+								title: name || "",
+								description: desc || "",
+								icon: icon || "",
+								color: color || ""
+							})
+						}
+					}
+					root.onFetchByIdsSuccess(rid, normalized)
+				}
+			}
+		}
+
+		onFinished: {
+			if (status === -1){
+				root.onFetchByIdsError(root.__gql.pendingFetchByIdsRequestId, qsTr("Failed to resolve items by IDs"))
 			}
 		}
 
@@ -90,5 +138,14 @@ FilterableSelectDataProvider {
 		}
 
 		getSelectableItemsRequest.send(getSelectableItemsInput)
+	}
+
+	function executeFetchByIds(requestId, ids){
+		__gql.pendingFetchByIdsRequestId = requestId
+
+		__fetchByIdsInput.m_collectionId = root.collectionId
+		__fetchByIdsInput.m_ids = ids
+
+		__fetchByIdsRequest.send(__fetchByIdsInput)
 	}
 }
