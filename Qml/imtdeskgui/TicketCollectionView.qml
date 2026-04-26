@@ -209,6 +209,7 @@ RemoteCollectionView {
 						m_ticketType: "SupportRequest"
 						m_priority: "Medium"
 						m_stateReason: "None"
+						m_accessLevel: "FullAccess"
 					}
 
 					function updateRepresentationFromDocument(){

@@ -4,6 +4,7 @@ import QtGraphicalEffects 1.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
+import imtgui 1.0
 
 /*!
 	\qmltype FilterableSelectPopup
@@ -27,7 +28,7 @@ import imtcontrols 1.0
 
 	\sa FilterableSelectDataProvider, FilterableSelectGqlDataProvider
 */
-Item {
+PopupView {
 	id: root
 
 	visible: false
@@ -66,7 +67,7 @@ Item {
 
 			text: root.getItemText(model.index)
 
-			selected: __internal.focusedIndex === model.index
+			selected: root.__internal.focusedIndex === model.index
 			highlighted: root.dataProvider ? root.dataProvider.isItemSelected(root.getItemId(model.index)) : false
 
 			onClicked: {
@@ -74,7 +75,7 @@ Item {
 			}
 
 			onEntered: {
-				__internal.focusedIndex = model.index
+				root.__internal.focusedIndex = model.index
 			}
 		}
 	}
@@ -132,8 +133,8 @@ Item {
 			return
 		}
 
-		__internal.focusedIndex = -1
-		__internal.hoverBlocked = true
+		root.__internal.focusedIndex = -1
+		root.__internal.hoverBlocked = true
 
 		filterField.text = ""
 
@@ -191,14 +192,14 @@ Item {
 		target: root.dataProvider
 		enabled: root.dataProvider !== null
 
-		onDataChanged: {
+		function onDataChanged() {
 			var itemCount = root.dataProvider ? root.dataProvider.items.length : 0
-			if (__internal.focusedIndex >= itemCount){
-				__internal.focusedIndex = itemCount > 0 ? itemCount - 1 : -1
+			if (root.__internal.focusedIndex >= itemCount){
+				root.__internal.focusedIndex = itemCount > 0 ? itemCount - 1 : -1
 			}
 		}
 
-		onSelectionChanged: {
+		function onSelectionChanged(){
 			root.selectionChanged(root.dataProvider.getSelectedIds())
 		}
 	}
@@ -210,7 +211,7 @@ Item {
 		duration: root.debounceInterval
 		onFinished: {
 			if (root.dataProvider){
-				__internal.focusedIndex = -1
+				root.__internal.focusedIndex = -1
 				root.dataProvider.fetch(filterField.text)
 			}
 		}
@@ -231,7 +232,7 @@ Item {
 		placeHolderText: qsTr("Filter...")
 
 		onTextChanged: {
-			__internal.focusedIndex = -1
+			root.__internal.focusedIndex = -1
 			debounce.stop()
 			debounce.start()
 		}
@@ -239,7 +240,7 @@ Item {
 		onAccepted: {
 			debounce.stop()
 			if (root.dataProvider){
-				__internal.focusedIndex = -1
+				root.__internal.focusedIndex = -1
 				root.dataProvider.fetch(filterField.text)
 			}
 		}
@@ -378,10 +379,10 @@ Item {
 		MouseArea {
 			anchors.fill: parent
 			hoverEnabled: true
-			visible: __internal.hoverBlocked
+			visible: root.__internal.hoverBlocked
 
 			onPositionChanged: {
-				__internal.hoverBlocked = false
+				root.__internal.hoverBlocked = false
 			}
 		}
 	}
@@ -434,9 +435,9 @@ Item {
 		sequence: "Return"
 		enabled: root.visible && !filterField.textInputFocus
 		onActivated: {
-			if (__internal.focusedIndex >= 0){
-				var id = root.getItemId(__internal.focusedIndex)
-				root.handleItemClick(id, __internal.focusedIndex)
+			if (root.__internal.focusedIndex >= 0){
+				var id = root.getItemId(root.__internal.focusedIndex)
+				root.handleItemClick(id, root.__internal.focusedIndex)
 			}
 		}
 	}
@@ -448,9 +449,9 @@ Item {
 			if (filterField.textInputFocus){
 				filterField.setFocus(false)
 			}
-			__internal.hoverBlocked = true
-			if (__internal.focusedIndex > 0){
-				__internal.focusedIndex--
+			root.__internal.hoverBlocked = true
+			if (root.__internal.focusedIndex > 0){
+				root.__internal.focusedIndex--
 				contentYCorrection(false)
 			}
 		}
@@ -463,26 +464,26 @@ Item {
 			if (filterField.textInputFocus){
 				filterField.setFocus(false)
 			}
-			__internal.hoverBlocked = true
+			root.__internal.hoverBlocked = true
 			var itemCount = root.dataProvider ? root.dataProvider.items.length : 0
-			if (__internal.focusedIndex < itemCount - 1){
-				__internal.focusedIndex++
+			if (root.__internal.focusedIndex < itemCount - 1){
+				root.__internal.focusedIndex++
 				contentYCorrection(true)
 			}
-			else if (__internal.focusedIndex === itemCount - 1 && root.dataProvider){
+			else if (root.__internal.focusedIndex === itemCount - 1 && root.dataProvider){
 				root.dataProvider.fetchMore()
 			}
 		}
 	}
 
 	function contentYCorrection(down_){
-		if (__internal.focusedIndex >= 0){
+		if (root.__internal.focusedIndex >= 0){
 			var contentY = popupListView.contentY
 			var itemH = root.itemHeight
 			var itemCount = root.dataProvider ? root.dataProvider.items.length : 0
 			var visibleCount = root.maxVisibleItems === -1 ? itemCount : Math.min(root.maxVisibleItems, itemCount)
 			if (visibleCount <= 0) return
-			var index = __internal.focusedIndex
+			var index = root.__internal.focusedIndex
 
 			if (down_){
 				if ((index + 1) * itemH > contentY + visibleCount * itemH){

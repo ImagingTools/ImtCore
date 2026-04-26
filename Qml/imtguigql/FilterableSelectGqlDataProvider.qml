@@ -111,6 +111,10 @@ FilterableSelectDataProvider {
 
 		getSelectableItemsInput.m_collectionId = root.collectionId
 
+		if (!getSelectableItemsInput.hasViewParams()){
+			getSelectableItemsInput.emplaceViewParams()
+		}
+
 		var viewParams = getSelectableItemsInput.m_viewParams
 		viewParams.m_offset = offset || 0
 		viewParams.m_count = count || 20
