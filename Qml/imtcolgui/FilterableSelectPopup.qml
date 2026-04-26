@@ -61,6 +61,8 @@ PopupView {
 			width: root.itemWidth
 			height: root.itemHeight
 
+			isSeparator: false
+
 			text: root.getItemText(model.index)
 
 			selected: root.__internal.focusedIndex === model.index
@@ -185,209 +187,221 @@ PopupView {
 		}
 	}
 
-	// --- Search Field ---
-	CustomTextField {
-		id: filterField
-
-		z: 100
-		width: root.itemWidth
-		height: Style.controlHeightM
-		anchors.top: parent.top
-		anchors.left: parent.left
-		margin: Style.marginM
-		textSize: root.textSize
-		fontColor: root.fontColor
-		placeHolderText: qsTr("Filter...")
-
-		onTextChanged: {
-			root.__internal.focusedIndex = -1
-			debounce.stop()
-			debounce.start()
-		}
-
-		onAccepted: {
-			debounce.stop()
-			if (root.dataProvider){
-				root.__internal.focusedIndex = -1
-				root.dataProvider.fetch(filterField.text)
-			}
-		}
-
-		Button {
-			id: clearButton
-
-			anchors.verticalCenter: filterField.verticalCenter
-			anchors.right: filterField.right
-			anchors.rightMargin: Style.marginXS
-
-			width: height
-			height: 12
-			z: filterField.z + 1
-
-			decorator: Component { IconButtonDecorator {} }
-			iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
-
-			visible: filterField.text !== ""
-			enabled: visible
-
-			onClicked: {
-				filterField.text = ""
-			}
-		}
-	}
-
-	// --- List Body ---
+	// --- Background (single visual container for shadow) ---
 	Rectangle {
-		id: itemBody
+		id: background
 
-		anchors.top: filterField.bottom
-		anchors.left: parent.left
-
-		width: root.itemWidth
-		height: errorItem.visible ? errorItem.height
-				: noDataItem.visible ? noDataItem.height
-				: popupListView.height
-		radius: Style.buttonRadius
-
+		anchors.fill: parent
 		color: Style.baseColor
+		radius: Style.buttonRadius
 		border.width: 1
 		border.color: Style.alternateBaseColor
+	}
 
-		Rectangle {
-			id: noDataItem
+	MouseArea {
+		anchors.fill: background
+		onWheel: {
+			wheel.accepted = true
+		}
+		onClicked: {
+			mouse.accepted = true
+		}
+		onReleased: {}
+		onPressAndHold: {}
+		onPressed: {}
+		onPositionChanged: {}
+	}
 
-			width: parent.width
-			height: 50
-			radius: parent.radius
-			color: parent.color
-			visible: root.dataProvider
-					&& !root.dataProvider.isInitialLoading
-					&& !root.dataProvider.error
-					&& root.dataProvider.items.length === 0
+	// --- Content column ---
+	Column {
+		id: contentColumn
 
-			Text {
-				anchors.centerIn: parent
-				font.pixelSize: root.textSize
-				color: root.fontColor
-				text: qsTr("No items found")
+		width: parent.width
+
+		// --- Search Field ---
+		CustomTextField {
+			id: filterField
+
+			width: root.itemWidth
+			height: Style.controlHeightM
+			margin: Style.marginM
+			textSize: root.textSize
+			fontColor: root.fontColor
+			placeHolderText: qsTr("Filter...")
+
+			onTextChanged: {
+				root.__internal.focusedIndex = -1
+				debounce.stop()
+				debounce.start()
+			}
+
+			onAccepted: {
+				debounce.stop()
+				if (root.dataProvider){
+					root.__internal.focusedIndex = -1
+					root.dataProvider.fetch(filterField.text)
+				}
+			}
+
+			Button {
+				id: clearButton
+
+				anchors.verticalCenter: filterField.verticalCenter
+				anchors.right: filterField.right
+				anchors.rightMargin: Style.marginXS
+
+				width: height
+				height: 12
+				z: filterField.z + 1
+
+				decorator: Component { IconButtonDecorator {} }
+				iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+
+				visible: filterField.text !== ""
+				enabled: visible
+
+				onClicked: {
+					filterField.text = ""
+				}
 			}
 		}
 
-		Rectangle {
-			id: errorItem
+		// --- List Body ---
+		Item {
+			id: itemBody
 
-			width: parent.width
-			height: 50
-			radius: parent.radius
-			color: parent.color
-			visible: root.dataProvider
-					&& root.dataProvider.error !== null
-					&& !root.dataProvider.isInitialLoading
-					&& !root.dataProvider.isPageLoading
+			width: root.itemWidth
+			height: errorItem.visible ? errorItem.height
+					: noDataItem.visible ? noDataItem.height
+					: popupListView.height
 
-			Text {
-				anchors.centerIn: parent
-				font.pixelSize: root.textSize
-				color: Style.errorColor
-				text: root.dataProvider && root.dataProvider.error
-					? (root.dataProvider.error.message || qsTr("Error loading items"))
-					: qsTr("Error loading items")
+			Item {
+				id: noDataItem
+
+				width: parent.width
+				height: 50
+				visible: root.dataProvider
+						&& !root.dataProvider.isInitialLoading
+						&& !root.dataProvider.error
+						&& root.dataProvider.items.length === 0
+
+				Text {
+					anchors.centerIn: parent
+					font.pixelSize: root.textSize
+					color: root.fontColor
+					text: qsTr("No items found")
+				}
+			}
+
+			Item {
+				id: errorItem
+
+				width: parent.width
+				height: 50
+				visible: root.dataProvider
+						&& root.dataProvider.error !== null
+						&& !root.dataProvider.isInitialLoading
+						&& !root.dataProvider.isPageLoading
+
+				Text {
+					anchors.centerIn: parent
+					font.pixelSize: root.textSize
+					color: Style.errorColor
+					text: root.dataProvider && root.dataProvider.error
+						? (root.dataProvider.error.message || qsTr("Error loading items"))
+						: qsTr("Error loading items")
+				}
+
+				MouseArea {
+					anchors.fill: parent
+					onClicked: {
+						if (root.dataProvider){
+							root.dataProvider.retry()
+						}
+					}
+				}
+			}
+
+			Item {
+				id: loadingOverlay
+
+				anchors.fill: parent
+				visible: root.dataProvider && root.dataProvider.isInitialLoading
+
+				Text {
+					anchors.centerIn: parent
+					color: Style.textColor
+					font.pixelSize: Style.fontSizeM
+					text: qsTr("Loading...")
+				}
+			}
+
+			ListView {
+				id: popupListView
+
+				property int itemCount: root.dataProvider ? root.dataProvider.items.length : 0
+
+				width: root.itemWidth
+				height: itemCount === 0 ? 0
+						: (root.maxVisibleItems === -1 ? itemCount : Math.min(root.maxVisibleItems, itemCount)) * root.itemHeight
+
+				boundsBehavior: Flickable.StopAtBounds
+				clip: true
+				model: popupListView.itemCount
+
+				delegate: root.delegate
+
+				onContentYChanged: {
+					if (contentHeight > 0 && contentHeight - contentY - popupListView.height <= root.itemHeight){
+						if (root.dataProvider){
+							root.dataProvider.fetchMore()
+						}
+					}
+				}
 			}
 
 			MouseArea {
 				anchors.fill: parent
-				onClicked: {
-					if (root.dataProvider){
-						root.dataProvider.retry()
-					}
+				hoverEnabled: true
+				visible: root.__internal.hoverBlocked
+
+				onPositionChanged: {
+					root.__internal.hoverBlocked = false
 				}
 			}
 		}
 
-		Rectangle {
-			id: loadingOverlay
+		// --- Footer (loading more) ---
+		Item {
+			id: footerItem
 
-			anchors.fill: parent
-			opacity: 0.5
-			color: "transparent"
-			visible: root.dataProvider && root.dataProvider.isInitialLoading
+			width: root.itemWidth
+			height: visible ? 30 : 0
+			visible: root.dataProvider
+					&& root.dataProvider.isPageLoading
+					&& root.dataProvider.items.length > 0
 
 			Text {
 				anchors.centerIn: parent
-				color: Style.textColor
-				font.pixelSize: Style.fontSizeM
-				text: qsTr("Loading...")
-			}
-		}
-
-		ListView {
-			id: popupListView
-
-			property int itemCount: root.dataProvider ? root.dataProvider.items.length : 0
-
-			width: root.itemWidth
-			height: itemCount === 0 ? 0
-					: (root.maxVisibleItems === -1 ? itemCount : Math.min(root.maxVisibleItems, itemCount)) * root.itemHeight
-
-			boundsBehavior: Flickable.StopAtBounds
-			clip: true
-			model: popupListView.itemCount
-
-			delegate: root.delegate
-
-			onContentYChanged: {
-				if (contentHeight > 0 && contentHeight - contentY - popupListView.height <= root.itemHeight){
-					if (root.dataProvider){
-						root.dataProvider.fetchMore()
-					}
-				}
-			}
-		}
-
-		MouseArea {
-			anchors.fill: parent
-			hoverEnabled: true
-			visible: root.__internal.hoverBlocked
-
-			onPositionChanged: {
-				root.__internal.hoverBlocked = false
+				color: Style.placeHolderTextColor
+				font.pixelSize: Style.fontSizeS
+				text: qsTr("Loading more...")
 			}
 		}
 	}
 
-	// --- Footer (loading more) ---
-	Item {
-		id: footerItem
-
-		anchors.top: itemBody.bottom
-		anchors.left: parent.left
-
-		width: root.itemWidth
-		height: visible ? 30 : 0
-		visible: root.dataProvider
-				&& root.dataProvider.isPageLoading
-				&& root.dataProvider.items.length > 0
-
-		Text {
-			anchors.centerIn: parent
-			color: Style.placeHolderTextColor
-			font.pixelSize: Style.fontSizeS
-			text: qsTr("Loading more...")
-		}
-	}
-
-	// --- Shadow ---
+	// --- Shadow (covers entire background including filter field) ---
 	DropShadow {
 		id: dropShadow
 
-		anchors.fill: itemBody
-		z: itemBody.z - 1
+		anchors.fill: background
+		z: background.z - 1
 
 		horizontalOffset: 2
 		verticalOffset: 2
-		radius: 4
+		radius: Style.radiusM
 		color: Style.shadowColor
-		source: itemBody
+		source: background
 	}
 
 	// --- Keyboard navigation ---
