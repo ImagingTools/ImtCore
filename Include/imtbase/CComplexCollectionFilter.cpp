@@ -294,7 +294,7 @@ bool CComplexCollectionFilter::SerializeFields(IComplexCollectionFilter::FieldIn
 
 	static iser::CArchiveTag flagsTag("Flags", "Flags", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(flagsTag);
-	retVal = retVal && I_SERIALIZE_FLAG(SupportedOperations, archive, object.metaInfo.flags);
+	retVal = retVal && archive.Process(object.metaInfo.flags);
 	retVal = retVal && archive.EndTag(flagsTag);
 
 	static iser::CArchiveTag isDistinctTag("IsDistinct", "Is Distinct", iser::CArchiveTag::TT_LEAF);
