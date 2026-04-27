@@ -88,7 +88,7 @@ FilterableSelectDataProvider {
 
 	function executeRequest(requestId, count, offset, filter){
 		// Guard against empty collectionId — server cannot handle it
-		if (!root.collectionId || root.collectionId === "") {
+		if (!root.collectionId) {
 			root.onRequestError(requestId, qsTr("No collection selected"), "EMPTY_COLLECTION")
 			return
 		}
