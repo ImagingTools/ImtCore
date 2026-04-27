@@ -1483,6 +1483,7 @@ DocumentViewBase {
 												spacing: Style.marginS
 
 												Text {
+													id: entityTypeLabel
 													text: qsTr("Entity type")
 													font.pixelSize: Style.fontSizeM
 													font.bold: true
@@ -1492,7 +1493,7 @@ DocumentViewBase {
 
 												ComboBox {
 													id: ctxHeaderTypeCB
-													width: parent.width - parent.spacing - parent.children[0].contentWidth
+													width: parent.width - parent.spacing - entityTypeLabel.contentWidth
 													height: Style.buttonHeightM
 													model: entityTypeModel
 													onCurrentIndexChanged: {
@@ -1512,14 +1513,21 @@ DocumentViewBase {
 										}
 
 										onSelectionChanged: {
-											var arr = root.pendingEntityRefs.slice()
+											// Build entity refs from current selection (not append)
+											// Keep existing refs from other entity types, replace refs for current type
+											var otherRefs = []
+											for (var j = 0; j < root.pendingEntityRefs.length; j++) {
+												if (root.pendingEntityRefs[j].entityType !== ctxSelectPopup.selectedEntityTypeId) {
+													otherRefs.push(root.pendingEntityRefs[j])
+												}
+											}
 											for (var i = 0; i < selectedIds.length; i++) {
 												var selId = selectedIds[i]
 												var selName = dataProvider ? dataProvider.getSelectedItemText(selId) : ""
 												if (!selName)
 													selName = selId
 												var linkPath = ctxSelectPopup.selectedEntityTypeId + "/" + selId
-												arr.push({
+												otherRefs.push({
 													entityType: ctxSelectPopup.selectedEntityTypeId,
 													entityId: selId,
 													displayName: selName,
@@ -1527,7 +1535,7 @@ DocumentViewBase {
 													typeId: ""
 												})
 											}
-											root.pendingEntityRefs = arr
+											root.pendingEntityRefs = otherRefs
 											root._entityRefsChanged = true
 											root.doUpdateModel()
 										}
