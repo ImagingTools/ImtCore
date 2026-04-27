@@ -90,8 +90,8 @@ Item {
 
 				ctx.beginPath();
 				ctx.strokeStyle = edge.type === "factory"
-					? String(root.factoryEdgeColor)
-					: String(root.referenceEdgeColor);
+					? root.factoryEdgeColor
+					: root.referenceEdgeColor;
 				ctx.lineWidth = edge.isResolved ? 2 : 1;
 
 				if (!edge.isResolved) {
@@ -139,8 +139,8 @@ Item {
 				var h = root.nodeHeight;
 				var r = 6;
 
-				ctx.fillStyle = node.isActive ? String(root.activeNodeColor) : String(root.inactiveNodeColor);
-				ctx.strokeStyle = String(root.nodeBorderColor);
+				ctx.fillStyle = node.isActive ? root.activeNodeColor : root.inactiveNodeColor;
+				ctx.strokeStyle = root.nodeBorderColor;
 				ctx.lineWidth = 1.5;
 				ctx.setLineDash([]);
 
@@ -161,7 +161,7 @@ Item {
 
 				// Заголовок
 				ctx.font = "bold 11px sans-serif";
-				ctx.fillStyle = String(root.nodeTextColor);
+				ctx.fillStyle = root.nodeTextColor;
 				ctx.fillText(node.id, x + 8, y + 18);
 
 				// Package
