@@ -132,29 +132,27 @@ QByteArray CCollectionDocumentManagerBase::OpenDocument(const QByteArray& userId
 
 	retVal = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
-	WorkingDocument* documentPtr = nullptr;
+	QString documentName = collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
+
 	{
 		QMutexLocker locker(&m_mutex);
-		documentPtr = &m_userDocuments[userId][retVal];
-	}
+		WorkingDocument& doc = m_userDocuments[userId][retVal];
+		doc.objectId = objectId;
+		doc.typeId = objectTypeId;
+		doc.url = url;
+		doc.name = documentName;
+		doc.undoManagerPtr = undoManagerPtr;
+		doc.isDirty = false;
+		doc.isLoading = true;
 
-	documentPtr->objectId = objectId;
-	documentPtr->typeId = objectTypeId;
-	documentPtr->url = url;
-	documentPtr->name = collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
-
-	documentPtr->undoManagerPtr = undoManagerPtr;
-	documentPtr->isDirty = false;
-	documentPtr->isLoading = true;
-
-	if (IsSingleCopyMode()) {
-		QMutexLocker locker(&m_mutex);
-		SharedDocumentData& shared = m_sharedDocuments[objectId];
-		shared.typeId = objectTypeId;
-		shared.name = documentPtr->name;
-		shared.undoManagerPtr = undoManagerPtr;
-		shared.refCount = 1;
-		shared.isLoading = true;
+		if (IsSingleCopyMode()) {
+			SharedDocumentData& shared = m_sharedDocuments[objectId];
+			shared.typeId = objectTypeId;
+			shared.name = documentName;
+			shared.undoManagerPtr = undoManagerPtr;
+			shared.refCount = 1;
+			shared.isLoading = true;
+		}
 	}
 
 	{
@@ -163,7 +161,7 @@ QByteArray CCollectionDocumentManagerBase::OpenDocument(const QByteArray& userId
 		info.documentId = retVal;
 		info.typeId = objectTypeId;
 		info.url = url;
-		info.name = documentPtr->name;
+		info.name = documentName;
 		info.isDirty = false;
 		info.isLoading = true;
 
@@ -178,9 +176,9 @@ QByteArray CCollectionDocumentManagerBase::OpenDocument(const QByteArray& userId
 				userId,
 				retVal,
 				objectTypeId,
-				documentPtr->name,
-				ObjectIdToUrl(documentPtr->objectId),
-				documentPtr->isDirty);
+				documentName,
+				ObjectIdToUrl(objectId),
+				false);
 			handlerPtr->ProcessEvent(&event);
 		}
 	}
@@ -323,16 +321,14 @@ QByteArray CCollectionDocumentManagerBase::OpenDocument(const QByteArray& userId
 
 IDocumentManager::OperationStatus CCollectionDocumentManagerBase::SetDocumentName(const QByteArray& userId, const QByteArray& documentId, const QString& documentName)
 {
-	WorkingDocument* workingDocumentPtr = nullptr;
-	{
-		QMutexLocker locker(&m_mutex);
-		OperationStatus validationStatus;
-		if (!ValidateInputParams(userId, documentId, validationStatus)){
-			return validationStatus;
-		}
+	QMutexLocker locker(&m_mutex);
 
-		workingDocumentPtr = &m_userDocuments[userId][documentId];
+	OperationStatus validationStatus;
+	if (!ValidateInputParams(userId, documentId, validationStatus)){
+		return validationStatus;
 	}
+
+	WorkingDocument* workingDocumentPtr = &m_userDocuments[userId][documentId];
 
 	if (workingDocumentPtr->name == documentName){
 		return OS_OK;
@@ -353,8 +349,6 @@ IDocumentManager::OperationStatus CCollectionDocumentManagerBase::SetDocumentNam
 	workingDocumentPtr->name = documentName;
 
 	if (IsSingleCopyMode() && !objectId.isEmpty()) {
-		QMutexLocker locker(&m_mutex);
-
 		if (m_sharedDocuments.contains(objectId)) {
 			m_sharedDocuments[objectId].name = documentName;
 		}
@@ -427,34 +421,30 @@ IDocumentManager::OperationStatus CCollectionDocumentManagerBase::SaveDocument(
 		return OS_FAILED;
 	}
 
-	WorkingDocument* workingDocumentPtr = nullptr;
+	QMutexLocker locker(&m_mutex);
+
 	OperationStatus validationStatus = OS_OK;
-	WorkingDocument workingDocumentSnapshot;
-	istd::IChangeableSharedPtr documentSnapshotPtr;
-	{
-		QMutexLocker locker(&m_mutex);
-		if (!ValidateInputParams(userId, documentId, validationStatus)){
-			return validationStatus;
-		}
-
-		workingDocumentPtr = &m_userDocuments[userId][documentId];
-
-		if (workingDocumentPtr->isLoading) {
-			return OS_FAILED;
-		}
-
-		documentSnapshotPtr = CreateObject(workingDocumentPtr->typeId);
-		if (!documentSnapshotPtr.IsValid()){
-			return OS_FAILED;
-		}
-
-		if (!documentSnapshotPtr->CopyFrom(*workingDocumentPtr->objectPtr)){
-			return OS_FAILED;
-		}
-
-		workingDocumentSnapshot = *workingDocumentPtr;
-		workingDocumentSnapshot.objectPtr = documentSnapshotPtr;
+	if (!ValidateInputParams(userId, documentId, validationStatus)){
+		return validationStatus;
 	}
+
+	WorkingDocument* workingDocumentPtr = &m_userDocuments[userId][documentId];
+
+	if (workingDocumentPtr->isLoading) {
+		return OS_FAILED;
+	}
+
+	istd::IChangeableSharedPtr documentSnapshotPtr = CreateObject(workingDocumentPtr->typeId);
+	if (!documentSnapshotPtr.IsValid()){
+		return OS_FAILED;
+	}
+
+	if (!documentSnapshotPtr->CopyFrom(*workingDocumentPtr->objectPtr)){
+		return OS_FAILED;
+	}
+
+	WorkingDocument workingDocumentSnapshot = *workingDocumentPtr;
+	workingDocumentSnapshot.objectPtr = documentSnapshotPtr;
 
 	QString validationMessage;
 	if (!ValidateDocumentData(workingDocumentSnapshot, validationStatus, &validationMessage)){
