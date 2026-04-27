@@ -502,15 +502,6 @@ QtObject {
 					}
 
 					documentDecorator.registerView(view, representationController, !isNew && !isLoading)
-
-					// Handle case where DocumentDataLoaded arrived before this view registered:
-					// registerView above uses updateRepr=!isNew&&!isLoading (3rd param).
-					// For new documents (isNew=true), updateRepr=false leaves the view blocked.
-					// If loading already completed (!isLoading), explicitly unblock and update.
-					if (isNew && !isLoading){
-						view.setBlockingUpdateModel(false)
-						view.doUpdateGui()
-					}
 				}
 
 				function addView(viewTypeId, view){
