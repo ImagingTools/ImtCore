@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-import QtQuick 2.15
+import QtQuick 2.12
 import Qt5Compat.GraphicalEffects 6.0
 import QtGraphicalEffects 1.12
 import Acf 1.0
@@ -12,9 +12,8 @@ import imtdocgui 1.0
 import imtcolgui 1.0
 import imtdeskImtDeskSdl 1.0
 import imtdeskTicketCollectionDocumentManagerSdl 1.0
-import imtauthUsersSdl 1.0
 import imtchatgui 1.0
-import Qt.labs.platform 1.1
+import Qt.labs.platform 1.1 as QLP
 
 DocumentViewBase {
 	id: root
@@ -59,6 +58,8 @@ DocumentViewBase {
 	// Pending assignees for multi-select
 	property var pendingAssignees: []
 	property bool _assigneesChanged: false
+	// User name cache: id → name (populated from FilterableSelectPopup and userNameResolver)
+	property var __userNameCache: ({})
 	// Reply-to message context (null = not replying)
 	property var _replyToMessage: null
 	// Highlighted message (temporarily set when scrolling to a reply-to source)
@@ -397,23 +398,23 @@ DocumentViewBase {
 			}
 		}
 		
+		// Load assignees — resolve names from cache, trigger server resolution for uncached
 		var assigns = []
 		var aIds = ticketData.m_assigneeIds || []
+		var hasUnresolved = false
 		for (var a = 0; a < aIds.length; a++) {
 			var aId = aIds[a]
-			var aName = aId
-			if (editAssigneeCB.model) {
-				for (var ai = 0; ai < editAssigneeCB.model.getItemsCount(); ai++) {
-					if (editAssigneeCB.model.getData("id", ai) === aId) {
-						aName = editAssigneeCB.model.getData("name", ai) || aId
-						break
-					}
-				}
-			}
-			assigns.push({id: aId, name: aName})
+			var cachedName = root.__userNameCache[aId]
+			assigns.push({id: aId, name: cachedName || aId})
+			if (!cachedName) hasUnresolved = true
 		}
 		root.pendingAssignees = assigns
 		root._assigneesChanged = false
+		
+		// Trigger user name resolution for uncached IDs
+		if (hasUnresolved && aIds.length > 0) {
+			userNameResolver.fetch("")
+		}
 		
 		// Detect assignee removal: if user was an assignee but no longer is, show notification and go readOnly
 		if (wasAssignee) {
@@ -432,17 +433,6 @@ DocumentViewBase {
 				)
 			}
 		}
-		
-		editReporterCB.currentIndex = -1
-		if (editReporterCB.model) {
-			let reporterId = ticketData.m_reporterId || AuthorizationController.getUserId()
-			for (let i = 0; i < editReporterCB.model.getItemsCount(); i++) {
-				if (editReporterCB.model.getData("id", i) === reporterId) {
-					editReporterCB.currentIndex = i
-					break
-				}
-			}
-		}
 	}
 	
 	function updateModel() {
@@ -454,12 +444,7 @@ DocumentViewBase {
 		ticketData.m_assigneeIds = root.pendingAssignees.map(function(a) { return a.id })
 		
 		if (root.isNewIssue) {
-			if (editReporterCB.model && editReporterCB.currentIndex >= 0) {
-				ticketData.m_reporterId = editReporterCB.model.getData("id", editReporterCB.currentIndex)
-			}
-			else {
-				ticketData.m_reporterId = AuthorizationController.getUserId()
-			}
+			ticketData.m_reporterId = AuthorizationController.getUserId()
 		}
 		
 		if (editTypeCB.model && editTypeCB.currentIndex >= 0) {
@@ -522,18 +507,44 @@ DocumentViewBase {
 		onTriggered: root._exportChatCopiedState = false
 	}
 	
-	CollectionDataProvider {
-		id: userCollectionProvider
-		commandId: ImtauthUsersSdlCommandIds.s_usersList
-		fields: [UserDataInputTypeMetaInfo.s_id, UserDataInputTypeMetaInfo.s_typeId, UserDataInputTypeMetaInfo.s_name]
-		onCollectionModelChanged: {
-			editAssigneeCB.model = collectionModel
-			editReporterCB.model = collectionModel
-			root.doUpdateGui()
+	// Standalone user name resolver — fetches Users collection to resolve assignee IDs to display names
+	FilterableSelectGqlDataProvider {
+		id: userNameResolver
+		collectionId: "Users"
+		multiSelect: true
+		pageSize: 100
+		
+		onDataChanged: {
+			root.__resolveAssigneeNamesFromResolver()
 		}
-		Component.onCompleted: {
-			updateModel()
+	}
+	
+	function __resolveAssigneeNamesFromResolver() {
+		var resolverItems = userNameResolver.items
+		if (!resolverItems || resolverItems.length === 0) return
+		
+		var cacheUpdated = false
+		for (var i = 0; i < resolverItems.length; i++) {
+			var item = resolverItems[i]
+			if (item.id && item.title && item.title !== "") {
+				root.__userNameCache[item.id] = item.title
+				cacheUpdated = true
+			}
 		}
+		
+		if (!cacheUpdated) return
+		
+		// Re-build pendingAssignees with resolved names
+		var assigns = []
+		for (var j = 0; j < root.pendingAssignees.length; j++) {
+			var a = root.pendingAssignees[j]
+			var cachedName = root.__userNameCache[a.id]
+			assigns.push({
+				id: a.id,
+				name: cachedName || a.name || a.id
+			})
+		}
+		root.pendingAssignees = assigns
 	}
 	
 	TreeItemModel {
@@ -1082,7 +1093,7 @@ DocumentViewBase {
 										model: priorityModel
 										changeable: root.canEditCoreTicketFields
 										onCurrentIndexChanged: root.doUpdateModel()
-										KeyNavigation.tab: editAssigneeCB
+										KeyNavigation.tab: editStatusCB
 										KeyNavigation.backtab: editTypeCB
 									}
 								}
@@ -1107,7 +1118,7 @@ DocumentViewBase {
 										changeable: root.canEdit
 										onCurrentIndexChanged: root.doUpdateModel()
 										KeyNavigation.tab: editLockedCB
-										KeyNavigation.backtab: editAssigneeCB
+										KeyNavigation.backtab: editPriorityCB
 									}
 								}
 							}
@@ -1169,7 +1180,23 @@ DocumentViewBase {
 											anchors.fill: parent
 											hoverEnabled: true
 											cursorShape: Qt.PointingHandCursor
-											onClicked: ModalDialogManager.openDialog(assigneePickerDialogComp)
+											onClicked: {
+												var known = []
+												for (var j = 0; j < root.pendingAssignees.length; j++) {
+													var assignee = root.pendingAssignees[j]
+													known.push({ id: assignee.id, title: assignee.name || assignee.id })
+												}
+												var ids = []
+												for (var i = 0; i < root.pendingAssignees.length; i++)
+													ids.push(root.pendingAssignees[i].id)
+												var point = addAssigneeBtn.mapToItem(null, 0, addAssigneeBtn.height)
+												ModalDialogManager.openDialog(assigneeSelectComp, {
+													"x": point.x,
+													"y": point.y,
+													"knownItems": known,
+													"preselectedIds": ids
+												})
+											}
 										}
 									}
 								}
@@ -1236,79 +1263,38 @@ DocumentViewBase {
 									wrapMode: Text.WordWrap
 								}
 								
-								// Assignee picker dialog — RemoteCollectionView with Users collection
+								// Assignee picker Component — opened via ModalDialogManager
 								Component {
-									id: assigneePickerDialogComp
-									Dialog {
-										id: assigneeDialog
-										title: qsTr("Select Assignees")
-										canMove: false
-										width: Math.min(ModalDialogManager.activeView.width - 80, 900)
-										height: ModalDialogManager.activeView.height - 80
-										
-										property RemoteCollectionView collectionView: null
-										
-										Component.onCompleted: {
-											addButton(Enums.apply, qsTr("Attach Selected"), false)
-											addButton(Enums.cancel, qsTr("Cancel"), true)
-											setButtonEnabled(Enums.apply, false)
+									id: assigneeSelectComp
+									
+									FilterableSelectPopup {
+										dataProvider: FilterableSelectGqlDataProvider {
+											collectionId: "Users"
+											multiSelect: true
 										}
+
+										itemWidth: 280
+										showCheckBox: true
+										showSelectedGroup: true
+										filterPlaceholder: qsTr("Type or choose a user")
 										
-										contentComp: Component {
-											Item {
-												width: assigneeDialog.width
-												height: assigneeDialog.height - 100
-												
-												Rectangle {
-													anchors.fill: parent
-													anchors.margins: Style.paddingM
-													radius: Style.radiusM
-													color: "transparent"
-													border.color: Style.borderColor
-													border.width: 1
-													
-													RemoteCollectionView {
-														anchors.fill: parent
-														anchors.margins: 1
-														commandsControllerComp: null
-														visibleMetaInfo: false
-														commandsDelegateComp: null
-														documentCollectionFilter: null
-														showRemoteChangesAlert: false
-														tableViewParamsStoredServer: false
-														collectionId: "Users"
-														headerRightClickEnabled: false
-														Component.onCompleted: {
-															assigneeDialog.collectionView = this
-														}
-														onSelectionChanged: {
-															assigneeDialog.setButtonEnabled(Enums.apply, selectedIds.length > 0)
-														}
-													}
-												}
+										onSelectionChanged: {
+											var arr = []
+											for (var i = 0; i < selectedIds.length; i++) {
+												var selId = selectedIds[i]
+												var selName = dataProvider ? dataProvider.getSelectedItemText(selId) : ""
+												if (!selName)
+													selName = selId
+												// Cache resolved name
+												if (selName !== selId) root.__userNameCache[selId] = selName
+												arr.push({id: selId, name: selName})
 											}
+											root.pendingAssignees = arr
+											root._assigneesChanged = true
 										}
 										
-										onFinished: {
-											if (buttonId === Enums.apply && collectionView) {
-												var arr = root.pendingAssignees.slice()
-												var mdl = collectionView.table.elements
-												let indexes = collectionView.table.getSelectedIndexes()
-												for (var i = 0; i < indexes.length; i++) {
-													let idx = indexes[i]
-													var userId = mdl.getData("id", idx)
-													var userName = mdl.getData("name", idx) || userId
-													// Skip duplicates
-													var exists = false
-													for (var j = 0; j < arr.length; j++) {
-														if (arr[j].id === userId) { exists = true; break }
-													}
-													if (!exists) {
-														arr.push({id: userId, name: userName})
-													}
-												}
-												root.pendingAssignees = arr
-												root._assigneesChanged = true
+										Component.onDestruction: {
+											if (root._assigneesChanged) {
 												root.doUpdateModel()
 											}
 										}
@@ -1316,23 +1302,6 @@ DocumentViewBase {
 								}
 							}
 							
-							// Hidden assignee ComboBox (data source for dialog)
-							ComboBox {
-								id: editAssigneeCB
-								visible: false
-								width: 0
-								height: 0
-							}
-							
-							// Hidden Reporter (data still tracked for model)
-							ComboBox {
-								id: editReporterCB
-								visible: false
-								width: 0
-								height: 0
-								onCurrentIndexChanged: root.doUpdateModel()
-							}
-
 							// Hidden State Reason (data still tracked for model)
 							ComboBox {
 								id: editStateReasonCB
@@ -1404,7 +1373,11 @@ DocumentViewBase {
 											hoverEnabled: true
 											cursorShape: Qt.PointingHandCursor
 											onClicked: {
-												ModalDialogManager.openDialog(contextPickerDialogComp)
+												var point = addContextBtn.mapToItem(null, 0, addContextBtn.height)
+												ModalDialogManager.openDialog(contextPickerDialogComp, {
+													"x": point.x,
+													"y": point.y
+												})
 											}
 										}
 									}
@@ -1486,189 +1459,195 @@ DocumentViewBase {
 									color: Style.inactiveTextColor
 									wrapMode: Text.WordWrap
 								}
-								
-								// Context picker dialog: entity type ComboBox + StackView with per-entity RemoteCollectionView
+							
+								// Context picker — ComboBox + per-entity FilterableSelectPopup via Loader
 								Component {
 									id: contextPickerDialogComp
-									Dialog {
-										id: ctxDialog
-										title: qsTr("Link Entity to Ticket")
-										canMove: false
-										width: Math.min(ModalDialogManager.activeView.width - 80, 900)
-										height: ModalDialogManager.activeView.height - 80
-										
+
+									PopupView {
+										id: ctxWrapper
+
 										property string selectedEntityTypeId: ""
-										property var entityTypePages: ({})
-										
-										function getCurrentCollectionView() {
-											if (!ctxStackView) return null
-											var page = ctxStackView.currentPage()
-											if (!page) return null
-											return page.collectionView || null
-										}
-										
-										Component.onCompleted: {
-											addButton(Enums.apply, qsTr("Attach Selected"), false)
-											addButton(Enums.cancel, qsTr("Cancel"), true)
-											setButtonEnabled(Enums.apply, false)
-											if (entityTypeModel.getItemsCount() > 0) {
-												selectedEntityTypeId = entityTypeModel.getData("id", 0)
-											}
-										}
-										
-										contentComp: Component {
-											Item {
-												width: ctxDialog.width
-												height: ctxDialog.height - 100
-												
-												Component.onCompleted: {
-													ctxTypeCB.model = entityTypeModel
-													// Create a StackView page for each entity type
-													for (var i = 0; i < entityTypeModel.getItemsCount(); i++) {
-														ctxStackView.addPage(ctxEntityPageComp)
-													}
-													if (entityTypeModel.getItemsCount() > 0) {
-														ctxTypeCB.currentIndex = 0
-														ctxStackView.setCurrentIndex(0)
-													}
-												}
-												
-												Connections {
-													target: ctxStackView
-													function onPageAdded(index, item) {
-														if (item && index < entityTypeModel.getItemsCount()) {
-															var typeId = entityTypeModel.getData("id", index)
-															ctxDialog.entityTypePages[typeId] = index
-															item.collectionView.collectionId = typeId
-														}
-													}
-													function onCurrentPageChanged(item) {
-														if (item && item.collectionView) {
-															let indexes = item.collectionView.table.getSelectedIndexes()
-															ctxDialog.setButtonEnabled(Enums.apply, indexes.length > 0)
-														}
-													}
-												}
-												
-												Column {
-													id: ctxContentCol
-													anchors.fill: parent
-													anchors.margins: Style.paddingM
-													spacing: Style.spacingM
-													
-													// Entity type selector row
-													Rectangle {
-														width: parent.width
-														height: ctxTypeRow.height + Style.paddingM * 2
-														radius: Style.radiusM
-														color: editView.accentBadgeBg
-														border.color: editView.accentBorderLight
-														border.width: 1
-														
-														Row {
-															id: ctxTypeRow
-															anchors.centerIn: parent
-															spacing: Style.spacingM
-															
-															Text {
-																text: qsTr("Entity type")
-																font.pixelSize: Style.fontSizeM
-																font.bold: true
-																color: Style.textColor
-																anchors.verticalCenter: parent.verticalCenter
-															}
-															
-															ComboBox {
-																id: ctxTypeCB
-																width: 280
-																height: Style.buttonHeightM
-																onCurrentIndexChanged: {
-																	if (entityTypeModel.getItemsCount() > currentIndex) {
-																		ctxDialog.selectedEntityTypeId = entityTypeModel.getData("id", currentIndex)
-																		ctxDialog.setButtonEnabled(Enums.apply, false)
-																		var pageIdx = ctxDialog.entityTypePages[ctxDialog.selectedEntityTypeId]
-																		if (pageIdx !== undefined) {
-																			ctxStackView.setCurrentIndex(pageIdx)
-																		}
-																	}
-																}
-															}
-														}
-													}
-													
-													// StackView with per-entity RemoteCollectionView pages
-													Item {
-														width: parent.width
-														height: parent.height - ctxTypeRow.height - Style.paddingM * 2 - Style.spacingM * 2
-														
-														Rectangle {
-															anchors.fill: parent
-															radius: Style.radiusM
-															color: "transparent"
-															border.color: Style.borderColor
-															border.width: 1
-															
-															StackView {
-																id: ctxStackView
-																anchors.fill: parent
-																anchors.margins: 1
-															}
-														}
-													}
-												}
-												
-												Component {
-													id: ctxEntityPageComp
-													Item {
-														property alias collectionView: pageCollView
-														
-														RemoteCollectionView {
-															id: pageCollView
-															anchors.fill: parent
-															commandsControllerComp: null
-															visibleMetaInfo: false
-															commandsDelegateComp: null
-															documentCollectionFilter: null
-															showRemoteChangesAlert: false
-															tableViewParamsStoredServer: false
-															headerRightClickEnabled: false
-															onSelectionChanged: {
-																if (ctxStackView.currentPage() === pageCollView.parent) {
-																	ctxDialog.setButtonEnabled(Enums.apply, selectedIds.length > 0)
-																}
-															}
-														}
-													}
-												}
-											}
-										}
-										
-										onFinished: {
-											var cv = getCurrentCollectionView()
-											if (buttonId === Enums.apply && cv) {
-												var arr = root.pendingEntityRefs.slice()
-												var mdl = cv.table.elements
-												let indexes = cv.table.getSelectedIndexes()
-												for (var i = 0; i < indexes.length; i++) {
-													let idx = indexes[i]
-													var displayName = mdl.getData("name", idx)
-													var typeId = mdl.getData("typeId", idx)
-													var elementId = mdl.getData("id", idx)
-													var linkPath = selectedEntityTypeId
-													if (typeId) linkPath += "/" + typeId
-													linkPath += "/" + elementId
-													arr.push({
-																 entityType: selectedEntityTypeId,
-																 entityId: elementId,
-																 displayName: displayName,
-																 entityLinkPath: linkPath,
-																 typeId: typeId
-															 })
-												}
-												root.pendingEntityRefs = arr
-												root._entityRefsChanged = true
+										property bool __ctxReady: false
+										readonly property int __popupWidth: 320
+										readonly property int __maxHeight: 600
+
+										Component.onDestruction: {
+											if (root._entityRefsChanged) {
 												root.doUpdateModel()
 											}
+										}
+
+										width: __popupWidth + 2 * Style.marginL
+										height: Math.min(Style.marginL + ctxTypeCB.height + ctxPopupItem.height + 2*Style.marginL, __maxHeight)
+
+										function started() {
+											ctxWrapper.__ctxReady = false
+											if (entityTypeModel.getItemsCount() > 0) {
+												ctxWrapper.selectedEntityTypeId = entityTypeModel.getData("id", 0)
+												ctxTypeCB.currentIndex = 0
+											}
+											ctxWrapper.__ctxReady = true
+											// Trigger Loader (re)creation via sourceComponent swap
+											if (ctxWrapper.selectedEntityTypeId !== "") {
+												ctxPopupLoader.sourceComponent = null
+												ctxPopupLoader.sourceComponent = ctxPopupComp
+											}
+										}
+
+										function closePopup() {
+											ModalDialogManager.closeDialog()
+										}
+
+										onSelectedEntityTypeIdChanged: {
+											if (ctxWrapper.__ctxReady) {
+												ctxPopupLoader.sourceComponent = null
+												ctxPopupLoader.sourceComponent = ctxPopupComp
+											}
+										}
+
+										// Unified background
+										Rectangle {
+											id: ctxBg
+											anchors.fill: parent
+											color: Style.baseColor
+											radius: Style.radiusL
+											border.width: 1
+											border.color: Style.alternateBaseColor
+										}
+
+										MouseArea {
+											anchors.fill: ctxBg
+											onWheel: { wheel.accepted = true }
+											onClicked: { mouse.accepted = true }
+											onReleased: {}
+											onPressAndHold: {}
+											onPressed: {}
+											onPositionChanged: {}
+										}
+
+										// Unified shadow
+										DropShadow {
+											anchors.fill: ctxBg
+											z: ctxBg.z - 1
+											horizontalOffset: 3
+											verticalOffset: 3
+											radius: Style.radiusL
+											color: Style.shadowColor
+											source: ctxBg
+										}
+
+										ComboBox {
+											id: ctxTypeCB
+											anchors.left: parent.left
+											anchors.right: parent.right
+											anchors.top: parent.top
+											anchors.margins: Style.marginL
+											width: parent.width
+											height: Style.buttonHeightM
+											model: entityTypeModel
+											currentIndex: 0
+											onCurrentIndexChanged: {
+												if (!ctxWrapper.__ctxReady) return
+												if (entityTypeModel.getItemsCount() > currentIndex && currentIndex >= 0) {
+													var newTypeId = entityTypeModel.getData("id", currentIndex)
+													if (ctxWrapper.selectedEntityTypeId !== newTypeId) {
+														ctxWrapper.selectedEntityTypeId = newTypeId
+													}
+												}
+											}
+										}
+
+										// Per-entity FilterableSelectPopup (recreated on entity type change)
+										Component {
+											id: ctxPopupComp
+
+											FilterableSelectPopup {
+												id: ctxInnerPopup
+
+												embedded: true
+
+												dataProvider: FilterableSelectGqlDataProvider {
+													collectionId: ctxWrapper.selectedEntityTypeId
+													multiSelect: true
+												}
+
+												itemWidth: ctxWrapper.__popupWidth
+												showCheckBox: true
+												filterPlaceholder: qsTr("Search entities...")
+
+												onRequestClose: ctxWrapper.closePopup()
+
+												onSelectionChanged: {
+													var otherRefs = []
+													for (var j = 0; j < root.pendingEntityRefs.length; j++) {
+														if (root.pendingEntityRefs[j].entityType !== ctxWrapper.selectedEntityTypeId) {
+															otherRefs.push(root.pendingEntityRefs[j])
+														}
+													}
+													for (var i = 0; i < selectedIds.length; i++) {
+														var selId = selectedIds[i]
+														var selName = dataProvider ? dataProvider.getSelectedItemText(selId) : ""
+														if (!selName)
+															selName = selId
+														var linkPath = ctxWrapper.selectedEntityTypeId + "/" + selId
+														otherRefs.push({
+															entityType: ctxWrapper.selectedEntityTypeId,
+															entityId: selId,
+															displayName: selName,
+															entityLinkPath: linkPath,
+															typeId: ""
+														})
+													}
+													root.pendingEntityRefs = otherRefs
+													root._entityRefsChanged = true
+												}
+											}
+										}
+
+										Item {
+											id: ctxPopupItem
+											anchors.left: parent.left
+											anchors.leftMargin: Style.marginL
+											anchors.right: parent.right
+											anchors.rightMargin: Style.marginL
+											anchors.top: ctxTypeCB.bottom
+											anchors.topMargin: Style.marginL
+
+											Loader {
+												id: ctxPopupLoader
+												width: parent.width
+												onLoaded: {
+													var preIds = []
+													var knownItms = []
+													for (var i = 0; i < root.pendingEntityRefs.length; i++) {
+														var ref = root.pendingEntityRefs[i]
+														if (ref.entityType === ctxWrapper.selectedEntityTypeId) {
+															preIds.push(ref.entityId)
+															knownItms.push({
+																id: ref.entityId,
+																title: ref.displayName || ref.entityId
+															})
+														}
+													}
+													ctxPopupItemConnections.target = item
+													ctxPopupItem.height = item.height
+													item.knownItems = knownItms
+													item.preselectedIds = preIds
+													item.started()
+												}
+											}
+											Connections {
+												id:ctxPopupItemConnections
+												function onHeightChanged(){
+													ctxPopupItem.height = ctxPopupLoader.item.height
+												}
+											}
+										}
+
+										Shortcut {
+											sequence: "Escape"
+											onActivated: ctxWrapper.closePopup()
 										}
 									}
 								}
@@ -2544,10 +2523,10 @@ DocumentViewBase {
 					}
 					
 					// File dialog
-					FileDialog {
+					QLP.FileDialog {
 						id: attachImageDialog
 						title: qsTr("Attach image")
-						fileMode: FileDialog.OpenFile
+						fileMode: QLP.FileDialog.OpenFile
 						nameFilters: [qsTr("Image files") + " (*.png *.jpg *.jpeg *.gif *.bmp *.svg *.webp)"]
 						
 						onAccepted: {

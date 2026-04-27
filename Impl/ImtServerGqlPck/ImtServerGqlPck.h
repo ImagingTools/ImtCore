@@ -41,6 +41,7 @@
 #include <imtservergql/CCollectionDocumentManagerControllerComp.h>
 #include <imtservergql/CCollectionDocumentManagerPublisherComp.h>
 #include <imtservergql/CGqlContextCreatorComp.h>
+#include <imtservergql/CFilterableSelectControllerComp.h>
 
 
 /**
@@ -83,6 +84,7 @@ typedef imtservergql::CCollectionImportJobParamsFillerComp CollectionImportJobPa
 typedef imtservergql::CCollectionDocumentManagerControllerComp CollectionDocumentManagerController;
 typedef imtservergql::CCollectionDocumentManagerPublisherComp CollectionDocumentManagerPublisher;
 typedef imtservergql::CGqlContextCreatorComp GqlContextCreator;
+typedef imtservergql::CFilterableSelectControllerComp FilterableSelectController;
 
 
 } // namespace ImtServerGqlPck

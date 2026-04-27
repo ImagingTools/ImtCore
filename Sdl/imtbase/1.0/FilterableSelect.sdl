@@ -1,0 +1,37 @@
+schema {
+	namespace: imtbase
+	version: 1.0
+	query: Query
+}
+
+import {
+	"../../imtbase/1.0/ImtCollection.sdl"
+}
+
+# --- Filterable Select ---
+# Reusable types for GitHub-style filterable select popups.
+# Provides server-side text filtering and offset-based pagination
+# for large datasets (10k+ items).
+
+type SelectableItemData {
+	id: ID!
+	name: String!
+	description: String
+	icon: String
+	color: String
+}
+
+input GetSelectableItemsInput {
+	collectionId: ID!
+	viewParams: CollectionViewParams
+	excludeIds: [ID]
+}
+
+type GetSelectableItemsPayload {
+	items: [SelectableItemData]
+	notification: NotificationItem
+}
+
+type Query {
+	GetSelectableItems (input: GetSelectableItemsInput): GetSelectableItemsPayload!
+}

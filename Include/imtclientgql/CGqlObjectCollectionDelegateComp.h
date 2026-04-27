@@ -17,6 +17,7 @@
 #include <imtserverapp/CParamSetRepresentationController.h>
 #include <imtserverapp/CComplexCollectionFilterRepresentationController.h>
 #include <imtserverapp/CDocumentFilterRepresentationController.h>
+#include <imtserverapp/CDocumentIdFilterRepresentationController.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
 
 
@@ -128,6 +129,7 @@ private:
 	imtserverapp::CParamSetRepresentationController m_paramSetRepresentationController;
 	imtserverapp::CDocumentFilterRepresentationController m_documentFilterRepresentationController;
 	imtserverapp::CComplexCollectionFilterRepresentationController m_complexCollectionFilterRepresentationController;
+	imtserverapp::CDocumentIdFilterRepresentationController m_documentIdFilterRepresentationController;
 
 private:
 	I_ATTR(QByteArray, m_collectionIdAttrPtr);

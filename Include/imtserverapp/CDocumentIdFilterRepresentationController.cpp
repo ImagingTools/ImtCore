@@ -52,6 +52,9 @@ bool CDocumentIdFilterRepresentationController::GetSdlRepresentationFromDataMode
 
 	imtcol::IDocumentIdFilter::ConditionType conditionType = documentIdFilterPtr->GetConditionType();
 	switch(conditionType){
+	case imtcol::IDocumentIdFilter::CT_NONE:
+		sdlRepresentation.conditionType = sdl::imtbase::DocumentIdFilter::ConditionType::None;
+		break;
 	case imtcol::IDocumentIdFilter::CT_IN:
 		sdlRepresentation.conditionType = sdl::imtbase::DocumentIdFilter::ConditionType::In;
 		break;
@@ -80,6 +83,9 @@ bool CDocumentIdFilterRepresentationController::GetDataModelFromSdlRepresentatio
 
 	if (sdlRepresentation.conditionType){
 		switch (*sdlRepresentation.conditionType){
+		case sdl::imtbase::DocumentIdFilter::ConditionType::None:
+			documentIdFilterPtr->SetConditionType(imtcol::IDocumentIdFilter::CT_NONE);
+			break;
 		case sdl::imtbase::DocumentIdFilter::ConditionType::In:
 			documentIdFilterPtr->SetConditionType(imtcol::IDocumentIdFilter::CT_IN);
 			break;
