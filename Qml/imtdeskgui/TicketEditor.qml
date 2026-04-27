@@ -1481,9 +1481,9 @@ DocumentViewBase {
 												ctxTypeCB.currentIndex = 0
 											}
 											ctxWrapper.__ctxReady = true
-											// Trigger Loader (re)creation
-											ctxPopupLoader.active = false
-											ctxPopupLoader.active = true
+											// Trigger Loader (re)creation via sourceComponent swap
+											ctxPopupLoader.sourceComponent = null
+											ctxPopupLoader.sourceComponent = ctxPopupComp
 										}
 
 										function closePopup() {
@@ -1492,8 +1492,8 @@ DocumentViewBase {
 
 										onSelectedEntityTypeIdChanged: {
 											if (ctxWrapper.__ctxReady) {
-												ctxPopupLoader.active = false
-												ctxPopupLoader.active = true
+												ctxPopupLoader.sourceComponent = null
+												ctxPopupLoader.sourceComponent = ctxPopupComp
 											}
 										}
 
@@ -1574,56 +1574,58 @@ DocumentViewBase {
 												}
 
 												// Per-entity FilterableSelectPopup (recreated on entity type change)
+												Component {
+													id: ctxPopupComp
+
+													FilterableSelectPopup {
+														id: ctxInnerPopup
+
+														embedded: true
+
+														dataProvider: FilterableSelectGqlDataProvider {
+															collectionId: ctxWrapper.selectedEntityTypeId
+															multiSelect: true
+														}
+
+														itemWidth: ctxWrapper.__popupWidth
+														showCheckBox: true
+														filterPlaceholder: qsTr("Search entities...")
+
+														onRequestClose: ctxWrapper.closePopup()
+
+														onSelectionChanged: {
+															var otherRefs = []
+															for (var j = 0; j < root.pendingEntityRefs.length; j++) {
+																if (root.pendingEntityRefs[j].entityType !== ctxWrapper.selectedEntityTypeId) {
+																	otherRefs.push(root.pendingEntityRefs[j])
+																}
+															}
+															for (var i = 0; i < selectedIds.length; i++) {
+																var selId = selectedIds[i]
+																var selName = dataProvider ? dataProvider.getSelectedItemText(selId) : ""
+																if (!selName)
+																	selName = selId
+																var linkPath = ctxWrapper.selectedEntityTypeId + "/" + selId
+																otherRefs.push({
+																	entityType: ctxWrapper.selectedEntityTypeId,
+																	entityId: selId,
+																	displayName: selName,
+																	entityLinkPath: linkPath,
+																	typeId: ""
+																})
+															}
+															root.pendingEntityRefs = otherRefs
+															root._entityRefsChanged = true
+															root.doUpdateModel()
+														}
+													}
+												}
+
 												Loader {
 													id: ctxPopupLoader
 													width: parent.width
 													height: item ? item.height : 0
-													active: ctxWrapper.selectedEntityTypeId !== ""
-
-													sourceComponent: Component {
-														FilterableSelectPopup {
-															id: ctxInnerPopup
-
-															embedded: true
-
-															dataProvider: FilterableSelectGqlDataProvider {
-																collectionId: ctxWrapper.selectedEntityTypeId
-																multiSelect: true
-															}
-
-															itemWidth: ctxWrapper.__popupWidth
-															showCheckBox: true
-															filterPlaceholder: qsTr("Search entities...")
-
-															onRequestClose: ctxWrapper.closePopup()
-
-															onSelectionChanged: {
-																var otherRefs = []
-																for (var j = 0; j < root.pendingEntityRefs.length; j++) {
-																	if (root.pendingEntityRefs[j].entityType !== ctxWrapper.selectedEntityTypeId) {
-																		otherRefs.push(root.pendingEntityRefs[j])
-																	}
-																}
-																for (var i = 0; i < selectedIds.length; i++) {
-																	var selId = selectedIds[i]
-																	var selName = dataProvider ? dataProvider.getSelectedItemText(selId) : ""
-																	if (!selName)
-																		selName = selId
-																	var linkPath = ctxWrapper.selectedEntityTypeId + "/" + selId
-																	otherRefs.push({
-																		entityType: ctxWrapper.selectedEntityTypeId,
-																		entityId: selId,
-																		displayName: selName,
-																		entityLinkPath: linkPath,
-																		typeId: ""
-																	})
-																}
-																root.pendingEntityRefs = otherRefs
-																root._entityRefsChanged = true
-																root.doUpdateModel()
-															}
-														}
-													}
+													sourceComponent: ctxPopupComp
 
 													onItemChanged: {
 														if (item) {
