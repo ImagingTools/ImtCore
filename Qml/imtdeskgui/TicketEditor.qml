@@ -1636,7 +1636,6 @@ DocumentViewBase {
 
 											onItemChanged: {
 												if (item) {
-													// Set initial height
 													ctxWrapper.__updateLoaderHeight()
 
 													// Set preselected IDs for the current entity type
