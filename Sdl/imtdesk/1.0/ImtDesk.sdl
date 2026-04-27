@@ -94,6 +94,8 @@ type TicketComment {
 	replyToId: ID
 	replyToContent: String
 	replyToUserName: String
+	edited: Boolean
+	deleted: Boolean
 }
 
 # --- Ticket ---

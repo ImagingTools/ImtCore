@@ -173,6 +173,20 @@ QtObject {
 	}
 
 	/*!
+		Returns the type identifier for a selected item by ID, if known.
+		\param id Item ID.
+		\return Type ID string or empty string if not resolved.
+	*/
+	function getSelectedItemTypeId(id){
+		var sid = String(id || "")
+		if (sid === ""){
+			return ""
+		}
+		var item = __internal.selectedItems[sid]
+		return item ? String(item.typeId || "") : ""
+	}
+
+	/*!
 		Toggles the selection state of an item.
 		In multiSelect mode: adds if not selected, removes if selected.
 		In single-select mode: replaces the selection.

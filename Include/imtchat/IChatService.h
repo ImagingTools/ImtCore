@@ -86,6 +86,32 @@ public:
 	virtual bool MarkMessageRead(
 				const QByteArray& conversationId,
 				const QByteArray& messageId) = 0;
+
+	/**
+		Edit the text content of an existing message. The message's
+		\c updatedAt timestamp is refreshed so clients can detect that
+		the message was edited.
+		\param messageId  The message to edit.
+		\param senderId   The user requesting the edit; must match the
+		                  original sender.
+		\param newContent The new text content.
+		\return True on success.
+	*/
+	virtual bool EditMessage(
+				const QByteArray& messageId,
+				const QByteArray& senderId,
+				const QString& newContent) = 0;
+
+	/**
+		Permanently delete a message from its conversation.
+		\param messageId  The message to delete.
+		\param senderId   The user requesting the deletion; must match the
+		                  original sender.
+		\return True on success.
+	*/
+	virtual bool DeleteMessage(
+				const QByteArray& messageId,
+				const QByteArray& senderId) = 0;
 };
 
 } // namespace imtchat

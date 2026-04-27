@@ -123,6 +123,11 @@ sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectCont
 		sdl::imtbase::FilterableSelect::CSelectableItemData::V1_0 itemRepresentation;
 		itemRepresentation.id = objectId;
 
+		QByteArray objectTypeId = iteratorPtr->GetObjectTypeId();
+		if (!objectTypeId.isEmpty()){
+			itemRepresentation.typeId = objectTypeId;
+		}
+
 		QString name = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
 		itemRepresentation.name = name.isEmpty() ? QString::fromUtf8(objectId) : name;
 

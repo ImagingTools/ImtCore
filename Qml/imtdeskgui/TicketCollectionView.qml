@@ -33,6 +33,7 @@ RemoteCollectionView {
 	onHeadersChanged: {
 		table.setColumnContentById(TicketItemDataTypeMetaInfo.s_createdAt, createdAtCellDelegateComp)
 		table.setColumnContentById(TicketItemDataTypeMetaInfo.s_status, statusCellDelegateComp)
+		table.setColumnContentById(TicketItemDataTypeMetaInfo.s_priority, priorityCellDelegateComp)
 	}
 
 	// Subscribes to server-side ticket message notifications and surfaces
@@ -74,6 +75,49 @@ RemoteCollectionView {
 	Component {
 		id: createdAtCellDelegateComp
 		TableCellDateDelegate {}
+	}
+
+	Component {
+		id: priorityCellDelegateComp
+		TableCellDelegateBase {
+			id: priorityDelegate
+
+			readonly property var _priorityColors: ({
+				"Low": "#3FB950",       // green
+				"Medium": "#D29922",    // amber
+				"High": "#DB6D28",      // orange
+				"Critical": "#F85149"   // red
+			})
+
+			onReused: {
+				var val = priorityDelegate.getValue()
+				priorityLabel.text = val ? qsTr(String(val)) : ""
+				priorityCircle.color = _priorityColors[val] || "#8C95A6"
+			}
+
+			Row {
+				anchors.verticalCenter: parent.verticalCenter
+				anchors.left: parent.left
+				anchors.leftMargin: Style.marginM
+				spacing: Style.spacingS
+
+				Rectangle {
+					id: priorityCircle
+					anchors.verticalCenter: parent.verticalCenter
+					width: 10
+					height: 10
+					radius: width / 2
+					color: "#8C95A6"
+				}
+
+				Text {
+					id: priorityLabel
+					anchors.verticalCenter: parent.verticalCenter
+					font.pixelSize: Style.fontSizeM
+					color: Style.textColor
+				}
+			}
+		}
 	}
 
 	Component {

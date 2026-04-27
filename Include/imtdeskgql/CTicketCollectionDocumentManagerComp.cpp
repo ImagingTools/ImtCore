@@ -200,6 +200,15 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 						itemData.timestamp = msgPtr->GetCreatedAt();
 						itemData.content = msgPtr->GetContent();
 
+						// Mark the message as edited if its updatedAt is set and
+						// differs from createdAt — clients use this flag to show
+						// an "edited" indicator next to the message.
+						QString createdAt = msgPtr->GetCreatedAt();
+						QString updatedAt = msgPtr->GetUpdatedAt();
+						if (!updatedAt.isEmpty() && updatedAt != createdAt){
+							itemData.edited = true;
+						}
+
 						QByteArrayList attachmentIds = msgPtr->GetAttachmentIds();
 						if (!attachmentIds.isEmpty()){
 							itemData.attachments.Emplace();
@@ -464,8 +473,31 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 				if (!sdlItem){
 					continue;
 				}
-				// Skip items that already have an id — they are existing messages loaded from DB
+				// Existing messages (with id) may be edited or deleted.
 				if (sdlItem->id && !sdlItem->id->isEmpty()){
+					QByteArray messageId = *sdlItem->id;
+
+					// Delete request (explicit `deleted: true` flag from client).
+					if (sdlItem->deleted && *sdlItem->deleted){
+						m_chatServiceCompPtr->DeleteMessage(messageId, userId);
+						continue;
+					}
+
+					// Edit request: only when content was provided and differs
+					// from the stored value. We compare against the current DB
+					// content to avoid unnecessary write operations.
+					if (sdlItem->content){
+						imtbase::IObjectCollection::DataPtr msgDataPtr;
+						if (m_messageCollectionCompPtr.IsValid()
+								&& m_messageCollectionCompPtr->GetObjectData(messageId, msgDataPtr)){
+							const imtchat::IChatMessage* existingMsgPtr =
+									dynamic_cast<const imtchat::IChatMessage*>(msgDataPtr.GetPtr());
+							if (existingMsgPtr != nullptr
+									&& existingMsgPtr->GetContent() != *sdlItem->content){
+								m_chatServiceCompPtr->EditMessage(messageId, userId, *sdlItem->content);
+							}
+						}
+					}
 					continue;
 				}
 
