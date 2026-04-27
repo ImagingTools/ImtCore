@@ -1482,8 +1482,10 @@ DocumentViewBase {
 											}
 											ctxWrapper.__ctxReady = true
 											// Trigger Loader (re)creation via sourceComponent swap
-											ctxPopupLoader.sourceComponent = null
-											ctxPopupLoader.sourceComponent = ctxPopupComp
+											if (ctxWrapper.selectedEntityTypeId !== "") {
+												ctxPopupLoader.sourceComponent = null
+												ctxPopupLoader.sourceComponent = ctxPopupComp
+											}
 										}
 
 										function closePopup() {
@@ -1625,7 +1627,6 @@ DocumentViewBase {
 													id: ctxPopupLoader
 													width: parent.width
 													height: item ? item.height : 0
-													sourceComponent: ctxPopupComp
 
 													onItemChanged: {
 														if (item) {
