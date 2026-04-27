@@ -1,0 +1,8 @@
+module imtacf
+
+singleton AcfRegistryHelper 1.0 ./AcfRegistryHelper.qml
+
+AcfComponentWrapper 1.0 ./AcfComponentWrapper.qml
+AcfCompositeComponent 1.0 ./AcfCompositeComponent.qml
+AcfConnection 1.0 ./AcfConnection.qml
+ComponentGraphView 1.0 ./ComponentGraphView.qml
