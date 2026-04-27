@@ -640,6 +640,7 @@ void CGqlObjectCollectionDelegateComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 	m_paramSetRepresentationController.RegisterSubController(m_complexCollectionFilterRepresentationController);
+	m_paramSetRepresentationController.RegisterSubController(m_documentIdFilterRepresentationController);
 	m_paramSetRepresentationController.RegisterSubController(m_documentFilterRepresentationController);
 }
 

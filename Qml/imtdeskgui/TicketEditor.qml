@@ -1261,9 +1261,7 @@ DocumentViewBase {
 											collectionId: "Users"
 											multiSelect: true
 										}
-										
-										idRole: "id"
-										textRole: "title"
+
 										itemWidth: 280
 										showCheckBox: true
 										showSeparator: true
