@@ -12,7 +12,6 @@ import imtdocgui 1.0
 import imtcolgui 1.0
 import imtdeskImtDeskSdl 1.0
 import imtdeskTicketCollectionDocumentManagerSdl 1.0
-import imtauthUsersSdl 1.0
 import imtchatgui 1.0
 import Qt.labs.platform 1.1 as QLP
 
@@ -401,16 +400,7 @@ DocumentViewBase {
 		var aIds = ticketData.m_assigneeIds || []
 		for (var a = 0; a < aIds.length; a++) {
 			var aId = aIds[a]
-			var aName = aId
-			if (editAssigneeCB.model) {
-				for (var ai = 0; ai < editAssigneeCB.model.getItemsCount(); ai++) {
-					if (editAssigneeCB.model.getData("id", ai) === aId) {
-						aName = editAssigneeCB.model.getData("name", ai) || aId
-						break
-					}
-				}
-			}
-			assigns.push({id: aId, name: aName})
+			assigns.push({id: aId, name: aId})
 		}
 		root.pendingAssignees = assigns
 		root._assigneesChanged = false
@@ -432,17 +422,6 @@ DocumentViewBase {
 				)
 			}
 		}
-		
-		editReporterCB.currentIndex = -1
-		if (editReporterCB.model) {
-			let reporterId = ticketData.m_reporterId || AuthorizationController.getUserId()
-			for (let i = 0; i < editReporterCB.model.getItemsCount(); i++) {
-				if (editReporterCB.model.getData("id", i) === reporterId) {
-					editReporterCB.currentIndex = i
-					break
-				}
-			}
-		}
 	}
 	
 	function updateModel() {
@@ -454,12 +433,7 @@ DocumentViewBase {
 		ticketData.m_assigneeIds = root.pendingAssignees.map(function(a) { return a.id })
 		
 		if (root.isNewIssue) {
-			if (editReporterCB.model && editReporterCB.currentIndex >= 0) {
-				ticketData.m_reporterId = editReporterCB.model.getData("id", editReporterCB.currentIndex)
-			}
-			else {
-				ticketData.m_reporterId = AuthorizationController.getUserId()
-			}
+			ticketData.m_reporterId = AuthorizationController.getUserId()
 		}
 		
 		if (editTypeCB.model && editTypeCB.currentIndex >= 0) {
@@ -522,19 +496,7 @@ DocumentViewBase {
 		onTriggered: root._exportChatCopiedState = false
 	}
 	
-	CollectionDataProvider {
-		id: userCollectionProvider
-		commandId: ImtauthUsersSdlCommandIds.s_usersList
-		fields: [UserDataInputTypeMetaInfo.s_id, UserDataInputTypeMetaInfo.s_typeId, UserDataInputTypeMetaInfo.s_name]
-		onCollectionModelChanged: {
-			editAssigneeCB.model = collectionModel
-			editReporterCB.model = collectionModel
-			root.doUpdateGui()
-		}
-		Component.onCompleted: {
-			updateModel()
-		}
-	}
+	
 	
 	TreeItemModel {
 		id: ticketTypeModel
@@ -1284,23 +1246,6 @@ DocumentViewBase {
 								}
 							}
 							
-							// Hidden assignee ComboBox (data source for name resolution)
-							ComboBox {
-								id: editAssigneeCB
-								visible: false
-								width: 0
-								height: 0
-							}
-							
-							// Hidden Reporter (data still tracked for model)
-							ComboBox {
-								id: editReporterCB
-								visible: false
-								width: 0
-								height: 0
-								onCurrentIndexChanged: root.doUpdateModel()
-							}
-
 							// Hidden State Reason (data still tracked for model)
 							ComboBox {
 								id: editStateReasonCB
