@@ -36,8 +36,8 @@ import imtgui 1.0
 PopupView {
 	id: root
 
-	width: itemWidth + 2 * Style.marginL
-	height: Math.min(contentColumn.height + 2 * Style.marginL, root.__maxPopupHeight)
+	width: root.embedded ? (parent ? parent.width : itemWidth) : (itemWidth + 2 * Style.marginL)
+	height: root.embedded ? contentColumn.height : Math.min(contentColumn.height + 2 * Style.marginL, root.__maxPopupHeight)
 
 	// --- Data Controller (dependency injection) ---
 	property QtObject dataProvider: null
@@ -83,6 +83,9 @@ PopupView {
 
 	// --- Private: suppress selectionChanged during initialization ---
 	property bool __initializing: false
+
+	// --- Embedded mode (no own background/shadow, parent provides chrome) ---
+	property bool embedded: false
 
 	// --- Injectable delegate ---
 	property Component delegate: Component {
@@ -153,6 +156,7 @@ PopupView {
 	// --- Signals ---
 	signal itemSelected(string itemId, int index)
 	signal selectionChanged(var selectedIds)
+	signal requestClose()
 
 	// --- Delegate helpers (public, use in custom delegates) ---
 
@@ -229,6 +233,10 @@ PopupView {
 	}
 
 	function closePopup(){
+		if (root.embedded){
+			root.requestClose()
+			return
+		}
 		ModalDialogManager.closeDialog()
 	}
 
@@ -346,10 +354,12 @@ PopupView {
 		radius: Style.radiusL
 		border.width: 1
 		border.color: Style.alternateBaseColor
+		visible: !root.embedded
 	}
 
 	MouseArea {
 		anchors.fill: background
+		visible: !root.embedded
 		onWheel: {
 			wheel.accepted = true
 		}
@@ -367,7 +377,7 @@ PopupView {
 		id: body
 
 		anchors.fill: parent
-		anchors.margins: Style.marginM
+		anchors.margins: root.embedded ? 0 : Style.marginM
 
 		// --- Content column ---
 		Column {
@@ -749,6 +759,7 @@ PopupView {
 
 		anchors.fill: background
 		z: background.z - 1
+		visible: !root.embedded
 
 		horizontalOffset: 3
 		verticalOffset: 3
@@ -813,6 +824,7 @@ PopupView {
 	// --- Keyboard navigation ---
 	Shortcut {
 		sequence: "Escape"
+		enabled: !root.embedded
 		onActivated: {
 			root.closePopup()
 		}

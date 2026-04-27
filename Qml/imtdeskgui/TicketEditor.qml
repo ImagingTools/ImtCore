@@ -1459,100 +1459,199 @@ DocumentViewBase {
 									wrapMode: Text.WordWrap
 								}
 							
-								// Context picker via FilterableSelectPopup with entity type header
+								// Context picker — ComboBox + per-entity FilterableSelectPopup via Loader
 								Component {
 									id: contextPickerDialogComp
 
-									FilterableSelectPopup {
-										id: ctxSelectPopup
+									PopupView {
+										id: ctxWrapper
 
 										property string selectedEntityTypeId: ""
 										property bool __ctxReady: false
+										readonly property int __popupWidth: 320
+										readonly property int __maxHeight: 600
 
-										function __initEntityType() {
+										width: __popupWidth + 2 * Style.marginL
+										height: Math.min(ctxBodyItem.height + 2 * Style.marginL, __maxHeight)
+
+										function started() {
+											ctxWrapper.__ctxReady = false
 											if (entityTypeModel.getItemsCount() > 0) {
-												ctxSelectPopup.selectedEntityTypeId = entityTypeModel.getData("id", 0)
+												ctxWrapper.selectedEntityTypeId = entityTypeModel.getData("id", 0)
+												ctxTypeCB.currentIndex = 0
 											}
-											ctxSelectPopup.__ctxReady = true
+											ctxWrapper.__ctxReady = true
+											// Trigger Loader (re)creation
+											ctxPopupLoader.active = false
+											ctxPopupLoader.active = true
 										}
 
-										dataProvider: FilterableSelectGqlDataProvider {
-											id: ctxDataProvider
-											collectionId: ctxSelectPopup.selectedEntityTypeId
-											multiSelect: true
+										function closePopup() {
+											ModalDialogManager.closeDialog()
 										}
 
-										itemWidth: 320
-										showCheckBox: true
-										filterPlaceholder: qsTr("Search entities...")
+										onSelectedEntityTypeIdChanged: {
+											if (ctxWrapper.__ctxReady) {
+												ctxPopupLoader.active = false
+												ctxPopupLoader.active = true
+											}
+										}
 
-										headerComponent: Component {
-											Row {
-												width: parent ? parent.width : 0
-												spacing: Style.marginS
+										// Unified background
+										Rectangle {
+											id: ctxBg
+											anchors.fill: parent
+											color: Style.baseColor
+											radius: Style.radiusL
+											border.width: 1
+											border.color: Style.alternateBaseColor
+										}
 
-												Text {
-													id: entityTypeLabel
-													text: qsTr("Entity type")
-													font.pixelSize: Style.fontSizeM
-													font.bold: true
-													color: Style.textColor
-													anchors.verticalCenter: parent.verticalCenter
-												}
+										MouseArea {
+											anchors.fill: ctxBg
+											onWheel: { wheel.accepted = true }
+											onClicked: { mouse.accepted = true }
+											onReleased: {}
+											onPressAndHold: {}
+											onPressed: {}
+											onPositionChanged: {}
+										}
 
-												ComboBox {
-													id: ctxHeaderTypeCB
-													width: parent.width - parent.spacing - entityTypeLabel.contentWidth
-													height: Style.buttonHeightM
-													model: entityTypeModel
-													currentIndex: 0
-													onCurrentIndexChanged: {
-														if (entityTypeModel.getItemsCount() > currentIndex && currentIndex >= 0) {
-															var newTypeId = entityTypeModel.getData("id", currentIndex)
-															if (ctxSelectPopup.selectedEntityTypeId !== newTypeId) {
-																ctxSelectPopup.selectedEntityTypeId = newTypeId
-																// Only re-fetch when user changes type (not during init)
-																if (ctxSelectPopup.__ctxReady && ctxDataProvider) {
-																	ctxDataProvider.clearSelection()
-																	ctxDataProvider.fetch("")
+										// Unified shadow
+										DropShadow {
+											anchors.fill: ctxBg
+											z: ctxBg.z - 1
+											horizontalOffset: 3
+											verticalOffset: 3
+											radius: Style.radiusL
+											color: Style.shadowColor
+											source: ctxBg
+										}
+
+										Item {
+											id: ctxBodyItem
+											anchors.left: parent.left
+											anchors.right: parent.right
+											anchors.top: parent.top
+											anchors.margins: Style.marginM
+											height: ctxContentCol.height
+
+											Column {
+												id: ctxContentCol
+												width: parent.width
+												spacing: Style.marginM
+
+												// Entity type selector (separate from FilterableSelectPopup)
+												Row {
+													width: parent.width
+													spacing: Style.marginS
+
+													Text {
+														id: ctxTypeLabel
+														text: qsTr("Entity type")
+														font.pixelSize: Style.fontSizeM
+														font.bold: true
+														color: Style.textColor
+														anchors.verticalCenter: parent.verticalCenter
+													}
+
+													ComboBox {
+														id: ctxTypeCB
+														width: parent.width - parent.spacing - ctxTypeLabel.contentWidth
+														height: Style.buttonHeightM
+														model: entityTypeModel
+														currentIndex: 0
+														onCurrentIndexChanged: {
+															if (!ctxWrapper.__ctxReady) return
+															if (entityTypeModel.getItemsCount() > currentIndex && currentIndex >= 0) {
+																var newTypeId = entityTypeModel.getData("id", currentIndex)
+																if (ctxWrapper.selectedEntityTypeId !== newTypeId) {
+																	ctxWrapper.selectedEntityTypeId = newTypeId
 																}
 															}
+														}
+													}
+												}
+
+												// Per-entity FilterableSelectPopup (recreated on entity type change)
+												Loader {
+													id: ctxPopupLoader
+													width: parent.width
+													height: item ? item.height : 0
+													active: ctxWrapper.selectedEntityTypeId !== ""
+
+													sourceComponent: Component {
+														FilterableSelectPopup {
+															id: ctxInnerPopup
+
+															embedded: true
+
+															dataProvider: FilterableSelectGqlDataProvider {
+																collectionId: ctxWrapper.selectedEntityTypeId
+																multiSelect: true
+															}
+
+															itemWidth: ctxWrapper.__popupWidth
+															showCheckBox: true
+															filterPlaceholder: qsTr("Search entities...")
+
+															onRequestClose: ctxWrapper.closePopup()
+
+															onSelectionChanged: {
+																var otherRefs = []
+																for (var j = 0; j < root.pendingEntityRefs.length; j++) {
+																	if (root.pendingEntityRefs[j].entityType !== ctxWrapper.selectedEntityTypeId) {
+																		otherRefs.push(root.pendingEntityRefs[j])
+																	}
+																}
+																for (var i = 0; i < selectedIds.length; i++) {
+																	var selId = selectedIds[i]
+																	var selName = dataProvider ? dataProvider.getSelectedItemText(selId) : ""
+																	if (!selName)
+																		selName = selId
+																	var linkPath = ctxWrapper.selectedEntityTypeId + "/" + selId
+																	otherRefs.push({
+																		entityType: ctxWrapper.selectedEntityTypeId,
+																		entityId: selId,
+																		displayName: selName,
+																		entityLinkPath: linkPath,
+																		typeId: ""
+																	})
+																}
+																root.pendingEntityRefs = otherRefs
+																root._entityRefsChanged = true
+																root.doUpdateModel()
+															}
+														}
+													}
+
+													onItemChanged: {
+														if (item) {
+															// Set preselected IDs for the current entity type
+															var preIds = []
+															var knownItms = []
+															for (var i = 0; i < root.pendingEntityRefs.length; i++) {
+																var ref = root.pendingEntityRefs[i]
+																if (ref.entityType === ctxWrapper.selectedEntityTypeId) {
+																	preIds.push(ref.entityId)
+																	knownItms.push({
+																		id: ref.entityId,
+																		title: ref.displayName || ref.entityId
+																	})
+																}
+															}
+															item.knownItems = knownItms
+															item.preselectedIds = preIds
+															item.started()
 														}
 													}
 												}
 											}
 										}
 
-										Component.onCompleted: {
-											ctxSelectPopup.__initEntityType()
-										}
-
-										onSelectionChanged: {
-											// Build entity refs from current selection (not append)
-											// Keep existing refs from other entity types, replace refs for current type
-											var otherRefs = []
-											for (var j = 0; j < root.pendingEntityRefs.length; j++) {
-												if (root.pendingEntityRefs[j].entityType !== ctxSelectPopup.selectedEntityTypeId) {
-													otherRefs.push(root.pendingEntityRefs[j])
-												}
-											}
-											for (var i = 0; i < selectedIds.length; i++) {
-												var selId = selectedIds[i]
-												var selName = dataProvider ? dataProvider.getSelectedItemText(selId) : ""
-												if (!selName)
-													selName = selId
-												var linkPath = ctxSelectPopup.selectedEntityTypeId + "/" + selId
-												otherRefs.push({
-													entityType: ctxSelectPopup.selectedEntityTypeId,
-													entityId: selId,
-													displayName: selName,
-													entityLinkPath: linkPath,
-													typeId: ""
-												})
-											}
-											root.pendingEntityRefs = otherRefs
-											root._entityRefsChanged = true
-											root.doUpdateModel()
+										Shortcut {
+											sequence: "Escape"
+											onActivated: ctxWrapper.closePopup()
 										}
 									}
 								}
