@@ -36,7 +36,7 @@ PopupView {
 	id: root
 
 	width: itemWidth + 2 * Style.marginL
-	height: contentColumn.height + 2 * Style.marginL
+	height: Math.min(contentColumn.height + 2 * Style.marginL, root.__maxPopupHeight)
 
 	// --- Data Controller (dependency injection) ---
 	property QtObject dataProvider: null
@@ -70,6 +70,15 @@ PopupView {
 
 	// --- Selected items group at top ---
 	property bool showSelectedGroup: false
+
+	// --- Max height for selected group (in items) before scrolling ---
+	property int maxSelectedGroupItems: 4
+
+	// --- Private: max popup height (screen height minus margins) ---
+	property int __maxPopupHeight: 600
+
+	// --- Private: suppress selectionChanged during initialization ---
+	property bool __initializing: false
 
 	// --- Injectable delegate ---
 	property Component delegate: Component {
@@ -179,6 +188,8 @@ PopupView {
 	// --- Internal state (UI-only) ---
 	property QtObject __internal: QtObject {
 		property int focusedIndex: -1
+		property int selectedFocusedIndex: -1
+		property bool clearAllFocused: false
 		property bool hoverBlocked: true
 		property var selectedItemsList: []
 		property int selectedItemsCount: 0
@@ -186,8 +197,12 @@ PopupView {
 
 	// --- Lifecycle (called by ModalDialogManager via DialogManagerView) ---
 	function started(){
+		root.__initializing = true
+
 		root.__internal.focusedIndex = -1
+		root.__internal.selectedFocusedIndex = -1
 		root.__internal.hoverBlocked = true
+		root.__internal.clearAllFocused = false
 		popupListView.itemCount = 0
 
 		filterField.text = ""
@@ -203,7 +218,10 @@ PopupView {
 
 		root.__rebuildSelectedGroup()
 
-		root.__focusFilter()
+		root.__initializing = false
+
+		// Delayed focus to prevent other elements from stealing it during dialog setup
+		__focusTimer.start()
 	}
 
 	function closePopup(){
@@ -227,11 +245,17 @@ PopupView {
 		if (!root.showSelectedGroup || !root.dataProvider){
 			root.__internal.selectedItemsList = []
 			root.__internal.selectedItemsCount = 0
+			root.__internal.selectedFocusedIndex = -1
+			root.__internal.clearAllFocused = false
 			return
 		}
 		var items = root.dataProvider.getSelectedItems()
 		root.__internal.selectedItemsList = items
 		root.__internal.selectedItemsCount = items.length
+		// Adjust focused index if it's out of bounds after rebuild
+		if (root.__internal.selectedFocusedIndex >= items.length){
+			root.__internal.selectedFocusedIndex = items.length > 0 ? items.length - 1 : -1
+		}
 	}
 
 	function __handleRemoveSelectedItem(itemId){
@@ -244,8 +268,20 @@ PopupView {
 	}
 
 	function __focusFilter(){
+		root.__internal.selectedFocusedIndex = -1
+		root.__internal.clearAllFocused = false
 		filterField.setFocus(true)
 		filterField.forceActiveFocus()
+	}
+
+	// --- Focus delay timer (prevents focus theft during dialog setup) ---
+	PauseAnimation {
+		id: __focusTimer
+
+		duration: 50
+		onFinished: {
+			root.__focusFilter()
+		}
 	}
 
 	// --- Data provider connection ---
@@ -262,6 +298,10 @@ PopupView {
 		}
 
 		function onSelectionChanged(){
+			// Suppress during initialization to avoid unwanted side-effects (e.g. doUpdateModel in TicketEditor)
+			if (root.__initializing){
+				return
+			}
 			root.selectionChanged(root.dataProvider.getSelectedIds())
 			root.__rebuildSelectedGroup()
 
@@ -404,11 +444,14 @@ PopupView {
 					}
 
 					Text {
+						id: clearAllBtn
+
 						anchors.right: parent.right
 						anchors.verticalCenter: parent.verticalCenter
 						font.pixelSize: Style.fontSizeS
-						color: Style.linkColor
+						color: root.__internal.clearAllFocused ? Style.textSelectedColor : Style.linkColor
 						text: qsTr("Clear all")
+						font.underline: root.__internal.clearAllFocused
 
 						MouseArea {
 							anchors.fill: parent
@@ -418,28 +461,45 @@ PopupView {
 								if (root.dataProvider){
 									root.dataProvider.clearSelection()
 								}
+								root.__internal.clearAllFocused = false
 								root.__focusFilter()
 							}
 						}
 					}
 				}
 
-				// Selected items list
-				Column {
+				// Selected items list (scrollable)
+				Item {
+					id: selectedListContainer
+
 					width: parent.width
-					spacing: 0
+					height: {
+						var totalHeight = root.__internal.selectedItemsCount * root.itemHeight
+						var maxHeight = root.maxSelectedGroupItems * root.itemHeight
+						return Math.min(totalHeight, maxHeight)
+					}
 
-					Repeater {
-						id: selectedItemsRepeater
+					ListView {
+						id: selectedListView
 
+						anchors.fill: parent
+						clip: true
+						boundsBehavior: Flickable.StopAtBounds
 						model: root.__internal.selectedItemsCount
 
 						delegate: Item {
-							width: selectedGroup.width
+							width: selectedListView.width
 							height: root.itemHeight
 
 							property var __selItem: model.index >= 0 && model.index < root.__internal.selectedItemsList.length
 								? root.__internal.selectedItemsList[model.index] : null
+
+							// Highlight when keyboard-focused
+							Rectangle {
+								anchors.fill: parent
+								color: root.__internal.selectedFocusedIndex === model.index ? Style.hoverColor : "transparent"
+								opacity: 0.5
+							}
 
 							Row {
 								anchors.verticalCenter: parent.verticalCenter
@@ -510,6 +570,19 @@ PopupView {
 								opacity: 0.4
 							}
 						}
+					}
+
+					CustomScrollbar {
+						id: selectedScrollbar
+
+						z: 100
+
+						anchors.right: parent.right
+						anchors.bottom: parent.bottom
+
+						secondSize: 8
+						targetItem: selectedListView
+						visible: root.__internal.selectedItemsCount > root.maxSelectedGroupItems
 					}
 				}
 
@@ -599,6 +672,7 @@ PopupView {
 
 					secondSize: 8
 					targetItem: popupListView
+					visible: popupListView.itemCount > 0 && popupListView.contentHeight > popupListView.height
 				}
 
 				ListView {
@@ -671,6 +745,18 @@ PopupView {
 		source: background
 	}
 
+	// --- Helper: clear all focus indicators ---
+	function __clearAllFocusIndicators(){
+		root.__internal.focusedIndex = -1
+		root.__internal.selectedFocusedIndex = -1
+		root.__internal.clearAllFocused = false
+	}
+
+	// --- Helper: is any selected group element focused? ---
+	function __isSelectedGroupFocused(){
+		return root.__internal.selectedFocusedIndex >= 0 || root.__internal.clearAllFocused
+	}
+
 	// --- Keyboard navigation ---
 	Shortcut {
 		sequence: "Escape"
@@ -683,6 +769,33 @@ PopupView {
 		sequence: "Return"
 		enabled: !filterField.textInputFocus
 		onActivated: {
+			// "Clear all" button action
+			if (root.__internal.clearAllFocused){
+				if (root.dataProvider){
+					root.dataProvider.clearSelection()
+				}
+				root.__internal.clearAllFocused = false
+				root.__focusFilter()
+				return
+			}
+			// Selected group item — remove
+			if (root.__internal.selectedFocusedIndex >= 0){
+				var si = root.__internal.selectedFocusedIndex < root.__internal.selectedItemsList.length
+					? root.__internal.selectedItemsList[root.__internal.selectedFocusedIndex] : null
+				if (si){
+					root.__handleRemoveSelectedItem(si[root.idRole])
+				}
+				// Adjust index after removal
+				if (root.__internal.selectedFocusedIndex >= root.__internal.selectedItemsCount){
+					root.__internal.selectedFocusedIndex = root.__internal.selectedItemsCount - 1
+				}
+				if (root.__internal.selectedItemsCount === 0){
+					root.__internal.selectedFocusedIndex = -1
+					root.__focusFilter()
+				}
+				return
+			}
+			// Main list item — toggle
 			if (root.__internal.focusedIndex >= 0){
 				var id = root.getItemId(root.__internal.focusedIndex)
 				root.handleItemClick(id, root.__internal.focusedIndex)
@@ -690,11 +803,34 @@ PopupView {
 		}
 	}
 
-	// Enter key (numpad) — same behavior as Return for delegate selection
+	// Enter key (numpad) — same behavior as Return
 	Shortcut {
 		sequence: "Enter"
 		enabled: !filterField.textInputFocus
 		onActivated: {
+			if (root.__internal.clearAllFocused){
+				if (root.dataProvider){
+					root.dataProvider.clearSelection()
+				}
+				root.__internal.clearAllFocused = false
+				root.__focusFilter()
+				return
+			}
+			if (root.__internal.selectedFocusedIndex >= 0){
+				var si = root.__internal.selectedFocusedIndex < root.__internal.selectedItemsList.length
+					? root.__internal.selectedItemsList[root.__internal.selectedFocusedIndex] : null
+				if (si){
+					root.__handleRemoveSelectedItem(si[root.idRole])
+				}
+				if (root.__internal.selectedFocusedIndex >= root.__internal.selectedItemsCount){
+					root.__internal.selectedFocusedIndex = root.__internal.selectedItemsCount - 1
+				}
+				if (root.__internal.selectedItemsCount === 0){
+					root.__internal.selectedFocusedIndex = -1
+					root.__focusFilter()
+				}
+				return
+			}
 			if (root.__internal.focusedIndex >= 0){
 				var id = root.getItemId(root.__internal.focusedIndex)
 				root.handleItemClick(id, root.__internal.focusedIndex)
@@ -706,6 +842,29 @@ PopupView {
 		sequence: "Space"
 		enabled: !filterField.textInputFocus
 		onActivated: {
+			if (root.__internal.clearAllFocused){
+				if (root.dataProvider){
+					root.dataProvider.clearSelection()
+				}
+				root.__internal.clearAllFocused = false
+				root.__focusFilter()
+				return
+			}
+			if (root.__internal.selectedFocusedIndex >= 0){
+				var si = root.__internal.selectedFocusedIndex < root.__internal.selectedItemsList.length
+					? root.__internal.selectedItemsList[root.__internal.selectedFocusedIndex] : null
+				if (si){
+					root.__handleRemoveSelectedItem(si[root.idRole])
+				}
+				if (root.__internal.selectedFocusedIndex >= root.__internal.selectedItemsCount){
+					root.__internal.selectedFocusedIndex = root.__internal.selectedItemsCount - 1
+				}
+				if (root.__internal.selectedItemsCount === 0){
+					root.__internal.selectedFocusedIndex = -1
+					root.__focusFilter()
+				}
+				return
+			}
 			if (root.__internal.focusedIndex >= 0){
 				var id = root.getItemId(root.__internal.focusedIndex)
 				root.handleItemClick(id, root.__internal.focusedIndex)
@@ -719,13 +878,35 @@ PopupView {
 			if (filterField.textInputFocus){
 				filterField.setFocus(false)
 				root.__internal.hoverBlocked = true
-				var count = root.dataProvider ? root.dataProvider.items.length : 0
-				if (root.__internal.focusedIndex < 0 && count > 0){
-					root.__internal.focusedIndex = 0
+				// If selected group visible, tab to "Clear all" first
+				if (root.showSelectedGroup && root.__internal.selectedItemsCount > 0){
+					root.__internal.clearAllFocused = true
+					root.__internal.selectedFocusedIndex = -1
+					root.__internal.focusedIndex = -1
+				} else {
+					var count = root.dataProvider ? root.dataProvider.items.length : 0
+					if (root.__internal.focusedIndex < 0 && count > 0){
+						root.__internal.focusedIndex = 0
+					}
 				}
+			} else if (root.__internal.clearAllFocused){
+				// Tab from "Clear all" → first selected item
+				root.__internal.clearAllFocused = false
+				if (root.__internal.selectedItemsCount > 0){
+					root.__internal.selectedFocusedIndex = 0
+				} else {
+					var cnt = root.dataProvider ? root.dataProvider.items.length : 0
+					root.__internal.focusedIndex = cnt > 0 ? 0 : -1
+				}
+			} else if (root.__internal.selectedFocusedIndex >= 0){
+				// Tab from selected group → main list
+				root.__internal.selectedFocusedIndex = -1
+				var mainCount = root.dataProvider ? root.dataProvider.items.length : 0
+				root.__internal.focusedIndex = mainCount > 0 ? 0 : -1
 			} else {
+				// Tab from main list → back to filter
 				root.__focusFilter()
-				root.__internal.focusedIndex = -1
+				root.__clearAllFocusIndicators()
 			}
 		}
 	}
@@ -733,9 +914,25 @@ PopupView {
 	Shortcut {
 		sequence: "Shift+Tab"
 		onActivated: {
-			if (!filterField.textInputFocus){
-				root.__focusFilter()
+			if (root.__internal.focusedIndex >= 0){
+				// Shift+Tab from main list → selected group (last item) or "Clear all" or filter
 				root.__internal.focusedIndex = -1
+				if (root.showSelectedGroup && root.__internal.selectedItemsCount > 0){
+					root.__internal.selectedFocusedIndex = root.__internal.selectedItemsCount - 1
+				} else {
+					root.__focusFilter()
+				}
+			} else if (root.__internal.selectedFocusedIndex >= 0){
+				// Shift+Tab from selected group → "Clear all"
+				root.__internal.selectedFocusedIndex = -1
+				root.__internal.clearAllFocused = true
+			} else if (root.__internal.clearAllFocused){
+				// Shift+Tab from "Clear all" → filter
+				root.__internal.clearAllFocused = false
+				root.__focusFilter()
+			} else if (!filterField.textInputFocus){
+				root.__focusFilter()
+				root.__clearAllFocusIndicators()
 			}
 		}
 	}
@@ -747,9 +944,39 @@ PopupView {
 				filterField.setFocus(false)
 			}
 			root.__internal.hoverBlocked = true
+
+			// Navigate within selected group
+			if (root.__internal.selectedFocusedIndex > 0){
+				root.__internal.selectedFocusedIndex--
+				root.__selectedContentYCorrection(false)
+				return
+			}
+			if (root.__internal.selectedFocusedIndex === 0){
+				// Up from first selected item → "Clear all"
+				root.__internal.selectedFocusedIndex = -1
+				root.__internal.clearAllFocused = true
+				return
+			}
+			if (root.__internal.clearAllFocused){
+				// Up from "Clear all" → go to filter
+				root.__internal.clearAllFocused = false
+				root.__focusFilter()
+				return
+			}
+
+			// Navigate within main list
 			if (root.__internal.focusedIndex > 0){
 				root.__internal.focusedIndex--
 				root.contentYCorrection(false)
+			} else if (root.__internal.focusedIndex === 0){
+				// Up from first main item → last selected item (if exists) or filter
+				root.__internal.focusedIndex = -1
+				if (root.showSelectedGroup && root.__internal.selectedItemsCount > 0){
+					root.__internal.selectedFocusedIndex = root.__internal.selectedItemsCount - 1
+					root.__selectedContentYCorrection(false)
+				} else {
+					root.__focusFilter()
+				}
 			}
 		}
 	}
@@ -761,7 +988,45 @@ PopupView {
 				filterField.setFocus(false)
 			}
 			root.__internal.hoverBlocked = true
+
+			// From filter or "Clear all" → navigate into selected group or main list
+			if (root.__internal.clearAllFocused){
+				root.__internal.clearAllFocused = false
+				if (root.__internal.selectedItemsCount > 0){
+					root.__internal.selectedFocusedIndex = 0
+					root.__selectedContentYCorrection(true)
+				} else {
+					var mc = root.dataProvider ? root.dataProvider.items.length : 0
+					root.__internal.focusedIndex = mc > 0 ? 0 : -1
+				}
+				return
+			}
+
+			// Navigate within selected group
+			if (root.__internal.selectedFocusedIndex >= 0){
+				if (root.__internal.selectedFocusedIndex < root.__internal.selectedItemsCount - 1){
+					root.__internal.selectedFocusedIndex++
+					root.__selectedContentYCorrection(true)
+				} else {
+					// Down from last selected item → first main list item
+					root.__internal.selectedFocusedIndex = -1
+					var mainCount = root.dataProvider ? root.dataProvider.items.length : 0
+					root.__internal.focusedIndex = mainCount > 0 ? 0 : -1
+				}
+				return
+			}
+
+			// Navigate within main list
 			var itemCount = root.dataProvider ? root.dataProvider.items.length : 0
+			if (root.__internal.focusedIndex < 0){
+				// Down from filter → "Clear all" if selected group visible, else first main item
+				if (root.showSelectedGroup && root.__internal.selectedItemsCount > 0){
+					root.__internal.clearAllFocused = true
+				} else if (itemCount > 0){
+					root.__internal.focusedIndex = 0
+				}
+				return
+			}
 			if (root.__internal.focusedIndex < itemCount - 1){
 				root.__internal.focusedIndex++
 				root.contentYCorrection(true)
@@ -789,6 +1054,27 @@ PopupView {
 			else {
 				if (index * itemH < contentY){
 					popupListView.contentY = index * itemH
+				}
+			}
+		}
+	}
+
+	function __selectedContentYCorrection(down_){
+		if (root.__internal.selectedFocusedIndex >= 0){
+			var contentY = selectedListView.contentY
+			var itemH = root.itemHeight
+			var visibleCount = root.maxSelectedGroupItems
+			if (visibleCount <= 0) return
+			var index = root.__internal.selectedFocusedIndex
+
+			if (down_){
+				if ((index + 1) * itemH > contentY + visibleCount * itemH){
+					selectedListView.contentY = (index + 1) * itemH - visibleCount * itemH
+				}
+			}
+			else {
+				if (index * itemH < contentY){
+					selectedListView.contentY = index * itemH
 				}
 			}
 		}
