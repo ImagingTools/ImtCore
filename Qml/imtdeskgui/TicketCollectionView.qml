@@ -241,6 +241,10 @@ RemoteCollectionView {
 								}
 							}
 						}
+
+						function onError(message, type){
+							root.updateRepresentationFailed(root.documentId, message)
+						}
 					}
 
 					property UpdateTicketInput updateTicketInput: UpdateTicketInput {}
@@ -255,6 +259,10 @@ RemoteCollectionView {
 									}
 								}
 							}
+						}
+
+						function onError(message, type){
+							root.updateDocumentFailed(root.documentId, message)
 						}
 					}
 				}

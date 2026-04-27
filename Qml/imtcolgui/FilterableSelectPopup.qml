@@ -75,7 +75,10 @@ PopupView {
 	property Component delegate: Component {
 		PopupMenuDelegate {
 			width: root.itemWidth
-			height: root.itemHeight
+
+			property bool __isHiddenSelected: root.showSelectedGroup && root.dataProvider && root.dataProvider.isItemSelected(root.getItemId(model.index))
+			visible: !__isHiddenSelected
+			height: __isHiddenSelected ? 0 : root.itemHeight
 
 			isSeparator: false
 

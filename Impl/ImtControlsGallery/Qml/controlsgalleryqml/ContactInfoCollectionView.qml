@@ -125,6 +125,10 @@ RemoteCollectionView {
 								}
 							}
 						}
+
+						function onError(message, type){
+							root.updateRepresentationFailed(root.documentId, message)
+						}
 					}
 
 					property UpdateContactInfoEmailInput updateContactInfoInput: UpdateContactInfoEmailInput {}
@@ -139,6 +143,10 @@ RemoteCollectionView {
 									}
 								}
 							}
+						}
+
+						function onError(message, type){
+							root.updateDocumentFailed(root.documentId, message)
 						}
 					}
 				}
@@ -179,6 +187,10 @@ RemoteCollectionView {
 								}
 							}
 						}
+
+						function onError(message, type){
+							root.updateRepresentationFailed(root.documentId, message)
+						}
 					}
 
 					property UpdateContactInfoInput updateContactInfoInput: UpdateContactInfoInput {}
@@ -193,6 +205,10 @@ RemoteCollectionView {
 									}
 								}
 							}
+						}
+
+						function onError(message, type){
+							root.updateDocumentFailed(root.documentId, message)
 						}
 					}
 				}
