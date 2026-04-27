@@ -219,12 +219,7 @@ DocumentManagerBase {
 					root.setDocumentName(m_documentId, m_documentName)
 					root.__internal.createDocumentData(m_documentId, m_objectTypeId, false)
 					root.setDocumentObjectId(m_documentId, m_objectId)
-
-					// Clean up early DocumentDataLoaded if it arrived before this response
-					if (m_documentId in root.__internal.pendingDataLoaded) {
-						delete root.__internal.pendingDataLoaded[m_documentId]
-					}
-
+					root.setDocumentIsLoading(m_documentId, true)
 					root.documentOpened(m_documentId, m_objectTypeId)
 				}
 			}
