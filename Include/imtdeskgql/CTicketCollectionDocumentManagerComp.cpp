@@ -200,12 +200,12 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 						itemData.timestamp = msgPtr->GetCreatedAt();
 						itemData.content = msgPtr->GetContent();
 
-						// Mark the message as edited if its updatedAt is set and
-						// differs from createdAt — clients use this flag to show
-						// an "edited" indicator next to the message.
-						QString createdAt = msgPtr->GetCreatedAt();
+						// Mark the message as edited when its updatedAt timestamp
+						// was set by IChatService::EditMessage (SendMessage does
+						// not populate updatedAt, so a non-empty value reliably
+						// indicates a subsequent edit).
 						QString updatedAt = msgPtr->GetUpdatedAt();
-						if (!updatedAt.isEmpty() && updatedAt != createdAt){
+						if (!updatedAt.isEmpty() && updatedAt != msgPtr->GetCreatedAt()){
 							itemData.edited = true;
 						}
 

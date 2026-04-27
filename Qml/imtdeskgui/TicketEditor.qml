@@ -2174,7 +2174,7 @@ DocumentViewBase {
 													font.pixelSize: Style.fontSizeM
 													color: Style.textColor
 													wrapMode: Text.Wrap
-													visible: text.length > 0 && !commentDelegate.isEditingThis
+													visible: String(model.item.m_content || "").length > 0 && !commentDelegate.isEditingThis
 													lineHeight: 1.45
 												}
 
