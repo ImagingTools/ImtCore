@@ -1470,11 +1470,9 @@ DocumentViewBase {
 										property bool __ctxReady: false
 										readonly property int __popupWidth: 320
 										readonly property int __maxHeight: 600
-										// Track Loader content height imperatively (JQML v2 compatible)
-										property int __loaderHeight: 0
 
 										width: __popupWidth + 2 * Style.marginL
-										height: Math.min(Style.marginL + ctxComboRow.height + Style.marginL + ctxWrapper.__loaderHeight + Style.marginL, __maxHeight)
+										height: Math.min(Style.marginL + ctxTypeCB.height + ctxPopupItem.height + 2*Style.marginL, __maxHeight)
 
 										function started() {
 											ctxWrapper.__ctxReady = false
@@ -1492,10 +1490,6 @@ DocumentViewBase {
 
 										function closePopup() {
 											ModalDialogManager.closeDialog()
-										}
-
-										function __updateLoaderHeight() {
-											ctxWrapper.__loaderHeight = ctxPopupLoader.item ? ctxPopupLoader.item.height : 0
 										}
 
 										onSelectedEntityTypeIdChanged: {
@@ -1536,39 +1530,22 @@ DocumentViewBase {
 											source: ctxBg
 										}
 
-										// Entity type selector (ComboBox)
-										Row {
-											id: ctxComboRow
+										ComboBox {
+											id: ctxTypeCB
 											anchors.left: parent.left
 											anchors.right: parent.right
 											anchors.top: parent.top
-											anchors.leftMargin: Style.marginL
-											anchors.rightMargin: Style.marginL
-											anchors.topMargin: Style.marginL
-											spacing: Style.marginS
-
-											Text {
-												id: ctxTypeLabel
-												text: qsTr("Entity type")
-												font.pixelSize: Style.fontSizeM
-												font.bold: true
-												color: Style.textColor
-												anchors.verticalCenter: parent.verticalCenter
-											}
-
-											ComboBox {
-												id: ctxTypeCB
-												width: parent.width - parent.spacing - ctxTypeLabel.contentWidth
-												height: Style.buttonHeightM
-												model: entityTypeModel
-												currentIndex: 0
-												onCurrentIndexChanged: {
-													if (!ctxWrapper.__ctxReady) return
-													if (entityTypeModel.getItemsCount() > currentIndex && currentIndex >= 0) {
-														var newTypeId = entityTypeModel.getData("id", currentIndex)
-														if (ctxWrapper.selectedEntityTypeId !== newTypeId) {
-															ctxWrapper.selectedEntityTypeId = newTypeId
-														}
+											anchors.margins: Style.marginL
+											width: parent.width
+											height: Style.buttonHeightM
+											model: entityTypeModel
+											currentIndex: 0
+											onCurrentIndexChanged: {
+												if (!ctxWrapper.__ctxReady) return
+												if (entityTypeModel.getItemsCount() > currentIndex && currentIndex >= 0) {
+													var newTypeId = entityTypeModel.getData("id", currentIndex)
+													if (ctxWrapper.selectedEntityTypeId !== newTypeId) {
+														ctxWrapper.selectedEntityTypeId = newTypeId
 													}
 												}
 											}
@@ -1593,8 +1570,6 @@ DocumentViewBase {
 												filterPlaceholder: qsTr("Search entities...")
 
 												onRequestClose: ctxWrapper.closePopup()
-
-												onHeightChanged: ctxWrapper.__updateLoaderHeight()
 
 												onSelectionChanged: {
 													var otherRefs = []
@@ -1624,21 +1599,19 @@ DocumentViewBase {
 											}
 										}
 
-										Loader {
-											id: ctxPopupLoader
+										Item {
+											id: ctxPopupItem
 											anchors.left: parent.left
-											anchors.right: parent.right
-											anchors.top: ctxComboRow.bottom
 											anchors.leftMargin: Style.marginL
+											anchors.right: parent.right
 											anchors.rightMargin: Style.marginL
+											anchors.top: ctxTypeCB.bottom
 											anchors.topMargin: Style.marginL
-											height: ctxWrapper.__loaderHeight
 
-											onItemChanged: {
-												if (item) {
-													ctxWrapper.__updateLoaderHeight()
-
-													// Set preselected IDs for the current entity type
+											Loader {
+												id: ctxPopupLoader
+												width: parent.width
+												onLoaded: {
 													var preIds = []
 													var knownItms = []
 													for (var i = 0; i < root.pendingEntityRefs.length; i++) {
@@ -1651,11 +1624,17 @@ DocumentViewBase {
 															})
 														}
 													}
+													ctxPopupItemConnections.target = item
+													ctxPopupItem.height = item.height
 													item.knownItems = knownItms
 													item.preselectedIds = preIds
 													item.started()
-												} else {
-													ctxWrapper.__loaderHeight = 0
+												}
+											}
+											Connections {
+												id:ctxPopupItemConnections
+												function onHeightChanged(){
+													ctxPopupItem.height = ctxPopupLoader.item.height
 												}
 											}
 										}
