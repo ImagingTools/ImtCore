@@ -529,7 +529,7 @@ QtObject {
 		xml += '        <Element Id="' + __escapeXml(comp.componentId);
 		xml += '" PackageId="' + __escapeXml(comp.packageId);
 		xml += '" ComponentId="' + __escapeXml(comp.componentId) + '">\n';
-		xml += '            <Data IsEnabled="' + (comp.isActive ? "true" : "true") + '" Flags="0">\n';
+		xml += '            <Data IsEnabled="true" Flags="0">\n';
 		xml += '                <AttributeInfoMap>\n';
 
 		// Attributes
@@ -754,9 +754,9 @@ QtObject {
 				var exportId = attrMatch[3] || "";
 				var dataBlock = attrMatch[4];
 
-				var dataMatch = /<Data\s+IsEnabled="([^"]*)"(?:\s+Value="([^"]*)")?/.exec(dataBlock);
+				var dataMatch = /<Data\s+IsEnabled="([^"]*)"(?:\s+Value="([^"]*)")?[^>]*>/.exec(dataBlock);
 				var isEnabled = dataMatch ? (dataMatch[1] === "true") : false;
-				var value = dataMatch ? (dataMatch[2] || undefined) : undefined;
+				var value = dataMatch ? dataMatch[2] : undefined;
 
 				// Check for Values list (arrays: Reference[], Id[], etc.)
 				var values = [];

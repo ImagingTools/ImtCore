@@ -62,7 +62,7 @@ QtObject {
 	property bool isActive: false
 
 	/*! Позиция в визуальном макете Compositor (AcfSln). { x, y, note } */
-	property var layoutPosition: ({ x: 0, y: 0, note: "" })
+	property var layoutPosition: ({ "x": 0, "y": 0, "note": "" })
 
 	/*! Список атрибутов. Каждый элемент — AcfAttribute. */
 	property var acfAttributes: []
