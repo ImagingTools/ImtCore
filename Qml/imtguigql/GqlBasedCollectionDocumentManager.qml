@@ -37,7 +37,6 @@ DocumentManagerBase {
 		}
 
 		onMessageReceived: {
-			console.log("UndoChanged onMessageReceived", data.toJson())
 			let documentId = data.getData("documentId")
 			let availableUndoSteps = data.getData("availableUndoSteps")
 			let availableRedoSteps = data.getData("availableRedoSteps")
@@ -245,8 +244,8 @@ DocumentManagerBase {
 					root.setAutoNamedTypeId(m_objectTypeId, m_hasNameProvider)
 					root.setDocumentName(m_documentId, m_documentName)
 					root.__internal.createDocumentData(m_documentId, m_objectTypeId, true)
-					root.setDocumentIsLoading(m_documentId, true)
 					root.documentCreated(m_documentId, m_objectTypeId)
+					root.setDocumentIsLoading(m_documentId, true)
 				}
 			}
 		}

@@ -34,5 +34,7 @@ MetaInfoDateDelegate 1.0 MetaInfoDateDelegate.qml
 MetaInfoStringListDelegate 1.0 MetaInfoStringListDelegate.qml
 
 CollectionDataController 1.0 CollectionDataController.qml
+FilterableSelectDataProvider 1.0 FilterableSelectDataProvider.qml
+FilterableSelectPopup 1.0 FilterableSelectPopup.qml
 DocCollectionFilter 1.0 DocCollectionFilter.qml
 CollectionWorkspacePageView 1.0 CollectionWorkspacePageView.qml
