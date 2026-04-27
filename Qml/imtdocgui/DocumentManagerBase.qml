@@ -351,9 +351,17 @@ QtObject {
 				docData.isLoading = false
 				isLoading = false
 			}
+			else{
+				__internal.loadingStartTimes[documentId] = Date.now()
+				if (!__loadingCheckAnim.running){
+					__loadingCheckAnim.start()
+				}
+			}
 		}
 
 		if (!isLoading){
+			delete __internal.loadingStartTimes[documentId]
+
 			if (!docData.isNew){
 				docData.documentDecorator.updateRepresentationForAllViews()
 			}
@@ -454,11 +462,44 @@ QtObject {
 		return typeId in __internal.autoNamedTypeIds && __internal.autoNamedTypeIds[typeId]
 	}
 
+	property int __loadingTimeoutMs: 30000
+
+	property SequentialAnimation __loadingCheckAnim: SequentialAnimation {
+		loops: Animation.Infinite
+		PauseAnimation { duration: 5000 }
+		ScriptAction {
+			script: root.__checkLoadingTimeouts()
+		}
+	}
+
+	function __checkLoadingTimeouts(){
+		var now = Date.now()
+		var keys = Object.keys(__internal.loadingStartTimes)
+		var hasRemaining = false
+
+		for (var i = 0; i < keys.length; i++){
+			var docId = keys[i]
+			if (now - __internal.loadingStartTimes[docId] > __loadingTimeoutMs){
+				console.warn("DocumentManagerBase: loading timeout for document " + docId + ", forcing representation load as fallback")
+				delete __internal.loadingStartTimes[docId]
+				setDocumentIsLoading(docId, false)
+			}
+			else{
+				hasRemaining = true
+			}
+		}
+
+		if (!hasRemaining){
+			__loadingCheckAnim.stop()
+		}
+	}
+
 	property QtObject __internal: QtObject {
 		property var documentTypeEditors: ({}) // DocumentTypeId -> [{View Type 1}, {View Type 2}]
 		property var openedDocuments: [] // Array of objects {id, name, model, view, isDirty}
 		property var cachedDocumentNames: ({}) // DocumentId -> Name
 		property var pendingDataLoaded: ({}) // DocumentId -> true for early DocumentDataLoaded notifications
+		property var loadingStartTimes: ({}) // DocumentId -> Date.now() timestamp for loading timeout tracking
 		property var autoNamedTypeIds: ({}) // TypeId -> true for types with automatic name providers
 		property var documentManagerActiveView: null
 
@@ -540,6 +581,7 @@ QtObject {
 			}
 
 			delete pendingDataLoaded[documentId]
+			delete loadingStartTimes[documentId]
 			openedDocuments.splice(index, 1)
 		}
 	}
