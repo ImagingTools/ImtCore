@@ -55,8 +55,14 @@ QtObject {
 	/*! Описание компонента. */
 	property string description: ""
 
+	/*! Ключевые слова (для ACC/Compositor). */
+	property string keywords: ""
+
 	/*! Компонент активирован (все required-ссылки разрешены). */
 	property bool isActive: false
+
+	/*! Позиция в визуальном макете Compositor (AcfSln). { x, y, note } */
+	property var layoutPosition: ({ x: 0, y: 0, note: "" })
 
 	/*! Список атрибутов. Каждый элемент — AcfAttribute. */
 	property var acfAttributes: []

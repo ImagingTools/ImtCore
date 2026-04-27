@@ -310,4 +310,60 @@ Item {
 	ComponentGraphView {
 		anchors.fill: parent
 	}
+
+	// ═══════════════════════════════════════════════════════
+	// ШАГ 8. ИНТЕГРАЦИЯ С COMPOSITOR (AcfSln)
+	// ═══════════════════════════════════════════════════════
+	//
+	// Compositor (AcfSln) — визуальный редактор ACF-конфигураций.
+	// Он работает с XML-форматами:
+	//   *.acc  — конфигурация компонентов (элементы, атрибуты, ссылки)
+	//   *.accl — визуальная раскладка (позиции компонентов на диаграмме)
+	//
+	// Наш QML ACF Framework может:
+	// 1. Экспортировать текущий реестр в ACC XML → открыть в Compositor
+	// 2. Импортировать ACC XML → настроить QML-компоненты из Compositor
+	// 3. Экспортировать/импортировать ACCL позиции для визуализации
+	//
+	// Пример экспорта:
+	//
+	//   var accXml = AcfRegistry.exportToAcc("My Application", "QML WebApp");
+	//   console.log(accXml);
+	//   // → <?xml version="1.0" encoding="UTF-8"?>
+	//   // → <Acf>
+	//   // →   <ElementsList>
+	//   // →     <Element Id="MainAuthProvider" PackageId="imtauthgui" ...>
+	//   // →       <Data IsEnabled="true">
+	//   // →         <AttributeInfoMap>
+	//   // →           <AttributeInfo Id="AuthServerUrl" Type="String" ...>
+	//   // →   ...
+	//
+	// Пример импорта из Compositor:
+	//
+	//   var accFromCompositor = loadFile("MyApp.acc");
+	//   AcfRegistry.importFromAcc(accFromCompositor);
+	//   AcfRegistry.resolveAll();
+	//
+	// Пример полного цикла:
+	//
+	//   // 1. Зарегистрировать компоненты
+	//   AcfRegistry.registerComponent(myComponent);
+	//   // 2. Загрузить конфигурацию из Compositor
+	//   AcfRegistry.importAccAndResolve(accXml, acclXml);
+	//   // 3. Экспортировать обратно
+	//   var exportedAcc  = AcfRegistry.exportToAcc("MyApp", "");
+	//   var exportedAccl = AcfRegistry.exportToAccl();
+
+	// Пример программного экспорта:
+	Timer {
+		interval: 500
+		running: true
+		repeat: false
+		onTriggered: {
+			console.log("=== ACC EXPORT ===");
+			console.log(AcfRegistry.exportToAcc("Example Application", "QML ACF Demo"));
+			console.log("=== ACCL EXPORT ===");
+			console.log(AcfRegistry.exportToAccl());
+		}
+	}
 }

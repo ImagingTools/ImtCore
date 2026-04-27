@@ -46,6 +46,9 @@ QtObject {
 	/*! Человекочитаемое описание атрибута. */
 	property string description: ""
 
+	/*! ExportId для Compositor (AcfSln). Если пустой — атрибут не экспортируется. */
+	property string exportId: ""
+
 	/*!
 		Возвращает эффективное значение: value, если задано, иначе defaultValue.
 	*/

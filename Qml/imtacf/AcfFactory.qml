@@ -25,4 +25,7 @@ QtObject {
 
 	/*! Человекочитаемое описание. */
 	property string description: ""
+
+	/*! ExportId для Compositor (AcfSln). Если пустой — фабрика не экспортируется. */
+	property string exportId: ""
 }

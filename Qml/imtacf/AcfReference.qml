@@ -45,6 +45,9 @@ QtObject {
 	/*! Человекочитаемое описание. */
 	property string description: ""
 
+	/*! ExportId для Compositor (AcfSln). Если пустой — ссылка не экспортируется. */
+	property string exportId: ""
+
 	/*!
 		Возвращает true, если ссылка разрешена (target !== null).
 	*/
