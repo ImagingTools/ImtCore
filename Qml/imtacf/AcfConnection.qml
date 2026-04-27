@@ -1,26 +1,33 @@
 import QtQuick 2.0
 
-/**
-	AcfConnection describes a wiring between two sibling components
-	inside an AcfCompositeComponent.
+/*!
+	\qmltype AcfConnection
+	\inqmlmodule imtacf
+	\brief Описание связи между двумя компонентами-сиблингами внутри AcfCompositeComponent.
 
-	Usage:
-	\code
-	AcfConnection { from: "TicketEditor"; refId: "TicketList"; to: "TicketList" }
-	\endcode
+	AcfConnection задаёт явную «проводку» — указывает, что ссылка refId
+	компонента from должна быть связана с компонентом to.
 
-	Properties:
-	- from:  componentId of the component that owns the reference
-	- refId: the refId of the AcfReference within the source component
-	- to:    componentId of the target component that satisfies the reference
+	\qml
+	AcfCompositeComponent {
+		componentId: "Workspace"
+
+		AcfComponent { componentId: "Editor";  acfReferences: [ AcfReference { refId: "List" } ] }
+		AcfComponent { componentId: "TicketList" }
+
+		acfConnections: [
+			AcfConnection { from: "Editor"; refId: "List"; to: "TicketList" }
+		]
+	}
+	\endqml
 */
 QtObject {
-	/// componentId of the source component (the one that owns the reference)
-	property string from
+	/*! componentId компонента-источника (владельца ссылки). */
+	property string from: ""
 
-	/// refId of the AcfReference within the source component
-	property string refId
+	/*! refId ссылки внутри компонента-источника. */
+	property string refId: ""
 
-	/// componentId of the target component
-	property string to
+	/*! componentId целевого компонента. */
+	property string to: ""
 }

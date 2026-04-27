@@ -1,68 +1,38 @@
 import QtQuick 2.0
-import com.imtcore.imtqml 1.0
 
-/**
-	ComponentGraphView provides an interactive visualization of
-	all QML ACF components registered in AcfRegistry.
+/*!
+	\qmltype ComponentGraphView
+	\inqmlmodule imtacf
+	\brief Интерактивная визуализация графа компонентов AcfRegistry.
 
-	It displays components as rectangular nodes arranged in a grid
-	and draws connection lines for all resolved references.
+	Отображает все зарегистрированные компоненты в виде узлов и рёбер.
+	Обновляется автоматически при изменении реестра.
 
-	Usage:
-	\code
+	\qml
 	ComponentGraphView {
 		anchors.fill: parent
 	}
-	\endcode
-
-	The view automatically refreshes whenever the registry changes.
-	You can also call refresh() manually.
+	\endqml
 */
 Item {
 	id: root
 
-	/// Spacing between graph nodes (horizontal)
 	property int nodeSpacingX: 200
-
-	/// Spacing between graph nodes (vertical)
 	property int nodeSpacingY: 120
-
-	/// Width of each node box
 	property int nodeWidth: 170
-
-	/// Height of each node box
 	property int nodeHeight: 90
 
-	/// Background color
 	property color backgroundColor: "#f5f5f5"
-
-	/// Node fill color for active components
 	property color activeNodeColor: "#e3f2fd"
-
-	/// Node fill color for inactive components
 	property color inactiveNodeColor: "#fce4ec"
-
-	/// Node border color
 	property color nodeBorderColor: "#78909c"
-
-	/// Reference edge color
 	property color referenceEdgeColor: "#1565c0"
-
-	/// Factory edge color
 	property color factoryEdgeColor: "#2e7d32"
-
-	/// Node text color
 	property color nodeTextColor: "#263238"
 
-	/// Internal graph data
 	property var __graphData: ({nodes: [], edges: []})
-
-	/// Map from componentId -> {x, y} for node positions
 	property var __nodePositions: ({})
 
-	/**
-		Refresh the graph from the current AcfRegistry state.
-	*/
 	function refresh() {
 		__graphData = AcfRegistry.exportGraph();
 		__computeLayout();
@@ -74,7 +44,7 @@ Item {
 		var positions = {};
 		var columns = Math.max(1, Math.floor(Math.sqrt(nodes.length)));
 
-		for (var i = 0; i < nodes.length; ++i){
+		for (var i = 0; i < nodes.length; ++i) {
 			var col = i % columns;
 			var row = Math.floor(i / columns);
 			positions[nodes[i].id] = {
@@ -111,21 +81,20 @@ Item {
 			var nodes = root.__graphData.nodes || [];
 			var edges = root.__graphData.edges || [];
 
-			// Draw edges
-			for (var e = 0; e < edges.length; ++e){
+			// Рёбра
+			for (var e = 0; e < edges.length; ++e) {
 				var edge = edges[e];
 				var fromCenter = root.__getNodeCenter(edge.from);
 				var toCenter = root.__getNodeCenter(edge.to);
-
 				if (toCenter.x === 0 && toCenter.y === 0) continue;
 
 				ctx.beginPath();
 				ctx.strokeStyle = edge.type === "factory"
-					? root.factoryEdgeColor
-					: root.referenceEdgeColor;
+					? String(root.factoryEdgeColor)
+					: String(root.referenceEdgeColor);
 				ctx.lineWidth = edge.isResolved ? 2 : 1;
 
-				if (!edge.isResolved){
+				if (!edge.isResolved) {
 					ctx.setLineDash([5, 5]);
 				} else {
 					ctx.setLineDash([]);
@@ -135,7 +104,7 @@ Item {
 				ctx.lineTo(toCenter.x, toCenter.y);
 				ctx.stroke();
 
-				// Draw arrowhead
+				// Стрелка
 				var angle = Math.atan2(toCenter.y - fromCenter.y, toCenter.x - fromCenter.x);
 				var arrowLen = 10;
 				var ax = toCenter.x - Math.cos(angle) * (root.nodeWidth / 2 + 5);
@@ -149,7 +118,7 @@ Item {
 				ctx.lineTo(ax - arrowLen * Math.cos(angle + 0.3), ay - arrowLen * Math.sin(angle + 0.3));
 				ctx.stroke();
 
-				// Edge label
+				// Подпись ребра
 				var midX = (fromCenter.x + toCenter.x) / 2;
 				var midY = (fromCenter.y + toCenter.y) / 2;
 				ctx.font = "9px sans-serif";
@@ -158,8 +127,8 @@ Item {
 				ctx.fillText(label, midX + 3, midY - 3);
 			}
 
-			// Draw nodes
-			for (var n = 0; n < nodes.length; ++n){
+			// Узлы
+			for (var n = 0; n < nodes.length; ++n) {
 				var node = nodes[n];
 				var pos = root.__nodePositions[node.id];
 				if (!pos) continue;
@@ -168,15 +137,14 @@ Item {
 				var y = pos.y;
 				var w = root.nodeWidth;
 				var h = root.nodeHeight;
+				var r = 6;
 
-				// Node background
-				ctx.fillStyle = node.isActive ? root.activeNodeColor : root.inactiveNodeColor;
-				ctx.strokeStyle = root.nodeBorderColor;
+				ctx.fillStyle = node.isActive ? String(root.activeNodeColor) : String(root.inactiveNodeColor);
+				ctx.strokeStyle = String(root.nodeBorderColor);
 				ctx.lineWidth = 1.5;
 				ctx.setLineDash([]);
 
-				// Rounded rectangle
-				var r = 6;
+				// Скруглённый прямоугольник
 				ctx.beginPath();
 				ctx.moveTo(x + r, y);
 				ctx.lineTo(x + w - r, y);
@@ -191,32 +159,27 @@ Item {
 				ctx.fill();
 				ctx.stroke();
 
-				// Component ID (title)
+				// Заголовок
 				ctx.font = "bold 11px sans-serif";
-				ctx.fillStyle = root.nodeTextColor;
+				ctx.fillStyle = String(root.nodeTextColor);
 				ctx.fillText(node.id, x + 8, y + 18);
 
-				// Package ID
+				// Package
 				ctx.font = "9px sans-serif";
 				ctx.fillStyle = "#546e7a";
-				if (node.packageId){
-					ctx.fillText(node.packageId, x + 8, y + 32);
-				}
+				if (node.packageId) ctx.fillText(node.packageId, x + 8, y + 32);
 
-				// Interfaces
+				// Интерфейсы
 				var ifaces = node.interfaces || [];
-				if (ifaces.length > 0){
+				if (ifaces.length > 0) {
 					ctx.font = "italic 9px sans-serif";
 					ctx.fillStyle = "#1565c0";
 					var ifaceText = ifaces.join(", ");
-					// Truncate if too long
-					if (ifaceText.length > 25){
-						ifaceText = ifaceText.substring(0, 22) + "...";
-					}
+					if (ifaceText.length > 25) ifaceText = ifaceText.substring(0, 22) + "...";
 					ctx.fillText(ifaceText, x + 8, y + 46);
 				}
 
-				// Status indicator
+				// Статус
 				ctx.font = "8px sans-serif";
 				ctx.fillStyle = node.isActive ? "#2e7d32" : "#c62828";
 				ctx.fillText(node.isActive ? "● active" : "○ inactive", x + 8, y + h - 8);
@@ -224,21 +187,12 @@ Item {
 		}
 	}
 
-	// Auto-refresh when registry changes
 	Connections {
 		target: AcfRegistry
 
-		function onComponentRegistered() {
-			root.refresh();
-		}
-
-		function onComponentUnregistered() {
-			root.refresh();
-		}
-
-		function onReferencesResolved() {
-			root.refresh();
-		}
+		function onComponentRegistered() { root.refresh(); }
+		function onComponentUnregistered() { root.refresh(); }
+		function onReferencesResolved() { root.refresh(); }
 	}
 
 	Component.onCompleted: {

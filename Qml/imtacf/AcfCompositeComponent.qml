@@ -1,92 +1,100 @@
 import QtQuick 2.0
-import com.imtcore.imtqml 1.0
 
-/**
-	AcfCompositeComponent is a container that groups multiple
-	AcfComponentWrapper children and resolves their internal
-	connections via AcfConnection declarations.
+/*!
+	\qmltype AcfCompositeComponent
+	\inqmlmodule imtacf
+	\brief Композитный компонент, группирующий дочерние AcfComponent (аналог CCompositeComponent).
 
-	Usage:
-	\code
+	AcfCompositeComponent:
+	- Регистрирует себя и все дочерние компоненты в AcfRegistry
+	- Применяет явные соединения (AcfConnection)
+	- Вызывает resolveAll() для всех
+
+	\b Жизненный цикл:
+	1. Component.onCompleted: регистрирует себя в AcfRegistry
+	2. Регистрирует каждый дочерний AcfComponent из children[]
+	3. Применяет acfConnections: для каждого AcfConnection находит
+	   ссылку from.refId и записывает targetId = to
+	4. Вызывает AcfRegistry.resolveAll()
+	5. При удалении — удаляет всех детей и себя из реестра
+
+	\qml
 	AcfCompositeComponent {
 		componentId: "TicketWorkspace"
 		packageId: "imtdeskgui"
 		interfaces: ["IWorkspace"]
 
-		AcfComponentWrapper {
-			componentId: "TicketList"
-			acfReferences: [
-				AcfReference { refId: "DataProvider"; interfaceName: "IDataProvider" }
-			]
-		}
-
-		AcfComponentWrapper {
-			componentId: "TicketEditor"
-			acfReferences: [
-				AcfReference { refId: "TicketList"; interfaceName: "ISelectable" }
-			]
-		}
+		children: [
+			AcfComponent {
+				componentId: "TicketList"
+				interfaces: ["ISelectable"]
+				acfReferences: [
+					AcfReference { refId: "DataProvider"; interfaceName: "IDataProvider" }
+				]
+			},
+			AcfComponent {
+				componentId: "TicketEditor"
+				acfReferences: [
+					AcfReference { refId: "List"; interfaceName: "ISelectable" }
+				]
+			}
+		]
 
 		acfConnections: [
-			AcfConnection { from: "TicketEditor"; refId: "TicketList"; to: "TicketList" }
+			AcfConnection { from: "TicketEditor"; refId: "List"; to: "TicketList" }
 		]
 	}
-	\endcode
+	\endqml
 */
 AcfComponent {
 	id: root
 
-	/// If true, auto-register with AcfRegistry on Component.onCompleted
-	property bool autoRegister: true
+	/*! Дочерние AcfComponent. */
+	property var children: []
 
-	/// Child ACF components
-	default property list<AcfComponent> children
-
-	/// Internal connections between child components
-	property list<QtObject> acfConnections
+	/*! Явные соединения между дочерними компонентами. */
+	property var acfConnections: []
 
 	Component.onCompleted: {
-		// Register this composite
-		if (autoRegister && root.componentId !== ""){
+		// 1. Регистрируем себя
+		if (root.componentId !== "") {
 			AcfRegistry.registerComponent(root);
 		}
 
-		// Register all children
-		for (var i = 0; i < children.length; ++i){
+		// 2. Регистрируем дочерние компоненты
+		for (var i = 0; i < children.length; ++i) {
 			var child = children[i];
-			if (child.componentId && child.componentId !== ""){
+			if (child.componentId && child.componentId !== "") {
 				AcfRegistry.registerComponent(child);
 			}
 		}
 
-		// Apply explicit connections
-		for (var j = 0; j < acfConnections.length; ++j){
+		// 3. Применяем явные соединения
+		for (var j = 0; j < acfConnections.length; ++j) {
 			var conn = acfConnections[j];
-			if (conn && conn.from && conn.refId && conn.to){
+			if (conn && conn.from && conn.refId && conn.to) {
 				var sourceComp = AcfRegistry.getComponent(conn.from);
-				var targetComp = AcfRegistry.getComponent(conn.to);
-				if (sourceComp && targetComp){
+				if (sourceComp) {
 					var ref = sourceComp.findReference(conn.refId);
-					if (ref){
+					if (ref) {
 						ref.targetId = conn.to;
 					}
 				}
 			}
 		}
 
-		// Resolve all
+		// 4. Разрешаем все ссылки
 		AcfRegistry.resolveAll();
 	}
 
 	Component.onDestruction: {
-		for (var i = 0; i < children.length; ++i){
+		for (var i = 0; i < children.length; ++i) {
 			var child = children[i];
-			if (child.componentId && child.componentId !== ""){
+			if (child.componentId && child.componentId !== "") {
 				AcfRegistry.unregisterComponent(child.componentId);
 			}
 		}
-
-		if (autoRegister && root.componentId !== ""){
+		if (root.componentId !== "") {
 			AcfRegistry.unregisterComponent(root.componentId);
 		}
 	}
