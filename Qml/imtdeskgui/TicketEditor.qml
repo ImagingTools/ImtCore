@@ -1264,7 +1264,6 @@ DocumentViewBase {
 
 										itemWidth: 280
 										showCheckBox: true
-										showSeparator: true
 										showSelectedGroup: true
 										filterPlaceholder: qsTr("Type or choose a user")
 										
@@ -1485,8 +1484,6 @@ DocumentViewBase {
 
 										itemWidth: 320
 										showCheckBox: true
-										showSeparator: true
-										showSelectedGroup: true
 										filterPlaceholder: qsTr("Search entities...")
 
 										headerComponent: Component {
