@@ -752,9 +752,50 @@ PopupView {
 		root.__internal.clearAllFocused = false
 	}
 
-	// --- Helper: is any selected group element focused? ---
-	function __isSelectedGroupFocused(){
-		return root.__internal.selectedFocusedIndex >= 0 || root.__internal.clearAllFocused
+	// --- Helper: handle "Clear all" action from keyboard ---
+	function __handleClearAllAction(){
+		if (root.dataProvider){
+			root.dataProvider.clearSelection()
+		}
+		root.__internal.clearAllFocused = false
+		root.__focusFilter()
+	}
+
+	// --- Helper: remove focused selected item and adjust focus ---
+	function __handleRemoveSelectedItemAndAdjustFocus(){
+		var idx = root.__internal.selectedFocusedIndex
+		var si = idx >= 0 && idx < root.__internal.selectedItemsList.length
+			? root.__internal.selectedItemsList[idx] : null
+		if (si){
+			root.__handleRemoveSelectedItem(si[root.idRole])
+		}
+		// Adjust index after removal
+		if (root.__internal.selectedFocusedIndex >= root.__internal.selectedItemsCount){
+			root.__internal.selectedFocusedIndex = root.__internal.selectedItemsCount - 1
+		}
+		if (root.__internal.selectedItemsCount === 0){
+			root.__internal.selectedFocusedIndex = -1
+			root.__focusFilter()
+		}
+	}
+
+	// --- Helper: handle keyboard activation (Return/Enter/Space) ---
+	function __handleKeyboardActivation(){
+		// "Clear all" button action
+		if (root.__internal.clearAllFocused){
+			root.__handleClearAllAction()
+			return
+		}
+		// Selected group item — remove
+		if (root.__internal.selectedFocusedIndex >= 0){
+			root.__handleRemoveSelectedItemAndAdjustFocus()
+			return
+		}
+		// Main list item — toggle
+		if (root.__internal.focusedIndex >= 0){
+			var id = root.getItemId(root.__internal.focusedIndex)
+			root.handleItemClick(id, root.__internal.focusedIndex)
+		}
 	}
 
 	// --- Keyboard navigation ---
@@ -768,108 +809,20 @@ PopupView {
 	Shortcut {
 		sequence: "Return"
 		enabled: !filterField.textInputFocus
-		onActivated: {
-			// "Clear all" button action
-			if (root.__internal.clearAllFocused){
-				if (root.dataProvider){
-					root.dataProvider.clearSelection()
-				}
-				root.__internal.clearAllFocused = false
-				root.__focusFilter()
-				return
-			}
-			// Selected group item — remove
-			if (root.__internal.selectedFocusedIndex >= 0){
-				var si = root.__internal.selectedFocusedIndex < root.__internal.selectedItemsList.length
-					? root.__internal.selectedItemsList[root.__internal.selectedFocusedIndex] : null
-				if (si){
-					root.__handleRemoveSelectedItem(si[root.idRole])
-				}
-				// Adjust index after removal
-				if (root.__internal.selectedFocusedIndex >= root.__internal.selectedItemsCount){
-					root.__internal.selectedFocusedIndex = root.__internal.selectedItemsCount - 1
-				}
-				if (root.__internal.selectedItemsCount === 0){
-					root.__internal.selectedFocusedIndex = -1
-					root.__focusFilter()
-				}
-				return
-			}
-			// Main list item — toggle
-			if (root.__internal.focusedIndex >= 0){
-				var id = root.getItemId(root.__internal.focusedIndex)
-				root.handleItemClick(id, root.__internal.focusedIndex)
-			}
-		}
+		onActivated: root.__handleKeyboardActivation()
 	}
 
 	// Enter key (numpad) — same behavior as Return
 	Shortcut {
 		sequence: "Enter"
 		enabled: !filterField.textInputFocus
-		onActivated: {
-			if (root.__internal.clearAllFocused){
-				if (root.dataProvider){
-					root.dataProvider.clearSelection()
-				}
-				root.__internal.clearAllFocused = false
-				root.__focusFilter()
-				return
-			}
-			if (root.__internal.selectedFocusedIndex >= 0){
-				var si = root.__internal.selectedFocusedIndex < root.__internal.selectedItemsList.length
-					? root.__internal.selectedItemsList[root.__internal.selectedFocusedIndex] : null
-				if (si){
-					root.__handleRemoveSelectedItem(si[root.idRole])
-				}
-				if (root.__internal.selectedFocusedIndex >= root.__internal.selectedItemsCount){
-					root.__internal.selectedFocusedIndex = root.__internal.selectedItemsCount - 1
-				}
-				if (root.__internal.selectedItemsCount === 0){
-					root.__internal.selectedFocusedIndex = -1
-					root.__focusFilter()
-				}
-				return
-			}
-			if (root.__internal.focusedIndex >= 0){
-				var id = root.getItemId(root.__internal.focusedIndex)
-				root.handleItemClick(id, root.__internal.focusedIndex)
-			}
-		}
+		onActivated: root.__handleKeyboardActivation()
 	}
 
 	Shortcut {
 		sequence: "Space"
 		enabled: !filterField.textInputFocus
-		onActivated: {
-			if (root.__internal.clearAllFocused){
-				if (root.dataProvider){
-					root.dataProvider.clearSelection()
-				}
-				root.__internal.clearAllFocused = false
-				root.__focusFilter()
-				return
-			}
-			if (root.__internal.selectedFocusedIndex >= 0){
-				var si = root.__internal.selectedFocusedIndex < root.__internal.selectedItemsList.length
-					? root.__internal.selectedItemsList[root.__internal.selectedFocusedIndex] : null
-				if (si){
-					root.__handleRemoveSelectedItem(si[root.idRole])
-				}
-				if (root.__internal.selectedFocusedIndex >= root.__internal.selectedItemsCount){
-					root.__internal.selectedFocusedIndex = root.__internal.selectedItemsCount - 1
-				}
-				if (root.__internal.selectedItemsCount === 0){
-					root.__internal.selectedFocusedIndex = -1
-					root.__focusFilter()
-				}
-				return
-			}
-			if (root.__internal.focusedIndex >= 0){
-				var id = root.getItemId(root.__internal.focusedIndex)
-				root.handleItemClick(id, root.__internal.focusedIndex)
-			}
-		}
+		onActivated: root.__handleKeyboardActivation()
 	}
 
 	Shortcut {
