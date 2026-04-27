@@ -207,14 +207,22 @@ class BaseModel extends ListModel {
 		element.connectProperties()
 		this.append({item: element})
 		if (this.owner){
-			this.owner.modelChanged([])
+			if (this.owner._internal && this.owner._internal.isTransaction){
+				this.owner._internal.countChanges++
+			} else {
+				this.owner.modelChanged([])
+			}
 		}
 	}
 
 	removeElement(index){
 		this.remove(index)
 		if (this.owner){
-			this.owner.modelChanged([])
+			if (this.owner._internal && this.owner._internal.isTransaction){
+				this.owner._internal.countChanges++
+			} else {
+				this.owner.modelChanged([])
+			}
 		}
 	}
 
@@ -258,7 +266,11 @@ class BaseModel extends ListModel {
 		element.connectProperties()
 		this.insert(index, {item: element})
 		if (this.owner){
-			this.owner.modelChanged([])
+			if (this.owner._internal && this.owner._internal.isTransaction){
+				this.owner._internal.countChanges++
+			} else {
+				this.owner.modelChanged([])
+			}
 		}
 	}
 }
