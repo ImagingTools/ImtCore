@@ -1,10 +1,10 @@
 <RCC>
-    <qresource prefix="/imtacf">
-        <file alias="qmldir">../qmldir</file>
-        <file alias="AcfComponentWrapper.qml">../AcfComponentWrapper.qml</file>
-        <file alias="AcfCompositeComponent.qml">../AcfCompositeComponent.qml</file>
-        <file alias="AcfConnection.qml">../AcfConnection.qml</file>
-        <file alias="AcfRegistryHelper.qml">../AcfRegistryHelper.qml</file>
-        <file alias="ComponentGraphView.qml">../ComponentGraphView.qml</file>
+    <qresource prefix="/qml">
+        <file alias="imtacf/qmldir">qmldir</file>
+        <file alias="imtacf/AcfComponentWrapper.qml">AcfComponentWrapper.qml</file>
+        <file alias="imtacf/AcfCompositeComponent.qml">AcfCompositeComponent.qml</file>
+        <file alias="imtacf/AcfConnection.qml">AcfConnection.qml</file>
+        <file alias="imtacf/AcfRegistryHelper.qml">AcfRegistryHelper.qml</file>
+        <file alias="imtacf/ComponentGraphView.qml">ComponentGraphView.qml</file>
     </qresource>
 </RCC>

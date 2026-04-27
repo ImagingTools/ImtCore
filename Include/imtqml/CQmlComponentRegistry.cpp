@@ -312,6 +312,10 @@ int CQmlComponentRegistry::ResolveReferences(CQmlAcfComponent* component)
 				ref->SetTargetId(target->GetComponentId());
 				continue;
 			}
+			if (target == component){
+				qWarning() << "CQmlComponentRegistry: skipping self-reference for"
+						   << component->GetComponentId() << "ref" << ref->GetRefId();
+			}
 		}
 
 		++unresolvedCount;
