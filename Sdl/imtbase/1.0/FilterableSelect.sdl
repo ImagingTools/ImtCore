@@ -24,7 +24,7 @@ type SelectableItemData {
 input GetSelectableItemsInput {
 	collectionId: ID!
 	viewParams: CollectionViewParams
-	ids: [ID]
+	excludeIds: [ID]
 }
 
 type GetSelectableItemsPayload {

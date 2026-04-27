@@ -13,6 +13,7 @@
 #include <imtbase/IObjectCollectionIterator.h>
 #include <imtbase/ICollectionInfo.h>
 #include <imtbase/CComplexCollectionFilter.h>
+#include <imtcol/CDocumentIdFilter.h>
 #include <imtgql/CGqlRequest.h>
 
 
@@ -65,40 +66,28 @@ sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectCont
 
 	imtsdl::TElementList<sdl::imtbase::FilterableSelect::CSelectableItemData::V1_0> itemsList;
 
-	// ID-based fetch mode: when ids are provided, return only those specific items
-	if (arguments.input.Version_1_0->ids && !arguments.input.Version_1_0->ids->empty()){
-		const auto& requestedIds = *arguments.input.Version_1_0->ids;
-		for (size_t i = 0; i < requestedIds.size(); ++i){
-			QByteArray objectId = *requestedIds[i];
-			if (objectId.isEmpty()){
-				continue;
-			}
-
-			QString name = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
-			if (name.isEmpty()){
-				continue;
-			}
-
-			sdl::imtbase::FilterableSelect::CSelectableItemData::V1_0 itemRepresentation;
-			itemRepresentation.id = objectId;
-			itemRepresentation.name = name;
-			itemsList << itemRepresentation;
-		}
-
-		response.Version_1_0->items = itemsList;
-		
-		sdl::imtbase::ImtCollection::CNotificationItem::V1_0 notification;
-		notification.pagesCount = 1;
-		notification.totalCount = static_cast<int>(itemsList.size());
-		response.Version_1_0->notification = notification;
-
-		return response;
-	}
-
 	// Normal paginated fetch mode
 	int offset = 0;
 	int count = -1;
 	iprm::CParamsSet filterParams;
+
+	// Exclude selected IDs: create CDocumentIdFilter with CT_NOT_IN
+	if (arguments.input.Version_1_0->excludeIds && !arguments.input.Version_1_0->excludeIds->empty()){
+		const auto& excludeIdsList = *arguments.input.Version_1_0->excludeIds;
+		QByteArrayList documentIds;
+		for (size_t i = 0; i < excludeIdsList.size(); ++i){
+			QByteArray docId = *excludeIdsList[i];
+			if (!docId.isEmpty()){
+				documentIds.append(docId);
+			}
+		}
+		if (!documentIds.isEmpty()){
+			imtcol::CDocumentIdFilter* documentIdFilterPtr = new imtcol::CDocumentIdFilter();
+			documentIdFilterPtr->SetConditionType(imtcol::IDocumentIdFilter::CT_NOT_IN);
+			documentIdFilterPtr->SetDocumentIds(documentIds);
+			filterParams.SetEditableParameter("DocumentIdFilter", documentIdFilterPtr, true);
+		}
+	}
 
 	if (arguments.input.Version_1_0->viewParams){
 		auto& viewParams = *arguments.input.Version_1_0->viewParams;

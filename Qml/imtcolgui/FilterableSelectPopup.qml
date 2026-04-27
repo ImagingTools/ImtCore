@@ -76,9 +76,7 @@ PopupView {
 		PopupMenuDelegate {
 			width: root.itemWidth
 
-			property bool __isHiddenSelected: root.showSelectedGroup && root.dataProvider && root.dataProvider.isItemSelected(root.getItemId(model.index))
-			visible: !__isHiddenSelected
-			height: __isHiddenSelected ? 0 : root.itemHeight
+			height: root.itemHeight
 
 			isSeparator: false
 
@@ -266,6 +264,11 @@ PopupView {
 		function onSelectionChanged(){
 			root.selectionChanged(root.dataProvider.getSelectedIds())
 			root.__rebuildSelectedGroup()
+
+			// Re-fetch to apply server-side excludeIds filtering after selection change
+			if (root.showSelectedGroup && root.dataProvider){
+				root.dataProvider.fetch(filterField.text)
+			}
 		}
 
 		function onIsInitialLoadingChanged(){

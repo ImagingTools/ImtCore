@@ -15,8 +15,10 @@ import imtbaseFilterableSelectSdl 1.0
 	Normalizes SDL response objects to plain JS { id, title, description, icon, color }
 	before passing to the base provider.
 
-	Also implements \c executeFetchByIds() for resolving preselected items
-	that are not in the current visible dataset.
+	Passes currently selected IDs as \c excludeIds so the server excludes them
+	from the result set via \c CDocumentIdFilter with \c CT_NOT_IN.
+
+	Preselected items are resolved via \c knownItems passed on popup open.
 
 	\sa FilterableSelectDataProvider
 */
@@ -29,7 +31,6 @@ FilterableSelectDataProvider {
 
 	property QtObject __gql: QtObject {
 		property int pendingRequestId: 0
-		property int pendingFetchByIdsRequestId: 0
 	}
 
 	// --- Shared normalization helper ---
@@ -85,35 +86,19 @@ FilterableSelectDataProvider {
 		}
 	}
 
-	// --- FetchByIds request ---
-	property GetSelectableItemsInput __fetchByIdsInput: GetSelectableItemsInput {}
-
-	property GqlSdlRequestSender __fetchByIdsRequest: GqlSdlRequestSender {
-		gqlCommandId: ImtbaseFilterableSelectSdlCommandIds.s_getSelectableItems
-		sdlObjectComp: Component {
-			GetSelectableItemsPayload {
-				onFinished: {
-					var rid = root.__gql.pendingFetchByIdsRequestId
-					root.onFetchByIdsSuccess(rid, root.__normalizePayloadItems(m_items))
-				}
-			}
-		}
-
-		onFinished: {
-			if (status === -1){
-				root.onFetchByIdsError(root.__gql.pendingFetchByIdsRequestId, qsTr("Failed to resolve items by IDs"))
-			}
-		}
-
-		function getHeaders(){
-			return root.getHeaders()
-		}
-	}
-
 	function executeRequest(requestId, count, offset, filter){
 		__gql.pendingRequestId = requestId
 
 		getSelectableItemsInput.m_collectionId = root.collectionId
+
+		// Pass selected IDs as excludeIds for server-side filtering
+		var selectedIds = root.getSelectedIds()
+		if (selectedIds.length > 0){
+			getSelectableItemsInput.m_excludeIds = selectedIds
+		}
+		else {
+			getSelectableItemsInput.m_excludeIds = null
+		}
 
 		if (!getSelectableItemsInput.hasViewParams()){
 			getSelectableItemsInput.emplaceViewParams()
@@ -136,11 +121,8 @@ FilterableSelectDataProvider {
 	}
 
 	function executeFetchByIds(requestId, ids){
-		__gql.pendingFetchByIdsRequestId = requestId
-
-		__fetchByIdsInput.m_collectionId = root.collectionId
-		__fetchByIdsInput.m_ids = ids
-
-		__fetchByIdsRequest.send(__fetchByIdsInput)
+		// Items are resolved via knownItems passed on popup open.
+		// If items are not available, UI gracefully degrades to showing the ID.
+		root.onFetchByIdsSuccess(requestId, [])
 	}
 }
