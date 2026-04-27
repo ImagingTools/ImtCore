@@ -689,6 +689,9 @@ DocumentViewBase {
 		readonly property real cardRadius: Style.radiusL
 		readonly property string cardColor: Style.baseColor
 		readonly property string cardBorderColor: Style.borderColor
+		// Pre-faded variant of cardBorderColor used by inputs to render a subtle
+		// (40% opacity) border in their unfocused state.
+		readonly property color cardBorderColorFaded: Qt.rgba(Qt.color(cardBorderColor).r, Qt.color(cardBorderColor).g, Qt.color(cardBorderColor).b, 0.4)
 		readonly property string pageBgColor: Style.backgroundColor2
 		readonly property string accentColor: "#5b8fd6"
 		readonly property string labelColor: Style.textColor
@@ -832,10 +835,17 @@ DocumentViewBase {
 											editTitleInput.oldText = editTitleInput.text
 											root.__titleEditOpening = true
 											root._titleEditing = true
-											Qt.callLater(function(){
-												editTitleInput.forceActiveFocus()
-												root.__titleEditOpening = false
-											})
+											titleEditFocusTimer.start()
+										}
+									}
+
+									Timer {
+										id: titleEditFocusTimer
+										interval: 1
+										repeat: false
+										onTriggered: {
+											editTitleInput.forceActiveFocus()
+											root.__titleEditOpening = false
 										}
 									}
 								}
@@ -965,14 +975,10 @@ DocumentViewBase {
 								}
 
 								Rectangle {
-									readonly property color __unfocusedBorder: {
-										var c = Qt.color(editView.cardBorderColor)
-										return Qt.rgba(c.r, c.g, c.b, 0.4)
-									}
 									width: parent.width
 									height: Math.min(220, Math.max(50, editDescriptionInput.contentHeight)) + Style.paddingM * 2
 									radius: Style.radiusM
-									border.color: editDescriptionInput.activeFocus ? editView.accentColor : __unfocusedBorder
+									border.color: editDescriptionInput.activeFocus ? editView.accentColor : editView.cardBorderColorFaded
 									border.width: editDescriptionInput.activeFocus ? 2 : 1
 									color: root.canEditCoreTicketFields ? "white" : Style.alternateBaseColor
 
@@ -2204,8 +2210,15 @@ DocumentViewBase {
 															onVisibleChanged: {
 																if (visible) {
 																	text = model.item.m_content || ""
-																	Qt.callLater(function(){ forceActiveFocus() })
+																	editMessageFocusTimer.start()
 																}
+															}
+
+															Timer {
+																id: editMessageFocusTimer
+																interval: 1
+																repeat: false
+																onTriggered: editMessageInput.forceActiveFocus()
 															}
 														}
 													}
