@@ -16,6 +16,11 @@
 #include <imtqml/CNetworkEventInterceptor.h>
 #include <imtqml/CQmlProcess.h>
 #include <imtqml/CRemoteFileController.h>
+#include <imtqml/CQmlAcfComponent.h>
+#include <imtqml/CQmlAcfAttribute.h>
+#include <imtqml/CQmlAcfReference.h>
+#include <imtqml/CQmlAcfFactory.h>
+#include <imtqml/CQmlComponentRegistry.h>
 
 
 namespace imtqml
@@ -64,6 +69,13 @@ void CStaticQmlTypeRegistratorComp::OnComponentCreated()
 	}
 	if (!m_registerCDataModelControllerAttrPtr.IsValid() || *m_registerCDataModelControllerAttrPtr){
 		qmlRegisterType<imtqml::CDataModelController>("com.imtcore.imtqml", 1, 0, "DataModelController");
+	}
+	if (!m_registerAcfComponentTypesAttrPtr.IsValid() || *m_registerAcfComponentTypesAttrPtr){
+		qmlRegisterType<imtqml::CQmlAcfComponent>("com.imtcore.imtqml", 1, 0, "AcfComponent");
+		qmlRegisterType<imtqml::CQmlAcfAttribute>("com.imtcore.imtqml", 1, 0, "AcfAttribute");
+		qmlRegisterType<imtqml::CQmlAcfReference>("com.imtcore.imtqml", 1, 0, "AcfReference");
+		qmlRegisterType<imtqml::CQmlAcfFactory>("com.imtcore.imtqml", 1, 0, "AcfFactory");
+		qmlRegisterSingletonInstance<imtqml::CQmlComponentRegistry>("com.imtcore.imtqml", 1, 0, "AcfRegistry", imtqml::CQmlComponentRegistry::Instance());
 	}
 }
 
