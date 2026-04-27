@@ -459,7 +459,7 @@ DocumentViewBase {
 		if (editStateReasonCB.model && editStateReasonCB.currentIndex >= 0) {
 			ticketData.m_stateReason = editStateReasonCB.model.getData("id", editStateReasonCB.currentIndex)
 		}
-		
+
 		// Save entity references to ticket data only when they actually changed
 		if (root._entityRefsChanged) {
 			root._entityRefsChanged = false
@@ -959,7 +959,7 @@ DocumentViewBase {
 											KeyNavigation.backtab: editTitleInput
 
 											onTextChanged: {
-												if (!root.guiIsBlocked()) {
+												if (!root.guiIsBlocked() && text !== root.ticketData.m_description) {
 													descriptionAutoSaveTimer.restart()
 												}
 											}
@@ -968,7 +968,9 @@ DocumentViewBase {
 												id: descriptionAutoSaveTimer
 												interval: 1000
 												repeat: false
-												onTriggered: root.doUpdateModel()
+												onTriggered: {
+													root.doUpdateModel()
+												}
 											}
 
 											onCursorRectangleChanged: {
@@ -1568,6 +1570,7 @@ DocumentViewBase {
 
 												itemWidth: ctxWrapper.__popupWidth
 												showCheckBox: true
+												showSelectedGroup: true
 												filterPlaceholder: qsTr("Search entities...")
 
 												onRequestClose: ctxWrapper.closePopup()
