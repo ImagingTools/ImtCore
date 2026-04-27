@@ -61,7 +61,7 @@ bool CRhiRenderBackend::Initialize()
 		return false;
 	}
 
-	// Load pre-compiled QSB shaders (produced by qt_add_shaders at build time).
+	// Load pre-compiled QSB shaders (produced by QMAKE_SHADER_FILES in the QMake build).
 	m_vertexShader = LoadShader(":/RhiShaders/vshader_rhi.vert.qsb");
 	m_fragmentShader = LoadShader(":/RhiShaders/fshader_rhi.frag.qsb");
 	if (!m_vertexShader.isValid() || !m_fragmentShader.isValid()){
