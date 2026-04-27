@@ -1373,7 +1373,11 @@ DocumentViewBase {
 											hoverEnabled: true
 											cursorShape: Qt.PointingHandCursor
 											onClicked: {
-												ModalDialogManager.openDialog(contextPickerDialogComp)
+												var point = addContextBtn.mapToItem(null, 0, addContextBtn.height)
+												ModalDialogManager.openDialog(contextPickerDialogComp, {
+													"x": point.x,
+													"y": point.y
+												})
 											}
 										}
 									}
@@ -1463,7 +1467,15 @@ DocumentViewBase {
 									FilterableSelectPopup {
 										id: ctxSelectPopup
 
-										property string selectedEntityTypeId: entityTypeModel.getItemsCount() > 0 ? entityTypeModel.getData("id", 0) : ""
+										property string selectedEntityTypeId: ""
+										property bool __ctxReady: false
+
+										function __initEntityType() {
+											if (entityTypeModel.getItemsCount() > 0) {
+												ctxSelectPopup.selectedEntityTypeId = entityTypeModel.getData("id", 0)
+											}
+											ctxSelectPopup.__ctxReady = true
+										}
 
 										dataProvider: FilterableSelectGqlDataProvider {
 											id: ctxDataProvider
@@ -1496,12 +1508,14 @@ DocumentViewBase {
 													width: parent.width - parent.spacing - entityTypeLabel.contentWidth
 													height: Style.buttonHeightM
 													model: entityTypeModel
+													currentIndex: 0
 													onCurrentIndexChanged: {
 														if (entityTypeModel.getItemsCount() > currentIndex && currentIndex >= 0) {
 															var newTypeId = entityTypeModel.getData("id", currentIndex)
 															if (ctxSelectPopup.selectedEntityTypeId !== newTypeId) {
 																ctxSelectPopup.selectedEntityTypeId = newTypeId
-																if (ctxDataProvider) {
+																// Only re-fetch when user changes type (not during init)
+																if (ctxSelectPopup.__ctxReady && ctxDataProvider) {
 																	ctxDataProvider.clearSelection()
 																	ctxDataProvider.fetch("")
 																}
@@ -1510,6 +1524,10 @@ DocumentViewBase {
 													}
 												}
 											}
+										}
+
+										Component.onCompleted: {
+											ctxSelectPopup.__initEntityType()
 										}
 
 										onSelectionChanged: {

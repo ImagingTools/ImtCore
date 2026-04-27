@@ -87,6 +87,12 @@ FilterableSelectDataProvider {
 	}
 
 	function executeRequest(requestId, count, offset, filter){
+		// Guard against empty collectionId — server cannot handle it
+		if (!root.collectionId || root.collectionId === "") {
+			root.onRequestError(requestId, qsTr("No collection selected"), "EMPTY_COLLECTION")
+			return
+		}
+
 		__gql.pendingRequestId = requestId
 
 		getSelectableItemsInput.m_collectionId = root.collectionId
