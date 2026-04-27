@@ -58,6 +58,8 @@ DocumentViewBase {
 	// Pending assignees for multi-select
 	property var pendingAssignees: []
 	property bool _assigneesChanged: false
+	// User name cache: id → name (populated from FilterableSelectPopup and userNameResolver)
+	property var __userNameCache: ({})
 	// Reply-to message context (null = not replying)
 	property var _replyToMessage: null
 	// Highlighted message (temporarily set when scrolling to a reply-to source)
@@ -396,15 +398,23 @@ DocumentViewBase {
 			}
 		}
 		
-		// Load assignees — names resolve via FilterableSelectPopup when opened
+		// Load assignees — resolve names from cache, trigger server resolution for uncached
 		var assigns = []
 		var aIds = ticketData.m_assigneeIds || []
+		var hasUnresolved = false
 		for (var a = 0; a < aIds.length; a++) {
 			var aId = aIds[a]
-			assigns.push({id: aId, name: aId})
+			var cachedName = root.__userNameCache[aId]
+			assigns.push({id: aId, name: cachedName || aId})
+			if (!cachedName) hasUnresolved = true
 		}
 		root.pendingAssignees = assigns
 		root._assigneesChanged = false
+		
+		// Trigger user name resolution for uncached IDs
+		if (hasUnresolved && aIds.length > 0) {
+			userNameResolver.fetch("")
+		}
 		
 		// Detect assignee removal: if user was an assignee but no longer is, show notification and go readOnly
 		if (wasAssignee) {
@@ -497,7 +507,45 @@ DocumentViewBase {
 		onTriggered: root._exportChatCopiedState = false
 	}
 	
+	// Standalone user name resolver — fetches Users collection to resolve assignee IDs to display names
+	FilterableSelectGqlDataProvider {
+		id: userNameResolver
+		collectionId: "Users"
+		multiSelect: true
+		pageSize: 100
+		
+		onDataChanged: {
+			root.__resolveAssigneeNamesFromResolver()
+		}
+	}
 	
+	function __resolveAssigneeNamesFromResolver() {
+		var resolverItems = userNameResolver.items
+		if (!resolverItems || resolverItems.length === 0) return
+		
+		var cacheUpdated = false
+		for (var i = 0; i < resolverItems.length; i++) {
+			var item = resolverItems[i]
+			if (item.id && item.title && item.title !== "") {
+				root.__userNameCache[item.id] = item.title
+				cacheUpdated = true
+			}
+		}
+		
+		if (!cacheUpdated) return
+		
+		// Re-build pendingAssignees with resolved names
+		var assigns = []
+		for (var j = 0; j < root.pendingAssignees.length; j++) {
+			var a = root.pendingAssignees[j]
+			var cachedName = root.__userNameCache[a.id]
+			assigns.push({
+				id: a.id,
+				name: cachedName || a.name || a.id
+			})
+		}
+		root.pendingAssignees = assigns
+	}
 	
 	TreeItemModel {
 		id: ticketTypeModel
@@ -1237,11 +1285,18 @@ DocumentViewBase {
 												var selName = dataProvider ? dataProvider.getSelectedItemText(selId) : ""
 												if (!selName)
 													selName = selId
+												// Cache resolved name
+												if (selName !== selId) root.__userNameCache[selId] = selName
 												arr.push({id: selId, name: selName})
 											}
 											root.pendingAssignees = arr
 											root._assigneesChanged = true
-											root.doUpdateModel()
+										}
+										
+										Component.onDestruction: {
+											if (root._assigneesChanged) {
+												root.doUpdateModel()
+											}
 										}
 									}
 								}
@@ -1417,6 +1472,12 @@ DocumentViewBase {
 										readonly property int __popupWidth: 320
 										readonly property int __maxHeight: 600
 
+										Component.onDestruction: {
+											if (root._entityRefsChanged) {
+												root.doUpdateModel()
+											}
+										}
+
 										width: __popupWidth + 2 * Style.marginL
 										height: Math.min(Style.marginL + ctxTypeCB.height + ctxPopupItem.height + 2*Style.marginL, __maxHeight)
 
@@ -1540,7 +1601,6 @@ DocumentViewBase {
 													}
 													root.pendingEntityRefs = otherRefs
 													root._entityRefsChanged = true
-													root.doUpdateModel()
 												}
 											}
 										}
