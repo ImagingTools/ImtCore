@@ -1456,154 +1456,53 @@ DocumentViewBase {
 									wrapMode: Text.WordWrap
 								}
 							
-								// Context picker dialog: entity type ComboBox + StackView with per-entity RemoteCollectionView
+								// Context picker via FilterableSelectPopup with entity type header
 								Component {
 									id: contextPickerDialogComp
-									Dialog {
-										id: ctxDialog
-										title: qsTr("Link Entity to Ticket")
-										canMove: false
-										width: Math.min(ModalDialogManager.activeView.width - 80, 900)
-										height: ModalDialogManager.activeView.height - 80
-										
-										property string selectedEntityTypeId: ""
-										property var entityTypePages: ({})
-										
-										function getCurrentCollectionView() {
-											if (!ctxStackView) return null
-											var page = ctxStackView.currentPage()
-											if (!page) return null
-											return page.collectionView || null
+
+									FilterableSelectPopup {
+										id: ctxSelectPopup
+
+										property string selectedEntityTypeId: entityTypeModel.getItemsCount() > 0 ? entityTypeModel.getData("id", 0) : ""
+
+										dataProvider: FilterableSelectGqlDataProvider {
+											id: ctxDataProvider
+											collectionId: ctxSelectPopup.selectedEntityTypeId
+											multiSelect: true
 										}
-										
-										Component.onCompleted: {
-											addButton(Enums.apply, qsTr("Attach Selected"), false)
-											addButton(Enums.cancel, qsTr("Cancel"), true)
-											setButtonEnabled(Enums.apply, false)
-											if (entityTypeModel.getItemsCount() > 0) {
-												selectedEntityTypeId = entityTypeModel.getData("id", 0)
-											}
-										}
-										
-										contentComp: Component {
-											Item {
-												width: ctxDialog.width
-												height: ctxDialog.height - 100
-												
-												Component.onCompleted: {
-													ctxTypeCB.model = entityTypeModel
-													// Create a StackView page for each entity type
-													for (var i = 0; i < entityTypeModel.getItemsCount(); i++) {
-														ctxStackView.addPage(ctxEntityPageComp)
-													}
-													if (entityTypeModel.getItemsCount() > 0) {
-														ctxTypeCB.currentIndex = 0
-														ctxStackView.setCurrentIndex(0)
-													}
+
+										itemWidth: 320
+										showCheckBox: true
+										showSeparator: true
+										showSelectedGroup: true
+										filterPlaceholder: qsTr("Search entities...")
+
+										headerComponent: Component {
+											Row {
+												width: parent ? parent.width : 0
+												spacing: Style.marginS
+
+												Text {
+													text: qsTr("Entity type")
+													font.pixelSize: Style.fontSizeM
+													font.bold: true
+													color: Style.textColor
+													anchors.verticalCenter: parent.verticalCenter
 												}
-												
-												Connections {
-													target: ctxStackView
-													function onPageAdded(index, item) {
-														if (item && index < entityTypeModel.getItemsCount()) {
-															var typeId = entityTypeModel.getData("id", index)
-															ctxDialog.entityTypePages[typeId] = index
-															item.collectionView.collectionId = typeId
-														}
-													}
-													function onCurrentPageChanged(item) {
-														if (item && item.collectionView) {
-															let indexes = item.collectionView.table.getSelectedIndexes()
-															ctxDialog.setButtonEnabled(Enums.apply, indexes.length > 0)
-														}
-													}
-												}
-												
-												Column {
-													id: ctxContentCol
-													anchors.fill: parent
-													anchors.margins: Style.paddingM
-													spacing: Style.spacingM
-													
-													// Entity type selector row
-													Rectangle {
-														width: parent.width
-														height: ctxTypeRow.height + Style.paddingM * 2
-														radius: Style.radiusM
-														color: editView.accentBadgeBg
-														border.color: editView.accentBorderLight
-														border.width: 1
-														
-														Row {
-															id: ctxTypeRow
-															anchors.centerIn: parent
-															spacing: Style.spacingM
-															
-															Text {
-																text: qsTr("Entity type")
-																font.pixelSize: Style.fontSizeM
-																font.bold: true
-																color: Style.textColor
-																anchors.verticalCenter: parent.verticalCenter
-															}
-															
-															ComboBox {
-																id: ctxTypeCB
-																width: 280
-																height: Style.buttonHeightM
-																onCurrentIndexChanged: {
-																	if (entityTypeModel.getItemsCount() > currentIndex) {
-																		ctxDialog.selectedEntityTypeId = entityTypeModel.getData("id", currentIndex)
-																		ctxDialog.setButtonEnabled(Enums.apply, false)
-																		var pageIdx = ctxDialog.entityTypePages[ctxDialog.selectedEntityTypeId]
-																		if (pageIdx !== undefined) {
-																			ctxStackView.setCurrentIndex(pageIdx)
-																		}
-																	}
-																}
-															}
-														}
-													}
-													
-													// StackView with per-entity RemoteCollectionView pages
-													Item {
-														width: parent.width
-														height: parent.height - ctxTypeRow.height - Style.paddingM * 2 - Style.spacingM * 2
-														
-														Rectangle {
-															anchors.fill: parent
-															radius: Style.radiusM
-															color: "transparent"
-															border.color: Style.borderColor
-															border.width: 1
-															
-															StackView {
-																id: ctxStackView
-																anchors.fill: parent
-																anchors.margins: 1
-															}
-														}
-													}
-												}
-												
-												Component {
-													id: ctxEntityPageComp
-													Item {
-														property alias collectionView: pageCollView
-														
-														RemoteCollectionView {
-															id: pageCollView
-															anchors.fill: parent
-															commandsControllerComp: null
-															visibleMetaInfo: false
-															commandsDelegateComp: null
-															documentCollectionFilter: null
-															showRemoteChangesAlert: false
-															tableViewParamsStoredServer: false
-															headerRightClickEnabled: false
-															onSelectionChanged: {
-																if (ctxStackView.currentPage() === pageCollView.parent) {
-																	ctxDialog.setButtonEnabled(Enums.apply, selectedIds.length > 0)
+
+												ComboBox {
+													id: ctxHeaderTypeCB
+													width: parent.width - parent.spacing - parent.children[0].contentWidth
+													height: Style.buttonHeightM
+													model: entityTypeModel
+													onCurrentIndexChanged: {
+														if (entityTypeModel.getItemsCount() > currentIndex && currentIndex >= 0) {
+															var newTypeId = entityTypeModel.getData("id", currentIndex)
+															if (ctxSelectPopup.selectedEntityTypeId !== newTypeId) {
+																ctxSelectPopup.selectedEntityTypeId = newTypeId
+																if (ctxDataProvider) {
+																	ctxDataProvider.clearSelection()
+																	ctxDataProvider.fetch("")
 																}
 															}
 														}
@@ -1611,33 +1510,26 @@ DocumentViewBase {
 												}
 											}
 										}
-										
-										onFinished: {
-											var cv = getCurrentCollectionView()
-											if (buttonId === Enums.apply && cv) {
-												var arr = root.pendingEntityRefs.slice()
-												var mdl = cv.table.elements
-												let indexes = cv.table.getSelectedIndexes()
-												for (var i = 0; i < indexes.length; i++) {
-													let idx = indexes[i]
-													var displayName = mdl.getData("name", idx)
-													var typeId = mdl.getData("typeId", idx)
-													var elementId = mdl.getData("id", idx)
-													var linkPath = selectedEntityTypeId
-													if (typeId) linkPath += "/" + typeId
-													linkPath += "/" + elementId
-													arr.push({
-																 entityType: selectedEntityTypeId,
-																 entityId: elementId,
-																 displayName: displayName,
-																 entityLinkPath: linkPath,
-																 typeId: typeId
-															 })
-												}
-												root.pendingEntityRefs = arr
-												root._entityRefsChanged = true
-												root.doUpdateModel()
+
+										onSelectionChanged: {
+											var arr = root.pendingEntityRefs.slice()
+											for (var i = 0; i < selectedIds.length; i++) {
+												var selId = selectedIds[i]
+												var selName = dataProvider ? dataProvider.getSelectedItemText(selId) : ""
+												if (!selName)
+													selName = selId
+												var linkPath = ctxSelectPopup.selectedEntityTypeId + "/" + selId
+												arr.push({
+													entityType: ctxSelectPopup.selectedEntityTypeId,
+													entityId: selId,
+													displayName: selName,
+													entityLinkPath: linkPath,
+													typeId: ""
+												})
 											}
+											root.pendingEntityRefs = arr
+											root._entityRefsChanged = true
+											root.doUpdateModel()
 										}
 									}
 								}

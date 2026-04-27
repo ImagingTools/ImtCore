@@ -29,6 +29,7 @@ import imtgui 1.0
 	- Optional separator lines between delegates (\c showSeparator)
 	- Customizable filter placeholder text (\c filterPlaceholder)
 	- Optional selected items group at top with "Clear all" button (\c showSelectedGroup)
+	- Optional header component above filter (\c headerComponent) for custom controls like type selectors
 
 	\sa FilterableSelectDataProvider, FilterableSelectGqlDataProvider
 */
@@ -67,6 +68,9 @@ PopupView {
 
 	// --- Filter field placeholder ---
 	property string filterPlaceholder: qsTr("Filter...")
+
+	// --- Optional header component (rendered above filter field) ---
+	property Component headerComponent: null
 
 	// --- Selected items group at top ---
 	property bool showSelectedGroup: false
@@ -372,6 +376,14 @@ PopupView {
 			width: parent.width
 			spacing: Style.marginM
 
+			// --- Optional header (e.g. entity type selector) ---
+			Loader {
+				id: headerLoader
+				width: parent.width
+				sourceComponent: root.headerComponent
+				visible: root.headerComponent !== null
+			}
+
 			// --- Search Field ---
 			CustomTextField {
 				id: filterField
@@ -428,7 +440,7 @@ PopupView {
 
 				width: parent.width
 				visible: root.showSelectedGroup && root.__internal.selectedItemsCount > 0
-				spacing: 0
+				spacing: Style.marginS
 
 				// Header row: "Selected (N)" + "Clear all"
 				Item {
@@ -544,7 +556,7 @@ PopupView {
 
 								anchors.verticalCenter: parent.verticalCenter
 								anchors.right: parent.right
-								anchors.rightMargin: Style.marginM
+								anchors.rightMargin: Style.marginM + (selectedScrollbar.visible ? selectedScrollbar.secondSize + Style.marginXS : 0)
 
 								width: Style.iconSizeXS
 								height: Style.iconSizeXS
