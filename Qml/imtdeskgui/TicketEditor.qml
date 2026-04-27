@@ -396,6 +396,7 @@ DocumentViewBase {
 			}
 		}
 		
+		// Load assignees — names resolve via FilterableSelectPopup when opened
 		var assigns = []
 		var aIds = ticketData.m_assigneeIds || []
 		for (var a = 0; a < aIds.length; a++) {
