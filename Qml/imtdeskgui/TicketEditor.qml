@@ -1472,12 +1472,6 @@ DocumentViewBase {
 										readonly property int __popupWidth: 320
 										readonly property int __maxHeight: 600
 
-										Component.onDestruction: {
-											if (root._entityRefsChanged) {
-												root.doUpdateModel()
-											}
-										}
-
 										width: __popupWidth + 2 * Style.marginL
 										height: Math.min(Style.marginL + ctxTypeCB.height + ctxPopupItem.height + 2*Style.marginL, __maxHeight)
 
@@ -1601,6 +1595,7 @@ DocumentViewBase {
 													}
 													root.pendingEntityRefs = otherRefs
 													root._entityRefsChanged = true
+													root.doUpdateModel()
 												}
 											}
 										}
