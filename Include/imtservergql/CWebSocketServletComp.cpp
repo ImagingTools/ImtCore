@@ -134,6 +134,10 @@ imtrest::ConstResponsePtr CWebSocketServletComp::ProcessGqlRequest(const imtrest
 imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtrest::IRequest& request) const
 {
 	const auto* webSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&request);
+	if (webSocketRequest == nullptr){
+		return CreateErrorResponse(QByteArrayLiteral("RegisterSubscription: request is not a WebSocketRequest"), request);
+	}
+
 	QByteArray body = request.GetBody();
 	const QJsonDocument document = QJsonDocument::fromJson(body);
 	if (document.isNull() || !document.isObject()) {
@@ -167,10 +171,8 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 		return CreateErrorResponse(errorMessage.toUtf8(), request);
 	}
 
-	imtrest::CWebSocketRequest* webSocketRequestPtr = const_cast<imtrest::CWebSocketRequest*>(dynamic_cast<const imtrest::CWebSocketRequest*>(&request));
-	if (webSocketRequestPtr != nullptr){
-		webSocketRequestPtr->SetCommandId(gqlRequest.GetCommandId());
-	}
+	imtrest::CWebSocketRequest* webSocketRequestPtr = const_cast<imtrest::CWebSocketRequest*>(webSocketRequest);
+	webSocketRequestPtr->SetCommandId(gqlRequest.GetCommandId());
 
 	imtgql::IGqlContext::Headers gqlHeaders;
 
@@ -215,7 +217,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 		QString errorMessage;
 		imtgql::IGqlContextUniquePtr gqlContextPtr = m_gqlContextCreatorCompPtr->CreateGqlContext(accessToken, productId, userId, gqlHeaders, errorMessage);
 		if (gqlContextPtr.IsValid()){
-			gqlRequest.SetGqlContext(std::move(gqlContextPtr));
+			gqlRequest.SetGqlContext(gqlContextPtr.PopInterfacePtr());
 		}
 		else{
 			// Fallback: create a minimal context with headers
