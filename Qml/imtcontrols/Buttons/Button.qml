@@ -85,12 +85,7 @@ ControlBase {
 	}
 
 	// Accessibility – mirrors QtQuick.Controls.AbstractButton
-	Accessible.role: Accessible.Button
-	Accessible.name: text
-	Accessible.description: tooltipText
-	Accessible.checkable: checkable
-	Accessible.checked: checked
-	Accessible.onPressAction: { if (enabled) _private.onClicked() }
+
 
 	// Auto-repeat timer
 	Timer {

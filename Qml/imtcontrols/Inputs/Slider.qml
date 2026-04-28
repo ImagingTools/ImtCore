@@ -61,11 +61,7 @@ ControlBase {
 	property bool hasTooltip: false;
 
 	// Accessibility
-	Accessible.role: Accessible.Slider
-	Accessible.name: tooltipText
-	Accessible.minimumValue: from
-	Accessible.maximumValue: to
-	Accessible.value: value
+
 
 	Component.onCompleted: {
 		correctPositionParams();

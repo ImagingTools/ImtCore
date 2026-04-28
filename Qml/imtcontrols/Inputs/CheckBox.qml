@@ -42,10 +42,7 @@ ControlBase {
 	signal toggled()
 
 	// Accessibility
-	Accessible.role: Accessible.CheckBox
-	Accessible.name: text
-	Accessible.checkable: true
-	Accessible.checked: checked
+
 
 	onCheckStateChanged: {
 		if (buttonGroup !== null)

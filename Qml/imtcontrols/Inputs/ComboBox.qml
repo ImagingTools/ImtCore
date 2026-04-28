@@ -58,9 +58,7 @@ ControlBase {
 	property alias tooltipItem: tooltip;
 
 	// Accessibility
-	Accessible.role: Accessible.ComboBox
-	Accessible.name: currentText !== "" ? currentText : placeHolderText
-	Accessible.description: tooltipText
+
 
 	signal accepted();
 	signal activated();

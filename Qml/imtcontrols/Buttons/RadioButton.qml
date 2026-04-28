@@ -27,10 +27,7 @@ ControlBase {
     property alias tooltipItem: tooltip;
 
 	// Accessibility
-	Accessible.role: Accessible.RadioButton
-	Accessible.name: text
-	Accessible.checkable: true
-	Accessible.checked: checked
+
 
 	signal clicked();
 	signal toggled();

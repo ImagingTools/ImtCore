@@ -38,10 +38,7 @@ ControlBase {
     property real placeHolderOpacity: 1;
 
 	// Accessibility
-	Accessible.role: Accessible.EditableText
-	Accessible.name: placeHolderText
-	Accessible.description: placeHolderText
-	Accessible.readOnly: textField.readOnly
+
 
     signal accepted();
     signal cancelled();
