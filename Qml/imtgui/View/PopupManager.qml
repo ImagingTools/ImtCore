@@ -32,6 +32,12 @@ QtObject {
 		}
 	}
 
+	function addInfoMessage(text, autoClose, id){
+		if (popupContainer){
+			popupContainer.addMessage("info", text, autoClose, id)
+		}
+	}
+
 	function addCustomMessage(id, customComponent, properties){
 		if (popupContainer){
 			popupContainer.addCustomMessage(id, customComponent, properties)
@@ -53,6 +59,12 @@ QtObject {
 	function replaceSuccessMessage(id, text, autoClose){
 		if (popupContainer){
 			popupContainer.replaceMessage(id, "success", text, autoClose)
+		}
+	}
+
+	function replaceInfoMessage(id, text, autoClose){
+		if (popupContainer){
+			popupContainer.replaceMessage(id, "info", text, autoClose)
 		}
 	}
 

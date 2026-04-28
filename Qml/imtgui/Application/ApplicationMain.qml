@@ -297,12 +297,19 @@ Item {
 				ticketLabel = ticketLabel ? (ticketLabel + " " + ticketTitle) : String(ticketTitle)
 			}
 			var who = senderName ? String(senderName) : qsTr("Someone")
-			var header = ticketLabel
-				? qsTr("New message in '%1' from '%2'").replace("%1", ticketLabel).replace("%2", who)
-				: qsTr("New ticket message from '%1'").replace("%1", who)
-			var text = preview ? (header + ":\n" + preview) : header
 
-			PopupManager.addSuccessMessage(text, true, "TicketMessage_" + messageId)
+			var text = ""
+			if (ticketLabel && preview){
+				text = who + " → " + ticketLabel + ":\n" + preview
+			} else if (ticketLabel){
+				text = who + " → " + ticketLabel
+			} else if (preview){
+				text = who + ": " + preview
+			} else {
+				text = qsTr("New ticket message from %1").arg(who)
+			}
+
+			PopupManager.addInfoMessage(text, true, "TicketMessage_" + messageId)
 		}
 	}
 

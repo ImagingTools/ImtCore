@@ -30,7 +30,7 @@ Item {
 
 			width: popupContainer ? popupContainer.width : Style.sizeHintXS
 			height: Style.sizeHintBXS
-			color: messageType == "error" ? "#ffcccc" : messageType == "warning" ? "#fff4cc" : "#ccffcc"
+			color: messageType == "error" ? "#ffcccc" : messageType == "warning" ? "#fff4cc" : messageType == "info" ? "#cce5ff" : "#ccffcc"
 			radius: Style.radiusM
 			border.color: Style.borderColor2
 
@@ -48,7 +48,8 @@ Item {
 					sourceSize.width: width
 					source: defaultDelegateRoot.messageType == "warning" ? "../../../" + Style.getIconPath("Icons/Alert", Icon.State.On, Icon.Mode.Normal) :
 							defaultDelegateRoot.messageType == "error" ? "../../../" + Style.getIconPath("Icons/Error", Icon.State.On, Icon.Mode.Normal) :
-							defaultDelegateRoot.messageType == "success" ? "../../../" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal) : ""
+							defaultDelegateRoot.messageType == "success" ? "../../../" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal) :
+							defaultDelegateRoot.messageType == "info" ? "../../../" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal) : ""
 				}
 			}
 
