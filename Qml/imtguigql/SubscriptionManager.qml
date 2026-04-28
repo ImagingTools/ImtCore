@@ -126,12 +126,12 @@ WebSocket {
 					headers = {}
 				}
 
-				let accessToken = __tokenHelper.GetGlobalAccessToken()
+				let accessToken = container.__tokenHelper.GetGlobalAccessToken()
 				if (accessToken && !headers["x-authentication-token"]){
 					headers["x-authentication-token"] = accessToken
 				}
 
-				let productId = __tokenHelper.GetProductId()
+				let productId = container.__tokenHelper.GetProductId()
 				if (productId && !headers["productId"]){
 					headers["productId"] = productId
 				}

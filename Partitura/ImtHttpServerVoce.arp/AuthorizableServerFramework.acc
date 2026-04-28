@@ -254,8 +254,14 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
+                    <AttributeInfo Id="JwtSessionController" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaClientEngine"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PersonalAccessTokenManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PersonalAccessTokenController/PersonalAccessTokenManager"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RequestHandler" Type="Factory" ExportId="RequestHandler">
                         <Data IsEnabled="false"/>
@@ -271,6 +277,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaClientEngine/UserRemoteRepository"/>
                     </AttributeInfo>
                     <AttributeInfo Id="WebServerConnectionInterface" Type="Reference" ExportId="ServerInterface">
                         <Data IsEnabled="false"/>

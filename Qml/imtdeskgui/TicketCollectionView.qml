@@ -64,8 +64,8 @@ RemoteCollectionView {
 			}
 			var who = senderName ? String(senderName) : qsTr("Someone")
 			var header = ticketLabel
-				? qsTr("New message in %1 from %2").arg(ticketLabel).arg(who)
-				: qsTr("New ticket message from %1").arg(who)
+				? qsTr("New message in '%1' from '%2'").replace("%1", ticketLabel).replace("%2", who)
+				: qsTr("New ticket message from '%1'").replace("%1", who)
 			var text = preview ? (header + ":\n" + preview) : header
 
 			PopupManager.addSuccessMessage(text, true, "TicketMessage_" + messageId)
@@ -82,6 +82,7 @@ RemoteCollectionView {
 			if (!data){
 				return
 			}
+
 			var ticketNumber = data.containsKey("ticketNumber") ? data.getData("ticketNumber") : ""
 			var ticketTitle = data.containsKey("ticketTitle") ? data.getData("ticketTitle") : ""
 
@@ -90,7 +91,7 @@ RemoteCollectionView {
 				ticketLabel = ticketLabel ? (ticketLabel + " " + ticketTitle) : String(ticketTitle)
 			}
 			var text = ticketLabel
-				? qsTr("You have been assigned to ticket %1").arg(ticketLabel)
+				? qsTr("You have been assigned to ticket '%1'").replace("%1", ticketLabel)
 				: qsTr("You have been assigned to a ticket")
 
 			PopupManager.addSuccessMessage(text, true, "TicketAssignee_" + ticketNumber)
