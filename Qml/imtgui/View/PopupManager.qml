@@ -32,6 +32,12 @@ QtObject {
 		}
 	}
 
+	function addCustomMessage(id, customComponent, properties){
+		if (popupContainer){
+			popupContainer.addCustomMessage(id, customComponent, properties)
+		}
+	}
+
 	function replaceErrorMessage(id, text, autoClose){
 		if (popupContainer){
 			popupContainer.replaceMessage(id, "error", text, autoClose)
@@ -55,10 +61,7 @@ QtObject {
 			return
 		}
 
-		let index = getIndexByMessageId(id);
-		if (index >= 0){
-			popupContainer.removeMessage(index);
-		}
+		popupContainer.removeMessageById(id)
 	}
 
 	function getIndexByMessageId(id){
@@ -71,5 +74,11 @@ QtObject {
 
 	function messageIsOpened(id){
 		return getIndexByMessageId(id) >= 0;
+	}
+
+	function clear(){
+		if (popupContainer){
+			popupContainer.clear()
+		}
 	}
 }
