@@ -122,7 +122,7 @@ WebSocket {
 				request["id"] = subscriptionModel[index]["subscriptionId"]
 
 				let headers = subscriptionModel[index]["headers"]
-				if (headers === undefined || headers === null){
+				if (!headers){
 					headers = {}
 				}
 
