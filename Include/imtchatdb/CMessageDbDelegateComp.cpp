@@ -187,7 +187,8 @@ QByteArray CMessageDbDelegateComp::CreateUpdateObjectQuery(
 	}
 
 	const QString nowUtc = utcNow();
-	const QString escapedId = QString::fromUtf8(objectId);
+	QString escapedId = QString::fromUtf8(objectId);
+	escapedId.replace('\'', "''");
 
 	QString combinedQuery;
 

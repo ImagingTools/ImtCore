@@ -2244,6 +2244,8 @@ DocumentViewBase {
 																onTriggered: editMessageInput.forceActiveFocus()
 															}
 
+															// Cancel edit when focus leaves; short delay lets
+															// Save/Cancel click handlers fire first.
 															Timer {
 																id: editCancelOnBlurTimer
 																interval: 50
