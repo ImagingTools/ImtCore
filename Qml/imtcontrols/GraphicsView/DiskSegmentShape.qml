@@ -58,11 +58,11 @@ SegmentBaseShape {
 		//ctx.lineTo(outerStartX, outerStartY)
 		ctx.closePath()
 
-		if(isSelected){
+		if(isSelected && brashAlpha !== 1 && penAlpha !== 1){
 			ctx.globalAlpha = 0.7
 		}
 		ctx.fill();
-		ctx.globalAlpha = 1
+		ctx.globalAlpha = penAlpha
 		if(!equalAngles){
 			ctx.stroke();
 		}
@@ -80,6 +80,7 @@ SegmentBaseShape {
 			ctx.setLineDash([])
 		}
 
+		ctx.globalAlpha = 1
 	}
 
 	function isInsideRadius(dist){

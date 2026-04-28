@@ -214,6 +214,9 @@ Matrix3x3 1.0 ./GraphicsView/Matrix3x3.qml
 Graph2d 1.0 ./GraphicsView/Graph2d.qml
 MultiGraph2d 1.0 ./GraphicsView/MultiGraph2d.qml
 
+GraphicsShapeFactoryManager 1.0 ./GraphicsView/GraphicsShapeFactoryManager.qml
+GraphicsShapeFactoryBase 1.0 ./GraphicsView/GraphicsShapeFactoryBase.qml
+
 PolygonShape 1.0 ./GraphicsView/PolygonShape.qml
 RectangleShape 1.0 ./GraphicsView/RectangleShape.qml
 CircleShape 1.0 ./GraphicsView/CircleShape.qml
