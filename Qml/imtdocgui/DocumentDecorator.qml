@@ -139,6 +139,8 @@ QtObject {
 			_internal.updateCounters[i] = 0
 			registeredViews[i].setBlockingUpdateModel(false)
 		}
+
+		documentManager.updateRepresentationFailed(documentId, message)
 	}
 
 	function onGuiUpdated(view, model){

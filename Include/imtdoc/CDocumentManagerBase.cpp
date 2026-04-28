@@ -85,24 +85,24 @@ QByteArray CDocumentManagerBase::CreateNewDocument(const QByteArray& userId, con
 
 	retVal = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
-	WorkingDocument* documentPtr = nullptr;
+	QString documentName;
 	{
 		QMutexLocker locker(&m_mutex);
-		documentPtr = &m_userDocuments[userId][retVal];
+		WorkingDocument& doc = m_userDocuments[userId][retVal];
+		doc.typeId = documentTypeId;
+		doc.undoManagerPtr = undoManagerPtr;
+		doc.isDirty = false;
+		doc.name = "";
+		doc.isLoading = true;
+		documentName = doc.name;
 	}
-
-	documentPtr->typeId = documentTypeId;
-	documentPtr->undoManagerPtr = undoManagerPtr;
-	documentPtr->isDirty = false;
-	documentPtr->name = "";
-	documentPtr->isLoading = true;
 
 	{
 		NewDocumentCreatedInfo info;
 		info.userId = userId;
 		info.documentId = retVal;
 		info.typeId = documentTypeId;
-		info.name = documentPtr->name;
+		info.name = documentName;
 		info.isDirty = false;
 
 		istd::IChangeable::ChangeSet changeSet(CF_NEW_DOCUMENT_CREATED);
@@ -116,9 +116,9 @@ QByteArray CDocumentManagerBase::CreateNewDocument(const QByteArray& userId, con
 				userId,
 				retVal,
 				documentTypeId,
-				documentPtr->name,
-				ObjectIdToUrl(documentPtr->objectId),
-				documentPtr->isDirty);
+				documentName,
+				QUrl(),
+				false);
 			handlerPtr->ProcessEvent(&event);
 		}
 	}
@@ -266,17 +266,14 @@ IDocumentManager::OperationStatus CDocumentManagerBase::GetDocumentData(const QB
 
 IDocumentManager::OperationStatus CDocumentManagerBase::SetDocumentData(const QByteArray& userId, const QByteArray& documentId, const istd::IChangeable& document)
 {
-	
-	WorkingDocument* workingDocumentPtr = nullptr;
-	{
-		QMutexLocker locker(&m_mutex);
-		OperationStatus validationStatus;
-		if (!ValidateInputParams(userId, documentId, validationStatus)){
-			return validationStatus;
-		}
+	QMutexLocker locker(&m_mutex);
 
-		workingDocumentPtr = &m_userDocuments[userId][documentId];
+	OperationStatus validationStatus;
+	if (!ValidateInputParams(userId, documentId, validationStatus)){
+		return validationStatus;
 	}
+
+	WorkingDocument* workingDocumentPtr = &m_userDocuments[userId][documentId];
 
 	if (workingDocumentPtr->isLoading) {
 		return OS_FAILED;

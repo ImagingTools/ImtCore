@@ -25,6 +25,26 @@ type Painter {
 	fill: Brush!
 }
 
+## Supported image formats for ImageShape
+enum ImageFormat {
+	PNG
+	JPEG
+	SVG
+}
+
+## Union of all shape types that can be drawn on a canvas.
+## The client must implement a rendering procedure for every member of this union.
+union GraphicsShape = Point2dShape | TextLabelShape | ImageShape | Rectangle2dShape | Polygon2dShape | Polyline2dShape | Line2dShape | CircleShape | AnnulusShape | ShapeGroup
+
+type ShapeGroup{
+        origin: Point2d!
+	shapes: [GraphicsShape]!
+}
+
+type GraphicsModel{
+        shapes: [GraphicsShape]
+}
+
 type Point2dShape {
 	point: Point2d!
 	painter: Painter
@@ -56,6 +76,25 @@ type CircleShape {
 }
 
 type AnnulusShape {
-	annulus: Annulus!
+        annulus: AnnulusSegment!
 	painter: Painter
+}
+
+## Shape: a raster or vector image placed in a rectangle on the page.
+## imageData contains the binary image encoded in Base64.
+type ImageShape {
+	rect: Rectangle2d!         ## Position and size on the page (millimetres)
+	imageFormat: ImageFormat!  ## Format of the encoded image data
+	imageData: String!         ## Base64-encoded image content
+	painter: Painter           ## Optional border stroke / fill tint
+}
+
+## Shape: a text string rendered at an anchor point.
+## The fill colour of painter is used as the text colour.
+type TextLabelShape {
+	rect: Rectangle2d!
+	text: String!                      ## Text content to render
+	fontName: String                   ## Font family name (e.g. "Arial")
+	fontSize: Float                    ## Font size in points
+	painter: Painter                   ## Fill colour = text colour; stroke = optional outline
 }

@@ -184,8 +184,8 @@
                     <AttributeInfo Id="HeaderIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>title</Value>
                                 <Value>number</Value>
+                                <Value>title</Value>
                                 <Value>status</Value>
                                 <Value>priority</Value>
                                 <Value>assignee</Value>
@@ -196,8 +196,8 @@
                     <AttributeInfo Id="HeaderNames" Type="Text[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
+                                <Value>#</Value>
                                 <Value>Title</Value>
-                                <Value>Number</Value>
                                 <Value>Status</Value>
                                 <Value>Priority</Value>
                                 <Value>Assignees</Value>

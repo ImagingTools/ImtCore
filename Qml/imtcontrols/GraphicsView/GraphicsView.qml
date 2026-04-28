@@ -13,6 +13,16 @@ Rectangle {
 
 	color: Style.baseColor;
 
+	property GraphicsShapeFactoryManager shapeFactoryManger: GraphicsShapeFactoryManager{
+		graphicsViewItem: graphicsView
+		sdlShapeModel: graphicsView.sdlShapeModel
+		onSdlShapesCreated :{
+			graphicsView.sdlShapesCreated();
+		}
+	}
+	property BaseModel sdlShapeModel: null
+
+
 	property alias selectedIndex: canvas.selectedIndex;
 
 	//for scrollBars
@@ -116,6 +126,11 @@ Rectangle {
 
 	signal painted()
 	signal imageLoaded()
+	signal sdlShapesCreated();
+
+	onSdlShapesCreated: {
+		drawSdlShapes()
+	}
 
 	Component.onCompleted: {
 		Events.subscribeEvent("DesignSchemeChanged", designSchemeChanged);
@@ -180,6 +195,10 @@ Rectangle {
 			graphicsView.restrictDrawing = false
 			graphicsView.resize()
 		}
+	}
+
+	function drawSdlShapes(){
+		requestPaintPause.restart();
 	}
 
 	function resize(){

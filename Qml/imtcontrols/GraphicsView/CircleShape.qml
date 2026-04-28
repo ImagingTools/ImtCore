@@ -11,7 +11,10 @@ BoundingBox {
 	property string color: Style.borderColor;
 	property string borderColor: color//Style.borderColor2;
 	property int borderWidth: 1;
-	property real opacity: 1;
+	property real opacity: brashAlpha;
+	property real brashAlpha: 1
+	property real penAlpha: 1
+
 
 	function draw(ctx, transformMatrixArg){
 		if(lineDashArray.length && !isSelected){
@@ -24,7 +27,7 @@ BoundingBox {
 
 		ctx.globalAlpha = opacity
 
-		if(isSelected){
+		if(isSelected && brashAlpha !== 1 && penAlpha !== 1){
 			ctx.globalAlpha = 0.7
 		}
 
@@ -35,9 +38,11 @@ BoundingBox {
 
 		ctx.arc(centerScreen.x, centerScreen.y, radiusScreen,  0, 2 * Math.PI, true)
 
+		ctx.globalAlpha = brashAlpha
 		ctx.fill();
-		ctx.globalAlpha = 1;
+		ctx.globalAlpha = penAlpha;
 		ctx.stroke();
+		ctx.globalAlpha = 1
 		ctx.closePath();
 
 		if(lineDashArray.length && !isSelected){

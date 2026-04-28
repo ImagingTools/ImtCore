@@ -16,7 +16,9 @@ BoundingBox {
 	property string color: Style.borderColor;
 	property string borderColor: color
 	property int borderWidth: 1;
-	property real opacity: 1;
+	property real opacity: brashAlpha;
+	property real brashAlpha: 1
+	property real penAlpha: 1
 	property real precision: 0.0001
 
 	readonly property bool anticlockwise: true;
