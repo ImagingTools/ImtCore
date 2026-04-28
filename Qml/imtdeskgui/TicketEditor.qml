@@ -2134,7 +2134,6 @@ DocumentViewBase {
 														
 														Row {
 															spacing: Style.spacingXS
-															clip: true
 															Text {
 																text: root.formatTimestamp(model.item.m_timestamp)
 																font.pixelSize: Style.fontSizeM - 1
