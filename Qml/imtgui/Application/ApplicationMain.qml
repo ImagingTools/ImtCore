@@ -266,6 +266,10 @@ Item {
 	// inside TicketCollectionView.qml which is lazy-loaded by PagesManager,
 	// so notifications were lost until the user navigated to the Tickets page.
 
+	// Subscribes to server-side ticket message notifications and surfaces
+	// them via PopupManager. The server-side filter (CTicketMessageNotifierComp)
+	// already restricts delivery to users related to the ticket
+	// (reporter / assignees / admin), excluding the sender.
 	SubscriptionClient {
 		id: ticketMessageSubscription
 		gqlCommandId: "OnTicketMessageReceived"
@@ -298,6 +302,9 @@ Item {
 		}
 	}
 
+	// Subscribes to server-side assignee change notifications and surfaces
+	// them via PopupManager. The server-side filter (CTicketAssigneeNotifierComp)
+	// delivers only to newly added assignees.
 	SubscriptionClient {
 		id: ticketAssigneeSubscription
 		gqlCommandId: "OnTicketAssigneeChanged"
