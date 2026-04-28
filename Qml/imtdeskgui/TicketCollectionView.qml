@@ -209,6 +209,7 @@ RemoteCollectionView {
 						m_ticketType: "SupportRequest"
 						m_priority: "Medium"
 						m_stateReason: "None"
+						m_accessLevel: "FullAccess"
 					}
 
 					function updateRepresentationFromDocument(){
@@ -240,6 +241,10 @@ RemoteCollectionView {
 								}
 							}
 						}
+
+						function onError(message, type){
+							root.updateRepresentationFailed(root.documentId, message)
+						}
 					}
 
 					property UpdateTicketInput updateTicketInput: UpdateTicketInput {}
@@ -254,6 +259,10 @@ RemoteCollectionView {
 									}
 								}
 							}
+						}
+
+						function onError(message, type){
+							root.updateDocumentFailed(root.documentId, message)
 						}
 					}
 				}
