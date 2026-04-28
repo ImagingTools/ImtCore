@@ -514,7 +514,7 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 										}
 									}
 								}
-								
+
 								bool contentChanged = existingMsgPtr->GetContent() != *sdlItem->content;
 								bool attachmentsChanged = existingMsgPtr->GetAttachmentIds() != editAttachmentIds;
 								if (contentChanged || attachmentsChanged){
