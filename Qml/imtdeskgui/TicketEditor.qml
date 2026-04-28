@@ -73,6 +73,11 @@ DocumentViewBase {
 	// Chat feedback
 	property string _chatActionHint: ""
 	property bool _exportChatCopiedState: false
+	// When true, the next content-height or ticket-data change scrolls to
+	// the bottom of the chat.  Set by addComment / deleteComment and by the
+	// initial load; cleared after the scroll happens so that editing a
+	// message does NOT jump the view.
+	property bool _shouldScrollToBottom: true
 	readonly property int chatHintDurationMs: 2000
 	readonly property int chatHintHeightPx: 28
 	readonly property int minCommentInputHeightPx: Style.controlHeightM - 10
@@ -84,11 +89,13 @@ DocumentViewBase {
 
 	onTicketDataChanged: {
 		descriptionAutoSaveTimer.stop()
-		try {
-			commentsFlick.scrollToBottom()
-		}
-		catch (err) {
-			console.warn("TicketEditor: Failed to scroll to bottom after ticket refresh:", err)
+		if (root._shouldScrollToBottom) {
+			try {
+				commentsFlick.scrollToBottom()
+			}
+			catch (err) {
+				console.warn("TicketEditor: Failed to scroll to bottom after ticket refresh:", err)
+			}
 		}
 	}
 	
@@ -282,6 +289,7 @@ DocumentViewBase {
 		ticketData.m_comments.addElement(newItem)
 		
 		setBlockingUpdateModel(false)
+		root._shouldScrollToBottom = true
 		ticketData.modelChanged()
 		root.commentSubmitted(commentText)
 	}
@@ -2022,7 +2030,10 @@ DocumentViewBase {
 					}
 
 					onContentHeightChanged: {
-						scrollToBottom()
+						if (root._shouldScrollToBottom) {
+							scrollToBottom()
+							root._shouldScrollToBottom = false
+						}
 					}
 
 					Column {

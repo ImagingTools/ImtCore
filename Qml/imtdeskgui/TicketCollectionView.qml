@@ -72,6 +72,31 @@ RemoteCollectionView {
 		}
 	}
 
+	// Subscribes to server-side assignee change notifications and surfaces
+	// them via PopupManager. The server-side filter (CTicketAssigneeNotifierComp)
+	// delivers only to newly added assignees.
+	SubscriptionClient {
+		id: ticketAssigneeSubscription
+		gqlCommandId: "OnTicketAssigneeChanged"
+		onMessageReceived: {
+			if (!data){
+				return
+			}
+			var ticketNumber = data.containsKey("ticketNumber") ? data.getData("ticketNumber") : ""
+			var ticketTitle = data.containsKey("ticketTitle") ? data.getData("ticketTitle") : ""
+
+			var ticketLabel = ticketNumber ? ("#" + ticketNumber) : ""
+			if (ticketTitle){
+				ticketLabel = ticketLabel ? (ticketLabel + " " + ticketTitle) : String(ticketTitle)
+			}
+			var text = ticketLabel
+				? qsTr("You have been assigned to ticket %1").arg(ticketLabel)
+				: qsTr("You have been assigned to a ticket")
+
+			PopupManager.addSuccessMessage(text, true, "TicketAssignee_" + ticketNumber)
+		}
+	}
+
 	Component {
 		id: createdAtCellDelegateComp
 		TableCellDateDelegate {}
