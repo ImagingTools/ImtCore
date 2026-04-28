@@ -18,6 +18,12 @@ WebSocket {
 	Component.onCompleted: {
 		Events.subscribeEvent("RegisterSubscription", container.registerSubscriptionEvent);
 		Events.subscribeEvent("UnregisterSubscription", container.unRegisterSubscription);
+
+		// Notify any SubscriptionClient instances that were created before this
+		// manager.  Their initial RegisterSubscription events were lost because
+		// this handler had not yet subscribed.  The clients listen for this
+		// event and re-register themselves.
+		Events.sendEvent("SubscriptionManagerReady", {});
 	}
 
 	Component.onDestruction: {

@@ -21,10 +21,22 @@ GqlModel {
 
 	Component.onCompleted: {
 		subscriptionId = UuidGenerator.generateUUID();
+
+		// If SubscriptionManager is created after this client, the initial
+		// RegisterSubscription event is lost.  Listen for the manager's
+		// ready signal and re-register.
+		Events.subscribeEvent("SubscriptionManagerReady", container.__onManagerReady);
 	}
 
 	Component.onDestruction: {
+		Events.unSubscribeEvent("SubscriptionManagerReady", container.__onManagerReady);
 		unRegisterSubscription();
+	}
+
+	function __onManagerReady(){
+		if (ok){
+			registerSubscription();
+		}
 	}
 
 	onStateChanged: {
