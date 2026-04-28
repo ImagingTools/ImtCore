@@ -272,12 +272,11 @@ DocumentViewBase {
 		setBlockingUpdateModel(false)
 		ticketData.modelChanged()
 		root.commentSubmitted(commentText)
-		root.doUpdateModel()
 	}
 
 	// Edit an existing comment in-place. The comment is located by its
 	// server-assigned id; the new content and an "edited" marker are written
-	// to the in-memory model, and doUpdateModel() pushes the change to the
+	// to the in-memory model, and modelChanged() pushes the change to the
 	// server which performs the actual edit via IChatService::EditMessage.
 	function editComment(messageId, newContent) {
 		if (!messageId || !ticketData || !ticketData.m_comments) return
@@ -293,13 +292,12 @@ DocumentViewBase {
 		}
 		setBlockingUpdateModel(false)
 		ticketData.modelChanged()
-		root.doUpdateModel()
 	}
 
 	// Mark an existing comment as deleted. The deleted flag is propagated to
-	// the server via doUpdateModel(), where IChatService::DeleteMessage
-	// physically removes the message; locally the message is hidden
-	// immediately so the UI feels responsive.
+	// the server via modelChanged() → updateDocumentFromRepresentation(),
+	// where IChatService::DeleteMessage physically removes the message;
+	// locally the message is hidden immediately so the UI feels responsive.
 	function deleteComment(messageId) {
 		if (!messageId || !ticketData || !ticketData.m_comments) return
 		setBlockingUpdateModel(true)
@@ -313,13 +311,11 @@ DocumentViewBase {
 		}
 		setBlockingUpdateModel(false)
 		ticketData.modelChanged()
-		root.doUpdateModel()
 	}
 
-	// Remove an attachment from an existing comment by index. The updated
-	// attachment list is saved to the server via editComment() which
-	// triggers doUpdateModel() → IChatService::EditMessage with the
-	// reduced attachment list.
+	// Remove an attachment from an existing comment by index. The change
+	// is local-only; the server update happens when the user clicks Save
+	// in the inline editor, which calls editComment() → modelChanged().
 	function removeCommentAttachment(messageId, attachmentIndex) {
 		if (!messageId || !ticketData || !ticketData.m_comments) return
 		setBlockingUpdateModel(true)
@@ -335,8 +331,6 @@ DocumentViewBase {
 			}
 		}
 		setBlockingUpdateModel(false)
-		ticketData.modelChanged()
-		root.doUpdateModel()
 	}
 	
 	// Upload attachment file to the server via HTTP POST.
