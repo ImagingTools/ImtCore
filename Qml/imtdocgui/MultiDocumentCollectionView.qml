@@ -169,15 +169,27 @@ Item {
 			// loading.stop()
 		}
 
+		function onUpdateRepresentationFailed(documentId, message){
+			ModalDialogManager.showErrorDialog(message)
+			if (!workspaceView.documentManager.documentIsLoading(documentId)){
+				workspaceView.stopLoading(documentId)
+			}
+		}
+
 		function onDocumentManagerChanged(typeOperation, objectId, documentId, documentName){
 			if (typeOperation === EDocumentOperationEnum.s_documentClosed){
 				tabView.removeTab(documentId)
 			}
 			else if (typeOperation === EDocumentOperationEnum.s_newDocumentCreated ||
-					typeOperation === EDocumentOperationEnum.s_documentOpened ||
-					typeOperation === EDocumentOperationEnum.s_documentSaved){
+					typeOperation === EDocumentOperationEnum.s_documentOpened){
 				workspaceView.documentManager.setDocumentName(documentId, documentName)
 			}
+			// Note: For s_documentSaved we intentionally do NOT update the
+			// document name from the subscription payload — the SDL save
+			// response already delivers the authoritative documentName via
+			// setDocumentName() and using the subscription value would cause
+			// a redundant overwrite (which has been observed to corrupt
+			// non-ASCII characters such as German umlauts in the tab title).
 		}
 
 		function onDocumentNameChanged(documentId, oldName, newName){

@@ -200,6 +200,15 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 						itemData.timestamp = msgPtr->GetCreatedAt();
 						itemData.content = msgPtr->GetContent();
 
+						// Mark the message as edited when its updatedAt timestamp
+						// was set by IChatService::EditMessage (SendMessage does
+						// not populate updatedAt, so a non-empty value reliably
+						// indicates a subsequent edit).
+						QString updatedAt = msgPtr->GetUpdatedAt();
+						if (!updatedAt.isEmpty() && updatedAt != msgPtr->GetCreatedAt()){
+							itemData.edited = true;
+						}
+
 						QByteArrayList attachmentIds = msgPtr->GetAttachmentIds();
 						if (!attachmentIds.isEmpty()){
 							itemData.attachments.Emplace();
@@ -301,10 +310,16 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 		ticketInfo = *arguments.input.Version_1_0->ticket;
 	}
 
-	QByteArray userId = GetUserId(gqlRequest);
+	QByteArray userId;
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr != nullptr){
+		userId = gqlContextPtr->GetUserId();
+	}
+
+	QByteArray userLogin = GetUserId(gqlRequest);
 
 	istd::IChangeableSharedPtr documentPtr;
-	m_documentManagerCompPtr->GetDocumentData(userId, documentId, documentPtr);
+	m_documentManagerCompPtr->GetDocumentData(userLogin, documentId, documentPtr);
 	if (!documentPtr.IsValid()){
 		response.Version_1_0->status = sdl::imtbase::CollectionDocumentManager::EDocumentOperationStatus::InvalidDocumentId;
 		return response;
@@ -464,8 +479,50 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 				if (!sdlItem){
 					continue;
 				}
-				// Skip items that already have an id — they are existing messages loaded from DB
+				// Existing messages (with id) may be edited or deleted.
 				if (sdlItem->id && !sdlItem->id->isEmpty()){
+					QByteArray messageId = *sdlItem->id;
+
+					// Delete request (explicit `deleted: true` flag from client).
+					if (sdlItem->deleted && *sdlItem->deleted){
+						m_chatServiceCompPtr->DeleteMessage(messageId, userId);
+						continue;
+					}
+
+					// Edit request: when content or attachments have changed.
+					if (sdlItem->content){
+						imtbase::IObjectCollection::DataPtr msgDataPtr;
+						if (m_messageCollectionCompPtr.IsValid()
+								&& m_messageCollectionCompPtr->GetObjectData(messageId, msgDataPtr)){
+							const imtchat::IChatMessage* existingMsgPtr =
+									dynamic_cast<const imtchat::IChatMessage*>(msgDataPtr.GetPtr());
+							if (existingMsgPtr != nullptr){
+								// Collect updated attachment IDs from the SDL item.
+								QByteArrayList editAttachmentIds;
+								if (sdlItem->attachments){
+									for (const auto& att : *sdlItem->attachments){
+										if (!att){
+											continue;
+										}
+										if (att->id && !att->id->isEmpty()){
+											QByteArray attId = *att->id;
+											int dotIdx = attId.lastIndexOf('.');
+											if (dotIdx > 0){
+												attId = attId.left(dotIdx);
+											}
+											editAttachmentIds << attId;
+										}
+									}
+								}
+
+								bool contentChanged = existingMsgPtr->GetContent() != *sdlItem->content;
+								bool attachmentsChanged = existingMsgPtr->GetAttachmentIds() != editAttachmentIds;
+								if (contentChanged || attachmentsChanged){
+									m_chatServiceCompPtr->EditMessage(messageId, userId, *sdlItem->content, editAttachmentIds);
+								}
+							}
+						}
+					}
 					continue;
 				}
 
@@ -510,13 +567,13 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 		}
 	}
 
-	m_documentManagerCompPtr->SetDocumentData(userId, documentId, *ticketPtr);
+	m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *ticketPtr);
 
 	// For new tickets (number == 0), do NOT auto-save — the user will save
 	// manually via the Undo/Redo/Save commands panel in the editor.
 	// For existing tickets (number > 0), save immediately after each change.
 	if (ticketPtr->GetNumber() > 0){
-		m_documentManagerCompPtr->SaveDocument(userId, documentId);
+		m_documentManagerCompPtr->SaveDocument(userLogin, documentId);
 	}
 
 	response.Version_1_0->status = sdl::imtbase::CollectionDocumentManager::EDocumentOperationStatus::Success;
