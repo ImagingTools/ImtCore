@@ -678,7 +678,7 @@ DocumentViewBase {
 	// Modern SaaS-level 2-column layout: LEFT (3 cards) + RIGHT (chat)
 	// Chat dominates; left panel is compact and structured
 	// ================================================================
-	
+
 	Item {
 		id: editView
 		anchors.fill: parent
@@ -691,7 +691,7 @@ DocumentViewBase {
 		readonly property string cardBorderColor: Style.borderColor
 		// Pre-faded variant of cardBorderColor used by inputs to render a subtle
 		// (~40% opacity, alpha 0x66) border in their unfocused state.
-		readonly property string cardBorderColorFaded: "#66d0d0d2"
+		readonly property string cardBorderColorFaded: "#d0d0d266"
 		readonly property string pageBgColor: Style.backgroundColor2
 		readonly property string accentColor: "#5b8fd6"
 		readonly property string labelColor: Style.textColor

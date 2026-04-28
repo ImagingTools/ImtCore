@@ -310,10 +310,16 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 		ticketInfo = *arguments.input.Version_1_0->ticket;
 	}
 
-	QByteArray userId = GetUserId(gqlRequest);
+	QByteArray userId;
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr != nullptr){
+		userId = gqlContextPtr->GetUserId();
+	}
+
+	QByteArray userLogin = GetUserId(gqlRequest);
 
 	istd::IChangeableSharedPtr documentPtr;
-	m_documentManagerCompPtr->GetDocumentData(userId, documentId, documentPtr);
+	m_documentManagerCompPtr->GetDocumentData(userLogin, documentId, documentPtr);
 	if (!documentPtr.IsValid()){
 		response.Version_1_0->status = sdl::imtbase::CollectionDocumentManager::EDocumentOperationStatus::InvalidDocumentId;
 		return response;
@@ -542,13 +548,13 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 		}
 	}
 
-	m_documentManagerCompPtr->SetDocumentData(userId, documentId, *ticketPtr);
+	m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *ticketPtr);
 
 	// For new tickets (number == 0), do NOT auto-save — the user will save
 	// manually via the Undo/Redo/Save commands panel in the editor.
 	// For existing tickets (number > 0), save immediately after each change.
 	if (ticketPtr->GetNumber() > 0){
-		m_documentManagerCompPtr->SaveDocument(userId, documentId);
+		m_documentManagerCompPtr->SaveDocument(userLogin, documentId);
 	}
 
 	response.Version_1_0->status = sdl::imtbase::CollectionDocumentManager::EDocumentOperationStatus::Success;
