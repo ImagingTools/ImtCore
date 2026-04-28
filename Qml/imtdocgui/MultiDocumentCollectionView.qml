@@ -169,6 +169,13 @@ Item {
 			// loading.stop()
 		}
 
+		function onUpdateRepresentationFailed(documentId, message){
+			ModalDialogManager.showErrorDialog(message)
+			if (!workspaceView.documentManager.documentIsLoading(documentId)){
+				workspaceView.stopLoading(documentId)
+			}
+		}
+
 		function onDocumentManagerChanged(typeOperation, objectId, documentId, documentName){
 			if (typeOperation === EDocumentOperationEnum.s_documentClosed){
 				tabView.removeTab(documentId)
