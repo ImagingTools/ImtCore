@@ -2281,22 +2281,23 @@ DocumentViewBase {
 													Repeater {
 														model: commentDelegate.dataModel.m_attachments || []
 														delegate: Row {
+															id: attachmentDelegate
 															spacing: Style.spacingS
 															readonly property string attachmentUrl: model.item.m_preview || ""
 
 															Text {
 																font.pixelSize: Style.fontSizeM
-																font.underline: attachmentUrl.length > 0
+																font.underline: attachmentDelegate.attachmentUrl.length > 0
 																elide: Text.ElideRight
-																color: attachmentUrl.length > 0 ? editView.accentColor : Style.textColor
+																color: attachmentDelegate.attachmentUrl.length > 0 ? editView.accentColor : Style.textColor
 																text: model.item.m_fileName || qsTr("file")
 
 																MouseArea {
 																	anchors.fill: parent
-																	enabled: parent.parent.attachmentUrl.length > 0
+																	enabled:attachmentDelegate.attachmentUrl.length > 0
 																	hoverEnabled: enabled
 																	cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-																	onClicked: Qt.openUrlExternally(parent.parent.attachmentUrl)
+																	onClicked: Qt.openUrlExternally(attachmentDelegate.attachmentUrl)
 																}
 															}
 
