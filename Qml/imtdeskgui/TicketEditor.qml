@@ -2231,12 +2231,28 @@ DocumentViewBase {
 																	editMessageFocusTimer.start()
 																}
 															}
+															onActiveFocusChanged: {
+																if (!activeFocus && commentDelegate.isEditingThis) {
+																	editCancelOnBlurTimer.start()
+																}
+															}
 
 															Timer {
 																id: editMessageFocusTimer
 																interval: 1
 																repeat: false
 																onTriggered: editMessageInput.forceActiveFocus()
+															}
+
+															Timer {
+																id: editCancelOnBlurTimer
+																interval: 50
+																repeat: false
+																onTriggered: {
+																	if (root._editingMessageId.length > 0) {
+																		root._editingMessageId = ""
+																	}
+																}
 															}
 														}
 													}
@@ -2253,6 +2269,7 @@ DocumentViewBase {
 																hoverEnabled: true
 																cursorShape: Qt.PointingHandCursor
 																onClicked: {
+																	editCancelOnBlurTimer.stop()
 																	var newText = editMessageInput.text
 																	root._editingMessageId = ""
 																	root.editComment(model.item.m_id, newText)
@@ -2267,7 +2284,10 @@ DocumentViewBase {
 																anchors.fill: parent
 																hoverEnabled: true
 																cursorShape: Qt.PointingHandCursor
-																onClicked: root._editingMessageId = ""
+																onClicked: {
+																	editCancelOnBlurTimer.stop()
+																	root._editingMessageId = ""
+																}
 															}
 														}
 													}
