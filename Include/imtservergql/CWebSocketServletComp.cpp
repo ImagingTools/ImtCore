@@ -10,6 +10,7 @@
 #include <imtrest/IRequest.h>
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/CWebSocketRequest.h>
+#include <imtbase/imtbase.h>
 #include <imtgql/CGqlContext.h>
 
 
@@ -171,7 +172,6 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 		webSocketRequestPtr->SetCommandId(gqlRequest.GetCommandId());
 	}
 
-	imtgql::IGqlContext* gqlContextPtr = nullptr;
 	imtgql::IGqlContext::Headers gqlHeaders;
 
 	QJsonObject headers = rootObject.value("headers").toObject();
@@ -179,18 +179,56 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 		gqlHeaders.insert(key.toUtf8().toLower(), headers.value(key).toString().toUtf8());
 	}
 
-	if (m_gqlContextControllerCompPtr.IsValid()){
-		QByteArray token = gqlHeaders.value(QByteArrayLiteral("x-authentication-token"));
+	QByteArray userId;
+	QByteArray accessToken = gqlHeaders.value(QByteArrayLiteral("x-authentication-token"));
+
+	// Validate token based on prefix: pat_ for PAT tokens, otherwise JWT
+	if (!accessToken.isEmpty()){
+		if (accessToken.size() > 8 && accessToken.startsWith("imt_pat_")){
+			// PAT token - validate with PAT manager
+			if (m_patManagerCompPtr.IsValid()){
+				QByteArray tokenId;
+				QByteArrayList scopes;
+				if (m_patManagerCompPtr->ValidateToken(accessToken, userId, tokenId, scopes)){
+					m_patManagerCompPtr->UpdateLastUsedAt(tokenId);
+				}
+			}
+		}
+		else{
+			// JWT token - validate with JWT controller
+			if (m_jwtSessionControllerCompPtr.IsValid()){
+				using JwtState = imtauth::IJwtSessionController::JwtState;
+				JwtState state = m_jwtSessionControllerCompPtr->ValidateJwt(accessToken);
+				if (state == JwtState::JS_OK){
+					userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(accessToken);
+				}
+			}
+		}
+	}
+
+	QByteArray productId;
+	if (gqlHeaders.contains(imtbase::s_productIdHeaderId)){
+		productId = gqlHeaders.value(imtbase::s_productIdHeaderId);
+	}
+
+	if (m_gqlContextCreatorCompPtr.IsValid()){
 		QString errorMessage;
-		gqlContextPtr = m_gqlContextControllerCompPtr->GetRequestContext(gqlRequest, token, gqlHeaders, errorMessage);
+		imtgql::IGqlContextUniquePtr gqlContextPtr = m_gqlContextCreatorCompPtr->CreateGqlContext(accessToken, productId, userId, gqlHeaders, errorMessage);
+		if (gqlContextPtr.IsValid()){
+			gqlRequest.SetGqlContext(std::move(gqlContextPtr));
+		}
+		else{
+			// Fallback: create a minimal context with headers
+			imtgql::CGqlContext* fallbackContext = new imtgql::CGqlContext();
+			fallbackContext->SetHeaders(gqlHeaders);
+			gqlRequest.SetGqlContext(fallbackContext);
+		}
 	}
-
-	if (gqlContextPtr == nullptr){
-		gqlContextPtr = new imtgql::CGqlContext();
+	else{
+		imtgql::CGqlContext* gqlContextPtr = new imtgql::CGqlContext();
 		gqlContextPtr->SetHeaders(gqlHeaders);
+		gqlRequest.SetGqlContext(gqlContextPtr);
 	}
-
-	gqlRequest.SetGqlContext(gqlContextPtr);
 
 	QByteArray commandId = gqlRequest.GetCommandId();
 
