@@ -18,27 +18,10 @@ FocusScope {
     property alias rowDelegate: flick.delegate;
     property alias background: backgroundLoader.sourceComponent;
 
-    // Optional header/footer rendered inside the virtualized list (Qt-style).
-    property alias headerComponent: flick.header;
-    property alias footerComponent: flick.footer;
-
-    // Optional section grouping (delegates to ListView.section.*).
-    property alias sectionProperty: flick.section.property;
-    property alias sectionCriteria: flick.section.criteria;
-    property alias sectionDelegate: flick.section.delegate;
-
-    // Animations for add/remove/displaced — opt-in by assigning a Transition.
-    property alias addTransition: flick.add;
-    property alias removeTransition: flick.remove;
-    property alias displacedTransition: flick.displaced;
-    property alias addDisplacedTransition: flick.addDisplaced;
-    property alias removeDisplacedTransition: flick.removeDisplaced;
-
-    // Public ListView-style API (previously not exposed).
+    // Public ListView-style API.
     property alias currentIndex: flick.currentIndex;
     property alias currentItem: flick.currentItem;
     property alias cacheBuffer: flick.cacheBuffer;
-    property alias keyNavigationWraps: flick.keyNavigationWraps;
     property alias reuseItems: flick.reuseItems;
 
     function positionViewAtIndex(index, mode){
@@ -390,8 +373,6 @@ FocusScope {
 
         boundsBehavior: Flickable.StopAtBounds;
         clip: true;
-        keyNavigationEnabled: true;
-        highlightFollowsCurrentItem: true;
         // High default cacheBuffer keeps every delegate alive (legacy behaviour
         // of the previous Repeater implementation, on which getItemsDataAsList()
         // and check-state iteration rely). Consumers handling large datasets
