@@ -690,8 +690,8 @@ DocumentViewBase {
 		readonly property string cardColor: Style.baseColor
 		readonly property string cardBorderColor: Style.borderColor
 		// Pre-faded variant of cardBorderColor used by inputs to render a subtle
-		// (40% opacity) border in their unfocused state.
-		readonly property color cardBorderColorFaded: Qt.rgba(Qt.color(cardBorderColor).r, Qt.color(cardBorderColor).g, Qt.color(cardBorderColor).b, 0.4)
+		// (~40% opacity, alpha 0x66) border in their unfocused state.
+		readonly property string cardBorderColorFaded: "#66d0d0d2"
 		readonly property string pageBgColor: Style.backgroundColor2
 		readonly property string accentColor: "#5b8fd6"
 		readonly property string labelColor: Style.textColor
