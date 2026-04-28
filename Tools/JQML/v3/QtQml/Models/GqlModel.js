@@ -8,6 +8,18 @@ class GqlModel extends TreeItemModel {
 	SetRefreshToken(token){
 		XMLHttpRequest.QMLAuthRefreshToken = token
 	}
+	
+	SetProductId(productId){
+		XMLHttpRequest.QMLProductId = productId
+	}
+	
+	GetGlobalAccessToken(){
+		return XMLHttpRequest.QMLAuthToken || ""
+	}
+	
+	GetProductId(){
+		return XMLHttpRequest.QMLProductId || ""
+	}
     
     setGqlQuery(gqlData, headers){
         this.state = "Loading"
