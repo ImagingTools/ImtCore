@@ -13,6 +13,8 @@ WebSocket {
 
 	property var subscriptionModel: []
 
+	property GqlModel __tokenHelper: GqlModel {}
+
 	Component.onCompleted: {
 		Events.subscribeEvent("RegisterSubscription", container.registerSubscriptionEvent);
 		Events.subscribeEvent("UnregisterSubscription", container.unRegisterSubscription);
@@ -118,7 +120,23 @@ WebSocket {
 			if (subscriptionModel[index]["status"] === "unregistered"){
 				let request = {}
 				request["id"] = subscriptionModel[index]["subscriptionId"]
-				request["headers"] = subscriptionModel[index]["headers"]
+
+				let headers = subscriptionModel[index]["headers"]
+				if (headers === undefined || headers === null){
+					headers = {}
+				}
+
+				let accessToken = __tokenHelper.GetGlobalAccessToken()
+				if (accessToken && !headers["x-authentication-token"]){
+					headers["x-authentication-token"] = accessToken
+				}
+
+				let productId = __tokenHelper.GetProductId()
+				if (productId && !headers["productId"]){
+					headers["productId"] = productId
+				}
+
+				request["headers"] = headers
 				request["type"] = "start"
 				let payload = {}
 				let query = subscriptionModel[index]["query"]
