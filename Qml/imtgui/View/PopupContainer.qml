@@ -195,7 +195,7 @@ Item {
 			let id = popupModel.get(index).id
 			popupModel.remove(index)
 			if (__customComponents.hasOwnProperty(id)){
-				delete __customComponents[id]
+				__customComponents[id] = undefined
 			}
 		}
 	}
@@ -223,7 +223,7 @@ Item {
 	}
 
 	function __getComponent(id){
-		if (__customComponents.hasOwnProperty(id)){
+		if (__customComponents.hasOwnProperty(id) && __customComponents[id]){
 			return __customComponents[id]
 		}
 		return popupContainer.delegate
