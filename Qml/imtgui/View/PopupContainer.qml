@@ -111,8 +111,7 @@ Item {
 
 		let existingIndex = findMessage(id)
 		if (existingIndex >= 0){
-			popupModel.set(existingIndex, { "type": type, "text": text, "closable": autoClose, "id": id })
-			return
+			popupModel.remove(existingIndex)
 		}
 
 		popupModel.insert(0, { "type": type, "text": text, "closable": autoClose, "id": id })
@@ -125,7 +124,8 @@ Item {
 
 		let existingIndex = findMessage(id)
 		if (existingIndex >= 0){
-			popupModel.set(existingIndex, { "type": type, "text": text, "closable": autoClose, "id": id })
+			popupModel.remove(existingIndex)
+			popupModel.insert(existingIndex, { "type": type, "text": text, "closable": autoClose, "id": id })
 		}
 	}
 
