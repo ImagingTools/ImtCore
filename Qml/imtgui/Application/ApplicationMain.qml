@@ -265,6 +265,9 @@ Item {
 	// which page is currently selected in MenuPanel.  Previously these lived
 	// inside TicketCollectionView.qml which is lazy-loaded by PagesManager,
 	// so notifications were lost until the user navigated to the Tickets page.
+	//
+	// autoSubscribe is false so that registration only happens after login
+	// (see onLoggedIn / onLoggedOut below).
 
 	// Subscribes to server-side ticket message notifications and surfaces
 	// them via PopupManager. The server-side filter (CTicketMessageNotifierComp)
@@ -273,6 +276,7 @@ Item {
 	SubscriptionClient {
 		id: ticketMessageSubscription
 		gqlCommandId: "OnTicketMessageReceived"
+		autoSubscribe: false
 		onMessageReceived: {
 			if (!data){
 				return
@@ -308,6 +312,7 @@ Item {
 	SubscriptionClient {
 		id: ticketAssigneeSubscription
 		gqlCommandId: "OnTicketAssigneeChanged"
+		autoSubscribe: false
 		onMessageReceived: {
 			if (!data){
 				return
@@ -479,9 +484,19 @@ Item {
 			thumbnailDecorator.showPage(undefined)
 			
 			application.updateAllModels();
+
+			// Register ticket notification subscriptions now that we have
+			// a valid auth token for the logged-in user.
+			ticketMessageSubscription.registerSubscription();
+			ticketAssigneeSubscription.registerSubscription();
 		}
 		
 		function onLoggedOut(){
+			// Unregister subscriptions for the previous user before
+			// SubscriptionManager.clear() wipes the model.
+			ticketMessageSubscription.unRegisterSubscription();
+			ticketAssigneeSubscription.unRegisterSubscription();
+
 			thumbnailDecorator.stopLoading();
 			application.firstModelsInit(true);
 			NavigationController.clear();

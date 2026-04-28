@@ -117,34 +117,13 @@ WebSocket {
 		container.subscriptionModel = []
 	}
 
-	// Retries registration of subscriptions that could not be sent because
-	// the auth token was not yet available (e.g. app startup before login).
-	property Timer __authRetryTimer: Timer {
-		interval: 2000
-		repeat: true
-		onTriggered: {
-			container.registerSubscriptionToServer()
-		}
-	}
-
 	function registerSubscriptionToServer(){
 		if (container.status != WebSocket.Open){
 			return;
 		}
 
-		let hasUnregistered = false
-
 		for (let index = 0; index < subscriptionModel.length; index++){
 			if (subscriptionModel[index]["status"] === "unregistered"){
-				let accessToken = container.__tokenHelper.GetGlobalAccessToken()
-
-				// If the auth token is not yet available, skip this
-				// subscription and let the retry timer try again later.
-				if (!accessToken){
-					hasUnregistered = true
-					continue
-				}
-
 				let request = {}
 				request["id"] = subscriptionModel[index]["subscriptionId"]
 
@@ -153,7 +132,8 @@ WebSocket {
 					headers = {}
 				}
 
-				if (!headers["x-authentication-token"]){
+				let accessToken = container.__tokenHelper.GetGlobalAccessToken()
+				if (accessToken && !headers["x-authentication-token"]){
 					headers["x-authentication-token"] = accessToken
 				}
 
@@ -174,10 +154,6 @@ WebSocket {
 				container.sendTextMessage(JSON.stringify(request))
 			}
 		}
-
-		// Start or stop the retry timer based on whether there are
-		// unregistered subscriptions still waiting for an auth token.
-		container.__authRetryTimer.running = hasUnregistered
 	}
 
 	function registerSubscription(query, subscriptionClient, headers){
