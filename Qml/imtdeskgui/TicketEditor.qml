@@ -272,6 +272,7 @@ DocumentViewBase {
 		setBlockingUpdateModel(false)
 		ticketData.modelChanged()
 		root.commentSubmitted(commentText)
+		root.doUpdateModel()
 	}
 
 	// Edit an existing comment in-place. The comment is located by its
@@ -307,6 +308,29 @@ DocumentViewBase {
 			if (!item) continue
 			if (String(item.m_id || "") === String(messageId)) {
 				item.m_deleted = true
+				break
+			}
+		}
+		setBlockingUpdateModel(false)
+		ticketData.modelChanged()
+		root.doUpdateModel()
+	}
+
+	// Remove an attachment from an existing comment by index. The updated
+	// attachment list is saved to the server via editComment() which
+	// triggers doUpdateModel() → IChatService::EditMessage with the
+	// reduced attachment list.
+	function removeCommentAttachment(messageId, attachmentIndex) {
+		if (!messageId || !ticketData || !ticketData.m_comments) return
+		setBlockingUpdateModel(true)
+		for (var i = 0; i < ticketData.m_comments.count; i++) {
+			var item = ticketData.m_comments.get(i).item
+			if (!item) continue
+			if (String(item.m_id || "") === String(messageId)) {
+				if (item.m_attachments && attachmentIndex >= 0 && attachmentIndex < item.m_attachments.count) {
+					item.m_attachments.removeElement(attachmentIndex)
+					item.m_edited = true
+				}
 				break
 			}
 		}
@@ -2262,21 +2286,38 @@ DocumentViewBase {
 
 													Repeater {
 														model: commentDelegate.dataModel.m_attachments || []
-														delegate: Text {
+														delegate: Row {
+															spacing: Style.spacingS
 															readonly property string attachmentUrl: model.item.m_preview || ""
-															width: parent.width
-															font.pixelSize: Style.fontSizeM
-															font.underline: attachmentUrl.length > 0
-															elide: Text.ElideRight
-															color: attachmentUrl.length > 0 ? editView.accentColor : Style.textColor
-															text: model.item.m_fileName || qsTr("file")
 
-															MouseArea {
-																anchors.fill: parent
-																enabled: parent.attachmentUrl.length > 0
-																hoverEnabled: enabled
-																cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-																onClicked: Qt.openUrlExternally(parent.attachmentUrl)
+															Text {
+																font.pixelSize: Style.fontSizeM
+																font.underline: attachmentUrl.length > 0
+																elide: Text.ElideRight
+																color: attachmentUrl.length > 0 ? editView.accentColor : Style.textColor
+																text: model.item.m_fileName || qsTr("file")
+
+																MouseArea {
+																	anchors.fill: parent
+																	enabled: parent.parent.attachmentUrl.length > 0
+																	hoverEnabled: enabled
+																	cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+																	onClicked: Qt.openUrlExternally(parent.parent.attachmentUrl)
+																}
+															}
+
+															Text {
+																visible: commentDelegate.isEditingThis
+																text: "\u2715"
+																font.pixelSize: Style.fontSizeM
+																color: Style.inactiveTextColor
+
+																MouseArea {
+																	anchors.fill: parent
+																	hoverEnabled: true
+																	cursorShape: Qt.PointingHandCursor
+																	onClicked: root.removeCommentAttachment(commentDelegate.dataModel.m_id, index)
+																}
 															}
 														}
 													}

@@ -91,16 +91,19 @@ public:
 		Edit the text content of an existing message. The message's
 		\c updatedAt timestamp is refreshed so clients can detect that
 		the message was edited.
-		\param messageId  The message to edit.
-		\param senderId   The user requesting the edit; must match the
-		                  original sender.
-		\param newContent The new text content.
+		\param messageId      The message to edit.
+		\param senderId       The user requesting the edit; must match the
+		                      original sender.
+		\param newContent     The new text content.
+		\param attachmentIds  Updated attachment ID list (replaces existing).
+		                      Pass an empty list to remove all attachments.
 		\return True on success.
 	*/
 	virtual bool EditMessage(
 				const QByteArray& messageId,
 				const QByteArray& senderId,
-				const QString& newContent) = 0;
+				const QString& newContent,
+				const QByteArrayList& attachmentIds) = 0;
 
 	/**
 		Permanently delete a message from its conversation.

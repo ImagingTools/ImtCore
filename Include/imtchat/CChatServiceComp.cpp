@@ -182,7 +182,8 @@ bool CChatServiceComp::MarkMessageRead(
 bool CChatServiceComp::EditMessage(
 			const QByteArray& messageId,
 			const QByteArray& senderId,
-			const QString& newContent)
+			const QString& newContent,
+			const QByteArrayList& attachmentIds)
 {
 	imtbase::IObjectCollection* messageCollectionPtr = m_messageCollectionCompPtr.GetPtr();
 	if (messageCollectionPtr == nullptr){
@@ -205,6 +206,7 @@ bool CChatServiceComp::EditMessage(
 	}
 
 	chatMessagePtr->SetContent(newContent);
+	chatMessagePtr->SetAttachmentIds(attachmentIds);
 	chatMessagePtr->SetUpdatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
 
 	return messageCollectionPtr->SetObjectData(messageId, *chatMessagePtr);

@@ -53,7 +53,8 @@ public:
 	virtual bool EditMessage(
 				const QByteArray& messageId,
 				const QByteArray& senderId,
-				const QString& newContent) override;
+				const QString& newContent,
+				const QByteArrayList& attachmentIds) override;
 	virtual bool DeleteMessage(
 				const QByteArray& messageId,
 				const QByteArray& senderId) override;

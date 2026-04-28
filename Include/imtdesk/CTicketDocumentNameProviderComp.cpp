@@ -15,12 +15,7 @@ QString CTicketDocumentNameProviderComp::GetDefaultDocumentName(const QByteArray
 {
 	const ISupportTicket* ticketPtr = dynamic_cast<const ISupportTicket*>(&document);
 	if (ticketPtr != nullptr){
-		const int number = ticketPtr->GetNumber();
-		const QString title = ticketPtr->GetTitle();
-		if (number > 0){
-			return QStringLiteral("#%1 %2").arg(number).arg(title);
-		}
-		return title;
+		return ticketPtr->GetTitle();
 	}
 
 	return QString();

@@ -489,18 +489,37 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 						continue;
 					}
 
-					// Edit request: only when content was provided and differs
-					// from the stored value. We compare against the current DB
-					// content to avoid unnecessary write operations.
+					// Edit request: when content or attachments have changed.
 					if (sdlItem->content){
 						imtbase::IObjectCollection::DataPtr msgDataPtr;
 						if (m_messageCollectionCompPtr.IsValid()
 								&& m_messageCollectionCompPtr->GetObjectData(messageId, msgDataPtr)){
 							const imtchat::IChatMessage* existingMsgPtr =
 									dynamic_cast<const imtchat::IChatMessage*>(msgDataPtr.GetPtr());
-							if (existingMsgPtr != nullptr
-									&& existingMsgPtr->GetContent() != *sdlItem->content){
-								m_chatServiceCompPtr->EditMessage(messageId, userId, *sdlItem->content);
+							if (existingMsgPtr != nullptr){
+								// Collect updated attachment IDs from the SDL item.
+								QByteArrayList editAttachmentIds;
+								if (sdlItem->attachments){
+									for (const auto& att : *sdlItem->attachments){
+										if (!att){
+											continue;
+										}
+										if (att->id && !att->id->isEmpty()){
+											QByteArray attId = *att->id;
+											int dotIdx = attId.lastIndexOf('.');
+											if (dotIdx > 0){
+												attId = attId.left(dotIdx);
+											}
+											editAttachmentIds << attId;
+										}
+									}
+								}
+								
+								bool contentChanged = existingMsgPtr->GetContent() != *sdlItem->content;
+								bool attachmentsChanged = existingMsgPtr->GetAttachmentIds() != editAttachmentIds;
+								if (contentChanged || attachmentsChanged){
+									m_chatServiceCompPtr->EditMessage(messageId, userId, *sdlItem->content, editAttachmentIds);
+								}
 							}
 						}
 					}
