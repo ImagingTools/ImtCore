@@ -79,6 +79,10 @@ RemoteCollectionView {
 								}
 							}
 						}
+
+						function onError(message, type){
+							root.updateRepresentationFailed(root.documentId, message)
+						}
 					}
 
 					property UpdateConversationInput updateConversationInput: UpdateConversationInput {}
@@ -93,6 +97,10 @@ RemoteCollectionView {
 									}
 								}
 							}
+						}
+
+						function onError(message, type){
+							root.updateDocumentFailed(root.documentId, message)
 						}
 					}
 				}

@@ -37,6 +37,7 @@ defineTest(prepareWebQml) {
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseProgressManagerSdl, $$buildwebdir/src/imtbaseProgressManagerSdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseDocumentIdFilterSdl, $$buildwebdir/src/imtbaseDocumentIdFilterSdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseMimeTypeSdl, $$buildwebdir/src/imtbaseMimeTypeSdl)
+	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseFilterableSelectSdl, $$buildwebdir/src/imtbaseFilterableSelectSdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imt2dsdl/SDL/1.0/QML/imt2dGeometrySdl, $$buildwebdir/src/imt2dGeometrySdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imt2dsdl/SDL/1.0/QML/imt2dPaintSystemSdl, $$buildwebdir/src/imt2dPaintSystemSdl)
 

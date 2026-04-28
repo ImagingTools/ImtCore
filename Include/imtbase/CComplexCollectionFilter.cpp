@@ -191,6 +191,19 @@ bool CComplexCollectionFilter::Serialize(iser::IArchive &archive)
 	retVal = retVal && m_timeFilter.Serialize(archive);
 	retVal = retVal && archive.EndTag(timeFilterTag);
 
+	// Serialization of the text filter
+	static iser::CArchiveTag textFilterTag("TextFilter", "Text filter", iser::CArchiveTag::TT_GROUP);
+	retVal = retVal && archive.BeginTag(textFilterTag);
+
+	static iser::CArchiveTag textTag("Text", "Text", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(textTag);
+	retVal = retVal && archive.Process(m_textFilter.text);
+	retVal = retVal && archive.EndTag(textTag);
+
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_textFilter.fieldIds, "FieldIds", "FieldId");
+
+	retVal = retVal && archive.EndTag(textFilterTag);
+
 	return retVal;
 }
 
@@ -281,7 +294,7 @@ bool CComplexCollectionFilter::SerializeFields(IComplexCollectionFilter::FieldIn
 
 	static iser::CArchiveTag flagsTag("Flags", "Flags", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(flagsTag);
-	// retVal = retVal && I_SERIALIZE_FLAG(SupportedOperations, archive, object.metaInfo.flags);
+	retVal = retVal && archive.Process(object.metaInfo.flags);
 	retVal = retVal && archive.EndTag(flagsTag);
 
 	static iser::CArchiveTag isDistinctTag("IsDistinct", "Is Distinct", iser::CArchiveTag::TT_LEAF);

@@ -1831,15 +1831,14 @@ bool CSqlDatabaseDocumentDelegateComp::CreateDocumentIdFilterQuery(
 			const imtcol::IDocumentIdFilter& documentIdFilter,
 			QString& documentIdFilterQuery) const
 {
+	imtcol::IDocumentIdFilter::ConditionType conditionType = documentIdFilter.GetConditionType();
+	if (conditionType == imtcol::IDocumentIdFilter::CT_NONE){
+		// No filter requested — caller skips adding the clause.
+		return true;
+	}
+
 	const QByteArrayList documentIds = documentIdFilter.GetDocumentIds();
 	if (documentIds.isEmpty()){
-		if (documentIdFilter.GetConditionType() == imtcol::IDocumentIdFilter::ConditionType::CT_IN){
-			documentIdFilterQuery = QStringLiteral("1 = 0");
-		}
-		else{
-			documentIdFilterQuery = QStringLiteral("1 = 1");
-		}
-
 		return true;
 	}
 
@@ -1850,7 +1849,6 @@ bool CSqlDatabaseDocumentDelegateComp::CreateDocumentIdFilterQuery(
 		idStrings << QString("'%1'").arg(SqlEncode(QString::fromUtf8(id)));
 	}
 
-	imtcol::IDocumentIdFilter::ConditionType conditionType = documentIdFilter.GetConditionType();
 	QString conditionStr;
 	switch (conditionType){
 	case imtcol::IDocumentIdFilter::CT_IN:
@@ -1858,6 +1856,8 @@ bool CSqlDatabaseDocumentDelegateComp::CreateDocumentIdFilterQuery(
 		break;
 	case imtcol::IDocumentIdFilter::CT_NOT_IN:
 		conditionStr = QStringLiteral("NOT IN");
+		break;
+	default:
 		break;
 	}
 	
