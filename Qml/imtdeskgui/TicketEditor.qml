@@ -115,6 +115,18 @@ DocumentViewBase {
 		.replace(/\n/g, "<br>")
 	}
 
+	// Convert literal \n sequences to real newlines (for plain-text editing)
+	function __unescapeNewlines(content) {
+		if (!content) return ""
+		return String(content).replace(/\\n/g, "\n")
+	}
+
+	// Convert real newlines back to literal \n sequences (for server storage)
+	function __escapeNewlines(text) {
+		if (!text) return ""
+		return String(text).replace(/\n/g, "\\n")
+	}
+
 	function normalizeUserId(userId) {
 		if (userId === undefined || userId === null)
 			return ""
@@ -1284,6 +1296,7 @@ DocumentViewBase {
 								
 								Flow {
 									width: parent.width
+									clip: true
 									spacing: Style.spacingXS
 									visible: root.pendingAssignees.length > 0
 									
@@ -1467,6 +1480,7 @@ DocumentViewBase {
 								// Entity chips (tags-style)
 								Flow {
 									width: parent.width
+									clip: true
 									spacing: Style.spacingXS
 									visible: root.pendingEntityRefs.length > 0
 									
@@ -2105,17 +2119,22 @@ DocumentViewBase {
 													Column {
 														anchors.top: parent.top
 														anchors.topMargin: 2
+														width: bubbleContent.width - editView.avatarSize - Style.spacingS
+														clip: true
 														spacing: 2
 														
 														Text {
+															width: parent.width
 															text: commentDelegate.isMe ? qsTr("You") : (model.item.m_userName || qsTr("Unknown"))
 															font.pixelSize: Style.fontSizeM
 															font.bold: true
 															color: Style.textColor
+															elide: Text.ElideRight
 														}
 														
 														Row {
 															spacing: Style.spacingXS
+															clip: true
 															Text {
 																text: root.formatTimestamp(model.item.m_timestamp)
 																font.pixelSize: Style.fontSizeM - 1
@@ -2224,10 +2243,10 @@ DocumentViewBase {
 															color: Style.textColor
 															wrapMode: TextEdit.Wrap
 															textFormat: TextEdit.PlainText
-															text: model.item.m_content || ""
+															text: root.__unescapeNewlines(model.item.m_content)
 															onVisibleChanged: {
 																if (visible) {
-																	text = model.item.m_content || ""
+																	text = root.__unescapeNewlines(model.item.m_content)
 																	editMessageFocusTimer.start()
 																}
 															}
@@ -2272,7 +2291,7 @@ DocumentViewBase {
 																cursorShape: Qt.PointingHandCursor
 																onClicked: {
 																	editCancelOnBlurTimer.stop()
-																	var newText = editMessageInput.text
+																	var newText = root.__escapeNewlines(editMessageInput.text)
 																	root._editingMessageId = ""
 																	root.editComment(model.item.m_id, newText)
 																}
