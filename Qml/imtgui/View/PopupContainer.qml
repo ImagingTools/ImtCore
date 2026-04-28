@@ -9,6 +9,8 @@ Item {
 
 	width: Style.sizeHintXS
 
+	property int __nextAutoId: 0
+
 	Column {
 		id: messageColumn
 		spacing: Style.marginM
@@ -18,6 +20,10 @@ Item {
 			model: popupModel
 
 			delegate: Rectangle {
+				id: delegateRoot
+
+				property string messageId: model.id
+
 				width: popupContainer.width
 				height: Style.sizeHintBXS
 				color: model.type == "error" ? "#ffcccc" : model.type == "warning" ? "#fff4cc" : "#ccffcc"
@@ -26,7 +32,7 @@ Item {
 
 				Component.onCompleted: {
 					if (model.closable){
-						autoCloseTimer.start();
+						autoCloseTimer.restart();
 					}
 				}
 
@@ -74,7 +80,7 @@ Item {
 					}
 
 					onClicked: {
-						popupModel.remove(model.index)
+						popupContainer.removeMessageById(delegateRoot.messageId)
 					}
 				}
 
@@ -82,7 +88,7 @@ Item {
 					id: autoCloseTimer
 					interval: 5000
 					onTriggered: {
-						popupModel.remove(model.index)
+						popupContainer.removeMessageById(delegateRoot.messageId)
 					}
 				}
 			}
@@ -98,11 +104,29 @@ Item {
 			autoClose = false
 		}
 
-		if (!id){
-			id = ""
+		if (!id || id === ""){
+			id = "__auto_" + __nextAutoId
+			__nextAutoId++
+		}
+
+		let existingIndex = findMessage(id)
+		if (existingIndex >= 0){
+			popupModel.set(existingIndex, { "type": type, "text": text, "closable": autoClose, "id": id })
+			return
 		}
 
 		popupModel.insert(0, { "type": type, "text": text, "closable": autoClose, "id": id })
+	}
+
+	function replaceMessage(id, type, text, autoClose){
+		if (!autoClose){
+			autoClose = false
+		}
+
+		let existingIndex = findMessage(id)
+		if (existingIndex >= 0){
+			popupModel.set(existingIndex, { "type": type, "text": text, "closable": autoClose, "id": id })
+		}
 	}
 
 	function removeMessage(index){
@@ -118,7 +142,7 @@ Item {
 
 	function findMessage(id){
 		for (let i = 0; i < popupModel.count; i++){
-			if (id == popupModel.get(i).id){
+			if (id === popupModel.get(i).id){
 				return i;
 			}
 		}

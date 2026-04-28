@@ -32,6 +32,24 @@ QtObject {
 		}
 	}
 
+	function replaceErrorMessage(id, text, autoClose){
+		if (popupContainer){
+			popupContainer.replaceMessage(id, "error", text, autoClose)
+		}
+	}
+
+	function replaceWarningMessage(id, text, autoClose){
+		if (popupContainer){
+			popupContainer.replaceMessage(id, "warning", text, autoClose)
+		}
+	}
+
+	function replaceSuccessMessage(id, text, autoClose){
+		if (popupContainer){
+			popupContainer.replaceMessage(id, "success", text, autoClose)
+		}
+	}
+
 	function closeMessage(id){
 		if (!popupContainer){
 			return
