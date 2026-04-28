@@ -171,20 +171,25 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 		webSocketRequestPtr->SetCommandId(gqlRequest.GetCommandId());
 	}
 
-	imtgql::IGqlContext* gqlContextPtr = const_cast<imtgql::IGqlContext*>(gqlRequest.GetRequestContext());
+	imtgql::IGqlContext* gqlContextPtr = nullptr;
 	imtgql::IGqlContext::Headers gqlHeaders;
-	if (gqlContextPtr != nullptr){
-		gqlHeaders = gqlContextPtr->GetHeaders();
-	}
-	else{
-		gqlContextPtr = new imtgql::CGqlContext();
-	}
+
 	QJsonObject headers = rootObject.value("headers").toObject();
 	for (QString& key: headers.keys()){
 		gqlHeaders.insert(key.toUtf8().toLower(), headers.value(key).toString().toUtf8());
 	}
 
-	gqlContextPtr->SetHeaders(gqlHeaders);
+	if (m_gqlContextControllerCompPtr.IsValid()){
+		QByteArray token = gqlHeaders.value(QByteArrayLiteral("x-authentication-token"));
+		QString errorMessage;
+		gqlContextPtr = m_gqlContextControllerCompPtr->GetRequestContext(gqlRequest, token, gqlHeaders, errorMessage);
+	}
+
+	if (gqlContextPtr == nullptr){
+		gqlContextPtr = new imtgql::CGqlContext();
+		gqlContextPtr->SetHeaders(gqlHeaders);
+	}
+
 	gqlRequest.SetGqlContext(gqlContextPtr);
 
 	QByteArray commandId = gqlRequest.GetCommandId();
