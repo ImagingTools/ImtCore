@@ -24,4 +24,11 @@ QtObject {
     property int tonemapMode: 1
     property int antialiasingMode: 0
     property int antialiasingQuality: 0
+    property var fog: undefined
+    property var effects: undefined
+    property var skyBoxCubeMap: undefined
+    property real probeExposure: 1
+    property real probeHorizon: -1
+    property bool depthTestEnabled: true
+    property bool depthPrePassEnabled: false
 }

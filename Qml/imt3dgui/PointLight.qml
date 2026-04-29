@@ -7,4 +7,9 @@ Node3D {
     property real linearFade: 0
     property real quadraticFade: 1
     property bool castsShadow: false
+    property int shadowMapQuality: 1
+    property real shadowBias: 0
+    property real shadowMapFar: 5000
+    property int bakeMode: 0
+    property var scope: undefined
 }
