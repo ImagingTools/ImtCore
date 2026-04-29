@@ -31,6 +31,7 @@
         <Element ComponentName="TicketCollectionDocumentManager" X="775" Y="450" Note=""/>
         <Element ComponentName="TicketDocumentNameProvider" X="1050" Y="625" Note=""/>
         <Element ComponentName="TicketMessageNotifier" X="0" Y="0" Note=""/>
+        <Element ComponentName="TicketAssigneeNotifier" X="0" Y="100" Note=""/>
         <Element ComponentName="TicketSqlRepository" X="275" Y="725" Note=""/>
         <Element ComponentName="TicketsChangeNotifier" X="200" Y="75" Note=""/>
         <Element ComponentName="UserFilterableSelectController" X="1200" Y="75" Note=""/>
