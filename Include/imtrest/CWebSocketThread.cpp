@@ -45,6 +45,8 @@ CWebSocketThread::CWebSocketThread(CWebSocketServerComp* parent)
 	m_requestServerHandlerPtr = m_server->GetRequestServerServlet();
 	m_requestClientHandlerPtr = m_server->GetRequestClientServlet();
 	m_productId = m_server->GetProductId();
+
+	// Always send through the event loop so disconnect/deleteLater events can clear m_socket first.
 	connect(this, &CWebSocketThread::SendTextMessage, this, &CWebSocketThread::OnSendTextMessage, Qt::QueuedConnection);
 }
 
@@ -59,8 +61,6 @@ void CWebSocketThread::SetWebSocket(QWebSocket* webSocketPtr)
 		connect(webSocketPtr, &QWebSocket::disconnected, this, &CWebSocketThread::OnSocketDisconnected, Qt::UniqueConnection);
 #if (QT_VERSION >= 0x060500)
 		connect(webSocketPtr, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::errorOccurred), this, &CWebSocketThread::OnError, Qt::UniqueConnection);
-#else
-//		connect(webSocketPtr, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error), this, &CWebSocketServerComp::OnError, Qt::UniqueConnection);
 #endif
 	}
 
@@ -298,4 +298,3 @@ void CWebSocketThread::OnSendTextMessage(const QByteArray& data) const
 
 
 } // namespace imtrest
-
