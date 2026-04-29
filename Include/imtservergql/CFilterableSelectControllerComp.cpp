@@ -44,7 +44,7 @@ bool CFilterableSelectControllerComp::IsRequestSupported(const imtgql::CGqlReque
 
 sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectControllerComp::OnGetSelectableItems(
 			const sdl::imtbase::FilterableSelect::CGetSelectableItemsGqlRequest& getSelectableItemsRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload response;
@@ -103,6 +103,14 @@ sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectCont
 			if (m_complexCollectionFilterRepresentationController.GetDataModelFromSdlRepresentation(*complexFilterPtr, *viewParams.filterModel)){
 				filterParams.SetEditableParameter("ComplexFilter", complexFilterPtr, true);
 			}
+		}
+	}
+
+	// Apply additional filters from filter providers
+	for (int i = 0; i < m_filterProvidersCompPtr.GetCount(); ++i){
+		const IFilterableSelectFilterProvider* filterProviderPtr = m_filterProvidersCompPtr.GetAt(i);
+		if (filterProviderPtr != nullptr){
+			filterProviderPtr->ApplySelectFilters(gqlRequest, filterParams);
 		}
 	}
 
