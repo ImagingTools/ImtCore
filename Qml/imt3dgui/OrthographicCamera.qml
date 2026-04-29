@@ -1,7 +1,5 @@
-// OrthographicCamera - orthographic projection camera.
 import QtQuick 2.15
+import QtQuick3D 6.5 as QQ3D
 
-Node3D {
-    property real clipNear: -10000
-    property real clipFar: 10000
+QQ3D.OrthographicCamera {
 }
