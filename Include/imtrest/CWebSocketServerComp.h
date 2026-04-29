@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QtWebSockets/QWebSocket>
+#include <QtCore/QMutex>
 #include <QtCore/QSharedPointer>
 
 // ACF includes
@@ -129,6 +130,7 @@ protected:
 	QTimer m_timer;
 	istd::TDelPtr<QWebSocketServer> m_webSocketServerPtr;
 	QList<CWebSocketThread*> m_webSocketThreadList;
+	mutable QMutex m_webSocketThreadListMutex;
 	QMap <QByteArray, QSharedPointer<CWebSocketSender>> m_senders;
 	QMap <QByteArray, imtcom::IConnectionStatusProvider::ConnectionStatus> m_senderLoginStatusMap;
 	mutable QReadWriteLock m_sendersLock;
@@ -151,5 +153,4 @@ private:
 
 
 } // namespace imtrest
-
 

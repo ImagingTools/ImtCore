@@ -146,10 +146,17 @@ void CWebSocketServerComp::OnModelChanged(int /*modelId*/, const istd::IChangeab
 	Q_ASSERT_X(m_sslConfigurationCompPtr.IsValid() && m_sslConfigurationManagerCompPtr.IsValid(), "Update server's SSL configuration", "SSL configuration or manager is not set!");
 
 	if (m_startServerOnCreateAttrPtr.IsValid() && *m_startServerOnCreateAttrPtr && m_isInitialized){
-		while (m_webSocketThreadList.count() > 0){
-			imtrest::CWebSocketThread* webSocketThread = m_webSocketThreadList.back();
+		QList<CWebSocketThread*> webSocketThreads;
+		{
+			QMutexLocker locker(&m_webSocketThreadListMutex);
+			webSocketThreads = m_webSocketThreadList;
+			m_webSocketThreadList.clear();
+		}
+
+		while (webSocketThreads.count() > 0){
+			imtrest::CWebSocketThread* webSocketThread = webSocketThreads.back();
 			webSocketThread->disconnect();
-			m_webSocketThreadList.pop_back();
+			webSocketThreads.pop_back();
 		}
 		StopServer();
 		EnsureServerStarted();
@@ -338,7 +345,11 @@ void CWebSocketServerComp::HandleNewConnections()
 		}
 #endif
 		CWebSocketThread* webSocketThreadPtr = new CWebSocketThread(this);
-		m_webSocketThreadList.append(webSocketThreadPtr);
+		{
+			QMutexLocker locker(&m_webSocketThreadListMutex);
+			m_webSocketThreadList.append(webSocketThreadPtr);
+		}
+
 		QPointer<CWebSocketServerComp> serverGuard(this);
 		QPointer<CWebSocketThread> webSocketThreadGuard(webSocketThreadPtr);
 		connect(webSocketThreadPtr, &QThread::finished, this, [serverGuard, webSocketThreadGuard](){
@@ -346,6 +357,7 @@ void CWebSocketServerComp::HandleNewConnections()
 				return;
 			}
 
+			QMutexLocker locker(&serverGuard->m_webSocketThreadListMutex);
 			serverGuard->m_webSocketThreadList.removeAll(webSocketThreadGuard.data());
 			webSocketThreadGuard->deleteLater();
 		}, Qt::QueuedConnection);
@@ -406,8 +418,16 @@ void CWebSocketServerComp::OnTimeout()
 	// Use QPointer guards and index-based iteration: sendTextMessage can
 	// trigger the Windows message pump, which may destroy other QWebSockets.
 	QSet<QWebSocket*> sentSockets;
-	for (int i = 0; i < m_webSocketThreadList.count(); ++i){
-		QPointer<CWebSocketThread> webSocketThreadPtr(m_webSocketThreadList.at(i));
+	QList<QPointer<CWebSocketThread>> webSocketThreads;
+	{
+		QMutexLocker locker(&m_webSocketThreadListMutex);
+		for (CWebSocketThread* webSocketThreadPtr : m_webSocketThreadList){
+			webSocketThreads.append(QPointer<CWebSocketThread>(webSocketThreadPtr));
+		}
+	}
+
+	for (int i = 0; i < webSocketThreads.count(); ++i){
+		QPointer<CWebSocketThread> webSocketThreadPtr(webSocketThreads.at(i));
 		if (webSocketThreadPtr.isNull()){
 			continue;
 		}
