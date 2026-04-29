@@ -4,7 +4,6 @@
 
 // Qt includes
 #include <QtCore/QMutex>
-#include <QtCore/QPointer>
 
 
 namespace imtservergql
@@ -50,18 +49,11 @@ bool CConnectionStatusSubscriberControllerComp::RegisterSubscription(
 		return false;
 	}
 
-	const imtrest::CWebSocketRequest* webSocketRequestPtr = dynamic_cast<const imtrest::CWebSocketRequest*>(&networkRequest);
-	QPointer<QObject> requestGuard(const_cast<imtrest::CWebSocketRequest*>(webSocketRequestPtr));
-
 	bool result = BaseClass::RegisterSubscription(subscriptionId, gqlRequest, networkRequest, errorMessage);
 	if (result){
 		QByteArray data = CreateBodySubscription().toUtf8();
 
 		QMutexLocker locker(&m_mutex);
-		if (requestGuard.isNull()){
-			return result;
-		}
-
 		if (IsSubscriptionRequestRegisteredLocked(subscriptionId, networkRequest)){
 			QByteArray commandId = m_commandIdsAttrPtr[0];
 			PushDataToSubscriber(subscriptionId, commandId, data, networkRequest);
