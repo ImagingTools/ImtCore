@@ -1,5 +1,9 @@
 import QtQuick 2.15
-import QtQuick3D 6.5 as QQ3D
 
-QQ3D.SpotLight {
+Node3D {
+    property color color: "#ffffff"
+    property real brightness: 1
+    property real coneAngle: 40
+    property real innerConeAngle: 30
+    property bool castsShadow: false
 }
