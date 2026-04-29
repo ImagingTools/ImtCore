@@ -151,6 +151,18 @@ bool CGqlPublisherCompBase::PushDataToSubscriber(
 }
 
 
+bool CGqlPublisherCompBase::IsSubscriptionRequestRegisteredLocked(const QByteArray& subscriptionId, const imtrest::IRequest& networkRequest) const
+{
+	for (const RequestNetworks& entry : m_registeredSubscribers){
+		if (entry.networkRequests.value(subscriptionId) == &networkRequest){
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
 bool CGqlPublisherCompBase::PublishData(const QByteArray& commandId, const QByteArray& data) const
 {
 	return PublishDataFiltered(commandId, data, nullptr);
@@ -189,5 +201,4 @@ bool CGqlPublisherCompBase::PublishDataFiltered(
 
 
 } // namespace imtservergql
-
 

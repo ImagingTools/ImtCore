@@ -50,6 +50,7 @@ protected:
 		const QByteArray& commandId,
 		const QByteArray& data,
 		std::function<bool(const imtgql::CGqlRequest&)> predicate) const;
+	bool IsSubscriptionRequestRegisteredLocked(const QByteArray& subscriptionId, const imtrest::IRequest& networkRequest) const;
 
 protected:
 	I_MULTIATTR(QByteArray, m_commandIdsAttrPtr);
@@ -72,5 +73,4 @@ protected:
 
 
 } // namespace imtservergql
-
 

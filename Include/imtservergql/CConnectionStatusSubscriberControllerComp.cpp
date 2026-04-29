@@ -62,12 +62,9 @@ bool CConnectionStatusSubscriberControllerComp::RegisterSubscription(
 			return result;
 		}
 
-		for (const BaseClass::RequestNetworks& entry : m_registeredSubscribers){
-			if (entry.networkRequests.value(subscriptionId) == &networkRequest){
-				QByteArray commandId = m_commandIdsAttrPtr[0];
-				PushDataToSubscriber(subscriptionId, commandId, data, networkRequest);
-				break;
-			}
+		if (IsSubscriptionRequestRegisteredLocked(subscriptionId, networkRequest)){
+			QByteArray commandId = m_commandIdsAttrPtr[0];
+			PushDataToSubscriber(subscriptionId, commandId, data, networkRequest);
 		}
 	}
 

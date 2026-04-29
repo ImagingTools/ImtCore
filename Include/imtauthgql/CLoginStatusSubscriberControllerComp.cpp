@@ -54,19 +54,10 @@ bool CLoginStatusSubscriberControllerComp::RegisterSubscription(
 			return result;
 		}
 
-		bool subscriptionActive = false;
-		for (const BaseClass::RequestNetworks& entry : m_registeredSubscribers){
-			if (entry.networkRequests.value(subscriptionId) == &networkRequest){
-				subscriptionActive = true;
-				break;
-			}
+		if (IsSubscriptionRequestRegisteredLocked(subscriptionId, networkRequest)){
+			QByteArray commandId = m_commandIdsAttrPtr[0];
+			PushDataToSubscriber(subscriptionId, commandId, data.toUtf8(), networkRequest);
 		}
-		if (!subscriptionActive){
-			return result;
-		}
-
-		QByteArray commandId = m_commandIdsAttrPtr[0];
-		PushDataToSubscriber(subscriptionId, commandId, data.toUtf8(), networkRequest);
 	}
 
 	return result;
