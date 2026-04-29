@@ -230,7 +230,7 @@ void CWebSocketThread::OnSocketDisconnected()
 	// Explicitly clean up subscription requests parented to this thread.
 	// Their destructors call OnRequestDestroyed on publishers, cleanly
 	// unregistering subscriptions before the QWebSocket is destroyed.
-	QList<CWebSocketRequest*> requests = findChildren<CWebSocketRequest*>();
+	QList<CWebSocketRequest*> requests = findChildren<CWebSocketRequest*>(QString(), Qt::FindDirectChildrenOnly);
 	qDeleteAll(requests);
 
 	m_socket = nullptr;
