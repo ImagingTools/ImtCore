@@ -2,6 +2,10 @@
 #include <imtrest/CWebSocketServerComp.h>
 
 
+// Qt includes
+#include <QtCore/QPointer>
+#include <QtCore/QSet>
+
 // ACF includes
 #include <istd/TDelPtr.h>
 #include <iprm/IEnableableParam.h>
@@ -391,31 +395,57 @@ void CWebSocketServerComp::OnSocketDisconnected()
 		m_senderLoginStatusMap.remove(key);
 	}
 
+	// Abort the socket to immediately close the underlying native handle.
+	// On Windows, the event loop (via CallWindowProcW) can dispatch stale
+	// network events for sockets that are still technically "alive" but
+	// queued for deferred deletion.  Aborting closes the native handle
+	// synchronously so that no further network events can arrive for this
+	// socket between now and the DeferredDelete.  Without this, the
+	// 8-deep QWebSocket::qt_metacall cascade (internal QSslSocket/
+	// QTcpSocket signal chain on freed memory) is triggered when the
+	// event loop dispatches a stale message after ~QWebSocket has run.
+	QWebSocket* webSocket = qobject_cast<QWebSocket*>(socketObjectPtr);
+	if (webSocket != nullptr){
+		webSocket->abort();
+	}
+
 	socketObjectPtr->deleteLater();
 }
 
 
 void CWebSocketServerComp::OnTimeout()
 {
-	QList<QWebSocket*> sendedSockets;
-	for (CWebSocketThread* webSocketThread: m_webSocketThreadList) {
-		QWebSocket* webSocketPtr = const_cast<QWebSocket*>(webSocketThread->GetWebSocket());
-		if (webSocketPtr != nullptr && !sendedSockets.contains(webSocketPtr)){
-			QString subProtocolId;
+	// Use QPointer guards and index-based iteration: sendTextMessage can
+	// trigger the Windows message pump (CallWindowProcW), which may process
+	// events — including disconnect notifications or DeferredDeletes — that
+	// destroy QWebSockets in this list.  QPointer auto-clears on destruction
+	// so we detect stale pointers.  Index-based iteration tolerates list
+	// mutations (HandleNewConnections may append during reentrancy).
+	QSet<QWebSocket*> sentSockets;
+	for (int i = 0; i < m_webSocketThreadList.count(); ++i){
+		QPointer<QWebSocket> webSocketPtr(const_cast<QWebSocket*>(m_webSocketThreadList.at(i)->GetWebSocket()));
+		if (webSocketPtr.isNull() || sentSockets.contains(webSocketPtr.data())){
+			continue;
+		}
 
-		#if QT_VERSION >= QT_VERSION_CHECK(6, 4, 0)
-			subProtocolId = webSocketPtr->subprotocol();
-		#endif
+		if (!webSocketPtr->isValid()){
+			continue;
+		}
 
-			if (subProtocolId == "graphql-transport-ws"){
-				//optional ToDo: Remember send ping and disconnect websocket if no pong is received
-				webSocketPtr->sendTextMessage(QString(R"({"type": "ping"})"));
-			}
-			else{
-				webSocketPtr->sendTextMessage(QString(R"({"type": "ka"})"));
-			}
+		sentSockets.insert(webSocketPtr.data());
 
-			sendedSockets.append(webSocketPtr);
+		QString subProtocolId;
+
+	#if QT_VERSION >= QT_VERSION_CHECK(6, 4, 0)
+		subProtocolId = webSocketPtr->subprotocol();
+	#endif
+
+		if (subProtocolId == "graphql-transport-ws"){
+			//optional ToDo: Remember send ping and disconnect websocket if no pong is received
+			webSocketPtr->sendTextMessage(QString(R"({"type": "ping"})"));
+		}
+		else{
+			webSocketPtr->sendTextMessage(QString(R"({"type": "ka"})"));
 		}
 	}
 }
