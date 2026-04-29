@@ -55,11 +55,12 @@ void CWebSocketThread::SetWebSocket(QWebSocket* webSocketPtr)
 	m_socket = webSocketPtr;
 
 	if (webSocketPtr != nullptr){
-		connect(webSocketPtr, &QWebSocket::textMessageReceived, this, &CWebSocketThread::OnWebSocketTextMessage, Qt::UniqueConnection);
-		connect(webSocketPtr, &QWebSocket::binaryMessageReceived, this, &CWebSocketThread::OnWebSocketBinaryMessage, Qt::UniqueConnection);
-		connect(webSocketPtr, &QWebSocket::disconnected, this, &CWebSocketThread::OnSocketDisconnected, Qt::UniqueConnection);
+		const Qt::ConnectionType connectionType = static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection);
+		connect(webSocketPtr, &QWebSocket::textMessageReceived, this, &CWebSocketThread::OnWebSocketTextMessage, connectionType);
+		connect(webSocketPtr, &QWebSocket::binaryMessageReceived, this, &CWebSocketThread::OnWebSocketBinaryMessage, connectionType);
+		connect(webSocketPtr, &QWebSocket::disconnected, this, &CWebSocketThread::OnSocketDisconnected, connectionType);
 #if (QT_VERSION >= 0x060500)
-		connect(webSocketPtr, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::errorOccurred), this, &CWebSocketThread::OnError, Qt::UniqueConnection);
+		connect(webSocketPtr, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::errorOccurred), this, &CWebSocketThread::OnError, connectionType);
 #endif
 	}
 
@@ -215,9 +216,6 @@ void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 
 void CWebSocketThread::OnSocketDisconnected()
 {
-	if (!m_socket.isNull()){
-		disconnect(m_socket.data(), nullptr, this, nullptr);
-	}
 	m_socket = nullptr;
 	exit();
 }
