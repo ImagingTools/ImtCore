@@ -299,11 +299,17 @@ bool CGqlRequest::ParseQuery(const QByteArray& query, qsizetype& errorPosition)
 	}
 	else{
 		index = body.indexOf('{');
+		if (index == -1){
+			return false;
+		}
 		m_commandId = body.left(index);
 		m_startParams = endParams = true;
 	}
 
 	m_commandId = m_commandId.simplified().replace(' ', "");
+	if (m_commandId.isEmpty()){
+		return false;
+	}
 	body = body.remove(0, index);
 	m_activeGqlObjectPtr = nullptr;
 	m_activeFieldObjectPtr = nullptr;

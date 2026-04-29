@@ -143,7 +143,7 @@ void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 		imtrest::CWebSocketRequest::MethodType methodType = webSocketRequest->GetMethodType();
 		if (methodType == CWebSocketRequest::MT_START || methodType == CWebSocketRequest::MT_SUBSCRIBE){
 			newRequestPtr.PopPtr();
-			webSocketRequest->setParent(m_socket);
+			webSocketRequest->setParent(this);
 			if (m_server != nullptr){
 				m_server->RegisterSender(webSocketRequest->GetRequestId(), webSocketPtr);
 			}
