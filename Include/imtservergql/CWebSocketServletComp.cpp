@@ -5,7 +5,6 @@
 // Qt includes
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
-#include <QtCore/QCoreApplication>
 #include <QtCore/QPointer>
 
 // ImtCore includes
@@ -201,18 +200,10 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	QByteArray accessToken = gqlHeaders.value(QByteArrayLiteral("x-authentication-token"));
 	QByteArray productId = gqlHeaders.value(imtbase::s_productIdHeaderId);
 
-	// Flush any pending deferred deletions (e.g. old WebSocket objects from page reload)
-	// BEFORE calling auth validation. Auth calls (ValidateJwt, GetObjectData, CreateGqlContext)
-	// may trigger Qt event processing. If old socket deleteLater() events fire during those calls,
-	// they cascade-destroy old CWebSocketRequests, triggering OnRequestDestroyed in publishers
-	// and potentially corrupting state. Flushing first ensures clean state.
-	QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
-
-	// Verify request is still alive after flushing deferred deletes
-	if (requestGuard.isNull()){
-		SendErrorMessage(0, QStringLiteral("WebSocket request destroyed during deferred-delete flush"), QStringLiteral("CWebSocketServletComp"));
-		return imtrest::ConstResponsePtr();
-	}
+	// NOTE: CWebSocketRequests are parented to CWebSocketThread (not QWebSocket),
+	// so auth validation calls (ValidateJwt, ValidateToken) that trigger Qt event
+	// processing are safe — even if old QWebSocket deleteLater() fires during processing,
+	// it won't cascade-delete CWebSocketRequests. No sendPostedEvents flush needed.
 
 	// Validate token and extract userId — same pattern as CHttpGraphQLServletComp::OnPost
 	QByteArray userId;
@@ -241,7 +232,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 		}
 	}
 
-	// Verify request is still alive after auth validation
+	// Verify request is still alive after auth validation (safety check)
 	if (requestGuard.isNull()){
 		SendErrorMessage(0, QStringLiteral("WebSocket request destroyed during auth validation"), QStringLiteral("CWebSocketServletComp"));
 		return imtrest::ConstResponsePtr();
@@ -250,9 +241,8 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	// Create simple GqlContext with authenticated user info.
 	// NOTE: We intentionally do NOT use IGqlContextCreator::CreateGqlContext() here.
 	// CreateGqlContext accesses UserCollection/UserSettingsCollection (database),
-	// which triggers Qt event loop processing. During that processing, old WebSocket
-	// deleteLater() events fire, cascade-destroying CWebSocketRequest objects → crash.
-	// A simple CGqlContext with userId/token/productId is sufficient for subscriptions —
+	// which triggers Qt event loop processing — unnecessary for subscriptions.
+	// A simple CGqlContext with userId/token/productId is sufficient —
 	// PublishDataFiltered only needs GetUserId() for filtering.
 	{
 		imtgql::CGqlContext* simpleContext = new imtgql::CGqlContext();
