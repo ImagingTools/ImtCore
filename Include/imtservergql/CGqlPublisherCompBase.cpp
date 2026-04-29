@@ -5,6 +5,9 @@
 // ACF includes
 #include<istd/TDelPtr.h>
 
+// Qt includes
+#include<QtCore/QPointer>
+
 // ImtCore includes
 #include<imtrest/IProtocolEngine.h>
 #include<imtrest/ITransport.h>
@@ -47,14 +50,19 @@ bool CGqlPublisherCompBase::RegisterSubscription(
 		return false;
 	}
 
+	// CWebSocketRequest is a QObject parented to QWebSocket. If the connection drops,
+	// the parent destroys its children, invalidating the reference. Use QPointer to
+	// detect this at the base level before dereferencing.
 	const imtrest::CWebSocketRequest* constWebSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&networkRequest);
-	imtrest::CWebSocketRequest* webSocketRequest = dynamic_cast<imtrest::CWebSocketRequest*>(const_cast<imtrest::CWebSocketRequest*>(constWebSocketRequest));
-	if (webSocketRequest == nullptr){
-		errorMessage = QString("Internal error");
+	if (constWebSocketRequest == nullptr){
+		errorMessage = QString("Internal error: networkRequest is not a CWebSocketRequest");
 		SendErrorMessage(0, errorMessage, "CGqlPublisherCompBase");
 
 		return false;
 	}
+
+	QPointer<QObject> requestGuard(const_cast<imtrest::CWebSocketRequest*>(constWebSocketRequest));
+	imtrest::CWebSocketRequest* webSocketRequest = const_cast<imtrest::CWebSocketRequest*>(constWebSocketRequest);
 
 	QMutexLocker locker(&m_mutex);
 
@@ -66,6 +74,12 @@ bool CGqlPublisherCompBase::RegisterSubscription(
 		}
 	}
 
+	// Verify the request is still alive before storing its pointer
+	if (requestGuard.isNull()){
+		errorMessage = QStringLiteral("WebSocket request was destroyed during registration");
+		SendErrorMessage(0, errorMessage, "CGqlPublisherCompBase");
+		return false;
+	}
 
 	// To support unique variables per user, every subscription MUST have its own RequestNetworks entry.
 	RequestNetworks newEntry;

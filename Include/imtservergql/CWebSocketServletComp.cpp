@@ -5,6 +5,7 @@
 // Qt includes
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
+#include <QtCore/QPointer>
 
 // ImtCore includes
 #include <imtrest/IRequest.h>
@@ -138,6 +139,12 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 		return CreateErrorResponse(QByteArrayLiteral("RegisterSubscription: request is not a WebSocketRequest"), request);
 	}
 
+	// Guard the QObject-based request lifetime with QPointer.
+	// CWebSocketRequest is parented to QWebSocket; if the connection drops during
+	// heavy processing (token validation, context creation), the parent deletes
+	// its children, leaving a dangling reference.
+	QPointer<QObject> requestGuard(const_cast<imtrest::CWebSocketRequest*>(webSocketRequest));
+
 	const QByteArray subscriptionId = webSocketRequest->GetRequestId();
 
 	QByteArray body = request.GetBody();
@@ -253,6 +260,13 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	}
 
 	if (subscriberControllerPtr != nullptr){
+		// Verify the request object is still alive before passing downstream.
+		// The QWebSocket may have disconnected during processing above, destroying the request.
+		if (requestGuard.isNull()){
+			SendErrorMessage(0, QStringLiteral("WebSocket request destroyed during subscription registration"), "CWebSocketServletComp");
+			return imtrest::ConstResponsePtr();
+		}
+
 		QString errorMessage;
 		if (subscriberControllerPtr->RegisterSubscription(subscriptionId, gqlRequest, request, errorMessage)){
 			return imtrest::ConstResponsePtr();
