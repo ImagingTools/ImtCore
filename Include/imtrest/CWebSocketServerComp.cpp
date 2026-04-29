@@ -347,7 +347,7 @@ void CWebSocketServerComp::HandleNewConnections()
 
 			m_webSocketThreadList.removeAll(webSocketThreadGuard.data());
 			webSocketThreadGuard->deleteLater();
-		});
+		}, Qt::QueuedConnection);
 		webSocketThreadPtr->SetWebSocket(webSocketPtr);
 
 		connect(webSocketPtr, &QWebSocket::disconnected, this, &CWebSocketServerComp::OnSocketDisconnected);

@@ -55,11 +55,12 @@ void CWebSocketThread::SetWebSocket(QWebSocket* webSocketPtr)
 	m_socket = webSocketPtr;
 
 	if (webSocketPtr != nullptr){
+		// Queue socket signals and avoid duplicate delivery if the same socket is wired twice.
 		const Qt::ConnectionType connectionType = static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection);
 		connect(webSocketPtr, &QWebSocket::textMessageReceived, this, &CWebSocketThread::OnWebSocketTextMessage, connectionType);
 		connect(webSocketPtr, &QWebSocket::binaryMessageReceived, this, &CWebSocketThread::OnWebSocketBinaryMessage, connectionType);
 		connect(webSocketPtr, &QWebSocket::disconnected, this, &CWebSocketThread::OnSocketDisconnected, connectionType);
-#if (QT_VERSION >= 0x060500)
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
 		connect(webSocketPtr, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::errorOccurred), this, &CWebSocketThread::OnError, connectionType);
 #endif
 	}
