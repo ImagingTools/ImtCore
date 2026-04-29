@@ -19,6 +19,22 @@ namespace imtgql
 {
 
 
+namespace
+{
+
+
+QByteArray ExtractCommandId(const QByteArray& body, qsizetype endIndex)
+{
+	QByteArray commandId = body.left(endIndex).simplified();
+	commandId.replace(' ', "");
+
+	return commandId;
+}
+
+
+} // namespace
+
+
 const QHash<QByteArray, IGqlRequest::RequestType> CGqlRequest::s_requestNameMap = {
 	{ QByteArrayLiteral("query"), IGqlRequest::RT_QUERY },
 	{ QByteArrayLiteral("mutation"), IGqlRequest::RT_MUTATION },
@@ -295,8 +311,7 @@ bool CGqlRequest::ParseQuery(const QByteArray& query, qsizetype& errorPosition)
 
 	index = body.indexOf('(');
 	if (index > -1){
-		QByteArray commandId = body.left(index).simplified();
-		commandId.replace(' ', "");
+		QByteArray commandId = ExtractCommandId(body, index);
 		if (commandId.isEmpty()){
 			return false;
 		}
@@ -308,8 +323,7 @@ bool CGqlRequest::ParseQuery(const QByteArray& query, qsizetype& errorPosition)
 		if (index == -1){
 			return false;
 		}
-		QByteArray commandId = body.left(index).simplified();
-		commandId.replace(' ', "");
+		QByteArray commandId = ExtractCommandId(body, index);
 		if (commandId.isEmpty()){
 			return false;
 		}

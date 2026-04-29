@@ -776,7 +776,7 @@ void CGqlRequestTest::TestVariablePrimitivesAndLists()
 void CGqlRequestTest::ParseRejectsEmptyCommandIdWithoutMutatingRequest()
 {
 	const char* validPayload = R"({"query": "query TestQuery { TestQuery { Field } }"})";
-	const char* invalidPayload = R"({"query": "query TestQuery { { Field } }"})";
+	const char* invalidPayload = R"({"query": "query TestQuery { 	 { Field } }"})";
 
 	qsizetype errorPosition = -1;
 	imtgql::CGqlRequest request;
