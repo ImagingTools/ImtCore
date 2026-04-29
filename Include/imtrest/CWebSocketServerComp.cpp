@@ -362,15 +362,33 @@ void CWebSocketServerComp::OnSocketDisconnected()
 		m_subscriberEngineCompPtr->UnRegisterSubscriber(socketObjectPtr);
 	}
 
-	for (const QByteArray& key: m_senders.keys()){
-		if (socketObjectPtr == m_senders[key]->GetSocket()){
-			m_senders.remove(key);
+	// Collect keys to remove first, then modify the map.  Acquiring
+	// m_sendersLock is mandatory: SendResponse() (called from publisher
+	// worker threads) reads m_senders under QReadLocker.  Without the
+	// write lock here the concurrent modification corrupts the QMap and
+	// produces crashes deep inside Qt's signal dispatch / qt_metacall.
+	QList<QByteArray> keysToRemove;
+	{
+		QWriteLocker locker(&m_sendersLock);
 
-			istd::IChangeable::ChangeSet loginChangeSet(imtcom::IConnectionStatusProvider::CS_UNKNOWN, QString("Logout"));
-			loginChangeSet.SetChangeInfo("ClientId", key);
-			istd::CChangeNotifier notifier(this, &loginChangeSet);
-			m_senderLoginStatusMap.remove(key);
+		for (auto it = m_senders.constBegin(); it != m_senders.constEnd(); ++it){
+			if (it.value() && socketObjectPtr == it.value()->GetSocket()){
+				keysToRemove.append(it.key());
+			}
 		}
+
+		for (const QByteArray& key : keysToRemove){
+			m_senders.remove(key);
+		}
+	}
+
+	// Notifications and login-status cleanup can happen outside the lock
+	// (they don't touch m_senders).
+	for (const QByteArray& key : keysToRemove){
+		istd::IChangeable::ChangeSet loginChangeSet(imtcom::IConnectionStatusProvider::CS_UNKNOWN, QString("Logout"));
+		loginChangeSet.SetChangeInfo("ClientId", key);
+		istd::CChangeNotifier notifier(this, &loginChangeSet);
+		m_senderLoginStatusMap.remove(key);
 	}
 
 	socketObjectPtr->deleteLater();
