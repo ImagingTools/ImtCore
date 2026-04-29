@@ -10,9 +10,11 @@ Item {
 	width: Style.sizeHintXS
 
 	property int autoCloseInterval: 5000
+	property int maxPopupCount: 5
 
 	property int __nextAutoId: 0
 	property var __customComponents: ({})
+	property var __customProperties: ({})
 
 	Component {
 		id: __defaultDelegate
@@ -20,15 +22,15 @@ Item {
 		Rectangle {
 			id: defaultDelegateRoot
 
-			property string messageId
-			property string messageType
-			property string messageText
-			property bool closable
-			property var popupContainer
+			property string messageId: ""
+			property string messageType: ""
+			property string messageText: ""
+			property bool closable: false
+			property var popupContainer: null
 
-			width: popupContainer ? popupContainer.width : Style.sizeHintXS
+			width: parent ? parent.width : Style.sizeHintXS
 			height: Style.sizeHintBXS
-			color: messageType == "error" ? "#ffcccc" : messageType == "warning" ? "#fff4cc" : messageType == "info" ? "#cce5ff" : "#ccffcc"
+			color: messageType === "error" ? "#ffcccc" : messageType === "warning" ? "#fff4cc" : messageType === "info" ? "#cce5ff" : "#ccffcc"
 			radius: Style.radiusM
 			border.color: Style.borderColor2
 
@@ -44,94 +46,123 @@ Item {
 					height: width
 					sourceSize.height: height
 					sourceSize.width: width
-					source: defaultDelegateRoot.messageType == "warning" ? "../../../" + Style.getIconPath("Icons/Alert", Icon.State.On, Icon.Mode.Normal) :
-							defaultDelegateRoot.messageType == "error" ? "../../../" + Style.getIconPath("Icons/Error", Icon.State.On, Icon.Mode.Normal) :
-							defaultDelegateRoot.messageType == "success" ? "../../../" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal) :
-							defaultDelegateRoot.messageType == "info" ? "../../../" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal) : ""
+					source: defaultDelegateRoot.messageType === "warning" ? "../../../" + Style.getIconPath("Icons/Alert", Icon.State.On, Icon.Mode.Normal) :
+							defaultDelegateRoot.messageType === "error" ? "../../../" + Style.getIconPath("Icons/Error", Icon.State.On, Icon.Mode.Normal) :
+							defaultDelegateRoot.messageType === "success" ? "../../../" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal) :
+							defaultDelegateRoot.messageType === "info" ? "../../../" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal) : ""
 				}
 			}
 
 			BaseText {
-				id: messageText
+				id: messageTextItem
 				anchors.verticalCenter: parent.verticalCenter
 				anchors.left: iconItem.right
-				anchors.right: closeButton.left
+				anchors.right: closeArea.left
 				anchors.rightMargin: Style.marginM
 				text: defaultDelegateRoot.messageText
 				wrapMode: Text.WordWrap
 			}
 
-			ToolButton {
-				id: closeButton
+			Rectangle {
+				id: closeArea
 				anchors.right: parent.right
 				anchors.top: parent.top
-				anchors.margins: Style.marginM
-				width: Style.buttonWidthXS
-				height: width
-				iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
-				decorator: Component {
-					ToolButtonDecorator {
-						color: "transparent"
-						icon.width: Style.iconSizeXS
-					}
+				anchors.margins: Style.marginS
+				width: 24
+				height: 24
+				radius: 12
+				color: closeMouseArea.containsMouse ? Qt.darker(defaultDelegateRoot.color, 1.15) : "transparent"
+
+				BaseText {
+					anchors.centerIn: parent
+					text: "✕"
+					font.pixelSize: 14
 				}
 
-				onClicked: {
-					console.log("onClicked", defaultDelegateRoot.messageId)
-					if (defaultDelegateRoot.popupContainer){
-						defaultDelegateRoot.popupContainer.removeMessageById(defaultDelegateRoot.messageId)
+				MouseArea {
+					id: closeMouseArea
+					anchors.fill: parent
+					hoverEnabled: true
+					cursorShape: Qt.PointingHandCursor
+					onClicked: {
+						if (defaultDelegateRoot.popupContainer){
+							defaultDelegateRoot.popupContainer.removeMessageById(defaultDelegateRoot.messageId)
+						}
 					}
 				}
 			}
 		}
 	}
 
-	Column {
-		id: messageColumn
-		spacing: Style.marginM
+	ListView {
+		id: messageListView
+		anchors.left: parent.left
+		anchors.right: parent.right
 		anchors.bottom: parent.bottom
+		height: contentHeight
+		spacing: Style.marginM
+		interactive: false
+		verticalLayoutDirection: ListView.BottomToTop
 
-		Repeater {
-			model: popupModel
+		model: popupModel
 
-			delegate: Item {
-				id: delegateWrapper
+		delegate: Item {
+			id: delegateWrapper
 
-				property string messageId: model.id
+			property string messageId: model.id
 
-				width: popupContainer.width
-				height: contentLoader.item ? contentLoader.item.height : Style.sizeHintBXS
+			width: messageListView.width
+			height: contentLoader.item ? contentLoader.item.height : Style.sizeHintBXS
 
-				Component.onCompleted: {
-					if (model.closable){
-						autoCloseTimer.restart()
-					}
+			Component.onCompleted: {
+				if (model.closable){
+					autoCloseTimer.restart()
+				}
+			}
+
+			Loader {
+				id: contentLoader
+				anchors.left: parent.left
+				anchors.right: parent.right
+
+				sourceComponent: {
+					var customComp = popupContainer.__customComponents[model.id]
+					return customComp ? customComp : __defaultDelegate
 				}
 
-				Loader {
-					id: contentLoader
-					anchors.left: parent.left
-					anchors.right: parent.right
-
-					sourceComponent: model.id in popupContainer.__customComponents ? popupContainer.__customComponents[model.id] : __defaultDelegate
-
-					onLoaded: {
-						if (item){
+				onLoaded: {
+					if (item){
+						if (item.hasOwnProperty("messageId"))
 							item.messageId = model.id
+						if (item.hasOwnProperty("messageType"))
 							item.messageType = model.type
+						if (item.hasOwnProperty("messageText"))
 							item.messageText = model.text
+						if (item.hasOwnProperty("closable"))
 							item.closable = model.closable
+						if (item.hasOwnProperty("popupContainer"))
 							item.popupContainer = popupContainer
+
+						// Inject extra custom properties from addCustomMessage
+						var extra = popupContainer.__customProperties[model.id]
+						if (extra){
+							var keys = Object.keys(extra)
+							for (var k = 0; k < keys.length; k++){
+								var key = keys[k]
+								if (item.hasOwnProperty(key)){
+									item[key] = extra[key]
+								}
+							}
 						}
 					}
 				}
+			}
 
-				Timer {
-					id: autoCloseTimer
-					interval: popupContainer.autoCloseInterval
-					onTriggered: {
-						popupContainer.removeMessageById(delegateWrapper.messageId)
-					}
+			Timer {
+				id: autoCloseTimer
+				interval: popupContainer.autoCloseInterval
+				onTriggered: {
+					popupContainer.removeMessageById(delegateWrapper.messageId)
 				}
 			}
 		}
@@ -139,6 +170,20 @@ Item {
 
 	ListModel {
 		id: popupModel
+	}
+
+	function __enforceMaxCount(){
+		while (popupModel.count > maxPopupCount){
+			let lastIndex = popupModel.count - 1
+			let lastId = popupModel.get(lastIndex).id
+			if (__customComponents.hasOwnProperty(lastId)){
+				delete __customComponents[lastId]
+			}
+			if (__customProperties.hasOwnProperty(lastId)){
+				delete __customProperties[lastId]
+			}
+			popupModel.remove(lastIndex)
+		}
 	}
 
 	function addMessage(type, text, autoClose, id){
@@ -156,12 +201,8 @@ Item {
 			popupModel.remove(existingIndex)
 		}
 
-		console.log("addMessage", type, text, autoClose, id)
 		popupModel.insert(0, { "type": type, "text": text, "closable": autoClose, "id": id })
-
-		for (let i = 0; i < popupModel.count; ++i){
-			console.log(JSON.stringify(popupModel.get(i)))
-		}
+		__enforceMaxCount()
 	}
 
 	function addCustomMessage(id, customComponent, properties){
@@ -180,7 +221,9 @@ Item {
 		}
 
 		__customComponents[id] = customComponent
+		__customProperties[id] = properties
 		popupModel.insert(0, { "type": type, "text": text, "closable": autoClose, "id": id })
+		__enforceMaxCount()
 	}
 
 	function replaceMessage(id, type, text, autoClose){
@@ -200,16 +243,16 @@ Item {
 			let id = popupModel.get(index).id
 			popupModel.remove(index)
 			if (__customComponents.hasOwnProperty(id)){
-				__customComponents[id] = undefined
+				delete __customComponents[id]
+			}
+			if (__customProperties.hasOwnProperty(id)){
+				delete __customProperties[id]
 			}
 		}
 	}
 
 	function removeMessageById(id){
-		console.log("removeMessageById", (id))
 		let index = findMessage(id)
-		console.log("index", index)
-		
 		if (index >= 0){
 			removeMessage(index)
 		}
@@ -228,6 +271,7 @@ Item {
 	function clear(){
 		popupModel.clear()
 		__customComponents = {}
+		__customProperties = {}
 	}
 }
 

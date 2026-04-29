@@ -269,6 +269,148 @@ Item {
 	// autoSubscribe is false so that registration only happens after login
 	// (see onLoggedIn / onLoggedOut below).
 
+	// Custom popup delegate for ticket notifications — clickable card
+	// that navigates to the ticket.
+	Component {
+		id: ticketNotificationDelegate
+
+		Rectangle {
+			id: ticketPopupRoot
+
+			property string messageId: ""
+			property string messageType: ""
+			property string messageText: ""
+			property bool closable: false
+			property var popupContainer: null
+
+			// Custom properties set via addCustomMessage properties bag
+			property string ticketId: ""
+			property string ticketNumber: ""
+			property string ticketTitle: ""
+			property string senderName: ""
+			property string preview: ""
+			property string notificationType: "message" // "message" or "assignee"
+
+			width: parent ? parent.width : Style.sizeHintXS
+			height: contentColumn.height + 2 * Style.marginM
+			radius: Style.radiusM
+			border.color: Qt.darker(ticketPopupRoot.color, 1.15)
+			color: notificationType === "assignee" ? "#d4edda" : "#d6eaf8"
+
+			MouseArea {
+				anchors.fill: parent
+				cursorShape: Qt.PointingHandCursor
+				hoverEnabled: true
+				onClicked: {
+					if (ticketPopupRoot.ticketId){
+						NavigationController.navigate("Tickets/Ticket/" + ticketPopupRoot.ticketId)
+					}
+					if (ticketPopupRoot.popupContainer){
+						ticketPopupRoot.popupContainer.removeMessageById(ticketPopupRoot.messageId)
+					}
+				}
+				onEntered: ticketPopupRoot.border.color = Style.highlightColor
+				onExited: ticketPopupRoot.border.color = Qt.darker(ticketPopupRoot.color, 1.15)
+			}
+
+			Column {
+				id: contentColumn
+				anchors.left: parent.left
+				anchors.right: closeArea.left
+				anchors.top: parent.top
+				anchors.margins: Style.marginM
+				spacing: 4
+
+				Row {
+					spacing: Style.marginS
+
+					BaseText {
+						text: ticketPopupRoot.notificationType === "assignee" ? "📋" : "💬"
+						font.pixelSize: 14
+					}
+
+					BaseText {
+						text: {
+							if (ticketPopupRoot.notificationType === "assignee"){
+								return qsTr("Assigned to you")
+							}
+							var who = ticketPopupRoot.senderName || qsTr("Someone")
+							return qsTr("New message from %1").replace("%1", who)
+						}
+						font.bold: true
+						font.pixelSize: 13
+					}
+				}
+
+				BaseText {
+					width: parent.width
+					text: {
+						var label = ""
+						if (ticketPopupRoot.ticketNumber)
+							label = "#" + ticketPopupRoot.ticketNumber
+						if (ticketPopupRoot.ticketTitle)
+							label = label ? (label + " " + ticketPopupRoot.ticketTitle) : ticketPopupRoot.ticketTitle
+						return label
+					}
+					font.pixelSize: 12
+					color: Style.foregroundColor
+					elide: Text.ElideRight
+					visible: text !== ""
+				}
+
+				BaseText {
+					width: parent.width
+					text: ticketPopupRoot.preview
+					font.pixelSize: 11
+					color: Style.foregroundColor2 ? Style.foregroundColor2 : "#666666"
+					wrapMode: Text.WordWrap
+					maximumLineCount: 2
+					elide: Text.ElideRight
+					visible: text !== ""
+				}
+			}
+
+			Rectangle {
+				id: closeArea
+				anchors.right: parent.right
+				anchors.top: parent.top
+				anchors.margins: Style.marginS
+				width: 22
+				height: 22
+				radius: 11
+				color: closeMouseArea.containsMouse ? Qt.darker(ticketPopupRoot.color, 1.15) : "transparent"
+
+				BaseText {
+					anchors.centerIn: parent
+					text: "✕"
+					font.pixelSize: 12
+				}
+
+				MouseArea {
+					id: closeMouseArea
+					anchors.fill: parent
+					hoverEnabled: true
+					cursorShape: Qt.PointingHandCursor
+					onClicked: {
+						if (ticketPopupRoot.popupContainer){
+							ticketPopupRoot.popupContainer.removeMessageById(ticketPopupRoot.messageId)
+						}
+					}
+				}
+			}
+
+			// "Click to open" hint
+			BaseText {
+				anchors.right: parent.right
+				anchors.bottom: parent.bottom
+				anchors.margins: Style.marginS
+				text: qsTr("Click to open →")
+				font.pixelSize: 10
+				color: Style.foregroundColor2 ? Style.foregroundColor2 : "#999999"
+			}
+		}
+	}
+
 	// Subscribes to server-side ticket message notifications and surfaces
 	// them via PopupManager. The server-side filter (CTicketMessageNotifierComp)
 	// already restricts delivery to users related to the ticket
@@ -281,6 +423,7 @@ Item {
 			if (!data){
 				return
 			}
+			var ticketId = data.containsKey("ticketId") ? data.getData("ticketId") : ""
 			var ticketNumber = data.containsKey("ticketNumber") ? data.getData("ticketNumber") : ""
 			var ticketTitle = data.containsKey("ticketTitle") ? data.getData("ticketTitle") : ""
 			var senderName = data.containsKey("senderUserName") ? data.getData("senderUserName") : ""
@@ -292,24 +435,16 @@ Item {
 				preview = preview.substring(0, 80) + "…"
 			}
 
-			var ticketLabel = ticketNumber ? ("#" + ticketNumber) : ""
-			if (ticketTitle){
-				ticketLabel = ticketLabel ? (ticketLabel + " " + ticketTitle) : String(ticketTitle)
-			}
-			var who = senderName ? String(senderName) : qsTr("Someone")
-
-			var text = ""
-			if (ticketLabel && preview){
-				text = who + " → " + ticketLabel + ":\n" + preview
-			} else if (ticketLabel){
-				text = who + " → " + ticketLabel
-			} else if (preview){
-				text = who + ": " + preview
-			} else {
-				text = qsTr("New ticket message from '%1'").replace("%1", who)
-			}
-
-			PopupManager.addInfoMessage(text, true, "TicketMessage_" + messageId)
+			var popupId = "TicketMessage_" + messageId
+			PopupManager.addCustomMessage(popupId, ticketNotificationDelegate, {
+				autoClose: true,
+				ticketId: ticketId,
+				ticketNumber: ticketNumber,
+				ticketTitle: ticketTitle,
+				senderName: senderName,
+				preview: preview,
+				notificationType: "message"
+			})
 		}
 	}
 
@@ -325,18 +460,18 @@ Item {
 				return
 			}
 
+			var ticketId = data.containsKey("ticketId") ? data.getData("ticketId") : ""
 			var ticketNumber = data.containsKey("ticketNumber") ? data.getData("ticketNumber") : ""
 			var ticketTitle = data.containsKey("ticketTitle") ? data.getData("ticketTitle") : ""
 
-			var ticketLabel = ticketNumber ? ("#" + ticketNumber) : ""
-			if (ticketTitle){
-				ticketLabel = ticketLabel ? (ticketLabel + " " + ticketTitle) : String(ticketTitle)
-			}
-			var text = ticketLabel
-				? qsTr("You have been assigned to ticket '%1'").replace("%1", ticketLabel)
-				: qsTr("You have been assigned to a ticket")
-
-			PopupManager.addSuccessMessage(text, true, "TicketAssignee_" + ticketNumber)
+			var popupId = "TicketAssignee_" + ticketNumber
+			PopupManager.addCustomMessage(popupId, ticketNotificationDelegate, {
+				autoClose: true,
+				ticketId: ticketId,
+				ticketNumber: ticketNumber,
+				ticketTitle: ticketTitle,
+				notificationType: "assignee"
+			})
 		}
 	}
 	
