@@ -11,8 +11,6 @@ Item {
 
 	property int autoCloseInterval: 5000
 
-	property Component delegate: __defaultDelegate
-
 	property int __nextAutoId: 0
 	property var __customComponents: ({})
 
@@ -79,6 +77,7 @@ Item {
 				}
 
 				onClicked: {
+					console.log("onClicked", defaultDelegateRoot.messageId)
 					if (defaultDelegateRoot.popupContainer){
 						defaultDelegateRoot.popupContainer.removeMessageById(defaultDelegateRoot.messageId)
 					}
@@ -114,7 +113,7 @@ Item {
 					anchors.left: parent.left
 					anchors.right: parent.right
 
-					sourceComponent: popupContainer.__getComponent(model.id)
+					sourceComponent: model.id in popupContainer.__customComponents ? popupContainer.__customComponents[model.id] : __defaultDelegate
 
 					onLoaded: {
 						if (item){
@@ -157,7 +156,12 @@ Item {
 			popupModel.remove(existingIndex)
 		}
 
+		console.log("addMessage", type, text, autoClose, id)
 		popupModel.insert(0, { "type": type, "text": text, "closable": autoClose, "id": id })
+
+		for (let i = 0; i < popupModel.count; ++i){
+			console.log(JSON.stringify(popupModel.get(i)))
+		}
 	}
 
 	function addCustomMessage(id, customComponent, properties){
@@ -202,7 +206,10 @@ Item {
 	}
 
 	function removeMessageById(id){
+		console.log("removeMessageById", (id))
 		let index = findMessage(id)
+		console.log("index", index)
+		
 		if (index >= 0){
 			removeMessage(index)
 		}
@@ -221,13 +228,6 @@ Item {
 	function clear(){
 		popupModel.clear()
 		__customComponents = {}
-	}
-
-	function __getComponent(id){
-		if (__customComponents.hasOwnProperty(id) && __customComponents[id]){
-			return __customComponents[id]
-		}
-		return popupContainer.delegate
 	}
 }
 

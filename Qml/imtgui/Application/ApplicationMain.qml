@@ -306,7 +306,7 @@ Item {
 			} else if (preview){
 				text = who + ": " + preview
 			} else {
-				text = qsTr("New ticket message from %1").arg(who)
+				text = qsTr("New ticket message from '%1'").replace("%1", who)
 			}
 
 			PopupManager.addInfoMessage(text, true, "TicketMessage_" + messageId)
