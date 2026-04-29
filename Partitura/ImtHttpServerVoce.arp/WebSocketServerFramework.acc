@@ -106,10 +106,19 @@
         <Element Id="WebSocketServlet" PackageId="ImtServerGqlPck" ComponentId="WebSocketServlet">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="GqlContextCreator" Type="Reference" ExportId="GqlContextCreator">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="GqlSubscriberControllers" Type="Reference[]" ExportId="GqlSubscriberControllers">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="JwtSessionController" Type="Reference" ExportId="JwtSessionController">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PersonalAccessTokenManager" Type="Reference" ExportId="PersonalAccessTokenManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
