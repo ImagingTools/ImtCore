@@ -243,19 +243,18 @@ bool CGqlRequest::ParseQuery(const QByteArray& query, qsizetype& errorPosition)
 		return false;
 	}
 
-	// Extract and store the "operationName" key
+	// Extract the "operationName" key
+	QString operationName;
 	QJsonValue operationNameValue = rootObject.value(QStringLiteral("operationName"));
 	if (operationNameValue.isString()) {
-		m_operationName = operationNameValue.toString();
-	} else {
-		m_operationName.clear(); // Reset if not present
+		operationName = operationNameValue.toString();
 	}
 
-	// Extract and populate the "variables"
+	// Extract and populate the "variables" locally before mutating this request.
 	QJsonValue variablesValue = rootObject.value(QStringLiteral("variables"));
-	m_variables.ResetData();
+	CGqlParamObject variables;
 	if (variablesValue.isObject()) {
-		ParseObjectParamPart(m_variables, variablesValue.toObject());
+		ParseObjectParamPart(variables, variablesValue.toObject());
 	}
 
 	qsizetype index = body.indexOf('{');
@@ -279,7 +278,7 @@ bool CGqlRequest::ParseQuery(const QByteArray& query, qsizetype& errorPosition)
 		return false;
 	}
 
-	m_requestType = s_requestNameMap[type];
+	const RequestType requestType = s_requestNameMap[type];
 
 	body = body.mid(index + 1);
 	index = body.lastIndexOf('}');
@@ -296,7 +295,12 @@ bool CGqlRequest::ParseQuery(const QByteArray& query, qsizetype& errorPosition)
 
 	index = body.indexOf('(');
 	if (index > -1){
-		m_commandId = body.left(index);
+		QByteArray commandId = body.left(index).simplified();
+		commandId.replace(' ', "");
+		if (commandId.isEmpty()){
+			return false;
+		}
+		m_commandId = commandId;
 		m_startParams = false;
 	}
 	else{
@@ -304,14 +308,18 @@ bool CGqlRequest::ParseQuery(const QByteArray& query, qsizetype& errorPosition)
 		if (index == -1){
 			return false;
 		}
-		m_commandId = body.left(index);
+		QByteArray commandId = body.left(index).simplified();
+		commandId.replace(' ', "");
+		if (commandId.isEmpty()){
+			return false;
+		}
+		m_commandId = commandId;
 		m_startParams = endParams = true;
 	}
 
-	m_commandId = m_commandId.simplified().replace(' ', "");
-	if (m_commandId.isEmpty()){
-		return false;
-	}
+	m_requestType = requestType;
+	m_variables = variables;
+	m_operationName = operationName;
 	body = body.remove(0, index);
 	m_activeGqlObjectPtr = nullptr;
 	m_activeFieldObjectPtr = nullptr;
@@ -1122,4 +1130,3 @@ bool CGqlRequest::CloseArray()
 
 
 } // namespace imtgql
-

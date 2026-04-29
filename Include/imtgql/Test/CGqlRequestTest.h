@@ -32,11 +32,11 @@ private slots:
 	void ParseStartPatchMeasurementComplex();
 	void TestVariableObjectList();
 	void TestVariablePrimitivesAndLists();
+	void ParseRejectsEmptyCommandIdWithoutMutatingRequest();
 	void ParseStringWithEscapeSequences();
 
 	void cleanupTestCase();
 
 private:
 };
-
 

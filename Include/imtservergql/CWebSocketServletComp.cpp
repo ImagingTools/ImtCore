@@ -144,6 +144,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	// socket is deleted via deleteLater().
 	const QByteArray subscriptionId = webSocketRequest->GetRequestId();
 	QByteArray body = request.GetBody();
+	body.detach();
 	const QJsonDocument document = QJsonDocument::fromJson(body);
 	if (document.isNull() || !document.isObject()) {
 		QString errorMessage = QString("Error when parsing JSON request for command Id: '%1'").arg(request.GetCommandId());
@@ -158,13 +159,16 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 
 		if (payloadObject.contains(QStringLiteral("data"))) {
 			body = payloadObject.value(QStringLiteral("data")).toString().toUtf8();
+			body.detach();
 		}
 		else {
 			body = QJsonDocument(payloadObject).toJson(QJsonDocument::Compact);
+			body.detach();
 		}
 	}
 	else if (payloadValue.isString()) {
 		body = payloadValue.toString().toUtf8();
+		body.detach();
 	}
 
 
@@ -364,4 +368,3 @@ imtrest::ConstResponsePtr CWebSocketServletComp::CreateErrorResponse(const QByte
 
 
 } // namespace imtservergql
-

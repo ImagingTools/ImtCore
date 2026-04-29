@@ -773,6 +773,27 @@ void CGqlRequestTest::TestVariablePrimitivesAndLists()
 }
 
 
+void CGqlRequestTest::ParseRejectsEmptyCommandIdWithoutMutatingRequest()
+{
+	const char* validPayload = R"({"query": "query TestQuery { TestQuery { Field } }"})";
+	const char* invalidPayload = R"({"query": "query TestQuery { { Field } }"})";
+
+	qsizetype errorPosition = -1;
+	imtgql::CGqlRequest request;
+	bool success = request.ParseQuery(validPayload, errorPosition);
+
+	QVERIFY(success);
+	QVERIFY(errorPosition < 0);
+	QCOMPARE(request.GetCommandId(), QByteArrayLiteral("TestQuery"));
+
+	errorPosition = -1;
+	success = request.ParseQuery(invalidPayload, errorPosition);
+
+	QVERIFY(!success);
+	QCOMPARE(request.GetCommandId(), QByteArrayLiteral("TestQuery"));
+}
+
+
 void CGqlRequestTest::ParseStringWithEscapeSequences()
 {
 	// Test that \n, \r, \t escape sequences inside GraphQL string literals
