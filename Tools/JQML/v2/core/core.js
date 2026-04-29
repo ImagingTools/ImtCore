@@ -407,20 +407,6 @@ window.onload = ()=>{
         h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit;}
         br {}
 
-        * {
-            display: flex;
-        }
-
-        .Row > *[no-view] {
-            display: none;
-        }
-        .Column > *[no-view] {
-            display: none;
-        }
-
-        *[unvisible] {
-            display: none;
-        }
     </style>`)  
 
     const mainRoot = new Item()

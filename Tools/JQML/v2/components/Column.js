@@ -12,8 +12,6 @@ class Column extends Item {
         this.setStyle({
             flexDirection: 'column'
         })
-
-        this.$dom.classList.add('Column')
     }
 
     updateGeometry(){
@@ -37,8 +35,23 @@ class Column extends Item {
                     }
                     if(i < children.length - 1 && find){
                         h += this.getPropertyValue('spacing')
+                        children[i].setStyle({
+                            marginBottom: `${this.getPropertyValue('spacing')}px`
+                        })
+                    } else {
+                        children[i].setStyle({
+                            marginBottom: `0`
+                        })
                     }
+                } else {
+                    children[i].setStyle({
+                        marginBottom: `0`
+                    })
                 }
+            } else {
+                children[i].setStyle({
+                    marginBottom: `0`
+                })
             }
         }
 
@@ -62,11 +75,7 @@ class Column extends Item {
     }
 
     $spacingChanged(){
-        this.setStyle({
-            gap: `${this.getPropertyValue('spacing')}px`
-        })
         this.updateGeometry()
-        
     }
 }
 
