@@ -35,5 +35,10 @@ I_EXPORT_COMPONENT(
 			"Ticket message subscription publisher (notifies ticket reporter/assignees about new messages)",
 			"Ticket Message Notifier");
 
+I_EXPORT_COMPONENT(
+			TicketAssigneeNotifier,
+			"Ticket assignee change subscription publisher (notifies newly added assignees)",
+			"Ticket Assignee Notifier");
+
 
 } // namespace ImtDeskGqlPck

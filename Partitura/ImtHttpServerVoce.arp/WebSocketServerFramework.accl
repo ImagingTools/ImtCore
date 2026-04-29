@@ -2,17 +2,19 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6154" Description="ACF"/>
-            <Version Id="1" Number="2274" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395778" Description="Qt Framework"/>
+            <Version Id="0" Number="6390" Description="ACF"/>
+            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
+        <Element ComponentName="GqlContext" X="825" Y="50" Note=""/>
+        <Element ComponentName="GqlContextCreator" X="800" Y="150" Note=""/>
         <Element ComponentName="SslConfigurationManager" X="150" Y="375" Note=""/>
         <Element ComponentName="SubscriptionManager" X="775" Y="650" Note=""/>
         <Element ComponentName="WebSocketProtocolEngine" X="1025" Y="375" Note=""/>
         <Element ComponentName="WebSocketServer" X="450" Y="375" Note=""/>
-        <Element ComponentName="WebSocketServlet" X="775" Y="150" Note=""/>
+        <Element ComponentName="WebSocketServlet" X="800" Y="250" Note=""/>
         <Element ComponentName="WorkerManager" X="425" Y="175" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>

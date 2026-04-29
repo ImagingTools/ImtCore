@@ -600,10 +600,20 @@ bool CGqlRequest::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/
 
 			m_params = sourcePtr->m_params;
 			m_fields = sourcePtr->m_fields;
-			m_gqlContextPtr = sourcePtr->m_gqlContextPtr;
 			m_protocolVersion = sourcePtr->m_protocolVersion;
 			m_variables = sourcePtr->m_variables;
 			m_operationName = sourcePtr->m_operationName;
+
+			if (sourcePtr->m_gqlContextPtr.IsValid()){
+				const IGqlContext* sourceContextPtr = sourcePtr->m_gqlContextPtr.GetPtr();
+				istd::IChangeableUniquePtr clonedContextPtr = sourceContextPtr->CloneMe();
+				if (clonedContextPtr.IsValid()){
+					m_gqlContextPtr.MoveCastedPtr(std::move(clonedContextPtr));
+				}
+			}
+			else{
+				m_gqlContextPtr.Reset();
+			}
 
 			return true;
 		}
@@ -634,6 +644,7 @@ bool CGqlRequest::ResetData(istd::IChangeable::CompatibilityMode /*mode*/)
 	m_protocolVersion.clear();
 	m_variables.ResetData();
 	m_operationName.clear();
+	m_gqlContextPtr.Reset();
 
 	return true;
 }
