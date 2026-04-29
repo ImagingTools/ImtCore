@@ -6,9 +6,6 @@
 #include <ilog/TLoggerCompWrap.h>
 #include <iqt/ITranslationManager.h>
 
-// Qt includes
-#include <QtCore/QPointer>
-
 // ImtCore includes
 #include <imtrest/CWebSocketRequest.h>
 #include <imtrest/IResponseDispatcher.h>
@@ -62,7 +59,6 @@ protected:
 	{
 		imtgql::CGqlRequest gqlRequest;
 		QMap<QByteArray, const imtrest::IRequest*> networkRequests; // Subscription-ID -> NetworkRequest
-		QMap<QByteArray, QPointer<QObject>> requestLifetimeGuards; // Subscription-ID -> QPointer for lifetime tracking
 
 		RequestNetworks()
 			:gqlRequest(imtgql::IGqlRequest::RT_SUBSCRIPTION)

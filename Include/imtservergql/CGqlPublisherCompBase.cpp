@@ -5,9 +5,6 @@
 // ACF includes
 #include<istd/TDelPtr.h>
 
-// Qt includes
-#include<QtCore/QPointer>
-
 // ImtCore includes
 #include<imtrest/IProtocolEngine.h>
 #include<imtrest/ITransport.h>
@@ -50,19 +47,14 @@ bool CGqlPublisherCompBase::RegisterSubscription(
 		return false;
 	}
 
-	// CWebSocketRequest is a QObject parented to QWebSocket. If the connection drops,
-	// the parent destroys its children, invalidating the reference. Use QPointer to
-	// detect this at the base level before dereferencing.
 	const imtrest::CWebSocketRequest* constWebSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&networkRequest);
-	if (constWebSocketRequest == nullptr){
-		errorMessage = QString("Internal error: networkRequest is not a CWebSocketRequest");
+	imtrest::CWebSocketRequest* webSocketRequest = dynamic_cast<imtrest::CWebSocketRequest*>(const_cast<imtrest::CWebSocketRequest*>(constWebSocketRequest));
+	if (webSocketRequest == nullptr){
+		errorMessage = QString("Internal error");
 		SendErrorMessage(0, errorMessage, "CGqlPublisherCompBase");
 
 		return false;
 	}
-
-	QPointer<QObject> requestGuard(const_cast<imtrest::CWebSocketRequest*>(constWebSocketRequest));
-	imtrest::CWebSocketRequest* webSocketRequest = const_cast<imtrest::CWebSocketRequest*>(constWebSocketRequest);
 
 	QMutexLocker locker(&m_mutex);
 
@@ -74,18 +66,11 @@ bool CGqlPublisherCompBase::RegisterSubscription(
 		}
 	}
 
-	// Verify the request is still alive before storing its pointer
-	if (requestGuard.isNull()){
-		errorMessage = QStringLiteral("WebSocket request was destroyed during registration");
-		SendErrorMessage(0, errorMessage, "CGqlPublisherCompBase");
-		return false;
-	}
 
 	// To support unique variables per user, every subscription MUST have its own RequestNetworks entry.
 	RequestNetworks newEntry;
 	newEntry.gqlRequest.CopyFrom(gqlRequest);
 	newEntry.networkRequests.insert(subscriptionId, &networkRequest);
-	newEntry.requestLifetimeGuards.insert(subscriptionId, const_cast<imtrest::CWebSocketRequest*>(constWebSocketRequest));
 
 	m_registeredSubscribers.append(newEntry);
 
@@ -177,7 +162,7 @@ bool CGqlPublisherCompBase::PublishDataFiltered(
 	const QByteArray& data,
 	std::function<bool(const imtgql::CGqlRequest&)> predicate) const
 {
-	struct Target { QByteArray id; const imtrest::IRequest* req; QPointer<QObject> guard; };
+	struct Target { QByteArray id; const imtrest::IRequest* req; };
 	QList<Target> targets;
 
 	{
@@ -188,8 +173,7 @@ bool CGqlPublisherCompBase::PublishDataFiltered(
 				// Apply filtering (predicate) to this subscriber's unique variables
 				if (!predicate || predicate(entry.gqlRequest)) {
 					for (auto it = entry.networkRequests.constBegin(); it != entry.networkRequests.constEnd(); ++it) {
-						QPointer<QObject> guard = entry.requestLifetimeGuards.value(it.key());
-						targets.append({it.key(), it.value(), guard});
+						targets.append({it.key(), it.value()});
 					}
 				}
 			}
@@ -198,12 +182,6 @@ bool CGqlPublisherCompBase::PublishDataFiltered(
 
 	// push data to subscribers outside the lock to keep the server responsive
 	for (const auto& target : targets) {
-		// Verify the request is still alive before dereferencing.
-		// The WebSocket may have disconnected, destroying the CWebSocketRequest.
-		if (target.guard.isNull()){
-			continue;
-		}
-
 		bool retVal = PushDataToSubscriber(target.id, commandId, data, *target.req);
 
 		if (!retVal){
