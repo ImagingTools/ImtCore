@@ -255,16 +255,22 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 			gqlRequest.SetGqlContext(gqlContextPtr.PopInterfacePtr());
 		}
 		else{
-			// Fall back to simple context with headers only
+			// Fall back to simple context with all available auth info
 			imtgql::CGqlContext* simpleContext = new imtgql::CGqlContext();
 			simpleContext->SetHeaders(gqlHeaders);
+			simpleContext->SetUserId(userId);
+			simpleContext->SetToken(accessToken);
+			simpleContext->SetProductId(productId);
 			gqlRequest.SetGqlContext(simpleContext);
 		}
 	}
 	else{
-		// No context creator — create simple context with headers
+		// No context creator — create simple context with all available auth info
 		imtgql::CGqlContext* simpleContext = new imtgql::CGqlContext();
 		simpleContext->SetHeaders(gqlHeaders);
+		simpleContext->SetUserId(userId);
+		simpleContext->SetToken(accessToken);
+		simpleContext->SetProductId(productId);
 		gqlRequest.SetGqlContext(simpleContext);
 	}
 
