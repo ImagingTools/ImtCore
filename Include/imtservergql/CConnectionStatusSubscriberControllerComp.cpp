@@ -2,6 +2,11 @@
 #include <imtservergql/CConnectionStatusSubscriberControllerComp.h>
 
 
+// Qt includes
+#include <QtCore/QMutex>
+#include <QtCore/QPointer>
+
+
 namespace imtservergql
 {
 
@@ -45,9 +50,25 @@ bool CConnectionStatusSubscriberControllerComp::RegisterSubscription(
 		return false;
 	}
 
+	const imtrest::CWebSocketRequest* webSocketRequestPtr = dynamic_cast<const imtrest::CWebSocketRequest*>(&networkRequest);
+	QPointer<QObject> requestGuard(const_cast<QObject*>(static_cast<const QObject*>(webSocketRequestPtr)));
+
 	bool result = BaseClass::RegisterSubscription(subscriptionId, gqlRequest, networkRequest, errorMessage);
 	if (result){
-		PushDataToSubscriber(subscriptionId, m_commandIdsAttrPtr[0], CreateBodySubscription().toUtf8(), networkRequest);
+		QByteArray commandId = m_commandIdsAttrPtr[0];
+		QByteArray data = CreateBodySubscription().toUtf8();
+
+		QMutexLocker locker(&m_mutex);
+		for (const BaseClass::RequestNetworks& entry : m_registeredSubscribers){
+			if (requestGuard.isNull()){
+				break;
+			}
+
+			if (entry.networkRequests.value(subscriptionId) == &networkRequest){
+				PushDataToSubscriber(subscriptionId, commandId, data, networkRequest);
+				break;
+			}
+		}
 	}
 
 	return result;
@@ -89,5 +110,3 @@ void CConnectionStatusSubscriberControllerComp::OnComponentDestroyed()
 
 
 } // namespace imtservergql
-
-

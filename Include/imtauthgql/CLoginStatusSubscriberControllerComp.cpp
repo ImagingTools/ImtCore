@@ -2,6 +2,10 @@
 #include <imtauthgql/CLoginStatusSubscriberControllerComp.h>
 
 
+// Qt includes
+#include <QtCore/QMutex>
+#include <QtCore/QPointer>
+
 // ImtCore includes
 #include<imtrest/IProtocolEngine.h>
 
@@ -28,6 +32,9 @@ bool CLoginStatusSubscriberControllerComp::RegisterSubscription(
 		return false;
 	}
 
+	const imtrest::CWebSocketRequest* webSocketRequestPtr = dynamic_cast<const imtrest::CWebSocketRequest*>(&networkRequest);
+	QPointer<QObject> requestGuard(const_cast<QObject*>(static_cast<const QObject*>(webSocketRequestPtr)));
+
 	bool result = BaseClass::RegisterSubscription(subscriptionId, gqlRequest, networkRequest, errorMessage);
 	if (result){
 		QByteArray status;
@@ -41,8 +48,23 @@ bool CLoginStatusSubscriberControllerComp::RegisterSubscription(
 		}
 
 		QString data = QString("{\"status\": \"%1\"}").arg(qPrintable(status));
-
 		QByteArray commandId = m_commandIdsAttrPtr[0];
+
+		QMutexLocker locker(&m_mutex);
+		bool subscriptionActive = false;
+		for (const BaseClass::RequestNetworks& entry : m_registeredSubscribers){
+			if (requestGuard.isNull()){
+				break;
+			}
+
+			if (entry.networkRequests.value(subscriptionId) == &networkRequest){
+				subscriptionActive = true;
+				break;
+			}
+		}
+		if (!subscriptionActive){
+			return result;
+		}
 
 		PushDataToSubscriber(subscriptionId, commandId, data.toUtf8(), networkRequest);
 	}
@@ -102,5 +124,3 @@ void CLoginStatusSubscriberControllerComp::OnComponentDestroyed()
 
 
 } // namespace imtauthgql
-
-

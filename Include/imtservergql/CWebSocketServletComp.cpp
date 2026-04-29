@@ -169,7 +169,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 
 
 	imtgql::CGqlRequest gqlRequest;
-	qsizetype errorPosition;
+	qsizetype errorPosition = -1;
 	if (!gqlRequest.ParseQuery(body, errorPosition)){
 		QString errorMessage = QString("Error when parsing request: '%1'; Error position: '%2'")
 								.arg(qPrintable(body)).arg(errorPosition);
@@ -200,10 +200,9 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	QByteArray accessToken = gqlHeaders.value(QByteArrayLiteral("x-authentication-token"));
 	QByteArray productId = gqlHeaders.value(imtbase::s_productIdHeaderId);
 
-	// NOTE: CWebSocketRequests are parented to CWebSocketThread (not QWebSocket),
-	// so auth validation calls (ValidateJwt, ValidateToken) that trigger Qt event
-	// processing are safe — even if old QWebSocket deleteLater() fires during processing,
-	// it won't cascade-delete CWebSocketRequests. No sendPostedEvents flush needed.
+	// NOTE: CWebSocketRequests are parented to QWebSocket. Keep any event-loop
+	// re-entering work after requestGuard checks; ParseQuery above only works on
+	// copied QByteArray data and a local CGqlRequest instance.
 
 	// Validate token and extract userId — same pattern as CHttpGraphQLServletComp::OnPost
 	QByteArray userId;
@@ -365,5 +364,4 @@ imtrest::ConstResponsePtr CWebSocketServletComp::CreateErrorResponse(const QByte
 
 
 } // namespace imtservergql
-
 

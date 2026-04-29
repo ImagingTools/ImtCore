@@ -226,6 +226,8 @@ QByteArray CGqlRequest::GetProtocolVersion() const
 
 bool CGqlRequest::ParseQuery(const QByteArray& query, qsizetype& errorPosition)
 {
+	errorPosition = -1;
+
 	if(query.isEmpty()){
 		return false;
 	}
@@ -1120,5 +1122,4 @@ bool CGqlRequest::CloseArray()
 
 
 } // namespace imtgql
-
 
