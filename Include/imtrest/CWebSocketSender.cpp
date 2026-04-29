@@ -39,7 +39,7 @@ bool CWebSocketSender::SendResponse(ConstResponsePtr& response) const
 		return false;
 	}
 
-	if (m_webSocketPtr != nullptr){
+	if (!m_webSocketPtr.isNull()){
 		if (!m_webSocketPtr->isValid()){
 			return false;
 		}
@@ -57,7 +57,7 @@ bool CWebSocketSender::SendResponse(ConstResponsePtr& response) const
 
 bool CWebSocketSender::SendRequest(ConstRequestPtr& request) const
 {
-	if (m_webSocketPtr != nullptr){
+	if (!m_webSocketPtr.isNull()){
 		if (!m_webSocketPtr->isValid()){
 			return false;
 		}
@@ -76,7 +76,11 @@ bool CWebSocketSender::SendRequest(ConstRequestPtr& request) const
 
 void CWebSocketSender::OnSendTextMessage(const QByteArray& data) const
 {
-	if (m_webSocketPtr != nullptr){
+	// Re-check the guard here: this slot is invoked via QueuedConnection on the
+	// main thread, and the QWebSocket may have been destroyed (deleteLater()
+	// from OnSocketDisconnected) between the emit in SendResponse/SendRequest
+	// and the dispatch of this slot.
+	if (!m_webSocketPtr.isNull()){
 		if (!m_webSocketPtr->isValid()){
 			return;
 		}
