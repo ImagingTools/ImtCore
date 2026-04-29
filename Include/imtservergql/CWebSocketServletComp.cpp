@@ -159,16 +159,13 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 
 		if (payloadObject.contains(QStringLiteral("data"))) {
 			body = payloadObject.value(QStringLiteral("data")).toString().toUtf8();
-			body.detach();
 		}
 		else {
 			body = QJsonDocument(payloadObject).toJson(QJsonDocument::Compact);
-			body.detach();
 		}
 	}
 	else if (payloadValue.isString()) {
 		body = payloadValue.toString().toUtf8();
-		body.detach();
 	}
 
 
