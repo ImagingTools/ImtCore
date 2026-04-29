@@ -32,8 +32,7 @@ void CWebSocket::OnWebSocketTextMessage(const QString& textMessage)
 
 CWebSocketThread::CWebSocketThread(CWebSocketServerComp* parent)
 	:QThread(parent),
-	m_status(ST_START),
-	m_isSecureConnection(false)
+	m_status(ST_START)
 {
 	qRegisterMetaType<ConstResponsePtr>("ConstResponsePtr");
 
