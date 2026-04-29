@@ -146,13 +146,6 @@ void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 		imtrest::CWebSocketRequest::MethodType methodType = webSocketRequest->GetMethodType();
 		if (methodType == CWebSocketRequest::MT_START || methodType == CWebSocketRequest::MT_SUBSCRIBE){
 			newRequestPtr.PopPtr();
-			// Parent to QWebSocket so that the request is cascade-deleted via the
-			// socket's deleteLater() — i.e. after the current event-loop iteration
-			// has fully unwound. Synchronous destruction inside OnSocketDisconnected
-			// (while QWebSocket's qt_metacall is still on the stack) was observed to
-			// crash deep inside Qt's signal dispatcher.
-			// Concurrent-publisher safety is provided by the QPointer<QObject>
-			// lifetime guard in CGqlPublisherCompBase::PublishDataFiltered.
 			webSocketRequest->setParent(m_socket);
 			if (m_server != nullptr){
 				m_server->RegisterSender(webSocketRequest->GetRequestId(), webSocketPtr);
@@ -229,14 +222,6 @@ void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 
 void CWebSocketThread::OnSocketDisconnected()
 {
-	// Do NOT explicitly delete CWebSocketRequest children here. The requests are
-	// parented to QWebSocket and will be destroyed asynchronously when the socket
-	// itself is processed by deleteLater() — i.e. after the current event-loop
-	// iteration has fully unwound. Destroying them synchronously here (while the
-	// QWebSocket signal dispatch is still on the stack) caused crashes deep in
-	// Qt's qt_metacall machinery.
-	// Concurrent publishers are protected by the QPointer<QObject> lifetime guard
-	// in CGqlPublisherCompBase::PublishDataFiltered.
 	m_socket = nullptr;
 	exit();
 }

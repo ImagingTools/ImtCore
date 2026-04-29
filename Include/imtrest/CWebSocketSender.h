@@ -3,7 +3,6 @@
 
 
 // Qt includes
-#include <QtCore/QPointer>
 #include <QtWebSockets/QtWebSockets>
 
 // ImtCore includes
@@ -32,12 +31,7 @@ Q_SIGNALS:
 	void SendTextMessage(const QByteArray& data) const;
 
 private:
-	// QPointer auto-clears when the QWebSocket is destroyed (e.g. by deleteLater()
-	// in CWebSocketServerComp::OnSocketDisconnected). A raw pointer here would
-	// dangle after destruction and lead to crashes deep inside QWebSocket::qt_metacall
-	// when OnSendTextMessage (queued to the main thread) eventually invokes
-	// sendTextMessage on the destroyed socket.
-	QPointer<QWebSocket> m_webSocketPtr;
+	QWebSocket* m_webSocketPtr;
 };
 
 

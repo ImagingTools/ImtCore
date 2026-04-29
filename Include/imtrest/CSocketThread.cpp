@@ -119,6 +119,7 @@ void CSocketThread::run()
 	Q_ASSERT(retVal);
 
 	exec();
+	m_socket.Reset();
 }
 
 

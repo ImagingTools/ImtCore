@@ -39,42 +39,44 @@ bool CWebSocketSender::SendResponse(ConstResponsePtr& response) const
 		return false;
 	}
 
-	// Do NOT access m_webSocketPtr here — this method is called from publisher
-	// worker threads, and m_webSocketPtr (a QPointer<QWebSocket>) tracks a
-	// QWebSocket that lives on the main thread.  A cross-thread isNull() /
-	// operator->() sequence has a TOCTOU race: the QWebSocket can be destroyed
-	// (deleteLater) between the two calls, making operator->() return a stale
-	// pointer and crashing deep inside QWebSocket::qt_metacall.
-	//
-	// Instead, just emit the queued signal unconditionally.  The main-thread
-	// OnSendTextMessage slot performs the QPointer validation safely.
-	// If the CWebSocketSender has already been removed from m_senders (by
-	// OnSocketDisconnected), the caller (CWebSocketServerComp::SendResponse)
-	// won't even reach this method.
-	const QByteArray& contentData = response->GetData();
-	emit SendTextMessage(contentData);
-	return true;
+	if (m_webSocketPtr != nullptr){
+		if (!m_webSocketPtr->isValid()){
+			return false;
+		}
+
+		const QByteArray& contentData = response->GetData();
+
+		emit SendTextMessage(contentData);
+
+		return true;
+	}
+
+	return false;
 }
 
 
 bool CWebSocketSender::SendRequest(ConstRequestPtr& request) const
 {
-	// Same reasoning as SendResponse — do not access m_webSocketPtr from a
-	// worker thread.  The main-thread OnSendTextMessage slot validates the
-	// QPointer before touching the socket.
-	const QByteArray& contentData = request->GetBody();
-	emit SendTextMessage(contentData);
-	return true;
+	if (m_webSocketPtr != nullptr){
+		if (!m_webSocketPtr->isValid()){
+			return false;
+		}
+
+		const QByteArray& contentData = request->GetBody();
+
+		emit SendTextMessage(contentData);
+
+		return true;
+	}
+
+	return false;
+
 }
 
 
 void CWebSocketSender::OnSendTextMessage(const QByteArray& data) const
 {
-	// Re-check the guard here: this slot is invoked via QueuedConnection on the
-	// main thread, and the QWebSocket may have been destroyed (deleteLater()
-	// from OnSocketDisconnected) between the emit in SendResponse/SendRequest
-	// and the dispatch of this slot.
-	if (!m_webSocketPtr.isNull()){
+	if (m_webSocketPtr != nullptr){
 		if (!m_webSocketPtr->isValid()){
 			return;
 		}
