@@ -292,30 +292,23 @@ Item {
 			property string notificationType: "message" // "message" or "assignee"
 
 			width: parent ? parent.width : Style.sizeHintXS
-			height: contentColumn.height + 2 * Style.marginM
+			height: contentColumn.height + 2 * Style.marginL
 			radius: Style.radiusM
 			border.color: "#bbbbbb"
-			color: notificationType === "assignee" ? "#d4edda" : "#d6eaf8"
+			color: ticketPopupRoot.notificationType === "assignee" ? "#d4edda" : "#d6eaf8"
 
 			MouseArea {
 				anchors.fill: parent
 				cursorShape: Qt.PointingHandCursor
 				hoverEnabled: true
 				onClicked: {
-					if (ticketPopupRoot.ticketId){
+					if (ticketPopupRoot.ticketId)
 						NavigationController.navigate("Tickets/Ticket/" + ticketPopupRoot.ticketId)
-					}
-					// Always dismiss popup on click
-					if (ticketPopupRoot.popupContainer){
+					if (ticketPopupRoot.popupContainer)
 						ticketPopupRoot.popupContainer.removeMessageById(ticketPopupRoot.messageId)
-					}
 				}
-				onEntered: {
-					ticketPopupRoot.border.color = Style.highlightColor
-				}
-				onExited: {
-					ticketPopupRoot.border.color = "#bbbbbb"
-				}
+				onEntered: ticketPopupRoot.border.color = Style.highlightColor
+				onExited: ticketPopupRoot.border.color = "#bbbbbb"
 			}
 
 			Column {
@@ -323,76 +316,83 @@ Item {
 				anchors.left: parent.left
 				anchors.right: closeArea.left
 				anchors.top: parent.top
-				anchors.margins: Style.marginM
-				spacing: Style.marginS
+				anchors.margins: Style.marginL
+				spacing: Style.marginM
 
+				// Title row: icon + "#Number Title — SenderName" (all key info)
 				Row {
+					width: parent.width
 					spacing: Style.marginS
 
 					Image {
 						anchors.verticalCenter: parent.verticalCenter
 						width: Style.iconSizeS
 						height: width
-						source:ticketPopupRoot.notificationType === "assignee" ?
-									Style.getIconPath("Icons/Assignment", Icon.State.On, Icon.Mode.Normal) :
-									Style.getIconPath("Icons/Message", Icon.State.On, Icon.Mode.Normal)
+						source: ticketPopupRoot.notificationType === "assignee"
+								? Style.getIconPath("Icons/Assignment", Icon.State.On, Icon.Mode.Normal)
+								: Style.getIconPath("Icons/Message", Icon.State.On, Icon.Mode.Normal)
 						sourceSize.width: width
 						sourceSize.height: height
 					}
-					
+
 					BaseText {
+						width: parent.width - Style.iconSizeS - Style.marginS
 						text: ticketPopupRoot.notificationType === "assignee"
-							  ? qsTr("Assigned to you")
-							  : qsTr("New message from %1").replace("%1", ticketPopupRoot.senderName || qsTr("Someone"))
+							  ? (ticketPopupRoot.ticketNumber ? "#" + ticketPopupRoot.ticketNumber + " " : "")
+								+ ticketPopupRoot.ticketTitle + " — " + qsTr("Assigned to you")
+							  : (ticketPopupRoot.ticketNumber ? "#" + ticketPopupRoot.ticketNumber + " " : "")
+								+ ticketPopupRoot.ticketTitle
+								+ (ticketPopupRoot.senderName ? " — " + ticketPopupRoot.senderName : "")
 						font.bold: true
+						elide: Text.ElideRight
+						maximumLineCount: 1
 					}
 				}
 
+				// Message preview — single line, limited height, no raw \n
 				BaseText {
 					width: parent.width
-					text: (ticketPopupRoot.ticketNumber ? ("#" + ticketPopupRoot.ticketNumber + " ") : "") + ticketPopupRoot.ticketTitle
-					color: Style.foregroundColor
+					text: ticketPopupRoot.preview.split("\n").join(" ")
+					color: "#666666"
 					elide: Text.ElideRight
-					visible: text !== ""
+					maximumLineCount: 1
+					visible: ticketPopupRoot.preview !== ""
 				}
 
+				// Hint
 				BaseText {
-					width: parent.width
-					text: ticketPopupRoot.preview
-					color: "#666666"
-					wrapMode: Text.WordWrap
-					maximumLineCount: 2
-					elide: Text.ElideRight
-					visible: text !== ""
+					text: qsTr("Click to open →")
+					color: "#999999"
 				}
 			}
 
-			ToolButton {
+			// Close button
+			MouseArea {
 				id: closeArea
+				width: Style.iconSizeS + Style.marginM
+				height: width
 				anchors.right: parent.right
 				anchors.top: parent.top
 				anchors.margins: Style.marginS
-				iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
-				decorator: Component {
-					ToolButtonDecorator {
-						color: "transparent"
-						icon.width: Style.iconSizeXS
-					}
-				}
+				cursorShape: Qt.PointingHandCursor
 				onClicked: {
-					if (ticketPopupRoot.popupContainer){
+					if (ticketPopupRoot.popupContainer)
 						ticketPopupRoot.popupContainer.removeMessageById(ticketPopupRoot.messageId)
+				}
+
+				Rectangle {
+					anchors.centerIn: parent
+					width: Style.iconSizeS
+					height: width
+					radius: width / 2
+					color: "#dddddd"
+
+					BaseText {
+						anchors.centerIn: parent
+						text: "✕"
+						color: "#333333"
 					}
 				}
-			}
-
-			// "Click to open" hint
-			BaseText {
-				anchors.right: parent.right
-				anchors.bottom: parent.bottom
-				anchors.margins: Style.marginS
-				text: qsTr("Click to open →")
-				color: "#999999"
 			}
 		}
 	}
