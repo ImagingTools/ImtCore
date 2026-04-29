@@ -305,6 +305,7 @@ Item {
 					if (ticketPopupRoot.ticketId){
 						NavigationController.navigate("Tickets/Ticket/" + ticketPopupRoot.ticketId)
 					}
+					// Always dismiss popup on click
 					if (ticketPopupRoot.popupContainer){
 						ticketPopupRoot.popupContainer.removeMessageById(ticketPopupRoot.messageId)
 					}
@@ -391,7 +392,8 @@ Item {
 					anchors.fill: parent
 					hoverEnabled: true
 					cursorShape: Qt.PointingHandCursor
-					onClicked: {
+					onClicked: function(mouse) {
+						mouse.accepted = true
 						if (ticketPopupRoot.popupContainer){
 							ticketPopupRoot.popupContainer.removeMessageById(ticketPopupRoot.messageId)
 						}
