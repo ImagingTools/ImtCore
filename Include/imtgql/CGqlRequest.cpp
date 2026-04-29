@@ -23,6 +23,7 @@ namespace
 {
 
 
+// Extracts and normalizes the command id from a GraphQL query body prefix.
 QByteArray ExtractCommandId(const QByteArray& body, qsizetype endIndex)
 {
 	QByteArray commandId = body.left(endIndex).simplified();

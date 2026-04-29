@@ -776,8 +776,8 @@ void CGqlRequestTest::TestVariablePrimitivesAndLists()
 void CGqlRequestTest::ParseRejectsEmptyCommandIdWithoutMutatingRequest()
 {
 	const char* validPayload = R"({"query": "query TestQuery { TestQuery { Field } }"})";
-	// The whitespace between the operation body opening brace and the nested selection
-	// makes the parsed command id empty after simplification.
+	// Tab and space characters between the braces make the parsed command id
+	// empty after simplification.
 	const char* invalidPayload = R"({"query": "query TestQuery { 	 { Field } }"})";
 
 	qsizetype errorPosition = -1;
