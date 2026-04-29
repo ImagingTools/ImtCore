@@ -85,6 +85,7 @@ bool CGqlPublisherCompBase::RegisterSubscription(
 	RequestNetworks newEntry;
 	newEntry.gqlRequest.CopyFrom(gqlRequest);
 	newEntry.networkRequests.insert(subscriptionId, &networkRequest);
+	newEntry.requestLifetimeGuards.insert(subscriptionId, const_cast<imtrest::CWebSocketRequest*>(constWebSocketRequest));
 
 	m_registeredSubscribers.append(newEntry);
 
@@ -176,7 +177,7 @@ bool CGqlPublisherCompBase::PublishDataFiltered(
 	const QByteArray& data,
 	std::function<bool(const imtgql::CGqlRequest&)> predicate) const
 {
-	struct Target { QByteArray id; const imtrest::IRequest* req; };
+	struct Target { QByteArray id; const imtrest::IRequest* req; QPointer<QObject> guard; };
 	QList<Target> targets;
 
 	{
@@ -187,7 +188,8 @@ bool CGqlPublisherCompBase::PublishDataFiltered(
 				// Apply filtering (predicate) to this subscriber's unique variables
 				if (!predicate || predicate(entry.gqlRequest)) {
 					for (auto it = entry.networkRequests.constBegin(); it != entry.networkRequests.constEnd(); ++it) {
-						targets.append({it.key(), it.value()});
+						QPointer<QObject> guard = entry.requestLifetimeGuards.value(it.key());
+						targets.append({it.key(), it.value(), guard});
 					}
 				}
 			}
@@ -196,6 +198,12 @@ bool CGqlPublisherCompBase::PublishDataFiltered(
 
 	// push data to subscribers outside the lock to keep the server responsive
 	for (const auto& target : targets) {
+		// Verify the request is still alive before dereferencing.
+		// The WebSocket may have disconnected, destroying the CWebSocketRequest.
+		if (target.guard.isNull()){
+			continue;
+		}
+
 		bool retVal = PushDataToSubscriber(target.id, commandId, data, *target.req);
 
 		if (!retVal){
