@@ -337,21 +337,14 @@ void CWebSocketServerComp::HandleNewConnections()
 			SendVerboseMessage("Unsupported subprotocol: " + subprotocol, "CWebSocketServerComp");
 		}
 #endif
-		bool find = false;
-		for (CWebSocketThread* webSocketThreadPtr: m_webSocketThreadList){
-			if (!webSocketThreadPtr->isRunning()){
-				webSocketThreadPtr->SetWebSocket(webSocketPtr);
-				find = true;
+		CWebSocketThread* webSocketThreadPtr = new CWebSocketThread(this);
+		m_webSocketThreadList.append(webSocketThreadPtr);
+		connect(webSocketThreadPtr, &QThread::finished, this, [this, webSocketThreadPtr](){
+			m_webSocketThreadList.removeAll(webSocketThreadPtr);
+			webSocketThreadPtr->deleteLater();
+		});
+		webSocketThreadPtr->SetWebSocket(webSocketPtr);
 
-				break;
-			}
-		}
-
-		if (!find){
-			CWebSocketThread* webSocketThreadPtr = new CWebSocketThread(this);
-			m_webSocketThreadList.append(webSocketThreadPtr);
-			webSocketThreadPtr->SetWebSocket(webSocketPtr);
-		}
 		connect(webSocketPtr, &QWebSocket::disconnected, this, &CWebSocketServerComp::OnSocketDisconnected);
 	}
 }
@@ -408,7 +401,12 @@ void CWebSocketServerComp::OnTimeout()
 	// trigger the Windows message pump, which may destroy other QWebSockets.
 	QSet<QWebSocket*> sentSockets;
 	for (int i = 0; i < m_webSocketThreadList.count(); ++i){
-		QPointer<QWebSocket> webSocketPtr(const_cast<QWebSocket*>(m_webSocketThreadList.at(i)->GetWebSocket()));
+		QPointer<CWebSocketThread> webSocketThreadPtr(m_webSocketThreadList.at(i));
+		if (webSocketThreadPtr.isNull()){
+			continue;
+		}
+
+		QPointer<QWebSocket> webSocketPtr(const_cast<QWebSocket*>(webSocketThreadPtr->GetWebSocket()));
 		if (webSocketPtr.isNull() || sentSockets.contains(webSocketPtr.data())){
 			continue;
 		}
@@ -462,5 +460,4 @@ void CWebSocketServerComp::OnSslErrors(const QList<QSslError>& errors)
 
 
 } // namespace imtrest
-
 
