@@ -33,7 +33,7 @@ bool CLoginStatusSubscriberControllerComp::RegisterSubscription(
 	}
 
 	const imtrest::CWebSocketRequest* webSocketRequestPtr = dynamic_cast<const imtrest::CWebSocketRequest*>(&networkRequest);
-	QPointer<QObject> requestGuard(const_cast<QObject*>(static_cast<const QObject*>(webSocketRequestPtr)));
+	QPointer<QObject> requestGuard(const_cast<imtrest::CWebSocketRequest*>(webSocketRequestPtr));
 
 	bool result = BaseClass::RegisterSubscription(subscriptionId, gqlRequest, networkRequest, errorMessage);
 	if (result){
@@ -48,7 +48,6 @@ bool CLoginStatusSubscriberControllerComp::RegisterSubscription(
 		}
 
 		QString data = QString("{\"status\": \"%1\"}").arg(qPrintable(status));
-		QByteArray commandId = m_commandIdsAttrPtr[0];
 
 		QMutexLocker locker(&m_mutex);
 		bool subscriptionActive = false;
@@ -66,6 +65,7 @@ bool CLoginStatusSubscriberControllerComp::RegisterSubscription(
 			return result;
 		}
 
+		QByteArray commandId = m_commandIdsAttrPtr[0];
 		PushDataToSubscriber(subscriptionId, commandId, data.toUtf8(), networkRequest);
 	}
 
