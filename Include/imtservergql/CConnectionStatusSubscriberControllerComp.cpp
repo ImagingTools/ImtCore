@@ -58,11 +58,11 @@ bool CConnectionStatusSubscriberControllerComp::RegisterSubscription(
 		QByteArray data = CreateBodySubscription().toUtf8();
 
 		QMutexLocker locker(&m_mutex);
-		for (const BaseClass::RequestNetworks& entry : m_registeredSubscribers){
-			if (requestGuard.isNull()){
-				break;
-			}
+		if (requestGuard.isNull()){
+			return result;
+		}
 
+		for (const BaseClass::RequestNetworks& entry : m_registeredSubscribers){
 			if (entry.networkRequests.value(subscriptionId) == &networkRequest){
 				QByteArray commandId = m_commandIdsAttrPtr[0];
 				PushDataToSubscriber(subscriptionId, commandId, data, networkRequest);

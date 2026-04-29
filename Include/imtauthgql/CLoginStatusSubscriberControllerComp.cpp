@@ -50,12 +50,12 @@ bool CLoginStatusSubscriberControllerComp::RegisterSubscription(
 		QString data = QString("{\"status\": \"%1\"}").arg(qPrintable(status));
 
 		QMutexLocker locker(&m_mutex);
+		if (requestGuard.isNull()){
+			return result;
+		}
+
 		bool subscriptionActive = false;
 		for (const BaseClass::RequestNetworks& entry : m_registeredSubscribers){
-			if (requestGuard.isNull()){
-				break;
-			}
-
 			if (entry.networkRequests.value(subscriptionId) == &networkRequest){
 				subscriptionActive = true;
 				break;
