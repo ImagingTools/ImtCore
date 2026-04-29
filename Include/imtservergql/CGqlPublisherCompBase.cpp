@@ -71,6 +71,9 @@ bool CGqlPublisherCompBase::RegisterSubscription(
 	RequestNetworks newEntry;
 	newEntry.gqlRequest.CopyFrom(gqlRequest);
 	newEntry.networkRequests.insert(subscriptionId, &networkRequest);
+	// Track lifetime of the underlying QObject (CWebSocketRequest) so that
+	// PublishDataFiltered can detect a destroyed request before dereferencing it.
+	newEntry.requestLifetimeGuards.insert(subscriptionId, QPointer<QObject>(webSocketRequest));
 
 	m_registeredSubscribers.append(newEntry);
 
@@ -162,7 +165,18 @@ bool CGqlPublisherCompBase::PublishDataFiltered(
 	const QByteArray& data,
 	std::function<bool(const imtgql::CGqlRequest&)> predicate) const
 {
-	struct Target { QByteArray id; const imtrest::IRequest* req; };
+	// Each Target carries a QPointer guard so that we can detect — after the
+	// mutex is released — whether the underlying CWebSocketRequest has already
+	// been destroyed (e.g. via OnSocketDisconnected → qDeleteAll → ~CWebSocketRequest
+	// → OnRequestDestroyed → UnregisterSubscription). Dereferencing target.req
+	// without this check is undefined behaviour and was the root cause of
+	// SIGSEGV crashes observed on page reload / disconnect.
+	struct Target
+	{
+		QByteArray id;
+		const imtrest::IRequest* req;
+		QPointer<QObject> guard;
+	};
 	QList<Target> targets;
 
 	{
@@ -173,7 +187,9 @@ bool CGqlPublisherCompBase::PublishDataFiltered(
 				// Apply filtering (predicate) to this subscriber's unique variables
 				if (!predicate || predicate(entry.gqlRequest)) {
 					for (auto it = entry.networkRequests.constBegin(); it != entry.networkRequests.constEnd(); ++it) {
-						targets.append({it.key(), it.value()});
+						const QByteArray& subscriptionId = it.key();
+						QPointer<QObject> guard = entry.requestLifetimeGuards.value(subscriptionId);
+						targets.append({subscriptionId, it.value(), guard});
 					}
 				}
 			}
@@ -182,6 +198,13 @@ bool CGqlPublisherCompBase::PublishDataFiltered(
 
 	// push data to subscribers outside the lock to keep the server responsive
 	for (const auto& target : targets) {
+		// Validate that the network request is still alive before dereferencing.
+		// Without this check, a concurrent disconnect/teardown can leave target.req
+		// dangling and cause a crash inside PushDataToSubscriber.
+		if (target.guard.isNull()){
+			continue;
+		}
+
 		bool retVal = PushDataToSubscriber(target.id, commandId, data, *target.req);
 
 		if (!retVal){
