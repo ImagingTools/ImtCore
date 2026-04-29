@@ -24,12 +24,25 @@ namespace
 
 
 // Extracts and normalizes the command id from a GraphQL query body prefix.
-QByteArray ExtractCommandId(const QByteArray& body, qsizetype endIndex)
+bool ExtractCommandId(const QByteArray& body, qsizetype endIndex, QByteArray& commandId)
 {
-	QByteArray commandId = body.left(endIndex).simplified();
+	commandId = body.left(endIndex).simplified();
 	commandId.replace(' ', "");
 
-	return commandId;
+	return !commandId.isEmpty();
+}
+
+
+bool AssignCommandId(const QByteArray& body, qsizetype endIndex, QByteArray& targetCommandId)
+{
+	QByteArray commandId;
+	if (!ExtractCommandId(body, endIndex, commandId)){
+		return false;
+	}
+
+	targetCommandId = commandId;
+
+	return true;
 }
 
 
@@ -312,11 +325,9 @@ bool CGqlRequest::ParseQuery(const QByteArray& query, qsizetype& errorPosition)
 
 	index = body.indexOf('(');
 	if (index > -1){
-		QByteArray commandId = ExtractCommandId(body, index);
-		if (commandId.isEmpty()){
+		if (!AssignCommandId(body, index, m_commandId)){
 			return false;
 		}
-		m_commandId = commandId;
 		m_startParams = false;
 	}
 	else{
@@ -324,11 +335,9 @@ bool CGqlRequest::ParseQuery(const QByteArray& query, qsizetype& errorPosition)
 		if (index == -1){
 			return false;
 		}
-		QByteArray commandId = ExtractCommandId(body, index);
-		if (commandId.isEmpty()){
+		if (!AssignCommandId(body, index, m_commandId)){
 			return false;
 		}
-		m_commandId = commandId;
 		m_startParams = endParams = true;
 	}
 
