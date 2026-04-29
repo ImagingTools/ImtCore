@@ -102,7 +102,6 @@ Item {
 		height: contentHeight
 		spacing: Style.marginM
 		interactive: false
-		verticalLayoutDirection: ListView.BottomToTop
 
 		model: popupModel
 

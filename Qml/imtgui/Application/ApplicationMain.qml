@@ -310,8 +310,12 @@ Item {
 						ticketPopupRoot.popupContainer.removeMessageById(ticketPopupRoot.messageId)
 					}
 				}
-				onEntered: ticketPopupRoot.border.color = Style.highlightColor
-				onExited: ticketPopupRoot.border.color = "#bbbbbb"
+				onEntered: {
+					ticketPopupRoot.border.color = Style.highlightColor
+				}
+				onExited: {
+					ticketPopupRoot.border.color = "#bbbbbb"
+				}
 			}
 
 			Column {
@@ -320,29 +324,33 @@ Item {
 				anchors.right: closeArea.left
 				anchors.top: parent.top
 				anchors.margins: Style.marginM
-				spacing: 4
+				spacing: Style.marginS
 
 				Row {
 					spacing: Style.marginS
 
-					BaseText {
-						text: ticketPopupRoot.notificationType === "assignee" ? "📋" : "💬"
-						font.pixelSize: 14
+					Image {
+						anchors.verticalCenter: parent.verticalCenter
+						width: Style.iconSizeS
+						height: width
+						source:ticketPopupRoot.notificationType === "assignee" ?
+									Style.getIconPath("Icons/Assignment", Icon.State.On, Icon.Mode.Normal) :
+									Style.getIconPath("Icons/Message", Icon.State.On, Icon.Mode.Normal)
+						sourceSize.width: width
+						sourceSize.height: height
 					}
-
+					
 					BaseText {
 						text: ticketPopupRoot.notificationType === "assignee"
 							  ? qsTr("Assigned to you")
 							  : qsTr("New message from %1").replace("%1", ticketPopupRoot.senderName || qsTr("Someone"))
 						font.bold: true
-						font.pixelSize: 13
 					}
 				}
 
 				BaseText {
 					width: parent.width
 					text: (ticketPopupRoot.ticketNumber ? ("#" + ticketPopupRoot.ticketNumber + " ") : "") + ticketPopupRoot.ticketTitle
-					font.pixelSize: 12
 					color: Style.foregroundColor
 					elide: Text.ElideRight
 					visible: text !== ""
@@ -351,8 +359,7 @@ Item {
 				BaseText {
 					width: parent.width
 					text: ticketPopupRoot.preview
-					font.pixelSize: 11
-					color: Style.foregroundColor2 ? Style.foregroundColor2 : "#666666"
+					color: "#666666"
 					wrapMode: Text.WordWrap
 					maximumLineCount: 2
 					elide: Text.ElideRight
@@ -360,31 +367,21 @@ Item {
 				}
 			}
 
-			Rectangle {
+			ToolButton {
 				id: closeArea
 				anchors.right: parent.right
 				anchors.top: parent.top
 				anchors.margins: Style.marginS
-				width: 22
-				height: 22
-				radius: 11
-				color: closeMouseArea.containsMouse ? "#dddddd" : "transparent"
-
-				BaseText {
-					anchors.centerIn: parent
-					text: "✕"
-					font.pixelSize: 12
+				iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+				decorator: Component {
+					ToolButtonDecorator {
+						color: "transparent"
+						icon.width: Style.iconSizeXS
+					}
 				}
-
-				MouseArea {
-					id: closeMouseArea
-					anchors.fill: parent
-					hoverEnabled: true
-					cursorShape: Qt.PointingHandCursor
-					onClicked: {
-						if (ticketPopupRoot.popupContainer){
-							ticketPopupRoot.popupContainer.removeMessageById(ticketPopupRoot.messageId)
-						}
+				onClicked: {
+					if (ticketPopupRoot.popupContainer){
+						ticketPopupRoot.popupContainer.removeMessageById(ticketPopupRoot.messageId)
 					}
 				}
 			}
@@ -395,8 +392,7 @@ Item {
 				anchors.bottom: parent.bottom
 				anchors.margins: Style.marginS
 				text: qsTr("Click to open →")
-				font.pixelSize: 10
-				color: Style.foregroundColor2 ? Style.foregroundColor2 : "#999999"
+				color: "#999999"
 			}
 		}
 	}
@@ -425,8 +421,7 @@ Item {
 				preview = preview.substring(0, 80) + "…"
 			}
 
-			var popupId = "TicketMessage_" + messageId
-			PopupManager.addCustomMessage(popupId, ticketNotificationDelegate, {
+			PopupManager.addCustomMessage(messageId, ticketNotificationDelegate, {
 				autoClose: true,
 				ticketId: ticketId,
 				ticketNumber: ticketNumber,
