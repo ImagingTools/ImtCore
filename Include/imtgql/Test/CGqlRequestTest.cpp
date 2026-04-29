@@ -778,7 +778,7 @@ void CGqlRequestTest::ParseRejectsEmptyCommandIdWithoutMutatingRequest()
 	const char* validPayload = R"({"query": "query TestQuery { TestQuery { Field } }"})";
 	// Tab and space characters between the braces make the parsed command id
 	// empty after normalization and whitespace removal.
-	const char* invalidPayload = R"({"query": "query TestQuery { 	 { Field } }"})";
+	const char* invalidPayload = R"({"query": "query TestQuery { 	 { Field } }", "variables": {"items": [{"id": 1}, {"id": 2}]}})";
 
 	qsizetype errorPosition = -1;
 	imtgql::CGqlRequest request;

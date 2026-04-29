@@ -26,8 +26,28 @@ namespace
 // Extracts and normalizes the command id from a GraphQL query body prefix.
 bool ExtractCommandId(const QByteArray& body, qsizetype endIndex, QByteArray& commandId)
 {
-	commandId = body.left(endIndex).simplified();
-	commandId.replace(' ', "");
+	if (endIndex <= 0){
+		commandId.clear();
+
+		return false;
+	}
+
+	commandId.clear();
+	for (qsizetype i = 0; i < endIndex; ++i){
+		const char chr = body.at(i);
+		switch (chr) {
+		case ' ':
+		case '\t':
+		case '\n':
+		case '\r':
+		case '\v':
+		case '\f':
+			break;
+		default:
+			commandId.append(chr);
+			break;
+		}
+	}
 
 	return !commandId.isEmpty();
 }
@@ -280,12 +300,8 @@ bool CGqlRequest::ParseQuery(const QByteArray& query, qsizetype& errorPosition)
 		operationName = operationNameValue.toString();
 	}
 
-	// Extract and populate the "variables" locally before mutating this request.
+	// Extract the "variables" key, but parse it only after command validation.
 	QJsonValue variablesValue = rootObject.value(QStringLiteral("variables"));
-	CGqlParamObject variables;
-	if (variablesValue.isObject()) {
-		ParseObjectParamPart(variables, variablesValue.toObject());
-	}
 
 	qsizetype index = body.indexOf('{');
 	if (index == -1){
@@ -342,7 +358,10 @@ bool CGqlRequest::ParseQuery(const QByteArray& query, qsizetype& errorPosition)
 	}
 
 	m_requestType = requestType;
-	m_variables = variables;
+	m_variables.ResetData();
+	if (variablesValue.isObject()) {
+		ParseObjectParamPart(m_variables, variablesValue.toObject());
+	}
 	m_operationName = operationName;
 	body = body.remove(0, index);
 	m_activeGqlObjectPtr = nullptr;
