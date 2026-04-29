@@ -39,44 +39,32 @@ bool CWebSocketSender::SendResponse(ConstResponsePtr& response) const
 		return false;
 	}
 
-	if (m_webSocketPtr != nullptr){
-		if (!m_webSocketPtr->isValid()){
-			return false;
-		}
-
-		const QByteArray& contentData = response->GetData();
-
-		emit SendTextMessage(contentData);
-
-		return true;
-	}
-
-	return false;
+	// Do NOT access m_webSocketPtr here — this method is called from publisher
+	// worker threads, and m_webSocketPtr tracks a QWebSocket on the main thread.
+	// Just emit the queued signal unconditionally; the main-thread
+	// OnSendTextMessage slot validates the QPointer safely.
+	const QByteArray& contentData = response->GetData();
+	emit SendTextMessage(contentData);
+	return true;
 }
 
 
 bool CWebSocketSender::SendRequest(ConstRequestPtr& request) const
 {
-	if (m_webSocketPtr != nullptr){
-		if (!m_webSocketPtr->isValid()){
-			return false;
-		}
-
-		const QByteArray& contentData = request->GetBody();
-
-		emit SendTextMessage(contentData);
-
-		return true;
-	}
-
-	return false;
-
+	// Same reasoning as SendResponse — do not access m_webSocketPtr from a
+	// worker thread.
+	const QByteArray& contentData = request->GetBody();
+	emit SendTextMessage(contentData);
+	return true;
 }
 
 
 void CWebSocketSender::OnSendTextMessage(const QByteArray& data) const
 {
-	if (m_webSocketPtr != nullptr){
+	// Re-check the guard here: this slot is invoked via QueuedConnection on the
+	// main thread.  The QWebSocket may have been destroyed between the emit and
+	// the dispatch of this slot.
+	if (!m_webSocketPtr.isNull()){
 		if (!m_webSocketPtr->isValid()){
 			return;
 		}

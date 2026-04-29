@@ -7,6 +7,10 @@
 #include <iprm/IEnableableParam.h>
 #include <iprm/TParamsPtr.h>
 
+// Qt includes
+#include <QtCore/QPointer>
+#include <QtCore/QSet>
+
 // ImtCore includes
 #include <imtrest/CWebSocketRequest.h>
 #include <imtrest/CWebSocketThread.h>
@@ -362,15 +366,36 @@ void CWebSocketServerComp::OnSocketDisconnected()
 		m_subscriberEngineCompPtr->UnRegisterSubscriber(socketObjectPtr);
 	}
 
-	for (const QByteArray& key: m_senders.keys()){
-		if (socketObjectPtr == m_senders[key]->GetSocket()){
-			m_senders.remove(key);
+	// Collect keys to remove first, then modify the map under write lock.
+	// SendResponse() reads m_senders under QReadLocker from worker threads.
+	QList<QByteArray> keysToRemove;
+	{
+		QWriteLocker locker(&m_sendersLock);
 
-			istd::IChangeable::ChangeSet loginChangeSet(imtcom::IConnectionStatusProvider::CS_UNKNOWN, QString("Logout"));
-			loginChangeSet.SetChangeInfo("ClientId", key);
-			istd::CChangeNotifier notifier(this, &loginChangeSet);
-			m_senderLoginStatusMap.remove(key);
+		for (auto it = m_senders.constBegin(); it != m_senders.constEnd(); ++it){
+			if (it.value() && socketObjectPtr == it.value()->GetSocket()){
+				keysToRemove.append(it.key());
+			}
 		}
+
+		for (const QByteArray& key : keysToRemove){
+			m_senders.remove(key);
+		}
+	}
+
+	for (const QByteArray& key : keysToRemove){
+		istd::IChangeable::ChangeSet loginChangeSet(imtcom::IConnectionStatusProvider::CS_UNKNOWN, QString("Logout"));
+		loginChangeSet.SetChangeInfo("ClientId", key);
+		istd::CChangeNotifier notifier(this, &loginChangeSet);
+		m_senderLoginStatusMap.remove(key);
+	}
+
+	// Abort the socket to immediately close the native handle.
+	// On Windows, the event loop dispatches stale network events for sockets
+	// queued for deferred deletion.  abort() closes the handle synchronously.
+	QWebSocket* webSocket = qobject_cast<QWebSocket*>(socketObjectPtr);
+	if (webSocket != nullptr){
+		webSocket->abort();
 	}
 
 	socketObjectPtr->deleteLater();
@@ -379,25 +404,32 @@ void CWebSocketServerComp::OnSocketDisconnected()
 
 void CWebSocketServerComp::OnTimeout()
 {
-	QList<QWebSocket*> sendedSockets;
-	for (CWebSocketThread* webSocketThread: m_webSocketThreadList) {
-		QWebSocket* webSocketPtr = const_cast<QWebSocket*>(webSocketThread->GetWebSocket());
-		if (webSocketPtr != nullptr && !sendedSockets.contains(webSocketPtr)){
-			QString subProtocolId;
+	// Use QPointer guards and index-based iteration: sendTextMessage can
+	// trigger the Windows message pump, which may destroy other QWebSockets.
+	QSet<QWebSocket*> sentSockets;
+	for (int i = 0; i < m_webSocketThreadList.count(); ++i){
+		QPointer<QWebSocket> webSocketPtr(const_cast<QWebSocket*>(m_webSocketThreadList.at(i)->GetWebSocket()));
+		if (webSocketPtr.isNull() || sentSockets.contains(webSocketPtr.data())){
+			continue;
+		}
 
-		#if QT_VERSION >= QT_VERSION_CHECK(6, 4, 0)
-			subProtocolId = webSocketPtr->subprotocol();
-		#endif
+		if (!webSocketPtr->isValid()){
+			continue;
+		}
 
-			if (subProtocolId == "graphql-transport-ws"){
-				//optional ToDo: Remember send ping and disconnect websocket if no pong is received
-				webSocketPtr->sendTextMessage(QString(R"({"type": "ping"})"));
-			}
-			else{
-				webSocketPtr->sendTextMessage(QString(R"({"type": "ka"})"));
-			}
+		sentSockets.insert(webSocketPtr.data());
 
-			sendedSockets.append(webSocketPtr);
+		QString subProtocolId;
+
+	#if QT_VERSION >= QT_VERSION_CHECK(6, 4, 0)
+		subProtocolId = webSocketPtr->subprotocol();
+	#endif
+
+		if (subProtocolId == "graphql-transport-ws"){
+			webSocketPtr->sendTextMessage(QString(R"({"type": "ping"})"));
+		}
+		else{
+			webSocketPtr->sendTextMessage(QString(R"({"type": "ka"})"));
 		}
 	}
 }

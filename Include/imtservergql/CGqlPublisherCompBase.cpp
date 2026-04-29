@@ -162,31 +162,25 @@ bool CGqlPublisherCompBase::PublishDataFiltered(
 	const QByteArray& data,
 	std::function<bool(const imtgql::CGqlRequest&)> predicate) const
 {
-	struct Target { QByteArray id; const imtrest::IRequest* req; };
-	QList<Target> targets;
+	// Hold the mutex for the entire operation, including the send loop.
+	// ~CWebSocketRequest calls OnRequestDestroyed → UnregisterSubscription,
+	// which acquires the same m_mutex.  While the worker holds the mutex,
+	// the destructor blocks, so the CWebSocketRequest stays alive.
+	// The actual network I/O happens asynchronously on the main thread
+	// (QueuedConnection in CWebSocketSender), so the worker-side call is fast.
+	QMutexLocker locker(&m_mutex);
 
-	{
-		QMutexLocker locker(&m_mutex);
-		for (const auto& entry : m_registeredSubscribers) {
-			if (entry.gqlRequest.GetCommandId() == commandId) {
-
-				// Apply filtering (predicate) to this subscriber's unique variables
-				if (!predicate || predicate(entry.gqlRequest)) {
-					for (auto it = entry.networkRequests.constBegin(); it != entry.networkRequests.constEnd(); ++it) {
-						targets.append({it.key(), it.value()});
+	for (const auto& entry : m_registeredSubscribers) {
+		if (entry.gqlRequest.GetCommandId() == commandId) {
+			if (!predicate || predicate(entry.gqlRequest)) {
+				for (auto it = entry.networkRequests.constBegin(); it != entry.networkRequests.constEnd(); ++it) {
+					bool retVal = PushDataToSubscriber(it.key(), commandId, data, *(it.value()));
+					if (!retVal){
+						QString message = QString("Unable to notify subscriber about the changes. Subscription-ID: '%1', '%2'").arg(qPrintable(commandId), qPrintable(data));
+						SendErrorMessage(0, message, "CGqlPublisherCompBase");
 					}
 				}
 			}
-		}
-	}
-
-	// push data to subscribers outside the lock to keep the server responsive
-	for (const auto& target : targets) {
-		bool retVal = PushDataToSubscriber(target.id, commandId, data, *target.req);
-
-		if (!retVal){
-			QString message = QString("Unable to notify subscriber about the changes. Subscription-ID: '%1', '%2'").arg(qPrintable(commandId), qPrintable(data));
-			SendErrorMessage(0, message, "CGqlPublisherCompBase");
 		}
 	}
 

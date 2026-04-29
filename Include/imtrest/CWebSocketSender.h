@@ -3,6 +3,7 @@
 
 
 // Qt includes
+#include <QtCore/QPointer>
 #include <QtWebSockets/QtWebSockets>
 
 // ImtCore includes
@@ -31,7 +32,7 @@ Q_SIGNALS:
 	void SendTextMessage(const QByteArray& data) const;
 
 private:
-	QWebSocket* m_webSocketPtr;
+	QPointer<QWebSocket> m_webSocketPtr;
 };
 
 
