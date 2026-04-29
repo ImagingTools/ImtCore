@@ -6,9 +6,6 @@
 #include <ilog/TLoggerCompWrap.h>
 #include <iqt/ITranslationManager.h>
 
-// Qt includes
-#include <QtCore/QPointer>
-
 // ImtCore includes
 #include <imtrest/CWebSocketRequest.h>
 #include <imtrest/IResponseDispatcher.h>
@@ -62,12 +59,6 @@ protected:
 	{
 		imtgql::CGqlRequest gqlRequest;
 		QMap<QByteArray, const imtrest::IRequest*> networkRequests; // Subscription-ID -> NetworkRequest
-		// Lifetime guards for each network request (keyed by Subscription-ID).
-		// CWebSocketRequest is a QObject; QPointer auto-clears when it is destroyed,
-		// so PublishDataFiltered can detect a dangling pointer and skip sending —
-		// closing the race between subscription teardown (OnSocketDisconnected /
-		// ~CWebSocketRequest → UnregisterSubscription) and concurrent publishing.
-		QMap<QByteArray, QPointer<QObject>> requestLifetimeGuards;
 
 		RequestNetworks()
 			:gqlRequest(imtgql::IGqlRequest::RT_SUBSCRIPTION)
