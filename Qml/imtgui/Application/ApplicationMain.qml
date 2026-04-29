@@ -366,32 +366,23 @@ Item {
 				}
 			}
 
-			// Close button
-			MouseArea {
+			ToolButton {
 				id: closeArea
 				width: Style.iconSizeS + Style.marginM
 				height: width
 				anchors.right: parent.right
 				anchors.top: parent.top
 				anchors.margins: Style.marginS
-				cursorShape: Qt.PointingHandCursor
+				iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+				decorator: Component {
+					ToolButtonDecorator {
+						color: "transparent"
+						icon.width: Style.iconSizeXS
+					}
+				}
 				onClicked: {
 					if (ticketPopupRoot.popupContainer)
 						ticketPopupRoot.popupContainer.removeMessageById(ticketPopupRoot.messageId)
-				}
-
-				Rectangle {
-					anchors.centerIn: parent
-					width: Style.iconSizeS
-					height: width
-					radius: width / 2
-					color: "#dddddd"
-
-					BaseText {
-						anchors.centerIn: parent
-						text: "✕"
-						color: "#333333"
-					}
 				}
 			}
 		}
