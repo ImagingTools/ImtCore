@@ -139,8 +139,9 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 		return CreateErrorResponse(QByteArrayLiteral("Invalid WebSocket request"), request);
 	}
 
-	// Capture all data from the request immediately. The CWebSocketRequest is parented
-	// to CWebSocketThread, so it stays alive while the socket disconnect path unwinds.
+	// Capture all data from the request immediately — the CWebSocketRequest is parented
+	// to QWebSocket via setParent(m_socket), so it can be cascade-destroyed when the
+	// socket is deleted via deleteLater().
 	const QByteArray subscriptionId = webSocketRequest->GetRequestId();
 	QByteArray body = request.GetBody();
 	const QJsonDocument document = QJsonDocument::fromJson(body);
