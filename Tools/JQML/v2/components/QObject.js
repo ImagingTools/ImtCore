@@ -13,7 +13,7 @@ class QObject extends ComplexObject {
         modelData_: { type: QVar, value: undefined, signalWithout: true },
         parentModelData_: { type: QVar, value: undefined, signalWithout: true },
 
-        index: { type: QReal, value: 0 },
+        index: { type: QReal, value: 0, changed: '$indexChanged'},
         context: { type: QVar, value: undefined },
         parent: { type: QVar, value: undefined, changed: '$parentChanged' },
         children: { type: QList, changed: '$childrenChanged' },
@@ -111,6 +111,10 @@ class QObject extends ComplexObject {
     }
 
     $_testIdChanged(){
+        
+    }
+
+    $indexChanged(){
         
     }
 
