@@ -62,6 +62,8 @@ void CWebSocketThread::SetWebSocket(QWebSocket* webSocketPtr)
 		connect(webSocketPtr, &QWebSocket::disconnected, this, &CWebSocketThread::OnSocketDisconnected, connectionType);
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
 		connect(webSocketPtr, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::errorOccurred), this, &CWebSocketThread::OnError, connectionType);
+#else
+		// Older Qt builds still use disconnected() for cleanup; error logging is optional here.
 #endif
 	}
 

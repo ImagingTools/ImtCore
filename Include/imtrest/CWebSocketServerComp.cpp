@@ -339,13 +339,14 @@ void CWebSocketServerComp::HandleNewConnections()
 #endif
 		CWebSocketThread* webSocketThreadPtr = new CWebSocketThread(this);
 		m_webSocketThreadList.append(webSocketThreadPtr);
+		QPointer<CWebSocketServerComp> serverGuard(this);
 		QPointer<CWebSocketThread> webSocketThreadGuard(webSocketThreadPtr);
-		connect(webSocketThreadPtr, &QThread::finished, this, [this, webSocketThreadGuard](){
-			if (webSocketThreadGuard.isNull()){
+		connect(webSocketThreadPtr, &QThread::finished, this, [serverGuard, webSocketThreadGuard](){
+			if (serverGuard.isNull() || webSocketThreadGuard.isNull()){
 				return;
 			}
 
-			m_webSocketThreadList.removeAll(webSocketThreadGuard.data());
+			serverGuard->m_webSocketThreadList.removeAll(webSocketThreadGuard.data());
 			webSocketThreadGuard->deleteLater();
 		}, Qt::QueuedConnection);
 		webSocketThreadPtr->SetWebSocket(webSocketPtr);
