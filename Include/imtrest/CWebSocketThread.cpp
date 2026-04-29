@@ -45,7 +45,7 @@ CWebSocketThread::CWebSocketThread(CWebSocketServerComp* parent)
 	m_requestClientHandlerPtr = m_server->GetRequestClientServlet();
 	m_productId = m_server->GetProductId();
 
-	// Always send through the event loop so disconnect/deleteLater events can clear m_socket first.
+	// Always send through the event loop so pending disconnect events can invalidate m_socket first.
 	connect(this, &CWebSocketThread::SendTextMessage, this, &CWebSocketThread::OnSendTextMessage, Qt::QueuedConnection);
 }
 

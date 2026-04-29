@@ -339,9 +339,14 @@ void CWebSocketServerComp::HandleNewConnections()
 #endif
 		CWebSocketThread* webSocketThreadPtr = new CWebSocketThread(this);
 		m_webSocketThreadList.append(webSocketThreadPtr);
-		connect(webSocketThreadPtr, &QThread::finished, this, [this, webSocketThreadPtr](){
-			m_webSocketThreadList.removeAll(webSocketThreadPtr);
-			webSocketThreadPtr->deleteLater();
+		QPointer<CWebSocketThread> webSocketThreadGuard(webSocketThreadPtr);
+		connect(webSocketThreadPtr, &QThread::finished, this, [this, webSocketThreadGuard](){
+			if (webSocketThreadGuard.isNull()){
+				return;
+			}
+
+			m_webSocketThreadList.removeAll(webSocketThreadGuard.data());
+			webSocketThreadGuard->deleteLater();
 		});
 		webSocketThreadPtr->SetWebSocket(webSocketPtr);
 
@@ -460,4 +465,3 @@ void CWebSocketServerComp::OnSslErrors(const QList<QSslError>& errors)
 
 
 } // namespace imtrest
-
