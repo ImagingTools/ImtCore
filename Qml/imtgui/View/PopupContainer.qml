@@ -71,7 +71,7 @@ Item {
 				width: 24
 				height: 24
 				radius: 12
-				color: closeMouseArea.containsMouse ? Qt.darker(defaultDelegateRoot.color, 1.15) : "transparent"
+				color: closeMouseArea.containsMouse ? "#dddddd" : "transparent"
 
 				BaseText {
 					anchors.centerIn: parent
@@ -125,10 +125,9 @@ Item {
 				anchors.left: parent.left
 				anchors.right: parent.right
 
-				sourceComponent: {
-					var customComp = popupContainer.__customComponents[model.id]
-					return customComp ? customComp : __defaultDelegate
-				}
+				sourceComponent: popupContainer.__customComponents[model.id]
+								 ? popupContainer.__customComponents[model.id]
+								 : __defaultDelegate
 
 				onLoaded: {
 					if (item){

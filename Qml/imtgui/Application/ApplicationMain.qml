@@ -294,7 +294,7 @@ Item {
 			width: parent ? parent.width : Style.sizeHintXS
 			height: contentColumn.height + 2 * Style.marginM
 			radius: Style.radiusM
-			border.color: Qt.darker(ticketPopupRoot.color, 1.15)
+			border.color: "#bbbbbb"
 			color: notificationType === "assignee" ? "#d4edda" : "#d6eaf8"
 
 			MouseArea {
@@ -311,7 +311,7 @@ Item {
 					}
 				}
 				onEntered: ticketPopupRoot.border.color = Style.highlightColor
-				onExited: ticketPopupRoot.border.color = Qt.darker(ticketPopupRoot.color, 1.15)
+				onExited: ticketPopupRoot.border.color = "#bbbbbb"
 			}
 
 			Column {
@@ -331,13 +331,9 @@ Item {
 					}
 
 					BaseText {
-						text: {
-							if (ticketPopupRoot.notificationType === "assignee"){
-								return qsTr("Assigned to you")
-							}
-							var who = ticketPopupRoot.senderName || qsTr("Someone")
-							return qsTr("New message from %1").replace("%1", who)
-						}
+						text: ticketPopupRoot.notificationType === "assignee"
+							  ? qsTr("Assigned to you")
+							  : qsTr("New message from %1").replace("%1", ticketPopupRoot.senderName || qsTr("Someone"))
 						font.bold: true
 						font.pixelSize: 13
 					}
@@ -345,14 +341,7 @@ Item {
 
 				BaseText {
 					width: parent.width
-					text: {
-						var label = ""
-						if (ticketPopupRoot.ticketNumber)
-							label = "#" + ticketPopupRoot.ticketNumber
-						if (ticketPopupRoot.ticketTitle)
-							label = label ? (label + " " + ticketPopupRoot.ticketTitle) : ticketPopupRoot.ticketTitle
-						return label
-					}
+					text: (ticketPopupRoot.ticketNumber ? ("#" + ticketPopupRoot.ticketNumber + " ") : "") + ticketPopupRoot.ticketTitle
 					font.pixelSize: 12
 					color: Style.foregroundColor
 					elide: Text.ElideRight
@@ -379,7 +368,7 @@ Item {
 				width: 22
 				height: 22
 				radius: 11
-				color: closeMouseArea.containsMouse ? Qt.darker(ticketPopupRoot.color, 1.15) : "transparent"
+				color: closeMouseArea.containsMouse ? "#dddddd" : "transparent"
 
 				BaseText {
 					anchors.centerIn: parent
@@ -392,8 +381,7 @@ Item {
 					anchors.fill: parent
 					hoverEnabled: true
 					cursorShape: Qt.PointingHandCursor
-					onClicked: function(mouse) {
-						mouse.accepted = true
+					onClicked: {
 						if (ticketPopupRoot.popupContainer){
 							ticketPopupRoot.popupContainer.removeMessageById(ticketPopupRoot.messageId)
 						}
