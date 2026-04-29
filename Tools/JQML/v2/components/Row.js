@@ -12,7 +12,6 @@ class Row extends Item {
 
     constructor(parent,exCtx,exModel){
         super(parent,exCtx,exModel)
-        this.$dom.classList.add('Row')
     }
 
     updateGeometry(){
@@ -36,8 +35,23 @@ class Row extends Item {
                     }
                     if(i < children.length - 1 && find){
                         w += this.getPropertyValue('spacing')
+                        children[i].setStyle({
+                            marginRight: `${this.getPropertyValue('spacing')}px`
+                        })
+                    } else {
+                        children[i].setStyle({
+                            marginRight: `0`
+                        })
                     }
+                } else {
+                    children[i].setStyle({
+                        marginRight: `0`
+                    })
                 }
+            } else {
+                children[i].setStyle({
+                    marginRight: `0`
+                })
             }
         }
 
@@ -61,9 +75,6 @@ class Row extends Item {
     }
 
     $spacingChanged(){
-        this.setStyle({
-            gap: `${this.getPropertyValue('spacing')}px`
-        })
         this.updateGeometry()
     }
 
