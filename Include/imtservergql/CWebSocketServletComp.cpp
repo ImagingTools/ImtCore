@@ -247,37 +247,20 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 		return imtrest::ConstResponsePtr();
 	}
 
-	// Create GqlContext with auth info
-	if (m_gqlContextCreatorCompPtr.IsValid()){
-		QString contextError;
-		imtgql::IGqlContextUniquePtr gqlContextPtr = m_gqlContextCreatorCompPtr->CreateGqlContext(accessToken, productId, userId, gqlHeaders, contextError);
-		if (gqlContextPtr.IsValid()){
-			gqlRequest.SetGqlContext(gqlContextPtr.PopInterfacePtr());
-		}
-		else{
-			// Fall back to simple context with all available auth info
-			imtgql::CGqlContext* simpleContext = new imtgql::CGqlContext();
-			simpleContext->SetHeaders(gqlHeaders);
-			simpleContext->SetUserId(userId);
-			simpleContext->SetToken(accessToken);
-			simpleContext->SetProductId(productId);
-			gqlRequest.SetGqlContext(simpleContext);
-		}
-	}
-	else{
-		// No context creator — create simple context with all available auth info
+	// Create simple GqlContext with authenticated user info.
+	// NOTE: We intentionally do NOT use IGqlContextCreator::CreateGqlContext() here.
+	// CreateGqlContext accesses UserCollection/UserSettingsCollection (database),
+	// which triggers Qt event loop processing. During that processing, old WebSocket
+	// deleteLater() events fire, cascade-destroying CWebSocketRequest objects → crash.
+	// A simple CGqlContext with userId/token/productId is sufficient for subscriptions —
+	// PublishDataFiltered only needs GetUserId() for filtering.
+	{
 		imtgql::CGqlContext* simpleContext = new imtgql::CGqlContext();
 		simpleContext->SetHeaders(gqlHeaders);
 		simpleContext->SetUserId(userId);
 		simpleContext->SetToken(accessToken);
 		simpleContext->SetProductId(productId);
 		gqlRequest.SetGqlContext(simpleContext);
-	}
-
-	// Verify request is still alive after context creation
-	if (requestGuard.isNull()){
-		SendErrorMessage(0, QStringLiteral("WebSocket request destroyed during context creation"), QStringLiteral("CWebSocketServletComp"));
-		return imtrest::ConstResponsePtr();
 	}
 
 	QByteArray commandId = gqlRequest.GetCommandId();
