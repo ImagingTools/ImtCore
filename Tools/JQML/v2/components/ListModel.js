@@ -17,6 +17,16 @@ class ListModel extends QtObject {
         this.getProperty('data').value = []
     }
 
+    $listeners = new Set()
+
+    $addListener(obj){
+        this.$listeners.add(obj)
+    }
+
+    $removeListener(obj){
+        this.$listeners.delete(obj)
+    }
+
     $complete(){
         super.$complete()
         this.getStatement('count').reset(this.getStatement('data').get().length)
@@ -28,6 +38,12 @@ class ListModel extends QtObject {
 
     addData(data){
         // this.getPropertyValue('data').push(data)
+    }
+
+    $notifyListeners(topLeft, bottomRight, roles){
+        for(let listener of this.$listeners){
+            if(listener.UID) listener.updateView(topLeft, bottomRight, roles)
+        }
     }
 
     $dataChanged(topLeft, bottomRight, roles){
@@ -81,6 +97,7 @@ class ListModel extends QtObject {
         
         this.getStatement('count').reset(this.getStatement('data').get().length)
         this.$emitDataChanged(this.getStatement('data').get().length-1, this.getStatement('data').get().length, 'append')
+        this.$notifyListeners(this.getStatement('data').get().length-1, this.getStatement('data').get().length, 'append')
     }
     clear(){
         let leftTop = 0
@@ -89,6 +106,7 @@ class ListModel extends QtObject {
 
         this.getStatement('count').reset(0)
         this.$emitDataChanged(leftTop, rightBottom, 'remove')
+        this.$notifyListeners(leftTop, rightBottom, 'remove')
     }
     get(index){
         return index >= 0 && index < this.getStatement('data').get().length ? this.getStatement('data').get()[index] : undefined
@@ -113,6 +131,7 @@ class ListModel extends QtObject {
         
         this.getStatement('count').reset(this.getStatement('data').get().length)
         this.$emitDataChanged(index, index+1, 'insert')
+        this.$notifyListeners(index, index+1, 'insert')
     }
     set(index, dict){
         this.getStatement('data').get()[index] = dict
@@ -129,6 +148,7 @@ class ListModel extends QtObject {
         }
         
         this.$emitDataChanged(from, from+n, 'move')
+        this.$notifyListeners([from, to], n, 'move')
     }
     remove(index, count = 1){
         this.getStatement('data').get().splice(index, count)
@@ -143,6 +163,7 @@ class ListModel extends QtObject {
         // }
         // this.dataChanged(index, index+count)
         this.$emitDataChanged(index, index+count, 'remove')
+        this.$notifyListeners(index, index+count, 'remove')
     }
     setProperty(index, property, value){
         this.getStatement('data').get()[index][property] = value
@@ -205,6 +226,11 @@ class ListModel extends QtObject {
         return retVal
     }
     
+
+    $free(){
+        this.$listeners.clear()
+        super.$free()
+    }
 }
 
 module.exports.ListModel = ListModel

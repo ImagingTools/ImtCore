@@ -2,10 +2,6 @@ const { QtObject } = require('./QtObject')
 const { QReal, QAnchors, QAnchorLine, QAutoGeometry, QBool, QInt, QProperty, QKeyNavigation, QVisible, QDrag } = require('../utils/properties')
 
 class Item extends QtObject {
-    static defaultCSS = {
-        display: 'flex'
-    }
-
     static TopLeft = 0
     static Top = 1
     static TopRight = 2
@@ -100,7 +96,6 @@ class Item extends QtObject {
         super(parent,exCtx,exModel)
         this.createDom('div', {
             position: 'absolute',
-            display: 'flex',
             overflow : 'unset',
             zIndex: 0,
             pointerEvents: 'none',
@@ -127,6 +122,13 @@ class Item extends QtObject {
         this.$anchorsUpdate()
     }
 
+    $indexChanged(){
+        if(this.$dom)
+        this.setStyle({
+            order: this.index,
+        })
+    }
+
     $anchorsUpdate(){
         for(let func of this.$anchorsUpdateList.splice(0, this.$anchorsUpdateList.length)){
             func()
@@ -136,6 +138,7 @@ class Item extends QtObject {
     createDom(tag = 'div', style){
         this.$dom = document.createElement(tag)
         this.setStyle(style)
+        this.$dom.style.order = this.getPropertyValue('index')
         this.$dom.id = this.UID
         this.$dom.setAttribute('_testId', this._testId)
         // this.$dom.classList.add(this.constructor.name)
@@ -410,21 +413,25 @@ class Item extends QtObject {
         
     }
 
-    $visibleChanged(){
-        let currentValue = this.getPropertyValue('visible')
-        if(currentValue){
-            if(this.$dom) {
-                this.$dom.setAttribute('visible', '')
-                this.$dom.removeAttribute('unvisible', '')
+    $checkVisibility(){
+        if(this.getPropertyValue('visible')){
+            this.$dom.setAttribute('visible', '')
+            this.$dom.removeAttribute('unvisible')
+            if(this.getPropertyValue('width') > 0 && this.getPropertyValue('height') > 0){
+                this.$dom.removeAttribute('no-view')
+            } else {
+                this.$dom.setAttribute('no-view', '')
             }
         } else {
-            if(this.$dom) {
-                this.$dom.setAttribute('unvisible', '')
-                this.$dom.removeAttribute('visible')
-            }
+            this.$dom.removeAttribute('visible')
+            this.$dom.setAttribute('unvisible', '')
         }
         
-        this.setStyle({ display: currentValue ? Item.defaultCSS.display : 'none' })
+    }
+
+    $visibleChanged(){
+        let currentValue = this.getPropertyValue('visible')
+        this.$checkVisibility()
 
         for(let child of this.children){
             if(child.UID) child.getProperty('visible').set2(currentValue)
@@ -448,6 +455,7 @@ class Item extends QtObject {
             width: `${this.getProperty('width').get()}px`,
             minWidth: `${this.getProperty('width').get()}px`,
         })
+        this.$checkVisibility()
         // this.$dom.style.width = `${this.getProperty('width').get() > 0 ? this.getProperty('width').get() : 0}px`
     }
 
@@ -456,6 +464,7 @@ class Item extends QtObject {
             height: `${this.getProperty('height').get()}px`,
             minHeight: `${this.getProperty('height').get()}px`,
         })
+        this.$checkVisibility()
         // this.$dom.style.height = `${this.getProperty('height').get() > 0 ? this.getProperty('height').get() : 0}px`
     }
 
