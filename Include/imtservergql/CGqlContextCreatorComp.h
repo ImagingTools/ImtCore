@@ -59,6 +59,12 @@ private:
 				QByteArray& userId,
 				QString& errorMessage,
 				imtgql::IGqlContextCreator::ContextCreationStatus& status) const;
+	bool TryGetCachedToken(const QByteArray& token, QByteArray& userId) const;
+	void StoreCachedToken(
+				const QByteArray& token,
+				const QByteArray& userId,
+				const QByteArray& tokenId,
+				bool isPat) const;
 	imtgql::IGqlContextUniquePtr CreateContextInstance() const;
 	bool IsPatToken(const QByteArray& token) const;
 	void SetStatus(
@@ -72,8 +78,9 @@ private:
 	I_REF(imtauth::IJwtSessionController, m_jwtSessionControllerCompPtr);
 	I_REF(imtauth::IPersonalAccessTokenManager, m_patManagerCompPtr);
 
-	mutable QMutex m_contextFactoryMutex;
-	mutable QMutex m_tokenResolverMutex;
+	mutable QMutex m_contextCreationMutex;
+	mutable QMutex m_tokenValidationMutex;
+	mutable QMutex m_tokenCacheMutex;
 	mutable QHash<QByteArray, TokenCacheEntry> m_tokenCache;
 };
 
