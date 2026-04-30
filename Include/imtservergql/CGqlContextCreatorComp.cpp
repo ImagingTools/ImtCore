@@ -140,12 +140,12 @@ bool CGqlContextCreatorComp::ResolveUserId(
 		return true;
 	}
 
-	// Keep calls into shared auth components serialized; their thread-safety is not guaranteed.
+	// Both PAT and JWT paths serialize calls into shared auth components; their thread-safety is not guaranteed.
 	if (IsPatToken(token)){
 		QByteArray tokenId;
 		QByteArrayList scopes;
 		{
-			QMutexLocker validationLocker(&m_tokenValidationMutex);
+			QMutexLocker locker(&m_tokenValidationMutex);
 			if (!m_patManagerCompPtr.IsValid()){
 				errorMessage = QStringLiteral("Personal access token manager is not configured.");
 				status = imtgql::IGqlContextCreator::CCS_FORBIDDEN;
@@ -166,7 +166,7 @@ bool CGqlContextCreatorComp::ResolveUserId(
 	}
 
 	{
-		QMutexLocker validationLocker(&m_tokenValidationMutex);
+		QMutexLocker locker(&m_tokenValidationMutex);
 		if (!m_jwtSessionControllerCompPtr.IsValid()){
 			errorMessage = QStringLiteral("JWT session controller is not configured.");
 			status = imtgql::IGqlContextCreator::CCS_FORBIDDEN;
