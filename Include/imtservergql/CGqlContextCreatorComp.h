@@ -59,12 +59,6 @@ private:
 				QByteArray& userId,
 				QString& errorMessage,
 				imtgql::IGqlContextCreator::ContextCreationStatus& status) const;
-	bool TryGetCachedTokenLocked(const QByteArray& token, QByteArray& userId) const;
-	void StoreCachedTokenLocked(
-				const QByteArray& token,
-				const QByteArray& userId,
-				const QByteArray& tokenId,
-				bool isPat) const;
 	imtgql::IGqlContextUniquePtr CreateContextInstance() const;
 	bool IsPatToken(const QByteArray& token) const;
 	void SetStatus(

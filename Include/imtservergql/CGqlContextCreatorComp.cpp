@@ -136,9 +136,16 @@ bool CGqlContextCreatorComp::ResolveUserId(
 			imtgql::IGqlContextCreator::ContextCreationStatus& status) const
 {
 	QMutexLocker resolverLocker(&m_tokenResolverMutex);
-	if (TryGetCachedTokenLocked(token, userId)){
+
+	const qint64 now = QDateTime::currentMSecsSinceEpoch();
+	auto iter = m_tokenCache.find(token);
+	if (iter != m_tokenCache.end() && iter->expiresAt > now){
+		userId = iter->userId;
 		status = imtgql::IGqlContextCreator::CCS_OK;
 		return true;
+	}
+	if (iter != m_tokenCache.end()){
+		m_tokenCache.erase(iter);
 	}
 
 	if (IsPatToken(token)){
@@ -157,7 +164,12 @@ bool CGqlContextCreatorComp::ResolveUserId(
 		}
 
 		m_patManagerCompPtr->UpdateLastUsedAt(tokenId);
-		StoreCachedTokenLocked(token, userId, tokenId, true);
+		TokenCacheEntry entry;
+		entry.userId = userId;
+		entry.tokenId = tokenId;
+		entry.isPat = true;
+		entry.expiresAt = QDateTime::currentMSecsSinceEpoch() + s_tokenCacheTtlMs;
+		m_tokenCache.insert(token, entry);
 		return true;
 	}
 
@@ -181,43 +193,12 @@ bool CGqlContextCreatorComp::ResolveUserId(
 	}
 
 	userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(token);
-	StoreCachedTokenLocked(token, userId, QByteArray(), false);
-	return true;
-}
-
-
-bool CGqlContextCreatorComp::TryGetCachedTokenLocked(const QByteArray& token, QByteArray& userId) const
-{
-	const qint64 now = QDateTime::currentMSecsSinceEpoch();
-
-	auto iter = m_tokenCache.find(token);
-	if (iter == m_tokenCache.end()){
-		return false;
-	}
-
-	if (iter->expiresAt <= now){
-		m_tokenCache.erase(iter);
-		return false;
-	}
-
-	userId = iter->userId;
-	return true;
-}
-
-
-void CGqlContextCreatorComp::StoreCachedTokenLocked(
-			const QByteArray& token,
-			const QByteArray& userId,
-			const QByteArray& tokenId,
-			bool isPat) const
-{
 	TokenCacheEntry entry;
 	entry.userId = userId;
-	entry.tokenId = tokenId;
-	entry.isPat = isPat;
+	entry.isPat = false;
 	entry.expiresAt = QDateTime::currentMSecsSinceEpoch() + s_tokenCacheTtlMs;
-
 	m_tokenCache.insert(token, entry);
+	return true;
 }
 
 
