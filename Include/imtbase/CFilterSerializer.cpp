@@ -88,6 +88,28 @@ QString JoinToCombinator(imtbase::CFilter::RuleSet::Join join)
 }
 
 
+QString ValueTypeToQmlType(const QVariant& value)
+{
+    switch (value.type()){
+    case QVariant::Invalid:
+        return QStringLiteral("null");
+    case QVariant::Bool:
+        return QStringLiteral("boolean");
+    case QVariant::Int:
+    case QVariant::UInt:
+    case QVariant::LongLong:
+    case QVariant::ULongLong:
+    case QVariant::Double:
+        return QStringLiteral("number");
+    case QVariant::List:
+    case QVariant::StringList:
+        return QStringLiteral("array");
+    default:
+        return QStringLiteral("string");
+    }
+}
+
+
 imtbase::CFilter::RuleSet::Join CombinatorToJoin(const QString& combinator)
 {
     return NormalizeToken(combinator) == QLatin1String("or")
@@ -110,10 +132,7 @@ QJsonObject ToQmlQuery(const imtbase::CFilter::RuleSet& rules)
         item[QStringLiteral("field")] = QString::fromUtf8(rule.path);
         item[QStringLiteral("operator")] = PredicateToOperator(rule.predicate);
         item[QStringLiteral("value")] = QJsonValue::fromVariant(rule.argument);
-        const char* typeName = rule.argument.typeName();
-        if (typeName != nullptr){
-            item[QStringLiteral("type")] = QString::fromUtf8(typeName);
-        }
+        item[QStringLiteral("type")] = ValueTypeToQmlType(rule.argument);
         items << item;
     }
     for (const imtbase::CFilter::RuleSet& child : rules.children){

@@ -2,6 +2,9 @@
 #include <imtbase/CFilter.h>
 
 
+// Qt includes
+#include <QtCore/QDebug>
+
 // STD includes
 #include <limits>
 
@@ -392,6 +395,7 @@ CFilter::RuleSet& CFilter::CurrentRuleSet()
     RuleSet* current = &m_rules;
     for (const int index : m_groupPath){
         if (index < 0 || index >= current->children.size()){
+            qWarning() << "Invalid CFilter group path, resetting fluent group stack";
             m_groupPath.clear();
             return m_rules;
         }
