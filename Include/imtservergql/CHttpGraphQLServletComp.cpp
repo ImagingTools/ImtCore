@@ -79,7 +79,6 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 		}
 	}
 
-	QByteArray userId;
 	QByteArray accessToken = headers.value(QByteArrayLiteral("x-authentication-token"));
 
 	QByteArray productId;
@@ -90,7 +89,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 	if (m_gqlContextCreatorCompPtr.IsValid()){
 		QString errorMessage;
 		imtgql::IGqlContextCreator::ContextCreationStatus contextStatus = imtgql::IGqlContextCreator::CCS_OK;
-		imtgql::IGqlContextUniquePtr gqlContextPtr = m_gqlContextCreatorCompPtr->CreateGqlContext(accessToken, productId, userId, headers, errorMessage, &contextStatus);
+		imtgql::IGqlContextUniquePtr gqlContextPtr = m_gqlContextCreatorCompPtr->CreateGqlContext(accessToken, productId, QByteArray(), headers, errorMessage, &contextStatus);
 		if (!gqlContextPtr.IsValid()){
 			if (contextStatus == imtgql::IGqlContextCreator::CCS_UNAUTHORIZED){
 				return CreateResponse(StatusCode::SC_UNAUTHORIZED, QByteArray(), request);
@@ -266,4 +265,3 @@ QByteArray CHttpGraphQLServletComp::BuildGqlErrorJson(
 
 
 } // namespace imtservergql
-
