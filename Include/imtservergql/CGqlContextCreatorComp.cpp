@@ -140,7 +140,7 @@ bool CGqlContextCreatorComp::ResolveUserId(
 		return true;
 	}
 
-	// Both PAT and JWT paths serialize calls into shared auth components; their thread-safety is not guaranteed.
+	// Serialize calls into m_patManagerCompPtr and m_jwtSessionControllerCompPtr; their thread-safety is not guaranteed.
 	if (IsPatToken(token)){
 		QByteArray tokenId;
 		QByteArrayList scopes;
@@ -197,7 +197,6 @@ bool CGqlContextCreatorComp::ResolveUserId(
 bool CGqlContextCreatorComp::TryGetCachedToken(const QByteArray& token, QByteArray& userId) const
 {
 	const qint64 now = QDateTime::currentMSecsSinceEpoch();
-
 	QMutexLocker cacheLocker(&m_tokenCacheMutex);
 	auto iter = m_tokenCache.find(token);
 	if (iter == m_tokenCache.end()){
