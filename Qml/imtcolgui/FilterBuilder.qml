@@ -4,22 +4,18 @@ import QtQuick 2.12
 /*!
     \qmltype FilterBuilder
     \inqmlmodule imtcolgui
-    \brief Pure QML fluent builder for standalone collection-filter query strings.
+    \brief Pure QML fluent builder for standalone filter-request query strings.
 
-    This component does not wrap existing collection-filter QML types. It only keeps
-    builder state and emits a URL query string that can be parsed by
-    imtbase::CFilterSerializer.
+    This component keeps only local builder state and emits a query string that
+    can be parsed by imtbase::CFilterSerializer. It does not wrap or mimic the
+    existing collection-filter QML types.
 
     Example:
     \code
-    FilterBuilder {
-        id: myFilter
-        onFilterReady: collectionView.applyFilter(queryString)
-    }
-
-    myFilter.where("Status", "eq", "Active")
-            .where("Name", "contains", searchText)
-            .orderBy("CreatedAt", "desc")
+    myFilter.search("john", ["Name", "Email"])
+            .where("Status", "is", "Active")
+            .where("Name", "like", searchText)
+            .orderBy("CreatedAt", true)
             .page(1, 50)
             .apply()
     \endcode
@@ -27,40 +23,49 @@ import QtQuick 2.12
 QtObject {
     id: root
 
-    property string textFilter: ""
-    property var textFilteringInfoIds: []
-    // Pagination sentinel: -1 means currentPage is intentionally unset and should not be serialized.
-    property int currentPage: -1
-    // Pagination sentinel: -1 means pageSize is intentionally unset and should not be serialized.
-    property int pageSize: -1
+    property string searchText: ""
+    property var searchScopes: []
+    property int offset: -1
+    property int count: -1
     property string queryString: ""
 
     signal filterReady(string queryString)
     signal filterChanged()
     signal cleared()
 
-    property var _filters: []
-    property var _sortFields: []
+    property var _rules: []
+    property var _orders: []
 
-    function text(value, fields) {
-        textFilter = value || ""
-        textFilteringInfoIds = fields || textFilteringInfoIds
+    function search(text, scopes) {
+        searchText = text || ""
+        searchScopes = scopes || []
         return root
     }
 
-    function where(field, op, value) {
-        _filters = _filters.concat([{field: field, op: op || "eq", value: value}])
+    function where(path, predicate, argument) {
+        _rules = _rules.concat([{path: path, predicate: predicate || "is", argument: argument}])
         return root
     }
 
-    function orderBy(field, direction) {
-        _sortFields = _sortFields.concat([{field: field, direction: direction || "asc"}])
+    function orderBy(path, descending) {
+        _orders = _orders.concat([{path: path, descending: descending === true}])
         return root
     }
 
-    function page(pageNum, size) {
-        currentPage = pageNum > 0 ? pageNum : -1
-        pageSize = size > 0 ? size : -1
+    function page(pageNumber, pageSize) {
+        if (pageNumber > 0 && pageSize > 0) {
+            offset = (pageNumber - 1) * pageSize
+            count = pageSize
+        } else {
+            offset = -1
+            count = -1
+        }
+        return root
+    }
+
+    function window(first, size) {
+        offset = first >= 0 ? first : -1
+        count = size > 0 ? size : -1
         return root
     }
 
@@ -71,13 +76,13 @@ QtObject {
     }
 
     function reset() {
-        textFilter = ""
-        textFilteringInfoIds = []
-        currentPage = -1
-        pageSize = -1
+        searchText = ""
+        searchScopes = []
+        offset = -1
+        count = -1
         queryString = ""
-        _filters = []
-        _sortFields = []
+        _rules = []
+        _orders = []
         cleared()
         return root
     }
@@ -85,33 +90,32 @@ QtObject {
     function _buildQueryString() {
         var parts = []
 
-        if (textFilter !== "") {
-            parts.push("text=" + encodeURIComponent(textFilter))
+        if (searchText !== "") {
+            parts.push("search=" + encodeURIComponent(searchText))
         }
 
-        if (textFilteringInfoIds.length > 0) {
-            parts.push("textFields=" + encodeURIComponent(textFilteringInfoIds.join(",")))
+        if (searchScopes.length > 0) {
+            parts.push("scope=" + encodeURIComponent(searchScopes.join(",")))
         }
 
-        for (var i = 0; i < _filters.length; ++i) {
-            var f = _filters[i]
-            parts.push("filter[" + encodeURIComponent(f.field) + "][" + encodeURIComponent(f.op) + "]=" + encodeURIComponent(f.value))
+        for (var i = 0; i < _rules.length; ++i) {
+            var r = _rules[i]
+            var prefix = "rule[" + i + "]."
+            parts.push(prefix + "path=" + encodeURIComponent(r.path))
+            parts.push(prefix + "pred=" + encodeURIComponent(r.predicate))
+            parts.push(prefix + "arg=" + encodeURIComponent(r.argument))
         }
 
-        if (_sortFields.length > 0) {
-            var sortParts = []
-            for (var j = 0; j < _sortFields.length; ++j) {
-                var s = _sortFields[j]
-                sortParts.push(encodeURIComponent(s.field) + ":" + encodeURIComponent(s.direction))
-            }
-            parts.push("sort=" + sortParts.join(","))
+        for (var j = 0; j < _orders.length; ++j) {
+            var o = _orders[j]
+            var orderPrefix = "order[" + j + "]."
+            parts.push(orderPrefix + "path=" + encodeURIComponent(o.path))
+            parts.push(orderPrefix + "dir=" + (o.descending ? "down" : "up"))
         }
 
-        if (currentPage > 0) {
-            parts.push("page=" + currentPage)
-        }
-        if (pageSize > 0) {
-            parts.push("limit=" + pageSize)
+        if (offset >= 0 && count > 0) {
+            parts.push("offset=" + offset)
+            parts.push("count=" + count)
         }
 
         return parts.join("&")

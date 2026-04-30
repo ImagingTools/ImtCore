@@ -3,8 +3,9 @@
 
 
 // Qt includes
-#include <QtCore/QStringList>
+#include <QtCore/QMap>
 #include <QtCore/QJsonArray>
+#include <QtCore/QStringList>
 #include <QtCore/QUrl>
 #include <QtCore/QUrlQuery>
 
@@ -13,13 +14,29 @@ namespace
 {
 
 
-const QString s_filterKeyPrefix = QStringLiteral("filter[");
+const QString s_rulePrefix = QStringLiteral("rule[");
+const QString s_orderPrefix = QStringLiteral("order[");
 
 
-// Normalizes operation and sorting-order tokens for case-insensitive deserialization.
 QString NormalizeToken(const QString& value)
 {
     return value.trimmed().toLower();
+}
+
+
+int ExtractIndexedKey(const QString& key, const QString& prefix, const QString& suffix)
+{
+    if (!key.startsWith(prefix) || !key.endsWith(suffix)){
+        return -1;
+    }
+
+    const int start = prefix.size();
+    const int close = key.indexOf(QLatin1Char(']'), start);
+    if (close <= start){
+        return -1;
+    }
+
+    return key.mid(start, close - start).toInt();
 }
 
 
@@ -34,44 +51,42 @@ QString CFilterSerializer::ToQueryString(const CFilter& filter)
 {
     QUrlQuery query;
 
-    if (!filter.GetTextFilter().isEmpty()){
-        query.addQueryItem(QStringLiteral("text"), filter.GetTextFilter());
+    if (!filter.GetSearch().text.isEmpty()){
+        query.addQueryItem(QStringLiteral("search"), filter.GetSearch().text);
     }
 
-    if (!filter.GetTextFieldIds().isEmpty()){
-        QStringList fieldIds;
-        for (const QByteArray& fieldId : filter.GetTextFieldIds()){
-            fieldIds << QString::fromUtf8(fieldId);
+    if (!filter.GetSearch().scopes.isEmpty()){
+        QStringList scopes;
+        for (const QByteArray& scope : filter.GetSearch().scopes){
+            scopes << QString::fromUtf8(scope);
         }
-        query.addQueryItem(QStringLiteral("textFields"), fieldIds.join(QLatin1Char(',')));
+        query.addQueryItem(QStringLiteral("scope"), scopes.join(QLatin1Char(',')));
     }
 
-    QStringList sortParts;
-    for (const CFilter::SortField& sortField : filter.GetSortFields()){
-        if (sortField.fieldId.isEmpty() || sortField.sortingOrder == CFilter::SO_NO_ORDER){
+    int ruleIndex = 0;
+    for (const CFilter::Rule& rule : filter.GetRules().rules){
+        if (!rule.IsValid()){
             continue;
         }
-        sortParts << QStringLiteral("%1:%2")
-            .arg(QString::fromUtf8(sortField.fieldId), SortingOrderToString(sortField.sortingOrder));
-    }
-    if (!sortParts.isEmpty()){
-        query.addQueryItem(QStringLiteral("sort"), sortParts.join(QLatin1Char(',')));
+        const QString prefix = QStringLiteral("rule[%1].").arg(ruleIndex++);
+        query.addQueryItem(prefix + QStringLiteral("path"), QString::fromUtf8(rule.path));
+        query.addQueryItem(prefix + QStringLiteral("pred"), rule.predicate);
+        query.addQueryItem(prefix + QStringLiteral("arg"), rule.argument.toString());
     }
 
-    for (const CFilter::FieldFilter& fieldFilter : filter.GetFilterExpression().fieldFilters){
-        if (fieldFilter.fieldId.isEmpty()){
+    int orderIndex = 0;
+    for (const CFilter::Order& order : filter.GetOrders()){
+        if (!order.IsValid()){
             continue;
         }
-        query.addQueryItem(
-            QStringLiteral("filter[%1][%2]").arg(
-                QString::fromUtf8(fieldFilter.fieldId),
-                FieldOperationToString(fieldFilter.operation)),
-            fieldFilter.value.toString());
+        const QString prefix = QStringLiteral("order[%1].").arg(orderIndex++);
+        query.addQueryItem(prefix + QStringLiteral("path"), QString::fromUtf8(order.path));
+        query.addQueryItem(prefix + QStringLiteral("dir"), order.descending ? QStringLiteral("down") : QStringLiteral("up"));
     }
 
-    if (filter.HasPagination()){
-        query.addQueryItem(QStringLiteral("page"), QString::number(filter.GetPage()));
-        query.addQueryItem(QStringLiteral("limit"), QString::number(filter.GetPageSize()));
+    if (filter.HasWindow()){
+        query.addQueryItem(QStringLiteral("offset"), QString::number(filter.GetOffset()));
+        query.addQueryItem(QStringLiteral("count"), QString::number(filter.GetLimit()));
     }
 
     return query.toString(QUrl::FullyEncoded);
@@ -89,64 +104,85 @@ bool CFilterSerializer::FromQueryString(const QString& queryString, CFilter& fil
     query.setQuery(normalized);
     filter.Clear();
 
-    if (query.hasQueryItem(QStringLiteral("text"))){
-        filter.SetTextFilter(query.queryItemValue(QStringLiteral("text"), QUrl::FullyDecoded));
-    }
-
-    if (query.hasQueryItem(QStringLiteral("textFields"))){
-        QByteArrayList fieldIds;
-        const QString value = query.queryItemValue(QStringLiteral("textFields"), QUrl::FullyDecoded);
+    QByteArrayList scopes;
+    if (query.hasQueryItem(QStringLiteral("scope"))){
+        const QString value = query.queryItemValue(QStringLiteral("scope"), QUrl::FullyDecoded);
         for (const QString& part : value.split(QLatin1Char(','), Qt::SkipEmptyParts)){
-            fieldIds << part.trimmed().toUtf8();
+            scopes << part.trimmed().toUtf8();
         }
-        filter.SetTextFieldIds(fieldIds);
     }
+    filter.SetSearch(query.queryItemValue(QStringLiteral("search"), QUrl::FullyDecoded), scopes);
 
-    if (query.hasQueryItem(QStringLiteral("sort"))){
-        QVector<CFilter::SortField> sortFields;
-        const QString value = query.queryItemValue(QStringLiteral("sort"), QUrl::FullyDecoded);
-        for (const QString& part : value.split(QLatin1Char(','), Qt::SkipEmptyParts)){
-            const QStringList pair = part.split(QLatin1Char(':'));
-            if (pair.size() != 2){
-                continue;
-            }
-            sortFields << CFilter::SortField(
-                pair.at(0).trimmed().toUtf8(),
-                StringToSortingOrder(pair.at(1).trimmed()));
-        }
-        filter.SetSortFields(sortFields);
-    }
+    struct PendingRule
+    {
+        QByteArray path;
+        QString predicate;
+        QVariant argument;
+    };
 
-    CFilter::FilterExpression expression;
+    struct PendingOrder
+    {
+        QByteArray path;
+        bool descending = false;
+    };
+
+    QMap<int, PendingRule> rules;
+    QMap<int, PendingOrder> orders;
     const QList<QPair<QString, QString>> items = query.queryItems(QUrl::FullyDecoded);
     for (const QPair<QString, QString>& item : items){
-        const QString& key = item.first;
-        if (!key.startsWith(s_filterKeyPrefix)){
+        const int pathRuleIndex = ExtractIndexedKey(item.first, s_rulePrefix, QStringLiteral(".path"));
+        if (pathRuleIndex >= 0){
+            rules[pathRuleIndex].path = item.second.toUtf8();
             continue;
         }
 
-        const int firstClose = key.indexOf(QLatin1Char(']'));
-        const int secondOpen = key.indexOf(QLatin1Char('['), firstClose);
-        const int secondClose = key.indexOf(QLatin1Char(']'), secondOpen);
-        const int fieldStart = s_filterKeyPrefix.size();
-        if (firstClose <= fieldStart || secondOpen < 0 || secondClose < 0){
+        const int predicateRuleIndex = ExtractIndexedKey(item.first, s_rulePrefix, QStringLiteral(".pred"));
+        if (predicateRuleIndex >= 0){
+            rules[predicateRuleIndex].predicate = item.second;
             continue;
         }
 
-        const QByteArray fieldId = key.mid(fieldStart, firstClose - fieldStart).toUtf8();
-        const QString operation = key.mid(secondOpen + 1, secondClose - secondOpen - 1);
-        expression.fieldFilters << CFilter::FieldFilter(
-            fieldId,
-            item.second,
-            StringToFieldOperation(operation));
-    }
-    filter.SetFilterExpression(expression);
+        const int argumentRuleIndex = ExtractIndexedKey(item.first, s_rulePrefix, QStringLiteral(".arg"));
+        if (argumentRuleIndex >= 0){
+            rules[argumentRuleIndex].argument = item.second;
+            continue;
+        }
 
-    if (query.hasQueryItem(QStringLiteral("page"))){
-        filter.SetPage(query.queryItemValue(QStringLiteral("page")).toInt());
+        const int pathOrderIndex = ExtractIndexedKey(item.first, s_orderPrefix, QStringLiteral(".path"));
+        if (pathOrderIndex >= 0){
+            orders[pathOrderIndex].path = item.second.toUtf8();
+            continue;
+        }
+
+        const int directionOrderIndex = ExtractIndexedKey(item.first, s_orderPrefix, QStringLiteral(".dir"));
+        if (directionOrderIndex >= 0){
+            orders[directionOrderIndex].descending = NormalizeToken(item.second) == QLatin1String("down");
+            continue;
+        }
     }
-    if (query.hasQueryItem(QStringLiteral("limit"))){
-        filter.SetPageSize(query.queryItemValue(QStringLiteral("limit")).toInt());
+
+    CFilter::RuleSet ruleSet;
+    for (auto it = rules.cbegin(); it != rules.cend(); ++it){
+        const CFilter::Rule rule(it.value().path, it.value().predicate, it.value().argument);
+        if (rule.IsValid()){
+            ruleSet.rules << rule;
+        }
+    }
+    filter.SetRules(ruleSet);
+
+    QVector<CFilter::Order> orderList;
+    for (auto it = orders.cbegin(); it != orders.cend(); ++it){
+        const CFilter::Order order(it.value().path, it.value().descending);
+        if (order.IsValid()){
+            orderList << order;
+        }
+    }
+    filter.SetOrders(orderList);
+
+    if (query.hasQueryItem(QStringLiteral("offset")) || query.hasQueryItem(QStringLiteral("count"))){
+        filter.SetWindow(
+            query.queryItemValue(QStringLiteral("offset")).toInt(),
+            query.queryItemValue(QStringLiteral("count")).toInt());
     }
 
     return true;
@@ -157,40 +193,41 @@ QJsonObject CFilterSerializer::ToJson(const CFilter& filter)
 {
     QJsonObject json;
 
-    if (!filter.GetTextFilter().isEmpty()){
-        json[QStringLiteral("text")] = filter.GetTextFilter();
+    if (filter.GetSearch().IsActive()){
+        QJsonObject search;
+        search[QStringLiteral("text")] = filter.GetSearch().text;
+        QJsonArray scopes;
+        for (const QByteArray& scope : filter.GetSearch().scopes){
+            scopes << QString::fromUtf8(scope);
+        }
+        search[QStringLiteral("scope")] = scopes;
+        json[QStringLiteral("search")] = search;
     }
 
-    QJsonArray textFields;
-    for (const QByteArray& fieldId : filter.GetTextFieldIds()){
-        textFields << QString::fromUtf8(fieldId);
-    }
-    if (!textFields.isEmpty()){
-        json[QStringLiteral("textFields")] = textFields;
+    const QJsonObject rules = ToJson(filter.GetRules());
+    if (!rules.isEmpty()){
+        json[QStringLiteral("rules")] = rules;
     }
 
-    QJsonArray sort;
-    for (const CFilter::SortField& sortField : filter.GetSortFields()){
-        if (sortField.fieldId.isEmpty() || sortField.sortingOrder == CFilter::SO_NO_ORDER){
+    QJsonArray orders;
+    for (const CFilter::Order& order : filter.GetOrders()){
+        if (!order.IsValid()){
             continue;
         }
-        QJsonObject sortItem;
-        sortItem[QStringLiteral("field")] = QString::fromUtf8(sortField.fieldId);
-        sortItem[QStringLiteral("order")] = SortingOrderToString(sortField.sortingOrder);
-        sort << sortItem;
+        QJsonObject item;
+        item[QStringLiteral("path")] = QString::fromUtf8(order.path);
+        item[QStringLiteral("descending")] = order.descending;
+        orders << item;
     }
-    if (!sort.isEmpty()){
-        json[QStringLiteral("sort")] = sort;
-    }
-
-    const QJsonObject expressionJson = ToJson(filter.GetFilterExpression());
-    if (!expressionJson.isEmpty()){
-        json[QStringLiteral("filter")] = expressionJson;
+    if (!orders.isEmpty()){
+        json[QStringLiteral("orders")] = orders;
     }
 
-    if (filter.HasPagination()){
-        json[QStringLiteral("page")] = filter.GetPage();
-        json[QStringLiteral("limit")] = filter.GetPageSize();
+    if (filter.HasWindow()){
+        QJsonObject window;
+        window[QStringLiteral("offset")] = filter.GetOffset();
+        window[QStringLiteral("count")] = filter.GetLimit();
+        json[QStringLiteral("window")] = window;
     }
 
     return json;
@@ -201,156 +238,125 @@ bool CFilterSerializer::FromJson(const QJsonObject& json, CFilter& filter)
 {
     filter.Clear();
 
-    if (json.contains(QStringLiteral("text"))){
-        filter.SetTextFilter(json[QStringLiteral("text")].toString());
+    const QJsonObject search = json[QStringLiteral("search")].toObject();
+    if (!search.isEmpty()){
+        QByteArrayList scopes;
+        for (const QJsonValue& value : search[QStringLiteral("scope")].toArray()){
+            scopes << value.toString().toUtf8();
+        }
+        filter.SetSearch(search[QStringLiteral("text")].toString(), scopes);
     }
 
-    QByteArrayList textFieldIds;
-    for (const QJsonValue& value : json[QStringLiteral("textFields")].toArray()){
-        textFieldIds << value.toString().toUtf8();
-    }
-    filter.SetTextFieldIds(textFieldIds);
-
-    QVector<CFilter::SortField> sortFields;
-    for (const QJsonValue& value : json[QStringLiteral("sort")].toArray()){
-        const QJsonObject sortItem = value.toObject();
-        sortFields << CFilter::SortField(
-            sortItem[QStringLiteral("field")].toString().toUtf8(),
-            StringToSortingOrder(sortItem[QStringLiteral("order")].toString()));
-    }
-    filter.SetSortFields(sortFields);
-
-    if (json.contains(QStringLiteral("filter"))){
-        CFilter::FilterExpression expression;
-        if (!FromJson(json[QStringLiteral("filter")].toObject(), expression)){
+    if (json.contains(QStringLiteral("rules"))){
+        CFilter::RuleSet rules;
+        if (!FromJson(json[QStringLiteral("rules")].toObject(), rules)){
             return false;
         }
-        filter.SetFilterExpression(expression);
+        filter.SetRules(rules);
     }
 
-    if (json.contains(QStringLiteral("page"))){
-        filter.SetPage(json[QStringLiteral("page")].toInt());
+    QVector<CFilter::Order> orders;
+    for (const QJsonValue& value : json[QStringLiteral("orders")].toArray()){
+        const QJsonObject item = value.toObject();
+        const CFilter::Order order(
+            item[QStringLiteral("path")].toString().toUtf8(),
+            item[QStringLiteral("descending")].toBool());
+        if (order.IsValid()){
+            orders << order;
+        }
     }
-    if (json.contains(QStringLiteral("limit"))){
-        filter.SetPageSize(json[QStringLiteral("limit")].toInt());
+    filter.SetOrders(orders);
+
+    if (json.contains(QStringLiteral("window"))){
+        const QJsonObject window = json[QStringLiteral("window")].toObject();
+        filter.SetWindow(
+            window[QStringLiteral("offset")].toInt(-1),
+            window[QStringLiteral("count")].toInt(-1));
     }
 
     return true;
 }
 
 
-QJsonObject CFilterSerializer::ToJson(const CFilter::FilterExpression& expression)
+QJsonObject CFilterSerializer::ToJson(const CFilter::RuleSet& rules)
 {
-    if (expression.fieldFilters.isEmpty() && expression.filterExpressions.isEmpty()){
+    if (rules.IsEmpty()){
         return QJsonObject();
     }
 
     QJsonObject json;
-    json[QStringLiteral("op")] = expression.logicalOperation == CFilter::LO_OR
-        ? QStringLiteral("or")
-        : QStringLiteral("and");
+    json[QStringLiteral("join")] = JoinToString(rules.join);
 
-    QJsonArray fields;
-    for (const CFilter::FieldFilter& fieldFilter : expression.fieldFilters){
+    QJsonArray ruleArray;
+    for (const CFilter::Rule& rule : rules.rules){
+        if (!rule.IsValid()){
+            continue;
+        }
         QJsonObject item;
-        item[QStringLiteral("field")] = QString::fromUtf8(fieldFilter.fieldId);
-        item[QStringLiteral("op")] = FieldOperationToString(fieldFilter.operation);
-        item[QStringLiteral("value")] = QJsonValue::fromVariant(fieldFilter.value);
-        fields << item;
+        item[QStringLiteral("path")] = QString::fromUtf8(rule.path);
+        item[QStringLiteral("pred")] = rule.predicate;
+        item[QStringLiteral("arg")] = QJsonValue::fromVariant(rule.argument);
+        ruleArray << item;
     }
-    if (!fields.isEmpty()){
-        json[QStringLiteral("fields")] = fields;
+    if (!ruleArray.isEmpty()){
+        json[QStringLiteral("items")] = ruleArray;
     }
 
-    QJsonArray groups;
-    for (const CFilter::FilterExpression& group : expression.filterExpressions){
-        const QJsonObject groupJson = ToJson(group);
-        if (!groupJson.isEmpty()){
-            groups << groupJson;
+    QJsonArray childArray;
+    for (const CFilter::RuleSet& child : rules.children){
+        const QJsonObject childJson = ToJson(child);
+        if (!childJson.isEmpty()){
+            childArray << childJson;
         }
     }
-    if (!groups.isEmpty()){
-        json[QStringLiteral("groups")] = groups;
+    if (!childArray.isEmpty()){
+        json[QStringLiteral("sets")] = childArray;
     }
 
     return json;
 }
 
 
-bool CFilterSerializer::FromJson(const QJsonObject& json, CFilter::FilterExpression& expression)
+bool CFilterSerializer::FromJson(const QJsonObject& json, CFilter::RuleSet& rules)
 {
-    expression.logicalOperation = json[QStringLiteral("op")].toString().toLower() == QLatin1String("or")
-        ? CFilter::LO_OR
-        : CFilter::LO_AND;
+    rules.join = StringToJoin(json[QStringLiteral("join")].toString());
 
-    for (const QJsonValue& value : json[QStringLiteral("fields")].toArray()){
+    for (const QJsonValue& value : json[QStringLiteral("items")].toArray()){
         const QJsonObject item = value.toObject();
-        expression.fieldFilters << CFilter::FieldFilter(
-            item[QStringLiteral("field")].toString().toUtf8(),
-            item[QStringLiteral("value")].toVariant(),
-            StringToFieldOperation(item[QStringLiteral("op")].toString()));
+        const CFilter::Rule rule(
+            item[QStringLiteral("path")].toString().toUtf8(),
+            item[QStringLiteral("pred")].toString(),
+            item[QStringLiteral("arg")].toVariant());
+        if (rule.IsValid()){
+            rules.rules << rule;
+        }
     }
 
-    for (const QJsonValue& value : json[QStringLiteral("groups")].toArray()){
-        CFilter::FilterExpression childExpression;
-        if (!FromJson(value.toObject(), childExpression)){
+    for (const QJsonValue& value : json[QStringLiteral("sets")].toArray()){
+        CFilter::RuleSet child;
+        if (!FromJson(value.toObject(), child)){
             return false;
         }
-        expression.filterExpressions << childExpression;
+        if (!child.IsEmpty()){
+            rules.children << child;
+        }
     }
 
     return true;
 }
 
 
-QString CFilterSerializer::FieldOperationToString(CFilter::FilterOperation operation)
+QString CFilterSerializer::JoinToString(CFilter::RuleSet::Join join)
 {
-    switch (operation){
-    case CFilter::FO_NOT_EQUAL:   return QStringLiteral("ne");
-    case CFilter::FO_LESS:        return QStringLiteral("lt");
-    case CFilter::FO_GREATER:     return QStringLiteral("gt");
-    case CFilter::FO_NOT_LESS:    return QStringLiteral("gte");
-    case CFilter::FO_NOT_GREATER: return QStringLiteral("lte");
-    case CFilter::FO_CONTAINS:    return QStringLiteral("contains");
-    case CFilter::FO_EQUAL:
-    default:                      return QStringLiteral("eq");
-    }
+    return join == CFilter::RuleSet::Any ? QStringLiteral("any") : QStringLiteral("all");
 }
 
 
-CFilter::FilterOperation CFilterSerializer::StringToFieldOperation(const QString& value)
+CFilter::RuleSet::Join CFilterSerializer::StringToJoin(const QString& value)
 {
-    const QString normalized = NormalizeToken(value);
-    if (normalized == QLatin1String("ne"))       return CFilter::FO_NOT_EQUAL;
-    if (normalized == QLatin1String("lt"))       return CFilter::FO_LESS;
-    if (normalized == QLatin1String("gt"))       return CFilter::FO_GREATER;
-    if (normalized == QLatin1String("gte"))      return CFilter::FO_NOT_LESS;
-    if (normalized == QLatin1String("lte"))      return CFilter::FO_NOT_GREATER;
-    if (normalized == QLatin1String("contains")) return CFilter::FO_CONTAINS;
-    return CFilter::FO_EQUAL;
-}
-
-
-QString CFilterSerializer::SortingOrderToString(CFilter::SortingOrder order)
-{
-    switch (order){
-    case CFilter::SO_DESC: return QStringLiteral("desc");
-    case CFilter::SO_ASC:  return QStringLiteral("asc");
-    default:               return QString();
-    }
-}
-
-
-CFilter::SortingOrder CFilterSerializer::StringToSortingOrder(const QString& value)
-{
-    const QString normalized = NormalizeToken(value);
-    if (normalized == QLatin1String("desc")){
-        return CFilter::SO_DESC;
-    }
-    if (normalized == QLatin1String("asc")){
-        return CFilter::SO_ASC;
-    }
-    return CFilter::SO_NO_ORDER;
+    return NormalizeToken(value) == QLatin1String("any")
+        ? CFilter::RuleSet::Any
+        : CFilter::RuleSet::All;
 }
 
 

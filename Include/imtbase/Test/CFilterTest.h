@@ -15,10 +15,11 @@ class CFilterTest: public QObject
     Q_OBJECT
 
 private slots:
-    void CFilter_TextAndFields();
-    void CFilter_FieldExpression();
-    void CFilter_SortFields();
-    void CFilter_Pagination();
+    void CFilter_Search();
+    void CFilter_Rules();
+    void CFilter_RuleSets();
+    void CFilter_Orders();
+    void CFilter_Window();
     void CFilter_Clear();
 
     void CPaginatedFilter_DefaultValues();
@@ -29,21 +30,21 @@ private slots:
     void CPaginatedFilter_HasNextPage();
     void CPaginatedFilter_HasPreviousPage();
 
-    void ToQueryString_TextFilter();
-    void ToQueryString_WithPagination();
-    void ToQueryString_SortFields();
-    void ToQueryString_FieldFilters();
-    void FromQueryString_TextFilter();
-    void FromQueryString_SortFields();
-    void FromQueryString_FieldFilters();
+    void ToQueryString_Search();
+    void ToQueryString_Window();
+    void ToQueryString_Orders();
+    void ToQueryString_Rules();
+    void FromQueryString_Search();
+    void FromQueryString_Orders();
+    void FromQueryString_Rules();
     void FromQueryString_LeadingQuestionMark();
 
-    void ToJson_TextFilter();
-    void ToJson_SortFields();
-    void ToJson_FieldFilters();
-    void FromJson_TextFilter();
-    void FromJson_SortFields();
-    void FromJson_FieldFilters();
+    void ToJson_Search();
+    void ToJson_Orders();
+    void ToJson_Rules();
+    void FromJson_Search();
+    void FromJson_Orders();
+    void FromJson_Rules();
     void FromJson_Empty();
 };
 

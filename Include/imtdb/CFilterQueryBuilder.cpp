@@ -14,6 +14,12 @@ namespace
 const QString s_likeEscapeSql = QStringLiteral("ESCAPE '\\\\'");
 
 
+QString NormalizePredicate(const QString& predicate)
+{
+    return predicate.trimmed().toLower();
+}
+
+
 } // namespace
 
 
@@ -32,94 +38,58 @@ CFilterQueryBuilder::QueryResult CFilterQueryBuilder::Build(const imtbase::CFilt
     QueryResult result;
 
     QStringList whereParts;
-    const QString textClause = BuildTextFilter(filter.GetTextFilter(), filter.GetTextFieldIds(), result.bindValues);
-    if (!textClause.isEmpty()){
-        whereParts << textClause;
+    const QString searchClause = BuildSearchClause(filter.GetSearch(), result.bindValues);
+    if (!searchClause.isEmpty()){
+        whereParts << searchClause;
     }
 
-    const QString expressionClause = BuildFilterExpression(filter.GetFilterExpression(), result.bindValues);
-    if (!expressionClause.isEmpty()){
-        whereParts << expressionClause;
+    const QString rulesClause = BuildRulesClause(filter.GetRules(), result.bindValues);
+    if (!rulesClause.isEmpty()){
+        whereParts << rulesClause;
     }
 
     result.whereClause = whereParts.join(QStringLiteral(" AND "));
-    result.orderByClause = BuildSortClause(filter.GetSortFields());
-    result.limitClause = BuildLimitClause(filter);
+    result.orderByClause = BuildOrderClause(filter.GetOrders());
+    result.limitClause = BuildWindowClause(filter.GetWindow());
 
     return result;
 }
 
 
-QString CFilterQueryBuilder::BuildTextFilter(
-    const QString& text,
-    const QByteArrayList& columnIds,
+QString CFilterQueryBuilder::BuildSearchClause(
+    const imtbase::CFilter::Search& search,
     QVariantList& bindValues) const
 {
-    if (text.isEmpty() || columnIds.isEmpty()){
+    if (!search.IsActive()){
         return QString();
     }
 
     QStringList parts;
-    for (const QByteArray& columnId : columnIds){
-        parts << MakeLikeCondition(MakeFieldAccess(columnId), AddLikeBindValue(text, bindValues));
+    for (const QByteArray& scope : search.scopes){
+        parts << MakeLikeCondition(MakeFieldAccess(scope), AddLikeBindValue(search.text, bindValues));
     }
 
-    return QStringLiteral("(%1)").arg(parts.join(QStringLiteral(" OR ")));
+    return parts.isEmpty() ? QString() : QStringLiteral("(%1)").arg(parts.join(QStringLiteral(" OR ")));
 }
 
 
-QString CFilterQueryBuilder::BuildFilterExpression(
-    const imtbase::CFilter::FilterExpression& expression,
+QString CFilterQueryBuilder::BuildRulesClause(
+    const imtbase::CFilter::RuleSet& rules,
     QVariantList& bindValues) const
 {
     QStringList parts;
 
-    for (const imtbase::CFilter::FieldFilter& fieldFilter : expression.fieldFilters){
-        if (fieldFilter.fieldId.isEmpty()){
-            continue;
-        }
-
-        const QString fieldAccess = MakeFieldAccess(fieldFilter.fieldId);
-        QString part;
-        switch (fieldFilter.operation){
-        case imtbase::CFilter::FO_EQUAL:
-            part = QStringLiteral("%1 = %2").arg(fieldAccess, AddBindValue(fieldFilter.value, bindValues));
-            break;
-        case imtbase::CFilter::FO_NOT_EQUAL:
-            part = QStringLiteral("%1 != %2").arg(fieldAccess, AddBindValue(fieldFilter.value, bindValues));
-            break;
-        case imtbase::CFilter::FO_LESS:
-            part = QStringLiteral("%1 < %2").arg(fieldAccess, AddBindValue(fieldFilter.value, bindValues));
-            break;
-        case imtbase::CFilter::FO_GREATER:
-            part = QStringLiteral("%1 > %2").arg(fieldAccess, AddBindValue(fieldFilter.value, bindValues));
-            break;
-        case imtbase::CFilter::FO_NOT_LESS:
-            part = QStringLiteral("%1 >= %2").arg(fieldAccess, AddBindValue(fieldFilter.value, bindValues));
-            break;
-        case imtbase::CFilter::FO_NOT_GREATER:
-            part = QStringLiteral("%1 <= %2").arg(fieldAccess, AddBindValue(fieldFilter.value, bindValues));
-            break;
-        case imtbase::CFilter::FO_CONTAINS:
-            part = MakeLikeCondition(fieldAccess, AddLikeBindValue(fieldFilter.value.toString(), bindValues));
-            break;
-        default:
-            qWarning() << "Unexpected filter operation"
-                << static_cast<int>(fieldFilter.operation)
-                << "for field"
-                << QString::fromUtf8(fieldFilter.fieldId);
-            break;
-        }
-
-        if (!part.isEmpty()){
-            parts << part;
+    for (const imtbase::CFilter::Rule& rule : rules.rules){
+        const QString ruleClause = BuildRuleClause(rule, bindValues);
+        if (!ruleClause.isEmpty()){
+            parts << ruleClause;
         }
     }
 
-    for (const imtbase::CFilter::FilterExpression& childExpression : expression.filterExpressions){
-        const QString childPart = BuildFilterExpression(childExpression, bindValues);
-        if (!childPart.isEmpty()){
-            parts << childPart;
+    for (const imtbase::CFilter::RuleSet& child : rules.children){
+        const QString childClause = BuildRulesClause(child, bindValues);
+        if (!childClause.isEmpty()){
+            parts << childClause;
         }
     }
 
@@ -127,39 +97,35 @@ QString CFilterQueryBuilder::BuildFilterExpression(
         return QString();
     }
 
-    const QString op = expression.logicalOperation == imtbase::CFilter::LO_OR
+    const QString join = rules.join == imtbase::CFilter::RuleSet::Any
         ? QStringLiteral(" OR ")
         : QStringLiteral(" AND ");
-    return QStringLiteral("(%1)").arg(parts.join(op));
+    return QStringLiteral("(%1)").arg(parts.join(join));
 }
 
 
-QString CFilterQueryBuilder::BuildSortClause(const QVector<imtbase::CFilter::SortField>& sortFields) const
+QString CFilterQueryBuilder::BuildOrderClause(const QVector<imtbase::CFilter::Order>& orders) const
 {
     QStringList parts;
-    for (const imtbase::CFilter::SortField& sortField : sortFields){
-        if (sortField.fieldId.isEmpty() || sortField.sortingOrder == imtbase::CFilter::SO_NO_ORDER){
+    for (const imtbase::CFilter::Order& order : orders){
+        if (!order.IsValid()){
             continue;
         }
-        const QString order = sortField.sortingOrder == imtbase::CFilter::SO_DESC
-            ? QStringLiteral("DESC")
-            : QStringLiteral("ASC");
-        parts << QStringLiteral("%1 %2").arg(MakeFieldAccess(sortField.fieldId), order);
+        parts << QStringLiteral("%1 %2").arg(
+            MakeFieldAccess(order.path),
+            order.descending ? QStringLiteral("DESC") : QStringLiteral("ASC"));
     }
 
-    if (parts.isEmpty()){
-        return QString();
-    }
-    return QStringLiteral("ORDER BY %1").arg(parts.join(QStringLiteral(", ")));
+    return parts.isEmpty() ? QString() : QStringLiteral("ORDER BY %1").arg(parts.join(QStringLiteral(", ")));
 }
 
 
-QString CFilterQueryBuilder::BuildLimitClause(const imtbase::CFilter& filter) const
+QString CFilterQueryBuilder::BuildWindowClause(const imtbase::CFilter::Window& window) const
 {
-    if (!filter.HasPagination()){
+    if (!window.IsActive()){
         return QString();
     }
-    return QStringLiteral("LIMIT %1 OFFSET %2").arg(filter.GetLimit()).arg(filter.GetOffset());
+    return QStringLiteral("LIMIT %1 OFFSET %2").arg(window.count).arg(window.first);
 }
 
 
@@ -175,6 +141,41 @@ void CFilterQueryBuilder::SetUseJsonExtract(bool useJsonExtract)
 }
 
 
+QString CFilterQueryBuilder::BuildRuleClause(const imtbase::CFilter::Rule& rule, QVariantList& bindValues) const
+{
+    if (!rule.IsValid()){
+        return QString();
+    }
+
+    const QString fieldAccess = MakeFieldAccess(rule.path);
+    const QString predicate = NormalizePredicate(rule.predicate);
+    if (predicate == QLatin1String("is")){
+        return QStringLiteral("%1 = %2").arg(fieldAccess, AddBindValue(rule.argument, bindValues));
+    }
+    if (predicate == QLatin1String("not")){
+        return QStringLiteral("%1 != %2").arg(fieldAccess, AddBindValue(rule.argument, bindValues));
+    }
+    if (predicate == QLatin1String("before")){
+        return QStringLiteral("%1 < %2").arg(fieldAccess, AddBindValue(rule.argument, bindValues));
+    }
+    if (predicate == QLatin1String("after")){
+        return QStringLiteral("%1 > %2").arg(fieldAccess, AddBindValue(rule.argument, bindValues));
+    }
+    if (predicate == QLatin1String("from")){
+        return QStringLiteral("%1 >= %2").arg(fieldAccess, AddBindValue(rule.argument, bindValues));
+    }
+    if (predicate == QLatin1String("until")){
+        return QStringLiteral("%1 <= %2").arg(fieldAccess, AddBindValue(rule.argument, bindValues));
+    }
+    if (predicate == QLatin1String("like")){
+        return MakeLikeCondition(fieldAccess, AddLikeBindValue(rule.argument.toString(), bindValues));
+    }
+
+    qWarning() << "Unexpected filter predicate" << rule.predicate << "for field" << QString::fromUtf8(rule.path);
+    return QString();
+}
+
+
 QString CFilterQueryBuilder::MakeLikeCondition(const QString& expression, const QString& placeholder) const
 {
     if (m_dialect == DD_SQLITE){
@@ -184,12 +185,12 @@ QString CFilterQueryBuilder::MakeLikeCondition(const QString& expression, const 
 }
 
 
-QString CFilterQueryBuilder::MakeJsonFieldAccess(const QString& fieldId) const
+QString CFilterQueryBuilder::MakeJsonFieldAccess(const QString& path) const
 {
     if (m_useJsonExtract){
-        return QStringLiteral("json_extract(%1, '$.%2')").arg(QuoteIdentifier(m_jsonColumnName), EscapeJsonKey(fieldId));
+        return QStringLiteral("json_extract(%1, '$.%2')").arg(QuoteIdentifier(m_jsonColumnName), EscapeJsonKey(path));
     }
-    return QStringLiteral("%1->>'%2'").arg(QuoteIdentifier(m_jsonColumnName), EscapeJsonKey(fieldId));
+    return QStringLiteral("%1->>'%2'").arg(QuoteIdentifier(m_jsonColumnName), EscapeJsonKey(path));
 }
 
 
@@ -215,9 +216,9 @@ QString CFilterQueryBuilder::AddLikeBindValue(const QString& value, QVariantList
 }
 
 
-QString CFilterQueryBuilder::MakeFieldAccess(const QByteArray& fieldId) const
+QString CFilterQueryBuilder::MakeFieldAccess(const QByteArray& path) const
 {
-    const QString field = QString::fromUtf8(fieldId);
+    const QString field = QString::fromUtf8(path);
     if (!m_jsonColumnName.isEmpty()){
         return MakeJsonFieldAccess(field);
     }

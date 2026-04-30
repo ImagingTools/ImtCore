@@ -2,202 +2,247 @@
 #include <imtbase/CFilter.h>
 
 
-// Qt includes
-#include <QtCore/QtGlobal>
-
-
 namespace imtbase
 {
 
 
-CFilter::FieldFilter::FieldFilter(
-    const QByteArray& fieldId,
-    const QVariant& value,
-    FilterOperation operation)
-    : fieldId(fieldId)
-    , value(value)
-    , operation(operation)
+CFilter::Search::Search(const QString& text, const QByteArrayList& scopes)
+    : text(text)
+    , scopes(scopes)
 {
 }
 
 
-bool CFilter::FieldFilter::operator==(const FieldFilter& other) const
+bool CFilter::Search::IsActive() const
 {
-    return fieldId == other.fieldId &&
-        value == other.value &&
-        operation == other.operation;
+    return !text.isEmpty() && !scopes.isEmpty();
 }
 
 
-bool CFilter::FieldFilter::operator!=(const FieldFilter& other) const
+bool CFilter::Search::operator==(const Search& other) const
+{
+    return text == other.text && scopes == other.scopes;
+}
+
+
+bool CFilter::Search::operator!=(const Search& other) const
 {
     return !(*this == other);
 }
 
 
-CFilter::FilterExpression::FilterExpression(
-    const QVector<FieldFilter>& fieldFilters,
-    const QVector<FilterExpression>& filterExpressions,
-    LogicalOperation logicalOperation)
-    : fieldFilters(fieldFilters)
-    , filterExpressions(filterExpressions)
-    , logicalOperation(logicalOperation)
+CFilter::Rule::Rule(const QByteArray& path, const QString& predicate, const QVariant& argument)
+    : path(path)
+    , predicate(predicate)
+    , argument(argument)
 {
 }
 
 
-bool CFilter::FilterExpression::operator==(const FilterExpression& other) const
+bool CFilter::Rule::IsValid() const
 {
-    return fieldFilters == other.fieldFilters &&
-        filterExpressions == other.filterExpressions &&
-        logicalOperation == other.logicalOperation;
+    return !path.isEmpty() && !predicate.isEmpty();
 }
 
 
-bool CFilter::FilterExpression::operator!=(const FilterExpression& other) const
+bool CFilter::Rule::operator==(const Rule& other) const
+{
+    return path == other.path &&
+        predicate == other.predicate &&
+        argument == other.argument;
+}
+
+
+bool CFilter::Rule::operator!=(const Rule& other) const
 {
     return !(*this == other);
 }
 
 
-CFilter::SortField::SortField(const QByteArray& fieldId, SortingOrder sortingOrder)
-    : fieldId(fieldId)
-    , sortingOrder(sortingOrder)
+CFilter::RuleSet::RuleSet(Join join)
+    : join(join)
 {
 }
 
 
-bool CFilter::SortField::operator==(const SortField& other) const
+bool CFilter::RuleSet::IsEmpty() const
 {
-    return fieldId == other.fieldId && sortingOrder == other.sortingOrder;
+    return rules.isEmpty() && children.isEmpty();
 }
 
 
-bool CFilter::SortField::operator!=(const SortField& other) const
+bool CFilter::RuleSet::operator==(const RuleSet& other) const
+{
+    return join == other.join &&
+        rules == other.rules &&
+        children == other.children;
+}
+
+
+bool CFilter::RuleSet::operator!=(const RuleSet& other) const
 {
     return !(*this == other);
 }
 
 
-QString CFilter::GetTextFilter() const
+CFilter::Order::Order(const QByteArray& path, bool descending)
+    : path(path)
+    , descending(descending)
 {
-    return m_textFilter;
 }
 
 
-void CFilter::SetTextFilter(const QString& textFilter)
+bool CFilter::Order::IsValid() const
 {
-    m_textFilter = textFilter;
+    return !path.isEmpty();
 }
 
 
-QByteArrayList CFilter::GetTextFieldIds() const
+bool CFilter::Order::operator==(const Order& other) const
 {
-    return m_textFieldIds;
+    return path == other.path && descending == other.descending;
 }
 
 
-void CFilter::SetTextFieldIds(const QByteArrayList& fieldIds)
+bool CFilter::Order::operator!=(const Order& other) const
 {
-    m_textFieldIds = fieldIds;
+    return !(*this == other);
 }
 
 
-const CFilter::FilterExpression& CFilter::GetFilterExpression() const
+CFilter::Window::Window(int first, int count)
+    : first(first >= 0 ? first : -1)
+    , count(count > 0 ? count : -1)
 {
-    return m_filterExpression;
 }
 
 
-void CFilter::SetFilterExpression(const FilterExpression& expression)
+bool CFilter::Window::IsActive() const
 {
-    m_filterExpression = expression;
+    return first >= 0 && count > 0;
 }
 
 
-void CFilter::AddFieldFilter(const FieldFilter& filter)
+bool CFilter::Window::operator==(const Window& other) const
 {
-    m_filterExpression.fieldFilters << filter;
+    return first == other.first && count == other.count;
 }
 
 
-void CFilter::AddFilterExpression(const FilterExpression& expression)
+bool CFilter::Window::operator!=(const Window& other) const
 {
-    m_filterExpression.filterExpressions << expression;
+    return !(*this == other);
 }
 
 
-QVector<CFilter::SortField> CFilter::GetSortFields() const
+const CFilter::Search& CFilter::GetSearch() const
 {
-    return m_sortFields;
+    return m_search;
 }
 
 
-void CFilter::SetSortFields(const QVector<SortField>& sortFields)
+void CFilter::SetSearch(const Search& search)
 {
-    m_sortFields = sortFields;
+    m_search = search;
 }
 
 
-void CFilter::AddSortField(const SortField& sortField)
+void CFilter::SetSearch(const QString& text, const QByteArrayList& scopes)
 {
-    m_sortFields << sortField;
+    m_search = Search(text, scopes);
 }
 
 
-int CFilter::GetPage() const
+const CFilter::RuleSet& CFilter::GetRules() const
 {
-    return m_page;
+    return m_rules;
 }
 
 
-void CFilter::SetPage(int page)
+void CFilter::SetRules(const RuleSet& rules)
 {
-    m_page = page > 0 ? page : -1;
+    m_rules = rules;
 }
 
 
-int CFilter::GetPageSize() const
+void CFilter::AddRule(const Rule& rule)
 {
-    return m_pageSize;
+    m_rules.rules << rule;
 }
 
 
-void CFilter::SetPageSize(int pageSize)
+void CFilter::AddRuleSet(const RuleSet& rules)
 {
-    m_pageSize = pageSize > 0 ? pageSize : -1;
+    m_rules.children << rules;
+}
+
+
+QVector<CFilter::Order> CFilter::GetOrders() const
+{
+    return m_orders;
+}
+
+
+void CFilter::SetOrders(const QVector<Order>& orders)
+{
+    m_orders = orders;
+}
+
+
+void CFilter::AddOrder(const Order& order)
+{
+    m_orders << order;
+}
+
+
+CFilter::Window CFilter::GetWindow() const
+{
+    return m_window;
+}
+
+
+void CFilter::SetWindow(const Window& window)
+{
+    m_window = window;
+}
+
+
+void CFilter::SetWindow(int first, int count)
+{
+    m_window = Window(first, count);
+}
+
+
+void CFilter::ClearWindow()
+{
+    m_window = Window();
 }
 
 
 int CFilter::GetOffset() const
 {
-    if (!HasPagination()){
-        return -1;
-    }
-    return (m_page - 1) * m_pageSize;
+    return m_window.IsActive() ? m_window.first : -1;
 }
 
 
 int CFilter::GetLimit() const
 {
-    return HasPagination() ? m_pageSize : -1;
+    return m_window.IsActive() ? m_window.count : -1;
 }
 
 
-bool CFilter::HasPagination() const
+bool CFilter::HasWindow() const
 {
-    return m_page > 0 && m_pageSize > 0;
+    return m_window.IsActive();
 }
 
 
 void CFilter::Clear()
 {
-    m_textFilter.clear();
-    m_textFieldIds.clear();
-    m_filterExpression = FilterExpression();
-    m_sortFields.clear();
-    m_page = -1;
-    m_pageSize = -1;
+    m_search = Search();
+    m_rules = RuleSet();
+    m_orders.clear();
+    m_window = Window();
 }
 
 

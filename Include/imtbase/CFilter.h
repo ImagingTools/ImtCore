@@ -3,6 +3,7 @@
 
 
 // Qt includes
+#include <QtCore/QByteArray>
 #include <QtCore/QByteArrayList>
 #include <QtCore/QVariant>
 #include <QtCore/QVector>
@@ -14,116 +15,115 @@ namespace imtbase
 
 
 /**
- * @brief Standalone collection filter model.
+ * @brief Independent filter request model.
  *
- * CFilter is intentionally independent from the existing collection-filter
- * interfaces.  It is a small data model that can be serialized,
- * sent over URLs/API calls, and translated to SQL by imtdb::CFilterQueryBuilder.
+ * CFilter describes a query request as search text, predicate rules, ordering,
+ * and a result window.  Predicate names are stored as strings on purpose so the
+ * model can grow without mirroring legacy enum-based filter interfaces.
  */
 class CFilter
 {
 public:
-    enum FilterOperation
+    struct Search
     {
-        FO_EQUAL = 0,
-        FO_NOT_EQUAL,
-        FO_LESS,
-        FO_GREATER,
-        FO_NOT_LESS,
-        FO_NOT_GREATER,
-        FO_CONTAINS
+        Search(const QString& text = QString(), const QByteArrayList& scopes = QByteArrayList());
+
+        bool IsActive() const;
+        bool operator==(const Search& other) const;
+        bool operator!=(const Search& other) const;
+
+        QString text;
+        QByteArrayList scopes;
     };
 
-    enum LogicalOperation
+    struct Rule
     {
-        LO_AND = 0,
-        LO_OR
+        Rule(
+            const QByteArray& path = QByteArray(),
+            const QString& predicate = QString(),
+            const QVariant& argument = QVariant());
+
+        bool IsValid() const;
+        bool operator==(const Rule& other) const;
+        bool operator!=(const Rule& other) const;
+
+        QByteArray path;
+        QString predicate;
+        QVariant argument;
     };
 
-    enum SortingOrder
+    struct RuleSet
     {
-        SO_NO_ORDER = 0,
-        SO_ASC,
-        SO_DESC
+        enum Join
+        {
+            All,
+            Any
+        };
+
+        explicit RuleSet(Join join = All);
+
+        bool IsEmpty() const;
+        bool operator==(const RuleSet& other) const;
+        bool operator!=(const RuleSet& other) const;
+
+        Join join = All;
+        QVector<Rule> rules;
+        QVector<RuleSet> children;
     };
 
-    struct FieldFilter
+    struct Order
     {
-        FieldFilter(
-            const QByteArray& fieldId = QByteArray(),
-            const QVariant& value = QVariant(),
-            FilterOperation operation = FO_EQUAL);
+        Order(const QByteArray& path = QByteArray(), bool descending = false);
 
-        bool operator==(const FieldFilter& other) const;
-        bool operator!=(const FieldFilter& other) const;
+        bool IsValid() const;
+        bool operator==(const Order& other) const;
+        bool operator!=(const Order& other) const;
 
-        QByteArray fieldId;
-        QVariant value;
-        FilterOperation operation = FO_EQUAL;
+        QByteArray path;
+        bool descending = false;
     };
 
-    struct FilterExpression
+    struct Window
     {
-        FilterExpression(
-            const QVector<FieldFilter>& fieldFilters = QVector<FieldFilter>(),
-            const QVector<FilterExpression>& filterExpressions = QVector<FilterExpression>(),
-            LogicalOperation logicalOperation = LO_AND);
+        Window(int first = -1, int count = -1);
 
-        bool operator==(const FilterExpression& other) const;
-        bool operator!=(const FilterExpression& other) const;
+        bool IsActive() const;
+        bool operator==(const Window& other) const;
+        bool operator!=(const Window& other) const;
 
-        QVector<FieldFilter> fieldFilters;
-        QVector<FilterExpression> filterExpressions;
-        LogicalOperation logicalOperation = LO_AND;
+        int first = -1;
+        int count = -1;
     };
 
-    struct SortField
-    {
-        SortField(
-            const QByteArray& fieldId = QByteArray(),
-            SortingOrder sortingOrder = SO_NO_ORDER);
+    const Search& GetSearch() const;
+    void SetSearch(const Search& search);
+    void SetSearch(const QString& text, const QByteArrayList& scopes = QByteArrayList());
 
-        bool operator==(const SortField& other) const;
-        bool operator!=(const SortField& other) const;
+    const RuleSet& GetRules() const;
+    void SetRules(const RuleSet& rules);
+    void AddRule(const Rule& rule);
+    void AddRuleSet(const RuleSet& rules);
 
-        QByteArray fieldId;
-        SortingOrder sortingOrder = SO_NO_ORDER;
-    };
+    QVector<Order> GetOrders() const;
+    void SetOrders(const QVector<Order>& orders);
+    void AddOrder(const Order& order);
 
-    QString GetTextFilter() const;
-    void SetTextFilter(const QString& textFilter);
-
-    QByteArrayList GetTextFieldIds() const;
-    void SetTextFieldIds(const QByteArrayList& fieldIds);
-
-    const FilterExpression& GetFilterExpression() const;
-    void SetFilterExpression(const FilterExpression& expression);
-    void AddFieldFilter(const FieldFilter& filter);
-    void AddFilterExpression(const FilterExpression& expression);
-
-    QVector<SortField> GetSortFields() const;
-    void SetSortFields(const QVector<SortField>& sortFields);
-    void AddSortField(const SortField& sortField);
-
-    int GetPage() const;
-    void SetPage(int page);
-
-    int GetPageSize() const;
-    void SetPageSize(int pageSize);
+    Window GetWindow() const;
+    void SetWindow(const Window& window);
+    void SetWindow(int first, int count);
+    void ClearWindow();
 
     int GetOffset() const;
     int GetLimit() const;
-    bool HasPagination() const;
+    bool HasWindow() const;
 
     void Clear();
 
 private:
-    QString m_textFilter;
-    QByteArrayList m_textFieldIds;
-    FilterExpression m_filterExpression;
-    QVector<SortField> m_sortFields;
-    int m_page = -1;
-    int m_pageSize = -1;
+    Search m_search;
+    RuleSet m_rules;
+    QVector<Order> m_orders;
+    Window m_window;
 };
 
 

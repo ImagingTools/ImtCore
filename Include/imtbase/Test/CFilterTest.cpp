@@ -12,49 +12,58 @@
 #include <imtbase/CPaginatedFilter.h>
 
 
-void CFilterTest::CFilter_TextAndFields()
+void CFilterTest::CFilter_Search()
 {
     imtbase::CFilter filter;
-    filter.SetTextFilter(QStringLiteral("hello"));
-    filter.SetTextFieldIds({ "Name", "Email" });
+    filter.SetSearch(QStringLiteral("hello"), { "Name", "Email" });
 
-    QCOMPARE(filter.GetTextFilter(), QStringLiteral("hello"));
-    QCOMPARE(filter.GetTextFieldIds().count(), 2);
-    QVERIFY(filter.GetTextFieldIds().contains("Name"));
-    QVERIFY(filter.GetTextFieldIds().contains("Email"));
+    QCOMPARE(filter.GetSearch().text, QStringLiteral("hello"));
+    QCOMPARE(filter.GetSearch().scopes.count(), 2);
+    QVERIFY(filter.GetSearch().IsActive());
 }
 
 
-void CFilterTest::CFilter_FieldExpression()
+void CFilterTest::CFilter_Rules()
 {
     imtbase::CFilter filter;
-    filter.AddFieldFilter(imtbase::CFilter::FieldFilter(
-        "Status", QStringLiteral("active"), imtbase::CFilter::FO_EQUAL));
+    filter.AddRule(imtbase::CFilter::Rule("Status", QStringLiteral("is"), QStringLiteral("active")));
 
-    QCOMPARE(filter.GetFilterExpression().fieldFilters.size(), 1);
-    QCOMPARE(filter.GetFilterExpression().fieldFilters.first().fieldId, QByteArray("Status"));
-    QCOMPARE(filter.GetFilterExpression().fieldFilters.first().operation, imtbase::CFilter::FO_EQUAL);
+    QCOMPARE(filter.GetRules().rules.size(), 1);
+    QCOMPARE(filter.GetRules().rules.first().path, QByteArray("Status"));
+    QCOMPARE(filter.GetRules().rules.first().predicate, QStringLiteral("is"));
 }
 
 
-void CFilterTest::CFilter_SortFields()
+void CFilterTest::CFilter_RuleSets()
 {
-    imtbase::CFilter filter;
-    filter.AddSortField(imtbase::CFilter::SortField("CreatedAt", imtbase::CFilter::SO_DESC));
+    imtbase::CFilter::RuleSet any(imtbase::CFilter::RuleSet::Any);
+    any.rules << imtbase::CFilter::Rule("Status", QStringLiteral("is"), QStringLiteral("active"));
 
-    QCOMPARE(filter.GetSortFields().size(), 1);
-    QCOMPARE(filter.GetSortFields().first().fieldId, QByteArray("CreatedAt"));
-    QCOMPARE(filter.GetSortFields().first().sortingOrder, imtbase::CFilter::SO_DESC);
+    imtbase::CFilter filter;
+    filter.AddRuleSet(any);
+
+    QCOMPARE(filter.GetRules().children.size(), 1);
+    QCOMPARE(filter.GetRules().children.first().join, imtbase::CFilter::RuleSet::Any);
 }
 
 
-void CFilterTest::CFilter_Pagination()
+void CFilterTest::CFilter_Orders()
 {
     imtbase::CFilter filter;
-    filter.SetPage(3);
-    filter.SetPageSize(25);
+    filter.AddOrder(imtbase::CFilter::Order("CreatedAt", true));
 
-    QVERIFY(filter.HasPagination());
+    QCOMPARE(filter.GetOrders().size(), 1);
+    QCOMPARE(filter.GetOrders().first().path, QByteArray("CreatedAt"));
+    QVERIFY(filter.GetOrders().first().descending);
+}
+
+
+void CFilterTest::CFilter_Window()
+{
+    imtbase::CFilter filter;
+    filter.SetWindow(50, 25);
+
+    QVERIFY(filter.HasWindow());
     QCOMPARE(filter.GetLimit(), 25);
     QCOMPARE(filter.GetOffset(), 50);
 }
@@ -63,18 +72,16 @@ void CFilterTest::CFilter_Pagination()
 void CFilterTest::CFilter_Clear()
 {
     imtbase::CFilter filter;
-    filter.SetTextFilter(QStringLiteral("hello"));
-    filter.SetTextFieldIds({ "Name" });
-    filter.AddSortField(imtbase::CFilter::SortField("Name", imtbase::CFilter::SO_ASC));
-    filter.SetPage(2);
-    filter.SetPageSize(10);
+    filter.SetSearch(QStringLiteral("hello"), { "Name" });
+    filter.AddOrder(imtbase::CFilter::Order("Name"));
+    filter.SetWindow(10, 10);
 
     filter.Clear();
 
-    QVERIFY(filter.GetTextFilter().isEmpty());
-    QVERIFY(filter.GetTextFieldIds().isEmpty());
-    QVERIFY(filter.GetSortFields().isEmpty());
-    QVERIFY(!filter.HasPagination());
+    QVERIFY(!filter.GetSearch().IsActive());
+    QVERIFY(filter.GetRules().IsEmpty());
+    QVERIFY(filter.GetOrders().isEmpty());
+    QVERIFY(!filter.HasWindow());
 }
 
 
@@ -94,25 +101,25 @@ void CFilterTest::CPaginatedFilter_SetPage()
     imtbase::CPaginatedFilter pager;
     pager.SetPage(3);
     QCOMPARE(pager.GetPage(), 3);
-    QCOMPARE(pager.GetFilter().GetPage(), 3);
+    QCOMPARE(pager.GetFilter().GetWindow().first, 100);
     pager.SetPage(0);
     QCOMPARE(pager.GetPage(), 1);
-    QCOMPARE(pager.GetFilter().GetPage(), 1);
+    QCOMPARE(pager.GetFilter().GetWindow().first, 0);
 }
 
 
 void CFilterTest::CPaginatedFilter_SetFilter()
 {
     imtbase::CFilter filter;
-    filter.SetTextFilter(QStringLiteral("test"));
+    filter.SetSearch(QStringLiteral("test"), { "Name" });
 
     imtbase::CPaginatedFilter pager;
     pager.SetFilter(filter);
 
-    QCOMPARE(pager.GetFilter().GetTextFilter(), QStringLiteral("test"));
-    QVERIFY(pager.GetFilter().HasPagination());
-    QCOMPARE(pager.GetFilter().GetPage(), 1);
-    QCOMPARE(pager.GetFilter().GetPageSize(), 50);
+    QCOMPARE(pager.GetFilter().GetSearch().text, QStringLiteral("test"));
+    QVERIFY(pager.GetFilter().HasWindow());
+    QCOMPARE(pager.GetFilter().GetWindow().first, 0);
+    QCOMPARE(pager.GetFilter().GetWindow().count, 50);
 }
 
 
@@ -122,8 +129,8 @@ void CFilterTest::CPaginatedFilter_Offset()
     pager.SetPage(3);
     pager.SetPageSize(25);
     QCOMPARE(pager.GetOffset(), 50);
-    QCOMPARE(pager.GetFilter().GetPage(), 3);
-    QCOMPARE(pager.GetFilter().GetPageSize(), 25);
+    QCOMPARE(pager.GetFilter().GetWindow().first, 50);
+    QCOMPARE(pager.GetFilter().GetWindow().count, 25);
 }
 
 
@@ -158,176 +165,181 @@ void CFilterTest::CPaginatedFilter_HasPreviousPage()
 }
 
 
-void CFilterTest::ToQueryString_TextFilter()
+void CFilterTest::ToQueryString_Search()
 {
     imtbase::CFilter filter;
-    filter.SetTextFilter(QStringLiteral("hello"));
+    filter.SetSearch(QStringLiteral("hello"), { "Name" });
 
     const QString qs = imtbase::CFilterSerializer::ToQueryString(filter);
-    QVERIFY(qs.contains(QStringLiteral("text=hello")));
+    QVERIFY(qs.contains(QStringLiteral("search=hello")));
+    QVERIFY(qs.contains(QStringLiteral("scope=Name")));
 }
 
 
-void CFilterTest::ToQueryString_WithPagination()
+void CFilterTest::ToQueryString_Window()
 {
     imtbase::CFilter filter;
-    filter.SetPage(2);
-    filter.SetPageSize(50);
+    filter.SetWindow(50, 25);
 
     const QString qs = imtbase::CFilterSerializer::ToQueryString(filter);
-    QVERIFY(qs.contains(QStringLiteral("page=2")));
-    QVERIFY(qs.contains(QStringLiteral("limit=50")));
+    QVERIFY(qs.contains(QStringLiteral("offset=50")));
+    QVERIFY(qs.contains(QStringLiteral("count=25")));
 }
 
 
-void CFilterTest::ToQueryString_SortFields()
+void CFilterTest::ToQueryString_Orders()
 {
     imtbase::CFilter filter;
-    filter.AddSortField(imtbase::CFilter::SortField("Name", imtbase::CFilter::SO_ASC));
+    filter.AddOrder(imtbase::CFilter::Order("Name"));
 
     const QString qs = imtbase::CFilterSerializer::ToQueryString(filter);
-    QVERIFY(qs.contains(QStringLiteral("sort=Name%3Aasc")) || qs.contains(QStringLiteral("sort=Name:asc")));
+    QVERIFY(qs.contains(QStringLiteral("order%5B0%5D.path=Name")) || qs.contains(QStringLiteral("order[0].path=Name")));
+    QVERIFY(qs.contains(QStringLiteral("order%5B0%5D.dir=up")) || qs.contains(QStringLiteral("order[0].dir=up")));
 }
 
 
-void CFilterTest::ToQueryString_FieldFilters()
+void CFilterTest::ToQueryString_Rules()
 {
     imtbase::CFilter filter;
-    filter.AddFieldFilter(imtbase::CFilter::FieldFilter(
-        "Status", QStringLiteral("active"), imtbase::CFilter::FO_EQUAL));
+    filter.AddRule(imtbase::CFilter::Rule("Status", QStringLiteral("is"), QStringLiteral("active")));
 
     const QString qs = imtbase::CFilterSerializer::ToQueryString(filter);
-    QVERIFY(qs.contains(QStringLiteral("filter%5BStatus%5D%5Beq%5D=active")) ||
-            qs.contains(QStringLiteral("filter[Status][eq]=active")));
+    QVERIFY(qs.contains(QStringLiteral("rule%5B0%5D.path=Status")) || qs.contains(QStringLiteral("rule[0].path=Status")));
+    QVERIFY(qs.contains(QStringLiteral("rule%5B0%5D.pred=is")) || qs.contains(QStringLiteral("rule[0].pred=is")));
 }
 
 
-void CFilterTest::FromQueryString_TextFilter()
+void CFilterTest::FromQueryString_Search()
 {
     imtbase::CFilter filter;
-    QVERIFY(imtbase::CFilterSerializer::FromQueryString(QStringLiteral("text=hello"), filter));
-    QCOMPARE(filter.GetTextFilter(), QStringLiteral("hello"));
+    QVERIFY(imtbase::CFilterSerializer::FromQueryString(QStringLiteral("search=hello&scope=Name"), filter));
+    QCOMPARE(filter.GetSearch().text, QStringLiteral("hello"));
+    QCOMPARE(filter.GetSearch().scopes.first(), QByteArray("Name"));
 }
 
 
-void CFilterTest::FromQueryString_SortFields()
+void CFilterTest::FromQueryString_Orders()
 {
     imtbase::CFilter filter;
-    QVERIFY(imtbase::CFilterSerializer::FromQueryString(QStringLiteral("sort=Name:desc"), filter));
+    QVERIFY(imtbase::CFilterSerializer::FromQueryString(QStringLiteral("order[0].path=Name&order[0].dir=down"), filter));
 
-    QCOMPARE(filter.GetSortFields().size(), 1);
-    QCOMPARE(filter.GetSortFields().first().fieldId, QByteArray("Name"));
-    QCOMPARE(filter.GetSortFields().first().sortingOrder, imtbase::CFilter::SO_DESC);
+    QCOMPARE(filter.GetOrders().size(), 1);
+    QCOMPARE(filter.GetOrders().first().path, QByteArray("Name"));
+    QVERIFY(filter.GetOrders().first().descending);
 }
 
 
-void CFilterTest::FromQueryString_FieldFilters()
+void CFilterTest::FromQueryString_Rules()
 {
     imtbase::CFilter filter;
-    QVERIFY(imtbase::CFilterSerializer::FromQueryString(QStringLiteral("filter[Status][eq]=active"), filter));
+    QVERIFY(imtbase::CFilterSerializer::FromQueryString(QStringLiteral("rule[0].path=Status&rule[0].pred=is&rule[0].arg=active"), filter));
 
-    const imtbase::CFilter::FilterExpression& expr = filter.GetFilterExpression();
-    QCOMPARE(expr.fieldFilters.size(), 1);
-    QCOMPARE(expr.fieldFilters.first().fieldId, QByteArray("Status"));
-    QCOMPARE(expr.fieldFilters.first().operation, imtbase::CFilter::FO_EQUAL);
-    QCOMPARE(expr.fieldFilters.first().value.toString(), QStringLiteral("active"));
+    QCOMPARE(filter.GetRules().rules.size(), 1);
+    QCOMPARE(filter.GetRules().rules.first().path, QByteArray("Status"));
+    QCOMPARE(filter.GetRules().rules.first().predicate, QStringLiteral("is"));
+    QCOMPARE(filter.GetRules().rules.first().argument.toString(), QStringLiteral("active"));
 }
 
 
 void CFilterTest::FromQueryString_LeadingQuestionMark()
 {
     imtbase::CFilter filter;
-    QVERIFY(imtbase::CFilterSerializer::FromQueryString(QStringLiteral("?text=world"), filter));
-    QCOMPARE(filter.GetTextFilter(), QStringLiteral("world"));
+    QVERIFY(imtbase::CFilterSerializer::FromQueryString(QStringLiteral("?search=world&scope=Name"), filter));
+    QCOMPARE(filter.GetSearch().text, QStringLiteral("world"));
 }
 
 
-void CFilterTest::ToJson_TextFilter()
+void CFilterTest::ToJson_Search()
 {
     imtbase::CFilter filter;
-    filter.SetTextFilter(QStringLiteral("hello"));
+    filter.SetSearch(QStringLiteral("hello"), { "Name" });
 
     const QJsonObject json = imtbase::CFilterSerializer::ToJson(filter);
-    QCOMPARE(json[QStringLiteral("text")].toString(), QStringLiteral("hello"));
+    QCOMPARE(json[QStringLiteral("search")].toObject()[QStringLiteral("text")].toString(), QStringLiteral("hello"));
 }
 
 
-void CFilterTest::ToJson_SortFields()
+void CFilterTest::ToJson_Orders()
 {
     imtbase::CFilter filter;
-    filter.AddSortField(imtbase::CFilter::SortField("CreatedAt", imtbase::CFilter::SO_DESC));
+    filter.AddOrder(imtbase::CFilter::Order("CreatedAt", true));
 
-    const QJsonObject json = imtbase::CFilterSerializer::ToJson(filter);
-    const QJsonArray sortArray = json[QStringLiteral("sort")].toArray();
-    QCOMPARE(sortArray.size(), 1);
-    QCOMPARE(sortArray[0].toObject()[QStringLiteral("field")].toString(), QStringLiteral("CreatedAt"));
-    QCOMPARE(sortArray[0].toObject()[QStringLiteral("order")].toString(), QStringLiteral("desc"));
+    const QJsonArray orders = imtbase::CFilterSerializer::ToJson(filter)[QStringLiteral("orders")].toArray();
+    QCOMPARE(orders.size(), 1);
+    QCOMPARE(orders[0].toObject()[QStringLiteral("path")].toString(), QStringLiteral("CreatedAt"));
+    QVERIFY(orders[0].toObject()[QStringLiteral("descending")].toBool());
 }
 
 
-void CFilterTest::ToJson_FieldFilters()
+void CFilterTest::ToJson_Rules()
 {
     imtbase::CFilter filter;
-    filter.AddFieldFilter(imtbase::CFilter::FieldFilter(
-        "Status", QStringLiteral("active"), imtbase::CFilter::FO_EQUAL));
+    filter.AddRule(imtbase::CFilter::Rule("Status", QStringLiteral("is"), QStringLiteral("active")));
 
     const QJsonObject json = imtbase::CFilterSerializer::ToJson(filter);
-    QVERIFY(json.contains(QStringLiteral("filter")));
-    QVERIFY(json[QStringLiteral("filter")].toObject().contains(QStringLiteral("fields")));
+    QVERIFY(json.contains(QStringLiteral("rules")));
+    QCOMPARE(json[QStringLiteral("rules")].toObject()[QStringLiteral("items")].toArray().size(), 1);
 }
 
 
-void CFilterTest::FromJson_TextFilter()
+void CFilterTest::FromJson_Search()
 {
+    QJsonArray scopes;
+    scopes << QStringLiteral("Name");
+    QJsonObject search;
+    search[QStringLiteral("text")] = QStringLiteral("hello");
+    search[QStringLiteral("scope")] = scopes;
+
     QJsonObject json;
-    json[QStringLiteral("text")] = QStringLiteral("hello");
+    json[QStringLiteral("search")] = search;
 
     imtbase::CFilter filter;
     QVERIFY(imtbase::CFilterSerializer::FromJson(json, filter));
-    QCOMPARE(filter.GetTextFilter(), QStringLiteral("hello"));
+    QCOMPARE(filter.GetSearch().text, QStringLiteral("hello"));
+    QCOMPARE(filter.GetSearch().scopes.first(), QByteArray("Name"));
 }
 
 
-void CFilterTest::FromJson_SortFields()
+void CFilterTest::FromJson_Orders()
 {
-    QJsonArray sortArray;
-    QJsonObject sortItem;
-    sortItem[QStringLiteral("field")] = QStringLiteral("Name");
-    sortItem[QStringLiteral("order")] = QStringLiteral("asc");
-    sortArray << sortItem;
+    QJsonArray orders;
+    QJsonObject order;
+    order[QStringLiteral("path")] = QStringLiteral("Name");
+    order[QStringLiteral("descending")] = true;
+    orders << order;
 
     QJsonObject json;
-    json[QStringLiteral("sort")] = sortArray;
+    json[QStringLiteral("orders")] = orders;
 
     imtbase::CFilter filter;
     QVERIFY(imtbase::CFilterSerializer::FromJson(json, filter));
-    QCOMPARE(filter.GetSortFields().size(), 1);
-    QCOMPARE(filter.GetSortFields().first().fieldId, QByteArray("Name"));
-    QCOMPARE(filter.GetSortFields().first().sortingOrder, imtbase::CFilter::SO_ASC);
+    QCOMPARE(filter.GetOrders().size(), 1);
+    QCOMPARE(filter.GetOrders().first().path, QByteArray("Name"));
+    QVERIFY(filter.GetOrders().first().descending);
 }
 
 
-void CFilterTest::FromJson_FieldFilters()
+void CFilterTest::FromJson_Rules()
 {
-    QJsonArray fields;
-    QJsonObject field;
-    field[QStringLiteral("field")] = QStringLiteral("Status");
-    field[QStringLiteral("op")] = QStringLiteral("eq");
-    field[QStringLiteral("value")] = QStringLiteral("active");
-    fields << field;
+    QJsonArray items;
+    QJsonObject item;
+    item[QStringLiteral("path")] = QStringLiteral("Status");
+    item[QStringLiteral("pred")] = QStringLiteral("is");
+    item[QStringLiteral("arg")] = QStringLiteral("active");
+    items << item;
 
-    QJsonObject expression;
-    expression[QStringLiteral("op")] = QStringLiteral("and");
-    expression[QStringLiteral("fields")] = fields;
+    QJsonObject rules;
+    rules[QStringLiteral("join")] = QStringLiteral("all");
+    rules[QStringLiteral("items")] = items;
 
     QJsonObject json;
-    json[QStringLiteral("filter")] = expression;
+    json[QStringLiteral("rules")] = rules;
 
     imtbase::CFilter filter;
     QVERIFY(imtbase::CFilterSerializer::FromJson(json, filter));
-    QCOMPARE(filter.GetFilterExpression().fieldFilters.size(), 1);
-    QCOMPARE(filter.GetFilterExpression().fieldFilters.first().fieldId, QByteArray("Status"));
-    QCOMPARE(filter.GetFilterExpression().fieldFilters.first().value.toString(), QStringLiteral("active"));
+    QCOMPARE(filter.GetRules().rules.size(), 1);
+    QCOMPARE(filter.GetRules().rules.first().path, QByteArray("Status"));
+    QCOMPARE(filter.GetRules().rules.first().argument.toString(), QStringLiteral("active"));
 }
 
 
@@ -335,9 +347,9 @@ void CFilterTest::FromJson_Empty()
 {
     imtbase::CFilter filter;
     QVERIFY(imtbase::CFilterSerializer::FromJson(QJsonObject(), filter));
-    QVERIFY(filter.GetTextFilter().isEmpty());
-    QVERIFY(filter.GetTextFieldIds().isEmpty());
-    QVERIFY(filter.GetSortFields().isEmpty());
+    QVERIFY(!filter.GetSearch().IsActive());
+    QVERIFY(filter.GetRules().IsEmpty());
+    QVERIFY(filter.GetOrders().isEmpty());
 }
 
 

@@ -15,10 +15,7 @@ namespace imtdb
 
 
 /**
- * @brief SQL query builder for standalone imtbase::CFilter.
- *
- * This builder is not integrated into database delegates.  It provides a clean
- * reusable translation layer from the standalone filter model to SQL clauses.
+ * @brief SQL query builder for standalone imtbase::CFilter requests.
  */
 class CFilterQueryBuilder
 {
@@ -41,28 +38,28 @@ public:
 
     QueryResult Build(const imtbase::CFilter& filter) const;
 
-    QString BuildTextFilter(
-        const QString& text,
-        const QByteArrayList& columnIds,
+    QString BuildSearchClause(
+        const imtbase::CFilter::Search& search,
         QVariantList& bindValues) const;
 
-    QString BuildFilterExpression(
-        const imtbase::CFilter::FilterExpression& expression,
+    QString BuildRulesClause(
+        const imtbase::CFilter::RuleSet& rules,
         QVariantList& bindValues) const;
 
-    QString BuildSortClause(const QVector<imtbase::CFilter::SortField>& sortFields) const;
-    QString BuildLimitClause(const imtbase::CFilter& filter) const;
+    QString BuildOrderClause(const QVector<imtbase::CFilter::Order>& orders) const;
+    QString BuildWindowClause(const imtbase::CFilter::Window& window) const;
 
     void SetJsonColumnName(const QString& columnName);
     void SetUseJsonExtract(bool useJsonExtract);
 
 private:
+    QString BuildRuleClause(const imtbase::CFilter::Rule& rule, QVariantList& bindValues) const;
     QString MakeLikeCondition(const QString& expression, const QString& placeholder) const;
-    QString MakeJsonFieldAccess(const QString& fieldId) const;
+    QString MakeJsonFieldAccess(const QString& path) const;
     QString MakePlaceholder(int bindIndex) const;
     QString AddBindValue(const QVariant& value, QVariantList& bindValues) const;
     QString AddLikeBindValue(const QString& value, QVariantList& bindValues) const;
-    QString MakeFieldAccess(const QByteArray& fieldId) const;
+    QString MakeFieldAccess(const QByteArray& path) const;
     QString EscapeLikePattern(const QString& text) const;
     static QString QuoteIdentifier(const QString& identifier);
     static QString EscapeJsonKey(const QString& key);

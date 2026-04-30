@@ -15,7 +15,7 @@ namespace imtbase
 
 
 /**
- * @brief Serializes standalone CFilter objects to URL query strings and JSON.
+ * @brief Serializes standalone CFilter requests to URL query strings and JSON.
  */
 class CFilterSerializer
 {
@@ -27,12 +27,10 @@ public:
     static bool FromJson(const QJsonObject& json, CFilter& filter);
 
 private:
-    static QJsonObject ToJson(const CFilter::FilterExpression& expression);
-    static bool FromJson(const QJsonObject& json, CFilter::FilterExpression& expression);
-    static QString FieldOperationToString(CFilter::FilterOperation operation);
-    static CFilter::FilterOperation StringToFieldOperation(const QString& value);
-    static QString SortingOrderToString(CFilter::SortingOrder order);
-    static CFilter::SortingOrder StringToSortingOrder(const QString& value);
+    static QJsonObject ToJson(const CFilter::RuleSet& rules);
+    static bool FromJson(const QJsonObject& json, CFilter::RuleSet& rules);
+    static QString JoinToString(CFilter::RuleSet::Join join);
+    static CFilter::RuleSet::Join StringToJoin(const QString& value);
 };
 
 

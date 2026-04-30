@@ -112,8 +112,7 @@ bool CPaginatedFilter::HasPreviousPage() const
 
 void CPaginatedFilter::SyncFilterPagination()
 {
-    m_filter.SetPage(m_page);
-    m_filter.SetPageSize(m_pageSize);
+    m_filter.SetWindow(GetOffset(), GetLimit());
 }
 
 
