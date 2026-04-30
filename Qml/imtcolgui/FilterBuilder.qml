@@ -54,14 +54,19 @@ QtObject {
     }
 
     function page(pageNumber, pageSize) {
-        if (pageNumber > 0 && pageSize > 0 && (pageNumber - 1) <= Math.floor(_maxSafeInteger / pageSize)) {
-            offset = (pageNumber - 1) * pageSize
+        var zeroBasedPage = pageNumber - 1
+        if (pageNumber > 0 && pageSize > 0 && _canMultiplyWithoutOverflow(zeroBasedPage, pageSize)) {
+            offset = zeroBasedPage * pageSize
             count = pageSize
         } else {
             offset = -1
             count = -1
         }
         return root
+    }
+
+    function _canMultiplyWithoutOverflow(left, right) {
+        return left <= Math.floor(_maxSafeInteger / right)
     }
 
     function window(first, size) {

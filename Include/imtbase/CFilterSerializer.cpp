@@ -26,13 +26,13 @@ QString NormalizeToken(const QString& value)
 
 int ExtractIndexedKey(const QString& key, const QString& prefix, const QString& suffix)
 {
-    if (!key.startsWith(prefix) || !key.endsWith(suffix)){
+    if (!key.startsWith(prefix)){
         return -1;
     }
 
     const int start = prefix.size();
     const int close = key.indexOf(QLatin1Char(']'), start);
-    if (close <= start){
+    if (close <= start || key.mid(close + 1) != suffix){
         return -1;
     }
 
