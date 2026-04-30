@@ -203,13 +203,13 @@ CFilter& CFilter::page(int pageNumber, int pageSize)
         return *this;
     }
 
-    const qint64 first = static_cast<qint64>(pageNumber - 1) * pageSize;
-    if (first > std::numeric_limits<int>::max()){
+    const int zeroBasedPage = pageNumber - 1;
+    if (zeroBasedPage > std::numeric_limits<int>::max() / pageSize){
         ClearWindow();
         return *this;
     }
 
-    SetWindow(static_cast<int>(first), pageSize);
+    SetWindow(zeroBasedPage * pageSize, pageSize);
     return *this;
 }
 

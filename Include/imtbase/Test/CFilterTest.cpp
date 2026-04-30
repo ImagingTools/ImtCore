@@ -64,10 +64,12 @@ void CFilterTest::CFilter_FluentApi()
         .build();
 
     QCOMPARE(filter.GetSearch().text, QStringLiteral("john"));
+    QCOMPARE(filter.GetSearch().scopes, QByteArrayList({ "Name", "Email" }));
     QCOMPARE(filter.GetRules().rules.size(), 1);
     QCOMPARE(filter.GetRules().children.size(), 1);
     QCOMPARE(filter.GetRules().children.first().join, imtbase::CFilter::RuleSet::Any);
     QCOMPARE(filter.GetOrders().first().path, QByteArray("CreatedAt"));
+    QVERIFY(filter.GetOrders().first().descending);
     QCOMPARE(filter.GetWindow().first, 50);
     QCOMPARE(filter.GetWindow().count, 50);
 }
@@ -436,6 +438,7 @@ void CFilterTest::SdlConverter_FromQmlModel()
     imtbase::CFilter filter;
     QVERIFY(imtbase::CFilterSdlConverter::FromQmlModel(model, filter));
     QCOMPARE(filter.GetSearch().text, QStringLiteral("john"));
+    QCOMPARE(filter.GetSearch().scopes, QByteArrayList({ "Name", "Email" }));
     QCOMPARE(filter.GetRules().rules.size(), 1);
     QCOMPARE(filter.GetRules().rules.first().path, QByteArray("Status"));
     QCOMPARE(filter.GetWindow().count, 50);

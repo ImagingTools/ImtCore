@@ -145,7 +145,8 @@ QtObject {
     }
 
     function _normalizeJoin(mode) {
-        return String(mode || "all").toLowerCase() === "any" || String(mode || "").toLowerCase() === "or" ? "any" : "all"
+        var normalized = String(mode || "all").toLowerCase()
+        return normalized === "any" || normalized === "or" ? "any" : "all"
     }
 
     function _hasRules(group) {
