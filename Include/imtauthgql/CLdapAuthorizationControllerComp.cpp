@@ -100,10 +100,6 @@ istd::TUniqueInterfacePtr<imtauth::IUserInfo> CLdapAuthorizationControllerComp::
 	LPWSTR serverName = nullptr;
 	if (domain != "."){
 		if (NetGetDCName(NULL, qUtf16Printable(domain), &computerName) != 0){
-			if (computerName != nullptr){
-				NetApiBufferFree(computerName);
-			}
-
 			return nullptr;
 		}
 

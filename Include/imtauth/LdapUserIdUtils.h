@@ -57,6 +57,7 @@ inline bool SplitRawUserId(const QByteArray& userId, QByteArray& domain, QByteAr
 	domain = userId.left(separatorIndex);
 	username = userId.mid(separatorIndex + 1);
 
+	// Keep malformed values like "domain\\" unchanged instead of producing an empty username.
 	return !username.isEmpty();
 }
 
