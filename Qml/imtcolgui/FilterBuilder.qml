@@ -31,7 +31,7 @@ QtObject {
     property int offset: -1
     property int count: -1
     property string queryString: ""
-    property var filterModel: ({})
+    property var filterModel: null
 
     signal filterReady(string queryString)
     signal filterModelReady(var filterModel)
@@ -39,7 +39,7 @@ QtObject {
     signal cleared()
 
     readonly property double _maxSafeInteger: Number.MAX_SAFE_INTEGER
-    property var _rules: ({join: "all", items: [], sets: []})
+    property var _rules: _createEmptyRuleSet()
     property var _orders: []
 
     function search(text, scopes) {
@@ -112,11 +112,15 @@ QtObject {
         offset = -1
         count = -1
         queryString = ""
-        filterModel = ({})
-        _rules = {join: "all", items: [], sets: []}
+        filterModel = null
+        _rules = _createEmptyRuleSet()
         _orders = []
         cleared()
         return root
+    }
+
+    function _createEmptyRuleSet() {
+        return {join: "all", items: [], sets: []}
     }
 
     function _addGroup(parent, joinMode, configure) {

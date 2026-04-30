@@ -204,6 +204,7 @@ CFilter& CFilter::page(int pageNumber, int pageSize)
     }
 
     const int zeroBasedPage = pageNumber - 1;
+    // Prevent integer overflow before calculating zeroBasedPage * pageSize.
     if (zeroBasedPage > std::numeric_limits<int>::max() / pageSize){
         ClearWindow();
         return *this;
