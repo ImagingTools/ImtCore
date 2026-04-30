@@ -15,6 +15,67 @@ namespace imtauth
 {
 
 
+namespace
+{
+
+
+#ifdef Q_OS_WIN
+bool IsLocalLdapDomain(const QByteArray& domain)
+{
+	QByteArray normalizedDomain = domain.trimmed();
+	if (normalizedDomain.isEmpty() || normalizedDomain == "."){
+		return true;
+	}
+
+	if (normalizedDomain.compare("localhost", Qt::CaseInsensitive) == 0){
+		return true;
+	}
+
+	WCHAR computerName[MAX_COMPUTERNAME_LENGTH + 1];
+	DWORD computerNameSize = MAX_COMPUTERNAME_LENGTH + 1;
+	if (GetComputerNameW(computerName, &computerNameSize)){
+		QByteArray localComputerName = QString::fromWCharArray(computerName).toUtf8();
+		return normalizedDomain.compare(localComputerName, Qt::CaseInsensitive) == 0;
+	}
+
+	return false;
+}
+
+
+QByteArray NormalizeLdapUserId(const QByteArray& userId)
+{
+	int separatorIndex = userId.indexOf('\\');
+	if (separatorIndex < 0){
+		return userId;
+	}
+
+	QByteArray domain = userId.left(separatorIndex);
+	QByteArray username = userId.mid(separatorIndex + 1);
+	if (IsLocalLdapDomain(domain)){
+		return username;
+	}
+
+	return userId;
+}
+
+
+void SplitLdapUserId(const QByteArray& userId, QByteArray& domain, QByteArray& username)
+{
+	domain = ".";
+	username = NormalizeLdapUserId(userId);
+
+	int separatorIndex = username.indexOf('\\');
+	if (separatorIndex >= 0){
+		domain = username.left(separatorIndex);
+		username = username.mid(separatorIndex + 1);
+	}
+}
+#endif
+
+
+} // namespace
+
+
 // protected methods
 
 // reimplemented (imtauth::ICredentialController)
@@ -24,14 +85,9 @@ bool CLdapCredentialControllerComp::CheckCredential(const QByteArray& login, con
 	int result = 0;
 #ifdef Q_OS_WIN
 	// Local domain by default
-	QByteArray domain = ".";
-	QByteArray username = login;
-
-	QByteArrayList data = login.split('\\');
-	if (data.size() >= 2){
-		domain = data[0];
-		username = data[1];
-	}
+	QByteArray domain;
+	QByteArray username;
+	SplitLdapUserId(login, domain, username);
 
 	HANDLE  hUser;
 	result = LogonUser(qUtf16Printable(username), qUtf16Printable(domain), qUtf16Printable(password), LOGON32_LOGON_INTERACTIVE, LOGON32_PROVIDER_DEFAULT, &hUser);
@@ -75,5 +131,4 @@ bool CLdapCredentialControllerComp::CheckCredential(const QByteArray& login, con
 
 
 } // namespace imtauth
-
 

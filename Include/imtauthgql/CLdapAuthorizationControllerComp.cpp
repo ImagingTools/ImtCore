@@ -23,6 +23,71 @@ namespace imtauthgql
 {
 
 
+namespace
+{
+
+
+bool IsLocalLdapDomain(const QByteArray& domain)
+{
+#ifdef Q_OS_WIN
+	QByteArray normalizedDomain = domain.trimmed();
+	if (normalizedDomain.isEmpty() || normalizedDomain == "."){
+		return true;
+	}
+
+	if (normalizedDomain.compare("localhost", Qt::CaseInsensitive) == 0){
+		return true;
+	}
+
+	WCHAR computerName[MAX_COMPUTERNAME_LENGTH + 1];
+	DWORD computerNameSize = MAX_COMPUTERNAME_LENGTH + 1;
+	if (GetComputerNameW(computerName, &computerNameSize)){
+		QByteArray localComputerName = QString::fromWCharArray(computerName).toUtf8();
+		return normalizedDomain.compare(localComputerName, Qt::CaseInsensitive) == 0;
+	}
+#else
+	Q_UNUSED(domain)
+#endif
+
+	return false;
+}
+
+
+QByteArray NormalizeLdapUserId(const QByteArray& userId)
+{
+#ifdef Q_OS_WIN
+	int separatorIndex = userId.indexOf('\\');
+	if (separatorIndex < 0){
+		return userId;
+	}
+
+	QByteArray domain = userId.left(separatorIndex);
+	QByteArray username = userId.mid(separatorIndex + 1);
+	if (IsLocalLdapDomain(domain)){
+		return username;
+	}
+#endif
+
+	return userId;
+}
+
+
+void SplitLdapUserId(const QByteArray& userId, QByteArray& domain, QByteArray& username)
+{
+	domain = ".";
+	username = NormalizeLdapUserId(userId);
+
+	int separatorIndex = username.indexOf('\\');
+	if (separatorIndex >= 0){
+		domain = username.left(separatorIndex);
+		username = username.mid(separatorIndex + 1);
+	}
+}
+
+
+} // namespace
+
+
 // protected methods
 
 QByteArray CLdapAuthorizationControllerComp::CheckExistsRole(const QByteArray& productId, RoleType roleType) const
@@ -90,20 +155,23 @@ istd::TUniqueInterfacePtr<imtauth::IUserInfo> CLdapAuthorizationControllerComp::
 #ifdef Q_OS_WIN
 	LPUSER_INFO_3 userInfo3BufPtr = NULL;
 
-	QByteArray domain = ".";
-	QByteArray username = ldapUserId;
+	QByteArray normalizedUserId = NormalizeLdapUserId(ldapUserId);
+	QByteArray domain;
+	QByteArray username;
+	SplitLdapUserId(normalizedUserId, domain, username);
 
-	QByteArrayList data = ldapUserId.split('\\');
-	if (data.size() >= 2){
-		domain = data[0];
-		username = data[1];
+	LPBYTE computerName = nullptr;
+	LPWSTR serverName = nullptr;
+	if (domain != "."){
+		if (NetGetDCName(NULL, qUtf16Printable(domain), &computerName) == 0){
+			serverName = (LPWSTR)computerName;
+		}
 	}
 
-	// Get the computer name of a DC for the specified domain.
-	LPBYTE computerName;
-	NetGetDCName(NULL, qUtf16Printable(domain), &computerName);
-
-	NetUserGetInfo((LPWSTR)computerName, qUtf16Printable(ldapUserId), 3, (LPBYTE *)&userInfo3BufPtr);
+	NetUserGetInfo(serverName, qUtf16Printable(username), 3, (LPBYTE *)&userInfo3BufPtr);
+	if (computerName != nullptr){
+		NetApiBufferFree(computerName);
+	}
 
 	if (userInfo3BufPtr != nullptr){
 		istd::TDelPtr<imtauth::CIdentifiableUserInfo> userInfoPtr;
@@ -116,7 +184,7 @@ istd::TUniqueInterfacePtr<imtauth::IUserInfo> CLdapAuthorizationControllerComp::
 		systemInfo.systemName = "LDAP";
 
 		userInfoPtr->AddToSystem(systemInfo);
-		userInfoPtr->SetId(ldapUserId);
+		userInfoPtr->SetId(normalizedUserId);
 
 		QByteArray password = QString::fromWCharArray(userInfo3BufPtr->usri3_password).toUtf8();
 		userInfoPtr->SetPasswordHash(password);
@@ -126,7 +194,7 @@ istd::TUniqueInterfacePtr<imtauth::IUserInfo> CLdapAuthorizationControllerComp::
 			userInfoPtr->SetName(name);
 		}
 		else{
-			userInfoPtr->SetName(ldapUserId);
+			userInfoPtr->SetName(normalizedUserId);
 		}
 
 		QString description = QString::fromWCharArray(userInfo3BufPtr->usri3_comment);
@@ -164,7 +232,7 @@ sdl::imtauth::Authorization::CAuthorizationPayload CLdapAuthorizationControllerC
 
 			QByteArray login;
 			if (inputArgument.login){
-				login = inputArgument.login->toUtf8();
+				login = NormalizeLdapUserId(inputArgument.login->toUtf8());
 			}
 
 			QByteArray productId;
@@ -256,5 +324,3 @@ sdl::imtauth::Authorization::CAuthorizationPayload CLdapAuthorizationControllerC
 
 
 } // namespace imtauthgql
-
-
