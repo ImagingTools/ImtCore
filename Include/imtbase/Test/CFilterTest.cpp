@@ -94,8 +94,10 @@ void CFilterTest::CPaginatedFilter_SetPage()
     imtbase::CPaginatedFilter pager;
     pager.SetPage(3);
     QCOMPARE(pager.GetPage(), 3);
+    QCOMPARE(pager.GetFilter().GetPage(), 3);
     pager.SetPage(0);
     QCOMPARE(pager.GetPage(), 1);
+    QCOMPARE(pager.GetFilter().GetPage(), 1);
 }
 
 
@@ -120,6 +122,8 @@ void CFilterTest::CPaginatedFilter_Offset()
     pager.SetPage(3);
     pager.SetPageSize(25);
     QCOMPARE(pager.GetOffset(), 50);
+    QCOMPARE(pager.GetFilter().GetPage(), 3);
+    QCOMPARE(pager.GetFilter().GetPageSize(), 25);
 }
 
 

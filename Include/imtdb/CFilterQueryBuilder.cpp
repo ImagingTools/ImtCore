@@ -92,6 +92,8 @@ QString CFilterQueryBuilder::BuildFilterExpression(
         case imtbase::CFilter::FO_CONTAINS:
             part = MakeLikeCondition(fieldAccess, AddLikeBindValue(fieldFilter.value.toString(), bindValues));
             break;
+        default:
+            break;
         }
 
         if (!part.isEmpty()){
