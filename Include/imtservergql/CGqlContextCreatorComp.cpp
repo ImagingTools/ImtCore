@@ -66,7 +66,7 @@ imtgql::IGqlContextUniquePtr CGqlContextCreatorComp::CreateGqlContext(
 		}
 	}
 
-	imtgql::IGqlContextUniquePtr gqlContextPtr = m_gqlContextFactCompPtr.CreateInstance();
+	imtgql::IGqlContextUniquePtr gqlContextPtr = CreateContextInstance();
 	if (!gqlContextPtr.IsValid()){
 		errorMessage = QStringLiteral("Unable to create GraphQL context instance.");
 		SetStatus(statusPtr, imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR);
@@ -135,6 +135,12 @@ bool CGqlContextCreatorComp::ResolveUserId(
 			QString& errorMessage,
 			imtgql::IGqlContextCreator::ContextCreationStatus& status) const
 {
+	if (TryGetCachedToken(token, userId)){
+		status = imtgql::IGqlContextCreator::CCS_OK;
+		return true;
+	}
+
+	QMutexLocker authLocker(&m_authMutex);
 	if (TryGetCachedToken(token, userId)){
 		status = imtgql::IGqlContextCreator::CCS_OK;
 		return true;
@@ -219,6 +225,13 @@ void CGqlContextCreatorComp::StoreCachedToken(
 
 	QMutexLocker locker(&m_tokenCacheMutex);
 	m_tokenCache.insert(token, entry);
+}
+
+
+imtgql::IGqlContextUniquePtr CGqlContextCreatorComp::CreateContextInstance() const
+{
+	QMutexLocker locker(&m_contextFactoryMutex);
+	return m_gqlContextFactCompPtr.CreateInstance();
 }
 
 

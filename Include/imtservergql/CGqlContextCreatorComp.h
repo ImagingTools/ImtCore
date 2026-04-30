@@ -65,6 +65,7 @@ private:
 				const QByteArray& userId,
 				const QByteArray& tokenId,
 				bool isPat) const;
+	imtgql::IGqlContextUniquePtr CreateContextInstance() const;
 	bool IsPatToken(const QByteArray& token) const;
 	void SetStatus(
 				imtgql::IGqlContextCreator::ContextCreationStatus* statusPtr,
@@ -77,10 +78,11 @@ private:
 	I_REF(imtauth::IJwtSessionController, m_jwtSessionControllerCompPtr);
 	I_REF(imtauth::IPersonalAccessTokenManager, m_patManagerCompPtr);
 
+	mutable QMutex m_contextFactoryMutex;
+	mutable QMutex m_authMutex;
 	mutable QMutex m_tokenCacheMutex;
 	mutable QHash<QByteArray, TokenCacheEntry> m_tokenCache;
 };
 
 
 } // namespace imtservergql
-
