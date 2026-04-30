@@ -99,7 +99,13 @@ istd::TUniqueInterfacePtr<imtauth::IUserInfo> CLdapAuthorizationControllerComp::
 	LPBYTE computerName = nullptr;
 	LPWSTR serverName = nullptr;
 	if (domain != "."){
-		if (NetGetDCName(NULL, qUtf16Printable(domain), &computerName) != 0){
+		NET_API_STATUS dcStatus = NetGetDCName(NULL, qUtf16Printable(domain), &computerName);
+		if (dcStatus != 0){
+			SendWarningMessage(
+				0,
+				QString("Unable to find LDAP domain controller for domain '%1', error code: %2").arg(QString::fromUtf8(domain), QString::number(dcStatus)),
+				"CLdapAuthorizationControllerComp");
+
 			return nullptr;
 		}
 
@@ -111,11 +117,14 @@ istd::TUniqueInterfacePtr<imtauth::IUserInfo> CLdapAuthorizationControllerComp::
 		NetApiBufferFree(computerName);
 	}
 
-	if (userInfoStatus != 0 || userInfo3BufPtr == nullptr){
+	if (userInfoStatus != 0){
 		if (userInfo3BufPtr != nullptr){
 			NetApiBufferFree(userInfo3BufPtr);
 		}
 
+		return nullptr;
+	}
+	if (userInfo3BufPtr == nullptr){
 		return nullptr;
 	}
 
