@@ -64,8 +64,9 @@ imtgql::IGqlContextUniquePtr CGqlContextCreatorComp::CreateGqlContext(
 	bool isPat = false;
 	if (!token.isEmpty()){
 		imtgql::IGqlContextCreator::ContextCreationStatus authStatus = imtgql::IGqlContextCreator::CCS_OK;
-		if (!ResolveUserId(token, resolvedUserId, scopes, isPat, error.message, authStatus)){
-			error.status = authStatus;
+		QString authErrorMessage;
+		if (!ResolveUserId(token, resolvedUserId, scopes, isPat, authErrorMessage, authStatus)){
+			SetError(error, authStatus, authErrorMessage);
 			return nullptr;
 		}
 	}
