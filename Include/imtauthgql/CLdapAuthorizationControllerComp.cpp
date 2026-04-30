@@ -17,75 +17,11 @@
 
 // ImtCore includes
 #include <imtauth/CUserInfo.h>
+#include <imtauth/LdapUserIdUtils.h>
 
 
 namespace imtauthgql
 {
-
-
-namespace
-{
-
-
-bool IsLocalLdapDomain(const QByteArray& domain)
-{
-#ifdef Q_OS_WIN
-	QByteArray normalizedDomain = domain.trimmed();
-	if (normalizedDomain.isEmpty() || normalizedDomain == "."){
-		return true;
-	}
-
-	if (normalizedDomain.compare("localhost", Qt::CaseInsensitive) == 0){
-		return true;
-	}
-
-	WCHAR computerName[MAX_COMPUTERNAME_LENGTH + 1];
-	DWORD computerNameSize = MAX_COMPUTERNAME_LENGTH + 1;
-	if (GetComputerNameW(computerName, &computerNameSize)){
-		QByteArray localComputerName = QString::fromWCharArray(computerName).toUtf8();
-		return normalizedDomain.compare(localComputerName, Qt::CaseInsensitive) == 0;
-	}
-#else
-	Q_UNUSED(domain)
-#endif
-
-	return false;
-}
-
-
-QByteArray NormalizeLdapUserId(const QByteArray& userId)
-{
-#ifdef Q_OS_WIN
-	int separatorIndex = userId.indexOf('\\');
-	if (separatorIndex < 0){
-		return userId;
-	}
-
-	QByteArray domain = userId.left(separatorIndex);
-	QByteArray username = userId.mid(separatorIndex + 1);
-	if (IsLocalLdapDomain(domain)){
-		return username;
-	}
-#endif
-
-	return userId;
-}
-
-
-void SplitLdapUserId(const QByteArray& userId, QByteArray& domain, QByteArray& username)
-{
-	domain = ".";
-	username = NormalizeLdapUserId(userId);
-
-	int separatorIndex = username.indexOf('\\');
-	if (separatorIndex >= 0){
-		domain = username.left(separatorIndex);
-		username = username.mid(separatorIndex + 1);
-	}
-}
-
-
-} // namespace
 
 
 // protected methods
@@ -155,10 +91,10 @@ istd::TUniqueInterfacePtr<imtauth::IUserInfo> CLdapAuthorizationControllerComp::
 #ifdef Q_OS_WIN
 	LPUSER_INFO_3 userInfo3BufPtr = NULL;
 
-	QByteArray normalizedUserId = NormalizeLdapUserId(ldapUserId);
+	QByteArray normalizedUserId = imtauth::LdapUserIdUtils::NormalizeUserId(ldapUserId);
 	QByteArray domain;
 	QByteArray username;
-	SplitLdapUserId(normalizedUserId, domain, username);
+	imtauth::LdapUserIdUtils::SplitUserId(normalizedUserId, domain, username);
 
 	LPBYTE computerName = nullptr;
 	LPWSTR serverName = nullptr;
@@ -232,7 +168,7 @@ sdl::imtauth::Authorization::CAuthorizationPayload CLdapAuthorizationControllerC
 
 			QByteArray login;
 			if (inputArgument.login){
-				login = NormalizeLdapUserId(inputArgument.login->toUtf8());
+				login = imtauth::LdapUserIdUtils::NormalizeUserId(inputArgument.login->toUtf8());
 			}
 
 			QByteArray productId;
