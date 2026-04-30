@@ -33,6 +33,7 @@ QtObject {
     signal filterChanged()
     signal cleared()
 
+    readonly property double _maxSafeInteger: 9007199254740991 // JavaScript Number.MAX_SAFE_INTEGER
     property var _rules: []
     property var _orders: []
 
@@ -53,8 +54,7 @@ QtObject {
     }
 
     function page(pageNumber, pageSize) {
-        var maxSafeInteger = 9007199254740991
-        if (pageNumber > 0 && pageSize > 0 && (pageNumber - 1) <= Math.floor(maxSafeInteger / pageSize)) {
+        if (pageNumber > 0 && pageSize > 0 && (pageNumber - 1) <= Math.floor(_maxSafeInteger / pageSize)) {
             offset = (pageNumber - 1) * pageSize
             count = pageSize
         } else {
