@@ -118,6 +118,12 @@ istd::TUniqueInterfacePtr<imtauth::IUserInfo> CLdapAuthorizationControllerComp::
 	}
 
 	if (userInfoStatus != 0){
+		SendWarningMessage(
+			0,
+			QString("Unable to get LDAP user info for user '%1' in domain '%2', error code: %3")
+				.arg(QString::fromUtf8(username), QString::fromUtf8(domain), QString::number(userInfoStatus)),
+			"CLdapAuthorizationControllerComp");
+
 		if (userInfo3BufPtr != nullptr){
 			NetApiBufferFree(userInfo3BufPtr);
 		}
@@ -125,6 +131,12 @@ istd::TUniqueInterfacePtr<imtauth::IUserInfo> CLdapAuthorizationControllerComp::
 		return nullptr;
 	}
 	if (userInfo3BufPtr == nullptr){
+		SendWarningMessage(
+			0,
+			QString("Unable to get LDAP user info for user '%1' in domain '%2': empty response")
+				.arg(QString::fromUtf8(username), QString::fromUtf8(domain)),
+			"CLdapAuthorizationControllerComp");
+
 		return nullptr;
 	}
 

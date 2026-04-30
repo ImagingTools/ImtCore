@@ -57,7 +57,7 @@ inline bool SplitRawUserId(const QByteArray& userId, QByteArray& domain, QByteAr
 	domain = userId.left(separatorIndex);
 	username = userId.mid(separatorIndex + 1);
 
-	// Preserves malformed values like "domain\\" instead of producing an empty username.
+	// Preserve malformed values like "domain\\" so authentication fails for the original login instead of an empty username.
 	return !username.isEmpty();
 }
 
