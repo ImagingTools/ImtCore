@@ -197,7 +197,7 @@ bool CGqlContextCreatorComp::ResolveUserId(
 		}
 
 		state = m_jwtSessionControllerCompPtr->ValidateJwt(token);
-		if (state != JwtState::JS_EXPIRED && state != JwtState::JS_INVALID){
+		if (state == JwtState::JS_OK){
 			userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(token);
 		}
 	}
@@ -208,7 +208,7 @@ bool CGqlContextCreatorComp::ResolveUserId(
 		StoreCachedToken(token, QByteArray(), QByteArray(), QByteArrayList(), false, false, status, s_negativeTokenCacheTtlMs);
 		return false;
 	}
-	if (state == JwtState::JS_INVALID){
+	if (state != JwtState::JS_OK){
 		errorMessage = QStringLiteral("Invalid JWT token.");
 		status = imtgql::IGqlContextCreator::CCS_FORBIDDEN;
 		StoreCachedToken(token, QByteArray(), QByteArray(), QByteArrayList(), false, false, status, s_negativeTokenCacheTtlMs);
@@ -240,9 +240,9 @@ CGqlContextCreatorComp::TokenCacheLookupResult CGqlContextCreatorComp::TryGetCac
 		return TCLR_MISS;
 	}
 
-	if (!iter->isValid || iter->userId.isEmpty()){
+	if (!iter->isValid){
 		isPat = iter->isPat;
-		status = iter->isValid ? imtgql::IGqlContextCreator::CCS_FORBIDDEN : iter->status;
+		status = iter->status;
 		errorMessage = status == imtgql::IGqlContextCreator::CCS_UNAUTHORIZED
 				? QStringLiteral("JWT token expired.")
 				: QStringLiteral("Invalid authentication token.");
