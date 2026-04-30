@@ -135,13 +135,8 @@ bool CGqlContextCreatorComp::ResolveUserId(
 			QString& errorMessage,
 			imtgql::IGqlContextCreator::ContextCreationStatus& status) const
 {
-	if (TryGetCachedToken(token, userId)){
-		status = imtgql::IGqlContextCreator::CCS_OK;
-		return true;
-	}
-
-	QMutexLocker authLocker(&m_authMutex);
-	if (TryGetCachedToken(token, userId)){
+	QMutexLocker resolverLocker(&m_tokenResolverMutex);
+	if (TryGetCachedTokenLocked(token, userId)){
 		status = imtgql::IGqlContextCreator::CCS_OK;
 		return true;
 	}
@@ -162,7 +157,7 @@ bool CGqlContextCreatorComp::ResolveUserId(
 		}
 
 		m_patManagerCompPtr->UpdateLastUsedAt(tokenId);
-		StoreCachedToken(token, userId, tokenId, true);
+		StoreCachedTokenLocked(token, userId, tokenId, true);
 		return true;
 	}
 
@@ -186,15 +181,14 @@ bool CGqlContextCreatorComp::ResolveUserId(
 	}
 
 	userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(token);
-	StoreCachedToken(token, userId, QByteArray(), false);
+	StoreCachedTokenLocked(token, userId, QByteArray(), false);
 	return true;
 }
 
 
-bool CGqlContextCreatorComp::TryGetCachedToken(const QByteArray& token, QByteArray& userId) const
+bool CGqlContextCreatorComp::TryGetCachedTokenLocked(const QByteArray& token, QByteArray& userId) const
 {
 	const qint64 now = QDateTime::currentMSecsSinceEpoch();
-	QMutexLocker locker(&m_tokenCacheMutex);
 
 	auto iter = m_tokenCache.find(token);
 	if (iter == m_tokenCache.end()){
@@ -211,7 +205,7 @@ bool CGqlContextCreatorComp::TryGetCachedToken(const QByteArray& token, QByteArr
 }
 
 
-void CGqlContextCreatorComp::StoreCachedToken(
+void CGqlContextCreatorComp::StoreCachedTokenLocked(
 			const QByteArray& token,
 			const QByteArray& userId,
 			const QByteArray& tokenId,
@@ -223,7 +217,6 @@ void CGqlContextCreatorComp::StoreCachedToken(
 	entry.isPat = isPat;
 	entry.expiresAt = QDateTime::currentMSecsSinceEpoch() + s_tokenCacheTtlMs;
 
-	QMutexLocker locker(&m_tokenCacheMutex);
 	m_tokenCache.insert(token, entry);
 }
 

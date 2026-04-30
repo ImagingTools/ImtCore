@@ -59,8 +59,8 @@ private:
 				QByteArray& userId,
 				QString& errorMessage,
 				imtgql::IGqlContextCreator::ContextCreationStatus& status) const;
-	bool TryGetCachedToken(const QByteArray& token, QByteArray& userId) const;
-	void StoreCachedToken(
+	bool TryGetCachedTokenLocked(const QByteArray& token, QByteArray& userId) const;
+	void StoreCachedTokenLocked(
 				const QByteArray& token,
 				const QByteArray& userId,
 				const QByteArray& tokenId,
@@ -79,8 +79,7 @@ private:
 	I_REF(imtauth::IPersonalAccessTokenManager, m_patManagerCompPtr);
 
 	mutable QMutex m_contextFactoryMutex;
-	mutable QMutex m_authMutex;
-	mutable QMutex m_tokenCacheMutex;
+	mutable QMutex m_tokenResolverMutex;
 	mutable QHash<QByteArray, TokenCacheEntry> m_tokenCache;
 };
 
