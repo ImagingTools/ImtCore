@@ -397,6 +397,50 @@ QJsonObject CFilterSerializer::ToJson(const CFilter& filter)
 }
 
 
+QJsonObject CFilterSerializer::ToQmlJson(const CFilter& filter)
+{
+    QJsonObject json;
+
+    if (filter.GetSearch().IsActive()){
+        QJsonObject search;
+        search[QStringLiteral("text")] = filter.GetSearch().text;
+        QJsonArray scopes;
+        for (const QByteArray& scope : filter.GetSearch().scopes){
+            scopes << QString::fromUtf8(scope);
+        }
+        search[QStringLiteral("scopes")] = scopes;
+        json[QStringLiteral("search")] = search;
+    }
+
+    if (!filter.GetRules().IsEmpty()){
+        json[QStringLiteral("query")] = ToQmlQuery(filter.GetRules());
+    }
+
+    QJsonArray sort;
+    for (const CFilter::Order& order : filter.GetOrders()){
+        if (!order.IsValid()){
+            continue;
+        }
+        QJsonObject item;
+        item[QStringLiteral("field")] = QString::fromUtf8(order.path);
+        item[QStringLiteral("direction")] = order.descending ? QStringLiteral("desc") : QStringLiteral("asc");
+        sort << item;
+    }
+    if (!sort.isEmpty()){
+        json[QStringLiteral("sort")] = sort;
+    }
+
+    if (filter.HasWindow()){
+        QJsonObject window;
+        window[QStringLiteral("first")] = filter.GetOffset();
+        window[QStringLiteral("count")] = filter.GetLimit();
+        json[QStringLiteral("window")] = window;
+    }
+
+    return json;
+}
+
+
 bool CFilterSerializer::FromJson(const QJsonObject& json, CFilter& filter)
 {
     filter.Clear();

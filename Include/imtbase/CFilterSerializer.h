@@ -25,6 +25,7 @@ public:
 
     static QJsonObject ToJson(const CFilter& filter);
     static bool FromJson(const QJsonObject& json, CFilter& filter);
+    static QJsonObject ToQmlJson(const CFilter& filter);
 
 private:
     static QJsonObject ToJson(const CFilter::RuleSet& rules);
@@ -35,5 +36,4 @@ private:
 
 
 } // namespace imtbase
-
 
