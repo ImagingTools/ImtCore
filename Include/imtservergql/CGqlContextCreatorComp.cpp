@@ -24,6 +24,12 @@ namespace imtservergql
 namespace
 {
 
+constexpr const char* s_legacyPatPrefix = "pat_";
+constexpr const char* s_patPrefix = "imt_pat_";
+constexpr int s_legacyPatPrefixLength = 4;
+constexpr int s_patPrefixLength = 8;
+// Keep the token cache short-lived: it avoids bursts of remote validation calls
+// while limiting stale authorization data for both JWT and PAT tokens.
 constexpr qint64 s_tokenCacheTtlMs = 5 * 60 * 1000;
 
 } // namespace
@@ -216,8 +222,8 @@ void CGqlContextCreatorComp::StoreCachedToken(
 
 bool CGqlContextCreatorComp::IsPatToken(const QByteArray& token) const
 {
-	return (token.size() > 4 && token.startsWith("pat_"))
-			|| (token.size() > 8 && token.startsWith("imt_pat_"));
+	return (token.size() > s_legacyPatPrefixLength && token.startsWith(s_legacyPatPrefix))
+			|| (token.size() > s_patPrefixLength && token.startsWith(s_patPrefix));
 }
 
 
@@ -232,4 +238,3 @@ void CGqlContextCreatorComp::SetStatus(
 
 
 } // namespace imtservergql
-
