@@ -33,7 +33,7 @@ QtObject {
     signal filterChanged()
     signal cleared()
 
-    readonly property double _maxSafeInteger: 9007199254740991 // JavaScript Number.MAX_SAFE_INTEGER
+    readonly property double _maxSafeInteger: Number.MAX_SAFE_INTEGER
     property var _rules: []
     property var _orders: []
 
