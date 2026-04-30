@@ -92,7 +92,7 @@ QString ValueTypeToQmlType(const QVariant& value)
 {
     switch (value.type()){
     case QVariant::Invalid:
-        return QStringLiteral("null");
+        return QStringLiteral("undefined");
     case QVariant::Bool:
         return QStringLiteral("boolean");
     case QVariant::Int:

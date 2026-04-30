@@ -311,12 +311,14 @@ void CFilter::SetRules(const RuleSet& rules)
 void CFilter::AddRule(const Rule& rule)
 {
     m_rules.rules << rule;
+    m_groupPath.clear();
 }
 
 
 void CFilter::AddRuleSet(const RuleSet& rules)
 {
     m_rules.children << rules;
+    m_groupPath.clear();
 }
 
 
@@ -395,8 +397,7 @@ CFilter::RuleSet& CFilter::CurrentRuleSet()
     RuleSet* current = &m_rules;
     for (const int index : m_groupPath){
         if (index < 0 || index >= current->children.size()){
-            qWarning() << "Invalid CFilter fluent group stack while adding to the current group;"
-                << "use beginGroup()/beginAnd()/beginOr() and endGroup() in balanced order";
+            qWarning() << "Invalid CFilter fluent group stack while adding to the current group; use beginGroup()/beginAnd()/beginOr() and endGroup() in balanced order";
             m_groupPath.clear();
             return m_rules;
         }
