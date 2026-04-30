@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtbase/CComplexCollectionFilter.h>
+#include <imtbase/IIdentifiable.h>
 #include <imtauth/CUserInfo.h>
 #include <imtauth/CUserConnectionInfo.h>
 
@@ -96,6 +97,9 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 
 	QByteArray login = userInfo.GetId();
 	QByteArray objectId = GetUserObjectId(login);
+	if (objectId.isEmpty()){
+		objectId = imtbase::GetObjectUuid(&userInfo);
+	}
 	Q_ASSERT(!objectId.isEmpty());
 	if (objectId.isEmpty()){
 		errorMessage = QString("Unable to create authorization request. Error: User with login '%1' does not exists").arg(qPrintable(login));
@@ -393,5 +397,4 @@ bool CAuthorizationControllerComp::CheckPermissions(const imtgql::CGqlRequest& /
 
 
 } // namespace imtauthgql
-
 
