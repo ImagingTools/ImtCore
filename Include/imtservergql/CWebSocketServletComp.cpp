@@ -199,26 +199,26 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 		return CreateErrorResponse(QByteArrayLiteral("GraphQL context creator is not configured"), request);
 	}
 
-	imtgql::IGqlContextCreator::ContextCreationError contextError;
-	imtgql::IGqlContextUniquePtr gqlContextPtr = m_gqlContextCreatorCompPtr->CreateGqlContext(gqlHeaders, contextError);
-	if (!gqlContextPtr.IsValid()){
-		if (contextError.status == imtgql::IGqlContextCreator::CCS_UNAUTHORIZED){
-			return CreateErrorResponse(QByteArrayLiteral("Unauthorized: expired JWT token"), request);
-		}
-		if (contextError.status == imtgql::IGqlContextCreator::CCS_FORBIDDEN){
-			return CreateErrorResponse(QByteArrayLiteral("Forbidden: invalid authentication token"), request);
-		}
+	// imtgql::IGqlContextCreator::ContextCreationError contextError;
+	// imtgql::IGqlContextUniquePtr gqlContextPtr = m_gqlContextCreatorCompPtr->CreateGqlContext(gqlHeaders, contextError);
+	// if (!gqlContextPtr.IsValid()){
+	// 	if (contextError.status == imtgql::IGqlContextCreator::CCS_UNAUTHORIZED){
+	// 		return CreateErrorResponse(QByteArrayLiteral("Unauthorized: expired JWT token"), request);
+	// 	}
+	// 	if (contextError.status == imtgql::IGqlContextCreator::CCS_FORBIDDEN){
+	// 		return CreateErrorResponse(QByteArrayLiteral("Forbidden: invalid authentication token"), request);
+	// 	}
 
-		return CreateErrorResponse(contextError.message.toUtf8(), request);
-	}
+	// 	return CreateErrorResponse(contextError.message.toUtf8(), request);
+	// }
 
-	// Verify request is still alive after context creation (safety check)
-	if (requestGuard.isNull()){
-		SendErrorMessage(0, QStringLiteral("WebSocket request destroyed during context creation"), QStringLiteral("CWebSocketServletComp"));
-		return imtrest::ConstResponsePtr();
-	}
+	// // Verify request is still alive after context creation (safety check)
+	// if (requestGuard.isNull()){
+	// 	SendErrorMessage(0, QStringLiteral("WebSocket request destroyed during context creation"), QStringLiteral("CWebSocketServletComp"));
+	// 	return imtrest::ConstResponsePtr();
+	// }
 
-	gqlRequest.SetGqlContext(std::move(gqlContextPtr));
+	// gqlRequest.SetGqlContext(std::move(gqlContextPtr));
 
 	QByteArray commandId = gqlRequest.GetCommandId();
 
