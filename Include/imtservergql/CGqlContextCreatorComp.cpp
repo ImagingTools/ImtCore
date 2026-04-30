@@ -135,15 +135,14 @@ bool CGqlContextCreatorComp::ResolveUserId(
 			QString& errorMessage,
 			imtgql::IGqlContextCreator::ContextCreationStatus& status) const
 {
+	// Serialize calls into m_patManagerCompPtr and m_jwtSessionControllerCompPtr; their thread-safety is not guaranteed.
 	if (TryGetCachedToken(token, userId)){
 		status = imtgql::IGqlContextCreator::CCS_OK;
 		return true;
 	}
 
-	// Serialize calls into m_patManagerCompPtr and m_jwtSessionControllerCompPtr; their thread-safety is not guaranteed.
 	if (IsPatToken(token)){
 		QByteArray tokenId;
-		QByteArrayList scopes;
 		{
 			QMutexLocker locker(&m_tokenValidationMutex);
 			if (!m_patManagerCompPtr.IsValid()){
@@ -152,6 +151,7 @@ bool CGqlContextCreatorComp::ResolveUserId(
 				return false;
 			}
 
+			QByteArrayList scopes;
 			if (!m_patManagerCompPtr->ValidateToken(token, userId, tokenId, scopes)){
 				errorMessage = QStringLiteral("Invalid personal access token.");
 				status = imtgql::IGqlContextCreator::CCS_FORBIDDEN;
