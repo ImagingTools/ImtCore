@@ -3,6 +3,7 @@
 
 
 // Qt includes
+#include <QtCore/QStringList>
 #include <QtCore/QJsonArray>
 #include <QtCore/QUrl>
 #include <QtCore/QUrlQuery>
@@ -12,406 +13,326 @@ namespace imtbase
 {
 
 
-// -------------------------------------------------------------------------
-// URL query-string serialization
-// -------------------------------------------------------------------------
-
-QString CFilterSerializer::ToQueryString(
-    const IComplexCollectionFilter& filter,
-    int page,
-    int pageSize)
+QString CFilterSerializer::ToQueryString(const CFilter& filter)
 {
     QUrlQuery query;
 
-    // Text filter
-    const QString textFilter = filter.GetTextFilter();
-    if (!textFilter.isEmpty()){
-        query.addQueryItem(QStringLiteral("text"), textFilter);
+    if (!filter.GetTextFilter().isEmpty()){
+        query.addQueryItem(QStringLiteral("text"), filter.GetTextFilter());
     }
 
-    // Text filter field IDs
-    QByteArrayList textFieldIds;
-    for (const IComplexCollectionFilter::FieldInfo& info : filter.GetFields()){
-        if (info.metaInfo.flags & IComplexCollectionFilter::SO_TEXT_FILTER){
-            textFieldIds << info.id;
+    if (!filter.GetTextFieldIds().isEmpty()){
+        QStringList fieldIds;
+        for (const QByteArray& fieldId : filter.GetTextFieldIds()){
+            fieldIds << QString::fromUtf8(fieldId);
         }
-    }
-    if (!textFieldIds.isEmpty()){
-        QStringList parts;
-        for (const QByteArray& id : textFieldIds){
-            parts << QString::fromUtf8(id);
-        }
-        query.addQueryItem(QStringLiteral("textFields"), parts.join(QLatin1Char(',')));
+        query.addQueryItem(QStringLiteral("textFields"), fieldIds.join(QLatin1Char(',')));
     }
 
-    // Sort fields
     QStringList sortParts;
-    for (const IComplexCollectionFilter::FieldInfo& info : filter.GetFields()){
-        if (!(info.metaInfo.flags & IComplexCollectionFilter::SO_SORT)){
+    for (const CFilter::SortField& sortField : filter.GetSortFields()){
+        if (sortField.fieldId.isEmpty() || sortField.sortingOrder == CFilter::SO_NO_ORDER){
             continue;
         }
-        if (info.metaInfo.sortingOrder == IComplexCollectionFilter::SO_NO_ORDER){
-            continue;
-        }
-        const QString order = (info.metaInfo.sortingOrder == IComplexCollectionFilter::SO_ASC)
-            ? QStringLiteral("asc")
-            : QStringLiteral("desc");
-        sortParts << QStringLiteral("%1:%2").arg(QString::fromUtf8(info.id), order);
+        sortParts << QStringLiteral("%1:%2")
+            .arg(QString::fromUtf8(sortField.fieldId), SortingOrderToString(sortField.sortingOrder));
     }
     if (!sortParts.isEmpty()){
         query.addQueryItem(QStringLiteral("sort"), sortParts.join(QLatin1Char(',')));
     }
 
-    // Field filters (flat: filter[field][op]=value)
-    const IComplexCollectionFilter::FilterExpression& expr = filter.GetFilterExpression();
-    for (const IComplexCollectionFilter::FieldFilter& ff : expr.fieldFilters){
-        const QString key = QStringLiteral("filter[%1][%2]")
-            .arg(QString::fromUtf8(ff.fieldId), FieldOperationToString(ff.filterOperation));
-        query.addQueryItem(key, ff.filterValue.toString());
+    for (const CFilter::FieldFilter& fieldFilter : filter.GetFilterExpression().fieldFilters){
+        if (fieldFilter.fieldId.isEmpty()){
+            continue;
+        }
+        query.addQueryItem(
+            QStringLiteral("filter[%1][%2]").arg(
+                QString::fromUtf8(fieldFilter.fieldId),
+                FieldOperationToString(fieldFilter.operation)),
+            fieldFilter.value.toString());
     }
 
-    // Pagination
-    if (page > 0){
-        query.addQueryItem(QStringLiteral("page"), QString::number(page));
-    }
-    if (pageSize > 0){
-        query.addQueryItem(QStringLiteral("limit"), QString::number(pageSize));
+    if (filter.HasPagination()){
+        query.addQueryItem(QStringLiteral("page"), QString::number(filter.GetPage()));
+        query.addQueryItem(QStringLiteral("limit"), QString::number(filter.GetPageSize()));
     }
 
     return query.toString(QUrl::FullyEncoded);
 }
 
 
-bool CFilterSerializer::FromQueryString(const QString& queryString, CComplexCollectionFilter& filter)
+bool CFilterSerializer::FromQueryString(const QString& queryString, CFilter& filter)
 {
-    QString qs = queryString;
-    if (qs.startsWith(QLatin1Char('?'))){
-        qs = qs.mid(1);
+    QString normalized = queryString;
+    if (normalized.startsWith(QLatin1Char('?'))){
+        normalized = normalized.mid(1);
     }
 
     QUrlQuery query;
-    query.setQuery(qs);
+    query.setQuery(normalized);
+    filter.Clear();
 
-    // Text filter
     if (query.hasQueryItem(QStringLiteral("text"))){
         filter.SetTextFilter(query.queryItemValue(QStringLiteral("text"), QUrl::FullyDecoded));
     }
 
-    // Text filter fields
     if (query.hasQueryItem(QStringLiteral("textFields"))){
-        const QString fieldsStr = query.queryItemValue(QStringLiteral("textFields"), QUrl::FullyDecoded);
-        IComplexCollectionFilter::Fields fields = filter.GetFields();
-
-        for (const QString& fieldStr : fieldsStr.split(QLatin1Char(','), Qt::SkipEmptyParts)){
-            const QByteArray fieldId = fieldStr.trimmed().toUtf8();
-            bool found = false;
-            for (IComplexCollectionFilter::FieldInfo& info : fields){
-                if (info.id == fieldId){
-                    info.metaInfo.flags |= IComplexCollectionFilter::SO_TEXT_FILTER;
-                    found = true;
-                    break;
-                }
-            }
-            if (!found){
-                IComplexCollectionFilter::FieldInfo info(fieldId);
-                info.metaInfo.flags = IComplexCollectionFilter::SO_TEXT_FILTER;
-                fields << info;
-            }
+        QByteArrayList fieldIds;
+        const QString value = query.queryItemValue(QStringLiteral("textFields"), QUrl::FullyDecoded);
+        for (const QString& part : value.split(QLatin1Char(','), Qt::SkipEmptyParts)){
+            fieldIds << part.trimmed().toUtf8();
         }
-        filter.SetFields(fields);
+        filter.SetTextFieldIds(fieldIds);
     }
 
-    // Sort fields
     if (query.hasQueryItem(QStringLiteral("sort"))){
-        const QString sortStr = query.queryItemValue(QStringLiteral("sort"), QUrl::FullyDecoded);
-        IComplexCollectionFilter::Fields fields = filter.GetFields();
-
-        for (const QString& part : sortStr.split(QLatin1Char(','), Qt::SkipEmptyParts)){
+        QVector<CFilter::SortField> sortFields;
+        const QString value = query.queryItemValue(QStringLiteral("sort"), QUrl::FullyDecoded);
+        for (const QString& part : value.split(QLatin1Char(','), Qt::SkipEmptyParts)){
             const QStringList pair = part.split(QLatin1Char(':'));
             if (pair.size() != 2){
                 continue;
             }
-            const QByteArray fieldId = pair.at(0).trimmed().toUtf8();
-            const IComplexCollectionFilter::SortingOrder order =
-                (pair.at(1).trimmed().toLower() == QLatin1String("desc"))
-                ? IComplexCollectionFilter::SO_DESC
-                : IComplexCollectionFilter::SO_ASC;
-
-            bool found = false;
-            for (IComplexCollectionFilter::FieldInfo& info : fields){
-                if (info.id == fieldId){
-                    info.metaInfo.flags |= IComplexCollectionFilter::SO_SORT;
-                    info.metaInfo.sortingOrder = order;
-                    found = true;
-                    break;
-                }
-            }
-            if (!found){
-                IComplexCollectionFilter::FieldInfo info(fieldId);
-                info.metaInfo.flags = IComplexCollectionFilter::SO_SORT;
-                info.metaInfo.sortingOrder = order;
-                fields << info;
-            }
+            sortFields << CFilter::SortField(
+                pair.at(0).trimmed().toUtf8(),
+                StringToSortingOrder(pair.at(1).trimmed()));
         }
-        filter.SetFields(fields);
+        filter.SetSortFields(sortFields);
     }
 
-    // Field filters
-    IComplexCollectionFilter::FilterExpression expr = filter.GetFilterExpression();
-    const QList<QPair<QString, QString>> allItems = query.queryItems(QUrl::FullyDecoded);
-    for (const QPair<QString, QString>& item : allItems){
+    CFilter::FilterExpression expression;
+    const QList<QPair<QString, QString>> items = query.queryItems(QUrl::FullyDecoded);
+    for (const QPair<QString, QString>& item : items){
         const QString& key = item.first;
         if (!key.startsWith(QStringLiteral("filter["))){
             continue;
         }
-        // Parse filter[field][op]
-        const int firstBracket = key.indexOf(QLatin1Char('['));
-        const int secondBracket = key.indexOf(QLatin1Char(']'), firstBracket);
-        const int thirdBracket = key.indexOf(QLatin1Char('['), secondBracket);
-        const int fourthBracket = key.indexOf(QLatin1Char(']'), thirdBracket);
-        if (firstBracket < 0 || secondBracket < 0 || thirdBracket < 0 || fourthBracket < 0){
+
+        const int firstClose = key.indexOf(QLatin1Char(']'));
+        const int secondOpen = key.indexOf(QLatin1Char('['), firstClose);
+        const int secondClose = key.indexOf(QLatin1Char(']'), secondOpen);
+        if (firstClose <= 7 || secondOpen < 0 || secondClose < 0){
             continue;
         }
-        const QByteArray fieldId = key.mid(firstBracket + 1, secondBracket - firstBracket - 1).toUtf8();
-        const QString opStr = key.mid(thirdBracket + 1, fourthBracket - thirdBracket - 1);
-        const IComplexCollectionFilter::FieldOperation op = StringToFieldOperation(opStr);
 
-        IComplexCollectionFilter::FieldFilter ff(fieldId, item.second, op);
-        if (!expr.fieldFilters.contains(ff)){
-            expr.fieldFilters << ff;
-        }
+        const QByteArray fieldId = key.mid(7, firstClose - 7).toUtf8();
+        const QString operation = key.mid(secondOpen + 1, secondClose - secondOpen - 1);
+        expression.fieldFilters << CFilter::FieldFilter(
+            fieldId,
+            item.second,
+            StringToFieldOperation(operation));
     }
-    filter.SetFilterExpression(expr);
+    filter.SetFilterExpression(expression);
+
+    if (query.hasQueryItem(QStringLiteral("page"))){
+        filter.SetPage(query.queryItemValue(QStringLiteral("page")).toInt());
+    }
+    if (query.hasQueryItem(QStringLiteral("limit"))){
+        filter.SetPageSize(query.queryItemValue(QStringLiteral("limit")).toInt());
+    }
 
     return true;
 }
 
 
-// -------------------------------------------------------------------------
-// JSON serialization
-// -------------------------------------------------------------------------
-
-QJsonObject CFilterSerializer::ToJson(
-    const IComplexCollectionFilter& filter,
-    int page,
-    int pageSize)
+QJsonObject CFilterSerializer::ToJson(const CFilter& filter)
 {
-    QJsonObject obj;
+    QJsonObject json;
 
-    // Text filter
-    const QString textFilter = filter.GetTextFilter();
-    if (!textFilter.isEmpty()){
-        obj[QStringLiteral("text")] = textFilter;
+    if (!filter.GetTextFilter().isEmpty()){
+        json[QStringLiteral("text")] = filter.GetTextFilter();
     }
 
-    // Fields
-    QJsonArray textFieldsArray;
-    QJsonArray sortArray;
+    QJsonArray textFields;
+    for (const QByteArray& fieldId : filter.GetTextFieldIds()){
+        textFields << QString::fromUtf8(fieldId);
+    }
+    if (!textFields.isEmpty()){
+        json[QStringLiteral("textFields")] = textFields;
+    }
 
-    for (const IComplexCollectionFilter::FieldInfo& info : filter.GetFields()){
-        if (info.metaInfo.flags & IComplexCollectionFilter::SO_TEXT_FILTER){
-            textFieldsArray << QString::fromUtf8(info.id);
+    QJsonArray sort;
+    for (const CFilter::SortField& sortField : filter.GetSortFields()){
+        if (sortField.fieldId.isEmpty() || sortField.sortingOrder == CFilter::SO_NO_ORDER){
+            continue;
         }
-        if ((info.metaInfo.flags & IComplexCollectionFilter::SO_SORT) &&
-            info.metaInfo.sortingOrder != IComplexCollectionFilter::SO_NO_ORDER){
-            QJsonObject sortItem;
-            sortItem[QStringLiteral("field")] = QString::fromUtf8(info.id);
-            sortItem[QStringLiteral("order")] = (info.metaInfo.sortingOrder == IComplexCollectionFilter::SO_ASC)
-                ? QStringLiteral("asc")
-                : QStringLiteral("desc");
-            sortArray << sortItem;
-        }
+        QJsonObject sortItem;
+        sortItem[QStringLiteral("field")] = QString::fromUtf8(sortField.fieldId);
+        sortItem[QStringLiteral("order")] = SortingOrderToString(sortField.sortingOrder);
+        sort << sortItem;
+    }
+    if (!sort.isEmpty()){
+        json[QStringLiteral("sort")] = sort;
     }
 
-    if (!textFieldsArray.isEmpty()){
-        obj[QStringLiteral("textFields")] = textFieldsArray;
-    }
-    if (!sortArray.isEmpty()){
-        obj[QStringLiteral("sort")] = sortArray;
+    const QJsonObject expressionJson = ToJson(filter.GetFilterExpression());
+    if (!expressionJson.isEmpty()){
+        json[QStringLiteral("filter")] = expressionJson;
     }
 
-    // Filter expression
-    const QString exprStr = SerializeFilterExpression(filter.GetFilterExpression());
-    if (!exprStr.isEmpty()){
-        QJsonArray fieldFiltersArray;
-        for (const IComplexCollectionFilter::FieldFilter& ff : filter.GetFilterExpression().fieldFilters){
-            QJsonObject ffObj;
-            ffObj[QStringLiteral("field")] = QString::fromUtf8(ff.fieldId);
-            ffObj[QStringLiteral("op")] = FieldOperationToString(ff.filterOperation);
-            ffObj[QStringLiteral("value")] = QJsonValue::fromVariant(ff.filterValue);
-            fieldFiltersArray << ffObj;
-        }
-        if (!fieldFiltersArray.isEmpty()){
-            QJsonObject filterExprObj;
-            filterExprObj[QStringLiteral("op")] =
-                (filter.GetFilterExpression().logicalOperation == IComplexCollectionFilter::LO_OR)
-                ? QStringLiteral("or")
-                : QStringLiteral("and");
-            filterExprObj[QStringLiteral("fields")] = fieldFiltersArray;
-            obj[QStringLiteral("filter")] = filterExprObj;
-        }
+    if (filter.HasPagination()){
+        json[QStringLiteral("page")] = filter.GetPage();
+        json[QStringLiteral("limit")] = filter.GetPageSize();
     }
 
-    // Pagination
-    if (page > 0){
-        obj[QStringLiteral("page")] = page;
-    }
-    if (pageSize > 0){
-        obj[QStringLiteral("limit")] = pageSize;
-    }
-
-    return obj;
+    return json;
 }
 
 
-bool CFilterSerializer::FromJson(const QJsonObject& json, CComplexCollectionFilter& filter)
+bool CFilterSerializer::FromJson(const QJsonObject& json, CFilter& filter)
 {
-    // Text filter
+    filter.Clear();
+
     if (json.contains(QStringLiteral("text"))){
         filter.SetTextFilter(json[QStringLiteral("text")].toString());
     }
 
-    IComplexCollectionFilter::Fields fields = filter.GetFields();
-
-    // Text fields
-    if (json.contains(QStringLiteral("textFields"))){
-        const QJsonArray textFields = json[QStringLiteral("textFields")].toArray();
-        for (const QJsonValue& val : textFields){
-            const QByteArray fieldId = val.toString().toUtf8();
-            bool found = false;
-            for (IComplexCollectionFilter::FieldInfo& info : fields){
-                if (info.id == fieldId){
-                    info.metaInfo.flags |= IComplexCollectionFilter::SO_TEXT_FILTER;
-                    found = true;
-                    break;
-                }
-            }
-            if (!found){
-                IComplexCollectionFilter::FieldInfo info(fieldId);
-                info.metaInfo.flags = IComplexCollectionFilter::SO_TEXT_FILTER;
-                fields << info;
-            }
-        }
+    QByteArrayList textFieldIds;
+    for (const QJsonValue& value : json[QStringLiteral("textFields")].toArray()){
+        textFieldIds << value.toString().toUtf8();
     }
+    filter.SetTextFieldIds(textFieldIds);
 
-    // Sort fields
-    if (json.contains(QStringLiteral("sort"))){
-        const QJsonArray sortArray = json[QStringLiteral("sort")].toArray();
-        for (const QJsonValue& val : sortArray){
-            const QJsonObject sortObj = val.toObject();
-            const QByteArray fieldId = sortObj[QStringLiteral("field")].toString().toUtf8();
-            const IComplexCollectionFilter::SortingOrder order =
-                (sortObj[QStringLiteral("order")].toString().toLower() == QLatin1String("desc"))
-                ? IComplexCollectionFilter::SO_DESC
-                : IComplexCollectionFilter::SO_ASC;
-
-            bool found = false;
-            for (IComplexCollectionFilter::FieldInfo& info : fields){
-                if (info.id == fieldId){
-                    info.metaInfo.flags |= IComplexCollectionFilter::SO_SORT;
-                    info.metaInfo.sortingOrder = order;
-                    found = true;
-                    break;
-                }
-            }
-            if (!found){
-                IComplexCollectionFilter::FieldInfo info(fieldId);
-                info.metaInfo.flags = IComplexCollectionFilter::SO_SORT;
-                info.metaInfo.sortingOrder = order;
-                fields << info;
-            }
-        }
+    QVector<CFilter::SortField> sortFields;
+    for (const QJsonValue& value : json[QStringLiteral("sort")].toArray()){
+        const QJsonObject sortItem = value.toObject();
+        sortFields << CFilter::SortField(
+            sortItem[QStringLiteral("field")].toString().toUtf8(),
+            StringToSortingOrder(sortItem[QStringLiteral("order")].toString()));
     }
+    filter.SetSortFields(sortFields);
 
-    filter.SetFields(fields);
-
-    // Filter expression
     if (json.contains(QStringLiteral("filter"))){
-        IComplexCollectionFilter::FilterExpression expr;
-        if (!DeserializeFilterExpression(json[QStringLiteral("filter")].toObject(), expr)){
+        CFilter::FilterExpression expression;
+        if (!FromJson(json[QStringLiteral("filter")].toObject(), expression)){
             return false;
         }
-        filter.SetFilterExpression(expr);
+        filter.SetFilterExpression(expression);
+    }
+
+    if (json.contains(QStringLiteral("page"))){
+        filter.SetPage(json[QStringLiteral("page")].toInt());
+    }
+    if (json.contains(QStringLiteral("limit"))){
+        filter.SetPageSize(json[QStringLiteral("limit")].toInt());
     }
 
     return true;
 }
 
 
-// -------------------------------------------------------------------------
-// private helpers
-// -------------------------------------------------------------------------
-
-QString CFilterSerializer::SerializeFilterExpression(
-    const IComplexCollectionFilter::FilterExpression& expr)
+QJsonObject CFilterSerializer::ToJson(const CFilter::FilterExpression& expression)
 {
-    if (expr.fieldFilters.isEmpty() && expr.filterExpressions.isEmpty()){
-        return QString();
-    }
-    return QStringLiteral("<non-empty>");
-}
-
-
-bool CFilterSerializer::DeserializeFilterExpression(
-    const QJsonObject& json,
-    IComplexCollectionFilter::FilterExpression& expr)
-{
-    const QString opStr = json[QStringLiteral("op")].toString().toLower();
-    expr.logicalOperation = (opStr == QLatin1String("or"))
-        ? IComplexCollectionFilter::LO_OR
-        : IComplexCollectionFilter::LO_AND;
-
-    const QJsonArray fields = json[QStringLiteral("fields")].toArray();
-    for (const QJsonValue& val : fields){
-        const QJsonObject ffObj = val.toObject();
-        const QByteArray fieldId = ffObj[QStringLiteral("field")].toString().toUtf8();
-        const IComplexCollectionFilter::FieldOperation op =
-            StringToFieldOperation(ffObj[QStringLiteral("op")].toString());
-        const QVariant value = ffObj[QStringLiteral("value")].toVariant();
-
-        expr.fieldFilters << IComplexCollectionFilter::FieldFilter(fieldId, value, op);
+    if (expression.fieldFilters.isEmpty() && expression.filterExpressions.isEmpty()){
+        return QJsonObject();
     }
 
-    // Nested expressions
-    if (json.contains(QStringLiteral("groups"))){
-        const QJsonArray groups = json[QStringLiteral("groups")].toArray();
-        for (const QJsonValue& val : groups){
-            IComplexCollectionFilter::FilterExpression subExpr;
-            if (!DeserializeFilterExpression(val.toObject(), subExpr)){
-                return false;
-            }
-            expr.filterExpressions << subExpr;
+    QJsonObject json;
+    json[QStringLiteral("op")] = expression.logicalOperation == CFilter::LO_OR
+        ? QStringLiteral("or")
+        : QStringLiteral("and");
+
+    QJsonArray fields;
+    for (const CFilter::FieldFilter& fieldFilter : expression.fieldFilters){
+        QJsonObject item;
+        item[QStringLiteral("field")] = QString::fromUtf8(fieldFilter.fieldId);
+        item[QStringLiteral("op")] = FieldOperationToString(fieldFilter.operation);
+        item[QStringLiteral("value")] = QJsonValue::fromVariant(fieldFilter.value);
+        fields << item;
+    }
+    if (!fields.isEmpty()){
+        json[QStringLiteral("fields")] = fields;
+    }
+
+    QJsonArray groups;
+    for (const CFilter::FilterExpression& group : expression.filterExpressions){
+        const QJsonObject groupJson = ToJson(group);
+        if (!groupJson.isEmpty()){
+            groups << groupJson;
         }
     }
+    if (!groups.isEmpty()){
+        json[QStringLiteral("groups")] = groups;
+    }
+
+    return json;
+}
+
+
+bool CFilterSerializer::FromJson(const QJsonObject& json, CFilter::FilterExpression& expression)
+{
+    expression.logicalOperation = json[QStringLiteral("op")].toString().toLower() == QLatin1String("or")
+        ? CFilter::LO_OR
+        : CFilter::LO_AND;
+
+    for (const QJsonValue& value : json[QStringLiteral("fields")].toArray()){
+        const QJsonObject item = value.toObject();
+        expression.fieldFilters << CFilter::FieldFilter(
+            item[QStringLiteral("field")].toString().toUtf8(),
+            item[QStringLiteral("value")].toVariant(),
+            StringToFieldOperation(item[QStringLiteral("op")].toString()));
+    }
+
+    for (const QJsonValue& value : json[QStringLiteral("groups")].toArray()){
+        CFilter::FilterExpression childExpression;
+        if (!FromJson(value.toObject(), childExpression)){
+            return false;
+        }
+        expression.filterExpressions << childExpression;
+    }
 
     return true;
 }
 
 
-QString CFilterSerializer::FieldOperationToString(IComplexCollectionFilter::FieldOperation op)
+QString CFilterSerializer::FieldOperationToString(CFilter::FilterOperation operation)
 {
-    switch (op){
-    case IComplexCollectionFilter::FO_EQUAL:        return QStringLiteral("eq");
-    case IComplexCollectionFilter::FO_NOT_EQUAL:    return QStringLiteral("ne");
-    case IComplexCollectionFilter::FO_LESS:         return QStringLiteral("lt");
-    case IComplexCollectionFilter::FO_GREATER:      return QStringLiteral("gt");
-    case IComplexCollectionFilter::FO_NOT_LESS:     return QStringLiteral("gte");
-    case IComplexCollectionFilter::FO_NOT_GREATER:  return QStringLiteral("lte");
-    case IComplexCollectionFilter::FO_CONTAINS:     return QStringLiteral("contains");
-    default:                                         return QStringLiteral("eq");
+    switch (operation){
+    case CFilter::FO_NOT_EQUAL:   return QStringLiteral("ne");
+    case CFilter::FO_LESS:        return QStringLiteral("lt");
+    case CFilter::FO_GREATER:     return QStringLiteral("gt");
+    case CFilter::FO_NOT_LESS:    return QStringLiteral("gte");
+    case CFilter::FO_NOT_GREATER: return QStringLiteral("lte");
+    case CFilter::FO_CONTAINS:    return QStringLiteral("contains");
+    case CFilter::FO_EQUAL:
+    default:                      return QStringLiteral("eq");
     }
 }
 
 
-IComplexCollectionFilter::FieldOperation CFilterSerializer::StringToFieldOperation(const QString& str)
+CFilter::FilterOperation CFilterSerializer::StringToFieldOperation(const QString& value)
 {
-    if (str == QLatin1String("ne"))       return IComplexCollectionFilter::FO_NOT_EQUAL;
-    if (str == QLatin1String("lt"))       return IComplexCollectionFilter::FO_LESS;
-    if (str == QLatin1String("gt"))       return IComplexCollectionFilter::FO_GREATER;
-    if (str == QLatin1String("gte"))      return IComplexCollectionFilter::FO_NOT_LESS;
-    if (str == QLatin1String("lte"))      return IComplexCollectionFilter::FO_NOT_GREATER;
-    if (str == QLatin1String("contains")) return IComplexCollectionFilter::FO_CONTAINS;
-    return IComplexCollectionFilter::FO_EQUAL;
+    const QString normalized = value.toLower();
+    if (normalized == QLatin1String("ne"))       return CFilter::FO_NOT_EQUAL;
+    if (normalized == QLatin1String("lt"))       return CFilter::FO_LESS;
+    if (normalized == QLatin1String("gt"))       return CFilter::FO_GREATER;
+    if (normalized == QLatin1String("gte"))      return CFilter::FO_NOT_LESS;
+    if (normalized == QLatin1String("lte"))      return CFilter::FO_NOT_GREATER;
+    if (normalized == QLatin1String("contains")) return CFilter::FO_CONTAINS;
+    return CFilter::FO_EQUAL;
+}
+
+
+QString CFilterSerializer::SortingOrderToString(CFilter::SortingOrder order)
+{
+    switch (order){
+    case CFilter::SO_DESC: return QStringLiteral("desc");
+    case CFilter::SO_ASC:  return QStringLiteral("asc");
+    default:               return QStringLiteral("none");
+    }
+}
+
+
+CFilter::SortingOrder CFilterSerializer::StringToSortingOrder(const QString& value)
+{
+    const QString normalized = value.toLower();
+    if (normalized == QLatin1String("desc")){
+        return CFilter::SO_DESC;
+    }
+    if (normalized == QLatin1String("asc")){
+        return CFilter::SO_ASC;
+    }
+    return CFilter::SO_NO_ORDER;
 }
 
 

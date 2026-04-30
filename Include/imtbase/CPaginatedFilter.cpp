@@ -10,34 +10,31 @@ namespace imtbase
 {
 
 
-// public methods
-
 CPaginatedFilter::CPaginatedFilter()
-    : m_page(1)
-    , m_pageSize(50)
-    , m_totalCount(-1)
 {
+    SyncFilterPagination();
 }
 
 
-CPaginatedFilter::CPaginatedFilter(const IComplexCollectionFilter& filter, int page, int pageSize)
-    : m_page(qMax(1, page))
+CPaginatedFilter::CPaginatedFilter(const CFilter& filter, int page, int pageSize)
+    : m_filter(filter)
+    , m_page(qMax(1, page))
     , m_pageSize(qMax(1, pageSize))
-    , m_totalCount(-1)
 {
-    m_filter.CopyFrom(filter);
+    SyncFilterPagination();
 }
 
 
-const IComplexCollectionFilter& CPaginatedFilter::GetFilter() const
+const CFilter& CPaginatedFilter::GetFilter() const
 {
     return m_filter;
 }
 
 
-void CPaginatedFilter::SetFilter(const IComplexCollectionFilter& filter)
+void CPaginatedFilter::SetFilter(const CFilter& filter)
 {
-    m_filter.CopyFrom(filter);
+    m_filter = filter;
+    SyncFilterPagination();
 }
 
 
@@ -50,6 +47,7 @@ int CPaginatedFilter::GetPage() const
 void CPaginatedFilter::SetPage(int page)
 {
     m_page = qMax(1, page);
+    SyncFilterPagination();
 }
 
 
@@ -62,6 +60,7 @@ int CPaginatedFilter::GetPageSize() const
 void CPaginatedFilter::SetPageSize(int pageSize)
 {
     m_pageSize = qMax(1, pageSize);
+    SyncFilterPagination();
 }
 
 
@@ -94,9 +93,6 @@ int CPaginatedFilter::GetTotalPages() const
     if (m_totalCount < 0){
         return -1;
     }
-    if (m_pageSize <= 0){
-        return 0;
-    }
     return (m_totalCount + m_pageSize - 1) / m_pageSize;
 }
 
@@ -104,16 +100,20 @@ int CPaginatedFilter::GetTotalPages() const
 bool CPaginatedFilter::HasNextPage() const
 {
     const int totalPages = GetTotalPages();
-    if (totalPages < 0){
-        return false;
-    }
-    return m_page < totalPages;
+    return totalPages >= 0 && m_page < totalPages;
 }
 
 
 bool CPaginatedFilter::HasPreviousPage() const
 {
     return m_page > 1;
+}
+
+
+void CPaginatedFilter::SyncFilterPagination()
+{
+    m_filter.SetPage(m_page);
+    m_filter.SetPageSize(m_pageSize);
 }
 
 

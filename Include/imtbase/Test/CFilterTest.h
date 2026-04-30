@@ -6,12 +6,8 @@
 #include <QtCore/QObject>
 #include <QtTest/QtTest>
 
-// ImtCore includes
-#include <imtbase/CCollectionFilter.h>
-#include <imtbase/CCollectionFilterAdapter.h>
-#include <imtbase/CComplexCollectionFilter.h>
-#include <imtbase/CFilterSerializer.h>
-#include <imtbase/CPaginatedFilter.h>
+// ACF includes
+#include <itest/CStandardTestExecutor.h>
 
 
 class CFilterTest: public QObject
@@ -19,13 +15,12 @@ class CFilterTest: public QObject
     Q_OBJECT
 
 private slots:
-    // CCollectionFilterAdapter tests
-    void ToComplexFilter_TextFilter();
-    void ToComplexFilter_SortInfo();
-    void ToLegacyFilter_TextFilter();
-    void ToLegacyFilter_SortInfo();
+    void CFilter_TextAndFields();
+    void CFilter_FieldExpression();
+    void CFilter_SortFields();
+    void CFilter_Pagination();
+    void CFilter_Clear();
 
-    // CPaginatedFilter tests
     void CPaginatedFilter_DefaultValues();
     void CPaginatedFilter_SetPage();
     void CPaginatedFilter_SetFilter();
@@ -34,7 +29,6 @@ private slots:
     void CPaginatedFilter_HasNextPage();
     void CPaginatedFilter_HasPreviousPage();
 
-    // CFilterSerializer URL tests
     void ToQueryString_TextFilter();
     void ToQueryString_WithPagination();
     void ToQueryString_SortFields();
@@ -44,7 +38,6 @@ private slots:
     void FromQueryString_FieldFilters();
     void FromQueryString_LeadingQuestionMark();
 
-    // CFilterSerializer JSON tests
     void ToJson_TextFilter();
     void ToJson_SortFields();
     void ToJson_FieldFilters();
