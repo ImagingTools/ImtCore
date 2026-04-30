@@ -99,9 +99,15 @@ istd::TUniqueInterfacePtr<imtauth::IUserInfo> CLdapAuthorizationControllerComp::
 	LPBYTE computerName = nullptr;
 	LPWSTR serverName = nullptr;
 	if (domain != "."){
-		if (NetGetDCName(NULL, qUtf16Printable(domain), &computerName) == 0){
-			serverName = (LPWSTR)computerName;
+		if (NetGetDCName(NULL, qUtf16Printable(domain), &computerName) != 0){
+			if (computerName != nullptr){
+				NetApiBufferFree(computerName);
+			}
+
+			return nullptr;
 		}
+
+		serverName = (LPWSTR)computerName;
 	}
 
 	NET_API_STATUS userInfoStatus = NetUserGetInfo(serverName, qUtf16Printable(username), 3, (LPBYTE *)&userInfo3BufPtr);

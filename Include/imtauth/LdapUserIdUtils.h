@@ -47,17 +47,26 @@ inline bool IsLocalDomain(const QByteArray& domain)
 }
 
 
+inline bool SplitRawUserId(const QByteArray& userId, QByteArray& domain, QByteArray& username)
+{
+	int separatorIndex = userId.indexOf('\\');
+	if (separatorIndex < 0){
+		return false;
+	}
+
+	domain = userId.left(separatorIndex);
+	username = userId.mid(separatorIndex + 1);
+
+	return !username.isEmpty();
+}
+
+
 inline QByteArray NormalizeUserId(const QByteArray& userId)
 {
 #ifdef Q_OS_WIN
-	int separatorIndex = userId.indexOf('\\');
-	if (separatorIndex < 0){
-		return userId;
-	}
-
-	QByteArray domain = userId.left(separatorIndex);
-	QByteArray username = userId.mid(separatorIndex + 1);
-	if (username.isEmpty()){
+	QByteArray domain;
+	QByteArray username;
+	if (!SplitRawUserId(userId, domain, username)){
 		return userId;
 	}
 
@@ -75,14 +84,9 @@ inline void SplitUserId(const QByteArray& userId, QByteArray& domain, QByteArray
 	domain = ".";
 	username = userId;
 
-	int separatorIndex = userId.indexOf('\\');
-	if (separatorIndex >= 0){
-		QByteArray prefix = userId.left(separatorIndex);
-		QByteArray suffix = userId.mid(separatorIndex + 1);
-		if (suffix.isEmpty()){
-			return;
-		}
-
+	QByteArray prefix;
+	QByteArray suffix;
+	if (SplitRawUserId(userId, prefix, suffix)){
 		if (IsLocalDomain(prefix)){
 			username = suffix;
 		}
