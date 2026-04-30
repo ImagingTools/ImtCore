@@ -2,6 +2,10 @@
 #include <imtservergql/CGqlContextCreatorComp.h>
 
 
+// Qt includes
+#include <QtCore/QDateTime>
+#include <QtCore/QMutexLocker>
+
 // ACF includes
 #include <iprm/TParamsPtr.h>
 #include <iprm/ISelectionParam.h>
@@ -17,6 +21,14 @@ namespace imtservergql
 {
 
 
+namespace
+{
+
+constexpr qint64 s_tokenCacheTtlMs = 5 * 60 * 1000;
+
+} // namespace
+
+
 // public methods
 
 // reimplemented (imtgql::IGqlContextCreator)
@@ -26,35 +38,51 @@ imtgql::IGqlContextUniquePtr CGqlContextCreatorComp::CreateGqlContext(
 			const QByteArray& productId,
 			const QByteArray& userId,
 			const imtgql::IGqlContext::Headers& headers,
-			QString& /*errorMessage*/) const
+			QString& errorMessage,
+			imtgql::IGqlContextCreator::ContextCreationStatus* statusPtr) const
 {
+	SetStatus(statusPtr, imtgql::IGqlContextCreator::CCS_OK);
+
 	if (!m_gqlContextFactCompPtr.IsValid()){
+		errorMessage = QStringLiteral("GraphQL context factory is not configured.");
+		SetStatus(statusPtr, imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR);
 		return nullptr;
+	}
+
+	QByteArray resolvedUserId = userId;
+	if (!token.isEmpty() && resolvedUserId.isEmpty()){
+		imtgql::IGqlContextCreator::ContextCreationStatus authStatus = imtgql::IGqlContextCreator::CCS_OK;
+		if (!ResolveUserId(token, resolvedUserId, errorMessage, authStatus)){
+			SetStatus(statusPtr, authStatus);
+			return nullptr;
+		}
 	}
 
 	imtgql::IGqlContextUniquePtr gqlContextPtr = m_gqlContextFactCompPtr.CreateInstance();
 	if (!gqlContextPtr.IsValid()){
+		errorMessage = QStringLiteral("Unable to create GraphQL context instance.");
+		SetStatus(statusPtr, imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR);
 		return nullptr;
 	}
 
-	gqlContextPtr->SetUserId(userId);
+	gqlContextPtr->SetUserId(resolvedUserId);
 	gqlContextPtr->SetToken(token);
 	gqlContextPtr->SetHeaders(headers);
 	gqlContextPtr->SetProductId(productId);
 
 	imtgql::CGqlRequestContextManager::SetContext(dynamic_cast<imtgql::IGqlContext*>(gqlContextPtr.GetPtr()));
 
-	if (m_userCollectionCompPtr.IsValid() && !userId.isEmpty()){
+	if (m_userCollectionCompPtr.IsValid() && !resolvedUserId.isEmpty()){
 		imtbase::IObjectCollection::DataPtr userDataPtr;
-		if (m_userCollectionCompPtr->GetObjectData(userId, userDataPtr)){
+		if (m_userCollectionCompPtr->GetObjectData(resolvedUserId, userDataPtr)){
 			const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(userDataPtr.GetPtr());
 			gqlContextPtr->SetUserInfo(userInfoPtr);
 		}
 	}
 
-	if (m_userSettingsCollectionCompPtr.IsValid() && !userId.isEmpty()){
+	if (m_userSettingsCollectionCompPtr.IsValid() && !resolvedUserId.isEmpty()){
 		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_userSettingsCollectionCompPtr->GetObjectData(userId, dataPtr)){
+		if (m_userSettingsCollectionCompPtr->GetObjectData(resolvedUserId, dataPtr)){
 			imtauth::IUserSettings* userSettingsPtr = dynamic_cast<imtauth::IUserSettings*>(dataPtr.GetPtr());
 			if (userSettingsPtr != nullptr){
 				iprm::IParamsSet* paramsSetPtr = userSettingsPtr->GetSettings();
@@ -91,6 +119,117 @@ imtgql::IGqlContextUniquePtr CGqlContextCreatorComp::CreateGqlContext(
 }
 
 
-} // namespace imtservergql
+// private methods
 
+bool CGqlContextCreatorComp::ResolveUserId(
+			const QByteArray& token,
+			QByteArray& userId,
+			QString& errorMessage,
+			imtgql::IGqlContextCreator::ContextCreationStatus& status) const
+{
+	if (TryGetCachedToken(token, userId)){
+		status = imtgql::IGqlContextCreator::CCS_OK;
+		return true;
+	}
+
+	if (IsPatToken(token)){
+		if (!m_patManagerCompPtr.IsValid()){
+			errorMessage = QStringLiteral("Personal access token manager is not configured.");
+			status = imtgql::IGqlContextCreator::CCS_FORBIDDEN;
+			return false;
+		}
+
+		QByteArray tokenId;
+		QByteArrayList scopes;
+		if (!m_patManagerCompPtr->ValidateToken(token, userId, tokenId, scopes)){
+			errorMessage = QStringLiteral("Invalid personal access token.");
+			status = imtgql::IGqlContextCreator::CCS_FORBIDDEN;
+			return false;
+		}
+
+		m_patManagerCompPtr->UpdateLastUsedAt(tokenId);
+		StoreCachedToken(token, userId, tokenId, true);
+		return true;
+	}
+
+	if (!m_jwtSessionControllerCompPtr.IsValid()){
+		errorMessage = QStringLiteral("JWT session controller is not configured.");
+		status = imtgql::IGqlContextCreator::CCS_FORBIDDEN;
+		return false;
+	}
+
+	using JwtState = imtauth::IJwtSessionController::JwtState;
+	JwtState state = m_jwtSessionControllerCompPtr->ValidateJwt(token);
+	if (state == JwtState::JS_EXPIRED){
+		errorMessage = QStringLiteral("JWT token expired.");
+		status = imtgql::IGqlContextCreator::CCS_UNAUTHORIZED;
+		return false;
+	}
+	if (state == JwtState::JS_INVALID){
+		errorMessage = QStringLiteral("Invalid JWT token.");
+		status = imtgql::IGqlContextCreator::CCS_FORBIDDEN;
+		return false;
+	}
+
+	userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(token);
+	StoreCachedToken(token, userId, QByteArray(), false);
+	return true;
+}
+
+
+bool CGqlContextCreatorComp::TryGetCachedToken(const QByteArray& token, QByteArray& userId) const
+{
+	const qint64 now = QDateTime::currentMSecsSinceEpoch();
+	QMutexLocker locker(&m_tokenCacheMutex);
+
+	auto iter = m_tokenCache.find(token);
+	if (iter == m_tokenCache.end()){
+		return false;
+	}
+
+	if (iter->expiresAt <= now){
+		m_tokenCache.erase(iter);
+		return false;
+	}
+
+	userId = iter->userId;
+	return true;
+}
+
+
+void CGqlContextCreatorComp::StoreCachedToken(
+			const QByteArray& token,
+			const QByteArray& userId,
+			const QByteArray& tokenId,
+			bool isPat) const
+{
+	TokenCacheEntry entry;
+	entry.userId = userId;
+	entry.tokenId = tokenId;
+	entry.isPat = isPat;
+	entry.expiresAt = QDateTime::currentMSecsSinceEpoch() + s_tokenCacheTtlMs;
+
+	QMutexLocker locker(&m_tokenCacheMutex);
+	m_tokenCache.insert(token, entry);
+}
+
+
+bool CGqlContextCreatorComp::IsPatToken(const QByteArray& token) const
+{
+	return (token.size() > 4 && token.startsWith("pat_"))
+			|| (token.size() > 8 && token.startsWith("imt_pat_"));
+}
+
+
+void CGqlContextCreatorComp::SetStatus(
+			imtgql::IGqlContextCreator::ContextCreationStatus* statusPtr,
+			imtgql::IGqlContextCreator::ContextCreationStatus status) const
+{
+	if (statusPtr != nullptr){
+		*statusPtr = status;
+	}
+}
+
+
+} // namespace imtservergql
 

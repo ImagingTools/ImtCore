@@ -82,41 +82,6 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 	QByteArray userId;
 	QByteArray accessToken = headers.value(QByteArrayLiteral("x-authentication-token"));
 
-	// Validate token based on prefix: pat_ for PAT tokens, otherwise JWT
-	if (!accessToken.isEmpty()){
-		// Check if token starts with "pat_" prefix and has content beyond the prefix
-		if (accessToken.size() > 8 && accessToken.startsWith("imt_pat_")){
-			// PAT token - validate with PAT manager
-			if (m_patManagerCompPtr.IsValid()){
-				QByteArray tokenId;
-				QByteArrayList scopes;
-				if (!m_patManagerCompPtr->ValidateToken(accessToken, userId, tokenId, scopes)){
-					return CreateResponse(StatusCode::SC_FORBIDDEN, QByteArray(), request);
-				}
-
-				m_patManagerCompPtr->UpdateLastUsedAt(tokenId);
-			}
-			else{
-				return CreateResponse(StatusCode::SC_FORBIDDEN, QByteArray(), request);
-			}
-		}
-		else{
-			// JWT token - validate with JWT controller
-			if (m_jwtSessionControllerCompPtr.IsValid()){
-				using JwtState = imtauth::IJwtSessionController::JwtState;
-				JwtState state = m_jwtSessionControllerCompPtr->ValidateJwt(accessToken);
-				if (state == JwtState::JS_EXPIRED){
-					return CreateResponse(StatusCode::SC_UNAUTHORIZED, QByteArray(), request);
-				}
-				else if (state == JwtState::JS_INVALID){
-					return CreateResponse(StatusCode::SC_FORBIDDEN, QByteArray(), request);
-				}
-
-				userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(accessToken);
-			}
-		}
-	}
-
 	QByteArray productId;
 	if (headers.contains(imtbase::s_productIdHeaderId)){
 		productId = headers.value(imtbase::s_productIdHeaderId);
@@ -124,8 +89,16 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 
 	if (m_gqlContextCreatorCompPtr.IsValid()){
 		QString errorMessage;
-		imtgql::IGqlContextUniquePtr gqlContextPtr = m_gqlContextCreatorCompPtr->CreateGqlContext(accessToken, productId, userId, headers, errorMessage);
+		imtgql::IGqlContextCreator::ContextCreationStatus contextStatus = imtgql::IGqlContextCreator::CCS_OK;
+		imtgql::IGqlContextUniquePtr gqlContextPtr = m_gqlContextCreatorCompPtr->CreateGqlContext(accessToken, productId, userId, headers, errorMessage, &contextStatus);
 		if (!gqlContextPtr.IsValid()){
+			if (contextStatus == imtgql::IGqlContextCreator::CCS_UNAUTHORIZED){
+				return CreateResponse(StatusCode::SC_UNAUTHORIZED, QByteArray(), request);
+			}
+			if (contextStatus == imtgql::IGqlContextCreator::CCS_FORBIDDEN){
+				return CreateResponse(StatusCode::SC_FORBIDDEN, QByteArray(), request);
+			}
+
 			SendCriticalMessage(
 						0,
 						QStringLiteral("Unable to create a GraphQL context for the access token '%1' for Command-ID: '%2'. Error: '%3'")
@@ -293,5 +266,4 @@ QByteArray CHttpGraphQLServletComp::BuildGqlErrorJson(
 
 
 } // namespace imtservergql
-
 
