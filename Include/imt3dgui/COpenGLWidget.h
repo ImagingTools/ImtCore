@@ -12,6 +12,9 @@
 #else
 #include <QtOpenGLWidgets/QOpenGLWidget>
 #endif
+
+#include <QtGui/QOpenGLExtraFunctions>
+
 // ACF includes
 #include <istd/istd.h>
 
@@ -24,7 +27,7 @@ namespace imt3dgui
 
 class ISceneEventHandler;
 
-class COpenGLWidget: public QOpenGLWidget, protected QOpenGLFunctions
+class COpenGLWidget: public QOpenGLWidget, protected QOpenGLExtraFunctions
 {
 	Q_OBJECT
 
@@ -152,6 +155,7 @@ private:
 	imt3dview::IScene3dCamera* m_cameraPtr;
 	QColor m_backgroundColor;
 	ProjectionMode m_projectionMode = PM_PERSPECTIVE;
+	GLuint m_vao;
 
 	static const float s_verticalAngle;
 	static const float s_nearPlane;
