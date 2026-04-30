@@ -44,6 +44,119 @@ int ExtractIndexedKey(const QString& key, const QString& prefix, const QString& 
 }
 
 
+QString PredicateToOperator(const QString& predicate)
+{
+    const QString normalized = NormalizeToken(predicate);
+    if (normalized == QLatin1String("is")){
+        return QStringLiteral("=");
+    }
+    if (normalized == QLatin1String("like")){
+        return QStringLiteral("contains");
+    }
+    if (normalized == QLatin1String("after")){
+        return QStringLiteral(">");
+    }
+    if (normalized == QLatin1String("before")){
+        return QStringLiteral("<");
+    }
+    return predicate;
+}
+
+
+QString OperatorToPredicate(const QString& op)
+{
+    const QString normalized = NormalizeToken(op);
+    if (normalized == QLatin1String("=") || normalized == QLatin1String("eq")){
+        return QStringLiteral("is");
+    }
+    if (normalized == QLatin1String("contains") || normalized == QLatin1String("like")){
+        return QStringLiteral("like");
+    }
+    if (normalized == QLatin1String(">") || normalized == QLatin1String("gt")){
+        return QStringLiteral("after");
+    }
+    if (normalized == QLatin1String("<") || normalized == QLatin1String("lt")){
+        return QStringLiteral("before");
+    }
+    return op;
+}
+
+
+QString JoinToCombinator(imtbase::CFilter::RuleSet::Join join)
+{
+    return join == imtbase::CFilter::RuleSet::Any ? QStringLiteral("or") : QStringLiteral("and");
+}
+
+
+imtbase::CFilter::RuleSet::Join CombinatorToJoin(const QString& combinator)
+{
+    return NormalizeToken(combinator) == QLatin1String("or")
+        ? imtbase::CFilter::RuleSet::Any
+        : imtbase::CFilter::RuleSet::All;
+}
+
+
+QJsonObject ToQmlQuery(const imtbase::CFilter::RuleSet& rules)
+{
+    QJsonObject json;
+    json[QStringLiteral("combinator")] = JoinToCombinator(rules.join);
+
+    QJsonArray items;
+    for (const imtbase::CFilter::Rule& rule : rules.rules){
+        if (!rule.IsValid()){
+            continue;
+        }
+        QJsonObject item;
+        item[QStringLiteral("field")] = QString::fromUtf8(rule.path);
+        item[QStringLiteral("operator")] = PredicateToOperator(rule.predicate);
+        item[QStringLiteral("value")] = QJsonValue::fromVariant(rule.argument);
+        const char* typeName = rule.argument.typeName();
+        if (typeName != nullptr){
+            item[QStringLiteral("type")] = QString::fromUtf8(typeName);
+        }
+        items << item;
+    }
+    for (const imtbase::CFilter::RuleSet& child : rules.children){
+        if (!child.IsEmpty()){
+            items << ToQmlQuery(child);
+        }
+    }
+
+    json[QStringLiteral("rules")] = items;
+    return json;
+}
+
+
+bool FromQmlQuery(const QJsonObject& json, imtbase::CFilter::RuleSet& rules)
+{
+    rules.join = CombinatorToJoin(json[QStringLiteral("combinator")].toString());
+
+    for (const QJsonValue& value : json[QStringLiteral("rules")].toArray()){
+        const QJsonObject item = value.toObject();
+        if (item.contains(QStringLiteral("rules")) || item.contains(QStringLiteral("combinator"))){
+            imtbase::CFilter::RuleSet child;
+            if (!FromQmlQuery(item, child)){
+                return false;
+            }
+            if (!child.IsEmpty()){
+                rules.children << child;
+            }
+            continue;
+        }
+
+        const imtbase::CFilter::Rule rule(
+            item[QStringLiteral("field")].toString().toUtf8(),
+            OperatorToPredicate(item[QStringLiteral("operator")].toString()),
+            item[QStringLiteral("value")].toVariant());
+        if (rule.IsValid()){
+            rules.rules << rule;
+        }
+    }
+
+    return true;
+}
+
+
 } // namespace
 
 
@@ -68,20 +181,25 @@ QString CFilterSerializer::ToQueryString(const CFilter& filter)
     }
 
     if (!filter.GetRules().IsEmpty()){
-        const QJsonObject rulesJson = ToJson(filter.GetRules());
         query.addQueryItem(
-            QStringLiteral("rules"),
-            QString::fromUtf8(QJsonDocument(rulesJson).toJson(QJsonDocument::Compact)));
+            QStringLiteral("query"),
+            QString::fromUtf8(QJsonDocument(ToQmlQuery(filter.GetRules())).toJson(QJsonDocument::Compact)));
     }
 
-    int orderIndex = 0;
+    QJsonArray sort;
     for (const CFilter::Order& order : filter.GetOrders()){
         if (!order.IsValid()){
             continue;
         }
-        const QString prefix = QStringLiteral("order[%1].").arg(orderIndex++);
-        query.addQueryItem(prefix + QStringLiteral("path"), QString::fromUtf8(order.path));
-        query.addQueryItem(prefix + QStringLiteral("dir"), order.descending ? QStringLiteral("down") : QStringLiteral("up"));
+        QJsonObject item;
+        item[QStringLiteral("field")] = QString::fromUtf8(order.path);
+        item[QStringLiteral("direction")] = order.descending ? QStringLiteral("desc") : QStringLiteral("asc");
+        sort << item;
+    }
+    if (!sort.isEmpty()){
+        query.addQueryItem(
+            QStringLiteral("sort"),
+            QString::fromUtf8(QJsonDocument(sort).toJson(QJsonDocument::Compact)));
     }
 
     if (filter.HasWindow()){
@@ -161,7 +279,19 @@ bool CFilterSerializer::FromQueryString(const QString& queryString, CFilter& fil
         }
     }
 
-    if (query.hasQueryItem(QStringLiteral("rules"))){
+    if (query.hasQueryItem(QStringLiteral("query"))){
+        const QByteArray rulesJson = query.queryItemValue(QStringLiteral("query"), QUrl::FullyDecoded).toUtf8();
+        const QJsonDocument rulesDocument = QJsonDocument::fromJson(rulesJson);
+        if (!rulesDocument.isObject()){
+            return false;
+        }
+
+        CFilter::RuleSet ruleSet;
+        if (!FromQmlQuery(rulesDocument.object(), ruleSet)){
+            return false;
+        }
+        filter.SetRules(ruleSet);
+    } else if (query.hasQueryItem(QStringLiteral("rules"))){
         const QByteArray rulesJson = query.queryItemValue(QStringLiteral("rules"), QUrl::FullyDecoded).toUtf8();
         const QJsonDocument rulesDocument = QJsonDocument::fromJson(rulesJson);
         if (!rulesDocument.isObject()){
@@ -185,13 +315,32 @@ bool CFilterSerializer::FromQueryString(const QString& queryString, CFilter& fil
     }
 
     QVector<CFilter::Order> orderList;
-    for (auto it = orders.cbegin(); it != orders.cend(); ++it){
-        const CFilter::Order order(it.value().path, it.value().descending);
-        if (order.IsValid()){
-            orderList << order;
+    if (query.hasQueryItem(QStringLiteral("sort"))){
+        const QByteArray sortJson = query.queryItemValue(QStringLiteral("sort"), QUrl::FullyDecoded).toUtf8();
+        const QJsonDocument sortDocument = QJsonDocument::fromJson(sortJson);
+        if (!sortDocument.isArray()){
+            return false;
         }
+
+        for (const QJsonValue& value : sortDocument.array()){
+            const QJsonObject item = value.toObject();
+            const CFilter::Order order(
+                item[QStringLiteral("field")].toString().toUtf8(),
+                NormalizeToken(item[QStringLiteral("direction")].toString()) == QLatin1String("desc"));
+            if (order.IsValid()){
+                orderList << order;
+            }
+        }
+        filter.SetOrders(orderList);
+    } else {
+        for (auto it = orders.cbegin(); it != orders.cend(); ++it){
+            const CFilter::Order order(it.value().path, it.value().descending);
+            if (order.IsValid()){
+                orderList << order;
+            }
+        }
+        filter.SetOrders(orderList);
     }
-    filter.SetOrders(orderList);
 
     if (query.hasQueryItem(QStringLiteral("offset")) || query.hasQueryItem(QStringLiteral("count"))){
         filter.SetWindow(
@@ -264,7 +413,13 @@ bool CFilterSerializer::FromJson(const QJsonObject& json, CFilter& filter)
         filter.SetSearch(search[QStringLiteral("text")].toString(), scopes);
     }
 
-    if (json.contains(QStringLiteral("rules"))){
+    if (json.contains(QStringLiteral("query"))){
+        CFilter::RuleSet rules;
+        if (!FromQmlQuery(json[QStringLiteral("query")].toObject(), rules)){
+            return false;
+        }
+        filter.SetRules(rules);
+    } else if (json.contains(QStringLiteral("rules"))){
         CFilter::RuleSet rules;
         if (!FromJson(json[QStringLiteral("rules")].toObject(), rules)){
             return false;
@@ -273,11 +428,18 @@ bool CFilterSerializer::FromJson(const QJsonObject& json, CFilter& filter)
     }
 
     QVector<CFilter::Order> orders;
-    for (const QJsonValue& value : json[QStringLiteral("orders")].toArray()){
+    const QJsonArray orderArray = json.contains(QStringLiteral("sort"))
+        ? json[QStringLiteral("sort")].toArray()
+        : json[QStringLiteral("orders")].toArray();
+    for (const QJsonValue& value : orderArray){
         const QJsonObject item = value.toObject();
         const CFilter::Order order(
-            item[QStringLiteral("path")].toString().toUtf8(),
-            item[QStringLiteral("descending")].toBool());
+            item.contains(QStringLiteral("field"))
+                ? item[QStringLiteral("field")].toString().toUtf8()
+                : item[QStringLiteral("path")].toString().toUtf8(),
+            item.contains(QStringLiteral("direction"))
+                ? NormalizeToken(item[QStringLiteral("direction")].toString()) == QLatin1String("desc")
+                : item[QStringLiteral("descending")].toBool());
         if (order.IsValid()){
             orders << order;
         }
@@ -378,5 +540,3 @@ CFilter::RuleSet::Join CFilterSerializer::StringToJoin(const QString& value)
 
 
 } // namespace imtbase
-
-

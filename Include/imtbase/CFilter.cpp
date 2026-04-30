@@ -164,9 +164,45 @@ CFilter& CFilter::search(const QString& text, const QByteArrayList& scopes)
 }
 
 
+CFilter& CFilter::searchText(const QString& text, const QByteArrayList& scopes)
+{
+    return search(text, scopes);
+}
+
+
 CFilter& CFilter::where(const QByteArray& path, const QString& predicate, const QVariant& argument)
 {
-    AddRule(Rule(path, predicate, argument));
+    CurrentRuleSet().rules << Rule(path, predicate, argument);
+    return *this;
+}
+
+
+CFilter& CFilter::beginGroup(RuleSet::Join join)
+{
+    RuleSet& current = CurrentRuleSet();
+    current.children << RuleSet(join);
+    m_groupPath << (current.children.size() - 1);
+    return *this;
+}
+
+
+CFilter& CFilter::beginAnd()
+{
+    return beginGroup(RuleSet::All);
+}
+
+
+CFilter& CFilter::beginOr()
+{
+    return beginGroup(RuleSet::Any);
+}
+
+
+CFilter& CFilter::endGroup()
+{
+    if (!m_groupPath.isEmpty()){
+        m_groupPath.removeLast();
+    }
     return *this;
 }
 
@@ -226,6 +262,12 @@ CFilter& CFilter::window(int first, int count)
 }
 
 
+CFilter& CFilter::windowed(int first, int count)
+{
+    return window(first, count);
+}
+
+
 const CFilter& CFilter::build() const
 {
     return *this;
@@ -259,6 +301,7 @@ const CFilter::RuleSet& CFilter::GetRules() const
 void CFilter::SetRules(const RuleSet& rules)
 {
     m_rules = rules;
+    m_groupPath.clear();
 }
 
 
@@ -340,9 +383,22 @@ void CFilter::Clear()
     m_rules = RuleSet();
     m_orders.clear();
     m_window = Window();
+    m_groupPath.clear();
+}
+
+
+CFilter::RuleSet& CFilter::CurrentRuleSet()
+{
+    RuleSet* current = &m_rules;
+    for (const int index : m_groupPath){
+        if (index < 0 || index >= current->children.size()){
+            m_groupPath.clear();
+            return m_rules;
+        }
+        current = &current->children[index];
+    }
+    return *current;
 }
 
 
 } // namespace imtbase
-
-

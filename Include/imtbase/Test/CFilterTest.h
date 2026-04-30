@@ -40,6 +40,7 @@ private slots:
     void FromQueryString_Orders();
     void FromQueryString_Rules();
     void FromQueryString_GroupRules();
+    void FromQueryString_QmlModel();
     void FromQueryString_LeadingQuestionMark();
 
     void ToJson_Search();
@@ -51,6 +52,6 @@ private slots:
     void FromJson_Empty();
 
     void SdlConverter_FromQmlModel();
+    void SdlConverter_ToSdlJson();
 };
-
 

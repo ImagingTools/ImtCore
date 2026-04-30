@@ -14,22 +14,24 @@ scopes: [ID]
 
 type FilterRule
 {
-path: ID!
-pred: String!
-arg: String
+field: ID!
+operator: String!
+value: String
+type: String
 }
 
-type FilterRuleSet
+union FilterQueryEntry = FilterRule | FilterQuery
+
+type FilterQuery
 {
-join: String!
-items: [FilterRule]
-sets: [FilterRuleSet]
+combinator: String!
+rules: [FilterQueryEntry]
 }
 
 type FilterOrder
 {
-path: ID!
-descending: Bool!
+field: ID!
+direction: String!
 }
 
 type FilterWindow
@@ -41,9 +43,8 @@ count: Integer!
 type FilterRequest
 {
 search: FilterSearch
-rules: FilterRuleSet
-orders: [FilterOrder]
+query: FilterQuery
+sort: [FilterOrder]
 window: FilterWindow
 }
-
 

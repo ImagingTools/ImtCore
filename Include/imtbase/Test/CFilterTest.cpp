@@ -53,12 +53,12 @@ void CFilterTest::CFilter_RuleSets()
 void CFilterTest::CFilter_FluentApi()
 {
     const imtbase::CFilter filter = imtbase::CFilter()
-        .search(QStringLiteral("john"), { "Name", "Email" })
+        .searchText(QStringLiteral("john"), { "Name", "Email" })
         .where("Status", QStringLiteral("is"), QStringLiteral("active"))
-        .any(imtbase::CFilter::AnyOf({
-            imtbase::CFilter::Rule("Name", QStringLiteral("like"), QStringLiteral("john")),
-            imtbase::CFilter::Rule("Email", QStringLiteral("like"), QStringLiteral("john"))
-        }))
+        .beginOr()
+            .where("Name", QStringLiteral("like"), QStringLiteral("john"))
+            .where("Email", QStringLiteral("like"), QStringLiteral("john"))
+        .endGroup()
         .orderBy("CreatedAt", true)
         .page(2, 50)
         .build();
@@ -221,8 +221,9 @@ void CFilterTest::ToQueryString_Orders()
     filter.AddOrder(imtbase::CFilter::Order("Name"));
 
     const QString qs = imtbase::CFilterSerializer::ToQueryString(filter);
-    QVERIFY(qs.contains(QStringLiteral("order%5B0%5D.path=Name")) || qs.contains(QStringLiteral("order[0].path=Name")));
-    QVERIFY(qs.contains(QStringLiteral("order%5B0%5D.dir=up")) || qs.contains(QStringLiteral("order[0].dir=up")));
+    QVERIFY(qs.contains(QStringLiteral("sort=")));
+    QVERIFY(qs.contains(QStringLiteral("Name")));
+    QVERIFY(qs.contains(QStringLiteral("asc")));
 }
 
 
@@ -232,7 +233,7 @@ void CFilterTest::ToQueryString_Rules()
     filter.AddRule(imtbase::CFilter::Rule("Status", QStringLiteral("is"), QStringLiteral("active")));
 
     const QString qs = imtbase::CFilterSerializer::ToQueryString(filter);
-    QVERIFY(qs.contains(QStringLiteral("rules=")));
+    QVERIFY(qs.contains(QStringLiteral("query=")));
     QVERIFY(qs.contains(QStringLiteral("Status")));
 }
 
@@ -246,8 +247,8 @@ void CFilterTest::ToQueryString_GroupRules()
     }));
 
     const QString qs = imtbase::CFilterSerializer::ToQueryString(filter);
-    QVERIFY(qs.contains(QStringLiteral("rules=")));
-    QVERIFY(qs.contains(QStringLiteral("any")));
+    QVERIFY(qs.contains(QStringLiteral("query=")));
+    QVERIFY(qs.contains(QStringLiteral("or")));
 }
 
 
@@ -296,6 +297,31 @@ void CFilterTest::FromQueryString_GroupRules()
     QCOMPARE(filter.GetRules().children.size(), 1);
     QCOMPARE(filter.GetRules().children.first().join, imtbase::CFilter::RuleSet::Any);
     QCOMPARE(filter.GetRules().children.first().rules.size(), 2);
+}
+
+
+void CFilterTest::FromQueryString_QmlModel()
+{
+    const QString query = QStringLiteral(
+        "query=%7B%22combinator%22%3A%22and%22%2C%22rules%22%3A%5B%7B%22field%22%3A%22Status%22%2C%22operator%22%3A%22%3D%22%2C%22value%22%3A%22active%22%2C%22type%22%3A%22string%22%7D%2C%7B%22combinator%22%3A%22or%22%2C%22rules%22%3A%5B%7B%22field%22%3A%22Name%22%2C%22operator%22%3A%22contains%22%2C%22value%22%3A%22john%22%2C%22type%22%3A%22string%22%7D%5D%7D%5D%7D"
+        "&sort=%5B%7B%22field%22%3A%22CreatedAt%22%2C%22direction%22%3A%22desc%22%7D%5D"
+        "&offset=0&count=50&search=john&scope=Name%2CEmail");
+
+    imtbase::CFilter filter;
+    QVERIFY(imtbase::CFilterSerializer::FromQueryString(query, filter));
+    QCOMPARE(filter.GetSearch().text, QStringLiteral("john"));
+    QCOMPARE(filter.GetSearch().scopes, QByteArrayList({ "Name", "Email" }));
+    QCOMPARE(filter.GetRules().rules.size(), 1);
+    QCOMPARE(filter.GetRules().rules.first().path, QByteArray("Status"));
+    QCOMPARE(filter.GetRules().rules.first().predicate, QStringLiteral("is"));
+    QCOMPARE(filter.GetRules().children.size(), 1);
+    QCOMPARE(filter.GetRules().children.first().join, imtbase::CFilter::RuleSet::Any);
+    QCOMPARE(filter.GetRules().children.first().rules.first().predicate, QStringLiteral("like"));
+    QCOMPARE(filter.GetOrders().size(), 1);
+    QCOMPARE(filter.GetOrders().first().path, QByteArray("CreatedAt"));
+    QVERIFY(filter.GetOrders().first().descending);
+    QCOMPARE(filter.GetWindow().first, 0);
+    QCOMPARE(filter.GetWindow().count, 50);
 }
 
 
@@ -418,13 +444,14 @@ void CFilterTest::SdlConverter_FromQmlModel()
     search[QStringLiteral("scopes")] = QStringList({ QStringLiteral("Name"), QStringLiteral("Email") });
 
     QVariantMap rule;
-    rule[QStringLiteral("path")] = QStringLiteral("Status");
-    rule[QStringLiteral("pred")] = QStringLiteral("is");
-    rule[QStringLiteral("arg")] = QStringLiteral("active");
+    rule[QStringLiteral("field")] = QStringLiteral("Status");
+    rule[QStringLiteral("operator")] = QStringLiteral("=");
+    rule[QStringLiteral("value")] = QStringLiteral("active");
+    rule[QStringLiteral("type")] = QStringLiteral("string");
 
-    QVariantMap rules;
-    rules[QStringLiteral("join")] = QStringLiteral("all");
-    rules[QStringLiteral("items")] = QVariantList({ rule });
+    QVariantMap query;
+    query[QStringLiteral("combinator")] = QStringLiteral("and");
+    query[QStringLiteral("rules")] = QVariantList({ rule });
 
     QVariantMap window;
     window[QStringLiteral("first")] = 0;
@@ -432,7 +459,7 @@ void CFilterTest::SdlConverter_FromQmlModel()
 
     QVariantMap model;
     model[QStringLiteral("search")] = search;
-    model[QStringLiteral("rules")] = rules;
+    model[QStringLiteral("query")] = query;
     model[QStringLiteral("window")] = window;
 
     imtbase::CFilter filter;
@@ -445,6 +472,21 @@ void CFilterTest::SdlConverter_FromQmlModel()
 }
 
 
+void CFilterTest::SdlConverter_ToSdlJson()
+{
+    imtbase::CFilter filter;
+    filter.SetSearch(QStringLiteral("john"), { "Name" });
+    filter.AddRule(imtbase::CFilter::Rule("Status", QStringLiteral("is"), QStringLiteral("active")));
+    filter.AddOrder(imtbase::CFilter::Order("CreatedAt", true));
+    filter.SetWindow(0, 50);
+
+    const QJsonObject json = imtbase::CFilterSdlConverter::ToSdlJson(filter);
+    QCOMPARE(json[QStringLiteral("query")].toObject()[QStringLiteral("combinator")].toString(), QStringLiteral("and"));
+    QCOMPARE(json[QStringLiteral("query")].toObject()[QStringLiteral("rules")].toArray()[0].toObject()[QStringLiteral("field")].toString(), QStringLiteral("Status"));
+    QCOMPARE(json[QStringLiteral("query")].toObject()[QStringLiteral("rules")].toArray()[0].toObject()[QStringLiteral("operator")].toString(), QStringLiteral("="));
+    QCOMPARE(json[QStringLiteral("sort")].toArray()[0].toObject()[QStringLiteral("field")].toString(), QStringLiteral("CreatedAt"));
+    QCOMPARE(json[QStringLiteral("sort")].toArray()[0].toObject()[QStringLiteral("direction")].toString(), QStringLiteral("desc"));
+}
+
+
 I_ADD_TEST(CFilterTest);
-
-

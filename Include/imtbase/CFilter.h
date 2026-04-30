@@ -103,12 +103,18 @@ public:
         const QVector<RuleSet>& children = QVector<RuleSet>());
 
     CFilter& search(const QString& text, const QByteArrayList& scopes = QByteArrayList());
+    CFilter& searchText(const QString& text, const QByteArrayList& scopes = QByteArrayList());
     CFilter& where(const QByteArray& path, const QString& predicate, const QVariant& argument = QVariant());
+    CFilter& beginGroup(RuleSet::Join join);
+    CFilter& beginAnd();
+    CFilter& beginOr();
+    CFilter& endGroup();
     CFilter& all(const RuleSet& rules);
     CFilter& any(const RuleSet& rules);
     CFilter& orderBy(const QByteArray& path, bool descending = false);
     CFilter& page(int pageNumber, int pageSize);
     CFilter& window(int first, int count);
+    CFilter& windowed(int first, int count);
     const CFilter& build() const;
 
     const Search& GetSearch() const;
@@ -136,13 +142,15 @@ public:
     void Clear();
 
 private:
+    RuleSet& CurrentRuleSet();
+
     Search m_search;
     RuleSet m_rules;
     QVector<Order> m_orders;
     Window m_window;
+    QVector<int> m_groupPath;
 };
 
 
 } // namespace imtbase
-
 
