@@ -94,29 +94,21 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 		}
 	}
 
-	QByteArray accessToken = headers.value(QByteArrayLiteral("x-authentication-token"));
-
-	QByteArray productId;
-	if (headers.contains(imtbase::s_productIdHeaderId)){
-		productId = headers.value(imtbase::s_productIdHeaderId);
-	}
-
 	if (m_gqlContextCreatorCompPtr.IsValid()){
-		QString errorMessage;
-		imtgql::IGqlContextCreator::ContextCreationStatus contextStatus = imtgql::IGqlContextCreator::CCS_OK;
-		imtgql::IGqlContextUniquePtr gqlContextPtr = m_gqlContextCreatorCompPtr->CreateGqlContext(accessToken, productId, QByteArray(), headers, errorMessage, &contextStatus);
+		imtgql::IGqlContextCreator::ContextCreationError contextError;
+		imtgql::IGqlContextUniquePtr gqlContextPtr = m_gqlContextCreatorCompPtr->CreateGqlContext(headers, contextError);
 		if (!gqlContextPtr.IsValid()){
-			if (contextStatus == imtgql::IGqlContextCreator::CCS_UNAUTHORIZED){
+			if (contextError.status == imtgql::IGqlContextCreator::CCS_UNAUTHORIZED){
 				return CreateResponse(StatusCode::SC_UNAUTHORIZED, QByteArray(), request);
 			}
-			if (contextStatus == imtgql::IGqlContextCreator::CCS_FORBIDDEN){
+			if (contextError.status == imtgql::IGqlContextCreator::CCS_FORBIDDEN){
 				return CreateResponse(StatusCode::SC_FORBIDDEN, QByteArray(), request);
 			}
 
 			SendCriticalMessage(
 						0,
 						QStringLiteral("Unable to create a GraphQL context for the access token '%1' for Command-ID: '%2'. Error: '%3'")
-											.arg(MaskToken(accessToken), QString(gqlCommand), errorMessage),
+											.arg(MaskToken(headers.value(imtbase::s_authenticationTokenHeaderId)), QString(gqlCommand), contextError.message),
 						QStringLiteral("GraphQL - servlet"));
 			return GenerateError(StatusCode::SC_INTERNAL_SERVER_ERROR, QStringLiteral("Request context is invalid"), request);
 		}

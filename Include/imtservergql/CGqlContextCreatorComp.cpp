@@ -44,36 +44,38 @@ constexpr qint64 s_negativeTokenCacheTtlMs = 30 * 1000;
 // reimplemented (imtgql::IGqlContextCreator)
 
 imtgql::IGqlContextUniquePtr CGqlContextCreatorComp::CreateGqlContext(
-			const QByteArray& token,
-			const QByteArray& productId,
-			const QByteArray& userId,
 			const imtgql::IGqlContext::Headers& headers,
-			QString& errorMessage,
-			imtgql::IGqlContextCreator::ContextCreationStatus* statusPtr) const
+			imtgql::IGqlContextCreator::ContextCreationError& error) const
 {
-	SetStatus(statusPtr, imtgql::IGqlContextCreator::CCS_OK);
+	SetError(error, imtgql::IGqlContextCreator::CCS_OK);
 
 	if (!m_gqlContextFactCompPtr.IsValid()){
-		errorMessage = QStringLiteral("GraphQL context factory is not configured.");
-		SetStatus(statusPtr, imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR);
+		SetError(
+					error,
+					imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR,
+					QStringLiteral("GraphQL context factory is not configured."));
 		return nullptr;
 	}
 
-	QByteArray resolvedUserId = userId;
+	const QByteArray token = headers.value(imtbase::s_authenticationTokenHeaderId);
+	const QByteArray productId = headers.value(imtbase::s_productIdHeaderId);
+	QByteArray resolvedUserId;
 	QByteArrayList scopes;
 	bool isPat = false;
 	if (!token.isEmpty() && resolvedUserId.isEmpty()){
 		imtgql::IGqlContextCreator::ContextCreationStatus authStatus = imtgql::IGqlContextCreator::CCS_OK;
-		if (!ResolveUserId(token, resolvedUserId, scopes, isPat, errorMessage, authStatus)){
-			SetStatus(statusPtr, authStatus);
+		if (!ResolveUserId(token, resolvedUserId, scopes, isPat, error.message, authStatus)){
+			error.status = authStatus;
 			return nullptr;
 		}
 	}
 
 	imtgql::IGqlContextUniquePtr gqlContextPtr = CreateContextInstance();
 	if (!gqlContextPtr.IsValid()){
-		errorMessage = QStringLiteral("Unable to create GraphQL context instance.");
-		SetStatus(statusPtr, imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR);
+		SetError(
+					error,
+					imtgql::IGqlContextCreator::CCS_INTERNAL_ERROR,
+					QStringLiteral("Unable to create GraphQL context instance."));
 		return nullptr;
 	}
 
@@ -311,13 +313,13 @@ bool CGqlContextCreatorComp::IsPatToken(const QByteArray& token) const
 }
 
 
-void CGqlContextCreatorComp::SetStatus(
-			imtgql::IGqlContextCreator::ContextCreationStatus* statusPtr,
-			imtgql::IGqlContextCreator::ContextCreationStatus status) const
+void CGqlContextCreatorComp::SetError(
+			imtgql::IGqlContextCreator::ContextCreationError& error,
+			imtgql::IGqlContextCreator::ContextCreationStatus status,
+			const QString& message) const
 {
-	if (statusPtr != nullptr){
-		*statusPtr = status;
-	}
+	error.status = status;
+	error.message = message;
 }
 
 

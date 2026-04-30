@@ -38,12 +38,8 @@ public:
 
 	// reimplemented (imtgql::IGqlContextCreator)
 	virtual imtgql::IGqlContextUniquePtr CreateGqlContext(
-				const QByteArray& token,
-				const QByteArray& productId,
-				const QByteArray& userId,
 				const imtgql::IGqlContext::Headers& headers,
-				QString& errorMessage,
-				imtgql::IGqlContextCreator::ContextCreationStatus* statusPtr = nullptr) const override;
+				imtgql::IGqlContextCreator::ContextCreationError& error) const override;
 
 private:
 	enum TokenCacheLookupResult
@@ -89,9 +85,10 @@ private:
 				qint64 ttlMs) const;
 	imtgql::IGqlContextUniquePtr CreateContextInstance() const;
 	bool IsPatToken(const QByteArray& token) const;
-	void SetStatus(
-				imtgql::IGqlContextCreator::ContextCreationStatus* statusPtr,
-				imtgql::IGqlContextCreator::ContextCreationStatus status) const;
+	void SetError(
+				imtgql::IGqlContextCreator::ContextCreationError& error,
+				imtgql::IGqlContextCreator::ContextCreationStatus status,
+				const QString& message = QString()) const;
 
 private:
 	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);

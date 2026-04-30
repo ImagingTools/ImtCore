@@ -195,32 +195,21 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 		gqlHeaders.insert(key.toUtf8().toLower(), headers.value(key).toString().toUtf8());
 	}
 
-	// Extract auth token and productId from headers
-	QByteArray accessToken = gqlHeaders.value(QByteArrayLiteral("x-authentication-token"));
-	QByteArray productId = gqlHeaders.value(imtbase::s_productIdHeaderId);
-
 	if (!m_gqlContextCreatorCompPtr.IsValid()){
 		return CreateErrorResponse(QByteArrayLiteral("GraphQL context creator is not configured"), request);
 	}
 
-	QString contextErrorMessage;
-	imtgql::IGqlContextCreator::ContextCreationStatus contextStatus = imtgql::IGqlContextCreator::CCS_OK;
-	imtgql::IGqlContextUniquePtr gqlContextPtr = m_gqlContextCreatorCompPtr->CreateGqlContext(
-				accessToken,
-				productId,
-				QByteArray(),
-				gqlHeaders,
-				contextErrorMessage,
-				&contextStatus);
+	imtgql::IGqlContextCreator::ContextCreationError contextError;
+	imtgql::IGqlContextUniquePtr gqlContextPtr = m_gqlContextCreatorCompPtr->CreateGqlContext(gqlHeaders, contextError);
 	if (!gqlContextPtr.IsValid()){
-		if (contextStatus == imtgql::IGqlContextCreator::CCS_UNAUTHORIZED){
+		if (contextError.status == imtgql::IGqlContextCreator::CCS_UNAUTHORIZED){
 			return CreateErrorResponse(QByteArrayLiteral("Unauthorized: expired JWT token"), request);
 		}
-		if (contextStatus == imtgql::IGqlContextCreator::CCS_FORBIDDEN){
+		if (contextError.status == imtgql::IGqlContextCreator::CCS_FORBIDDEN){
 			return CreateErrorResponse(QByteArrayLiteral("Forbidden: invalid authentication token"), request);
 		}
 
-		return CreateErrorResponse(contextErrorMessage.toUtf8(), request);
+		return CreateErrorResponse(contextError.message.toUtf8(), request);
 	}
 
 	// Verify request is still alive after context creation (safety check)

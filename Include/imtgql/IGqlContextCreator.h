@@ -6,6 +6,9 @@
 #include <imtgql/IGqlContext.h>
 #include <imtgql/CGqlRequest.h>
 
+// Qt includes
+#include <QtCore/QString>
+
 
 namespace imtgql
 {
@@ -22,15 +25,16 @@ public:
 		CCS_INTERNAL_ERROR
 	};
 
+	struct ContextCreationError
+	{
+		ContextCreationStatus status = CCS_OK;
+		QString message;
+	};
+
 	virtual IGqlContextUniquePtr CreateGqlContext(
-				const QByteArray& token,
-				const QByteArray& productId,
-				const QByteArray& userId,
 				const IGqlContext::Headers& headers,
-				QString& errorMessage,
-				ContextCreationStatus* statusPtr = nullptr) const = 0;
+				ContextCreationError& error) const = 0;
 };
 
 
 } // namespace imtgql
-

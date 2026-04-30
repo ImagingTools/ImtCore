@@ -26,16 +26,15 @@ imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(
 		return nullptr;
 	}
 
-	QByteArray productId = headers.value(imtbase::s_productIdHeaderId);
-	imtgql::IGqlContextCreator::ContextCreationStatus status = imtgql::IGqlContextCreator::CCS_OK;
-	imtgql::IGqlContextUniquePtr gqlContextPtr = m_gqlContextCreatorCompPtr->CreateGqlContext(
-				token,
-				productId,
-				QByteArray(),
-				headers,
-				errorMessage,
-				&status);
+	imtgql::IGqlContext::Headers contextHeaders = headers;
+	if (!token.isEmpty() && !contextHeaders.contains(imtbase::s_authenticationTokenHeaderId)){
+		contextHeaders.insert(imtbase::s_authenticationTokenHeaderId, token);
+	}
+
+	imtgql::IGqlContextCreator::ContextCreationError contextError;
+	imtgql::IGqlContextUniquePtr gqlContextPtr = m_gqlContextCreatorCompPtr->CreateGqlContext(contextHeaders, contextError);
 	if (!gqlContextPtr.IsValid()){
+		errorMessage = contextError.message;
 		SendErrorMessage(0, errorMessage, "CGqlContextControllerComp");
 		return nullptr;
 	}
