@@ -227,7 +227,7 @@ QJsonObject CFilterSerializer::ToJson(const CFilter& filter)
 
     if (filter.HasWindow()){
         QJsonObject window;
-        window[QStringLiteral("offset")] = filter.GetOffset();
+        window[QStringLiteral("first")] = filter.GetOffset();
         window[QStringLiteral("count")] = filter.GetLimit();
         json[QStringLiteral("window")] = window;
     }
@@ -272,7 +272,7 @@ bool CFilterSerializer::FromJson(const QJsonObject& json, CFilter& filter)
     if (json.contains(QStringLiteral("window"))){
         const QJsonObject window = json[QStringLiteral("window")].toObject();
         filter.SetWindow(
-            window[QStringLiteral("offset")].toInt(-1),
+            window[QStringLiteral("first")].toInt(-1),
             window[QStringLiteral("count")].toInt(-1));
     }
 
