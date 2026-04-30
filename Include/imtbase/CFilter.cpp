@@ -2,10 +2,6 @@
 #include <imtbase/CFilter.h>
 
 
-// Qt includes
-#include <QtCore/QtGlobal>
-
-
 // STD includes
 #include <limits>
 
@@ -210,8 +206,6 @@ CFilter& CFilter::page(int pageNumber, int pageSize)
         ClearWindow();
         return *this;
     }
-
-    Q_ASSERT(pageSize > 0);
 
     const int zeroBasedPage = pageNumber - 1;
     // Guard the offset multiplication below: zeroBasedPage * pageSize must fit into int.
