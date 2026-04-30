@@ -95,6 +95,22 @@ public:
         int count = -1;
     };
 
+    static RuleSet AllOf(
+        const QVector<Rule>& rules = QVector<Rule>(),
+        const QVector<RuleSet>& children = QVector<RuleSet>());
+    static RuleSet AnyOf(
+        const QVector<Rule>& rules = QVector<Rule>(),
+        const QVector<RuleSet>& children = QVector<RuleSet>());
+
+    CFilter& search(const QString& text, const QByteArrayList& scopes = QByteArrayList());
+    CFilter& where(const QByteArray& path, const QString& predicate, const QVariant& argument = QVariant());
+    CFilter& all(const RuleSet& rules);
+    CFilter& any(const RuleSet& rules);
+    CFilter& orderBy(const QByteArray& path, bool descending = false);
+    CFilter& page(int pageNumber, int pageSize);
+    CFilter& window(int first, int count);
+    const CFilter& build() const;
+
     const Search& GetSearch() const;
     void SetSearch(const Search& search);
     void SetSearch(const QString& text, const QByteArrayList& scopes = QByteArrayList());

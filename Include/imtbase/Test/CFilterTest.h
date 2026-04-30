@@ -18,6 +18,7 @@ private slots:
     void CFilter_Search();
     void CFilter_Rules();
     void CFilter_RuleSets();
+    void CFilter_FluentApi();
     void CFilter_Orders();
     void CFilter_Window();
     void CFilter_Clear();
@@ -34,9 +35,11 @@ private slots:
     void ToQueryString_Window();
     void ToQueryString_Orders();
     void ToQueryString_Rules();
+    void ToQueryString_GroupRules();
     void FromQueryString_Search();
     void FromQueryString_Orders();
     void FromQueryString_Rules();
+    void FromQueryString_GroupRules();
     void FromQueryString_LeadingQuestionMark();
 
     void ToJson_Search();
@@ -46,6 +49,8 @@ private slots:
     void FromJson_Orders();
     void FromJson_Rules();
     void FromJson_Empty();
+
+    void SdlConverter_FromQmlModel();
 };
 
 

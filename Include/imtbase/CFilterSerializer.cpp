@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QtCore/QJsonArray>
+#include <QtCore/QJsonDocument>
 #include <QtCore/QMap>
 #include <QtCore/QStringList>
 #include <QtCore/QUrl>
@@ -66,15 +67,11 @@ QString CFilterSerializer::ToQueryString(const CFilter& filter)
         query.addQueryItem(QStringLiteral("scope"), scopes.join(QLatin1Char(',')));
     }
 
-    int ruleIndex = 0;
-    for (const CFilter::Rule& rule : filter.GetRules().rules){
-        if (!rule.IsValid()){
-            continue;
-        }
-        const QString prefix = QStringLiteral("rule[%1].").arg(ruleIndex++);
-        query.addQueryItem(prefix + QStringLiteral("path"), QString::fromUtf8(rule.path));
-        query.addQueryItem(prefix + QStringLiteral("pred"), rule.predicate);
-        query.addQueryItem(prefix + QStringLiteral("arg"), rule.argument.toString());
+    if (!filter.GetRules().IsEmpty()){
+        const QJsonObject rulesJson = ToJson(filter.GetRules());
+        query.addQueryItem(
+            QStringLiteral("rules"),
+            QString::fromUtf8(QJsonDocument(rulesJson).toJson(QJsonDocument::Compact)));
     }
 
     int orderIndex = 0;
@@ -164,14 +161,28 @@ bool CFilterSerializer::FromQueryString(const QString& queryString, CFilter& fil
         }
     }
 
-    CFilter::RuleSet ruleSet;
-    for (auto it = rules.cbegin(); it != rules.cend(); ++it){
-        const CFilter::Rule rule(it.value().path, it.value().predicate, it.value().argument);
-        if (rule.IsValid()){
-            ruleSet.rules << rule;
+    if (query.hasQueryItem(QStringLiteral("rules"))){
+        const QByteArray rulesJson = query.queryItemValue(QStringLiteral("rules"), QUrl::FullyDecoded).toUtf8();
+        const QJsonDocument rulesDocument = QJsonDocument::fromJson(rulesJson);
+        if (!rulesDocument.isObject()){
+            return false;
         }
+
+        CFilter::RuleSet ruleSet;
+        if (!FromJson(rulesDocument.object(), ruleSet)){
+            return false;
+        }
+        filter.SetRules(ruleSet);
+    } else {
+        CFilter::RuleSet ruleSet;
+        for (auto it = rules.cbegin(); it != rules.cend(); ++it){
+            const CFilter::Rule rule(it.value().path, it.value().predicate, it.value().argument);
+            if (rule.IsValid()){
+                ruleSet.rules << rule;
+            }
+        }
+        filter.SetRules(ruleSet);
     }
-    filter.SetRules(ruleSet);
 
     QVector<CFilter::Order> orderList;
     for (auto it = orders.cbegin(); it != orders.cend(); ++it){

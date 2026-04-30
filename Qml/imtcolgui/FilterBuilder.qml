@@ -6,15 +6,18 @@ import QtQuick 2.12
     \inqmlmodule imtcolgui
     \brief Pure QML fluent builder for standalone filter-request query strings.
 
-    This component keeps only local builder state and emits a query string that
-    can be parsed by imtbase::CFilterSerializer. It does not wrap or mimic the
-    existing collection-filter QML types.
+    This component keeps only local builder state and emits both a URL query
+    string and an SDL-friendly model that can be converted to imtbase::CFilter
+    on the server. It does not wrap or mimic existing collection-filter QML types.
 
     Example:
     \code
     myFilter.search("john", ["Name", "Email"])
             .where("Status", "is", "Active")
-            .where("Name", "like", searchText)
+            .any(function(or) {
+                or.where("Name", "like", searchText)
+                  .where("Email", "like", searchText)
+            })
             .orderBy("CreatedAt", true)
             .page(1, 50)
             .apply()
@@ -28,13 +31,15 @@ QtObject {
     property int offset: -1
     property int count: -1
     property string queryString: ""
+    property var filterModel: ({})
 
     signal filterReady(string queryString)
+    signal filterModelReady(var filterModel)
     signal filterChanged()
     signal cleared()
 
     readonly property double _maxSafeInteger: Number.MAX_SAFE_INTEGER
-    property var _rules: []
+    property var _rules: ({join: "all", items: [], sets: []})
     property var _orders: []
 
     function search(text, scopes) {
@@ -43,8 +48,23 @@ QtObject {
         return root
     }
 
+    function join(mode) {
+        _rules.join = _normalizeJoin(mode)
+        return root
+    }
+
     function where(path, predicate, argument) {
-        _rules = _rules.concat([{path: path, predicate: predicate || "is", argument: argument}])
+        _rules.items.push({path: path, pred: predicate || "is", arg: argument})
+        return root
+    }
+
+    function all(configure) {
+        _addGroup(_rules, "all", configure)
+        return root
+    }
+
+    function any(configure) {
+        _addGroup(_rules, "any", configure)
         return root
     }
 
@@ -79,7 +99,9 @@ QtObject {
     }
 
     function apply() {
-        queryString = _buildQueryString()
+        filterModel = _buildModel()
+        queryString = _buildQueryString(filterModel)
+        filterModelReady(filterModel)
         filterReady(queryString)
         filterChanged()
     }
@@ -90,41 +112,92 @@ QtObject {
         offset = -1
         count = -1
         queryString = ""
-        _rules = []
+        filterModel = ({})
+        _rules = {join: "all", items: [], sets: []}
         _orders = []
         cleared()
         return root
     }
 
-    function _buildQueryString() {
-        var parts = []
+    function _addGroup(parent, joinMode, configure) {
+        var group = {join: _normalizeJoin(joinMode), items: [], sets: []}
+        if (configure) {
+            configure(_groupBuilder(group))
+        }
+        parent.sets.push(group)
+    }
 
-        if (searchText !== "") {
-            parts.push("search=" + encodeURIComponent(searchText))
+    function _groupBuilder(group) {
+        return {
+            where: function(path, predicate, argument) {
+                group.items.push({path: path, pred: predicate || "is", arg: argument})
+                return this
+            },
+            all: function(configure) {
+                root._addGroup(group, "all", configure)
+                return this
+            },
+            any: function(configure) {
+                root._addGroup(group, "any", configure)
+                return this
+            }
+        }
+    }
+
+    function _normalizeJoin(mode) {
+        return String(mode || "all").toLowerCase() === "any" || String(mode || "").toLowerCase() === "or" ? "any" : "all"
+    }
+
+    function _hasRules(group) {
+        return group && ((group.items && group.items.length > 0) || (group.sets && group.sets.length > 0))
+    }
+
+    function _buildModel() {
+        var model = {}
+
+        if (searchText !== "" && searchScopes.length > 0) {
+            model.search = {text: searchText, scope: searchScopes.slice(0)}
         }
 
-        if (searchScopes.length > 0) {
-            parts.push("scope=" + encodeURIComponent(searchScopes.join(",")))
+        if (_hasRules(_rules)) {
+            model.rules = JSON.parse(JSON.stringify(_rules))
         }
 
-        for (var i = 0; i < _rules.length; ++i) {
-            var r = _rules[i]
-            var prefix = "rule[" + i + "]."
-            parts.push(prefix + "path=" + encodeURIComponent(r.path))
-            parts.push(prefix + "pred=" + encodeURIComponent(r.predicate))
-            parts.push(prefix + "arg=" + encodeURIComponent(r.argument))
-        }
-
-        for (var j = 0; j < _orders.length; ++j) {
-            var o = _orders[j]
-            var orderPrefix = "order[" + j + "]."
-            parts.push(orderPrefix + "path=" + encodeURIComponent(o.path))
-            parts.push(orderPrefix + "dir=" + (o.descending ? "down" : "up"))
+        if (_orders.length > 0) {
+            model.orders = _orders.slice(0)
         }
 
         if (offset >= 0 && count > 0) {
-            parts.push("offset=" + offset)
-            parts.push("count=" + count)
+            model.window = {first: offset, count: count}
+        }
+
+        return model
+    }
+
+    function _buildQueryString(model) {
+        var parts = []
+
+        if (model.search) {
+            parts.push("search=" + encodeURIComponent(model.search.text))
+            parts.push("scope=" + encodeURIComponent(model.search.scope.join(",")))
+        }
+
+        if (model.rules) {
+            parts.push("rules=" + encodeURIComponent(JSON.stringify(model.rules)))
+        }
+
+        if (model.orders) {
+            for (var j = 0; j < model.orders.length; ++j) {
+                var o = model.orders[j]
+                var orderPrefix = "order[" + j + "]."
+                parts.push(orderPrefix + "path=" + encodeURIComponent(o.path))
+                parts.push(orderPrefix + "dir=" + (o.descending ? "down" : "up"))
+            }
+        }
+
+        if (model.window) {
+            parts.push("offset=" + model.window.first)
+            parts.push("count=" + model.window.count)
         }
 
         return parts.join("&")

@@ -1,0 +1,48 @@
+schema {
+namespace: imtbase
+version: 1.0
+}
+
+
+# Standalone filter transport model used by QML clients and server-side CFilter conversion.
+type FilterSearch
+{
+text: String
+scope: [ID]
+}
+
+type FilterRule
+{
+path: ID!
+pred: String!
+arg: String
+}
+
+type FilterRuleSet
+{
+join: String!
+items: [FilterRule]
+sets: [FilterRuleSet]
+}
+
+type FilterOrder
+{
+path: ID!
+descending: Bool!
+}
+
+type FilterWindow
+{
+first: Integer!
+count: Integer!
+}
+
+type FilterRequest
+{
+search: FilterSearch
+rules: FilterRuleSet
+orders: [FilterOrder]
+window: FilterWindow
+}
+
+

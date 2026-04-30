@@ -2,6 +2,10 @@
 #include <imtbase/CFilter.h>
 
 
+// STD includes
+#include <limits>
+
+
 namespace imtbase
 {
 
@@ -132,6 +136,94 @@ bool CFilter::Window::operator==(const Window& other) const
 bool CFilter::Window::operator!=(const Window& other) const
 {
     return !(*this == other);
+}
+
+
+CFilter::RuleSet CFilter::AllOf(const QVector<Rule>& rules, const QVector<RuleSet>& children)
+{
+    RuleSet ruleSet(RuleSet::All);
+    ruleSet.rules = rules;
+    ruleSet.children = children;
+    return ruleSet;
+}
+
+
+CFilter::RuleSet CFilter::AnyOf(const QVector<Rule>& rules, const QVector<RuleSet>& children)
+{
+    RuleSet ruleSet(RuleSet::Any);
+    ruleSet.rules = rules;
+    ruleSet.children = children;
+    return ruleSet;
+}
+
+
+CFilter& CFilter::search(const QString& text, const QByteArrayList& scopes)
+{
+    SetSearch(text, scopes);
+    return *this;
+}
+
+
+CFilter& CFilter::where(const QByteArray& path, const QString& predicate, const QVariant& argument)
+{
+    AddRule(Rule(path, predicate, argument));
+    return *this;
+}
+
+
+CFilter& CFilter::all(const RuleSet& rules)
+{
+    RuleSet allRules = rules;
+    allRules.join = RuleSet::All;
+    AddRuleSet(allRules);
+    return *this;
+}
+
+
+CFilter& CFilter::any(const RuleSet& rules)
+{
+    RuleSet anyRules = rules;
+    anyRules.join = RuleSet::Any;
+    AddRuleSet(anyRules);
+    return *this;
+}
+
+
+CFilter& CFilter::orderBy(const QByteArray& path, bool descending)
+{
+    AddOrder(Order(path, descending));
+    return *this;
+}
+
+
+CFilter& CFilter::page(int pageNumber, int pageSize)
+{
+    if (pageNumber <= 0 || pageSize <= 0){
+        ClearWindow();
+        return *this;
+    }
+
+    const qint64 first = static_cast<qint64>(pageNumber - 1) * pageSize;
+    if (first > std::numeric_limits<int>::max()){
+        ClearWindow();
+        return *this;
+    }
+
+    SetWindow(static_cast<int>(first), pageSize);
+    return *this;
+}
+
+
+CFilter& CFilter::window(int first, int count)
+{
+    SetWindow(first, count);
+    return *this;
+}
+
+
+const CFilter& CFilter::build() const
+{
+    return *this;
 }
 
 
