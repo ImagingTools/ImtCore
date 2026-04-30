@@ -29,7 +29,8 @@ QtObject {
 
     property string textFilter: ""
     property var textFilteringInfoIds: []
-    // -1 means pagination is intentionally unset and should not be serialized.
+    // Pagination sentinel: -1 means both currentPage and pageSize are intentionally
+    // unset and should not be serialized.
     property int currentPage: -1
     property int pageSize: -1
     property string queryString: ""

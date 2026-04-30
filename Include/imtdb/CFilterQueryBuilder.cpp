@@ -94,7 +94,10 @@ QString CFilterQueryBuilder::BuildFilterExpression(
             part = MakeLikeCondition(fieldAccess, AddLikeBindValue(fieldFilter.value.toString(), bindValues));
             break;
         default:
-            qWarning() << "Unexpected filter operation" << static_cast<int>(fieldFilter.operation);
+            qWarning() << "Unexpected filter operation"
+                << static_cast<int>(fieldFilter.operation)
+                << "for field"
+                << QString::fromUtf8(fieldFilter.fieldId);
             break;
         }
 
