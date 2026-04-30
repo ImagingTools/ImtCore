@@ -125,7 +125,7 @@ QString CFilterQueryBuilder::BuildWindowClause(const imtbase::CFilter::Window& w
     if (!window.IsActive()){
         return QString();
     }
-    // CFilter::Window stores offset in first and limit in count; SQL requires LIMIT count OFFSET first ordering.
+    // Argument order differs from Window(first, count): SQL uses LIMIT count OFFSET first.
     return QStringLiteral("LIMIT %1 OFFSET %2").arg(window.count).arg(window.first);
 }
 

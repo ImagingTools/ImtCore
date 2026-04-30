@@ -39,7 +39,7 @@ int ExtractIndexedKey(const QString& key, const QString& prefix, const QString& 
 
     bool ok = false;
     const int index = key.mid(start, close - start).toInt(&ok);
-    return ok ? index : -1;
+    return ok ? index : s_invalidIndex;
 }
 
 
