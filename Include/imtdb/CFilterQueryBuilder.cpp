@@ -3,6 +3,7 @@
 
 
 // Qt includes
+#include <QtCore/QDebug>
 #include <QtCore/QStringList>
 
 
@@ -93,6 +94,7 @@ QString CFilterQueryBuilder::BuildFilterExpression(
             part = MakeLikeCondition(fieldAccess, AddLikeBindValue(fieldFilter.value.toString(), bindValues));
             break;
         default:
+            qWarning() << "Unexpected filter operation" << static_cast<int>(fieldFilter.operation);
             break;
         }
 

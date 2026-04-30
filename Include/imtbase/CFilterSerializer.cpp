@@ -332,7 +332,7 @@ QString CFilterSerializer::SortingOrderToString(CFilter::SortingOrder order)
     switch (order){
     case CFilter::SO_DESC: return QStringLiteral("desc");
     case CFilter::SO_ASC:  return QStringLiteral("asc");
-    default:               return QStringLiteral("none");
+    default:               return QString();
     }
 }
 
