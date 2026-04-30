@@ -13,6 +13,9 @@ namespace
 {
 
 
+const QString s_filterKeyPrefix = QStringLiteral("filter[");
+
+
 // Normalizes operation and sorting-order tokens for case-insensitive deserialization.
 QString NormalizeToken(const QString& value)
 {
@@ -118,18 +121,19 @@ bool CFilterSerializer::FromQueryString(const QString& queryString, CFilter& fil
     const QList<QPair<QString, QString>> items = query.queryItems(QUrl::FullyDecoded);
     for (const QPair<QString, QString>& item : items){
         const QString& key = item.first;
-        if (!key.startsWith(QStringLiteral("filter["))){
+        if (!key.startsWith(s_filterKeyPrefix)){
             continue;
         }
 
         const int firstClose = key.indexOf(QLatin1Char(']'));
         const int secondOpen = key.indexOf(QLatin1Char('['), firstClose);
         const int secondClose = key.indexOf(QLatin1Char(']'), secondOpen);
-        if (firstClose <= 7 || secondOpen < 0 || secondClose < 0){
+        const int fieldStart = s_filterKeyPrefix.size();
+        if (firstClose <= fieldStart || secondOpen < 0 || secondClose < 0){
             continue;
         }
 
-        const QByteArray fieldId = key.mid(7, firstClose - 7).toUtf8();
+        const QByteArray fieldId = key.mid(fieldStart, firstClose - fieldStart).toUtf8();
         const QString operation = key.mid(secondOpen + 1, secondClose - secondOpen - 1);
         expression.fieldFilters << CFilter::FieldFilter(
             fieldId,

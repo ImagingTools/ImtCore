@@ -7,6 +7,16 @@
 #include <QtCore/QStringList>
 
 
+namespace
+{
+
+
+const QString s_likeEscapeSql = QStringLiteral("ESCAPE '\\\\'");
+
+
+} // namespace
+
+
 namespace imtdb
 {
 
@@ -168,9 +178,9 @@ void CFilterQueryBuilder::SetUseJsonExtract(bool useJsonExtract)
 QString CFilterQueryBuilder::MakeLikeCondition(const QString& expression, const QString& placeholder) const
 {
     if (m_dialect == DD_SQLITE){
-        return QStringLiteral("LOWER(%1) LIKE LOWER(%2) ESCAPE '\\\\'").arg(expression, placeholder);
+        return QStringLiteral("LOWER(%1) LIKE LOWER(%2) %3").arg(expression, placeholder, s_likeEscapeSql);
     }
-    return QStringLiteral("%1 ILIKE %2 ESCAPE '\\\\'").arg(expression, placeholder);
+    return QStringLiteral("%1 ILIKE %2 %3").arg(expression, placeholder, s_likeEscapeSql);
 }
 
 
