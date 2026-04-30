@@ -64,8 +64,10 @@ inline bool IsLocalDomain(const QByteArray& domain)
 		}
 	}
 
-	WCHAR dnsHostName[256] = {};
-	DWORD dnsHostNameSize = 256;
+	enum { DnsComputerNameBufferLength = 256 };
+
+	WCHAR dnsHostName[DnsComputerNameBufferLength] = {};
+	DWORD dnsHostNameSize = DnsComputerNameBufferLength;
 	if (GetComputerNameExW(ComputerNameDnsHostname, dnsHostName, &dnsHostNameSize)){
 		QByteArray localDnsHostName = QString::fromWCharArray(dnsHostName).toUtf8();
 		if (normalizedDomain.compare(localDnsHostName, Qt::CaseInsensitive) == 0){
@@ -73,8 +75,8 @@ inline bool IsLocalDomain(const QByteArray& domain)
 		}
 	}
 
-	WCHAR dnsFullName[256] = {};
-	DWORD dnsFullNameSize = 256;
+	WCHAR dnsFullName[DnsComputerNameBufferLength] = {};
+	DWORD dnsFullNameSize = DnsComputerNameBufferLength;
 	if (GetComputerNameExW(ComputerNameDnsFullyQualified, dnsFullName, &dnsFullNameSize)){
 		QByteArray localDnsFullName = QString::fromWCharArray(dnsFullName).toUtf8();
 		if (normalizedDomain.compare(localDnsFullName, Qt::CaseInsensitive) == 0){
@@ -124,25 +126,23 @@ inline QByteArray JoinDomainUserId(const QByteArray& domain, const QByteArray& u
 }
 
 
+inline QByteArray NormalizeQualifiedUserId(const QByteArray& domain, const QByteArray& username)
+{
+	if (IsLocalDomain(domain)){
+		return username;
+	}
+
+	return JoinDomainUserId(domain, username);
+}
+
+
 inline QByteArray NormalizeUserId(const QByteArray& userId)
 {
 #ifdef Q_OS_WIN
 	QByteArray domain;
 	QByteArray username;
-	if (SplitRawDomainUserId(userId, domain, username)){
-		if (IsLocalDomain(domain)){
-			return username;
-		}
-
-		return JoinDomainUserId(domain, username);
-	}
-
-	if (SplitRawPrincipalUserId(userId, domain, username)){
-		if (IsLocalDomain(domain)){
-			return username;
-		}
-
-		return JoinDomainUserId(domain, username);
+	if (SplitRawDomainUserId(userId, domain, username) || SplitRawPrincipalUserId(userId, domain, username)){
+		return NormalizeQualifiedUserId(domain, username);
 	}
 #endif
 
