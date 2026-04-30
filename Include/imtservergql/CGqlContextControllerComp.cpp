@@ -27,7 +27,7 @@ imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(
 	}
 
 	imtgql::IGqlContext::Headers contextHeaders = headers;
-	// Preserve legacy callers that still pass the auth token separately.
+	// Preserve legacy callers until IGqlContextController's token parameter is removed.
 	if (!token.isEmpty() && !contextHeaders.contains(imtbase::s_authenticationTokenHeaderId)){
 		contextHeaders.insert(imtbase::s_authenticationTokenHeaderId, token);
 	}
