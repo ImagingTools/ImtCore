@@ -13,6 +13,7 @@ namespace
 {
 
 
+// Normalizes operation and sorting-order tokens for case-insensitive deserialization.
 QString NormalizeToken(const QString& value)
 {
     return value.trimmed().toLower();

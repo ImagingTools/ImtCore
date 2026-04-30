@@ -61,6 +61,7 @@ private:
     QString MakeJsonFieldAccess(const QString& fieldId) const;
     QString MakePlaceholder(int bindIndex) const;
     QString AddBindValue(const QVariant& value, QVariantList& bindValues) const;
+    QString AddLikeBindValue(const QString& value, QVariantList& bindValues) const;
     QString MakeFieldAccess(const QByteArray& fieldId) const;
     QString EscapeLikePattern(const QString& text) const;
     static QString QuoteIdentifier(const QString& identifier);

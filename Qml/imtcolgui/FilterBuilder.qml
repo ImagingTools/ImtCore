@@ -100,9 +100,9 @@ QtObject {
             var sortParts = []
             for (var j = 0; j < _sortFields.length; ++j) {
                 var s = _sortFields[j]
-                sortParts.push(s.field + ":" + s.direction)
+                sortParts.push(encodeURIComponent(s.field) + ":" + encodeURIComponent(s.direction))
             }
-            parts.push("sort=" + encodeURIComponent(sortParts.join(",")))
+            parts.push("sort=" + sortParts.join(","))
         }
 
         if (currentPage > 0) {

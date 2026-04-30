@@ -109,6 +109,8 @@ void CFilterTest::CPaginatedFilter_SetFilter()
 
     QCOMPARE(pager.GetFilter().GetTextFilter(), QStringLiteral("test"));
     QVERIFY(pager.GetFilter().HasPagination());
+    QCOMPARE(pager.GetFilter().GetPage(), 1);
+    QCOMPARE(pager.GetFilter().GetPageSize(), 50);
 }
 
 
