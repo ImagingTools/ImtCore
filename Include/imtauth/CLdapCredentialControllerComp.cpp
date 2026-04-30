@@ -25,9 +25,10 @@ bool CLdapCredentialControllerComp::CheckCredential(const QByteArray& login, con
 	int result = 0;
 #ifdef Q_OS_WIN
 	// Local domain by default
+	QByteArray normalizedLogin = LdapUserIdUtils::NormalizeUserId(login);
 	QByteArray domain;
 	QByteArray username;
-	LdapUserIdUtils::SplitUserId(login, domain, username);
+	LdapUserIdUtils::SplitUserId(normalizedLogin, domain, username);
 
 	HANDLE  hUser;
 	result = LogonUser(qUtf16Printable(username), qUtf16Printable(domain), qUtf16Printable(password), LOGON32_LOGON_INTERACTIVE, LOGON32_PROVIDER_DEFAULT, &hUser);
