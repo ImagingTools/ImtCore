@@ -101,5 +101,4 @@ inline void SplitUserId(const QByteArray& userId, QByteArray& domain, QByteArray
 
 } // namespace LdapUserIdUtils
 
-
 } // namespace imtauth
