@@ -140,11 +140,11 @@ bool CGqlContextCreatorComp::ResolveUserId(
 		return true;
 	}
 
+	// Keep calls into shared auth components serialized; their thread-safety is not guaranteed.
 	if (IsPatToken(token)){
 		QByteArray tokenId;
 		QByteArrayList scopes;
 		{
-			// Keep all calls into shared auth components serialized; their thread-safety is not guaranteed.
 			QMutexLocker validationLocker(&m_tokenValidationMutex);
 			if (!m_patManagerCompPtr.IsValid()){
 				errorMessage = QStringLiteral("Personal access token manager is not configured.");
@@ -166,7 +166,6 @@ bool CGqlContextCreatorComp::ResolveUserId(
 	}
 
 	{
-		// Keep all calls into shared auth components serialized; their thread-safety is not guaranteed.
 		QMutexLocker validationLocker(&m_tokenValidationMutex);
 		if (!m_jwtSessionControllerCompPtr.IsValid()){
 			errorMessage = QStringLiteral("JWT session controller is not configured.");
