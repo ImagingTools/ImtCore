@@ -46,25 +46,47 @@ public:
 				imtgql::IGqlContextCreator::ContextCreationStatus* statusPtr = nullptr) const override;
 
 private:
+	enum TokenCacheLookupResult
+	{
+		TCLR_MISS,
+		TCLR_VALID,
+		TCLR_INVALID
+	};
+
 	struct TokenCacheEntry
 	{
 		QByteArray userId;
 		QByteArray tokenId;
+		QByteArrayList scopes;
 		bool isPat = false;
+		bool isValid = true;
+		imtgql::IGqlContextCreator::ContextCreationStatus status = imtgql::IGqlContextCreator::CCS_OK;
 		qint64 expiresAt = 0;
 	};
 
 	bool ResolveUserId(
 				const QByteArray& token,
 				QByteArray& userId,
+				QByteArrayList& scopes,
+				bool& isPat,
 				QString& errorMessage,
 				imtgql::IGqlContextCreator::ContextCreationStatus& status) const;
-	bool TryGetCachedToken(const QByteArray& token, QByteArray& userId) const;
+	TokenCacheLookupResult TryGetCachedToken(
+				const QByteArray& token,
+				QByteArray& userId,
+				QByteArrayList& scopes,
+				bool& isPat,
+				QString& errorMessage,
+				imtgql::IGqlContextCreator::ContextCreationStatus& status) const;
 	void StoreCachedToken(
 				const QByteArray& token,
 				const QByteArray& userId,
 				const QByteArray& tokenId,
-				bool isPat) const;
+				const QByteArrayList& scopes,
+				bool isPat,
+				bool isValid,
+				imtgql::IGqlContextCreator::ContextCreationStatus status,
+				qint64 ttlMs) const;
 	imtgql::IGqlContextUniquePtr CreateContextInstance() const;
 	bool IsPatToken(const QByteArray& token) const;
 	void SetStatus(
@@ -78,7 +100,11 @@ private:
 	I_REF(imtauth::IJwtSessionController, m_jwtSessionControllerCompPtr);
 	I_REF(imtauth::IPersonalAccessTokenManager, m_patManagerCompPtr);
 
+	// TODO: Remove this mutex if the ACF component factory (I_FACT) is confirmed thread-safe.
+	// Currently serializes all context creation which may become a bottleneck under load.
 	mutable QMutex m_contextCreationMutex;
+	// TODO: Remove this mutex if IJwtSessionController and IPersonalAccessTokenManager
+	// implementations are confirmed thread-safe. Currently serializes all token validation.
 	mutable QMutex m_tokenValidationMutex;
 	mutable QMutex m_tokenCacheMutex;
 	mutable QHash<QByteArray, TokenCacheEntry> m_tokenCache;

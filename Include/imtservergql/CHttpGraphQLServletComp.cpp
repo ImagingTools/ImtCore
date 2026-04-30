@@ -24,6 +24,21 @@ namespace imtservergql
 {
 
 
+namespace
+{
+
+QString MaskToken(const QByteArray& token)
+{
+	if (token.isEmpty()){
+		return QStringLiteral("<empty>");
+	}
+
+	return QStringLiteral("***") + QString::fromUtf8(token.right(4));
+}
+
+} // namespace
+
+
 // protected methods
 
 // reimplemented (IRequestHandler)
@@ -101,7 +116,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 			SendCriticalMessage(
 						0,
 						QStringLiteral("Unable to create a GraphQL context for the access token '%1' for Command-ID: '%2'. Error: '%3'")
-											.arg(QString(accessToken), QString(gqlCommand), errorMessage),
+											.arg(MaskToken(accessToken), QString(gqlCommand), errorMessage),
 						QStringLiteral("GraphQL - servlet"));
 			return GenerateError(StatusCode::SC_INTERNAL_SERVER_ERROR, QStringLiteral("Request context is invalid"), request);
 		}

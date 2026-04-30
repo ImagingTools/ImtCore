@@ -28,11 +28,13 @@ constexpr const char* s_deprecatedPatPrefix = "pat_";
 constexpr const char* s_patPrefix = "imt_pat_";
 constexpr int s_deprecatedPatPrefixLength = 4;
 constexpr int s_patPrefixLength = 8;
+constexpr int s_maxTokenCacheSize = 10000;
 // Support both the current PAT prefix and the older prefix accepted by legacy callers.
 // Keep the token cache short-lived: it avoids bursts of remote validation calls
 // while limiting stale authorization data for both JWT and PAT tokens. Revocation
 // becomes visible after the TTL unless the component is recreated earlier.
 constexpr qint64 s_tokenCacheTtlMs = 5 * 60 * 1000;
+constexpr qint64 s_negativeTokenCacheTtlMs = 30 * 1000;
 
 } // namespace
 
@@ -58,9 +60,11 @@ imtgql::IGqlContextUniquePtr CGqlContextCreatorComp::CreateGqlContext(
 	}
 
 	QByteArray resolvedUserId = userId;
+	QByteArrayList scopes;
+	bool isPat = false;
 	if (!token.isEmpty() && resolvedUserId.isEmpty()){
 		imtgql::IGqlContextCreator::ContextCreationStatus authStatus = imtgql::IGqlContextCreator::CCS_OK;
-		if (!ResolveUserId(token, resolvedUserId, errorMessage, authStatus)){
+		if (!ResolveUserId(token, resolvedUserId, scopes, isPat, errorMessage, authStatus)){
 			SetStatus(statusPtr, authStatus);
 			return nullptr;
 		}
@@ -77,6 +81,9 @@ imtgql::IGqlContextUniquePtr CGqlContextCreatorComp::CreateGqlContext(
 	gqlContextPtr->SetToken(token);
 	gqlContextPtr->SetHeaders(headers);
 	gqlContextPtr->SetProductId(productId);
+	if (isPat){
+		gqlContextPtr->SetScopes(scopes);
+	}
 
 	imtgql::CGqlRequestContextManager::SetContext(dynamic_cast<imtgql::IGqlContext*>(gqlContextPtr.GetPtr()));
 
@@ -132,17 +139,25 @@ imtgql::IGqlContextUniquePtr CGqlContextCreatorComp::CreateGqlContext(
 bool CGqlContextCreatorComp::ResolveUserId(
 			const QByteArray& token,
 			QByteArray& userId,
+			QByteArrayList& scopes,
+			bool& isPat,
 			QString& errorMessage,
 			imtgql::IGqlContextCreator::ContextCreationStatus& status) const
 {
-	// Serialize calls into m_patManagerCompPtr and m_jwtSessionControllerCompPtr; their thread-safety is not guaranteed.
-	if (TryGetCachedToken(token, userId)){
+	TokenCacheLookupResult lookupResult = TryGetCachedToken(token, userId, scopes, isPat, errorMessage, status);
+	if (lookupResult == TCLR_VALID){
 		status = imtgql::IGqlContextCreator::CCS_OK;
 		return true;
+	}
+	if (lookupResult == TCLR_INVALID){
+		return false;
 	}
 
 	if (IsPatToken(token)){
 		QByteArray tokenId;
+		bool isTokenValid = false;
+		isPat = true;
+		scopes.clear();
 		{
 			QMutexLocker locker(&m_tokenValidationMutex);
 			if (!m_patManagerCompPtr.IsValid()){
@@ -151,20 +166,28 @@ bool CGqlContextCreatorComp::ResolveUserId(
 				return false;
 			}
 
-			QByteArrayList scopes;
 			if (!m_patManagerCompPtr->ValidateToken(token, userId, tokenId, scopes)){
 				errorMessage = QStringLiteral("Invalid personal access token.");
 				status = imtgql::IGqlContextCreator::CCS_FORBIDDEN;
-				return false;
 			}
-
-			m_patManagerCompPtr->UpdateLastUsedAt(tokenId);
+			else{
+				isTokenValid = true;
+				m_patManagerCompPtr->UpdateLastUsedAt(tokenId);
+			}
 		}
 
-		StoreCachedToken(token, userId, tokenId, true);
+		if (!isTokenValid){
+			StoreCachedToken(token, QByteArray(), QByteArray(), QByteArrayList(), true, false, status, s_negativeTokenCacheTtlMs);
+			return false;
+		}
+
+		StoreCachedToken(token, userId, tokenId, scopes, true, true, imtgql::IGqlContextCreator::CCS_OK, s_tokenCacheTtlMs);
 		return true;
 	}
 
+	isPat = false;
+	using JwtState = imtauth::IJwtSessionController::JwtState;
+	JwtState state = JwtState::JS_NONE;
 	{
 		QMutexLocker locker(&m_tokenValidationMutex);
 		if (!m_jwtSessionControllerCompPtr.IsValid()){
@@ -173,43 +196,63 @@ bool CGqlContextCreatorComp::ResolveUserId(
 			return false;
 		}
 
-		using JwtState = imtauth::IJwtSessionController::JwtState;
-		JwtState state = m_jwtSessionControllerCompPtr->ValidateJwt(token);
-		if (state == JwtState::JS_EXPIRED){
-			errorMessage = QStringLiteral("JWT token expired.");
-			status = imtgql::IGqlContextCreator::CCS_UNAUTHORIZED;
-			return false;
+		state = m_jwtSessionControllerCompPtr->ValidateJwt(token);
+		if (state != JwtState::JS_EXPIRED && state != JwtState::JS_INVALID){
+			userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(token);
 		}
-		if (state == JwtState::JS_INVALID){
-			errorMessage = QStringLiteral("Invalid JWT token.");
-			status = imtgql::IGqlContextCreator::CCS_FORBIDDEN;
-			return false;
-		}
-
-		userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(token);
 	}
 
-	StoreCachedToken(token, userId, QByteArray(), false);
+	if (state == JwtState::JS_EXPIRED){
+		errorMessage = QStringLiteral("JWT token expired.");
+		status = imtgql::IGqlContextCreator::CCS_UNAUTHORIZED;
+		StoreCachedToken(token, QByteArray(), QByteArray(), QByteArrayList(), false, false, status, s_negativeTokenCacheTtlMs);
+		return false;
+	}
+	if (state == JwtState::JS_INVALID){
+		errorMessage = QStringLiteral("Invalid JWT token.");
+		status = imtgql::IGqlContextCreator::CCS_FORBIDDEN;
+		StoreCachedToken(token, QByteArray(), QByteArray(), QByteArrayList(), false, false, status, s_negativeTokenCacheTtlMs);
+		return false;
+	}
+
+	StoreCachedToken(token, userId, QByteArray(), QByteArrayList(), false, true, imtgql::IGqlContextCreator::CCS_OK, s_tokenCacheTtlMs);
 	return true;
 }
 
 
-bool CGqlContextCreatorComp::TryGetCachedToken(const QByteArray& token, QByteArray& userId) const
+CGqlContextCreatorComp::TokenCacheLookupResult CGqlContextCreatorComp::TryGetCachedToken(
+			const QByteArray& token,
+			QByteArray& userId,
+			QByteArrayList& scopes,
+			bool& isPat,
+			QString& errorMessage,
+			imtgql::IGqlContextCreator::ContextCreationStatus& status) const
 {
 	const qint64 now = QDateTime::currentMSecsSinceEpoch();
 	QMutexLocker cacheLocker(&m_tokenCacheMutex);
 	auto iter = m_tokenCache.find(token);
 	if (iter == m_tokenCache.end()){
-		return false;
+		return TCLR_MISS;
 	}
 
 	if (iter->expiresAt <= now){
 		m_tokenCache.erase(iter);
-		return false;
+		return TCLR_MISS;
+	}
+
+	if (!iter->isValid || iter->userId.isEmpty()){
+		isPat = iter->isPat;
+		status = iter->isValid ? imtgql::IGqlContextCreator::CCS_FORBIDDEN : iter->status;
+		errorMessage = status == imtgql::IGqlContextCreator::CCS_UNAUTHORIZED
+				? QStringLiteral("JWT token expired.")
+				: QStringLiteral("Invalid authentication token.");
+		return TCLR_INVALID;
 	}
 
 	userId = iter->userId;
-	return true;
+	scopes = iter->scopes;
+	isPat = iter->isPat;
+	return TCLR_VALID;
 }
 
 
@@ -217,16 +260,40 @@ void CGqlContextCreatorComp::StoreCachedToken(
 			const QByteArray& token,
 			const QByteArray& userId,
 			const QByteArray& tokenId,
-			bool isPat) const
+			const QByteArrayList& scopes,
+			bool isPat,
+			bool isValid,
+			imtgql::IGqlContextCreator::ContextCreationStatus status,
+			qint64 ttlMs) const
 {
 	TokenCacheEntry entry;
 	entry.userId = userId;
 	entry.tokenId = tokenId;
+	entry.scopes = scopes;
 	entry.isPat = isPat;
-	entry.expiresAt = QDateTime::currentMSecsSinceEpoch() + s_tokenCacheTtlMs;
+	entry.isValid = isValid;
+	entry.status = status;
+	const qint64 now = QDateTime::currentMSecsSinceEpoch();
+	entry.expiresAt = now + ttlMs;
 
 	QMutexLocker cacheLocker(&m_tokenCacheMutex);
 	m_tokenCache.insert(token, entry);
+	if (m_tokenCache.size() <= s_maxTokenCacheSize){
+		return;
+	}
+
+	for (auto iter = m_tokenCache.begin(); iter != m_tokenCache.end(); ){
+		if (iter->expiresAt <= now){
+			iter = m_tokenCache.erase(iter);
+		}
+		else{
+			++iter;
+		}
+	}
+
+	if (m_tokenCache.size() > s_maxTokenCacheSize){
+		m_tokenCache.clear();
+	}
 }
 
 
