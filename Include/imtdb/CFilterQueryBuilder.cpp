@@ -125,6 +125,7 @@ QString CFilterQueryBuilder::BuildWindowClause(const imtbase::CFilter::Window& w
     if (!window.IsActive()){
         return QString();
     }
+    // CFilter::Window stores semantic order as first/count; SQL syntax is LIMIT count OFFSET first.
     return QStringLiteral("LIMIT %1 OFFSET %2").arg(window.count).arg(window.first);
 }
 

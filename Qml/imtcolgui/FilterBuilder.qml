@@ -53,7 +53,8 @@ QtObject {
     }
 
     function page(pageNumber, pageSize) {
-        if (pageNumber > 0 && pageSize > 0) {
+        var maxSafeInteger = 9007199254740991
+        if (pageNumber > 0 && pageSize > 0 && (pageNumber - 1) <= Math.floor(maxSafeInteger / pageSize)) {
             offset = (pageNumber - 1) * pageSize
             count = pageSize
         } else {

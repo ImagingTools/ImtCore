@@ -3,8 +3,8 @@
 
 
 // Qt includes
-#include <QtCore/QMap>
 #include <QtCore/QJsonArray>
+#include <QtCore/QMap>
 #include <QtCore/QStringList>
 #include <QtCore/QUrl>
 #include <QtCore/QUrlQuery>
