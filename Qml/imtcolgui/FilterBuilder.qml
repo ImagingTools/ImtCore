@@ -155,7 +155,27 @@ QtObject {
     }
 
     function _hasRules(group) {
-        return group && ((group.items && group.items.length > 0) || (group.sets && group.sets.length > 0))
+        return group && (group.items.length > 0 || group.sets.length > 0)
+    }
+
+    function _copyValue(value) {
+        if (value instanceof Array) {
+            var arrayCopy = []
+            for (var i = 0; i < value.length; ++i) {
+                arrayCopy.push(_copyValue(value[i]))
+            }
+            return arrayCopy
+        }
+
+        if (value && typeof value === "object") {
+            var objectCopy = {}
+            for (var key in value) {
+                objectCopy[key] = _copyValue(value[key])
+            }
+            return objectCopy
+        }
+
+        return value
     }
 
     function _buildModel() {
@@ -166,11 +186,11 @@ QtObject {
         }
 
         if (_hasRules(_rules)) {
-            model.rules = JSON.parse(JSON.stringify(_rules))
+            model.rules = _copyValue(_rules)
         }
 
         if (_orders.length > 0) {
-            model.orders = _orders.slice(0)
+            model.orders = _copyValue(_orders)
         }
 
         if (offset >= 0 && count > 0) {
