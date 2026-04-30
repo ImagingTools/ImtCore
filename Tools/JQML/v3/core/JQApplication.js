@@ -5,6 +5,7 @@ const TextController = require('./TextController')
 const MemoryController = require('./MemoryController')
 
 module.exports = {
+    rootPath: '',
     root: null,
 
     init: function(){ 
