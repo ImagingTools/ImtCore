@@ -161,7 +161,7 @@ QtObject {
         var model = {}
 
         if (searchText !== "" && searchScopes.length > 0) {
-            model.search = {text: searchText, scope: searchScopes.slice(0)}
+            model.search = {text: searchText, scopes: searchScopes.slice(0)}
         }
 
         if (_hasRules(_rules)) {
@@ -184,7 +184,7 @@ QtObject {
 
         if (model.search) {
             parts.push("search=" + encodeURIComponent(model.search.text))
-            parts.push("scope=" + encodeURIComponent(model.search.scope.join(",")))
+            parts.push("scope=" + encodeURIComponent(model.search.scopes.join(",")))
         }
 
         if (model.rules) {

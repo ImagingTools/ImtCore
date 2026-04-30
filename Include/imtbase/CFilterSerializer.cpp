@@ -214,7 +214,7 @@ QJsonObject CFilterSerializer::ToJson(const CFilter& filter)
         for (const QByteArray& scope : filter.GetSearch().scopes){
             scopes << QString::fromUtf8(scope);
         }
-        search[QStringLiteral("scope")] = scopes;
+        search[QStringLiteral("scopes")] = scopes;
         json[QStringLiteral("search")] = search;
     }
 
@@ -255,7 +255,10 @@ bool CFilterSerializer::FromJson(const QJsonObject& json, CFilter& filter)
     const QJsonObject search = json[QStringLiteral("search")].toObject();
     if (!search.isEmpty()){
         QByteArrayList scopes;
-        for (const QJsonValue& value : search[QStringLiteral("scope")].toArray()){
+        const QJsonArray scopeArray = search.contains(QStringLiteral("scopes"))
+            ? search[QStringLiteral("scopes")].toArray()
+            : search[QStringLiteral("scope")].toArray();
+        for (const QJsonValue& value : scopeArray){
             scopes << value.toString().toUtf8();
         }
         filter.SetSearch(search[QStringLiteral("text")].toString(), scopes);

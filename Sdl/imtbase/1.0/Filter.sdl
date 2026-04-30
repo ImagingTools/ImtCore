@@ -8,7 +8,7 @@ version: 1.0
 type FilterSearch
 {
 text: String
-scope: [ID]
+scopes: [ID]
 }
 
 type FilterRule

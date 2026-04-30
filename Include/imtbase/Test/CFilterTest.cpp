@@ -346,7 +346,7 @@ void CFilterTest::FromJson_Search()
     scopes << QStringLiteral("Name");
     QJsonObject search;
     search[QStringLiteral("text")] = QStringLiteral("hello");
-    search[QStringLiteral("scope")] = scopes;
+    search[QStringLiteral("scopes")] = scopes;
 
     QJsonObject json;
     json[QStringLiteral("search")] = search;
@@ -415,7 +415,7 @@ void CFilterTest::SdlConverter_FromQmlModel()
 {
     QVariantMap search;
     search[QStringLiteral("text")] = QStringLiteral("john");
-    search[QStringLiteral("scope")] = QStringList({ QStringLiteral("Name"), QStringLiteral("Email") });
+    search[QStringLiteral("scopes")] = QStringList({ QStringLiteral("Name"), QStringLiteral("Email") });
 
     QVariantMap rule;
     rule[QStringLiteral("path")] = QStringLiteral("Status");
