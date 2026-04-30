@@ -21,11 +21,33 @@ namespace LdapUserIdUtils
 {
 
 
+inline QByteArray TrimmedDomainName(const QByteArray& domain)
+{
+	QByteArray normalizedDomain = domain.trimmed();
+	while (normalizedDomain.endsWith('.')){
+		normalizedDomain.chop(1);
+	}
+
+	return normalizedDomain;
+}
+
+
+inline QByteArray NormalizedDomainName(const QByteArray& domain)
+{
+	QByteArray normalizedDomain = TrimmedDomainName(domain);
+	if (normalizedDomain.contains('.')){
+		return normalizedDomain.toLower();
+	}
+
+	return normalizedDomain.toUpper();
+}
+
+
 inline bool IsLocalDomain(const QByteArray& domain)
 {
 #ifdef Q_OS_WIN
-	QByteArray normalizedDomain = domain.trimmed();
-	if (normalizedDomain.isEmpty() || normalizedDomain == "."){
+	QByteArray normalizedDomain = TrimmedDomainName(domain);
+	if (normalizedDomain.isEmpty()){
 		return true;
 	}
 
@@ -33,11 +55,31 @@ inline bool IsLocalDomain(const QByteArray& domain)
 		return true;
 	}
 
-	WCHAR computerName[MAX_COMPUTERNAME_LENGTH + 1];
+	WCHAR computerName[MAX_COMPUTERNAME_LENGTH + 1] = {};
 	DWORD computerNameSize = MAX_COMPUTERNAME_LENGTH + 1;
 	if (GetComputerNameW(computerName, &computerNameSize)){
 		QByteArray localComputerName = QString::fromWCharArray(computerName).toUtf8();
-		return normalizedDomain.compare(localComputerName, Qt::CaseInsensitive) == 0;
+		if (normalizedDomain.compare(localComputerName, Qt::CaseInsensitive) == 0){
+			return true;
+		}
+	}
+
+	WCHAR dnsHostName[256] = {};
+	DWORD dnsHostNameSize = 256;
+	if (GetComputerNameExW(ComputerNameDnsHostname, dnsHostName, &dnsHostNameSize)){
+		QByteArray localDnsHostName = QString::fromWCharArray(dnsHostName).toUtf8();
+		if (normalizedDomain.compare(localDnsHostName, Qt::CaseInsensitive) == 0){
+			return true;
+		}
+	}
+
+	WCHAR dnsFullName[256] = {};
+	DWORD dnsFullNameSize = 256;
+	if (GetComputerNameExW(ComputerNameDnsFullyQualified, dnsFullName, &dnsFullNameSize)){
+		QByteArray localDnsFullName = QString::fromWCharArray(dnsFullName).toUtf8();
+		if (normalizedDomain.compare(localDnsFullName, Qt::CaseInsensitive) == 0){
+			return true;
+		}
 	}
 #else
 	Q_UNUSED(domain)
@@ -47,7 +89,7 @@ inline bool IsLocalDomain(const QByteArray& domain)
 }
 
 
-inline bool SplitRawUserId(const QByteArray& userId, QByteArray& domain, QByteArray& username)
+inline bool SplitRawDomainUserId(const QByteArray& userId, QByteArray& domain, QByteArray& username)
 {
 	int separatorIndex = userId.indexOf('\\');
 	if (separatorIndex < 0){
@@ -62,17 +104,45 @@ inline bool SplitRawUserId(const QByteArray& userId, QByteArray& domain, QByteAr
 }
 
 
+inline bool SplitRawPrincipalUserId(const QByteArray& userId, QByteArray& domain, QByteArray& username)
+{
+	int separatorIndex = userId.lastIndexOf('@');
+	if (separatorIndex <= 0 || separatorIndex == userId.size() - 1){
+		return false;
+	}
+
+	username = userId.left(separatorIndex);
+	domain = userId.mid(separatorIndex + 1);
+
+	return true;
+}
+
+
+inline QByteArray JoinDomainUserId(const QByteArray& domain, const QByteArray& username)
+{
+	return NormalizedDomainName(domain) + "\\" + username;
+}
+
+
 inline QByteArray NormalizeUserId(const QByteArray& userId)
 {
 #ifdef Q_OS_WIN
 	QByteArray domain;
 	QByteArray username;
-	if (!SplitRawUserId(userId, domain, username)){
-		return userId;
+	if (SplitRawDomainUserId(userId, domain, username)){
+		if (IsLocalDomain(domain)){
+			return username;
+		}
+
+		return JoinDomainUserId(domain, username);
 	}
 
-	if (IsLocalDomain(domain)){
-		return username;
+	if (SplitRawPrincipalUserId(userId, domain, username)){
+		if (IsLocalDomain(domain)){
+			return username;
+		}
+
+		return JoinDomainUserId(domain, username);
 	}
 #endif
 
@@ -87,12 +157,12 @@ inline void SplitUserId(const QByteArray& userId, QByteArray& domain, QByteArray
 
 	QByteArray prefix;
 	QByteArray suffix;
-	if (SplitRawUserId(userId, prefix, suffix)){
+	if (SplitRawDomainUserId(userId, prefix, suffix) || SplitRawPrincipalUserId(userId, prefix, suffix)){
 		if (IsLocalDomain(prefix)){
 			username = suffix;
 		}
 		else{
-			domain = prefix;
+			domain = NormalizedDomainName(prefix);
 			username = suffix;
 		}
 	}
