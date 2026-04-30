@@ -208,7 +208,7 @@ CFilter& CFilter::page(int pageNumber, int pageSize)
     }
 
     const int zeroBasedPage = pageNumber - 1;
-    // Guard the offset multiplication below: zeroBasedPage * pageSize must fit into int.
+    // Guard the offset multiplication below from undefined signed integer overflow.
     if (zeroBasedPage > std::numeric_limits<int>::max() / pageSize){
         ClearWindow();
         return *this;

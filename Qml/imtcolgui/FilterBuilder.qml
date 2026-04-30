@@ -39,8 +39,12 @@ QtObject {
     signal cleared()
 
     readonly property double _maxSafeInteger: Number.MAX_SAFE_INTEGER
-    property var _rules: _createEmptyRuleSet()
+    property var _rules: null
     property var _orders: []
+
+    Component.onCompleted: {
+        _rules = _createEmptyRuleSet()
+    }
 
     function search(text, scopes) {
         searchText = text || ""
@@ -49,22 +53,22 @@ QtObject {
     }
 
     function join(mode) {
-        _rules.join = _normalizeJoin(mode)
+        _ensureRuleSet().join = _normalizeJoin(mode)
         return root
     }
 
     function where(path, predicate, argument) {
-        _rules.items.push({path: path, pred: predicate || "is", arg: argument})
+        _ensureRuleSet().items.push({path: path, pred: predicate || "is", arg: argument})
         return root
     }
 
     function all(configure) {
-        _addGroup(_rules, "all", configure)
+        _addGroup(_ensureRuleSet(), "all", configure)
         return root
     }
 
     function any(configure) {
-        _addGroup(_rules, "any", configure)
+        _addGroup(_ensureRuleSet(), "any", configure)
         return root
     }
 
@@ -122,6 +126,13 @@ QtObject {
 
     function _createEmptyRuleSet() {
         return {join: "all", items: [], sets: []}
+    }
+
+    function _ensureRuleSet() {
+        if (!_rules) {
+            _rules = _createEmptyRuleSet()
+        }
+        return _rules
     }
 
     function _addGroup(parent, joinMode, configure) {
