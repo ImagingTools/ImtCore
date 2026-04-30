@@ -183,9 +183,6 @@ CollectionFilter {
 
         // Apply sort
         if (_sortField !== "") {
-            var sortOrder = (_sortDirection === "desc")
-                ? logicalOperation.OR  // placeholder — real sort enum
-                : logicalOperation.AND // placeholder
             setSortingInfo(_sortField, _sortDirection === "desc" ? "Desc" : "Asc")
         }
 
