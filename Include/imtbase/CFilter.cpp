@@ -198,7 +198,11 @@ CFilter& CFilter::orderBy(const QByteArray& path, bool descending)
 
 CFilter& CFilter::page(int pageNumber, int pageSize)
 {
-    if (pageNumber <= 0 || pageSize <= 0){
+    if (pageNumber <= 0){
+        ClearWindow();
+        return *this;
+    }
+    if (pageSize <= 0){
         ClearWindow();
         return *this;
     }

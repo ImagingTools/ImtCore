@@ -93,6 +93,7 @@ QtObject {
     }
 
     function window(first, size) {
+        // window() is offset-based and accepts first=0; page() is 1-based.
         offset = first >= 0 ? first : -1
         count = size > 0 ? size : -1
         return root
