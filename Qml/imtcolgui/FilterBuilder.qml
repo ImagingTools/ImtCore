@@ -1,212 +1,279 @@
 import QtQuick 2.12
 
-
-/*!
-    \qmltype FilterBuilder
-    \inqmlmodule imtcolgui
-    \brief Pure QML fluent builder for standalone filter-request query strings.
-
-    This component keeps only local builder state and emits both a URL query
-    string and an SDL-friendly model that can be converted to imtbase::CFilter
-    on the server. It does not wrap or mimic existing collection-filter QML types.
-
-    Example:
-    \code
-    myFilter.search("john", ["Name", "Email"])
-            .where("Status", "is", "Active")
-            .any(function(or) {
-                or.where("Name", "like", searchText)
-                  .where("Email", "like", searchText)
-            })
-            .orderBy("CreatedAt", true)
-            .page(1, 50)
-            .apply()
-    \endcode
-*/
 QtObject {
     id: root
 
-    property string searchText: ""
-    property var searchScopes: []
-    property int offset: -1
-    property int count: -1
-    property string queryString: ""
-    property var filterModel: null
+    // =========================
+    // CONFIG / SCHEMA
+    // =========================
 
-    signal filterReady(string queryString)
-    signal filterModelReady(var filterModel)
-    signal filterChanged()
+    /*!
+        Schema example:
+        {
+            name: { operators: ["=", "contains"] },
+            age:  { operators: [">", "<", "="] }
+        }
+    */
+    property var schema: ({})
+    property bool strictValidation: false
+
+    // =========================
+    // STATE (SOURCE OF TRUTH)
+    // =========================
+
+    property var query: ({
+        combinator: "and",
+        rules: []
+    })
+
+    property var sort: []
+    property var window: ({ first: -1, count: -1 })
+
+    property var search: ({
+        text: "",
+        scopes: []
+    })
+
+    property string queryString: ""
+
+    signal changed(var model, string queryString)
     signal cleared()
 
-    readonly property double _maxSafeInteger: Number.MAX_SAFE_INTEGER
-    property var _rules: null
-    property var _orders: []
+    // =========================
+    // INTERNAL
+    // =========================
+
+    property var _stack: []
 
     Component.onCompleted: {
-        _rules = _createEmptyRuleSet()
+        _resetStack()
     }
 
-    function search(text, scopes) {
-        searchText = text || ""
-        searchScopes = scopes || []
+    function _resetStack() {
+        _stack = [query]
+    }
+
+    function _current() {
+        return _stack[_stack.length - 1]
+    }
+
+    // =========================
+    // VALIDATION
+    // =========================
+
+    function _validateField(field) {
+        if (!field) {
+            console.warn("FilterBuilder: empty field")
+            return false
+        }
+
+        if (schema && schema[field]) {
+            return true
+        }
+
+        if (strictValidation) {
+            console.warn("FilterBuilder: unknown field:", field)
+            return false
+        }
+
+        return true
+    }
+
+    function _validateOperator(field, operator) {
+        if (!operator)
+            return false
+
+        if (schema && schema[field] && schema[field].operators) {
+            return schema[field].operators.indexOf(operator) !== -1
+        }
+
+        return true
+    }
+
+    function _normalizeOperator(op) {
+        if (!op)
+            return "="
+
+        op = String(op).toLowerCase()
+
+        switch (op) {
+        case "eq":
+        case "=": return "="
+        case "like":
+        case "contains": return "contains"
+        case ">":
+        case "gt": return ">"
+        case "<":
+        case "lt": return "<"
+        default: return op
+        }
+    }
+
+    function _inferType(value) {
+        if (value === null) return "null"
+        if (typeof value === "number") return "number"
+        if (typeof value === "boolean") return "boolean"
+        if (value instanceof Array) return "array"
+        return "string"
+    }
+
+    // =========================
+    // BUILDER API
+    // =========================
+
+    function where(field, operator, value) {
+        if (!_validateField(field))
+            return root
+
+        operator = _normalizeOperator(operator)
+
+        if (!_validateOperator(field, operator)) {
+            console.warn("FilterBuilder: invalid operator", operator, "for", field)
+            return root
+        }
+
+        if (value === undefined) {
+            console.warn("FilterBuilder: undefined value for", field)
+            return root
+        }
+
+        var rule = {
+            field: field,
+            operator: operator,
+            value: value,
+            type: _inferType(value)
+        }
+
+        _current().rules.push(rule)
         return root
     }
 
-    function join(mode) {
-        _ensureRuleSet().join = _normalizeJoin(mode)
+    function beginGroup(combinator) {
+        var group = {
+            combinator: _normalizeCombinator(combinator),
+            rules: []
+        }
+
+        _current().rules.push(group)
+        _stack.push(group)
+
         return root
     }
 
-    function where(path, predicate, argument) {
-        _ensureRuleSet().items.push({path: path, pred: predicate || "is", arg: argument})
+    function beginAnd() { return beginGroup("and") }
+    function beginOr() { return beginGroup("or") }
+
+    function endGroup() {
+        if (_stack.length > 1) {
+            _stack.pop()
+        } else {
+            console.warn("FilterBuilder: unmatched endGroup()")
+        }
         return root
     }
 
-    function all(configure) {
-        _addGroup(_ensureRuleSet(), "all", configure)
-        return root
-    }
+    function orderBy(field, descending) {
+        if (!_validateField(field))
+            return root
 
-    function any(configure) {
-        _addGroup(_ensureRuleSet(), "any", configure)
-        return root
-    }
+        sort.push({
+            field: field,
+            direction: descending ? "desc" : "asc"
+        })
 
-    function orderBy(path, descending) {
-        _orders = _orders.concat([{path: path, descending: descending === true}])
         return root
     }
 
     function page(pageNumber, pageSize) {
-        if (pageNumber > 0 && pageSize > 0 && pageNumber <= _maxSafeInteger) {
-            var zeroBasedPage = pageNumber - 1
-            if (_canMultiplyWithoutOverflow(zeroBasedPage, pageSize)) {
-                offset = zeroBasedPage * pageSize
-                count = pageSize
-                return root
-            }
+        if (pageNumber > 0 && pageSize > 0) {
+            window.first = (pageNumber - 1) * pageSize
+            window.count = pageSize
         }
-
-        offset = -1
-        count = -1
         return root
     }
 
-    function _canMultiplyWithoutOverflow(left, right) {
-        return left <= Math.floor(_maxSafeInteger / right)
-    }
-
-    function window(first, size) {
-        // window() is offset-based and accepts first=0; page() is 1-based.
-        offset = first >= 0 ? first : -1
-        count = size > 0 ? size : -1
+    function windowed(first, count) {
+        window.first = first >= 0 ? first : -1
+        window.count = count > 0 ? count : -1
         return root
     }
+
+    function searchText(text, scopes) {
+        search.text = text || ""
+        search.scopes = scopes || []
+        return root
+    }
+
+    // =========================
+    // PUBLIC HELPERS
+    // =========================
+
+    function getQuery() {
+        return JSON.parse(JSON.stringify(query))
+    }
+
+    function getModel() {
+        return _buildModel()
+    }
+
+    function clone() {
+        var copy = Qt.createQmlObject('import QtQuick 2.0; QtObject {}', root)
+
+        copy.query = getQuery()
+        copy.sort = JSON.parse(JSON.stringify(sort))
+        copy.window = JSON.parse(JSON.stringify(window))
+        copy.search = JSON.parse(JSON.stringify(search))
+
+        return copy
+    }
+
+    // =========================
+    // APPLY / RESET
+    // =========================
 
     function apply() {
-        filterModel = _buildModel()
-        queryString = _buildQueryString(filterModel)
-        filterModelReady(filterModel)
-        filterReady(queryString)
-        filterChanged()
+        if (_stack.length !== 1) {
+            console.warn("FilterBuilder: unclosed groups, auto-fixing")
+            while (_stack.length > 1)
+                _stack.pop()
+        }
+
+        var model = _buildModel()
+        queryString = _buildQueryString(model)
+
+        changed(model, queryString)
     }
 
     function reset() {
-        searchText = ""
-        searchScopes = []
-        offset = -1
-        count = -1
+        query = { combinator: "and", rules: [] }
+        sort = []
+        window = { first: -1, count: -1 }
+        search = { text: "", scopes: [] }
         queryString = ""
-        filterModel = null
-        _rules = _createEmptyRuleSet()
-        _orders = []
+
+        _resetStack()
         cleared()
+
         return root
     }
 
-    function _createEmptyRuleSet() {
-        return {join: "all", items: [], sets: []}
-    }
-
-    function _ensureRuleSet() {
-        if (!_rules) {
-            _rules = _createEmptyRuleSet()
-        }
-        return _rules
-    }
-
-    function _addGroup(parent, joinMode, configure) {
-        var group = {join: _normalizeJoin(joinMode), items: [], sets: []}
-        if (configure) {
-            configure(_groupBuilder(group))
-        }
-        parent.sets.push(group)
-    }
-
-    function _groupBuilder(group) {
-        return {
-            where: function(path, predicate, argument) {
-                group.items.push({path: path, pred: predicate || "is", arg: argument})
-                return this
-            },
-            all: function(configure) {
-                root._addGroup(group, "all", configure)
-                return this
-            },
-            any: function(configure) {
-                root._addGroup(group, "any", configure)
-                return this
-            }
-        }
-    }
-
-    function _normalizeJoin(mode) {
-        var normalized = String(mode || "all").toLowerCase()
-        return normalized === "any" || normalized === "or" ? "any" : "all"
-    }
-
-    function _hasRules(group) {
-        return group && (group.items.length > 0 || group.sets.length > 0)
-    }
-
-    function _copyValue(value) {
-        if (value instanceof Array) {
-            var arrayCopy = []
-            for (var i = 0; i < value.length; ++i) {
-                arrayCopy.push(_copyValue(value[i]))
-            }
-            return arrayCopy
-        }
-
-        if (value && typeof value === "object") {
-            var objectCopy = {}
-            for (var key in value) {
-                objectCopy[key] = _copyValue(value[key])
-            }
-            return objectCopy
-        }
-
-        return value
-    }
+    // =========================
+    // BUILD
+    // =========================
 
     function _buildModel() {
-        var model = {}
-
-        if (searchText !== "" && searchScopes.length > 0) {
-            model.search = {text: searchText, scopes: searchScopes.slice(0)}
+        var model = {
+            query: JSON.parse(JSON.stringify(query))
         }
 
-        if (_hasRules(_rules)) {
-            model.rules = _copyValue(_rules)
-        }
+        if (sort.length > 0)
+            model.sort = JSON.parse(JSON.stringify(sort))
 
-        if (_orders.length > 0) {
-            model.orders = _copyValue(_orders)
-        }
+        if (window.first >= 0 && window.count > 0)
+            model.window = JSON.parse(JSON.stringify(window))
 
-        if (offset >= 0 && count > 0) {
-            model.window = {first: offset, count: count}
-        }
+        if (search.text && search.scopes.length > 0)
+            model.search = JSON.parse(JSON.stringify(search))
 
         return model
     }
@@ -214,29 +281,27 @@ QtObject {
     function _buildQueryString(model) {
         var parts = []
 
-        if (model.search) {
-            parts.push("search=" + encodeURIComponent(model.search.text))
-            parts.push("scope=" + encodeURIComponent(model.search.scopes.join(",")))
-        }
+        if (model.query)
+            parts.push("query=" + encodeURIComponent(JSON.stringify(model.query)))
 
-        if (model.rules) {
-            parts.push("rules=" + encodeURIComponent(JSON.stringify(model.rules)))
-        }
-
-        if (model.orders) {
-            for (var j = 0; j < model.orders.length; ++j) {
-                var o = model.orders[j]
-                var orderPrefix = "order[" + j + "]."
-                parts.push(orderPrefix + "path=" + encodeURIComponent(o.path))
-                parts.push(orderPrefix + "dir=" + (o.descending ? "down" : "up"))
-            }
-        }
+        if (model.sort)
+            parts.push("sort=" + encodeURIComponent(JSON.stringify(model.sort)))
 
         if (model.window) {
             parts.push("offset=" + model.window.first)
             parts.push("count=" + model.window.count)
         }
 
+        if (model.search) {
+            parts.push("search=" + encodeURIComponent(model.search.text))
+            parts.push("scope=" + encodeURIComponent(model.search.scopes.join(",")))
+        }
+
         return parts.join("&")
+    }
+
+    function _normalizeCombinator(c) {
+        c = String(c || "and").toLowerCase()
+        return c === "or" ? "or" : "and"
     }
 }
