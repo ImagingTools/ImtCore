@@ -69,12 +69,19 @@ inline QByteArray NormalizeUserId(const QByteArray& userId)
 inline void SplitUserId(const QByteArray& userId, QByteArray& domain, QByteArray& username)
 {
 	domain = ".";
-	username = NormalizeUserId(userId);
+	username = userId;
 
-	int separatorIndex = username.indexOf('\\');
+	int separatorIndex = userId.indexOf('\\');
 	if (separatorIndex >= 0){
-		domain = username.left(separatorIndex);
-		username = username.mid(separatorIndex + 1);
+		QByteArray prefix = userId.left(separatorIndex);
+		QByteArray suffix = userId.mid(separatorIndex + 1);
+		if (IsLocalDomain(prefix)){
+			username = suffix;
+		}
+		else{
+			domain = prefix;
+			username = suffix;
+		}
 	}
 }
 

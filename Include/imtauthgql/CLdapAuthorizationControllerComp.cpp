@@ -104,42 +104,48 @@ istd::TUniqueInterfacePtr<imtauth::IUserInfo> CLdapAuthorizationControllerComp::
 		}
 	}
 
-	NetUserGetInfo(serverName, qUtf16Printable(username), 3, (LPBYTE *)&userInfo3BufPtr);
+	NET_API_STATUS userInfoStatus = NetUserGetInfo(serverName, qUtf16Printable(username), 3, (LPBYTE *)&userInfo3BufPtr);
 	if (computerName != nullptr){
 		NetApiBufferFree(computerName);
 	}
 
-	if (userInfo3BufPtr != nullptr){
-		istd::TDelPtr<imtauth::CIdentifiableUserInfo> userInfoPtr;
-		userInfoPtr.SetPtr(new imtauth::CIdentifiableUserInfo);
-
-		userInfoPtr->SetObjectUuid(QUuid::createUuid().toByteArray(QUuid::WithoutBraces));
-
-		imtauth::IUserInfo::SystemInfo systemInfo;
-		systemInfo.systemId = *m_systemIdAttrPtr;
-		systemInfo.systemName = "LDAP";
-
-		userInfoPtr->AddToSystem(systemInfo);
-		userInfoPtr->SetId(normalizedUserId);
-
-		QByteArray password = QString::fromWCharArray(userInfo3BufPtr->usri3_password).toUtf8();
-		userInfoPtr->SetPasswordHash(password);
-
-		QString name = QString::fromWCharArray(userInfo3BufPtr->usri3_full_name);
-		if (!name.isEmpty()){
-			userInfoPtr->SetName(name);
-		}
-		else{
-			userInfoPtr->SetName(normalizedUserId);
+	if (userInfoStatus != 0 || userInfo3BufPtr == nullptr){
+		if (userInfo3BufPtr != nullptr){
+			NetApiBufferFree(userInfo3BufPtr);
 		}
 
-		QString description = QString::fromWCharArray(userInfo3BufPtr->usri3_comment);
-		userInfoPtr->SetDescription(description);
-
-		NetApiBufferFree(userInfo3BufPtr);
-
-		return userInfoPtr.PopPtr();
+		return nullptr;
 	}
+
+	istd::TDelPtr<imtauth::CIdentifiableUserInfo> userInfoPtr;
+	userInfoPtr.SetPtr(new imtauth::CIdentifiableUserInfo);
+
+	userInfoPtr->SetObjectUuid(QUuid::createUuid().toByteArray(QUuid::WithoutBraces));
+
+	imtauth::IUserInfo::SystemInfo systemInfo;
+	systemInfo.systemId = *m_systemIdAttrPtr;
+	systemInfo.systemName = "LDAP";
+
+	userInfoPtr->AddToSystem(systemInfo);
+	userInfoPtr->SetId(normalizedUserId);
+
+	QByteArray password = QString::fromWCharArray(userInfo3BufPtr->usri3_password).toUtf8();
+	userInfoPtr->SetPasswordHash(password);
+
+	QString name = QString::fromWCharArray(userInfo3BufPtr->usri3_full_name);
+	if (!name.isEmpty()){
+		userInfoPtr->SetName(name);
+	}
+	else{
+		userInfoPtr->SetName(normalizedUserId);
+	}
+
+	QString description = QString::fromWCharArray(userInfo3BufPtr->usri3_comment);
+	userInfoPtr->SetDescription(description);
+
+	NetApiBufferFree(userInfo3BufPtr);
+
+	return userInfoPtr.PopPtr();
 
 #else
 	Q_UNUSED(ldapUserId)
