@@ -50,8 +50,10 @@ QString CFilterQueryBuilder::BuildTextFilter(
 
     QStringList parts;
     for (const QByteArray& columnId : columnIds){
-        bindValues << (QStringLiteral("%") + EscapeLikePattern(text) + QStringLiteral("%"));
-        parts << MakeLikeCondition(MakeFieldAccess(columnId), MakePlaceholder(bindValues.size()));
+        const QString placeholder = AddBindValue(
+            QStringLiteral("%") + EscapeLikePattern(text) + QStringLiteral("%"),
+            bindValues);
+        parts << MakeLikeCondition(MakeFieldAccess(columnId), placeholder);
     }
 
     return QStringLiteral("(%1)").arg(parts.join(QStringLiteral(" OR ")));
@@ -73,32 +75,29 @@ QString CFilterQueryBuilder::BuildFilterExpression(
         QString part;
         switch (fieldFilter.operation){
         case imtbase::CFilter::FO_EQUAL:
-            bindValues << fieldFilter.value;
-            part = QStringLiteral("%1 = %2").arg(fieldAccess, MakePlaceholder(bindValues.size()));
+            part = QStringLiteral("%1 = %2").arg(fieldAccess, AddBindValue(fieldFilter.value, bindValues));
             break;
         case imtbase::CFilter::FO_NOT_EQUAL:
-            bindValues << fieldFilter.value;
-            part = QStringLiteral("%1 != %2").arg(fieldAccess, MakePlaceholder(bindValues.size()));
+            part = QStringLiteral("%1 != %2").arg(fieldAccess, AddBindValue(fieldFilter.value, bindValues));
             break;
         case imtbase::CFilter::FO_LESS:
-            bindValues << fieldFilter.value;
-            part = QStringLiteral("%1 < %2").arg(fieldAccess, MakePlaceholder(bindValues.size()));
+            part = QStringLiteral("%1 < %2").arg(fieldAccess, AddBindValue(fieldFilter.value, bindValues));
             break;
         case imtbase::CFilter::FO_GREATER:
-            bindValues << fieldFilter.value;
-            part = QStringLiteral("%1 > %2").arg(fieldAccess, MakePlaceholder(bindValues.size()));
+            part = QStringLiteral("%1 > %2").arg(fieldAccess, AddBindValue(fieldFilter.value, bindValues));
             break;
         case imtbase::CFilter::FO_NOT_LESS:
-            bindValues << fieldFilter.value;
-            part = QStringLiteral("%1 >= %2").arg(fieldAccess, MakePlaceholder(bindValues.size()));
+            part = QStringLiteral("%1 >= %2").arg(fieldAccess, AddBindValue(fieldFilter.value, bindValues));
             break;
         case imtbase::CFilter::FO_NOT_GREATER:
-            bindValues << fieldFilter.value;
-            part = QStringLiteral("%1 <= %2").arg(fieldAccess, MakePlaceholder(bindValues.size()));
+            part = QStringLiteral("%1 <= %2").arg(fieldAccess, AddBindValue(fieldFilter.value, bindValues));
             break;
         case imtbase::CFilter::FO_CONTAINS:
-            bindValues << (QStringLiteral("%") + EscapeLikePattern(fieldFilter.value.toString()) + QStringLiteral("%"));
-            part = MakeLikeCondition(fieldAccess, MakePlaceholder(bindValues.size()));
+            part = MakeLikeCondition(
+                fieldAccess,
+                AddBindValue(
+                    QStringLiteral("%") + EscapeLikePattern(fieldFilter.value.toString()) + QStringLiteral("%"),
+                    bindValues));
             break;
         }
 
@@ -190,6 +189,13 @@ QString CFilterQueryBuilder::MakePlaceholder(int bindIndex) const
         return QStringLiteral("$%1").arg(bindIndex);
     }
     return QStringLiteral("?");
+}
+
+
+QString CFilterQueryBuilder::AddBindValue(const QVariant& value, QVariantList& bindValues) const
+{
+    bindValues << value;
+    return MakePlaceholder(bindValues.size());
 }
 
 

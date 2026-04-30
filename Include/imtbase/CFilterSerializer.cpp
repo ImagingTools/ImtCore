@@ -9,6 +9,19 @@
 #include <QtCore/QUrlQuery>
 
 
+namespace
+{
+
+
+QString NormalizeToken(const QString& value)
+{
+    return value.trimmed().toLower();
+}
+
+
+} // namespace
+
+
 namespace imtbase
 {
 
@@ -302,7 +315,7 @@ QString CFilterSerializer::FieldOperationToString(CFilter::FilterOperation opera
 
 CFilter::FilterOperation CFilterSerializer::StringToFieldOperation(const QString& value)
 {
-    const QString normalized = value.toLower();
+    const QString normalized = NormalizeToken(value);
     if (normalized == QLatin1String("ne"))       return CFilter::FO_NOT_EQUAL;
     if (normalized == QLatin1String("lt"))       return CFilter::FO_LESS;
     if (normalized == QLatin1String("gt"))       return CFilter::FO_GREATER;
@@ -325,7 +338,7 @@ QString CFilterSerializer::SortingOrderToString(CFilter::SortingOrder order)
 
 CFilter::SortingOrder CFilterSerializer::StringToSortingOrder(const QString& value)
 {
-    const QString normalized = value.toLower();
+    const QString normalized = NormalizeToken(value);
     if (normalized == QLatin1String("desc")){
         return CFilter::SO_DESC;
     }
