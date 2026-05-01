@@ -17,7 +17,6 @@ type FilterRule
 field: ID!
 operator: String!
 value: String
-type: String
 }
 
 union FilterQueryEntry = FilterRule | FilterQuery
@@ -47,4 +46,3 @@ query: FilterQuery
 sort: [FilterOrder]
 window: FilterWindow
 }
-

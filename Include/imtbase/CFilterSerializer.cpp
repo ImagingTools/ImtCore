@@ -47,38 +47,33 @@ int ExtractIndexedKey(const QString& key, const QString& prefix, const QString& 
 QString PredicateToOperator(const QString& predicate)
 {
     const QString normalized = NormalizeToken(predicate);
-    if (normalized == QLatin1String("is")){
+    if (normalized == QLatin1String("is") || normalized == QLatin1String("eq") || normalized == QLatin1String("=")){
         return QStringLiteral("=");
     }
-    if (normalized == QLatin1String("like")){
+    if (normalized == QLatin1String("like") || normalized == QLatin1String("contains")){
         return QStringLiteral("contains");
     }
-    if (normalized == QLatin1String("after")){
+    if (normalized == QLatin1String("after") || normalized == QLatin1String("gt") || normalized == QLatin1String(">")){
         return QStringLiteral(">");
     }
-    if (normalized == QLatin1String("before")){
+    if (normalized == QLatin1String("before") || normalized == QLatin1String("lt") || normalized == QLatin1String("<")){
         return QStringLiteral("<");
     }
-    return predicate;
+    if (normalized == QLatin1String("nin") || normalized == QLatin1String("not_in")){
+        return QStringLiteral("not_in");
+    }
+    if (normalized == QLatin1String("in") ||
+        normalized == QLatin1String("between") ||
+        normalized == QLatin1String("not_between")){
+        return normalized;
+    }
+    return QString();
 }
 
 
 QString OperatorToPredicate(const QString& op)
 {
-    const QString normalized = NormalizeToken(op);
-    if (normalized == QLatin1String("=") || normalized == QLatin1String("eq")){
-        return QStringLiteral("is");
-    }
-    if (normalized == QLatin1String("contains") || normalized == QLatin1String("like")){
-        return QStringLiteral("like");
-    }
-    if (normalized == QLatin1String(">") || normalized == QLatin1String("gt")){
-        return QStringLiteral("after");
-    }
-    if (normalized == QLatin1String("<") || normalized == QLatin1String("lt")){
-        return QStringLiteral("before");
-    }
-    return op;
+    return PredicateToOperator(op);
 }
 
 
@@ -88,25 +83,37 @@ QString JoinToCombinator(imtbase::CFilter::RuleSet::Join join)
 }
 
 
-QString ValueTypeToQmlType(const QVariant& value)
+bool HasOnlyKeys(const QJsonObject& json, const QStringList& keys)
 {
-    switch (value.type()){
-    case QVariant::Invalid:
-        return QStringLiteral("undefined");
-    case QVariant::Bool:
-        return QStringLiteral("boolean");
-    case QVariant::Int:
-    case QVariant::UInt:
-    case QVariant::LongLong:
-    case QVariant::ULongLong:
-    case QVariant::Double:
-        return QStringLiteral("number");
-    case QVariant::List:
-    case QVariant::StringList:
-        return QStringLiteral("array");
-    default:
-        return QStringLiteral("string");
+    for (auto it = json.constBegin(); it != json.constEnd(); ++it){
+        if (!keys.contains(it.key())){
+            return false;
+        }
     }
+    return true;
+}
+
+
+QJsonValue NormalizeValue(const QString& op, const QJsonValue& value)
+{
+    if ((op == QLatin1String("in") || op == QLatin1String("not_in")) && !value.isArray()){
+        QJsonArray array;
+        array << value;
+        return array;
+    }
+    return value;
+}
+
+
+bool ValidateValueByOperator(const QString& op, const QJsonValue& value)
+{
+    if (op == QLatin1String("in") || op == QLatin1String("not_in")){
+        return value.isArray() && !value.toArray().isEmpty();
+    }
+    if (op == QLatin1String("between") || op == QLatin1String("not_between")){
+        return value.isArray() && value.toArray().size() == 2;
+    }
+    return !value.isArray();
 }
 
 
@@ -115,6 +122,13 @@ imtbase::CFilter::RuleSet::Join CombinatorToJoin(const QString& combinator)
     return NormalizeToken(combinator) == QLatin1String("or")
         ? imtbase::CFilter::RuleSet::Any
         : imtbase::CFilter::RuleSet::All;
+}
+
+
+bool IsValidCombinator(const QString& combinator)
+{
+    const QString normalized = NormalizeToken(combinator);
+    return normalized == QLatin1String("and") || normalized == QLatin1String("or");
 }
 
 
@@ -128,11 +142,14 @@ QJsonObject ToQmlQuery(const imtbase::CFilter::RuleSet& rules)
         if (!rule.IsValid()){
             continue;
         }
+        const QString op = PredicateToOperator(rule.predicate);
+        if (op.isEmpty()){
+            continue;
+        }
         QJsonObject item;
         item[QStringLiteral("field")] = QString::fromUtf8(rule.path);
-        item[QStringLiteral("operator")] = PredicateToOperator(rule.predicate);
+        item[QStringLiteral("operator")] = op;
         item[QStringLiteral("value")] = QJsonValue::fromVariant(rule.argument);
-        item[QStringLiteral("type")] = ValueTypeToQmlType(rule.argument);
         items << item;
     }
     for (const imtbase::CFilter::RuleSet& child : rules.children){
@@ -148,11 +165,26 @@ QJsonObject ToQmlQuery(const imtbase::CFilter::RuleSet& rules)
 
 bool FromQmlQuery(const QJsonObject& json, imtbase::CFilter::RuleSet& rules)
 {
-    rules.join = CombinatorToJoin(json[QStringLiteral("combinator")].toString());
+    if (!json.contains(QStringLiteral("combinator")) ||
+        !json.contains(QStringLiteral("rules")) ||
+        !HasOnlyKeys(json, { QStringLiteral("combinator"), QStringLiteral("rules") })){
+        return false;
+    }
+
+    const QString combinator = json[QStringLiteral("combinator")].toString();
+    if (!IsValidCombinator(combinator)){
+        return false;
+    }
+    rules.join = CombinatorToJoin(combinator);
 
     for (const QJsonValue& value : json[QStringLiteral("rules")].toArray()){
         const QJsonObject item = value.toObject();
         if (item.contains(QStringLiteral("rules")) || item.contains(QStringLiteral("combinator"))){
+            if (!item.contains(QStringLiteral("rules")) ||
+                !item.contains(QStringLiteral("combinator")) ||
+                !HasOnlyKeys(item, { QStringLiteral("combinator"), QStringLiteral("rules") })){
+                return false;
+            }
             imtbase::CFilter::RuleSet child;
             if (!FromQmlQuery(item, child)){
                 return false;
@@ -163,10 +195,30 @@ bool FromQmlQuery(const QJsonObject& json, imtbase::CFilter::RuleSet& rules)
             continue;
         }
 
+        if (!item.contains(QStringLiteral("field")) ||
+            !item.contains(QStringLiteral("operator")) ||
+            !item.contains(QStringLiteral("value")) ||
+            !HasOnlyKeys(item, { QStringLiteral("field"), QStringLiteral("operator"), QStringLiteral("value") })){
+            return false;
+        }
+
+        const QString predicate = OperatorToPredicate(item[QStringLiteral("operator")].toString());
+        if (predicate.isEmpty()){
+            return false;
+        }
+        const QByteArray field = item[QStringLiteral("field")].toString().toUtf8();
+        if (field.isEmpty()){
+            return false;
+        }
+        const QJsonValue argument = NormalizeValue(predicate, item[QStringLiteral("value")]);
+        if (!ValidateValueByOperator(predicate, argument)){
+            return false;
+        }
+
         const imtbase::CFilter::Rule rule(
-            item[QStringLiteral("field")].toString().toUtf8(),
-            OperatorToPredicate(item[QStringLiteral("operator")].toString()),
-            item[QStringLiteral("value")].toVariant());
+            field,
+            predicate,
+            argument.toVariant());
         if (rule.IsValid()){
             rules.rules << rule;
         }
@@ -275,7 +327,7 @@ bool CFilterSerializer::FromQueryString(const QString& queryString, CFilter& fil
 
         const int predicateRuleIndex = ExtractIndexedKey(item.first, s_rulePrefix, QStringLiteral(".pred"));
         if (predicateRuleIndex >= 0){
-            rules[predicateRuleIndex].predicate = item.second;
+            rules[predicateRuleIndex].predicate = OperatorToPredicate(item.second);
             continue;
         }
 
@@ -567,7 +619,7 @@ bool CFilterSerializer::FromJson(const QJsonObject& json, CFilter::RuleSet& rule
         const QJsonObject item = value.toObject();
         const CFilter::Rule rule(
             item[QStringLiteral("path")].toString().toUtf8(),
-            item[QStringLiteral("pred")].toString(),
+            OperatorToPredicate(item[QStringLiteral("pred")].toString()),
             item[QStringLiteral("arg")].toVariant());
         if (rule.IsValid()){
             rules.rules << rule;

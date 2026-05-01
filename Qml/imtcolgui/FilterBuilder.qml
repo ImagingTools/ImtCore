@@ -8,12 +8,13 @@ QtObject {
     // =========================
 
     /*!
-        Schema example:
-        {
-            name: { operators: ["=", "contains"] },
-            age:  { operators: [">", "<", "="] }
-        }
+        Field schema example:
+        [
+            { name: "id", operators: ["=", "in", "not_in"] },
+            { name: "age", operators: [">", "<", "between"] }
+        ]
     */
+    property var fields: []
     property var schema: ({})
     property bool strictValidation: false
 
@@ -45,6 +46,8 @@ QtObject {
 
     property var _stack: []
 
+    onQueryChanged: _resetStack()
+
     Component.onCompleted: {
         _resetStack()
     }
@@ -67,11 +70,11 @@ QtObject {
             return false
         }
 
-        if (schema && schema[field]) {
+        if (_fieldSchema(field) !== null) {
             return true
         }
 
-        if (strictValidation) {
+        if ((fields && fields.length > 0) || strictValidation) {
             console.warn("FilterBuilder: unknown field:", field)
             return false
         }
@@ -83,8 +86,14 @@ QtObject {
         if (!operator)
             return false
 
-        if (schema && schema[field] && schema[field].operators) {
-            return schema[field].operators.indexOf(operator) !== -1
+        if (_supportedOperators().indexOf(operator) === -1) {
+            console.warn("FilterBuilder: unsupported operator:", operator)
+            return false
+        }
+
+        var fieldInfo = _fieldSchema(field)
+        if (fieldInfo && fieldInfo.operators) {
+            return fieldInfo.operators.indexOf(operator) !== -1
         }
 
         return true
@@ -105,16 +114,88 @@ QtObject {
         case "gt": return ">"
         case "<":
         case "lt": return "<"
+        case "nin":
+        case "not_in": return "not_in"
+        case "in": return "in"
+        case "between": return "between"
+        case "not_between": return "not_between"
         default: return op
         }
     }
 
-    function _inferType(value) {
-        if (value === null) return "null"
-        if (typeof value === "number") return "number"
-        if (typeof value === "boolean") return "boolean"
-        if (value instanceof Array) return "array"
-        return "string"
+    function _fieldSchema(field) {
+        if (fields && fields.length > 0) {
+            for (var i = 0; i < fields.length; ++i) {
+                if (fields[i] && fields[i].name === field)
+                    return fields[i]
+            }
+        }
+
+        if (schema && schema[field])
+            return schema[field]
+
+        return null
+    }
+
+    function _supportedOperators() {
+        return ["=", ">", "<", "contains", "in", "not_in", "between", "not_between"]
+    }
+
+    function _isArray(value) {
+        return value instanceof Array
+    }
+
+    function _containsUndefined(values) {
+        if (!_isArray(values))
+            return values === undefined
+
+        for (var i = 0; i < values.length; ++i) {
+            if (values[i] === undefined)
+                return true
+        }
+
+        return false
+    }
+
+    function _normalizeValue(operator, value) {
+        if (operator === "in" || operator === "not_in") {
+            return _isArray(value) ? JSON.parse(JSON.stringify(value)) : [value]
+        }
+
+        if (_isArray(value))
+            return JSON.parse(JSON.stringify(value))
+
+        return value
+    }
+
+    function _validateValueByOperator(operator, value) {
+        if (_containsUndefined(value)) {
+            console.warn("FilterBuilder: undefined value")
+            return false
+        }
+
+        if (operator === "in" || operator === "not_in") {
+            if (!_isArray(value) || value.length === 0) {
+                console.warn("FilterBuilder:", operator, "requires a non-empty array")
+                return false
+            }
+            return true
+        }
+
+        if (operator === "between" || operator === "not_between") {
+            if (!_isArray(value) || value.length !== 2) {
+                console.warn("FilterBuilder:", operator, "requires an array with exactly two values")
+                return false
+            }
+            return true
+        }
+
+        if (_isArray(value)) {
+            console.warn("FilterBuilder:", operator, "requires a scalar value")
+            return false
+        }
+
+        return true
     }
 
     // =========================
@@ -132,16 +213,19 @@ QtObject {
             return root
         }
 
-        if (value === undefined) {
-            console.warn("FilterBuilder: undefined value for", field)
+        if (_containsUndefined(value)) {
+            console.warn("FilterBuilder: undefined value")
             return root
         }
+
+        value = _normalizeValue(operator, value)
+        if (!_validateValueByOperator(operator, value))
+            return root
 
         var rule = {
             field: field,
             operator: operator,
-            value: value,
-            type: _inferType(value)
+            value: value
         }
 
         _current().rules.push(rule)

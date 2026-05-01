@@ -16,7 +16,53 @@ const QString s_likeEscapeSql = QStringLiteral("ESCAPE '\\\\'");
 
 QString NormalizePredicate(const QString& predicate)
 {
-    return predicate.trimmed().toLower();
+    const QString normalized = predicate.trimmed().toLower();
+    if (normalized == QLatin1String("is") ||
+        normalized == QLatin1String("eq") ||
+        normalized == QLatin1String("=")){
+        return QStringLiteral("=");
+    }
+    if (normalized == QLatin1String("like") ||
+        normalized == QLatin1String("contains")){
+        return QStringLiteral("contains");
+    }
+    if (normalized == QLatin1String("after") ||
+        normalized == QLatin1String("gt") ||
+        normalized == QLatin1String(">")){
+        return QStringLiteral(">");
+    }
+    if (normalized == QLatin1String("before") ||
+        normalized == QLatin1String("lt") ||
+        normalized == QLatin1String("<")){
+        return QStringLiteral("<");
+    }
+    if (normalized == QLatin1String("nin") ||
+        normalized == QLatin1String("not_in")){
+        return QStringLiteral("not_in");
+    }
+    if (normalized == QLatin1String("in") ||
+        normalized == QLatin1String("between") ||
+        normalized == QLatin1String("not_between")){
+        return normalized;
+    }
+    return normalized;
+}
+
+
+QVariantList ToVariantList(const QVariant& value)
+{
+    if (value.type() == QVariant::StringList){
+        QVariantList result;
+        for (const QString& item : value.toStringList()){
+            result << item;
+        }
+        return result;
+    }
+    const QVariantList values = value.toList();
+    if (!values.isEmpty()){
+        return values;
+    }
+    return { value };
 }
 
 
@@ -150,26 +196,46 @@ QString CFilterQueryBuilder::BuildRuleClause(const imtbase::CFilter::Rule& rule,
 
     const QString fieldAccess = MakeFieldAccess(rule.path);
     const QString predicate = NormalizePredicate(rule.predicate);
-    if (predicate == QLatin1String("is")){
+    if (predicate == QLatin1String("=")){
         return QStringLiteral("%1 = %2").arg(fieldAccess, AddBindValue(rule.argument, bindValues));
     }
-    if (predicate == QLatin1String("not")){
-        return QStringLiteral("%1 != %2").arg(fieldAccess, AddBindValue(rule.argument, bindValues));
-    }
-    if (predicate == QLatin1String("before")){
-        return QStringLiteral("%1 < %2").arg(fieldAccess, AddBindValue(rule.argument, bindValues));
-    }
-    if (predicate == QLatin1String("after")){
+    if (predicate == QLatin1String(">")){
         return QStringLiteral("%1 > %2").arg(fieldAccess, AddBindValue(rule.argument, bindValues));
     }
-    if (predicate == QLatin1String("from")){
-        return QStringLiteral("%1 >= %2").arg(fieldAccess, AddBindValue(rule.argument, bindValues));
+    if (predicate == QLatin1String("<")){
+        return QStringLiteral("%1 < %2").arg(fieldAccess, AddBindValue(rule.argument, bindValues));
     }
-    if (predicate == QLatin1String("until")){
-        return QStringLiteral("%1 <= %2").arg(fieldAccess, AddBindValue(rule.argument, bindValues));
-    }
-    if (predicate == QLatin1String("like")){
+    if (predicate == QLatin1String("contains")){
         return MakeLikeCondition(fieldAccess, AddLikeBindValue(rule.argument.toString(), bindValues));
+    }
+    if (predicate == QLatin1String("in") || predicate == QLatin1String("not_in")){
+        QStringList placeholders;
+        const QVariantList values = ToVariantList(rule.argument);
+        for (const QVariant& value : values){
+            placeholders << AddBindValue(value, bindValues);
+        }
+        if (placeholders.isEmpty()){
+            return QString();
+        }
+        const QString inClause = QStringLiteral("%1 %2 (%3)").arg(
+            fieldAccess,
+            predicate == QLatin1String("not_in") ? QStringLiteral("NOT IN") : QStringLiteral("IN"),
+            placeholders.join(QStringLiteral(", ")));
+        if (predicate == QLatin1String("not_in")){
+            return QStringLiteral("(%1 OR %2 IS NULL)").arg(inClause, fieldAccess);
+        }
+        return inClause;
+    }
+    if (predicate == QLatin1String("between") || predicate == QLatin1String("not_between")){
+        const QVariantList values = ToVariantList(rule.argument);
+        if (values.size() != 2){
+            return QString();
+        }
+        return QStringLiteral("%1 %2BETWEEN %3 AND %4").arg(
+            fieldAccess,
+            predicate == QLatin1String("not_between") ? QStringLiteral("NOT ") : QString(),
+            AddBindValue(values.at(0), bindValues),
+            AddBindValue(values.at(1), bindValues));
     }
 
     qWarning() << "Unexpected filter predicate" << rule.predicate << "for field" << QString::fromUtf8(rule.path);
@@ -254,5 +320,3 @@ QString CFilterQueryBuilder::EscapeJsonKey(const QString& key)
 
 
 } // namespace imtdb
-
-

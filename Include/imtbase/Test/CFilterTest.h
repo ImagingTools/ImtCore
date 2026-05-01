@@ -52,5 +52,6 @@ private slots:
     void FromJson_Empty();
 
     void SdlConverter_FromQmlModel();
+    void SdlConverter_RejectsNonAstRuleFields();
     void SdlConverter_ToSdlJson();
 };

@@ -13,6 +13,61 @@ namespace imtbase
 {
 
 
+namespace
+{
+
+
+QString NormalizeOperator(const QString& op)
+{
+    const QString normalized = op.trimmed().toLower();
+    if (normalized == QLatin1String("is") ||
+        normalized == QLatin1String("eq") ||
+        normalized == QLatin1String("=")){
+        return QStringLiteral("=");
+    }
+    if (normalized == QLatin1String("like") ||
+        normalized == QLatin1String("contains")){
+        return QStringLiteral("contains");
+    }
+    if (normalized == QLatin1String("after") ||
+        normalized == QLatin1String("gt") ||
+        normalized == QLatin1String(">")){
+        return QStringLiteral(">");
+    }
+    if (normalized == QLatin1String("before") ||
+        normalized == QLatin1String("lt") ||
+        normalized == QLatin1String("<")){
+        return QStringLiteral("<");
+    }
+    if (normalized == QLatin1String("nin") ||
+        normalized == QLatin1String("not_in")){
+        return QStringLiteral("not_in");
+    }
+    if (normalized == QLatin1String("in") ||
+        normalized == QLatin1String("between") ||
+        normalized == QLatin1String("not_between")){
+        return normalized;
+    }
+    return op;
+}
+
+
+QVariant NormalizeValue(const QString& op, const QVariant& value)
+{
+    if ((op == QLatin1String("in") || op == QLatin1String("not_in")) &&
+        value.type() != QVariant::List &&
+        value.type() != QVariant::StringList){
+        QVariantList values;
+        values << value;
+        return values;
+    }
+    return value;
+}
+
+
+} // namespace
+
+
 CFilterBuilder& CFilterBuilder::searchText(const QString& text, const QByteArrayList& scopes)
 {
     return search(text, scopes);
@@ -28,7 +83,8 @@ CFilterBuilder& CFilterBuilder::search(const QString& text, const QByteArrayList
 
 CFilterBuilder& CFilterBuilder::where(const QByteArray& path, const QString& predicate, const QVariant& argument)
 {
-    CurrentRuleSet().rules << CFilter::Rule(path, predicate, argument);
+    const QString op = NormalizeOperator(predicate);
+    CurrentRuleSet().rules << CFilter::Rule(path, op, NormalizeValue(op, argument));
     return *this;
 }
 

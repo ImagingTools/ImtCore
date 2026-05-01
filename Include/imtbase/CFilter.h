@@ -17,9 +17,10 @@ namespace imtbase
 /**
  * @brief Independent filter request model.
  *
- * CFilter describes a query request as search text, predicate rules, ordering,
- * and a result window.  Predicate names are stored as strings on purpose so the
- * model can grow without mirroring legacy enum-based filter interfaces.
+ * CFilter describes a query request as search text, React Query Builder-style
+ * operator rules, ordering, and a result window. Operator names are stored as
+ * strings on purpose so the model can grow without mirroring legacy enum-based
+ * filter interfaces.
  */
 class CFilter
 {
