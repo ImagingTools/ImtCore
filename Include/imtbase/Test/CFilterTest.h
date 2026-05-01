@@ -18,7 +18,7 @@ private slots:
     void CFilter_Search();
     void CFilter_Rules();
     void CFilter_RuleSets();
-    void CFilter_FluentApi();
+    void CFilterBuilder_FluentApi();
     void CFilter_Orders();
     void CFilter_Window();
     void CFilter_Clear();
@@ -54,4 +54,3 @@ private slots:
     void SdlConverter_FromQmlModel();
     void SdlConverter_ToSdlJson();
 };
-

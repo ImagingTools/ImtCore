@@ -2,13 +2,6 @@
 #include <imtbase/CFilter.h>
 
 
-// Qt includes
-#include <QtCore/QDebug>
-
-// STD includes
-#include <limits>
-
-
 namespace imtbase
 {
 
@@ -160,123 +153,6 @@ CFilter::RuleSet CFilter::AnyOf(const QVector<Rule>& rules, const QVector<RuleSe
 }
 
 
-CFilter& CFilter::search(const QString& text, const QByteArrayList& scopes)
-{
-    SetSearch(text, scopes);
-    return *this;
-}
-
-
-CFilter& CFilter::searchText(const QString& text, const QByteArrayList& scopes)
-{
-    return search(text, scopes);
-}
-
-
-CFilter& CFilter::where(const QByteArray& path, const QString& predicate, const QVariant& argument)
-{
-    CurrentRuleSet().rules << Rule(path, predicate, argument);
-    return *this;
-}
-
-
-CFilter& CFilter::beginGroup(RuleSet::Join join)
-{
-    RuleSet& current = CurrentRuleSet();
-    current.children << RuleSet(join);
-    m_groupPath << (current.children.size() - 1);
-    return *this;
-}
-
-
-CFilter& CFilter::beginAnd()
-{
-    return beginGroup(RuleSet::All);
-}
-
-
-CFilter& CFilter::beginOr()
-{
-    return beginGroup(RuleSet::Any);
-}
-
-
-CFilter& CFilter::endGroup()
-{
-    if (!m_groupPath.isEmpty()){
-        m_groupPath.removeLast();
-    }
-    return *this;
-}
-
-
-CFilter& CFilter::all(const RuleSet& rules)
-{
-    RuleSet allRules = rules;
-    allRules.join = RuleSet::All;
-    AddRuleSet(allRules);
-    return *this;
-}
-
-
-CFilter& CFilter::any(const RuleSet& rules)
-{
-    RuleSet anyRules = rules;
-    anyRules.join = RuleSet::Any;
-    AddRuleSet(anyRules);
-    return *this;
-}
-
-
-CFilter& CFilter::orderBy(const QByteArray& path, bool descending)
-{
-    AddOrder(Order(path, descending));
-    return *this;
-}
-
-
-CFilter& CFilter::page(int pageNumber, int pageSize)
-{
-    if (pageNumber <= 0){
-        ClearWindow();
-        return *this;
-    }
-    if (pageSize <= 0){
-        ClearWindow();
-        return *this;
-    }
-
-    const int zeroBasedPage = pageNumber - 1;
-    // Guard the offset multiplication below from undefined signed integer overflow.
-    if (zeroBasedPage > std::numeric_limits<int>::max() / pageSize){
-        ClearWindow();
-        return *this;
-    }
-
-    SetWindow(zeroBasedPage * pageSize, pageSize);
-    return *this;
-}
-
-
-CFilter& CFilter::window(int first, int count)
-{
-    SetWindow(first, count);
-    return *this;
-}
-
-
-CFilter& CFilter::windowed(int first, int count)
-{
-    return window(first, count);
-}
-
-
-const CFilter& CFilter::build() const
-{
-    return *this;
-}
-
-
 const CFilter::Search& CFilter::GetSearch() const
 {
     return m_search;
@@ -304,21 +180,18 @@ const CFilter::RuleSet& CFilter::GetRules() const
 void CFilter::SetRules(const RuleSet& rules)
 {
     m_rules = rules;
-    m_groupPath.clear();
 }
 
 
 void CFilter::AddRule(const Rule& rule)
 {
     m_rules.rules << rule;
-    m_groupPath.clear();
 }
 
 
 void CFilter::AddRuleSet(const RuleSet& rules)
 {
     m_rules.children << rules;
-    m_groupPath.clear();
 }
 
 
@@ -388,22 +261,6 @@ void CFilter::Clear()
     m_rules = RuleSet();
     m_orders.clear();
     m_window = Window();
-    m_groupPath.clear();
-}
-
-
-CFilter::RuleSet& CFilter::CurrentRuleSet()
-{
-    RuleSet* current = &m_rules;
-    for (const int index : m_groupPath){
-        if (index < 0 || index >= current->children.size()){
-            qWarning() << "Invalid CFilter fluent group stack while adding to the current group; use beginGroup()/beginAnd()/beginOr() and endGroup() in balanced order";
-            m_groupPath.clear();
-            return m_rules;
-        }
-        current = &current->children[index];
-    }
-    return *current;
 }
 
 

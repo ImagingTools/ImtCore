@@ -10,6 +10,7 @@
 
 // ImtCore includes
 #include <imtbase/CFilter.h>
+#include <imtbase/CFilterBuilder.h>
 #include <imtbase/CFilterSerializer.h>
 #include <imtbase/CFilterSdlConverter.h>
 #include <imtbase/CPaginatedFilter.h>
@@ -50,9 +51,9 @@ void CFilterTest::CFilter_RuleSets()
 }
 
 
-void CFilterTest::CFilter_FluentApi()
+void CFilterTest::CFilterBuilder_FluentApi()
 {
-    const imtbase::CFilter filter = imtbase::CFilter()
+    const imtbase::CFilter filter = imtbase::CFilterBuilder()
         .searchText(QStringLiteral("john"), { "Name", "Email" })
         .where("Status", QStringLiteral("is"), QStringLiteral("active"))
         .beginOr()
@@ -241,7 +242,7 @@ void CFilterTest::ToQueryString_Rules()
 void CFilterTest::ToQueryString_GroupRules()
 {
     imtbase::CFilter filter;
-    filter.any(imtbase::CFilter::AnyOf({
+    filter.AddRuleSet(imtbase::CFilter::AnyOf({
         imtbase::CFilter::Rule("Name", QStringLiteral("like"), QStringLiteral("john")),
         imtbase::CFilter::Rule("Email", QStringLiteral("like"), QStringLiteral("john"))
     }));
@@ -287,7 +288,7 @@ void CFilterTest::FromQueryString_Rules()
 void CFilterTest::FromQueryString_GroupRules()
 {
     imtbase::CFilter source;
-    source.any(imtbase::CFilter::AnyOf({
+    source.AddRuleSet(imtbase::CFilter::AnyOf({
         imtbase::CFilter::Rule("Name", QStringLiteral("like"), QStringLiteral("john")),
         imtbase::CFilter::Rule("Email", QStringLiteral("like"), QStringLiteral("john"))
     }));
