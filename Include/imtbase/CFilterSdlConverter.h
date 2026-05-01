@@ -17,6 +17,10 @@ namespace imtbase
 /**
  * @brief Converts the SDL/QML transport representation of a standalone filter
  *        into the C++ CFilter model used on the server.
+ *
+ * The converter is a semantic SDL/QML boundary.  The actual JSON/query-string
+ * mapping is shared with CFilterSerializer so URL/API transport and SDL
+ * transport stay aligned.
  */
 class CFilterSdlConverter
 {
@@ -28,5 +32,4 @@ public:
 
 
 } // namespace imtbase
-
 

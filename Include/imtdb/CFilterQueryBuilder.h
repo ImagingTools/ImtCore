@@ -15,7 +15,12 @@ namespace imtdb
 
 
 /**
- * @brief SQL query builder for standalone imtbase::CFilter requests.
+ * @brief Converts standalone imtbase::CFilter requests into SQL clauses and
+ *        bind values.
+ *
+ * The builder intentionally returns WHERE, ORDER BY, and LIMIT/OFFSET clauses
+ * instead of executing them, so database delegates can opt in later without
+ * coupling the standalone filter model to any existing delegate implementation.
  */
 class CFilterQueryBuilder
 {
@@ -72,5 +77,4 @@ private:
 
 
 } // namespace imtdb
-
 

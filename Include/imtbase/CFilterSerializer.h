@@ -15,7 +15,12 @@ namespace imtbase
 
 
 /**
- * @brief Serializes standalone CFilter requests to URL query strings and JSON.
+ * @brief Serializes standalone CFilter requests to shareable URL query strings
+ *        and generic JSON payloads.
+ *
+ * This class owns transport-neutral CFilter serialization.  SDL/QML-specific
+ * conversion is intentionally kept in CFilterSdlConverter, which reuses this
+ * serializer instead of duplicating the JSON mapping.
  */
 class CFilterSerializer
 {
@@ -36,4 +41,3 @@ private:
 
 
 } // namespace imtbase
-
