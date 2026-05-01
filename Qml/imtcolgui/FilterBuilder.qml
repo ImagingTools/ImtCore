@@ -170,9 +170,9 @@ QtObject {
         }
 
         var objectClone = {}
-        for (i in value) {
-            if (Object.prototype.hasOwnProperty.call(value, i))
-                objectClone[i] = _cloneValue(value[i])
+        for (var key in value) {
+            if (Object.prototype.hasOwnProperty.call(value, key))
+                objectClone[key] = _cloneValue(value[key])
         }
         return objectClone
     }

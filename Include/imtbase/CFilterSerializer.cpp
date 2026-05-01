@@ -74,7 +74,6 @@ bool TryNormalizeOperator(const QString& predicate, QString& op)
         op = normalized;
         return true;
     }
-    op.clear();
     return false;
 }
 
