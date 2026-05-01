@@ -102,6 +102,9 @@ QJsonValue NormalizeValue(const QString& op, const QJsonValue& value)
         array << value;
         return array;
     }
+    if (op == QLatin1String("between") || op == QLatin1String("not_between")){
+        return value;
+    }
     return value;
 }
 

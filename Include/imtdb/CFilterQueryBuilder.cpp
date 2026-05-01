@@ -232,6 +232,8 @@ QString CFilterQueryBuilder::BuildRuleClause(const imtbase::CFilter::Rule& rule,
     if (predicate == QLatin1String("between") || predicate == QLatin1String("not_between")){
         const QVariantList values = ToVariantList(rule.argument);
         if (values.size() != 2){
+            qWarning() << "Skipping" << rule.predicate << "filter for field"
+                << QString::fromUtf8(rule.path) << "because it does not have exactly two values";
             return QString();
         }
         return QStringLiteral("%1 %2BETWEEN %3 AND %4").arg(

@@ -180,6 +180,10 @@ QtObject {
             return _isArray(value) ? _cloneValue(value) : [_cloneValue(value)]
         }
 
+        if (operator === "between" || operator === "not_between") {
+            return _isArray(value) ? _cloneValue(value) : value
+        }
+
         return _cloneValue(value)
     }
 
