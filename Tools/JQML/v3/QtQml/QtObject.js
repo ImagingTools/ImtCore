@@ -17,6 +17,7 @@ class QtObject extends QObject {
         data: {type:List, },
         
         modelChanged: {type:Signal, args:[]},
+        modelDataChanged: {type:Signal, args:[]},
         childrenChanged: {type:Signal, args:[]},
         resourcesChanged: {type:Signal, args:[]},
         dataChanged: {type:Signal, args:[]},

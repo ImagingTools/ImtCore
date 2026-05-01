@@ -1353,13 +1353,14 @@ function compile(options){
                             aliasCode.add('\n')
                         } else {
                             // lazyCode.add(`'${assignProperty.name}': function(){return ${stat.value}},`)
+                            let isReturn = stat.value.toString().indexOf('return ') >= 0
                             if(names.length > 1){
-                                lazyCode.add(`${this.name}['${names[0]}'].__properties['${names[1]}']=function(){return ${stat.value}}`)
+                                lazyCode.add(`${this.name}['${names[0]}'].__properties['${names[1]}']=function(){${isReturn ? '' : 'return '}${stat.value}}`)
                                 lazyCode.add('\n')
                                 lazyCode.add(`${this.name}.__properties['${names[0]}']='JQGroup'`)
                                 lazyCode.add('\n')
                             } else {
-                                lazyCode.add(`${this.name}.__properties['${assignProperty.name}']=function(){return ${stat.value}}`)
+                                lazyCode.add(`${this.name}.__properties['${assignProperty.name}']=function(){${isReturn ? '' : 'return '}${stat.value}}`)
                                 lazyCode.add('\n')
                             }
                             
@@ -1777,9 +1778,11 @@ function compile(options){
 
             if (this.singleton) {
                 if (this.moduleName) {
-                    code.add(`JQModules.${this.moduleName}.${this.instruction.className} = (class extends ${typeInfo.path} {\n`)
+                    code.add(`Object.defineProperty(JQModules.${this.moduleName},'${this.instruction.className}',{get:()=>{
+                        if(!JQModules.${this.moduleName}.__${this.instruction.className}) JQModules.${this.moduleName}.__${this.instruction.className} = (class extends ${typeInfo.path} {\n`)
                 } else {
-                    code.add(`const ${this.instruction.className} = (class extends ${typeInfo.path} {\n`)
+                    code.add(`Object.defineProperty(window,'${this.instruction.className}',{get:()=>{
+                        if(!window.__${this.instruction.className}) window.__${this.instruction.className} = (class extends ${typeInfo.path} {\n`)
                 }
 
                 code.add(`static singleton = true\n`)
@@ -1854,8 +1857,13 @@ function compile(options){
 
             code.add('\n')
 
+
             if (this.singleton) {
-                code.add(`}).create()`)
+                if (this.moduleName) {
+                    code.add(`}).create()\nreturn JQModules.${this.moduleName}.__${this.instruction.className}}})`)
+                } else {
+                    code.add(`}).create()\nreturn window.__${this.instruction.className}}})`)
+                }
             } else {
                 code.add(`}`)
             }
@@ -2097,7 +2105,15 @@ function compile(options){
 
     if(options.mode === 'js'){
         if (options.entry) {
-            fullCode.add(`window.addEventListener('load', ()=>{console.time('build');JQApplication.rootPath='${options.root}';${options.entry.split(/[\/\\]+/g).pop().replace('.qml', '')}.create(JQApplication.root);console.timeEnd('build')})`)
+            fullCode.add(`window.addEventListener('load', ()=>{
+                console.time('build');
+                if(location.pathname.indexOf('${options.root}')>=0){
+                    JQApplication.rootPath = location.origin + location.pathname.slice(0, location.pathname.indexOf('${options.root}') + '${options.root}'.length)
+                } else {
+                    JQApplication.rootPath = '${options.root}'
+                }
+                ${options.entry.split(/[\/\\]+/g).pop().replace('.qml', '')}.create(JQApplication.root);
+                console.timeEnd('build')})`)
         }
 
         if (options.output) {
