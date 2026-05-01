@@ -65,6 +65,31 @@ QVariant NormalizeValue(const QString& op, const QVariant& value)
 }
 
 
+QVariantList ToVariantList(const QVariant& value)
+{
+    if (value.type() == QVariant::StringList){
+        QVariantList result;
+        for (const QString& item : value.toStringList()){
+            result << item;
+        }
+        return result;
+    }
+    return value.toList();
+}
+
+
+bool ValidateValue(const QString& op, const QVariant& value)
+{
+    if (op == QLatin1String("in") || op == QLatin1String("not_in")){
+        return !ToVariantList(value).isEmpty();
+    }
+    if (op == QLatin1String("between") || op == QLatin1String("not_between")){
+        return ToVariantList(value).size() == 2;
+    }
+    return value.type() != QVariant::List && value.type() != QVariant::StringList;
+}
+
+
 } // namespace
 
 
@@ -84,7 +109,12 @@ CFilterBuilder& CFilterBuilder::search(const QString& text, const QByteArrayList
 CFilterBuilder& CFilterBuilder::where(const QByteArray& path, const QString& predicate, const QVariant& argument)
 {
     const QString op = NormalizeOperator(predicate);
-    CurrentRuleSet().rules << CFilter::Rule(path, op, NormalizeValue(op, argument));
+    const QVariant value = NormalizeValue(op, argument);
+    if (!ValidateValue(op, value)){
+        qWarning() << "Invalid filter value for operator" << op << "and field" << path;
+        return *this;
+    }
+    CurrentRuleSet().rules << CFilter::Rule(path, op, value);
     return *this;
 }
 

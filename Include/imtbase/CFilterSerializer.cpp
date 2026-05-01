@@ -45,30 +45,37 @@ int ExtractIndexedKey(const QString& key, const QString& prefix, const QString& 
 }
 
 
-QString PredicateToOperator(const QString& predicate)
+bool TryNormalizeOperator(const QString& predicate, QString& op)
 {
     const QString normalized = NormalizeToken(predicate);
     if (normalized == QLatin1String("is") || normalized == QLatin1String("eq") || normalized == QLatin1String("=")){
-        return QStringLiteral("=");
+        op = QStringLiteral("=");
+        return true;
     }
     if (normalized == QLatin1String("like") || normalized == QLatin1String("contains")){
-        return QStringLiteral("contains");
+        op = QStringLiteral("contains");
+        return true;
     }
     if (normalized == QLatin1String("after") || normalized == QLatin1String("gt") || normalized == QLatin1String(">")){
-        return QStringLiteral(">");
+        op = QStringLiteral(">");
+        return true;
     }
     if (normalized == QLatin1String("before") || normalized == QLatin1String("lt") || normalized == QLatin1String("<")){
-        return QStringLiteral("<");
+        op = QStringLiteral("<");
+        return true;
     }
     if (normalized == QLatin1String("nin") || normalized == QLatin1String("not_in")){
-        return QStringLiteral("not_in");
+        op = QStringLiteral("not_in");
+        return true;
     }
     if (normalized == QLatin1String("in") ||
         normalized == QLatin1String("between") ||
         normalized == QLatin1String("not_between")){
-        return normalized;
+        op = normalized;
+        return true;
     }
-    return QString();
+    op.clear();
+    return false;
 }
 
 
@@ -137,8 +144,8 @@ QJsonObject ToQmlQuery(const imtbase::CFilter::RuleSet& rules)
         if (!rule.IsValid()){
             continue;
         }
-        const QString op = PredicateToOperator(rule.predicate);
-        if (op.isEmpty()){
+        QString op;
+        if (!TryNormalizeOperator(rule.predicate, op)){
             qWarning() << "Skipping filter rule with unsupported operator" << rule.predicate
                 << "for field" << QString::fromUtf8(rule.path);
             continue;
@@ -199,8 +206,8 @@ bool FromQmlQuery(const QJsonObject& json, imtbase::CFilter::RuleSet& rules)
             return false;
         }
 
-        const QString predicate = PredicateToOperator(item[QStringLiteral("operator")].toString());
-        if (predicate.isEmpty()){
+        QString predicate;
+        if (!TryNormalizeOperator(item[QStringLiteral("operator")].toString(), predicate)){
             return false;
         }
         const QByteArray field = item[QStringLiteral("field")].toString().toUtf8();
@@ -324,7 +331,10 @@ bool CFilterSerializer::FromQueryString(const QString& queryString, CFilter& fil
 
         const int predicateRuleIndex = ExtractIndexedKey(item.first, s_rulePrefix, QStringLiteral(".pred"));
         if (predicateRuleIndex >= 0){
-            rules[predicateRuleIndex].predicate = PredicateToOperator(item.second);
+            QString predicate;
+            rules[predicateRuleIndex].predicate = TryNormalizeOperator(item.second, predicate)
+                ? predicate
+                : QString();
             continue;
         }
 
@@ -614,9 +624,14 @@ bool CFilterSerializer::FromJson(const QJsonObject& json, CFilter::RuleSet& rule
 
     for (const QJsonValue& value : json[QStringLiteral("items")].toArray()){
         const QJsonObject item = value.toObject();
+        QString predicate;
+        if (!TryNormalizeOperator(item[QStringLiteral("pred")].toString(), predicate)){
+            return false;
+        }
+
         const CFilter::Rule rule(
             item[QStringLiteral("path")].toString().toUtf8(),
-            PredicateToOperator(item[QStringLiteral("pred")].toString()),
+            predicate,
             item[QStringLiteral("arg")].toVariant());
         if (rule.IsValid()){
             rules.rules << rule;
