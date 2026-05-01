@@ -157,15 +157,30 @@ QtObject {
         return false
     }
 
-    function _normalizeValue(operator, value) {
-        if (operator === "in" || operator === "not_in") {
-            return _isArray(value) ? JSON.parse(JSON.stringify(value)) : [value]
+    function _cloneValue(value) {
+        if (value === null || typeof value !== "object")
+            return value
+
+        var i
+        if (_isArray(value)) {
+            var arrayClone = []
+            for (i = 0; i < value.length; ++i)
+                arrayClone.push(_cloneValue(value[i]))
+            return arrayClone
         }
 
-        if (_isArray(value))
-            return JSON.parse(JSON.stringify(value))
+        var objectClone = {}
+        for (i in value)
+            objectClone[i] = _cloneValue(value[i])
+        return objectClone
+    }
 
-        return value
+    function _normalizeValue(operator, value) {
+        if (operator === "in" || operator === "not_in") {
+            return _isArray(value) ? _cloneValue(value) : [_cloneValue(value)]
+        }
+
+        return _cloneValue(value)
     }
 
     function _validateValueByOperator(operator, value) {

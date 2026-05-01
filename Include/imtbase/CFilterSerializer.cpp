@@ -3,6 +3,7 @@
 
 
 // Qt includes
+#include <QtCore/QDebug>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QMap>
@@ -68,12 +69,6 @@ QString PredicateToOperator(const QString& predicate)
         return normalized;
     }
     return QString();
-}
-
-
-QString OperatorToPredicate(const QString& op)
-{
-    return PredicateToOperator(op);
 }
 
 
@@ -144,6 +139,8 @@ QJsonObject ToQmlQuery(const imtbase::CFilter::RuleSet& rules)
         }
         const QString op = PredicateToOperator(rule.predicate);
         if (op.isEmpty()){
+            qWarning() << "Skipping filter rule with unsupported operator" << rule.predicate
+                << "for field" << QString::fromUtf8(rule.path);
             continue;
         }
         QJsonObject item;
@@ -202,7 +199,7 @@ bool FromQmlQuery(const QJsonObject& json, imtbase::CFilter::RuleSet& rules)
             return false;
         }
 
-        const QString predicate = OperatorToPredicate(item[QStringLiteral("operator")].toString());
+        const QString predicate = PredicateToOperator(item[QStringLiteral("operator")].toString());
         if (predicate.isEmpty()){
             return false;
         }
@@ -327,7 +324,7 @@ bool CFilterSerializer::FromQueryString(const QString& queryString, CFilter& fil
 
         const int predicateRuleIndex = ExtractIndexedKey(item.first, s_rulePrefix, QStringLiteral(".pred"));
         if (predicateRuleIndex >= 0){
-            rules[predicateRuleIndex].predicate = OperatorToPredicate(item.second);
+            rules[predicateRuleIndex].predicate = PredicateToOperator(item.second);
             continue;
         }
 
@@ -619,7 +616,7 @@ bool CFilterSerializer::FromJson(const QJsonObject& json, CFilter::RuleSet& rule
         const QJsonObject item = value.toObject();
         const CFilter::Rule rule(
             item[QStringLiteral("path")].toString().toUtf8(),
-            OperatorToPredicate(item[QStringLiteral("pred")].toString()),
+            PredicateToOperator(item[QStringLiteral("pred")].toString()),
             item[QStringLiteral("arg")].toVariant());
         if (rule.IsValid()){
             rules.rules << rule;
