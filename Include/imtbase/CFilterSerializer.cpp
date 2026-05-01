@@ -84,7 +84,7 @@ QString JoinToCombinator(imtbase::CFilter::RuleSet::Join join)
 }
 
 
-bool HasOnlyKeys(const QJsonObject& json, const QStringList& keys)
+bool ContainsOnlyAllowedKeys(const QJsonObject& json, const QStringList& keys)
 {
     for (auto it = json.constBegin(); it != json.constEnd(); ++it){
         if (!keys.contains(it.key())){
@@ -170,7 +170,7 @@ bool FromQmlQuery(const QJsonObject& json, imtbase::CFilter::RuleSet& rules)
 {
     if (!json.contains(QStringLiteral("combinator")) ||
         !json.contains(QStringLiteral("rules")) ||
-        !HasOnlyKeys(json, { QStringLiteral("combinator"), QStringLiteral("rules") })){
+        !ContainsOnlyAllowedKeys(json, { QStringLiteral("combinator"), QStringLiteral("rules") })){
         return false;
     }
 
@@ -185,7 +185,7 @@ bool FromQmlQuery(const QJsonObject& json, imtbase::CFilter::RuleSet& rules)
         if (item.contains(QStringLiteral("rules")) || item.contains(QStringLiteral("combinator"))){
             if (!item.contains(QStringLiteral("rules")) ||
                 !item.contains(QStringLiteral("combinator")) ||
-                !HasOnlyKeys(item, { QStringLiteral("combinator"), QStringLiteral("rules") })){
+                !ContainsOnlyAllowedKeys(item, { QStringLiteral("combinator"), QStringLiteral("rules") })){
                 return false;
             }
             imtbase::CFilter::RuleSet child;
@@ -201,7 +201,7 @@ bool FromQmlQuery(const QJsonObject& json, imtbase::CFilter::RuleSet& rules)
         if (!item.contains(QStringLiteral("field")) ||
             !item.contains(QStringLiteral("operator")) ||
             !item.contains(QStringLiteral("value")) ||
-            !HasOnlyKeys(item, { QStringLiteral("field"), QStringLiteral("operator"), QStringLiteral("value") })){
+            !ContainsOnlyAllowedKeys(item, { QStringLiteral("field"), QStringLiteral("operator"), QStringLiteral("value") })){
             return false;
         }
 
@@ -331,9 +331,10 @@ bool CFilterSerializer::FromQueryString(const QString& queryString, CFilter& fil
         const int predicateRuleIndex = ExtractIndexedKey(item.first, s_rulePrefix, QStringLiteral(".pred"));
         if (predicateRuleIndex >= 0){
             QString predicate;
-            rules[predicateRuleIndex].predicate = TryNormalizeOperator(item.second, predicate)
-                ? predicate
-                : QString();
+            if (!TryNormalizeOperator(item.second, predicate)){
+                return false;
+            }
+            rules[predicateRuleIndex].predicate = predicate;
             continue;
         }
 

@@ -46,8 +46,6 @@ QtObject {
 
     property var _stack: []
 
-    onQueryChanged: _resetStack()
-
     Component.onCompleted: {
         _resetStack()
     }

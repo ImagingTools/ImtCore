@@ -216,6 +216,8 @@ QString CFilterQueryBuilder::BuildRuleClause(const imtbase::CFilter::Rule& rule,
             placeholders << AddBindValue(value, bindValues);
         }
         if (placeholders.isEmpty()){
+            qWarning() << "Skipping" << rule.predicate << "filter for field"
+                << QString::fromUtf8(rule.path) << "because it has no values";
             return QString();
         }
         const QString inClause = QStringLiteral("%1 %2 (%3)").arg(
