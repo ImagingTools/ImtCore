@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QtCore/QDebug>
+#include <QtCore/QMetaType>
 
 // STD includes
 #include <limits>
@@ -55,8 +56,8 @@ QString NormalizeOperator(const QString& op)
 QVariant NormalizeValue(const QString& op, const QVariant& value)
 {
     if ((op == QLatin1String("in") || op == QLatin1String("not_in")) &&
-        value.type() != QVariant::List &&
-        value.type() != QVariant::StringList){
+        value.userType() != QMetaType::QVariantList &&
+        value.userType() != QMetaType::QStringList){
         QVariantList values;
         values << value;
         return values;
@@ -67,7 +68,7 @@ QVariant NormalizeValue(const QString& op, const QVariant& value)
 
 QVariantList ToVariantList(const QVariant& value)
 {
-    if (value.type() == QVariant::StringList){
+    if (value.userType() == QMetaType::QStringList){
         QVariantList result;
         for (const QString& item : value.toStringList()){
             result << item;
@@ -86,7 +87,7 @@ bool ValidateValue(const QString& op, const QVariant& value)
     if (op == QLatin1String("between") || op == QLatin1String("not_between")){
         return ToVariantList(value).size() == 2;
     }
-    return value.type() != QVariant::List && value.type() != QVariant::StringList;
+    return value.userType() != QMetaType::QVariantList && value.userType() != QMetaType::QStringList;
 }
 
 

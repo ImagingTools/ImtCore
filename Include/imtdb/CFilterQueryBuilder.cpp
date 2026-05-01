@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QtCore/QDebug>
+#include <QtCore/QMetaType>
 #include <QtCore/QStringList>
 
 
@@ -51,7 +52,7 @@ QString NormalizePredicate(const QString& predicate)
 
 QVariantList ToVariantList(const QVariant& value)
 {
-    if (value.type() == QVariant::StringList){
+    if (value.userType() == QMetaType::QStringList){
         QVariantList result;
         for (const QString& item : value.toStringList()){
             result << item;
