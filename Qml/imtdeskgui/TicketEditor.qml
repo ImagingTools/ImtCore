@@ -2515,7 +2515,7 @@ DocumentViewBase {
 							color: editView.accentBadgeBg
 							border.color: editView.accentBorderLight
 							border.width: 1
-							
+						
 							Row {
 								id: replyRow
 								anchors.left: parent.left
@@ -2530,7 +2530,7 @@ DocumentViewBase {
 									radius: 1
 									color: editView.accentColor
 								}
-								
+						
 								Column {
 									width: parent.width - 3 - Style.spacingXS
 									spacing: 1
@@ -2810,7 +2810,7 @@ DocumentViewBase {
 						id: attachmentFileIO
 					}
 				}
-				
+			
 				// Lock notice / read-only notice
 				Row {
 					id: lockNoticeRow
@@ -2838,7 +2838,7 @@ DocumentViewBase {
 						font.pixelSize: Style.fontSizeM
 						color: Style.inactiveTextColor
 						wrapMode: Text.Wrap
-						width: parent.width - Style.fontSizM - Style.paddingS
+						width: parent.width - Style.fontSizeM - Style.paddingS
 					}
 				}
 			}
