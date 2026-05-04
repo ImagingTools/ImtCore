@@ -79,6 +79,27 @@ public:
 				QRhiCommandBuffer* commandBuffer,
 				QRhiRenderPassDescriptor* renderPassDescriptor);
 
+	/**
+		Build a QRhiResourceUpdateBatch containing all pending geometry uploads,
+		GlobalUBO and per-draw DrawUBO fills for the current frame. The caller
+		is responsible for submitting the batch (e.g. via
+		commandBuffer()->resourceUpdate() in a QSGRenderNode::prepare()).
+
+		This is the first phase of inline rendering; call IssuePendingDrawCalls()
+		afterwards to emit the actual draw commands.
+	*/
+	QRhiResourceUpdateBatch* FlushPendingUpdates();
+
+	/**
+		Issue all pending draw calls to m_commandBuffer. The caller must have
+		already applied the resource-update batch returned by FlushPendingUpdates()
+		and set the viewport. After this call the pending-draw list is cleared.
+
+		This is the second phase of inline rendering, used by QSGRenderNode
+		implementations that are already inside a render pass owned by Qt Quick.
+	*/
+	void IssuePendingDrawCalls();
+
 	// reimplemented (imt3dview::IRenderBackend)
 	virtual bool Initialize() override;
 	virtual void Shutdown() override;

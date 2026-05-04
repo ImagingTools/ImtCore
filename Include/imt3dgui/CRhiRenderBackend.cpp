@@ -139,24 +139,20 @@ void CRhiRenderBackend::BeginFrame(const imt3dview::SceneState& sceneState)
 }
 
 
-void CRhiRenderBackend::EndFrame()
+QRhiResourceUpdateBatch* CRhiRenderBackend::FlushPendingUpdates()
 {
-	if (!m_initialized || m_commandBuffer == nullptr || m_renderTarget == nullptr){
-		return;
+	if (!m_initialized || m_rhi == nullptr){
+		return nullptr;
 	}
 
 	const int drawCount = static_cast<int>(m_pendingDraws.size());
 	if (drawCount > s_maxDrawsPerFrame){
-		qDebug() << "CRhiRenderBackend::EndFrame: draw count" << drawCount
+		qDebug() << "CRhiRenderBackend::FlushPendingUpdates: draw count" << drawCount
 		         << "exceeds s_maxDrawsPerFrame =" << s_maxDrawsPerFrame
 		         << "; excess draws will be skipped";
 	}
 	const int effectiveDrawCount = qMin(drawCount, s_maxDrawsPerFrame);
 
-	// Build a single resource-update batch that uploads:
-	//   1. Any pending geometry (vertex / index buffers updated by shapes)
-	//   2. GlobalUBO with this frame's scene state
-	//   3. DrawUBO slots for each pending draw
 	QRhiResourceUpdateBatch* batch = m_rhi->nextResourceUpdateBatch();
 
 	// 1. Flush pending geometry uploads.
@@ -196,26 +192,22 @@ void CRhiRenderBackend::EndFrame()
 					&drawData);
 	}
 
-	// Open the render pass — this atomically applies the batch before any GPU work.
-	const QColor& cc = m_sceneState.clearColor;
-	m_commandBuffer->beginPass(
-				m_renderTarget,
-				cc,
-				{ 1.0f, 0 },
-				batch);
+	return batch;
+}
 
-	// Set the full-widget viewport once (shapes don't adjust it individually).
-	const QRect& vp = m_sceneState.viewport;
-	m_commandBuffer->setViewport(QRhiViewport(
-				static_cast<float>(vp.x()),
-				static_cast<float>(vp.y()),
-				static_cast<float>(vp.width()),
-				static_cast<float>(vp.height())));
+
+void CRhiRenderBackend::IssuePendingDrawCalls()
+{
+	if (!m_initialized || m_commandBuffer == nullptr){
+		return;
+	}
+
+	const int drawCount = static_cast<int>(m_pendingDraws.size());
+	const int effectiveDrawCount = qMin(drawCount, s_maxDrawsPerFrame);
 
 	const bool cullFace =
 		m_sceneState.renderHints & imt3dview::SceneState::RH_CULLFACE;
 
-	// Issue draw calls.
 	for (int i = 0; i < effectiveDrawCount; ++i){
 		const PendingDraw& pd = m_pendingDraws[i];
 
@@ -258,8 +250,40 @@ void CRhiRenderBackend::EndFrame()
 					pd.command.indexOffset);
 	}
 
-	m_commandBuffer->endPass();
 	m_pendingDraws.clear();
+}
+
+
+void CRhiRenderBackend::EndFrame()
+{
+	if (!m_initialized || m_commandBuffer == nullptr || m_renderTarget == nullptr){
+		return;
+	}
+
+	QRhiResourceUpdateBatch* batch = FlushPendingUpdates();
+	if (batch == nullptr){
+		return;
+	}
+
+	// Open the render pass — this atomically applies the batch before any GPU work.
+	const QColor& cc = m_sceneState.clearColor;
+	m_commandBuffer->beginPass(
+				m_renderTarget,
+				cc,
+				{ 1.0f, 0 },
+				batch);
+
+	// Set the full-widget viewport once (shapes don't adjust it individually).
+	const QRect& vp = m_sceneState.viewport;
+	m_commandBuffer->setViewport(QRhiViewport(
+				static_cast<float>(vp.x()),
+				static_cast<float>(vp.y()),
+				static_cast<float>(vp.width()),
+				static_cast<float>(vp.height())));
+
+	IssuePendingDrawCalls();
+
+	m_commandBuffer->endPass();
 }
 
 
