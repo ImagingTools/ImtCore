@@ -53,5 +53,6 @@
         <file alias="imt3dgui/Fog.qml">Fog.qml</file>
         <file alias="imt3dgui/ReflectionProbe.qml">ReflectionProbe.qml</file>
         <file alias="imt3dgui/RenderStats.qml">RenderStats.qml</file>
+        <file alias="imt3dgui/Render3D.qml">Render3D.qml</file>
     </qresource>
 </RCC>

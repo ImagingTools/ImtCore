@@ -65,3 +65,4 @@ DebugView 1.0 DebugView.qml
 Fog 1.0 Fog.qml
 ReflectionProbe 1.0 ReflectionProbe.qml
 RenderStats 1.0 RenderStats.qml
+Render3D 1.0 Render3D.qml
