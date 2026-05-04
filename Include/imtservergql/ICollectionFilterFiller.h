@@ -14,16 +14,16 @@ namespace imtservergql
 {
 
 
-class ICollectionFilterProvider : virtual public istd::IPolymorphic
+class ICollectionFilterFiller : virtual public istd::IPolymorphic
 {
 public:
 	/**
-		Apply additional filters to the filter params set.
+		Fill additional filters into the filter params set.
 		@param gqlRequest The GraphQL request context.
 		@param filterParams The params set to add filters to.
 		@return true if filters were successfully applied, false otherwise.
 	*/
-	virtual bool ApplyCollectionFilters(
+	virtual bool FillCollectionFilters(
 		const imtgql::CGqlRequest& gqlRequest,
 		iprm::IParamsSet& filterParams) const = 0;
 };

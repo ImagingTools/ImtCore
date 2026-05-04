@@ -6,26 +6,26 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtservergql/ICollectionFilterProvider.h>
+#include <imtservergql/ICollectionFilterFiller.h>
 
 
 namespace imtservergql
 {
 
 
-class CUserGroupFilterProviderComp:
+class CUserGroupFilterFillerComp:
 	public icomp::CComponentBase,
-	virtual public ICollectionFilterProvider
+	virtual public ICollectionFilterFiller
 {
 public:
 	typedef CComponentBase BaseClass;
 
-	I_BEGIN_COMPONENT(CUserGroupFilterProviderComp);
-		I_REGISTER_INTERFACE(ICollectionFilterProvider);
+	I_BEGIN_COMPONENT(CUserGroupFilterFillerComp);
+		I_REGISTER_INTERFACE(ICollectionFilterFiller);
 	I_END_COMPONENT;
 
-	// reimplemented (imtservergql::ICollectionFilterProvider)
-	virtual bool ApplyCollectionFilters(
+	// reimplemented (imtservergql::ICollectionFilterFiller)
+	virtual bool FillCollectionFilters(
 		const imtgql::CGqlRequest& gqlRequest,
 		iprm::IParamsSet& filterParams) const override;
 };

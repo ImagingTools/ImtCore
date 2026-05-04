@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include <imtservergql/CUserGroupFilterProviderComp.h>
+#include <imtservergql/CUserGroupFilterFillerComp.h>
 
 
 // ACF includes
@@ -18,9 +18,9 @@ namespace imtservergql
 
 // public methods
 
-// reimplemented (imtservergql::ICollectionFilterProvider)
+// reimplemented (imtservergql::ICollectionFilterFiller)
 
-bool CUserGroupFilterProviderComp::ApplyCollectionFilters(
+bool CUserGroupFilterFillerComp::FillCollectionFilters(
 	const imtgql::CGqlRequest& gqlRequest,
 	iprm::IParamsSet& filterParams) const
 {

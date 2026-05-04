@@ -106,11 +106,11 @@ sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectCont
 		}
 	}
 
-	// Apply additional filters from filter providers
-	for (int i = 0; i < m_filterProvidersCompPtr.GetCount(); ++i){
-		const ICollectionFilterProvider* filterProviderPtr = m_filterProvidersCompPtr.GetAt(i);
-		if (filterProviderPtr != nullptr){
-			filterProviderPtr->ApplyCollectionFilters(gqlRequest, filterParams);
+	// Apply additional filters from filter fillers
+	for (int i = 0; i < m_filterFillersCompPtr.GetCount(); ++i){
+		const ICollectionFilterFiller* filterFillerPtr = m_filterFillersCompPtr.GetAt(i);
+		if (filterFillerPtr != nullptr){
+			filterFillerPtr->FillCollectionFilters(gqlRequest, filterParams);
 		}
 	}
 
