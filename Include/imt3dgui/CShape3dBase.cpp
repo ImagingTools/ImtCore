@@ -285,6 +285,7 @@ void CShape3dBase::DrawGl(QOpenGLShaderProgram &program)
 
 	// set point size
 	program.setUniformValue("usePointSize", false);
+	program.setUniformValue("useThickLines", false);
 
 	// set points
 	switch (m_pointsDataPtr->GetPointFormat()){
