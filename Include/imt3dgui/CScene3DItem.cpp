@@ -308,6 +308,8 @@ void CScene3DItem::SetBackgroundColor(const QColor& color)
 }
 
 
+// reimplemented (QQuickItem)
+
 QSGNode* CScene3DItem::updatePaintNode(QSGNode* oldNode, UpdatePaintNodeData* /*data*/)
 {
 	CScene3DNode* node = static_cast<CScene3DNode*>(oldNode);
