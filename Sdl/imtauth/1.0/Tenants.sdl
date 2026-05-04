@@ -1,0 +1,79 @@
+schema {
+	query: Query
+	mutation: Mutation
+	subscription: Subscription
+	namespace: imtauth
+	version: 1.0
+}
+
+import {
+	"../../../../ImtCore/Sdl/imtbase/1.0/ImtCollection.sdl"
+	"../../../../ImtCore/Sdl/imtbase/1.0/ImtBaseTypes.sdl"
+}
+
+input TenantsListInput {
+	viewParams: CollectionViewParams
+}
+
+type TenantItemData {
+	id: ID!
+	typeId: ID!
+	name: String!
+	description: String
+	isActive: Bool
+	added: String
+	lastModified: String
+}
+
+type TenantsListPayload {
+	items: [TenantItemData]
+	notification: NotificationItem
+}
+
+type TenantData {
+	id: ID
+	name: String
+	description: String
+	isActive: Bool
+}
+
+input TenantDataInput {
+	id: ID!
+	typeId: ID!
+	item: TenantData!
+	name: String
+	description: String
+}
+
+input TenantItemInput {
+	id: ID!
+}
+
+type Query {
+	TenantsList (input:TenantsListInput): TenantsListPayload!
+	TenantItem (input: TenantItemInput): TenantData!
+}
+
+type Mutation {
+	TenantUpdate (input: TenantDataInput): UpdatedNotificationPayload!
+	TenantAdd (input: TenantDataInput): AddedNotificationPayload!
+}
+
+collectionSchema {
+	type Tenant {
+		ref: TenantItemData
+		operations {
+			list: TenantsList
+		}
+		subtype Tenant {
+			ref: TenantData
+			operations {
+				get: TenantItem
+				update: TenantUpdate
+				insert: TenantAdd
+			}
+		}
+	}
+}
+
+
