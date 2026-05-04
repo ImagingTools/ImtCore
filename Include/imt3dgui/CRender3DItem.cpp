@@ -230,10 +230,14 @@ private:
 	void InitResources(QRhi* rhi, const RenderState* state)
 	{
 		// Load pre-compiled QSB shaders (same ones CRhiRenderBackend uses)
-		m_vertexShader = LoadShader(":/RhiShaders/vshader_rhi.vert.qsb");
-		m_fragmentShader = LoadShader(":/RhiShaders/fshader_rhi.frag.qsb");
+		const QString vertPath = QStringLiteral(":/RhiShaders/vshader_rhi.vert.qsb");
+		const QString fragPath = QStringLiteral(":/RhiShaders/fshader_rhi.frag.qsb");
+		m_vertexShader = LoadShader(vertPath);
+		m_fragmentShader = LoadShader(fragPath);
 		if (!m_vertexShader.isValid() || !m_fragmentShader.isValid()){
-			qDebug() << "CRender3DNode: failed to load RHI shaders";
+			qDebug() << "CRender3DNode: failed to load RHI shaders —"
+					 << "vertex:" << vertPath << (m_vertexShader.isValid() ? "ok" : "MISSING")
+					 << "fragment:" << fragPath << (m_fragmentShader.isValid() ? "ok" : "MISSING");
 			return;
 		}
 
@@ -339,11 +343,13 @@ private:
 		return QShader::fromSerialized(f.readAll());
 	}
 
+	static constexpr float s_degToRad = static_cast<float>(M_PI) / 180.0f;
+
 	void BuildMatrices(QMatrix4x4& viewOut, QMatrix4x4& projOut, QVector3D& camPosOut) const
 	{
 		const float dist = static_cast<float>(m_itemPtr->GetCameraDistance());
-		const float rx = static_cast<float>(m_itemPtr->GetRotationX()) * float(M_PI) / 180.0f;
-		const float ry = static_cast<float>(m_itemPtr->GetRotationY()) * float(M_PI) / 180.0f;
+		const float rx = static_cast<float>(m_itemPtr->GetRotationX()) * s_degToRad;
+		const float ry = static_cast<float>(m_itemPtr->GetRotationY()) * s_degToRad;
 
 		camPosOut = QVector3D(
 					dist * std::cos(rx) * std::sin(ry),
