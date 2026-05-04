@@ -18,11 +18,11 @@ namespace imtservergql
 
 // public methods
 
-// reimplemented (imtservergql::ICollectionFilterFiller)
+// reimplemented (imtservergql::IParamsSetJoiner)
 
-bool CUserGroupFilterFillerComp::FillCollectionFilters(
+bool CUserGroupFilterFillerComp::JoinParamsSet(
 	const imtgql::CGqlRequest& gqlRequest,
-	iprm::IParamsSet& filterParams) const
+	iprm::IParamsSet& paramsSet) const
 {
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	if (gqlContextPtr == nullptr){
@@ -37,7 +37,7 @@ bool CUserGroupFilterFillerComp::FillCollectionFilters(
 	istd::TDelPtr<imtauth::CUserGroupFilter> groupFilterPtr = new imtauth::CUserGroupFilter();
 	groupFilterPtr->SetUserId(gqlContextPtr->GetUserId());
 	groupFilterPtr->SetGroupIds(userInfoPtr->GetGroups());
-	filterParams.SetEditableParameter("GroupFilter", groupFilterPtr.PopPtr(), true);
+	paramsSet.SetEditableParameter("GroupFilter", groupFilterPtr.PopPtr(), true);
 
 	return true;
 }
