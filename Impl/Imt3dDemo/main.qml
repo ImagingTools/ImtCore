@@ -9,16 +9,17 @@ Window {
     width: 800
     height: 600
     visible: true
-    title: "Imt3dDemo — 3D Cube"
+    title: "Imt3dDemo — 3D Cube (Scene3DView)"
     color: "#1a1a2e"
 
-    Render3DView {
+    Scene3DView {
         id: view3d
+        objectName: "view3d"
         anchors.fill: parent
-        cubeColor: colorPicker.currentColor
         cameraDistance: distanceSlider.value
         rotationX: xSlider.value
         rotationY: yRotation
+        backgroundColor: "#1a1a2e"
 
         property real yRotation: 45
 
@@ -85,7 +86,7 @@ Window {
             spacing: 8
 
             Text {
-                text: "3D Cube Demo"
+                text: "3D Cube Demo (Scene3DView)"
                 font.pixelSize: 16
                 font.bold: true
                 color: "white"
@@ -108,28 +109,6 @@ Window {
                 from: 1.5; to: 20
                 value: 3.0
             }
-
-            Text { text: "Color"; color: "#aaa"; font.pixelSize: 11 }
-            Row {
-                id: colorPicker
-                spacing: 6
-                Layout.alignment: Qt.AlignHCenter
-                property color currentColor: "#e94560"
-
-                Repeater {
-                    model: ["#e94560", "#0f3460", "#16c79a", "#f5a623", "#bd10e0", "#50e3c2", "#f8e71c"]
-                    Rectangle {
-                        width: 24; height: 24; radius: 12
-                        color: modelData
-                        border.color: colorPicker.currentColor === modelData ? "white" : "transparent"
-                        border.width: 2
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: colorPicker.currentColor = modelData
-                        }
-                    }
-                }
-            }
         }
     }
 
@@ -138,7 +117,7 @@ Window {
         anchors.bottom: parent.bottom
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottomMargin: 16
-        text: "Drag to rotate · Scroll to zoom · GPU-accelerated via Qt RHI"
+        text: "Drag to rotate · Scroll to zoom · Generic Scene3DView pipeline"
         color: "#666"
         font.pixelSize: 12
     }

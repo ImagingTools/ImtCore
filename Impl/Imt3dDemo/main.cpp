@@ -2,15 +2,19 @@
 //
 // Imt3dDemo — Minimal pure-QML desktop application showing a 3D cube.
 //
-// This demo uses CRender3DItem (a QQuickItem that renders via CRhiRenderBackend)
-// to display a GPU-accelerated 3D cube.  No QWidget code is involved — the
-// entire application is driven by QQmlApplicationEngine + main.qml.
+// This demo uses CScene3DItem (the generic scene-based QQuickItem) together
+// with a CCubeSceneItem that is added to the scene, demonstrating how any
+// IScene3dItem can be rendered through the generic pipeline.  No QWidget code
+// is involved — the entire application is driven by QQmlApplicationEngine +
+// main.qml.
 //
 
 #include <QtGui/QGuiApplication>
 #include <QtQml/QQmlApplicationEngine>
+#include <QtQml/QQmlContext>
 
-#include <imt3dgui/CRender3DItem.h>
+#include <imt3dgui/CScene3DItem.h>
+#include <imt3dgui/CCubeSceneItem.h>
 
 
 int main(int argc, char* argv[])
@@ -18,14 +22,23 @@ int main(int argc, char* argv[])
 	QGuiApplication app(argc, argv);
 	app.setApplicationName("Imt3dDemo");
 
-	// Register the C++ QML type
-	imt3dgui::CRender3DItem::RegisterQmlType();
+	// Register the generic Scene3DView QML type
+	imt3dgui::CScene3DItem::RegisterQmlType();
 
 	QQmlApplicationEngine engine;
 	engine.load(QUrl("qrc:/main.qml"));
 
 	if (engine.rootObjects().isEmpty()){
 		return -1;
+	}
+
+	// Get the Scene3DView item and add a cube to its scene.
+	QObject* rootPtr = engine.rootObjects().first();
+	auto* viewPtr = rootPtr->findChild<imt3dgui::CScene3DItem*>("view3d");
+	if (viewPtr){
+		static imt3dgui::CCubeSceneItem cube;
+		cube.SetColor(QVector3D(0.91f, 0.27f, 0.38f));
+		viewPtr->GetScene()->AddShapeToScene(&cube);
 	}
 
 	return app.exec();
