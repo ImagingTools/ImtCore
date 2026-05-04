@@ -9,6 +9,7 @@
 // main.qml.
 //
 
+#include <QtCore/QDebug>
 #include <QtGui/QGuiApplication>
 #include <QtQml/QQmlApplicationEngine>
 #include <QtQml/QQmlContext>
@@ -35,11 +36,14 @@ int main(int argc, char* argv[])
 	// Get the Scene3DView item and add a cube to its scene.
 	QObject* rootPtr = engine.rootObjects().first();
 	auto* viewPtr = rootPtr->findChild<imt3dgui::CScene3DItem*>("view3d");
-	if (viewPtr){
-		static imt3dgui::CCubeSceneItem cube;
-		cube.SetColor(QVector3D(0.91f, 0.27f, 0.38f));
-		viewPtr->GetScene()->AddShapeToScene(&cube);
+	if (!viewPtr){
+		qWarning() << "Imt3dDemo: Scene3DView 'view3d' not found — cube will not be displayed";
+		return app.exec();
 	}
+
+	imt3dgui::CCubeSceneItem cube;
+	cube.SetColor(QVector3D(0.91f, 0.27f, 0.38f));
+	viewPtr->GetScene()->AddShapeToScene(&cube);
 
 	return app.exec();
 }
