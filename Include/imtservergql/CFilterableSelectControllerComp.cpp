@@ -108,7 +108,7 @@ sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectCont
 
 	// Apply additional filters from params set joiners
 	for (int i = 0; i < m_filterFillersCompPtr.GetCount(); ++i){
-		const IParamsSetJoiner* filterFillerPtr = m_filterFillersCompPtr.GetAt(i);
+		const IParamsSetJoiner* filterFillerPtr = m_filterFillersCompPtr[i];
 		if (filterFillerPtr != nullptr){
 			filterFillerPtr->JoinParamsSet(gqlRequest, filterParams);
 		}

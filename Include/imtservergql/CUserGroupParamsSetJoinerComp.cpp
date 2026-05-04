@@ -4,6 +4,7 @@
 
 // ACF includes
 #include <istd/TDelPtr.h>
+#include <iprm/CParamsSet.h>
 
 // ImtCore includes
 #include <imtauth/CUserGroupFilter.h>
@@ -34,13 +35,20 @@ bool CUserGroupParamsSetJoinerComp::JoinParamsSet(
 		return false;
 	}
 
+	iprm::CParamsSet* paramsSetPtr = dynamic_cast<iprm::CParamsSet*>(&paramsSet);
+	if (paramsSetPtr == nullptr){
+		return false;
+	}
+
 	istd::TDelPtr<imtauth::CUserGroupFilter> groupFilterPtr = new imtauth::CUserGroupFilter();
 	groupFilterPtr->SetUserId(gqlContextPtr->GetUserId());
 	groupFilterPtr->SetGroupIds(userInfoPtr->GetGroups());
-	paramsSet.SetEditableParameter("GroupFilter", groupFilterPtr.PopPtr(), true);
+	paramsSetPtr->SetEditableParameter("GroupFilter", groupFilterPtr.PopPtr(), true);
 
 	return true;
 }
 
 
 } // namespace imtservergql
+
+
