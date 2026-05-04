@@ -94,6 +94,7 @@ DocumentViewBase {
 					}
 
 					KeyNavigation.tab: descriptionInput
+					KeyNavigation.backtab: isActiveInput
 				}
 
 				TextInputElementView {
@@ -109,7 +110,7 @@ DocumentViewBase {
 						}
 					}
 
-					KeyNavigation.tab: nameInput
+					KeyNavigation.tab: isActiveInput
 					KeyNavigation.backtab: nameInput
 				}
 
