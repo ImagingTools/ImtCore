@@ -16,6 +16,9 @@ import imtbaseComplexCollectionFilterSdl 1.0
 RemoteCollectionView {
 	id: container
 
+	property string productId;
+	property var documentManager: null;
+
 	collectionId: "Tenants"
 	gqlGetListCommandId: ImtauthTenantsSdlCommandIds.s_getTenantList
 	documentCollectionFilter: null
