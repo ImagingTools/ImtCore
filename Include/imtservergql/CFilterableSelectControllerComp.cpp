@@ -108,9 +108,9 @@ sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectCont
 
 	// Apply additional filters from filter providers
 	for (int i = 0; i < m_filterProvidersCompPtr.GetCount(); ++i){
-		const IFilterableSelectFilterProvider* filterProviderPtr = m_filterProvidersCompPtr.GetAt(i);
+		const ICollectionFilterProvider* filterProviderPtr = m_filterProvidersCompPtr.GetAt(i);
 		if (filterProviderPtr != nullptr){
-			filterProviderPtr->ApplySelectFilters(gqlRequest, filterParams);
+			filterProviderPtr->ApplyCollectionFilters(gqlRequest, filterParams);
 		}
 	}
 

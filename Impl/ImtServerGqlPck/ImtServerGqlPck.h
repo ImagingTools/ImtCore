@@ -42,6 +42,7 @@
 #include <imtservergql/CCollectionDocumentManagerPublisherComp.h>
 #include <imtservergql/CGqlContextCreatorComp.h>
 #include <imtservergql/CFilterableSelectControllerComp.h>
+#include <imtservergql/CUserGroupFilterProviderComp.h>
 
 
 /**
@@ -85,6 +86,7 @@ typedef imtservergql::CCollectionDocumentManagerControllerComp CollectionDocumen
 typedef imtservergql::CCollectionDocumentManagerPublisherComp CollectionDocumentManagerPublisher;
 typedef imtservergql::CGqlContextCreatorComp GqlContextCreator;
 typedef imtservergql::CFilterableSelectControllerComp FilterableSelectController;
+typedef imtservergql::CUserGroupFilterProviderComp UserGroupFilterProvider;
 
 
 } // namespace ImtServerGqlPck
