@@ -1,7 +1,6 @@
 schema {
 	query: Query
 	mutation: Mutation
-	subscription: Subscription
 	namespace: imtauth
 	version: 1.0
 }
@@ -11,9 +10,7 @@ import {
 	"../../../../ImtCore/Sdl/imtbase/1.0/ImtBaseTypes.sdl"
 }
 
-input TenantsListInput {
-	viewParams: CollectionViewParams
-}
+# --- Tenant ---
 
 type TenantItemData {
 	id: ID!
@@ -21,13 +18,7 @@ type TenantItemData {
 	name: String!
 	description: String
 	isActive: Bool
-	added: String
-	lastModified: String
-}
-
-type TenantsListPayload {
-	items: [TenantItemData]
-	notification: NotificationItem
+	createdAt: String
 }
 
 type TenantData {
@@ -35,6 +26,17 @@ type TenantData {
 	name: String
 	description: String
 	isActive: Bool
+	createdAt: String
+	updatedAt: String
+}
+
+input TenantsListInput {
+	viewParams: CollectionViewParams
+}
+
+type TenantsListPayload {
+	items: [TenantItemData]
+	notification: NotificationItem
 }
 
 input TenantDataInput {
@@ -50,7 +52,7 @@ input TenantItemInput {
 }
 
 type Query {
-	TenantsList (input:TenantsListInput): TenantsListPayload!
+	TenantsList (input: TenantsListInput): TenantsListPayload!
 	TenantItem (input: TenantItemInput): TenantData!
 }
 
@@ -75,5 +77,4 @@ collectionSchema {
 		}
 	}
 }
-
 

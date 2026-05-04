@@ -25,6 +25,10 @@ public:
 	virtual void SetTenantDescription(const QString& description) override;
 	virtual bool IsActive() const override;
 	virtual void SetActive(bool isActive) override;
+	virtual QString GetCreatedAt() const override;
+	virtual void SetCreatedAt(const QString& createdAt) override;
+	virtual QString GetUpdatedAt() const override;
+	virtual void SetUpdatedAt(const QString& updatedAt) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -39,6 +43,8 @@ protected:
 	QString m_name;
 	QString m_description;
 	bool m_isActive;
+	QString m_createdAt;
+	QString m_updatedAt;
 };
 
 

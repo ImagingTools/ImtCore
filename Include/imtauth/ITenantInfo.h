@@ -63,9 +63,29 @@ public:
 	virtual bool IsActive() const = 0;
 
 	/**
-		Set active state.
+	  Set active state.
 	*/
 	virtual void SetActive(bool isActive) = 0;
+
+	/**
+		Get created at timestamp.
+	*/
+	virtual QString GetCreatedAt() const = 0;
+
+	/**
+		Set created at timestamp.
+	*/
+	virtual void SetCreatedAt(const QString& createdAt) = 0;
+
+	/**
+		Get updated at timestamp.
+	*/
+	virtual QString GetUpdatedAt() const = 0;
+
+	/**
+		Set updated at timestamp.
+	*/
+	virtual void SetUpdatedAt(const QString& updatedAt) = 0;
 };
 
 

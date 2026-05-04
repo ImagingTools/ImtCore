@@ -79,9 +79,41 @@ bool CTenantInfo::IsActive() const
 void CTenantInfo::SetActive(bool isActive)
 {
 	if (m_isActive != isActive){
-		istd::CChangeNotifier changeNotifier(this);
+		istd::CChangeNotifier notifier(this);
 
 		m_isActive = isActive;
+	}
+}
+
+
+QString CTenantInfo::GetCreatedAt() const
+{
+	return m_createdAt;
+}
+
+
+void CTenantInfo::SetCreatedAt(const QString& createdAt)
+{
+	if (m_createdAt != createdAt){
+		istd::CChangeNotifier notifier(this);
+
+		m_createdAt = createdAt;
+	}
+}
+
+
+QString CTenantInfo::GetUpdatedAt() const
+{
+	return m_updatedAt;
+}
+
+
+void CTenantInfo::SetUpdatedAt(const QString& updatedAt)
+{
+	if (m_updatedAt != updatedAt){
+		istd::CChangeNotifier notifier(this);
+
+		m_updatedAt = updatedAt;
 	}
 }
 
@@ -90,17 +122,39 @@ void CTenantInfo::SetActive(bool isActive)
 
 bool CTenantInfo::Serialize(iser::IArchive& archive)
 {
-	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
+	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
 
-	iser::CArchiveTag tenantTag("Tenant");
-	bool retVal = archive.BeginTag(tenantTag);
+	bool retVal = true;
 
-	retVal = retVal && archive.Process(m_tenantId, "TenantId");
-	retVal = retVal && archive.Process(m_name, "Name");
-	retVal = retVal && archive.Process(m_description, "Description");
-	retVal = retVal && archive.Process(m_isActive, "IsActive");
+	iser::CArchiveTag idTag("Id", "Id", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(idTag);
+	retVal = retVal && archive.Process(m_tenantId);
+	retVal = retVal && archive.EndTag(idTag);
 
-	retVal = archive.EndTag(tenantTag) && retVal;
+	iser::CArchiveTag nameTag("Name", "Name", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(nameTag);
+	retVal = retVal && archive.Process(m_name);
+	retVal = retVal && archive.EndTag(nameTag);
+
+	iser::CArchiveTag descriptionTag("Description", "Description", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(descriptionTag);
+	retVal = retVal && archive.Process(m_description);
+	retVal = retVal && archive.EndTag(descriptionTag);
+
+	iser::CArchiveTag isActiveTag("IsActive", "Is active", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(isActiveTag);
+	retVal = retVal && archive.Process(m_isActive);
+	retVal = retVal && archive.EndTag(isActiveTag);
+
+	iser::CArchiveTag createdAtTag("CreatedAt", "Created at", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(createdAtTag);
+	retVal = retVal && archive.Process(m_createdAt);
+	retVal = retVal && archive.EndTag(createdAtTag);
+
+	iser::CArchiveTag updatedAtTag("UpdatedAt", "Updated at", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(updatedAtTag);
+	retVal = retVal && archive.Process(m_updatedAt);
+	retVal = retVal && archive.EndTag(updatedAtTag);
 
 	return retVal;
 }
@@ -112,12 +166,14 @@ bool CTenantInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/
 {
 	const CTenantInfo* sourcePtr = dynamic_cast<const CTenantInfo*>(&object);
 	if (sourcePtr != nullptr){
-		istd::CChangeNotifier changeNotifier(this);
+		istd::CChangeNotifier notifier(this);
 
 		m_tenantId = sourcePtr->m_tenantId;
 		m_name = sourcePtr->m_name;
 		m_description = sourcePtr->m_description;
 		m_isActive = sourcePtr->m_isActive;
+		m_createdAt = sourcePtr->m_createdAt;
+		m_updatedAt = sourcePtr->m_updatedAt;
 
 		return true;
 	}
@@ -139,12 +195,14 @@ istd::IChangeableUniquePtr CTenantInfo::CloneMe(CompatibilityMode mode) const
 
 bool CTenantInfo::ResetData(CompatibilityMode /*mode*/)
 {
-	istd::CChangeNotifier changeNotifier(this);
+	istd::CChangeNotifier notifier(this);
 
 	m_tenantId.clear();
 	m_name.clear();
 	m_description.clear();
 	m_isActive = true;
+	m_createdAt.clear();
+	m_updatedAt.clear();
 
 	return true;
 }

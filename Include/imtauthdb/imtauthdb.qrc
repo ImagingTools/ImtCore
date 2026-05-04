@@ -2,9 +2,11 @@
     <qresource prefix="/SQL/Postgres">
         <file alias="CreatePersonalAccessTokenTable.sql">Resources/SQL/Postgres/CreatePersonalAccessTokenTable.sql</file>
 	<file alias="CreateUserSessionsTable.sql">Resources/SQL/Postgres/CreateUserSessionsTable.sql</file>
+        <file alias="CreateTenantsTable.sql">Resources/SQL/Postgres/CreateTenantsTable.sql</file>
     </qresource>
     <qresource prefix="/SQL/SQLite">
         <file alias="CreatePersonalAccessTokenTable.sql">Resources/SQL/SQLite/CreatePersonalAccessTokenTable.sql</file>
 	<file alias="CreateUserSessionsTable.sql">Resources/SQL/SQLite/CreateUserSessionsTable.sql</file>
+        <file alias="CreateTenantsTable.sql">Resources/SQL/SQLite/CreateTenantsTable.sql</file>
     </qresource>
 </RCC>

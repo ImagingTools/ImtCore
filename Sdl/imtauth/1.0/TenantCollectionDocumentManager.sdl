@@ -1,0 +1,26 @@
+schema {
+	namespace: imtauth
+	version: 1.0
+
+	query: Query
+	mutation: Mutation
+}
+
+import {
+	"Tenants.sdl"
+	"../../imtbase/1.0/CollectionDocumentManager.sdl"
+	"../../imtbase/1.0/UndoManager.sdl"
+}
+
+type UpdateTenantInput {
+	documentId: ID!
+	tenant: TenantData!
+}
+
+type Query {
+	GetTenantRepresentation(input: DocumentId): TenantData!
+}
+
+type Mutation {
+	UpdateTenantFromRepresentation(input: UpdateTenantInput): DocumentOperationStatus!
+}
