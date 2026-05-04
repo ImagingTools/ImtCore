@@ -17,7 +17,7 @@ RemoteCollectionView {
 	id: container
 
 	collectionId: "Tenants"
-	gqlGetListCommandId: ImtauthTenantsSdlCommandIds.s_tenantsList
+	gqlGetListCommandId: ImtauthTenantsSdlCommandIds.s_getTenantList
 	documentCollectionFilter: null
 
 	Component.onCompleted: {

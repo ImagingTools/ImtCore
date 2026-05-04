@@ -30,11 +30,11 @@ type TenantData {
 	updatedAt: String
 }
 
-input TenantsListInput {
+input GetTenantListInput {
 	viewParams: CollectionViewParams
 }
 
-type TenantsListPayload {
+type GetTenantListPayload {
 	items: [TenantItemData]
 	notification: NotificationItem
 }
@@ -47,13 +47,8 @@ input TenantDataInput {
 	description: String
 }
 
-input TenantItemInput {
-	id: ID!
-}
-
 type Query {
-	TenantsList (input: TenantsListInput): TenantsListPayload!
-	TenantItem (input: TenantItemInput): TenantData!
+	GetTenantList (input: GetTenantListInput): GetTenantListPayload!
 }
 
 type Mutation {
@@ -65,12 +60,11 @@ collectionSchema {
 	type Tenant {
 		ref: TenantItemData
 		operations {
-			list: TenantsList
+			list: GetTenantList
 		}
 		subtype Tenant {
 			ref: TenantData
 			operations {
-				get: TenantItem
 				update: TenantUpdate
 				insert: TenantAdd
 			}

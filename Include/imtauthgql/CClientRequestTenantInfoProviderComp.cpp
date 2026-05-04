@@ -6,7 +6,7 @@
 #include <imtbase/CCollectionInfo.h>
 #include <imtgql/CGqlContext.h>
 #include <imtgql/CGqlRequestContextManager.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/TenantCollectionDocumentManager.h>
 
 
 namespace imtauthgql
@@ -31,14 +31,14 @@ imtauth::ITenantInfoSharedPtr CClientRequestTenantInfoProviderComp::GetTenant(co
 		return nullptr;
 	}
 
-	namespace tenantssdl = sdl::imtauth::Tenants;
+	namespace docMgrSdl = sdl::imtauth::TenantCollectionDocumentManager;
 
-	tenantssdl::TenantItemRequestArguments arguments;
+	docMgrSdl::GetTenantRepresentationRequestArguments arguments;
 	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->id = tenantId;
+	arguments.input.Version_1_0->documentId = tenantId;
 
 	imtgql::CGqlRequest gqlRequest;
-	if (!tenantssdl::CTenantItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+	if (!docMgrSdl::CGetTenantRepresentationGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		return nullptr;
 	}
 
@@ -51,7 +51,7 @@ imtauth::ITenantInfoSharedPtr CClientRequestTenantInfoProviderComp::GetTenant(co
 	}
 
 	QString errorMessage;
-	tenantssdl::CTenantData payload = SendModelRequest<tenantssdl::CTenantData>(gqlRequest, errorMessage);
+	docMgrSdl::CTenantData payload = SendModelRequest<docMgrSdl::CTenantData>(gqlRequest, errorMessage);
 	if (!errorMessage.isEmpty()){
 		return nullptr;
 	}

@@ -38,17 +38,12 @@ protected:
 	// reimplemented (sdl::imtauth::Tenants::CTenantCollectionControllerCompBase)
 	virtual bool CreateRepresentationFromObject(
 				const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-				const sdl::imtauth::Tenants::CTenantsListGqlRequest& tenantsListRequest,
+				const sdl::imtauth::Tenants::CGetTenantListGqlRequest& getTenantListRequest,
 				sdl::imtauth::Tenants::CTenantItemData::V1_0& representationObject,
 				QString& errorMessage) const override;
 	virtual istd::IChangeableUniquePtr CreateObjectFromRepresentation(
 				const sdl::imtauth::Tenants::CTenantData::V1_0& tenantDataRepresentation,
 				QByteArray& newObjectId,
-				QString& errorMessage) const override;
-	virtual bool CreateRepresentationFromObject(
-				const istd::IChangeable& data,
-				const sdl::imtauth::Tenants::CTenantItemGqlRequest& tenantItemRequest,
-				sdl::imtauth::Tenants::CTenantData::V1_0& representationPayload,
 				QString& errorMessage) const override;
 	virtual bool UpdateObjectFromRepresentationRequest(
 				const ::imtgql::CGqlRequest& rawGqlRequest,

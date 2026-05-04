@@ -114,7 +114,7 @@ sdl::imtbase::ImtCollection::CVisualStatus CTenantCollectionControllerComp::OnGe
 
 bool CTenantCollectionControllerComp::CreateRepresentationFromObject(
 			const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-			const sdl::imtauth::Tenants::CTenantsListGqlRequest& tenantsListRequest,
+			const sdl::imtauth::Tenants::CGetTenantListGqlRequest& getTenantListRequest,
 			sdl::imtauth::Tenants::CTenantItemData::V1_0& representationObject,
 			QString& errorMessage) const
 {
@@ -133,7 +133,7 @@ bool CTenantCollectionControllerComp::CreateRepresentationFromObject(
 		return false;
 	}
 
-	sdl::imtauth::Tenants::TenantsListRequestInfo requestInfo = tenantsListRequest.GetRequestInfo();
+	sdl::imtauth::Tenants::GetTenantListRequestInfo requestInfo = getTenantListRequest.GetRequestInfo();
 
 	if (requestInfo.items.isIdRequested){
 		representationObject.id = QByteArray(objectId);
@@ -204,31 +204,6 @@ istd::IChangeableUniquePtr CTenantCollectionControllerComp::CreateObjectFromRepr
 	}
 
 	return tenantInstancePtr;
-}
-
-
-bool CTenantCollectionControllerComp::CreateRepresentationFromObject(
-			const istd::IChangeable& data,
-			const sdl::imtauth::Tenants::CTenantItemGqlRequest& tenantItemRequest,
-			sdl::imtauth::Tenants::CTenantData::V1_0& representationPayload,
-			QString& errorMessage) const
-{
-	auto tenantInfoPtr = dynamic_cast<const imtauth::CIdentifiableTenantInfo*>(&data);
-	if (tenantInfoPtr == nullptr){
-		errorMessage = QString("Unable to create representation from object. Error: Object is invalid");
-		SendErrorMessage(0, errorMessage, "CTenantCollectionControllerComp");
-
-		return false;
-	}
-
-	representationPayload.id = QByteArray(tenantInfoPtr->GetObjectUuid());
-	representationPayload.name = QString(tenantInfoPtr->GetTenantName());
-	representationPayload.description = QString(tenantInfoPtr->GetTenantDescription());
-	representationPayload.isActive = tenantInfoPtr->IsActive();
-	representationPayload.createdAt = tenantInfoPtr->GetCreatedAt();
-	representationPayload.updatedAt = tenantInfoPtr->GetUpdatedAt();
-
-	return true;
 }
 
 

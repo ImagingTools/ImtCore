@@ -2,6 +2,10 @@
 #include <imtauthgql/CClientRequestTenantManagerComp.h>
 
 
+// ImtCore includes
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/TenantCollectionDocumentManager.h>
+
+
 namespace imtauthgql
 {
 
@@ -120,14 +124,14 @@ bool CClientRequestTenantManagerComp::SetTenantActive(const QByteArray& tenantId
 
 bool CClientRequestTenantManagerComp::GetTenantDataSdl(const QByteArray& tenantId, sdl::imtauth::Tenants::CTenantData::V1_0& tenantData) const
 {
-	namespace tenantssdl = sdl::imtauth::Tenants;
+	namespace docMgrSdl = sdl::imtauth::TenantCollectionDocumentManager;
 
-	tenantssdl::TenantItemRequestArguments arguments;
+	docMgrSdl::GetTenantRepresentationRequestArguments arguments;
 	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->id = tenantId;
+	arguments.input.Version_1_0->documentId = tenantId;
 
-	tenantssdl::CTenantData payload;
-	bool ok = SendModelRequestInternal<tenantssdl::TenantItemRequestArguments, tenantssdl::CTenantData, tenantssdl::CTenantItemGqlRequest>(arguments, payload);
+	docMgrSdl::CTenantData payload;
+	bool ok = SendModelRequestInternal<docMgrSdl::GetTenantRepresentationRequestArguments, docMgrSdl::CTenantData, docMgrSdl::CGetTenantRepresentationGqlRequest>(arguments, payload);
 	if (!ok){
 		return false;
 	}
