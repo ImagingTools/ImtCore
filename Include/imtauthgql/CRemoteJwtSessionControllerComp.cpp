@@ -133,7 +133,7 @@ bool CRemoteJwtSessionControllerComp::RefreshToken(
 
 bool CRemoteJwtSessionControllerComp::CreateNewSession(
 			const QByteArray& userId,
-			const QByteArray& /*tenantId*/,
+			const QByteArray& /*tenantId*/, // TODO: Forward tenantId to remote service when SDL schema supports it
 			imtauth::IJwtSessionController::UserSession& userSession) const
 {
 	namespace sessionsdl = sdl::imtauth::Sessions;
