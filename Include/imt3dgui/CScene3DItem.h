@@ -94,10 +94,10 @@ protected:
 private:
 	imt3dview::CScene3d m_scene;
 
-	qreal m_cameraDistance;
-	qreal m_rotationX;
-	qreal m_rotationY;
-	QColor m_backgroundColor;
+	qreal m_cameraDistance = 3.0;
+	qreal m_rotationX = 25.0;
+	qreal m_rotationY = 45.0;
+	QColor m_backgroundColor{Qt::black};
 };
 
 
