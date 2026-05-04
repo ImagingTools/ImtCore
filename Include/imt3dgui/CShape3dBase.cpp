@@ -273,7 +273,7 @@ void CShape3dBase::DrawOverlay(QPainter& /*painter*/)
 }
 
 
-// reimplement (IShape3d)
+// reimplemented (IShape3d)
 
 QVector3D CShape3dBase::GetColor() const
 {

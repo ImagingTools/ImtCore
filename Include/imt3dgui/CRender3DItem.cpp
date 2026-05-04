@@ -518,6 +518,8 @@ void CRender3DItem::SetRotationY(qreal angle)
 }
 
 
+// reimplemented (QQuickItem)
+
 QSGNode* CRender3DItem::updatePaintNode(QSGNode* oldNode, UpdatePaintNodeData* /*data*/)
 {
 	CRender3DNode* node = static_cast<CRender3DNode*>(oldNode);

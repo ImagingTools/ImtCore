@@ -54,7 +54,7 @@ void CGridShape::SetPlaneMode(PlaneMode planeMode)
 
 // protected methods
 
-// reimplement (imt3dgui::CShape3dBase)
+// reimplemented (imt3dgui::CShape3dBase)
 
 void CGridShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
@@ -97,7 +97,7 @@ void CGridShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& /*chang
 }
 
 
-// reimplement (imt3dgui::IShape3d)
+// reimplemented (imt3dgui::IShape3d)
 
 QVector3D CGridShape::GetColor() const
 {
@@ -107,7 +107,7 @@ QVector3D CGridShape::GetColor() const
 
 // protected methods
 
-// reimplement (imt3dgui::CShape3dBase)
+// reimplemented (imt3dgui::CShape3dBase)
 
 imt3dview::PrimitiveType CGridShape::GetPrimitiveType() const
 {

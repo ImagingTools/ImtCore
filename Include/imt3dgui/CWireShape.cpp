@@ -37,7 +37,7 @@ void CWireShape::SetInfoBoxEnabled(bool isEnabled)
 
 // protected methods
 
-// reimplement (imt3dgui::CShape3dBase)
+// reimplemented (imt3dgui::CShape3dBase)
 
 void CWireShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {

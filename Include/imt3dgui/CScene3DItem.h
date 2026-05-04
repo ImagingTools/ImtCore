@@ -89,6 +89,7 @@ signals:
 	void BackgroundColorChanged();
 
 protected:
+	// reimplemented (QQuickItem)
 	QSGNode* updatePaintNode(QSGNode* oldNode, UpdatePaintNodeData* data) override;
 
 private:

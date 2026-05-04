@@ -168,7 +168,7 @@ void CRulerShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& /*chan
 
 // protected methods
 
-// reimplement (imt3dgui::CShape3dBase)
+// reimplemented (imt3dgui::CShape3dBase)
 
 imt3dview::PrimitiveType CRulerShape::GetPrimitiveType() const
 {

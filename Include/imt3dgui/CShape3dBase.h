@@ -43,12 +43,12 @@ public:
 
 	int FindVertex(const QPoint& point, bool limitDistance, QVector3D* positionPtr = nullptr) const;
 
-	// reimplement (imt3dgui::IShape3d)
+	// reimplemented (imt3dgui::IShape3d)
 	virtual bool IsValid() const override;
 	virtual bool IsVisible() const override;
 	virtual void SetVisible(bool isVisible) override;
 
-	// reimplement (imt3dview::IScene3dItem)
+	// reimplemented (imt3dview::IScene3dItem)
 	virtual void SetCamera(const imt3dview::IScene3dCamera* cameraPtr) override;
 	virtual void SetProjection(const QMatrix4x4& projection) override;
 	virtual void SetViewPort(const QRect& viewPort) override;
@@ -62,13 +62,13 @@ public:
 	virtual float GetScale() const override;
 	virtual void SetScale(float scale) override;
 
-	// reimplement (imt3dview::IDrawable)
+	// reimplemented (imt3dview::IDrawable)
 	virtual void OnAttachBackend(imt3dview::IRenderBackend* backendPtr) override;
 	virtual void Render(imt3dview::IRenderBackend& backend) override;
 	virtual void DrawOverlay(QPainter& /*painter*/) override;
 
 protected:
-	// reimplement (IShape3d)
+	// reimplemented (IShape3d)
 	virtual QVector3D GetColor() const override;
 
 protected:

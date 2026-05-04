@@ -100,7 +100,7 @@ void CAxisShape::SetAxisLabel(AxisType axis, const QString& label)
 
 // protected methods
 
-// reimplement (imt3dgui::CShape3dBase)
+// reimplemented (imt3dgui::CShape3dBase)
 
 void CAxisShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet & /*changeSet*/)
 {
@@ -143,7 +143,7 @@ void CAxisShape::FillMaterial(imt3dview::Material& material) const
 }
 
 
-// reimplement (imt3dgui::IDrawable)
+// reimplemented (imt3dgui::IDrawable)
 
 void CAxisShape::DrawOverlay(QPainter& painter)
 {

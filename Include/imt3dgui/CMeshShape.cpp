@@ -155,7 +155,7 @@ void CMeshShape::SetInfoBoxEnabled(bool isEnabled)
 
 // protected methods
 
-// reimplement (imt3dgui::CShape3dBase)
+// reimplemented (imt3dgui::CShape3dBase)
 
 void CMeshShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {

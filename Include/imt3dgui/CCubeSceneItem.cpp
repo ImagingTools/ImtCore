@@ -32,6 +32,8 @@ QVector3D CCubeSceneItem::GetColor() const
 }
 
 
+// reimplemented (imt3dview::IScene3dItem)
+
 bool CCubeSceneItem::IsValid() const
 {
 	return true;
@@ -88,6 +90,8 @@ void CCubeSceneItem::SetScale(float scale)
 	m_scale = scale;
 }
 
+
+// reimplemented (imt3dview::IDrawable)
 
 void CCubeSceneItem::OnAttachBackend(imt3dview::IRenderBackend* backendPtr)
 {
