@@ -16,6 +16,7 @@
 #include <imtchat/IAttachmentStorage.h>
 #include <imtchat/IConversation.h>
 #include <imtbase/IObjectCollectionIterator.h>
+#include <imtbase/CCollectionFilter.h>
 #include <imtdeskgql/imtdeskgql.h>
 #include <imtdeskgql/TicketPermissions.h>
 #include <imtdoc/CDocumentSavedEvent.h>
@@ -166,8 +167,13 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentManagerComp::OnGetTi
 	if (!conversationId.isEmpty() && m_messageCollectionCompPtr.IsValid()){
 		CIdParam conversationIdParam(conversationId);
 
+		imtbase::CCollectionFilter sortFilter;
+		sortFilter.SetSortingOrder(imtbase::ICollectionFilter::SO_ASC);
+		sortFilter.SetSortingInfoIds(QByteArrayList() << "CreatedAt");
+
 		iprm::CParamsSet paramsSet;
 		paramsSet.SetEditableParameter("ConversationId", &conversationIdParam);
+		paramsSet.SetEditableParameter("Filter", &sortFilter);
 
 		istd::TDelPtr<imtbase::IObjectCollectionIterator> iteratorPtr(
 					m_messageCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), 0, -1, &paramsSet));

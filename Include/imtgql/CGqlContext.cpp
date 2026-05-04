@@ -125,6 +125,9 @@ void CGqlContext::SetUserInfo(const imtauth::IUserInfo* userInfoPtr)
 				Q_ASSERT(false);
 			}
 		}
+		else{
+			m_userInfoPtr.Reset();
+		}
 	}
 }
 
@@ -193,7 +196,7 @@ bool CGqlContext::Serialize(iser::IArchive &archive)
 
 int CGqlContext::GetSupportedOperations() const
 {
-	return SO_COPY | SO_COMPARE | SO_RESET;
+	return SO_COPY | SO_COMPARE | SO_RESET | SO_CLONE;
 }
 
 
@@ -240,6 +243,7 @@ bool CGqlContext::ResetData(CompatibilityMode /*mode*/)
 	m_token.clear();
 	m_userId.clear();
 	m_headers.clear();
+	m_userInfoPtr.Reset();
 
 	return true;
 }

@@ -7,6 +7,7 @@
 #include <imtdeskgql/CTicketCollectionDocumentManagerComp.h>
 #include <imtdeskgql/CEntityContextTicketsControllerComp.h>
 #include <imtdeskgql/CTicketMessageNotifierComp.h>
+#include <imtdeskgql/CTicketAssigneeNotifierComp.h>
 
 
 /**
@@ -20,6 +21,7 @@ typedef imtdeskgql::CTicketCollectionControllerComp TicketCollectionController;
 typedef imtdeskgql::CTicketCollectionDocumentManagerComp TicketCollectionDocumentManager;
 typedef imtdeskgql::CEntityContextTicketsControllerComp EntityContextTicketsController;
 typedef imtdeskgql::CTicketMessageNotifierComp TicketMessageNotifier;
+typedef imtdeskgql::CTicketAssigneeNotifierComp TicketAssigneeNotifier;
 
 
 } // namespace ImtDeskGqlPck

@@ -6,7 +6,23 @@ TreeItemModel {
     function SetGlobalAccessToken(token){
         XMLHttpRequest.QMLAuthToken = token
     }
-    
+
+    function SetRefreshToken(token){
+        XMLHttpRequest.QMLAuthRefreshToken = token
+    }
+
+    function SetProductId(productId){
+        XMLHttpRequest.QMLProductId = productId
+    }
+
+    function GetGlobalAccessToken(){
+        return XMLHttpRequest.QMLAuthToken || ""
+    }
+
+    function GetProductId(){
+        return XMLHttpRequest.QMLProductId || ""
+    }
+
     function setGqlQuery(gqlData){
         this.state = "Loading"
         var xhr = new XMLHttpRequest;
