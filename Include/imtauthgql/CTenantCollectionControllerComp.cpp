@@ -155,20 +155,8 @@ bool CTenantCollectionControllerComp::CreateRepresentationFromObject(
 		representationObject.isActive = tenantInfoPtr->IsActive();
 	}
 
-	if (requestInfo.items.isAddedRequested){
-		QDateTime addedTime = objectCollectionIterator.GetElementInfo("Added").toDateTime();
-		addedTime.setTimeZone(QTimeZone::utc());
-
-		QString added = addedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-		representationObject.added = QString(added);
-	}
-
-	if (requestInfo.items.isLastModifiedRequested){
-		QDateTime lastModifiedTime = objectCollectionIterator.GetElementInfo("LastModified").toDateTime();
-		lastModifiedTime.setTimeZone(QTimeZone::utc());
-
-		QString lastModified = lastModifiedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-		representationObject.lastModified = QString(lastModified);
+	if (requestInfo.items.isCreatedAtRequested){
+		representationObject.createdAt = tenantInfoPtr->GetCreatedAt();
 	}
 
 	return true;
@@ -237,6 +225,8 @@ bool CTenantCollectionControllerComp::CreateRepresentationFromObject(
 	representationPayload.name = QString(tenantInfoPtr->GetTenantName());
 	representationPayload.description = QString(tenantInfoPtr->GetTenantDescription());
 	representationPayload.isActive = tenantInfoPtr->IsActive();
+	representationPayload.createdAt = tenantInfoPtr->GetCreatedAt();
+	representationPayload.updatedAt = tenantInfoPtr->GetUpdatedAt();
 
 	return true;
 }
