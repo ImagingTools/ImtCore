@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include <imtservergql/CUserGroupFilterFillerComp.h>
+#include <imtservergql/CUserGroupParamsSetJoinerComp.h>
 
 
 // ACF includes
@@ -20,7 +20,7 @@ namespace imtservergql
 
 // reimplemented (imtservergql::IParamsSetJoiner)
 
-bool CUserGroupFilterFillerComp::JoinParamsSet(
+bool CUserGroupParamsSetJoinerComp::JoinParamsSet(
 	const imtgql::CGqlRequest& gqlRequest,
 	iprm::IParamsSet& paramsSet) const
 {

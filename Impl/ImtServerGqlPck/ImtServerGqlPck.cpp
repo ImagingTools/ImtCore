@@ -186,9 +186,9 @@ I_EXPORT_COMPONENT(
 			"Filterable Select Controller");
 
 I_EXPORT_COMPONENT(
-			UserGroupFilterFiller,
-			"User group filter filler",
-			"User Group Filter Filler");
+			UserGroupParamsSetJoiner,
+			"User group params set joiner",
+			"User Group Params Set Joiner");
 
 
 } // namespace ImtServerGqlPck

@@ -13,14 +13,14 @@ namespace imtservergql
 {
 
 
-class CUserGroupFilterFillerComp:
+class CUserGroupParamsSetJoinerComp:
 	public icomp::CComponentBase,
 	virtual public IParamsSetJoiner
 {
 public:
 	typedef CComponentBase BaseClass;
 
-	I_BEGIN_COMPONENT(CUserGroupFilterFillerComp);
+	I_BEGIN_COMPONENT(CUserGroupParamsSetJoinerComp);
 		I_REGISTER_INTERFACE(IParamsSetJoiner);
 	I_END_COMPONENT;
 
