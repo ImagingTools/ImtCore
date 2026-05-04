@@ -133,6 +133,7 @@ bool CRemoteJwtSessionControllerComp::RefreshToken(
 
 bool CRemoteJwtSessionControllerComp::CreateNewSession(
 			const QByteArray& userId,
+			const QByteArray& /*tenantId*/,
 			imtauth::IJwtSessionController::UserSession& userSession) const
 {
 	namespace sessionsdl = sdl::imtauth::Sessions;
@@ -274,6 +275,12 @@ QByteArray CRemoteJwtSessionControllerComp::GetUserFromJwt(const QByteArray& jwt
 
 
 QByteArray CRemoteJwtSessionControllerComp::GetSessionFromJwt(const QByteArray& /*jwt*/) const
+{
+	return QByteArray();
+}
+
+
+QByteArray CRemoteJwtSessionControllerComp::GetTenantFromJwt(const QByteArray& /*jwt*/) const
 {
 	return QByteArray();
 }

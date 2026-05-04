@@ -8,7 +8,7 @@ namespace imtcore
 
 enum VersionId
 {
-	VI_IMTCORE = 1977
+	VI_IMTCORE = 14580
 };
 
 

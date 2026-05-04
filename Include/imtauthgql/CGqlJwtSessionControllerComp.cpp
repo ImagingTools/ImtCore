@@ -177,7 +177,7 @@ sdl::imtauth::Sessions::CCreateNewSessionPayload CGqlJwtSessionControllerComp::O
 	}
 
 	imtauth::IJwtSessionController::UserSession userSession;
-	response.Version_1_0->ok = m_jwtSessionControllerCompPtr->CreateNewSession(userId, userSession);
+	response.Version_1_0->ok = m_jwtSessionControllerCompPtr->CreateNewSession(userId, QByteArray(), userSession);
 	if (response.Version_1_0->ok){
 		sdl::imtauth::Sessions::CUserSession::V1_0 userData;
 		userData.userId = userSession.userId;
