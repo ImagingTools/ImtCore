@@ -19,6 +19,7 @@ type TenantItemData {
 	description: String
 	isActive: Boolean
 	createdAt: String
+	updatedAt: String
 }
 
 type TenantData {
@@ -96,10 +97,61 @@ type GetTenantIdsPayload {
 	errorMessage: String
 }
 
+# --- Tenant Relationships ---
+
+enum TenantRelationshipRole {
+	Parent
+	Child
+	Partner
+	Supplier
+	Customer
+	Affiliate
+}
+
+type TenantRelationship {
+	id: ID!
+	sourceTenantId: ID!
+	targetTenantId: ID!
+	role: TenantRelationshipRole!
+	description: String
+	createdAt: String
+}
+
+input AddTenantRelationshipInput {
+	sourceTenantId: ID!
+	targetTenantId: ID!
+	role: TenantRelationshipRole!
+	description: String
+}
+
+type AddTenantRelationshipPayload {
+	relationshipId: ID
+	errorMessage: String
+}
+
+input RemoveTenantRelationshipInput {
+	relationshipId: ID!
+}
+
+type RemoveTenantRelationshipPayload {
+	success: Boolean
+	errorMessage: String
+}
+
+input GetTenantRelationshipsInput {
+	tenantId: ID!
+}
+
+type GetTenantRelationshipsPayload {
+	relationships: [TenantRelationship]
+	errorMessage: String
+}
+
 type Query {
 	GetTenantList (input: GetTenantListInput): GetTenantListPayload!
 	GetTenant (input: GetTenantInput): GetTenantPayload!
 	GetTenantIds: GetTenantIdsPayload!
+	GetTenantRelationships (input: GetTenantRelationshipsInput): GetTenantRelationshipsPayload!
 }
 
 type Mutation {
@@ -107,6 +159,8 @@ type Mutation {
 	RemoveTenant (input: RemoveTenantInput): RemoveTenantPayload!
 	UpdateTenant (input: UpdateTenantInput): UpdateTenantPayload!
 	SetTenantActive (input: SetTenantActiveInput): SetTenantActivePayload!
+	AddTenantRelationship (input: AddTenantRelationshipInput): AddTenantRelationshipPayload!
+	RemoveTenantRelationship (input: RemoveTenantRelationshipInput): RemoveTenantRelationshipPayload!
 }
 
 collectionSchema {

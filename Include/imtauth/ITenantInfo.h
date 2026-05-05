@@ -7,6 +7,9 @@
 #include <idoc/IDocumentMetaInfo.h>
 #include <istd/TSmartPtr.h>
 
+// Qt includes
+#include <QList>
+
 
 namespace imtauth
 {
@@ -26,6 +29,47 @@ public:
 		MIT_TENANT_DESCRIPTION,
 		MIT_TENANT_IS_ACTIVE
 	};
+
+	/**
+		Tenant relationship roles.
+	*/
+	enum TenantRelationshipRole
+	{
+		Parent = 0,
+		Child,
+		Partner,
+		Supplier,
+		Customer,
+		Affiliate
+	};
+
+	/**
+		Structure describing a relationship between tenants.
+	*/
+	struct TenantRelationship
+	{
+		QByteArray relationshipId;
+		QByteArray targetTenantId;
+		TenantRelationshipRole role;
+		QString description;
+		QString createdAt;
+
+		bool operator==(const TenantRelationship& other) const
+		{
+			return relationshipId == other.relationshipId
+				&& targetTenantId == other.targetTenantId
+				&& role == other.role
+				&& description == other.description
+				&& createdAt == other.createdAt;
+		}
+
+		bool operator!=(const TenantRelationship& other) const
+		{
+			return !(*this == other);
+		}
+	};
+
+	typedef QList<TenantRelationship> TenantRelationships;
 
 	/**
 		Get tenant ID.
@@ -86,6 +130,26 @@ public:
 		Set updated at timestamp.
 	*/
 	virtual void SetUpdatedAt(const QString& updatedAt) = 0;
+
+	/**
+		Get all relationships for this tenant.
+	*/
+	virtual TenantRelationships GetRelationships() const = 0;
+
+	/**
+		Set relationships for this tenant.
+	*/
+	virtual void SetRelationships(const TenantRelationships& relationships) = 0;
+
+	/**
+		Add a relationship to this tenant.
+	*/
+	virtual void AddRelationship(const TenantRelationship& relationship) = 0;
+
+	/**
+		Remove a relationship by its ID.
+	*/
+	virtual bool RemoveRelationship(const QByteArray& relationshipId) = 0;
 };
 
 

@@ -59,6 +59,10 @@ bool CTenantCollectionControllerComp::CreateRepresentationFromObject(
 		representationObject.createdAt = tenantInfoPtr->GetCreatedAt();
 	}
 
+	if (requestInfo.items.isUpdatedAtRequested){
+		representationObject.updatedAt = tenantInfoPtr->GetUpdatedAt();
+	}
+
 	return true;
 }
 

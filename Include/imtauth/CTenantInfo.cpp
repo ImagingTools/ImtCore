@@ -118,6 +118,46 @@ void CTenantInfo::SetUpdatedAt(const QString& updatedAt)
 }
 
 
+ITenantInfo::TenantRelationships CTenantInfo::GetRelationships() const
+{
+	return m_relationships;
+}
+
+
+void CTenantInfo::SetRelationships(const TenantRelationships& relationships)
+{
+	if (m_relationships != relationships){
+		istd::CChangeNotifier notifier(this);
+
+		m_relationships = relationships;
+	}
+}
+
+
+void CTenantInfo::AddRelationship(const TenantRelationship& relationship)
+{
+	istd::CChangeNotifier notifier(this);
+
+	m_relationships.append(relationship);
+}
+
+
+bool CTenantInfo::RemoveRelationship(const QByteArray& relationshipId)
+{
+	for (int i = 0; i < m_relationships.size(); ++i){
+		if (m_relationships[i].relationshipId == relationshipId){
+			istd::CChangeNotifier notifier(this);
+
+			m_relationships.removeAt(i);
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
 // reimplemented (iser::ISerializable)
 
 bool CTenantInfo::Serialize(iser::IArchive& archive)
@@ -156,6 +196,56 @@ bool CTenantInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_updatedAt);
 	retVal = retVal && archive.EndTag(updatedAtTag);
 
+	iser::CArchiveTag relationshipsTag("Relationships", "Relationships", iser::CArchiveTag::TT_GROUP);
+	if (archive.BeginTag(relationshipsTag)){
+		int count = m_relationships.size();
+		retVal = retVal && archive.Process(count);
+
+		if (archive.IsStoring()){
+			for (int i = 0; i < count; ++i){
+				iser::CArchiveTag relTag("Relationship", "Relationship", iser::CArchiveTag::TT_GROUP);
+				retVal = retVal && archive.BeginTag(relTag);
+
+				QByteArray relId = m_relationships[i].relationshipId;
+				QByteArray targetId = m_relationships[i].targetTenantId;
+				int role = static_cast<int>(m_relationships[i].role);
+				QString desc = m_relationships[i].description;
+				QString created = m_relationships[i].createdAt;
+
+				retVal = retVal && archive.Process(relId);
+				retVal = retVal && archive.Process(targetId);
+				retVal = retVal && archive.Process(role);
+				retVal = retVal && archive.Process(desc);
+				retVal = retVal && archive.Process(created);
+
+				retVal = retVal && archive.EndTag(relTag);
+			}
+		}
+		else{
+			m_relationships.clear();
+			for (int i = 0; i < count; ++i){
+				iser::CArchiveTag relTag("Relationship", "Relationship", iser::CArchiveTag::TT_GROUP);
+				retVal = retVal && archive.BeginTag(relTag);
+
+				TenantRelationship rel;
+				int role = 0;
+
+				retVal = retVal && archive.Process(rel.relationshipId);
+				retVal = retVal && archive.Process(rel.targetTenantId);
+				retVal = retVal && archive.Process(role);
+				retVal = retVal && archive.Process(rel.description);
+				retVal = retVal && archive.Process(rel.createdAt);
+
+				rel.role = static_cast<TenantRelationshipRole>(role);
+				m_relationships.append(rel);
+
+				retVal = retVal && archive.EndTag(relTag);
+			}
+		}
+
+		retVal = retVal && archive.EndTag(relationshipsTag);
+	}
+
 	return retVal;
 }
 
@@ -174,6 +264,7 @@ bool CTenantInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/
 		m_isActive = sourcePtr->m_isActive;
 		m_createdAt = sourcePtr->m_createdAt;
 		m_updatedAt = sourcePtr->m_updatedAt;
+		m_relationships = sourcePtr->m_relationships;
 
 		return true;
 	}
@@ -203,6 +294,7 @@ bool CTenantInfo::ResetData(CompatibilityMode /*mode*/)
 	m_isActive = true;
 	m_createdAt.clear();
 	m_updatedAt.clear();
+	m_relationships.clear();
 
 	return true;
 }
