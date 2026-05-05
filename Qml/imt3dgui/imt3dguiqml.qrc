@@ -50,10 +50,6 @@
         <file alias="imt3dgui/WasdController.qml">WasdController.qml</file>
         <file alias="imt3dgui/AxisHelper.qml">AxisHelper.qml</file>
         <file alias="imt3dgui/DebugView.qml">DebugView.qml</file>
-        <file alias="imt3dgui/RulerShape.qml">RulerShape.qml</file>
-        <file alias="imt3dgui/MeshShape.qml">MeshShape.qml</file>
-        <file alias="imt3dgui/PointCloudShape.qml">PointCloudShape.qml</file>
-        <file alias="imt3dgui/AxisShape.qml">AxisShape.qml</file>
         <file alias="imt3dgui/Fog.qml">Fog.qml</file>
         <file alias="imt3dgui/ReflectionProbe.qml">ReflectionProbe.qml</file>
         <file alias="imt3dgui/RenderStats.qml">RenderStats.qml</file>
