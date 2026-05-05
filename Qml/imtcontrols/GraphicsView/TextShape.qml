@@ -21,7 +21,7 @@ BoundingBox {
 		ctx.lineWidth = params.lineWidth !== undefined ? params.lineWidth : 1;
 		let fontSize = params.fontSize !== undefined ? params.fontSize : textShape.fontSize;
 		if(viewItem && canZoomText){
-			fontSize =  Math.trunc(fontSize * textShape.scaleCoeff)
+			fontSize =  Math.ceil(fontSize * textShape.scaleCoeff)
 		}
 		let fontBold = params.fontBold !== undefined ? params.fontBold : textShape.fontBold;
 		let fontFamily = params.fontFamily !== undefined ? params.fontFamily : textShape.fontFamily;

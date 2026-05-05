@@ -32,15 +32,48 @@ QtObject {
 		}
 	}
 
+	function addInfoMessage(text, autoClose, id){
+		if (popupContainer){
+			popupContainer.addMessage("info", text, autoClose, id)
+		}
+	}
+
+	function addCustomMessage(id, customComponent, properties){
+		if (popupContainer){
+			popupContainer.addCustomMessage(id, customComponent, properties)
+		}
+	}
+
+	function replaceErrorMessage(id, text, autoClose){
+		if (popupContainer){
+			popupContainer.replaceMessage(id, "error", text, autoClose)
+		}
+	}
+
+	function replaceWarningMessage(id, text, autoClose){
+		if (popupContainer){
+			popupContainer.replaceMessage(id, "warning", text, autoClose)
+		}
+	}
+
+	function replaceSuccessMessage(id, text, autoClose){
+		if (popupContainer){
+			popupContainer.replaceMessage(id, "success", text, autoClose)
+		}
+	}
+
+	function replaceInfoMessage(id, text, autoClose){
+		if (popupContainer){
+			popupContainer.replaceMessage(id, "info", text, autoClose)
+		}
+	}
+
 	function closeMessage(id){
 		if (!popupContainer){
 			return
 		}
 
-		let index = getIndexByMessageId(id);
-		if (index >= 0){
-			popupContainer.removeMessage(index);
-		}
+		popupContainer.removeMessageById(id)
 	}
 
 	function getIndexByMessageId(id){
@@ -53,5 +86,11 @@ QtObject {
 
 	function messageIsOpened(id){
 		return getIndexByMessageId(id) >= 0;
+	}
+
+	function clear(){
+		if (popupContainer){
+			popupContainer.clear()
+		}
 	}
 }

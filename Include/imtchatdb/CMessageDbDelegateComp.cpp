@@ -186,7 +186,14 @@ QByteArray CMessageDbDelegateComp::CreateUpdateObjectQuery(
 		return QByteArray();
 	}
 
-	return QString(
+	const QString nowUtc = utcNow();
+	QString escapedId = QString::fromUtf8(objectId);
+	escapedId.replace('\'', "''");
+
+	QString combinedQuery;
+
+	// UPDATE the message row
+	combinedQuery += QString(
 		"UPDATE \"Messages\" SET "
 		"\"Content\"='%1', "
 		"\"Status\"=%2, "
@@ -194,9 +201,31 @@ QByteArray CMessageDbDelegateComp::CreateUpdateObjectQuery(
 		"WHERE \"Id\"='%4';")
 		.arg(imtdb::SqlEncode(msgPtr->GetContent()))
 		.arg(msgPtr->GetStatus())
-		.arg(utcNow())
-		.arg(QString::fromUtf8(objectId))
-		.toUtf8();
+		.arg(nowUtc)
+		.arg(escapedId);
+
+	// Replace attachments: remove existing, then re-insert current list
+	combinedQuery += QString(
+		"\nDELETE FROM \"MessageAttachments\" WHERE \"MessageId\"='%1';")
+		.arg(escapedId);
+
+	const QByteArrayList attachIds = msgPtr->GetAttachmentIds();
+	for (const QByteArray& attachId : attachIds){
+		if (attachId.isEmpty()){
+			continue;
+		}
+		QString escapedAttachId = QString::fromUtf8(attachId);
+		escapedAttachId.replace('\'', "''");
+		combinedQuery += QString(
+			"\nINSERT INTO \"MessageAttachments\" "
+			"(\"MessageId\", \"AttachmentId\", \"CreatedAt\") "
+			"VALUES('%1', '%2', '%3');")
+			.arg(escapedId)
+			.arg(escapedAttachId)
+			.arg(nowUtc);
+	}
+
+	return combinedQuery.toUtf8();
 }
 
 

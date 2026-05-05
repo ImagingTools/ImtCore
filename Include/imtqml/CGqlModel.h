@@ -34,6 +34,9 @@ public Q_SLOTS:
 	static void SetRefreshToken(const QString& refreshToken);
 	static void SetProductId(const QString& productId);
 
+	Q_INVOKABLE static QString GetGlobalAccessToken();
+	Q_INVOKABLE static QString GetProductId();
+
 public:
 	static QString s_accessToken;
 	static QString s_refreshToken;

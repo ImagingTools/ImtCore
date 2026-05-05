@@ -10,21 +10,38 @@ GqlModel {
 	property string gqlCommandId;
 	property string state;
 
+	// When true (default), the subscription is registered automatically as
+	// soon as the client is ready.  Set to false for subscriptions that
+	// should only be registered after an external trigger (e.g. login).
+	property bool autoSubscribe: true
+
 	signal messageReceived(var data);
 
 	property bool ok: subscriptionId !== "" && gqlCommandId !== "";
 	onOkChanged: {
-		if (ok){
+		if (ok && autoSubscribe){
 			registerSubscription();
 		}
 	}
 
 	Component.onCompleted: {
 		subscriptionId = UuidGenerator.generateUUID();
+
+		// If SubscriptionManager is created after this client, the initial
+		// RegisterSubscription event is lost.  Listen for the manager's
+		// ready signal and re-register.
+		Events.subscribeEvent("SubscriptionManagerReady", container.__onManagerReady);
 	}
 
 	Component.onDestruction: {
+		Events.unSubscribeEvent("SubscriptionManagerReady", container.__onManagerReady);
 		unRegisterSubscription();
+	}
+
+	function __onManagerReady(){
+		if (ok && autoSubscribe){
+			registerSubscription();
+		}
 	}
 
 	onStateChanged: {

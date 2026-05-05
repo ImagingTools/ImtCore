@@ -33,47 +33,56 @@ RemoteCollectionView {
 	onHeadersChanged: {
 		table.setColumnContentById(TicketItemDataTypeMetaInfo.s_createdAt, createdAtCellDelegateComp)
 		table.setColumnContentById(TicketItemDataTypeMetaInfo.s_status, statusCellDelegateComp)
+		table.setColumnContentById(TicketItemDataTypeMetaInfo.s_priority, priorityCellDelegateComp)
 	}
 
-	// Subscribes to server-side ticket message notifications and surfaces
-	// them via PopupManager. The server-side filter (CTicketMessageNotifierComp)
-	// already restricts delivery to users related to the ticket
-	// (reporter / assignees / admin), excluding the sender.
-	SubscriptionClient {
-		id: ticketMessageSubscription
-		gqlCommandId: "OnTicketMessageReceived"
-		onMessageReceived: {
-			if (!data){
-				return
-			}
-			var ticketNumber = data.containsKey("ticketNumber") ? data.getData("ticketNumber") : ""
-			var ticketTitle = data.containsKey("ticketTitle") ? data.getData("ticketTitle") : ""
-			var senderName = data.containsKey("senderUserName") ? data.getData("senderUserName") : ""
-			var content = data.containsKey("content") ? data.getData("content") : ""
-			var messageId = data.containsKey("messageId") ? data.getData("messageId") : ""
-
-			var preview = content ? String(content) : ""
-			if (preview.length > 80){
-				preview = preview.substring(0, 80) + "…"
-			}
-
-			var ticketLabel = ticketNumber ? ("#" + ticketNumber) : ""
-			if (ticketTitle){
-				ticketLabel = ticketLabel ? (ticketLabel + " " + ticketTitle) : String(ticketTitle)
-			}
-			var who = senderName ? String(senderName) : qsTr("Someone")
-			var header = ticketLabel
-				? qsTr("New message in %1 from %2").arg(ticketLabel).arg(who)
-				: qsTr("New ticket message from %1").arg(who)
-			var text = preview ? (header + ":\n" + preview) : header
-
-			PopupManager.addSuccessMessage(text, true, "TicketMessage_" + messageId)
-		}
-	}
 
 	Component {
 		id: createdAtCellDelegateComp
 		TableCellDateDelegate {}
+	}
+
+	Component {
+		id: priorityCellDelegateComp
+		TableCellDelegateBase {
+			id: priorityDelegate
+
+			readonly property var _priorityColors: ({
+				"Low": "#3FB950",       // green
+				"Medium": "#D29922",    // amber
+				"High": "#DB6D28",      // orange
+				"Critical": "#F85149"   // red
+			})
+
+			onReused: {
+				var val = priorityDelegate.getValue()
+				priorityLabel.text = val ? qsTr(String(val)) : ""
+				priorityCircle.color = _priorityColors[val] || "#8C95A6"
+			}
+
+			Row {
+				anchors.verticalCenter: parent.verticalCenter
+				anchors.left: parent.left
+				anchors.leftMargin: Style.marginM
+				spacing: Style.spacingS
+
+				Rectangle {
+					id: priorityCircle
+					anchors.verticalCenter: parent.verticalCenter
+					width: 10
+					height: 10
+					radius: width / 2
+					color: "#8C95A6"
+				}
+
+				Text {
+					id: priorityLabel
+					anchors.verticalCenter: parent.verticalCenter
+					font.pixelSize: Style.fontSizeM
+					color: Style.textColor
+				}
+			}
+		}
 	}
 
 	Component {
@@ -256,6 +265,9 @@ RemoteCollectionView {
 								onFinished: {
 									if (m_status === "Success"){
 										root.documentUpdated(root.documentId)
+										// Re-request representation to get server-assigned IDs
+										// (e.g. comment m_id after addComment) back to the view.
+										root.updateRepresentationFromDocument()
 									}
 								}
 							}

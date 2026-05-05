@@ -42,6 +42,7 @@
         "${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseSearchSdl",
         "${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseCollectionImportSdl",
         "${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseProgressManagerSdl",
+        "${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseFilterableSelectSdl",
         "${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtcolorsdl/SDL/1.0/QML/imtcolorRgbColorHexSdl",
         "${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtcolorsdl/SDL/1.0/QML/imtcolorLabSdl",
         "${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imt2dsdl/SDL/1.0/QML/imt2dGeometrySdl",

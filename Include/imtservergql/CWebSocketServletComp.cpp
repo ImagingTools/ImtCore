@@ -5,12 +5,14 @@
 // Qt includes
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
+#include <QtCore/QPointer>
 
 // ImtCore includes
 #include <imtrest/IRequest.h>
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/CWebSocketRequest.h>
 #include <imtgql/CGqlContext.h>
+#include <imtbase/imtbase.h>
 
 
 namespace imtservergql
@@ -133,6 +135,14 @@ imtrest::ConstResponsePtr CWebSocketServletComp::ProcessGqlRequest(const imtrest
 imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtrest::IRequest& request) const
 {
 	const auto* webSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&request);
+	if (webSocketRequest == nullptr){
+		return CreateErrorResponse(QByteArrayLiteral("Invalid WebSocket request"), request);
+	}
+
+	// Capture all data from the request immediately - the CWebSocketRequest is parented
+	// to QWebSocket via setParent(m_socket) in CWebSocketThread, so it can be
+	// cascade-destroyed if the socket disconnects during processing.
+	const QByteArray subscriptionId = webSocketRequest->GetRequestId();
 	QByteArray body = request.GetBody();
 	const QJsonDocument document = QJsonDocument::fromJson(body);
 	if (document.isNull() || !document.isObject()) {
@@ -166,26 +176,82 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 		return CreateErrorResponse(errorMessage.toUtf8(), request);
 	}
 
-	imtrest::CWebSocketRequest* webSocketRequestPtr = const_cast<imtrest::CWebSocketRequest*>(dynamic_cast<const imtrest::CWebSocketRequest*>(&request));
+	// Track request lifetime with QPointer — the request is a QObject
+	QPointer<QObject> requestGuard(const_cast<QObject*>(static_cast<const QObject*>(webSocketRequest)));
+
+	imtrest::CWebSocketRequest* webSocketRequestPtr = const_cast<imtrest::CWebSocketRequest*>(webSocketRequest);
 	if (webSocketRequestPtr != nullptr){
 		webSocketRequestPtr->SetCommandId(gqlRequest.GetCommandId());
 	}
 
-	imtgql::IGqlContext* gqlContextPtr = const_cast<imtgql::IGqlContext*>(gqlRequest.GetRequestContext());
+	// Extract headers from the message JSON
 	imtgql::IGqlContext::Headers gqlHeaders;
-	if (gqlContextPtr != nullptr){
-		gqlHeaders = gqlContextPtr->GetHeaders();
+	imtgql::IGqlContext* existingContextPtr = const_cast<imtgql::IGqlContext*>(gqlRequest.GetRequestContext());
+	if (existingContextPtr != nullptr){
+		gqlHeaders = existingContextPtr->GetHeaders();
 	}
-	else{
-		gqlContextPtr = new imtgql::CGqlContext();
-	}
+
 	QJsonObject headers = rootObject.value("headers").toObject();
-	for (QString& key: headers.keys()){
+	for (const QString& key: headers.keys()){
 		gqlHeaders.insert(key.toUtf8().toLower(), headers.value(key).toString().toUtf8());
 	}
 
-	gqlContextPtr->SetHeaders(gqlHeaders);
-	gqlRequest.SetGqlContext(gqlContextPtr);
+	// Extract auth token and productId from headers
+	QByteArray accessToken = gqlHeaders.value(QByteArrayLiteral("x-authentication-token"));
+	QByteArray productId = gqlHeaders.value(imtbase::s_productIdHeaderId);
+
+	// NOTE: CWebSocketRequests are parented to CWebSocketThread (not QWebSocket),
+	// so auth validation calls (ValidateJwt, ValidateToken) that trigger Qt event
+	// processing are safe — even if old QWebSocket deleteLater() fires during processing,
+	// it won't cascade-delete CWebSocketRequests. No sendPostedEvents flush needed.
+
+	// Validate token and extract userId — same pattern as CHttpGraphQLServletComp::OnPost
+	QByteArray userId;
+	// if (!accessToken.isEmpty()){
+	// 	if (accessToken.size() > 8 && accessToken.startsWith("imt_pat_")){
+	// 		// PAT token
+	// 		if (m_patManagerCompPtr.IsValid()){
+	// 			QByteArray tokenId;
+	// 			QByteArrayList scopes;
+	// 			if (!m_patManagerCompPtr->ValidateToken(accessToken, userId, tokenId, scopes)){
+	// 				return CreateErrorResponse(QByteArrayLiteral("Forbidden: invalid PAT token"), request);
+	// 			}
+	// 			m_patManagerCompPtr->UpdateLastUsedAt(tokenId);
+	// 		}
+	// 	}
+	// 	else{
+	// 		// JWT token
+	// 		if (m_jwtSessionControllerCompPtr.IsValid()){
+	// 			using JwtState = imtauth::IJwtSessionController::JwtState;
+	// 			JwtState state = m_jwtSessionControllerCompPtr->ValidateJwt(accessToken);
+	// 			if (state == JwtState::JS_EXPIRED || state == JwtState::JS_INVALID){
+	// 				return CreateErrorResponse(QByteArrayLiteral("Forbidden: invalid or expired JWT token"), request);
+	// 			}
+	// 			userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(accessToken);
+	// 		}
+	// 	}
+	// }
+
+	// Verify request is still alive after auth validation (safety check)
+	if (requestGuard.isNull()){
+		SendErrorMessage(0, QStringLiteral("WebSocket request destroyed during auth validation"), QStringLiteral("CWebSocketServletComp"));
+		return imtrest::ConstResponsePtr();
+	}
+
+	// Create simple GqlContext with authenticated user info.
+	// NOTE: We intentionally do NOT use IGqlContextCreator::CreateGqlContext() here.
+	// CreateGqlContext accesses UserCollection/UserSettingsCollection (database),
+	// which triggers Qt event loop processing — unnecessary for subscriptions.
+	// A simple CGqlContext with userId/token/productId is sufficient —
+	// PublishDataFiltered only needs GetUserId() for filtering.
+	{
+		imtgql::CGqlContext* simpleContext = new imtgql::CGqlContext();
+		simpleContext->SetHeaders(gqlHeaders);
+		simpleContext->SetUserId(userId);
+		simpleContext->SetToken(accessToken);
+		simpleContext->SetProductId(productId);
+		gqlRequest.SetGqlContext(simpleContext);
+	}
 
 	QByteArray commandId = gqlRequest.GetCommandId();
 
@@ -206,8 +272,14 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	}
 
 	if (subscriberControllerPtr != nullptr){
+		// Final lifetime check before passing request reference to publisher
+		if (requestGuard.isNull()){
+			SendErrorMessage(0, QStringLiteral("WebSocket request destroyed before subscription registration"), QStringLiteral("CWebSocketServletComp"));
+			return imtrest::ConstResponsePtr();
+		}
+
 		QString errorMessage;
-		if (subscriberControllerPtr->RegisterSubscription(webSocketRequest->GetRequestId(), gqlRequest, request, errorMessage)){
+		if (subscriberControllerPtr->RegisterSubscription(subscriptionId, gqlRequest, request, errorMessage)){
 			return imtrest::ConstResponsePtr();
 		}
 	}

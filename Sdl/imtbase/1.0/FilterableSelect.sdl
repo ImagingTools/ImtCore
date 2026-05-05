@@ -15,6 +15,7 @@ import {
 
 type SelectableItemData {
 	id: ID!
+	typeId: ID
 	name: String!
 	description: String
 	icon: String

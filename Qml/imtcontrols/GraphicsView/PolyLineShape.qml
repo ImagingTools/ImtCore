@@ -18,6 +18,7 @@ BoundingBox {
 	property bool isMultiColor: false;
 	property string shapePointBorderColor: color;
 	property bool hasHoverReaction: true;
+	property real penAlpha: 1
 
 	property var invalidPointIndexArr: [];
 
@@ -43,7 +44,7 @@ BoundingBox {
 			ctx.setLineDash(lineDashArray)
 		}
 
-
+		ctx.globalAlpha = penAlpha
 		ctx.strokeStyle = isSelected ? DesignScheme.selectionColor : polylineShape.color;
 		ctx.lineWidth = lineWidth
 		ctx.beginPath()
@@ -61,6 +62,7 @@ BoundingBox {
 		if(lineDashArray.length && !isSelected){
 			ctx.setLineDash([])
 		}
+		ctx.globalAlpha = 1
 		ctx.closePath();
 	}
 

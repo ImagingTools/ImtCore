@@ -38,6 +38,10 @@ class ListView extends Flickable {
         contentWidth: { type: Real, value: 0},
         contentHeight: { type: Real, value: 0},
         reuseItems: { type: Bool, value: false },
+        footer: { type: Variant, typeTarget: Component, value: undefined},
+        footerItem: { type: Var, value: null},
+        header: { type: Variant, typeTarget: Component, value: undefined},
+        headerItem: { type: Var, value: null},
 
         modelChanged: { type: Signal, args: [] },
         delegateChanged: { type: Signal, args: [] },
@@ -53,6 +57,10 @@ class ListView extends Flickable {
         contentWidthChanged: { type: Signal, args: [] },
         contentHeightChanged: { type: Signal, args: [] },
         reuseItemsChanged: { type: Signal, args: [] },
+        footerChanged: { type: Signal, args: [] },
+        headerChanged: { type: Signal, args: [] },
+        footerItemChanged: { type: Signal, args: [] },
+        headerItemChanged: { type: Signal, args: [] },
     })
 
     __items = []

@@ -8,6 +8,7 @@
 #include <QtCore/QDebug>
 #include <QtCore/QElapsedTimer>
 #include <QtGui/QMouseEvent>
+#include <QtGui/QOpenGLExtraFunctions>
 
 // ImtCore includes
 #include <imt3dgui/ISceneEventHandler.h>
@@ -318,6 +319,10 @@ void COpenGLWidget::initializeGL()
 {
 	initializeOpenGLFunctions();
 
+	// create and bind VAO to avoid "vao not bound" error on MacOS
+	glGenVertexArrays(1, &m_vao);
+	glBindVertexArray(m_vao);
+
 	glClearColor(m_backgroundColor.redF(), m_backgroundColor.greenF(), m_backgroundColor.blueF(), 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_PROGRAM_POINT_SIZE);
@@ -335,8 +340,14 @@ void COpenGLWidget::initializeGL()
 }
 
 
-void COpenGLWidget::resizeGL(int /*w*/, int /*h*/)
+void COpenGLWidget::resizeGL(int w, int h)
 {
+	// Get the physical pixel ratio (e.g., 2.0 on Retina Macs)
+	qreal ratio = devicePixelRatio();
+
+	// Set the OpenGL viewport to PHYSICAL pixels, not logical pixels
+	glViewport(0, 0, static_cast<GLsizei>(w * ratio), static_cast<GLsizei>(h * ratio));
+
 	m_scene.SetViewPort(rect());
 
 	m_scene.SetProjection(GetProjectionMatrix());

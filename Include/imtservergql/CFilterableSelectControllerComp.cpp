@@ -44,7 +44,7 @@ bool CFilterableSelectControllerComp::IsRequestSupported(const imtgql::CGqlReque
 
 sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectControllerComp::OnGetSelectableItems(
 			const sdl::imtbase::FilterableSelect::CGetSelectableItemsGqlRequest& getSelectableItemsRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload response;
@@ -106,6 +106,14 @@ sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectCont
 		}
 	}
 
+	// Apply additional filters from params set joiners
+	for (int i = 0; i < m_filterFillersCompPtr.GetCount(); ++i){
+		const IParamsSetJoiner* filterFillerPtr = m_filterFillersCompPtr[i];
+		if (filterFillerPtr != nullptr){
+			filterFillerPtr->JoinParamsSet(gqlRequest, filterParams);
+		}
+	}
+
 	istd::TDelPtr<imtbase::IObjectCollectionIterator> iteratorPtr(
 				m_objectCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), offset, count, &filterParams));
 	if (!iteratorPtr.IsValid()){
@@ -122,6 +130,11 @@ sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectCont
 
 		sdl::imtbase::FilterableSelect::CSelectableItemData::V1_0 itemRepresentation;
 		itemRepresentation.id = objectId;
+
+		QByteArray objectTypeId = iteratorPtr->GetObjectTypeId();
+		if (!objectTypeId.isEmpty()){
+			itemRepresentation.typeId = objectTypeId;
+		}
 
 		QString name = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
 		itemRepresentation.name = name.isEmpty() ? QString::fromUtf8(objectId) : name;

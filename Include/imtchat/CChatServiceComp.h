@@ -50,6 +50,14 @@ public:
 	virtual bool MarkMessageRead(
 				const QByteArray& conversationId,
 				const QByteArray& messageId) override;
+	virtual bool EditMessage(
+				const QByteArray& messageId,
+				const QByteArray& senderId,
+				const QString& newContent,
+				const QByteArrayList& attachmentIds) override;
+	virtual bool DeleteMessage(
+				const QByteArray& messageId,
+				const QByteArray& senderId) override;
 
 private:
 	I_REF(imtbase::IObjectCollection, m_messageCollectionCompPtr);

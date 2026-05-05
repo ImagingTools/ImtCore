@@ -2,6 +2,7 @@
 #include <imtchat/CChatServiceComp.h>
 
 // Qt includes
+#include <QtCore/QDateTime>
 #include <QtCore/QUuid>
 
 
@@ -175,6 +176,70 @@ bool CChatServiceComp::MarkMessageRead(
 	chatMessagePtr->SetStatus(IChatMessage::MS_READ);
 
 	return messageCollectionPtr->SetObjectData(messageId, *chatMessagePtr);
+}
+
+
+bool CChatServiceComp::EditMessage(
+			const QByteArray& messageId,
+			const QByteArray& senderId,
+			const QString& newContent,
+			const QByteArrayList& attachmentIds)
+{
+	imtbase::IObjectCollection* messageCollectionPtr = m_messageCollectionCompPtr.GetPtr();
+	if (messageCollectionPtr == nullptr){
+		return false;
+	}
+
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (!messageCollectionPtr->GetObjectData(messageId, dataPtr)){
+		return false;
+	}
+
+	IChatMessage* chatMessagePtr = dynamic_cast<IChatMessage*>(dataPtr.GetPtr());
+	if (chatMessagePtr == nullptr){
+		return false;
+	}
+
+	// Only the original sender may edit their own message.
+	if (!senderId.isEmpty() && chatMessagePtr->GetSenderId() != senderId){
+		return false;
+	}
+
+	chatMessagePtr->SetContent(newContent);
+	chatMessagePtr->SetAttachmentIds(attachmentIds);
+	chatMessagePtr->SetUpdatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
+
+	return messageCollectionPtr->SetObjectData(messageId, *chatMessagePtr);
+}
+
+
+bool CChatServiceComp::DeleteMessage(
+			const QByteArray& messageId,
+			const QByteArray& senderId)
+{
+	imtbase::IObjectCollection* messageCollectionPtr = m_messageCollectionCompPtr.GetPtr();
+	if (messageCollectionPtr == nullptr){
+		return false;
+	}
+
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (!messageCollectionPtr->GetObjectData(messageId, dataPtr)){
+		return false;
+	}
+
+	IChatMessage* chatMessagePtr = dynamic_cast<IChatMessage*>(dataPtr.GetPtr());
+	if (chatMessagePtr == nullptr){
+		return false;
+	}
+
+	// Only the original sender may delete their own message.
+	if (!senderId.isEmpty() && chatMessagePtr->GetSenderId() != senderId){
+		return false;
+	}
+
+	imtbase::ICollectionInfo::Ids ids;
+	ids << messageId;
+	return messageCollectionPtr->RemoveElements(ids);
 }
 
 

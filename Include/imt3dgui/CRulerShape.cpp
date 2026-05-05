@@ -250,6 +250,13 @@ void CRulerShape::DrawOverlay(QPainter& painter)
 	font.setBold(true);
 
 	painter.save();
+	painter.setRenderHint(QPainter::Antialiasing, true);
+
+	QPen linePen(QColor::fromRgbF(s_color.x(), s_color.y(), s_color.z()), 4.0);
+	linePen.setCapStyle(Qt::RoundCap);
+	painter.setPen(linePen);
+	painter.drawLine(pos2d1, pos2d2);
+
 	painter.setPen(QColor(0, 0, 0, 128));
 	painter.setFont(font);
 	painter.drawText(pos2d1, point1Text);

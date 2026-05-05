@@ -55,6 +55,10 @@ DocumentViewBase {
 	property bool _entityRefsChanged: false
 	// Title inline edit mode (display vs edit)
 	property bool _titleEditing: root.isNewIssue
+	// Guard flag: set briefly when entering title edit so the activeFocus blur
+	// handler does not immediately cancel edit mode while the focus is being
+	// transferred to the input.
+	property bool __titleEditOpening: false
 	// Pending assignees for multi-select
 	property var pendingAssignees: []
 	property bool _assigneesChanged: false
@@ -64,6 +68,8 @@ DocumentViewBase {
 	property var _replyToMessage: null
 	// Highlighted message (temporarily set when scrolling to a reply-to source)
 	property string _highlightedMessageId: ""
+	// ID of message currently being edited inline ("" = none)
+	property string _editingMessageId: ""
 	// Chat feedback
 	property string _chatActionHint: ""
 	property bool _exportChatCopiedState: false
@@ -107,6 +113,18 @@ DocumentViewBase {
 		.replace(/'/g, "&#39;")
 		.replace(/\\n/g, "<br>")
 		.replace(/\n/g, "<br>")
+	}
+
+	// Convert literal \n sequences to real newlines (for plain-text editing)
+	function __unescapeNewlines(content) {
+		if (!content) return ""
+		return String(content).replace(/\\n/g, "\n")
+	}
+
+	// Convert real newlines back to literal \n sequences (for server storage)
+	function __escapeNewlines(text) {
+		if (!text) return ""
+		return String(text).replace(/\n/g, "\\n")
 	}
 
 	function normalizeUserId(userId) {
@@ -266,6 +284,65 @@ DocumentViewBase {
 		setBlockingUpdateModel(false)
 		ticketData.modelChanged()
 		root.commentSubmitted(commentText)
+	}
+
+	// Edit an existing comment in-place. The comment is located by its
+	// server-assigned id; the new content and an "edited" marker are written
+	// to the in-memory model, and modelChanged() pushes the change to the
+	// server which performs the actual edit via IChatService::EditMessage.
+	function editComment(messageId, newContent) {
+		if (!messageId || !ticketData || !ticketData.m_comments) return
+		setBlockingUpdateModel(true)
+		for (var i = 0; i < ticketData.m_comments.count; i++) {
+			var item = ticketData.m_comments.get(i).item
+			if (!item) continue
+			if (String(item.m_id || "") === String(messageId)) {
+				item.m_content = String(newContent || "")
+				item.m_edited = true
+				break
+			}
+		}
+		setBlockingUpdateModel(false)
+		ticketData.modelChanged()
+	}
+
+	// Mark an existing comment as deleted. The deleted flag is propagated to
+	// the server via modelChanged() → updateDocumentFromRepresentation(),
+	// where IChatService::DeleteMessage physically removes the message;
+	// locally the message is hidden immediately so the UI feels responsive.
+	function deleteComment(messageId) {
+		if (!messageId || !ticketData || !ticketData.m_comments) return
+		setBlockingUpdateModel(true)
+		for (var i = 0; i < ticketData.m_comments.count; i++) {
+			var item = ticketData.m_comments.get(i).item
+			if (!item) continue
+			if (String(item.m_id || "") === String(messageId)) {
+				item.m_deleted = true
+				break
+			}
+		}
+		setBlockingUpdateModel(false)
+		ticketData.modelChanged()
+	}
+
+	// Remove an attachment from an existing comment by index. The change
+	// is local-only; the server update happens when the user clicks Save
+	// in the inline editor, which calls editComment() → modelChanged().
+	function removeCommentAttachment(messageId, attachmentIndex) {
+		if (!messageId || !ticketData || !ticketData.m_comments) return
+		setBlockingUpdateModel(true)
+		for (var i = 0; i < ticketData.m_comments.count; i++) {
+			var item = ticketData.m_comments.get(i).item
+			if (!item) continue
+			if (String(item.m_id || "") === String(messageId)) {
+				if (item.m_attachments && attachmentIndex >= 0 && attachmentIndex < item.m_attachments.count) {
+					item.m_attachments.removeElement(attachmentIndex)
+					item.m_edited = true
+				}
+				break
+			}
+		}
+		setBlockingUpdateModel(false)
 	}
 	
 	// Upload attachment file to the server via HTTP POST.
@@ -631,7 +708,7 @@ DocumentViewBase {
 	// Modern SaaS-level 2-column layout: LEFT (3 cards) + RIGHT (chat)
 	// Chat dominates; left panel is compact and structured
 	// ================================================================
-	
+
 	Item {
 		id: editView
 		anchors.fill: parent
@@ -642,8 +719,11 @@ DocumentViewBase {
 		readonly property real cardRadius: Style.radiusL
 		readonly property string cardColor: Style.baseColor
 		readonly property string cardBorderColor: Style.borderColor
+		// Pre-faded variant of cardBorderColor used by inputs to render a subtle
+		// (~40% opacity, alpha 0x66) border in their unfocused state.
+		readonly property string cardBorderColorFaded: "#d0d0d266"
 		readonly property string pageBgColor: Style.backgroundColor2
-		readonly property string accentColor: Style.imaginToolsAccentColor
+		readonly property string accentColor: "#5b8fd6"
 		readonly property string labelColor: Style.textColor
 		readonly property real avatarSize: 36
 		readonly property real accentDividerHeight: 2
@@ -783,8 +863,19 @@ DocumentViewBase {
 										cursorShape: Qt.PointingHandCursor
 										onClicked: {
 											editTitleInput.oldText = editTitleInput.text
+											root.__titleEditOpening = true
 											root._titleEditing = true
+											titleEditFocusTimer.start()
+										}
+									}
+
+									Timer {
+										id: titleEditFocusTimer
+										interval: 1
+										repeat: false
+										onTriggered: {
 											editTitleInput.forceActiveFocus()
+											root.__titleEditOpening = false
 										}
 									}
 								}
@@ -817,7 +908,7 @@ DocumentViewBase {
 										placeHolderText: qsTr("Enter ticket title...")
 										readOnly: !root.canEditCoreTicketFields
 										onActiveFocusChanged: {
-											if (!activeFocus && root._titleEditing && !root.isNewIssue) {
+											if (!activeFocus && root._titleEditing && !root.isNewIssue && !root.__titleEditOpening) {
 												editTitleInput.text = root.ticketData ? root.ticketData.m_title : editTitleInput.oldText
 												root._titleEditing = false
 											}
@@ -917,7 +1008,7 @@ DocumentViewBase {
 									width: parent.width
 									height: Math.min(220, Math.max(50, editDescriptionInput.contentHeight)) + Style.paddingM * 2
 									radius: Style.radiusM
-									border.color: editDescriptionInput.activeFocus ? editView.accentColor : editView.cardBorderColor
+									border.color: editDescriptionInput.activeFocus ? editView.accentColor : editView.cardBorderColorFaded
 									border.width: editDescriptionInput.activeFocus ? 2 : 1
 									color: root.canEditCoreTicketFields ? "white" : Style.alternateBaseColor
 
@@ -1040,7 +1131,7 @@ DocumentViewBase {
 							x: editView.cardPadding
 							y: editView.cardPadding
 							width: parent.width - editView.cardPadding * 2
-							spacing: Style.spacingM
+							spacing: Style.spacingL
 							
 							Text {
 								text: qsTr("Properties")
@@ -1052,7 +1143,7 @@ DocumentViewBase {
 							// Row 1: Type then Priority (stacked vertically in narrow Properties card)
 							Column {
 								width: parent.width
-								spacing: Style.spacingM
+								spacing: Style.spacingL
 								
 								Column {
 									width: parent.width
@@ -1205,6 +1296,7 @@ DocumentViewBase {
 								
 								Flow {
 									width: parent.width
+									clip: true
 									spacing: Style.spacingXS
 									visible: root.pendingAssignees.length > 0
 									
@@ -1388,6 +1480,7 @@ DocumentViewBase {
 								// Entity chips (tags-style)
 								Flow {
 									width: parent.width
+									clip: true
 									spacing: Style.spacingXS
 									visible: root.pendingEntityRefs.length > 0
 									
@@ -1587,13 +1680,16 @@ DocumentViewBase {
 														var selName = dataProvider ? dataProvider.getSelectedItemText(selId) : ""
 														if (!selName)
 															selName = selId
-														var linkPath = ctxWrapper.selectedEntityTypeId + "/" + selId
+														var selTypeId = dataProvider ? dataProvider.getSelectedItemTypeId(selId) : ""
+														var linkPath = ctxWrapper.selectedEntityTypeId
+																+ (selTypeId ? "/" + selTypeId : "")
+																+ "/" + selId
 														otherRefs.push({
 															entityType: ctxWrapper.selectedEntityTypeId,
 															entityId: selId,
 															displayName: selName,
 															entityLinkPath: linkPath,
-															typeId: ""
+															typeId: selTypeId
 														})
 													}
 													root.pendingEntityRefs = otherRefs
@@ -1946,7 +2042,8 @@ DocumentViewBase {
 								delegate: Item {
 									id: commentDelegate
 									width: commentsListCol.width
-									height: commentBubbleCol.height + topGap
+									height: visible ? (commentBubbleCol.height + topGap) : 0
+									visible: !(model.item.m_deleted === true)
 									
 									readonly property bool isMe: root.isSameUserId(model.item.m_userId, root.currentUserId)
 									readonly property var dataModel: model.item
@@ -1955,6 +2052,12 @@ DocumentViewBase {
 																			  && _prevUserId.length > 0
 																			  && root.isSameUserId(_prevUserId, model.item.m_userId)
 									readonly property int topGap: index === 0 ? 0 : (isGroupedWithPrev ? 2 : Style.spacingS)
+									readonly property bool isEditingThis: root._editingMessageId.length > 0
+																		  && String(model.item.m_id || "") === root._editingMessageId
+									readonly property bool canEditOrDelete: isMe
+																			&& root.canComment
+																			&& String(model.item.m_id || "").length > 0
+																			&& !(root.ticketData && root.ticketData.m_locked)
 									
 									Column {
 										id: commentBubbleCol
@@ -2016,19 +2119,33 @@ DocumentViewBase {
 													Column {
 														anchors.top: parent.top
 														anchors.topMargin: 2
+														width: bubbleContent.width - editView.avatarSize - Style.spacingS
+														clip: true
 														spacing: 2
 														
 														Text {
+															width: parent.width
 															text: commentDelegate.isMe ? qsTr("You") : (model.item.m_userName || qsTr("Unknown"))
 															font.pixelSize: Style.fontSizeM
 															font.bold: true
 															color: Style.textColor
+															elide: Text.ElideRight
 														}
 														
-														Text {
-															text: root.formatTimestamp(model.item.m_timestamp)
-															font.pixelSize: Style.fontSizeM - 1
-															color: editView.timestampColor
+														Row {
+															spacing: Style.spacingXS
+															Text {
+																text: root.formatTimestamp(model.item.m_timestamp)
+																font.pixelSize: Style.fontSizeM - 1
+																color: editView.timestampColor
+															}
+															Text {
+																visible: model.item.m_edited === true
+																text: "· " + qsTr("edited")
+																font.pixelSize: Style.fontSizeM - 1
+																font.italic: true
+																color: editView.timestampColor
+															}
 														}
 													}
 												}
@@ -2099,8 +2216,101 @@ DocumentViewBase {
 													font.pixelSize: Style.fontSizeM
 													color: Style.textColor
 													wrapMode: Text.Wrap
-													visible: text.length > 0
+													visible: String(model.item.m_content || "").length > 0 && !commentDelegate.isEditingThis
 													lineHeight: 1.45
+												}
+
+												// Inline edit field (replaces the body when editing this message)
+												Column {
+													visible: commentDelegate.isEditingThis
+													width: parent.width
+													spacing: Style.spacingXS
+
+													Rectangle {
+														width: parent.width
+														height: Math.max(40, editMessageInput.contentHeight + Style.paddingS * 2)
+														radius: Style.radiusM
+														color: "white"
+														border.color: editView.accentColor
+														border.width: 1
+
+														TextEdit {
+															id: editMessageInput
+															anchors.fill: parent
+															anchors.margins: Style.paddingS
+															font.pixelSize: Style.fontSizeM
+															color: Style.textColor
+															wrapMode: TextEdit.Wrap
+															textFormat: TextEdit.PlainText
+															text: root.__unescapeNewlines(model.item.m_content)
+															onVisibleChanged: {
+																if (visible) {
+																	text = root.__unescapeNewlines(model.item.m_content)
+																	editMessageFocusTimer.start()
+																}
+															}
+															onActiveFocusChanged: {
+																if (!activeFocus && commentDelegate.isEditingThis) {
+																	editCancelOnBlurTimer.start()
+																}
+															}
+
+															Timer {
+																id: editMessageFocusTimer
+																interval: 1
+																repeat: false
+																onTriggered: editMessageInput.forceActiveFocus()
+															}
+
+															// Cancel edit when focus leaves; short delay lets
+															// Save/Cancel click handlers fire first.
+															Timer {
+																id: editCancelOnBlurTimer
+																interval: 50
+																repeat: false
+																onTriggered: {
+																	if (root._editingMessageId.length > 0) {
+																		root._editingMessageId = ""
+																	}
+																}
+															}
+														}
+													}
+
+													Row {
+														spacing: Style.spacingS
+														Text {
+															text: qsTr("Save")
+															font.pixelSize: Style.fontSizeM
+															color: editView.accentColor
+															font.bold: true
+															MouseArea {
+																anchors.fill: parent
+																hoverEnabled: true
+																cursorShape: Qt.PointingHandCursor
+																onClicked: {
+																	editCancelOnBlurTimer.stop()
+																	var newText = root.__escapeNewlines(editMessageInput.text)
+																	root._editingMessageId = ""
+																	root.editComment(model.item.m_id, newText)
+																}
+															}
+														}
+														Text {
+															text: qsTr("Cancel")
+															font.pixelSize: Style.fontSizeM
+															color: Style.inactiveTextColor
+															MouseArea {
+																anchors.fill: parent
+																hoverEnabled: true
+																cursorShape: Qt.PointingHandCursor
+																onClicked: {
+																	editCancelOnBlurTimer.stop()
+																	root._editingMessageId = ""
+																}
+															}
+														}
+													}
 												}
 												
 												Flow {
@@ -2110,21 +2320,39 @@ DocumentViewBase {
 
 													Repeater {
 														model: commentDelegate.dataModel.m_attachments || []
-														delegate: Text {
+														delegate: Row {
+															id: attachmentDelegate
+															spacing: Style.spacingS
 															readonly property string attachmentUrl: model.item.m_preview || ""
-															width: parent.width
-															font.pixelSize: Style.fontSizeM
-															font.underline: attachmentUrl.length > 0
-															elide: Text.ElideRight
-															color: attachmentUrl.length > 0 ? editView.accentColor : Style.textColor
-															text: model.item.m_fileName || qsTr("file")
 
-															MouseArea {
-																anchors.fill: parent
-																enabled: parent.attachmentUrl.length > 0
-																hoverEnabled: enabled
-																cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-																onClicked: Qt.openUrlExternally(parent.attachmentUrl)
+															Text {
+																font.pixelSize: Style.fontSizeM
+																font.underline: attachmentDelegate.attachmentUrl.length > 0
+																elide: Text.ElideRight
+																color: attachmentDelegate.attachmentUrl.length > 0 ? editView.accentColor : Style.textColor
+																text: model.item.m_fileName || qsTr("file")
+
+																MouseArea {
+																	anchors.fill: parent
+																	enabled:attachmentDelegate.attachmentUrl.length > 0
+																	hoverEnabled: enabled
+																	cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+																	onClicked: Qt.openUrlExternally(attachmentDelegate.attachmentUrl)
+																}
+															}
+
+															Text {
+																visible: commentDelegate.isEditingThis
+																text: "\u2715"
+																font.pixelSize: Style.fontSizeM
+																color: Style.inactiveTextColor
+
+																MouseArea {
+																	anchors.fill: parent
+																	hoverEnabled: true
+																	cursorShape: Qt.PointingHandCursor
+																	onClicked: root.removeCommentAttachment(commentDelegate.dataModel.m_id, index)
+																}
 															}
 														}
 													}
@@ -2132,6 +2360,7 @@ DocumentViewBase {
 												
 												Row {
 													spacing: Style.spacingM
+													visible: !commentDelegate.isEditingThis
 
 													Text {
 														visible: root.canComment
@@ -2164,6 +2393,34 @@ DocumentViewBase {
 															hoverEnabled: true
 															cursorShape: Qt.PointingHandCursor
 															onClicked: root.copyTextToClipboard(model.item.m_content || "", qsTr("Message copied"))
+														}
+													}
+
+													Text {
+														visible: commentDelegate.canEditOrDelete
+														text: qsTr("Edit")
+														font.pixelSize: Style.fontSizeM
+														color: Style.inactiveTextColor
+
+														MouseArea {
+															anchors.fill: parent
+															hoverEnabled: true
+															cursorShape: Qt.PointingHandCursor
+															onClicked: root._editingMessageId = String(model.item.m_id || "")
+														}
+													}
+
+													Text {
+														visible: commentDelegate.canEditOrDelete
+														text: qsTr("Delete")
+														font.pixelSize: Style.fontSizeM
+														color: Style.inactiveTextColor
+
+														MouseArea {
+															anchors.fill: parent
+															hoverEnabled: true
+															cursorShape: Qt.PointingHandCursor
+															onClicked: root.deleteComment(model.item.m_id)
 														}
 													}
 												}
@@ -2258,7 +2515,7 @@ DocumentViewBase {
 							color: editView.accentBadgeBg
 							border.color: editView.accentBorderLight
 							border.width: 1
-							
+						
 							Row {
 								id: replyRow
 								anchors.left: parent.left
@@ -2273,7 +2530,7 @@ DocumentViewBase {
 									radius: 1
 									color: editView.accentColor
 								}
-								
+						
 								Column {
 									width: parent.width - 3 - Style.spacingXS
 									spacing: 1
@@ -2553,7 +2810,7 @@ DocumentViewBase {
 						id: attachmentFileIO
 					}
 				}
-				
+			
 				// Lock notice / read-only notice
 				Row {
 					id: lockNoticeRow
@@ -2581,7 +2838,7 @@ DocumentViewBase {
 						font.pixelSize: Style.fontSizeM
 						color: Style.inactiveTextColor
 						wrapMode: Text.Wrap
-						width: parent.width - Style.fontSizM - Style.paddingS
+						width: parent.width - Style.fontSizeM - Style.paddingS
 					}
 				}
 			}

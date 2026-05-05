@@ -18,6 +18,7 @@ TreeItemModel {
 		headers.setData("FontSize",Style.fontSizeL);
         headers.setData("FontBold", false);
 		headers.setData("FontColor", Style.tableHeaderFontColor);
+		headers.setData("FontFamily", Style.fontFamilyBold);
         headers.setData("TextPosition",Text.AlignHCenter);
 
         headers.setData("CellRadius",8);
