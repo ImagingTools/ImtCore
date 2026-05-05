@@ -31,16 +31,6 @@ QString CTenantDbDelegateComp::EscapeSql(const QString& value) const
 }
 
 
-QByteArray CTenantDbDelegateComp::GetSelectionQuery(
-		const QByteArray& objectId,
-		int offset,
-		int count,
-		const iprm::IParamsSet* paramsPtr) const
-{
-	return BaseClass::GetSelectionQuery(objectId, offset, count, paramsPtr);
-}
-
-
 istd::IChangeableUniquePtr CTenantDbDelegateComp::CreateObjectFromRecord(
 		const QSqlRecord& record,
 		const iprm::IParamsSet* /*dataConfigurationPtr*/) const
@@ -113,7 +103,7 @@ CTenantDbDelegateComp::NewObjectQuery CTenantDbDelegateComp::CreateNewObjectQuer
 			 id,
 			 name,
 			 description,
-			 isActive ? "1" : "0",
+			 isActive ? "true" : "false",
 			 now,
 			 now).toUtf8();
 
@@ -146,7 +136,7 @@ QByteArray CTenantDbDelegateComp::CreateUpdateObjectQuery(
 		.arg(*m_tableNameAttrPtr,
 			 EscapeSql(tenantPtr->GetTenantName()),
 			 EscapeSql(tenantPtr->GetTenantDescription()),
-			 tenantPtr->IsActive() ? "1" : "0",
+			 tenantPtr->IsActive() ? "true" : "false",
 			 now,
 			 escapedId).toUtf8();
 }

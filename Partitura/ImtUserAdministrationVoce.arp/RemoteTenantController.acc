@@ -213,8 +213,8 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>GetTenantList</Value>
-                                <Value>GetTicketRepresentation</Value>
-                                <Value>UpdateTicketFromRepresentation</Value>
+                                <Value>GetTenantRepresentation</Value>
+                                <Value>UpdateTenantFromRepresentation</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

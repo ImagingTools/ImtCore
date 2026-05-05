@@ -24,21 +24,6 @@ DocumentViewBase {
 		generalGroup.updateModel();
 	}
 
-	function getHeaders(){
-		return {};
-	}
-
-	DocumentHistoryPanel {
-		id: historyPanel
-		documentId: container.tenantData ? container.tenantData.m_id : ""
-		collectionId: "Tenants"
-		editorFlickable: flickable
-
-		function getHeaders(){
-			return container.getHeaders();
-		}
-	}
-
 	CustomScrollbar {
 		id: scrollbar
 		z: parent.z + 1
@@ -60,7 +45,7 @@ DocumentViewBase {
 		anchors.right: scrollbar.left
 		anchors.rightMargin: Style.marginXL
 		contentWidth: bodyColumn.width
-		contentHeight: Math.max(bodyColumn.height + 2 * Style.marginXL, historyPanel.contentHeight + 2 * Style.marginXL)
+		contentHeight: bodyColumn.height + 2 * Style.marginXL
 
 		boundsBehavior: Flickable.StopAtBounds
 		clip: true

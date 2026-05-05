@@ -16,7 +16,6 @@
         <Element ComponentName="PagesController" X="300" Y="275" Note=""/>
         <Element ComponentName="SearchController" X="850" Y="275" Note=""/>
         <Element ComponentName="SearchPage" X="100" Y="700" Note=""/>
-        <Element ComponentName="TenantsPage" X="875" Y="700" Note=""/>
         <Element ComponentName="Workspace" X="325" Y="700" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
