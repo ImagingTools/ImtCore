@@ -59,9 +59,6 @@ public:
 				const QString& description,
 				const imtbase::IOperationContext* operationContextPtr) const override;
 
-	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated() override;
-
 	/**
 		Build an upsert query to set per-user message status.
 		\param messageId  Message whose status is changing.

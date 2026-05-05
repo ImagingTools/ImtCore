@@ -547,31 +547,6 @@ void CSupportTicketDbDelegateComp::OnComponentCreated()
 		return;
 	}
 
-	// Create Tickets table
-	const QString tableName = GetTableName();
-	if (!TableExists(tableName)){
-		QFile scriptFile(imtdb::GetSqlResourcePath(*m_databaseEngineCompPtr, QStringLiteral("CreateTicketsTable.sql")));
-		if (!scriptFile.open(QFile::ReadOnly)){
-			SendErrorMessage(0, QString("Tickets table creation script '%1' could not be loaded").arg(scriptFile.fileName()));
-			return;
-		}
-
-		QByteArray query = scriptFile.readAll();
-		scriptFile.close();
-		query.replace("${TableScheme}", "public");
-
-		QSqlError sqlError;
-		m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
-
-		if (sqlError.type() != QSqlError::NoError){
-			qCritical() << __FILE__ << __LINE__
-						<< "\n\t| Tickets table could not be created"
-						<< "\n\t| Error:" << sqlError
-						<< "\n\t| Query:" << query;
-			SendErrorMessage(0, QString("Tickets table could not be created: %1").arg(sqlError.text()));
-		}
-	}
-
 	// Create TicketEntityReferences junction table
 	if (!TableExists("TicketEntityReferences")){
 		QFile junctionScriptFile(imtdb::GetSqlResourcePath(*m_databaseEngineCompPtr, QStringLiteral("CreateTicketEntityReferencesTable.sql")));

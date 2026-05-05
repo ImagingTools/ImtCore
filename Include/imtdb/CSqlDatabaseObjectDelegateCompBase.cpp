@@ -3,7 +3,9 @@
 
 
 // Qt includes
+#include <QtCore/QFile>
 #include <QtSql/QSqlRecord>
+#include <QtSql/QSqlError>
 
 // ACF includes
 #include <istd/TOptDelPtr.h>
@@ -16,6 +18,7 @@
 // ImtCore includes
 #include <imtbase/imtbase.h>
 #include <imtdb/CComplexCollectionFilterConverter.h>
+#include <imtdb/imtdb.h>
 
 
 namespace imtdb
@@ -656,6 +659,89 @@ bool CSqlDatabaseObjectDelegateCompBase::TableExists(const QString& tableName) c
 QString CSqlDatabaseObjectDelegateCompBase::CreateAdditionalFiltersQuery(const iprm::IParamsSet& /*filterParams*/) const
 {
 	return QString();
+}
+
+
+// reimplemented (icomp::CComponentBase)
+
+void CSqlDatabaseObjectDelegateCompBase::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+
+	if (!CreateTableIfNeeded()){
+		SendWarningMessage(0, QT_TR_NOOP("Collection table auto-creation failed; see previous errors. Component initialization was stopped"));
+	}
+}
+
+
+bool CSqlDatabaseObjectDelegateCompBase::CreateTableIfNeeded()
+{
+	const bool autoCreateTable = m_autoCreateTableAttrPtr.IsValid() ? *m_autoCreateTableAttrPtr : false;
+	if (!autoCreateTable){
+		return true;
+	}
+
+	if (!m_databaseEngineCompPtr.IsValid()){
+		return false;
+	}
+
+	const QString tableName = QString::fromUtf8(GetTableName());
+	if (tableName.isEmpty()){
+		return false;
+	}
+
+	if (TableExists(tableName)){
+		return true;
+	}
+
+	const QByteArray scriptPath = m_createTableScriptPathAttrPtr.IsValid() ? *m_createTableScriptPathAttrPtr : QByteArray();
+	if (scriptPath.isEmpty()){
+		SendErrorMessage(0, QT_TR_NOOP("Table creation script path is empty"));
+		return false;
+	}
+
+	QString resourcePath = QString::fromUtf8(scriptPath);
+	if (!resourcePath.startsWith(QStringLiteral(":/"))){
+		resourcePath = GetSqlResourcePath(*m_databaseEngineCompPtr, resourcePath);
+	}
+
+	QFile scriptFile(resourcePath);
+	if (!scriptFile.open(QFile::ReadOnly)){
+		SendErrorMessage(0, QString::fromUtf8(QT_TR_NOOP("Collection table creation script '%1' could not be loaded"))
+							.arg(scriptFile.fileName()));
+		return false;
+	}
+
+	QByteArray createTableQuery = scriptFile.readAll();
+	scriptFile.close();
+
+	QByteArray tableScheme = GetTableScheme();
+	if (!tableScheme.isEmpty()){
+		createTableQuery.replace("${TableScheme}", tableScheme);
+	}
+	else{
+		createTableQuery.replace("${TableScheme}", "public");
+	}
+
+	createTableQuery.replace("${TableName}", tableName.toUtf8());
+
+	QSqlError sqlError;
+	m_databaseEngineCompPtr->ExecSqlQuery(createTableQuery, &sqlError);
+
+	if (sqlError.type() != QSqlError::NoError){
+		qCritical() << __FILE__ << __LINE__
+					<< "\n\t| Table could not be created"
+					<< "\n\t| Error: " << sqlError
+					<< "\n\t| Query: " << createTableQuery;
+
+		SendErrorMessage(0, QString::fromUtf8(QT_TR_NOOP("\n\t| Table could not be created"
+														"\n\t| Error: %1"
+														"\n\t| Query: %2"))
+								.arg(sqlError.text(), qPrintable(createTableQuery)));
+		return false;
+	}
+
+	return true;
 }
 
 
