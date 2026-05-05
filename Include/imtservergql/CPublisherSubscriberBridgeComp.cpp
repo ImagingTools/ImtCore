@@ -2,6 +2,10 @@
 #include <imtservergql/CPublisherSubscriberBridgeComp.h>
 
 
+// Qt includes
+#include <QJsonDocument>
+#include <QJsonObject>
+
 // ImtCore includes
 #include <imtgql/CGqlRequest.h>
 
@@ -54,6 +58,26 @@ void CPublisherSubscriberBridgeComp::OnResponseReceived(
 	QByteArray commandId = GetCommandForSubscription(subscriptionId);
 	if (commandId.isEmpty()){
 		return;
+	}
+
+	// The subscriptionData arrives as {"commandId": <innerPayload>} from the subscription manager.
+	// PublishData wraps data with commandId again, so we need to extract the inner payload
+	// to avoid double-wrapping like {"commandId": {"commandId": {...}}}.
+	QJsonDocument jsonDoc = QJsonDocument::fromJson(subscriptionData);
+	if (jsonDoc.isObject()){
+		QJsonObject jsonObject = jsonDoc.object();
+		QJsonValue innerValue = jsonObject.value(QString::fromUtf8(commandId));
+		if (!innerValue.isUndefined()){
+			QJsonDocument innerDoc;
+			if (innerValue.isObject()){
+				innerDoc.setObject(innerValue.toObject());
+			}
+			else{
+				innerDoc.setObject(jsonObject);
+			}
+			PublishData(commandId, innerDoc.toJson(QJsonDocument::Compact));
+			return;
+		}
 	}
 
 	PublishData(commandId, subscriptionData);
