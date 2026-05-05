@@ -62,10 +62,6 @@ WasdController 1.0 WasdController.qml
 AxisHelper 1.0 AxisHelper.qml
 DebugView 1.0 DebugView.qml
 
-RulerShape 1.0 RulerShape.qml
-MeshShape 1.0 MeshShape.qml
-PointCloudShape 1.0 PointCloudShape.qml
-AxisShape 1.0 AxisShape.qml
 
 Fog 1.0 Fog.qml
 ReflectionProbe 1.0 ReflectionProbe.qml
