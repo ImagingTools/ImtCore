@@ -162,7 +162,7 @@ RemoteCollectionView {
 						}
 					}
 
-					property UpdateTenantInput updateTenantInput: UpdateTenantInput {}
+					property UpdateTenantFromRepresentation updateTenantInput: UpdateTenantFromRepresentation {}
 					property GqlSdlRequestSender updateTenantRequest: GqlSdlRequestSender {
 						gqlCommandId: ImtauthTenantCollectionDocumentManagerSdlCommandIds.s_updateTenantFromRepresentation
 						requestType: 1

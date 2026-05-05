@@ -39,13 +39,6 @@ type GetTenantListPayload {
 	notification: NotificationItem
 }
 
-input TenantDataInput {
-	id: ID!
-	typeId: ID!
-	item: TenantData!
-	name: String
-	description: String
-}
 
 # --- TenantManager operations ---
 
@@ -104,8 +97,6 @@ type Query {
 }
 
 type Mutation {
-	TenantUpdate (input: TenantDataInput): UpdatedNotificationPayload!
-	TenantAdd (input: TenantDataInput): AddedNotificationPayload!
 	CreateTenant (input: CreateTenantInput): CreateTenantPayload!
 	RemoveTenant (input: RemoveTenantInput): RemoveTenantPayload!
 	UpdateTenant (input: UpdateTenantInput): UpdateTenantPayload!
@@ -117,13 +108,6 @@ collectionSchema {
 		ref: TenantItemData
 		operations {
 			list: GetTenantList
-		}
-		subtype Tenant {
-			ref: TenantData
-			operations {
-				update: TenantUpdate
-				insert: TenantAdd
-			}
 		}
 	}
 }
