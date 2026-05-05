@@ -27,7 +27,7 @@ QByteArrayList CRemoteTenantControllerComp::GetTenantIds() const
 
 	QByteArrayList result;
 	for (const auto& id : *payload.Version_1_0->tenantIds){
-		result.append(id);
+		result.append(*id);
 	}
 
 	return result;
