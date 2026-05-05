@@ -29,6 +29,10 @@ public:
 	virtual void SetCreatedAt(const QString& createdAt) override;
 	virtual QString GetUpdatedAt() const override;
 	virtual void SetUpdatedAt(const QString& updatedAt) override;
+	virtual TenantRelationships GetRelationships() const override;
+	virtual void SetRelationships(const TenantRelationships& relationships) override;
+	virtual void AddRelationship(const TenantRelationship& relationship) override;
+	virtual bool RemoveRelationship(const QByteArray& relationshipId) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -45,6 +49,7 @@ protected:
 	bool m_isActive;
 	QString m_createdAt;
 	QString m_updatedAt;
+	TenantRelationships m_relationships;
 };
 
 
