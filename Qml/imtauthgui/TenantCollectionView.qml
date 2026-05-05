@@ -27,12 +27,18 @@ RemoteCollectionView {
 
 	onHeadersChanged: {
 		table.setColumnContentById(TenantItemDataTypeMetaInfo.s_createdAt, createdAtCellDelegateComp)
+		table.setColumnContentById(TenantItemDataTypeMetaInfo.s_updatedAt, updatedAtCellDelegateComp)
 		table.setColumnContentById(TenantItemDataTypeMetaInfo.s_isActive, isActiveCellDelegateComp)
 	}
 
 
 	Component {
 		id: createdAtCellDelegateComp
+		TableCellDateDelegate {}
+	}
+
+	Component {
+		id: updatedAtCellDelegateComp
 		TableCellDateDelegate {}
 	}
 
