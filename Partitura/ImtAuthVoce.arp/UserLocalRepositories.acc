@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6318" Description="ACF"/>
-            <Version Id="1" Number="2296" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6390" Description="ACF"/>
+            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -11,6 +11,24 @@
     <Keywords></Keywords>
     <ElementsList>
         <Element Id="SQLiteRoleRepository" PackageId="ImtUserAdministrationVoce" ComponentId="SQLiteRoleRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SQLiteTenantRepository" PackageId="ImtUserAdministrationVoce" ComponentId="SQLiteTenantRepository">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
@@ -126,6 +144,7 @@
     <ExportedInterfaces/>
     <ExportedComponents>
         <Component ExportedId="RoleRepository" ComponentId="SQLiteRoleRepository"/>
+        <Component ExportedId="SQLiteTenantRepository" ComponentId="SQLiteTenantRepository"/>
         <Component ExportedId="SessionSqlRepository" ComponentId="SessionSqlRepository"/>
         <Component ExportedId="UserConnectionRepository" ComponentId="UserConnectionRepository"/>
         <Component ExportedId="UserGroupRepository" ComponentId="SQLiteUserGroupRepository"/>
