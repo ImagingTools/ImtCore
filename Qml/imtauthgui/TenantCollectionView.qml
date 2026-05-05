@@ -108,12 +108,6 @@ RemoteCollectionView {
 							typeId: "Tenant"
 						}
 					}
-
-					onDocumentSaved: {
-						if (tenantEditor.representationController){
-							tenantEditor.representationController.updateRepresentationFromDocument()
-						}
-					}
 				}
 			}
 
@@ -162,7 +156,7 @@ RemoteCollectionView {
 						}
 					}
 
-					property UpdateTenantFromRepresentation updateTenantInput: UpdateTenantFromRepresentation {}
+					property UpdateTenantFromRepresentationInput updateTenantInput: UpdateTenantFromRepresentationInput {}
 					property GqlSdlRequestSender updateTenantRequest: GqlSdlRequestSender {
 						gqlCommandId: ImtauthTenantCollectionDocumentManagerSdlCommandIds.s_updateTenantFromRepresentation
 						requestType: 1
