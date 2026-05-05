@@ -1,3 +1,11 @@
+/**
+ * \brief Desktop demo — uses Scene3DView (real C++ implementation).
+ *
+ * This demo runs on the desktop only, using the C++ backed Scene3DView
+ * type (CScene3dItem).  It is NOT compilable via the JQML web pipeline.
+ * For a cross-platform demo that works on both desktop and web see
+ * View3DDemo.qml in Qml/imt3dgui-demo/.
+ */
 import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15

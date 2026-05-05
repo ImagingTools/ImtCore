@@ -1,3 +1,10 @@
+/**
+ * \brief Web stub — base type for all 3-D scene-graph nodes.
+ *
+ * Mirrors the spatial properties of QtQuick3D's Node (position,
+ * rotation, scale, …).  On the desktop the real QtQuick3D types are
+ * used; this stub exists so the JQML web compiler can resolve the type.
+ */
 import QtQuick 2.15
 
 QtObject {

@@ -1,3 +1,17 @@
+/**
+ * \brief Canvas-based software 3-D renderer (web fallback).
+ *
+ * Unlike the other stub files in this module, Render3D contains a real
+ * (albeit simplified) rendering implementation built on the QML Canvas
+ * element.  It performs perspective projection and painter's-algorithm
+ * face sorting entirely in JavaScript, so it works both on the desktop
+ * (as a lightweight preview) and on the web without three.js.
+ *
+ * Currently supports only \c #Cube geometry with basic diffuse lighting.
+ *
+ * \sa View3D (web stub for JQML/three.js pipeline)
+ * \sa Scene3DView (real C++ implementation backed by CScene3dItem)
+ */
 import QtQuick 2.15
 
 Canvas {
