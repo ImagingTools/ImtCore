@@ -3,11 +3,8 @@
 
 
 // ImtCore includes
-#include <imtauth/ITenantInfo.h>
 #include <imtdoc/IDocumentManager.h>
-#include <imtdoc/IDocumentManagerEventHandler.h>
 #include <imtbase/IObjectCollection.h>
-#include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentManager.h>
 
 // Generated includes
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/TenantCollectionDocumentManager.h>
@@ -18,14 +15,12 @@ namespace imtauthgql
 
 
 class CTenantCollectionDocumentManagerComp:
-			public sdl::imtauth::TenantCollectionDocumentManager::CGraphQlHandlerCompBase,
-			virtual public imtdoc::IDocumentManagerEventHandler
+			public sdl::imtauth::TenantCollectionDocumentManager::CGraphQlHandlerCompBase
 {
 public:
 	typedef sdl::imtauth::TenantCollectionDocumentManager::CGraphQlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CTenantCollectionDocumentManagerComp)
-		I_REGISTER_INTERFACE(imtdoc::IDocumentManagerEventHandler)
 		I_ASSIGN(m_documentManagerCompPtr, "CollectionDocumentManager", "Collection document manager", false, "CollectionDocumentManager");
 		I_ASSIGN(m_tenantCollectionCompPtr, "TenantCollection", "Tenant collection for refreshing DB-computed fields after save", false, "TenantCollection");
 	I_END_COMPONENT
@@ -40,9 +35,6 @@ protected:
 				const sdl::imtauth::TenantCollectionDocumentManager::CUpdateTenantFromRepresentationGqlRequest& updateTenantFromRepresentationRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-
-	// reimplemented (imtdoc::IDocumentManagerEventHandler)
-	virtual bool ProcessEvent(imtdoc::CEventBase* eventPtr) override;
 
 private:
 	I_REF(imtdoc::IDocumentManager, m_documentManagerCompPtr);

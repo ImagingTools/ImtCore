@@ -4,10 +4,6 @@
 
 // ImtCore includes
 #include <imtauth/ITenantInfo.h>
-#include <imtbase/IObjectCollection.h>
-#include <imtbase/IObjectCollectionIterator.h>
-#include <imtdoc/CDocumentSavedEvent.h>
-#include <imtgql/IGqlContext.h>
 
 
 namespace imtauthgql
@@ -126,46 +122,10 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTenantCollect
 	}
 
 	m_documentManagerCompPtr->SetDocumentData(userId, documentId, *documentPtr);
-	m_documentManagerCompPtr->SaveDocument(userId, documentId);
 
 	response.Version_1_0->status = sdl::imtbase::CollectionDocumentManager::EDocumentOperationStatus::Success;
 
 	return response;
-}
-
-
-// reimplemented (imtdoc::IDocumentManagerEventHandler)
-
-bool CTenantCollectionDocumentManagerComp::ProcessEvent(imtdoc::CEventBase* eventPtr)
-{
-	imtdoc::CDocumentSavedEvent* savedEventPtr = dynamic_cast<imtdoc::CDocumentSavedEvent*>(eventPtr);
-	if (savedEventPtr != nullptr){
-		QByteArray documentId = savedEventPtr->GetDocumentId();
-		QByteArray userId = savedEventPtr->GetUserId();
-
-		// Refresh DB-computed fields (createdAt/updatedAt) from the collection after save
-		imtbase::IObjectCollection::DataPtr collectionDataPtr;
-		const imtauth::ITenantInfo* dbTenantPtr = nullptr;
-		if (m_tenantCollectionCompPtr.IsValid() && m_tenantCollectionCompPtr->GetObjectData(documentId, collectionDataPtr)){
-			dbTenantPtr = dynamic_cast<const imtauth::ITenantInfo*>(collectionDataPtr.GetPtr());
-		}
-
-		istd::IChangeableSharedPtr documentPtr;
-		imtauth::ITenantInfo* documentTenantPtr = nullptr;
-		if (m_documentManagerCompPtr->GetDocumentData(userId, documentId, documentPtr) == imtdoc::IDocumentManager::OS_OK){
-			documentTenantPtr = dynamic_cast<imtauth::ITenantInfo*>(documentPtr.GetPtr());
-		}
-
-		if (dbTenantPtr != nullptr && documentTenantPtr != nullptr){
-			documentTenantPtr->SetCreatedAt(dbTenantPtr->GetCreatedAt());
-			documentTenantPtr->SetUpdatedAt(dbTenantPtr->GetUpdatedAt());
-
-			m_documentManagerCompPtr->SetDocumentData(userId, documentId, *documentPtr);
-			m_documentManagerCompPtr->SaveDocument(userId, documentId);
-		}
-	}
-
-	return true;
 }
 
 

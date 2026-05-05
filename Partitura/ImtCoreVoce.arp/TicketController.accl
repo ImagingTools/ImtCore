@@ -27,11 +27,11 @@
         <Element ComponentName="StandardCollectionCommands" X="1000" Y="150" Note=""/>
         <Element ComponentName="StandardDocumentCommands" X="225" Y="450" Note=""/>
         <Element ComponentName="SupportTicket" X="1000" Y="750" Note=""/>
+        <Element ComponentName="TicketAssigneeNotifier" X="0" Y="100" Note=""/>
         <Element ComponentName="TicketCollectionController" X="1050" Y="525" Note=""/>
         <Element ComponentName="TicketCollectionDocumentManager" X="775" Y="450" Note=""/>
         <Element ComponentName="TicketDocumentNameProvider" X="1050" Y="625" Note=""/>
         <Element ComponentName="TicketMessageNotifier" X="0" Y="0" Note=""/>
-        <Element ComponentName="TicketAssigneeNotifier" X="0" Y="100" Note=""/>
         <Element ComponentName="TicketSqlRepository" X="275" Y="725" Note=""/>
         <Element ComponentName="TicketsChangeNotifier" X="200" Y="75" Note=""/>
         <Element ComponentName="UserFilterableSelectController" X="1200" Y="75" Note=""/>

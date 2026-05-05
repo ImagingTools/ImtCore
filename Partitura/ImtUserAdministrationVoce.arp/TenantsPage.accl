@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6379" Description="ACF"/>
+            <Version Id="0" Number="6390" Description="ACF"/>
             <Version Id="1" Number="2306" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
@@ -11,10 +11,8 @@
         <Element ComponentName="CheckPermissionOr" X="350" Y="700" Note=""/>
         <Element ComponentName="CollectionHeadersProvider" X="1025" Y="475" Note=""/>
         <Element ComponentName="Demultiplexer" X="550" Y="75" Note=""/>
-        <Element ComponentName="OperationContextController" X="1050" Y="200" Note=""/>
         <Element ComponentName="TenantCommands" X="425" Y="350" Note=""/>
         <Element ComponentName="TenantDocumentManager" X="200" Y="200" Note=""/>
-        <Element ComponentName="TenantInfo" X="475" Y="550" Note=""/>
         <Element ComponentName="TenantPermissions" X="725" Y="675" Note=""/>
         <Element ComponentName="TenantsCommands" X="725" Y="350" Note=""/>
         <Element ComponentName="TenantsListController" X="1000" Y="350" Note=""/>
