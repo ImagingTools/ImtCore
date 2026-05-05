@@ -41,6 +41,7 @@
 #include <imtservergql/CCollectionDocumentManagerControllerComp.h>
 #include <imtservergql/CCollectionDocumentManagerPublisherComp.h>
 #include <imtservergql/CCollectionDocumentManagerNotificationProxyComp.h>
+#include <imtservergql/CPublisherSubscriberBridgeComp.h>
 #include <imtservergql/CGqlContextCreatorComp.h>
 #include <imtservergql/CFilterableSelectControllerComp.h>
 #include <imtservergql/CUserGroupParamsSetJoinerComp.h>
@@ -86,6 +87,7 @@ typedef imtservergql::CCollectionImportJobParamsFillerComp CollectionImportJobPa
 typedef imtservergql::CCollectionDocumentManagerControllerComp CollectionDocumentManagerController;
 typedef imtservergql::CCollectionDocumentManagerPublisherComp CollectionDocumentManagerPublisher;
 typedef imtservergql::CCollectionDocumentManagerNotificationProxyComp CollectionDocumentManagerNotificationProxy;
+typedef imtservergql::CPublisherSubscriberBridgeComp PublisherSubscriberBridge;
 typedef imtservergql::CGqlContextCreatorComp GqlContextCreator;
 typedef imtservergql::CFilterableSelectControllerComp FilterableSelectController;
 typedef imtservergql::CUserGroupParamsSetJoinerComp UserGroupParamsSetJoiner;
