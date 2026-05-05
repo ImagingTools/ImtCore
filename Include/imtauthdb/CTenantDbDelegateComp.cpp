@@ -202,14 +202,22 @@ bool CTenantDbDelegateComp::SetCollectionItemMetaInfoFromRecord(
 		const QSqlRecord& record,
 		idoc::IDocumentMetaInfo& metaInfo) const
 {
-	if (record.contains("Id")){
-		metaInfo.SetMetaInfo(imtauth::ITenantInfo::MIT_TENANT_ID, record.value("Id").toByteArray());
-	}
 	if (record.contains("Name")){
-		metaInfo.SetMetaInfo(imtauth::ITenantInfo::MIT_TENANT_NAME, record.value("Name").toString());
+		metaInfo.SetMetaInfo(imtbase::ICollectionInfo::EIT_NAME, record.value("Name").toString());
 	}
+
 	if (record.contains("Description")){
-		metaInfo.SetMetaInfo(imtauth::ITenantInfo::MIT_TENANT_DESCRIPTION, record.value("Description").toString());
+		metaInfo.SetMetaInfo(imtbase::ICollectionInfo::EIT_DESCRIPTION, record.value("Description").toString());
+	}
+
+	if (record.contains("UpdatedAt")){
+		QDateTime lastModificationTime = record.value("UpdatedAt").toDateTime();
+		metaInfo.SetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME, lastModificationTime);
+	}
+
+	if (record.contains("CreatedAt")){
+		QDateTime createdAtTime = record.value("CreatedAt").toDateTime();
+		metaInfo.SetMetaInfo(idoc::IDocumentMetaInfo::MIT_CREATION_TIME, createdAtTime);
 	}
 
 	return true;
