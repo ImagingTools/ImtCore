@@ -17,6 +17,8 @@ namespace imtauthgql
 class CTenantManagerControllerComp: public sdl::imtauth::Tenants::CGraphQlHandlerCompBase
 {
 public:
+	typedef sdl::imtauth::Tenants::CGraphQlHandlerCompBase BaseClass;
+
 	I_BEGIN_COMPONENT(CTenantManagerControllerComp);
 		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager providing CRUD operations", true, "TenantManager");
 	I_END_COMPONENT;
