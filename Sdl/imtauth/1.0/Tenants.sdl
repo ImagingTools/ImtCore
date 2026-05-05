@@ -17,7 +17,7 @@ type TenantItemData {
 	typeId: ID!
 	name: String!
 	description: String
-	isActive: Bool
+	isActive: Boolean
 	createdAt: String
 }
 
@@ -25,7 +25,7 @@ type TenantData {
 	id: ID
 	name: String
 	description: String
-	isActive: Bool
+	isActive: Boolean
 	createdAt: String
 	updatedAt: String
 }
@@ -73,7 +73,7 @@ input RemoveTenantInput {
 }
 
 type RemoveTenantPayload {
-	success: Bool
+	success: Boolean
 	errorMessage: String
 }
 
@@ -84,17 +84,17 @@ input UpdateTenantInput {
 }
 
 type UpdateTenantPayload {
-	success: Bool
+	success: Boolean
 	errorMessage: String
 }
 
 input SetTenantActiveInput {
 	tenantId: ID!
-	isActive: Bool!
+	isActive: Boolean!
 }
 
 type SetTenantActivePayload {
-	success: Bool
+	success: Boolean
 	errorMessage: String
 }
 
