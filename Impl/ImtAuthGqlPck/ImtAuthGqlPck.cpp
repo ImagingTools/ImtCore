@@ -200,6 +200,26 @@ I_EXPORT_COMPONENT(
 			"Client request personal access token manager",
 			"Client Request Personal Access Token Manager");
 
+I_EXPORT_COMPONENT(
+			TenantCollectionController,
+			"Tenant collection controller",
+			"Tenant Collection Controller");
+
+I_EXPORT_COMPONENT(
+			TenantMetaInfoDelegate,
+			"Tenant meta info delegate",
+			"Tenant Meta Info Delegate");
+
+I_EXPORT_COMPONENT(
+			TenantCollectionDocumentManager,
+			"Tenant collection document manager",
+			"Tenant Collection Document Manager");
+
+I_EXPORT_COMPONENT(
+			RemoteTenantController,
+			"Remote tenant controller",
+			"Remote Tenant Controller");
+
 
 } // namespace ImtAuthGqlPck
 

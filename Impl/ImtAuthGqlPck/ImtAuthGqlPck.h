@@ -44,6 +44,10 @@
 #include <imtauthgql/CTokenBasedPermissionsProviderComp.h>
 #include <imtauthgql/CPersonalAccessTokenControllerComp.h>
 #include <imtauthgql/CClientRequestPersonalAccessTokenManagerComp.h>
+#include <imtauthgql/CTenantCollectionControllerComp.h>
+#include <imtauthgql/CTenantMetaInfoDelegateComp.h>
+#include <imtauthgql/CTenantCollectionDocumentManagerComp.h>
+#include <imtauthgql/CRemoteTenantControllerComp.h>
 
 
 /**
@@ -90,6 +94,10 @@ typedef imtauthgql::CClientRequestGroupInfoProviderComp ClientRequestGroupInfoPr
 typedef imtauthgql::CTokenBasedPermissionsProviderComp ClientRequestTokenBasedPermissionsProvider;
 typedef imtauthgql::CPersonalAccessTokenControllerComp PersonalAccessTokenController;
 typedef icomp::TModelCompWrap<imtauthgql::CClientRequestPersonalAccessTokenManagerComp> ClientRequestPersonalAccessTokenManager;
+typedef imtauthgql::CTenantCollectionControllerComp TenantCollectionController;
+typedef imtauthgql::CTenantMetaInfoDelegateComp TenantMetaInfoDelegate;
+typedef imtauthgql::CTenantCollectionDocumentManagerComp TenantCollectionDocumentManager;
+typedef imtauthgql::CRemoteTenantControllerComp RemoteTenantController;
 
 
 } // namespace ImtAuthGqlPck

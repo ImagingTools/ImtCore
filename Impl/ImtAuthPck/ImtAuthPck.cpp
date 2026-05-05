@@ -230,6 +230,16 @@ I_EXPORT_COMPONENT(
 			"Personal access token meta info creator",
 			"Personal Access Token Meta Info Creator");
 
+I_EXPORT_COMPONENT(
+			TenantInfo,
+			"Tenant info",
+			"Tenant Info");
+
+I_EXPORT_COMPONENT(
+			TenantMetaInfoCreator,
+			"Tenant meta info creator",
+			"Tenant Meta Info Creator");
+
 
 } // namespace ImtAuthPck
 
