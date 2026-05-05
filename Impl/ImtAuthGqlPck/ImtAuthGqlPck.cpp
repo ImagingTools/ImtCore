@@ -220,6 +220,11 @@ I_EXPORT_COMPONENT(
 			"Remote tenant controller",
 			"Remote Tenant Controller");
 
+I_EXPORT_COMPONENT(
+			TenantManagerController,
+			"Tenant manager controller",
+			"Tenant Manager Controller");
+
 
 } // namespace ImtAuthGqlPck
 
