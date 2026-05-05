@@ -31,6 +31,7 @@ public:
 	I_END_COMPONENT
 
 protected:
+	// reimplemented (CGraphQlHandlerCompBase)
 	virtual sdl::imtauth::Tenants::CTenantData OnGetTenantRepresentation(
 				const sdl::imtauth::TenantCollectionDocumentManager::CGetTenantRepresentationGqlRequest& getTenantRepresentationRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,

@@ -47,13 +47,69 @@ input TenantDataInput {
 	description: String
 }
 
+# --- TenantManager operations ---
+
+input GetTenantInput {
+	tenantId: ID!
+}
+
+type GetTenantPayload {
+	tenant: TenantData
+	errorMessage: String
+}
+
+input CreateTenantInput {
+	name: String!
+	description: String
+}
+
+type CreateTenantPayload {
+	tenantId: ID
+	errorMessage: String
+}
+
+input RemoveTenantInput {
+	tenantId: ID!
+}
+
+type RemoveTenantPayload {
+	success: Bool
+	errorMessage: String
+}
+
+input UpdateTenantInput {
+	tenantId: ID!
+	name: String!
+	description: String
+}
+
+type UpdateTenantPayload {
+	success: Bool
+	errorMessage: String
+}
+
+input SetTenantActiveInput {
+	tenantId: ID!
+	isActive: Bool!
+}
+
+type SetTenantActivePayload {
+	success: Bool
+	errorMessage: String
+}
+
 type Query {
 	GetTenantList (input: GetTenantListInput): GetTenantListPayload!
+	GetTenant (input: GetTenantInput): GetTenantPayload!
 }
 
 type Mutation {
 	TenantUpdate (input: TenantDataInput): UpdatedNotificationPayload!
 	TenantAdd (input: TenantDataInput): AddedNotificationPayload!
+	CreateTenant (input: CreateTenantInput): CreateTenantPayload!
+	RemoveTenant (input: RemoveTenantInput): RemoveTenantPayload!
+	UpdateTenant (input: UpdateTenantInput): UpdateTenantPayload!
+	SetTenantActive (input: SetTenantActiveInput): SetTenantActivePayload!
 }
 
 collectionSchema {
