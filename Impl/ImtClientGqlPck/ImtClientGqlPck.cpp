@@ -95,6 +95,11 @@ I_EXPORT_COMPONENT(
 			"Remote commands controller",
 			"Remote Commands Controller");
 
+I_EXPORT_COMPONENT(
+			CollectionDocumentManagerSubscriber,
+			"Collection document manager subscriber",
+			"Collection Document Manager Subscriber");
+
 
 } // namespace ImtClientGqlPck
 

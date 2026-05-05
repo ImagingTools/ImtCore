@@ -176,6 +176,11 @@ I_EXPORT_COMPONENT(
 			"Collection Document Manager Publisher");
 
 I_EXPORT_COMPONENT(
+			CollectionDocumentManagerNotificationProxy,
+			"Collection document manager notification proxy",
+			"Collection Document Manager Notification Proxy");
+
+I_EXPORT_COMPONENT(
 			GqlContextCreator,
 			"GraphQL context creator",
 			"GraphQL GQL Context Creator");

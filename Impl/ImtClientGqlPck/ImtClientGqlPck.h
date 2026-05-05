@@ -24,6 +24,7 @@
 #include <imtclientgql/CObjectCollectionSubscriberComp.h>
 #include <imtclientgql/CRemoteCollectionDocumentManagerControllerComp.h>
 #include <imtclientgql/CRemoteCommandsControllerComp.h>
+#include <imtclientgql/CCollectionDocumentManagerSubscriberComp.h>
 
 
 /**
@@ -49,6 +50,7 @@ typedef imtclientgql::CRemoteObjectCollectionControllerComp RemoteObjectCollecti
 typedef imtclientgql::CRemoteCollectionDocumentManagerControllerComp RemoteCollectionDocumentManagerController;
 typedef imtclientgql::CObjectCollectionSubscriberComp ObjectCollectionSubscriber;
 typedef imtclientgql::CRemoteCommandsControllerComp RemoteCommandsController;
+typedef icomp::TModelCompWrap<imtclientgql::CCollectionDocumentManagerSubscriberComp> CollectionDocumentManagerSubscriber;
 
 
 } // namespace ImtClientGqlPck
