@@ -23,7 +23,6 @@
                             <Values>
                                 <Value>name</Value>
                                 <Value>description</Value>
-                                <Value>isActive</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -206,6 +205,9 @@
                             <Values>
                                 <Value>name</Value>
                                 <Value>description</Value>
+                                <Value>createdAt</Value>
+                                <Value>updatedAt</Value>
+                                <Value>isActive</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -214,6 +216,9 @@
                             <Values>
                                 <Value>Name</Value>
                                 <Value>Description</Value>
+                                <Value>CreatedAt</Value>
+                                <Value>UpdatedAt</Value>
+                                <Value>IsActive</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

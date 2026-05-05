@@ -39,6 +39,10 @@ protected:
 				const sdl::imtauth::Tenants::CGetTenantIdsGqlRequest& getTenantIdsRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+	virtual sdl::imtauth::Tenants::CGetTenantRelationshipsPayload OnGetTenantRelationships(
+				const sdl::imtauth::Tenants::CGetTenantRelationshipsGqlRequest& getTenantRelationshipsRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	virtual sdl::imtauth::Tenants::CGetTenantPayload OnGetTenant(
 				const sdl::imtauth::Tenants::CGetTenantGqlRequest& getTenantRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
@@ -57,6 +61,14 @@ protected:
 				QString& errorMessage) const override;
 	virtual sdl::imtauth::Tenants::CSetTenantActivePayload OnSetTenantActive(
 				const sdl::imtauth::Tenants::CSetTenantActiveGqlRequest& setTenantActiveRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtauth::Tenants::CAddTenantRelationshipPayload OnAddTenantRelationship(
+				const sdl::imtauth::Tenants::CAddTenantRelationshipGqlRequest& addTenantRelationshipRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtauth::Tenants::CRemoveTenantRelationshipPayload OnRemoveTenantRelationship(
+				const sdl::imtauth::Tenants::CRemoveTenantRelationshipGqlRequest& removeTenantRelationshipRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 
