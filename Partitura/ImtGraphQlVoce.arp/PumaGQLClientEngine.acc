@@ -89,6 +89,7 @@
                                 <Value>DocumentRevision</Value>
                                 <Value>GqlJwtSessionController</Value>
                                 <Value>RemoteControllers</Value>
+                                <Value>RemoteTenantController</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -226,6 +227,27 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="RemoteTenantController" PackageId="ImtAuthGqlPck" ComponentId="RemoteTenantController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApiClient"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="TenantInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="SubscriberDemultiplexer" PackageId="ImtServerGqlPck" ComponentId="SlaveSubscriberController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -274,6 +296,11 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="TenantInfo" PackageId="ImtAuthPck" ComponentId="TenantInfo">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
             </Data>
         </Element>
         <Element Id="UserInfo" PackageId="ImtAuthPck" ComponentId="UserInfo">

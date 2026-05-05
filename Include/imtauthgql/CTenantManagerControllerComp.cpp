@@ -26,7 +26,7 @@ sdl::imtauth::Tenants::CGetTenantIdsPayload CTenantManagerControllerComp::OnGetT
 
 	QByteArrayList ids = m_tenantManagerCompPtr->GetTenantIds();
 
-	response.Version_1_0->tenantIds = std::vector<std::optional<QByteArray>>();
+	response.Version_1_0->tenantIds.Emplace().FromList(ids);
 	for (const auto& id : ids){
 		response.Version_1_0->tenantIds->push_back(id);
 	}

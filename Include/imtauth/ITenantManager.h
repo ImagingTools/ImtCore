@@ -3,7 +3,7 @@
 
 
 // ACF includes
-#include <istd/IPolymorphic.h>
+#include <istd/IChangeable.h>
 
 // ImtCore includes
 #include <imtauth/ITenantInfo.h>
@@ -13,7 +13,7 @@ namespace imtauth
 {
 
 
-class ITenantManager: virtual public istd::IPolymorphic
+class ITenantManager: virtual public istd::IChangeable
 {
 public:
 	virtual QByteArrayList GetTenantIds() const = 0;

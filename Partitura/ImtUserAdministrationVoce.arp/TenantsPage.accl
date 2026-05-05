@@ -13,6 +13,7 @@
         <Element ComponentName="Demultiplexer" X="550" Y="75" Note=""/>
         <Element ComponentName="TenantCommands" X="425" Y="350" Note=""/>
         <Element ComponentName="TenantDocumentManager" X="200" Y="200" Note=""/>
+        <Element ComponentName="TenantManagerController" X="800" Y="200" Note=""/>
         <Element ComponentName="TenantPermissions" X="725" Y="675" Note=""/>
         <Element ComponentName="TenantsCommands" X="725" Y="350" Note=""/>
         <Element ComponentName="TenantsListController" X="1000" Y="350" Note=""/>

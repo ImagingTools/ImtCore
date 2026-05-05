@@ -35,9 +35,6 @@ public:
 	virtual bool UpdateTenant(const QByteArray& tenantId, const QString& tenantName, const QString& description) override;
 	virtual bool SetTenantActive(const QByteArray& tenantId, bool isActive) override;
 
-	// reimplemented (iser::ISerializable)
-	virtual bool Serialize(iser::IArchive& archive) override;
-
 private:
 	I_REF(imtbase::IObjectCollection, m_tenantCollectionCompPtr);
 	I_FACT(imtauth::ITenantInfo, m_tenantFactoryCompPtr);

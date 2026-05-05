@@ -64,6 +64,9 @@
                     <AttributeInfo Id="StyleFileNamePrefix" Type="String" ExportId="StyleFileNamePrefix">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="TenantPageVisible" Type="Boolean" ExportId="TenantPageVisible">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

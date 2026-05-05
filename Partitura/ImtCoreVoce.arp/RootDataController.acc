@@ -92,6 +92,9 @@
                     <AttributeInfo Id="SearchPageVisible" Type="Boolean" ExportId="SearchPageVisible">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="TenantPageVisible" Type="Boolean" ExportId="TenantPageVisible">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

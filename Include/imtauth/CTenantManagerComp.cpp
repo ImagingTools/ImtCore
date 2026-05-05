@@ -96,7 +96,7 @@ QByteArray CTenantManagerComp::CreateTenant(const QString& tenantName, const QSt
 		return QByteArray();
 	}
 
-	SendInfoMessage(0, QString("Created tenant '%1' (id: %2)").arg(tenantName).arg(QString::fromUtf8(tenantId)), "CTenantManagerComp");
+	SendInfoMessage(0, QString("Created tenant '%1' (id: %2)").arg(tenantName, QString::fromUtf8(tenantId), "CTenantManagerComp"));
 
 	return tenantId;
 }
@@ -193,12 +193,6 @@ bool CTenantManagerComp::SetTenantActive(const QByteArray& tenantId, bool isActi
 }
 
 
-// reimplemented (iser::ISerializable)
-
-bool CTenantManagerComp::Serialize(iser::IArchive& /*archive*/)
-{
-	return true;
-}
-
-
 } // namespace imtauth
+
+
