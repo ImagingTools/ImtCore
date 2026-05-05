@@ -3,7 +3,7 @@
 
 
 // ImtCore includes
-#include <imtgql/CGqlRequest.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants.h>
 
 
 namespace imtauthgql
@@ -20,37 +20,51 @@ QByteArrayList CRemoteTenantControllerComp::GetTenantIds() const
 
 imtauth::ITenantInfoUniquePtr CRemoteTenantControllerComp::GetTenant(const QByteArray& tenantId) const
 {
+	namespace tenantsdl = sdl::imtauth::Tenants;
+
 	if (!m_tenantFactoryCompPtr.IsValid()){
 		return nullptr;
 	}
 
-	imtgql::CGqlRequest gqlRequest(imtgql::IGqlRequest::RT_QUERY, sdl::imtauth::Tenants::CGetTenantGqlRequest::GetCommandId());
-	sdl::imtauth::Tenants::CGetTenantGqlRequest getTenantRequest(gqlRequest, false);
+	tenantsdl::GetTenantRequestArguments arguments;
+	arguments.input.Version_1_0 = tenantsdl::CGetTenantInput::V1_0();
+	arguments.input.Version_1_0->tenantId = tenantId;
+
+	imtgql::CGqlRequest gqlRequest;
+	if (!tenantsdl::CGetTenantGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+		return nullptr;
+	}
+
+	typedef tenantsdl::CGetTenantPayload Response;
 
 	QString errorMessage;
-	sdl::imtauth::Tenants::CGetTenantPayload payload = OnGetTenant(getTenantRequest, gqlRequest, errorMessage);
-	if (!payload.Version_1_0.has_value() || !payload.Version_1_0->tenant.has_value()){
+	Response response = SendModelRequest<Response>(gqlRequest, errorMessage);
+	if (!errorMessage.isEmpty()){
 		return nullptr;
 	}
 
-	const auto& tenantData = *payload.Version_1_0->tenant;
-	if (!tenantData.Version_1_0.has_value()){
+	if (!response.Version_1_0 || !response.Version_1_0->tenant.has_value()){
 		return nullptr;
 	}
+
+	const auto& tenantData = *response.Version_1_0->tenant;
 
 	imtauth::ITenantInfoUniquePtr tenantInfoPtr = m_tenantFactoryCompPtr.CreateInstance();
 	if (!tenantInfoPtr.IsValid()){
 		return nullptr;
 	}
 
-	if (tenantData.Version_1_0->name){
-		tenantInfoPtr->SetTenantName(*tenantData.Version_1_0->name);
+	if (tenantData.id){
+		tenantInfoPtr->SetTenantId(*tenantData.id);
 	}
-	if (tenantData.Version_1_0->description){
-		tenantInfoPtr->SetTenantDescription(*tenantData.Version_1_0->description);
+	if (tenantData.name){
+		tenantInfoPtr->SetTenantName(*tenantData.name);
 	}
-	if (tenantData.Version_1_0->isActive){
-		tenantInfoPtr->SetActive(*tenantData.Version_1_0->isActive);
+	if (tenantData.description){
+		tenantInfoPtr->SetTenantDescription(*tenantData.description);
+	}
+	if (tenantData.isActive){
+		tenantInfoPtr->SetActive(*tenantData.isActive);
 	}
 
 	return tenantInfoPtr;
@@ -59,108 +73,121 @@ imtauth::ITenantInfoUniquePtr CRemoteTenantControllerComp::GetTenant(const QByte
 
 QByteArray CRemoteTenantControllerComp::CreateTenant(const QString& tenantName, const QString& description)
 {
-	imtgql::CGqlRequest gqlRequest(imtgql::IGqlRequest::RT_MUTATION, sdl::imtauth::Tenants::CCreateTenantGqlRequest::GetCommandId());
-	sdl::imtauth::Tenants::CCreateTenantGqlRequest createTenantRequest(gqlRequest, false);
+	namespace tenantsdl = sdl::imtauth::Tenants;
 
-	QString errorMessage;
-	sdl::imtauth::Tenants::CCreateTenantPayload payload = OnCreateTenant(createTenantRequest, gqlRequest, errorMessage);
-	if (!payload.Version_1_0.has_value() || !payload.Version_1_0->tenantId.has_value()){
+	tenantsdl::CreateTenantRequestArguments arguments;
+	arguments.input.Version_1_0 = tenantsdl::CCreateTenantInput::V1_0();
+	arguments.input.Version_1_0->name = tenantName;
+	arguments.input.Version_1_0->description = description;
+
+	imtgql::CGqlRequest gqlRequest;
+	if (!tenantsdl::CCreateTenantGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		return QByteArray();
 	}
 
-	return *payload.Version_1_0->tenantId;
+	typedef tenantsdl::CCreateTenantPayload Response;
+
+	QString errorMessage;
+	Response response = SendModelRequest<Response>(gqlRequest, errorMessage);
+	if (!errorMessage.isEmpty()){
+		return QByteArray();
+	}
+
+	if (response.Version_1_0 && response.Version_1_0->tenantId.has_value()){
+		return *response.Version_1_0->tenantId;
+	}
+
+	return QByteArray();
 }
 
 
 bool CRemoteTenantControllerComp::RemoveTenant(const QByteArray& tenantId)
 {
-	imtgql::CGqlRequest gqlRequest(imtgql::IGqlRequest::RT_MUTATION, sdl::imtauth::Tenants::CRemoveTenantGqlRequest::GetCommandId());
-	sdl::imtauth::Tenants::CRemoveTenantGqlRequest removeTenantRequest(gqlRequest, false);
+	namespace tenantsdl = sdl::imtauth::Tenants;
 
-	QString errorMessage;
-	sdl::imtauth::Tenants::CRemoveTenantPayload payload = OnRemoveTenant(removeTenantRequest, gqlRequest, errorMessage);
-	if (!payload.Version_1_0.has_value() || !payload.Version_1_0->success.has_value()){
+	tenantsdl::RemoveTenantRequestArguments arguments;
+	arguments.input.Version_1_0 = tenantsdl::CRemoveTenantInput::V1_0();
+	arguments.input.Version_1_0->tenantId = tenantId;
+
+	imtgql::CGqlRequest gqlRequest;
+	if (!tenantsdl::CRemoveTenantGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		return false;
 	}
 
-	return *payload.Version_1_0->success;
+	typedef tenantsdl::CRemoveTenantPayload Response;
+
+	QString errorMessage;
+	Response response = SendModelRequest<Response>(gqlRequest, errorMessage);
+	if (!errorMessage.isEmpty()){
+		return false;
+	}
+
+	if (response.Version_1_0 && response.Version_1_0->success.has_value()){
+		return *response.Version_1_0->success;
+	}
+
+	return false;
 }
 
 
 bool CRemoteTenantControllerComp::UpdateTenant(const QByteArray& tenantId, const QString& tenantName, const QString& description)
 {
-	imtgql::CGqlRequest gqlRequest(imtgql::IGqlRequest::RT_MUTATION, sdl::imtauth::Tenants::CUpdateTenantGqlRequest::GetCommandId());
-	sdl::imtauth::Tenants::CUpdateTenantGqlRequest updateTenantRequest(gqlRequest, false);
+	namespace tenantsdl = sdl::imtauth::Tenants;
 
-	QString errorMessage;
-	sdl::imtauth::Tenants::CUpdateTenantPayload payload = OnUpdateTenant(updateTenantRequest, gqlRequest, errorMessage);
-	if (!payload.Version_1_0.has_value() || !payload.Version_1_0->success.has_value()){
+	tenantsdl::UpdateTenantRequestArguments arguments;
+	arguments.input.Version_1_0 = tenantsdl::CUpdateTenantInput::V1_0();
+	arguments.input.Version_1_0->tenantId = tenantId;
+	arguments.input.Version_1_0->name = tenantName;
+	arguments.input.Version_1_0->description = description;
+
+	imtgql::CGqlRequest gqlRequest;
+	if (!tenantsdl::CUpdateTenantGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		return false;
 	}
 
-	return *payload.Version_1_0->success;
+	typedef tenantsdl::CUpdateTenantPayload Response;
+
+	QString errorMessage;
+	Response response = SendModelRequest<Response>(gqlRequest, errorMessage);
+	if (!errorMessage.isEmpty()){
+		return false;
+	}
+
+	if (response.Version_1_0 && response.Version_1_0->success.has_value()){
+		return *response.Version_1_0->success;
+	}
+
+	return false;
 }
 
 
 bool CRemoteTenantControllerComp::SetTenantActive(const QByteArray& tenantId, bool isActive)
 {
-	imtgql::CGqlRequest gqlRequest(imtgql::IGqlRequest::RT_MUTATION, sdl::imtauth::Tenants::CSetTenantActiveGqlRequest::GetCommandId());
-	sdl::imtauth::Tenants::CSetTenantActiveGqlRequest setTenantActiveRequest(gqlRequest, false);
+	namespace tenantsdl = sdl::imtauth::Tenants;
 
-	QString errorMessage;
-	sdl::imtauth::Tenants::CSetTenantActivePayload payload = OnSetTenantActive(setTenantActiveRequest, gqlRequest, errorMessage);
-	if (!payload.Version_1_0.has_value() || !payload.Version_1_0->success.has_value()){
+	tenantsdl::SetTenantActiveRequestArguments arguments;
+	arguments.input.Version_1_0 = tenantsdl::CSetTenantActiveInput::V1_0();
+	arguments.input.Version_1_0->tenantId = tenantId;
+	arguments.input.Version_1_0->isActive = isActive;
+
+	imtgql::CGqlRequest gqlRequest;
+	if (!tenantsdl::CSetTenantActiveGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		return false;
 	}
 
-	return *payload.Version_1_0->success;
-}
+	typedef tenantsdl::CSetTenantActivePayload Response;
 
+	QString errorMessage;
+	Response response = SendModelRequest<Response>(gqlRequest, errorMessage);
+	if (!errorMessage.isEmpty()){
+		return false;
+	}
 
-// reimplemented (sdl::imtauth::Tenants::CGraphQlHandlerCompBase)
+	if (response.Version_1_0 && response.Version_1_0->success.has_value()){
+		return *response.Version_1_0->success;
+	}
 
-sdl::imtauth::Tenants::CGetTenantPayload CRemoteTenantControllerComp::OnGetTenant(
-			const sdl::imtauth::Tenants::CGetTenantGqlRequest& /*getTenantRequest*/,
-			const ::imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
-{
-	return SendModelRequest<sdl::imtauth::Tenants::CGetTenantPayload>(gqlRequest, errorMessage);
-}
-
-
-sdl::imtauth::Tenants::CCreateTenantPayload CRemoteTenantControllerComp::OnCreateTenant(
-			const sdl::imtauth::Tenants::CCreateTenantGqlRequest& /*createTenantRequest*/,
-			const ::imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
-{
-	return SendModelRequest<sdl::imtauth::Tenants::CCreateTenantPayload>(gqlRequest, errorMessage);
-}
-
-
-sdl::imtauth::Tenants::CRemoveTenantPayload CRemoteTenantControllerComp::OnRemoveTenant(
-			const sdl::imtauth::Tenants::CRemoveTenantGqlRequest& /*removeTenantRequest*/,
-			const ::imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
-{
-	return SendModelRequest<sdl::imtauth::Tenants::CRemoveTenantPayload>(gqlRequest, errorMessage);
-}
-
-
-sdl::imtauth::Tenants::CUpdateTenantPayload CRemoteTenantControllerComp::OnUpdateTenant(
-			const sdl::imtauth::Tenants::CUpdateTenantGqlRequest& /*updateTenantRequest*/,
-			const ::imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
-{
-	return SendModelRequest<sdl::imtauth::Tenants::CUpdateTenantPayload>(gqlRequest, errorMessage);
-}
-
-
-sdl::imtauth::Tenants::CSetTenantActivePayload CRemoteTenantControllerComp::OnSetTenantActive(
-			const sdl::imtauth::Tenants::CSetTenantActiveGqlRequest& /*setTenantActiveRequest*/,
-			const ::imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
-{
-	return SendModelRequest<sdl::imtauth::Tenants::CSetTenantActivePayload>(gqlRequest, errorMessage);
+	return false;
 }
 
 
