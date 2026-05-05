@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include <imt3dgui/CRender3DItem.h>
+#include <imt3dgui/CRender3dItem.h>
 
 
 // STL includes
@@ -86,18 +86,18 @@ namespace imt3dgui
 
 
 // ──────────────────────────────────────────────────────────────────
-// CRender3DNode — QSGRenderNode that issues RHI draw commands inline
+// CRender3dNode — QSGRenderNode that issues RHI draw commands inline
 // ──────────────────────────────────────────────────────────────────
 
-class CRender3DNode: public QSGRenderNode
+class CRender3dNode: public QSGRenderNode
 {
 public:
-	explicit CRender3DNode(CRender3DItem* itemPtr)
+	explicit CRender3dNode(CRender3dItem* itemPtr)
 		:m_itemPtr(itemPtr)
 	{
 	}
 
-	~CRender3DNode() override
+	~CRender3dNode() override
 	{
 		ReleaseResources();
 	}
@@ -235,7 +235,7 @@ private:
 		m_vertexShader = LoadShader(vertPath);
 		m_fragmentShader = LoadShader(fragPath);
 		if (!m_vertexShader.isValid() || !m_fragmentShader.isValid()){
-			qDebug() << "CRender3DNode: failed to load RHI shaders —"
+			qDebug() << "CRender3dNode: failed to load RHI shaders —"
 					 << "vertex:" << vertPath << (m_vertexShader.isValid() ? "ok" : "MISSING")
 					 << "fragment:" << fragPath << (m_fragmentShader.isValid() ? "ok" : "MISSING");
 			return;
@@ -411,7 +411,7 @@ private:
 		out.pointSize = 1.0f;
 	}
 
-	CRender3DItem* m_itemPtr = nullptr;
+	CRender3dItem* m_itemPtr = nullptr;
 
 	QShader m_vertexShader;
 	QShader m_fragmentShader;
@@ -429,10 +429,10 @@ private:
 
 
 // ──────────────────────────────────────────────────────────────────
-// CRender3DItem — QQuickItem implementation
+// CRender3dItem — QQuickItem implementation
 // ──────────────────────────────────────────────────────────────────
 
-CRender3DItem::CRender3DItem(QQuickItem* parentPtr)
+CRender3dItem::CRender3dItem(QQuickItem* parentPtr)
 	:QQuickItem(parentPtr),
 	m_cubeColor("#e94560"),
 	m_cameraDistance(3.0),
@@ -443,24 +443,24 @@ CRender3DItem::CRender3DItem(QQuickItem* parentPtr)
 }
 
 
-CRender3DItem::~CRender3DItem()
+CRender3dItem::~CRender3dItem()
 {
 }
 
 
-void CRender3DItem::RegisterQmlType()
+void CRender3dItem::RegisterQmlType()
 {
-	qmlRegisterType<CRender3DItem>("imt3dgui", 1, 0, "Render3DView");
+	qmlRegisterType<CRender3dItem>("imt3dgui", 1, 0, "Render3DView");
 }
 
 
-QColor CRender3DItem::GetCubeColor() const
+QColor CRender3dItem::GetCubeColor() const
 {
 	return m_cubeColor;
 }
 
 
-void CRender3DItem::SetCubeColor(const QColor& color)
+void CRender3dItem::SetCubeColor(const QColor& color)
 {
 	if (m_cubeColor != color){
 		m_cubeColor = color;
@@ -470,13 +470,13 @@ void CRender3DItem::SetCubeColor(const QColor& color)
 }
 
 
-qreal CRender3DItem::GetCameraDistance() const
+qreal CRender3dItem::GetCameraDistance() const
 {
 	return m_cameraDistance;
 }
 
 
-void CRender3DItem::SetCameraDistance(qreal distance)
+void CRender3dItem::SetCameraDistance(qreal distance)
 {
 	if (!qFuzzyCompare(m_cameraDistance, distance)){
 		m_cameraDistance = distance;
@@ -486,13 +486,13 @@ void CRender3DItem::SetCameraDistance(qreal distance)
 }
 
 
-qreal CRender3DItem::GetRotationX() const
+qreal CRender3dItem::GetRotationX() const
 {
 	return m_rotationX;
 }
 
 
-void CRender3DItem::SetRotationX(qreal angle)
+void CRender3dItem::SetRotationX(qreal angle)
 {
 	if (!qFuzzyCompare(m_rotationX, angle)){
 		m_rotationX = angle;
@@ -502,13 +502,13 @@ void CRender3DItem::SetRotationX(qreal angle)
 }
 
 
-qreal CRender3DItem::GetRotationY() const
+qreal CRender3dItem::GetRotationY() const
 {
 	return m_rotationY;
 }
 
 
-void CRender3DItem::SetRotationY(qreal angle)
+void CRender3dItem::SetRotationY(qreal angle)
 {
 	if (!qFuzzyCompare(m_rotationY, angle)){
 		m_rotationY = angle;
@@ -520,9 +520,9 @@ void CRender3DItem::SetRotationY(qreal angle)
 
 // reimplemented (QQuickItem)
 
-QSGNode* CRender3DItem::updatePaintNode(QSGNode* oldNode, UpdatePaintNodeData* /*data*/)
+QSGNode* CRender3dItem::updatePaintNode(QSGNode* oldNode, UpdatePaintNodeData* /*data*/)
 {
-	CRender3DNode* node = static_cast<CRender3DNode*>(oldNode);
+	CRender3dNode* node = static_cast<CRender3dNode*>(oldNode);
 
 	if (width() <= 0 || height() <= 0){
 		delete node;
@@ -530,7 +530,7 @@ QSGNode* CRender3DItem::updatePaintNode(QSGNode* oldNode, UpdatePaintNodeData* /
 	}
 
 	if (!node){
-		node = new CRender3DNode(this);
+		node = new CRender3dNode(this);
 	}
 
 	node->markDirty(QSGNode::DirtyMaterial);

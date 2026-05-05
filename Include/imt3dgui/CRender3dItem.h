@@ -14,7 +14,7 @@ namespace imt3dgui
 /**
 	Pure-QML 3D viewport item.
 
-	CRender3DItem is a QQuickItem that renders a 3D cube using a
+	CRender3dItem is a QQuickItem that renders a 3D cube using a
 	QSGRenderNode — exactly the same pattern Qt Quick 3D View3D uses in its
 	"Inline" render mode.  The RenderNode issues RHI draw commands directly
 	into the Qt Quick scene graph's existing render pass, achieving full GPU
@@ -39,15 +39,15 @@ namespace imt3dgui
 
 	### Registration
 
-	Call CRender3DItem::RegisterQmlType() once before loading QML, or use
-	qmlRegisterType<CRender3DItem>("imt3dgui", 1, 0, "Render3DView") directly.
+	Call CRender3dItem::RegisterQmlType() once before loading QML, or use
+	qmlRegisterType<CRender3dItem>("imt3dgui", 1, 0, "Render3DView") directly.
 
 	### Thread safety
 
 	All rendering happens on the Qt Quick render thread via the
 	QSGRenderNode::render() callback.  No external synchronisation is required.
 */
-class CRender3DItem: public QQuickItem
+class CRender3dItem: public QQuickItem
 {
 	Q_OBJECT
 
@@ -57,8 +57,8 @@ class CRender3DItem: public QQuickItem
 	Q_PROPERTY(qreal rotationY READ GetRotationY WRITE SetRotationY NOTIFY RotationYChanged)
 
 public:
-	explicit CRender3DItem(QQuickItem* parentPtr = nullptr);
-	~CRender3DItem() override;
+	explicit CRender3dItem(QQuickItem* parentPtr = nullptr);
+	~CRender3dItem() override;
 
 	static void RegisterQmlType();
 
