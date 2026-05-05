@@ -215,7 +215,10 @@ Item{
 																		Style.fontSizeM * headerDelegate.scale;
 
 
-		font.family: Style.fontFamilyBold;
+		font.family: headerDelegate.tableItem.emptyDecorHeader ? Style.fontFamilyBold :
+																 headerDelegate.tableItem.headerDecorator.isValidData("FontFamily", headerDelegate.columnIndex) ?
+																	 headerDelegate.tableItem.headerDecorator.getData("FontFamily", headerDelegate.columnIndex) :
+																	 Style.fontFamilyBold;
 
 		font.bold: headerDelegate.tableItem.emptyDecorHeader ? true :
 															   headerDelegate.tableItem.headerDecorator.isValidData("FontBold", headerDelegate.columnIndex) ?
