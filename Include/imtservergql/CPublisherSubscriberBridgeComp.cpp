@@ -10,36 +10,6 @@ namespace imtservergql
 {
 
 
-// CPublisherSubscriberBridgeComp::SubscriptionClient
-
-CPublisherSubscriberBridgeComp::SubscriptionClient::SubscriptionClient(CPublisherSubscriberBridgeComp* ownerPtr)
-	:m_ownerPtr(ownerPtr)
-{
-}
-
-
-// reimplemented (imtclientgql::IGqlSubscriptionClient)
-
-void CPublisherSubscriberBridgeComp::SubscriptionClient::OnResponseReceived(
-			const QByteArray& subscriptionId,
-			const QByteArray& subscriptionData)
-{
-	if (m_ownerPtr != nullptr){
-		m_ownerPtr->HandleSubscriptionData(subscriptionId, subscriptionData);
-	}
-}
-
-
-void CPublisherSubscriberBridgeComp::SubscriptionClient::OnSubscriptionStatusChanged(
-			const QByteArray& /*subscriptionId*/,
-			const SubscriptionStatus& /*status*/,
-			const QString& /*message*/)
-{
-}
-
-
-// CPublisherSubscriberBridgeComp
-
 // protected methods
 
 // reimplemented (icomp::CComponentBase)
@@ -56,7 +26,7 @@ void CPublisherSubscriberBridgeComp::OnComponentCreated()
 			subscriptionField.InsertField("id");
 			gqlRequest.AddField("data", subscriptionField);
 
-			m_subscriptionIds << m_subscriptionManagerCompPtr->RegisterSubscription(gqlRequest, &m_subscriptionClient);
+			m_subscriptionIds << m_subscriptionManagerCompPtr->RegisterSubscription(gqlRequest, this);
 		}
 	}
 }
@@ -75,9 +45,11 @@ void CPublisherSubscriberBridgeComp::OnComponentDestroyed()
 }
 
 
-// private methods
+// reimplemented (imtclientgql::IGqlSubscriptionClient)
 
-void CPublisherSubscriberBridgeComp::HandleSubscriptionData(const QByteArray& subscriptionId, const QByteArray& subscriptionData)
+void CPublisherSubscriberBridgeComp::OnResponseReceived(
+			const QByteArray& subscriptionId,
+			const QByteArray& subscriptionData)
 {
 	QByteArray commandId = GetCommandForSubscription(subscriptionId);
 	if (commandId.isEmpty()){
@@ -87,6 +59,16 @@ void CPublisherSubscriberBridgeComp::HandleSubscriptionData(const QByteArray& su
 	PublishData(commandId, subscriptionData);
 }
 
+
+void CPublisherSubscriberBridgeComp::OnSubscriptionStatusChanged(
+			const QByteArray& /*subscriptionId*/,
+			const SubscriptionStatus& /*status*/,
+			const QString& /*message*/)
+{
+}
+
+
+// private methods
 
 QByteArray CPublisherSubscriberBridgeComp::GetCommandForSubscription(const QByteArray& subscriptionId) const
 {
