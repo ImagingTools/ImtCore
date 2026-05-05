@@ -133,5 +133,17 @@ void CGqlModel::SetProductId(const QString& productId)
 }
 
 
+QString CGqlModel::GetGlobalAccessToken()
+{
+	return s_accessToken;
+}
+
+
+QString CGqlModel::GetProductId()
+{
+	return s_productId;
+}
+
+
 } // namespace imtqml
 

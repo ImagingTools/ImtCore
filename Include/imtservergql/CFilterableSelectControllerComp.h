@@ -4,6 +4,7 @@
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtserverapp/CComplexCollectionFilterRepresentationController.h>
+#include <imtservergql/IParamsSetJoiner.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/FilterableSelect.h>
 
 
@@ -20,6 +21,7 @@ public:
 	I_BEGIN_COMPONENT(CFilterableSelectControllerComp);
 		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection ID to match incoming requests", true, "");
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection providing selectable items", true, "ObjectCollection");
+		I_ASSIGN_MULTI_0(m_filterFillersCompPtr, "ParamsSetJoiners", "Optional params set joiners for injecting additional filters", false);
 	I_END_COMPONENT;
 
 	// reimplemented (imtgql::IGqlRequestHandler)
@@ -38,6 +40,7 @@ private:
 private:
 	I_ATTR(QByteArray, m_collectionIdAttrPtr);
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
+	I_MULTIREF(IParamsSetJoiner, m_filterFillersCompPtr);
 };
 
 

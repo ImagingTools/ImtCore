@@ -92,8 +92,7 @@ QtObject {
 
 
 	//factories
-	Component{
-		id: textShapeSdlComp
+	property Component textShapeSdlComp: Component{
 		GraphicsShapeFactoryBase{
 			typeName: "TextLabelShape"
 			qmlShapeComp: factoryManager.textShapeComp
@@ -125,8 +124,7 @@ QtObject {
 
 		}
 	}
-	Component{
-		id: imageShapeSdlComp
+	property Component imageShapeSdlComp: Component{
 		GraphicsShapeFactoryBase{
 			typeName: "ImageShape"
 			qmlShapeComp: factoryManager.imageShapeComp
@@ -157,8 +155,7 @@ QtObject {
 			}
 		}
 	}
-	Component{
-		id: rectangleShapeSdlComp
+	property Component rectangleShapeSdlComp: Component{
 		GraphicsShapeFactoryBase{
 			typeName: "Rectangle2dShape"
 			qmlShapeComp: factoryManager.rectangleShapeComp
@@ -182,8 +179,7 @@ QtObject {
 			}
 		}
 	}
-	Component{
-		id: polygonShapeSdlComp
+	property Component polygonShapeSdlComp: Component{
 		GraphicsShapeFactoryBase{
 			typeName: "Polygon2dShape"
 			qmlShapeComp: factoryManager.polygonShapeComp
@@ -213,8 +209,7 @@ QtObject {
 			}
 		}
 	}
-	Component{
-		id: polyLineShapeSdlComp
+	property Component polyLineShapeSdlComp: Component{
 		GraphicsShapeFactoryBase{
 			typeName: "Polyline2dShape"
 			qmlShapeComp: factoryManager.polyLineShapeComp
@@ -240,8 +235,7 @@ QtObject {
 			}
 		}
 	}
-	Component{
-		id: lineShapeSdlComp
+	property Component lineShapeSdlComp: Component{
 		GraphicsShapeFactoryBase{
 			typeName: "Line2dShape"
 			qmlShapeComp: factoryManager.polyLineShapeComp
@@ -262,8 +256,7 @@ QtObject {
 			}
 		}
 	}
-	Component{
-		id: segmentShapeSdlComp
+	property Component segmentShapeSdlComp: Component{
 		GraphicsShapeFactoryBase{
 			typeName: "SegmentShape"
 			qmlShapeComp: factoryManager.segmentShapeComp
@@ -273,20 +266,13 @@ QtObject {
 		}
 	}
 
-	Component{
-		id: annulusShapeSdlComp
+	property Component annulusShapeSdlComp: Component{
 		GraphicsShapeFactoryBase{
 			typeName: "AnnulusShape"
 			qmlShapeComp: factoryManager.diskSegmentShapeComp
 
 			function createQmlShape(shapeItemArg, layerArg) {
 				let annulusObj = qmlShapeComp.createObject(factoryManager)
-
-				// center: Point2d!
-				// innerRadius: Double!
-				// outerRadius: Double!
-				// beginAngle: Double!
-				// endAngle: Double!
 
 				let annulus = shapeItemArg.m_circle
 				let center = annulus.m_center
@@ -310,8 +296,7 @@ QtObject {
 			}
 		}
 	}
-	Component{
-		id: circleShapeSdlComp
+	property Component circleShapeSdlComp: Component{
 		GraphicsShapeFactoryBase{
 			typeName: "CircleShape"
 			qmlShapeComp: factoryManager.circleShapeComp
