@@ -17,9 +17,9 @@ namespace imt3dgui
 /**
 	Generic scene-based 3D viewport item for Qt Quick.
 
-	CScene3DItem is a QQuickItem that renders the full contents of an
+	CScene3dItem is a QQuickItem that renders the full contents of an
 	imt3dview::IScene3d scene using a QSGRenderNode.  Unlike CRender3DItem
-	(which renders only a hardcoded cube), CScene3DItem delegates to the
+	(which renders only a hardcoded cube), CScene3dItem delegates to the
 	IRenderBackend pipeline so that **any** IScene3dItem (meshes, point clouds,
 	grids, axes, rulers, wires, …) added to the scene is rendered
 	automatically — no per-shape QQuickItem subclass is required.
@@ -44,10 +44,10 @@ namespace imt3dgui
 
 	### Registration
 
-	Call CScene3DItem::RegisterQmlType() once before loading QML, or use
-	qmlRegisterType<CScene3DItem>("imt3dgui", 1, 0, "Scene3DView") directly.
+	Call CScene3dItem::RegisterQmlType() once before loading QML, or use
+	qmlRegisterType<CScene3dItem>("imt3dgui", 1, 0, "Scene3DView") directly.
 */
-class CScene3DItem: public QQuickItem
+class CScene3dItem: public QQuickItem
 {
 	Q_OBJECT
 
@@ -57,8 +57,8 @@ class CScene3DItem: public QQuickItem
 	Q_PROPERTY(QColor backgroundColor READ GetBackgroundColor WRITE SetBackgroundColor NOTIFY BackgroundColorChanged)
 
 public:
-	explicit CScene3DItem(QQuickItem* parentPtr = nullptr);
-	~CScene3DItem() override;
+	explicit CScene3dItem(QQuickItem* parentPtr = nullptr);
+	~CScene3dItem() override;
 
 	static void RegisterQmlType();
 

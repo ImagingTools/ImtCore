@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include <imt3dgui/CScene3DItem.h>
+#include <imt3dgui/CScene3dItem.h>
 
 
 // STL includes
@@ -22,18 +22,18 @@ namespace imt3dgui
 
 
 // ──────────────────────────────────────────────────────────────────
-// CScene3DNode — QSGRenderNode that renders the full IScene3d scene
+// CScene3dNode — QSGRenderNode that renders the full IScene3d scene
 // ──────────────────────────────────────────────────────────────────
 
-class CScene3DNode: public QSGRenderNode
+class CScene3dNode: public QSGRenderNode
 {
 public:
-	explicit CScene3DNode(CScene3DItem* itemPtr)
+	explicit CScene3dNode(CScene3dItem* itemPtr)
 		:m_itemPtr(itemPtr)
 	{
 	}
 
-	~CScene3DNode() override
+	~CScene3dNode() override
 	{
 		ReleaseResources();
 	}
@@ -75,7 +75,7 @@ public:
 						renderTarget()->renderPassDescriptor());
 
 			if (!m_backend.Initialize()){
-				qDebug() << "CScene3DNode: backend initialization failed";
+				qDebug() << "CScene3dNode: backend initialization failed";
 				return;
 			}
 
@@ -205,7 +205,7 @@ private:
 		return state;
 	}
 
-	CScene3DItem* m_itemPtr = nullptr;
+	CScene3dItem* m_itemPtr = nullptr;
 	imt3dview::CScene3d* m_scene = nullptr;
 	CRhiRenderBackend m_backend;
 	bool m_backendReady = false;
@@ -213,10 +213,10 @@ private:
 
 
 // ──────────────────────────────────────────────────────────────────
-// CScene3DItem — QQuickItem implementation
+// CScene3dItem — QQuickItem implementation
 // ──────────────────────────────────────────────────────────────────
 
-CScene3DItem::CScene3DItem(QQuickItem* parentPtr)
+CScene3dItem::CScene3dItem(QQuickItem* parentPtr)
 	:QQuickItem(parentPtr),
 	m_cameraDistance(3.0),
 	m_rotationX(25.0),
@@ -227,30 +227,30 @@ CScene3DItem::CScene3DItem(QQuickItem* parentPtr)
 }
 
 
-CScene3DItem::~CScene3DItem()
+CScene3dItem::~CScene3dItem()
 {
 }
 
 
-void CScene3DItem::RegisterQmlType()
+void CScene3dItem::RegisterQmlType()
 {
-	qmlRegisterType<CScene3DItem>("imt3dgui", 1, 0, "Scene3DView");
+	qmlRegisterType<CScene3dItem>("imt3dgui", 1, 0, "Scene3DView");
 }
 
 
-imt3dview::IScene3d* CScene3DItem::GetScene()
+imt3dview::IScene3d* CScene3dItem::GetScene()
 {
 	return &m_scene;
 }
 
 
-qreal CScene3DItem::GetCameraDistance() const
+qreal CScene3dItem::GetCameraDistance() const
 {
 	return m_cameraDistance;
 }
 
 
-void CScene3DItem::SetCameraDistance(qreal distance)
+void CScene3dItem::SetCameraDistance(qreal distance)
 {
 	if (!qFuzzyCompare(m_cameraDistance, distance)){
 		m_cameraDistance = distance;
@@ -260,13 +260,13 @@ void CScene3DItem::SetCameraDistance(qreal distance)
 }
 
 
-qreal CScene3DItem::GetRotationX() const
+qreal CScene3dItem::GetRotationX() const
 {
 	return m_rotationX;
 }
 
 
-void CScene3DItem::SetRotationX(qreal angle)
+void CScene3dItem::SetRotationX(qreal angle)
 {
 	if (!qFuzzyCompare(m_rotationX, angle)){
 		m_rotationX = angle;
@@ -276,13 +276,13 @@ void CScene3DItem::SetRotationX(qreal angle)
 }
 
 
-qreal CScene3DItem::GetRotationY() const
+qreal CScene3dItem::GetRotationY() const
 {
 	return m_rotationY;
 }
 
 
-void CScene3DItem::SetRotationY(qreal angle)
+void CScene3dItem::SetRotationY(qreal angle)
 {
 	if (!qFuzzyCompare(m_rotationY, angle)){
 		m_rotationY = angle;
@@ -292,13 +292,13 @@ void CScene3DItem::SetRotationY(qreal angle)
 }
 
 
-QColor CScene3DItem::GetBackgroundColor() const
+QColor CScene3dItem::GetBackgroundColor() const
 {
 	return m_backgroundColor;
 }
 
 
-void CScene3DItem::SetBackgroundColor(const QColor& color)
+void CScene3dItem::SetBackgroundColor(const QColor& color)
 {
 	if (m_backgroundColor != color){
 		m_backgroundColor = color;
@@ -310,9 +310,9 @@ void CScene3DItem::SetBackgroundColor(const QColor& color)
 
 // reimplemented (QQuickItem)
 
-QSGNode* CScene3DItem::updatePaintNode(QSGNode* oldNode, UpdatePaintNodeData* /*data*/)
+QSGNode* CScene3dItem::updatePaintNode(QSGNode* oldNode, UpdatePaintNodeData* /*data*/)
 {
-	CScene3DNode* node = static_cast<CScene3DNode*>(oldNode);
+	CScene3dNode* node = static_cast<CScene3dNode*>(oldNode);
 
 	if (width() <= 0 || height() <= 0){
 		delete node;
@@ -320,7 +320,7 @@ QSGNode* CScene3DItem::updatePaintNode(QSGNode* oldNode, UpdatePaintNodeData* /*
 	}
 
 	if (!node){
-		node = new CScene3DNode(this);
+		node = new CScene3dNode(this);
 		node->SetScene(&m_scene);
 	}
 
