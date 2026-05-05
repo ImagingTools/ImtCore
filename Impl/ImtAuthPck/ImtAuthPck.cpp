@@ -240,6 +240,11 @@ I_EXPORT_COMPONENT(
 			"Tenant meta info creator",
 			"Tenant Meta Info Creator");
 
+I_EXPORT_COMPONENT(
+			TenantManager,
+			"Tenant manager",
+			"Tenant Manager");
+
 
 } // namespace ImtAuthPck
 
