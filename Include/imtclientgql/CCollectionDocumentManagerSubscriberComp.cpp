@@ -6,14 +6,6 @@ namespace imtclientgql
 {
 
 
-// public methods
-
-QByteArray CCollectionDocumentManagerSubscriberComp::GetLastNotificationData() const
-{
-	return m_lastNotificationData;
-}
-
-
 // protected methods
 
 // reimplemented (imtgql::IGqlSubscriptionClient)
@@ -25,8 +17,6 @@ void CCollectionDocumentManagerSubscriberComp::OnResponseReceived(
 	if (!m_subscriptionIds.contains(subscriptionId)){
 		return;
 	}
-
-	m_lastNotificationData = subscriptionData;
 
 	istd::IChangeable::ChangeSet changeSet(istd::IChangeable::CF_ANY);
 	istd::CChangeNotifier notifier(this, &changeSet);

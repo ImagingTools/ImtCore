@@ -89,6 +89,7 @@
                                 <Value>DocumentRevision</Value>
                                 <Value>GqlJwtSessionController</Value>
                                 <Value>RemoteControllers</Value>
+                                <Value>RemoteCollectionDocumentManagerController</Value>
                                 <Value>RemoteTenantController</Value>
                             </Values>
                         </Data>
@@ -148,6 +149,33 @@
                     </AttributeInfo>
                     <AttributeInfo Id="ServerPrefix" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="/Puma"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RemoteCollectionDocumentManagerController" PackageId="ImtClientGqlPck" ComponentId="RemoteCollectionDocumentManagerController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApiClient"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CollectionIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Roles</Value>
+                                <Value>Users</Value>
+                                <Value>Groups</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -227,17 +255,26 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="RemoteTenantController" PackageId="ImtAuthGqlPck" ComponentId="RemoteTenantController">
+        <Element Id="RemoteTenantController" PackageId="ImtUserAdministrationVoce" ComponentId="RemoteTenantController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ApiClient"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="TenantFactory" Type="Factory" ExportId="">
-                        <Data IsEnabled="true" Value="TenantInfo"/>
+                    <AttributeInfo Id="ProductId" Type="Id" ExportId="ProductId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SubscriptionManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Subscription"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
@@ -262,6 +299,7 @@
                             <Values>
                                 <Value>ConnectionSubscriber</Value>
                                 <Value>RemoteRepositories</Value>
+                                <Value>RemoteTenantController</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -296,11 +334,6 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="TenantInfo" PackageId="ImtAuthPck" ComponentId="TenantInfo">
-            <Data IsEnabled="true" Flags="2">
-                <AttributeInfoMap/>
             </Data>
         </Element>
         <Element Id="UserInfo" PackageId="ImtAuthPck" ComponentId="UserInfo">

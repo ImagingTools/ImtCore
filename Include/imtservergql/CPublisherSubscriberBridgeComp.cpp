@@ -19,8 +19,8 @@ void CPublisherSubscriberBridgeComp::OnComponentCreated()
 	BaseClass::OnComponentCreated();
 
 	if (m_subscriptionManagerCompPtr.IsValid()){
-		for (int i = 0; i < m_subscriptionCommandAttrPtr.GetCount(); i++){
-			imtgql::CGqlRequest gqlRequest(imtgql::IGqlRequest::RT_SUBSCRIPTION, m_subscriptionCommandAttrPtr[i]);
+		for (int i = 0; i < m_commandIdsAttrPtr.GetCount(); i++){
+			imtgql::CGqlRequest gqlRequest(imtgql::IGqlRequest::RT_SUBSCRIPTION, m_commandIdsAttrPtr[i]);
 
 			imtgql::CGqlFieldObject subscriptionField;
 			subscriptionField.InsertField("id");

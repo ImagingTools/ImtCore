@@ -19,16 +19,12 @@ public:
 		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection ID for filtering", true, "DummyCollection");
 	I_END_COMPONENT;
 
-	QByteArray GetLastNotificationData() const;
-
 protected:
 	// reimplemented (imtgql::IGqlSubscriptionClient)
 	virtual void OnResponseReceived(const QByteArray& subscriptionId, const QByteArray& subscriptionData) override;
 
 private:
 	I_ATTR(QByteArray, m_collectionIdAttrPtr);
-
-	QByteArray m_lastNotificationData;
 };
 
 

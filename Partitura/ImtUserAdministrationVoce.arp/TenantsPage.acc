@@ -173,16 +173,6 @@
                     <AttributeInfo Id="CollectionName" Type="String" ExportId="">
                         <Data IsEnabled="true" Value="Tenants"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>GetTenantList</Value>
-                                <Value>TenantAdd</Value>
-                                <Value>TenantUpdate</Value>
-                                <Value>GetObjectVisualStatus</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
                     <AttributeInfo Id="CommandPermissions" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="TenantPermissions"/>
                     </AttributeInfo>

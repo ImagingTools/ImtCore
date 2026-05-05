@@ -30,7 +30,6 @@ public:
 
 	I_BEGIN_COMPONENT(CPublisherSubscriberBridgeComp);
 		I_ASSIGN(m_subscriptionManagerCompPtr, "SubscriptionManager", "Subscription manager for registering subscriptions", true, "SubscriptionManager");
-		I_ASSIGN_MULTI_0(m_subscriptionCommandAttrPtr, "SubscriptionCommand", "Commands to subscribe to on the remote server", true);
 	I_END_COMPONENT;
 
 protected:
@@ -52,7 +51,6 @@ private:
 
 private:
 	I_REF(imtclientgql::IGqlSubscriptionManager, m_subscriptionManagerCompPtr);
-	I_MULTIATTR(QByteArray, m_subscriptionCommandAttrPtr);
 
 	QByteArrayList m_subscriptionIds;
 };

@@ -46,10 +46,7 @@ void CCollectionDocumentManagerNotificationProxyComp::OnUpdate(const istd::IChan
 		return;
 	}
 
-	QByteArray notificationData = subscriberPtr->GetLastNotificationData();
-	if (notificationData.isEmpty()){
-		return;
-	}
+	QByteArray notificationData;
 
 	PublishData(m_commandIdsAttrPtr[0], notificationData);
 }

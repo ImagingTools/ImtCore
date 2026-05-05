@@ -14,13 +14,13 @@
         <Element ComponentName="GqlDemultiplexer" X="275" Y="75" Note=""/>
         <Element ComponentName="GqlJwtSessionController" X="175" Y="175" Note=""/>
         <Element ComponentName="GraphQLClientEngine" X="575" Y="225" Note=""/>
+        <Element ComponentName="RemoteCollectionDocumentManagerController" X="600" Y="150" Note=""/>
         <Element ComponentName="RemoteControllers" X="150" Y="600" Note=""/>
         <Element ComponentName="RemoteJwtSessionController" X="175" Y="325" Note=""/>
         <Element ComponentName="RemoteRepositories" X="1000" Y="275" Note=""/>
-        <Element ComponentName="RemoteTenantController" X="750" Y="550" Note=""/>
+        <Element ComponentName="RemoteTenantController" X="750" Y="525" Note=""/>
         <Element ComponentName="SubscriberDemultiplexer" X="925" Y="75" Note=""/>
-        <Element ComponentName="Subscription" X="1080" Y="520" Note=""/>
-        <Element ComponentName="TenantInfo" X="750" Y="650" Note=""/>
+        <Element ComponentName="Subscription" X="1075" Y="525" Note=""/>
         <Element ComponentName="UserInfo" X="1050" Y="650" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
@@ -30,7 +30,7 @@
                 <Element ComponentName="RemoteAuthorizationController" X="775" Y="350" Note=""/>
                 <Element ComponentName="RemoteCollectionController" X="575" Y="550" Note=""/>
                 <Element ComponentName="RemoteCommandsController" X="400" Y="400" Note=""/>
-                <Element ComponentName="RemoteRepresentationController" X="250" Y="275" Note=""/>
+                <Element ComponentName="RemoteRepresentationController" X="250" Y="300" Note=""/>
                 <Element ComponentName="RemoteUserController" X="150" Y="175" Note=""/>
                 <Element ComponentName="RoleRemoteCollectionController" X="1000" Y="550" Note=""/>
             </PositionMap>
