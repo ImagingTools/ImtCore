@@ -106,11 +106,10 @@ CTenantDbDelegateComp::NewObjectQuery CTenantDbDelegateComp::CreateNewObjectQuer
 	bool isActive = tenantPtr != nullptr ? tenantPtr->IsActive() : true;
 	QString now = UtcNow();
 
-	result.m_objectId = id.toUtf8();
-	result.m_query = QString(
+	result.query = QString(
 		"INSERT INTO \"%1\" (\"Id\", \"Name\", \"Description\", \"IsActive\", \"CreatedAt\", \"UpdatedAt\") "
 		"VALUES ('%2', '%3', '%4', %5, '%6', '%7');")
-		.arg(m_tableName,
+		.arg(*m_tableNameAttrPtr,
 			 id,
 			 name,
 			 description,
@@ -144,7 +143,7 @@ QByteArray CTenantDbDelegateComp::CreateUpdateObjectQuery(
 		"\"IsActive\"=%4, "
 		"\"UpdatedAt\"='%5' "
 		"WHERE \"Id\"='%6';")
-		.arg(m_tableName,
+		.arg(*m_tableNameAttrPtr,
 			 EscapeSql(tenantPtr->GetTenantName()),
 			 EscapeSql(tenantPtr->GetTenantDescription()),
 			 tenantPtr->IsActive() ? "1" : "0",
@@ -168,7 +167,16 @@ QByteArray CTenantDbDelegateComp::CreateDeleteObjectsQuery(
 	}
 
 	return QString("DELETE FROM \"%1\" WHERE \"Id\" IN (%2);")
-			.arg(m_tableName, escapedIds.join(", ")).toUtf8();
+			.arg(*m_tableNameAttrPtr, escapedIds.join(", ")).toUtf8();
+}
+
+
+QByteArray CTenantDbDelegateComp::CreateDeleteObjectSetQuery(
+			const imtbase::IObjectCollection& /*collection*/,
+			const iprm::IParamsSet* /*paramsPtr*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
+{
+	return QByteArray();
 }
 
 
@@ -179,7 +187,7 @@ QByteArray CTenantDbDelegateComp::CreateRenameObjectQuery(
 		const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	return QString("UPDATE \"%1\" SET \"Name\"='%2', \"UpdatedAt\"='%3' WHERE \"Id\"='%4';")
-			.arg(m_tableName,
+			.arg(*m_tableNameAttrPtr,
 				 EscapeSql(newObjectName),
 				 UtcNow(),
 				 EscapeSql(QString::fromUtf8(objectId))).toUtf8();
@@ -193,7 +201,7 @@ QByteArray CTenantDbDelegateComp::CreateDescriptionObjectQuery(
 		const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	return QString("UPDATE \"%1\" SET \"Description\"='%2', \"UpdatedAt\"='%3' WHERE \"Id\"='%4';")
-			.arg(m_tableName,
+			.arg(*m_tableNameAttrPtr,
 				 EscapeSql(description),
 				 UtcNow(),
 				 EscapeSql(QString::fromUtf8(objectId))).toUtf8();

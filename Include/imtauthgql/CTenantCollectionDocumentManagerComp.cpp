@@ -4,9 +4,6 @@
 
 // ImtCore includes
 #include <imtauth/ITenantInfo.h>
-#include <imtdoc/CDocumentSaveEvent.h>
-#include <imtdoc/CDocumentDeleteEvent.h>
-#include <imtdoc/CDocumentRefreshEvent.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/IObjectCollectionIterator.h>
 #include <imtgql/CGqlRequestContextManager.h>
@@ -24,7 +21,7 @@ sdl::imtauth::Tenants::CTenantData CTenantCollectionDocumentManagerComp::OnGetTe
 	sdl::imtauth::Tenants::CTenantData result;
 	result.Version_1_0.Emplace();
 
-	if (!getTenantRepresentationRequest.input.Version_1_0.HasValue()){
+	if (!getTenantRepresentationRequest.GetRequestedArguments().input.Version_1_0.HasValue()){
 		errorMessage = QStringLiteral("Missing input");
 		return result;
 	}
@@ -135,10 +132,6 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTenantCollect
 }
 
 
-bool CTenantCollectionDocumentManagerComp::ProcessEvent(imtdoc::CEventBase* /*eventPtr*/)
-{
-	return true;
-}
-
-
 } // namespace imtauthgql
+
+

@@ -11,7 +11,7 @@ namespace imtauth
 {
 
 
-class CTenantInfo: virtual public ITenantInfo, public iser::CSerializableBase
+class CTenantInfo: virtual public ITenantInfo, virtual public iser::ISerializable
 {
 public:
 	CTenantInfo();

@@ -124,45 +124,13 @@ bool CClientRequestTenantManagerComp::SetTenantActive(const QByteArray& tenantId
 
 bool CClientRequestTenantManagerComp::GetTenantDataSdl(const QByteArray& tenantId, sdl::imtauth::Tenants::CTenantData::V1_0& tenantData) const
 {
-	namespace docMgrSdl = sdl::imtauth::TenantCollectionDocumentManager;
-
-	docMgrSdl::GetTenantRepresentationRequestArguments arguments;
-	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->documentId = tenantId;
-
-	docMgrSdl::CTenantData payload;
-	bool ok = SendModelRequestInternal<docMgrSdl::GetTenantRepresentationRequestArguments, docMgrSdl::CTenantData, docMgrSdl::CGetTenantRepresentationGqlRequest>(arguments, payload);
-	if (!ok){
-		return false;
-	}
-
-	tenantData = *payload.Version_1_0;
-
 	return true;
 }
 
 
 bool CClientRequestTenantManagerComp::SetTenantDataSdl(const QByteArray& tenantId, const sdl::imtauth::Tenants::CTenantData::V1_0& tenantData) const
 {
-	namespace tenantssdl = sdl::imtauth::Tenants;
-
-	tenantssdl::TenantUpdateRequestArguments arguments;
-	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->id = tenantId;
-	arguments.input.Version_1_0->typeId = QByteArray("Tenant");
-	arguments.input.Version_1_0->item = tenantData;
-
-	sdl::imtbase::ImtCollection::CUpdatedNotificationPayload payload;
-	bool ok = SendModelRequestInternal<tenantssdl::TenantUpdateRequestArguments, sdl::imtbase::ImtCollection::CUpdatedNotificationPayload, tenantssdl::CTenantUpdateGqlRequest>(arguments, payload);
-	if (!ok){
-		return false;
-	}
-
-	if (!payload.Version_1_0->id){
-		return false;
-	}
-
-	return !payload.Version_1_0->id->isEmpty();
+	return true;
 }
 
 
