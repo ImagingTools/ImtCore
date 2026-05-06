@@ -83,7 +83,7 @@ imtauth::ITenantInfoUniquePtr CRemoteTenantControllerComp::GetTenant(const QByte
 }
 
 
-QByteArray CRemoteTenantControllerComp::CreateTenant(const QString& tenantName, const QString& description)
+QByteArray CRemoteTenantControllerComp::CreateTenant(const QString& tenantName, const QString& description, const QByteArray& ownerId)
 {
 	namespace tenantsdl = sdl::imtauth::Tenants;
 
@@ -91,6 +91,7 @@ QByteArray CRemoteTenantControllerComp::CreateTenant(const QString& tenantName, 
 	arguments.input.Version_1_0 = tenantsdl::CCreateTenantInput::V1_0();
 	arguments.input.Version_1_0->name = tenantName;
 	arguments.input.Version_1_0->description = description;
+	arguments.input.Version_1_0->ownerId = ownerId;
 
 	imtgql::CGqlRequest gqlRequest;
 	if (!tenantsdl::CCreateTenantGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
@@ -134,7 +135,7 @@ bool CRemoteTenantControllerComp::RemoveTenant(const QByteArray& tenantId)
 }
 
 
-bool CRemoteTenantControllerComp::UpdateTenant(const QByteArray& tenantId, const QString& tenantName, const QString& description)
+bool CRemoteTenantControllerComp::UpdateTenant(const QByteArray& tenantId, const QString& tenantName, const QString& description, const QByteArray& ownerId)
 {
 	namespace tenantsdl = sdl::imtauth::Tenants;
 
@@ -143,6 +144,7 @@ bool CRemoteTenantControllerComp::UpdateTenant(const QByteArray& tenantId, const
 	arguments.input.Version_1_0->tenantId = tenantId;
 	arguments.input.Version_1_0->name = tenantName;
 	arguments.input.Version_1_0->description = description;
+	arguments.input.Version_1_0->ownerId = ownerId;
 
 	imtgql::CGqlRequest gqlRequest;
 	if (!tenantsdl::CUpdateTenantGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
@@ -271,5 +273,3 @@ sdl::imtauth::Tenants::CRemoveTenantRelationshipPayload CRemoteTenantControllerC
 
 
 } // namespace imtauthgql
-
-

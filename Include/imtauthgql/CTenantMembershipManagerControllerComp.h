@@ -53,12 +53,24 @@ protected:
 				const sdl::imtauth::TenantMemberships::CAddMembershipGqlRequest& request,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+	virtual sdl::imtauth::TenantMemberships::CInviteTenantMemberPayload OnInviteTenantMember(
+				const sdl::imtauth::TenantMemberships::CInviteTenantMemberGqlRequest& request,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	virtual sdl::imtauth::TenantMemberships::CRemoveMembershipPayload OnRemoveMembership(
 				const sdl::imtauth::TenantMemberships::CRemoveMembershipGqlRequest& request,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 	virtual sdl::imtauth::TenantMemberships::CUpdateMembershipRolePayload OnUpdateMembershipRole(
 				const sdl::imtauth::TenantMemberships::CUpdateMembershipRoleGqlRequest& request,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtauth::TenantMemberships::CAcceptTenantMembershipInvitationPayload OnAcceptTenantMembershipInvitation(
+				const sdl::imtauth::TenantMemberships::CAcceptTenantMembershipInvitationGqlRequest& request,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtauth::TenantMemberships::CRejectTenantMembershipInvitationPayload OnRejectTenantMembershipInvitation(
+				const sdl::imtauth::TenantMemberships::CRejectTenantMembershipInvitationGqlRequest& request,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 

@@ -41,6 +41,7 @@ bool CTenantMetaInfoCreatorComp::CreateMetaInfo(
 	metaInfoPtr->SetMetaInfo(imtauth::ITenantInfo::MIT_TENANT_ID, tenantInfoPtr->GetTenantId());
 	metaInfoPtr->SetMetaInfo(imtauth::ITenantInfo::MIT_TENANT_NAME, tenantInfoPtr->GetTenantName());
 	metaInfoPtr->SetMetaInfo(imtauth::ITenantInfo::MIT_TENANT_DESCRIPTION, tenantInfoPtr->GetTenantDescription());
+	metaInfoPtr->SetMetaInfo(imtauth::ITenantInfo::MIT_TENANT_OWNER_ID, tenantInfoPtr->GetOwnerId());
 
 	return true;
 }
@@ -55,5 +56,4 @@ QString CTenantMetaInfoCreatorComp::MetaInfo::GetMetaInfoName(int /*metaInfoType
 
 
 } // namespace imtauth
-
 

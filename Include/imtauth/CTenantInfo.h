@@ -23,6 +23,8 @@ public:
 	virtual void SetTenantName(const QString& name) override;
 	virtual QString GetTenantDescription() const override;
 	virtual void SetTenantDescription(const QString& description) override;
+	virtual QByteArray GetOwnerId() const override;
+	virtual void SetOwnerId(const QByteArray& ownerId) override;
 	virtual bool IsActive() const override;
 	virtual void SetActive(bool isActive) override;
 	virtual QString GetCreatedAt() const override;
@@ -46,6 +48,7 @@ protected:
 	QByteArray m_tenantId;
 	QString m_name;
 	QString m_description;
+	QByteArray m_ownerId;
 	bool m_isActive;
 	QString m_createdAt;
 	QString m_updatedAt;
@@ -57,5 +60,4 @@ typedef imtbase::TIdentifiableWrap<CTenantInfo> CIdentifiableTenantInfo;
 
 
 } // namespace imtauth
-
 

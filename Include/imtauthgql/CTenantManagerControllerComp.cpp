@@ -80,7 +80,10 @@ sdl::imtauth::Tenants::CGetTenantPayload CTenantManagerControllerComp::OnGetTena
 	tenantData.id = tenantInfoPtr->GetTenantId();
 	tenantData.name = tenantInfoPtr->GetTenantName();
 	tenantData.description = tenantInfoPtr->GetTenantDescription();
+	tenantData.ownerId = tenantInfoPtr->GetOwnerId();
 	tenantData.isActive = tenantInfoPtr->IsActive();
+	tenantData.createdAt = tenantInfoPtr->GetCreatedAt();
+	tenantData.updatedAt = tenantInfoPtr->GetUpdatedAt();
 
 	// Populate memberIds from TenantMemberships
 	if (m_membershipManagerCompPtr.IsValid()){
@@ -88,7 +91,7 @@ sdl::imtauth::Tenants::CGetTenantPayload CTenantManagerControllerComp::OnGetTena
 		tenantData.memberIds.Emplace();
 		for (const QByteArray& msId : membershipIds){
 			const imtauth::ITenantMembership* msPtr = m_membershipManagerCompPtr->GetMembership(msId);
-			if (msPtr){
+			if (msPtr && msPtr->IsActive()){
 				tenantData.memberIds->push_back(msPtr->GetUserId());
 			}
 		}
@@ -102,7 +105,7 @@ sdl::imtauth::Tenants::CGetTenantPayload CTenantManagerControllerComp::OnGetTena
 
 sdl::imtauth::Tenants::CCreateTenantPayload CTenantManagerControllerComp::OnCreateTenant(
 	const sdl::imtauth::Tenants::CCreateTenantGqlRequest& createTenantRequest,
-	const ::imtgql::CGqlRequest& /*gqlRequest*/,
+	const ::imtgql::CGqlRequest& gqlRequest,
 	QString& /*errorMessage*/) const
 {
 	sdl::imtauth::Tenants::CCreateTenantPayload response;
@@ -116,6 +119,7 @@ sdl::imtauth::Tenants::CCreateTenantPayload CTenantManagerControllerComp::OnCrea
 
 	QString name;
 	QString description;
+	QByteArray ownerId = GetUserId(gqlRequest);
 	sdl::imtauth::Tenants::CreateTenantRequestArguments arguments = createTenantRequest.GetRequestedArguments();
 	if (arguments.input.Version_1_0->name){
 		name = *arguments.input.Version_1_0->name;
@@ -123,12 +127,19 @@ sdl::imtauth::Tenants::CCreateTenantPayload CTenantManagerControllerComp::OnCrea
 	if (arguments.input.Version_1_0->description){
 		description = *arguments.input.Version_1_0->description;
 	}
+	if (arguments.input.Version_1_0->ownerId){
+		ownerId = *arguments.input.Version_1_0->ownerId;
+	}
 
-	QByteArray tenantId = m_tenantManagerCompPtr->CreateTenant(name, description);
+	QByteArray tenantId = m_tenantManagerCompPtr->CreateTenant(name, description, ownerId);
 
 	if (tenantId.isEmpty()){
 		response.Version_1_0->errorMessage = QStringLiteral("Failed to create tenant");
 		return response;
+	}
+
+	if (m_membershipManagerCompPtr.IsValid() && !ownerId.isEmpty()){
+		m_membershipManagerCompPtr->AddMembership(ownerId, tenantId, imtauth::ITenantMembership::TMR_OWNER);
 	}
 
 	response.Version_1_0->tenantId = tenantId;
@@ -185,6 +196,7 @@ sdl::imtauth::Tenants::CUpdateTenantPayload CTenantManagerControllerComp::OnUpda
 	QByteArray tenantId;
 	QString name;
 	QString description;
+	QByteArray ownerId;
 	sdl::imtauth::Tenants::UpdateTenantRequestArguments arguments = updateTenantRequest.GetRequestedArguments();
 	if (arguments.input.Version_1_0->tenantId){
 		tenantId = *arguments.input.Version_1_0->tenantId;
@@ -195,8 +207,11 @@ sdl::imtauth::Tenants::CUpdateTenantPayload CTenantManagerControllerComp::OnUpda
 	if (arguments.input.Version_1_0->description){
 		description = *arguments.input.Version_1_0->description;
 	}
+	if (arguments.input.Version_1_0->ownerId){
+		ownerId = *arguments.input.Version_1_0->ownerId;
+	}
 
-	bool success = m_tenantManagerCompPtr->UpdateTenant(tenantId, name, description);
+	bool success = m_tenantManagerCompPtr->UpdateTenant(tenantId, name, description, ownerId);
 
 	// Sync memberIds with TenantMemberships
 	if (success && m_membershipManagerCompPtr.IsValid() && arguments.input.Version_1_0->memberIds){
@@ -230,7 +245,7 @@ sdl::imtauth::Tenants::CUpdateTenantPayload CTenantManagerControllerComp::OnUpda
 		// Add memberships for new users
 		for (const QByteArray& uid : newUserIds){
 			if (!currentUserIds.contains(uid)){
-				m_membershipManagerCompPtr->AddMembership(uid, tenantId, imtauth::ITenantMembership::TMR_MEMBER);
+				m_membershipManagerCompPtr->InviteMembership(uid, tenantId, imtauth::ITenantMembership::TMR_MEMBER);
 			}
 		}
 	}
@@ -300,5 +315,3 @@ sdl::imtauth::Tenants::CRemoveTenantRelationshipPayload CTenantManagerController
 
 
 } // namespace imtauthgql
-
-

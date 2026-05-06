@@ -153,6 +153,26 @@ QByteArray CTenantMembershipManagerComp::AddMembership(const QByteArray& userId,
 }
 
 
+QByteArray CTenantMembershipManagerComp::InviteMembership(const QByteArray& userId, const QByteArray& tenantId, ITenantMembership::TenantMemberRole role)
+{
+	QByteArray membershipId = AddMembership(userId, tenantId, role);
+	if (membershipId.isEmpty() || !m_membershipCollectionCompPtr.IsValid()){
+		return membershipId;
+	}
+
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (m_membershipCollectionCompPtr->GetObjectData(membershipId, dataPtr)){
+		ITenantMembership* membershipPtr = dynamic_cast<ITenantMembership*>(dataPtr.GetPtr());
+		if (membershipPtr != nullptr){
+			membershipPtr->SetActive(false);
+			m_membershipCollectionCompPtr->SetObjectData(membershipId, *membershipPtr);
+		}
+	}
+
+	return membershipId;
+}
+
+
 bool CTenantMembershipManagerComp::RemoveMembership(const QByteArray& membershipId)
 {
 	if (!m_membershipCollectionCompPtr.IsValid()){
@@ -170,6 +190,39 @@ bool CTenantMembershipManagerComp::RemoveMembership(const QByteArray& membership
 	SendInfoMessage(0, QString("Removed membership '%1'").arg(QString::fromUtf8(membershipId)), "CTenantMembershipManagerComp");
 
 	return true;
+}
+
+
+bool CTenantMembershipManagerComp::AcceptMembershipInvitation(const QByteArray& membershipId)
+{
+	if (!m_membershipCollectionCompPtr.IsValid()){
+		SendErrorMessage(0, "Membership collection not configured", "CTenantMembershipManagerComp");
+		return false;
+	}
+
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (!m_membershipCollectionCompPtr->GetObjectData(membershipId, dataPtr)){
+		return false;
+	}
+
+	ITenantMembership* membershipPtr = dynamic_cast<ITenantMembership*>(dataPtr.GetPtr());
+	if (membershipPtr == nullptr){
+		return false;
+	}
+
+	istd::CChangeNotifier changeNotifier(this);
+
+	membershipPtr->SetActive(true);
+	membershipPtr->SetJoinedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
+	membershipPtr->SetUpdatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
+
+	return m_membershipCollectionCompPtr->SetObjectData(membershipId, *membershipPtr);
+}
+
+
+bool CTenantMembershipManagerComp::RejectMembershipInvitation(const QByteArray& membershipId)
+{
+	return RemoveMembership(membershipId);
 }
 
 

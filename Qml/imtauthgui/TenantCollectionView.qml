@@ -23,10 +23,12 @@ RemoteCollectionView {
 	Component.onCompleted: {
 		table.setSortingInfo(TenantItemDataTypeMetaInfo.s_createdAt, "DESC")
 		registerFieldFilterDelegate("isActiveFilter", isActiveDelegateFilterComp)
+		registerFieldFilterDelegate("tenantRelationFilter", tenantRelationDelegateFilterComp)
 	}
 
 	onHeadersChanged: {
 		table.setColumnContentById(TenantItemDataTypeMetaInfo.s_membersCount, membersCountCellDelegateComp)
+		table.setColumnContentById(TenantItemDataTypeMetaInfo.s_ownerId, ownerIdCellDelegateComp)
 		table.setColumnContentById(TenantItemDataTypeMetaInfo.s_createdAt, createdAtCellDelegateComp)
 		table.setColumnContentById(TenantItemDataTypeMetaInfo.s_updatedAt, updatedAtCellDelegateComp)
 		table.setColumnContentById(TenantItemDataTypeMetaInfo.s_isActive, isActiveCellDelegateComp)
@@ -50,6 +52,29 @@ RemoteCollectionView {
 				anchors.leftMargin: Style.marginM
 				font.pixelSize: Style.fontSizeM
 				color: Style.textColor
+			}
+		}
+	}
+
+	Component {
+		id: ownerIdCellDelegateComp
+		TableCellDelegateBase {
+			id: ownerIdDelegate
+
+			onReused: {
+				var val = ownerIdDelegate.getValue()
+				ownerIdLabel.text = val !== undefined && val !== null ? val.toString() : ""
+			}
+
+			Text {
+				id: ownerIdLabel
+				anchors.verticalCenter: parent.verticalCenter
+				anchors.left: parent.left
+				anchors.leftMargin: Style.marginM
+				width: parent.width - 2 * Style.marginM
+				font.pixelSize: Style.fontSizeM
+				color: Style.textColor
+				elide: Text.ElideRight
 			}
 		}
 	}
@@ -110,6 +135,40 @@ RemoteCollectionView {
 			Component.onCompleted: {
 				createAndAddOption("1", qsTr("Active"), "", true)
 				createAndAddOption("0", qsTr("Inactive"), "", true)
+			}
+		}
+	}
+
+	Component {
+		id: tenantRelationDelegateFilterComp
+		FieldFilterDelegate {
+			name: qsTr("My tenants")
+
+			Component.onCompleted: {
+				createAndAddOption("owner", qsTr("I am owner"), "", true)
+				createAndAddOption("member", qsTr("I am member"), "", true)
+				setFieldFilterForOption("owner", ownerFieldFilterComp.createObject(this))
+				setFieldFilterForOption("member", memberFieldFilterComp.createObject(this))
+			}
+
+			Component {
+				id: ownerFieldFilterComp
+				FieldFilter {
+					m_fieldId: "OwnerId"
+					m_filterValueType: "String"
+					m_filterOperations: ["Equal"]
+					m_filterValue: "__CURRENT_USER__"
+				}
+			}
+
+			Component {
+				id: memberFieldFilterComp
+				FieldFilter {
+					m_fieldId: "OwnerId"
+					m_filterValueType: "String"
+					m_filterOperations: ["Not", "Equal"]
+					m_filterValue: "__CURRENT_USER__"
+				}
 			}
 		}
 	}

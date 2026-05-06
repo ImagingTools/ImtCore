@@ -70,6 +70,22 @@ void CTenantInfo::SetTenantDescription(const QString& description)
 }
 
 
+QByteArray CTenantInfo::GetOwnerId() const
+{
+	return m_ownerId;
+}
+
+
+void CTenantInfo::SetOwnerId(const QByteArray& ownerId)
+{
+	if (m_ownerId != ownerId){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_ownerId = ownerId;
+	}
+}
+
+
 bool CTenantInfo::IsActive() const
 {
 	return m_isActive;
@@ -181,6 +197,11 @@ bool CTenantInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_description);
 	retVal = retVal && archive.EndTag(descriptionTag);
 
+	iser::CArchiveTag ownerIdTag("OwnerId", "Owner ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(ownerIdTag);
+	retVal = retVal && archive.Process(m_ownerId);
+	retVal = retVal && archive.EndTag(ownerIdTag);
+
 	iser::CArchiveTag isActiveTag("IsActive", "Is active", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(isActiveTag);
 	retVal = retVal && archive.Process(m_isActive);
@@ -261,6 +282,7 @@ bool CTenantInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/
 		m_tenantId = sourcePtr->m_tenantId;
 		m_name = sourcePtr->m_name;
 		m_description = sourcePtr->m_description;
+		m_ownerId = sourcePtr->m_ownerId;
 		m_isActive = sourcePtr->m_isActive;
 		m_createdAt = sourcePtr->m_createdAt;
 		m_updatedAt = sourcePtr->m_updatedAt;
@@ -291,6 +313,7 @@ bool CTenantInfo::ResetData(CompatibilityMode /*mode*/)
 	m_tenantId.clear();
 	m_name.clear();
 	m_description.clear();
+	m_ownerId.clear();
 	m_isActive = true;
 	m_createdAt.clear();
 	m_updatedAt.clear();
@@ -301,5 +324,4 @@ bool CTenantInfo::ResetData(CompatibilityMode /*mode*/)
 
 
 } // namespace imtauth
-
 

@@ -64,7 +64,7 @@ ITenantInfoUniquePtr CTenantManagerComp::GetTenant(const QByteArray& tenantId) c
 }
 
 
-QByteArray CTenantManagerComp::CreateTenant(const QString& tenantName, const QString& description)
+QByteArray CTenantManagerComp::CreateTenant(const QString& tenantName, const QString& description, const QByteArray& ownerId)
 {
 	if (!m_tenantCollectionCompPtr.IsValid() || !m_tenantFactoryCompPtr.IsValid()){
 		SendErrorMessage(0, "Tenant collection or factory not configured", "CTenantManagerComp");
@@ -86,6 +86,7 @@ QByteArray CTenantManagerComp::CreateTenant(const QString& tenantName, const QSt
 	tenantPtr->SetTenantId(tenantId);
 	tenantPtr->SetTenantName(tenantName);
 	tenantPtr->SetTenantDescription(description);
+	tenantPtr->SetOwnerId(ownerId);
 	tenantPtr->SetActive(true);
 	tenantPtr->SetCreatedAt(now);
 	tenantPtr->SetUpdatedAt(now);
@@ -122,7 +123,7 @@ bool CTenantManagerComp::RemoveTenant(const QByteArray& tenantId)
 }
 
 
-bool CTenantManagerComp::UpdateTenant(const QByteArray& tenantId, const QString& tenantName, const QString& description)
+bool CTenantManagerComp::UpdateTenant(const QByteArray& tenantId, const QString& tenantName, const QString& description, const QByteArray& ownerId)
 {
 	if (!m_tenantCollectionCompPtr.IsValid()){
 		SendErrorMessage(0, "Tenant collection not configured", "CTenantManagerComp");
@@ -145,6 +146,9 @@ bool CTenantManagerComp::UpdateTenant(const QByteArray& tenantId, const QString&
 
 	tenantPtr->SetTenantName(tenantName);
 	tenantPtr->SetTenantDescription(description);
+	if (!ownerId.isEmpty()){
+		tenantPtr->SetOwnerId(ownerId);
+	}
 	tenantPtr->SetUpdatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
 
 	if (!m_tenantCollectionCompPtr->SetObjectData(tenantId, *tenantPtr)){
@@ -194,5 +198,3 @@ bool CTenantManagerComp::SetTenantActive(const QByteArray& tenantId, bool isActi
 
 
 } // namespace imtauth
-
-

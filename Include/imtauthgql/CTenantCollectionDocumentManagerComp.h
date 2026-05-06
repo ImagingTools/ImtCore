@@ -5,6 +5,7 @@
 // ImtCore includes
 #include <imtdoc/IDocumentManager.h>
 #include <imtbase/IObjectCollection.h>
+#include <imtauth/ITenantMembershipManager.h>
 
 // Generated includes
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/TenantCollectionDocumentManager.h>
@@ -23,6 +24,7 @@ public:
 	I_BEGIN_COMPONENT(CTenantCollectionDocumentManagerComp)
 		I_ASSIGN(m_documentManagerCompPtr, "CollectionDocumentManager", "Collection document manager", false, "CollectionDocumentManager");
 		I_ASSIGN(m_tenantCollectionCompPtr, "TenantCollection", "Tenant collection for refreshing DB-computed fields after save", false, "TenantCollection");
+		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager for memberIds", false, "MembershipManager");
 	I_END_COMPONENT
 
 protected:
@@ -39,6 +41,7 @@ protected:
 private:
 	I_REF(imtdoc::IDocumentManager, m_documentManagerCompPtr);
 	I_REF(imtbase::IObjectCollection, m_tenantCollectionCompPtr);
+	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
 };
 
 

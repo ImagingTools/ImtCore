@@ -17,6 +17,7 @@ type TenantItemData {
 	typeId: ID!
 	name: String!
 	description: String
+	ownerId: ID
 	isActive: Boolean
 	membersCount: Int
 	createdAt: String
@@ -27,6 +28,7 @@ type TenantData {
 	id: ID
 	name: String
 	description: String
+	ownerId: ID
 	isActive: Boolean
 	createdAt: String
 	updatedAt: String
@@ -57,6 +59,7 @@ type GetTenantPayload {
 input CreateTenantInput {
 	name: String!
 	description: String
+	ownerId: ID
 }
 
 type CreateTenantPayload {
@@ -77,6 +80,7 @@ input UpdateTenantInput {
 	tenantId: ID!
 	name: String!
 	description: String
+	ownerId: ID
 	memberIds: [ID]
 }
 
@@ -174,4 +178,3 @@ collectionSchema {
 		}
 	}
 }
-

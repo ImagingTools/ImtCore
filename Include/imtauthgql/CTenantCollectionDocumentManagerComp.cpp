@@ -5,6 +5,10 @@
 // ImtCore includes
 #include <imtauth/ITenantInfo.h>
 
+// Qt includes
+#include <QMap>
+#include <QSet>
+
 
 namespace imtauthgql
 {
@@ -56,9 +60,20 @@ sdl::imtauth::Tenants::CTenantData CTenantCollectionDocumentManagerComp::OnGetTe
 	response.Version_1_0->id = tenantPtr->GetTenantId();
 	response.Version_1_0->name = tenantPtr->GetTenantName();
 	response.Version_1_0->description = tenantPtr->GetTenantDescription();
+	response.Version_1_0->ownerId = tenantPtr->GetOwnerId();
 	response.Version_1_0->isActive = tenantPtr->IsActive();
 	response.Version_1_0->createdAt = tenantPtr->GetCreatedAt();
 	response.Version_1_0->updatedAt = tenantPtr->GetUpdatedAt();
+	if (m_membershipManagerCompPtr.IsValid()){
+		QByteArrayList membershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantPtr->GetTenantId());
+		response.Version_1_0->memberIds.Emplace();
+		for (const QByteArray& membershipId : membershipIds){
+			const imtauth::ITenantMembership* membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
+			if (membershipPtr != nullptr && membershipPtr->IsActive()){
+				response.Version_1_0->memberIds->push_back(membershipPtr->GetUserId());
+			}
+		}
+	}
 
 	return response;
 }
@@ -117,8 +132,42 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTenantCollect
 		tenantPtr->SetTenantDescription(*tenantData.description);
 	}
 
+	if (tenantData.ownerId){
+		tenantPtr->SetOwnerId(*tenantData.ownerId);
+	}
+
 	if (tenantData.isActive){
 		tenantPtr->SetActive(*tenantData.isActive);
+	}
+
+	if (tenantData.memberIds && m_membershipManagerCompPtr.IsValid()){
+		QByteArrayList currentMembershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantPtr->GetTenantId());
+		QMap<QByteArray, QByteArray> userIdToMembershipId;
+		QSet<QByteArray> currentUserIds;
+		for (const QByteArray& membershipId : currentMembershipIds){
+			const imtauth::ITenantMembership* membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
+			if (membershipPtr != nullptr){
+				currentUserIds.insert(membershipPtr->GetUserId());
+				userIdToMembershipId[membershipPtr->GetUserId()] = membershipId;
+			}
+		}
+
+		QSet<QByteArray> newUserIds;
+		for (const auto& userId : *tenantData.memberIds){
+			newUserIds.insert(*userId);
+		}
+
+		for (const QByteArray& userId : currentUserIds){
+			if (!newUserIds.contains(userId)){
+				m_membershipManagerCompPtr->RemoveMembership(userIdToMembershipId.value(userId));
+			}
+		}
+
+		for (const QByteArray& userId : newUserIds){
+			if (!currentUserIds.contains(userId)){
+				m_membershipManagerCompPtr->InviteMembership(userId, tenantPtr->GetTenantId(), imtauth::ITenantMembership::TMR_MEMBER);
+			}
+		}
 	}
 
 	m_documentManagerCompPtr->SetDocumentData(userId, documentId, *documentPtr);
@@ -130,5 +179,3 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTenantCollect
 
 
 } // namespace imtauthgql
-
-

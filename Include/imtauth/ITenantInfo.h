@@ -27,7 +27,8 @@ public:
 		MIT_TENANT_ID = idoc::IDocumentMetaInfo::MIT_USER + 200,
 		MIT_TENANT_NAME,
 		MIT_TENANT_DESCRIPTION,
-		MIT_TENANT_IS_ACTIVE
+		MIT_TENANT_IS_ACTIVE,
+		MIT_TENANT_OWNER_ID
 	};
 
 	/**
@@ -102,6 +103,16 @@ public:
 	virtual void SetTenantDescription(const QString& description) = 0;
 
 	/**
+		Get owner user ID.
+	*/
+	virtual QByteArray GetOwnerId() const = 0;
+
+	/**
+		Set owner user ID.
+	*/
+	virtual void SetOwnerId(const QByteArray& ownerId) = 0;
+
+	/**
 		Check if tenant is active.
 	*/
 	virtual bool IsActive() const = 0;
@@ -158,5 +169,4 @@ typedef istd::TSharedInterfacePtr<ITenantInfo> ITenantInfoSharedPtr;
 
 
 } // namespace imtauth
-
 

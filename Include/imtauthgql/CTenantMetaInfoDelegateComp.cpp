@@ -27,6 +27,9 @@ bool CTenantMetaInfoDelegateComp::FillRepresentation(QJsonObject& representation
 	
 	QString description = metaInfo.GetMetaInfo(imtauth::ITenantInfo::MIT_TENANT_DESCRIPTION).toString();
 	representation["TenantDescription"] = description;
+
+	QByteArray ownerId = metaInfo.GetMetaInfo(imtauth::ITenantInfo::MIT_TENANT_OWNER_ID).toByteArray();
+	representation["TenantOwnerId"] = QString(ownerId);
 	
 	return true;
 }
@@ -47,11 +50,14 @@ bool CTenantMetaInfoDelegateComp::FillMetaInfo(idoc::IDocumentMetaInfo& metaInfo
 	if (representation.contains("TenantDescription")){
 		metaInfo.SetMetaInfo(imtauth::ITenantInfo::MIT_TENANT_DESCRIPTION, representation.value("TenantDescription"));
 	}
+
+	if (representation.contains("TenantOwnerId")){
+		metaInfo.SetMetaInfo(imtauth::ITenantInfo::MIT_TENANT_OWNER_ID, representation.value("TenantOwnerId"));
+	}
 	
 	return true;
 }
 
 
 } // namespace imtauthgql
-
 

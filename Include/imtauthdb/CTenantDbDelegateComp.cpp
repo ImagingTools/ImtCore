@@ -39,6 +39,9 @@ istd::IChangeableUniquePtr CTenantDbDelegateComp::CreateObjectFromRecord(
 	if (record.contains("Description")){
 		tenantPtr->SetTenantDescription(record.value("Description").toString());
 	}
+	if (record.contains("OwnerId")){
+		tenantPtr->SetOwnerId(record.value("OwnerId").toByteArray());
+	}
 	if (record.contains("IsActive")){
 		tenantPtr->SetActive(record.value("IsActive").toBool());
 	}
@@ -79,16 +82,18 @@ CTenantDbDelegateComp::NewObjectQuery CTenantDbDelegateComp::CreateNewObjectQuer
 
 	QString name = imtdb::EscapeSql(tenantPtr != nullptr ? tenantPtr->GetTenantName() : objectName);
 	QString description = imtdb::EscapeSql(tenantPtr != nullptr ? tenantPtr->GetTenantDescription() : objectDescription);
+	QString ownerId = imtdb::EscapeSql(tenantPtr != nullptr ? QString::fromUtf8(tenantPtr->GetOwnerId()) : QString());
 	bool isActive = tenantPtr != nullptr ? tenantPtr->IsActive() : true;
 	QString now = imtdb::UtcNow();
 
 	result.query = QString(
-		"INSERT INTO \"%1\" (\"Id\", \"Name\", \"Description\", \"IsActive\", \"CreatedAt\", \"UpdatedAt\") "
-		"VALUES ('%2', '%3', '%4', %5, '%6', '%7');")
+		"INSERT INTO \"%1\" (\"Id\", \"Name\", \"Description\", \"OwnerId\", \"IsActive\", \"CreatedAt\", \"UpdatedAt\") "
+		"VALUES ('%2', '%3', '%4', '%5', %6, '%7', '%8');")
 		.arg(*m_tableNameAttrPtr,
 			 id,
 			 name,
 			 description,
+			 ownerId,
 			 isActive ? "true" : "false",
 			 now,
 			 now).toUtf8();
@@ -116,12 +121,14 @@ QByteArray CTenantDbDelegateComp::CreateUpdateObjectQuery(
 		"UPDATE \"%1\" SET "
 		"\"Name\"='%2', "
 		"\"Description\"='%3', "
-		"\"IsActive\"=%4, "
-		"\"UpdatedAt\"='%5' "
-		"WHERE \"Id\"='%6';")
+		"\"OwnerId\"='%4', "
+		"\"IsActive\"=%5, "
+		"\"UpdatedAt\"='%6' "
+		"WHERE \"Id\"='%7';")
 		.arg(*m_tableNameAttrPtr,
 			 imtdb::EscapeSql(tenantPtr->GetTenantName()),
 			 imtdb::EscapeSql(tenantPtr->GetTenantDescription()),
+			 imtdb::EscapeSql(QString::fromUtf8(tenantPtr->GetOwnerId())),
 			 tenantPtr->IsActive() ? "true" : "false",
 			 now,
 			 escapedId).toUtf8();

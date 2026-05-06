@@ -33,8 +33,11 @@ public:
 	virtual const ITenantMembership* GetMembership(const QByteArray& membershipId) const override;
 	virtual const ITenantMembership* FindMembership(const QByteArray& userId, const QByteArray& tenantId) const override;
 	virtual QByteArray AddMembership(const QByteArray& userId, const QByteArray& tenantId, ITenantMembership::TenantMemberRole role) override;
+	virtual QByteArray InviteMembership(const QByteArray& userId, const QByteArray& tenantId, ITenantMembership::TenantMemberRole role) override;
 	virtual bool RemoveMembership(const QByteArray& membershipId) override;
 	virtual bool UpdateMembershipRole(const QByteArray& membershipId, ITenantMembership::TenantMemberRole newRole) override;
+	virtual bool AcceptMembershipInvitation(const QByteArray& membershipId) override;
+	virtual bool RejectMembershipInvitation(const QByteArray& membershipId) override;
 	virtual bool IsMember(const QByteArray& userId, const QByteArray& tenantId) const override;
 	virtual bool HasMinimumRole(const QByteArray& userId, const QByteArray& tenantId, ITenantMembership::TenantMemberRole minimumRole) const override;
 
