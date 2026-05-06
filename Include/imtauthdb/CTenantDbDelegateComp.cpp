@@ -8,6 +8,8 @@
 
 // ACF includes
 #include <imtauth/ITenantInfo.h>
+#include <iprm/IIdParam.h>
+#include <iprm/TParamsPtr.h>
 #include <imtdb/CDatabaseEngineComp.h>
 #include <imtdb/imtdb.h>
 #include <idoc/CStandardDocumentMetaInfo.h>
@@ -227,6 +229,27 @@ idoc::MetaInfoPtr CTenantDbDelegateComp::CreateObjectMetaInfo(const QByteArray& 
 bool CTenantDbDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const
 {
 	return SetCollectionItemMetaInfoFromRecord(record, metaInfo);
+}
+
+
+QString CTenantDbDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const
+{
+	iprm::IParamsSet::Ids paramIds = filterParams.GetParamIds();
+
+	if (paramIds.contains("UserId")){
+		iprm::TParamsPtr<iprm::IIdParam> userIdParamPtr(&filterParams, "UserId");
+		if (userIdParamPtr.IsValid()){
+			QByteArray userId = userIdParamPtr->GetId();
+			if (!userId.isEmpty()){
+				QString escapedUserId = imtdb::EscapeSql(QString::fromUtf8(userId));
+				return QString("(\"OwnerId\"='%1' OR \"Id\" IN "
+					"(SELECT \"TenantId\" FROM \"TenantMemberships\" WHERE \"UserId\"='%1' AND \"IsActive\"=true))")
+					.arg(escapedUserId);
+			}
+		}
+	}
+
+	return QString();
 }
 
 

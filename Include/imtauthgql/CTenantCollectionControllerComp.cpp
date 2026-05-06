@@ -7,70 +7,11 @@
 
 // ACF includes
 #include <iprm/CParamsSet.h>
-#include <istd/TDelPtr.h>
+#include <iprm/CIdParam.h>
 
 
 namespace imtauthgql
 {
-
-namespace
-{
-
-static const QByteArray kCurrentUserFilterValue("__CURRENT_USER__");
-static const QByteArray kNoTenantAccessId("__NO_TENANT_ACCESS__");
-
-void ReplaceCurrentUserSentinel(imtbase::IComplexCollectionFilter::FilterExpression& expression, const QByteArray& userId)
-{
-	for (imtbase::IComplexCollectionFilter::FieldFilter& fieldFilter : expression.fieldFilters){
-		if (fieldFilter.fieldId == "OwnerId" && fieldFilter.filterValue.toByteArray() == kCurrentUserFilterValue){
-			fieldFilter.filterValue = userId;
-		}
-		else if (fieldFilter.fieldId == "TenantRelationScope"){
-			QByteArray relationScope = fieldFilter.filterValue.toByteArray();
-			fieldFilter.fieldId = "OwnerId";
-			fieldFilter.filterValue = userId;
-			// Visibility is already restricted to owned-or-member tenants; Member scope narrows that set to non-owned tenants.
-			fieldFilter.filterOperation = relationScope == "Member"
-				? imtbase::IComplexCollectionFilter::FO_NOT_EQUAL
-				: imtbase::IComplexCollectionFilter::FO_EQUAL;
-		}
-	}
-
-	for (imtbase::IComplexCollectionFilter::FilterExpression& childExpression : expression.filterExpressions){
-		ReplaceCurrentUserSentinel(childExpression, userId);
-	}
-}
-
-void AddVisibilityFilter(
-		imtbase::CComplexCollectionFilter& complexFilter,
-		const QByteArray& userId,
-		const imtauth::ITenantMembershipManager* membershipManagerPtr)
-{
-	if (userId.isEmpty()){
-		complexFilter.AddFieldFilter(imtbase::IComplexCollectionFilter::FieldFilter("Id", kNoTenantAccessId));
-		return;
-	}
-
-	QVector<imtbase::IComplexCollectionFilter::FieldFilter> visibilityFieldFilters;
-	visibilityFieldFilters.append(imtbase::IComplexCollectionFilter::FieldFilter("OwnerId", userId));
-
-	if (membershipManagerPtr != nullptr){
-		QByteArrayList membershipIds = membershipManagerPtr->GetMembershipsByUser(userId);
-		for (const QByteArray& membershipId : membershipIds){
-			const imtauth::ITenantMembership* membershipPtr = membershipManagerPtr->GetMembership(membershipId);
-			if (membershipPtr != nullptr && membershipPtr->IsActive()){
-				visibilityFieldFilters.append(imtbase::IComplexCollectionFilter::FieldFilter("Id", membershipPtr->GetTenantId()));
-			}
-		}
-	}
-
-	complexFilter.AddFilterExpression(imtbase::IComplexCollectionFilter::FilterExpression(
-		visibilityFieldFilters,
-		QVector<imtbase::IComplexCollectionFilter::FilterExpression>(),
-		imtbase::IComplexCollectionFilter::LO_OR));
-}
-
-} // namespace
 
 
 // reimplemented (sdl::imtauth::Tenants::CTenantCollectionControllerCompBase)
@@ -155,21 +96,14 @@ void CTenantCollectionControllerComp::SetAdditionalFilters(
 		return;
 	}
 
-	istd::TDelPtr<imtbase::CComplexCollectionFilter> complexFilterPtr = new imtbase::CComplexCollectionFilter();
-	AddVisibilityFilter(*complexFilterPtr, GetUserId(gqlRequest), m_membershipManagerCompPtr.GetPtr());
-	filterParamsPtr->SetEditableParameter("ComplexFilter", complexFilterPtr.PopPtr(), true);
-}
-
-
-void CTenantCollectionControllerComp::SetAdditionalFilters(
-			const imtgql::CGqlRequest& gqlRequest,
-			imtbase::CComplexCollectionFilter& complexFilter) const
-{
 	QByteArray userId = GetUserId(gqlRequest);
-	imtbase::IComplexCollectionFilter::FilterExpression expression = complexFilter.GetFilterExpression();
-	ReplaceCurrentUserSentinel(expression, userId);
-	complexFilter.SetFilterExpression(expression);
-	AddVisibilityFilter(complexFilter, userId, m_membershipManagerCompPtr.GetPtr());
+	if (userId.isEmpty()){
+		return;
+	}
+
+	iprm::CIdParam* userIdParamPtr = new iprm::CIdParam();
+	userIdParamPtr->SetId(userId);
+	filterParamsPtr->SetEditableParameter("UserId", userIdParamPtr, true);
 }
 
 
