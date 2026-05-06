@@ -6,6 +6,7 @@
 #include <istd/CChangeNotifier.h>
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
+#include <iser/CPrimitiveTypesSerializer.h>
 
 
 namespace imtauth
@@ -71,7 +72,7 @@ void CTenantMembership::SetTenantId(const QByteArray& tenantId)
 }
 
 
-TenantMemberRole CTenantMembership::GetRole() const
+ITenantMembership::TenantMemberRole CTenantMembership::GetRole() const
 {
 	return m_role;
 }

@@ -3,7 +3,7 @@
 
 
 // ACF includes
-#include <istd/IPolymorphic.h>
+#include <istd/IChangeable.h>
 
 // ImtCore includes
 #include <imtauth/ITenantMembership.h>
@@ -20,7 +20,7 @@ namespace imtauth
 	Analogous to GitHub's Organization Membership management API.
 	\ingroup TenantMembership
 */
-class ITenantMembershipManager: virtual public istd::IPolymorphic
+class ITenantMembershipManager: virtual public istd::IChangeable
 {
 public:
 	typedef QByteArrayList MembershipIds;
