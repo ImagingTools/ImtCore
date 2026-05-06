@@ -37,12 +37,7 @@ void AddVisibilityFilter(
 		const imtauth::ITenantMembershipManager* membershipManagerPtr)
 {
 	if (userId.isEmpty()){
-		const QByteArray impossibleId("__NO_TENANT_ACCESS__");
-		complexFilter.AddFieldFilter(imtbase::IComplexCollectionFilter::FieldFilter("Id", impossibleId));
-		complexFilter.AddFieldFilter(imtbase::IComplexCollectionFilter::FieldFilter(
-			"Id",
-			impossibleId,
-			imtbase::IComplexCollectionFilter::FO_NOT_EQUAL));
+		complexFilter.AddFieldFilter(imtbase::IComplexCollectionFilter::FieldFilter("Id", QByteArray("__NO_TENANT_ACCESS__")));
 		return;
 	}
 

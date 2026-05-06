@@ -211,7 +211,7 @@ sdl::imtauth::Tenants::CUpdateTenantPayload CTenantManagerControllerComp::OnUpda
 		ownerId = *arguments.input.Version_1_0->ownerId;
 	}
 
-	bool success = m_tenantManagerCompPtr->UpdateTenant(tenantId, name, description, ownerId);
+	bool success = m_tenantManagerCompPtr->UpdateTenant(tenantId, name, description, ownerId, bool(arguments.input.Version_1_0->ownerId));
 
 	// Sync memberIds with TenantMemberships
 	if (success && m_membershipManagerCompPtr.IsValid() && arguments.input.Version_1_0->memberIds){

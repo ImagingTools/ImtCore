@@ -123,7 +123,7 @@ bool CTenantManagerComp::RemoveTenant(const QByteArray& tenantId)
 }
 
 
-bool CTenantManagerComp::UpdateTenant(const QByteArray& tenantId, const QString& tenantName, const QString& description, const QByteArray& ownerId)
+bool CTenantManagerComp::UpdateTenant(const QByteArray& tenantId, const QString& tenantName, const QString& description, const QByteArray& ownerId, bool updateOwner)
 {
 	if (!m_tenantCollectionCompPtr.IsValid()){
 		SendErrorMessage(0, "Tenant collection not configured", "CTenantManagerComp");
@@ -146,7 +146,7 @@ bool CTenantManagerComp::UpdateTenant(const QByteArray& tenantId, const QString&
 
 	tenantPtr->SetTenantName(tenantName);
 	tenantPtr->SetTenantDescription(description);
-	if (!ownerId.isEmpty()){
+	if (updateOwner){
 		tenantPtr->SetOwnerId(ownerId);
 	}
 	tenantPtr->SetUpdatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));

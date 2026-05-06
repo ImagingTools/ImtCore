@@ -135,7 +135,7 @@ bool CRemoteTenantControllerComp::RemoveTenant(const QByteArray& tenantId)
 }
 
 
-bool CRemoteTenantControllerComp::UpdateTenant(const QByteArray& tenantId, const QString& tenantName, const QString& description, const QByteArray& ownerId)
+bool CRemoteTenantControllerComp::UpdateTenant(const QByteArray& tenantId, const QString& tenantName, const QString& description, const QByteArray& ownerId, bool updateOwner)
 {
 	namespace tenantsdl = sdl::imtauth::Tenants;
 
@@ -144,7 +144,9 @@ bool CRemoteTenantControllerComp::UpdateTenant(const QByteArray& tenantId, const
 	arguments.input.Version_1_0->tenantId = tenantId;
 	arguments.input.Version_1_0->name = tenantName;
 	arguments.input.Version_1_0->description = description;
-	arguments.input.Version_1_0->ownerId = ownerId;
+	if (updateOwner){
+		arguments.input.Version_1_0->ownerId = ownerId;
+	}
 
 	imtgql::CGqlRequest gqlRequest;
 	if (!tenantsdl::CUpdateTenantGqlRequest::SetupGqlRequest(gqlRequest, arguments)){

@@ -20,7 +20,7 @@ public:
 	virtual ITenantInfoUniquePtr GetTenant(const QByteArray& tenantId) const = 0;
 	virtual QByteArray CreateTenant(const QString& tenantName, const QString& description = QString(), const QByteArray& ownerId = QByteArray()) = 0;
 	virtual bool RemoveTenant(const QByteArray& tenantId) = 0;
-	virtual bool UpdateTenant(const QByteArray& tenantId, const QString& tenantName, const QString& description, const QByteArray& ownerId = QByteArray()) = 0;
+	virtual bool UpdateTenant(const QByteArray& tenantId, const QString& tenantName, const QString& description, const QByteArray& ownerId = QByteArray(), bool updateOwner = false) = 0;
 	virtual bool SetTenantActive(const QByteArray& tenantId, bool isActive) = 0;
 };
 
