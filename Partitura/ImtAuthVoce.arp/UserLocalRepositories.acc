@@ -46,6 +46,24 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="SQLiteTenantMembershipRepository" PackageId="ImtUserAdministrationVoce" ComponentId="SQLiteTenantMembershipRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="SQLiteUserGroupRepository" PackageId="ImtUserAdministrationVoce" ComponentId="SQLiteUserGroupRepository">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -145,6 +163,7 @@
     <ExportedComponents>
         <Component ExportedId="RoleRepository" ComponentId="SQLiteRoleRepository"/>
         <Component ExportedId="SQLiteTenantRepository" ComponentId="SQLiteTenantRepository"/>
+        <Component ExportedId="SQLiteTenantMembershipRepository" ComponentId="SQLiteTenantMembershipRepository"/>
         <Component ExportedId="SessionSqlRepository" ComponentId="SessionSqlRepository"/>
         <Component ExportedId="UserConnectionRepository" ComponentId="UserConnectionRepository"/>
         <Component ExportedId="UserGroupRepository" ComponentId="SQLiteUserGroupRepository"/>
