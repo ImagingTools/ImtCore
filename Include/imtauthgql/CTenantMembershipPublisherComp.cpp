@@ -85,7 +85,7 @@ void CTenantMembershipPublisherComp::PublishNotification(
 {
 	sdl::imtauth::TenantMemberships::CMembershipNotification notification;
 	notification.Version_1_0.emplace();
-	notification.Version_1_0->notificationType = static_cast<sdl::imtauth::TenantMemberships::EMembershipNotificationType>(notificationType);
+	notification.Version_1_0->notificationType = notificationType;
 	notification.Version_1_0->membershipId = membershipId;
 	notification.Version_1_0->userId = userId;
 	notification.Version_1_0->tenantId = tenantId;
