@@ -16,7 +16,6 @@ DocumentViewBase {
 
 	property TenantData tenantData: model
 	property var pendingMembers: []
-	property bool _membersChanged: false
 	property var __userNameCache: ({})
 
 	function updateGui(){
@@ -162,7 +161,6 @@ DocumentViewBase {
 					var arr = container.pendingMembers.slice()
 					arr.splice(index, 1)
 					container.pendingMembers = arr
-					container._membersChanged = true
 					container.doUpdateModel()
 				}
 
@@ -173,13 +171,10 @@ DocumentViewBase {
 						if (selName !== selId) container.__userNameCache[selId] = selName
 					}
 					container.pendingMembers = selectedItems
-					container._membersChanged = true
 				}
 
 				onPopupClosed: {
-					if (container._membersChanged) {
-						container.doUpdateModel()
-					}
+					container.doUpdateModel()
 				}
 			}
 		}

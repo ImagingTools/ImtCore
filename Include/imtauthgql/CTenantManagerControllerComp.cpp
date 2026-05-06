@@ -217,7 +217,7 @@ sdl::imtauth::Tenants::CUpdateTenantPayload CTenantManagerControllerComp::OnUpda
 		// Build new set
 		QSet<QByteArray> newUserIds;
 		for (const auto& uid : newMemberIds){
-			newUserIds.insert(uid);
+			newUserIds << *uid;
 		}
 
 		// Remove memberships for users no longer in the list
