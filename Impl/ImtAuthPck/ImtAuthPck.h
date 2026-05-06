@@ -55,6 +55,7 @@
 #include <imtauth/CTenantManagerComp.h>
 #include <imtauth/CTenantMembershipComp.h>
 #include <imtauth/CTenantMembershipManagerComp.h>
+#include <imtauth/CTenantDocumentNameProviderComp.h>
 
 
 namespace ImtAuthPck
@@ -149,6 +150,7 @@ typedef imtauth::CTenantMetaInfoCreatorComp TenantMetaInfoCreator;
 typedef imtauth::CTenantManagerComp TenantManager;
 typedef icomp::TModelCompWrap<imtauth::CTenantMembershipComp> TenantMembershipInfo;
 typedef imtauth::CTenantMembershipManagerComp TenantMembershipManager;
+typedef imtauth::CTenantDocumentNameProviderComp TenantDocumentNameProvider;
 
 
 } // namespace ImtAuthPck

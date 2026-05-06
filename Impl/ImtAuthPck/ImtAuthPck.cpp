@@ -256,6 +256,11 @@ I_EXPORT_COMPONENT(
 			"CRUD manager for tenant memberships with role hierarchy and duplicate detection",
 			"Tenant Membership Manager");
 
+I_EXPORT_COMPONENT(
+			TenantDocumentNameProvider,
+			"Provides default document name from tenant name",
+			"Tenant Document Name Provider");
+
 
 } // namespace ImtAuthPck
 
