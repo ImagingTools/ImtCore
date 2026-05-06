@@ -39,4 +39,4 @@ UserSettingsController 1.0 UserSettingsController.qml
 UserActionCollectionView 1.0 UserActionCollectionView.qml
 TenantCollectionView 1.0 TenantCollectionView.qml
 TenantEditor 1.0 TenantEditor.qml
-MemberSelectElementView 1.0 MemberSelectElementView.qml
+ItemSelectElementView 1.0 ItemSelectElementView.qml

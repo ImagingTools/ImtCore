@@ -149,11 +149,16 @@ DocumentViewBase {
 				title: qsTr("Members")
 			}
 
-			MemberSelectElementView {
+			ItemSelectElementView {
 				width: parent.width
-				members: container.pendingMembers
+				items: container.pendingMembers
+				label: qsTr("Members")
+				addButtonText: qsTr("Add member")
+				filterPlaceholder: qsTr("Type or choose a user")
+				collectionId: "Users"
+				emptyText: qsTr("No members")
 
-				onMemberRemoved: {
+				onItemRemoved: {
 					var arr = container.pendingMembers.slice()
 					arr.splice(index, 1)
 					container.pendingMembers = arr
@@ -162,12 +167,12 @@ DocumentViewBase {
 				}
 
 				onSelectionChanged: {
-					for (var i = 0; i < selectedMembers.length; i++) {
-						var selName = selectedMembers[i].name
-						var selId = selectedMembers[i].id
+					for (var i = 0; i < selectedItems.length; i++) {
+						var selName = selectedItems[i].name
+						var selId = selectedItems[i].id
 						if (selName !== selId) container.__userNameCache[selId] = selName
 					}
-					container.pendingMembers = selectedMembers
+					container.pendingMembers = selectedItems
 					container._membersChanged = true
 				}
 

@@ -9,28 +9,28 @@ import imtcolgui 1.0
 ElementView {
 	id: root
 
-	// Data: array of {id, name, membershipId?} objects
-	property var members: []
-	// Whether the member list can be edited (add/remove)
+	// Data: array of {id, name} objects
+	property var items: []
+	// Whether the list can be edited (add/remove)
 	property bool editable: true
 	// Label for the element
-	property string label: qsTr("Members")
+	property string label: qsTr("Items")
 	// Label for the add button
-	property string addButtonText: qsTr("Add member")
+	property string addButtonText: qsTr("Add item")
 	// Placeholder for the filter popup
-	property string filterPlaceholder: qsTr("Type or choose a user")
+	property string filterPlaceholder: qsTr("Type or choose an item")
 	// CollectionId for the data provider
 	property string collectionId: "Users"
-	// Text shown when no members
-	property string emptyText: qsTr("No members")
+	// Text shown when no items selected
+	property string emptyText: qsTr("No items")
 
 	// Chip colors (matching TicketEditor accent palette)
 	readonly property string accentColor: "#5b8fd6"
 	readonly property string accentBgLight: "#DFECF9"
 	readonly property string accentBorderLight: "#B4D3F2"
 
-	signal memberRemoved(int index, var memberData)
-	signal selectionChanged(var selectedMembers)
+	signal itemRemoved(int index, var itemData)
+	signal selectionChanged(var selectedItems)
 	signal popupClosed()
 
 	name: root.label
@@ -50,13 +50,13 @@ ElementView {
 				cursorShape: Qt.PointingHandCursor
 				onClicked: {
 					var known = []
-					for (var j = 0; j < root.members.length; j++) {
-						var member = root.members[j]
-						known.push({ id: member.id, title: member.name || member.id })
+					for (var j = 0; j < root.items.length; j++) {
+						var item = root.items[j]
+						known.push({ id: item.id, title: item.name || item.id })
 					}
 					var ids = []
-					for (var i = 0; i < root.members.length; i++)
-						ids.push(root.members[i].id)
+					for (var i = 0; i < root.items.length; i++)
+						ids.push(root.items[i].id)
 					var point = addBtn.mapToItem(null, 0, addBtn.height)
 					ModalDialogManager.openDialog(selectComp, {
 						"x": point.x,
@@ -78,10 +78,10 @@ ElementView {
 				width: parent.width
 				clip: true
 				spacing: Style.spacingXS
-				visible: root.members.length > 0
+				visible: root.items.length > 0
 
 				Repeater {
-					model: root.members
+					model: root.items
 					delegate: Rectangle {
 						width: Math.min(chipText.contentWidth + chipRemove.width + Style.paddingS * 3, 200)
 						height: 28
@@ -117,7 +117,7 @@ ElementView {
 								}
 							}
 							onClicked: {
-								root.memberRemoved(index, modelData)
+								root.itemRemoved(index, modelData)
 							}
 						}
 					}
@@ -125,7 +125,7 @@ ElementView {
 			}
 
 			Text {
-				visible: root.members.length === 0
+				visible: root.items.length === 0
 				width: parent.width
 				text: root.emptyText
 				font.pixelSize: Style.fontSizeM
