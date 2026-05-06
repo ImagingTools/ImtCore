@@ -34,7 +34,6 @@ RemoteCollectionView {
 		table.setColumnContentById(TenantItemDataTypeMetaInfo.s_isActive, isActiveCellDelegateComp)
 	}
 
-
 	Component {
 		id: membersCountCellDelegateComp
 		TableCellDelegateBase {

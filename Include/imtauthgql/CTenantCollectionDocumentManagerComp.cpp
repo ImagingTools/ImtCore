@@ -129,6 +129,12 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTenantCollect
 		tenantData = *arguments.input.Version_1_0->tenant;
 	}
 
+	QByteArray tenantId = tenantPtr->GetTenantId();
+	if (tenantId.isEmpty()){
+		tenantId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+		tenantPtr->SetTenantId(tenantId);
+	}
+
 	if (tenantData.name){
 		tenantPtr->SetTenantName(*tenantData.name);
 	}
@@ -146,11 +152,6 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTenantCollect
 	}
 
 	if (tenantData.memberIds && m_membershipManagerCompPtr.IsValid()){
-		QByteArray tenantId = tenantPtr->GetTenantId();
-		if (tenantId.isEmpty()){
-			tenantId = documentId;
-		}
-
 		QByteArrayList currentMembershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
 		QMap<QByteArray, QByteArray> userIdToMembershipId;
 		QSet<QByteArray> currentUserIds;

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6390" Description="ACF"/>
+            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="CheckPermissionOr" X="825" Y="525" Note=""/>
+        <Element ComponentName="CollectionCommands" X="525" Y="350" Note=""/>
+        <Element ComponentName="CollectionCommandsController" X="525" Y="250" Note=""/>
+        <Element ComponentName="CollectionDocumentManager" X="675" Y="625" Note=""/>
+        <Element ComponentName="CollectionHeadersProvider" X="1025" Y="50" Note=""/>
+        <Element ComponentName="Demultiplexer" X="575" Y="75" Note=""/>
+        <Element ComponentName="DocumentCommandsController" X="1000" Y="300" Note=""/>
+        <Element ComponentName="SlaveSubscriberController" X="750" Y="775" Note=""/>
+        <Element ComponentName="TenantCollectionChangeNotifier" X="275" Y="775" Note=""/>
+        <Element ComponentName="TenantDocumentManager" X="200" Y="150" Note=""/>
+        <Element ComponentName="TenantInfo" X="425" Y="600" Note=""/>
+        <Element ComponentName="TenantManager" X="150" Y="600" Note=""/>
+        <Element ComponentName="TenantManagerController" X="825" Y="425" Note=""/>
+        <Element ComponentName="TenantMemberships" X="200" Y="375" Note=""/>
+        <Element ComponentName="TenantPermissions" X="1050" Y="650" Note=""/>
+        <Element ComponentName="TenantsListController" X="1025" Y="150" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries>
+        <EmbededRegistry Id="TenantMemberships">
+            <PositionMap>
+                <Element ComponentName="TenantMembershipInfo" X="600" Y="400" Note=""/>
+                <Element ComponentName="TenantMembershipManager" X="600" Y="225" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+    </EmbeddedRegistries>
+</Acf>

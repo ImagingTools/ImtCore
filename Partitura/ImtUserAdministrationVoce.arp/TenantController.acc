@@ -15,6 +15,114 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
+        <Element Id="CollectionCommands" PackageId="ImtCoreVoce" ComponentId="StandardCollectionCommands">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="EditPermissions" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>ViewTenants</Value>
+                                <Value>ChangeTenant</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="NewCommandName" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="New Tenant"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="NewPermissions" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>AddTenant</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RemovePermissions" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>RemoveTenant</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="CollectionCommandsController" PackageId="ImtGraphQlVoce" ComponentId="CommandsController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="LeftAlignmentCommands" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>CollectionCommands/New</Value>
+                                <Value>CollectionCommands/Edit</Value>
+                                <Value>CollectionCommands/Remove</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Tenants"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="CollectionDocumentManager" PackageId="ImtCollectionVoce" ComponentId="CollectionDocumentManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Collection" Type="Reference" ExportId="TenantRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Tenants"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsSingleCopyMode" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectFactories" Type="Factory[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>TenantInfo</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectTypeIdList" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Tenant</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="CollectionHeadersProvider" PackageId="ImtColPck" ComponentId="CollectionHeadersProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -72,11 +180,12 @@
                     <AttributeInfo Id="GqlRequestHandlers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>TenantCommands</Value>
-                                <Value>TenantsCommands</Value>
                                 <Value>TenantsListController</Value>
                                 <Value>TenantDocumentManager</Value>
                                 <Value>TenantManagerController</Value>
+                                <Value>CollectionDocumentManager</Value>
+                                <Value>DocumentCommandsController</Value>
+                                <Value>CollectionCommandsController</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -89,16 +198,100 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="TenantCommands" PackageId="" ComponentId="TenantCommands">
+        <Element Id="DocumentCommandsController" PackageId="ImtGraphQlVoce" ComponentId="StandardDocumentCommandsController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ClosePermissions" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>RemoveTenant</Value>
+                                <Value>ChangeTenant</Value>
+                                <Value>ViewTenants</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RedoPermissions" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>AddTenant</Value>
+                                <Value>RemoveTenant</Value>
+                                <Value>ChangeTenant</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SavePermissions" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>AddTenant</Value>
+                                <Value>RemoveTenant</Value>
+                                <Value>ChangeTenant</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Tenant"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UndoPermissions" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>AddTenant</Value>
+                                <Value>RemoveTenant</Value>
+                                <Value>ChangeTenant</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SlaveSubscriberController" PackageId="ImtServerGqlPck" ComponentId="SlaveSubscriberController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SubscriberController" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>CollectionDocumentManager</Value>
+                                <Value>TenantCollectionChangeNotifier</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="TenantCollectionChangeNotifier" PackageId="ImtServerGqlPck" ComponentId="ObjectCollectionChangeNotifier">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>OnTenantsCollectionChanged</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="TenantRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -107,14 +300,14 @@
         <Element Id="TenantDocumentManager" PackageId="ImtAuthGqlPck" ComponentId="TenantCollectionDocumentManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="CollectionDocumentManager" Type="Reference" ExportId="TenantDocumentManager">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="CollectionDocumentManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="CollectionDocumentManager"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="MembershipManager" Type="Reference" ExportId="TenantMembershipManager">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="MembershipManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TenantMemberships"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TenantCollection" Type="Reference" ExportId="TenantRepository">
                         <Data IsEnabled="false"/>
@@ -128,6 +321,29 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="TenantInfo" PackageId="ImtAuthPck" ComponentId="TenantInfo">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="TenantManager" PackageId="ImtAuthPck" ComponentId="TenantManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantCollection" Type="Reference" ExportId="TenantRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="TenantInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="TenantManagerController" PackageId="ImtAuthGqlPck" ComponentId="TenantManagerController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -135,10 +351,10 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="MembershipManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="TenantMembershipManager"/>
+                        <Data IsEnabled="true" Value="TenantMemberships"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="TenantManager" Type="Reference" ExportId="TenantManager">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="TenantManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TenantManager"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
@@ -149,22 +365,14 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="TenantMembershipInfo" PackageId="ImtAuthPck" ComponentId="TenantMembershipInfo">
-            <Data IsEnabled="true" Flags="2">
-                <AttributeInfoMap/>
-            </Data>
-        </Element>
-        <Element Id="TenantMembershipManager" PackageId="ImtAuthPck" ComponentId="TenantMembershipManager">
+        <Element Id="TenantMemberships" PackageId="" ComponentId="TenantMemberships">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="MembershipCollection" Type="Reference" ExportId="TenantMembershipRepository">
+                    <AttributeInfo Id="TenantMembershipRepository" Type="Reference" ExportId="TenantMembershipRepository">
                         <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="MembershipFactory" Type="Factory" ExportId="">
-                        <Data IsEnabled="true" Value="TenantMembershipInfo"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
@@ -179,21 +387,6 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="TenantsCommands" PackageId="" ComponentId="TenantsCommands">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -221,7 +414,7 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="MembershipManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="TenantMembershipManager"/>
+                        <Data IsEnabled="true" Value="TenantMemberships"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="TenantRepository">
                         <Data IsEnabled="false"/>
@@ -264,6 +457,9 @@
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="UserActionManager" Type="Reference" ExportId="UserActionManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -272,59 +468,28 @@
         </Element>
     </ElementsList>
     <EmbeddedRegistriesList>
-        <EmbeddedRegistry Id="TenantCommands">
+        <EmbeddedRegistry Id="TenantMemberships">
             <Data Description="" Keywords="">
                 <ElementsList>
-                    <Element Id="StandardDocumentCommandsController" PackageId="ImtGraphQlVoce" ComponentId="StandardDocumentCommandsController">
+                    <Element Id="TenantMembershipInfo" PackageId="ImtAuthPck" ComponentId="TenantMembershipInfo">
+                        <Data IsEnabled="true" Flags="2">
+                            <AttributeInfoMap/>
+                        </Data>
+                    </Element>
+                    <Element Id="TenantMembershipManager" PackageId="ImtAuthPck" ComponentId="TenantMembershipManager">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
-                                <AttributeInfo Id="ClosePermissions" Type="Id[]" ExportId="">
-                                    <Data IsEnabled="true">
-                                        <Values>
-                                            <Value>RemoveTenant</Value>
-                                            <Value>ChangeTenant</Value>
-                                            <Value>ViewTenants</Value>
-                                        </Values>
-                                    </Data>
-                                </AttributeInfo>
                                 <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
-                                <AttributeInfo Id="RedoPermissions" Type="Id[]" ExportId="">
-                                    <Data IsEnabled="true">
-                                        <Values>
-                                            <Value>AddTenant</Value>
-                                            <Value>RemoveTenant</Value>
-                                            <Value>ChangeTenant</Value>
-                                        </Values>
-                                    </Data>
+                                <AttributeInfo Id="MembershipCollection" Type="Reference" ExportId="TenantMembershipRepository">
+                                    <Data IsEnabled="false"/>
                                 </AttributeInfo>
-                                <AttributeInfo Id="SavePermissions" Type="Id[]" ExportId="">
-                                    <Data IsEnabled="true">
-                                        <Values>
-                                            <Value>AddTenant</Value>
-                                            <Value>RemoveTenant</Value>
-                                            <Value>ChangeTenant</Value>
-                                        </Values>
-                                    </Data>
+                                <AttributeInfo Id="MembershipFactory" Type="Factory" ExportId="">
+                                    <Data IsEnabled="true" Value="TenantMembershipInfo"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                                     <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="TypeId" Type="Id" ExportId="">
-                                    <Data IsEnabled="true" Value="Tenant"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="UndoPermissions" Type="Id[]" ExportId="">
-                                    <Data IsEnabled="true">
-                                        <Values>
-                                            <Value>AddTenant</Value>
-                                            <Value>RemoveTenant</Value>
-                                            <Value>ChangeTenant</Value>
-                                        </Values>
-                                    </Data>
                                 </AttributeInfo>
                             </AttributeInfoMap>
                         </Data>
@@ -332,89 +497,7 @@
                 </ElementsList>
                 <EmbeddedRegistriesList/>
                 <ExportedInterfaces>
-                    <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="StandardDocumentCommandsController"/>
-                    <Interface InterfaceId="imtserverapp::IGuiElementContainer" ComponentId="StandardDocumentCommandsController"/>
-                    <Interface InterfaceId="imtserverapp::IRepresentationController" ComponentId="StandardDocumentCommandsController"/>
-                </ExportedInterfaces>
-                <ExportedComponents/>
-            </Data>
-        </EmbeddedRegistry>
-        <EmbeddedRegistry Id="TenantsCommands">
-            <Data Description="" Keywords="">
-                <ElementsList>
-                    <Element Id="CollectionCommands" PackageId="ImtCoreVoce" ComponentId="StandardCollectionCommands">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="EditPermissions" Type="Id[]" ExportId="">
-                                    <Data IsEnabled="true">
-                                        <Values>
-                                            <Value>ViewTenants</Value>
-                                            <Value>ChangeTenant</Value>
-                                        </Values>
-                                    </Data>
-                                </AttributeInfo>
-                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="NewCommandName" Type="Text" ExportId="">
-                                    <Data IsEnabled="true" Value="New Tenant"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="NewPermissions" Type="Id[]" ExportId="">
-                                    <Data IsEnabled="true">
-                                        <Values>
-                                            <Value>AddTenant</Value>
-                                        </Values>
-                                    </Data>
-                                </AttributeInfo>
-                                <AttributeInfo Id="RemovePermissions" Type="Id[]" ExportId="">
-                                    <Data IsEnabled="true">
-                                        <Values>
-                                            <Value>RemoveTenant</Value>
-                                        </Values>
-                                    </Data>
-                                </AttributeInfo>
-                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
-                    <Element Id="CollectionCommandsController" PackageId="ImtGraphQlVoce" ComponentId="CommandsController">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="LeftAlignmentCommands" Type="Reference[]" ExportId="">
-                                    <Data IsEnabled="true">
-                                        <Values>
-                                            <Value>CollectionCommands/New</Value>
-                                            <Value>CollectionCommands/Edit</Value>
-                                            <Value>CollectionCommands/Remove</Value>
-                                        </Values>
-                                    </Data>
-                                </AttributeInfo>
-                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="TypeId" Type="Id" ExportId="">
-                                    <Data IsEnabled="true" Value="Tenants"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
-                </ElementsList>
-                <EmbeddedRegistriesList/>
-                <ExportedInterfaces>
-                    <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="CollectionCommandsController"/>
-                    <Interface InterfaceId="imtrest::IRepresentationController" ComponentId="CollectionCommands"/>
-                    <Interface InterfaceId="istd::IPolymorphic" ComponentId="CollectionCommandsController"/>
+                    <Interface InterfaceId="imtauth::ITenantMembershipManager" ComponentId="TenantMembershipManager"/>
                 </ExportedInterfaces>
                 <ExportedComponents/>
             </Data>
@@ -422,7 +505,7 @@
     </EmbeddedRegistriesList>
     <ExportedInterfaces>
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="Demultiplexer"/>
-        <Interface InterfaceId="istd::IPolymorphic" ComponentId="Demultiplexer"/>
+        <Interface InterfaceId="imtgql::IGqlSubscriberController" ComponentId="SlaveSubscriberController"/>
     </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>

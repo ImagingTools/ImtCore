@@ -92,14 +92,14 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="MembershipFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="TenantMembershipInfo"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ObjectTypes" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Types"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TableName" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="TenantMemberships"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="MembershipFactory" Type="Factory" ExportId="">
-                        <Data IsEnabled="true" Value="TenantMembershipInfo"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
