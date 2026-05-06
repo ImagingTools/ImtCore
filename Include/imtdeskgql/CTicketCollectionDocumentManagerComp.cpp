@@ -603,7 +603,7 @@ bool CTicketCollectionDocumentManagerComp::ProcessEvent(imtdoc::CEventBase* even
 		if (m_ticketCollectionCompPtr->GetObjectData(objectId, collectionDataPtr)){
 			dbTicketPtr = dynamic_cast<const imtdesk::ISupportTicket*>(collectionDataPtr.GetPtr());
 		}
-	
+
 		istd::IChangeableSharedPtr documentPtr;
 		imtdesk::ISupportTicket* documentTicketPtr = nullptr;
 		if (m_documentManagerCompPtr->GetDocumentData(userId, documentId, documentPtr) == imtdoc::IDocumentManager::OS_OK){

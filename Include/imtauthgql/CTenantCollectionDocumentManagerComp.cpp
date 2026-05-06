@@ -2,13 +2,14 @@
 #include <imtauthgql/CTenantCollectionDocumentManagerComp.h>
 
 
-// ImtCore includes
-#include <imtauth/ITenantInfo.h>
-#include <imtgql/IGqlContext.h>
-
 // Qt includes
 #include <QMap>
 #include <QSet>
+
+// ImtCore includes
+#include <imtauth/ITenantInfo.h>
+#include <imtgql/IGqlContext.h>
+#include <imtdoc/CDocumentSavedEvent.h>
 
 
 namespace imtauthgql
@@ -136,13 +137,7 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTenantCollect
 		tenantData = *arguments.input.Version_1_0->tenant;
 	}
 
-	bool isNewTenant = tenantPtr->GetTenantId().isEmpty();
-
 	QByteArray tenantId = tenantPtr->GetTenantId();
-	if (tenantId.isEmpty()){
-		tenantId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
-		tenantPtr->SetTenantId(tenantId);
-	}
 
 	if (tenantData.name){
 		tenantPtr->SetTenantName(*tenantData.name);
@@ -161,7 +156,7 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTenantCollect
 		tenantPtr->SetActive(*tenantData.isActive);
 	}
 
-	if (tenantData.memberIds && m_membershipManagerCompPtr.IsValid()){
+	if (!tenantId.isEmpty() && tenantData.memberIds && m_membershipManagerCompPtr.IsValid()){
 		QByteArrayList currentMembershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
 		QMap<QByteArray, QByteArray> userIdToMembershipId;
 		QSet<QByteArray> currentUserIds;
@@ -195,7 +190,7 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTenantCollect
 
 	// For new tenants do NOT auto-save — user will save manually.
 	// For existing tenants, save immediately after each change (like tickets).
-	if (!isNewTenant){
+	if (!tenantId.isEmpty()){
 		m_documentManagerCompPtr->SaveDocument(userLogin, documentId);
 	}
 
@@ -205,4 +200,34 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTenantCollect
 }
 
 
+// reimplemented (imtdoc::IDocumentManagerEventHandler)
+
+bool CTenantCollectionDocumentManagerComp::ProcessEvent(imtdoc::CEventBase* eventPtr)
+{
+	imtdoc::CDocumentSavedEvent* savedEventPtr = dynamic_cast<imtdoc::CDocumentSavedEvent*>(eventPtr);
+	if (savedEventPtr != nullptr){
+		QByteArray documentId = savedEventPtr->GetDocumentId();
+		QByteArray userId = savedEventPtr->GetUserId();
+		QByteArray objectId = savedEventPtr->GetDocumentUrl().toString().toUtf8().replace("collection:///", "");
+
+		istd::IChangeableSharedPtr documentPtr;
+		imtauth::ITenantInfo* documentTicketPtr = nullptr;
+		if (m_documentManagerCompPtr->GetDocumentData(userId, documentId, documentPtr) == imtdoc::IDocumentManager::OS_OK){
+			documentTicketPtr = dynamic_cast<imtauth::ITenantInfo*>(documentPtr.GetPtr());
+		}
+
+		if (documentTicketPtr != nullptr){
+			documentTicketPtr->SetTenantId(objectId);
+
+			m_documentManagerCompPtr->SetDocumentData(userId, documentId, *documentPtr);
+			m_documentManagerCompPtr->SaveDocument(userId, documentId);
+		}
+	}
+
+	return true;
+}
+
+
 } // namespace imtauthgql
+
+
