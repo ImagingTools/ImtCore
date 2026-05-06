@@ -5,6 +5,7 @@ import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtcontrols 1.0
 import imtcolgui 1.0
+import imtguigql 1.0
 
 ElementView {
 	id: root
@@ -23,6 +24,8 @@ ElementView {
 	property string collectionId: ""
 	// Text shown when no items selected
 	property string emptyText: qsTr("No items")
+	// Whether to show selected count next to the label
+	property bool showCount: false
 
 	// Chip colors (matching TicketEditor accent palette)
 	readonly property string accentColor: "#5b8fd6"
@@ -33,7 +36,68 @@ ElementView {
 	signal selectionChanged(var selectedItems)
 	signal popupClosed()
 
-	name: root.label
+	name: root.showCount && root.items.length > 0
+		? root.label + " (" + root.items.length + ")"
+		: root.label
+
+	// --- Name resolution via FilterableSelectPopup's data provider pattern ---
+	FilterableSelectGqlDataProvider {
+		id: nameResolver
+		collectionId: root.collectionId
+		multiSelect: true
+		pageSize: 100
+
+		onDataChanged: {
+			root.__resolveItemNames()
+		}
+	}
+
+	onItemsChanged: {
+		root.__triggerResolveIfNeeded()
+	}
+
+	function __triggerResolveIfNeeded() {
+		if (!root.items || root.items.length === 0) return
+		var hasUnresolved = false
+		for (var i = 0; i < root.items.length; i++) {
+			var item = root.items[i]
+			if (!item.name || item.name === item.id) {
+				hasUnresolved = true
+				break
+			}
+		}
+		if (hasUnresolved) {
+			nameResolver.fetch("")
+		}
+	}
+
+	function __resolveItemNames() {
+		var resolverItems = nameResolver.items
+		if (!resolverItems || resolverItems.length === 0) return
+
+		var nameMap = ({})
+		for (var i = 0; i < resolverItems.length; i++) {
+			var ri = resolverItems[i]
+			if (ri.id && ri.title && ri.title !== "")
+				nameMap[ri.id] = ri.title
+		}
+
+		var updated = false
+		var newItems = []
+		for (var j = 0; j < root.items.length; j++) {
+			var cur = root.items[j]
+			var resolved = nameMap[cur.id]
+			if (resolved && cur.name !== resolved) {
+				newItems.push({ id: cur.id, name: resolved })
+				updated = true
+			} else {
+				newItems.push(cur)
+			}
+		}
+		if (updated) {
+			root.items = newItems
+		}
+	}
 
 	controlComp: Component {
 		Text {

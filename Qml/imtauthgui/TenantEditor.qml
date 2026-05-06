@@ -5,7 +5,6 @@ import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtcontrols 1.0
 import imtdocgui 1.0
-import imtguigql 1.0
 import imtauthTenantsSdl 1.0
 
 DocumentViewBase {
@@ -16,7 +15,6 @@ DocumentViewBase {
 
 	property TenantData tenantData: model
 	property var pendingMembers: []
-	property var __userNameCache: ({})
 	property bool isNewTenant: tenantData ? (!tenantData.m_id || tenantData.m_id === "") : true
 
 	function updateGui(){
@@ -44,55 +42,8 @@ DocumentViewBase {
 			return
 		var ids = container.tenantData.m_memberIds || []
 		var members = []
-		var hasUnresolved = false
 		for (var i = 0; i < ids.length; i++) {
-			var uid = ids[i]
-			var cachedName = container.__userNameCache[uid]
-			members.push({ id: uid, name: cachedName || uid })
-			if (!cachedName) hasUnresolved = true
-		}
-		container.pendingMembers = members
-		if (hasUnresolved && ids.length > 0) {
-			userNameResolver.fetch("")
-		}
-	}
-
-	// Standalone user name resolver — fetches Users collection to resolve member IDs to display names
-	FilterableSelectGqlDataProvider {
-		id: userNameResolver
-		collectionId: "Users"
-		multiSelect: true
-		pageSize: 100
-
-		onDataChanged: {
-			container.__resolveMemberNamesFromResolver()
-		}
-	}
-
-	function __resolveMemberNamesFromResolver() {
-		var resolverItems = userNameResolver.items
-		if (!resolverItems || resolverItems.length === 0) return
-
-		var cacheUpdated = false
-		for (var i = 0; i < resolverItems.length; i++) {
-			var item = resolverItems[i]
-			if (item.id && item.title && item.title !== "") {
-				container.__userNameCache[item.id] = item.title
-				cacheUpdated = true
-			}
-		}
-
-		if (!cacheUpdated) return
-
-		// Re-build pendingMembers with resolved names
-		var members = []
-		for (var j = 0; j < container.pendingMembers.length; j++) {
-			var m = container.pendingMembers[j]
-			var cachedName = container.__userNameCache[m.id]
-			members.push({
-				id: m.id,
-				name: cachedName || m.name || m.id
-			})
+			members.push({ id: ids[i], name: ids[i] })
 		}
 		container.pendingMembers = members
 	}
@@ -206,6 +157,7 @@ DocumentViewBase {
 				filterPlaceholder: qsTr("Type or choose a user")
 				collectionId: "Users"
 				emptyText: qsTr("No members")
+				showCount: true
 
 				onItemRemoved: {
 					var arr = container.pendingMembers.slice()
@@ -215,11 +167,6 @@ DocumentViewBase {
 				}
 
 				onSelectionChanged: {
-					for (var i = 0; i < selectedItems.length; i++) {
-						var selName = selectedItems[i].name
-						var selId = selectedItems[i].id
-						if (selName !== selId) container.__userNameCache[selId] = selName
-					}
 					container.pendingMembers = selectedItems
 					container.doUpdateModel()
 				}
