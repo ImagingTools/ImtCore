@@ -4,6 +4,7 @@
 
 // ImtCore includes
 #include <imtauth/ITenantInfo.h>
+#include <imtgql/IGqlContext.h>
 
 // Qt includes
 #include <QMap>
@@ -109,10 +110,16 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTenantCollect
 		return response;
 	}
 
-	QByteArray userId = GetUserId(gqlRequest);
+	QByteArray contextUserId;
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr != nullptr){
+		contextUserId = gqlContextPtr->GetUserId();
+	}
+
+	QByteArray userLogin = GetUserId(gqlRequest);
 
 	istd::IChangeableSharedPtr documentPtr;
-	m_documentManagerCompPtr->GetDocumentData(userId, documentId, documentPtr);
+	m_documentManagerCompPtr->GetDocumentData(userLogin, documentId, documentPtr);
 	if (!documentPtr.IsValid()){
 		response.Version_1_0->status = sdl::imtbase::CollectionDocumentManager::EDocumentOperationStatus::InvalidDocumentId;
 		return response;
@@ -129,6 +136,8 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTenantCollect
 		tenantData = *arguments.input.Version_1_0->tenant;
 	}
 
+	bool isNewTenant = tenantPtr->GetTenantId().isEmpty();
+
 	QByteArray tenantId = tenantPtr->GetTenantId();
 	if (tenantId.isEmpty()){
 		tenantId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
@@ -143,8 +152,9 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTenantCollect
 		tenantPtr->SetTenantDescription(*tenantData.description);
 	}
 
-	if (tenantData.ownerId){
-		tenantPtr->SetOwnerId(*tenantData.ownerId);
+	// OwnerId is set once on first save — the creator is the owner (immutable).
+	if (tenantPtr->GetOwnerId().isEmpty()){
+		tenantPtr->SetOwnerId(contextUserId);
 	}
 
 	if (tenantData.isActive){
@@ -164,24 +174,30 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTenantCollect
 		}
 
 		QSet<QByteArray> newUserIds;
-		for (const auto& userId : *tenantData.memberIds){
-			newUserIds.insert(*userId);
+		for (const auto& newUserId : *tenantData.memberIds){
+			newUserIds.insert(*newUserId);
 		}
 
-		for (const QByteArray& userId : currentUserIds){
-			if (!newUserIds.contains(userId)){
-				m_membershipManagerCompPtr->RemoveMembership(userIdToMembershipId.value(userId));
+		for (const QByteArray& existingUserId : currentUserIds){
+			if (!newUserIds.contains(existingUserId)){
+				m_membershipManagerCompPtr->RemoveMembership(userIdToMembershipId.value(existingUserId));
 			}
 		}
 
-		for (const QByteArray& userId : newUserIds){
-			if (!currentUserIds.contains(userId)){
-				m_membershipManagerCompPtr->InviteMembership(userId, tenantId, imtauth::ITenantMembership::TMR_MEMBER);
+		for (const QByteArray& addUserId : newUserIds){
+			if (!currentUserIds.contains(addUserId)){
+				m_membershipManagerCompPtr->InviteMembership(addUserId, tenantId, imtauth::ITenantMembership::TMR_MEMBER);
 			}
 		}
 	}
 
-	m_documentManagerCompPtr->SetDocumentData(userId, documentId, *documentPtr);
+	m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *documentPtr);
+
+	// For new tenants do NOT auto-save — user will save manually.
+	// For existing tenants, save immediately after each change (like tickets).
+	if (!isNewTenant){
+		m_documentManagerCompPtr->SaveDocument(userLogin, documentId);
+	}
 
 	response.Version_1_0->status = sdl::imtbase::CollectionDocumentManager::EDocumentOperationStatus::Success;
 

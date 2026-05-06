@@ -17,6 +17,7 @@ DocumentViewBase {
 	property TenantData tenantData: model
 	property var pendingMembers: []
 	property var __userNameCache: ({})
+	property bool isNewTenant: tenantData ? (!tenantData.m_id || tenantData.m_id === "") : true
 
 	function updateGui(){
 		generalGroup.updateGui();
@@ -152,6 +153,7 @@ DocumentViewBase {
 
 			ItemSelectElementView {
 				width: parent.width
+				visible: !container.isNewTenant
 				items: container.pendingMembers
 				label: qsTr("Members")
 				addButtonText: qsTr("Add member")
