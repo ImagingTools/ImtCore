@@ -41,6 +41,8 @@ ElementView {
 		: root.label
 
 	// --- Name resolution via FilterableSelectPopup's data provider pattern ---
+	property bool __resolvingNames: false
+
 	FilterableSelectGqlDataProvider {
 		id: nameResolver
 		collectionId: root.collectionId
@@ -53,7 +55,8 @@ ElementView {
 	}
 
 	onItemsChanged: {
-		root.__triggerResolveIfNeeded()
+		if (!root.__resolvingNames)
+			root.__triggerResolveIfNeeded()
 	}
 
 	function __triggerResolveIfNeeded() {
@@ -95,7 +98,9 @@ ElementView {
 			}
 		}
 		if (updated) {
+			root.__resolvingNames = true
 			root.items = newItems
+			root.__resolvingNames = false
 		}
 	}
 
