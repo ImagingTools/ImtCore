@@ -437,6 +437,7 @@
                                 <Value>createdAt</Value>
                                 <Value>updatedAt</Value>
                                 <Value>isActive</Value>
+                                <Value>ownerId</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -448,6 +449,7 @@
                                 <Value>CreatedAt</Value>
                                 <Value>UpdatedAt</Value>
                                 <Value>IsActive</Value>
+                                <Value>OwnerId</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

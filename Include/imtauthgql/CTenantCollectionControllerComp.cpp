@@ -96,7 +96,21 @@ void CTenantCollectionControllerComp::SetAdditionalFilters(
 		return;
 	}
 
-	QByteArray userId = GetUserId(gqlRequest);
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr == nullptr){
+		return;
+	}
+
+	const imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
+	if (userInfoPtr == nullptr){
+		return;
+	}
+
+	if (userInfoPtr->IsAdmin()){
+		return;
+	}
+
+	QByteArray userId = gqlContextPtr->GetUserId();
 	if (userId.isEmpty()){
 		return;
 	}
@@ -108,3 +122,5 @@ void CTenantCollectionControllerComp::SetAdditionalFilters(
 
 
 } // namespace imtauthgql
+
+
