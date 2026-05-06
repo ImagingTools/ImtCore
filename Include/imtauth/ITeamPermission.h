@@ -34,8 +34,8 @@ public:
 	*/
 	enum TeamMemberRole
 	{
-		TMR_MAINTAINER = 0,
-		TMR_MEMBER
+		TMR_MAINTAINER = 0,	///< Can manage team members and team settings
+		TMR_MEMBER			///< Standard team member, access determined by team permissions
 	};
 
 	I_DECLARE_ENUM(TeamMemberRole, TMR_MAINTAINER, TMR_MEMBER);
