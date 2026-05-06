@@ -26,11 +26,33 @@ RemoteCollectionView {
 	}
 
 	onHeadersChanged: {
+		table.setColumnContentById(TenantItemDataTypeMetaInfo.s_membersCount, membersCountCellDelegateComp)
 		table.setColumnContentById(TenantItemDataTypeMetaInfo.s_createdAt, createdAtCellDelegateComp)
 		table.setColumnContentById(TenantItemDataTypeMetaInfo.s_updatedAt, updatedAtCellDelegateComp)
 		table.setColumnContentById(TenantItemDataTypeMetaInfo.s_isActive, isActiveCellDelegateComp)
 	}
 
+
+	Component {
+		id: membersCountCellDelegateComp
+		TableCellDelegateBase {
+			id: membersCountDelegate
+
+			onReused: {
+				var val = membersCountDelegate.getValue()
+				membersCountLabel.text = val !== undefined && val !== null ? val.toString() : "0"
+			}
+
+			Text {
+				id: membersCountLabel
+				anchors.verticalCenter: parent.verticalCenter
+				anchors.left: parent.left
+				anchors.leftMargin: Style.marginM
+				font.pixelSize: Style.fontSizeM
+				color: Style.textColor
+			}
+		}
+	}
 
 	Component {
 		id: createdAtCellDelegateComp

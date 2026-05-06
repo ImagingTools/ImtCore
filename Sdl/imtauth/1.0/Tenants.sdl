@@ -18,6 +18,7 @@ type TenantItemData {
 	name: String!
 	description: String
 	isActive: Boolean
+	membersCount: Int
 	createdAt: String
 	updatedAt: String
 }
