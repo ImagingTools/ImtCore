@@ -1,0 +1,148 @@
+schema {
+	query: Query
+	mutation: Mutation
+	namespace: imtauth
+	version: 1.0
+}
+
+import {
+	"../../../../ImtCore/Sdl/imtbase/1.0/ImtCollection.sdl"
+	"../../../../ImtCore/Sdl/imtbase/1.0/ImtBaseTypes.sdl"
+}
+
+# --- TenantMembership ---
+
+enum TenantMemberRole {
+	Owner
+	Admin
+	Member
+	Guest
+}
+
+type TenantMembershipItemData {
+	id: ID!
+	typeId: ID!
+	userId: ID!
+	tenantId: ID!
+	role: TenantMemberRole!
+	isActive: Boolean
+	joinedAt: String
+	updatedAt: String
+}
+
+type TenantMembershipData {
+	id: ID
+	userId: ID
+	tenantId: ID
+	role: TenantMemberRole
+	isActive: Boolean
+	joinedAt: String
+	updatedAt: String
+}
+
+# --- Queries ---
+
+input GetMembershipsByTenantInput {
+	tenantId: ID!
+}
+
+type GetMembershipsByTenantPayload {
+	membershipIds: [ID]
+	errorMessage: String
+}
+
+input GetMembershipsByUserInput {
+	userId: ID!
+}
+
+type GetMembershipsByUserPayload {
+	membershipIds: [ID]
+	errorMessage: String
+}
+
+input GetMembershipInput {
+	membershipId: ID!
+}
+
+type GetMembershipPayload {
+	membership: TenantMembershipData
+	errorMessage: String
+}
+
+input FindMembershipInput {
+	userId: ID!
+	tenantId: ID!
+}
+
+type FindMembershipPayload {
+	membership: TenantMembershipData
+	errorMessage: String
+}
+
+input IsMemberInput {
+	userId: ID!
+	tenantId: ID!
+}
+
+type IsMemberPayload {
+	isMember: Boolean
+	errorMessage: String
+}
+
+input HasMinimumRoleInput {
+	userId: ID!
+	tenantId: ID!
+	minimumRole: TenantMemberRole!
+}
+
+type HasMinimumRolePayload {
+	hasRole: Boolean
+	errorMessage: String
+}
+
+# --- Mutations ---
+
+input AddMembershipInput {
+	userId: ID!
+	tenantId: ID!
+	role: TenantMemberRole!
+}
+
+type AddMembershipPayload {
+	membershipId: ID
+	errorMessage: String
+}
+
+input RemoveMembershipInput {
+	membershipId: ID!
+}
+
+type RemoveMembershipPayload {
+	success: Boolean
+	errorMessage: String
+}
+
+input UpdateMembershipRoleInput {
+	membershipId: ID!
+	role: TenantMemberRole!
+}
+
+type UpdateMembershipRolePayload {
+	success: Boolean
+	errorMessage: String
+}
+
+type Query {
+	GetMembershipsByTenant (input: GetMembershipsByTenantInput): GetMembershipsByTenantPayload!
+	GetMembershipsByUser (input: GetMembershipsByUserInput): GetMembershipsByUserPayload!
+	GetMembership (input: GetMembershipInput): GetMembershipPayload!
+	FindMembership (input: FindMembershipInput): FindMembershipPayload!
+	IsMember (input: IsMemberInput): IsMemberPayload!
+	HasMinimumRole (input: HasMinimumRoleInput): HasMinimumRolePayload!
+}
+
+type Mutation {
+	AddMembership (input: AddMembershipInput): AddMembershipPayload!
+	RemoveMembership (input: RemoveMembershipInput): RemoveMembershipPayload!
+	UpdateMembershipRole (input: UpdateMembershipRoleInput): UpdateMembershipRolePayload!
+}
