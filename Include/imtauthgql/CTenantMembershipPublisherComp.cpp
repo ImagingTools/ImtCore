@@ -218,10 +218,7 @@ void CTenantMembershipPublisherComp::PublishNotification(
 	PublishDataFiltered(commandId, data, [targetUserId](const imtgql::CGqlRequest& gqlRequest) -> bool {
 		const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
 		if (contextPtr != nullptr){
-			const imtauth::IUserInfo* userInfoPtr = contextPtr->GetUserInfo();
-			if (userInfoPtr != nullptr){
-				return userInfoPtr->GetId() == targetUserId;
-			}
+			return contextPtr->GetUserId() == targetUserId;
 		}
 		return false;
 	});
