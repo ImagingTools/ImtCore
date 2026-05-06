@@ -228,7 +228,7 @@ I_EXPORT_COMPONENT(
 
 I_EXPORT_COMPONENT(
 			TenantMembershipManagerController,
-			"Tenant membership manager controller",
+			"GraphQL handler for tenant membership queries and mutations",
 			"Tenant Membership Manager Controller");
 
 

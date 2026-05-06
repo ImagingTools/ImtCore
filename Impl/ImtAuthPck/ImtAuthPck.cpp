@@ -232,28 +232,28 @@ I_EXPORT_COMPONENT(
 
 I_EXPORT_COMPONENT(
 			TenantInfo,
-			"Tenant info",
+			"Tenant entity storing organization data (name, description, status, relationships)",
 			"Tenant Info");
 
 I_EXPORT_COMPONENT(
 			TenantMetaInfoCreator,
-			"Tenant meta info creator",
+			"Creates meta-information descriptors for tenant entity fields",
 			"Tenant Meta Info Creator");
 
 I_EXPORT_COMPONENT(
 			TenantManager,
-			"Tenant manager",
+			"CRUD manager for tenant entities (create, read, update, delete, activate/deactivate)",
 			"Tenant Manager");
 
 
 I_EXPORT_COMPONENT(
 			TenantMembershipInfo,
-			"Tenant membership info",
+			"Entity representing user-to-tenant membership with role (Owner/Admin/Member/Guest)",
 			"Tenant Membership Info");
 
 I_EXPORT_COMPONENT(
 			TenantMembershipManager,
-			"Tenant membership manager",
+			"CRUD manager for tenant memberships with role hierarchy and duplicate detection",
 			"Tenant Membership Manager");
 
 

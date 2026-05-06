@@ -15,26 +15,6 @@ namespace imtauth
 
 
 /**
-	Defines the role of a user within a team (UserGroup) inside a tenant.
-	Analogous to GitHub's team membership roles.
-*/
-enum TeamMemberRole
-{
-	/**
-		Can manage team members and team settings.
-		Analogous to GitHub Team Maintainer.
-	*/
-	TMMR_Maintainer = 0,
-
-	/**
-		Standard team member. Access determined by team permissions.
-		Analogous to GitHub Team Member.
-	*/
-	TMMR_Member
-};
-
-
-/**
 	Interface for managing team-level permissions within a tenant.
 	Teams (UserGroups) can be scoped to a tenant and inherit/override permissions
 	on resources.
@@ -48,6 +28,17 @@ enum TeamMemberRole
 class ITeamPermission: virtual public istd::IPolymorphic
 {
 public:
+	/**
+		Defines the role of a user within a team (UserGroup) inside a tenant.
+		Analogous to GitHub's team membership roles.
+	*/
+	enum TeamMemberRole
+	{
+		TMR_MAINTAINER = 0,
+		TMR_MEMBER
+	};
+
+	I_DECLARE_ENUM(TeamMemberRole, TMR_MAINTAINER, TMR_MEMBER);
 	/**
 		Get all teams (UserGroup IDs) within a tenant.
 	*/
@@ -73,7 +64,7 @@ public:
 
 	/**
 		Get the role of a user within a team.
-		\return The team member role, or TMMR_Member as default.
+		\return The team member role, or TMR_MEMBER as default.
 	*/
 	virtual TeamMemberRole GetTeamMemberRole(const QByteArray& userId, const QByteArray& teamId) const = 0;
 

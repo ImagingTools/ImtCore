@@ -88,7 +88,7 @@ I_EXPORT_COMPONENT(
 
 I_EXPORT_COMPONENT(
 			TenantMembershipDatabaseDelegate,
-			"Tenant membership database delegate",
+			"SQL delegate for tenant memberships (hydration, INSERT/UPDATE/DELETE)",
 			"Tenant Membership Database Delegate");
 
 
