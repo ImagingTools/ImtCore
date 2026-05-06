@@ -44,9 +44,55 @@ DocumentViewBase {
 			return
 		var ids = container.tenantData.m_memberIds || []
 		var members = []
+		var hasUnresolved = false
 		for (var i = 0; i < ids.length; i++) {
 			var uid = ids[i]
-			members.push({ id: uid, name: container.__userNameCache[uid] || uid })
+			var cachedName = container.__userNameCache[uid]
+			members.push({ id: uid, name: cachedName || uid })
+			if (!cachedName) hasUnresolved = true
+		}
+		container.pendingMembers = members
+		if (hasUnresolved && ids.length > 0) {
+			userNameResolver.fetch("")
+		}
+	}
+
+	// Standalone user name resolver — fetches Users collection to resolve member IDs to display names
+	FilterableSelectGqlDataProvider {
+		id: userNameResolver
+		collectionId: "Users"
+		multiSelect: true
+		pageSize: 100
+
+		onDataChanged: {
+			container.__resolveMemberNamesFromResolver()
+		}
+	}
+
+	function __resolveMemberNamesFromResolver() {
+		var resolverItems = userNameResolver.items
+		if (!resolverItems || resolverItems.length === 0) return
+
+		var cacheUpdated = false
+		for (var i = 0; i < resolverItems.length; i++) {
+			var item = resolverItems[i]
+			if (item.id && item.title && item.title !== "") {
+				container.__userNameCache[item.id] = item.title
+				cacheUpdated = true
+			}
+		}
+
+		if (!cacheUpdated) return
+
+		// Re-build pendingMembers with resolved names
+		var members = []
+		for (var j = 0; j < container.pendingMembers.length; j++) {
+			var m = container.pendingMembers[j]
+			var cachedName = container.__userNameCache[m.id]
+			members.push({
+				id: m.id,
+				name: cachedName || m.name || m.id
+			})
 		}
 		container.pendingMembers = members
 	}
