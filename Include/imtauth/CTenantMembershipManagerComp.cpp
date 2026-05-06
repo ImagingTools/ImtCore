@@ -165,6 +165,7 @@ QByteArray CTenantMembershipManagerComp::InviteMembership(const QByteArray& user
 		ITenantMembership* membershipPtr = dynamic_cast<ITenantMembership*>(dataPtr.GetPtr());
 		if (membershipPtr != nullptr){
 			membershipPtr->SetActive(false);
+			membershipPtr->SetJoinedAt(QString());
 			m_membershipCollectionCompPtr->SetObjectData(membershipId, *membershipPtr);
 		}
 	}

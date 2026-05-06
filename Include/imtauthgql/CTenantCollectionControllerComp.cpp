@@ -29,6 +29,7 @@ void ReplaceCurrentUserSentinel(imtbase::IComplexCollectionFilter::FilterExpress
 			QByteArray relationScope = fieldFilter.filterValue.toByteArray();
 			fieldFilter.fieldId = "OwnerId";
 			fieldFilter.filterValue = userId;
+			// Visibility is already restricted to owned-or-member tenants; Member scope narrows that set to non-owned tenants.
 			fieldFilter.filterOperation = relationScope == "Member"
 				? imtbase::IComplexCollectionFilter::FO_NOT_EQUAL
 				: imtbase::IComplexCollectionFilter::FO_EQUAL;
