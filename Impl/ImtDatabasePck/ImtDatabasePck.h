@@ -28,6 +28,8 @@
 #include <imtdb/CPostgresXPathExtractorComp.h>
 #include <imtdb/CSqliteXPathExtractorComp.h>
 #include <imtdb/CSqlDatabaseTransactionManagerComp.h>
+#include <imtdb/CTenantFilterStrategyComp.h>
+#include <imtdb/CTenantAwareDelegateCompBase.h>
 
 
 /**
@@ -58,6 +60,9 @@ typedef imtdb::CSqliteDatabaseDocumentDelegateComp SQLiteDatabaseDocumentDelegat
 typedef imtdb::CPostgresXPathExtractorComp PostgresXPathExtractor;
 typedef imtdb::CSqliteXPathExtractorComp SqliteXPathExtractor;
 typedef imtdb::CSqlDatabaseTransactionManagerComp SqlDatabaseTransactionManager;
+typedef imtdb::CDirectTenantFilterStrategyComp DirectTenantFilterStrategy;
+typedef imtdb::CMembershipTenantFilterStrategyComp MembershipTenantFilterStrategy;
+typedef imtdb::CDocumentOwnerTenantFilterStrategyComp DocumentOwnerTenantFilterStrategy;
 
 
 } // namespace ImtDatabasePck
