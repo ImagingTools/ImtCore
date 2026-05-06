@@ -27,8 +27,15 @@ DocumentViewBase {
 		generalGroup.updateModel();
 		// Sync memberIds back to model
 		if (container.tenantData) {
-			container.tenantData.m_memberIds = container.pendingMembers.map(function(m) { return m.id })
+			container.tenantData.m_memberIds = __pendingMemberIds()
 		}
+	}
+
+	function __pendingMemberIds() {
+		var ids = []
+		for (var i = 0; i < pendingMembers.length; ++i)
+			ids.push(pendingMembers[i].id)
+		return ids
 	}
 
 	function __loadMembersFromModel() {
@@ -141,11 +148,6 @@ DocumentViewBase {
 					container.tenantData.m_description = descriptionInput.text
 					container.tenantData.m_isActive = isActiveInput.checked
 				}
-			}
-
-			GroupHeaderView {
-				width: parent.width
-				title: qsTr("Members")
 			}
 
 			ItemSelectElementView {
