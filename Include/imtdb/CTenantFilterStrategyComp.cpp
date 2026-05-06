@@ -147,6 +147,7 @@ QString CDocumentOwnerTenantFilterStrategyComp::CreateTenantFilterSql(
     QString ownerIdPath = QString::fromUtf8(*m_ownerIdJsonPathAttrPtr);
     QString documentCol = QString::fromUtf8(*m_documentColumnAttrPtr);
     QString membershipTable = QString::fromUtf8(*m_membershipTableAttrPtr);
+    QString userIdCol = QString::fromUtf8(*m_userIdColumnAttrPtr);
     QString tenantIdCol = QString::fromUtf8(*m_tenantIdColumnAttrPtr);
     QString activeCol = QString::fromUtf8(*m_activeColumnAttrPtr);
 
@@ -164,7 +165,7 @@ QString CDocumentOwnerTenantFilterStrategyComp::CreateTenantFilterSql(
 
     return QStringLiteral("EXISTS (SELECT 1 FROM \"%1\" WHERE \"%2\"=(%3->>'%4') AND \"%5\"='%6'%7)")
         .arg(membershipTable,
-             QStringLiteral("UserId"),
+             userIdCol,
              docRef, ownerIdPath,
              tenantIdCol, imtdb::EscapeSql(tenantId),
              activeCondition);
@@ -176,6 +177,7 @@ QString CDocumentOwnerTenantFilterStrategyComp::CreateGlobalScopeFilterSql(const
     QString ownerIdPath = QString::fromUtf8(*m_ownerIdJsonPathAttrPtr);
     QString documentCol = QString::fromUtf8(*m_documentColumnAttrPtr);
     QString membershipTable = QString::fromUtf8(*m_membershipTableAttrPtr);
+    QString userIdCol = QString::fromUtf8(*m_userIdColumnAttrPtr);
     QString activeCol = QString::fromUtf8(*m_activeColumnAttrPtr);
 
     QString docRef;
@@ -192,7 +194,7 @@ QString CDocumentOwnerTenantFilterStrategyComp::CreateGlobalScopeFilterSql(const
 
     return QStringLiteral("NOT EXISTS (SELECT 1 FROM \"%1\" WHERE \"%2\"=(%3->>'%4')%5)")
         .arg(membershipTable,
-             QStringLiteral("UserId"),
+             userIdCol,
              docRef, ownerIdPath,
              activeCondition);
 }

@@ -143,6 +143,7 @@ public:
         I_ASSIGN(m_ownerIdJsonPathAttrPtr, "OwnerIdJsonPath", "JSON key to extract OwnerId from document", false, "OwnerId");
         I_ASSIGN(m_documentColumnAttrPtr, "DocumentColumn", "Name of the JSONB document column", false, "Document");
         I_ASSIGN(m_membershipTableAttrPtr, "MembershipTable", "Table for owner-tenant membership check", false, "TenantMemberships");
+        I_ASSIGN(m_userIdColumnAttrPtr, "UserIdColumn", "UserId column in membership table", false, "UserId");
         I_ASSIGN(m_tenantIdColumnAttrPtr, "TenantIdColumn", "TenantId column in membership table", false, "TenantId");
         I_ASSIGN(m_activeColumnAttrPtr, "ActiveColumn", "Active status column in membership table", false, "IsActive");
     I_END_COMPONENT
@@ -157,6 +158,7 @@ protected:
     I_ATTR(QByteArray, m_ownerIdJsonPathAttrPtr);
     I_ATTR(QByteArray, m_documentColumnAttrPtr);
     I_ATTR(QByteArray, m_membershipTableAttrPtr);
+    I_ATTR(QByteArray, m_userIdColumnAttrPtr);
     I_ATTR(QByteArray, m_tenantIdColumnAttrPtr);
     I_ATTR(QByteArray, m_activeColumnAttrPtr);
 };

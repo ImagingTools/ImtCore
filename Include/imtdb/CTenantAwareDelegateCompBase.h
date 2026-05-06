@@ -25,7 +25,7 @@ namespace imtdb
  * 2. Wire a tenant filter strategy component (Direct, Membership, or DocumentOwner)
  *    to the "TenantFilterStrategy" slot.
  * 3. The controller passes TenantId from the GQL context via a "TenantId" parameter
- *    in the filter params (use CTenantContextFilterComp or manually add CIdParam).
+ *    in the filter params (use CTenantContextHelper or manually add CIdParam).
  *
  * The delegate will automatically inject the tenant filter into every query's
  * WHERE clause via CreateAdditionalFiltersQuery().
