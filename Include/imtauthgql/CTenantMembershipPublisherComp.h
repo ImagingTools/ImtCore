@@ -3,7 +3,7 @@
 
 
 // ACF includes
-#include <icomp/CComponentBase.h>
+#include <imod/TSingleModelObserverBase.h>
 
 // ImtCore includes
 #include <imtauth/ITenantMembershipManager.h>
@@ -16,71 +16,61 @@ namespace imtauthgql
 
 
 /**
- * Publisher component for tenant membership notifications.
- * Notifies invited users about new invitations and notifies inviters
- * about invitation acceptance/rejection.
- *
- * Publishes to subscribers filtered by target userId so that only
- * the relevant user receives the notification.
- */
-class CTenantMembershipPublisherComp: public imtservergql::CGqlPublisherCompBase
+	Server-side publisher that broadcasts notifications when tenant membership
+	state changes (invitation, acceptance, rejection).
+
+	The component observes imtauth::ITenantMembershipManager via
+	imod::TSingleModelObserverBase. When a membership changes, it compares
+	the cached state to detect:
+	- New inactive memberships → InvitationReceived (notifies invited user)
+	- Previously inactive membership becoming active → InvitationAccepted (notifies owner)
+	- Previously inactive membership removed → InvitationRejected (notifies owner)
+
+	Notifications are delivered only to subscribers whose authenticated user
+	matches the target userId.
+
+	The subscription endpoint name is configurable via the \c CommandId
+	attribute and defaults to "OnMembershipNotification".
+*/
+class CTenantMembershipPublisherComp:
+			public imtservergql::CGqlPublisherCompBase,
+			protected imod::TSingleModelObserverBase<imtauth::ITenantMembershipManager>
 {
 public:
 	typedef imtservergql::CGqlPublisherCompBase BaseClass;
+	typedef imod::TSingleModelObserverBase<imtauth::ITenantMembershipManager> BaseClass2;
 
 	I_BEGIN_COMPONENT(CTenantMembershipPublisherComp);
+		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager to observe for changes", true, "TenantMembershipManager");
+		I_ASSIGN_TO(m_membershipManagerModelCompPtr, m_membershipManagerCompPtr, true);
+		I_ASSIGN(m_commandIdAttrPtr, "CommandId", "Subscription command-ID this notifier responds to", false, "OnMembershipNotification");
 	I_END_COMPONENT;
 
-	/**
-	 * Publish an invitation notification to the invited user.
-	 * @param targetUserId  The user being invited (receives the notification)
-	 * @param membershipId  The membership ID
-	 * @param tenantId      The tenant ID
-	 * @param tenantName    Display name of the tenant
-	 * @param role          Assigned role
-	 */
-	void PublishInvitationReceived(
-		const QByteArray& targetUserId,
-		const QByteArray& membershipId,
-		const QByteArray& tenantId,
-		const QString& tenantName,
-		imtauth::ITenantMembership::TenantMemberRole role) const;
+protected:
+	// reimplemented (imtgql::IGqlSubscriberController)
+	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
 
-	/**
-	 * Publish an acceptance notification to the inviter (tenant owner).
-	 * @param targetUserId  The owner/inviter who receives this notification
-	 * @param acceptingUserId  The user who accepted
-	 * @param membershipId  The membership ID
-	 * @param tenantId      The tenant ID
-	 * @param tenantName    Display name of the tenant
-	 * @param role          The role of the accepted member
-	 */
-	void PublishInvitationAccepted(
-		const QByteArray& targetUserId,
-		const QByteArray& acceptingUserId,
-		const QByteArray& membershipId,
-		const QByteArray& tenantId,
-		const QString& tenantName,
-		imtauth::ITenantMembership::TenantMemberRole role) const;
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
+	virtual void OnComponentDestroyed() override;
 
-	/**
-	 * Publish a rejection notification to the inviter (tenant owner).
-	 * @param targetUserId  The owner/inviter who receives this notification
-	 * @param rejectingUserId  The user who rejected
-	 * @param membershipId  The membership ID
-	 * @param tenantId      The tenant ID
-	 * @param tenantName    Display name of the tenant
-	 * @param role          The role that was offered
-	 */
-	void PublishInvitationRejected(
-		const QByteArray& targetUserId,
-		const QByteArray& rejectingUserId,
-		const QByteArray& membershipId,
-		const QByteArray& tenantId,
-		const QString& tenantName,
-		imtauth::ITenantMembership::TenantMemberRole role) const;
+	// reimplemented (imod::CSingleModelObserverBase)
+	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
+
+protected:
+	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
+	I_REF(imod::IModel, m_membershipManagerModelCompPtr);
+	I_ATTR(QByteArray, m_commandIdAttrPtr);
 
 private:
+	struct CachedMembership
+	{
+		QByteArray userId;
+		QByteArray tenantId;
+		imtauth::ITenantMembership::TenantMemberRole role;
+		bool isActive;
+	};
+
 	void PublishNotification(
 		const QByteArray& targetUserId,
 		sdl::imtauth::TenantMemberships::EMembershipNotificationType notificationType,
@@ -89,6 +79,11 @@ private:
 		const QByteArray& tenantId,
 		const QString& tenantName,
 		imtauth::ITenantMembership::TenantMemberRole role) const;
+
+	QByteArray FindTenantOwnerUserId(const QByteArray& tenantId) const;
+
+	// Cache of membershipId → state for change detection.
+	mutable QMap<QByteArray, CachedMembership> m_cachedMemberships;
 };
 
 
