@@ -53,11 +53,6 @@ Item {
         if (groupsIndex >= 0){
             multiPageView.pagesModel.setProperty(groupsIndex, "name", qsTr("Groups"))
         }
-
-        let tenantsIndex = multiPageView.getIndexById("Tenants");
-        if (tenantsIndex >= 0){
-            multiPageView.pagesModel.setProperty(tenantsIndex, "name", qsTr("Tenants"))
-        }
     }
 
     Rectangle {
@@ -92,15 +87,6 @@ Item {
         }
     }
 
-    Component {
-        id: tenantCollectionComp;
-
-        TenantCollectionView {
-            productId: administrationContainer.productId;
-            documentManager: administrationContainer.documentManager;
-        }
-    }
-
     MultiPageView {
         id: multiPageView;
 
@@ -111,7 +97,7 @@ Item {
         
         NavigableItem {
             parentSegment: "Administration"
-            paths: ["Roles", "Users", "Groups", "Tenants"]
+            paths: ["Roles", "Users", "Groups"]
             onActivated: {
                 let index = paths.indexOf(matchedPath)
                 multiPageView.block = true
@@ -134,7 +120,6 @@ Item {
             MainDocumentManager.registerDocumentManager("Administration/Roles", administrationContainer.documentManager)
             MainDocumentManager.registerDocumentManager("Administration/Users", administrationContainer.documentManager)
             MainDocumentManager.registerDocumentManager("Administration/Groups", administrationContainer.documentManager)
-            MainDocumentManager.registerDocumentManager("Administration/Tenants", administrationContainer.documentManager)
             
             updateModel();
         }
@@ -175,14 +160,6 @@ Item {
             }
             else{
                 console.warn("Group collection cannot be displayed. Error: Permission denied");
-            }
-
-            ok = PermissionsController.checkPermission("ViewTenants");
-            if (ok){
-                multiPageView.addPage("Tenants", qsTr("Tenants"), tenantCollectionComp, "Icons/Organization");
-            }
-            else{
-                console.warn("Tenant collection cannot be displayed. Error: Permission denied");
             }
 
             multiPageView.currentIndex = 0;
