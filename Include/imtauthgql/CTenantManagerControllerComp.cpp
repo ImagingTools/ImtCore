@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CTenantManagerControllerComp.h>
 
+// Qt includes
+#include <QSet>
+#include <QMap>
+
 
 namespace imtauthgql
 {
@@ -77,6 +81,18 @@ sdl::imtauth::Tenants::CGetTenantPayload CTenantManagerControllerComp::OnGetTena
 	tenantData.name = tenantInfoPtr->GetTenantName();
 	tenantData.description = tenantInfoPtr->GetTenantDescription();
 	tenantData.isActive = tenantInfoPtr->IsActive();
+
+	// Populate memberIds from TenantMemberships
+	if (m_membershipManagerCompPtr.IsValid()){
+		QByteArrayList membershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
+		tenantData.memberIds.Emplace();
+		for (const QByteArray& msId : membershipIds){
+			const imtauth::ITenantMembership* msPtr = m_membershipManagerCompPtr->GetMembership(msId);
+			if (msPtr){
+				tenantData.memberIds->push_back(msPtr->GetUserId());
+			}
+		}
+	}
 
 	response.Version_1_0->tenant = tenantData;
 
@@ -181,6 +197,43 @@ sdl::imtauth::Tenants::CUpdateTenantPayload CTenantManagerControllerComp::OnUpda
 	}
 
 	bool success = m_tenantManagerCompPtr->UpdateTenant(tenantId, name, description);
+
+	// Sync memberIds with TenantMemberships
+	if (success && m_membershipManagerCompPtr.IsValid() && arguments.input.Version_1_0->memberIds){
+		const auto& newMemberIds = *arguments.input.Version_1_0->memberIds;
+
+		// Get current member user IDs
+		QByteArrayList currentMembershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
+		QSet<QByteArray> currentUserIds;
+		QMap<QByteArray, QByteArray> userIdToMembershipId; // userId -> membershipId
+		for (const QByteArray& msId : currentMembershipIds){
+			const imtauth::ITenantMembership* msPtr = m_membershipManagerCompPtr->GetMembership(msId);
+			if (msPtr){
+				currentUserIds.insert(msPtr->GetUserId());
+				userIdToMembershipId[msPtr->GetUserId()] = msId;
+			}
+		}
+
+		// Build new set
+		QSet<QByteArray> newUserIds;
+		for (const auto& uid : newMemberIds){
+			newUserIds.insert(uid);
+		}
+
+		// Remove memberships for users no longer in the list
+		for (const QByteArray& uid : currentUserIds){
+			if (!newUserIds.contains(uid)){
+				m_membershipManagerCompPtr->RemoveMembership(userIdToMembershipId[uid]);
+			}
+		}
+
+		// Add memberships for new users
+		for (const QByteArray& uid : newUserIds){
+			if (!currentUserIds.contains(uid)){
+				m_membershipManagerCompPtr->AddMembership(uid, tenantId, imtauth::ITenantMembership::TMR_MEMBER);
+			}
+		}
+	}
 
 	response.Version_1_0->success = success;
 	if (!success){

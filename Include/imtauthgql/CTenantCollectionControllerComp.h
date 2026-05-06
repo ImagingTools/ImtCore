@@ -4,6 +4,7 @@
 
 // ImtCore includes
 #include <imtauth/ITenantInfo.h>
+#include <imtauth/ITenantMembershipManager.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants.h>
 
 
@@ -17,6 +18,7 @@ public:
 	typedef sdl::imtauth::Tenants::CTenantCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CTenantCollectionControllerComp);
+		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager for member count", false, "MembershipManager");
 	I_END_COMPONENT;
 
 protected:
@@ -26,6 +28,9 @@ protected:
 				const sdl::imtauth::Tenants::CGetTenantListGqlRequest& getTenantListRequest,
 				sdl::imtauth::Tenants::CTenantItemData::V1_0& representationObject,
 				QString& errorMessage) const override;
+
+private:
+	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
 };
 
 

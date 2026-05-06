@@ -63,6 +63,11 @@ bool CTenantCollectionControllerComp::CreateRepresentationFromObject(
 		representationObject.updatedAt = tenantInfoPtr->GetUpdatedAt();
 	}
 
+	if (requestInfo.items.isMembersCountRequested && m_membershipManagerCompPtr.IsValid()){
+		QByteArrayList membershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(objectId);
+		representationObject.membersCount = membershipIds.size();
+	}
+
 	return true;
 }
 
