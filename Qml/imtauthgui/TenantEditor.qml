@@ -173,9 +173,6 @@ DocumentViewBase {
 						if (selName !== selId) container.__userNameCache[selId] = selName
 					}
 					container.pendingMembers = selectedItems
-				}
-
-				onPopupClosed: {
 					container.doUpdateModel()
 				}
 			}
