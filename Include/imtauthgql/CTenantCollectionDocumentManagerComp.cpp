@@ -57,7 +57,12 @@ sdl::imtauth::Tenants::CTenantData CTenantCollectionDocumentManagerComp::OnGetTe
 	sdl::imtauth::Tenants::CTenantData response;
 	response.Version_1_0.Emplace();
 
-	response.Version_1_0->id = tenantPtr->GetTenantId();
+	QByteArray tenantId = tenantPtr->GetTenantId();
+	if (tenantId.isEmpty()){
+		tenantId = objectId;
+	}
+
+	response.Version_1_0->id = tenantId;
 	response.Version_1_0->name = tenantPtr->GetTenantName();
 	response.Version_1_0->description = tenantPtr->GetTenantDescription();
 	response.Version_1_0->ownerId = tenantPtr->GetOwnerId();
@@ -65,7 +70,7 @@ sdl::imtauth::Tenants::CTenantData CTenantCollectionDocumentManagerComp::OnGetTe
 	response.Version_1_0->createdAt = tenantPtr->GetCreatedAt();
 	response.Version_1_0->updatedAt = tenantPtr->GetUpdatedAt();
 	if (m_membershipManagerCompPtr.IsValid()){
-		QByteArrayList membershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantPtr->GetTenantId());
+		QByteArrayList membershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
 		response.Version_1_0->memberIds.Emplace();
 		for (const QByteArray& membershipId : membershipIds){
 			const imtauth::ITenantMembership* membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
@@ -141,7 +146,12 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTenantCollect
 	}
 
 	if (tenantData.memberIds && m_membershipManagerCompPtr.IsValid()){
-		QByteArrayList currentMembershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantPtr->GetTenantId());
+		QByteArray tenantId = tenantPtr->GetTenantId();
+		if (tenantId.isEmpty()){
+			tenantId = documentId;
+		}
+
+		QByteArrayList currentMembershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
 		QMap<QByteArray, QByteArray> userIdToMembershipId;
 		QSet<QByteArray> currentUserIds;
 		for (const QByteArray& membershipId : currentMembershipIds){
@@ -165,7 +175,7 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTenantCollect
 
 		for (const QByteArray& userId : newUserIds){
 			if (!currentUserIds.contains(userId)){
-				m_membershipManagerCompPtr->InviteMembership(userId, tenantPtr->GetTenantId(), imtauth::ITenantMembership::TMR_MEMBER);
+				m_membershipManagerCompPtr->InviteMembership(userId, tenantId, imtauth::ITenantMembership::TMR_MEMBER);
 			}
 		}
 	}

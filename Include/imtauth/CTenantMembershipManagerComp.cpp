@@ -114,6 +114,12 @@ QByteArray CTenantMembershipManagerComp::AddMembership(const QByteArray& userId,
 		return QByteArray();
 	}
 
+	if (userId.isEmpty() || tenantId.isEmpty()){
+		SendErrorMessage(0, QString("Cannot add membership: userId or tenantId is empty (userId='%1', tenantId='%2')")
+			.arg(QString::fromUtf8(userId), QString::fromUtf8(tenantId)), "CTenantMembershipManagerComp");
+		return QByteArray();
+	}
+
 	// Check if membership already exists
 	if (FindMembership(userId, tenantId) != nullptr){
 		SendErrorMessage(0, QString("User '%1' is already a member of tenant '%2'")
