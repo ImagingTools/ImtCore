@@ -125,6 +125,16 @@ public:
 		Set active state of the membership.
 	*/
 	virtual void SetActive(bool isActive) = 0;
+
+	/**
+		Get the last update timestamp.
+	*/
+	virtual QString GetUpdatedAt() const = 0;
+
+	/**
+		Set the last update timestamp.
+	*/
+	virtual void SetUpdatedAt(const QString& updatedAt) = 0;
 };
 
 

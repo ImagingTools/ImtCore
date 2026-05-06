@@ -29,6 +29,8 @@ public:
 	virtual void SetJoinedAt(const QString& joinedAt) override;
 	virtual bool IsActive() const override;
 	virtual void SetActive(bool isActive) override;
+	virtual QString GetUpdatedAt() const override;
+	virtual void SetUpdatedAt(const QString& updatedAt) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -44,6 +46,7 @@ protected:
 	QByteArray m_tenantId;
 	TenantMemberRole m_role;
 	QString m_joinedAt;
+	QString m_updatedAt;
 	bool m_isActive;
 };
 

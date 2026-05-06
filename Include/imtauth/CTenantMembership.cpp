@@ -119,6 +119,22 @@ void CTenantMembership::SetActive(bool isActive)
 }
 
 
+QString CTenantMembership::GetUpdatedAt() const
+{
+	return m_updatedAt;
+}
+
+
+void CTenantMembership::SetUpdatedAt(const QString& updatedAt)
+{
+	if (m_updatedAt != updatedAt){
+		istd::CChangeNotifier notifier(this);
+
+		m_updatedAt = updatedAt;
+	}
+}
+
+
 // reimplemented (iser::ISerializable)
 
 bool CTenantMembership::Serialize(iser::IArchive& archive)
@@ -161,6 +177,11 @@ bool CTenantMembership::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_isActive);
 	retVal = retVal && archive.EndTag(isActiveTag);
 
+	iser::CArchiveTag updatedAtTag("UpdatedAt", "Updated at", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(updatedAtTag);
+	retVal = retVal && archive.Process(m_updatedAt);
+	retVal = retVal && archive.EndTag(updatedAtTag);
+
 	return retVal;
 }
 
@@ -178,6 +199,7 @@ bool CTenantMembership::CopyFrom(const IChangeable& object, CompatibilityMode /*
 		m_tenantId = sourcePtr->m_tenantId;
 		m_role = sourcePtr->m_role;
 		m_joinedAt = sourcePtr->m_joinedAt;
+		m_updatedAt = sourcePtr->m_updatedAt;
 		m_isActive = sourcePtr->m_isActive;
 
 		return true;
@@ -207,6 +229,7 @@ bool CTenantMembership::ResetData(CompatibilityMode /*mode*/)
 	m_tenantId.clear();
 	m_role = TMR_Member;
 	m_joinedAt.clear();
+	m_updatedAt.clear();
 	m_isActive = true;
 
 	return true;

@@ -104,6 +104,7 @@ sdl::imtauth::TenantMemberships::CGetMembershipPayload CTenantMembershipManagerC
 	membershipData.role = static_cast<sdl::imtauth::TenantMemberships::TenantMemberRole>(membershipPtr->GetRole());
 	membershipData.isActive = membershipPtr->IsActive();
 	membershipData.joinedAt = membershipPtr->GetJoinedAt();
+	membershipData.updatedAt = membershipPtr->GetUpdatedAt();
 
 	response.Version_1_0->membership = membershipData;
 
@@ -149,6 +150,7 @@ sdl::imtauth::TenantMemberships::CFindMembershipPayload CTenantMembershipManager
 	membershipData.role = static_cast<sdl::imtauth::TenantMemberships::TenantMemberRole>(membershipPtr->GetRole());
 	membershipData.isActive = membershipPtr->IsActive();
 	membershipData.joinedAt = membershipPtr->GetJoinedAt();
+	membershipData.updatedAt = membershipPtr->GetUpdatedAt();
 
 	response.Version_1_0->membership = membershipData;
 

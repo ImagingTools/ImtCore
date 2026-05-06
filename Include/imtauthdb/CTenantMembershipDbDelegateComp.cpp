@@ -64,6 +64,11 @@ istd::IChangeableUniquePtr CTenantMembershipDbDelegateComp::CreateObjectFromReco
 		QDateTime dt = val.toDateTime();
 		membershipPtr->SetJoinedAt(dt.isValid() ? dt.toString(Qt::ISODateWithMs) : val.toString());
 	}
+	if (record.contains("UpdatedAt")){
+		QVariant val = record.value("UpdatedAt");
+		QDateTime dt = val.toDateTime();
+		membershipPtr->SetUpdatedAt(dt.isValid() ? dt.toString(Qt::ISODateWithMs) : val.toString());
+	}
 
 	return membershipPtr;
 }
