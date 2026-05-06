@@ -18,6 +18,7 @@
         <Element ComponentName="SlaveSubscriberController" X="750" Y="775" Note=""/>
         <Element ComponentName="TenantCollectionChangeNotifier" X="275" Y="775" Note=""/>
         <Element ComponentName="TenantDocumentManager" X="200" Y="150" Note=""/>
+        <Element ComponentName="TenantDocumentNameProvider" X="475" Y="475" Note=""/>
         <Element ComponentName="TenantInfo" X="425" Y="600" Note=""/>
         <Element ComponentName="TenantManager" X="150" Y="600" Note=""/>
         <Element ComponentName="TenantManagerController" X="825" Y="425" Note=""/>

@@ -191,6 +191,14 @@ RemoteCollectionView {
 							typeId: "Tenant"
 						}
 					}
+					commandsPanelVisible: isNewTenant
+					onDocumentSaved: {
+						if (isNewTenant){
+							if (tenantEditor.representationController){
+								tenantEditor.representationController.updateRepresentationFromDocument()
+							}
+						}
+					}
 				}
 			}
 

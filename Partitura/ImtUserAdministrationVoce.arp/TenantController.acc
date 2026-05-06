@@ -98,6 +98,13 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
+                    <AttributeInfo Id="DocumentNameProviders" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>TenantDocumentNameProvider</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="IsSingleCopyMode" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="false"/>
                     </AttributeInfo>
@@ -326,6 +333,11 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="TenantDocumentNameProvider" PackageId="ImtAuthPck" ComponentId="TenantDocumentNameProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
             </Data>
         </Element>
         <Element Id="TenantInfo" PackageId="ImtAuthPck" ComponentId="TenantInfo">

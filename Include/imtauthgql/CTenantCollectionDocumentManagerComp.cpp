@@ -217,10 +217,13 @@ bool CTenantCollectionDocumentManagerComp::ProcessEvent(imtdoc::CEventBase* even
 		}
 
 		if (documentTicketPtr != nullptr){
-			documentTicketPtr->SetTenantId(objectId);
-
-			m_documentManagerCompPtr->SetDocumentData(userId, documentId, *documentPtr);
-			m_documentManagerCompPtr->SaveDocument(userId, documentId);
+			QByteArray tenantId = documentTicketPtr->GetTenantId();
+			if (tenantId.isEmpty()){
+				documentTicketPtr->SetTenantId(objectId);
+	
+				m_documentManagerCompPtr->SetDocumentData(userId, documentId, *documentPtr);
+				m_documentManagerCompPtr->SaveDocument(userId, documentId);
+			}
 		}
 	}
 
