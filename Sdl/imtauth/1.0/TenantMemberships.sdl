@@ -1,6 +1,7 @@
 schema {
 	query: Query
 	mutation: Mutation
+	subscription: Subscription
 	namespace: imtauth
 	version: 1.0
 }
@@ -177,4 +178,29 @@ type Mutation {
 	UpdateMembershipRole (input: UpdateMembershipRoleInput): UpdateMembershipRolePayload!
 	AcceptTenantMembershipInvitation (input: AcceptTenantMembershipInvitationInput): AcceptTenantMembershipInvitationPayload!
 	RejectTenantMembershipInvitation (input: RejectTenantMembershipInvitationInput): RejectTenantMembershipInvitationPayload!
+}
+
+# --- Subscriptions ---
+
+enum EMembershipNotificationType {
+	InvitationReceived
+	InvitationAccepted
+	InvitationRejected
+}
+
+type MembershipNotification {
+	notificationType: EMembershipNotificationType!
+	membershipId: ID!
+	userId: ID!
+	tenantId: ID!
+	tenantName: String
+	role: TenantMemberRole
+}
+
+input MembershipSubscriptionInput {
+	userId: ID!
+}
+
+type Subscription {
+	OnMembershipNotification(input: MembershipSubscriptionInput): MembershipNotification!
 }

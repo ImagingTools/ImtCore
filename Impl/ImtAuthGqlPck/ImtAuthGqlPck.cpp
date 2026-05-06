@@ -231,6 +231,11 @@ I_EXPORT_COMPONENT(
 			"GraphQL handler for tenant membership queries and mutations",
 			"Tenant Membership Manager Controller");
 
+I_EXPORT_COMPONENT(
+			TenantMembershipPublisher,
+			"Publisher for tenant membership invitation/response notifications via WebSocket",
+			"Tenant Membership Publisher");
+
 
 } // namespace ImtAuthGqlPck
 

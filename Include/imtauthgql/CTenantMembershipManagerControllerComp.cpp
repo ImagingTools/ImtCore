@@ -330,6 +330,12 @@ sdl::imtauth::TenantMemberships::CInviteTenantMemberPayload CTenantMembershipMan
 	}
 
 	response.Version_1_0->membershipId = membershipId;
+
+	// Publish invitation notification to invited user
+	if (m_publisherCompPtr.IsValid()){
+		m_publisherCompPtr->PublishInvitationReceived(userId, membershipId, tenantId, QString(), role);
+	}
+
 	return response;
 }
 
@@ -394,6 +400,25 @@ sdl::imtauth::TenantMemberships::CAcceptTenantMembershipInvitationPayload CTenan
 	if (!success){
 		response.Version_1_0->errorMessage = QStringLiteral("Failed to accept membership invitation");
 	}
+	else if (m_publisherCompPtr.IsValid()){
+		// Notify the tenant owner that user accepted
+		const imtauth::ITenantMembership* membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
+		if (membershipPtr != nullptr){
+			QByteArray tenantId = membershipPtr->GetTenantId();
+			QByteArray acceptingUserId = membershipPtr->GetUserId();
+			// Find owner of this tenant
+			QByteArrayList tenantMembers = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
+			for (const auto& mId : tenantMembers){
+				const imtauth::ITenantMembership* mPtr = m_membershipManagerCompPtr->GetMembership(mId);
+				if (mPtr != nullptr && mPtr->GetRole() == imtauth::ITenantMembership::TMR_OWNER){
+					m_publisherCompPtr->PublishInvitationAccepted(
+						mPtr->GetUserId(), acceptingUserId, membershipId,
+						tenantId, QString(), membershipPtr->GetRole());
+					break;
+				}
+			}
+		}
+	}
 
 	return response;
 }
@@ -419,10 +444,34 @@ sdl::imtauth::TenantMemberships::CRejectTenantMembershipInvitationPayload CTenan
 		membershipId = *arguments.input.Version_1_0->membershipId;
 	}
 
+	// Get membership info BEFORE rejection (since it may be removed after)
+	const imtauth::ITenantMembership* membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
+	QByteArray tenantId;
+	QByteArray rejectingUserId;
+	imtauth::ITenantMembership::TenantMemberRole role = imtauth::ITenantMembership::TMR_MEMBER;
+	if (membershipPtr != nullptr){
+		tenantId = membershipPtr->GetTenantId();
+		rejectingUserId = membershipPtr->GetUserId();
+		role = membershipPtr->GetRole();
+	}
+
 	bool success = m_membershipManagerCompPtr->RejectMembershipInvitation(membershipId);
 	response.Version_1_0->success = success;
 	if (!success){
 		response.Version_1_0->errorMessage = QStringLiteral("Failed to reject membership invitation");
+	}
+	else if (m_publisherCompPtr.IsValid() && !tenantId.isEmpty()){
+		// Notify the tenant owner that user rejected
+		QByteArrayList tenantMembers = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
+		for (const auto& mId : tenantMembers){
+			const imtauth::ITenantMembership* mPtr = m_membershipManagerCompPtr->GetMembership(mId);
+			if (mPtr != nullptr && mPtr->GetRole() == imtauth::ITenantMembership::TMR_OWNER){
+				m_publisherCompPtr->PublishInvitationRejected(
+					mPtr->GetUserId(), rejectingUserId, membershipId,
+					tenantId, QString(), role);
+				break;
+			}
+		}
 	}
 
 	return response;

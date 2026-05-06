@@ -37,6 +37,7 @@
 	<file alias="imtauthgui/TenantCollectionView.qml">TenantCollectionView.qml</file>
 	<file alias="imtauthgui/TenantEditor.qml">TenantEditor.qml</file>
 	<file alias="imtauthgui/ItemSelectElementView.qml">ItemSelectElementView.qml</file>
+	<file alias="imtauthgui/TenantMembershipSubscriptionClient.qml">TenantMembershipSubscriptionClient.qml</file>
         <file alias="imtauthgui/qmldir">qmldir</file>
     </qresource>
     <qresource prefix="/"/>
