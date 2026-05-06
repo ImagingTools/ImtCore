@@ -264,7 +264,7 @@ bool CRs256JwtTokenProviderComp::LoadPrivateKey()
 		return false;
 	}
 
-	QString keyPath = m_privateKeyPathCompPtr->GetFileName();
+	QString keyPath = m_privateKeyPathCompPtr->GetPath();
 	QFile keyFile(keyPath);
 	if (!keyFile.open(QFile::ReadOnly)){
 		SendErrorMessage(0, QString("Cannot open private key file: %1").arg(keyPath), "CRs256JwtTokenProviderComp");
