@@ -16,38 +16,6 @@ namespace imtauth
 
 
 /**
-	Defines the role of a user within a tenant (organization).
-	Analogous to GitHub's organization membership roles.
-*/
-enum TenantMemberRole
-{
-	/**
-		Full control over the tenant: settings, billing, members, teams.
-		Analogous to GitHub Organization Owner.
-	*/
-	TMR_Owner = 0,
-
-	/**
-		Can manage members, teams, and most settings but cannot delete the tenant.
-		Analogous to GitHub admin permissions at org level.
-	*/
-	TMR_Admin,
-
-	/**
-		Standard member with access determined by team assignments.
-		Analogous to GitHub Organization Member.
-	*/
-	TMR_Member,
-
-	/**
-		Limited access, read-only by default.
-		Analogous to GitHub outside collaborator with minimal permissions.
-	*/
-	TMR_Guest
-};
-
-
-/**
 	Interface describing a membership — the relationship between a User and a Tenant.
 	This is the missing entity that explicitly models "User X belongs to Tenant Y with Role Z".
 
@@ -57,6 +25,20 @@ enum TenantMemberRole
 class ITenantMembership: virtual public iser::IObject
 {
 public:
+	/**
+		Defines the role of a user within a tenant (organization).
+		Analogous to GitHub's organization membership roles.
+	*/
+	enum TenantMemberRole
+	{
+		TMR_OWNER,
+		TMR_ADMIN,
+		TMR_MEMBER,
+		TMR_GUEST
+	};
+
+	I_DECLARE_ENUM(TenantMemberRole, TMR_OWNER, TMR_ADMIN, TMR_MEMBER, TMR_GUEST);
+
 	enum MetaInfoTypes
 	{
 		MIT_MEMBERSHIP_ID = idoc::IDocumentMetaInfo::MIT_USER + 300,

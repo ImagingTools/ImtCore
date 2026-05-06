@@ -32,11 +32,11 @@ public:
 	virtual MembershipIds GetMembershipsByUser(const QByteArray& userId) const override;
 	virtual const ITenantMembership* GetMembership(const QByteArray& membershipId) const override;
 	virtual const ITenantMembership* FindMembership(const QByteArray& userId, const QByteArray& tenantId) const override;
-	virtual QByteArray AddMembership(const QByteArray& userId, const QByteArray& tenantId, TenantMemberRole role) override;
+	virtual QByteArray AddMembership(const QByteArray& userId, const QByteArray& tenantId, ITenantMembership::TenantMemberRole role) override;
 	virtual bool RemoveMembership(const QByteArray& membershipId) override;
-	virtual bool UpdateMembershipRole(const QByteArray& membershipId, TenantMemberRole newRole) override;
+	virtual bool UpdateMembershipRole(const QByteArray& membershipId, ITenantMembership::TenantMemberRole newRole) override;
 	virtual bool IsMember(const QByteArray& userId, const QByteArray& tenantId) const override;
-	virtual bool HasMinimumRole(const QByteArray& userId, const QByteArray& tenantId, TenantMemberRole minimumRole) const override;
+	virtual bool HasMinimumRole(const QByteArray& userId, const QByteArray& tenantId, ITenantMembership::TenantMemberRole minimumRole) const override;
 
 private:
 	I_REF(imtbase::IObjectCollection, m_membershipCollectionCompPtr);

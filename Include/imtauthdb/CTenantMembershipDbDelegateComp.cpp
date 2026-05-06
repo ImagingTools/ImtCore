@@ -54,7 +54,7 @@ istd::IChangeableUniquePtr CTenantMembershipDbDelegateComp::CreateObjectFromReco
 		membershipPtr->SetTenantId(record.value("TenantId").toByteArray());
 	}
 	if (record.contains("Role")){
-		membershipPtr->SetRole(static_cast<imtauth::TenantMemberRole>(record.value("Role").toInt()));
+		membershipPtr->SetRole(static_cast<imtauth::ITenantMembership::TenantMemberRole>(record.value("Role").toInt()));
 	}
 	if (record.contains("IsActive")){
 		membershipPtr->SetActive(record.value("IsActive").toBool());
@@ -96,7 +96,7 @@ CTenantMembershipDbDelegateComp::NewObjectQuery CTenantMembershipDbDelegateComp:
 
 	QString userId = membershipPtr != nullptr ? EscapeSql(QString::fromUtf8(membershipPtr->GetUserId())) : QString();
 	QString tenantId = membershipPtr != nullptr ? EscapeSql(QString::fromUtf8(membershipPtr->GetTenantId())) : QString();
-	int role = membershipPtr != nullptr ? static_cast<int>(membershipPtr->GetRole()) : static_cast<int>(imtauth::TMR_Member);
+	int role = membershipPtr != nullptr ? static_cast<int>(membershipPtr->GetRole()) : static_cast<int>(imtauth::ITenantMembership::TMR_MEMBER);
 	bool isActive = membershipPtr != nullptr ? membershipPtr->IsActive() : true;
 	QString now = UtcNow();
 

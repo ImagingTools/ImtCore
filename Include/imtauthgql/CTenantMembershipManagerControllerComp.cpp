@@ -212,9 +212,9 @@ sdl::imtauth::TenantMemberships::CHasMinimumRolePayload CTenantMembershipManager
 		tenantId = *arguments.input.Version_1_0->tenantId;
 	}
 
-	imtauth::TenantMemberRole minimumRole = imtauth::TMR_Member;
+	imtauth::ITenantMembership::TenantMemberRole minimumRole = imtauth::ITenantMembership::TMR_MEMBER;
 	if (arguments.input.Version_1_0->minimumRole){
-		minimumRole = static_cast<imtauth::TenantMemberRole>(*arguments.input.Version_1_0->minimumRole);
+		minimumRole = static_cast<imtauth::ITenantMembership::TenantMemberRole>(*arguments.input.Version_1_0->minimumRole);
 	}
 
 	response.Version_1_0->hasRole = m_membershipManagerCompPtr->HasMinimumRole(userId, tenantId, minimumRole);
@@ -239,7 +239,7 @@ sdl::imtauth::TenantMemberships::CAddMembershipPayload CTenantMembershipManagerC
 
 	QByteArray userId;
 	QByteArray tenantId;
-	imtauth::TenantMemberRole role = imtauth::TMR_Member;
+	imtauth::ITenantMembership::TenantMemberRole role = imtauth::ITenantMembership::TMR_MEMBER;
 	sdl::imtauth::TenantMemberships::AddMembershipRequestArguments arguments = request.GetRequestedArguments();
 	if (arguments.input.Version_1_0->userId){
 		userId = *arguments.input.Version_1_0->userId;
@@ -248,7 +248,7 @@ sdl::imtauth::TenantMemberships::CAddMembershipPayload CTenantMembershipManagerC
 		tenantId = *arguments.input.Version_1_0->tenantId;
 	}
 	if (arguments.input.Version_1_0->role){
-		role = static_cast<imtauth::TenantMemberRole>(*arguments.input.Version_1_0->role);
+		role = static_cast<imtauth::ITenantMembership::TenantMemberRole>(*arguments.input.Version_1_0->role);
 	}
 
 	QByteArray membershipId = m_membershipManagerCompPtr->AddMembership(userId, tenantId, role);
@@ -310,13 +310,13 @@ sdl::imtauth::TenantMemberships::CUpdateMembershipRolePayload CTenantMembershipM
 	response.Version_1_0.emplace();
 
 	QByteArray membershipId;
-	imtauth::TenantMemberRole role = imtauth::TMR_Member;
+	imtauth::ITenantMembership::TenantMemberRole role = imtauth::ITenantMembership::TMR_MEMBER;
 	sdl::imtauth::TenantMemberships::UpdateMembershipRoleRequestArguments arguments = request.GetRequestedArguments();
 	if (arguments.input.Version_1_0->membershipId){
 		membershipId = *arguments.input.Version_1_0->membershipId;
 	}
 	if (arguments.input.Version_1_0->role){
-		role = static_cast<imtauth::TenantMemberRole>(*arguments.input.Version_1_0->role);
+		role = static_cast<imtauth::ITenantMembership::TenantMemberRole>(*arguments.input.Version_1_0->role);
 	}
 
 	bool success = m_membershipManagerCompPtr->UpdateMembershipRole(membershipId, role);

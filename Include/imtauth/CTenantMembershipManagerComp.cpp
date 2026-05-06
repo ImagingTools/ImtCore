@@ -107,7 +107,7 @@ const ITenantMembership* CTenantMembershipManagerComp::FindMembership(const QByt
 }
 
 
-QByteArray CTenantMembershipManagerComp::AddMembership(const QByteArray& userId, const QByteArray& tenantId, TenantMemberRole role)
+QByteArray CTenantMembershipManagerComp::AddMembership(const QByteArray& userId, const QByteArray& tenantId, ITenantMembership::TenantMemberRole role)
 {
 	if (!m_membershipCollectionCompPtr.IsValid() || !m_membershipFactoryCompPtr.IsValid()){
 		SendErrorMessage(0, "Membership collection or factory not configured", "CTenantMembershipManagerComp");
@@ -173,7 +173,7 @@ bool CTenantMembershipManagerComp::RemoveMembership(const QByteArray& membership
 }
 
 
-bool CTenantMembershipManagerComp::UpdateMembershipRole(const QByteArray& membershipId, TenantMemberRole newRole)
+bool CTenantMembershipManagerComp::UpdateMembershipRole(const QByteArray& membershipId, ITenantMembership::TenantMemberRole newRole)
 {
 	if (!m_membershipCollectionCompPtr.IsValid()){
 		SendErrorMessage(0, "Membership collection not configured", "CTenantMembershipManagerComp");
@@ -213,7 +213,7 @@ bool CTenantMembershipManagerComp::IsMember(const QByteArray& userId, const QByt
 }
 
 
-bool CTenantMembershipManagerComp::HasMinimumRole(const QByteArray& userId, const QByteArray& tenantId, TenantMemberRole minimumRole) const
+bool CTenantMembershipManagerComp::HasMinimumRole(const QByteArray& userId, const QByteArray& tenantId, ITenantMembership::TenantMemberRole minimumRole) const
 {
 	const ITenantMembership* membershipPtr = FindMembership(userId, tenantId);
 	if (membershipPtr == nullptr){

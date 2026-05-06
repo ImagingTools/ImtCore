@@ -52,7 +52,7 @@ public:
 		Creates a new membership entity.
 		\return The ID of the newly created membership, or empty on failure.
 	*/
-	virtual QByteArray AddMembership(const QByteArray& userId, const QByteArray& tenantId, TenantMemberRole role) = 0;
+	virtual QByteArray AddMembership(const QByteArray& userId, const QByteArray& tenantId, ITenantMembership::TenantMemberRole role) = 0;
 
 	/**
 		Remove a membership (remove user from tenant).
@@ -64,7 +64,7 @@ public:
 		Update the role of an existing membership.
 		\return true if updated successfully.
 	*/
-	virtual bool UpdateMembershipRole(const QByteArray& membershipId, TenantMemberRole newRole) = 0;
+	virtual bool UpdateMembershipRole(const QByteArray& membershipId, ITenantMembership::TenantMemberRole newRole) = 0;
 
 	/**
 		Check if a user is a member of a specific tenant.
@@ -75,7 +75,7 @@ public:
 		Check if a user has at least the specified role in a tenant.
 		Role hierarchy: Owner > Admin > Member > Guest.
 	*/
-	virtual bool HasMinimumRole(const QByteArray& userId, const QByteArray& tenantId, TenantMemberRole minimumRole) const = 0;
+	virtual bool HasMinimumRole(const QByteArray& userId, const QByteArray& tenantId, ITenantMembership::TenantMemberRole minimumRole) const = 0;
 };
 
 

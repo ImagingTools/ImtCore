@@ -15,7 +15,7 @@ namespace imtauth
 // public methods
 
 CTenantMembership::CTenantMembership():
-	m_role(TMR_Member),
+	m_role(TMR_MEMBER),
 	m_isActive(true)
 {
 }
@@ -160,11 +160,7 @@ bool CTenantMembership::Serialize(iser::IArchive& archive)
 
 	iser::CArchiveTag roleTag("Role", "Role", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(roleTag);
-	int roleInt = static_cast<int>(m_role);
-	retVal = retVal && archive.Process(roleInt);
-	if (!archive.IsStoring()){
-		m_role = static_cast<TenantMemberRole>(roleInt);
-	}
+	retVal = retVal && I_SERIALIZE_ENUM(TenantMemberRole, archive, m_role);
 	retVal = retVal && archive.EndTag(roleTag);
 
 	iser::CArchiveTag joinedAtTag("JoinedAt", "Joined at", iser::CArchiveTag::TT_LEAF);
@@ -227,7 +223,7 @@ bool CTenantMembership::ResetData(CompatibilityMode /*mode*/)
 	m_membershipId.clear();
 	m_userId.clear();
 	m_tenantId.clear();
-	m_role = TMR_Member;
+	m_role = TMR_MEMBER;
 	m_joinedAt.clear();
 	m_updatedAt.clear();
 	m_isActive = true;
