@@ -23,18 +23,6 @@ namespace imtdeskdb
 {
 
 
-QString CSupportTicketDbDelegateComp::UtcNow() const
-{
-	return QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
-}
-
-QString CSupportTicketDbDelegateComp::EscapeSql(const QString& value) const
-{
-	QString escaped = value;
-	escaped.replace('\'', "''");
-	return escaped;
-}
-
 QString CSupportTicketDbDelegateComp::EscapeSqlLikePattern(const QString& value) const
 {
 	QString escaped = value;
@@ -61,12 +49,12 @@ QString CSupportTicketDbDelegateComp::CreateVisibilityCondition(
 		return QString();
 	}
 
-	const QString escapedUserId = EscapeSql(QString::fromUtf8(userId));
+	const QString escapedUserId = imtdb::EscapeSql(QString::fromUtf8(userId));
 	const QString escapedUserIdForLike = EscapeSqlLikePattern(QString::fromUtf8(userId));
 	const QString assigneeLikePattern = QString("%%,%1,%%").arg(escapedUserIdForLike);
 	QStringList escapedCurrentUserGroups;
 	for (const QByteArray& groupId : currentUserGroups){
-		const QString escapedGroupId = EscapeSql(QString::fromUtf8(groupId));
+		const QString escapedGroupId = imtdb::EscapeSql(QString::fromUtf8(groupId));
 		if (!escapedGroupId.isEmpty()){
 			escapedCurrentUserGroups << QString("'%1'").arg(escapedGroupId);
 		}
@@ -300,9 +288,9 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSupportTicketDbDelegateComp::Cre
 
 	const QString lockReasonSql = ticketPtr->GetLockReason().isEmpty()
 			? "NULL"
-			: QString("'%1'").arg(EscapeSql(ticketPtr->GetLockReason()));
+			: QString("'%1'").arg(imtdb::EscapeSql(ticketPtr->GetLockReason()));
 
-	const QString nowUtc = UtcNow();
+	const QString nowUtc = imtdb::UtcNow();
 
 	QString combinedQuery;
 
@@ -315,8 +303,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSupportTicketDbDelegateComp::Cre
 		"\"ResolvedAt\", \"ClosedAt\", \"CreatedAt\", \"UpdatedAt\") "
 		"VALUES('%1', '%2', '%3', %4, %5, %6, %7, %8, '%9', %10, %11, %12, %13, %14, %15, '%16', '%17');")
 		.arg(QString::fromUtf8(ticketId))
-		.arg(EscapeSql(title))
-		.arg(EscapeSql(ticketPtr->GetDescription()))
+		.arg(imtdb::EscapeSql(title))
+		.arg(imtdb::EscapeSql(ticketPtr->GetDescription()))
 		.arg(ticketPtr->GetTicketType())
 		.arg(ticketPtr->GetStatus())
 		.arg(ticketPtr->GetStateReason())
@@ -384,9 +372,9 @@ QByteArray CSupportTicketDbDelegateComp::CreateUpdateObjectQuery(
 
 	const QString lockReasonSql = ticketPtr->GetLockReason().isEmpty()
 			? "NULL"
-			: QString("'%1'").arg(EscapeSql(ticketPtr->GetLockReason()));
+			: QString("'%1'").arg(imtdb::EscapeSql(ticketPtr->GetLockReason()));
 
-	const QString nowUtc = UtcNow();
+	const QString nowUtc = imtdb::UtcNow();
 
 	QString combinedQuery;
 
@@ -407,8 +395,8 @@ QByteArray CSupportTicketDbDelegateComp::CreateUpdateObjectQuery(
 		"\"ClosedAt\"=%13, "
 		"\"UpdatedAt\"='%14' "
 		"WHERE \"Id\"='%15';")
-		.arg(EscapeSql(ticketPtr->GetTitle()))
-		.arg(EscapeSql(ticketPtr->GetDescription()))
+		.arg(imtdb::EscapeSql(ticketPtr->GetTitle()))
+		.arg(imtdb::EscapeSql(ticketPtr->GetDescription()))
 		.arg(ticketPtr->GetTicketType())
 		.arg(ticketPtr->GetStatus())
 		.arg(ticketPtr->GetStateReason())
@@ -488,8 +476,8 @@ QByteArray CSupportTicketDbDelegateComp::CreateRenameObjectQuery(
 	}
 
 	return QString("UPDATE \"Tickets\" SET \"Title\"='%1', \"UpdatedAt\"='%2' WHERE \"Id\"='%3';")
-		.arg(EscapeSql(newObjectName))
-		.arg(UtcNow())
+		.arg(imtdb::EscapeSql(newObjectName))
+		.arg(imtdb::UtcNow())
 		.arg(QString::fromUtf8(objectId))
 		.toUtf8();
 }
@@ -506,8 +494,8 @@ QByteArray CSupportTicketDbDelegateComp::CreateDescriptionObjectQuery(
 	}
 
 	return QString("UPDATE \"Tickets\" SET \"Description\"='%1', \"UpdatedAt\"='%2' WHERE \"Id\"='%3';")
-		.arg(EscapeSql(description))
-		.arg(UtcNow())
+		.arg(imtdb::EscapeSql(description))
+		.arg(imtdb::UtcNow())
 		.arg(QString::fromUtf8(objectId))
 		.toUtf8();
 }

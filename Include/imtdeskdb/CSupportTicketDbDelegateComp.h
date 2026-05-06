@@ -75,8 +75,6 @@ protected:
 	virtual bool SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const override;
 
 private:
-	QString UtcNow() const;
-	QString EscapeSql(const QString& value) const;
 	QString EscapeSqlLikePattern(const QString& value) const;
 	bool IsSqliteDatabase() const;
 	QString CreateVisibilityCondition(const QByteArray& userId, const QByteArrayList& currentUserGroups) const;

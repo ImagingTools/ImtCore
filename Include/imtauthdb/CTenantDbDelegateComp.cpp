@@ -17,20 +17,6 @@ namespace imtauthdb
 {
 
 
-QString CTenantDbDelegateComp::UtcNow() const
-{
-	return QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
-}
-
-
-QString CTenantDbDelegateComp::EscapeSql(const QString& value) const
-{
-	QString escaped = value;
-	escaped.replace('\'', "''");
-	return escaped;
-}
-
-
 istd::IChangeableUniquePtr CTenantDbDelegateComp::CreateObjectFromRecord(
 		const QSqlRecord& record,
 		const iprm::IParamsSet* /*dataConfigurationPtr*/) const
@@ -85,16 +71,16 @@ CTenantDbDelegateComp::NewObjectQuery CTenantDbDelegateComp::CreateNewObjectQuer
 
 	QString id;
 	if (!proposedObjectId.isEmpty()){
-		id = EscapeSql(QString::fromUtf8(proposedObjectId));
+		id = imtdb::EscapeSql(QString::fromUtf8(proposedObjectId));
 	}
 	else{
 		id = QUuid::createUuid().toString(QUuid::WithoutBraces);
 	}
 
-	QString name = EscapeSql(tenantPtr != nullptr ? tenantPtr->GetTenantName() : objectName);
-	QString description = EscapeSql(tenantPtr != nullptr ? tenantPtr->GetTenantDescription() : objectDescription);
+	QString name = imtdb::EscapeSql(tenantPtr != nullptr ? tenantPtr->GetTenantName() : objectName);
+	QString description = imtdb::EscapeSql(tenantPtr != nullptr ? tenantPtr->GetTenantDescription() : objectDescription);
 	bool isActive = tenantPtr != nullptr ? tenantPtr->IsActive() : true;
-	QString now = UtcNow();
+	QString now = imtdb::UtcNow();
 
 	result.query = QString(
 		"INSERT INTO \"%1\" (\"Id\", \"Name\", \"Description\", \"IsActive\", \"CreatedAt\", \"UpdatedAt\") "
@@ -123,8 +109,8 @@ QByteArray CTenantDbDelegateComp::CreateUpdateObjectQuery(
 		return QByteArray();
 	}
 
-	QString escapedId = EscapeSql(QString::fromUtf8(objectId));
-	QString now = UtcNow();
+	QString escapedId = imtdb::EscapeSql(QString::fromUtf8(objectId));
+	QString now = imtdb::UtcNow();
 
 	return QString(
 		"UPDATE \"%1\" SET "
@@ -134,8 +120,8 @@ QByteArray CTenantDbDelegateComp::CreateUpdateObjectQuery(
 		"\"UpdatedAt\"='%5' "
 		"WHERE \"Id\"='%6';")
 		.arg(*m_tableNameAttrPtr,
-			 EscapeSql(tenantPtr->GetTenantName()),
-			 EscapeSql(tenantPtr->GetTenantDescription()),
+			 imtdb::EscapeSql(tenantPtr->GetTenantName()),
+			 imtdb::EscapeSql(tenantPtr->GetTenantDescription()),
 			 tenantPtr->IsActive() ? "true" : "false",
 			 now,
 			 escapedId).toUtf8();
@@ -153,7 +139,7 @@ QByteArray CTenantDbDelegateComp::CreateDeleteObjectsQuery(
 
 	QStringList escapedIds;
 	for (const QByteArray& id : objectIds){
-		escapedIds << QString("'%1'").arg(EscapeSql(QString::fromUtf8(id)));
+		escapedIds << QString("'%1'").arg(imtdb::EscapeSql(QString::fromUtf8(id)));
 	}
 
 	return QString("DELETE FROM \"%1\" WHERE \"Id\" IN (%2);")
@@ -178,9 +164,9 @@ QByteArray CTenantDbDelegateComp::CreateRenameObjectQuery(
 {
 	return QString("UPDATE \"%1\" SET \"Name\"='%2', \"UpdatedAt\"='%3' WHERE \"Id\"='%4';")
 			.arg(*m_tableNameAttrPtr,
-				 EscapeSql(newObjectName),
-				 UtcNow(),
-				 EscapeSql(QString::fromUtf8(objectId))).toUtf8();
+				 imtdb::EscapeSql(newObjectName),
+				 imtdb::UtcNow(),
+				 imtdb::EscapeSql(QString::fromUtf8(objectId))).toUtf8();
 }
 
 
@@ -192,9 +178,9 @@ QByteArray CTenantDbDelegateComp::CreateDescriptionObjectQuery(
 {
 	return QString("UPDATE \"%1\" SET \"Description\"='%2', \"UpdatedAt\"='%3' WHERE \"Id\"='%4';")
 			.arg(*m_tableNameAttrPtr,
-				 EscapeSql(description),
-				 UtcNow(),
-				 EscapeSql(QString::fromUtf8(objectId))).toUtf8();
+				 imtdb::EscapeSql(description),
+				 imtdb::UtcNow(),
+				 imtdb::EscapeSql(QString::fromUtf8(objectId))).toUtf8();
 }
 
 

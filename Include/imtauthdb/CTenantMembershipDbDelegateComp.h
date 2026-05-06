@@ -64,9 +64,6 @@ protected:
 	virtual bool SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const override;
 
 private:
-	QString UtcNow() const;
-	QString EscapeSql(const QString& value) const;
-
 	I_FACT(imtauth::ITenantMembership, m_membershipFactCompPtr);
 };
 

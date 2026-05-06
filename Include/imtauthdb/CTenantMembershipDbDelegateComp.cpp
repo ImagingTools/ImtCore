@@ -17,20 +17,6 @@ namespace imtauthdb
 {
 
 
-QString CTenantMembershipDbDelegateComp::UtcNow() const
-{
-	return QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
-}
-
-
-QString CTenantMembershipDbDelegateComp::EscapeSql(const QString& value) const
-{
-	QString escaped = value;
-	escaped.replace('\'', "''");
-	return escaped;
-}
-
-
 istd::IChangeableUniquePtr CTenantMembershipDbDelegateComp::CreateObjectFromRecord(
 		const QSqlRecord& record,
 		const iprm::IParamsSet* /*dataConfigurationPtr*/) const
@@ -88,17 +74,17 @@ CTenantMembershipDbDelegateComp::NewObjectQuery CTenantMembershipDbDelegateComp:
 
 	QString id;
 	if (!proposedObjectId.isEmpty()){
-		id = EscapeSql(QString::fromUtf8(proposedObjectId));
+		id = imtdb::EscapeSql(QString::fromUtf8(proposedObjectId));
 	}
 	else{
 		id = QUuid::createUuid().toString(QUuid::WithoutBraces);
 	}
 
-	QString userId = membershipPtr != nullptr ? EscapeSql(QString::fromUtf8(membershipPtr->GetUserId())) : QString();
-	QString tenantId = membershipPtr != nullptr ? EscapeSql(QString::fromUtf8(membershipPtr->GetTenantId())) : QString();
+	QString userId = membershipPtr != nullptr ? imtdb::EscapeSql(QString::fromUtf8(membershipPtr->GetUserId())) : QString();
+	QString tenantId = membershipPtr != nullptr ? imtdb::EscapeSql(QString::fromUtf8(membershipPtr->GetTenantId())) : QString();
 	int role = membershipPtr != nullptr ? static_cast<int>(membershipPtr->GetRole()) : static_cast<int>(imtauth::ITenantMembership::TMR_MEMBER);
 	bool isActive = membershipPtr != nullptr ? membershipPtr->IsActive() : true;
-	QString now = UtcNow();
+	QString now = imtdb::UtcNow();
 
 	result.query = QString(
 		"INSERT INTO \"%1\" (\"Id\", \"UserId\", \"TenantId\", \"Role\", \"IsActive\", \"JoinedAt\", \"UpdatedAt\") "
@@ -128,8 +114,8 @@ QByteArray CTenantMembershipDbDelegateComp::CreateUpdateObjectQuery(
 		return QByteArray();
 	}
 
-	QString escapedId = EscapeSql(QString::fromUtf8(objectId));
-	QString now = UtcNow();
+	QString escapedId = imtdb::EscapeSql(QString::fromUtf8(objectId));
+	QString now = imtdb::UtcNow();
 
 	return QString(
 		"UPDATE \"%1\" SET "
@@ -156,7 +142,7 @@ QByteArray CTenantMembershipDbDelegateComp::CreateDeleteObjectsQuery(
 
 	QStringList escapedIds;
 	for (const QByteArray& id : objectIds){
-		escapedIds << QString("'%1'").arg(EscapeSql(QString::fromUtf8(id)));
+		escapedIds << QString("'%1'").arg(imtdb::EscapeSql(QString::fromUtf8(id)));
 	}
 
 	return QString("DELETE FROM \"%1\" WHERE \"Id\" IN (%2);")
