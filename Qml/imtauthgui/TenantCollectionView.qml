@@ -19,7 +19,6 @@ RemoteCollectionView {
 	collectionId: "Tenants"
 	gqlGetListCommandId: ImtauthTenantsSdlCommandIds.s_getTenantList
 	documentCollectionFilter: null
-	readonly property string currentUserFilterValue: "__CURRENT_USER__"
 
 	Component.onCompleted: {
 		table.setSortingInfo(TenantItemDataTypeMetaInfo.s_createdAt, "DESC")
@@ -155,20 +154,20 @@ RemoteCollectionView {
 			Component {
 				id: ownerFieldFilterComp
 				FieldFilter {
-					m_fieldId: "OwnerId"
+					m_fieldId: "TenantRelationScope"
 					m_filterValueType: "String"
 					m_filterOperations: ["Equal"]
-					m_filterValue: container.currentUserFilterValue
+					m_filterValue: "Owner"
 				}
 			}
 
 			Component {
 				id: memberFieldFilterComp
 				FieldFilter {
-					m_fieldId: "OwnerId"
+					m_fieldId: "TenantRelationScope"
 					m_filterValueType: "String"
-					m_filterOperations: ["Not", "Equal"]
-					m_filterValue: container.currentUserFilterValue
+					m_filterOperations: ["Equal"]
+					m_filterValue: "Member"
 				}
 			}
 		}

@@ -25,6 +25,14 @@ void ReplaceCurrentUserSentinel(imtbase::IComplexCollectionFilter::FilterExpress
 		if (fieldFilter.fieldId == "OwnerId" && fieldFilter.filterValue.toByteArray() == kCurrentUserFilterValue){
 			fieldFilter.filterValue = userId;
 		}
+		else if (fieldFilter.fieldId == "TenantRelationScope"){
+			QByteArray relationScope = fieldFilter.filterValue.toByteArray();
+			fieldFilter.fieldId = "OwnerId";
+			fieldFilter.filterValue = userId;
+			fieldFilter.filterOperation = relationScope == "Member"
+				? imtbase::IComplexCollectionFilter::FO_NOT_EQUAL
+				: imtbase::IComplexCollectionFilter::FO_EQUAL;
+		}
 	}
 
 	for (imtbase::IComplexCollectionFilter::FilterExpression& childExpression : expression.filterExpressions){
@@ -39,10 +47,6 @@ void AddVisibilityFilter(
 {
 	if (userId.isEmpty()){
 		complexFilter.AddFieldFilter(imtbase::IComplexCollectionFilter::FieldFilter("Id", kNoTenantAccessId));
-		complexFilter.AddFieldFilter(imtbase::IComplexCollectionFilter::FieldFilter(
-			"Id",
-			kNoTenantAccessId,
-			imtbase::IComplexCollectionFilter::FO_NOT_EQUAL));
 		return;
 	}
 
