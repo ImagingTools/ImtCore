@@ -17,6 +17,7 @@ namespace
 {
 
 static const QByteArray kCurrentUserFilterValue("__CURRENT_USER__");
+static const QByteArray kNoTenantAccessId("__NO_TENANT_ACCESS__");
 
 void ReplaceCurrentUserSentinel(imtbase::IComplexCollectionFilter::FilterExpression& expression, const QByteArray& userId)
 {
@@ -37,7 +38,11 @@ void AddVisibilityFilter(
 		const imtauth::ITenantMembershipManager* membershipManagerPtr)
 {
 	if (userId.isEmpty()){
-		complexFilter.AddFieldFilter(imtbase::IComplexCollectionFilter::FieldFilter("Id", QByteArray("__NO_TENANT_ACCESS__")));
+		complexFilter.AddFieldFilter(imtbase::IComplexCollectionFilter::FieldFilter("Id", kNoTenantAccessId));
+		complexFilter.AddFieldFilter(imtbase::IComplexCollectionFilter::FieldFilter(
+			"Id",
+			kNoTenantAccessId,
+			imtbase::IComplexCollectionFilter::FO_NOT_EQUAL));
 		return;
 	}
 
