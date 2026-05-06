@@ -24,9 +24,9 @@ ElementView {
 	// Text shown when no members
 	property string emptyText: qsTr("No members")
 
-	signal memberAdded(var userId, var userName)
 	signal memberRemoved(int index, var memberData)
 	signal selectionChanged(var selectedMembers)
+	signal popupClosed()
 
 	name: root.label
 
@@ -158,7 +158,7 @@ ElementView {
 			}
 
 			Component.onDestruction: {
-				// Notify parent that popup is closed
+				root.popupClosed()
 			}
 		}
 	}

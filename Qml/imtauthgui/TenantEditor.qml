@@ -182,7 +182,12 @@ DocumentViewBase {
 					}
 					container.pendingMembers = selectedMembers
 					container._membersChanged = true
-					container.__syncMemberships()
+				}
+
+				onPopupClosed: {
+					if (container._membersChanged) {
+						container.__syncMemberships()
+					}
 				}
 			}
 		}
