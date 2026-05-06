@@ -24,6 +24,11 @@ ElementView {
 	// Text shown when no members
 	property string emptyText: qsTr("No members")
 
+	// Chip colors (matching TicketEditor accent palette)
+	readonly property string accentColor: "#5b8fd6"
+	readonly property string accentBgLight: "#DFECF9"
+	readonly property string accentBorderLight: "#B4D3F2"
+
 	signal memberRemoved(int index, var memberData)
 	signal selectionChanged(var selectedMembers)
 	signal popupClosed()
@@ -37,7 +42,7 @@ ElementView {
 			text: "+ " + root.addButtonText
 			font.pixelSize: Style.fontSizeM
 			font.bold: true
-			color: Style.accentColor
+			color: root.accentColor
 
 			MouseArea {
 				anchors.fill: parent
@@ -81,8 +86,8 @@ ElementView {
 						width: Math.min(chipText.contentWidth + chipRemove.width + Style.paddingS * 3, 200)
 						height: 28
 						radius: 14
-						color: Qt.rgba(Style.accentColor.r, Style.accentColor.g, Style.accentColor.b, 0.1)
-						border.color: Qt.rgba(Style.accentColor.r, Style.accentColor.g, Style.accentColor.b, 0.3)
+						color: root.accentBgLight
+						border.color: root.accentBorderLight
 						border.width: 1
 
 						Text {
@@ -94,7 +99,7 @@ ElementView {
 							anchors.verticalCenter: parent.verticalCenter
 							text: modelData.name || modelData.id
 							font.pixelSize: Style.fontSizeM
-							color: Style.accentColor
+							color: root.accentColor
 							elide: Text.ElideRight
 							maximumLineCount: 1
 						}

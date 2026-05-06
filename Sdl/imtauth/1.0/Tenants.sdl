@@ -30,6 +30,7 @@ type TenantData {
 	isActive: Boolean
 	createdAt: String
 	updatedAt: String
+	memberIds: [ID]
 }
 
 input GetTenantListInput {

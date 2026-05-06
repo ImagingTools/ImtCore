@@ -7,7 +7,6 @@ import imtcontrols 1.0
 import imtdocgui 1.0
 import imtguigql 1.0
 import imtauthTenantsSdl 1.0
-import imtauthTenantMembershipsSdl 1.0
 
 DocumentViewBase {
 	id: container
@@ -17,47 +16,32 @@ DocumentViewBase {
 
 	property TenantData tenantData: model
 	property var pendingMembers: []
-	property var __originalMemberUserIds: []
 	property bool _membersChanged: false
 	property var __userNameCache: ({})
 
 	function updateGui(){
 		generalGroup.updateGui();
-		__loadMembers();
+		__loadMembersFromModel();
 	}
 
 	function updateModel(){
 		generalGroup.updateModel();
-	}
-
-	function __loadMembers() {
-		if (!container.tenantData || !container.tenantData.m_id)
-			return
-		getMembershipsByTenantInput.m_tenantId = container.tenantData.m_id
-		getMembershipsByTenantRequest.send(getMembershipsByTenantInput)
-	}
-
-	property GetMembershipsByTenantInput getMembershipsByTenantInput: GetMembershipsByTenantInput {}
-	property GqlSdlRequestSender getMembershipsByTenantRequest: GqlSdlRequestSender {
-		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_getMembershipsByTenant
-		sdlObjectComp: Component {
-			GetMembershipsByTenantPayload {
-				onFinished: {
-					if (m_errorMessage) return
-					var members = []
-					if (m_membershipIds) {
-						for (var i = 0; i < m_membershipIds.length; i++) {
-							var membershipId = m_membershipIds[i]
-							// Each entry stores membershipId for removal and uses it as display key
-							members.push({ membershipId: membershipId, id: membershipId, name: container.__userNameCache[membershipId] || membershipId })
-						}
-					}
-					container.pendingMembers = members
-					// Track original member IDs so sync only adds new ones
-					container.__originalMemberUserIds = members.map(function(m) { return m.membershipId })
-				}
-			}
+		// Sync memberIds back to model
+		if (container.tenantData) {
+			container.tenantData.m_memberIds = container.pendingMembers.map(function(m) { return m.id })
 		}
+	}
+
+	function __loadMembersFromModel() {
+		if (!container.tenantData)
+			return
+		var ids = container.tenantData.m_memberIds || []
+		var members = []
+		for (var i = 0; i < ids.length; i++) {
+			var uid = ids[i]
+			members.push({ id: uid, name: container.__userNameCache[uid] || uid })
+		}
+		container.pendingMembers = members
 	}
 
 	CustomScrollbar {
@@ -170,8 +154,11 @@ DocumentViewBase {
 				members: container.pendingMembers
 
 				onMemberRemoved: {
-					removeMembershipInput.m_membershipId = memberData.membershipId
-					removeMembershipRequest.send(removeMembershipInput)
+					var arr = container.pendingMembers.slice()
+					arr.splice(index, 1)
+					container.pendingMembers = arr
+					container._membersChanged = true
+					container.doUpdateModel()
 				}
 
 				onSelectionChanged: {
@@ -186,49 +173,8 @@ DocumentViewBase {
 
 				onPopupClosed: {
 					if (container._membersChanged) {
-						container.__syncMemberships()
+						container.doUpdateModel()
 					}
-				}
-			}
-		}
-	}
-
-	// Sync memberships: only add genuinely new members (not already in original list)
-	function __syncMemberships() {
-		if (!container.tenantData || !container.tenantData.m_id) return
-		for (var i = 0; i < pendingMembers.length; i++) {
-			var userId = pendingMembers[i].id
-			// Skip members that were already loaded from backend
-			if (container.__originalMemberUserIds.indexOf(userId) >= 0) continue
-			addMembershipInput.m_userId = userId
-			addMembershipInput.m_tenantId = container.tenantData.m_id
-			addMembershipInput.m_role = "Member"
-			addMembershipRequest.send(addMembershipInput)
-		}
-		container._membersChanged = false
-	}
-
-	property AddMembershipInput addMembershipInput: AddMembershipInput {}
-	property GqlSdlRequestSender addMembershipRequest: GqlSdlRequestSender {
-		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_addMembership
-		sdlObjectComp: Component {
-			AddMembershipPayload {
-				onFinished: {
-					// Refresh members list after adding
-					container.__loadMembers()
-				}
-			}
-		}
-	}
-
-	property RemoveMembershipInput removeMembershipInput: RemoveMembershipInput {}
-	property GqlSdlRequestSender removeMembershipRequest: GqlSdlRequestSender {
-		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_removeMembership
-		sdlObjectComp: Component {
-			RemoveMembershipPayload {
-				onFinished: {
-					// Refresh members list after removal
-					container.__loadMembers()
 				}
 			}
 		}
