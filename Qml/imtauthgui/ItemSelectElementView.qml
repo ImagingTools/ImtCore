@@ -20,7 +20,7 @@ ElementView {
 	// Placeholder for the filter popup
 	property string filterPlaceholder: qsTr("Type or choose an item")
 	// CollectionId for the data provider
-	property string collectionId: "Users"
+	property string collectionId: ""
 	// Text shown when no items selected
 	property string emptyText: qsTr("No items")
 
