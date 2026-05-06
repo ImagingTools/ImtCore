@@ -3,6 +3,7 @@
 
 
 // Qt includes
+#include <QtCore/QtGlobal>
 #if QT_VERSION < 0x060000
 #include <QtGui/QOpenGLBuffer>
 #else

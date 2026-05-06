@@ -5,6 +5,11 @@ include($(ACFCONFIGDIR)/QMake/QtGuiBaseConfig.pri)
 include($$PWD/../../../Config/QMake/ImtCore.pri)
 
 # Qt RHI widget (QRhiWidget) requires Qt >= 6.7; shader-tools for pre-compiled QSB.
+# opengl / openglwidgets are needed for QOpenGLBuffer, QOpenGLShaderProgram,
+# and QOpenGLWidget; the headers moved from QtGui to separate modules in Qt 6.
+greaterThan(QT_MAJOR_VERSION, 5) {
+    QT += opengl openglwidgets
+}
 QT += shadertools
 
 DESIGN_TOKEN_CREATOR_COMMAND_PARAM_IMAGES_INPUT_DIR = $$_PRO_FILE_/../../Resources/Icons/Template
