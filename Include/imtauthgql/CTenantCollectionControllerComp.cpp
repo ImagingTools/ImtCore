@@ -76,8 +76,8 @@ bool CTenantCollectionControllerComp::CreateRepresentationFromObject(
 		QByteArrayList membershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(objectId);
 		int activeMembersCount = 0;
 		for (const QByteArray& membershipId : membershipIds){
-			const imtauth::ITenantMembership* membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
-			if (membershipPtr != nullptr && membershipPtr->IsActive()){
+			imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
+			if (membershipPtr.IsValid() && membershipPtr->IsActive()){
 				++activeMembersCount;
 			}
 		}

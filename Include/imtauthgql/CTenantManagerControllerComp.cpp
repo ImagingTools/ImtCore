@@ -90,8 +90,8 @@ sdl::imtauth::Tenants::CGetTenantPayload CTenantManagerControllerComp::OnGetTena
 		QByteArrayList membershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
 		tenantData.memberIds.Emplace();
 		for (const QByteArray& msId : membershipIds){
-			const imtauth::ITenantMembership* msPtr = m_membershipManagerCompPtr->GetMembership(msId);
-			if (msPtr && msPtr->IsActive()){
+			imtauth::ITenantMembershipUniquePtr msPtr = m_membershipManagerCompPtr->GetMembership(msId);
+			if (msPtr.IsValid() && msPtr->IsActive()){
 				tenantData.memberIds->push_back(msPtr->GetUserId());
 			}
 		}
@@ -222,8 +222,8 @@ sdl::imtauth::Tenants::CUpdateTenantPayload CTenantManagerControllerComp::OnUpda
 		QSet<QByteArray> currentUserIds;
 		QMap<QByteArray, QByteArray> userIdToMembershipId; // userId -> membershipId
 		for (const QByteArray& msId : currentMembershipIds){
-			const imtauth::ITenantMembership* msPtr = m_membershipManagerCompPtr->GetMembership(msId);
-			if (msPtr){
+			imtauth::ITenantMembershipUniquePtr msPtr = m_membershipManagerCompPtr->GetMembership(msId);
+			if (msPtr.IsValid()){
 				currentUserIds.insert(msPtr->GetUserId());
 				userIdToMembershipId[msPtr->GetUserId()] = msId;
 			}

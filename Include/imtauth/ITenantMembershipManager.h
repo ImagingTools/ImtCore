@@ -37,15 +37,15 @@ public:
 
 	/**
 		Get a specific membership by ID.
-		\return Pointer to the membership object, or nullptr if not found.
+		\return UniquePtr to the membership object, or invalid ptr if not found.
 	*/
-	virtual const ITenantMembership* GetMembership(const QByteArray& membershipId) const = 0;
+	virtual ITenantMembershipUniquePtr GetMembership(const QByteArray& membershipId) const = 0;
 
 	/**
 		Find membership for a specific user in a specific tenant.
-		\return Pointer to the membership, or nullptr if the user is not a member of the tenant.
+		\return UniquePtr to the membership, or invalid ptr if the user is not a member of the tenant.
 	*/
-	virtual const ITenantMembership* FindMembership(const QByteArray& userId, const QByteArray& tenantId) const = 0;
+	virtual ITenantMembershipUniquePtr FindMembership(const QByteArray& userId, const QByteArray& tenantId) const = 0;
 
 	/**
 		Add a user to a tenant with the specified role.

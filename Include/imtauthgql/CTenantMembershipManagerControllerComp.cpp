@@ -90,9 +90,9 @@ sdl::imtauth::TenantMemberships::CGetMembershipPayload CTenantMembershipManagerC
 		membershipId = *arguments.input.Version_1_0->membershipId;
 	}
 
-	const imtauth::ITenantMembership* membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
+	imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
 
-	if (membershipPtr == nullptr){
+	if (!membershipPtr.IsValid()){
 		response.Version_1_0->errorMessage = QStringLiteral("Membership not found");
 		return response;
 	}
@@ -136,9 +136,9 @@ sdl::imtauth::TenantMemberships::CFindMembershipPayload CTenantMembershipManager
 		tenantId = *arguments.input.Version_1_0->tenantId;
 	}
 
-	const imtauth::ITenantMembership* membershipPtr = m_membershipManagerCompPtr->FindMembership(userId, tenantId);
+	imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->FindMembership(userId, tenantId);
 
-	if (membershipPtr == nullptr){
+	if (!membershipPtr.IsValid()){
 		response.Version_1_0->errorMessage = QStringLiteral("Membership not found");
 		return response;
 	}

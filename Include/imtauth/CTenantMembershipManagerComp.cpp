@@ -69,10 +69,10 @@ ITenantMembershipManager::MembershipIds CTenantMembershipManagerComp::GetMembers
 }
 
 
-const ITenantMembership* CTenantMembershipManagerComp::GetMembership(const QByteArray& membershipId) const
+ITenantMembershipUniquePtr CTenantMembershipManagerComp::GetMembership(const QByteArray& membershipId) const
 {
-	if (!m_membershipCollectionCompPtr.IsValid()){
-		SendErrorMessage(0, "Membership collection not configured", "CTenantMembershipManagerComp");
+	if (!m_membershipCollectionCompPtr.IsValid() || !m_membershipFactoryCompPtr.IsValid()){
+		SendErrorMessage(0, "Membership collection or factory not configured", "CTenantMembershipManagerComp");
 		return nullptr;
 	}
 
@@ -81,14 +81,28 @@ const ITenantMembership* CTenantMembershipManagerComp::GetMembership(const QByte
 		return nullptr;
 	}
 
-	return dynamic_cast<const ITenantMembership*>(dataPtr.GetPtr());
+	const ITenantMembership* membershipPtr = dynamic_cast<const ITenantMembership*>(dataPtr.GetPtr());
+	if (membershipPtr == nullptr){
+		return nullptr;
+	}
+
+	ITenantMembershipUniquePtr clonedMembership = m_membershipFactoryCompPtr.CreateInstance();
+	if (!clonedMembership.IsValid()){
+		return nullptr;
+	}
+
+	if (!clonedMembership->CopyFrom(*membershipPtr)){
+		return nullptr;
+	}
+
+	return clonedMembership;
 }
 
 
-const ITenantMembership* CTenantMembershipManagerComp::FindMembership(const QByteArray& userId, const QByteArray& tenantId) const
+ITenantMembershipUniquePtr CTenantMembershipManagerComp::FindMembership(const QByteArray& userId, const QByteArray& tenantId) const
 {
-	if (!m_membershipCollectionCompPtr.IsValid()){
-		SendErrorMessage(0, "Membership collection not configured", "CTenantMembershipManagerComp");
+	if (!m_membershipCollectionCompPtr.IsValid() || !m_membershipFactoryCompPtr.IsValid()){
+		SendErrorMessage(0, "Membership collection or factory not configured", "CTenantMembershipManagerComp");
 		return nullptr;
 	}
 
@@ -98,7 +112,11 @@ const ITenantMembership* CTenantMembershipManagerComp::FindMembership(const QByt
 		if (m_membershipCollectionCompPtr->GetObjectData(id, dataPtr)){
 			const ITenantMembership* membershipPtr = dynamic_cast<const ITenantMembership*>(dataPtr.GetPtr());
 			if (membershipPtr != nullptr && membershipPtr->GetUserId() == userId && membershipPtr->GetTenantId() == tenantId){
-				return membershipPtr;
+				ITenantMembershipUniquePtr clonedMembership = m_membershipFactoryCompPtr.CreateInstance();
+				if (clonedMembership.IsValid() && clonedMembership->CopyFrom(*membershipPtr)){
+					return clonedMembership;
+				}
+				return nullptr;
 			}
 		}
 	}
@@ -121,7 +139,7 @@ QByteArray CTenantMembershipManagerComp::AddMembership(const QByteArray& userId,
 	}
 
 	// Check if membership already exists
-	if (FindMembership(userId, tenantId) != nullptr){
+	if (FindMembership(userId, tenantId).IsValid()){
 		SendErrorMessage(0, QString("User '%1' is already a member of tenant '%2'")
 			.arg(QString::fromUtf8(userId), QString::fromUtf8(tenantId)), "CTenantMembershipManagerComp");
 		return QByteArray();
@@ -269,14 +287,14 @@ bool CTenantMembershipManagerComp::UpdateMembershipRole(const QByteArray& member
 
 bool CTenantMembershipManagerComp::IsMember(const QByteArray& userId, const QByteArray& tenantId) const
 {
-	return FindMembership(userId, tenantId) != nullptr;
+	return FindMembership(userId, tenantId).IsValid();
 }
 
 
 bool CTenantMembershipManagerComp::HasMinimumRole(const QByteArray& userId, const QByteArray& tenantId, ITenantMembership::TenantMemberRole minimumRole) const
 {
-	const ITenantMembership* membershipPtr = FindMembership(userId, tenantId);
-	if (membershipPtr == nullptr){
+	ITenantMembershipUniquePtr membershipPtr = FindMembership(userId, tenantId);
+	if (!membershipPtr.IsValid()){
 		return false;
 	}
 

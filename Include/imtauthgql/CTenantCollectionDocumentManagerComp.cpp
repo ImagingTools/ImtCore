@@ -75,8 +75,8 @@ sdl::imtauth::Tenants::CTenantData CTenantCollectionDocumentManagerComp::OnGetTe
 		QByteArrayList membershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
 		response.Version_1_0->memberIds.Emplace();
 		for (const QByteArray& membershipId : membershipIds){
-			const imtauth::ITenantMembership* membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
-			if (membershipPtr != nullptr && membershipPtr->IsActive()){
+			imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
+			if (membershipPtr.IsValid() && membershipPtr->IsActive()){
 				response.Version_1_0->memberIds->push_back(membershipPtr->GetUserId());
 			}
 		}
@@ -161,8 +161,8 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTenantCollect
 		QMap<QByteArray, QByteArray> userIdToMembershipId;
 		QSet<QByteArray> currentUserIds;
 		for (const QByteArray& membershipId : currentMembershipIds){
-			const imtauth::ITenantMembership* membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
-			if (membershipPtr != nullptr){
+			imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
+			if (membershipPtr.IsValid()){
 				currentUserIds.insert(membershipPtr->GetUserId());
 				userIdToMembershipId[membershipPtr->GetUserId()] = membershipId;
 			}

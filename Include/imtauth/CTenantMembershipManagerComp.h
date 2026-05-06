@@ -30,8 +30,8 @@ public:
 	// reimplemented (imtauth::ITenantMembershipManager)
 	virtual MembershipIds GetMembershipsByTenant(const QByteArray& tenantId) const override;
 	virtual MembershipIds GetMembershipsByUser(const QByteArray& userId) const override;
-	virtual const ITenantMembership* GetMembership(const QByteArray& membershipId) const override;
-	virtual const ITenantMembership* FindMembership(const QByteArray& userId, const QByteArray& tenantId) const override;
+	virtual ITenantMembershipUniquePtr GetMembership(const QByteArray& membershipId) const override;
+	virtual ITenantMembershipUniquePtr FindMembership(const QByteArray& userId, const QByteArray& tenantId) const override;
 	virtual QByteArray AddMembership(const QByteArray& userId, const QByteArray& tenantId, ITenantMembership::TenantMemberRole role) override;
 	virtual QByteArray InviteMembership(const QByteArray& userId, const QByteArray& tenantId, ITenantMembership::TenantMemberRole role) override;
 	virtual bool RemoveMembership(const QByteArray& membershipId) override;

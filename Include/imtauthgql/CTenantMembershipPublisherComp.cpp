@@ -83,8 +83,8 @@ void CTenantMembershipPublisherComp::OnUpdate(const istd::IChangeable::ChangeSet
 	// Check all previously known memberships for changes or removal.
 	for (auto it = m_cachedMemberships.constBegin(); it != m_cachedMemberships.constEnd(); ++it){
 		const QByteArray& membershipId = it.key();
-		const imtauth::ITenantMembership* membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
-		if (membershipPtr != nullptr){
+		imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
+		if (membershipPtr.IsValid()){
 			CachedMembership current;
 			current.userId = membershipPtr->GetUserId();
 			current.tenantId = membershipPtr->GetTenantId();
@@ -150,8 +150,8 @@ void CTenantMembershipPublisherComp::OnUpdate(const istd::IChangeable::ChangeSet
 		for (const QByteArray& membershipId : std::as_const(membershipIds)){
 			if (!m_cachedMemberships.contains(membershipId)){
 				// New membership detected.
-				const imtauth::ITenantMembership* membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
-				if (membershipPtr != nullptr){
+				imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
+				if (membershipPtr.IsValid()){
 					CachedMembership newEntry;
 					newEntry.userId = membershipPtr->GetUserId();
 					newEntry.tenantId = membershipPtr->GetTenantId();
@@ -233,8 +233,8 @@ QByteArray CTenantMembershipPublisherComp::FindTenantOwnerUserId(const QByteArra
 
 	QByteArrayList membershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
 	for (const QByteArray& mId : std::as_const(membershipIds)){
-		const imtauth::ITenantMembership* mPtr = m_membershipManagerCompPtr->GetMembership(mId);
-		if (mPtr != nullptr && mPtr->GetRole() == imtauth::ITenantMembership::TMR_OWNER){
+		imtauth::ITenantMembershipUniquePtr mPtr = m_membershipManagerCompPtr->GetMembership(mId);
+		if (mPtr.IsValid() && mPtr->GetRole() == imtauth::ITenantMembership::TMR_OWNER){
 			return mPtr->GetUserId();
 		}
 	}
