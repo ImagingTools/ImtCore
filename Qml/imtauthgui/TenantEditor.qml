@@ -18,6 +18,7 @@ DocumentViewBase {
 
 	property TenantData tenantData: model
 	property var pendingMembers: []
+	property var __originalMemberUserIds: []
 	property bool _membersChanged: false
 	property var __userNameCache: ({})
 
@@ -47,11 +48,14 @@ DocumentViewBase {
 					var members = []
 					if (m_membershipIds) {
 						for (var i = 0; i < m_membershipIds.length; i++) {
-							var mid = m_membershipIds[i]
-							members.push({ id: mid, name: container.__userNameCache[mid] || mid })
+							var membershipId = m_membershipIds[i]
+							// Each entry stores membershipId for removal and uses it as display key
+							members.push({ membershipId: membershipId, id: membershipId, name: container.__userNameCache[membershipId] || membershipId })
 						}
 					}
 					container.pendingMembers = members
+					// Track original member IDs so sync only adds new ones
+					container.__originalMemberUserIds = members.map(function(m) { return m.membershipId })
 				}
 			}
 		}
@@ -246,8 +250,8 @@ DocumentViewBase {
 											}
 										}
 										onClicked: {
-											// Remove membership via API
-											removeMembershipInput.m_membershipId = modelData.id
+											// Remove membership via API using the membershipId
+											removeMembershipInput.m_membershipId = modelData.membershipId
 											removeMembershipRequest.send(removeMembershipInput)
 										}
 									}
@@ -306,11 +310,14 @@ DocumentViewBase {
 		}
 	}
 
-	// Sync memberships: add new members via AddMembership mutation
+	// Sync memberships: only add genuinely new members (not already in original list)
 	function __syncMemberships() {
 		if (!container.tenantData || !container.tenantData.m_id) return
 		for (var i = 0; i < pendingMembers.length; i++) {
-			addMembershipInput.m_userId = pendingMembers[i].id
+			var userId = pendingMembers[i].id
+			// Skip members that were already loaded from backend
+			if (container.__originalMemberUserIds.indexOf(userId) >= 0) continue
+			addMembershipInput.m_userId = userId
 			addMembershipInput.m_tenantId = container.tenantData.m_id
 			addMembershipInput.m_role = "Member"
 			addMembershipRequest.send(addMembershipInput)
