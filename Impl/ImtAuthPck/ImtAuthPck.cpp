@@ -246,6 +246,17 @@ I_EXPORT_COMPONENT(
 			"Tenant Manager");
 
 
+I_EXPORT_COMPONENT(
+			TenantMembershipInfo,
+			"Tenant membership info",
+			"Tenant Membership Info");
+
+I_EXPORT_COMPONENT(
+			TenantMembershipManager,
+			"Tenant membership manager",
+			"Tenant Membership Manager");
+
+
 } // namespace ImtAuthPck
 
 

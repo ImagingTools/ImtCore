@@ -53,6 +53,8 @@
 #include <imtauth/CTenantInfoComp.h>
 #include <imtauth/CTenantMetaInfoCreatorComp.h>
 #include <imtauth/CTenantManagerComp.h>
+#include <imtauth/CTenantMembershipComp.h>
+#include <imtauth/CTenantMembershipManagerComp.h>
 
 
 namespace ImtAuthPck
@@ -145,6 +147,8 @@ typedef icomp::TModelCompWrap<imtauth::CUserRecentActionComp> UserRecentAction;
 typedef icomp::TModelCompWrap<imtauth::CTenantInfoComp> TenantInfo;
 typedef imtauth::CTenantMetaInfoCreatorComp TenantMetaInfoCreator;
 typedef imtauth::CTenantManagerComp TenantManager;
+typedef icomp::TModelCompWrap<imtauth::CTenantMembershipComp> TenantMembershipInfo;
+typedef imtauth::CTenantMembershipManagerComp TenantMembershipManager;
 
 
 } // namespace ImtAuthPck

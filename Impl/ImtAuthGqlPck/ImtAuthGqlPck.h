@@ -49,6 +49,7 @@
 #include <imtauthgql/CTenantCollectionDocumentManagerComp.h>
 #include <imtauthgql/CRemoteTenantControllerComp.h>
 #include <imtauthgql/CTenantManagerControllerComp.h>
+#include <imtauthgql/CTenantMembershipManagerControllerComp.h>
 
 
 /**
@@ -100,6 +101,7 @@ typedef imtauthgql::CTenantMetaInfoDelegateComp TenantMetaInfoDelegate;
 typedef imtauthgql::CTenantCollectionDocumentManagerComp TenantCollectionDocumentManager;
 typedef imtauthgql::CRemoteTenantControllerComp RemoteTenantController;
 typedef imtauthgql::CTenantManagerControllerComp TenantManagerController;
+typedef imtauthgql::CTenantMembershipManagerControllerComp TenantMembershipManagerController;
 
 
 } // namespace ImtAuthGqlPck

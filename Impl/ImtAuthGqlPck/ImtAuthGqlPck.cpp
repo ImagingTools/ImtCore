@@ -226,6 +226,12 @@ I_EXPORT_COMPONENT(
 			"Tenant Manager Controller");
 
 
+I_EXPORT_COMPONENT(
+			TenantMembershipManagerController,
+			"Tenant membership manager controller",
+			"Tenant Membership Manager Controller");
+
+
 } // namespace ImtAuthGqlPck
 
 

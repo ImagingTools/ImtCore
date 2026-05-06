@@ -86,6 +86,12 @@ I_EXPORT_COMPONENT(
 			"Tenant Database Delegate");
 
 
+I_EXPORT_COMPONENT(
+			TenantMembershipDatabaseDelegate,
+			"Tenant membership database delegate",
+			"Tenant Membership Database Delegate");
+
+
 } // namespace ImtAuthDbPck
 
 
