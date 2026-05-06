@@ -121,21 +121,6 @@ I_EXPORT_COMPONENT(
 			"SQL database transaction manager",
 			"SQL Database Transaction Manager");
 
-I_EXPORT_COMPONENT(
-			DirectTenantFilterStrategy,
-			"Direct tenant filter strategy - filters by TenantId column",
-			"Tenant Filter Strategy Direct");
-
-I_EXPORT_COMPONENT(
-			MembershipTenantFilterStrategy,
-			"Membership-based tenant filter strategy - filters through join table",
-			"Tenant Filter Strategy Membership");
-
-I_EXPORT_COMPONENT(
-			DocumentOwnerTenantFilterStrategy,
-			"Document-owner tenant filter strategy - filters by document owner's tenant",
-			"Tenant Filter Strategy Document Owner");
-
 
 } // namespace ImtDatabasePck
 
