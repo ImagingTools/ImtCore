@@ -2,12 +2,13 @@
 #include <imtauthgql/CTenantCollectionControllerComp.h>
 
 
-// ImtCore includes
-#include <imtauth/ITenantInfo.h>
-
 // ACF includes
 #include <iprm/CParamsSet.h>
 #include <iprm/CIdParam.h>
+
+// ImtCore includes
+#include <imtauth/ITenantInfo.h>
+#include <imtauth/imtauth.h>
 
 
 namespace imtauthgql
@@ -56,7 +57,7 @@ bool CTenantCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (requestInfo.items.isOwnerIdRequested){
-		representationObject.ownerId = tenantInfoPtr->GetOwnerId();
+		representationObject.ownerId = imtauth::GetUserName(*m_userCollectionCompPtr, tenantInfoPtr->GetOwnerId()).toUtf8();
 	}
 
 	if (requestInfo.items.isIsActiveRequested){

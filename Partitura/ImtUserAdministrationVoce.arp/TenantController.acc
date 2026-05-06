@@ -30,7 +30,7 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="NewCommandName" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="New Tenant"/>
+                        <Data IsEnabled="true" Value="New Organization"/>
                     </AttributeInfo>
                     <AttributeInfo Id="NewPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">

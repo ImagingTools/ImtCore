@@ -3,13 +3,8 @@
 
 
 // ImtCore includes
-#include <imtauth/ITenantInfo.h>
 #include <imtauth/ITenantMembershipManager.h>
-#include <imtgql/CGqlParamObject.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants.h>
-
-// ACF includes
-#include <iprm/CParamsSet.h>
 
 
 namespace imtauthgql
@@ -23,6 +18,7 @@ public:
 
 	I_BEGIN_COMPONENT(CTenantCollectionControllerComp);
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager for member count", false, "MembershipManager");
+		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "Collection of users", true, "UserCollection");
 	I_END_COMPONENT;
 
 protected:
@@ -39,6 +35,7 @@ protected:
 
 private:
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
+	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
 };
 
 
