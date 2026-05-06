@@ -2,9 +2,15 @@
     <qresource prefix="/SQL/Postgres">
         <file alias="CreatePersonalAccessTokenTable.sql">Resources/SQL/Postgres/CreatePersonalAccessTokenTable.sql</file>
 	<file alias="CreateUserSessionsTable.sql">Resources/SQL/Postgres/CreateUserSessionsTable.sql</file>
+	<file alias="CreateOidcClientsTable.sql">Resources/SQL/Postgres/CreateOidcClientsTable.sql</file>
+	<file alias="CreateOidcAuthCodesTable.sql">Resources/SQL/Postgres/CreateOidcAuthCodesTable.sql</file>
+	<file alias="CreateOidcTokensTable.sql">Resources/SQL/Postgres/CreateOidcTokensTable.sql</file>
     </qresource>
     <qresource prefix="/SQL/SQLite">
         <file alias="CreatePersonalAccessTokenTable.sql">Resources/SQL/SQLite/CreatePersonalAccessTokenTable.sql</file>
 	<file alias="CreateUserSessionsTable.sql">Resources/SQL/SQLite/CreateUserSessionsTable.sql</file>
+	<file alias="CreateOidcClientsTable.sql">Resources/SQL/SQLite/CreateOidcClientsTable.sql</file>
+	<file alias="CreateOidcAuthCodesTable.sql">Resources/SQL/SQLite/CreateOidcAuthCodesTable.sql</file>
+	<file alias="CreateOidcTokensTable.sql">Resources/SQL/SQLite/CreateOidcTokensTable.sql</file>
     </qresource>
 </RCC>

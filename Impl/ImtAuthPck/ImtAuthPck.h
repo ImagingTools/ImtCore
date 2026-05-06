@@ -50,6 +50,10 @@
 #include <imtauth/CPersonalAccessTokenManagerComp.h>
 #include <imtauth/CPersonalAccessTokenMetaInfoCreatorComp.h>
 #include <imtauth/CUserRecentActionComp.h>
+#include <imtauth/COidcClient.h>
+#include <imtauth/COidcAuthorizationCode.h>
+#include <imtauth/COidcTokenInfo.h>
+#include <imtauth/CRs256JwtTokenProviderComp.h>
 
 
 namespace ImtAuthPck
@@ -139,6 +143,25 @@ typedef icomp::TModelCompWrap<
 typedef imtauth::CPersonalAccessTokenManagerComp PersonalAccessTokenManager;
 typedef imtauth::CPersonalAccessTokenMetaInfoCreatorComp PersonalAccessTokenMetaInfoCreator;
 typedef icomp::TModelCompWrap<imtauth::CUserRecentActionComp> UserRecentAction;
+typedef icomp::TModelCompWrap<
+			icomp::TMakeComponentWrap <
+						imtauth::COidcClient,
+						imtauth::IOidcClient,
+						iser::ISerializable,
+						istd::IChangeable>> OidcClient;
+typedef icomp::TModelCompWrap<
+			icomp::TMakeComponentWrap <
+						imtauth::COidcAuthorizationCode,
+						imtauth::IOidcAuthorizationCode,
+						iser::ISerializable,
+						istd::IChangeable>> OidcAuthorizationCode;
+typedef icomp::TModelCompWrap<
+			icomp::TMakeComponentWrap <
+						imtauth::COidcTokenInfo,
+						imtauth::IOidcTokenInfo,
+						iser::ISerializable,
+						istd::IChangeable>> OidcTokenInfo;
+typedef imtauth::CRs256JwtTokenProviderComp Rs256JwtTokenProvider;
 
 
 } // namespace ImtAuthPck

@@ -230,6 +230,26 @@ I_EXPORT_COMPONENT(
 			"Personal access token meta info creator",
 			"Personal Access Token Meta Info Creator");
 
+I_EXPORT_COMPONENT(
+			OidcClient,
+			"OIDC client registration data",
+			"OIDC Client");
+
+I_EXPORT_COMPONENT(
+			OidcAuthorizationCode,
+			"OIDC authorization code",
+			"OIDC Authorization Code");
+
+I_EXPORT_COMPONENT(
+			OidcTokenInfo,
+			"OIDC token info",
+			"OIDC Token Info");
+
+I_EXPORT_COMPONENT(
+			Rs256JwtTokenProvider,
+			"RS256 JWT token provider for OIDC",
+			"RS256 JWT Token Provider OIDC");
+
 
 } // namespace ImtAuthPck
 

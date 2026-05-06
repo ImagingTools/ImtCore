@@ -80,6 +80,16 @@ I_EXPORT_COMPONENT(
 			"Personal access token database delegate",
 			"Personal Access Token Database Delegate");
 
+I_EXPORT_COMPONENT(
+			OidcClientDatabaseDelegate,
+			"OIDC client database delegate",
+			"OIDC Client Database Delegate");
+
+I_EXPORT_COMPONENT(
+			OidcTokenDatabaseDelegate,
+			"OIDC token database delegate",
+			"OIDC Token Database Delegate");
+
 
 } // namespace ImtAuthDbPck
 
