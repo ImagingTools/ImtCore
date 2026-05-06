@@ -46,6 +46,7 @@
                                 <Value>OnTenantsDocumentChanged</Value>
                                 <Value>OnTenantsUndoChanged</Value>
                                 <Value>OnTenantsCollectionChanged</Value>
+                                <Value>OnMembershipNotification</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

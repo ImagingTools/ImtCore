@@ -21,8 +21,8 @@ namespace imtauthgql
 
 bool CTenantMembershipPublisherComp::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
 {
-	if (m_commandIdAttrPtr.IsValid()){
-		QByteArray commandId = *m_commandIdAttrPtr;
+	if (m_commandIdsAttrPtr.IsValid()){
+		QByteArray commandId = m_commandIdsAttrPtr[0];
 		if (!commandId.isEmpty() && gqlRequest.GetCommandId() == commandId){
 			return true;
 		}
@@ -210,8 +210,8 @@ void CTenantMembershipPublisherComp::PublishNotification(
 	jsonDoc.setObject(jsonObject);
 	QByteArray data = jsonDoc.toJson(QJsonDocument::Compact);
 
-	const QByteArray commandId = m_commandIdAttrPtr.IsValid()
-			? *m_commandIdAttrPtr
+	const QByteArray commandId = m_commandIdsAttrPtr.IsValid() && m_commandIdsAttrPtr.GetCount() > 0
+			? m_commandIdsAttrPtr[0]
 			: QByteArray("OnMembershipNotification");
 
 	// Filter: only push to subscribers whose context userId matches targetUserId

@@ -277,6 +277,7 @@
                             <Values>
                                 <Value>CollectionDocumentManager</Value>
                                 <Value>TenantCollectionChangeNotifier</Value>
+                                <Value>TenantMembershipPublisher</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -379,6 +380,31 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="TenantMembershipPublisher" PackageId="ImtAuthGqlPck" ComponentId="TenantMembershipPublisher">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>OnMembershipNotification</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MembershipManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TenantMemberships"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -521,6 +547,7 @@
                 </ElementsList>
                 <EmbeddedRegistriesList/>
                 <ExportedInterfaces>
+                    <Interface InterfaceId="imod::IModel" ComponentId="TenantMembershipManager"/>
                     <Interface InterfaceId="imtauth::ITenantMembershipManager" ComponentId="TenantMembershipManager"/>
                 </ExportedInterfaces>
                 <ExportedComponents/>

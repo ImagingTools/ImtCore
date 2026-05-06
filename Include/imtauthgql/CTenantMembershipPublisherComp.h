@@ -43,7 +43,6 @@ public:
 	I_BEGIN_COMPONENT(CTenantMembershipPublisherComp);
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager to observe for changes", true, "TenantMembershipManager");
 		I_ASSIGN_TO(m_membershipManagerModelCompPtr, m_membershipManagerCompPtr, true);
-		I_ASSIGN(m_commandIdAttrPtr, "CommandId", "Subscription command-ID this notifier responds to", false, "OnMembershipNotification");
 	I_END_COMPONENT;
 
 protected:
@@ -60,7 +59,6 @@ protected:
 protected:
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
 	I_REF(imod::IModel, m_membershipManagerModelCompPtr);
-	I_ATTR(QByteArray, m_commandIdAttrPtr);
 
 private:
 	struct CachedMembership

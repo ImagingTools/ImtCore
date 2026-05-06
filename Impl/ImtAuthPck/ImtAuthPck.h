@@ -149,7 +149,7 @@ typedef icomp::TModelCompWrap<imtauth::CTenantInfoComp> TenantInfo;
 typedef imtauth::CTenantMetaInfoCreatorComp TenantMetaInfoCreator;
 typedef imtauth::CTenantManagerComp TenantManager;
 typedef icomp::TModelCompWrap<imtauth::CTenantMembershipComp> TenantMembershipInfo;
-typedef imtauth::CTenantMembershipManagerComp TenantMembershipManager;
+typedef icomp::TModelCompWrap<imtauth::CTenantMembershipManagerComp> TenantMembershipManager;
 typedef imtauth::CTenantDocumentNameProviderComp TenantDocumentNameProvider;
 
 
