@@ -21,7 +21,7 @@ class ListModel extends QtObject {
     })
 
     __views = []
-    __changeSet = []
+    // __changeSet = []
 
     SLOT_JQAbstractModelChanged(oldValue, newValue){
         // console.log('SLOT_JQAbstractModelChanged')
@@ -49,28 +49,35 @@ class ListModel extends QtObject {
         if(this.signalsBlocked()) return
         // this.dataChanged.blockSignal(false)
 
-        let changeSet = this.__changeSet
-        this.__changeSet = []
+        // let changeSet = this.__changeSet
+        // this.__changeSet = []
 
-        if(changeSet.length > 0){
-            let i = 0
-            while(i < changeSet.length - 1){
-                if(changeSet[i][0] === changeSet[i+1][0] && changeSet[i][1] === changeSet[i+1][1] && 
-                    (changeSet[i][2] === 'append' || changeSet[i][2] === 'insert') && changeSet[i+1][2] === 'remove'){
-                        changeSet.splice(i, 2)
-                } else {
-                    i++
-                }
-            }
-        }
+        // if(changeSet.length > 0){
+        //     let i = 0
+        //     while(i < changeSet.length - 1){
+        //         if(changeSet[i][0] === changeSet[i+1][0] && changeSet[i][1] === changeSet[i+1][1] && 
+        //             (changeSet[i][2] === 'append' || changeSet[i][2] === 'insert') && changeSet[i+1][2] === 'remove'){
+        //                 changeSet.splice(i, 2)
+        //         } else {
+        //             i++
+        //         }
+        //     }
+        // }
 
         for(let obj of this.__views){
             if(!(obj instanceof Repeater)) 
-                obj.__updateView(changeSet)
+                obj.__updateView()
         } 
 
         this.__proxy.dataChanged()
         super.__endUpdate()
+    }
+
+    __updateChangedSet(changeSet){
+        for(let obj of this.__views){
+            if(!(obj instanceof Repeater)) 
+                obj.__updateChangedSet(changeSet)
+        }
     }
 
     __updateRepeaters(changeSet){
@@ -94,7 +101,7 @@ class ListModel extends QtObject {
 
             JQApplication.updateLater(this)
             if(index < 0) {
-                this.__changeSet.push([this.data.length, this.data.length + 1, 'append'])
+                this.__updateChangedSet([this.data.length, this.data.length + 1, 'append'])
                 this.data.__push(child)
             }
             
@@ -112,14 +119,14 @@ class ListModel extends QtObject {
 				return
 
             changeSet = [this.data.length, this.data.length+dict.length, 'append']
-            this.__changeSet.push(changeSet)
+            this.__updateChangedSet(changeSet)
             for(let i = 0; i < dict.length; i++){
                 this.data.__push(AbstractItemModel.create(this, this.data.length, dict[i]))
             }
             
 		} else {
             changeSet = [this.data.length, this.data.length+1, 'append']
-            this.__changeSet.push(changeSet)
+            this.__updateChangedSet(changeSet)
             this.data.__push(AbstractItemModel.create(this, this.data.length, dict))
 		}
 
@@ -137,13 +144,13 @@ class ListModel extends QtObject {
 				return
 
             changeSet = [index, index+dict.length, 'insert']
-            this.__changeSet.push(changeSet)
+            this.__updateChangedSet(changeSet)
             for(let i = 0; i < dict.length; i++){
                 this.data.__splice(i+index, 0, AbstractItemModel.create(this, i+index, dict[i]))
             }
 		} else {
             changeSet = [index, index+1, 'insert']
-            this.__changeSet.push(changeSet)
+            this.__updateChangedSet(changeSet)
             this.data.__splice(index, 0, AbstractItemModel.create(this, index, dict))
 		}
 
@@ -169,7 +176,7 @@ class ListModel extends QtObject {
 
         let changeSet = [index, index+count, 'remove']
 
-        this.__changeSet.push(changeSet)
+        this.__updateChangedSet(changeSet)
         let removed = this.data.__splice(index, count)
 
         for(let r of removed){
