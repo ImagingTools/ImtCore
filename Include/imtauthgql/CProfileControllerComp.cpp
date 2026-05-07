@@ -62,7 +62,7 @@ sdl::imtauth::Profile::CProfileData CProfileControllerComp::OnGetProfile(
 	}
 
 	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
-	for (const imtauth::IUserInfo::SystemInfo& systemInfo : systemInfoList){
+	for (const imtauth::IUserInfo::SystemInfo& systemInfo : std::as_const(systemInfoList)){
 		if (systemInfo.enabled){
 			profileData.systemId = QByteArray(systemInfo.systemId);
 			break;
@@ -83,9 +83,9 @@ sdl::imtauth::Profile::CProfileData CProfileControllerComp::OnGetProfile(
 	imtsdl::TElementList<sdl::imtauth::Profile::CRoleInfo::V1_0> roleList;
 
 	if (m_roleCollectionCompPtr.IsValid()){
-		QByteArrayList roles = userInfoPtr->GetRoles(productId);
+		const QByteArrayList roles = userInfoPtr->GetRoles(productId);
 
-		for (const QByteArray& roleId : roles){
+		for (const QByteArray& roleId : std::as_const(roles)){
 			imtbase::IObjectCollection::DataPtr roleDataPtr;
 			if (m_roleCollectionCompPtr->GetObjectData(roleId, roleDataPtr)){
 				const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(roleDataPtr.GetPtr());
@@ -108,7 +108,7 @@ sdl::imtauth::Profile::CProfileData CProfileControllerComp::OnGetProfile(
 	if (m_groupCollectionCompPtr.IsValid()){
 		QByteArrayList groups = userInfoPtr->GetGroups();
 
-		for (const QByteArray& groupId : groups){
+		for (const QByteArray& groupId : std::as_const(groups)){
 			imtbase::IObjectCollection::DataPtr groupDataPtr;
 			if (m_groupCollectionCompPtr->GetObjectData(groupId, groupDataPtr)){
 				const imtauth::IUserGroupInfo* groupInfoPtr = dynamic_cast<const imtauth::IUserGroupInfo*>(groupDataPtr.GetPtr());
@@ -129,33 +129,11 @@ sdl::imtauth::Profile::CProfileData CProfileControllerComp::OnGetProfile(
 
 	imtsdl::TElementList<sdl::imtauth::Profile::CPermissionInfo::V1_0> permissionList;
 
-	if (m_productInfoCompPtr.IsValid()){
-		imtbase::IObjectCollection* featureCollectionPtr = m_productInfoCompPtr->GetFeatures();
-		if (featureCollectionPtr != nullptr){
-			QByteArrayList permissions = userInfoPtr->GetPermissions(productId);
-			for (imtbase::ICollectionInfo::Id& elementId : featureCollectionPtr->GetElementIds()){
-				imtbase::IObjectCollection::DataPtr permissionDataPtr;
-				if (featureCollectionPtr->GetObjectData(elementId, permissionDataPtr)){
-					const imtlic::IFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::IFeatureInfo*>(permissionDataPtr.GetPtr());
-					if (featureInfoPtr != nullptr){
-						for (imtbase::ICollectionInfo::Id& subFeatureId : featureInfoPtr->GetSubFeatureIds()){
-							if (permissions.contains(subFeatureId)){
-								imtlic::IFeatureInfoSharedPtr subFeatureInfoPtr = featureInfoPtr->GetSubFeature(subFeatureId);
-								if (subFeatureInfoPtr.IsValid()){
-									sdl::imtauth::Profile::CPermissionInfo::V1_0 info;
-
-									info.id = QByteArray(subFeatureInfoPtr->GetFeatureId());
-									info.name = QString(subFeatureInfoPtr->GetFeatureName());
-									info.description = QString(subFeatureInfoPtr->GetFeatureDescription());
-
-									permissionList << info;
-								}
-							}
-						}
-					}
-				}
-			}
-		}
+	QByteArrayList permissions = userInfoPtr->GetPermissions(productId);
+	for (const QByteArray& permissionId : std::as_const(permissions)){
+		sdl::imtauth::Profile::CPermissionInfo::V1_0 info;
+		info.id = permissionId;
+		permissionList << info;
 	}
 
 	profileData.permissions = std::move(permissionList);

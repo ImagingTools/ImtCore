@@ -239,7 +239,7 @@ ViewBase {
 			GroupElementView {
 				id: organizationsGroup;
 				width: parent.width;
-				visible: container.profileData ? container.profileData.m_organizations && container.profileData.m_organizations.elementsCount > 0 : false;
+				visible: container.profileData ? container.profileData.m_organizations && container.profileData.m_organizations.count > 0 : false;
 				
 				ElementView {
 					name: qsTr("Current");
@@ -265,13 +265,13 @@ ViewBase {
 							Repeater {
 								model: container.profileData ? container.profileData.m_organizations : null;
 								
-								Button {
+								delegate: Button {
 									width: Style.buttonWidthXXL;
 									height: Style.controlHeightM;
-									text: modelData.m_name || modelData.m_id;
-									enabled: modelData.m_id !== AuthorizationController.currentTenantId;
+									text: model.item.m_name || model.item.m_id;
+									enabled: model.item.m_id !== AuthorizationController.currentTenantId;
 									onClicked: {
-										AuthorizationController.selectTenant(modelData.m_id);
+										AuthorizationController.selectTenant(model.item.m_id);
 									}
 								}
 							}

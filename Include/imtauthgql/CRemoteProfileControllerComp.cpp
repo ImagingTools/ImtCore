@@ -32,8 +32,8 @@ sdl::imtauth::Profile::CProfileData CRemoteProfileControllerComp::OnGetProfile(
 			QByteArrayList permissions;
 			if (profileData.Version_1_0->permissions.has_value()){
 				for (const auto& permInfo : *profileData.Version_1_0->permissions){
-					if (permInfo.id){
-						permissions.append(*permInfo.id);
+					if (permInfo->id){
+						permissions.append(*permInfo->id);
 					}
 				}
 			}
