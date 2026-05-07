@@ -72,6 +72,7 @@ public:
 		I_ASSIGN(m_userActionManagerCompPtr, "UserActionManager", "User action manager", false, "UserActionManager");
 		I_ASSIGN(m_headersProviderCompPtr, "HeadersProvider", "Collection headers provider", false, "HeadersProvider");
 		I_ASSIGN(m_operationContextControllerCompPtr, "OperationContextController", "Operation context controller", false, "OperationContextController");
+		I_ASSIGN(m_tenantFilterEnabledAttrPtr, "TenantFilterEnabled", "Enable tenant filter param injection", false, false);
 		I_ASSIGN_MULTI_0(m_objectTypeIdAttrPtr, "ObjectTypeIds", "Object type IDs", false);
 		I_ASSIGN_MULTI_0(m_objectIconPathsAttrPtr, "ObjectIconPaths", "List of item paths related to object type-IDs", false);
 		I_ASSIGN_MULTI_0(m_objectFactCompPtr, "CollectionObjectFactory", "Collection object factories", false);
@@ -295,8 +296,7 @@ protected:
 
 	/**
 		Create an optional tenant filter param to be injected into filter params.
-		Override in subclasses to enable multi-tenant filtering for this collection.
-		Returns nullptr by default (no tenant filtering).
+		Returns nullptr when tenant filtering is disabled.
 		The returned pointer is owned by the caller (ParamsSet takes ownership).
 	*/
 	virtual imtdb::CTenantFilterParam* CreateTenantFilterParam(const imtgql::CGqlRequest& gqlRequest) const;
@@ -373,6 +373,7 @@ protected:
 	I_REF(imtcol::ICollectionHeadersProvider, m_headersProviderCompPtr);
 	I_REF(imtbase::IOperationContextController, m_operationContextControllerCompPtr);
 	I_REF(imtauth::IUserActionManager, m_userActionManagerCompPtr);
+	I_ATTR(bool, m_tenantFilterEnabledAttrPtr);
 
 	I_MULTIATTR(QByteArray, m_objectTypeIdAttrPtr);
 	I_MULTIATTR(QByteArray, m_objectIconPathsAttrPtr);
@@ -386,4 +387,3 @@ protected:
 
 
 } // namespace imtservergql
-

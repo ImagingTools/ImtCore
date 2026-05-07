@@ -2,189 +2,119 @@
 #include <imtdb/CTenantFilterParam.h>
 
 
+// ACF includes
+#include <iser/IArchive.h>
+#include <iser/CArchiveTag.h>
+#include <istd/CChangeNotifier.h>
+
+
 namespace imtdb
 {
 
 
 CTenantFilterParam::CTenantFilterParam()
-    : m_filterType(FT_DIRECT)
-    , m_directTenantIdColumn("TenantId")
-    , m_membershipTable("TenantMemberships")
-    , m_entityIdColumn("UserId")
-    , m_tenantIdColumn("TenantId")
-    , m_activeColumn("IsActive")
-    , m_ownerIdJsonPath("OwnerId")
-    , m_documentColumn("Document")
 {
 }
 
 
-// --- Factory methods ---
-
-CTenantFilterParam* CTenantFilterParam::CreateDirect(
-            const QByteArray& tenantId,
-            const QByteArray& tenantIdColumn)
-{
-    CTenantFilterParam* paramPtr = new CTenantFilterParam();
-    paramPtr->m_tenantId = tenantId;
-    paramPtr->m_filterType = FT_DIRECT;
-    paramPtr->m_directTenantIdColumn = tenantIdColumn;
-    return paramPtr;
-}
-
-
-CTenantFilterParam* CTenantFilterParam::CreateMembership(
-            const QByteArray& tenantId,
-            const QByteArray& membershipTable,
-            const QByteArray& entityIdColumn,
-            const QByteArray& tenantIdColumn,
-            const QByteArray& activeColumn)
-{
-    CTenantFilterParam* paramPtr = new CTenantFilterParam();
-    paramPtr->m_tenantId = tenantId;
-    paramPtr->m_filterType = FT_MEMBERSHIP;
-    paramPtr->m_membershipTable = membershipTable;
-    paramPtr->m_entityIdColumn = entityIdColumn;
-    paramPtr->m_tenantIdColumn = tenantIdColumn;
-    paramPtr->m_activeColumn = activeColumn;
-    return paramPtr;
-}
-
-
-CTenantFilterParam* CTenantFilterParam::CreateDocumentOwner(
-            const QByteArray& tenantId,
-            const QByteArray& membershipTable,
-            const QByteArray& ownerIdJsonPath,
-            const QByteArray& documentColumn)
-{
-    CTenantFilterParam* paramPtr = new CTenantFilterParam();
-    paramPtr->m_tenantId = tenantId;
-    paramPtr->m_filterType = FT_DOCUMENT_OWNER;
-    paramPtr->m_membershipTable = membershipTable;
-    paramPtr->m_ownerIdJsonPath = ownerIdJsonPath;
-    paramPtr->m_documentColumn = documentColumn;
-    return paramPtr;
-}
-
-
-// --- ITenantFilterParam implementation ---
+// reimplemented (imtdb::ITenantFilterParam)
 
 QByteArray CTenantFilterParam::GetTenantId() const
 {
     return m_tenantId;
 }
 
-ITenantFilterParam::FilterType CTenantFilterParam::GetFilterType() const
-{
-    return m_filterType;
-}
 
-QByteArray CTenantFilterParam::GetMembershipTable() const
+void CTenantFilterParam::SetTenantId(const QByteArray& tenantId)
 {
-    return m_membershipTable;
-}
+    if (m_tenantId != tenantId){
+        istd::CChangeNotifier notifier(this);
 
-QByteArray CTenantFilterParam::GetEntityIdColumn() const
-{
-    return m_entityIdColumn;
-}
-
-QByteArray CTenantFilterParam::GetTenantIdColumn() const
-{
-    return m_tenantIdColumn;
-}
-
-QByteArray CTenantFilterParam::GetActiveColumn() const
-{
-    return m_activeColumn;
-}
-
-QByteArray CTenantFilterParam::GetDirectTenantIdColumn() const
-{
-    return m_directTenantIdColumn;
-}
-
-QByteArray CTenantFilterParam::GetOwnerIdJsonPath() const
-{
-    return m_ownerIdJsonPath;
-}
-
-QByteArray CTenantFilterParam::GetDocumentColumn() const
-{
-    return m_documentColumn;
+        m_tenantId = tenantId;
+    }
 }
 
 
-// --- ISerializable ---
+QByteArray CTenantFilterParam::GetOwnerId() const
+{
+    return m_ownerId;
+}
+
+
+void CTenantFilterParam::SetOwnerId(const QByteArray& ownerId)
+{
+    if (m_ownerId != ownerId){
+        istd::CChangeNotifier notifier(this);
+
+        m_ownerId = ownerId;
+    }
+}
+
+
+// reimplemented (iser::ISerializable)
 
 bool CTenantFilterParam::Serialize(iser::IArchive& archive)
 {
-    archive.Serialize(m_tenantId, "TenantId", "Tenant ID");
+    istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
 
-    int filterType = static_cast<int>(m_filterType);
-    archive.Serialize(filterType, "FilterType", "Filter type");
-    m_filterType = static_cast<FilterType>(filterType);
+    bool retVal = true;
 
-    archive.Serialize(m_membershipTable, "MembershipTable", "Membership table name");
-    archive.Serialize(m_entityIdColumn, "EntityIdColumn", "Entity ID column");
-    archive.Serialize(m_tenantIdColumn, "TenantIdColumn", "Tenant ID column");
-    archive.Serialize(m_activeColumn, "ActiveColumn", "Active status column");
-    archive.Serialize(m_directTenantIdColumn, "DirectTenantIdColumn", "Direct TenantId column");
-    archive.Serialize(m_ownerIdJsonPath, "OwnerIdJsonPath", "Owner ID JSON path");
-    archive.Serialize(m_documentColumn, "DocumentColumn", "Document column");
+    iser::CArchiveTag tenantIdTag("TenantId", "Tenant ID", iser::CArchiveTag::TT_LEAF);
+    retVal = retVal && archive.BeginTag(tenantIdTag);
+    retVal = retVal && archive.Process(m_tenantId);
+    retVal = retVal && archive.EndTag(tenantIdTag);
 
-    return true;
+    iser::CArchiveTag ownerIdTag("OwnerId", "Owner ID", iser::CArchiveTag::TT_LEAF);
+    retVal = retVal && archive.BeginTag(ownerIdTag);
+    retVal = retVal && archive.Process(m_ownerId);
+    retVal = retVal && archive.EndTag(ownerIdTag);
+
+    return retVal;
 }
 
 
-// --- IChangeable ---
+// reimplemented (istd::IChangeable)
 
 int CTenantFilterParam::GetSupportedOperations() const
 {
-    return OnCopyFrom | OnClone | OnReset;
+    return SO_COPY | SO_CLONE | SO_RESET;
 }
 
 
 bool CTenantFilterParam::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
     const ITenantFilterParam* sourcePtr = dynamic_cast<const ITenantFilterParam*>(&object);
-    if (sourcePtr == nullptr){
-        return false;
+    if (sourcePtr != nullptr){
+        istd::CChangeNotifier notifier(this);
+
+        m_tenantId = sourcePtr->GetTenantId();
+        m_ownerId = sourcePtr->GetOwnerId();
+
+        return true;
     }
 
-    m_tenantId = sourcePtr->GetTenantId();
-    m_filterType = sourcePtr->GetFilterType();
-    m_membershipTable = sourcePtr->GetMembershipTable();
-    m_entityIdColumn = sourcePtr->GetEntityIdColumn();
-    m_tenantIdColumn = sourcePtr->GetTenantIdColumn();
-    m_activeColumn = sourcePtr->GetActiveColumn();
-    m_directTenantIdColumn = sourcePtr->GetDirectTenantIdColumn();
-    m_ownerIdJsonPath = sourcePtr->GetOwnerIdJsonPath();
-    m_documentColumn = sourcePtr->GetDocumentColumn();
-
-    return true;
+    return false;
 }
 
 
 istd::IChangeableUniquePtr CTenantFilterParam::CloneMe(CompatibilityMode mode) const
 {
-    CTenantFilterParam* clonePtr = new CTenantFilterParam();
-    clonePtr->CopyFrom(*this, mode);
-    return istd::IChangeableUniquePtr(clonePtr);
+    istd::IChangeableUniquePtr clonePtr(new CTenantFilterParam());
+    if (clonePtr->CopyFrom(*this, mode)){
+        return clonePtr;
+    }
+
+    return nullptr;
 }
 
 
 bool CTenantFilterParam::ResetData(CompatibilityMode /*mode*/)
 {
+    istd::CChangeNotifier notifier(this);
+
     m_tenantId.clear();
-    m_filterType = FT_DIRECT;
-    m_membershipTable = "TenantMemberships";
-    m_entityIdColumn = "UserId";
-    m_tenantIdColumn = "TenantId";
-    m_activeColumn = "IsActive";
-    m_directTenantIdColumn = "TenantId";
-    m_ownerIdJsonPath = "OwnerId";
-    m_documentColumn = "Document";
+    m_ownerId.clear();
+
     return true;
 }
 

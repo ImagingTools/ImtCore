@@ -2911,9 +2911,22 @@ void CObjectCollectionControllerCompBase::SetAdditionalFilters(
 
 
 imtdb::CTenantFilterParam* CObjectCollectionControllerCompBase::CreateTenantFilterParam(
-			const imtgql::CGqlRequest& /*gqlRequest*/) const
+			const imtgql::CGqlRequest& gqlRequest) const
 {
-	return nullptr;
+	if (!(*m_tenantFilterEnabledAttrPtr)){
+		return nullptr;
+	}
+
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr == nullptr){
+		return nullptr;
+	}
+
+	imtdb::CTenantFilterParam* tenantFilterPtr = new imtdb::CTenantFilterParam();
+	tenantFilterPtr->SetTenantId(gqlContextPtr->GetTenantId());
+	tenantFilterPtr->SetOwnerId(gqlContextPtr->GetUserId());
+
+	return tenantFilterPtr;
 }
 
 
@@ -3293,4 +3306,3 @@ bool CObjectCollectionControllerCompBase::CreateUserActionLog(
 
 
 } // namespace imtservergql
-
