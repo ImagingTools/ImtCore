@@ -61,6 +61,7 @@ DocumentViewBase {
 	// --- Member roles support ---
 	// Role options matching TenantMemberRole enum from TenantMemberships.sdl
 	readonly property var roleOptions: ["Owner", "Admin", "Member", "Guest"]
+	readonly property string defaultRole: "Member"
 
 	// Map of userId -> role string
 	property var __memberRolesMap: ({})
@@ -140,11 +141,11 @@ DocumentViewBase {
 			if (data && data.m_membership) {
 				var membership = data.m_membership
 				var rolesMap = container.__memberRolesMap
-				rolesMap[membership.m_userId] = membership.m_role || "Member"
+				rolesMap[membership.m_userId] = membership.m_role || container.defaultRole
 				container.__memberRolesMap = rolesMap
 			}
 			container.__pendingMembershipFetches--
-			if (container.__pendingMembershipFetches <= 0) {
+			if (container.__pendingMembershipFetches === 0) {
 				memberRolesRepeater.model = container.__buildMemberRolesModel()
 			}
 		}
@@ -152,6 +153,9 @@ DocumentViewBase {
 		function onError(message, type) {
 			container.__pendingMembershipFetches--
 			console.warn("GetMembership error:", message)
+			if (container.__pendingMembershipFetches === 0) {
+				memberRolesRepeater.model = container.__buildMemberRolesModel()
+			}
 		}
 	}
 
@@ -218,7 +222,7 @@ DocumentViewBase {
 		for (var i = 0; i < members.length; i++) {
 			var userId = members[i].id
 			var userName = members[i].name || userId
-			var role = container.__memberRolesMap[userId] || "Member"
+			var role = container.__memberRolesMap[userId] || container.defaultRole
 			result.push({ userId: userId, userName: userName, role: role })
 		}
 		return result
