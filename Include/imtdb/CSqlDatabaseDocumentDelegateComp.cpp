@@ -1288,7 +1288,27 @@ bool CSqlDatabaseDocumentDelegateComp::CreateFilterQuery(const iprm::IParamsSet&
 		documentFilterQuery = QString("root.\"%0\" = 'Active'").arg(QString::fromUtf8(s_stateColumn));
 	}
 
+	QString tenantFilterQuery;
+	if (paramIds.contains("TenantFilter")){
+		iprm::TParamsPtr<imtauth::ITenantFilterParam> tenantFilterPtr(&filterParams, "TenantFilter");
+		if (tenantFilterPtr.IsValid()){
+			QByteArray tenantId = tenantFilterPtr->GetTenantId();
+			if (!tenantId.isEmpty()){
+				QString escapedTenantId = SqlEncode(QString::fromUtf8(tenantId));
+				tenantFilterQuery = QString("root.\"TenantId\" = '%1'").arg(escapedTenantId);
+			}
+		}
+	}
+
 	QString additionalFilters = CreateAdditionalFiltersQuery(filterParams);
+
+	if (!tenantFilterQuery.isEmpty()){
+		if (!filterQuery.isEmpty()){
+			filterQuery += " AND ";
+		}
+
+		filterQuery += "(" + tenantFilterQuery + ")";
+	}
 
 	if (!objectTypeIdQuery.isEmpty()){
 		if (!filterQuery.isEmpty()){
@@ -1354,19 +1374,6 @@ bool CSqlDatabaseDocumentDelegateComp::CreateFilterQuery(const iprm::IParamsSet&
 
 QString CSqlDatabaseDocumentDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const
 {
-	iprm::IParamsSet::Ids paramIds = filterParams.GetParamIds();
-
-	if (paramIds.contains("TenantFilter")){
-		iprm::TParamsPtr<imtauth::ITenantFilterParam> tenantFilterPtr(&filterParams, "TenantFilter");
-		if (tenantFilterPtr.IsValid()){
-			QByteArray tenantId = tenantFilterPtr->GetTenantId();
-			if (!tenantId.isEmpty()){
-				QString escapedTenantId = SqlEncode(QString::fromUtf8(tenantId));
-				return QString("root.\"TenantId\" = '%1'").arg(escapedTenantId);
-			}
-		}
-	}
-
 	return QString();
 }
 
