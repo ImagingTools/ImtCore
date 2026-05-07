@@ -56,7 +56,7 @@ type CreateNewSessionPayload {
 }
 
 input SelectTenantInput {
-	tenantId: ID!
+	tenantId: ID
 }
 
 type SelectTenantPayload {

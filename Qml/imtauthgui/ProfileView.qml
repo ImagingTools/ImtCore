@@ -4,6 +4,7 @@ import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtguigql 1.0
 import imtcontrols 1.0
+import imtauthgui 1.0
 import imtauthProfileSdl 1.0
 
 ViewBase {
@@ -207,6 +208,76 @@ ViewBase {
 						onFinished: {
 							if (buttonId == Enums.save){
 								AuthorizationController.changePassword(container.profileData.m_username, contentItem.oldPassword, contentItem.newPassword);
+							}
+						}
+					}
+				}
+			}
+			
+			GroupHeaderView {
+				width: parent.width;
+				title: qsTr("Organizations");
+				groupView: organizationsGroup;
+				visible: organizationsGroup.visible;
+			}
+			
+			GroupElementView {
+				id: organizationsGroup;
+				width: parent.width;
+				visible: container.profileData ? container.profileData.m_organizations && container.profileData.m_organizations.elementsCount > 0 : false;
+				
+				ElementView {
+					name: qsTr("Current");
+					controlComp: Component {
+						Label {
+							text: {
+								if (!AuthorizationController.currentTenantId || AuthorizationController.currentTenantId === ""){
+									return qsTr("Default (No Organization)");
+								}
+								let orgs = container.profileData ? container.profileData.m_organizations : null;
+								if (orgs){
+									for (let i = 0; i < orgs.elementsCount; i++){
+										let org = orgs.element(i);
+										if (org && org.m_id === AuthorizationController.currentTenantId){
+											return org.m_name || org.m_id;
+										}
+									}
+								}
+								return AuthorizationController.currentTenantId;
+							}
+							color: Style.textColor;
+						}
+					}
+				}
+				
+				ElementView {
+					name: qsTr("Switch Organization");
+					controlComp: Component {
+						Column {
+							spacing: Style.marginS;
+							
+							Button {
+								width: Style.buttonWidthXXL;
+								height: Style.controlHeightM;
+								text: qsTr("Default (No Organization)");
+								enabled: AuthorizationController.currentTenantId !== "";
+								onClicked: {
+									AuthorizationController.selectTenant("");
+								}
+							}
+							
+							Repeater {
+								model: container.profileData ? container.profileData.m_organizations : null;
+								
+								Button {
+									width: Style.buttonWidthXXL;
+									height: Style.controlHeightM;
+									text: modelData.m_name || modelData.m_id;
+									enabled: modelData.m_id !== AuthorizationController.currentTenantId;
+									onClicked: {
+										AuthorizationController.selectTenant(modelData.m_id);
+									}
+								}
 							}
 						}
 					}

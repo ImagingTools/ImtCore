@@ -241,11 +241,13 @@ sdl::imtauth::Sessions::CSelectTenantPayload CGqlJwtSessionControllerComp::OnSel
 		tenantId = *arguments.input.Version_1_0->tenantId;
 	}
 
-	QString tenantError;
-	if (!CanUseTenant(userId, tenantId, tenantError)){
-		response.Version_1_0->ok = false;
-		response.Version_1_0->errorMessage = tenantError;
-		return response;
+	if (!tenantId.isEmpty()){
+		QString tenantError;
+		if (!CanUseTenant(userId, tenantId, tenantError)){
+			response.Version_1_0->ok = false;
+			response.Version_1_0->errorMessage = tenantError;
+			return response;
+		}
 	}
 
 	QByteArray oldSessionId;
