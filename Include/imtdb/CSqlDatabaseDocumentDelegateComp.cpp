@@ -26,6 +26,7 @@
 #include <imtdb/CComplexCollectionFilterConverter.h>
 #include <imtcol/IObjectTypeIdFilter.h>
 #include <imtbase/CComplexCollectionFilter.h>
+#include <imtauth/ITenantFilterParam.h>
 
 
 namespace imtdb
@@ -880,7 +881,15 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 
 	static const QString nullDataLiteral = QStringLiteral("NULL");
 
-	query += QString("INSERT INTO %0 \"%1\"(\"%2\", \"%3\", \"%4\", \"%5\", \"%6\", \"%7\", \"%8\", \"%9\", \"%10\", \"%11\") VALUES('%12', '%13', '%14', %15, %16, '%17', %18, %19, '%20', '%21');")
+	QString tenantIdValue = nullDataLiteral;
+	if (operationContextPtr != nullptr){
+		QByteArray tenantId = operationContextPtr->GetTenantId();
+		if (!tenantId.isEmpty()){
+			tenantIdValue = QString("'%1'").arg(SqlEncode(QString::fromUtf8(tenantId)));
+		}
+	}
+
+	query += QString("INSERT INTO %0 \"%1\"(\"%2\", \"%3\", \"%4\", \"%5\", \"%6\", \"%7\", \"%8\", \"%9\", \"%10\", \"%11\", \"TenantId\") VALUES('%12', '%13', '%14', %15, %16, '%17', %18, %19, '%20', '%21', %22);")
 				.arg(
 						schemaPrefix,
 						qPrintable(*m_tableNameAttrPtr),
@@ -903,7 +912,8 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 						metaInfoRepresentation.isEmpty() ? nullDataLiteral : SqlEncode(metaInfoRepresentation).append('\'').prepend('\''),
 						revisionInfoQuery.isEmpty() ? nullDataLiteral : revisionInfoQuery,
 						QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs),
-						QStringLiteral("Active")
+						QStringLiteral("Active"),
+						tenantIdValue
 					);
 
 	retVal = query.toUtf8();
@@ -1339,6 +1349,25 @@ bool CSqlDatabaseDocumentDelegateComp::CreateFilterQuery(const iprm::IParamsSet&
 	filterQuery = " WHERE " + filterQuery;
 
 	return true;
+}
+
+
+QString CSqlDatabaseDocumentDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const
+{
+	iprm::IParamsSet::Ids paramIds = filterParams.GetParamIds();
+
+	if (paramIds.contains("TenantFilter")){
+		iprm::TParamsPtr<imtauth::ITenantFilterParam> tenantFilterPtr(&filterParams, "TenantFilter");
+		if (tenantFilterPtr.IsValid()){
+			QByteArray tenantId = tenantFilterPtr->GetTenantId();
+			if (!tenantId.isEmpty()){
+				QString escapedTenantId = SqlEncode(QString::fromUtf8(tenantId));
+				return QString("root.\"TenantId\" = '%1'").arg(escapedTenantId);
+			}
+		}
+	}
+
+	return QString();
 }
 
 

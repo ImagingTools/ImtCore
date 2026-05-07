@@ -92,6 +92,11 @@ I_EXPORT_COMPONENT(
 			"ObjectCollection Migration Controller");
 
 I_EXPORT_COMPONENT(
+			TenantIdMigrationController,
+			"TenantId migration controller",
+			"TenantId Migration Controller Add Column");
+
+I_EXPORT_COMPONENT(
 			DatabaseConnector,
 			"Database connector",
 			"Database Connector");

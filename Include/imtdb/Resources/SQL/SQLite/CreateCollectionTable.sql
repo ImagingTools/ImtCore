@@ -10,5 +10,6 @@ CREATE TABLE IF NOT EXISTS "${TableName}"
     "DataMetaInfo" TEXT,
     "Derivates" TEXT,
     "TimeStamp" TEXT NOT NULL, -- UTC Time
-    "State" TEXT
+    "State" TEXT,
+    "TenantId" TEXT -- optional, multi-tenant support
 );
