@@ -48,6 +48,7 @@
 #include <imtauthgql/CTenantMetaInfoDelegateComp.h>
 #include <imtauthgql/CTenantCollectionDocumentManagerComp.h>
 #include <imtauthgql/CRemoteProfileControllerComp.h>
+#include <imtauthgql/CJwtSessionControllerProxyComp.h>
 #include <imtauthgql/CRemoteTenantControllerComp.h>
 #include <imtauthgql/CTenantManagerControllerComp.h>
 #include <imtauthgql/CTenantMembershipManagerControllerComp.h>
@@ -102,6 +103,7 @@ typedef imtauthgql::CTenantCollectionControllerComp TenantCollectionController;
 typedef imtauthgql::CTenantMetaInfoDelegateComp TenantMetaInfoDelegate;
 typedef imtauthgql::CTenantCollectionDocumentManagerComp TenantCollectionDocumentManager;
 typedef imtauthgql::CRemoteProfileControllerComp RemoteProfileController;
+typedef imtauthgql::CJwtSessionControllerProxyComp JwtSessionControllerProxy;
 typedef imtauthgql::CRemoteTenantControllerComp RemoteTenantController;
 typedef imtauthgql::CTenantManagerControllerComp TenantManagerController;
 typedef imtauthgql::CTenantMembershipManagerControllerComp TenantMembershipManagerController;

@@ -226,6 +226,11 @@ I_EXPORT_COMPONENT(
 			"Remote Profile Controller");
 
 I_EXPORT_COMPONENT(
+			JwtSessionControllerProxy,
+			"JWT session controller proxy",
+			"JWT Session Controller Proxy");
+
+I_EXPORT_COMPONENT(
 			TenantManagerController,
 			"Tenant manager controller",
 			"Tenant Manager Controller");
