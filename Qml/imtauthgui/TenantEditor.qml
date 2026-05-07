@@ -27,9 +27,10 @@ DocumentViewBase {
 
 	function updateModel(){
 		generalGroup.updateModel();
-		// Sync memberIds back to model
+		// Sync memberIds and memberRoles back to model
 		if (container.tenantData) {
 			container.tenantData.m_memberIds = __pendingMemberIds()
+			container.tenantData.m_memberRoles = __buildMemberRolesForModel()
 		}
 	}
 
@@ -53,167 +54,38 @@ DocumentViewBase {
 			members.push({ id: ids[i], name: ids[i] })
 		}
 		container.pendingMembers = members
-		if (!container.isNewTenant && ids.length > 0) {
-			__fetchMemberRoles()
-		}
+		__loadMemberRolesFromModel()
 	}
 
 	// --- Member roles support ---
-	// Role options matching TenantMemberRole enum from TenantMemberships.sdl
+	// Static role options matching TenantMemberRole enum
 	readonly property var roleOptions: ["Owner", "Admin", "Member", "Guest"]
 	readonly property string defaultRole: "Member"
 
-	// Map of userId -> role string
+	// Map of userId -> role string (built from TenantData.memberRoles)
 	property var __memberRolesMap: ({})
-	// Flag to prevent re-entrant fetches
-	property bool __fetchingRoles: false
 
-	function __fetchMemberRoles() {
-		if (container.__fetchingRoles || !container.tenantData || !container.tenantData.m_id)
-			return
-		container.__fetchingRoles = true
-		getMembershipsByTenantSender.send()
+	function __loadMemberRolesFromModel() {
+		var rolesMap = {}
+		if (container.tenantData && container.tenantData.m_memberRoles) {
+			var roleEntries = container.tenantData.m_memberRoles
+			for (var i = 0; i < roleEntries.length; i++) {
+				var entry = roleEntries[i]
+				if (entry && entry.m_userId) {
+					rolesMap[entry.m_userId] = entry.m_role || container.defaultRole
+				}
+			}
+		}
+		container.__memberRolesMap = rolesMap
+		memberRolesRepeater.model = container.__buildMemberRolesModel()
 	}
 
 	function __updateMemberRole(userId, newRole) {
-		// First find the membership, then update its role
-		findMembershipInput_userId = userId
-		findMembershipInput_newRole = newRole
-		findMembershipSender.send()
-	}
-
-	property string findMembershipInput_userId: ""
-	property string findMembershipInput_newRole: ""
-
-	// GQL: GetMembershipsByTenant - fetches all membership IDs for this tenant
-	GqlRequestSender {
-		id: getMembershipsByTenantSender
-		requestType: 0 // Query
-		gqlCommandId: "GetMembershipsByTenant"
-
-		function createQueryParams(query) {
-			var inputParams = Gql.GqlObject("input")
-			inputParams.InsertField("tenantId", container.tenantData ? container.tenantData.m_id : "")
-			query.AddParam(inputParams)
-		}
-
-		function onResult(data) {
-			container.__fetchingRoles = false
-			if (!data)
-				return
-			var membershipIds = data.m_membershipIds || []
-			// Fetch each membership to get userId→role mapping
-			container.__pendingMembershipFetches = membershipIds.length
-			container.__memberRolesMap = {}
-			for (var i = 0; i < membershipIds.length; i++) {
-				getMembershipSender.fetchMembership(membershipIds[i])
-			}
-		}
-
-		function onError(message, type) {
-			container.__fetchingRoles = false
-			console.warn("GetMembershipsByTenant error:", message)
-		}
-	}
-
-	property int __pendingMembershipFetches: 0
-
-	// GQL: GetMembership - fetches a single membership by ID
-	GqlRequestSender {
-		id: getMembershipSender
-		requestType: 0 // Query
-		gqlCommandId: "GetMembership"
-
-		property string __currentMembershipId: ""
-
-		function fetchMembership(membershipId) {
-			__currentMembershipId = membershipId
-			send()
-		}
-
-		function createQueryParams(query) {
-			var inputParams = Gql.GqlObject("input")
-			inputParams.InsertField("membershipId", __currentMembershipId)
-			query.AddParam(inputParams)
-		}
-
-		function onResult(data) {
-			if (data && data.m_membership) {
-				var membership = data.m_membership
-				var rolesMap = container.__memberRolesMap
-				rolesMap[membership.m_userId] = membership.m_role || container.defaultRole
-				container.__memberRolesMap = rolesMap
-			}
-			container.__pendingMembershipFetches--
-			if (container.__pendingMembershipFetches === 0) {
-				memberRolesRepeater.model = container.__buildMemberRolesModel()
-			}
-		}
-
-		function onError(message, type) {
-			container.__pendingMembershipFetches--
-			console.warn("GetMembership error:", message)
-			if (container.__pendingMembershipFetches === 0) {
-				memberRolesRepeater.model = container.__buildMemberRolesModel()
-			}
-		}
-	}
-
-	// GQL: FindMembership - find membership by userId+tenantId, then update role
-	GqlRequestSender {
-		id: findMembershipSender
-		requestType: 0 // Query
-		gqlCommandId: "FindMembership"
-
-		function createQueryParams(query) {
-			var inputParams = Gql.GqlObject("input")
-			inputParams.InsertField("userId", container.findMembershipInput_userId)
-			inputParams.InsertField("tenantId", container.tenantData ? container.tenantData.m_id : "")
-			query.AddParam(inputParams)
-		}
-
-		function onResult(data) {
-			if (data && data.m_membership && data.m_membership.m_id) {
-				updateMembershipRoleSender.membershipId = data.m_membership.m_id
-				updateMembershipRoleSender.newRole = container.findMembershipInput_newRole
-				updateMembershipRoleSender.send()
-			}
-		}
-
-		function onError(message, type) {
-			console.warn("FindMembership error:", message)
-		}
-	}
-
-	// GQL: UpdateMembershipRole - updates the role of a membership
-	GqlRequestSender {
-		id: updateMembershipRoleSender
-		requestType: 1 // Mutation
-		gqlCommandId: "UpdateMembershipRole"
-
-		property string membershipId: ""
-		property string newRole: ""
-
-		function createQueryParams(query) {
-			var inputParams = Gql.GqlObject("input")
-			inputParams.InsertField("membershipId", membershipId)
-			inputParams.InsertField("role", newRole)
-			query.AddParam(inputParams)
-		}
-
-		function onResult(data) {
-			if (data && data.m_success) {
-				// Update local cache
-				var rolesMap = container.__memberRolesMap
-				rolesMap[container.findMembershipInput_userId] = newRole
-				container.__memberRolesMap = rolesMap
-				memberRolesRepeater.model = container.__buildMemberRolesModel()
-			}
-		}
-
-		function onError(message, type) {
-			console.warn("UpdateMembershipRole error:", message)
-		}
+		var rolesMap = container.__memberRolesMap
+		rolesMap[userId] = newRole
+		container.__memberRolesMap = rolesMap
+		memberRolesRepeater.model = container.__buildMemberRolesModel()
+		container.doUpdateModel()
 	}
 
 	function __buildMemberRolesModel() {
@@ -224,6 +96,17 @@ DocumentViewBase {
 			var userName = members[i].name || userId
 			var role = container.__memberRolesMap[userId] || container.defaultRole
 			result.push({ userId: userId, userName: userName, role: role })
+		}
+		return result
+	}
+
+	function __buildMemberRolesForModel() {
+		var result = []
+		var members = container.pendingMembers
+		for (var i = 0; i < members.length; i++) {
+			var userId = members[i].id
+			var role = container.__memberRolesMap[userId] || container.defaultRole
+			result.push({ m_userId: userId, m_role: role })
 		}
 		return result
 	}

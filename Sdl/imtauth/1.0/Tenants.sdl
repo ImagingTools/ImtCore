@@ -24,6 +24,11 @@ type TenantItemData {
 	updatedAt: String
 }
 
+type TenantMemberRoleEntry {
+	userId: ID!
+	role: String!
+}
+
 type TenantData {
 	id: ID
 	name: String
@@ -33,6 +38,7 @@ type TenantData {
 	createdAt: String
 	updatedAt: String
 	memberIds: [ID]
+	memberRoles: [TenantMemberRoleEntry]
 }
 
 input GetTenantListInput {
@@ -76,12 +82,18 @@ type RemoveTenantPayload {
 	errorMessage: String
 }
 
+input MemberRoleEntryInput {
+	userId: ID!
+	role: String!
+}
+
 input UpdateTenantInput {
 	tenantId: ID!
 	name: String!
 	description: String
 	ownerId: ID
 	memberIds: [ID]
+	memberRoles: [MemberRoleEntryInput]
 }
 
 type UpdateTenantPayload {
