@@ -16,6 +16,8 @@ DocumentViewBase {
 	property TenantData tenantData: model
 	property var pendingMembers: []
 	property bool isNewTenant: tenantData ? (!tenantData.m_id || tenantData.m_id === "") : true
+	// Guard: set when members are modified locally, prevents updateGui from overwriting
+	property bool __membersModifiedLocally: false
 
 	function updateGui(){
 		generalGroup.updateGui();
@@ -38,6 +40,10 @@ DocumentViewBase {
 	}
 
 	function __loadMembersFromModel() {
+		if (container.__membersModifiedLocally) {
+			container.__membersModifiedLocally = false
+			return
+		}
 		if (!container.tenantData)
 			return
 		var ids = container.tenantData.m_memberIds || []
@@ -163,12 +169,19 @@ DocumentViewBase {
 					var arr = container.pendingMembers.slice()
 					arr.splice(index, 1)
 					container.pendingMembers = arr
+					container.__membersModifiedLocally = true
 					container.doUpdateModel()
 				}
 
 				onSelectionChanged: {
 					container.pendingMembers = selectedItems
-					container.doUpdateModel()
+					container.__membersModifiedLocally = true
+				}
+
+				onPopupClosed: {
+					if (container.__membersModifiedLocally) {
+						container.doUpdateModel()
+					}
 				}
 			}
 		}
