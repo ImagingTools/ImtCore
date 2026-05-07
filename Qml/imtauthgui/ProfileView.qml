@@ -10,6 +10,7 @@ import imtauthProfileSdl 1.0
 ViewBase {
 	id: container;
 	property ProfileData profileData: model ? model : null;
+	readonly property bool isDefaultTenant: AuthorizationController.currentTenantId === null || AuthorizationController.currentTenantId === "";
 	
 	Connections {
 		target: container.profileData;
@@ -231,7 +232,7 @@ ViewBase {
 					controlComp: Component {
 						Label {
 							text: {
-								if (!AuthorizationController.currentTenantId || AuthorizationController.currentTenantId === ""){
+								if (container.isDefaultTenant){
 									return qsTr("Default (No Organization)");
 								}
 								let orgs = container.profileData ? container.profileData.m_organizations : null;
@@ -260,7 +261,7 @@ ViewBase {
 								width: Style.buttonWidthXXL;
 								height: Style.controlHeightM;
 								text: qsTr("Default (No Organization)");
-								enabled: AuthorizationController.currentTenantId !== "";
+								enabled: !container.isDefaultTenant;
 								onClicked: {
 									AuthorizationController.selectTenant("");
 								}
