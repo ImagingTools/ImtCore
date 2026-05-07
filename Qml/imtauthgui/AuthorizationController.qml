@@ -22,6 +22,8 @@ QtObject {
 	
 	signal loggedIn();
 	signal loggedOut();
+	signal tenantSelected(string tenantId);
+	signal tenantSelectionFailed(string error);
 	signal changePasswordSuccessfully();
 	signal changePasswordFailed();
 	signal registerSuccessfully();
@@ -31,6 +33,7 @@ QtObject {
 	property bool rememberMe: false
 	property string lastUser: ""
 	property string storedRefreshToken: ""
+	property string currentTenantId: ""
 	
 	// Load settings from LocalStorage on component creation
 	Component.onCompleted: {
@@ -157,6 +160,7 @@ QtObject {
 		userTokenProvider.systemId = LocalStorage.getItem("systemId");
 		userTokenProvider.productId = LocalStorage.getItem("productId");
 		userTokenProvider.permissions = LocalStorage.getItem("permissions");
+		root.currentTenantId = LocalStorage.getItem("tenantId") || "";
 	}
 	
 	function saveDataToStorage(){
@@ -167,6 +171,7 @@ QtObject {
 		LocalStorage.setItem("systemId", userTokenProvider.systemId);
 		LocalStorage.setItem("productId", userTokenProvider.productId);
 		LocalStorage.setItem("permissions", userTokenProvider.permissions);
+		LocalStorage.setItem("tenantId", root.currentTenantId);
 	}
 	
 	function removeDataFromStorage(){
@@ -177,6 +182,7 @@ QtObject {
 		LocalStorage.removeItem("systemId");
 		LocalStorage.removeItem("productId");
 		LocalStorage.removeItem("permissions");
+		LocalStorage.removeItem("tenantId");
 	}
 
 	function saveRefreshTokenIfRememberMe(){
@@ -249,6 +255,7 @@ QtObject {
 		userTokenProvider.refreshToken = ""
 		userTokenProvider.systemId = ""
 		userTokenProvider.permissions = []
+		currentTenantId = ""
 		setAccessToken("");
 		setRefreshToken("");
 		
@@ -288,6 +295,15 @@ QtObject {
 	
 	function getUserId(){
 		return userTokenProvider.userId
+	}
+
+	function getTenantId(){
+		return currentTenantId
+	}
+
+	function selectTenant(tenantId){
+		selectTenantInput.m_tenantId = tenantId
+		selectTenantGqlSender.send(selectTenantInput)
 	}
 	
 	function isStrongUserManagement(){
@@ -387,9 +403,11 @@ QtObject {
 					if (m_ok){
 						root.userTokenProvider.accessToken = m_userSession.m_accessToken;
 						root.userTokenProvider.refreshToken = m_userSession.m_refreshToken;
-						
+						root.currentTenantId = m_userSession.m_tenantId || "";
+
 						root.setAccessToken(m_userSession.m_accessToken);
-						
+						root.setRefreshToken(m_userSession.m_refreshToken);
+
 						if (Qt.platform.os === "web"){
 							XMLHttpRequest.QMLAuthToken = m_userSession.m_accessToken
 							XMLHttpRequest.QMLAuthRefreshToken = m_userSession.m_refreshToken
@@ -423,6 +441,7 @@ QtObject {
 						root.userTokenProvider.refreshToken = m_userSession.m_refreshToken;
 						root.userTokenProvider.userId = m_userSession.m_userId;
 						root.userTokenProvider.login = root.refreshTokenForLoginGqlSender.userName;
+						root.currentTenantId = m_userSession.m_tenantId || "";
 						
 						root.setAccessToken(m_userSession.m_accessToken);
 						root.setRefreshToken(m_userSession.m_refreshToken);
@@ -435,6 +454,39 @@ QtObject {
 					else {
 						// Refresh token login failed, clear stored token
 						root.clearRefreshToken();
+					}
+				}
+			}
+		}
+	}
+
+	property SelectTenantInput selectTenantInput: SelectTenantInput {}
+	property GqlSdlRequestSender selectTenantGqlSender: GqlSdlRequestSender {
+		requestType: 1;
+		gqlCommandId: ImtauthSessionsSdlCommandIds.s_selectTenant;
+
+		sdlObjectComp: Component {
+			SelectTenantPayload {
+				onFinished: {
+					if (m_ok && m_userSession){
+						root.userTokenProvider.accessToken = m_userSession.m_accessToken;
+						root.userTokenProvider.refreshToken = m_userSession.m_refreshToken;
+						root.currentTenantId = m_userSession.m_tenantId || "";
+
+						root.setAccessToken(m_userSession.m_accessToken);
+						root.setRefreshToken(m_userSession.m_refreshToken);
+						root.saveRefreshTokenIfRememberMe();
+
+						if (Qt.platform.os === "web"){
+							XMLHttpRequest.QMLAuthToken = m_userSession.m_accessToken
+							XMLHttpRequest.QMLAuthRefreshToken = m_userSession.m_refreshToken
+							root.saveDataToStorage()
+						}
+
+						root.tenantSelected(root.currentTenantId);
+					}
+					else{
+						root.tenantSelectionFailed(m_errorMessage || "");
 					}
 				}
 			}

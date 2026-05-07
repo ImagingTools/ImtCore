@@ -67,6 +67,11 @@ istd::IChangeableUniquePtr CUsersSessionsDatabaseDelegateComp::CreateObjectFromR
 		sessionInfoPtr->SetUserId(userId);
 	}
 
+	if (record.contains("TenantId")){
+		QByteArray tenantId = record.value("TenantId").toByteArray();
+		sessionInfoPtr->SetTenantId(tenantId);
+	}
+
 	if (record.contains("CreationDate")){
 		QDateTime creationDate = record.value("CreationDate").toDateTime();
 		sessionInfoPtr->SetCreationDate(creationDate);
@@ -96,13 +101,14 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUsersSessionsDatabaseDelegateCom
 
 	QByteArray token = sessionPtr->GetToken();
 	QByteArray userId = sessionPtr->GetUserId();
+	QByteArray tenantId = sessionPtr->GetTenantId();
 	QDateTime creationDate = sessionPtr->GetCreationDate();
 	QDateTime expirationDate = sessionPtr->GetExpirationDate();
 
 	NewObjectQuery retVal;
 
-	retVal.query += QString("\nINSERT INTO \"UserSessions\" (\"Id\", \"RefreshToken\", \"UserId\", \"CreationDate\", \"ExpirationDate\") VALUES ('%0', '%1', '%2', '%3', '%4');")
-				.arg(SqlEncode(QString::fromUtf8(proposedObjectId)), SqlEncode(QString::fromUtf8(token)), SqlEncode(QString::fromUtf8(userId)), creationDate.toString(Qt::ISODate), expirationDate.toString(Qt::ISODate)).toUtf8();
+	retVal.query += QString("\nINSERT INTO \"UserSessions\" (\"Id\", \"RefreshToken\", \"UserId\", \"TenantId\", \"CreationDate\", \"ExpirationDate\") VALUES ('%0', '%1', '%2', '%3', '%4', '%5');")
+				.arg(SqlEncode(QString::fromUtf8(proposedObjectId)), SqlEncode(QString::fromUtf8(token)), SqlEncode(QString::fromUtf8(userId)), SqlEncode(QString::fromUtf8(tenantId)), creationDate.toString(Qt::ISODate), expirationDate.toString(Qt::ISODate)).toUtf8();
 
 	return retVal;
 }
@@ -122,15 +128,17 @@ QByteArray CUsersSessionsDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 	QByteArray token = sessionPtr->GetToken();
 	QByteArray userId = sessionPtr->GetUserId();
+	QByteArray tenantId = sessionPtr->GetTenantId();
 	QDateTime creationDate = sessionPtr->GetCreationDate();
 	QDateTime expirationDate = sessionPtr->GetExpirationDate();
 
 	QByteArray retVal;
 
-	retVal += QString("\nUPDATE \"%0\" SET \"RefreshToken\" = '%1', \"CreationDate\" = '%2', \"ExpirationDate\" = '%3' WHERE \"%4\" = '%5'")
+	retVal += QString("\nUPDATE \"%0\" SET \"RefreshToken\" = '%1', \"TenantId\" = '%2', \"CreationDate\" = '%3', \"ExpirationDate\" = '%4' WHERE \"%5\" = '%6'")
 				  .arg(
 					  qPrintable(*m_tableNameAttrPtr),
 					  SqlEncode(QString::fromUtf8(token)),
+					  SqlEncode(QString::fromUtf8(tenantId)),
 					creationDate.toString(Qt::ISODate),
 					expirationDate.toString(Qt::ISODate),
 					qPrintable(*m_objectIdColumnAttrPtr),
@@ -191,5 +199,4 @@ bool CUsersSessionsDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsSe
 
 
 } // namespace imtauthdb
-
 

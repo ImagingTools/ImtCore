@@ -39,6 +39,7 @@ bool CSessionMetaInfoCreatorComp::CreateMetaInfo(
 
 	metaInfoPtr->SetMetaInfo(ISession::MIT_TOKEN, sessionPtr->GetToken());
 	metaInfoPtr->SetMetaInfo(ISession::MIT_USER_ID, sessionPtr->GetUserId());
+	metaInfoPtr->SetMetaInfo(ISession::MIT_TENANT_ID, sessionPtr->GetTenantId());
 
 	return true;
 }
@@ -53,6 +54,8 @@ QString CSessionMetaInfoCreatorComp::MetaInfo::GetMetaInfoName(int metaInfoType)
 		return QObject::tr("Token");
 	case ISession::MIT_USER_ID:
 		return QObject::tr("User-ID");
+	case ISession::MIT_TENANT_ID:
+		return QObject::tr("Tenant-ID");
 	}
 
 	return BaseClass::GetMetaInfoName(metaInfoType);
@@ -61,5 +64,4 @@ QString CSessionMetaInfoCreatorComp::MetaInfo::GetMetaInfoName(int metaInfoType)
 
 
 } // namespace imtauth
-
 

@@ -115,6 +115,7 @@
                                 <Value>GetSession</Value>
                                 <Value>RefreshToken</Value>
                                 <Value>CreateNewSession</Value>
+                                <Value>SelectTenant</Value>
                                 <Value>RemoveSession</Value>
                                 <Value>GetUserFromJwt</Value>
                             </Values>
