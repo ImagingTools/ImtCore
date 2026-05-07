@@ -6,6 +6,10 @@
 #include <iprm/TParamsPtr.h>
 #include <iprm/ITextParam.h>
 
+// Qt includes
+#include <QtSql/QSqlQuery>
+#include <QtSql/QSqlError>
+
 // ImtCore includes
 #include <imtlic/CFeatureInfo.h>
 #include <imtauth/CSessionInfo.h>
@@ -17,6 +21,52 @@ namespace imtauthdb
 
 
 // public methods
+
+// reimplemented (icomp::CComponentBase)
+
+void CUsersSessionsDatabaseDelegateComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+
+	if (!m_databaseEngineCompPtr.IsValid()){
+		return;
+	}
+
+	const QString tableName = QString::fromUtf8(GetTableName());
+	if (tableName.isEmpty() || !TableExists(tableName)){
+		return;
+	}
+
+	QString driverId = m_databaseEngineCompPtr->GetDatabaseDriverId();
+	QString checkColumnQuery;
+
+	if (driverId == "QPSQL"){
+		checkColumnQuery = QString(
+			"SELECT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = '%1' AND column_name = 'TenantId');"
+		).arg(tableName);
+	}
+	else if (driverId == "QSQLITE"){
+		checkColumnQuery = QString(
+			"SELECT COUNT(*) > 0 FROM pragma_table_info('%1') WHERE name = 'TenantId';"
+		).arg(tableName);
+	}
+	else{
+		return;
+	}
+
+	QSqlError sqlError;
+	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(checkColumnQuery.toUtf8(), &sqlError);
+
+	if (sqlError.type() != QSqlError::NoError){
+		return;
+	}
+
+	if (sqlQuery.next() && !sqlQuery.value(0).toBool()){
+		QString alterQuery = QString("ALTER TABLE \"%1\" ADD COLUMN \"TenantId\" VARCHAR(1000);").arg(tableName);
+		m_databaseEngineCompPtr->ExecSqlQuery(alterQuery.toUtf8(), &sqlError);
+	}
+}
+
 
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
