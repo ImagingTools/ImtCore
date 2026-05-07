@@ -20,15 +20,9 @@ namespace imtdb
  * passed through the ParamsSet to database delegates. Each delegate reads this
  * model and constructs its own SQL filter based on the provided information.
  *
- * @section filter_types Filter Types
- *
- * - **Direct**: Entity has a TenantId column — delegate generates WHERE "TenantId"='...'
- * - **Membership**: Entity linked via membership table — delegate generates appropriate subquery
- * - **DocumentOwner**: Document entity linked through owner's membership
- *
  * @section usage Usage
  *
- * 1. Controller injects CTenantFilterParam into the ParamsSet via CTenantContextHelper
+ * 1. Controller creates CTenantFilterParam via factory and places it into ParamsSet
  * 2. The param travels to the delegate layer
  * 3. Each delegate reads the param and constructs its own SQL filter
  *
@@ -37,7 +31,7 @@ namespace imtdb
  * iprm::TParamsPtr<imtdb::ITenantFilterParam> tenantParam(&filterParams, "TenantFilter");
  * if (tenantParam.IsValid()) {
  *     QByteArray tenantId = tenantParam->GetTenantId();
- *     // Build SQL based on entity-specific logic...
+ *     // Build SQL based on GetFilterType()...
  * }
  * @endcode
  */
@@ -50,16 +44,14 @@ public:
     enum FilterType
     {
         /** Entity has a direct TenantId column */
-        FT_DIRECT,
+        FT_DIRECT = 0,
 
         /** Entity is linked to tenant through a membership/join table */
-        FT_MEMBERSHIP,
+        FT_MEMBERSHIP = 1,
 
         /** Document entity where tenant is determined via owner's membership */
-        FT_DOCUMENT_OWNER
+        FT_DOCUMENT_OWNER = 2
     };
-
-    I_DECLARE_ENUM(FilterType, FT_DIRECT, FT_MEMBERSHIP, FT_DOCUMENT_OWNER);
 
     /**
      * @brief Gets the tenant ID to filter by. Empty means global scope.
@@ -67,19 +59,9 @@ public:
     virtual QByteArray GetTenantId() const = 0;
 
     /**
-     * @brief Sets the tenant ID to filter by.
-     */
-    virtual void SetTenantId(const QByteArray& tenantId) = 0;
-
-    /**
      * @brief Gets the filter type.
      */
     virtual FilterType GetFilterType() const = 0;
-
-    /**
-     * @brief Sets the filter type.
-     */
-    virtual void SetFilterType(FilterType filterType) = 0;
 
     /**
      * @brief Gets the membership/join table name (for FT_MEMBERSHIP and FT_DOCUMENT_OWNER).
@@ -87,19 +69,9 @@ public:
     virtual QByteArray GetMembershipTable() const = 0;
 
     /**
-     * @brief Sets the membership/join table name.
-     */
-    virtual void SetMembershipTable(const QByteArray& tableName) = 0;
-
-    /**
      * @brief Gets the entity ID column in the membership table (for FT_MEMBERSHIP).
      */
     virtual QByteArray GetEntityIdColumn() const = 0;
-
-    /**
-     * @brief Sets the entity ID column in the membership table.
-     */
-    virtual void SetEntityIdColumn(const QByteArray& columnName) = 0;
 
     /**
      * @brief Gets the tenant ID column in the membership table.
@@ -107,19 +79,9 @@ public:
     virtual QByteArray GetTenantIdColumn() const = 0;
 
     /**
-     * @brief Sets the tenant ID column in the membership table.
-     */
-    virtual void SetTenantIdColumn(const QByteArray& columnName) = 0;
-
-    /**
      * @brief Gets the active status column in the membership table (empty to skip).
      */
     virtual QByteArray GetActiveColumn() const = 0;
-
-    /**
-     * @brief Sets the active status column name.
-     */
-    virtual void SetActiveColumn(const QByteArray& columnName) = 0;
 
     /**
      * @brief Gets the direct TenantId column name on the entity table (for FT_DIRECT).
@@ -127,29 +89,14 @@ public:
     virtual QByteArray GetDirectTenantIdColumn() const = 0;
 
     /**
-     * @brief Sets the direct TenantId column name.
-     */
-    virtual void SetDirectTenantIdColumn(const QByteArray& columnName) = 0;
-
-    /**
      * @brief Gets the owner ID JSON path for document-based filtering (for FT_DOCUMENT_OWNER).
      */
     virtual QByteArray GetOwnerIdJsonPath() const = 0;
 
     /**
-     * @brief Sets the owner ID JSON path.
-     */
-    virtual void SetOwnerIdJsonPath(const QByteArray& jsonPath) = 0;
-
-    /**
      * @brief Gets the document JSONB column name (for FT_DOCUMENT_OWNER).
      */
     virtual QByteArray GetDocumentColumn() const = 0;
-
-    /**
-     * @brief Sets the document JSONB column name.
-     */
-    virtual void SetDocumentColumn(const QByteArray& columnName) = 0;
 };
 
 

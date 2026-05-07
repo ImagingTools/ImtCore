@@ -6,7 +6,7 @@
 #include <imtauth/IUserInfo.h>
 
 
-namespace imtdb
+namespace imtservergql
 {
 
 
@@ -25,23 +25,15 @@ QByteArray CTenantContextHelper::ExtractTenantId(const imtgql::CGqlRequest& gqlR
 }
 
 
-bool CTenantContextHelper::ShouldSkip(const imtgql::CGqlRequest& gqlRequest, bool skipForAdmin)
+bool CTenantContextHelper::IsAdmin(const imtgql::CGqlRequest& gqlRequest)
 {
-    if (!skipForAdmin){
-        return false;
-    }
-
     const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
     if (gqlContextPtr == nullptr){
         return false;
     }
 
     const imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
-    if (userInfoPtr != nullptr && userInfoPtr->IsAdmin()){
-        return true;
-    }
-
-    return false;
+    return (userInfoPtr != nullptr && userInfoPtr->IsAdmin());
 }
 
 
@@ -50,24 +42,20 @@ bool CTenantContextHelper::ShouldSkip(const imtgql::CGqlRequest& gqlRequest, boo
 bool CTenantContextHelper::InjectDirectFilter(
             const imtgql::CGqlRequest& gqlRequest,
             iprm::CParamsSet* filterParamsPtr,
-            const QByteArray& tenantIdColumn,
-            const QByteArray& paramKey,
-            bool skipForAdmin)
+            const QByteArray& tenantIdColumn)
 {
     if (filterParamsPtr == nullptr){
         return false;
     }
 
-    if (ShouldSkip(gqlRequest, skipForAdmin)){
+    if (IsAdmin(gqlRequest)){
         return false;
     }
 
     QByteArray tenantId = ExtractTenantId(gqlRequest);
 
-    CTenantFilterParam* paramPtr = CTenantFilterParam::CreateDirect(tenantId, tenantIdColumn);
-
-    QByteArray key = paramKey.isEmpty() ? DefaultParamKey : paramKey;
-    filterParamsPtr->SetEditableParameter(key, paramPtr, true);
+    imtdb::CTenantFilterParam* paramPtr = imtdb::CTenantFilterParam::CreateDirect(tenantId, tenantIdColumn);
+    filterParamsPtr->SetEditableParameter(DefaultParamKey, paramPtr, true);
 
     return true;
 }
@@ -79,25 +67,21 @@ bool CTenantContextHelper::InjectMembershipFilter(
             const QByteArray& membershipTable,
             const QByteArray& entityIdColumn,
             const QByteArray& tenantIdColumn,
-            const QByteArray& activeColumn,
-            const QByteArray& paramKey,
-            bool skipForAdmin)
+            const QByteArray& activeColumn)
 {
     if (filterParamsPtr == nullptr){
         return false;
     }
 
-    if (ShouldSkip(gqlRequest, skipForAdmin)){
+    if (IsAdmin(gqlRequest)){
         return false;
     }
 
     QByteArray tenantId = ExtractTenantId(gqlRequest);
 
-    CTenantFilterParam* paramPtr = CTenantFilterParam::CreateMembership(
+    imtdb::CTenantFilterParam* paramPtr = imtdb::CTenantFilterParam::CreateMembership(
                 tenantId, membershipTable, entityIdColumn, tenantIdColumn, activeColumn);
-
-    QByteArray key = paramKey.isEmpty() ? DefaultParamKey : paramKey;
-    filterParamsPtr->SetEditableParameter(key, paramPtr, true);
+    filterParamsPtr->SetEditableParameter(DefaultParamKey, paramPtr, true);
 
     return true;
 }
@@ -108,59 +92,26 @@ bool CTenantContextHelper::InjectDocumentOwnerFilter(
             iprm::CParamsSet* filterParamsPtr,
             const QByteArray& membershipTable,
             const QByteArray& ownerIdJsonPath,
-            const QByteArray& documentColumn,
-            const QByteArray& paramKey,
-            bool skipForAdmin)
+            const QByteArray& documentColumn)
 {
     if (filterParamsPtr == nullptr){
         return false;
     }
 
-    if (ShouldSkip(gqlRequest, skipForAdmin)){
+    if (IsAdmin(gqlRequest)){
         return false;
     }
 
     QByteArray tenantId = ExtractTenantId(gqlRequest);
 
-    CTenantFilterParam* paramPtr = CTenantFilterParam::CreateDocumentOwner(
+    imtdb::CTenantFilterParam* paramPtr = imtdb::CTenantFilterParam::CreateDocumentOwner(
                 tenantId, membershipTable, ownerIdJsonPath, documentColumn);
-
-    QByteArray key = paramKey.isEmpty() ? DefaultParamKey : paramKey;
-    filterParamsPtr->SetEditableParameter(key, paramPtr, true);
+    filterParamsPtr->SetEditableParameter(DefaultParamKey, paramPtr, true);
 
     return true;
 }
 
 
-bool CTenantContextHelper::InjectFilterParam(
-            const imtgql::CGqlRequest& gqlRequest,
-            iprm::CParamsSet* filterParamsPtr,
-            CTenantFilterParam* filterParamPtr,
-            const QByteArray& paramKey,
-            bool skipForAdmin)
-{
-    if (filterParamsPtr == nullptr || filterParamPtr == nullptr){
-        return false;
-    }
-
-    if (ShouldSkip(gqlRequest, skipForAdmin)){
-        delete filterParamPtr;
-        return false;
-    }
-
-    // Fill tenantId from context if not already set
-    if (filterParamPtr->GetTenantId().isEmpty()){
-        QByteArray tenantId = ExtractTenantId(gqlRequest);
-        filterParamPtr->SetTenantId(tenantId);
-    }
-
-    QByteArray key = paramKey.isEmpty() ? DefaultParamKey : paramKey;
-    filterParamsPtr->SetEditableParameter(key, filterParamPtr, true);
-
-    return true;
-}
-
-
-} // namespace imtdb
+} // namespace imtservergql
 
 

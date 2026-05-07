@@ -21,13 +21,13 @@ namespace imtdb
  * Use the static factory methods for convenient construction:
  * @code{.cpp}
  * // For entities with direct TenantId column:
- * auto param = CTenantFilterParam::CreateDirect(tenantId, "TenantId");
+ * auto* param = CTenantFilterParam::CreateDirect(tenantId);
  *
  * // For entities linked through membership table:
- * auto param = CTenantFilterParam::CreateMembership(tenantId, "TenantMemberships", "UserId", "TenantId", "IsActive");
+ * auto* param = CTenantFilterParam::CreateMembership(tenantId);
  *
  * // For document entities:
- * auto param = CTenantFilterParam::CreateDocumentOwner(tenantId, "TenantMemberships", "OwnerId", "Document");
+ * auto* param = CTenantFilterParam::CreateDocumentOwner(tenantId);
  * @endcode
  */
 class CTenantFilterParam: virtual public ITenantFilterParam
@@ -55,23 +55,14 @@ public:
 
     // reimplemented (imtdb::ITenantFilterParam)
     virtual QByteArray GetTenantId() const override;
-    virtual void SetTenantId(const QByteArray& tenantId) override;
     virtual FilterType GetFilterType() const override;
-    virtual void SetFilterType(FilterType filterType) override;
     virtual QByteArray GetMembershipTable() const override;
-    virtual void SetMembershipTable(const QByteArray& tableName) override;
     virtual QByteArray GetEntityIdColumn() const override;
-    virtual void SetEntityIdColumn(const QByteArray& columnName) override;
     virtual QByteArray GetTenantIdColumn() const override;
-    virtual void SetTenantIdColumn(const QByteArray& columnName) override;
     virtual QByteArray GetActiveColumn() const override;
-    virtual void SetActiveColumn(const QByteArray& columnName) override;
     virtual QByteArray GetDirectTenantIdColumn() const override;
-    virtual void SetDirectTenantIdColumn(const QByteArray& columnName) override;
     virtual QByteArray GetOwnerIdJsonPath() const override;
-    virtual void SetOwnerIdJsonPath(const QByteArray& jsonPath) override;
     virtual QByteArray GetDocumentColumn() const override;
-    virtual void SetDocumentColumn(const QByteArray& columnName) override;
 
     // reimplemented (iser::ISerializable)
     virtual bool Serialize(iser::IArchive& archive) override;
@@ -79,7 +70,6 @@ public:
     // reimplemented (istd::IChangeable)
     virtual int GetSupportedOperations() const override;
     virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
-    virtual bool IsEqual(const IChangeable& object) const override;
     virtual istd::IChangeableUniquePtr CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
     virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 

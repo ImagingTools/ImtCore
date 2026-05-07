@@ -2825,6 +2825,12 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 {
 	this->SetAdditionalFilters(gqlRequest, inputParamsGql, &filterParams);
 
+	// Inject optional tenant filter
+	imtdb::CTenantFilterParam* tenantFilterPtr = CreateTenantFilterParam(gqlRequest);
+	if (tenantFilterPtr != nullptr){
+		filterParams.SetEditableParameter("TenantFilter", tenantFilterPtr, true);
+	}
+
 	const imtgql::CGqlParamObject* complexFilterModelPtr = inputParamsGql.GetParamArgumentObjectPtr("filterModel");
 	const imtgql::CGqlParamObject* documentFilterModelPtr = inputParamsGql.GetParamArgumentObjectPtr("documentFilterModel");
 
@@ -2901,6 +2907,13 @@ void CObjectCollectionControllerCompBase::SetAdditionalFilters(
 			const imtgql::CGqlRequest& /*gqlRequest*/,
 			imtbase::CComplexCollectionFilter& /*complexFilter*/) const
 {
+}
+
+
+imtdb::CTenantFilterParam* CObjectCollectionControllerCompBase::CreateTenantFilterParam(
+			const imtgql::CGqlRequest& /*gqlRequest*/) const
+{
+	return nullptr;
 }
 
 

@@ -26,9 +26,9 @@ CTenantFilterParam* CTenantFilterParam::CreateDirect(
             const QByteArray& tenantIdColumn)
 {
     CTenantFilterParam* paramPtr = new CTenantFilterParam();
-    paramPtr->SetTenantId(tenantId);
-    paramPtr->SetFilterType(FT_DIRECT);
-    paramPtr->SetDirectTenantIdColumn(tenantIdColumn);
+    paramPtr->m_tenantId = tenantId;
+    paramPtr->m_filterType = FT_DIRECT;
+    paramPtr->m_directTenantIdColumn = tenantIdColumn;
     return paramPtr;
 }
 
@@ -41,12 +41,12 @@ CTenantFilterParam* CTenantFilterParam::CreateMembership(
             const QByteArray& activeColumn)
 {
     CTenantFilterParam* paramPtr = new CTenantFilterParam();
-    paramPtr->SetTenantId(tenantId);
-    paramPtr->SetFilterType(FT_MEMBERSHIP);
-    paramPtr->SetMembershipTable(membershipTable);
-    paramPtr->SetEntityIdColumn(entityIdColumn);
-    paramPtr->SetTenantIdColumn(tenantIdColumn);
-    paramPtr->SetActiveColumn(activeColumn);
+    paramPtr->m_tenantId = tenantId;
+    paramPtr->m_filterType = FT_MEMBERSHIP;
+    paramPtr->m_membershipTable = membershipTable;
+    paramPtr->m_entityIdColumn = entityIdColumn;
+    paramPtr->m_tenantIdColumn = tenantIdColumn;
+    paramPtr->m_activeColumn = activeColumn;
     return paramPtr;
 }
 
@@ -58,11 +58,11 @@ CTenantFilterParam* CTenantFilterParam::CreateDocumentOwner(
             const QByteArray& documentColumn)
 {
     CTenantFilterParam* paramPtr = new CTenantFilterParam();
-    paramPtr->SetTenantId(tenantId);
-    paramPtr->SetFilterType(FT_DOCUMENT_OWNER);
-    paramPtr->SetMembershipTable(membershipTable);
-    paramPtr->SetOwnerIdJsonPath(ownerIdJsonPath);
-    paramPtr->SetDocumentColumn(documentColumn);
+    paramPtr->m_tenantId = tenantId;
+    paramPtr->m_filterType = FT_DOCUMENT_OWNER;
+    paramPtr->m_membershipTable = membershipTable;
+    paramPtr->m_ownerIdJsonPath = ownerIdJsonPath;
+    paramPtr->m_documentColumn = documentColumn;
     return paramPtr;
 }
 
@@ -74,19 +74,9 @@ QByteArray CTenantFilterParam::GetTenantId() const
     return m_tenantId;
 }
 
-void CTenantFilterParam::SetTenantId(const QByteArray& tenantId)
-{
-    m_tenantId = tenantId;
-}
-
 ITenantFilterParam::FilterType CTenantFilterParam::GetFilterType() const
 {
     return m_filterType;
-}
-
-void CTenantFilterParam::SetFilterType(FilterType filterType)
-{
-    m_filterType = filterType;
 }
 
 QByteArray CTenantFilterParam::GetMembershipTable() const
@@ -94,19 +84,9 @@ QByteArray CTenantFilterParam::GetMembershipTable() const
     return m_membershipTable;
 }
 
-void CTenantFilterParam::SetMembershipTable(const QByteArray& tableName)
-{
-    m_membershipTable = tableName;
-}
-
 QByteArray CTenantFilterParam::GetEntityIdColumn() const
 {
     return m_entityIdColumn;
-}
-
-void CTenantFilterParam::SetEntityIdColumn(const QByteArray& columnName)
-{
-    m_entityIdColumn = columnName;
 }
 
 QByteArray CTenantFilterParam::GetTenantIdColumn() const
@@ -114,19 +94,9 @@ QByteArray CTenantFilterParam::GetTenantIdColumn() const
     return m_tenantIdColumn;
 }
 
-void CTenantFilterParam::SetTenantIdColumn(const QByteArray& columnName)
-{
-    m_tenantIdColumn = columnName;
-}
-
 QByteArray CTenantFilterParam::GetActiveColumn() const
 {
     return m_activeColumn;
-}
-
-void CTenantFilterParam::SetActiveColumn(const QByteArray& columnName)
-{
-    m_activeColumn = columnName;
 }
 
 QByteArray CTenantFilterParam::GetDirectTenantIdColumn() const
@@ -134,29 +104,14 @@ QByteArray CTenantFilterParam::GetDirectTenantIdColumn() const
     return m_directTenantIdColumn;
 }
 
-void CTenantFilterParam::SetDirectTenantIdColumn(const QByteArray& columnName)
-{
-    m_directTenantIdColumn = columnName;
-}
-
 QByteArray CTenantFilterParam::GetOwnerIdJsonPath() const
 {
     return m_ownerIdJsonPath;
 }
 
-void CTenantFilterParam::SetOwnerIdJsonPath(const QByteArray& jsonPath)
-{
-    m_ownerIdJsonPath = jsonPath;
-}
-
 QByteArray CTenantFilterParam::GetDocumentColumn() const
 {
     return m_documentColumn;
-}
-
-void CTenantFilterParam::SetDocumentColumn(const QByteArray& columnName)
-{
-    m_documentColumn = columnName;
 }
 
 
@@ -186,7 +141,7 @@ bool CTenantFilterParam::Serialize(iser::IArchive& archive)
 
 int CTenantFilterParam::GetSupportedOperations() const
 {
-    return OnCopyFrom | OnClone | OnCompare | OnReset;
+    return OnCopyFrom | OnClone | OnReset;
 }
 
 
@@ -208,25 +163,6 @@ bool CTenantFilterParam::CopyFrom(const IChangeable& object, CompatibilityMode /
     m_documentColumn = sourcePtr->GetDocumentColumn();
 
     return true;
-}
-
-
-bool CTenantFilterParam::IsEqual(const IChangeable& object) const
-{
-    const ITenantFilterParam* otherPtr = dynamic_cast<const ITenantFilterParam*>(&object);
-    if (otherPtr == nullptr){
-        return false;
-    }
-
-    return m_tenantId == otherPtr->GetTenantId()
-        && m_filterType == otherPtr->GetFilterType()
-        && m_membershipTable == otherPtr->GetMembershipTable()
-        && m_entityIdColumn == otherPtr->GetEntityIdColumn()
-        && m_tenantIdColumn == otherPtr->GetTenantIdColumn()
-        && m_activeColumn == otherPtr->GetActiveColumn()
-        && m_directTenantIdColumn == otherPtr->GetDirectTenantIdColumn()
-        && m_ownerIdJsonPath == otherPtr->GetOwnerIdJsonPath()
-        && m_documentColumn == otherPtr->GetDocumentColumn();
 }
 
 

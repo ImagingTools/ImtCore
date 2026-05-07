@@ -28,6 +28,7 @@
 #include <imtcol/CDocumentIdFilter.h>
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtauth/IUserActionManager.h>
+#include <imtdb/CTenantFilterParam.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
 
 
@@ -291,6 +292,14 @@ protected:
 	virtual void SetAdditionalFilters(const imtgql::CGqlRequest& gqlRequest,const imtgql::CGqlParamObject& viewParamsGql, iprm::CParamsSet* filterParams) const;
 	
 	virtual void SetAdditionalFilters(const imtgql::CGqlRequest& gqlRequest, imtbase::CComplexCollectionFilter& complexFilter) const;
+
+	/**
+		Create an optional tenant filter param to be injected into filter params.
+		Override in subclasses to enable multi-tenant filtering for this collection.
+		Returns nullptr by default (no tenant filtering).
+		The returned pointer is owned by the caller (ParamsSet takes ownership).
+	*/
+	virtual imtdb::CTenantFilterParam* CreateTenantFilterParam(const imtgql::CGqlRequest& gqlRequest) const;
 
 	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId) const;
 	virtual QString GetObjectNameFromRequest(const imtgql::CGqlRequest& gqlRequest) const;

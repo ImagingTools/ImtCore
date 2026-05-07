@@ -14,7 +14,7 @@
 #include <imtgql/IGqlContext.h>
 
 
-namespace imtdb
+namespace imtservergql
 {
 
 
@@ -33,14 +33,7 @@ namespace imtdb
  *         const imtgql::CGqlParamObject& viewParams,
  *         iprm::CParamsSet* filterParamsPtr) const
  * {
- *     // For entities with direct TenantId column:
- *     imtdb::CTenantContextHelper::InjectDirectFilter(gqlRequest, filterParamsPtr);
- *
- *     // For entities linked via membership table:
- *     imtdb::CTenantContextHelper::InjectMembershipFilter(gqlRequest, filterParamsPtr);
- *
- *     // For document entities:
- *     imtdb::CTenantContextHelper::InjectDocumentOwnerFilter(gqlRequest, filterParamsPtr);
+ *     imtservergql::CTenantContextHelper::InjectDirectFilter(gqlRequest, filterParamsPtr);
  * }
  * @endcode
  */
@@ -58,9 +51,7 @@ public:
     static bool InjectDirectFilter(
                 const imtgql::CGqlRequest& gqlRequest,
                 iprm::CParamsSet* filterParamsPtr,
-                const QByteArray& tenantIdColumn = "TenantId",
-                const QByteArray& paramKey = QByteArray(),
-                bool skipForAdmin = true);
+                const QByteArray& tenantIdColumn = "TenantId");
 
     /**
      * @brief Injects a membership-based tenant filter.
@@ -71,9 +62,7 @@ public:
                 const QByteArray& membershipTable = "TenantMemberships",
                 const QByteArray& entityIdColumn = "UserId",
                 const QByteArray& tenantIdColumn = "TenantId",
-                const QByteArray& activeColumn = "IsActive",
-                const QByteArray& paramKey = QByteArray(),
-                bool skipForAdmin = true);
+                const QByteArray& activeColumn = "IsActive");
 
     /**
      * @brief Injects a document-owner tenant filter.
@@ -83,26 +72,14 @@ public:
                 iprm::CParamsSet* filterParamsPtr,
                 const QByteArray& membershipTable = "TenantMemberships",
                 const QByteArray& ownerIdJsonPath = "OwnerId",
-                const QByteArray& documentColumn = "Document",
-                const QByteArray& paramKey = QByteArray(),
-                bool skipForAdmin = true);
-
-    /**
-     * @brief Injects a pre-configured CTenantFilterParam into the ParamsSet.
-     */
-    static bool InjectFilterParam(
-                const imtgql::CGqlRequest& gqlRequest,
-                iprm::CParamsSet* filterParamsPtr,
-                CTenantFilterParam* filterParamPtr,
-                const QByteArray& paramKey = QByteArray(),
-                bool skipForAdmin = true);
+                const QByteArray& documentColumn = "Document");
 
 private:
     static QByteArray ExtractTenantId(const imtgql::CGqlRequest& gqlRequest);
-    static bool ShouldSkip(const imtgql::CGqlRequest& gqlRequest, bool skipForAdmin);
+    static bool IsAdmin(const imtgql::CGqlRequest& gqlRequest);
 };
 
 
-} // namespace imtdb
+} // namespace imtservergql
 
 
