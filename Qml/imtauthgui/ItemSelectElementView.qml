@@ -194,6 +194,7 @@ ElementView {
 								root.items = arr
 								root.__resolvingNames = false
 								root.itemRemoved(removedIndex, removedData)
+								root.selectionChanged(arr)
 							}
 						}
 					}
