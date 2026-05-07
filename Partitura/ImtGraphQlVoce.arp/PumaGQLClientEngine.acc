@@ -87,11 +87,12 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>DocumentRevision</Value>
-                                <Value>GqlJwtSessionController</Value>
+                                <Value>JwtSessionControllerProxy</Value>
                                 <Value>RemoteControllers</Value>
                                 <Value>RemoteCollectionDocumentManagerController</Value>
                                 <Value>RemoteTenantController</Value>
                                 <Value>RemoteProfileController</Value>
+                                <Value>JwtSessionControllerProxy</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -99,45 +100,6 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="GqlJwtSessionController" PackageId="ImtAuthGqlPck" ComponentId="GqlJwtSessionController">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>ValidateSession</Value>
-                                <Value>ValidateJwt</Value>
-                                <Value>GenerateJwt</Value>
-                                <Value>GetSession</Value>
-                                <Value>RefreshToken</Value>
-                                <Value>CreateNewSession</Value>
-                                <Value>SelectTenant</Value>
-                                <Value>RemoveSession</Value>
-                                <Value>GetUserFromJwt</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="JwtSessionController" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="RemoteJwtSessionController"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -151,6 +113,24 @@
                     </AttributeInfo>
                     <AttributeInfo Id="ServerPrefix" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="/Puma"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="JwtSessionControllerProxy" PackageId="ImtAuthGqlPck" ComponentId="JwtSessionControllerProxy">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApiClient"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

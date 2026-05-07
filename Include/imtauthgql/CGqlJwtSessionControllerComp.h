@@ -22,7 +22,6 @@ public:
 	typedef sdl::imtauth::Sessions::CGraphQlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CGqlJwtSessionControllerComp);
-		I_REGISTER_INTERFACE(imtauth::IJwtSessionController);
 		I_ASSIGN(m_jwtSessionControllerCompPtr, "JwtSessionController", "Json Web Token session controller", false, "JwtSessionController");
 		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager", false, "TenantManager");
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager", false, "TenantMembershipManager");
