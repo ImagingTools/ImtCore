@@ -22,7 +22,7 @@ namespace imtauthgql
 
 sdl::imtauth::Profile::CProfileData CProfileControllerComp::OnGetProfile(
 			const sdl::imtauth::Profile::CGetProfileGqlRequest& getProfileRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::imtauth::Profile::CProfileData::V1_0 profileData;
@@ -73,6 +73,12 @@ sdl::imtauth::Profile::CProfileData CProfileControllerComp::OnGetProfile(
 	profileData.name = QString(userInfoPtr->GetName());
 	profileData.email = QString(userInfoPtr->GetMail());
 	profileData.username = QString(userInfoPtr->GetId());
+	profileData.organizations = CreateOrganizationList(objectId);
+
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr != nullptr){
+		profileData.currentTenantId = gqlContextPtr->GetTenantId();
+	}
 
 	imtsdl::TElementList<sdl::imtauth::Profile::CRoleInfo::V1_0> roleList;
 
@@ -161,6 +167,65 @@ sdl::imtauth::Profile::CProfileData CProfileControllerComp::OnGetProfile(
 }
 
 
+imtsdl::TElementList<sdl::imtauth::Profile::CProfileTenantInfo::V1_0> CProfileControllerComp::CreateOrganizationList(
+			const QByteArray& userId) const
+{
+	imtsdl::TElementList<sdl::imtauth::Profile::CProfileTenantInfo::V1_0> organizationList;
+
+	if (!m_tenantManagerCompPtr.IsValid()){
+		return organizationList;
+	}
+
+	for (const QByteArray& tenantId : m_tenantManagerCompPtr->GetTenantIds()){
+		imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
+		if (!tenantPtr.IsValid() || !tenantPtr->IsActive()){
+			continue;
+		}
+
+		const bool isOwner = tenantPtr->GetOwnerId() == userId;
+		imtauth::ITenantMembershipUniquePtr membershipPtr;
+		if (m_membershipManagerCompPtr.IsValid()){
+			membershipPtr = m_membershipManagerCompPtr->FindMembership(userId, tenantId);
+		}
+
+		const bool isActiveMember = membershipPtr.IsValid() && membershipPtr->IsActive();
+		if (!isOwner && !isActiveMember){
+			continue;
+		}
+
+		sdl::imtauth::Profile::CProfileTenantInfo::V1_0 organizationInfo;
+		organizationInfo.id = tenantId;
+		organizationInfo.name = tenantPtr->GetTenantName();
+		organizationInfo.description = tenantPtr->GetTenantDescription();
+		organizationInfo.ownerId = tenantPtr->GetOwnerId();
+		organizationInfo.isOwner = isOwner;
+		organizationInfo.isActive = tenantPtr->IsActive();
+		organizationInfo.role = isOwner ? QStringLiteral("Owner") : TenantMembershipRoleToString(membershipPtr->GetRole());
+
+		organizationList << organizationInfo;
+	}
+
+	return organizationList;
+}
+
+
+QString CProfileControllerComp::TenantMembershipRoleToString(imtauth::ITenantMembership::TenantMemberRole role) const
+{
+	switch (role){
+		case imtauth::ITenantMembership::TMR_OWNER:
+			return QStringLiteral("Owner");
+		case imtauth::ITenantMembership::TMR_ADMIN:
+			return QStringLiteral("Admin");
+		case imtauth::ITenantMembership::TMR_MEMBER:
+			return QStringLiteral("Member");
+		case imtauth::ITenantMembership::TMR_GUEST:
+			return QStringLiteral("Guest");
+	}
+
+	return QString();
+}
+
+
 sdl::imtauth::Profile::CSetProfileResponse CProfileControllerComp::OnSetProfile(
 			const sdl::imtauth::Profile::CSetProfileGqlRequest& setProfileRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
@@ -173,7 +238,7 @@ sdl::imtauth::Profile::CSetProfileResponse CProfileControllerComp::OnSetProfile(
 
 		return sdl::imtauth::Profile::CSetProfileResponse();
 	}
-	
+
 	sdl::imtauth::Profile::SetProfileRequestArguments arguments = setProfileRequest.GetRequestedArguments();
 	if (!arguments.input.Version_1_0.has_value()){
 		Q_ASSERT(false);
@@ -225,5 +290,3 @@ sdl::imtauth::Profile::CSetProfileResponse CProfileControllerComp::OnSetProfile(
 
 
 } // namespace imtauthgql
-
-
