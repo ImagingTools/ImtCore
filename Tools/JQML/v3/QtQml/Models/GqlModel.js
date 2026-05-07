@@ -1,6 +1,10 @@
 const TreeItemModel = require("./TreeItemModel")
 
 class GqlModel extends TreeItemModel {
+	GetGlobalAccessToken(){
+		return XMLHttpRequest.QMLAuthToken || ""
+	}
+
     SetGlobalAccessToken(token){
 		XMLHttpRequest.QMLAuthToken = token
 	}
