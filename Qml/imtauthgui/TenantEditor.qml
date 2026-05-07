@@ -181,6 +181,7 @@ DocumentViewBase {
 				onPopupClosed: {
 					if (container.__membersModifiedLocally) {
 						container.doUpdateModel()
+						container.__membersModifiedLocally = false
 					}
 				}
 			}
