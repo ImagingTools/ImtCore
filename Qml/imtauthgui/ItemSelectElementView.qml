@@ -186,7 +186,14 @@ ElementView {
 								}
 							}
 							onClicked: {
-								root.itemRemoved(index, modelData)
+								var removedIndex = index
+								var removedData = modelData
+								var arr = root.items.slice()
+								arr.splice(removedIndex, 1)
+								root.__resolvingNames = true
+								root.items = arr
+								root.__resolvingNames = false
+								root.itemRemoved(removedIndex, removedData)
 							}
 						}
 					}
@@ -228,6 +235,9 @@ ElementView {
 						selName = selId
 					arr.push({id: selId, name: selName})
 				}
+				root.__resolvingNames = true
+				root.items = arr
+				root.__resolvingNames = false
 				root.selectionChanged(arr)
 			}
 

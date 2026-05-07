@@ -155,6 +155,7 @@ DocumentViewBase {
 			}
 
 			ItemSelectElementView {
+				id: membersSelector
 				width: parent.width
 				visible: !container.isNewTenant
 				items: container.pendingMembers
@@ -166,9 +167,7 @@ DocumentViewBase {
 				showCount: true
 
 				onItemRemoved: {
-					var arr = container.pendingMembers.slice()
-					arr.splice(index, 1)
-					container.pendingMembers = arr
+					container.pendingMembers = membersSelector.items.slice()
 					container.__membersModifiedLocally = true
 					container.doUpdateModel()
 				}
