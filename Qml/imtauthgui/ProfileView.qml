@@ -43,6 +43,20 @@ ViewBase {
 		profileData.m_email = mailInput.text
 	}
 	
+	function __resolveCurrentTenantName(){
+		if (container.isDefaultTenant)
+			return qsTr("Default (No Organization)");
+		var orgs = container.profileData ? container.profileData.m_organizations : null;
+		if (orgs){
+			for (var i = 0; i < orgs.elementsCount; i++){
+				var org = orgs.element(i);
+				if (org && org.m_id === AuthorizationController.currentTenantId)
+					return org.m_name || org.m_id;
+			}
+		}
+		return AuthorizationController.currentTenantId;
+	}
+	
 	GqlSdlRequestSender {
 		id: getProfileRequest;
 		gqlCommandId: ImtauthProfileSdlCommandIds.s_getProfile;
@@ -229,26 +243,7 @@ ViewBase {
 				
 				ElementView {
 					name: qsTr("Current");
-					controlComp: Component {
-						Label {
-							text: {
-								if (container.isDefaultTenant){
-									return qsTr("Default (No Organization)");
-								}
-								let orgs = container.profileData ? container.profileData.m_organizations : null;
-								if (orgs){
-									for (let i = 0; i < orgs.elementsCount; i++){
-										let org = orgs.element(i);
-										if (org && org.m_id === AuthorizationController.currentTenantId){
-											return org.m_name || org.m_id;
-										}
-									}
-								}
-								return AuthorizationController.currentTenantId;
-							}
-							color: Style.textColor;
-						}
-					}
+					description: container.__resolveCurrentTenantName();
 				}
 				
 				ElementView {
