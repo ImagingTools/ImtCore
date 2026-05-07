@@ -89,11 +89,20 @@ type GetUserFromJwtPayload {
 	userId: ID!
 }
 
+input GetTenantFromJwtInput {
+	jwt: ID!
+}
+
+type GetTenantFromJwtPayload {
+	tenantId: ID!
+}
+
 type Query {
 	ValidateSession (input: ValidateSessionInput): ValidateSessionPayload!
 	ValidateJwt (input: ValidateJwtInput): ValidateJwtPayload!
 	GetSession (input: GetSessionInput): GetSessionPayload!
 	GetUserFromJwt (input: GetUserFromJwtInput): GetUserFromJwtPayload!
+	GetTenantFromJwt (input: GetTenantFromJwtInput): GetTenantFromJwtPayload!
 }
 
 type Mutation {

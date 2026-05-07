@@ -55,6 +55,10 @@ protected:
 				const sdl::imtauth::Sessions::CGetUserFromJwtGqlRequest& getUserFromJwtRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+	virtual sdl::imtauth::Sessions::CGetTenantFromJwtPayload OnGetTenantFromJwt(
+				const sdl::imtauth::Sessions::CGetTenantFromJwtGqlRequest& getTenantFromJwtRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 };
 
 

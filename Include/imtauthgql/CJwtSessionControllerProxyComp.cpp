@@ -80,4 +80,13 @@ sdl::imtauth::Sessions::CGetUserFromJwtPayload CJwtSessionControllerProxyComp::O
 }
 
 
+sdl::imtauth::Sessions::CGetTenantFromJwtPayload CJwtSessionControllerProxyComp::OnGetTenantFromJwt(
+			const sdl::imtauth::Sessions::CGetTenantFromJwtGqlRequest& /*getTenantFromJwtRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::imtauth::Sessions::CGetTenantFromJwtPayload>(gqlRequest, errorMessage);
+}
+
+
 } // namespace imtauthgql

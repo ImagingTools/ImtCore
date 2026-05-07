@@ -327,6 +327,33 @@ sdl::imtauth::Sessions::CGetUserFromJwtPayload CGqlJwtSessionControllerComp::OnG
 }
 
 
+sdl::imtauth::Sessions::CGetTenantFromJwtPayload CGqlJwtSessionControllerComp::OnGetTenantFromJwt(
+	const sdl::imtauth::Sessions::CGetTenantFromJwtGqlRequest& getTenantFromJwtRequest,
+	const ::imtgql::CGqlRequest& /*gqlRequest*/,
+	QString& /*errorMessage*/) const
+{
+	sdl::imtauth::Sessions::CGetTenantFromJwtPayload::V1_0 response;
+
+	if (!m_jwtSessionControllerCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'JwtSessionController' was not set", "CGqlJwtSessionControllerComp");
+		return sdl::imtauth::Sessions::CGetTenantFromJwtPayload();
+	}
+
+	QString jwt;
+	sdl::imtauth::Sessions::GetTenantFromJwtRequestArguments arguments = getTenantFromJwtRequest.GetRequestedArguments();
+	if (arguments.input.Version_1_0->jwt){
+		jwt = *arguments.input.Version_1_0->jwt;
+	}
+
+	response.tenantId = m_jwtSessionControllerCompPtr->GetTenantFromJwt(jwt.toUtf8());
+
+	sdl::imtauth::Sessions::CGetTenantFromJwtPayload retVal;
+	retVal.Version_1_0 = std::move(response);
+
+	return retVal;
+}
+
+
 // private methods
 
 QByteArray CGqlJwtSessionControllerComp::GetAuthenticatedUserId(const ::imtgql::CGqlRequest& gqlRequest) const

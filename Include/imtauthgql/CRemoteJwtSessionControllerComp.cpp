@@ -291,8 +291,31 @@ QByteArray CRemoteJwtSessionControllerComp::GetSessionFromJwt(const QByteArray& 
 }
 
 
-QByteArray CRemoteJwtSessionControllerComp::GetTenantFromJwt(const QByteArray& /*jwt*/) const
+QByteArray CRemoteJwtSessionControllerComp::GetTenantFromJwt(const QByteArray& jwt) const
 {
+	namespace sessionsdl = sdl::imtauth::Sessions;
+
+	sessionsdl::GetTenantFromJwtRequestArguments arguments;
+	arguments.input.Version_1_0 = sessionsdl::CGetTenantFromJwtInput::V1_0();
+	arguments.input.Version_1_0->jwt = jwt;
+
+	imtgql::CGqlRequest gqlRequest;
+	if (!sessionsdl::CGetTenantFromJwtGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+		return QByteArray();
+	}
+
+	typedef sdl::imtauth::Sessions::CGetTenantFromJwtPayload Response;
+
+	QString errorMessage;
+	Response response = SendModelRequest<Response>(gqlRequest, errorMessage);
+	if (!errorMessage.isEmpty()){
+		return QByteArray();
+	}
+
+	if (response.Version_1_0 && response.Version_1_0->tenantId.has_value()){
+		return *response.Version_1_0->tenantId;
+	}
+
 	return QByteArray();
 }
 
