@@ -200,8 +200,10 @@ imtsdl::TElementList<sdl::imtauth::Profile::CProfileTenantInfo::V1_0> CProfileCo
 		organizationInfo.ownerId = tenantPtr->GetOwnerId();
 		organizationInfo.isOwner = isOwner;
 		organizationInfo.isActive = tenantPtr->IsActive();
-		organizationInfo.role = QStringLiteral("Owner");
-		if (!isOwner && membershipPtr.IsValid()){
+		if (isOwner){
+			organizationInfo.role = QStringLiteral("Owner");
+		}
+		else if (membershipPtr.IsValid()){
 			organizationInfo.role = TenantMembershipRoleToString(membershipPtr->GetRole());
 		}
 
