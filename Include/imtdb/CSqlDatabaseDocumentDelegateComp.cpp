@@ -881,7 +881,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 
 	static const QString nullDataLiteral = QStringLiteral("NULL");
 
-	QString tenantIdValue = nullDataLiteral;
+	QString tenantIdValue;
 	if (operationContextPtr != nullptr){
 		QByteArray tenantId = operationContextPtr->GetTenantId();
 		if (!tenantId.isEmpty()){
@@ -889,10 +889,10 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 		}
 	}
 
-	query += QString("INSERT INTO %0 \"%1\"(\"%2\", \"%3\", \"%4\", \"%5\", \"%6\", \"%7\", \"%8\", \"%9\", \"%10\", \"%11\", \"TenantId\") VALUES('%12', '%13', '%14', %15, %16, '%17', %18, %19, '%20', '%21', %22);")
+	const bool hasTenantId = !tenantIdValue.isEmpty();
+
+	QString columnsClause = QString("\"%0\", \"%1\", \"%2\", \"%3\", \"%4\", \"%5\", \"%6\", \"%7\", \"%8\", \"%9\"")
 				.arg(
-						schemaPrefix,
-						qPrintable(*m_tableNameAttrPtr),
 						qPrintable(s_idColumn),
 						qPrintable(s_typeIdColumn),
 						qPrintable(s_documentIdColumn),
@@ -902,7 +902,15 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 						qPrintable(s_dataMetaInfoColumn),
 						qPrintable(s_revisionInfoColumn),
 						qPrintable(s_lastModifiedColumn),
-						qPrintable(s_stateColumn),
+						qPrintable(s_stateColumn)
+					);
+
+	if (hasTenantId){
+		columnsClause += ", \"TenantId\"";
+	}
+
+	QString valuesClause = QString("'%0', '%1', '%2', %3, %4, '%5', %6, %7, '%8', '%9'")
+				.arg(
 						QUuid::createUuid().toString(QUuid::WithoutBraces),
 						qPrintable(typeId),
 						qPrintable(objectId),
@@ -912,8 +920,19 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 						metaInfoRepresentation.isEmpty() ? nullDataLiteral : SqlEncode(metaInfoRepresentation).append('\'').prepend('\''),
 						revisionInfoQuery.isEmpty() ? nullDataLiteral : revisionInfoQuery,
 						QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs),
-						QStringLiteral("Active"),
-						tenantIdValue
+						QStringLiteral("Active")
+					);
+
+	if (hasTenantId){
+		valuesClause += QString(", %1").arg(tenantIdValue);
+	}
+
+	query += QString("INSERT INTO %0 \"%1\"(%2) VALUES(%3);")
+				.arg(
+						schemaPrefix,
+						qPrintable(*m_tableNameAttrPtr),
+						columnsClause,
+						valuesClause
 					);
 
 	retVal = query.toUtf8();
