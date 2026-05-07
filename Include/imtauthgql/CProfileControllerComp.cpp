@@ -200,7 +200,10 @@ imtsdl::TElementList<sdl::imtauth::Profile::CProfileTenantInfo::V1_0> CProfileCo
 		organizationInfo.ownerId = tenantPtr->GetOwnerId();
 		organizationInfo.isOwner = isOwner;
 		organizationInfo.isActive = tenantPtr->IsActive();
-		organizationInfo.role = isOwner ? QStringLiteral("Owner") : TenantMembershipRoleToString(membershipPtr->GetRole());
+		organizationInfo.role = QStringLiteral("Owner");
+		if (!isOwner && membershipPtr.IsValid()){
+			organizationInfo.role = TenantMembershipRoleToString(membershipPtr->GetRole());
+		}
 
 		organizationList << organizationInfo;
 	}
@@ -220,9 +223,9 @@ QString CProfileControllerComp::TenantMembershipRoleToString(imtauth::ITenantMem
 			return QStringLiteral("Member");
 		case imtauth::ITenantMembership::TMR_GUEST:
 			return QStringLiteral("Guest");
+		default:
+			return QStringLiteral("Unknown");
 	}
-
-	return QString();
 }
 
 
