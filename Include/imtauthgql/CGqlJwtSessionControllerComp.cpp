@@ -157,7 +157,7 @@ sdl::imtauth::Sessions::CRefreshTokenPayload CGqlJwtSessionControllerComp::OnRef
 
 sdl::imtauth::Sessions::CCreateNewSessionPayload CGqlJwtSessionControllerComp::OnCreateNewSession(
 	const sdl::imtauth::Sessions::CCreateNewSessionGqlRequest& createNewSessionRequest,
-	const ::imtgql::CGqlRequest& /*gqlRequest*/,
+	const ::imtgql::CGqlRequest& gqlRequest,
 	QString& /*errorMessage*/) const
 {
 	sdl::imtauth::Sessions::CCreateNewSessionPayload response;

@@ -322,7 +322,7 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="MembershipManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="TenantMemberships"/>
+                        <Data IsEnabled="true" Value="TenantMembershipManager"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TenantCollection" Type="Reference" ExportId="TenantRepository">
                         <Data IsEnabled="false"/>
@@ -371,7 +371,7 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="MembershipManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="TenantMemberships"/>
+                        <Data IsEnabled="true" Value="TenantMembershipManager"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TenantManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="TenantManager"/>
@@ -380,6 +380,29 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="TenantMembershipInfo" PackageId="ImtAuthPck" ComponentId="TenantMembershipInfo">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="TenantMembershipManager" PackageId="ImtAuthPck" ComponentId="TenantMembershipManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MembershipCollection" Type="Reference" ExportId="TenantMembershipRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MembershipFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="TenantMembershipInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -399,24 +422,9 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="MembershipManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="TenantMemberships"/>
+                        <Data IsEnabled="true" Value="TenantMembershipManager"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="TenantMemberships" PackageId="" ComponentId="TenantMemberships">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TenantMembershipRepository" Type="Reference" ExportId="TenantMembershipRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
@@ -459,7 +467,7 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="MembershipManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="TenantMemberships"/>
+                        <Data IsEnabled="true" Value="TenantMembershipManager"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="TenantRepository">
                         <Data IsEnabled="false"/>
@@ -558,5 +566,8 @@
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="Demultiplexer"/>
         <Interface InterfaceId="imtgql::IGqlSubscriberController" ComponentId="SlaveSubscriberController"/>
     </ExportedInterfaces>
-    <ExportedComponents/>
+    <ExportedComponents>
+        <Component ExportedId="TenantManager" ComponentId="TenantManager"/>
+        <Component ExportedId="TenantMembershipManager" ComponentId="TenantMembershipManager"/>
+    </ExportedComponents>
 </Acf>

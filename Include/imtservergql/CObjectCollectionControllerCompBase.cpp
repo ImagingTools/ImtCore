@@ -2913,7 +2913,8 @@ void CObjectCollectionControllerCompBase::SetAdditionalFilters(
 imtauth::CTenantFilterParam* CObjectCollectionControllerCompBase::CreateTenantFilterParam(
 			const imtgql::CGqlRequest& gqlRequest) const
 {
-	if (!(*m_tenantFilterEnabledAttrPtr)){
+	bool filterEnabled = m_tenantFilterEnabledAttrPtr.IsValid() ? *m_tenantFilterEnabledAttrPtr : false;
+	if (!filterEnabled){
 		return nullptr;
 	}
 
