@@ -150,6 +150,19 @@ imtsdl::TElementList<sdl::imtauth::Profile::CProfileTenantInfo::V1_0> CProfileCo
 {
 	imtsdl::TElementList<sdl::imtauth::Profile::CProfileTenantInfo::V1_0> organizationList;
 
+	// Add Default Tenant (always available to all users, empty tenantId)
+	{
+		sdl::imtauth::Profile::CProfileTenantInfo::V1_0 defaultOrganization;
+		defaultOrganization.id = QByteArray();
+		defaultOrganization.name = QStringLiteral("Default");
+		defaultOrganization.description = QString();
+		defaultOrganization.ownerId = QByteArray();
+		defaultOrganization.isOwner = false;
+		defaultOrganization.isActive = true;
+		defaultOrganization.role = QStringLiteral("Member");
+		organizationList << defaultOrganization;
+	}
+
 	if (!m_tenantManagerCompPtr.IsValid()){
 		return organizationList;
 	}
