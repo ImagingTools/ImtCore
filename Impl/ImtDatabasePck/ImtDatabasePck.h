@@ -28,7 +28,7 @@
 #include <imtdb/CPostgresXPathExtractorComp.h>
 #include <imtdb/CSqliteXPathExtractorComp.h>
 #include <imtdb/CSqlDatabaseTransactionManagerComp.h>
-#include <imtdb/CTenantFilterParam.h>
+#include <imtauth/CTenantFilterParam.h>
 
 
 /**

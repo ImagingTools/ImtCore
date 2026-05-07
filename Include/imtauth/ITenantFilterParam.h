@@ -9,21 +9,21 @@
 #include <QtCore/QByteArray>
 
 
-namespace imtdb
+namespace imtauth
 {
 
 
 class ITenantFilterParam: virtual public iser::ISerializable
 {
 public:
-    virtual QByteArray GetTenantId() const = 0;
-    virtual void SetTenantId(const QByteArray& tenantId) = 0;
+	virtual QByteArray GetTenantId() const = 0;
+	virtual void SetTenantId(const QByteArray& tenantId) = 0;
 
-    virtual QByteArray GetOwnerId() const = 0;
-    virtual void SetOwnerId(const QByteArray& ownerId) = 0;
+	virtual QByteArray GetOwnerId() const = 0;
+	virtual void SetOwnerId(const QByteArray& ownerId) = 0;
 };
 
 
-} // namespace imtdb
+} // namespace imtauth
 
 

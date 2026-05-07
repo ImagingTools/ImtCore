@@ -28,7 +28,7 @@
 #include <imtcol/CDocumentIdFilter.h>
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtauth/IUserActionManager.h>
-#include <imtdb/CTenantFilterParam.h>
+#include <imtauth/CTenantFilterParam.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
 
 
@@ -299,7 +299,7 @@ protected:
 		Returns nullptr when tenant filtering is disabled.
 		The returned pointer is owned by the caller (ParamsSet takes ownership).
 	*/
-	virtual imtdb::CTenantFilterParam* CreateTenantFilterParam(const imtgql::CGqlRequest& gqlRequest) const;
+	virtual imtauth::CTenantFilterParam* CreateTenantFilterParam(const imtgql::CGqlRequest& gqlRequest) const;
 
 	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId) const;
 	virtual QString GetObjectNameFromRequest(const imtgql::CGqlRequest& gqlRequest) const;

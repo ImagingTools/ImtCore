@@ -2826,7 +2826,7 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 	this->SetAdditionalFilters(gqlRequest, inputParamsGql, &filterParams);
 
 	// Inject optional tenant filter
-	imtdb::CTenantFilterParam* tenantFilterPtr = CreateTenantFilterParam(gqlRequest);
+	imtauth::CTenantFilterParam* tenantFilterPtr = CreateTenantFilterParam(gqlRequest);
 	if (tenantFilterPtr != nullptr){
 		filterParams.SetEditableParameter("TenantFilter", tenantFilterPtr, true);
 	}
@@ -2910,7 +2910,7 @@ void CObjectCollectionControllerCompBase::SetAdditionalFilters(
 }
 
 
-imtdb::CTenantFilterParam* CObjectCollectionControllerCompBase::CreateTenantFilterParam(
+imtauth::CTenantFilterParam* CObjectCollectionControllerCompBase::CreateTenantFilterParam(
 			const imtgql::CGqlRequest& gqlRequest) const
 {
 	if (!(*m_tenantFilterEnabledAttrPtr)){
@@ -2922,7 +2922,7 @@ imtdb::CTenantFilterParam* CObjectCollectionControllerCompBase::CreateTenantFilt
 		return nullptr;
 	}
 
-	imtdb::CTenantFilterParam* tenantFilterPtr = new imtdb::CTenantFilterParam();
+	imtauth::CTenantFilterParam* tenantFilterPtr = new imtauth::CTenantFilterParam();
 	tenantFilterPtr->SetTenantId(gqlContextPtr->GetTenantId());
 	tenantFilterPtr->SetOwnerId(gqlContextPtr->GetUserId());
 
