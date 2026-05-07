@@ -120,5 +120,3 @@ bool CTenantFilterParam::ResetData(CompatibilityMode /*mode*/)
 
 
 } // namespace imtauth
-
-
