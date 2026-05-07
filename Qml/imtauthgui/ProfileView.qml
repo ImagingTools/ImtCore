@@ -10,7 +10,6 @@ import imtauthProfileSdl 1.0
 ViewBase {
 	id: container;
 	property ProfileData profileData: model ? model : null;
-	readonly property bool isDefaultTenant: AuthorizationController.currentTenantId === null || AuthorizationController.currentTenantId === "";
 	
 	Connections {
 		target: container.profileData;
@@ -34,8 +33,40 @@ ViewBase {
 		mailInput.text = profileData.m_email;
 		
 		permissionsTable.table.elements = profileData.m_permissions;
-		rolesTable.table.elements = profileData.m_roles
-		groupsTable.table.elements = profileData.m_groups
+		rolesTable.table.elements = profileData.m_roles;
+		groupsTable.table.elements = profileData.m_groups;
+		__updateOrganizationsTable();
+	}
+	
+	function __updateOrganizationsTable(){
+		if (!organizationsTable.table || !container.profileData)
+			return;
+		
+		organizationsTable.table.elements = container.profileData.m_organizations;
+		__selectCurrentTenantInTable();
+	}
+	
+	function __selectCurrentTenantInTable(){
+		if (!organizationsTable.table || !container.profileData)
+			return;
+		
+		organizationsGroup.__blockSelection = true;
+		organizationsTable.table.uncheckAll();
+		
+		var orgs = container.profileData.m_organizations;
+		if (!orgs){
+			organizationsGroup.__blockSelection = false;
+			return;
+		}
+		
+		for (var i = 0; i < orgs.count; i++){
+			var org = orgs.get(i).item;
+			if (org && org.m_id === AuthorizationController.currentTenantId){
+				organizationsTable.table.checkItem(i);
+				break;
+			}
+		}
+		organizationsGroup.__blockSelection = false;
 	}
 	
 	function updateModel(){
@@ -43,19 +74,6 @@ ViewBase {
 		profileData.m_email = mailInput.text
 	}
 	
-	function __resolveCurrentTenantName(){
-		if (container.isDefaultTenant)
-			return qsTr("Default (No Organization)");
-		var orgs = container.profileData ? container.profileData.m_organizations : null;
-		if (orgs){
-			for (var i = 0; i < orgs.elementsCount; i++){
-				var org = orgs.element(i);
-				if (org && org.m_id === AuthorizationController.currentTenantId)
-					return org.m_name || org.m_id;
-			}
-		}
-		return AuthorizationController.currentTenantId;
-	}
 	
 	GqlSdlRequestSender {
 		id: getProfileRequest;
@@ -239,40 +257,40 @@ ViewBase {
 			GroupElementView {
 				id: organizationsGroup;
 				width: parent.width;
-				visible: container.profileData ? container.profileData.m_organizations && container.profileData.m_organizations.count > 0 : false;
+				visible: organizationsTable.table ? organizationsTable.table.elementsCount > 0 : false;
 				
-				ElementView {
-					name: qsTr("Current");
-					description: container.__resolveCurrentTenantName();
-				}
+				property bool __blockSelection: false;
 				
-				ElementView {
-					name: qsTr("Switch Organization");
-					controlComp: Component {
-						Column {
-							spacing: Style.marginS;
+				TableElementView {
+					id: organizationsTable;
+					
+					onTableChanged: {
+						if (table){
+							table.checkable = true;
+							table.isMultiCheckable = false;
+						}
+						container.__updateOrganizationsTable();
+					}
+					
+					Connections {
+						target: organizationsTable.table;
+						
+						function onCheckedItemsChanged(){
+							if (organizationsGroup.__blockSelection)
+								return;
 							
-							Button {
-								width: Style.buttonWidthXXL;
-								height: Style.controlHeightM;
-								text: qsTr("Default (No Organization)");
-								enabled: !container.isDefaultTenant;
-								onClicked: {
-									AuthorizationController.selectTenant("");
-								}
+							let indexes = organizationsTable.table.getCheckedItems();
+							if (indexes.length === 0){
+								AuthorizationController.selectTenant("");
+								return;
 							}
 							
-							Repeater {
-								model: container.profileData ? container.profileData.m_organizations : null;
-								
-								delegate: Button {
-									width: Style.buttonWidthXXL;
-									height: Style.controlHeightM;
-									text: model.item.m_name || model.item.m_id;
-									enabled: model.item.m_id !== AuthorizationController.currentTenantId;
-									onClicked: {
-										AuthorizationController.selectTenant(model.item.m_id);
-									}
+							let selectedIndex = indexes[0];
+							let orgs = container.profileData ? container.profileData.m_organizations : null;
+							if (orgs && selectedIndex < orgs.count){
+								let org = orgs.get(selectedIndex).item;
+								if (org && org.m_id !== AuthorizationController.currentTenantId){
+									AuthorizationController.selectTenant(org.m_id);
 								}
 							}
 						}
@@ -362,6 +380,10 @@ ViewBase {
 			
 			if (groupsTable.table){
 				groupsTable.table.headers = headersModel;
+			}
+			
+			if (organizationsTable.table){
+				organizationsTable.table.headers = headersModel;
 			}
 		}
 		
