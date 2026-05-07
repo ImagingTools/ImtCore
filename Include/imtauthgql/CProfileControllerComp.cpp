@@ -206,6 +206,9 @@ imtsdl::TElementList<sdl::imtauth::Profile::CProfileTenantInfo::V1_0> CProfileCo
 		else if (membershipPtr.IsValid()){
 			organizationInfo.role = TenantMembershipRoleToString(membershipPtr->GetRole());
 		}
+		else {
+			organizationInfo.role = QStringLiteral("Unknown");
+		}
 
 		organizationList << organizationInfo;
 	}
