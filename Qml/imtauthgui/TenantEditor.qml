@@ -17,6 +17,8 @@ DocumentViewBase {
 	property TenantData tenantData: model
 	property var pendingMembers: []
 	property bool isNewTenant: tenantData ? (!tenantData.m_id || tenantData.m_id === "") : true
+	readonly property real memberRoleNameWidthRatio: 0.55
+	readonly property real memberRoleComboWidthRatio: 0.4
 	// Guard: set when members are modified locally, prevents updateGui from overwriting
 	property bool __membersModifiedLocally: false
 
@@ -83,6 +85,7 @@ DocumentViewBase {
 			for (var i = 0; i < count; i++) {
 				var m = serverMembers.get(i).item
 				if (m) {
+					// Keep id visible if server cannot resolve the display name; this avoids blank chips/role rows.
 					members.push({ id: m.m_id || "", name: m.m_name || m.m_id || "" })
 				}
 			}
@@ -104,6 +107,7 @@ DocumentViewBase {
 	function __getRoleModelValue(rolesModel, index, key) {
 		if (!rolesModel || index < 0)
 			return ""
+		// SDL BaseModel items expose generated m_* properties, while some QML models use plain keys.
 		if (rolesModel.getData)
 			return rolesModel.getData("m_" + key, index) || rolesModel.getData(key, index) || ""
 		var role = rolesModel.get(index).item
@@ -330,7 +334,7 @@ DocumentViewBase {
 								spacing: Style.marginL
 
 								BaseText {
-									width: parent.width * 0.55
+									width: parent.width * container.memberRoleNameWidthRatio
 									anchors.verticalCenter: parent.verticalCenter
 									text: modelData.userName
 									elide: Text.ElideRight
@@ -338,7 +342,7 @@ DocumentViewBase {
 
 								ComboBox {
 									id: roleCombo
-									width: parent.width * 0.4
+									width: parent.width * container.memberRoleComboWidthRatio
 									anchors.verticalCenter: parent.verticalCenter
 									model: container.__getAvailableRolesModel()
 									nameId: "name"
