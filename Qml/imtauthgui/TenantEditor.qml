@@ -101,6 +101,17 @@ DocumentViewBase {
 		return container.tenantData.m_availableRoles
 	}
 
+	function __getRoleModelValue(rolesModel, index, key) {
+		if (!rolesModel || index < 0)
+			return ""
+		if (rolesModel.getData)
+			return rolesModel.getData("m_" + key, index) || rolesModel.getData(key, index) || ""
+		var role = rolesModel.get(index).item
+		if (!role)
+			return ""
+		return role["m_" + key] || role[key] || ""
+	}
+
 	function __findRoleIndex(roleId) {
 		var roles = container.__getAvailableRolesModel()
 		if (!roles)
@@ -108,8 +119,8 @@ DocumentViewBase {
 
 		var count = roles.getItemsCount ? roles.getItemsCount() : (roles.count || 0)
 		for (var i = 0; i < count; i++) {
-			var id = roles.getData ? (roles.getData("m_id", i) || roles.getData("id", i)) : ""
-			var name = roles.getData ? (roles.getData("m_name", i) || roles.getData("name", i)) : ""
+			var id = container.__getRoleModelValue(roles, i, "id")
+			var name = container.__getRoleModelValue(roles, i, "name")
 			if (id === roleId || name === roleId)
 				return i
 		}
@@ -337,7 +348,9 @@ DocumentViewBase {
 										if (!roleCombo.model || index < 0)
 											return
 
-										var selectedRole = itemId || roleCombo.model.getData("m_id", index) || roleCombo.model.getData("id", index)
+										var selectedRole = itemId || container.__getRoleModelValue(roleCombo.model, index, "id")
+										if (!selectedRole)
+											return
 										if (selectedRole !== modelData.role) {
 											container.__updateMemberRole(modelData.userId, selectedRole)
 										}
