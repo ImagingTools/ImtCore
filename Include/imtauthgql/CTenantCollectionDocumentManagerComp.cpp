@@ -11,6 +11,7 @@
 #include <imtauth/IUserManager.h>
 #include <imtgql/IGqlContext.h>
 #include <imtdoc/CDocumentSavedEvent.h>
+#include <imtauth/imtauth.h>
 
 
 namespace
@@ -120,37 +121,29 @@ sdl::imtauth::Tenants::CTenantData CTenantCollectionDocumentManagerComp::OnGetTe
 			if (membershipPtr.IsValid() && membershipPtr->IsActive()){
 				QByteArray userId = membershipPtr->GetUserId();
 
-				sdl::imtauth::Tenants::CTenantMemberEntry memberEntry;
-				memberEntry.Version_1_0.Emplace();
-				memberEntry.Version_1_0->id = userId;
-				// Resolve user name via IUserManager
-				QString userName = QString::fromUtf8(userId);
-				if (m_userManagerCompPtr.IsValid()){
-					imtauth::IUserInfoUniquePtr userPtr = m_userManagerCompPtr->GetUser(userId);
-					if (userPtr.IsValid()){
-						userName = userPtr->GetName();
-					}
+				sdl::imtauth::Tenants::CTenantMemberEntry::V1_0 memberEntry;
+				memberEntry.id = userId;
+
+				if (m_userCollectionCompPtr.IsValid()){
+					memberEntry.name = imtauth::GetUserName(*m_userCollectionCompPtr, userId);
 				}
-				memberEntry.Version_1_0->name = userName;
+
 				response.Version_1_0->members->push_back(memberEntry);
 
-				sdl::imtauth::Tenants::CTenantMemberRoleEntry roleEntry;
-				roleEntry.Version_1_0.Emplace();
-				roleEntry.Version_1_0->userId = userId;
-				roleEntry.Version_1_0->role = TenantMemberRoleToString(membershipPtr->GetRole());
+				sdl::imtauth::Tenants::CTenantMemberRoleEntry::V1_0 roleEntry;
+				roleEntry.userId = userId;
+				roleEntry.role = TenantMemberRoleToString(membershipPtr->GetRole());
 				response.Version_1_0->memberRoles->push_back(roleEntry);
 			}
 		}
 	}
 
-	// Populate available roles from TenantMemberRole enum
 	response.Version_1_0->availableRoles.Emplace();
 	static const char* roleNames[] = {"Owner", "Admin", "Member", "Guest"};
 	for (const char* roleName : roleNames){
-		sdl::imtauth::Tenants::CTenantRoleOption opt;
-		opt.Version_1_0.Emplace();
-		opt.Version_1_0->id = QByteArray(roleName);
-		opt.Version_1_0->name = QString::fromLatin1(roleName);
+		sdl::imtauth::Tenants::CTenantRoleOption::V1_0 opt;
+		opt.id = QByteArray(roleName);
+		opt.name = QString::fromLatin1(roleName);
 		response.Version_1_0->availableRoles->push_back(opt);
 	}
 
@@ -242,8 +235,8 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTenantCollect
 
 		QSet<QByteArray> newUserIds;
 		for (const auto& memberEntry : *tenantData.members){
-			if (memberEntry.Version_1_0 && memberEntry.Version_1_0->id){
-				newUserIds.insert(*memberEntry.Version_1_0->id);
+			if (memberEntry->id){
+				newUserIds.insert(*memberEntry->id);
 			}
 		}
 
@@ -272,9 +265,9 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTenantCollect
 			}
 
 			for (const auto& roleEntry : *tenantData.memberRoles){
-				if (roleEntry.Version_1_0 && roleEntry.Version_1_0->userId && roleEntry.Version_1_0->role){
-					QByteArray userId = *roleEntry.Version_1_0->userId;
-					QString roleStr = *roleEntry.Version_1_0->role;
+				if (roleEntry->userId && roleEntry->role){
+					QByteArray userId = *roleEntry->userId;
+					QString roleStr = *roleEntry->role;
 					if (updatedUserIdToMembershipId.contains(userId)){
 						imtauth::ITenantMembership::TenantMemberRole newRole = StringToTenantMemberRole(roleStr);
 						m_membershipManagerCompPtr->UpdateMembershipRole(updatedUserIdToMembershipId.value(userId), newRole);

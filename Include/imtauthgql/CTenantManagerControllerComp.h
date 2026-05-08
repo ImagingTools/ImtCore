@@ -24,7 +24,7 @@ public:
 	I_BEGIN_COMPONENT(CTenantManagerControllerComp);
 		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager providing CRUD operations", true, "TenantManager");
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager for member operations", true, "MembershipManager");
-		I_ASSIGN(m_userManagerCompPtr, "UserManager", "User manager for resolving member names", false, "UserManager");
+		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "Collection of users", true, "UserCollection");
 	I_END_COMPONENT;
 
 protected:
@@ -37,10 +37,12 @@ protected:
 				const sdl::imtauth::Tenants::CGetTenantRelationshipsGqlRequest& getTenantRelationshipsRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+	void extracted(sdl::imtauth::Tenants::CTenantData::V1_0 &tenantData,
+				   QByteArrayList &membershipIds) const;
 	virtual sdl::imtauth::Tenants::CGetTenantPayload OnGetTenant(
-				const sdl::imtauth::Tenants::CGetTenantGqlRequest& getTenantRequest,
-				const ::imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
+			const sdl::imtauth::Tenants::CGetTenantGqlRequest &getTenantRequest,
+			const ::imtgql::CGqlRequest &gqlRequest,
+			QString &errorMessage) const override;
 	virtual sdl::imtauth::Tenants::CCreateTenantPayload OnCreateTenant(
 				const sdl::imtauth::Tenants::CCreateTenantGqlRequest& createTenantRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
@@ -69,7 +71,7 @@ protected:
 private:
 	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
-	I_REF(imtauth::IUserManager, m_userManagerCompPtr);
+	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
 };
 
 

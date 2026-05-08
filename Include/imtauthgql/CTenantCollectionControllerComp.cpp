@@ -56,7 +56,7 @@ bool CTenantCollectionControllerComp::CreateRepresentationFromObject(
 		representationObject.description = QString(tenantInfoPtr->GetTenantDescription());
 	}
 
-	if (requestInfo.items.isOwnerIdRequested){
+	if (requestInfo.items.isOwnerIdRequested && m_userCollectionCompPtr.IsValid()){
 		representationObject.ownerId = imtauth::GetUserName(*m_userCollectionCompPtr, tenantInfoPtr->GetOwnerId()).toUtf8();
 	}
 

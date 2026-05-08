@@ -1,9 +1,13 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CTenantManagerControllerComp.h>
 
+
 // Qt includes
 #include <QSet>
 #include <QMap>
+
+// ImtCore includes
+#include <imtauth/imtauth.h>
 
 
 namespace imtauthgql
@@ -15,9 +19,9 @@ namespace imtauthgql
 // reimplemented (sdl::imtauth::Tenants::CGraphQlHandlerCompBase)
 
 sdl::imtauth::Tenants::CGetTenantIdsPayload CTenantManagerControllerComp::OnGetTenantIds(
-	const sdl::imtauth::Tenants::CGetTenantIdsGqlRequest& /*getTenantIdsRequest*/,
-	const ::imtgql::CGqlRequest& /*gqlRequest*/,
-	QString& /*errorMessage*/) const
+			const sdl::imtauth::Tenants::CGetTenantIdsGqlRequest& /*getTenantIdsRequest*/,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
 {
 	sdl::imtauth::Tenants::CGetTenantIdsPayload response;
 
@@ -50,9 +54,9 @@ sdl::imtauth::Tenants::CGetTenantRelationshipsPayload CTenantManagerControllerCo
 
 
 sdl::imtauth::Tenants::CGetTenantPayload CTenantManagerControllerComp::OnGetTenant(
-	const sdl::imtauth::Tenants::CGetTenantGqlRequest& getTenantRequest,
-	const ::imtgql::CGqlRequest& /*gqlRequest*/,
-	QString& /*errorMessage*/) const
+			const sdl::imtauth::Tenants::CGetTenantGqlRequest& getTenantRequest,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
 {
 	sdl::imtauth::Tenants::CGetTenantPayload response;
 
@@ -89,21 +93,17 @@ sdl::imtauth::Tenants::CGetTenantPayload CTenantManagerControllerComp::OnGetTena
 	if (m_membershipManagerCompPtr.IsValid()){
 		QByteArrayList membershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
 		tenantData.members.Emplace();
-		for (const QByteArray& msId : membershipIds){
+		for (const QByteArray& msId : std::as_const(membershipIds)){
 			imtauth::ITenantMembershipUniquePtr msPtr = m_membershipManagerCompPtr->GetMembership(msId);
 			if (msPtr.IsValid() && msPtr->IsActive()){
 				QByteArray userId = msPtr->GetUserId();
-				sdl::imtauth::Tenants::CTenantMemberEntry memberEntry;
-				memberEntry.Version_1_0.Emplace();
-				memberEntry.Version_1_0->id = userId;
-				QString userName = QString::fromUtf8(userId);
-				if (m_userManagerCompPtr.IsValid()){
-					imtauth::IUserInfoUniquePtr userPtr = m_userManagerCompPtr->GetUser(userId);
-					if (userPtr.IsValid()){
-						userName = userPtr->GetName();
-					}
+				sdl::imtauth::Tenants::CTenantMemberEntry::V1_0 memberEntry;
+				memberEntry.id = userId;
+
+				if (m_userCollectionCompPtr.IsValid()){
+					memberEntry.name = imtauth::GetUserName(*m_userCollectionCompPtr, userId);
 				}
-				memberEntry.Version_1_0->name = userName;
+
 				tenantData.members->push_back(memberEntry);
 			}
 		}
@@ -116,9 +116,9 @@ sdl::imtauth::Tenants::CGetTenantPayload CTenantManagerControllerComp::OnGetTena
 
 
 sdl::imtauth::Tenants::CCreateTenantPayload CTenantManagerControllerComp::OnCreateTenant(
-	const sdl::imtauth::Tenants::CCreateTenantGqlRequest& createTenantRequest,
-	const ::imtgql::CGqlRequest& gqlRequest,
-	QString& /*errorMessage*/) const
+			const sdl::imtauth::Tenants::CCreateTenantGqlRequest& createTenantRequest,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& /*errorMessage*/) const
 {
 	sdl::imtauth::Tenants::CCreateTenantPayload response;
 
