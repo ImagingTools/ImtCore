@@ -1096,6 +1096,50 @@ QString CSqlDatabaseDocumentDelegateComp::CreateTenantBindingTableName() const
 }
 
 
+QByteArray CSqlDatabaseDocumentDelegateComp::CreateTenantBindingTableInitializationQuery() const
+{
+	const QByteArray databaseDriverId = m_databaseEngineCompPtr.IsValid() ? m_databaseEngineCompPtr->GetDatabaseDriverId() : QByteArray();
+	const bool isSqlite = databaseDriverId.compare(QByteArrayLiteral("QSQLITE"), Qt::CaseInsensitive) == 0;
+	const QString bindingsTableName = CreateTenantBindingTableName();
+
+	if (isSqlite){
+		return QString(
+					"CREATE TABLE IF NOT EXISTS %1 "
+					"(\"Id\" TEXT PRIMARY KEY, "
+					"\"TenantId\" TEXT NOT NULL, "
+					"\"EntityType\" TEXT NOT NULL, "
+					"\"EntityId\" TEXT NOT NULL, "
+					"\"CreatedAt\" TEXT NOT NULL, "
+					"\"CreatedByUserId\" TEXT, "
+					"\"Scope\" TEXT, "
+					"UNIQUE (\"TenantId\", \"EntityType\", \"EntityId\"));"
+					"CREATE INDEX IF NOT EXISTS \"IX_TenantEntityBindings_TenantId\" "
+					"ON %1 (\"TenantId\");"
+					"CREATE INDEX IF NOT EXISTS \"IX_TenantEntityBindings_Entity\" "
+					"ON %1 (\"EntityType\", \"EntityId\");")
+				.arg(bindingsTableName)
+				.toUtf8();
+	}
+
+	return QString(
+				"CREATE TABLE IF NOT EXISTS %1 "
+				"(\"Id\" TEXT PRIMARY KEY, "
+				"\"TenantId\" TEXT NOT NULL, "
+				"\"EntityType\" TEXT NOT NULL, "
+				"\"EntityId\" TEXT NOT NULL, "
+				"\"CreatedAt\" timestamp without time zone NOT NULL, "
+				"\"CreatedByUserId\" TEXT, "
+				"\"Scope\" TEXT, "
+				"CONSTRAINT \"UQ_TenantEntityBindings_Tenant_Entity\" UNIQUE (\"TenantId\", \"EntityType\", \"EntityId\"));"
+				"CREATE INDEX IF NOT EXISTS \"IX_TenantEntityBindings_TenantId\" "
+				"ON %1 (\"TenantId\");"
+				"CREATE INDEX IF NOT EXISTS \"IX_TenantEntityBindings_Entity\" "
+				"ON %1 (\"EntityType\", \"EntityId\");")
+			.arg(bindingsTableName)
+			.toUtf8();
+}
+
+
 QString CSqlDatabaseDocumentDelegateComp::CreateTenantBindingFilterQuery(const QByteArray& tenantId) const
 {
 	const QString bindingsTableName = CreateTenantBindingTableName();
@@ -1163,7 +1207,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateTenantBindingInsertQuery(
 					ownerId.isEmpty() ? QStringLiteral("NULL") : QString("'%1'").arg(SqlEncode(QString::fromUtf8(ownerId))),
 					onConflictClause);
 
-	return query.toUtf8();
+	return CreateTenantBindingTableInitializationQuery() + query.toUtf8();
 }
 
 
