@@ -47,6 +47,7 @@ type TenantData {
 	isActive: Boolean
 	createdAt: String
 	updatedAt: String
+	memberIds: [ID]
 	members: [TenantMemberEntry]
 	memberRoles: [TenantMemberRoleEntry]
 	availableRoles: [TenantRoleOption]

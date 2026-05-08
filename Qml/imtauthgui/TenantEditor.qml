@@ -25,25 +25,34 @@ DocumentViewBase {
 	}
 
 	function updateGui(){
-		generalGroup.updateGui();
 		__loadMembersFromModel();
+		generalGroup.updateGui();
 	}
 
 	function updateModel(){
 		generalGroup.updateModel();
-		// Sync members and memberRoles back to model
+		// Sync memberIds and memberRoles back to model
 		if (container.tenantData) {
-			container.tenantData.m_members = __buildMembersForModel()
-			container.tenantData.m_memberRoles = __buildMemberRolesForModel()
-		}
-	}
+			// memberIds: simple [ID] array — works with plain JS assignment
+			container.tenantData.m_memberIds = container.pendingMembers.map(function(m) { return m.id })
 
-	function __buildMembersForModel() {
-		var result = []
-		for (var i = 0; i < pendingMembers.length; ++i) {
-			result.push({ m_id: pendingMembers[i].id, m_name: pendingMembers[i].name || pendingMembers[i].id })
+			// memberRoles: structured SDL list — use emplace/create/addElement API
+			if (!container.tenantData.hasMemberRoles()) {
+				container.tenantData.emplaceMemberRoles()
+			}
+			while (container.tenantData.m_memberRoles.count > 0) {
+				container.tenantData.m_memberRoles.removeElement(0)
+			}
+			var members = container.pendingMembers
+			for (var i = 0; i < members.length; i++) {
+				var entry = container.tenantData.createMemberRolesArrayElement()
+				if (entry) {
+					entry.m_userId = members[i].id
+					entry.m_role = container.__memberRolesMap[members[i].id] || container.defaultRole
+					container.tenantData.m_memberRoles.addElement(entry)
+				}
+			}
 		}
-		return result
 	}
 
 	function __loadMembersFromModel() {
@@ -53,11 +62,17 @@ DocumentViewBase {
 		}
 		if (!container.tenantData)
 			return
-		var serverMembers = container.tenantData.m_members || []
+		// m_members is an SDL-generated list — access via .count and .get(i).item
+		var serverMembers = container.tenantData.m_members
 		var members = []
-		for (var i = 0; i < serverMembers.length; i++) {
-			var m = serverMembers[i]
-			members.push({ id: m.m_id || "", name: m.m_name || m.m_id || "" })
+		if (serverMembers) {
+			var count = serverMembers.count || 0
+			for (var i = 0; i < count; i++) {
+				var m = serverMembers.get(i).item
+				if (m) {
+					members.push({ id: m.m_id || "", name: m.m_name || m.m_id || "" })
+				}
+			}
 		}
 		container.pendingMembers = members
 		__loadMemberRolesFromModel()
@@ -70,10 +85,14 @@ DocumentViewBase {
 	function __getAvailableRoleNames() {
 		if (!container.tenantData || !container.tenantData.m_availableRoles)
 			return []
+		var roles = container.tenantData.m_availableRoles
+		var count = roles.count || 0
 		var names = []
-		for (var i = 0; i < container.tenantData.m_availableRoles.length; i++) {
-			var role = container.tenantData.m_availableRoles[i]
-			names.push(role.m_name || role.m_id || "Unknown")
+		for (var i = 0; i < count; i++) {
+			var role = roles.get(i).item
+			if (role) {
+				names.push(role.m_name || role.m_id || "Unknown")
+			}
 		}
 		return names
 	}
@@ -85,8 +104,9 @@ DocumentViewBase {
 		var rolesMap = {}
 		if (container.tenantData && container.tenantData.m_memberRoles) {
 			var roleEntries = container.tenantData.m_memberRoles
-			for (var i = 0; i < roleEntries.length; i++) {
-				var entry = roleEntries[i]
+			var count = roleEntries.count || 0
+			for (var i = 0; i < count; i++) {
+				var entry = roleEntries.get(i).item
 				if (entry && entry.m_userId) {
 					rolesMap[entry.m_userId] = entry.m_role || container.defaultRole
 				}
@@ -112,17 +132,6 @@ DocumentViewBase {
 			var userName = members[i].name || userId
 			var role = container.__memberRolesMap[userId] || container.defaultRole
 			result.push({ userId: userId, userName: userName, role: role })
-		}
-		return result
-	}
-
-	function __buildMemberRolesForModel() {
-		var result = []
-		var members = container.pendingMembers
-		for (var i = 0; i < members.length; i++) {
-			var userId = members[i].id
-			var role = container.__memberRolesMap[userId] || container.defaultRole
-			result.push({ m_userId: userId, m_role: role })
 		}
 		return result
 	}

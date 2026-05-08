@@ -221,7 +221,7 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTenantCollect
 		tenantPtr->SetActive(*tenantData.isActive);
 	}
 
-	if (!tenantId.isEmpty() && tenantData.members && m_membershipManagerCompPtr.IsValid()){
+	if (!tenantId.isEmpty() && tenantData.memberIds && m_membershipManagerCompPtr.IsValid()){
 		QByteArrayList currentMembershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
 		QMap<QByteArray, QByteArray> userIdToMembershipId;
 		QSet<QByteArray> currentUserIds;
@@ -234,10 +234,8 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTenantCollect
 		}
 
 		QSet<QByteArray> newUserIds;
-		for (const auto& memberEntry : *tenantData.members){
-			if (memberEntry->id){
-				newUserIds.insert(*memberEntry->id);
-			}
+		for (const QByteArray& userId : *tenantData.memberIds){
+			newUserIds.insert(userId);
 		}
 
 		for (const QByteArray& existingUserId : currentUserIds){
