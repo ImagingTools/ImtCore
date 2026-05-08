@@ -4,7 +4,7 @@
 #if __has_include(<rhi/qrhi.h>)
 #include <rhi/qrhi.h>
 #elif __has_include(<QtGui/rhi/qrhi.h>)
-#include <QtGui/qrhi.h>
+#include <QtGui/rhi/qrhi.h>
 #elif __has_include(<QtGui/private/qrhi_p.h>)
 #include <QtGui/private/qrhi_p.h>
 #else

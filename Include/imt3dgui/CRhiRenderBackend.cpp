@@ -233,7 +233,7 @@ void CRhiRenderBackend::IssuePendingDrawCalls()
 
 		m_commandBuffer->setGraphicsPipeline(pipeline);
 
-		const quint32 dynamicOffset = static_cast<quint32>(i * m_alignedDrawUboSize);
+		const QRhiCommandBuffer::DynamicOffset dynamicOffset(1, static_cast<quint32>(i * m_alignedDrawUboSize));
 		m_commandBuffer->setShaderResources(m_srb, 1, &dynamicOffset);
 
 		const QRhiCommandBuffer::VertexInput vbufBinding{

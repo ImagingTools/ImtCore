@@ -55,9 +55,9 @@ public:
 		return QRectF(0, 0, m_itemPtr->width(), m_itemPtr->height());
 	}
 
-	void prepare(const RenderState* state) override
+	void prepare() override
 	{
-		QRhi* rhi = state->rhi();
+		QRhi* rhi = renderTarget()->rhi();
 		if (!rhi){
 			return;
 		}

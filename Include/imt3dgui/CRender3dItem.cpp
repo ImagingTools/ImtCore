@@ -119,15 +119,15 @@ public:
 		return QRectF(0, 0, m_itemPtr->width(), m_itemPtr->height());
 	}
 
-	void prepare(const RenderState* state) override
+	void prepare() override
 	{
-		QRhi* rhi = state->rhi();
+		QRhi* rhi = renderTarget()->rhi();
 		if (!rhi){
 			return;
 		}
 
 		if (!m_initialized){
-			InitResources(rhi, state);
+			InitResources(rhi);
 		}
 
 		if (!m_initialized){
@@ -227,7 +227,7 @@ private:
 		float pointSize;
 	};
 
-	void InitResources(QRhi* rhi, const RenderState* state)
+	void InitResources(QRhi* rhi)
 	{
 		// Load pre-compiled QSB shaders (same ones CRhiRenderBackend uses)
 		const QString vertPath = QStringLiteral(":/RhiShaders/vshader_rhi.vert.qsb");
