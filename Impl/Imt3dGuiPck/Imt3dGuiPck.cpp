@@ -3,6 +3,7 @@
 
 
 #include <icomp/export.h>
+#include <imt3dgui/CRhiRenderBackend.h>
 
 
 I_REGISTER_QT_RESOURCE(imt3dguilight)
@@ -68,5 +69,4 @@ I_EXPORT_COMPONENT(
 			"3D Render Backend RHI");
 
 } // namespace Imt3dGuiPck
-
 
