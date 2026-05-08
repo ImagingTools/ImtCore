@@ -381,6 +381,9 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 
 			add_subdirectory("${IMPL_DIR}/Imt3dGuiPck/CMake" "${AUX_INCLUDE_DIR}/Imt3dGuiPck")
 			add_dependencies(Imt3dGuiPck imt3dview imt3dgui)
+
+			add_subdirectory("${IMPL_DIR}/Imt3dDemo/CMake" "${AUX_INCLUDE_DIR}/Imt3dDemo")
+			add_dependencies(Imt3dDemo imt3dgui imt3dview imt3d)
 		endif()
 
 		if(NOT DEFINED USE_QTQML OR USE_QTQML)

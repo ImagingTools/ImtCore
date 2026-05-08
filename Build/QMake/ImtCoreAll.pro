@@ -456,6 +456,10 @@ SUBDIRS += EagleView
 EagleView.file = ../../Impl/EagleView/QMake/EagleView.pro
 EagleView.depends = imt3dgui
 
+SUBDIRS += Imt3dDemo
+Imt3dDemo.file = ../../Impl/Imt3dDemo/QMake/Imt3dDemo.pro
+Imt3dDemo.depends = imt3dgui imt3dview
+
 SUBDIRS += ImtHypePck
 ImtHypePck.file = ../../Impl/ImtHypePck/QMake/ImtHypePck.pro
 ImtHypePck.depends = imthype
