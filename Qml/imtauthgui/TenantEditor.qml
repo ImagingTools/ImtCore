@@ -150,6 +150,15 @@ DocumentViewBase {
 		container.pendingInvitations = invitations
 	}
 
+	function __formatDateTime(value) {
+		if (!value)
+			return ""
+		var date = new Date(value)
+		if (isNaN(date.getTime()))
+			return value
+		return Qt.formatDateTime(date, Qt.DefaultLocaleShortDate)
+	}
+
 	// --- Member roles support ---
 	// Available role options from server (TenantData.availableRoles)
 	readonly property string defaultRole: "Member"
@@ -401,7 +410,7 @@ DocumentViewBase {
 
 									BaseText {
 										width: parent.width - revokeInviteButton.width - resendInviteButton.width - parent.spacing * 2
-										text: qsTr("Invited by %1 at %2").arg(modelData.invitedByName || modelData.invitedByUserId).arg(modelData.createdAt)
+										text: qsTr("Invited by %1 at %2").arg(modelData.invitedByName || modelData.invitedByUserId).arg(container.__formatDateTime(modelData.createdAt))
 										elide: Text.ElideRight
 									}
 

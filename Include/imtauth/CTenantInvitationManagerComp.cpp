@@ -14,6 +14,22 @@ namespace imtauth
 {
 
 
+namespace
+{
+
+
+constexpr int TenantInvitationExpirationDays = 7;
+
+
+QString CreateInvitationExpirationTime()
+{
+	return QDateTime::currentDateTimeUtc().addDays(TenantInvitationExpirationDays).toString(Qt::ISODate);
+}
+
+
+} // anonymous namespace
+
+
 ITenantInvitationManager::InvitationIds CTenantInvitationManagerComp::GetInvitationsByTenant(const QByteArray& tenantId, const Statuses& statuses) const
 {
 	InvitationIds result;
@@ -126,7 +142,7 @@ QByteArray CTenantInvitationManagerComp::CreateInvitation(const QByteArray& invi
 
 	QByteArray invitationId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 	QString now = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
-	QString expiresAt = QDateTime::currentDateTimeUtc().addDays(7).toString(Qt::ISODate);
+	QString expiresAt = CreateInvitationExpirationTime();
 
 	invitationPtr->SetInvitationId(invitationId);
 	invitationPtr->SetUserId(userId);
@@ -253,7 +269,7 @@ bool CTenantInvitationManagerComp::ResendInvitation(const QByteArray& invitation
 	QString now = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
 	invitationPtr->SetLastSentAt(now);
 	invitationPtr->SetUpdatedAt(now);
-	invitationPtr->SetExpiresAt(QDateTime::currentDateTimeUtc().addDays(7).toString(Qt::ISODate));
+	invitationPtr->SetExpiresAt(CreateInvitationExpirationTime());
 
 	return StoreInvitation(invitationId, *invitationPtr);
 }
@@ -293,4 +309,3 @@ bool CTenantInvitationManagerComp::StoreInvitation(const QByteArray& invitationI
 
 
 } // namespace imtauth
-
