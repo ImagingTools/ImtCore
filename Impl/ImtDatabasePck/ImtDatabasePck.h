@@ -22,7 +22,6 @@
 #include <imtdb/CMigrationControllerComp.h>
 #include <imtdb/CCompositeMigrationControllerComp.h>
 #include <imtdb/CObjectCollectionMigrationControllerComp.h>
-#include <imtdb/CTenantBindingMigrationControllerComp.h>
 #include <imtdb/CDatabaseConnectorComp.h>
 #include <imtdb/CDependentTableMetaInfoControllerComp.h>
 #include <imtdb/CSqliteDatabaseDocumentDelegateComp.h>
@@ -54,7 +53,6 @@ typedef imtdb::TMessageDatabaseDelegateComp<imtdb::CSqliteDatabaseDocumentDelega
 typedef imtdb::CMigrationControllerComp MigrationController;
 typedef imtdb::CCompositeMigrationControllerComp CompositeMigrationController;
 typedef imtdb::CObjectCollectionMigrationControllerComp ObjectCollectionMigrationController;
-typedef imtdb::CTenantBindingMigrationControllerComp TenantBindingMigrationController;
 typedef imtdb::CDatabaseConnectorComp DatabaseConnector;
 typedef imtdb::CDependentTableMetaInfoControllerComp DependentTableMetaInfoController;
 typedef imtdb::CSqliteDatabaseDocumentDelegateComp SQLiteDatabaseDocumentDelegate;
@@ -64,4 +62,3 @@ typedef imtdb::CSqlDatabaseTransactionManagerComp SqlDatabaseTransactionManager;
 
 
 } // namespace ImtDatabasePck
-
