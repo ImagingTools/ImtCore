@@ -459,8 +459,8 @@ void CPointsBasedObject::TEnsureCuboidCalculated() const
 		double right = xRange.GetMaxValue();
 		double bottom = yRange.GetMinValue();
 		double top = yRange.GetMaxValue();
-		double near = zRange.GetMinValue();
-		double far = zRange.GetMaxValue();
+		double far = zRange.GetMinValue();
+		double near = zRange.GetMaxValue();
 
 		m_boundingCuboid = CCuboid(left, right, bottom, top, near, far);
 
