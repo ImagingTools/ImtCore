@@ -80,24 +80,24 @@ public:
 				QRhiRenderPassDescriptor* renderPassDescriptor);
 
 	/**
-		Build a QRhiResourceUpdateBatch containing all pending geometry uploads,
-		GlobalUBO and per-draw DrawUBO fills for the current frame. The caller
-		is responsible for submitting the batch (e.g. via
-		commandBuffer()->resourceUpdate() in a QSGRenderNode::render()).
+		Apply all pending geometry uploads, GlobalUBO and per-draw DrawUBO fills
+		for the current frame using QRhiBuffer::beginFullDynamicBufferUpdateForCurrentFrame().
 
-		Important: the batch must be submitted inside an active render pass.
-		QSGRenderNode::prepare() is called before beginPass(), so submitting
-		there would trigger D3D11 assertion "cbD->commands.isEmpty()".
+		This approach maps the Dynamic buffers directly in CPU memory without recording
+		any commands into the QRhiCommandBuffer. It is therefore safe to call from
+		QSGRenderNode::prepare() — before the render pass begins — without triggering
+		the D3D11 assertion "cbD->commands.isEmpty()" at beginPass(), and without
+		requiring an active render pass (which would be needed for resourceUpdate()).
 
-		This is the first phase of inline rendering; call IssuePendingDrawCalls()
-		afterwards to emit the actual draw commands.
+		Must be called while a QRhi frame is active (between beginFrame/endFrame).
+		Call IssuePendingDrawCalls() afterwards to emit the actual draw commands.
 	*/
-	QRhiResourceUpdateBatch* FlushPendingUpdates();
+	void FlushPendingUpdates();
 
 	/**
 		Issue all pending draw calls to m_commandBuffer. The caller must have
-		already applied the resource-update batch returned by FlushPendingUpdates()
-		and set the viewport. After this call the pending-draw list is cleared.
+		already called FlushPendingUpdates() and set the viewport. After this
+		call the pending-draw list is cleared.
 
 		This is the second phase of inline rendering, used by QSGRenderNode
 		implementations that are already inside a render pass owned by Qt Quick.

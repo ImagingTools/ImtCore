@@ -118,13 +118,15 @@ public:
 		imt3dview::SceneState sceneState = BuildSceneState(projMatrix);
 
 		// Run the scene render pipeline: BeginFrame → scene.Render → FlushPendingUpdates.
-		// Resource updates are built here but submitted in render(), because
-		// prepare() is called before the render pass is activated and
-		// commandBuffer()->resourceUpdate() must not be called outside an
-		// active render pass (triggers D3D11 assertion "cbD->commands.isEmpty()").
+		// FlushPendingUpdates() applies all buffer updates via
+		// QRhiBuffer::beginFullDynamicBufferUpdateForCurrentFrame(), which maps Dynamic
+		// buffers directly in CPU memory without recording commands into the
+		// QRhiCommandBuffer. This is safe in prepare() (before beginPass()) and avoids
+		// both D3D11 assertions: "cbD->commands.isEmpty()" (if resourceUpdate were called
+		// before beginPass) and "recordingPass == NoPass" (if called during render).
 		m_backend.BeginFrame(sceneState);
 		m_scene->Render(m_backend);
-		m_pendingBatch = m_backend.FlushPendingUpdates();
+		m_backend.FlushPendingUpdates();
 	}
 
 	void render(const RenderState* state) override
@@ -134,12 +136,6 @@ public:
 		}
 
 		QRhiCommandBuffer* cb = commandBuffer();
-
-		// Submit resource updates inside the active render pass.
-		if (m_pendingBatch){
-			cb->resourceUpdate(m_pendingBatch);
-			m_pendingBatch = nullptr;
-		}
 
 		// Viewport
 		const QRectF r = rect();
@@ -220,7 +216,6 @@ private:
 	CScene3dItem* m_itemPtr = nullptr;
 	imt3dview::CScene3d* m_scene = nullptr;
 	CRhiRenderBackend m_backend;
-	QRhiResourceUpdateBatch* m_pendingBatch = nullptr;
 	bool m_backendReady = false;
 };
 

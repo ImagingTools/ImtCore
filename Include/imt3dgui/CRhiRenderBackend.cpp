@@ -139,10 +139,10 @@ void CRhiRenderBackend::BeginFrame(const imt3dview::SceneState& sceneState)
 }
 
 
-QRhiResourceUpdateBatch* CRhiRenderBackend::FlushPendingUpdates()
+void CRhiRenderBackend::FlushPendingUpdates()
 {
 	if (!m_initialized || m_rhi == nullptr){
-		return nullptr;
+		return;
 	}
 
 	const int drawCount = static_cast<int>(m_pendingDraws.size());
@@ -153,46 +153,62 @@ QRhiResourceUpdateBatch* CRhiRenderBackend::FlushPendingUpdates()
 	}
 	const int effectiveDrawCount = qMin(drawCount, s_maxDrawsPerFrame);
 
-	QRhiResourceUpdateBatch* batch = m_rhi->nextResourceUpdateBatch();
-
-	// 1. Flush pending geometry uploads.
+	// 1. Flush pending geometry uploads via direct CPU mapping.
+	// beginFullDynamicBufferUpdateForCurrentFrame() maps Dynamic buffers without
+	// recording any commands into the QRhiCommandBuffer, so it is safe to call
+	// from QSGRenderNode::prepare() before the render pass begins.
 	for (const PendingUpload& upload : m_pendingUploads){
 		if (!upload.geometry || !upload.geometry->IsCreated()){
 			continue;
 		}
-		batch->updateDynamicBuffer(
-					upload.geometry->GetVertexBuffer(),
-					0,
-					upload.vertexData.size(),
-					upload.vertexData.constData());
+
+		void* vDst = upload.geometry->GetVertexBuffer()->beginFullDynamicBufferUpdateForCurrentFrame();
+		if (vDst){
+			memcpy(vDst, upload.vertexData.constData(), upload.vertexData.size());
+			upload.geometry->GetVertexBuffer()->endFullDynamicBufferUpdateForCurrentFrame();
+		}
+		else{
+			qDebug() << "CRhiRenderBackend::FlushPendingUpdates: vertex buffer mapping failed";
+		}
 
 		if (!upload.vertexOnly && !upload.indexData.isEmpty()){
-			batch->updateDynamicBuffer(
-						upload.geometry->GetIndexBuffer(),
-						0,
-						upload.indexData.size(),
-						upload.indexData.constData());
+			void* iDst = upload.geometry->GetIndexBuffer()->beginFullDynamicBufferUpdateForCurrentFrame();
+			if (iDst){
+				memcpy(iDst, upload.indexData.constData(), upload.indexData.size());
+				upload.geometry->GetIndexBuffer()->endFullDynamicBufferUpdateForCurrentFrame();
+			}
+			else{
+				qDebug() << "CRhiRenderBackend::FlushPendingUpdates: index buffer mapping failed";
+			}
 		}
 	}
 	m_pendingUploads.clear();
 
-	// 2. Fill GlobalUBO.
+	// 2. Update GlobalUBO via direct CPU mapping.
 	GlobalUboData globalData{};
 	FillGlobalUbo(m_sceneState, globalData);
-	batch->updateDynamicBuffer(m_globalUbo, 0, sizeof(GlobalUboData), &globalData);
-
-	// 3. Fill per-draw DrawUBO slots.
-	for (int i = 0; i < effectiveDrawCount; ++i){
-		DrawUboData drawData{};
-		FillDrawUbo(m_pendingDraws[i], drawData);
-		batch->updateDynamicBuffer(
-					m_drawUbo,
-					i * m_alignedDrawUboSize,
-					sizeof(DrawUboData),
-					&drawData);
+	void* gp = m_globalUbo->beginFullDynamicBufferUpdateForCurrentFrame();
+	if (gp){
+		memcpy(gp, &globalData, sizeof(GlobalUboData));
+		m_globalUbo->endFullDynamicBufferUpdateForCurrentFrame();
+	}
+	else{
+		qDebug() << "CRhiRenderBackend::FlushPendingUpdates: GlobalUBO mapping failed";
 	}
 
-	return batch;
+	// 3. Update per-draw DrawUBO slots via direct CPU mapping.
+	char* dp = reinterpret_cast<char*>(m_drawUbo->beginFullDynamicBufferUpdateForCurrentFrame());
+	if (dp){
+		for (int i = 0; i < effectiveDrawCount; ++i){
+			DrawUboData drawData{};
+			FillDrawUbo(m_pendingDraws[i], drawData);
+			memcpy(dp + i * m_alignedDrawUboSize, &drawData, sizeof(DrawUboData));
+		}
+		m_drawUbo->endFullDynamicBufferUpdateForCurrentFrame();
+	}
+	else{
+		qDebug() << "CRhiRenderBackend::FlushPendingUpdates: DrawUBO mapping failed";
+	}
 }
 
 
@@ -260,18 +276,16 @@ void CRhiRenderBackend::EndFrame()
 		return;
 	}
 
-	QRhiResourceUpdateBatch* batch = FlushPendingUpdates();
-	if (batch == nullptr){
-		return;
-	}
+	FlushPendingUpdates();
 
-	// Open the render pass — this atomically applies the batch before any GPU work.
+	// Open the render pass. Resource updates are already applied via CPU mapping
+	// in FlushPendingUpdates(), so no batch is needed here.
 	const QColor& cc = m_sceneState.clearColor;
 	m_commandBuffer->beginPass(
 				m_renderTarget,
 				cc,
 				{ 1.0f, 0 },
-				batch);
+				nullptr);
 
 	// Set the full-widget viewport once (shapes don't adjust it individually).
 	const QRect& vp = m_sceneState.viewport;

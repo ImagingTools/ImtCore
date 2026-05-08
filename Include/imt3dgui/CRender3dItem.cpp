@@ -142,32 +142,55 @@ public:
 		QVector3D camPos;
 		BuildMatrices(rhi, viewMatrix, projMatrix, camPos);
 
-		// Build resource update batch.  It is NOT submitted here because
-		// prepare() is called before the render pass is activated.
-		// Submitting via commandBuffer()->resourceUpdate() outside an active
-		// pass triggers D3D11 assertion "cbD->commands.isEmpty()".
-		// The batch is stored and submitted at the start of render().
-		m_pendingBatch = rhi->nextResourceUpdateBatch();
+		// Update UBO and vertex/index data via direct CPU mapping.
+		// QRhiBuffer::beginFullDynamicBufferUpdateForCurrentFrame() maps Dynamic buffers
+		// without recording any commands into the QRhiCommandBuffer, so it is safe to
+		// call from prepare() (before the render pass begins) and avoids both D3D11
+		// assertions: "cbD->commands.isEmpty()" and "recordingPass == NoPass".
 
 		// GlobalUBO
 		GlobalUboData globalData{};
 		FillGlobal(viewMatrix, projMatrix, camPos, globalData);
-		m_pendingBatch->updateDynamicBuffer(m_globalUbo, 0, sizeof(GlobalUboData), &globalData);
+		void* gp = m_globalUbo->beginFullDynamicBufferUpdateForCurrentFrame();
+		if (gp){
+			memcpy(gp, &globalData, sizeof(GlobalUboData));
+			m_globalUbo->endFullDynamicBufferUpdateForCurrentFrame();
+		}
+		else{
+			qDebug() << "CRender3dNode::prepare: GlobalUBO mapping failed";
+		}
 
 		// DrawUBO
 		DrawUboData drawData{};
 		FillDraw(drawData);
-		m_pendingBatch->updateDynamicBuffer(m_drawUbo, 0, sizeof(DrawUboData), &drawData);
+		void* dp = m_drawUbo->beginFullDynamicBufferUpdateForCurrentFrame();
+		if (dp){
+			memcpy(dp, &drawData, sizeof(DrawUboData));
+			m_drawUbo->endFullDynamicBufferUpdateForCurrentFrame();
+		}
+		else{
+			qDebug() << "CRender3dNode::prepare: DrawUBO mapping failed";
+		}
 
 		// Upload cube vertex/index data if first time
 		if (m_needsUpload){
 			CubeData cube;
-			m_pendingBatch->updateDynamicBuffer(
-						m_vertexBuffer, 0,
-						sizeof(cube.vertices), cube.vertices);
-			m_pendingBatch->updateDynamicBuffer(
-						m_indexBuffer, 0,
-						sizeof(cube.indices), cube.indices);
+			void* vp = m_vertexBuffer->beginFullDynamicBufferUpdateForCurrentFrame();
+			if (vp){
+				memcpy(vp, cube.vertices, sizeof(cube.vertices));
+				m_vertexBuffer->endFullDynamicBufferUpdateForCurrentFrame();
+			}
+			else{
+				qDebug() << "CRender3dNode::prepare: vertex buffer mapping failed";
+			}
+			void* ip = m_indexBuffer->beginFullDynamicBufferUpdateForCurrentFrame();
+			if (ip){
+				memcpy(ip, cube.indices, sizeof(cube.indices));
+				m_indexBuffer->endFullDynamicBufferUpdateForCurrentFrame();
+			}
+			else{
+				qDebug() << "CRender3dNode::prepare: index buffer mapping failed";
+			}
 			m_needsUpload = false;
 		}
 	}
@@ -179,12 +202,6 @@ public:
 		}
 
 		QRhiCommandBuffer* cb = commandBuffer();
-
-		// Submit resource updates inside the active render pass.
-		if (m_pendingBatch){
-			cb->resourceUpdate(m_pendingBatch);
-			m_pendingBatch = nullptr;
-		}
 
 		// Viewport
 		const QRectF r = rect();
@@ -435,7 +452,6 @@ private:
 
 	bool m_initialized = false;
 	bool m_needsUpload = true;
-	QRhiResourceUpdateBatch* m_pendingBatch = nullptr;
 };
 
 
