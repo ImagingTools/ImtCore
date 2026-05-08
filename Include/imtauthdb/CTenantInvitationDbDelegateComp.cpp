@@ -27,6 +27,16 @@ static QString RecordDateTimeToString(const QSqlRecord& record, const char* fiel
 }
 
 
+static QString NullableSqlDateTime(const QString& value)
+{
+	if (value.isEmpty()){
+		return QStringLiteral("NULL");
+	}
+
+	return QString("'%1'").arg(imtdb::EscapeSql(value));
+}
+
+
 istd::IChangeableUniquePtr CTenantInvitationDbDelegateComp::CreateObjectFromRecord(
 		const QSqlRecord& record,
 		const iprm::IParamsSet* /*dataConfigurationPtr*/) const
@@ -99,11 +109,14 @@ CTenantInvitationDbDelegateComp::NewObjectQuery CTenantInvitationDbDelegateComp:
 	QString createdAt = !invitationPtr->GetCreatedAt().isEmpty() ? imtdb::EscapeSql(invitationPtr->GetCreatedAt()) : imtdb::UtcNow();
 	QString updatedAt = !invitationPtr->GetUpdatedAt().isEmpty() ? imtdb::EscapeSql(invitationPtr->GetUpdatedAt()) : createdAt;
 	QString expiresAt = imtdb::EscapeSql(invitationPtr->GetExpiresAt());
+	QString acceptedAt = NullableSqlDateTime(invitationPtr->GetAcceptedAt());
+	QString rejectedAt = NullableSqlDateTime(invitationPtr->GetRejectedAt());
+	QString revokedAt = NullableSqlDateTime(invitationPtr->GetRevokedAt());
 	QString lastSentAt = imtdb::EscapeSql(invitationPtr->GetLastSentAt());
 
 	result.query = QString(
 		"INSERT INTO \"%1\" (\"Id\", \"UserId\", \"TenantId\", \"Role\", \"Status\", \"InvitedByUserId\", \"CreatedAt\", \"UpdatedAt\", \"ExpiresAt\", \"AcceptedAt\", \"RejectedAt\", \"RevokedAt\", \"RevokedByUserId\", \"LastSentAt\") "
-		"VALUES ('%2', '%3', '%4', %5, %6, '%7', '%8', '%9', '%10', NULL, NULL, NULL, '%11', '%12');")
+		"VALUES ('%2', '%3', '%4', %5, %6, '%7', '%8', '%9', '%10', %11, %12, %13, '%14', '%15');")
 		.arg(*m_tableNameAttrPtr,
 			 id,
 			 userId,
@@ -114,6 +127,9 @@ CTenantInvitationDbDelegateComp::NewObjectQuery CTenantInvitationDbDelegateComp:
 			 createdAt,
 			 updatedAt,
 			 expiresAt,
+			 acceptedAt,
+			 rejectedAt,
+			 revokedAt,
 			 revokedByUserId,
 			 lastSentAt).toUtf8();
 

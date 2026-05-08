@@ -22,7 +22,7 @@ public:
 
 	I_BEGIN_COMPONENT(CTenantMembershipManagerControllerComp);
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager providing CRUD operations", true, "TenantMembershipManager");
-		I_ASSIGN(m_invitationManagerCompPtr, "InvitationManager", "Tenant invitation manager providing invitation lifecycle operations", false, "TenantInvitationManager");
+		I_ASSIGN(m_invitationManagerCompPtr, "InvitationManager", "Tenant invitation manager providing invitation lifecycle operations", true, "TenantInvitationManager");
 	I_END_COMPONENT;
 
 protected:

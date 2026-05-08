@@ -164,6 +164,7 @@ input InviteTenantMemberInput {
 	role: TenantMemberRole
 }
 
+# Legacy compatibility wrapper around CreateTenantInvitation. New callers should use CreateTenantInvitation.
 type InviteTenantMemberPayload {
 	membershipId: ID
 	errorMessage: String

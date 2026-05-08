@@ -334,7 +334,7 @@ DocumentViewBase {
 				visible: !container.isNewTenant
 				items: container.pendingMembers
 				label: qsTr("Active Members")
-				addButtonText: qsTr("Invite member")
+				addButtonText: qsTr("Create invitation")
 				filterPlaceholder: qsTr("Type or choose a user")
 				collectionId: "Users"
 				emptyText: qsTr("No members")
