@@ -19,6 +19,8 @@ DocumentViewBase {
 	property bool isNewTenant: tenantData ? (!tenantData.m_id || tenantData.m_id === "") : true
 	readonly property real memberRoleNameWidthRatio: 0.55
 	readonly property real memberRoleComboWidthRatio: 0.4
+	readonly property int memberRoleHorizontalMargin: Style.marginL
+	readonly property int memberRoleHorizontalMargins: memberRoleHorizontalMargin + memberRoleHorizontalMargin
 	// Guard: set when members are modified locally, prevents updateGui from overwriting
 	property bool __membersModifiedLocally: false
 
@@ -38,8 +40,8 @@ DocumentViewBase {
 			if (!container.tenantData.hasMembers()) {
 				container.tenantData.emplaceMembers()
 			}
-			while (container.tenantData.m_members.count > 0) {
-				container.tenantData.m_members.removeElement(0)
+			for (var oldMemberIndex = container.tenantData.m_members.count - 1; oldMemberIndex >= 0; oldMemberIndex--) {
+				container.tenantData.m_members.removeElement(oldMemberIndex)
 			}
 			var pendingMembers = container.pendingMembers
 			for (var memberIndex = 0; memberIndex < pendingMembers.length; memberIndex++) {
@@ -55,8 +57,8 @@ DocumentViewBase {
 			if (!container.tenantData.hasMemberRoles()) {
 				container.tenantData.emplaceMemberRoles()
 			}
-			while (container.tenantData.m_memberRoles.count > 0) {
-				container.tenantData.m_memberRoles.removeElement(0)
+			for (var oldRoleIndex = container.tenantData.m_memberRoles.count - 1; oldRoleIndex >= 0; oldRoleIndex--) {
+				container.tenantData.m_memberRoles.removeElement(oldRoleIndex)
 			}
 			var members = container.pendingMembers
 			for (var i = 0; i < members.length; i++) {
@@ -316,8 +318,8 @@ DocumentViewBase {
 				visible: !container.isNewTenant && container.pendingMembers.length > 0
 
 				Column {
-					width: parent.width - 2 * Style.marginL
-					x: Style.marginL
+					width: parent.width - container.memberRoleHorizontalMargins
+					x: container.memberRoleHorizontalMargin
 					spacing: Style.marginM
 
 					Repeater {
