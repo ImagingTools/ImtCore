@@ -20,6 +20,10 @@ DocumentViewBase {
 	// Guard: set when members are modified locally, prevents updateGui from overwriting
 	property bool __membersModifiedLocally: false
 
+	onPendingMembersChanged: {
+		memberRolesRepeater.model = __buildMemberRolesModel()
+	}
+
 	function updateGui(){
 		generalGroup.updateGui();
 		__loadMembersFromModel();
@@ -58,9 +62,20 @@ DocumentViewBase {
 	}
 
 	// --- Member roles support ---
-	// Static role options matching TenantMemberRole enum
-	readonly property var roleOptions: ["Owner", "Admin", "Member", "Guest"]
+	// Available role options from server (TenantData.availableRoles)
+	readonly property var __fallbackRoleNames: ["Owner", "Admin", "Member", "Guest"]
 	readonly property string defaultRole: "Member"
+
+	function __getAvailableRoleNames() {
+		if (!container.tenantData || !container.tenantData.m_availableRoles)
+			return container.__fallbackRoleNames
+		var names = []
+		for (var i = 0; i < container.tenantData.m_availableRoles.length; i++) {
+			var role = container.tenantData.m_availableRoles[i]
+			names.push(role.m_name || role.m_id || "Unknown")
+		}
+		return names.length > 0 ? names : container.__fallbackRoleNames
+	}
 
 	// Map of userId -> role string (built from TenantData.memberRoles)
 	property var __memberRolesMap: ({})
@@ -276,10 +291,11 @@ DocumentViewBase {
 
 							ComboBox {
 								width: parent.width * 0.4
-								model: container.roleOptions
-								currentIndex: container.roleOptions.indexOf(modelData.role)
+								model: container.__getAvailableRoleNames()
+								currentIndex: container.__getAvailableRoleNames().indexOf(modelData.role)
 								onActivated: {
-									var selectedRole = container.roleOptions[index]
+									var roles = container.__getAvailableRoleNames()
+									var selectedRole = roles[index]
 									if (selectedRole !== modelData.role) {
 										container.__updateMemberRole(modelData.userId, selectedRole)
 									}

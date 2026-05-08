@@ -12,6 +12,45 @@
 #include <imtdoc/CDocumentSavedEvent.h>
 
 
+namespace
+{
+
+
+QString TenantMemberRoleToString(imtauth::ITenantMembership::TenantMemberRole role)
+{
+	switch (role){
+		case imtauth::ITenantMembership::TMR_OWNER:
+			return QStringLiteral("Owner");
+		case imtauth::ITenantMembership::TMR_ADMIN:
+			return QStringLiteral("Admin");
+		case imtauth::ITenantMembership::TMR_MEMBER:
+			return QStringLiteral("Member");
+		case imtauth::ITenantMembership::TMR_GUEST:
+			return QStringLiteral("Guest");
+		default:
+			return QStringLiteral("Member");
+	}
+}
+
+
+imtauth::ITenantMembership::TenantMemberRole StringToTenantMemberRole(const QString& role)
+{
+	if (role == QStringLiteral("Owner")){
+		return imtauth::ITenantMembership::TMR_OWNER;
+	}
+	if (role == QStringLiteral("Admin")){
+		return imtauth::ITenantMembership::TMR_ADMIN;
+	}
+	if (role == QStringLiteral("Guest")){
+		return imtauth::ITenantMembership::TMR_GUEST;
+	}
+	return imtauth::ITenantMembership::TMR_MEMBER;
+}
+
+
+} // anonymous namespace
+
+
 namespace imtauthgql
 {
 
@@ -74,12 +113,50 @@ sdl::imtauth::Tenants::CTenantData CTenantCollectionDocumentManagerComp::OnGetTe
 	if (m_membershipManagerCompPtr.IsValid()){
 		QByteArrayList membershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
 		response.Version_1_0->memberIds.Emplace();
+		response.Version_1_0->memberRoles.Emplace();
 		for (const QByteArray& membershipId : membershipIds){
 			imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
 			if (membershipPtr.IsValid() && membershipPtr->IsActive()){
 				response.Version_1_0->memberIds->push_back(membershipPtr->GetUserId());
+
+				sdl::imtauth::Tenants::CTenantMemberRoleEntry roleEntry;
+				roleEntry.Version_1_0.Emplace();
+				roleEntry.Version_1_0->userId = membershipPtr->GetUserId();
+				roleEntry.Version_1_0->role = TenantMemberRoleToString(membershipPtr->GetRole());
+				response.Version_1_0->memberRoles->push_back(roleEntry);
 			}
 		}
+	}
+
+	// Populate available roles from TenantMemberRole enum
+	response.Version_1_0->availableRoles.Emplace();
+	{
+		sdl::imtauth::Tenants::CTenantRoleOption opt;
+		opt.Version_1_0.Emplace();
+		opt.Version_1_0->id = QByteArray("Owner");
+		opt.Version_1_0->name = QStringLiteral("Owner");
+		response.Version_1_0->availableRoles->push_back(opt);
+	}
+	{
+		sdl::imtauth::Tenants::CTenantRoleOption opt;
+		opt.Version_1_0.Emplace();
+		opt.Version_1_0->id = QByteArray("Admin");
+		opt.Version_1_0->name = QStringLiteral("Admin");
+		response.Version_1_0->availableRoles->push_back(opt);
+	}
+	{
+		sdl::imtauth::Tenants::CTenantRoleOption opt;
+		opt.Version_1_0.Emplace();
+		opt.Version_1_0->id = QByteArray("Member");
+		opt.Version_1_0->name = QStringLiteral("Member");
+		response.Version_1_0->availableRoles->push_back(opt);
+	}
+	{
+		sdl::imtauth::Tenants::CTenantRoleOption opt;
+		opt.Version_1_0.Emplace();
+		opt.Version_1_0->id = QByteArray("Guest");
+		opt.Version_1_0->name = QStringLiteral("Guest");
+		response.Version_1_0->availableRoles->push_back(opt);
 	}
 
 	return response;
@@ -182,6 +259,30 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTenantCollect
 		for (const QByteArray& addUserId : newUserIds){
 			if (!currentUserIds.contains(addUserId)){
 				m_membershipManagerCompPtr->InviteMembership(addUserId, tenantId, imtauth::ITenantMembership::TMR_MEMBER);
+			}
+		}
+
+		// Apply role updates from memberRoles
+		if (tenantData.memberRoles){
+			// Rebuild userIdToMembershipId after additions
+			QMap<QByteArray, QByteArray> updatedUserIdToMembershipId;
+			QByteArrayList updatedMembershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
+			for (const QByteArray& membershipId : updatedMembershipIds){
+				imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
+				if (membershipPtr.IsValid()){
+					updatedUserIdToMembershipId[membershipPtr->GetUserId()] = membershipId;
+				}
+			}
+
+			for (const auto& roleEntry : *tenantData.memberRoles){
+				if (roleEntry.Version_1_0 && roleEntry.Version_1_0->userId && roleEntry.Version_1_0->role){
+					QByteArray userId = *roleEntry.Version_1_0->userId;
+					QString roleStr = *roleEntry.Version_1_0->role;
+					if (updatedUserIdToMembershipId.contains(userId)){
+						imtauth::ITenantMembership::TenantMemberRole newRole = StringToTenantMemberRole(roleStr);
+						m_membershipManagerCompPtr->UpdateMembershipRole(updatedUserIdToMembershipId.value(userId), newRole);
+					}
+				}
 			}
 		}
 	}

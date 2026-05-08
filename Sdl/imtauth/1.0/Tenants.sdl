@@ -29,6 +29,11 @@ type TenantMemberRoleEntry {
 	role: String!
 }
 
+type TenantRoleOption {
+	id: String!
+	name: String!
+}
+
 type TenantData {
 	id: ID
 	name: String
@@ -39,6 +44,7 @@ type TenantData {
 	updatedAt: String
 	memberIds: [ID]
 	memberRoles: [TenantMemberRoleEntry]
+	availableRoles: [TenantRoleOption]
 }
 
 input GetTenantListInput {
