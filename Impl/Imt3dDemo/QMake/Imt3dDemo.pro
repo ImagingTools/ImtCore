@@ -16,8 +16,8 @@ greaterThan(QT_MAJOR_VERSION, 5): QT += openglwidgets
 win32-msvc*{
 	QMAKE_CXXFLAGS += /wd4264
 
-	# copying all Qt DLLs to destination directory
-	greaterThan(QT_MAJOR_VERSION, 4): QMAKE_POST_LINK = set path=$(QTDIR)\bin;%path% && $(QTDIR)\bin\windeployqt $$DESTDIR/$${TARGET}.exe
+	# copying all Qt DLLs to destination directory (--qmldir ensures QML modules like QtQuick.Controls are deployed)
+	greaterThan(QT_MAJOR_VERSION, 4): QMAKE_POST_LINK = set path=$(QTDIR)\bin;%path% && $(QTDIR)\bin\windeployqt --qmldir $$_PRO_FILE_PWD_/.. $$DESTDIR/$${TARGET}.exe
 }
 
 include($(ACFCONFIGDIR)/QMake/AcfQt.pri)
