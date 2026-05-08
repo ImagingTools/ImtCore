@@ -4,7 +4,7 @@ include($(ACFCONFIGDIR)/QMake/TestConfig.pri)
 include($$PWD/../../../../Config/QMake/ImtCore.pri)
 
 LIBS += -L../../../../Lib/$$COMPILER_DIR
-LIBS += -limtsdlgenqml -limtsdlgencpp -limtsdl -limtbase -litest
+LIBS += -limtsdlgenqml -limtsdlgencpp -limtsdl -limtfile -limtbase -litest
 
 QT += core testlib widgets
 

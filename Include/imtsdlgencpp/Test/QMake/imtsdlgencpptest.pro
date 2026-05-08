@@ -4,7 +4,11 @@ include($(ACFCONFIGDIR)/QMake/TestConfig.pri)
 include($$PWD/../../../../Config/QMake/ImtCore.pri)
 
 LIBS += -L../../../../Lib/$$COMPILER_DIR
-LIBS += -limtsdlgencpp -limtsdlgenqml -limtsdl -limtbase -litest
+LIBS += -limtsdlgencpp -limtsdlgenqml -limtsdl -limtfile -limtbase -litest
+
+QT += core testlib
+
+CONFIG += console
 
 # Set configuration of custom builds:
 # ARX Compiler:
