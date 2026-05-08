@@ -110,7 +110,8 @@ DocumentViewBase {
 		// Prefer SDL-generated m_* roles but keep plain-key lookup for regular QML models.
 		if (rolesModel.getData)
 			return rolesModel.getData("m_" + key, index) || rolesModel.getData(key, index) || ""
-		var role = rolesModel.get(index).item
+		var modelItem = rolesModel.get(index)
+		var role = modelItem ? modelItem.item : null
 		if (!role)
 			return ""
 		return role["m_" + key] || role[key] || ""
@@ -349,10 +350,11 @@ DocumentViewBase {
 									currentIndex: container.__findRoleIndex(modelData.role)
 
 									onFinished: {
-										if (!roleCombo.model || index < 0)
+										var selectedIndex = index
+										if (!roleCombo.model || selectedIndex < 0)
 											return
 
-										var selectedRole = container.__getRoleModelValue(roleCombo.model, index, "id")
+										var selectedRole = container.__getRoleModelValue(roleCombo.model, selectedIndex, "id")
 										if (!selectedRole)
 											return
 										if (selectedRole !== modelData.role) {
