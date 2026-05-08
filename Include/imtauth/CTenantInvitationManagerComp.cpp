@@ -278,7 +278,7 @@ bool CTenantInvitationManagerComp::ResendInvitation(const QByteArray& invitation
 ITenantInvitation::TenantInvitationStatus CTenantInvitationManagerComp::GetEffectiveStatus(const ITenantInvitation& invitation) const
 {
 	if (invitation.GetStatus() == ITenantInvitation::TIS_PENDING && !invitation.GetExpiresAt().isEmpty()){
-		QDateTime expiresAt = QDateTime::fromString(invitation.GetExpiresAt(), Qt::ISODate);
+		QDateTime expiresAt = QDateTime::fromString(invitation.GetExpiresAt(), Qt::ISODateWithMs);
 		if (expiresAt.isValid() && expiresAt < QDateTime::currentDateTimeUtc()){
 			return ITenantInvitation::TIS_EXPIRED;
 		}

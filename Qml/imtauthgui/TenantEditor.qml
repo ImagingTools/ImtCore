@@ -159,6 +159,10 @@ DocumentViewBase {
 		return Qt.formatDateTime(date, Qt.DefaultLocaleShortDate)
 	}
 
+	function __displayNameOrId(name, id) {
+		return name ? name : id
+	}
+
 	// --- Member roles support ---
 	// Available role options from server (TenantData.availableRoles)
 	readonly property string defaultRole: "Member"
@@ -427,7 +431,7 @@ DocumentViewBase {
 
 									BaseText {
 										width: parent.width - revokeInviteButton.width - resendInviteButton.width - parent.spacing * 2
-										text: qsTr("Invited by %1 at %2").arg(modelData.invitedByName ? modelData.invitedByName : modelData.invitedByUserId).arg(container.__formatDateTime(modelData.createdAt))
+										text: qsTr("Invited by %1 at %2").arg(container.__displayNameOrId(modelData.invitedByName, modelData.invitedByUserId)).arg(container.__formatDateTime(modelData.createdAt))
 										elide: Text.ElideRight
 									}
 

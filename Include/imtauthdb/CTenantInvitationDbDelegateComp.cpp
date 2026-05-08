@@ -127,21 +127,21 @@ CTenantInvitationDbDelegateComp::NewObjectQuery CTenantInvitationDbDelegateComp:
 	result.query = QString(
 		"INSERT INTO \"%1\" (\"Id\", \"UserId\", \"TenantId\", \"Role\", \"Status\", \"InvitedByUserId\", \"CreatedAt\", \"UpdatedAt\", \"ExpiresAt\", \"AcceptedAt\", \"RejectedAt\", \"RevokedAt\", \"RevokedByUserId\", \"LastSentAt\") "
 		"VALUES ('%2', '%3', '%4', %5, %6, '%7', '%8', '%9', '%10', %11, %12, %13, %14, '%15');")
-		.arg(*m_tableNameAttrPtr,
-			 id,
-			 userId,
-			 tenantId,
-			 QString::number(role),
-			 QString::number(status),
-			 invitedByUserId,
-			 createdAt,
-			 updatedAt,
-			 expiresAt,
-			 acceptedAt,
-			 rejectedAt,
-			 revokedAt,
-			 revokedByUserId,
-			 lastSentAt).toUtf8();
+		.arg(*m_tableNameAttrPtr)
+		.arg(id)
+		.arg(userId)
+		.arg(tenantId)
+		.arg(QString::number(role))
+		.arg(QString::number(status))
+		.arg(invitedByUserId)
+		.arg(createdAt)
+		.arg(updatedAt)
+		.arg(expiresAt)
+		.arg(acceptedAt)
+		.arg(rejectedAt)
+		.arg(revokedAt)
+		.arg(revokedByUserId)
+		.arg(lastSentAt).toUtf8();
 
 	return result;
 }
@@ -171,17 +171,17 @@ QByteArray CTenantInvitationDbDelegateComp::CreateUpdateObjectQuery(
 		"\"RevokedByUserId\"=%9, "
 		"\"LastSentAt\"='%10' "
 		"WHERE \"Id\"='%11';")
-		.arg(*m_tableNameAttrPtr,
-			 QString::number(static_cast<int>(invitationPtr->GetRole())),
-			 QString::number(static_cast<int>(invitationPtr->GetStatus())),
-			 imtdb::EscapeSql(invitationPtr->GetUpdatedAt()),
-			 imtdb::EscapeSql(invitationPtr->GetExpiresAt()),
-			 NullableSqlDateTime(invitationPtr->GetAcceptedAt()),
-			 NullableSqlDateTime(invitationPtr->GetRejectedAt()),
-			 NullableSqlDateTime(invitationPtr->GetRevokedAt()),
-			 NullableSqlText(QString::fromUtf8(invitationPtr->GetRevokedByUserId())),
-			 imtdb::EscapeSql(invitationPtr->GetLastSentAt()),
-			 imtdb::EscapeSql(QString::fromUtf8(objectId))).toUtf8();
+		.arg(*m_tableNameAttrPtr)
+		.arg(QString::number(static_cast<int>(invitationPtr->GetRole())))
+		.arg(QString::number(static_cast<int>(invitationPtr->GetStatus())))
+		.arg(imtdb::EscapeSql(invitationPtr->GetUpdatedAt()))
+		.arg(imtdb::EscapeSql(invitationPtr->GetExpiresAt()))
+		.arg(NullableSqlDateTime(invitationPtr->GetAcceptedAt()))
+		.arg(NullableSqlDateTime(invitationPtr->GetRejectedAt()))
+		.arg(NullableSqlDateTime(invitationPtr->GetRevokedAt()))
+		.arg(NullableSqlText(QString::fromUtf8(invitationPtr->GetRevokedByUserId())))
+		.arg(imtdb::EscapeSql(invitationPtr->GetLastSentAt()))
+		.arg(imtdb::EscapeSql(QString::fromUtf8(objectId))).toUtf8();
 }
 
 
