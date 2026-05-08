@@ -6,6 +6,7 @@
 #include <imtdoc/IDocumentManager.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtauth/ITenantMembershipManager.h>
+#include <imtauth/IUserManager.h>
 #include <imtdoc/IDocumentManagerEventHandler.h>
 
 // Generated includes
@@ -28,6 +29,7 @@ public:
 		I_ASSIGN(m_documentManagerCompPtr, "CollectionDocumentManager", "Collection document manager", false, "CollectionDocumentManager");
 		I_ASSIGN(m_tenantCollectionCompPtr, "TenantCollection", "Tenant collection for refreshing DB-computed fields after save", false, "TenantCollection");
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager for memberIds", false, "MembershipManager");
+		I_ASSIGN(m_userManagerCompPtr, "UserManager", "User manager for resolving member names", false, "UserManager");
 	I_END_COMPONENT
 
 protected:
@@ -48,6 +50,7 @@ private:
 	I_REF(imtdoc::IDocumentManager, m_documentManagerCompPtr);
 	I_REF(imtbase::IObjectCollection, m_tenantCollectionCompPtr);
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
+	I_REF(imtauth::IUserManager, m_userManagerCompPtr);
 };
 
 

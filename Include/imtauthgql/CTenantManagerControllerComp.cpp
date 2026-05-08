@@ -85,14 +85,26 @@ sdl::imtauth::Tenants::CGetTenantPayload CTenantManagerControllerComp::OnGetTena
 	tenantData.createdAt = tenantInfoPtr->GetCreatedAt();
 	tenantData.updatedAt = tenantInfoPtr->GetUpdatedAt();
 
-	// Populate memberIds from TenantMemberships
+	// Populate members (id + name) from TenantMemberships
 	if (m_membershipManagerCompPtr.IsValid()){
 		QByteArrayList membershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
-		tenantData.memberIds.Emplace();
+		tenantData.members.Emplace();
 		for (const QByteArray& msId : membershipIds){
 			imtauth::ITenantMembershipUniquePtr msPtr = m_membershipManagerCompPtr->GetMembership(msId);
 			if (msPtr.IsValid() && msPtr->IsActive()){
-				tenantData.memberIds->push_back(msPtr->GetUserId());
+				QByteArray userId = msPtr->GetUserId();
+				sdl::imtauth::Tenants::CTenantMemberEntry memberEntry;
+				memberEntry.Version_1_0.Emplace();
+				memberEntry.Version_1_0->id = userId;
+				QString userName = QString::fromUtf8(userId);
+				if (m_userManagerCompPtr.IsValid()){
+					imtauth::IUserInfoUniquePtr userPtr = m_userManagerCompPtr->GetUser(userId);
+					if (userPtr.IsValid()){
+						userName = userPtr->GetName();
+					}
+				}
+				memberEntry.Version_1_0->name = userName;
+				tenantData.members->push_back(memberEntry);
 			}
 		}
 	}

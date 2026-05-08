@@ -24,6 +24,11 @@ type TenantItemData {
 	updatedAt: String
 }
 
+type TenantMemberEntry {
+	id: ID!
+	name: String!
+}
+
 type TenantMemberRoleEntry {
 	userId: ID!
 	role: String!
@@ -42,7 +47,7 @@ type TenantData {
 	isActive: Boolean
 	createdAt: String
 	updatedAt: String
-	memberIds: [ID]
+	members: [TenantMemberEntry]
 	memberRoles: [TenantMemberRoleEntry]
 	availableRoles: [TenantRoleOption]
 }

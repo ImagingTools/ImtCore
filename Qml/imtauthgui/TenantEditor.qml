@@ -31,18 +31,19 @@ DocumentViewBase {
 
 	function updateModel(){
 		generalGroup.updateModel();
-		// Sync memberIds and memberRoles back to model
+		// Sync members and memberRoles back to model
 		if (container.tenantData) {
-			container.tenantData.m_memberIds = __pendingMemberIds()
+			container.tenantData.m_members = __buildMembersForModel()
 			container.tenantData.m_memberRoles = __buildMemberRolesForModel()
 		}
 	}
 
-	function __pendingMemberIds() {
-		var ids = []
-		for (var i = 0; i < pendingMembers.length; ++i)
-			ids.push(pendingMembers[i].id)
-		return ids
+	function __buildMembersForModel() {
+		var result = []
+		for (var i = 0; i < pendingMembers.length; ++i) {
+			result.push({ m_id: pendingMembers[i].id, m_name: pendingMembers[i].name || pendingMembers[i].id })
+		}
+		return result
 	}
 
 	function __loadMembersFromModel() {
@@ -52,10 +53,11 @@ DocumentViewBase {
 		}
 		if (!container.tenantData)
 			return
-		var ids = container.tenantData.m_memberIds || []
+		var serverMembers = container.tenantData.m_members || []
 		var members = []
-		for (var i = 0; i < ids.length; i++) {
-			members.push({ id: ids[i], name: ids[i] })
+		for (var i = 0; i < serverMembers.length; i++) {
+			var m = serverMembers[i]
+			members.push({ id: m.m_id || "", name: m.m_name || m.m_id || "" })
 		}
 		container.pendingMembers = members
 		__loadMemberRolesFromModel()
@@ -63,18 +65,17 @@ DocumentViewBase {
 
 	// --- Member roles support ---
 	// Available role options from server (TenantData.availableRoles)
-	readonly property var __fallbackRoleNames: ["Owner", "Admin", "Member", "Guest"]
 	readonly property string defaultRole: "Member"
 
 	function __getAvailableRoleNames() {
 		if (!container.tenantData || !container.tenantData.m_availableRoles)
-			return container.__fallbackRoleNames
+			return []
 		var names = []
 		for (var i = 0; i < container.tenantData.m_availableRoles.length; i++) {
 			var role = container.tenantData.m_availableRoles[i]
 			names.push(role.m_name || role.m_id || "Unknown")
 		}
-		return names.length > 0 ? names : container.__fallbackRoleNames
+		return names
 	}
 
 	// Map of userId -> role string (built from TenantData.memberRoles)

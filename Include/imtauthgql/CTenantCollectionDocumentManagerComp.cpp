@@ -8,6 +8,7 @@
 
 // ImtCore includes
 #include <imtauth/ITenantInfo.h>
+#include <imtauth/IUserManager.h>
 #include <imtgql/IGqlContext.h>
 #include <imtdoc/CDocumentSavedEvent.h>
 
@@ -112,16 +113,30 @@ sdl::imtauth::Tenants::CTenantData CTenantCollectionDocumentManagerComp::OnGetTe
 	response.Version_1_0->updatedAt = tenantPtr->GetUpdatedAt();
 	if (m_membershipManagerCompPtr.IsValid()){
 		QByteArrayList membershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
-		response.Version_1_0->memberIds.Emplace();
+		response.Version_1_0->members.Emplace();
 		response.Version_1_0->memberRoles.Emplace();
 		for (const QByteArray& membershipId : membershipIds){
 			imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
 			if (membershipPtr.IsValid() && membershipPtr->IsActive()){
-				response.Version_1_0->memberIds->push_back(membershipPtr->GetUserId());
+				QByteArray userId = membershipPtr->GetUserId();
+
+				sdl::imtauth::Tenants::CTenantMemberEntry memberEntry;
+				memberEntry.Version_1_0.Emplace();
+				memberEntry.Version_1_0->id = userId;
+				// Resolve user name via IUserManager
+				QString userName = QString::fromUtf8(userId);
+				if (m_userManagerCompPtr.IsValid()){
+					imtauth::IUserInfoUniquePtr userPtr = m_userManagerCompPtr->GetUser(userId);
+					if (userPtr.IsValid()){
+						userName = userPtr->GetName();
+					}
+				}
+				memberEntry.Version_1_0->name = userName;
+				response.Version_1_0->members->push_back(memberEntry);
 
 				sdl::imtauth::Tenants::CTenantMemberRoleEntry roleEntry;
 				roleEntry.Version_1_0.Emplace();
-				roleEntry.Version_1_0->userId = membershipPtr->GetUserId();
+				roleEntry.Version_1_0->userId = userId;
 				roleEntry.Version_1_0->role = TenantMemberRoleToString(membershipPtr->GetRole());
 				response.Version_1_0->memberRoles->push_back(roleEntry);
 			}
@@ -213,7 +228,7 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTenantCollect
 		tenantPtr->SetActive(*tenantData.isActive);
 	}
 
-	if (!tenantId.isEmpty() && tenantData.memberIds && m_membershipManagerCompPtr.IsValid()){
+	if (!tenantId.isEmpty() && tenantData.members && m_membershipManagerCompPtr.IsValid()){
 		QByteArrayList currentMembershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
 		QMap<QByteArray, QByteArray> userIdToMembershipId;
 		QSet<QByteArray> currentUserIds;
@@ -226,8 +241,10 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTenantCollect
 		}
 
 		QSet<QByteArray> newUserIds;
-		for (const auto& newUserId : *tenantData.memberIds){
-			newUserIds.insert(*newUserId);
+		for (const auto& memberEntry : *tenantData.members){
+			if (memberEntry.Version_1_0 && memberEntry.Version_1_0->id){
+				newUserIds.insert(*memberEntry.Version_1_0->id);
+			}
 		}
 
 		for (const QByteArray& existingUserId : currentUserIds){
