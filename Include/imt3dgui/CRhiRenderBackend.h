@@ -24,17 +24,32 @@ namespace imt3dgui
 	Qt RHI implementation of imt3dview::IRenderBackend.
 
 	### Two-phase render model
-	The QRhi API requires that all UBO / buffer uploads happen via a
-	QRhiResourceUpdateBatch that is submitted to QRhiCommandBuffer::beginPass().
-	To satisfy this constraint without changing the IRenderBackend interface,
-	CRhiRenderBackend uses a two-phase approach:
+	CRhiRenderBackend uses a two-phase approach that keeps all buffer writes
+	outside the command buffer, avoiding both D3D11 assertions:
+	  - "cbD->commands.isEmpty()" at beginPass() (triggered when
+	    resourceUpdate() records commands before the pass is opened), and
+	  - "recordingPass == NoPass" at resourceUpdate() (triggered when
+	    resourceUpdate() is called while a render pass is already active).
+
+	All buffer updates (geometry uploads, GlobalUBO, per-draw DrawUBO) are
+	applied via QRhiBuffer::beginFullDynamicBufferUpdateForCurrentFrame() /
+	endFullDynamicBufferUpdateForCurrentFrame(), which maps Dynamic buffers
+	directly in CPU memory without recording any commands into the
+	QRhiCommandBuffer.  This is safe at any point between QRhi::beginFrame()
+	and QRhi::endFrame(), whether or not a render pass is active.
 
 	  * BeginFrame() — stores the scene state and clears the pending-draw list.
 	  * Draw()       — appends DrawCommand entries to the pending-draw list.
-	  * EndFrame()   — builds a single resource-update batch (pending geometry
-	                   uploads + GlobalUBO + per-draw DrawUBO slots), opens the
-	                   render pass with that batch, issues all collected draw calls
-	                   in one go, then closes the pass.
+	  * FlushPendingUpdates() — uploads all pending geometry, GlobalUBO and
+	                   DrawUBO data via direct CPU mapping.  Must be called
+	                   while a QRhi frame is active and before issuing draw
+	                   commands.  Safe to call from QSGRenderNode::prepare()
+	                   (before the render pass begins).
+	  * IssuePendingDrawCalls() — emits draw commands into the active command
+	                   buffer.  Must be called while a render pass is active.
+	  * EndFrame()   — calls FlushPendingUpdates(), opens a new render pass,
+	                   calls IssuePendingDrawCalls(), then closes the pass.
+	                   Used by CRhiWidget (standalone widget path).
 
 	### Canonical vertex format
 	All vertex data is converted to a fixed 9-float interleaved format
