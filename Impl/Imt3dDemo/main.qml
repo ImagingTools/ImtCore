@@ -6,10 +6,10 @@
  * For a cross-platform demo that works on both desktop and web see
  * View3DDemo.qml in Qml/imt3dgui-demo/.
  */
-import QtQuick 2.15
-import QtQuick.Window 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.15
+import QtQuick
+import QtQuick.Window
+import QtQuick.Controls
+import QtQuick.Layouts
 import imt3dgui 1.0
 
 Window {
