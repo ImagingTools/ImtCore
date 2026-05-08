@@ -142,32 +142,34 @@ public:
 		QVector3D camPos;
 		BuildMatrices(rhi, viewMatrix, projMatrix, camPos);
 
-		// Upload UBO data
-		QRhiResourceUpdateBatch* batch = rhi->nextResourceUpdateBatch();
+		// Build resource update batch.  It is NOT submitted here because
+		// prepare() is called before the render pass is activated.
+		// Submitting via commandBuffer()->resourceUpdate() outside an active
+		// pass triggers D3D11 assertion "cbD->commands.isEmpty()".
+		// The batch is stored and submitted at the start of render().
+		m_pendingBatch = rhi->nextResourceUpdateBatch();
 
 		// GlobalUBO
 		GlobalUboData globalData{};
 		FillGlobal(viewMatrix, projMatrix, camPos, globalData);
-		batch->updateDynamicBuffer(m_globalUbo, 0, sizeof(GlobalUboData), &globalData);
+		m_pendingBatch->updateDynamicBuffer(m_globalUbo, 0, sizeof(GlobalUboData), &globalData);
 
 		// DrawUBO
 		DrawUboData drawData{};
 		FillDraw(drawData);
-		batch->updateDynamicBuffer(m_drawUbo, 0, sizeof(DrawUboData), &drawData);
+		m_pendingBatch->updateDynamicBuffer(m_drawUbo, 0, sizeof(DrawUboData), &drawData);
 
 		// Upload cube vertex/index data if first time
 		if (m_needsUpload){
 			CubeData cube;
-			batch->updateDynamicBuffer(
+			m_pendingBatch->updateDynamicBuffer(
 						m_vertexBuffer, 0,
 						sizeof(cube.vertices), cube.vertices);
-			batch->updateDynamicBuffer(
+			m_pendingBatch->updateDynamicBuffer(
 						m_indexBuffer, 0,
 						sizeof(cube.indices), cube.indices);
 			m_needsUpload = false;
 		}
-
-		commandBuffer()->resourceUpdate(batch);
 	}
 
 	void render(const RenderState* state) override
@@ -177,6 +179,12 @@ public:
 		}
 
 		QRhiCommandBuffer* cb = commandBuffer();
+
+		// Submit resource updates inside the active render pass.
+		if (m_pendingBatch){
+			cb->resourceUpdate(m_pendingBatch);
+			m_pendingBatch = nullptr;
+		}
 
 		// Viewport
 		const QRectF r = rect();
@@ -427,6 +435,7 @@ private:
 
 	bool m_initialized = false;
 	bool m_needsUpload = true;
+	QRhiResourceUpdateBatch* m_pendingBatch = nullptr;
 };
 
 

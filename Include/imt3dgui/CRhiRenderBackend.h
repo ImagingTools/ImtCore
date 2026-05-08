@@ -83,7 +83,11 @@ public:
 		Build a QRhiResourceUpdateBatch containing all pending geometry uploads,
 		GlobalUBO and per-draw DrawUBO fills for the current frame. The caller
 		is responsible for submitting the batch (e.g. via
-		commandBuffer()->resourceUpdate() in a QSGRenderNode::prepare()).
+		commandBuffer()->resourceUpdate() in a QSGRenderNode::render()).
+
+		Important: the batch must be submitted inside an active render pass.
+		QSGRenderNode::prepare() is called before beginPass(), so submitting
+		there would trigger D3D11 assertion "cbD->commands.isEmpty()".
 
 		This is the first phase of inline rendering; call IssuePendingDrawCalls()
 		afterwards to emit the actual draw commands.
