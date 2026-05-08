@@ -304,7 +304,7 @@ DocumentViewBase {
 								property var __roles: container.__getAvailableRoleNames()
 								model: __roles
 								currentIndex: __roles.indexOf(modelData.role)
-								onActivated: {
+								onCurrentIndexChanged: {
 									var selectedRole = __roles[index]
 									if (selectedRole !== modelData.role) {
 										container.__updateMemberRole(modelData.userId, selectedRole)
