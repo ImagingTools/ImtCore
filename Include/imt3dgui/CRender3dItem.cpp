@@ -105,8 +105,10 @@ public:
 	// QSGRenderNode API
 	StateFlags changedStates() const override
 	{
+		// Note: RenderTargetState is intentionally NOT included.  This node
+		// renders inline within the scene-graph's existing render pass.
 		return DepthState | StencilState | ScissorState | ColorState | BlendState
-			| CullState | ViewportState | RenderTargetState;
+			| CullState | ViewportState;
 	}
 
 	RenderingFlags flags() const override

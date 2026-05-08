@@ -41,8 +41,15 @@ public:
 	// QSGRenderNode API
 	StateFlags changedStates() const override
 	{
+		// Note: RenderTargetState is intentionally NOT included.  This node
+		// renders inline within the scene-graph's existing render pass; it
+		// does not call beginPass()/endPass() itself.  Including
+		// RenderTargetState would cause the scene graph to end its render
+		// pass before calling render(), which triggers an assertion
+		// ("cbD->commands.isEmpty()") on the D3D11 backend because the
+		// node then issues draw commands without an active render pass.
 		return DepthState | StencilState | ScissorState | ColorState | BlendState
-			| CullState | ViewportState | RenderTargetState;
+			| CullState | ViewportState;
 	}
 
 	RenderingFlags flags() const override
