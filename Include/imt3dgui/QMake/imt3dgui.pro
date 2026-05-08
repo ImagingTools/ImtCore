@@ -21,9 +21,27 @@ include($$PWD/../../../Config/QMake/DesignTokenCreator.pri)
 RESOURCES += $$files($$_PRO_FILE_PWD_/../*.qrc, false)
 
 # Compile GLSL 450 shaders to QSB and embed them as Qt resources under :/RhiShaders/
-QMAKE_SHADER_FILES += \
-    $$_PRO_FILE_PWD_/../Resources/Shaders/vshader_rhi.vert \
-    $$_PRO_FILE_PWD_/../Resources/Shaders/fshader_rhi.frag
+# We use explicit QMAKE_EXTRA_TARGETS instead of QMAKE_SHADER_FILES so that the
+# compiled .qsb files end up in imt3dgui.qrc with the /RhiShaders prefix that
+# the C++ code (CRhiRenderBackend, CRender3dItem) expects.
+QSB_TOOL = $$[QT_HOST_BINS]/qsb
+
+QSB_VERT_IN  = $$_PRO_FILE_PWD_/../Resources/Shaders/vshader_rhi.vert
+QSB_FRAG_IN  = $$_PRO_FILE_PWD_/../Resources/Shaders/fshader_rhi.frag
+QSB_VERT_OUT = $$_PRO_FILE_PWD_/../Resources/Shaders/vshader_rhi.vert.qsb
+QSB_FRAG_OUT = $$_PRO_FILE_PWD_/../Resources/Shaders/fshader_rhi.frag.qsb
+
+compile_vert_shader.target = $$QSB_VERT_OUT
+compile_vert_shader.depends = $$QSB_VERT_IN
+compile_vert_shader.commands = $$QSB_TOOL --glsl \"100 es,120,150\" --hlsl 50 --msl 12 -o $$QSB_VERT_OUT $$QSB_VERT_IN
+QMAKE_EXTRA_TARGETS += compile_vert_shader
+
+compile_frag_shader.target = $$QSB_FRAG_OUT
+compile_frag_shader.depends = $$QSB_FRAG_IN
+compile_frag_shader.commands = $$QSB_TOOL --glsl \"100 es,120,150\" --hlsl 50 --msl 12 -o $$QSB_FRAG_OUT $$QSB_FRAG_IN
+QMAKE_EXTRA_TARGETS += compile_frag_shader
+
+PRE_TARGETDEPS += $$QSB_VERT_OUT $$QSB_FRAG_OUT
 
 INCLUDEPATH += ../../
 

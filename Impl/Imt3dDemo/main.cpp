@@ -21,6 +21,7 @@
 int main(int argc, char* argv[])
 {
 	Q_INIT_RESOURCE(imt3ddemo);
+	Q_INIT_RESOURCE(imt3dgui);
 
 	QGuiApplication app(argc, argv);
 	app.setApplicationName("Imt3dDemo");
