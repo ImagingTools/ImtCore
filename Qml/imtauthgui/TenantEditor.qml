@@ -21,6 +21,8 @@ DocumentViewBase {
 	readonly property real memberRoleComboWidthRatio: 0.45
 	readonly property int memberRoleHorizontalMargin: Style.marginL
 	readonly property int totalMemberRoleHorizontalMargin: memberRoleHorizontalMargin + memberRoleHorizontalMargin
+	readonly property int memberRoleRowMargin: Style.marginS
+	readonly property int totalMemberRoleRowMargin: memberRoleRowMargin + memberRoleRowMargin
 	// Guard: set when members are modified locally, prevents updateGui from overwriting
 	property bool __membersModifiedLocally: false
 
@@ -324,11 +326,11 @@ DocumentViewBase {
 
 						delegate: Item {
 							width: parent.width
-							height: Style.controlHeightM + 2 * Style.marginS
+							height: Style.controlHeightM + container.totalMemberRoleRowMargin
 
 							Row {
 								anchors.fill: parent
-								anchors.margins: Style.marginS
+								anchors.margins: container.memberRoleRowMargin
 								spacing: Style.marginL
 
 								BaseText {
