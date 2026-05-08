@@ -8,7 +8,7 @@ RESOURCES += $$files($$_PRO_FILE_PWD_/../*.qrc, false)
 
 LIBS += -L../../../Lib/$$COMPILER_DIR -limtbase -limt3d -limt3dview -limt3dgui
 
-QT += qml quick
+QT += qml quick quickcontrols2
 
 greaterThan(QT_MAJOR_VERSION, 5): QT += openglwidgets
 
