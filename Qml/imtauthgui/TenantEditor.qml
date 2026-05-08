@@ -20,7 +20,7 @@ DocumentViewBase {
 	readonly property real memberRoleNameWidthRatio: 0.55
 	readonly property real memberRoleComboWidthRatio: 0.45
 	readonly property int memberRoleHorizontalMargin: Style.marginL
-	readonly property int memberRoleHorizontalMargins: memberRoleHorizontalMargin + memberRoleHorizontalMargin
+	readonly property int totalMemberRoleHorizontalMargin: memberRoleHorizontalMargin + memberRoleHorizontalMargin
 	// Guard: set when members are modified locally, prevents updateGui from overwriting
 	property bool __membersModifiedLocally: false
 
@@ -105,7 +105,7 @@ DocumentViewBase {
 	function __getRoleModelValue(rolesModel, index, key) {
 		if (!rolesModel || index < 0)
 			return ""
-		// SDL BaseModel items expose generated m_* properties, while some QML models use plain keys.
+		// Prefer SDL-generated m_* roles but keep plain-key lookup for regular QML models.
 		if (rolesModel.getData)
 			return rolesModel.getData("m_" + key, index) || rolesModel.getData(key, index) || ""
 		var role = rolesModel.get(index).item
@@ -314,7 +314,7 @@ DocumentViewBase {
 				visible: !container.isNewTenant && container.pendingMembers.length > 0
 
 				Column {
-					width: parent.width - container.memberRoleHorizontalMargins
+					width: parent.width - container.totalMemberRoleHorizontalMargin
 					x: container.memberRoleHorizontalMargin
 					spacing: Style.marginM
 
@@ -350,7 +350,7 @@ DocumentViewBase {
 										if (!roleCombo.model || index < 0)
 											return
 
-										var selectedRole = itemId || container.__getRoleModelValue(roleCombo.model, index, "id")
+										var selectedRole = container.__getRoleModelValue(roleCombo.model, index, "id")
 										if (!selectedRole)
 											return
 										if (selectedRole !== modelData.role) {
