@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS "${TableName}"
     "State" TEXT
 );
 
+-- Shared tenant scope table; kept idempotent here to avoid a separate migration/init component.
 CREATE TABLE IF NOT EXISTS "TenantEntityBindings"
 (
     "Id" TEXT PRIMARY KEY,

@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS ${TableScheme}."${TableName}"
     "State" "DocumentState"
 );
 
+-- Shared tenant scope table; kept idempotent here to avoid a separate migration/init component.
 CREATE TABLE IF NOT EXISTS ${TableScheme}."TenantEntityBindings"
 (
     "Id" TEXT PRIMARY KEY,
