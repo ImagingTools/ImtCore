@@ -18,7 +18,7 @@ DocumentViewBase {
 	property var pendingMembers: []
 	property bool isNewTenant: tenantData ? (!tenantData.m_id || tenantData.m_id === "") : true
 	readonly property real memberRoleNameWidthRatio: 0.55
-	readonly property real memberRoleComboWidthRatio: 0.4
+	readonly property real memberRoleComboWidthRatio: 0.45
 	readonly property int memberRoleHorizontalMargin: Style.marginL
 	readonly property int memberRoleHorizontalMargins: memberRoleHorizontalMargin + memberRoleHorizontalMargin
 	// Guard: set when members are modified locally, prevents updateGui from overwriting
@@ -40,9 +40,7 @@ DocumentViewBase {
 			if (!container.tenantData.hasMembers()) {
 				container.tenantData.emplaceMembers()
 			}
-			for (var oldMemberIndex = container.tenantData.m_members.count - 1; oldMemberIndex >= 0; oldMemberIndex--) {
-				container.tenantData.m_members.removeElement(oldMemberIndex)
-			}
+			container.tenantData.m_members.clear()
 			var pendingMembers = container.pendingMembers
 			for (var memberIndex = 0; memberIndex < pendingMembers.length; memberIndex++) {
 				var memberEntry = container.tenantData.createMembersArrayElement()
@@ -57,9 +55,7 @@ DocumentViewBase {
 			if (!container.tenantData.hasMemberRoles()) {
 				container.tenantData.emplaceMemberRoles()
 			}
-			for (var oldRoleIndex = container.tenantData.m_memberRoles.count - 1; oldRoleIndex >= 0; oldRoleIndex--) {
-				container.tenantData.m_memberRoles.removeElement(oldRoleIndex)
-			}
+			container.tenantData.m_memberRoles.clear()
 			var members = container.pendingMembers
 			for (var i = 0; i < members.length; i++) {
 				var entry = container.tenantData.createMemberRolesArrayElement()
@@ -336,7 +332,7 @@ DocumentViewBase {
 								spacing: Style.marginL
 
 								BaseText {
-									width: parent.width * container.memberRoleNameWidthRatio
+									width: (parent.width - parent.spacing) * container.memberRoleNameWidthRatio
 									anchors.verticalCenter: parent.verticalCenter
 									text: modelData.userName
 									elide: Text.ElideRight
@@ -344,7 +340,7 @@ DocumentViewBase {
 
 								ComboBox {
 									id: roleCombo
-									width: parent.width * container.memberRoleComboWidthRatio
+									width: (parent.width - parent.spacing) * container.memberRoleComboWidthRatio
 									anchors.verticalCenter: parent.verticalCenter
 									model: container.__getAvailableRolesModel()
 									nameId: "name"
