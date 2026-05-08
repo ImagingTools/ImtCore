@@ -225,10 +225,8 @@ sdl::imtauth::Tenants::CUpdateTenantPayload CTenantManagerControllerComp::OnUpda
 
 	bool success = m_tenantManagerCompPtr->UpdateTenant(tenantId, name, description, ownerId, bool(arguments.input.Version_1_0->ownerId));
 
-	// Sync memberIds with TenantMemberships
-	if (success && m_membershipManagerCompPtr.IsValid() && arguments.input.Version_1_0->memberIds){
-		const auto& newMemberIds = *arguments.input.Version_1_0->memberIds;
-
+	// Sync members with TenantMemberships
+	if (success && m_membershipManagerCompPtr.IsValid() && arguments.input.Version_1_0->members){
 		// Get current member user IDs
 		QByteArrayList currentMembershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
 		QSet<QByteArray> currentUserIds;
@@ -243,8 +241,10 @@ sdl::imtauth::Tenants::CUpdateTenantPayload CTenantManagerControllerComp::OnUpda
 
 		// Build new set
 		QSet<QByteArray> newUserIds;
-		for (const auto& uid : newMemberIds){
-			newUserIds << *uid;
+		for (const auto& member : *arguments.input.Version_1_0->members){
+			if (member->id){
+				newUserIds << *member->id;
+			}
 		}
 
 		// Remove memberships for users no longer in the list

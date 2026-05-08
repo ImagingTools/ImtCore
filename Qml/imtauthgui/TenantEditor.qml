@@ -31,10 +31,23 @@ DocumentViewBase {
 
 	function updateModel(){
 		generalGroup.updateModel();
-		// Sync memberIds and memberRoles back to model
+		// Sync members and memberRoles back to model
 		if (container.tenantData) {
-			// memberIds: simple [ID] array — works with plain JS assignment
-			container.tenantData.m_memberIds = container.pendingMembers.map(function(m) { return m.id })
+			if (!container.tenantData.hasMembers()) {
+				container.tenantData.emplaceMembers()
+			}
+			while (container.tenantData.m_members.count > 0) {
+				container.tenantData.m_members.removeElement(0)
+			}
+			var pendingMembers = container.pendingMembers
+			for (var memberIndex = 0; memberIndex < pendingMembers.length; memberIndex++) {
+				var memberEntry = container.tenantData.createMembersArrayElement()
+				if (memberEntry) {
+					memberEntry.m_id = pendingMembers[memberIndex].id
+					memberEntry.m_name = pendingMembers[memberIndex].name || pendingMembers[memberIndex].id
+					container.tenantData.m_members.addElement(memberEntry)
+				}
+			}
 
 			// memberRoles: structured SDL list — use emplace/create/addElement API
 			if (!container.tenantData.hasMemberRoles()) {
@@ -82,19 +95,26 @@ DocumentViewBase {
 	// Available role options from server (TenantData.availableRoles)
 	readonly property string defaultRole: "Member"
 
-	function __getAvailableRoleNames() {
+	function __getAvailableRolesModel() {
 		if (!container.tenantData || !container.tenantData.m_availableRoles)
-			return []
-		var roles = container.tenantData.m_availableRoles
-		var count = roles.count || 0
-		var names = []
+			return null
+		return container.tenantData.m_availableRoles
+	}
+
+	function __findRoleIndex(roleId) {
+		var roles = container.__getAvailableRolesModel()
+		if (!roles)
+			return -1
+
+		var count = roles.getItemsCount ? roles.getItemsCount() : (roles.count || 0)
 		for (var i = 0; i < count; i++) {
-			var role = roles.get(i).item
-			if (role) {
-				names.push(role.m_name || role.m_id || "Unknown")
-			}
+			var id = roles.getData ? (roles.getData("m_id", i) || roles.getData("id", i)) : ""
+			var name = roles.getData ? (roles.getData("m_name", i) || roles.getData("name", i)) : ""
+			if (id === roleId || name === roleId)
+				return i
 		}
-		return names
+
+		return -1
 	}
 
 	// Map of userId -> role string (built from TenantData.memberRoles)
@@ -281,33 +301,46 @@ DocumentViewBase {
 				visible: !container.isNewTenant && container.pendingMembers.length > 0
 
 				Column {
-					width: parent.width
+					width: parent.width - 2 * Style.marginL
+					x: Style.marginL
 					spacing: Style.marginM
 
 					Repeater {
 						id: memberRolesRepeater
 						model: []
 
-						delegate: Row {
+						delegate: Item {
 							width: parent.width
-							spacing: Style.marginL
+							height: Style.controlHeightM + 2 * Style.marginS
 
-							BaseText {
-								width: parent.width * 0.5
-								anchors.verticalCenter: parent.verticalCenter
-								text: modelData.userName
-								elide: Text.ElideRight
-							}
+							Row {
+								anchors.fill: parent
+								anchors.margins: Style.marginS
+								spacing: Style.marginL
 
-							ComboBox {
-								width: parent.width * 0.4
-								property var __roles: container.__getAvailableRoleNames()
-								model: __roles
-								currentIndex: __roles.indexOf(modelData.role)
-								onCurrentIndexChanged: {
-									var selectedRole = __roles[index]
-									if (selectedRole !== modelData.role) {
-										container.__updateMemberRole(modelData.userId, selectedRole)
+								BaseText {
+									width: parent.width * 0.55
+									anchors.verticalCenter: parent.verticalCenter
+									text: modelData.userName
+									elide: Text.ElideRight
+								}
+
+								ComboBox {
+									id: roleCombo
+									width: parent.width * 0.4
+									anchors.verticalCenter: parent.verticalCenter
+									model: container.__getAvailableRolesModel()
+									nameId: "name"
+									currentIndex: container.__findRoleIndex(modelData.role)
+
+									onFinished: {
+										if (!roleCombo.model || index < 0)
+											return
+
+										var selectedRole = itemId || roleCombo.model.getData("m_id", index) || roleCombo.model.getData("id", index)
+										if (selectedRole !== modelData.role) {
+											container.__updateMemberRole(modelData.userId, selectedRole)
+										}
 									}
 								}
 							}

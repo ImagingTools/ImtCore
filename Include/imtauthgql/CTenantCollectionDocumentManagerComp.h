@@ -28,7 +28,7 @@ public:
 		I_REGISTER_INTERFACE(imtdoc::IDocumentManagerEventHandler)
 		I_ASSIGN(m_documentManagerCompPtr, "CollectionDocumentManager", "Collection document manager", false, "CollectionDocumentManager");
 		I_ASSIGN(m_tenantCollectionCompPtr, "TenantCollection", "Tenant collection for refreshing DB-computed fields after save", false, "TenantCollection");
-		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager for memberIds", false, "MembershipManager");
+		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager for members", false, "MembershipManager");
 		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "Collection of users", true, "UserCollection");
 	I_END_COMPONENT
 
@@ -55,5 +55,4 @@ private:
 
 
 } // namespace imtauthgql
-
 
