@@ -15,16 +15,7 @@
 #include <imt3dgui/CCompositeShapeViewComp.h>
 #include <imt3dgui/CWireShape.h>
 #include <imt3dgui/CPointCloudShapeComp.h>
-
-
-namespace imt3dgui
-{
-
-
-class CRhiRenderBackend;
-
-
-} // namespace imt3dgui
+#include <imt3dgui/CRhiRenderBackend.h>
 
 
 /**
