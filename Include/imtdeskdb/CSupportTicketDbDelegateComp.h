@@ -19,7 +19,6 @@ public:
 
 	I_BEGIN_COMPONENT(CSupportTicketDbDelegateComp)
 		I_ASSIGN(m_ticketFactCompPtr, "TicketFactory", "Factory used for creation of new ticket instances", true, "TicketFactory");
-		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "Users collection for DB-level visibility filtering", false, "Users");
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
@@ -79,8 +78,8 @@ private:
 	bool IsSqliteDatabase() const;
 	QString CreateVisibilityCondition(const QByteArray& userId, const QByteArrayList& currentUserGroups) const;
 
+private:
 	I_FACT(imtdesk::ISupportTicket, m_ticketFactCompPtr);
-	I_FACT(imtbase::IObjectCollection, m_userCollectionCompPtr);
 };
 
 

@@ -71,6 +71,8 @@ public:
 		Q_INIT_RESOURCE(imtauthPersonalAccessTokensSdl);
 		Q_INIT_RESOURCE(imtbaseFilterableSelectSdl);
 		Q_INIT_RESOURCE(imtauthTenantsSdl);
+		Q_INIT_RESOURCE(imtauthTenantMembershipsSdl);
+		Q_INIT_RESOURCE(imtauthTenantCollectionDocumentManagerSdl);
 	}
 
 	static void InitQml()

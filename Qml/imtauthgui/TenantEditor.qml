@@ -439,8 +439,8 @@ DocumentViewBase {
 										id: resendInviteButton
 										text: qsTr("Resend")
 										onClicked: {
-											resendInvitationInput.m_invitationId = modelData.id
-											resendInvitationSender.send(resendInvitationInput)
+											container.resendInvitationInput.m_invitationId = modelData.id
+											container.resendInvitationSender.send(container.resendInvitationInput)
 										}
 									}
 
@@ -448,8 +448,8 @@ DocumentViewBase {
 										id: revokeInviteButton
 										text: qsTr("Revoke")
 										onClicked: {
-											revokeInvitationInput.m_invitationId = modelData.id
-											revokeInvitationSender.send(revokeInvitationInput)
+											container.revokeInvitationInput.m_invitationId = modelData.id
+											container.revokeInvitationSender.send(container.revokeInvitationInput)
 											container.__removePendingInvitation(modelData.id)
 										}
 									}

@@ -63,7 +63,7 @@ QString CSupportTicketDbDelegateComp::CreateVisibilityCondition(
 	QStringList visibilityConditions;
 	visibilityConditions << QString("\"ReporterId\"='%1'").arg(escapedUserId);
 	visibilityConditions << QString("(\"AssigneeIds\" IS NOT NULL AND (',' || \"AssigneeIds\" || ',') LIKE '%1' ESCAPE '\\')").arg(assigneeLikePattern);
-	if (!escapedCurrentUserGroups.isEmpty() && m_userCollectionCompPtr.IsValid()){
+	if (!escapedCurrentUserGroups.isEmpty()){
 		if (IsSqliteDatabase()){
 			const QString groupsInClause = escapedCurrentUserGroups.join(", ");
 			visibilityConditions << QString(

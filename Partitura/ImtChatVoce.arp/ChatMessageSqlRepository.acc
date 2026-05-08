@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6379" Description="ACF"/>
+            <Version Id="0" Number="6390" Description="ACF"/>
             <Version Id="1" Number="2306" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
@@ -15,11 +15,23 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
+        <Element Id="JsonSerializer" PackageId="FilePck" ComponentId="JsonFileSerializer">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="MessageDatabaseDelegate" PackageId="ImtChatDbPck" ComponentId="MessageDbDelegate">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="MessageFactory" Type="Factory" ExportId="">
-                        <Data IsEnabled="true" Value="ChatMessage"/>
+                    <AttributeInfo Id="AutoCreateTable" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CreateTableScriptPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value=":/SQL/Postgres/CreateMessagesTable.sql"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
                         <Data IsEnabled="false"/>
@@ -27,21 +39,15 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="MessageFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="ChatMessage"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ObjectTypes" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Types"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TableName" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Messages"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="JsonSerializer" PackageId="FilePck" ComponentId="JsonFileSerializer">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
