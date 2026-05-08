@@ -211,8 +211,14 @@ void CScene3d::UpdateItemsScale()
 		const ShapeInfoPtr& shapeInfoPtr = i.value();
 
 		if (shapeInfoPtr && shapeInfoPtr->shapePtr){
-			imt3d::CCuboid cuboid = GetItemBoundingCuboid(shapeInfoPtr->shapePtr);
-			if (cuboid.IsValid()){
+			// Check whether this shape is a model-backed item (has an observed 3D object).
+			// Only model-backed items participate in auto-scaling so that the data
+			// fits the normalised scene space.  Auxiliary shapes such as CAxisShape
+			// and CGridShape have no observed model and keep their configured size.
+			const imod::CSingleModelObserverBase* modelObserverPtr =
+				dynamic_cast<const imod::CSingleModelObserverBase*>(shapeInfoPtr->shapePtr);
+
+			if (modelObserverPtr != nullptr && modelObserverPtr->GetObservedModel() != nullptr){
 				UpdateItemScale(*shapeInfoPtr->shapePtr);
 			}
 		}
