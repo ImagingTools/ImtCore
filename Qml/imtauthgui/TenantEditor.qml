@@ -398,10 +398,27 @@ DocumentViewBase {
 								anchors.margins: container.memberRoleRowMargin
 								spacing: Style.marginXS
 
-								BaseText {
+								Row {
 									width: parent.width
-									text: modelData.userName + " • " + modelData.role + " • " + modelData.status
-									elide: Text.ElideRight
+									spacing: Style.marginS
+
+									BaseText {
+										width: (parent.width - parent.spacing * 2) * 0.5
+										text: modelData.userName
+										elide: Text.ElideRight
+									}
+
+									BaseText {
+										width: (parent.width - parent.spacing * 2) * 0.25
+										text: modelData.role
+										elide: Text.ElideRight
+									}
+
+									BaseText {
+										width: (parent.width - parent.spacing * 2) * 0.25
+										text: modelData.status
+										elide: Text.ElideRight
+									}
 								}
 
 								Row {
@@ -410,7 +427,7 @@ DocumentViewBase {
 
 									BaseText {
 										width: parent.width - revokeInviteButton.width - resendInviteButton.width - parent.spacing * 2
-										text: qsTr("Invited by %1 at %2").arg(modelData.invitedByName || modelData.invitedByUserId).arg(container.__formatDateTime(modelData.createdAt))
+										text: qsTr("Invited by %1 at %2").arg(modelData.invitedByName ? modelData.invitedByName : modelData.invitedByUserId).arg(container.__formatDateTime(modelData.createdAt))
 										elide: Text.ElideRight
 									}
 

@@ -23,7 +23,7 @@ constexpr int TenantInvitationExpirationDays = 7;
 
 QString CreateInvitationExpirationTime()
 {
-	return QDateTime::currentDateTimeUtc().addDays(TenantInvitationExpirationDays).toString(Qt::ISODate);
+	return QDateTime::currentDateTimeUtc().addDays(TenantInvitationExpirationDays).toString(Qt::ISODateWithMs);
 }
 
 
@@ -141,7 +141,7 @@ QByteArray CTenantInvitationManagerComp::CreateInvitation(const QByteArray& invi
 	istd::CChangeNotifier changeNotifier(this);
 
 	QByteArray invitationId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
-	QString now = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
+	QString now = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
 	QString expiresAt = CreateInvitationExpirationTime();
 
 	invitationPtr->SetInvitationId(invitationId);
@@ -183,7 +183,7 @@ QByteArray CTenantInvitationManagerComp::AcceptInvitation(const QByteArray& invi
 
 	istd::CChangeNotifier changeNotifier(this);
 
-	QString now = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
+	QString now = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
 	invitationPtr->SetStatus(ITenantInvitation::TIS_ACCEPTED);
 	invitationPtr->SetAcceptedAt(now);
 	invitationPtr->SetUpdatedAt(now);
@@ -211,7 +211,7 @@ bool CTenantInvitationManagerComp::RejectInvitation(const QByteArray& invitation
 
 	istd::CChangeNotifier changeNotifier(this);
 
-	QString now = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
+	QString now = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
 	invitationPtr->SetStatus(ITenantInvitation::TIS_REJECTED);
 	invitationPtr->SetRejectedAt(now);
 	invitationPtr->SetUpdatedAt(now);
@@ -238,7 +238,7 @@ bool CTenantInvitationManagerComp::RevokeInvitation(const QByteArray& invitation
 
 	istd::CChangeNotifier changeNotifier(this);
 
-	QString now = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
+	QString now = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
 	invitationPtr->SetStatus(ITenantInvitation::TIS_REVOKED);
 	invitationPtr->SetRevokedAt(now);
 	invitationPtr->SetRevokedByUserId(revokedByUserId);
@@ -266,7 +266,7 @@ bool CTenantInvitationManagerComp::ResendInvitation(const QByteArray& invitation
 
 	istd::CChangeNotifier changeNotifier(this);
 
-	QString now = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
+	QString now = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
 	invitationPtr->SetLastSentAt(now);
 	invitationPtr->SetUpdatedAt(now);
 	invitationPtr->SetExpiresAt(CreateInvitationExpirationTime());
