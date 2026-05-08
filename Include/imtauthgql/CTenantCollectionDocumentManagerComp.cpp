@@ -130,32 +130,12 @@ sdl::imtauth::Tenants::CTenantData CTenantCollectionDocumentManagerComp::OnGetTe
 
 	// Populate available roles from TenantMemberRole enum
 	response.Version_1_0->availableRoles.Emplace();
-	{
+	static const char* roleNames[] = {"Owner", "Admin", "Member", "Guest"};
+	for (const char* roleName : roleNames){
 		sdl::imtauth::Tenants::CTenantRoleOption opt;
 		opt.Version_1_0.Emplace();
-		opt.Version_1_0->id = QByteArray("Owner");
-		opt.Version_1_0->name = QStringLiteral("Owner");
-		response.Version_1_0->availableRoles->push_back(opt);
-	}
-	{
-		sdl::imtauth::Tenants::CTenantRoleOption opt;
-		opt.Version_1_0.Emplace();
-		opt.Version_1_0->id = QByteArray("Admin");
-		opt.Version_1_0->name = QStringLiteral("Admin");
-		response.Version_1_0->availableRoles->push_back(opt);
-	}
-	{
-		sdl::imtauth::Tenants::CTenantRoleOption opt;
-		opt.Version_1_0.Emplace();
-		opt.Version_1_0->id = QByteArray("Member");
-		opt.Version_1_0->name = QStringLiteral("Member");
-		response.Version_1_0->availableRoles->push_back(opt);
-	}
-	{
-		sdl::imtauth::Tenants::CTenantRoleOption opt;
-		opt.Version_1_0.Emplace();
-		opt.Version_1_0->id = QByteArray("Guest");
-		opt.Version_1_0->name = QStringLiteral("Guest");
+		opt.Version_1_0->id = QByteArray(roleName);
+		opt.Version_1_0->name = QString::fromLatin1(roleName);
 		response.Version_1_0->availableRoles->push_back(opt);
 	}
 

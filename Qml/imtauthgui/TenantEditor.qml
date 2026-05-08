@@ -291,11 +291,11 @@ DocumentViewBase {
 
 							ComboBox {
 								width: parent.width * 0.4
-								model: container.__getAvailableRoleNames()
-								currentIndex: container.__getAvailableRoleNames().indexOf(modelData.role)
+								property var __roles: container.__getAvailableRoleNames()
+								model: __roles
+								currentIndex: __roles.indexOf(modelData.role)
 								onActivated: {
-									var roles = container.__getAvailableRoleNames()
-									var selectedRole = roles[index]
+									var selectedRole = __roles[index]
 									if (selectedRole !== modelData.role) {
 										container.__updateMemberRole(modelData.userId, selectedRole)
 									}
