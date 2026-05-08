@@ -20,9 +20,9 @@ DocumentViewBase {
 	readonly property real memberRoleNameWidthRatio: 0.55
 	readonly property real memberRoleComboWidthRatio: 0.45
 	readonly property int memberRoleHorizontalMargin: Style.marginL
-	readonly property int totalMemberRoleHorizontalMargin: memberRoleHorizontalMargin + memberRoleHorizontalMargin
+	readonly property int totalMemberRoleHorizontalMargin: memberRoleHorizontalMargin * 2
 	readonly property int memberRoleRowMargin: Style.marginS
-	readonly property int totalMemberRoleRowMargin: memberRoleRowMargin + memberRoleRowMargin
+	readonly property int totalMemberRoleRowMargin: memberRoleRowMargin * 2
 	// Guard: set when members are modified locally, prevents updateGui from overwriting
 	property bool __membersModifiedLocally: false
 
