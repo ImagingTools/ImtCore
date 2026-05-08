@@ -8,9 +8,9 @@
 
 // Qt includes
 #include <QtCore/QByteArray>
-#include <rhi/qrhi.h>
 
 // ImtCore includes
+#include <imt3dgui/QtRhiCompat.h>
 #include <imt3dview/IRenderBackend.h>
 #include <imt3dview/SceneState.h>
 #include <imt3dview/DrawCommand.h>

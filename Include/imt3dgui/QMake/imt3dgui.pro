@@ -8,7 +8,7 @@ include($$PWD/../../../Config/QMake/ImtCore.pri)
 # opengl / openglwidgets are needed for QOpenGLBuffer, QOpenGLShaderProgram,
 # and QOpenGLWidget; the headers moved from QtGui to separate modules in Qt 6.
 greaterThan(QT_MAJOR_VERSION, 5) {
-    QT += opengl openglwidgets
+    QT += opengl openglwidgets gui-private
 }
 QT += shadertools
 

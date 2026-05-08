@@ -10,7 +10,7 @@
 #include <QtQml/qqml.h>
 #include <QtQuick/QQuickWindow>
 #include <QtQuick/QSGRenderNode>
-#include <rhi/qrhi.h>
+#include <imt3dgui/QtRhiCompat.h>
 
 // ImtCore includes
 #include <imt3dgui/CRhiRenderBackend.h>
@@ -100,8 +100,7 @@ public:
 					static_cast<int>(r.height()));
 		m_scene->SetViewPort(viewPort);
 
-		QMatrix4x4 projMatrix;
-		projMatrix.setToIdentity();
+		QMatrix4x4 projMatrix = rhi->clipSpaceCorrMatrix();
 		const float w = static_cast<float>(r.width());
 		const float h = static_cast<float>(r.height());
 		const float aspect = (h > 0) ? w / h : 1.0f;
@@ -268,8 +267,9 @@ qreal CScene3dItem::GetRotationX() const
 
 void CScene3dItem::SetRotationX(qreal angle)
 {
-	if (!qFuzzyCompare(m_rotationX, angle)){
-		m_rotationX = angle;
+	const qreal clamped = qBound<qreal>(-89.9, angle, 89.9);
+	if (!qFuzzyCompare(m_rotationX, clamped)){
+		m_rotationX = clamped;
 		emit RotationXChanged();
 		update();
 	}

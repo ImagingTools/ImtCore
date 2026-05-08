@@ -40,7 +40,7 @@ CRulerShape::CRulerShape()
 	vertices.push_back(vertices[0]);
 	vertices.push_back(vertices[1]);
 
-	m_data.CreateCloud(imt3d::CPointCloud3d::PF_XYZW_RGBA_32, vertices.size(), vertices.data());
+	m_data.CreateCloud(imt3d::CPointCloud3d::PF_XYZW_RGBA_32, static_cast<int>(vertices.size()), vertices.data());
 	m_vertices = static_cast<imt3d::IPointsBasedObject::PointXyzwRgba32*>(m_data.GetData());
 
 	m_indices = { 0, 1, 2, 3 };
@@ -267,5 +267,4 @@ void CRulerShape::DrawOverlay(QPainter& painter)
 
 
 } // namespace imt3dgui
-
 

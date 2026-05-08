@@ -16,6 +16,8 @@ namespace imt3dgui
 
 class CRulerShape: public CShape3dBase
 {
+	typedef CShape3dBase BaseClass;
+
 public:
 	CRulerShape();
 
@@ -47,5 +49,4 @@ private:
 
 
 } // namespace imt3dgui
-
 

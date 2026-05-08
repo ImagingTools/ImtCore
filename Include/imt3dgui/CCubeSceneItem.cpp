@@ -172,12 +172,12 @@ void CCubeSceneItem::CreateGeometry()
 
 	struct FaceDesc { float nx, ny, nz; int corners[4]; };
 	const FaceDesc faces[6] = {
-		{  1, 0, 0, { 1, 5, 6, 2 } },
-		{ -1, 0, 0, { 4, 0, 3, 7 } },
-		{  0, 1, 0, { 3, 2, 6, 7 } },
-		{  0,-1, 0, { 4, 5, 1, 0 } },
-		{  0, 0, 1, { 5, 4, 7, 6 } },
-		{  0, 0,-1, { 0, 1, 2, 3 } },
+		{  1, 0, 0, { 1, 2, 6, 5 } },
+		{ -1, 0, 0, { 4, 7, 3, 0 } },
+		{  0, 1, 0, { 3, 7, 6, 2 } },
+		{  0,-1, 0, { 4, 0, 1, 5 } },
+		{  0, 0, 1, { 5, 6, 7, 4 } },
+		{  0, 0,-1, { 0, 3, 2, 1 } },
 	};
 
 	float vertices[s_vertexCount * s_floatsPerVertex]{};

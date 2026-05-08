@@ -253,6 +253,7 @@ void COpenGLRenderBackend::ApplyRenderHints(int renderHints)
 	}
 
 	if (renderHints & imt3dview::SceneState::RH_CULLFACE){
+		functions->glEnable(GL_CULL_FACE);
 		functions->glCullFace(GL_BACK);
 		functions->glFrontFace(GL_CCW);
 	}

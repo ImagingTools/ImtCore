@@ -32,7 +32,7 @@ void main()
 
         vec3  n    = normalize(fragNormal);
         vec3  l    = normalize(global.lightPosition.xyz - fragPosition);
-        float diff = abs(dot(n, l));
+        float diff = max(dot(n, l), 0.0);
         vec3  diffuse = diff * global.lightColor.xyz;
 
         float specStr   = 0.5;

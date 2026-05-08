@@ -11,7 +11,7 @@
 #include <QtQml/qqml.h>
 #include <QtQuick/QQuickWindow>
 #include <QtQuick/QSGRenderNode>
-#include <rhi/qrhi.h>
+#include <imt3dgui/QtRhiCompat.h>
 
 
 namespace
@@ -46,12 +46,12 @@ struct CubeData
 
 		struct FaceDesc { float nx, ny, nz; int corners[4]; };
 		const FaceDesc faces[6] = {
-			{  1, 0, 0, { 1, 5, 6, 2 } },
-			{ -1, 0, 0, { 4, 0, 3, 7 } },
-			{  0, 1, 0, { 3, 2, 6, 7 } },
-			{  0,-1, 0, { 4, 5, 1, 0 } },
-			{  0, 0, 1, { 5, 4, 7, 6 } },
-			{  0, 0,-1, { 0, 1, 2, 3 } },
+			{  1, 0, 0, { 1, 2, 6, 5 } },
+			{ -1, 0, 0, { 4, 7, 3, 0 } },
+			{  0, 1, 0, { 3, 7, 6, 2 } },
+			{  0,-1, 0, { 4, 0, 1, 5 } },
+			{  0, 0, 1, { 5, 6, 7, 4 } },
+			{  0, 0,-1, { 0, 3, 2, 1 } },
 		};
 
 		int vOff = 0;
@@ -138,7 +138,7 @@ public:
 		QMatrix4x4 viewMatrix;
 		QMatrix4x4 projMatrix;
 		QVector3D camPos;
-		BuildMatrices(viewMatrix, projMatrix, camPos);
+		BuildMatrices(rhi, viewMatrix, projMatrix, camPos);
 
 		// Upload UBO data
 		QRhiResourceUpdateBatch* batch = rhi->nextResourceUpdateBatch();
@@ -345,7 +345,7 @@ private:
 
 	static constexpr float s_degToRad = static_cast<float>(M_PI) / 180.0f;
 
-	void BuildMatrices(QMatrix4x4& viewOut, QMatrix4x4& projOut, QVector3D& camPosOut) const
+	void BuildMatrices(QRhi* rhi, QMatrix4x4& viewOut, QMatrix4x4& projOut, QVector3D& camPosOut) const
 	{
 		const float dist = static_cast<float>(m_itemPtr->GetCameraDistance());
 		const float rx = static_cast<float>(m_itemPtr->GetRotationX()) * s_degToRad;
@@ -362,7 +362,7 @@ private:
 		const float w = static_cast<float>(m_itemPtr->width());
 		const float h = static_cast<float>(m_itemPtr->height());
 		const float aspect = (h > 0) ? w / h : 1.0f;
-		projOut.setToIdentity();
+		projOut = (rhi != nullptr) ? rhi->clipSpaceCorrMatrix() : QMatrix4x4();
 		projOut.perspective(45.0f, aspect, 0.1f, 100.0f);
 	}
 
@@ -494,8 +494,9 @@ qreal CRender3dItem::GetRotationX() const
 
 void CRender3dItem::SetRotationX(qreal angle)
 {
-	if (!qFuzzyCompare(m_rotationX, angle)){
-		m_rotationX = angle;
+	const qreal clamped = qBound<qreal>(-89.9, angle, 89.9);
+	if (!qFuzzyCompare(m_rotationX, clamped)){
+		m_rotationX = clamped;
 		emit RotationXChanged();
 		update();
 	}

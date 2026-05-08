@@ -674,7 +674,12 @@ QMatrix4x4 CRhiWidget::GetProjectionMatrix() const
 	float aspectRatio = w / (h > 0.0f ? h : 1.0f);
 
 	QMatrix4x4 projection;
-	projection.setToIdentity();
+	if (QRhi* currentRhi = rhi()){
+		projection = currentRhi->clipSpaceCorrMatrix();
+	}
+	else{
+		projection.setToIdentity();
+	}
 
 	const double cameraZ =
 		m_cameraPtr ? m_cameraPtr->GetPosition().z() : 5.0;

@@ -2,10 +2,9 @@
 #pragma once
 
 
-// Qt includes
-#include <rhi/qrhi.h>
-
 // ImtCore includes
+#include <imt3dgui/QtRhiCompat.h>
+
 #include <imt3dview/IRenderResource.h>
 #include <imt3dview/VertexLayout.h>
 
