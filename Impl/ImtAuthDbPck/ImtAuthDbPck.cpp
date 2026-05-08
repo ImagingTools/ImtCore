@@ -91,7 +91,10 @@ I_EXPORT_COMPONENT(
 			"SQL delegate for tenant memberships (hydration, INSERT/UPDATE/DELETE)",
 			"Tenant Membership Database Delegate");
 
+I_EXPORT_COMPONENT(
+			TenantInvitationDatabaseDelegate,
+			"SQL delegate for tenant invitations (hydration, INSERT/UPDATE/DELETE)",
+			"Tenant Invitation Database Delegate");
 
 } // namespace ImtAuthDbPck
-
 

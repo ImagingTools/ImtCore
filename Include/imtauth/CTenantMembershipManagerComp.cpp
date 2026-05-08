@@ -179,22 +179,11 @@ QByteArray CTenantMembershipManagerComp::AddMembership(const QByteArray& userId,
 
 QByteArray CTenantMembershipManagerComp::InviteMembership(const QByteArray& userId, const QByteArray& tenantId, ITenantMembership::TenantMemberRole role)
 {
-	QByteArray membershipId = AddMembership(userId, tenantId, role);
-	if (membershipId.isEmpty() || !m_membershipCollectionCompPtr.IsValid()){
-		return membershipId;
-	}
-
-	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (m_membershipCollectionCompPtr->GetObjectData(membershipId, dataPtr)){
-		ITenantMembership* membershipPtr = dynamic_cast<ITenantMembership*>(dataPtr.GetPtr());
-		if (membershipPtr != nullptr){
-			membershipPtr->SetActive(true);
-			membershipPtr->SetJoinedAt(QString());
-			m_membershipCollectionCompPtr->SetObjectData(membershipId, *membershipPtr);
-		}
-	}
-
-	return membershipId;
+	Q_UNUSED(userId);
+	Q_UNUSED(tenantId);
+	Q_UNUSED(role);
+	SendErrorMessage(0, "Tenant invitations are stored separately; use ITenantInvitationManager::CreateInvitation", "CTenantMembershipManagerComp");
+	return QByteArray();
 }
 
 
@@ -287,7 +276,8 @@ bool CTenantMembershipManagerComp::UpdateMembershipRole(const QByteArray& member
 
 bool CTenantMembershipManagerComp::IsMember(const QByteArray& userId, const QByteArray& tenantId) const
 {
-	return FindMembership(userId, tenantId).IsValid();
+	ITenantMembershipUniquePtr membershipPtr = FindMembership(userId, tenantId);
+	return membershipPtr.IsValid() && membershipPtr->IsActive();
 }
 
 
@@ -295,6 +285,9 @@ bool CTenantMembershipManagerComp::HasMinimumRole(const QByteArray& userId, cons
 {
 	ITenantMembershipUniquePtr membershipPtr = FindMembership(userId, tenantId);
 	if (!membershipPtr.IsValid()){
+		return false;
+	}
+	if (!membershipPtr->IsActive()){
 		return false;
 	}
 

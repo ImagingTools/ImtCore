@@ -7,6 +7,7 @@ import imtcontrols 1.0
 import imtdocgui 1.0
 import imtguigql 1.0
 import imtauthTenantsSdl 1.0
+import imtauthTenantMembershipsSdl 1.0
 
 DocumentViewBase {
 	id: container
@@ -16,6 +17,7 @@ DocumentViewBase {
 
 	property TenantData tenantData: model
 	property var pendingMembers: []
+	property var pendingInvitations: []
 	property bool isNewTenant: tenantData ? (!tenantData.m_id || tenantData.m_id === "") : true
 	readonly property real memberRoleNameWidthRatio: 0.55
 	readonly property real memberRoleComboWidthRatio: 0.45
@@ -32,6 +34,7 @@ DocumentViewBase {
 
 	function updateGui(){
 		__loadMembersFromModel();
+		__loadInvitationsFromModel();
 		generalGroup.updateGui();
 	}
 
@@ -92,6 +95,59 @@ DocumentViewBase {
 		}
 		container.pendingMembers = members
 		__loadMemberRolesFromModel()
+	}
+
+	function __loadInvitationsFromModel() {
+		if (!container.tenantData)
+			return
+		var invitationsModel = container.tenantData.m_pendingInvitations
+		var invitations = []
+		if (invitationsModel) {
+			var count = invitationsModel.count || 0
+			for (var i = 0; i < count; i++) {
+				var invitation = invitationsModel.get(i).item
+				if (invitation) {
+					invitations.push({
+						id: invitation.m_id || "",
+						userId: invitation.m_userId || "",
+						userName: invitation.m_userName || invitation.m_userId || "",
+						role: invitation.m_role || container.defaultRole,
+						status: invitation.m_status || "Pending",
+						invitedByUserId: invitation.m_invitedByUserId || "",
+						invitedByName: invitation.m_invitedByName || invitation.m_invitedByUserId || "",
+						createdAt: invitation.m_createdAt || "",
+						expiresAt: invitation.m_expiresAt || ""
+					})
+				}
+			}
+		}
+		container.pendingInvitations = invitations
+	}
+
+	function __inviteSelectedUsers(selectedItems) {
+		var activeIds = {}
+		for (var i = 0; i < container.pendingMembers.length; i++)
+			activeIds[container.pendingMembers[i].id] = true
+		for (var j = 0; j < container.pendingInvitations.length; j++)
+			activeIds[container.pendingInvitations[j].userId] = true
+		for (var k = 0; k < selectedItems.length; k++) {
+			var selected = selectedItems[k]
+			if (selected && selected.id && !activeIds[selected.id]) {
+				createInvitationInput.m_tenantId = container.tenantData.m_id || ""
+				createInvitationInput.m_userId = selected.id
+				createInvitationInput.m_role = TenantMemberRole.Member
+				createInvitationSender.send(createInvitationInput)
+			}
+		}
+	}
+
+	function __removePendingInvitation(invitationId) {
+		var invitations = []
+		for (var i = 0; i < container.pendingInvitations.length; i++) {
+			if (container.pendingInvitations[i].id !== invitationId)
+				invitations.push(container.pendingInvitations[i])
+		}
+		container.pendingInvitations = invitations
 	}
 
 	// --- Member roles support ---
@@ -277,8 +333,8 @@ DocumentViewBase {
 				width: parent.width
 				visible: !container.isNewTenant
 				items: container.pendingMembers
-				label: qsTr("Members")
-				addButtonText: qsTr("Add member")
+				label: qsTr("Active Members")
+				addButtonText: qsTr("Invite member")
 				filterPlaceholder: qsTr("Type or choose a user")
 				collectionId: "Users"
 				emptyText: qsTr("No members")
@@ -291,14 +347,85 @@ DocumentViewBase {
 				}
 
 				onSelectionChanged: {
-					container.pendingMembers = selectedItems
-					container.__membersModifiedLocally = true
+					container.__inviteSelectedUsers(selectedItems)
+					membersSelector.items = container.pendingMembers.slice()
 				}
 
 				onPopupClosed: {
 					if (container.__membersModifiedLocally) {
 						container.doUpdateModel()
 						container.__membersModifiedLocally = false
+					}
+					membersSelector.items = container.pendingMembers.slice()
+				}
+			}
+
+			GroupHeaderView {
+				width: parent.width
+				title: qsTr("Pending Invitations")
+				groupView: pendingInvitationsGroup
+				visible: pendingInvitationsGroup.visible
+			}
+
+			GroupElementView {
+				id: pendingInvitationsGroup
+				width: parent.width
+				visible: !container.isNewTenant && container.pendingInvitations.length > 0
+
+				Column {
+					width: parent.width - container.totalMemberRoleHorizontalMargin
+					x: container.memberRoleHorizontalMargin
+					spacing: Style.marginM
+
+					Repeater {
+						model: container.pendingInvitations
+
+						delegate: Item {
+							width: parent.width
+							height: Style.controlHeightM * 2 + container.totalMemberRoleRowMargin
+
+							Column {
+								anchors.fill: parent
+								anchors.margins: container.memberRoleRowMargin
+								spacing: Style.marginXS
+
+								BaseText {
+									width: parent.width
+									text: modelData.userName + " • " + modelData.role + " • " + modelData.status
+									elide: Text.ElideRight
+								}
+
+								Row {
+									width: parent.width
+									spacing: Style.marginM
+
+									BaseText {
+										width: parent.width - revokeInviteButton.width - resendInviteButton.width - parent.spacing * 2
+										text: qsTr("Invited by %1 at %2").arg(modelData.invitedByName || modelData.invitedByUserId).arg(modelData.createdAt)
+										elide: Text.ElideRight
+									}
+
+									Button {
+										id: resendInviteButton
+										text: qsTr("Resend")
+										onClicked: {
+											resendInvitationInput.m_invitationId = modelData.id
+											resendInvitationSender.send(resendInvitationInput)
+										}
+									}
+
+									Button {
+										id: revokeInviteButton
+										text: qsTr("Revoke")
+										onClicked: {
+											revokeInvitationInput.m_invitationId = modelData.id
+											revokeInvitationSender.send(revokeInvitationInput)
+											container.__removePendingInvitation(modelData.id)
+										}
+									}
+								}
+							}
+						}
 					}
 				}
 			}
@@ -368,5 +495,32 @@ DocumentViewBase {
 				}
 			}
 		}
+	}
+
+	property CreateTenantInvitationInput createInvitationInput: CreateTenantInvitationInput {}
+	property GqlSdlRequestSender createInvitationSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_createTenantInvitation
+
+		sdlObjectComp: Component {
+			CreateTenantInvitationPayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "")
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+				}
+			}
+		}
+	}
+
+	property RevokeTenantInvitationInput revokeInvitationInput: RevokeTenantInvitationInput {}
+	property GqlSdlRequestSender revokeInvitationSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_revokeTenantInvitation
+	}
+
+	property ResendTenantInvitationInput resendInvitationInput: ResendTenantInvitationInput {}
+	property GqlSdlRequestSender resendInvitationSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_resendTenantInvitation
 	}
 }

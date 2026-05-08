@@ -50,6 +50,24 @@ imtauth::ITenantMembership::TenantMemberRole StringToTenantMemberRole(const QStr
 }
 
 
+QString TenantInvitationStatusToString(imtauth::ITenantInvitation::TenantInvitationStatus status)
+{
+	switch (status){
+		case imtauth::ITenantInvitation::TIS_ACCEPTED:
+			return QStringLiteral("Accepted");
+		case imtauth::ITenantInvitation::TIS_REJECTED:
+			return QStringLiteral("Rejected");
+		case imtauth::ITenantInvitation::TIS_REVOKED:
+			return QStringLiteral("Revoked");
+		case imtauth::ITenantInvitation::TIS_EXPIRED:
+			return QStringLiteral("Expired");
+		case imtauth::ITenantInvitation::TIS_PENDING:
+		default:
+			return QStringLiteral("Pending");
+	}
+}
+
+
 } // anonymous namespace
 
 
@@ -134,6 +152,33 @@ sdl::imtauth::Tenants::CTenantData CTenantCollectionDocumentManagerComp::OnGetTe
 				roleEntry.userId = userId;
 				roleEntry.role = TenantMemberRoleToString(membershipPtr->GetRole());
 				response.Version_1_0->memberRoles->push_back(roleEntry);
+			}
+		}
+	}
+
+	if (m_invitationManagerCompPtr.IsValid()){
+		imtauth::ITenantInvitationManager::Statuses statuses;
+		statuses.append(imtauth::ITenantInvitation::TIS_PENDING);
+		QByteArrayList invitationIds = m_invitationManagerCompPtr->GetInvitationsByTenant(tenantId, statuses);
+		response.Version_1_0->pendingInvitations.Emplace();
+		for (const QByteArray& invitationId : invitationIds){
+			imtauth::ITenantInvitationUniquePtr invitationPtr = m_invitationManagerCompPtr->GetInvitation(invitationId);
+			if (invitationPtr.IsValid()){
+				sdl::imtauth::Tenants::CTenantInvitationEntry::V1_0 invitationEntry;
+				invitationEntry.id = invitationPtr->GetInvitationId();
+				invitationEntry.userId = invitationPtr->GetUserId();
+				invitationEntry.role = TenantMemberRoleToString(invitationPtr->GetRole());
+				invitationEntry.status = TenantInvitationStatusToString(m_invitationManagerCompPtr->GetEffectiveStatus(*invitationPtr));
+				invitationEntry.invitedByUserId = invitationPtr->GetInvitedByUserId();
+				invitationEntry.createdAt = invitationPtr->GetCreatedAt();
+				invitationEntry.expiresAt = invitationPtr->GetExpiresAt();
+
+				if (m_userCollectionCompPtr.IsValid()){
+					invitationEntry.userName = imtauth::GetUserName(*m_userCollectionCompPtr, invitationPtr->GetUserId());
+					invitationEntry.invitedByName = imtauth::GetUserName(*m_userCollectionCompPtr, invitationPtr->GetInvitedByUserId());
+				}
+
+				response.Version_1_0->pendingInvitations->push_back(invitationEntry);
 			}
 		}
 	}
@@ -227,7 +272,7 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTenantCollect
 		QSet<QByteArray> currentUserIds;
 		for (const QByteArray& membershipId : currentMembershipIds){
 			imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
-			if (membershipPtr.IsValid()){
+			if (membershipPtr.IsValid() && membershipPtr->IsActive()){
 				currentUserIds.insert(membershipPtr->GetUserId());
 				userIdToMembershipId[membershipPtr->GetUserId()] = membershipId;
 			}
@@ -249,7 +294,9 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTenantCollect
 
 		for (const QByteArray& addUserId : newUserIds){
 			if (!currentUserIds.contains(addUserId)){
-				m_membershipManagerCompPtr->InviteMembership(addUserId, tenantId, imtauth::ITenantMembership::TMR_MEMBER);
+				if (m_invitationManagerCompPtr.IsValid()){
+					m_invitationManagerCompPtr->CreateInvitation(contextUserId, addUserId, tenantId, imtauth::ITenantMembership::TMR_MEMBER);
+				}
 			}
 		}
 
@@ -324,5 +371,4 @@ bool CTenantCollectionDocumentManagerComp::ProcessEvent(imtdoc::CEventBase* even
 
 
 } // namespace imtauthgql
-
 

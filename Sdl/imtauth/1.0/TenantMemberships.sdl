@@ -20,6 +20,14 @@ enum TenantMemberRole {
 	Guest
 }
 
+enum TenantInvitationStatus {
+	Pending
+	Accepted
+	Rejected
+	Revoked
+	Expired
+}
+
 type TenantMembershipItemData {
 	id: ID!
 	typeId: ID!
@@ -39,6 +47,23 @@ type TenantMembershipData {
 	isActive: Boolean
 	joinedAt: String
 	updatedAt: String
+}
+
+type TenantInvitationData {
+	id: ID
+	userId: ID
+	tenantId: ID
+	role: TenantMemberRole
+	status: TenantInvitationStatus
+	invitedByUserId: ID
+	createdAt: String
+	updatedAt: String
+	expiresAt: String
+	acceptedAt: String
+	rejectedAt: String
+	revokedAt: String
+	revokedByUserId: ID
+	lastSentAt: String
 }
 
 # --- Queries ---
@@ -101,6 +126,25 @@ type HasMinimumRolePayload {
 	errorMessage: String
 }
 
+input GetTenantInvitationsInput {
+	tenantId: ID!
+	statuses: [TenantInvitationStatus]
+}
+
+type GetTenantInvitationsPayload {
+	invitations: [TenantInvitationData]
+	errorMessage: String
+}
+
+input GetMyTenantInvitationsInput {
+	statuses: [TenantInvitationStatus]
+}
+
+type GetMyTenantInvitationsPayload {
+	invitations: [TenantInvitationData]
+	errorMessage: String
+}
+
 # --- Mutations ---
 
 input AddMembershipInput {
@@ -122,6 +166,54 @@ input InviteTenantMemberInput {
 
 type InviteTenantMemberPayload {
 	membershipId: ID
+	errorMessage: String
+}
+
+input CreateTenantInvitationInput {
+	userId: ID!
+	tenantId: ID!
+	role: TenantMemberRole
+}
+
+type CreateTenantInvitationPayload {
+	invitationId: ID
+	errorMessage: String
+}
+
+input AcceptTenantInvitationInput {
+	invitationId: ID!
+}
+
+type AcceptTenantInvitationPayload {
+	membershipId: ID
+	success: Boolean
+	errorMessage: String
+}
+
+input RejectTenantInvitationInput {
+	invitationId: ID!
+}
+
+type RejectTenantInvitationPayload {
+	success: Boolean
+	errorMessage: String
+}
+
+input RevokeTenantInvitationInput {
+	invitationId: ID!
+}
+
+type RevokeTenantInvitationPayload {
+	success: Boolean
+	errorMessage: String
+}
+
+input ResendTenantInvitationInput {
+	invitationId: ID!
+}
+
+type ResendTenantInvitationPayload {
+	success: Boolean
 	errorMessage: String
 }
 
@@ -169,11 +261,18 @@ type Query {
 	FindMembership (input: FindMembershipInput): FindMembershipPayload!
 	IsMember (input: IsMemberInput): IsMemberPayload!
 	HasMinimumRole (input: HasMinimumRoleInput): HasMinimumRolePayload!
+	GetTenantInvitations (input: GetTenantInvitationsInput): GetTenantInvitationsPayload!
+	GetMyTenantInvitations (input: GetMyTenantInvitationsInput): GetMyTenantInvitationsPayload!
 }
 
 type Mutation {
 	AddMembership (input: AddMembershipInput): AddMembershipPayload!
 	InviteTenantMember (input: InviteTenantMemberInput): InviteTenantMemberPayload!
+	CreateTenantInvitation (input: CreateTenantInvitationInput): CreateTenantInvitationPayload!
+	AcceptTenantInvitation (input: AcceptTenantInvitationInput): AcceptTenantInvitationPayload!
+	RejectTenantInvitation (input: RejectTenantInvitationInput): RejectTenantInvitationPayload!
+	RevokeTenantInvitation (input: RevokeTenantInvitationInput): RevokeTenantInvitationPayload!
+	ResendTenantInvitation (input: ResendTenantInvitationInput): ResendTenantInvitationPayload!
 	RemoveMembership (input: RemoveMembershipInput): RemoveMembershipPayload!
 	UpdateMembershipRole (input: UpdateMembershipRoleInput): UpdateMembershipRolePayload!
 	AcceptTenantMembershipInvitation (input: AcceptTenantMembershipInvitationInput): AcceptTenantMembershipInvitationPayload!

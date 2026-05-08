@@ -257,11 +257,20 @@ I_EXPORT_COMPONENT(
 			"Tenant Membership Manager");
 
 I_EXPORT_COMPONENT(
+			TenantInvitationInfo,
+			"Entity representing pending tenant invitation lifecycle state",
+			"Tenant Invitation Info");
+
+I_EXPORT_COMPONENT(
+			TenantInvitationManager,
+			"Manager for tenant invitations and accept/reject/revoke flows",
+			"Tenant Invitation Manager");
+
+I_EXPORT_COMPONENT(
 			TenantDocumentNameProvider,
 			"Provides default document name from tenant name",
 			"Tenant Document Name Provider");
 
 
 } // namespace ImtAuthPck
-
 

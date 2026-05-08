@@ -44,6 +44,18 @@ type TenantRoleOption {
 	name: String!
 }
 
+type TenantInvitationEntry {
+	id: ID!
+	userId: ID!
+	userName: String
+	role: String!
+	status: String!
+	invitedByUserId: ID
+	invitedByName: String
+	createdAt: String
+	expiresAt: String
+}
+
 type TenantData {
 	id: ID
 	name: String
@@ -54,6 +66,7 @@ type TenantData {
 	updatedAt: String
 	members: [TenantMemberEntry]
 	memberRoles: [TenantMemberRoleEntry]
+	pendingInvitations: [TenantInvitationEntry]
 	availableRoles: [TenantRoleOption]
 }
 

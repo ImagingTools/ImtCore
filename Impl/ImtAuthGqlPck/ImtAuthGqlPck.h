@@ -112,4 +112,3 @@ typedef imtauthgql::CTenantMembershipPublisherComp TenantMembershipPublisher;
 
 } // namespace ImtAuthGqlPck
 
-
