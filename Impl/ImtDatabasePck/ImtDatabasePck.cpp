@@ -92,9 +92,9 @@ I_EXPORT_COMPONENT(
 			"ObjectCollection Migration Controller");
 
 I_EXPORT_COMPONENT(
-			TenantIdMigrationController,
-			"TenantId migration controller",
-			"TenantId Migration Controller Add Column");
+			TenantBindingMigrationController,
+			"Tenant binding migration controller",
+			"Tenant Binding Migration Controller Create Bindings Table");
 
 I_EXPORT_COMPONENT(
 			DatabaseConnector,
@@ -128,5 +128,4 @@ I_EXPORT_COMPONENT(
 
 
 } // namespace ImtDatabasePck
-
 

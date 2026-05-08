@@ -15,12 +15,12 @@ namespace imtdb
 {
 
 
-class CTenantIdMigrationControllerComp: virtual public imtdb::CMigrationControllerCompBase
+class CTenantBindingMigrationControllerComp: virtual public imtdb::CMigrationControllerCompBase
 {
 public:
 	typedef imtdb::CMigrationControllerCompBase BaseClass;
 
-	I_BEGIN_COMPONENT(CTenantIdMigrationControllerComp);
+	I_BEGIN_COMPONENT(CTenantBindingMigrationControllerComp);
 		I_ASSIGN_MULTI_0(m_sqlDatabaseObjectDelegatesCompPtr, "SqlDatabaseObjectDelegates", "List of object collection sql delegates", false);
 	I_END_COMPONENT;
 
@@ -34,5 +34,4 @@ private:
 
 
 } // namespace imtdb
-
 

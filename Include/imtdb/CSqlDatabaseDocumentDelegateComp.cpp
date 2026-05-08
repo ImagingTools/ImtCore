@@ -3,9 +3,11 @@
 
 
 // Qt includes
+#include <QtCore/QDateTime>
 #include <QtCore/QFile>
 #include <QtCore/QRegularExpression>
 #include <QtCore/QRegularExpressionMatch>
+#include <QtCore/QUuid>
 
 // ACF includes
 #include <istd/TOptDelPtr.h>
@@ -881,15 +883,10 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 
 	static const QString nullDataLiteral = QStringLiteral("NULL");
 
-	QString tenantIdValue;
+	QByteArray tenantId;
 	if (operationContextPtr != nullptr){
-		QByteArray tenantId = operationContextPtr->GetTenantId();
-		if (!tenantId.isEmpty()){
-			tenantIdValue = QString("'%1'").arg(SqlEncode(QString::fromUtf8(tenantId)));
-		}
+		tenantId = operationContextPtr->GetTenantId();
 	}
-
-	const bool hasTenantId = !tenantIdValue.isEmpty();
 
 	QString columnsClause = QString("\"%0\", \"%1\", \"%2\", \"%3\", \"%4\", \"%5\", \"%6\", \"%7\", \"%8\", \"%9\"")
 				.arg(
@@ -905,10 +902,6 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 						qPrintable(s_stateColumn)
 					);
 
-	if (hasTenantId){
-		columnsClause += ", \"TenantId\"";
-	}
-
 	QString valuesClause = QString("'%0', '%1', '%2', %3, %4, '%5', %6, %7, '%8', '%9'")
 				.arg(
 						QUuid::createUuid().toString(QUuid::WithoutBraces),
@@ -923,10 +916,6 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 						QStringLiteral("Active")
 					);
 
-	if (hasTenantId){
-		valuesClause += QString(", %1").arg(tenantIdValue);
-	}
-
 	query += QString("INSERT INTO %0 \"%1\"(%2) VALUES(%3);")
 				.arg(
 						schemaPrefix,
@@ -934,6 +923,10 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 						columnsClause,
 						valuesClause
 					);
+
+	if (!tenantId.isEmpty()){
+		query += CreateTenantBindingInsertQuery(tenantId, objectId, operationContextPtr);
+	}
 
 	retVal = query.toUtf8();
 
@@ -1090,6 +1083,87 @@ QString CSqlDatabaseDocumentDelegateComp::CreateJsonExtractSql(
 	}
 
 	return QString();
+}
+
+
+QString CSqlDatabaseDocumentDelegateComp::CreateTenantBindingTableName() const
+{
+	if (m_tableSchemaAttrPtr.IsValid() && !(*m_tableSchemaAttrPtr).isEmpty()){
+		return QString("%1.\"TenantEntityBindings\"").arg(qPrintable(*m_tableSchemaAttrPtr));
+	}
+
+	return QStringLiteral("\"TenantEntityBindings\"");
+}
+
+
+QString CSqlDatabaseDocumentDelegateComp::CreateTenantBindingFilterQuery(const QByteArray& tenantId) const
+{
+	const QString bindingsTableName = CreateTenantBindingTableName();
+	const QString escapedEntityType = SqlEncode(QString::fromUtf8(GetTableName()));
+	const QByteArray databaseDriverId = m_databaseEngineCompPtr.IsValid() ? m_databaseEngineCompPtr->GetDatabaseDriverId() : QByteArray();
+	const bool isSqlite = databaseDriverId.compare(QByteArrayLiteral("QSQLITE"), Qt::CaseInsensitive) == 0;
+	const QString entityIdExpression = isSqlite
+			? QString("root.\"%1\"").arg(qPrintable(s_documentIdColumn))
+			: QString("root.\"%1\"::text").arg(qPrintable(s_documentIdColumn));
+
+	QString bindingsLookup = QString(
+				"SELECT 1 FROM %1 tenantBindings "
+				"WHERE tenantBindings.\"EntityType\" = '%2' "
+				"AND tenantBindings.\"EntityId\" = %3")
+			.arg(
+					bindingsTableName,
+					escapedEntityType,
+					entityIdExpression);
+
+	if (!tenantId.isEmpty()){
+		bindingsLookup += QString(" AND tenantBindings.\"TenantId\" = '%1'")
+				.arg(SqlEncode(QString::fromUtf8(tenantId)));
+
+		return QString("EXISTS (%1)").arg(bindingsLookup);
+	}
+
+	return QString("NOT EXISTS (%1)").arg(bindingsLookup);
+}
+
+
+QByteArray CSqlDatabaseDocumentDelegateComp::CreateTenantBindingInsertQuery(
+			const QByteArray& tenantId,
+			const QByteArray& entityId,
+			const imtbase::IOperationContext* operationContextPtr) const
+{
+	if (tenantId.isEmpty() || entityId.isEmpty()){
+		return QByteArray();
+	}
+
+	QByteArray ownerId;
+	if (operationContextPtr != nullptr){
+		ownerId = operationContextPtr->GetOperationOwnerId().id;
+	}
+
+	const QByteArray databaseDriverId = m_databaseEngineCompPtr.IsValid() ? m_databaseEngineCompPtr->GetDatabaseDriverId() : QByteArray();
+	const bool isSqlite = databaseDriverId.compare(QByteArrayLiteral("QSQLITE"), Qt::CaseInsensitive) == 0;
+	const QString conflictClause = isSqlite
+			? QStringLiteral("INSERT OR IGNORE INTO")
+			: QStringLiteral("INSERT INTO");
+	const QString onConflictClause = isSqlite
+			? QString()
+			: QStringLiteral(" ON CONFLICT (\"TenantId\", \"EntityType\", \"EntityId\") DO NOTHING");
+
+	const QString query = QString(
+				"%1 %2 (\"Id\", \"TenantId\", \"EntityType\", \"EntityId\", \"CreatedAt\", \"CreatedByUserId\") "
+				"VALUES ('%3', '%4', '%5', '%6', '%7', %8)%9;")
+			.arg(
+					conflictClause,
+					CreateTenantBindingTableName(),
+					QUuid::createUuid().toString(QUuid::WithoutBraces),
+					SqlEncode(QString::fromUtf8(tenantId)),
+					SqlEncode(QString::fromUtf8(GetTableName())),
+					SqlEncode(QString::fromUtf8(entityId)),
+					QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs),
+					ownerId.isEmpty() ? QStringLiteral("NULL") : QString("'%1'").arg(SqlEncode(QString::fromUtf8(ownerId))),
+					onConflictClause);
+
+	return query.toUtf8();
 }
 
 
@@ -1312,10 +1386,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateFilterQuery(const iprm::IParamsSet&
 		iprm::TParamsPtr<imtauth::ITenantFilterParam> tenantFilterPtr(&filterParams, "TenantFilter");
 		if (tenantFilterPtr.IsValid()){
 			QByteArray tenantId = tenantFilterPtr->GetTenantId();
-			if (!tenantId.isEmpty()){
-				QString escapedTenantId = SqlEncode(QString::fromUtf8(tenantId));
-				tenantFilterQuery = QString("root.\"TenantId\" = '%1'").arg(escapedTenantId);
-			}
+			tenantFilterQuery = CreateTenantBindingFilterQuery(tenantId);
 		}
 	}
 

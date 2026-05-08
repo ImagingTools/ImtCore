@@ -17,8 +17,7 @@ CREATE TABLE IF NOT EXISTS ${TableScheme}."${TableName}"
     "DataMetaInfo" jsonb,
     "Derivates" jsonb,
     "TimeStamp" timestamp without time zone  NOT NULL, -- UTC Time
-    "State" "DocumentState",
-    "TenantId" Text -- optional, multi-tenant support
+    "State" "DocumentState"
 );
 
 CREATE INDEX IF NOT EXISTS "${TableName}DocumentIdIndex"
@@ -33,8 +32,3 @@ CREATE INDEX IF NOT EXISTS "${TableName}StateIndex"
 
 CREATE INDEX IF NOT EXISTS "${TableName}RevisionNumberIndex"
     ON ${TableScheme}."${TableName}" ((("RevisionInfo"->>'RevisionNumber')::int));
-
-CREATE INDEX IF NOT EXISTS "${TableName}TenantIdIndex"
-    ON ${TableScheme}."${TableName}" USING btree
-    ("TenantId" ASC NULLS LAST)
-    TABLESPACE pg_default;

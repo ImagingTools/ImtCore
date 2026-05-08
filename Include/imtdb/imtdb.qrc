@@ -5,7 +5,8 @@
         <file alias="GetRevision.sql">Resources/SQL/Postgres/GetRevision.sql</file>
         <file alias="SetRevision.sql">Resources/SQL/Postgres/SetRevision.sql</file>
         <file alias="CreateCollectionTable.sql">Resources/SQL/Postgres/CreateCollectionTable.sql</file>
-        <file alias="AddTenantIdColumn.sql">Resources/SQL/Postgres/AddTenantIdColumn.sql</file>
+        <file alias="CreateTenantEntityBindingsTable.sql">Resources/SQL/Postgres/CreateTenantEntityBindingsTable.sql</file>
+        <file alias="MigrateTenantIdToEntityBindings.sql">Resources/SQL/Postgres/MigrateTenantIdToEntityBindings.sql</file>
     </qresource>
     <qresource prefix="/SQL/SQLite">
         <file alias="CreateDatabase.sql">Resources/SQL/SQLite/CreateDatabase.sql</file>
@@ -13,6 +14,7 @@
         <file alias="GetRevision.sql">Resources/SQL/SQLite/GetRevision.sql</file>
         <file alias="SetRevision.sql">Resources/SQL/SQLite/SetRevision.sql</file>
         <file alias="CreateCollectionTable.sql">Resources/SQL/SQLite/CreateCollectionTable.sql</file>
-        <file alias="AddTenantIdColumn.sql">Resources/SQL/SQLite/AddTenantIdColumn.sql</file>
+        <file alias="CreateTenantEntityBindingsTable.sql">Resources/SQL/SQLite/CreateTenantEntityBindingsTable.sql</file>
+        <file alias="MigrateTenantIdToEntityBindings.sql">Resources/SQL/SQLite/MigrateTenantIdToEntityBindings.sql</file>
     </qresource>
 </RCC>
