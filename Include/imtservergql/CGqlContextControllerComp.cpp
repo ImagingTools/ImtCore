@@ -64,6 +64,12 @@ imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(
 	gqlContextPtr->SetToken(token);
 	gqlContextPtr->SetHeaders(headers);
 
+	// Extract tenant ID from JWT token
+	if (m_jwtSessionControllerCompPtr.IsValid() && !token.startsWith("pat_")){
+		QByteArray tenantId = m_jwtSessionControllerCompPtr->GetTenantFromJwt(token);
+		gqlContextPtr->SetTenantId(tenantId);
+	}
+
 	imtgql::CGqlRequestContextManager::SetContext(gqlContextPtr);
 
 	if (headers.contains(imtbase::s_productIdHeaderId)){

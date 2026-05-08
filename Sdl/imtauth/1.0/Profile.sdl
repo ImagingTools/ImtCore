@@ -23,15 +23,27 @@ type PermissionInfo {
 	description: String
 }
 
+type ProfileTenantInfo {
+	id: ID
+	name: String
+	description: String
+	ownerId: ID
+	role: String
+	isOwner: Boolean
+	isActive: Boolean
+}
+
 type ProfileData {
 	id: ID
 	systemId: ID
 	username: String
 	name: String
 	email: String
+	currentTenantId: ID
 	roles: [RoleInfo]
 	groups: [GroupInfo]
 	permissions: [PermissionInfo]
+	organizations: [ProfileTenantInfo]
 }
 
 type SetProfileResponse {

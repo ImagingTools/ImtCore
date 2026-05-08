@@ -22,8 +22,8 @@ namespace imtservergql
 // reimplemented (imtservergql::IParamsSetJoiner)
 
 bool CUserGroupParamsSetJoinerComp::JoinParamsSet(
-	const imtgql::CGqlRequest& gqlRequest,
-	iprm::IParamsSet& paramsSet) const
+			const imtgql::CGqlRequest& gqlRequest,
+			iprm::IParamsSet& paramsSet) const
 {
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	if (gqlContextPtr == nullptr){

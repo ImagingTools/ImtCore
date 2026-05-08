@@ -1,0 +1,221 @@
+schema {
+	query: Query
+	mutation: Mutation
+	namespace: imtauth
+	version: 1.0
+}
+
+import {
+	"../../../../ImtCore/Sdl/imtbase/1.0/ImtCollection.sdl"
+	"../../../../ImtCore/Sdl/imtbase/1.0/ImtBaseTypes.sdl"
+}
+
+# --- Tenant ---
+
+type TenantItemData {
+	id: ID!
+	typeId: ID!
+	name: String!
+	description: String
+	ownerId: ID
+	isActive: Boolean
+	membersCount: Int
+	createdAt: String
+	updatedAt: String
+}
+
+type TenantMemberEntry {
+	id: ID!
+	name: String!
+}
+
+input TenantMemberEntryInput {
+	id: ID!
+	name: String
+}
+
+type TenantMemberRoleEntry {
+	userId: ID!
+	role: String!
+}
+
+type TenantRoleOption {
+	id: String!
+	name: String!
+}
+
+type TenantInvitationEntry {
+	id: ID!
+	userId: ID!
+	userName: String
+	role: String!
+	status: String!
+	invitedByUserId: ID
+	invitedByName: String
+	createdAt: String
+	expiresAt: String
+}
+
+type TenantData {
+	id: ID
+	name: String
+	description: String
+	ownerId: ID
+	isActive: Boolean
+	createdAt: String
+	updatedAt: String
+	members: [TenantMemberEntry]
+	memberRoles: [TenantMemberRoleEntry]
+	pendingInvitations: [TenantInvitationEntry]
+	availableRoles: [TenantRoleOption]
+}
+
+input GetTenantListInput {
+	viewParams: CollectionViewParams
+}
+
+type GetTenantListPayload {
+	items: [TenantItemData]
+	notification: NotificationItem
+}
+
+
+# --- TenantManager operations ---
+
+input GetTenantInput {
+	tenantId: ID!
+}
+
+type GetTenantPayload {
+	tenant: TenantData
+	errorMessage: String
+}
+
+input CreateTenantInput {
+	name: String!
+	description: String
+	ownerId: ID
+}
+
+type CreateTenantPayload {
+	tenantId: ID
+	errorMessage: String
+}
+
+input RemoveTenantInput {
+	tenantId: ID!
+}
+
+type RemoveTenantPayload {
+	success: Boolean
+	errorMessage: String
+}
+
+input MemberRoleEntryInput {
+	userId: ID!
+	role: String!
+}
+
+input UpdateTenantInput {
+	tenantId: ID!
+	name: String!
+	description: String
+	ownerId: ID
+	members: [TenantMemberEntryInput]
+	memberRoles: [MemberRoleEntryInput]
+}
+
+type UpdateTenantPayload {
+	success: Boolean
+	errorMessage: String
+}
+
+input SetTenantActiveInput {
+	tenantId: ID!
+	isActive: Boolean!
+}
+
+type SetTenantActivePayload {
+	success: Boolean
+	errorMessage: String
+}
+
+type GetTenantIdsPayload {
+	tenantIds: [ID]
+	errorMessage: String
+}
+
+# --- Tenant Relationships ---
+
+enum TenantRelationshipRole {
+	Parent
+	Child
+	Partner
+	Supplier
+	Customer
+	Affiliate
+}
+
+type TenantRelationship {
+	id: ID!
+	sourceTenantId: ID!
+	targetTenantId: ID!
+	role: TenantRelationshipRole!
+	description: String
+	createdAt: String
+}
+
+input AddTenantRelationshipInput {
+	sourceTenantId: ID!
+	targetTenantId: ID!
+	role: TenantRelationshipRole!
+	description: String
+}
+
+type AddTenantRelationshipPayload {
+	relationshipId: ID
+	errorMessage: String
+}
+
+input RemoveTenantRelationshipInput {
+	relationshipId: ID!
+}
+
+type RemoveTenantRelationshipPayload {
+	success: Boolean
+	errorMessage: String
+}
+
+input GetTenantRelationshipsInput {
+	tenantId: ID!
+}
+
+type GetTenantRelationshipsPayload {
+	relationships: [TenantRelationship]
+	errorMessage: String
+}
+
+type Query {
+	GetTenantList (input: GetTenantListInput): GetTenantListPayload!
+	GetTenant (input: GetTenantInput): GetTenantPayload!
+	GetTenantIds: GetTenantIdsPayload!
+	GetTenantRelationships (input: GetTenantRelationshipsInput): GetTenantRelationshipsPayload!
+}
+
+type Mutation {
+	CreateTenant (input: CreateTenantInput): CreateTenantPayload!
+	RemoveTenant (input: RemoveTenantInput): RemoveTenantPayload!
+	UpdateTenant (input: UpdateTenantInput): UpdateTenantPayload!
+	SetTenantActive (input: SetTenantActiveInput): SetTenantActivePayload!
+	AddTenantRelationship (input: AddTenantRelationshipInput): AddTenantRelationshipPayload!
+	RemoveTenantRelationship (input: RemoveTenantRelationshipInput): RemoveTenantRelationshipPayload!
+}
+
+collectionSchema {
+	type Tenant {
+		ref: TenantItemData
+		operations {
+			list: GetTenantList
+		}
+	}
+}

@@ -13,7 +13,7 @@
         <Element Id="CollectionDocumentManager" PackageId="ImtDocPck" ComponentId="CollectionDocumentManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="Collection" Type="Reference" ExportId="DeviceRepository">
+                    <AttributeInfo Id="Collection" Type="Reference" ExportId="Collection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DocumentManagerEventHandler" Type="Reference[]" ExportId="">
