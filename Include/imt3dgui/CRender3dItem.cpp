@@ -113,7 +113,15 @@ public:
 
 	RenderingFlags flags() const override
 	{
-		return BoundedRectRendering | DepthAwareRendering;
+		// NoExternalRendering tells the scene graph that render() uses only the
+		// QRhi APIs through commandBuffer() and does not call into any native
+		// graphics API (D3D11, Vulkan, OpenGL, ...).  Without this flag the
+		// scene graph wraps render() in beginExternal()/endExternal(), and the
+		// D3D11 backend asserts in endExternal() that no RHI commands were
+		// recorded ("cbD->commands.isEmpty()", qrhid3d11.cpp:1321) — which is
+		// violated because render() records setGraphicsPipeline/
+		// setShaderResources/drawIndexed via the RHI command buffer.
+		return BoundedRectRendering | DepthAwareRendering | NoExternalRendering;
 	}
 
 	QRectF rect() const override
