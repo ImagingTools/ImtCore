@@ -15,6 +15,7 @@
 #include <imt3dgui/CCompositeShapeViewComp.h>
 #include <imt3dgui/CWireShape.h>
 #include <imt3dgui/CPointCloudShapeComp.h>
+#include <imt3dgui/CRhiRenderBackend.h>
 
 
 /**
@@ -45,8 +46,9 @@ typedef ibase::TMakeModelObserverCompWrap<
 			imt3dgui::CWireShape,
 			imt3dgui::IShape3d,
 			imt3dview::IScene3dItem> WireShape;
+typedef icomp::TMakeComponentWrap<imt3dgui::CRhiRenderBackend, imt3dview::IRenderBackend> RhiRenderBackend;
+
 
 } // namespace Imt3dGuiPck
-
 
 

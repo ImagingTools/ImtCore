@@ -8,7 +8,7 @@ QT += sql
 CONFIG += network
 
 LIBS += -L$$(ACFSLNDIR)/Lib/$$COMPILER_DIR -liproc
-LIBS += -L../../../Lib/$$COMPILER_DIR -limtbase -limtrest -limtgql -limtdbgql -limtcom -limtbasesdl -limtservergql
+LIBS += -L../../../Lib/$$COMPILER_DIR -limtbase -limtrest -limtgql -limtdbgql -limtdb -limtcom -limtbasesdl -limtservergql
 
 include($(ACFCONFIGDIR)/QMake/AcfQt.pri)
 include($(ACFCONFIGDIR)/QMake/AcfStd.pri)
