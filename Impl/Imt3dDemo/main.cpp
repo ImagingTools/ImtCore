@@ -29,6 +29,22 @@ int main(int argc, char* argv[])
 	// Register the generic Scene3DView QML type
 	imt3dgui::CScene3dItem::RegisterQmlType();
 
+	// IMPORTANT: declare `cube` BEFORE `engine` so that, on scope exit,
+	// the QQmlApplicationEngine (and the QML scene-graph it owns) is destroyed
+	// FIRST.  Engine teardown reaches CScene3dNode::releaseResources(), which
+	// calls CScene3d::OnAttachBackend(nullptr) and propagates that to every
+	// shape — including `cube` — releasing its GPU resources while both the
+	// cube and the RHI backend are still alive.  Only afterwards does `cube`
+	// itself destruct, by which time its m_backendPtr has been cleared and
+	// ~CCubeSceneItem skips DestroyResource.
+	//
+	// If the order is reversed (cube declared after engine), `cube` would be
+	// destroyed first while the scene still holds a raw pointer to it; engine
+	// teardown would then dereference the dangling cube and pass a dangling
+	// IRenderResource& to CRhiRenderBackend::DestroyResource → crash on exit.
+	imt3dgui::CCubeSceneItem cube;
+	cube.SetColor(QVector3D(0.91f, 0.27f, 0.38f));
+
 	QQmlApplicationEngine engine;
 	engine.load(QUrl("qrc:/main.qml"));
 
@@ -36,7 +52,7 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
-	// Get the Scene3DView item and add a cube to its scene.
+	// Get the Scene3DView item and add the cube to its scene.
 	QObject* rootPtr = engine.rootObjects().first();
 	auto* viewPtr = rootPtr->findChild<imt3dgui::CScene3dItem*>("view3d");
 	if (!viewPtr){
@@ -44,8 +60,6 @@ int main(int argc, char* argv[])
 		return app.exec();
 	}
 
-	imt3dgui::CCubeSceneItem cube;
-	cube.SetColor(QVector3D(0.91f, 0.27f, 0.38f));
 	viewPtr->GetScene()->AddShapeToScene(&cube);
 
 	return app.exec();
