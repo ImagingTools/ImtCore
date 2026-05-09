@@ -3,9 +3,11 @@
 
 
 // Qt includes
+#include <QtCore/QDateTime>
 #include <QtCore/QFile>
 #include <QtCore/QRegularExpression>
 #include <QtCore/QRegularExpressionMatch>
+#include <QtCore/QUuid>
 
 // ACF includes
 #include <istd/TOptDelPtr.h>
@@ -26,6 +28,7 @@
 #include <imtdb/CComplexCollectionFilterConverter.h>
 #include <imtcol/IObjectTypeIdFilter.h>
 #include <imtbase/CComplexCollectionFilter.h>
+#include <imtauth/ITenantFilterParam.h>
 
 
 namespace imtdb
@@ -826,90 +829,6 @@ bool CSqlDatabaseDocumentDelegateComp::ClearDependentMetaInfo(const MetaFieldCle
 }
 
 
-// reimplemented (icomp::CComponentBase)
-
-void CSqlDatabaseDocumentDelegateComp::OnComponentCreated()
-{
-	BaseClass::OnComponentCreated();
-
-	if (!CreateTableIfNeeded()){
-		SendWarningMessage(0, QT_TR_NOOP("Collection table auto-creation failed; see previous errors. Component initialization was stopped"));
-		return;
-	}
-}
-
-
-bool CSqlDatabaseDocumentDelegateComp::CreateTableIfNeeded()
-{
-	const bool autoCreateTable = m_autoCreateTableAttrPtr.IsValid() ? *m_autoCreateTableAttrPtr : false;
-	if (!autoCreateTable){
-		return true;
-	}
-
-	if (!m_databaseEngineCompPtr.IsValid()){
-		return false;
-	}
-
-	const QString tableName = QString::fromUtf8(GetTableName());
-	if (tableName.isEmpty()){
-		return false;
-	}
-
-	if (TableExists(tableName)){
-		return true;
-	}
-
-	const QByteArray scriptPath = m_createTableScriptPathAttrPtr.IsValid() ? *m_createTableScriptPathAttrPtr : QByteArray();
-	if (scriptPath.isEmpty()){
-		SendErrorMessage(0, QT_TR_NOOP("Table creation script path is empty"));
-		return false;
-	}
-
-	const QString resourcePath = QString::fromUtf8(scriptPath);
-	if (!resourcePath.startsWith(QStringLiteral(":/"))){
-		SendErrorMessage(0, QT_TR_NOOP("Table creation script path must point to a QRC resource"));
-		return false;
-	}
-	QFile scriptFile(resourcePath);
-	if (!scriptFile.open(QFile::ReadOnly)){
-		SendErrorMessage(0, QString::fromUtf8(QT_TR_NOOP("Collection table creation script '%1' could not be loaded"))
-							.arg(scriptFile.fileName()));
-		return false;
-	}
-
-	QByteArray createTableQuery = scriptFile.readAll();
-	scriptFile.close();
-
-	QByteArray tableScheme = GetTableScheme();
-	if (!tableScheme.isEmpty()){
-		createTableQuery.replace("${TableScheme}", tableScheme);
-	}
-	else{
-		createTableQuery.replace("${TableScheme}", "public");
-	}
-
-	createTableQuery.replace("${TableName}", tableName.toUtf8());
-
-	QSqlError sqlError;
-	m_databaseEngineCompPtr->ExecSqlQuery(createTableQuery, &sqlError);
-
-	if (sqlError.type() != QSqlError::NoError){
-		qCritical() << __FILE__ << __LINE__
-					<< "\n\t| Table could not be created"
-					<< "\n\t| Error: " << sqlError
-					<< "\n\t| Query: " << createTableQuery;
-
-		SendErrorMessage(0, QString::fromUtf8(QT_TR_NOOP("\n\t| Table could not be created"
-														"\n\t| Error: %1"
-														"\n\t| Query: %2"))
-								.arg(sqlError.text(), qPrintable(createTableQuery)));
-		return false;
-	}
-
-	return true;
-}
-
-
 // protected methods
 
 QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
@@ -964,10 +883,13 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 
 	static const QString nullDataLiteral = QStringLiteral("NULL");
 
-	query += QString("INSERT INTO %0 \"%1\"(\"%2\", \"%3\", \"%4\", \"%5\", \"%6\", \"%7\", \"%8\", \"%9\", \"%10\", \"%11\") VALUES('%12', '%13', '%14', %15, %16, '%17', %18, %19, '%20', '%21');")
+	QByteArray tenantId;
+	if (operationContextPtr != nullptr){
+		tenantId = operationContextPtr->GetTenantId();
+	}
+
+	QString columnsClause = QString("\"%0\", \"%1\", \"%2\", \"%3\", \"%4\", \"%5\", \"%6\", \"%7\", \"%8\", \"%9\"")
 				.arg(
-						schemaPrefix,
-						qPrintable(*m_tableNameAttrPtr),
 						qPrintable(s_idColumn),
 						qPrintable(s_typeIdColumn),
 						qPrintable(s_documentIdColumn),
@@ -977,7 +899,11 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 						qPrintable(s_dataMetaInfoColumn),
 						qPrintable(s_revisionInfoColumn),
 						qPrintable(s_lastModifiedColumn),
-						qPrintable(s_stateColumn),
+						qPrintable(s_stateColumn)
+					);
+
+	QString valuesClause = QString("'%0', '%1', '%2', %3, %4, '%5', %6, %7, '%8', '%9'")
+				.arg(
 						QUuid::createUuid().toString(QUuid::WithoutBraces),
 						qPrintable(typeId),
 						qPrintable(objectId),
@@ -989,6 +915,18 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 						QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs),
 						QStringLiteral("Active")
 					);
+
+	query += QString("INSERT INTO %0 \"%1\"(%2) VALUES(%3);")
+				.arg(
+						schemaPrefix,
+						qPrintable(*m_tableNameAttrPtr),
+						columnsClause,
+						valuesClause
+					);
+
+	if (!tenantId.isEmpty()){
+		query += CreateTenantBindingInsertQuery(tenantId, objectId, operationContextPtr);
+	}
 
 	retVal = query.toUtf8();
 
@@ -1145,6 +1083,131 @@ QString CSqlDatabaseDocumentDelegateComp::CreateJsonExtractSql(
 	}
 
 	return QString();
+}
+
+
+QString CSqlDatabaseDocumentDelegateComp::CreateTenantBindingTableName() const
+{
+	if (m_tableSchemaAttrPtr.IsValid() && !(*m_tableSchemaAttrPtr).isEmpty()){
+		return QString("%1.\"TenantEntityBindings\"").arg(qPrintable(*m_tableSchemaAttrPtr));
+	}
+
+	return QStringLiteral("\"TenantEntityBindings\"");
+}
+
+
+QByteArray CSqlDatabaseDocumentDelegateComp::CreateTenantBindingTableInitializationQuery() const
+{
+	const QByteArray databaseDriverId = m_databaseEngineCompPtr.IsValid() ? m_databaseEngineCompPtr->GetDatabaseDriverId() : QByteArray();
+	const bool isSqlite = databaseDriverId.compare(QByteArrayLiteral("QSQLITE"), Qt::CaseInsensitive) == 0;
+	const QString bindingsTableName = CreateTenantBindingTableName();
+
+	if (isSqlite){
+		return QString(
+					"CREATE TABLE IF NOT EXISTS %1 "
+					"(\"Id\" TEXT PRIMARY KEY, "
+					"\"TenantId\" TEXT NOT NULL, "
+					"\"EntityType\" TEXT NOT NULL, "
+					"\"EntityId\" TEXT NOT NULL, "
+					"\"CreatedAt\" TEXT NOT NULL, "
+					"\"CreatedByUserId\" TEXT, "
+					"\"Scope\" TEXT, "
+					"UNIQUE (\"TenantId\", \"EntityType\", \"EntityId\"));"
+					"CREATE INDEX IF NOT EXISTS \"IX_TenantEntityBindings_TenantId\" "
+					"ON %1 (\"TenantId\");"
+					"CREATE INDEX IF NOT EXISTS \"IX_TenantEntityBindings_Entity\" "
+					"ON %1 (\"EntityType\", \"EntityId\");")
+				.arg(bindingsTableName)
+				.toUtf8();
+	}
+
+	return QString(
+				"CREATE TABLE IF NOT EXISTS %1 "
+				"(\"Id\" TEXT PRIMARY KEY, "
+				"\"TenantId\" TEXT NOT NULL, "
+				"\"EntityType\" TEXT NOT NULL, "
+				"\"EntityId\" TEXT NOT NULL, "
+				"\"CreatedAt\" timestamp without time zone NOT NULL, "
+				"\"CreatedByUserId\" TEXT, "
+				"\"Scope\" TEXT, "
+				"CONSTRAINT \"UQ_TenantEntityBindings_Tenant_Entity\" UNIQUE (\"TenantId\", \"EntityType\", \"EntityId\"));"
+				"CREATE INDEX IF NOT EXISTS \"IX_TenantEntityBindings_TenantId\" "
+				"ON %1 (\"TenantId\");"
+				"CREATE INDEX IF NOT EXISTS \"IX_TenantEntityBindings_Entity\" "
+				"ON %1 (\"EntityType\", \"EntityId\");")
+			.arg(bindingsTableName)
+			.toUtf8();
+}
+
+
+QString CSqlDatabaseDocumentDelegateComp::CreateTenantBindingFilterQuery(const QByteArray& tenantId) const
+{
+	const QString bindingsTableName = CreateTenantBindingTableName();
+	const QString escapedEntityType = SqlEncode(QString::fromUtf8(GetTableName()));
+	const QByteArray databaseDriverId = m_databaseEngineCompPtr.IsValid() ? m_databaseEngineCompPtr->GetDatabaseDriverId() : QByteArray();
+	const bool isSqlite = databaseDriverId.compare(QByteArrayLiteral("QSQLITE"), Qt::CaseInsensitive) == 0;
+	const QString entityIdExpression = isSqlite
+			? QString("root.\"%1\"").arg(qPrintable(s_documentIdColumn))
+			: QString("root.\"%1\"::text").arg(qPrintable(s_documentIdColumn));
+
+	QString bindingsLookup = QString(
+				"SELECT 1 FROM %1 tenantBindings "
+				"WHERE tenantBindings.\"EntityType\" = '%2' "
+				"AND tenantBindings.\"EntityId\" = %3")
+			.arg(
+					bindingsTableName,
+					escapedEntityType,
+					entityIdExpression);
+
+	if (!tenantId.isEmpty()){
+		bindingsLookup += QString(" AND tenantBindings.\"TenantId\" = '%1'")
+				.arg(SqlEncode(QString::fromUtf8(tenantId)));
+
+		return QString("EXISTS (%1)").arg(bindingsLookup);
+	}
+
+	return QString("NOT EXISTS (%1)").arg(bindingsLookup);
+}
+
+
+QByteArray CSqlDatabaseDocumentDelegateComp::CreateTenantBindingInsertQuery(
+			const QByteArray& tenantId,
+			const QByteArray& entityId,
+			const imtbase::IOperationContext* operationContextPtr) const
+{
+	if (tenantId.isEmpty() || entityId.isEmpty()){
+		return QByteArray();
+	}
+
+	QByteArray ownerId;
+	if (operationContextPtr != nullptr){
+		ownerId = operationContextPtr->GetOperationOwnerId().id;
+	}
+
+	const QByteArray databaseDriverId = m_databaseEngineCompPtr.IsValid() ? m_databaseEngineCompPtr->GetDatabaseDriverId() : QByteArray();
+	const bool isSqlite = databaseDriverId.compare(QByteArrayLiteral("QSQLITE"), Qt::CaseInsensitive) == 0;
+	const QString conflictClause = isSqlite
+			? QStringLiteral("INSERT OR IGNORE INTO")
+			: QStringLiteral("INSERT INTO");
+	const QString onConflictClause = isSqlite
+			? QString()
+			: QStringLiteral(" ON CONFLICT (\"TenantId\", \"EntityType\", \"EntityId\") DO NOTHING");
+
+	const QString query = QString(
+				"%1 %2 (\"Id\", \"TenantId\", \"EntityType\", \"EntityId\", \"CreatedAt\", \"CreatedByUserId\") "
+				"VALUES ('%3', '%4', '%5', '%6', '%7', %8)%9;")
+			.arg(
+					conflictClause,
+					CreateTenantBindingTableName(),
+					QUuid::createUuid().toString(QUuid::WithoutBraces),
+					SqlEncode(QString::fromUtf8(tenantId)),
+					SqlEncode(QString::fromUtf8(GetTableName())),
+					SqlEncode(QString::fromUtf8(entityId)),
+					QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs),
+					ownerId.isEmpty() ? QStringLiteral("NULL") : QString("'%1'").arg(SqlEncode(QString::fromUtf8(ownerId))),
+					onConflictClause);
+
+	return CreateTenantBindingTableInitializationQuery() + query.toUtf8();
 }
 
 
@@ -1362,7 +1425,24 @@ bool CSqlDatabaseDocumentDelegateComp::CreateFilterQuery(const iprm::IParamsSet&
 		documentFilterQuery = QString("root.\"%0\" = 'Active'").arg(QString::fromUtf8(s_stateColumn));
 	}
 
+	QString tenantFilterQuery;
+	if (paramIds.contains("TenantFilter")){
+		iprm::TParamsPtr<imtauth::ITenantFilterParam> tenantFilterPtr(&filterParams, "TenantFilter");
+		if (tenantFilterPtr.IsValid()){
+			QByteArray tenantId = tenantFilterPtr->GetTenantId();
+			tenantFilterQuery = CreateTenantBindingFilterQuery(tenantId);
+		}
+	}
+
 	QString additionalFilters = CreateAdditionalFiltersQuery(filterParams);
+
+	if (!tenantFilterQuery.isEmpty()){
+		if (!filterQuery.isEmpty()){
+			filterQuery += " AND ";
+		}
+
+		filterQuery += "(" + tenantFilterQuery + ")";
+	}
 
 	if (!objectTypeIdQuery.isEmpty()){
 		if (!filterQuery.isEmpty()){
@@ -1423,6 +1503,12 @@ bool CSqlDatabaseDocumentDelegateComp::CreateFilterQuery(const iprm::IParamsSet&
 	filterQuery = " WHERE " + filterQuery;
 
 	return true;
+}
+
+
+QString CSqlDatabaseDocumentDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const
+{
+	return QString();
 }
 
 

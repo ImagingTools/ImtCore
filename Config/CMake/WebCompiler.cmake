@@ -480,6 +480,15 @@ macro(getImtAuthQmlWebDirs webdirs buildwebdir)
 
 	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthPersonalAccessTokensSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthPersonalAccessTokensSdl)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthTenantsSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthTenantsSdl)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthTenantCollectionDocumentManagerSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthTenantCollectionDocumentManagerSdl)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthTenantMembershipsSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthTenantMembershipsSdl)
 endmacro(getImtAuthQmlWebDirs)
 
 macro(getImtGeoQmlWebDirs webdirs buildwebdir)

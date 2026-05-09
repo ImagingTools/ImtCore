@@ -49,6 +49,11 @@ public:
 	virtual IdentifableObjectInfo GetOperationOwnerId() const = 0;
 
 	/**
+		Get tenant-ID of the operation.
+	*/
+	virtual QByteArray GetTenantId() const = 0;
+
+	/**
 		Description related to the operation.
 	*/
 	virtual QString GetOperationDescription() const = 0;

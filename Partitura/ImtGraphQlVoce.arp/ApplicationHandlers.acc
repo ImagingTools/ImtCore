@@ -34,9 +34,6 @@
                     <AttributeInfo Id="FeatureContainer" Type="Reference" ExportId="FeatureContainer">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="GroupCollection" Type="Reference" ExportId="GroupCollection">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="LanguageConstraints" Type="Reference" ExportId="LanguageConstraints">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -44,9 +41,6 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Pages" Type="Reference[]" ExportId="Pages">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RoleCollection" Type="Reference" ExportId="RoleCollection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SearchControllers" Type="Reference[]" ExportId="SearchControllers">
@@ -68,9 +62,6 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserCollection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">

@@ -119,11 +119,11 @@
         <Element Id="CollectionDocumentManager" PackageId="ImtCollectionVoce" ComponentId="CollectionDocumentManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="Collection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TicketSqlRepository"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Tickets"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DeviceRepository" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="TicketSqlRepository"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DocumentManagerEventHandlers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
@@ -391,6 +391,27 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
+        <Element Id="TicketAssigneeNotifier" PackageId="ImtDeskGqlPck" ComponentId="TicketAssigneeNotifier">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CommandId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="OnTicketAssigneeChanged"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TicketCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TicketSqlRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="TicketCollectionController" PackageId="ImtDeskGqlPck" ComponentId="TicketCollectionController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -538,33 +559,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="MessageCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ChatMessageSqlRepository"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TicketCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="TicketSqlRepository"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserCollection">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="UserGroupInfoProvider" Type="Reference" ExportId="UserGroupInfoProvider">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="TicketAssigneeNotifier" PackageId="ImtDeskGqlPck" ComponentId="TicketAssigneeNotifier">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="CommandId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="OnTicketAssigneeChanged"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
                         <Data IsEnabled="false"/>

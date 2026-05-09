@@ -250,6 +250,13 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 		simpleContext->SetUserId(userId);
 		simpleContext->SetToken(accessToken);
 		simpleContext->SetProductId(productId);
+
+		// Extract tenant ID from JWT token when available
+		if (m_jwtSessionControllerCompPtr.IsValid() && !accessToken.isEmpty() && !accessToken.startsWith("pat_")){
+			QByteArray tenantId = m_jwtSessionControllerCompPtr->GetTenantFromJwt(accessToken);
+			simpleContext->SetTenantId(tenantId);
+		}
+
 		gqlRequest.SetGqlContext(simpleContext);
 	}
 

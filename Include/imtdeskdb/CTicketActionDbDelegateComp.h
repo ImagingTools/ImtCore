@@ -55,9 +55,6 @@ public:
 				const QString& description,
 				const imtbase::IOperationContext* operationContextPtr) const override;
 
-	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated() override;
-
 protected:
 	// reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
 	virtual QString CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const override;

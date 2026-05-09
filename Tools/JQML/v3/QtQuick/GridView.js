@@ -47,6 +47,7 @@ class GridView extends Flickable {
     }
 
     __items = []
+    __changeSet = []
 
     __complete(){
         this.__initView(true)
@@ -123,6 +124,7 @@ class GridView extends Flickable {
 
     __clear(){
         this.blockSignals(true)
+        this.__changeSet = []
 
         let removed = this.__items
         this.__items = []
@@ -199,6 +201,10 @@ class GridView extends Flickable {
         }
     }
 
+    __updateChangedSet(changeSet) {
+        this.__changeSet.push(changeSet)
+    }
+
     __updateView(changeSet){
         if(this.delegate && this.model && this.__completed){
             let length = 0 
@@ -224,6 +230,21 @@ class GridView extends Flickable {
             }
 
             this.__self.count = length
+
+            let changeSet = this.__changeSet
+            this.__changeSet = []
+
+            if(changeSet.length > 0){
+                let i = 0
+                while(i < changeSet.length - 1){
+                    if(changeSet[i][0] === changeSet[i+1][0] && changeSet[i][1] === changeSet[i+1][1] && 
+                        (changeSet[i][2] === 'append' || changeSet[i][2] === 'insert') && changeSet[i+1][2] === 'remove'){
+                            changeSet.splice(i, 2)
+                    } else {
+                        i++
+                    }
+                }
+            }
 
             for(let change of changeSet){
                 let leftTop = change[0]

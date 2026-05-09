@@ -123,5 +123,3 @@ I_EXPORT_COMPONENT(
 
 
 } // namespace ImtDatabasePck
-
-

@@ -608,6 +608,10 @@ Item {
 			ticketMessageSubscription.registerSubscription();
 			ticketAssigneeSubscription.registerSubscription();
 		}
+
+		function onTenantSelected(tenantId){
+			application.updateAllModels();
+		}
 		
 		function onLoggedOut(){
 			// Unregister subscriptions for the previous user before

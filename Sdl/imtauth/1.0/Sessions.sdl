@@ -30,6 +30,7 @@ type ValidateJwtPayload {
 
 type UserSession {
 	userId: ID!
+	tenantId: ID
 	accessToken: ID!
 	refreshToken: ID!
 }
@@ -45,11 +46,23 @@ type RefreshTokenPayload {
 
 input CreateNewSessionInput {
 	userId: ID!
+	tenantId: ID
 }
 
 type CreateNewSessionPayload {
 	ok: Boolean!
 	userSession: UserSession
+	errorMessage: String
+}
+
+input SelectTenantInput {
+	tenantId: ID
+}
+
+type SelectTenantPayload {
+	ok: Boolean!
+	userSession: UserSession
+	errorMessage: String
 }
 
 input GetSessionInput {
@@ -76,16 +89,26 @@ type GetUserFromJwtPayload {
 	userId: ID!
 }
 
+input GetTenantFromJwtInput {
+	jwt: ID!
+}
+
+type GetTenantFromJwtPayload {
+	tenantId: ID!
+}
+
 type Query {
 	ValidateSession (input: ValidateSessionInput): ValidateSessionPayload!
 	ValidateJwt (input: ValidateJwtInput): ValidateJwtPayload!
 	GetSession (input: GetSessionInput): GetSessionPayload!
 	GetUserFromJwt (input: GetUserFromJwtInput): GetUserFromJwtPayload!
+	GetTenantFromJwt (input: GetTenantFromJwtInput): GetTenantFromJwtPayload!
 }
 
 type Mutation {
 	RefreshToken (input: RefreshTokenInput): RefreshTokenPayload!
 	CreateNewSession (input: CreateNewSessionInput): CreateNewSessionPayload!
+	SelectTenant (input: SelectTenantInput): SelectTenantPayload!
 	RemoveSession (input: RemoveSessionInput): RemoveSessionPayload!
 }
 

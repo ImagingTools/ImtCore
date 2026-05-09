@@ -265,9 +265,6 @@ RemoteCollectionView {
 								onFinished: {
 									if (m_status === "Success"){
 										root.documentUpdated(root.documentId)
-										// Re-request representation to get server-assigned IDs
-										// (e.g. comment m_id after addComment) back to the view.
-										root.updateRepresentationFromDocument()
 									}
 								}
 							}

@@ -28,6 +28,7 @@
 #include <imtcol/CDocumentIdFilter.h>
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtauth/IUserActionManager.h>
+#include <imtauth/CTenantFilterParam.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
 
 
@@ -71,6 +72,7 @@ public:
 		I_ASSIGN(m_userActionManagerCompPtr, "UserActionManager", "User action manager", false, "UserActionManager");
 		I_ASSIGN(m_headersProviderCompPtr, "HeadersProvider", "Collection headers provider", false, "HeadersProvider");
 		I_ASSIGN(m_operationContextControllerCompPtr, "OperationContextController", "Operation context controller", false, "OperationContextController");
+		I_ASSIGN(m_tenantFilterEnabledAttrPtr, "TenantFilterEnabled", "Enable tenant filter param injection", false, false);
 		I_ASSIGN_MULTI_0(m_objectTypeIdAttrPtr, "ObjectTypeIds", "Object type IDs", false);
 		I_ASSIGN_MULTI_0(m_objectIconPathsAttrPtr, "ObjectIconPaths", "List of item paths related to object type-IDs", false);
 		I_ASSIGN_MULTI_0(m_objectFactCompPtr, "CollectionObjectFactory", "Collection object factories", false);
@@ -292,6 +294,13 @@ protected:
 	
 	virtual void SetAdditionalFilters(const imtgql::CGqlRequest& gqlRequest, imtbase::CComplexCollectionFilter& complexFilter) const;
 
+	/**
+		Create an optional tenant filter param to be injected into filter params.
+		Returns nullptr when tenant filtering is disabled.
+		The returned pointer is owned by the caller (ParamsSet takes ownership).
+	*/
+	virtual imtauth::CTenantFilterParam* CreateTenantFilterParam(const imtgql::CGqlRequest& gqlRequest) const;
+
 	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId) const;
 	virtual QString GetObjectNameFromRequest(const imtgql::CGqlRequest& gqlRequest) const;
 	virtual bool CreateCollectionFilterFromViewParamsSdl(
@@ -364,6 +373,7 @@ protected:
 	I_REF(imtcol::ICollectionHeadersProvider, m_headersProviderCompPtr);
 	I_REF(imtbase::IOperationContextController, m_operationContextControllerCompPtr);
 	I_REF(imtauth::IUserActionManager, m_userActionManagerCompPtr);
+	I_ATTR(bool, m_tenantFilterEnabledAttrPtr);
 
 	I_MULTIATTR(QByteArray, m_objectTypeIdAttrPtr);
 	I_MULTIATTR(QByteArray, m_objectIconPathsAttrPtr);
@@ -377,4 +387,3 @@ protected:
 
 
 } // namespace imtservergql
-

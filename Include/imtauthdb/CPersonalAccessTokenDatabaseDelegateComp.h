@@ -54,9 +54,6 @@ public:
 				const QString& description,
 				const imtbase::IOperationContext* operationContextPtr) const override;
 
-	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated() override;
-
 protected:
 	// reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
 	virtual idoc::MetaInfoPtr CreateObjectMetaInfo(const QByteArray& typeId) const override;

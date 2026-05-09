@@ -34,9 +34,14 @@ public:
 		I_ASSIGN(m_objectIdColumnAttrPtr, "ObjectIdColumn", "Name of the column containing ID of the object", true, "Id");
 		I_ASSIGN(m_objectTypeIdColumnAttrPtr, "ObjectTypeIdColumn", "Name of the column containing type-ID of the object", true, "TypeId");
 		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", false, "VersionInfo");
+		I_ASSIGN(m_autoCreateTableAttrPtr, "AutoCreateTable", "Auto create collection table if it does not exist", false, false);
+		I_ASSIGN(m_createTableScriptPathAttrPtr, "CreateTableScriptPath", "QRC path or file name of SQL script used to create collection table", false, "");
 	I_END_COMPONENT
 
 	virtual QString SqlEncode(const QString& sqlQuery) const;
+
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 	virtual const iprm::IOptionsList* GetObjectTypeInfos() const override;
@@ -93,6 +98,7 @@ protected:
 	virtual bool CreateSortQuery(const imtbase::ICollectionFilter& collectionFilter, QString& sortQuery) const;
 	virtual bool CreateSortQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& sortQuery) const;
 	virtual QString EncodeTextArgument(const QString& argument) const;
+	virtual bool CreateTableIfNeeded();
 	virtual bool TableExists(const QString& tableName) const;
 
 protected:
@@ -103,6 +109,8 @@ protected:
 	I_ATTR(QByteArray, m_tableNameAttrPtr);
 	I_ATTR(QByteArray, m_objectIdColumnAttrPtr);
 	I_ATTR(QByteArray, m_objectTypeIdColumnAttrPtr);
+	I_ATTR(bool, m_autoCreateTableAttrPtr);
+	I_ATTR(QByteArray, m_createTableScriptPathAttrPtr);
 };
 
 

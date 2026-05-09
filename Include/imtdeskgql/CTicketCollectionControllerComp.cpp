@@ -1,25 +1,18 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtdeskgql/CTicketCollectionControllerComp.h>
 
+
 // Qt includes
 #include <QtCore/QUuid>
 
 // ACF includes
 #include <istd/TDelPtr.h>
-#include <iprm/CParamsSet.h>
 
 // ImtCore includes
 #include <imtauth/CUserGroupFilter.h>
 #include <imtdesk/ISupportTicket.h>
-#include <imtdesk/ITicketAction.h>
-#include <imtchat/IChatService.h>
-#include <imtchat/IConversation.h>
 #include <imtbase/IObjectCollectionIterator.h>
-#include <imtdeskgql/imtdeskgql.h>
 #include <imtauth/imtauth.h>
-#include <imtgql/CGqlRequestContextManager.h>
-#include <imtgql/IGqlContext.h>
-#include <imtauth/IUserGroupInfoProvider.h>
 
 
 namespace imtdeskgql
@@ -86,7 +79,7 @@ bool CTicketCollectionControllerComp::CreateRepresentationFromObject(
 
 	QByteArrayList assigneeIds = ticketPtr->GetAssigneeIds();
 	QStringList assigneeNames;
-	for (const QByteArray& userId : assigneeIds){
+	for (const QByteArray& userId : std::as_const(assigneeIds)){
 		assigneeNames << imtauth::GetUserName(*m_userCollectionCompPtr, userId);
 	}
 	representationObject.assignee = assigneeNames.join(';');
