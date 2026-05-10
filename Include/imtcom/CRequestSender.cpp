@@ -50,7 +50,7 @@ QNetworkReply* CRequestSender::DoSyncPut(const QNetworkRequest& request, const Q
 	if (replyPtr != nullptr){
 		QObject::connect(replyPtr, &QNetworkReply::finished, &networkOperation.connectionLoop, &QEventLoop::quit);
 
-		networkOperation.connectionLoop.exec(QEventLoop::ExcludeSocketNotifiers | QEventLoop::ExcludeUserInputEvents);
+		networkOperation.connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
 		networkOperation.timer.stop();
 
 		if (replyPtr->isRunning()){
@@ -74,7 +74,7 @@ QNetworkReply* CRequestSender::DoSyncPost(const QNetworkRequest& request, const 
 
 		replyPtr->ignoreSslErrors();
 
-		networkOperation.connectionLoop.exec(QEventLoop::ExcludeSocketNotifiers | QEventLoop::ExcludeUserInputEvents);
+		networkOperation.connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
 		networkOperation.timer.stop();
 
 		if (replyPtr->isRunning()){
@@ -96,7 +96,7 @@ QNetworkReply* CRequestSender::DoSyncCustomRequest(const QNetworkRequest& reques
 	if (replyPtr != nullptr){
 		QObject::connect(replyPtr, &QNetworkReply::finished, &networkOperation.connectionLoop, &QEventLoop::quit);
 
-		networkOperation.connectionLoop.exec(QEventLoop::ExcludeSocketNotifiers | QEventLoop::ExcludeUserInputEvents);
+		networkOperation.connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
 		networkOperation.timer.stop();
 
 		if (replyPtr->isRunning()){
@@ -150,5 +150,4 @@ CRequestSender::NetworkOperation::~NetworkOperation()
 
 
 } // namespace imtcom
-
 
