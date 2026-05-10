@@ -22,6 +22,7 @@
 #include <imtclientgql/CRemoteDocumentRevisionControllerComp.h>
 #include <imtclientgql/CRemoteObjectCollectionControllerComp.h>
 #include <imtclientgql/CObjectCollectionSubscriberComp.h>
+#include <imtclientgql/CRemoteCollectionDocumentManagerControllerComp.h>
 #include <imtclientgql/CRemoteCommandsControllerComp.h>
 
 
@@ -45,10 +46,10 @@ typedef imtclientgql::CGqlHierarchicalStructureDelegateComp GqlHierarchicalStruc
 typedef icomp::TModelCompWrap<imtclientgql::CConnectionStatusSubscriberComp> ConnectionStatusSubscriber;
 typedef imtclientgql::CRemoteDocumentRevisionControllerComp RemoteDocumentRevisionController;
 typedef imtclientgql::CRemoteObjectCollectionControllerComp RemoteObjectCollectionController;
+typedef imtclientgql::CRemoteCollectionDocumentManagerControllerComp RemoteCollectionDocumentManagerController;
 typedef imtclientgql::CObjectCollectionSubscriberComp ObjectCollectionSubscriber;
 typedef imtclientgql::CRemoteCommandsControllerComp RemoteCommandsController;
 
 
 } // namespace ImtClientGqlPck
-
 

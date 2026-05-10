@@ -28,6 +28,7 @@
 #include <imtdb/CPostgresXPathExtractorComp.h>
 #include <imtdb/CSqliteXPathExtractorComp.h>
 #include <imtdb/CSqlDatabaseTransactionManagerComp.h>
+#include <imtauth/CTenantFilterParam.h>
 
 
 /**
@@ -61,5 +62,3 @@ typedef imtdb::CSqlDatabaseTransactionManagerComp SqlDatabaseTransactionManager;
 
 
 } // namespace ImtDatabasePck
-
-

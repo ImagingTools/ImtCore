@@ -56,8 +56,6 @@ public:
 		I_REGISTER_INTERFACE(imtbase::IRevisionController);
 		I_REGISTER_INTERFACE(imtdb::IDependentMetaInfoController);
 		I_ASSIGN(m_useDataMetaInfoAttrPtr, "UseDataMetaInfo", "If true - documents will be searched and sorted by the 'DataMetaInfo' column,\n else - otherwise according to the contents of the 'Document' column", true, false);
-		I_ASSIGN(m_autoCreateTableAttrPtr, "AutoCreateTable", "Auto create collection table if it does not exist", false, false);
-		I_ASSIGN(m_createTableScriptPathAttrPtr, "CreateTableScriptPath", "QRC path or file name of SQL script used to create collection table", false, ":/SQL/Postgres/CreateCollectionTable.sql");
 		I_ASSIGN_MULTI_0(m_documentFactoriesCompPtr, "DocumentFactories", "Factory list used for creation of the new document instance according to the given type-ID", true);
 		I_ASSIGN(m_metaInfoCreatorCompPtr, "MetaInfoCreator", "Creator of metainformation of object data", false, "MetaInfoCreator");
 		I_ASSIGN(m_jsonBasedMetaInfoDelegateCompPtr, "JsonBasedMetaInfoDelegate", "Delegate for converting document metainfo to JSON representation", false, "JsonBasedMetaInfoDelegate");
@@ -143,11 +141,7 @@ public:
 	virtual bool UpdateDependentMetaInfo(const DependentMetaInfo& metaInfo) const override;
 	virtual bool ClearDependentMetaInfo(const MetaFieldCleanupPlan& metaInfo) const override;
 
-	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated() override;
-
 protected:
-	virtual bool CreateTableIfNeeded();
 	virtual QByteArray PrepareInsertNewObjectQuery(
 				const QByteArray& typeId,
 				const QByteArray& objectId,
@@ -162,6 +156,10 @@ protected:
 	virtual QByteArray CreateRevisionInfoQuery(const imtbase::IOperationContext* operationContextPtr, const QVariant& revisionArgument, quint32 checksum) const;
 	virtual QByteArray CreateJsonBuildObjectQuery(const QVariantMap& paramMap) const;
 	virtual QString CreateJsonExtractSql(const QString& jsonName, const QString& key, QMetaType::Type metaType = QMetaType::QString, const QString& tableAlias = QString()) const;
+	virtual QString CreateTenantBindingTableName() const;
+	virtual QByteArray CreateTenantBindingTableInitializationQuery() const;
+	virtual QString CreateTenantBindingFilterQuery(const QByteArray& tenantId) const;
+	virtual QByteArray CreateTenantBindingInsertQuery(const QByteArray& tenantId, const QByteArray& entityId, const imtbase::IOperationContext* operationContextPtr) const;
 
 	// reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
 	virtual QString GetBaseSelectionQuery() const override;
@@ -173,6 +171,7 @@ protected:
 	virtual bool CreateFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const override;
 	virtual bool CreateTextFilterQuery(const imtbase::ICollectionFilter& collectionFilter, QString& textFilterQuery) const override;
 	virtual bool CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery, const QString& timeFieldId = QStringLiteral("root1.\"TimeStamp\"")) const override;
+	virtual QString CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const override;
 	
 protected:
 	virtual bool CreateObjectFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& filterQuery) const override;
@@ -187,8 +186,6 @@ protected:
 
 protected:
 	I_ATTR(bool, m_useDataMetaInfoAttrPtr);
-	I_ATTR(bool, m_autoCreateTableAttrPtr);
-	I_ATTR(QByteArray, m_createTableScriptPathAttrPtr);
 	I_MULTIFACT(istd::IChangeable, m_documentFactoriesCompPtr);
 	I_REF(imtbase::IMetaInfoCreator, m_metaInfoCreatorCompPtr);
 	I_REF(imtdb::IJsonBasedMetaInfoDelegate, m_jsonBasedMetaInfoDelegateCompPtr);

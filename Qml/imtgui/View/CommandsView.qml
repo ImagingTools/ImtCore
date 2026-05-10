@@ -187,7 +187,7 @@ Item {
 					text: element ? element.m_elementName : "";
 					widthFromDecorator: true;
 					heightFromDecorator: true;
-					checkable: element ? element.m_toggleable : false;
+					checkable: false
 					checked: element ? element.m_toggled : false
 
 					iconSource: !element ? "" : element.m_elementItemPath === "" ? "" : element.m_enabled ? "../../../../" + Style.getIconPath(element.m_elementItemPath, Icon.State.On, Icon.Mode.Normal) :

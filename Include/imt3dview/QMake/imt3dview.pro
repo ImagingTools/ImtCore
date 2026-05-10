@@ -1,7 +1,5 @@
 TARGET = imt3dview
 
-QT += opengl
-
 include($(ACFCONFIGDIR)/QMake/StaticConfig.pri)
 include($(ACFCONFIGDIR)/QMake/QtGuiBaseConfig.pri)
 include($$PWD/../../../Config/QMake/ImtCore.pri)

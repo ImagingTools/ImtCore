@@ -19,7 +19,7 @@ namespace imt3dview
 // public methods
 
 CScene3d::CScene3d()
-	:m_contextPtr(nullptr),
+	:m_backendPtr(nullptr),
 	m_nextModelId(0),
 	m_cameraPtr(nullptr)
 {
@@ -116,7 +116,7 @@ QByteArray CScene3d::AddShapeToScene(imt3dview::IScene3dItem* objectPtr, int ite
 	QByteArray newId = QUuid::createUuid().toByteArray();
 	m_shapes.insert(newId, newItemPtr);
 
-	objectPtr->SetContext(m_contextPtr);
+	objectPtr->OnAttachBackend(m_backendPtr);
 
 	return newId;
 }
@@ -128,7 +128,7 @@ void CScene3d::RemoveShapeFromScene(imt3dview::IScene3dItem* objectPtr)
 		const ShapeInfoPtr& shapeInfoPtr = i.value();
 
 		if (shapeInfoPtr && shapeInfoPtr->shapePtr == objectPtr){
-			shapeInfoPtr->shapePtr->SetContext(nullptr);
+			shapeInfoPtr->shapePtr->OnAttachBackend(nullptr);
 			m_shapes.erase(i);
 
 			return;
@@ -139,21 +139,21 @@ void CScene3d::RemoveShapeFromScene(imt3dview::IScene3dItem* objectPtr)
 
 // reimplemented (imt3dview::IDrawable)
 
-void CScene3d::SetContext(QOpenGLContext* contextPtr)
+void CScene3d::OnAttachBackend(imt3dview::IRenderBackend* backendPtr)
 {
 	for (Shapes::Iterator i = m_shapes.begin(); i != m_shapes.end(); ++i){
 		const ShapeInfoPtr& shapeInfoPtr = i.value();
 
 		if (shapeInfoPtr && shapeInfoPtr->shapePtr){
-			shapeInfoPtr->shapePtr->SetContext(contextPtr);
+			shapeInfoPtr->shapePtr->OnAttachBackend(backendPtr);
 		}
 	}
 
-	m_contextPtr = contextPtr;
+	m_backendPtr = backendPtr;
 }
 
 
-void CScene3d::DrawGl(QOpenGLShaderProgram& program)
+void CScene3d::Render(imt3dview::IRenderBackend& backend)
 {
 	UpdateBoundingCuboid();
 
@@ -161,19 +161,19 @@ void CScene3d::DrawGl(QOpenGLShaderProgram& program)
 		const ShapeInfoPtr& shapeInfoPtr = i.value();
 
 		if (shapeInfoPtr && shapeInfoPtr->shapePtr){
-			shapeInfoPtr->shapePtr->DrawGl(program);
+			shapeInfoPtr->shapePtr->Render(backend);
 		}
 	}
 }
 
 
-void CScene3d::Draw(QPainter& painter)
+void CScene3d::DrawOverlay(QPainter& painter)
 {
 	for (Shapes::Iterator i = m_shapes.begin(); i != m_shapes.end(); ++i){
 		const ShapeInfoPtr& shapeInfoPtr = i.value();
 
 		if (shapeInfoPtr && shapeInfoPtr->shapePtr){
-			shapeInfoPtr->shapePtr->Draw(painter);
+			shapeInfoPtr->shapePtr->DrawOverlay(painter);
 		}
 	}
 }
@@ -211,8 +211,14 @@ void CScene3d::UpdateItemsScale()
 		const ShapeInfoPtr& shapeInfoPtr = i.value();
 
 		if (shapeInfoPtr && shapeInfoPtr->shapePtr){
-			imt3d::CCuboid cuboid = GetItemBoundingCuboid(shapeInfoPtr->shapePtr);
-			if (cuboid.IsValid()){
+			// Check whether this shape is a model-backed item (has an observed 3D object).
+			// Only model-backed items participate in auto-scaling so that the data
+			// fits the normalised scene space.  Auxiliary shapes such as CAxisShape
+			// and CGridShape have no observed model and keep their configured size.
+			const imod::CSingleModelObserverBase* modelObserverPtr =
+				dynamic_cast<const imod::CSingleModelObserverBase*>(shapeInfoPtr->shapePtr);
+
+			if (modelObserverPtr != nullptr && modelObserverPtr->GetObservedModel() != nullptr){
 				UpdateItemScale(*shapeInfoPtr->shapePtr);
 			}
 		}

@@ -579,6 +579,31 @@ var Qt = {
             y: y,
         }
     },
+    vector3d(x, y, z){
+        return { x: x, y: y, z: z }
+    },
+    vector4d(x, y, z, w){
+        return { x: x, y: y, z: z, w: w }
+    },
+    quaternion(scalar, x, y, z){
+        return { scalar: scalar, x: x, y: y, z: z }
+    },
+    matrix4x4(){
+        // accept either 16 separate arguments or a single 16-element array
+        if(arguments.length === 16){
+            return Array.prototype.slice.call(arguments)
+        }
+        if(arguments.length === 1 && Array.isArray(arguments[0]) && arguments[0].length === 16){
+            return arguments[0].slice()
+        }
+        // identity
+        return [
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1,
+        ]
+    },
     rect(x, y, width, height){
         return {
             x: x,

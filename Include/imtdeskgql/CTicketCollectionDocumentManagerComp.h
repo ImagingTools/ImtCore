@@ -2,6 +2,9 @@
 #pragma once
 
 
+// ACF includes
+#include <ibase/IApplicationInfo.h>
+
 // ImtCore includes
 #include <imtdesk/ISupportTicket.h>
 #include <imtdesk/IEntityTypeProvider.h>
@@ -12,11 +15,7 @@
 #include <imtdoc/IDocumentManager.h>
 #include <imtdoc/IDocumentManagerEventHandler.h>
 #include <imtbase/IObjectCollection.h>
-#include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentManager.h>
 #include <imtauth/IUserGroupInfoProvider.h>
-
-// ACF includes
-#include <ibase/IApplicationInfo.h>
 
 // Generated includes
 #include <GeneratedFiles/imtdesksdl/SDL/1.0/CPP/TicketCollectionDocumentManager.h>
