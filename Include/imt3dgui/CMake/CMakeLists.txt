@@ -3,11 +3,13 @@ project(imt3dgui LANGUAGES CXX)
 include(${ACFDIR}/Config/CMake/StaticConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
-# Qt modules matching QMake's QT += gui-private opengl openglwidgets shadertools:
-# - GuiPrivate  : exposes <rhi/qrhi.h> (private QRhi API used by CRhiRenderBackend)
+# Qt modules matching QMake's QT += gui-private opengl openglwidgets:
+# - GuiPrivate  : exposes <rhi/qrhi.h> (private QRhi API used by CRhiRenderBackend).
+#                 Not a find_package component — the target is available automatically
+#                 once Qt6::Gui has been found (done by the ACF includes above).
 # - OpenGL / OpenGLWidgets : QOpenGLBuffer, QOpenGLShaderProgram, QOpenGLWidget
 #                            (headers moved from QtGui to separate modules in Qt 6)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS GuiPrivate OpenGL OpenGLWidgets REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS OpenGL OpenGLWidgets REQUIRED)
 target_link_libraries(${PROJECT_NAME}
     Qt${QT_VERSION_MAJOR}::GuiPrivate
     Qt${QT_VERSION_MAJOR}::OpenGL
