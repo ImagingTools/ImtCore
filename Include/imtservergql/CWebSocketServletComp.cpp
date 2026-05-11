@@ -141,12 +141,12 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 		return imtrest::ConstResponsePtr();
 	}
 
-	QPointer<const CWebSocketServletComp> servletGuard(this);
-	QPointer<const imtrest::CWebSocketRequest> requestGuard(webSocketRequest);
+	QPointer<CWebSocketServletComp> servletGuard(const_cast<CWebSocketServletComp*>(this));
+	QPointer<imtrest::CWebSocketRequest> requestGuard(const_cast<imtrest::CWebSocketRequest*>(webSocketRequest));
 	constexpr int maxPendingSubscriptionFutures = 64;
 	QFuture<void> future = QtConcurrent::run([servletGuard, requestGuard]() {
-		const auto* servletPtr = servletGuard.data();
-		const auto* requestPtr = requestGuard.data();
+		auto* servletPtr = servletGuard.data();
+		auto* requestPtr = requestGuard.data();
 		if (servletPtr == nullptr || requestPtr == nullptr){
 			return;
 		}
