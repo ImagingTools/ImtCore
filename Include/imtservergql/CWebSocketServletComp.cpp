@@ -308,7 +308,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 		}
 	}
 	else{
-		QByteArray errorMessage = QString("The requested command could not be executed. No servlet was found for the given command: '%1")
+		QByteArray errorMessage = QString("The requested command could not be executed. No servlet was found for the given command: '%1'")
 		.arg(QString(commandId)).toUtf8();
 		return sendResponse(CreateErrorResponse(errorMessage, request));
 	}
