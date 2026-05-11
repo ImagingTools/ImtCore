@@ -145,7 +145,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 
 		if (!m_requestManagerCompPtr->SendResponse(request.GetRequestId(), responsePtr)){
 			SendErrorMessage(0, QStringLiteral("Unable to send RegisterSubscription response via RequestManager"), QStringLiteral("CWebSocketServletComp"));
-			return responsePtr;
+			return imtrest::ConstResponsePtr();
 		}
 
 		return imtrest::ConstResponsePtr();
@@ -389,4 +389,3 @@ imtrest::ConstResponsePtr CWebSocketServletComp::CreateErrorResponse(const QByte
 
 
 } // namespace imtservergql
-
