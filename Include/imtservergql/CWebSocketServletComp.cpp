@@ -134,9 +134,26 @@ imtrest::ConstResponsePtr CWebSocketServletComp::ProcessGqlRequest(const imtrest
 
 imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtrest::IRequest& request) const
 {
+	const auto sendResponse = [this, &request](imtrest::ConstResponsePtr responsePtr) -> imtrest::ConstResponsePtr {
+		if (!responsePtr.IsValid()){
+			return responsePtr;
+		}
+
+		if (!m_requestManagerCompPtr.IsValid()){
+			return responsePtr;
+		}
+
+		if (!m_requestManagerCompPtr->SendResponse(request.GetRequestId(), responsePtr)){
+			SendErrorMessage(0, QStringLiteral("Unable to send RegisterSubscription response via RequestManager"), QStringLiteral("CWebSocketServletComp"));
+			return responsePtr;
+		}
+
+		return imtrest::ConstResponsePtr();
+	};
+
 	const auto* webSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&request);
 	if (webSocketRequest == nullptr){
-		return CreateErrorResponse(QByteArrayLiteral("Invalid WebSocket request"), request);
+		return sendResponse(CreateErrorResponse(QByteArrayLiteral("Invalid WebSocket request"), request));
 	}
 
 	// Capture all data from the request immediately - the CWebSocketRequest is parented
@@ -147,7 +164,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	const QJsonDocument document = QJsonDocument::fromJson(body);
 	if (document.isNull() || !document.isObject()) {
 		QString errorMessage = QString("Error when parsing JSON request for command Id: '%1'").arg(request.GetCommandId());
-		return CreateErrorResponse(errorMessage.toUtf8(), request);
+		return sendResponse(CreateErrorResponse(errorMessage.toUtf8(), request));
 	}
 
 	const QJsonObject rootObject = document.object();
@@ -173,7 +190,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	if (!gqlRequest.ParseQuery(body, errorPosition)){
 		QString errorMessage = QString("Error when parsing request: '%1'; Error position: '%2'")
 								.arg(qPrintable(body)).arg(errorPosition);
-		return CreateErrorResponse(errorMessage.toUtf8(), request);
+		return sendResponse(CreateErrorResponse(errorMessage.toUtf8(), request));
 	}
 
 	// Track request lifetime with QPointer — the request is a QObject
@@ -263,7 +280,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	QByteArray commandId = gqlRequest.GetCommandId();
 
 	if (commandId.isEmpty()){
-		return CreateErrorResponse(QByteArrayLiteral("Unable to register subscription with empty command-ID"), request);
+		return sendResponse(CreateErrorResponse(QByteArrayLiteral("Unable to register subscription with empty command-ID"), request));
 	}
 
 	imtgql::IGqlSubscriberController* subscriberControllerPtr = nullptr;
@@ -293,7 +310,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	else{
 		QByteArray errorMessage = QString("The requested command could not be executed. No servlet was found for the given command: '%1")
 		.arg(QString(commandId)).toUtf8();
-		return CreateErrorResponse(errorMessage, request);
+		return sendResponse(CreateErrorResponse(errorMessage, request));
 	}
 
 	return imtrest::ConstResponsePtr();
@@ -372,5 +389,4 @@ imtrest::ConstResponsePtr CWebSocketServletComp::CreateErrorResponse(const QByte
 
 
 } // namespace imtservergql
-
 
