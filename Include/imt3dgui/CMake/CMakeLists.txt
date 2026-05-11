@@ -3,6 +3,17 @@ project(imt3dgui LANGUAGES CXX)
 include(${ACFDIR}/Config/CMake/StaticConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
+# Qt modules matching QMake's QT += gui-private opengl openglwidgets shadertools:
+# - GuiPrivate  : exposes <rhi/qrhi.h> (private QRhi API used by CRhiRenderBackend)
+# - OpenGL / OpenGLWidgets : QOpenGLBuffer, QOpenGLShaderProgram, QOpenGLWidget
+#                            (headers moved from QtGui to separate modules in Qt 6)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS GuiPrivate OpenGL OpenGLWidgets REQUIRED)
+target_link_libraries(${PROJECT_NAME}
+    Qt${QT_VERSION_MAJOR}::GuiPrivate
+    Qt${QT_VERSION_MAJOR}::OpenGL
+    Qt${QT_VERSION_MAJOR}::OpenGLWidgets
+)
+
 set(DESIGN_TOKEN_CREATOR_COMMAND_PARAM_IMAGES_INPUT_DIR "${PROJECT_SOURCE_DIR}/../Resources/Icons/Template")
 set(DESIGN_TOKEN_CREATOR_COMMAND_PARAM_OUTPUT_DIR "${AUX_INCLUDE_DIR}/${PROJECT_NAME}")
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../../Config/CMake/DesignTokenCreator.cmake)
