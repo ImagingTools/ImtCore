@@ -45,11 +45,16 @@ QByteArray CCollectionDocumentManagerTest::CreateDocumentAndWaitForLoad(
 {
 	QByteArray documentId = manager.CreateNewDocument(userId, typeId);
 
-	// Process events to let async thread complete and main thread callbacks fire
-	for (int i = 0; i < 50; ++i) {
-		QCoreApplication::processEvents();
-		QThread::msleep(10);
-	}
+	// Wait for async object creation to complete
+	QTRY_VERIFY_WITH_TIMEOUT([&]() {
+		auto list = manager.GetOpenedDocumentList(userId);
+		for (const auto& info : list) {
+			if (info.documentId == documentId) {
+				return !info.isLoading;
+			}
+		}
+		return true; // document was closed (e.g. due to failure)
+	}(), 5000);
 
 	return documentId;
 }
@@ -63,11 +68,16 @@ QByteArray CCollectionDocumentManagerTest::OpenDocumentAndWaitForLoad(
 	QUrl url = QUrl("collection:///" + objectId);
 	QByteArray documentId = manager.OpenDocument(userId, url);
 
-	// Process events to let async thread complete and main thread callbacks fire
-	for (int i = 0; i < 50; ++i) {
-		QCoreApplication::processEvents();
-		QThread::msleep(10);
-	}
+	// Wait for async object loading to complete
+	QTRY_VERIFY_WITH_TIMEOUT([&]() {
+		auto list = manager.GetOpenedDocumentList(userId);
+		for (const auto& info : list) {
+			if (info.documentId == documentId) {
+				return !info.isLoading;
+			}
+		}
+		return true; // document was closed (e.g. due to failure)
+	}(), 5000);
 
 	return documentId;
 }
@@ -185,10 +195,7 @@ void CCollectionDocumentManagerTest::CreateNewDocumentObjectCreationFailAsyncTes
 	QVERIFY2(!docId.isEmpty(), "CreateNewDocument returns ID immediately even if object creation will fail async");
 
 	// Wait for async completion — the document should be closed due to failure
-	for (int i = 0; i < 50; ++i) {
-		QCoreApplication::processEvents();
-		QThread::msleep(10);
-	}
+	QTRY_VERIFY_WITH_TIMEOUT(m_managerPtr->GetOpenedDocumentList(TEST_USER_ID).isEmpty(), 5000);
 
 	auto list = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
 	QVERIFY2(list.isEmpty(), "Document should be closed after async object creation failure");
@@ -239,6 +246,33 @@ void CCollectionDocumentManagerTest::CreateNewDocumentMultipleDocumentsTest()
 
 	auto list = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
 	QCOMPARE(list.size(), 2);
+}
+
+
+void CCollectionDocumentManagerTest::CreateNewDocumentProposedSourceDocumentIdUsedOnSaveTest()
+{
+	const QByteArray proposedId = "proposed-object-id";
+
+	QByteArray docId = m_managerPtr->CreateNewDocument(TEST_USER_ID, TEST_TYPE_ID, proposedId);
+	QVERIFY2(!docId.isEmpty(), "CreateNewDocument should return a non-empty document ID");
+
+	// Wait for async object creation to complete
+	QTRY_VERIFY_WITH_TIMEOUT([&]() {
+		auto list = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
+		for (const auto& info : list) {
+			if (info.documentId == docId) {
+				return !info.isLoading;
+			}
+		}
+		return true;
+	}(), 5000);
+
+	// Save the document – this should insert it into the collection using the proposed ID
+	auto status = m_managerPtr->SaveDocument(TEST_USER_ID, docId, TEST_DOC_NAME);
+	QCOMPARE(status, imtdoc::IDocumentManager::OS_OK);
+
+	// Verify the proposed ID was used as the collection element ID
+	QCOMPARE(m_managerPtr->GetMockCollection().GetLastInsertedId(), proposedId);
 }
 
 
@@ -1244,11 +1278,9 @@ void CCollectionDocumentManagerTest::SingleCopySecondUserGetsDataLoadedEventTest
 	QByteArray docId2 = m_managerPtr->OpenDocument(TEST_USER_ID_2, url);
 	QVERIFY2(!docId2.isEmpty(), "Second user should open document successfully");
 
-	// DocumentDataLoaded is deferred via QTimer::singleShot — process events
-	for (int i = 0; i < 20; ++i) {
-		QCoreApplication::processEvents();
-		QThread::msleep(10);
-	}
+	// DocumentDataLoaded is deferred via QTimer::singleShot — wait for event
+	QTRY_VERIFY_WITH_TIMEOUT(
+		m_managerPtr->GetMockEventHandler().CountEventsOfType("DocumentDataLoadedEvent") >= 1, 5000);
 
 	// Second user should have received DocumentDataLoaded event
 	int dataLoadedCount = m_managerPtr->GetMockEventHandler().CountEventsOfType("DocumentDataLoadedEvent");
