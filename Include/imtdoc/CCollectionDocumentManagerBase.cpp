@@ -634,6 +634,7 @@ IDocumentManager::OperationStatus CCollectionDocumentManagerBase::SaveDocument(
 	}
 
 	// Create new object
+	// m_mutex is already held by the QMutexLocker above (acquired at function entry)
 	QByteArray proposedElementId;
 	{
 		auto it = m_proposedSourceDocumentIds.find(documentId);
