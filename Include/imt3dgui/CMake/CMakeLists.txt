@@ -19,6 +19,11 @@ set(RHI_SHADER_SOURCES
     ${RHI_SHADER_DIR}/fshader_rhi.frag
 )
 
+foreach(SHADER_SRC ${RHI_SHADER_SOURCES})
+    get_filename_component(SHADER_NAME ${SHADER_SRC} NAME)
+    list(APPEND QSB_OUTPUTS "${RHI_SHADER_DIR}/${SHADER_NAME}.qsb")
+endforeach()
+
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS ShaderTools QUIET)
 
 if(TARGET Qt${QT_VERSION_MAJOR}::qsb)
@@ -35,7 +40,6 @@ if(TARGET Qt${QT_VERSION_MAJOR}::qsb)
             COMMENT "[imt3dgui] Compiling RHI shader ${SHADER_NAME} -> ${SHADER_NAME}.qsb"
             VERBATIM
         )
-        list(APPEND QSB_OUTPUTS ${QSB_OUTPUT})
     endforeach()
 endif()
 
