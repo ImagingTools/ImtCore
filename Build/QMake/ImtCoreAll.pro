@@ -544,7 +544,7 @@ ImtGeoPck.file = ../../Impl/ImtGeoPck/QMake/ImtGeoPck.pro
 ImtGeoPck.depends = imtgeo
 
 SUBDIRS += ImtEjPck
-ImtEjPck.file = ../../Impl/ImtEjPck/QMake/ImtReportPck.pro
+ImtEjPck.file = ../../Impl/ImtEjPck/QMake/ImtEjPck.pro
 ImtEjPck.depends = imtej
 
 SUBDIRS += ImtMongoPck
