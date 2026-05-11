@@ -110,6 +110,10 @@ SUBDIRS += imtdesksdl
 imtdesksdl.file = ../../Sdl/imtdesk/QMake/imtdesksdl.pro
 imtdesksdl.depends = imtbasesdl
 
+SUBDIRS += imtpaysdl
+imtpaysdl.file = ../../Sdl/imtpay/QMake/imtpaysdl.pro
+imtpaysdl.depends = imtbasesdl
+
 SUBDIRS += imt2dsdl
 imt2dsdl.file = ../../Sdl/imt2d/QMake/imt2dsdl.pro
 imt2dsdl.depends = imtcolorsdl
@@ -260,6 +264,12 @@ imtchatdb.file = ../../Include/imtchatdb/QMake/imtchatdb.pro
 
 SUBDIRS += imtdeskdb
 imtdeskdb.file = ../../Include/imtdeskdb/QMake/imtdeskdb.pro
+
+SUBDIRS += imtej
+imtej.file = ../../Include/imtej/QMake/imtej.pro
+
+SUBDIRS += imtmongo
+imtmongo.file = ../../Include/imtmongo/QMake/imtmongo.pro
 
 # GUI libraries
 SUBDIRS += imtgui
@@ -532,6 +542,18 @@ ImtDeskGqlPck.depends = imtdeskgql imtdb imtdesk
 SUBDIRS += ImtGeoPck
 ImtGeoPck.file = ../../Impl/ImtGeoPck/QMake/ImtGeoPck.pro
 ImtGeoPck.depends = imtgeo
+
+SUBDIRS += ImtEjPck
+ImtEjPck.file = ../../Impl/ImtEjPck/QMake/ImtReportPck.pro
+ImtEjPck.depends = imtej
+
+SUBDIRS += ImtMongoPck
+ImtMongoPck.file = ../../Impl/ImtMongoPck/QMake/ImtMongoPck.pro
+ImtMongoPck.depends = imtmongo
+
+SUBDIRS += ImtMdbxPck
+ImtMdbxPck.file = ../../Impl/ImtMdbxPck/QMake/ImtMdbxPck.pro
+ImtMdbxPck.depends = imtmdbx
 
 # SUBDIRS += ImtControlsGallery
 # ImtControlsGallery.file = ../../Impl/ImtControlsGallery/QMake/ImtControlsGallery.pro
