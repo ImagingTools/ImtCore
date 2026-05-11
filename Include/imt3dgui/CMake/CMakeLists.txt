@@ -7,11 +7,49 @@ set(DESIGN_TOKEN_CREATOR_COMMAND_PARAM_IMAGES_INPUT_DIR "${PROJECT_SOURCE_DIR}/.
 set(DESIGN_TOKEN_CREATOR_COMMAND_PARAM_OUTPUT_DIR "${AUX_INCLUDE_DIR}/${PROJECT_NAME}")
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../../Config/CMake/DesignTokenCreator.cmake)
 
-# RHI shaders (vshader_rhi.vert, fshader_rhi.frag) are compiled to QSB via
-# QMAKE_EXTRA_COMPILERS in the QMake build path (see QMake/imt3dgui.pro).
-# CMake shader compilation is intentionally omitted because Qt's
-# qt_add_shaders / qt_add_resources macros use keyword-style
-# target_link_libraries, which conflicts with the plain-style calls in the
-# ACF / ImtCore build system.  CRhiRenderBackend::Initialize() handles the
-# missing-shaders case gracefully (returns false; COpenGLWidget is the
-# primary rendering path and does not require RHI shaders).
+# --- RHI shader compilation (mirrors QMake qsb_compiler in imt3dgui.pro) ---
+# Pre-compiled .qsb files are committed to the repository so that builds
+# without Qt ShaderTools still work.  When ShaderTools is available the
+# shaders are recompiled from source, keeping the checked-in copies up to date.
+
+set(RHI_SHADER_DIR "${PROJECT_SOURCE_DIR}/../Resources/Shaders")
+
+set(RHI_SHADER_SOURCES
+    ${RHI_SHADER_DIR}/vshader_rhi.vert
+    ${RHI_SHADER_DIR}/fshader_rhi.frag
+)
+
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS ShaderTools QUIET)
+
+if(TARGET Qt${QT_VERSION_MAJOR}::qsb)
+    foreach(SHADER_SRC ${RHI_SHADER_SOURCES})
+        get_filename_component(SHADER_NAME ${SHADER_SRC} NAME)
+        set(QSB_OUTPUT "${RHI_SHADER_DIR}/${SHADER_NAME}.qsb")
+
+        add_custom_command(
+            OUTPUT ${QSB_OUTPUT}
+            COMMAND Qt${QT_VERSION_MAJOR}::qsb
+                --glsl "100 es,120,150" --hlsl 50 --msl 12
+                -o ${QSB_OUTPUT} ${SHADER_SRC}
+            DEPENDS ${SHADER_SRC}
+            COMMENT "[imt3dgui] Compiling RHI shader ${SHADER_NAME} -> ${SHADER_NAME}.qsb"
+            VERBATIM
+        )
+        list(APPEND QSB_OUTPUTS ${QSB_OUTPUT})
+    endforeach()
+endif()
+
+# --- Compile the static .qrc (which references the .qsb files) via rcc ---
+set(IMT3DGUI_QRC_FILE "${PROJECT_SOURCE_DIR}/../imt3dgui.qrc")
+set(IMT3DGUI_QRC_CPP  "${CMAKE_CURRENT_BINARY_DIR}/qrc_imt3dgui.cpp")
+
+add_custom_command(
+    OUTPUT ${IMT3DGUI_QRC_CPP}
+    COMMAND Qt${QT_VERSION_MAJOR}::rcc
+        -name imt3dgui ${IMT3DGUI_QRC_FILE} -o ${IMT3DGUI_QRC_CPP}
+    DEPENDS ${IMT3DGUI_QRC_FILE} ${QSB_OUTPUTS}
+    COMMENT "[imt3dgui] CREATING RES ${IMT3DGUI_QRC_CPP}"
+    VERBATIM
+)
+
+target_sources(${PROJECT_NAME} PRIVATE ${IMT3DGUI_QRC_CPP})
