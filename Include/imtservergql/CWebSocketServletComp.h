@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
+// Qt includes
+#include <QtCore/QFuture>
+
 
 // ImtCore includes
 #include <imtrest/CHttpRootServletComp.h>
@@ -61,6 +64,8 @@ private:
 
 	SubscriberControllersMap m_subscriberControllersMap;
 	mutable QMutex m_subscriberControllersMapMutex;
+	mutable QList<QFuture<void>> m_registerSubscriptionFutures;
+	mutable QMutex m_registerSubscriptionFuturesMutex;
 };
 
 

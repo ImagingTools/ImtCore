@@ -5,6 +5,7 @@
 // Qt includes
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
+#include <QtCore/QMutexLocker>
 #include <QtCore/QPointer>
 #include <QtConcurrent/QtConcurrent>
 
@@ -140,17 +141,26 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 		return imtrest::ConstResponsePtr();
 	}
 
-	QPointer<QObject> servletGuard(const_cast<CWebSocketServletComp*>(this));
-	QPointer<QObject> requestGuard(const_cast<imtrest::CWebSocketRequest*>(webSocketRequest));
-	QtConcurrent::run([servletGuard, requestGuard]() {
-		const auto* servletPtr = dynamic_cast<const CWebSocketServletComp*>(servletGuard.data());
-		const auto* requestPtr = dynamic_cast<const imtrest::CWebSocketRequest*>(requestGuard.data());
+	QPointer<const CWebSocketServletComp> servletGuard(this);
+	QPointer<const imtrest::CWebSocketRequest> requestGuard(webSocketRequest);
+	QFuture<void> future = QtConcurrent::run([servletGuard, requestGuard]() {
+		const auto* servletPtr = servletGuard.data();
+		const auto* requestPtr = requestGuard.data();
 		if (servletPtr == nullptr || requestPtr == nullptr){
 			return;
 		}
 
 		servletPtr->RegisterSubscriptionImpl(*requestPtr);
 	});
+	{
+		QMutexLocker locker(&m_registerSubscriptionFuturesMutex);
+		for (int index = m_registerSubscriptionFutures.count() - 1; index >= 0; index--){
+			if (m_registerSubscriptionFutures[index].isFinished()){
+				m_registerSubscriptionFutures.removeAt(index);
+			}
+		}
+		m_registerSubscriptionFutures.append(future);
+	}
 
 	return imtrest::ConstResponsePtr();
 }
