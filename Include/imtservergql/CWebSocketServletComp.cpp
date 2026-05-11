@@ -154,12 +154,14 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	});
 	{
 		QMutexLocker locker(&m_registerSubscriptionFuturesMutex);
-		for (int index = m_registerSubscriptionFutures.count() - 1; index >= 0; index--){
-			if (m_registerSubscriptionFutures[index].isFinished()){
-				m_registerSubscriptionFutures.removeAt(index);
+		m_registerSubscriptionFutures.append(future);
+		if (m_registerSubscriptionFutures.count() > 64){
+			for (int index = m_registerSubscriptionFutures.count() - 1; index >= 0; index--){
+				if (m_registerSubscriptionFutures[index].isFinished()){
+					m_registerSubscriptionFutures.removeAt(index);
+				}
 			}
 		}
-		m_registerSubscriptionFutures.append(future);
 	}
 
 	return imtrest::ConstResponsePtr();
