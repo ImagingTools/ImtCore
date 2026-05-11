@@ -140,7 +140,8 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 		}
 
 		if (!m_requestManagerCompPtr.IsValid()){
-			return responsePtr;
+			SendErrorMessage(0, QStringLiteral("RegisterSubscription response was not sent: RequestManager is not available"), QStringLiteral("CWebSocketServletComp"));
+			return imtrest::ConstResponsePtr();
 		}
 
 		if (!m_requestManagerCompPtr->SendResponse(request.GetRequestId(), responsePtr)){
