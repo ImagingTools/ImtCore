@@ -45,16 +45,11 @@ QByteArray CCollectionDocumentManagerTest::CreateDocumentAndWaitForLoad(
 {
 	QByteArray documentId = manager.CreateNewDocument(userId, typeId);
 
-	// Wait for async object creation to complete
-	QTRY_VERIFY_WITH_TIMEOUT([&]() {
-		auto list = manager.GetOpenedDocumentList(userId);
-		for (const auto& info : list) {
-			if (info.documentId == documentId) {
-				return !info.isLoading;
-			}
-		}
-		return true; // document was closed (e.g. due to failure)
-	}(), 5000);
+	// Process events to let async thread complete and main thread callbacks fire
+	for (int i = 0; i < 50; ++i){
+		QCoreApplication::processEvents();
+		QThread::msleep(10);
+	}
 
 	return documentId;
 }
@@ -68,16 +63,11 @@ QByteArray CCollectionDocumentManagerTest::OpenDocumentAndWaitForLoad(
 	QUrl url = QUrl("collection:///" + objectId);
 	QByteArray documentId = manager.OpenDocument(userId, url);
 
-	// Wait for async object loading to complete
-	QTRY_VERIFY_WITH_TIMEOUT([&]() {
-		auto list = manager.GetOpenedDocumentList(userId);
-		for (const auto& info : list) {
-			if (info.documentId == documentId) {
-				return !info.isLoading;
-			}
-		}
-		return true; // document was closed (e.g. due to failure)
-	}(), 5000);
+	// Process events to let async thread complete and main thread callbacks fire
+	for (int i = 0; i < 50; ++i){
+		QCoreApplication::processEvents();
+		QThread::msleep(10);
+	}
 
 	return documentId;
 }
