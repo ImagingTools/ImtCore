@@ -31,18 +31,17 @@ QByteArray CCollectionDocumentManagerBase::CreateNewDocument(
 	const QByteArray& documentTypeId,
 	const QByteArray& proposedSourceDocumentId)
 {
+	QMutexLocker locker(&m_mutex);
+
 	QByteArray documentId = CDocumentManagerBase::CreateNewDocument(userId, documentTypeId, proposedSourceDocumentId);
 
 	if (!documentId.isEmpty() && !proposedSourceDocumentId.isEmpty()) {
-		QMutexLocker locker(&m_mutex);
 		m_proposedSourceDocumentIds[documentId] = proposedSourceDocumentId;
 	}
 
 	return documentId;
 }
 
-
-// reimplemented (imtdoc::IDocumentManager)
 
 QByteArray CCollectionDocumentManagerBase::OpenDocument(const QByteArray& userId, const QUrl& url)
 {
@@ -681,6 +680,17 @@ IDocumentManager::OperationStatus CCollectionDocumentManagerBase::SaveDocument(
 	}
 
 	return workingDocumentPtr->objectId.isEmpty() ? OS_FAILED : OS_OK;
+}
+
+
+IDocumentManager::OperationStatus CCollectionDocumentManagerBase::CloseDocument(
+	const QByteArray& userId, const QByteArray& documentId)
+{
+	QMutexLocker locker(&m_mutex);
+
+	m_proposedSourceDocumentIds.remove(documentId);
+
+	return CDocumentManagerBase::CloseDocument(userId, documentId);
 }
 
 

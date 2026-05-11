@@ -29,6 +29,7 @@ public:
 		const QByteArray& documentId,
 		const QString& documentName = QString(),
 		QString* errorMessage = nullptr) override;
+	virtual OperationStatus CloseDocument(const QByteArray& userId, const QByteArray& documentId) override;
 
 protected:
 	virtual imtbase::IObjectCollection* GetCollection() const = 0;
