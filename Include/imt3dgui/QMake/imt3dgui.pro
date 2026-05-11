@@ -21,8 +21,12 @@ include($$PWD/../../../Config/QMake/DesignTokenCreator.pri)
 RESOURCES += $$files($$_PRO_FILE_PWD_/../*.qrc, false)
 
 # Compile GLSL 450 shaders to QSB and embed them as Qt resources under :/RhiShaders/
-# We use QMAKE_EXTRA_COMPILERS so that the compiled .qsb files are generated
-# before rcc processes imt3dgui.qrc (which references them).
+# Output goes to $$OUT_PWD so that qmake generates consistent build-tree paths for
+# both the extra-compiler rule and the rcc dependency.  Placing output in the source
+# tree (${QMAKE_FILE_IN_PATH}) caused "no known rule to make it" on Windows/nmake
+# because the path-separator form used in the rule differed from the one emitted by
+# the QRC scanner.  A QRC file referencing build-tree paths is generated via
+# write_file() and added to RESOURCES explicitly.
 QSB_TOOL = $$[QT_HOST_BINS]/qsb
 
 QSB_SHADERS = \
@@ -30,11 +34,28 @@ QSB_SHADERS = \
     $$_PRO_FILE_PWD_/../Resources/Shaders/fshader_rhi.frag
 
 qsb_compiler.input = QSB_SHADERS
-qsb_compiler.output = ${QMAKE_FILE_IN_PATH}/${QMAKE_FILE_IN_BASE}.${QMAKE_FILE_IN_EXT}.qsb
+qsb_compiler.output = $$OUT_PWD/${QMAKE_FILE_IN_BASE}.${QMAKE_FILE_IN_EXT}.qsb
 qsb_compiler.commands = $$QSB_TOOL --glsl \"100 es,120,150\" --hlsl 50 --msl 12 -o ${QMAKE_FILE_OUT} ${QMAKE_FILE_IN}
 qsb_compiler.name = QSB ${QMAKE_FILE_IN}
 qsb_compiler.CONFIG += no_link target_predeps
 QMAKE_EXTRA_COMPILERS += qsb_compiler
+
+# Generate a QRC file in the build directory that references the compiled .qsb files.
+# The content is derived from QSB_SHADERS, so adding/renaming shaders only requires
+# updating QSB_SHADERS above.  Single-quoted XML attributes avoid QMake quoting issues.
+RHI_SHADERS_QRC = $$OUT_PWD/rhi_shaders.qrc
+RHI_QRC_CONTENT = \
+    "<RCC>" \
+    "<qresource prefix='/RhiShaders'>"
+for(shader, QSB_SHADERS) {
+    shaderBase = $$basename(shader)
+    RHI_QRC_CONTENT += "<file alias='$${shaderBase}.qsb'>$$OUT_PWD/$${shaderBase}.qsb</file>"
+}
+RHI_QRC_CONTENT += \
+    "</qresource>" \
+    "</RCC>"
+write_file($$RHI_SHADERS_QRC, RHI_QRC_CONTENT)
+RESOURCES += $$RHI_SHADERS_QRC
 
 INCLUDEPATH += ../../
 
