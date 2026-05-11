@@ -6,6 +6,7 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 #include <QtCore/QPointer>
+#include <QtConcurrent/QtConcurrent>
 
 // ImtCore includes
 #include <imtrest/IRequest.h>
@@ -133,6 +134,29 @@ imtrest::ConstResponsePtr CWebSocketServletComp::ProcessGqlRequest(const imtrest
 
 
 imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtrest::IRequest& request) const
+{
+	const auto* webSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&request);
+	if (webSocketRequest == nullptr){
+		return imtrest::ConstResponsePtr();
+	}
+
+	QPointer<QObject> servletGuard(const_cast<CWebSocketServletComp*>(this));
+	QPointer<QObject> requestGuard(const_cast<imtrest::CWebSocketRequest*>(webSocketRequest));
+	QtConcurrent::run([servletGuard, requestGuard]() {
+		const auto* servletPtr = dynamic_cast<const CWebSocketServletComp*>(servletGuard.data());
+		const auto* requestPtr = dynamic_cast<const imtrest::CWebSocketRequest*>(requestGuard.data());
+		if (servletPtr == nullptr || requestPtr == nullptr){
+			return;
+		}
+
+		servletPtr->RegisterSubscriptionImpl(*requestPtr);
+	});
+
+	return imtrest::ConstResponsePtr();
+}
+
+
+imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscriptionImpl(const imtrest::IRequest& request) const
 {
 	const auto sendResponse = [this, &request](imtrest::ConstResponsePtr responsePtr) -> imtrest::ConstResponsePtr {
 		if (!responsePtr.IsValid()){

@@ -45,6 +45,7 @@ protected:
 	virtual imtrest::ConstResponsePtr KeepAliveAcknowledge(const imtrest::IRequest& request) const;
 	virtual imtrest::ConstResponsePtr ProcessGqlRequest(const imtrest::IRequest& request) const;
 	virtual imtrest::ConstResponsePtr RegisterSubscription(const imtrest::IRequest& request) const;
+	virtual imtrest::ConstResponsePtr RegisterSubscriptionImpl(const imtrest::IRequest& request) const;
 	virtual imtrest::ConstResponsePtr UnregisterSubscription(const imtrest::IRequest& request) const;
 	virtual imtrest::ConstResponsePtr CreateDataResponse(const QByteArray& data, const imtrest::IRequest& request) const;
 	virtual imtrest::ConstResponsePtr CreateErrorResponse(const QByteArray& errorMessage, const imtrest::IRequest& request) const;
@@ -64,4 +65,3 @@ private:
 
 
 } // namespace imtservergql
-
