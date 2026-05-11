@@ -26,6 +26,24 @@ namespace imtdoc
 
 // reimplemented (imtdoc::IDocumentManager)
 
+QByteArray CCollectionDocumentManagerBase::CreateNewDocument(
+	const QByteArray& userId,
+	const QByteArray& documentTypeId,
+	const QByteArray& proposedSourceDocumentId)
+{
+	QByteArray documentId = CDocumentManagerBase::CreateNewDocument(userId, documentTypeId, proposedSourceDocumentId);
+
+	if (!documentId.isEmpty() && !proposedSourceDocumentId.isEmpty()) {
+		QMutexLocker locker(&m_mutex);
+		m_proposedSourceDocumentIds[documentId] = proposedSourceDocumentId;
+	}
+
+	return documentId;
+}
+
+
+// reimplemented (imtdoc::IDocumentManager)
+
 QByteArray CCollectionDocumentManagerBase::OpenDocument(const QByteArray& userId, const QUrl& url)
 {
 	QByteArray retVal;
@@ -616,8 +634,17 @@ IDocumentManager::OperationStatus CCollectionDocumentManagerBase::SaveDocument(
 	}
 
 	// Create new object
+	QByteArray proposedElementId;
+	{
+		auto it = m_proposedSourceDocumentIds.find(documentId);
+		if (it != m_proposedSourceDocumentIds.end()) {
+			proposedElementId = it.value();
+			m_proposedSourceDocumentIds.erase(it);
+		}
+	}
+
 	workingDocumentPtr->objectId =
-		collectionPtr->InsertNewObject(workingDocumentPtr->typeId, resultDocumentName, "", documentSnapshotPtr.GetPtr());
+		collectionPtr->InsertNewObject(workingDocumentPtr->typeId, resultDocumentName, "", documentSnapshotPtr.GetPtr(), proposedElementId);
 
 	if (HasDocumentNameProvider(workingDocumentPtr->typeId)){
 		resultDocumentName = GetDefaultDocumentName(*workingDocumentPtr);

@@ -242,6 +242,28 @@ void CCollectionDocumentManagerTest::CreateNewDocumentMultipleDocumentsTest()
 }
 
 
+void CCollectionDocumentManagerTest::CreateNewDocumentProposedSourceDocumentIdUsedOnSaveTest()
+{
+	const QByteArray proposedId = "proposed-object-id";
+
+	QByteArray docId = m_managerPtr->CreateNewDocument(TEST_USER_ID, TEST_TYPE_ID, proposedId);
+	QVERIFY2(!docId.isEmpty(), "CreateNewDocument should return a non-empty document ID");
+
+	// Wait for async object creation to complete
+	for (int i = 0; i < 50; ++i) {
+		QCoreApplication::processEvents();
+		QThread::msleep(10);
+	}
+
+	// Save the document – this should insert it into the collection using the proposed ID
+	auto status = m_managerPtr->SaveDocument(TEST_USER_ID, docId, TEST_DOC_NAME);
+	QCOMPARE(status, imtdoc::IDocumentManager::OS_OK);
+
+	// Verify the proposed ID was used as the collection element ID
+	QCOMPARE(m_managerPtr->GetMockCollection().GetLastInsertedId(), proposedId);
+}
+
+
 // ======================================================================
 // OpenDocument tests
 // ======================================================================
