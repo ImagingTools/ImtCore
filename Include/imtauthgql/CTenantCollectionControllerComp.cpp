@@ -98,6 +98,13 @@ bool CTenantCollectionControllerComp::CreateRepresentationFromObject(
 		}
 	}
 
+	if (requestInfo.items.isInvitedByNameRequested){
+		QVariant invByName = objectCollectionIterator.GetElementInfo("InvitedByName");
+		if (invByName.isValid() && !invByName.isNull()){
+			representationObject.invitedByName = invByName.toString();
+		}
+	}
+
 	return true;
 }
 

@@ -20,11 +20,11 @@ RemoteCollectionView {
 	collectionId: "Tenants"
 	gqlGetListCommandId: ImtauthTenantsSdlCommandIds.s_getTenantList
 	documentCollectionFilter: null
-	additionalFieldIds: ["id", "name", TenantItemDataTypeMetaInfo.s_tenantRelationScope, TenantItemDataTypeMetaInfo.s_invitationId]
+	additionalFieldIds: ["id", "name", TenantItemDataTypeMetaInfo.s_tenantRelationScope, TenantItemDataTypeMetaInfo.s_invitationId, TenantItemDataTypeMetaInfo.s_invitedByName]
 
 	Component.onCompleted: {
 		table.setSortingInfo(TenantItemDataTypeMetaInfo.s_createdAt, "DESC")
-		table.nonSortableColumns = [TenantItemDataTypeMetaInfo.s_ownerId, TenantItemDataTypeMetaInfo.s_isActive, TenantItemDataTypeMetaInfo.s_membersCount, TenantItemDataTypeMetaInfo.s_tenantRelationScope, TenantItemDataTypeMetaInfo.s_invitationId]
+		table.nonSortableColumns = [TenantItemDataTypeMetaInfo.s_ownerId, TenantItemDataTypeMetaInfo.s_isActive, TenantItemDataTypeMetaInfo.s_membersCount, TenantItemDataTypeMetaInfo.s_tenantRelationScope, TenantItemDataTypeMetaInfo.s_invitationId, TenantItemDataTypeMetaInfo.s_invitedByName]
 		registerFieldFilterDelegate("isActiveFilter", isActiveDelegateFilterComp)
 		registerFieldFilterDelegate("tenantRelationFilter", tenantRelationDelegateFilterComp)
 	}
@@ -97,90 +97,128 @@ RemoteCollectionView {
 
 			property string scopeValue: ""
 			property string invitationIdValue: ""
+			property string invitedByNameValue: ""
 
 			onReused: {
 				var val = tenantRelationScopeDelegate.getValue()
 				scopeValue = val !== undefined && val !== null ? val.toString() : ""
 
 				if (tenantRelationScopeDelegate.rowDelegate && tenantRelationScopeDelegate.rowDelegate.dataModel) {
-					var invId = ""
-					if ("item" in tenantRelationScopeDelegate.rowDelegate.dataModel) {
-						invId = tenantRelationScopeDelegate.rowDelegate.dataModel.item.m_invitationId || ""
-					}
-					invitationIdValue = invId.toString()
-				}
-			}
-
-			Row {
-				anchors.verticalCenter: parent.verticalCenter
-				anchors.left: parent.left
-				anchors.leftMargin: Style.marginM
-				anchors.right: parent.right
-				anchors.rightMargin: Style.marginM
-				spacing: Style.spacingS
-				visible: tenantRelationScopeDelegate.scopeValue === "Invited"
-
-				Rectangle {
-					width: acceptLabel.contentWidth + 2 * Style.marginM
-					height: Style.controlHeightS
-					radius: Style.radiusM
-					color: "#3FB950"
-					anchors.verticalCenter: parent.verticalCenter
-
-					Text {
-						id: acceptLabel
-						anchors.centerIn: parent
-						text: qsTr("Accept")
-						font.pixelSize: Style.fontSizeS
-						color: "#FFFFFF"
-					}
-
-					MouseArea {
-						anchors.fill: parent
-						cursorShape: Qt.PointingHandCursor
-						onClicked: {
-							if (tenantRelationScopeDelegate.invitationIdValue !== "") {
-								container.acceptInvitation(tenantRelationScopeDelegate.invitationIdValue)
-							}
-						}
-					}
-				}
-
-				Rectangle {
-					width: rejectLabel.contentWidth + 2 * Style.marginM
-					height: Style.controlHeightS
-					radius: Style.radiusM
-					color: "#DA3633"
-					anchors.verticalCenter: parent.verticalCenter
-
-					Text {
-						id: rejectLabel
-						anchors.centerIn: parent
-						text: qsTr("Reject")
-						font.pixelSize: Style.fontSizeS
-						color: "#FFFFFF"
-					}
-
-					MouseArea {
-						anchors.fill: parent
-						cursorShape: Qt.PointingHandCursor
-						onClicked: {
-							if (tenantRelationScopeDelegate.invitationIdValue !== "") {
-								container.rejectInvitation(tenantRelationScopeDelegate.invitationIdValue)
-							}
-						}
+					var item = tenantRelationScopeDelegate.rowDelegate.dataModel.item
+					if (item) {
+						invitationIdValue = (item.m_invitationId || "").toString()
+						invitedByNameValue = (item.m_invitedByName || "").toString()
 					}
 				}
 			}
 
 			Text {
+				id: scopeLabel
 				anchors.verticalCenter: parent.verticalCenter
 				anchors.left: parent.left
 				anchors.leftMargin: Style.marginM
 				font.pixelSize: Style.fontSizeM
-				color: Style.textColor
+				color: tenantRelationScopeDelegate.scopeValue === "Invited" ? Style.accentColor : Style.textColor
 				text: tenantRelationScopeDelegate.scopeValue
-				visible: tenantRelationScopeDelegate.scopeValue !== "Invited"
+				font.underline: tenantRelationScopeDelegate.scopeValue === "Invited"
+
+				MouseArea {
+					id: scopeMouseArea
+					anchors.fill: parent
+					hoverEnabled: tenantRelationScopeDelegate.scopeValue === "Invited"
+					cursorShape: tenantRelationScopeDelegate.scopeValue === "Invited" ? Qt.PointingHandCursor : Qt.ArrowCursor
+					onEntered: {
+						if (tenantRelationScopeDelegate.scopeValue === "Invited") {
+							invitationPopup.open()
+						}
+					}
+				}
+			}
+
+			Popup {
+				id: invitationPopup
+				x: scopeLabel.x
+				y: scopeLabel.y + scopeLabel.height + Style.spacingS
+				width: invitationPopupContent.width + 2 * Style.marginL
+				height: invitationPopupContent.height + 2 * Style.marginL
+				modal: false
+				closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
+
+				background: Rectangle {
+					color: Style.panelColor
+					border.color: Style.borderColor
+					border.width: 1
+					radius: Style.radiusM
+				}
+
+				Column {
+					id: invitationPopupContent
+					anchors.centerIn: parent
+					spacing: Style.spacingM
+
+					Text {
+						text: qsTr("Invited by: %1").arg(tenantRelationScopeDelegate.invitedByNameValue || qsTr("Unknown"))
+						font.pixelSize: Style.fontSizeM
+						color: Style.textColor
+					}
+
+					Row {
+						spacing: Style.spacingM
+						anchors.horizontalCenter: parent.horizontalCenter
+
+						Rectangle {
+							width: acceptBtnLabel.contentWidth + 2 * Style.marginL
+							height: Style.controlHeightS
+							radius: Style.radiusM
+							color: "#3FB950"
+
+							Text {
+								id: acceptBtnLabel
+								anchors.centerIn: parent
+								text: qsTr("Accept")
+								font.pixelSize: Style.fontSizeS
+								color: "#FFFFFF"
+							}
+
+							MouseArea {
+								anchors.fill: parent
+								cursorShape: Qt.PointingHandCursor
+								onClicked: {
+									if (tenantRelationScopeDelegate.invitationIdValue !== "") {
+										container.acceptInvitation(tenantRelationScopeDelegate.invitationIdValue)
+										invitationPopup.close()
+									}
+								}
+							}
+						}
+
+						Rectangle {
+							width: rejectBtnLabel.contentWidth + 2 * Style.marginL
+							height: Style.controlHeightS
+							radius: Style.radiusM
+							color: "#DA3633"
+
+							Text {
+								id: rejectBtnLabel
+								anchors.centerIn: parent
+								text: qsTr("Reject")
+								font.pixelSize: Style.fontSizeS
+								color: "#FFFFFF"
+							}
+
+							MouseArea {
+								anchors.fill: parent
+								cursorShape: Qt.PointingHandCursor
+								onClicked: {
+									if (tenantRelationScopeDelegate.invitationIdValue !== "") {
+										container.rejectInvitation(tenantRelationScopeDelegate.invitationIdValue)
+										invitationPopup.close()
+									}
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 	}

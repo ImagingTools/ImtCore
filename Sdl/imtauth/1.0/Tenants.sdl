@@ -24,6 +24,7 @@ type TenantItemData {
 	updatedAt: String
 	tenantRelationScope: String
 	invitationId: ID
+	invitedByName: String
 }
 
 type TenantMemberEntry {
