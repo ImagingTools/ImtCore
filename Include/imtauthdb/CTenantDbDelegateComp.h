@@ -58,23 +58,27 @@ public:
 				const QSqlRecord& record,
 				idoc::IDocumentMetaInfo& metaInfo) const override;
 
+	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
+	virtual QByteArray GetSelectionQuery(
+				const QByteArray& objectId = QByteArray(),
+				int offset = 0,
+				int count = -1,
+				const iprm::IParamsSet* paramsPtr = nullptr) const override;
+
 	// reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
 	virtual QByteArray GetCountQuery(const iprm::IParamsSet* paramsPtr = nullptr) const override;
 
 protected:
 	// reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
-	virtual QString GetBaseSelectionQuery() const override;
 	virtual idoc::MetaInfoPtr CreateObjectMetaInfo(const QByteArray& typeId) const override;
 	virtual bool SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const override;
-	virtual bool CreateFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const override;
 	virtual QString CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const override;
 
 private:
-	QString GetTenantRelationScopeSubquery() const;
+	static QByteArray ExtractUserId(const iprm::IParamsSet* paramsPtr);
+	QString GetTenantRelationScopeSubquery(const QByteArray& userId) const;
 
 	I_FACT(imtauth::ITenantInfo, m_tenantFactCompPtr);
-
-	mutable QByteArray m_cachedUserId;
 };
 
 

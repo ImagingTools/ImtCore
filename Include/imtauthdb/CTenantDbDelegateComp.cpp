@@ -7,9 +7,13 @@
 #include <QtSql/QSqlRecord>
 
 // ACF includes
+#include <istd/TOptDelPtr.h>
 #include <imtauth/ITenantInfo.h>
 #include <iprm/IIdParam.h>
+#include <iprm/CParamsSet.h>
 #include <iprm/TParamsPtr.h>
+#include <imtbase/ICollectionFilter.h>
+#include <imtbase/IComplexCollectionFilter.h>
 #include <imtdb/CDatabaseEngineComp.h>
 #include <imtdb/imtdb.h>
 #include <idoc/CStandardDocumentMetaInfo.h>
@@ -240,10 +244,28 @@ bool CTenantDbDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& record
 }
 
 
-QString CTenantDbDelegateComp::GetTenantRelationScopeSubquery() const
+QByteArray CTenantDbDelegateComp::ExtractUserId(const iprm::IParamsSet* paramsPtr)
+{
+	if (paramsPtr == nullptr){
+		return QByteArray();
+	}
+
+	iprm::IParamsSet::Ids paramIds = paramsPtr->GetParamIds();
+	if (paramIds.contains("UserId")){
+		iprm::TParamsPtr<iprm::IIdParam> userIdParamPtr(paramsPtr, "UserId");
+		if (userIdParamPtr.IsValid()){
+			return userIdParamPtr->GetId();
+		}
+	}
+
+	return QByteArray();
+}
+
+
+QString CTenantDbDelegateComp::GetTenantRelationScopeSubquery(const QByteArray& userId) const
 {
 	QString tableName = qPrintable(*m_tableNameAttrPtr);
-	QString escapedUserId = imtdb::EscapeSql(QString::fromUtf8(m_cachedUserId));
+	QString escapedUserId = imtdb::EscapeSql(QString::fromUtf8(userId));
 
 	return QString(
 		"SELECT *, "
@@ -260,30 +282,78 @@ QString CTenantDbDelegateComp::GetTenantRelationScopeSubquery() const
 }
 
 
-QString CTenantDbDelegateComp::GetBaseSelectionQuery() const
+QByteArray CTenantDbDelegateComp::GetSelectionQuery(
+		const QByteArray& objectId,
+		int offset,
+		int count,
+		const iprm::IParamsSet* paramsPtr) const
 {
-	if (m_cachedUserId.isEmpty()){
-		return BaseClass::GetBaseSelectionQuery();
+	// Single-object selection does not need the computed column
+	if (!objectId.isEmpty()){
+		return BaseClass::GetSelectionQuery(objectId, offset, count, paramsPtr);
 	}
 
-	return QString("SELECT * FROM (%1) AS _t").arg(GetTenantRelationScopeSubquery());
+	QByteArray userId = ExtractUserId(paramsPtr);
+	if (userId.isEmpty()){
+		return BaseClass::GetSelectionQuery(objectId, offset, count, paramsPtr);
+	}
+
+	if (count == 0){
+		return QByteArray();
+	}
+
+	QString sortQuery;
+	QString filterQuery;
+
+	istd::TOptDelPtr<const iprm::IParamsSet> selectionParamsPtr;
+	if (paramsPtr != nullptr){
+		selectionParamsPtr.SetPtr(paramsPtr, false);
+	}
+	else{
+		selectionParamsPtr.SetPtr(new iprm::CParamsSet(), true);
+	}
+
+	if (selectionParamsPtr.IsValid()){
+		if (!CreateFilterQuery(*selectionParamsPtr, filterQuery)){
+			return QByteArray();
+		}
+
+		iprm::IParamsSet::Ids paramIds = selectionParamsPtr->GetParamIds();
+		if (paramIds.contains("ComplexFilter")){
+			iprm::TParamsPtr<imtbase::IComplexCollectionFilter> complexFilterParamPtr(selectionParamsPtr.GetPtr(), "ComplexFilter");
+			if (!CreateSortQuery(*complexFilterParamPtr, sortQuery)){
+				return QByteArray();
+			}
+		}
+		else if (paramIds.contains("Filter")){
+			iprm::TParamsPtr<imtbase::ICollectionFilter> collectionFilterParamPtr(selectionParamsPtr.GetPtr(), "Filter");
+			if (!CreateSortQuery(*collectionFilterParamPtr, sortQuery)){
+				return QByteArray();
+			}
+		}
+	}
+
+	QByteArray paginationQuery;
+	if (!CreatePaginationQuery(offset, count, paginationQuery)){
+		return QByteArray();
+	}
+
+	QString baseQuery = QString("SELECT * FROM (%1) AS _t").arg(GetTenantRelationScopeSubquery(userId));
+
+	// Due to a bug in qt in the context of resolving of an expression like this: '%<SOME_NUMBER>%'
+	QString retVal = "(" + baseQuery;
+	retVal += QString(" ") + filterQuery;
+	retVal += QString(" ") + qPrintable(paginationQuery) + ")";
+	retVal += QString(" ") + sortQuery;
+
+	return retVal.toUtf8();
 }
 
 
 QByteArray CTenantDbDelegateComp::GetCountQuery(const iprm::IParamsSet* paramsPtr) const
 {
-	// Cache UserId first (needed by GetTenantRelationScopeSubquery)
-	if (paramsPtr != nullptr){
-		iprm::IParamsSet::Ids paramIds = paramsPtr->GetParamIds();
-		if (paramIds.contains("UserId")){
-			iprm::TParamsPtr<iprm::IIdParam> userIdParamPtr(paramsPtr, "UserId");
-			if (userIdParamPtr.IsValid()){
-				m_cachedUserId = userIdParamPtr->GetId();
-			}
-		}
-	}
-
-	if (m_cachedUserId.isEmpty()){
+	QByteArray userId = ExtractUserId(paramsPtr);
+	if (userId.isEmpty()){
 		return BaseClass::GetCountQuery(paramsPtr);
 	}
 
@@ -295,35 +365,21 @@ QByteArray CTenantDbDelegateComp::GetCountQuery(const iprm::IParamsSet* paramsPt
 	}
 
 	return QString("SELECT COUNT(*) FROM (%1) AS _t %2")
-			.arg(GetTenantRelationScopeSubquery())
+			.arg(GetTenantRelationScopeSubquery(userId))
 			.arg(filterQuery)
 			.toUtf8();
 }
 
 
-bool CTenantDbDelegateComp::CreateFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const
+QString CTenantDbDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const
 {
-	// Cache UserId before base class constructs the query — it's needed by GetBaseSelectionQuery()
-	iprm::IParamsSet::Ids paramIds = filterParams.GetParamIds();
-	if (paramIds.contains("UserId")){
-		iprm::TParamsPtr<iprm::IIdParam> userIdParamPtr(&filterParams, "UserId");
-		if (userIdParamPtr.IsValid()){
-			m_cachedUserId = userIdParamPtr->GetId();
-		}
-	}
-
-	return BaseClass::CreateFilterQuery(filterParams, filterQuery);
-}
-
-
-QString CTenantDbDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsSet& /*filterParams*/) const
-{
-	if (m_cachedUserId.isEmpty()){
+	QByteArray userId = ExtractUserId(&filterParams);
+	if (userId.isEmpty()){
 		return QString();
 	}
 
-	// With TenantRelationScope as a computed column, only show tenants where
-	// the user has a relationship (Owner, Member, or Invited)
+	// With TenantRelationScope as a computed column in the subquery,
+	// only show tenants where the user has a relationship (Owner, Member, or Invited)
 	return QStringLiteral("\"TenantRelationScope\" IS NOT NULL");
 }
 
