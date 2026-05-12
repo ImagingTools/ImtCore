@@ -36,7 +36,6 @@ RemoteCollectionView {
 		table.setColumnContentById(TenantItemDataTypeMetaInfo.s_updatedAt, updatedAtCellDelegateComp)
 		table.setColumnContentById(TenantItemDataTypeMetaInfo.s_isActive, isActiveCellDelegateComp)
 		table.setColumnContentById(TenantItemDataTypeMetaInfo.s_tenantRelationScope, tenantRelationScopeCellDelegateComp)
-		table.setColumnContentById(TenantItemDataTypeMetaInfo.s_invitationId, hiddenCellDelegateComp)
 	}
 
 	function acceptInvitation(invitationId) {
@@ -122,7 +121,7 @@ RemoteCollectionView {
 				visible: tenantRelationScopeDelegate.scopeValue === "Invited"
 
 				Rectangle {
-					width: acceptLabel.implicitWidth + 2 * Style.marginM
+					width: acceptLabel.contentWidth + 2 * Style.marginM
 					height: Style.controlHeightS
 					radius: Style.radiusM
 					color: "#3FB950"
@@ -148,7 +147,7 @@ RemoteCollectionView {
 				}
 
 				Rectangle {
-					width: rejectLabel.implicitWidth + 2 * Style.marginM
+					width: rejectLabel.contentWidth + 2 * Style.marginM
 					height: Style.controlHeightS
 					radius: Style.radiusM
 					color: "#DA3633"

@@ -132,6 +132,7 @@
                                 <Value>name</Value>
                                 <Value>description</Value>
                                 <Value>ownerId</Value>
+                                <Value>tenantRelationScope</Value>
                                 <Value>membersCount</Value>
                                 <Value>isActive</Value>
                                 <Value>createdAt</Value>
@@ -145,6 +146,7 @@
                                 <Value>Tenant Name</Value>
                                 <Value>Description</Value>
                                 <Value>Owner</Value>
+                                <Value>Tenant Relation Scope</Value>
                                 <Value>Members Count</Value>
                                 <Value>Active</Value>
                                 <Value>Created</Value>
