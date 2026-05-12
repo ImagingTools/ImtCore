@@ -359,6 +359,22 @@ global.JQModules = {
         TextInput: __components.TextInput,
         TextEdit: __components.TextEdit,
     },
+    QtQuick_Controls: {
+        Action: __components.Action,
+        Menu: __components.Menu,
+        MenuItem: __components.MenuItem,
+        MenuSeparator: __components.MenuSeparator,
+        MenuBar: __components.MenuBar,
+        MenuBarItem: __components.MenuBarItem,
+        Popup: __components.Popup,
+        Overlay: __components.Overlay,
+        Dialog: __components.Dialog,
+        ToolTip: __components.ToolTip,
+        Drawer: __components.Drawer,
+    },
+    QtQuick_Layouts: {
+        ColumnLayout: __components.ColumnLayout,
+    },
     Qt5Compat: {
         GraphicalEffects: {
             DropShadow: __components.DropShadow,
