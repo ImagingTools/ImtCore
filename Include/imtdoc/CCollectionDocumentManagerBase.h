@@ -2,6 +2,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QMap>
+
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtdoc/CDocumentManagerBase.h>
@@ -15,6 +18,10 @@ class CCollectionDocumentManagerBase: virtual public CDocumentManagerBase
 {
 public:
 	// reimplemented (imtdoc::IDocumentManager)
+	virtual QByteArray CreateNewDocument(
+		const QByteArray& userId,
+		const QByteArray& documentTypeId,
+		const QByteArray& proposedSourceDocumentId = QByteArray()) override;
 	virtual QByteArray OpenDocument(const QByteArray& userId, const QUrl& url) override;
 	virtual OperationStatus SetDocumentName(const QByteArray& userId, const QByteArray& documentId, const QString& documentName) override;
 	virtual OperationStatus SaveDocument(
@@ -22,9 +29,13 @@ public:
 		const QByteArray& documentId,
 		const QString& documentName = QString(),
 		QString* errorMessage = nullptr) override;
+	virtual OperationStatus CloseDocument(const QByteArray& userId, const QByteArray& documentId) override;
 
 protected:
 	virtual imtbase::IObjectCollection* GetCollection() const = 0;
+
+private:
+	QMap<QByteArray, QByteArray> m_proposedSourceDocumentIds;
 };
 
 

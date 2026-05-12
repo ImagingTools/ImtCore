@@ -650,6 +650,7 @@ private slots:
 	void CreateNewDocumentEventFiredTest();
 	void CreateNewDocumentIsLoadingTest();
 	void CreateNewDocumentMultipleDocumentsTest();
+	void CreateNewDocumentProposedSourceDocumentIdUsedOnSaveTest();
 
 	// OpenDocument tests
 	void OpenDocumentSuccessTest();

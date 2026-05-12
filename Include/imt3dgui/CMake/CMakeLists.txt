@@ -5,13 +5,73 @@ include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
 # Qt modules matching QMake's QT += gui-private opengl openglwidgets:
 # - GuiPrivate  : exposes <rhi/qrhi.h> (private QRhi API used by CRhiRenderBackend).
-#                 Not a find_package component — the target is available automatically
-#                 once Qt6::Gui has been found (done by the ACF includes above).
+#                 For Qt 6.8+ rhi/qrhi.h is a public header of Qt::Gui, so we link
+#                 Qt::Gui directly.  For older versions fall back to GuiPrivate.
 # - OpenGL / OpenGLWidgets : QOpenGLBuffer, QOpenGLShaderProgram, QOpenGLWidget
 #                            (headers moved from QtGui to separate modules in Qt 6)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS OpenGL OpenGLWidgets REQUIRED)
+
+set(QT_VERSION_STR
+    "${Qt${QT_VERSION_MAJOR}Core_VERSION_MAJOR}.${Qt${QT_VERSION_MAJOR}Core_VERSION_MINOR}.${Qt${QT_VERSION_MAJOR}Core_VERSION_PATCH}")
+
+if(QT_VERSION VERSION_GREATER_EQUAL "6.8.0")
+    # In Qt 6.8+, rhi/qrhi.h is a public header of Qt::Gui.
+    # On macOS framework builds the versioned headers live inside
+    # QtGui.framework and are not on the default include path.
+    # Resolve the QtGui include root from the Gui target, handling both
+    # framework layouts (.../QtGui.framework/Headers) and non-framework
+    # layouts (.../include/QtGui).
+    get_target_property(_qtgui_loc Qt${QT_VERSION_MAJOR}::Gui IMPORTED_LOCATION_RELEASE)
+    if(NOT _qtgui_loc)
+        get_target_property(_qtgui_loc Qt${QT_VERSION_MAJOR}::Gui IMPORTED_LOCATION)
+    endif()
+
+    set(QTGUI_HEADERS_DIR "")
+    if(_qtgui_loc AND _qtgui_loc MATCHES "QtGui\\.framework")
+        # Framework layout: <prefix>/lib/QtGui.framework/Versions/A/QtGui
+        get_filename_component(_fw_dir "${_qtgui_loc}" DIRECTORY)  # .../Versions/A
+        set(_fw_headers "${_fw_dir}/Headers")
+        set(_fw_versioned "${_fw_headers}/${QT_VERSION_STR}/QtGui")
+        if(EXISTS "${_fw_versioned}")
+            set(QTGUI_HEADERS_DIR "${_fw_versioned}")
+        elseif(EXISTS "${_fw_headers}")
+            set(QTGUI_HEADERS_DIR "${_fw_headers}")
+        endif()
+    else()
+        # Non-framework layout: try the standard include path
+        get_target_property(_qtgui_inc Qt${QT_VERSION_MAJOR}::Gui INTERFACE_INCLUDE_DIRECTORIES)
+        foreach(dir IN LISTS _qtgui_inc)
+            file(TO_CMAKE_PATH "${dir}" dir_norm)
+            if(dir_norm MATCHES "/QtGui$")
+                set(_versioned "${dir_norm}/${QT_VERSION_STR}/QtGui")
+                if(EXISTS "${_versioned}")
+                    set(QTGUI_HEADERS_DIR "${_versioned}")
+                else()
+                    set(QTGUI_HEADERS_DIR "${dir_norm}")
+                endif()
+                break()
+            endif()
+        endforeach()
+    endif()
+
+    if(QTGUI_HEADERS_DIR)
+        target_include_directories(${PROJECT_NAME} PUBLIC "${QTGUI_HEADERS_DIR}")
+    endif()
+else()
+    # Pre-6.8: rhi/qrhi.h is a private header, need the private module's
+    # include directories (but NOT linking GuiPrivate — headers only via
+    # the versioned include path resolved above would be the 6.8+ path;
+    # for older Qt the private header is only reachable through GuiPrivate).
+    find_package(Qt${QT_VERSION_MAJOR} COMPONENTS GuiPrivate QUIET)
+    if(TARGET Qt${QT_VERSION_MAJOR}::GuiPrivate)
+        get_target_property(_gp_incs Qt${QT_VERSION_MAJOR}::GuiPrivate INTERFACE_INCLUDE_DIRECTORIES)
+        foreach(dir IN LISTS _gp_incs)
+            target_include_directories(${PROJECT_NAME} PUBLIC "${dir}")
+        endforeach()
+    endif()
+endif()
+
 target_link_libraries(${PROJECT_NAME}
-    Qt${QT_VERSION_MAJOR}::GuiPrivate
     Qt${QT_VERSION_MAJOR}::OpenGL
     Qt${QT_VERSION_MAJOR}::OpenGLWidgets
 )
