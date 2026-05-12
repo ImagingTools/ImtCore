@@ -953,6 +953,47 @@ class QKeyNavigation extends ComplexObject {
     }
 }
 
+class QLayout extends ComplexObject {
+    static defaultProperties = {
+        fillWidth: { type: QBool, value: false, changed: 'mainChanged' },
+        fillHeight: { type: QBool, value: false, changed: 'mainChanged' },
+        preferredWidth: { type: QReal, value: -1, changed: 'mainChanged' },
+        preferredHeight: { type: QReal, value: -1, changed: 'mainChanged' },
+        minimumWidth: { type: QReal, value: 0, changed: 'mainChanged' },
+        minimumHeight: { type: QReal, value: 0, changed: 'mainChanged' },
+        maximumWidth: { type: QReal, value: Number.MAX_SAFE_INTEGER, changed: 'mainChanged' },
+        maximumHeight: { type: QReal, value: Number.MAX_SAFE_INTEGER, changed: 'mainChanged' },
+        alignment: { type: QReal, value: 0, changed: 'mainChanged' },
+    }
+
+    mainChanged(){
+        this.getNotify()()
+    }
+
+    getNotify(){
+        if(!this.notify) this.notify = new QSignal()
+        return this.notify
+    }
+
+    updateOnce(){
+        if(!this.completed) this.update()
+    }
+
+    update(){
+        this.completed = true
+
+        if(this.$properties.fillWidth) this.$properties.fillWidth.update()
+        if(this.$properties.fillHeight) this.$properties.fillHeight.update()
+        if(this.$properties.preferredWidth) this.$properties.preferredWidth.update()
+        if(this.$properties.preferredHeight) this.$properties.preferredHeight.update()
+        if(this.$properties.minimumWidth) this.$properties.minimumWidth.update()
+        if(this.$properties.minimumHeight) this.$properties.minimumHeight.update()
+        if(this.$properties.maximumWidth) this.$properties.maximumWidth.update()
+        if(this.$properties.maximumHeight) this.$properties.maximumHeight.update()
+        if(this.$properties.alignment) this.$properties.alignment.update()
+    }
+}
+
 class QGeometry extends QReal {
     reset(newValue){
         this.subscribersReset()
@@ -1241,6 +1282,7 @@ module.exports.QLine = QLine
 module.exports.QPoint = QPoint
 module.exports.QSourceSize = QSourceSize
 module.exports.QKeyNavigation = QKeyNavigation
+module.exports.QLayout = QLayout
 module.exports.MapGestureArea = MapGestureArea
 module.exports.QDrag = QDrag
 

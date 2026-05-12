@@ -359,6 +359,9 @@ global.JQModules = {
         TextInput: __components.TextInput,
         TextEdit: __components.TextEdit,
     },
+    'QtQuick.Layouts': {
+        ColumnLayout: __components.ColumnLayout,
+    },
     Qt5Compat: {
         GraphicalEffects: {
             DropShadow: __components.DropShadow,
