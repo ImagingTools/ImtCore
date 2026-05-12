@@ -119,9 +119,6 @@ sdl::imtauth::Tenants::CTenantData CTenantCollectionDocumentManagerComp::OnGetTe
 	response.Version_1_0.Emplace();
 
 	QByteArray tenantId = tenantPtr->GetTenantId();
-	if (tenantId.isEmpty()){
-		tenantId = objectId;
-	}
 
 	response.Version_1_0->id = tenantId;
 	response.Version_1_0->name = tenantPtr->GetTenantName();

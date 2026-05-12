@@ -135,7 +135,7 @@ DocumentViewBase {
 			if (selected && selected.id && !activeIds[selected.id]) {
 				createInvitationInput.m_tenantId = container.tenantData.m_id || ""
 				createInvitationInput.m_userId = selected.id
-				createInvitationInput.m_role = TenantMemberRole.Member
+				createInvitationInput.m_role = "Member"
 				createInvitationSender.send(createInvitationInput)
 			}
 		}
