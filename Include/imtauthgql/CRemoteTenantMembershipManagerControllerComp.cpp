@@ -93,15 +93,6 @@ sdl::imtauth::TenantMemberships::CAddMembershipPayload CRemoteTenantMembershipMa
 }
 
 
-sdl::imtauth::TenantMemberships::CInviteTenantMemberPayload CRemoteTenantMembershipManagerControllerComp::OnInviteTenantMember(
-			const sdl::imtauth::TenantMemberships::CInviteTenantMemberGqlRequest& /*request*/,
-			const ::imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
-{
-	return SendModelRequest<sdl::imtauth::TenantMemberships::CInviteTenantMemberPayload>(gqlRequest, errorMessage);
-}
-
-
 sdl::imtauth::TenantMemberships::CCreateTenantInvitationPayload CRemoteTenantMembershipManagerControllerComp::OnCreateTenantInvitation(
 			const sdl::imtauth::TenantMemberships::CCreateTenantInvitationGqlRequest& /*request*/,
 			const ::imtgql::CGqlRequest& gqlRequest,
@@ -162,24 +153,6 @@ sdl::imtauth::TenantMemberships::CUpdateMembershipRolePayload CRemoteTenantMembe
 			QString& errorMessage) const
 {
 	return SendModelRequest<sdl::imtauth::TenantMemberships::CUpdateMembershipRolePayload>(gqlRequest, errorMessage);
-}
-
-
-sdl::imtauth::TenantMemberships::CAcceptTenantMembershipInvitationPayload CRemoteTenantMembershipManagerControllerComp::OnAcceptTenantMembershipInvitation(
-			const sdl::imtauth::TenantMemberships::CAcceptTenantMembershipInvitationGqlRequest& /*request*/,
-			const ::imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
-{
-	return SendModelRequest<sdl::imtauth::TenantMemberships::CAcceptTenantMembershipInvitationPayload>(gqlRequest, errorMessage);
-}
-
-
-sdl::imtauth::TenantMemberships::CRejectTenantMembershipInvitationPayload CRemoteTenantMembershipManagerControllerComp::OnRejectTenantMembershipInvitation(
-			const sdl::imtauth::TenantMemberships::CRejectTenantMembershipInvitationGqlRequest& /*request*/,
-			const ::imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
-{
-	return SendModelRequest<sdl::imtauth::TenantMemberships::CRejectTenantMembershipInvitationPayload>(gqlRequest, errorMessage);
 }
 
 
