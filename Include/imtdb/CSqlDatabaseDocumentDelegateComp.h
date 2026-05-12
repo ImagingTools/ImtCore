@@ -158,6 +158,7 @@ protected:
 	virtual QString CreateJsonExtractSql(const QString& jsonName, const QString& key, QMetaType::Type metaType = QMetaType::QString, const QString& tableAlias = QString()) const;
 	virtual QString CreateTenantBindingTableName() const;
 	virtual QByteArray CreateTenantBindingTableInitializationQuery() const;
+	virtual void EnsureTenantBindingTableExists() const;
 	virtual QString CreateTenantBindingFilterQuery(const QByteArray& tenantId) const;
 	virtual QByteArray CreateTenantBindingInsertQuery(const QByteArray& tenantId, const QByteArray& entityId, const imtbase::IOperationContext* operationContextPtr) const;
 

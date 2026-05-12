@@ -1140,6 +1140,28 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateTenantBindingTableInitializat
 }
 
 
+void CSqlDatabaseDocumentDelegateComp::EnsureTenantBindingTableExists() const
+{
+	if (!m_databaseEngineCompPtr.IsValid()){
+		return;
+	}
+
+	QByteArray initQuery = CreateTenantBindingTableInitializationQuery();
+	if (initQuery.isEmpty()){
+		return;
+	}
+
+	QSqlError sqlError;
+	m_databaseEngineCompPtr->ExecSqlQuery(initQuery, &sqlError);
+
+	if (sqlError.type() != QSqlError::NoError){
+		qWarning() << __FILE__ << __LINE__
+					<< "\n\t| TenantEntityBindings table could not be initialized"
+					<< "\n\t| Error: " << sqlError;
+	}
+}
+
+
 QString CSqlDatabaseDocumentDelegateComp::CreateTenantBindingFilterQuery(const QByteArray& tenantId) const
 {
 	const QString bindingsTableName = CreateTenantBindingTableName();
@@ -1207,7 +1229,9 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateTenantBindingInsertQuery(
 					ownerId.isEmpty() ? QStringLiteral("NULL") : QString("'%1'").arg(SqlEncode(QString::fromUtf8(ownerId))),
 					onConflictClause);
 
-	return CreateTenantBindingTableInitializationQuery() + query.toUtf8();
+	EnsureTenantBindingTableExists();
+
+	return query.toUtf8();
 }
 
 
@@ -1429,6 +1453,8 @@ bool CSqlDatabaseDocumentDelegateComp::CreateFilterQuery(const iprm::IParamsSet&
 	if (paramIds.contains("TenantFilter")){
 		iprm::TParamsPtr<imtauth::ITenantFilterParam> tenantFilterPtr(&filterParams, "TenantFilter");
 		if (tenantFilterPtr.IsValid()){
+			EnsureTenantBindingTableExists();
+
 			QByteArray tenantId = tenantFilterPtr->GetTenantId();
 			tenantFilterQuery = CreateTenantBindingFilterQuery(tenantId);
 		}
