@@ -8,7 +8,6 @@ import imtguigql 1.0
 import imtdocgui 1.0
 import imtauthgui 1.0
 import imtauthTenantsSdl 1.0
-import imtauthTenantMembershipsSdl 1.0
 import imtauthTenantCollectionDocumentManagerSdl 1.0
 import imtbaseCollectionDocumentManagerSdl 1.0
 import imtbaseUndoManagerSdl 1.0
@@ -21,202 +20,11 @@ RemoteCollectionView {
 	gqlGetListCommandId: ImtauthTenantsSdlCommandIds.s_getTenantList
 	documentCollectionFilter: null
 
-	// --- Pending invitations for the current user ---
-	property var myPendingInvitations: []
-
-	function loadMyPendingInvitations() {
-		getMyInvitationsInput.m_statuses = ["Pending"]
-		getMyInvitationsSender.send(getMyInvitationsInput)
-	}
-
-	function __removeMyInvitation(invitationId) {
-		var updated = []
-		for (var i = 0; i < container.myPendingInvitations.length; i++) {
-			if (container.myPendingInvitations[i].id !== invitationId)
-				updated.push(container.myPendingInvitations[i])
-		}
-		container.myPendingInvitations = updated
-	}
-
-	property GetMyTenantInvitationsInput getMyInvitationsInput: GetMyTenantInvitationsInput {}
-	property GqlSdlRequestSender getMyInvitationsSender: GqlSdlRequestSender {
-		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_getMyTenantInvitations
-		sdlObjectComp: Component {
-			GetMyTenantInvitationsPayload {
-				onFinished: {
-					var invitations = []
-					if (m_invitations) {
-						var count = m_invitations.count || 0
-						for (var i = 0; i < count; i++) {
-							var inv = m_invitations.get(i).item
-							if (inv) {
-								invitations.push({
-									id: inv.m_id || "",
-									tenantId: inv.m_tenantId || "",
-									tenantName: inv.m_tenantName || inv.m_tenantId || "",
-									role: inv.m_role || "Member",
-									createdAt: inv.m_createdAt || ""
-								})
-							}
-						}
-					}
-					container.myPendingInvitations = invitations
-				}
-			}
-		}
-	}
-
-	property AcceptTenantInvitationInput acceptInvitationInput: AcceptTenantInvitationInput {}
-	property GqlSdlRequestSender acceptInvitationSender: GqlSdlRequestSender {
-		requestType: 1
-		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_acceptTenantInvitation
-		sdlObjectComp: Component {
-			AcceptTenantInvitationPayload {
-				onFinished: {
-					if (m_success) {
-						container.__removeMyInvitation(container.acceptInvitationInput.m_invitationId)
-						container.doUpdateGui()
-					}
-					else if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
-					}
-				}
-			}
-		}
-
-		function onError(message, type) {
-			ModalDialogManager.showInfoDialog(message)
-		}
-	}
-
-	property RejectTenantInvitationInput rejectInvitationInput: RejectTenantInvitationInput {}
-	property GqlSdlRequestSender rejectInvitationSender: GqlSdlRequestSender {
-		requestType: 1
-		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_rejectTenantInvitation
-		sdlObjectComp: Component {
-			RejectTenantInvitationPayload {
-				onFinished: {
-					if (m_success) {
-						container.__removeMyInvitation(container.rejectInvitationInput.m_invitationId)
-					}
-					else if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
-					}
-				}
-			}
-		}
-
-		function onError(message, type) {
-			ModalDialogManager.showInfoDialog(message)
-		}
-	}
-
 	Component.onCompleted: {
 		table.setSortingInfo(TenantItemDataTypeMetaInfo.s_createdAt, "DESC")
 		table.nonSortableColumns = [TenantItemDataTypeMetaInfo.s_ownerId, TenantItemDataTypeMetaInfo.s_isActive, TenantItemDataTypeMetaInfo.s_membersCount]
 		registerFieldFilterDelegate("isActiveFilter", isActiveDelegateFilterComp)
 		registerFieldFilterDelegate("tenantRelationFilter", tenantRelationDelegateFilterComp)
-		loadMyPendingInvitations()
-	}
-
-	// --- Pending Invitations Panel (above the table) ---
-	Item {
-		id: pendingInvitationsPanel
-		anchors.left: parent.left
-		anchors.right: parent.right
-		anchors.top: parent.top
-		height: visible ? pendingInvitationsColumn.height + 2 * Style.marginM : 0
-		visible: container.myPendingInvitations.length > 0
-		z: 10
-
-		Rectangle {
-			anchors.fill: parent
-			color: Style.baseColor
-			border.color: Style.borderColor
-			border.width: 1
-		}
-
-		Column {
-			id: pendingInvitationsColumn
-			anchors.left: parent.left
-			anchors.right: parent.right
-			anchors.top: parent.top
-			anchors.margins: Style.marginM
-			spacing: Style.marginS
-
-			BaseText {
-				font.pixelSize: Style.fontSizeL
-				font.bold: true
-				text: qsTr("Pending Invitations")
-			}
-
-			Repeater {
-				model: container.myPendingInvitations
-
-				delegate: Rectangle {
-					width: pendingInvitationsColumn.width
-					height: Style.controlHeightL
-					color: invitationMouseArea.containsMouse ? Style.hoveredColor : "transparent"
-					radius: Style.radiusS
-
-					MouseArea {
-						id: invitationMouseArea
-						anchors.fill: parent
-						hoverEnabled: true
-					}
-
-					Row {
-						anchors.fill: parent
-						anchors.leftMargin: Style.marginM
-						anchors.rightMargin: Style.marginM
-						spacing: Style.marginL
-
-						BaseText {
-							width: (parent.width - acceptBtn.width - rejectBtn.width - parent.spacing * 3) * 0.5
-							anchors.verticalCenter: parent.verticalCenter
-							text: modelData.tenantName
-							elide: Text.ElideRight
-							font.pixelSize: Style.fontSizeM
-						}
-
-						BaseText {
-							width: (parent.width - acceptBtn.width - rejectBtn.width - parent.spacing * 3) * 0.5
-							anchors.verticalCenter: parent.verticalCenter
-							text: qsTr("Role: %1").arg(modelData.role)
-							elide: Text.ElideRight
-							font.pixelSize: Style.fontSizeM
-							color: Style.secondaryTextColor
-						}
-
-						Button {
-							id: acceptBtn
-							anchors.verticalCenter: parent.verticalCenter
-							width: Style.buttonWidthL
-							height: Style.controlHeightM
-							text: qsTr("Accept")
-
-							onClicked: {
-								container.acceptInvitationInput.m_invitationId = modelData.id
-								container.acceptInvitationSender.send(container.acceptInvitationInput)
-							}
-						}
-
-						Button {
-							id: rejectBtn
-							anchors.verticalCenter: parent.verticalCenter
-							width: Style.buttonWidthL
-							height: Style.controlHeightM
-							text: qsTr("Reject")
-
-							onClicked: {
-								container.rejectInvitationInput.m_invitationId = modelData.id
-								container.rejectInvitationSender.send(container.rejectInvitationInput)
-							}
-						}
-					}
-				}
-			}
-		}
 	}
 
 	onHeadersChanged: {
@@ -339,8 +147,10 @@ RemoteCollectionView {
 			Component.onCompleted: {
 				createAndAddOption("owner", qsTr("I am owner"), "", true)
 				createAndAddOption("member", qsTr("I am member"), "", true)
+				createAndAddOption("invited", qsTr("I am invited"), "", true)
 				setFieldFilterForOption("owner", ownerFieldFilterComp.createObject(this))
 				setFieldFilterForOption("member", memberFieldFilterComp.createObject(this))
+				setFieldFilterForOption("invited", invitedFieldFilterComp.createObject(this))
 			}
 
 			Component {
@@ -360,6 +170,16 @@ RemoteCollectionView {
 					m_filterValueType: "String"
 					m_filterOperations: ["Equal"]
 					m_filterValue: "Member"
+				}
+			}
+
+			Component {
+				id: invitedFieldFilterComp
+				FieldFilter {
+					m_fieldId: "TenantRelationScope"
+					m_filterValueType: "String"
+					m_filterOperations: ["Equal"]
+					m_filterValue: "Invited"
 				}
 			}
 		}

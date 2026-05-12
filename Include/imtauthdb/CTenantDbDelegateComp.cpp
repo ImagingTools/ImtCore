@@ -10,6 +10,7 @@
 #include <imtauth/ITenantInfo.h>
 #include <iprm/IIdParam.h>
 #include <iprm/TParamsPtr.h>
+#include <imtbase/IComplexCollectionFilter.h>
 #include <imtdb/CDatabaseEngineComp.h>
 #include <imtdb/imtdb.h>
 #include <idoc/CStandardDocumentMetaInfo.h>
@@ -242,14 +243,78 @@ QString CTenantDbDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsS
 			QByteArray userId = userIdParamPtr->GetId();
 			if (!userId.isEmpty()){
 				QString escapedUserId = imtdb::EscapeSql(QString::fromUtf8(userId));
-				return QString("(\"OwnerId\"='%1' OR \"Id\" IN "
-					"(SELECT \"TenantId\" FROM \"TenantMemberships\" WHERE \"UserId\"='%1' AND \"IsActive\"=true))")
-					.arg(escapedUserId);
+
+				// Check if ComplexFilter contains a TenantRelationScope field filter
+				QString scopeValue;
+				if (paramIds.contains("ComplexFilter")){
+					iprm::TParamsPtr<imtbase::IComplexCollectionFilter> complexFilterPtr(&filterParams, "ComplexFilter");
+					if (complexFilterPtr.IsValid()){
+						const imtbase::IComplexCollectionFilter::FilterExpression& expr = complexFilterPtr->GetFilterExpression();
+						for (const imtbase::IComplexCollectionFilter::FieldFilter& ff : expr.fieldFilters){
+							if (ff.fieldId == "TenantRelationScope"){
+								scopeValue = ff.filterValue.toString();
+								break;
+							}
+						}
+					}
+				}
+
+				if (scopeValue == "Owner"){
+					return QString("\"OwnerId\"='%1'").arg(escapedUserId);
+				}
+				else if (scopeValue == "Member"){
+					return QString("\"Id\" IN "
+						"(SELECT \"TenantId\" FROM \"TenantMemberships\" WHERE \"UserId\"='%1' AND \"IsActive\"=true)")
+						.arg(escapedUserId);
+				}
+				else if (scopeValue == "Invited"){
+					return QString("\"Id\" IN "
+						"(SELECT \"TenantId\" FROM \"TenantInvitations\" WHERE \"UserId\"='%1' AND \"Status\"=0)")
+						.arg(escapedUserId);
+				}
+				else{
+					// Default: show tenants where user is owner, member, or invited
+					return QString("(\"OwnerId\"='%1' OR \"Id\" IN "
+						"(SELECT \"TenantId\" FROM \"TenantMemberships\" WHERE \"UserId\"='%1' AND \"IsActive\"=true) OR \"Id\" IN "
+						"(SELECT \"TenantId\" FROM \"TenantInvitations\" WHERE \"UserId\"='%1' AND \"Status\"=0))")
+						.arg(escapedUserId);
+				}
 			}
 		}
 	}
 
 	return QString();
+}
+
+
+bool CTenantDbDelegateComp::CreateObjectFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& filterQuery) const
+{
+	// Call base implementation
+	if (!BaseClass::CreateObjectFilterQuery(collectionFilter, filterQuery)){
+		return false;
+	}
+
+	// Remove TenantRelationScope clauses from the generated SQL (handled in CreateAdditionalFiltersQuery)
+	if (filterQuery.contains("TenantRelationScope")){
+		// The converter generates: ("TenantRelationScope")::text = 'Value'
+		// It may be combined with AND/OR. Best to regenerate without TenantRelationScope.
+		const imtbase::IComplexCollectionFilter::FilterExpression& originalExpr = collectionFilter.GetFilterExpression();
+
+		bool hasTenantRelationScope = false;
+		for (const imtbase::IComplexCollectionFilter::FieldFilter& ff : originalExpr.fieldFilters){
+			if (ff.fieldId == "TenantRelationScope"){
+				hasTenantRelationScope = true;
+				break;
+			}
+		}
+
+		if (hasTenantRelationScope && originalExpr.fieldFilters.size() == 1 && originalExpr.filterExpressions.isEmpty()){
+			// Only filter is TenantRelationScope — clear the query entirely
+			filterQuery.clear();
+		}
+	}
+
+	return true;
 }
 
 
