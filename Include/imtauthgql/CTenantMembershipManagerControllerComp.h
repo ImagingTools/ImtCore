@@ -6,6 +6,7 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
+#include <imtauth/ITenantManager.h>
 #include <imtauth/ITenantMembershipManager.h>
 #include <imtauth/ITenantInvitationManager.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/TenantMemberships.h>
@@ -23,6 +24,7 @@ public:
 	I_BEGIN_COMPONENT(CTenantMembershipManagerControllerComp);
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager providing CRUD operations", true, "TenantMembershipManager");
 		I_ASSIGN(m_invitationManagerCompPtr, "InvitationManager", "Tenant invitation manager providing invitation lifecycle operations", true, "TenantInvitationManager");
+		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager for resolving tenant names", false, "TenantManager");
 	I_END_COMPONENT;
 
 protected:
@@ -95,6 +97,7 @@ protected:
 private:
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
 	I_REF(imtauth::ITenantInvitationManager, m_invitationManagerCompPtr);
+	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
 };
 
 

@@ -2,6 +2,7 @@
 #include <imtauthgql/CTenantMembershipManagerControllerComp.h>
 
 // ImtCore includes
+#include <imtauth/ITenantInfo.h>
 #include <imtgql/IGqlContext.h>
 
 
@@ -304,7 +305,14 @@ sdl::imtauth::TenantMemberships::CGetTenantInvitationsPayload CTenantMembershipM
 	for (const QByteArray& invitationId : m_invitationManagerCompPtr->GetInvitationsByTenant(tenantId, statuses)){
 		imtauth::ITenantInvitationUniquePtr invitationPtr = m_invitationManagerCompPtr->GetInvitation(invitationId);
 		if (invitationPtr.IsValid()){
-			response.Version_1_0->invitations->push_back(ToTenantInvitationData(*invitationPtr, m_invitationManagerCompPtr->GetEffectiveStatus(*invitationPtr)));
+			sdl::imtauth::TenantMemberships::CTenantInvitationData::V1_0 data = ToTenantInvitationData(*invitationPtr, m_invitationManagerCompPtr->GetEffectiveStatus(*invitationPtr));
+			if (m_tenantManagerCompPtr.IsValid()){
+				imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(invitationPtr->GetTenantId());
+				if (tenantPtr.IsValid()){
+					data.tenantName = tenantPtr->GetTenantName();
+				}
+			}
+			response.Version_1_0->invitations->push_back(data);
 		}
 	}
 
@@ -337,7 +345,14 @@ sdl::imtauth::TenantMemberships::CGetMyTenantInvitationsPayload CTenantMembershi
 	for (const QByteArray& invitationId : m_invitationManagerCompPtr->GetInvitationsByUser(ContextUserId(gqlRequest), statuses)){
 		imtauth::ITenantInvitationUniquePtr invitationPtr = m_invitationManagerCompPtr->GetInvitation(invitationId);
 		if (invitationPtr.IsValid()){
-			response.Version_1_0->invitations->push_back(ToTenantInvitationData(*invitationPtr, m_invitationManagerCompPtr->GetEffectiveStatus(*invitationPtr)));
+			sdl::imtauth::TenantMemberships::CTenantInvitationData::V1_0 data = ToTenantInvitationData(*invitationPtr, m_invitationManagerCompPtr->GetEffectiveStatus(*invitationPtr));
+			if (m_tenantManagerCompPtr.IsValid()){
+				imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(invitationPtr->GetTenantId());
+				if (tenantPtr.IsValid()){
+					data.tenantName = tenantPtr->GetTenantName();
+				}
+			}
+			response.Version_1_0->invitations->push_back(data);
 		}
 	}
 

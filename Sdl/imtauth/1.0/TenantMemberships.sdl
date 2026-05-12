@@ -53,6 +53,7 @@ type TenantInvitationData {
 	id: ID
 	userId: ID
 	tenantId: ID
+	tenantName: String
 	role: TenantMemberRole
 	status: TenantInvitationStatus
 	invitedByUserId: ID
