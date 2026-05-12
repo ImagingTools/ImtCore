@@ -26,6 +26,8 @@ ElementView {
 	property string emptyText: qsTr("No items")
 	// Whether to show selected count next to the label
 	property bool showCount: false
+	// List of item IDs that cannot be removed
+	property var nonRemovableIds: []
 
 	// Chip colors (matching TicketEditor accent palette)
 	readonly property string accentColor: "#5b8fd6"
@@ -175,7 +177,7 @@ ElementView {
 
 						ToolButton {
 							id: chipRemove
-							visible: root.editable
+							visible: root.editable && root.nonRemovableIds.indexOf(modelData.id) < 0
 							anchors.right: parent.right
 							anchors.verticalCenter: parent.verticalCenter
 							iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)

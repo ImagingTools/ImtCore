@@ -352,6 +352,7 @@ DocumentViewBase {
 				collectionId: "Users"
 				emptyText: qsTr("No members")
 				showCount: true
+				nonRemovableIds: container.tenantData && container.tenantData.m_ownerId ? [container.tenantData.m_ownerId] : []
 
 				onItemRemoved: {
 					container.pendingMembers = membersSelector.items.slice()
@@ -486,6 +487,8 @@ DocumentViewBase {
 							width: parent.width
 							height: Style.controlHeightM + container.totalMemberRoleRowMargin
 
+							readonly property bool isOwner: container.tenantData && modelData.userId === container.tenantData.m_ownerId
+
 							Row {
 								anchors.fill: parent
 								anchors.margins: container.memberRoleRowMargin
@@ -505,6 +508,7 @@ DocumentViewBase {
 									model: container.__getAvailableRolesModel()
 									nameId: "name"
 									currentIndex: container.__findRoleIndex(modelData.role)
+									enabled: !isOwner
 
 									onFinished: {
 										var selectedIndex = index

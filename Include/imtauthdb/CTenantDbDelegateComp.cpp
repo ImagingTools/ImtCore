@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtCore/QDateTime>
+#include <QtCore/QRegularExpression>
 #include <QtCore/QUuid>
 #include <QtSql/QSqlRecord>
 
@@ -278,7 +279,7 @@ QString CTenantDbDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsS
 				}
 				else if (scopeValue == "Invited"){
 					return QString("\"Id\" IN "
-						"(SELECT \"TenantId\" FROM \"TenantInvitations\" WHERE \"UserId\"='%1' AND \"Status\"=%2)")
+						"(SELECT \"TenantId\"::uuid FROM \"TenantInvitations\" WHERE \"UserId\"='%1' AND \"Status\"=%2)")
 						.arg(escapedUserId)
 						.arg(s_invitationStatusPending);
 				}
@@ -286,7 +287,7 @@ QString CTenantDbDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsS
 					// Default: show tenants where user is owner, member, or invited
 					return QString("(\"OwnerId\"='%1' OR \"Id\" IN "
 						"(SELECT \"TenantId\" FROM \"TenantMemberships\" WHERE \"UserId\"='%1' AND \"IsActive\"=true) OR \"Id\" IN "
-						"(SELECT \"TenantId\" FROM \"TenantInvitations\" WHERE \"UserId\"='%1' AND \"Status\"=%2))")
+						"(SELECT \"TenantId\"::uuid FROM \"TenantInvitations\" WHERE \"UserId\"='%1' AND \"Status\"=%2))")
 						.arg(escapedUserId)
 						.arg(s_invitationStatusPending);
 				}
@@ -300,29 +301,50 @@ QString CTenantDbDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsS
 
 bool CTenantDbDelegateComp::CreateObjectFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& filterQuery) const
 {
-	// Call base implementation
+	// Strip TenantRelationScope from the filter expression before generating SQL —
+	// it is a virtual field handled by CreateAdditionalFiltersQuery, not a real column.
+	const imtbase::IComplexCollectionFilter::FilterExpression& originalExpr = collectionFilter.GetFilterExpression();
+
+	bool hasTenantRelationScope = false;
+	for (const imtbase::IComplexCollectionFilter::FieldFilter& ff : originalExpr.fieldFilters){
+		if (ff.fieldId == s_tenantRelationScopeFieldId){
+			hasTenantRelationScope = true;
+			break;
+		}
+	}
+
+	if (!hasTenantRelationScope){
+		// No virtual field — use base implementation as-is
+		return BaseClass::CreateObjectFilterQuery(collectionFilter, filterQuery);
+	}
+
+	// Let the base class generate the full SQL, then strip TenantRelationScope clauses
 	if (!BaseClass::CreateObjectFilterQuery(collectionFilter, filterQuery)){
 		return false;
 	}
 
-	// Remove TenantRelationScope clauses from the generated SQL (handled in CreateAdditionalFiltersQuery)
-	if (filterQuery.contains(s_tenantRelationScopeFieldId)){
-		// The converter generates: ("TenantRelationScope")::text = 'Value'
-		// It may be combined with AND/OR. Best to regenerate without TenantRelationScope.
-		const imtbase::IComplexCollectionFilter::FilterExpression& originalExpr = collectionFilter.GetFilterExpression();
+	if (filterQuery.isEmpty()){
+		return true;
+	}
 
-		bool hasTenantRelationScope = false;
-		for (const imtbase::IComplexCollectionFilter::FieldFilter& ff : originalExpr.fieldFilters){
-			if (ff.fieldId == s_tenantRelationScopeFieldId){
-				hasTenantRelationScope = true;
-				break;
-			}
-		}
+	// The converter generates clauses like: ("TenantRelationScope")::text = 'Value'
+	// These need to be removed since it's not a real column.
+	// Strategy: remove the TenantRelationScope clause and any surrounding AND/OR connector.
+	// Pattern in Postgres context: ("TenantRelationScope")::text = 'Value'
+	static const QRegularExpression tenantScopeClauseRe(
+		QStringLiteral(R"(\s*(?:AND|OR)\s+\(\"TenantRelationScope\"\)::text\s*=\s*'[^']*')")
+		+ QStringLiteral("|")
+		+ QStringLiteral(R"(\(\"TenantRelationScope\"\)::text\s*=\s*'[^']*'\s*(?:AND|OR)\s*)")
+		+ QStringLiteral("|")
+		+ QStringLiteral(R"(\(\"TenantRelationScope\"\)::text\s*=\s*'[^']*')")
+	);
 
-		if (hasTenantRelationScope && originalExpr.fieldFilters.size() == 1 && originalExpr.filterExpressions.isEmpty()){
-			// Only filter is TenantRelationScope — clear the query entirely
-			filterQuery.clear();
-		}
+	filterQuery.replace(tenantScopeClauseRe, QString());
+	filterQuery = filterQuery.trimmed();
+
+	// If the entire filter was just TenantRelationScope, clear it
+	if (filterQuery.isEmpty() || filterQuery == "()" || filterQuery == "( )"){
+		filterQuery.clear();
 	}
 
 	return true;
