@@ -5,20 +5,16 @@ include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
 # Qt modules matching QMake's QT += gui-private opengl openglwidgets:
 # - GuiPrivate  : exposes <rhi/qrhi.h> (private QRhi API used by CRhiRenderBackend).
-#                 For Qt 6.8+ we only need the private include directories without
-#                 linking the GuiPrivate module.  For older versions fall back to the
-#                 full target_link_libraries approach.
+#                 For Qt 6.8+ rhi/qrhi.h is a public header of Qt::Gui, so we link
+#                 Qt::Gui directly.  For older versions fall back to GuiPrivate.
 # - OpenGL / OpenGLWidgets : QOpenGLBuffer, QOpenGLShaderProgram, QOpenGLWidget
 #                            (headers moved from QtGui to separate modules in Qt 6)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS OpenGL OpenGLWidgets REQUIRED)
 
 if(QT_VERSION VERSION_GREATER_EQUAL "6.8.0")
-    # Use generator expression so that Qt's include paths (which contain
-    # $<BUILD_INTERFACE:…> / $<INSTALL_INTERFACE:…>) are resolved correctly
-    # at build time.  This exposes <rhi/qrhi.h> without linking GuiPrivate.
-    target_include_directories(${PROJECT_NAME} PRIVATE
-        $<TARGET_PROPERTY:Qt${QT_VERSION_MAJOR}::Gui,INTERFACE_INCLUDE_DIRECTORIES>
-    )
+    # In Qt 6.8+, rhi/qrhi.h is a public header of Qt::Gui.
+    # Link Qt::Gui to get its include directories (exposes <rhi/qrhi.h>).
+    target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::Gui)
 else()
     target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::GuiPrivate)
 endif()
