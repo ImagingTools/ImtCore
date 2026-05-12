@@ -265,6 +265,12 @@ QByteArray CTenantDbDelegateComp::ExtractUserId(const iprm::IParamsSet* paramsPt
 QString CTenantDbDelegateComp::GetTenantRelationScopeSubquery(const QByteArray& userId) const
 {
 	QString tableName = qPrintable(*m_tableNameAttrPtr);
+
+	// For admin users (no userId), add NULL column so filters referencing it don't cause SQL errors
+	if (userId.isEmpty()){
+		return QString("SELECT *, NULL AS \"TenantRelationScope\" FROM \"%1\"").arg(tableName);
+	}
+
 	QString escapedUserId = imtdb::EscapeSql(QString::fromUtf8(userId));
 
 	return QString(
@@ -294,9 +300,6 @@ QByteArray CTenantDbDelegateComp::GetSelectionQuery(
 	}
 
 	QByteArray userId = ExtractUserId(paramsPtr);
-	if (userId.isEmpty()){
-		return BaseClass::GetSelectionQuery(objectId, offset, count, paramsPtr);
-	}
 
 	if (count == 0){
 		return QByteArray();
@@ -353,9 +356,6 @@ QByteArray CTenantDbDelegateComp::GetSelectionQuery(
 QByteArray CTenantDbDelegateComp::GetCountQuery(const iprm::IParamsSet* paramsPtr) const
 {
 	QByteArray userId = ExtractUserId(paramsPtr);
-	if (userId.isEmpty()){
-		return BaseClass::GetCountQuery(paramsPtr);
-	}
 
 	QString filterQuery;
 	if (paramsPtr != nullptr){
