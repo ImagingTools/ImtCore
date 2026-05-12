@@ -72,7 +72,6 @@ module.exports.listComponents = [
     // Popup components (Qt Quick Controls)
     'Popup',
     'Overlay',
-    'Dialog',
     'ToolTip',
     'Drawer',
     // 3D (Qt Quick 3D analogs, Web runtime backed by Three.js, lazy-loaded)

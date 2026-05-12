@@ -368,7 +368,6 @@ global.JQModules = {
         MenuBarItem: __components.MenuBarItem,
         Popup: __components.Popup,
         Overlay: __components.Overlay,
-        Dialog: __components.Dialog,
         ToolTip: __components.ToolTip,
         Drawer: __components.Drawer,
     },
