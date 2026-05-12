@@ -84,6 +84,20 @@ bool CTenantCollectionControllerComp::CreateRepresentationFromObject(
 		representationObject.membersCount = activeMembersCount;
 	}
 
+	if (requestInfo.items.isTenantRelationScopeRequested){
+		QVariant scope = objectCollectionIterator.GetElementInfo("TenantRelationScope");
+		if (scope.isValid() && !scope.isNull()){
+			representationObject.tenantRelationScope = scope.toString();
+		}
+	}
+
+	if (requestInfo.items.isInvitationIdRequested){
+		QVariant invId = objectCollectionIterator.GetElementInfo("InvitationId");
+		if (invId.isValid() && !invId.isNull()){
+			representationObject.invitationId = invId.toByteArray();
+		}
+	}
+
 	return true;
 }
 

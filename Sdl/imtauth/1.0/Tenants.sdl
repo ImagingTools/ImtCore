@@ -22,6 +22,8 @@ type TenantItemData {
 	membersCount: Int
 	createdAt: String
 	updatedAt: String
+	tenantRelationScope: String
+	invitationId: ID
 }
 
 type TenantMemberEntry {

@@ -12,6 +12,7 @@ import imtauthTenantCollectionDocumentManagerSdl 1.0
 import imtbaseCollectionDocumentManagerSdl 1.0
 import imtbaseUndoManagerSdl 1.0
 import imtbaseComplexCollectionFilterSdl 1.0
+import imtauthTenantMembershipsSdl 1.0
 
 RemoteCollectionView {
 	id: container
@@ -19,10 +20,11 @@ RemoteCollectionView {
 	collectionId: "Tenants"
 	gqlGetListCommandId: ImtauthTenantsSdlCommandIds.s_getTenantList
 	documentCollectionFilter: null
+	additionalFieldIds: ["id", "name", TenantItemDataTypeMetaInfo.s_tenantRelationScope, TenantItemDataTypeMetaInfo.s_invitationId]
 
 	Component.onCompleted: {
 		table.setSortingInfo(TenantItemDataTypeMetaInfo.s_createdAt, "DESC")
-		table.nonSortableColumns = [TenantItemDataTypeMetaInfo.s_ownerId, TenantItemDataTypeMetaInfo.s_isActive, TenantItemDataTypeMetaInfo.s_membersCount]
+		table.nonSortableColumns = [TenantItemDataTypeMetaInfo.s_ownerId, TenantItemDataTypeMetaInfo.s_isActive, TenantItemDataTypeMetaInfo.s_membersCount, TenantItemDataTypeMetaInfo.s_tenantRelationScope, TenantItemDataTypeMetaInfo.s_invitationId]
 		registerFieldFilterDelegate("isActiveFilter", isActiveDelegateFilterComp)
 		registerFieldFilterDelegate("tenantRelationFilter", tenantRelationDelegateFilterComp)
 	}
@@ -33,6 +35,162 @@ RemoteCollectionView {
 		table.setColumnContentById(TenantItemDataTypeMetaInfo.s_createdAt, createdAtCellDelegateComp)
 		table.setColumnContentById(TenantItemDataTypeMetaInfo.s_updatedAt, updatedAtCellDelegateComp)
 		table.setColumnContentById(TenantItemDataTypeMetaInfo.s_isActive, isActiveCellDelegateComp)
+		table.setColumnContentById(TenantItemDataTypeMetaInfo.s_tenantRelationScope, tenantRelationScopeCellDelegateComp)
+		table.setColumnContentById(TenantItemDataTypeMetaInfo.s_invitationId, hiddenCellDelegateComp)
+	}
+
+	function acceptInvitation(invitationId) {
+		acceptInvitationInput.m_invitationId = invitationId
+		acceptInvitationSender.send(acceptInvitationInput)
+	}
+
+	function rejectInvitation(invitationId) {
+		rejectInvitationInput.m_invitationId = invitationId
+		rejectInvitationSender.send(rejectInvitationInput)
+	}
+
+	property AcceptTenantInvitationInput acceptInvitationInput: AcceptTenantInvitationInput {}
+	property GqlSdlRequestSender acceptInvitationSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_acceptTenantInvitation
+		sdlObjectComp: Component {
+			AcceptTenantInvitationPayload {
+				onFinished: {
+					if (m_success) {
+						container.doUpdateModel()
+					} else if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+					}
+				}
+			}
+		}
+
+		function onError(message, type) {
+			ModalDialogManager.showInfoDialog(message)
+		}
+	}
+
+	property RejectTenantInvitationInput rejectInvitationInput: RejectTenantInvitationInput {}
+	property GqlSdlRequestSender rejectInvitationSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_rejectTenantInvitation
+		sdlObjectComp: Component {
+			RejectTenantInvitationPayload {
+				onFinished: {
+					if (m_success) {
+						container.doUpdateModel()
+					} else if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+					}
+				}
+			}
+		}
+
+		function onError(message, type) {
+			ModalDialogManager.showInfoDialog(message)
+		}
+	}
+
+	Component {
+		id: tenantRelationScopeCellDelegateComp
+		TableCellDelegateBase {
+			id: tenantRelationScopeDelegate
+
+			property string scopeValue: ""
+			property string invitationIdValue: ""
+
+			onReused: {
+				var val = tenantRelationScopeDelegate.getValue()
+				scopeValue = val !== undefined && val !== null ? val.toString() : ""
+
+				if (tenantRelationScopeDelegate.rowDelegate && tenantRelationScopeDelegate.rowDelegate.dataModel) {
+					var invId = ""
+					if ("item" in tenantRelationScopeDelegate.rowDelegate.dataModel) {
+						invId = tenantRelationScopeDelegate.rowDelegate.dataModel.item.m_invitationId || ""
+					}
+					invitationIdValue = invId.toString()
+				}
+			}
+
+			Row {
+				anchors.verticalCenter: parent.verticalCenter
+				anchors.left: parent.left
+				anchors.leftMargin: Style.marginM
+				anchors.right: parent.right
+				anchors.rightMargin: Style.marginM
+				spacing: Style.spacingS
+				visible: tenantRelationScopeDelegate.scopeValue === "Invited"
+
+				Rectangle {
+					width: acceptLabel.implicitWidth + 2 * Style.marginM
+					height: Style.controlHeightS
+					radius: Style.radiusM
+					color: "#3FB950"
+					anchors.verticalCenter: parent.verticalCenter
+
+					Text {
+						id: acceptLabel
+						anchors.centerIn: parent
+						text: qsTr("Accept")
+						font.pixelSize: Style.fontSizeS
+						color: "#FFFFFF"
+					}
+
+					MouseArea {
+						anchors.fill: parent
+						cursorShape: Qt.PointingHandCursor
+						onClicked: {
+							if (tenantRelationScopeDelegate.invitationIdValue !== "") {
+								container.acceptInvitation(tenantRelationScopeDelegate.invitationIdValue)
+							}
+						}
+					}
+				}
+
+				Rectangle {
+					width: rejectLabel.implicitWidth + 2 * Style.marginM
+					height: Style.controlHeightS
+					radius: Style.radiusM
+					color: "#DA3633"
+					anchors.verticalCenter: parent.verticalCenter
+
+					Text {
+						id: rejectLabel
+						anchors.centerIn: parent
+						text: qsTr("Reject")
+						font.pixelSize: Style.fontSizeS
+						color: "#FFFFFF"
+					}
+
+					MouseArea {
+						anchors.fill: parent
+						cursorShape: Qt.PointingHandCursor
+						onClicked: {
+							if (tenantRelationScopeDelegate.invitationIdValue !== "") {
+								container.rejectInvitation(tenantRelationScopeDelegate.invitationIdValue)
+							}
+						}
+					}
+				}
+			}
+
+			Text {
+				anchors.verticalCenter: parent.verticalCenter
+				anchors.left: parent.left
+				anchors.leftMargin: Style.marginM
+				font.pixelSize: Style.fontSizeM
+				color: Style.textColor
+				text: tenantRelationScopeDelegate.scopeValue
+				visible: tenantRelationScopeDelegate.scopeValue !== "Invited"
+			}
+		}
+	}
+
+	Component {
+		id: hiddenCellDelegateComp
+		TableCellDelegateBase {
+			Item {}
+		}
 	}
 
 	Component {
