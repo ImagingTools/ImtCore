@@ -116,7 +116,6 @@ class Popup extends Item {
     static defaultSignals = {
         aboutToShow: { params: [] },
         aboutToHide: { params: [] },
-        opened: { params: [] },
         closed: { params: [] },
     }
 
