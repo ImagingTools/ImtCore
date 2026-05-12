@@ -329,13 +329,13 @@ class Popup extends Item {
             this.$contentBox.style.top = '50%'
             this.$contentBox.style.transform = 'translate(-50%, -50%)'
         } else {
-            this.$contentBox.style.left = x ? `${x}px` : ''
-            this.$contentBox.style.top = y ? `${y}px` : ''
+            this.$contentBox.style.left = (x != null && x !== '') ? `${x}px` : ''
+            this.$contentBox.style.top = (y != null && y !== '') ? `${y}px` : ''
             this.$contentBox.style.transform = ''
         }
 
-        if (w) this.$contentBox.style.width = `${w}px`
-        if (h) this.$contentBox.style.height = `${h}px`
+        if (w != null && w > 0) this.$contentBox.style.width = `${w}px`
+        if (h != null && h > 0) this.$contentBox.style.height = `${h}px`
     }
 
     $applyPadding(){
