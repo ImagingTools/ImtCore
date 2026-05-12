@@ -68,7 +68,13 @@ CDM::CDocumentInfo CCollectionDocumentManagerControllerComp::OnCreateNewDocument
 	}
 
 	if (m_documentManagerCompPtr.IsValid()) {
-		QByteArray documentId = m_documentManagerCompPtr->CreateNewDocument(userId, *documentTypeId->typeId);
+		const QByteArray proposedSourceDocumentId = documentTypeId->proposedSourceDocumentId
+			? *documentTypeId->proposedSourceDocumentId
+			: QByteArray();
+		QByteArray documentId = m_documentManagerCompPtr->CreateNewDocument(
+			userId,
+			*documentTypeId->typeId,
+			proposedSourceDocumentId);
 		if (documentId.isEmpty()){
 			errorMessage = "Unable to create document or undo manager";
 

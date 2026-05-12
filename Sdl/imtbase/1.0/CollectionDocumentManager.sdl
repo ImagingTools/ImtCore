@@ -67,6 +67,7 @@ type DocumentList {
 type DocumentTypeId {
 	collectionId: ID
 	typeId: ID!
+	proposedSourceDocumentId: ID
 }
 
 type DocumentManagerNotification {

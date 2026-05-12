@@ -176,11 +176,6 @@ I_EXPORT_COMPONENT(
 			"Collection Document Manager Publisher");
 
 I_EXPORT_COMPONENT(
-			CollectionDocumentManagerNotificationProxy,
-			"Collection document manager notification proxy",
-			"Collection Document Manager Notification Proxy");
-
-I_EXPORT_COMPONENT(
 			PublisherSubscriberBridge,
 			"Publisher-subscriber bridge",
 			"Publisher Subscriber Bridge");
@@ -202,5 +197,4 @@ I_EXPORT_COMPONENT(
 
 
 } // namespace ImtServerGqlPck
-
 

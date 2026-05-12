@@ -74,8 +74,14 @@ IDocumentManager::DocumentList CDocumentManagerBase::GetOpenedDocumentList(
 }
 
 
-QByteArray CDocumentManagerBase::CreateNewDocument(const QByteArray& userId, const QByteArray& documentTypeId)
+QByteArray CDocumentManagerBase::CreateNewDocument(
+	const QByteArray& userId,
+	const QByteArray& documentTypeId,
+	const QByteArray& proposedSourceDocumentId)
 {
+	// Base implementation creates a blank document; source-based initialization is handled by derived managers if needed.
+	Q_UNUSED(proposedSourceDocumentId);
+
 	QByteArray retVal;
 
 	idoc::IUndoManagerSharedPtr undoManagerPtr = CreateUndoManager();

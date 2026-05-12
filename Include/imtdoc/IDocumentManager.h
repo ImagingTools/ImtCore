@@ -115,7 +115,10 @@ public:
 		Create a document of the given type (documentTypeId) for the given user-ID
 		/return		Document instance ID in the document manager
 	*/
-	virtual QByteArray CreateNewDocument(const QByteArray& userId, const QByteArray& documentTypeId) = 0;
+	virtual QByteArray CreateNewDocument(
+		const QByteArray& userId,
+		const QByteArray& documentTypeId,
+		const QByteArray& proposedSourceDocumentId = QByteArray()) = 0;
 
 	/**
 		Open a document from a given URL for a given user-ID

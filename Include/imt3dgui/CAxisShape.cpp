@@ -100,7 +100,7 @@ void CAxisShape::SetAxisLabel(AxisType axis, const QString& label)
 
 // protected methods
 
-// reimplement (imt3dgui::CShape3dBase)
+// reimplemented (imt3dgui::CShape3dBase)
 
 void CAxisShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet & /*changeSet*/)
 {
@@ -130,24 +130,22 @@ void CAxisShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet & /*chan
 }
 
 
-// reimplement (imt3dgui::IDrawable)
-
-void CAxisShape::DrawShapeGl(QOpenGLShaderProgram& /*program*/, QOpenGLFunctions& functions)
+imt3dview::PrimitiveType CAxisShape::GetPrimitiveType() const
 {
-#ifndef Q_OS_MACOS
-	double lineWidth = m_axisConfigs[AT_X].lineWidth;
-
-	functions.glLineWidth(lineWidth);
-	functions.glDrawElements(GL_LINES, m_indices.count(), GL_UNSIGNED_INT, 0);
-#else
-	Q_UNUSED(functions);
-#endif
+	return imt3dview::PT_LINES;
 }
 
 
-// reimplement (imt3dgui::IDrawable)
+void CAxisShape::FillMaterial(imt3dview::Material& material) const
+{
+	BaseClass::FillMaterial(material);
+	material.lineWidth = static_cast<float>(m_axisConfigs.value(AT_X).lineWidth);
+}
 
-void CAxisShape::Draw(QPainter& painter)
+
+// reimplemented (imt3dgui::IDrawable)
+
+void CAxisShape::DrawOverlay(QPainter& painter)
 {
 	if (!IsVisible()){
 		return;

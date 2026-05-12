@@ -1216,6 +1216,157 @@ class QDrag extends ComplexObject {
     }
 }
 
+// ---------------------------------------------------------------------------
+// 3D value types (Qt Quick 3D analogs).
+// QVector3D / QVector4D / QQuaternion / QMatrix4x4 follow the same QProperty
+// contract as QPoint above: they store a plain object literal value and
+// notify subscribers via .notify when set().
+// They are deliberately not ComplexObjects (no nested QProperty children) so
+// that bindings such as `position: Qt.vector3d(1, 2, 3)` and animations on
+// the whole vector behave like primitive values.
+// ---------------------------------------------------------------------------
+
+class QVector3D extends QProperty {
+    getDefaultValue(){
+        return { x: 0, y: 0, z: 0 }
+    }
+
+    typeCasting(value){
+        if(value === undefined || value === null) return this.getDefaultValue()
+        if(typeof value !== 'object') throw 'Cannot assign non-object to QVector3D'
+        return {
+            x: Number(value.x) || 0,
+            y: Number(value.y) || 0,
+            z: Number(value.z) || 0,
+        }
+    }
+
+    set(newValue){
+        let safeValue = this.value
+        try {
+            safeValue = this.typeCasting(newValue)
+        } catch (error) {
+            console.error(error)
+        }
+        let cur = this.value
+        if(!cur || safeValue.x !== cur.x || safeValue.y !== cur.y || safeValue.z !== cur.z || this.alwaysNotify){
+            this.value = safeValue
+            if(this.notify) this.notify()
+        }
+    }
+}
+
+class QVector4D extends QProperty {
+    getDefaultValue(){
+        return { x: 0, y: 0, z: 0, w: 0 }
+    }
+
+    typeCasting(value){
+        if(value === undefined || value === null) return this.getDefaultValue()
+        if(typeof value !== 'object') throw 'Cannot assign non-object to QVector4D'
+        return {
+            x: Number(value.x) || 0,
+            y: Number(value.y) || 0,
+            z: Number(value.z) || 0,
+            w: Number(value.w) || 0,
+        }
+    }
+
+    set(newValue){
+        let safeValue = this.value
+        try {
+            safeValue = this.typeCasting(newValue)
+        } catch (error) {
+            console.error(error)
+        }
+        let cur = this.value
+        if(!cur || safeValue.x !== cur.x || safeValue.y !== cur.y || safeValue.z !== cur.z || safeValue.w !== cur.w || this.alwaysNotify){
+            this.value = safeValue
+            if(this.notify) this.notify()
+        }
+    }
+}
+
+class QQuaternion extends QProperty {
+    getDefaultValue(){
+        // identity quaternion (no rotation)
+        return { scalar: 1, x: 0, y: 0, z: 0 }
+    }
+
+    typeCasting(value){
+        if(value === undefined || value === null) return this.getDefaultValue()
+        if(typeof value !== 'object') throw 'Cannot assign non-object to QQuaternion'
+        // accept both Qt-style (scalar,x,y,z) and three.js-style (x,y,z,w)
+        let scalar = value.scalar !== undefined ? value.scalar
+                    : (value.w !== undefined ? value.w : 1)
+        return {
+            scalar: Number(scalar) || 0,
+            x: Number(value.x) || 0,
+            y: Number(value.y) || 0,
+            z: Number(value.z) || 0,
+        }
+    }
+
+    set(newValue){
+        let safeValue = this.value
+        try {
+            safeValue = this.typeCasting(newValue)
+        } catch (error) {
+            console.error(error)
+        }
+        let cur = this.value
+        if(!cur || safeValue.scalar !== cur.scalar || safeValue.x !== cur.x || safeValue.y !== cur.y || safeValue.z !== cur.z || this.alwaysNotify){
+            this.value = safeValue
+            if(this.notify) this.notify()
+        }
+    }
+}
+
+class QMatrix4x4 extends QProperty {
+    getDefaultValue(){
+        // identity matrix in row-major order (Qt convention)
+        return [
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1,
+        ]
+    }
+
+    typeCasting(value){
+        if(value === undefined || value === null) return this.getDefaultValue()
+        if(!Array.isArray(value) || value.length !== 16) throw 'QMatrix4x4 requires a 16-element array'
+        let out = new Array(16)
+        for(let i = 0; i < 16; i++) out[i] = Number(value[i]) || 0
+        return out
+    }
+
+    set(newValue){
+        let safeValue = this.value
+        try {
+            safeValue = this.typeCasting(newValue)
+        } catch (error) {
+            console.error(error)
+        }
+        let cur = this.value
+        let same = cur && cur.length === 16
+        if(same){
+            for(let i = 0; i < 16; i++){
+                if(cur[i] !== safeValue[i]){ same = false; break }
+            }
+        }
+        if(!same || this.alwaysNotify){
+            this.value = safeValue
+            if(this.notify) this.notify()
+        }
+    }
+}
+
+module.exports.QVector3D = QVector3D
+module.exports.QVector4D = QVector4D
+module.exports.QQuaternion = QQuaternion
+module.exports.QMatrix4x4 = QMatrix4x4
+
 module.exports.QGeometry = QGeometry
 module.exports.QAutoGeometry = QAutoGeometry
 module.exports.QAlias = QAlias
