@@ -26,6 +26,23 @@ namespace imtdoc
 
 // reimplemented (imtdoc::IDocumentManager)
 
+QByteArray CCollectionDocumentManagerBase::CreateNewDocument(
+	const QByteArray& userId,
+	const QByteArray& documentTypeId,
+	const QByteArray& proposedSourceDocumentId)
+{
+	QMutexLocker locker(&m_mutex);
+
+	QByteArray documentId = CDocumentManagerBase::CreateNewDocument(userId, documentTypeId, proposedSourceDocumentId);
+
+	if (!documentId.isEmpty() && !proposedSourceDocumentId.isEmpty()) {
+		m_proposedSourceDocumentIds[documentId] = proposedSourceDocumentId;
+	}
+
+	return documentId;
+}
+
+
 QByteArray CCollectionDocumentManagerBase::OpenDocument(const QByteArray& userId, const QUrl& url)
 {
 	QByteArray retVal;
@@ -616,8 +633,18 @@ IDocumentManager::OperationStatus CCollectionDocumentManagerBase::SaveDocument(
 	}
 
 	// Create new object
+	// m_mutex is already held by the QMutexLocker above (acquired at function entry)
+	QByteArray proposedElementId;
+	{
+		auto it = m_proposedSourceDocumentIds.find(documentId);
+		if (it != m_proposedSourceDocumentIds.end()) {
+			proposedElementId = it.value();
+			m_proposedSourceDocumentIds.erase(it);
+		}
+	}
+
 	workingDocumentPtr->objectId =
-		collectionPtr->InsertNewObject(workingDocumentPtr->typeId, resultDocumentName, "", documentSnapshotPtr.GetPtr());
+		collectionPtr->InsertNewObject(workingDocumentPtr->typeId, resultDocumentName, "", documentSnapshotPtr.GetPtr(), proposedElementId);
 
 	if (HasDocumentNameProvider(workingDocumentPtr->typeId)){
 		resultDocumentName = GetDefaultDocumentName(*workingDocumentPtr);
@@ -653,6 +680,17 @@ IDocumentManager::OperationStatus CCollectionDocumentManagerBase::SaveDocument(
 	}
 
 	return workingDocumentPtr->objectId.isEmpty() ? OS_FAILED : OS_OK;
+}
+
+
+IDocumentManager::OperationStatus CCollectionDocumentManagerBase::CloseDocument(
+	const QByteArray& userId, const QByteArray& documentId)
+{
+	QMutexLocker locker(&m_mutex);
+
+	m_proposedSourceDocumentIds.remove(documentId);
+
+	return CDocumentManagerBase::CloseDocument(userId, documentId);
 }
 
 
