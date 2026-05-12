@@ -1,4 +1,0 @@
-height (по anchors): 300
-y (по anchors): 0
-parent.height: 300
-Проверка: y + height == parent.height? true
