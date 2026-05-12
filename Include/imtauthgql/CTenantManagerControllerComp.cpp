@@ -151,7 +151,7 @@ sdl::imtauth::Tenants::CCreateTenantPayload CTenantManagerControllerComp::OnCrea
 	}
 
 	if (m_membershipManagerCompPtr.IsValid() && !ownerId.isEmpty()){
-		m_membershipManagerCompPtr->AddMembership(ownerId, tenantId, imtauth::ITenantMembership::TMR_ADMIN);
+		m_membershipManagerCompPtr->AddMembership(ownerId, tenantId, imtauth::ITenantMembership::TMR_OWNER);
 	}
 
 	response.Version_1_0->tenantId = tenantId;

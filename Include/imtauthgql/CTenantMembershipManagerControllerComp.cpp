@@ -41,7 +41,8 @@ sdl::imtauth::TenantMemberships::CTenantInvitationData::V1_0 ToTenantInvitationD
 
 bool CanManageTenant(const imtauth::ITenantMembershipManager& membershipManager, const QByteArray& userId, const QByteArray& tenantId)
 {
-	return membershipManager.HasMinimumRole(userId, tenantId, imtauth::ITenantMembership::TMR_ADMIN);
+	return membershipManager.HasMinimumRole(userId, tenantId, imtauth::ITenantMembership::TMR_ADMIN) ||
+			membershipManager.HasMinimumRole(userId, tenantId, imtauth::ITenantMembership::TMR_OWNER);
 }
 
 
