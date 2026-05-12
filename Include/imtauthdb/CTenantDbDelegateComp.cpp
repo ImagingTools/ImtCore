@@ -266,9 +266,9 @@ QString CTenantDbDelegateComp::GetTenantRelationScopeSubquery(const QByteArray& 
 {
 	QString tableName = qPrintable(*m_tableNameAttrPtr);
 
-	// For admin users (no userId), add NULL columns so filters referencing them don't cause SQL errors
+	// For admin users (no userId), add NULL column so filters referencing it don't cause SQL errors
 	if (userId.isEmpty()){
-		return QString("SELECT *, NULL AS \"TenantRelationScope\", NULL AS \"InvitationId\", NULL AS \"InvitedByName\" FROM \"%1\"").arg(tableName);
+		return QString("SELECT *, NULL AS \"TenantRelationScope\" FROM \"%1\"").arg(tableName);
 	}
 
 	QString escapedUserId = imtdb::EscapeSql(QString::fromUtf8(userId));
@@ -280,9 +280,7 @@ QString CTenantDbDelegateComp::GetTenantRelationScopeSubquery(const QByteArray& 
 		"WHEN \"Id\" IN (SELECT \"TenantId\" FROM \"TenantMemberships\" WHERE \"UserId\"='%1' AND \"IsActive\"=true) THEN 'Member' "
 		"WHEN \"Id\" IN (SELECT \"TenantId\"::uuid FROM \"TenantInvitations\" WHERE \"UserId\"='%1' AND \"Status\"=%2) THEN 'Invited' "
 		"ELSE NULL "
-		"END AS \"TenantRelationScope\", "
-		"(SELECT \"Id\" FROM \"TenantInvitations\" WHERE \"TenantId\"::uuid = \"%3\".\"Id\" AND \"UserId\"='%1' AND \"Status\"=%2 LIMIT 1) AS \"InvitationId\", "
-		"(SELECT u.\"Name\" FROM \"TenantInvitations\" ti LEFT JOIN \"Users\" u ON u.\"Id\" = ti.\"InvitedByUserId\" WHERE ti.\"TenantId\"::uuid = \"%3\".\"Id\" AND ti.\"UserId\"='%1' AND ti.\"Status\"=%2 LIMIT 1) AS \"InvitedByName\" "
+		"END AS \"TenantRelationScope\" "
 		"FROM \"%3\"")
 		.arg(escapedUserId)
 		.arg(s_invitationStatusPending)
