@@ -20,6 +20,15 @@ namespace imtauthdb
 {
 
 
+namespace
+{
+
+const char s_tenantRelationScopeFieldId[] = "TenantRelationScope";
+const int s_invitationStatusPending = 0;
+
+} // namespace
+
+
 istd::IChangeableUniquePtr CTenantDbDelegateComp::CreateObjectFromRecord(
 		const QSqlRecord& record,
 		const iprm::IParamsSet* /*dataConfigurationPtr*/) const
@@ -251,7 +260,7 @@ QString CTenantDbDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsS
 					if (complexFilterPtr.IsValid()){
 						const imtbase::IComplexCollectionFilter::FilterExpression& expr = complexFilterPtr->GetFilterExpression();
 						for (const imtbase::IComplexCollectionFilter::FieldFilter& ff : expr.fieldFilters){
-							if (ff.fieldId == "TenantRelationScope"){
+							if (ff.fieldId == s_tenantRelationScopeFieldId){
 								scopeValue = ff.filterValue.toString();
 								break;
 							}
@@ -269,15 +278,17 @@ QString CTenantDbDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsS
 				}
 				else if (scopeValue == "Invited"){
 					return QString("\"Id\" IN "
-						"(SELECT \"TenantId\" FROM \"TenantInvitations\" WHERE \"UserId\"='%1' AND \"Status\"=0)")
-						.arg(escapedUserId);
+						"(SELECT \"TenantId\" FROM \"TenantInvitations\" WHERE \"UserId\"='%1' AND \"Status\"=%2)")
+						.arg(escapedUserId)
+						.arg(s_invitationStatusPending);
 				}
 				else{
 					// Default: show tenants where user is owner, member, or invited
 					return QString("(\"OwnerId\"='%1' OR \"Id\" IN "
 						"(SELECT \"TenantId\" FROM \"TenantMemberships\" WHERE \"UserId\"='%1' AND \"IsActive\"=true) OR \"Id\" IN "
-						"(SELECT \"TenantId\" FROM \"TenantInvitations\" WHERE \"UserId\"='%1' AND \"Status\"=0))")
-						.arg(escapedUserId);
+						"(SELECT \"TenantId\" FROM \"TenantInvitations\" WHERE \"UserId\"='%1' AND \"Status\"=%2))")
+						.arg(escapedUserId)
+						.arg(s_invitationStatusPending);
 				}
 			}
 		}
@@ -295,14 +306,14 @@ bool CTenantDbDelegateComp::CreateObjectFilterQuery(const imtbase::IComplexColle
 	}
 
 	// Remove TenantRelationScope clauses from the generated SQL (handled in CreateAdditionalFiltersQuery)
-	if (filterQuery.contains("TenantRelationScope")){
+	if (filterQuery.contains(s_tenantRelationScopeFieldId)){
 		// The converter generates: ("TenantRelationScope")::text = 'Value'
 		// It may be combined with AND/OR. Best to regenerate without TenantRelationScope.
 		const imtbase::IComplexCollectionFilter::FilterExpression& originalExpr = collectionFilter.GetFilterExpression();
 
 		bool hasTenantRelationScope = false;
 		for (const imtbase::IComplexCollectionFilter::FieldFilter& ff : originalExpr.fieldFilters){
-			if (ff.fieldId == "TenantRelationScope"){
+			if (ff.fieldId == s_tenantRelationScopeFieldId){
 				hasTenantRelationScope = true;
 				break;
 			}
