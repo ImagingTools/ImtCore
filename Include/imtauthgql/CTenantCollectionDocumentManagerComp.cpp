@@ -356,9 +356,15 @@ bool CTenantCollectionDocumentManagerComp::ProcessEvent(imtdoc::CEventBase* even
 			QByteArray tenantId = documentTicketPtr->GetTenantId();
 			if (tenantId.isEmpty()){
 				documentTicketPtr->SetTenantId(objectId);
-	
+
 				m_documentManagerCompPtr->SetDocumentData(userId, documentId, *documentPtr);
 				m_documentManagerCompPtr->SaveDocument(userId, documentId);
+
+				// Auto-create OWNER membership for the tenant creator
+				QByteArray ownerId = documentTicketPtr->GetOwnerId();
+				if (m_membershipManagerCompPtr.IsValid() && !ownerId.isEmpty()){
+					m_membershipManagerCompPtr->AddMembership(ownerId, objectId, imtauth::ITenantMembership::TMR_OWNER);
+				}
 			}
 		}
 	}
