@@ -142,7 +142,7 @@ RemoteCollectionView {
 				width: invitationPopupContent.width + 2 * Style.marginL
 				height: invitationPopupContent.height + 2 * Style.marginL
 				modal: false
-				closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
+				closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
 
 				background: Rectangle {
 					color: Style.panelColor
