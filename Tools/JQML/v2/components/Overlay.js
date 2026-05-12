@@ -21,7 +21,6 @@ class Overlay extends Item {
     }
 
     static defaultSignals = {
-        pressed: { params: [] },
         released: { params: [] },
     }
 
