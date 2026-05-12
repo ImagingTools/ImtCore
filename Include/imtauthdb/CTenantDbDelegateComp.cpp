@@ -343,9 +343,9 @@ bool CTenantDbDelegateComp::CreateObjectFilterQuery(const imtbase::IComplexColle
 	filterQuery = filterQuery.trimmed();
 
 	// If the entire filter was just TenantRelationScope, clear it
-	if (filterQuery.isEmpty() || filterQuery == "()" || filterQuery == "( )"){
-		filterQuery.clear();
-	}
+	QString trimmed = filterQuery.trimmed();
+	trimmed.remove(QRegularExpression(QStringLiteral(R"(^\(\s*\)$)")));
+	filterQuery = trimmed.trimmed();
 
 	return true;
 }
