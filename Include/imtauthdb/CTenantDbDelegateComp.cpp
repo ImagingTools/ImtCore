@@ -3,7 +3,6 @@
 
 // Qt includes
 #include <QtCore/QDateTime>
-#include <QtCore/QRegularExpression>
 #include <QtCore/QUuid>
 #include <QtSql/QSqlRecord>
 
@@ -11,7 +10,6 @@
 #include <imtauth/ITenantInfo.h>
 #include <iprm/IIdParam.h>
 #include <iprm/TParamsPtr.h>
-#include <imtbase/IComplexCollectionFilter.h>
 #include <imtdb/CDatabaseEngineComp.h>
 #include <imtdb/imtdb.h>
 #include <idoc/CStandardDocumentMetaInfo.h>
@@ -24,7 +22,6 @@ namespace imtauthdb
 namespace
 {
 
-const char s_tenantRelationScopeFieldId[] = "TenantRelationScope";
 const int s_invitationStatusPending = 0;
 
 } // namespace
@@ -243,111 +240,91 @@ bool CTenantDbDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& record
 }
 
 
-QString CTenantDbDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const
+QString CTenantDbDelegateComp::GetTenantRelationScopeSubquery() const
 {
-	iprm::IParamsSet::Ids paramIds = filterParams.GetParamIds();
+	QString tableName = qPrintable(*m_tableNameAttrPtr);
+	QString escapedUserId = imtdb::EscapeSql(QString::fromUtf8(m_cachedUserId));
 
-	if (paramIds.contains("UserId")){
-		iprm::TParamsPtr<iprm::IIdParam> userIdParamPtr(&filterParams, "UserId");
-		if (userIdParamPtr.IsValid()){
-			QByteArray userId = userIdParamPtr->GetId();
-			if (!userId.isEmpty()){
-				QString escapedUserId = imtdb::EscapeSql(QString::fromUtf8(userId));
+	return QString(
+		"SELECT *, "
+		"CASE "
+		"WHEN \"OwnerId\"='%1' THEN 'Owner' "
+		"WHEN \"Id\" IN (SELECT \"TenantId\" FROM \"TenantMemberships\" WHERE \"UserId\"='%1' AND \"IsActive\"=true) THEN 'Member' "
+		"WHEN \"Id\" IN (SELECT \"TenantId\"::uuid FROM \"TenantInvitations\" WHERE \"UserId\"='%1' AND \"Status\"=%2) THEN 'Invited' "
+		"ELSE NULL "
+		"END AS \"TenantRelationScope\" "
+		"FROM \"%3\"")
+		.arg(escapedUserId)
+		.arg(s_invitationStatusPending)
+		.arg(tableName);
+}
 
-				// Check if ComplexFilter contains a TenantRelationScope field filter
-				QString scopeValue;
-				if (paramIds.contains("ComplexFilter")){
-					iprm::TParamsPtr<imtbase::IComplexCollectionFilter> complexFilterPtr(&filterParams, "ComplexFilter");
-					if (complexFilterPtr.IsValid()){
-						const imtbase::IComplexCollectionFilter::FilterExpression& expr = complexFilterPtr->GetFilterExpression();
-						for (const imtbase::IComplexCollectionFilter::FieldFilter& ff : expr.fieldFilters){
-							if (ff.fieldId == s_tenantRelationScopeFieldId){
-								scopeValue = ff.filterValue.toString();
-								break;
-							}
-						}
-					}
-				}
 
-				if (scopeValue == "Owner"){
-					return QString("\"OwnerId\"='%1'").arg(escapedUserId);
-				}
-				else if (scopeValue == "Member"){
-					return QString("\"Id\" IN "
-						"(SELECT \"TenantId\" FROM \"TenantMemberships\" WHERE \"UserId\"='%1' AND \"IsActive\"=true)")
-						.arg(escapedUserId);
-				}
-				else if (scopeValue == "Invited"){
-					return QString("\"Id\" IN "
-						"(SELECT \"TenantId\"::uuid FROM \"TenantInvitations\" WHERE \"UserId\"='%1' AND \"Status\"=%2)")
-						.arg(escapedUserId)
-						.arg(s_invitationStatusPending);
-				}
-				else{
-					// Default: show tenants where user is owner, member, or invited
-					return QString("(\"OwnerId\"='%1' OR \"Id\" IN "
-						"(SELECT \"TenantId\" FROM \"TenantMemberships\" WHERE \"UserId\"='%1' AND \"IsActive\"=true) OR \"Id\" IN "
-						"(SELECT \"TenantId\"::uuid FROM \"TenantInvitations\" WHERE \"UserId\"='%1' AND \"Status\"=%2))")
-						.arg(escapedUserId)
-						.arg(s_invitationStatusPending);
-				}
+QString CTenantDbDelegateComp::GetBaseSelectionQuery() const
+{
+	if (m_cachedUserId.isEmpty()){
+		return BaseClass::GetBaseSelectionQuery();
+	}
+
+	return QString("SELECT * FROM (%1) AS _t").arg(GetTenantRelationScopeSubquery());
+}
+
+
+QByteArray CTenantDbDelegateComp::GetCountQuery(const iprm::IParamsSet* paramsPtr) const
+{
+	// Cache UserId first (needed by GetTenantRelationScopeSubquery)
+	if (paramsPtr != nullptr){
+		iprm::IParamsSet::Ids paramIds = paramsPtr->GetParamIds();
+		if (paramIds.contains("UserId")){
+			iprm::TParamsPtr<iprm::IIdParam> userIdParamPtr(paramsPtr, "UserId");
+			if (userIdParamPtr.IsValid()){
+				m_cachedUserId = userIdParamPtr->GetId();
 			}
 		}
 	}
 
-	return QString();
-}
+	if (m_cachedUserId.isEmpty()){
+		return BaseClass::GetCountQuery(paramsPtr);
+	}
 
-
-bool CTenantDbDelegateComp::CreateObjectFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& filterQuery) const
-{
-	// Strip TenantRelationScope from the filter expression before generating SQL —
-	// it is a virtual field handled by CreateAdditionalFiltersQuery, not a real column.
-	const imtbase::IComplexCollectionFilter::FilterExpression& originalExpr = collectionFilter.GetFilterExpression();
-
-	bool hasTenantRelationScope = false;
-	for (const imtbase::IComplexCollectionFilter::FieldFilter& ff : originalExpr.fieldFilters){
-		if (ff.fieldId == s_tenantRelationScopeFieldId){
-			hasTenantRelationScope = true;
-			break;
+	QString filterQuery;
+	if (paramsPtr != nullptr){
+		if (!CreateFilterQuery(*paramsPtr, filterQuery)){
+			return QByteArray();
 		}
 	}
 
-	if (!hasTenantRelationScope){
-		// No virtual field — use base implementation as-is
-		return BaseClass::CreateObjectFilterQuery(collectionFilter, filterQuery);
+	return QString("SELECT COUNT(*) FROM (%1) AS _t %2")
+			.arg(GetTenantRelationScopeSubquery())
+			.arg(filterQuery)
+			.toUtf8();
+}
+
+
+bool CTenantDbDelegateComp::CreateFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const
+{
+	// Cache UserId before base class constructs the query — it's needed by GetBaseSelectionQuery()
+	iprm::IParamsSet::Ids paramIds = filterParams.GetParamIds();
+	if (paramIds.contains("UserId")){
+		iprm::TParamsPtr<iprm::IIdParam> userIdParamPtr(&filterParams, "UserId");
+		if (userIdParamPtr.IsValid()){
+			m_cachedUserId = userIdParamPtr->GetId();
+		}
 	}
 
-	// Let the base class generate the full SQL, then strip TenantRelationScope clauses
-	if (!BaseClass::CreateObjectFilterQuery(collectionFilter, filterQuery)){
-		return false;
+	return BaseClass::CreateFilterQuery(filterParams, filterQuery);
+}
+
+
+QString CTenantDbDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsSet& /*filterParams*/) const
+{
+	if (m_cachedUserId.isEmpty()){
+		return QString();
 	}
 
-	if (filterQuery.isEmpty()){
-		return true;
-	}
-
-	// The converter generates clauses like: ("TenantRelationScope")::text = 'Value'
-	// These need to be removed since it's not a real column.
-	// Strategy: remove the TenantRelationScope clause and any surrounding AND/OR connector.
-	// Pattern in Postgres context: ("TenantRelationScope")::text = 'Value'
-	static const QRegularExpression tenantScopeClauseRe(
-		QStringLiteral(R"(\s*(?:AND|OR)\s+\(\"TenantRelationScope\"\)::text\s*=\s*'[^']*')")
-		+ QStringLiteral("|")
-		+ QStringLiteral(R"(\(\"TenantRelationScope\"\)::text\s*=\s*'[^']*'\s*(?:AND|OR)\s*)")
-		+ QStringLiteral("|")
-		+ QStringLiteral(R"(\(\"TenantRelationScope\"\)::text\s*=\s*'[^']*')")
-	);
-
-	filterQuery.replace(tenantScopeClauseRe, QString());
-	filterQuery = filterQuery.trimmed();
-
-	// If the entire filter was just TenantRelationScope, clear it
-	QString trimmed = filterQuery.trimmed();
-	trimmed.remove(QRegularExpression(QStringLiteral(R"(^\(\s*\)$)")));
-	filterQuery = trimmed.trimmed();
-
-	return true;
+	// With TenantRelationScope as a computed column, only show tenants where
+	// the user has a relationship (Owner, Member, or Invited)
+	return QStringLiteral("\"TenantRelationScope\" IS NOT NULL");
 }
 
 
