@@ -6,6 +6,7 @@
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
+#include <imtauth/ITenantManager.h>
 #include <imtauth/ITenantMembershipManager.h>
 #include <imtbase/IObjectCollection.h>
 
@@ -25,6 +26,7 @@ public:
 		I_REGISTER_INTERFACE(imtauth::ITenantMembershipManager);
 		I_ASSIGN(m_membershipCollectionCompPtr, "MembershipCollection", "Membership collection", true, "MembershipCollection");
 		I_ASSIGN(m_membershipFactoryCompPtr, "MembershipFactory", "Membership info factory", true, "TenantMembershipInfo");
+		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager for ownership checks", false, "TenantManager");
 	I_END_COMPONENT;
 
 	// reimplemented (imtauth::ITenantMembershipManager)
@@ -42,8 +44,11 @@ public:
 	virtual bool HasMinimumRole(const QByteArray& userId, const QByteArray& tenantId, ITenantMembership::TenantMemberRole minimumRole) const override;
 
 private:
+	bool IsOwnerMembership(const QByteArray& membershipId) const;
+
 	I_REF(imtbase::IObjectCollection, m_membershipCollectionCompPtr);
 	I_FACT(imtauth::ITenantMembership, m_membershipFactoryCompPtr);
+	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
 };
 
 
