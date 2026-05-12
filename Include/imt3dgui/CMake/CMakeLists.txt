@@ -17,7 +17,7 @@ if(QT_VERSION VERSION_GREATER_EQUAL "6.8.0")
     # $<BUILD_INTERFACE:…> / $<INSTALL_INTERFACE:…>) are resolved correctly
     # at build time.  This exposes <rhi/qrhi.h> without linking GuiPrivate.
     target_include_directories(${PROJECT_NAME} PRIVATE
-        $<TARGET_PROPERTY:Qt${QT_VERSION_MAJOR}::GuiPrivate,INTERFACE_INCLUDE_DIRECTORIES>
+        $<TARGET_PROPERTY:Qt${QT_VERSION_MAJOR}::Gui,INTERFACE_INCLUDE_DIRECTORIES>
     )
 else()
     target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::GuiPrivate)
