@@ -9,6 +9,7 @@
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="RoleDocumentSqlRepository" X="200" Y="100" Note=""/>
+        <Element ComponentName="TenantInvitationSqlRepository" X="200" Y="625" Note=""/>
         <Element ComponentName="TenantMembershipSqlRepository" X="200" Y="450" Note=""/>
         <Element ComponentName="TenantSqlRepository" X="200" Y="275" Note=""/>
         <Element ComponentName="UserGroupSqlRepository" X="775" Y="450" Note=""/>
