@@ -74,6 +74,7 @@ RemoteCollectionView {
 			AcceptTenantInvitationPayload {
 				onFinished: {
 					if (m_success) {
+						container.__removeMyInvitation(container.acceptInvitationInput.m_invitationId)
 						container.doUpdateGui()
 					}
 					else if (m_errorMessage && m_errorMessage !== "") {
@@ -95,7 +96,10 @@ RemoteCollectionView {
 		sdlObjectComp: Component {
 			RejectTenantInvitationPayload {
 				onFinished: {
-					if (m_errorMessage && m_errorMessage !== "") {
+					if (m_success) {
+						container.__removeMyInvitation(container.rejectInvitationInput.m_invitationId)
+					}
+					else if (m_errorMessage && m_errorMessage !== "") {
 						ModalDialogManager.showInfoDialog(m_errorMessage)
 					}
 				}
@@ -194,7 +198,6 @@ RemoteCollectionView {
 							onClicked: {
 								container.acceptInvitationInput.m_invitationId = modelData.id
 								container.acceptInvitationSender.send(container.acceptInvitationInput)
-								container.__removeMyInvitation(modelData.id)
 							}
 						}
 
@@ -208,7 +211,6 @@ RemoteCollectionView {
 							onClicked: {
 								container.rejectInvitationInput.m_invitationId = modelData.id
 								container.rejectInvitationSender.send(container.rejectInvitationInput)
-								container.__removeMyInvitation(modelData.id)
 							}
 						}
 					}
