@@ -1,3 +1,0 @@
-ChildItem.onCompleted
-Item.onCompleted
-ListModel.onCompleted

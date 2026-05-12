@@ -1,2 +1,0 @@
-data = Array(0)
-data is Array? true
