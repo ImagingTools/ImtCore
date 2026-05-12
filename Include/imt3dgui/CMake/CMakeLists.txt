@@ -13,12 +13,12 @@ include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS OpenGL OpenGLWidgets REQUIRED)
 
 if(QT_VERSION VERSION_GREATER_EQUAL "6.8.0")
-    get_target_property(_gui_private_incs Qt${QT_VERSION_MAJOR}::GuiPrivate INTERFACE_INCLUDE_DIRECTORIES)
-    if(_gui_private_incs)
-        target_include_directories(${PROJECT_NAME} PRIVATE ${_gui_private_incs})
-    else()
-        target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::GuiPrivate)
-    endif()
+    # Use generator expression so that Qt's include paths (which contain
+    # $<BUILD_INTERFACE:…> / $<INSTALL_INTERFACE:…>) are resolved correctly
+    # at build time.  This exposes <rhi/qrhi.h> without linking GuiPrivate.
+    target_include_directories(${PROJECT_NAME} PRIVATE
+        $<TARGET_PROPERTY:Qt${QT_VERSION_MAJOR}::GuiPrivate,INTERFACE_INCLUDE_DIRECTORIES>
+    )
 else()
     target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::GuiPrivate)
 endif()
