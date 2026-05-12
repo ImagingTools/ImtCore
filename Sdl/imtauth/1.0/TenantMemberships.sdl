@@ -158,18 +158,6 @@ type AddMembershipPayload {
 	errorMessage: String
 }
 
-input InviteTenantMemberInput {
-	userId: ID!
-	tenantId: ID!
-	role: TenantMemberRole
-}
-
-# Legacy compatibility wrapper around CreateTenantInvitation. New callers should use CreateTenantInvitation.
-type InviteTenantMemberPayload {
-	membershipId: ID
-	errorMessage: String
-}
-
 input CreateTenantInvitationInput {
 	userId: ID!
 	tenantId: ID!
@@ -237,24 +225,6 @@ type UpdateMembershipRolePayload {
 	errorMessage: String
 }
 
-input AcceptTenantMembershipInvitationInput {
-	membershipId: ID!
-}
-
-type AcceptTenantMembershipInvitationPayload {
-	success: Boolean
-	errorMessage: String
-}
-
-input RejectTenantMembershipInvitationInput {
-	membershipId: ID!
-}
-
-type RejectTenantMembershipInvitationPayload {
-	success: Boolean
-	errorMessage: String
-}
-
 type Query {
 	GetMembershipsByTenant (input: GetMembershipsByTenantInput): GetMembershipsByTenantPayload!
 	GetMembershipsByUser (input: GetMembershipsByUserInput): GetMembershipsByUserPayload!
@@ -268,7 +238,6 @@ type Query {
 
 type Mutation {
 	AddMembership (input: AddMembershipInput): AddMembershipPayload!
-	InviteTenantMember (input: InviteTenantMemberInput): InviteTenantMemberPayload!
 	CreateTenantInvitation (input: CreateTenantInvitationInput): CreateTenantInvitationPayload!
 	AcceptTenantInvitation (input: AcceptTenantInvitationInput): AcceptTenantInvitationPayload!
 	RejectTenantInvitation (input: RejectTenantInvitationInput): RejectTenantInvitationPayload!
@@ -276,8 +245,6 @@ type Mutation {
 	ResendTenantInvitation (input: ResendTenantInvitationInput): ResendTenantInvitationPayload!
 	RemoveMembership (input: RemoveMembershipInput): RemoveMembershipPayload!
 	UpdateMembershipRole (input: UpdateMembershipRoleInput): UpdateMembershipRolePayload!
-	AcceptTenantMembershipInvitation (input: AcceptTenantMembershipInvitationInput): AcceptTenantMembershipInvitationPayload!
-	RejectTenantMembershipInvitation (input: RejectTenantMembershipInvitationInput): RejectTenantMembershipInvitationPayload!
 }
 
 # --- Subscriptions ---
