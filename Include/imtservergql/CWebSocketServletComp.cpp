@@ -141,17 +141,16 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 		return imtrest::ConstResponsePtr();
 	}
 
-	QPointer<CWebSocketServletComp> servletGuard(const_cast<CWebSocketServletComp*>(this));
+	const CWebSocketServletComp* servletGuard(this);
 	QPointer<imtrest::CWebSocketRequest> requestGuard(const_cast<imtrest::CWebSocketRequest*>(webSocketRequest));
 	constexpr int maxPendingSubscriptionFutures = 64;
 	QFuture<void> future = QtConcurrent::run([servletGuard, requestGuard]() {
-		auto* const servletPtr = servletGuard.data();
-		auto* const requestPtr = requestGuard.data();
-		if (servletPtr == nullptr || requestPtr == nullptr){
+		auto* requestPtr = requestGuard.data();
+		if (servletGuard == nullptr || requestPtr == nullptr){
 			return;
 		}
 
-		servletPtr->RegisterSubscriptionImpl(*requestPtr);
+		servletGuard->RegisterSubscriptionImpl(*requestPtr);
 	});
 	{
 		QMutexLocker locker(&m_registerSubscriptionFuturesMutex);
@@ -265,30 +264,30 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscriptionImpl(const 
 
 	// Validate token and extract userId — same pattern as CHttpGraphQLServletComp::OnPost
 	QByteArray userId;
-	// if (!accessToken.isEmpty()){
-	// 	if (accessToken.size() > 8 && accessToken.startsWith("imt_pat_")){
-	// 		// PAT token
-	// 		if (m_patManagerCompPtr.IsValid()){
-	// 			QByteArray tokenId;
-	// 			QByteArrayList scopes;
-	// 			if (!m_patManagerCompPtr->ValidateToken(accessToken, userId, tokenId, scopes)){
-	// 				return CreateErrorResponse(QByteArrayLiteral("Forbidden: invalid PAT token"), request);
-	// 			}
-	// 			m_patManagerCompPtr->UpdateLastUsedAt(tokenId);
-	// 		}
-	// 	}
-	// 	else{
-	// 		// JWT token
-	// 		if (m_jwtSessionControllerCompPtr.IsValid()){
-	// 			using JwtState = imtauth::IJwtSessionController::JwtState;
-	// 			JwtState state = m_jwtSessionControllerCompPtr->ValidateJwt(accessToken);
-	// 			if (state == JwtState::JS_EXPIRED || state == JwtState::JS_INVALID){
-	// 				return CreateErrorResponse(QByteArrayLiteral("Forbidden: invalid or expired JWT token"), request);
-	// 			}
-	// 			userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(accessToken);
-	// 		}
-	// 	}
-	// }
+	if (!accessToken.isEmpty()){
+		if (accessToken.size() > 8 && accessToken.startsWith("imt_pat_")){
+			// PAT token
+			if (m_patManagerCompPtr.IsValid()){
+				QByteArray tokenId;
+				QByteArrayList scopes;
+				if (!m_patManagerCompPtr->ValidateToken(accessToken, userId, tokenId, scopes)){
+					return CreateErrorResponse(QByteArrayLiteral("Forbidden: invalid PAT token"), request);
+				}
+				m_patManagerCompPtr->UpdateLastUsedAt(tokenId);
+			}
+		}
+		else{
+			// JWT token
+			if (m_jwtSessionControllerCompPtr.IsValid()){
+				using JwtState = imtauth::IJwtSessionController::JwtState;
+				JwtState state = m_jwtSessionControllerCompPtr->ValidateJwt(accessToken);
+				if (state == JwtState::JS_EXPIRED || state == JwtState::JS_INVALID){
+					return CreateErrorResponse(QByteArrayLiteral("Forbidden: invalid or expired JWT token"), request);
+				}
+				userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(accessToken);
+			}
+		}
+	}
 
 	// Verify request is still alive after auth validation (safety check)
 	if (requestGuard.isNull()){
