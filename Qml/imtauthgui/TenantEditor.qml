@@ -342,13 +342,23 @@ DocumentViewBase {
 
 		anchors.fill: parent
 
-		Component.onCompleted: {
+		function updatePages() {
+			multiPageView.clear()
 			multiPageView.addPage("General", qsTr("General"), generalPageComp, "Icons/Settings")
 			if (!container.isNewTenant) {
 				multiPageView.addPage("Members", qsTr("Members"), membersPageComp, "Icons/MultipleUser")
 				multiPageView.addPage("Permissions", qsTr("Permissions"), permissionsPageComp, "Icons/Role")
 			}
+			multiPageView.currentIndex = 0
 		}
+
+		Component.onCompleted: {
+			multiPageView.updatePages()
+		}
+	}
+
+	onIsNewTenantChanged: {
+		multiPageView.updatePages()
 	}
 
 	// ===== Page: General =====
