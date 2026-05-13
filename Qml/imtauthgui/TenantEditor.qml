@@ -25,6 +25,7 @@ DocumentViewBase {
 	readonly property int totalMemberRoleHorizontalMargin: memberRoleHorizontalMargin * 2
 	readonly property int memberRoleRowMargin: Style.marginS
 	readonly property int totalMemberRoleRowMargin: memberRoleRowMargin * 2
+	readonly property int memberActionColumnWidth: Style.controlHeightM * 2
 	// Guard: set when members are modified locally, prevents updateGui from overwriting
 	property bool __membersModifiedLocally: false
 
@@ -475,7 +476,7 @@ DocumentViewBase {
 								readonly property bool isOwner: container.tenantData && modelData.userId === container.tenantData.m_ownerId
 								readonly property bool isPending: modelData.isPending === true
 								readonly property bool isCurrentUser: container.tenantData && container.tenantData.m_currentUserId && modelData.userId === container.tenantData.m_currentUserId
-									readonly property int actionBtnWidth: chipRemoveBtn.visible ? chipRemoveBtn.width : (leaveBtn.visible ? leaveBtn.width : 0)
+								readonly property int actionBtnWidth: container.memberActionColumnWidth
 
 								Column {
 									anchors.fill: parent
@@ -561,6 +562,7 @@ DocumentViewBase {
 											id: leaveBtn
 											visible: !memberDelegate.isPending && memberDelegate.isCurrentUser && !memberDelegate.isOwner && !chipRemoveBtn.visible
 											anchors.verticalCenter: parent.verticalCenter
+											width: container.memberActionColumnWidth
 											text: qsTr("Leave")
 											onClicked: {
 												container.__removeMemberById(modelData.userId)
