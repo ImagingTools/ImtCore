@@ -708,16 +708,39 @@ sdl::imtauth::TenantMemberships::CTransferTenantOwnershipPayload CTenantMembersh
 		response.Version_1_0->errorMessage = QStringLiteral("Failed to find new owner membership");
 		return response;
 	}
-	m_membershipManagerCompPtr->UpdateMembershipRole(newOwnerMembership->GetMembershipId(), imtauth::ITenantMembership::TMR_OWNER);
+
+	bool newOwnerUpdated = m_membershipManagerCompPtr->UpdateMembershipRole(newOwnerMembership->GetMembershipId(), imtauth::ITenantMembership::TMR_OWNER);
+	if (!newOwnerUpdated){
+		response.Version_1_0->success = false;
+		response.Version_1_0->errorMessage = QStringLiteral("Failed to promote new owner");
+		return response;
+	}
 
 	// Demote old owner to Admin
 	imtauth::ITenantMembershipUniquePtr oldOwnerMembership = m_membershipManagerCompPtr->FindMembership(currentOwnerId, tenantId);
 	if (oldOwnerMembership.IsValid()){
-		m_membershipManagerCompPtr->UpdateMembershipRole(oldOwnerMembership->GetMembershipId(), imtauth::ITenantMembership::TMR_ADMIN);
+		bool oldOwnerDemoted = m_membershipManagerCompPtr->UpdateMembershipRole(oldOwnerMembership->GetMembershipId(), imtauth::ITenantMembership::TMR_ADMIN);
+		if (!oldOwnerDemoted){
+			// Rollback: revert new owner back to their previous role
+			m_membershipManagerCompPtr->UpdateMembershipRole(newOwnerMembership->GetMembershipId(), imtauth::ITenantMembership::TMR_ADMIN);
+			response.Version_1_0->success = false;
+			response.Version_1_0->errorMessage = QStringLiteral("Failed to demote old owner, operation rolled back");
+			return response;
+		}
 	}
 
 	// Update tenant's ownerId
-	m_tenantManagerCompPtr->UpdateTenant(tenantId, tenantPtr->GetTenantName(), tenantPtr->GetTenantDescription(), newOwnerId, true);
+	bool tenantUpdated = m_tenantManagerCompPtr->UpdateTenant(tenantId, tenantPtr->GetTenantName(), tenantPtr->GetTenantDescription(), newOwnerId, true);
+	if (!tenantUpdated){
+		// Rollback: revert both membership changes
+		m_membershipManagerCompPtr->UpdateMembershipRole(newOwnerMembership->GetMembershipId(), imtauth::ITenantMembership::TMR_ADMIN);
+		if (oldOwnerMembership.IsValid()){
+			m_membershipManagerCompPtr->UpdateMembershipRole(oldOwnerMembership->GetMembershipId(), imtauth::ITenantMembership::TMR_OWNER);
+		}
+		response.Version_1_0->success = false;
+		response.Version_1_0->errorMessage = QStringLiteral("Failed to update tenant owner, operation rolled back");
+		return response;
+	}
 
 	response.Version_1_0->success = true;
 	return response;
