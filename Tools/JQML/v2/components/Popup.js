@@ -1,5 +1,5 @@
 const { Item } = require('./Item')
-const { QString, QBool, QReal, QVar, QInt, QColor } = require('../utils/properties')
+const { QString, QBool, QReal, QVar, QInt, QColor, QVisible } = require('../utils/properties')
 
 /**
  * Popup — Qt Quick Controls Popup implementation for JQML v2
@@ -32,9 +32,9 @@ class Popup extends Item {
     static defaultProperties = {
         // Visibility / state
         opened: { type: QBool, value: false },
-        visible: { type: QBool, value: false, changed: '$visibleChanged' },
+        visible: { type: QVisible, value: false, changed: '$visibleChanged' },
         modal: { type: QBool, value: false, changed: '$modalChanged' },
-        dim: { type: QBool, value: false, changed: '$dimChanged' },
+        dim: { type: QBool, value: false, changed: '$dimChangedExplicit' },
 
         // Close policy (default: CloseOnEscape | CloseOnPressOutside)
         closePolicy: { type: QInt, value: ClosePolicy.CloseOnEscape | ClosePolicy.CloseOnPressOutside, changed: '$closePolicyChanged' },
@@ -86,9 +86,9 @@ class Popup extends Item {
         opacity: { type: QReal, value: 1, changed: '$opacityChanged' },
         scale: { type: QReal, value: 1, changed: '$scaleChanged' },
         clip: { type: QBool, value: false, changed: '$clipChanged' },
-        enabled: { type: QBool, value: true },
+        enabled: { type: QBool, value: true, changed: '$enabledChanged' },
         focus: { type: QBool, value: false },
-        spacing: { type: QReal, value: 0 },
+        spacing: { type: QReal, value: 0, changed: '$spacingChanged' },
 
         // Transitions
         enter: { type: QVar },
@@ -121,6 +121,13 @@ class Popup extends Item {
 
     constructor(parent, exCtx, exModel){
         super(parent, exCtx, exModel)
+
+        // Move popup DOM out of parent tree into document.body
+        // so it is never clipped by ancestor overflow or broken by ancestor transforms
+        if (this.$dom && this.$dom.parentNode) {
+            this.$dom.parentNode.removeChild(this.$dom)
+        }
+        document.body.appendChild(this.$dom)
 
         // Popup root container (fixed overlay)
         this.setStyle({
@@ -168,6 +175,13 @@ class Popup extends Item {
             }
         }
 
+        // Modal: block scroll/wheel behind overlay
+        this.$onWheelBlock = (e) => { e.preventDefault(); e.stopPropagation() }
+
+        this.$onResize = () => {
+            if (this.getPropertyValue('visible')) this.$applyGeometry()
+        }
+
         this.$overlay.addEventListener('mousedown', this.$onOverlayClick)
         this.$overlay.addEventListener('mouseup', this.$onOverlayRelease)
 
@@ -176,12 +190,16 @@ class Popup extends Item {
     }
 
     /**
-     * Reparent child DOM elements into the content box instead of the root overlay
+     * Reparent child DOM elements into the content box instead of the root overlay.
+     * addChild is called before child DOM exists, so we use addDomChild hook instead.
      */
     addChild(child){
         super.addChild(child)
-        if (child.getDom && child.getDom()){
-            this.$contentBox.appendChild(child.getDom())
+    }
+
+    addDomChild(child){
+        if (child.$dom && this.$contentBox){
+            this.$contentBox.appendChild(child.$dom)
         }
     }
 
@@ -189,14 +207,14 @@ class Popup extends Item {
 
     open(){
         if (this.getPropertyValue('opened')) return
-        if (this.$signals.aboutToShow) this.$signals.aboutToShow()
+        this.getSignal('aboutToShow')()
         this.getProperty('visible').reset(true)
         this.getProperty('opened').reset(true)
     }
 
     close(){
         if (!this.getPropertyValue('opened')) return
-        if (this.$signals.aboutToHide) this.$signals.aboutToHide()
+        this.getSignal('aboutToHide')()
         this.getProperty('visible').reset(false)
         this.getProperty('opened').reset(false)
     }
@@ -208,31 +226,52 @@ class Popup extends Item {
     // --- Property change handlers ---
 
     $visibleChanged(){
-        if (this.getPropertyValue('visible')){
+        let currentValue = this.getPropertyValue('visible')
+        if (currentValue){
             this.setStyle({ display: 'block' })
             this.$contentBox.style.display = 'flex'
             document.addEventListener('keydown', this.$onEscapeKey)
+            window.addEventListener('resize', this.$onResize)
             this.$applyGeometry()
             this.$updateOverlay()
-            if (this.$signals.opened) this.$signals.opened()
         } else {
             this.setStyle({ display: 'none' })
             document.removeEventListener('keydown', this.$onEscapeKey)
+            window.removeEventListener('resize', this.$onResize)
             this.$updateOverlay()
-            if (this.$signals.closed) this.$signals.closed()
+            this.getSignal('closed')()
+        }
+
+        // Propagate visibility to children (QVisible.set2) — 
+        // Item.$visibleChanged does this, but Popup overrides $visibleChanged
+        // so children's value2 would never be updated without this.
+        let children = this.getProperty('children').get()
+        for(let child of children){
+            if(child.UID) child.getProperty('visible').set2(currentValue)
         }
     }
 
     $modalChanged(){
+        // In Qt, dim follows modal unless explicitly set
+        if (!this.$dimExplicit) {
+            this.$dimAutoSetting = true
+            this.getProperty('dim').reset(this.getPropertyValue('modal'))
+            this.$dimAutoSetting = false
+        }
         this.$updateOverlay()
     }
 
-    $dimChanged(){
+    $dimChangedExplicit(){
+        // Mark dim as explicitly set by user so $modalChanged won't override it
+        if (!this.$dimAutoSetting) {
+            this.$dimExplicit = true
+        }
         this.$updateOverlay()
     }
 
     $closePolicyChanged(){
-        // no-op: policy is checked at event time
+        // Update overlay visibility when policy changes at runtime
+        this.$updateOverlay()
     }
 
     $geometryChanged(){
@@ -252,18 +291,50 @@ class Popup extends Item {
     }
 
     $scaleChanged(){
-        this.$contentBox.style.transform = `scale(${this.getPropertyValue('scale')})`
+        this.$applyTransform()
     }
 
     $clipChanged(){
         this.$contentBox.style.overflow = this.getPropertyValue('clip') ? 'hidden' : 'visible'
     }
 
+    $enabledChanged(){
+        this.$contentBox.style.pointerEvents = this.getPropertyValue('enabled') ? 'auto' : 'none'
+    }
+
+    $spacingChanged(){
+        this.$contentBox.style.gap = `${this.getPropertyValue('spacing')}px`
+    }
+
     $backgroundChanged(){
-        // Background is a QML Item; if it's a color string, apply directly
         let bg = this.getPropertyValue('background')
         if (typeof bg === 'string'){
             this.$contentBox.style.background = bg
+        } else if (bg && bg.$dom) {
+            // QML Item used as background (e.g. background: Rectangle { ... })
+            // Clear default contentBox visual styling — the background Item provides its own
+            this.$contentBox.style.background = 'transparent'
+            this.$contentBox.style.border = 'none'
+            this.$contentBox.style.borderRadius = '0'
+            this.$contentBox.style.boxShadow = 'none'
+
+            // Ensure background is first child (renders behind content)
+            if (this.$contentBox.firstChild !== bg.$dom) {
+                this.$contentBox.insertBefore(bg.$dom, this.$contentBox.firstChild)
+            }
+
+            // Bind background size to popup size
+            this.$bgItem = bg
+            bg.getProperty('x').reset(0)
+            bg.getProperty('y').reset(0)
+            bg.getProperty('width').freeze()
+            bg.getProperty('width').subscribePrimary(this.getProperty('width'))
+            bg.getProperty('width').setCompute(() => this.getPropertyValue('width'))
+            bg.getProperty('height').freeze()
+            bg.getProperty('height').subscribePrimary(this.getProperty('height'))
+            bg.getProperty('height').setCompute(() => this.getPropertyValue('height'))
+            bg.getProperty('width').update()
+            bg.getProperty('height').update()
         }
     }
 
@@ -280,19 +351,25 @@ class Popup extends Item {
 
         if (!visible){
             this.$overlay.style.display = 'none'
+            this.$overlay.removeEventListener('wheel', this.$onWheelBlock)
+            this.$overlay.removeEventListener('touchmove', this.$onWheelBlock)
             return
         }
 
-        // modal popup blocks clicks on overlay; modeless allows pass-through
+        // modal popup blocks clicks/scroll on overlay; modeless allows pass-through
         if (modal){
             this.$overlay.style.display = 'block'
             this.$overlay.style.pointerEvents = 'auto'
+            this.$overlay.addEventListener('wheel', this.$onWheelBlock, { passive: false })
+            this.$overlay.addEventListener('touchmove', this.$onWheelBlock, { passive: false })
             if (dim){
-                this.$overlay.style.backgroundColor = 'rgba(0,0,0,0.4)'
+                this.$overlay.style.backgroundColor = 'rgba(0,0,0,0.25)'
             } else {
                 this.$overlay.style.backgroundColor = 'transparent'
             }
         } else {
+            this.$overlay.removeEventListener('wheel', this.$onWheelBlock)
+            this.$overlay.removeEventListener('touchmove', this.$onWheelBlock)
             // non-modal: overlay still catches clicks for CloseOnPressOutside
             let policy = this.getPropertyValue('closePolicy')
             if (policy & (ClosePolicy.CloseOnPressOutside | ClosePolicy.CloseOnReleaseOutside)){
@@ -303,7 +380,7 @@ class Popup extends Item {
                 this.$overlay.style.pointerEvents = 'none'
             }
             if (dim){
-                this.$overlay.style.backgroundColor = 'rgba(0,0,0,0.2)'
+                this.$overlay.style.backgroundColor = 'rgba(0,0,0,0.12)'
             } else {
                 this.$overlay.style.backgroundColor = 'transparent'
             }
@@ -326,15 +403,55 @@ class Popup extends Item {
         if (centerIn){
             this.$contentBox.style.left = '50%'
             this.$contentBox.style.top = '50%'
-            this.$contentBox.style.transform = 'translate(-50%, -50%)'
+            this.$isCenterIn = true
         } else {
-            this.$contentBox.style.left = (x != null && x !== '') ? `${x}px` : ''
-            this.$contentBox.style.top = (y != null && y !== '') ? `${y}px` : ''
-            this.$contentBox.style.transform = ''
+            this.$isCenterIn = false
+            // Compute viewport-relative offset from QML parent's DOM position
+            let offsetX = 0
+            let offsetY = 0
+            let qmlParent = this.getProperty('parent').get()
+            if (qmlParent && qmlParent.$dom){
+                let rect = qmlParent.$dom.getBoundingClientRect()
+                offsetX = rect.left
+                offsetY = rect.top
+            }
+
+            let finalX = offsetX + (x || 0)
+            let finalY = offsetY + (y || 0)
+
+            // Clamp to viewport using margins (Qt: margins prevent popup going off-screen)
+            let mg = this.getPropertyValue('margins')
+            let tM = this.getPropertyValue('topMargin')
+            let bM = this.getPropertyValue('bottomMargin')
+            let lM = this.getPropertyValue('leftMargin')
+            let rM = this.getPropertyValue('rightMargin')
+            let mTop = tM >= 0 ? tM : (mg >= 0 ? mg : -1)
+            let mBottom = bM >= 0 ? bM : (mg >= 0 ? mg : -1)
+            let mLeft = lM >= 0 ? lM : (mg >= 0 ? mg : -1)
+            let mRight = rM >= 0 ? rM : (mg >= 0 ? mg : -1)
+
+            if (mLeft >= 0 && finalX < mLeft) finalX = mLeft
+            if (mTop >= 0 && finalY < mTop) finalY = mTop
+            if (mRight >= 0 && w > 0 && finalX + w > window.innerWidth - mRight)
+                finalX = Math.max(mLeft >= 0 ? mLeft : 0, window.innerWidth - mRight - w)
+            if (mBottom >= 0 && h > 0 && finalY + h > window.innerHeight - mBottom)
+                finalY = Math.max(mTop >= 0 ? mTop : 0, window.innerHeight - mBottom - h)
+
+            this.$contentBox.style.left = `${finalX}px`
+            this.$contentBox.style.top = `${finalY}px`
         }
 
         if (w != null && w > 0) this.$contentBox.style.width = `${w}px`
         if (h != null && h > 0) this.$contentBox.style.height = `${h}px`
+        this.$applyTransform()
+    }
+
+    $applyTransform(){
+        let parts = []
+        if (this.$isCenterIn) parts.push('translate(-50%, -50%)')
+        let s = this.getPropertyValue('scale')
+        if (s !== 1) parts.push(`scale(${s})`)
+        this.$contentBox.style.transform = parts.join(' ')
     }
 
     $applyPadding(){
@@ -356,8 +473,17 @@ class Popup extends Item {
 
     destroy(){
         document.removeEventListener('keydown', this.$onEscapeKey)
-        this.$overlay.removeEventListener('mousedown', this.$onOverlayClick)
-        this.$overlay.removeEventListener('mouseup', this.$onOverlayRelease)
+        window.removeEventListener('resize', this.$onResize)
+        if(this.$overlay){
+            this.$overlay.removeEventListener('mousedown', this.$onOverlayClick)
+            this.$overlay.removeEventListener('mouseup', this.$onOverlayRelease)
+            this.$overlay.removeEventListener('wheel', this.$onWheelBlock)
+            this.$overlay.removeEventListener('touchmove', this.$onWheelBlock)
+        }
+        // Remove from document.body since we reparented there in constructor
+        if(this.$dom && this.$dom.parentNode === document.body){
+            document.body.removeChild(this.$dom)
+        }
         delete this.$onOverlayClick
         delete this.$onOverlayRelease
         delete this.$onEscapeKey

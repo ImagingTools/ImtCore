@@ -1,3 +1,15 @@
+// QML String.arg() — replaces the lowest %N placeholder with the given value
+String.prototype.arg = function(val) {
+    var s = this.toString()
+    for (var i = 1; i <= 99; i++) {
+        var ph = '%' + i
+        if (s.indexOf(ph) >= 0) {
+            return s.replace(ph, val != null ? String(val) : '')
+        }
+    }
+    return s
+}
+
 RegExp.prototype.toPartialMatchRegex = function() {
     "use strict";
     

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 import QtQuick 2.12
+import QtQuick.Controls
 import Acf 1.0
 import imtgui 1.0
 import imtcolgui 1.0
@@ -56,7 +57,7 @@ RemoteCollectionView {
 			AcceptTenantInvitationPayload {
 				onFinished: {
 					if (m_success) {
-						container.doUpdateModel()
+						container.doUpdateGui()
 					} else if (m_errorMessage && m_errorMessage !== "") {
 						ModalDialogManager.showInfoDialog(m_errorMessage)
 					}
@@ -77,7 +78,7 @@ RemoteCollectionView {
 			RejectTenantInvitationPayload {
 				onFinished: {
 					if (m_success) {
-						container.doUpdateModel()
+						container.doUpdateGui()
 					} else if (m_errorMessage && m_errorMessage !== "") {
 						ModalDialogManager.showInfoDialog(m_errorMessage)
 					}
@@ -100,15 +101,10 @@ RemoteCollectionView {
 			property string invitedByNameValue: ""
 
 			onReused: {
-				var val = tenantRelationScopeDelegate.getValue()
-				scopeValue = val !== undefined && val !== null ? val.toString() : ""
-
-				if (tenantRelationScopeDelegate.rowDelegate && tenantRelationScopeDelegate.rowDelegate.dataModel) {
-					var item = tenantRelationScopeDelegate.rowDelegate.dataModel.item
-					if (item) {
-						invitationIdValue = (item.m_invitationId || "").toString()
-						invitedByNameValue = (item.m_invitedByName || "").toString()
-					}
+				if (rowIndex >= 0 && tenantRelationScopeDelegate.rowDelegate && tenantRelationScopeDelegate.rowDelegate.tableItem){
+					scopeValue = tenantRelationScopeDelegate.rowDelegate.tableItem.elements.getData(TenantItemDataTypeMetaInfo.s_tenantRelationScope, rowIndex);
+					invitationIdValue = tenantRelationScopeDelegate.rowDelegate.tableItem.elements.getData(TenantItemDataTypeMetaInfo.s_invitationId, rowIndex);
+					invitedByNameValue = tenantRelationScopeDelegate.rowDelegate.tableItem.elements.getData(TenantItemDataTypeMetaInfo.s_invitedByName, rowIndex);
 				}
 			}
 
@@ -141,7 +137,6 @@ RemoteCollectionView {
 				y: scopeLabel.y + scopeLabel.height + Style.spacingS
 				width: invitationPopupContent.width + 2 * Style.marginL
 				height: invitationPopupContent.height + 2 * Style.marginL
-				modal: false
 				closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
 
 				background: Rectangle {
@@ -224,13 +219,6 @@ RemoteCollectionView {
 	}
 
 	Component {
-		id: hiddenCellDelegateComp
-		TableCellDelegateBase {
-			Item {}
-		}
-	}
-
-	Component {
 		id: membersCountCellDelegateComp
 		TableCellDelegateBase {
 			id: membersCountDelegate
@@ -288,7 +276,6 @@ RemoteCollectionView {
 		id: isActiveCellDelegateComp
 		TableCellDelegateBase {
 			id: isActiveDelegate
-
 			onReused: {
 				var val = isActiveDelegate.getValue()
 				isActiveLabel.text = val ? qsTr("Active") : qsTr("Inactive")

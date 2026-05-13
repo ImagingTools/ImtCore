@@ -1,10 +1,10 @@
 const { Item } = require('./Item')
-const { QString, QBool, QReal, QVar, QInt } = require('../utils/properties')
+const { QString, QBool, QReal, QVar, QInt, QVisible } = require('../utils/properties')
 
 class Menu extends Item {
     static defaultProperties = {
         title: { type: QString, value: '', changed: '$titleChanged' },
-        visible: { type: QBool, value: false, changed: '$visibleChanged' },
+        visible: { type: QVisible, value: false, changed: '$visibleChanged' },
         enabled: { type: QBool, value: true },
         count: { type: QInt, value: 0 },
         currentIndex: { type: QInt, value: -1 },

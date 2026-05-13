@@ -1088,7 +1088,7 @@ class Item extends QtObject {
     }
 
     destroy(){
-        this.$dom.remove()
+        if(this.$dom) this.$dom.remove()
         super.destroy()
 
         let index = mainRoot.$focusedElements.indexOf(this)
