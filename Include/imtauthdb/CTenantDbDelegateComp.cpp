@@ -194,13 +194,18 @@ QByteArray CTenantDbDelegateComp::CreateDeleteObjectsQuery(
 		escapedIds << QString("'%1'").arg(imtdb::EscapeSql(QString::fromUtf8(id)));
 	}
 
-	QString permissionsTableName = QString::fromUtf8(*m_permissionsTableNameAttrPtr);
 	QString idsJoined = escapedIds.join(", ");
 
-	return (QString("DELETE FROM \"%1\" WHERE \"TenantId\" IN (%2);")
-				.arg(permissionsTableName, idsJoined)
-			+ QString("DELETE FROM \"%1\" WHERE \"Id\" IN (%2);")
-				.arg(*m_tableNameAttrPtr, idsJoined)).toUtf8();
+	QByteArray result;
+	// Delete permissions first (explicit for DBs where FK CASCADE may not be enforced)
+	for (const QByteArray& id : objectIds){
+		result += CreatePermissionsDeleteQuery(id);
+	}
+
+	result += QString("DELETE FROM \"%1\" WHERE \"Id\" IN (%2);")
+				.arg(*m_tableNameAttrPtr, idsJoined).toUtf8();
+
+	return result;
 }
 
 
