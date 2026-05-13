@@ -876,13 +876,30 @@ DocumentViewBase {
 			function updateGui() {
 				if (!container.tenantData)
 					return
+
+				// Populate permissions model from server data
+				container.permissionsModel.clear()
+				var allPermsModel = container.tenantData.m_allProductPermissions
+				if (allPermsModel) {
+					var allCount = allPermsModel.count || 0
+					for (var pi = 0; pi < allCount; pi++) {
+						var perm = allPermsModel.get(pi).item
+						if (perm) {
+							var permIndex = container.permissionsModel.insertNewItem()
+							container.permissionsModel.setData("FeatureId", perm.m_id || "", permIndex)
+							container.permissionsModel.setData("FeatureName", perm.m_name || "", permIndex)
+						}
+					}
+				}
+				container.permissionsModel.refresh()
+				tenantPermissionHeaders.updateHeaders()
+
+				// Restore checked state from selected permissions
 				var selectedPermissionsIds = []
 				var selectedPermissions = container.tenantData.m_tenantPermissions
 				if (selectedPermissions && selectedPermissions !== "") {
 					selectedPermissionsIds = selectedPermissions.split(';')
 				}
-
-				selectedPermissionsIds.sort()
 
 				tenantPermissionsTreeView.treeView.uncheckAll()
 
@@ -894,10 +911,7 @@ DocumentViewBase {
 						var id = itemData.FeatureId
 
 						if (selectedPermissionsIds.includes(id)) {
-							delegateItem.isOpened = true
 							tenantPermissionsTreeView.treeView.checkItem(delegateItem)
-						} else {
-							delegateItem.isOpened = false
 						}
 					}
 				}

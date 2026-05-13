@@ -47,6 +47,12 @@ type TenantRoleOption {
 	name: String!
 }
 
+type TenantPermissionOption {
+	id: ID!
+	name: String!
+	description: String
+}
+
 type TenantInvitationEntry {
 	id: ID!
 	userId: ID!
@@ -73,6 +79,7 @@ type TenantData {
 	pendingInvitations: [TenantInvitationEntry]
 	availableRoles: [TenantRoleOption]
 	tenantPermissions: String
+	allProductPermissions: [TenantPermissionOption]
 }
 
 input GetTenantListInput {

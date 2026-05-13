@@ -8,6 +8,7 @@
 #include <imtauth/ITenantMembershipManager.h>
 #include <imtauth/ITenantInvitationManager.h>
 #include <imtauth/IUserManager.h>
+#include <imtlic/IFeatureInfoProvider.h>
 #include <imtdoc/IDocumentManagerEventHandler.h>
 
 // Generated includes
@@ -32,6 +33,7 @@ public:
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager for members", false, "MembershipManager");
 		I_ASSIGN(m_invitationManagerCompPtr, "InvitationManager", "Tenant invitation manager for pending invitations", false, "TenantInvitationManager");
 		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "Collection of users", true, "UserCollection");
+		I_ASSIGN(m_featureInfoProviderCompPtr, "FeatureInfoProvider", "Provider of product features and permissions", true, "FeatureInfoProvider");
 	I_END_COMPONENT
 
 protected:
@@ -54,6 +56,7 @@ private:
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
 	I_REF(imtauth::ITenantInvitationManager, m_invitationManagerCompPtr);
 	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
+	I_REF(imtlic::IFeatureInfoProvider, m_featureInfoProviderCompPtr);
 };
 
 

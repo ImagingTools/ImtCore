@@ -9,6 +9,7 @@
 // ImtCore includes
 #include <imtauth/ITenantInfo.h>
 #include <imtauth/IUserManager.h>
+#include <imtbase/ICollectionInfo.h>
 #include <imtgql/IGqlContext.h>
 #include <imtdoc/CDocumentSavedEvent.h>
 #include <imtauth/imtauth.h>
@@ -197,6 +198,23 @@ sdl::imtauth::Tenants::CTenantData CTenantCollectionDocumentManagerComp::OnGetTe
 
 	// Tenant-scoped permissions (selected subset of product permissions)
 	response.Version_1_0->tenantPermissions = tenantPtr->GetTenantPermissions();
+
+	// All available product permissions for selection UI
+	response.Version_1_0->allProductPermissions.Emplace();
+	if (m_featureInfoProviderCompPtr.IsValid()){
+		const imtbase::ICollectionInfo& featureList = m_featureInfoProviderCompPtr->GetFeatureList();
+		imtbase::ICollectionInfo::Ids featureIds = featureList.GetElementIds();
+		for (const QByteArray& featureId : featureIds){
+			imtlic::IFeatureInfoSharedPtr featurePtr = m_featureInfoProviderCompPtr->GetFeatureInfo(featureId);
+			if (featurePtr.IsValid() && featurePtr->IsPermission()){
+				sdl::imtauth::Tenants::CTenantPermissionOption::V1_0 permOpt;
+				permOpt.id = featurePtr->GetFeatureId();
+				permOpt.name = featurePtr->GetFeatureName();
+				permOpt.description = featurePtr->GetFeatureDescription();
+				response.Version_1_0->allProductPermissions->push_back(permOpt);
+			}
+		}
+	}
 
 	return response;
 }
