@@ -505,7 +505,7 @@ DocumentViewBase {
 												? (parent.width - parent.spacing * 2 - Style.iconSizeS - chipRemoveBtn.width) * container.memberRoleComboWidthRatio
 												: 0
 											anchors.verticalCenter: parent.verticalCenter
-											text: modelData.isExpired ? qsTr("Expired") : modelData.role + " (" + modelData.status + ")"
+											text: modelData.isExpired ? qsTr("Expired") : qsTr("%1 (%2)").arg(modelData.role).arg(modelData.status)
 											color: modelData.isExpired ? "#DA3633" : Style.inactiveTextColor
 											font.bold: modelData.isExpired
 											elide: Text.ElideRight
@@ -601,6 +601,7 @@ DocumentViewBase {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "")
 						ModalDialogManager.showInfoDialog(m_errorMessage)
+					// Refresh to show the new pending invitation
 					else if (container.representationController)
 						container.representationController.updateRepresentationFromDocument()
 				}
