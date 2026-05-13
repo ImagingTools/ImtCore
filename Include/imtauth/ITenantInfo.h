@@ -163,14 +163,14 @@ public:
 	virtual bool RemoveRelationship(const QByteArray& relationshipId) = 0;
 
 	/**
-		Get the list of permissions available for this tenant (semicolon-separated permission IDs).
+		Get the list of permissions available for this tenant.
 	*/
-	virtual QString GetTenantPermissions() const = 0;
+	virtual QByteArrayList GetTenantPermissions() const = 0;
 
 	/**
-		Set the list of permissions available for this tenant (semicolon-separated permission IDs).
+		Set the list of permissions available for this tenant.
 	*/
-	virtual void SetTenantPermissions(const QString& permissions) = 0;
+	virtual void SetTenantPermissions(const QByteArrayList& permissions) = 0;
 };
 
 

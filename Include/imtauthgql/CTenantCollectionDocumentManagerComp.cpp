@@ -197,7 +197,7 @@ sdl::imtauth::Tenants::CTenantData CTenantCollectionDocumentManagerComp::OnGetTe
 	}
 
 	// Tenant-scoped permissions (selected subset of product permissions)
-	response.Version_1_0->tenantPermissions = tenantPtr->GetTenantPermissions();
+	response.Version_1_0->tenantPermissions.Emplace().FromList(tenantPtr->GetTenantPermissions());
 
 	// All available product permissions for selection UI
 	response.Version_1_0->allProductPermissions.Emplace();
@@ -388,7 +388,7 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTenantCollect
 
 		// Apply tenant permissions (only Owner/Admin)
 		if ((isOwner || isAdmin) && tenantData.tenantPermissions){
-			tenantPtr->SetTenantPermissions(*tenantData.tenantPermissions);
+			tenantPtr->SetTenantPermissions(tenantData.tenantPermissions->ToList());
 		}
 	}
 

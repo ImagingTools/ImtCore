@@ -896,9 +896,14 @@ DocumentViewBase {
 
 				// Restore checked state from selected permissions
 				var selectedPermissionsIds = []
-				var selectedPermissions = container.tenantData.m_tenantPermissions
-				if (selectedPermissions && selectedPermissions !== "") {
-					selectedPermissionsIds = selectedPermissions.split(';')
+				var permissionsArray = container.tenantData.m_tenantPermissions
+				if (permissionsArray) {
+					var permCount = permissionsArray.count || 0
+					for (var pi2 = 0; pi2 < permCount; pi2++) {
+						var permId = permissionsArray.get(pi2)
+						if (permId)
+							selectedPermissionsIds.push(permId)
+					}
 				}
 
 				tenantPermissionsTreeView.treeView.uncheckAll()
@@ -933,7 +938,12 @@ DocumentViewBase {
 
 				selectedPermissionIds.sort()
 
-				container.tenantData.m_tenantPermissions = selectedPermissionIds.join(';')
+				if (!container.tenantData.hasTenantPermissions())
+					container.tenantData.emplaceTenantPermissions()
+				container.tenantData.m_tenantPermissions.clear()
+				for (var k = 0; k < selectedPermissionIds.length; k++) {
+					container.tenantData.m_tenantPermissions.addElement(selectedPermissionIds[k])
+				}
 			}
 
 			CustomScrollbar {
