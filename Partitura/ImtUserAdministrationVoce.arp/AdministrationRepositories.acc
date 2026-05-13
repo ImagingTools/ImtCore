@@ -136,6 +136,24 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="TenantInvitationSqlRepository" PackageId="ImtUserAdministrationVoce" ComponentId="TenantInvitationSqlRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="TenantMembershipSqlRepository" PackageId="ImtUserAdministrationVoce" ComponentId="TenantMembershipSqlRepository">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -162,6 +180,7 @@
         <Component ExportedId="CachedRoleCollection" ComponentId="RoleDocumentSqlRepository/CachedRoleCollection"/>
         <Component ExportedId="CachedUserCollection" ComponentId="UserSqlRepository/CachedUserCollection"/>
         <Component ExportedId="RoleRepository" ComponentId="RoleDocumentSqlRepository"/>
+        <Component ExportedId="TenantInvitationRepository" ComponentId="TenantInvitationSqlRepository/TenantInvitationRepository"/>
         <Component ExportedId="TenantMembershipRepository" ComponentId="TenantMembershipSqlRepository/TenantMembershipRepository"/>
         <Component ExportedId="TenantRepository" ComponentId="TenantSqlRepository/TenantRepository"/>
         <Component ExportedId="UserGroupRepository" ComponentId="UserGroupSqlRepository"/>

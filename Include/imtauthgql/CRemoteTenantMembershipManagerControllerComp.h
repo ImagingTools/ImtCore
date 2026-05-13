@@ -2,13 +2,8 @@
 #pragma once
 
 
-// ACF includes
-#include <icomp/CComponentBase.h>
-
 // ImtCore includes
-#include <imtauth/ITenantManager.h>
-#include <imtauth/ITenantMembershipManager.h>
-#include <imtauth/ITenantInvitationManager.h>
+#include <imtclientgql/TClientRequestManagerCompWrap.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/TenantMemberships.h>
 
 
@@ -16,15 +11,14 @@ namespace imtauthgql
 {
 
 
-class CTenantMembershipManagerControllerComp: public sdl::imtauth::TenantMemberships::CGraphQlHandlerCompBase
+class CRemoteTenantMembershipManagerControllerComp:
+			public imtclientgql::TClientRequestManagerCompWrap<
+							sdl::imtauth::TenantMemberships::CGraphQlHandlerCompBase>
 {
 public:
-	typedef sdl::imtauth::TenantMemberships::CGraphQlHandlerCompBase BaseClass;
+	typedef imtclientgql::TClientRequestManagerCompWrap<sdl::imtauth::TenantMemberships::CGraphQlHandlerCompBase> BaseClass;
 
-	I_BEGIN_COMPONENT(CTenantMembershipManagerControllerComp);
-		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager providing CRUD operations", true, "TenantMembershipManager");
-		I_ASSIGN(m_invitationManagerCompPtr, "InvitationManager", "Tenant invitation manager providing invitation lifecycle operations", true, "TenantInvitationManager");
-		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager for resolving tenant names", false, "TenantManager");
+	I_BEGIN_COMPONENT(CRemoteTenantMembershipManagerControllerComp);
 	I_END_COMPONENT;
 
 protected:
@@ -93,11 +87,6 @@ protected:
 				const sdl::imtauth::TenantMemberships::CUpdateMembershipRoleGqlRequest& request,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-
-private:
-	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
-	I_REF(imtauth::ITenantInvitationManager, m_invitationManagerCompPtr);
-	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
 };
 
 

@@ -2,6 +2,7 @@
 #include <imtauthgql/CTenantMembershipManagerControllerComp.h>
 
 // ImtCore includes
+#include <imtauth/ITenantInfo.h>
 #include <imtgql/IGqlContext.h>
 
 
@@ -41,7 +42,8 @@ sdl::imtauth::TenantMemberships::CTenantInvitationData::V1_0 ToTenantInvitationD
 
 bool CanManageTenant(const imtauth::ITenantMembershipManager& membershipManager, const QByteArray& userId, const QByteArray& tenantId)
 {
-	return membershipManager.HasMinimumRole(userId, tenantId, imtauth::ITenantMembership::TMR_ADMIN);
+	return membershipManager.HasMinimumRole(userId, tenantId, imtauth::ITenantMembership::TMR_ADMIN) ||
+			membershipManager.HasMinimumRole(userId, tenantId, imtauth::ITenantMembership::TMR_OWNER);
 }
 
 
@@ -303,7 +305,14 @@ sdl::imtauth::TenantMemberships::CGetTenantInvitationsPayload CTenantMembershipM
 	for (const QByteArray& invitationId : m_invitationManagerCompPtr->GetInvitationsByTenant(tenantId, statuses)){
 		imtauth::ITenantInvitationUniquePtr invitationPtr = m_invitationManagerCompPtr->GetInvitation(invitationId);
 		if (invitationPtr.IsValid()){
-			response.Version_1_0->invitations->push_back(ToTenantInvitationData(*invitationPtr, m_invitationManagerCompPtr->GetEffectiveStatus(*invitationPtr)));
+			sdl::imtauth::TenantMemberships::CTenantInvitationData::V1_0 data = ToTenantInvitationData(*invitationPtr, m_invitationManagerCompPtr->GetEffectiveStatus(*invitationPtr));
+			if (m_tenantManagerCompPtr.IsValid()){
+				imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(invitationPtr->GetTenantId());
+				if (tenantPtr.IsValid()){
+					data.tenantName = tenantPtr->GetTenantName();
+				}
+			}
+			response.Version_1_0->invitations->push_back(data);
 		}
 	}
 
@@ -336,7 +345,14 @@ sdl::imtauth::TenantMemberships::CGetMyTenantInvitationsPayload CTenantMembershi
 	for (const QByteArray& invitationId : m_invitationManagerCompPtr->GetInvitationsByUser(ContextUserId(gqlRequest), statuses)){
 		imtauth::ITenantInvitationUniquePtr invitationPtr = m_invitationManagerCompPtr->GetInvitation(invitationId);
 		if (invitationPtr.IsValid()){
-			response.Version_1_0->invitations->push_back(ToTenantInvitationData(*invitationPtr, m_invitationManagerCompPtr->GetEffectiveStatus(*invitationPtr)));
+			sdl::imtauth::TenantMemberships::CTenantInvitationData::V1_0 data = ToTenantInvitationData(*invitationPtr, m_invitationManagerCompPtr->GetEffectiveStatus(*invitationPtr));
+			if (m_tenantManagerCompPtr.IsValid()){
+				imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(invitationPtr->GetTenantId());
+				if (tenantPtr.IsValid()){
+					data.tenantName = tenantPtr->GetTenantName();
+				}
+			}
+			response.Version_1_0->invitations->push_back(data);
 		}
 	}
 
@@ -411,52 +427,6 @@ sdl::imtauth::TenantMemberships::CRemoveMembershipPayload CTenantMembershipManag
 	if (!success){
 		response.Version_1_0->errorMessage = QStringLiteral("Failed to remove membership");
 	}
-
-	return response;
-}
-
-
-sdl::imtauth::TenantMemberships::CInviteTenantMemberPayload CTenantMembershipManagerControllerComp::OnInviteTenantMember(
-	const sdl::imtauth::TenantMemberships::CInviteTenantMemberGqlRequest& request,
-	const ::imtgql::CGqlRequest& gqlRequest,
-	QString& /*errorMessage*/) const
-{
-	sdl::imtauth::TenantMemberships::CInviteTenantMemberPayload response;
-
-	if (!m_invitationManagerCompPtr.IsValid() || !m_membershipManagerCompPtr.IsValid()){
-		Q_ASSERT_X(false, "Attribute 'InvitationManager' or 'MembershipManager' was not set", "CTenantMembershipManagerControllerComp");
-		return response;
-	}
-
-	response.Version_1_0.emplace();
-
-	QByteArray userId;
-	QByteArray tenantId;
-	imtauth::ITenantMembership::TenantMemberRole role = imtauth::ITenantMembership::TMR_MEMBER;
-	sdl::imtauth::TenantMemberships::InviteTenantMemberRequestArguments arguments = request.GetRequestedArguments();
-	if (arguments.input.Version_1_0->userId){
-		userId = *arguments.input.Version_1_0->userId;
-	}
-	if (arguments.input.Version_1_0->tenantId){
-		tenantId = *arguments.input.Version_1_0->tenantId;
-	}
-	if (arguments.input.Version_1_0->role){
-		role = static_cast<imtauth::ITenantMembership::TenantMemberRole>(*arguments.input.Version_1_0->role);
-	}
-
-	QByteArray contextUserId = ContextUserId(gqlRequest);
-	if (!CanManageTenant(*m_membershipManagerCompPtr.GetPtr(), contextUserId, tenantId)){
-		response.Version_1_0->errorMessage = QStringLiteral("Access denied");
-		return response;
-	}
-
-	QByteArray invitationId = m_invitationManagerCompPtr->CreateInvitation(contextUserId, userId, tenantId, role);
-	if (invitationId.isEmpty()){
-		response.Version_1_0->errorMessage = QStringLiteral("Failed to invite tenant member");
-		return response;
-	}
-
-	response.Version_1_0->membershipId = invitationId;
 
 	return response;
 }
@@ -658,71 +628,19 @@ sdl::imtauth::TenantMemberships::CUpdateMembershipRolePayload CTenantMembershipM
 		role = static_cast<imtauth::ITenantMembership::TenantMemberRole>(*arguments.input.Version_1_0->role);
 	}
 
+	// Owner role is immutable — cannot be changed
+	imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
+	if (membershipPtr.IsValid() && membershipPtr->GetRole() == imtauth::ITenantMembership::TMR_OWNER){
+		response.Version_1_0->success = false;
+		response.Version_1_0->errorMessage = QStringLiteral("Cannot change the Owner role");
+		return response;
+	}
+
 	bool success = m_membershipManagerCompPtr->UpdateMembershipRole(membershipId, role);
 
 	response.Version_1_0->success = success;
 	if (!success){
 		response.Version_1_0->errorMessage = QStringLiteral("Failed to update membership role");
-	}
-
-	return response;
-}
-
-
-sdl::imtauth::TenantMemberships::CAcceptTenantMembershipInvitationPayload CTenantMembershipManagerControllerComp::OnAcceptTenantMembershipInvitation(
-	const sdl::imtauth::TenantMemberships::CAcceptTenantMembershipInvitationGqlRequest& request,
-	const ::imtgql::CGqlRequest& /*gqlRequest*/,
-	QString& /*errorMessage*/) const
-{
-	sdl::imtauth::TenantMemberships::CAcceptTenantMembershipInvitationPayload response;
-
-	if (!m_membershipManagerCompPtr.IsValid()){
-		Q_ASSERT_X(false, "Attribute 'MembershipManager' was not set", "CTenantMembershipManagerControllerComp");
-		return response;
-	}
-
-	response.Version_1_0.emplace();
-
-	QByteArray membershipId;
-	sdl::imtauth::TenantMemberships::AcceptTenantMembershipInvitationRequestArguments arguments = request.GetRequestedArguments();
-	if (arguments.input.Version_1_0->membershipId){
-		membershipId = *arguments.input.Version_1_0->membershipId;
-	}
-
-	bool success = m_membershipManagerCompPtr->AcceptMembershipInvitation(membershipId);
-	response.Version_1_0->success = success;
-	if (!success){
-		response.Version_1_0->errorMessage = QStringLiteral("Failed to accept membership invitation");
-	}
-
-	return response;
-}
-
-
-sdl::imtauth::TenantMemberships::CRejectTenantMembershipInvitationPayload CTenantMembershipManagerControllerComp::OnRejectTenantMembershipInvitation(
-	const sdl::imtauth::TenantMemberships::CRejectTenantMembershipInvitationGqlRequest& request,
-	const ::imtgql::CGqlRequest& /*gqlRequest*/,
-	QString& /*errorMessage*/) const
-{
-	sdl::imtauth::TenantMemberships::CRejectTenantMembershipInvitationPayload response;
-
-	if (!m_membershipManagerCompPtr.IsValid()){
-		Q_ASSERT_X(false, "Attribute 'MembershipManager' was not set", "CTenantMembershipManagerControllerComp");
-		return response;
-	}
-
-	response.Version_1_0.emplace();
-
-	QByteArray membershipId;
-	sdl::imtauth::TenantMemberships::RejectTenantMembershipInvitationRequestArguments arguments = request.GetRequestedArguments();
-	if (arguments.input.Version_1_0->membershipId){
-		membershipId = *arguments.input.Version_1_0->membershipId;
-	}
-
-	bool success = m_membershipManagerCompPtr->RejectMembershipInvitation(membershipId);
-	response.Version_1_0->success = success;
-	if (!success){
-		response.Version_1_0->errorMessage = QStringLiteral("Failed to reject membership invitation");
 	}
 
 	return response;

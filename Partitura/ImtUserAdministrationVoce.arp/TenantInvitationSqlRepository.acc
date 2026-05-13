@@ -25,7 +25,7 @@
                     <AttributeInfo Id="ObjectFactories" Type="Factory[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>PersonalAccessToken</Value>
+                                <Value>TenantInvitationInfo</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -39,51 +39,16 @@
                     <AttributeInfo Id="TypeIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>PersonalAccessToken</Value>
+                                <Value>TenantInvitation</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="TypeNames" Type="Text[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>Personal Access Token</Value>
+                                <Value>TenantInvitation</Value>
                             </Values>
                         </Data>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="PersonalAccessToken" PackageId="ImtAuthPck" ComponentId="PersonalAccessToken">
-            <Data IsEnabled="true" Flags="2">
-                <AttributeInfoMap/>
-            </Data>
-        </Element>
-        <Element Id="PersonalAccessTokenDatabaseDelegate" PackageId="ImtAuthDbPck" ComponentId="PersonalAccessTokenDatabaseDelegate">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="AutoCreateTable" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="true"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CreateTableScriptPath" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value=":/SQL/Postgres/CreatePersonalAccessTokenTable.sql"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ObjectTypes" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="Types"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="PersonalAccessToken" Type="Factory" ExportId="">
-                        <Data IsEnabled="true" Value="PersonalAccessToken"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TableName" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="PersonalAccessTokens"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
-                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -104,12 +69,47 @@
                         <Data IsEnabled="true" Value="ObjectCollection"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ObjectDelegate" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PersonalAccessTokenDatabaseDelegate"/>
+                        <Data IsEnabled="true" Value="TenantInvitationDatabaseDelegate"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="TenantInvitationDatabaseDelegate" PackageId="ImtAuthDbPck" ComponentId="TenantInvitationDatabaseDelegate">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="AutoCreateTable" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CreateTableScriptPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value=":/SQL/Postgres/CreateTenantInvitationsTable.sql"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="InvitationFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="TenantInvitationInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectTypes" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Types"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TableName" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="TenantInvitations"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="TenantInvitationInfo" PackageId="ImtAuthPck" ComponentId="TenantInvitationInfo">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
             </Data>
         </Element>
         <Element Id="Types" PackageId="BasePck" ComponentId="SelectionConstraints">
@@ -118,14 +118,14 @@
                     <AttributeInfo Id="OptionIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>PersonalAccessToken</Value>
+                                <Value>TenantInvitation</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="OptionNames" Type="Text[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>Personal Access Token</Value>
+                                <Value>TenantInvitation</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -135,11 +135,15 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
+        <Interface InterfaceId="imod::IModel" ComponentId="Repository"/>
+        <Interface InterfaceId="imtbase::ICollectionInfo" ComponentId="Repository"/>
         <Interface InterfaceId="imtbase::IObjectCollection" ComponentId="Repository"/>
-        <Interface InterfaceId="imtdb::ISqlDatabaseObjectDelegate" ComponentId="PersonalAccessTokenDatabaseDelegate"/>
+        <Interface InterfaceId="imtdb::ISqlDatabaseObjectCollection" ComponentId="Repository"/>
+        <Interface InterfaceId="imtdb::ISqlDatabaseObjectDelegate" ComponentId="TenantInvitationDatabaseDelegate"/>
+        <Interface InterfaceId="istd::IChangeable" ComponentId="Repository"/>
     </ExportedInterfaces>
     <ExportedComponents>
-        <Component ExportedId="PersonalAccessTokenDatabaseDelegate" ComponentId="PersonalAccessTokenDatabaseDelegate"/>
-        <Component ExportedId="PersonalAccessTokenRepository" ComponentId="Repository"/>
+        <Component ExportedId="TenantInvitationDatabaseDelegate" ComponentId="TenantInvitationDatabaseDelegate"/>
+        <Component ExportedId="TenantInvitationRepository" ComponentId="Repository"/>
     </ExportedComponents>
 </Acf>

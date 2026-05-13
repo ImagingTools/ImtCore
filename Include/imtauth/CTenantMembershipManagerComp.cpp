@@ -11,6 +11,7 @@
 
 // ImtCore includes
 #include <imtauth/ITenantMembership.h>
+#include <imtauth/ITenantManager.h>
 
 
 namespace imtauth
@@ -194,6 +195,11 @@ bool CTenantMembershipManagerComp::RemoveMembership(const QByteArray& membership
 		return false;
 	}
 
+	if (IsOwnerMembership(membershipId)){
+		SendErrorMessage(0, QString("Cannot remove the tenant owner's membership (membership '%1')").arg(QString::fromUtf8(membershipId)), "CTenantMembershipManagerComp");
+		return false;
+	}
+
 	istd::CChangeNotifier changeNotifier(this);
 
 	if (!m_membershipCollectionCompPtr->RemoveElements({membershipId})){
@@ -247,6 +253,11 @@ bool CTenantMembershipManagerComp::UpdateMembershipRole(const QByteArray& member
 		return false;
 	}
 
+	if (IsOwnerMembership(membershipId)){
+		SendErrorMessage(0, QString("Cannot change the role of the tenant owner (membership '%1')").arg(QString::fromUtf8(membershipId)), "CTenantMembershipManagerComp");
+		return false;
+	}
+
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_membershipCollectionCompPtr->GetObjectData(membershipId, dataPtr)){
 		SendErrorMessage(0, QString("Membership '%1' not found").arg(QString::fromUtf8(membershipId)), "CTenantMembershipManagerComp");
@@ -294,6 +305,33 @@ bool CTenantMembershipManagerComp::HasMinimumRole(const QByteArray& userId, cons
 	// Role hierarchy: Owner(0) > Admin(1) > Member(2) > Guest(3)
 	// Lower enum value = higher privilege
 	return static_cast<int>(membershipPtr->GetRole()) <= static_cast<int>(minimumRole);
+}
+
+
+// private methods
+
+bool CTenantMembershipManagerComp::IsOwnerMembership(const QByteArray& membershipId) const
+{
+	if (!m_tenantManagerCompPtr.IsValid()){
+		return false;
+	}
+
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (!m_membershipCollectionCompPtr->GetObjectData(membershipId, dataPtr)){
+		return false;
+	}
+
+	const ITenantMembership* membershipPtr = dynamic_cast<const ITenantMembership*>(dataPtr.GetPtr());
+	if (membershipPtr == nullptr){
+		return false;
+	}
+
+	ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(membershipPtr->GetTenantId());
+	if (!tenantPtr.IsValid()){
+		return false;
+	}
+
+	return tenantPtr->GetOwnerId() == membershipPtr->GetUserId();
 }
 
 

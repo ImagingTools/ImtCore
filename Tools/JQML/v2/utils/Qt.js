@@ -527,6 +527,11 @@ var Qt = {
     LeftToRight: 0,
     RightToLeft: 1,
 
+    TextDate: 0,
+    ISODate: 1,
+    RFC2822Date: 8,
+    ISODateWithMs: 9,
+
     platform: {
         os: 'web',
     },
@@ -773,26 +778,35 @@ var Qt = {
         
 
     },
-    darker(baseColor, factor = 1.5){
+    darker(baseColor, factor = 2.0){
         let rgba = this.toRGBA(baseColor)
         let hsv = this.rgbToHsv(rgba.r, rgba.g, rgba.b)
-        rgba = this.hsvToRgb(hsv[0], hsv[0], hsv[0] / factor)
-        let rh = rgba[0] > 15 ? rgba[0].toString(16) : '0' + rgba[0].toString(16)
-        let gh = rgba[1] > 15 ? rgba[1].toString(16) : '0' + rgba[1].toString(16)
-        let bh = rgba[2] > 15 ? rgba[2].toString(16) : '0' + rgba[2].toString(16)
+        let rgb = this.hsvToRgb(hsv[0], hsv[1], hsv[2] / factor)
+        let rh = Math.round(Math.max(0, Math.min(255, rgb[0]))); rh = (rh < 16 ? '0' : '') + rh.toString(16)
+        let gh = Math.round(Math.max(0, Math.min(255, rgb[1]))); gh = (gh < 16 ? '0' : '') + gh.toString(16)
+        let bh = Math.round(Math.max(0, Math.min(255, rgb[2]))); bh = (bh < 16 ? '0' : '') + bh.toString(16)
         return `#${rh}${gh}${bh}`
     },
-    lighter(baseColor, factor = 2.0){
+    lighter(baseColor, factor = 1.5){
         let rgba = this.toRGBA(baseColor)
         let hsv = this.rgbToHsv(rgba.r, rgba.g, rgba.b)
-        rgba = this.hsvToRgb(hsv[0], hsv[0], hsv[0] * factor)
-        let rh = rgba[0] > 15 ? rgba[0].toString(16) : '0' + rgba[0].toString(16)
-        let gh = rgba[1] > 15 ? rgba[1].toString(16) : '0' + rgba[1].toString(16)
-        let bh = rgba[2] > 15 ? rgba[2].toString(16) : '0' + rgba[2].toString(16)
+        let rgb = this.hsvToRgb(hsv[0], hsv[1], Math.min(1, hsv[2] * factor))
+        let rh = Math.round(Math.max(0, Math.min(255, rgb[0]))); rh = (rh < 16 ? '0' : '') + rh.toString(16)
+        let gh = Math.round(Math.max(0, Math.min(255, rgb[1]))); gh = (gh < 16 ? '0' : '') + gh.toString(16)
+        let bh = Math.round(Math.max(0, Math.min(255, rgb[2]))); bh = (bh < 16 ? '0' : '') + bh.toString(16)
         return `#${rh}${gh}${bh}`
     },
     tint(baseColor, tintColor){
-
+        let base = this.toRGBA(baseColor)
+        let tint = this.toRGBA(tintColor)
+        let a = tint.a
+        let r = Math.round(tint.r * a + base.r * (1 - a))
+        let g = Math.round(tint.g * a + base.g * (1 - a))
+        let b = Math.round(tint.b * a + base.b * (1 - a))
+        r = Math.max(0, Math.min(255, r)); r = (r < 16 ? '0' : '') + r.toString(16)
+        g = Math.max(0, Math.min(255, g)); g = (g < 16 ? '0' : '') + g.toString(16)
+        b = Math.max(0, Math.min(255, b)); b = (b < 16 ? '0' : '') + b.toString(16)
+        return `#${r}${g}${b}`
     },
     openUrlExternally: function(url){
         return window.open(url, '_blank')
@@ -803,9 +817,12 @@ var Qt = {
         }
     },
     qsTr: function(sourceText){
-        let translate = mainRoot.languages[mainRoot.language]
-        let result = translate ? translate[sourceText] : sourceText
-        return result ? result : sourceText
+        if (typeof mainRoot !== 'undefined' && mainRoot && mainRoot.languages) {
+            let translate = mainRoot.languages[mainRoot.language]
+            let result = translate ? translate[sourceText] : sourceText
+            return result ? result : sourceText
+        }
+        return sourceText
     },
     createComponent(namespace, path, parent){
         let qmlName = path.replaceAll('/', '_').replaceAll('\\', '_').replaceAll('.qml', '').split('_').pop()
@@ -858,6 +875,246 @@ var Qt = {
     },
     btoa: function(data){
         return btoa(data)
+    },
+
+    // --- Date/Time formatters ---
+    $formatDateTimeStr(dt, fmt) {
+        const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
+        const dayNamesShort = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
+        const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December']
+        const monthNamesShort = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+        let result = ''
+        let i = 0
+        let useAP = /AP|ap/.test(fmt)
+        while (i < fmt.length) {
+            if (fmt[i] === "'") {
+                let j = i + 1
+                if (j < fmt.length && fmt[j] === "'") { result += "'"; i = j + 1; continue }
+                while (j < fmt.length && fmt[j] !== "'") j++
+                result += fmt.substring(i + 1, j)
+                i = j + 1
+                continue
+            }
+            if (fmt.substr(i, 4) === 'dddd') { result += dayNames[dt.getDay()]; i += 4 }
+            else if (fmt.substr(i, 3) === 'ddd') { result += dayNamesShort[dt.getDay()]; i += 3 }
+            else if (fmt.substr(i, 2) === 'dd') { result += String(dt.getDate()).padStart(2, '0'); i += 2 }
+            else if (fmt[i] === 'd') { result += dt.getDate(); i += 1 }
+            else if (fmt.substr(i, 4) === 'MMMM') { result += monthNames[dt.getMonth()]; i += 4 }
+            else if (fmt.substr(i, 3) === 'MMM') { result += monthNamesShort[dt.getMonth()]; i += 3 }
+            else if (fmt.substr(i, 2) === 'MM') { result += String(dt.getMonth() + 1).padStart(2, '0'); i += 2 }
+            else if (fmt[i] === 'M') { result += (dt.getMonth() + 1); i += 1 }
+            else if (fmt.substr(i, 4) === 'yyyy') { result += dt.getFullYear(); i += 4 }
+            else if (fmt.substr(i, 2) === 'yy') { result += String(dt.getFullYear()).slice(-2); i += 2 }
+            else if (fmt.substr(i, 2) === 'hh') { let h = dt.getHours(); if (useAP) h = h % 12 || 12; result += String(h).padStart(2, '0'); i += 2 }
+            else if (fmt[i] === 'h') { let h = dt.getHours(); if (useAP) h = h % 12 || 12; result += h; i += 1 }
+            else if (fmt.substr(i, 2) === 'mm') { result += String(dt.getMinutes()).padStart(2, '0'); i += 2 }
+            else if (fmt[i] === 'm') { result += dt.getMinutes(); i += 1 }
+            else if (fmt.substr(i, 2) === 'ss') { result += String(dt.getSeconds()).padStart(2, '0'); i += 2 }
+            else if (fmt[i] === 's') { result += dt.getSeconds(); i += 1 }
+            else if (fmt.substr(i, 3) === 'zzz') { result += String(dt.getMilliseconds()).padStart(3, '0'); i += 3 }
+            else if (fmt[i] === 'z') { result += dt.getMilliseconds(); i += 1 }
+            else if (fmt.substr(i, 2) === 'AP') { result += (dt.getHours() < 12 ? 'AM' : 'PM'); i += 2 }
+            else if (fmt.substr(i, 2) === 'ap') { result += (dt.getHours() < 12 ? 'am' : 'pm'); i += 2 }
+            else if (fmt[i] === 't') { try { result += dt.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() } catch(e) { result += '' }; i += 1 }
+            else { result += fmt[i]; i += 1 }
+        }
+        return result
+    },
+    $formatByEnum(dt, format) {
+        switch (format) {
+            case 0: return dt.toString()
+            case 1: { let s = dt.toISOString(); return s.replace('T',' ').replace(/\.\d{3}Z$/,'') }
+            case 8: return dt.toUTCString()
+            case 9: return dt.toISOString()
+            default: return dt.toString()
+        }
+    },
+    formatDateTime(dateTime, format) {
+        let dt = dateTime instanceof Date ? dateTime : new Date(dateTime)
+        if (format === undefined || format === null) return dt.toLocaleString()
+        if (typeof format === 'number') return this.$formatByEnum(dt, format)
+        if (typeof format === 'string') return this.$formatDateTimeStr(dt, format)
+        return dt.toLocaleString()
+    },
+    formatDate(date, format) {
+        let dt = date instanceof Date ? date : new Date(date)
+        if (format === undefined || format === null) return dt.toLocaleDateString()
+        if (typeof format === 'number') return this.$formatByEnum(dt, format)
+        if (typeof format === 'string') return this.$formatDateTimeStr(dt, format)
+        return dt.toLocaleDateString()
+    },
+    formatTime(time, format) {
+        let dt = time instanceof Date ? time : new Date(time)
+        if (format === undefined || format === null) return dt.toLocaleTimeString()
+        if (typeof format === 'number') return this.$formatByEnum(dt, format)
+        if (typeof format === 'string') return this.$formatDateTimeStr(dt, format)
+        return dt.toLocaleTimeString()
+    },
+
+    // --- Color functions ---
+    hsla(h, s, l, a) {
+        if (a === undefined) a = 1
+        let rgb = this.hslToRgb(h, s, l)
+        let _r = Math.round(Math.max(0, Math.min(255, rgb[0]))); _r = (_r < 16 ? '0' : '') + _r.toString(16)
+        let _g = Math.round(Math.max(0, Math.min(255, rgb[1]))); _g = (_g < 16 ? '0' : '') + _g.toString(16)
+        let _b = Math.round(Math.max(0, Math.min(255, rgb[2]))); _b = (_b < 16 ? '0' : '') + _b.toString(16)
+        let _a = Math.round(Math.max(0, Math.min(255, a * 255))); _a = (_a < 16 ? '0' : '') + _a.toString(16)
+        return `#${_r}${_g}${_b}${_a}`
+    },
+    hsva(h, s, v, a) {
+        if (a === undefined) a = 1
+        let rgb = this.hsvToRgb(h, s, v)
+        let _r = Math.round(Math.max(0, Math.min(255, rgb[0]))); _r = (_r < 16 ? '0' : '') + _r.toString(16)
+        let _g = Math.round(Math.max(0, Math.min(255, rgb[1]))); _g = (_g < 16 ? '0' : '') + _g.toString(16)
+        let _b = Math.round(Math.max(0, Math.min(255, rgb[2]))); _b = (_b < 16 ? '0' : '') + _b.toString(16)
+        let _a = Math.round(Math.max(0, Math.min(255, a * 255))); _a = (_a < 16 ? '0' : '') + _a.toString(16)
+        return `#${_r}${_g}${_b}${_a}`
+    },
+    color(name) {
+        let el = document.createElement('div')
+        el.style.color = name
+        document.body.appendChild(el)
+        let computed = getComputedStyle(el).color
+        document.body.removeChild(el)
+        if (!computed || computed === '') return null
+        let m = computed.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/)
+        if (!m) return null
+        let r = parseInt(m[1]); r = (r < 16 ? '0' : '') + r.toString(16)
+        let g = parseInt(m[2]); g = (g < 16 ? '0' : '') + g.toString(16)
+        let b = parseInt(m[3]); b = (b < 16 ? '0' : '') + b.toString(16)
+        return `#${r}${g}${b}`
+    },
+    colorEqual(lhs, rhs) {
+        let a = this.toRGBA(typeof lhs === 'string' && lhs[0] !== '#' ? this.color(lhs) || '#000000' : lhs)
+        let b = this.toRGBA(typeof rhs === 'string' && rhs[0] !== '#' ? this.color(rhs) || '#000000' : rhs)
+        return a.r === b.r && a.g === b.g && a.b === b.b && Math.abs(a.a - b.a) < 0.004
+    },
+    alpha(baseColor, value) {
+        let c = this.toRGBA(baseColor)
+        let r = (c.r < 16 ? '0' : '') + c.r.toString(16)
+        let g = (c.g < 16 ? '0' : '') + c.g.toString(16)
+        let b = (c.b < 16 ? '0' : '') + c.b.toString(16)
+        let a = Math.round(Math.max(0, Math.min(255, value * 255))); a = (a < 16 ? '0' : '') + a.toString(16)
+        return `#${r}${g}${b}${a}`
+    },
+
+    // --- Type constructors ---
+    size(width, height) {
+        return { width: width, height: height }
+    },
+    vector2d(x, y) {
+        return { x: x, y: y }
+    },
+    font(fontSpecifier) {
+        if (!fontSpecifier) return {}
+        return Object.assign({
+            family: '',
+            bold: false,
+            italic: false,
+            underline: false,
+            strikeout: false,
+            pointSize: -1,
+            pixelSize: -1,
+            weight: 50,
+            capitalization: 0,
+            letterSpacing: 0,
+            wordSpacing: 0,
+            kerning: true,
+            preferShaping: true,
+        }, fontSpecifier)
+    },
+    fontFamilies() {
+        try { return Array.from(document.fonts.values()).map(f => f.family).filter((v, i, a) => a.indexOf(v) === i) } catch(e) { return [] }
+    },
+
+    // --- Binding / object ---
+    binding(fn) {
+        return { $isBinding: true, $bindingFn: fn }
+    },
+    isQtObject(obj) {
+        return obj != null && typeof obj === 'object' && typeof obj.objectName !== 'undefined'
+    },
+
+    // --- App lifecycle ---
+    quit() {
+        if (typeof window !== 'undefined') window.close()
+    },
+    exit(retCode) {
+        if (typeof window !== 'undefined') window.close()
+    },
+    gc() {},
+    callLater(fn) {
+        let args = Array.prototype.slice.call(arguments, 1)
+        setTimeout(function() { fn.apply(null, args) }, 0)
+    },
+
+    // --- URL ---
+    resolvedUrl(url) {
+        return url
+    },
+    url(url) {
+        return url
+    },
+
+    // --- Translation ---
+    qsTrId(id) {
+        return id
+    },
+    qsTranslate(context, sourceText) {
+        return sourceText
+    },
+    QT_TR_NOOP(sourceText) {
+        return sourceText
+    },
+    QT_TRANSLATE_NOOP(context, sourceText) {
+        return sourceText
+    },
+    QT_TRID_NOOP(id) {
+        return id
+    },
+
+    // --- Properties ---
+    uiLanguage: '',
+    application: {
+        active: true,
+        state: 4,
+        layoutDirection: 0,
+        font: null,
+        name: '',
+        version: '',
+        organization: '',
+        domain: '',
+        arguments: [],
+        displayName: '',
+    },
+    styleHints: {
+        cursorFlashTime: 1000,
+        fontSmoothingGamma: 1.7,
+        keyboardAutoRepeatRate: 30,
+        keyboardAutoRepeatRateF: 30.0,
+        keyboardInputInterval: 400,
+        mouseDoubleClickDistance: 5,
+        mouseDoubleClickInterval: 400,
+        mousePressAndHoldInterval: 800,
+        mouseQuickSelectionThreshold: 0,
+        passwordMaskCharacter: '*',
+        passwordMaskDelay: 0,
+        setFocusOnTouchRelease: false,
+        showIsFullScreen: false,
+        showIsMaximized: false,
+        showShortcutsInContextMenus: true,
+        singleClickActivation: false,
+        startDragDistance: 10,
+        startDragTime: 500,
+        startDragVelocity: 0,
+        tabFocusBehavior: 2,
+        touchDoubleTapDistance: 40,
+        useHoverEffects: true,
+        useRtlExtensions: false,
+        wheelScrollLines: 3,
+    },
+    inputMethod: {
+        visible: false,
     },
 
     get localStorage(){return localStorage},
