@@ -202,6 +202,11 @@ Item {
 							icon.source: button.isPositiveAccent || button.isNegativeAccent ?
 											 "../../../../" + Style.getIconPath(button.element.m_elementItemPath, Icon.State.Off, Icon.Mode.Disabled)
 										   : baseElement.iconSource;
+
+							arrowIconAlias.source: button.isPositiveAccent || button.isNegativeAccent ?
+													"../../../../" + Style.getIconPath("Icons/Down", Icon.State.Off, Icon.Mode.Disabled)
+												  : "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal);
+
 							border.width: button.isPositiveAccent || button.isNegativeAccent ? 0 : baseElement.mouseArea.containsMouse;
 							opacity: button.hovered && (button.isPositiveAccent || button.isNegativeAccent) ? 0.85 : 1;
 						}

@@ -1,6 +1,0 @@
-child.width (начальное): 300
-child.height (начальное): 200
-root.width (изменено): 500
-root.height (изменено): 400
-child.width (после изменения родителя): 500
-child.height (после изменения родителя): 400

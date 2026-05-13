@@ -341,7 +341,8 @@ class ImtCoreConan(ConanFile):
             "Config/CMake/WebCompiler.cmake",
             "Config/CMake/ImtSdlConfig.cmake",
             "Config/CMake/ImtCoreSdlCustomConfig.cmake",
-            "Config/CMake/DdlCreator.cmake"]
+            "Config/CMake/DdlCreator.cmake",
+            "Config/CMake/ImtCoreQtRhiCompat.cmake"]
         # modern v2 approach
         self.cpp.package.set_property("cmake_build_modules", cmakeModules)
         self.cpp.source.set_property("cmake_build_modules", cmakeModules)

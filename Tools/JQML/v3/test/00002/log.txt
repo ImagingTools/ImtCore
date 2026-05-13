@@ -1,3 +1,0 @@
-Сигнал valueChanged: 10
-Сигнал valueChanged: 20
-Проверка: последнее значение value = 20

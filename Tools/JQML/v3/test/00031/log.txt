@@ -1,5 +1,0 @@
-rectA.x (видимый): 75
-rectA.y (видимый): 60
-rectB.x (после скрытия A): 25
-rectB.y (после скрытия A): 10
-rectB.visible: false
