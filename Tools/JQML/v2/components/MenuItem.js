@@ -33,11 +33,13 @@ class MenuItem extends Item {
             whiteSpace: 'nowrap',
             fontSize: '14px',
             fontFamily: 'sans-serif',
-            color: '#333333',
+            color: '#1a1a1a',
             backgroundColor: 'transparent',
             minHeight: '28px',
             boxSizing: 'border-box',
             position: 'relative',
+            transition: 'background-color 0.08s ease',
+            pointerEvents: 'auto',
         })
 
         this.$textNode = document.createTextNode(this.getPropertyValue('text'))
@@ -45,12 +47,12 @@ class MenuItem extends Item {
 
         this.getDom().addEventListener('mouseenter', () => {
             if (this.getPropertyValue('enabled')){
-                this.setStyle({ backgroundColor: '#e0e0e0' })
+                this.setStyle({ backgroundColor: '#e8e8e8', color: '#1a1a1a' })
                 this.getProperty('highlighted').reset(true)
             }
         })
         this.getDom().addEventListener('mouseleave', () => {
-            this.setStyle({ backgroundColor: 'transparent' })
+            this.setStyle({ backgroundColor: 'transparent', color: '#1a1a1a' })
             this.getProperty('highlighted').reset(false)
         })
         this.getDom().addEventListener('click', (e) => {

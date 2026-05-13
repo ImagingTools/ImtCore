@@ -141,27 +141,31 @@ class Popup extends Item {
             pointerEvents: 'none',
         })
 
-        // Overlay/dimming element
+        // Overlay/dimming element (visual only — pointer events handled at document level)
         this.$overlay = document.createElement('div')
-        this.$overlay.style.cssText = 'position:absolute;left:0;top:0;right:0;bottom:0;pointer-events:auto;'
+        this.$overlay.style.cssText = 'position:absolute;left:0;top:0;right:0;bottom:0;pointer-events:none;'
         this.getDom().appendChild(this.$overlay)
 
         // Content container (the actual popup box)
         this.$contentBox = document.createElement('div')
-        this.$contentBox.style.cssText = 'position:absolute;display:flex;flex-direction:column;pointer-events:auto;background:#ffffff;border:1px solid #cccccc;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.15);'
+        this.$contentBox.style.cssText = 'position:absolute;display:flex;flex-direction:column;pointer-events:auto;background:#ffffff;border:1px solid #e0e0e0;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.12);'
         this.getDom().appendChild(this.$contentBox)
 
-        // Event handlers
-        this.$onOverlayClick = (e) => {
+        // Event handlers — outside click detection via document listeners
+        this.$onDocumentMouseDown = (e) => {
+            if (!this.getPropertyValue('visible')) return
+            if (this.$contentBox.contains(e.target)) return
             let policy = this.getPropertyValue('closePolicy')
-            if (policy & ClosePolicy.CloseOnPressOutside){
+            if (policy & (ClosePolicy.CloseOnPressOutside | ClosePolicy.CloseOnPressOutsideParent)){
                 this.close()
             }
         }
 
-        this.$onOverlayRelease = (e) => {
+        this.$onDocumentMouseUp = (e) => {
+            if (!this.getPropertyValue('visible')) return
+            if (this.$contentBox.contains(e.target)) return
             let policy = this.getPropertyValue('closePolicy')
-            if (policy & ClosePolicy.CloseOnReleaseOutside){
+            if (policy & (ClosePolicy.CloseOnReleaseOutside | ClosePolicy.CloseOnReleaseOutsideParent)){
                 this.close()
             }
         }
@@ -181,9 +185,6 @@ class Popup extends Item {
         this.$onResize = () => {
             if (this.getPropertyValue('visible')) this.$applyGeometry()
         }
-
-        this.$overlay.addEventListener('mousedown', this.$onOverlayClick)
-        this.$overlay.addEventListener('mouseup', this.$onOverlayRelease)
 
         // Apply initial dim/modal state
         this.$updateOverlay()
@@ -231,12 +232,16 @@ class Popup extends Item {
             this.setStyle({ display: 'block' })
             this.$contentBox.style.display = 'flex'
             document.addEventListener('keydown', this.$onEscapeKey)
+            document.addEventListener('mousedown', this.$onDocumentMouseDown, true)
+            document.addEventListener('mouseup', this.$onDocumentMouseUp, true)
             window.addEventListener('resize', this.$onResize)
             this.$applyGeometry()
             this.$updateOverlay()
         } else {
             this.setStyle({ display: 'none' })
             document.removeEventListener('keydown', this.$onEscapeKey)
+            document.removeEventListener('mousedown', this.$onDocumentMouseDown, true)
+            document.removeEventListener('mouseup', this.$onDocumentMouseUp, true)
             window.removeEventListener('resize', this.$onResize)
             this.$updateOverlay()
             this.getSignal('closed')()
@@ -351,37 +356,29 @@ class Popup extends Item {
 
         if (!visible){
             this.$overlay.style.display = 'none'
+            this.$overlay.style.pointerEvents = 'none'
             this.$overlay.removeEventListener('wheel', this.$onWheelBlock)
             this.$overlay.removeEventListener('touchmove', this.$onWheelBlock)
             return
         }
 
-        // modal popup blocks clicks/scroll on overlay; modeless allows pass-through
         if (modal){
+            // Modal: overlay blocks scroll/wheel and shows dim
             this.$overlay.style.display = 'block'
             this.$overlay.style.pointerEvents = 'auto'
             this.$overlay.addEventListener('wheel', this.$onWheelBlock, { passive: false })
             this.$overlay.addEventListener('touchmove', this.$onWheelBlock, { passive: false })
-            if (dim){
-                this.$overlay.style.backgroundColor = 'rgba(0,0,0,0.25)'
-            } else {
-                this.$overlay.style.backgroundColor = 'transparent'
-            }
+            this.$overlay.style.backgroundColor = dim ? 'rgba(0,0,0,0.25)' : 'transparent'
         } else {
+            // Non-modal: overlay only provides visual dimming, no pointer interception
             this.$overlay.removeEventListener('wheel', this.$onWheelBlock)
             this.$overlay.removeEventListener('touchmove', this.$onWheelBlock)
-            // non-modal: overlay still catches clicks for CloseOnPressOutside
-            let policy = this.getPropertyValue('closePolicy')
-            if (policy & (ClosePolicy.CloseOnPressOutside | ClosePolicy.CloseOnReleaseOutside)){
-                this.$overlay.style.display = 'block'
-                this.$overlay.style.pointerEvents = 'auto'
-            } else {
-                this.$overlay.style.display = 'none'
-                this.$overlay.style.pointerEvents = 'none'
-            }
+            this.$overlay.style.pointerEvents = 'none'
             if (dim){
+                this.$overlay.style.display = 'block'
                 this.$overlay.style.backgroundColor = 'rgba(0,0,0,0.12)'
             } else {
+                this.$overlay.style.display = 'none'
                 this.$overlay.style.backgroundColor = 'transparent'
             }
         }
@@ -474,9 +471,9 @@ class Popup extends Item {
     destroy(){
         document.removeEventListener('keydown', this.$onEscapeKey)
         window.removeEventListener('resize', this.$onResize)
+        document.removeEventListener('mousedown', this.$onDocumentMouseDown, true)
+        document.removeEventListener('mouseup', this.$onDocumentMouseUp, true)
         if(this.$overlay){
-            this.$overlay.removeEventListener('mousedown', this.$onOverlayClick)
-            this.$overlay.removeEventListener('mouseup', this.$onOverlayRelease)
             this.$overlay.removeEventListener('wheel', this.$onWheelBlock)
             this.$overlay.removeEventListener('touchmove', this.$onWheelBlock)
         }
@@ -484,8 +481,8 @@ class Popup extends Item {
         if(this.$dom && this.$dom.parentNode === document.body){
             document.body.removeChild(this.$dom)
         }
-        delete this.$onOverlayClick
-        delete this.$onOverlayRelease
+        delete this.$onDocumentMouseDown
+        delete this.$onDocumentMouseUp
         delete this.$onEscapeKey
         delete this.$overlay
         delete this.$contentBox

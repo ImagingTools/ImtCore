@@ -342,7 +342,7 @@ DocumentViewBase {
 
 					name: qsTr("Tenant Name")
 					placeHolderText: qsTr("Enter the tenant name")
-					enabled: container.__isOwner || container.isNewTenant
+					readOnly: !container.__isOwner && !container.isNewTenant
 
 					onEditingFinished: {
 						let oldText = container.tenantData ? container.tenantData.m_name : ""
@@ -360,7 +360,7 @@ DocumentViewBase {
 
 					name: qsTr("Description")
 					placeHolderText: qsTr("Enter the description")
-					enabled: container.__isOwner || container.isNewTenant
+					readOnly: !container.__isOwner && !container.isNewTenant
 
 					onEditingFinished: {
 						let oldText = container.tenantData ? container.tenantData.m_description : ""
@@ -377,7 +377,7 @@ DocumentViewBase {
 					id: isActiveInput
 
 					name: qsTr("Active")
-					enabled: container.__isOwner || container.isNewTenant
+					readOnly: !container.__isOwner && !container.isNewTenant
 
 					onCheckedChanged: {
 						container.doUpdateModel();
@@ -495,7 +495,7 @@ DocumentViewBase {
 											model: container.__getAvailableRolesModel()
 											nameId: "name"
 											currentIndex: container.__findRoleIndex(modelData.role)
-											enabled: !memberDelegate.isOwner && container.__isOwnerOrAdmin
+											changeable: memberDelegate.isOwner || container.__isOwnerOrAdmin
 
 											onFinished: {
 												var selectedIndex = index

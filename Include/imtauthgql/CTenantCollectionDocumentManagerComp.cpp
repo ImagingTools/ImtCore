@@ -264,7 +264,6 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTenantCollect
 
 	// Block updates from non-members (e.g., invited users who haven't accepted yet)
 	if (!isNewTenant && !isOwner && !isMember){
-		response.Version_1_0->status = sdl::imtbase::CollectionDocumentManager::EDocumentOperationStatus::DocumentSaved;
 		return response;
 	}
 
