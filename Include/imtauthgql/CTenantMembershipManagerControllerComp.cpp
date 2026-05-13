@@ -647,4 +647,81 @@ sdl::imtauth::TenantMemberships::CUpdateMembershipRolePayload CTenantMembershipM
 }
 
 
+sdl::imtauth::TenantMemberships::CTransferTenantOwnershipPayload CTenantMembershipManagerControllerComp::OnTransferTenantOwnership(
+	const sdl::imtauth::TenantMemberships::CTransferTenantOwnershipGqlRequest& request,
+	const ::imtgql::CGqlRequest& gqlRequest,
+	QString& /*errorMessage*/) const
+{
+	sdl::imtauth::TenantMemberships::CTransferTenantOwnershipPayload response;
+
+	if (!m_membershipManagerCompPtr.IsValid() || !m_tenantManagerCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'MembershipManager' or 'TenantManager' was not set", "CTenantMembershipManagerControllerComp");
+		return response;
+	}
+
+	response.Version_1_0.emplace();
+
+	QByteArray contextUserId = ContextUserId(gqlRequest);
+
+	QByteArray tenantId;
+	QByteArray newOwnerId;
+	sdl::imtauth::TenantMemberships::TransferTenantOwnershipRequestArguments arguments = request.GetRequestedArguments();
+	if (arguments.input.Version_1_0->tenantId){
+		tenantId = *arguments.input.Version_1_0->tenantId;
+	}
+	if (arguments.input.Version_1_0->newOwnerId){
+		newOwnerId = *arguments.input.Version_1_0->newOwnerId;
+	}
+
+	if (tenantId.isEmpty() || newOwnerId.isEmpty()){
+		response.Version_1_0->success = false;
+		response.Version_1_0->errorMessage = QStringLiteral("Missing tenantId or newOwnerId");
+		return response;
+	}
+
+	// Only the current owner can transfer ownership
+	imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
+	if (!tenantPtr.IsValid()){
+		response.Version_1_0->success = false;
+		response.Version_1_0->errorMessage = QStringLiteral("Tenant not found");
+		return response;
+	}
+
+	QByteArray currentOwnerId = tenantPtr->GetOwnerId();
+	if (currentOwnerId != contextUserId){
+		response.Version_1_0->success = false;
+		response.Version_1_0->errorMessage = QStringLiteral("Only the current owner can transfer ownership");
+		return response;
+	}
+
+	// Verify the new owner is a member of the tenant
+	if (!m_membershipManagerCompPtr->IsMember(newOwnerId, tenantId)){
+		response.Version_1_0->success = false;
+		response.Version_1_0->errorMessage = QStringLiteral("New owner must be a member of the tenant");
+		return response;
+	}
+
+	// Update new owner's membership role to Owner
+	imtauth::ITenantMembershipUniquePtr newOwnerMembership = m_membershipManagerCompPtr->FindMembership(newOwnerId, tenantId);
+	if (!newOwnerMembership.IsValid()){
+		response.Version_1_0->success = false;
+		response.Version_1_0->errorMessage = QStringLiteral("Failed to find new owner membership");
+		return response;
+	}
+	m_membershipManagerCompPtr->UpdateMembershipRole(newOwnerMembership->GetMembershipId(), imtauth::ITenantMembership::TMR_OWNER);
+
+	// Demote old owner to Admin
+	imtauth::ITenantMembershipUniquePtr oldOwnerMembership = m_membershipManagerCompPtr->FindMembership(currentOwnerId, tenantId);
+	if (oldOwnerMembership.IsValid()){
+		m_membershipManagerCompPtr->UpdateMembershipRole(oldOwnerMembership->GetMembershipId(), imtauth::ITenantMembership::TMR_ADMIN);
+	}
+
+	// Update tenant's ownerId
+	m_tenantManagerCompPtr->UpdateTenant(tenantId, tenantPtr->GetTenantName(), tenantPtr->GetTenantDescription(), newOwnerId, true);
+
+	response.Version_1_0->success = true;
+	return response;
+}
+
+
 } // namespace imtauthgql

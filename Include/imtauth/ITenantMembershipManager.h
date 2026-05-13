@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtauth/ITenantMembership.h>
+#include <imtauth/ITenantRole.h>
 
 
 namespace imtauth
@@ -91,6 +92,36 @@ public:
 		Role hierarchy: Owner > Admin > Member > Guest.
 	*/
 	virtual bool HasMinimumRole(const QByteArray& userId, const QByteArray& tenantId, ITenantMembership::TenantMemberRole minimumRole) const = 0;
+
+	// --- Tenant-scoped role management ---
+
+	/**
+		Get all tenant-scoped role IDs for a specific tenant.
+	*/
+	virtual QByteArrayList GetTenantRoleIds(const QByteArray& tenantId) const = 0;
+
+	/**
+		Get a tenant-scoped role by its ID.
+	*/
+	virtual ITenantRoleUniquePtr GetTenantRole(const QByteArray& roleId) const = 0;
+
+	/**
+		Create a new tenant-scoped role.
+		\return The ID of the newly created role, or empty on failure.
+	*/
+	virtual QByteArray CreateTenantRole(const QByteArray& tenantId, const QString& roleName, const QString& permissions) = 0;
+
+	/**
+		Update an existing tenant-scoped role.
+		\return true if updated successfully.
+	*/
+	virtual bool UpdateTenantRole(const QByteArray& roleId, const QString& roleName, const QString& permissions) = 0;
+
+	/**
+		Remove a tenant-scoped role.
+		\return true if removed successfully.
+	*/
+	virtual bool RemoveTenantRole(const QByteArray& roleId) = 0;
 };
 
 

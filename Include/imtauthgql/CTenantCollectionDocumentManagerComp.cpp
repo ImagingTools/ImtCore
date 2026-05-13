@@ -195,6 +195,22 @@ sdl::imtauth::Tenants::CTenantData CTenantCollectionDocumentManagerComp::OnGetTe
 		response.Version_1_0->availableRoles->push_back(opt);
 	}
 
+	// Tenant-scoped roles (dynamic)
+	response.Version_1_0->tenantRoles.Emplace();
+	if (m_membershipManagerCompPtr.IsValid()){
+		QByteArrayList tenantRoleIds = m_membershipManagerCompPtr->GetTenantRoleIds(tenantId);
+		for (const QByteArray& roleId : tenantRoleIds){
+			auto rolePtr = m_membershipManagerCompPtr->GetTenantRole(roleId);
+			if (rolePtr.IsValid()){
+				sdl::imtauth::Tenants::CTenantRoleEntry::V1_0 roleEntry;
+				roleEntry.id = rolePtr->GetRoleId();
+				roleEntry.name = rolePtr->GetRoleName();
+				roleEntry.permissions = rolePtr->GetPermissions();
+				response.Version_1_0->tenantRoles->push_back(roleEntry);
+			}
+		}
+	}
+
 	return response;
 }
 
@@ -361,6 +377,39 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTenantCollect
 						imtauth::ITenantMembership::TenantMemberRole newRole = StringToTenantMemberRole(roleStr);
 						m_membershipManagerCompPtr->UpdateMembershipRole(updatedUserIdToMembershipId.value(userId), newRole);
 					}
+				}
+			}
+		}
+
+		// Apply tenant-scoped roles updates (only Owner/Admin)
+		if ((isOwner || isAdmin) && tenantData.tenantRoles){
+			QByteArrayList existingRoleIds = m_membershipManagerCompPtr->GetTenantRoleIds(tenantId);
+			QSet<QByteArray> incomingRoleIds;
+
+			for (const auto& roleEntry : *tenantData.tenantRoles){
+				if (roleEntry->name){
+					QByteArray roleId = roleEntry->id ? *roleEntry->id : QByteArray();
+					QString roleName = *roleEntry->name;
+					QString permissions = roleEntry->permissions ? *roleEntry->permissions : QString();
+
+					if (!roleId.isEmpty() && existingRoleIds.contains(roleId)){
+						// Update existing role
+						m_membershipManagerCompPtr->UpdateTenantRole(roleId, roleName, permissions);
+						incomingRoleIds.insert(roleId);
+					} else {
+						// Create new role
+						QByteArray newRoleId = m_membershipManagerCompPtr->CreateTenantRole(tenantId, roleName, permissions);
+						if (!newRoleId.isEmpty()){
+							incomingRoleIds.insert(newRoleId);
+						}
+					}
+				}
+			}
+
+			// Remove roles that are no longer present
+			for (const QByteArray& existingRoleId : existingRoleIds){
+				if (!incomingRoleIds.contains(existingRoleId)){
+					m_membershipManagerCompPtr->RemoveTenantRole(existingRoleId);
 				}
 			}
 		}

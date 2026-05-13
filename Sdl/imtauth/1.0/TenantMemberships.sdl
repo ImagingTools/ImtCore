@@ -226,6 +226,16 @@ type UpdateMembershipRolePayload {
 	errorMessage: String
 }
 
+input TransferTenantOwnershipInput {
+	tenantId: ID!
+	newOwnerId: ID!
+}
+
+type TransferTenantOwnershipPayload {
+	success: Boolean
+	errorMessage: String
+}
+
 type Query {
 	GetMembershipsByTenant (input: GetMembershipsByTenantInput): GetMembershipsByTenantPayload!
 	GetMembershipsByUser (input: GetMembershipsByUserInput): GetMembershipsByUserPayload!
@@ -246,6 +256,7 @@ type Mutation {
 	ResendTenantInvitation (input: ResendTenantInvitationInput): ResendTenantInvitationPayload!
 	RemoveMembership (input: RemoveMembershipInput): RemoveMembershipPayload!
 	UpdateMembershipRole (input: UpdateMembershipRoleInput): UpdateMembershipRolePayload!
+	TransferTenantOwnership (input: TransferTenantOwnershipInput): TransferTenantOwnershipPayload!
 }
 
 # --- Subscriptions ---
