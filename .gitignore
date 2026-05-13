@@ -2,6 +2,8 @@
 AuxInclude/
 Bin/
 Lib/
+Build/
+node_modules/
 
 # CMake build artifacts
 CMakeCache.txt

@@ -75,6 +75,9 @@ async function runTests() {
 
     let completedTests = 0
     let testCount = 0
+
+    const driver = await createWebDriver()
+
     for (let testdir of tests) {
         let mainFilePath = path.resolve(__dirname, `./${testdir}/Main.qml`)
         let testDirPath = path.resolve(__dirname, `./${testdir}`)
@@ -91,8 +94,10 @@ async function runTests() {
                 console.error(`${colors.red}[Error] Error running test on desktop: ${err.message}${colors.reset}`)
             }
 
+            
+
             try {
-                resultWeb = await runWebTest(testDirPath)
+                resultWeb = await runWebTest(driver, testDirPath)
             } catch (err) {
                 console.error(`${colors.red}[Error] Error running web test: ${err.message}${colors.reset}`)
             }
@@ -109,10 +114,13 @@ async function runTests() {
             }
         }
     }
+
+    await closeWebDriver(driver)
+
     console.log(`${colors.yellow}[i] Completed tests: ${completedTests}/${testCount}${colors.reset}`)
 }
 
-async function runWebTest(testDirPath, timeout = 5000) {
+async function runWebTest(driver, testDirPath, timeout = 5000) {
     try {
         fs.mkdirSync(path.resolve(testDirPath, '_web'), { recursive: true })
     } catch (err) {
@@ -141,22 +149,6 @@ async function runWebTest(testDirPath, timeout = 5000) {
         console.error(`${colors.red}[Error] Error during compilation: ${err.message}${colors.reset}`)
     }
 
-    // Настройка Chrome (опционально: запуск без окна)
-    let options = new chrome.Options()
-    options.addArguments('--headless', '--window-size=800,600') // Раскомментировать для headless-режима
-
-    const caps = Capabilities.chrome()
-    caps.setLoggingPrefs({
-        browser: 'ALL', // Собирать все типы сообщений (INFO, WARNING, SEVERE)
-        driver: 'WARNING'
-    })
-
-    let driver = await new Builder()
-        .forBrowser('chrome')
-        .setChromeOptions(options)
-        .withCapabilities(caps)
-        .build()
-
     try {
         await driver.get(path.resolve(testDirPath, './_web/test.html'))
 
@@ -181,8 +173,6 @@ async function runWebTest(testDirPath, timeout = 5000) {
 
         return messages
     } finally {
-        await driver.quit() // Закрыть браузер
-
         try {
             fs.rmSync(path.resolve(testDirPath, '_web'), { recursive: true, force: true });
         } catch (err) {
@@ -192,5 +182,35 @@ async function runWebTest(testDirPath, timeout = 5000) {
 
 
 }
+
+async function createWebDriver() {
+    try {
+        // Настройка Chrome (опционально: запуск без окна)
+        let options = new chrome.Options()
+        options.addArguments('--headless', '--window-size=800,600') // Раскомментировать для headless-режима
+
+        const caps = Capabilities.chrome()
+        caps.setLoggingPrefs({
+            browser: 'ALL', // Собирать все типы сообщений (INFO, WARNING, SEVERE)
+            driver: 'WARNING'
+        })
+
+        let driver = await new Builder()
+            .forBrowser('chrome')
+            .setChromeOptions(options)
+            .withCapabilities(caps)
+            .build()
+        
+        return driver
+    } catch (err) {
+        console.error(`${colors.red}[Error] Error creating WebDriver: ${err.message}${colors.reset}`)
+    }
+}
+
+
+async function closeWebDriver(driver) {
+    await driver.quit() // Закрыть браузер
+}
+
 
 runTests()
