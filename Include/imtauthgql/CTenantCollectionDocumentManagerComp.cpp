@@ -288,7 +288,8 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTenantCollect
 	}
 
 	// Only Owner/Admin can manage members (add/remove/change roles)
-	if ((isOwner || isAdmin || isNewTenant) && !tenantId.isEmpty() && tenantData.members && m_membershipManagerCompPtr.IsValid()){
+	// Exception: any member can remove themselves (leave)
+	if (!tenantId.isEmpty() && tenantData.members && m_membershipManagerCompPtr.IsValid()){
 		QByteArrayList currentMembershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
 		QMap<QByteArray, QByteArray> userIdToMembershipId;
 		QSet<QByteArray> currentUserIds;
@@ -307,23 +308,31 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTenantCollect
 			}
 		}
 
+		// Determine if current user is leaving (self-removal)
+		bool isSelfLeaving = isMember && !isOwner && currentUserIds.contains(contextUserId) && !newUserIds.contains(contextUserId);
 
-		for (const QByteArray& existingUserId : currentUserIds){
-			if (!newUserIds.contains(existingUserId)){
-				m_membershipManagerCompPtr->RemoveMembership(userIdToMembershipId.value(existingUserId));
-			}
-		}
-
-		for (const QByteArray& addUserId : newUserIds){
-			if (!currentUserIds.contains(addUserId)){
-				if (m_invitationManagerCompPtr.IsValid()){
-					m_invitationManagerCompPtr->CreateInvitation(contextUserId, addUserId, tenantId, imtauth::ITenantMembership::TMR_MEMBER);
+		if (isOwner || isAdmin || isNewTenant){
+			// Owner/Admin can remove any member (except owner) and add new ones
+			for (const QByteArray& existingUserId : currentUserIds){
+				if (!newUserIds.contains(existingUserId)){
+					m_membershipManagerCompPtr->RemoveMembership(userIdToMembershipId.value(existingUserId));
 				}
 			}
+
+			for (const QByteArray& addUserId : newUserIds){
+				if (!currentUserIds.contains(addUserId)){
+					if (m_invitationManagerCompPtr.IsValid()){
+						m_invitationManagerCompPtr->CreateInvitation(contextUserId, addUserId, tenantId, imtauth::ITenantMembership::TMR_MEMBER);
+					}
+				}
+			}
+		} else if (isSelfLeaving){
+			// Non-admin member can only remove themselves
+			m_membershipManagerCompPtr->RemoveMembership(userIdToMembershipId.value(contextUserId));
 		}
 
-		// Apply role updates from memberRoles
-		if (tenantData.memberRoles){
+		// Apply role updates from memberRoles (only Owner/Admin can change roles)
+		if ((isOwner || isAdmin) && tenantData.memberRoles){
 			// Rebuild userIdToMembershipId after additions
 			QMap<QByteArray, QByteArray> updatedUserIdToMembershipId;
 			QByteArrayList updatedMembershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);

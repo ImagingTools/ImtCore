@@ -296,6 +296,22 @@ DocumentViewBase {
 		return expDate.getTime() < Date.now()
 	}
 
+	function __removeMemberById(userId) {
+		var arr = membersSelector.items.slice()
+		for (var i = 0; i < arr.length; i++) {
+			if (arr[i].id === userId) {
+				arr.splice(i, 1)
+				break
+			}
+		}
+		membersSelector.__resolvingNames = true
+		membersSelector.items = arr
+		membersSelector.__resolvingNames = false
+		container.pendingMembers = arr
+		container.__membersModifiedLocally = true
+		container.doUpdateModel()
+	}
+
 	CustomScrollbar {
 		id: scrollbar
 		z: parent.z + 1
@@ -458,6 +474,8 @@ DocumentViewBase {
 
 								readonly property bool isOwner: container.tenantData && modelData.userId === container.tenantData.m_ownerId
 								readonly property bool isPending: modelData.isPending === true
+								readonly property bool isCurrentUser: container.tenantData && container.tenantData.m_currentUserId && modelData.userId === container.tenantData.m_currentUserId
+									readonly property int actionBtnWidth: chipRemoveBtn.visible ? chipRemoveBtn.width : (leaveBtn.visible ? leaveBtn.width : 0)
 
 								Column {
 									anchors.fill: parent
@@ -479,8 +497,8 @@ DocumentViewBase {
 
 										BaseText {
 											width: memberDelegate.isPending
-												? (parent.width - parent.spacing * 2 - Style.iconSizeS - chipRemoveBtn.width) * container.memberRoleNameWidthRatio
-												: (parent.width - parent.spacing - chipRemoveBtn.width) * container.memberRoleNameWidthRatio
+												? (parent.width - parent.spacing * 2 - Style.iconSizeS - memberDelegate.actionBtnWidth) * container.memberRoleNameWidthRatio
+												: (parent.width - parent.spacing - memberDelegate.actionBtnWidth) * container.memberRoleNameWidthRatio
 											anchors.verticalCenter: parent.verticalCenter
 											text: modelData.userName
 											elide: Text.ElideRight
@@ -490,12 +508,12 @@ DocumentViewBase {
 										ComboBox {
 											id: roleCombo
 											visible: !memberDelegate.isPending
-											width: (parent.width - parent.spacing - chipRemoveBtn.width) * container.memberRoleComboWidthRatio
+											width: (parent.width - parent.spacing - memberDelegate.actionBtnWidth) * container.memberRoleComboWidthRatio
 											anchors.verticalCenter: parent.verticalCenter
 											model: container.__getAvailableRolesModel()
 											nameId: "name"
 											currentIndex: container.__findRoleIndex(modelData.role)
-											changeable: memberDelegate.isOwner || container.__isOwnerOrAdmin
+											changeable: !memberDelegate.isOwner && container.__isOwnerOrAdmin
 
 											onFinished: {
 												var selectedIndex = index
@@ -514,7 +532,7 @@ DocumentViewBase {
 										BaseText {
 											visible: memberDelegate.isPending
 											width: memberDelegate.isPending
-												? (parent.width - parent.spacing * 2 - Style.iconSizeS - chipRemoveBtn.width) * container.memberRoleComboWidthRatio
+												? (parent.width - parent.spacing * 2 - Style.iconSizeS - memberDelegate.actionBtnWidth) * container.memberRoleComboWidthRatio
 												: 0
 											anchors.verticalCenter: parent.verticalCenter
 											text: modelData.isExpired ? qsTr("Expired") : qsTr("%1 (%2)").arg(modelData.role).arg(modelData.status)
@@ -535,19 +553,17 @@ DocumentViewBase {
 												}
 											}
 											onClicked: {
-												var arr = membersSelector.items.slice()
-												for (var i = 0; i < arr.length; i++) {
-													if (arr[i].id === modelData.userId) {
-														arr.splice(i, 1)
-														break
-													}
-												}
-												membersSelector.__resolvingNames = true
-												membersSelector.items = arr
-												membersSelector.__resolvingNames = false
-												container.pendingMembers = arr
-												container.__membersModifiedLocally = true
-												container.doUpdateModel()
+												container.__removeMemberById(modelData.userId)
+											}
+										}
+
+										Button {
+											id: leaveBtn
+											visible: !memberDelegate.isPending && memberDelegate.isCurrentUser && !memberDelegate.isOwner && !chipRemoveBtn.visible
+											anchors.verticalCenter: parent.verticalCenter
+											text: qsTr("Leave")
+											onClicked: {
+												container.__removeMemberById(modelData.userId)
 											}
 										}
 									}
