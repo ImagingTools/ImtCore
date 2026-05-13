@@ -34,10 +34,11 @@ DocumentViewBase {
 		: !container.tenantData.m_currentUserId ? ""
 		: container.tenantData.m_ownerId && container.tenantData.m_currentUserId === container.tenantData.m_ownerId ? "Owner"
 		: container.__memberRolesMap && container.__memberRolesMap[container.tenantData.m_currentUserId] ? container.__memberRolesMap[container.tenantData.m_currentUserId]
+		: container.__isCurrentUserInvited() ? "Invited"
 		: ""
 	readonly property bool __isOwnerOrAdmin: container.__currentUserRole === "Owner" || container.__currentUserRole === "Admin"
 	readonly property bool __isOwner: container.__currentUserRole === "Owner"
-	readonly property bool __isReadOnly: !container.__isOwner && container.__currentUserRole !== "Admin" && container.__currentUserRole !== ""
+	readonly property bool __isReadOnly: !container.isNewTenant && !container.__isOwnerOrAdmin
 
 	onPendingMembersChanged: {
 		// Trigger rebuild by reassigning __memberRolesMap (bottomComp binds to __buildMemberRolesModel)
@@ -273,6 +274,17 @@ DocumentViewBase {
 		var byPart = invitedByName ? qsTr("by %1").arg(invitedByName) : ""
 		var expPart = expiresAt ? qsTr("expires %1").arg(container.__formatDateTime(expiresAt)) : ""
 		return byPart && expPart ? byPart + " · " + expPart : byPart + expPart
+	}
+
+	function __isCurrentUserInvited() {
+		if (!container.tenantData || !container.tenantData.m_currentUserId)
+			return false
+		var userId = container.tenantData.m_currentUserId
+		for (var i = 0; i < container.pendingInvitations.length; i++) {
+			if (container.pendingInvitations[i].userId === userId)
+				return true
+		}
+		return false
 	}
 
 	function __isInvitationExpired(expiresAt) {

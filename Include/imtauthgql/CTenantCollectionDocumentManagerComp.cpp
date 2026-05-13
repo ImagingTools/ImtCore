@@ -255,10 +255,18 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTenantCollect
 	// Role-based access control for existing tenants
 	bool isOwner = !tenantId.isEmpty() && (tenantPtr->GetOwnerId() == contextUserId);
 	bool isAdmin = false;
+	bool isMember = false;
 	if (!tenantId.isEmpty() && m_membershipManagerCompPtr.IsValid()){
 		isAdmin = m_membershipManagerCompPtr->HasMinimumRole(contextUserId, tenantId, imtauth::ITenantMembership::TMR_ADMIN);
+		isMember = m_membershipManagerCompPtr->HasMinimumRole(contextUserId, tenantId, imtauth::ITenantMembership::TMR_GUEST);
 	}
 	bool isNewTenant = tenantId.isEmpty();
+
+	// Block updates from non-members (e.g., invited users who haven't accepted yet)
+	if (!isNewTenant && !isOwner && !isMember){
+		response.Version_1_0->status = sdl::imtbase::CollectionDocumentManager::EDocumentOperationStatus::DocumentSaved;
+		return response;
+	}
 
 	// Only Owner (or new tenant creator) can change Name/Description/Active
 	if (isOwner || isNewTenant){
