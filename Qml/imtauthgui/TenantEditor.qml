@@ -29,19 +29,12 @@ DocumentViewBase {
 	property bool __membersModifiedLocally: false
 
 	// Role-based access: determine current user's role in this tenant
-	readonly property string __currentUserRole: {
-		if (!container.tenantData)
-			return ""
-		var currentUserId = container.tenantData.m_currentUserId || ""
-		if (currentUserId === "")
-			return ""
-		if (container.tenantData.m_ownerId && currentUserId === container.tenantData.m_ownerId)
-			return "Owner"
-		var rolesMap = container.__memberRolesMap
-		if (rolesMap && rolesMap[currentUserId])
-			return rolesMap[currentUserId]
-		return ""
-	}
+	readonly property string __currentUserRole:
+		!container.tenantData ? ""
+		: !(container.tenantData.m_currentUserId || "") ? ""
+		: container.tenantData.m_ownerId && container.tenantData.m_currentUserId === container.tenantData.m_ownerId ? "Owner"
+		: container.__memberRolesMap && container.__memberRolesMap[container.tenantData.m_currentUserId] ? container.__memberRolesMap[container.tenantData.m_currentUserId]
+		: ""
 	readonly property bool __isOwnerOrAdmin: container.__currentUserRole === "Owner" || container.__currentUserRole === "Admin"
 	readonly property bool __isOwner: container.__currentUserRole === "Owner"
 	readonly property bool __isReadOnly: !container.__isOwner && container.__currentUserRole !== "Admin" && container.__currentUserRole !== ""
@@ -276,6 +269,12 @@ DocumentViewBase {
 		return result
 	}
 
+	function __formatInvitationInfo(invitedByName, expiresAt) {
+		var byPart = invitedByName ? qsTr("by %1").arg(invitedByName) : ""
+		var expPart = expiresAt ? qsTr("expires %1").arg(container.__formatDateTime(expiresAt)) : ""
+		return byPart && expPart ? byPart + " · " + expPart : byPart + expPart
+	}
+
 	function __isInvitationExpired(expiresAt) {
 		if (!expiresAt)
 			return false
@@ -439,8 +438,9 @@ DocumentViewBase {
 							model: container.__buildMemberRolesModel()
 
 							delegate: Item {
+								id: memberDelegate
 								width: parent.width
-								height: modelData.isPending
+								height: memberDelegate.isPending
 									? Style.controlHeightM * 1.5 + container.totalMemberRoleRowMargin
 									: Style.controlHeightM + container.totalMemberRoleRowMargin
 
@@ -458,7 +458,7 @@ DocumentViewBase {
 
 										// Pending indicator
 										Text {
-											visible: isPending
+											visible: memberDelegate.isPending
 											anchors.verticalCenter: parent.verticalCenter
 											text: "⏳"
 											font.pixelSize: Style.fontSizeM
@@ -466,24 +466,24 @@ DocumentViewBase {
 										}
 
 										BaseText {
-											width: isPending
+											width: memberDelegate.isPending
 												? (parent.width - parent.spacing * 2 - Style.iconSizeS - chipRemoveBtn.width) * container.memberRoleNameWidthRatio
 												: (parent.width - parent.spacing - chipRemoveBtn.width) * container.memberRoleNameWidthRatio
 											anchors.verticalCenter: parent.verticalCenter
 											text: modelData.userName
 											elide: Text.ElideRight
-											color: isPending ? Style.inactiveTextColor : Style.textColor
+											color: memberDelegate.isPending ? Style.inactiveTextColor : Style.textColor
 										}
 
 										ComboBox {
 											id: roleCombo
-											visible: !isPending
+											visible: !memberDelegate.isPending
 											width: (parent.width - parent.spacing - chipRemoveBtn.width) * container.memberRoleComboWidthRatio
 											anchors.verticalCenter: parent.verticalCenter
 											model: container.__getAvailableRolesModel()
 											nameId: "name"
 											currentIndex: container.__findRoleIndex(modelData.role)
-											enabled: !isOwner && container.__isOwnerOrAdmin
+											enabled: !memberDelegate.isOwner && container.__isOwnerOrAdmin
 
 											onFinished: {
 												var selectedIndex = index
@@ -500,8 +500,8 @@ DocumentViewBase {
 										}
 
 										BaseText {
-											visible: isPending
-											width: isPending
+											visible: memberDelegate.isPending
+											width: memberDelegate.isPending
 												? (parent.width - parent.spacing * 2 - Style.iconSizeS - chipRemoveBtn.width) * container.memberRoleComboWidthRatio
 												: 0
 											anchors.verticalCenter: parent.verticalCenter
@@ -513,7 +513,7 @@ DocumentViewBase {
 
 										ToolButton {
 											id: chipRemoveBtn
-											visible: !isPending && membersSelector.editable && membersSelector.nonRemovableIds.indexOf(modelData.userId) < 0
+											visible: !memberDelegate.isPending && membersSelector.editable && membersSelector.nonRemovableIds.indexOf(modelData.userId) < 0
 											anchors.verticalCenter: parent.verticalCenter
 											iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
 											decorator: Component {
@@ -542,20 +542,13 @@ DocumentViewBase {
 
 									// Second row for pending invitations: expiry info + revoke/resend
 									Row {
-										visible: isPending
+										visible: memberDelegate.isPending
 										width: parent.width
 										spacing: Style.marginM
 
 										BaseText {
 											width: parent.width - revokeBtn.width - resendBtn.width - parent.spacing * 2
-											text: {
-												var parts = []
-												if (modelData.invitedByName)
-													parts.push(qsTr("by %1").arg(modelData.invitedByName))
-												if (modelData.expiresAt)
-													parts.push(qsTr("expires %1").arg(container.__formatDateTime(modelData.expiresAt)))
-												return parts.join(" · ")
-											}
+											text: container.__formatInvitationInfo(modelData.invitedByName, modelData.expiresAt)
 											color: modelData.isExpired ? "#DA3633" : Style.inactiveTextColor
 											font.pixelSize: Style.fontSizeS
 											elide: Text.ElideRight
