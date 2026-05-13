@@ -24,6 +24,8 @@ class Menu extends Popup {
         super(parent, exCtx, exModel)
 
         // Override Popup's contentBox styling for menu appearance
+        // Qt Basic Menu: background=palette.window(#fff), border=palette.dark(#c0c0c0)
+        //                implicitWidth=200, implicitHeight=40
         if (this.$contentBox){
             this.$contentBox.style.minWidth = '200px'
             this.$contentBox.style.padding = '4px 0'
@@ -35,11 +37,19 @@ class Menu extends Popup {
         // Internal ordered list of content items (separate from QML children)
         this.$contentItems = []
 
-        // Re-clamp to viewport on window resize
+        // Override Popup's resize handler: recalc geometry then clamp
         this.$onResize = () => {
-            if (this.getPropertyValue('visible')) this.$clampToViewport()
+            if (this.getPropertyValue('visible')){
+                this.$applyGeometry()
+                // Update original position from freshly computed geometry
+                if (this.$contentBox){
+                    let rect = this.$contentBox.getBoundingClientRect()
+                    this.$originalX = rect.left
+                    this.$originalY = rect.top
+                }
+                this.$clampToViewport()
+            }
         }
-        window.addEventListener('resize', this.$onResize)
     }
 
     // Override Popup's addDomChild: force children to position:relative

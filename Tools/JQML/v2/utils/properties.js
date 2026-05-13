@@ -63,7 +63,14 @@ class QProperty {
     }
 
     getStatement(name){
-        return this.get().getStatement(name)
+        let val = this.get()
+        if(val && typeof val.getStatement === 'function'){
+            return val.getStatement(name)
+        }
+        // Fallback for non-complex values (e.g. icon.source on a plain QVariant)
+        if(!this.$sub) this.$sub = {}
+        if(!this.$sub[name]) this.$sub[name] = new QVar()
+        return this.$sub[name]
     }
 
     set(newValue){

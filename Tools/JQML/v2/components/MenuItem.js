@@ -1,9 +1,10 @@
 const { Item } = require('./Item')
-const { QString, QBool, QReal, QVar, QColor, QIcon } = require('../utils/properties')
+const { QString, QBool, QReal, QVar, QColor, QIcon, QFont } = require('../utils/properties')
 
 class MenuItem extends Item {
     static defaultProperties = {
         text: { type: QString, value: '', changed: '$textChanged' },
+        font: { type: QFont, changed: '$fontChanged' },
         icon: { type: QIcon, changed: '$iconChanged' },
         action: { type: QVar, changed: '$actionChanged' },
         enabled: { type: QBool, value: true, changed: '$enabledChanged' },
@@ -11,10 +12,16 @@ class MenuItem extends Item {
         checkable: { type: QBool, value: false },
         checked: { type: QBool, value: false },
         autoExclusive: { type: QBool, value: false },
+        down: { type: QBool, value: false },
         subMenu: { type: QVar },
         menu: { type: QVar },
         contentItem: { type: QVar },
+        indicator: { type: QVar },
         arrow: { type: QVar },
+        background: { type: QVar, changed: '$backgroundChanged' },
+        spacing: { type: QReal, value: 6 },
+        display: { type: QVar, value: 0 },
+        mirrored: { type: QBool, value: false },
         textPadding: { type: QReal, value: 0 },
         implicitTextPadding: { type: QReal, value: 0 },
     }
@@ -26,37 +33,70 @@ class MenuItem extends Item {
 
     constructor(parent, exCtx, exModel){
         super(parent, exCtx, exModel)
+
+        // Qt Basic: background implicitWidth=200 implicitHeight=40, padding=6
         this.setStyle({
             display: 'flex',
             flexDirection: 'row',
             alignItems: 'center',
-            padding: '6px 16px',
+            padding: '4px 12px',
             cursor: 'pointer',
             userSelect: 'none',
             whiteSpace: 'nowrap',
-            fontSize: '14px',
-            fontFamily: 'sans-serif',
-            color: '#1a1a1a',
+            color: '#000000',
             backgroundColor: 'transparent',
-            minHeight: '28px',
+            minWidth: '200px',
+            minHeight: '30px',
             boxSizing: 'border-box',
             position: 'relative',
             transition: 'background-color 0.08s ease',
             pointerEvents: 'auto',
         })
 
-        this.$textNode = document.createTextNode(this.getPropertyValue('text'))
-        this.getDom().appendChild(this.$textNode)
+        // Icon element (hidden by default, shown when icon.source is set)
+        this.$iconImg = document.createElement('img')
+        this.$iconImg.style.width = '16px'
+        this.$iconImg.style.height = '16px'
+        this.$iconImg.style.flexShrink = '0'
+        this.$iconImg.style.display = 'none'
+        this.$iconImg.style.objectFit = 'contain'
+        this.getDom().appendChild(this.$iconImg)
+
+        // Spacer between icon and text (Qt spacing: 6)
+        this.$iconSpacer = document.createElement('span')
+        this.$iconSpacer.style.width = '6px'
+        this.$iconSpacer.style.flexShrink = '0'
+        this.$iconSpacer.style.display = 'none'
+        this.getDom().appendChild(this.$iconSpacer)
+
+        // Text node
+        this.$textSpan = document.createElement('span')
+        this.$textSpan.style.flex = '1'
+        this.$textSpan.style.textAlign = 'left'
+        this.$textSpan.textContent = this.getPropertyValue('text')
+        this.getDom().appendChild(this.$textSpan)
 
         this.getDom().addEventListener('mouseenter', () => {
             if (this.getPropertyValue('enabled')){
-                this.setStyle({ backgroundColor: '#e8e8e8', color: '#1a1a1a' })
+                this.setStyle({ backgroundColor: '#e8e8e8' })
                 this.getProperty('highlighted').reset(true)
             }
         })
         this.getDom().addEventListener('mouseleave', () => {
-            this.setStyle({ backgroundColor: 'transparent', color: '#1a1a1a' })
+            this.setStyle({ backgroundColor: 'transparent' })
             this.getProperty('highlighted').reset(false)
+        })
+        this.getDom().addEventListener('mousedown', () => {
+            if (this.getPropertyValue('enabled')){
+                this.setStyle({ backgroundColor: '#d0d0d0' })
+                this.getProperty('down').reset(true)
+            }
+        })
+        this.getDom().addEventListener('mouseup', () => {
+            this.getProperty('down').reset(false)
+            if (this.getPropertyValue('highlighted')){
+                this.setStyle({ backgroundColor: '#e8e8e8' })
+            }
         })
         this.getDom().addEventListener('click', (e) => {
             e.stopPropagation()
@@ -79,9 +119,19 @@ class MenuItem extends Item {
     }
 
     $textChanged(){
-        if (this.$textNode){
-            this.$textNode.nodeValue = this.getPropertyValue('text')
+        if (this.$textSpan){
+            this.$textSpan.textContent = this.getPropertyValue('text')
         }
+    }
+
+    $fontChanged(){
+        if (!this.$textSpan) return
+        let font = this.getProperty('font')
+        this.$textSpan.style.fontWeight = font.getPropertyValue('bold') ? 'bold' : 'normal'
+        this.$textSpan.style.fontSize = font.getPropertyValue('pixelSize') + 'px'
+        this.$textSpan.style.fontFamily = `'${font.getPropertyValue('family')}'`
+        this.$textSpan.style.fontStyle = font.getPropertyValue('italic') ? 'italic' : 'normal'
+        this.$textSpan.style.textDecoration = font.getPropertyValue('underline') ? 'underline' : 'none'
     }
 
     $enabledChanged(){
@@ -96,21 +146,27 @@ class MenuItem extends Item {
         let icon = this.getProperty('icon')
         let src = icon.getPropertyValue('source')
         if (src){
-            if (!this.$iconImg){
-                this.$iconImg = document.createElement('img')
-                this.$iconImg.style.marginRight = '8px'
-                this.$iconImg.style.verticalAlign = 'middle'
-                this.$iconImg.style.flexShrink = '0'
-                this.getDom().insertBefore(this.$iconImg, this.getDom().firstChild)
-            }
-            this.$iconImg.src = src
             let w = icon.getPropertyValue('width')
             let h = icon.getPropertyValue('height')
-            this.$iconImg.style.width = w > 0 ? w + 'px' : '16px'
-            this.$iconImg.style.height = h > 0 ? h + 'px' : '16px'
-        } else if (this.$iconImg){
-            this.$iconImg.remove()
-            this.$iconImg = null
+            this.$iconImg.style.width = (w > 0 ? w : 16) + 'px'
+            this.$iconImg.style.height = (h > 0 ? h : 16) + 'px'
+            this.$iconImg.style.display = 'block'
+            this.$iconSpacer.style.display = 'block'
+
+            // Resolve URL same as Image.js: rootPath + source, strip qrc:/
+            let url = src.startsWith('data:image') ? src : (rootPath+'/'+src.replaceAll('../','')).replaceAll('qrc:','').replaceAll('//','/')
+            this.$iconUrl = url
+            ImageController.load(url, (img)=>{
+                if(!this.UID || this.$iconUrl !== url) return
+                this.$iconImg.src = img.data
+            }, ()=>{
+                if(!this.UID) return
+                this.$iconImg.style.display = 'none'
+                this.$iconSpacer.style.display = 'none'
+            })
+        } else {
+            this.$iconImg.style.display = 'none'
+            this.$iconSpacer.style.display = 'none'
         }
     }
 
@@ -130,8 +186,25 @@ class MenuItem extends Item {
         }
     }
 
+    $backgroundChanged(){
+        let bg = this.getPropertyValue('background')
+        if (bg && bg.$dom){
+            bg.$dom.style.position = 'absolute'
+            bg.$dom.style.left = '0'
+            bg.$dom.style.top = '0'
+            bg.$dom.style.width = '100%'
+            bg.$dom.style.height = '100%'
+            bg.$dom.style.zIndex = '-1'
+            if (this.getDom().firstChild !== bg.$dom){
+                this.getDom().insertBefore(bg.$dom, this.getDom().firstChild)
+            }
+        }
+    }
+
     destroy(){
-        delete this.$textNode
+        delete this.$textSpan
+        delete this.$iconImg
+        delete this.$iconSpacer
         super.destroy()
     }
 }

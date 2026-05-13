@@ -1073,6 +1073,7 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
 
     let updateAnchors = false
     let updateFont = false
+    let updateIcon = false
     // let updateList = []
     // let updatePrimaryList = []
 
@@ -1098,7 +1099,7 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
         }
 
         let pathName = property.name.split('.')
-        if(pathName[0] !== 'anchors' && pathName[0] !== 'font') continue
+        if(pathName[0] !== 'anchors' && pathName[0] !== 'font' && pathName[0] !== 'icon') continue
 
         for(let i = 0; i < pathName.length; i++){
             pathName[i] = `getStatement('${pathName[i]}')`
@@ -1180,6 +1181,10 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
             }
             if(!updateFont && property.name.split('.')[0] === 'font'){
                 updateFont = true
+                updatePrimaryList.push(`${currentInstructions.name}.${pathName[0]}.update()`)
+            }
+            if(!updateIcon && property.name.split('.')[0] === 'icon'){
+                updateIcon = true
                 updatePrimaryList.push(`${currentInstructions.name}.${pathName[0]}.update()`)
             }
             

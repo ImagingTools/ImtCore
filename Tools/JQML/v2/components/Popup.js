@@ -46,8 +46,8 @@ class Popup extends Item {
         width: { type: QReal, value: 0, changed: '$geometryChanged' },
         height: { type: QReal, value: 0, changed: '$geometryChanged' },
 
-        // Padding
-        padding: { type: QReal, value: 0, changed: '$paddingChanged' },
+        // Padding (Qt Basic: padding=12)
+        padding: { type: QReal, value: 12, changed: '$paddingChanged' },
         topPadding: { type: QReal, value: -1, changed: '$paddingChanged' },
         bottomPadding: { type: QReal, value: -1, changed: '$paddingChanged' },
         leftPadding: { type: QReal, value: -1, changed: '$paddingChanged' },
@@ -147,8 +147,9 @@ class Popup extends Item {
         this.getDom().appendChild(this.$overlay)
 
         // Content container (the actual popup box)
+        // Qt Basic: background=palette.window(#fff), border=palette.dark(#c0c0c0), padding=12
         this.$contentBox = document.createElement('div')
-        this.$contentBox.style.cssText = 'position:absolute;display:flex;flex-direction:column;pointer-events:auto;background:#ffffff;border:1px solid #e0e0e0;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.12);'
+        this.$contentBox.style.cssText = 'position:absolute;display:flex;flex-direction:column;pointer-events:auto;background:#ffffff;border:1px solid #c0c0c0;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.15);padding:12px;box-sizing:border-box;overflow:visible;'
         this.getDom().appendChild(this.$contentBox)
 
         // Event handlers — outside click detection via document listeners
@@ -237,6 +238,15 @@ class Popup extends Item {
             window.addEventListener('resize', this.$onResize)
             this.$applyGeometry()
             this.$updateOverlay()
+            // Sync actual rendered size to QML properties for bindings (e.g. menu.width)
+            requestAnimationFrame(() => {
+                if (!this.UID || !this.$contentBox) return
+                let rect = this.$contentBox.getBoundingClientRect()
+                if (this.getPropertyValue('width') === 0 && rect.width > 0)
+                    this.getProperty('width').set(rect.width)
+                if (this.getPropertyValue('height') === 0 && rect.height > 0)
+                    this.getProperty('height').set(rect.height)
+            })
         } else {
             this.setStyle({ display: 'none' })
             document.removeEventListener('keydown', this.$onEscapeKey)
@@ -332,6 +342,7 @@ class Popup extends Item {
             this.$contentBox.style.border = 'none'
             this.$contentBox.style.borderRadius = '0'
             this.$contentBox.style.boxShadow = 'none'
+            this.$contentBox.style.padding = '0'
 
             // Ensure background is first child (renders behind content)
             if (this.$contentBox.firstChild !== bg.$dom) {
@@ -378,7 +389,7 @@ class Popup extends Item {
             this.$overlay.style.pointerEvents = 'auto'
             this.$overlay.addEventListener('wheel', this.$onWheelBlock, { passive: false })
             this.$overlay.addEventListener('touchmove', this.$onWheelBlock, { passive: false })
-            this.$overlay.style.backgroundColor = dim ? 'rgba(0,0,0,0.25)' : 'transparent'
+            this.$overlay.style.backgroundColor = dim ? 'rgba(0,0,0,0.5)' : 'transparent'
         } else {
             // Non-modal: overlay only provides visual dimming, no pointer interception
             this.$overlay.removeEventListener('wheel', this.$onWheelBlock)
