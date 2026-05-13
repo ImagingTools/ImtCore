@@ -1,5 +1,5 @@
 const { Item } = require('./Item')
-const { QString, QBool, QReal, QVar, QInt, QColor, QVisible } = require('../utils/properties')
+const { QString, QBool, QReal, QVar, QInt, QColor, QVisible, QFont } = require('../utils/properties')
 
 /**
  * Popup — Qt Quick Controls Popup implementation for JQML v2
@@ -102,7 +102,7 @@ class Popup extends Item {
         anchors: { type: QVar },
 
         // Font/Locale/Palette
-        font: { type: QVar },
+        font: { type: QFont, changed: '$fontChanged' },
         locale: { type: QVar },
         palette: { type: QVar },
 
@@ -309,6 +309,16 @@ class Popup extends Item {
 
     $spacingChanged(){
         this.$contentBox.style.gap = `${this.getPropertyValue('spacing')}px`
+    }
+
+    $fontChanged(){
+        if (!this.$contentBox) return
+        let font = this.getProperty('font')
+        this.$contentBox.style.fontWeight = font.getPropertyValue('bold') ? 'bold' : 'normal'
+        this.$contentBox.style.fontSize = font.getPropertyValue('pixelSize') + 'px'
+        this.$contentBox.style.fontFamily = `'${font.getPropertyValue('family')}'`
+        this.$contentBox.style.fontStyle = font.getPropertyValue('italic') ? 'italic' : 'normal'
+        this.$contentBox.style.textDecoration = font.getPropertyValue('underline') ? 'underline' : 'none'
     }
 
     $backgroundChanged(){

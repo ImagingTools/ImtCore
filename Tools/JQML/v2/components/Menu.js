@@ -50,9 +50,14 @@ class Menu extends Popup {
     // ── Child management ────────────────────────────────────────
 
     addChild(child){
-        super.addChild(child)
+        // Re-parent if child belongs to a different parent (moves DOM too)
+        if (child.getProperty && child.getProperty('parent') && child.getProperty('parent').get() !== this){
+            child.getProperty('parent').reset(this)
+        } else {
+            super.addChild(child)
+        }
         // Track in content items
-        if (child.UID !== undefined) {
+        if (child.UID !== undefined && this.$contentItems.indexOf(child) < 0) {
             this.$contentItems.push(child)
         }
         // Auto-set MenuItem.menu back-reference
@@ -132,11 +137,8 @@ class Menu extends Popup {
     insertItem(index, item){
         if (!item) return
         index = Math.max(0, Math.min(index, this.$contentItems.length))
-        // Add as QML child (appends to children & DOM)
-        super.addChild(item)
-        if (item.getProperty && item.getProperty('menu')){
-            item.getProperty('menu').reset(this)
-        }
+        // Add as QML child (re-parents & moves DOM)
+        this.addChild(item)
         // Reorder in content items list
         let curIdx = this.$contentItems.indexOf(item)
         if (curIdx >= 0) this.$contentItems.splice(curIdx, 1)

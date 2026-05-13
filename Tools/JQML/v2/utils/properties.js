@@ -816,6 +816,40 @@ class QFont extends ComplexObject {
     }
 }
 
+class QIcon extends ComplexObject {
+    static defaultProperties = {
+        source: { type: QString, value: '', changed: 'mainChanged' },
+        name: { type: QString, value: '', changed: 'mainChanged' },
+        color: { type: QColor, value: 'transparent', changed: 'mainChanged' },
+        width: { type: QReal, value: 0, changed: 'mainChanged' },
+        height: { type: QReal, value: 0, changed: 'mainChanged' },
+        cache: { type: QBool, value: true, changed: 'mainChanged' },
+    }
+
+    mainChanged(){
+        this.getNotify()()
+    }
+
+    getNotify(){
+        if(!this.notify) this.notify = new QSignal()
+        return this.notify
+    }
+
+    updateOnce(){
+        if(!this.completed) this.update()
+    }
+
+    update(){
+        this.completed = true
+        if(this.$properties.source) this.$properties.source.update()
+        if(this.$properties.name) this.$properties.name.update()
+        if(this.$properties.color) this.$properties.color.update()
+        if(this.$properties.width) this.$properties.width.update()
+        if(this.$properties.height) this.$properties.height.update()
+        if(this.$properties.cache) this.$properties.cache.update()
+    }
+}
+
 class QBorder extends ComplexObject {
     static defaultProperties = {
         color: { type: QColor, value: 'black', changed: 'mainChanged' },
@@ -1394,6 +1428,7 @@ module.exports.QSourceSize = QSourceSize
 module.exports.QKeyNavigation = QKeyNavigation
 module.exports.MapGestureArea = MapGestureArea
 module.exports.QDrag = QDrag
+module.exports.QIcon = QIcon
 
 
 module.exports.QVariant = QVariant

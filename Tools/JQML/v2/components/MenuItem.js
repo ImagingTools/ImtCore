@@ -1,10 +1,10 @@
 const { Item } = require('./Item')
-const { QString, QBool, QReal, QVar, QColor } = require('../utils/properties')
+const { QString, QBool, QReal, QVar, QColor, QIcon } = require('../utils/properties')
 
 class MenuItem extends Item {
     static defaultProperties = {
         text: { type: QString, value: '', changed: '$textChanged' },
-        icon: { type: QVar },
+        icon: { type: QIcon, changed: '$iconChanged' },
         action: { type: QVar, changed: '$actionChanged' },
         enabled: { type: QBool, value: true, changed: '$enabledChanged' },
         highlighted: { type: QBool, value: false },
@@ -14,6 +14,9 @@ class MenuItem extends Item {
         subMenu: { type: QVar },
         menu: { type: QVar },
         contentItem: { type: QVar },
+        arrow: { type: QVar },
+        textPadding: { type: QReal, value: 0 },
+        implicitTextPadding: { type: QReal, value: 0 },
     }
 
     static defaultSignals = {
@@ -86,6 +89,28 @@ class MenuItem extends Item {
             this.setStyle({ opacity: '1', cursor: 'pointer' })
         } else {
             this.setStyle({ opacity: '0.4', cursor: 'default' })
+        }
+    }
+
+    $iconChanged(){
+        let icon = this.getProperty('icon')
+        let src = icon.getPropertyValue('source')
+        if (src){
+            if (!this.$iconImg){
+                this.$iconImg = document.createElement('img')
+                this.$iconImg.style.marginRight = '8px'
+                this.$iconImg.style.verticalAlign = 'middle'
+                this.$iconImg.style.flexShrink = '0'
+                this.getDom().insertBefore(this.$iconImg, this.getDom().firstChild)
+            }
+            this.$iconImg.src = src
+            let w = icon.getPropertyValue('width')
+            let h = icon.getPropertyValue('height')
+            this.$iconImg.style.width = w > 0 ? w + 'px' : '16px'
+            this.$iconImg.style.height = h > 0 ? h + 'px' : '16px'
+        } else if (this.$iconImg){
+            this.$iconImg.remove()
+            this.$iconImg = null
         }
     }
 
