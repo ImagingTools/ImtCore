@@ -34,6 +34,12 @@ class Menu extends Popup {
 
         // Internal ordered list of content items (separate from QML children)
         this.$contentItems = []
+
+        // Re-clamp to viewport on window resize
+        this.$onResize = () => {
+            if (this.getPropertyValue('visible')) this.$clampToViewport()
+        }
+        window.addEventListener('resize', this.$onResize)
     }
 
     // Override Popup's addDomChild: force children to position:relative
@@ -331,7 +337,14 @@ class Menu extends Popup {
 
         if (this.getPropertyValue('visible')){
             this.getSignal('opened')()            // Clamp to viewport after layout completes
-            requestAnimationFrame(() => this.$clampToViewport())
+            requestAnimationFrame(() => {
+                if (!this.$contentBox) return
+                // Save the original (unclamped) position
+                let rect = this.$contentBox.getBoundingClientRect()
+                this.$originalX = rect.left
+                this.$originalY = rect.top
+                this.$clampToViewport()
+            })
         }
     }
 
@@ -340,34 +353,24 @@ class Menu extends Popup {
         let rect = this.$contentBox.getBoundingClientRect()
         let vw = window.innerWidth
         let vh = window.innerHeight
-        let changed = false
-        let x = rect.left
-        let y = rect.top
 
-        // If menu extends past right edge, shift left
-        if (rect.right > vw){
-            x = Math.max(0, vw - rect.width)
-            changed = true
-        }
-        // If menu extends past bottom edge, shift up
-        if (rect.bottom > vh){
-            y = Math.max(0, vh - rect.height)
-            changed = true
-        }
-        // If menu extends past left edge
-        if (x < 0){
-            x = 0
-            changed = true
-        }
-        // If menu extends past top edge
-        if (y < 0){
-            y = 0
-            changed = true
-        }
+        // Start from the original (unclamped) position
+        let x = this.$originalX !== undefined ? this.$originalX : rect.left
+        let y = this.$originalY !== undefined ? this.$originalY : rect.top
+        let w = rect.width
+        let h = rect.height
 
-        if (changed){
-            this.$contentBox.style.left = `${x}px`
-            this.$contentBox.style.top = `${y}px`        }
+        // Clamp right edge
+        if (x + w > vw) x = Math.max(0, vw - w)
+        // Clamp bottom edge
+        if (y + h > vh) y = Math.max(0, vh - h)
+        // Clamp left edge
+        if (x < 0) x = 0
+        // Clamp top edge
+        if (y < 0) y = 0
+
+        this.$contentBox.style.left = `${x}px`
+        this.$contentBox.style.top = `${y}px`
     }
 
     $titleChanged(){
@@ -397,6 +400,7 @@ class Menu extends Popup {
     }
 
     destroy(){
+        window.removeEventListener('resize', this.$onResize)
         this.$contentItems = []
         super.destroy()
     }
