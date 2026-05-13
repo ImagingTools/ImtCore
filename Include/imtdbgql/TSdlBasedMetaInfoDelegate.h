@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -21,20 +22,20 @@ template<class MetaInfoRepresentation>
 class TSdlBasedMetaInfoDelegate: virtual public imtdb::IJsonBasedMetaInfoDelegate
 {
 public:
-	virtual bool ToJsonRepresentation(const idoc::IDocumentMetaInfo& metaInfo, QByteArray& json) const override;
-	virtual bool FromJsonRepresentation(const QByteArray& json, idoc::IDocumentMetaInfo& metaInfo) const override;
+	virtual bool ToJsonRepresentation(const idoc::IDocumentMetaInfo& metaInfo, QByteArray& json, const QByteArray& typeId) const override;
+	virtual bool FromJsonRepresentation(const QByteArray& json, idoc::IDocumentMetaInfo& metaInfo, const QByteArray& typeId) const override;
 
 protected:
-	virtual bool FillRepresentation(MetaInfoRepresentation& metaInfoRepresentation, const idoc::IDocumentMetaInfo& metaInfo) const = 0;
-	virtual bool FillMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const MetaInfoRepresentation& metaInfoRepresentation) const = 0;
+	virtual bool FillRepresentation(MetaInfoRepresentation& metaInfoRepresentation, const idoc::IDocumentMetaInfo& metaInfo, const QByteArray& typeId) const = 0;
+	virtual bool FillMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const MetaInfoRepresentation& metaInfoRepresentation, const QByteArray& typeId) const = 0;
 };
 
 
 template<class MetaInfoRepresentation>
-bool TSdlBasedMetaInfoDelegate<MetaInfoRepresentation>::ToJsonRepresentation(const idoc::IDocumentMetaInfo& metaInfo, QByteArray& json) const
+bool TSdlBasedMetaInfoDelegate<MetaInfoRepresentation>::ToJsonRepresentation(const idoc::IDocumentMetaInfo& metaInfo, QByteArray& json, const QByteArray& typeId) const
 {
 	MetaInfoRepresentation representation;
-	if (FillRepresentation(representation, metaInfo)){
+	if (FillRepresentation(representation, metaInfo, typeId)){
 		QJsonObject object;
 
 		if (representation.WriteToJsonObject(object)){
@@ -50,7 +51,7 @@ bool TSdlBasedMetaInfoDelegate<MetaInfoRepresentation>::ToJsonRepresentation(con
 
 
 template<class MetaInfoRepresentation>
-bool TSdlBasedMetaInfoDelegate<MetaInfoRepresentation>::FromJsonRepresentation(const QByteArray& json, idoc::IDocumentMetaInfo& metaInfo) const
+bool TSdlBasedMetaInfoDelegate<MetaInfoRepresentation>::FromJsonRepresentation(const QByteArray& json, idoc::IDocumentMetaInfo& metaInfo, const QByteArray& typeId) const
 {
 	QJsonDocument document;
 	QJsonParseError error;
@@ -59,7 +60,7 @@ bool TSdlBasedMetaInfoDelegate<MetaInfoRepresentation>::FromJsonRepresentation(c
 		QJsonObject object = document.object();
 		MetaInfoRepresentation representation;
 		if (representation.ReadFromJsonObject(object)){
-			if (FillMetaInfo(metaInfo, representation)){
+			if (FillMetaInfo(metaInfo, representation, typeId)){
 				return true;
 			}
 		}

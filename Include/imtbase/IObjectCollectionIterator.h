@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -46,6 +47,11 @@ public:
 	*/
 	virtual idoc::MetaInfoPtr GetDataMetaInfo() const = 0;
 
+	/**
+		Get number of elements available for the iterator query.
+	*/
+	virtual int GetElementsCount() const = 0;
+
 	virtual idoc::MetaInfoPtr GetCollectionMetaInfo() const = 0;
 
 	/**
@@ -61,5 +67,4 @@ public:
 
 
 } // namespace imtbase
-
 

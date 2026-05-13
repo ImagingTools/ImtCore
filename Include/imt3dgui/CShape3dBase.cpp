@@ -1,4 +1,10 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imt3dgui/CShape3dBase.h>
+
+
+// ImtCore includes
+#include <imt3dview/CPointFormatTraits.h>
+#include <imt3dview/IScene3dCamera.h>
 
 
 namespace imt3dgui
@@ -79,17 +85,11 @@ QVector3D ExtractPosition(const imt3d::IPointsBasedObject& points, int index)
 CShape3dBase::CShape3dBase()
 	: m_pointsDataPtr(nullptr),
 	m_scale(1.0),
-	m_contextPtr(nullptr),
+	m_backendPtr(nullptr),
+	m_geometryFormat(imt3d::IPointsBasedObject::PF_UNDEFINED),
 	m_cameraPtr(nullptr),
-	m_vertexBuffer(QOpenGLBuffer::VertexBuffer),
-	m_indexBuffer(QOpenGLBuffer::IndexBuffer),
-#if QT_VERSION < 0x060000
-	m_bufferMutex(QMutex::Recursive),
-#endif
 	m_isVisible(true)
 {
-	m_vertexBuffer.setUsagePattern(QOpenGLBuffer::DynamicDraw);
-	m_indexBuffer.setUsagePattern(QOpenGLBuffer::DynamicDraw);
 }
 
 
@@ -148,8 +148,7 @@ int CShape3dBase::FindVertex(const QPoint& point, bool limitDistance, QVector3D*
 
 bool CShape3dBase::IsValid() const
 {
-	QMutexLocker lock(&m_bufferMutex);
-	return m_contextPtr && m_vertexBuffer.isCreated() && m_indexBuffer.isCreated();
+	return m_backendPtr != nullptr && m_geometry.get() != nullptr;
 }
 
 
@@ -221,52 +220,34 @@ void CShape3dBase::SetScale(float scale)
 }
 
 
-void CShape3dBase::SetContext(QOpenGLContext* contextPtr)
+// reimplemented (IDrawable)
+
+void CShape3dBase::OnAttachBackend(imt3dview::IRenderBackend* backendPtr)
 {
-	if (contextPtr != nullptr){
-		if (m_contextPtr != nullptr)
+	if (backendPtr != nullptr){
+		if (m_backendPtr == backendPtr){
 			return;
-		m_contextPtr = contextPtr;
-
-		{
-			QMutexLocker lock(&m_bufferMutex);
-			if (!m_vertexBuffer.isCreated()){
-				m_vertexBuffer.create();
-			}
-
-			if (!m_indexBuffer.isCreated()){
-				m_indexBuffer.create();
-			}
-
-			Q_ASSERT(m_vertexBuffer.isCreated());
-			Q_ASSERT(m_indexBuffer.isCreated());
 		}
+
+		m_backendPtr = backendPtr;
+		// geometry is created lazily as soon as we know the point format
+		m_geometry.reset();
+		m_geometryFormat = imt3d::IPointsBasedObject::PF_UNDEFINED;
 
 		UpdateGeometry(istd::IChangeable::GetAllChanges());
 	}
 	else {
-		QMutexLocker lock(&m_bufferMutex);
-
-		if (m_vertexBuffer.isCreated()){
-			m_vertexBuffer.destroy();
-		}
-
-		if (m_indexBuffer.isCreated()){
-			m_indexBuffer.destroy();
-		}
-
-		m_contextPtr = nullptr;
+		m_geometry.reset();
+		m_geometryFormat = imt3d::IPointsBasedObject::PF_UNDEFINED;
+		m_backendPtr = nullptr;
 	}
-
 }
 
 
-// pseudo-reimplemented (IDrawable)
-
-void CShape3dBase::DrawGl(QOpenGLShaderProgram &program)
+void CShape3dBase::Render(imt3dview::IRenderBackend& backend)
 {
-	if (		!m_isVisible ||
-				!IsValid() ||
+	if (!m_isVisible ||
+				!m_geometry ||
 				m_pointsDataPtr == nullptr ||
 				m_pointsDataPtr->GetData() == nullptr ||
 				m_pointsDataPtr->IsEmpty() ||
@@ -274,94 +255,47 @@ void CShape3dBase::DrawGl(QOpenGLShaderProgram &program)
 		return;
 	}
 
-	QMutexLocker lock(&m_bufferMutex);
+	imt3dview::DrawCommand command;
+	command.geometry = m_geometry;
+	command.primitive = GetPrimitiveType();
+	command.indexCount = m_indices.size();
+	command.indexOffset = 0;
+	command.modelMatrix = GetModelMatrix();
 
-	m_vertexBuffer.bind();
-	m_indexBuffer.bind();
+	FillMaterial(command.material);
 
-	// set model matrix
-	program.setUniformValue("modelMatrix", GetModelMatrix());
-
-	// set point size
-	program.setUniformValue("usePointSize", false);
-
-	// set points
-	switch (m_pointsDataPtr->GetPointFormat()){
-	case imt3d::IPointsBasedObject::PF_XYZ_32:
-	case imt3d::IPointsBasedObject::PF_XYZ_ABC_32:
-	case imt3d::IPointsBasedObject::PF_XYZW_32:
-	case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32:
-	case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32:
-	case imt3d::IPointsBasedObject::PF_XYZW_RGBA_32:
-		{
-			program.enableAttributeArray("pointPosition");
-			program.setAttributeBuffer("pointPosition", GL_FLOAT, 0, 3, m_pointsDataPtr->GetPointBytesSize());
-		}
-		break;
-	case imt3d::IPointsBasedObject::PF_XYZ_64:
-		{
-			program.enableAttributeArray("pointPosition");
-			program.setAttributeBuffer("pointPosition", GL_DOUBLE, 0, 3, m_pointsDataPtr->GetPointBytesSize());
-		}
-		break;
-	default:
-		break;
-	}
-
-	// set normals
-	switch (m_pointsDataPtr->GetPointFormat()){
-	case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32:
-	case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32:
-		{
-			program.setUniformValue("useNormals", true);
-			program.enableAttributeArray("pointNormal");
-			program.setAttributeBuffer("pointNormal", GL_FLOAT, 4 * sizeof(float), 3, m_pointsDataPtr->GetPointBytesSize());
-		}
-		break;
-	default:
-		program.setUniformValue("useNormals", false);
-		break;
-	}
-
-	// set color
-
-	switch (m_pointsDataPtr->GetPointFormat()){
-	case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32:
-		{
-			program.enableAttributeArray("pointColor");
-			program.setUniformValue("colorMode", 0);
-			program.setAttributeBuffer("pointColor", GL_FLOAT, 8 * sizeof(float), 3, m_pointsDataPtr->GetPointBytesSize());
-		}
-		break;
-	case imt3d::IPointsBasedObject::PF_XYZW_RGBA_32:
-		{
-			program.enableAttributeArray("pointColor");
-			program.setUniformValue("colorMode", 0);
-			program.setAttributeBuffer("pointColor", GL_FLOAT, 4 * sizeof(float), 3, m_pointsDataPtr->GetPointBytesSize());
-		}
-		break;
-	default:
-		{
-			program.setUniformValue("colorMode", 1);
-			program.setUniformValue("itemColor", GetColor());
-		}
-		break;
-	}
-
-	// draw shape specifics
-	DrawShapeGl(program, *m_contextPtr->functions());
-
-	m_vertexBuffer.release();
-	m_indexBuffer.release();
+	backend.Draw(command);
 }
 
 
-void CShape3dBase::Draw(QPainter& /*painter*/)
+void CShape3dBase::DrawOverlay(QPainter& /*painter*/)
 {
 }
 
 
+// reimplemented (IShape3d)
+
+QVector3D CShape3dBase::GetColor() const
+{
+	return QVector3D();
+}
+
+
 // protected methods
+
+void CShape3dBase::FillMaterial(imt3dview::Material& material) const
+{
+	if (m_pointsDataPtr != nullptr && imt3dview::CPointFormatTraits::HasColor(m_pointsDataPtr->GetPointFormat())){
+		material.colorMode = imt3dview::Material::CM_PER_VERTEX;
+	}
+	else{
+		material.colorMode = imt3dview::Material::CM_SOLID;
+		material.solidColor = GetColor();
+	}
+
+	material.useNormals = (m_pointsDataPtr != nullptr && imt3dview::CPointFormatTraits::HasNormals(m_pointsDataPtr->GetPointFormat()));
+}
+
 
 void CShape3dBase::UpdateGeometry(const istd::IChangeable::ChangeSet& changeSet)
 {
@@ -424,40 +358,57 @@ QVector3D CShape3dBase::WindowToModel(const QPoint& windowCoordinate, float z) c
 
 void CShape3dBase::CreateGeometry()
 {
-	if (
-				m_pointsDataPtr != nullptr &&
-				m_pointsDataPtr->GetData() != nullptr &&
-				!m_pointsDataPtr->IsEmpty() &&
-				!m_indices.isEmpty() && IsValid()){
-
-		QMutexLocker lock(&m_bufferMutex);
-
-		m_vertexBuffer.bind();
-		m_indexBuffer.bind();
-
-		m_vertexBuffer.allocate(m_pointsDataPtr->GetData(), m_pointsDataPtr->GetPointsCount() * m_pointsDataPtr->GetPointBytesSize());
-		m_indexBuffer.allocate(m_indices.data(), m_indices.size() * sizeof(GLuint));
-
-		m_vertexBuffer.release();
-		m_indexBuffer.release();
+	if (m_backendPtr == nullptr ||
+				m_pointsDataPtr == nullptr ||
+				m_pointsDataPtr->GetData() == nullptr ||
+				m_pointsDataPtr->IsEmpty() ||
+				m_indices.isEmpty()){
+		return;
 	}
+
+	imt3d::IPointsBasedObject::PointFormat pointFormat = m_pointsDataPtr->GetPointFormat();
+
+	// (re)create the backend resource if format changed or it doesn't yet exist
+	if (!m_geometry || m_geometryFormat != pointFormat){
+		imt3dview::VertexLayout layout = imt3dview::CPointFormatTraits::BuildLayout(pointFormat);
+		// fall back to the actual stride reported by the points object in case of unknown formats
+		if (layout.stride == 0){
+			layout.stride = m_pointsDataPtr->GetPointBytesSize();
+		}
+		m_geometry = m_backendPtr->CreateGeometry(layout);
+		m_geometryFormat = pointFormat;
+	}
+
+	if (!m_geometry){
+		return;
+	}
+
+	const size_t vertexBytes = static_cast<size_t>(m_pointsDataPtr->GetPointsCount()) *
+				static_cast<size_t>(m_pointsDataPtr->GetPointBytesSize());
+
+	m_backendPtr->UpdateGeometry(
+				*m_geometry,
+				m_pointsDataPtr->GetData(),
+				vertexBytes,
+				reinterpret_cast<const uint32_t*>(m_indices.data()),
+				static_cast<size_t>(m_indices.size()));
 }
 
 
 void CShape3dBase::RefreshGeometry()
 {
-	if (		m_pointsDataPtr != nullptr &&
-			m_pointsDataPtr->GetData() != nullptr &&
-			!m_pointsDataPtr->IsEmpty() &&
-			IsValid()){
-		QMutexLocker lock(&m_bufferMutex);
-
-		m_vertexBuffer.bind();
-
-		m_vertexBuffer.write(0, m_pointsDataPtr->GetData(), m_pointsDataPtr->GetPointsCount() * m_pointsDataPtr->GetPointBytesSize());
-
-		m_vertexBuffer.release();
+	if (m_backendPtr == nullptr ||
+				!m_geometry ||
+				m_pointsDataPtr == nullptr ||
+				m_pointsDataPtr->GetData() == nullptr ||
+				m_pointsDataPtr->IsEmpty()){
+		return;
 	}
+
+	const size_t vertexBytes = static_cast<size_t>(m_pointsDataPtr->GetPointsCount()) *
+				static_cast<size_t>(m_pointsDataPtr->GetPointBytesSize());
+
+	m_backendPtr->RefreshVertices(*m_geometry, m_pointsDataPtr->GetData(), vertexBytes);
 }
 
 
@@ -465,12 +416,10 @@ void CShape3dBase::RefreshGeometry()
 
 void CShape3dBase::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
 {
-	if (IsValid()){
+	if (m_backendPtr != nullptr){
 		UpdateGeometry(changeSet);
 	}
 }
 
 
 } // namespace imt3dgui
-
-

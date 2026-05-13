@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtserverapp/CTableViewParamRepresentationControllerComp.h>
 
 
@@ -7,6 +8,10 @@
 // ImtCore includes
 #include <imtqml/IPageGuiElementModel.h>
 #include <imtbase/ITableViewParam.h>
+
+// Qt includes
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonValue>
 
 
 namespace imtserverapp
@@ -37,7 +42,7 @@ bool CTableViewParamRepresentationControllerComp::IsModelSupported(const istd::I
 
 bool CTableViewParamRepresentationControllerComp::GetRepresentationFromDataModel(
 		const istd::IChangeable& dataModel,
-		imtbase::CTreeItemModel& representation,
+		QJsonObject& representation,
 		const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	Q_ASSERT(IsModelSupported(dataModel));
@@ -47,6 +52,7 @@ bool CTableViewParamRepresentationControllerComp::GetRepresentationFromDataModel
 		return false;
 	}
 
+	representation = QJsonObject();
 	QByteArrayList headerList = tableViewParamPtr->GetHeaderIds();
 
 	// sort headerList by order
@@ -67,22 +73,24 @@ bool CTableViewParamRepresentationControllerComp::GetRepresentationFromDataModel
 		}
 	}
 
+	QJsonArray itemsArray;
 	for (const QByteArray& headerId : headerList){
 		imtbase::ITableViewParam::HeaderInfo headerInfo = tableViewParamPtr->GetHeaderInfo(headerId);
-
-		int index = representation.InsertNewItem();
-		representation.SetData("HeaderId", headerInfo.headerId, index);
-		representation.SetData("Size", headerInfo.size, index);
-		representation.SetData("Visible", headerInfo.visible, index);
-		representation.SetData("Order", headerInfo.order, index);
+		QJsonObject itemObj;
+		itemObj.insert(QStringLiteral("HeaderId"), QString::fromUtf8(headerInfo.headerId));
+		itemObj.insert(QStringLiteral("Size"), headerInfo.size);
+		itemObj.insert(QStringLiteral("Visible"), headerInfo.visible);
+		itemObj.insert(QStringLiteral("Order"), headerInfo.order);
+		itemsArray.append(itemObj);
 	}
 
+	representation.insert(QStringLiteral("items"), itemsArray);
 	return true;
 }
 
 
 bool CTableViewParamRepresentationControllerComp::GetDataModelFromRepresentation(
-		const imtbase::CTreeItemModel& representation,
+		const QJsonObject& representation,
 		istd::IChangeable& dataModel) const
 {
 	Q_ASSERT(IsModelSupported(dataModel));
@@ -92,27 +100,29 @@ bool CTableViewParamRepresentationControllerComp::GetDataModelFromRepresentation
 		return false;
 	}
 
-	for (int i = 0; i < representation.GetItemsCount(); i++){
+	QJsonArray itemsArray;
+	if (representation.contains(QStringLiteral("items")) && representation.value(QStringLiteral("items")).isArray()){
+		itemsArray = representation.value(QStringLiteral("items")).toArray();
+	}
+
+	for (int i = 0; i < itemsArray.size(); i++){
+		QJsonObject itemObj = itemsArray.at(i).toObject();
 		imtbase::ITableViewParam::HeaderInfo headerInfo;
 
-		if (representation.ContainsKey("HeaderId", i)){
-			QByteArray headerId = representation.GetData("HeaderId", i).toByteArray();
-			headerInfo.headerId = headerId;
+		if (itemObj.contains(QStringLiteral("HeaderId"))){
+			headerInfo.headerId = itemObj.value(QStringLiteral("HeaderId")).toVariant().toByteArray();
 		}
 
-		if (representation.ContainsKey("Size", i)){
-			double size = representation.GetData("Size", i).toDouble();
-			headerInfo.size = size;
+		if (itemObj.contains(QStringLiteral("Size"))){
+			headerInfo.size = itemObj.value(QStringLiteral("Size")).toDouble();
 		}
 
-		if (representation.ContainsKey("Visible", i)){
-			bool visible = representation.GetData("Visible", i).toBool();
-			headerInfo.visible = visible;
+		if (itemObj.contains(QStringLiteral("Visible"))){
+			headerInfo.visible = itemObj.value(QStringLiteral("Visible")).toBool();
 		}
 
-		if (representation.ContainsKey("Order", i)){
-			int order = representation.GetData("Order", i).toInt();
-			headerInfo.order = order;
+		if (itemObj.contains(QStringLiteral("Order"))){
+			headerInfo.order = itemObj.value(QStringLiteral("Order")).toInt();
 		}
 
 		tableViewParamPtr->SetHeaderInfo(headerInfo.headerId, headerInfo);
@@ -123,5 +133,3 @@ bool CTableViewParamRepresentationControllerComp::GetDataModelFromRepresentation
 
 
 } // namespace imtserverapp
-
-

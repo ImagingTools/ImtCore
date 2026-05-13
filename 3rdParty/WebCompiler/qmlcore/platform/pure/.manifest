@@ -1,7 +1,0 @@
-{
-	"standalone": false,
-	"requires": ["core"],
-	"properties": {
-		"cssDisableTransformations": true
-	}
-}

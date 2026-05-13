@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -22,12 +23,6 @@ protected:
 	// reimplemented (imtdb::CSqlDatabaseDocumentDelegateComp)
 	virtual QString CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const override;
 	virtual QByteArray CreateJoinTablesQuery() const override;
-
-	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated() override;
-
-private:
-	virtual bool TableExists(const QString& tableName) const;
 
 private:
 	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);

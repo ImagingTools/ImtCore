@@ -29,7 +29,7 @@ OptionManager {
 
 		responseModel: OptionsList { id: optionsListModel
 			Component.onCompleted: {
-				createOptions()
+				emplaceOptions()
 			}
 		}
 

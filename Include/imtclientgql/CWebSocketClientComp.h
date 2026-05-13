@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -21,8 +22,8 @@
 #include <imtcom/IConnectionStatusProvider.h>
 #include <imtrest/IRequestServlet.h>
 #include <imtrest/IProtocolEngine.h>
-#include <imtrest/ISender.h>
-#include <imtrest/IRequestManager.h>
+#include <imtrest/ITransport.h>
+#include <imtrest/IResponseDispatcher.h>
 #include <imtclientgql/IGqlClient.h>
 #include <imtcom/ISslConfigurationManager.h>
 
@@ -53,9 +54,9 @@ protected:
 class CWebSocketClientComp:
 			public QObject,
 			public CWebSocketClientCompBase,
-			virtual public imtrest::ISender,
+			virtual public imtrest::ITransport,
 			virtual public imtcom::IConnectionController,
-			virtual public imtrest::IRequestManager,
+			virtual public imtrest::IResponseDispatcher,
 			virtual public IGqlClient,
 			private imod::CMultiModelDispatcherBase
 {
@@ -65,8 +66,8 @@ public:
 	typedef imod::CMultiModelDispatcherBase BaseClass2;
 
 	I_BEGIN_COMPONENT(CWebSocketClientComp);
-		I_REGISTER_INTERFACE(ISender)
-		I_REGISTER_INTERFACE(IRequestManager)
+		I_REGISTER_INTERFACE(ITransport)
+		I_REGISTER_INTERFACE(IResponseDispatcher)
 		I_REGISTER_INTERFACE(imtcom::IConnectionController)
 		I_REGISTER_INTERFACE(imtclientgql::IGqlClient)
 		I_REGISTER_SUBELEMENT(ConnectionStatusProvider);
@@ -91,12 +92,13 @@ public:
 	// reimplemented (imtclientgql::IGqlClient)
 	virtual GqlResponsePtr SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* urlParamPtr = nullptr) const override;
 
-	// reimplemented (imtrest::ISender)
+	// reimplemented (imtrest::ITransport)
 	virtual bool SendResponse(imtrest::ConstResponsePtr& response) const override;
 	virtual bool SendRequest(imtrest::ConstRequestPtr& request) const override;
 
-	// reimplemented (imtrest::IRequestManager)
-	virtual const imtrest::ISender* GetSender(const QByteArray& requestId) const override;
+	// reimplemented (imtrest::IResponseDispatcher)
+	virtual bool SendResponse(const QByteArray& requestId, imtrest::ConstResponsePtr& response) const override;
+	virtual bool SendRequest(const QByteArray& requestId, imtrest::ConstRequestPtr& request) const override;
 
 	// reimplemented (imtcom::IConnectionController)
 	virtual bool Connect() override;

@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5405" Description="ACF"/>
-            <Version Id="1" Number="2250" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="0" Number="6154" Description="ACF"/>
+            <Version Id="1" Number="2274" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395778" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>WebSocket server framework</Description>
@@ -46,7 +46,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="WebSocketProtocolEngine" PackageId="ImtHttpPck" ComponentId="WebSocketProtocolEngine">
+        <Element Id="WebSocketProtocolEngine" PackageId="ImtRestPck" ComponentId="WebSocketProtocolEngine">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
@@ -58,7 +58,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="WebSocketServer" PackageId="ImtHttpPck" ComponentId="WebSocketServer">
+        <Element Id="WebSocketServer" PackageId="ImtRestPck" ComponentId="WebSocketServer">
             <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
                     <AttributeInfo Id="HttpProtocolEngine" Type="Reference" ExportId="HttpProtocolEngine">
@@ -109,7 +109,13 @@
                     <AttributeInfo Id="GqlSubscriberControllers" Type="Reference[]" ExportId="GqlSubscriberControllers">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="JwtSessionController" Type="Reference" ExportId="JwtSessionController">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PersonalAccessTokenManager" Type="Reference" ExportId="PersonalAccessTokenManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
@@ -121,7 +127,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="WorkerManager" PackageId="ImtHttpPck" ComponentId="WorkerManager">
+        <Element Id="WorkerManager" PackageId="ImtRestPck" ComponentId="WorkerManaqer">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
@@ -149,10 +155,10 @@
         <Interface InterfaceId="imtclientgql::IGqlClient" ComponentId="SubscriptionManager"/>
         <Interface InterfaceId="imtclientgql::IGqlSubscriptionManager" ComponentId="SubscriptionManager"/>
         <Interface InterfaceId="imtcom::IConnectionStatusProvider" ComponentId="WebSocketServer"/>
-        <Interface InterfaceId="imthttp::IProtocolEngine" ComponentId="WebSocketProtocolEngine"/>
-        <Interface InterfaceId="imthttp::IRequestManager" ComponentId="WebSocketServer"/>
+        <Interface InterfaceId="imtrest::IProtocolEngine" ComponentId="WebSocketProtocolEngine"/>
+        <Interface InterfaceId="imtrest::IResponseDispatcher" ComponentId="WebSocketServer"/>
         <Interface InterfaceId="imtrest::IRequestServlet" ComponentId="WebSocketServlet"/>
-        <Interface InterfaceId="imthttp::IServer" ComponentId="WebSocketServer"/>
+        <Interface InterfaceId="imtrest::IServer" ComponentId="WebSocketServer"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="WebSocketServer"/>
     </ExportedInterfaces>
     <ExportedComponents/>

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -67,6 +68,11 @@ public:
 		Q_INIT_RESOURCE(imtbaseCollectionImportSdl);
 		Q_INIT_RESOURCE(imt2dGeometrySdl);
 		Q_INIT_RESOURCE(imt2dPaintSystemSdl);
+		Q_INIT_RESOURCE(imtauthPersonalAccessTokensSdl);
+		Q_INIT_RESOURCE(imtbaseFilterableSelectSdl);
+		Q_INIT_RESOURCE(imtauthTenantsSdl);
+		Q_INIT_RESOURCE(imtauthTenantMembershipsSdl);
+		Q_INIT_RESOURCE(imtauthTenantCollectionDocumentManagerSdl);
 	}
 
 	static void InitQml()
@@ -78,6 +84,11 @@ public:
 		Q_INIT_RESOURCE(imtguigqlqml);
 		Q_INIT_RESOURCE(imtauthguiqml);
 		Q_INIT_RESOURCE(imtlicguiqml);
+	}
+
+	static void InitGeoQml()
+	{
+		Q_INIT_RESOURCE(imtgeoguiqml);
 	}
 
 	static void InitTheme()

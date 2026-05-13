@@ -1,5 +1,12 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtlicgql/CPermissionsProviderComp.h>
 
+
+// Qt includes
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonValue>
 
 // ACF includes
 #include <iqt/iqt.h>
@@ -74,11 +81,11 @@ bool CPermissionsProviderComp::CreateRepresentationModelFromFeatureInfo(
 
 // reimplemented (imtservergql::CGqlRequestHandlerCompBase)
 
-imtbase::CTreeItemModel* CPermissionsProviderComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& /*errorMessage*/) const
+QJsonObject CPermissionsProviderComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& /*errorMessage*/) const
 {
 	if (!m_productInfoCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'FeatureContainer' was not set", "CPermissionsProviderComp");
-		return nullptr;
+		return QJsonObject();
 	}
 
 	QByteArray languageId;
@@ -87,7 +94,8 @@ imtbase::CTreeItemModel* CPermissionsProviderComp::CreateInternalResponse(const 
 		languageId = gqlContextPtr->GetLanguageId();
 	}
 
-	istd::TDelPtr<imtbase::CTreeItemModel> representationModelPtr(new imtbase::CTreeItemModel());
+	QJsonObject resultObj;
+	QJsonArray dataArray;
 
 	imtbase::IObjectCollection* featureCollectionPtr = m_productInfoCompPtr->GetFeatures();
 	if (featureCollectionPtr != nullptr){
@@ -101,16 +109,25 @@ imtbase::CTreeItemModel* CPermissionsProviderComp::CreateInternalResponse(const 
 					QString errorMessage;
 					bool ok = CreateRepresentationModelFromFeatureInfo(*featureInfoPtr, featureRepresentationModel, languageId, errorMessage);
 					if (ok){
-						int index = representationModelPtr->InsertNewItem();
-						representationModelPtr->CopyItemDataFromModel(index, &featureRepresentationModel, 0);
-						representationModelPtr->SetData("Id", elementId, index);
+						QJsonObject itemObj;
+						QString jsonStr = featureRepresentationModel.ToJson();
+						QJsonDocument doc = QJsonDocument::fromJson(jsonStr.toUtf8());
+						if (doc.isObject()){
+							itemObj = doc.object();
+						}
+						else if (doc.isArray() && !doc.array().isEmpty()){
+							itemObj = doc.array().first().toObject();
+						}
+						itemObj.insert(QStringLiteral("Id"), QJsonValue::fromVariant(elementId));
+						dataArray.append(itemObj);
 					}
 				}
 			}
 		}
 	}
 
-	return representationModelPtr.PopPtr();
+	resultObj.insert(QStringLiteral("data"), dataArray);
+	return resultObj;
 }
 
 

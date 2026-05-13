@@ -6,6 +6,7 @@ import imtcontrols 1.0
 import imtauthUsersSdl 1.0
 import imtdocgui 1.0
 import imtguigql 1.0
+import imtdeskgui 1.0
 
 ViewBase {
 	id: container;
@@ -19,6 +20,10 @@ ViewBase {
 	property alias passwordInputConfirm: userGeneralEditor.confirmPasswordInput;
 	
 	property bool isNew: true
+	readonly property bool hasValidUserId: container.userData && container.userData.m_id && container.userData.m_id !== ""
+	readonly property string contextEntityDisplayName: container.userData
+		? (container.userData.m_name || container.userData.m_username || container.userData.m_id)
+		: ""
 	
 	function updateGui(){
 		userGeneralEditor.updateGui();
@@ -109,6 +114,11 @@ ViewBase {
 			}
 		}
 	}
+
+	Component {
+		id: contextTicketsDialogComp
+		EntityContextTicketsDialog {}
+	}
 	
 	DocumentHistoryPanel {
 		id: historyPanel;
@@ -183,7 +193,7 @@ ViewBase {
 				width: parent.width;
 				title: qsTr("General");
 			}
-			
+
 			UserGeneralEditor {
 				id: userGeneralEditor;
 				width: parent.width;

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -16,14 +17,14 @@
 
 // ImtCore includes
 #include <imtcom/IServerConnectionInterface.h>
-#include <imthttp/IRequest.h>
+#include <imtrest/IRequest.h>
+#include <imtrest/IRequestServlet.h>
+#include <imtrest/IProtocolEngine.h>
+#include <imtrest/IResponseDispatcher.h>
+#include <imtrest/IServer.h>
+#include <imtrest/CUdpRequest.h>
 
-#include <imthttp/IProtocolEngine.h>
-#include <imthttp/IRequestManager.h>
-#include <imthttp/IServer.h>
-#include <imthttp/CUdpRequest.h>
-
-namespace imthttp
+namespace imtrest
 {
 
 
@@ -35,7 +36,7 @@ class CUdpServerComp:
 			public QObject,
 			public ibase::TRuntimeStatusHanderCompWrap<ilog::CLoggerComponentBase>,
 			private imod::CMultiModelDispatcherBase,
-			virtual public IRequestManager,
+			virtual public IResponseDispatcher,
 			virtual public IServer
 {
 	Q_OBJECT
@@ -44,7 +45,7 @@ public:
 	typedef imod::CMultiModelDispatcherBase BaseClass2;
 
 	I_BEGIN_COMPONENT(CUdpServerComp);
-		I_REGISTER_INTERFACE(IRequestManager)
+		I_REGISTER_INTERFACE(IResponseDispatcher)
 		I_REGISTER_INTERFACE(IServer)
 		I_ASSIGN(m_requestHandlerCompPtr, "RequestHandler", "Request handler registered for the server", true, "RequestHandler");
 		I_ASSIGN(m_protocolEngineCompPtr, "ProtocolEngine", "Protocol engine used in the server", true, "ProtocolEngine");
@@ -55,7 +56,7 @@ public:
 	CUdpServerComp();
 	~CUdpServerComp();
 
-	imthttp::imtrest::IRequestServlet* GetRequestServlet();
+	imtrest::IRequestServlet* GetRequestServlet();
 	int GetThreadsLimit();
 
 protected:
@@ -68,10 +69,11 @@ protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 
-	// reimplemented (icomp::IRequestManager)
-	virtual const ISender* GetSender(const QByteArray& requestId) const override;
+	// reimplemented (imtrest::IResponseDispatcher)
+	virtual bool SendResponse(const QByteArray& requestId, ConstResponsePtr& response) const override;
+	virtual bool SendRequest(const QByteArray& requestId, ConstRequestPtr& request) const override;
 
-	// reimplemented (imthttp::IServer)
+	// reimplemented (imtrest::IServer)
 	virtual bool StartServer() override;
 	virtual bool StopServer() override;
 	virtual ServerStatus GetServerStatus() const override;
@@ -85,7 +87,7 @@ private Q_SLOTS:
     void SendedResponse(QByteArray);
 
 private:
-	I_REF(imthttp::imtrest::IRequestServlet, m_requestHandlerCompPtr);
+	I_REF(imtrest::IRequestServlet, m_requestHandlerCompPtr);
 	I_REF(IProtocolEngine, m_protocolEngineCompPtr);
 	I_REF(imtcom::IServerConnectionInterface, m_serverConnnectionInterfaceCompPtr);
 
@@ -100,6 +102,6 @@ private:
 };
 
 
-} // namespace imthttp
+} // namespace imtrest
 
 

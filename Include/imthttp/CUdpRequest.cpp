@@ -1,4 +1,5 @@
-#include <imthttp/CUdpRequest.h>
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+#include <imtrest/CUdpRequest.h>
 
 
 // Qt includes
@@ -6,12 +7,12 @@
 #include <QtCore/QUuid>
 
 
-namespace imthttp
+namespace imtrest
 {
 
 
 // public methods
-CUdpRequest::CUdpRequest(const imtrest::IRequestServlet& handler,
+CUdpRequest::CUdpRequest(const IRequestServlet& handler,
 				const IProtocolEngine& engine,
 				QUdpSocket *socket,
 				QHostAddress address,
@@ -56,6 +57,6 @@ bool CUdpRequest::ParseDeviceData(QIODevice& device)
 }
 
 
-} // namespace imthttp
+} // namespace imtrest
 
 

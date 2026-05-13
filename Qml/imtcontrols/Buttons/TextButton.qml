@@ -43,7 +43,7 @@ Item {
         font.bold: textButton.fontBold;
         font.family: textButton.fontFamily;
 
-        color: textButton.legendColor;
+		color: textButton.legendColor !==undefined ? textButton.legendColor : Style.textColor;
 
         text: textButton.legend;
     }

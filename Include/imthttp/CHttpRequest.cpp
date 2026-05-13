@@ -1,4 +1,5 @@
-#include <imthttp/CHttpRequest.h>
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+#include <imtrest/CHttpRequest.h>
 
 
 // Qt includes
@@ -10,7 +11,7 @@
 #include <QtWebSockets/QWebSocket>
 
 
-namespace imthttp
+namespace imtrest
 {
 
 
@@ -31,7 +32,7 @@ static http_parser_settings s_httpParserSettings
 
 // public methods
 
-CHttpRequest::CHttpRequest(const imtrest::IRequestServlet& handler, const IProtocolEngine& engine)
+CHttpRequest::CHttpRequest(const IRequestServlet& handler, const IProtocolEngine& engine)
 	:m_state(RS_NON_STARTED),
 	m_requestHandler(handler),
 	m_engine(engine)
@@ -463,6 +464,6 @@ bool CHttpRequest::ParseUrl(const char* at, size_t length, bool connect, QUrl& u
 }
 
 
-} // namespace imthttp
+} // namespace imtrest
 
 

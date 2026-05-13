@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -68,10 +69,6 @@ public:
 				OT_EXPORT,
 				OT_GET_VIEW)
 
-	const CSdlEntryBase& GetReferenceType() const;
-	void SetReferenceType(const CSdlType& referenceType);
-	void SetReferenceType(const CSdlUnion& referenceType);
-
 	QMultiMap<OperationType, CSdlRequest> GetOperationsList() const;
 	bool HasRequest(OperationType operationType) const;
 	CSdlRequest GetRequest(OperationType operationType) const;
@@ -104,8 +101,6 @@ public:
 										const QByteArray& valueTagId);
 
 private:
-	CSdlType m_referenceType;
-	CSdlUnion m_referenceUnionType;
 	QMultiMap<OperationType, CSdlRequest> m_operationsList;
 	SdlDocumentTypeList m_subtypes;
 };

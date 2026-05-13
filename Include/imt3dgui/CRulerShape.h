@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -15,6 +16,8 @@ namespace imt3dgui
 
 class CRulerShape: public CShape3dBase
 {
+	typedef CShape3dBase BaseClass;
+
 public:
 	CRulerShape();
 
@@ -26,8 +29,12 @@ public:
 protected:
 	// reimplemented (imt3dgui::CShape3dBase)
 	virtual void UpdateShapeGeometry(const istd::IChangeable::ChangeSet& changeSet) override;
-	virtual void DrawShapeGl(QOpenGLShaderProgram& program, QOpenGLFunctions& functions) override;
-	virtual void Draw(QPainter& painter) override;
+	virtual imt3dview::PrimitiveType GetPrimitiveType() const override;
+	virtual void FillMaterial(imt3dview::Material& material) const override;
+
+	// reimplemented (imt3dview::IDrawable)
+	virtual void Render(imt3dview::IRenderBackend& backend) override;
+	virtual void DrawOverlay(QPainter& painter) override;
 
 private:
 	const CShape3dBase* m_slaveShapePtr;
@@ -42,5 +49,4 @@ private:
 
 
 } // namespace imt3dgui
-
 

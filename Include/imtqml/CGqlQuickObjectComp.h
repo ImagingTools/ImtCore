@@ -1,12 +1,13 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
 // ACF includes
 #include <iprm/IEnableableParam.h>
 #include <imod/TModelWrap.h>
+#include <ibase/IApplicationInfo.h>
 
 // ImtCore includes
-#include <imtbase/IApplicationInfoController.h>
 #include <imtcom/IServerConnectionInterface.h>
 #include <imtbase/TModelUpdateBinder.h>
 #include <imtqml/CQuickObjectCompBase.h>
@@ -32,7 +33,7 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(QuickItemCreated, istd::IChangeable, ExtractEnableableParam);
 		I_ASSIGN(m_baseUrlAttrPtr, "BaseUrl", "BaseUrl for AccessManager", false, "");
 		I_ASSIGN(m_serverConnectionParamPtr, "ServerConnectionParam", "ServerConnectionParam", false, "ServerConnectionParam");
-		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfoController", "Application info controller", true, "ApplicationInfo");
+		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Application info", true, "ApplicationInfo");
 	I_END_COMPONENT;
 
 	CGqlQuickObjectComp();
@@ -49,7 +50,7 @@ protected:
 
 private:
 	void OnServerConnectionParamChanged(const istd::IChangeable::ChangeSet& changeSet, const imtcom::IServerConnectionInterface* serverConnectionParamPtr);
-	void OnApplicationInfoChanged(const istd::IChangeable::ChangeSet& changeSet, const imtbase::IApplicationInfoController* applicationInfoControllerPtr);
+	void OnApplicationInfoChanged(const istd::IChangeable::ChangeSet& changeSet, const ibase::IApplicationInfo* applicationInfoPtr);
 	virtual void SetBaseUrl() const;
 
 private:
@@ -87,10 +88,10 @@ protected:
 	I_MULTIATTR(QByteArray, m_modelIdsAttrPtr);
 	I_MULTIATTR(QByteArray, m_modelQueriesAttrPtr);
 	I_REF(imtcom::IServerConnectionInterface, m_serverConnectionParamPtr);
-	I_REF(imtbase::IApplicationInfoController, m_applicationInfoCompPtr);
+	I_REF(ibase::IApplicationInfo, m_applicationInfoCompPtr);
 
 	imtbase::TModelUpdateBinder<imtcom::IServerConnectionInterface, CGqlQuickObjectComp> m_serverConnectionObserver;
-	imtbase::TModelUpdateBinder<imtbase::IApplicationInfoController, CGqlQuickObjectComp> m_applicationInfoObserver;
+	imtbase::TModelUpdateBinder<ibase::IApplicationInfo, CGqlQuickObjectComp> m_applicationInfoObserver;
 };
 
 

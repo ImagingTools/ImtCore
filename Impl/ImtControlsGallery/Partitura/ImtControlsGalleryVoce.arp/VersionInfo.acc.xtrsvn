@@ -1,0 +1,80 @@
+<Acf>
+    <AcfHeader>
+      <VersionInfos>
+        <Version Id="0" Number="4160" Description="ACF"/>
+        <Version Id="1" Number="1574" Description="ACF-Solutions"/>
+        <Version Id="1023" Number="328449" Description="Qt Framework"/>
+      </VersionInfos>
+    </AcfHeader>
+  <Description></Description>
+  <Keywords></Keywords>
+  <ElementsList>
+        <Element PackageId="ImtCoreVoce" Id="BaseInfo" ComponentId="VersionInfo">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="IsExtensionUsed" ExportId="" Type="Boolean">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="KnownVersionNames" ExportId="" Type="String[]">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>1.0.0</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="KnownVersions" ExportId="" Type="Integer[]">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>0</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SlaveVersionInfo" ExportId="SlaveVersionInfo" Type="Reference">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionId" ExportId="" Type="Integer">
+                        <Data IsEnabled="true" Value="1983"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionIdDesc" ExportId="" Type="Text">
+                        <Data IsEnabled="true" Value="ImtControlsGallery"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionNumber" ExportId="" Type="Integer">
+                        <Data IsEnabled="true" Value="$WCREV$"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element PackageId="BasePck" Id="VersionInfo" ComponentId="VersionInfo">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="IsExtensionUsed" ExportId="IsExtensionUsed" Type="Boolean">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="KnownVersionNames" ExportId="KnownVersionNames" Type="String[]">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="KnownVersions" ExportId="KnownVersions" Type="Integer[]">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SlaveVersionInfo" ExportId="" Type="Reference">
+                        <Data IsEnabled="true" Value="BaseInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionId" ExportId="VersionId" Type="Integer">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionIdDesc" ExportId="VersionIdDesc" Type="Text">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionNumber" ExportId="VersionNumber" Type="Integer">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="iser::IVersionInfo" ComponentId="VersionInfo"/>
+    </ExportedInterfaces>
+    <ExportedComponents/>
+</Acf>

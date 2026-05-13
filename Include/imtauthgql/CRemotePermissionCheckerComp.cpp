@@ -1,5 +1,9 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CRemotePermissionCheckerComp.h>
 
+
+// Qt includes
+#include <QtCore/QJsonObject>
 
 // ImtCore includes
 #include <imtgql/CGqlRequest.h>
@@ -34,8 +38,8 @@ bool CRemotePermissionCheckerComp::CheckPermission(const imtauth::IUserInfo::Fea
 	gqlRequest.AddParam("input", inputParam);
 
 	QString errorMessage;
-	imtbase::CTreeItemModel* responseModelPtr = m_gqlRequestHandlerCompPtr->CreateResponse(gqlRequest, errorMessage);
-	if (responseModelPtr == nullptr){
+	QJsonObject responseObj = m_gqlRequestHandlerCompPtr->CreateResponse(gqlRequest, errorMessage);
+	if (responseObj.isEmpty()){
 		SendErrorMessage(0, errorMessage, "CRemotePermissionCheckerComp");
 
 		return false;
@@ -45,8 +49,8 @@ bool CRemotePermissionCheckerComp::CheckPermission(const imtauth::IUserInfo::Fea
 
 	result << permissions;
 
-	if (responseModelPtr->ContainsKey("FeaturesDependencies")){
-		QByteArray featureDependencies = responseModelPtr->GetData("FeaturesDependencies").toByteArray();
+	if (responseObj.contains("FeaturesDependencies")){
+		QByteArray featureDependencies = responseObj.value("FeaturesDependencies").toString().toUtf8();
 		if (!featureDependencies.isEmpty()){
 			QByteArrayList dependencyIds = featureDependencies.split(';');
 

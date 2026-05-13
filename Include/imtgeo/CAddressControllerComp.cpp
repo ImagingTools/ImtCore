@@ -1,5 +1,10 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtgeo/CAddressControllerComp.h>
 
+
+// Qt includes
+#include <QJsonArray>
+#include <QJsonValue>
 
 // ImtCore includes
 #include <imtgeo/CAddressTypeInfo.h>
@@ -11,18 +16,18 @@ namespace imtgeo
 {
 
 
-imtbase::CTreeItemModel* CAddressControllerComp::GetObject(
+QJsonObject CAddressControllerComp::GetObject(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
 
-		return nullptr;
+		return QJsonObject();
 	}
 
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
+	QJsonObject rootObj;
+	QJsonObject dataObj;
 
 	QByteArray addressId = GetObjectIdFromInputParams(gqlRequest.GetParams());
 
@@ -33,7 +38,7 @@ imtbase::CTreeItemModel* CAddressControllerComp::GetObject(
 
 		if (addressInfoPtr == nullptr){
 			errorMessage = QT_TR_NOOP("Unable to get an address info");
-			return nullptr;
+			return QJsonObject();
 		}
 
 		QByteArray id = addressPosition->GetObjectUuid();
@@ -80,30 +85,29 @@ imtbase::CTreeItemModel* CAddressControllerComp::GetObject(
 		double lat = addressInfoPtr->GetLatitude();
 		double lon = addressInfoPtr->GetLongitude();
 
-		dataModel->SetData("AddressId", id);
-		dataModel->SetData("ParentId", parentId);
-		dataModel->SetData("TypeId", typeId);
-		dataModel->SetData("TypeName", typeName);
-		dataModel->SetData("Name", name);
-		dataModel->SetData("Address", address);
-		dataModel->SetData("Description", description);
-		dataModel->SetData("Latitude", lat);
-		dataModel->SetData("Longitude", lon);
+		dataObj.insert(QStringLiteral("AddressId"), QJsonValue::fromVariant(QVariant(id)));
+		dataObj.insert(QStringLiteral("ParentId"), QJsonValue::fromVariant(QVariant(parentId)));
+		dataObj.insert(QStringLiteral("TypeId"), QJsonValue::fromVariant(QVariant(typeId)));
+		dataObj.insert(QStringLiteral("TypeName"), QJsonValue::fromVariant(typeName));
+		dataObj.insert(QStringLiteral("Name"), QJsonValue::fromVariant(name));
+		dataObj.insert(QStringLiteral("Address"), QJsonValue::fromVariant(address));
+		dataObj.insert(QStringLiteral("Description"), QJsonValue::fromVariant(description));
+		dataObj.insert(QStringLiteral("Latitude"), QJsonValue::fromVariant(lat));
+		dataObj.insert(QStringLiteral("Longitude"), QJsonValue::fromVariant(lon));
 	}
 
-	rootModelPtr->SetExternTreeModel("data", dataModel);
+	rootObj.insert(QStringLiteral("data"), dataObj);
 
-	return rootModelPtr.PopPtr();
+	return rootObj;
 }
 
 
-imtbase::CTreeItemModel* CAddressControllerComp::InsertObject(
+QJsonObject CAddressControllerComp::InsertObject(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModel = nullptr;
-	imtbase::CTreeItemModel* notificationModel = nullptr;
+	QJsonObject rootObj;
+	QJsonObject dataObj;
 	QByteArray newObjectId;
 	QString name;
 	QString description;
@@ -129,21 +133,20 @@ imtbase::CTreeItemModel* CAddressControllerComp::InsertObject(
 	}
 
 	if (!errorMessage.isEmpty()){
-		imtbase::CTreeItemModel* errorsModel = rootModelPtr->AddTreeModel("errors");
-		errorsModel->SetData("message", errorMessage);
+		QJsonObject errorsObj;
+		errorsObj.insert(QStringLiteral("message"), QJsonValue::fromVariant(errorMessage));
+		rootObj.insert(QStringLiteral("errors"), errorsObj);
 	}
 	else{
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		dataModel = new imtbase::CTreeItemModel();
-		notificationModel = new imtbase::CTreeItemModel();
-		notificationModel->SetData("Id", newObjectId);
-		notificationModel->SetData("Name", name);
-		dataModel->SetExternTreeModel("addedNotification", notificationModel);
+		QJsonObject notificationObj;
+		notificationObj.insert(QStringLiteral("Id"), QJsonValue::fromVariant(QVariant(newObjectId)));
+		notificationObj.insert(QStringLiteral("Name"), QJsonValue::fromVariant(name));
+		dataObj.insert(QStringLiteral("addedNotification"), notificationObj);
 	}
 
-	rootModelPtr->SetExternTreeModel("data", dataModel);
+	rootObj.insert(QStringLiteral("data"), dataObj);
 
-	return rootModelPtr.PopPtr();
+	return rootObj;
 }
 
 
@@ -231,20 +234,19 @@ istd::IChangeableUniquePtr CAddressControllerComp::CreateObjectFromRequest(
 
 
 
-imtbase::CTreeItemModel* CAddressControllerComp::UpdateObject(
+QJsonObject CAddressControllerComp::UpdateObject(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModel = nullptr;
-	imtbase::CTreeItemModel* notificationModel = nullptr;
+	QJsonObject rootObj;
+	QJsonObject dataObj;
 
 	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject(QByteArrayLiteral("input"));
 	if (inputParamPtr == nullptr){
 		errorMessage = QStringLiteral("Unable to update address object. Error: GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, __FILE__);
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	QByteArray oldObjectId = GetObjectIdFromInputParams(*inputParamPtr);
@@ -290,19 +292,19 @@ imtbase::CTreeItemModel* CAddressControllerComp::UpdateObject(
 	}
 
 	if (!errorMessage.isEmpty()){
-		imtbase::CTreeItemModel* errorsModel = rootModelPtr->AddTreeModel("errors");
-		errorsModel->SetData("message", errorMessage);
+		QJsonObject errorsObj;
+		errorsObj.insert(QStringLiteral("message"), QJsonValue::fromVariant(errorMessage));
+		rootObj.insert(QStringLiteral("errors"), errorsObj);
 	}
 	else{
-		dataModel = new imtbase::CTreeItemModel();
-		notificationModel = new imtbase::CTreeItemModel();
-		notificationModel->SetData("Id", newObjectId);
-		notificationModel->SetData("Name", name);
-		dataModel->SetExternTreeModel("updatedNotification", notificationModel);
+		QJsonObject notificationObj;
+		notificationObj.insert(QStringLiteral("Id"), QJsonValue::fromVariant(QVariant(newObjectId)));
+		notificationObj.insert(QStringLiteral("Name"), QJsonValue::fromVariant(name));
+		dataObj.insert(QStringLiteral("updatedNotification"), notificationObj);
 	}
-	rootModelPtr->SetExternTreeModel("data", dataModel);
+	rootObj.insert(QStringLiteral("data"), dataObj);
 
-	return rootModelPtr.PopPtr();
+	return rootObj;
 }
 
 

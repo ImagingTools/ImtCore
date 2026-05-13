@@ -29,6 +29,7 @@ QtObject {
 	property Component constrainedDoubleParamEditorComp: Component { ConstrainedDoubleParamEditor{}}
 	property Component enableableParamEditorComp: Component { EnableableParamEditor {}}
 	property Component serverConnectionParamEditorComp: Component { ServerConnectionParamEditor {}}
+	property Component patTokenParamEditorComp: Component { PatTokenParamEditor {}}
 	
 	Component.onCompleted: {
 		registerParamEditor(ParamTypeIdsTypeMetaInfo.s_textParam, textParamEditorComp)
@@ -46,6 +47,7 @@ QtObject {
 		registerParamEditor(ParamTypeIdsTypeMetaInfo.s_constrainedDoubleParam, constrainedDoubleParamEditorComp)
 		registerParamEditor(ParamTypeIdsTypeMetaInfo.s_enableableParam, enableableParamEditorComp)
 		registerParamEditor(ParamTypeIdsTypeMetaInfo.s_serverConnectionParam, serverConnectionParamEditorComp)
+		registerParamEditor("PatTokenList", patTokenParamEditorComp)
 	}
 	
 	function addParamsSet(id, name, paramsSet){

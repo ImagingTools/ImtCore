@@ -1,10 +1,11 @@
-#include <imthttp/CWorker.h>
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+#include <imtrest/CWorker.h>
 
 
 // ImtCore includes
-#include <imthttp/ISender.h>
-#include <imthttp/CWorkerThread.h>
-#include <imthttp/CWebSocketRequest.h>
+#include <imtrest/ITransport.h>
+#include <imtrest/CWorkerThread.h>
+#include <imtrest/CWebSocketRequest.h>
 #include <imtclientgql/CWebSocketClientComp.h>
 
 // Qt includes
@@ -13,11 +14,11 @@
 #include <QtCore/QJsonObject>
 
 
-namespace imthttp
+namespace imtrest
 {
 
 
-CWorker::CWorker(imthttp::IRequestServletPtr&& requestServletPtr, CWorkerThread* workerThread)
+CWorker::CWorker(imtrest::IRequestServletPtr&& requestServletPtr, CWorkerThread* workerThread)
 	:m_requestServletPtr(std::move(requestServletPtr)),
 	m_workerThread(workerThread)
 {
@@ -41,10 +42,7 @@ void CWorker::ProcessRequest(const IRequest* request, const QByteArray& subComma
 
 		ConstResponsePtr responsePtr = m_requestServletPtr->ProcessRequest(*request, subCommandId);
 		if (responsePtr.IsValid()){
-			const ISender* sender = m_workerThread->GetSender(request->GetRequestId());
-			if (sender != nullptr){
-				sender->SendResponse(responsePtr);
-			}
+			m_workerThread->SendResponse(request->GetRequestId(), responsePtr);
 		}
 		else{
 			Q_ASSERT_X(false, __FILE__, "Request result invalid");
@@ -57,6 +55,6 @@ void CWorker::ProcessRequest(const IRequest* request, const QByteArray& subComma
 }
 
 
-} // namespace imthttp
+} // namespace imtrest
 
 

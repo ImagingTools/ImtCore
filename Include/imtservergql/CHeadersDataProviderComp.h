@@ -1,4 +1,5 @@
-﻿#pragma once
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+#pragma once
 
 
 // ImtCore includes
@@ -28,7 +29,7 @@ public:
 protected:
 	// reimplemented (imtservergql::CGqlRepresentationControllerCompBase)
 	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
-	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual QJsonObject CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 private:
 	bool CheckHeaderPermission(const QByteArray& headerId, const imtgql::IGqlContext& gqlContext) const;

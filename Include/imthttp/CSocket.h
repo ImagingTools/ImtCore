@@ -1,11 +1,12 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 // ACF includes
 #include <istd/TDelPtr.h>
 
 // ImtCore  includes
-#include <imthttp/IRequest.h>
-#include <imthttp/IResponse.h>
+#include <imtrest/IRequest.h>
+#include <imtrest/IResponse.h>
 
 
 // Qt includes
@@ -15,7 +16,7 @@
 #include <QtNetwork/QSslConfiguration>
 
 
-namespace imthttp
+namespace imtrest
 {
 
 
@@ -27,7 +28,7 @@ class CSocket: public QObject
 {
 	Q_OBJECT
 public:
-	CSocket(CSocketThread* rootSocket, imthttp::IRequest* request, bool secureConnection, const QSslConfiguration& sslConfiguration, qintptr socketDescriptor);
+	CSocket(CSocketThread* rootSocket, imtrest::IRequest* request, bool secureConnection, const QSslConfiguration& sslConfiguration, qintptr socketDescriptor);
 	~CSocket();
 
 public Q_SLOTS:
@@ -46,6 +47,6 @@ private:
 };
 
 
-} // namespace imthttp
+} // namespace imtrest
 
 

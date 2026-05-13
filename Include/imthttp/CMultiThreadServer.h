@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -10,18 +11,12 @@
 #include <QtNetwork/QSslConfiguration>
 
 // ImtCore  includes
-#include <imthttp/CTcpServerComp.h>
-#include <imthttp/IRequestManager.h>
-#include <imthttp/CSocketThread.h>
+#include <imtrest/CTcpServerComp.h>
+#include <imtrest/IResponseDispatcher.h>
+#include <imtrest/CSocketThread.h>
 
 
 namespace imtrest
-{
-class IRequestServlet;
-}
-
-
-namespace imthttp
 {
 
 
@@ -32,7 +27,7 @@ class CMultiThreadServer :
 		public QTcpServer,
 #endif
 			virtual public ilog::CLoggerBase,
-			virtual public IRequestManager
+			virtual public IResponseDispatcher
 {
 	Q_OBJECT
 public:
@@ -46,8 +41,8 @@ public:
 	explicit CMultiThreadServer(CTcpServerComp* rootServer);
 	virtual ~CMultiThreadServer();
 
-	imthttp::imtrest::IRequestServlet* GetRequestServlet();
-	imthttp::IProtocolEngine* GetProtocolEngine();
+	imtrest::IRequestServlet* GetRequestServlet();
+	imtrest::IProtocolEngine* GetProtocolEngine();
 
 	[[nodiscard]] bool IsSecureConnection() const;
 	void EnableSecureConnection(bool isSecureConnection = true);
@@ -61,8 +56,9 @@ public:
 	 */
 	void SetSslConfiguration(const QSslConfiguration& sslConfiguration);
 
-	// reimplemented (imthttp::IRequestManager)
-	virtual const ISender* GetSender(const QByteArray& requestId) const override;
+	// reimplemented (imtrest::IResponseDispatcher)
+	virtual bool SendResponse(const QByteArray& requestId, ConstResponsePtr& response) const override;
+	virtual bool SendRequest(const QByteArray& requestId, ConstRequestPtr& request) const override;
 
 Q_SIGNALS:
 	void NewThreadConnection(const IRequest* request, const QByteArray& subCommandId);
@@ -92,6 +88,6 @@ protected:
 };
 
 
-} // namespace imthttp
+} // namespace imtrest
 
 

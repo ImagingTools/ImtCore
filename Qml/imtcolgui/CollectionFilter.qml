@@ -121,7 +121,7 @@ ComplexCollectionFilter{
 		}
 		else{
 			if (!hasTextFilter()){
-				createTextFilter()
+				emplaceTextFilter()
 			}
 
 			m_textFilter.m_text = filter
@@ -139,7 +139,7 @@ ComplexCollectionFilter{
 		obj.m_fieldId = infoId
 		obj.m_sortingOrder = sortOrder
 		if (!hasSortingInfo()){
-			createSortingInfo()
+			emplaceSortingInfo()
 		}
 
 		m_sortingInfo.addElement(obj)
@@ -163,11 +163,11 @@ ComplexCollectionFilter{
 	*/
 	function setFilteringInfoIds(filteringInfoIds){
 		if (!hasTextFilter()){
-			createTextFilter()
+			emplaceTextFilter()
 		}
 
 		if (!m_textFilter.hasFieldIds()){
-			m_textFilter.createFieldIds()
+			m_textFilter.emplaceFieldIds()
 		}
 
 		m_textFilter.m_fieldIds = filteringInfoIds
@@ -197,11 +197,11 @@ ComplexCollectionFilter{
 	*/
 	function addGroupFilter(group){
 		if (!hasFieldsFilter()){
-			createFieldsFilter()
+			emplaceFieldsFilter()
 			m_fieldsFilter.m_logicalOperation = logicalOperation.AND
 		}
 		if (!m_fieldsFilter.hasGroupFilters()){
-			m_fieldsFilter.createGroupFilters()
+			m_fieldsFilter.emplaceGroupFilters()
 		}
 		if (!m_fieldsFilter.hasLogicalOperation()){
 			m_fieldsFilter.m_logicalOperation = logicalOperation.AND
@@ -229,12 +229,12 @@ ComplexCollectionFilter{
 	*/
 	function addFieldFilter(field){
 		if (!hasFieldsFilter()){
-			createFieldsFilter()
+			emplaceFieldsFilter()
 			m_fieldsFilter.m_logicalOperation = logicalOperation.AND
 		}
 
 		if (!m_fieldsFilter.hasFieldFilters()){
-			m_fieldsFilter.createFieldFilters()
+			m_fieldsFilter.emplaceFieldFilters()
 		}
 
 		m_fieldsFilter.m_fieldFilters.addElement(field)
@@ -324,7 +324,7 @@ ComplexCollectionFilter{
 		clearTimeFilter()
 		if (timeFilter){
 			if (!hasTimeFilter()){
-				createTimeFilter()
+				emplaceTimeFilter()
 			}
 
 			m_timeFilter.copyFrom(timeFilter)

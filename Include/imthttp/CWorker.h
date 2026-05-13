@@ -1,14 +1,15 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 // ImtCore includes
-
+#include <imtrest/IRequestServlet.h>
 
 // Qt includes
 #include <QtCore/QObject>
 #include <QtCore/QMutex>
 
 
-namespace imthttp
+namespace imtrest
 {
 
 class CWorkerManagerComp;
@@ -19,7 +20,7 @@ class CWorker: public QObject
 {
 	Q_OBJECT
 public:
-	CWorker(imthttp::IRequestServletPtr&& requestServletPtr, CWorkerThread* workerThread);
+	CWorker(imtrest::IRequestServletPtr&& requestServletPtr, CWorkerThread* workerThread);
 
 Q_SIGNALS:
 	void FinishProcess(const IRequest* request, const QByteArray& subCommandId);
@@ -35,6 +36,6 @@ private:
 };
 
 
-} // namespace imthttp
+} // namespace imtrest
 
 

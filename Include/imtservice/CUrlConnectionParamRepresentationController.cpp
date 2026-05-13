@@ -1,4 +1,9 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtservice/CUrlConnectionParamRepresentationController.h>
+
+// Qt includes
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonValue>
 
 
 namespace imtservice
@@ -21,7 +26,7 @@ bool CUrlConnectionParamRepresentationController::IsModelSupported(const istd::I
 
 bool CUrlConnectionParamRepresentationController::GetRepresentationFromDataModel(
 			const istd::IChangeable& dataModel,
-			imtbase::CTreeItemModel& representation,
+			QJsonObject& representation,
 			const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	if (!IsModelSupported(dataModel)){
@@ -36,7 +41,7 @@ bool CUrlConnectionParamRepresentationController::GetRepresentationFromDataModel
 	const imtcom::IServerConnectionInterface& defaultInterface  = urlConnectionParamPtr->GetDefaultInterface();
 	QByteArray serviceTypeId = urlConnectionParamPtr->GetServiceTypeId();
 
-	representation.SetData("ServiceTypeName", serviceTypeId);
+	representation.insert(QStringLiteral("ServiceTypeName"), QString::fromUtf8(serviceTypeId));
 
 	imtcom::IServerConnectionInterface::ProtocolTypes defaultProtocols = defaultInterface.GetSupportedProtocols();
 
@@ -50,7 +55,7 @@ bool CUrlConnectionParamRepresentationController::GetRepresentationFromDataModel
 					return false;
 				}
 
-				representation.SetData("DefaultHttpUrl", url.toString());
+				representation.insert(QStringLiteral("DefaultHttpUrl"), url.toString());
 			}
 			break;
 			case imtcom::IServerConnectionInterface::PT_WEBSOCKET:
@@ -61,42 +66,41 @@ bool CUrlConnectionParamRepresentationController::GetRepresentationFromDataModel
 					return false;
 				}
 
-				representation.SetData("DefaultWsUrl", url.toString());
+				representation.insert(QStringLiteral("DefaultWsUrl"), url.toString());
 			}
 			break;
 		}
 	}
 
 	imtcom::IServerConnectionInterface::ProtocolTypes protocols = urlConnectionParamPtr->GetSupportedProtocols();
-	representation.SetData("Host", defaultInterface.GetHost());
+	representation.insert(QStringLiteral("Host"), defaultInterface.GetHost());
 
 	for (imtcom::IServerConnectionInterface::ProtocolType protocolType : protocols){
 		switch (protocolType){
 		case imtcom::IServerConnectionInterface::PT_HTTP:
-			representation.SetData("HttpPort", defaultInterface.GetPort(imtcom::IServerConnectionInterface::PT_HTTP));
+			representation.insert(QStringLiteral("HttpPort"), defaultInterface.GetPort(imtcom::IServerConnectionInterface::PT_HTTP));
 			break;
 		case imtcom::IServerConnectionInterface::PT_WEBSOCKET:
-			representation.SetData("WsPort", defaultInterface.GetPort(imtcom::IServerConnectionInterface::PT_WEBSOCKET));
+			representation.insert(QStringLiteral("WsPort"), defaultInterface.GetPort(imtcom::IServerConnectionInterface::PT_WEBSOCKET));
 			break;
 		}
 	}
 
-	imtbase::CTreeItemModel* externPortsModelPtr = representation.AddTreeModel("ExternPorts");
-
+	QJsonArray externPortsArray;
 	QList<IServiceConnectionParam::IncomingConnectionParam> incomingConnections = urlConnectionParamPtr->GetIncomingConnections();
 	for (const IServiceConnectionParam::IncomingConnectionParam& incomingConnection : incomingConnections){
-		int externIndex = externPortsModelPtr->InsertNewItem();
-
-		externPortsModelPtr->SetData("Id", incomingConnection.id, externIndex);
-		externPortsModelPtr->SetData("Description", incomingConnection.description, externIndex);
+		QJsonObject itemObj;
+		itemObj.insert(QStringLiteral("Id"), QString::fromUtf8(incomingConnection.GetObjectUuid()));
+		externPortsArray.append(itemObj);
 	}
+	representation.insert(QStringLiteral("ExternPorts"), externPortsArray);
 
 	return true;
 }
 
 
 bool CUrlConnectionParamRepresentationController::GetDataModelFromRepresentation(
-			const imtbase::CTreeItemModel& representation,
+			const QJsonObject& representation,
 			istd::IChangeable& dataModel) const
 {
 	if (!IsModelSupported(dataModel)){
@@ -110,69 +114,29 @@ bool CUrlConnectionParamRepresentationController::GetDataModelFromRepresentation
 
 	urlConnectionParamPtr->SetConnectionType(IServiceConnectionInfo::CT_INPUT);
 
-	if (representation.ContainsKey("Host")){
-		QString host = representation.GetData("Host").toString();
-
-		urlConnectionParamPtr->SetHost(host);
+	if (representation.contains(QStringLiteral("Host"))){
+		urlConnectionParamPtr->SetHost(representation.value(QStringLiteral("Host")).toString());
 	}
 
-	if (representation.ContainsKey("WsPort")){
-		int port = representation.GetData("WsPort").toInt();
-
-		urlConnectionParamPtr->SetPort(imtcom::IServerConnectionInterface::PT_WEBSOCKET, port);
+	if (representation.contains(QStringLiteral("WsPort"))){
+		urlConnectionParamPtr->SetPort(imtcom::IServerConnectionInterface::PT_WEBSOCKET, representation.value(QStringLiteral("WsPort")).toInt());
 	}
 
-	if (representation.ContainsKey("HttpPort")){
-		int port = representation.GetData("HttpPort").toInt();
-
-		urlConnectionParamPtr->SetPort(imtcom::IServerConnectionInterface::PT_HTTP, port);
+	if (representation.contains(QStringLiteral("HttpPort"))){
+		urlConnectionParamPtr->SetPort(imtcom::IServerConnectionInterface::PT_HTTP, representation.value(QStringLiteral("HttpPort")).toInt());
 	}
 
-	if (representation.ContainsKey("ExternPorts")){
-		imtbase::CTreeItemModel* externPortsModelPtr = representation.GetTreeItemModel("ExternPorts");
-		if (externPortsModelPtr != nullptr){
-			for (int i = 0; i < externPortsModelPtr->GetItemsCount(); i++){
-				IServiceConnectionParam::IncomingConnectionParam incomingConnection;
+	if (representation.contains(QStringLiteral("ExternPorts")) && representation.value(QStringLiteral("ExternPorts")).isArray()){
+		QJsonArray externPortsArray = representation.value(QStringLiteral("ExternPorts")).toArray();
+		for (const QJsonValue& value : externPortsArray){
+			QJsonObject itemObj = value.toObject();
+			IServiceConnectionParam::IncomingConnectionParam incomingConnection;
 
-				if (externPortsModelPtr->ContainsKey("Id", i)){
-					QByteArray id = externPortsModelPtr->GetData("Id", i).toByteArray();
-
-					incomingConnection.id = id;
-				}
-
-				if (externPortsModelPtr->ContainsKey("Name", i)){
-					QString name = externPortsModelPtr->GetData("Name", i).toString();
-				}
-
-				if (externPortsModelPtr->ContainsKey("Description", i)){
-					QString description = externPortsModelPtr->GetData("Description", i).toString();
-
-					incomingConnection.description = description;
-				}
-
-				QUrl externalUrl;
-				if (externPortsModelPtr->ContainsKey("Host", i)){
-					QString host = externPortsModelPtr->GetData("Host", i).toString();
-
-					externalUrl.setHost(host);
-				}
-
-				if (externPortsModelPtr->ContainsKey("Port", i)){
-					int port = externPortsModelPtr->GetData("Port", i).toInt();
-
-					externalUrl.setPort(port);
-				}
-
-				if (externPortsModelPtr->ContainsKey("Scheme", i)){
-					QString scheme = externPortsModelPtr->GetData("Scheme", i).toString();
-
-					externalUrl.setScheme(scheme);
-				}
-
-				// incomingConnection.url = externalUrl;
-
-				urlConnectionParamPtr->AddExternConnection(incomingConnection);
+			if (itemObj.contains(QStringLiteral("Id"))){
+				incomingConnection.SetObjectUuid(itemObj.value(QStringLiteral("Id")).toVariant().toByteArray());
 			}
+
+			urlConnectionParamPtr->AddExternConnection(incomingConnection);
 		}
 	}
 
@@ -181,5 +145,3 @@ bool CUrlConnectionParamRepresentationController::GetDataModelFromRepresentation
 
 
 } // namespace imtservice
-
-

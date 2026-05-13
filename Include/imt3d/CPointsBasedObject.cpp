@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imt3d/CPointsBasedObject.h>
 
 
@@ -456,10 +457,12 @@ void CPointsBasedObject::TEnsureCuboidCalculated() const
 
 		double left = xRange.GetMinValue();
 		double right = xRange.GetMaxValue();
+
 		double bottom = yRange.GetMinValue();
 		double top = yRange.GetMaxValue();
-		double far = zRange.GetMinValue();
-		double near = zRange.GetMaxValue();
+
+		double near = zRange.GetMinValue();
+		double far = zRange.GetMaxValue();
 
 		m_boundingCuboid = CCuboid(left, right, bottom, top, near, far);
 
@@ -569,10 +572,8 @@ int CPointsBasedObject::GetPointBytesSize(PointFormat pointFormat)
 	case IPointsBasedObject::PF_XYZW_RGBA_32:
 		return sizeof(PointXyzwRgba32);
 	default:
-		break;
+		return 0;
 	}
-
-	return 0;
 }
 
 

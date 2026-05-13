@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include "ImtAuthDbPck.h"
 
 
@@ -74,7 +75,26 @@ I_EXPORT_COMPONENT(
 			"User action database delegate",
 			"User Action Database Delegate");
 
+I_EXPORT_COMPONENT(
+			PersonalAccessTokenDatabaseDelegate,
+			"Personal access token database delegate",
+			"Personal Access Token Database Delegate");
+
+I_EXPORT_COMPONENT(
+			TenantDatabaseDelegate,
+			"Tenant database delegate",
+			"Tenant Database Delegate");
+
+
+I_EXPORT_COMPONENT(
+			TenantMembershipDatabaseDelegate,
+			"SQL delegate for tenant memberships (hydration, INSERT/UPDATE/DELETE)",
+			"Tenant Membership Database Delegate");
+
+I_EXPORT_COMPONENT(
+			TenantInvitationDatabaseDelegate,
+			"SQL delegate for tenant invitations (hydration, INSERT/UPDATE/DELETE)",
+			"Tenant Invitation Database Delegate");
 
 } // namespace ImtAuthDbPck
-
 

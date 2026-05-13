@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5430" Description="ACF"/>
-            <Version Id="1" Number="2253" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6390" Description="ACF"/>
+            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -11,21 +11,20 @@
         <Element ComponentName="ApplicationInfoController" X="225" Y="400" Note=""/>
         <Element ComponentName="AuthorizationOptions" X="425" Y="275" Note=""/>
         <Element ComponentName="Demultiplexer" X="600" Y="75" Note=""/>
-        <Element ComponentName="PagesController" X="1000" Y="500" Note=""/>
+        <Element ComponentName="PagesController" X="825" Y="450" Note=""/>
         <Element ComponentName="PermissionsController" X="150" Y="150" Note=""/>
-        <Element ComponentName="ProfileController" X="725" Y="500" Note=""/>
         <Element ComponentName="SlaveDemultiplexer" X="1050" Y="150" Note=""/>
         <Element ComponentName="UserSettings" X="500" Y="450" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
         <EmbededRegistry Id="UserSettings">
             <PositionMap>
-                <Element ComponentName="DatabaseUserSettings" X="560" Y="-40" Note=""/>
-                <Element ComponentName="Demultiplexer" X="1080" Y="-260" Note=""/>
-                <Element ComponentName="SettingsController" X="500" Y="-260" Note=""/>
-                <Element ComponentName="TableViewParamController" X="1020" Y="240" Note=""/>
-                <Element ComponentName="UserSettings" X="-100" Y="-40" Note=""/>
-                <Element ComponentName="UserSettingsRepresentation" X="220" Y="-40" Note=""/>
+                <Element ComponentName="DatabaseUserSettings" X="600" Y="275" Note=""/>
+                <Element ComponentName="Demultiplexer" X="1025" Y="50" Note=""/>
+                <Element ComponentName="SettingsController" X="625" Y="25" Note=""/>
+                <Element ComponentName="TableViewParamController" X="975" Y="250" Note=""/>
+                <Element ComponentName="UserSettings" X="125" Y="75" Note=""/>
+                <Element ComponentName="UserSettingsRepresentation" X="275" Y="275" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5715" Description="ACF"/>
+            <Version Id="1" Number="2274" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="PersonalAccessToken" PackageId="ImtAuthPck" ComponentId="PersonalAccessToken">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="PersonalAccessTokenController" PackageId="ImtAuthGqlPck" ComponentId="PersonalAccessTokenController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PersonalAccessTokenManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PersonalAccessTokenManager"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TokenFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="PersonalAccessToken"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="PersonalAccessTokenManager" PackageId="ImtAuthPck" ComponentId="PersonalAccessTokenManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TokenCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PersonalAccessTokenSqlRepository/PersonalAccessTokenRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TokenFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="PersonalAccessToken"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="PersonalAccessTokenSqlRepository" PackageId="ImtAuthVoce" ComponentId="PersonalAccessTokenSqlRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="PersonalAccessTokenController"/>
+    </ExportedInterfaces>
+    <ExportedComponents>
+        <Component ExportedId="PersonalAccessTokenManager" ComponentId="PersonalAccessTokenManager"/>
+    </ExportedComponents>
+</Acf>

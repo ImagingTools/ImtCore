@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -33,12 +34,13 @@ public:
 	void SetPlaneMode(PlaneMode planeMode);
 
 protected:
-	// reimplement (imt3dgui::CShape3dBase)
+	// reimplemented (imt3dgui::CShape3dBase)
 	virtual void UpdateShapeGeometry(const istd::IChangeable::ChangeSet& changeSet) override;
-	virtual void DrawShapeGl(QOpenGLShaderProgram& program, QOpenGLFunctions& functions) override;
+	virtual imt3dview::PrimitiveType GetPrimitiveType() const override;
+	virtual void FillMaterial(imt3dview::Material& material) const override;
 
-	// reimplement (imt3dgui::IShape3d)
-	virtual QVector3D GetColor() const override { return QVector3D(0.5, 0.5, 0.5); }
+	// reimplemented (imt3dgui::IShape3d)
+	virtual QVector3D GetColor() const override;
 
 private:
 	typedef std::vector<imt3d::CPointCloud3d::PointXyz32> Vertices;

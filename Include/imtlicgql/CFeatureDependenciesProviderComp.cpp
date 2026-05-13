@@ -1,5 +1,10 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtlicgql/CFeatureDependenciesProviderComp.h>
 
+
+// Qt includes
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonValue>
 
 // ACF includes
 #include <iprm/CIdParam.h>
@@ -17,14 +22,14 @@ namespace imtlicgql
 
 // reimplemented (imtservergql::CGqlRepresentationDataControllerComp)
 
-imtbase::CTreeItemModel* CFeatureDependenciesProviderComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CFeatureDependenciesProviderComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	const imtgql::CGqlParamObject* gqlInputParamPtr = gqlRequest.GetParamObject("input");
 	if (gqlInputParamPtr == nullptr){
 		errorMessage = QString("Unable to get a feature dependencies. GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "CFeatureDependenciesProviderComp");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	QByteArray features = gqlInputParamPtr->GetParamArgumentValue("FeatureIds").toByteArray();
@@ -32,7 +37,7 @@ imtbase::CTreeItemModel* CFeatureDependenciesProviderComp::CreateInternalRespons
 		errorMessage = QString("Unable to get dependencies for feature with empty Feature-ID.");
 		SendErrorMessage(0, errorMessage, "CFeatureDependenciesProviderComp");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	QByteArrayList featureIds = features.split(';');
@@ -43,14 +48,14 @@ imtbase::CTreeItemModel* CFeatureDependenciesProviderComp::CreateInternalRespons
 		retVal += GetFeatureDependencies(featureId);
 	}
 
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
-	Q_ASSERT(dataModelPtr != nullptr);
+	QJsonObject rootObj;
+	QJsonObject dataObj;
 
-	dataModelPtr->SetData("FeatureIds", features);
-	dataModelPtr->SetData("FeaturesDependencies", retVal.join(';'));
+	dataObj.insert(QStringLiteral("FeatureIds"), QJsonValue::fromVariant(features));
+	dataObj.insert(QStringLiteral("FeaturesDependencies"), QJsonValue::fromVariant(retVal.join(';')));
 
-	return rootModelPtr.PopPtr();
+	rootObj.insert(QStringLiteral("data"), dataObj);
+	return rootObj;
 }
 
 

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imthype/CTaskCollectionCompBase.h>
 
 
@@ -356,7 +357,7 @@ bool CTaskCollectionCompBase::GetObjectData(const QByteArray& objectId, DataPtr&
 				iinsp::ISupplierUniquePtr newInstancePtr = CreateTaskInstance(task.typeId);
 				if (newInstancePtr.IsValid()){
 					if (newInstancePtr->CopyFrom(*task.taskPtr)){
-						dataPtr.MoveCastedPtr(newInstancePtr);
+						dataPtr = std::move(newInstancePtr);
 
 						return true;
 					}

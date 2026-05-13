@@ -17,7 +17,7 @@ Row {
 			id: objectLinkDelegate
 			onLinkActivated: {
 				let targetLink = getValue()
-				if (targetLink.containsKey("url")){
+				if (targetLink && targetLink.containsKey("url")){
 					let targetUrl = targetLink.getData("url")
 					if (targetUrl && targetUrl.containsKey("path")){
 						let path = targetUrl.getData("path")
@@ -28,7 +28,9 @@ Row {
 
 			onReused: {
 				let targetLink = getValue()
-				text = targetLink.getData("name")
+				if (targetLink){
+					text = targetLink.getData("name")
+				}
 			}
 		}
 	}

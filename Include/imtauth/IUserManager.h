@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -15,7 +16,19 @@ namespace imtauth
 class IUserManager: virtual public istd::IPolymorphic
 {
 public:
+	struct User
+	{
+		QByteArray uuid;
+		QString name;
+		QString systemName;
+		QString email;
+		QByteArray login;
+		QByteArrayList roleIds;
+		QByteArrayList groupIds;
+	};
+
 	virtual QByteArrayList GetUserIds() const = 0;
+	virtual QList<User> GetUserList() const = 0;
 	virtual QByteArray GetUserObjectId(const QByteArray& login) const = 0;
 	virtual IUserInfoUniquePtr GetUser(const QByteArray& userId) const = 0;
 	virtual bool RemoveUser(const QByteArray& userId) = 0;

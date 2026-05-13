@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -10,6 +11,10 @@
 // Acula includes
 #include <imthype/IJobOutput.h>
 #include <imthype/CProcessingInfo.h>
+#include <imthype/CJobExecutionLog.h>
+
+// ACF includes
+#include <ilog/CMessageContainer.h>
 
 
 namespace imthype
@@ -86,6 +91,10 @@ public:
 				const QDateTime& finishTime) override;
 	virtual ProcessingOutputType GetOutputType(const QByteArray & outputObjectId) const override;
 	virtual void SetOutputType(const QByteArray & outputObjectId, ProcessingOutputType outputType) override;
+	virtual const IJobExecutionLog* GetExecutionLog() const override;
+	virtual void SetExecutionLog(const IJobExecutionLog& executionLog) override;
+	virtual const ilog::IMessageContainer* GetProcessorLog() const override;
+	virtual void SetProcessorLog(const ilog::IMessageContainer& processorLog) override;
 
 	// reimplemented (istd::IInformationProvider)
 	virtual QDateTime GetInformationTimeStamp() const override;
@@ -112,6 +121,10 @@ private:
 
 	CProcessingInfo m_processingInfo;
 	imtbase::CSimpleReferenceCollection m_results;
+	
+	// Separate logs for different purposes
+	CJobExecutionLog m_executionLog;         // System-level controller events
+	ilog::CMessageContainer m_processorLog;  // Worker processing output
 };
 
 

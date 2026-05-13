@@ -1,8 +1,11 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtdb/CSqlDatabaseObjectDelegateCompBase.h>
 
 
 // Qt includes
+#include <QtCore/QFile>
 #include <QtSql/QSqlRecord>
+#include <QtSql/QSqlError>
 
 // ACF includes
 #include <istd/TOptDelPtr.h>
@@ -15,6 +18,7 @@
 // ImtCore includes
 #include <imtbase/imtbase.h>
 #include <imtdb/CComplexCollectionFilterConverter.h>
+#include <imtdb/imtdb.h>
 
 
 namespace imtdb
@@ -494,7 +498,7 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateObjectFilterQuery(
 
 			QString value = textParamPtr->GetText();
 
-			filterQuery = QStringLiteral(R"("%1" = '%2')").arg(qPrintable(key)).arg(value);
+			filterQuery = QStringLiteral(R"("%1" = '%2')").arg(qPrintable(key)).arg(SqlEncode(value));
 		}
 	}
 
@@ -521,12 +525,13 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateTextFilterQuery(
 
 	QString textFilter = collectionFilter.GetTextFilter();
 	if (!textFilter.isEmpty()){
-		textFilterQuery = QStringLiteral(R"("%1" ILIKE '%%2%')").arg(qPrintable(filteringColumnIds.first())).arg(textFilter);
+		QString encodedFilter = SqlEncode(textFilter);
+		textFilterQuery = QStringLiteral(R"("%1" ILIKE '%%2%')").arg(qPrintable(filteringColumnIds.first())).arg(encodedFilter);
 
 		for (int i = 1; i < filteringColumnIds.count(); ++i){
 			textFilterQuery += QStringLiteral(" OR ");
 
-			textFilterQuery += QStringLiteral(R"("%1" ILIKE '%%2%')").arg(qPrintable(filteringColumnIds[i])).arg(textFilter);
+			textFilterQuery += QStringLiteral(R"("%1" ILIKE '%%2%')").arg(qPrintable(filteringColumnIds[i])).arg(encodedFilter);
 		}
 	}
 
@@ -540,13 +545,14 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateTextFilterQuery(const imtbase::IC
 
 	QString textFilter = collectionFilter.GetTextFilter();
 	if (!textFilter.isEmpty()){
+		QString encodedFilter = SqlEncode(textFilter);
 		for (const imtbase::IComplexCollectionFilter::FieldInfo& info : collectionFilter.GetFields()){
 			if (info.metaInfo.flags & imtbase::IComplexCollectionFilter::SO_TEXT_FILTER){
 				if (!textFilterQuery.isEmpty()){
 					textFilterQuery += QStringLiteral(" OR ");
 				}
 
-				textFilterQuery += QStringLiteral(R"("%1" ILIKE '%%2%')").arg(QString::fromUtf8(info.id), textFilter);
+				textFilterQuery += QStringLiteral(R"("%1" ILIKE '%%2%')").arg(QString::fromUtf8(info.id), encodedFilter);
 			}
 		}
 	}
@@ -570,23 +576,24 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateSortQuery(
 	QByteArray columnId;
 	QByteArray sortOrder;
 
-	if (!collectionFilter.GetSortingInfoIds().isEmpty()){
-		columnId = collectionFilter.GetSortingInfoIds().first();
+	const QByteArrayList sortingInfoIds = collectionFilter.GetSortingInfoIds();
+	if (!sortingInfoIds.isEmpty()){
+		columnId = sortingInfoIds.first();
 	}
 
 	switch (collectionFilter.GetSortingOrder()){
 	case imtbase::ICollectionFilter::SO_ASC:
-		sortOrder = "ASC";
+		sortOrder = QByteArrayLiteral("ASC");
 		break;
 	case imtbase::ICollectionFilter::SO_DESC:
-		sortOrder = "DESC";
+		sortOrder = QByteArrayLiteral("DESC");
 		break;
 	default:
 		break;
 	}
 
 	if (!columnId.isEmpty() && !sortOrder.isEmpty()){
-		sortQuery = QString("ORDER BY \"%1\" %2").arg(qPrintable(columnId)).arg(qPrintable(sortOrder));
+		sortQuery = QStringLiteral(R"(ORDER BY "%1" %2)").arg(QString::fromUtf8(columnId), QString::fromUtf8((sortOrder)));
 	}
 
 	return true;
@@ -611,9 +618,130 @@ QString CSqlDatabaseObjectDelegateCompBase::EncodeTextArgument(const QString& ar
 }
 
 
+bool CSqlDatabaseObjectDelegateCompBase::TableExists(const QString& tableName) const
+{
+	if (!m_databaseEngineCompPtr.IsValid()){
+		return false;
+	}
+
+	QString driverId = m_databaseEngineCompPtr->GetDatabaseDriverId();
+	QString tableExistsQuery;
+
+	if (driverId == "QPSQL"){
+		tableExistsQuery = QString(
+								"SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = '%1');"
+								).arg(tableName);
+	}
+	else if (driverId == "QSQLITE"){
+		tableExistsQuery = QString(
+								"SELECT EXISTS (SELECT 1 FROM sqlite_master WHERE type='table' AND name='%1');"
+								).arg(tableName);
+	}
+	else{
+		return false;
+	}
+
+	QSqlError sqlError;
+	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(tableExistsQuery.toUtf8(), &sqlError);
+	
+	if (sqlError.type() != QSqlError::NoError){
+		return false;
+	}
+
+	if (!sqlQuery.next()){
+		return false;
+	}
+
+	return sqlQuery.value(0).toBool();
+}
+
+
 QString CSqlDatabaseObjectDelegateCompBase::CreateAdditionalFiltersQuery(const iprm::IParamsSet& /*filterParams*/) const
 {
 	return QString();
+}
+
+
+// reimplemented (icomp::CComponentBase)
+
+void CSqlDatabaseObjectDelegateCompBase::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+
+	if (!CreateTableIfNeeded()){
+		SendWarningMessage(0, QT_TR_NOOP("Collection table auto-creation failed; see previous errors. Component initialization was stopped"));
+	}
+}
+
+
+bool CSqlDatabaseObjectDelegateCompBase::CreateTableIfNeeded()
+{
+	const bool autoCreateTable = m_autoCreateTableAttrPtr.IsValid() ? *m_autoCreateTableAttrPtr : false;
+	if (!autoCreateTable){
+		return true;
+	}
+
+	if (!m_databaseEngineCompPtr.IsValid()){
+		return false;
+	}
+
+	const QString tableName = QString::fromUtf8(GetTableName());
+	if (tableName.isEmpty()){
+		return false;
+	}
+
+	if (TableExists(tableName)){
+		return true;
+	}
+
+	const QByteArray scriptPath = m_createTableScriptPathAttrPtr.IsValid() ? *m_createTableScriptPathAttrPtr : QByteArray();
+	if (scriptPath.isEmpty()){
+		SendErrorMessage(0, QT_TR_NOOP("Table creation script path is empty"));
+		return false;
+	}
+
+	QString resourcePath = QString::fromUtf8(scriptPath);
+	if (!resourcePath.startsWith(QStringLiteral(":/"))){
+		resourcePath = GetSqlResourcePath(*m_databaseEngineCompPtr, resourcePath);
+	}
+
+	QFile scriptFile(resourcePath);
+	if (!scriptFile.open(QFile::ReadOnly)){
+		SendErrorMessage(0, QString::fromUtf8(QT_TR_NOOP("Collection table creation script '%1' could not be loaded"))
+							.arg(scriptFile.fileName()));
+		return false;
+	}
+
+	QByteArray createTableQuery = scriptFile.readAll();
+	scriptFile.close();
+
+	QByteArray tableScheme = GetTableScheme();
+	if (!tableScheme.isEmpty()){
+		createTableQuery.replace("${TableScheme}", tableScheme);
+	}
+	else{
+		createTableQuery.replace("${TableScheme}", "public");
+	}
+
+	createTableQuery.replace("${TableName}", tableName.toUtf8());
+
+	QSqlError sqlError;
+	m_databaseEngineCompPtr->ExecSqlQuery(createTableQuery, &sqlError);
+
+	if (sqlError.type() != QSqlError::NoError){
+		qCritical() << __FILE__ << __LINE__
+					<< "\n\t| Table could not be created"
+					<< "\n\t| Error: " << sqlError
+					<< "\n\t| Query: " << createTableQuery;
+
+		SendErrorMessage(0, QString::fromUtf8(QT_TR_NOOP("\n\t| Table could not be created"
+														"\n\t| Error: %1"
+														"\n\t| Query: %2"))
+								.arg(sqlError.text(), qPrintable(createTableQuery)));
+		return false;
+	}
+
+	return true;
 }
 
 

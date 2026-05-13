@@ -13,6 +13,8 @@ ThumbnailDecorator 1.0 ./Application/ThumbnailDecorator.qml
 ApplicationEvents 1.0 ./Application/ApplicationEvents.qml
 ClientSettingsController 1.0 ./Application/ClientSettingsController.qml
 
+singleton LocalStorage 1.0 ./Application/LocalStorage.qml
+
 ButtonPanel 1.0 Panels/ButtonPanel.qml
 CommandsDecorator 1.0 Panels/CommandsDecorator.qml
 FilterMenu 1.0 Panels/FilterMenu.qml
@@ -34,6 +36,7 @@ TopPanelDecorator 1.0 Panels/TopPanelDecorator.qml
 TopRightPanel 1.0 Panels/TopRightPanel.qml
 TopRightPanelDecorator 1.0 Panels/TopRightPanelDecorator.qml
 CommandsPanel 1.0 Panels/CommandsPanel.qml
+EnableableFilterDelegate 1.0 Panels/EnableableFilterDelegate.qml
 FieldFilterDelegate 1.0 Panels/FieldFilterDelegate.qml
 FilterDelegateBase 1.0 Panels/FilterDelegateBase.qml
 OptionsFilterDelegate 1.0 Panels/OptionsFilterDelegate.qml
@@ -47,6 +50,7 @@ ServerLogProvider 1.0 Settings/ServerLogProvider.qml
 SettingsObserver 1.0 Settings/SettingsObserver.qml
 SettingsProvider 1.0 Settings/SettingsProvider.qml
 SettingsController 1.0 Settings/SettingsController.qml
+PatTokenSettingsController 1.0 Settings/PatTokenSettingsController.qml
 
 MultiPageView 1.0 View/MultiPageView.qml
 TabView 1.0 View/TabView.qml
@@ -91,6 +95,7 @@ ServerConnectionParamElementView 1.0 View/ServerConnectionParamElementView.qml
 ComboBoxGqlElementView 1.0 View/ComboBoxGqlElementView.qml
 ComboBoxGqlLegacyElementView 1.0 View/ComboBoxGqlLegacyElementView.qml
 SpinBoxElementView 1.0 View/SpinBoxElementView.qml
+ComboBoxAddressElementView 1.0 View/ComboBoxAddressElementView.qml
 
 singleton PopupManager 1.0 View/PopupManager.qml
 
@@ -111,3 +116,7 @@ ConstrainedDoubleParamEditor 1.0 Params/ConstrainedDoubleParamEditor.qml
 IntegerParamEditor 1.0 Params/IntegerParamEditor.qml
 EnableableParamEditor 1.0 Params/EnableableParamEditor.qml
 ServerConnectionParamEditor 1.0 Params/ServerConnectionParamEditor.qml
+PatTokenListParam 1.0 Params/PatTokenListParam.qml
+PatTokenParamEditor 1.0 Params/PatTokenParamEditor.qml
+
+

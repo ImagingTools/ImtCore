@@ -1,16 +1,17 @@
-#include <imthttp/CSocketThread.h>
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+#include <imtrest/CSocketThread.h>
 
 // Qt includes
 #include <QtCore/QCoreApplication>
 #include <QtCore/QMutableListIterator>
 
 // ImtCore includes
-#include <imthttp/IProtocolEngine.h>
-#include <imthttp/ISender.h>
-#include <imthttp/CMultiThreadServer.h>
+#include <imtrest/IProtocolEngine.h>
+#include <imtrest/ITransport.h>
+#include <imtrest/CMultiThreadServer.h>
 
 
-namespace imthttp
+namespace imtrest
 {
 
 
@@ -64,7 +65,7 @@ QByteArray CSocketThread::GetRequestId()
 }
 
 
-imthttp::imtrest::IRequestServlet* CSocketThread::GetRequestServlet()
+imtrest::IRequestServlet* CSocketThread::GetRequestServlet()
 {
 	return m_requestHandlerPtr;
 }
@@ -82,13 +83,13 @@ void CSocketThread::EnableSecureConnection(bool isSecureConnection)
 }
 
 
-imthttp::IRequestUniquePtr CSocketThread::CreateRequest() const
+imtrest::IRequestUniquePtr CSocketThread::CreateRequest() const
 {
 	if (m_enginePtr == nullptr){
 		return nullptr;
 	}
 
-	imthttp::IRequestUniquePtr newRequestPtr = m_enginePtr->CreateRequest(*this);
+	imtrest::IRequestUniquePtr newRequestPtr = m_enginePtr->CreateRequest(*this);
 	if (newRequestPtr.IsValid()){
 		m_requestId = newRequestPtr->GetRequestId();
 	}
@@ -105,7 +106,7 @@ void CSocketThread::run()
 		return;
 	}
 
-	imthttp::IRequestUniquePtr newRequestPtr = m_enginePtr->CreateRequest(*this);
+	imtrest::IRequestUniquePtr newRequestPtr = m_enginePtr->CreateRequest(*this);
 	Q_ASSERT(newRequestPtr.IsValid());
 	m_requestId = newRequestPtr->GetRequestId();
 
@@ -118,6 +119,7 @@ void CSocketThread::run()
 	Q_ASSERT(retVal);
 
 	exec();
+	m_socket.Reset();
 }
 
 
@@ -137,7 +139,7 @@ ConstResponsePtr CSocketThread::ProcessRequest(const IRequest& request, const QB
 }
 
 
-// reimplemented (ISender)
+// reimplemented (ITransport)
 
 bool CSocketThread::SendResponse(ConstResponsePtr& response) const
 {
@@ -147,12 +149,12 @@ bool CSocketThread::SendResponse(ConstResponsePtr& response) const
 }
 
 
-bool CSocketThread::SendRequest(ConstRequestPtr& /*reguest*/) const
+bool CSocketThread::SendRequest(ConstRequestPtr& /*request*/) const
 {
 	return false;
 }
 
 
-} // namespace imthttp
+} // namespace imtrest
 
 

@@ -2,6 +2,7 @@ import QtQuick 2.0
 
 ListModel {
 	property var owner: null
+	signal finished
 	dynamicRoles: true;
 
 	function getProperties(item){
@@ -12,7 +13,7 @@ ListModel {
 						key.indexOf('m_') >= 0
 						&& typeof item[key] !== "function"
 						&& item[key] !== undefined
-						&& item[key] !== null){
+						&& item[key] !== null || key == '__typename'){
 					list.push(key)
 				}
 			}
@@ -22,7 +23,7 @@ ListModel {
 						key.indexOf('m_') >= 0
 						&& typeof item[key] !== "function"
 						&& item[key] !== undefined
-						&& item[key] !== null){
+						&& item[key] !== null || key == '__typename'){
 					list.push(key)
 				}
 			}
@@ -116,9 +117,9 @@ ListModel {
 
 								data = data.replace(/\\/g, "\\\\")
 								data = data.replace(/\"/g, "\\\"")
-								data = data.replace(/\r/g, "\\\\r")
-								data = data.replace(/\n/g, "\\\\n")
-								data = data.replace(/\t/g, "\\\\t")
+								data = data.replace(/\r/g, "\\r")
+								data = data.replace(/\n/g, "\\n")
+								data = data.replace(/\t/g, "\\t")
 
 								graphQL += "\"" + data + "\""
 							}
@@ -138,9 +139,9 @@ ListModel {
 					if(typeof value === 'string'){
 						value = value.replace(/\\/g, "\\\\")
 						value = value.replace(/\"/g, "\\\"")
-						value = value.replace(/\r/g, "\\\\r")
-						value = value.replace(/\n/g, "\\\\n")
-						value = value.replace(/\t/g, "\\\\t")
+						value = value.replace(/\r/g, "\\r")
+						value = value.replace(/\n/g, "\\n")
+						value = value.replace(/\t/g, "\\t")
 					}
 
 					if (value === undefined){
@@ -214,6 +215,30 @@ ListModel {
 		}
 		
 		return retVal
+	}
+
+	function createFromJson(json){
+		return fromJSON(json);
+	}
+
+	function fromJSON(json){
+		this.clear()
+
+		let arr = JSON.parse(json)
+		for(let i = 0; i < arr.length; i++){
+			let sourceTypename
+			if (arr[i]['__typename']){
+				sourceTypename = arr[i]['__typename']
+			}
+			else {
+				continue
+			}
+			let obj = Qt.createComponent(sourceTypename + ".qml").createObject(this)
+			obj.fromObject(arr[i])
+			this.addElement(obj)
+		}
+
+		finished()
 	}
 
 	/// \deprecated! OBSOLETE function ONLY for support legacy code DO NOT USE IT! Use \c appendElement() instead. Will be removed next releases.

@@ -1,4 +1,9 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauth/CFeaturePackageRepresentationControllerComp.h>
+
+// Qt includes
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonValue>
 
 
 // ImtCore includes
@@ -15,32 +20,33 @@ namespace imtauth
 
 bool CFeaturePackageRepresentationControllerComp::GetRepresentationFromValue(
 			const istd::IChangeable& dataModel,
-			imtbase::CTreeItemModel& representation,
+			QJsonObject& representation,
 			const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	const imtlic::CFeatureContainer* packagePtr = dynamic_cast<const imtlic::CFeatureContainer*>(&dataModel);
 	Q_ASSERT(packagePtr != nullptr);
 
+	QJsonArray itemsArray;
 	QByteArrayList featureCollectionIds = packagePtr->GetFeatureList().GetElementIds().toList();
 	for (const QByteArray& featureCollectionId : featureCollectionIds){
 		const imtlic::CFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::CFeatureInfo*>(packagePtr->GetFeatureInfo(featureCollectionId).GetPtr());
 		if (featureInfoPtr != nullptr){
-			istd::TDelPtr<imtbase::CTreeItemModel> featureModelPtr(new imtbase::CTreeItemModel);
+			QJsonObject featureModel;
 
 			QString errorMessage;
-			bool ok = CreateRepresentationModelFromFeatureInfo(*featureInfoPtr, *featureModelPtr, errorMessage);
+			bool ok = CreateRepresentationModelFromFeatureInfo(*featureInfoPtr, featureModel, errorMessage);
 			if (!ok){
 				SendErrorMessage(0, errorMessage, "CObjectRepresentationControllerCompBase");
 
 				return false;
 			}
 
-			int index = representation.InsertNewItem();
-			representation.CopyItemDataFromModel(index, featureModelPtr.PopPtr(), 0);
-			representation.SetData("Id", featureCollectionId, index);
+			featureModel.insert(QStringLiteral("Id"), QString::fromUtf8(featureCollectionId));
+			itemsArray.append(featureModel);
 		}
 	}
 
+	representation.insert(QStringLiteral("items"), itemsArray);
 	return true;
 }
 
@@ -55,14 +61,14 @@ bool CFeaturePackageRepresentationControllerComp::IsModelSupported(const istd::I
 
 
 bool CFeaturePackageRepresentationControllerComp::GetDataModelFromRepresentation(
-			const imtbase::CTreeItemModel& /*representation*/,
+			const QJsonObject& /*representation*/,
 			istd::IChangeable& /*dataModel*/) const
 {
 	return false;
 }
 
 
-bool CFeaturePackageRepresentationControllerComp::GetRepresentationFromDataModel(const istd::IChangeable& dataModel, imtbase::CTreeItemModel& representation, const iprm::IParamsSet* paramsPtr) const
+bool CFeaturePackageRepresentationControllerComp::GetRepresentationFromDataModel(const istd::IChangeable& dataModel, QJsonObject& representation, const iprm::IParamsSet* paramsPtr) const
 {
 	return GetRepresentationFromValue(dataModel, representation, paramsPtr);
 }
@@ -72,22 +78,20 @@ bool CFeaturePackageRepresentationControllerComp::GetRepresentationFromDataModel
 
 bool CFeaturePackageRepresentationControllerComp::CreateRepresentationModelFromFeatureInfo(
 			const imtlic::CFeatureInfo& featureInfo,
-			imtbase::CTreeItemModel& representationModel,
+			QJsonObject& representationModel,
 			QString& errorMessage) const
 {
 	QByteArray featureId = featureInfo.GetFeatureId();
 
-	representationModel.SetData("FeatureId", featureId);
-	representationModel.SetData("FeatureName", featureInfo.GetFeatureName());
-	representationModel.SetData("Optional", featureInfo.IsOptional());
-	representationModel.SetData("FeatureDescription", featureInfo.GetFeatureDescription());
-	representationModel.SetData("Dependencies", featureInfo.GetDependencies().join(';'));
-	representationModel.SetData("ChildModel", 0);
+	representationModel.insert(QStringLiteral("FeatureId"), QString::fromUtf8(featureId));
+	representationModel.insert(QStringLiteral("FeatureName"), featureInfo.GetFeatureName());
+	representationModel.insert(QStringLiteral("Optional"), featureInfo.IsOptional());
+	representationModel.insert(QStringLiteral("FeatureDescription"), featureInfo.GetFeatureDescription());
+	representationModel.insert(QStringLiteral("Dependencies"), QString(featureInfo.GetDependencies().join(';')));
 
 	const imtlic::IFeatureInfo::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();
 	if (!subFeatures.isEmpty()){
-		imtbase::CTreeItemModel* childModelPtr = representationModel.AddTreeModel("ChildModel");
-		Q_ASSERT(childModelPtr != nullptr);
+		QJsonArray childModelArray;
 
 		for (int i = 0; i < subFeatures.count(); i++){
 			imtlic::IFeatureInfoSharedPtr featureInfoPtr = subFeatures.at(i);
@@ -99,15 +103,15 @@ bool CFeaturePackageRepresentationControllerComp::CreateRepresentationModelFromF
 			const imtlic::CFeatureInfo* subFeatureInfoPtr = dynamic_cast<const imtlic::CFeatureInfo*>(featureInfoPtr.GetPtr());
 			Q_ASSERT(subFeatureInfoPtr != nullptr);
 
-			imtbase::CTreeItemModel subFeatureRepresentationModel;
+			QJsonObject subFeatureRepresentationModel;
 			bool ok = CreateRepresentationModelFromFeatureInfo(*subFeatureInfoPtr, subFeatureRepresentationModel, errorMessage);
 			if (!ok){
 				return false;
 			}
 
-			childModelPtr->InsertNewItem();
-			childModelPtr->CopyItemDataFromModel(i, &subFeatureRepresentationModel, 0);
+			childModelArray.append(subFeatureRepresentationModel);
 		}
+		representationModel.insert(QStringLiteral("ChildModel"), childModelArray);
 	}
 
 	return true;
@@ -115,5 +119,3 @@ bool CFeaturePackageRepresentationControllerComp::CreateRepresentationModelFromF
 
 
 } // namespace imtauth
-
-

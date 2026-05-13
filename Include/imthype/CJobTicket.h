@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -28,6 +29,7 @@ public:
 	virtual QByteArray GetContextId() const override;
 	virtual void SetContextId(const QByteArray& contextId) override;
 	virtual iprm::IParamsSetSharedPtr GetParams() const override;
+	virtual iprm::IParamsSetSharedPtr CreateParams() const override;
 	virtual void SetParams(const iprm::IParamsSetSharedPtr& paramsPtr) override;
 	virtual imthype::IJobQueueManager::ProcessingStatus GetProcessingStatus() const override;
 	virtual void SetProcessingStatus(imthype::IJobQueueManager::ProcessingStatus status) override;

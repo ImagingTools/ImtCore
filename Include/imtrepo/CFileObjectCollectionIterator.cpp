@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtrepo/CFileObjectCollectionIterator.h>
 
 
@@ -72,6 +73,12 @@ idoc::MetaInfoPtr CFileObjectCollectionIterator::GetDataMetaInfo() const
 }
 
 
+int CFileObjectCollectionIterator::GetElementsCount() const
+{
+	return m_fileObjectCollectionPtr != nullptr ? m_fileObjectCollectionPtr->GetElementsCount() : 0;
+}
+
+
 idoc::MetaInfoPtr CFileObjectCollectionIterator::GetCollectionMetaInfo() const
 {
 
@@ -92,5 +99,4 @@ QVariant CFileObjectCollectionIterator::GetElementInfo(QByteArray /*infoId*/) co
 
 
 } // namespace imtdb
-
 

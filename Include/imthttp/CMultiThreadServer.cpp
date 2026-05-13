@@ -1,4 +1,5 @@
-#include <imthttp/CMultiThreadServer.h>
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+#include <imtrest/CMultiThreadServer.h>
 
 
 // Qt includes
@@ -6,11 +7,11 @@
 #include <QtCore/QMutableListIterator>
 
 // ImtCore includes
-#include <imthttp/IProtocolEngine.h>
-#include <imthttp/ISender.h>
+#include <imtrest/IProtocolEngine.h>
+#include <imtrest/ITransport.h>
 
 
-namespace imthttp
+namespace imtrest
 {
 
 
@@ -35,13 +36,13 @@ CMultiThreadServer::~CMultiThreadServer()
 }
 
 
-imthttp::imtrest::IRequestServlet* CMultiThreadServer::GetRequestServlet()
+imtrest::IRequestServlet* CMultiThreadServer::GetRequestServlet()
 {
 	return m_rootServer.GetRequestServlet();
 }
 
 
-imthttp::IProtocolEngine* CMultiThreadServer::GetProtocolEngine()
+imtrest::IProtocolEngine* CMultiThreadServer::GetProtocolEngine()
 {
 	return m_rootServer.GetProtocolEngine();
 }
@@ -79,19 +80,33 @@ void CMultiThreadServer::SetSslConfiguration(const QSslConfiguration& sslConfigu
 }
 
 
-// reimplemented (imthttp::IRequestManager)
+// reimplemented (imtrest::IResponseDispatcher)
 
-const ISender* CMultiThreadServer::GetSender(const QByteArray& requestId) const
+bool CMultiThreadServer::SendResponse(const QByteArray& requestId, ConstResponsePtr& response) const
 {
 	QReadLocker threadListLock(&m_threadSocketListGuard);
 
 	for (CSocketThread* socket : m_threadSocketList){
 		if (socket->GetRequestId() == requestId){
-			return socket;
+			return socket->SendResponse(response);
 		}
 	}
 
-	return nullptr;
+	return false;
+}
+
+
+bool CMultiThreadServer::SendRequest(const QByteArray& requestId, ConstRequestPtr& request) const
+{
+	QReadLocker threadListLock(&m_threadSocketListGuard);
+
+	for (CSocketThread* socket : m_threadSocketList){
+		if (socket->GetRequestId() == requestId){
+			return socket->SendRequest(request);
+		}
+	}
+
+	return false;
 }
 
 
@@ -205,6 +220,6 @@ void CMultiThreadServer::incomingConnection(qintptr socketDescriptor)
 }
 
 
-} // namespace imthttp
+} // namespace imtrest
 
 

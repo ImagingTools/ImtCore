@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtservice/CUrlConnectionParam.h>
 
 
@@ -10,6 +11,7 @@
 
 // ImtCore includes
 #include <imtbase/imtbase.h>
+#include <imtcore/Version.h>
 
 
 namespace imtservice
@@ -27,7 +29,16 @@ CUrlConnectionParam::CUrlConnectionParam()
 
 void CUrlConnectionParam::AddExternConnection(const imtservice::IServiceConnectionParam::IncomingConnectionParam& externConnection)
 {
-	if (!m_externConnectionList.contains(externConnection)){
+	const QByteArray uuid = externConnection.GetObjectUuid();
+	bool alreadyExists = false;
+	for (const IncomingConnectionParam& existing : m_externConnectionList){
+		if (existing.GetObjectUuid() == uuid){
+			alreadyExists = true;
+			break;
+		}
+	}
+
+	if (!alreadyExists){
 		istd::CChangeNotifier changeNotifier(this);
 
 		m_externConnectionList << externConnection;
@@ -53,6 +64,9 @@ bool CUrlConnectionParam::Serialize(iser::IArchive& archive)
 
 	retVal = retVal && BaseClass::Serialize(archive);
 
+	quint32 imtCoreVersion = 0;
+	archive.GetVersionInfo().GetVersionNumber(imtcore::VI_IMTCORE, imtCoreVersion);
+
 	int objectCount = imtbase::narrow_cast<int>(m_externConnectionList.count());
 	if (!archive.IsStoring()){
 		objectCount = 0;
@@ -72,30 +86,44 @@ bool CUrlConnectionParam::Serialize(iser::IArchive& archive)
 			elementInfo = m_externConnectionList[i];
 		}
 
-		iser::CArchiveTag idTag("Id", "Id", iser::CArchiveTag::TT_LEAF, &objectTag);
-		retVal = retVal && archive.BeginTag(idTag);
-		retVal = retVal && archive.Process(elementInfo.id);
-		retVal = retVal && archive.EndTag(idTag);
+		if (archive.IsStoring() || imtCoreVersion >= 20596){
+			retVal = retVal && elementInfo.Serialize(archive);
+		} else {
+			// old format: plain struct with "Id", "Host", "WsPort", "HttpPort" tags
+			QByteArray id;
+			QString host;
+			int wsPort = -1;
+			int httpPort = -1;
 
-		iser::CArchiveTag descriptionTag("Description", "Connection description", iser::CArchiveTag::TT_LEAF, &objectTag);
-		retVal = retVal && archive.BeginTag(descriptionTag);
-		retVal = retVal && archive.Process(elementInfo.description);
-		retVal = retVal && archive.EndTag(descriptionTag);
+			iser::CArchiveTag idTag("Id", "Id", iser::CArchiveTag::TT_LEAF);
+			retVal = retVal && archive.BeginTag(idTag);
+			retVal = retVal && archive.Process(id);
+			retVal = retVal && archive.EndTag(idTag);
 
-		iser::CArchiveTag hostTag("Host", "Host", iser::CArchiveTag::TT_LEAF, &objectTag);
-		retVal = retVal && archive.BeginTag(hostTag);
-		retVal = retVal && archive.Process(elementInfo.host);
-		retVal = retVal && archive.EndTag(hostTag);
+			iser::CArchiveTag hostTag("Host", "Host", iser::CArchiveTag::TT_LEAF);
+			retVal = retVal && archive.BeginTag(hostTag);
+			retVal = retVal && archive.Process(host);
+			retVal = retVal && archive.EndTag(hostTag);
 
-		iser::CArchiveTag  wsPortTag("WsPort", "Web Socket Port", iser::CArchiveTag::TT_LEAF, &objectTag);
-		retVal = retVal && archive.BeginTag(wsPortTag);
-		retVal = retVal && archive.Process(elementInfo.wsPort);
-		retVal = retVal && archive.EndTag(wsPortTag);
+			iser::CArchiveTag wsPortTag("WsPort", "WsPort", iser::CArchiveTag::TT_LEAF);
+			retVal = retVal && archive.BeginTag(wsPortTag);
+			retVal = retVal && archive.Process(wsPort);
+			retVal = retVal && archive.EndTag(wsPortTag);
 
-		iser::CArchiveTag  httpPortTag("HttpPort", "Http Socket Port", iser::CArchiveTag::TT_LEAF, &objectTag);
-		retVal = retVal && archive.BeginTag(httpPortTag);
-		retVal = retVal && archive.Process(elementInfo.httpPort);
-		retVal = retVal && archive.EndTag(httpPortTag);
+			iser::CArchiveTag httpPortTag("HttpPort", "HttpPort", iser::CArchiveTag::TT_LEAF);
+			retVal = retVal && archive.BeginTag(httpPortTag);
+			retVal = retVal && archive.Process(httpPort);
+			retVal = retVal && archive.EndTag(httpPortTag);
+
+			if (retVal){
+				elementInfo.SetObjectUuid(id);
+				elementInfo.SetHost(host);
+				elementInfo.RegisterProtocol(imtcom::IServerConnectionInterface::PT_WEBSOCKET);
+				elementInfo.SetPort(imtcom::IServerConnectionInterface::PT_WEBSOCKET, wsPort);
+				elementInfo.RegisterProtocol(imtcom::IServerConnectionInterface::PT_HTTP);
+				elementInfo.SetPort(imtcom::IServerConnectionInterface::PT_HTTP, httpPort);
+			}
+		}
 
 		retVal = retVal && archive.EndTag(objectTag);
 
@@ -128,11 +156,7 @@ bool CUrlConnectionParam::CopyFrom(const IChangeable& object, CompatibilityMode 
 
 		for (const IncomingConnectionParam& connectionParam : sourcePtr->m_externConnectionList){
 			IncomingConnectionParam newParam;
-			newParam.description = connectionParam.description;
-			newParam.host = connectionParam.host;
-			newParam.wsPort = connectionParam.wsPort;
-			newParam.httpPort = connectionParam.httpPort;
-			newParam.id = connectionParam.id;
+			newParam.CopyFrom(connectionParam);
 
 			m_externConnectionList << newParam;
 		}

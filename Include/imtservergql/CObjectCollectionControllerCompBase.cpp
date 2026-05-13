@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+
+
 #include <imtservergql/CObjectCollectionControllerCompBase.h>
 
 
@@ -9,6 +12,9 @@
 #include <QtCore/QUuid>
 #include <QtCore/QTemporaryDir>
 #include <QtCore/QFileInfo>
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonDocument>
 
 // ACF includes
 #include <iprm/CTextParam.h>
@@ -46,6 +52,102 @@
 
 namespace imtservergql
 {
+
+
+// static helpers
+
+/**
+	Returns the storage type ID of the value stored in the \c var.
+*/
+[[nodiscard]] static QByteArray GetTypeIdOfVariant(const QVariant& var)
+{
+	static const QHash<int, QByteArray> typeIdMap = {
+		{ QMetaType::Void,                   QByteArrayLiteral("Void")                },
+		{ QMetaType::Bool,                   QByteArrayLiteral("Bool")                },
+		{ QMetaType::Int,                    QByteArrayLiteral("Int")                 },
+		{ QMetaType::UInt,                   QByteArrayLiteral("UInt")                },
+		{ QMetaType::Double,                 QByteArrayLiteral("Double")              },
+		{ QMetaType::QChar,                  QByteArrayLiteral("Char")                },
+		{ QMetaType::Char,                   QByteArrayLiteral("Char")                },
+		{ QMetaType::Char16,                 QByteArrayLiteral("Char16")              },
+		{ QMetaType::Char32,                 QByteArrayLiteral("Char32")              },
+		{ QMetaType::SChar,                  QByteArrayLiteral("SChar")               },
+		{ QMetaType::QString,               QByteArrayLiteral("String")               },
+		{ QMetaType::QByteArray,            QByteArrayLiteral("ByteArray")            },
+		{ QMetaType::Nullptr,               QByteArrayLiteral("Null")                 },
+		{ QMetaType::VoidStar,              QByteArrayLiteral("Void*")                },
+		{ QMetaType::Long,                  QByteArrayLiteral("Long")                 },
+		{ QMetaType::LongLong,              QByteArrayLiteral("LongLong")             },
+		{ QMetaType::Short,                 QByteArrayLiteral("Short")                },
+		{ QMetaType::ULong,                 QByteArrayLiteral("ULong")                },
+		{ QMetaType::ULongLong,             QByteArrayLiteral("ULongLong")            },
+		{ QMetaType::UShort,                QByteArrayLiteral("UShort")               },
+		{ QMetaType::UChar,                 QByteArrayLiteral("UChar")                },
+		{ QMetaType::Float,                 QByteArrayLiteral("Float")                },
+		{ QMetaType::Float16,               QByteArrayLiteral("Float16")              },
+		{ QMetaType::QDate,                 QByteArrayLiteral("Date")                 },
+		{ QMetaType::QSize,                 QByteArrayLiteral("Size")                 },
+		{ QMetaType::QSizeF,                QByteArrayLiteral("Size")                 },
+		{ QMetaType::QTime,                 QByteArrayLiteral("Time")                 },
+		{ QMetaType::QVariantList,          QByteArrayLiteral("VariantList")          },
+		{ QMetaType::QPolygon,              QByteArrayLiteral("Polygon")              },
+		{ QMetaType::QPolygonF,             QByteArrayLiteral("Polygon")              },
+		{ QMetaType::QColor,                QByteArrayLiteral("Color")                },
+		{ QMetaType::QColorSpace,           QByteArrayLiteral("ColorSpace")           },
+		{ QMetaType::QRect,                 QByteArrayLiteral("Rect")                 },
+		{ QMetaType::QRectF,                QByteArrayLiteral("Rect")                 },
+		{ QMetaType::QLine,                 QByteArrayLiteral("Line")                 },
+		{ QMetaType::QLineF,                QByteArrayLiteral("Line")                 },
+		{ QMetaType::QStringList,           QByteArrayLiteral("StringList")           },
+		{ QMetaType::QVariantMap,           QByteArrayLiteral("VariantMap")           },
+		{ QMetaType::QVariantHash,          QByteArrayLiteral("VariantHash")          },
+		{ QMetaType::QVariantPair,          QByteArrayLiteral("VariantPair")          },
+		{ QMetaType::QIcon,                 QByteArrayLiteral("Icon")                 },
+		{ QMetaType::QPen,                  QByteArrayLiteral("Pen")                  },
+		{ QMetaType::QPoint,                QByteArrayLiteral("Point")                },
+		{ QMetaType::QPointF,               QByteArrayLiteral("Point")                },
+		{ QMetaType::QUrl,                  QByteArrayLiteral("Url")                  },
+		{ QMetaType::QRegularExpression,    QByteArrayLiteral("RegExp")               },
+		{ QMetaType::QDateTime,             QByteArrayLiteral("DateTime")             },
+		{ QMetaType::QPalette,              QByteArrayLiteral("Palette")              },
+		{ QMetaType::QFont,                 QByteArrayLiteral("Font")                 },
+		{ QMetaType::QBrush,                QByteArrayLiteral("Brush")                },
+		{ QMetaType::QRegion,               QByteArrayLiteral("Region")               },
+		{ QMetaType::QBitArray,             QByteArrayLiteral("BitArray")             },
+		{ QMetaType::QImage,                QByteArrayLiteral("Image")                },
+		{ QMetaType::QKeySequence,          QByteArrayLiteral("KeySeq")               },
+		{ QMetaType::QSizePolicy,           QByteArrayLiteral("SizePolicy")           },
+		{ QMetaType::QPixmap,               QByteArrayLiteral("Pixmap")               },
+		{ QMetaType::QLocale,               QByteArrayLiteral("Locale")               },
+		{ QMetaType::QBitmap,               QByteArrayLiteral("Bitmap")               },
+		{ QMetaType::QTransform,            QByteArrayLiteral("Transform")            },
+		{ QMetaType::QMatrix4x4,            QByteArrayLiteral("Matrix4x4")            },
+		{ QMetaType::QVector2D,             QByteArrayLiteral("Vector2D")             },
+		{ QMetaType::QVector3D,             QByteArrayLiteral("Vector3D")             },
+		{ QMetaType::QVector4D,             QByteArrayLiteral("Vector4D")             },
+		{ QMetaType::QQuaternion,           QByteArrayLiteral("Quaternion")           },
+		{ QMetaType::QEasingCurve,          QByteArrayLiteral("EasingCurve")          },
+		{ QMetaType::QJsonValue,            QByteArrayLiteral("JsonValue")            },
+		{ QMetaType::QJsonObject,           QByteArrayLiteral("JsonObject")           },
+		{ QMetaType::QJsonArray,            QByteArrayLiteral("JsonArray")            },
+		{ QMetaType::QJsonDocument,         QByteArrayLiteral("JsonDocument")         },
+		{ QMetaType::QCborValue,            QByteArrayLiteral("CborValue")            },
+		{ QMetaType::QCborArray,            QByteArrayLiteral("CborArray")            },
+		{ QMetaType::QCborMap,              QByteArrayLiteral("CborMap")              },
+		{ QMetaType::QCborSimpleType,       QByteArrayLiteral("CborSimpleType")       },
+		{ QMetaType::QModelIndex,           QByteArrayLiteral("ModelIndex")           },
+		{ QMetaType::QPersistentModelIndex, QByteArrayLiteral("PersistentModelIndex") },
+		{ QMetaType::QUuid,                 QByteArrayLiteral("Uuid")                 },
+		{ QMetaType::QByteArrayList,        QByteArrayLiteral("ByteArrayList")        },
+		{ QMetaType::QVariant,              QByteArrayLiteral("Variant")              },
+	};
+
+	const auto it = typeIdMap.constFind(var.typeId());
+	if (it != typeIdMap.constEnd()) {
+		return it.value();
+	}
+	return var.typeName();
+}
 
 
 // public methods
@@ -165,29 +267,30 @@ const imtbase::ISearchResults* CObjectCollectionControllerCompBase::Search(const
 	items.InsertField("description");
 	gqlRequest.AddField("items", items);
 
-	istd::TDelPtr<imtbase::CTreeItemModel> resultModelPtr = ListObjects(gqlRequest, errorMessage);
-	if (!resultModelPtr.IsValid()){
+	QJsonObject resultObj = ListObjects(gqlRequest, errorMessage);
+	if (resultObj.isEmpty()){
 		return nullptr;
 	}
 
-	imtbase::CTreeItemModel* dataModelPtr = resultModelPtr->GetTreeItemModel("data");
-	if (dataModelPtr == nullptr){
+	QJsonObject dataObj = resultObj.value(QStringLiteral("data")).toObject();
+	if (dataObj.isEmpty()){
 		return nullptr;
 	}
 
-	imtbase::CTreeItemModel* itemsModelPtr = dataModelPtr->GetTreeItemModel("items");
-	if (itemsModelPtr == nullptr){
+	QJsonArray itemsArray = dataObj.value(QStringLiteral("items")).toArray();
+	if (itemsArray.isEmpty()){
 		return nullptr;
 	}
 
 	imtbase::CSearchResults* searchResultsPtr = new imtbase::CSearchResults();
-	for (int i = 0; i < itemsModelPtr->GetItemsCount(); i++){
+	for (int i = 0; i < itemsArray.count(); i++){
+		QJsonObject itemObj = itemsArray.at(i).toObject();
 		imtbase::ISearchResults::SearchResult searchResult;
 
-		searchResult.contextId = itemsModelPtr->GetData("id", i).toByteArray();
-		searchResult.resultName = itemsModelPtr->GetData("name", i).toString();
-		searchResult.resultDescription = itemsModelPtr->GetData("description", i).toString();
-		searchResult.contextTypeId = itemsModelPtr->GetData("typeId", i).toByteArray();
+		searchResult.contextId = itemObj.value(QStringLiteral("id")).toString().toUtf8();
+		searchResult.resultName = itemObj.value(QStringLiteral("name")).toString();
+		searchResult.resultDescription = itemObj.value(QStringLiteral("description")).toString();
+		searchResult.contextTypeId = itemObj.value(QStringLiteral("typeId")).toString().toUtf8();
 
 		QUrl url;
 		url.setScheme("applink");
@@ -1359,11 +1462,11 @@ sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload CObjectCollectionControl
 	for (const int& infoType : metaInfoTypes){
 		sdl::imtbase::ImtBaseTypes::CParameter::V1_0 parameterInfo;
 		parameterInfo.id = metaInfo->GetMetaInfoId(infoType);
-		parameterInfo.typeId = metaInfo->GetMetaInfoId(infoType);
 		parameterInfo.name = metaInfo->GetMetaInfoName(infoType);
 		parameterInfo.description = metaInfo->GetMetaInfoDescription(infoType);
 
 		QVariant metaInfoValue = metaInfo->GetMetaInfo(infoType);
+		parameterInfo.typeId = GetTypeIdOfVariant(metaInfoValue);
 		parameterInfo.data = ConvertMetaInfoToString(infoType, metaInfoValue);
 
 		parameterInfos << parameterInfo;
@@ -1485,14 +1588,14 @@ sdl::imtbase::ImtCollection::CCreateSubCollectionPayload CObjectCollectionContro
 
 // reimplemented (imtservergql::CGqlRepresentationDataControllerComp)
 
-imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateInternalResponse(
+QJsonObject CObjectCollectionControllerCompBase::CreateInternalResponse(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	imtgql::CGqlParamObject gqlObject;
 	int operationType = OT_UNKNOWN;
 	if (!GetOperationFromRequest(gqlRequest, gqlObject, errorMessage, operationType)){
-		return nullptr;
+		return QJsonObject();
 	}
 
 	switch (operationType){
@@ -1659,7 +1762,7 @@ QByteArray CObjectCollectionControllerCompBase::GetObjectIdFromRequest(const imt
 }
 
 
-imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObject(
+QJsonObject CObjectCollectionControllerCompBase::GetObject(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
@@ -1667,7 +1770,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObject(
 		errorMessage = QString("Unable to get data object. Error: Attribute 'm_objectCollectionCompPtr' was not set").toUtf8();
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
@@ -1675,7 +1778,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObject(
 		errorMessage = QString("Unable to get data object. Error: GraphQL input params is invalid.").toUtf8();
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	QByteArray objectId = inputParamPtr->GetParamArgumentValue("id").toByteArray();
@@ -1686,27 +1789,28 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObject(
 		errorMessage = QString("Unable to get document. Error: Document does not exists");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
+	QJsonObject rootObj;
+	QJsonObject dataObj;
 
-	if (!CreateRepresentationFromObject(*dataPtr, objectTypeId, gqlRequest, *dataModelPtr, errorMessage)){
+	if (!CreateRepresentationFromObject(*dataPtr, objectTypeId, gqlRequest, dataObj, errorMessage)){
 		if (errorMessage.isEmpty()){
 			errorMessage = QString("Unable create object representation for the object with ID: '%1'.").arg(qPrintable(objectId));
 		}
 
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
-	return rootModelPtr.PopPtr();
+	rootObj.insert(QStringLiteral("data"), dataObj);
+	return rootObj;
 }
 
 
-imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
+QJsonObject CObjectCollectionControllerCompBase::InsertObject(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
@@ -1714,7 +1818,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 		errorMessage = QT_TR_NOOP("Internal error");
 		SendErrorMessage(0, "Internal error", "Object collection controller");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	const imtgql::CGqlParamObject* gqlInputParamPtr = gqlRequest.GetParamObject("input");
@@ -1722,7 +1826,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 		errorMessage = QString("Unable to insert an object. GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	QByteArray typeId = GetObjectTypeIdFromRequest(gqlRequest);
@@ -1744,7 +1848,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 	if (!newObjectPtr.IsValid()){
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	if (!objectIdFromRepresentation.isEmpty()){
@@ -1756,7 +1860,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 		errorMessage = QString("Object with ID: '%1' already exists").arg(qPrintable(objectId));
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr = nullptr;
@@ -1769,7 +1873,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 		errorMessage = QString("Error when creating a new object. Object-ID: '%1'.").arg(qPrintable(objectId));
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	CreateUserActionLog(objectId, typeId, "Create", gqlRequest);
@@ -1777,22 +1881,21 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 	sdl::imtbase::ImtCollection::CAddedNotificationPayload::V1_0 response;
 	response.id = newObjectId;
 
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+	QJsonObject rootObj;
+	QJsonObject dataObj;
 
-	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
-	Q_ASSERT(dataModelPtr != nullptr);
-
-	if (!response.WriteToModel(*dataModelPtr)){
+	if (!response.WriteToJsonObject(dataObj)){
 		errorMessage = QString("Unable to insert object '%1'. Error: Unable to write notification data to the model").arg(qPrintable(newObjectId));
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
-		return nullptr;
+		return QJsonObject();
 	}
 
-	return rootModelPtr.PopPtr();
+	rootObj.insert(QStringLiteral("data"), dataObj);
+	return rootObj;
 }
 
 
-imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
+QJsonObject CObjectCollectionControllerCompBase::UpdateObject(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
@@ -1800,7 +1903,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 		errorMessage = QString("Unable to update an object. Internal error.");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
@@ -1808,13 +1911,13 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 		errorMessage = QString("Unable to update an object. GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	if (!inputParamPtr->ContainsParam("id")){
 		errorMessage = "Bad request. Unable to update object. Parameter 'id' missing.";
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	QByteArray objectId = inputParamPtr->GetParamArgumentValue("id").toByteArray();
@@ -1825,7 +1928,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 	if (!m_objectCollectionCompPtr->GetObjectData(objectId, savedObjectPtr)){
 		errorMessage = QString("Unable to find object with id '%1'").arg(qPrintable(objectId));
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	Q_ASSERT(savedObjectPtr.IsValid());
@@ -1835,7 +1938,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 			errorMessage = QString("Can't update object in the collection: '%1'").arg(qPrintable(objectId));
 		}
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr = nullptr;
@@ -1847,7 +1950,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 		errorMessage = QString("Can not update object: '%1'").arg(qPrintable(objectId));
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	if (name.length() > 0){
@@ -1868,19 +1971,20 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 	sdl::imtbase::ImtCollection::CUpdatedNotificationPayload::V1_0 response;
 	response.id = objectId;
 
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
+	QJsonObject rootObj;
+	QJsonObject dataObj;
 
-	if (!response.WriteToModel(*dataModelPtr, 0)){
+	if (!response.WriteToJsonObject(dataObj)){
 		errorMessage = QString("Unable to update object '%1'. Error: Unable to write notification data to the model").arg(qPrintable(objectId));
-		return nullptr;
+		return QJsonObject();
 	}
 
-	return rootModelPtr.PopPtr();
+	rootObj.insert(QStringLiteral("data"), dataObj);
+	return rootObj;
 }
 
 
-imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::RenameObject(
+QJsonObject CObjectCollectionControllerCompBase::RenameObject(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
@@ -1888,7 +1992,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::RenameObject(
 		errorMessage = QString("Unable to rename object. Component reference 'ObjectCollection' was not set");
 		SendCriticalMessage(0, errorMessage);
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
@@ -1896,7 +2000,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::RenameObject(
 		errorMessage = QString("Unable to rename object. GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	QByteArray objectId = inputParamPtr->GetParamArgumentValue("id").toByteArray();
@@ -1906,20 +2010,21 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::RenameObject(
 		errorMessage = QString("Unable to set name '%1' for element with ID: '%2'").arg(newName, qPrintable(objectId));
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
+	QJsonObject rootObj;
+	QJsonObject dataObj;
 
-	dataModel->SetData("id", objectId);
-	dataModel->SetData("name", newName);
+	dataObj.insert(QStringLiteral("id"), QJsonValue::fromVariant(objectId));
+	dataObj.insert(QStringLiteral("name"), newName);
 
-	return rootModelPtr.PopPtr();
+	rootObj.insert(QStringLiteral("data"), dataObj);
+	return rootObj;
 }
 
 
-imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::SetObjectDescription(
+QJsonObject CObjectCollectionControllerCompBase::SetObjectDescription(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
@@ -1927,7 +2032,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::SetObjectDescripti
 		errorMessage = QString("Unable to set the object description. Component reference 'ObjectCollection' was not set");
 		SendCriticalMessage(0, errorMessage);
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
@@ -1935,7 +2040,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::SetObjectDescripti
 		errorMessage = QString("Unable to set description for object. GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	QByteArray objectId = inputParamPtr->GetParamArgumentValue("id").toByteArray();
@@ -1945,20 +2050,21 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::SetObjectDescripti
 		errorMessage = QString("Unable to set description '%1' for element with ID: '%2'").arg(description, qPrintable(objectId));
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
+	QJsonObject rootObj;
+	QJsonObject dataObj;
 
-	dataModelPtr->SetData("id", objectId);
-	dataModelPtr->SetData("description", description);
+	dataObj.insert(QStringLiteral("id"), QJsonValue::fromVariant(objectId));
+	dataObj.insert(QStringLiteral("description"), description);
 
-	return rootModelPtr.PopPtr();
+	rootObj.insert(QStringLiteral("data"), dataObj);
+	return rootObj;
 }
 
 
-imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
+QJsonObject CObjectCollectionControllerCompBase::ListObjects(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
@@ -1966,11 +2072,11 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 		errorMessage = QString("Unable to list objects. Component reference 'ObjectCollection' was not set");
 		SendCriticalMessage(0, errorMessage);
 
-		return nullptr;
+		return QJsonObject();
 	}
 
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
+	QJsonObject rootObj;
+	QJsonObject dataObj;
 
 	iprm::CParamsSet filterParams;
 
@@ -2002,49 +2108,57 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 		count = -1;
 	}
 
-	int elementsCount = m_objectCollectionCompPtr->GetElementsCount(&filterParams);
-
-	int pagesCount = std::ceil(elementsCount / (double)count);
-	if (pagesCount <= 0){
-		pagesCount = 1;
-	}
-
-	imtbase::CTreeItemModel* notificationModelPtr = dataModelPtr->AddTreeModel("notification");
-	notificationModelPtr->SetData("pagesCount", pagesCount);
-	notificationModelPtr->SetData("totalCount", elementsCount);
-
 	istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(
 		m_objectCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), offset, count, &filterParams));
 	if (objectCollectionIterator == nullptr){
 		errorMessage = QString("Object collection iterator creation failed");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
-	imtbase::CTreeItemModel* itemsModelPtr = dataModelPtr->AddTreeModel("items");
-	itemsModelPtr->SetIsArray(true);
+	// GetElementsCount() returns the total count across all pages (from COUNT(*) OVER()),
+	// not just the number of records in the current page.
+	int elementsCount = objectCollectionIterator->GetElementsCount();
+
+	int pagesCount = std::ceil(elementsCount / (double)count);
+	if (pagesCount <= 0){
+		pagesCount = 1;
+	}
+
+	QJsonObject notificationObj;
+	notificationObj.insert(QStringLiteral("pagesCount"), pagesCount);
+	notificationObj.insert(QStringLiteral("totalCount"), elementsCount);
+	dataObj.insert(QStringLiteral("notification"), notificationObj);
+
+	QJsonArray itemsArray;
+
+	const GqlItemSetupContext setupContext = CreateGqlItemSetupContext(gqlRequest, errorMessage);
+	if (!errorMessage.isEmpty()){
+		return QJsonObject();
+	}
+
 	while (objectCollectionIterator->Next()){
-		imtbase::IObjectCollection::DataPtr objectDataPtr;
-		int itemIndex = itemsModelPtr->InsertNewItem();
-		if (itemIndex >= 0){
-			if (!SetupGqlItem(gqlRequest, *itemsModelPtr, itemIndex, objectCollectionIterator.GetPtr(), errorMessage)){
-				SendWarningMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
-			}
+		QJsonObject itemObj;
+		if (!SetupGqlItemWithContext(gqlRequest, setupContext, itemObj, objectCollectionIterator.GetPtr(), errorMessage)){
+			SendWarningMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		}
+		itemsArray.append(itemObj);
 	}
+	dataObj.insert(QStringLiteral("items"), itemsArray);
 
-	return rootModelPtr.PopPtr();
+	rootObj.insert(QStringLiteral("data"), dataObj);
+	return rootObj;
 }
 
 
-imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetElementsCount(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CObjectCollectionControllerCompBase::GetElementsCount(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QString("Unable to get the element count. Component reference 'ObjectCollection' was not set");
 		SendCriticalMessage(0, errorMessage);
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	const imtgql::CGqlParamObject* inputParamsPtr = gqlRequest.GetParamObject("input");
@@ -2052,7 +2166,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetElementsCount(c
 		errorMessage = QString("Unable to rename object. GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	iprm::CParamsSet filterParams;
@@ -2069,15 +2183,16 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetElementsCount(c
 
 	int elementsCount = m_objectCollectionCompPtr->GetElementsCount(&filterParams);
 
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
-	dataModelPtr->SetData("itemsCount", elementsCount);
+	QJsonObject rootObj;
+	QJsonObject dataObj;
+	dataObj.insert(QStringLiteral("itemsCount"), elementsCount);
 
-	return rootModelPtr.PopPtr();
+	rootObj.insert(QStringLiteral("data"), dataObj);
+	return rootObj;
 }
 
 
-imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
+QJsonObject CObjectCollectionControllerCompBase::DeleteObject(
 	const imtgql::CGqlRequest& gqlRequest,
 	QString& errorMessage) const
 {
@@ -2085,12 +2200,12 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
 		errorMessage = QString("Unable to remove the object from the collection. Component reference 'ObjectCollection' was not set");
 		SendCriticalMessage(0, errorMessage);
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	imtbase::ICollectionInfo::Ids objectIds = ExtractObjectIdsForRemoval(gqlRequest, errorMessage);
 	if (!errorMessage.isEmpty()){
-		return nullptr;
+		return QJsonObject();
 	}
 
 	imtbase::ICollectionInfo::Ids elementIds = m_objectCollectionCompPtr->GetElementIds();
@@ -2098,7 +2213,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
 		if (!elementIds.contains(objectId)){
 			errorMessage = QString("Unable to delete object. Object with ID '%1' does not exists").arg(QString(objectId));
 			SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
-			return nullptr;
+			return QJsonObject();
 		}
 	}
 
@@ -2111,89 +2226,88 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
 		errorMessage = QString("Can't remove object with ID: '%1'").arg(QString(objectIds.toList().join(';')));
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	sdl::imtbase::ImtCollection::CRemovedNotificationPayload::V1_0 response;
 	response.elementIds.Emplace();
 	response.elementIds->FromList(objectIds);
 
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+	QJsonObject rootObj;
+	QJsonObject dataObj;
 
-	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
-	Q_ASSERT(dataModelPtr != nullptr);
-
-	if (!response.WriteToModel(*dataModelPtr)){
+	if (!response.WriteToJsonObject(dataObj)){
 		errorMessage = QString("Unable to delete object '%1'. Error: Unable to write notification data to the model").arg(qPrintable(objectIds.toList().join(';')));
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
-		return nullptr;
+		return QJsonObject();
 	}
 
-	return rootModelPtr.PopPtr();
+	rootObj.insert(QStringLiteral("data"), dataObj);
+	return rootObj;
 }
 
 
-imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetMetaInfo(
+QJsonObject CObjectCollectionControllerCompBase::GetMetaInfo(
 			const imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
-	return nullptr;
+	return QJsonObject();
 }
 
 
-imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetInfo(
+QJsonObject CObjectCollectionControllerCompBase::GetInfo(
 			const imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
-	return nullptr;
+	return QJsonObject();
 }
 
 
-imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetDataMetaInfo(
+QJsonObject CObjectCollectionControllerCompBase::GetDataMetaInfo(
 			const imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
-	return nullptr;
+	return QJsonObject();
 }
 
 
-imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObjectTypeId(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CObjectCollectionControllerCompBase::GetObjectTypeId(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
-		return nullptr;
+		return QJsonObject();
 	}
 
 	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
 		errorMessage = QT_TR_NOOP("Unable to import the object. GQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
-		return nullptr;
+		return QJsonObject();
 	}
 
 	QByteArray objectId = inputParamPtr->GetParamArgumentValue("id").toByteArray();
 
 	QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
 
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	rootModelPtr->SetData("typeId", typeId);
+	QJsonObject rootObj;
+	rootObj.insert(QStringLiteral("typeId"), QJsonValue::fromVariant(typeId));
 
-	return rootModelPtr.PopPtr();
+	return rootObj;
 }
 
 
-imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ImportObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CObjectCollectionControllerCompBase::ImportObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
-		return nullptr;
+		return QJsonObject();
 	}
 
 	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
 		errorMessage = QT_TR_NOOP("Unable to import the object. GQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
-		return nullptr;
+		return QJsonObject();
 	}
 
 	QByteArray objectData = inputParamPtr->GetParamArgumentValue("fileData").toByteArray();
@@ -2207,17 +2321,17 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ImportObject(const
 	if (index < 0){
 		errorMessage = "Mime type is invalid";
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
-		return nullptr;
+		return QJsonObject();
 	}
 	if (index >= m_importExportObjectFactCompPtr.GetCount()){
 		errorMessage = "Import/Export object factory index out of range";
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
-		return nullptr;
+		return QJsonObject();
 	}
 	if (index >= m_filePersistenceCompPtr.GetCount()){
 		errorMessage = "File persistence index out of range";
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
-		return nullptr;
+		return QJsonObject();
 	}
 
 	istd::IChangeableUniquePtr objectPersistenceInstancePtr = m_importExportObjectFactCompPtr.CreateInstance(index);
@@ -2225,7 +2339,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ImportObject(const
 		errorMessage = QString("Unable to import object to the collection. Error: Object instance is invalid");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	imtbase::CMimeType mime;
@@ -2233,7 +2347,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ImportObject(const
 		errorMessage = QString("Unable to parse mime type");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	QString extension = GetExtensionFromMimeType(mime);
@@ -2244,7 +2358,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ImportObject(const
 	QFile file(filePathTmp);
 	if (!file.open(QIODevice::WriteOnly)){
 		SendErrorMessage(0, QString("Unable to open file with name '%1'").arg(filePathTmp), "CObjectCollectionControllerCompBase");
-		return nullptr;
+		return QJsonObject();
 	}
 
 	file.write(data);
@@ -2255,7 +2369,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ImportObject(const
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		QFile::remove(filePathTmp);
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	QByteArray objectUuid = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
@@ -2269,7 +2383,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ImportObject(const
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		QFile::remove(filePathTmp);
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	int typeIdIndex = GetObjectTypeIdIndex(typeId);
@@ -2280,11 +2394,11 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ImportObject(const
 		errorMessage = QString("Unable to import object to the collection. Error: Object instance is invalid");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	if (!ConvertObject(*objectPersistenceInstancePtr.GetPtr(), *collectionObjectInstancePtr.GetPtr())){
-		return nullptr;
+		return QJsonObject();
 	}
 
 	QByteArray retVal = m_objectCollectionCompPtr->InsertNewObject(typeId, name, description, collectionObjectInstancePtr.GetPtr(), objectUuid);
@@ -2293,30 +2407,30 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ImportObject(const
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		QFile::remove(filePathTmp);
 
-		return nullptr;
+		return QJsonObject();
 	}
 
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	rootModelPtr->SetData("id", objectUuid);
-	rootModelPtr->SetData("status", "ok");
+	QJsonObject rootObj;
+	rootObj.insert(QStringLiteral("id"), QJsonValue::fromVariant(objectUuid));
+	rootObj.insert(QStringLiteral("status"), QStringLiteral("ok"));
 	QFile::remove(filePathTmp);
 
-	return rootModelPtr.PopPtr();
+	return rootObj;
 }
 
 
-imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ExportObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CObjectCollectionControllerCompBase::ExportObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
-		return nullptr;
+		return QJsonObject();
 	}
 
 	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
 		errorMessage = QT_TR_NOOP("Unable to import the object. GQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
-		return nullptr;
+		return QJsonObject();
 	}
 
 	QByteArray objectId = inputParamPtr->GetParamArgumentValue("id").toByteArray();
@@ -2327,7 +2441,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ExportObject(const
 		errorMessage = QString("Unable to export the object with ID: '%1'. Error: Object does not exists").arg(qPrintable(objectId));
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	int index = GetMimeTypeIndex(mimeType);
@@ -2335,19 +2449,19 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ExportObject(const
 		errorMessage = "Mime type is invalid";
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
-		return nullptr;
+		return QJsonObject();
 	}
 	if (index >= m_importExportObjectFactCompPtr.GetCount()){
 		errorMessage = "Import/Export object factory index out of range";
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
-		return nullptr;
+		return QJsonObject();
 	}
 	if (index >= m_filePersistenceCompPtr.GetCount()){
 		errorMessage = "File persistence index out of range";
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	imtbase::CMimeType mime;
@@ -2355,7 +2469,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ExportObject(const
 		errorMessage = QString("Unable to parse mime type");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	QString extension = GetExtensionFromMimeType(mime);
@@ -2370,18 +2484,18 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ExportObject(const
 		errorMessage = QString("Unable to import object to the collection. Error: Object persistence instance is invalid");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	if (!ConvertObject(*dataPtr.GetPtr(), *objectPersistenceInstancePtr.GetPtr())){
-		return nullptr;
+		return QJsonObject();
 	}
 
 	if (m_filePersistenceCompPtr[index]->SaveToFile(*objectPersistenceInstancePtr.GetPtr(), filePathTmp) != ifile::IFilePersistence::OS_OK){
 		errorMessage = QString("Unable to export the object with ID: '%1'. Error: Saving data to the file '%1' failed").arg(qPrintable(objectId), filePathTmp);
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	QFile file(filePathTmp);
@@ -2390,18 +2504,18 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ExportObject(const
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		QFile::remove(filePathTmp);
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	QByteArray data = file.readAll();
 	file.close();
 	QFile::remove(filePathTmp);
 
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	rootModelPtr->SetData("fileData", data.toBase64());
-	rootModelPtr->SetData("fileName", fileName);
+	QJsonObject rootObj;
+	rootObj.insert(QStringLiteral("fileData"), QString::fromUtf8(data.toBase64()));
+	rootObj.insert(QStringLiteral("fileName"), fileName);
 
-	return rootModelPtr.PopPtr();
+	return rootObj;
 }
 
 
@@ -2506,10 +2620,28 @@ imtbase::ICollectionInfo::Ids CObjectCollectionControllerCompBase::ExtractObject
 }
 
 
+CObjectCollectionControllerCompBase::GqlItemSetupContext CObjectCollectionControllerCompBase::CreateGqlItemSetupContext(
+			const imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
+{
+	return {};
+}
+
+
+bool CObjectCollectionControllerCompBase::SetupGqlItemWithContext(
+			const imtgql::CGqlRequest& gqlRequest,
+			const GqlItemSetupContext& /*setupContext*/,
+			QJsonObject& itemObj,
+			const imtbase::IObjectCollectionIterator* objectCollectionIterator,
+			QString& errorMessage) const
+{
+	return SetupGqlItem(gqlRequest, itemObj, objectCollectionIterator, errorMessage);
+}
+
+
 bool CObjectCollectionControllerCompBase::SetupGqlItem(
 			const imtgql::CGqlRequest& gqlRequest,
-			imtbase::CTreeItemModel& model,
-			int itemIndex,
+			QJsonObject& itemObj,
 			const QByteArray& collectionId,
 			QString& /*errorMessage*/) const
 {
@@ -2554,7 +2686,7 @@ bool CObjectCollectionControllerCompBase::SetupGqlItem(
 			elementInformation = "";
 		}
 
-		retVal = retVal && model.SetData(informationId, elementInformation, itemIndex);
+		itemObj.insert(QString::fromUtf8(informationId), QJsonValue::fromVariant(elementInformation));
 	}
 
 	return retVal;
@@ -2563,8 +2695,7 @@ bool CObjectCollectionControllerCompBase::SetupGqlItem(
 
 bool CObjectCollectionControllerCompBase::SetupGqlItem(
 			const imtgql::CGqlRequest& gqlRequest,
-			imtbase::CTreeItemModel& model,
-			int itemIndex,
+			QJsonObject& itemObj,
 			const imtbase::IObjectCollectionIterator* objectCollectionIterator,
 			QString&/*errorMessage*/) const
 {
@@ -2615,7 +2746,7 @@ bool CObjectCollectionControllerCompBase::SetupGqlItem(
 			elementInformation = "";
 		}
 
-		retVal = retVal && model.SetData(informationId, elementInformation, itemIndex);
+		itemObj.insert(QString::fromUtf8(informationId), QJsonValue::fromVariant(elementInformation));
 	}
 
 	return retVal;
@@ -2659,7 +2790,7 @@ bool CObjectCollectionControllerCompBase::CreateRepresentationFromObject(
 			const istd::IChangeable& /*data*/,
 			const QByteArray& /*objectTypeId*/,
 			const imtgql::CGqlRequest& /*gqlRequest*/,
-			imtbase::CTreeItemModel& /*dataModel*/,
+			QJsonObject& /*dataObj*/,
 			QString& /*errorMessage*/) const
 {
 	return false;
@@ -2693,6 +2824,12 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 			iprm::CParamsSet& filterParams) const
 {
 	this->SetAdditionalFilters(gqlRequest, inputParamsGql, &filterParams);
+
+	// Inject optional tenant filter
+	imtauth::CTenantFilterParam* tenantFilterPtr = CreateTenantFilterParam(gqlRequest);
+	if (tenantFilterPtr != nullptr){
+		filterParams.SetEditableParameter("TenantFilter", tenantFilterPtr, true);
+	}
 
 	const imtgql::CGqlParamObject* complexFilterModelPtr = inputParamsGql.GetParamArgumentObjectPtr("filterModel");
 	const imtgql::CGqlParamObject* documentFilterModelPtr = inputParamsGql.GetParamArgumentObjectPtr("documentFilterModel");
@@ -2770,6 +2907,27 @@ void CObjectCollectionControllerCompBase::SetAdditionalFilters(
 			const imtgql::CGqlRequest& /*gqlRequest*/,
 			imtbase::CComplexCollectionFilter& /*complexFilter*/) const
 {
+}
+
+
+imtauth::CTenantFilterParam* CObjectCollectionControllerCompBase::CreateTenantFilterParam(
+			const imtgql::CGqlRequest& gqlRequest) const
+{
+	bool filterEnabled = m_tenantFilterEnabledAttrPtr.IsValid() ? *m_tenantFilterEnabledAttrPtr : false;
+	if (!filterEnabled){
+		return nullptr;
+	}
+
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr == nullptr){
+		return nullptr;
+	}
+
+	imtauth::CTenantFilterParam* tenantFilterPtr = new imtauth::CTenantFilterParam();
+	tenantFilterPtr->SetTenantId(gqlContextPtr->GetTenantId());
+	tenantFilterPtr->SetOwnerId(gqlContextPtr->GetUserId());
+
+	return tenantFilterPtr;
 }
 
 
@@ -3149,5 +3307,3 @@ bool CObjectCollectionControllerCompBase::CreateUserActionLog(
 
 
 } // namespace imtservergql
-
-

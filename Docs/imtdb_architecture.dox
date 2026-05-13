@@ -1,0 +1,720 @@
+/**
+@page imtdb_architecture ImtDB Library Architecture
+
+@tableofcontents
+
+@section imtdb_overview Overview
+
+The **imtdb** library is a comprehensive Database Abstraction Layer (ORM-like framework) designed for 
+managing database operations in ImtCore applications. It provides a complete ecosystem for multi-database 
+support, object-relational mapping, transaction management, schema migrations, and metadata persistence.
+
+@section imtdb_purpose Core Purpose
+
+The library addresses the following key requirements:
+- **Multi-Database Support**: Unified interface for PostgreSQL, SQLite, and file-based databases
+- **Object-Relational Mapping**: Bidirectional mapping between C++ objects and database records
+- **SQL Query Generation**: Automatic generation of parameterized SQL queries for CRUD operations
+- **Transaction Management**: ACID-compliant transactions with multi-collection coordination
+- **Schema Migrations**: Version-controlled database schema evolution and upgrade management
+- **Document Management**: JSON-based serialization of complex objects with metadata
+- **Revision Control**: Audit trail and version history for data changes
+- **Hierarchical Structures**: Support for tree-structured data and parent-child relationships
+- **Metadata Management**: Rich metadata with cascading updates and dependent data cleanup
+- **Backup & Restore**: Automated backup scheduling and database restoration capabilities
+
+@section imtdb_architecture_layers Architectural Layers
+
+The imtdb architecture follows a layered approach with clear separation of concerns:
+
+@verbatim
+┌─────────────────────────────────────────────────────────────┐
+│              Application Layer                               │
+│        (IObjectCollection, Business Logic)                   │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│         ORM Layer (Object-Relational Mapping)               │
+│    ISqlDatabaseObjectDelegate, CSqlDatabaseObjectDelegateComp│
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│     SQL Generation Layer (Query Builders)                   │
+│  CreateInsertQuery, CreateSelectQuery, CreateUpdateQuery    │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│        Database Engine Layer                                │
+│    IDatabaseEngine, CDatabaseEngineComp                     │
+│  (Transaction Management, Query Execution)                  │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│         Qt SQL Driver Layer (QSqlDatabase)                  │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│    Database Server (PostgreSQL, SQLite, Files)             │
+└─────────────────────────────────────────────────────────────┘
+@endverbatim
+
+@section imtdb_arch_interface Interface Layer
+
+The interface layer defines the core abstractions for database management:
+
+<table>
+<tr><th>Interface</th><th>Purpose</th></tr>
+<tr><td>@ref imtdb::IDatabaseEngine</td>
+    <td>Low-level SQL execution: transactions, query execution (static & from files), database/table creation</td></tr>
+<tr><td>@ref imtdb::IDatabaseConnector</td>
+    <td>Database connection lifecycle management (connect, disconnect, connection state)</td></tr>
+<tr><td>@ref imtdb::IDatabaseLoginSettings</td>
+    <td>Connection parameters: host, port, database name, username, password, file path</td></tr>
+<tr><td>@ref imtdb::IDatabaseObjectDelegate</td>
+    <td>Bridge between database and C++ objects; generates SQL queries for CRUD operations</td></tr>
+<tr><td>@ref imtdb::ISqlDatabaseObjectDelegate</td>
+    <td>Extended delegate: converts SQL records to objects, creates meta-information from records</td></tr>
+<tr><td>@ref imtdb::ISqlDatabaseObjectCollection</td>
+    <td>Manages collections of objects in SQL database with transaction control and filtering</td></tr>
+<tr><td>@ref imtdb::IMigrationController</td>
+    <td>Manages database schema versioning and executes migration scripts</td></tr>
+<tr><td>@ref imtdb::IDatabaseServerConnectionChecker</td>
+    <td>Verifies database server connectivity and health status</td></tr>
+<tr><td>@ref imtdb::IDependentMetaInfoController</td>
+    <td>Manages cascading metadata updates when related objects are deleted</td></tr>
+<tr><td>@ref imtdb::IJsonBasedMetaInfoDelegate</td>
+    <td>Converts object metadata to/from JSON representation</td></tr>
+<tr><td>@ref imtdb::IMetaInfoTableDelegate</td>
+    <td>Describes database table structure and metadata column mappings</td></tr>
+<tr><td>@ref imtdb::ISqlJsonXPathExtractor</td>
+    <td>Database-specific JSON field extraction (PostgreSQL vs SQLite dialects)</td></tr>
+</table>
+
+@section imtdb_arch_components Component Implementations
+
+@subsection imtdb_arch_connection Database Connection & Management
+
+<table>
+<tr><th>Component</th><th>Purpose</th></tr>
+<tr><td>@ref imtdb::CDatabaseEngineComp</td>
+    <td>Core database engine: manages connections, transactions, query execution, 
+        automatic database/table creation</td></tr>
+<tr><td>@ref imtdb::CDatabaseConnectorComp</td>
+    <td>Manages connections to remote database servers with credential handling</td></tr>
+<tr><td>@ref imtdb::CDatabaseAccessSettings</td>
+    <td>Stores and manages database connection credentials and settings</td></tr>
+<tr><td>@ref imtdb::CDatabaseAccessSettingsComp</td>
+    <td>Component wrapper for CDatabaseAccessSettings with ACF integration</td></tr>
+<tr><td>@ref imtdb::CDatabaseAutomaticBackupComp</td>
+    <td>Schedules periodic database backups with configurable retention policies</td></tr>
+</table>
+
+@subsection imtdb_arch_collections Object Collections & Delegates
+
+<table>
+<tr><th>Component</th><th>Purpose</th></tr>
+<tr><td>@ref imtdb::CSqlDatabaseObjectCollectionComp</td>
+    <td>Core collection implementation: manages CRUD operations on object collections via SQL</td></tr>
+<tr><td>@ref imtdb::CSqlDatabaseObjectDelegateCompBase</td>
+    <td>Base implementation for object delegates: generates SQL queries for CRUD operations,
+        handles filtering, sorting, and pagination</td></tr>
+<tr><td>@ref imtdb::CSqlDatabaseDocumentDelegateComp</td>
+    <td>Specialized delegate for document-based objects with JSON metadata, revision tracking,
+        and dependent metadata management</td></tr>
+<tr><td>@ref imtdb::CSqlDatabaseDocumentDelegateLegacyComp</td>
+    <td>Legacy version of document delegate for backward compatibility</td></tr>
+<tr><td>@ref imtdb::CSqlJsonDatabaseDelegateComp</td>
+    <td>Extension supporting JSON-based object serialization and deserialization</td></tr>
+<tr><td>@ref imtdb::CSqliteDatabaseDocumentDelegateComp</td>
+    <td>SQLite-specific document delegate with dialect-specific SQL (LIMIT/OFFSET, JSON functions)</td></tr>
+<tr><td>@ref imtdb::CSqliteJsonDatabaseDelegateComp</td>
+    <td>SQLite-specific JSON delegate implementation</td></tr>
+<tr><td>@ref imtdb::CSqlDatabaseObjectCollectionIterator</td>
+    <td>Iterator for traversing SQL query results and converting records to objects</td></tr>
+<tr><td>@ref imtdb::CSqlDatabaseCollectionStructureIterator</td>
+    <td>Iterator for traversing hierarchical tree structures in database</td></tr>
+</table>
+
+@subsection imtdb_arch_metadata Metadata Management
+
+<table>
+<tr><th>Component</th><th>Purpose</th></tr>
+<tr><td>@ref imtdb::CJsonBasedMetaInfoDelegateComp</td>
+    <td>Abstract base for JSON ↔ MetaInfo conversion (subclasses implement specific representations)</td></tr>
+<tr><td>@ref imtdb::CStandardSqlMetaInfoTableDelegateComp</td>
+    <td>Defines metadata table schema and handles metadata field conversions</td></tr>
+<tr><td>@ref imtdb::CDependentTableMetaInfoControllerComp</td>
+    <td>Observes collection changes and triggers dependent metadata cleanup on deletions</td></tr>
+</table>
+
+@subsection imtdb_arch_sql SQL & JSON Handling
+
+<table>
+<tr><th>Component</th><th>Purpose</th></tr>
+<tr><td>@ref imtdb::CPostgresXPathExtractorComp</td>
+    <td>PostgreSQL-specific JSON extraction using operators: `->`, `->>`, `#>`</td></tr>
+<tr><td>@ref imtdb::CSqliteXPathExtractorComp</td>
+    <td>SQLite-specific JSON extraction using functions: `json_extract()`, `json_type()`</td></tr>
+<tr><td>@ref imtdb::CComplexCollectionFilterConverter</td>
+    <td>Converts filter parameters (IParamsSet) to SQL WHERE clauses with proper escaping</td></tr>
+<tr><td>@ref imtdb::CSqlStructureDelegateCompBase</td>
+    <td>Base class for hierarchical structure management (tree nodes and leaves)</td></tr>
+<tr><td>@ref imtdb::CSqlStructureDelegateComp</td>
+    <td>Concrete implementation of structure delegate for tree-based data</td></tr>
+</table>
+
+@subsection imtdb_arch_migrations Migrations & Versioning
+
+<table>
+<tr><th>Component</th><th>Purpose</th></tr>
+<tr><td>@ref imtdb::CMigrationControllerComp</td>
+    <td>Reads SQL migration scripts from folders and executes schema upgrades sequentially</td></tr>
+<tr><td>@ref imtdb::CMigrationControllerCompBase</td>
+    <td>Base migration logic with version range tracking and script execution</td></tr>
+<tr><td>@ref imtdb::CCompositeMigrationControllerComp</td>
+    <td>Combines multiple migration controllers with coordinated sequential execution</td></tr>
+<tr><td>@ref imtdb::CObjectCollectionMigrationControllerComp</td>
+    <td>Migration controller specialized for object collection schema changes</td></tr>
+</table>
+
+@subsection imtdb_arch_advanced Advanced Features
+
+<table>
+<tr><th>Component</th><th>Purpose</th></tr>
+<tr><td>@ref imtdb::CSqlDatabaseTransactionManagerComp</td>
+    <td>Coordinates ACID transactions across multiple collections with rollback support</td></tr>
+<tr><td>@ref imtdb::CRestoringDatabaseControllerComp</td>
+    <td>Database backup and restore using command-line tools (pg_dump, pg_restore)</td></tr>
+<tr><td>@ref imtdb::TMessageDatabaseDelegateComp</td>
+    <td>Template-based delegate for message/notification persistence</td></tr>
+</table>
+
+@section imtdb_patterns Architectural Patterns
+
+@subsection imtdb_pattern_delegate Delegate Pattern
+
+The imtdb library extensively uses the Delegate pattern to separate collection logic from database-specific operations:
+
+- **IDatabaseObjectDelegate** abstracts SQL generation from collection management
+- Subclasses provide type-specific and database-specific query generation
+- Enables swapping database backends (PostgreSQL ↔ SQLite) without changing collection code
+- Allows specialized delegates for documents, messages, and hierarchical structures
+
+@subsection imtdb_pattern_template Template Method
+
+Base classes define algorithmic structure while subclasses provide specific implementations:
+
+- **CSqlDatabaseObjectDelegateCompBase** provides query generation template
+- **CMigrationControllerCompBase** defines migration execution flow
+- Subclasses override specific methods for database-specific SQL dialects
+
+@subsection imtdb_pattern_component Component-Based Architecture
+
+Uses ACF (Application Component Framework) for dependency injection:
+
+- Components declared with `I_BEGIN_COMPONENT` / `I_END_COMPONENT`
+- Dependencies injected via `I_ASSIGN` (references and attributes)
+- Configuration-driven composition for flexible system assembly
+- Hot-swappable implementations through component substitution
+
+@subsection imtdb_pattern_observer Observer Pattern
+
+Components observe changes and trigger cascading operations:
+
+- Database access settings notify components of connection parameter changes
+- **CDependentTableMetaInfoControllerComp** observes collection updates
+- Enables automatic cleanup of dependent metadata on object deletion
+
+@subsection imtdb_pattern_adapter Adapter Pattern
+
+Adapters bridge between different abstraction layers:
+
+- **CSqlDatabaseDocumentDelegateComp** adapts documents to SQL tables
+- **CJsonBasedMetaInfoDelegate** adapts metadata to JSON representation
+- **CSqlJsonXPathExtractor** adapts JSON queries to database-specific syntax
+
+@subsection imtdb_pattern_factory Factory Pattern
+
+Factory methods create objects based on runtime type information:
+
+- Document factories create objects by TypeId
+- Collection factories create sub-collections for hierarchical data
+- Enables polymorphic object creation from database records
+
+@section imtdb_workflows Main Workflows
+
+@subsection imtdb_workflow_insert Object Insertion Flow
+
+@verbatim
+InsertNewObject(object)
+  ↓
+1. Validate object data
+  ↓
+2. CreateNewObjectQuery()
+   - Generate SQL INSERT statement
+   - Serialize object data (binary/JSON)
+   - Create metadata JSON
+  ↓
+3. Add operation context
+   - User ID, timestamp
+   - Operation description
+  ↓
+4. ExecuteTransaction()
+   - Begin transaction
+   - Execute INSERT
+   - Commit or rollback
+  ↓
+5. Return generated object ID
+@endverbatim
+
+@subsection imtdb_workflow_retrieve Object Retrieval Flow
+
+@verbatim
+GetObjectData(filters, sort, pagination)
+  ↓
+1. Build selection query
+   - CreateFilterQuery() → WHERE clause
+   - CreateSortQuery() → ORDER BY clause
+   - CreatePaginationQuery() → LIMIT/OFFSET
+  ↓
+2. ExecuteQuery(sql)
+  ↓
+3. For each record in result set:
+   a. CreateObjectFromRecord()
+      - Deserialize object data
+   b. CreateObjectInfoFromRecord()
+      - Extract metadata
+      - Parse JSON fields
+  ↓
+4. Return populated object collection
+@endverbatim
+
+@subsection imtdb_workflow_update Object Update Flow
+
+@verbatim
+UpdateObject(objectId, newData)
+  ↓
+1. Backup current revision (if enabled)
+   - Serialize current state
+   - Calculate checksum
+   - Store in revision table
+  ↓
+2. CreateUpdateQuery()
+   - Generate SQL UPDATE
+   - Update modified fields
+   - Update LastModified timestamp
+  ↓
+3. Update metadata
+   - Increment revision number
+   - Record operation context
+  ↓
+4. ExecuteTransaction()
+  ↓
+5. Notify observers (dependent metadata updates)
+@endverbatim
+
+@subsection imtdb_workflow_dependent Dependent Metadata Cleanup Flow
+
+@verbatim
+RemoveElements(objectIds)
+  ↓
+1. For each object ID:
+   ClearDependentMetaInfo(metaInfo)
+  ↓
+2. Find dependent tables
+   - Parse DataMetaInfo JSON
+   - Identify referenced objects
+   Example: Order objects referencing deleted Customer
+  ↓
+3. Extract referencing object IDs
+   - Query dependent tables
+   - Find objects with references to deleted items
+  ↓
+4. Update metadata JSON fields
+   - Remove stale references
+   - Update metadata timestamps
+  ↓
+5. Execute batch updates
+   - NULL out or remove dependent references
+   - Preserve data integrity
+@endverbatim
+
+@subsection imtdb_workflow_migration Database Migration Flow
+
+@verbatim
+DoMigration(targetVersion)
+  ↓
+1. GetMigrationRange()
+   - Determine current database version
+   - Calculate required migration steps
+  ↓
+2. For each version in range:
+   a. Load migration SQL script
+      - Read from configured folder
+      - Format: "migration_v001_to_v002.sql"
+   b. Validate script syntax
+   c. Begin transaction
+   d. Execute migration script
+   e. Update schema version table
+   f. Commit transaction
+  ↓
+3. Handle errors
+   - Rollback on failure
+   - Log migration errors
+  ↓
+4. Return final database version
+@endverbatim
+
+@subsection imtdb_workflow_transaction Transaction Management Flow
+
+@verbatim
+CSqlDatabaseTransactionManagerComp::StartTransaction()
+  ↓
+1. Disable internal transactions
+   - Suspend auto-commit on all collections
+  ↓
+2. DatabaseEngine.BeginTransaction()
+  ↓
+3. Application performs operations
+   - Multiple inserts/updates/deletes
+   - Across multiple collections
+  ↓
+4. EndTransaction(commit=true/false)
+  ↓
+5. If commit:
+   a. Execute accumulated SQL statements
+   b. DatabaseEngine.FinishTransaction()
+   c. Re-enable collection auto-transactions
+   Else:
+   a. DatabaseEngine.RollbackTransaction()
+   b. Discard pending operations
+   c. Re-enable collection auto-transactions
+@endverbatim
+
+@section imtdb_subsystems Major Subsystems
+
+<table>
+<tr><th>Subsystem</th><th>Key Components</th><th>Purpose</th></tr>
+<tr><td><b>Connection Management</b></td>
+    <td>IDatabaseEngine, CDatabaseEngineComp, CDatabaseConnectorComp</td>
+    <td>Connect/disconnect, manage database connections, execute raw SQL</td></tr>
+<tr><td><b>Object Collections</b></td>
+    <td>CSqlDatabaseObjectCollectionComp, ISqlDatabaseObjectCollection</td>
+    <td>CRUD operations on object collections with filtering and pagination</td></tr>
+<tr><td><b>Delegation & ORM</b></td>
+    <td>IDatabaseObjectDelegate, CSqlDatabaseObjectDelegateCompBase</td>
+    <td>SQL generation strategies, object-relational mapping</td></tr>
+<tr><td><b>Document Management</b></td>
+    <td>CSqlDatabaseDocumentDelegateComp, CSqlJsonDatabaseDelegateComp</td>
+    <td>Serialization of complex objects, JSON-based document storage</td></tr>
+<tr><td><b>Metadata System</b></td>
+    <td>IJsonBasedMetaInfoDelegate, CStandardSqlMetaInfoTableDelegateComp</td>
+    <td>Object metadata, attributes, custom fields</td></tr>
+<tr><td><b>Revision Control</b></td>
+    <td>CSqlDatabaseDocumentDelegateComp (IRevisionController)</td>
+    <td>Audit trail, version history, object change tracking</td></tr>
+<tr><td><b>Hierarchical Data</b></td>
+    <td>CSqlStructureDelegateCompBase, CSqlDatabaseCollectionStructureIterator</td>
+    <td>Tree-structured data, parent-child relationships</td></tr>
+<tr><td><b>Schema Migrations</b></td>
+    <td>IMigrationController, CMigrationControllerComp</td>
+    <td>Database versioning, schema evolution, upgrade scripts</td></tr>
+<tr><td><b>Transaction Management</b></td>
+    <td>CSqlDatabaseTransactionManagerComp</td>
+    <td>Multi-collection ACID transactions, coordinated commits</td></tr>
+<tr><td><b>Backup & Restore</b></td>
+    <td>CRestoringDatabaseControllerComp, CDatabaseAutomaticBackupComp</td>
+    <td>Data persistence, disaster recovery, automated backups</td></tr>
+<tr><td><b>JSON Operations</b></td>
+    <td>CPostgresXPathExtractorComp, CSqliteXPathExtractorComp</td>
+    <td>Database-agnostic JSON queries, field extraction</td></tr>
+<tr><td><b>Dependent Data Management</b></td>
+    <td>CDependentTableMetaInfoControllerComp</td>
+    <td>Cascading updates, reference cleanup, referential integrity</td></tr>
+</table>
+
+@section imtdb_schema Database Schema Conventions
+
+The imtdb library assumes specific database table structures for proper operation:
+
+@subsection imtdb_schema_core Core Object Tables
+
+Each object collection typically has a table with these columns:
+
+- **Id** (PRIMARY KEY): Unique object identifier (UUID or auto-increment integer)
+- **TypeId**: Object type identifier for polymorphic collections
+- **Name**: Human-readable object name
+- **Description**: Object description or summary
+- **Document** or **Data**: Serialized object data (binary or JSON)
+- **State**: Object state (active, deleted, archived)
+
+@subsection imtdb_schema_metadata Metadata Columns
+
+Extended metadata support (optional):
+
+- **DataMetaInfo** (JSON/JSONB): Custom metadata fields, dependent references
+- **RevisionInfo** (JSON/JSONB): Revision history, audit information
+- **TimeStamp**: Object creation timestamp
+- **LastModified**: Last modification timestamp
+- **Added**: Date added to collection
+- **OwnerID**: User/owner identifier
+- **OperationDescription**: Last operation performed
+
+@subsection imtdb_schema_revisions Revision Tables
+
+For audit trail functionality:
+
+- **RevisionNumber**: Sequential revision identifier
+- **ObjectId**: Reference to original object
+- **RevisionData**: Serialized object state at revision
+- **Checksum**: Data integrity verification
+- **UserId**: User who made the change
+- **OperationDescription**: Change description
+- **RevisionTimestamp**: When revision was created
+
+@subsection imtdb_schema_hierarchy Hierarchical Tables
+
+For tree structures:
+
+- **ParentId**: Reference to parent object
+- **ChildId**: Reference to child object
+- **Level**: Depth level in hierarchy
+- **Path**: Materialized path (e.g., "/root/parent/child")
+
+@section imtdb_features Key Design Features
+
+@subsection imtdb_feature_multidb Multi-Database Support
+
+✓ **Pluggable database backends** via delegate pattern
+- PostgreSQL support with advanced features (JSONB, full-text search)
+- SQLite support for embedded/offline scenarios
+- File-based storage for simple use cases
+- Easy addition of new database backends
+
+@subsection imtdb_feature_safety Type Safety & Security
+
+✓ **Parameterized queries** prevent SQL injection attacks
+- All user input properly escaped
+- Bound parameters used for values
+- No string concatenation for SQL generation
+
+@subsection imtdb_feature_performance Performance Optimizations
+
+✓ **Lazy loading** for large datasets
+✓ **Pagination** support (LIMIT/OFFSET)
+✓ **Indexed queries** via metadata
+✓ **Batch operations** for bulk inserts/updates
+✓ **Connection pooling** (via Qt SQL layer)
+✓ **Transaction batching** reduces round-trips
+
+@subsection imtdb_feature_filtering Advanced Filtering
+
+✓ **Complex filters** via IParamsSet without raw SQL:
+- Equality, inequality comparisons
+- Range queries (BETWEEN)
+- Pattern matching (LIKE, regex)
+- JSON field queries
+- Composite filters (AND/OR)
+- NULL checks
+
+@subsection imtdb_feature_audit Audit Trail & Compliance
+
+✓ **Complete revision history** for objects
+✓ **User tracking** for all modifications
+✓ **Timestamp tracking** (created, modified)
+✓ **Checksum verification** for data integrity
+✓ **Operation descriptions** for audit logs
+✓ **Soft delete** support (state column)
+
+@subsection imtdb_feature_hierarchy Hierarchical Data Support
+
+✓ **Tree structures** with parent-child relationships
+✓ **Recursive queries** for descendants/ancestors
+✓ **Materialized paths** for efficient traversal
+✓ **Level tracking** for depth calculations
+✓ **Subtree operations** (move, copy, delete)
+
+@subsection imtdb_feature_metadata Rich Metadata
+
+✓ **JSON-based metadata** fields
+✓ **Custom attributes** per object
+✓ **Dependent references** tracking
+✓ **Cascading updates** on deletions
+✓ **Schema-less extensions** via JSON
+
+@subsection imtdb_feature_migrations Schema Evolution
+
+✓ **Version-controlled migrations** from SQL scripts
+✓ **Sequential execution** ensures consistency
+✓ **Rollback on failure** maintains database integrity
+✓ **Multi-step migrations** for complex changes
+✓ **Composite controllers** for distributed schemas
+
+@section imtdb_examples Usage Examples
+
+@subsection imtdb_example_connect Connecting to Database
+
+@code{.cpp}
+// Create database engine
+auto engine = acf::CreateComponent<imtdb::CDatabaseEngineComp>();
+
+// Configure connection settings
+auto settings = acf::CreateComponent<imtdb::CDatabaseAccessSettingsComp>();
+settings->SetHost("localhost");
+settings->SetPort(5432);
+settings->SetDatabaseName("myapp_db");
+settings->SetUserName("dbuser");
+settings->SetPassword("secure_password");
+
+// Assign settings to engine
+engine->SetDatabaseSettings(settings);
+
+// Connect to database
+if (engine->ConnectToDatabase()) {
+    // Database ready for operations
+}
+@endcode
+
+@subsection imtdb_example_collection Creating Object Collection
+
+@code{.cpp}
+// Create collection with delegate
+auto collection = acf::CreateComponent<imtdb::CSqlDatabaseObjectCollectionComp>();
+auto delegate = acf::CreateComponent<imtdb::CSqlDatabaseDocumentDelegateComp>();
+
+// Configure delegate
+delegate->SetTableName("users");
+delegate->SetDatabaseEngine(engine);
+
+// Assign delegate to collection
+collection->SetDelegate(delegate);
+
+// Collection is ready for CRUD operations
+@endcode
+
+@subsection imtdb_example_insert Inserting Objects
+
+@code{.cpp}
+// Create new object
+auto user = std::make_shared<User>();
+user->SetName("John Doe");
+user->SetEmail("john@example.com");
+
+// Insert into collection
+QString objectId;
+if (collection->InsertNewObject(user, objectId)) {
+    // Object inserted successfully, objectId contains new ID
+}
+@endcode
+
+@subsection imtdb_example_query Querying with Filters
+
+@code{.cpp}
+// Create filter parameters
+auto filters = acf::CreateComponent<iprm::CParamsSetComp>();
+filters->SetValue("Name", "John%");  // LIKE query
+filters->SetValue("Age", 25, iprm::CT_GREATER_THAN);
+
+// Create sort parameters
+auto sortParams = acf::CreateComponent<iprm::CParamsSetComp>();
+sortParams->SetValue("Name", true);  // Ascending
+
+// Query collection
+auto results = collection->CreateSubCollection(filters, sortParams);
+for (int i = 0; i < results->GetCount(); ++i) {
+    auto user = results->GetObject(i);
+    // Process user object
+}
+@endcode
+
+@subsection imtdb_example_transaction Using Transactions
+
+@code{.cpp}
+// Create transaction manager
+auto txManager = acf::CreateComponent<imtdb::CSqlDatabaseTransactionManagerComp>();
+txManager->AddCollection(usersCollection);
+txManager->AddCollection(ordersCollection);
+
+// Start transaction
+if (txManager->StartTransaction()) {
+    try {
+        // Multiple operations across collections
+        usersCollection->UpdateObject(userId, userData);
+        ordersCollection->InsertNewObject(order, orderId);
+        
+        // Commit transaction
+        txManager->EndTransaction(true);
+    } catch (...) {
+        // Rollback on error
+        txManager->EndTransaction(false);
+    }
+}
+@endcode
+
+@subsection imtdb_example_migration Running Migrations
+
+@code{.cpp}
+// Create migration controller
+auto migrationCtrl = acf::CreateComponent<imtdb::CMigrationControllerComp>();
+migrationCtrl->SetDatabaseEngine(engine);
+migrationCtrl->SetMigrationFolder("./migrations/");
+
+// Check current version
+int currentVersion = migrationCtrl->GetCurrentDatabaseVersion();
+
+// Migrate to latest version
+int targetVersion = migrationCtrl->GetLatestMigrationVersion();
+if (migrationCtrl->DoMigration(targetVersion)) {
+    // Migration successful
+}
+@endcode
+
+@section imtdb_best_practices Best Practices
+
+@subsection imtdb_bp_transactions Transaction Usage
+
+1. **Keep transactions short**: Minimize transaction duration to reduce lock contention
+2. **Batch operations**: Group related operations in single transaction
+3. **Handle errors**: Always rollback on errors, commit on success
+4. **Avoid nested transactions**: Use transaction manager for coordinated access
+
+@subsection imtdb_bp_migrations Migration Guidelines
+
+1. **Sequential numbering**: Use consistent versioning (v001, v002, ...)
+2. **Idempotent scripts**: Make migrations repeatable (IF NOT EXISTS)
+3. **Test migrations**: Validate on copy before production
+4. **Backup first**: Always backup before major schema changes
+5. **Document changes**: Include comments in migration scripts
+
+@subsection imtdb_bp_performance Performance Tips
+
+1. **Use indexes**: Create indexes on frequently queried columns
+2. **Limit result sets**: Use pagination for large collections
+3. **Batch operations**: Use bulk inserts instead of individual operations
+4. **Connection pooling**: Reuse database connections
+5. **Lazy loading**: Load related objects only when needed
+
+@subsection imtdb_bp_security Security Considerations
+
+1. **Parameterized queries**: Never concatenate user input into SQL
+2. **Least privilege**: Use minimal database permissions
+3. **Encrypt credentials**: Don't store passwords in plain text
+4. **Validate input**: Check data before database operations
+5. **Audit trail**: Enable revision tracking for sensitive data
+
+@section imtdb_conclusion Conclusion
+
+The **imtdb** library provides a robust, flexible, and feature-rich database abstraction layer that:
+
+- Simplifies database operations through high-level abstractions
+- Supports multiple database backends with minimal code changes
+- Ensures data integrity through transaction management
+- Enables schema evolution via migration system
+- Provides audit trail and revision control
+- Optimizes performance through lazy loading and pagination
+- Maintains security through parameterized queries
+
+The component-based architecture allows easy customization and extension while maintaining
+clean separation of concerns through well-defined interfaces and design patterns.
+
+*/

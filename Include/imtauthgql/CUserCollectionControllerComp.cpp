@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CUserCollectionControllerComp.h>
 
 
@@ -393,7 +394,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (requestInfo.items.isTypeIdRequested){
-		representationObject.typeId = QByteArray(m_objectCollectionCompPtr->GetObjectTypeId(objectId));
+		representationObject.typeId = objectCollectionIterator.GetObjectTypeId();
 	}
 
 	if (requestInfo.items.isUserIdRequested){
@@ -568,10 +569,8 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateObjectFromRepres
 			break;
 		}
 	}
-	istd::IChangeableUniquePtr retVal;
-	retVal.MoveCastedPtr<imtauth::IUserInfo>(userInstancePtr);
 
-	return retVal;
+	return userInstancePtr;
 }
 
 

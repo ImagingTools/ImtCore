@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 
 #include <imtclientgql/CGqlObjectCollectionDelegateComp.h>
 
@@ -639,6 +640,7 @@ void CGqlObjectCollectionDelegateComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 	m_paramSetRepresentationController.RegisterSubController(m_complexCollectionFilterRepresentationController);
+	m_paramSetRepresentationController.RegisterSubController(m_documentIdFilterRepresentationController);
 	m_paramSetRepresentationController.RegisterSubController(m_documentFilterRepresentationController);
 }
 
@@ -755,7 +757,10 @@ istd::TUniqueInterfacePtr<imtgql::IGqlRequest> CGqlObjectCollectionDelegateComp:
 	imtgql::CGqlRequest* requestPtr = new imtgql::CGqlRequest();
 	imtgql::IGqlContext* gqlContextPtr = imtgql::CGqlRequestContextManager::GetContext();
 	if (gqlContextPtr != nullptr){
-		requestPtr->SetGqlContext(dynamic_cast<imtgql::IGqlContext*>(gqlContextPtr->CloneMe().PopInterfacePtr()));
+		istd::IChangeableUniquePtr clonedPtr = gqlContextPtr->CloneMe();
+		imtgql::IGqlContextUniquePtr castedPtr;
+		castedPtr.MoveCastedPtr(std::move(clonedPtr));
+		requestPtr->SetGqlContext(imtgql::IGqlContextSharedPtr::CreateFromUnique(castedPtr));
 	}
 
 	if (!SdlRequest::SetupGqlRequest(*requestPtr, arguments)){

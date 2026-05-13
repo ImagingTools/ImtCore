@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -155,6 +156,11 @@ protected:
 	virtual QByteArray CreateRevisionInfoQuery(const imtbase::IOperationContext* operationContextPtr, const QVariant& revisionArgument, quint32 checksum) const;
 	virtual QByteArray CreateJsonBuildObjectQuery(const QVariantMap& paramMap) const;
 	virtual QString CreateJsonExtractSql(const QString& jsonName, const QString& key, QMetaType::Type metaType = QMetaType::QString, const QString& tableAlias = QString()) const;
+	virtual QString CreateTenantBindingTableName() const;
+	virtual QByteArray CreateTenantBindingTableInitializationQuery() const;
+	virtual void EnsureTenantBindingTableExists() const;
+	virtual QString CreateTenantBindingFilterQuery(const QByteArray& tenantId) const;
+	virtual QByteArray CreateTenantBindingInsertQuery(const QByteArray& tenantId, const QByteArray& entityId, const imtbase::IOperationContext* operationContextPtr) const;
 
 	// reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
 	virtual QString GetBaseSelectionQuery() const override;
@@ -166,6 +172,7 @@ protected:
 	virtual bool CreateFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const override;
 	virtual bool CreateTextFilterQuery(const imtbase::ICollectionFilter& collectionFilter, QString& textFilterQuery) const override;
 	virtual bool CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery, const QString& timeFieldId = QStringLiteral("root1.\"TimeStamp\"")) const override;
+	virtual QString CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const override;
 	
 protected:
 	virtual bool CreateObjectFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& filterQuery) const override;
@@ -191,5 +198,3 @@ protected:
 
 
 Q_DECLARE_METATYPE(imtdb::RawSqlExpression);
-
-

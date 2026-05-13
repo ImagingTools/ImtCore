@@ -88,6 +88,10 @@ FocusScope {
 	function ensureVisible(pos){
 		textField.ensureVisible(pos);
 	}
+
+	function copy(){
+		textField.copy()
+	}
 	
 	onFocusChanged: {
 		if (containerTextField.focus){

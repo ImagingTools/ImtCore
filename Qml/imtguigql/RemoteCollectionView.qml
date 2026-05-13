@@ -12,12 +12,15 @@ CollectionView {
 
 	property bool hasRemoteChanges: false;
 	property bool tableViewParamsStoredServer: true;
+	property bool showRemoteChangesAlert: true
 
 	property string gqlGetListCommandId: root.collectionId + "List";
 
 	// Invisible fields that will be requested for collection
 	property var additionalFieldIds: ["id", "name"]
 	property var requestedFields: []
+
+	property alias subscriptionCommandId: subscriptionClient.gqlCommandId
 
 	signal removed(string objectId)
 
@@ -82,6 +85,7 @@ CollectionView {
 	}
 
 	Component.onCompleted: {
+		console.log("RemoteCollectionView.qml onCompleted", table)
 		table.setSortingInfo("timeStamp", "DESC")
 		table.saveWidth.connect(root.tableViewParamsAccepted)
 		Events.subscribeEvent("UpdateAllModels", root.receiveRemoteChanges);
@@ -93,7 +97,7 @@ CollectionView {
 	}
 
 	onHasRemoteChangesChanged: {
-		if (root.visible && hasRemoteChanges){
+		if (root.visible && hasRemoteChanges && showRemoteChangesAlert){
 			root.setAlertPanel(alertPanelComp)
 		}
 	}
@@ -105,7 +109,7 @@ CollectionView {
 	}
 
 	onVisibleChanged: {
-		if (hasRemoteChanges && visible){
+		if (hasRemoteChanges && visible && showRemoteChangesAlert){
 			root.setAlertPanel(alertPanelComp)
 		}
 		else{
@@ -211,6 +215,7 @@ CollectionView {
 		}
 
 		onMessageReceived: {
+			console.log("RemoteCollectionView.qml onMessageReceived", root.collectionId)
 			root.handleSubscription(data);
 		}
 	}

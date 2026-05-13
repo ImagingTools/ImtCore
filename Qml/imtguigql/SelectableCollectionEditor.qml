@@ -129,7 +129,7 @@ ElementView {
 					}
 					
 					Connections {
-						target: container.targetCollectionView
+						target: container.targetCollectionView ? container.targetCollectionView : null
 						function onSelectionChanged(ids, indexes){
 							removeButton.enabled = indexes.length > 0
 						}
@@ -278,41 +278,17 @@ ElementView {
 			headerRightClickEnabled: false
 			requestedFields: container.targetRequestedFields
 			hasPagination: false
+			showRemoteChangesAlert: false
 			Component.onCompleted: {
 				container.targetCollectionView = this
 				container.updateTargetCollection()
 			}
 			Component.onDestruction: {
-				container.targetCollectionView = null
+				if (container){
+					container.targetCollectionView = null
+				}
 			}
 
-			onContentHeightChanged: {
-				height = contentHeight
-			}
-		}
-	}
-
-	Component {
-		id: remoteCollectionViewComp2
-		RemoteCollectionView {
-			id: remoteCollectionView2
-			width: container.contentWidth
-			collectionId: container.collectionId
-			commandsControllerComp: null
-			documentCollectionFilter: null
-			canResetFilters: false
-			filterMenuVisible: false
-			tableViewParamsStoredServer: false
-			headerRightClickEnabled: false
-			Component.onCompleted: {
-				container.sourceCollectionView = this
-				container.updateSourceCollection()
-			}
-			
-			Component.onDestruction: {
-				container.sourceCollectionView = null
-			}
-			
 			onContentHeightChanged: {
 				height = contentHeight
 			}

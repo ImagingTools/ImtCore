@@ -24,6 +24,7 @@ MainWindow 1.0 ./Base/MainWindow.qml
 WrapItem 1.0 ./Base/WrapItem.qml
 IconProperties 1.0 ./Base/IconProperties.qml
 FontProperties 1.0 ./Base/FontProperties.qml
+StateManager 1.0 ./Base/StateManager.qml
 
 Action 1.0 ./Actions/Action.qml
 PopupMenuDelegate 1.0 ./Actions/PopupMenuDelegate.qml
@@ -71,6 +72,7 @@ DialogDecorator 1.0 ./Dialogs/DialogDecorator.qml
 DialogManagerView 1.0 ./Dialogs/DialogManagerView.qml
 CriticalErrorDialog 1.0 ./Dialogs/CriticalErrorDialog.qml
 FileImportDialog 1.0 ./Dialogs/FileImportDialog.qml
+FileExportDialog 1.0 ./Dialogs/FileExportDialog.qml
 
 Calendar 1.0 ./Inputs/Calendar.qml
 CalendarCellDelegateBase 1.0 ./Inputs/CalendarCellDelegateBase.qml
@@ -132,6 +134,8 @@ TableCellTextDelegate 1.0 ./Views/TableCellTextDelegate.qml
 TableCellTextWithTooltipDelegate 1.0 ./Views/TableCellTextWithTooltipDelegate.qml
 TableCellRowNumberDelegate 1.0 ./Views/TableCellRowNumberDelegate.qml
 TableCellIconTextDelegate 1.0 ./Views/TableCellIconTextDelegate.qml
+TableCellDelegateCheckable 1.0 ./Views/TableCellDelegateCheckable.qml
+TableCellDateDelegate 1.0 ./Views/TableCellDateDelegate.qml
 TableDelegate 1.0 ./Views/TableDelegate.qml
 TableRowDelegateBase 1.0 ./Views/TableRowDelegateBase.qml
 TablePainterRowDelegateBase 1.0 ./Views/TablePainterRowDelegateBase.qml
@@ -177,6 +181,8 @@ Splitter 1.0 ./Views/Splitter.qml
 StackView 1.0 ./Views/StackView.qml
 Gallery 1.0 ./Views/Gallery.qml
 ExpandingContainer 1.0 ./Views/ExpandingContainer.qml
+CollapsibleRectangle 1.0 ./Views/CollapsibleRectangle.qml
+Title 1.0 ./Views/Title.qml
 TextInputCellContentComp 1.0 ./Views/TextInputCellContentComp.qml
 ComboBoxCellContentComp 1.0 ./Views/ComboBoxCellContentComp.qml
 SubMenuPanelButtonDecorator 1.0 ./Views/SubMenuPanelButtonDecorator.qml
@@ -208,6 +214,9 @@ Matrix3x3 1.0 ./GraphicsView/Matrix3x3.qml
 Graph2d 1.0 ./GraphicsView/Graph2d.qml
 MultiGraph2d 1.0 ./GraphicsView/MultiGraph2d.qml
 
+GraphicsShapeFactoryManager 1.0 ./GraphicsView/GraphicsShapeFactoryManager.qml
+GraphicsShapeFactoryBase 1.0 ./GraphicsView/GraphicsShapeFactoryBase.qml
+
 PolygonShape 1.0 ./GraphicsView/PolygonShape.qml
 RectangleShape 1.0 ./GraphicsView/RectangleShape.qml
 CircleShape 1.0 ./GraphicsView/CircleShape.qml
@@ -217,7 +226,7 @@ ArcShape 1.0 ./GraphicsView/ArcShape.qml
 BezierCurveShape 1.0 ./GraphicsView/BezierCurveShape.qml
 QuadraticCurveShape 1.0 ./GraphicsView/QuadraticCurveShape.qml
 TextShape 1.0 ./GraphicsView/TextShape.qml
-ImageShape 1.0 ./GraphicsView/ImageShape.qml
+ImageShape2d 1.0 ./GraphicsView/ImageShape2d.qml
 CoordinateGridShape 1.0 ./GraphicsView/CoordinateGridShape.qml
 SegmentShape 1.0 ./GraphicsView/SegmentShape.qml
 DiskSegmentShape 1.0 ./GraphicsView/DiskSegmentShape.qml

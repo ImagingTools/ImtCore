@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include "ImtClientGqlPck.h"
 
 
@@ -80,6 +81,11 @@ I_EXPORT_COMPONENT(
 			"Remote Object Collection Controller");
 
 I_EXPORT_COMPONENT(
+			RemoteCollectionDocumentManagerController,
+			"Remote collection document manager controller",
+			"Remote Collection Document Manager Controller");
+
+I_EXPORT_COMPONENT(
 			ObjectCollectionSubscriber,
 			"Object collection subscriber",
 			"Object Collection Subscriber");
@@ -91,5 +97,4 @@ I_EXPORT_COMPONENT(
 
 
 } // namespace ImtClientGqlPck
-
 

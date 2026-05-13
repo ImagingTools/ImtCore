@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include "ImtCorePck.h"
 
 
@@ -223,6 +224,11 @@ I_EXPORT_COMPONENT(
 			ApplicationInfoDelegator,
 			"Application info delegator",
 			"Application Info Delegator");
+
+I_EXPORT_COMPONENT(
+			OrderedObjectCollectionProxy,
+			"Implementation of an ordered object collection facade",
+			"Object Data Model Collection Container Composition Order");
 
 
 } // namespace ImtCorePck

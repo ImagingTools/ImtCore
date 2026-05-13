@@ -1,7 +1,9 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include "Imt3dGuiPck.h"
 
 
 #include <icomp/export.h>
+#include <imt3dgui/CRhiRenderBackend.h>
 
 
 I_REGISTER_QT_RESOURCE(imt3dguilight)
@@ -61,6 +63,10 @@ I_EXPORT_COMPONENT(
 			"3D-wire shape",
 			"3D Shape Wire");
 
-} // namespace Imt3dGuiPck
+I_EXPORT_COMPONENT(
+			RhiRenderBackend,
+			"Qt RHI render backend for 3D scenes",
+			"3D Render Backend RHI");
 
+} // namespace Imt3dGuiPck
 

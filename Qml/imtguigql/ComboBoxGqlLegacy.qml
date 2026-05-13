@@ -47,7 +47,7 @@ Item {
 	property int dialogsCount: ModalDialogManager.count;
 
 	property string commandId: "";
-	property string filterName: "Name";
+	property string filterName: nameId;
 	property string filterText: "";
 	property string fontColor: Style.textColor;
 	property string fontColorTitle: fontColor;
@@ -77,7 +77,8 @@ Item {
 		selected: comboBoxContainerGql.selectedIndex === model.index;
 
 		onClicked: {
-			comboBoxContainerGql.finished(model.id, model.index)
+			let resultId = model.Id || model.id || model.item.m_id || "";
+			comboBoxContainerGql.finished(resultId, model.index)
 		}
 
 		onEntered: {
@@ -105,7 +106,7 @@ Item {
 
 	onSetCurrentText: {
 		if(!comboBoxContainerGql.complexModel){
-			comboBoxContainerGql.currentText = modelll.getData(comboBoxContainerGql.nameId,index);
+			comboBoxContainerGql.currentText = modelll.getData(comboBoxContainerGql.nameId, index);
 		}
 	}
 
@@ -115,7 +116,7 @@ Item {
 
 	onModelChanged: {
 		if (comboBoxContainerGql.currentIndex > -1){
-			comboBoxContainerGql.currentText = popup.model.getData("name");
+			comboBoxContainerGql.currentText = popup.model.getData(nameId);
 		}
 	}
 
@@ -202,13 +203,13 @@ Item {
 			onFinished: {
 				if (index > -1){
 					for (var item = 0; item < comboBoxContainerGql.gettedParams.getItemsCount(); item++){
-						let param = comboBoxContainerGql.gettedParams.getData("name", item);
+						let param = comboBoxContainerGql.gettedParams.getData(comboBoxContainerGql.nameId, item);
 						let value = popup.model.getData(param, index);
 						comboBoxContainerGql.gettedParams.setData("Value", value, item);
 					}
 				}
-				// comboBoxContainerGql.currentText = popup.model.getData("name", index);
-				comboBoxContainerGql.setCurrentText(popup.model,index)
+				// comboBoxContainerGql.currentText = popup.model.getData(comboBoxContainerGql.nameId, index);
+				comboBoxContainerGql.setCurrentText(popup.model, index)
 				if (comboBoxContainerGql.currentText == ""){
 					comboBoxContainerGql.currentText = popup.filterText;
 				}

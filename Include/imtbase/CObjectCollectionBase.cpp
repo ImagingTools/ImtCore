@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtbase/CObjectCollectionBase.h>
 
 
@@ -32,13 +33,6 @@ CObjectCollectionBase::CObjectCollectionBase()
 {
 
 }
-
-
-CObjectCollectionBase::~CObjectCollectionBase()
-{
-	RemoveAllObjects();
-}
-
 
 // reimplemented (ICollectionDataController)
 
@@ -840,6 +834,8 @@ bool CObjectCollectionBase::CopyFrom(const IChangeable& object, CompatibilityMod
 					targetLock.relock();
 					if (targetObjectInfoPtr->dataPtr->CopyFrom(*dataPtr, sourceObjectInfo.copyMode)){
 						targetObjectInfoPtr->copyMode = sourceObjectInfo.copyMode;
+						targetObjectInfoPtr->name = sourceObjectInfo.name;
+						targetObjectInfoPtr->description = sourceObjectInfo.description;
 					}
 					else{
 						return false;
@@ -1121,6 +1117,12 @@ idoc::MetaInfoPtr CObjectCollectionBase::CollectionIterator::GetDataMetaInfo() c
 	}
 
 	return idoc::MetaInfoPtr();
+}
+
+
+int CObjectCollectionBase::CollectionIterator::GetElementsCount() const
+{
+	return m_parent.GetElementsCount();
 }
 
 

@@ -1,17 +1,18 @@
-#include <imthttp/CMultiThreadServer.h>
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+#include <imtrest/CMultiThreadServer.h>
 
 // Qt includes
 #include <QtNetwork/QSslSocket>
 #include <QtNetwork/QSslKey>
 
 // ImtCore includes
-#include <imthttp/CHttpResponse.h>
-#include <imthttp/CHttpSender.h>
-#include <imthttp/CTcpResponse.h>
-#include <imthttp/CTcpSender.h>
+#include <imtrest/CHttpResponse.h>
+#include <imtrest/CHttpSender.h>
+#include <imtrest/CTcpResponse.h>
+#include <imtrest/CTcpSender.h>
 
 
-namespace imthttp
+namespace imtrest
 {
 
 
@@ -102,7 +103,7 @@ void CSocket::OnHandleSslErrors(QList<QSslError> errorList)
 
 void CSocket::HandleReadyRead()
 {
-	imthttp::imtrest::IRequestServlet* requestHandlerPtr = m_rootSocket->GetRequestServlet();
+	imtrest::IRequestServlet* requestHandlerPtr = m_rootSocket->GetRequestServlet();
 	Q_ASSERT(requestHandlerPtr != nullptr);
 
 	if (requestHandlerPtr == nullptr){
@@ -179,6 +180,6 @@ void CSocket::OnSendResponse(ConstResponsePtr response)
 }
 
 
-} // namespace imthttp
+} // namespace imtrest
 
 

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 // Qt includes
@@ -42,6 +43,7 @@ public:
 	virtual void SetContextId(const QByteArray& contextId) = 0;
 
 	virtual iprm::IParamsSetSharedPtr GetParams() const = 0;
+	virtual iprm::IParamsSetSharedPtr CreateParams() const = 0;
 	virtual void SetParams(const iprm::IParamsSetSharedPtr& paramsPtr) = 0;
 
 	virtual IJobQueueManager::ProcessingStatus GetProcessingStatus() const = 0;
@@ -55,6 +57,7 @@ public:
 
 	virtual const imtbase::IReferenceCollection* GetInput() const = 0;
 	virtual void SetInput(const imtbase::IReferenceCollection& input) = 0;
+	// JobStatus - Progress, ProcassingStatus, MessageContainer log
 
 	virtual void SetParamsFactory(const ParamsFactoryFunction& factory) = 0;
 };

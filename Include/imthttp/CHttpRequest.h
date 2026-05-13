@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -6,18 +7,12 @@
 #include <QtNetwork/QHostAddress>
 
 // ImtCore includes
-#include <imthttp/IRequest.h>
-#include <imthttp/IProtocolEngine.h>
-#include <imthttp/http_parser.h>
+#include <imtrest/IRequest.h>
+#include <imtrest/IRequestServlet.h>
+#include <imtrest/http_parser.h>
 
 
 namespace imtrest
-{
-	class imtrest::IRequestServlet;
-}
-
-
-namespace imthttp
 {
 
 
@@ -37,7 +32,7 @@ public:
 		MT_PATCH = 64
 	};
 
-	CHttpRequest(const imtrest::IRequestServlet& requestHandler, const IProtocolEngine& engine);
+	CHttpRequest(const IRequestServlet& requestHandler, const IProtocolEngine& engine);
 
 	QByteArrayList GetHeaders() const;
 	QByteArray GetHeaderValue(const QByteArray& headerType) const;
@@ -89,7 +84,7 @@ protected:
 	QByteArray m_body;
 	QByteArray m_data;
 
-	const imtrest::IRequestServlet& m_requestHandler;
+	const IRequestServlet& m_requestHandler;
 	const IProtocolEngine& m_engine;
 	QObject* m_socket;
 
@@ -102,6 +97,6 @@ protected:
 };
 
 
-} // namespace imthttp
+} // namespace imtrest
 
 

@@ -1,4 +1,5 @@
-#include <imthttp/CUdpServerComp.h>
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+#include <imtrest/CUdpServerComp.h>
 
 
 // Qt includes
@@ -9,14 +10,14 @@
 #include <iprm/IEnableableParam.h>
 
 // ImtCore includes
-#include <imthttp/IRequest.h>
-#include <imthttp/IResponse.h>
-#include <imthttp/ISender.h>
-#include <imthttp/CUdpRequest.h>
-#include <imthttp/CUdpSender.h>
+#include <imtrest/IRequest.h>
+#include <imtrest/IResponse.h>
+#include <imtrest/ITransport.h>
+#include <imtrest/CUdpRequest.h>
+#include <imtrest/CUdpSender.h>
 
 
-namespace imthttp
+namespace imtrest
 {
 
 
@@ -33,7 +34,7 @@ CUdpServerComp::~CUdpServerComp()
 }
 
 
-imthttp::imtrest::IRequestServlet* CUdpServerComp::GetRequestServlet()
+imtrest::IRequestServlet* CUdpServerComp::GetRequestServlet()
 {
 	if (!m_requestHandlerCompPtr.IsValid()){
 		return nullptr;
@@ -75,10 +76,10 @@ void CUdpServerComp::OnComponentCreated()
 }
 
 
-const ISender* CUdpServerComp::GetSender(const QByteArray& requestId) const
+bool CUdpServerComp::SendResponse(const QByteArray& requestId, ConstResponsePtr& response) const
 {
 	if (m_requests.GetCount() == 0){
-		return nullptr;
+		return false;
 	}
 
 	for (int i = 0; i < m_requests.GetCount(); i++){
@@ -87,15 +88,35 @@ const ISender* CUdpServerComp::GetSender(const QByteArray& requestId) const
 
 			connect(sender, &CUdpSender::sended, this, &CUdpServerComp::SendedResponse);
 
-			return sender;
+			return sender->SendResponse(response);
 		}
 	}
 
-	return nullptr;
+	return false;
 }
 
 
-// reimplemented (imthttp::IServer)
+bool CUdpServerComp::SendRequest(const QByteArray& requestId, ConstRequestPtr& request) const
+{
+	if (m_requests.GetCount() == 0){
+		return false;
+	}
+
+	for (int i = 0; i < m_requests.GetCount(); i++){
+		if (m_requests.GetAt(i)->GetRequestId() == requestId){
+			CUdpSender* sender = new CUdpSender(m_requests.GetAt(i));
+
+			connect(sender, &CUdpSender::sended, this, &CUdpServerComp::SendedResponse);
+
+			return sender->SendRequest(request);
+		}
+	}
+
+	return false;
+}
+
+
+// reimplemented (imtrest::IServer)
 
 bool CUdpServerComp::StartServer()
 {
@@ -181,6 +202,6 @@ bool CUdpServerComp::EnsureServerStarted()
 }
 
 
-} // namespace imthttp
+} // namespace imtrest
 
 

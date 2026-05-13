@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthdb/CUserDatabaseDelegateComp.h>
 
 
@@ -179,7 +180,7 @@ bool CUserDatabaseDelegateComp::CreateObjectFilterQuery(const iprm::IParamsSet& 
 			filterQuery += " AND ";
 		}
 
-		filterQuery += QString(R"((('%1' = '' AND NOT root."Document" ? 'SystemInfos') OR EXISTS (SELECT 1 FROM jsonb_array_elements(root."Document"->'SystemInfos') as s WHERE s->>'SystemId' = '%1')))").arg(systemId);
+		filterQuery += QString(R"((('%1' = '' AND NOT root."Document" ? 'SystemInfos') OR EXISTS (SELECT 1 FROM jsonb_array_elements(root."Document"->'SystemInfos') as s WHERE s->>'SystemId' = '%1')))").arg(SqlEncode(systemId));
 	}
 	else{
 		return BaseClass::CreateObjectFilterQuery(filterParams, filterQuery);

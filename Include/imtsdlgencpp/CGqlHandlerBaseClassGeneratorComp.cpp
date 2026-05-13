@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtsdlgencpp/CGqlHandlerBaseClassGeneratorComp.h>
 
 
@@ -101,7 +102,7 @@ bool CGqlHandlerBaseClassGeneratorComp::ProcessHeaderClassFile(const imtsdl::CSd
 	FeedStream(ifStream, 1, false);
 
 	FeedStreamHorizontally(ifStream, 1);
-	ifStream << QStringLiteral("virtual ::imtbase::CTreeItemModel* CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;");
+	ifStream << QStringLiteral("virtual QJsonObject CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;");
 	FeedStream(ifStream, 2, false);
 
 	// protected section
@@ -186,7 +187,7 @@ void CGqlHandlerBaseClassGeneratorComp::AddCollectionMethodsImplForDocument(QTex
 	// add CreateInternalResponse method
 	// declare method
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("::imtbase::CTreeItemModel* ");
+	stream << QStringLiteral("QJsonObject ");
 	stream << className;
 	stream << ':' << ':';
 	stream << QStringLiteral("CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const");
@@ -209,14 +210,14 @@ void CGqlHandlerBaseClassGeneratorComp::AddCollectionMethodsImplForDocument(QTex
 
 		/// create a carrier model GQL spec	\link https://spec.graphql.org/draft/#sec-Response-Format
 		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("istd::TDelPtr<::imtbase::CTreeItemModel> modelPtr(new ::imtbase::CTreeItemModel);");
+		stream << QStringLiteral("QJsonObject modelObj;");
 		FeedStream(stream, 1, false);
 
 		/// \todo add errors model and don't forget to fill it	\link https://spec.graphql.org/draft/#sec-Errors
 
 		// create dataModel - child of a carrier model
 		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("::imtbase::CTreeItemModel* dataModelPtr = modelPtr->AddTreeModel(\"data\");");
+		stream << QStringLiteral("QJsonObject dataModelObj;");
 		FeedStream(stream, 2, false);
 
 		// create sections for expected command IDs
@@ -239,7 +240,7 @@ void CGqlHandlerBaseClassGeneratorComp::AddCollectionMethodsImplForDocument(QTex
 
 		// return
 		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("return nullptr;");
+		stream << QStringLiteral("return QJsonObject();");
 		FeedStream(stream, 1, false);
 
 
@@ -304,7 +305,7 @@ void CGqlHandlerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& strea
 
 	// [2] return
 	FeedStreamHorizontally(stream, hIndents + 2);
-	stream << QStringLiteral("return nullptr;");
+	stream << QStringLiteral("return QJsonObject();");
 	FeedStream(stream, 1, false);
 
 	// [2->1] end of SDL request validate
@@ -335,7 +336,7 @@ void CGqlHandlerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& strea
 
 	// [2] return
 	FeedStreamHorizontally(stream, hIndents + 2);
-	stream << QStringLiteral("return nullptr;");
+	stream << QStringLiteral("return QJsonObject();");
 	FeedStream(stream, 1, false);
 
 	// [2->1] end of derived error checks
@@ -358,16 +359,16 @@ void CGqlHandlerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& strea
 					*m_sdlEnumListCompPtr,
 					*m_sdlUnionListCompPtr,
 					hIndents + 1,
-					CSdlUnionConverter::CT_MODEL_SCALAR,
-					QStringLiteral("dataModelPtr->SetData("), //QString(),
-					QStringLiteral("*dataModelPtr"),
-					QStringLiteral("nullptr"));
+					CSdlUnionConverter::CT_JSON_SCALAR,
+					QStringLiteral("dataModelObj.insert("), //QString(),
+					QStringLiteral("dataModelObj"),
+					QStringLiteral("QJsonObject()"));
 	}
 	else{
 		// [1] write payload variable in model and create variable, to check if it success
 		FeedStreamHorizontally(stream, hIndents + 1);
 		stream << QStringLiteral("const bool isModelCreated = ");
-		stream << QStringLiteral("replyPayload.WriteToModel(*dataModelPtr);");
+		stream << QStringLiteral("replyPayload.WriteToJsonObject(dataModelObj);");
 		FeedStream(stream, 1, false);
 
 		// [1->2] check if payload write to TreeModel is failed
@@ -387,7 +388,7 @@ void CGqlHandlerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& strea
 
 		// [2] return
 		FeedStreamHorizontally(stream, hIndents + 2);
-		stream << QStringLiteral("return nullptr;");
+		stream << QStringLiteral("return QJsonObject();");
 		FeedStream(stream, 1, false);
 
 		// [2->1] end of payload write to TreeModel checks
@@ -399,7 +400,7 @@ void CGqlHandlerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& strea
 
 	// [1] return pop ptr
 	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("return modelPtr.PopPtr();");
+	stream << QStringLiteral("modelObj.insert(QStringLiteral(\"data\"), dataModelObj); return modelObj;");
 	FeedStream(stream, 1, false);
 
 	// end of section

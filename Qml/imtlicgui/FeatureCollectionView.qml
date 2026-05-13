@@ -62,13 +62,13 @@ RemoteCollectionView {
 						
 						if (commandId === "InsertFeature"){
 							if (!featureEditor.featureData.hasSubFeatures()){
-								featureEditor.featureData.createSubFeatures()
+								featureEditor.featureData.emplaceSubFeatures()
 							}
 
 							let childModel = featureEditor.featureData.m_subFeatures;
 							if (selectedIndex != null){
 								if (!selectedIndex.itemData.hasSubFeatures()){
-									selectedIndex.itemData.createSubFeatures()
+									selectedIndex.itemData.emplaceSubFeatures()
 								}
 								childModel = selectedIndex.itemData.m_subFeatures;
 							}

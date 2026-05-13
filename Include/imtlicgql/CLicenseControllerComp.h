@@ -1,5 +1,9 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
+
+// Qt includes
+#include <QtCore/QJsonObject>
 
 // ImtCore includes
 #include <imtservergql/CObjectCollectionControllerCompBase.h>
@@ -21,7 +25,7 @@ public:
 protected:
 	// reimplemented (imtservergql::CObjectCollectionControllerCompBase)
 	virtual istd::IChangeableUniquePtr CreateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QByteArray &objectId, QString& errorMessage) const override;
-	virtual imtbase::CTreeItemModel* GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual QJsonObject GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 };
 
 

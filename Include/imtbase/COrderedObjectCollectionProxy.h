@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -38,17 +39,22 @@ namespace imtbase
 class COrderedObjectCollectionProxy: virtual public IOrderedObjectCollection
 {
 public:
+	COrderedObjectCollectionProxy();
+
 	/**
 		Constructor.
 		\param collectionPtr    Pointer to the collection to wrap (must not be null).
 		\param takeOwnership    If true, proxy takes ownership; if false, caller manages lifetime (default: false).
 	*/
 	explicit COrderedObjectCollectionProxy(IObjectCollection* collectionPtr, bool takeOwnership = false);
-	
 	COrderedObjectCollectionProxy(IObjectCollectionUniquePtr&& collectionPtr);
 	COrderedObjectCollectionProxy(const istd::TOptInterfacePtr<IObjectCollection>& collectionPtr);
 
 	virtual ~COrderedObjectCollectionProxy();
+
+	void SetCollection(IObjectCollection* collectionPtr, bool takeOwnership = false);
+	void SetCollection(IObjectCollectionUniquePtr&& collectionPtr);
+	void SetCollection(const istd::TOptInterfacePtr<IObjectCollection>& collectionPtr);
 
 	// reimplemented (IOrderedObjectCollection)
 	virtual bool SetItemOrder(const Id& itemId, int position) override;

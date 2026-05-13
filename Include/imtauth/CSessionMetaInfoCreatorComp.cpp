@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauth/CSessionMetaInfoCreatorComp.h>
 
 
@@ -21,7 +22,7 @@ bool CSessionMetaInfoCreatorComp::CreateMetaInfo(
 			const QByteArray& typeId,
 			idoc::MetaInfoPtr& metaInfoPtr) const
 {
-	if (typeId != *m_objectTypeIdAttrPtr){
+	if (m_objectTypeIdsAttrPtr.FindValue(typeId) < 0){
 		return false;
 	}
 
@@ -38,6 +39,7 @@ bool CSessionMetaInfoCreatorComp::CreateMetaInfo(
 
 	metaInfoPtr->SetMetaInfo(ISession::MIT_TOKEN, sessionPtr->GetToken());
 	metaInfoPtr->SetMetaInfo(ISession::MIT_USER_ID, sessionPtr->GetUserId());
+	metaInfoPtr->SetMetaInfo(ISession::MIT_TENANT_ID, sessionPtr->GetTenantId());
 
 	return true;
 }
@@ -52,6 +54,8 @@ QString CSessionMetaInfoCreatorComp::MetaInfo::GetMetaInfoName(int metaInfoType)
 		return QObject::tr("Token");
 	case ISession::MIT_USER_ID:
 		return QObject::tr("User-ID");
+	case ISession::MIT_TENANT_ID:
+		return QObject::tr("Tenant-ID");
 	}
 
 	return BaseClass::GetMetaInfoName(metaInfoType);
@@ -60,5 +64,4 @@ QString CSessionMetaInfoCreatorComp::MetaInfo::GetMetaInfoName(int metaInfoType)
 
 
 } // namespace imtauth
-
 

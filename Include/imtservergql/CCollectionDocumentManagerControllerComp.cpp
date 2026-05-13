@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtservergql/CCollectionDocumentManagerControllerComp.h>
 
 
@@ -35,6 +36,7 @@ CDM::CDocumentList CCollectionDocumentManagerControllerComp::OnGetOpenedDocument
 			sdlInfo.Version_1_0->objectId = objectId;
 			sdlInfo.Version_1_0->objectTypeId = info.typeId;
 			sdlInfo.Version_1_0->isDirty = info.isDirty;
+			sdlInfo.Version_1_0->hasNameProvider = info.hasNameProvider;
 
 			retVal.Version_1_0->documentList->append(sdlInfo.Version_1_0);
 		}
@@ -44,12 +46,12 @@ CDM::CDocumentList CCollectionDocumentManagerControllerComp::OnGetOpenedDocument
 }
 
 
-CDM::CDocumentId CCollectionDocumentManagerControllerComp::OnCreateNewDocument(
+CDM::CDocumentInfo CCollectionDocumentManagerControllerComp::OnCreateNewDocument(
 			const CDM::CCreateNewDocumentGqlRequest& createNewDocumentRequest,
 			const::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	CDM::CDocumentId retVal;
+	CDM::CDocumentInfo retVal;
 
 	const auto& arguments = createNewDocumentRequest.GetRequestedArguments();
 
@@ -66,26 +68,50 @@ CDM::CDocumentId CCollectionDocumentManagerControllerComp::OnCreateNewDocument(
 	}
 
 	if (m_documentManagerCompPtr.IsValid()) {
-		QByteArray documentId = m_documentManagerCompPtr->CreateNewDocument(userId, *documentTypeId->typeId);
+		const QByteArray proposedSourceDocumentId = documentTypeId->proposedSourceDocumentId
+			? *documentTypeId->proposedSourceDocumentId
+			: QByteArray();
+		QByteArray documentId = m_documentManagerCompPtr->CreateNewDocument(
+			userId,
+			*documentTypeId->typeId,
+			proposedSourceDocumentId);
 		if (documentId.isEmpty()){
 			errorMessage = "Unable to create document or undo manager";
 
 			return retVal;
 		}
 
-		retVal.Version_1_0.emplace().id = documentId;
+		QString documentName;
+		m_documentManagerCompPtr->GetDocumentName(userId, documentId, documentName);
+
+		retVal.Version_1_0.emplace();
+		retVal.Version_1_0->documentId = documentId;
+		retVal.Version_1_0->documentName = documentName;
+		retVal.Version_1_0->objectTypeId = *documentTypeId->typeId;
+		retVal.Version_1_0->objectId = QByteArray();
+		retVal.Version_1_0->isDirty = false;
+		retVal.Version_1_0->hasNameProvider = false;
+		retVal.Version_1_0->isLoading = false;
+
+		imtdoc::IDocumentManager::DocumentList list = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
+		for (const imtdoc::IDocumentManager::DocumentListItem& info : list){
+			if (info.documentId == documentId){
+				retVal.Version_1_0->hasNameProvider = info.hasNameProvider;
+				break;
+			}
+		}
 	}
 
 	return retVal;
 }
 
 
-CDM::CDocumentId CCollectionDocumentManagerControllerComp::OnOpenDocument(
+CDM::CDocumentInfo CCollectionDocumentManagerControllerComp::OnOpenDocument(
 			const CDM::COpenDocumentGqlRequest& openDocumentRequest,
 			const::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	CDM::CDocumentId retVal;
+	CDM::CDocumentInfo retVal;
 
 	const auto& arguments = openDocumentRequest.GetRequestedArguments();
 
@@ -111,7 +137,23 @@ CDM::CDocumentId CCollectionDocumentManagerControllerComp::OnOpenDocument(
 			return retVal;
 		}
 
-		retVal.Version_1_0.emplace().id = documentId;
+		retVal.Version_1_0.emplace();
+		retVal.Version_1_0->documentId = documentId;
+		retVal.Version_1_0->objectId = *objectId->id;
+		retVal.Version_1_0->isDirty = false;
+		retVal.Version_1_0->hasNameProvider = false;
+		retVal.Version_1_0->isLoading = true;
+
+		imtdoc::IDocumentManager::DocumentList list = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
+		for (const imtdoc::IDocumentManager::DocumentListItem& info : list){
+			if (info.documentId == documentId){
+				retVal.Version_1_0->documentName = info.name;
+				retVal.Version_1_0->objectTypeId = info.typeId;
+				retVal.Version_1_0->hasNameProvider = info.hasNameProvider;
+				retVal.Version_1_0->isLoading = info.isLoading;
+				break;
+			}
+		}
 	}
 
 	return retVal;
@@ -243,26 +285,45 @@ CDM::CDocumentOperationStatus CCollectionDocumentManagerControllerComp::OnSaveDo
 	retVal.Version_1_0.emplace();
 
 	if (m_documentManagerCompPtr.IsValid()) {
-		imtdoc::IDocumentManager::OperationStatus status = m_documentManagerCompPtr->SaveDocument(userId, *saveDocumentInput->documentId, *saveDocumentInput->documentName);
+		QString saveErrorMessage;
+		imtdoc::IDocumentManager::OperationStatus status = m_documentManagerCompPtr->SaveDocument(
+			userId,
+			*saveDocumentInput->documentId,
+			*saveDocumentInput->documentName,
+			&saveErrorMessage);
+		QString responseMessage;
 		switch (status){
 		case imtdoc::IDocumentManager::OS_OK:
 			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Success;
+			{
+				QString resolvedName;
+				if (m_documentManagerCompPtr->GetDocumentName(userId, *saveDocumentInput->documentId, resolvedName) == imtdoc::IDocumentManager::OS_OK){
+					retVal.Version_1_0->documentName = resolvedName;
+				}
+			}
 			break;
 		case imtdoc::IDocumentManager::OS_INVALID_USER_ID:
 			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidUserId;
+			responseMessage = "Invalid user-ID";
 			break;
 		case imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_ID:
 			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidDocumentId;
+			responseMessage = "Invalid document ID";
+			break;
+		case imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_DATA:
+			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidDocumentData;
+			responseMessage = saveErrorMessage.isEmpty() ? "Document data is invalid" : saveErrorMessage;
 			break;
 		case imtdoc::IDocumentManager::OS_FAILED:
 			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Failed;
+			responseMessage = "Failed to save document";
 			break;
 		default:
 			break;
 		}
-
-		if (status != imtdoc::IDocumentManager::OperationStatus::OS_OK){
-			errorMessage = "Unable to open document or create undo manager";
+		if (!responseMessage.isEmpty()) {
+			retVal.Version_1_0->message = responseMessage;
+			errorMessage = responseMessage;
 		}
 	}
 
@@ -600,4 +661,3 @@ QByteArray CCollectionDocumentManagerControllerComp::GetUserId(const ::imtgql::C
 
 
 } // namespace imtservergql
-

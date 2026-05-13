@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtgql/CGqlFieldObject.h>
 
 
@@ -38,7 +39,7 @@ CGqlFieldObject *CGqlFieldObject::CreateFieldObject(const QByteArray& fieldId)
 	CGqlFieldObject gqlObject;
 	InsertField(fieldId, gqlObject);
 
-	return m_objectFields[fieldId].GetPtr();
+	return m_objectFields[fieldId].get();
 }
 
 
@@ -51,7 +52,7 @@ CGqlFieldFragment* CGqlFieldObject::CreateFragmentObject(const QByteArray& typeI
 	CGqlFieldFragment gqlFragment;
 	InsertFragment(typeId, gqlFragment);
 
-	return m_fragmentFields[typeId].GetPtr();
+	return m_fragmentFields[typeId].get();
 }
 
 
@@ -65,20 +66,24 @@ void CGqlFieldObject::InsertField(const QByteArray &fieldId)
 
 void CGqlFieldObject::InsertField(const QByteArray &fieldId, const CGqlFieldObject& object)
 {
-	istd::TSharedInterfacePtr<CGqlFieldObject> objectPtr(new CGqlFieldObject());
+	std::shared_ptr<CGqlFieldObject> objectPtr(new CGqlFieldObject());
 	*objectPtr = object;
 	objectPtr->m_parentPtr = this;
+
 	RemoveField(fieldId);
+
 	m_objectFields.insert(fieldId, objectPtr);
 }
 
 
 void CGqlFieldObject::InsertFragment(const QByteArray& typeId, const CGqlFieldFragment& object)
 {
-	istd::TSharedInterfacePtr<CGqlFieldFragment> fragmentPtr(new CGqlFieldFragment());
+	std::shared_ptr<CGqlFieldFragment> fragmentPtr(new CGqlFieldFragment());
 	*fragmentPtr = object;
 	fragmentPtr->m_parentPtr = this;
+
 	RemoveField(typeId);
+
 	m_fragmentFields.insert(typeId,fragmentPtr);
 }
 
@@ -110,7 +115,7 @@ const CGqlFieldObject* CGqlFieldObject::GetFieldArgumentObjectPtr(const QByteArr
 	const CGqlFieldObject* retVal = nullptr;
 
 	if (m_objectFields.contains(fieldId)){
-		retVal = m_objectFields[fieldId].GetPtr();
+		retVal = m_objectFields[fieldId].get();
 	}
 
 	return retVal;
@@ -122,14 +127,14 @@ const CGqlFieldFragment* CGqlFieldObject::GetFragmentArgumentObjectPtr(const QBy
 	const CGqlFieldFragment* retVal = nullptr;
 
 	if (m_fragmentFields.contains(fieldId)){
-		retVal = m_fragmentFields[fieldId].GetPtr();
+		retVal = m_fragmentFields[fieldId].get();
 	}
 
 	return retVal;
 }
 
 
-CGqlFieldObject *CGqlFieldObject::GetParentObject() const
+CGqlFieldObject* CGqlFieldObject::GetParentObject() const
 {
 	return m_parentPtr;
 }
@@ -158,11 +163,16 @@ bool CGqlFieldObject::CopyFrom(const IChangeable& object, CompatibilityMode /*mo
 
 		QByteArrayList keys = sourcePtr->m_objectFields.keys();
 		for (const QByteArray& key : keys){
-			istd::TSharedInterfacePtr<CGqlFieldObject> sourceObject = sourcePtr->m_objectFields.value(key);
+			std::shared_ptr<CGqlFieldObject> sourceObject = sourcePtr->m_objectFields.value(key);
 
-			istd::TSharedInterfacePtr<CGqlFieldObject> gqlObject;
-			gqlObject.MoveCastedPtr(sourceObject->CloneMe());
-			if (!gqlObject.IsValid()){
+			std::shared_ptr<CGqlFieldObject> gqlObject;
+			std::shared_ptr<istd::IChangeable> clonedPtr(sourceObject->CloneMe().PopInterfacePtr());
+			Q_ASSERT(clonedPtr != nullptr);
+
+			gqlObject = std::dynamic_pointer_cast<CGqlFieldObject>(clonedPtr);
+			if (gqlObject == nullptr){
+				Q_ASSERT(false);
+
 				return false;
 			}
 
@@ -173,11 +183,17 @@ bool CGqlFieldObject::CopyFrom(const IChangeable& object, CompatibilityMode /*mo
 
 		keys = sourcePtr->m_fragmentFields.keys();
 		for (const QByteArray& key : keys){
-			istd::TSharedInterfacePtr<CGqlFieldFragment> sourceObject = sourcePtr->m_fragmentFields.value(key);
+			std::shared_ptr<CGqlFieldFragment> sourceObject = sourcePtr->m_fragmentFields.value(key);
 
-			istd::TSharedInterfacePtr<CGqlFieldFragment> gqlFragment;
-			gqlFragment.MoveCastedPtr(sourceObject->CloneMe());
-			if (!gqlFragment.IsValid()){
+			std::shared_ptr<CGqlFieldFragment> gqlFragment;
+
+			std::shared_ptr<istd::IChangeable> clonedPtr(sourceObject->CloneMe().PopInterfacePtr());
+			Q_ASSERT(clonedPtr != nullptr);
+
+			gqlFragment = std::dynamic_pointer_cast<CGqlFieldFragment>(clonedPtr);
+			if (gqlFragment == nullptr){
+				Q_ASSERT(false);
+
 				return false;
 			}
 
@@ -226,5 +242,6 @@ void CGqlFieldObject::RemoveField(const QByteArray &fieldId)
 
 
 } // namespace imtgql
+
 
 

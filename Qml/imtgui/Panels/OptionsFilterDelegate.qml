@@ -113,7 +113,7 @@ FilterDelegateBase {
 		}
 
 		if (!selectionParam.hasConstraints()){
-			selectionParam.createConstraints()
+			selectionParam.emplaceConstraints()
 		}
 
 		selectionParam.m_constraints.m_options = optionsList
@@ -128,11 +128,11 @@ FilterDelegateBase {
 		}
 
 		if (!selectionParam.hasConstraints()){
-			selectionParam.createConstraints()
+			selectionParam.emplaceConstraints()
 		}
 
 		if (!selectionParam.m_constraints.hasOptions()){
-			selectionParam.m_constraints.createOptions()
+			selectionParam.m_constraints.emplaceOptions()
 		}
 
 		selectionParam.m_constraints.m_options.addElement(option)

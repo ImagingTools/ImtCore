@@ -1,0 +1,184 @@
+schema {
+	query: Query
+	mutation: Mutation
+	subscription: Subscription
+	namespace: imtchat
+	version: 1.0
+}
+
+import {
+	"../../../../ImtCore/Sdl/imtbase/1.0/ImtCollection.sdl"
+}
+
+# --- Enums ---
+
+enum ConversationType {
+	Direct
+	Group
+	Channel
+	Support
+}
+
+enum MessageStatus {
+	Sent
+	Delivered
+	Read
+}
+
+# --- Entity Reference ---
+
+type EntityReferenceData {
+	entityType: String!
+	entityId: ID!
+	displayName: String
+	entityUrl: String
+}
+
+# --- Conversation ---
+
+type ConversationItemData {
+	id: ID!
+	typeId: ID!
+	name: String!
+	lastMessage: String
+	unreadCount: Int
+	participantCount: Int
+	updatedAt: String
+}
+
+type ConversationData {
+	id: ID!
+	name: String!
+	conversationType: ConversationType
+	participants: [ID]
+	createdAt: String
+	updatedAt: String
+	metadata: String
+}
+
+input ConversationsListInput {
+	viewParams: CollectionViewParams
+}
+
+type ConversationsListPayload {
+	items: [ConversationItemData]
+	notification: NotificationItem
+}
+
+input ConversationItemInput {
+	id: ID!
+}
+
+input ConversationDataInput {
+	id: ID!
+	item: ConversationData!
+}
+
+# --- Message ---
+
+type MessageItemData {
+	id: ID!
+	typeId: ID!
+	senderId: ID!
+	senderName: String
+	contentPreview: String
+	createdAt: String
+	status: MessageStatus
+	hasEntityRefs: Boolean
+}
+
+type MessageData {
+	id: ID!
+	conversationId: ID!
+	senderId: ID!
+	content: String!
+	entityReferences: [EntityReferenceData]
+	attachmentIds: [ID]
+	reactions: [String]
+	createdAt: String
+	updatedAt: String
+	status: MessageStatus
+}
+
+input MessagesListInput {
+	conversationId: ID!
+	viewParams: CollectionViewParams
+}
+
+type MessagesListPayload {
+	items: [MessageItemData]
+	notification: NotificationItem
+}
+
+input MessageItemInput {
+	id: ID!
+}
+
+input MessageSendInput {
+	conversationId: ID!
+	content: String!
+	entityReferences: [EntityReferenceData]
+	attachmentIds: [ID]
+}
+
+input MessageDataInput {
+	id: ID!
+	item: MessageData!
+}
+
+input MessageMarkReadInput {
+	conversationId: ID!
+	messageId: ID!
+}
+
+# --- Subscription payloads ---
+
+type ConversationId {
+	conversationId: ID!
+}
+
+type MessageStatusUpdate {
+	messageId: ID!
+	conversationId: ID!
+	status: MessageStatus!
+}
+
+type TypingIndicator {
+	conversationId: ID!
+	userId: ID!
+	isTyping: Boolean!
+}
+
+type Query {
+	ConversationsList (input: ConversationsListInput): ConversationsListPayload!
+	ConversationItem (input: ConversationItemInput): ConversationData!
+	MessagesList (input: MessagesListInput): MessagesListPayload!
+	MessageItem (input: MessageItemInput): MessageData!
+}
+
+type Mutation {
+	ConversationCreate (input: ConversationDataInput): AddedNotificationPayload!
+	ConversationUpdate (input: ConversationDataInput): UpdatedNotificationPayload!
+	MessageSend (input: MessageSendInput): AddedNotificationPayload!
+	MessageUpdate (input: MessageDataInput): UpdatedNotificationPayload!
+	MessageMarkRead (input: MessageMarkReadInput): UpdatedNotificationPayload!
+}
+
+collectionSchema {
+	type Conversation {
+		ref: ConversationItemData
+		operations {
+			list: ConversationsList
+		}
+		subtype Conversation {
+			ref: ConversationData
+			operations {
+				get: ConversationItem
+				update: ConversationUpdate
+				insert: ConversationCreate
+			}
+		}
+	}
+}
+
+

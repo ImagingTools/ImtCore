@@ -1,5 +1,10 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtgeo/CMapTileCollectionControllerComp.h>
 
+
+// Qt includes
+#include <QJsonArray>
+#include <QJsonValue>
 
 // ACF includes
 #include <idoc/IDocumentMetaInfo.h>
@@ -29,31 +34,26 @@ QVariant CMapTileCollectionControllerComp::GetObjectInformation(
 }
 
 
-imtbase::CTreeItemModel* CMapTileCollectionControllerComp::GetMetaInfo(
+QJsonObject CMapTileCollectionControllerComp::GetMetaInfo(
 			const imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-
-	return rootModelPtr.PopPtr();
+	return QJsonObject();
 }
 
 
-imtbase::CTreeItemModel* CMapTileCollectionControllerComp::ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CMapTileCollectionControllerComp::ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModel = nullptr;
-	imtbase::CTreeItemModel* itemsModel = nullptr;
-	imtbase::CTreeItemModel* notificationModel = nullptr;
+	QJsonObject rootObj;
+	QJsonObject dataObj;
 
 	if (!errorMessage.isEmpty()){
-		imtbase::CTreeItemModel* errorsItemModel = rootModelPtr->AddTreeModel("errors");
-		errorsItemModel->SetData("message", errorMessage);
+		QJsonObject errorsObj;
+		errorsObj.insert(QStringLiteral("message"), QJsonValue::fromVariant(errorMessage));
+		rootObj.insert(QStringLiteral("errors"), errorsObj);
 	}
 	else {
-		dataModel = new imtbase::CTreeItemModel();
-		itemsModel = new imtbase::CTreeItemModel();
-		notificationModel = new imtbase::CTreeItemModel();
+		QJsonObject notificationObj;
 
 		const imtgql::CGqlParamObject* viewParamsGql = nullptr;
 		QList<imtgql::CGqlParamObject> inputParams;
@@ -86,11 +86,13 @@ imtbase::CTreeItemModel* CMapTileCollectionControllerComp::ListObjects(const imt
 			}
 		}
 
+		QJsonArray itemsArray;
+
 		{
 			if (!tileList.isEmpty()){
-				int itemIndex = 0;
 				int z = tileList.at(0).second;
 				for (int i = 0; i < tileList.size(); i++){
+					QJsonObject itemObj;
 
 					double lat = 0;
 					double lon = 0;
@@ -98,22 +100,21 @@ imtbase::CTreeItemModel* CMapTileCollectionControllerComp::ListObjects(const imt
 					lat = tiley2lat(tileList.at(i).first.second, z);
 					lon = tilex2long(tileList.at(i).first.first, z);
 
-					itemIndex = itemsModel->InsertNewItem();
-					itemsModel->SetData("Id", itemIndex, itemIndex);
-					itemsModel->SetData("Latitude", lat, itemIndex);
-					itemsModel->SetData("Longitude", lon, itemIndex);
+					itemObj.insert(QStringLiteral("Id"), QJsonValue::fromVariant(i));
+					itemObj.insert(QStringLiteral("Latitude"), QJsonValue::fromVariant(lat));
+					itemObj.insert(QStringLiteral("Longitude"), QJsonValue::fromVariant(lon));
 
+					itemsArray.append(itemObj);
 				}
 			}
 		}
 
-		itemsModel->SetIsArray(true);
-		dataModel->SetExternTreeModel("items", itemsModel);
-		dataModel->SetExternTreeModel("notification", notificationModel);
+		dataObj.insert(QStringLiteral("items"), itemsArray);
+		dataObj.insert(QStringLiteral("notification"), notificationObj);
 	}
-	rootModelPtr->SetExternTreeModel("data", dataModel);
+	rootObj.insert(QStringLiteral("data"), dataObj);
 
-	return rootModelPtr.PopPtr();
+	return rootObj;
 }
 
 

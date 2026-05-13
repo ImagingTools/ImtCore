@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CRemoteJwtSessionControllerComp.h>
 
 
@@ -114,6 +115,10 @@ bool CRemoteJwtSessionControllerComp::RefreshToken(
 				userSession.userId = *response.Version_1_0->userSession->userId;
 			}
 
+			if (response.Version_1_0->userSession->tenantId.has_value()){
+				userSession.tenantId = *response.Version_1_0->userSession->tenantId;
+			}
+
 			if (response.Version_1_0->userSession->accessToken.has_value()){
 				userSession.accessToken = *response.Version_1_0->userSession->accessToken;
 			}
@@ -132,6 +137,7 @@ bool CRemoteJwtSessionControllerComp::RefreshToken(
 
 bool CRemoteJwtSessionControllerComp::CreateNewSession(
 			const QByteArray& userId,
+			const QByteArray& tenantId,
 			imtauth::IJwtSessionController::UserSession& userSession) const
 {
 	namespace sessionsdl = sdl::imtauth::Sessions;
@@ -139,6 +145,9 @@ bool CRemoteJwtSessionControllerComp::CreateNewSession(
 	sessionsdl::CreateNewSessionRequestArguments arguments;
 	arguments.input.Version_1_0 = sessionsdl::CCreateNewSessionInput::V1_0();
 	arguments.input.Version_1_0->userId = userId;
+	if (!tenantId.isEmpty()){
+		arguments.input.Version_1_0->tenantId = tenantId;
+	}
 
 	imtgql::CGqlRequest gqlRequest;
 	if (!sessionsdl::CCreateNewSessionGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
@@ -157,6 +166,10 @@ bool CRemoteJwtSessionControllerComp::CreateNewSession(
 		if (response.Version_1_0->userSession.has_value()){
 			if (response.Version_1_0->userSession->userId.has_value()){
 				userSession.userId = *response.Version_1_0->userSession->userId;
+			}
+
+			if (response.Version_1_0->userSession->tenantId.has_value()){
+				userSession.tenantId = *response.Version_1_0->userSession->tenantId;
 			}
 
 			if (response.Version_1_0->userSession->accessToken.has_value()){
@@ -274,6 +287,35 @@ QByteArray CRemoteJwtSessionControllerComp::GetUserFromJwt(const QByteArray& jwt
 
 QByteArray CRemoteJwtSessionControllerComp::GetSessionFromJwt(const QByteArray& /*jwt*/) const
 {
+	return QByteArray();
+}
+
+
+QByteArray CRemoteJwtSessionControllerComp::GetTenantFromJwt(const QByteArray& jwt) const
+{
+	namespace sessionsdl = sdl::imtauth::Sessions;
+
+	sessionsdl::GetTenantFromJwtRequestArguments arguments;
+	arguments.input.Version_1_0 = sessionsdl::CGetTenantFromJwtInput::V1_0();
+	arguments.input.Version_1_0->jwt = jwt;
+
+	imtgql::CGqlRequest gqlRequest;
+	if (!sessionsdl::CGetTenantFromJwtGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+		return QByteArray();
+	}
+
+	typedef sdl::imtauth::Sessions::CGetTenantFromJwtPayload Response;
+
+	QString errorMessage;
+	Response response = SendModelRequest<Response>(gqlRequest, errorMessage);
+	if (!errorMessage.isEmpty()){
+		return QByteArray();
+	}
+
+	if (response.Version_1_0 && response.Version_1_0->tenantId.has_value()){
+		return *response.Version_1_0->tenantId;
+	}
+
 	return QByteArray();
 }
 

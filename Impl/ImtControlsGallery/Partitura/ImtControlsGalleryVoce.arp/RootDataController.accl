@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5423" Description="ACF"/>
+            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="ApplicationController" X="575" Y="75" Note=""/>
+        <Element ComponentName="AuthorizationOptions" X="625" Y="300" Note=""/>
+        <Element ComponentName="ContactInfoController" X="850" Y="500" Note=""/>
+        <Element ComponentName="Pages" X="950" Y="300" Note=""/>
+        <Element ComponentName="SettingsController" X="250" Y="300" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

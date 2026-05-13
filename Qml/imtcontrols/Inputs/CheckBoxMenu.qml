@@ -16,6 +16,7 @@ FocusScope{
     property string nameId: "name";
 
     property string currentText;
+	property bool allChecked: false
 
 	property int radius: Style.radiusXS;
     property int currentIndex: -1;
@@ -25,7 +26,7 @@ FocusScope{
 
     property color borderColor: checkBoxMenu.focus ? Style.iconColorOnSelected : Style.borderColor;
     property color backgroundColor: Style.baseColor;
-    property bool isColor: false;
+	property bool isColor: false;
     property int dialogsCountPrev: 1000;
     property int dialogsCount: ModalDialogManager.count;
 
@@ -58,9 +59,17 @@ FocusScope{
 	property int menuHeight: Style.sizeHintM;
     property int delegateHeight: 60;
 
+	property Component menuItemContent: Component{
+		BaseText{
+		}
+	}
+
     signal finished();
     signal menuCreated();
     signal changedSignal();
+
+	signal setAllSelected()
+	signal setAllNotSelected()
 
     Component.onCompleted: {
 
@@ -102,6 +111,12 @@ FocusScope{
     function setText(model_, role_){
         let currText = "";
         let count = 0;
+		if(role_ == undefined){
+			role_ = "checkState"
+		}
+		if(model_ == undefined){
+			model_ = dataModel
+		}
         let itemsCount = model_.getItemsCount();
         if(!itemsCount){
             return;
@@ -119,6 +134,8 @@ FocusScope{
                 count++;
             }
         }
+		checkBoxMenu.allChecked = count == itemsCount
+
         checkBoxMenu.currentText = currText;
     }
 
@@ -129,7 +146,7 @@ FocusScope{
             id: popupMenuContainer;
 
 			width: checkBoxMenu.width;
-            height: checkBoxMenu.menuHeight;
+			height: Math.min(checkBoxMenu.menuHeight, listView.y + listView.contentHeight + Style.marginM);
 
             property Item root: null;
             property Item rootItem: null;
@@ -137,7 +154,8 @@ FocusScope{
             property TreeItemModel dataModel: TreeItemModel{};
             signal setCheckedSignal();
 
-            onDataModelChanged: {
+
+			onDataModelChanged: {
                 if(dataModel.getItemsCount()){
                     popupMenuContainer.setAllChecked();
                     popupMenuContainer.setCheckedSignal();
@@ -175,6 +193,7 @@ FocusScope{
                     }
                 }
                 let ok = count == itemsCount;
+				checkBoxMenu.allChecked = ok
                 if(ok){
                     checkBoxAll.checkState = Qt.Checked;
                 }
@@ -292,10 +311,12 @@ FocusScope{
                         if(checkBoxAll.checkState == Qt.Unchecked){
                             checkBoxAll.checkState = Qt.Checked;
                             popupMenuContainer.setAllCheckedInModel(Qt.Checked)
+							checkBoxMenu.allChecked = true
                         }
                         else if(checkBoxAll.checkState == Qt.Checked){
                             checkBoxAll.checkState = Qt.Unchecked;
                             popupMenuContainer.setAllCheckedInModel(Qt.Unchecked);
+							checkBoxMenu.allChecked = false
                         }
                         popupMenuContainer.rootItem.changedSignal();
                     }
@@ -314,10 +335,10 @@ FocusScope{
 					anchors.topMargin: Style.marginM;
 
                     width: parent.width;
-                    height: Style.size_TextFieldHeight;
+					height: Style.controlHeightM;
                     border.width: 1;
 					border.color: Style.grayColor;
-                    radius: Style.size_TextFieldRadius;
+					radius: Style.textFieldRadius;
 
                     visible: checkBoxMenu.hasSearch;
 
@@ -357,10 +378,20 @@ FocusScope{
                     spacing: 0;
                     model: popupMenuContainer.dataModel;
                     delegate: Item{
-
+						id: item
                         width: listView.width;
                         height: visible ? checkBoxMenu.delegateHeight: 0;
                         visible: !searchTfc.text  ? true : checkBox.text.toLowerCase().search(searchTfc.text.toLowerCase()) >= 0;
+
+						Component.onCompleted: {
+							let item_ = checkBoxMenu.menuItemContent.createObject(item)
+
+							item_.text = model[checkBoxMenu.nameId]
+
+							item_.anchors.left = checkBox.right
+							item_.anchors.leftMargin = checkBox.mainMargin
+							item_.anchors.verticalCenter = checkBox.verticalCenter
+						}
 
                         CheckBox{
                             id: checkBox;
@@ -374,10 +405,11 @@ FocusScope{
 							borderColor:Style.grayColor;
 
                             //imageSource: popupMenuContainer.rootItem && checkState == Qt.Checked ? popupMenuContainer.rootItem.checkImageSource: "";
-                            text: model[checkBoxMenu.nameId];
+							// text: model[checkBoxMenu.nameId];
                             Component.onCompleted: {
                                 popupMenuContainer.setCheckedSignal.connect(checkBox.setCheckState);
                                 checkBox.setCheckState();
+
                             }
 
                             function setCheckState(){
@@ -400,7 +432,6 @@ FocusScope{
                                 popupMenuContainer.rootItem.changedSignal();
                             }
                         }//CheckBox
-
                     }
                 }
             }
@@ -437,11 +468,11 @@ FocusScope{
             anchors.right: cbArrowIcon.left;
 			anchors.rightMargin: Style.marginM;
 
-            color: checkBoxMenu.fontColorTitle;
+			color: checkBoxMenu.currentText !== "" ? checkBoxMenu.fontColorTitle : Style.placeHolderTextColor;
             font.family: Style.fontFamily;
             font.pixelSize: checkBoxMenu.textSize;
 
-            text: checkBoxMenu.currentText !== "" ? checkBoxMenu.currentText : checkBoxMenu.placeHolderText;
+			text:  checkBoxMenu.currentText == "" ?  checkBoxMenu.placeHolderText : checkBoxMenu.allChecked ? qsTr("All"):  checkBoxMenu.currentText
 
             elide: Text.ElideRight;
         }

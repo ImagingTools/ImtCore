@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5270" Description="ACF"/>
+            <Version Id="1" Number="2220" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="ApplicationSettings" X="625" Y="75" Note=""/>
+        <Element ComponentName="GeneralSettingsFactory" X="225" Y="475" Note=""/>
+        <Element ComponentName="UserSettings" X="225" Y="250" Note=""/>
+        <Element ComponentName="UserSettingsController" X="625" Y="250" Note=""/>
+        <Element ComponentName="UserSettingsRepresentation" X="1000" Y="250" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

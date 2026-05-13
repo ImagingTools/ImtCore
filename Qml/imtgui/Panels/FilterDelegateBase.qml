@@ -94,7 +94,7 @@ Item {
 			icon.height: Style.iconSizeS
 			enabled: !filterDelegateBase.readOnly
 			onClicked: {
-				filterDelegateBase.clearFilter()
+				filterDelegateBase.clearFilter(false)
 			}
 
 			decorator: Component{

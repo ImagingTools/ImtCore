@@ -1,8 +1,9 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
 // ACF includes
-#include <ifile/IFilePersistence.h>
+#include <ifile/IDeviceBasedPersistence.h>
 
 // ImtCore includes
 #include <imtbase/IRevisionController.h>
@@ -24,7 +25,7 @@ public:
 	I_BEGIN_COMPONENT(CSqlDatabaseDocumentDelegateLegacyComp)
 		I_REGISTER_INTERFACE(imtbase::IRevisionController);
 		I_ASSIGN_MULTI_0(m_documentFactoriesCompPtr, "DocumentFactories", "Factory list used for creation of the new document instance according to the given type-ID", true);
-		I_ASSIGN_MULTI_0(m_documentPersistenceListCompPtr, "DocumentPersistenceList", "List of persistence components for each type of the document", true);
+		I_ASSIGN_MULTI_0(m_documentPersistenceListCompPtr, "DocumentPersistenceList", "List of device-based persistence components for each type of the document", true);
 		I_ASSIGN(m_metaInfoTableDelegateCompPtr, "MetaInfoTableDelegate", "Delegate for the table containing meta-informations for the document type", false, "MetaInfoTableDelegate");
 		I_ASSIGN(m_documentContentColumnIdAttrPtr, "DocumentContentColumnId", "ID of the column in the table containing document content", true, "Document");
 		I_ASSIGN(m_metaInfoTableNameAttrPtr, "MetaInfoTableName", "Name of the meta-info table", true, "");
@@ -112,7 +113,7 @@ protected:
 
 protected:
 	virtual QByteArray CreateOperationDescriptionQuery(const QByteArray& objectId, const imtbase::IOperationContext* operationContextPtr) const;
-	const ifile::IFilePersistence* FindDocumentPersistence(const QByteArray& typeId) const;
+	const ifile::IDeviceBasedPersistence* FindDocumentPersistence(const QByteArray& typeId) const;
 	virtual QByteArray CreateObjectHistoryQuery(
 		int offset = 0,
 		int count = -1,
@@ -127,7 +128,7 @@ protected:
 
 protected:
 	I_MULTIFACT(istd::IChangeable, m_documentFactoriesCompPtr);
-	I_MULTIREF(ifile::IFilePersistence, m_documentPersistenceListCompPtr);
+	I_MULTIREF(ifile::IDeviceBasedPersistence, m_documentPersistenceListCompPtr);
 	I_REF(IMetaInfoTableDelegate, m_metaInfoTableDelegateCompPtr);
 	I_ATTR(QByteArray, m_documentContentColumnIdAttrPtr);
 	I_ATTR(QByteArray, m_metaInfoTableNameAttrPtr);

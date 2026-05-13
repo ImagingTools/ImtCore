@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -6,8 +7,8 @@
 #include <QtCore/QMutex>
 
 // ImtCore includes
-
-#include <imthttp/ISender.h>
+#include <imtrest/IRequestServlet.h>
+#include <imtrest/ITransport.h>
 
 // Qt includes
 #include <QtWebSockets/QWebSocket>
@@ -15,12 +16,6 @@
 
 
 namespace imtrest
-{
-class IRequestServlet;
-}
-
-
-namespace imthttp
 {
 
 
@@ -54,12 +49,13 @@ public:
 		ST_CLOSE
 	};
 
-	explicit CWebSocketThread(imthttp::CWebSocketServerComp *parent);
+	explicit CWebSocketThread(imtrest::CWebSocketServerComp *parent);
 	void SetWebSocket(QWebSocket* webSocketPtr);
+	const QWebSocket* GetWebSocket() const;
 	void SetSocketStatus(Status socketStatus);
 	Status GetSocketStatus();
 	QByteArray GetRequestId();
-	// imthttp::imtrest::IRequestServlet* GetRequestServlet();
+	// imtrest::IRequestServlet* GetRequestServlet();
 
 	[[nodiscard]] bool IsSecureConnection() const;
 	void EnableSecureConnection(bool isSecureConnection = true);
@@ -83,22 +79,22 @@ Q_SIGNALS:
 
 private:
 	CWebSocketServerComp* m_server;
-	imthttp::IProtocolEngine* m_enginePtr;
+	imtrest::IProtocolEngine* m_enginePtr;
 	mutable QMutex m_socketDescriptorMutex;
 	mutable QMutex m_statusMutex;
 	Status m_status;
 	QPointer<QWebSocket> m_socket;
 	bool m_isSecureConnection;
 
-	imthttp::IProtocolEngine* m_httpEnginePtr;
-	imthttp::imtrest::IRequestServlet* m_requestServerHandlerPtr;
-	imthttp::imtrest::IRequestServlet* m_requestClientHandlerPtr;
+	imtrest::IProtocolEngine* m_httpEnginePtr;
+	imtrest::IRequestServlet* m_requestServerHandlerPtr;
+	imtrest::IRequestServlet* m_requestClientHandlerPtr;
 	QByteArray m_productId;
 
 	QByteArray m_requestId;
 };
 
 
-} // namespace imthttp
+} // namespace imtrest
 
 

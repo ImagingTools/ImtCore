@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -11,11 +12,15 @@
 #else
 #include <QtOpenGLWidgets/QOpenGLWidget>
 #endif
+
+#include <QtGui/QOpenGLExtraFunctions>
+
 // ACF includes
 #include <istd/istd.h>
 
 // ImtCore includes
 #include <imt3dview/CScene3d.h>
+#include <imt3dgui/COpenGLRenderBackend.h>
 
 
 namespace imt3dgui
@@ -23,7 +28,7 @@ namespace imt3dgui
 
 class ISceneEventHandler;
 
-class COpenGLWidget: public QOpenGLWidget, protected QOpenGLFunctions
+class COpenGLWidget: public QOpenGLWidget, protected QOpenGLExtraFunctions
 {
 	Q_OBJECT
 
@@ -129,8 +134,7 @@ private:
 	void MousePressSelection(QMouseEvent& e);
 	void MouseMoveView(QMouseEvent& e);
 	void MouseMoveSelection(QMouseEvent& e);
-	void SetGlFlags();
-	void SetGlUniformValues();
+	imt3dview::SceneState BuildSceneState() const;
 	QMatrix4x4 GetProjectionMatrix() const;
 	static void GetFovRect(float aspectRatio, float nearPlane, float& width, float& height);
 
@@ -147,10 +151,11 @@ private:
 	ViewMode m_viewMode;
 	SelectionMode m_selectionMode;
 	RotationMode m_rotationMode;
-	QOpenGLShaderProgram* m_programPtr;
+	imt3dgui::COpenGLRenderBackend m_backend;
 	imt3dview::IScene3dCamera* m_cameraPtr;
 	QColor m_backgroundColor;
 	ProjectionMode m_projectionMode = PM_PERSPECTIVE;
+	GLuint m_vao;
 
 	static const float s_verticalAngle;
 	static const float s_nearPlane;

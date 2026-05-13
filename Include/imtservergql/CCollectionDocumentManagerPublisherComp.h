@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -42,6 +43,7 @@ protected:
 	virtual bool OnDocumentSaved(imtdoc::CEventBase* eventPtr) const;
 	virtual bool OnDocumentSavedAs(imtdoc::CEventBase* eventPtr) const;
 	virtual bool OnDocumentClosed(imtdoc::CEventBase* eventPtr) const;
+	virtual bool OnDocumentDataLoaded(imtdoc::CEventBase* eventPtr) const;
 
 protected:
 	void FillDocumentNotification(
@@ -97,7 +99,9 @@ void CCollectionDocumentManagerPublisherComp::PublishRepresentation(
 		}
 
 		if (commandId == networkRequest.gqlRequest.GetCommandId()){
-			PublishData(commandId, data);
+			for (auto it = networkRequest.networkRequests.constBegin(); it != networkRequest.networkRequests.constEnd(); ++it) {
+				PushDataToSubscriber(it.key(), commandId, data, *it.value());
+			}
 		}
 	}
 }

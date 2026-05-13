@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtservergql/CGqlRequestHandlerCompBase.h>
 
 
@@ -17,14 +18,14 @@ bool CGqlRequestHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& g
 }
 
 
-imtbase::CTreeItemModel* CGqlRequestHandlerCompBase::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CGqlRequestHandlerCompBase::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	Q_ASSERT(IsRequestSupported(gqlRequest));
 
 	if (!IsRequestSupported(gqlRequest)){
 		SendErrorMessage(0, QString("GQL handler is not supported GQL request with command-ID:'%1'").arg(qPrintable(gqlRequest.GetCommandId())));
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	return CreateInternalResponse(gqlRequest, errorMessage);

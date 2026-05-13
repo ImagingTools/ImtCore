@@ -72,8 +72,12 @@
                     <AttributeInfo Id="EditDialog" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ModelDialogGui"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ObjectTypeId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="ProductLicensingInfo"/>
+                    <AttributeInfo Id="ObjectTypeIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>ProductLicensingInfo</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="StatusIcons" Type="Reference" ExportId="StatusIcons">
                         <Data IsEnabled="false"/>

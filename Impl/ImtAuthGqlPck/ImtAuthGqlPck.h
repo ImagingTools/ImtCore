@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -41,6 +42,17 @@
 #include <imtauthgql/CClientRequestRoleInfoProviderComp.h>
 #include <imtauthgql/CClientRequestGroupInfoProviderComp.h>
 #include <imtauthgql/CTokenBasedPermissionsProviderComp.h>
+#include <imtauthgql/CPersonalAccessTokenControllerComp.h>
+#include <imtauthgql/CClientRequestPersonalAccessTokenManagerComp.h>
+#include <imtauthgql/CTenantCollectionControllerComp.h>
+#include <imtauthgql/CTenantMetaInfoDelegateComp.h>
+#include <imtauthgql/CTenantCollectionDocumentManagerComp.h>
+#include <imtauthgql/CRemoteProfileControllerComp.h>
+#include <imtauthgql/CJwtSessionControllerProxyComp.h>
+#include <imtauthgql/CRemoteTenantControllerComp.h>
+#include <imtauthgql/CTenantManagerControllerComp.h>
+#include <imtauthgql/CTenantMembershipManagerControllerComp.h>
+#include <imtauthgql/CTenantMembershipPublisherComp.h>
 
 
 /**
@@ -85,8 +97,18 @@ typedef imtauthgql::CClientRequestUserInfoProviderComp ClientRequestUserInfoProv
 typedef imtauthgql::CClientRequestRoleInfoProviderComp ClientRequestRoleInfoProvider;
 typedef imtauthgql::CClientRequestGroupInfoProviderComp ClientRequestGroupInfoProvider;
 typedef imtauthgql::CTokenBasedPermissionsProviderComp ClientRequestTokenBasedPermissionsProvider;
+typedef imtauthgql::CPersonalAccessTokenControllerComp PersonalAccessTokenController;
+typedef icomp::TModelCompWrap<imtauthgql::CClientRequestPersonalAccessTokenManagerComp> ClientRequestPersonalAccessTokenManager;
+typedef imtauthgql::CTenantCollectionControllerComp TenantCollectionController;
+typedef imtauthgql::CTenantMetaInfoDelegateComp TenantMetaInfoDelegate;
+typedef imtauthgql::CTenantCollectionDocumentManagerComp TenantCollectionDocumentManager;
+typedef imtauthgql::CRemoteProfileControllerComp RemoteProfileController;
+typedef imtauthgql::CJwtSessionControllerProxyComp JwtSessionControllerProxy;
+typedef imtauthgql::CRemoteTenantControllerComp RemoteTenantController;
+typedef imtauthgql::CTenantManagerControllerComp TenantManagerController;
+typedef imtauthgql::CTenantMembershipManagerControllerComp TenantMembershipManagerController;
+typedef imtauthgql::CTenantMembershipPublisherComp TenantMembershipPublisher;
 
 
 } // namespace ImtAuthGqlPck
-
 

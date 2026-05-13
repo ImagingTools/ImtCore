@@ -207,7 +207,6 @@ Item {
 	// Update representation model from GUI
 	function doUpdateModel()
 	{
-		console.debug("doUpdateModel", model, viewBase.internal__);
 		if (!model || !viewBase.internal__){
 			return;
 		}
@@ -232,7 +231,7 @@ Item {
 			model.endChanges();
 		}
 	}
-	
+
 	// Update GUI from representation model
 	function doUpdateGui()
 	{
@@ -276,10 +275,7 @@ Item {
 		property bool localizationChanged: false;
 		property bool blockingUpdateGui: false;
 		property bool blockingUpdateModel: false;
-		onBlockingUpdateModelChanged: {
-			console.log("onBlockingUpdateModelChanged",blockingUpdateModel )
-		}
-		
+
 		property var commandStates: ({})
 		
 		function cacheCommandsState(){

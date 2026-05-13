@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -27,6 +28,7 @@
 #include <imtdb/CPostgresXPathExtractorComp.h>
 #include <imtdb/CSqliteXPathExtractorComp.h>
 #include <imtdb/CSqlDatabaseTransactionManagerComp.h>
+#include <imtauth/CTenantFilterParam.h>
 
 
 /**
@@ -60,5 +62,3 @@ typedef imtdb::CSqlDatabaseTransactionManagerComp SqlDatabaseTransactionManager;
 
 
 } // namespace ImtDatabasePck
-
-

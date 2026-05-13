@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CRoleMetaInfoDelegateComp.h>
 
 
@@ -14,8 +15,10 @@ namespace imtauthgql
 
 // protected methods
 
-bool CRoleMetaInfoDelegateComp::FillRepresentation(QJsonObject& representation, const idoc::IDocumentMetaInfo& metaInfo) const
+bool CRoleMetaInfoDelegateComp::FillRepresentation(QJsonObject& representation, const idoc::IDocumentMetaInfo& metaInfo, const QByteArray& typeId) const
 {
+	Q_UNUSED(typeId);
+	
 	QByteArray roleId = metaInfo.GetMetaInfo(imtauth::IRole::MIT_ROLE_ID).toByteArray();
 	representation["RoleId"] = QString(roleId);
 
@@ -32,8 +35,10 @@ bool CRoleMetaInfoDelegateComp::FillRepresentation(QJsonObject& representation, 
 }
 
 
-bool CRoleMetaInfoDelegateComp::FillMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const QJsonObject& representation) const
+bool CRoleMetaInfoDelegateComp::FillMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const QJsonObject& representation, const QByteArray& typeId) const
 {
+	Q_UNUSED(typeId);
+	
 	if (representation.contains("RoleId")){
 		metaInfo.SetMetaInfo(imtauth::IRole::MIT_ROLE_ID, representation.value("RoleId"));
 	}

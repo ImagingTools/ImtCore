@@ -1,15 +1,16 @@
-#include <imthttp/CWebSocketSender.h>
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+#include <imtrest/CWebSocketSender.h>
 
 
 // Qt includes
 #include <QtWebSockets/QWebSocket>
 
 // ImtCore includes
-#include <imthttp/IResponse.h>
-#include <imthttp/IProtocolEngine.h>
+#include <imtrest/IResponse.h>
+#include <imtrest/IProtocolEngine.h>
 
 
-namespace imthttp
+namespace imtrest
 {
 
 
@@ -54,14 +55,14 @@ bool CWebSocketSender::SendResponse(ConstResponsePtr& response) const
 }
 
 
-bool CWebSocketSender::SendRequest(ConstRequestPtr& reguest) const
+bool CWebSocketSender::SendRequest(ConstRequestPtr& request) const
 {
 	if (m_webSocketPtr != nullptr){
 		if (!m_webSocketPtr->isValid()){
 			return false;
 		}
 
-		const QByteArray& contentData = reguest->GetBody();
+		const QByteArray& contentData = request->GetBody();
 
 		emit SendTextMessage(contentData);
 
@@ -85,6 +86,6 @@ void CWebSocketSender::OnSendTextMessage(const QByteArray& data) const
 }
 
 
-} // namespace imthttp
+} // namespace imtrest
 
 

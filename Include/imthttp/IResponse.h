@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -9,10 +10,10 @@
 #include <istd/TInterfacePtr.h>
 
 // ImtCore includes
-#include <imthttp/INetworkObject.h>
+#include <imtrest/INetworkObject.h>
 
 
-namespace imthttp
+namespace imtrest
 {
 
 
@@ -51,15 +52,15 @@ public:
 };
 
 
-typedef istd::TSmartPtr<const imthttp::IResponse> ConstResponsePtr;
-typedef istd::TUniqueInterfacePtr<imthttp::IResponse> IResponseUniquePtr;
-typedef istd::TSharedInterfacePtr<imthttp::IResponse> IResponseSharedPtr;
+typedef istd::TSmartPtr<const imtrest::IResponse> ConstResponsePtr;
+typedef istd::TUniqueInterfacePtr<imtrest::IResponse> IResponseUniquePtr;
+typedef istd::TSharedInterfacePtr<imtrest::IResponse> IResponseSharedPtr;
 
 
-} // namespace imthttp
+} // namespace imtrest
 
 
-Q_DECLARE_METATYPE(imthttp::ConstResponsePtr)
-Q_DECLARE_METATYPE(imthttp::IResponseSharedPtr)
+Q_DECLARE_METATYPE(imtrest::ConstResponsePtr)
+Q_DECLARE_METATYPE(imtrest::IResponseSharedPtr)
 
 

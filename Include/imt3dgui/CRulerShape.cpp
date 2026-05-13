@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imt3dgui/CRulerShape.h>
 
 
@@ -22,8 +23,6 @@ CRulerShape::CRulerShape()
 	:m_slaveShapePtr(nullptr),
 	m_movingVertexIndex(-1)
 {
-	m_vertexBuffer.setUsagePattern(QOpenGLBuffer::StreamDraw);
-
 	std::vector<imt3d::IPointsBasedObject::PointXyzwRgba32> vertices;
 	// line vertices
 	imt3d::IPointsBasedObject::PointXyzwRgba32 a;
@@ -41,7 +40,7 @@ CRulerShape::CRulerShape()
 	vertices.push_back(vertices[0]);
 	vertices.push_back(vertices[1]);
 
-	m_data.CreateCloud(imt3d::CPointCloud3d::PF_XYZW_RGBA_32, vertices.size(), vertices.data());
+	m_data.CreateCloud(imt3d::CPointCloud3d::PF_XYZW_RGBA_32, static_cast<int>(vertices.size()), vertices.data());
 	m_vertices = static_cast<imt3d::IPointsBasedObject::PointXyzwRgba32*>(m_data.GetData());
 
 	m_indices = { 0, 1, 2, 3 };
@@ -169,25 +168,57 @@ void CRulerShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& /*chan
 
 // protected methods
 
-// reimplement (imt3dgui::CShape3dBase)
+// reimplemented (imt3dgui::CShape3dBase)
 
-void CRulerShape::DrawShapeGl(QOpenGLShaderProgram& program, QOpenGLFunctions& functions)
+imt3dview::PrimitiveType CRulerShape::GetPrimitiveType() const
 {
-	// draw line
-	GLuint* offsetPtr = (GLuint*)0;
-
-	functions.glLineWidth(4.0f);
-	functions.glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, offsetPtr);
-
-	// draw points
-	program.setUniformValue("usePointSize", true);
-	program.setUniformValue("pointSize", 12.0f);
-
-	functions.glDrawElements(GL_POINTS, 2, GL_UNSIGNED_INT, offsetPtr + 2);
+	// Default; the actual primitive used per sub-pass is set in Render()
+	return imt3dview::PT_LINES;
 }
 
 
-void CRulerShape::Draw(QPainter& painter)
+void CRulerShape::FillMaterial(imt3dview::Material& material) const
+{
+	BaseClass::FillMaterial(material);
+}
+
+
+void CRulerShape::Render(imt3dview::IRenderBackend& backend)
+{
+	if (!m_isVisible ||
+				!m_geometry ||
+				m_pointsDataPtr == nullptr ||
+				m_pointsDataPtr->GetData() == nullptr ||
+				m_pointsDataPtr->IsEmpty() ||
+				m_indices.size() < 4){
+		return;
+	}
+
+	imt3dview::DrawCommand command;
+	command.geometry = m_geometry;
+	command.modelMatrix = GetModelMatrix();
+
+	FillMaterial(command.material);
+
+	// draw line (first 2 indices)
+	command.primitive = imt3dview::PT_LINES;
+	command.indexCount = 2;
+	command.indexOffset = 0;
+	command.material.lineWidth = 4.0f;
+	command.material.usePointSize = false;
+	backend.Draw(command);
+
+	// draw points (next 2 indices)
+	command.primitive = imt3dview::PT_POINTS;
+	command.indexCount = 2;
+	command.indexOffset = 2;
+	command.material.usePointSize = true;
+	command.material.pointSize = 12.0f;
+	backend.Draw(command);
+}
+
+
+void CRulerShape::DrawOverlay(QPainter& painter)
 {
 	if (!IsVisible() || !m_slaveShapePtr){
 		return;
@@ -219,6 +250,13 @@ void CRulerShape::Draw(QPainter& painter)
 	font.setBold(true);
 
 	painter.save();
+	painter.setRenderHint(QPainter::Antialiasing, true);
+
+	QPen linePen(QColor::fromRgbF(s_color.x(), s_color.y(), s_color.z()), 4.0);
+	linePen.setCapStyle(Qt::RoundCap);
+	painter.setPen(linePen);
+	painter.drawLine(pos2d1, pos2d2);
+
 	painter.setPen(QColor(0, 0, 0, 128));
 	painter.setFont(font);
 	painter.drawText(pos2d1, point1Text);
@@ -229,5 +267,4 @@ void CRulerShape::Draw(QPainter& painter)
 
 
 } // namespace imt3dgui
-
 

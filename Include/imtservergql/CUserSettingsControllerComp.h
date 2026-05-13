@@ -1,5 +1,9 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
+
+// Qt includes
+#include <QtCore/QJsonObject>
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
@@ -25,8 +29,8 @@ public:
 
 protected:
 	// reimplemented (imtservergql::CGqlRepresentationControllerCompBase)
-	virtual imtbase::CTreeItemModel* CreateRepresentationFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-	virtual bool UpdateModelFromRepresentation(const imtgql::CGqlRequest& request, imtbase::CTreeItemModel* representationPtr) const override;
+	virtual QJsonObject CreateRepresentationFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual bool UpdateModelFromRepresentation(const imtgql::CGqlRequest& request, const QJsonObject& representation) const override;
 
 protected:
 	I_REF(imtserverapp::IRepresentationController, m_userSettingsRepresentationControllerCompPtr);

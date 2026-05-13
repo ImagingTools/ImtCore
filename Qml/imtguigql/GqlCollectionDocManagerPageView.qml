@@ -13,6 +13,10 @@ PageContainer {
 		collectionId: root.pageId
 	}
 
+	Component.onCompleted: {
+		console.log("GqlCollectionDocManagerPageView.qml onCompleted", root.pageId)
+	}
+
 	onPageIdChanged: {
 		if (pageId !== ""){
 			MainDocumentManager.registerDocumentManager(pageId, documentManager)
@@ -20,7 +24,6 @@ PageContainer {
 	}
 
 	onStartItemSourceCompChanged: {
-		console.log("onStartItemSourceCompChanged")
 		if (startItemSourceComp){
 			documentManagerView_.setCollectionViewComp(pageName, startItemSourceComp)
 		}
@@ -46,8 +49,5 @@ PageContainer {
 		id: documentManagerView_
 		anchors.fill: root
 		documentManager: root.documentManager
-		visualStatusProvider: GqlBasedObjectVisualStatusProvider {
-			collectionId: root.pageId
-		}
 	}
 }

@@ -1,5 +1,10 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtlicgql/CAccountControllerComp.h>
 
+
+// Qt includes
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonValue>
 
 // ImtCore includes
 #include <imtauth/CCompanyInfo.h>
@@ -13,13 +18,13 @@ namespace imtlicgql
 
 // reimplemented (imtservergql::CObjectCollectionControllerCompBase)
 
-imtbase::CTreeItemModel* CAccountControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CAccountControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QString("Internal error");
 		SendErrorMessage(0, errorMessage, "CAccountControllerComp");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	QByteArray accountId = GetObjectIdFromInputParams(gqlRequest.GetParams());
@@ -28,8 +33,8 @@ imtbase::CTreeItemModel* CAccountControllerComp::GetObject(const imtgql::CGqlReq
 	if (m_objectCollectionCompPtr->GetObjectData(accountId, dataPtr)){
 		const imtauth::CCompanyInfo* companyInfoPtr = dynamic_cast<const imtauth::CCompanyInfo*>(dataPtr.GetPtr());
 		if (companyInfoPtr != nullptr){
-			istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-			imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
+			QJsonObject rootObj;
+			QJsonObject dataObj;
 
 			QString accountName = companyInfoPtr->GetName();
 			QString accountDescription = companyInfoPtr->GetDescription();
@@ -44,8 +49,8 @@ imtbase::CTreeItemModel* CAccountControllerComp::GetObject(const imtgql::CGqlReq
 				for (const imtbase::ICollectionInfo::Id& addressId : addressesIds){
 					const imtauth::IAddress* addressPtr = addressProviderPtr->GetAddress(addressId);
 					if (addressPtr != nullptr){
-						dataModelPtr->SetData("Country", addressPtr->GetCountry());
-						dataModelPtr->SetData("City", addressPtr->GetCity());
+						dataObj.insert(QStringLiteral("Country"), QJsonValue::fromVariant(addressPtr->GetCountry()));
+						dataObj.insert(QStringLiteral("City"), QJsonValue::fromVariant(addressPtr->GetCity()));
 
 						QString postalCodeStr;
 
@@ -54,28 +59,29 @@ imtbase::CTreeItemModel* CAccountControllerComp::GetObject(const imtgql::CGqlReq
 							postalCodeStr = QString::number(postalCode);
 						}
 
-						dataModelPtr->SetData("PostalCode", postalCodeStr);
-						dataModelPtr->SetData("Street", addressPtr->GetStreet());
+						dataObj.insert(QStringLiteral("PostalCode"), QJsonValue::fromVariant(postalCodeStr));
+						dataObj.insert(QStringLiteral("Street"), QJsonValue::fromVariant(addressPtr->GetStreet()));
 
 						break;
 					}
 				}
 			}
 
-			dataModelPtr->SetData("Id", accountId);
-			dataModelPtr->SetData("Name", accountName);
-			dataModelPtr->SetData("Description", accountDescription);
-			dataModelPtr->SetData("Email", mail);
-			dataModelPtr->SetData("Groups", groups.join(';'));
+			dataObj.insert(QStringLiteral("Id"), QJsonValue::fromVariant(accountId));
+			dataObj.insert(QStringLiteral("Name"), QJsonValue::fromVariant(accountName));
+			dataObj.insert(QStringLiteral("Description"), QJsonValue::fromVariant(accountDescription));
+			dataObj.insert(QStringLiteral("Email"), QJsonValue::fromVariant(mail));
+			dataObj.insert(QStringLiteral("Groups"), QJsonValue::fromVariant(groups.join(';')));
 
-			return rootModelPtr.PopPtr();
+			rootObj.insert(QStringLiteral("data"), dataObj);
+			return rootObj;
 		}
 	}
 
 	errorMessage = QT_TR_NOOP(QString("Unable to get an account with ID: '%1'.").arg(qPrintable(accountId)));
 	SendErrorMessage(0, errorMessage, "CAccountControllerComp");
 
-	return nullptr;
+	return QJsonObject();
 }
 
 

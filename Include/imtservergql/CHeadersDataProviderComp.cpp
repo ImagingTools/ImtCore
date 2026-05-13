@@ -1,5 +1,9 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtservergql/CHeadersDataProviderComp.h>
 
+// Qt includes
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonObject>
 
 // ACF includes
 #include <iqt/iqt.h>
@@ -26,7 +30,7 @@ bool CHeadersDataProviderComp::IsRequestSupported(const imtgql::CGqlRequest& gql
 
 // reimplemented (imtservergql::CGqlRepresentationControllerCompBase)
 
-imtbase::CTreeItemModel* CHeadersDataProviderComp::CreateInternalResponse(
+QJsonObject CHeadersDataProviderComp::CreateInternalResponse(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
@@ -38,11 +42,11 @@ imtbase::CTreeItemModel* CHeadersDataProviderComp::CreateInternalResponse(
 
 	if (gqlContextPtr == nullptr){
 		errorMessage = QString("Unable to create response. Error: GraphQL context is invalid");
-		return nullptr;
+		return QJsonObject();
 	}
 
-	istd::TDelPtr<imtbase::CTreeItemModel> dataModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* headersModelPtr = dataModelPtr->AddTreeModel("headers");
+	QJsonObject rootObj;
+	QJsonArray headersArray;
 
 	const int idsCount = m_headersIdsAttrPtr.GetCount();
 	const int namesCount = m_headersNamesAttrPtr.GetCount();
@@ -54,9 +58,8 @@ imtbase::CTreeItemModel* CHeadersDataProviderComp::CreateInternalResponse(
 			continue;
 		}
 
-		int index = headersModelPtr->InsertNewItem();
-
-		headersModelPtr->SetData("id", m_headersIdsAttrPtr[i], index);
+		QJsonObject headerObj;
+		headerObj.insert(QStringLiteral("id"), m_headersIdsAttrPtr[i]);
 
 		QString headerName = m_headersNamesAttrPtr[i];
 
@@ -66,23 +69,28 @@ imtbase::CTreeItemModel* CHeadersDataProviderComp::CreateInternalResponse(
 			headerName = headerNameTr;
 		}
 
-		headersModelPtr->SetData("name", headerName, index);
+		headerObj.insert(QStringLiteral("name"), headerName);
+		headersArray.append(headerObj);
 	}
 
+	rootObj.insert(QStringLiteral("headers"), headersArray);
+
 	if (m_headersSearchByFilterAttrPtr.IsValid()){
-		imtbase::CTreeItemModel* searchModel = dataModelPtr->AddTreeModel("filterSearch");
+		QJsonArray searchArray;
 		for (int i = 0; i < m_headersSearchByFilterAttrPtr.GetCount(); i++){
 			QString headerId = m_headersSearchByFilterAttrPtr[i];
 			if (!CheckHeaderPermission(headerId.toUtf8(), *gqlContextPtr)){
 				continue;
 			}
 
-			int index = searchModel->InsertNewItem();
-			searchModel->SetData("id", m_headersSearchByFilterAttrPtr[i], index);
+			QJsonObject searchObj;
+			searchObj.insert(QStringLiteral("id"), m_headersSearchByFilterAttrPtr[i]);
+			searchArray.append(searchObj);
 		}
+		rootObj.insert(QStringLiteral("filterSearch"), searchArray);
 	}
 
-	return dataModelPtr.PopPtr();
+	return rootObj;
 }
 
 

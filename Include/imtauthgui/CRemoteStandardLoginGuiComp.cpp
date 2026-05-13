@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgui/CRemoteStandardLoginGuiComp.h>
 
 
@@ -163,9 +164,16 @@ void CRemoteStandardLoginGuiComp::OnRestoreSettings(const QSettings& settings)
 {
 	QString lastUser = settings.value("LastUser").toString();
 	bool isRememberMe = settings.value("RememberMe", false).toBool();
+	QByteArray refreshToken = settings.value("RefreshToken").toByteArray();
 
 	if (isRememberMe){
 		UserEdit->setText(lastUser);
+		
+		// Try to login with refresh token if available
+		if (TryRestoreSessionWithRefreshToken(lastUser, refreshToken)){
+			// Successfully logged in with refresh token
+			return;
+		}
 	}
 
 	RememberMe->setChecked(isRememberMe);
@@ -184,6 +192,12 @@ void CRemoteStandardLoginGuiComp::OnSaveSettings(QSettings& settings) const
 
 	settings.setValue("RememberMe", isRememberMe);
 	settings.setValue("LastUser", lastUser);
+	
+	// Save refresh token only if "Remember me" is checked
+	SaveRefreshTokenIfRememberMe(settings);
+	
+	// Clear refresh token if "Remember me" is not checked
+	ClearRefreshTokenIfNeeded(settings);
 }
 
 
@@ -246,14 +260,14 @@ void CRemoteStandardLoginGuiComp::on_SuPasswordEdit_textEdited(const QString& te
 	SuPasswordEdit->setStyleSheet("");
 	SuPasswordMessage->setText("");
 
-	CheckMatchingPassword();
-
 	if (text.isEmpty()){
 		SuPasswordMessage->setStyleSheet("color: red");
 		SuPasswordMessage->setText(tr("Please enter a non-empty password"));
+		SetPasswordButton->setEnabled(false);
 	}
-
-	SetPasswordButton->setEnabled(!text.isEmpty());
+	else{
+		CheckMatchingPassword();
+	}
 }
 
 
@@ -266,7 +280,7 @@ void CRemoteStandardLoginGuiComp::on_SuConfirmPasswordEdit_textEdited(const QStr
 void CRemoteStandardLoginGuiComp::OnSetSuPasswordFinished()
 {
 	SetSuPasswordThread::ThreadState state = m_setSuPasswordThread.GetState();
-	if (state != SetSuPasswordThread::ThreadState::TS_OK){
+	if (state == SetSuPasswordThread::ThreadState::TS_OK){
 		StackedWidget->setCurrentIndex(US_USER_PASSWORD_LOGIN);
 	}
 	else if (state == SetSuPasswordThread::ThreadState::TS_FAILED){
@@ -377,6 +391,27 @@ void CRemoteStandardLoginGuiComp::CheckMatchingPassword()
 	}
 
 	SetPasswordButton->setEnabled(isEqual);
+}
+
+
+bool CRemoteStandardLoginGuiComp::TryRestoreSessionWithRefreshToken(const QString& /*userName*/, const QByteArray& /*refreshToken*/)
+{
+	return false;
+}
+
+
+void CRemoteStandardLoginGuiComp::SaveRefreshTokenIfRememberMe(QSettings& /*settings*/) const
+{
+}
+
+
+void CRemoteStandardLoginGuiComp::ClearRefreshTokenIfNeeded(QSettings& settings) const
+{
+	bool isRememberMe = RememberMe->isChecked();
+	
+	if (!isRememberMe){
+		settings.remove("RefreshToken");
+	}
 }
 
 

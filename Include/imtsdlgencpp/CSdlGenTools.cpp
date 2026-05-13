@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+
 #include <imtsdlgencpp/CSdlGenTools.h>
 
 
@@ -16,10 +18,44 @@
 #include <imtsdl/CSdlEnum.h>
 #include <imtsdl/CSdlRequest.h>
 #include <imtsdl/CSdlDocumentType.h>
+#include <imtsdl/CSdlTools.h>
 
 
 namespace imtsdlgencpp
 {
+
+
+
+// static helpers
+namespace
+{
+
+std::optional<imtsdl::CSdlField> GetResponseFieldById(
+			const imtsdl::CSdlField& requestField,
+			const imtsdl::SdlTypeList& typeList,
+			const QString& fieldId)
+{
+	imtsdl::CSdlType responseType;
+	if (!imtsdl::CSdlTools::GetSdlTypeForField(requestField, typeList, responseType)){
+		return {};
+	}
+
+	const imtsdl::SdlFieldList responseFields = responseType.GetFields();
+	auto itemsField = std::find_if(responseFields.begin(), responseFields.end(),
+			[&fieldId](const imtsdl::CSdlField& field) {
+				return field.GetId() == fieldId;
+			});
+
+	if (itemsField == responseFields.end()){
+		return {};
+	}
+
+	return *itemsField;
+}
+
+} // namespace
+
+
 
 // public methods of embedded CStructNamespaceConverter class
 
@@ -352,6 +388,8 @@ void CSdlGenTools::AddArrayInternalChecksFail(QTextStream& stream, const imtsdl:
 	stream << QStringLiteral("){");
 	imtsdl::CSdlTools::FeedStream(stream, 1, false);
 
+	AddErrorReport(stream, QStringLiteral("Field: '%3' doesn't exist, but required"), 2, QStringList({QString("\"%1\"").arg(field.GetId())}));
+	
 	imtsdl::CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
 	stream << QStringLiteral("return false;\n\t}");
 	imtsdl::CSdlTools::FeedStream(stream, 1, false);
@@ -446,7 +484,8 @@ QString CSdlGenTools::GetQObjectTypeName(const imtsdl::CSdlField& sdlField,
 			const imtsdl::SdlTypeList& typeList,
 			const imtsdl::SdlEnumList& enumList,
 			const imtsdl::SdlUnionList& unionList,
-			bool withPointer)
+			bool withPointer,
+			bool treatArrayAsElement)
 {
 	QString retVal = "";
 	bool isArray = false;
@@ -467,7 +506,8 @@ QString CSdlGenTools::GetQObjectTypeName(const imtsdl::CSdlField& sdlField,
 	}
 
 	if (!isCustom || isEnum){
-		if (isArray){
+		// For primitive types and enums
+		if (isArray && !treatArrayAsElement){
 			retVal = QStringLiteral("QList<");
 		}
 
@@ -490,14 +530,15 @@ QString CSdlGenTools::GetQObjectTypeName(const imtsdl::CSdlField& sdlField,
 			retVal += QStringLiteral("QString");
 		}
 		else {
-			Q_ASSERT_X(false, "CSdlQObjectGeneratorComp::ProcessSourceClassFile", sdlField.GetType().toUtf8() + " field.GetType() not implemented");
+			Q_ASSERT_X(false, "CSdlGenTools::GetQObjectTypeName", sdlField.GetType().toUtf8() + " field.GetType() not implemented");
 		}
 
-		if (isArray){
+		if (isArray && !treatArrayAsElement){
 			retVal += QStringLiteral(">");
 		}
 	}
-	else if(isArray){
+	else if(isArray && !treatArrayAsElement){
+		// For custom array types, return ObjectList
 		retVal = sdlNamespace;
 		retVal += QStringLiteral("::C") + sdlField.GetType();
 		retVal += QStringLiteral("ObjectList");
@@ -510,6 +551,7 @@ QString CSdlGenTools::GetQObjectTypeName(const imtsdl::CSdlField& sdlField,
 		retVal = "QVariant";
 	}
 	else{
+		// For custom non-array types, or when treating arrays as elements, return Object
 		retVal = sdlNamespace;
 		retVal += QStringLiteral("::C") + sdlField.GetType();
 		retVal += QStringLiteral("Object");
@@ -526,6 +568,72 @@ QString CSdlGenTools::GetQObjectTypeName(const imtsdl::CSdlField& sdlField,
 QString CSdlGenTools::GetTempVariableWrappedValue(const QString& variableName)
 {
 	return QStringLiteral("t_%1").arg(imtsdl::CSdlTools::GetDecapitalizedValue(variableName));
+}
+
+
+std::shared_ptr<imtsdl::CSdlEntryBase> CSdlGenTools::GetCollectionReferenceForDocument(
+			const imtsdl::CSdlDocumentType& documentType,
+			const imtsdl::SdlTypeList& typeList,
+			const imtsdl::SdlUnionList& unionList,
+			imtsdl::CSdlDocumentType::OperationType operationType)
+{
+	using namespace imtsdl;
+
+	if (!documentType.HasRequest(operationType)) {
+		return {};
+	}
+
+	CSdlRequest request = documentType.GetRequest(operationType);
+	std::optional<CSdlField> fieldForType;
+	switch (operationType) {
+		case CSdlDocumentType::OT_GET:
+			fieldForType = request.GetOutputArgument();
+			break;
+
+		case CSdlDocumentType::OT_LIST: 
+			fieldForType = GetResponseFieldById(request.GetOutputArgument(), typeList, QStringLiteral("items"));
+			break;
+		case CSdlDocumentType::OT_INSERT:
+		case CSdlDocumentType::OT_UPDATE: {
+			const auto inputArgs = request.GetInputArguments();
+			if (inputArgs.isEmpty()) {
+				qWarning() << "No input arguments for operation type" << operationType;
+				break;
+			}
+			fieldForType = GetResponseFieldById(inputArgs.constFirst(), typeList, QStringLiteral("item"));
+			break;
+		}
+		case CSdlDocumentType::OT_GET_VIEW:
+		case CSdlDocumentType::OT_DELETE:
+		case CSdlDocumentType::OT_UPDATE_COLLECTION:
+		case CSdlDocumentType::OT_RENAME:
+		case CSdlDocumentType::OT_SET_DESCRIPTION:
+		case CSdlDocumentType::OT_HEADERS:
+		case CSdlDocumentType::OT_INFO:
+		case CSdlDocumentType::OT_METAINFO:
+		case CSdlDocumentType::OT_DATAMETAINFO:
+		case CSdlDocumentType::OT_ELEMENTS_COUNT:
+		case CSdlDocumentType::OT_ELEMENT_IDS:
+		case CSdlDocumentType::OT_ELEMENT_HISTORY:
+		case CSdlDocumentType::OT_IMPORT:
+		case CSdlDocumentType::OT_EXPORT:
+			break;
+		default:
+			qWarning() << "Operation type not implemented" << operationType;
+			break;
+		}
+
+	if (!fieldForType){
+		return {};
+	}
+
+	auto typeForField =  CSdlTools::GetSdlTypeOrEnumOrUnionForField(
+		*fieldForType,
+		typeList,
+		{},
+		unionList);
+
+	return typeForField;
 }
 
 

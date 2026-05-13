@@ -21,6 +21,10 @@ endif()
 
 get_filename_component(IMTCOREDIR "../.." ABSOLUTE BASE_DIR ${CMAKE_CURRENT_LIST_DIR})
 
+if(NOT DEFINED IMTCOREDIR_BUILD)
+	set(IMTCOREDIR_BUILD "${IMTCOREDIR}")
+endif()
+
 include(${IMTCOREDIR}/Config/CMake/ImtCoreEnv.cmake)
 include(${IMTCOREDIR}/Config/CMake/PartituraUpgrade.cmake)
 if (NOT ANDROID)
@@ -28,10 +32,6 @@ if (NOT ANDROID)
 endif()
 
 message(VERBOSE "ImtCore ACFDIR_BUILD ${ACFDIR_BUILD}")
-
-if(NOT DEFINED IMTCOREDIR_BUILD)
-	set(IMTCOREDIR_BUILD "${IMTCOREDIR}")
-endif()
 
 set (INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Include")
 set (IMPL_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Impl")
@@ -68,7 +68,7 @@ add_dependencies(DesignTokenCreator imtbase imtdesign)
 add_subdirectory("${IMPL_DIR}/DdlCodeCreatorExe/CMake" "${AUX_INCLUDE_DIR}/DdlCodeCreator")
 add_dependencies(DdlCodeCreator imtddl)
 
-#------ SDL ------
+#------ SDL tool ------
 add_subdirectory("${INCLUDE_DIR}/imtsdl/CMake" "${AUX_INCLUDE_DIR}/imtsdl")
 add_subdirectory("${IMPL_DIR}/ImtSdlPck/CMake" "${AUX_INCLUDE_DIR}/ImtSdlPck")
 add_dependencies(ImtSdlPck imtsdl imtfile imtbase)
@@ -84,18 +84,16 @@ add_dependencies(ImtSdlGenCppPck imtsdlgencpp imtsdlgenqml imtsdl imtfile imtbas
 add_subdirectory("${IMPL_DIR}/SdlCodeGeneratorExe/CMake" "${AUX_INCLUDE_DIR}/SdlCodeGenerator")
 add_dependencies(SdlCodeGenerator ImtSdlGenCppPck ImtSdlGenQmlPck ImtSdlPck)
 
-#------ OpenAPI ------
-add_subdirectory("${INCLUDE_DIR}/imtoas/CMake" "${AUX_INCLUDE_DIR}/imtoas")
-add_subdirectory("${IMPL_DIR}/ImtOasPck/CMake" "${AUX_INCLUDE_DIR}/ImtOasPck")
-add_subdirectory("${IMPL_DIR}/OasCodeGeneratorExe/CMake" "${AUX_INCLUDE_DIR}/OasCodeGeneratorExe")
-
-#------ BaseTests ------
+#------ SDL tool tests ------
 if (NOT DEFINED BUILD_TESTING OR BUILD_TESTING)
-	add_subdirectory("${INCLUDE_DIR}/imtbase/Test/CMake" "${AUX_INCLUDE_DIR}/imtbase/Test")
 	add_subdirectory("${INCLUDE_DIR}/imtsdlgencpp/Test/CMake" "${AUX_INCLUDE_DIR}/ImtSdlGenCppTest")
 	add_subdirectory("${INCLUDE_DIR}/imtsdlgenqml/Test/CMake" "${AUX_INCLUDE_DIR}/ImtSdlGenQmlTest")
 endif()
 
+#------ OpenAPI ------
+add_subdirectory("${INCLUDE_DIR}/imtoas/CMake" "${AUX_INCLUDE_DIR}/imtoas")
+add_subdirectory("${IMPL_DIR}/ImtOasPck/CMake" "${AUX_INCLUDE_DIR}/ImtOasPck")
+add_subdirectory("${IMPL_DIR}/OasCodeGeneratorExe/CMake" "${AUX_INCLUDE_DIR}/OasCodeGeneratorExe")
 
 if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 	#-------- Sdl --------
@@ -109,6 +107,8 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 		add_subdirectory("${SDL_DIR}/imtapp/CMake" "${AUX_INCLUDE_DIR}/imtappsdl")
 		add_subdirectory("${SDL_DIR}/imtpay/CMake" "${AUX_INCLUDE_DIR}/imtpaysdl")
 		add_dependencies(imtpaysdl imtbasesdl)
+		add_subdirectory("${SDL_DIR}/imtchat/CMake" "${AUX_INCLUDE_DIR}/imtchatsdl")
+		add_subdirectory("${SDL_DIR}/imtdesk/CMake" "${AUX_INCLUDE_DIR}/imtdesksdl")
 	endif()
 
 	#-------- Libraries --------
@@ -150,10 +150,11 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 	add_subdirectory("${INCLUDE_DIR}/imthttp/CMake" "${AUX_INCLUDE_DIR}/imthttp")
 	add_dependencies(imthttp imtcom)
 	add_subdirectory("${INCLUDE_DIR}/imtauthdb/CMake" "${AUX_INCLUDE_DIR}/imtauthdb")
+	add_subdirectory("${INCLUDE_DIR}/imtchat/CMake" "${AUX_INCLUDE_DIR}/imtchat")
+	add_subdirectory("${INCLUDE_DIR}/imtdesk/CMake" "${AUX_INCLUDE_DIR}/imtdesk")
 	add_subdirectory("${INCLUDE_DIR}/imtservice/CMake" "${AUX_INCLUDE_DIR}/imtservice")
 	add_subdirectory("${INCLUDE_DIR}/imtserverapp/CMake" "${AUX_INCLUDE_DIR}/imtserverapp")
 	add_dependencies(imtserverapp imtbasesdl)
-
 	add_subdirectory("${INCLUDE_DIR}/imthype/CMake" "${AUX_INCLUDE_DIR}/imthype")
 	add_subdirectory("${INCLUDE_DIR}/imthypegui/CMake" "${AUX_INCLUDE_DIR}/imthypegui")
 
@@ -176,6 +177,7 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 		add_subdirectory("${INCLUDE_DIR}/imt3d/CMake" "${AUX_INCLUDE_DIR}/imt3d")
 		add_subdirectory("${INCLUDE_DIR}/imt3dview/CMake" "${AUX_INCLUDE_DIR}/imt3dview")
 		add_subdirectory("${INCLUDE_DIR}/imt3dgui/CMake" "${AUX_INCLUDE_DIR}/imt3dgui")
+		add_subdirectory("${INCLUDE_DIR}/imt3d/Test/CMake" "${AUX_INCLUDE_DIR}/imt3d/Test")
 		add_dependencies(imt3dgui DesignTokenCreator)
 	endif()
 
@@ -184,6 +186,9 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 		add_subdirectory("${INCLUDE_DIR}/imtdbgui/CMake" "${AUX_INCLUDE_DIR}/imtdbgui")
 		add_subdirectory("${INCLUDE_DIR}/imtlicdb/CMake" "${AUX_INCLUDE_DIR}/imtlicdb")
 		add_subdirectory("${INCLUDE_DIR}/imtdbgql/CMake" "${AUX_INCLUDE_DIR}/imtdbgql")
+		add_subdirectory("${INCLUDE_DIR}/imthypedb/CMake" "${AUX_INCLUDE_DIR}/imthypedb")
+		add_subdirectory("${INCLUDE_DIR}/imtchatdb/CMake" "${AUX_INCLUDE_DIR}/imtchatdb")
+		add_subdirectory("${INCLUDE_DIR}/imtdeskdb/CMake" "${AUX_INCLUDE_DIR}/imtdeskdb")
 	endif()
 
 	if(DEFINED USE_MDBX AND USE_MDBX)
@@ -197,6 +202,8 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 		add_subdirectory("${INCLUDE_DIR}/imtauthgui/CMake" "${AUX_INCLUDE_DIR}/imtauthgui")
 		add_dependencies(imtauthgui DesignTokenCreator)
 		add_subdirectory("${INCLUDE_DIR}/imtauthgql/CMake" "${AUX_INCLUDE_DIR}/imtauthgql")
+		add_subdirectory("${INCLUDE_DIR}/imtchatgql/CMake" "${AUX_INCLUDE_DIR}/imtchatgql")
+		add_subdirectory("${INCLUDE_DIR}/imtdeskgql/CMake" "${AUX_INCLUDE_DIR}/imtdeskgql")
 		add_subdirectory("${QML_DIR}/imtdocgui/CMake" "${AUX_INCLUDE_DIR}/imtdocguiqml")
 		add_subdirectory("${QML_DIR}/imtauthgui/CMake" "${AUX_INCLUDE_DIR}/imtauthguiqml")
 		add_subdirectory("${QML_DIR}/imtcolgui/CMake" "${AUX_INCLUDE_DIR}/imtcolguiqml")
@@ -207,6 +214,9 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 		add_subdirectory("${INCLUDE_DIR}/imtqml/CMake" "${AUX_INCLUDE_DIR}/imtqml")
 		add_dependencies(imtqml imtbasesdl)
 		add_subdirectory("${INCLUDE_DIR}/imtstylecontrolsqml/CMake" "${AUX_INCLUDE_DIR}/imtstylecontrolsqml")
+		add_subdirectory("${QML_DIR}/imtgeogui/CMake" "${AUX_INCLUDE_DIR}/imtgeoguiqml")
+		add_subdirectory("${QML_DIR}/imtdeskgui/CMake" "${AUX_INCLUDE_DIR}/imtdeskguiqml")
+		add_subdirectory("${QML_DIR}/imtchatgui/CMake" "${AUX_INCLUDE_DIR}/imtchatguiqml")
 	endif()
 
 	#-------- Packages --------
@@ -234,6 +244,12 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 
 		add_subdirectory("${IMPL_DIR}/ImtAuthPck/CMake" "${AUX_INCLUDE_DIR}/ImtAuthPck")
 		add_dependencies(ImtAuthPck imtbase imtauth)
+
+		add_subdirectory("${IMPL_DIR}/ImtChatPck/CMake" "${AUX_INCLUDE_DIR}/ImtChatPck")
+		add_dependencies(ImtChatPck imtbase imtchat)
+
+		add_subdirectory("${IMPL_DIR}/ImtDeskPck/CMake" "${AUX_INCLUDE_DIR}/ImtDeskPck")
+		add_dependencies(ImtDeskPck imtbase imtdesk)
 
 	if(NOT DEFINED USE_QTQML OR USE_QTQML)
 		add_subdirectory("${IMPL_DIR}/ImtAuthGuiPck/CMake" "${AUX_INCLUDE_DIR}/ImtAuthGuiPck")
@@ -340,6 +356,15 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 
 			add_subdirectory("${IMPL_DIR}/ImtGuiGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtGuiGqlPck")
 			add_dependencies(ImtGuiGqlPck imtguigql imtdb)
+
+			add_subdirectory("${IMPL_DIR}/ImtHypeDbPck/CMake" "${AUX_INCLUDE_DIR}/ImtHypeDbPck")
+			add_dependencies(ImtHypeDbPck imthypedb imtdb imthype)
+
+			add_subdirectory("${IMPL_DIR}/ImtChatDbPck/CMake" "${AUX_INCLUDE_DIR}/ImtChatDbPck")
+			add_dependencies(ImtChatDbPck imtchatdb imtdb imtchat)
+
+			add_subdirectory("${IMPL_DIR}/ImtDeskDbPck/CMake" "${AUX_INCLUDE_DIR}/ImtDeskDbPck")
+			add_dependencies(ImtDeskDbPck imtdeskdb imtdb imtdesk)
 		endif()
 
 		if(NOT DEFINED USE_QT3D OR USE_QT3D)
@@ -356,6 +381,9 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 
 			add_subdirectory("${IMPL_DIR}/Imt3dGuiPck/CMake" "${AUX_INCLUDE_DIR}/Imt3dGuiPck")
 			add_dependencies(Imt3dGuiPck imt3dview imt3dgui)
+
+			add_subdirectory("${IMPL_DIR}/Imt3dDemo/CMake" "${AUX_INCLUDE_DIR}/Imt3dDemo")
+			add_dependencies(Imt3dDemo imt3dgui imt3dview imt3d)
 		endif()
 
 		if(NOT DEFINED USE_QTQML OR USE_QTQML)
@@ -364,32 +392,56 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 			if(NOT DEFINED USE_QTDB OR USE_QTDB)
 				add_subdirectory("${IMPL_DIR}/ImtAuthGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtAuthGqlPck")
 				add_dependencies(ImtAuthGqlPck imtauthgql imtdb)
+
+				add_subdirectory("${IMPL_DIR}/ImtChatGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtChatGqlPck")
+				add_dependencies(ImtChatGqlPck imtchatgql imtdb imtchat)
+
+				add_subdirectory("${IMPL_DIR}/ImtDeskGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtDeskGqlPck")
+				add_dependencies(ImtDeskGqlPck imtdeskgql imtdb imtdesk)
 			endif()
 		endif()
 	endif()
 
 	#-------- Tests --------
 	if (NOT DEFINED BUILD_TESTING OR BUILD_TESTING)
+		add_subdirectory("${INCLUDE_DIR}/imtbase/Test/CMake" "${AUX_INCLUDE_DIR}/imtbase/Test")
 		add_subdirectory("${INCLUDE_DIR}/imttest/CMake" "${AUX_INCLUDE_DIR}/imttest")
 
-		if(NOT DEFINED USE_QTDB OR USE_QTDB)
-			add_subdirectory("${IMPL_DIR}/ImtTestPck/CMake" "${AUX_INCLUDE_DIR}/ImtTestPck")
-			add_dependencies(ImtTestPck imtbase imtdb imttest)
-		endif()
-
-		if(DEFINED USE_MDBX AND USE_MDBX)
-			add_subdirectory("${INCLUDE_DIR}/imtmdbx/Test/CMake" "${AUX_INCLUDE_DIR}/imtmdbx/Test")
-		endif()
-
-		add_subdirectory("${INCLUDE_DIR}/imtgql/Test/CMake" "${AUX_INCLUDE_DIR}/imtgql/Test")
-		add_subdirectory("${INCLUDE_DIR}/imtgqltest/CMake" "${AUX_INCLUDE_DIR}/imtgqltest")
+	if(NOT DEFINED USE_QTDB OR USE_QTDB)
+		add_subdirectory("${IMPL_DIR}/ImtTestPck/CMake" "${AUX_INCLUDE_DIR}/ImtTestPck")
+		add_dependencies(ImtTestPck imtbase imtdb imttest)
 
 		add_subdirectory("${TESTS_DIR}/ObjectCollectionTest/CMake" "${AUX_INCLUDE_DIR}/ObjectCollectionTest")
-		add_subdirectory("${TESTS_DIR}/FileCollectionTest/CMake" "${AUX_INCLUDE_DIR}/FileCollectionTest")
-		add_subdirectory("${TESTS_DIR}/RevisionControllerTest/CMake" "${AUX_INCLUDE_DIR}/RevisionControllerTest")
+		add_dependencies(ImtCoreObjectCollectionTest imtbase imtauth imtdb imttest)
+
 		add_subdirectory("${TESTS_DIR}/StructureTest/CMake" "${AUX_INCLUDE_DIR}/StructureTest")
-		file(COPY ${TESTS_DIR}/Migrations DESTINATION ${TESTS_DIR}/../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
+		add_dependencies(StructureTest imtbase imtauth imtdb imttest)
 	endif()
 
+	if(DEFINED USE_MDBX AND USE_MDBX)
+		add_subdirectory("${INCLUDE_DIR}/imtmdbx/Test/CMake" "${AUX_INCLUDE_DIR}/imtmdbx/Test")
+	endif()
+
+	add_subdirectory("${INCLUDE_DIR}/imtgql/Test/CMake" "${AUX_INCLUDE_DIR}/imtgql/Test")
+	add_dependencies(imtGqlTest imtbase imtgql imtbasesdl)
+
+	add_subdirectory("${INCLUDE_DIR}/imtgqltest/CMake" "${AUX_INCLUDE_DIR}/imtgqltest")
+	add_dependencies(imtgqltest imtcom imtrest imtbase)
+
+	add_subdirectory("${TESTS_DIR}/FileCollectionTest/CMake" "${AUX_INCLUDE_DIR}/FileCollectionTest")
+	add_dependencies(ImtCoreFileCollectionTest imtbase imtauth imtrepo)
+
+	add_subdirectory("${TESTS_DIR}/RevisionControllerTest/CMake" "${AUX_INCLUDE_DIR}/RevisionControllerTest")
+	add_dependencies(ImtCoreRevisionControllerTest imtauth imtbase)
+
+	add_subdirectory("${TESTS_DIR}/PersonalAccessTokenTest/CMake" "${AUX_INCLUDE_DIR}/PersonalAccessTokenTest")
+	add_dependencies(PersonalAccessTokenTest imtbase imtauth)
+
+	add_subdirectory("${TESTS_DIR}/CollectionDocumentManagerTest/CMake" "${AUX_INCLUDE_DIR}/CollectionDocumentManagerTest")
+	add_dependencies(CollectionDocumentManagerTest imtbase imtdoc)
+
+	file(COPY ${TESTS_DIR}/Migrations DESTINATION ${TESTS_DIR}/../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
+
+	endif() # BUILD_TESTING
 endif() # NOT ONLYTOOLS
 

@@ -1,4 +1,5 @@
-#include <imthttp/CBinaryDataProviderComp.h>
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+#include <imtrest/CBinaryDataProviderComp.h>
 
 
 // Qt includes
@@ -6,7 +7,7 @@
 #include <QtCore/QRegularExpressionMatch>
 
 
-namespace imthttp
+namespace imtrest
 {
 
 
@@ -110,6 +111,6 @@ bool CBinaryDataProviderComp::GetData(
 }
 
 
-} // namespace imthttp
+} // namespace imtrest
 
 

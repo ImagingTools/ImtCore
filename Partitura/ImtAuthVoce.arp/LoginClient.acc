@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5430" Description="ACF"/>
-            <Version Id="1" Number="2253" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5715" Description="ACF"/>
+            <Version Id="1" Number="2274" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -32,6 +32,7 @@
         <Interface InterfaceId="iauth::IRightsProvider" ComponentId="SimpleLoginWrap"/>
         <Interface InterfaceId="imod::IModel" ComponentId="SimpleLoginWrap"/>
         <Interface InterfaceId="imtauth::IAccessTokenProvider" ComponentId="SimpleLoginWrap"/>
+        <Interface InterfaceId="imtauth::ILoginInfoProvider" ComponentId="SimpleLoginWrap"/>
         <Interface InterfaceId="istd::IChangeable" ComponentId="SimpleLoginWrap"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="SimpleLoginWrap"/>
     </ExportedInterfaces>

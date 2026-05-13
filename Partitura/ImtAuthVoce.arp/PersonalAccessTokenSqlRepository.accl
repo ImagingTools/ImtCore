@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5715" Description="ACF"/>
+            <Version Id="1" Number="2274" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="JsonSerializer" X="275" Y="475" Note=""/>
+        <Element ComponentName="ObjectCollection" X="275" Y="300" Note=""/>
+        <Element ComponentName="PersonalAccessToken" X="624" Y="472" Note=""/>
+        <Element ComponentName="PersonalAccessTokenDatabaseDelegate" X="900" Y="300" Note=""/>
+        <Element ComponentName="Repository" X="575" Y="125" Note=""/>
+        <Element ComponentName="Types" X="1050" Y="475" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

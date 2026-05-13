@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include "ImtServerAppPck.h"
 
 
@@ -138,6 +139,21 @@ I_EXPORT_COMPONENT(
 			ServerConnectionParamRepresentationController,
 			"Server connection param representation controller",
 			"Server Connection Param Representation Controller");
+
+I_EXPORT_COMPONENT(
+			CollectionImportParamRepresentationController,
+			"Collection import param representation controller",
+			"Collection Import Param Representation Controller");
+
+I_EXPORT_COMPONENT(
+			IdParamRepresentationController,
+			"Id param representation controller",
+			"ID Param Representation Controller");
+
+I_EXPORT_COMPONENT(
+			ParamsRepresentationController,
+			"Params representation controller",
+			"Params Representation Controller");
 
 
 } // namespace ImtServerAppPck

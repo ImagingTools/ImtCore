@@ -1,13 +1,9 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
 // Qt includes
 #include <QtGui/QPainter>
-#if QT_VERSION < 0x060000
-#include <QtGui/QOpenGLShaderProgram>
-#else
-#include <QtOpenGL/QOpenGLShaderProgram>
-#endif
 
 // ACF includes
 #include <istd/IPolymorphic.h>
@@ -17,29 +13,34 @@ namespace imt3dview
 {
 
 
+class IRenderBackend;
+
+
 /**
-	Basic drawable object interface
+	Basic drawable object interface. Backend-neutral; concrete render work is delegated
+	to an IRenderBackend instance attached via OnAttachBackend.
 */
 class IDrawable: virtual public istd::IPolymorphic
 {
 public:
 	/**
-		Set used OpenGL context for the drawing.
+		Attach the drawable to a render backend (or detach by passing nullptr).
+		Backend-owned resources should be (re)created here.
 	*/
-	virtual void SetContext(QOpenGLContext* contextPtr) = 0;
+	virtual void OnAttachBackend(IRenderBackend* backendPtr) = 0;
 
 	/**
-		Draw the shape using the given shader program and available OpenGL functions.
+		Render the drawable using the given backend (which must be the same instance
+		previously passed to OnAttachBackend).
 	*/
-	virtual void DrawGl(QOpenGLShaderProgram& program) = 0;
+	virtual void Render(IRenderBackend& backend) = 0;
 
 	/**
-		Draw the shape using painter.
+		Optional 2D painter overlay (axis labels, info boxes, ...) drawn on top of the
+		3D scene by the host. This is intentionally outside the IRenderBackend pipeline.
 	*/
-	virtual void Draw(QPainter& painter) = 0;
+	virtual void DrawOverlay(QPainter& painter) = 0;
 };
 
 
 } // namespace imt3dview
-
-

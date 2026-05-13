@@ -1,4 +1,5 @@
-#include <imthttp/CWebSocketRequest.h>
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+#include <imtrest/CWebSocketRequest.h>
 
 
 // Qt includes
@@ -12,7 +13,7 @@
 #include <QtCore/QJsonObject>
 
 
-namespace imthttp
+namespace imtrest
 {
 
 
@@ -25,7 +26,7 @@ CWebSocketRequest::CWebSocketRequest(const IProtocolEngine& engine)
 }
 
 
-CWebSocketRequest::CWebSocketRequest(const imtrest::IRequestServlet& handler, const IProtocolEngine& engine)
+CWebSocketRequest::CWebSocketRequest(const IRequestServlet& handler, const IProtocolEngine& engine)
 			:m_state(RS_NON_STARTED),
 			m_requestHandlerPtr(&handler),
 			m_engine(engine)
@@ -113,7 +114,7 @@ void CWebSocketRequest::SetBody(const QByteArray &body)
 		m_type = MT_START;
 	}
 	if (object.value("type") == "subscribe"){
-		m_type = MT_START;
+		m_type = MT_SUBSCRIBE;
 	}
 	if (object.value("type") == "start_ack"){
 		m_type = MT_START_ACK;
@@ -123,6 +124,9 @@ void CWebSocketRequest::SetBody(const QByteArray &body)
 	}
 	if (object.value("type") == "connection_error"){
 		m_type = MT_ERROR;
+	}
+	if (object.value("type") == "connection_terminate"){
+		m_type = MT_COMPLETE;
 	}
 	if (object.value("type") == "stop"){
 		m_type = MT_STOP;
@@ -160,7 +164,7 @@ void CWebSocketRequest::SetBody(const QByteArray &body)
 }
 
 
-void CWebSocketRequest::SetRequestHandler(const imtrest::IRequestServlet* requestHandlerPtr)
+void CWebSocketRequest::SetRequestHandler(const IRequestServlet* requestHandlerPtr)
 {
 	if (m_requestHandlerPtr != requestHandlerPtr){
 		m_requestHandlerPtr = requestHandlerPtr;
@@ -256,6 +260,6 @@ bool CWebSocketRequest::ResetData(CompatibilityMode /*mode*/)
 }
 
 
-} // namespace imthttp
+} // namespace imtrest
 
 

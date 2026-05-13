@@ -1,5 +1,5 @@
-
-#include <imthttp/CTcpServerComp.h>
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+#include <imtrest/CTcpServerComp.h>
 
 
 // Qt includes
@@ -11,13 +11,13 @@
 #include <iprm/IEnableableParam.h>
 
 // ImtCore includes
-#include <imthttp/IRequest.h>
-#include <imthttp/IResponse.h>
-#include <imthttp/ISender.h>
-#include <imthttp/CMultiThreadServer.h>
+#include <imtrest/IRequest.h>
+#include <imtrest/IResponse.h>
+#include <imtrest/ITransport.h>
+#include <imtrest/CMultiThreadServer.h>
 
 
-namespace imthttp
+namespace imtrest
 {
 
 
@@ -35,7 +35,7 @@ CTcpServerComp::~CTcpServerComp()
 }
 
 
-imthttp::imtrest::IRequestServlet* CTcpServerComp::GetRequestServlet()
+imtrest::IRequestServlet* CTcpServerComp::GetRequestServlet()
 {
 	if (!m_requestHandlerCompPtr.IsValid()){
 		return nullptr;
@@ -45,7 +45,7 @@ imthttp::imtrest::IRequestServlet* CTcpServerComp::GetRequestServlet()
 }
 
 
-imthttp::IProtocolEngine* CTcpServerComp::GetProtocolEngine()
+imtrest::IProtocolEngine* CTcpServerComp::GetProtocolEngine()
 {
 	if (!m_protocolEngineCompPtr.IsValid()){
 		return nullptr;
@@ -102,15 +102,19 @@ void CTcpServerComp::OnComponentCreated()
 }
 
 
-const ISender* CTcpServerComp::GetSender(const QByteArray& requestId) const
+bool CTcpServerComp::SendResponse(const QByteArray& requestId, ConstResponsePtr& response) const
 {
-	const ISender* senderPtr = m_serverPtr->GetSender(requestId);
-
-	return senderPtr;
+	return m_serverPtr->SendResponse(requestId, response);
 }
 
 
-// reimplemented (imthttp::IServer)
+bool CTcpServerComp::SendRequest(const QByteArray& requestId, ConstRequestPtr& request) const
+{
+	return m_serverPtr->SendRequest(requestId, request);
+}
+
+
+// reimplemented (imtrest::IServer)
 
 bool CTcpServerComp::StartServer()
 {
@@ -215,6 +219,6 @@ void CTcpServerComp::OnNewThreadConnection(const IRequest* request, const QByteA
 }
 
 
-} // namespace imthttp
+} // namespace imtrest
 
 

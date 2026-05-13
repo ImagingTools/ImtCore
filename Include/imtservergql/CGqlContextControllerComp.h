@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -8,6 +9,7 @@
 #include <imtbase/IObjectCollection.h>
 #include <imtgql/IGqlContextController.h>
 #include <imtauth/IJwtSessionController.h>
+#include <imtauth/IPersonalAccessTokenManager.h>
 
 
 namespace imtservergql
@@ -26,6 +28,7 @@ public:
 		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "User collection", false, "UserCollection");
 		I_ASSIGN(m_userSettingsCollectionCompPtr, "UserSettingsCollection", "User settings collection", false, "UserSettingsCollection");
 		I_ASSIGN(m_jwtSessionControllerCompPtr, "JwtSessionController", "JWT session controller", false, "JwtSessionController");
+		I_ASSIGN(m_patManagerCompPtr, "PersonalAccessTokenManager", "Personal Access Token manager", false, "PersonalAccessTokenManager");
 	I_END_COMPONENT;
 
 	// reimplemented (imtgql::IGqlContextController)
@@ -39,6 +42,7 @@ private:
 	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
 	I_REF(imtbase::IObjectCollection, m_userSettingsCollectionCompPtr);
 	I_REF(imtauth::IJwtSessionController, m_jwtSessionControllerCompPtr);
+	I_REF(imtauth::IPersonalAccessTokenManager, m_patManagerCompPtr);
 };
 
 

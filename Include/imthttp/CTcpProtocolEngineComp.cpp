@@ -1,12 +1,13 @@
-#include <imthttp/CTcpProtocolEngineComp.h>
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+#include <imtrest/CTcpProtocolEngineComp.h>
 
 
 // ImtCore includes
-#include <imthttp/CTcpRequest.h>
-#include <imthttp/CTcpResponse.h>
+#include <imtrest/CTcpRequest.h>
+#include <imtrest/CTcpResponse.h>
 
 
-namespace imthttp
+namespace imtrest
 {
 
 
@@ -23,12 +24,6 @@ QByteArray CTcpProtocolEngineComp::GetProtocolTypeId() const
 const iser::IVersionInfo* CTcpProtocolEngineComp::GetProtocolVersion() const
 {
 	return nullptr;
-}
-
-
-IProtocolEngine::ProtocolPattern CTcpProtocolEngineComp::GetProtocolPattern() const
-{
-	return PP_REQUEST_RESPONSE;
 }
 
 
@@ -156,14 +151,14 @@ bool CTcpProtocolEngineComp::GetProtocolStatusCode(int statusCode, int& protocol
 }
 
 
-imthttp::IRequestUniquePtr CTcpProtocolEngineComp::CreateRequest(const imtrest::IRequestServlet& requestHandler) const
+imtrest::IRequestUniquePtr CTcpProtocolEngineComp::CreateRequest(const IRequestServlet& requestHandler) const
 {
 	return new CTcpRequest(requestHandler, *this);
 }
 
 
-imthttp::IRequestUniquePtr CTcpProtocolEngineComp::CreateRequestForSend(
-			const imtrest::IRequestServlet& requestHandler,
+imtrest::IRequestUniquePtr CTcpProtocolEngineComp::CreateRequestForSend(
+			const IRequestServlet& requestHandler,
 			int /*statusCode*/,
 			const QByteArray& /*data*/,
 			const QByteArray& /*dataTypeId*/) const
@@ -172,7 +167,7 @@ imthttp::IRequestUniquePtr CTcpProtocolEngineComp::CreateRequestForSend(
 }
 
 
-imthttp::IResponseUniquePtr CTcpProtocolEngineComp::CreateResponse(
+imtrest::IResponseUniquePtr CTcpProtocolEngineComp::CreateResponse(
 			const IRequest& /*request*/,
 			int statusCode,
 			const QByteArray& data,
@@ -182,6 +177,6 @@ imthttp::IResponseUniquePtr CTcpProtocolEngineComp::CreateResponse(
 }
 
 
-} // namespace imthttp
+} // namespace imtrest
 
 

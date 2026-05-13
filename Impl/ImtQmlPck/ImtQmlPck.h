@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -11,6 +12,9 @@
 #include <imtqml/CGuiQuickWrapComp.h>
 #include <imtqml/CObserverQmlComp.h>
 #include <imtqml/CClientUserContextComp.h>
+#include <imtqml/CDataModelBridgeDemultiplexer.h>
+#include <imtqml/CDocumentManagerBridge.h>
+#include <imtqml/CGqlClientBridge.h>
 #include <imtqml/CPageGuiElementModelComp.h>
 #include <imtqml/CCommandsObserverQmlComp.h>
 #include <imtqml/CQmlObjectCollectionComp.h>
@@ -31,6 +35,9 @@ typedef imtqml::CGqlQuickObjectComp QuickObject;
 typedef imtqml::CGuiQuickWrapComp GuiQuickWrap;
 typedef imtqml::CObserverQmlComp ObserverQml;
 typedef imtqml::CClientUserContextComp ClientUserContext;
+typedef imtqml::CGqlClientBridge GqlClientBridge;
+typedef imtqml::CDocumentManagerBridge DocumentManagerBridge;
+typedef imtqml::CDataModelBridgeDemultiplexer DataModelBridge;
 typedef imtqml::CPageGuiElementModelComp PageGuiElementModel;
 typedef icomp::TModelCompWrap<imtqml::CCommandsObserverQmlComp> CommandsObserverQml;
 typedef imtqml::CQmlObjectCollectionComp QmlObjectCollection;

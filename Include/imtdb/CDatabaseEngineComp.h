@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -15,6 +16,9 @@
 #include <imtdb/IDatabaseServerConnectionChecker.h>
 #include <imtdb/CDatabaseAccessSettings.h>
 #include <imtdb/IMigrationController.h>
+
+// std includes
+#include <set>
 
 
 namespace imtdb
@@ -66,6 +70,7 @@ public:
 	virtual bool BeginTransaction() const override;
 	virtual bool FinishTransaction() const override;
 	virtual bool CancelTransaction() const override;
+	virtual QByteArray GetDatabaseDriverId() const override;
 	virtual QSqlQuery ExecSqlQuery(const QByteArray& queryString, QSqlError* sqlError = nullptr, bool isForwardOnly = false) const override;
 	virtual QSqlQuery ExecSqlQuery(const QByteArray& queryString, const QVariantMap& bindValues, QSqlError* sqlError = nullptr, bool isForwardOnly = false) const override;
 	virtual QSqlQuery ExecSqlQueryFromFile(const QString& filePath, QSqlError* sqlError = nullptr, bool isForwardOnly = false) const override;
@@ -165,9 +170,11 @@ private:
 	imtbase::TModelUpdateBinder<imtdb::IDatabaseLoginSettings, CDatabaseEngineComp> m_databaseAccessObserver;
 
 	imod::TModelWrap<imtdb::CDatabaseAccessSettings> m_workingAccessSettings;
+
+	mutable std::mutex m_connectedThreadsMutex;
+	mutable std::set<quintptr> m_connectedThreads;
 };
 
 
 } // namespace imtdb
-
 

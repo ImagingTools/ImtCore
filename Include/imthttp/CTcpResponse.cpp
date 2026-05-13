@@ -1,11 +1,12 @@
-#include <imthttp/CTcpResponse.h>
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+#include <imtrest/CTcpResponse.h>
 
 
 // ImtCore includes
-#include <imthttp/IProtocolEngine.h>
+#include <imtrest/IProtocolEngine.h>
 
 
-namespace imthttp
+namespace imtrest
 {
 
 
@@ -81,6 +82,6 @@ bool CTcpResponse::ResetData(CompatibilityMode /*mode*/)
 }
 
 
-} // namespace imthttp
+} // namespace imtrest
 
 

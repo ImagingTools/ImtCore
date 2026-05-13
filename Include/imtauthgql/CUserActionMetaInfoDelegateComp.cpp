@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CUserActionMetaInfoDelegateComp.h>
 
 
@@ -15,8 +16,10 @@ namespace imtauthgql
 
 // protected methods
 
-bool CUserActionMetaInfoDelegateComp::FillRepresentation(QJsonObject& representation, const idoc::IDocumentMetaInfo& metaInfo) const
+bool CUserActionMetaInfoDelegateComp::FillRepresentation(QJsonObject& representation, const idoc::IDocumentMetaInfo& metaInfo, const QByteArray& typeId) const
 {
+	Q_UNUSED(typeId);
+	
 	QByteArray userId = metaInfo.GetMetaInfo(imtauth::IUserRecentAction::MIT_USER_ID).toByteArray();
 	representation["userId"] = QString(userId);
 
@@ -51,8 +54,10 @@ bool CUserActionMetaInfoDelegateComp::FillRepresentation(QJsonObject& representa
 }
 
 
-bool CUserActionMetaInfoDelegateComp::FillMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const QJsonObject& representation) const
+bool CUserActionMetaInfoDelegateComp::FillMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const QJsonObject& representation, const QByteArray& typeId) const
 {
+	Q_UNUSED(typeId);
+	
 	if (representation.contains("userId")){
 		metaInfo.SetMetaInfo(imtauth::IUserRecentAction::MIT_USER_ID, representation.value("userId"));
 	}

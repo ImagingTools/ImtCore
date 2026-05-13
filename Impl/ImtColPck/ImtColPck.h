@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -10,6 +11,7 @@
 #include <imtcol/CTextFilter.h>
 #include <imtcol/CCollectionHeadersProviderComp.h>
 #include <imtcol/CDocumentCollectionFilter.h>
+#include <imtcol/CCollectionImportParam.h>
 
 
 namespace ImtColPck
@@ -19,6 +21,7 @@ namespace ImtColPck
 typedef icomp::TModelCompWrap<icomp::TMakeComponentWrap<imtcol::CObjectTypeIdFilter, imtcol::IObjectTypeIdFilter, iser::ISerializable>> ObjectTypeIdFilter;
 typedef icomp::TModelCompWrap<icomp::TMakeComponentWrap<imtcol::CTextFilter, imtcol::ITextFilter, iser::ISerializable>> TextFilter;
 typedef icomp::TModelCompWrap<icomp::TMakeComponentWrap<imtcol::CDocumentCollectionFilter, imtcol::IDocumentCollectionFilter, iser::ISerializable>> DocumentFilter;
+typedef icomp::TModelCompWrap<icomp::TMakeComponentWrap<imtcol::CCollectionImportParam, imtcol::ICollectionImportParam, iser::ISerializable>> CollectionImportParam;
 typedef imtcol::CCollectionHeadersProviderComp CollectionHeadersProvider;
 
 

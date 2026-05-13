@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtserverapp/CCommandRepresentationController.h>
 
 
@@ -5,6 +6,9 @@
 #include <iprm/TParamsPtr.h>
 #include <iprm/IIdParam.h>
 #include <iqt/iqt.h>
+
+// Qt includes
+#include <QtCore/QJsonValue>
 
 // ImtCore includes
 #include <imtserverapp/IGuiElementModel.h>
@@ -38,7 +42,7 @@ bool CCommandRepresentationController::IsModelSupported(const istd::IChangeable&
 
 bool CCommandRepresentationController::GetRepresentationFromDataModel(
 			const istd::IChangeable& dataModel,
-			imtbase::CTreeItemModel& representation,
+			QJsonObject& representation,
 			const iprm::IParamsSet* paramsPtr) const
 {
 	const imtserverapp::IGuiElementModel* guiElementPtr = dynamic_cast<const imtserverapp::IGuiElementModel*>(&dataModel);
@@ -78,22 +82,22 @@ bool CCommandRepresentationController::GetRepresentationFromDataModel(
 		elementName = elementNameTr;
 	}
 
-	representation.SetData("id", elementId);
-	representation.SetData("name", elementName);
-	representation.SetData("description", elementDescription);
-	representation.SetData("isEnabled", isEnabled);
-	representation.SetData("visible", isVisible);
-	representation.SetData("icon", elementPath);
-	representation.SetData("status", elementStatus);
-	representation.SetData("priority", priority);
-	representation.SetData("alignment", alignment);
+	representation.insert(QStringLiteral("id"), QString::fromUtf8(elementId));
+	representation.insert(QStringLiteral("name"), elementName);
+	representation.insert(QStringLiteral("description"), elementDescription);
+	representation.insert(QStringLiteral("isEnabled"), isEnabled);
+	representation.insert(QStringLiteral("visible"), isVisible);
+	representation.insert(QStringLiteral("icon"), elementPath);
+	representation.insert(QStringLiteral("status"), elementStatus);
+	representation.insert(QStringLiteral("priority"), priority);
+	representation.insert(QStringLiteral("alignment"), alignment);
 
 	return true;
 }
 
 
 bool CCommandRepresentationController::GetDataModelFromRepresentation(
-			const imtbase::CTreeItemModel& /*representation*/,
+			const QJsonObject& /*representation*/,
 			istd::IChangeable& /*dataModel*/) const
 {
 	return false;
@@ -101,5 +105,3 @@ bool CCommandRepresentationController::GetDataModelFromRepresentation(
 
 
 } // namespace imtserverapp
-
-

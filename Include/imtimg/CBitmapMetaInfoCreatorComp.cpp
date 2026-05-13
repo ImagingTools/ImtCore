@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtimg/CBitmapMetaInfoCreatorComp.h>
 
 
@@ -22,7 +23,7 @@ bool CBitmapMetaInfoCreatorComp::CreateMetaInfo(
 			const QByteArray& typeId,
 			idoc::MetaInfoPtr& metaInfoPtr) const
 {
-	if (typeId != *m_objectTypeIdAttrPtr){
+	if (m_objectTypeIdsAttrPtr.FindValue(typeId) < 0){
 		return false;
 	}
 
@@ -63,6 +64,10 @@ bool CBitmapMetaInfoCreatorComp::CreateMetaInfo(
 	case iimg::IBitmap::PF_FLOAT32:
 	case iimg::IBitmap::PF_FLOAT64:
 		metaInfoPtr->SetMetaInfo(IBitmapMetaInfo::MIT_BITMAP_FORMAT, QObject::tr("Float"));
+		metaInfoPtr->SetMetaInfo(IBitmapMetaInfo::MIT_COLOR_SPACE_TYPE, QObject::tr("Unknown"));
+		break;
+	default:
+		metaInfoPtr->SetMetaInfo(IBitmapMetaInfo::MIT_BITMAP_FORMAT, QObject::tr("Unknown"));
 		metaInfoPtr->SetMetaInfo(IBitmapMetaInfo::MIT_COLOR_SPACE_TYPE, QObject::tr("Unknown"));
 		break;
 	}

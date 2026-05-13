@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+
 #include <imthype/CStandardJobOutput.h>
 
 
@@ -202,6 +204,39 @@ void CStandardJobOutput::SetOutputType(const QByteArray& outputObjectId, Process
 }
 
 
+const IJobExecutionLog* CStandardJobOutput::GetExecutionLog() const
+{
+	return &m_executionLog;
+}
+
+
+void CStandardJobOutput::SetExecutionLog(const IJobExecutionLog& executionLog)
+{
+	istd::CChangeNotifier changeNotifier(this);
+	
+	// Copy the execution log using CopyFrom
+	const istd::IChangeable* changeablePtr = dynamic_cast<const istd::IChangeable*>(&executionLog);
+	if (changeablePtr) {
+		m_executionLog.CopyFrom(*changeablePtr);
+	}
+}
+
+
+const ilog::IMessageContainer* CStandardJobOutput::GetProcessorLog() const
+{
+	return &m_processorLog;
+}
+
+
+void CStandardJobOutput::SetProcessorLog(const ilog::IMessageContainer& processorLog)
+{
+	istd::CChangeNotifier changeNotifier(this);
+	
+	// Copy the processor log using CopyFrom (IMessageContainer inherits from IChangeable)
+	m_processorLog.CopyFrom(processorLog);
+}
+
+
 // reimplemented (istd::IInformationProvider)
 
 QDateTime CStandardJobOutput::GetInformationTimeStamp() const
@@ -247,9 +282,9 @@ bool CStandardJobOutput::Serialize(iser::IArchive& archive)
 
 	bool retVal = true;
 
-	static iser::CArchiveTag processingInfoTag("ProcessingInfo", "Processing informations");
+	static iser::CArchiveTag processingInfoTag("ProcessingInfo", "Processing informations", iser::CArchiveTag::TT_GROUP);
 	retVal = retVal && archive.BeginTag(processingInfoTag);
-	retVal = m_processingInfo.Serialize(archive);
+	retVal = retVal && m_processingInfo.Serialize(archive);
 	retVal = retVal && archive.EndTag(processingInfoTag);
 
 	static iser::CArchiveTag jobNameTag("JobName", "Job name", iser::CArchiveTag::TT_LEAF);
@@ -257,10 +292,20 @@ bool CStandardJobOutput::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_jobName);
 	retVal = retVal && archive.EndTag(jobNameTag);
 
-	static iser::CArchiveTag outputTag("Output", "Processing output");
+	static iser::CArchiveTag outputTag("Output", "Processing output", iser::CArchiveTag::TT_GROUP);
 	retVal = retVal && archive.BeginTag(outputTag);
-	retVal = m_results.Serialize(archive);
+	retVal = retVal && m_results.Serialize(archive);
 	retVal = retVal && archive.EndTag(outputTag);
+
+	static iser::CArchiveTag executionLogTag("ExecutionLog", "Job execution log", iser::CArchiveTag::TT_GROUP);
+	retVal = retVal && archive.BeginTag(executionLogTag);
+	retVal = retVal && m_executionLog.Serialize(archive);
+	retVal = retVal && archive.EndTag(executionLogTag);
+
+	static iser::CArchiveTag processorLogTag("ProcessorLog", "Processor/worker log", iser::CArchiveTag::TT_GROUP);
+	retVal = retVal && archive.BeginTag(processorLogTag);
+	retVal = retVal && m_processorLog.Serialize(archive);
+	retVal = retVal && archive.EndTag(processorLogTag);
 
 	return retVal;
 }
@@ -279,6 +324,14 @@ bool CStandardJobOutput::CopyFrom(const istd::IChangeable& object, Compatibility
 
 		m_jobName = sourcePtr->m_jobName;
 		m_outputTypeMap = sourcePtr->m_outputTypeMap;
+		
+		// Copy logs (CopyFrom can fail, check return value)
+		if (!m_executionLog.CopyFrom(sourcePtr->m_executionLog)) {
+			return false;
+		}
+		if (!m_processorLog.CopyFrom(sourcePtr->m_processorLog)) {
+			return false;
+		}
 
 		return true;
 	}
@@ -296,6 +349,10 @@ bool CStandardJobOutput::IsEqual(const istd::IChangeable& object) const
 
 		retVal = retVal && (m_jobName == sourcePtr->m_jobName);
 		retVal = retVal && (m_outputTypeMap == sourcePtr->m_outputTypeMap);
+		
+		// Compare logs
+		retVal = retVal && m_executionLog.IsEqual(sourcePtr->m_executionLog);
+		retVal = retVal && m_processorLog.IsEqual(sourcePtr->m_processorLog);
 
 		return retVal;
 	}
@@ -315,7 +372,7 @@ istd::IChangeableUniquePtr CStandardJobOutput::CloneMe(CompatibilityMode mode) c
 }
 
 
-bool CStandardJobOutput::ResetData(CompatibilityMode /*mode*/)
+bool CStandardJobOutput::ResetData(CompatibilityMode mode)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
@@ -324,6 +381,10 @@ bool CStandardJobOutput::ResetData(CompatibilityMode /*mode*/)
 
 	m_jobName.clear();
 	m_outputTypeMap.clear();
+	
+	// Reset logs using ResetData
+	m_executionLog.ResetData(mode);
+	m_processorLog.ResetData(mode);
 
 	return true;
 }

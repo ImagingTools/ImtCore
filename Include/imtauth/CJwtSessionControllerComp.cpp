@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauth/CJwtSessionControllerComp.h>
 
 
@@ -121,7 +122,7 @@ bool CJwtSessionControllerComp::RefreshToken(
 
 	QByteArray userId = sessionInfoPtr->GetUserId();
 
-	QByteArray jwt = GenerateJwt(newSessionId, userId);
+	QByteArray jwt = GenerateJwt(newSessionId, userId, sessionInfoPtr->GetTenantId());
 	if (jwt.isEmpty()){
 		SendErrorMessage(0, QString("Unable to refresh session for user '%1'. Error: JWT is invalid").arg(qPrintable(userId)), "CJwtSessionControllerComp");
 		return false;
@@ -130,6 +131,7 @@ bool CJwtSessionControllerComp::RefreshToken(
 	userSession.accessToken = jwt;
 	userSession.refreshToken = newRefreshToken;
 	userSession.userId = userId;
+	userSession.tenantId = sessionInfoPtr->GetTenantId();
 
 	return true;
 }
@@ -137,6 +139,7 @@ bool CJwtSessionControllerComp::RefreshToken(
 
 bool CJwtSessionControllerComp::CreateNewSession(
 			const QByteArray& userId,
+			const QByteArray& tenantId,
 			imtauth::IJwtSessionController::UserSession& userSession) const
 {
 	if (!m_sessionFactoryCompPtr.IsValid()){
@@ -153,6 +156,7 @@ bool CJwtSessionControllerComp::CreateNewSession(
 	sessionInfoPtr->SetExpirationDate(expirationDate);
 
 	sessionInfoPtr->SetUserId(userId);
+	sessionInfoPtr->SetTenantId(tenantId);
 
 	QByteArray refreshToken = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 	sessionInfoPtr->SetToken(refreshToken);
@@ -164,8 +168,9 @@ bool CJwtSessionControllerComp::CreateNewSession(
 	}
 
 	userSession.userId = userId;
+	userSession.tenantId = tenantId;
 
-	QByteArray jwt = GenerateJwt(sessionId, userId);
+	QByteArray jwt = GenerateJwt(sessionId, userId, tenantId);
 	if (jwt.isEmpty()){
 		SendErrorMessage(0, QString("Unable to create a new session for user '%1'. Error: JWT is invalid").arg(qPrintable(userId)), "CJwtSessionControllerComp");
 		return false;
@@ -253,6 +258,26 @@ QByteArray CJwtSessionControllerComp::GetSessionFromJwt(const QByteArray& jwt) c
 }
 
 
+QByteArray CJwtSessionControllerComp::GetTenantFromJwt(const QByteArray& jwt) const
+{
+	QByteArrayList parts = jwt.split('.');
+	if (parts.size() != 3){
+		return QByteArray();
+	}
+
+	QByteArray payloadBase64 = parts[1];
+
+	QJsonObject payloadObj = JsonObjectFromBase64(payloadBase64);
+	if (!payloadObj.contains("tenantId")){
+		return QByteArray();
+	}
+
+	QString tenantId = payloadObj["tenantId"].toString();
+
+	return tenantId.toUtf8();
+}
+
+
 // private methods
 
 QByteArray CJwtSessionControllerComp::JsonObjectToBase64(const QJsonObject& object) const
@@ -299,7 +324,7 @@ QByteArray CJwtSessionControllerComp::CreateSignature(
 }
 
 
-QByteArray CJwtSessionControllerComp::GenerateJwt(const QByteArray& sessionId, const QByteArray& userId) const
+QByteArray CJwtSessionControllerComp::GenerateJwt(const QByteArray& sessionId, const QByteArray& userId, const QByteArray& tenantId) const
 {
 	qint64 expiresAt = QDateTime::currentSecsSinceEpoch() + *m_jwtLifetimeAttrPtr;
 	QJsonObject header;
@@ -308,6 +333,7 @@ QByteArray CJwtSessionControllerComp::GenerateJwt(const QByteArray& sessionId, c
 
 	QJsonObject payload;
 	payload["userId"] = QString(userId);
+	payload["tenantId"] = QString(tenantId);
 	payload["sessionId"] = QString(sessionId);
 	payload["exp"] = expiresAt;
 

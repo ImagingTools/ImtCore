@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -5,12 +6,14 @@
 #include <istd/TInterfacePtr.h>
 
 // ImtCore includes
-#include <imthttp/IRequest.h>
-#include <imthttp/IResponse.h>
+#include <imtrest/IResponse.h>
 
 
 namespace imtrest
 {
+
+
+class IRequest;
 
 
 class IRequestServlet: virtual public istd::IPolymorphic
@@ -25,7 +28,7 @@ public:
 	/**
 		Process a given request.
 	*/
-	virtual imthttp::ConstResponsePtr ProcessRequest(const imthttp::IRequest& request, const QByteArray& subCommandId = QByteArray()) const = 0;
+	virtual ConstResponsePtr ProcessRequest(const IRequest& request, const QByteArray& subCommandId = QByteArray()) const = 0;
 };
 
 

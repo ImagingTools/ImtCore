@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtbase/COrderedObjectCollectionProxy.h>
 
 
@@ -20,36 +21,30 @@ namespace imtbase
 
 // public methods
 
-COrderedObjectCollectionProxy::COrderedObjectCollectionProxy(IObjectCollection* collectionPtr, bool takeOwnership)
-	:m_updateBridge(this, imod::CModelUpdateBridge::UF_SOURCE),
-	 m_hasCustomOrder(false)
+COrderedObjectCollectionProxy::COrderedObjectCollectionProxy()
+	:m_updateBridge(this, imod::CModelUpdateBridge::UF_SOURCE)
 {
-	Q_ASSERT(collectionPtr != nullptr);
-	
-	if (takeOwnership) {
-		m_collectionPtr.AdoptRawPtr(collectionPtr);
-	}
-	else {
-		m_collectionPtr.SetUnmanagedPtr(collectionPtr);
-	}
-	
-	AttachCollectionObserver();
+}
+
+
+COrderedObjectCollectionProxy::COrderedObjectCollectionProxy(IObjectCollection* collectionPtr, bool takeOwnership)
+	:m_updateBridge(this, imod::CModelUpdateBridge::UF_SOURCE)
+{
+	SetCollection(collectionPtr, takeOwnership);
 }
 
 
 COrderedObjectCollectionProxy::COrderedObjectCollectionProxy(IObjectCollectionUniquePtr&& collectionPtr)
-	:m_updateBridge(this, imod::CModelUpdateBridge::UF_SOURCE),
-	m_hasCustomOrder(false)
+	:m_updateBridge(this, imod::CModelUpdateBridge::UF_SOURCE)
 {
-	m_collectionPtr.TakeOver(collectionPtr);
+	SetCollection(std::move(collectionPtr));
 }
 
 
 COrderedObjectCollectionProxy::COrderedObjectCollectionProxy(const istd::TOptInterfacePtr<IObjectCollection>& collectionPtr)
-	:m_updateBridge(this, imod::CModelUpdateBridge::UF_SOURCE),
-	m_hasCustomOrder(false)
+	:m_updateBridge(this, imod::CModelUpdateBridge::UF_SOURCE)
 {
-	m_collectionPtr = collectionPtr;
+	SetCollection(collectionPtr);
 }
 
 
@@ -57,6 +52,55 @@ COrderedObjectCollectionProxy::~COrderedObjectCollectionProxy()
 {
 	// Ensure all models are properly detached before destruction
 	m_updateBridge.EnsureModelsDetached();
+}
+
+
+void COrderedObjectCollectionProxy::SetCollection(IObjectCollection* collectionPtr, bool takeOwnership)
+{
+	Q_ASSERT(collectionPtr != nullptr);
+
+	istd::CChangeNotifier notifier(this, &istd::IChangeable::GetAllChanges());
+
+	m_updateBridge.EnsureModelsDetached();
+	m_hasCustomOrder = false;
+	m_customOrder.clear();
+
+	if (takeOwnership){
+		m_collectionPtr.AdoptRawPtr(collectionPtr);
+	}
+	else{
+		m_collectionPtr.SetUnmanagedPtr(collectionPtr);
+	}
+
+	AttachCollectionObserver();
+}
+
+
+void COrderedObjectCollectionProxy::SetCollection(IObjectCollectionUniquePtr&& collectionPtr)
+{
+	istd::CChangeNotifier notifier(this, &istd::IChangeable::GetAllChanges());
+
+	m_updateBridge.EnsureModelsDetached();
+	m_hasCustomOrder = false;
+	m_customOrder.clear();
+
+	m_collectionPtr.TakeOver(collectionPtr);
+
+	AttachCollectionObserver();
+}
+
+
+void COrderedObjectCollectionProxy::SetCollection(const istd::TOptInterfacePtr<IObjectCollection>& collectionPtr)
+{
+	istd::CChangeNotifier notifier(this, &istd::IChangeable::GetAllChanges());
+
+	m_updateBridge.EnsureModelsDetached();
+	m_hasCustomOrder = false;
+	m_customOrder.clear();
+
+	m_collectionPtr = collectionPtr;
+
+	AttachCollectionObserver();
 }
 
 
@@ -499,6 +543,16 @@ bool COrderedObjectCollectionProxy::Serialize(iser::IArchive& archive)
 
 	bool retVal = true;
 
+	if (m_collectionPtr.IsValid()){
+		iser::ISerializable* serializablePtr = dynamic_cast<iser::ISerializable*>(m_collectionPtr.GetPtr());
+		if (serializablePtr != nullptr){
+			static iser::CArchiveTag collectionTag("ObjectCollection", "Proxied object collection");
+			retVal = retVal && archive.BeginTag(collectionTag);
+			retVal = retVal && serializablePtr->Serialize(archive);
+			retVal = retVal && archive.EndTag(collectionTag);
+		}
+	}
+
 	// Serialize custom order flag
 	static iser::CArchiveTag hasCustomOrderTag("HasCustomOrder", "Flag indicating if custom order is active");
 	retVal = retVal && archive.BeginTag(hasCustomOrderTag);
@@ -542,14 +596,28 @@ int COrderedObjectCollectionProxy::GetSupportedOperations() const
 }
 
 
-bool COrderedObjectCollectionProxy::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
+bool COrderedObjectCollectionProxy::CopyFrom(const IChangeable& object, CompatibilityMode mode)
 {
 	const COrderedObjectCollectionProxy* otherPtr = dynamic_cast<const COrderedObjectCollectionProxy*>(&object);
 	if (otherPtr != nullptr){
+		istd::CChangeNotifier changeNotifier(this);
+
 		m_customOrder = otherPtr->m_customOrder;
 		m_hasCustomOrder = otherPtr->m_hasCustomOrder;
+
+		if (mode == CM_WITH_REFS){
+			if (otherPtr->m_collectionPtr.IsValid()){
+				if (!m_collectionPtr.IsValid()){
+					return false;
+				}
+
+				return m_collectionPtr->CopyFrom(*otherPtr->m_collectionPtr, mode);
+			}
+		}
+
 		return true;
 	}
+
 	return false;
 }
 
@@ -560,33 +628,35 @@ bool COrderedObjectCollectionProxy::IsEqual(const IChangeable& object) const
 	if (otherPtr != nullptr){
 		return (m_hasCustomOrder == otherPtr->m_hasCustomOrder) && (m_customOrder == otherPtr->m_customOrder);
 	}
+
 	return false;
 }
 
 
-istd::IChangeableUniquePtr COrderedObjectCollectionProxy::CloneMe(CompatibilityMode /*mode*/) const
+istd::IChangeableUniquePtr COrderedObjectCollectionProxy::CloneMe(CompatibilityMode mode) const
 {
-	if (!m_collectionPtr.IsValid()){
-		return istd::IChangeableUniquePtr();
-	}
-	
 	// Note: The clone always creates a non-owning proxy that shares the same collection pointer.
 	// This is intentional for the proxy pattern, where clones manage ordering independently
 	// but delegate data operations to the same collection.
 	COrderedObjectCollectionProxy* clonePtr = new COrderedObjectCollectionProxy(m_collectionPtr);
-	clonePtr->m_customOrder = m_customOrder;
-	clonePtr->m_hasCustomOrder = m_hasCustomOrder;
+	if (!clonePtr->CopyFrom(*this, mode)){
+		return nullptr;
+	}
 
 	return istd::IChangeableUniquePtr(clonePtr);
 }
 
 
-bool COrderedObjectCollectionProxy::ResetData(CompatibilityMode /*mode*/)
+bool COrderedObjectCollectionProxy::ResetData(CompatibilityMode mode)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
 	m_customOrder.clear();
 	m_hasCustomOrder = false;
+
+	if (mode == CM_WITH_REFS && m_collectionPtr.IsValid()){
+		return m_collectionPtr->ResetData(mode);
+	}
 
 	return true;
 }
@@ -599,6 +669,7 @@ imtbase::ICollectionInfo::Ids COrderedObjectCollectionProxy::GetCollectionElemen
 	if (!m_collectionPtr.IsValid()){
 		return Ids();
 	}
+
 	return m_collectionPtr->GetElementIds();
 }
 

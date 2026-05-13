@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtclientgql/CSubscriptionManagerComp.h>
 
 
@@ -377,10 +378,7 @@ bool CSubscriptionManagerComp::SendRequestInternal(const imtgql::IGqlRequest& re
 		retVal = m_subscriptionSenderCompPtr->SendRequest(requestPtr);
 	}
 	else if (m_requestManagerCompPtr.IsValid()){
-		const imtrest::ISender* sender = m_requestManagerCompPtr->GetSender(clientId);
-		if (sender != nullptr){
-			retVal = sender->SendRequest(requestPtr);
-		}
+		retVal = m_requestManagerCompPtr->SendRequest(clientId, requestPtr);
 	}
 
 	return retVal;
@@ -407,10 +405,9 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::CreateErrorResponse(const QB
 
 	const imtrest::IProtocolEngine& engine = request.GetProtocolEngine();
 
-	QString body =
-		QString(R"({"id": "%1","type": "error","payload": {"errors": [{"errorType": "ProcessRequestError","message": "%2"}]}})")
-						.arg(object["id"].toString())
-						.arg(QString(errorMessage));
+	QString body = QString(R"({"id": "%1","type": "error","payload": [ {"message": "%2", "extensions": { "type": "Warning" }} ]})")
+					   .arg(object["id"].toString())
+					   .arg(errorMessage);
 
 	QByteArray responseTypeId("text/html; charset=utf-8");
 	imtrest::ConstResponsePtr responsePtr(

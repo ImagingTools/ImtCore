@@ -126,8 +126,8 @@ Item {
 
         property bool block: false
         onCurrentIndexChanged: {
-            if (currentIndex >= 0){
-                let pageId = pagesModel.get(currentIndex).id
+            if (currentIndex >= 0 && multiPageView.pagesModel.count > currentIndex){
+                let pageId = multiPageView.pagesModel.get(currentIndex).id
                 visualStatusProvider.collectionId = pageId
                 if (!block){
                     NavigationController.push("Administration/" + pageId)

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtlicdb/CLicenseDatabaseDelegateComp.h>
 
 
@@ -6,6 +7,7 @@
 #include <iprm/IIdParam.h>
 
 // ImtCore includes
+#include <imtdb/imtdb.h>
 #include <imtlic/ILicenseDefinition.h>
 
 
@@ -71,16 +73,17 @@ bool CLicenseDatabaseDelegateComp::CreateTextFilterQuery(const imtbase::ICollect
 
 	QString textFilter = collectionFilter.GetTextFilter();
 	if (!textFilter.isEmpty()){
+		QString encodedFilter = imtdb::SqlEncode(textFilter);
 		for (int i = 0; i < filteringColumnIds.size(); i++){
 			if (!textFilterQuery.isEmpty()){
 				textFilterQuery += " OR ";
 			}
 
 			if (filteringColumnIds[i] == "ProductId"){
-				textFilterQuery += QString("%1 ILIKE '%%2%'").arg(R"((SELECT "Document"->>'ProductId' FROM "Products" as pr WHERE pr."DocumentId" = root."Document"->>'ProductId' AND pr."IsActive" = true))").arg(textFilter);
+				textFilterQuery += QString("%1 ILIKE '%%2%'").arg(R"((SELECT "Document"->>'ProductId' FROM "Products" as pr WHERE pr."DocumentId" = root."Document"->>'ProductId' AND pr."IsActive" = true))").arg(encodedFilter);
 			}
 			else{
-				textFilterQuery += QString("\"Document\"->>'%1' ILIKE '%%2%'").arg(qPrintable(filteringColumnIds[i])).arg(textFilter);
+				textFilterQuery += QString("\"Document\"->>'%1' ILIKE '%%2%'").arg(qPrintable(filteringColumnIds[i])).arg(encodedFilter);
 			}
 		}
 	}

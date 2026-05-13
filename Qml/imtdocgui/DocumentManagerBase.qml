@@ -45,12 +45,18 @@ QtObject {
 
 	// typeOperation: NewDocumentCreated, DocumentOpened, DocumentChanged, DocumentSaved, DocumentClosed
 	signal documentManagerChanged(string typeOperation, string objectId, string documentId, string documentName)
+	signal documentDataLoaded(string documentId)
 	signal startUpdateRepresentation(string documentId, var representation)
 	signal documentRepresentationUpdated(string documentId, var representation)
+	signal updateRepresentationFailed(string documentId, string message)
 	signal documentGuiUpdated(string documentId, var representation)
 
 	// callback(undefined) - cancel, callback(false) - close, callback(true) - save and close
 	signal tryCloseDirtyDocument(string documentId, var callback)
+
+	signal documentViewRegistered(string typeId, string viewTypeId)
+
+	signal documentAlreadyOpened(string documentId, string typeId)
 
 	onDocumentSaved: {
 		setDocumentIsNew(documentId, false)
@@ -58,6 +64,17 @@ QtObject {
 
 	onUndoInfoReceived: {
 		setDocumentIsDirty(documentId, isDirty)
+	}
+
+	onStartCloseDocument: {
+		let index = getDocumentIndexByDocumentId(documentId)
+		if (index >= 0){
+			__internal.openedDocuments[index].isClosing = true
+		}
+	}
+
+	onDocumentClosed: {
+		__internal.removeDocumentData(documentId)
 	}
 
 	onDocumentCreated: {
@@ -135,6 +152,8 @@ QtObject {
 		else{
 			__internal.documentTypeEditors[documentTypeId] = [obj]
 		}
+
+		documentViewRegistered(documentTypeId, viewTypeId)
 	}
 
 	function getDocumentEditorFactory(documentTypeId, viewTypeId){
@@ -240,6 +259,26 @@ QtObject {
 		return index >= 0
 	}
 
+	function setDocumentObjectId(documentId, objectId){
+		let index = getDocumentIndexByDocumentId(documentId)
+		if (index < 0){
+			return
+		}
+
+		__internal.openedDocuments[index].objectId = objectId
+	}
+
+	function getDocumentIdByObjectId(objectId){
+		for (let i = 0; i < __internal.openedDocuments.length; ++i){
+			let documentData = __internal.openedDocuments[i]
+			if (documentData.objectId === objectId){
+				return documentData.id
+			}
+		}
+
+		return ""
+	}
+
 	function getDocumentIndexByDocumentId(documentId){
 		for (let i = 0; i < __internal.openedDocuments.length; ++i){
 			let documentData = __internal.openedDocuments[i]
@@ -280,6 +319,54 @@ QtObject {
 		}
 
 		return __internal.openedDocuments[index].isDirty
+	}
+
+	function documentIsLoading(documentId){
+		let index = getDocumentIndexByDocumentId(documentId)
+		if (index < 0){
+			return false
+		}
+
+		return __internal.openedDocuments[index].isLoading
+	}
+
+	function setDocumentIsLoading(documentId, isLoading){
+		let index = getDocumentIndexByDocumentId(documentId)
+		if (index < 0){
+			if (!isLoading){
+				__internal.pendingDataLoaded[documentId] = true
+			}
+			return
+		}
+
+		let docData = __internal.openedDocuments[index]
+		if (docData.isClosing){
+			return
+		}
+
+		docData.isLoading = isLoading
+
+		if (isLoading){
+			if (documentId in __internal.pendingDataLoaded){
+				delete __internal.pendingDataLoaded[documentId]
+				docData.isLoading = false
+				isLoading = false
+			}
+		}
+
+		if (!isLoading){
+			if (!docData.isNew){
+				docData.documentDecorator.updateRepresentationForAllViews()
+			}
+			else{
+				let decorator = docData.documentDecorator
+				for (let i = 0; i < decorator.registeredViews.length; ++i){
+					decorator.registeredViews[i].setBlockingUpdateModel(false)
+					decorator.registeredViews[i].doUpdateGui()
+				}
+			}
+			documentDataLoaded(documentId)
+		}
 	}
 
 	function setDocumentIsDirty(documentId, isDirty){
@@ -352,10 +439,29 @@ QtObject {
 		__internal.openedDocuments[index].addView(viewTypeId, view)
 	}
 
+	function getDocumentManagerActiveView(){
+		return __internal.documentManagerActiveView
+	}
+
+	function setDocumentManagerActiveView(view){
+		__internal.documentManagerActiveView = view
+	}
+
+	function setAutoNamedTypeId(typeId, hasProvider){
+		__internal.autoNamedTypeIds[typeId] = hasProvider
+	}
+
+	function hasDocumentNameProvider(typeId){
+		return typeId in __internal.autoNamedTypeIds && __internal.autoNamedTypeIds[typeId]
+	}
+
 	property QtObject __internal: QtObject {
 		property var documentTypeEditors: ({}) // DocumentTypeId -> [{View Type 1}, {View Type 2}]
 		property var openedDocuments: [] // Array of objects {id, name, model, view, isDirty}
 		property var cachedDocumentNames: ({}) // DocumentId -> Name
+		property var pendingDataLoaded: ({}) // DocumentId -> true for early DocumentDataLoaded notifications
+		property var autoNamedTypeIds: ({}) // TypeId -> true for types with automatic name providers
+		property var documentManagerActiveView: null
 
 		property Component documentDataFactory: Component{ 
 			QtObject{
@@ -364,8 +470,11 @@ QtObject {
 				property string id
 				property string typeId
 				property string name
+				property string objectId: ""
 				property bool isDirty: false
 				property bool isNew: true
+				property bool isLoading: false
+				property bool isClosing: false
 				property var views: ({})
 				property DocumentDecorator documentDecorator: DocumentDecorator {
 					documentId: documentData.id
@@ -386,7 +495,14 @@ QtObject {
 					let representationController = representationControllerFactory.createObject(documentData)
 					representationController.documentId = id
 					representationController.view = view
-					documentDecorator.registerView(view, representationController, !isNew)
+
+					if (view.objectName === "DocumentViewBase"){
+						if (view.representationController !== undefined){
+							view.representationController = representationController
+						}
+					}
+
+					documentDecorator.registerView(view, representationController, !isNew && !isLoading)
 				}
 
 				function addView(viewTypeId, view){
@@ -397,6 +513,10 @@ QtObject {
 		}
 
 		function createDocumentData(id, typeId, isNew){
+			if (root.getDocumentIndexByDocumentId(id) >= 0){
+				return
+			}
+
 			let documentData = documentDataFactory.createObject(root)
 			documentData.id = id
 			documentData.typeId = typeId
@@ -412,6 +532,16 @@ QtObject {
 			documentData.isNew = isNew
 
 			openedDocuments.push(documentData)
+		}
+
+		function removeDocumentData(documentId){
+			let index = root.getDocumentIndexByDocumentId(documentId)
+			if (index < 0){
+				return
+			}
+
+			delete pendingDataLoaded[documentId]
+			openedDocuments.splice(index, 1)
 		}
 	}
 }

@@ -10,10 +10,9 @@ import imtbaseCollectionDocumentManagerSdl 1.0
 Item {
 	id: workspaceView
 
+	property bool showStandardLoading: true
 	property CollectionView collectionView: null
 	property DocumentManagerBase documentManager
-
-	property ObjectVisualStatusProvider visualStatusProvider: null
 
 	signal startLoading(string documentId)
 	signal stopLoading(string documentId)
@@ -21,6 +20,13 @@ Item {
 	onCollectionViewChanged: {
 		if (collectionView){
 			collectionView.documentManager = documentManager
+			navigableItem.parentSegment = collectionView.collectionId
+		}
+	}
+
+	onDocumentManagerChanged: {
+		if (documentManager){
+			documentManager.setDocumentManagerActiveView(workspaceView)
 		}
 	}
 
@@ -37,57 +43,14 @@ Item {
 	NavigableItem {
 		id: navigableItem
 		onActivated: {
+			console.log("navigableItem onActivated", paths)
 			if (workspaceView.documentManager){
 				if (restPath.length >= 1){
 					let documentTypeId = matchedPath
 					let documentId = restPath[0]
-					workspaceView.documentManager.openDocument(documentId, documentTypeId)
+					workspaceView.documentManager.openDocument(documentTypeId, documentId)
 				}
 			}
-		}
-	}
-
-	function updateDocumentName(objectId, documentId){
-		if (!documentManager){
-			console.error("Unable to update document name for '"+documentId+"'. Error: Document manager is invalid")
-			return
-		}
-
-		if (!workspaceView.visualStatusProvider){
-			console.error("Unable to update document name for '"+documentId+"'. Error: Visual status provider is invalid")
-			return
-		}
-
-		let callbackOk = function(objectId2, icon, text, description){
-			if (objectId2 === objectId){
-				let documentName = text
-				if (documentName === ""){
-					documentName = workspaceView.documentManager.getDefaultDocumentName()
-				}
-
-				workspaceView.documentManager.setDocumentName(documentId, text)
-				workspaceView.visualStatusProvider.visualStatusReceived.disconnect(callbackOk)
-				workspaceView.visualStatusProvider.visualStatusReceiveFailed.disconnect(cbFailed)
-			}
-		}
-
-		let cbFailed = function(objectId2, errorMessage){
-			if (objectId2 === objectId){
-				let defaultName = workspaceView.documentManager.getDefaultDocumentName()
-				workspaceView.documentManager.setDocumentName(documentId, defaultName)
-				workspaceView.visualStatusProvider.visualStatusReceived.disconnect(callbackOk)
-				workspaceView.visualStatusProvider.visualStatusReceiveFailed.disconnect(cbFailed)
-			}
-		}
-
-		if (objectId === ""){
-			callbackOk("", "", "", "")
-		}
-		else{
-			let documentTypeId = documentManager.getDocumentTypeId(documentId)
-			workspaceView.visualStatusProvider.visualStatusReceived.connect(callbackOk)
-			workspaceView.visualStatusProvider.visualStatusReceiveFailed.connect(cbFailed)
-			workspaceView.visualStatusProvider.getVisualStatus(objectId, documentTypeId)
 		}
 	}
 
@@ -111,6 +74,10 @@ Item {
 		}
 	}
 
+	function setCurrentTabIndex(index){
+		tabView.currentIndex = index
+	}
+
 	Component {
 		id: inputDialogComp
 		InputDialog {
@@ -126,10 +93,24 @@ Item {
 	}
 
 	Connections {
+		target: workspaceView.collectionView
+		function onCollectionIdChanged(){
+			navigableItem.parentSegment = target.collectionId
+		}
+	}
+
+	Connections {
 		id: connections
 		target: workspaceView.documentManager
 
+		function onDocumentViewRegistered(documentTypeId, viewTypeId){
+			navigableItem.paths = target.getSupportedDocumentTypeIds()
+		}
+
 		function onRequestDocumentName(documentId, documentTypeId){
+			if (workspaceView.documentManager && workspaceView.documentManager.hasDocumentNameProvider(documentTypeId)){
+				return
+			}
 			ModalDialogManager.openDialog(inputDialogComp, {documentId: documentId})
 		}
 
@@ -145,6 +126,9 @@ Item {
 				let documentName = documentInfo.m_documentName
 				let objectTypeId = documentInfo.m_objectTypeId
 				let isDirty = documentInfo.m_isDirty
+				let hasNameProvider = documentInfo.m_hasNameProvider
+
+				workspaceView.documentManager.setAutoNamedTypeId(objectTypeId, hasNameProvider)
 
 				if (objectId === ""){
 					workspaceView.documentManager.documentCreated(documentId, objectTypeId)
@@ -152,6 +136,7 @@ Item {
 				else{
 					workspaceView.documentManager.setDocumentName(documentId, documentName)
 					workspaceView.documentManager.documentOpened(documentId, objectTypeId)
+					workspaceView.documentManager.setDocumentObjectId(documentId, objectId)
 				}
 
 				workspaceView.documentManager.getUndoInfo(documentId)
@@ -167,6 +152,12 @@ Item {
 		}
 
 		function onDocumentGuiUpdated(documentId, representation){
+			if (!workspaceView.documentManager.documentIsLoading(documentId)){
+				workspaceView.stopLoading(documentId)
+			}
+		}
+
+		function onDocumentDataLoaded(documentId){
 			workspaceView.stopLoading(documentId)
 		}
 
@@ -178,13 +169,27 @@ Item {
 			// loading.stop()
 		}
 
+		function onUpdateRepresentationFailed(documentId, message){
+			ModalDialogManager.showErrorDialog(message)
+			if (!workspaceView.documentManager.documentIsLoading(documentId)){
+				workspaceView.stopLoading(documentId)
+			}
+		}
+
 		function onDocumentManagerChanged(typeOperation, objectId, documentId, documentName){
 			if (typeOperation === EDocumentOperationEnum.s_documentClosed){
 				tabView.removeTab(documentId)
 			}
-			else if (typeOperation === EDocumentOperationEnum.s_documentOpened || typeOperation === EDocumentOperationEnum.s_documentSaved){
+			else if (typeOperation === EDocumentOperationEnum.s_newDocumentCreated ||
+					typeOperation === EDocumentOperationEnum.s_documentOpened){
 				workspaceView.documentManager.setDocumentName(documentId, documentName)
 			}
+			// Note: For s_documentSaved we intentionally do NOT update the
+			// document name from the subscription payload — the SDL save
+			// response already delivers the authoritative documentName via
+			// setDocumentName() and using the subscription value would cause
+			// a redundant overwrite (which has been observed to corrupt
+			// non-ASCII characters such as German umlauts in the tab title).
 		}
 
 		function onDocumentNameChanged(documentId, oldName, newName){
@@ -204,6 +209,14 @@ Item {
 			tabView.addTab(documentId, "", stackViewComp, "", "", false)
 			tabView.currentIndex = tabView.tabModel.count - 1
 			workspaceView.updateTabName(documentId)
+			workspaceView.startLoading(documentId)
+		}
+
+		function onDocumentAlreadyOpened(documentId, typeId){
+			let index = tabView.getIndexById(documentId)
+			if (index >= 0){
+				tabView.currentIndex = index
+			}
 		}
 
 		function onOpenDocumentFailed(documentId, message){
@@ -253,8 +266,8 @@ Item {
 			tabView.addTab(documentId, "", stackViewComp, "", "", false)
 
 			tabView.currentIndex = tabView.tabModel.count - 1
-
-			workspaceView.stopLoading(documentId)
+			workspaceView.updateTabName(documentId)
+			workspaceView.startLoading(documentId)
 		}
 
 		// Undo info signals
@@ -386,12 +399,14 @@ Item {
 			property string documentTypeId
 
 			property var itemViewTypes: ({}) // ViewTypeId -> Item
+			property var viewTypeIds: []
 
 			function initialize(id, typeId){
 				documentId = id
 				documentTypeId = typeId
-				
-				let viewTypeIds = workspaceView.documentManager.getSupportedDocumentViewTypeIds(documentTypeId)
+
+				viewTypeIds = workspaceView.documentManager.getSupportedDocumentViewTypeIds(documentTypeId)
+
 				for (let i = 0; i < viewTypeIds.length; ++i){
 					let viewComp = workspaceView.documentManager.getDocumentEditorFactory(documentTypeId, viewTypeIds[i])
 					addPage(viewComp)
@@ -402,7 +417,7 @@ Item {
 
 			onPageAdded: {
 				let comp = getComponent(index)
-				let viewTypeId = workspaceView.documentManager.getViewTypeIdByViewFactory(documentTypeId, comp)
+				let viewTypeId = viewTypeIds[index]
 
 				itemViewTypes[viewTypeId] = item
 
@@ -414,6 +429,21 @@ Item {
 				if (index === 0){
 					if (item.commandsController){
 						item.commandsController.setToggled(viewTypeId, true)
+					}
+				}
+
+				if (item.objectName === "DocumentViewBase"){
+					if (item.documentManagerView !== undefined){
+						item.documentManagerView = workspaceView
+					}
+					if (item.documentManager !== undefined){
+						item.documentManager = workspaceView.documentManager
+					}
+					if (item.documentId !== undefined){
+						item.documentId = stackView.documentId
+					}
+					if (item.documentTypeId !== undefined){
+						item.documentTypeId = stackView.documentTypeId
 					}
 				}
 
@@ -474,6 +504,7 @@ Item {
 				z: parent.z + 1
 				anchors.fill: parent
 				visible: false
+				opacity: workspaceView.showStandardLoading ? 1 : 0
 
 				background.opacity: 0
 			}

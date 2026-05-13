@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include "ImtDocPck.h"
 
 
@@ -18,6 +19,11 @@ I_EXPORT_COMPONENT(
 			CollectionDocumentManager,
 			"Collection-based document manager",
 			"Collection Document");
+
+I_EXPORT_COMPONENT(
+			DocumentManagerEventHandlerDemultiplexer,
+			"Document manager event handler demultiplexer",
+			"Document Manager Event Handler Demultiplexer");
 
 
 } // namespace ImtDocPck

@@ -1,0 +1,26 @@
+<RCC>
+    <qresource prefix="/Images">
+        <file alias="testImage">Resources/Images/testImage.jpg</file>
+    </qresource>
+    <qresource prefix="/qml">
+        <file alias="ImtControlsGalleryMain.qml">ImtControlsGalleryMain.qml</file>
+        <file alias="ImtControlsGalleryWeb.qml">ImtControlsGalleryWeb.qml</file>
+        <file alias="ButtonsRepresentaitonPage.qml">ButtonsRepresentaitonPage.qml</file>
+        <file alias="InputsRepresentaitonPage.qml">InputsRepresentaitonPage.qml</file>
+        <file alias="ViewsRepresentaitonPage.qml">ViewsRepresentaitonPage.qml</file>
+        <file alias="IndicatorsRepresentaitonPage.qml">IndicatorsRepresentaitonPage.qml</file>
+        <file alias="DialogsRepresentaitonPage.qml">DialogsRepresentaitonPage.qml</file>
+        <file alias="TestPage.qml">TestPage.qml</file>
+        <file alias="SdlTestPage.qml">SdlTestPage.qml</file>
+        <file alias="CanvasPage.qml">CanvasPage.qml</file>
+	<file alias="GraphicsViewPage.qml">GraphicsViewPage.qml</file>
+	<file alias="GrVTestPage.qml">GrVTestPage.qml</file>
+        <file alias="TablePage.qml">TablePage.qml</file>
+        <file alias="GridViewPage.qml">GridViewPage.qml</file>
+        <file alias="TreeViewPage.qml">TreeViewPage.qml</file>
+        <file alias="TableTreeViewPage.qml">TableTreeViewPage.qml</file>
+        <file alias="TopPanelDecoratorCustom.qml">TopPanelDecoratorCustom.qml</file>
+	<file alias="ContactInfoCollectionView.qml">ContactInfoCollectionView.qml</file>
+	<file alias="ContactInfoEditor.qml">ContactInfoEditor.qml</file>
+    </qresource>
+</RCC>

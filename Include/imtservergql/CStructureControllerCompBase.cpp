@@ -1,5 +1,10 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtservergql/CStructureControllerCompBase.h>
 
+
+// Qt includes
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonArray>
 
 // ACF includes
 #include <iprm/CTextParam.h>
@@ -40,7 +45,7 @@ bool CStructureControllerCompBase::IsRequestSupported(const imtgql::CGqlRequest&
 
 // reimplemented (imtservergql::CGqlRepresentationDataControllerComp)
 
-imtbase::CTreeItemModel* CStructureControllerCompBase::CreateInternalResponse(
+QJsonObject CStructureControllerCompBase::CreateInternalResponse(
 	const imtgql::CGqlRequest& gqlRequest,
 	QString& errorMessage) const
 {
@@ -48,7 +53,7 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::CreateInternalResponse(
 
 	int operationType = OT_UNKNOWN;
 	if (!GetOperationFromRequest(gqlRequest, gqlObject, errorMessage, operationType)){
-		return nullptr;
+		return QJsonObject();
 	}
 
 	Q_ASSERT(operationType != OT_UNKNOWN);
@@ -87,7 +92,7 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::CreateInternalResponse(
 	errorMessage = QString("Unable to create internal response. Operation is not supported");
 	SendErrorMessage(0, errorMessage, "CStructureControllerCompBase");
 
-	return nullptr;
+	return QJsonObject();
 }
 
 
@@ -182,7 +187,7 @@ QByteArray CStructureControllerCompBase::GetObjectIdFromInputParams(const QList<
 }
 
 
-imtbase::CTreeItemModel* CStructureControllerCompBase::InsertNewNode(
+QJsonObject CStructureControllerCompBase::InsertNewNode(
 		const imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const
 {
@@ -191,7 +196,7 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::InsertNewNode(
 
 		SendCriticalMessage(0, errorMessage);
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	const imtgql::CGqlParamObject& inputParams = gqlRequest.GetParams();
@@ -205,21 +210,22 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::InsertNewNode(
 	newName = inputParams.GetParamArgumentValue("NewName").toString();
 	description = inputParams.GetParamArgumentValue("Description").toString();
 
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
+	QJsonObject rootObj;
+	QJsonObject dataObj;
 
 	if (!nodeId.isEmpty()){
 		nodeId = m_collectionStructureCompPtr->InsertNewNode(newName, description, nodeId, parentNodeId, nullptr);
-		dataModel->SetData("Id", nodeId);
-		dataModel->SetData("ParentNodeId", parentNodeId);
-		dataModel->SetData("successful", !nodeId.isEmpty());
+		dataObj.insert(QStringLiteral("Id"), QJsonValue::fromVariant(nodeId));
+		dataObj.insert(QStringLiteral("ParentNodeId"), QJsonValue::fromVariant(parentNodeId));
+		dataObj.insert(QStringLiteral("successful"), QJsonValue::fromVariant(!nodeId.isEmpty()));
 	}
 
-	return rootModelPtr.PopPtr();
+	rootObj.insert(QStringLiteral("data"), dataObj);
+	return rootObj;
 }
 
 
-imtbase::CTreeItemModel* CStructureControllerCompBase::SetNodeName(
+QJsonObject CStructureControllerCompBase::SetNodeName(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
@@ -228,7 +234,7 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::SetNodeName(
 
 		SendCriticalMessage(0, errorMessage);
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	const imtgql::CGqlParamObject& inputParams = gqlRequest.GetParams();
@@ -239,53 +245,54 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::SetNodeName(
 	nodeId = inputParams.GetParamArgumentValue("Id").toByteArray();
 	newName = inputParams.GetParamArgumentValue("NewName").toString();
 
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
+	QJsonObject rootObj;
+	QJsonObject dataObj;
 
 	if (!nodeId.isEmpty()){
-		dataModel->SetData("Id", nodeId);
-		dataModel->SetData("Name", newName);
+		dataObj.insert(QStringLiteral("Id"), QJsonValue::fromVariant(nodeId));
+		dataObj.insert(QStringLiteral("Name"), QJsonValue::fromVariant(newName));
 		bool successful = m_collectionStructureCompPtr->SetNodeName(nodeId, newName);
-		dataModel->SetData("successful", successful);
+		dataObj.insert(QStringLiteral("successful"), QJsonValue::fromVariant(successful));
 	}
 
-	return rootModelPtr.PopPtr();
+	rootObj.insert(QStringLiteral("data"), dataObj);
+	return rootObj;
 }
 
 
-imtbase::CTreeItemModel* CStructureControllerCompBase::SetNodeDescription(
+QJsonObject CStructureControllerCompBase::SetNodeDescription(
 	const imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& /*errorMessage*/) const
 {
-	return nullptr;
+	return QJsonObject();
 }
 
 
-imtbase::CTreeItemModel* CStructureControllerCompBase::SetNodeMetaInfo(
+QJsonObject CStructureControllerCompBase::SetNodeMetaInfo(
 	const imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& /*errorMessage*/) const
 {
-	return nullptr;
+	return QJsonObject();
 }
 
 
-imtbase::CTreeItemModel* CStructureControllerCompBase::MoveNode(
+QJsonObject CStructureControllerCompBase::MoveNode(
 	const imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& /*errorMessage*/) const
 {
-	return nullptr;
+	return QJsonObject();
 }
 
 
-imtbase::CTreeItemModel* CStructureControllerCompBase::RemoveNode(
+QJsonObject CStructureControllerCompBase::RemoveNode(
 	const imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& /*errorMessage*/) const
 {
-	return nullptr;
+	return QJsonObject();
 }
 
 
-imtbase::CTreeItemModel* CStructureControllerCompBase::InsertNewObject(
+QJsonObject CStructureControllerCompBase::InsertNewObject(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
@@ -293,7 +300,7 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::InsertNewObject(
 		errorMessage = QT_TR_NOOP("Internal error");
 		SendErrorMessage(0, "Internal error", "Structure controller");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	QByteArray objectId;
@@ -322,7 +329,7 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::InsertNewObject(
 	if (!newObjectPtr.IsValid()){
 		SendErrorMessage(0, "Unable to create object from gql request", "Object collection controller");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr;
@@ -333,7 +340,7 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::InsertNewObject(
 
 	imtbase::IStructuredObjectCollectionController* collectionStructureController = nullptr; // connect via I_REF 
 	if (collectionStructureController == nullptr){
-		return nullptr;
+		return QJsonObject();
 	}
 
 	QByteArray newObjectId =  collectionStructureController->InsertNewObjectIntoCollection(m_objectCollectionCompPtr.GetPtr(), nodeId, typeId, name, description, newObjectPtr.GetPtr(), objectId, nullptr, nullptr, operationContextPtr.GetPtr());
@@ -341,77 +348,76 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::InsertNewObject(
 		errorMessage = QT_TR_NOOP(QString("Can not insert object: %1").arg(qPrintable(objectId)));
 		SendErrorMessage(0, QString("Can not insert object: %1").arg(qPrintable(objectId)), "Object collection controller");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
-	imtbase::CTreeItemModel* rootModelPtr(new imtbase::CTreeItemModel());
+	QJsonObject rootObj;
+	QJsonObject dataObj;
+	QJsonObject notificationObj;
 
-	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
-	Q_ASSERT(dataModelPtr != nullptr);
+	notificationObj.insert(QStringLiteral("Id"), QJsonValue::fromVariant(newObjectId));
+	notificationObj.insert(QStringLiteral("Name"), QJsonValue::fromVariant(name));
 
-	imtbase::CTreeItemModel* notificationModelPtr = dataModelPtr->AddTreeModel("addedNotification");
-	Q_ASSERT(notificationModelPtr != nullptr);
+	dataObj.insert(QStringLiteral("addedNotification"), notificationObj);
+	rootObj.insert(QStringLiteral("data"), dataObj);
 
-	notificationModelPtr->SetData("Id", newObjectId);
-	notificationModelPtr->SetData("Name", name);
-
-	return rootModelPtr;
+	return rootObj;
 }
 
 
-imtbase::CTreeItemModel* CStructureControllerCompBase::MoveObject(
+QJsonObject CStructureControllerCompBase::MoveObject(
 	const imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& /*errorMessage*/) const
 {
-	return nullptr;
+	return QJsonObject();
 }
 
 
-imtbase::CTreeItemModel* CStructureControllerCompBase::RemoveObject(
+QJsonObject CStructureControllerCompBase::RemoveObject(
 	const imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& /*errorMessage*/) const
 {
-	return nullptr;
+	return QJsonObject();
 }
 
 
-imtbase::CTreeItemModel* CStructureControllerCompBase::GetNodeCount(
+QJsonObject CStructureControllerCompBase::GetNodeCount(
 	const imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& /*errorMessage*/) const
 {
-	return nullptr;
+	return QJsonObject();
 }
 
 
-imtbase::CTreeItemModel* CStructureControllerCompBase::GetNodeIds(
+QJsonObject CStructureControllerCompBase::GetNodeIds(
 	const imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& /*errorMessage*/) const
 {
 	if (!m_collectionStructureCompPtr.IsValid()){
-		return nullptr;
+		return QJsonObject();
 	}
 
-	return nullptr;
+	return QJsonObject();
 }
 
 
-imtbase::CTreeItemModel* CStructureControllerCompBase::GetItemInfo(
+QJsonObject CStructureControllerCompBase::GetItemInfo(
 	const imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& /*errorMessage*/) const
 {
-	return nullptr;
+	return QJsonObject();
 }
 
 
-imtbase::CTreeItemModel* CStructureControllerCompBase::GetObjectParentNodeIds(
+QJsonObject CStructureControllerCompBase::GetObjectParentNodeIds(
 	const imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& /*errorMessage*/) const
 {
-	return nullptr;
+	return QJsonObject();
 }
 
 
-imtbase::CTreeItemModel* CStructureControllerCompBase::GetNodes(
+QJsonObject CStructureControllerCompBase::GetNodes(
 	const imtgql::CGqlRequest& gqlRequest,
 	QString& errorMessage) const
 {
@@ -420,26 +426,22 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::GetNodes(
 
 		SendCriticalMessage(0, errorMessage);
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	const imtgql::CGqlParamObject& inputParams = gqlRequest.GetParams();
 
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-
-	imtbase::CTreeItemModel* dataModel = nullptr;
-	imtbase::CTreeItemModel* itemsModel = nullptr;
-	imtbase::CTreeItemModel* notificationModel = nullptr;
+	QJsonObject rootObj;
+	QJsonObject dataObj;
+	QJsonArray itemsArray;
+	QJsonObject notificationObj;
 
 	if (!errorMessage.isEmpty()){
-		imtbase::CTreeItemModel* errorsItemModel = rootModelPtr->AddTreeModel("errors");
-		errorsItemModel->SetData("message", errorMessage);
+		QJsonObject errorsObj;
+		errorsObj.insert(QStringLiteral("message"), QJsonValue::fromVariant(errorMessage));
+		rootObj.insert(QStringLiteral("errors"), errorsObj);
 	}
 	else{
-		dataModel = new imtbase::CTreeItemModel();
-		itemsModel = new imtbase::CTreeItemModel();
-		notificationModel = new imtbase::CTreeItemModel();
-
 		const imtgql::CGqlParamObject* viewParamsGql = nullptr;
 		const imtgql::CGqlParamObject* inputObject = inputParams.GetParamArgumentObjectPtr("input");
 		if (inputObject != nullptr){
@@ -463,48 +465,44 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::GetNodes(
 			pagesCount = 1;
 		}
 
-		notificationModel->SetData("PagesCount", pagesCount);
-		notificationModel->SetData("TotalCount", itemCount);
+		notificationObj.insert(QStringLiteral("PagesCount"), QJsonValue::fromVariant(pagesCount));
+		notificationObj.insert(QStringLiteral("TotalCount"), QJsonValue::fromVariant(itemCount));
 
 		istd::TDelPtr<imtbase::IHierarchicalStructureIterator> collectionStructureIterator(m_collectionStructureCompPtr->CreateHierarchicalStructureIterator(offset, count, &filterParams));
 		if (collectionStructureIterator != nullptr){
 			while (collectionStructureIterator->Next()){
 				imtbase::IHierarchicalStructureInfo::ItemInfo nodeInfo = collectionStructureIterator->GetItemInfo();
-				int itemIndex = itemsModel->InsertNewItem();
-				if (itemIndex >= 0){
-					if (!SetupNodeItem(gqlRequest, *itemsModel, itemIndex, collectionStructureIterator.GetPtr(), errorMessage)){
-						SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+				QJsonObject itemObj;
+				if (!SetupNodeItem(gqlRequest, itemObj, collectionStructureIterator.GetPtr(), errorMessage)){
+					SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
-						return nullptr;
-					}
+					return QJsonObject();
 				}
+				itemsArray.append(itemObj);
 			}
 		}
 
-		itemsModel->SetIsArray(true);
-
-		dataModel->SetExternTreeModel("items", itemsModel);
-		dataModel->SetExternTreeModel("notification", notificationModel);
+		dataObj.insert(QStringLiteral("items"), itemsArray);
+		dataObj.insert(QStringLiteral("notification"), notificationObj);
 	}
 
-	rootModelPtr->SetExternTreeModel("data", dataModel);
+	rootObj.insert(QStringLiteral("data"), dataObj);
 
-	return rootModelPtr.PopPtr();
+	return rootObj;
 }
 
 
-imtbase::CTreeItemModel* CStructureControllerCompBase::GetElements(
+QJsonObject CStructureControllerCompBase::GetElements(
 	const imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& /*errorMessage*/) const
 {
-	return nullptr;
+	return QJsonObject();
 }
 
 
 bool CStructureControllerCompBase::SetupNodeItem(
 			const imtgql::CGqlRequest& /*gqlRequest*/,
-			imtbase::CTreeItemModel& /*model*/,
-			int /*itemIndex*/,
+			QJsonObject& /*itemObj*/,
 			const imtbase::IHierarchicalStructureIterator* /*collectionStructureIterator*/,
 			QString& /*errorMessage*/) const
 {
@@ -514,8 +512,7 @@ bool CStructureControllerCompBase::SetupNodeItem(
 
 bool CStructureControllerCompBase::SetupObjectItem(
 			const imtgql::CGqlRequest& /*gqlRequest*/,
-			imtbase::CTreeItemModel& /*model*/,
-			int /*itemIndex*/,
+			QJsonObject& /*itemObj*/,
 			const imtbase::IObjectCollectionIterator* /*objectCollectionIterator*/,
 			QString& /*errorMessage*/) const
 {

@@ -18,7 +18,7 @@ import json
 
 
 class ImtCoreConan(ConanFile):
-    name = "ImtCore"
+    name = "imtcore"
     settings = "os", "compiler", "build_type", "arch"
     options = {
         "qt_package": ["system", "conan"],
@@ -39,15 +39,13 @@ class ImtCoreConan(ConanFile):
     }
 
     description = "ImagingTools Core Framework"
-    url = "http://b035a0a.online-server.cloud/svn/ImtReleases/ImtCore"
-    license = "LGPL"
+    url = "https://github.com/ImagingTools/ImtCore"
+    license = "LicenseRef-ACF-Commercial", "LGPL-2.1-or-later"
     author = "ImagingTools"
-    topics = None
-    short_paths = True
+    topics = ("qt", "component-framework")
     exports_sources = ["patches/*"]
-    no_copy_source = False
     generators = "CMakeDeps"
-    python_requires = "conantools/0.2.0@gmg/stable"
+    python_requires = "conantools/0.2.4.rev.0@gmg/stable"
 
     @property
     def _gmgtools(self):
@@ -80,12 +78,14 @@ class ImtCoreConan(ConanFile):
 
     def requirements(self):
         if self.options.qt_package == "conan":
-            self.requires("qt/6.8.3-r0@gmg/system")
+            self.requires("qt/[>=6.8]@gmg/system")
 
         self.requires("quazip/[~1]@gmg/stable")
-        self.requires("openssl/1.1.1u")
-        self.requires("AcfPublic/[>=1.2.480-r0 <1.3.0]@gmg/stable", include_prerelease=True)
-        self.requires("zlib/1.2.11-r1@gmg/stable", override=True)
+        self.requires("openssl/[~1.1]")
+        self.requires("acf/[~1]@gmg/stable")
+        self.requires("acfsln/[~1]@gmg/stable")
+        self.requires("iacf/[~1]@gmg/stable")
+        self.requires("zlib/1.2.11.rev.3@gmg/stable", override=True)
 
     def build_requirements(self):
         if self.settings.os == "Linux":
@@ -97,6 +97,10 @@ class ImtCoreConan(ConanFile):
             self.output.info(f"Auto-detected Qt version: {self.options.qt_version}")
         else:
             del self.options.qt_version
+
+        # Set this to match the trunk options
+        # TODO: use conan profiles for this
+        self.options['openssl'].shared = True
 
     def layout(self):
         # FIXME: ImtCore cmake files done wrong and expect sources to be located in the ImtCore subdirectory
@@ -144,11 +148,18 @@ class ImtCoreConan(ConanFile):
         if self.options.qt_package == "system":
             return self.options.qt_version
         else:
-            return str(self.deps_cpp_info["qt"].version)
+            return str(self.dependencies["qt"].ref.version)
+
+    def _update_version(self):
+        script_name = "UpdateVersion.bat" if self.settings.os == "Windows" else "UpdateVersion.sh"
+        script_path = os.path.join(self.source_folder, "Build", "Git", script_name)
+        backup_dir = os.path.join(self.build_folder, "xtrsvn-backups")
+
+        self.run(f'"{script_path}" "{backup_dir}"', cwd=self.source_folder)
 
     def generate(self):
         if self.options.qt_package == "conan":
-            qtDir = str(self.deps_cpp_info["qt"].rootpath)
+            qtDir = str(self.dependencies["qt"].cpp_info.bindirs[0])
         else:
             qtDir = self._gmgtools.detect_qtdir(self)
         self.output.info(f"QTDIR: {qtDir}")
@@ -189,7 +200,7 @@ class ImtCoreConan(ConanFile):
             var: val for var, val in env.items()
             if var.startswith('ACF') or var.startswith('IACF') or var.startswith('IMTCORE')})
 
-        # AcfPublic shall be both build_requires() and requires() dependency because of the Arxc compiler tool
+        # Acf shall be both build_requires() and requires() dependency because of the Arxc compiler tool
         # However, we want to make things simple and use only requires()
         if not can_run(self):
             self.output.error("Cross compiling may not be able to run Arxc")
@@ -199,14 +210,17 @@ class ImtCoreConan(ConanFile):
             runEnv = VirtualRunEnv(self)
             runEnv.generate(scope="build")
 
+        self._update_version()
+
     def build(self):
         cmake = CMake(self)
         cmake.configure(build_script_folder='Build/CMake')
         cmake.build()
 
     def package_id(self):
-        # AcfPublic may break binary compatibility with any change in the version
-        self.info.requires['AcfPublic'].full_version_mode()
+        # Acf may break binary compatibility with any change in the version
+        self.info.requires['acf'].full_version_mode()
+        self.info.requires['acfsln'].full_version_mode()
         # qt may break binary compatibility with any change in the version
         # because of patches or repackaging
         self.info.requires['qt'].full_version_mode()
@@ -221,7 +235,13 @@ class ImtCoreConan(ConanFile):
         qt_major = self._get_qt_version().split(".")[0]
 
         if self.settings.os == 'Windows':
-            if self.settings.compiler == 'Visual Studio':
+            if self.settings.compiler == 'msvc':
+                compiler = 'VC' + {
+                    "192": "16",
+                    "193": "17", 
+                    "194": "17",
+                }[str(self.settings.compiler.version)]
+            elif self.settings.compiler == 'Visual Studio':
                 compiler = 'VC' + str(self.settings.compiler.version)
             else:
                 compiler = 'Clang'
@@ -286,25 +306,23 @@ class ImtCoreConan(ConanFile):
         cp(["*"], "Include/imtstylecontrolsqml")
 
     def _collect_libs(self):
-        if self.package_folder is not None:
-            return collect_libs(self)
+        prefix = ''
+        if (self.package_path / self.folders.build).is_dir():
+            self.output.info("Assuming editable mode")
+            prefix = self.folders.build
 
-        # In editable mode with conan v2 layout() package_folder is None
-        # and we need to implement our own search
-        libs = set()
+        libs = []
         for libdir in self.cpp_info.libdirs:
-            for ext in ('*.a', '*.so', '*.lib', '*.dylib'):
-                libPaths = Path(self.build_path / libdir).glob(ext)
-                for lib in libPaths:
-                    lib = lib.stem
-                    if lib[:3] == 'lib' and ext != '*.lib':
-                        lib = lib[3:]
-                    libs.add(lib)
-        return list(libs)
+            absoluteLibdir = self.package_path / prefix / libdir
+            if not absoluteLibdir.is_dir():
+                raise Exception(f"libdir does not exists {absoluteLibdir}")
+            libs += collect_libs(self, os.path.join(prefix, libdir))
+        return libs
 
     def package_info(self):
         #self.cpp_info.srcdirs = ["."]
 
+        self.cpp_info.bindirs = []
         self.cpp_info.includedirs = [os.path.join("AuxInclude", self._include_folder_suffix()), "Include", "Impl"]
         self.cpp_info.libdirs = [os.path.join("Lib", self._build_folder_suffix())]
         self.cpp_info.libs = self._collect_libs()
@@ -314,7 +332,8 @@ class ImtCoreConan(ConanFile):
         # HACK: we call it in package_info() instead of layout() because deps_cpp_info is needed to calculate the directory name
         self.cpp.source.includedirs = ["Include", "Impl", "Sdl"]
         self.cpp.build.includedirs = [os.path.join("AuxInclude", self._include_folder_suffix()), os.path.join("AuxInclude", self._include_folder_suffix(), "GeneratedFiles")]
-        self.cpp.build.libdirs = self.cpp_info.libdirs
+        self.cpp.build.libdirs = [] + self.cpp_info.libdirs # force deepcopy
+        self.cpp.build.bindirs = [] + self.cpp_info.bindirs
 
         cmakeModules = [
             "Config/CMake/ImtCoreDesign.cmake",
@@ -322,7 +341,8 @@ class ImtCoreConan(ConanFile):
             "Config/CMake/WebCompiler.cmake",
             "Config/CMake/ImtSdlConfig.cmake",
             "Config/CMake/ImtCoreSdlCustomConfig.cmake",
-            "Config/CMake/DdlCreator.cmake"]
+            "Config/CMake/DdlCreator.cmake",
+            "Config/CMake/ImtCoreQtRhiCompat.cmake"]
         # modern v2 approach
         self.cpp.package.set_property("cmake_build_modules", cmakeModules)
         self.cpp.source.set_property("cmake_build_modules", cmakeModules)
@@ -330,10 +350,13 @@ class ImtCoreConan(ConanFile):
         self.cpp_info.build_modules["cmake_find_package"] = cmakeModules
         self.cpp_info.build_modules["cmake_find_package_multi"] = cmakeModules
 
-        self.cpp_info.requires = ['quazip::quazip', 'openssl::openssl', 'AcfPublic::AcfPublic']
+        self.cpp_info.requires = ['quazip::quazip', 'openssl::openssl', 'acf::acf', 'acfsln::acfsln', 'iacf::iacf']
 
-        qt_components = self.deps_cpp_info["qt"].components.keys()
+        qt_components = self.dependencies["qt"].cpp_info.components.keys()
         self.output.info(f"Qt components: {qt_components}")
         if len(qt_components) > 0:
             # some imt components require more qt libraries, but for conan generated cmake configs keep it minimal
             self.cpp_info.requires += ['qt::qtCore']
+
+        self.cpp_info.set_property("cmake_file_name", "ImtCore")
+        self.cpp_info.set_property("cmake_target_name", "ImtCore::ImtCore")

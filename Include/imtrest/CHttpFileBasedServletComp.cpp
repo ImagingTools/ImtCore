@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtrest/CHttpFileBasedServletComp.h>
 
 
@@ -5,8 +6,8 @@
 #include <QtCore/QFile>
 
 // ImtCore includes
-#include <imthttp/IRequest.h>
-#include <imthttp/IProtocolEngine.h>
+#include <imtrest/IRequest.h>
+#include <imtrest/IProtocolEngine.h>
 
 
 namespace imtrest
@@ -23,13 +24,13 @@ bool CHttpFileBasedServletComp::IsCommandSupported(const QByteArray& commandId) 
 }
 
 
-imthttp::ConstResponsePtr CHttpFileBasedServletComp::ProcessRequest(const imthttp::IRequest& request, const QByteArray& /*subCommandId*/) const
+ConstResponsePtr CHttpFileBasedServletComp::ProcessRequest(const IRequest& request, const QByteArray& /*subCommandId*/) const
 {
 	const IProtocolEngine& engine = request.GetProtocolEngine();
 	QByteArray errorBody = "<html><head><title>Error</title></head><body><p>File resource was not found</p></body></html>";
 	QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
 
-	imthttp::ConstResponsePtr errorResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_RESOURCE_NOT_AVAILABLE, errorBody, reponseTypeId).PopInterfacePtr());
+	ConstResponsePtr errorResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_RESOURCE_NOT_AVAILABLE, errorBody, reponseTypeId).PopInterfacePtr());
 
 	if (!m_fileTemplatePathCompPtr.IsValid()){
 		return errorResponsePtr;
@@ -47,7 +48,7 @@ imthttp::ConstResponsePtr CHttpFileBasedServletComp::ProcessRequest(const imthtt
 
 	QByteArray body = templateFile.readAll();
 
-	imthttp::ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OK, body, reponseTypeId).PopInterfacePtr());
+	ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OK, body, reponseTypeId).PopInterfacePtr());
 
 	return responsePtr;
 }

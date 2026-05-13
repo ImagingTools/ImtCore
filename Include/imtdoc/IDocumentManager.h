@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -26,7 +27,8 @@ public:
 		CF_DOCUMENT_UNDO_CHANGED,
 		CF_DOCUMENT_SAVED,
 		CF_DOCUMENT_SAVED_AS,
-		CF_DOCUMENT_CLOSED
+		CF_DOCUMENT_CLOSED,
+		CF_DOCUMENT_DATA_LOADED
 	};
 
 	enum OperationStatus
@@ -34,6 +36,7 @@ public:
 		OS_OK = 0,
 		OS_INVALID_USER_ID,
 		OS_INVALID_DOCUMENT_ID,
+		OS_INVALID_DOCUMENT_DATA,
 		OS_FAILED
 	};
 
@@ -43,6 +46,8 @@ public:
 		QUrl url;
 		QString name;
 		bool isDirty = false;
+		bool hasNameProvider = false;
+		bool isLoading = false;
 	};
 
 	struct DocumentListItem : public DocumentInfo
@@ -98,6 +103,9 @@ public:
 	static const QByteArray CN_DOCUMENT_CLOSED;
 	typedef DocumentClosedNotification DocumentClosedInfo;
 
+	static const QByteArray CN_DOCUMENT_DATA_LOADED;
+	typedef DocumentNotification DocumentDataLoadedInfo;
+
 	/**
 		Get a list of open document instances for a given user-ID
 	*/
@@ -107,7 +115,10 @@ public:
 		Create a document of the given type (documentTypeId) for the given user-ID
 		/return		Document instance ID in the document manager
 	*/
-	virtual QByteArray CreateNewDocument(const QByteArray& userId, const QByteArray& documentTypeId) = 0;
+	virtual QByteArray CreateNewDocument(
+		const QByteArray& userId,
+		const QByteArray& documentTypeId,
+		const QByteArray& proposedSourceDocumentId = QByteArray()) = 0;
 
 	/**
 		Open a document from a given URL for a given user-ID
@@ -149,7 +160,11 @@ public:
 	/**
 		Save document with the given user-ID and document-ID
 	*/
-	virtual OperationStatus SaveDocument(const QByteArray& userId, const QByteArray& documentId, const QString& documentName) = 0;
+		virtual OperationStatus SaveDocument(
+			const QByteArray& userId,
+			const QByteArray& documentId,
+			const QString& documentName = QString(),
+			QString* errorMessage = nullptr) = 0;
 
 	/**
 		Close document with the given user-ID and document-ID

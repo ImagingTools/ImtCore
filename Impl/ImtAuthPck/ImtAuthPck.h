@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -16,7 +17,6 @@
 #include <imtauth/CCompanyInfoMetaInfoCreatorComp.h>
 #include <imtauth/CRoleComp.h>
 #include <imtauth/CRoleMetaInfoCreatorComp.h>
-#include <imtauth/CUserInfo.h>
 #include <imtauth/CUserInfoMetaInfoCreatorComp.h>
 #include <imtauth/CUserInfoComp.h>
 #include <imtauth/CUserGroupInfoComp.h>
@@ -44,9 +44,20 @@
 #include <imtauth/CUserMetaInfoCreatorComp.h>
 #include <imtauth/CGroupMetaInfoCreatorComp.h>
 #include <imtauth/CUserConnectionInfo.h>
-#include <imtauth/CUserRecentAction.h>
 #include <imtauth/CUserActionMetaInfoCreatorComp.h>
 #include <imtauth/CUserActionManagerComp.h>
+#include <imtauth/CPersonalAccessToken.h>
+#include <imtauth/CPersonalAccessTokenManagerComp.h>
+#include <imtauth/CPersonalAccessTokenMetaInfoCreatorComp.h>
+#include <imtauth/CUserRecentActionComp.h>
+#include <imtauth/CTenantInfoComp.h>
+#include <imtauth/CTenantMetaInfoCreatorComp.h>
+#include <imtauth/CTenantManagerComp.h>
+#include <imtauth/CTenantMembershipComp.h>
+#include <imtauth/CTenantMembershipManagerComp.h>
+#include <imtauth/CTenantInvitationComp.h>
+#include <imtauth/CTenantInvitationManagerComp.h>
+#include <imtauth/CTenantDocumentNameProviderComp.h>
 
 
 namespace ImtAuthPck
@@ -125,15 +136,25 @@ typedef icomp::TModelCompWrap<
 						imtauth::IUserConnectionInfo,
 						iser::ISerializable,
 						istd::IChangeable>> UserConnectionInfo;
-typedef icomp::TModelCompWrap<
-			icomp::TMakeComponentWrap<
-						imtauth::CIdentifiableUserRecentAction,
-						imtauth::IUserRecentAction,
-						iser::IObject,
-						iser::ISerializable,
-						istd::IChangeable>> UserRecentAction;
 typedef imtauth::CUserActionMetaInfoCreatorComp UserActionMetaInfoCreator;
 typedef imtauth::CUserActionManagerComp UserActionManager;
+typedef icomp::TModelCompWrap<
+			icomp::TMakeComponentWrap <
+						imtauth::CPersonalAccessToken,
+						imtauth::IPersonalAccessToken,
+						iser::ISerializable,
+						istd::IChangeable>> PersonalAccessToken;
+typedef imtauth::CPersonalAccessTokenManagerComp PersonalAccessTokenManager;
+typedef imtauth::CPersonalAccessTokenMetaInfoCreatorComp PersonalAccessTokenMetaInfoCreator;
+typedef icomp::TModelCompWrap<imtauth::CUserRecentActionComp> UserRecentAction;
+typedef icomp::TModelCompWrap<imtauth::CTenantInfoComp> TenantInfo;
+typedef imtauth::CTenantMetaInfoCreatorComp TenantMetaInfoCreator;
+typedef imtauth::CTenantManagerComp TenantManager;
+typedef icomp::TModelCompWrap<imtauth::CTenantMembershipComp> TenantMembershipInfo;
+typedef icomp::TModelCompWrap<imtauth::CTenantMembershipManagerComp> TenantMembershipManager;
+typedef icomp::TModelCompWrap<imtauth::CTenantInvitationComp> TenantInvitationInfo;
+typedef icomp::TModelCompWrap<imtauth::CTenantInvitationManagerComp> TenantInvitationManager;
+typedef imtauth::CTenantDocumentNameProviderComp TenantDocumentNameProvider;
 
 
 } // namespace ImtAuthPck

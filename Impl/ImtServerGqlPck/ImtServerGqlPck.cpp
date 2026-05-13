@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include "ImtServerGqlPck.h"
 
 
@@ -174,7 +175,26 @@ I_EXPORT_COMPONENT(
 			"Collection document manager publisher",
 			"Collection Document Manager Publisher");
 
+I_EXPORT_COMPONENT(
+			PublisherSubscriberBridge,
+			"Publisher-subscriber bridge",
+			"Publisher Subscriber Bridge");
+
+I_EXPORT_COMPONENT(
+			GqlContextCreator,
+			"GraphQL context creator",
+			"GraphQL GQL Context Creator");
+
+I_EXPORT_COMPONENT(
+			FilterableSelectController,
+			"Filterable select items controller",
+			"Filterable Select Controller");
+
+I_EXPORT_COMPONENT(
+			UserGroupParamsSetJoiner,
+			"User group params set joiner",
+			"User Group Params Set Joiner");
+
 
 } // namespace ImtServerGqlPck
-
 

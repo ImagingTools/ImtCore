@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include "ImtHypePck.h"
 
 
@@ -12,7 +13,7 @@ namespace ImtHypePck
 I_EXPORT_PACKAGE(
 			"ImtHypePck",
 			"Acula's task-related components",
-			IM_PROJECT("Acula") IM_COMPANY("ImagingTools") "Job Task");
+			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools") "Job Task");
 
 I_EXPORT_COMPONENT(
 			TaskCollection,

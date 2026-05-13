@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -24,9 +25,9 @@ protected:
 	// reimplemented (imtrest::CHttpServletCompBase)
 	virtual ConstResponsePtr OnPut(
 		const QByteArray& commandId,
-		const imthttp::IRequest::CommandParams& commandParams,
+		const imtrest::IRequest::CommandParams& commandParams,
 		const HeadersMap& headers,
-		const imthttp::CHttpRequest& request) const override;
+		const imtrest::CHttpRequest& request) const override;
 
 private:
 	struct RangeData

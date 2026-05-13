@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CAuthorizationControllerComp.h>
 
 
@@ -120,7 +121,7 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 
 	if (m_jwtSessionControllerCompPtr.IsValid()){
 		imtauth::IJwtSessionController::UserSession userSession;
-		if (m_jwtSessionControllerCompPtr->CreateNewSession(objectId, userSession)){
+		if (m_jwtSessionControllerCompPtr->CreateNewSession(objectId, QByteArray(), userSession)){
 			payload.Version_1_0->refreshToken = userSession.refreshToken;
 			payload.Version_1_0->token = userSession.accessToken;
 			payload.Version_1_0->userId = userSession.userId;

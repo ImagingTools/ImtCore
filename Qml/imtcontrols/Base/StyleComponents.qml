@@ -4,6 +4,7 @@ import QtQuick 2.12
 Item {
 	property Component menuPanelButtonDecorator
 	property Component subMenuPanelButtonDecorator
+	property Component menuPanelDecorator
 	property Component filterPanelDecorator
 	property Component bottomPanelDecorator
 	property Component topButtonDecorator

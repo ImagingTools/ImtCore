@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -13,6 +14,10 @@
 #include <imtauthdb/CSqliteRoleDatabaseDelegateComp.h>
 #include <imtauthdb/CUsersSqlPathExtractorComp.h>
 #include <imtauthdb/CUserActionDatabaseDelegateComp.h>
+#include <imtauthdb/CPersonalAccessTokenDatabaseDelegateComp.h>
+#include <imtauthdb/CTenantDbDelegateComp.h>
+#include <imtauthdb/CTenantMembershipDbDelegateComp.h>
+#include <imtauthdb/CTenantInvitationDbDelegateComp.h>
 
 
 /**
@@ -34,8 +39,11 @@ typedef imtauthdb::CRoleDatabaseDelegateComp SqlJsonRoleDatabaseDelegate;
 typedef imtauthdb::CSqliteRoleDatabaseDelegateComp SqliteJsonRoleDatabaseDelegate;
 typedef imtauthdb::CUsersSqlPathExtractorComp UsersSqlPathExtractor;
 typedef imtauthdb::CUserActionDatabaseDelegateComp UserActionDatabaseDelegate;
+typedef imtauthdb::CPersonalAccessTokenDatabaseDelegateComp PersonalAccessTokenDatabaseDelegate;
+typedef imtauthdb::CTenantDbDelegateComp TenantDatabaseDelegate;
+typedef imtauthdb::CTenantMembershipDbDelegateComp TenantMembershipDatabaseDelegate;
+typedef imtauthdb::CTenantInvitationDbDelegateComp TenantInvitationDatabaseDelegate;
 
 
 } // namespace ImtAuthDbPck
-
 

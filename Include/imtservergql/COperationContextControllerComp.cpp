@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtservergql/COperationContextControllerComp.h>
 
 
@@ -55,6 +56,9 @@ imtbase::IOperationContext* COperationContextControllerComp::CreateOperationCont
 	operationContextPtr.SetPtr(new imtbase::COperationContext);
 
 	operationContextPtr->SetOperationOwnerId(objectInfo);
+
+	QByteArray tenantId = requestContextPtr->GetTenantId();
+	operationContextPtr->SetTenantId(tenantId);
 
 	if (m_documentChangeGeneratorCompPtr.IsValid()){
 		imtbase::CObjectCollection* changeCollectionPtr = dynamic_cast<imtbase::CObjectCollection*>(operationContextPtr->GetChangesCollection());

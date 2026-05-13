@@ -29,7 +29,7 @@ ParamController {
 		parameterObj.m_data = parameterData
 
 		if (!paramsSet.hasParameters()){
-			paramsSet.createParameters()
+			paramsSet.emplaceParameters()
 		}
 
 		paramsSet.m_parameters.addElement(parameterObj)

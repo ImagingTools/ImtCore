@@ -1,6 +1,8 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 #include <QtPositioning/QGeoCoordinate>
+#include <QJsonObject>
 
 
 // ImtCore includes
@@ -22,8 +24,8 @@ public:
 protected:
 	// reimplemented (imtservergql::CObjectCollectionControllerCompBase)
 	virtual QVariant GetObjectInformation(const QByteArray& informationId, const QByteArray& objectId) const override;
-	virtual imtbase::CTreeItemModel* GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-	virtual imtbase::CTreeItemModel* ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual QJsonObject GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual QJsonObject ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	int long2tilex(double lon, int z) const;
 	int lat2tiley(double lat, int z) const;
 	double tilex2long(int x, int z) const;

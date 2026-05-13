@@ -1,5 +1,10 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtlicgql/CLicenseControllerComp.h>
 
+
+// Qt includes
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonValue>
 
 // ACF includes
 #include <iprm/CIdParam.h>
@@ -152,13 +157,13 @@ istd::IChangeableUniquePtr CLicenseControllerComp::CreateObjectFromRequest(
 }
 
 
-imtbase::CTreeItemModel* CLicenseControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CLicenseControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
 		SendErrorMessage(0, errorMessage, "License controller");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
@@ -166,7 +171,7 @@ imtbase::CTreeItemModel* CLicenseControllerComp::GetObject(const imtgql::CGqlReq
 		errorMessage = QT_TR_NOOP("Unable to get object. GQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "License controller");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	QByteArray objectId = inputParamPtr->GetParamArgumentValue("Id").toByteArray();
@@ -175,33 +180,34 @@ imtbase::CTreeItemModel* CLicenseControllerComp::GetObject(const imtgql::CGqlReq
 	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
 		imtlic::ILicenseDefinition* licenseInfoPtr = dynamic_cast<imtlic::ILicenseDefinition*>(dataPtr.GetPtr());
 		if (licenseInfoPtr != nullptr){
-			istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-			imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
+			QJsonObject rootObj;
+			QJsonObject dataObj;
 
-			dataModelPtr->SetData("Id", objectId);
-			dataModelPtr->SetData("Name", licenseInfoPtr->GetLicenseName());
+			dataObj.insert(QStringLiteral("Id"), QJsonValue::fromVariant(objectId));
+			dataObj.insert(QStringLiteral("Name"), QJsonValue::fromVariant(licenseInfoPtr->GetLicenseName()));
 
-			dataModelPtr->SetData("LicenseId", licenseInfoPtr->GetLicenseId());
-			dataModelPtr->SetData("LicenseName", licenseInfoPtr->GetLicenseName());
-			dataModelPtr->SetData("LicenseDescription", licenseInfoPtr->GetLicenseDescription());
-			dataModelPtr->SetData("ProductId", licenseInfoPtr->GetProductId());
+			dataObj.insert(QStringLiteral("LicenseId"), QJsonValue::fromVariant(licenseInfoPtr->GetLicenseId()));
+			dataObj.insert(QStringLiteral("LicenseName"), QJsonValue::fromVariant(licenseInfoPtr->GetLicenseName()));
+			dataObj.insert(QStringLiteral("LicenseDescription"), QJsonValue::fromVariant(licenseInfoPtr->GetLicenseDescription()));
+			dataObj.insert(QStringLiteral("ProductId"), QJsonValue::fromVariant(licenseInfoPtr->GetProductId()));
 
 			QByteArrayList featureUuids;
 			for (const imtlic::ILicenseDefinition::FeatureInfo& featureInfo : licenseInfoPtr->GetFeatureInfos()){
 				featureUuids << featureInfo.id;
 			}
 
-			dataModelPtr->SetData("Features", featureUuids.join(';'));
-			dataModelPtr->SetData("ParentLicenses", licenseInfoPtr->GetDependencies().join(';'));
+			dataObj.insert(QStringLiteral("Features"), QJsonValue::fromVariant(featureUuids.join(';')));
+			dataObj.insert(QStringLiteral("ParentLicenses"), QJsonValue::fromVariant(licenseInfoPtr->GetDependencies().join(';')));
 
-			return rootModelPtr.PopPtr();
+			rootObj.insert(QStringLiteral("data"), dataObj);
+			return rootObj;
 		}
 	}
 
 	errorMessage = QT_TR_NOOP(QString("Unable to get license by ID: %1.").arg(qPrintable(objectId)));
 	SendErrorMessage(0, errorMessage, "License controller");
 
-	return nullptr;
+	return QJsonObject();
 }
 
 

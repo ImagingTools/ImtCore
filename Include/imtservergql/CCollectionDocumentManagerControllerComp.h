@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -33,11 +34,11 @@ protected:
 		const sdl::imtbase::CollectionDocumentManager::CGetOpenedDocumentListGqlRequest& getOpenedDocumentListRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	virtual sdl::imtbase::CollectionDocumentManager::CDocumentId OnCreateNewDocument(
+	virtual sdl::imtbase::CollectionDocumentManager::CDocumentInfo OnCreateNewDocument(
 		const sdl::imtbase::CollectionDocumentManager::CCreateNewDocumentGqlRequest& createNewDocumentRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	virtual sdl::imtbase::CollectionDocumentManager::CDocumentId OnOpenDocument(
+	virtual sdl::imtbase::CollectionDocumentManager::CDocumentInfo OnOpenDocument(
 		const sdl::imtbase::CollectionDocumentManager::COpenDocumentGqlRequest& openDocumentRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;

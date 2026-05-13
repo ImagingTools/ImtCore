@@ -1,14 +1,18 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
 // Qt includes
 #include <QtCore/QReadWriteLock>
+#include <QtCore/QVector>
+
+// std includes
+#include <memory>
 
 // ACF includes
 #include <istd/TComposedFactory.h>
 #include <icomp/CComponentBase.h>
 #include <istd/TDelPtr.h>
-#include <istd/TPointerVector.h>
 #include <imod/TSingleModelObserverBase.h>
 
 // ImtCore includes
@@ -126,7 +130,9 @@ protected:
 		imtbase::IObjectCollectionUniquePtr cachePtr;
 	};
 
-	FilteredCollection* GetFilteredCollection(
+	typedef std::shared_ptr<FilteredCollection> FilteredCollectionPtr;
+
+	FilteredCollectionPtr GetFilteredCollection(
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const;
@@ -140,7 +146,7 @@ private:
 	I_ATTR(int, m_metaInfoCacheLimitAttrPtr);
 	I_ATTR(int, m_objectCacheLimitAttrPtr);
 
-	mutable istd::TPointerVector<FilteredCollection> m_cachedCollections;
+	mutable QVector<FilteredCollectionPtr> m_cachedCollections;
 
 	struct CacheItem
 	{

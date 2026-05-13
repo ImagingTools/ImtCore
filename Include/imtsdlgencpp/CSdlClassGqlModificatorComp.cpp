@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include "CSdlClassGqlModificatorComp.h"
 
 
@@ -481,7 +482,7 @@ bool CSdlClassGqlModificatorComp::AddContainerListAccessCode(
 		stream << QStringLiteral("ElementsCount = ");
 		stream << GetContainerObjectVariableName();
 		stream << QStringLiteral(".GetObjectsCount(\"");
-		stream << GetDecapitalizedValue(field.GetId());
+		stream << field.GetId();
 		stream << QStringLiteral("\");");
 
 		result.listVariableName = '*' + GetDecapitalizedValue(field.GetId()) + QStringLiteral("DataObjectPtr");
@@ -769,6 +770,16 @@ QString CSdlClassGqlModificatorComp::GetUnionListElementType(bool forScalar) con
 	}
 
 	return QStringLiteral("::imtgql::CGqlParamObject*");
+}
+
+
+void CSdlClassGqlModificatorComp::WriteTypenameToObjectCode(QTextStream& stream, const imtsdl::CSdlType& sdlType) const 
+{
+	stream << GetContainerObjectVariableName();
+	stream << QStringLiteral(".InsertParam(");
+	stream << QStringLiteral("\"__typename\", ");
+	stream << QStringLiteral("QVariant(\"") << sdlType.GetName() << "\")";
+	stream << QStringLiteral(");");
 }
 
 

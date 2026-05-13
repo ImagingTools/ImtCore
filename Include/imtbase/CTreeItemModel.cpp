@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtbase/CTreeItemModel.h>
 
 
@@ -261,7 +262,9 @@ int CTreeItemModel::InsertNewItem()
 {
 	int index = m_items.size();
 
-	beginInsertRows(QModelIndex(), index, index);
+	if(m_isUpdateEnabled){
+		beginInsertRows(QModelIndex(), index, index);
+	}
 
 	m_items.append(new Item());
 
@@ -269,7 +272,9 @@ int CTreeItemModel::InsertNewItem()
 		m_isArray = true;
 	}
 
-	endInsertRows();
+	if(m_isUpdateEnabled){
+		endInsertRows();
+	}
 
 	if(m_isUpdateEnabled){
 		OnModelChanged();
@@ -285,7 +290,9 @@ int CTreeItemModel::InsertNewItem(int index)
 		return -1;
 	}
 
-	beginInsertRows(QModelIndex(), index, index);
+	if(m_isUpdateEnabled){
+		beginInsertRows(QModelIndex(), index, index);
+	}
 
 	m_items.insert(index, new Item());
 
@@ -293,7 +300,9 @@ int CTreeItemModel::InsertNewItem(int index)
 		m_isArray = true;
 	}
 
-	endInsertRows();
+	if(m_isUpdateEnabled){
+		endInsertRows();
+	}
 
 	if(m_isUpdateEnabled){
 		OnModelChanged();
@@ -309,18 +318,24 @@ int CTreeItemModel::RemoveItem(int index)
 		return -1;
 	}
 
-	beginRemoveRows(QModelIndex(), index, index);
+	if(m_isUpdateEnabled){
+		beginRemoveRows(QModelIndex(), index, index);
+	}
 
 	Item* item = m_items.takeAt(index);
 	delete item;
 
-	endRemoveRows();
+	if(m_isUpdateEnabled){
+		endRemoveRows();
+	}
 
 	if(m_items.isEmpty()){
 		m_isArray = false;
 	}
 
-	OnModelChanged();
+	if(m_isUpdateEnabled){
+		OnModelChanged();
+	}
 
 	return index;
 }
@@ -335,12 +350,15 @@ bool CTreeItemModel::SwapItems(int index1, int index2)
 		return true;
 	}
 
-//	beginMoveRows(QModelIndex(), index1, index1, QModelIndex(), index2);
+	if(m_isUpdateEnabled){
+		beginResetModel();
+	}
 
-	beginResetModel();
 	m_items.swapItemsAt(index1, index2);
-//	endMoveRows();
-	endResetModel();
+
+	if(m_isUpdateEnabled){
+		endResetModel();
+	}
 
 	return true;
 }
@@ -348,14 +366,18 @@ bool CTreeItemModel::SwapItems(int index1, int index2)
 
 imtbase::CTreeItemModel* CTreeItemModel::AddTreeModel(const QByteArray& key, int index)
 {
-	BeginChanges();
+	if(m_isUpdateEnabled){
+		BeginChanges();
+	}
 
 	if (m_items.isEmpty() && index == 0){
 		InsertNewItem();
 	}
 
 	if (index < 0 || index > m_items.count() - 1){
-		EndChanges();
+		if(m_isUpdateEnabled){
+			EndChanges();
+		}
 
 		return nullptr;
 	}
@@ -372,7 +394,9 @@ imtbase::CTreeItemModel* CTreeItemModel::AddTreeModel(const QByteArray& key, int
 		retVal->Clear();
 	}
 
-	EndChanges();
+	if(m_isUpdateEnabled){
+		EndChanges();
+	}
 
 	return retVal;
 }
@@ -380,14 +404,18 @@ imtbase::CTreeItemModel* CTreeItemModel::AddTreeModel(const QByteArray& key, int
 
 bool CTreeItemModel::SetExternTreeModel(const QByteArray& key, CTreeItemModel* externTreeModel, int index)
 {
-	BeginChanges();
+	if(m_isUpdateEnabled){
+		BeginChanges();
+	}
 
 	if (m_items.isEmpty() && index == 0){
 		InsertNewItem();
 	}
 
 	if (index < 0 || index > m_items.count() - 1){
-		EndChanges();
+		if(m_isUpdateEnabled){
+			EndChanges();
+		}
 
 		return false;
 	}
@@ -399,7 +427,9 @@ bool CTreeItemModel::SetExternTreeModel(const QByteArray& key, CTreeItemModel* e
 	QVariant v = QVariant::fromValue(externTreeModel);
 	SetData(key, v, index);
 
-	EndChanges();
+	if(m_isUpdateEnabled){
+		EndChanges();
+	}
 
 	return true;
 }
@@ -415,7 +445,9 @@ bool CTreeItemModel::CopyItemDataFromModel(int index, CTreeItemModel* externTree
 
 bool CTreeItemModel::CopyItemDataFromModel(int index, const CTreeItemModel* externTreeModel, int externIndex)
 {
-	BeginChanges();
+	if(m_isUpdateEnabled){
+		BeginChanges();
+	}
 
 	RemoveItem(index);
 	InsertNewItem(index);
@@ -444,7 +476,9 @@ bool CTreeItemModel::CopyItemDataFromModel(int index, const CTreeItemModel* exte
 		}
 	}
 
-	EndChanges();
+	if(m_isUpdateEnabled){
+		EndChanges();
+	}
 
 	return retVal;
 }
@@ -538,10 +572,14 @@ bool CTreeItemModel::RemoveData(const QByteArray& key, int index)
 		QVector<int> roles;
 		roles.append(keyRole);
 
-		Q_EMIT dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index), roles);
+		if(m_isUpdateEnabled){
+			Q_EMIT dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index), roles);
+		}
 	}
 
-	OnModelChanged();
+	if(m_isUpdateEnabled){
+		OnModelChanged();
+	}
 
 	return true;
 }
@@ -648,14 +686,18 @@ QList<QString> CTreeItemModel::GetKeys(int index) const
 
 void CTreeItemModel::Clear()
 {
-	beginResetModel();
+	if(m_isUpdateEnabled){
+		beginResetModel();
+	}
 
 	qDeleteAll(m_items);
 	m_items.clear();
 
-	endResetModel();
+	if(m_isUpdateEnabled){
+		endResetModel();
 
-	OnModelChanged();
+		OnModelChanged();
+	}
 }
 
 
@@ -673,34 +715,56 @@ void CTreeItemModel::SetIsArray(const bool& isArray)
 
 bool CTreeItemModel::CreateFromJson(const QByteArray& jsonContent)
 {
-	BeginChanges();
+	if(m_isUpdateEnabled){
+		BeginChanges();
+	}
 
 	Clear();
-	QJsonParseError error;
 
-	QJsonDocument document = QJsonDocument::fromJson(jsonContent, &error);
+	QJsonParseError error;
+	const QJsonDocument document = QJsonDocument::fromJson(jsonContent, &error);
 	if (error.error != QJsonParseError::NoError){
 		qCritical() << "Error during parsing JSON document:" << error.errorString() << "content:" << jsonContent;
-		EndChanges();
+		if(m_isUpdateEnabled){
+			EndChanges();
+		}
 
 		return false;
 	}
 
 	bool retVal = true;
+
 	if (document.isArray()){
 		const QJsonArray jsonArray = document.array();
-		int index;
-		for (const auto& v : jsonArray){
-			index = InsertNewItem();
-			QJsonObject element = v.toObject();
-			retVal = retVal && ParseRecursive(element, index);
+
+		for (const QJsonValue& value : jsonArray){
+			if (value.isObject()){
+				const int index = InsertNewItem();
+				retVal = retVal && ParseRecursive(value.toObject(), index);
+			}
+			else if (value.isArray()){
+				retVal = false;
+			}
+			else{
+				const int index = InsertNewItem();
+				retVal = retVal && SetData(QByteArray(), value.toVariant(), index);
+			}
+
+			if (!retVal){
+				break;
+			}
 		}
 	}
-	else{
+	else if (document.isObject()){
 		retVal = ParseRecursive(document.object(), 0);
 	}
+	else{
+		retVal = false;
+	}
 
-	EndChanges();
+	if(m_isUpdateEnabled){
+		EndChanges();
+	}
 
 	return retVal;
 }
@@ -774,22 +838,20 @@ QString CTreeItemModel::ToJson()
 {
 	QByteArray representationData;
 
-	{
-		iser::CJsonMemWriteArchive archive(nullptr, false);
-
-		if (SerializeModel(archive)){
-			representationData = archive.GetData();
-		}
-		else{
-			Q_ASSERT(false);
-		}
+	iser::CJsonMemWriteArchive archive(nullptr, false);
+	if (SerializeModel(archive)){
+		representationData = archive.GetData();
+	}
+	else{
+		Q_ASSERT(false);
+		return QString();
 	}
 
 	if (representationData.length() > 2 && representationData[1] == '['){
 		representationData = representationData.mid(1, representationData.length() - 2);
 	}
 
-	return QString(representationData);
+	return QString::fromUtf8(representationData);
 }
 
 
@@ -876,18 +938,16 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive& archive, const QByteArra
 {
 	bool retVal = true;
 	int countSize = m_items.count();
+
 	iser::CArchiveTag arrayTag(tagName, QByteArrayLiteral("array items"), iser::CArchiveTag::TT_MULTIPLE);
 	iser::CArchiveTag subArrayTag(QByteArrayLiteral("Item"), QByteArrayLiteral("array item"), iser::CArchiveTag::TT_GROUP, &arrayTag);
 	iser::CArchiveTag objectTag(tagName, QByteArrayLiteral("key"), iser::CArchiveTag::TT_GROUP);
-	bool isMultiTag = false;
 
-	QList<QByteArray> keys = m_roleNames.values();
-	if (keys.size() == 1 && keys[0].isEmpty()){
+	bool isMultiTag = (m_isArray || countSize > 1);
+
+	const QList<QByteArray> roleKeys = m_roleNames.values();
+	if (roleKeys.size() == 1 && roleKeys[0].isEmpty()){
 		subArrayTag = iser::CArchiveTag(QByteArrayLiteral("Item"), QByteArrayLiteral("array item"), iser::CArchiveTag::TT_LEAF, &arrayTag);
-	}
-
-	if (m_isArray || countSize > 1){
-		isMultiTag = true;
 	}
 
 	if (!isMultiTag){
@@ -899,98 +959,45 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive& archive, const QByteArra
 		retVal = retVal && archive.BeginMultiTag(arrayTag, subArrayTag, countSize);
 	}
 
-	for (int i = 0; i < countSize; i++){
+	for (int i = 0; i < countSize && retVal; ++i){
 		Item* item = m_items[i];
+		if (item == nullptr){
+			retVal = false;
+			break;
+		}
+
 		QList<QByteArray> itemKeys;
 		item->GetKeys(itemKeys);
-		if (isMultiTag && !itemKeys.isEmpty() && !itemKeys[0].isEmpty()){
+
+		const bool wrapSubItem = isMultiTag && !itemKeys.isEmpty() && !itemKeys[0].isEmpty();
+		if (wrapSubItem){
 			retVal = retVal && archive.BeginTag(subArrayTag);
 		}
-		for (const QByteArray& key: std::as_const(itemKeys)){
-			CTreeItemModel* treeItemModelPtr = nullptr;
-			QVariant v = item->Value(key);
-			if (v.isValid()){
-				treeItemModelPtr = v.value<CTreeItemModel*>();
+
+		for (const QByteArray& key : std::as_const(itemKeys)){
+			const QVariant value = item->Value(key);
+
+			if (value.isValid()){
+				if (CTreeItemModel* treeItemModelPtr = value.value<CTreeItemModel*>()){
+					retVal = retVal && treeItemModelPtr->SerializeRecursive(archive, key);
+					if (!retVal){
+						break;
+					}
+					continue;
+				}
 			}
-			if (treeItemModelPtr != nullptr){
-				treeItemModelPtr->SerializeRecursive(archive, key);
-			}
-			else{
-				iser::CArchiveTag keyTag(key, QByteArrayLiteral("key"), iser::CArchiveTag::TT_LEAF);
-				retVal = retVal && archive.BeginTag(keyTag);
-				QVariant value = item->Value(key);
-#if QT_VERSION < 0x060000
-				if (value.type() == QMetaType::Int){
-#else
-				if (value.typeId() == QMetaType::Int){
-#endif
-					qint32 intVal = value.toInt();
-					retVal = retVal && archive.Process(intVal);
-				}
-#if QT_VERSION < 0x060000
-				else if (value.type() == QMetaType::UInt){
-#else
-				else if (value.typeId() == QMetaType::UInt){
-#endif
-					quint32 intVal = value.toUInt();
-					retVal = retVal && archive.Process(intVal);
-				}
-#if QT_VERSION < 0x060000
-				else if (value.type() == QMetaType::Double){
-#else
-				else if (value.typeId() == QMetaType::Double){
-#endif
-					double doubleVal = value.toDouble();
-					retVal = retVal && archive.Process(doubleVal);
-				}
-#if QT_VERSION < 0x060000
-				else if (value.type() == QMetaType::Float){
-#else
-				else if (value.typeId() == QMetaType::Float){
-#endif
-					double floatVal = value.toFloat();
-					retVal = retVal && archive.Process(floatVal);
-				}
-#if QT_VERSION < 0x060000
-				else if (value.type() == QMetaType::LongLong){
-#else
-				else if (value.typeId() == QMetaType::LongLong){
-#endif
-					qint64 intVal = value.toLongLong();
-					retVal = retVal && archive.Process(intVal);
-				}
-#if QT_VERSION < 0x060000
-				else if (value.type() == QMetaType::ULongLong){
-#else
-				else if (value.typeId() == QMetaType::ULongLong){
-#endif
-					quint64 intVal = value.toULongLong();
-					retVal = retVal && archive.Process(intVal);
-				}
-#if QT_VERSION < 0x060000
-				else if (value.type() == QMetaType::Bool){
-#else
-				else if (value.typeId() == QMetaType::Bool){
-#endif
-					bool boolVal = value.toBool();
-					retVal = retVal && archive.Process(boolVal);
-				}
-#if QT_VERSION < 0x060000
-				else if (value.type() == QMetaType::QString || value.type() == QMetaType::QByteArray){
-#else
-				else if (value.typeId() == QMetaType::QString || value.typeId() == QMetaType::QByteArray){
-#endif
-					QString strVal = value.toString();
-					retVal = retVal && archive.Process(strVal);
-				}
-				else {
-					QByteArray baVal = QByteArrayLiteral("null");
-					retVal = retVal && archive.Process(baVal);
-				}
-				retVal = retVal && archive.EndTag(keyTag);
+
+			iser::CArchiveTag keyTag(key, QByteArrayLiteral("key"), iser::CArchiveTag::TT_LEAF);
+			retVal = retVal && archive.BeginTag(keyTag);
+			retVal = retVal && SerializeVariantValue(archive, value);
+			retVal = retVal && archive.EndTag(keyTag);
+
+			if (!retVal){
+				break;
 			}
 		}
-		if (isMultiTag && !itemKeys.isEmpty() && !itemKeys[0].isEmpty()){
+
+		if (wrapSubItem){
 			retVal = retVal && archive.EndTag(subArrayTag);
 		}
 	}
@@ -1024,45 +1031,119 @@ int CTreeItemModel::GetKeyRole(const QByteArray& key) const
 bool CTreeItemModel::ParseRecursive(const QJsonObject& jsonObject, int index)
 {
 	bool retVal = true;
-	QJsonObject::ConstIterator objectIterator = jsonObject.begin();
-	while (objectIterator != jsonObject.end()){
-		QJsonValue jsonValue = objectIterator.value();
+
+	for (QJsonObject::ConstIterator it = jsonObject.begin(); it != jsonObject.end(); ++it){
+		const QByteArray key = it.key().toUtf8();
+		const QJsonValue jsonValue = it.value();
+
 		if (jsonValue.isArray()){
-			CTreeItemModel* treeItemModel = AddTreeModel(objectIterator.key().toUtf8(), index);
+			CTreeItemModel* treeItemModel = AddTreeModel(key, index);
+			if (treeItemModel == nullptr){
+				return false;
+			}
+
 			treeItemModel->SetIsArray(true);
-			QJsonArray jsonArrary = jsonValue.toArray();
-			QJsonArray::ConstIterator arrayIterator = jsonArrary.begin();
-			while (arrayIterator != jsonArrary.end()){
-				jsonValue = *arrayIterator;
-				if(jsonValue.isObject()){
-					treeItemModel->InsertNewItem();
-					treeItemModel->ParseRecursive(jsonValue.toObject(), treeItemModel->m_items.size() - 1);
+
+			const QJsonArray jsonArray = jsonValue.toArray();
+			for (const QJsonValue& arrayValue : jsonArray){
+				if (arrayValue.isObject()){
+					const int childIndex = treeItemModel->InsertNewItem();
+					retVal = retVal && treeItemModel->ParseRecursive(arrayValue.toObject(), childIndex);
 				}
-				else if(jsonValue.isArray()){
+				else if (arrayValue.isArray()){
+					// Unsupported yet
+					retVal = false;
 				}
 				else{
-					int i = treeItemModel->InsertNewItem();
-					treeItemModel->SetData(QByteArray(), jsonValue.toVariant(), i);
+					const int childIndex = treeItemModel->InsertNewItem();
+					retVal = retVal && treeItemModel->SetData(QByteArray(), arrayValue.toVariant(), childIndex);
 				}
 
-				arrayIterator++;
+				if (!retVal){
+					break;
+				}
 			}
 		}
-		else if(jsonValue.isObject()){
-			CTreeItemModel* treeItemModel = AddTreeModel(objectIterator.key().toUtf8(), index);
+		else if (jsonValue.isObject()){
+			CTreeItemModel* treeItemModel = AddTreeModel(key, index);
+			if (treeItemModel == nullptr){
+				return false;
+			}
 
-			QJsonObject valueObject = jsonValue.toObject();
+			const QJsonObject valueObject = jsonValue.toObject();
 			if (!valueObject.isEmpty()){
-				treeItemModel->ParseRecursive(valueObject, 0);
+				retVal = retVal && treeItemModel->ParseRecursive(valueObject, 0);
 			}
 		}
 		else{
-			SetData(objectIterator.key().toUtf8(),objectIterator.value().toVariant(), index);
+			retVal = retVal && SetData(key, jsonValue.toVariant(), index);
 		}
-		objectIterator++;
+
+		if (!retVal){
+			break;
+		}
 	}
 
 	return retVal;
+}
+
+
+// private methods
+
+#if QT_VERSION < 0x060000
+inline int CTreeItemModel::GetVariantTypeId(const QVariant& value)
+{
+	return value.type();
+}
+#else
+inline int CTreeItemModel::GetVariantTypeId(const QVariant& value)
+{
+	return value.typeId();
+}
+#endif
+
+
+bool CTreeItemModel::SerializeVariantValue(iser::IArchive& archive, const QVariant& value)
+{
+	switch (GetVariantTypeId(value)){
+	case QMetaType::Int: {
+		qint32 intVal = value.toInt();
+		return archive.Process(intVal);
+	}
+	case QMetaType::UInt: {
+		quint32 intVal = value.toUInt();
+		return archive.Process(intVal);
+	}
+	case QMetaType::Double: {
+		double doubleVal = value.toDouble();
+		return archive.Process(doubleVal);
+	}
+	case QMetaType::Float: {
+		double floatVal = value.toFloat();
+		return archive.Process(floatVal);
+	}
+	case QMetaType::LongLong: {
+		qint64 intVal = value.toLongLong();
+		return archive.Process(intVal);
+	}
+	case QMetaType::ULongLong: {
+		quint64 intVal = value.toULongLong();
+		return archive.Process(intVal);
+	}
+	case QMetaType::Bool: {
+		bool boolVal = value.toBool();
+		return archive.Process(boolVal);
+	}
+	case QMetaType::QString:
+	case QMetaType::QByteArray: {
+		QString strVal = value.toString();
+		return archive.Process(strVal);
+	}
+	default: {
+		QByteArray baVal = QByteArrayLiteral("null");
+		return archive.Process(baVal);
+	}
+	}
 }
 
 

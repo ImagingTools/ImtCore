@@ -1,12 +1,16 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtservergql/CGqlRepresentationDataControllerComp.h>
 
+
+// Qt includes
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
 
 // ACF include
 #include <istd/TDelPtr.h>
 #include <iprm/CParamsSet.h>
 #include <iprm/CIdParam.h>
 #include <imod/TModelWrap.h>
-
 
 namespace imtservergql
 {
@@ -16,39 +20,38 @@ namespace imtservergql
 
 // reimplemented (imtgql::IGqlRepresentationController)
 
-imtbase::CTreeItemModel* CGqlRepresentationDataControllerComp::CreateRepresentationFromRequest(
+QJsonObject CGqlRepresentationDataControllerComp::CreateRepresentationFromRequest(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	if (!m_representationControllerCompPtr.IsValid() || !m_dataModelCompPtr.IsValid()){
 		SendCriticalMessage(0, QString("Missing component references: 'DataModel' or 'RepresentationController'"));
 
-		return nullptr;
+		return QJsonObject();
 	}
 
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-
-	imtbase::CTreeItemModel* representationPtr = rootModelPtr->AddTreeModel("data");
-	Q_ASSERT(representationPtr != nullptr);
+	QJsonObject representationModel;
 
 	iprm::IParamsSetUniquePtr representationParamsPtr = CreateContextParams(gqlRequest);
 
-	bool result = m_representationControllerCompPtr->GetRepresentationFromDataModel(*m_dataModelCompPtr, *representationPtr, representationParamsPtr.GetPtr());
+	bool result = m_representationControllerCompPtr->GetRepresentationFromDataModel(*m_dataModelCompPtr, representationModel, representationParamsPtr.GetPtr());
 	if (result){
-		return rootModelPtr.PopPtr();
+		QJsonObject rootObj;
+		rootObj.insert(QStringLiteral("data"), representationModel);
+		return rootObj;
 	}
 
 	errorMessage = QString("Unable to get representation from the data model. Command-ID: '%1'").arg(qPrintable(gqlRequest.GetCommandId()));
 
 	SendErrorMessage(0, errorMessage);
 
-	return nullptr;
+	return QJsonObject();
 }
 
 
 bool CGqlRepresentationDataControllerComp::UpdateModelFromRepresentation(
 			const imtgql::CGqlRequest& request,
-			imtbase::CTreeItemModel* representationPtr) const
+			const QJsonObject& representation) const
 {
 	if (!m_representationControllerCompPtr.IsValid() || !m_dataModelCompPtr.IsValid()){
 		SendErrorMessage(0, QString("Internal error"));
@@ -56,7 +59,7 @@ bool CGqlRepresentationDataControllerComp::UpdateModelFromRepresentation(
 		return false;
 	}
 
-	bool retVal = m_representationControllerCompPtr->GetDataModelFromRepresentation(*representationPtr, *m_dataModelCompPtr);
+	bool retVal = m_representationControllerCompPtr->GetDataModelFromRepresentation(representation, *m_dataModelCompPtr);
 	if (!retVal){
 		SendErrorMessage(0, QString("Unable to get data model from representation. Command: %1.").arg(qPrintable(request.GetCommandId())));
 	}
@@ -67,7 +70,7 @@ bool CGqlRepresentationDataControllerComp::UpdateModelFromRepresentation(
 
 // reimplemented (imtservergql::CGqlRequestHandlerCompBase)
 
-imtbase::CTreeItemModel* CGqlRepresentationDataControllerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CGqlRepresentationDataControllerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	QByteArray commandId = gqlRequest.GetCommandId();
 
@@ -82,11 +85,12 @@ imtbase::CTreeItemModel* CGqlRepresentationDataControllerComp::CreateInternalRes
 		if (!params.isEmpty()){
 			QByteArray itemData = params.at(0).GetParamArgumentValue("Item").toByteArray();
 			if (!itemData.isEmpty()){
-				istd::TDelPtr<imtbase::CTreeItemModel> representationPtr(new imtbase::CTreeItemModel);
-				if (representationPtr->CreateFromJson(itemData)){
-					bool result = UpdateModelFromRepresentation(gqlRequest, representationPtr.GetPtr());
+				QJsonDocument doc = QJsonDocument::fromJson(itemData);
+				if (!doc.isNull() && doc.isObject()){
+					QJsonObject representation = doc.object();
+					bool result = UpdateModelFromRepresentation(gqlRequest, representation);
 					if (result){
-						return representationPtr.PopPtr();
+						return representation;
 					}
 				}
 			}
@@ -99,7 +103,7 @@ imtbase::CTreeItemModel* CGqlRepresentationDataControllerComp::CreateInternalRes
 
 	Q_ASSERT(false);
 
-	return nullptr;
+	return QJsonObject();
 }
 
 
@@ -143,5 +147,4 @@ iprm::IParamsSetUniquePtr CGqlRepresentationDataControllerComp::CreateContextPar
 
 
 } // namespace imtservergql
-
 

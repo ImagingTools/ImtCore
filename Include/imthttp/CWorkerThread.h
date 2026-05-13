@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -8,12 +9,12 @@
 #include <istd/TDelPtr.h>
 
 // ImtCore includes
-#include <imthttp/IRequest.h>
-#include <imthttp/ISender.h>
-#include <imthttp/CWorker.h>
+#include <imtrest/IRequest.h>
+#include <imtrest/IResponse.h>
+#include <imtrest/CWorker.h>
 
 
-namespace imthttp
+namespace imtrest
 {
 
 class CWorkerManagerComp;
@@ -34,7 +35,7 @@ public:
 	Status GetStatus();
 	void SetStatus(Status status);
 	void SetRequestPtr(const IRequest* requestPtr);
-	const ISender* GetSender(const QByteArray& requestId);
+	bool SendResponse(const QByteArray& requestId, ConstResponsePtr& response);
 
 	//reimplemented (QThread)
 	virtual void run() override;
@@ -57,6 +58,6 @@ private:
 };
 
 
-} // namespace imthttp
+} // namespace imtrest
 
 

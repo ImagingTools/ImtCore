@@ -1,0 +1,5 @@
+module imtgeogui
+
+AddressTreeView 1.0 AddressTreeView.qml
+StructureAddressView 1.0 StructureAddressView.qml
+AddressEditor 1.0 AddressEditor.qml

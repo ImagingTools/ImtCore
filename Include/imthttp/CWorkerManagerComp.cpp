@@ -1,10 +1,11 @@
-#include <imthttp/CWorkerManagerComp.h>
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+#include <imtrest/CWorkerManagerComp.h>
 
 // Qt includes
 #include <QtCore/QDebug>
 
 
-namespace imthttp
+namespace imtrest
 {
 
 
@@ -29,13 +30,13 @@ IRequestServletPtr CWorkerManagerComp::CreateServlet()
 }
 
 
-const ISender* CWorkerManagerComp::GetSender(const QByteArray& requestId)
+bool CWorkerManagerComp::SendResponse(const QByteArray& requestId, ConstResponsePtr& response)
 {
 	if (!m_requestManagerCompPtr.IsValid()){
-		return nullptr;
+		return false;
 	}
 
-	return m_requestManagerCompPtr->GetSender(requestId);
+	return m_requestManagerCompPtr->SendResponse(requestId, response);
 }
 
 
@@ -126,6 +127,6 @@ void CWorkerManagerComp::AboutToQuit()
 }
 
 
-} // namespace imthttp
+} // namespace imtrest
 
 

@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5332" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6318" Description="ACF"/>
+            <Version Id="1" Number="2296" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -11,7 +11,6 @@
         <Element ComponentName="FileAutoPersistence" X="875" Y="475" Note=""/>
         <Element ComponentName="JwtSessionController" X="275" Y="275" Note=""/>
         <Element ComponentName="SessionInfo" X="275" Y="475" Note=""/>
-        <Element ComponentName="SessionSqlRepository" X="825" Y="275" Note=""/>
         <Element ComponentName="Uuid" X="550" Y="475" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>

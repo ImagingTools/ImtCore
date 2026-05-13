@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imt3dgui/CPointCloudShape.h>
 
 
@@ -168,7 +169,7 @@ void CPointCloudShape::SetInfoBoxEnabled(bool isEnabled)
 
 // protected methods
 
-// reimplement (imt3dgui::CShape3dBase)
+// reimplemented (imt3dgui::CShape3dBase)
 
 void CPointCloudShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& changeSet)
 {
@@ -201,18 +202,26 @@ void CPointCloudShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& c
 }
 
 
-void CPointCloudShape::DrawShapeGl(QOpenGLShaderProgram& program, QOpenGLFunctions& functions)
+imt3dview::PrimitiveType CPointCloudShape::GetPrimitiveType() const
 {
-	program.setUniformValue("usePointSize", true);
-	program.setUniformValue("pointSize", m_pointSize);
+	return imt3dview::PT_POINTS;
+}
 
-	functions.glDrawElements(GL_POINTS, m_indices.size(), GL_UNSIGNED_INT, (GLuint*)0);
+
+void CPointCloudShape::FillMaterial(imt3dview::Material& material) const
+{
+	BaseClass::FillMaterial(material);
+	if (material.colorMode == imt3dview::Material::CM_SOLID){
+		material.solidColor = m_color;
+	}
+	material.usePointSize = true;
+	material.pointSize = m_pointSize;
 }
 
 
 // reimplemented (imt3dview::IDrawable)
 
-void CPointCloudShape::Draw(QPainter& painter)
+void CPointCloudShape::DrawOverlay(QPainter& painter)
 {
 	imt3d::IPointCloud3d* pointCloudPtr = dynamic_cast<imt3d::IPointCloud3d*>(GetObservedModel());
 	if (!pointCloudPtr){

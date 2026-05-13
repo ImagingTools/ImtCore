@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauth/CSessionInfo.h>
 
 
@@ -46,6 +47,22 @@ void CSessionInfo::SetUserId(const QByteArray &userId)
 		istd::CChangeNotifier changeNotifier(this);
 
 		m_userId = userId;
+	}
+}
+
+
+QByteArray CSessionInfo::GetTenantId() const
+{
+	return m_tenantId;
+}
+
+
+void CSessionInfo::SetTenantId(const QByteArray &tenantId)
+{
+	if (m_tenantId != tenantId){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_tenantId = tenantId;
 	}
 }
 
@@ -117,6 +134,13 @@ bool CSessionInfo::Serialize(iser::IArchive &archive)
 		retVal = retVal && archive.EndTag(expirationDateTag);
 	}
 
+	if (imtCoreVersion >= 14580){
+		iser::CArchiveTag tenantIdTag("TenantId", "Tenant-ID", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(tenantIdTag);
+		retVal = retVal && archive.Process(m_tenantId);
+		retVal = retVal && archive.EndTag(tenantIdTag);
+	}
+
 	return retVal;
 }
 
@@ -131,6 +155,7 @@ bool CSessionInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*
 
 		m_token = sourcePtr->m_token;
 		m_userId = sourcePtr->m_userId;
+		m_tenantId = sourcePtr->m_tenantId;
 		m_creationDate = sourcePtr->m_creationDate;
 		m_expirationDate = sourcePtr->m_expirationDate;
 
@@ -149,6 +174,7 @@ bool CSessionInfo::IsEqual(const IChangeable& object) const
 	if (retVal && sourcePtr != nullptr){
 		retVal = retVal && m_token == sourcePtr->m_token;
 		retVal = retVal && m_userId == sourcePtr->m_userId;
+		retVal = retVal && m_tenantId == sourcePtr->m_tenantId;
 		retVal = retVal && m_creationDate == sourcePtr->m_creationDate;
 		retVal = retVal && m_expirationDate == sourcePtr->m_expirationDate;
 
@@ -176,6 +202,7 @@ bool CSessionInfo::ResetData(CompatibilityMode /*mode*/)
 
 	m_token.clear();
 	m_userId.clear();
+	m_tenantId.clear();
 
 	return true;
 }

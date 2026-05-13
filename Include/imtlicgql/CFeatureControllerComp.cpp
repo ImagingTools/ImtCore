@@ -1,5 +1,12 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtlicgql/CFeatureControllerComp.h>
 
+
+// Qt includes
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonValue>
 
 // ACF includes
 #include <iprm/CIdParam.h>
@@ -85,13 +92,13 @@ istd::IChangeableUniquePtr CFeatureControllerComp::CreateObjectFromRequest(
 }
 
 
-imtbase::CTreeItemModel* CFeatureControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CFeatureControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QString("Internal error.").toUtf8();
 		SendErrorMessage(0, errorMessage, "Feature controller");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
@@ -99,7 +106,7 @@ imtbase::CTreeItemModel* CFeatureControllerComp::GetObject(const imtgql::CGqlReq
 		errorMessage = QT_TR_NOOP("Unable to get object. GQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "Feature controller");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	QByteArray objectId = inputParamPtr->GetParamArgumentValue("Id").toByteArray();
@@ -108,46 +115,51 @@ imtbase::CTreeItemModel* CFeatureControllerComp::GetObject(const imtgql::CGqlReq
 	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
 		const imtlic::CIdentifiableFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::CIdentifiableFeatureInfo*>(dataPtr.GetPtr());
 		if (featureInfoPtr != nullptr){
-			istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-			imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
+			imtbase::CTreeItemModel tempModel;
+			tempModel.SetData("Id", objectId);
+			tempModel.SetData("RootFeatureId", featureInfoPtr->GetFeatureId());
+			tempModel.SetData("ParentFeatureId", "");
 
-			dataModelPtr->SetData("Id", objectId);
-
-			dataModelPtr->SetData("RootFeatureId", featureInfoPtr->GetFeatureId());
-			dataModelPtr->SetData("ParentFeatureId", "");
-
-			bool ok = CreateRepresentationModelFromFeatureInfo(*featureInfoPtr, nullptr, *dataModelPtr, errorMessage);
+			bool ok = CreateRepresentationModelFromFeatureInfo(*featureInfoPtr, nullptr, tempModel, errorMessage);
 			if (!ok){
 				SendErrorMessage(0, errorMessage, "Feature controller");
 
-				return nullptr;
+				return QJsonObject();
 			}
 
-			if (dataModelPtr->ContainsKey("FeatureName")){
-				dataModelPtr->SetData("Name", dataModelPtr->GetData("FeatureName").toString());
+			if (tempModel.ContainsKey("FeatureName")){
+				tempModel.SetData("Name", tempModel.GetData("FeatureName").toString());
 			}
 
-			return rootModelPtr.PopPtr();
+			QJsonObject rootObj;
+			QString jsonStr = tempModel.ToJson();
+			QJsonDocument doc = QJsonDocument::fromJson(jsonStr.toUtf8());
+			if (doc.isObject()){
+				rootObj.insert(QStringLiteral("data"), doc.object());
+			}
+			else if (doc.isArray() && !doc.array().isEmpty()){
+				rootObj.insert(QStringLiteral("data"), doc.array().first().toObject());
+			}
+
+			return rootObj;
 		}
 	}
 
 	errorMessage = QT_TR_NOOP(QString("Unable to get feature by ID: %1.").arg(qPrintable(objectId)));
 	SendErrorMessage(0, errorMessage, "Feature controller");
 
-	return nullptr;
+	return QJsonObject();
 }
 
 
-imtbase::CTreeItemModel* CFeatureControllerComp::GetTreeItemModel(const imtgql::CGqlRequest& /*gqlRequest*/, QString& errorMessage) const
+QJsonObject CFeatureControllerComp::GetTreeItemModel(const imtgql::CGqlRequest& /*gqlRequest*/, QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		return nullptr;
+		return QJsonObject();
 	}
 
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
-
-	dataModelPtr->SetIsArray(true);
+	QJsonObject rootObj;
+	QJsonArray dataArray;
 
 	imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
 	for (const QByteArray& collectionId : collectionIds){
@@ -157,32 +169,38 @@ imtbase::CTreeItemModel* CFeatureControllerComp::GetTreeItemModel(const imtgql::
 			if (featureInfoPtr != nullptr){
 				QByteArray featureId = featureInfoPtr->GetFeatureId();
 
-				int index = dataModelPtr->InsertNewItem();
-				dataModelPtr->SetData("Id", collectionId, index);
+				imtbase::CTreeItemModel featureModel;
+				featureModel.SetData("RootFeatureId", featureId);
+				featureModel.SetData("ParentFeatureId", "");
 
-				istd::TDelPtr<imtbase::CTreeItemModel> featureModelPtr(new imtbase::CTreeItemModel);
-
-				featureModelPtr->SetData("RootFeatureId", featureId);
-				featureModelPtr->SetData("ParentFeatureId", "");
-
-				bool ok = CreateRepresentationModelFromFeatureInfo(*featureInfoPtr, nullptr, *featureModelPtr, errorMessage);
+				bool ok = CreateRepresentationModelFromFeatureInfo(*featureInfoPtr, nullptr, featureModel, errorMessage);
 				if (!ok){
 					SendErrorMessage(0, errorMessage, "Feature controller");
 
-					return nullptr;
+					return QJsonObject();
 				}
 
-				dataModelPtr->CopyItemDataFromModel(index, featureModelPtr.PopPtr(), 0);
+				QJsonObject itemObj;
+				QString jsonStr = featureModel.ToJson();
+				QJsonDocument doc = QJsonDocument::fromJson(jsonStr.toUtf8());
+				if (doc.isObject()){
+					itemObj = doc.object();
+				}
+				else if (doc.isArray() && !doc.array().isEmpty()){
+					itemObj = doc.array().first().toObject();
+				}
 
-				dataModelPtr->SetData("RootFeatureId", featureId, index);
-				dataModelPtr->SetData("ParentFeatureId", "", index);
+				itemObj.insert(QStringLiteral("RootFeatureId"), QJsonValue::fromVariant(featureId));
+				itemObj.insert(QStringLiteral("ParentFeatureId"), QJsonValue::fromVariant(QString("")));
+				itemObj.insert(QStringLiteral("Id"), QJsonValue::fromVariant(collectionId));
 
-				dataModelPtr->SetData("Id", collectionId, index);
+				dataArray.append(itemObj);
 			}
 		}
 	}
 
-	return rootModelPtr.PopPtr();
+	rootObj.insert(QStringLiteral("data"), dataArray);
+	return rootObj;
 }
 
 

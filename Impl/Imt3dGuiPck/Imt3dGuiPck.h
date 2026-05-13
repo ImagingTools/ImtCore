@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -14,6 +15,7 @@
 #include <imt3dgui/CCompositeShapeViewComp.h>
 #include <imt3dgui/CWireShape.h>
 #include <imt3dgui/CPointCloudShapeComp.h>
+#include <imt3dgui/CRhiRenderBackend.h>
 
 
 /**
@@ -44,8 +46,9 @@ typedef ibase::TMakeModelObserverCompWrap<
 			imt3dgui::CWireShape,
 			imt3dgui::IShape3d,
 			imt3dview::IScene3dItem> WireShape;
+typedef icomp::TMakeComponentWrap<imt3dgui::CRhiRenderBackend, imt3dview::IRenderBackend> RhiRenderBackend;
+
 
 } // namespace Imt3dGuiPck
-
 
 

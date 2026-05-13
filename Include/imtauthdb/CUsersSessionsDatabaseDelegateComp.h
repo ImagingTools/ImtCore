@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -16,6 +17,9 @@ public:
 
 	I_BEGIN_COMPONENT(CUsersSessionsDatabaseDelegateComp)
 	I_END_COMPONENT
+
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 	virtual QByteArray GetSelectionQuery(

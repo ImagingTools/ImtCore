@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtservergql/CModelChangeNotifierComp.h>
 
 
@@ -55,10 +56,7 @@ void CModelChangeNotifierComp::OnUpdate(const istd::IChangeable::ChangeSet& /*ch
 
 			imtrest::ConstResponsePtr responsePtr(engine.CreateResponse(*networkRequest, imtrest::IProtocolEngine::SC_OK, body, reponseTypeId).PopInterfacePtr());
 			if (responsePtr.IsValid()){
-				const imtrest::ISender* sender = m_requestManagerCompPtr->GetSender(networkRequest->GetRequestId());
-				if (sender != nullptr){
-					sender->SendResponse(responsePtr);
-				}
+				m_requestManagerCompPtr->SendResponse(networkRequest->GetRequestId(), responsePtr);
 			}
 		}
 	}

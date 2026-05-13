@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include "CSdlClassTreeModelModificatorComp.h"
 
 
@@ -57,6 +58,18 @@ bool CSdlClassTreeModelModificatorComp::ProcessSourceClassFile(const imtsdl::CSd
 	ofStream << GetEscapedNamespace(QStringLiteral("imtbase"), QString());
 	ofStream << QStringLiteral("::CTreeItemModel& model, int modelIndex) const\n{");
 	FeedStream(ofStream, 1, false);
+
+	// Write __typename for the type itself based on typename mode
+	const imtsdl::ISdlProcessArgumentsParser::TypenameWriteMode typenameMode = 
+		m_argumentParserCompPtr.IsValid() ? m_argumentParserCompPtr->GetTypenameWriteMode() : imtsdl::ISdlProcessArgumentsParser::TWM_IF_REQUIRED;
+	
+	if (typenameMode == imtsdl::ISdlProcessArgumentsParser::TWM_ALWAYS){
+		FeedStreamHorizontally(ofStream);
+		ofStream << QStringLiteral("model.SetData(\"__typename\", \"");
+		ofStream << sdlType.GetName();
+		ofStream << QStringLiteral("\", modelIndex);");
+		FeedStream(ofStream, 2, false);
+	}
 
 	// add write logic for each field
 	for (const imtsdl::CSdlField& field: sdlType.GetFields()){
@@ -149,6 +162,8 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(
 		stream << GetNullCheckString(field) << QStringLiteral("){");
 		FeedStream(stream, 1, false);
 
+		AddErrorReport(stream, QStringLiteral("Field: '%3' doesn't exist, but required"), 2, QStringList({QString("\"%1\"").arg(field.GetId())}));
+
 		FeedStreamHorizontally(stream, 2);
 		stream << QStringLiteral("return false;\n\t}");
 		FeedStream(stream, 1, false);
@@ -201,7 +216,9 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(
 				*m_sdlUnionListCompPtr,
 				2,
 				CSdlUnionConverter::ConversionType::CT_MODEL_SCALAR,
-				"model.SetData(");
+				"model.SetData(",
+				QString(),
+				QStringLiteral("false"));
 		}
 		else {
 			stream << QStringLiteral("model.SetData(\"") << field.GetId() << QStringLiteral("\", ");
@@ -270,7 +287,9 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(
 				*m_sdlUnionListCompPtr,
 				2,
 				CT_MODEL_SCALAR,
-				"model.SetData(");
+				"model.SetData(",
+				QString(),
+				QStringLiteral("false"));
 		}
 		else {
 			stream << QStringLiteral("model.SetData(\"") << field.GetId() << QStringLiteral("\", ");
@@ -385,11 +404,21 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(
 			imtsdl::CSdlUnion foundUnion;
 			[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
 
-			stream << QStringLiteral("QString ");
-			stream << GetDecapitalizedValue(field.GetId());
-			stream << QStringLiteral("Typename = ") << dataVarName;
-			stream << QStringLiteral(".value<::imtbase::CTreeItemModel*>()->GetData(\"__typename\").toString();");
-			FeedStream(stream, 1, false);
+			bool hasComplexTypes = false;
+			for (const QString& unionType : foundUnion.GetTypes()){
+				if (FindEntryByName(unionType, m_sdlTypeListCompPtr->GetSdlTypes(false), m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false)) != nullptr){
+					hasComplexTypes = true;
+					break;
+				}
+			}
+			if (hasComplexTypes){
+				stream << QStringLiteral("QString ");
+				stream << GetDecapitalizedValue(field.GetId());
+				stream << QStringLiteral("Typename = model.GetTreeItemModel(\"");
+				stream << field.GetId();
+				stream << QStringLiteral("\", modelIndex)->GetData(\"__typename\").toString();");
+				FeedStream(stream, 1, false);
+			}
 
 			WriteUnionConversionFromData(stream,
 				foundUnion,
@@ -399,7 +428,11 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(
 				"modelIndex",
 				*m_sdlTypeListCompPtr,
 				*m_sdlEnumListCompPtr,
-				*m_sdlUnionListCompPtr);
+				*m_sdlUnionListCompPtr,
+				1,
+				CT_MODEL_SCALAR,
+				QString(),
+				QString());
 		}
 		else {
 			stream << GetSettingValueString(
@@ -441,12 +474,22 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(
 			imtsdl::CSdlUnion foundUnion;
 			[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
 
-			FeedStreamHorizontally(stream, 2);
-			stream << QStringLiteral("QString ");
-			stream << GetDecapitalizedValue(field.GetId());
-			stream << QStringLiteral("Typename = ") << dataVarName;
-			stream << QStringLiteral(".value<::imtbase::CTreeItemModel*>()->GetData(\"__typename\").toString();");
-			FeedStream(stream, 1, false);
+			bool hasComplexTypes = false;
+			for (const QString& unionType : foundUnion.GetTypes()){
+				if (FindEntryByName(unionType, m_sdlTypeListCompPtr->GetSdlTypes(false), m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false)) != nullptr){
+					hasComplexTypes = true;
+					break;
+				}
+			}
+			if (hasComplexTypes){
+				FeedStreamHorizontally(stream, 2);
+				stream << QStringLiteral("QString ");
+				stream << GetDecapitalizedValue(field.GetId());
+				stream << QStringLiteral("Typename = model.GetTreeItemModel(\"");
+				stream << field.GetId();
+				stream << QStringLiteral("\", modelIndex)->GetData(\"__typename\").toString();");
+				FeedStream(stream, 1, false);
+			}
 
 			WriteUnionConversionFromData(stream,
 				foundUnion,
@@ -488,9 +531,13 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldWriteToModelCode(
 		stream << QStringLiteral("if (");
 		stream << GetNullCheckString(field) << QStringLiteral("){");
 		FeedStream(stream, 1, false);
+
+		AddErrorReport(stream, QStringLiteral("Field: '%3' doesn't exist, but required"), 2, QStringList({QString("\"%1\"").arg(field.GetId())}));
+
 		FeedStreamHorizontally(stream, 2);
 		stream << QStringLiteral("return false;\n\t}");
 		FeedStream(stream, 1, false);
+
 		AddCustomFieldWriteToModelImplCode(stream, field, sdlType, optional);
 	}
 	else {
@@ -761,7 +808,9 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelImplCo
 			*m_sdlUnionListCompPtr,
 			hIndents + 1,
 			CSdlUnionConverter::ConversionType::CT_MODEL_ARRAY,
-			newTreeModelVarName + QString("->SetData("));
+			newTreeModelVarName + QString("->SetData("),
+			QString(),
+			QStringLiteral("false"));
 	}
 
 	if (!isUnion){

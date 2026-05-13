@@ -95,6 +95,7 @@ Item {
 			else if (totalStatus == status.APP_SERVER_CONNECTION_ERROR){
 				internal.errorMessage = qsTr("Server connection error")
 				internal.loadingVisible = false
+				Events.sendEvent("ServerConnectionError");
 			}
 			else if (totalStatus == status.CONNECTION_SUCCESFUL){
 				thumbnailDecorator.stackView.clear();
@@ -199,7 +200,8 @@ Item {
 			if (serverApplicationInfo){
 				context.appId = serverApplicationInfo.m_applicationId;
 				context.appName = serverApplicationInfo.m_applicationName;
-				
+				Style.logoIconName = serverApplicationInfo.m_logoIconName;
+
 				pageAboutProvider.serverVersion = serverApplicationInfo.m_version
 				
 				AuthorizationController.productId = serverApplicationInfo.m_applicationId
@@ -246,6 +248,10 @@ Item {
 		}
 	}
 	
+	PatTokenSettingsController {
+		id: patTokenSettingsController
+	}
+	
 	PageAboutProvider {
 		id: pageAboutProvider
 	}
@@ -253,6 +259,196 @@ Item {
 	SubscriptionManager {
 		id: subscriptionManager_;
 		active: application.useWebSocketSubscription;
+	}
+
+	// Global ticket notification subscriptions — always active regardless of
+	// which page is currently selected in MenuPanel.  Previously these lived
+	// inside TicketCollectionView.qml which is lazy-loaded by PagesManager,
+	// so notifications were lost until the user navigated to the Tickets page.
+	//
+	// autoSubscribe is false so that registration only happens after login
+	// (see onLoggedIn / onLoggedOut below).
+
+	// Custom popup delegate for ticket notifications — clickable card
+	// that navigates to the ticket.
+	Component {
+		id: ticketNotificationDelegate
+
+		Rectangle {
+			id: ticketPopupRoot
+
+			property string messageId: ""
+			property string messageType: ""
+			property string messageText: ""
+			property bool closable: false
+			property var popupContainer: null
+
+			// Custom properties set via addCustomMessage properties bag
+			property string ticketId: ""
+			property string ticketNumber: ""
+			property string ticketTitle: ""
+			property string senderName: ""
+			property string preview: ""
+			property string notificationType: "message" // "message" or "assignee"
+
+			width: parent ? parent.width : Style.sizeHintXS
+			height: contentColumn.height + 2 * Style.marginL
+			radius: Style.radiusM
+			border.color: "#bbbbbb"
+			color: ticketPopupRoot.notificationType === "assignee" ? "#d4edda" : "#d6eaf8"
+
+			MouseArea {
+				anchors.fill: parent
+				cursorShape: Qt.PointingHandCursor
+				hoverEnabled: true
+				onClicked: {
+					if (ticketPopupRoot.ticketId)
+						NavigationController.navigate("Tickets/Ticket/" + ticketPopupRoot.ticketId)
+					if (ticketPopupRoot.popupContainer)
+						ticketPopupRoot.popupContainer.removeMessageById(ticketPopupRoot.messageId)
+				}
+				onEntered: ticketPopupRoot.border.color = Style.highlightColor
+				onExited: ticketPopupRoot.border.color = "#bbbbbb"
+			}
+
+			Column {
+				id: contentColumn
+				anchors.left: parent.left
+				anchors.right: closeArea.left
+				anchors.top: parent.top
+				anchors.margins: Style.marginL
+				spacing: Style.marginM
+
+				// Title row: icon + "#Number Title — SenderName" (all key info)
+				Row {
+					width: parent.width
+					spacing: Style.marginS
+
+					Image {
+						anchors.verticalCenter: parent.verticalCenter
+						width: Style.iconSizeS
+						height: width
+						source: ticketPopupRoot.notificationType === "assignee"
+								? Style.getIconPath("Icons/Assignment", Icon.State.On, Icon.Mode.Normal)
+								: Style.getIconPath("Icons/Message", Icon.State.On, Icon.Mode.Normal)
+						sourceSize.width: width
+						sourceSize.height: height
+					}
+
+					BaseText {
+						width: parent.width - Style.iconSizeS - Style.marginS
+						text: ticketPopupRoot.notificationType === "assignee"
+							  ? (ticketPopupRoot.ticketNumber ? "#" + ticketPopupRoot.ticketNumber + " " : "")
+								+ ticketPopupRoot.ticketTitle + " — " + qsTr("Assigned to you")
+							  : (ticketPopupRoot.ticketNumber ? "#" + ticketPopupRoot.ticketNumber + " " : "")
+								+ ticketPopupRoot.ticketTitle
+								+ (ticketPopupRoot.senderName ? " — " + ticketPopupRoot.senderName : "")
+						font.bold: true
+						elide: Text.ElideRight
+						maximumLineCount: 1
+					}
+				}
+
+				// Message preview — single line, limited height, no raw \n
+				BaseText {
+					width: parent.width
+					text: ticketPopupRoot.preview.split("\n").join(" ")
+					color: "#666666"
+					elide: Text.ElideRight
+					maximumLineCount: 1
+					visible: ticketPopupRoot.preview !== ""
+				}
+
+				// Hint
+				BaseText {
+					text: qsTr("Click to open →")
+					color: "#999999"
+				}
+			}
+
+			ToolButton {
+				id: closeArea
+				width: Style.iconSizeS + Style.marginM
+				height: width
+				anchors.right: parent.right
+				anchors.top: parent.top
+				anchors.margins: Style.marginS
+				iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+				decorator: Component {
+					ToolButtonDecorator {
+						color: "transparent"
+						icon.width: Style.iconSizeXS
+					}
+				}
+				onClicked: {
+					if (ticketPopupRoot.popupContainer)
+						ticketPopupRoot.popupContainer.removeMessageById(ticketPopupRoot.messageId)
+				}
+			}
+		}
+	}
+
+	// Subscribes to server-side ticket message notifications and surfaces
+	// them via PopupManager. The server-side filter (CTicketMessageNotifierComp)
+	// already restricts delivery to users related to the ticket
+	// (reporter / assignees / admin), excluding the sender.
+	SubscriptionClient {
+		id: ticketMessageSubscription
+		gqlCommandId: "OnTicketMessageReceived"
+		autoSubscribe: false
+		onMessageReceived: {
+			if (!data){
+				return
+			}
+			var ticketId = data.containsKey("ticketId") ? data.getData("ticketId") : ""
+			var ticketNumber = data.containsKey("ticketNumber") ? data.getData("ticketNumber") : ""
+			var ticketTitle = data.containsKey("ticketTitle") ? data.getData("ticketTitle") : ""
+			var senderName = data.containsKey("senderUserName") ? data.getData("senderUserName") : ""
+			var content = data.containsKey("content") ? data.getData("content") : ""
+			var messageId = data.containsKey("messageId") ? data.getData("messageId") : ""
+
+			var preview = content ? String(content) : ""
+			if (preview.length > 80){
+				preview = preview.substring(0, 80) + "…"
+			}
+
+			PopupManager.addCustomMessage(messageId, ticketNotificationDelegate, {
+				autoClose: true,
+				ticketId: ticketId,
+				ticketNumber: ticketNumber,
+				ticketTitle: ticketTitle,
+				senderName: senderName,
+				preview: preview,
+				notificationType: "message"
+			})
+		}
+	}
+
+	// Subscribes to server-side assignee change notifications and surfaces
+	// them via PopupManager. The server-side filter (CTicketAssigneeNotifierComp)
+	// delivers only to newly added assignees.
+	SubscriptionClient {
+		id: ticketAssigneeSubscription
+		gqlCommandId: "OnTicketAssigneeChanged"
+		autoSubscribe: false
+		onMessageReceived: {
+			if (!data){
+				return
+			}
+
+			var ticketId = data.containsKey("ticketId") ? data.getData("ticketId") : ""
+			var ticketNumber = data.containsKey("ticketNumber") ? data.getData("ticketNumber") : ""
+			var ticketTitle = data.containsKey("ticketTitle") ? data.getData("ticketTitle") : ""
+
+			var popupId = "TicketAssignee_" + ticketNumber
+			PopupManager.addCustomMessage(popupId, ticketNotificationDelegate, {
+				autoClose: true,
+				ticketId: ticketId,
+				ticketNumber: ticketNumber,
+				ticketTitle: ticketTitle,
+				notificationType: "assignee"
+			})
+		}
 	}
 	
 	property Component messagePageComp: Component {
@@ -320,10 +516,13 @@ Item {
 			if (Qt.platform.os !== "web"){
 				settingsController.registerParamsSetController("Network", qsTr("Network"), clientSettingsController)
 			}
-			
+
 			if (application.serverConnected){
 				settingsController.registerParamsSetController("General", qsTr("General"), userSettingsController)
 				settingsController.registerParamsSetController("About", qsTr("About"), pageAboutProvider)
+
+				// Register PAT tokens settings (always available)
+				settingsController.registerParamsSetController("PatTokens", qsTr("PAT Tokens"), patTokenSettingsController)
 			}
 		}
 	}
@@ -403,9 +602,23 @@ Item {
 			thumbnailDecorator.showPage(undefined)
 			
 			application.updateAllModels();
+
+			// Register ticket notification subscriptions now that we have
+			// a valid auth token for the logged-in user.
+			ticketMessageSubscription.registerSubscription();
+			ticketAssigneeSubscription.registerSubscription();
+		}
+
+		function onTenantSelected(tenantId){
+			application.updateAllModels();
 		}
 		
 		function onLoggedOut(){
+			// Unregister subscriptions for the previous user before
+			// SubscriptionManager.clear() wipes the model.
+			ticketMessageSubscription.unRegisterSubscription();
+			ticketAssigneeSubscription.unRegisterSubscription();
+
 			thumbnailDecorator.stopLoading();
 			application.firstModelsInit(true);
 			NavigationController.clear();

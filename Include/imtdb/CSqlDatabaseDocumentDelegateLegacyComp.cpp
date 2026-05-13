@@ -1,8 +1,10 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtdb/CSqlDatabaseDocumentDelegateLegacyComp.h>
 
 
 // Qt includes
 #include <QtCore/QFile>
+#include <QtCore/QBuffer>
 
 // ACF includes
 #include <istd/TOptDelPtr.h>
@@ -136,8 +138,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateLegac
 				.arg(qPrintable(*m_objectTypeIdColumnAttrPtr))
 				.arg(qPrintable(objectId))
 				.arg(qPrintable(typeId))
-				.arg(objectName)
-				.arg(objectDescription)
+				.arg(SqlEncode(objectName))
+				.arg(SqlEncode(objectDescription))
 				.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
 				.arg(qPrintable(revisionUuid))
 				.toUtf8();
@@ -173,7 +175,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateLegac
 
 				QString value = m_metaInfoTableDelegateCompPtr->ToTableRepresentation(data, columnId).toString();
 
-				tableValues.push_back("'" + value + "'");
+				tableValues.push_back("'" + SqlEncode(value) + "'");
 			}
 
 			// Insert new entry into the document' meta info table:
@@ -277,6 +279,7 @@ QByteArray CSqlDatabaseDocumentDelegateLegacyComp::CreateUpdateObjectQuery(
 					.toUtf8();
 
 		QString operationComment = operationContextPtr != nullptr ? operationContextPtr->GetOperationDescription() : QString();
+		operationComment = operationComment.replace("'", "''");
 		retVal += QString("INSERT INTO \"%1\"(\"Id\", \"%2\", \"%3\", \"RevisionNumber\", \"Comment\", \"LastModified\", \"Checksum\") VALUES('%4', '%5', '%6', '%7', '%8', '%9', %10);")
 					.arg(qPrintable(*m_revisionsTableNameAttrPtr))
 					.arg(qPrintable(s_documentIdColumn))
@@ -307,7 +310,7 @@ QByteArray CSqlDatabaseDocumentDelegateLegacyComp::CreateUpdateObjectQuery(
 
 					QString value = m_metaInfoTableDelegateCompPtr->ToTableRepresentation(data, columnId).toString();
 
-					tableValues.push_back("'" + value + "'");
+					tableValues.push_back("'" + SqlEncode(value) + "'");
 				}
 
 				retVal += QString("INSERT INTO \"%1\"(%2) VALUES(%3);")
@@ -331,7 +334,7 @@ QByteArray CSqlDatabaseDocumentDelegateLegacyComp::CreateRenameObjectQuery(
 {
 	QByteArray retVal = QString("UPDATE \"%1\" SET \"Name\" = '%2' WHERE \"%3\" = '%4';")
 				.arg(qPrintable(*m_tableNameAttrPtr))
-				.arg(newObjectName)
+				.arg(SqlEncode(newObjectName))
 				.arg(qPrintable(s_idColumn))
 				.arg(qPrintable(objectId))
 				.toUtf8();
@@ -437,9 +440,11 @@ int CSqlDatabaseDocumentDelegateLegacyComp::BackupRevision(
 				.arg(qPrintable(objectId))
 				.toUtf8();
 
+	QString escapedComment = userComment;
+	escapedComment = escapedComment.replace("'", "''");
 	QByteArray updateCommentQuery = QString("UPDATE \"%1\" SET \"Comment\" = '%2' WHERE \"%3\" in (%4)")
 				.arg(qPrintable(*m_revisionsTableNameAttrPtr))
-				.arg(userComment)
+				.arg(escapedComment)
 				.arg(qPrintable(s_idColumn))
 				.arg(qPrintable(lastRevisionQuery))
 				.toUtf8();
@@ -549,56 +554,25 @@ istd::IChangeableUniquePtr CSqlDatabaseDocumentDelegateLegacyComp::CreateObject(
 
 bool CSqlDatabaseDocumentDelegateLegacyComp::WriteDataToMemory(const QByteArray& typeId, const istd::IChangeable& object, QByteArray& data) const
 {
-	const ifile::IFilePersistence* documentPersistencePtr = FindDocumentPersistence(typeId);
+	const ifile::IDeviceBasedPersistence* documentPersistencePtr = FindDocumentPersistence(typeId);
 	if (documentPersistencePtr == nullptr){
 		SendErrorMessage(0, QString("Document data could not be written due no persistence was found for the type: %1").arg(qPrintable(typeId)));
 
 		return false;
 	}
 
-	QString tempFolder = QDir::tempPath() + "/ImtCore/SqlDatabaseDocumentDelegate/" + QUuid::createUuid().toString();
-	if (!istd::CSystem::EnsurePathExists(tempFolder)){
+	QBuffer buffer(&data);
+	if (!buffer.open(QIODevice::WriteOnly)){
+		SendErrorMessage(0, "Failed to open QBuffer for writing");
 		return false;
 	}
 
-	int flags = ifile::IFilePersistence::QF_FILE | ifile::IFilePersistence::QF_SAVE;
+	int operationState = documentPersistencePtr->WriteToDevice(object, buffer, nullptr);
+	buffer.close();
 
-	QStringList supportedExts;
-	documentPersistencePtr->GetFileExtensions(supportedExts, &object, flags);
-
-	QString fileName = QUuid::createUuid().toString();
-	QString workingExtension;
-	for (const QString& ext : std::as_const(supportedExts)){
-		QString filePath = fileName + "." + ext;
-		if (documentPersistencePtr->IsOperationSupported(&object, &filePath, flags, false)){
-			workingExtension = ext;
-			break;
-		}
-	}
-
-	fileName += "." + workingExtension;
-
-	QString filePath = tempFolder + "/" + fileName;
-
-	int operationState = documentPersistencePtr->SaveToFile(object, filePath);
-	if (operationState != ifile::IFilePersistence::OS_OK){
-		istd::CSystem::RemoveDirectory(tempFolder);
-
+	if (operationState != ifile::IDeviceBasedPersistence::Successful){
 		return false;
 	}
-
-	QFile documentFile(filePath);
-	if (!documentFile.open(QFile::ReadOnly)){
-		istd::CSystem::RemoveDirectory(tempFolder);
-
-		return false;
-	}
-
-	data = documentFile.readAll();
-
-	documentFile.close();
-
-	istd::CSystem::RemoveDirectory(tempFolder);
 
 	return true;
 }
@@ -606,57 +580,28 @@ bool CSqlDatabaseDocumentDelegateLegacyComp::WriteDataToMemory(const QByteArray&
 
 bool CSqlDatabaseDocumentDelegateLegacyComp::ReadDataFromMemory(const QByteArray& typeId, const QByteArray& data, istd::IChangeable& object) const
 {
-	const ifile::IFilePersistence* documentPersistencePtr = FindDocumentPersistence(typeId);
+	const ifile::IDeviceBasedPersistence* documentPersistencePtr = FindDocumentPersistence(typeId);
 	if (documentPersistencePtr == nullptr){
 		SendErrorMessage(0, QString("Document data could not be read due no persistence was found for the type: %1").arg(qPrintable(typeId)));
 
 		return false;
 	}
 
-	QString tempFolder = QDir::tempPath() + "/ImtCore/SqlDatabaseDocumentDelegate/" + QUuid::createUuid().toString();
-
-	if (!istd::CSystem::EnsurePathExists(tempFolder)){
+	// Use copy to avoid const_cast. QByteArray uses copy-on-write, so this shares data until modified.
+	// QBuffer in ReadOnly mode doesn't modify the data, only tracks position internally.
+	QByteArray dataCopy = data;
+	QBuffer buffer(&dataCopy);
+	if (!buffer.open(QIODevice::ReadOnly)){
+		SendErrorMessage(0, "Failed to open QBuffer for reading");
 		return false;
 	}
 
-	int flags = ifile::IFilePersistence::QF_FILE | ifile::IFilePersistence::QF_SAVE;
+	int operationState = documentPersistencePtr->ReadFromDevice(object, buffer, nullptr);
+	buffer.close();
 
-	QStringList supportedExts;
-	documentPersistencePtr->GetFileExtensions(supportedExts, &object, flags);
-
-	QString fileName = QUuid::createUuid().toString();
-	QString workingExtension;
-	for (const QString& ext : std::as_const(supportedExts)){
-		QString filePath = fileName + "." + ext;
-		if (documentPersistencePtr->IsOperationSupported(&object, &filePath, flags, false)){
-			workingExtension = ext;
-			break;
-		}
-	}
-
-	fileName += "." + workingExtension;
-
-	QString filePath = tempFolder + "/" + fileName;
-
-	QFile documentFile(filePath);
-	if (!documentFile.open(QFile::WriteOnly)){
-		istd::CSystem::RemoveDirectory(tempFolder);
-
+	if (operationState != ifile::IDeviceBasedPersistence::Successful){
 		return false;
 	}
-
-	documentFile.write(data);
-
-	documentFile.close();
-
-	int operationState = documentPersistencePtr->LoadFromFile(object, filePath);
-	if (operationState != ifile::IFilePersistence::OS_OK){
-		istd::CSystem::RemoveDirectory(tempFolder);
-
-		return false;
-	}
-
-	istd::CSystem::RemoveDirectory(tempFolder);
 
 	return true;
 }
@@ -822,7 +767,7 @@ QByteArray CSqlDatabaseDocumentDelegateLegacyComp::CreateOperationDescriptionQue
 }
 
 
-const ifile::IFilePersistence* CSqlDatabaseDocumentDelegateLegacyComp::FindDocumentPersistence(const QByteArray& typeId) const
+const ifile::IDeviceBasedPersistence* CSqlDatabaseDocumentDelegateLegacyComp::FindDocumentPersistence(const QByteArray& typeId) const
 {
 	int persistenceIndex = -1;
 

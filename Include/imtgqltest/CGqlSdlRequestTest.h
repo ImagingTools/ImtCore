@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -5,7 +6,7 @@
 #include <ipackage/CComponentAccessor.h>
 
 // ImtCore includes
-#include <imtbase/CTreeItemModel.h>
+#include <QtCore/QJsonObject>
 #include <imtgql/CGqlRequest.h>
 #include <imtgql/IGqlRequestHandler.h>
 #include <imtdb/IDatabaseEngine.h>
@@ -32,25 +33,25 @@ protected:
 			}
 
 			QString errorMessage;
-			istd::TDelPtr<imtbase::CTreeItemModel> responseModelPtr = requestHandlerPtr->CreateResponse(gqlRequest, errorMessage);
-			if (!responseModelPtr.IsValid()){
+			QJsonObject responseObj = requestHandlerPtr->CreateResponse(gqlRequest, errorMessage);
+			if (responseObj.isEmpty()){
 				return false;
 			}
 
-			if (responseModelPtr->ContainsKey("errors")){
+			if (responseObj.contains(QStringLiteral("errors"))){
 				return false;
 			}
 
-			imtbase::CTreeItemModel* dataModelPtr = nullptr;
-			if (responseModelPtr->ContainsKey("data")){
-				dataModelPtr = responseModelPtr->GetTreeItemModel("data");
+			QJsonObject dataObj;
+			if (responseObj.contains(QStringLiteral("data"))){
+				dataObj = responseObj.value(QStringLiteral("data")).toObject();
 			}
 
-			if (dataModelPtr == nullptr){
+			if (dataObj.isEmpty()){
 				return false;
 			}
 
-			if (!response.ReadFromModel(*dataModelPtr)){
+			if (!response.ReadFromJsonObject(dataObj)){
 				return false;
 			}
 		}

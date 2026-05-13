@@ -1,50 +1,21 @@
-#include <imtbase/COrderedObjectCollectionProxy.h>
-#include <imtbase/CObjectCollection.h>
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+#include "COrderedObjectCollectionTest.h"
 
+
+#include "CTestData.h"
 
 // Qt includes
 #include <QtTest/QtTest>
 
 // ACF includes
-#include <istd/IChangeable.h>
+#include <istd/TDelPtr.h>
 #include <istd/TComposedFactory.h>
 #include <istd/TSingleFactory.h>
+#include <itest/CStandardTestExecutor.h>
 
-
-// Simple test data class for the tests
-class CTestData: public istd::IChangeable
-{
-public:
-	CTestData() {}
-	virtual ~CTestData() {}
-	
-	virtual int GetSupportedOperations() const override { return SO_CLONE | SO_COPY | SO_COMPARE; }
-	virtual istd::IChangeableUniquePtr CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override
-	{
-		return istd::IChangeableUniquePtr(new CTestData());
-	}
-};
-
-
-/**
-	Unit test for the ordered object collection facade.
-*/
-class COrderedObjectCollectionTest: public QObject
-{
-	Q_OBJECT
-
-private slots:
-	void initTestCase();
-	void testSetItemOrder();
-	void testGetItemOrder();
-	void testSetItemsOrder();
-	void testResetItemOrder();
-	void testInsertNewItem();
-	void testRemoveItem();
-	void testGetOrderedItemIds();
-	void testDelegatedOperations();
-	void testSerialization();
-};
+// ImtCore includes
+#include <imtbase/COrderedObjectCollectionProxy.h>
+#include <imtbase/CObjectCollection.h>
 
 
 void COrderedObjectCollectionTest::initTestCase()
@@ -342,6 +313,25 @@ void COrderedObjectCollectionTest::testDelegatedOperations()
 }
 
 
+void COrderedObjectCollectionTest::testIteratorElementsCount()
+{
+	imtbase::CObjectCollection baseCollection;
+	baseCollection.SetOperationFlags(imtbase::IObjectCollection::OF_ALL);
+
+	typedef istd::TSingleFactory<istd::IChangeable, CTestData> TestDataImpl;
+	baseCollection.RegisterFactory<TestDataImpl>("TestType");
+
+	baseCollection.InsertNewObject("TestType", "Item1", "Description1");
+	baseCollection.InsertNewObject("TestType", "Item2", "Description2");
+	baseCollection.InsertNewObject("TestType", "Item3", "Description3");
+
+	imtbase::COrderedObjectCollectionProxy orderedProxy(&baseCollection);
+	istd::TDelPtr<imtbase::IObjectCollectionIterator> iteratorPtr(orderedProxy.CreateObjectCollectionIterator());
+	QVERIFY(iteratorPtr.IsValid());
+	QCOMPARE(iteratorPtr->GetElementsCount(), orderedProxy.GetElementsCount());
+}
+
+
 void COrderedObjectCollectionTest::testSerialization()
 {
 	// Create a base collection
@@ -377,4 +367,4 @@ void COrderedObjectCollectionTest::testSerialization()
 }
 
 
-// QTEST_MAIN(COrderedObjectCollectionTest)
+I_ADD_TEST(COrderedObjectCollectionTest);

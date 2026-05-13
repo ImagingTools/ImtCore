@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include "ImtQmlPck.h"
 
 
@@ -38,6 +39,21 @@ I_EXPORT_COMPONENT(
 			ClientUserContext,
 			"Client-specific context for control global properties of QML engine",
 			"Client Localization QML-Engine");
+
+I_EXPORT_COMPONENT(
+			GqlClientBridge,
+			"Bridge that exposes the imtclientgql GraphQL pipeline (IGqlClient ApiClient) to QML controllers as a singleton",
+			"GraphQL QML Bridge ApiClient" IM_AUTHOR("Sergey Zastrovnyh"));
+
+I_EXPORT_COMPONENT(
+			DocumentManagerBridge,
+			"In-process implementation of imtqml::IDocumentManagerBridge - forwards every CDocumentManagerController request directly to an injected imtdoc::IDocumentManager. Resolved through icomp; not exposed to QML.",
+			"In-Process QML Bridge DocumentManager DataController");
+
+I_EXPORT_COMPONENT(
+			DataModelBridge,
+			"Demultiplexing in-process implementation of imtqml::IDataModelBridge for CDataModelController - owns N delegate IDataModelBridge instances via I_MULTIREF (slot 'ModelDelegates') and routes each call to the first delegate that reports IsSupported(modelId). Resolved through icomp; not exposed to QML.",
+			"In-Process QML Bridge DataModel DataController Demultiplexer");
 
 I_EXPORT_COMPONENT(
 			PageGuiElementModel,

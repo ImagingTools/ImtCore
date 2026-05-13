@@ -21,6 +21,7 @@ ComboBox {
 	property bool endListStatus: false;
 	property bool closeOnFinished: true;
 	property bool keepFilterText: false;
+	property bool hasLoading: true;
 
 	property int modelUpdateDelay: 200
 
@@ -61,6 +62,7 @@ ComboBox {
 			moveToEnd: comboBoxContainerGql.moveToEnd;
 			moveToIndex: comboBoxContainerGql.moveToIndex;
 			visibleScrollBar: comboBoxContainerGql.visibleScrollBar;
+			hasLoading: comboBoxContainerGql.hasLoading;
 
 			onFilterTextChanged: { comboBoxContainerGql.filterText = filterText }
 

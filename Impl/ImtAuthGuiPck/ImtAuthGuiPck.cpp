@@ -64,6 +64,11 @@ I_EXPORT_COMPONENT(
 			"Server connection editor",
 			"Server connection editor");
 
+I_EXPORT_COMPONENT(
+			PersonalAccessTokenManagerGui,
+			"Personal access token manager GUI",
+			"Personal Access Token Manager GUI");
+
 
 } // namespace ImtAuthGuiPck
 

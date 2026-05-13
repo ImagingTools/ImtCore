@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtrest/CHttpRootServletComp.h>
 
 
@@ -9,12 +10,12 @@
 #include "zlib.h"
 
 // ImtCore includes
-#include <imthttp/IRequest.h>
-#include <imtrest/ISender.h>
-#include <imthttp/IResponse.h>
-#include <imthttp/IProtocolEngine.h>
-#include <imthttp/CHttpResponse.h>
-#include <imthttp/CHttpRequest.h>
+#include <imtrest/IRequest.h>
+#include <imtrest/ITransport.h>
+#include <imtrest/IResponse.h>
+#include <imtrest/IProtocolEngine.h>
+#include <imtrest/CHttpResponse.h>
+#include <imtrest/CHttpRequest.h>
 
 
 namespace imtrest
@@ -31,7 +32,7 @@ bool CHttpRootServletComp::IsCommandSupported(const QByteArray& commandId) const
 }
 
 
-imtrest::imthttp::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const imthttp::IRequest& request, const QByteArray& /*subCommandId*/) const
+imtrest::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRequest& request, const QByteArray& /*subCommandId*/) const
 {
 	QByteArray commandId = request.GetCommandId();
 	if (commandId.startsWith('/')){
@@ -46,9 +47,9 @@ imtrest::imthttp::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const im
 
 	const IRequestServlet* handlerPtr = FindRequestHandler(commandId);
 	if (handlerPtr != nullptr){
-		imthttp::ConstResponsePtr responsePtr = handlerPtr->ProcessRequest(request, commandId);
-		const imthttp::CHttpResponse* httpResponseConstPtr = dynamic_cast<const imthttp::CHttpResponse*>(responsePtr.GetPtr());
-		imthttp::CHttpResponse* httpResponsePtr = dynamic_cast<imthttp::CHttpResponse*>(const_cast<imthttp::CHttpResponse*>(httpResponseConstPtr));
+		ConstResponsePtr responsePtr = handlerPtr->ProcessRequest(request, commandId);
+		const CHttpResponse* httpResponseConstPtr = dynamic_cast<const CHttpResponse*>(responsePtr.GetPtr());
+		CHttpResponse* httpResponsePtr = dynamic_cast<CHttpResponse*>(const_cast<CHttpResponse*>(httpResponseConstPtr));
 
 		if (m_autoCompressionAttrPtr->GetValue() == true && httpResponsePtr != nullptr){
 			EncodingType encodingType = ET_NONE;
@@ -69,7 +70,7 @@ imtrest::imthttp::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const im
 				QByteArray qData = qCompress(data, 8);
 				qData.remove(0, 4);
 				httpResponsePtr->SetData(qData);
-				imthttp::IResponse::Headers headers = responsePtr->GetHeaders();
+				IResponse::Headers headers = responsePtr->GetHeaders();
 				headers.insert("content-encoding", "deflate");
 				httpResponsePtr->SetHeaders(headers);
 			}
@@ -94,7 +95,7 @@ imtrest::imthttp::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const im
 				datastream << crc;
 				datastream << qData.length();
 				httpResponsePtr->SetData(outData);
-				imthttp::IResponse::Headers headers = responsePtr->GetHeaders();
+				IResponse::Headers headers = responsePtr->GetHeaders();
 				headers.insert("content-encoding", "gzip");
 				httpResponsePtr->SetHeaders(headers);
 			}
@@ -106,7 +107,7 @@ imtrest::imthttp::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const im
 		QByteArray body = QByteArray("<html><head><title>Error</title></head><body><p>Empty command-ID</p></body></html>");
 		QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
 
-		imthttp::ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId).PopInterfacePtr());
+		ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId).PopInterfacePtr());
 
 		return responsePtr;
 	}
@@ -116,14 +117,14 @@ imtrest::imthttp::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const im
 		QByteArray body = QString("<html><head><title>Error</title></head><body><p>The requested command could not be executed. No servlet was found for the given command: '%1'</p></body></html>").arg(qPrintable(commandIdSafe)).toUtf8();
 		QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
 
-		imthttp::ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId).PopInterfacePtr());
+		ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId).PopInterfacePtr());
 
 		SendErrorMessage(0, QString("No request handler found for: '%1'").arg(qPrintable(commandId)));
 
 		return responsePtr;
 	}
 
-	return imthttp::ConstResponsePtr();
+	return ConstResponsePtr();
 }
 
 

@@ -26,20 +26,10 @@ QtObject {
 
 			representationController.representationUpdated.connect(onRepresentationUpdated)
 			representationController.startUpdateRepresentation.connect(onStartUpdateRepresentation)
+			representationController.updateRepresentationFailed.connect(onUpdateRepresentationFailed)
 
 			if (updateRepresentation){
-				if (view.visible){
-					representationController.updateRepresentationFromDocument()
-				}
-				else{
-					if (!_internal.requestUpdateViews.includes(view)){
-						_internal.requestUpdateViews.push(view)
-					}
-				}
-			}
-			else{
-				representationController.startUpdateRepresentation(documentId, view.model)
-				representationController.representationUpdated(documentId, view.model)
+				representationController.updateRepresentationFromDocument()
 			}
 		}
 	}
@@ -81,6 +71,12 @@ QtObject {
 			if (typeOperation === EDocumentOperationEnum.s_documentChanged){
 				root.updateRepresentationForAllViews()
 			}
+
+			if (typeOperation === EDocumentOperationEnum.s_documentSaved){
+				for (let i = 0; i < root.registeredViews.length; ++i){
+					root.registeredViews[i].documentSaved()
+				}
+			}
 		}
 
 		function onDocumentNameChanged(documentId, oldName, newName){
@@ -105,6 +101,7 @@ QtObject {
 		for (let i = 0; i < registeredViews.length; ++i){
 			if (registeredViews[i].model === representation){
 				registeredViews[i].setBlockingUpdateModel(true)
+				_internal.updateCounters[i] = _internal.updateCounters[i] + 1
 				break
 			}
 		}
@@ -119,14 +116,31 @@ QtObject {
 
 		for (let i = 0; i < registeredViews.length; ++i){
 			if (registeredViews[i].model === representation){
-				registeredViews[i].setBlockingUpdateModel(false)
-				
+				_internal.updateCounters[i] = _internal.updateCounters[i] - 1
+				if (_internal.updateCounters[i] <= 0){
+					_internal.updateCounters[i] = 0
+					registeredViews[i].setBlockingUpdateModel(false)
+				}
+
 				registeredViews[i].doUpdateGui()
 				break
 			}
 		}
 
 		documentManager.documentRepresentationUpdated(documentId, representation)
+	}
+
+	function onUpdateRepresentationFailed(documentId, message){
+		if (root.documentId !== documentId){
+			return
+		}
+
+		for (let i = 0; i < registeredViews.length; ++i){
+			_internal.updateCounters[i] = 0
+			registeredViews[i].setBlockingUpdateModel(false)
+		}
+
+		documentManager.updateRepresentationFailed(documentId, message)
 	}
 
 	function onGuiUpdated(view, model){
@@ -152,6 +166,7 @@ QtObject {
 
 	function onModelDataChanged(view, model){
 		if (registeredViews.includes(view)){
+			_internal.initiatingView = view
 			let index = registeredViews.indexOf(view)
 			registeredRepresentation[index].updateDocumentFromRepresentation()
 		}
@@ -170,6 +185,7 @@ QtObject {
 
 		registeredViews.push(view)
 		registeredRepresentation.push(representationController)
+		_internal.updateCounters.push(0)
 		
 		viewRegistered(view, representationController, updateRepr)
 	}
@@ -198,7 +214,10 @@ QtObject {
 			return
 		}
 
-		if (documentName.length === 0){
+		if (documentManager.hasDocumentNameProvider(documentTypeId)){
+			documentManager.saveDocument(documentId, "")
+		}
+		else if (documentName.length === 0){
 			_internal.saveRequested = true
 			documentManager.requestDocumentName(documentId, documentTypeId)
 		}
@@ -208,7 +227,14 @@ QtObject {
 	}
 
 	function updateRepresentationForAllViews(){
+		let skipView = _internal.initiatingView
+		_internal.initiatingView = null
+
 		for (let i = 0; i < registeredViews.length; ++i){
+			if (registeredViews[i] === skipView){
+				continue
+			}
+
 			if (registeredViews[i].visible){
 				registeredRepresentation[i].updateRepresentationFromDocument()
 			}
@@ -230,5 +256,7 @@ QtObject {
 	property QtObject _internal: QtObject {
 		property var requestUpdateViews: []
 		property bool saveRequested: false
+		property var updateCounters: []
+		property var initiatingView: null
 	}
 }

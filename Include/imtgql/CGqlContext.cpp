@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtgql/CGqlContext.h>
 
 
@@ -104,6 +105,22 @@ void CGqlContext::SetUserId(const QByteArray& userId)
 }
 
 
+QByteArray CGqlContext::GetTenantId() const
+{
+	return m_tenantId;
+}
+
+
+void CGqlContext::SetTenantId(const QByteArray& tenantId)
+{
+	if (m_tenantId != tenantId){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_tenantId = tenantId;
+	}
+}
+
+
 const imtauth::IUserInfo* CGqlContext::GetUserInfo() const
 {
 	return m_userInfoPtr.GetPtr();
@@ -118,11 +135,14 @@ void CGqlContext::SetUserInfo(const imtauth::IUserInfo* userInfoPtr)
 		if (userInfoPtr != nullptr){
 			istd::IChangeableUniquePtr clonedUserPtr = userInfoPtr->CloneMe();
 			if (clonedUserPtr.IsValid()){
-				m_userInfoPtr.MoveCastedPtr(clonedUserPtr);
+				m_userInfoPtr.MoveCastedPtr(std::move(clonedUserPtr));
 			}
 			else {
 				Q_ASSERT(false);
 			}
+		}
+		else{
+			m_userInfoPtr.Reset();
 		}
 	}
 }
@@ -177,6 +197,11 @@ bool CGqlContext::Serialize(iser::IArchive &archive)
 	retVal = retVal && archive.Process(m_userId);
 	retVal = retVal && archive.EndTag(userIdTag);
 
+	iser::CArchiveTag tenantIdTag("TenantId", "Tenant-ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(tenantIdTag);
+	retVal = retVal && archive.Process(m_tenantId);
+	retVal = retVal && archive.EndTag(tenantIdTag);
+
 	if (m_userInfoPtr.IsValid()){
 		iser::CArchiveTag contactTag("UserInfo", "User info", iser::CArchiveTag::TT_GROUP);
 		retVal = retVal && archive.BeginTag(contactTag);
@@ -192,7 +217,7 @@ bool CGqlContext::Serialize(iser::IArchive &archive)
 
 int CGqlContext::GetSupportedOperations() const
 {
-	return SO_COPY | SO_COMPARE | SO_RESET;
+	return SO_COPY | SO_COMPARE | SO_RESET | SO_CLONE;
 }
 
 
@@ -206,6 +231,7 @@ bool CGqlContext::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/
 		m_designScheme = sourcePtr->m_designScheme;
 		m_token = sourcePtr->m_token;
 		m_userId = sourcePtr->m_userId;
+		m_tenantId = sourcePtr->m_tenantId;
 		m_productId = sourcePtr->m_productId;
 		m_headers = sourcePtr->m_headers;
 
@@ -238,7 +264,9 @@ bool CGqlContext::ResetData(CompatibilityMode /*mode*/)
 	m_designScheme.clear();
 	m_token.clear();
 	m_userId.clear();
+	m_tenantId.clear();
 	m_headers.clear();
+	m_userInfoPtr.Reset();
 
 	return true;
 }

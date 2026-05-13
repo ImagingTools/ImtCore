@@ -1,0 +1,51 @@
+# Ignore these files when building Docker images
+# This speeds up the build process
+
+# Node modules (will be installed in container)
+node_modules/
+npm-debug.log
+package-lock.json
+
+# Test results (generated during test run)
+test-results/
+playwright-report/
+newman-report/
+screenshots/
+videos/
+traces/
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+tmp/
+temp/
+*.log
+
+# Documentation (not needed in container)
+*.md
+!README.md
+
+# CI/CD files
+.github/
+.gitlab-ci.yml
+Jenkinsfile
+
+# Other
+.env
+.env.local
+.env.*.local

@@ -113,7 +113,7 @@ SearchComp{
 		}
 		else{
 			searchContainer.setTextFilter("")
-			dataProvider.updateModel()
+			searchContainer.updateModel(0)
 		}
 	}
 

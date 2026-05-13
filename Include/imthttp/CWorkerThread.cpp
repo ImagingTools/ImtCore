@@ -1,14 +1,15 @@
-#include <imthttp/CWorkerThread.h>
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+#include <imtrest/CWorkerThread.h>
 
 
 // Qt includes
 #include <QtCore/QDebug>
 
 // ImtCore includes
-#include <imthttp/CWorkerManagerComp.h>
+#include <imtrest/CWorkerManagerComp.h>
 
 
-namespace imthttp
+namespace imtrest
 {
 
 
@@ -44,13 +45,13 @@ void CWorkerThread::SetRequestPtr(const IRequest* requestPtr)
 }
 
 
-const ISender* CWorkerThread::GetSender(const QByteArray& requestId)
+bool CWorkerThread::SendResponse(const QByteArray& requestId, ConstResponsePtr& response)
 {
 	if (m_workerManager == nullptr){
-		return nullptr;
+		return false;
 	}
 
-	return m_workerManager->GetSender(requestId);
+	return m_workerManager->SendResponse(requestId, response);
 }
 
 
@@ -58,7 +59,7 @@ const ISender* CWorkerThread::GetSender(const QByteArray& requestId)
 
 void CWorkerThread::run()
 {
-	imthttp::IRequestServletPtr requestServletPtr = m_workerManager->CreateServlet();
+	imtrest::IRequestServletPtr requestServletPtr = m_workerManager->CreateServlet();
 	if (!requestServletPtr.IsValid()){
 		Q_ASSERT(false);
 
@@ -88,6 +89,6 @@ void CWorkerThread::OnFinishProcess(const IRequest* request, const QByteArray& s
 }
 
 
-} // namespace imthttp
+} // namespace imtrest
 
 

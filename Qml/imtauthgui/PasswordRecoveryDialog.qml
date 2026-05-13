@@ -106,7 +106,7 @@ Dialog {
 		else if (buttonId === Enums.no){
 			ModalDialogManager.showInfoDialog(qsTr("Check the email you entered"));
 
-			currentIndex == 0;
+			currentIndex = 0;
 			finished(Enums.cancel);
 		}
 	}

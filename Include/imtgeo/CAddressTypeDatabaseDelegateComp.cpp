@@ -1,4 +1,8 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtgeo/CAddressTypeDatabaseDelegateComp.h>
+
+// ImtCore includes
+#include <imtdb/imtdb.h>
 
 
 namespace imtgeo
@@ -77,9 +81,9 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CAddressTypeDatabaseDelegateComp:
 	NewObjectQuery retVal;
 	retVal.query = QString("INSERT INTO \"AddressTypes\"(\"Id\", \"Name\", \"ShortName\", \"Description\")  VALUES('%1', '%2', '%3', '%4');")
 				.arg(qPrintable(proposedObjectId))
-				.arg(name)
-				.arg(sname)
-				.arg(description)
+				.arg(imtdb::SqlEncode(name))
+				.arg(imtdb::SqlEncode(sname))
+				.arg(imtdb::SqlEncode(description))
 				.toUtf8();
 	retVal.objectName = name;
 
@@ -145,9 +149,9 @@ QByteArray CAddressTypeDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 	QByteArray retVal = QString("UPDATE \"AddressTypes\" SET \"Id\" = '%1', \"Name\" = '%2', \"ShortName\" = '%3', \"Description\" = '%4' WHERE \"Id\" ='%5';")
 				.arg(qPrintable(adrId))
-				.arg(name)
-				.arg(shortName)
-				.arg(description)
+				.arg(imtdb::SqlEncode(name))
+				.arg(imtdb::SqlEncode(shortName))
+				.arg(imtdb::SqlEncode(description))
 				.arg(qPrintable(objectId))
 				.toUtf8();
 

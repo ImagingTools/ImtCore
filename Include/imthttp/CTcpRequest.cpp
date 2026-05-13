@@ -1,4 +1,5 @@
-#include <imthttp/CTcpRequest.h>
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+#include <imtrest/CTcpRequest.h>
 
 
 // Qt includes
@@ -10,12 +11,12 @@
 #include <QtWebSockets/QWebSocket>
 
 
-namespace imthttp
+namespace imtrest
 {
 
 
 // public methods
-CTcpRequest::CTcpRequest(const imtrest::IRequestServlet& handler, const IProtocolEngine& engine)
+CTcpRequest::CTcpRequest(const IRequestServlet& handler, const IProtocolEngine& engine)
     :CHttpRequest(handler, engine)
 {
 
@@ -52,6 +53,6 @@ bool CTcpRequest::ParseDeviceData(QIODevice& device)
 }
 
 
-} // namespace imthttp
+} // namespace imtrest
 
 

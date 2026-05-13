@@ -38,7 +38,7 @@ ViewBase {
 	onFeatureDataChanged: {
 		if (featureData){
 			if (!featureData.hasSubFeatures()){
-				featureData.createSubFeatures()
+				featureData.emplaceSubFeatures()
 			}
 
 			tableView_.rowModel = featureData.m_subFeatures;

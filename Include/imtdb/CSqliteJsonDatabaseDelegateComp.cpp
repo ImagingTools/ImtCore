@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtdb/CSqliteJsonDatabaseDelegateComp.h>
 
 
@@ -119,7 +120,7 @@ bool CSqliteJsonDatabaseDelegateComp::CreateObjectFilterQuery(const iprm::IParam
 			}
 
 			QString value = textParamPtr->GetText();
-			filterQuery += QString("json_extract(\"Document\",'$.%1') = '%2'").arg(qPrintable(key)).arg(value);
+			filterQuery += QString("json_extract(\"Document\",'$.%1') = '%2'").arg(qPrintable(key)).arg(SqlEncode(value));
 		}
 	}
 
@@ -136,12 +137,13 @@ bool CSqliteJsonDatabaseDelegateComp::CreateTextFilterQuery(const imtbase::IColl
 
 	QString textFilter = collectionFilter.GetTextFilter();
 	if (!textFilter.isEmpty()){
-		textFilterQuery = QString("json_extract(\"Document\",'$.%1') LIKE '%%2%'").arg(qPrintable(filteringColumnIds.first())).arg(textFilter);
+		QString encodedFilter = SqlEncode(textFilter);
+		textFilterQuery = QString("json_extract(\"Document\",'$.%1') LIKE '%%2%'").arg(qPrintable(filteringColumnIds.first())).arg(encodedFilter);
 
 		for (int i = 1; i < filteringColumnIds.count(); ++i){
 			textFilterQuery += " OR ";
 
-			textFilterQuery += QString("json_extract(\"Document\",'$.%1') LIKE '%%2%'").arg(qPrintable(filteringColumnIds[i])).arg(textFilter);
+			textFilterQuery += QString("json_extract(\"Document\",'$.%1') LIKE '%%2%'").arg(qPrintable(filteringColumnIds[i])).arg(encodedFilter);
 		}
 	}
 

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -25,6 +26,7 @@ public:
 
 	// reimplemented (imtauth::IUserManager)
 	virtual QByteArrayList GetUserIds() const override;
+	virtual QList<User> GetUserList() const override;
 	virtual QByteArray GetUserObjectId(const QByteArray& login) const override;
 	virtual imtauth::IUserInfoUniquePtr GetUser(const QByteArray& userId) const override;
 	virtual bool RemoveUser(const QByteArray& userId) override;

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -9,7 +10,7 @@
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtgql/CGqlRequest.h>
-#include <imtdoc/CCollectionDocumentManager.h>
+#include <imtdoc/CCollectionDocumentManagerBase.h>
 #include <imtbasesdl/SDL/1.0/CPP/DocumentManager.h>
 #include <imtbasesdl/SDL/1.0/CPP/UndoManager.h>
 
@@ -23,11 +24,11 @@ namespace UM = sdl::imtbase::UndoManager;
 
 
 template<class Base, class ColorCollectionDocumentManagerDefs>
-class TCollectionDocumentManagerCompBase : public Base, public imtdoc::CCollectionDocumentManager
+class TCollectionDocumentManagerCompBase : public Base, public imtdoc::CCollectionDocumentManagerBase
 {
 public:
 	typedef Base BaseClass;
-	typedef imtdoc::CCollectionDocumentManager BaseClass2;
+	typedef imtdoc::CCollectionDocumentManagerBase BaseClass2;
 	typedef ColorCollectionDocumentManagerDefs Defs;
 
 	I_BEGIN_BASE_COMPONENT(TCollectionDocumentManagerCompBase)
@@ -47,11 +48,11 @@ protected:
 		const typename Defs::GetOpenedDocumentListGqlRequest& getDocumentListRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	CDM::CDocumentId OnCreateNewDocument(
+	CDM::CDocumentInfo OnCreateNewDocument(
 		const typename Defs::CreateNewDocumentGqlRequest& createDocumentRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	CDM::CDocumentId OnOpenDocument(
+	CDM::CDocumentInfo OnOpenDocument(
 		const typename Defs::OpenDocumentGqlRequest& openDocumentRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
@@ -80,11 +81,11 @@ protected:
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
 
-	imtdoc::CCollectionDocumentManager* GetNonConstThis() const;
+	imtdoc::CCollectionDocumentManagerBase* GetNonConstThis() const;
 	int GetObjectFactoryIndex(const QByteArray& typeId) const;
 	QByteArray GetUserId(const ::imtgql::CGqlRequest& gqlRequest) const;
 
-	// reimplemented (imtdoc::CCollectionDocumentManager)
+	// reimplemented (imtdoc::CCollectionDocumentManagerBase)
 	virtual imtbase::IObjectCollection* GetCollection() const override;
 	virtual istd::IChangeableSharedPtr CreateObject(const QByteArray& typeId) const override;
 	virtual idoc::IUndoManagerSharedPtr CreateUndoManager() const override;
@@ -119,11 +120,11 @@ inline void TCollectionDocumentManagerCompBase<Base, ColorCollectionDocumentMana
 // protected methods
 
 template<class Base, class ColorCollectionDocumentManagerDefs>
-inline imtdoc::CCollectionDocumentManager* TCollectionDocumentManagerCompBase<
+inline imtdoc::CCollectionDocumentManagerBase* TCollectionDocumentManagerCompBase<
 	Base,
 	ColorCollectionDocumentManagerDefs>::GetNonConstThis() const
 {
-	return const_cast<CCollectionDocumentManager*>(dynamic_cast<const CCollectionDocumentManager*>(this));
+	return const_cast<imtdoc::CCollectionDocumentManagerBase*>(dynamic_cast<const imtdoc::CCollectionDocumentManagerBase*>(this));
 }
 
 
@@ -158,7 +159,7 @@ inline QByteArray TCollectionDocumentManagerCompBase<Base, ColorCollectionDocume
 }
 
 
-// reimplemented (imtdoc::CCollectionDocumentManager)
+// reimplemented (imtdoc::CCollectionDocumentManagerBase)
 
 template<class Base, class ColorCollectionDocumentManagerDefs>
 inline imtbase::IObjectCollection* TCollectionDocumentManagerCompBase<Base, ColorCollectionDocumentManagerDefs>::
@@ -249,13 +250,13 @@ inline CDM::CDocumentList TCollectionDocumentManagerCompBase<Base, ColorCollecti
 }
 
 template<class Base, class ColorCollectionDocumentManagerDefs>
-inline CDM::CDocumentId TCollectionDocumentManagerCompBase<Base, ColorCollectionDocumentManagerDefs>::
+inline CDM::CDocumentInfo TCollectionDocumentManagerCompBase<Base, ColorCollectionDocumentManagerDefs>::
 	OnCreateNewDocument(
 		const typename Defs::CreateNewDocumentGqlRequest& createDocumentRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const
 {
-	CDM::CDocumentId retVal;
+	CDM::CDocumentInfo retVal;
 
 	const auto& arguments = createDocumentRequest.GetRequestedArguments();
 	const auto& info = createDocumentRequest.GetRequestInfo();
@@ -281,19 +282,34 @@ inline CDM::CDocumentId TCollectionDocumentManagerCompBase<Base, ColorCollection
 		return retVal;
 	}
 
-	retVal.Version_1_0.emplace().id = documentId;
+	retVal.Version_1_0.emplace();
+	retVal.Version_1_0->documentId = documentId;
+	retVal.Version_1_0->objectTypeId = *documentTypeId->typeId;
+	retVal.Version_1_0->objectId = QByteArray();
+	retVal.Version_1_0->isDirty = false;
+	retVal.Version_1_0->hasNameProvider = false;
+	retVal.Version_1_0->isLoading = false;
+
+	DocumentList list = BaseClass2::GetOpenedDocumentList(userId);
+	for (const DocumentListItem& docInfo : list) {
+		if (docInfo.documentId == documentId) {
+			retVal.Version_1_0->documentName = docInfo.name;
+			retVal.Version_1_0->hasNameProvider = docInfo.hasNameProvider;
+			break;
+		}
+	}
 
 	return retVal;
 }
 
 
 template<class Base, class ColorCollectionDocumentManagerDefs>
-inline CDM::CDocumentId TCollectionDocumentManagerCompBase<Base, ColorCollectionDocumentManagerDefs>::OnOpenDocument(
+inline CDM::CDocumentInfo TCollectionDocumentManagerCompBase<Base, ColorCollectionDocumentManagerDefs>::OnOpenDocument(
 	const typename Defs::OpenDocumentGqlRequest& openDocumentRequest,
 	const ::imtgql::CGqlRequest& gqlRequest,
 	QString& errorMessage) const
 {
-	CDM::CDocumentId retVal;
+	CDM::CDocumentInfo retVal;
 
 	const auto& arguments = openDocumentRequest.GetRequestedArguments();
 	const auto& info = openDocumentRequest.GetRequestInfo();
@@ -319,7 +335,23 @@ inline CDM::CDocumentId TCollectionDocumentManagerCompBase<Base, ColorCollection
 		return retVal;
 	}
 
-	retVal.Version_1_0.emplace().id = documentId;
+	retVal.Version_1_0.emplace();
+	retVal.Version_1_0->documentId = documentId;
+	retVal.Version_1_0->objectId = *objectId->id;
+	retVal.Version_1_0->isDirty = false;
+	retVal.Version_1_0->hasNameProvider = false;
+	retVal.Version_1_0->isLoading = true;
+
+	DocumentList list = BaseClass2::GetOpenedDocumentList(userId);
+	for (const DocumentListItem& docInfo : list) {
+		if (docInfo.documentId == documentId) {
+			retVal.Version_1_0->documentName = docInfo.name;
+			retVal.Version_1_0->objectTypeId = docInfo.typeId;
+			retVal.Version_1_0->hasNameProvider = docInfo.hasNameProvider;
+			retVal.Version_1_0->isLoading = docInfo.isLoading;
+			break;
+		}
+	}
 
 	return retVal;
 }
@@ -352,16 +384,30 @@ inline CDM::CDocumentOperationStatus TCollectionDocumentManagerCompBase<Base, Co
 
 	retVal.Version_1_0.emplace();
 
-	OperationStatus status = GetNonConstThis()->SaveDocument(userId, *documentId->id);
+	QString saveErrorMessage;
+	OperationStatus status = GetNonConstThis()->SaveDocument(
+		userId,
+		*documentId->id,
+		QString(),
+		&saveErrorMessage);
 	switch (status) {
 	case imtdoc::ICollectionDocumentManager::OS_OK:
 		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Success;
+		{
+			QString resolvedName;
+			if (GetNonConstThis()->GetDocumentName(userId, *documentId->id, resolvedName) == OperationStatus::OS_OK){
+				retVal.Version_1_0->documentName = resolvedName;
+			}
+		}
 		break;
 	case imtdoc::ICollectionDocumentManager::OS_INVALID_USER_ID:
 		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidUserId;
 		break;
 	case imtdoc::ICollectionDocumentManager::OS_INVALID_DOCUMENT_ID:
 		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidDocumentId;
+		break;
+	case imtdoc::ICollectionDocumentManager::OS_INVALID_DOCUMENT_DATA:
+		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidDocumentData;
 		break;
 	case imtdoc::ICollectionDocumentManager::OS_FAILED:
 		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Failed;
@@ -371,7 +417,27 @@ inline CDM::CDocumentOperationStatus TCollectionDocumentManagerCompBase<Base, Co
 	}
 
 	if (status != OperationStatus::OS_OK) {
-		errorMessage = "Unable to open document or create undo manager";
+		QString responseMessage;
+		switch (status) {
+		case imtdoc::ICollectionDocumentManager::OS_INVALID_USER_ID:
+			responseMessage = "Invalid user ID";
+			break;
+		case imtdoc::ICollectionDocumentManager::OS_INVALID_DOCUMENT_ID:
+			responseMessage = "Invalid document ID";
+			break;
+		case imtdoc::ICollectionDocumentManager::OS_INVALID_DOCUMENT_DATA:
+			responseMessage = saveErrorMessage.isEmpty() ? "Document data is invalid" : saveErrorMessage;
+			break;
+		case imtdoc::ICollectionDocumentManager::OS_FAILED:
+			responseMessage = "Failed to save document";
+			break;
+		default:
+			break;
+		}
+		if (!responseMessage.isEmpty()) {
+			retVal.Version_1_0->message = responseMessage;
+			errorMessage = responseMessage;
+		}
 	}
 
 	return retVal;

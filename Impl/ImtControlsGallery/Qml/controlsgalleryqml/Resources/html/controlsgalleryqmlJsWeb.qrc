@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/html">
+        <file alias="index.html">index.html</file>
+	<file alias="Times New Roman.ttf">Times New Roman.ttf</file>
+	<file alias="Icon.js">Icon.js</file>
+        <file alias="GraphQLRequest.js">GraphQLRequest.js</file>
+        <file alias="main.js">main.js</file>
+        <file alias="jqml.controlsgallery.js">jqml.controlsgallery.js</file>
+    </qresource>
+</RCC>

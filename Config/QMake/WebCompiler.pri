@@ -45,7 +45,7 @@ defineTest(compyleWeb) {
     buildwebdir = $$1
 	resname = $$2
 	dir = $$1/src
-	jqmldir = $(IMTCOREDIR)/3rdParty/JQML2
+	jqmldir = $(IMTCOREDIR)/Tools/JQML/v2
 	npmexe = npm
 
     win32{
@@ -53,7 +53,7 @@ defineTest(compyleWeb) {
 		jqmldir ~= s,/,\\,g
 
         PATH += $(IMTCOREDIR)/3rdParty/nodejs
-		npmexe = $(IMTCOREDIR)/3rdParty/JQML2/jqml2compiler.bat
+		npmexe = $(IMTCOREDIR)/Tools/JQML/v2/jqml2compiler.bat
 		npmexe ~= s,/,\\,g
 	}
 

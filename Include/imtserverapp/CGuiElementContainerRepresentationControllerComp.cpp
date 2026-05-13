@@ -1,9 +1,17 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtserverapp/CGuiElementContainerRepresentationControllerComp.h>
 
 
 // ACF includes
 #include <iprm/TParamsPtr.h>
 #include <iprm/IIdParam.h>
+
+// std includes
+#include <algorithm>
+
+// Qt includes
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonObject>
 
 // ImtCore includes
 #include <imtserverapp/IGuiElementContainer.h>
@@ -56,7 +64,7 @@ bool CGuiElementContainerRepresentationControllerComp::IsModelSupported(const is
 
 bool CGuiElementContainerRepresentationControllerComp::GetRepresentationFromDataModel(
 			const istd::IChangeable& dataModel,
-			imtbase::CTreeItemModel& representation,
+			QJsonObject& representation,
 			const iprm::IParamsSet* paramsPtr) const
 {
 	Q_ASSERT(IsModelSupported(dataModel));
@@ -66,6 +74,7 @@ bool CGuiElementContainerRepresentationControllerComp::GetRepresentationFromData
 		return false;
 	}
 
+	representation = QJsonObject();
 	QByteArray productId;
 	iprm::TParamsPtr<iprm::IIdParam> productIdParamPtr(paramsPtr, "ProductId");
 	if (productIdParamPtr.IsValid()){
@@ -83,6 +92,8 @@ bool CGuiElementContainerRepresentationControllerComp::GetRepresentationFromData
 
 		isAdmin = userInfoParamPtr->IsAdmin();
 	}
+
+	QJsonArray itemsArray;
 
 	QByteArrayList elementIds = guiElementContainerPtr->GetElementIds();
 	for (const QByteArray& elementId : elementIds){
@@ -103,51 +114,76 @@ bool CGuiElementContainerRepresentationControllerComp::GetRepresentationFromData
 
 			const imtserverapp::IRepresentationController* representationControllerPtr = FindRepresentationController(elementId);
 			if (representationControllerPtr != nullptr){
-				imtbase::CTreeItemModel guiElementRepresentationModel;
+				QJsonObject guiElementRepresentationModel;
 				if (representationControllerPtr->GetRepresentationFromDataModel(*guiElementModelPtr, guiElementRepresentationModel, paramsPtr)){
-					int index = representation.InsertNewItem();
-					representation.CopyItemDataFromModel(index, &guiElementRepresentationModel);
+					if (guiElementRepresentationModel.contains(QStringLiteral("items")) && guiElementRepresentationModel.value(QStringLiteral("items")).isArray()){
+						const QJsonArray nestedItems = guiElementRepresentationModel.value(QStringLiteral("items")).toArray();
+						for (const QJsonValue& value : nestedItems){
+							if (value.isObject()){
+								itemsArray.append(value.toObject());
+							}
+						}
+					}
+					else{
+						itemsArray.append(guiElementRepresentationModel);
+					}
 				}
 			}
 		}
 	}
 
 	if (m_slaveRepresentationControllerCompPtr.IsValid()){
-		bool ok = m_slaveRepresentationControllerCompPtr->GetRepresentationFromDataModel(*guiElementContainerPtr, representation, paramsPtr);
+		QJsonObject slaveRepresentation;
+		bool ok = m_slaveRepresentationControllerCompPtr->GetRepresentationFromDataModel(*guiElementContainerPtr, slaveRepresentation, paramsPtr);
 		if (!ok){
 			return false;
 		}
-	}
-
-	int n = representation.GetItemsCount();
-	for (int i = 0; i < n; i++) {
-		for (int j = 0; j < n - i - 1; j++) {
-			int alignment1 = representation.GetData("alignment", j).toInt();
-			int alignment2 = representation.GetData("alignment", j + 1).toInt();
-			int priority1   = representation.GetData("priority", j).toInt();
-			int priority2   = representation.GetData("priority", j + 1).toInt();
-
-			bool needSwap = false;
-
-			if (alignment1 != alignment2){
-				needSwap = (alignment1 == Qt::AlignBottom && alignment2 == Qt::AlignTop);
+		if (slaveRepresentation.contains(QStringLiteral("items")) && slaveRepresentation.value(QStringLiteral("items")).isArray()){
+			const QJsonArray nestedItems = slaveRepresentation.value(QStringLiteral("items")).toArray();
+			for (const QJsonValue& value : nestedItems){
+				if (value.isObject()){
+					itemsArray.append(value.toObject());
+				}
 			}
-			else {
-				needSwap = (priority1 < priority2);
-			}
-
-			if (needSwap) {
-				representation.swapItems(j, j + 1);
-			}
+		}
+		else if (!slaveRepresentation.isEmpty()){
+			itemsArray.append(slaveRepresentation);
 		}
 	}
 
+	QList<QJsonObject> sortedItems;
+	sortedItems.reserve(itemsArray.size());
+	for (const QJsonValue& value : itemsArray){
+		if (value.isObject()){
+			sortedItems.append(value.toObject());
+		}
+	}
+	std::sort(sortedItems.begin(), sortedItems.end(), [](const QJsonObject& item1, const QJsonObject& item2){
+		const int alignment1 = item1.value(QStringLiteral("alignment")).toInt();
+		const int alignment2 = item2.value(QStringLiteral("alignment")).toInt();
+		// Keep the original behavior: top/default-aligned items go before bottom-aligned items.
+		const int alignmentRank1 = alignment1 == Qt::AlignBottom ? 1 : 0;
+		const int alignmentRank2 = alignment2 == Qt::AlignBottom ? 1 : 0;
+		if (alignmentRank1 != alignmentRank2){
+			return alignmentRank1 < alignmentRank2;
+		}
+
+		const int priority1 = item1.value(QStringLiteral("priority")).toInt();
+		const int priority2 = item2.value(QStringLiteral("priority")).toInt();
+		return priority1 > priority2;
+	});
+	itemsArray = QJsonArray();
+	for (const QJsonObject& itemObj : sortedItems){
+		itemsArray.append(itemObj);
+	}
+
+	representation.insert(QStringLiteral("items"), itemsArray);
 	return true;
 }
 
 
 bool CGuiElementContainerRepresentationControllerComp::GetDataModelFromRepresentation(
-			const imtbase::CTreeItemModel& /*representation*/,
+			const QJsonObject& /*representation*/,
 			istd::IChangeable& /*dataModel*/) const
 {
 	return false;
@@ -155,5 +191,3 @@ bool CGuiElementContainerRepresentationControllerComp::GetDataModelFromRepresent
 
 
 } // namespace imtserverapp
-
-

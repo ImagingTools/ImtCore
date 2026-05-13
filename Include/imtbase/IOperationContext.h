@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -46,6 +47,11 @@ public:
 		Get information about the initiator of the operation. E.g user-ID
 	*/
 	virtual IdentifableObjectInfo GetOperationOwnerId() const = 0;
+
+	/**
+		Get tenant-ID of the operation.
+	*/
+	virtual QByteArray GetTenantId() const = 0;
 
 	/**
 		Description related to the operation.

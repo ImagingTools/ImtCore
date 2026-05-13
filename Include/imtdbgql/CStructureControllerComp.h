@@ -1,9 +1,11 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
 // ImtCore includes
 #include <imtdb/IDatabaseEngine.h>
 #include <imtservergql/CStructureControllerCompBase.h>
+#include <QtCore/QJsonObject>
 
 
 namespace imtdbgql
@@ -23,7 +25,7 @@ protected:
 	QByteArray GetElementsQuery(iprm::IParamsSet* filterParams) const;
 
 	// reimpemented (CStructureControllerCompBase)
-	virtual imtbase::CTreeItemModel* GetElements(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual QJsonObject GetElements(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 protected:
 	I_REF(imtdb::IDatabaseEngine, m_databaseEngineCompPtr);
@@ -31,5 +33,4 @@ protected:
 
 
 } // namespace imtdbgql
-
 

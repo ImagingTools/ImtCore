@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imt3dgui/CMeshShape.h>
 
 
@@ -154,7 +155,7 @@ void CMeshShape::SetInfoBoxEnabled(bool isEnabled)
 
 // protected methods
 
-// reimplement (imt3dgui::CShape3dBase)
+// reimplemented (imt3dgui::CShape3dBase)
 
 void CMeshShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
@@ -182,15 +183,7 @@ void CMeshShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& /*chang
 }
 
 
-void CMeshShape::DrawShapeGl(QOpenGLShaderProgram& /*program*/, QOpenGLFunctions& functions)
-{
-	functions.glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, (GLuint*)0);
-}
-
-
-// reimplemented (imt3dview::IDrawable)
-
-void CMeshShape::Draw(QPainter& painter)
+void CMeshShape::DrawOverlay(QPainter& painter)
 {
 	if (m_isInfoBoxEnabled && m_pointsDataPtr != nullptr){
 		QString text = QString("<b><p>Total vertices: %1</p>").arg(m_pointsDataPtr->GetPointsCount());
@@ -208,6 +201,21 @@ void CMeshShape::Draw(QPainter& painter)
 		doc.drawContents(&painter);
 
 		painter.restore();
+	}
+}
+
+
+imt3dview::PrimitiveType CMeshShape::GetPrimitiveType() const
+{
+	return imt3dview::PT_TRIANGLES;
+}
+
+
+void CMeshShape::FillMaterial(imt3dview::Material& material) const
+{
+	BaseClass::FillMaterial(material);
+	if (material.colorMode == imt3dview::Material::CM_SOLID){
+		material.solidColor = m_color;
 	}
 }
 

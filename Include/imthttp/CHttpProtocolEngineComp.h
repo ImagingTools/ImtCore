@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -8,10 +9,10 @@
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
-#include <imthttp/IProtocolEngine.h>
+#include <imtrest/IProtocolEngine.h>
 
 
-namespace imthttp
+namespace imtrest
 {
 
 
@@ -29,11 +30,10 @@ public:
 	// reimplemented (IProtocolEngine)
 	virtual QByteArray GetProtocolTypeId() const override;
 	virtual const iser::IVersionInfo* GetProtocolVersion() const override;
-	virtual ProtocolPattern GetProtocolPattern() const override;
 	virtual bool GetProtocolStatusCode(int statusCode, int& protocolStatusCode, QByteArray& statusCodeLiteral) const override;
-	virtual IRequestUniquePtr CreateRequest(const imtrest::IRequestServlet& requestHandler) const override;
+	virtual IRequestUniquePtr CreateRequest(const IRequestServlet& requestHandler) const override;
 	virtual IRequestUniquePtr CreateRequestForSend(
-				const imtrest::IRequestServlet& requestHandler,
+				const IRequestServlet& requestHandler,
 				int statusCode,
 				const QByteArray& data,
 				const QByteArray& dataTypeId) const override;
@@ -45,6 +45,6 @@ public:
 };
 
 
-} // namespace imthttp
+} // namespace imtrest
 
 

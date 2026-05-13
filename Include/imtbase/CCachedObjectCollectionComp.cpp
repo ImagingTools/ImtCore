@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtbase/CCachedObjectCollectionComp.h>
 
 
@@ -104,10 +105,10 @@ ICollectionInfo::Id CCachedObjectCollectionComp::InsertNewObject(
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 	QWriteLocker locker(&m_lock);
-	m_cachedCollections.Reset();
+	m_cachedCollections.clear();
 	locker.unlock();
 
-	QByteArray retVal =  m_objectCollectionCompPtr->InsertNewObject(
+	QByteArray retVal = m_objectCollectionCompPtr->InsertNewObject(
 				typeId,
 				name,
 				description,
@@ -140,10 +141,16 @@ bool CCachedObjectCollectionComp::RemoveElements(const Ids& elementIds, const IO
 	bool retVal = m_objectCollectionCompPtr->RemoveElements(elementIds, operationContextPtr);
 	if (retVal){
 		QWriteLocker locker(&m_lock);
-		m_cachedCollections.Reset();
+		m_cachedCollections.clear();
+		for (int i = 0; i < elementIds.size(); ++i){
+			m_cacheItems.remove(elementIds[i]);
+		}
+	}
+	else{
+		changeNotifier.Abort();
 	}
 
-	return  retVal;
+	return retVal;
 }
 
 
@@ -187,29 +194,27 @@ bool CCachedObjectCollectionComp::GetObjectData(const Id& objectId, DataPtr& dat
 		return false;
 	}
 
-	QReadLocker locker(&m_lock);
+	{
+		QReadLocker locker(&m_lock);
 
-	if (m_cacheItems.contains(objectId)){
-		dataPtr = m_cacheItems[objectId].dataPtr;
+		CacheItemMap::const_iterator it = m_cacheItems.constFind(objectId);
+		if (it != m_cacheItems.constEnd()){
+			dataPtr = it.value().dataPtr;
 
-		return true;
-	}
-
-	locker.unlock();
-
-	int cacheSize = m_cacheItems.size();
-	if (cacheSize >= *m_objectCacheLimitAttrPtr){
-		RemoveOldestObjectFromCache();
+			return true;
+		}
 	}
 
 	bool retVal = m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr);
 	if (retVal){
-		m_lock.lockForWrite();
+		QWriteLocker locker(&m_lock);
+		if (m_cacheItems.size() >= *m_objectCacheLimitAttrPtr){
+			RemoveOldestObjectFromCache();
+		}
 		m_cacheItems.insert(objectId, {dataPtr, QDateTime::currentMSecsSinceEpoch()});
-		m_lock.unlock();
 	}
 
-	return  retVal;
+	return retVal;
 }
 
 
@@ -228,7 +233,8 @@ bool CCachedObjectCollectionComp::SetObjectData(
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 	QWriteLocker locker(&m_lock);
-	m_cachedCollections.Reset();
+	m_cachedCollections.clear();
+	m_cacheItems.remove(objectId);
 	locker.unlock();
 
 	bool retVal = m_objectCollectionCompPtr->SetObjectData(objectId, object, mode, operationContextPtr);
@@ -242,9 +248,9 @@ bool CCachedObjectCollectionComp::SetObjectData(
 
 IObjectCollectionUniquePtr CCachedObjectCollectionComp::CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr) const
 {
-	FilteredCollection* collectionChacheItemPtr = GetFilteredCollection(offset, count, selectionParamsPtr);
-	if (collectionChacheItemPtr != nullptr){
-		return collectionChacheItemPtr->cachePtr->CreateSubCollection(offset, count, selectionParamsPtr);
+	FilteredCollectionPtr collectionCacheItemPtr = GetFilteredCollection(offset, count, selectionParamsPtr);
+	if (collectionCacheItemPtr != nullptr){
+		return collectionCacheItemPtr->cachePtr->CreateSubCollection(0, -1, nullptr);
 	}
 
 	return nullptr;
@@ -257,9 +263,9 @@ imtbase::IObjectCollectionIterator* CCachedObjectCollectionComp::CreateObjectCol
 			int count,
 			const iprm::IParamsSet* selectionParamsPtr) const
 {
-	FilteredCollection* collectionChacheItemPtr = GetFilteredCollection(offset, count, selectionParamsPtr);
-	if (collectionChacheItemPtr != nullptr){
-		return collectionChacheItemPtr->cachePtr->CreateObjectCollectionIterator(objectId, offset, count, selectionParamsPtr);
+	FilteredCollectionPtr collectionCacheItemPtr = GetFilteredCollection(offset, count, selectionParamsPtr);
+	if (collectionCacheItemPtr != nullptr){
+		return collectionCacheItemPtr->cachePtr->CreateObjectCollectionIterator(objectId, 0, -1, nullptr);
 	}
 	
 	if (!m_objectCollectionCompPtr.IsValid()){
@@ -296,10 +302,10 @@ idoc::MetaInfoPtr CCachedObjectCollectionComp::GetDataMetaInfo(const Id& objectI
 {
 	QReadLocker locker(&m_lock);
 
-	for (int index = 0; index < m_cachedCollections.GetCount(); index++){
-		FilteredCollection* collectionChacheItemPtr = m_cachedCollections.GetAt(index);
-		if (collectionChacheItemPtr->cachePtr->GetElementIds().contains(objectId)){
-			return collectionChacheItemPtr->cachePtr->GetDataMetaInfo(objectId);
+	for (int index = 0; index < m_cachedCollections.size(); index++){
+		const FilteredCollectionPtr& collectionCacheItemPtr = m_cachedCollections.at(index);
+		if (collectionCacheItemPtr->cachePtr->GetElementIds().contains(objectId)){
+			return collectionCacheItemPtr->cachePtr->GetDataMetaInfo(objectId);
 		}
 	}
 
@@ -323,9 +329,9 @@ ICollectionInfo::Ids CCachedObjectCollectionComp::GetElementIds(
 			const iprm::IParamsSet* selectionParamsPtr,
 			ilog::IMessageConsumer* logPtr) const
 {
-	FilteredCollection* collectionChacheItemPtr = GetFilteredCollection(offset, count, selectionParamsPtr);
-	if (collectionChacheItemPtr != nullptr){
-		return collectionChacheItemPtr->cachePtr->GetElementIds(0, -1, nullptr, logPtr);
+	FilteredCollectionPtr collectionCacheItemPtr = GetFilteredCollection(offset, count, selectionParamsPtr);
+	if (collectionCacheItemPtr != nullptr){
+		return collectionCacheItemPtr->cachePtr->GetElementIds(0, -1, nullptr, logPtr);
 	}
 
 	return ICollectionInfo::Ids();
@@ -347,10 +353,10 @@ QVariant CCachedObjectCollectionComp::GetElementInfo(const Id& elementId, int in
 {
 	QReadLocker locker(&m_lock);
 
-	for (int index = 0; index < m_cachedCollections.GetCount(); index++){
-		FilteredCollection* collectionChacheItemPtr = m_cachedCollections.GetAt(index);
-		if (collectionChacheItemPtr->cachePtr->GetElementIds().contains(elementId)){
-			return collectionChacheItemPtr->cachePtr->GetElementInfo(elementId, infoType, logPtr);
+	for (int index = 0; index < m_cachedCollections.size(); index++){
+		const FilteredCollectionPtr& collectionCacheItemPtr = m_cachedCollections.at(index);
+		if (collectionCacheItemPtr->cachePtr->GetElementIds().contains(elementId)){
+			return collectionCacheItemPtr->cachePtr->GetElementInfo(elementId, infoType, logPtr);
 		}
 	}
 
@@ -362,10 +368,10 @@ idoc::MetaInfoPtr CCachedObjectCollectionComp::GetElementMetaInfo(const Id& elem
 {
 	QReadLocker locker(&m_lock);
 
-	for (int index = 0; index < m_cachedCollections.GetCount(); index++){
-		FilteredCollection* collectionChacheItemPtr = m_cachedCollections.GetAt(index);
-		if (collectionChacheItemPtr->cachePtr->GetElementIds().contains(elementId)){
-			return collectionChacheItemPtr->cachePtr->GetElementMetaInfo(elementId, logPtr);
+	for (int index = 0; index < m_cachedCollections.size(); index++){
+		const FilteredCollectionPtr& collectionCacheItemPtr = m_cachedCollections.at(index);
+		if (collectionCacheItemPtr->cachePtr->GetElementIds().contains(elementId)){
+			return collectionCacheItemPtr->cachePtr->GetElementMetaInfo(elementId, logPtr);
 		}
 	}
 
@@ -380,14 +386,14 @@ bool CCachedObjectCollectionComp::SetElementName(const Id& elementId, const QStr
 	}
 
 	QWriteLocker locker(&m_lock);
-	m_cachedCollections.Reset();
+	m_cachedCollections.clear();
 	locker.unlock();
 
 	istd::IChangeable::ChangeSet changeSet(CF_ELEMENT_RENAMED);
 	changeSet.SetChangeInfo(CN_ELEMENT_RENAMED, elementId);
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
-	bool retVal =  m_objectCollectionCompPtr->SetElementName(elementId, name);
+	bool retVal = m_objectCollectionCompPtr->SetElementName(elementId, name);
 	if (!retVal){
 		changeNotifier.Abort();
 	}
@@ -403,7 +409,7 @@ bool CCachedObjectCollectionComp::SetElementDescription(const Id& elementId, con
 	}
 
 	QWriteLocker locker(&m_lock);
-	m_cachedCollections.Reset();
+	m_cachedCollections.clear();
 	locker.unlock();
 
 	istd::IChangeable::ChangeSet changeSet(CF_ELEMENT_DESCRIPTION_CHANGED);
@@ -426,7 +432,7 @@ bool CCachedObjectCollectionComp::SetElementEnabled(const Id& elementId, bool is
 	}
 
 	QWriteLocker locker(&m_lock);
-	m_cachedCollections.Reset();
+	m_cachedCollections.clear();
 	locker.unlock();
 
 	istd::IChangeable::ChangeSet changeSet(CF_ELEMENT_STATE);
@@ -442,9 +448,7 @@ bool CCachedObjectCollectionComp::SetElementEnabled(const Id& elementId, bool is
 }
 
 
-// TODO: cannot return a pointer in this function it's not thread-safe.
-
-CCachedObjectCollectionComp::FilteredCollection* CCachedObjectCollectionComp::GetFilteredCollection(
+CCachedObjectCollectionComp::FilteredCollectionPtr CCachedObjectCollectionComp::GetFilteredCollection(
 			int offset,
 			int count,
 			const iprm::IParamsSet* selectionParamsPtr) const
@@ -461,22 +465,21 @@ CCachedObjectCollectionComp::FilteredCollection* CCachedObjectCollectionComp::Ge
 		return nullptr;
 	}
 
-	m_lock.lockForRead();
-
 	QByteArray data((char*)archive.GetBuffer(), archive.GetBufferSize());
 
-	for (int index = 0; index < m_cachedCollections.GetCount(); index++){
-		FilteredCollection* collectionChacheItemPtr = m_cachedCollections.GetAt(index);
-		if (		collectionChacheItemPtr != nullptr &&
-					collectionChacheItemPtr->offset == offset &&
-					collectionChacheItemPtr->count == count &&
-					collectionChacheItemPtr->selectionParamsData == data){
-			m_lock.unlock();
-			return collectionChacheItemPtr;
+	{
+		QReadLocker locker(&m_lock);
+
+		for (int index = 0; index < m_cachedCollections.size(); index++){
+			const FilteredCollectionPtr& collectionCacheItemPtr = m_cachedCollections.at(index);
+			if (		collectionCacheItemPtr != nullptr &&
+						collectionCacheItemPtr->offset == offset &&
+						collectionCacheItemPtr->count == count &&
+						collectionCacheItemPtr->selectionParamsData == data){
+				return collectionCacheItemPtr;
+			}
 		}
 	}
-
-	m_lock.unlock();
 
 	IObjectCollectionUniquePtr subCollectionPtr = m_objectCollectionCompPtr->CreateSubCollection(offset, count, selectionParamsPtr);
 	if (!subCollectionPtr.IsValid()){
@@ -485,15 +488,24 @@ CCachedObjectCollectionComp::FilteredCollection* CCachedObjectCollectionComp::Ge
 
 	QWriteLocker locker(&m_lock);
 
-	if (!m_cachedCollections.IsEmpty()){
-		if (m_cachedCollections.GetCount() >= *m_metaInfoCacheLimitAttrPtr){
-			m_cachedCollections.RemoveAt(0);
+	// Re-check cache after acquiring write lock to avoid duplicates
+	for (int index = 0; index < m_cachedCollections.size(); index++){
+		const FilteredCollectionPtr& collectionCacheItemPtr = m_cachedCollections.at(index);
+		if (		collectionCacheItemPtr != nullptr &&
+					collectionCacheItemPtr->offset == offset &&
+					collectionCacheItemPtr->count == count &&
+					collectionCacheItemPtr->selectionParamsData == data){
+			return collectionCacheItemPtr;
 		}
 	}
 
-	m_cachedCollections.PushBack(new FilteredCollection(offset, count, data, std::move(subCollectionPtr)));
+	if (m_cachedCollections.size() >= *m_metaInfoCacheLimitAttrPtr){
+		m_cachedCollections.removeFirst();
+	}
 
-	return m_cachedCollections.GetAt(m_cachedCollections.GetCount() - 1);
+	m_cachedCollections.append(std::make_shared<FilteredCollection>(offset, count, data, std::move(subCollectionPtr)));
+
+	return m_cachedCollections.last();
 }
 
 
@@ -501,7 +513,7 @@ void CCachedObjectCollectionComp::ClearCache()
 {
 	QWriteLocker locker(&m_lock);
 
-	m_cachedCollections.Reset();
+	m_cachedCollections.clear();
 
 	m_cacheItems.clear();
 }
@@ -509,30 +521,19 @@ void CCachedObjectCollectionComp::ClearCache()
 
 void CCachedObjectCollectionComp::RemoveOldestObjectFromCache() const
 {
-	QByteArray oldestObjectId;
+	if (m_cacheItems.isEmpty()){
+		return;
+	}
 
-	QReadLocker locker(&m_lock);
+	CacheItemMap::iterator oldestIter = m_cacheItems.begin();
 
-	if (!m_cacheItems.isEmpty()){
-		qint64 minTimeStamp = m_cacheItems.first().timestamp;
-
-		for (CacheItemMap::ConstIterator iter = m_cacheItems.constBegin(); iter != m_cacheItems.constEnd(); ++iter){
-			const CacheItem& item = iter.value();
-
-			if (item.timestamp < minTimeStamp){
-				minTimeStamp = item.timestamp;
-				oldestObjectId = iter.key();
-			}
+	for (CacheItemMap::iterator iter = m_cacheItems.begin(); iter != m_cacheItems.end(); ++iter){
+		if (iter.value().timestamp < oldestIter.value().timestamp){
+			oldestIter = iter;
 		}
 	}
 
-	locker.unlock();
-
-	if (!oldestObjectId.isEmpty()){
-		m_lock.lockForWrite();
-		m_cacheItems.remove(oldestObjectId);
-		m_lock.unlock();
-	}
+	m_cacheItems.erase(oldestIter);
 }
 
 

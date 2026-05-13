@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtservergql/CGqlContextControllerComp.h>
 
 
@@ -27,14 +28,32 @@ imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(
 			const imtgql::IGqlContext::Headers& headers,
 			QString& errorMessage) const
 {
-	if (!m_jwtSessionControllerCompPtr.IsValid()){
-		Q_ASSERT(false);
-		return nullptr;
+	QByteArray userObjectId;
+
+	// Extract user ID based on token prefix: pat_ for PAT tokens, otherwise JWT
+	if (token.startsWith("pat_") && token.size() > 4){
+		// PAT token - validate with PAT manager to extract userId
+		if (m_patManagerCompPtr.IsValid()){
+			QByteArrayList scopes;
+			QByteArray tokenId;
+			if (!m_patManagerCompPtr->ValidateToken(token, userObjectId, tokenId, scopes)){
+				// PAT validation failed - this is unexpected since validation already passed in servlet
+				errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: PAT validation failed.").arg(qPrintable(token));
+				SendErrorMessage(0, errorMessage, "CGqlContextControllerComp");
+				return nullptr;
+			}
+		}
+	}
+	else{
+		// JWT token - extract user from JWT controller
+		if (m_jwtSessionControllerCompPtr.IsValid()){
+			userObjectId = m_jwtSessionControllerCompPtr->GetUserFromJwt(token);
+		}
 	}
 
-	QByteArray userObjectId = m_jwtSessionControllerCompPtr->GetUserFromJwt(token);
+	// If neither JWT nor PAT validation succeeded
 	if (userObjectId.isEmpty()){
-		errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: Session model is invalid.").arg(qPrintable(token));
+		errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: Invalid authentication token.").arg(qPrintable(token));
 		SendErrorMessage(0, errorMessage, "CGqlContextControllerComp");
 
 		return nullptr;
@@ -44,6 +63,12 @@ imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(
 	gqlContextPtr->SetUserId(userObjectId);
 	gqlContextPtr->SetToken(token);
 	gqlContextPtr->SetHeaders(headers);
+
+	// Extract tenant ID from JWT token
+	if (m_jwtSessionControllerCompPtr.IsValid() && !token.startsWith("pat_")){
+		QByteArray tenantId = m_jwtSessionControllerCompPtr->GetTenantFromJwt(token);
+		gqlContextPtr->SetTenantId(tenantId);
+	}
 
 	imtgql::CGqlRequestContextManager::SetContext(gqlContextPtr);
 

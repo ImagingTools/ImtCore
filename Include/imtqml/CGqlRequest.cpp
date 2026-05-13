@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtqml/CGqlRequest.h>
 
 
@@ -41,12 +42,19 @@ bool CGqlRequest::SetGqlQuery(QString query, QVariantMap headers)
 		QNetworkRequest networkRequest = QNetworkRequest(requestUrl);
 		networkRequest.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("application/x-www-form-urlencoded"));
 
+		QStringList keys = headers.keys();
+		for (QString& key: keys){
+			networkRequest.setRawHeader(key.toLatin1(), headers.value(key).toByteArray());
+		}
+
+		if (!CGqlModel::s_productId.isEmpty()){
+			if (!networkRequest.hasRawHeader("productId")){
+				networkRequest.setRawHeader("productId", CGqlModel::s_productId.toUtf8());
+			}
+		}
+
 		if (!CGqlModel::s_accessToken.isEmpty()){
 			networkRequest.setRawHeader("x-authentication-token", CGqlModel::s_accessToken.toUtf8());
-			QStringList keys = headers.keys();
-			for (QString& key: keys){
-				networkRequest.setRawHeader(key.toLatin1(), headers.value(key).toByteArray());
-			}
 		}
 
 		QString message = QString("Post to url '%1' query '%2'").arg(requestUrl.toString()).arg(query);

@@ -1,9 +1,11 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
 // Qt includes
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
+#include <QtCore/QJsonArray>
 
 // ACF includes
 #include <icomp/CComponentBase.h>
@@ -30,64 +32,71 @@ protected:
 	template<class SdlClass>
 	SdlClass SendModelRequest(const imtgql::IGqlRequest& request, QString& errorMessage) const
 	{
+		errorMessage.clear();
+
 		if (!m_apiClientCompPtr.IsValid()){
 			Q_ASSERT(false);
 			return SdlClass();
 		}
 
 		IGqlClient::GqlRequestPtr requestPtr;
-		
 		requestPtr.MoveCastedPtr(request.CloneMe());
 		if (!requestPtr.IsValid()){
-			errorMessage = QString("Request is invalid");
-
+			errorMessage = QStringLiteral("Request is invalid");
 			return SdlClass();
+		}
+
+		IGqlClient::GqlResponsePtr responsePtr = m_apiClientCompPtr->SendRequest(requestPtr);
+		if (!responsePtr.IsValid()){
+			errorMessage = QStringLiteral("Response is invalid");
+			return SdlClass();
+		}
+
+		const QByteArray responseData = responsePtr->GetResponseData();
+		const QJsonDocument document = QJsonDocument::fromJson(responseData);
+		if (!document.isObject()){
+			errorMessage = QStringLiteral("Response is invalid");
+			return SdlClass();
+		}
+
+		QJsonObject object = document.object();
+
+		const QJsonValue payloadValue = object.value(QStringLiteral("payload"));
+		if (payloadValue.isObject()){
+			object = payloadValue.toObject();
+		}
+
+		const QJsonValue errorsValue = object.value(QStringLiteral("errors"));
+		if (errorsValue.isArray()){
+			const QJsonArray errorArr = errorsValue.toArray();
+			if (!errorArr.isEmpty()){
+				const QJsonValue firstError = errorArr.at(0);
+				if (firstError.isObject()){
+					errorMessage = firstError.toObject().value(QStringLiteral("message")).toString();
+				}
+			}
+
+			SdlClass response;
+			response.Version_1_0.emplace();
+			return response;
+		}
+
+		const QJsonValue dataValue = object.value(QStringLiteral("data"));
+		if (dataValue.isObject()){
+			object = dataValue.toObject();
+
+			const QString commandId = request.GetCommandId();
+			const QJsonValue commandValue = object.value(commandId);
+			if (commandValue.isObject()){
+				object = commandValue.toObject();
+			}
 		}
 
 		SdlClass response;
 		response.Version_1_0.emplace();
 
-		IGqlClient::GqlRequestPtr gqlRequestPtr(requestPtr);
-		IGqlClient::GqlResponsePtr responsePtr = m_apiClientCompPtr->SendRequest(gqlRequestPtr);
-		if (!responsePtr.IsValid()){
-			errorMessage = QString("Response is invalid");
-			return response;
-		}
-
-		QByteArray responseData = responsePtr->GetResponseData();
-		QJsonDocument document = QJsonDocument::fromJson(responseData);
-		if (!document.isObject()){
-			errorMessage = QString("Response is invalid");
-			return response;
-		}
-
-		bool isError = false;
-		QJsonObject object = document.object();
-
-		if (object.contains("payload")){
-			object = object.value("payload").toObject();
-		}
-
-		if (object.contains("errors")){
-			object = object.value("errors").toObject();
-			isError = true;
-		}
-		else if (object.contains("data")){
-			object = object.value("data").toObject();
-		}
-
-		if (object.contains(request.GetCommandId())){
-			object = object.value(request.GetCommandId()).toObject();
-		}
-
-		if (isError){
-			errorMessage = object.value("message").toString();
-			return response;
-		}
-
 		if (!response.Version_1_0->ReadFromJsonObject(object)){
-			errorMessage = QString("Response parsing error");
-			return response;
+			errorMessage = QStringLiteral("Response parsing error");
 		}
 
 		return response;

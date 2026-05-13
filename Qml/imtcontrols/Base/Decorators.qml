@@ -10,6 +10,7 @@ StyleComponents {
 	property string styleId: "StyleAcf"
 	menuPanelButtonDecorator: menuPanelButtonDecoratorComp
 	subMenuPanelButtonDecorator: subMenuPanelButtonDecoratorComp
+	menuPanelDecorator: Component{Item{}}
 	filterPanelDecorator: filterPanelDecoratorComp
 	// bottomPanelDecorator: bottomPanelDecoratorComp
 	topButtonDecorator: topButtonDecoratorComp
@@ -559,6 +560,7 @@ StyleComponents {
 
 			property var baseElement: null;
 			property bool checked: !baseElement ? false : baseElement.checked;
+			property bool readOnly: !baseElement ? false : baseElement.readOnly;
 
 			property int mainMargin: !baseElement ? 0 : Style.marginS;
 			property string text: !baseElement ? "" : baseElement.text == undefined ? "" : baseElement.text;
@@ -594,7 +596,7 @@ StyleComponents {
 				width: switchItem.height;
 				height: width;
 				radius: width;
-				color: !switchItem.baseElement ? "transparent" : switchItem.checked ? switchItem.baseElement.controlColorChecked :
+				color: switchItem.readOnly ? switchItem.baseElement.controlColor : !switchItem.baseElement ? "transparent" : switchItem.checked ? switchItem.baseElement.controlColorChecked :
 																					  switchItem.baseElement.controlColor;
 			}
 
@@ -1182,7 +1184,7 @@ StyleComponents {
 
 						anchors.centerIn: circle;
 
-						height: circle.height - 8;
+						height: circle.height - 4;
 						width: height;
 						radius: width;
 						color: !radioButtonItem.baseElement ? "transparent" : radioButtonItem.baseElement.selectedColor;
@@ -1244,7 +1246,9 @@ StyleComponents {
 
 				anchors.left: textAreaItem.left;
 				anchors.leftMargin: !textAreaItem.baseElement ? 0 : textAreaItem.baseElement.margin;
-				anchors.verticalCenter: textAreaItem.verticalCenter;
+				anchors.verticalCenter: !textAreaItem.baseElement ? undefined : textAreaItem.baseElement.placeHolderVerticalCentered ? textAreaItem.verticalCenter : undefined;
+				anchors.top: !textAreaItem.baseElement ? undefined : !textAreaItem.baseElement.placeHolderVerticalCentered ? textAreaItem.top : undefined;
+				anchors.topMargin: !textAreaItem.baseElement ? 0 : !textAreaItem.baseElement.placeHolderVerticalCentered ? textAreaItem.baseElement.margin : 0;
 
 
 				font.pixelSize: Style.fontSizeM;

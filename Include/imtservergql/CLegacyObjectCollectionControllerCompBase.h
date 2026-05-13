@@ -1,5 +1,10 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
+
+// Qt includes
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonArray>
 
 // ACF includes
 #include <iprm/CParamsSet.h>
@@ -70,7 +75,7 @@ public:
 	};
 
 	// reimplemented (imtservergql::CGqlRequestHandlerCompBase)
-	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual QJsonObject CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 	// reimplemented (imtgql::IGqlRequestExtractor)
 	virtual istd::IChangeableUniquePtr ExtractObject(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& errorMessage) const override;
@@ -81,26 +86,26 @@ protected:
 	virtual bool GetOperationFromRequest(const imtgql::CGqlRequest& gqlRequest, imtgql::CGqlParamObject& gqlObject, QString& errorMessage, int& operationType) const;
 	virtual QByteArray GetObjectIdFromInputParams(const imtgql::CGqlParamObject &inputParams) const;
 	virtual QByteArray GetObjectIdFromRequest(const imtgql::CGqlRequest& gqlRequest) const;
-	virtual imtbase::CTreeItemModel* GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* InsertObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* UpdateObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* UpdateCollection(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* RenameObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* SetObjectDescription(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* GetElementsCount(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* GetElementIds(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* DeleteObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* GetHeaders(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* GetTreeItemModel(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* GetDependencies(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject InsertObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject UpdateObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject UpdateCollection(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject RenameObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject SetObjectDescription(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject GetElementsCount(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject GetElementIds(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject DeleteObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject GetHeaders(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject GetTreeItemModel(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject GetDependencies(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	/// \todo rename to GetElementMetaInfo
-	virtual imtbase::CTreeItemModel* GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* GetInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* GetDataMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* GetObjectHistory(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* ImportObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* ExportObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject GetInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject GetDataMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject GetObjectHistory(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject ImportObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject ExportObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 
 	virtual bool ConvertObject(const istd::IChangeable& source, istd::IChangeable& target) const;
 	virtual int GetObjectTypeIdIndex(const QByteArray& typeId) const;
@@ -111,15 +116,13 @@ protected:
 	*/
 	virtual bool SetupGqlItem(
 			const imtgql::CGqlRequest& gqlRequest,
-			imtbase::CTreeItemModel& model,
-			int itemIndex,
+			QJsonObject& itemObj,
 			const QByteArray& collectionId,
 			QString& errorMessage) const;
 
 	virtual bool SetupGqlItem(
 			const imtgql::CGqlRequest& gqlRequest,
-			imtbase::CTreeItemModel& model,
-			int itemIndex,
+			QJsonObject& itemObj,
 			const imtbase::IObjectCollectionIterator* objectCollectionIterator,
 			QString& errorMessage) const;
 
@@ -145,7 +148,7 @@ protected:
 				const istd::IChangeable& data,
 				const QByteArray& objectTypeId,
 				const imtgql::CGqlRequest& gqlRequest,
-				imtbase::CTreeItemModel& dataModel,
+				QJsonObject& dataObj,
 				QString& errorMessage) const;
 
 	/**

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtcol/CDocumentIdFilter.h>
 
 
@@ -15,7 +16,7 @@ namespace imtcol
 // public methods
 
 CDocumentIdFilter::	CDocumentIdFilter()
-	:m_conditionType(CT_IN)
+	:m_conditionType(CT_NONE)
 {
 }
 
@@ -109,7 +110,7 @@ istd::IChangeableUniquePtr CDocumentIdFilter::CloneMe(CompatibilityMode /*mode*/
 bool CDocumentIdFilter::ResetData(CompatibilityMode /*mode*/)
 {
 	m_documentIds.clear();
-	m_conditionType = CT_IN;
+	m_conditionType = CT_NONE;
 
 	return true;
 }

@@ -1,10 +1,11 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtrest/CHttpRedirectComp.h>
 
 
 // ImtCore includes
-#include <imthttp/CHttpRequest.h>
-#include <imthttp/CHttpResponse.h>
-#include <imthttp/IProtocolEngine.h>
+#include <imtrest/CHttpRequest.h>
+#include <imtrest/CHttpResponse.h>
+#include <imtrest/IProtocolEngine.h>
 
 
 namespace imtrest
@@ -19,7 +20,7 @@ bool CHttpRedirectComp::IsCommandSupported(const QByteArray& commandId) const
 }
 
 
-imthttp::ConstResponsePtr CHttpRedirectComp::ProcessRequest(const imthttp::IRequest& request, const QByteArray& /*subCommandId*/) const
+ConstResponsePtr CHttpRedirectComp::ProcessRequest(const IRequest& request, const QByteArray& /*subCommandId*/) const
 {
 	QByteArray commandId = request.GetCommandId();
 	if (commandId.startsWith('/')){
@@ -36,7 +37,7 @@ imthttp::ConstResponsePtr CHttpRedirectComp::ProcessRequest(const imthttp::IRequ
 		body.append(*m_redirectToCommandIdAttrPtr);
 		body.append(R"(" /></head>)");
 
-		imthttp::ConstResponsePtr retval = ConstResponsePtr(request.GetProtocolEngine()
+		ConstResponsePtr retval = ConstResponsePtr(request.GetProtocolEngine()
 			.CreateResponse(
 				request,
 				IProtocolEngine::SC_MOVED_PERMANENTLY,
@@ -46,7 +47,7 @@ imthttp::ConstResponsePtr CHttpRedirectComp::ProcessRequest(const imthttp::IRequ
 		return retval;
 	}
 
-	imthttp::ConstResponsePtr retval = ConstResponsePtr(request.GetProtocolEngine()
+	ConstResponsePtr retval = ConstResponsePtr(request.GetProtocolEngine()
 		.CreateResponse(
 			request,
 			IProtocolEngine::SC_NOT_FOUND,

@@ -20,6 +20,8 @@ bool CPrinterSpecificationBase::V1_0::operator==(const V1_0& other) const
 
 bool CPrinterSpecificationBase::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
+	model.SetData("__typename", "PrinterSpecificationBase", modelIndex);
+
 	if (name){
 		model.SetData("name", *name, modelIndex);
 	}
@@ -57,6 +59,8 @@ bool CPrinterSpecificationBase::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamOb
 		gqlObject.InsertParam("name", QVariant(*name));
 	}
 
+	gqlObject.InsertParam("__typename", QVariant("PrinterSpecificationBase"));
+
 	return true;
 }
 
@@ -86,6 +90,8 @@ bool CPrinterSpecificationBase::V1_0::WriteToJsonObject(QJsonObject& jsonObject)
 	if (name){
 		jsonObject["name"] = QJsonValue::fromVariant(*name);
 	}
+
+	jsonObject["__typename"] = "PrinterSpecificationBase";
 
 	return true;
 }
@@ -358,7 +364,11 @@ bool CLink::V1_0::operator==(const V1_0& other) const
 
 bool CLink::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
+	model.SetData("__typename", "Link", modelIndex);
+
 	if (!link){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "link").toLocal8Bit().constData();)
+
 		return false;
 	}
 	model.SetData("link", *link, modelIndex);
@@ -396,9 +406,13 @@ bool CLink::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int m
 bool CLink::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!link){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "link").toLocal8Bit().constData();)
+
 		return false;
 	}
 	gqlObject.InsertParam("link", QVariant(*link));
+
+	gqlObject.InsertParam("__typename", QVariant("Link"));
 
 	return true;
 }
@@ -430,9 +444,13 @@ bool CLink::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlO
 bool CLink::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!link){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "link").toLocal8Bit().constData();)
+
 		return false;
 	}
-	jsonObject["link"] = QJsonValue::fromVariant(*link);
+	jsonObject["link"] = QString::fromUtf8(*link);
+
+	jsonObject["__typename"] = "Link";
 
 	return true;
 }
@@ -711,24 +729,28 @@ bool CPrinterBase::V1_0::operator==(const V1_0& other) const
 
 bool CPrinterBase::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
+	model.SetData("__typename", "PrinterBase", modelIndex);
+
 	if (name){
 		model.SetData("name", *name, modelIndex);
 	}
 
 	if (!specification){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "specification").toLocal8Bit().constData();)
+
 		return false;
 	}
 	QVariant specificationVariantValue;
-		if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>(specification.GetPtr())){
-			if (!val->WriteToModel(*(model.AddTreeModel("specification", modelIndex)), 0)){
+		if (const CPrinterSpecificationBase* printerSpecificationBaseVal = std::get_if<CPrinterSpecificationBase>(specification.GetPtr())){
+			if (!printerSpecificationBaseVal->WriteToModel(*(model.AddTreeModel("specification", modelIndex)), 0)){
 				return false;
 			}
 			if(model.GetTreeItemModel("specification", modelIndex) != nullptr){
 				model.GetTreeItemModel("specification", modelIndex)->SetData("__typename", "PrinterSpecificationBase", 0);
 			}
 		}
-		else if (const CLink* val = std::get_if<CLink>(specification.GetPtr())){
-			if (!val->WriteToModel(*(model.AddTreeModel("specification", modelIndex)), 0)){
+		else if (const CLink* linkVal = std::get_if<CLink>(specification.GetPtr())){
+			if (!linkVal->WriteToModel(*(model.AddTreeModel("specification", modelIndex)), 0)){
 				return false;
 			}
 			if(model.GetTreeItemModel("specification", modelIndex) != nullptr){
@@ -738,26 +760,30 @@ bool CPrinterBase::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int mode
 
 
 	if (!simpleTest){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "simpleTest").toLocal8Bit().constData();)
+
 		return false;
 	}
 	QVariant simpleTestVariantValue;
-		if (const QString* val = std::get_if<QString>(simpleTest.GetPtr())){
-			model.SetData("", *val);
+		if (const QString* stringVal = std::get_if<QString>(simpleTest.GetPtr())){
+			model.SetData("", *stringVal);
 		}
-		else if (const double* val = std::get_if<double>(simpleTest.GetPtr())){
-			model.SetData("", *val);
+		else if (const double* doubleVal = std::get_if<double>(simpleTest.GetPtr())){
+			model.SetData("", *doubleVal);
 		}
 
 
 	if (!mixedTest){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "mixedTest").toLocal8Bit().constData();)
+
 		return false;
 	}
 	QVariant mixedTestVariantValue;
-		if (const QString* val = std::get_if<QString>(mixedTest.GetPtr())){
-			model.SetData("", *val);
+		if (const QString* stringVal = std::get_if<QString>(mixedTest.GetPtr())){
+			model.SetData("", *stringVal);
 		}
-		else if (const CLink* val = std::get_if<CLink>(mixedTest.GetPtr())){
-			if (!val->WriteToModel(*(model.AddTreeModel("mixedTest", modelIndex)), 0)){
+		else if (const CLink* linkVal = std::get_if<CLink>(mixedTest.GetPtr())){
+			if (!linkVal->WriteToModel(*(model.AddTreeModel("mixedTest", modelIndex)), 0)){
 				return false;
 			}
 			if(model.GetTreeItemModel("mixedTest", modelIndex) != nullptr){
@@ -784,7 +810,7 @@ bool CPrinterBase::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 
 		return false;
 	}
-	QString specificationTypename = specificationData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
+	QString specificationTypename = model.GetTreeItemModel("specification", modelIndex)->GetData("__typename").toString();
 	if (specificationTypename == "PrinterSpecificationBase") {
 		CPrinterSpecificationBase specificationConvert;
 		const bool isspecificationRead = specificationConvert.ReadFromModel(*model.GetTreeItemModel("specification", modelIndex)); 
@@ -808,7 +834,6 @@ bool CPrinterBase::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 
 		return false;
 	}
-	QString simpleTestTypename = simpleTestData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
 	if (simpleTestData.canConvert<QString>()){
 		simpleTest = SimpleUnion(simpleTestData.value<QString>());
 	}
@@ -822,7 +847,7 @@ bool CPrinterBase::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 
 		return false;
 	}
-	QString mixedTestTypename = mixedTestData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
+	QString mixedTestTypename = model.GetTreeItemModel("mixedTest", modelIndex)->GetData("__typename").toString();
 	if (mixedTestData.canConvert<QString>()){
 		mixedTest = MixedUnion(mixedTestData.value<QString>());
 	}
@@ -848,7 +873,7 @@ bool CPrinterBase::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 
 	QVariant specificationData = model.GetData("specification", modelIndex);
 	if (!specificationData.isNull()){
-		QString specificationTypename = specificationData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
+		QString specificationTypename = model.GetTreeItemModel("specification", modelIndex)->GetData("__typename").toString();
 		if (specificationTypename == "PrinterSpecificationBase") {
 			CPrinterSpecificationBase specificationConvert;
 			const bool isspecificationRead = specificationConvert.ReadFromModel(*model.GetTreeItemModel("specification", modelIndex)); 
@@ -869,7 +894,6 @@ bool CPrinterBase::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 
 	QVariant simpleTestData = model.GetData("simpleTest", modelIndex);
 	if (!simpleTestData.isNull()){
-		QString simpleTestTypename = simpleTestData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
 		if (simpleTestData.canConvert<QString>()){
 			simpleTest = SimpleUnion(simpleTestData.value<QString>());
 		}
@@ -880,7 +904,7 @@ bool CPrinterBase::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 
 	QVariant mixedTestData = model.GetData("mixedTest", modelIndex);
 	if (!mixedTestData.isNull()){
-		QString mixedTestTypename = mixedTestData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
+		QString mixedTestTypename = model.GetTreeItemModel("mixedTest", modelIndex)->GetData("__typename").toString();
 		if (mixedTestData.canConvert<QString>()){
 			mixedTest = MixedUnion(mixedTestData.value<QString>());
 		}
@@ -905,17 +929,19 @@ bool CPrinterBase::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 	}
 
 	if (!specification){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "specification").toLocal8Bit().constData();)
+
 		return false;
 	}
 	::imtgql::CGqlParamObject specificationDataObject;
-	if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>(specification.GetPtr())){
-		if (!val->WriteToGraphQlObject(specificationDataObject)){
+	if (const CPrinterSpecificationBase* printerSpecificationBaseVal = std::get_if<CPrinterSpecificationBase>(specification.GetPtr())){
+		if (!printerSpecificationBaseVal->WriteToGraphQlObject(specificationDataObject)){
 			return false;
 		}
 		specificationDataObject.InsertParam("__typename", QVariant("PrinterSpecificationBase"));
 	}
-	else if (const CLink* val = std::get_if<CLink>(specification.GetPtr())){
-		if (!val->WriteToGraphQlObject(specificationDataObject)){
+	else if (const CLink* linkVal = std::get_if<CLink>(specification.GetPtr())){
+		if (!linkVal->WriteToGraphQlObject(specificationDataObject)){
 			return false;
 		}
 		specificationDataObject.InsertParam("__typename", QVariant("Link"));
@@ -923,31 +949,37 @@ bool CPrinterBase::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 	gqlObject.InsertParam("specification", specificationDataObject);
 
 	if (!simpleTest){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "simpleTest").toLocal8Bit().constData();)
+
 		return false;
 	}
 	::imtgql::CGqlParamObject simpleTestDataObject;
-	if (const QString* val = std::get_if<QString>(simpleTest.GetPtr())){
-		simpleTestDataObject.InsertParam("simpleTest", *val);
+	if (const QString* stringVal = std::get_if<QString>(simpleTest.GetPtr())){
+		simpleTestDataObject.InsertParam("simpleTest", *stringVal);
 	}
-	else if (const double* val = std::get_if<double>(simpleTest.GetPtr())){
-		simpleTestDataObject.InsertParam("simpleTest", *val);
+	else if (const double* doubleVal = std::get_if<double>(simpleTest.GetPtr())){
+		simpleTestDataObject.InsertParam("simpleTest", *doubleVal);
 	}
 	gqlObject.InsertParam("simpleTest", simpleTestDataObject);
 
 	if (!mixedTest){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "mixedTest").toLocal8Bit().constData();)
+
 		return false;
 	}
 	::imtgql::CGqlParamObject mixedTestDataObject;
-	if (const QString* val = std::get_if<QString>(mixedTest.GetPtr())){
-		mixedTestDataObject.InsertParam("mixedTest", *val);
+	if (const QString* stringVal = std::get_if<QString>(mixedTest.GetPtr())){
+		mixedTestDataObject.InsertParam("mixedTest", *stringVal);
 	}
-	else if (const CLink* val = std::get_if<CLink>(mixedTest.GetPtr())){
-		if (!val->WriteToGraphQlObject(mixedTestDataObject)){
+	else if (const CLink* linkVal = std::get_if<CLink>(mixedTest.GetPtr())){
+		if (!linkVal->WriteToGraphQlObject(mixedTestDataObject)){
 			return false;
 		}
 		mixedTestDataObject.InsertParam("__typename", QVariant("Link"));
 	}
 	gqlObject.InsertParam("mixedTest", mixedTestDataObject);
+
+	gqlObject.InsertParam("__typename", QVariant("PrinterBase"));
 
 	return true;
 }
@@ -1105,20 +1137,22 @@ bool CPrinterBase::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 	}
 
 	if (!specification){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "specification").toLocal8Bit().constData();)
+
 		return false;
 	}
-	if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>(specification.GetPtr())){
+	if (const CPrinterSpecificationBase* printerSpecificationBaseVal = std::get_if<CPrinterSpecificationBase>(specification.GetPtr())){
 		QJsonObject specificationJsonObject;
-		const bool isspecificationAdded = val->WriteToJsonObject(specificationJsonObject);
+		const bool isspecificationAdded = printerSpecificationBaseVal->WriteToJsonObject(specificationJsonObject);
 		if (!isspecificationAdded){
 			return false;
 		}
 		specificationJsonObject["__typename"] = "PrinterSpecificationBase";
 		jsonObject["specification"] = specificationJsonObject;
 	}
-	else if (const CLink* val = std::get_if<CLink>(specification.GetPtr())){
+	else if (const CLink* linkVal = std::get_if<CLink>(specification.GetPtr())){
 		QJsonObject specificationJsonObject;
-		const bool isspecificationAdded = val->WriteToJsonObject(specificationJsonObject);
+		const bool isspecificationAdded = linkVal->WriteToJsonObject(specificationJsonObject);
 		if (!isspecificationAdded){
 			return false;
 		}
@@ -1128,34 +1162,38 @@ bool CPrinterBase::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 
 
 	if (!simpleTest){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "simpleTest").toLocal8Bit().constData();)
+
 		return false;
 	}
-	if (const QString* val = std::get_if<QString>(simpleTest.GetPtr())){
+	if (const QString* stringVal = std::get_if<QString>(simpleTest.GetPtr())){
 		if (!simpleTest){
 			return false;
 		}
-		jsonObject["simpleTest"] = QJsonValue::fromVariant(*val);
+		jsonObject["simpleTest"] = QJsonValue::fromVariant(*stringVal);
 	}
-	else if (const double* val = std::get_if<double>(simpleTest.GetPtr())){
+	else if (const double* doubleVal = std::get_if<double>(simpleTest.GetPtr())){
 		if (!simpleTest){
 			return false;
 		}
-		jsonObject["simpleTest"] = QJsonValue::fromVariant(*val);
+		jsonObject["simpleTest"] = QJsonValue::fromVariant(*doubleVal);
 	}
 
 
 	if (!mixedTest){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "mixedTest").toLocal8Bit().constData();)
+
 		return false;
 	}
-	if (const QString* val = std::get_if<QString>(mixedTest.GetPtr())){
+	if (const QString* stringVal = std::get_if<QString>(mixedTest.GetPtr())){
 		if (!mixedTest){
 			return false;
 		}
-		jsonObject["mixedTest"] = QJsonValue::fromVariant(*val);
+		jsonObject["mixedTest"] = QJsonValue::fromVariant(*stringVal);
 	}
-	else if (const CLink* val = std::get_if<CLink>(mixedTest.GetPtr())){
+	else if (const CLink* linkVal = std::get_if<CLink>(mixedTest.GetPtr())){
 		QJsonObject mixedTestJsonObject;
-		const bool ismixedTestAdded = val->WriteToJsonObject(mixedTestJsonObject);
+		const bool ismixedTestAdded = linkVal->WriteToJsonObject(mixedTestJsonObject);
 		if (!ismixedTestAdded){
 			return false;
 		}
@@ -1163,6 +1201,8 @@ bool CPrinterBase::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		jsonObject["mixedTest"] = mixedTestJsonObject;
 	}
 
+
+	jsonObject["__typename"] = "PrinterBase";
 
 	return true;
 }
@@ -1560,6 +1600,8 @@ bool CPrinterList::V1_0::operator==(const V1_0& other) const
 
 bool CPrinterList::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
+	model.SetData("__typename", "PrinterList", modelIndex);
+
 	if (data){
 		::imtbase::CTreeItemModel* newDataModelPtr = model.AddTreeModel("data", modelIndex);
 		newDataModelPtr->setIsArray(true);
@@ -1639,6 +1681,8 @@ bool CPrinterList::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 		gqlObject.InsertParam("data", dataDataObjectList);
 	}
 
+	gqlObject.InsertParam("__typename", QVariant("PrinterList"));
+
 	return true;
 }
 
@@ -1714,6 +1758,8 @@ bool CPrinterList::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		}
 		jsonObject["data"] = newDataArray;
 	}
+
+	jsonObject["__typename"] = "PrinterList";
 
 	return true;
 }
@@ -2002,7 +2048,7 @@ CPrinterSpecificationBaseObject::CPrinterSpecificationBaseObject(QObject* parent
 
 QVariant CPrinterSpecificationBaseObject::GetName()
 {
-	if (Version_1_0->name.has_value()){
+	if (Version_1_0 && Version_1_0->name){
 		return Version_1_0->name.value();
 	}
 
@@ -2012,6 +2058,10 @@ QVariant CPrinterSpecificationBaseObject::GetName()
 
 void CPrinterSpecificationBaseObject::SetName(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->name = v.value<QString>();
 	nameChanged();
 }
@@ -2019,7 +2069,7 @@ void CPrinterSpecificationBaseObject::SetName(const QVariant& v)
 
 bool CPrinterSpecificationBaseObject::hasName()
 {
-	 return Version_1_0->name.HasValue();
+	 return Version_1_0 && Version_1_0->name.HasValue();
 }
 
 
@@ -2171,13 +2221,16 @@ QVariant sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObjectList::getData(
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObject*>();
-	if (itemPtr == nullptr) return QVariant();
+	if (itemPtr == nullptr){
+		return QVariant();
+	}
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
-		if (nameId == "m_name"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->name.value());
-		}
+	if (nameId == "m_name"){
+		return QVariant::fromValue(Version_1_0->at(index)->name.value());
+	}
+
 	return QVariant();
 }
 CLinkObject::CLinkObject(QObject* parent): ::imtbase::CItemModelBase(parent){
@@ -2189,7 +2242,7 @@ CLinkObject::CLinkObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 
 QVariant CLinkObject::GetLink()
 {
-	if (Version_1_0->link.has_value()){
+	if (Version_1_0 && Version_1_0->link){
 		return Version_1_0->link.value();
 	}
 
@@ -2199,6 +2252,10 @@ QVariant CLinkObject::GetLink()
 
 void CLinkObject::SetLink(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->link = v.value<QString>().toUtf8();
 	linkChanged();
 }
@@ -2206,7 +2263,7 @@ void CLinkObject::SetLink(const QVariant& v)
 
 bool CLinkObject::hasLink()
 {
-	 return Version_1_0->link.HasValue();
+	 return Version_1_0 && Version_1_0->link.HasValue();
 }
 
 
@@ -2358,13 +2415,16 @@ QVariant sdl::modsdl::PrinterBase::CLinkObjectList::getData(const QString& nameI
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::modsdl::PrinterBase::CLinkObject*>();
-	if (itemPtr == nullptr) return QVariant();
+	if (itemPtr == nullptr){
+		return QVariant();
+	}
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
-		if (nameId == "m_link"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->link.value());
-		}
+	if (nameId == "m_link"){
+		return QVariant::fromValue(Version_1_0->at(index)->link.value());
+	}
+
 	return QVariant();
 }
 CPrinterBaseObject::CPrinterBaseObject(QObject* parent): ::imtbase::CItemModelBase(parent){
@@ -2379,7 +2439,7 @@ CPrinterBaseObject::CPrinterBaseObject(QObject* parent): ::imtbase::CItemModelBa
 
 QVariant CPrinterBaseObject::GetName()
 {
-	if (Version_1_0->name.has_value()){
+	if (Version_1_0 && Version_1_0->name){
 		return Version_1_0->name.value();
 	}
 
@@ -2389,6 +2449,10 @@ QVariant CPrinterBaseObject::GetName()
 
 void CPrinterBaseObject::SetName(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	Version_1_0->name = v.value<QString>();
 	nameChanged();
 }
@@ -2396,13 +2460,13 @@ void CPrinterBaseObject::SetName(const QVariant& v)
 
 bool CPrinterBaseObject::hasName()
 {
-	 return Version_1_0->name.HasValue();
+	 return Version_1_0 && Version_1_0->name.HasValue();
 }
 
 
 QVariant CPrinterBaseObject::GetSpecification()
 {
-	if (Version_1_0->specification.has_value()){
+	if (Version_1_0 && Version_1_0->specification){
 		if (m_specificationQObjectPtr.isValid()){
 			if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>((Version_1_0->specification).GetPtr())){
 				CPrinterSpecificationBaseObject *newObjectPtr = new CPrinterSpecificationBaseObject(this);
@@ -2424,6 +2488,10 @@ QVariant CPrinterBaseObject::GetSpecification()
 
 void CPrinterBaseObject::SetSpecification(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	if (v.isValid()){
 		if (const CPrinterSpecificationBaseObject* val = v.value<const CPrinterSpecificationBaseObject*>()){
 			*Version_1_0->specification = *val;
@@ -2443,14 +2511,17 @@ void CPrinterBaseObject::SetSpecification(const QVariant& v)
 
 bool CPrinterBaseObject::hasSpecification()
 {
-	 return Version_1_0->specification.HasValue();
+	 return Version_1_0 && Version_1_0->specification.HasValue();
 }
 
 
-void CPrinterBaseObject::createSpecification()
+void CPrinterBaseObject::emplaceSpecification()
 {
+	ResetSpecification();
+	if(!Version_1_0){
+		Version_1_0.emplace();
+	}
 	Version_1_0->specification.emplace();
-
 }
 
 
@@ -2466,7 +2537,7 @@ void CPrinterBaseObject::ResetSpecification()
 
 QVariant CPrinterBaseObject::GetSimpleTest()
 {
-	if (Version_1_0->simpleTest.has_value()){
+	if (Version_1_0 && Version_1_0->simpleTest){
 		if (m_simpleTestQObjectPtr.isValid()){
 			if (const QString* val = std::get_if<QString>((Version_1_0->simpleTest).GetPtr())){
 				m_simpleTestQObjectPtr = QVariant::fromValue(val);
@@ -2484,6 +2555,10 @@ QVariant CPrinterBaseObject::GetSimpleTest()
 
 void CPrinterBaseObject::SetSimpleTest(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	if (v.isValid()){
 		if (const QString* val = v.value<const QString*>()){
 			*Version_1_0->simpleTest = *val;
@@ -2503,14 +2578,17 @@ void CPrinterBaseObject::SetSimpleTest(const QVariant& v)
 
 bool CPrinterBaseObject::hasSimpleTest()
 {
-	 return Version_1_0->simpleTest.HasValue();
+	 return Version_1_0 && Version_1_0->simpleTest.HasValue();
 }
 
 
-void CPrinterBaseObject::createSimpleTest()
+void CPrinterBaseObject::emplaceSimpleTest()
 {
+	ResetSimpleTest();
+	if(!Version_1_0){
+		Version_1_0.emplace();
+	}
 	Version_1_0->simpleTest.emplace();
-
 }
 
 
@@ -2526,7 +2604,7 @@ void CPrinterBaseObject::ResetSimpleTest()
 
 QVariant CPrinterBaseObject::GetMixedTest()
 {
-	if (Version_1_0->mixedTest.has_value()){
+	if (Version_1_0 && Version_1_0->mixedTest){
 		if (m_mixedTestQObjectPtr.isValid()){
 			if (const QString* val = std::get_if<QString>((Version_1_0->mixedTest).GetPtr())){
 				m_mixedTestQObjectPtr = QVariant::fromValue(val);
@@ -2546,6 +2624,10 @@ QVariant CPrinterBaseObject::GetMixedTest()
 
 void CPrinterBaseObject::SetMixedTest(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	if (v.isValid()){
 		if (const QString* val = v.value<const QString*>()){
 			*Version_1_0->mixedTest = *val;
@@ -2565,14 +2647,17 @@ void CPrinterBaseObject::SetMixedTest(const QVariant& v)
 
 bool CPrinterBaseObject::hasMixedTest()
 {
-	 return Version_1_0->mixedTest.HasValue();
+	 return Version_1_0 && Version_1_0->mixedTest.HasValue();
 }
 
 
-void CPrinterBaseObject::createMixedTest()
+void CPrinterBaseObject::emplaceMixedTest()
 {
+	ResetMixedTest();
+	if(!Version_1_0){
+		Version_1_0.emplace();
+	}
 	Version_1_0->mixedTest.emplace();
-
 }
 
 
@@ -2743,22 +2828,25 @@ QVariant sdl::modsdl::PrinterBase::CPrinterBaseObjectList::getData(const QString
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::modsdl::PrinterBase::CPrinterBaseObject*>();
-	if (itemPtr == nullptr) return QVariant();
+	if (itemPtr == nullptr){
+		return QVariant();
+	}
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
-		if (nameId == "m_name"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->name.value());
-		}
-		if (nameId == "m_specification"){
-			return itemPtr->GetSpecification();
-		}
-		if (nameId == "m_simpleTest"){
-			return itemPtr->GetSimpleTest();
-		}
-		if (nameId == "m_mixedTest"){
-			return itemPtr->GetMixedTest();
-		}
+	if (nameId == "m_name"){
+		return QVariant::fromValue(Version_1_0->at(index)->name.value());
+	}
+	if (nameId == "m_specification"){
+		return itemPtr->GetSpecification();
+	}
+	if (nameId == "m_simpleTest"){
+		return itemPtr->GetSimpleTest();
+	}
+	if (nameId == "m_mixedTest"){
+		return itemPtr->GetMixedTest();
+	}
+
 	return QVariant();
 }
 CPrinterListObject::CPrinterListObject(QObject* parent): ::imtbase::CItemModelBase(parent){
@@ -2770,7 +2858,7 @@ CPrinterListObject::CPrinterListObject(QObject* parent): ::imtbase::CItemModelBa
 
 QVariant CPrinterListObject::GetData()
 {
-	if (Version_1_0->data.has_value()){
+	if (Version_1_0 && Version_1_0->data){
 		if (!m_dataQObjectPtr.isValid()){
 			m_dataQObjectPtr = CreateObject("data");
 			auto itemPtr = m_dataQObjectPtr.value<sdl::modsdl::PrinterBase::CPrinterBaseObjectList*>();
@@ -2785,6 +2873,10 @@ QVariant CPrinterListObject::GetData()
 
 void CPrinterListObject::SetData(const QVariant& v)
 {
+	if (!Version_1_0){
+		Version_1_0.emplace();
+	}
+
 	if (v.isValid()){
 		sdl::modsdl::PrinterBase::CPrinterBaseObjectList* itemPtr = v.value<sdl::modsdl::PrinterBase::CPrinterBaseObjectList*>();
 		if (itemPtr != nullptr)  Version_1_0->data = itemPtr->Version_1_0;
@@ -2800,14 +2892,17 @@ void CPrinterListObject::SetData(const QVariant& v)
 
 bool CPrinterListObject::hasData()
 {
-	 return Version_1_0->data.HasValue();
+	 return Version_1_0 && Version_1_0->data.HasValue();
 }
 
 
-void CPrinterListObject::createData()
+void CPrinterListObject::emplaceData()
 {
+	ResetData();
+	if(!Version_1_0){
+		Version_1_0.emplace();
+	}
 	Version_1_0->data.emplace();
-
 }
 
 
@@ -2818,6 +2913,13 @@ void CPrinterListObject::ResetData()
 		itemPtr->deleteLater();
 	}
 	m_dataQObjectPtr = QVariant();
+}
+
+
+QVariant CPrinterListObject::createDataArrayElement(const QVariant& v)
+{
+	Q_UNUSED(v);
+	return QVariant::fromValue(new sdl::modsdl::PrinterBase::CPrinterBaseObject());
 }
 
 
@@ -2972,13 +3074,16 @@ QVariant sdl::modsdl::PrinterBase::CPrinterListObjectList::getData(const QString
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::modsdl::PrinterBase::CPrinterListObject*>();
-	if (itemPtr == nullptr) return QVariant();
+	if (itemPtr == nullptr){
+		return QVariant();
+	}
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
-		if (nameId == "m_data"){
-			return itemPtr->GetData();
-		}
+	if (nameId == "m_data"){
+		return itemPtr->GetData();
+	}
+
 	return QVariant();
 }
 
@@ -3724,11 +3829,11 @@ bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlR
 }
 
 
-::imtbase::CTreeItemModel* CGraphQlHandlerCompBase::CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CGraphQlHandlerCompBase::CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	const QByteArray commandId = gqlRequest.GetCommandId();
-	istd::TDelPtr<::imtbase::CTreeItemModel> modelPtr(new ::imtbase::CTreeItemModel);
-	::imtbase::CTreeItemModel* dataModelPtr = modelPtr->AddTreeModel("data");
+	QJsonObject modelObj;
+	QJsonObject dataModelObj;
 
 	// GetPrinters
 	if (commandId == CGetPrintersGqlRequest::GetCommandId()){
@@ -3737,31 +3842,31 @@ bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlR
 			errorMessage = QString("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
 			SendErrorMessage(0, errorMessage);
 
-			return nullptr;
+			return QJsonObject();
 		}
 
 		CPrinterList replyPayload = OnGetPrinters(getPrintersGqlRequest, gqlRequest, errorMessage);
 		if (!errorMessage.isEmpty()){
 			SendErrorMessage(0, QString("The derived call [OnGetPrinters] returned an error: %1").arg(errorMessage));
 
-			return nullptr;
+			return QJsonObject();
 		}
 
-		const bool isModelCreated = replyPayload.WriteToModel(*dataModelPtr);
+		const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);
 		if (!isModelCreated){
 			errorMessage = QString("Internal error. Unable to create response for command-ID: '%1'").arg(qPrintable(commandId));
 			SendCriticalMessage(0, errorMessage);
 
-			return nullptr;
+			return QJsonObject();
 		}
 
-		return modelPtr.PopPtr();
+		modelObj.insert(QStringLiteral("data"), dataModelObj); return modelObj;
 	}
 
 	errorMessage = QString("Bad request. Unexpected command-ID: '%1'").arg(qPrintable(commandId));
 	SendErrorMessage(0, errorMessage);
 
-	return nullptr;
+	return QJsonObject();
 }
 
 

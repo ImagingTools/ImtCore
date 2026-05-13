@@ -1,0 +1,206 @@
+schema {
+	query: Query
+	mutation: Mutation
+	subscription: Subscription
+	namespace: imtdesk
+	version: 1.0
+}
+
+import {
+	"../../../../ImtCore/Sdl/imtbase/1.0/ImtCollection.sdl"
+	"../../../../ImtCore/Sdl/imtbase/1.0/ImtBaseTypes.sdl"
+}
+
+# --- Enums ---
+
+enum TicketType {
+	AccessRequest
+	SupportRequest
+	FeatureRequest
+	BugReport
+}
+
+enum TicketStatus {
+	Open
+	Closed
+}
+
+enum StateReason {
+	None
+	Completed
+	NotPlanned
+	Reopened
+}
+
+enum TicketPriority {
+	Low
+	Medium
+	High
+	Critical
+}
+
+enum TicketAccessLevel {
+	FullAccess
+	LimitedAccess
+	CommentOnly
+	ViewOnly
+}
+
+# --- Label ---
+
+type LabelData {
+	id: ID!
+	name: String!
+	color: String!
+	description: String
+}
+
+# --- Entity Type ---
+
+type EntityType {
+	id: String
+	name: String
+}
+
+# --- Entity Reference ---
+
+type EntityReference {
+	entityType: String
+	entityId: ID
+	displayName: String
+	entityLink: ObjectLink
+}
+
+# --- Attachment ---
+
+type Attachment {
+	id: ID
+	fileName: String
+	mimeType: String
+	data: String
+	preview: String
+}
+
+# --- Comment ---
+
+type TicketComment {
+	id: ID
+	userId: ID
+	userName: String
+	timestamp: String
+	content: String
+	attachments: [Attachment]
+	reactions: [String]
+	replyToId: ID
+	replyToContent: String
+	replyToUserName: String
+	edited: Boolean
+	deleted: Boolean
+}
+
+# --- Ticket ---
+
+type TicketItemData {
+	id: ID!
+	typeId: ID!
+	number: Int
+	title: String!
+	ticketType: TicketType
+	status: TicketStatus
+	priority: TicketPriority
+	assignee: String
+	createdAt: String
+}
+
+type TicketData {
+	id: ID!
+	number: Int
+	title: String!
+	description: String
+	ticketType: TicketType
+	status: TicketStatus
+	stateReason: StateReason
+	priority: TicketPriority
+	assigneeIds: [ID]
+	reporterId: ID
+	conversationId: ID
+	messageId: ID
+	labelIds: [ID]
+	locked: Boolean
+	lockReason: String
+	createdAt: String
+	updatedAt: String
+	closedAt: String
+	resolvedAt: String
+	entityReferences: [EntityReference]
+	entityTypes: [EntityType]
+	comments: [TicketComment]
+	accessLevel: TicketAccessLevel
+}
+
+input TicketsListInput {
+	viewParams: CollectionViewParams
+}
+
+type TicketsListPayload {
+	items: [TicketItemData]
+	notification: NotificationItem
+}
+
+input TicketDataInput {
+	id: ID!
+	item: TicketData!
+}
+
+input EntityContextTicketsInput {
+	entityType: String!
+	entityId: ID!
+	viewParams: CollectionViewParams
+}
+
+type EntityContextTicketsPayload {
+	items: [TicketItemData]
+	notification: NotificationItem
+}
+
+input CreateEntityContextTicketInput {
+	entityType: String!
+	entityId: ID!
+	entityDisplayName: String
+	title: String!
+	description: String
+}
+
+type CreateEntityContextTicketPayload {
+	id: ID
+}
+
+# --- Subscription payloads ---
+
+type TicketId {
+	ticketId: ID!
+}
+
+type TicketStatusUpdate {
+	ticketId: ID!
+	status: TicketStatus!
+	assigneeId: ID
+}
+
+type Query {
+	TicketsList (input: TicketsListInput): TicketsListPayload!
+	EntityContextTickets (input: EntityContextTicketsInput): EntityContextTicketsPayload!
+}
+
+type Mutation {
+	CreateEntityContextTicket (input: CreateEntityContextTicketInput): CreateEntityContextTicketPayload!
+}
+
+collectionSchema {
+	type Ticket {
+		ref: TicketItemData
+		operations {
+			list: TicketsList
+		}
+	}
+}

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -6,20 +7,20 @@
 #include <QtCore/QMutex>
 
 // ImtCore includes
+#include <imtrest/IRequestServlet.h>
+#include <imtrest/ITransport.h>
+#include <imtrest/CSocket.h>
 
-#include <imthttp/ISender.h>
-#include <imthttp/CSocket.h>
 
-
-namespace imthttp
+namespace imtrest
 {
 
 class CMultiThreadServer;
 
 class CSocketThread:
 			public QThread,
-			virtual public imtrest::IRequestServlet,
-			virtual public ISender
+			virtual public IRequestServlet,
+			virtual public ITransport
 {
 	Q_OBJECT
 public:
@@ -36,12 +37,12 @@ public:
 	void SetSocketStatus(Status socketStatus);
 	Status GetSocketStatus();
 	QByteArray GetRequestId();
-	imthttp::imtrest::IRequestServlet* GetRequestServlet();
+	imtrest::IRequestServlet* GetRequestServlet();
 
 	[[nodiscard]] bool IsSecureConnection() const;
 	void EnableSecureConnection(bool isSecureConnection = true);
 
-	virtual imthttp::IRequestUniquePtr CreateRequest() const;
+	virtual imtrest::IRequestUniquePtr CreateRequest() const;
 
 	// reimplemented (QThread)
 	virtual void run() override;
@@ -50,9 +51,9 @@ public:
 	virtual bool IsCommandSupported(const QByteArray& commandId) const override;
 	virtual ConstResponsePtr ProcessRequest(const IRequest& request, const QByteArray& subCommandId = QByteArray()) const override;
 
-	// reimplemented (ISender)
+	// reimplemented (ITransport)
 	virtual bool SendResponse(ConstResponsePtr& response) const override;
-	virtual bool SendRequest(ConstRequestPtr& reguest) const override;
+	virtual bool SendRequest(ConstRequestPtr& request) const override;
 
 Q_SIGNALS:
 	void Error(QTcpSocket::SocketError socketerror);
@@ -63,8 +64,8 @@ Q_SIGNALS:
 private:
 	CMultiThreadServer* m_server;
 	qintptr m_socketDescriptor;
-	const imthttp::IProtocolEngine* m_enginePtr;
-	imthttp::imtrest::IRequestServlet* m_requestHandlerPtr;
+	const imtrest::IProtocolEngine* m_enginePtr;
+	imtrest::IRequestServlet* m_requestHandlerPtr;
 	mutable QMutex m_socketDescriptorMutex;
 	mutable QMutex m_statusMutex;
 	Status m_status;
@@ -76,6 +77,6 @@ private:
 };
 
 
-} // namespace imthttp
+} // namespace imtrest
 
 

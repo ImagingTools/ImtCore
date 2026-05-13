@@ -19,6 +19,7 @@ DecoratorBase {
 	property bool moveToEnd: !baseElement ? false : baseElement.moveToEnd;
 	property bool isUpwards: !baseElement ? false: baseElement.isUpwards;
 	property bool modelLoading: false
+	property bool hasLoading: !baseElement ? false: baseElement.hasLoading;
 
 	property string dataProviderState: !baseElement ? "ready": baseElement.dataProviderState;
 
@@ -86,6 +87,9 @@ DecoratorBase {
 	}
 
 	function setLoadingAnimVisible(visible_){
+		if(!root.hasLoading){
+			return;
+		}
 		if(loadingAnimLoader.item){
 			loadingAnimLoader.item.visible = visible_
 		}
@@ -109,17 +113,17 @@ DecoratorBase {
 		let visibleCount = root.shownItemsCount;
 		let index		 = root.selectedIndex;
 
-		if(root.baseElement && root.selectedIndex >= 0){
-			if(down_){
-				let nextElementIndex = index + 1
-				if(nextElementIndex * itemHeight > contentY + visibleCount * itemHeight){
-					popupMenuListView.contentY = nextElementIndex * itemHeight - visibleCount * itemHeight
-				}
-			}
-			else{
-				if(index * itemHeight < contentY){
-					popupMenuListView.contentY = index * itemHeight
-				}
+		if(!root.baseElement || index < 0){
+			return
+		}
+
+		if(!down_ && index * itemHeight < contentY){
+			popupMenuListView.contentY = index * itemHeight
+		}
+		else if(down_){
+			let nextElementIndex = index + 1
+			if(nextElementIndex * itemHeight > contentY + visibleCount * itemHeight){
+				popupMenuListView.contentY = nextElementIndex * itemHeight - visibleCount * itemHeight
 			}
 		}
 	}
@@ -309,7 +313,7 @@ DecoratorBase {
 					visible: !root.modelLoading
 
 					onVisibleChanged: {
-						if(mSLoadingAnimLoader.item){
+						if(mSLoadingAnimLoader.item && root.hasLoading){
 							mSLoadingAnimLoader.item.visible = !visible
 						}
 					}

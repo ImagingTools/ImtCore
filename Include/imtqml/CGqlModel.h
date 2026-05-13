@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -31,10 +32,15 @@ public Q_SLOTS:
 
 	static void SetGlobalAccessToken(const QString& accessToken);
 	static void SetRefreshToken(const QString& refreshToken);
+	static void SetProductId(const QString& productId);
+
+	Q_INVOKABLE static QString GetGlobalAccessToken();
+	Q_INVOKABLE static QString GetProductId();
 
 public:
 	static QString s_accessToken;
 	static QString s_refreshToken;
+	static QString s_productId;
 };
 
 

@@ -1,15 +1,16 @@
-#include <imthttp/CHttpSender.h>
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+#include <imtrest/CHttpSender.h>
 
 
 // Qt includes
 #include <QtCore/QDataStream>
 
 // ImtCore includes
-#include <imthttp/IResponse.h>
-#include <imthttp/IProtocolEngine.h>
+#include <imtrest/IResponse.h>
+#include <imtrest/IProtocolEngine.h>
 
 
-namespace imthttp
+namespace imtrest
 {
 
 
@@ -67,7 +68,7 @@ bool CHttpSender::SendResponse(ConstResponsePtr& response) const
 }
 
 
-bool imthttp::CHttpSender::SendRequest(ConstRequestPtr& /*reguest*/) const
+bool imtrest::CHttpSender::SendRequest(ConstRequestPtr& /*request*/) const
 {
 	return false;
 }
@@ -121,6 +122,6 @@ bool CHttpSender::WriteBody(const QByteArray& data, QAbstractSocket& socket) con
 }
 
 
-} // namespace imthttp
+} // namespace imtrest
 
 

@@ -289,7 +289,7 @@
     <ExportedInterfaces>
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="ExternGraphQlController"/>
         <Interface InterfaceId="imtgql::IGqlSubscriberController" ComponentId="ExternGraphQlPublisher"/>
-        <Interface InterfaceId="imtrest::IRequestManager" ComponentId="HttpServerFramework"/>
+        <Interface InterfaceId="imtrest::IResponseDispatcher" ComponentId="HttpServerFramework"/>
         <Interface InterfaceId="imtrest::IServer" ComponentId="HttpServerFramework"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="HttpServerFramework"/>
     </ExportedInterfaces>

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -16,15 +17,18 @@ public:
 	COperationContext();
 
 	void SetOperationOwnerId(const imtbase::IOperationContext::IdentifableObjectInfo& operationOwnerId);
+	void SetTenantId(const QByteArray& tenantId);
 	void SetOperationDescription(const QString& operationDescription);
 
 	// reimplemented (imtbase::IOperationContext)
 	virtual IdentifableObjectInfo GetOperationOwnerId() const override;
+	virtual QByteArray GetTenantId() const override;
 	virtual QString GetOperationDescription() const override;
 	virtual imtbase::IObjectCollection* GetChangesCollection() override;
 
 private:
 	IdentifableObjectInfo m_operationOwnerId;
+	QByteArray m_tenantId;
 	QString m_operationDescription;
 	imtbase::CObjectCollection m_changesCollection;
 };

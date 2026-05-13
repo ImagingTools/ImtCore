@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include "ImtAuthPck.h"
 
 
@@ -214,7 +215,62 @@ I_EXPORT_COMPONENT(
 			"User action manager",
 			"User Action manager");
 
+I_EXPORT_COMPONENT(
+			PersonalAccessToken,
+			"Personal access token",
+			"Personal Access Token");
+
+I_EXPORT_COMPONENT(
+			PersonalAccessTokenManager,
+			"Personal access token manager",
+			"Personal Access Token Manager");
+
+I_EXPORT_COMPONENT(
+			PersonalAccessTokenMetaInfoCreator,
+			"Personal access token meta info creator",
+			"Personal Access Token Meta Info Creator");
+
+I_EXPORT_COMPONENT(
+			TenantInfo,
+			"Tenant entity storing organization data (name, description, status, relationships)",
+			"Tenant Info");
+
+I_EXPORT_COMPONENT(
+			TenantMetaInfoCreator,
+			"Creates meta-information descriptors for tenant entity fields",
+			"Tenant Meta Info Creator");
+
+I_EXPORT_COMPONENT(
+			TenantManager,
+			"CRUD manager for tenant entities (create, read, update, delete, activate/deactivate)",
+			"Tenant Manager");
+
+
+I_EXPORT_COMPONENT(
+			TenantMembershipInfo,
+			"Entity representing user-to-tenant membership with role (Owner/Admin/Member/Guest)",
+			"Tenant Membership Info");
+
+I_EXPORT_COMPONENT(
+			TenantMembershipManager,
+			"CRUD manager for tenant memberships with role hierarchy and duplicate detection",
+			"Tenant Membership Manager");
+
+I_EXPORT_COMPONENT(
+			TenantInvitationInfo,
+			"Entity representing pending tenant invitation lifecycle state",
+			"Tenant Invitation Info");
+
+I_EXPORT_COMPONENT(
+			TenantInvitationManager,
+			"Manager for tenant invitations and accept/reject/revoke flows",
+			"Tenant Invitation Manager");
+
+I_EXPORT_COMPONENT(
+			TenantDocumentNameProvider,
+			"Provides default document name from tenant name",
+			"Tenant Document Name Provider");
+
 
 } // namespace ImtAuthPck
-
 

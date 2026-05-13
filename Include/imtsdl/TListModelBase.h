@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -180,12 +181,14 @@ void TListModelBase<ModelDataType, ModelObjectDataType>::insert(int index, Model
 template <class ModelDataType, class ModelObjectDataType>
 QVariant TListModelBase<ModelDataType, ModelObjectDataType>::GetOrCreateCachedObject(int index) const
 {
+	Q_ASSERT_X(this->Version_1_0, "TListModelBase::GetOrCreateCachedObject", "Version_1_0 is null");
+
 	QVariant retVal;
 	if (this->m_objectDataTypeMap.contains(index)){
 		retVal = QVariant::fromValue(this->m_objectDataTypeMap[index]);
 	}
 	else{
-		ModelObjectDataType* newItem = new ModelObjectDataType();
+		auto* newItem = new ModelObjectDataType();
 		newItem->Version_1_0 = this->Version_1_0->at(index);
 		this->m_objectDataTypeMap.insert(index, QVariant::fromValue(newItem));
 		retVal = QVariant::fromValue(newItem);

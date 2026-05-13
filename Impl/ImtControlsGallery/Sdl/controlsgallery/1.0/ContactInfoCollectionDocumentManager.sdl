@@ -1,0 +1,37 @@
+schema {
+	namespace: controlsgallery
+	version: 1.0
+
+	query: Query
+	mutation: Mutation
+}
+
+import {
+	"ContactInfos.sdl"
+	"../../../../..//Sdl/imtbase/1.0/CollectionDocumentManager.sdl"
+	"../../../../../Sdl/imtbase/1.0/UndoManager.sdl"
+}
+
+type UpdateContactInfoInput {
+	documentId: ID!
+	contactInfo: ContactInfoData!
+}
+
+type EmailData {
+	email: String
+}
+
+type UpdateContactInfoEmailInput {
+	documentId: ID!
+	email: EmailData!
+}
+
+type Query {
+	GetContactInfoRepresentation(input: DocumentId): ContactInfoData!
+	GetContactInfoEmailRepresentation(input: DocumentId): EmailData!
+}
+
+type Mutation {
+	UpdateContactInfoFromRepresentation(input: UpdateContactInfoInput): DocumentOperationStatus!
+	UpdateContactInfoEmailFromRepresentation(input: UpdateContactInfoEmailInput): DocumentOperationStatus!
+}

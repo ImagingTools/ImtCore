@@ -19,6 +19,14 @@ DocumentManagerBase {
 			let documentId = data.getData("documentId")
 			let documentName = data.getData("documentName")
 			let operation = data.getData("documentOperation")
+
+			if (operation === "DocumentDataLoaded"){
+				root.setDocumentIsLoading(documentId, false)
+			}
+			else if (operation === "DocumentClosed"){
+				root.documentClosed(documentId)
+			}
+
 			root.documentManagerChanged(operation, objectId, documentId, documentName)
 		}
 	}
@@ -29,7 +37,6 @@ DocumentManagerBase {
 		}
 
 		onMessageReceived: {
-			console.log("UndoChanged onMessageReceived", data.toJson())
 			let documentId = data.getData("documentId")
 			let availableUndoSteps = data.getData("availableUndoSteps")
 			let availableRedoSteps = data.getData("availableRedoSteps")
@@ -58,6 +65,12 @@ DocumentManagerBase {
 	}
 
 	function openDocument(typeId, documentId){
+		let existingDocumentId = getDocumentIdByObjectId(documentId)
+		if (existingDocumentId !== ""){
+			documentAlreadyOpened(existingDocumentId, typeId)
+			return
+		}
+
 		startOpenDocument(documentId, typeId)
 
 		openDocumentRequest.typeId = typeId
@@ -199,9 +212,14 @@ DocumentManagerBase {
 		gqlCommandId: ImtbaseCollectionDocumentManagerSdlCommandIds.s_openDocument
 		requestType: 1
 		sdlObjectComp: Component {
-			DocumentId {
+			DocumentInfo {
 				onFinished: {
-					root.documentOpened(m_id, root.openDocumentRequest.typeId)
+					root.setAutoNamedTypeId(m_objectTypeId, m_hasNameProvider)
+					root.setDocumentName(m_documentId, m_documentName)
+					root.__internal.createDocumentData(m_documentId, m_objectTypeId, false)
+					root.setDocumentObjectId(m_documentId, m_objectId)
+					root.setDocumentIsLoading(m_documentId, true)
+					root.documentOpened(m_documentId, m_objectTypeId)
 				}
 			}
 		}
@@ -221,9 +239,13 @@ DocumentManagerBase {
 		gqlCommandId: ImtbaseCollectionDocumentManagerSdlCommandIds.s_createNewDocument
 		requestType: 1
 		sdlObjectComp: Component {
-			DocumentId {
+			DocumentInfo {
 				onFinished: {
-					root.documentCreated(m_id, root.createDocumentRequest.typeId)
+					root.setAutoNamedTypeId(m_objectTypeId, m_hasNameProvider)
+					root.setDocumentName(m_documentId, m_documentName)
+					root.__internal.createDocumentData(m_documentId, m_objectTypeId, true)
+					root.documentCreated(m_documentId, m_objectTypeId)
+					root.setDocumentIsLoading(m_documentId, true)
 				}
 			}
 		}
@@ -245,17 +267,30 @@ DocumentManagerBase {
 		sdlObjectComp: Component {
 			DocumentOperationStatus {
 				onFinished: {
+					let statusMessage = function(defaultMessage){
+						if (m_message !== undefined && m_message !== "") {
+							return m_message
+						}
+						return defaultMessage
+					}
 					if (m_status === "Success"){
-						root.documentSaved(root.saveDocumentRequest.documentId)
+						let docId = root.saveDocumentRequest.documentId
+						root.documentSaved(docId)
+						if (m_documentName !== undefined && m_documentName !== "") {
+							root.setDocumentName(docId, m_documentName)
+						}
 					}
 					else if (m_status === "InvalidUserId"){
-						root.saveDocumentFailed(root.saveDocumentRequest.documentId, qsTr("Invalid user-ID"))
+						root.saveDocumentFailed(root.saveDocumentRequest.documentId, statusMessage(qsTr("Invalid user-ID")))
 					}
 					else if (m_status === "InvalidDocumentId"){
-						root.saveDocumentFailed(root.saveDocumentRequest.documentId, qsTr("Invalid document-ID"))
+						root.saveDocumentFailed(root.saveDocumentRequest.documentId, statusMessage(qsTr("Invalid document-ID")))
+					}
+					else if (m_status === "InvalidDocumentData"){
+						root.saveDocumentFailed(root.saveDocumentRequest.documentId, statusMessage(qsTr("Document data is invalid")))
 					}
 					else if (m_status === "Failed"){
-						root.saveDocumentFailed(root.saveDocumentRequest.documentId, qsTr("Save document failed"))
+						root.saveDocumentFailed(root.saveDocumentRequest.documentId, statusMessage(qsTr("Save document failed")))
 					}
 				}
 			}

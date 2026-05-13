@@ -1,9 +1,11 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
 // Qt includes
 #include <QtCore/QReadWriteLock>
 #include <QtCore/QObject>
+#include <QtCore/QHash>
 
 // ACF includes
 #include <iprm/IParamsSet.h>
@@ -16,6 +18,7 @@
 // Acula includes
 #include <imthype/IJobQueueManager.h>
 #include <imthype/IJobTicket.h>
+#include <imthype/IJobStatus.h>
 #include <imthype/CStandardJobOutput.h>
 
 
@@ -85,6 +88,7 @@ public:
 
 protected:
 	IJobTicketSharedPtr GetJobTicket(const QByteArray& jobId) const;
+	IJobStatusSharedPtr GetJobStatus(const QByteArray& jobId) const;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
@@ -94,6 +98,10 @@ protected:
 	I_REF(imtbase::IObjectCollection, m_jobTicketsCollectionCompPtr);
 
 	mutable QReadWriteLock m_mutex;
+	
+	// Separate storage for job status and progress
+	// This allows lightweight status queries without loading full job tickets
+	mutable QHash<QByteArray, IJobStatusSharedPtr> m_jobStatusMap;
 };
 
 

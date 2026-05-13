@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imt3dgui/CGridShape.h>
 
 
@@ -53,7 +54,7 @@ void CGridShape::SetPlaneMode(PlaneMode planeMode)
 
 // protected methods
 
-// reimplement (imt3dgui::CShape3dBase)
+// reimplemented (imt3dgui::CShape3dBase)
 
 void CGridShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
@@ -96,14 +97,30 @@ void CGridShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& /*chang
 }
 
 
+// reimplemented (imt3dgui::IShape3d)
+
+QVector3D CGridShape::GetColor() const
+{
+	return QVector3D(0.5, 0.5, 0.5);
+}
+
+
 // protected methods
 
-// reimplement (imt3dgui::CShape3dBase)
+// reimplemented (imt3dgui::CShape3dBase)
 
-void CGridShape::DrawShapeGl(QOpenGLShaderProgram& /*program*/, QOpenGLFunctions& functions)
+imt3dview::PrimitiveType CGridShape::GetPrimitiveType() const
 {
-	functions.glLineWidth(1.0f);
-	functions.glDrawElements(GL_LINES, m_indices.count(), GL_UNSIGNED_INT, 0);
+	return imt3dview::PT_LINES;
+}
+
+
+void CGridShape::FillMaterial(imt3dview::Material& material) const
+{
+	BaseClass::FillMaterial(material);
+	material.colorMode = imt3dview::Material::CM_SOLID;
+	material.solidColor = GetColor();
+	material.lineWidth = 1.0f;
 }
 
 

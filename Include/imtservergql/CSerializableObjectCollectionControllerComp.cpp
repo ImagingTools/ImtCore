@@ -1,5 +1,11 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtservergql/CSerializableObjectCollectionControllerComp.h>
 
+
+// Qt includes
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonValue>
 
 // ACF includes
 #include <iser/CMemoryWriteArchive.h>
@@ -83,25 +89,25 @@ bool CSerializableObjectCollectionControllerComp::DeSerializeObject(
 
 // reimplemented (imtservergql::CObjectCollectionControllerCompBase)
 
-imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetMetaInfo(
+QJsonObject CSerializableObjectCollectionControllerComp::GetMetaInfo(
 	const imtgql::CGqlRequest& gqlRequest,
 	QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CSerializableObjectCollectionControllerComp");
-		return nullptr;
+		return QJsonObject();
 	}
 
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
+	QJsonObject rootObj;
+	QJsonObject dataObj;
 
 	const imtgql::CGqlParamObject& inputParams = gqlRequest.GetParams();
 
 	QByteArray objectId = GetObjectIdFromInputParams(inputParams);
-	dataModel->SetData("id", objectId);
+	dataObj.insert(QStringLiteral("id"), QJsonValue::fromVariant(objectId));
 
 	QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
-	dataModel->SetData("typeId", typeId);
+	dataObj.insert(QStringLiteral("typeId"), QJsonValue::fromVariant(typeId));
 
 	idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(objectId);
 	QByteArray data;
@@ -110,68 +116,71 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetMetaInf
 		errorMessage = QString("Unable to get meta info for object with ID '%1'. Error: Serialization failed").arg(qPrintable(objectId));
 		SendErrorMessage(0, errorMessage, "CSerializableObjectCollectionControllerComp");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
-	dataModel->SetData("metaInfo", data.toBase64());
+	dataObj.insert(QStringLiteral("metaInfo"), QJsonValue::fromVariant(data.toBase64()));
 
-	return rootModelPtr.PopPtr();
+	rootObj.insert(QStringLiteral("data"), dataObj);
+	return rootObj;
 }
 
 
-imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetInfo(
+QJsonObject CSerializableObjectCollectionControllerComp::GetInfo(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& /*errorMessage*/) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CSerializableObjectCollectionControllerComp");
-		return nullptr;
+		return QJsonObject();
 	}
 
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
-	imtbase::CTreeItemModel* infoModelPtr = dataModel->AddTreeModel("info");
+	QJsonObject rootObj;
+	QJsonObject dataObj;
+	QJsonObject infoObj;
 
 	const imtgql::CGqlParamObject& inputParams = gqlRequest.GetParams();
 
 	QByteArray objectId = GetObjectIdFromInputParams(inputParams);
-	infoModelPtr->SetData("id", objectId);
+	infoObj.insert(QStringLiteral("id"), QJsonValue::fromVariant(objectId));
 
 	QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
-	infoModelPtr->SetData("typeId", typeId);
+	infoObj.insert(QStringLiteral("typeId"), QJsonValue::fromVariant(typeId));
 
 	QByteArray elementInfo = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toByteArray();
-	infoModelPtr->SetData("name", elementInfo);
+	infoObj.insert(QStringLiteral("name"), QJsonValue::fromVariant(elementInfo));
 
 	elementInfo = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toByteArray();
-	infoModelPtr->SetData("description", elementInfo);
+	infoObj.insert(QStringLiteral("description"), QJsonValue::fromVariant(elementInfo));
 
 	elementInfo = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_ENABLED).toByteArray();
-	infoModelPtr->SetData("enabled", elementInfo);
+	infoObj.insert(QStringLiteral("enabled"), QJsonValue::fromVariant(elementInfo));
 
-	return rootModelPtr.PopPtr();
+	dataObj.insert(QStringLiteral("info"), infoObj);
+	rootObj.insert(QStringLiteral("data"), dataObj);
+	return rootObj;
 }
 
 
-imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetDataMetaInfo(
+QJsonObject CSerializableObjectCollectionControllerComp::GetDataMetaInfo(
 	const imtgql::CGqlRequest& gqlRequest,
 	QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CSerializableObjectCollectionControllerComp");
-		return nullptr;
+		return QJsonObject();
 	}
 
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
+	QJsonObject rootObj;
+	QJsonObject dataObj;
 
 	const imtgql::CGqlParamObject& inputParams = gqlRequest.GetParams();
 
 	QByteArray objectId = GetObjectIdFromInputParams(inputParams);
-	dataModel->SetData("id", objectId);
+	dataObj.insert(QStringLiteral("id"), QJsonValue::fromVariant(objectId));
 
 	QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
-	dataModel->SetData("typeId", typeId);
+	dataObj.insert(QStringLiteral("typeId"), QJsonValue::fromVariant(typeId));
 
 	QByteArray data;
 	idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetDataMetaInfo(objectId);
@@ -179,26 +188,27 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetDataMet
 	if (!SerializeObject(metaInfo.GetPtr(), data)){
 		errorMessage = QString("Unable to get a data meta info for object with ID '%1'. Error: Serialization failed").arg(qPrintable(objectId));
 		SendErrorMessage(0, errorMessage, "CSerializableObjectCollectionControllerComp");
-		return nullptr;
+		return QJsonObject();
 	}
 
-	dataModel->SetData("dataMetaInfo", data.toBase64());
+	dataObj.insert(QStringLiteral("dataMetaInfo"), QJsonValue::fromVariant(data.toBase64()));
 
-	return rootModelPtr.PopPtr();
+	rootObj.insert(QStringLiteral("data"), dataObj);
+	return rootObj;
 }
 
 
-imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetObject(
+QJsonObject CSerializableObjectCollectionControllerComp::GetObject(
 	const imtgql::CGqlRequest& gqlRequest,
 	QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'm_objectCollectionCompPtr' was not set", "CSerializableObjectCollectionControllerComp");
-		return nullptr;
+		return QJsonObject();
 	}
 
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
+	QJsonObject rootObj;
+	QJsonObject dataObj;
 
 	const imtgql::CGqlParamObject& inputParams = gqlRequest.GetParams();
 
@@ -213,7 +223,7 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetObject(
 						.arg(qPrintable(objectId)).toUtf8();
 			SendErrorMessage(0, errorMessage);
 
-			return nullptr;
+			return QJsonObject();
 		}
 
 		CustomProcessObject(gqlRequest, *object);
@@ -233,11 +243,11 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetObject(
 							.arg(qPrintable(objectId)).toUtf8();
 				SendErrorMessage(0, errorMessage);
 
-				return nullptr;
+				return QJsonObject();
 			}
 
 			QByteArray data((char*)archivePtr->GetBuffer(), archivePtr->GetBufferSize());
-			dataModelPtr->SetData("objectData", data.toBase64());
+			dataObj.insert(QStringLiteral("objectData"), QJsonValue::fromVariant(data.toBase64()));
 		}
 	}
 	else{
@@ -245,10 +255,11 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetObject(
 				.arg(qPrintable(gqlRequest.GetCommandId()))
 				.arg(qPrintable(objectId)).toUtf8();
 
-		return nullptr;
+		return QJsonObject();
 	}
 
-	return rootModelPtr.PopPtr();
+	rootObj.insert(QStringLiteral("data"), dataObj);
+	return rootObj;
 }
 
 
@@ -328,22 +339,20 @@ bool CSerializableObjectCollectionControllerComp::UpdateObjectFromRequest(
 }
 
 
-imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::ListObjects(
+QJsonObject CSerializableObjectCollectionControllerComp::ListObjects(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& /*errorMessage*/) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'm_objectCollectionCompPtr' was not set", "CSerializableObjectCollectionControllerComp");
-		return nullptr;
+		return QJsonObject();
 	}
 
 	const imtgql::CGqlParamObject& inputParams = gqlRequest.GetParams();
 
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-
-	imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
-	imtbase::CTreeItemModel* itemsModel = dataModel->AddTreeModel("items");
-	itemsModel->SetIsArray(true);
+	QJsonObject rootObj;
+	QJsonObject dataObj;
+	QJsonArray itemsArray;
 
 	const imtgql::CGqlParamObject* viewParamsGql = nullptr;
 	const imtgql::CGqlParamObject* inputObject = inputParams.GetParamArgumentObjectPtr("input");
@@ -365,34 +374,35 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::ListObject
 		if (!DeSerializeObject(filterParamsPtr.GetPtr(), QByteArray::fromBase64(data))){
 			SendErrorMessage(0, "Unable to deserialize collection filter");
 
-			return nullptr;
+			return QJsonObject();
 		}
 	}
 
 	imtbase::ICollectionInfo::Ids ids = m_objectCollectionCompPtr->GetElementIds(offset, count, filterParamsPtr.GetPtr());
 	for (const imtbase::ICollectionInfo::Id& id: ids){
-		int itemIndex = itemsModel->InsertNewItem();
+		QJsonObject itemObj;
+		QJsonObject infoObj;
 
-		imtbase::CTreeItemModel* infoModelPtr = itemsModel->AddTreeModel("info", itemIndex);
-
-		infoModelPtr->SetData("id", id);
+		infoObj.insert(QStringLiteral("id"), QJsonValue::fromVariant(id));
 
 		QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(id);
-		infoModelPtr->SetData("typeId", typeId);
+		infoObj.insert(QStringLiteral("typeId"), QJsonValue::fromVariant(typeId));
 
 		QByteArray name = m_objectCollectionCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_NAME).toByteArray();
-		infoModelPtr->SetData("name", name);
+		infoObj.insert(QStringLiteral("name"), QJsonValue::fromVariant(name));
 
 		QByteArray description = m_objectCollectionCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_DESCRIPTION).toByteArray();
-		infoModelPtr->SetData("description", description);
+		infoObj.insert(QStringLiteral("description"), QJsonValue::fromVariant(description));
 
 		QByteArray enabled = m_objectCollectionCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_ENABLED).toByteArray();
-		infoModelPtr->SetData("enabled", enabled);
+		infoObj.insert(QStringLiteral("enabled"), QJsonValue::fromVariant(enabled));
+
+		itemObj.insert(QStringLiteral("info"), infoObj);
 
 		QByteArray serializedMetaIndoData;
 		idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(id);
 		if (SerializeObject(metaInfo.GetPtr(), serializedMetaIndoData)){
-			itemsModel->SetData("metaInfo", serializedMetaIndoData.toBase64(), itemIndex);
+			itemObj.insert(QStringLiteral("metaInfo"), QJsonValue::fromVariant(serializedMetaIndoData.toBase64()));
 		}
 		else{
 			SendWarningMessage(0, QString("Unable to set meta info for element '%1'. Error: Meta info serialization failed").arg(qPrintable(id)), "CSerializableObjectCollectionControllerComp");
@@ -402,14 +412,18 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::ListObject
 		idoc::MetaInfoPtr dataMetaInfo = m_objectCollectionCompPtr->GetDataMetaInfo(id);
 
 		if (SerializeObject(dataMetaInfo.GetPtr(), serializedMetaIndoData)){
-			itemsModel->SetData("dataMetaInfo", serializedMetaIndoData.toBase64(), itemIndex);
+			itemObj.insert(QStringLiteral("dataMetaInfo"), QJsonValue::fromVariant(serializedMetaIndoData.toBase64()));
 		}
 		else{
 			SendWarningMessage(0, QString("Unable to set data meta info for element '%1'. Error: Data meta info serialization failed").arg(qPrintable(id)), "CSerializableObjectCollectionControllerComp");
 		}
+
+		itemsArray.append(itemObj);
 	}
 
-	return rootModelPtr.PopPtr();
+	dataObj.insert(QStringLiteral("items"), itemsArray);
+	rootObj.insert(QStringLiteral("data"), dataObj);
+	return rootObj;
 }
 
 

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtserverapp/CPageGuiElementModelRepresentationControllerComp.h>
 
 
@@ -23,7 +24,7 @@ bool CPageGuiElementModelRepresentationControllerComp::IsModelSupported(const is
 
 bool CPageGuiElementModelRepresentationControllerComp::GetRepresentationFromDataModel(
 			const istd::IChangeable& dataModel,
-			imtbase::CTreeItemModel& representation,
+			QJsonObject& representation,
 			const iprm::IParamsSet* paramsPtr) const
 {
 	Q_ASSERT(IsModelSupported(dataModel));
@@ -41,15 +42,15 @@ bool CPageGuiElementModelRepresentationControllerComp::GetRepresentationFromData
 	QString pageQmlItemFilePath = guiElementPtr->GetPageQmlItemFilePath();
 	QString startSourceItem = guiElementPtr->GetStartSourceItem();
 
-	representation.SetData("source", pageQmlItemFilePath);
-	representation.SetData("startItem", startSourceItem);
+	representation.insert(QStringLiteral("source"), pageQmlItemFilePath);
+	representation.insert(QStringLiteral("startItem"), startSourceItem);
 
 	return true;
 }
 
 
 bool CPageGuiElementModelRepresentationControllerComp::GetDataModelFromRepresentation(
-			const imtbase::CTreeItemModel& /*representation*/,
+			const QJsonObject& /*representation*/,
 			istd::IChangeable& /*dataModel*/) const
 {
 	return false;
@@ -57,5 +58,4 @@ bool CPageGuiElementModelRepresentationControllerComp::GetDataModelFromRepresent
 
 
 } // namespace imtgui
-
 

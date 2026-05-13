@@ -13,6 +13,16 @@ Rectangle {
 
 	color: Style.baseColor;
 
+	property GraphicsShapeFactoryManager shapeFactoryManger: GraphicsShapeFactoryManager{
+		graphicsViewItem: graphicsView
+		sdlShapeModel: graphicsView.sdlShapeModel
+		onSdlShapesCreated :{
+			graphicsView.sdlShapesCreated();
+		}
+	}
+	property BaseModel sdlShapeModel: null
+
+
 	property alias selectedIndex: canvas.selectedIndex;
 
 	//for scrollBars
@@ -61,7 +71,7 @@ Rectangle {
 	property Component controlPanelComp: null
 	property Item controlPanelItem: null
 
-	property alias scaleCoeff: canvas.scaleCoeff;
+	property real scaleCoeff: canvas.scaleCoeff;
 	property alias deltaX: canvas.deltaX;
 	property alias deltaY: canvas.deltaY;
 	property alias viewMatrix: canvasMatrix;
@@ -116,6 +126,11 @@ Rectangle {
 
 	signal painted()
 	signal imageLoaded()
+	signal sdlShapesCreated();
+
+	onSdlShapesCreated: {
+		drawSdlShapes()
+	}
 
 	Component.onCompleted: {
 		Events.subscribeEvent("DesignSchemeChanged", designSchemeChanged);
@@ -143,6 +158,10 @@ Rectangle {
 		layerTools.canApplyViewTransform = false;
 		layerModel.push(layerTools);
 
+	}
+
+	onScaleCoeffChanged: {
+		canvas.scaleCoeff = scaleCoeff
 	}
 
 	Component.onDestruction: {
@@ -176,6 +195,10 @@ Rectangle {
 			graphicsView.restrictDrawing = false
 			graphicsView.resize()
 		}
+	}
+
+	function drawSdlShapes(){
+		requestPaintPause.restart();
 	}
 
 	function resize(){
@@ -954,6 +977,7 @@ Rectangle {
 
 			onScaleCoeffChanged: {
 				//console.log("scaleCoeff:::", scaleCoeff)
+				graphicsView.scaleCoeff = scaleCoeff
 				requestPaintPause.restart();
 			}
 

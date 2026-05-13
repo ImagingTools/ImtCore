@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -5,20 +6,20 @@
 #include <QtNetwork/QAbstractSocket>
 
 // ImtCore includes
-#include <imthttp/ISender.h>
+#include <imtrest/ITransport.h>
 
-namespace imthttp
+namespace imtrest
 {
 
 
-class CTcpSender: public QObject, virtual public ISender
+class CTcpSender: public QObject, virtual public ITransport
 {
 	Q_OBJECT
 public:
     CTcpSender(QAbstractSocket* tcpSocketPtr);
-	// reimplemented (ISender)
+	// reimplemented (ITransport)
 	virtual bool SendResponse(ConstResponsePtr& response) const override;
-	virtual bool SendRequest(ConstRequestPtr& reguest) const override;
+	virtual bool SendRequest(ConstRequestPtr& request) const override;
 
 protected:
     virtual bool WriteBody(const QByteArray& data, QAbstractSocket& socket) const;
@@ -27,6 +28,6 @@ protected:
 };
 
 
-} // namespace imthttp
+} // namespace imtrest
 
 

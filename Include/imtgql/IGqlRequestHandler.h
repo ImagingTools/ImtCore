@@ -1,8 +1,11 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QJsonObject>
+
 // ImtCore includes
-#include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlRequest.h>
 
 
@@ -21,7 +24,7 @@ public:
 	/**
 		Create response for a GraphQL-based request.
 	*/
-	virtual imtbase::CTreeItemModel* CreateResponse(const CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
+	virtual QJsonObject CreateResponse(const CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
 };
 
 

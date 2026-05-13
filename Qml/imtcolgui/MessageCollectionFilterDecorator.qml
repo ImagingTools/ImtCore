@@ -48,7 +48,7 @@ DecoratorBase {
 	
 	function updateFilter(){
 		if (!groupFilter.hasFieldFilters()){
-			groupFilter.createFieldFilters();
+			groupFilter.emplaceFieldFilters();
 		}
 
 		groupFilter.m_fieldFilters.clear()
@@ -84,6 +84,12 @@ DecoratorBase {
 			filter.m_filterValue = "0"
 			groupFilter.m_fieldFilters.addElement(filter)
 		}
+
+		if (groupFilter.m_fieldFilters.count == 0){
+			let filter = categoryFilter.copyMe();
+			filter.m_filterValue = "-1"
+			groupFilter.m_fieldFilters.addElement(filter)
+		}
 		
 		complexFilter.addGroupFilter(groupFilter)
 		
@@ -93,6 +99,7 @@ DecoratorBase {
 	SegmentedButton {
 		id: segmentedButton_
 		anchors.left: parent.left;
+		anchors.leftMargin: Style.marginM
 		anchors.verticalCenter: parent.verticalCenter;
 		
 		height: parent.height

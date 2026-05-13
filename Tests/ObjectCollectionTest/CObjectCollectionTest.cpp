@@ -11,8 +11,6 @@
 #include <imtauth/CAccountInfoMetaInfo.h>
 #include <imtauth/IAccountInfo.h>
 
-#include <GeneratedFiles/ObjectCollectionTest/CGenerateTest.h>
-
 
 void CObjectCollectionTest::initTestCase()
 {
@@ -157,3 +155,16 @@ void CObjectCollectionTest::cleanupTestCase()
 }
 
 I_ADD_TEST(CObjectCollectionTest);
+
+// Partitura test registrations for ObjectCollectionTest
+const char partituraDatabaseTest[] = "DatabaseTest";
+typedef CObjectCollectionPartituraTestBaseRegister<partituraDatabaseTest> partituraDatabaseTestClass;
+I_ADD_TEST(partituraDatabaseTestClass);
+
+const char partituraFileCollectionTest[] = "FileCollectionTest";
+typedef CObjectCollectionPartituraTestBaseRegister<partituraFileCollectionTest> partituraFileCollectionTestClass;
+I_ADD_TEST(partituraFileCollectionTestClass);
+
+const char partituraObjectCollectionWithoutFixedTypeIdsTest[] = "ObjectCollectionWithoutFixedTypeIdsTest";
+typedef CObjectCollectionPartituraTestBaseRegister<partituraObjectCollectionWithoutFixedTypeIdsTest> partituraObjectCollectionWithoutFixedTypeIdsTestClass;
+I_ADD_TEST(partituraObjectCollectionWithoutFixedTypeIdsTestClass);

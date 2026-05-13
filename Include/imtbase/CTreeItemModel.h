@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -182,6 +183,10 @@ private:
 protected:
 	virtual int GetKeyRole(const QByteArray& key) const;
 	virtual bool ParseRecursive(const QJsonObject& jsonObject, int index = 0);
+
+private:
+	inline int GetVariantTypeId(const QVariant& value);
+	bool SerializeVariantValue(iser::IArchive& archive, const QVariant& value);
 };
 
 

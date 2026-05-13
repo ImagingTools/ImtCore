@@ -9,18 +9,22 @@ BoundingBox {
 	property real width: 0
 	property real height: 0
 	property real radius: 0
+	property string color: Style.baseColor
+	property string borderColor: Style.baseColor
+	property real brashAlpha: 1
+	property real penAlpha: 1
 
 	function draw(ctx, transformMatrixArg){
 		//console.log("drawBase")
 		let params_;
 		params_ = getParams()
 
-		if(isSelected){
+		if(isSelected && brashAlpha !== 1 && penAlpha !== 1){
 			ctx.globalAlpha = 0.7
 		}
 
-		ctx.fillStyle = params_.color !== undefined ? params_.color : "transparent";
-		ctx.strokeStyle = params_.borderColor !== undefined ? params_.borderColor : "transparent";
+		ctx.fillStyle = params_.color !== undefined ? params_.color : color;
+		ctx.strokeStyle = params_.borderColor !== undefined ? params_.borderColor : borderColor;
 		ctx.lineWidth = params_.lineWidth !== undefined ? params_.lineWidth : 1
 		let radius_ = params_.radius !== undefined ? params_.radius : radius
 		let width_ = params_.width !== undefined ? params_.width : width;
@@ -43,8 +47,10 @@ BoundingBox {
 
 		ctx.beginPath()
 		ctx.roundedRect(x1 , y1, width_, height_, radius_, radius_)
-		ctx.stroke();
+		ctx.globalAlpha = brashAlpha
 		ctx.fill();
+		ctx.globalAlpha = penAlpha
+		ctx.stroke();
 		ctx.closePath();
 
 		ctx.globalAlpha = 1

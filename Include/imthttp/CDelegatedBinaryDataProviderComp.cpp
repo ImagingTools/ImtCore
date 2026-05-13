@@ -1,11 +1,12 @@
-#include <imthttp/CDelegatedBinaryDataProviderComp.h>
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+#include <imtrest/CDelegatedBinaryDataProviderComp.h>
 
 
-namespace imthttp
+namespace imtrest
 {
 
 
-// reimplemented (imthttp::IBinaryDataProvider)
+// reimplemented (imtrest::IBinaryDataProvider)
 
 bool CDelegatedBinaryDataProviderComp::GetData(
 			QByteArray& data,
@@ -23,6 +24,6 @@ bool CDelegatedBinaryDataProviderComp::GetData(
 }
 
 
-} // namespace imthttp
+} // namespace imtrest
 
 

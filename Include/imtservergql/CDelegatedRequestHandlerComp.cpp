@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtservergql/CDelegatedRequestHandlerComp.h>
 
 
@@ -20,13 +21,13 @@ bool CDelegatedRequestHandlerComp::IsRequestSupported(const imtgql::CGqlRequest&
 }
 
 
-imtbase::CTreeItemModel* CDelegatedRequestHandlerComp::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CDelegatedRequestHandlerComp::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (m_slaveRequestHandlerCompPtr.IsValid()){
 		return m_slaveRequestHandlerCompPtr->CreateResponse(gqlRequest, errorMessage);
 	}
 
-	return nullptr;
+	return QJsonObject();
 }
 
 

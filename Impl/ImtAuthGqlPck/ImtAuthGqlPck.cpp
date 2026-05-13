@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include "ImtAuthGqlPck.h"
 
 
@@ -188,6 +189,62 @@ I_EXPORT_COMPONENT(
 			ClientRequestTokenBasedPermissionsProvider,
 			"Client request token based permissions provider",
 			"Client Request Token Permissions Provider");
+
+I_EXPORT_COMPONENT(
+			PersonalAccessTokenController,
+			"Personal access token controllerr",
+			"Personal Access Token Controller");
+
+I_EXPORT_COMPONENT(
+			ClientRequestPersonalAccessTokenManager,
+			"Client request personal access token manager",
+			"Client Request Personal Access Token Manager");
+
+I_EXPORT_COMPONENT(
+			TenantCollectionController,
+			"Tenant collection controller",
+			"Tenant Collection Controller");
+
+I_EXPORT_COMPONENT(
+			TenantMetaInfoDelegate,
+			"Tenant meta info delegate",
+			"Tenant Meta Info Delegate");
+
+I_EXPORT_COMPONENT(
+			TenantCollectionDocumentManager,
+			"Tenant collection document manager",
+			"Tenant Collection Document Manager");
+
+I_EXPORT_COMPONENT(
+			RemoteTenantController,
+			"Remote tenant controller",
+			"Remote Tenant Controller");
+
+I_EXPORT_COMPONENT(
+			RemoteProfileController,
+			"Remote profile controller",
+			"Remote Profile Controller");
+
+I_EXPORT_COMPONENT(
+			JwtSessionControllerProxy,
+			"JWT session controller proxy",
+			"JWT Session Controller Proxy");
+
+I_EXPORT_COMPONENT(
+			TenantManagerController,
+			"Tenant manager controller",
+			"Tenant Manager Controller");
+
+
+I_EXPORT_COMPONENT(
+			TenantMembershipManagerController,
+			"GraphQL handler for tenant membership queries and mutations",
+			"Tenant Membership Manager Controller");
+
+I_EXPORT_COMPONENT(
+			TenantMembershipPublisher,
+			"Publisher for tenant membership invitation/response notifications via WebSocket",
+			"Tenant Membership Publisher");
 
 
 } // namespace ImtAuthGqlPck

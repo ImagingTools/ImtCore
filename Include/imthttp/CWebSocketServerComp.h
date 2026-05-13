@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 
@@ -13,24 +14,18 @@
 #include <imod/CMultiModelDispatcherBase.h>
 
 // ImtCore includes
-
-#include <imthttp/IProtocolEngine.h>
-#include <imthttp/ISubscriberEngine.h>
-#include <imthttp/IRequestManager.h>
-#include <imthttp/CWebSocketSender.h>
-#include <imthttp/IServer.h>
+#include <imtrest/IRequestServlet.h>
+#include <imtrest/IProtocolEngine.h>
+#include <imtrest/ISubscriberEngine.h>
+#include <imtrest/IResponseDispatcher.h>
+#include <imtrest/CWebSocketSender.h>
+#include <imtrest/IServer.h>
 #include <imtcom/IServerConnectionInterface.h>
 #include <imtcom/IConnectionStatusProvider.h>
 #include <imtcom/ISslConfigurationManager.h>
 
 
 namespace imtrest
-{
-class IRequestServlet;
-}
-
-
-namespace imthttp
 {
 
 
@@ -45,7 +40,7 @@ class CWebSocketServerComp:
 			public QObject,
 			public ibase::TRuntimeStatusHanderCompWrap<ilog::CLoggerComponentBase>,
 			private imod::CMultiModelDispatcherBase,
-			virtual public IRequestManager,
+			virtual public IResponseDispatcher,
 			virtual public imtcom::IConnectionStatusProvider,
 			virtual public IServer
 {
@@ -55,7 +50,7 @@ public:
 	typedef imod::CMultiModelDispatcherBase BaseClass2;
 
 	I_BEGIN_COMPONENT(CWebSocketServerComp);
-		I_REGISTER_INTERFACE(IRequestManager)
+		I_REGISTER_INTERFACE(IResponseDispatcher)
 		I_REGISTER_INTERFACE(imtcom::IConnectionStatusProvider)
 		I_REGISTER_INTERFACE(IServer)
 		I_ASSIGN(m_requestServerHandlerCompPtr, "RequestServerHandler", "Request handler registered for the server", false, "RequestServerHandler");
@@ -74,8 +69,8 @@ public:
 
 	IProtocolEngine* GetProtocolEngine();
 	IProtocolEngine* GetHttpProtocolEngine();
-	imthttp::imtrest::IRequestServlet* GetRequestServerServlet();
-	imthttp::imtrest::IRequestServlet* GetRequestClientServlet();
+	imtrest::IRequestServlet* GetRequestServerServlet();
+	imtrest::IRequestServlet* GetRequestClientServlet();
 	QByteArray GetProductId();
 	void SetConnectionStatus(const QByteArray& clientId);
 
@@ -96,8 +91,9 @@ public:
 	void RegisterSender(const QByteArray& clientId, QWebSocket* webSocketPtr);
 
 
-	// reimplemented (icomp::IRequestManager)
-	virtual const ISender* GetSender(const QByteArray& requestId) const override;
+	// reimplemented (imtrest::IResponseDispatcher)
+	virtual bool SendResponse(const QByteArray& requestId, ConstResponsePtr& response) const override;
+	virtual bool SendRequest(const QByteArray& requestId, ConstRequestPtr& request) const override;
 
 protected:
 	// reimplemented (imod::CMultiModelDispatcherBase)
@@ -113,7 +109,7 @@ protected:
 	// reimplemented (imtcom::IConnectionStatusProvider)
 	virtual ConnectionStatus GetConnectionStatus() const override;
 
-	// reimplemented (imthttp::IServer)
+	// reimplemented (imtrest::IServer)
 	virtual bool StartServer() override;
 	virtual bool StopServer() override;
 	virtual ServerStatus GetServerStatus() const override;
@@ -137,8 +133,8 @@ protected:
 	QMap <QByteArray, imtcom::IConnectionStatusProvider::ConnectionStatus> m_senderLoginStatusMap;
 	mutable QReadWriteLock m_sendersLock;
 private:
-	I_REF(imthttp::imtrest::IRequestServlet, m_requestServerHandlerCompPtr);
-	I_REF(imthttp::imtrest::IRequestServlet, m_requestClientHandlerCompPtr);
+	I_REF(imtrest::IRequestServlet, m_requestServerHandlerCompPtr);
+	I_REF(imtrest::IRequestServlet, m_requestClientHandlerCompPtr);
 	I_REF(IProtocolEngine, m_protocolEngineCompPtr);
 	I_REF(ISubscriberEngine, m_subscriberEngineCompPtr);
 	I_ATTR(bool, m_startServerOnCreateAttrPtr);
@@ -154,6 +150,6 @@ private:
 };
 
 
-} // namespace imthttp
+} // namespace imtrest
 
 
