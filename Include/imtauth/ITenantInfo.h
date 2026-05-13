@@ -161,6 +161,16 @@ public:
 		Remove a relationship by its ID.
 	*/
 	virtual bool RemoveRelationship(const QByteArray& relationshipId) = 0;
+
+	/**
+		Get the list of permissions available for this tenant (semicolon-separated permission IDs).
+	*/
+	virtual QString GetTenantPermissions() const = 0;
+
+	/**
+		Set the list of permissions available for this tenant (semicolon-separated permission IDs).
+	*/
+	virtual void SetTenantPermissions(const QString& permissions) = 0;
 };
 
 

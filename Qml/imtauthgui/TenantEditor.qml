@@ -49,9 +49,12 @@ DocumentViewBase {
 	function updateGui(){
 		container.__loadMembersFromModel()
 		container.__loadInvitationsFromModel()
-		container.__loadTenantRolesFromModel()
 		if (multiPageView.getPageByIndex(0))
 			multiPageView.getPageByIndex(0).updateGui()
+		// Update permissions page if loaded
+		var permissionsPage = multiPageView.getPageById("Permissions")
+		if (permissionsPage)
+			permissionsPage.updateGui()
 	}
 
 	function updateModel(){
@@ -88,21 +91,10 @@ DocumentViewBase {
 				}
 			}
 
-			// tenantRoles: sync tenant-scoped roles
-			if (!container.tenantData.hasTenantRoles()) {
-				container.tenantData.emplaceTenantRoles()
-			}
-			container.tenantData.m_tenantRoles.clear()
-			var roles = container.__tenantRoles
-			for (var ri = 0; ri < roles.length; ri++) {
-				var roleEntry = container.tenantData.createTenantRolesArrayElement()
-				if (roleEntry) {
-					roleEntry.m_id = roles[ri].id || ""
-					roleEntry.m_name = roles[ri].name || ""
-					roleEntry.m_permissions = roles[ri].permissions || ""
-					container.tenantData.m_tenantRoles.addElement(roleEntry)
-				}
-			}
+			// tenantPermissions: sync from permissions page
+			var permissionsPage = multiPageView.getPageById("Permissions")
+			if (permissionsPage)
+				permissionsPage.updateModel()
 		}
 	}
 
@@ -328,55 +320,8 @@ DocumentViewBase {
 		container.doUpdateModel()
 	}
 
-	// --- Tenant-scoped roles ---
-	property var __tenantRoles: []
-
-	function __loadTenantRolesFromModel() {
-		if (!container.tenantData)
-			return
-		var rolesModel = container.tenantData.m_tenantRoles
-		var roles = []
-		if (rolesModel) {
-			var count = rolesModel.count || 0
-			for (var i = 0; i < count; i++) {
-				var role = rolesModel.get(i).item
-				if (role) {
-					roles.push({
-						id: role.m_id || "",
-						name: role.m_name || "",
-						permissions: role.m_permissions || ""
-					})
-				}
-			}
-		}
-		container.__tenantRoles = roles
-	}
-
-	function __addTenantRole(name, permissions) {
-		var roles = container.__tenantRoles.slice()
-		roles.push({ id: "", name: name, permissions: permissions || "" })
-		container.__tenantRoles = roles
-		container.doUpdateModel()
-	}
-
-	function __updateTenantRole(index, name, permissions) {
-		var roles = container.__tenantRoles.slice()
-		if (index >= 0 && index < roles.length) {
-			roles[index].name = name
-			roles[index].permissions = permissions || ""
-			container.__tenantRoles = roles
-			container.doUpdateModel()
-		}
-	}
-
-	function __removeTenantRole(index) {
-		var roles = container.__tenantRoles.slice()
-		if (index >= 0 && index < roles.length) {
-			roles.splice(index, 1)
-			container.__tenantRoles = roles
-			container.doUpdateModel()
-		}
-	}
+	// --- Tenant permissions ---
+	property TreeItemModel permissionsModel: TreeItemModel {}
 
 	// --- Transfer ownership support ---
 	function __getTransferableMembers() {
@@ -401,7 +346,7 @@ DocumentViewBase {
 			multiPageView.addPage("General", qsTr("General"), generalPageComp, "Icons/Settings")
 			if (!container.isNewTenant) {
 				multiPageView.addPage("Members", qsTr("Members"), membersPageComp, "Icons/MultipleUser")
-				multiPageView.addPage("Roles", qsTr("Roles"), rolesPageComp, "Icons/Role")
+				multiPageView.addPage("Permissions", qsTr("Permissions"), permissionsPageComp, "Icons/Role")
 			}
 		}
 	}
@@ -921,208 +866,137 @@ DocumentViewBase {
 		}
 	}
 
-	// ===== Page: Roles =====
+	// ===== Page: Permissions =====
 	Component {
-		id: rolesPageComp
+		id: permissionsPageComp
 
 		Item {
-			id: rolesPage
+			id: permissionsPage
+
+			function updateGui() {
+				if (!container.tenantData)
+					return
+				var selectedPermissionsIds = []
+				var selectedPermissions = container.tenantData.m_tenantPermissions
+				if (selectedPermissions && selectedPermissions !== "") {
+					selectedPermissionsIds = selectedPermissions.split(';')
+				}
+
+				selectedPermissionsIds.sort()
+
+				tenantPermissionsTreeView.treeView.uncheckAll()
+
+				var itemsList = tenantPermissionsTreeView.treeView.getItemsDataAsList()
+				for (var i = 0; i < itemsList.length; i++) {
+					var delegateItem = itemsList[i]
+					if (!delegateItem.hasChild) {
+						var itemData = delegateItem.getItemData()
+						var id = itemData.FeatureId
+
+						if (selectedPermissionsIds.includes(id)) {
+							delegateItem.isOpened = true
+							tenantPermissionsTreeView.treeView.checkItem(delegateItem)
+						} else {
+							delegateItem.isOpened = false
+						}
+					}
+				}
+			}
+
+			function updateModel() {
+				if (!container.tenantData)
+					return
+				var selectedPermissionIds = []
+				var itemsList = tenantPermissionsTreeView.treeView.getCheckedItems()
+				for (var j = 0; j < itemsList.length; j++) {
+					var delegate = itemsList[j]
+					if (!delegate.hasChild) {
+						var itemData = delegate.getItemData()
+						var id = itemData.FeatureId
+						selectedPermissionIds.push(id)
+					}
+				}
+
+				selectedPermissionIds.sort()
+
+				container.tenantData.m_tenantPermissions = selectedPermissionIds.join(';')
+			}
 
 			CustomScrollbar {
-				id: rolesScrollbar
+				id: permissionsScrollbar
 				z: parent.z + 1
 				anchors.right: parent.right
-				anchors.top: rolesFlickable.top
-				anchors.bottom: rolesFlickable.bottom
+				anchors.top: permissionsFlickable.top
+				anchors.bottom: permissionsFlickable.bottom
 				secondSize: Style.marginM
-				targetItem: rolesFlickable
+				targetItem: permissionsFlickable
 			}
 
 			Flickable {
-				id: rolesFlickable
+				id: permissionsFlickable
 				anchors.top: parent.top
 				anchors.topMargin: Style.marginXL
 				anchors.bottom: parent.bottom
 				anchors.bottomMargin: Style.marginXL
 				anchors.left: parent.left
 				anchors.leftMargin: Style.marginXL
-				anchors.right: rolesScrollbar.left
+				anchors.right: permissionsScrollbar.left
 				anchors.rightMargin: Style.marginXL
-				contentWidth: rolesColumn.width
-				contentHeight: rolesColumn.height + 2 * Style.marginXL
+				contentWidth: permissionsColumn.width
+				contentHeight: permissionsColumn.height + 2 * Style.marginXL
 
 				boundsBehavior: Flickable.StopAtBounds
 				clip: true
 
 				Column {
-					id: rolesColumn
+					id: permissionsColumn
 					width: Style.sizeHintXXL
 					spacing: Style.marginXL
 
 					GroupHeaderView {
 						width: parent.width
-						title: qsTr("Tenant Roles")
-						groupView: rolesGroup
+						title: qsTr("Permissions")
+						groupView: permissionsGroup
 					}
 
 					GroupElementView {
-						id: rolesGroup
+						id: permissionsGroup
 						width: parent.width
 
-						Row {
-							width: parent.width
-							spacing: Style.marginL
+						TreeViewElementView {
+							id: tenantPermissionsTreeView
 
-							BaseText {
-								anchors.verticalCenter: parent.verticalCenter
-								text: qsTr("Manage roles available within this tenant")
-								color: Style.inactiveTextColor
+							Component.onCompleted: {
+								tenantPermissionsTreeView.treeView.tristate = true
 							}
 
-							Button {
-								id: createRoleBtn
-								visible: container.__isOwnerOrAdmin
-								anchors.verticalCenter: parent.verticalCenter
-								text: qsTr("Create Role")
-								onClicked: {
-									createRoleDialog.open()
-								}
-							}
-						}
+							Connections {
+								target: tenantPermissionsTreeView.treeView
 
-						// Roles list
-						Column {
-							width: parent.width
-							spacing: Style.marginS
-
-							Repeater {
-								model: container.__tenantRoles
-
-								delegate: Item {
-									id: roleDelegate
-									width: parent.width
-									height: Style.controlHeightM + Style.marginS * 2
-
-									readonly property int roleIndex: model.index
-
-									Row {
-										anchors.fill: parent
-										anchors.margins: Style.marginS
-										spacing: Style.marginL
-
-										BaseText {
-											width: parent.width * 0.3
-											anchors.verticalCenter: parent.verticalCenter
-											text: modelData.name
-											elide: Text.ElideRight
-										}
-
-										BaseText {
-											width: parent.width * 0.4
-											anchors.verticalCenter: parent.verticalCenter
-											text: modelData.permissions ? modelData.permissions.split(";").length + " " + qsTr("permissions") : qsTr("No permissions")
-											color: Style.inactiveTextColor
-											elide: Text.ElideRight
-										}
-
-										ToolButton {
-											visible: container.__isOwnerOrAdmin
-											anchors.verticalCenter: parent.verticalCenter
-											iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
-											decorator: Component {
-												ToolButtonDecorator {
-													color: "transparent"
-													icon.width: Style.iconSizeXS
-												}
-											}
-											onClicked: {
-												container.__removeTenantRole(roleDelegate.roleIndex)
-											}
-										}
-									}
+								function onCheckedItemsChanged() {
+									container.doUpdateModel()
 								}
 							}
 
-							BaseText {
-								visible: container.__tenantRoles.length === 0
-								width: parent.width
-								text: qsTr("No roles defined. Create a role to get started.")
-								color: Style.inactiveTextColor
-							}
-						}
-					}
-				}
-			}
+							TreeItemModel {
+								id: tenantPermissionHeaders
 
-			// Create Role Dialog
-			Item {
-				id: createRoleDialog
-				visible: false
-				anchors.fill: parent
-				z: 100
+								function updateHeaders() {
+									tenantPermissionHeaders.clear()
 
-				function open() {
-					createRoleDialog.visible = true
-					newRoleNameInput.text = ""
-				}
+									var index = tenantPermissionHeaders.insertNewItem()
+									tenantPermissionHeaders.setData("id", "FeatureName", index)
+									tenantPermissionHeaders.setData("name", qsTr("Permission"), index)
 
-				function close() {
-					createRoleDialog.visible = false
-				}
+									tenantPermissionHeaders.refresh()
 
-				Rectangle {
-					anchors.fill: parent
-					color: "#80000000"
-
-					MouseArea {
-						anchors.fill: parent
-						onClicked: createRoleDialog.close()
-					}
-				}
-
-				Rectangle {
-					anchors.centerIn: parent
-					width: Style.sizeHintL
-					height: Style.sizeHintXS * 2
-					color: Style.baseColor
-					radius: Style.radiusM
-
-					Column {
-						anchors.fill: parent
-						anchors.margins: Style.marginXL
-						spacing: Style.marginL
-
-						BaseText {
-							width: parent.width
-							text: qsTr("Create Role")
-							font.pixelSize: Style.fontSizeL
-							font.bold: true
-						}
-
-						TextInputElementView {
-							id: newRoleNameInput
-							width: parent.width
-							name: qsTr("Role Name")
-							placeHolderText: qsTr("Enter role name")
-						}
-
-						Row {
-							width: parent.width
-							layoutDirection: Qt.RightToLeft
-							spacing: Style.marginM
-
-							Button {
-								text: qsTr("Create")
-								enabled: newRoleNameInput.text.length > 0
-								onClicked: {
-									container.__addTenantRole(newRoleNameInput.text, "")
-									createRoleDialog.close()
+									tenantPermissionsTreeView.treeView.columnModel = tenantPermissionHeaders
+									tenantPermissionsTreeView.treeView.rowModel = container.permissionsModel
 								}
-							}
 
-							Button {
-								text: qsTr("Cancel")
-								onClicked: createRoleDialog.close()
+								Component.onCompleted: {
+									tenantPermissionHeaders.updateHeaders()
+								}
 							}
 						}
 					}
