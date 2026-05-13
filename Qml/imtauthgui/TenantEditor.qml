@@ -29,7 +29,8 @@ DocumentViewBase {
 	property bool __membersModifiedLocally: false
 
 	onPendingMembersChanged: {
-		memberRolesRepeater.model = __buildMemberRolesModel()
+		// Trigger rebuild by reassigning __memberRolesMap (bottomComp binds to __buildMemberRolesModel)
+		container.__memberRolesMap = container.__memberRolesMap
 	}
 
 	function updateGui(){
@@ -218,14 +219,12 @@ DocumentViewBase {
 			}
 		}
 		container.__memberRolesMap = rolesMap
-		memberRolesRepeater.model = container.__buildMemberRolesModel()
 	}
 
 	function __updateMemberRole(userId, newRole) {
 		var rolesMap = container.__memberRolesMap
 		rolesMap[userId] = newRole
 		container.__memberRolesMap = rolesMap
-		memberRolesRepeater.model = container.__buildMemberRolesModel()
 		container.doUpdateModel()
 	}
 
@@ -239,6 +238,15 @@ DocumentViewBase {
 			result.push({ userId: userId, userName: userName, role: role })
 		}
 		return result
+	}
+
+	function __isInvitationExpired(expiresAt) {
+		if (!expiresAt)
+			return false
+		var expDate = new Date(expiresAt)
+		if (isNaN(expDate.getTime()))
+			return false
+		return expDate.getTime() < Date.now()
 	}
 
 	CustomScrollbar {
@@ -346,7 +354,7 @@ DocumentViewBase {
 				width: parent.width
 				visible: !container.isNewTenant
 				items: container.pendingMembers
-				label: qsTr("Active Members")
+				label: qsTr("Members")
 				addButtonText: qsTr("Create invitation")
 				filterPlaceholder: qsTr("Type or choose a user")
 				collectionId: "Users"
@@ -371,6 +379,97 @@ DocumentViewBase {
 						container.__membersModifiedLocally = false
 					}
 					membersSelector.items = container.pendingMembers.slice()
+				}
+
+				bottomComp: Component {
+					Column {
+						width: parent.width
+						spacing: Style.spacingXS
+
+						Text {
+							visible: membersSelector.items.length === 0
+							width: parent.width
+							text: membersSelector.emptyText
+							font.pixelSize: Style.fontSizeM
+							color: Style.inactiveTextColor
+							wrapMode: Text.WordWrap
+						}
+
+						Repeater {
+							model: container.__buildMemberRolesModel()
+
+							delegate: Item {
+								width: parent.width
+								height: Style.controlHeightM + container.totalMemberRoleRowMargin
+
+								readonly property bool isOwner: container.tenantData && modelData.userId === container.tenantData.m_ownerId
+
+								Row {
+									anchors.fill: parent
+									anchors.margins: container.memberRoleRowMargin
+									spacing: Style.marginL
+
+									BaseText {
+										width: (parent.width - parent.spacing - chipRemoveBtn.width) * container.memberRoleNameWidthRatio
+										anchors.verticalCenter: parent.verticalCenter
+										text: modelData.userName
+										elide: Text.ElideRight
+									}
+
+									ComboBox {
+										id: roleCombo
+										width: (parent.width - parent.spacing - chipRemoveBtn.width) * container.memberRoleComboWidthRatio
+										anchors.verticalCenter: parent.verticalCenter
+										model: container.__getAvailableRolesModel()
+										nameId: "name"
+										currentIndex: container.__findRoleIndex(modelData.role)
+										enabled: !isOwner
+
+										onFinished: {
+											var selectedIndex = index
+											if (!roleCombo.model || selectedIndex < 0)
+												return
+
+											var selectedRole = container.__getRoleModelValue(roleCombo.model, selectedIndex, "id")
+											if (!selectedRole)
+												return
+											if (selectedRole !== modelData.role) {
+												container.__updateMemberRole(modelData.userId, selectedRole)
+											}
+										}
+									}
+
+									ToolButton {
+										id: chipRemoveBtn
+										visible: membersSelector.editable && membersSelector.nonRemovableIds.indexOf(modelData.userId) < 0
+										anchors.verticalCenter: parent.verticalCenter
+										iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+										decorator: Component {
+											ToolButtonDecorator {
+												color: "transparent"
+												icon.width: Style.iconSizeXS
+											}
+										}
+										onClicked: {
+											var arr = membersSelector.items.slice()
+											for (var i = 0; i < arr.length; i++) {
+												if (arr[i].id === modelData.userId) {
+													arr.splice(i, 1)
+													break
+												}
+											}
+											membersSelector.__resolvingNames = true
+											membersSelector.items = arr
+											membersSelector.__resolvingNames = false
+											container.pendingMembers = arr
+											container.__membersModifiedLocally = true
+											container.doUpdateModel()
+										}
+									}
+								}
+							}
+						}
+					}
 				}
 			}
 
@@ -398,6 +497,8 @@ DocumentViewBase {
 							width: parent.width
 							height: Style.controlHeightM * 2 + container.totalMemberRoleRowMargin
 
+							readonly property bool isExpired: container.__isInvitationExpired(modelData.expiresAt)
+
 							Column {
 								anchors.fill: parent
 								anchors.margins: container.memberRoleRowMargin
@@ -408,20 +509,30 @@ DocumentViewBase {
 									spacing: Style.marginS
 
 									BaseText {
-										width: (parent.width - parent.spacing * 2) * 0.5
+										width: (parent.width - parent.spacing * 3) * 0.35
 										text: modelData.userName
 										elide: Text.ElideRight
 									}
 
 									BaseText {
-										width: (parent.width - parent.spacing * 2) * 0.25
+										width: (parent.width - parent.spacing * 3) * 0.2
 										text: modelData.role
 										elide: Text.ElideRight
 									}
 
 									BaseText {
-										width: (parent.width - parent.spacing * 2) * 0.25
-										text: modelData.status
+										width: (parent.width - parent.spacing * 3) * 0.2
+										text: isExpired ? qsTr("Expired") : modelData.status
+										color: isExpired ? "#DA3633" : Style.textColor
+										font.bold: isExpired
+										elide: Text.ElideRight
+									}
+
+									BaseText {
+										width: (parent.width - parent.spacing * 3) * 0.25
+										text: modelData.expiresAt ? qsTr("Expires: %1").arg(container.__formatDateTime(modelData.expiresAt)) : ""
+										color: isExpired ? "#DA3633" : Style.inactiveTextColor
+										font.pixelSize: Style.fontSizeS
 										elide: Text.ElideRight
 									}
 								}
@@ -452,74 +563,6 @@ DocumentViewBase {
 											container.revokeInvitationInput.m_invitationId = modelData.id
 											container.revokeInvitationSender.send(container.revokeInvitationInput)
 											container.__removePendingInvitation(modelData.id)
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-
-			// --- Member Roles Section ---
-			GroupHeaderView {
-				width: parent.width
-				title: qsTr("Member Roles")
-				groupView: memberRolesGroup
-				visible: memberRolesGroup.visible
-			}
-
-			GroupElementView {
-				id: memberRolesGroup
-				width: parent.width
-				visible: !container.isNewTenant && container.pendingMembers.length > 0
-
-				Column {
-					width: parent.width - container.totalMemberRoleHorizontalMargin
-					x: container.memberRoleHorizontalMargin
-					spacing: Style.marginM
-
-					Repeater {
-						id: memberRolesRepeater
-						model: []
-
-						delegate: Item {
-							width: parent.width
-							height: Style.controlHeightM + container.totalMemberRoleRowMargin
-
-							readonly property bool isOwner: container.tenantData && modelData.userId === container.tenantData.m_ownerId
-
-							Row {
-								anchors.fill: parent
-								anchors.margins: container.memberRoleRowMargin
-								spacing: Style.marginL
-
-								BaseText {
-									width: (parent.width - parent.spacing) * container.memberRoleNameWidthRatio
-									anchors.verticalCenter: parent.verticalCenter
-									text: modelData.userName
-									elide: Text.ElideRight
-								}
-
-								ComboBox {
-									id: roleCombo
-									width: (parent.width - parent.spacing) * container.memberRoleComboWidthRatio
-									anchors.verticalCenter: parent.verticalCenter
-									model: container.__getAvailableRolesModel()
-									nameId: "name"
-									currentIndex: container.__findRoleIndex(modelData.role)
-									enabled: !isOwner
-
-									onFinished: {
-										var selectedIndex = index
-										if (!roleCombo.model || selectedIndex < 0)
-											return
-
-										var selectedRole = container.__getRoleModelValue(roleCombo.model, selectedIndex, "id")
-										if (!selectedRole)
-											return
-										if (selectedRole !== modelData.role) {
-											container.__updateMemberRole(modelData.userId, selectedRole)
 										}
 									}
 								}
