@@ -3,7 +3,10 @@
 
 // Qt includes
 #include <QtCore/QDateTime>
+#include <QtCore/QFile>
 #include <QtCore/QUuid>
+#include <QtSql/QSqlError>
+#include <QtSql/QSqlQuery>
 #include <QtSql/QSqlRecord>
 
 // ACF includes
@@ -29,6 +32,18 @@ namespace
 const int s_invitationStatusPending = 0;
 
 } // namespace
+
+
+// reimplemented (icomp::CComponentBase)
+
+void CTenantDbDelegateComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+
+	if (!CreatePermissionsTableIfNeeded()){
+		qWarning() << "CTenantDbDelegateComp: TenantPermissions table auto-creation failed";
+	}
+}
 
 
 istd::IChangeableUniquePtr CTenantDbDelegateComp::CreateObjectFromRecord(
@@ -68,6 +83,12 @@ istd::IChangeableUniquePtr CTenantDbDelegateComp::CreateObjectFromRecord(
 		QVariant val = record.value("UpdatedAt");
 		QDateTime dt = val.toDateTime();
 		tenantPtr->SetUpdatedAt(dt.isValid() ? dt.toString(Qt::ISODateWithMs) : val.toString());
+	}
+
+	// Load permissions from the TenantPermissions table
+	if (record.contains("Id")){
+		QByteArrayList permissions = LoadTenantPermissions(record.value("Id").toByteArray());
+		tenantPtr->SetTenantPermissions(permissions);
 	}
 
 	return tenantPtr;
@@ -112,6 +133,14 @@ CTenantDbDelegateComp::NewObjectQuery CTenantDbDelegateComp::CreateNewObjectQuer
 			 now,
 			 now).toUtf8();
 
+	// Append permissions insert if tenant has permissions
+	if (tenantPtr != nullptr){
+		QByteArrayList permissions = tenantPtr->GetTenantPermissions();
+		if (!permissions.isEmpty()){
+			result.query += CreatePermissionsInsertQuery(id.toUtf8(), permissions);
+		}
+	}
+
 	return result;
 }
 
@@ -145,7 +174,9 @@ QByteArray CTenantDbDelegateComp::CreateUpdateObjectQuery(
 			 imtdb::EscapeSql(QString::fromUtf8(tenantPtr->GetOwnerId())),
 			 tenantPtr->IsActive() ? "true" : "false",
 			 now,
-			 escapedId).toUtf8();
+			 escapedId).toUtf8()
+		+ CreatePermissionsDeleteQuery(objectId)
+		+ CreatePermissionsInsertQuery(objectId, tenantPtr->GetTenantPermissions());
 }
 
 
@@ -163,8 +194,13 @@ QByteArray CTenantDbDelegateComp::CreateDeleteObjectsQuery(
 		escapedIds << QString("'%1'").arg(imtdb::EscapeSql(QString::fromUtf8(id)));
 	}
 
-	return QString("DELETE FROM \"%1\" WHERE \"Id\" IN (%2);")
-			.arg(*m_tableNameAttrPtr, escapedIds.join(", ")).toUtf8();
+	QString permissionsTableName = QString::fromUtf8(*m_permissionsTableNameAttrPtr);
+	QString idsJoined = escapedIds.join(", ");
+
+	return (QString("DELETE FROM \"%1\" WHERE \"TenantId\" IN (%2);")
+				.arg(permissionsTableName, idsJoined)
+			+ QString("DELETE FROM \"%1\" WHERE \"Id\" IN (%2);")
+				.arg(*m_tableNameAttrPtr, idsJoined)).toUtf8();
 }
 
 
@@ -381,6 +417,121 @@ QString CTenantDbDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsS
 	// With TenantRelationScope as a computed column in the subquery,
 	// only show tenants where the user has a relationship (Owner, Member, or Invited)
 	return QStringLiteral("\"TenantRelationScope\" IS NOT NULL");
+}
+
+
+bool CTenantDbDelegateComp::CreatePermissionsTableIfNeeded()
+{
+	const bool autoCreate = m_autoCreatePermissionsTableAttrPtr.IsValid() ? *m_autoCreatePermissionsTableAttrPtr : false;
+	if (!autoCreate){
+		return true;
+	}
+
+	if (!m_databaseEngineCompPtr.IsValid()){
+		return false;
+	}
+
+	const QString permissionsTableName = QString::fromUtf8(*m_permissionsTableNameAttrPtr);
+	if (permissionsTableName.isEmpty()){
+		return false;
+	}
+
+	if (TableExists(permissionsTableName)){
+		return true;
+	}
+
+	const QByteArray scriptPath = m_createPermissionsTableScriptPathAttrPtr.IsValid() ? *m_createPermissionsTableScriptPathAttrPtr : QByteArray();
+	if (scriptPath.isEmpty()){
+		return false;
+	}
+
+	QString resourcePath = QString::fromUtf8(scriptPath);
+	if (!resourcePath.startsWith(QStringLiteral(":/"))){
+		resourcePath = imtdb::GetSqlResourcePath(*m_databaseEngineCompPtr, resourcePath);
+	}
+
+	QFile scriptFile(resourcePath);
+	if (!scriptFile.open(QFile::ReadOnly)){
+		qWarning() << "CTenantDbDelegateComp: TenantPermissions table creation script" << scriptFile.fileName() << "could not be loaded";
+		return false;
+	}
+
+	QByteArray createTableQuery = scriptFile.readAll();
+	scriptFile.close();
+
+	QByteArray tableScheme = GetTableScheme();
+	if (!tableScheme.isEmpty()){
+		createTableQuery.replace("${TableScheme}", tableScheme);
+	}
+	else{
+		createTableQuery.replace("${TableScheme}", "public");
+	}
+
+	QSqlError sqlError;
+	m_databaseEngineCompPtr->ExecSqlQuery(createTableQuery, &sqlError);
+
+	if (sqlError.type() != QSqlError::NoError){
+		qCritical() << "CTenantDbDelegateComp: TenantPermissions table could not be created."
+					<< "Error:" << sqlError
+					<< "Query:" << createTableQuery;
+		return false;
+	}
+
+	return true;
+}
+
+
+QByteArrayList CTenantDbDelegateComp::LoadTenantPermissions(const QByteArray& tenantId) const
+{
+	QByteArrayList result;
+	if (!m_databaseEngineCompPtr.IsValid() || tenantId.isEmpty()){
+		return result;
+	}
+
+	QString permissionsTableName = QString::fromUtf8(*m_permissionsTableNameAttrPtr);
+	QString escapedTenantId = imtdb::EscapeSql(QString::fromUtf8(tenantId));
+
+	QByteArray query = QString("SELECT \"PermissionId\" FROM \"%1\" WHERE \"TenantId\"='%2';")
+			.arg(permissionsTableName, escapedTenantId).toUtf8();
+
+	QSqlError sqlError;
+	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
+	if (sqlError.type() == QSqlError::NoError){
+		while (sqlQuery.next()){
+			result.append(sqlQuery.value(0).toByteArray());
+		}
+	}
+
+	return result;
+}
+
+
+QByteArray CTenantDbDelegateComp::CreatePermissionsInsertQuery(const QByteArray& tenantId, const QByteArrayList& permissions) const
+{
+	if (permissions.isEmpty()){
+		return QByteArray();
+	}
+
+	QString permissionsTableName = QString::fromUtf8(*m_permissionsTableNameAttrPtr);
+	QString escapedTenantId = imtdb::EscapeSql(QString::fromUtf8(tenantId));
+
+	QStringList valueRows;
+	for (const QByteArray& permissionId : permissions){
+		valueRows << QString("('%1', '%2')").arg(escapedTenantId, imtdb::EscapeSql(QString::fromUtf8(permissionId)));
+	}
+
+	return QString("INSERT INTO \"%1\" (\"TenantId\", \"PermissionId\") VALUES %2;")
+			.arg(permissionsTableName, valueRows.join(", ")).toUtf8();
+}
+
+
+QByteArray CTenantDbDelegateComp::CreatePermissionsDeleteQuery(const QByteArray& tenantId) const
+{
+	QString permissionsTableName = QString::fromUtf8(*m_permissionsTableNameAttrPtr);
+	QString escapedTenantId = imtdb::EscapeSql(QString::fromUtf8(tenantId));
+
+	return QString("DELETE FROM \"%1\" WHERE \"TenantId\"='%2';")
+			.arg(permissionsTableName, escapedTenantId).toUtf8();
 }
 
 
