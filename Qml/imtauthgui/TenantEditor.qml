@@ -522,12 +522,12 @@ DocumentViewBase {
 											nameId: "name"
 											currentIndex: container.__findRoleIndex(modelData.role)
 											changeable: container.__isOwnerOrAdmin
-										
+
 											onFinished: {
 												var selectedIndex = index
 												if (!roleCombo.model || selectedIndex < 0)
 													return
-										
+
 												var selectedRole = container.__getRoleModelValue(roleCombo.model, selectedIndex, "id")
 												if (!selectedRole)
 													return
