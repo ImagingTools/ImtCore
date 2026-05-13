@@ -138,6 +138,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 {
 	const auto* webSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&request);
 	if (webSocketRequest == nullptr){
+		SendErrorMessage(0, QStringLiteral("Invalid WebSocket request"), QStringLiteral("CWebSocketServletComp"));
 		return imtrest::ConstResponsePtr();
 	}
 
