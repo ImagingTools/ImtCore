@@ -506,21 +506,28 @@ DocumentViewBase {
 											color: memberDelegate.isPending ? Style.inactiveTextColor : Style.textColor
 										}
 
+										BaseText {
+											visible: !memberDelegate.isPending && memberDelegate.isOwner
+											width: (parent.width - parent.spacing - memberDelegate.actionBtnWidth) * container.memberRoleComboWidthRatio
+											anchors.verticalCenter: parent.verticalCenter
+											text: qsTr("Owner")
+										}
+
 										ComboBox {
 											id: roleCombo
-											visible: !memberDelegate.isPending
+											visible: !memberDelegate.isPending && !memberDelegate.isOwner
 											width: (parent.width - parent.spacing - memberDelegate.actionBtnWidth) * container.memberRoleComboWidthRatio
 											anchors.verticalCenter: parent.verticalCenter
 											model: container.__getAvailableRolesModel()
 											nameId: "name"
 											currentIndex: container.__findRoleIndex(modelData.role)
-											changeable: !memberDelegate.isOwner && container.__isOwnerOrAdmin
-
+											changeable: container.__isOwnerOrAdmin
+										
 											onFinished: {
 												var selectedIndex = index
 												if (!roleCombo.model || selectedIndex < 0)
 													return
-
+										
 												var selectedRole = container.__getRoleModelValue(roleCombo.model, selectedIndex, "id")
 												if (!selectedRole)
 													return
