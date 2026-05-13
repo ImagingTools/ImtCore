@@ -31,7 +31,7 @@ DocumentViewBase {
 	// Role-based access: determine current user's role in this tenant
 	readonly property string __currentUserRole:
 		!container.tenantData ? ""
-		: !(container.tenantData.m_currentUserId || "") ? ""
+		: !container.tenantData.m_currentUserId ? ""
 		: container.tenantData.m_ownerId && container.tenantData.m_currentUserId === container.tenantData.m_ownerId ? "Owner"
 		: container.__memberRolesMap && container.__memberRolesMap[container.tenantData.m_currentUserId] ? container.__memberRolesMap[container.tenantData.m_currentUserId]
 		: ""
