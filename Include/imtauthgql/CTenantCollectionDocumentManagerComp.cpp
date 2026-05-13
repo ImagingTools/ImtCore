@@ -313,8 +313,9 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTenantCollect
 
 		if (isOwner || isAdmin || isNewTenant){
 			// Owner/Admin can remove any member (except owner) and add new ones
+			QByteArray ownerId = tenantPtr->GetOwnerId();
 			for (const QByteArray& existingUserId : currentUserIds){
-				if (!newUserIds.contains(existingUserId)){
+				if (!newUserIds.contains(existingUserId) && existingUserId != ownerId){
 					m_membershipManagerCompPtr->RemoveMembership(userIdToMembershipId.value(existingUserId));
 				}
 			}
