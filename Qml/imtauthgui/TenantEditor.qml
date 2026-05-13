@@ -18,13 +18,13 @@ DocumentViewBase {
 	property TenantData tenantData: model
 	property var pendingMembers: []
 	property var pendingInvitations: []
-	property bool isNewTenant: tenantData ? (!tenantData.m_id || tenantData.m_id === "") : true
+	property bool isNewTenant: container.tenantData ? (!container.tenantData.m_id || container.tenantData.m_id === "") : true
 	readonly property real memberRoleNameWidthRatio: 0.55
 	readonly property real memberRoleComboWidthRatio: 0.45
 	readonly property int memberRoleHorizontalMargin: Style.marginL
-	readonly property int totalMemberRoleHorizontalMargin: memberRoleHorizontalMargin * 2
+	readonly property int totalMemberRoleHorizontalMargin: container.memberRoleHorizontalMargin * 2
 	readonly property int memberRoleRowMargin: Style.marginS
-	readonly property int totalMemberRoleRowMargin: memberRoleRowMargin * 2
+	readonly property int totalMemberRoleRowMargin: container.memberRoleRowMargin * 2
 	readonly property int memberActionColumnWidth: Style.controlHeightM * 2
 	// Guard: set when members are modified locally, prevents updateGui from overwriting
 	property bool __membersModifiedLocally: false
@@ -47,13 +47,16 @@ DocumentViewBase {
 	}
 
 	function updateGui(){
-		__loadMembersFromModel();
-		__loadInvitationsFromModel();
-		generalGroup.updateGui();
+		container.__loadMembersFromModel()
+		container.__loadInvitationsFromModel()
+		container.__loadTenantRolesFromModel()
+		if (multiPageView.getPageByIndex(0))
+			multiPageView.getPageByIndex(0).updateGui()
 	}
 
 	function updateModel(){
-		generalGroup.updateModel();
+		if (multiPageView.getPageByIndex(0))
+			multiPageView.getPageByIndex(0).updateModel()
 		// Sync members and memberRoles back to model
 		if (container.tenantData) {
 			if (!container.tenantData.hasMembers()) {
@@ -84,6 +87,22 @@ DocumentViewBase {
 					container.tenantData.m_memberRoles.addElement(entry)
 				}
 			}
+
+			// tenantRoles: sync tenant-scoped roles
+			if (!container.tenantData.hasTenantRoles()) {
+				container.tenantData.emplaceTenantRoles()
+			}
+			container.tenantData.m_tenantRoles.clear()
+			var roles = container.__tenantRoles
+			for (var ri = 0; ri < roles.length; ri++) {
+				var roleEntry = container.tenantData.createTenantRolesArrayElement()
+				if (roleEntry) {
+					roleEntry.m_id = roles[ri].id || ""
+					roleEntry.m_name = roles[ri].name || ""
+					roleEntry.m_permissions = roles[ri].permissions || ""
+					container.tenantData.m_tenantRoles.addElement(roleEntry)
+				}
+			}
 		}
 	}
 
@@ -94,7 +113,6 @@ DocumentViewBase {
 		}
 		if (!container.tenantData)
 			return
-		// m_members is an SDL-generated list — access via .count and .get(i).item
 		var serverMembers = container.tenantData.m_members
 		var members = []
 		if (serverMembers) {
@@ -102,13 +120,12 @@ DocumentViewBase {
 			for (var i = 0; i < count; i++) {
 				var m = serverMembers.get(i).item
 				if (m) {
-					// Keep id visible if server cannot resolve the display name; this avoids blank chips/role rows.
 					members.push({ id: m.m_id || "", name: m.m_name || m.m_id || "" })
 				}
 			}
 		}
 		container.pendingMembers = members
-		__loadMemberRolesFromModel()
+		container.__loadMemberRolesFromModel()
 	}
 
 	function __loadInvitationsFromModel() {
@@ -147,10 +164,10 @@ DocumentViewBase {
 		for (var k = 0; k < selectedItems.length; k++) {
 			var selected = selectedItems[k]
 			if (selected && selected.id && !activeIds[selected.id]) {
-				createInvitationInput.m_tenantId = container.tenantData.m_id || ""
-				createInvitationInput.m_userId = selected.id
-				createInvitationInput.m_role = "Member"
-				createInvitationSender.send(createInvitationInput)
+				container.createInvitationInput.m_tenantId = container.tenantData.m_id || ""
+				container.createInvitationInput.m_userId = selected.id
+				container.createInvitationInput.m_role = "Member"
+				container.createInvitationSender.send(container.createInvitationInput)
 			}
 		}
 	}
@@ -178,7 +195,6 @@ DocumentViewBase {
 	}
 
 	// --- Member roles support ---
-	// Available role options from server (TenantData.availableRoles)
 	readonly property string defaultRole: "Member"
 
 	function __getAvailableRolesModel() {
@@ -190,7 +206,6 @@ DocumentViewBase {
 	function __getRoleModelValue(rolesModel, index, key) {
 		if (!rolesModel || index < 0)
 			return ""
-		// Prefer SDL-generated m_* roles but keep plain-key lookup for regular QML models.
 		if (rolesModel.getData)
 			return rolesModel.getData("m_" + key, index) || rolesModel.getData(key, index) || ""
 		var modelItem = rolesModel.get(index)
@@ -313,303 +328,587 @@ DocumentViewBase {
 		container.doUpdateModel()
 	}
 
-	CustomScrollbar {
-		id: scrollbar
-		z: parent.z + 1
-		anchors.right: parent.right
-		anchors.top: flickable.top
-		anchors.bottom: flickable.bottom
-		secondSize: Style.marginM
-		targetItem: flickable
+	// --- Tenant-scoped roles ---
+	property var __tenantRoles: []
+
+	function __loadTenantRolesFromModel() {
+		if (!container.tenantData)
+			return
+		var rolesModel = container.tenantData.m_tenantRoles
+		var roles = []
+		if (rolesModel) {
+			var count = rolesModel.count || 0
+			for (var i = 0; i < count; i++) {
+				var role = rolesModel.get(i).item
+				if (role) {
+					roles.push({
+						id: role.m_id || "",
+						name: role.m_name || "",
+						permissions: role.m_permissions || ""
+					})
+				}
+			}
+		}
+		container.__tenantRoles = roles
 	}
 
-	Flickable {
-		id: flickable
-		anchors.top: parent.top
-		anchors.topMargin: Style.marginXL
-		anchors.bottom: parent.bottom
-		anchors.bottomMargin: Style.marginXL
-		anchors.left: parent.left
-		anchors.leftMargin: Style.marginXL
-		anchors.right: scrollbar.left
-		anchors.rightMargin: Style.marginXL
-		contentWidth: bodyColumn.width
-		contentHeight: bodyColumn.height + 2 * Style.marginXL
+	function __addTenantRole(name, permissions) {
+		var roles = container.__tenantRoles.slice()
+		roles.push({ id: "", name: name, permissions: permissions || "" })
+		container.__tenantRoles = roles
+		container.doUpdateModel()
+	}
 
-		boundsBehavior: Flickable.StopAtBounds
-		clip: true
+	function __updateTenantRole(index, name, permissions) {
+		var roles = container.__tenantRoles.slice()
+		if (index >= 0 && index < roles.length) {
+			roles[index].name = name
+			roles[index].permissions = permissions || ""
+			container.__tenantRoles = roles
+			container.doUpdateModel()
+		}
+	}
 
-		Column {
-			id: bodyColumn
-			width: Style.sizeHintXXL
-			spacing: Style.marginXL
+	function __removeTenantRole(index) {
+		var roles = container.__tenantRoles.slice()
+		if (index >= 0 && index < roles.length) {
+			roles.splice(index, 1)
+			container.__tenantRoles = roles
+			container.doUpdateModel()
+		}
+	}
 
-			GroupHeaderView {
-				width: parent.width
-				title: qsTr("General")
-				groupView: generalGroup
+	// --- Transfer ownership support ---
+	function __getTransferableMembers() {
+		var result = []
+		var members = container.pendingMembers
+		var ownerId = container.tenantData ? container.tenantData.m_ownerId : ""
+		for (var i = 0; i < members.length; i++) {
+			if (members[i].id !== ownerId) {
+				result.push(members[i])
+			}
+		}
+		return result
+	}
+
+	// --- MultiPageView ---
+	MultiPageView {
+		id: multiPageView
+
+		anchors.fill: parent
+
+		Component.onCompleted: {
+			multiPageView.addPage("General", qsTr("General"), generalPageComp, "Icons/Settings")
+			if (!container.isNewTenant) {
+				multiPageView.addPage("Members", qsTr("Members"), membersPageComp, "Icons/MultipleUser")
+				multiPageView.addPage("Roles", qsTr("Roles"), rolesPageComp, "Icons/Role")
+			}
+		}
+	}
+
+	// ===== Page: General =====
+	Component {
+		id: generalPageComp
+
+		Item {
+			id: generalPage
+
+			function updateGui() {
+				if (!container.tenantData) return
+				nameInput.text = container.tenantData.m_name || ""
+				descriptionInput.text = container.tenantData.m_description || ""
+				isActiveInput.checked = container.tenantData.m_isActive !== undefined ? container.tenantData.m_isActive : true
 			}
 
-			GroupElementView {
-				id: generalGroup
-				width: parent.width
-
-				TextInputElementView {
-					id: nameInput
-
-					name: qsTr("Tenant Name")
-					placeHolderText: qsTr("Enter the tenant name")
-					readOnly: !container.__isOwner && !container.isNewTenant
-
-					onEditingFinished: {
-						let oldText = container.tenantData ? container.tenantData.m_name : ""
-						if (oldText !== nameInput.text){
-							container.doUpdateModel();
-						}
-					}
-
-					KeyNavigation.tab: descriptionInput
-					KeyNavigation.backtab: isActiveInput
-				}
-
-				TextInputElementView {
-					id: descriptionInput
-
-					name: qsTr("Description")
-					placeHolderText: qsTr("Enter the description")
-					readOnly: !container.__isOwner && !container.isNewTenant
-
-					onEditingFinished: {
-						let oldText = container.tenantData ? container.tenantData.m_description : ""
-						if (oldText !== descriptionInput.text){
-							container.doUpdateModel();
-						}
-					}
-
-					KeyNavigation.tab: isActiveInput
-					KeyNavigation.backtab: nameInput
-				}
-
-				SwitchElementView {
-					id: isActiveInput
-
-					name: qsTr("Active")
-					readOnly: !container.__isOwner && !container.isNewTenant
-
-					onCheckedChanged: {
-						container.doUpdateModel();
-					}
-				}
-
-				function updateGui(){
-					if (!container.tenantData) return;
-					nameInput.text = container.tenantData.m_name || ""
-					descriptionInput.text = container.tenantData.m_description || ""
-					isActiveInput.checked = container.tenantData.m_isActive !== undefined ? container.tenantData.m_isActive : true
-				}
-
-				function updateModel(){
-					if (!container.tenantData) return;
-					container.tenantData.m_name = nameInput.text
-					container.tenantData.m_description = descriptionInput.text
-					container.tenantData.m_isActive = isActiveInput.checked
-				}
+			function updateModel() {
+				if (!container.tenantData) return
+				container.tenantData.m_name = nameInput.text
+				container.tenantData.m_description = descriptionInput.text
+				container.tenantData.m_isActive = isActiveInput.checked
 			}
 
-			ItemSelectElementView {
-				id: membersSelector
-				width: parent.width
-				visible: !container.isNewTenant
-				items: container.pendingMembers
-				label: qsTr("Members")
-				addButtonText: qsTr("Create invitation")
-				filterPlaceholder: qsTr("Type or choose a user")
-				collectionId: "Users"
-				emptyText: qsTr("No members")
-				showCount: true
-				editable: container.__isOwnerOrAdmin
-				nonRemovableIds: container.tenantData && container.tenantData.m_ownerId ? [container.tenantData.m_ownerId] : []
+			CustomScrollbar {
+				id: generalScrollbar
+				z: parent.z + 1
+				anchors.right: parent.right
+				anchors.top: generalFlickable.top
+				anchors.bottom: generalFlickable.bottom
+				secondSize: Style.marginM
+				targetItem: generalFlickable
+			}
 
-				onItemRemoved: {
-					container.pendingMembers = membersSelector.items.slice()
-					container.__membersModifiedLocally = true
-					container.doUpdateModel()
-				}
+			Flickable {
+				id: generalFlickable
+				anchors.top: parent.top
+				anchors.topMargin: Style.marginXL
+				anchors.bottom: parent.bottom
+				anchors.bottomMargin: Style.marginXL
+				anchors.left: parent.left
+				anchors.leftMargin: Style.marginXL
+				anchors.right: generalScrollbar.left
+				anchors.rightMargin: Style.marginXL
+				contentWidth: generalColumn.width
+				contentHeight: generalColumn.height + 2 * Style.marginXL
 
-				onSelectionChanged: {
-					container.__inviteSelectedUsers(selectedItems)
-					membersSelector.items = container.pendingMembers.slice()
-				}
+				boundsBehavior: Flickable.StopAtBounds
+				clip: true
 
-				onPopupClosed: {
-					if (container.__membersModifiedLocally) {
-						container.doUpdateModel()
-						container.__membersModifiedLocally = false
-					}
-					membersSelector.items = container.pendingMembers.slice()
-				}
+				Column {
+					id: generalColumn
+					width: Style.sizeHintXXL
+					spacing: Style.marginXL
 
-				bottomComp: Component {
-					Column {
+					GroupHeaderView {
 						width: parent.width
-						spacing: Style.spacingXS
+						title: qsTr("General")
+						groupView: generalGroup
+					}
 
-						Text {
-							visible: membersSelector.items.length === 0 && container.pendingInvitations.length === 0
-							width: parent.width
-							text: membersSelector.emptyText
-							font.pixelSize: Style.fontSizeM
-							color: Style.inactiveTextColor
-							wrapMode: Text.WordWrap
+					GroupElementView {
+						id: generalGroup
+						width: parent.width
+
+						TextInputElementView {
+							id: nameInput
+
+							name: qsTr("Tenant Name")
+							placeHolderText: qsTr("Enter the tenant name")
+							readOnly: !container.__isOwner && !container.isNewTenant
+
+							onEditingFinished: {
+								let oldText = container.tenantData ? container.tenantData.m_name : ""
+								if (oldText !== nameInput.text){
+									container.doUpdateModel()
+								}
+							}
+
+							KeyNavigation.tab: descriptionInput
+							KeyNavigation.backtab: isActiveInput
 						}
 
-						Repeater {
-							model: container.__buildMemberRolesModel()
+						TextInputElementView {
+							id: descriptionInput
+
+							name: qsTr("Description")
+							placeHolderText: qsTr("Enter the description")
+							readOnly: !container.__isOwner && !container.isNewTenant
+
+							onEditingFinished: {
+								let oldText = container.tenantData ? container.tenantData.m_description : ""
+								if (oldText !== descriptionInput.text){
+									container.doUpdateModel()
+								}
+							}
+
+							KeyNavigation.tab: isActiveInput
+							KeyNavigation.backtab: nameInput
+						}
+
+						SwitchElementView {
+							id: isActiveInput
+
+							name: qsTr("Active")
+							readOnly: !container.__isOwner && !container.isNewTenant
+
+							onCheckedChanged: {
+								container.doUpdateModel()
+							}
+						}
+					}
+
+					// Owner section
+					GroupHeaderView {
+						visible: !container.isNewTenant
+						width: parent.width
+						title: qsTr("Ownership")
+						groupView: ownerGroup
+					}
+
+					GroupElementView {
+						id: ownerGroup
+						visible: !container.isNewTenant
+						width: parent.width
+
+						Row {
+							width: parent.width
+							spacing: Style.marginL
+
+							BaseText {
+								id: ownerLabel
+								anchors.verticalCenter: parent.verticalCenter
+								text: qsTr("Owner: %1").arg(container.__getOwnerDisplayName())
+							}
+
+							Button {
+								id: transferOwnershipBtn
+								visible: container.__isOwner
+								anchors.verticalCenter: parent.verticalCenter
+								text: qsTr("Transfer Ownership")
+								onClicked: {
+									transferOwnershipDialog.open()
+								}
+							}
+						}
+					}
+				}
+			}
+
+			// Transfer Ownership Dialog
+			Item {
+				id: transferOwnershipDialog
+				visible: false
+				anchors.fill: parent
+				z: 100
+
+				function open() {
+					transferOwnershipDialog.visible = true
+					transferMembersList.model = container.__getTransferableMembers()
+				}
+
+				function close() {
+					transferOwnershipDialog.visible = false
+				}
+
+				Rectangle {
+					anchors.fill: parent
+					color: "#80000000"
+
+					MouseArea {
+						anchors.fill: parent
+						onClicked: transferOwnershipDialog.close()
+					}
+				}
+
+				Rectangle {
+					id: dialogContent
+					anchors.centerIn: parent
+					width: Style.sizeHintL
+					height: Style.sizeHintM
+					color: Style.baseColor
+					radius: Style.radiusM
+
+					Column {
+						anchors.fill: parent
+						anchors.margins: Style.marginXL
+						spacing: Style.marginL
+
+						BaseText {
+							width: parent.width
+							text: qsTr("Transfer Ownership")
+							font.pixelSize: Style.fontSizeL
+							font.bold: true
+						}
+
+						BaseText {
+							width: parent.width
+							text: qsTr("Select a member to transfer ownership to. You will be demoted to Admin role.")
+							wrapMode: Text.WordWrap
+							color: Style.inactiveTextColor
+						}
+
+						ListView {
+							id: transferMembersList
+							width: parent.width
+							height: parent.height - Style.controlHeightM * 3 - parent.spacing * 4
+							clip: true
+							spacing: Style.marginS
 
 							delegate: Item {
-								id: memberDelegate
-								width: parent.width
-								height: memberDelegate.isPending
-									? Style.controlHeightM * 1.5 + container.totalMemberRoleRowMargin
-									: Style.controlHeightM + container.totalMemberRoleRowMargin
+								id: transferDelegate
+								width: transferMembersList.width
+								height: Style.controlHeightM
 
-								readonly property bool isOwner: container.tenantData && modelData.userId === container.tenantData.m_ownerId
-								readonly property bool isPending: modelData.isPending === true
-								readonly property bool isCurrentUser: container.tenantData && container.tenantData.m_currentUserId && modelData.userId === container.tenantData.m_currentUserId
-								readonly property int actionBtnWidth: container.memberActionColumnWidth
-
-								Column {
+								Rectangle {
 									anchors.fill: parent
-									anchors.margins: container.memberRoleRowMargin
-									spacing: Style.marginXS
+									color: transferDelegateArea.containsMouse ? Style.highlightColor : "transparent"
+									radius: Style.radiusS
 
-									Row {
-										width: parent.width
-										spacing: Style.marginL
-
-										// Pending indicator
-										Text {
-											visible: memberDelegate.isPending
-											anchors.verticalCenter: parent.verticalCenter
-											text: "⏳"
-											font.pixelSize: Style.fontSizeM
-											width: Style.iconSizeS
-										}
-
-										BaseText {
-											width: memberDelegate.isPending
-												? (parent.width - parent.spacing * 2 - Style.iconSizeS - memberDelegate.actionBtnWidth) * container.memberRoleNameWidthRatio
-												: (parent.width - parent.spacing - memberDelegate.actionBtnWidth) * container.memberRoleNameWidthRatio
-											anchors.verticalCenter: parent.verticalCenter
-											text: modelData.userName
-											elide: Text.ElideRight
-											color: memberDelegate.isPending ? Style.inactiveTextColor : Style.textColor
-										}
-
-										BaseText {
-											visible: !memberDelegate.isPending && memberDelegate.isOwner
-											width: (parent.width - parent.spacing - memberDelegate.actionBtnWidth) * container.memberRoleComboWidthRatio
-											anchors.verticalCenter: parent.verticalCenter
-											text: qsTr("Owner")
-										}
-
-										ComboBox {
-											id: roleCombo
-											visible: !memberDelegate.isPending && !memberDelegate.isOwner
-											width: (parent.width - parent.spacing - memberDelegate.actionBtnWidth) * container.memberRoleComboWidthRatio
-											anchors.verticalCenter: parent.verticalCenter
-											model: container.__getAvailableRolesModel()
-											nameId: "name"
-											currentIndex: container.__findRoleIndex(modelData.role)
-											changeable: container.__isOwnerOrAdmin
-
-											onFinished: {
-												var selectedIndex = index
-												if (!roleCombo.model || selectedIndex < 0)
-													return
-
-												var selectedRole = container.__getRoleModelValue(roleCombo.model, selectedIndex, "id")
-												if (!selectedRole)
-													return
-												var currentRole = container.__memberRolesMap[modelData.userId] || container.defaultRole
-												if (selectedRole !== currentRole) {
-													container.__updateMemberRole(modelData.userId, selectedRole)
-												}
-											}
-										}
-
-										BaseText {
-											visible: memberDelegate.isPending
-											width: memberDelegate.isPending
-												? (parent.width - parent.spacing * 2 - Style.iconSizeS - memberDelegate.actionBtnWidth) * container.memberRoleComboWidthRatio
-												: 0
-											anchors.verticalCenter: parent.verticalCenter
-											text: modelData.isExpired ? qsTr("Expired") : qsTr("%1 (%2)").arg(modelData.role).arg(modelData.status)
-											color: modelData.isExpired ? "#DA3633" : Style.inactiveTextColor
-											font.bold: modelData.isExpired
-											elide: Text.ElideRight
-										}
-
-										ToolButton {
-											id: chipRemoveBtn
-											visible: !memberDelegate.isPending && membersSelector.editable && membersSelector.nonRemovableIds.indexOf(modelData.userId) < 0
-											anchors.verticalCenter: parent.verticalCenter
-											iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
-											decorator: Component {
-												ToolButtonDecorator {
-													color: "transparent"
-													icon.width: Style.iconSizeXS
-												}
-											}
-											onClicked: {
-												container.__removeMemberById(modelData.userId)
-											}
-										}
-
-										Button {
-											id: leaveBtn
-											visible: !memberDelegate.isPending && memberDelegate.isCurrentUser && !memberDelegate.isOwner && !chipRemoveBtn.visible
-											anchors.verticalCenter: parent.verticalCenter
-											width: container.memberActionColumnWidth
-											text: qsTr("Leave")
-											onClicked: {
-												container.__removeMemberById(modelData.userId)
-											}
+									MouseArea {
+										id: transferDelegateArea
+										anchors.fill: parent
+										hoverEnabled: true
+										onClicked: {
+											container.__transferOwnershipTo(modelData.id, modelData.name)
+											transferOwnershipDialog.close()
 										}
 									}
 
-									// Second row for pending invitations: expiry info + revoke/resend
-									Row {
-										visible: memberDelegate.isPending
+									BaseText {
+										anchors.verticalCenter: parent.verticalCenter
+										anchors.left: parent.left
+										anchors.leftMargin: Style.marginM
+										text: modelData.name || modelData.id
+									}
+								}
+							}
+						}
+
+						Row {
+							width: parent.width
+							layoutDirection: Qt.RightToLeft
+
+							Button {
+								text: qsTr("Cancel")
+								onClicked: transferOwnershipDialog.close()
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	function __getOwnerDisplayName() {
+		if (!container.tenantData || !container.tenantData.m_ownerId)
+			return ""
+		var ownerId = container.tenantData.m_ownerId
+		var members = container.pendingMembers
+		for (var i = 0; i < members.length; i++) {
+			if (members[i].id === ownerId)
+				return members[i].name || ownerId
+		}
+		return ownerId
+	}
+
+	function __transferOwnershipTo(newOwnerId, newOwnerName) {
+		container.transferOwnershipInput.m_tenantId = container.tenantData.m_id || ""
+		container.transferOwnershipInput.m_newOwnerId = newOwnerId
+		container.transferOwnershipSender.send(container.transferOwnershipInput)
+	}
+
+	// ===== Page: Members =====
+	Component {
+		id: membersPageComp
+
+		Item {
+			id: membersPage
+
+			CustomScrollbar {
+				id: membersScrollbar
+				z: parent.z + 1
+				anchors.right: parent.right
+				anchors.top: membersFlickable.top
+				anchors.bottom: membersFlickable.bottom
+				secondSize: Style.marginM
+				targetItem: membersFlickable
+			}
+
+			Flickable {
+				id: membersFlickable
+				anchors.top: parent.top
+				anchors.topMargin: Style.marginXL
+				anchors.bottom: parent.bottom
+				anchors.bottomMargin: Style.marginXL
+				anchors.left: parent.left
+				anchors.leftMargin: Style.marginXL
+				anchors.right: membersScrollbar.left
+				anchors.rightMargin: Style.marginXL
+				contentWidth: membersColumn.width
+				contentHeight: membersColumn.height + 2 * Style.marginXL
+
+				boundsBehavior: Flickable.StopAtBounds
+				clip: true
+
+				Column {
+					id: membersColumn
+					width: Style.sizeHintXXL
+					spacing: Style.marginXL
+
+					ItemSelectElementView {
+						id: membersSelector
+						width: parent.width
+						items: container.pendingMembers
+						label: qsTr("Members")
+						addButtonText: qsTr("Create invitation")
+						filterPlaceholder: qsTr("Type or choose a user")
+						collectionId: "Users"
+						emptyText: qsTr("No members")
+						showCount: true
+						editable: container.__isOwnerOrAdmin
+						nonRemovableIds: container.tenantData && container.tenantData.m_ownerId ? [container.tenantData.m_ownerId] : []
+
+						onItemRemoved: {
+							container.pendingMembers = membersSelector.items.slice()
+							container.__membersModifiedLocally = true
+							container.doUpdateModel()
+						}
+
+						onSelectionChanged: {
+							container.__inviteSelectedUsers(selectedItems)
+							membersSelector.items = container.pendingMembers.slice()
+						}
+
+						onPopupClosed: {
+							if (container.__membersModifiedLocally) {
+								container.doUpdateModel()
+								container.__membersModifiedLocally = false
+							}
+							membersSelector.items = container.pendingMembers.slice()
+						}
+
+						bottomComp: Component {
+							Column {
+								width: parent.width
+								spacing: Style.spacingXS
+
+								Text {
+									visible: membersSelector.items.length === 0 && container.pendingInvitations.length === 0
+									width: parent.width
+									text: membersSelector.emptyText
+									font.pixelSize: Style.fontSizeM
+									color: Style.inactiveTextColor
+									wrapMode: Text.WordWrap
+								}
+
+								Repeater {
+									model: container.__buildMemberRolesModel()
+
+									delegate: Item {
+										id: memberDelegate
 										width: parent.width
-										spacing: Style.marginM
+										height: memberDelegate.isPending
+											? Style.controlHeightM * 1.5 + container.totalMemberRoleRowMargin
+											: Style.controlHeightM + container.totalMemberRoleRowMargin
 
-										BaseText {
-											width: parent.width - revokeBtn.width - resendBtn.width - parent.spacing * 2
-											text: container.__formatInvitationInfo(modelData.invitedByName, modelData.expiresAt)
-											color: modelData.isExpired ? "#DA3633" : Style.inactiveTextColor
-											font.pixelSize: Style.fontSizeS
-											elide: Text.ElideRight
-										}
+										readonly property bool isOwner: container.tenantData && modelData.userId === container.tenantData.m_ownerId
+										readonly property bool isPending: modelData.isPending === true
+										readonly property bool isCurrentUser: container.tenantData && container.tenantData.m_currentUserId && modelData.userId === container.tenantData.m_currentUserId
+										readonly property int actionBtnWidth: container.memberActionColumnWidth
 
-										Button {
-											id: resendBtn
-											visible: container.__isOwnerOrAdmin
-											text: qsTr("Resend")
-											onClicked: {
-												container.resendInvitationInput.m_invitationId = modelData.invitationId
-												container.resendInvitationSender.send(container.resendInvitationInput)
+										Column {
+											anchors.fill: parent
+											anchors.margins: container.memberRoleRowMargin
+											spacing: Style.marginXS
+
+											Row {
+												width: parent.width
+												spacing: Style.marginL
+
+												// Pending indicator
+												Text {
+													visible: memberDelegate.isPending
+													anchors.verticalCenter: parent.verticalCenter
+													text: "⏳"
+													font.pixelSize: Style.fontSizeM
+													width: Style.iconSizeS
+												}
+
+												BaseText {
+													width: memberDelegate.isPending
+														? (parent.width - parent.spacing * 2 - Style.iconSizeS - memberDelegate.actionBtnWidth) * container.memberRoleNameWidthRatio
+														: (parent.width - parent.spacing - memberDelegate.actionBtnWidth) * container.memberRoleNameWidthRatio
+													anchors.verticalCenter: parent.verticalCenter
+													text: modelData.userName
+													elide: Text.ElideRight
+													color: memberDelegate.isPending ? Style.inactiveTextColor : Style.textColor
+												}
+
+												BaseText {
+													visible: !memberDelegate.isPending && memberDelegate.isOwner
+													width: (parent.width - parent.spacing - memberDelegate.actionBtnWidth) * container.memberRoleComboWidthRatio
+													anchors.verticalCenter: parent.verticalCenter
+													text: qsTr("Owner")
+												}
+
+												ComboBox {
+													id: roleCombo
+													visible: !memberDelegate.isPending && !memberDelegate.isOwner
+													width: (parent.width - parent.spacing - memberDelegate.actionBtnWidth) * container.memberRoleComboWidthRatio
+													anchors.verticalCenter: parent.verticalCenter
+													model: container.__getAvailableRolesModel()
+													nameId: "name"
+													currentIndex: container.__findRoleIndex(modelData.role)
+													changeable: container.__isOwnerOrAdmin
+
+													onFinished: {
+														var selectedIndex = index
+														if (!roleCombo.model || selectedIndex < 0)
+															return
+
+														var selectedRole = container.__getRoleModelValue(roleCombo.model, selectedIndex, "id")
+														if (!selectedRole)
+															return
+														var currentRole = container.__memberRolesMap[modelData.userId] || container.defaultRole
+														if (selectedRole !== currentRole) {
+															container.__updateMemberRole(modelData.userId, selectedRole)
+														}
+													}
+												}
+
+												BaseText {
+													visible: memberDelegate.isPending
+													width: memberDelegate.isPending
+														? (parent.width - parent.spacing * 2 - Style.iconSizeS - memberDelegate.actionBtnWidth) * container.memberRoleComboWidthRatio
+														: 0
+													anchors.verticalCenter: parent.verticalCenter
+													text: modelData.isExpired ? qsTr("Expired") : qsTr("%1 (%2)").arg(modelData.role).arg(modelData.status)
+													color: modelData.isExpired ? "#DA3633" : Style.inactiveTextColor
+													font.bold: modelData.isExpired
+													elide: Text.ElideRight
+												}
+
+												ToolButton {
+													id: chipRemoveBtn
+													visible: !memberDelegate.isPending && membersSelector.editable && membersSelector.nonRemovableIds.indexOf(modelData.userId) < 0
+													anchors.verticalCenter: parent.verticalCenter
+													iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+													decorator: Component {
+														ToolButtonDecorator {
+															color: "transparent"
+															icon.width: Style.iconSizeXS
+														}
+													}
+													onClicked: {
+														container.__removeMemberById(modelData.userId)
+													}
+												}
+
+												Button {
+													id: leaveBtn
+													visible: !memberDelegate.isPending && memberDelegate.isCurrentUser && !memberDelegate.isOwner && !chipRemoveBtn.visible
+													anchors.verticalCenter: parent.verticalCenter
+													width: container.memberActionColumnWidth
+													text: qsTr("Leave")
+													onClicked: {
+														container.__removeMemberById(modelData.userId)
+													}
+												}
 											}
-										}
 
-										Button {
-											id: revokeBtn
-											visible: container.__isOwnerOrAdmin
-											text: qsTr("Revoke")
-											onClicked: {
-												container.revokeInvitationInput.m_invitationId = modelData.invitationId
-												container.revokeInvitationSender.send(container.revokeInvitationInput)
-												container.__removePendingInvitation(modelData.invitationId)
+											// Second row for pending invitations: expiry info + revoke/resend
+											Row {
+												visible: memberDelegate.isPending
+												width: parent.width
+												spacing: Style.marginM
+
+												BaseText {
+													width: parent.width - revokeBtn.width - resendBtn.width - parent.spacing * 2
+													text: container.__formatInvitationInfo(modelData.invitedByName, modelData.expiresAt)
+													color: modelData.isExpired ? "#DA3633" : Style.inactiveTextColor
+													font.pixelSize: Style.fontSizeS
+													elide: Text.ElideRight
+												}
+
+												Button {
+													id: resendBtn
+													visible: container.__isOwnerOrAdmin
+													text: qsTr("Resend")
+													onClicked: {
+														container.resendInvitationInput.m_invitationId = modelData.invitationId
+														container.resendInvitationSender.send(container.resendInvitationInput)
+													}
+												}
+
+												Button {
+													id: revokeBtn
+													visible: container.__isOwnerOrAdmin
+													text: qsTr("Revoke")
+													onClicked: {
+														container.revokeInvitationInput.m_invitationId = modelData.invitationId
+														container.revokeInvitationSender.send(container.revokeInvitationInput)
+														container.__removePendingInvitation(modelData.invitationId)
+													}
+												}
 											}
 										}
 									}
@@ -622,6 +921,217 @@ DocumentViewBase {
 		}
 	}
 
+	// ===== Page: Roles =====
+	Component {
+		id: rolesPageComp
+
+		Item {
+			id: rolesPage
+
+			CustomScrollbar {
+				id: rolesScrollbar
+				z: parent.z + 1
+				anchors.right: parent.right
+				anchors.top: rolesFlickable.top
+				anchors.bottom: rolesFlickable.bottom
+				secondSize: Style.marginM
+				targetItem: rolesFlickable
+			}
+
+			Flickable {
+				id: rolesFlickable
+				anchors.top: parent.top
+				anchors.topMargin: Style.marginXL
+				anchors.bottom: parent.bottom
+				anchors.bottomMargin: Style.marginXL
+				anchors.left: parent.left
+				anchors.leftMargin: Style.marginXL
+				anchors.right: rolesScrollbar.left
+				anchors.rightMargin: Style.marginXL
+				contentWidth: rolesColumn.width
+				contentHeight: rolesColumn.height + 2 * Style.marginXL
+
+				boundsBehavior: Flickable.StopAtBounds
+				clip: true
+
+				Column {
+					id: rolesColumn
+					width: Style.sizeHintXXL
+					spacing: Style.marginXL
+
+					GroupHeaderView {
+						width: parent.width
+						title: qsTr("Tenant Roles")
+						groupView: rolesGroup
+					}
+
+					GroupElementView {
+						id: rolesGroup
+						width: parent.width
+
+						Row {
+							width: parent.width
+							spacing: Style.marginL
+
+							BaseText {
+								anchors.verticalCenter: parent.verticalCenter
+								text: qsTr("Manage roles available within this tenant")
+								color: Style.inactiveTextColor
+							}
+
+							Button {
+								id: createRoleBtn
+								visible: container.__isOwnerOrAdmin
+								anchors.verticalCenter: parent.verticalCenter
+								text: qsTr("Create Role")
+								onClicked: {
+									createRoleDialog.open()
+								}
+							}
+						}
+
+						// Roles list
+						Column {
+							width: parent.width
+							spacing: Style.marginS
+
+							Repeater {
+								model: container.__tenantRoles
+
+								delegate: Item {
+									id: roleDelegate
+									width: parent.width
+									height: Style.controlHeightM + Style.marginS * 2
+
+									readonly property int roleIndex: model.index
+
+									Row {
+										anchors.fill: parent
+										anchors.margins: Style.marginS
+										spacing: Style.marginL
+
+										BaseText {
+											width: parent.width * 0.3
+											anchors.verticalCenter: parent.verticalCenter
+											text: modelData.name
+											elide: Text.ElideRight
+										}
+
+										BaseText {
+											width: parent.width * 0.4
+											anchors.verticalCenter: parent.verticalCenter
+											text: modelData.permissions ? modelData.permissions.split(";").length + " " + qsTr("permissions") : qsTr("No permissions")
+											color: Style.inactiveTextColor
+											elide: Text.ElideRight
+										}
+
+										ToolButton {
+											visible: container.__isOwnerOrAdmin
+											anchors.verticalCenter: parent.verticalCenter
+											iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+											decorator: Component {
+												ToolButtonDecorator {
+													color: "transparent"
+													icon.width: Style.iconSizeXS
+												}
+											}
+											onClicked: {
+												container.__removeTenantRole(roleDelegate.roleIndex)
+											}
+										}
+									}
+								}
+							}
+
+							BaseText {
+								visible: container.__tenantRoles.length === 0
+								width: parent.width
+								text: qsTr("No roles defined. Create a role to get started.")
+								color: Style.inactiveTextColor
+							}
+						}
+					}
+				}
+			}
+
+			// Create Role Dialog
+			Item {
+				id: createRoleDialog
+				visible: false
+				anchors.fill: parent
+				z: 100
+
+				function open() {
+					createRoleDialog.visible = true
+					newRoleNameInput.text = ""
+				}
+
+				function close() {
+					createRoleDialog.visible = false
+				}
+
+				Rectangle {
+					anchors.fill: parent
+					color: "#80000000"
+
+					MouseArea {
+						anchors.fill: parent
+						onClicked: createRoleDialog.close()
+					}
+				}
+
+				Rectangle {
+					anchors.centerIn: parent
+					width: Style.sizeHintL
+					height: Style.sizeHintXS * 2
+					color: Style.baseColor
+					radius: Style.radiusM
+
+					Column {
+						anchors.fill: parent
+						anchors.margins: Style.marginXL
+						spacing: Style.marginL
+
+						BaseText {
+							width: parent.width
+							text: qsTr("Create Role")
+							font.pixelSize: Style.fontSizeL
+							font.bold: true
+						}
+
+						TextInputElementView {
+							id: newRoleNameInput
+							width: parent.width
+							name: qsTr("Role Name")
+							placeHolderText: qsTr("Enter role name")
+						}
+
+						Row {
+							width: parent.width
+							layoutDirection: Qt.RightToLeft
+							spacing: Style.marginM
+
+							Button {
+								text: qsTr("Create")
+								enabled: newRoleNameInput.text.length > 0
+								onClicked: {
+									container.__addTenantRole(newRoleNameInput.text, "")
+									createRoleDialog.close()
+								}
+							}
+
+							Button {
+								text: qsTr("Cancel")
+								onClicked: createRoleDialog.close()
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// --- GQL Request Senders ---
 	property CreateTenantInvitationInput createInvitationInput: CreateTenantInvitationInput {}
 	property GqlSdlRequestSender createInvitationSender: GqlSdlRequestSender {
 		requestType: 1
@@ -650,5 +1160,22 @@ DocumentViewBase {
 	property GqlSdlRequestSender resendInvitationSender: GqlSdlRequestSender {
 		requestType: 1
 		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_resendTenantInvitation
+	}
+
+	property TransferTenantOwnershipInput transferOwnershipInput: TransferTenantOwnershipInput {}
+	property GqlSdlRequestSender transferOwnershipSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_transferTenantOwnership
+
+		sdlObjectComp: Component {
+			TransferTenantOwnershipPayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "")
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+					else if (container.representationController)
+						container.representationController.updateRepresentationFromDocument()
+				}
+			}
+		}
 	}
 }
