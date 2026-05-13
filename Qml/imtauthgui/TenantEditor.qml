@@ -524,7 +524,8 @@ DocumentViewBase {
 												var selectedRole = container.__getRoleModelValue(roleCombo.model, selectedIndex, "id")
 												if (!selectedRole)
 													return
-												if (selectedRole !== modelData.role) {
+												var currentRole = container.__memberRolesMap[modelData.userId] || container.defaultRole
+												if (selectedRole !== currentRole) {
 													container.__updateMemberRole(modelData.userId, selectedRole)
 												}
 											}

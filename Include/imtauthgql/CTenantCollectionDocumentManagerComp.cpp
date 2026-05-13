@@ -187,7 +187,7 @@ sdl::imtauth::Tenants::CTenantData CTenantCollectionDocumentManagerComp::OnGetTe
 	}
 
 	response.Version_1_0->availableRoles.Emplace();
-	static const char* roleNames[] = {"Owner", "Admin", "Member", "Guest"};
+	static const char* roleNames[] = {"Admin", "Member", "Guest"};
 	for (const char* roleName : roleNames){
 		sdl::imtauth::Tenants::CTenantRoleOption::V1_0 opt;
 		opt.id = QByteArray(roleName);
@@ -353,8 +353,12 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTenantCollect
 						continue;
 					}
 					QString roleStr = *roleEntry->role;
+					imtauth::ITenantMembership::TenantMemberRole newRole = StringToTenantMemberRole(roleStr);
+					// Owner role cannot be assigned — it is set once at creation
+					if (newRole == imtauth::ITenantMembership::TMR_OWNER){
+						continue;
+					}
 					if (updatedUserIdToMembershipId.contains(userId)){
-						imtauth::ITenantMembership::TenantMemberRole newRole = StringToTenantMemberRole(roleStr);
 						m_membershipManagerCompPtr->UpdateMembershipRole(updatedUserIdToMembershipId.value(userId), newRole);
 					}
 				}
