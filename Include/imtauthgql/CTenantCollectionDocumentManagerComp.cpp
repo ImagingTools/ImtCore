@@ -353,12 +353,12 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTenantCollect
 						continue;
 					}
 					QString roleStr = *roleEntry->role;
-					imtauth::ITenantMembership::TenantMemberRole newRole = StringToTenantMemberRole(roleStr);
 					// Owner role cannot be assigned — it is set once at creation
-					if (newRole == imtauth::ITenantMembership::TMR_OWNER){
+					if (roleStr == QStringLiteral("Owner")){
 						continue;
 					}
 					if (updatedUserIdToMembershipId.contains(userId)){
+						imtauth::ITenantMembership::TenantMemberRole newRole = StringToTenantMemberRole(roleStr);
 						m_membershipManagerCompPtr->UpdateMembershipRole(updatedUserIdToMembershipId.value(userId), newRole);
 					}
 				}
