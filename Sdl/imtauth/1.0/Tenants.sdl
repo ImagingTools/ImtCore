@@ -67,6 +67,7 @@ type TenantData {
 	isActive: Boolean
 	createdAt: String
 	updatedAt: String
+	currentUserId: ID
 	members: [TenantMemberEntry]
 	memberRoles: [TenantMemberRoleEntry]
 	pendingInvitations: [TenantInvitationEntry]

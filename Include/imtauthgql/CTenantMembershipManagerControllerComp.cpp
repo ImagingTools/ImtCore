@@ -628,6 +628,14 @@ sdl::imtauth::TenantMemberships::CUpdateMembershipRolePayload CTenantMembershipM
 		role = static_cast<imtauth::ITenantMembership::TenantMemberRole>(*arguments.input.Version_1_0->role);
 	}
 
+	// Owner role is immutable — cannot be changed
+	imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
+	if (membershipPtr.IsValid() && membershipPtr->GetRole() == imtauth::ITenantMembership::TMR_OWNER){
+		response.Version_1_0->success = false;
+		response.Version_1_0->errorMessage = QStringLiteral("Cannot change the Owner role");
+		return response;
+	}
+
 	bool success = m_membershipManagerCompPtr->UpdateMembershipRole(membershipId, role);
 
 	response.Version_1_0->success = success;
