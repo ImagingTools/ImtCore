@@ -505,28 +505,17 @@ ElementView {
                                     anchors.verticalCenter: parent.verticalCenter;
                                     anchors.horizontalCenter: parent.horizontalCenter;
 
-                                    checkState: {
-                                        var ni = treeDelegate.model.nodeIndex;
-                                        if (ni !== undefined && ni >= 0 && ni < treeViewImpl.__allNodes.length) {
-                                            return treeViewImpl.__allNodes[ni].checkState;
-                                        }
-                                        return Qt.Unchecked;
-                                    }
-                                    isActive: {
-                                        var ni = treeDelegate.model.nodeIndex;
-                                        if (ni !== undefined && ni >= 0 && ni < treeViewImpl.__allNodes.length) {
-                                            return treeViewImpl.__allNodes[ni].isActive && !treeViewImpl.readOnly;
-                                        }
-                                        return !treeViewImpl.readOnly;
-                                    }
-                                    visible: {
-                                        if (!treeViewImpl.tristate) return false;
-                                        var ni = treeDelegate.model.nodeIndex;
-                                        if (ni !== undefined && ni >= 0 && ni < treeViewImpl.__allNodes.length) {
-                                            return treeViewImpl.__allNodes[ni].isCheckable;
-                                        }
-                                        return true;
-                                    }
+                                    checkState: (treeDelegate.model.nodeIndex !== undefined && treeDelegate.model.nodeIndex >= 0 && treeDelegate.model.nodeIndex < treeViewImpl.__allNodes.length)
+                                        ? treeViewImpl.__allNodes[treeDelegate.model.nodeIndex].checkState
+                                        : Qt.Unchecked;
+                                    isActive: (treeDelegate.model.nodeIndex !== undefined && treeDelegate.model.nodeIndex >= 0 && treeDelegate.model.nodeIndex < treeViewImpl.__allNodes.length)
+                                        ? (treeViewImpl.__allNodes[treeDelegate.model.nodeIndex].isActive && !treeViewImpl.readOnly)
+                                        : !treeViewImpl.readOnly;
+                                    visible: !treeViewImpl.tristate
+                                        ? false
+                                        : (treeDelegate.model.nodeIndex !== undefined && treeDelegate.model.nodeIndex >= 0 && treeDelegate.model.nodeIndex < treeViewImpl.__allNodes.length)
+                                            ? treeViewImpl.__allNodes[treeDelegate.model.nodeIndex].isCheckable
+                                            : true;
 
                                     function nextCheckState() {
                                         var ni = treeDelegate.model.nodeIndex;
@@ -548,13 +537,9 @@ ElementView {
 
                                     font.family: Style.fontFamily;
                                     font.pixelSize: Style.fontSizeM;
-                                    color: {
-                                        var ni = treeDelegate.model.nodeIndex;
-                                        if (ni !== undefined && ni >= 0 && ni < treeViewImpl.__allNodes.length) {
-                                            return treeViewImpl.__allNodes[ni].isActive ? Style.textColor : Style.inactiveTextColor;
-                                        }
-                                        return Style.textColor;
-                                    }
+                                    color: (treeDelegate.model.nodeIndex !== undefined && treeDelegate.model.nodeIndex >= 0 && treeDelegate.model.nodeIndex < treeViewImpl.__allNodes.length)
+                                        ? (treeViewImpl.__allNodes[treeDelegate.model.nodeIndex].isActive ? Style.textColor : Style.inactiveTextColor)
+                                        : Style.textColor;
 
                                     wrapMode: Text.WordWrap;
                                     elide: Text.ElideRight;
