@@ -4,6 +4,7 @@
 
 // ImtCore includes
 #include <imtlic/IProductInfo.h>
+#include <imtsdl/TElementList.h>
 #include <imtclientgql/TClientRequestManagerCompWrap.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/TenantCollectionDocumentManager.h>
 
@@ -38,7 +39,7 @@ protected:
 private:
 	void CollectLeafPermissions(
 				const imtlic::IFeatureInfo* featureInfoPtr,
-				QList<sdl::imtauth::Tenants::CTenantPermissionOption::V1_0>& leafPermissions) const;
+				imtsdl::TElementList<sdl::imtauth::Tenants::CTenantPermissionOption::V1_0>& leafPermissions) const;
 
 	I_REF(imtlic::IProductInfo, m_productInfoCompPtr);
 };

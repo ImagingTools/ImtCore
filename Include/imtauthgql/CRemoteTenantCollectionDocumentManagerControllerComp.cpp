@@ -40,11 +40,7 @@ sdl::imtauth::Tenants::CTenantData CRemoteTenantCollectionDocumentManagerControl
 				if (featureCollectionPtr->GetObjectData(elementId, dataPtr)){
 					const imtlic::IFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::IFeatureInfo*>(dataPtr.GetPtr());
 					if (featureInfoPtr != nullptr && featureInfoPtr->IsPermission()){
-						QList<sdl::imtauth::Tenants::CTenantPermissionOption::V1_0> leafPermissions;
-						CollectLeafPermissions(featureInfoPtr, leafPermissions);
-						for (const auto& leafPerm : leafPermissions){
-							response.Version_1_0->allProductPermissions->push_back(leafPerm);
-						}
+						CollectLeafPermissions(featureInfoPtr, *response.Version_1_0->allProductPermissions);
 					}
 				}
 			}
@@ -68,7 +64,7 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CRemoteTenantC
 
 void CRemoteTenantCollectionDocumentManagerControllerComp::CollectLeafPermissions(
 		const imtlic::IFeatureInfo* featureInfoPtr,
-		QList<sdl::imtauth::Tenants::CTenantPermissionOption::V1_0>& leafPermissions) const
+		imtsdl::TElementList<sdl::imtauth::Tenants::CTenantPermissionOption::V1_0>& leafPermissions) const
 {
 	if (featureInfoPtr == nullptr){
 		return;
