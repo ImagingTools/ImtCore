@@ -425,6 +425,12 @@ QString CTenantDbDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsS
 }
 
 
+QByteArray CTenantDbDelegateComp::GetProductId() const
+{
+	return m_productIdAttrPtr.IsValid() ? *m_productIdAttrPtr : QByteArray();
+}
+
+
 bool CTenantDbDelegateComp::CreatePermissionsTableIfNeeded()
 {
 	const bool autoCreate = m_autoCreatePermissionsTableAttrPtr.IsValid() ? *m_autoCreatePermissionsTableAttrPtr : false;
@@ -497,7 +503,7 @@ QByteArrayList CTenantDbDelegateComp::LoadTenantPermissions(const QByteArray& te
 	QString escapedTenantId = imtdb::EscapeSql(QString::fromUtf8(tenantId));
 
 	QString queryStr;
-	QByteArray productId = m_productIdAttrPtr.IsValid() ? *m_productIdAttrPtr : QByteArray();
+	QByteArray productId = GetProductId();
 	if (!productId.isEmpty()){
 		queryStr = QString("SELECT \"PermissionId\" FROM \"%1\" WHERE \"TenantId\"='%2' AND \"ProductId\"='%3';")
 				.arg(permissionsTableName, escapedTenantId, imtdb::EscapeSql(QString::fromUtf8(productId)));
@@ -526,7 +532,7 @@ QByteArray CTenantDbDelegateComp::CreatePermissionsInsertQuery(const QByteArray&
 
 	QString permissionsTableName = QString::fromUtf8(*m_permissionsTableNameAttrPtr);
 	QString escapedTenantId = imtdb::EscapeSql(QString::fromUtf8(tenantId));
-	QByteArray productId = m_productIdAttrPtr.IsValid() ? *m_productIdAttrPtr : QByteArray();
+	QByteArray productId = GetProductId();
 	QString escapedProductId = imtdb::EscapeSql(QString::fromUtf8(productId));
 
 	QStringList valueRows;
@@ -544,7 +550,7 @@ QByteArray CTenantDbDelegateComp::CreatePermissionsDeleteQuery(const QByteArray&
 	QString permissionsTableName = QString::fromUtf8(*m_permissionsTableNameAttrPtr);
 	QString escapedTenantId = imtdb::EscapeSql(QString::fromUtf8(tenantId));
 
-	QByteArray productId = m_productIdAttrPtr.IsValid() ? *m_productIdAttrPtr : QByteArray();
+	QByteArray productId = GetProductId();
 	if (!productId.isEmpty()){
 		return QString("DELETE FROM \"%1\" WHERE \"TenantId\"='%2' AND \"ProductId\"='%3';")
 				.arg(permissionsTableName, escapedTenantId, imtdb::EscapeSql(QString::fromUtf8(productId))).toUtf8();

@@ -84,6 +84,7 @@ protected:
 private:
 	static QByteArray ExtractUserId(const iprm::IParamsSet* paramsPtr);
 	QString GetTenantRelationScopeSubquery(const QByteArray& userId) const;
+	QByteArray GetProductId() const;
 	bool CreatePermissionsTableIfNeeded();
 	QByteArrayList LoadTenantPermissions(const QByteArray& tenantId) const;
 	QByteArray CreatePermissionsInsertQuery(const QByteArray& tenantId, const QByteArrayList& permissions) const;
