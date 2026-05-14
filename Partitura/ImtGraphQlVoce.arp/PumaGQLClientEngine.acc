@@ -273,6 +273,9 @@
                     <AttributeInfo Id="ProductId" Type="Id" ExportId="ProductId">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ProductInfo" Type="Reference" ExportId="ProductInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

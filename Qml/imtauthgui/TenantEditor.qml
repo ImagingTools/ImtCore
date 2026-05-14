@@ -908,11 +908,9 @@ DocumentViewBase {
 				var selectedPermissionsIds = []
 				var permissionsArray = container.tenantData.m_tenantPermissions
 				if (permissionsArray) {
-					var permCount = permissionsArray.count || 0
+					var permCount = permissionsArray.length || 0
 					for (var pi2 = 0; pi2 < permCount; pi2++) {
-						var permId = permissionsArray.get(pi2)
-						if (permId)
-							selectedPermissionsIds.push(permId)
+						selectedPermissionsIds.push(permissionsArray[pi2])
 					}
 				}
 
@@ -950,9 +948,9 @@ DocumentViewBase {
 
 				if (!container.tenantData.hasTenantPermissions())
 					container.tenantData.emplaceTenantPermissions()
-				container.tenantData.m_tenantPermissions.clear()
+				container.tenantData.m_tenantPermissions = []
 				for (var k = 0; k < selectedPermissionIds.length; k++) {
-					container.tenantData.m_tenantPermissions.addElement(selectedPermissionIds[k])
+					container.tenantData.m_tenantPermissions.push(selectedPermissionIds[k])
 				}
 			}
 
