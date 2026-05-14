@@ -152,6 +152,7 @@
                 <file alias="imtcontrols/Views/BarChartSimple.qml">Views/BarChartSimple.qml</file>
                 <file alias="imtcontrols/Views/BasicTableView.qml">Views/BasicTableView.qml</file>
                 <file alias="imtcontrols/Views/BasicTreeView.qml">Views/BasicTreeView.qml</file>
+                <file alias="imtcontrols/Views/CheckableTreeView.qml">Views/CheckableTreeView.qml</file>
                 <file alias="imtcontrols/Views/ChangeItemSize.qml">Views/ChangeItemSize.qml</file>
                 <file alias="imtcontrols/Views/CustomScrollbar.qml">Views/CustomScrollbar.qml</file>
                 <file alias="imtcontrols/Views/ScrollIndicator.qml">Views/ScrollIndicator.qml</file>

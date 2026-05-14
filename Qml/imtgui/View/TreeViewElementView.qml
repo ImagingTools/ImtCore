@@ -16,7 +16,7 @@ ElementView {
 
         FocusScope {
             width: root.contentWidth;
-            height: filterInput.height + Style.marginM + basicTreeView.height;
+            height: filterInput.height + Style.marginM + checkableTree.height;
 
             SearchTextInput {
                 id: filterInput;
@@ -24,17 +24,20 @@ ElementView {
                 width: parent.width;
                 placeHolderText: qsTr("Filter...");
 
-                onSearchChanged: basicTreeView.filterText = filterInput.text;
+                onSearchChanged: {
+                    checkableTree.filterText = filterInput.text;
+                    checkableTree.rebuild();
+                }
             }
 
-            BasicTreeView {
-                id: basicTreeView;
+            CheckableTreeView {
+                id: checkableTree;
 
                 anchors.top: filterInput.bottom;
                 anchors.topMargin: Style.marginM;
                 width: parent.width;
 
-                Component.onCompleted: root.treeView = basicTreeView;
+                Component.onCompleted: root.treeView = checkableTree;
             }
         }
     }
