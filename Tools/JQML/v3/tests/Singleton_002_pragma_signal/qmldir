@@ -1,0 +1,2 @@
+module LocalSingletons
+singleton Bus 1.0 Bus.qml
