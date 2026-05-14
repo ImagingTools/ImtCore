@@ -453,8 +453,112 @@ class TestCase extends Item {
         return this.__dispatchMouseEvent('dblclick', point, button, QtEnums.NoButton, modifiers)
     }
 
-}
+    __dispatchKeyEvent(type, key, modifiers = QtEnums.NoModifier){
+        if(typeof window === 'undefined' || typeof window.dispatchEvent !== 'function') return false
 
+        // Qt enums are already DOM key strings (e.g. Qt.Key_Left === 'ArrowLeft')
+        // Single-char strings like 'a', 'A' are passed through as-is
+        let domKey = String(key)
+        let shiftKey = !!(modifiers & QtEnums.ShiftModifier)
+        let ctrlKey  = !!(modifiers & QtEnums.ControlModifier)
+        let altKey   = !!(modifiers & QtEnums.AltModifier)
+        let metaKey  = !!(modifiers & QtEnums.MetaModifier)
+
+        let event = new KeyboardEvent(type, {
+            bubbles: true,
+            cancelable: true,
+            key: domKey,
+            code: domKey,
+            shiftKey,
+            ctrlKey,
+            altKey,
+            metaKey,
+        })
+
+        window.dispatchEvent(event)
+        return true
+    }
+
+    keyPress(key, modifiers = QtEnums.NoModifier){
+        return this.__dispatchKeyEvent('keydown', key, modifiers)
+    }
+
+    keyRelease(key, modifiers = QtEnums.NoModifier){
+        return this.__dispatchKeyEvent('keyup', key, modifiers)
+    }
+
+    keyClick(key, modifiers = QtEnums.NoModifier){
+        this.__dispatchKeyEvent('keydown', key, modifiers)
+        this.__dispatchKeyEvent('keyup',   key, modifiers)
+        return true
+    }
+
+
+    // Type text into a TextInput (contenteditable div) or TextEdit (textarea).
+    // On desktop the method is a no-op; use the fallback in the QML test.
+    typeText(item, text){
+        if(!item || typeof item.__impl === 'undefined') return false
+        if(typeof window === 'undefined') return false
+
+        let impl = item.__impl
+        if(!impl) return false
+
+        if(impl.tagName === 'TEXTAREA'){
+            // TextEdit
+            impl.focus()
+            for(let i = 0; i < text.length; i++){
+                let ch = text[i]
+                let key = ch === '\n' ? QtEnums.Key_Enter : ch
+
+                this.__dispatchKeyEvent('keydown', key)
+                impl.value = (impl.value || '') + ch
+                impl.dispatchEvent(new Event('input', { bubbles: true }))
+                this.__dispatchKeyEvent('keyup', key)
+            }
+        } else {
+            // TextInput (contenteditable)
+            impl.focus()
+            for(let i = 0; i < text.length; i++){
+                let ch = text[i]
+                this.__dispatchKeyEvent('keydown', ch)
+                impl.dispatchEvent(new InputEvent('input', {
+                    bubbles: true,
+                    cancelable: true,
+                    inputType: 'insertText',
+                    data: ch,
+                }))
+                this.__dispatchKeyEvent('keyup', ch)
+            }
+        }
+        return true
+    }
+
+    // Clear text in a TextInput or TextEdit via selectAll + delete event.
+    clearText(item){
+        if(!item || typeof item.__impl === 'undefined') return false
+        if(typeof window === 'undefined') return false
+
+        let impl = item.__impl
+        if(!impl) return false
+
+        if(impl.tagName === 'TEXTAREA'){
+            impl.focus()
+            impl.value = ''
+            impl.dispatchEvent(new Event('input', { bubbles: true }))
+        } else {
+            // Select all then delete
+            impl.focus()
+            item.selectAll()
+            impl.dispatchEvent(new InputEvent('input', {
+                bubbles: true,
+                cancelable: true,
+                inputType: 'deleteContentBackward',
+            }))
+        }
+        return true
+    }
+
+}
 
 
 module.exports = TestCase
