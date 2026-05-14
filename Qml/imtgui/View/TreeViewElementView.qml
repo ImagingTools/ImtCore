@@ -46,7 +46,8 @@ ElementView {
                 }
 
                 // --- Public API (backward-compatible with BasicTreeView) ---
-                property int shiftLevel: 15;
+                property int shiftLevel: 20;
+                property int __prefixWidth: 30;
                 property bool tristate: false;
                 property bool headerVisible: false;
                 property bool readOnly: false;
@@ -74,7 +75,7 @@ ElementView {
                     }
 
                     if (!("ChildModel" in row)) {
-                        row["ChildModel"] = childModelComponent.createObject(treeViewImpl.rowModel);
+                        row["ChildModel"] = childModelComponent.createObject(null);
                     }
                     if (!("CheckState" in row)) {
                         row["CheckState"] = Qt.Unchecked;
@@ -386,7 +387,7 @@ ElementView {
                             width: parent.width;
                             height: treeViewImpl.rowItemHeight;
 
-                            leftPadding: nodeColumn.level * 20;
+                            leftPadding: nodeColumn.level * treeViewImpl.shiftLevel;
                             spacing: Style.spacingM;
 
                             // Expand/collapse arrow
@@ -453,7 +454,7 @@ ElementView {
 
                                 delegate: Item {
                                     width: treeViewImpl.columnModel.count > 0
-                                        ? (treeViewImpl.width - nodeColumn.level * 20 - 30 - Style.spacingM * 2) / treeViewImpl.columnModel.count
+                                        ? (treeViewImpl.width - nodeColumn.level * treeViewImpl.shiftLevel - treeViewImpl.__prefixWidth - Style.spacingM * 2) / treeViewImpl.columnModel.count
                                         : 0;
                                     height: nodeRow.height;
 
