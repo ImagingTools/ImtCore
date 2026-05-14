@@ -185,11 +185,15 @@ DocumentViewBase {
 	}
 
 	// --- Member roles support ---
-	// Roles model provided from outside (e.g. RoleCollectionDataProvider)
-	property var rolesModel: null
+	// Roles loaded via RoleCollectionDataProvider from Puma
+	RoleCollectionDataProvider {
+		id: roleCollectionDataProvider
+		productId: AuthorizationController.productId
+		Component.onCompleted: roleCollectionDataProvider.updateModel()
+	}
 
 	function __getAvailableRolesModel() {
-		return container.rolesModel
+		return roleCollectionDataProvider.collectionModel
 	}
 
 	function __getRoleModelValue(rolesModel, index, key) {
@@ -211,8 +215,8 @@ DocumentViewBase {
 
 		var count = roles.getItemsCount ? roles.getItemsCount() : (roles.count || 0)
 		for (var i = 0; i < count; i++) {
-			var id = container.__getRoleModelValue(roles, i, "id")
-			var name = container.__getRoleModelValue(roles, i, "name")
+			var id = container.__getRoleModelValue(roles, i, "roleId")
+			var name = container.__getRoleModelValue(roles, i, "roleName")
 			if (id === roleId || name === roleId)
 				return i
 		}
@@ -548,8 +552,17 @@ DocumentViewBase {
 							color: Style.inactiveTextColor
 						}
 
+						BaseText {
+							visible: transferMembersList.count === 0
+							width: parent.width
+							text: qsTr("No members available to transfer ownership to. Invite members first.")
+							wrapMode: Text.WordWrap
+							color: Style.inactiveTextColor
+						}
+
 						ListView {
 							id: transferMembersList
+							visible: transferMembersList.count > 0
 							width: parent.width
 							height: parent.height - Style.controlHeightM * 3 - parent.spacing * 4
 							clip: true
@@ -758,7 +771,7 @@ DocumentViewBase {
 													width: (parent.width - parent.spacing - memberDelegate.actionBtnWidth) * container.memberRoleComboWidthRatio
 													anchors.verticalCenter: parent.verticalCenter
 													model: container.__getAvailableRolesModel()
-													nameId: "name"
+													nameId: "roleName"
 													currentIndex: container.__findRoleIndex(modelData.role)
 													changeable: container.__isOwnerOrAdmin
 
@@ -767,7 +780,7 @@ DocumentViewBase {
 														if (!roleCombo.model || selectedIndex < 0)
 															return
 
-														var selectedRole = container.__getRoleModelValue(roleCombo.model, selectedIndex, "id")
+														var selectedRole = container.__getRoleModelValue(roleCombo.model, selectedIndex, "roleId")
 														if (!selectedRole)
 															return
 														var currentRole = container.__memberRolesMap[modelData.userId] || ""
