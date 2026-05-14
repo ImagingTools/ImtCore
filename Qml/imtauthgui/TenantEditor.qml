@@ -199,15 +199,14 @@ DocumentViewBase {
 	}
 
 	function __getRoleModelValue(rolesModel, index, key) {
-		if (!rolesModel || index < 0)
+		if (!rolesModel || index < 0 || index >= rolesModel.getItemsCount())
 			return ""
-		if (rolesModel.getData)
-			return rolesModel.getData("m_" + key, index) || rolesModel.getData(key, index) || ""
-		var modelItem = rolesModel.get(index)
-		var role = modelItem ? modelItem.item : null
-		if (!role)
-			return ""
-		return role["m_" + key] || role[key] || ""
+		var mKey = "m_" + key
+		if (rolesModel.containsKey(mKey, index))
+			return rolesModel.getData(mKey, index) || ""
+		if (rolesModel.containsKey(key, index))
+			return rolesModel.getData(key, index) || ""
+		return ""
 	}
 
 	function __findRoleIndex(roleId) {
@@ -215,7 +214,7 @@ DocumentViewBase {
 		if (!roles)
 			return -1
 
-		var count = roles.getItemsCount ? roles.getItemsCount() : (roles.count || 0)
+		var count = roles.getItemsCount()
 		for (var i = 0; i < count; i++) {
 			var id = container.__getRoleModelValue(roles, i, "roleId")
 			var name = container.__getRoleModelValue(roles, i, "roleName")
