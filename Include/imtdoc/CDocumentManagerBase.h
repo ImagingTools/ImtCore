@@ -36,11 +36,7 @@ public:
 
 	// reimplemented (imtdoc::IDocumentManager)
 	virtual DocumentList GetOpenedDocumentList(const QByteArray& userId) const override;
-	virtual QByteArray CreateNewDocument(
-		const QByteArray& userId,
-		const QByteArray& documentTypeId,
-		const QByteArray& proposedSourceDocumentId = QByteArray()) override;
-	virtual QByteArray OpenDocument(const QByteArray& userId, const QUrl& url) override;
+	virtual QByteArray CreateNewDocument(const QByteArray& userId, const QByteArray& documentTypeId) override;
 	virtual OperationStatus GetDocumentName(const QByteArray& userId, const QByteArray& documentId, QString& documentName) const override;
 	virtual OperationStatus SetDocumentName(const QByteArray& userId, const QByteArray& documentId, const QString& documentName) override;
 	virtual const istd::IChangeable* GetDocumentPtr(const QByteArray& userId, const QByteArray& documentId) const override;
@@ -68,8 +64,8 @@ protected:
 	void InitializeDocumentObservers(WorkingDocument& document, const QByteArray& userId);
 	WorkingDocument* FindDocument(const QByteArray& userId, const QByteArray& documentId);
 	const WorkingDocument* FindDocument(const QByteArray& userId, const QByteArray& documentId) const;
-	bool FindDocument(int undoManagerModelId, QByteArray& outUserId, QByteArray& outDocumentId);
-	QUrl ObjectIdToUrl(const QByteArray& objectId);
+	bool FindDocument(int undoManagerModelId, QByteArray& outUserId, QByteArray& outDocumentId) const;
+	static QUrl ObjectIdToUrl(const QByteArray& objectId);
 	DocumentNotificationPtr CreateDocumentNotification(const QByteArray& userId, const QByteArray& documentId) const;
 
 	void OnDocumentDataLoaded(const QByteArray& userId, const QByteArray& documentId);

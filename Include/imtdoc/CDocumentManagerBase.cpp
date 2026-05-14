@@ -74,137 +74,64 @@ IDocumentManager::DocumentList CDocumentManagerBase::GetOpenedDocumentList(
 }
 
 
-QByteArray CDocumentManagerBase::CreateNewDocument(
-	const QByteArray& userId,
-	const QByteArray& documentTypeId,
-	const QByteArray& proposedSourceDocumentId)
+QByteArray CDocumentManagerBase::CreateNewDocument(const QByteArray& userId, const QByteArray& documentTypeId)
 {
-	// Base implementation creates a blank document; source-based initialization is handled by derived managers if needed.
-	Q_UNUSED(proposedSourceDocumentId);
-
-	QByteArray retVal;
+	QByteArray newDocumentId;
 
 	idoc::IUndoManagerSharedPtr undoManagerPtr = CreateUndoManager();
 	if (!undoManagerPtr.IsValid()) {
-		return retVal;
+		return newDocumentId;
 	}
 
-	retVal = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+	newDocumentId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
-	QString documentName;
-	{
-		QMutexLocker locker(&m_mutex);
-		WorkingDocument& doc = m_userDocuments[userId][retVal];
-		doc.typeId = documentTypeId;
-		doc.undoManagerPtr = undoManagerPtr;
-		doc.isDirty = false;
-		doc.name = "";
-		doc.isLoading = true;
-		documentName = doc.name;
-	}
+	WorkingDocument doc;
+	doc.typeId = documentTypeId;
+	doc.undoManagerPtr = undoManagerPtr;
+	doc.isDirty = false;
+	doc.name = "";
+	doc.isLoading = true;
+	doc.objectPtr = CreateObject(documentTypeId);
 
-	{
+	if (doc.objectPtr.IsValid()) {
 		NewDocumentCreatedInfo info;
 		info.userId = userId;
-		info.documentId = retVal;
+		info.documentId = newDocumentId;
 		info.typeId = documentTypeId;
-		info.name = documentName;
+		info.name = doc.name;
 		info.isDirty = false;
-
 		istd::IChangeable::ChangeSet changeSet(CF_NEW_DOCUMENT_CREATED);
 		changeSet.SetChangeInfo(CN_NEW_DOCUMENT_CREATED, QVariant::fromValue(info));
 		istd::CChangeNotifier notifier(this, &changeSet);
+
+		{
+			QMutexLocker locker(&m_mutex);
+
+			m_userDocuments[userId][newDocumentId] = doc;
+
+			InitializeDocumentObservers(doc, userId);
+		}
 	}
 
 	for (IDocumentManagerEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
 		if (handlerPtr != nullptr){
 			CDocumentCreatedEvent event(
 				userId,
-				retVal,
+				newDocumentId,
 				documentTypeId,
-				documentName,
+				doc.name,
 				QUrl(),
 				false);
 			handlerPtr->ProcessEvent(&event);
 		}
 	}
 
-	// Create object asynchronously in a separate thread
-	QByteArray documentId = retVal;
-	QThread* thread = new QThread();
-	QObject* worker = new QObject();
-	worker->moveToThread(thread);
-
-	std::weak_ptr<std::atomic<bool>> aliveGuard(m_isAlive);
-	QObject::connect(thread, &QThread::started, worker, [this, aliveGuard, documentTypeId, userId, documentId, worker]() {
-		auto isAlive = aliveGuard.lock();
-		if (!isAlive || !isAlive->load()) {
-			worker->deleteLater();
-			return;
-		}
-
-		istd::IChangeableSharedPtr objectPtr = CreateObject(documentTypeId);
-
-		isAlive = aliveGuard.lock();
-		if (!isAlive || !isAlive->load()) {
-			worker->deleteLater();
-			return;
-		}
-
-		{
-			QMutexLocker locker(&m_mutex);
-			WorkingDocument* docPtr = FindDocument(userId, documentId);
-
-			if (docPtr != nullptr && objectPtr.IsValid()) {
-				docPtr->objectPtr = objectPtr;
-			}
-			else if (docPtr != nullptr) {
-				// Creation failed - close the document and notify client
-				docPtr->isLoading = false;
-				CloseDocument(userId, documentId);
-			}
-		}
-
-		worker->deleteLater();
-	});
-
-	// Initialize observers and fire events in the main thread after background work completes
-	QObject::connect(thread, &QThread::finished, QCoreApplication::instance(), [this, aliveGuard, userId, documentId]() {
-		auto isAlive = aliveGuard.lock();
-		if (!isAlive || !isAlive->load()) {
-			return;
-		}
-
-		QMutexLocker locker(&m_mutex);
-		WorkingDocument* docPtr = FindDocument(userId, documentId);
-
-		if (docPtr != nullptr && docPtr->objectPtr.IsValid() && docPtr->isLoading) {
-			docPtr->isLoading = false;
-
-			InitializeDocumentObservers(*docPtr, userId);
-
-			OnDocumentDataLoaded(userId, documentId);
-		}
-	});
-
-	QObject::connect(worker, &QObject::destroyed, thread, &QThread::quit);
-	QObject::connect(thread, &QThread::finished, thread, &QObject::deleteLater);
-
-	thread->start();
-
-	return retVal;
-}
-
-
-QByteArray CDocumentManagerBase::OpenDocument(const QByteArray& /*userId*/, const QUrl& /*url*/)
-{
-	return QByteArray();
+	return newDocumentId;
 }
 
 
 IDocumentManager::OperationStatus CDocumentManagerBase::GetDocumentName(const QByteArray& userId, const QByteArray& documentId, QString& documentName) const
 {
-
 	QMutexLocker locker(&m_mutex);
 
 	OperationStatus validationStatus;
@@ -218,7 +145,7 @@ IDocumentManager::OperationStatus CDocumentManagerBase::GetDocumentName(const QB
 }
 
 
-IDocumentManager::OperationStatus CDocumentManagerBase::SetDocumentName(const QByteArray& userId, const QByteArray& documentId, const QString& documentName)
+IDocumentManager::OperationStatus CDocumentManagerBase::SetDocumentName(const QByteArray& /*userId*/, const QByteArray& /*documentId*/, const QString& /*documentName*/)
 {
 	return OS_FAILED;
 }
@@ -556,7 +483,7 @@ const CDocumentManagerBase::WorkingDocument* CDocumentManagerBase::FindDocument(
 bool CDocumentManagerBase::FindDocument(
 	int undoManagerModelId,
 	QByteArray& outUserId,
-	QByteArray& outDocumentId)
+	QByteArray& outDocumentId) const
 {
 	for (const QByteArray& userId : m_userDocuments.keys()){
 		WorkingDocumentList& documents = m_userDocuments[userId];
