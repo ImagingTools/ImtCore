@@ -55,6 +55,7 @@ function compile(options){
     const Qt = require('../Qt/Qt')
     const QtQml = require('../QtQml/QtQml')
     const QtQuick = require('../QtQuick/QtQuick')
+    const QtTest = require('../QtTest/QtTest')
     const Qt5Compat = require('../Qt5Compat/Qt5Compat')
     const QtWebSockets = require('../QtWebSockets/QtWebSockets')
     const QtPositioning = require('../QtPositioning/QtPositioning')
@@ -90,6 +91,7 @@ function compile(options){
         Qt,
         QtQml,
         QtQuick,
+        QtTest,
         Qt5Compat,
         QtWebSockets,
         QtPositioning,

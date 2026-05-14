@@ -5,7 +5,9 @@ const Signal = require("../../QtQml/Signal")
 
 class RoundButton extends Button {
     static meta = Object.assign({}, Button.meta, {
-
+        radius: { type: Real, value: 0 },
+        
+        radiusChanged: { type: Signal, args: [] }
     })
 
     static create(parent = null, properties = {}){
