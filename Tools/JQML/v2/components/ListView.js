@@ -3,6 +3,7 @@ const { Flickable } = require('./Flickable')
 const { QVar, QReal, QBool, QAutoGeometry } = require('../utils/properties')
 const { ListModel } = require('./ListModel')
 const { PropertyAnimation } = require('./PropertyAnimation')
+const { DelegateChooser } = require('./DelegateChooser')
 
 
 
@@ -393,6 +394,18 @@ class ListView extends Flickable {
 
     $delegateChanged(){
         this.$clear(true)
+
+        let model = this.getPropertyValue('model')
+        let length = 0
+        if(model instanceof ListModel){
+            length = model.getPropertyValue('count')
+        } else if(Array.isArray(model)){
+            length = model.length
+        } else if(typeof model === 'number'){
+            length = model
+        }
+        this.getProperty('count').value = length
+
         this.$updateView()
     }
 
@@ -885,9 +898,26 @@ class ListView extends Flickable {
 
             if(obj.$signals['ListView.reused']) obj.$signals['ListView.reused']()
         } else {
-            let ctx = new ContextController(this.getProperty('delegate').get().$exCtx, this.$exCtx)
-            let createObject = this.getProperty('delegate').get().createObject
-            let cls = this.getProperty('delegate').get().constructor
+            let delegateValue = this.getProperty('delegate').get()
+
+            // Resolve DelegateChooser: pick per-item delegate based on model data
+            if(delegateValue instanceof DelegateChooser){
+                let exModel = null
+                if(Array.isArray(this.getPropertyValue('model'))){
+                    let val = this.getPropertyValue('model')[index]
+                    exModel = (typeof val === 'object' && val !== null) ? val : { '$modelData': val, index: index }
+                } else if(typeof this.getPropertyValue('model') === 'number'){
+                    exModel = { index: index }
+                } else {
+                    exModel = this.getPropertyValue('model').getPropertyValue('data')[index]
+                }
+                delegateValue = delegateValue.$chooseDelegate(index, -1, exModel)
+                if(!delegateValue) return false
+            }
+
+            let ctx = new ContextController(delegateValue.$exCtx, this.$exCtx)
+            let createObject = delegateValue.createObject
+            let cls = delegateValue.constructor
             
             if(Array.isArray(this.getPropertyValue('model'))){
                 obj = createObject ? createObject(this.getProperty('contentItem').get(),ctx, {'$modelData': this.getPropertyValue('model')[index], index: index}, false) : new cls(this.getProperty('contentItem').get(),ctx, {'$modelData': this.getPropertyValue('model')[index], index: index})

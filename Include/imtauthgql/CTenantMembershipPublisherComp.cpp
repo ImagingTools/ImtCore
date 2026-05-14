@@ -198,7 +198,7 @@ void CTenantMembershipPublisherComp::PublishNotification(
 	notification.Version_1_0->userId = userId;
 	notification.Version_1_0->tenantId = tenantId;
 	notification.Version_1_0->tenantName = tenantName;
-	notification.Version_1_0->role = QString::fromUtf8(roleId);
+	notification.Version_1_0->role = roleId;
 
 	QJsonObject jsonObject;
 	if (!notification.WriteToJsonObject(jsonObject)){
