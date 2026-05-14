@@ -216,7 +216,7 @@ DocumentViewBase {
 
 		var count = roles.getItemsCount()
 		for (var i = 0; i < count; i++) {
-			var id = container.__getRoleModelValue(roles, i, "roleId")
+			var id = container.__getRoleModelValue(roles, i, "id")
 			var name = container.__getRoleModelValue(roles, i, "roleName")
 			if (id === roleId || name === roleId)
 				return i
@@ -603,18 +603,17 @@ DocumentViewBase {
 													currentIndex: container.__findRoleIndex(modelData.role)
 													changeable: container.__isOwnerOrAdmin
 
-													onFinished: {
-														var selectedIndex = index
-														if (!roleCombo.model || selectedIndex < 0)
-															return
-
-														var selectedRole = container.__getRoleModelValue(roleCombo.model, selectedIndex, "roleId")
-														if (!selectedRole)
-															return
-														var currentRole = container.__memberRolesMap[modelData.userId] || ""
-														if (selectedRole !== currentRole) {
-															container.__updateMemberRole(modelData.userId, selectedRole)
+													onCurrentIndexChanged: {
+														if (currentIndex >= 0){
+															var selectedRole = container.__getRoleModelValue(roleCombo.model, currentIndex, "id")
+															if (!selectedRole)
+																return
+															var currentRole = container.__memberRolesMap[modelData.userId] || ""
+															if (selectedRole !== currentRole) {
+																container.__updateMemberRole(modelData.userId, selectedRole)
+															}
 														}
+
 													}
 												}
 
@@ -661,7 +660,7 @@ DocumentViewBase {
 													id: transferOwnerBtn
 													visible: container.__isOwner && !memberDelegate.isOwner && !memberDelegate.isPending
 													anchors.verticalCenter: parent.verticalCenter
-													iconSource: Style.getIconPath("Icons/Transfer", Icon.State.On, Icon.Mode.Normal)
+													iconSource: Style.getIconPath("Icons/Switch", Icon.State.On, Icon.Mode.Normal)
 
 													decorator: Component {
 														ToolButtonDecorator {
