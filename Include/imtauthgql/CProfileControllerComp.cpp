@@ -195,7 +195,7 @@ imtsdl::TElementList<sdl::imtauth::Profile::CProfileTenantInfo::V1_0> CProfileCo
 			organizationInfo.role = QStringLiteral("Owner");
 		}
 		else{
-			organizationInfo.role = TenantMembershipRoleToString(membershipPtr->GetRole());
+			organizationInfo.role = TenantMembershipRoleToString(membershipPtr->GetRoleId());
 		}
 
 		organizationList << organizationInfo;
@@ -205,18 +205,9 @@ imtsdl::TElementList<sdl::imtauth::Profile::CProfileTenantInfo::V1_0> CProfileCo
 }
 
 
-QString CProfileControllerComp::TenantMembershipRoleToString(imtauth::ITenantMembership::TenantMemberRole role) const
+QString CProfileControllerComp::TenantMembershipRoleToString(const QByteArray& roleId) const
 {
-	switch (role){
-		case imtauth::ITenantMembership::TMR_ADMIN:
-			return QStringLiteral("Admin");
-		case imtauth::ITenantMembership::TMR_MEMBER:
-			return QStringLiteral("Member");
-		case imtauth::ITenantMembership::TMR_GUEST:
-			return QStringLiteral("Guest");
-		default:
-			return QStringLiteral("Unknown");
-	}
+	return QString::fromUtf8(roleId);
 }
 
 

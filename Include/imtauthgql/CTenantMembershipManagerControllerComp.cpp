@@ -25,7 +25,7 @@ sdl::imtauth::TenantMemberships::CTenantInvitationData::V1_0 ToTenantInvitationD
 	data.id = invitation.GetInvitationId();
 	data.userId = invitation.GetUserId();
 	data.tenantId = invitation.GetTenantId();
-	data.role = static_cast<sdl::imtauth::TenantMemberships::TenantMemberRole>(invitation.GetRole());
+	data.role = QString::fromUtf8(invitation.GetRoleId());
 	data.status = static_cast<sdl::imtauth::TenantMemberships::TenantInvitationStatus>(status);
 	data.invitedByUserId = invitation.GetInvitedByUserId();
 	data.createdAt = invitation.GetCreatedAt();
@@ -42,8 +42,7 @@ sdl::imtauth::TenantMemberships::CTenantInvitationData::V1_0 ToTenantInvitationD
 
 bool CanManageTenant(const imtauth::ITenantMembershipManager& membershipManager, const QByteArray& userId, const QByteArray& tenantId)
 {
-	return membershipManager.HasMinimumRole(userId, tenantId, imtauth::ITenantMembership::TMR_ADMIN) ||
-			membershipManager.HasMinimumRole(userId, tenantId, imtauth::ITenantMembership::TMR_OWNER);
+	return membershipManager.HasMinimumRole(userId, tenantId, QByteArray());
 }
 
 
@@ -149,7 +148,7 @@ sdl::imtauth::TenantMemberships::CGetMembershipPayload CTenantMembershipManagerC
 	membershipData.id = membershipPtr->GetMembershipId();
 	membershipData.userId = membershipPtr->GetUserId();
 	membershipData.tenantId = membershipPtr->GetTenantId();
-	membershipData.role = static_cast<sdl::imtauth::TenantMemberships::TenantMemberRole>(membershipPtr->GetRole());
+	membershipData.role = QString::fromUtf8(membershipPtr->GetRoleId());
 	membershipData.isActive = membershipPtr->IsActive();
 	membershipData.joinedAt = membershipPtr->GetJoinedAt();
 	membershipData.updatedAt = membershipPtr->GetUpdatedAt();
@@ -195,7 +194,7 @@ sdl::imtauth::TenantMemberships::CFindMembershipPayload CTenantMembershipManager
 	membershipData.id = membershipPtr->GetMembershipId();
 	membershipData.userId = membershipPtr->GetUserId();
 	membershipData.tenantId = membershipPtr->GetTenantId();
-	membershipData.role = static_cast<sdl::imtauth::TenantMemberships::TenantMemberRole>(membershipPtr->GetRole());
+	membershipData.role = QString::fromUtf8(membershipPtr->GetRoleId());
 	membershipData.isActive = membershipPtr->IsActive();
 	membershipData.joinedAt = membershipPtr->GetJoinedAt();
 	membershipData.updatedAt = membershipPtr->GetUpdatedAt();
@@ -260,12 +259,12 @@ sdl::imtauth::TenantMemberships::CHasMinimumRolePayload CTenantMembershipManager
 		tenantId = *arguments.input.Version_1_0->tenantId;
 	}
 
-	imtauth::ITenantMembership::TenantMemberRole minimumRole = imtauth::ITenantMembership::TMR_MEMBER;
+	QByteArray minimumRoleId;
 	if (arguments.input.Version_1_0->minimumRole){
-		minimumRole = static_cast<imtauth::ITenantMembership::TenantMemberRole>(*arguments.input.Version_1_0->minimumRole);
+		minimumRoleId = (*arguments.input.Version_1_0->minimumRole).toUtf8();
 	}
 
-	response.Version_1_0->hasRole = m_membershipManagerCompPtr->HasMinimumRole(userId, tenantId, minimumRole);
+	response.Version_1_0->hasRole = m_membershipManagerCompPtr->HasMinimumRole(userId, tenantId, minimumRoleId);
 
 	return response;
 }
@@ -376,7 +375,7 @@ sdl::imtauth::TenantMemberships::CAddMembershipPayload CTenantMembershipManagerC
 
 	QByteArray userId;
 	QByteArray tenantId;
-	imtauth::ITenantMembership::TenantMemberRole role = imtauth::ITenantMembership::TMR_MEMBER;
+	QByteArray roleId;
 	sdl::imtauth::TenantMemberships::AddMembershipRequestArguments arguments = request.GetRequestedArguments();
 	if (arguments.input.Version_1_0->userId){
 		userId = *arguments.input.Version_1_0->userId;
@@ -385,10 +384,10 @@ sdl::imtauth::TenantMemberships::CAddMembershipPayload CTenantMembershipManagerC
 		tenantId = *arguments.input.Version_1_0->tenantId;
 	}
 	if (arguments.input.Version_1_0->role){
-		role = static_cast<imtauth::ITenantMembership::TenantMemberRole>(*arguments.input.Version_1_0->role);
+		roleId = (*arguments.input.Version_1_0->role).toUtf8();
 	}
 
-	QByteArray membershipId = m_membershipManagerCompPtr->AddMembership(userId, tenantId, role);
+	QByteArray membershipId = m_membershipManagerCompPtr->AddMembership(userId, tenantId, roleId);
 
 	if (membershipId.isEmpty()){
 		response.Version_1_0->errorMessage = QStringLiteral("Failed to add membership");
@@ -447,7 +446,7 @@ sdl::imtauth::TenantMemberships::CCreateTenantInvitationPayload CTenantMembershi
 
 	QByteArray userId;
 	QByteArray tenantId;
-	imtauth::ITenantMembership::TenantMemberRole role = imtauth::ITenantMembership::TMR_MEMBER;
+	QByteArray roleId;
 	sdl::imtauth::TenantMemberships::CreateTenantInvitationRequestArguments arguments = request.GetRequestedArguments();
 	if (arguments.input.Version_1_0->userId){
 		userId = *arguments.input.Version_1_0->userId;
@@ -456,7 +455,7 @@ sdl::imtauth::TenantMemberships::CCreateTenantInvitationPayload CTenantMembershi
 		tenantId = *arguments.input.Version_1_0->tenantId;
 	}
 	if (arguments.input.Version_1_0->role){
-		role = static_cast<imtauth::ITenantMembership::TenantMemberRole>(*arguments.input.Version_1_0->role);
+		roleId = (*arguments.input.Version_1_0->role).toUtf8();
 	}
 
 	QByteArray contextUserId = ContextUserId(gqlRequest);
@@ -465,7 +464,7 @@ sdl::imtauth::TenantMemberships::CCreateTenantInvitationPayload CTenantMembershi
 		return response;
 	}
 
-	QByteArray invitationId = m_invitationManagerCompPtr->CreateInvitation(contextUserId, userId, tenantId, role);
+	QByteArray invitationId = m_invitationManagerCompPtr->CreateInvitation(contextUserId, userId, tenantId, roleId);
 	if (invitationId.isEmpty()){
 		response.Version_1_0->errorMessage = QStringLiteral("Failed to create tenant invitation");
 		return response;
@@ -619,24 +618,30 @@ sdl::imtauth::TenantMemberships::CUpdateMembershipRolePayload CTenantMembershipM
 	response.Version_1_0.emplace();
 
 	QByteArray membershipId;
-	imtauth::ITenantMembership::TenantMemberRole role = imtauth::ITenantMembership::TMR_MEMBER;
+	QByteArray roleId;
 	sdl::imtauth::TenantMemberships::UpdateMembershipRoleRequestArguments arguments = request.GetRequestedArguments();
 	if (arguments.input.Version_1_0->membershipId){
 		membershipId = *arguments.input.Version_1_0->membershipId;
 	}
 	if (arguments.input.Version_1_0->role){
-		role = static_cast<imtauth::ITenantMembership::TenantMemberRole>(*arguments.input.Version_1_0->role);
+		roleId = (*arguments.input.Version_1_0->role).toUtf8();
 	}
 
-	// Owner role is immutable — cannot be changed
+	// Check if membership is the owner — owner's role is managed via TransferOwnership, not UpdateMembershipRole
 	imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
-	if (membershipPtr.IsValid() && membershipPtr->GetRole() == imtauth::ITenantMembership::TMR_OWNER){
-		response.Version_1_0->success = false;
-		response.Version_1_0->errorMessage = QStringLiteral("Cannot change the Owner role");
-		return response;
+	if (membershipPtr.IsValid()){
+		QByteArray tenantId = membershipPtr->GetTenantId();
+		if (m_tenantManagerCompPtr.IsValid()){
+			imtauth::ITenantInfoUniquePtr tenantInfoPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
+			if (tenantInfoPtr.IsValid() && tenantInfoPtr->GetOwnerId() == membershipPtr->GetUserId()){
+				response.Version_1_0->success = false;
+				response.Version_1_0->errorMessage = QStringLiteral("Cannot change the Owner role");
+				return response;
+			}
+		}
 	}
 
-	bool success = m_membershipManagerCompPtr->UpdateMembershipRole(membershipId, role);
+	bool success = m_membershipManagerCompPtr->UpdateMembershipRole(membershipId, roleId);
 
 	response.Version_1_0->success = success;
 	if (!success){
@@ -708,44 +713,11 @@ sdl::imtauth::TenantMemberships::CTransferTenantOwnershipPayload CTenantMembersh
 		return response;
 	}
 
-	// Update new owner's membership role to Owner
-	imtauth::ITenantMembershipUniquePtr newOwnerMembership = m_membershipManagerCompPtr->FindMembership(newOwnerId, tenantId);
-	if (!newOwnerMembership.IsValid()){
-		response.Version_1_0->success = false;
-		response.Version_1_0->errorMessage = QStringLiteral("Failed to find new owner membership");
-		return response;
-	}
-
-	bool newOwnerUpdated = m_membershipManagerCompPtr->UpdateMembershipRole(newOwnerMembership->GetMembershipId(), imtauth::ITenantMembership::TMR_OWNER);
-	if (!newOwnerUpdated){
-		response.Version_1_0->success = false;
-		response.Version_1_0->errorMessage = QStringLiteral("Failed to promote new owner");
-		return response;
-	}
-
-	// Demote old owner to Admin
-	imtauth::ITenantMembershipUniquePtr oldOwnerMembership = m_membershipManagerCompPtr->FindMembership(currentOwnerId, tenantId);
-	if (oldOwnerMembership.IsValid()){
-		bool oldOwnerDemoted = m_membershipManagerCompPtr->UpdateMembershipRole(oldOwnerMembership->GetMembershipId(), imtauth::ITenantMembership::TMR_ADMIN);
-		if (!oldOwnerDemoted){
-			// Rollback: revert new owner back to their previous role
-			m_membershipManagerCompPtr->UpdateMembershipRole(newOwnerMembership->GetMembershipId(), imtauth::ITenantMembership::TMR_ADMIN);
-			response.Version_1_0->success = false;
-			response.Version_1_0->errorMessage = QStringLiteral("Failed to demote old owner, operation rolled back");
-			return response;
-		}
-	}
-
-	// Update tenant's ownerId
+	// Update tenant's ownerId — ownership is tracked via ITenantInfo::GetOwnerId(), not via membership role
 	bool tenantUpdated = m_tenantManagerCompPtr->UpdateTenant(tenantId, tenantPtr->GetTenantName(), tenantPtr->GetTenantDescription(), newOwnerId, true);
 	if (!tenantUpdated){
-		// Rollback: revert both membership changes
-		m_membershipManagerCompPtr->UpdateMembershipRole(newOwnerMembership->GetMembershipId(), imtauth::ITenantMembership::TMR_ADMIN);
-		if (oldOwnerMembership.IsValid()){
-			m_membershipManagerCompPtr->UpdateMembershipRole(oldOwnerMembership->GetMembershipId(), imtauth::ITenantMembership::TMR_OWNER);
-		}
 		response.Version_1_0->success = false;
-		response.Version_1_0->errorMessage = QStringLiteral("Failed to update tenant owner, operation rolled back");
+		response.Version_1_0->errorMessage = QStringLiteral("Failed to update tenant owner");
 		return response;
 	}
 

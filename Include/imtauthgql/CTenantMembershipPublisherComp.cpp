@@ -88,7 +88,7 @@ void CTenantMembershipPublisherComp::OnUpdate(const istd::IChangeable::ChangeSet
 			CachedMembership current;
 			current.userId = membershipPtr->GetUserId();
 			current.tenantId = membershipPtr->GetTenantId();
-			current.role = membershipPtr->GetRole();
+			current.roleId = membershipPtr->GetRoleId();
 			current.isActive = membershipPtr->IsActive();
 			currentState.insert(membershipId, current);
 			currentMembershipIds.insert(membershipId);
@@ -112,7 +112,7 @@ void CTenantMembershipPublisherComp::OnUpdate(const istd::IChangeable::ChangeSet
 						cached.userId,
 						cached.tenantId,
 						QString(),
-						cached.role);
+						cached.roleId);
 				}
 			}
 		}
@@ -129,7 +129,7 @@ void CTenantMembershipPublisherComp::OnUpdate(const istd::IChangeable::ChangeSet
 						current.userId,
 						current.tenantId,
 						QString(),
-						current.role);
+						current.roleId);
 				}
 			}
 		}
@@ -155,7 +155,7 @@ void CTenantMembershipPublisherComp::OnUpdate(const istd::IChangeable::ChangeSet
 					CachedMembership newEntry;
 					newEntry.userId = membershipPtr->GetUserId();
 					newEntry.tenantId = membershipPtr->GetTenantId();
-					newEntry.role = membershipPtr->GetRole();
+					newEntry.roleId = membershipPtr->GetRoleId();
 					newEntry.isActive = membershipPtr->IsActive();
 					currentState.insert(membershipId, newEntry);
 
@@ -168,7 +168,7 @@ void CTenantMembershipPublisherComp::OnUpdate(const istd::IChangeable::ChangeSet
 							newEntry.userId,
 							newEntry.tenantId,
 							QString(),
-							newEntry.role);
+							newEntry.roleId);
 					}
 				}
 			}
@@ -189,7 +189,7 @@ void CTenantMembershipPublisherComp::PublishNotification(
 	const QByteArray& userId,
 	const QByteArray& tenantId,
 	const QString& tenantName,
-	imtauth::ITenantMembership::TenantMemberRole role) const
+	const QByteArray& roleId) const
 {
 	sdl::imtauth::TenantMemberships::CMembershipNotification notification;
 	notification.Version_1_0.emplace();
@@ -198,7 +198,7 @@ void CTenantMembershipPublisherComp::PublishNotification(
 	notification.Version_1_0->userId = userId;
 	notification.Version_1_0->tenantId = tenantId;
 	notification.Version_1_0->tenantName = tenantName;
-	notification.Version_1_0->role = static_cast<sdl::imtauth::TenantMemberships::TenantMemberRole>(role);
+	notification.Version_1_0->role = QString::fromUtf8(roleId);
 
 	QJsonObject jsonObject;
 	if (!notification.WriteToJsonObject(jsonObject)){
@@ -227,16 +227,13 @@ void CTenantMembershipPublisherComp::PublishNotification(
 
 QByteArray CTenantMembershipPublisherComp::FindTenantOwnerUserId(const QByteArray& tenantId) const
 {
-	if (!m_membershipManagerCompPtr.IsValid() || tenantId.isEmpty()){
+	if (!m_tenantManagerCompPtr.IsValid() || tenantId.isEmpty()){
 		return QByteArray();
 	}
 
-	QByteArrayList membershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
-	for (const QByteArray& mId : std::as_const(membershipIds)){
-		imtauth::ITenantMembershipUniquePtr mPtr = m_membershipManagerCompPtr->GetMembership(mId);
-		if (mPtr.IsValid() && mPtr->GetRole() == imtauth::ITenantMembership::TMR_OWNER){
-			return mPtr->GetUserId();
-		}
+	imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
+	if (tenantPtr.IsValid()){
+		return tenantPtr->GetOwnerId();
 	}
 
 	return QByteArray();

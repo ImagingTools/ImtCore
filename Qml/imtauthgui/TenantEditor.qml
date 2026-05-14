@@ -605,8 +605,8 @@ DocumentViewBase {
 													changeable: container.__isOwnerOrAdmin
 
 													onCurrentIndexChanged: {
-														if (currentIndex >= 0){
-															var selectedRole = container.__getRoleModelValue(roleCombo.model, currentIndex, "id")
+														if (roleCombo.currentIndex >= 0){
+															var selectedRole = container.__getRoleModelValue(roleCombo.model, roleCombo.currentIndex, "id")
 															if (!selectedRole)
 																return
 															var currentRole = container.__memberRolesMap[modelData.userId] || ""
