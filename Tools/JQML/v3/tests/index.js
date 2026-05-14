@@ -45,6 +45,12 @@ function getQmlLog(fullLogs) {
     return matches
 }
 
+function getErrorMessage(error) {
+    if (!error) return 'Unknown error'
+    if (error.message) return error.message
+    return String(error)
+}
+
 function runQmlTest(filePath, timeout = 5000) {
     return new Promise((resolve, reject) => {
         // Запуск в headless режиме
@@ -153,13 +159,13 @@ async function runTests() {
             try {
                 resultDesktop = await runQmlTest(mainFilePath)
             } catch (err) {
-                console.error(`${colors.red}[Error] Error running test on desktop: ${err.message}${colors.reset}`)
+                console.error(`${colors.red}[Error] Error running test on desktop: ${getErrorMessage(err)}${colors.reset}`)
             }
 
             try {
                 resultWeb = await runWebTest(driver, testDirPath)
             } catch (err) {
-                console.error(`${colors.red}[Error] Error running web test: ${err.message}${colors.reset}`)
+                console.error(`${colors.red}[Error] Error running web test: ${getErrorMessage(err)}${colors.reset}`)
             }
 
             console.log(`${colors.cyan}[Desktop] ${resultDesktop}${colors.reset}`)
@@ -207,7 +213,7 @@ async function runWebTest(driver, testDirPath, timeout = 5000) {
             mode: 'html',
         })
     } catch (err) {
-        console.error(`${colors.red}[Error] Error during compilation: ${err.message}${colors.reset}`)
+        console.error(`${colors.red}[Error] Error during compilation: ${getErrorMessage(err)}${colors.reset}`)
     }
 
     try {

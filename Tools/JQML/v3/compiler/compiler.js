@@ -225,6 +225,7 @@ function compile(options){
                 this.assignProperties.push({
                     name: meta[2],
                     value: new Instruction(null, '', meta[4][1][1], meta[4][1][3], meta[4][1][2], this.qmlFile, meta[4][1].info, this),
+                    fromDefinition: true,
                 })
             } else {
                 let defaultValue = type.getDefaultValue()
@@ -236,12 +237,14 @@ function compile(options){
                             this.assignProperties.push({
                                 name: meta[2],
                                 value: meta[4],
+                                fromDefinition: true,
                             })
                         }
                     } catch {
                         this.assignProperties.push({
                             name: meta[2],
                             value: meta[4],
+                            fromDefinition: true,
                         })
                     }
                 }
@@ -413,6 +416,7 @@ function compile(options){
                 if (name === obj.name) return {
                     source: `${thisKey}.${name}`,
                     type: typeInfo.type,
+                    modifiers: obj.modifiers,
                 }
             }
             for (let obj of this.defineSignals) {
@@ -440,6 +444,7 @@ function compile(options){
                         return {
                             source: `${thisKey}.${name}`,
                             type: typeInfo.type.meta[name].typeTarget ? typeInfo.type.meta[name].typeTarget : typeInfo.type.meta[name].type,
+                            modifiers: typeInfo.type.meta[name].modifiers,
                         }
                     } else if (name in obj) {
                         return {
@@ -1208,6 +1213,11 @@ function compile(options){
                 let path = this.resolve(assignProperty.name.split('.')[0], this.name)
                 if (!path) {
                     console.log(`${this.qmlFile.fileName}:${assignProperty.value.info.line + 1}:${assignProperty.value.info.col - assignProperty.name.length - 1}: warning: ${assignProperty.name} is not founded`)
+                }
+
+                let assignNames = assignProperty.name.split('.')
+                if (path && assignNames.length === 1 && path.modifiers && path.modifiers.readonly && !assignProperty.fromDefinition) {
+                    throw new Error(`${this.qmlFile.fileName}:${assignProperty.value.info.line + 1}:${assignProperty.value.info.col - assignProperty.name.length - 1}: error: Cannot assign to read-only property "${assignProperty.name}"`)
                 }
 
                 if (assignProperty.value instanceof Instruction) {
