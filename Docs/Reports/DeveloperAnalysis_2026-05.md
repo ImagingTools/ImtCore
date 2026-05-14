@@ -12,7 +12,6 @@ Diese Analyse bewertet die Codequalität, architektonischen Fähigkeiten und Cop
 
 **Kernerkenntnisse:**
 - **Fehlende Code-Review-Kultur:** Kein PR hat sichtbare Review-Approvals. Branch-Protection existiert nicht.
-- **PR-Hygiene ist ein systemisches Problem:** ~30% aller PRs haben nichtssagende oder generische Titel.
 - **Copilot-Nutzung variiert stark:** Von exzellent (100% Merge-Rate bei 0x435641) bis problematisch (~75% Merge-Rate bei kucherenkord-cyber mit Mega-PRs).
 - **Stärkstes Asset:** Die strategische Copilot-Nutzung durch kirill-lepski und das architektonische Tiefenverständnis von 0x435641.
 - **Größtes Risiko:** Mega-PRs mit 20+ Änderungen ohne Code-Review.
@@ -48,7 +47,6 @@ Diese Analyse bewertet die Codequalität, architektonischen Fähigkeiten und Cop
 - **Eigene Beiträge:** WebSocket-Server, Q_ENUM-Serialization, Bitmap-Handling, Login-System, Bundled-Installer.
 - **Copilot-Nutzung:** Höchst strategisch – delegiert SQL-Injection-Fixes, 3D-Visualization (Three.js + QtQuick3D), ISender→ITransport Refactoring, Multi-Tenant-Architektur, LDAP/Auth, EU CRA Compliance, CI/CD.
 - **Merge-Rate Copilot-PRs:** ~86%
-- **Schwäche:** Eigene PRs haben oft generische Titel ("Several fixes", "Latest sync").
 
 #### 0x435641
 - **Stärken:** DocumentManagers-Refactoring, CCollectionDocumentManager-Split, Qt RHI-Kompatibilität, SDL-Generator-Fixes, CObjectCollectionBase::CopyFrom, TSimComponentsFactory.
@@ -70,10 +68,8 @@ Diese Analyse bewertet die Codequalität, architektonischen Fähigkeiten und Cop
 #### kucherenkord-cyber
 - **Stärken:** Breitester Contributor. GQL Response Parsing optimiert, Tree Model Optimization, Ticket-System, Chat-Module, Multi-Tenant (via Copilot).
 - **Schwächen:**
-  - PR-Titel worst in team: "Partitura fix" ×5+, "Build fixed" ×3+, "QML corrected"
   - Copilot-Mega-PRs: PR #429 enthält "20 fixes" in einem PR
   - ~25% Copilot-Rejection-Rate: Serielle Retry-Patterns (3 Versuche für einen Bug)
-  - Anti-Pattern: Identische Fix-PRs am selben Tag
 
 #### VekhterAleksandr (⭐⭐⭐½)
 - **Stärken:** Konsistente QML-UI-Arbeit: GraphicsShapeFactory, GraphicsView, DialogManagerView, TableViewParamController, TextArea, CheckBoxMenu, StackView, BaseModel.
