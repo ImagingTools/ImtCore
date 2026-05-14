@@ -199,13 +199,14 @@ DocumentViewBase {
 	}
 
 	function __getRoleModelValue(rolesModel, index, key) {
-		if (!rolesModel || index < 0 || index >= rolesModel.getItemsCount())
+		if (!rolesModel || index < 0 || index >= rolesModel.GetItemsCount())
 			return ""
-		var mKey = "m_" + key
-		if (rolesModel.containsKey(mKey, index))
-			return rolesModel.getData(mKey, index) || ""
-		if (rolesModel.containsKey(key, index))
-			return rolesModel.getData(key, index) || ""
+		var val = rolesModel.GetData("m_" + key, index)
+		if (val !== undefined && val !== null)
+			return val || ""
+		val = rolesModel.GetData(key, index)
+		if (val !== undefined && val !== null)
+			return val || ""
 		return ""
 	}
 
@@ -214,7 +215,7 @@ DocumentViewBase {
 		if (!roles)
 			return -1
 
-		var count = roles.getItemsCount()
+		var count = roles.GetItemsCount()
 		for (var i = 0; i < count; i++) {
 			var id = container.__getRoleModelValue(roles, i, "id")
 			var name = container.__getRoleModelValue(roles, i, "roleName")
