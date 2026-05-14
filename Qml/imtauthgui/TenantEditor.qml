@@ -39,9 +39,19 @@ DocumentViewBase {
 			: false)
 	readonly property bool __isReadOnly: !container.isNewTenant && !container.__isOwnerOrAdmin
 
+	// Explicit member-roles list model used by the Repeater in Members page
+	property var __memberRolesListModel: []
+
+	function __rebuildMemberRolesListModel() {
+		container.__memberRolesListModel = container.__buildMemberRolesModel()
+	}
+
 	onPendingMembersChanged: {
-		// Trigger rebuild by reassigning __memberRolesMap (bottomComp binds to __buildMemberRolesModel)
-		container.__memberRolesMap = container.__memberRolesMap
+		container.__rebuildMemberRolesListModel()
+	}
+
+	onPendingInvitationsChanged: {
+		container.__rebuildMemberRolesListModel()
 	}
 
 	function updateGui(){
@@ -242,12 +252,14 @@ DocumentViewBase {
 			}
 		}
 		container.__memberRolesMap = rolesMap
+		container.__rebuildMemberRolesListModel()
 	}
 
 	function __updateMemberRole(userId, newRole) {
 		var rolesMap = container.__memberRolesMap
 		rolesMap[userId] = newRole
 		container.__memberRolesMap = rolesMap
+		container.__rebuildMemberRolesListModel()
 		container.doUpdateModel()
 	}
 
@@ -545,7 +557,7 @@ DocumentViewBase {
 								}
 
 								Repeater {
-									model: container.__buildMemberRolesModel()
+									model: container.__memberRolesListModel
 
 									delegate: Item {
 										id: memberDelegate
