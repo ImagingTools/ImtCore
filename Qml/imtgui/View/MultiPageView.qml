@@ -103,7 +103,7 @@ Item {
                         spacing: Style.marginS;
 
                         Image {
-                            visible: model.icon ? true : false
+                            visible: model.icon
                             anchors.verticalCenter: parent.verticalCenter;
                             width: Style.iconSizeS;
                             height: Style.iconSizeS;
