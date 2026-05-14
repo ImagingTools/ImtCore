@@ -8,4 +8,7 @@ module.exports = {
     Dialog: require("./Dialog"),   
     ToolTip: require("./ToolTip"),   
     ScrollBar: require("./ScrollBar"),   
+    Menu: require("./Menu"),   
+    MenuItem: require("./MenuItem"),   
+    MenuSeparator: require("./MenuSeparator"),   
 }

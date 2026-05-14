@@ -115,6 +115,18 @@ class Row extends Item {
         super.__endUpdate()
     }
 
+    __removeChild(child){
+        super.__removeChild(child)
+
+        JQApplication.updateLater(this)
+    }
+
+    __addChild(child){
+        super.__addChild(child)
+
+        JQApplication.updateLater(this)
+    }
+
     forceLayout(){
         this.__updateGeometry(true)
     }

@@ -1,5 +1,4 @@
 const { spawn } = require('child_process')
-const compiler = require('../compiler/compiler')
 const fs = require('fs')
 const { Builder, Capabilities, By, until } = require('selenium-webdriver')
 const chrome = require('selenium-webdriver/chrome')
@@ -16,6 +15,22 @@ const colors = {
     cyan: "\x1b[36m",
     white: "\x1b[37m",
     gray: "\x1b[90m"
+}
+
+let compiler = null
+
+function getCompiler() {
+    if (compiler) return compiler
+
+    const originalArgv = process.argv
+
+    try {
+        process.argv = [originalArgv[0], originalArgv[1]]
+        compiler = require('../compiler/compiler')
+        return compiler
+    } finally {
+        process.argv = originalArgv
+    }
 }
 
 function getQmlLog(fullLogs) {
@@ -70,15 +85,62 @@ function checkIsDirectorySync(path) {
     }
 }
 
+function parseCliOptions() {
+    const args = process.argv.slice(2)
+    let testName = ''
+
+    for (let i = 0; i < args.length; i++) {
+        const arg = args[i]
+
+        if (arg.startsWith('--test=')) {
+            testName = arg.slice('--test='.length).trim()
+            continue
+        }
+
+        if (arg === '--test' || arg === '-t') {
+            testName = (args[i + 1] || '').trim()
+            i++
+            continue
+        }
+
+        if (!arg.startsWith('-') && !testName) {
+            testName = arg.trim()
+        }
+    }
+
+    return { testName }
+}
+
+function getTestsToRun(allEntries, selectedTestName) {
+    const allTests = allEntries.filter(testdir => {
+        const testDirPath = path.resolve(__dirname, `./${testdir}`)
+        const mainFilePath = path.resolve(__dirname, `./${testdir}/Main.qml`)
+
+        return checkIsDirectorySync(testDirPath) && fs.existsSync(mainFilePath)
+    })
+
+    if (!selectedTestName) return allTests
+
+    return allTests.filter(testName => testName === selectedTestName)
+}
+
 async function runTests() {
     const tests = fs.readdirSync('./tests')
+    const options = parseCliOptions()
+    const testsToRun = getTestsToRun(tests, options.testName)
+
+    if (options.testName && testsToRun.length === 0) {
+        console.error(`${colors.red}[Error] Test not found: ${options.testName}${colors.reset}`)
+        process.exitCode = 1
+        return
+    }
 
     let completedTests = 0
     let testCount = 0
 
     const driver = await createWebDriver()
 
-    for (let testdir of tests) {
+    for (let testdir of testsToRun) {
         let mainFilePath = path.resolve(__dirname, `./${testdir}/Main.qml`)
         let testDirPath = path.resolve(__dirname, `./${testdir}`)
 
@@ -94,14 +156,11 @@ async function runTests() {
                 console.error(`${colors.red}[Error] Error running test on desktop: ${err.message}${colors.reset}`)
             }
 
-            
-
             try {
                 resultWeb = await runWebTest(driver, testDirPath)
             } catch (err) {
                 console.error(`${colors.red}[Error] Error running web test: ${err.message}${colors.reset}`)
             }
-
 
             console.log(`${colors.cyan}[Desktop] ${resultDesktop}${colors.reset}`)
             console.log(`${colors.cyan}[Web] ${resultWeb}${colors.reset}`)
@@ -128,6 +187,8 @@ async function runWebTest(driver, testDirPath, timeout = 5000) {
     }
 
     try {
+        const compiler = getCompiler()
+
         compiler.compile({
             config: path.resolve(testDirPath, 'test.json'),
             output: path.resolve(testDirPath, '_web'),
