@@ -45,12 +45,6 @@ QByteArray CCollectionDocumentManagerTest::CreateDocumentAndWaitForLoad(
 {
 	QByteArray documentId = manager.CreateNewDocument(userId, typeId);
 
-	// Process events to let async thread complete and main thread callbacks fire
-	for (int i = 0; i < 50; ++i){
-		QCoreApplication::processEvents();
-		QThread::msleep(10);
-	}
-
 	return documentId;
 }
 
@@ -182,13 +176,10 @@ void CCollectionDocumentManagerTest::CreateNewDocumentObjectCreationFailAsyncTes
 	m_managerPtr->SetCreateObjectShouldFail(true);
 
 	QByteArray docId = m_managerPtr->CreateNewDocument(TEST_USER_ID, TEST_TYPE_ID);
-	QVERIFY2(!docId.isEmpty(), "CreateNewDocument returns ID immediately even if object creation will fail async");
-
-	// Wait for async completion — the document should be closed due to failure
-	QTRY_VERIFY_WITH_TIMEOUT(m_managerPtr->GetOpenedDocumentList(TEST_USER_ID).isEmpty(), 5000);
+	QVERIFY2(docId.isEmpty(), "CreateNewDocument should return empty ID when object creation fails");
 
 	auto list = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
-	QVERIFY2(list.isEmpty(), "Document should be closed after async object creation failure");
+	QVERIFY2(list.isEmpty(), "No document should be opened after object creation failure");
 }
 
 
@@ -221,7 +212,7 @@ void CCollectionDocumentManagerTest::CreateNewDocumentIsLoadingTest()
 
 	auto list = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
 	QCOMPARE(list.size(), 1);
-	QVERIFY2(list[0].isLoading, "Newly created document should be in loading state");
+	QVERIFY2(!list[0].isLoading, "Synchronously created document should not be in loading state");
 }
 
 
@@ -245,17 +236,6 @@ void CCollectionDocumentManagerTest::CreateNewDocumentProposedSourceDocumentIdUs
 
 	QByteArray docId = m_managerPtr->CreateNewDocument(TEST_USER_ID, TEST_TYPE_ID, proposedId);
 	QVERIFY2(!docId.isEmpty(), "CreateNewDocument should return a non-empty document ID");
-
-	// Wait for async object creation to complete
-	QTRY_VERIFY_WITH_TIMEOUT([&]() {
-		auto list = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
-		for (const auto& info : list) {
-			if (info.documentId == docId) {
-				return !info.isLoading;
-			}
-		}
-		return true;
-	}(), 5000);
 
 	// Save the document – this should insert it into the collection using the proposed ID
 	auto status = m_managerPtr->SaveDocument(TEST_USER_ID, docId, TEST_DOC_NAME);
@@ -1144,12 +1124,12 @@ void CCollectionDocumentManagerTest::CreateNewDocumentAsyncCompletionTest()
 	auto list = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
 	QCOMPARE(list.size(), 1);
 
-	// After async completion, document should no longer be loading
-	QVERIFY2(!list[0].isLoading, "Document should no longer be loading after async completion");
+	// Document should not be in loading state after synchronous creation
+	QVERIFY2(!list[0].isLoading, "Document should not be loading after creation");
 
 	// Document pointer should be available
 	const istd::IChangeable* ptr = m_managerPtr->GetDocumentPtr(TEST_USER_ID, docId);
-	QVERIFY2(ptr != nullptr, "Document pointer should be available after async load");
+	QVERIFY2(ptr != nullptr, "Document pointer should be available after creation");
 }
 
 

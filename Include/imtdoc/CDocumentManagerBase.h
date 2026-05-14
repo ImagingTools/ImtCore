@@ -5,7 +5,6 @@
 // Qt includes
 #include <QtCore/QMutex>
 #include <QtCore/QString>
-#include <QtCore/QThread>
 
 // STL includes
 #include <atomic>
@@ -36,7 +35,11 @@ public:
 
 	// reimplemented (imtdoc::IDocumentManager)
 	virtual DocumentList GetOpenedDocumentList(const QByteArray& userId) const override;
-	virtual QByteArray CreateNewDocument(const QByteArray& userId, const QByteArray& documentTypeId) override;
+	virtual QByteArray CreateNewDocument(
+		const QByteArray& userId,
+		const QByteArray& documentTypeId,
+		const QByteArray& proposedSourceDocumentId = QByteArray()) override;
+	virtual QByteArray OpenDocument(const QByteArray& userId, const QUrl& url) override;
 	virtual OperationStatus GetDocumentName(const QByteArray& userId, const QByteArray& documentId, QString& documentName) const override;
 	virtual OperationStatus SetDocumentName(const QByteArray& userId, const QByteArray& documentId, const QString& documentName) override;
 	virtual const istd::IChangeable* GetDocumentPtr(const QByteArray& userId, const QByteArray& documentId) const override;

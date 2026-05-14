@@ -5,7 +5,6 @@
 // Qt includes
 #include <QtCore/QCoreApplication>
 #include <QtCore/QUuid>
-#include <QtCore/QThread>
 
 // ACF includes
 #include <istd/CChangeNotifier.h>
@@ -74,8 +73,13 @@ IDocumentManager::DocumentList CDocumentManagerBase::GetOpenedDocumentList(
 }
 
 
-QByteArray CDocumentManagerBase::CreateNewDocument(const QByteArray& userId, const QByteArray& documentTypeId)
+QByteArray CDocumentManagerBase::CreateNewDocument(
+	const QByteArray& userId,
+	const QByteArray& documentTypeId,
+	const QByteArray& proposedSourceDocumentId)
 {
+	Q_UNUSED(proposedSourceDocumentId);
+
 	QByteArray newDocumentId;
 
 	idoc::IUndoManagerSharedPtr undoManagerPtr = CreateUndoManager();
@@ -90,10 +94,13 @@ QByteArray CDocumentManagerBase::CreateNewDocument(const QByteArray& userId, con
 	doc.undoManagerPtr = undoManagerPtr;
 	doc.isDirty = false;
 	doc.name = "";
-	doc.isLoading = true;
 	doc.objectPtr = CreateObject(documentTypeId);
 
-	if (doc.objectPtr.IsValid()) {
+	if (!doc.objectPtr.IsValid()) {
+		return QByteArray();
+	}
+
+	{
 		NewDocumentCreatedInfo info;
 		info.userId = userId;
 		info.documentId = newDocumentId;
@@ -103,15 +110,17 @@ QByteArray CDocumentManagerBase::CreateNewDocument(const QByteArray& userId, con
 		istd::IChangeable::ChangeSet changeSet(CF_NEW_DOCUMENT_CREATED);
 		changeSet.SetChangeInfo(CN_NEW_DOCUMENT_CREATED, QVariant::fromValue(info));
 		istd::CChangeNotifier notifier(this, &changeSet);
-
-		{
-			QMutexLocker locker(&m_mutex);
-
-			m_userDocuments[userId][newDocumentId] = doc;
-
-			InitializeDocumentObservers(doc, userId);
-		}
 	}
+
+	{
+		QMutexLocker locker(&m_mutex);
+
+		m_userDocuments[userId][newDocumentId] = doc;
+
+		InitializeDocumentObservers(m_userDocuments[userId][newDocumentId], userId);
+	}
+
+	OnDocumentDataLoaded(userId, newDocumentId);
 
 	for (IDocumentManagerEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
 		if (handlerPtr != nullptr){
@@ -127,6 +136,12 @@ QByteArray CDocumentManagerBase::CreateNewDocument(const QByteArray& userId, con
 	}
 
 	return newDocumentId;
+}
+
+
+QByteArray CDocumentManagerBase::OpenDocument(const QByteArray& /*userId*/, const QUrl& /*url*/)
+{
+	return QByteArray();
 }
 
 
