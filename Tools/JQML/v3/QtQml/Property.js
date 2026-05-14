@@ -161,9 +161,9 @@ class Property extends BaseObject {
      * @param {Object} meta
      */
     static reset(target, name, value, meta){
-        if(target.constructor.meta[name].modifiers && target.constructor.meta[name].modifiers.readonly && (!target.__properties || !target.__properties[name]) && typeof value !== 'function') {
-            throw `Cannot assign to read-only property "${name}"`
-        }
+        // if(target.constructor.meta[name].modifiers && target.constructor.meta[name].modifiers.readonly && (!target.__properties || !target.__properties[name]) && typeof value !== 'function') {
+        //     throw `Cannot assign to read-only property "${name}"`
+        // }
             
         if(target.__depends[name]){
             for(let connectionObj of target.__depends[name]){
