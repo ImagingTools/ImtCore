@@ -27,8 +27,8 @@ ElementView {
                 placeHolderText: qsTr("Filter...");
 
                 onSearchChanged: {
-                    treeViewImpl.filterText = filterInput.text;
-                    treeViewImpl.__rebuildTreeModel();
+                    treeViewImpl.__filterText = filterInput.text;
+                    treeViewImpl.__rebuild();
                 }
             }
 
@@ -46,122 +46,21 @@ ElementView {
                     root.treeView = treeViewImpl;
                 }
 
-                // --- Public API (backward-compatible with BasicTreeView) ---
-                property int shiftLevel: 20;
-                property int __prefixWidth: 30;
+                // --- Public properties ---
                 property bool tristate: false;
-                property bool headerVisible: false;
                 property bool readOnly: false;
                 property var rowModel: ListModel {};
                 property var columnModel: ListModel {};
                 property int rowItemHeight: Style.controlHeightM;
-                property int contentHeight: internalTreeView.contentHeight;
-                property string filterText: "";
 
                 signal checkedItemsChanged();
-                signal rowAdded();
-                signal rowRemoved();
 
-                // All node objects (flat list of every node in the tree)
+                // --- Internal state ---
+                property string __filterText: "";
                 property var __allNodes: [];
-                // Tree model data for JQML2 TreeView (array of objects with children)
                 property var __treeModelData: [];
 
                 // --- Public functions ---
-                function addRow(row) {
-                    insertRow([rowModel.count], row);
-                }
-
-                function insertRow(indexes, row) {
-                    if (!indexes || indexes.length === 0) {
-                        console.error("TreeView::insertRow() - invalid indexes", indexes);
-                        return;
-                    }
-
-                    if (!("ChildModel" in row)) {
-                        row["ChildModel"] = childModelComponent.createObject(null);
-                    }
-                    if (!("CheckState" in row)) {
-                        row["CheckState"] = Qt.Unchecked;
-                    }
-                    if (!("Visible" in row)) {
-                        row["Visible"] = true;
-                    }
-                    if (!("Selected" in row)) {
-                        row["Selected"] = false;
-                    }
-                    if (!("Active" in row)) {
-                        row["Active"] = true;
-                    }
-                    if (!("CheckBoxVisible" in row)) {
-                        row["CheckBoxVisible"] = true;
-                    }
-                    if (!("IsOpen" in row)) {
-                        row["IsOpen"] = true;
-                    }
-
-                    var localModel = rowModel;
-                    for (var i = 0; i < indexes.length - 1; i++) {
-                        var index = indexes[i];
-                        if (localModel.count <= index) {
-                            console.error("TreeView::insertRow() - invalid index", index, "from indexes", indexes);
-                            return;
-                        }
-                        localModel = localModel.get(index).ChildModel;
-                    }
-
-                    row["Level"] = indexes.length - 1;
-                    var lastIndex = indexes[indexes.length - 1];
-                    localModel.insert(lastIndex, row);
-
-                    treeViewImpl.__rebuildTreeModel();
-                    treeViewImpl.rowAdded();
-                }
-
-                function removeRow(indexes) {
-                    var localModel = rowModel;
-                    for (var i = 0; i < indexes.length - 1; i++) {
-                        var index = indexes[i];
-                        if (localModel.count <= index) {
-                            return;
-                        }
-                        localModel = localModel.get(index).ChildModel;
-                    }
-                    var lastIndex = indexes[indexes.length - 1];
-                    localModel.remove(lastIndex);
-                    treeViewImpl.__rebuildTreeModel();
-                    treeViewImpl.rowRemoved();
-                }
-
-                function getRow(indexes) {
-                    if (!indexes || indexes.length === 0) {
-                        return;
-                    }
-                    var localModel = rowModel;
-                    for (var i = 0; i < indexes.length - 1; i++) {
-                        var index = indexes[i];
-                        if (localModel.count <= index) {
-                            return;
-                        }
-                        localModel = localModel.get(index).ChildModel;
-                    }
-                    return localModel.get(indexes[indexes.length - 1]);
-                }
-
-                function setRow(indexes, row) {
-                    if (!indexes || indexes.length === 0) {
-                        return;
-                    }
-                    var localModel = rowModel;
-                    for (var i = 0; i < indexes.length - 1; i++) {
-                        var index = indexes[i];
-                        if (localModel.count <= index) {
-                            return;
-                        }
-                        localModel = localModel.get(index).ChildModel;
-                    }
-                    localModel.set(indexes[indexes.length - 1], row);
-                }
 
                 function getItemsDataAsList() {
                     return __allNodes;
@@ -178,21 +77,19 @@ ElementView {
                 }
 
                 function checkItem(node) {
-                    if (node && node.checkState !== Qt.Checked) {
-                        node.checkState = Qt.Checked;
-                        __propagateCheckDown(node, Qt.Checked);
-                        __propagateCheckUp(node);
-                        treeViewImpl.checkedItemsChanged();
-                    }
+                    if (!node || node.checkState === Qt.Checked) return;
+                    node.checkState = Qt.Checked;
+                    __propagateDown(node, Qt.Checked);
+                    __propagateUp(node);
+                    checkedItemsChanged();
                 }
 
                 function uncheckItem(node) {
-                    if (node && node.checkState !== Qt.Unchecked) {
-                        node.checkState = Qt.Unchecked;
-                        __propagateCheckDown(node, Qt.Unchecked);
-                        __propagateCheckUp(node);
-                        treeViewImpl.checkedItemsChanged();
-                    }
+                    if (!node || node.checkState === Qt.Unchecked) return;
+                    node.checkState = Qt.Unchecked;
+                    __propagateDown(node, Qt.Unchecked);
+                    __propagateUp(node);
+                    checkedItemsChanged();
                 }
 
                 function checkAll() {
@@ -203,9 +100,7 @@ ElementView {
                             changed = true;
                         }
                     }
-                    if (changed) {
-                        treeViewImpl.checkedItemsChanged();
-                    }
+                    if (changed) checkedItemsChanged();
                 }
 
                 function uncheckAll() {
@@ -216,198 +111,111 @@ ElementView {
                             changed = true;
                         }
                     }
-                    if (changed) {
-                        treeViewImpl.checkedItemsChanged();
-                    }
+                    if (changed) checkedItemsChanged();
                 }
 
-                // --- Internal: tree node management ---
+                // --- Internal: check propagation ---
 
-                function __propagateCheckDown(node, state) {
+                function __propagateDown(node, state) {
                     for (var i = 0; i < node.childNodes.length; i++) {
                         var child = node.childNodes[i];
-                        if (child.isCheckable) {
-                            child.checkState = state;
-                        }
-                        __propagateCheckDown(child, state);
+                        if (child.isCheckable) child.checkState = state;
+                        __propagateDown(child, state);
                     }
                 }
 
-                function __propagateCheckUp(node) {
-                    var parent = node.parentNode;
-                    if (!parent || !parent.isCheckable) {
-                        return;
-                    }
+                function __propagateUp(node) {
+                    var p = node.parentNode;
+                    if (!p || !p.isCheckable) return;
 
                     var allChecked = true;
                     var allUnchecked = true;
-                    for (var i = 0; i < parent.childNodes.length; i++) {
-                        var cs = parent.childNodes[i].checkState;
-                        if (cs !== Qt.Checked) {
-                            allChecked = false;
-                        }
-                        if (cs !== Qt.Unchecked) {
-                            allUnchecked = false;
-                        }
+                    for (var i = 0; i < p.childNodes.length; i++) {
+                        var cs = p.childNodes[i].checkState;
+                        if (cs !== Qt.Checked) allChecked = false;
+                        if (cs !== Qt.Unchecked) allUnchecked = false;
                     }
 
-                    if (allChecked) {
-                        parent.checkState = Qt.Checked;
-                    } else if (allUnchecked) {
-                        parent.checkState = Qt.Unchecked;
-                    } else {
-                        parent.checkState = Qt.PartiallyChecked;
-                    }
-
-                    __propagateCheckUp(parent);
+                    p.checkState = allChecked ? Qt.Checked : (allUnchecked ? Qt.Unchecked : Qt.PartiallyChecked);
+                    __propagateUp(p);
                 }
 
-                // --- Internal: filter matching ---
+                // --- Internal: filter ---
 
-                function __matchesFilter(itemData, filterLower) {
-                    if (filterLower === "") {
-                        return true;
-                    }
+                function __matchesFilter(item, filterLower) {
+                    if (filterLower === "") return true;
                     for (var i = 0; i < columnModel.count; i++) {
-                        var colId = columnModel.get(i).id;
-                        var value = itemData[colId];
-                        if (value && value.toString().toLowerCase().indexOf(filterLower) >= 0) {
-                            return true;
-                        }
+                        var value = item[columnModel.get(i).id];
+                        if (value && value.toString().toLowerCase().indexOf(filterLower) >= 0) return true;
                     }
                     return false;
                 }
 
-                function __subtreeMatchesFilter(sourceModel, filterLower) {
-                    if (filterLower === "") {
-                        return true;
-                    }
+                function __subtreeMatches(sourceModel, filterLower) {
                     for (var i = 0; i < sourceModel.count; i++) {
                         var item = sourceModel.get(i);
-                        if (__matchesFilter(item, filterLower)) {
-                            return true;
-                        }
-                        if (item.ChildModel && item.ChildModel.count > 0) {
-                            if (__subtreeMatchesFilter(item.ChildModel, filterLower)) {
-                                return true;
-                            }
-                        }
+                        if (__matchesFilter(item, filterLower)) return true;
+                        if (item.ChildModel && item.ChildModel.count > 0 && __subtreeMatches(item.ChildModel, filterLower)) return true;
                     }
                     return false;
                 }
 
-                // --- Internal: build nodes and tree model for JQML2 TreeView ---
+                // --- Internal: build tree model from rowModel ---
 
-                function __buildNodes(sourceModel, level, parentNode) {
-                    var result = [];
+                function __buildTreeItems(sourceModel, level, parentNode, filterLower) {
+                    var items = [];
                     for (var i = 0; i < sourceModel.count; i++) {
                         var item = sourceModel.get(i);
-                        var nodeIsOpen = item.IsOpen !== undefined ? item.IsOpen : true;
+
+                        // Filter check
+                        var selfMatch = __matchesFilter(item, filterLower);
+                        var childMatch = (item.ChildModel && item.ChildModel.count > 0) ? __subtreeMatches(item.ChildModel, filterLower) : false;
+                        if (filterLower !== "" && !selfMatch && !childMatch) continue;
+
+                        // Create node
                         var node = {
                             sourceItem: item,
                             level: level,
-                            isOpen: nodeIsOpen,
-                            isOpened: nodeIsOpen,
                             checkState: item.CheckState !== undefined ? item.CheckState : Qt.Unchecked,
                             isCheckable: item.CheckBoxVisible !== undefined ? item.CheckBoxVisible : true,
                             isActive: item.Active !== undefined ? item.Active : true,
-                            hasChild: false,
                             parentNode: parentNode,
-                            childNodes: [],
-                            selected: false
+                            childNodes: []
                         };
-
                         node.getItemData = function() { return this.sourceItem; }.bind(node);
 
-                        if (parentNode) {
-                            parentNode.childNodes.push(node);
-                            parentNode.hasChild = true;
-                        }
-
+                        if (parentNode) parentNode.childNodes.push(node);
+                        var nodeIndex = __allNodes.length;
                         __allNodes.push(node);
 
+                        // Recurse children
                         var childTreeItems = [];
                         if (item.ChildModel && item.ChildModel.count > 0) {
-                            childTreeItems = __buildNodes(item.ChildModel, level + 1, node);
+                            childTreeItems = __buildTreeItems(item.ChildModel, level + 1, node, filterLower);
                         }
 
-                        // Build display text from column model
+                        // Build display text from columns
                         var displayText = "";
                         for (var c = 0; c < columnModel.count; c++) {
-                            var colId = columnModel.get(c).id;
-                            var val = item[colId];
+                            var val = item[columnModel.get(c).id];
                             if (val !== undefined) {
-                                if (displayText !== "") {
-                                    displayText += " | ";
-                                }
-                                displayText += val;
+                                displayText += (displayText !== "" ? " | " : "") + val;
                             }
                         }
 
-                        // Create tree item for JQML2 TreeView model (uses 'children' property)
-                        var treeItem = {
+                        items.push({
                             displayText: displayText,
-                            nodeIndex: __allNodes.length - 1,
-                            checkState: node.checkState,
-                            isCheckable: node.isCheckable,
-                            isActive: node.isActive,
+                            nodeIndex: nodeIndex,
                             children: childTreeItems
-                        };
-                        node.__treeItem = treeItem;
-
-                        result.push(treeItem);
-                    }
-                    return result;
-                }
-
-                function __rebuildTreeModel() {
-                    __allNodes = [];
-
-                    if (!rowModel) {
-                        __treeModelData = [];
-                        return;
-                    }
-
-                    var filterLower = filterText.toLowerCase();
-                    var allItems = __buildNodes(rowModel, 0, null);
-
-                    // Apply filter: mark visibility
-                    for (var i = 0; i < __allNodes.length; i++) {
-                        var node = __allNodes[i];
-                        var selfMatch = __matchesFilter(node.sourceItem, filterLower);
-                        var childMatch = false;
-                        if (node.sourceItem.ChildModel && node.sourceItem.ChildModel.count > 0) {
-                            childMatch = __subtreeMatchesFilter(node.sourceItem.ChildModel, filterLower);
-                        }
-                        node.__visible = selfMatch || childMatch;
-                    }
-
-                    // Build filtered tree model
-                    __treeModelData = __filterTreeItems(allItems);
-
-                    // Expand all nodes by default in the TreeView
-                    internalTreeView.expandRecursively();
-                }
-
-                function __filterTreeItems(items) {
-                    var result = [];
-                    for (var i = 0; i < items.length; i++) {
-                        var item = items[i];
-                        var node = __allNodes[item.nodeIndex];
-                        if (!node.__visible) {
-                            continue;
-                        }
-                        var filteredChildren = __filterTreeItems(item.children);
-                        result.push({
-                            displayText: item.displayText,
-                            nodeIndex: item.nodeIndex,
-                            checkState: node.checkState,
-                            isCheckable: node.isCheckable,
-                            isActive: node.isActive,
-                            children: filteredChildren
                         });
                     }
-                    return result;
+                    return items;
+                }
+
+                function __rebuild() {
+                    __allNodes = [];
+                    __treeModelData = rowModel ? __buildTreeItems(rowModel, 0, null, __filterText.toLowerCase()) : [];
+                    internalTreeView.expandRecursively();
                 }
 
                 function __toggleCheck(nodeIndex) {
@@ -417,18 +225,10 @@ ElementView {
                     } else {
                         checkItem(node);
                     }
-                    // Rebuild model to update TreeView display
-                    __rebuildTreeModel();
+                    __rebuild();
                 }
 
-                Component {
-                    id: childModelComponent;
-                    ListModel {}
-                }
-
-                onRowModelChanged: {
-                    __rebuildTreeModel();
-                }
+                onRowModelChanged: __rebuild();
 
                 // --- JQML2 TreeView ---
                 TreeView {
@@ -458,7 +258,7 @@ ElementView {
                             id: nodeRow;
 
                             anchors.fill: parent;
-                            leftPadding: treeDelegate.depth * treeViewImpl.shiftLevel;
+                            leftPadding: treeDelegate.depth * 20;
                             spacing: Style.spacingM;
 
                             // Expand/collapse arrow
@@ -471,7 +271,6 @@ ElementView {
 
                                     anchors.verticalCenter: parent.verticalCenter;
                                     anchors.horizontalCenter: parent.horizontalCenter;
-
                                     width: parent.width;
                                     height: width;
 
@@ -481,9 +280,7 @@ ElementView {
                                         ? "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal)
                                         : "../../../" + Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Normal);
 
-                                    onClicked: {
-                                        treeDelegate.treeView.toggleExpanded(treeDelegate.row);
-                                    }
+                                    onClicked: treeDelegate.treeView.toggleExpanded(treeDelegate.row);
 
                                     decorator: Component {
                                         ButtonDecorator {
@@ -505,22 +302,15 @@ ElementView {
                                     anchors.verticalCenter: parent.verticalCenter;
                                     anchors.horizontalCenter: parent.horizontalCenter;
 
-                                    checkState: (treeDelegate.model.nodeIndex !== undefined && treeDelegate.model.nodeIndex >= 0 && treeDelegate.model.nodeIndex < treeViewImpl.__allNodes.length)
-                                        ? treeViewImpl.__allNodes[treeDelegate.model.nodeIndex].checkState
-                                        : Qt.Unchecked;
-                                    isActive: (treeDelegate.model.nodeIndex !== undefined && treeDelegate.model.nodeIndex >= 0 && treeDelegate.model.nodeIndex < treeViewImpl.__allNodes.length)
-                                        ? (treeViewImpl.__allNodes[treeDelegate.model.nodeIndex].isActive && !treeViewImpl.readOnly)
-                                        : !treeViewImpl.readOnly;
-                                    visible: !treeViewImpl.tristate
-                                        ? false
-                                        : (treeDelegate.model.nodeIndex !== undefined && treeDelegate.model.nodeIndex >= 0 && treeDelegate.model.nodeIndex < treeViewImpl.__allNodes.length)
-                                            ? treeViewImpl.__allNodes[treeDelegate.model.nodeIndex].isCheckable
-                                            : true;
+                                    property var __node: (treeDelegate.model.nodeIndex !== undefined && treeDelegate.model.nodeIndex >= 0 && treeDelegate.model.nodeIndex < treeViewImpl.__allNodes.length) ? treeViewImpl.__allNodes[treeDelegate.model.nodeIndex] : null;
+
+                                    checkState: __node ? __node.checkState : Qt.Unchecked;
+                                    isActive: __node ? (__node.isActive && !treeViewImpl.readOnly) : !treeViewImpl.readOnly;
+                                    visible: treeViewImpl.tristate && (__node ? __node.isCheckable : true);
 
                                     function nextCheckState() {
-                                        var ni = treeDelegate.model.nodeIndex;
-                                        if (ni !== undefined) {
-                                            treeViewImpl.__toggleCheck(ni);
+                                        if (treeDelegate.model.nodeIndex !== undefined) {
+                                            treeViewImpl.__toggleCheck(treeDelegate.model.nodeIndex);
                                         }
                                     }
                                 }
@@ -537,9 +327,7 @@ ElementView {
 
                                     font.family: Style.fontFamily;
                                     font.pixelSize: Style.fontSizeM;
-                                    color: (treeDelegate.model.nodeIndex !== undefined && treeDelegate.model.nodeIndex >= 0 && treeDelegate.model.nodeIndex < treeViewImpl.__allNodes.length)
-                                        ? (treeViewImpl.__allNodes[treeDelegate.model.nodeIndex].isActive ? Style.textColor : Style.inactiveTextColor)
-                                        : Style.textColor;
+                                    color: checkBox.__node ? (checkBox.__node.isActive ? Style.textColor : Style.inactiveTextColor) : Style.textColor;
 
                                     wrapMode: Text.WordWrap;
                                     elide: Text.ElideRight;
