@@ -251,6 +251,11 @@ I_EXPORT_COMPONENT(
 			"Publisher for tenant membership invitation/response notifications via WebSocket",
 			"Tenant Membership Publisher");
 
+I_EXPORT_COMPONENT(
+			RemoteTenantCollectionDocumentManager,
+			"Remote tenant collection document manager with product permissions enrichment",
+			"Remote Tenant Collection Document Manager");
+
 
 } // namespace ImtAuthGqlPck
 

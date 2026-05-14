@@ -9,11 +9,9 @@
 // ImtCore includes
 #include <imtauth/ITenantInfo.h>
 #include <imtauth/IUserManager.h>
-#include <imtbase/ICollectionInfo.h>
 #include <imtgql/IGqlContext.h>
 #include <imtdoc/CDocumentSavedEvent.h>
 #include <imtauth/imtauth.h>
-#include <imtlic/IFeatureInfo.h>
 
 
 namespace
@@ -199,28 +197,6 @@ sdl::imtauth::Tenants::CTenantData CTenantCollectionDocumentManagerComp::OnGetTe
 
 	// Tenant-scoped permissions (selected subset of product permissions)
 	response.Version_1_0->tenantPermissions.Emplace().FromList(tenantPtr->GetTenantPermissions());
-
-	// All available product permissions for selection UI
-	response.Version_1_0->allProductPermissions.Emplace();
-	if (m_productInfoCompPtr.IsValid()){
-		imtbase::IObjectCollection* featureCollectionPtr = m_productInfoCompPtr->GetFeatures();
-		if (featureCollectionPtr != nullptr){
-			imtbase::ICollectionInfo::Ids elementIds = featureCollectionPtr->GetElementIds();
-			for (const imtbase::ICollectionInfo::Id& elementId : elementIds){
-				imtbase::IObjectCollection::DataPtr dataPtr;
-				if (featureCollectionPtr->GetObjectData(elementId, dataPtr)){
-					const imtlic::IFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::IFeatureInfo*>(dataPtr.GetPtr());
-					if (featureInfoPtr != nullptr && featureInfoPtr->IsPermission()){
-						sdl::imtauth::Tenants::CTenantPermissionOption::V1_0 permOpt;
-						permOpt.id = featureInfoPtr->GetFeatureId();
-						permOpt.name = featureInfoPtr->GetFeatureName();
-						permOpt.description = featureInfoPtr->GetFeatureDescription();
-						response.Version_1_0->allProductPermissions->push_back(permOpt);
-					}
-				}
-			}
-		}
-	}
 
 	return response;
 }
