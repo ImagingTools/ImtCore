@@ -100,17 +100,17 @@ QByteArray CDocumentManagerBase::CreateNewDocument(
 		return QByteArray();
 	}
 
-	{
-		NewDocumentCreatedInfo info;
-		info.userId = userId;
-		info.documentId = newDocumentId;
-		info.typeId = documentTypeId;
-		info.name = doc.name;
-		info.isDirty = false;
-		istd::IChangeable::ChangeSet changeSet(CF_NEW_DOCUMENT_CREATED);
-		changeSet.SetChangeInfo(CN_NEW_DOCUMENT_CREATED, QVariant::fromValue(info));
-		istd::CChangeNotifier notifier(this, &changeSet);
-	}
+	NewDocumentCreatedInfo info;
+	info.userId = userId;
+	info.documentId = newDocumentId;
+	info.typeId = documentTypeId;
+	info.name = doc.name;
+	info.isDirty = false;
+	istd::IChangeable::ChangeSet changeSet(CF_NEW_DOCUMENT_CREATED);
+	changeSet.SetChangeInfo(CN_NEW_DOCUMENT_CREATED, QVariant::fromValue(info));
+
+	// Change notification starts bevor the data model was changed:
+	istd::CChangeNotifier notifier(this, &changeSet);
 
 	{
 		QMutexLocker locker(&m_mutex);
