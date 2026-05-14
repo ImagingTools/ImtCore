@@ -8,33 +8,33 @@
 
 ## 1. Zusammenfassung (Executive Summary)
 
-Diese Analyse bewertet die Codequalität, architektonischen Fähigkeiten und Copilot-SWE-Agent-Nutzung aller aktiven Entwickler der ImagingTools-Organisation. Die Bewertung basiert auf PR-Titeln, Merge-Raten, Revert-Häufigkeit, architektonischer Tiefe der Beiträge und der Qualität der Copilot-Orchestrierung.
+Diese Analyse bewertet die Codequalität, architektonischen Fähigkeiten und Copilot-SWE-Agent-Nutzung aller aktiven Entwickler der ImagingTools-Organisation. Die Bewertung basiert ausschließlich auf signifikanten Beiträgen (neue Features, Architekturentscheidungen, Framework-Erweiterungen, Refactorings mit breiter Wirkung). Triviale Commits (Build-Fixes, kleine UI-Korrekturen, isolierte Test-Ergänzungen) werden nicht bewertet.
 
 **Kernerkenntnisse:**
 - **Fehlende Code-Review-Kultur:** Kein PR hat sichtbare Review-Approvals. Branch-Protection existiert nicht.
-- **Copilot-Nutzung variiert stark:** Von exzellent (100% Merge-Rate bei 0x435641) bis problematisch (~75% Merge-Rate bei kucherenkord-cyber mit Mega-PRs).
+- **Copilot-Nutzung variiert stark:** Von exzellent (0x435641, chirurgische Problemdefinition) bis problematisch (kucherenkord-cyber, Mega-PRs mit 20+ ungekoppelten Änderungen).
 - **Stärkstes Asset:** Die strategische Copilot-Nutzung durch kirill-lepski und das architektonische Tiefenverständnis von 0x435641.
 - **Größtes Risiko:** Mega-PRs mit 20+ Änderungen ohne Code-Review.
 
 ---
 
-## 2. Gesamtstatistik pro Entwickler
+## 2. Aktive Entwickler – Übersicht
 
-| Entwickler | PRs (ca.) | Gemergt | Nicht gemergt | Reverts | Copilot-Nutzung | Hauptrepos |
-|---|---|---|---|---|---|---|
-| kucherenkord-cyber | ~60+ | ~50+ | ~5 | 0 | ★★★★★ Intensiv | ImtCore, ProLife, Puma, Lisa, Agentino |
-| kirill-lepski | ~30+ | ~25+ | ~5 | 0 | ★★★★★ Strategisch | ImtCore, Acf, Q-Vision, alle |
-| Artur1309 | ~35+ | ~28+ | ~7 | 1 | ☆ Kein | ImtCore (JQML/Tests) |
-| VekhterAleksandr | ~25+ | ~25 | 0 | 0 | ☆ Kein | ImtCore (QML), NeoPro |
-| 0x435641 | ~12+ | ~10+ | ~2 | 0 | ★★★ Gezielt | ImtCore, Acf |
-| legend-of-today | ~20+ | ~20 | 0 | 0 | ☆ Kein | IotPlatform, ImtCore |
-| oleksiigmg | ~10+ | ~10 | ~1 | 1 | ★ Minimal | Acf |
-| SERZSH1909 | ~8 | ~8 | 0 | 0 | ★ Alignment | ImtCore, Acf, Agentino |
-| ShcherbinaVA | ~10+ | ~8+ | ~2 | 0 | ★ Unterstützung | Agentino, ImtCore, Puma, Lisa |
-| gameon186 | ~10+ | ~8+ | ~2 | 1 | ☆ Kein | IotPlatform, ImtCore |
-| naskin-gmg | ~6 | ~5 | ~1 | 0 | ☆ Kein | Acf, ImtCore, Agentino |
-| lmoragmg | ~2 | ~2 | 0 | 0 | ☆ Kein | ImtCore, Acf |
-| sasatutus | ~2 | ~1 | ~1 | 0 | ☆ Kein | Acf |
+| Entwickler | Reverts | Copilot-Nutzung | Hauptrepos |
+|---|---|---|---|
+| kucherenkord-cyber | 0 | ★★★★★ Intensiv | ImtCore, ProLife, Puma, Lisa, Agentino |
+| kirill-lepski | 0 | ★★★★★ Strategisch | ImtCore, Acf, Q-Vision, alle |
+| Artur1309 | 1 | ☆ Kein | ImtCore (JQML/Tests) |
+| VekhterAleksandr | 0 | ☆ Kein | ImtCore (QML), NeoPro |
+| 0x435641 | 0 | ★★★ Gezielt | ImtCore, Acf |
+| legend-of-today | 0 | ☆ Kein | IotPlatform, ImtCore |
+| oleksiigmg | 1 | ★ Minimal | Acf |
+| SERZSH1909 | 0 | ★ Alignment | ImtCore, Acf, Agentino |
+| ShcherbinaVA | 0 | ★ Unterstützung | Agentino, ImtCore, Puma, Lisa |
+| gameon186 | 1 | ☆ Kein | IotPlatform, ImtCore |
+| naskin-gmg | 0 | ☆ Kein | Acf, ImtCore, Agentino |
+| lmoragmg | 0 | ☆ Kein | ImtCore, Acf |
+| sasatutus | 0 | ☆ Kein | Acf |
 
 ---
 
@@ -44,14 +44,13 @@ Diese Analyse bewertet die Codequalität, architektonischen Fähigkeiten und Cop
 
 #### kirill-lepski
 - **Rolle:** Technischer Leiter / Architekt. Orchestriert die gesamte Copilot-Strategie.
-- **Eigene Beiträge:** WebSocket-Server, Q_ENUM-Serialization, Bitmap-Handling, Login-System, Bundled-Installer.
+- **Eigene Beiträge:** WebSocket-Server, Q_ENUM-Serialization, Bitmap-Handling, Login-System.
 - **Copilot-Nutzung:** Höchst strategisch – delegiert SQL-Injection-Fixes, 3D-Visualization (Three.js + QtQuick3D), ISender→ITransport Refactoring, Multi-Tenant-Architektur, LDAP/Auth, EU CRA Compliance, CI/CD.
-- **Merge-Rate Copilot-PRs:** ~86%
 
 #### 0x435641
 - **Stärken:** DocumentManagers-Refactoring, CCollectionDocumentManager-Split, Qt RHI-Kompatibilität, SDL-Generator-Fixes, CObjectCollectionBase::CopyFrom, TSimComponentsFactory.
-- **Copilot-Nutzung:** 100% Merge-Rate. Chirurgisch präzise Problem-Spezifikationen.
-- **Qualität:** Beschreibende Titel, fokussierte PRs, tiefes System-Verständnis.
+- **Copilot-Nutzung:** Chirurgisch präzise Problemdefinitionen – liefert fokussierte, mergebare Ergebnisse. Benchmark für alle Entwickler.
+- **Qualität:** Tiefes System-Verständnis, klar abgegrenzte Änderungsscope.
 
 #### oleksiigmg (⭐⭐⭐⭐½)
 - **Stärken:** Framework-Kern (Acf): CListObserverDispatcher, TInterfacePtr Enhancements, Serializer-Interfaces, Document-Notifications, Conan-Integration.
@@ -61,9 +60,8 @@ Diese Analyse bewertet die Codequalität, architektonischen Fähigkeiten und Cop
 ### Tier 2 – Solide Senior-Entwickler (⭐⭐⭐⭐)
 
 #### SERZSH1909
-- **Stärken:** Smart-Pointer-Refactoring, Type-Safe Metadata Retrieval, showStandardLoading Property, deduplizierter onDestruction.
-- **Qualität:** Einziger Entwickler, der Labels konsequent verwendet (bug, enhancement).
-- **Copilot:** Nutzt Copilot für Alignment-PRs – zeigt Tool-Grenzen-Verständnis.
+- **Stärken:** Smart-Pointer-Refactoring, Type-Safe Metadata Retrieval.
+- **Copilot:** Nutzt Copilot gezielt für Alignment-Aufgaben – zeigt klares Verständnis der Tool-Grenzen.
 
 #### kucherenkord-cyber
 - **Stärken:** Breitester Contributor. GQL Response Parsing optimiert, Tree Model Optimization, Ticket-System, Chat-Module, Multi-Tenant (via Copilot).
@@ -72,8 +70,8 @@ Diese Analyse bewertet die Codequalität, architektonischen Fähigkeiten und Cop
   - ~25% Copilot-Rejection-Rate: Serielle Retry-Patterns (3 Versuche für einen Bug)
 
 #### VekhterAleksandr (⭐⭐⭐½)
-- **Stärken:** Konsistente QML-UI-Arbeit: GraphicsShapeFactory, GraphicsView, DialogManagerView, TableViewParamController, TextArea, CheckBoxMenu, StackView, BaseModel.
-- **Schwächen:** Tippfehler in Titeln ("componetn", "SeviseLog"), null Copilot-Nutzung, keine Tests.
+- **Stärken:** Konsistente QML-UI-Arbeit: GraphicsShapeFactory, GraphicsView, DialogManagerView, TableViewParamController, StackView, BaseModel.
+- **Schwächen:** Keine Copilot-Nutzung, keine Tests.
 
 ### Tier 3 – Funktionale Entwickler (⭐⭐⭐)
 
