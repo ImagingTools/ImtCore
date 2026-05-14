@@ -120,8 +120,6 @@ QByteArray CDocumentManagerBase::CreateNewDocument(
 		InitializeDocumentObservers(m_userDocuments[userId][newDocumentId], userId);
 	}
 
-	OnDocumentDataLoaded(userId, newDocumentId);
-
 	for (IDocumentManagerEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
 		if (handlerPtr != nullptr){
 			CDocumentCreatedEvent event(
