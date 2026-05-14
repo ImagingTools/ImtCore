@@ -496,11 +496,18 @@ QByteArrayList CTenantDbDelegateComp::LoadTenantPermissions(const QByteArray& te
 	QString permissionsTableName = QString::fromUtf8(*m_permissionsTableNameAttrPtr);
 	QString escapedTenantId = imtdb::EscapeSql(QString::fromUtf8(tenantId));
 
-	QByteArray query = QString("SELECT \"PermissionId\" FROM \"%1\" WHERE \"TenantId\"='%2';")
-			.arg(permissionsTableName, escapedTenantId).toUtf8();
+	QString queryStr;
+	QByteArray productId = m_productIdAttrPtr.IsValid() ? *m_productIdAttrPtr : QByteArray();
+	if (!productId.isEmpty()){
+		queryStr = QString("SELECT \"PermissionId\" FROM \"%1\" WHERE \"TenantId\"='%2' AND \"ProductId\"='%3';")
+				.arg(permissionsTableName, escapedTenantId, imtdb::EscapeSql(QString::fromUtf8(productId)));
+	} else {
+		queryStr = QString("SELECT \"PermissionId\" FROM \"%1\" WHERE \"TenantId\"='%2';")
+				.arg(permissionsTableName, escapedTenantId);
+	}
 
 	QSqlError sqlError;
-	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
+	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(queryStr.toUtf8(), &sqlError);
 	if (sqlError.type() == QSqlError::NoError){
 		while (sqlQuery.next()){
 			result.append(sqlQuery.value(0).toByteArray());
@@ -519,13 +526,15 @@ QByteArray CTenantDbDelegateComp::CreatePermissionsInsertQuery(const QByteArray&
 
 	QString permissionsTableName = QString::fromUtf8(*m_permissionsTableNameAttrPtr);
 	QString escapedTenantId = imtdb::EscapeSql(QString::fromUtf8(tenantId));
+	QByteArray productId = m_productIdAttrPtr.IsValid() ? *m_productIdAttrPtr : QByteArray();
+	QString escapedProductId = imtdb::EscapeSql(QString::fromUtf8(productId));
 
 	QStringList valueRows;
 	for (const QByteArray& permissionId : permissions){
-		valueRows << QString("('%1', '%2')").arg(escapedTenantId, imtdb::EscapeSql(QString::fromUtf8(permissionId)));
+		valueRows << QString("('%1', '%2', '%3')").arg(escapedTenantId, escapedProductId, imtdb::EscapeSql(QString::fromUtf8(permissionId)));
 	}
 
-	return QString("INSERT INTO \"%1\" (\"TenantId\", \"PermissionId\") VALUES %2;")
+	return QString("INSERT INTO \"%1\" (\"TenantId\", \"ProductId\", \"PermissionId\") VALUES %2;")
 			.arg(permissionsTableName, valueRows.join(", ")).toUtf8();
 }
 
@@ -534,6 +543,12 @@ QByteArray CTenantDbDelegateComp::CreatePermissionsDeleteQuery(const QByteArray&
 {
 	QString permissionsTableName = QString::fromUtf8(*m_permissionsTableNameAttrPtr);
 	QString escapedTenantId = imtdb::EscapeSql(QString::fromUtf8(tenantId));
+
+	QByteArray productId = m_productIdAttrPtr.IsValid() ? *m_productIdAttrPtr : QByteArray();
+	if (!productId.isEmpty()){
+		return QString("DELETE FROM \"%1\" WHERE \"TenantId\"='%2' AND \"ProductId\"='%3';")
+				.arg(permissionsTableName, escapedTenantId, imtdb::EscapeSql(QString::fromUtf8(productId))).toUtf8();
+	}
 
 	return QString("DELETE FROM \"%1\" WHERE \"TenantId\"='%2';")
 			.arg(permissionsTableName, escapedTenantId).toUtf8();

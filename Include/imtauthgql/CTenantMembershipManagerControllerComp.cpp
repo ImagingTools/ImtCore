@@ -694,6 +694,13 @@ sdl::imtauth::TenantMemberships::CTransferTenantOwnershipPayload CTenantMembersh
 		return response;
 	}
 
+	// Prevent transfer to self
+	if (newOwnerId == contextUserId){
+		response.Version_1_0->success = false;
+		response.Version_1_0->errorMessage = QStringLiteral("Cannot transfer ownership to yourself");
+		return response;
+	}
+
 	// Verify the new owner is a member of the tenant
 	if (!m_membershipManagerCompPtr->IsMember(newOwnerId, tenantId)){
 		response.Version_1_0->success = false;

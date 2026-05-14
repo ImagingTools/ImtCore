@@ -7,9 +7,13 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonValue>
+#include <QtCore/QSet>
 
 // ACF includes
 #include <iqt/iqt.h>
+
+// ImtCore includes
+#include <imtgql/IGqlContext.h>
 
 
 namespace imtlicgql
@@ -22,6 +26,7 @@ bool CPermissionsProviderComp::CreateRepresentationModelFromFeatureInfo(
 			const imtlic::CFeatureInfo& featureInfo,
 			imtbase::CTreeItemModel& representationModel,
 			const QByteArray& languageId,
+			const QSet<QByteArray>* allowedPermissionsPtr,
 			QString& errorMessage) const
 {
 	if (!featureInfo.IsPermission()){
@@ -29,6 +34,15 @@ bool CPermissionsProviderComp::CreateRepresentationModelFromFeatureInfo(
 	}
 
 	QByteArray featureId = featureInfo.GetFeatureId();
+
+	// If tenant filtering is active, check if this leaf permission (or any sub-permission) is allowed
+	const imtlic::IFeatureInfo::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();
+	if (allowedPermissionsPtr != nullptr && subFeatures.isEmpty()){
+		// Leaf node — skip if not in allowed set
+		if (!allowedPermissionsPtr->contains(featureId)){
+			return false;
+		}
+	}
 
 	representationModel.SetData("FeatureId", featureId);
 
@@ -51,11 +65,11 @@ bool CPermissionsProviderComp::CreateRepresentationModelFromFeatureInfo(
 	representationModel.SetData("Dependencies", featureInfo.GetDependencies().join(';'));
 	representationModel.SetData("ChildModel", 0);
 
-	const imtlic::IFeatureInfo::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();
 	if (!subFeatures.isEmpty()){
 		imtbase::CTreeItemModel* childModelPtr = representationModel.AddTreeModel("ChildModel");
 		Q_ASSERT(childModelPtr != nullptr);
 
+		int insertedCount = 0;
 		for (int i = 0; i < subFeatures.count(); i++){
 			const imtlic::IFeatureInfo::FeatureInfoPtr& featureInfoPtr = subFeatures.at(i);
 			if (!featureInfoPtr.IsValid()){
@@ -67,11 +81,17 @@ bool CPermissionsProviderComp::CreateRepresentationModelFromFeatureInfo(
 			Q_ASSERT(subFeatureInfoPtr != nullptr);
 
 			imtbase::CTreeItemModel subFeatureRepresentationModel;
-			bool ok = CreateRepresentationModelFromFeatureInfo(*subFeatureInfoPtr, subFeatureRepresentationModel, languageId, errorMessage);
+			bool ok = CreateRepresentationModelFromFeatureInfo(*subFeatureInfoPtr, subFeatureRepresentationModel, languageId, allowedPermissionsPtr, errorMessage);
 			if (ok){
 				childModelPtr->InsertNewItem();
-				childModelPtr->CopyItemDataFromModel(i, &subFeatureRepresentationModel, 0);
+				childModelPtr->CopyItemDataFromModel(insertedCount, &subFeatureRepresentationModel, 0);
+				insertedCount++;
 			}
+		}
+
+		// If filtering and no children survived, skip this parent node too
+		if (allowedPermissionsPtr != nullptr && insertedCount == 0){
+			return false;
 		}
 	}
 
@@ -94,6 +114,23 @@ QJsonObject CPermissionsProviderComp::CreateInternalResponse(const imtgql::CGqlR
 		languageId = gqlContextPtr->GetLanguageId();
 	}
 
+	// Build allowed permissions set from tenant scope (if tenant manager is available)
+	QSet<QByteArray> allowedPermissions;
+	const QSet<QByteArray>* allowedPermissionsPtr = nullptr;
+	if (m_tenantManagerCompPtr.IsValid() && gqlContextPtr != nullptr){
+		QByteArray tenantId = gqlContextPtr->GetTenantId();
+		if (!tenantId.isEmpty()){
+			imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
+			if (tenantPtr.IsValid()){
+				QByteArrayList tenantPermissions = tenantPtr->GetTenantPermissions();
+				for (const QByteArray& permId : tenantPermissions){
+					allowedPermissions.insert(permId);
+				}
+				allowedPermissionsPtr = &allowedPermissions;
+			}
+		}
+	}
+
 	QJsonObject resultObj;
 	QJsonArray dataArray;
 
@@ -107,7 +144,7 @@ QJsonObject CPermissionsProviderComp::CreateInternalResponse(const imtgql::CGqlR
 				if (featureInfoPtr != nullptr){
 					imtbase::CTreeItemModel featureRepresentationModel;
 					QString errorMessage;
-					bool ok = CreateRepresentationModelFromFeatureInfo(*featureInfoPtr, featureRepresentationModel, languageId, errorMessage);
+					bool ok = CreateRepresentationModelFromFeatureInfo(*featureInfoPtr, featureRepresentationModel, languageId, allowedPermissionsPtr, errorMessage);
 					if (ok){
 						QJsonObject itemObj;
 						QString jsonStr = featureRepresentationModel.ToJson();

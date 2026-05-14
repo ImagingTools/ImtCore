@@ -29,16 +29,14 @@ DocumentViewBase {
 	// Guard: set when members are modified locally, prevents updateGui from overwriting
 	property bool __membersModifiedLocally: false
 
-	// Role-based access: determine current user's role in this tenant
-	readonly property string __currentUserRole:
-		!container.tenantData ? ""
-		: !container.tenantData.m_currentUserId ? ""
-		: container.tenantData.m_ownerId && container.tenantData.m_currentUserId === container.tenantData.m_ownerId ? "Owner"
-		: container.__memberRolesMap && container.__memberRolesMap[container.tenantData.m_currentUserId] ? container.__memberRolesMap[container.tenantData.m_currentUserId]
-		: container.__isCurrentUserInvited() ? "Invited"
-		: ""
-	readonly property bool __isOwnerOrAdmin: container.__currentUserRole === "Owner" || container.__currentUserRole === "Admin"
-	readonly property bool __isOwner: container.__currentUserRole === "Owner"
+	// Role-based access: determine current user's access level from ownerId and membership
+	readonly property bool __isOwner: container.tenantData && container.tenantData.m_ownerId && container.tenantData.m_currentUserId
+		? container.tenantData.m_currentUserId === container.tenantData.m_ownerId
+		: false
+	readonly property bool __isOwnerOrAdmin: container.__isOwner
+		|| (container.__memberRolesMap && container.tenantData && container.tenantData.m_currentUserId
+			? container.__memberRolesMap[container.tenantData.m_currentUserId] === "Admin"
+			: false)
 	readonly property bool __isReadOnly: !container.isNewTenant && !container.__isOwnerOrAdmin
 
 	onPendingMembersChanged: {
@@ -86,7 +84,7 @@ DocumentViewBase {
 				var entry = container.tenantData.createMemberRolesArrayElement()
 				if (entry) {
 					entry.m_userId = members[i].id
-					entry.m_role = container.__memberRolesMap[members[i].id] || container.defaultRole
+					entry.m_role = container.__memberRolesMap[members[i].id] || ""
 					container.tenantData.m_memberRoles.addElement(entry)
 				}
 			}
@@ -134,7 +132,7 @@ DocumentViewBase {
 						id: invitation.m_id || "",
 						userId: invitation.m_userId || "",
 						userName: invitation.m_userName || invitation.m_userId || "",
-						role: invitation.m_role || container.defaultRole,
+						role: invitation.m_role || "",
 						status: invitation.m_status || "Pending",
 						invitedByUserId: invitation.m_invitedByUserId || "",
 						invitedByName: invitation.m_invitedByName || invitation.m_invitedByUserId || "",
@@ -187,12 +185,11 @@ DocumentViewBase {
 	}
 
 	// --- Member roles support ---
-	readonly property string defaultRole: "Member"
+	// Roles model provided from outside (e.g. RoleCollectionDataProvider)
+	property var rolesModel: null
 
 	function __getAvailableRolesModel() {
-		if (!container.tenantData || !container.tenantData.m_availableRoles)
-			return null
-		return container.tenantData.m_availableRoles
+		return container.rolesModel
 	}
 
 	function __getRoleModelValue(rolesModel, index, key) {
@@ -234,7 +231,7 @@ DocumentViewBase {
 			for (var i = 0; i < count; i++) {
 				var entry = roleEntries.get(i).item
 				if (entry && entry.m_userId) {
-					rolesMap[entry.m_userId] = entry.m_role || container.defaultRole
+					rolesMap[entry.m_userId] = entry.m_role || ""
 				}
 			}
 		}
@@ -254,7 +251,7 @@ DocumentViewBase {
 		for (var i = 0; i < members.length; i++) {
 			var userId = members[i].id
 			var userName = members[i].name || userId
-			var role = container.__memberRolesMap[userId] || container.defaultRole
+			var role = container.__memberRolesMap[userId] || ""
 			result.push({ userId: userId, userName: userName, role: role, isPending: false })
 		}
 		// Merge pending invitations into the same list
@@ -282,17 +279,6 @@ DocumentViewBase {
 		var byPart = invitedByName ? qsTr("by %1").arg(invitedByName) : ""
 		var expPart = expiresAt ? qsTr("expires %1").arg(container.__formatDateTime(expiresAt)) : ""
 		return byPart && expPart ? byPart + " · " + expPart : byPart + expPart
-	}
-
-	function __isCurrentUserInvited() {
-		if (!container.tenantData || !container.tenantData.m_currentUserId)
-			return false
-		var userId = container.tenantData.m_currentUserId
-		for (var i = 0; i < container.pendingInvitations.length; i++) {
-			if (container.pendingInvitations[i].userId === userId)
-				return true
-		}
-		return false
 	}
 
 	function __isInvitationExpired(expiresAt) {
@@ -328,8 +314,9 @@ DocumentViewBase {
 		var result = []
 		var members = container.pendingMembers
 		var ownerId = container.tenantData ? container.tenantData.m_ownerId : ""
+		var currentUserId = container.tenantData ? container.tenantData.m_currentUserId : ""
 		for (var i = 0; i < members.length; i++) {
-			if (members[i].id !== ownerId) {
+			if (members[i].id !== ownerId && members[i].id !== currentUserId) {
 				result.push(members[i])
 			}
 		}
@@ -783,7 +770,7 @@ DocumentViewBase {
 														var selectedRole = container.__getRoleModelValue(roleCombo.model, selectedIndex, "id")
 														if (!selectedRole)
 															return
-														var currentRole = container.__memberRolesMap[modelData.userId] || container.defaultRole
+														var currentRole = container.__memberRolesMap[modelData.userId] || ""
 														if (selectedRole !== currentRole) {
 															container.__updateMemberRole(modelData.userId, selectedRole)
 														}

@@ -186,14 +186,7 @@ sdl::imtauth::Tenants::CTenantData CTenantCollectionDocumentManagerComp::OnGetTe
 		}
 	}
 
-	response.Version_1_0->availableRoles.Emplace();
-	static const char* roleNames[] = {"Admin", "Member", "Guest"};
-	for (const char* roleName : roleNames){
-		sdl::imtauth::Tenants::CTenantRoleOption::V1_0 opt;
-		opt.id = QByteArray(roleName);
-		opt.name = QString::fromLatin1(roleName);
-		response.Version_1_0->availableRoles->push_back(opt);
-	}
+	// availableRoles will be provided by the client-side RoleCollectionDataProvider
 
 	// Tenant-scoped permissions (selected subset of product permissions)
 	response.Version_1_0->tenantPermissions.Emplace().FromList(tenantPtr->GetTenantPermissions());

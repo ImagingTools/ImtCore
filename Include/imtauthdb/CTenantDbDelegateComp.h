@@ -20,6 +20,7 @@ public:
 		I_ASSIGN(m_permissionsTableNameAttrPtr, "PermissionsTableName", "Name of the TenantPermissions table", false, "TenantPermissions");
 		I_ASSIGN(m_autoCreatePermissionsTableAttrPtr, "AutoCreatePermissionsTable", "Auto-create TenantPermissions table if not exists", false, true);
 		I_ASSIGN(m_createPermissionsTableScriptPathAttrPtr, "CreatePermissionsTableScriptPath", "SQL script path for TenantPermissions table creation", false, "CreateTenantPermissionsTable.sql");
+		I_ASSIGN(m_productIdAttrPtr, "ProductId", "Product ID used when storing permissions (scoped per product)", false, "");
 	I_END_COMPONENT
 
 	// reimplemented (icomp::CComponentBase)
@@ -92,6 +93,7 @@ private:
 	I_ATTR(QByteArray, m_permissionsTableNameAttrPtr);
 	I_ATTR(bool, m_autoCreatePermissionsTableAttrPtr);
 	I_ATTR(QByteArray, m_createPermissionsTableScriptPathAttrPtr);
+	I_ATTR(QByteArray, m_productIdAttrPtr);
 };
 
 
