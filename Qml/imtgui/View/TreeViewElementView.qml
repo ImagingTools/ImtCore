@@ -28,6 +28,7 @@ ElementView {
 
                 onSearchChanged: {
                     treeViewImpl.filterText = filterInput.text;
+                    treeViewImpl.__rebuildFlatModel();
                 }
             }
 
@@ -54,14 +55,17 @@ ElementView {
                 property var rowModel: ListModel {};
                 property var columnModel: ListModel {};
                 property int rowItemHeight: Style.controlHeightM;
-                property int contentHeight: bodyColumn.height;
+                property int contentHeight: treeListView.contentHeight;
                 property string filterText: "";
 
                 signal checkedItemsChanged();
                 signal rowAdded();
                 signal rowRemoved();
 
-                property var __itemsList: [];
+                // All node objects (flat list of every node in the tree)
+                property var __allNodes: [];
+                // Flat model for the ListView (only visible/expanded nodes)
+                property var __flatModel: ListModel {};
 
                 // --- Public functions ---
                 function addRow(row) {
@@ -110,6 +114,7 @@ ElementView {
                     var lastIndex = indexes[indexes.length - 1];
                     localModel.insert(lastIndex, row);
 
+                    treeViewImpl.__rebuildFlatModel();
                     treeViewImpl.rowAdded();
                 }
 
@@ -124,6 +129,7 @@ ElementView {
                     }
                     var lastIndex = indexes[indexes.length - 1];
                     localModel.remove(lastIndex);
+                    treeViewImpl.__rebuildFlatModel();
                     treeViewImpl.rowRemoved();
                 }
 
@@ -158,90 +164,119 @@ ElementView {
                 }
 
                 function getItemsDataAsList() {
-                    return __itemsList;
+                    return __allNodes;
                 }
 
                 function getCheckedItems() {
                     var result = [];
-                    for (var i = 0; i < __itemsList.length; i++) {
-                        if (__itemsList[i].checkState === Qt.Checked) {
-                            result.push(__itemsList[i]);
+                    for (var i = 0; i < __allNodes.length; i++) {
+                        if (__allNodes[i].checkState === Qt.Checked) {
+                            result.push(__allNodes[i]);
                         }
                     }
                     return result;
                 }
 
-                function checkItem(delegate) {
-                    if (delegate && delegate.checkState !== Qt.Checked) {
-                        delegate.checkState = Qt.Checked;
-                        if (delegate.parentDelegate) {
-                            delegate.parentDelegate.childrenCheckStateChanged(delegate);
-                        }
-                        for (var i = 0; i < delegate.childrenDelegates.length; i++) {
-                            delegate.childrenDelegates[i].parentCheckStateChanged(delegate);
-                        }
+                function checkItem(node) {
+                    if (node && node.checkState !== Qt.Checked) {
+                        node.checkState = Qt.Checked;
+                        __propagateCheckDown(node, Qt.Checked);
+                        __propagateCheckUp(node);
+                        __syncFlatModelCheckStates();
                         treeViewImpl.checkedItemsChanged();
                     }
                 }
 
-                function uncheckItem(delegate) {
-                    if (delegate && delegate.checkState !== Qt.Unchecked) {
-                        delegate.checkState = Qt.Unchecked;
-                        if (delegate.parentDelegate) {
-                            delegate.parentDelegate.childrenCheckStateChanged(delegate);
-                        }
-                        for (var i = 0; i < delegate.childrenDelegates.length; i++) {
-                            delegate.childrenDelegates[i].parentCheckStateChanged(delegate);
-                        }
+                function uncheckItem(node) {
+                    if (node && node.checkState !== Qt.Unchecked) {
+                        node.checkState = Qt.Unchecked;
+                        __propagateCheckDown(node, Qt.Unchecked);
+                        __propagateCheckUp(node);
+                        __syncFlatModelCheckStates();
                         treeViewImpl.checkedItemsChanged();
                     }
                 }
 
                 function checkAll() {
                     var changed = false;
-                    for (var i = 0; i < __itemsList.length; i++) {
-                        if (__itemsList[i].checkState !== Qt.Checked) {
-                            __itemsList[i].checkState = Qt.Checked;
+                    for (var i = 0; i < __allNodes.length; i++) {
+                        if (__allNodes[i].checkState !== Qt.Checked) {
+                            __allNodes[i].checkState = Qt.Checked;
                             changed = true;
                         }
                     }
                     if (changed) {
+                        __syncFlatModelCheckStates();
                         treeViewImpl.checkedItemsChanged();
                     }
                 }
 
                 function uncheckAll() {
                     var changed = false;
-                    for (var i = 0; i < __itemsList.length; i++) {
-                        if (__itemsList[i].checkState !== Qt.Unchecked) {
-                            __itemsList[i].checkState = Qt.Unchecked;
+                    for (var i = 0; i < __allNodes.length; i++) {
+                        if (__allNodes[i].checkState !== Qt.Unchecked) {
+                            __allNodes[i].checkState = Qt.Unchecked;
                             changed = true;
                         }
                     }
                     if (changed) {
+                        __syncFlatModelCheckStates();
                         treeViewImpl.checkedItemsChanged();
                     }
                 }
 
-                function _addItem(item) {
-                    __itemsList.push(item);
-                }
+                // --- Internal: tree node management ---
 
-                function _removeItem(item) {
-                    var index = __itemsList.indexOf(item);
-                    if (index !== -1) {
-                        __itemsList.splice(index, 1);
+                function __propagateCheckDown(node, state) {
+                    for (var i = 0; i < node.childNodes.length; i++) {
+                        var child = node.childNodes[i];
+                        if (child.isCheckable) {
+                            child.checkState = state;
+                        }
+                        __propagateCheckDown(child, state);
                     }
                 }
 
-                function __checkState(delegates, state) {
-                    for (var i = 0; i < delegates.length; i++) {
-                        if (delegates[i].checkState !== state) {
-                            return false;
+                function __propagateCheckUp(node) {
+                    var parent = node.parentNode;
+                    if (!parent || !parent.isCheckable) {
+                        return;
+                    }
+
+                    var allChecked = true;
+                    var allUnchecked = true;
+                    for (var i = 0; i < parent.childNodes.length; i++) {
+                        var cs = parent.childNodes[i].checkState;
+                        if (cs !== Qt.Checked) {
+                            allChecked = false;
+                        }
+                        if (cs !== Qt.Unchecked) {
+                            allUnchecked = false;
                         }
                     }
-                    return true;
+
+                    if (allChecked) {
+                        parent.checkState = Qt.Checked;
+                    } else if (allUnchecked) {
+                        parent.checkState = Qt.Unchecked;
+                    } else {
+                        parent.checkState = Qt.PartiallyChecked;
+                    }
+
+                    __propagateCheckUp(parent);
                 }
+
+                function __syncFlatModelCheckStates() {
+                    for (var i = 0; i < __flatModel.count; i++) {
+                        var flatItem = __flatModel.get(i);
+                        var node = __allNodes[flatItem.nodeIndex];
+                        if (node && flatItem.checkState !== node.checkState) {
+                            __flatModel.setProperty(i, "checkState", node.checkState);
+                        }
+                    }
+                }
+
+                // --- Internal: filter matching ---
 
                 function __matchesFilter(itemData, filterLower) {
                     if (filterLower === "") {
@@ -257,12 +292,12 @@ ElementView {
                     return false;
                 }
 
-                function __subtreeMatchesFilter(model, filterLower) {
+                function __subtreeMatchesFilter(sourceModel, filterLower) {
                     if (filterLower === "") {
                         return true;
                     }
-                    for (var i = 0; i < model.count; i++) {
-                        var item = model.get(i);
+                    for (var i = 0; i < sourceModel.count; i++) {
+                        var item = sourceModel.get(i);
                         if (__matchesFilter(item, filterLower)) {
                             return true;
                         }
@@ -275,119 +310,163 @@ ElementView {
                     return false;
                 }
 
+                // --- Internal: build flat model from hierarchical rowModel ---
+
+                function __buildNodes(sourceModel, level, parentNode) {
+                    for (var i = 0; i < sourceModel.count; i++) {
+                        var item = sourceModel.get(i);
+                        var nodeIsOpen = item.IsOpen !== undefined ? item.IsOpen : true;
+                        var node = {
+                            sourceItem: item,
+                            level: level,
+                            isOpen: nodeIsOpen,
+                            isOpened: nodeIsOpen,
+                            checkState: item.CheckState !== undefined ? item.CheckState : Qt.Unchecked,
+                            isCheckable: item.CheckBoxVisible !== undefined ? item.CheckBoxVisible : true,
+                            isActive: item.Active !== undefined ? item.Active : true,
+                            hasChild: false,
+                            parentNode: parentNode,
+                            childNodes: [],
+                            selected: false
+                        };
+
+                        node.getItemData = function() { return this.sourceItem; }.bind(node);
+
+                        if (parentNode) {
+                            parentNode.childNodes.push(node);
+                            parentNode.hasChild = true;
+                        }
+
+                        __allNodes.push(node);
+
+                        if (item.ChildModel && item.ChildModel.count > 0) {
+                            __buildNodes(item.ChildModel, level + 1, node);
+                        }
+                    }
+                }
+
+                function __rebuildFlatModel() {
+                    __allNodes = [];
+                    __flatModel.clear();
+
+                    if (!rowModel) {
+                        return;
+                    }
+
+                    __buildNodes(rowModel, 0, null);
+
+                    var filterLower = filterText.toLowerCase();
+
+                    for (var i = 0; i < __allNodes.length; i++) {
+                        var node = __allNodes[i];
+                        var selfMatch = __matchesFilter(node.sourceItem, filterLower);
+                        var childMatch = false;
+                        if (node.sourceItem.ChildModel && node.sourceItem.ChildModel.count > 0) {
+                            childMatch = __subtreeMatchesFilter(node.sourceItem.ChildModel, filterLower);
+                        }
+                        node.__visible = selfMatch || childMatch;
+                    }
+
+                    __appendVisibleNodes(__allNodes, 0);
+                }
+
+                function __appendVisibleNodes(nodes, startIdx) {
+                    // Walk top-level nodes only (parentNode === null), then recurse for open children
+                    var topNodes = [];
+                    for (var i = 0; i < nodes.length; i++) {
+                        if (!nodes[i].parentNode) {
+                            topNodes.push(nodes[i]);
+                        }
+                    }
+                    __flattenNodes(topNodes);
+                }
+
+                function __flattenNodes(nodes) {
+                    for (var i = 0; i < nodes.length; i++) {
+                        var node = nodes[i];
+                        if (!node.__visible) {
+                            continue;
+                        }
+
+                        var nodeIdx = __allNodes.indexOf(node);
+
+                        // Build display text from column model
+                        var displayText = "";
+                        for (var c = 0; c < columnModel.count; c++) {
+                            var colId = columnModel.get(c).id;
+                            var val = node.sourceItem[colId];
+                            if (val !== undefined) {
+                                if (displayText !== "") {
+                                    displayText += " | ";
+                                }
+                                displayText += val;
+                            }
+                        }
+
+                        __flatModel.append({
+                            "nodeIndex": nodeIdx,
+                            "level": node.level,
+                            "isOpen": node.isOpen,
+                            "checkState": node.checkState,
+                            "isCheckable": node.isCheckable,
+                            "isActive": node.isActive,
+                            "hasChild": node.hasChild,
+                            "displayText": displayText
+                        });
+
+                        if (node.isOpen && node.childNodes.length > 0) {
+                            __flattenNodes(node.childNodes);
+                        }
+                    }
+                }
+
+                function __toggleExpand(flatIndex) {
+                    var flatItem = __flatModel.get(flatIndex);
+                    var node = __allNodes[flatItem.nodeIndex];
+                    node.isOpen = !node.isOpen;
+                    __rebuildFlatModel();
+                }
+
+                function __toggleCheck(flatIndex) {
+                    var flatItem = __flatModel.get(flatIndex);
+                    var node = __allNodes[flatItem.nodeIndex];
+                    if (node.checkState === Qt.Checked) {
+                        uncheckItem(node);
+                    } else {
+                        checkItem(node);
+                    }
+                }
+
                 Component {
                     id: childModelComponent;
                     ListModel {}
                 }
 
                 onRowModelChanged: {
-                    treeViewImpl.__itemsList = [];
+                    __rebuildFlatModel();
                 }
 
-                // --- Tree body ---
-                Column {
-                    id: bodyColumn;
+                // --- Standard QML ListView for tree display ---
+                ListView {
+                    id: treeListView;
+
                     width: parent.width;
+                    height: contentHeight;
 
-                    Repeater {
-                        id: rootRepeater;
-                        model: treeViewImpl.rowModel;
+                    interactive: false;
+                    model: treeViewImpl.__flatModel;
 
-                        delegate: treeNodeDelegate;
-                    }
-                }
+                    delegate: Item {
+                        id: rowDelegate;
 
-                Component {
-                    id: treeNodeDelegate;
+                        width: treeListView.width;
+                        height: treeViewImpl.rowItemHeight;
 
-                    Column {
-                        id: nodeColumn;
-
-                        width: treeViewImpl.width;
-
-                        property var parentDelegate: null;
-                        property var childrenDelegates: [];
-                        property var rootDelegate: nodeColumn.level === 0 ? nodeColumn : (parentDelegate ? parentDelegate.rootDelegate : nodeColumn);
-
-                        property int level: parentDelegate ? parentDelegate.level + 1 : 0;
-                        property bool isOpened: model.IsOpen !== undefined ? model.IsOpen : true;
-                        property int checkState: model.CheckState !== undefined ? model.CheckState : Qt.Unchecked;
-                        property bool isCheckable: model.CheckBoxVisible !== undefined ? model.CheckBoxVisible : true;
-                        property bool isActive: model.Active !== undefined ? model.Active : true;
-                        property bool hasChild: childRepeater.count > 0;
-                        property bool selected: false;
-                        property var itemData: model;
-                        property string childModelKey: "ChildModel";
-
-                        property bool __matchesFilterSelf: treeViewImpl.__matchesFilter(model, treeViewImpl.filterText.toLowerCase());
-                        property bool __subtreeVisible: __matchesFilterSelf ||
-                            (model.ChildModel ? treeViewImpl.__subtreeMatchesFilter(model.ChildModel, treeViewImpl.filterText.toLowerCase()) : false);
-
-                        visible: __subtreeVisible;
-                        height: __subtreeVisible ? (nodeRow.height + (isOpened ? childColumn.height : 0)) : 0;
-
-                        signal parentCheckStateChanged(var delegate);
-                        signal childrenCheckStateChanged(var delegate);
-
-                        onCheckStateChanged: {
-                            if (model.CheckState !== undefined) {
-                                model.CheckState = nodeColumn.checkState;
-                            }
-                        }
-
-                        onParentCheckStateChanged: {
-                            if (isCheckable) {
-                                nodeColumn.checkState = delegate.checkState;
-                            }
-                            for (var i = 0; i < childrenDelegates.length; i++) {
-                                childrenDelegates[i].parentCheckStateChanged(nodeColumn);
-                            }
-                        }
-
-                        onChildrenCheckStateChanged: {
-                            if (isCheckable) {
-                                var isAllChecked = treeViewImpl.__checkState(childrenDelegates, Qt.Checked);
-                                var isAllUnchecked = treeViewImpl.__checkState(childrenDelegates, Qt.Unchecked);
-
-                                if (isAllChecked) {
-                                    if (nodeColumn.checkState !== Qt.Checked) {
-                                        nodeColumn.checkState = Qt.Checked;
-                                    }
-                                } else if (isAllUnchecked) {
-                                    if (nodeColumn.checkState !== Qt.Unchecked) {
-                                        nodeColumn.checkState = Qt.Unchecked;
-                                    }
-                                } else {
-                                    if (nodeColumn.checkState !== Qt.PartiallyChecked) {
-                                        nodeColumn.checkState = Qt.PartiallyChecked;
-                                    }
-                                }
-                            }
-                            if (nodeColumn.parentDelegate) {
-                                nodeColumn.parentDelegate.childrenCheckStateChanged(nodeColumn);
-                            }
-                        }
-
-                        function getItemData() {
-                            return nodeColumn.itemData;
-                        }
-
-                        Component.onCompleted: {
-                            treeViewImpl._addItem(nodeColumn);
-                        }
-
-                        Component.onDestruction: {
-                            treeViewImpl._removeItem(nodeColumn);
-                        }
-
-                        // --- Single row ---
                         Row {
                             id: nodeRow;
 
-                            width: parent.width;
-                            height: treeViewImpl.rowItemHeight;
-
-                            leftPadding: nodeColumn.level * treeViewImpl.shiftLevel;
+                            anchors.fill: parent;
+                            leftPadding: model.level * treeViewImpl.shiftLevel;
                             spacing: Style.spacingM;
 
                             // Expand/collapse arrow
@@ -404,14 +483,14 @@ ElementView {
                                     width: parent.width;
                                     height: width;
 
-                                    visible: nodeColumn.hasChild;
+                                    visible: model.hasChild;
 
-                                    iconSource: nodeColumn.isOpened
+                                    iconSource: model.isOpen
                                         ? "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal)
                                         : "../../../" + Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Normal);
 
                                     onClicked: {
-                                        nodeColumn.isOpened = !nodeColumn.isOpened;
+                                        treeViewImpl.__toggleExpand(model.index);
                                     }
 
                                     decorator: Component {
@@ -434,82 +513,33 @@ ElementView {
                                     anchors.verticalCenter: parent.verticalCenter;
                                     anchors.horizontalCenter: parent.horizontalCenter;
 
-                                    checkState: nodeColumn.checkState;
-                                    isActive: nodeColumn.isActive && !treeViewImpl.readOnly;
-                                    visible: treeViewImpl.tristate && nodeColumn.isCheckable;
+                                    checkState: model.checkState;
+                                    isActive: model.isActive && !treeViewImpl.readOnly;
+                                    visible: treeViewImpl.tristate && model.isCheckable;
 
                                     function nextCheckState() {
-                                        if (nodeColumn.checkState === Qt.Checked) {
-                                            treeViewImpl.uncheckItem(nodeColumn);
-                                        } else {
-                                            treeViewImpl.checkItem(nodeColumn);
-                                        }
+                                        treeViewImpl.__toggleCheck(model.index);
                                     }
                                 }
                             }
 
-                            // Text columns
-                            Repeater {
-                                model: treeViewImpl.columnModel;
+                            // Display text
+                            Item {
+                                width: nodeRow.width - nodeRow.leftPadding - 15 - (checkBox.visible ? 15 : 0) - Style.spacingM * 2;
+                                height: nodeRow.height;
 
-                                delegate: Item {
-                                    width: treeViewImpl.columnModel.count > 0
-                                        ? (treeViewImpl.width - nodeColumn.level * treeViewImpl.shiftLevel - treeViewImpl.__prefixWidth - Style.spacingM * 2) / treeViewImpl.columnModel.count
-                                        : 0;
-                                    height: nodeRow.height;
+                                Text {
+                                    anchors.verticalCenter: parent.verticalCenter;
+                                    width: parent.width;
 
-                                    Text {
-                                        anchors.verticalCenter: parent.verticalCenter;
-                                        width: parent.width;
+                                    font.family: Style.fontFamily;
+                                    font.pixelSize: Style.fontSizeM;
+                                    color: model.isActive ? Style.textColor : Style.inactiveTextColor;
 
-                                        font.family: Style.fontFamily;
-                                        font.pixelSize: Style.fontSizeM;
-                                        color: nodeColumn.isActive ? Style.textColor : Style.inactiveTextColor;
+                                    wrapMode: Text.WordWrap;
+                                    elide: Text.ElideRight;
 
-                                        wrapMode: Text.WordWrap;
-                                        elide: Text.ElideRight;
-
-                                        text: {
-                                            var colId = model.id;
-                                            var val = nodeColumn.itemData[colId];
-                                            return val !== undefined ? val : "";
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        // --- Children ---
-                        Column {
-                            id: childColumn;
-
-                            visible: nodeColumn.isOpened;
-                            width: parent.width;
-
-                            Repeater {
-                                id: childRepeater;
-
-                                model: nodeColumn.itemData[nodeColumn.childModelKey]
-                                    ? nodeColumn.itemData[nodeColumn.childModelKey]
-                                    : 0;
-
-                                delegate: Loader {
-                                    width: treeViewImpl.width;
-                                    sourceComponent: treeNodeDelegate;
-
-                                    onLoaded: {
-                                        item.parentDelegate = nodeColumn;
-                                        nodeColumn.childrenDelegates.push(item);
-                                    }
-
-                                    Component.onDestruction: {
-                                        if (item) {
-                                            var idx = nodeColumn.childrenDelegates.indexOf(item);
-                                            if (idx > -1) {
-                                                nodeColumn.childrenDelegates.splice(idx, 1);
-                                            }
-                                        }
-                                    }
+                                    text: model.displayText !== undefined ? model.displayText : "";
                                 }
                             }
                         }
