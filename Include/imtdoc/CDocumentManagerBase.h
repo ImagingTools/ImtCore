@@ -6,6 +6,7 @@
 #include <QtCore/QMutex>
 #include <QtCore/QString>
 #include <QtCore/QThread>
+#include <QtCore/QWaitCondition>
 
 // STL includes
 #include <atomic>
@@ -41,6 +42,12 @@ public:
 		const QByteArray& documentTypeId,
 		const QByteArray& proposedSourceDocumentId = QByteArray()) override;
 	virtual QByteArray OpenDocument(const QByteArray& userId, const QUrl& url) override;
+	virtual OperationStatus IsDocumentReady(
+		const QByteArray& userId, const QByteArray& documentId) const override;
+	virtual OperationStatus WaitForDocumentReady(
+		const QByteArray& userId,
+		const QByteArray& documentId,
+		int timeoutMs = -1) override;
 	virtual OperationStatus GetDocumentName(const QByteArray& userId, const QByteArray& documentId, QString& documentName) const override;
 	virtual OperationStatus SetDocumentName(const QByteArray& userId, const QByteArray& documentId, const QString& documentName) override;
 	virtual const istd::IChangeable* GetDocumentPtr(const QByteArray& userId, const QByteArray& documentId) const override;
@@ -139,6 +146,13 @@ protected:
 	mutable QRecursiveMutex m_mutex;
 
 	QMap<QByteArray, SharedDocumentData> m_sharedDocuments;
+
+	// Condition variable to notify threads waiting in WaitForDocumentReady().
+	// Woken whenever any document transitions out of the loading state, both
+	// on success (OnDocumentDataLoaded) and on failure (CloseDocument). Uses
+	// a dedicated non-recursive mutex so it is independent of m_mutex.
+	mutable QMutex m_loadingWaitMutex;
+	mutable QWaitCondition m_loadingWaitCondition;
 
 	UndoManagerObserver m_undoManagerObserver;
 	std::shared_ptr<std::atomic<bool>> m_isAlive;

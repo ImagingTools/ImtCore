@@ -534,6 +534,17 @@ public:
 	using imtdoc::CDocumentManagerBase::m_sharedDocuments;
 
 protected:
+	// reimplemented (imtdoc::IDocumentManager)
+	virtual bool IsAsynchronousDocumentCreation() const override
+	{
+		return true;
+	}
+
+	virtual bool IsAsynchronousDocumentOpen() const override
+	{
+		return true;
+	}
+
 	// reimplemented (CCollectionDocumentManagerBase)
 	virtual imtbase::IObjectCollection* GetCollection() const override
 	{
@@ -749,6 +760,19 @@ private slots:
 	// Async document loading completion tests
 	void CreateNewDocumentAsyncCompletionTest();
 	void OpenDocumentAsyncCompletionTest();
+
+	// IsAsynchronousDocument*/IsDocumentReady/WaitForDocumentReady tests
+	void IsAsynchronousDocumentCreationTest();
+	void IsAsynchronousDocumentOpenTest();
+	void IsDocumentReadyInvalidUserTest();
+	void IsDocumentReadyInvalidDocumentTest();
+	void IsDocumentReadyWhileLoadingTest();
+	void IsDocumentReadyAfterLoadTest();
+	void WaitForDocumentReadyAlreadyLoadedTest();
+	void WaitForDocumentReadyInvalidUserTest();
+	void WaitForDocumentReadyInvalidDocumentTest();
+	void WaitForDocumentReadyAfterCreateTest();
+	void WaitForDocumentReadyTimeoutTest();
 
 	// Multi-user scenario tests
 	void MultiUserCreateAndCloseTest();

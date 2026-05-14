@@ -37,7 +37,13 @@ public:
 		OS_INVALID_USER_ID,
 		OS_INVALID_DOCUMENT_ID,
 		OS_INVALID_DOCUMENT_DATA,
-		OS_FAILED
+		OS_FAILED,
+		/**
+			The document exists but its data has not finished loading yet.
+			Returned by IsDocumentReady() while loading is still in progress
+			and by WaitForDocumentReady() when the wait times out.
+		*/
+		OS_LOADING
 	};
 
 	struct DocumentInfo
@@ -47,6 +53,13 @@ public:
 		QString name;
 		bool isDirty = false;
 		bool hasNameProvider = false;
+		/**
+			True between the call that produced the document
+			(CreateNewDocument / OpenDocument) and the matching
+			CN_DOCUMENT_DATA_LOADED notification. Always false for
+			document managers whose IsAsynchronousDocumentCreation()
+			and IsAsynchronousDocumentOpen() both return false.
+		*/
 		bool isLoading = false;
 	};
 
@@ -112,7 +125,16 @@ public:
 	virtual DocumentList GetOpenedDocumentList(const QByteArray& userId) const = 0;
 
 	/**
-		Create a document of the given type (documentTypeId) for the given user-ID
+		Create a document of the given type (documentTypeId) for the given user-ID.
+
+		Depending on the implementation, the underlying document data may be
+		loaded asynchronously: in that case the call returns a valid document
+		ID immediately while DocumentInfo::isLoading is true, and
+		CN_DOCUMENT_DATA_LOADED is fired once loading completes. Use
+		IsAsynchronousDocumentCreation() to query this behavior, IsDocumentReady()
+		for a non-blocking check, or WaitForDocumentReady() to block until the
+		data is available.
+
 		/return		Document instance ID in the document manager
 	*/
 	virtual QByteArray CreateNewDocument(
@@ -121,7 +143,16 @@ public:
 		const QByteArray& proposedSourceDocumentId = QByteArray()) = 0;
 
 	/**
-		Open a document from a given URL for a given user-ID
+		Open a document from a given URL for a given user-ID.
+
+		Depending on the implementation, the underlying document data may be
+		loaded asynchronously: in that case the call returns a valid document
+		ID immediately while DocumentInfo::isLoading is true, and
+		CN_DOCUMENT_DATA_LOADED is fired once loading completes. Use
+		IsAsynchronousDocumentOpen() to query this behavior, IsDocumentReady()
+		for a non-blocking check, or WaitForDocumentReady() to block until the
+		data is available.
+
 		/return		Document instance ID in the document manager
 
 		From file:
@@ -131,6 +162,58 @@ public:
 			collection:///objectId				- for single collection document manager (or default collection)
 	*/
 	virtual QByteArray OpenDocument(const QByteArray& userId, const QUrl& url) = 0;
+
+	/**
+		Whether CreateNewDocument() loads the document data asynchronously
+		on this manager instance. The answer is constant per instance.
+	*/
+	virtual bool IsAsynchronousDocumentCreation() const = 0;
+
+	/**
+		Whether OpenDocument() loads the document data asynchronously on
+		this manager instance. The answer is constant per instance.
+	*/
+	virtual bool IsAsynchronousDocumentOpen() const = 0;
+
+	/**
+		Non-blocking predicate that reports whether the document identified
+		by (userId, documentId) has finished loading.
+
+		/return		OS_OK              - document exists and is fully loaded;
+					OS_LOADING         - document exists but is still loading;
+					OS_INVALID_USER_ID - the user has no documents open;
+					OS_INVALID_DOCUMENT_ID - the user has no such document.
+	*/
+	virtual OperationStatus IsDocumentReady(
+		const QByteArray& userId, const QByteArray& documentId) const = 0;
+
+	/**
+		Block until the document identified by (userId, documentId) has
+		finished loading.
+
+		If the manager loads documents synchronously (i.e. neither
+		IsAsynchronousDocumentCreation() nor IsAsynchronousDocumentOpen()
+		applies) or the document is already loaded, the method returns
+		immediately and execution continues.
+
+		The wait should be performed on a thread that does not drive the
+		manager's loading worker (typically not the GUI thread that creates
+		the document), otherwise the wait can deadlock.
+
+		/param	timeoutMs	Maximum wait in milliseconds; -1 waits forever.
+
+		/return		OS_OK              - document is now loaded;
+					OS_LOADING         - timeout expired while still loading
+					                     (an error message is also written
+					                     to the log);
+					OS_INVALID_USER_ID,
+					OS_INVALID_DOCUMENT_ID - the document is not (or is no
+					                     longer) known by the manager.
+	*/
+	virtual OperationStatus WaitForDocumentReady(
+		const QByteArray& userId,
+		const QByteArray& documentId,
+		int timeoutMs = -1) = 0;
 
 	/**
 		Get name of the document with the given user-ID and document-ID

@@ -24,6 +24,10 @@ public:
 	I_END_COMPONENT
 
 protected:
+	// reimplemented (imtdoc::IDocumentManager)
+	virtual bool IsAsynchronousDocumentCreation() const override;
+	virtual bool IsAsynchronousDocumentOpen() const override;
+
 	// reimplemented (imtdoc::CCollectionDocumentManagerBase)
 	virtual imtbase::IObjectCollection* GetCollection() const override;
 

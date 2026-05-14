@@ -1423,4 +1423,120 @@ void CCollectionDocumentManagerTest::SingleCopySetDocumentNameUpdatesAllTest()
 }
 
 
+// ======================================================================
+// IsAsynchronousDocument*/IsDocumentReady/WaitForDocumentReady tests
+// ======================================================================
+
+void CCollectionDocumentManagerTest::IsAsynchronousDocumentCreationTest()
+{
+	QVERIFY2(m_managerPtr->IsAsynchronousDocumentCreation(),
+		"CTestableDocumentManager creates documents asynchronously");
+}
+
+
+void CCollectionDocumentManagerTest::IsAsynchronousDocumentOpenTest()
+{
+	QVERIFY2(m_managerPtr->IsAsynchronousDocumentOpen(),
+		"CTestableDocumentManager opens documents asynchronously");
+}
+
+
+void CCollectionDocumentManagerTest::IsDocumentReadyInvalidUserTest()
+{
+	auto status = m_managerPtr->IsDocumentReady("noSuchUser", "noSuchDoc");
+	QCOMPARE(status, imtdoc::IDocumentManager::OS_INVALID_USER_ID);
+}
+
+
+void CCollectionDocumentManagerTest::IsDocumentReadyInvalidDocumentTest()
+{
+	SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID);
+	auto status = m_managerPtr->IsDocumentReady(TEST_USER_ID, "noSuchDoc");
+	QCOMPARE(status, imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_ID);
+}
+
+
+void CCollectionDocumentManagerTest::IsDocumentReadyWhileLoadingTest()
+{
+	// Right after CreateNewDocument, before processing events, the document
+	// should still be loading.
+	QByteArray docId = m_managerPtr->CreateNewDocument(TEST_USER_ID, TEST_TYPE_ID);
+	QVERIFY2(!docId.isEmpty(), "Document should be created");
+
+	auto status = m_managerPtr->IsDocumentReady(TEST_USER_ID, docId);
+	QCOMPARE(status, imtdoc::IDocumentManager::OS_LOADING);
+
+	// Drain pending events to let the async loader complete so cleanup is clean.
+	for (int i = 0; i < 50; ++i){
+		QCoreApplication::processEvents();
+		QThread::msleep(10);
+	}
+}
+
+
+void CCollectionDocumentManagerTest::IsDocumentReadyAfterLoadTest()
+{
+	QByteArray docId = CreateDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID, TEST_TYPE_ID);
+	auto status = m_managerPtr->IsDocumentReady(TEST_USER_ID, docId);
+	QCOMPARE(status, imtdoc::IDocumentManager::OS_OK);
+}
+
+
+void CCollectionDocumentManagerTest::WaitForDocumentReadyAlreadyLoadedTest()
+{
+	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID);
+
+	// Already loaded — must return immediately with OS_OK.
+	auto status = m_managerPtr->WaitForDocumentReady(TEST_USER_ID, docId, 0);
+	QCOMPARE(status, imtdoc::IDocumentManager::OS_OK);
+}
+
+
+void CCollectionDocumentManagerTest::WaitForDocumentReadyInvalidUserTest()
+{
+	auto status = m_managerPtr->WaitForDocumentReady("noSuchUser", "noSuchDoc", 0);
+	QCOMPARE(status, imtdoc::IDocumentManager::OS_INVALID_USER_ID);
+}
+
+
+void CCollectionDocumentManagerTest::WaitForDocumentReadyInvalidDocumentTest()
+{
+	SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID);
+	auto status = m_managerPtr->WaitForDocumentReady(TEST_USER_ID, "noSuchDoc", 0);
+	QCOMPARE(status, imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_ID);
+}
+
+
+void CCollectionDocumentManagerTest::WaitForDocumentReadyAfterCreateTest()
+{
+	// Issue CreateNewDocument and then call WaitForDocumentReady. Since the
+	// async worker completion is dispatched via the main thread event loop,
+	// we must process events between waits. Use a small repeated wait+pump.
+	QByteArray docId = m_managerPtr->CreateNewDocument(TEST_USER_ID, TEST_TYPE_ID);
+	QVERIFY2(!docId.isEmpty(), "Document should be created");
+
+	imtdoc::IDocumentManager::OperationStatus status = imtdoc::IDocumentManager::OS_LOADING;
+	for (int i = 0; i < 50 && status == imtdoc::IDocumentManager::OS_LOADING; ++i){
+		QCoreApplication::processEvents();
+		status = m_managerPtr->WaitForDocumentReady(TEST_USER_ID, docId, 10);
+	}
+	QCOMPARE(status, imtdoc::IDocumentManager::OS_OK);
+}
+
+
+void CCollectionDocumentManagerTest::WaitForDocumentReadyTimeoutTest()
+{
+	// Directly stage a document that is permanently in the loading state.
+	// No async worker will resolve it, so the wait must time out.
+	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID);
+	{
+		QMutexLocker locker(&m_managerPtr->m_mutex);
+		m_managerPtr->m_userDocuments[TEST_USER_ID][docId].isLoading = true;
+	}
+
+	auto status = m_managerPtr->WaitForDocumentReady(TEST_USER_ID, docId, 50);
+	QCOMPARE(status, imtdoc::IDocumentManager::OS_LOADING);
+}
+
+
 I_ADD_TEST(CCollectionDocumentManagerTest);

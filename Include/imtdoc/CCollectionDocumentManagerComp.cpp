@@ -7,6 +7,20 @@ namespace imtdoc
 
 // protected methods
 
+// reimplemented (imtdoc::IDocumentManager)
+
+bool CCollectionDocumentManagerComp::IsAsynchronousDocumentCreation() const
+{
+	return true;
+}
+
+
+bool CCollectionDocumentManagerComp::IsAsynchronousDocumentOpen() const
+{
+	return true;
+}
+
+
 // reimplemented (imtdoc::CCollectionDocumentManagerBase)
 
 imtbase::IObjectCollection* CCollectionDocumentManagerComp::GetCollection() const

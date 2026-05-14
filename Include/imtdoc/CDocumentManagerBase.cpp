@@ -4,8 +4,13 @@
 
 // Qt includes
 #include <QtCore/QCoreApplication>
+#include <QtCore/QDeadlineTimer>
 #include <QtCore/QUuid>
 #include <QtCore/QThread>
+
+// STL includes
+#include <algorithm>
+
 
 // ACF includes
 #include <istd/CChangeNotifier.h>
@@ -202,6 +207,78 @@ QByteArray CDocumentManagerBase::OpenDocument(const QByteArray& /*userId*/, cons
 }
 
 
+IDocumentManager::OperationStatus CDocumentManagerBase::IsDocumentReady(
+	const QByteArray& userId, const QByteArray& documentId) const
+{
+	QMutexLocker locker(&m_mutex);
+
+	OperationStatus validationStatus;
+	if (!ValidateInputParams(userId, documentId, validationStatus)){
+		return validationStatus;
+	}
+
+	const WorkingDocument& document = m_userDocuments[userId][documentId];
+	return document.isLoading ? OS_LOADING : OS_OK;
+}
+
+
+IDocumentManager::OperationStatus CDocumentManagerBase::WaitForDocumentReady(
+	const QByteArray& userId, const QByteArray& documentId, int timeoutMs)
+{
+	// Fast path: if the document is already ready, missing, or this manager
+	// loads documents synchronously, return immediately.
+	{
+		OperationStatus status = IsDocumentReady(userId, documentId);
+		if (status != OS_LOADING) {
+			return status;
+		}
+	}
+
+	if (!IsAsynchronousDocumentCreation() && !IsAsynchronousDocumentOpen()) {
+		// The manager does not load asynchronously; nothing to wait for.
+		// IsDocumentReady() above already returned OS_LOADING, which would
+		// be misleading for a synchronous manager - treat it as ready.
+		return OS_OK;
+	}
+
+	QDeadlineTimer deadline = (timeoutMs < 0)
+		? QDeadlineTimer(QDeadlineTimer::Forever)
+		: QDeadlineTimer(timeoutMs);
+
+	// Cap the per-iteration wait so we periodically recheck the document
+	// state. This also closes the race between IsDocumentReady() (which
+	// takes m_mutex) and acquiring m_loadingWaitMutex without locking both
+	// simultaneously, which would invert the lock order taken by
+	// OnDocumentDataLoaded() / CloseDocument().
+	const unsigned long maxWaitChunkMs = 100;
+
+	while (true) {
+		OperationStatus status = IsDocumentReady(userId, documentId);
+		if (status != OS_LOADING) {
+			return status;
+		}
+
+		if (deadline.hasExpired()) {
+			qWarning("CDocumentManagerBase::WaitForDocumentReady: timeout while waiting for document '%s' of user '%s' to finish loading",
+				documentId.constData(), userId.constData());
+			return OS_LOADING;
+		}
+
+		unsigned long waitMs = maxWaitChunkMs;
+		if (timeoutMs >= 0) {
+			qint64 remaining = deadline.remainingTime();
+			if (remaining <= 0) {
+				continue; // re-check expiry at the top
+			}
+			waitMs = std::min<unsigned long>(maxWaitChunkMs, static_cast<unsigned long>(remaining));
+		}
+
+		QMutexLocker waitLocker(&m_loadingWaitMutex);
+		m_loadingWaitCondition.wait(&m_loadingWaitMutex, waitMs);
+	}
+}
+
+
 IDocumentManager::OperationStatus CDocumentManagerBase::GetDocumentName(const QByteArray& userId, const QByteArray& documentId, QString& documentName) const
 {
 
@@ -349,6 +426,13 @@ IDocumentManager::OperationStatus CDocumentManagerBase::CloseDocument(
 		if (m_userDocuments[userId].isEmpty()) {
 			m_userDocuments.remove(userId);
 		}
+	}
+
+	{
+		// Wake any threads waiting in WaitForDocumentReady() — the document
+		// is gone now, so they should re-evaluate and return OS_INVALID_*.
+		QMutexLocker waitLocker(&m_loadingWaitMutex);
+		m_loadingWaitCondition.wakeAll();
 	}
 
 	{
@@ -611,6 +695,13 @@ void CDocumentManagerBase::OnDocumentDataLoaded(
 	WorkingDocument* documentPtr = FindDocument(userId, documentId);
 	if (documentPtr == nullptr) {
 		return;
+	}
+
+	{
+		// Wake any threads waiting in WaitForDocumentReady() — loading just
+		// completed for this document.
+		QMutexLocker waitLocker(&m_loadingWaitMutex);
+		m_loadingWaitCondition.wakeAll();
 	}
 
 	{
