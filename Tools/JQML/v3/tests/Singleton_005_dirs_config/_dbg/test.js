@@ -3517,3 +3517,101 @@ eval("{__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpa
 /******/ 	
 /******/ })()
 ;
+JQModules.MyCfg={},
+class Main extends JQModules.QtQuick.Item {
+static cachedComponents = {}
+
+                static meta = Object.assign({}, JQModules.QtQuick.Item.meta, {})
+
+                __removeObjectName(){removeObjectName('Main')}
+                __addObjectName(){addObjectName('Main')}
+
+                static create(parent,properties={},context={},isRoot=true){
+
+                let __root = this
+                let __context = JQContext.create()
+
+                let __el0 = super.create(parent,properties,context,false)
+
+                __el0.__MainContext = __context
+
+
+
+
+__el0.__Main____el0=true
+if(isRoot) {__el0.__updatePrimaryProperties();__el0.__updateProperties();__el0.__complete();__el0.__completeProperties()}
+return __el0
+}
+
+
+'SLOT_Component.completed'(){
+                        if(super['SLOT_Component.completed']) super['SLOT_Component.completed'](...arguments)
+                        if(!this.__Main____el0) return
+                        let __self = this
+                        let [] = []
+                        try{JQApplication.beginUpdate();JQModules.MyCfg.ConfState.reset()
+
+console.log(`singleton5-start`,JQModules.MyCfg.ConfState.count,JQModules.MyCfg.ConfState.last)
+
+JQModules.MyCfg.ConfState.bump(`A`,2)
+
+JQModules.MyCfg.ConfState.bump(`B`,3)
+
+console.log(`singleton5-final`,JQModules.MyCfg.ConfState.count,JQModules.MyCfg.ConfState.last)
+
+JQModules.Qt.quit()
+
+}finally{JQApplication.endUpdate()}}
+
+
+}
+
+Object.defineProperty(JQModules.MyCfg,'ConfState',{get:()=>{
+                        if(!JQModules.MyCfg.__ConfState) JQModules.MyCfg.__ConfState = (class extends JQModules.QtQml.QtObject {
+static singleton = true
+static cachedComponents = {}
+
+                static meta = Object.assign({}, JQModules.QtQml.QtObject.meta, {count:{type:JQModules.QtQml.int, value:0, modifiers: {"default":false,"required":false,"readonly":false}},last:{type:JQModules.QtQml.string, value:'none', modifiers: {"default":false,"required":false,"readonly":false}},countChanged:{type:JQModules.QtQml.Signal, args:[]},lastChanged:{type:JQModules.QtQml.Signal, args:[]},reset:{type:JQModules.QtQml.Method},bump:{type:JQModules.QtQml.Method},})
+
+                __removeObjectName(){removeObjectName('ConfState')}
+                __addObjectName(){addObjectName('ConfState')}
+
+                static create(parent,properties={},context={},isRoot=true){
+
+                let __root = this
+                let __context = JQContext.create()
+
+                let __el0 = super.create(parent,properties,context,false)
+
+                __el0.__ConfStateContext = __context
+
+
+
+
+__el0.__ConfState____el0=true
+if(isRoot) {__el0.__updatePrimaryProperties();__el0.__updateProperties();__el0.__complete();__el0.__completeProperties()}
+return __el0
+}
+reset(){let __self=this;let [] = [];try{JQApplication.beginUpdate();__self.count=0;
+__self.last=`none`;
+}finally{JQApplication.endUpdate()}}
+bump(tag,delta){let __self=this;let [] = [];try{JQApplication.beginUpdate();__self.count+=delta;
+__self.last=tag;
+}finally{JQApplication.endUpdate()}}
+
+
+
+
+}).create()
+return JQModules.MyCfg.__ConfState}})
+
+window.addEventListener('load', ()=>{
+                console.time('build');
+                if(location.pathname.indexOf('/')>=0){
+                    JQApplication.rootPath = location.origin + location.pathname.slice(0, location.pathname.indexOf('/') + '/'.length)
+                } else {
+                    JQApplication.rootPath = '/'
+                }
+                Main.create(JQApplication.root);
+                console.timeEnd('build')})
+//# sourceMappingURL=./tests/Singleton_005_dirs_config/_dbg/test.js.map

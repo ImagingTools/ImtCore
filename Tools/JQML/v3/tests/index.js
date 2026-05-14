@@ -51,12 +51,69 @@ function getErrorMessage(error) {
     return String(error)
 }
 
-function runQmlTest(filePath, timeout = 5000) {
+function getQmlImportPathsFromConfig(testDirPath) {
+    const visitedConfigs = new Set()
+    const resolvedDirs = new Set()
+
+    function collectConfig(configPath) {
+        const normalizedConfigPath = path.resolve(configPath)
+
+        if (visitedConfigs.has(normalizedConfigPath)) return
+        visitedConfigs.add(normalizedConfigPath)
+
+        if (!fs.existsSync(normalizedConfigPath)) return
+
+        let config
+        try {
+            config = JSON.parse(fs.readFileSync(normalizedConfigPath, { encoding: 'utf8', flag: 'r' }))
+        } catch (err) {
+            return
+        }
+
+        const configDirPath = path.dirname(normalizedConfigPath)
+
+        if (Array.isArray(config.dirs)) {
+            for (const dirPath of config.dirs) {
+                const absoluteDirPath = path.resolve(configDirPath, dirPath)
+                if (fs.existsSync(absoluteDirPath) && checkIsDirectorySync(absoluteDirPath)) {
+                    resolvedDirs.add(absoluteDirPath)
+                    resolvedDirs.add(path.dirname(absoluteDirPath))
+                }
+            }
+        }
+
+        if (Array.isArray(config.includes)) {
+            for (const includePath of config.includes) {
+                const absoluteIncludePath = path.resolve(configDirPath, includePath)
+                collectConfig(absoluteIncludePath)
+            }
+        }
+    }
+
+    collectConfig(path.resolve(testDirPath, 'test.json'))
+
+    return Array.from(resolvedDirs)
+}
+
+function runQmlTest(filePath, timeout = 5000, qmlImportPaths = []) {
     return new Promise((resolve, reject) => {
+        const pathSeparator = process.platform === 'win32' ? ';' : ':'
+        const mergedImportPath = qmlImportPaths.join(pathSeparator)
+
+        const env = { ...process.env, QT_LOGGING_TO_CONSOLE: "1" }
+        if (mergedImportPath) {
+            env.QML2_IMPORT_PATH = env.QML2_IMPORT_PATH
+                ? `${mergedImportPath}${pathSeparator}${env.QML2_IMPORT_PATH}`
+                : mergedImportPath
+            env.QML_IMPORT_PATH = env.QML_IMPORT_PATH
+                ? `${mergedImportPath}${pathSeparator}${env.QML_IMPORT_PATH}`
+                : mergedImportPath
+        }
+
         // Запуск в headless режиме
         const child = spawn('qml', ['-platform', 'offscreen', filePath], {
             cwd: path.dirname(filePath),
-            env: { ...process.env, QT_LOGGING_TO_CONSOLE: "1" }
+            env,
         })
 
         let logs = []
@@ -149,6 +206,7 @@ async function runTests() {
     for (let testdir of testsToRun) {
         let mainFilePath = path.resolve(__dirname, `./${testdir}/Main.qml`)
         let testDirPath = path.resolve(__dirname, `./${testdir}`)
+        const qmlImportPaths = getQmlImportPathsFromConfig(testDirPath)
 
         if (checkIsDirectorySync(testDirPath)) {
             console.log(`${colors.yellow}[i] Started test: ${testdir}${colors.reset}`)
@@ -157,7 +215,7 @@ async function runTests() {
             let resultWeb
 
             try {
-                resultDesktop = await runQmlTest(mainFilePath)
+                resultDesktop = await runQmlTest(mainFilePath, 5000, qmlImportPaths)
             } catch (err) {
                 console.error(`${colors.red}[Error] Error running test on desktop: ${getErrorMessage(err)}${colors.reset}`)
             }

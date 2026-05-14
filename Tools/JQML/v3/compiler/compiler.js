@@ -73,19 +73,22 @@ function compile(options){
         return result
     }
 
-    function includeFiles(sourceFile) {
+    function includeFiles(sourceFile, baseDirPath = configDirPath) {
         if (sourceFile.includes)
             for (let filePath of sourceFile.includes) {
-                let file = JSON.parse(envFill(fs.readFileSync(filePath, { encoding: 'utf8', flag: 'r' })))
-                includeFiles(file)
+                let absoluteConfigPath = path.resolve(baseDirPath, filePath)
+                let includeConfigDirPath = path.dirname(absoluteConfigPath)
+                let file = JSON.parse(envFill(fs.readFileSync(absoluteConfigPath, { encoding: 'utf8', flag: 'r' })))
+                includeFiles(file, includeConfigDirPath)
                 for (let dirPath of file.dirs) {
-                    sourceFile.dirs.unshift(dirPath)
+                    let absoluteDirPath = path.resolve(includeConfigDirPath, dirPath)
+                    sourceFile.dirs.unshift(absoluteDirPath)
                 }
             }
     }
 
     const config = JSON.parse(envFill(fs.readFileSync(configFilePath, { encoding: 'utf8', flag: 'r' })))
-    includeFiles(config)
+    includeFiles(config, configDirPath)
 
     const BaseModules = {
         Qt,
@@ -2020,7 +2023,7 @@ function compile(options){
     for (let moduleName in JQModules) {
         if (!BaseModules[moduleName]) {
             console.log(`    > ${moduleName} (${counter[moduleName] + ' files'})`)
-            fullCode.add(`JQModules.${moduleName}={},`)
+            fullCode.add(`JQModules.${moduleName}={};`)
         }
     }
 
