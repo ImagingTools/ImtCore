@@ -313,20 +313,6 @@ DocumentViewBase {
 	// --- Tenant permissions ---
 	property TreeItemModel permissionsModel: TreeItemModel {}
 
-	// --- Transfer ownership support ---
-	function __getTransferableMembers() {
-		var result = []
-		var members = container.pendingMembers
-		var ownerId = container.tenantData ? container.tenantData.m_ownerId : ""
-		var currentUserId = container.tenantData ? container.tenantData.m_currentUserId : ""
-		for (var i = 0; i < members.length; i++) {
-			if (members[i].id !== ownerId && members[i].id !== currentUserId) {
-				result.push(members[i])
-			}
-		}
-		return result
-	}
-
 	// --- MultiPageView ---
 	MultiPageView {
 		id: multiPageView
@@ -461,168 +447,9 @@ DocumentViewBase {
 							}
 						}
 					}
-
-					// Owner section
-					GroupHeaderView {
-						visible: !container.isNewTenant
-						width: parent.width
-						title: qsTr("Ownership")
-						groupView: ownerGroup
-					}
-
-					GroupElementView {
-						id: ownerGroup
-						visible: !container.isNewTenant
-						width: parent.width
-
-						Row {
-							width: parent.width
-							spacing: Style.marginL
-
-							BaseText {
-								id: ownerLabel
-								anchors.verticalCenter: parent.verticalCenter
-								text: qsTr("Owner: %1").arg(container.__getOwnerDisplayName())
-							}
-
-							Button {
-								id: transferOwnershipBtn
-								visible: container.__isOwner
-								anchors.verticalCenter: parent.verticalCenter
-								text: qsTr("Transfer Ownership")
-								onClicked: {
-									transferOwnershipDialog.open()
-								}
-							}
-						}
-					}
-				}
-			}
-
-			// Transfer Ownership Dialog
-			Item {
-				id: transferOwnershipDialog
-				visible: false
-				anchors.fill: parent
-				z: 100
-
-				function open() {
-					transferOwnershipDialog.visible = true
-					transferMembersList.model = container.__getTransferableMembers()
-				}
-
-				function close() {
-					transferOwnershipDialog.visible = false
-				}
-
-				Rectangle {
-					anchors.fill: parent
-					color: "#80000000"
-
-					MouseArea {
-						anchors.fill: parent
-						onClicked: transferOwnershipDialog.close()
-					}
-				}
-
-				Rectangle {
-					id: dialogContent
-					anchors.centerIn: parent
-					width: Style.sizeHintL
-					height: Style.sizeHintM
-					color: Style.baseColor
-					radius: Style.radiusM
-
-					Column {
-						anchors.fill: parent
-						anchors.margins: Style.marginXL
-						spacing: Style.marginL
-
-						BaseText {
-							width: parent.width
-							text: qsTr("Transfer Ownership")
-							font.pixelSize: Style.fontSizeL
-							font.bold: true
-						}
-
-						BaseText {
-							width: parent.width
-							text: qsTr("Select a member to transfer ownership to. You will be demoted to Admin role.")
-							wrapMode: Text.WordWrap
-							color: Style.inactiveTextColor
-						}
-
-						BaseText {
-							visible: transferMembersList.count === 0
-							width: parent.width
-							text: qsTr("No members available to transfer ownership to. Invite members first.")
-							wrapMode: Text.WordWrap
-							color: Style.inactiveTextColor
-						}
-
-						ListView {
-							id: transferMembersList
-							visible: transferMembersList.count > 0
-							width: parent.width
-							height: parent.height - Style.controlHeightM * 3 - parent.spacing * 4
-							clip: true
-							spacing: Style.marginS
-
-							delegate: Item {
-								id: transferDelegate
-								width: transferMembersList.width
-								height: Style.controlHeightM
-
-								Rectangle {
-									anchors.fill: parent
-									color: transferDelegateArea.containsMouse ? Style.highlightColor : "transparent"
-									radius: Style.radiusS
-
-									MouseArea {
-										id: transferDelegateArea
-										anchors.fill: parent
-										hoverEnabled: true
-										onClicked: {
-											container.__transferOwnershipTo(modelData.id, modelData.name)
-											transferOwnershipDialog.close()
-										}
-									}
-
-									BaseText {
-										anchors.verticalCenter: parent.verticalCenter
-										anchors.left: parent.left
-										anchors.leftMargin: Style.marginM
-										text: modelData.name || modelData.id
-									}
-								}
-							}
-						}
-
-						Row {
-							width: parent.width
-							layoutDirection: Qt.RightToLeft
-
-							Button {
-								text: qsTr("Cancel")
-								onClicked: transferOwnershipDialog.close()
-							}
-						}
-					}
 				}
 			}
 		}
-	}
-
-	function __getOwnerDisplayName() {
-		if (!container.tenantData || !container.tenantData.m_ownerId)
-			return ""
-		var ownerId = container.tenantData.m_ownerId
-		var members = container.pendingMembers
-		for (var i = 0; i < members.length; i++) {
-			if (members[i].id === ownerId)
-				return members[i].name || ownerId
-		}
-		return ownerId
 	}
 
 	function __transferOwnershipTo(newOwnerId, newOwnerName) {
@@ -826,6 +653,24 @@ DocumentViewBase {
 													text: qsTr("Leave")
 													onClicked: {
 														container.__removeMemberById(modelData.userId)
+													}
+												}
+
+												ToolButton {
+													id: transferOwnerBtn
+													visible: container.__isOwner && !memberDelegate.isOwner && !memberDelegate.isPending
+													anchors.verticalCenter: parent.verticalCenter
+													iconSource: Style.getIconPath("Icons/Transfer", Icon.State.On, Icon.Mode.Normal)
+													ToolTip.visible: transferOwnerBtn.hovered
+													ToolTip.text: qsTr("Transfer Ownership")
+													decorator: Component {
+														ToolButtonDecorator {
+															color: "transparent"
+															icon.width: Style.iconSizeXS
+														}
+													}
+													onClicked: {
+														container.__transferOwnershipTo(modelData.userId, modelData.userName)
 													}
 												}
 											}
