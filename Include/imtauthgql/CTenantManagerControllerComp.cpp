@@ -88,6 +88,7 @@ sdl::imtauth::Tenants::CGetTenantPayload CTenantManagerControllerComp::OnGetTena
 	tenantData.isActive = tenantInfoPtr->IsActive();
 	tenantData.createdAt = tenantInfoPtr->GetCreatedAt();
 	tenantData.updatedAt = tenantInfoPtr->GetUpdatedAt();
+	tenantData.tenantPermissions.Emplace().FromList(tenantInfoPtr->GetTenantPermissions());
 
 	// Populate members (id + name) from TenantMemberships
 	if (m_membershipManagerCompPtr.IsValid()){

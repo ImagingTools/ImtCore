@@ -189,7 +189,9 @@ DocumentViewBase {
 	RoleCollectionDataProvider {
 		id: roleCollectionDataProvider
 		productId: AuthorizationController.productId
-		Component.onCompleted: roleCollectionDataProvider.updateModel()
+		Component.onCompleted: {
+			updateModel()
+		}
 	}
 
 	function __getAvailableRolesModel() {
@@ -661,8 +663,7 @@ DocumentViewBase {
 													visible: container.__isOwner && !memberDelegate.isOwner && !memberDelegate.isPending
 													anchors.verticalCenter: parent.verticalCenter
 													iconSource: Style.getIconPath("Icons/Transfer", Icon.State.On, Icon.Mode.Normal)
-													ToolTip.visible: transferOwnerBtn.hovered
-													ToolTip.text: qsTr("Transfer Ownership")
+
 													decorator: Component {
 														ToolButtonDecorator {
 															color: "transparent"

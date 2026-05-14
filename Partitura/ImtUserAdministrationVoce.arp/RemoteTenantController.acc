@@ -282,5 +282,7 @@
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="GqlDemultiplexer"/>
         <Interface InterfaceId="imtgql::IGqlSubscriberController" ComponentId="PublisherSubscriberBridge"/>
     </ExportedInterfaces>
-    <ExportedComponents/>
+    <ExportedComponents>
+        <Component ExportedId="RemoteTenantController" ComponentId="RemoteTenantController"/>
+    </ExportedComponents>
 </Acf>

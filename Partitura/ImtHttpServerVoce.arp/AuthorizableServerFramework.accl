@@ -13,6 +13,7 @@
         <Element ComponentName="DeskController" X="600" Y="100" Note=""/>
         <Element ComponentName="HttpServerFramework" X="150" Y="100" Note=""/>
         <Element ComponentName="IdentifiableProductInfo" X="1000" Y="600" Note=""/>
+        <Element ComponentName="PermissionsController" X="600" Y="750" Note=""/>
         <Element ComponentName="PersonalAccessTokenController" X="575" Y="601.414213562" Note=""/>
         <Element ComponentName="PumaClientEngine" X="1000" Y="475" Note=""/>
         <Element ComponentName="SlaveSubscriberController" X="975" Y="50" Note=""/>

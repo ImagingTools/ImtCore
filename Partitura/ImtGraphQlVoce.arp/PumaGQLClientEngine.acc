@@ -646,6 +646,7 @@
         <Component ExportedId="CachedRoleCollection" ComponentId="RemoteRepositories/CachedRoleCollection"/>
         <Component ExportedId="CachedUserCollection" ComponentId="RemoteRepositories/CachedUserCollection"/>
         <Component ExportedId="GroupRemoteRepository" ComponentId="RemoteRepositories/GroupRemoteRepository"/>
+        <Component ExportedId="RemoteTenantController" ComponentId="RemoteTenantController/RemoteTenantController"/>
         <Component ExportedId="RoleRemoteRepository" ComponentId="RemoteRepositories/RoleRemoteRepository"/>
         <Component ExportedId="UserGroupInfoProvider" ComponentId="RemoteRepositories/UserGroupInfoProvider"/>
         <Component ExportedId="UserRemoteRepository" ComponentId="RemoteRepositories/UserRemoteRepository"/>
