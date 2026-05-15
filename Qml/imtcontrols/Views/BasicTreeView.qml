@@ -349,22 +349,22 @@ Item {
                                 height: parent.height
                                 visible: cellRoot.treeColumn
 
-                                Text {
+                                Button {
                                     anchors.centerIn: parent
+                                    width: parent.width
+                                    height: width
                                     visible: delegateRoot.nodeHasChildren
-                                    text: delegateRoot.nodeExpanded ? "▼" : "▶"
-                                    color: delegateRoot.nodeIsEnabled ? root.normalTextColor : root.disabledTextColor
-                                    font.pixelSize: 10
-                                }
-
-                                MouseArea {
-                                    anchors.fill: parent
-                                    enabled: delegateRoot.nodeHasChildren
-                                    acceptedButtons: Qt.LeftButton
-
+                                    iconSource: delegateRoot.nodeExpanded ? "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal) :
+                                                                            "../../../" + Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Normal)
                                     onClicked: {
                                         root.toggleExpanded(delegateRoot.nodeKey)
                                     }
+                                    
+                                    decorator: Component {
+                                        ButtonDecorator {
+                                            color: parent.hovered ? Style.buttonHoverColor : "transparent"
+                                            border.width: 0
+                                        }}
                                 }
                             }
 
@@ -373,7 +373,6 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                                 tristate: root.tristate
                                 checkState: delegateRoot.nodeChecked
-                                isActive: false
 
                                 MouseArea {
                                     anchors.fill: parent
