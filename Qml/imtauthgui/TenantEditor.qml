@@ -845,10 +845,6 @@ DocumentViewBase {
 						TreeViewElementView {
 							id: tenantPermissionsTreeView
 
-							Component.onCompleted: {
-								tenantPermissionsTreeView.treeView.tristate = true
-							}
-
 							Connections {
 								target: tenantPermissionsTreeView.treeView
 

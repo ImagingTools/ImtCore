@@ -82,7 +82,7 @@ Item {
     property int __editingColumn: -1
     property var __editingOriginalValue: null
 
-    implicitHeight: (root.showHeader ? root.headerHeight : 0) + visibleModel.count * root.rowHeight
+    height: (root.showHeader ? root.headerHeight : 0) + visibleModel.count * root.rowHeight
 
     QtObject {
         id: defaultTreeColumn
