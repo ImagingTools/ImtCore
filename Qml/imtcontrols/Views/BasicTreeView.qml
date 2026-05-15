@@ -342,7 +342,7 @@ Item {
                             anchors.fill: parent
                             anchors.leftMargin: cellRoot.treeColumn ? delegateRoot.nodeLevel * root.indentation + Style.marginS : Style.marginM
                             anchors.rightMargin: Style.marginM
-                            spacing: 4
+                            spacing: Style.spacingS
 
                             Item {
                                 width: cellRoot.treeColumn ? 16 : 0
@@ -373,10 +373,6 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                                 tristate: root.tristate
                                 checkState: delegateRoot.nodeChecked
-
-                                onClicked: {
-                                    root.toggleCheckState(delegateRoot.nodeKey)
-                                }
                             }
 
                             Text {
