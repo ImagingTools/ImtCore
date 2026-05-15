@@ -373,6 +373,16 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                                 tristate: root.tristate
                                 checkState: delegateRoot.nodeChecked
+                                isActive: false
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    cursorShape: Qt.PointingHandCursor
+
+                                    onClicked: {
+                                        root.toggleCheckState(delegateRoot.nodeKey)
+                                    }
+                                }
                             }
 
                             Text {
