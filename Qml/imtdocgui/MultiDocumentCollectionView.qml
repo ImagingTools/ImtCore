@@ -520,7 +520,7 @@ Item {
 		closable: true
 
 		onTabLoaded: {
-			if (workspaceView.collectionTabId !== "" && tabId === workspaceView.collectionTabId){
+			if (tabId === workspaceView.collectionTabId){
 				workspaceView.collectionView = tabItem
 			}
 			else{
