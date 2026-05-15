@@ -42,6 +42,7 @@ ElementView {
                 anchors.bottom: parent.bottom
 
                 showHeader: false
+                showToolbar: true
                 tristate: true
 
                 Component.onCompleted: root.treeView = checkableTree

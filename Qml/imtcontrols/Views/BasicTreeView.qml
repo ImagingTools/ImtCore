@@ -43,6 +43,8 @@ Item {
     property string filterRole: "text"
     property int filterDebounceInterval: 120
 
+    property bool showToolbar: false
+
     property int __hoveredRow: -1
 
     property string selectedBackgroundColor: Style.selectedColor
@@ -86,7 +88,7 @@ Item {
     property int __editingColumn: -1
     property var __editingOriginalValue: null
 
-    height: (root.showHeader ? root.headerHeight : 0) + visibleModel.count * root.rowHeight
+    height: (root.showToolbar ? toolbarRow.height : 0) + (root.showHeader ? root.headerHeight : 0) + visibleModel.count * root.rowHeight
 
     Timer {
         id: filterDebounceTimer
@@ -116,6 +118,82 @@ Item {
     Column {
         anchors.fill: parent
         spacing: 0
+
+        Row {
+            id: toolbarRow
+
+            width: parent.width
+            height: root.showToolbar ? 28 : 0
+            visible: root.showToolbar
+            spacing: Style.spacingM
+            leftPadding: Style.spacingS
+
+            Text {
+                text: qsTr("Expand All")
+                color: Style.linkColor
+                font.underline: toolbarExpandAllMa.containsMouse
+                verticalAlignment: Text.AlignVCenter
+                height: parent.height
+
+                MouseArea {
+                    id: toolbarExpandAllMa
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: root.expandAll()
+                }
+            }
+
+            Text {
+                text: qsTr("Collapse All")
+                color: Style.linkColor
+                font.underline: toolbarCollapseAllMa.containsMouse
+                verticalAlignment: Text.AlignVCenter
+                height: parent.height
+
+                MouseArea {
+                    id: toolbarCollapseAllMa
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: root.collapseAll()
+                }
+            }
+
+            Text {
+                text: qsTr("Check All")
+                color: Style.linkColor
+                font.underline: toolbarCheckAllMa.containsMouse
+                visible: root.tristate
+                verticalAlignment: Text.AlignVCenter
+                height: parent.height
+
+                MouseArea {
+                    id: toolbarCheckAllMa
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: root.checkAll()
+                }
+            }
+
+            Text {
+                text: qsTr("Uncheck All")
+                color: Style.linkColor
+                font.underline: toolbarUncheckAllMa.containsMouse
+                visible: root.tristate
+                verticalAlignment: Text.AlignVCenter
+                height: parent.height
+
+                MouseArea {
+                    id: toolbarUncheckAllMa
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: root.uncheckAll()
+                }
+            }
+        }
 
         Row {
             id: headerRow
@@ -163,7 +241,7 @@ Item {
             id: listView
 
             width: parent.width
-            height: parent.height - headerRow.height
+            height: parent.height - headerRow.height - toolbarRow.height
 
             clip: true
             reuseItems: true
