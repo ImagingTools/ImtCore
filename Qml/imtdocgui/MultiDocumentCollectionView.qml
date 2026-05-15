@@ -13,6 +13,7 @@ Item {
 	property bool showStandardLoading: true
 	property CollectionView collectionView: null
 	property DocumentManagerBase documentManager
+	property string collectionTabId: ""
 
 	signal startLoading(string documentId)
 	signal stopLoading(string documentId)
@@ -338,7 +339,9 @@ Item {
 	}
 
 	function setCollectionViewComp(name, collectionViewComp){
-		tabView.addTab(UuidGenerator.generateUUID(), name, collectionViewComp, false)
+		let tabId = UuidGenerator.generateUUID()
+		workspaceView.collectionTabId = tabId
+		tabView.addTab(tabId, name, collectionViewComp, "", "", false, true)
 		tabView.currentIndex = 0
 	}
 
@@ -354,8 +357,8 @@ Item {
 			itemWidth: Style.sizeHintXXS
 			onFinished: {
 				if (commandId === "Close"){
-					if (tabView.currentIndex > 0){
-						let tabId = tabView.getTabIdByIndex(tabView.currentIndex)
+					let tabId = tabView.getTabIdByIndex(tabView.currentIndex)
+					if (tabId !== workspaceView.collectionTabId){
 						workspaceView.documentManager.closeDocument(tabId)
 					}
 				}
@@ -517,7 +520,7 @@ Item {
 		closable: true
 
 		onTabLoaded: {
-			if (index === 0){
+			if (workspaceView.collectionTabId !== "" && tabId === workspaceView.collectionTabId){
 				workspaceView.collectionView = tabItem
 			}
 			else{
@@ -528,9 +531,12 @@ Item {
 		}
 
 		onTabClicked: {
-			if (mouse.button === Qt.RightButton && index != 0){
-				var point = tabItem.mapToItem(this, 0, 0)
-				ModalDialogManager.openDialog(popupMenuDialog, {"x": point.x + Style.sizeHintXXS, "y": point.y, "model": tabContextMenuModel})
+			if (mouse.button === Qt.RightButton){
+				let clickedTabId = tabView.getTabIdByIndex(index)
+				if (clickedTabId !== workspaceView.collectionTabId){
+					var point = tabItem.mapToItem(this, 0, 0)
+					ModalDialogManager.openDialog(popupMenuDialog, {"x": point.x + Style.sizeHintXXS, "y": point.y, "model": tabContextMenuModel})
+				}
 			}
 		}
 
