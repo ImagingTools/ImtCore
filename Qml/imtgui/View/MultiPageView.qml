@@ -81,7 +81,7 @@ Item {
             anchors.right: parent.right;
             anchors.topMargin: Style.marginS;
 
-            spacing: 2;
+            spacing: Style.spacingXS;
 
             Repeater {
                 model: root.pagesModel;
@@ -170,8 +170,6 @@ Item {
         anchors.topMargin: root.mainMargin;
         anchors.leftMargin: root.mainMargin;
         anchors.rightMargin: root.mainMargin;
-
-        z: 5;
 
         Repeater {
             id: bodyRepeater;

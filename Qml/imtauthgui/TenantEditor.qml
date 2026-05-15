@@ -570,6 +570,8 @@ DocumentViewBase {
 										readonly property bool isPending: modelData.isPending === true
 										readonly property bool isCurrentUser: container.tenantData && container.tenantData.m_currentUserId && modelData.userId === container.tenantData.m_currentUserId
 										readonly property int actionBtnWidth: container.memberActionColumnWidth
+										readonly property real contentWidth: memberDelegate.width - container.totalMemberRoleRowMargin * 2 - memberDelegate.actionBtnWidth
+											- (memberDelegate.isPending ? Style.iconSizeS + Style.marginL : 0) - Style.marginL
 
 										Column {
 											anchors.fill: parent
@@ -590,9 +592,7 @@ DocumentViewBase {
 												}
 
 												BaseText {
-													width: memberDelegate.isPending
-														? (parent.width - parent.spacing * 2 - Style.iconSizeS - memberDelegate.actionBtnWidth) * container.memberRoleNameWidthRatio
-														: (parent.width - parent.spacing - memberDelegate.actionBtnWidth) * container.memberRoleNameWidthRatio
+													width: memberDelegate.contentWidth * container.memberRoleNameWidthRatio
 													anchors.verticalCenter: parent.verticalCenter
 													text: modelData.userName
 													elide: Text.ElideRight
@@ -601,7 +601,7 @@ DocumentViewBase {
 
 												BaseText {
 													visible: !memberDelegate.isPending && memberDelegate.isOwner
-													width: (parent.width - parent.spacing - memberDelegate.actionBtnWidth) * container.memberRoleComboWidthRatio
+													width: memberDelegate.contentWidth * container.memberRoleComboWidthRatio
 													anchors.verticalCenter: parent.verticalCenter
 													text: qsTr("Owner")
 												}
@@ -609,7 +609,7 @@ DocumentViewBase {
 												ComboBox {
 													id: roleCombo
 													visible: !memberDelegate.isPending && !memberDelegate.isOwner
-													width: (parent.width - parent.spacing - memberDelegate.actionBtnWidth) * container.memberRoleComboWidthRatio
+													width: memberDelegate.contentWidth * container.memberRoleComboWidthRatio
 													anchors.verticalCenter: parent.verticalCenter
 													model: container.__getAvailableRolesModel()
 													nameId: "roleName"
@@ -632,9 +632,7 @@ DocumentViewBase {
 
 												BaseText {
 													visible: memberDelegate.isPending
-													width: memberDelegate.isPending
-														? (parent.width - parent.spacing * 2 - Style.iconSizeS - memberDelegate.actionBtnWidth) * container.memberRoleComboWidthRatio
-														: 0
+													width: memberDelegate.contentWidth * container.memberRoleComboWidthRatio
 													anchors.verticalCenter: parent.verticalCenter
 													text: modelData.isExpired ? qsTr("Expired") : qsTr("%1 (%2)").arg(modelData.role).arg(modelData.status)
 													color: modelData.isExpired ? "#DA3633" : Style.inactiveTextColor
