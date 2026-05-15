@@ -1,5 +1,5 @@
-import QtQuick 2.12
-import QtQuick.Controls 2.12 as QQC2
+import QtQuick
+import imtcontrols 1.0
 
 Item {
     id: root
@@ -22,7 +22,7 @@ Item {
     */
     property var model: []
 
-    property list<QtObject> columns
+    property var columns: []
 
     property int rowHeight: 28
     property int indentation: 18
@@ -290,20 +290,20 @@ Item {
                                 }
                             }
 
-                            QQC2.CheckBox {
+                            CheckBox {
                                 anchors.verticalCenter: parent.verticalCenter
                                 visible: !cellRoot.editingThisCell && cellRoot.editorType === "checkState"
-                                enabled: false
+                                isActive: false
                                 tristate: true
                                 checkState: cellRoot.value === undefined || cellRoot.value === null ? Qt.Unchecked : cellRoot.value
                             }
 
-                            QQC2.CheckBox {
-                                anchors.verticalCenter: parent.verticalCenter
-                                visible: !cellRoot.editingThisCell && cellRoot.editorType === "bool"
-                                enabled: false
-                                checked: cellRoot.value === true
-                            }
+                            // CheckBox {
+                            //     anchors.verticalCenter: parent.verticalCenter
+                            //     visible: !cellRoot.editingThisCell && cellRoot.editorType === "bool"
+                            //     enabled: false
+                            //     checked: cellRoot.value === true
+                            // }
 
                             Text {
                                 anchors.verticalCenter: parent.verticalCenter
@@ -316,13 +316,13 @@ Item {
                                 verticalAlignment: Text.AlignVCenter
                             }
 
-                            QQC2.TextField {
+                            CustomTextField {
                                 anchors.verticalCenter: parent.verticalCenter
                                 visible: cellRoot.editingThisCell && cellRoot.editorType === "string"
                                 width: Math.max(40, parent.width - x)
                                 height: Math.max(root.rowHeight - 4, 20)
                                 text: visible ? String(cellRoot.value !== undefined && cellRoot.value !== null ? cellRoot.value : "") : ""
-                                selectByMouse: true
+                                // selectByMouse: true
 
                                 onVisibleChanged: {
                                     if (visible) {
@@ -339,14 +339,14 @@ Item {
                                 }
                             }
 
-                            QQC2.TextField {
+                            CustomTextField {
                                 anchors.verticalCenter: parent.verticalCenter
                                 visible: cellRoot.editingThisCell && cellRoot.editorType === "number"
                                 width: Math.max(40, parent.width - x)
                                 height: Math.max(root.rowHeight - 4, 20)
                                 text: visible ? String(cellRoot.value !== undefined && cellRoot.value !== null ? cellRoot.value : 0) : ""
-                                selectByMouse: true
-                                validator: DoubleValidator {}
+                                // selectByMouse: true
+                                // validator: DoubleValidator {}
 
                                 onVisibleChanged: {
                                     if (visible) {
@@ -363,30 +363,30 @@ Item {
                                 }
                             }
 
-                            QQC2.CheckBox {
-                                anchors.verticalCenter: parent.verticalCenter
-                                visible: cellRoot.editingThisCell && cellRoot.editorType === "bool"
-                                checked: cellRoot.value === true
+                            // QQC2.CheckBox {
+                            //     anchors.verticalCenter: parent.verticalCenter
+                            //     visible: cellRoot.editingThisCell && cellRoot.editorType === "bool"
+                            //     checked: cellRoot.value === true
 
-                                onClicked: root.commitEdit(checked)
-                                onVisibleChanged: if (visible) forceActiveFocus()
-                                Keys.onEscapePressed: {
-                                    root.cancelEdit()
-                                    event.accepted = true
-                                }
-                            }
+                            //     onClicked: root.commitEdit(checked)
+                            //     onVisibleChanged: if (visible) forceActiveFocus()
+                            //     Keys.onEscapePressed: {
+                            //         root.cancelEdit()
+                            //         event.accepted = true
+                            //     }
+                            // }
 
-                            QQC2.CheckBox {
+                            CheckBox {
                                 anchors.verticalCenter: parent.verticalCenter
                                 visible: cellRoot.editingThisCell && cellRoot.editorType === "checkState"
                                 tristate: true
                                 checkState: cellRoot.value === undefined || cellRoot.value === null ? Qt.Unchecked : cellRoot.value
 
-                                nextCheckState: function() {
+                                function nextCheckState(){
                                     return checkState === Qt.Checked ? Qt.Unchecked : Qt.Checked
                                 }
 
-                                onClicked: root.commitEdit(checkState)
+                                // onClicked: root.commitEdit(checkState)
                                 onVisibleChanged: if (visible) forceActiveFocus()
                                 Keys.onEscapePressed: {
                                     root.cancelEdit()
@@ -394,7 +394,7 @@ Item {
                                 }
                             }
 
-                            QQC2.ComboBox {
+                            ComboBox {
                                 anchors.verticalCenter: parent.verticalCenter
                                 visible: cellRoot.editingThisCell && cellRoot.editorType === "combo"
                                 width: Math.max(80, parent.width - x)
@@ -1265,7 +1265,11 @@ Item {
         ensureVisible(currentIndex.key)
     }
 
-    onModelChanged: rebuildTree()
+    onModelChanged: {
+        rebuildTree()
+    }
 
-    Component.onCompleted: rebuildTree()
+    Component.onCompleted: {
+        rebuildTree()
+    }
 }

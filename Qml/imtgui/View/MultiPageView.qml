@@ -108,6 +108,8 @@ Item {
                             width: Style.iconSizeS;
                             height: Style.iconSizeS;
                             source: model.icon ? "../../../" + Style.getIconPath(model.icon, Icon.State.On, Icon.Mode.Normal) : ""
+                            sourceSize.width: width
+                            sourceSize.height: height
                         }
 
                         Text {
