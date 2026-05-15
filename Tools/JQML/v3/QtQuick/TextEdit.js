@@ -365,6 +365,7 @@ class TextEdit extends Item {
         selection.addRange(range)
         this.selectionStart = start
         this.selectionEnd = end
+        this.selectedText = this.text.substring(start, end)
     }
     selectAll(){
         this.select(0, this.text.length)

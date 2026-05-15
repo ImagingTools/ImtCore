@@ -120,7 +120,7 @@ class Canvas extends Item {
     __updateCanvasSize(){
         const w = this.width
         const h = this.height
-        this.canvasSize = { toString: () => `QSizeF(${w}, ${h})`, width: w, height: h }
+        this.canvasSize = `QSizeF(${w}, ${h})`
     }
 
     SLOT_widthChanged(oldValue, newValue){

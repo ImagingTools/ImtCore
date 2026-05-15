@@ -356,9 +356,20 @@ async function runWebTest(driver, testDirPath, timeout = 5000) {
             return readyState === 'complete'
         }, timeout) // таймаут 10 секунд
 
-        let containTimer = fs.readFileSync(path.resolve(testDirPath, 'Main.qml'), 'utf-8').indexOf('Timer') >= 0
+        let mainQml = fs.readFileSync(path.resolve(testDirPath, 'Main.qml'), 'utf-8')
+        let containTimer = mainQml.indexOf('Timer') >= 0
+        let containAsync = mainQml.indexOf('onStatusChanged') >= 0 || mainQml.indexOf('Image {') >= 0 || mainQml.indexOf('Image{') >= 0
 
-        if (containTimer) await driver.sleep(timeout)
+        if (containTimer || containAsync) {
+            // Wait for Qt.quit() signal via DOM attribute or timeout
+            try {
+                await driver.wait(async () => {
+                    return await driver.executeScript('return !!window.__jqmlQuit')
+                }, timeout)
+            } catch(e) {
+                // timeout - proceed anyway
+            }
+        }
 
         const logs = await driver.manage().logs().get('browser')
 

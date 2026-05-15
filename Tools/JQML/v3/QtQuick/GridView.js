@@ -2,6 +2,8 @@ const Flickable = require("./Flickable")
 const Var = require("../QtQml/Var")
 const Real = require("../QtQml/Real")
 const Signal = require("../QtQml/Signal")
+const Variant = require("../QtQml/Variant")
+const Component = require("../QtQml/Component")
 
 class GridView extends Flickable {
     static Beginning = 0
@@ -15,7 +17,7 @@ class GridView extends Flickable {
 
     static meta = Object.assign({}, Flickable.meta, {
         model: {type: Var, value:undefined, },
-        delegate: {type: Var, value:undefined, },
+        delegate: {type: Variant, typeTarget: Component, value:undefined, },
         layoutDirection: {type: Real, value:GridView.LeftToRight, },
         verticalLayoutDirection: {type: Real, value:GridView.TopToBottom, },
         currentIndex: {type: Real, value:-1, },
@@ -152,6 +154,7 @@ class GridView extends Flickable {
     }
 
     __createItem(index){
+        if(JQApplication.isQuitting) return null
         let properties = {}
 
         if (Array.isArray(this.model)) {

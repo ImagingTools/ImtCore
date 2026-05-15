@@ -97,6 +97,39 @@ class Signal extends BaseObject {
             }
         }
 
+        f.connectBefore = (...args)=>{
+            if(!target.__connections[name]) target.__connections[name] = []
+
+            if(args.length === 1){
+                let connection = {
+                    slot:args[0],
+                    priority: true
+                }
+
+                target.__connections[name].unshift(connection)
+                
+                let connectionObj = {
+                    target: target,
+                    name: name,
+                    connection: connection
+                }
+
+                if(connection.slot.meta && !connection.slot.meta.destruction){
+                    let destructionFunc = ()=>{
+                        this.removeConnection(connectionObj)
+                    }
+                    destructionFunc.meta = {
+                        name: connection.slot.meta.name,
+                        parent: connection.slot.meta.parent,
+                        destruction: true
+                    }
+                    connection.slot.meta.parent.__proxy['Component.destruction'].connect(destructionFunc)
+                }
+
+                return connectionObj
+            }
+        }
+
         f.disconnect = (...args)=>{
             if(!target.__connections || !target.__connections[name]) return
 

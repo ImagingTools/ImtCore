@@ -463,6 +463,7 @@ module.exports = {
 
     quit: function(){
         this.isQuitting = true
+        if(typeof window !== 'undefined') window.__jqmlQuit = true
     },
 
     endUpdate: function(){

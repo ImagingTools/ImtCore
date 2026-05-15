@@ -298,6 +298,7 @@ class ListView extends Flickable {
     }
 
     __createItem(index, itemInfo) {
+        if(JQApplication.isQuitting) return null
         let properties = {}
 
         if (Array.isArray(this.model)) {
