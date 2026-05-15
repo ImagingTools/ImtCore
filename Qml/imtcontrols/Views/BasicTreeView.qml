@@ -1,4 +1,4 @@
-import QtQuick
+import QtQuick 2.12
 import imtcontrols 1.0
 
 Item {
@@ -192,12 +192,22 @@ Item {
         Item {
             id: delegateRoot
 
+            property string nodeKey: model.key
+            property int nodeLevel: model.level
+            property bool nodeExpanded: model.expanded
+            property bool nodeHasChildren: model.hasChildren
+            property bool nodeSelected: model.selected
+            property int nodeChecked: model.checked
+            property bool nodeCheckable: model.checkable
+            property bool nodeIsEnabled: model.nodeEnabled
+            property string nodeText: model.text
+
             width: ListView.view.width
             height: root.rowHeight
 
             Rectangle {
                 anchors.fill: parent
-                color: selected ? root.selectedBackgroundColor : "transparent"
+                color: delegateRoot.nodeSelected ? root.selectedBackgroundColor : "transparent"
             }
 
             Row {
@@ -212,16 +222,16 @@ Item {
 
                         property var column: root.columnAt(index)
                         property bool treeColumn: root.isTreeColumn(column, index)
-                        property bool editingThisCell: root.isEditingCell(key, index)
-                        property string editorType: root.columnType(key, column)
-                        property var value: root.cellValue(key, column)
+                        property bool editingThisCell: root.isEditingCell(delegateRoot.nodeKey, index)
+                        property string editorType: root.columnType(delegateRoot.nodeKey, column)
+                        property var value: root.cellValue(delegateRoot.nodeKey, column)
 
                         width: root.columnWidth(column)
                         height: delegateRoot.height
 
                         Rectangle {
                             anchors.fill: parent
-                            color: cellMouseArea.containsMouse && !selected ? root.hoveredBackgroundColor : "transparent"
+                            color: cellMouseArea.containsMouse && !delegateRoot.nodeSelected ? root.hoveredBackgroundColor : "transparent"
                             border.color: root.gridLineColor
                             border.width: 1
                         }
@@ -235,9 +245,9 @@ Item {
 
                             onClicked: {
                                 listView.forceActiveFocus()
-                                root.select(key)
+                                root.select(delegateRoot.nodeKey)
 
-                                var node = root.__nodes[key]
+                                var node = root.__nodes[delegateRoot.nodeKey]
                                 if (node) {
                                     var indexObject = root.createIndex(node)
                                     root.nodeClicked(indexObject)
@@ -248,16 +258,16 @@ Item {
                             onDoubleClicked: {
                                 listView.forceActiveFocus()
 
-                                var node = root.__nodes[key]
+                                var node = root.__nodes[delegateRoot.nodeKey]
                                 if (!node)
                                     return
 
                                 var indexObject = root.createIndex(node)
 
                                 if (root.editable && root.editOnDoubleClick && root.isColumnEditable(cellRoot.column)) {
-                                    root.beginEditCell(key, index)
+                                    root.beginEditCell(delegateRoot.nodeKey, index)
                                 } else if (cellRoot.treeColumn) {
-                                    root.toggleExpanded(key)
+                                    root.toggleExpanded(delegateRoot.nodeKey)
                                 }
 
                                 root.nodeDoubleClicked(indexObject)
@@ -267,7 +277,7 @@ Item {
 
                         Row {
                             anchors.fill: parent
-                            anchors.leftMargin: cellRoot.treeColumn ? level * root.indentation : 6
+                            anchors.leftMargin: cellRoot.treeColumn ? delegateRoot.nodeLevel * root.indentation : 6
                             anchors.rightMargin: 6
                             spacing: 6
 
@@ -278,19 +288,19 @@ Item {
 
                                 Text {
                                     anchors.centerIn: parent
-                                    visible: hasChildren
-                                    text: expanded ? "▼" : "▶"
-                                    color: nodeEnabled ? root.normalTextColor : root.disabledTextColor
+                                    visible: delegateRoot.nodeHasChildren
+                                    text: delegateRoot.nodeExpanded ? "▼" : "▶"
+                                    color: delegateRoot.nodeIsEnabled ? root.normalTextColor : root.disabledTextColor
                                     font.pixelSize: 12
                                 }
 
                                 MouseArea {
                                     anchors.fill: parent
-                                    enabled: hasChildren
+                                    enabled: delegateRoot.nodeHasChildren
                                     acceptedButtons: Qt.LeftButton
 
                                     onClicked: {
-                                        root.toggleExpanded(key)
+                                        root.toggleExpanded(delegateRoot.nodeKey)
                                     }
                                 }
                             }
@@ -314,8 +324,8 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                                 visible: !cellRoot.editingThisCell && cellRoot.editorType !== "bool" && cellRoot.editorType !== "checkState"
                                 width: Math.max(0, parent.width - x)
-                                text: root.displayValue(cellRoot.value, cellRoot.column, key)
-                                color: !nodeEnabled ? root.disabledTextColor : selected ? root.selectedTextColor : root.normalTextColor
+                                text: root.displayValue(cellRoot.value, cellRoot.column, delegateRoot.nodeKey)
+                                color: !delegateRoot.nodeIsEnabled ? root.disabledTextColor : delegateRoot.nodeSelected ? root.selectedTextColor : root.normalTextColor
                                 horizontalAlignment: cellRoot.column && cellRoot.column.horizontalAlignment !== undefined ? cellRoot.column.horizontalAlignment : Text.AlignLeft
                                 elide: Text.ElideRight
                                 verticalAlignment: Text.AlignVCenter
