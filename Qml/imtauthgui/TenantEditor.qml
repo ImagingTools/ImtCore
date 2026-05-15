@@ -324,9 +324,6 @@ DocumentViewBase {
 		container.doUpdateModel()
 	}
 
-	// --- Tenant permissions ---
-	property TreeItemModel permissionsModel: TreeItemModel {}
-
 	// --- MultiPageView ---
 	MultiPageView {
 		id: multiPageView
@@ -733,17 +730,30 @@ DocumentViewBase {
 			id: permissionsPage
 
 			function updateGui() {
-				if (!container.tenantData)
+				if (!container.tenantData || !tenantPermissionsTreeView.treeView)
 					return
 
-				// Populate permissions model from server tree data
-				container.permissionsModel.clear()
+				// Build tree directly from server model (no intermediate TreeItemModel)
 				var allPermsModel = container.tenantData.m_allProductPermissions
-				if (allPermsModel) {
-					__populatePermissionsTree(allPermsModel, container.permissionsModel)
-				}
-				container.permissionsModel.refresh()
-				tenantPermissionsTreeView.buildPermissionsModel()
+				var nodes = TreeModelBuilder.fromListModel(
+					allPermsModel,
+					function(item, index) {
+						var perm = item && item.item ? item.item : item
+						return {
+							key: perm ? (perm.m_id || "") : "",
+							text: perm ? (perm.m_name || "") : "",
+							checkable: true,
+							expanded: true,
+							data: { FeatureId: perm ? (perm.m_id || "") : "" }
+						}
+					},
+					function(item, index) {
+						var perm = item && item.item ? item.item : item
+						var children = perm ? perm.m_children : null
+						return (children && (children.count || 0) > 0) ? children : null
+					}
+				)
+				tenantPermissionsTreeView.treeView.model = nodes
 
 				// Restore checked state from selected permissions (leaf nodes only)
 				var selectedPermissionsIds = []
@@ -759,32 +769,15 @@ DocumentViewBase {
 
 				var allNodesList = tenantPermissionsTreeView.treeView.allNodes()
 				for (var i = 0; i < allNodesList.length; i++) {
-					var nodeIdx = allNodesList[i]
-					var nodeChildren = nodeIdx.item && nodeIdx.item.children ? nodeIdx.item.children : []
+					var nodeObj = allNodesList[i]
+					var nodeChildren = nodeObj.children || []
 					if (nodeChildren.length === 0) {
-						var nodeData = nodeIdx.data || {}
+						var nodeData = nodeObj.data || {}
 						var id = nodeData.FeatureId
 
 						if (selectedPermissionsIds.includes(id)) {
-							tenantPermissionsTreeView.treeView.checkItem(nodeIdx.key)
+							tenantPermissionsTreeView.treeView.checkItem(nodeObj.key)
 						}
-					}
-				}
-			}
-
-			function __populatePermissionsTree(permsListModel, treeItemModel) {
-				var count = permsListModel.count || 0
-				for (var i = 0; i < count; i++) {
-					var perm = permsListModel.get(i).item
-					if (!perm)
-						continue
-					var idx = treeItemModel.insertNewItem()
-					treeItemModel.setData("FeatureId", perm.m_id || "", idx)
-					treeItemModel.setData("FeatureName", perm.m_name || "", idx)
-					var childrenModel = perm.m_children
-					if (childrenModel && (childrenModel.count || 0) > 0) {
-						var childTreeModel = treeItemModel.addTreeModel("ChildModel", idx)
-						__populatePermissionsTree(childrenModel, childTreeModel)
 					}
 				}
 			}
@@ -795,10 +788,10 @@ DocumentViewBase {
 				var selectedPermissionIds = []
 				var checkedNodes = tenantPermissionsTreeView.treeView.getCheckedNodes()
 				for (var j = 0; j < checkedNodes.length; j++) {
-					var nodeIdx = checkedNodes[j]
-					var nodeChildren = nodeIdx.item && nodeIdx.item.children ? nodeIdx.item.children : []
+					var nodeObj = checkedNodes[j]
+					var nodeChildren = nodeObj.children || []
 					if (nodeChildren.length === 0) {
-						var nodeData = nodeIdx.data || {}
+						var nodeData = nodeObj.data || {}
 						var id = nodeData.FeatureId
 						selectedPermissionIds.push(id)
 					}
@@ -862,32 +855,6 @@ DocumentViewBase {
 								function onCheckedItemsChanged() {
 									container.doUpdateModel()
 								}
-							}
-
-							function buildPermissionsModel() {
-								if (!container.permissionsModel)
-									return
-
-								var nodes = TreeModelBuilder.fromTreeItemModel(
-									container.permissionsModel,
-									function(wrapper, index) {
-										return {
-											key: wrapper.data("FeatureId", ""),
-											text: wrapper.data("FeatureName", ""),
-											checkable: true,
-											expanded: true,
-											data: {
-												FeatureId: wrapper.data("FeatureId", ""),
-												FeatureName: wrapper.data("FeatureName", "")
-											}
-										}
-									},
-									function(wrapper, index) {
-										return wrapper.childModel("ChildModel")
-									}
-								)
-
-								tenantPermissionsTreeView.treeView.model = nodes
 							}
 						}
 					}
