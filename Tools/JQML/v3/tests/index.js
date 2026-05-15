@@ -51,6 +51,39 @@ function getErrorMessage(error) {
     return String(error)
 }
 
+function envFill(source) {
+    let result = String(source)
+    for (const key of Object.keys(process.env)) {
+        const value = (process.env[key] || '').replaceAll('\\', '\\\\').trim()
+        result = result.replaceAll('${' + key + '}', value)
+    }
+    return result
+}
+
+function ensureDefaultTargetName() {
+    if (!process.env.IMTCOREDIR_BUILD && process.env.IMTCOREDIR) {
+        process.env.IMTCOREDIR_BUILD = process.env.IMTCOREDIR
+    }
+
+    if (process.env.TARGETNAME && process.env.TARGETNAME.trim()) return
+
+    const roots = [process.env.IMTCOREDIR_BUILD, process.env.IMTCOREDIR, process.env.PROLIFEDIR].filter(Boolean)
+    for (const root of roots) {
+        const auxIncludePath = path.resolve(root, 'AuxInclude')
+        if (!fs.existsSync(auxIncludePath) || !checkIsDirectorySync(auxIncludePath)) continue
+
+        const targets = fs.readdirSync(auxIncludePath)
+            .map(name => path.resolve(auxIncludePath, name))
+            .filter(p => checkIsDirectorySync(p))
+            .map(p => path.basename(p))
+
+        if (targets.length > 0) {
+            process.env.TARGETNAME = targets[0]
+            return
+        }
+    }
+}
+
 function getQmlImportPathsFromConfig(testDirPath) {
     const visitedConfigs = new Set()
     const resolvedDirs = new Set()
@@ -65,7 +98,8 @@ function getQmlImportPathsFromConfig(testDirPath) {
 
         let config
         try {
-            config = JSON.parse(fs.readFileSync(normalizedConfigPath, { encoding: 'utf8', flag: 'r' }))
+            const content = envFill(fs.readFileSync(normalizedConfigPath, { encoding: 'utf8', flag: 'r' }))
+            config = JSON.parse(content)
         } catch (err) {
             return
         }
@@ -74,7 +108,7 @@ function getQmlImportPathsFromConfig(testDirPath) {
 
         if (Array.isArray(config.dirs)) {
             for (const dirPath of config.dirs) {
-                const absoluteDirPath = path.resolve(configDirPath, dirPath)
+                const absoluteDirPath = path.resolve(configDirPath, envFill(dirPath))
                 if (fs.existsSync(absoluteDirPath) && checkIsDirectorySync(absoluteDirPath)) {
                     resolvedDirs.add(absoluteDirPath)
                     resolvedDirs.add(path.dirname(absoluteDirPath))
@@ -84,7 +118,7 @@ function getQmlImportPathsFromConfig(testDirPath) {
 
         if (Array.isArray(config.includes)) {
             for (const includePath of config.includes) {
-                const absoluteIncludePath = path.resolve(configDirPath, includePath)
+                const absoluteIncludePath = path.resolve(configDirPath, envFill(includePath))
                 collectConfig(absoluteIncludePath)
             }
         }
@@ -110,20 +144,30 @@ function runQmlTest(filePath, timeout = 5000, qmlImportPaths = []) {
                 : mergedImportPath
         }
 
+        const importArgs = []
+        for (const importPath of qmlImportPaths) {
+            importArgs.push('-I', importPath)
+        }
+
         // Запуск в headless режиме
-        const child = spawn('qml', ['-platform', 'offscreen', filePath], {
+        const child = spawn('qml', ['-platform', 'offscreen', ...importArgs, filePath], {
             cwd: path.dirname(filePath),
             env,
         })
 
         let logs = []
+        let rawOutput = ''
 
         child.stdout.on('data', (data) => {
-            let result = getQmlLog(data.toString().trim())
+            const chunk = data.toString()
+            rawOutput += chunk + '\n'
+            let result = getQmlLog(chunk.trim())
             logs.push(...result)
         })
         child.stderr.on('data', (data) => {
-            let result = getQmlLog(data.toString().trim())
+            const chunk = data.toString()
+            rawOutput += chunk + '\n'
+            let result = getQmlLog(chunk.trim())
             logs.push(...result)
         })
 
@@ -135,6 +179,28 @@ function runQmlTest(filePath, timeout = 5000, qmlImportPaths = []) {
 
         child.on('close', (code) => {
             clearTimeout(timer)
+
+            if (logs.length === 0 && rawOutput) {
+                const rawLines = rawOutput
+                    .split(/\r?\n/g)
+                    .map(line => line.trim())
+                    .filter(Boolean)
+
+                const diagnostics = rawLines.filter(line =>
+                    line.includes('QQmlApplicationEngine failed to load component') ||
+                    line.includes('Did not load any objects, exiting.') ||
+                    line.startsWith('file:///') ||
+                    line.includes(' is not installed') ||
+                    line.includes(': error:')
+                )
+
+                if (diagnostics.length > 0) {
+                    logs.push(...diagnostics)
+                } else {
+                    logs.push(...rawLines.slice(0, 20))
+                }
+            }
+
             resolve(logs)
         })
     })
@@ -188,6 +254,8 @@ function getTestsToRun(allEntries, selectedTestName) {
 }
 
 async function runTests() {
+    ensureDefaultTargetName()
+
     const tests = fs.readdirSync('./tests')
     const options = parseCliOptions()
     const testsToRun = getTestsToRun(tests, options.testName)
