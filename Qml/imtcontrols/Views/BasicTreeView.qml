@@ -38,6 +38,9 @@ Item {
     property bool editOnDoubleClick: true
     property bool allowDisabledEditing: false
 
+    property string filterText: ""
+    property string filterRole: "text"
+
     property color selectedBackgroundColor: "#2d4d7a"
     property color hoveredBackgroundColor: "#26384f"
     property color normalTextColor: "#dddddd"
@@ -498,10 +501,47 @@ Item {
         __visibleKeys = []
         __visibleRowsByKey = ({})
 
+        var ft = filterText.trim().toLowerCase()
+
         for (var i = 0; i < __rootKeys.length; ++i) {
             var rootNode = __nodes[__rootKeys[i]]
-            if (rootNode)
-                appendVisibleBranch(rootNode)
+            if (rootNode) {
+                if (ft.length > 0)
+                    appendFilteredBranch(rootNode, ft)
+                else
+                    appendVisibleBranch(rootNode)
+            }
+        }
+    }
+
+    function nodeMatchesFilter(node, ft) {
+        var value = valueByPath(node, filterRole)
+        return value !== undefined && value !== null && String(value).toLowerCase().indexOf(ft) >= 0
+    }
+
+    function subtreeMatchesFilter(node, ft) {
+        if (nodeMatchesFilter(node, ft))
+            return true
+
+        for (var i = 0; i < node.childrenKeys.length; ++i) {
+            var child = __nodes[node.childrenKeys[i]]
+            if (child && subtreeMatchesFilter(child, ft))
+                return true
+        }
+
+        return false
+    }
+
+    function appendFilteredBranch(node, ft) {
+        if (!subtreeMatchesFilter(node, ft))
+            return
+
+        appendVisibleNode(node)
+
+        for (var i = 0; i < node.childrenKeys.length; ++i) {
+            var child = __nodes[node.childrenKeys[i]]
+            if (child)
+                appendFilteredBranch(child, ft)
         }
     }
 
@@ -990,6 +1030,7 @@ Item {
         syncVisibleSubtree(node)
         syncVisibleAncestors(node)
         checkStateChanged(createIndex(node), state)
+        checkedItemsChanged()
     }
 
     function canChangeCheckState(node) {
@@ -1265,8 +1306,86 @@ Item {
         ensureVisible(currentIndex.key)
     }
 
+    function rebuild() {
+        rebuildTreePreservingState()
+    }
+
+    // --- Convenience API for checkable trees ---
+
+    signal checkedItemsChanged()
+
+    property bool tristate: false
+
+    function checkAll() {
+        for (var nodeKey in __nodes) {
+            var node = __nodes[nodeKey]
+            if (node && node.checkable && node.enabled) {
+                node.checked = Qt.Checked
+                writeBackNode(node)
+            }
+        }
+        buildVisibleTree()
+        checkedItemsChanged()
+    }
+
+    function uncheckAll() {
+        for (var nodeKey in __nodes) {
+            var node = __nodes[nodeKey]
+            if (node && node.checkable) {
+                node.checked = Qt.Unchecked
+                writeBackNode(node)
+            }
+        }
+        buildVisibleTree()
+        checkedItemsChanged()
+    }
+
+    function checkItem(key) {
+        setCheckState(key, Qt.Checked)
+        checkedItemsChanged()
+    }
+
+    function uncheckItem(key) {
+        setCheckState(key, Qt.Unchecked)
+        checkedItemsChanged()
+    }
+
+    function getCheckedKeys() {
+        var result = []
+        for (var nodeKey in __nodes) {
+            var node = __nodes[nodeKey]
+            if (node && node.checked === Qt.Checked)
+                result.push(nodeKey)
+        }
+        return result
+    }
+
+    function getCheckedNodes() {
+        var result = []
+        for (var nodeKey in __nodes) {
+            var node = __nodes[nodeKey]
+            if (node && node.checked === Qt.Checked)
+                result.push(createIndex(node))
+        }
+        return result
+    }
+
+    function allNodes() {
+        var result = []
+        for (var nodeKey in __nodes) {
+            var node = __nodes[nodeKey]
+            if (node)
+                result.push(createIndex(node))
+        }
+        return result
+    }
+
     onModelChanged: {
         rebuildTree()
+    }
+
+    onFilterTextChanged: {
+        buildVisibleTree()
     }
 
     Component.onCompleted: {

@@ -6,8 +6,9 @@ QtObject {
     id: builder
 
     /*
-        Fixed node format expected by TreeView:
+        Creates a normalized tree node.
 
+        Node format:
         {
             key: "unique-key",
             text: "Display text",
@@ -19,7 +20,6 @@ QtObject {
             data: null
         }
     */
-
     function node(options) {
         options = options || {}
 
@@ -35,182 +35,138 @@ QtObject {
         }
     }
 
+    /*
+        Converts a JS array of node-like objects to normalized format.
+    */
     function fromArray(items) {
         var result = []
-
         if (!items)
             return result
 
-        for (var i = 0; i < itemCount(items); ++i) {
-            result.push(normalizeNode(itemAt(items, i), createContext(null, i, String(i), 0)))
-        }
+        for (var i = 0; i < itemCount(items); ++i)
+            result.push(normalizeNode(itemAt(items, i), String(i)))
 
         return result
     }
 
     /*
-        Converts a JS array or QML ListModel to TreeView fixed node format.
+        Converts a JS array or QML ListModel to normalized tree nodes.
 
-        mapItem signature:
-            function(item, context) -> object
-
-        getChildren signature:
-            function(item, context) -> array/ListModel/null
+        mapItem(item, index) -> node-like object
+        getChildren(item, index) -> array/ListModel/null
     */
     function fromListModel(listModel, mapItem, getChildren) {
         var result = []
-
         if (!listModel)
             return result
 
         for (var i = 0; i < itemCount(listModel); ++i) {
             var item = itemAt(listModel, i)
-            var context = createContext(null, i, String(i), 0)
-
-            result.push(normalizeMappedListItem(item, context, mapItem, getChildren))
+            result.push(convertListItem(item, i, String(i), mapItem, getChildren))
         }
 
         return result
     }
 
-    function normalizeMappedListItem(item, context, mapItem, getChildren) {
-        var mapped = mapItem ? mapItem(item, context) : item
+    /*
+        Converts tree item models (GetItemsCount/GetData/GetTreeItemModel API).
+
+        mapItem(wrapper, index) -> node-like object
+        getChildren(wrapper, index) -> child tree item model or null
+
+        Wrapper properties: model, row, data(role, fallback), childModel(role)
+    */
+    function fromTreeItemModel(treeItemModel, mapItem, getChildren) {
+        var result = []
+        if (!treeItemModel)
+            return result
+
+        for (var i = 0; i < treeItemCount(treeItemModel); ++i) {
+            var wrapper = createTreeItemWrapper(treeItemModel, i)
+            result.push(convertTreeItem(wrapper, i, String(i), mapItem, getChildren))
+        }
+
+        return result
+    }
+
+    // --- Internal ---
+
+    function convertListItem(item, index, path, mapItem, getChildren) {
+        var mapped = mapItem ? mapItem(item, index) : item
         mapped = mapped || {}
 
-        var childrenSource = null
-
-        if (getChildren)
-            childrenSource = getChildren(item, context)
-        else if (item && item.children !== undefined)
-            childrenSource = item.children
-
+        var childrenSource = getChildren ? getChildren(item, index) : (item && item.children !== undefined ? item.children : null)
         var children = []
 
         if (childrenSource) {
             for (var i = 0; i < itemCount(childrenSource); ++i) {
                 var childItem = itemAt(childrenSource, i)
-                var childContext = createContext(mapped, i, context.path + "/" + i, context.level + 1)
-                children.push(normalizeMappedListItem(childItem, childContext, mapItem, getChildren))
+                children.push(convertListItem(childItem, i, path + "/" + i, mapItem, getChildren))
             }
         }
 
         mapped.children = children
-
         if (mapped.data === undefined)
             mapped.data = item
 
-        return normalizeNode(mapped, context)
+        return normalizeNode(mapped, path)
     }
 
-    /*
-        Converts tree item models with API like:
-            model.GetItemsCount()
-            model.GetData(role, row)
-            model.GetTreeItemModel(role, row)
-
-        User controls conversion through mapItem/getChildren rather than role options.
-
-        Wrapper passed to mapItem:
-            item.model
-            item.row
-            item.path
-            item.level
-            item.data(role, fallbackValue)
-            item.setData(role, value)
-            item.childModel(role)
-    */
-    function fromTreeItemModel(treeItemModel, mapItem, getChildren) {
-        var result = []
-
-        if (!treeItemModel)
-            return result
-
-        for (var i = 0; i < treeItemCount(treeItemModel); ++i) {
-            var context = createContext(null, i, String(i), 0)
-            var item = createTreeItemWrapper(treeItemModel, i, context)
-
-            result.push(normalizeMappedTreeItem(item, context, mapItem, getChildren))
-        }
-
-        return result
-    }
-
-    function normalizeMappedTreeItem(item, context, mapItem, getChildren) {
-        var mapped = mapItem ? mapItem(item, context) : {}
+    function convertTreeItem(wrapper, index, path, mapItem, getChildren) {
+        var mapped = mapItem ? mapItem(wrapper, index) : {}
         mapped = mapped || {}
 
-        var childrenSource = getChildren ? getChildren(item, context) : null
+        var childrenSource = getChildren ? getChildren(wrapper, index) : null
         var children = []
 
         if (childrenSource) {
             for (var i = 0; i < treeItemCount(childrenSource); ++i) {
-                var childContext = createContext(mapped, i, context.path + "/" + i, context.level + 1)
-                var childItem = createTreeItemWrapper(childrenSource, i, childContext)
-
-                children.push(normalizeMappedTreeItem(childItem, childContext, mapItem, getChildren))
+                var childWrapper = createTreeItemWrapper(childrenSource, i)
+                children.push(convertTreeItem(childWrapper, i, path + "/" + i, mapItem, getChildren))
             }
         }
 
         mapped.children = children
-
         if (mapped.data === undefined)
-            mapped.data = item
+            mapped.data = wrapper
 
-        return normalizeNode(mapped, context)
+        return normalizeNode(mapped, path)
     }
 
-    function createTreeItemWrapper(model, row, context) {
+    function createTreeItemWrapper(model, row) {
         return {
             model: model,
             row: row,
-            path: context.path,
-            level: context.level,
 
             data: function(role, fallbackValue) {
-                if (!model || !model.GetData)
-                    return fallbackValue
-
-                var value = model.GetData(role, row)
-                return value === undefined || value === null ? fallbackValue : value
-            },
-
-            setData: function(role, value) {
                 if (!model)
-                    return
-
-                if (model.SetData) {
-                    model.SetData(role, row, value)
-                    return
-                }
-
-                if (model.setData) {
-                    model.setData(role, row, value)
-                    return
-                }
+                    return fallbackValue
+                var fn = model.GetData || model.getData
+                if (!fn)
+                    return fallbackValue
+                var value = fn.call(model, role, row)
+                return value === undefined || value === null ? fallbackValue : value
             },
 
             childModel: function(role) {
                 if (!model || !model.GetTreeItemModel)
                     return null
-
                 return model.GetTreeItemModel(role, row)
             }
         }
     }
 
-    function normalizeNode(input, context) {
+    function normalizeNode(input, path) {
         input = input || {}
-        context = context || createContext(null, 0, "0", 0)
 
-        var fallbackKey = "path/" + context.path
+        var fallbackKey = "path/" + path
         var key = input.key !== undefined && input.key !== null && String(input.key).length > 0 ? String(input.key) : fallbackKey
         var text = input.text !== undefined && input.text !== null ? String(input.text) : key
         var rawChildren = input.children || []
         var children = []
 
-        for (var i = 0; i < itemCount(rawChildren); ++i) {
-            children.push(normalizeNode(itemAt(rawChildren, i), createContext(input, i, context.path + "/" + i, context.level + 1)))
-        }
+        for (var i = 0; i < itemCount(rawChildren); ++i)
+            children.push(normalizeNode(itemAt(rawChildren, i), path + "/" + i))
 
         return node({
             key: key,
@@ -224,51 +180,33 @@ QtObject {
         })
     }
 
-    function createContext(parent, row, path, level) {
-        return {
-            parent: parent,
-            row: row,
-            path: path,
-            level: level
-        }
-    }
-
     function itemCount(items) {
         if (!items)
             return 0
-
         if (items.count !== undefined)
             return items.count
-
         if (items.length !== undefined)
             return items.length
-
         return 0
     }
 
     function itemAt(items, row) {
         if (!items)
             return null
-
         if (items.get)
             return items.get(row)
-
         return items[row]
     }
 
     function treeItemCount(model) {
         if (!model)
             return 0
-
         if (model.GetItemsCount)
             return model.GetItemsCount()
-
         if (model.count !== undefined)
             return model.count
-
         if (model.length !== undefined)
             return model.length
-
         return 0
     }
 }
