@@ -114,11 +114,6 @@ ViewBase {
 			}
 		}
 	}
-
-	Component {
-		id: contextTicketsDialogComp
-		EntityContextTicketsDialog {}
-	}
 	
 	DocumentHistoryPanel {
 		id: historyPanel;

@@ -1,4 +1,0 @@
-width (по anchors): 500
-x (по anchors): 0
-parent.width: 500
-Проверка: x + width == parent.width? true

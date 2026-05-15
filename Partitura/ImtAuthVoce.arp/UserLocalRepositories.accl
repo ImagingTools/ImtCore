@@ -9,6 +9,7 @@
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="SQLiteRoleRepository" X="250" Y="125" Note=""/>
+        <Element ComponentName="SQLiteTenantInvitationRepository" X="675" Y="475" Note=""/>
         <Element ComponentName="SQLiteTenantMembershipRepository" X="700" Y="775" Note=""/>
         <Element ComponentName="SQLiteTenantRepository" X="700" Y="600" Note=""/>
         <Element ComponentName="SQLiteUserGroupRepository" X="250" Y="600" Note=""/>

@@ -6,6 +6,7 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
+#include <imtauth/ITenantManager.h>
 #include <imtauth/ITenantMembershipManager.h>
 #include <imtauth/ITenantInvitationManager.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/TenantMemberships.h>
@@ -23,6 +24,7 @@ public:
 	I_BEGIN_COMPONENT(CTenantMembershipManagerControllerComp);
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager providing CRUD operations", true, "TenantMembershipManager");
 		I_ASSIGN(m_invitationManagerCompPtr, "InvitationManager", "Tenant invitation manager providing invitation lifecycle operations", true, "TenantInvitationManager");
+		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager for resolving tenant names", false, "TenantManager");
 	I_END_COMPONENT;
 
 protected:
@@ -63,10 +65,6 @@ protected:
 				const sdl::imtauth::TenantMemberships::CAddMembershipGqlRequest& request,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::TenantMemberships::CInviteTenantMemberPayload OnInviteTenantMember(
-				const sdl::imtauth::TenantMemberships::CInviteTenantMemberGqlRequest& request,
-				const ::imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
 	virtual sdl::imtauth::TenantMemberships::CCreateTenantInvitationPayload OnCreateTenantInvitation(
 				const sdl::imtauth::TenantMemberships::CCreateTenantInvitationGqlRequest& request,
 				const ::imtgql::CGqlRequest& gqlRequest,
@@ -95,18 +93,11 @@ protected:
 				const sdl::imtauth::TenantMemberships::CUpdateMembershipRoleGqlRequest& request,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::TenantMemberships::CAcceptTenantMembershipInvitationPayload OnAcceptTenantMembershipInvitation(
-				const sdl::imtauth::TenantMemberships::CAcceptTenantMembershipInvitationGqlRequest& request,
-				const ::imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
-	virtual sdl::imtauth::TenantMemberships::CRejectTenantMembershipInvitationPayload OnRejectTenantMembershipInvitation(
-				const sdl::imtauth::TenantMemberships::CRejectTenantMembershipInvitationGqlRequest& request,
-				const ::imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
 
 private:
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
 	I_REF(imtauth::ITenantInvitationManager, m_invitationManagerCompPtr);
+	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
 };
 
 

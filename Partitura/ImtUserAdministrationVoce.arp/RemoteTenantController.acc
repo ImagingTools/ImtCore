@@ -25,6 +25,7 @@
                                 <Value>RemoteCommandsController</Value>
                                 <Value>RemoteDocumentRevisionController</Value>
                                 <Value>RemoteCollectionDocumentManagerController</Value>
+                                <Value>TenantMembershipManagerController</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -199,6 +200,24 @@
         <Element Id="TenantInfo" PackageId="ImtAuthPck" ComponentId="TenantInfo">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="TenantMembershipManagerController" PackageId="ImtAuthGqlPck" ComponentId="RemoteTenantMembershipManagerController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="TenantRemoteRepresentationController" PackageId="ImtClientGqlPck" ComponentId="PumaGqlRemoteRepresentationController">

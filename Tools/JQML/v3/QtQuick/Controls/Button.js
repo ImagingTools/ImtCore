@@ -1,11 +1,14 @@
 const AbstractButton = require("./AbstractButton")
-const Real = require("../../QtQml/Real")
 const Var = require("../../QtQml/Var")
 const Signal = require("../../QtQml/Signal")
 
 class Button extends AbstractButton {
     static meta = Object.assign({}, AbstractButton.meta, {
-
+        flat: { type: Var, value: false },
+        highlighted: { type: Var, value: false },
+        
+        flatChanged: { type: Signal, args: [] },
+        highlightedChanged: { type: Signal, args: [] }
     })
 
     static create(parent = null, properties = {}){

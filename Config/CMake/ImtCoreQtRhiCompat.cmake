@@ -1,105 +1,65 @@
 # ImtCoreQtRhiCompat.cmake
 #
-# Ensures the versioned QtGui headers directory (containing rhi/qrhi.h) is on the
-# include path.  On macOS framework builds the versioned headers live inside
-# QtGui.framework/Versions/A/Headers/<version>/QtGui and are NOT exposed by the
-# public Qt6::Gui target.  This module resolves that directory and adds it
-# globally so that any translation unit including <imt3dgui/QtRhiCompat.h> can
-# find <rhi/qrhi.h>.
+# Adds the versioned QtGui headers directory to the include path so that
+# <rhi/qrhi.h> can be found.  Required for Qt >= 6.8.0 where RHI headers
+# live in a version-specific subdirectory.
+#
+# Cross-platform: Windows, Linux, macOS (including framework builds).
+# Does NOT link or reference any Qt private libraries.
 
-if(_IMTCORE_QT_RHI_COMPAT_INCLUDED)
-    return()
-endif()
-set(_IMTCORE_QT_RHI_COMPAT_INCLUDED TRUE)
-
-# Need at least Qt 6 Gui to be available.
-if(NOT TARGET Qt6::Gui)
-    find_package(Qt6 COMPONENTS Gui QUIET)
-endif()
+include_guard(GLOBAL)
 
 if(NOT TARGET Qt6::Gui)
-    return()
+	find_package(Qt6 COMPONENTS Gui QUIET)
+endif()
+if(NOT TARGET Qt6::Gui OR NOT DEFINED Qt6_VERSION OR Qt6_VERSION VERSION_LESS "6.8.0")
+	return()
 endif()
 
-# Determine the full Qt version string.
-if(NOT DEFINED Qt6Core_VERSION_MAJOR)
-    find_package(Qt6 COMPONENTS Core QUIET)
+# Collect hint directories for find_path().
+set(_qrhi_hints "")
+
+# From INTERFACE_INCLUDE_DIRECTORIES of the public Qt6::Gui target.
+get_target_property(_gui_incs Qt6::Gui INTERFACE_INCLUDE_DIRECTORIES)
+if(_gui_incs)
+	foreach(_d IN LISTS _gui_incs)
+		if(NOT _d MATCHES "^\\$<")
+			list(APPEND _qrhi_hints "${_d}")
+		endif()
+	endforeach()
 endif()
 
-if(DEFINED Qt6Core_VERSION_MAJOR)
-    set(_qrhi_qt_ver "${Qt6Core_VERSION_MAJOR}.${Qt6Core_VERSION_MINOR}.${Qt6Core_VERSION_PATCH}")
+# From the imported library location (adds its parent and Headers/ subdir so
+# that both regular and framework install layouts are covered).
+get_target_property(_cfgs Qt6::Gui IMPORTED_CONFIGURATIONS)
+if(_cfgs)
+	list(GET _cfgs 0 _cfg)
+	get_target_property(_loc Qt6::Gui "IMPORTED_LOCATION_${_cfg}")
+	if(_loc)
+		get_filename_component(_lib_dir "${_loc}" DIRECTORY)
+		list(APPEND _qrhi_hints "${_lib_dir}" "${_lib_dir}/Headers")
+	endif()
+endif()
+
+find_path(_qrhi_versioned_dir
+	NAMES rhi/qrhi.h
+	HINTS ${_qrhi_hints}
+	PATH_SUFFIXES "${Qt6_VERSION}/QtGui"
+	NO_DEFAULT_PATH
+)
+
+if(_qrhi_versioned_dir)
+	include_directories("${_qrhi_versioned_dir}")
+	message(STATUS "[ImtCore] Added versioned QtGui RHI headers: ${_qrhi_versioned_dir}")
 else()
-    return()
+	message(FATAL_ERROR "[ImtCore] Could not find versioned QtGui RHI headers")
 endif()
 
-if(_qrhi_qt_ver VERSION_LESS "6.8.0")
-    return()
-endif()
-
-# --- Resolve the versioned QtGui headers directory ---
-set(_qrhi_headers_dir "")
-
-# Strategy 1: Framework layout (macOS) — derive from IMPORTED_LOCATION
-foreach(_cfg RELEASE RELWITHDEBINFO MINSIZEREL DEBUG NOCONFIG "")
-    if(_cfg STREQUAL "")
-        get_target_property(_qrhi_loc Qt6::Gui IMPORTED_LOCATION)
-    else()
-        get_target_property(_qrhi_loc Qt6::Gui IMPORTED_LOCATION_${_cfg})
-    endif()
-    if(_qrhi_loc AND NOT _qrhi_loc MATCHES "-NOTFOUND$")
-        break()
-    endif()
-endforeach()
-
-if(_qrhi_loc AND _qrhi_loc MATCHES "QtGui\\.framework")
-    get_filename_component(_qrhi_fw_dir "${_qrhi_loc}" DIRECTORY)
-    set(_qrhi_fw_versioned "${_qrhi_fw_dir}/Headers/${_qrhi_qt_ver}/QtGui")
-    if(EXISTS "${_qrhi_fw_versioned}/rhi/qrhi.h")
-        set(_qrhi_headers_dir "${_qrhi_fw_versioned}")
-    endif()
-endif()
-
-# Strategy 2: Non-framework layout — look for versioned subdir under QtGui include
-if(NOT _qrhi_headers_dir)
-    get_target_property(_qrhi_gui_incs Qt6::Gui INTERFACE_INCLUDE_DIRECTORIES)
-    foreach(_dir IN LISTS _qrhi_gui_incs)
-        # Skip generator expressions
-        if(_dir MATCHES "^\\$<")
-            continue()
-        endif()
-        file(TO_CMAKE_PATH "${_dir}" _dir_norm)
-        if(_dir_norm MATCHES "/QtGui$")
-            set(_versioned "${_dir_norm}/${_qrhi_qt_ver}/QtGui")
-            if(EXISTS "${_versioned}/rhi/qrhi.h")
-                set(_qrhi_headers_dir "${_versioned}")
-            elseif(EXISTS "${_dir_norm}/rhi/qrhi.h")
-                set(_qrhi_headers_dir "${_dir_norm}")
-            endif()
-            if(_qrhi_headers_dir)
-                break()
-            endif()
-        endif()
-    endforeach()
-endif()
-
-# Strategy 3: Derive from Qt6Gui_DIR (cmake config directory)
-if(NOT _qrhi_headers_dir AND DEFINED Qt6Gui_DIR)
-    get_filename_component(_qrhi_qt_lib "${Qt6Gui_DIR}/../../.." ABSOLUTE)
-    # Framework layout
-    set(_qrhi_fw_candidate "${_qrhi_qt_lib}/QtGui.framework/Versions/A/Headers/${_qrhi_qt_ver}/QtGui")
-    if(EXISTS "${_qrhi_fw_candidate}/rhi/qrhi.h")
-        set(_qrhi_headers_dir "${_qrhi_fw_candidate}")
-    else()
-        # Non-framework layout
-        get_filename_component(_qrhi_qt_prefix "${_qrhi_qt_lib}/.." ABSOLUTE)
-        set(_qrhi_inc_candidate "${_qrhi_qt_prefix}/include/QtGui/${_qrhi_qt_ver}/QtGui")
-        if(EXISTS "${_qrhi_inc_candidate}/rhi/qrhi.h")
-            set(_qrhi_headers_dir "${_qrhi_inc_candidate}")
-        endif()
-    endif()
-endif()
-
-if(_qrhi_headers_dir)
-    include_directories("${_qrhi_headers_dir}")
-    message(STATUS "[ImtCore] Added versioned QtGui RHI headers: ${_qrhi_headers_dir}")
-endif()
+# Clean up local variables to avoid leaking into the caller's scope.
+unset(_qrhi_hints)
+unset(_gui_incs)
+unset(_d)
+unset(_cfgs)
+unset(_cfg)
+unset(_loc)
+unset(_lib_dir)

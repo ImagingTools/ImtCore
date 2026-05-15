@@ -62,6 +62,18 @@ module.exports.listComponents = [
     'BaseClass',
     'BaseModel',
     'DropArea',
+    // Menu components (Qt Quick Controls)
+    'Action',
+    'Menu',
+    'MenuItem',
+    'MenuSeparator',
+    'MenuBar',
+    'MenuBarItem',
+    // Popup components (Qt Quick Controls)
+    'Popup',
+    'Overlay',
+    'ToolTip',
+    'Drawer',
     // 3D (Qt Quick 3D analogs, Web runtime backed by Three.js, lazy-loaded)
     'View3D',
     'Node3D',

@@ -221,6 +221,11 @@ I_EXPORT_COMPONENT(
 			"Remote Tenant Controller");
 
 I_EXPORT_COMPONENT(
+			RemoteTenantMembershipManagerController,
+			"Remote tenant membership manager controller",
+			"Remote Tenant Membership Manager Controller");
+
+I_EXPORT_COMPONENT(
 			RemoteProfileController,
 			"Remote profile controller",
 			"Remote Profile Controller");
