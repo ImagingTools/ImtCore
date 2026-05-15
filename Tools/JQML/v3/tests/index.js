@@ -369,15 +369,18 @@ async function runWebTest(driver, testDirPath, timeout = 5000) {
         let containTimer = mainQml.indexOf('Timer') >= 0
         let containAsync = mainQml.indexOf('onStatusChanged') >= 0 || mainQml.indexOf('Image {') >= 0 || mainQml.indexOf('Image{') >= 0
 
+        // Always wait for Qt.quit() signal (handles microtask-deferred signals like focus)
+        try {
+            await driver.wait(async () => {
+                return await driver.executeScript('return !!window.__jqmlQuit')
+            }, timeout)
+        } catch(e) {
+            // timeout - proceed anyway
+        }
+
         if (containTimer || containAsync) {
-            // Wait for Qt.quit() signal via DOM attribute or timeout
-            try {
-                await driver.wait(async () => {
-                    return await driver.executeScript('return !!window.__jqmlQuit')
-                }, timeout)
-            } catch(e) {
-                // timeout - proceed anyway
-            }
+            // Extra wait for async operations after Qt.quit()
+            await driver.sleep(200)
         }
 
         const logs = await driver.manage().logs().get('browser')

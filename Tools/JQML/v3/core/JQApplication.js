@@ -385,10 +385,32 @@ module.exports = {
     deleteObjects: [],
 
     focusTree: [],
+    pendingFocusTree: null,  // deferred during beginUpdate/endUpdate
     setFocusTree(tree){
+        // Qt semantics: during construction all siblings request focus, but FIRST wins.
+        // Use a microtask to batch focus requests; first one is kept.
+        if(this.pendingFocusTree === null){
+            this.pendingFocusTree = tree
+            Promise.resolve().then(()=>{
+                if(this.pendingFocusTree !== null){
+                    let t = this.pendingFocusTree
+                    this.pendingFocusTree = null
+                    this._applyFocusTree(t)
+                }
+            })
+        } else if(this.updateLayers.length === 0){
+            // Runtime focus change (outside construction): apply immediately
+            this.pendingFocusTree = null
+            this._applyFocusTree(tree)
+        }
+        // else: another item already pending in this batch — ignore (first wins)
+    },
+
+    _applyFocusTree(tree){
         let unionTree = []
-        while(this.focusTree.length || tree.length){
-            let origin = this.focusTree.pop()
+        let focusTree = this.focusTree
+        while(focusTree.length || tree.length){
+            let origin = focusTree.pop()
             let current = tree.pop()
 
             if(origin === current){
