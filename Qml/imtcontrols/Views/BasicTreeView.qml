@@ -1342,12 +1342,10 @@ Item {
 
     function checkItem(key) {
         setCheckState(key, Qt.Checked)
-        checkedItemsChanged()
     }
 
     function uncheckItem(key) {
         setCheckState(key, Qt.Unchecked)
-        checkedItemsChanged()
     }
 
     function getCheckedKeys() {
