@@ -25,6 +25,19 @@ class Model extends Node3D {
         geometry:        { type: QVar,    value: undefined, changed: '$sourceChanged' },
     }
 
+    constructor(parent, exCtx, exModel){
+        super(parent, exCtx, exModel)
+        // In compiled QML, materials can be assigned after the Model is created.
+        // Rebuild once at completion to ensure the final material is applied.
+        let done = this.getSignal && this.getSignal('Component.completed')
+        if(done){
+            done.connect(this, ()=>{
+                this.$rebuild()
+                if(this.$host3D) this.$host3D.$requestRender()
+            })
+        }
+    }
+
     $createObject3D(THREE){
         // Start with an empty Group; geometry/material are attached
         // asynchronously by $rebuild().
@@ -84,6 +97,11 @@ class Model extends Node3D {
 
     $buildMaterial(THREE){
         let mats = this.materials
+        // Compiler may emit a single material object for `materials: Material {}`
+        // even though the property is list-typed. Accept both forms.
+        if(mats && !Array.isArray(mats) && typeof mats.length === 'undefined'){
+            mats = [mats]
+        }
         if(mats && mats.length){
             let m = mats[0]
             if(m && typeof m.$build === 'function'){
