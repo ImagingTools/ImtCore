@@ -16,11 +16,12 @@ ElementView {
 
         FocusScope {
             width: root.contentWidth
-            height: filterInput.height + Style.marginM + checkableTree.height
+            height: filterInput.height + Style.marginM + Math.min(checkableTree.height, 350)
 
             SearchTextInput {
                 id: filterInput
 
+                anchors.top: parent.top
                 width: parent.width
                 placeHolderText: qsTr("Filter...")
 
@@ -34,6 +35,7 @@ ElementView {
 
                 anchors.top: filterInput.bottom
                 anchors.topMargin: Style.marginM
+                anchors.bottom: parent.bottom
                 width: parent.width
 
                 showHeader: false

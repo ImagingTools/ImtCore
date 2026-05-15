@@ -42,6 +42,8 @@ Item {
     property string filterText: ""
     property string filterRole: "text"
 
+    property int __hoveredRow: -1
+
     property string selectedBackgroundColor: Style.selectedColor
     property string hoveredBackgroundColor: Style.hover
     property string normalTextColor: Style.textColor
@@ -124,8 +126,6 @@ Item {
                     height: parent.height
 
                     color: root.headerBackgroundColor
-                    border.color: root.gridLineColor
-                    border.width: 1
 
                     Text {
                         anchors.fill: parent
@@ -269,13 +269,55 @@ Item {
             property bool nodeCheckable: model.checkable
             property bool nodeIsEnabled: model.nodeEnabled
             property string nodeText: model.text
+            property int nodeVisibleRow: model.index
 
             width: listView.width
             height: root.rowHeight
 
             Rectangle {
                 anchors.fill: parent
-                color: delegateRoot.nodeSelected ? root.selectedBackgroundColor : "transparent"
+                color: delegateRoot.nodeSelected ? root.selectedBackgroundColor : delegateRoot.nodeVisibleRow === root.__hoveredRow ? root.hoveredBackgroundColor : "transparent"
+            }
+
+            MouseArea {
+                id: rowMouseArea
+
+                anchors.fill: parent
+                hoverEnabled: true
+                acceptedButtons: Qt.LeftButton
+
+                onContainsMouseChanged: {
+                    root.__hoveredRow = containsMouse ? delegateRoot.nodeVisibleRow : -1
+                }
+
+                onClicked: {
+                    listView.forceActiveFocus()
+                    root.select(delegateRoot.nodeKey)
+
+                    var node = root.__nodes[delegateRoot.nodeKey]
+                    if (node) {
+                        var indexObject = root.createIndex(node)
+                        root.nodeClicked(indexObject)
+                    }
+                }
+
+                onDoubleClicked: {
+                    listView.forceActiveFocus()
+
+                    var node = root.__nodes[delegateRoot.nodeKey]
+                    if (!node)
+                        return
+
+                    var indexObject = root.createIndex(node)
+
+                    if (root.editable && root.editOnDoubleClick) {
+                        root.beginEditCell(delegateRoot.nodeKey, 0)
+                    } else if (delegateRoot.nodeHasChildren) {
+                        root.toggleExpanded(delegateRoot.nodeKey)
+                    }
+
+                    root.nodeDoubleClicked(indexObject)
+                }
             }
 
             Row {
@@ -290,65 +332,20 @@ Item {
 
                         property var column: root.columnAt(index)
                         property bool treeColumn: root.isTreeColumn(column, index)
-                        property bool editingThisCell: root.isEditingCell(delegateRoot.nodeKey, index)
-                        property string editorType: root.columnType(delegateRoot.nodeKey, column)
                         property var value: root.cellValue(delegateRoot.nodeKey, column)
+                        property string displayText: cellRoot.value !== undefined && cellRoot.value !== null ? String(cellRoot.value) : ""
 
                         width: root.columnWidth(column)
                         height: delegateRoot.height
 
-                        Rectangle {
-                            anchors.fill: parent
-                            color: cellMouseArea.containsMouse && !delegateRoot.nodeSelected ? root.selectedBackgroundColor : "transparent"
-                        }
-
-                        MouseArea {
-                            id: cellMouseArea
-
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            acceptedButtons: Qt.LeftButton
-
-                            onClicked: {
-                                listView.forceActiveFocus()
-                                root.select(delegateRoot.nodeKey)
-
-                                var node = root.__nodes[delegateRoot.nodeKey]
-                                if (node) {
-                                    var indexObject = root.createIndex(node)
-                                    root.nodeClicked(indexObject)
-                                    root.cellClicked(indexObject, cellRoot.column)
-                                }
-                            }
-
-                            onDoubleClicked: {
-                                listView.forceActiveFocus()
-
-                                var node = root.__nodes[delegateRoot.nodeKey]
-                                if (!node)
-                                    return
-
-                                var indexObject = root.createIndex(node)
-
-                                if (root.editable && root.editOnDoubleClick && root.isColumnEditable(cellRoot.column)) {
-                                    root.beginEditCell(delegateRoot.nodeKey, index)
-                                } else if (cellRoot.treeColumn) {
-                                    root.toggleExpanded(delegateRoot.nodeKey)
-                                }
-
-                                root.nodeDoubleClicked(indexObject)
-                                root.cellDoubleClicked(indexObject, cellRoot.column)
-                            }
-                        }
-
                         Row {
                             anchors.fill: parent
-                            anchors.leftMargin: cellRoot.treeColumn ? delegateRoot.nodeLevel * root.indentation : Style.marginM
+                            anchors.leftMargin: cellRoot.treeColumn ? delegateRoot.nodeLevel * root.indentation + Style.marginS : Style.marginM
                             anchors.rightMargin: Style.marginM
-                            spacing: Style.marginM
+                            spacing: 4
 
                             Item {
-                                width: cellRoot.treeColumn ? 18 : 0
+                                width: cellRoot.treeColumn ? 16 : 0
                                 height: parent.height
                                 visible: cellRoot.treeColumn
 
@@ -357,7 +354,7 @@ Item {
                                     visible: delegateRoot.nodeHasChildren
                                     text: delegateRoot.nodeExpanded ? "▼" : "▶"
                                     color: delegateRoot.nodeIsEnabled ? root.normalTextColor : root.disabledTextColor
-                                    font.pixelSize: Style.fontSizeM
+                                    font.pixelSize: 10
                                 }
 
                                 MouseArea {
@@ -371,33 +368,25 @@ Item {
                                 }
                             }
 
+                            CheckBox {
+                                visible: cellRoot.treeColumn && delegateRoot.nodeCheckable
+                                anchors.verticalCenter: parent.verticalCenter
+                                tristate: root.tristate
+                                checkState: delegateRoot.nodeChecked
+
+                                onClicked: {
+                                    root.toggleCheckState(delegateRoot.nodeKey)
+                                }
+                            }
+
                             Text {
                                 anchors.verticalCenter: parent.verticalCenter
                                 width: Math.max(0, parent.width - x)
-                                text: root.displayValue(cellRoot.value, cellRoot.column, delegateRoot.nodeKey)
+                                text: cellRoot.displayText
                                 color: !delegateRoot.nodeIsEnabled ? root.disabledTextColor : delegateRoot.nodeSelected ? root.selectedTextColor : root.normalTextColor
                                 horizontalAlignment: cellRoot.column && cellRoot.column.horizontalAlignment !== undefined ? cellRoot.column.horizontalAlignment : Text.AlignLeft
                                 elide: Text.ElideRight
                                 verticalAlignment: Text.AlignVCenter
-                            }
-
-                            CheckBox {
-                                anchors.verticalCenter: parent.verticalCenter
-                                tristate: root.tristate
-                                checkState: cellRoot.value === undefined || cellRoot.value === null ? Qt.Unchecked : cellRoot.value
-
-                                function nextCheckState(){
-                                    return checkState === Qt.Checked ? Qt.Unchecked : Qt.Checked
-                                }
-
-                                // onClicked: root.commitEdit(checkState)
-                                onVisibleChanged: {
-                                    if (visible) forceActiveFocus()
-                                }
-                                Keys.onEscapePressed: {
-                                    root.cancelEdit()
-                                    event.accepted = true
-                                }
                             }
                         }
                     }
@@ -658,7 +647,11 @@ Item {
         return ""
     }
 
-    function columnWidth(column) { return column && column.width !== undefined && column.width !== null ? column.width : 120 }
+    function columnWidth(column) {
+        if (columns.length <= 1)
+            return listView.width
+        return column && column.width !== undefined && column.width !== null ? column.width : 120
+    }
     function isTreeColumn(column, columnIndex) { return column && column.tree === true ? true : columnIndex === 0 && columns.length === 0 }
     function isColumnEditable(column) { return column && column.editable === true }
 
@@ -731,20 +724,8 @@ Item {
     }
 
     function displayValue(value, column, keyValue) {
-        console.log("displayValue", value, column, keyValue)
         if (value === undefined || value === null)
             return ""
-
-        var typeName = columnType(keyValue, column)
-        if (typeName === "bool")
-            return value ? "true" : "false"
-        if (typeName === "checkState") {
-            if (value === Qt.Checked)
-                return "checked"
-            if (value === Qt.PartiallyChecked)
-                return "partial"
-            return "unchecked"
-        }
         return String(value)
     }
 
