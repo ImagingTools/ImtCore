@@ -103,6 +103,7 @@ class ListModel extends QtObject {
             if(index < 0) {
                 this.__updateChangedSet([this.data.length, this.data.length + 1, 'append'])
                 this.data.__push(child)
+                this.count = this.data.length
             }
             
             
@@ -110,8 +111,6 @@ class ListModel extends QtObject {
     }
 
     append(dict){
-        JQApplication.updateLater(this)
-
         let changeSet
 
         if (Array.isArray(dict)) {
@@ -132,11 +131,10 @@ class ListModel extends QtObject {
 
         this.count = this.data.length
 
+        JQApplication.updateLater(this)
         this.__updateRepeaters([changeSet])
     }
     insert(index, dict){
-        JQApplication.updateLater(this)
-
         let changeSet
 
         if (Array.isArray(dict)) {
@@ -156,6 +154,7 @@ class ListModel extends QtObject {
 
         this.count = this.data.length
 
+        JQApplication.updateLater(this)
         this.__updateRepeaters([changeSet])
     }
 
@@ -172,8 +171,6 @@ class ListModel extends QtObject {
     }
 
     remove(index, count = 1){
-        JQApplication.updateLater(this)
-
         let changeSet = [index, index+count, 'remove']
 
         this.__updateChangedSet(changeSet)
@@ -191,6 +188,7 @@ class ListModel extends QtObject {
 
         this.count = this.data.length
 
+        JQApplication.updateLater(this)
         this.__updateRepeaters([changeSet])
     }
     get(index){

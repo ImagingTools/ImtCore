@@ -41,13 +41,15 @@ class Loader extends Item {
         super.__complete()
     }
 
-    'SLOT_Component.completed'(){
+    __updateProperties(){
+        super.__updateProperties()
         if(this.__lazyItem){
             this.item = this.__lazyItem
+            delete this.__lazyItem
             this.status = Loader.Ready
             this.loaded()
         }
-        
+        this.__propertiesUpdated = true
     }
 
     SLOT_itemChanged(oldValue, newValue){
@@ -97,15 +99,13 @@ class Loader extends Item {
             let item = this.sourceComponent.createObject(this, {}, true)
 
             if(item){
-                if(this.__completed){
+                if(this.__completed || this.__propertiesUpdated){
                     this.item = item
                     this.status = Loader.Ready
                     this.loaded()
                 } else {
                     this.__lazyItem = item
                 }
-                
-                
             } else {
                 this.item = null
                 this.status = Loader.Error
@@ -158,9 +158,8 @@ class Loader extends Item {
                     this.loaded()
                 } else {
                     this.__lazyItem = item
+                    this.status = Loader.Ready
                 }
-                
-                
             } else {
                 this.item = null
                 this.status = Loader.Error

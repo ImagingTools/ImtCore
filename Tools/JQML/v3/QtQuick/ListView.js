@@ -143,7 +143,7 @@ class ListView extends Flickable {
             newVlaue.__addViewListener(this)
         }
 
-        this.__initView(this.__completed)
+        this.__initView(true)
     }
 
     SLOT_delegateChanged() {
