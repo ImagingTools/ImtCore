@@ -461,6 +461,10 @@ module.exports = {
         }
     },
 
+    quit: function(){
+        this.isQuitting = true
+    },
+
     endUpdate: function(){
         let layer = this.updateLayers.pop()
         let initLayer = this.initLayers.pop()

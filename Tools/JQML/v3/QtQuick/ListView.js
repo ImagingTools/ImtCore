@@ -414,7 +414,6 @@ class ListView extends Flickable {
             if (Array.isArray(this.model)) {
                 length = this.model.length
             } else if (typeof this.model === 'object') {
-                if(this.model.count === this.count) return
                 length = this.model.count
             } else if (typeof this.model === 'number') {
                 length = this.model
@@ -452,6 +451,9 @@ class ListView extends Flickable {
 
     __updateChangedSet(changeSet) {
         this.__changeSet.push(changeSet)
+        if (this.model && typeof this.model === 'object') {
+            this.__self.count = this.model.count
+        }
     }
 
     __updateView() {

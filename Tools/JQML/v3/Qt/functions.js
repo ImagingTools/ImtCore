@@ -348,5 +348,9 @@ module.exports = {
         // if(cls && cls.isAssignableFrom && cls.isAssignableFrom(JQModules.QtBase.BaseObject)) return JQModules.QtQml.Component.create(null, {}, cls)
     },
 
+    quit: function(){
+        JQApplication.quit()
+    },
+
     get localStorage(){return global.localStorage},
 }
