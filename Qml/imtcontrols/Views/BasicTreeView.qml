@@ -1,4 +1,5 @@
 import QtQuick
+import Acf 1.0
 import imtcontrols 1.0
 
 Item {
@@ -41,13 +42,13 @@ Item {
     property string filterText: ""
     property string filterRole: "text"
 
-    property color selectedBackgroundColor: Style.selectedColor
-    property color hoveredBackgroundColor: Style.buttonHoverColor
-    property color normalTextColor: Style.textColor
-    property color selectedTextColor: Style.textColor
-    property color disabledTextColor: Style.inactiveTextColor
-    property color headerBackgroundColor: Style.backgroundColor
-    property color gridLineColor: Style.borderColor
+    property string selectedBackgroundColor: Style.selectedColor
+    property string hoveredBackgroundColor: Style.hover
+    property string normalTextColor: Style.textColor
+    property string selectedTextColor: Style.textSelectedColor
+    property string disabledTextColor: Style.inactiveTextColor
+    property string headerBackgroundColor: Style.backgroundColor
+    property string gridLineColor: Style.borderColor2
 
     property var currentIndex: null
 
@@ -123,6 +124,8 @@ Item {
                     height: parent.height
 
                     color: root.headerBackgroundColor
+                    border.color: root.gridLineColor
+                    border.width: 1
 
                     Text {
                         anchors.fill: parent
@@ -164,90 +167,90 @@ Item {
             delegate: treeRowDelegate
 
             Keys.onPressed: {
-                if (event.key === Qt.Key_F2) {
-                    if (root.currentIndex && root.currentIndex.key) {
-                        root.beginEditCell(root.currentIndex.key, 0)
-                        event.accepted = true
-                    }
-                    return
-                }
-
-                if (event.key === Qt.Key_Escape && root.editing) {
-                    root.cancelEdit()
-                    event.accepted = true
-                    return
-                }
-
-                if ((event.key === Qt.Key_Return || event.key === Qt.Key_Enter) && root.editing) {
-                    root.commitEdit()
-                    event.accepted = true
-                    return
-                }
-
-                if (event.key === Qt.Key_Down) {
-                    root.__navigateDown()
-                    event.accepted = true
-                    return
-                }
-
-                if (event.key === Qt.Key_Up) {
-                    root.__navigateUp()
-                    event.accepted = true
-                    return
-                }
-
-                if (event.key === Qt.Key_Right) {
-                    if (root.currentIndex && root.currentIndex.key) {
-                        var node = root.__nodes[root.currentIndex.key]
-                        if (node && node.childrenKeys.length > 0 && !node.expanded)
-                            root.expandNode(node.key)
-                        else
-                            root.__navigateDown()
-                    }
-                    event.accepted = true
-                    return
-                }
-
-                if (event.key === Qt.Key_Left) {
-                    if (root.currentIndex && root.currentIndex.key) {
-                        var n = root.__nodes[root.currentIndex.key]
-                        if (n && n.expanded && n.childrenKeys.length > 0)
-                            root.collapseNode(n.key)
-                        else if (n && n.parentKey !== "")
-                            root.selectAndEnsureVisible(n.parentKey)
-                    }
-                    event.accepted = true
-                    return
-                }
-
-                if (event.key === Qt.Key_Space) {
-                    if (root.currentIndex && root.currentIndex.key) {
-                        root.toggleCheckState(root.currentIndex.key)
-                    }
-                    event.accepted = true
-                    return
-                }
-
-                if (event.key === Qt.Key_Home) {
-                    if (root.__visibleKeys.length > 0)
-                        root.selectAndEnsureVisible(root.__visibleKeys[0])
-                    event.accepted = true
-                    return
-                }
-
-                if (event.key === Qt.Key_End) {
-                    if (root.__visibleKeys.length > 0)
-                        root.selectAndEnsureVisible(root.__visibleKeys[root.__visibleKeys.length - 1])
-                    event.accepted = true
-                    return
-                }
-
-                if (event.key === Qt.Key_Asterisk) {
-                    root.expandAll()
-                    event.accepted = true
-                    return
-                }
-            }
+                            if (event.key === Qt.Key_F2) {
+                                if (root.currentIndex && root.currentIndex.key) {
+                                    root.beginEditCell(root.currentIndex.key, 0)
+                                    event.accepted = true
+                                }
+                                return
+                            }
+            
+                            if (event.key === Qt.Key_Escape && root.editing) {
+                                root.cancelEdit()
+                                event.accepted = true
+                                return
+                            }
+            
+                            if ((event.key === Qt.Key_Return || event.key === Qt.Key_Enter) && root.editing) {
+                                root.commitEdit()
+                                event.accepted = true
+                                return
+                            }
+            
+                            if (event.key === Qt.Key_Down) {
+                                root.__navigateDown()
+                                event.accepted = true
+                                return
+                            }
+            
+                            if (event.key === Qt.Key_Up) {
+                                root.__navigateUp()
+                                event.accepted = true
+                                return
+                            }
+            
+                            if (event.key === Qt.Key_Right) {
+                                if (root.currentIndex && root.currentIndex.key) {
+                                    var node = root.__nodes[root.currentIndex.key]
+                                    if (node && node.childrenKeys.length > 0 && !node.expanded)
+                                        root.expandNode(node.key)
+                                    else
+                                        root.__navigateDown()
+                                }
+                                event.accepted = true
+                                return
+                            }
+            
+                            if (event.key === Qt.Key_Left) {
+                                if (root.currentIndex && root.currentIndex.key) {
+                                    var n = root.__nodes[root.currentIndex.key]
+                                    if (n && n.expanded && n.childrenKeys.length > 0)
+                                        root.collapseNode(n.key)
+                                    else if (n && n.parentKey !== "")
+                                        root.selectAndEnsureVisible(n.parentKey)
+                                }
+                                event.accepted = true
+                                return
+                            }
+            
+                            if (event.key === Qt.Key_Space) {
+                                if (root.currentIndex && root.currentIndex.key) {
+                                    root.toggleCheckState(root.currentIndex.key)
+                                }
+                                event.accepted = true
+                                return
+                            }
+            
+                            if (event.key === Qt.Key_Home) {
+                                if (root.__visibleKeys.length > 0)
+                                    root.selectAndEnsureVisible(root.__visibleKeys[0])
+                                event.accepted = true
+                                return
+                            }
+            
+                            if (event.key === Qt.Key_End) {
+                                if (root.__visibleKeys.length > 0)
+                                    root.selectAndEnsureVisible(root.__visibleKeys[root.__visibleKeys.length - 1])
+                                event.accepted = true
+                                return
+                            }
+            
+                            if (event.key === Qt.Key_Asterisk) {
+                                root.expandAll()
+                                event.accepted = true
+                                return
+                            }
+                        }
         }
     }
 
@@ -267,7 +270,7 @@ Item {
             property bool nodeIsEnabled: model.nodeEnabled
             property string nodeText: model.text
 
-            width: ListView.view.width
+            width: listView.width
             height: root.rowHeight
 
             Rectangle {
@@ -290,14 +293,13 @@ Item {
                         property bool editingThisCell: root.isEditingCell(delegateRoot.nodeKey, index)
                         property string editorType: root.columnType(delegateRoot.nodeKey, column)
                         property var value: root.cellValue(delegateRoot.nodeKey, column)
-                        property string displayText: cellRoot.value !== undefined && cellRoot.value !== null ? String(cellRoot.value) : ""
 
                         width: root.columnWidth(column)
                         height: delegateRoot.height
 
                         Rectangle {
                             anchors.fill: parent
-                            color: cellMouseArea.containsMouse && !delegateRoot.nodeSelected ? root.hoveredBackgroundColor : "transparent"
+                            color: cellMouseArea.containsMouse && !delegateRoot.nodeSelected ? root.selectedBackgroundColor : "transparent"
                         }
 
                         MouseArea {
@@ -341,9 +343,9 @@ Item {
 
                         Row {
                             anchors.fill: parent
-                            anchors.leftMargin: cellRoot.treeColumn ? delegateRoot.nodeLevel * root.indentation : 6
-                            anchors.rightMargin: 6
-                            spacing: 6
+                            anchors.leftMargin: cellRoot.treeColumn ? delegateRoot.nodeLevel * root.indentation : Style.marginM
+                            anchors.rightMargin: Style.marginM
+                            spacing: Style.marginM
 
                             Item {
                                 width: cellRoot.treeColumn ? 18 : 0
@@ -355,7 +357,7 @@ Item {
                                     visible: delegateRoot.nodeHasChildren
                                     text: delegateRoot.nodeExpanded ? "▼" : "▶"
                                     color: delegateRoot.nodeIsEnabled ? root.normalTextColor : root.disabledTextColor
-                                    font.pixelSize: 12
+                                    font.pixelSize: Style.fontSizeM
                                 }
 
                                 MouseArea {
@@ -369,95 +371,19 @@ Item {
                                 }
                             }
 
-                            CheckBox {
-                                anchors.verticalCenter: parent.verticalCenter
-                                visible: !cellRoot.editingThisCell && cellRoot.editorType === "checkState"
-                                isActive: false
-                                tristate: true
-                                checkState: cellRoot.value === undefined || cellRoot.value === null ? Qt.Unchecked : cellRoot.value
-                            }
-
-                            // CheckBox {
-                            //     anchors.verticalCenter: parent.verticalCenter
-                            //     visible: !cellRoot.editingThisCell && cellRoot.editorType === "bool"
-                            //     enabled: false
-                            //     checked: cellRoot.value === true
-                            // }
-
                             Text {
                                 anchors.verticalCenter: parent.verticalCenter
                                 width: Math.max(0, parent.width - x)
-                                text: cellRoot.displayText
+                                text: root.displayValue(cellRoot.value, cellRoot.column, delegateRoot.nodeKey)
                                 color: !delegateRoot.nodeIsEnabled ? root.disabledTextColor : delegateRoot.nodeSelected ? root.selectedTextColor : root.normalTextColor
                                 horizontalAlignment: cellRoot.column && cellRoot.column.horizontalAlignment !== undefined ? cellRoot.column.horizontalAlignment : Text.AlignLeft
                                 elide: Text.ElideRight
                                 verticalAlignment: Text.AlignVCenter
                             }
 
-                            CustomTextField {
-                                anchors.verticalCenter: parent.verticalCenter
-                                visible: cellRoot.editingThisCell && cellRoot.editorType === "string"
-                                width: Math.max(40, parent.width - x)
-                                height: Math.max(root.rowHeight - 4, 20)
-                                text: visible ? String(cellRoot.value !== undefined && cellRoot.value !== null ? cellRoot.value : "") : ""
-                                // selectByMouse: true
-
-                                onVisibleChanged: {
-                                    if (visible) {
-                                        forceActiveFocus()
-                                        selectAll()
-                                    }
-                                }
-
-                                onAccepted: root.commitEdit(text)
-                                onActiveFocusChanged: if (!activeFocus && cellRoot.editingThisCell) root.commitEdit(text)
-                                Keys.onEscapePressed: {
-                                    root.cancelEdit()
-                                    event.accepted = true
-                                }
-                            }
-
-                            CustomTextField {
-                                anchors.verticalCenter: parent.verticalCenter
-                                visible: cellRoot.editingThisCell && cellRoot.editorType === "number"
-                                width: Math.max(40, parent.width - x)
-                                height: Math.max(root.rowHeight - 4, 20)
-                                text: visible ? String(cellRoot.value !== undefined && cellRoot.value !== null ? cellRoot.value : 0) : ""
-                                // selectByMouse: true
-                                // validator: DoubleValidator {}
-
-                                onVisibleChanged: {
-                                    if (visible) {
-                                        forceActiveFocus()
-                                        selectAll()
-                                    }
-                                }
-
-                                onAccepted: root.commitEdit(Number(text))
-                                onActiveFocusChanged: if (!activeFocus && cellRoot.editingThisCell) root.commitEdit(Number(text))
-                                Keys.onEscapePressed: {
-                                    root.cancelEdit()
-                                    event.accepted = true
-                                }
-                            }
-
-                            // QQC2.CheckBox {
-                            //     anchors.verticalCenter: parent.verticalCenter
-                            //     visible: cellRoot.editingThisCell && cellRoot.editorType === "bool"
-                            //     checked: cellRoot.value === true
-
-                            //     onClicked: root.commitEdit(checked)
-                            //     onVisibleChanged: if (visible) forceActiveFocus()
-                            //     Keys.onEscapePressed: {
-                            //         root.cancelEdit()
-                            //         event.accepted = true
-                            //     }
-                            // }
-
                             CheckBox {
                                 anchors.verticalCenter: parent.verticalCenter
-                                visible: cellRoot.editingThisCell && cellRoot.editorType === "checkState"
-                                tristate: true
+                                tristate: root.tristate
                                 checkState: cellRoot.value === undefined || cellRoot.value === null ? Qt.Unchecked : cellRoot.value
 
                                 function nextCheckState(){
@@ -465,22 +391,9 @@ Item {
                                 }
 
                                 // onClicked: root.commitEdit(checkState)
-                                onVisibleChanged: if (visible) forceActiveFocus()
-                                Keys.onEscapePressed: {
-                                    root.cancelEdit()
-                                    event.accepted = true
+                                onVisibleChanged: {
+                                    if (visible) forceActiveFocus()
                                 }
-                            }
-
-                            ComboBox {
-                                anchors.verticalCenter: parent.verticalCenter
-                                visible: cellRoot.editingThisCell && cellRoot.editorType === "combo"
-                                width: Math.max(80, parent.width - x)
-                                model: cellRoot.column && cellRoot.column.options !== undefined ? cellRoot.column.options : []
-                                currentIndex: root.comboIndexOf(cellRoot.column ? cellRoot.column.options : [], cellRoot.value)
-
-                                onActivated: root.commitEdit(model[index])
-                                onVisibleChanged: if (visible) forceActiveFocus()
                                 Keys.onEscapePressed: {
                                     root.cancelEdit()
                                     event.accepted = true
@@ -817,6 +730,24 @@ Item {
             syncVisibleAncestors(node)
     }
 
+    function displayValue(value, column, keyValue) {
+        console.log("displayValue", value, column, keyValue)
+        if (value === undefined || value === null)
+            return ""
+
+        var typeName = columnType(keyValue, column)
+        if (typeName === "bool")
+            return value ? "true" : "false"
+        if (typeName === "checkState") {
+            if (value === Qt.Checked)
+                return "checked"
+            if (value === Qt.PartiallyChecked)
+                return "partial"
+            return "unchecked"
+        }
+        return String(value)
+    }
+
     function valueByPath(object, path) {
         if (!object || !path || path.length <= 0)
             return undefined
@@ -1123,16 +1054,16 @@ Item {
         if (!node || node.parentKey === "")
             return
 
-        var parent = __nodes[node.parentKey]
-        if (!parent)
+        var parentNode = __nodes[node.parentKey]
+        if (!parentNode)
             return
 
         var hasParticipatingChild = false
         var allChecked = true
         var allUnchecked = true
 
-        for (var i = 0; i < parent.childrenKeys.length; ++i) {
-            var child = __nodes[parent.childrenKeys[i]]
+        for (var i = 0; i < parentNode.childrenKeys.length; ++i) {
+            var child = __nodes[parentNode.childrenKeys[i]]
             if (!shouldParticipateInCheck(child))
                 continue
             hasParticipatingChild = true
@@ -1142,12 +1073,12 @@ Item {
                 allUnchecked = false
         }
 
-        if (hasParticipatingChild && shouldParticipateInCheck(parent)) {
-            parent.checked = allChecked ? Qt.Checked : allUnchecked ? Qt.Unchecked : Qt.PartiallyChecked
-            writeBackNode(parent)
+        if (hasParticipatingChild && shouldParticipateInCheck(parentNode)) {
+            parentNode.checked = allChecked ? Qt.Checked : allUnchecked ? Qt.Unchecked : Qt.PartiallyChecked
+            writeBackNode(parentNode)
         }
 
-        propagateUp(parent)
+        propagateUp(parentNode)
     }
 
     function isEditingCell(keyValue, columnIndex) { return __editingKey === keyValue && __editingColumn === columnIndex }
@@ -1347,9 +1278,9 @@ Item {
         }
 
         for (var i = 0; i < parents.length; ++i) {
-            var parent = __nodes[parents[i]]
-            if (parent && !parent.expanded)
-                expandNode(parent.key)
+            var parentNode = __nodes[parents[i]]
+            if (parentNode && !parentNode.expanded)
+                expandNode(parentNode.key)
         }
     }
 
@@ -1366,32 +1297,6 @@ Item {
 
     function rebuild() {
         rebuildTreePreservingState()
-    }
-
-    function __navigateDown() {
-        if (__visibleKeys.length === 0)
-            return
-        if (!currentIndex || !currentIndex.key) {
-            selectAndEnsureVisible(__visibleKeys[0])
-            return
-        }
-        var row = visibleRowOf(currentIndex.key)
-        if (row < 0 || row >= __visibleKeys.length - 1)
-            return
-        selectAndEnsureVisible(__visibleKeys[row + 1])
-    }
-
-    function __navigateUp() {
-        if (__visibleKeys.length === 0)
-            return
-        if (!currentIndex || !currentIndex.key) {
-            selectAndEnsureVisible(__visibleKeys[0])
-            return
-        }
-        var row = visibleRowOf(currentIndex.key)
-        if (row <= 0)
-            return
-        selectAndEnsureVisible(__visibleKeys[row - 1])
     }
 
     // --- Convenience API for checkable trees ---
@@ -1460,6 +1365,32 @@ Item {
                 result.push(createIndex(node))
         }
         return result
+    }
+    
+    function __navigateDown() {
+        if (__visibleKeys.length === 0)
+            return
+        if (!currentIndex || !currentIndex.key) {
+            selectAndEnsureVisible(__visibleKeys[0])
+            return
+        }
+        var row = visibleRowOf(currentIndex.key)
+        if (row < 0 || row >= __visibleKeys.length - 1)
+            return
+        selectAndEnsureVisible(__visibleKeys[row + 1])
+    }
+
+    function __navigateUp() {
+        if (__visibleKeys.length === 0)
+            return
+        if (!currentIndex || !currentIndex.key) {
+            selectAndEnsureVisible(__visibleKeys[0])
+            return
+        }
+        var row = visibleRowOf(currentIndex.key)
+        if (row <= 0)
+            return
+        selectAndEnsureVisible(__visibleKeys[row - 1])
     }
 
     onModelChanged: {

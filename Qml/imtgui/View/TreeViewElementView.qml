@@ -37,6 +37,7 @@ ElementView {
                 width: parent.width
 
                 showHeader: false
+                tristate: true
 
                 Component.onCompleted: root.treeView = checkableTree
             }
