@@ -323,6 +323,22 @@ class ListView extends Flickable {
                         if(toItem.model instanceof QModelData) toItem.model = fromModel
                     }
                 }
+                if(roles === 'update'){
+                    let data = model.getPropertyValue('data')
+                    for(let i = leftTop; i < bottomRight; i++){
+                        let item = this.$items[i]
+                        if(item && data[i]){
+                            item.getStatement('model').reset(data[i])
+                            item.getStatement('model_').reset(data[i])
+                        }
+                    }
+                }
+                if(roles === 'reset'){
+                    for(let i = 0; i < this.$items.length; i++){
+                        if(this.$items[i]) this.$toCache(this.$items[i])
+                    }
+                    this.$items = []
+                }
             }
 
             if(countChanged && this.getProperty('count').notify){
@@ -424,10 +440,21 @@ class ListView extends Flickable {
     }
 
     $updateView(){
-        if(!this.getPropertyValue('delegate') || this.getPropertyValue('model') === undefined || this.getPropertyValue('model') === null) return
+        if(this.$inUpdateView) {
+            this.$pendingUpdateView = true
+            return
+        }
+        this.$inUpdateView = true
+        this.$pendingUpdateView = false
+
+        if(!this.getPropertyValue('delegate') || this.getPropertyValue('model') === undefined || this.getPropertyValue('model') === null) {
+            this.$inUpdateView = false
+            return
+        }
 
         if(!this.$ready && !this.$properties.model.$isReset){
             this.$needUpdate = true
+            this.$inUpdateView = false
             return
         }
         
@@ -440,10 +467,12 @@ class ListView extends Flickable {
         } else if(typeof model === 'number'){
             length = model
         } else {
+            this.$inUpdateView = false
             return
         }
 
         if(length === 0) {
+            this.$inUpdateView = false
             return
         }
 
@@ -517,6 +546,9 @@ class ListView extends Flickable {
                 }
             }
 
+            if(approximateMiddleIndex >= length) approximateMiddleIndex = length - 1
+            if(approximateMiddleIndex < 0) approximateMiddleIndex = 0
+
             for(let i = approximateMiddleIndex; i >= 0; i--){
                 let info = this.$getItemInfo(i)
                 if(info.inner){
@@ -540,10 +572,18 @@ class ListView extends Flickable {
             }
 
         }
+
+        this.$inUpdateView = false
+        if(this.$pendingUpdateView) {
+            this.$pendingUpdateView = false
+            this.$updateView()
+        }
     }
 
     $updateGeometry(){
         if(!this.$items.length) {
+            this.middleWidth = 0
+            this.middleHeight = 0
             return
         }
 

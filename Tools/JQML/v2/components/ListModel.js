@@ -27,7 +27,6 @@ class ListModel extends QtObject {
     }
 
     addData(data){
-        // this.getPropertyValue('data').push(data)
     }
 
     $dataChanged(topLeft, bottomRight, roles){
@@ -62,8 +61,10 @@ class ListModel extends QtObject {
         resource.getStatement('index').reset(this.getStatement('data').get().length)
         let obj = resource
         
-        if(resource instanceof ListElement)
-        this.getStatement('data').get().push(obj)
+        if(resource instanceof ListElement){
+            this.getStatement('data').get().push(obj)
+            this.getStatement('count').reset(this.getStatement('data').get().length)
+        }
     }
     
     append(dict){
@@ -90,6 +91,16 @@ class ListModel extends QtObject {
         this.getStatement('count').reset(0)
         this.$emitDataChanged(leftTop, rightBottom, 'remove')
     }
+    replaceAll(items){
+        if(!Array.isArray(items)) items = []
+        let newData = []
+        for(let i = 0; i < items.length; i++){
+            newData.push(new QModelData(this, items[i], i))
+        }
+        this.getStatement('data').value = newData
+        this.getStatement('count').reset(newData.length)
+        this.$emitDataChanged(0, newData.length, 'reset')
+    }
     get(index){
         return index >= 0 && index < this.getStatement('data').get().length ? this.getStatement('data').get()[index] : undefined
     }
@@ -115,10 +126,23 @@ class ListModel extends QtObject {
         this.$emitDataChanged(index, index+1, 'insert')
     }
     set(index, dict){
-        this.getStatement('data').get()[index] = dict
-        this.getStatement('count').reset(this.getStatement('data').get().length)
-        // this.$notify()
-        // this.dataChanged(index)
+        let data = this.getStatement('data').get()
+        let existing = data[index]
+        // If the existing element is a QModelData proxy, update its properties
+        // in-place to preserve reactive subscriptions from delegate bindings.
+        if (existing && existing.$lock !== undefined) {
+            existing.$lock = true
+            for (let key in dict) {
+                if (key !== '$lock' && key !== 'index') {
+                    existing[key] = dict[key]
+                }
+            }
+            existing.$lock = false
+        } else {
+            data[index] = new QModelData(this, dict, index)
+        }
+        this.getStatement('count').reset(data.length)
+        this.$emitDataChanged(index, index + 1, 'update')
     }
     move(from, to, n = 1){
         let data = this.getStatement('data').get()
@@ -147,9 +171,7 @@ class ListModel extends QtObject {
     setProperty(index, property, value){
         this.getStatement('data').get()[index][property] = value
         this.getStatement('count').reset(this.getStatement('data').get().length)
-
-        // this.dataChanged(index)
-        // this.$notify()
+        this.$emitDataChanged(index, index + 1, 'update')
     }
 
     $notify(){

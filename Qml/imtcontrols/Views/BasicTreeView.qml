@@ -175,90 +175,90 @@ Item {
             delegate: treeRowDelegate
 
             Keys.onPressed: {
-                            if (event.key === Qt.Key_F2) {
-                                if (root.currentIndex && root.currentIndex.key) {
-                                    root.beginEditCell(root.currentIndex.key, 0)
-                                    event.accepted = true
-                                }
-                                return
-                            }
-            
-                            if (event.key === Qt.Key_Escape && root.editing) {
-                                root.cancelEdit()
-                                event.accepted = true
-                                return
-                            }
-            
-                            if ((event.key === Qt.Key_Return || event.key === Qt.Key_Enter) && root.editing) {
-                                root.commitEdit()
-                                event.accepted = true
-                                return
-                            }
-            
-                            if (event.key === Qt.Key_Down) {
-                                root.__navigateDown()
-                                event.accepted = true
-                                return
-                            }
-            
-                            if (event.key === Qt.Key_Up) {
-                                root.__navigateUp()
-                                event.accepted = true
-                                return
-                            }
-            
-                            if (event.key === Qt.Key_Right) {
-                                if (root.currentIndex && root.currentIndex.key) {
-                                    var node = root.__nodes[root.currentIndex.key]
-                                    if (node && node.childrenKeys.length > 0 && !node.expanded)
-                                        root.expandNode(node.key)
-                                    else
-                                        root.__navigateDown()
-                                }
-                                event.accepted = true
-                                return
-                            }
-            
-                            if (event.key === Qt.Key_Left) {
-                                if (root.currentIndex && root.currentIndex.key) {
-                                    var n = root.__nodes[root.currentIndex.key]
-                                    if (n && n.expanded && n.childrenKeys.length > 0)
-                                        root.collapseNode(n.key)
-                                    else if (n && n.parentKey !== "")
-                                        root.selectAndEnsureVisible(n.parentKey)
-                                }
-                                event.accepted = true
-                                return
-                            }
-            
-                            if (event.key === Qt.Key_Space) {
-                                if (root.currentIndex && root.currentIndex.key) {
-                                    root.toggleCheckState(root.currentIndex.key)
-                                }
-                                event.accepted = true
-                                return
-                            }
-            
-                            if (event.key === Qt.Key_Home) {
-                                if (root.__visibleKeys.length > 0)
-                                    root.selectAndEnsureVisible(root.__visibleKeys[0])
-                                event.accepted = true
-                                return
-                            }
-            
-                            if (event.key === Qt.Key_End) {
-                                if (root.__visibleKeys.length > 0)
-                                    root.selectAndEnsureVisible(root.__visibleKeys[root.__visibleKeys.length - 1])
-                                event.accepted = true
-                                return
-                            }
-            
-                            if (event.key === Qt.Key_Asterisk) {
-                                root.expandAll()
-                                event.accepted = true
-                                return
-                            }
-                        }
+                if (event.key === Qt.Key_F2) {
+                    if (root.currentIndex && root.currentIndex.key) {
+                        root.beginEditCell(root.currentIndex.key, 0)
+                        event.accepted = true
+                    }
+                    return
+                }
+                
+                if (event.key === Qt.Key_Escape && root.editing) {
+                    root.cancelEdit()
+                    event.accepted = true
+                    return
+                }
+                
+                if ((event.key === Qt.Key_Return || event.key === Qt.Key_Enter) && root.editing) {
+                    root.commitEdit()
+                    event.accepted = true
+                    return
+                }
+                
+                if (event.key === Qt.Key_Down) {
+                    root.__navigateDown()
+                    event.accepted = true
+                    return
+                }
+                
+                if (event.key === Qt.Key_Up) {
+                    root.__navigateUp()
+                    event.accepted = true
+                    return
+                }
+                
+                if (event.key === Qt.Key_Right) {
+                    if (root.currentIndex && root.currentIndex.key) {
+                        var node = root.__nodes[root.currentIndex.key]
+                        if (node && node.childrenKeys.length > 0 && !node.expanded)
+                            root.expandNode(node.key)
+                        else
+                            root.__navigateDown()
+                    }
+                    event.accepted = true
+                    return
+                }
+                
+                if (event.key === Qt.Key_Left) {
+                    if (root.currentIndex && root.currentIndex.key) {
+                        var n = root.__nodes[root.currentIndex.key]
+                        if (n && n.expanded && n.childrenKeys.length > 0)
+                            root.collapseNode(n.key)
+                        else if (n && n.parentKey !== "")
+                            root.selectAndEnsureVisible(n.parentKey)
+                    }
+                    event.accepted = true
+                    return
+                }
+                
+                if (event.key === Qt.Key_Space) {
+                    if (root.currentIndex && root.currentIndex.key) {
+                        root.toggleCheckState(root.currentIndex.key)
+                    }
+                    event.accepted = true
+                    return
+                }
+                
+                if (event.key === Qt.Key_Home) {
+                    if (root.__visibleKeys.length > 0)
+                        root.selectAndEnsureVisible(root.__visibleKeys[0])
+                    event.accepted = true
+                    return
+                }
+                
+                if (event.key === Qt.Key_End) {
+                    if (root.__visibleKeys.length > 0)
+                        root.selectAndEnsureVisible(root.__visibleKeys[root.__visibleKeys.length - 1])
+                    event.accepted = true
+                    return
+                }
+                
+                if (event.key === Qt.Key_Asterisk) {
+                    root.expandAll()
+                    event.accepted = true
+                    return
+                }
+            }
         }
     }
 
@@ -271,6 +271,7 @@ Item {
             property string nodeKey: model.key
             property int nodeLevel: model.level
             property bool nodeExpanded: model.expanded
+
             property bool nodeHasChildren: model.hasChildren
             property bool nodeSelected: model.selected
             property int nodeChecked: model.checked
@@ -514,7 +515,7 @@ Item {
         // then pre-order append of marked nodes
         var matchMap = {}
 
-        function markMatches(nodeKey) {
+        let markMatches = function(nodeKey) {
             var node = __nodes[nodeKey]
             if (!node)
                 return false
@@ -536,7 +537,7 @@ Item {
         for (var r = 0; r < __rootKeys.length; ++r)
             markMatches(__rootKeys[r])
 
-        function appendMarked(nodeKey) {
+        let appendMarked = function(nodeKey) {
             if (!matchMap[nodeKey])
                 return
             var node = __nodes[nodeKey]
