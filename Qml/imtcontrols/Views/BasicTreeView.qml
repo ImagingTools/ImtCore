@@ -41,6 +41,7 @@ Item {
 
     property string filterText: ""
     property string filterRole: "text"
+    property int filterDebounceInterval: 120
 
     property int __hoveredRow: -1
 
@@ -89,7 +90,7 @@ Item {
 
     Timer {
         id: filterDebounceTimer
-        interval: 120
+        interval: root.filterDebounceInterval
         repeat: false
         onTriggered: root.buildVisibleTree()
     }
@@ -511,7 +512,7 @@ Item {
     function buildFilteredVisible(ft) {
         // Single DFS pass: post-order traversal marks subtrees that match,
         // then pre-order append of marked nodes
-        var matchMap = ({})
+        var matchMap = {}
 
         function markMatches(nodeKey) {
             var node = __nodes[nodeKey]
