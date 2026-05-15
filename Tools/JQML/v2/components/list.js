@@ -79,6 +79,7 @@ module.exports.listComponents = [
     'TreeView',
     'TableModel',
     'TableModelColumn',
+    'ModelIndex',
     'ItemSelectionModel',
     'SelectionRectangle',
     'HorizontalHeaderView',

@@ -753,6 +753,8 @@ DocumentViewBase {
 						return (children && (children.count || 0) > 0) ? children : null
 					}
 				)
+				console.log("allPermsModel", allPermsModel.toJson())
+				console.log("nodes", JSON.stringify(nodes))
 				tenantPermissionsTreeView.treeView.model = nodes
 
 				// Restore checked state from selected permissions (leaf nodes only)

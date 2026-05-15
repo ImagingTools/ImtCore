@@ -98,6 +98,10 @@ Item {
         property int horizontalAlignment: Text.AlignLeft
     }
 
+    onModelChanged: {
+        
+    }
+
     ListModel {
         id: visibleModel
     }
@@ -204,6 +208,10 @@ Item {
 
             width: ListView.view.width
             height: root.rowHeight
+            
+            Component.onCompleted: {
+                console.log("delegateRoot onCompleted", nodeKey, nodeText)
+            }
 
             Rectangle {
                 anchors.fill: parent
