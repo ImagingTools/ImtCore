@@ -1,0 +1,6 @@
+{
+    "includes": [
+        "./config/generated_modules.json"
+    ],
+    "dirs": []
+}
