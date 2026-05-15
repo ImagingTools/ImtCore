@@ -6,7 +6,8 @@ module.exports = {
         path: path.resolve(__dirname, 'core/dist'),
     },
     externals: {
-        'three': 'three',
-        'three/examples/jsm/loaders/GLTFLoader.js': 'three/examples/jsm/loaders/GLTFLoader.js',
+        // three.js UMD bundle exposes the global as window.THREE (upper-case)
+        'three': 'THREE',
+        'three/examples/jsm/loaders/GLTFLoader.js': 'THREE_GLTFLoader',
     },
 }
