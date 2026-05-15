@@ -5,7 +5,11 @@ const Signal = require("../../QtQml/Signal")
 
 class Switch extends AbstractButton {
     static meta = Object.assign({}, AbstractButton.meta, {
-
+        position: { type: Real, value: 0 },
+        visualPosition: { type: Real, value: 0 },
+        
+        positionChanged: { type: Signal, args: [] },
+        visualPositionChanged: { type: Signal, args: [] }
     })
 
     static create(parent = null, properties = {}){

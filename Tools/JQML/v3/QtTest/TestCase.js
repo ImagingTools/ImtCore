@@ -3,6 +3,7 @@ const Bool = require("../QtQml/Bool")
 const Int = require("../QtQml/Int")
 const String = require("../QtQml/String")
 const Signal = require("../QtQml/Signal")
+const QtEnums = require("../Qt/enums")
 
 class TestFailError extends Error {}
 class TestSkipError extends Error {}
@@ -283,8 +284,281 @@ class TestCase extends Item {
         return false
     }
 
-}
+    __mouseDomButton(button = QtEnums.LeftButton){
+        if(button === QtEnums.RightButton) return 2
+        if(button === QtEnums.MiddleButton) return 1
+        return 0
+    }
 
+    __mouseDomButtons(buttons = QtEnums.NoButton){
+        let value = Number(buttons)
+        return Number.isFinite(value) ? value : QtEnums.NoButton
+    }
+
+    __mousePoint(item, x, y){
+        if(!item || typeof item.__getDOM !== 'function'){
+            this.__assertFailed('mouse event target should be an Item-like object')
+            return null
+        }
+
+        let dom = item.__getDOM()
+        if(!dom || typeof dom.getBoundingClientRect !== 'function'){
+            this.__assertFailed('mouse event target has no DOM representation')
+            return null
+        }
+
+        let rect = dom.getBoundingClientRect()
+        let localX = x === undefined || x === null ? rect.width / 2 : Number(x)
+        let localY = y === undefined || y === null ? rect.height / 2 : Number(y)
+
+        if(!Number.isFinite(localX) || !Number.isFinite(localY)){
+            this.__assertFailed('mouse coordinates should be finite numbers')
+            return null
+        }
+
+        let pageX = rect.left + localX + (window.scrollX || 0)
+        let pageY = rect.top + localY + (window.scrollY || 0)
+
+        return {
+            pageX,
+            pageY,
+        }
+    }
+
+    __dispatchMouseEvent(type, point, button = QtEnums.LeftButton, buttons = QtEnums.NoButton, modifiers = QtEnums.NoModifier){
+        if(typeof window === 'undefined' || typeof window.dispatchEvent !== 'function') return false
+
+        let shiftKey = !!(modifiers & QtEnums.ShiftModifier)
+        let ctrlKey = !!(modifiers & QtEnums.ControlModifier)
+        let altKey = !!(modifiers & QtEnums.AltModifier)
+        let metaKey = !!(modifiers & QtEnums.MetaModifier)
+
+        let event = new MouseEvent(type, {
+            bubbles: true,
+            cancelable: true,
+            clientX: point.pageX - (window.scrollX || 0),
+            clientY: point.pageY - (window.scrollY || 0),
+            screenX: point.pageX,
+            screenY: point.pageY,
+            button: this.__mouseDomButton(button),
+            buttons: this.__mouseDomButtons(buttons),
+            shiftKey,
+            ctrlKey,
+            altKey,
+            metaKey,
+        })
+
+        window.dispatchEvent(event)
+        return true
+    }
+
+    mouseMove(item, x, y, delay = 0, modifiers = QtEnums.NoModifier){
+        let point = this.__mousePoint(item, x, y)
+        if(!point) return false
+
+        if(delay > 0) {
+            console.warn('[TestCase] mouseMove delay is ignored in web runtime')
+        }
+
+        return this.__dispatchMouseEvent('mousemove', point, QtEnums.NoButton, QtEnums.NoButton, modifiers)
+    }
+
+    mousePress(item, x, y, button = QtEnums.LeftButton, modifiers = QtEnums.NoModifier, delay = 0){
+        let point = this.__mousePoint(item, x, y)
+        if(!point) return false
+
+        if(delay > 0) {
+            console.warn('[TestCase] mousePress delay is ignored in web runtime')
+        }
+
+        this.__dispatchMouseEvent('mousemove', point, button, button, modifiers)
+        return this.__dispatchMouseEvent('mousedown', point, button, button, modifiers)
+    }
+
+    mouseRelease(item, x, y, button = QtEnums.LeftButton, modifiers = QtEnums.NoModifier, delay = 0){
+        let point = this.__mousePoint(item, x, y)
+        if(!point) return false
+
+        if(delay > 0) {
+            console.warn('[TestCase] mouseRelease delay is ignored in web runtime')
+        }
+
+        this.__dispatchMouseEvent('mousemove', point, button, button, modifiers)
+        return this.__dispatchMouseEvent('mouseup', point, button, QtEnums.NoButton, modifiers)
+    }
+
+    mouseClick(item, x, y, button = QtEnums.LeftButton, modifiers = QtEnums.NoModifier, delay = 0){
+        let point = this.__mousePoint(item, x, y)
+        if(!point) return false
+
+        if(delay > 0) {
+            console.warn('[TestCase] mouseClick delay is ignored in web runtime')
+        }
+
+        this.__dispatchMouseEvent('mousemove', point, button, button, modifiers)
+        this.__dispatchMouseEvent('mousedown', point, button, button, modifiers)
+        this.__dispatchMouseEvent('mouseup', point, button, QtEnums.NoButton, modifiers)
+        return this.__dispatchMouseEvent('click', point, button, QtEnums.NoButton, modifiers)
+    }
+
+    mouseWheel(item, x, y, dx = 0, dy = 0, modifiers = QtEnums.NoModifier){
+        let point = this.__mousePoint(item, x, y)
+        if(!point) return false
+
+        if(typeof window === 'undefined' || typeof window.dispatchEvent !== 'function') return false
+
+        let shiftKey = !!(modifiers & QtEnums.ShiftModifier)
+        let ctrlKey = !!(modifiers & QtEnums.ControlModifier)
+        let altKey = !!(modifiers & QtEnums.AltModifier)
+        let metaKey = !!(modifiers & QtEnums.MetaModifier)
+
+        let event = new WheelEvent('wheel', {
+            bubbles: true,
+            cancelable: true,
+            clientX: point.pageX - (window.scrollX || 0),
+            clientY: point.pageY - (window.scrollY || 0),
+            screenX: point.pageX,
+            screenY: point.pageY,
+            deltaX: (dx || 0) * 8,
+            deltaY: (dy || 0) * 8,
+            deltaMode: 0,
+            shiftKey,
+            ctrlKey,
+            altKey,
+            metaKey,
+        })
+
+        window.dispatchEvent(event)
+        return true
+    }
+
+    mouseDoubleClick(item, x, y, button = QtEnums.LeftButton, modifiers = QtEnums.NoModifier, delay = 0){
+        let point = this.__mousePoint(item, x, y)
+        if(!point) return false
+
+        if(delay > 0) {
+            console.warn('[TestCase] mouseDoubleClick delay is ignored in web runtime')
+        }
+
+        this.__dispatchMouseEvent('mousemove', point, button, button, modifiers)
+
+        this.__dispatchMouseEvent('mousedown', point, button, button, modifiers)
+        this.__dispatchMouseEvent('mouseup', point, button, QtEnums.NoButton, modifiers)
+        this.__dispatchMouseEvent('click', point, button, QtEnums.NoButton, modifiers)
+
+        this.__dispatchMouseEvent('mousedown', point, button, button, modifiers)
+        this.__dispatchMouseEvent('mouseup', point, button, QtEnums.NoButton, modifiers)
+        this.__dispatchMouseEvent('click', point, button, QtEnums.NoButton, modifiers)
+
+        return this.__dispatchMouseEvent('dblclick', point, button, QtEnums.NoButton, modifiers)
+    }
+
+    __dispatchKeyEvent(type, key, modifiers = QtEnums.NoModifier){
+        if(typeof window === 'undefined' || typeof window.dispatchEvent !== 'function') return false
+
+        // Qt enums are already DOM key strings (e.g. Qt.Key_Left === 'ArrowLeft')
+        // Single-char strings like 'a', 'A' are passed through as-is
+        let domKey = String(key)
+        let shiftKey = !!(modifiers & QtEnums.ShiftModifier)
+        let ctrlKey  = !!(modifiers & QtEnums.ControlModifier)
+        let altKey   = !!(modifiers & QtEnums.AltModifier)
+        let metaKey  = !!(modifiers & QtEnums.MetaModifier)
+
+        let event = new KeyboardEvent(type, {
+            bubbles: true,
+            cancelable: true,
+            key: domKey,
+            code: domKey,
+            shiftKey,
+            ctrlKey,
+            altKey,
+            metaKey,
+        })
+
+        window.dispatchEvent(event)
+        return true
+    }
+
+    keyPress(key, modifiers = QtEnums.NoModifier){
+        return this.__dispatchKeyEvent('keydown', key, modifiers)
+    }
+
+    keyRelease(key, modifiers = QtEnums.NoModifier){
+        return this.__dispatchKeyEvent('keyup', key, modifiers)
+    }
+
+    keyClick(key, modifiers = QtEnums.NoModifier){
+        this.__dispatchKeyEvent('keydown', key, modifiers)
+        this.__dispatchKeyEvent('keyup',   key, modifiers)
+        return true
+    }
+
+
+    // Type text into a TextInput (contenteditable div) or TextEdit (textarea).
+    // On desktop the method is a no-op; use the fallback in the QML test.
+    typeText(item, text){
+        if(!item || typeof item.__impl === 'undefined') return false
+        if(typeof window === 'undefined') return false
+
+        let impl = item.__impl
+        if(!impl) return false
+
+        if(impl.tagName === 'TEXTAREA'){
+            // TextEdit
+            impl.focus()
+            for(let i = 0; i < text.length; i++){
+                let ch = text[i]
+                let key = ch === '\n' ? QtEnums.Key_Enter : ch
+
+                this.__dispatchKeyEvent('keydown', key)
+                impl.value = (impl.value || '') + ch
+                impl.dispatchEvent(new Event('input', { bubbles: true }))
+                this.__dispatchKeyEvent('keyup', key)
+            }
+        } else {
+            // TextInput (contenteditable)
+            impl.focus()
+            for(let i = 0; i < text.length; i++){
+                let ch = text[i]
+                this.__dispatchKeyEvent('keydown', ch)
+                impl.dispatchEvent(new InputEvent('input', {
+                    bubbles: true,
+                    cancelable: true,
+                    inputType: 'insertText',
+                    data: ch,
+                }))
+                this.__dispatchKeyEvent('keyup', ch)
+            }
+        }
+        return true
+    }
+
+    // Clear text in a TextInput or TextEdit via selectAll + delete event.
+    clearText(item){
+        if(!item || typeof item.__impl === 'undefined') return false
+        if(typeof window === 'undefined') return false
+
+        let impl = item.__impl
+        if(!impl) return false
+
+        if(impl.tagName === 'TEXTAREA'){
+            impl.focus()
+            impl.value = ''
+            impl.dispatchEvent(new Event('input', { bubbles: true }))
+        } else {
+            // Select all then delete
+            impl.focus()
+            item.selectAll()
+            impl.dispatchEvent(new InputEvent('input', {
+                bubbles: true,
+                cancelable: true,
+                inputType: 'deleteContentBackward',
+            }))
+        }
+        return true
+    }
+
+}
 
 
 module.exports = TestCase
