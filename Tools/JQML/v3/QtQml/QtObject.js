@@ -229,7 +229,10 @@ class QtObject extends QObject {
                     this.data[i].setParent(this)
                 }
             }
-        } else {
+            return
+        }
+
+        if(args.length >= 2){
             let oldValue = args[0]
             let newValue = args[1]
 
