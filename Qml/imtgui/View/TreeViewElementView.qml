@@ -8,6 +8,7 @@ ElementView {
     id: root
 
     property var treeView: null
+    property int maxTreeHeight: 350
 
     bottomComp: treeViewComp
 
@@ -16,7 +17,7 @@ ElementView {
 
         FocusScope {
             width: root.contentWidth
-            height: filterInput.height + Style.marginM + Math.min(checkableTree.height, 350)
+            height: filterInput.height + Style.marginM + Math.min(checkableTree.height, root.maxTreeHeight)
 
             SearchTextInput {
                 id: filterInput
