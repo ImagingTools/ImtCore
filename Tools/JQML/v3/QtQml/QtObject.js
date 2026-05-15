@@ -221,11 +221,11 @@ class QtObject extends QObject {
     SLOT_dataChanged(...args){
         if(args.length === 3){
             let leftTop = args[0]
-            let bottonRight = args[1]
+            let bottomRight = args[1]
             let roles = args[2]
 
             if(roles === 'append'){
-                for(let i = leftTop; i < bottonRight; i++){
+                for(let i = leftTop; i < bottomRight; i++){
                     this.data[i].setParent(this)
                 }
             }
