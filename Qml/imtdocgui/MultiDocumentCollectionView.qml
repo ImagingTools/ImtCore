@@ -15,6 +15,8 @@ Item {
 	property DocumentManagerBase documentManager
 	property string collectionTabId: ""
 
+	property bool tabVisible: true
+
 	signal startLoading(string documentId)
 	signal stopLoading(string documentId)
 
@@ -77,6 +79,31 @@ Item {
 
 	function setCurrentTabIndex(index){
 		tabView.currentIndex = index
+	}
+
+
+	function onTryCloseDirtyDocument(documentId, callback){
+		if (!workspaceView.documentManager.documentIsDirty(documentId)){
+			callback(false)
+			return
+		}
+
+		let dialogCallback = function(result){
+			if (result === Enums.yes){
+				callback(true)
+			}
+			else if (result === Enums.no){
+				callback(false)
+			}
+			else{
+				callback(undefined)
+			}
+		}
+
+		ModalDialogManager.showConfirmationDialog(
+					qsTr("Save document"),
+					qsTr("Save all changes ?"),
+					dialogCallback)
 	}
 
 	Component {
@@ -314,27 +341,7 @@ Item {
 		}
 
 		function onTryCloseDirtyDocument(documentId, callback){
-			if (!workspaceView.documentManager.documentIsDirty(documentId)){
-				callback(false)
-				return
-			}
-
-			let dialogCallback = function(result){
-				if (result === Enums.yes){
-					callback(true)
-				}
-				else if (result === Enums.no){
-					callback(false)
-				}
-				else{
-					callback(undefined)
-				}
-			}
-
-			ModalDialogManager.showConfirmationDialog(
-						qsTr("Save document"),
-						qsTr("Save all changes ?"),
-						dialogCallback)
+			workspaceView.onTryCloseDirtyDocument(documentId, callback)
 		}
 	}
 
@@ -518,6 +525,7 @@ Item {
 		id: tabView
 		anchors.fill: parent
 		closable: true
+		tabVisible: workspaceView.tabVisible
 
 		onTabLoaded: {
 			if (tabId === workspaceView.collectionTabId){
