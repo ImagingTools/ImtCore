@@ -30,7 +30,7 @@ ElementView {
                 }
             }
 
-            CheckableTreeView {
+            BasicTreeView {
                 id: checkableTree;
 
                 anchors.top: filterInput.bottom;
