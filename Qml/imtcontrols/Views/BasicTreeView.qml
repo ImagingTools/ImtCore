@@ -41,13 +41,13 @@ Item {
     property string filterText: ""
     property string filterRole: "text"
 
-    property color selectedBackgroundColor: "#2d4d7a"
-    property color hoveredBackgroundColor: "#26384f"
-    property color normalTextColor: "#dddddd"
-    property color selectedTextColor: "white"
-    property color disabledTextColor: "#777777"
-    property color headerBackgroundColor: "#202020"
-    property color gridLineColor: "#333333"
+    property color selectedBackgroundColor: Style.selectedColor
+    property color hoveredBackgroundColor: Style.buttonHoverColor
+    property color normalTextColor: Style.textColor
+    property color selectedTextColor: Style.textColor
+    property color disabledTextColor: Style.inactiveTextColor
+    property color headerBackgroundColor: Style.backgroundColor
+    property color gridLineColor: Style.borderColor
 
     property var currentIndex: null
 
@@ -123,8 +123,6 @@ Item {
                     height: parent.height
 
                     color: root.headerBackgroundColor
-                    border.color: root.gridLineColor
-                    border.width: 1
 
                     Text {
                         anchors.fill: parent
@@ -171,16 +169,83 @@ Item {
                         root.beginEditCell(root.currentIndex.key, 0)
                         event.accepted = true
                     }
+                    return
                 }
 
                 if (event.key === Qt.Key_Escape && root.editing) {
                     root.cancelEdit()
                     event.accepted = true
+                    return
                 }
 
                 if ((event.key === Qt.Key_Return || event.key === Qt.Key_Enter) && root.editing) {
                     root.commitEdit()
                     event.accepted = true
+                    return
+                }
+
+                if (event.key === Qt.Key_Down) {
+                    root.__navigateDown()
+                    event.accepted = true
+                    return
+                }
+
+                if (event.key === Qt.Key_Up) {
+                    root.__navigateUp()
+                    event.accepted = true
+                    return
+                }
+
+                if (event.key === Qt.Key_Right) {
+                    if (root.currentIndex && root.currentIndex.key) {
+                        var node = root.__nodes[root.currentIndex.key]
+                        if (node && node.childrenKeys.length > 0 && !node.expanded)
+                            root.expandNode(node.key)
+                        else
+                            root.__navigateDown()
+                    }
+                    event.accepted = true
+                    return
+                }
+
+                if (event.key === Qt.Key_Left) {
+                    if (root.currentIndex && root.currentIndex.key) {
+                        var n = root.__nodes[root.currentIndex.key]
+                        if (n && n.expanded && n.childrenKeys.length > 0)
+                            root.collapseNode(n.key)
+                        else if (n && n.parentKey !== "")
+                            root.selectAndEnsureVisible(n.parentKey)
+                    }
+                    event.accepted = true
+                    return
+                }
+
+                if (event.key === Qt.Key_Space) {
+                    if (root.currentIndex && root.currentIndex.key) {
+                        root.toggleCheckState(root.currentIndex.key)
+                    }
+                    event.accepted = true
+                    return
+                }
+
+                if (event.key === Qt.Key_Home) {
+                    if (root.__visibleKeys.length > 0)
+                        root.selectAndEnsureVisible(root.__visibleKeys[0])
+                    event.accepted = true
+                    return
+                }
+
+                if (event.key === Qt.Key_End) {
+                    if (root.__visibleKeys.length > 0)
+                        root.selectAndEnsureVisible(root.__visibleKeys[root.__visibleKeys.length - 1])
+                    event.accepted = true
+                    return
+                }
+
+                if (event.key === Qt.Key_Asterisk) {
+                    root.expandAll()
+                    event.accepted = true
+                    return
                 }
             }
         }
@@ -204,10 +269,6 @@ Item {
 
             width: ListView.view.width
             height: root.rowHeight
-            
-            Component.onCompleted: {
-                console.log("delegateRoot onCompleted", nodeKey, nodeText)
-            }
 
             Rectangle {
                 anchors.fill: parent
@@ -223,15 +284,13 @@ Item {
 
                     delegate: Item {
                         id: cellRoot
-                        Component.onCompleted: {
-                            console.log("cellRoot onCompleted", nodeKey, nodeText)
-                        }
 
                         property var column: root.columnAt(index)
                         property bool treeColumn: root.isTreeColumn(column, index)
                         property bool editingThisCell: root.isEditingCell(delegateRoot.nodeKey, index)
                         property string editorType: root.columnType(delegateRoot.nodeKey, column)
                         property var value: root.cellValue(delegateRoot.nodeKey, column)
+                        property string displayText: cellRoot.value !== undefined && cellRoot.value !== null ? String(cellRoot.value) : ""
 
                         width: root.columnWidth(column)
                         height: delegateRoot.height
@@ -239,8 +298,6 @@ Item {
                         Rectangle {
                             anchors.fill: parent
                             color: cellMouseArea.containsMouse && !delegateRoot.nodeSelected ? root.hoveredBackgroundColor : "transparent"
-                            border.color: root.gridLineColor
-                            border.width: 1
                         }
 
                         MouseArea {
@@ -329,10 +386,9 @@ Item {
 
                             Text {
                                 anchors.verticalCenter: parent.verticalCenter
-                                // visible: !cellRoot.editingThisCell && cellRoot.editorType !== "bool" && cellRoot.editorType !== "checkState"
                                 width: Math.max(0, parent.width - x)
-                                text: root.displayValue(cellRoot.value, cellRoot.column, delegateRoot.nodeKey)
-                                color: !delegateRoot.nodeIsEnabled ? root.disabledTextColor : delegateRoot.nodeSelected ? root.selectedTextColor : root.normalTextColor
+                                text: cellRoot.displayText
+                                color: !delegateRoot.nodeIsEnabled ? root.disabledTextColor : root.normalTextColor
                                 horizontalAlignment: cellRoot.column && cellRoot.column.horizontalAlignment !== undefined ? cellRoot.column.horizontalAlignment : Text.AlignLeft
                                 elide: Text.ElideRight
                                 verticalAlignment: Text.AlignVCenter
@@ -759,24 +815,6 @@ Item {
 
         if (path === "checked")
             syncVisibleAncestors(node)
-    }
-
-    function displayValue(value, column, keyValue) {
-        console.log("displayValue", value, column, keyValue)
-        if (value === undefined || value === null)
-            return ""
-
-        var typeName = columnType(keyValue, column)
-        if (typeName === "bool")
-            return value ? "true" : "false"
-        if (typeName === "checkState") {
-            if (value === Qt.Checked)
-                return "checked"
-            if (value === Qt.PartiallyChecked)
-                return "partial"
-            return "unchecked"
-        }
-        return String(value)
     }
 
     function valueByPath(object, path) {
@@ -1328,6 +1366,32 @@ Item {
 
     function rebuild() {
         rebuildTreePreservingState()
+    }
+
+    function __navigateDown() {
+        if (__visibleKeys.length === 0)
+            return
+        if (!currentIndex || !currentIndex.key) {
+            selectAndEnsureVisible(__visibleKeys[0])
+            return
+        }
+        var row = visibleRowOf(currentIndex.key)
+        if (row < 0 || row >= __visibleKeys.length - 1)
+            return
+        selectAndEnsureVisible(__visibleKeys[row + 1])
+    }
+
+    function __navigateUp() {
+        if (__visibleKeys.length === 0)
+            return
+        if (!currentIndex || !currentIndex.key) {
+            selectAndEnsureVisible(__visibleKeys[0])
+            return
+        }
+        var row = visibleRowOf(currentIndex.key)
+        if (row <= 0)
+            return
+        selectAndEnsureVisible(__visibleKeys[row - 1])
     }
 
     // --- Convenience API for checkable trees ---
