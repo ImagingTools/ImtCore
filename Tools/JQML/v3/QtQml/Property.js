@@ -94,7 +94,11 @@ class Property extends BaseObject {
             }
 
             if(!found){
-                let connectionObj = target.constructor.meta[name + 'Changed'].type.get(target, name + 'Changed').connect(()=>{
+                const signalFunc = target.constructor.meta[name + 'Changed'].type.get(target, name + 'Changed')
+                // Cross-item bindings use connectBefore so they fire before the source item's own SLOT_
+                const isCrossItem = link.target !== target
+                const connectFn = isCrossItem && signalFunc.connectBefore ? signalFunc.connectBefore : signalFunc.connect
+                let connectionObj = connectFn(()=>{
                     if(!link.target[link.name+'__updating']){
                         link.target[link.name+'__updating'] = true
                         link.meta.type.set(link.target, link.name, link.func, link.meta)

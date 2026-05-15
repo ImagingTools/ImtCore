@@ -2122,7 +2122,9 @@ function compile(options){
         if (options.entry) {
             fullCode.add(`window.addEventListener('load', ()=>{
                 console.time('build');
-                if(location.pathname.indexOf('${options.root}')>=0){
+                if(location.protocol === 'file:'){
+                    JQApplication.rootPath = location.href.slice(0, location.href.lastIndexOf('/') + 1)
+                } else if(location.pathname.indexOf('${options.root}')>=0){
                     JQApplication.rootPath = location.origin + location.pathname.slice(0, location.pathname.indexOf('${options.root}') + '${options.root}'.length)
                 } else {
                     JQApplication.rootPath = '${options.root}'

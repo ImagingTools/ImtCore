@@ -14,6 +14,23 @@ class Signal extends BaseObject {
             let slotName = 'SLOT_' + name
 
             global.queueFlag.push(false)
+
+            // Priority connections (cross-item bindings) fire before SLOT_
+            if(name in target.__connections){
+                for(let connection of target.__connections[name]){
+                    if(!connection.priority) continue
+                    try {
+                        if(connection.target){
+                            connection.slot.call(connection.target.__proxy, ...args)  
+                        } else {
+                            connection.slot(...args)
+                        }
+                    } catch (error) {
+                        if(location.hash === '#jqdebug')console.error(error)
+                    }
+                }
+            }
+
             if(slotName in target){
                 try {
                     target[slotName].call(target.__proxy, ...args)
@@ -24,6 +41,7 @@ class Signal extends BaseObject {
 
             if(name in target.__connections){
                 for(let connection of target.__connections[name]){
+                    if(connection.priority) continue
                     try {
                         if(connection.target){
                             connection.slot.call(connection.target.__proxy, ...args)  

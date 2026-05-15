@@ -344,6 +344,15 @@ async function runWebTest(driver, testDirPath, timeout = 5000) {
             root: '/',
             mode: 'html',
         })
+
+        // Copy image assets to _web for file:// access
+        const imageExts = ['.svg', '.png', '.jpg', '.jpeg', '.gif', '.webp', '.bmp', '.ico']
+        const testFiles = fs.readdirSync(testDirPath)
+        for(const f of testFiles){
+            if(imageExts.some(ext => f.toLowerCase().endsWith(ext))){
+                fs.copyFileSync(path.resolve(testDirPath, f), path.resolve(testDirPath, '_web', f))
+            }
+        }
     } catch (err) {
         console.error(`${colors.red}[Error] Error during compilation: ${getErrorMessage(err)}${colors.reset}`)
     }
@@ -397,7 +406,7 @@ async function createWebDriver() {
     try {
         // Настройка Chrome (опционально: запуск без окна)
         let options = new chrome.Options()
-        options.addArguments('--headless', '--window-size=800,600', '--no-sandbox', '--disable-dev-shm-usage') // Раскомментировать для headless-режима
+        options.addArguments('--headless', '--window-size=800,600', '--no-sandbox', '--disable-dev-shm-usage', '--allow-file-access-from-files') // Раскомментировать для headless-режима
         options.setLoggingPrefs({
             browser: 'ALL', // Собирать все типы сообщений (INFO, WARNING, SEVERE)
             driver: 'WARNING'
