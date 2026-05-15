@@ -28,17 +28,37 @@ class PrincipledMaterial extends QtObject {
      * @param {object} THREE the lazily-loaded three.js module
      * @returns {THREE.Material}
      */
+    $toThreeColor(THREE, colorValue, fallback = '#ffffff'){
+        let c = (colorValue === undefined || colorValue === null) ? fallback : ('' + colorValue)
+
+        // In this runtime QColor uses #RRGGBBAA / #RGBA, while THREE.Color
+        // expects #RRGGBB / #RGB (no alpha channel).
+        if(/^#([0-9a-f]{8})$/i.test(c)){
+            // #RRGGBBAA -> #RRGGBB
+            c = '#' + c.substring(1, 7)
+        } else if(/^#([0-9a-f]{4})$/i.test(c)){
+            // #RGBA -> #RGB
+            c = '#' + c[1] + c[2] + c[3]
+        }
+
+        try {
+            return new THREE.Color(c)
+        } catch (_e) {
+            return new THREE.Color(fallback)
+        }
+    }
+
     $build(THREE){
         if(!this.$threeMat){
             this.$threeMat = new THREE.MeshStandardMaterial()
         }
         let m = this.$threeMat
-        m.color = new THREE.Color(this.baseColor || '#ffffff')
+        m.color = this.$toThreeColor(THREE, this.baseColor, '#ffffff')
         m.metalness = this.metalness
         m.roughness = this.roughness
         m.opacity = this.opacity
         m.transparent = (this.opacity < 1)
-        m.emissive = new THREE.Color(this.emissiveColor || '#000000')
+        m.emissive = this.$toThreeColor(THREE, this.emissiveColor, '#000000')
 
         m.map = this.baseColorMap && this.baseColorMap.$build ? this.baseColorMap.$build(THREE) : null
         m.metalnessMap = this.metalnessMap && this.metalnessMap.$build ? this.metalnessMap.$build(THREE) : null
