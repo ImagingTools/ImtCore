@@ -387,23 +387,18 @@ module.exports = {
     focusTree: [],
     pendingFocusTree: null,  // deferred during beginUpdate/endUpdate
     setFocusTree(tree){
-        // Qt semantics: during construction all siblings request focus, but FIRST wins.
-        // Use a microtask to batch focus requests; first one is kept.
-        if(this.pendingFocusTree === null){
-            this.pendingFocusTree = tree
-            Promise.resolve().then(()=>{
-                if(this.pendingFocusTree !== null){
-                    let t = this.pendingFocusTree
-                    this.pendingFocusTree = null
-                    this._applyFocusTree(t)
-                }
-            })
-        } else if(this.updateLayers.length === 0){
-            // Runtime focus change (outside construction): apply immediately
-            this.pendingFocusTree = null
-            this._applyFocusTree(tree)
+        // Qt semantics: when multiple siblings request focus synchronously,
+        // the FIRST one wins. Use a microtask to batch; first request is kept.
+        if(this.pendingFocusTree !== null){
+            // Another request already queued — ignore (first wins)
+            return
         }
-        // else: another item already pending in this batch — ignore (first wins)
+        this.pendingFocusTree = tree
+        Promise.resolve().then(()=>{
+            let t = this.pendingFocusTree
+            this.pendingFocusTree = null
+            if(t) this._applyFocusTree(t)
+        })
     },
 
     _applyFocusTree(tree){
