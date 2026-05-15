@@ -1,5 +1,4 @@
 const { spawn } = require('child_process')
-const compiler = require('../compiler/compiler')
 const fs = require('fs')
 const { Builder, Capabilities, By, until } = require('selenium-webdriver')
 const chrome = require('selenium-webdriver/chrome')
@@ -18,6 +17,22 @@ const colors = {
     gray: "\x1b[90m"
 }
 
+let compiler = null
+
+function getCompiler() {
+    if (compiler) return compiler
+
+    const originalArgv = process.argv
+
+    try {
+        process.argv = [originalArgv[0], originalArgv[1]]
+        compiler = require('../compiler/compiler')
+        return compiler
+    } finally {
+        process.argv = originalArgv
+    }
+}
+
 function getQmlLog(fullLogs) {
     const regex = /^qml:\s+(?!warning:)(.+)$/gm
     let matches = []
@@ -30,12 +45,75 @@ function getQmlLog(fullLogs) {
     return matches
 }
 
-function runQmlTest(filePath, timeout = 5000) {
+function getErrorMessage(error) {
+    if (!error) return 'Unknown error'
+    if (error.message) return error.message
+    return String(error)
+}
+
+function getQmlImportPathsFromConfig(testDirPath) {
+    const visitedConfigs = new Set()
+    const resolvedDirs = new Set()
+
+    function collectConfig(configPath) {
+        const normalizedConfigPath = path.resolve(configPath)
+
+        if (visitedConfigs.has(normalizedConfigPath)) return
+        visitedConfigs.add(normalizedConfigPath)
+
+        if (!fs.existsSync(normalizedConfigPath)) return
+
+        let config
+        try {
+            config = JSON.parse(fs.readFileSync(normalizedConfigPath, { encoding: 'utf8', flag: 'r' }))
+        } catch (err) {
+            return
+        }
+
+        const configDirPath = path.dirname(normalizedConfigPath)
+
+        if (Array.isArray(config.dirs)) {
+            for (const dirPath of config.dirs) {
+                const absoluteDirPath = path.resolve(configDirPath, dirPath)
+                if (fs.existsSync(absoluteDirPath) && checkIsDirectorySync(absoluteDirPath)) {
+                    resolvedDirs.add(absoluteDirPath)
+                    resolvedDirs.add(path.dirname(absoluteDirPath))
+                }
+            }
+        }
+
+        if (Array.isArray(config.includes)) {
+            for (const includePath of config.includes) {
+                const absoluteIncludePath = path.resolve(configDirPath, includePath)
+                collectConfig(absoluteIncludePath)
+            }
+        }
+    }
+
+    collectConfig(path.resolve(testDirPath, 'test.json'))
+
+    return Array.from(resolvedDirs)
+}
+
+function runQmlTest(filePath, timeout = 5000, qmlImportPaths = []) {
     return new Promise((resolve, reject) => {
+        const pathSeparator = process.platform === 'win32' ? ';' : ':'
+        const mergedImportPath = qmlImportPaths.join(pathSeparator)
+
+        const env = { ...process.env, QT_LOGGING_TO_CONSOLE: "1" }
+        if (mergedImportPath) {
+            env.QML2_IMPORT_PATH = env.QML2_IMPORT_PATH
+                ? `${mergedImportPath}${pathSeparator}${env.QML2_IMPORT_PATH}`
+                : mergedImportPath
+            env.QML_IMPORT_PATH = env.QML_IMPORT_PATH
+                ? `${mergedImportPath}${pathSeparator}${env.QML_IMPORT_PATH}`
+                : mergedImportPath
+        }
+
         // Запуск в headless режиме
         const child = spawn('qml', ['-platform', 'offscreen', filePath], {
             cwd: path.dirname(filePath),
-            env: { ...process.env, QT_LOGGING_TO_CONSOLE: "1" }
+            env,
         })
 
         let logs = []
@@ -70,17 +148,65 @@ function checkIsDirectorySync(path) {
     }
 }
 
+function parseCliOptions() {
+    const args = process.argv.slice(2)
+    let testName = ''
+
+    for (let i = 0; i < args.length; i++) {
+        const arg = args[i]
+
+        if (arg.startsWith('--test=')) {
+            testName = arg.slice('--test='.length).trim()
+            continue
+        }
+
+        if (arg === '--test' || arg === '-t') {
+            testName = (args[i + 1] || '').trim()
+            i++
+            continue
+        }
+
+        if (!arg.startsWith('-') && !testName) {
+            testName = arg.trim()
+        }
+    }
+
+    return { testName }
+}
+
+function getTestsToRun(allEntries, selectedTestName) {
+    const allTests = allEntries.filter(testdir => {
+        const testDirPath = path.resolve(__dirname, `./${testdir}`)
+        const mainFilePath = path.resolve(__dirname, `./${testdir}/Main.qml`)
+
+        return checkIsDirectorySync(testDirPath) && fs.existsSync(mainFilePath)
+    })
+
+    if (!selectedTestName) return allTests
+
+    return allTests.filter(testName => testName === selectedTestName)
+}
+
 async function runTests() {
     const tests = fs.readdirSync('./tests')
+    const options = parseCliOptions()
+    const testsToRun = getTestsToRun(tests, options.testName)
+
+    if (options.testName && testsToRun.length === 0) {
+        console.error(`${colors.red}[Error] Test not found: ${options.testName}${colors.reset}`)
+        process.exitCode = 1
+        return
+    }
 
     let completedTests = 0
     let testCount = 0
 
     const driver = await createWebDriver()
 
-    for (let testdir of tests) {
+    for (let testdir of testsToRun) {
         let mainFilePath = path.resolve(__dirname, `./${testdir}/Main.qml`)
         let testDirPath = path.resolve(__dirname, `./${testdir}`)
+        const qmlImportPaths = getQmlImportPathsFromConfig(testDirPath)
 
         if (checkIsDirectorySync(testDirPath)) {
             console.log(`${colors.yellow}[i] Started test: ${testdir}${colors.reset}`)
@@ -89,19 +215,16 @@ async function runTests() {
             let resultWeb
 
             try {
-                resultDesktop = await runQmlTest(mainFilePath)
+                resultDesktop = await runQmlTest(mainFilePath, 5000, qmlImportPaths)
             } catch (err) {
-                console.error(`${colors.red}[Error] Error running test on desktop: ${err.message}${colors.reset}`)
+                console.error(`${colors.red}[Error] Error running test on desktop: ${getErrorMessage(err)}${colors.reset}`)
             }
-
-            
 
             try {
                 resultWeb = await runWebTest(driver, testDirPath)
             } catch (err) {
-                console.error(`${colors.red}[Error] Error running web test: ${err.message}${colors.reset}`)
+                console.error(`${colors.red}[Error] Error running web test: ${getErrorMessage(err)}${colors.reset}`)
             }
-
 
             console.log(`${colors.cyan}[Desktop] ${resultDesktop}${colors.reset}`)
             console.log(`${colors.cyan}[Web] ${resultWeb}${colors.reset}`)
@@ -128,6 +251,8 @@ async function runWebTest(driver, testDirPath, timeout = 5000) {
     }
 
     try {
+        const compiler = getCompiler()
+
         compiler.compile({
             config: path.resolve(testDirPath, 'test.json'),
             output: path.resolve(testDirPath, '_web'),
@@ -146,7 +271,7 @@ async function runWebTest(driver, testDirPath, timeout = 5000) {
             mode: 'html',
         })
     } catch (err) {
-        console.error(`${colors.red}[Error] Error during compilation: ${err.message}${colors.reset}`)
+        console.error(`${colors.red}[Error] Error during compilation: ${getErrorMessage(err)}${colors.reset}`)
     }
 
     try {

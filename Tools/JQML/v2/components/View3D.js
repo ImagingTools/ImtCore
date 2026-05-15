@@ -83,39 +83,136 @@ class View3D extends Item {
 
     /**
      * Lazy-load three.js. Resolves silently if it's already loaded.
+     *
+     * Strategy (in priority order):
+     *  1. Already loaded as window.THREE  → use it immediately.
+     *  2. Already injected <script> tag   → wait for it to finish.
+     *  3. Inject a <script> tag pointing at View3D.threeUrl and wait for onload.
+     *
+     * This approach works with webpack externals because we never call
+     * import('three') (which webpack can't resolve for externals at runtime).
+     *
+     * Set View3D.threeUrl BEFORE the first View3D is constructed if you want
+     * to use a different CDN or a local file, e.g.:
+     *   View3D.threeUrl = '/js/three.min.js'
      */
     $loadThree(){
         if(this.$THREE) return Promise.resolve(this.$THREE)
+
+        // Already available as a global (e.g. loaded by the page via <script>)
+        if(typeof window !== 'undefined' && window.THREE){
+            return Promise.resolve(window.THREE)
+                .then((THREE)=>{ this.$onThreeLoaded(THREE); return THREE })
+        }
+
         if(View3D.$threePromise) {
-            return View3D.$threePromise.then((THREE)=>{ this.$onThreeLoaded(THREE); return THREE })
+            return View3D.$threePromise.then((THREE)=>{ if(THREE) this.$onThreeLoaded(THREE); return THREE })
         }
-        let p
-        try {
-            // dynamic import keeps this out of the main bundle
-            p = import('three')
-        } catch (e) {
-            // some bundlers (CommonJS) won't honor `import()`; fallback
-            return new Promise((_resolve, reject)=>{
-                console.warn('[View3D] three.js could not be loaded:', e)
-                reject(e)
-            })
-        }
-        View3D.$threePromise = p.then((mod)=>{
-            // both `import('three')` (ESM) and webpack interop produce { ... } where
-            // the named exports live; some CDNs put them on .default
-            if(!mod) return null
-            if(mod.Scene || mod.WebGLRenderer) return mod
-            if(mod.default) return mod.default
-            return mod
+
+        // Inject a <script> tag to load three.js from CDN / local path
+        View3D.$threePromise = new Promise((resolve, reject)=>{
+            const urls = View3D.threeUrl
+                ? [View3D.threeUrl]
+                : [
+                    // Global UMD builds (window.THREE)
+                    'https://cdnjs.cloudflare.com/ajax/libs/three.js/r170/three.min.js',
+                    'https://cdn.jsdelivr.net/npm/three@0.146.0/build/three.min.js',
+                    'https://unpkg.com/three@0.146.0/build/three.min.js',
+                ]
+
+            const tryLoad = (index)=>{
+                if(index >= urls.length){
+                    reject(new Error('[View3D] Failed to load three.js from all configured CDNs'))
+                    return
+                }
+
+                const url = urls[index]
+                let script = document.querySelector(`script[src="${url}"]`)
+                if(!script){
+                    script = document.createElement('script')
+                    script.src = url
+                    script.async = true
+                    document.head.appendChild(script)
+                }
+
+                const onLoad = ()=>{
+                    const THREE = window.THREE
+                    if(THREE && (THREE.Scene || THREE.WebGLRenderer)){
+                        cleanup()
+                        resolve(THREE)
+                    } else {
+                        cleanup()
+                        tryLoad(index + 1)
+                    }
+                }
+                const onError = ()=>{
+                    cleanup()
+                    tryLoad(index + 1)
+                }
+                const cleanup = ()=>{
+                    script.removeEventListener('load', onLoad)
+                    script.removeEventListener('error', onError)
+                }
+
+                script.addEventListener('load', onLoad)
+                script.addEventListener('error', onError)
+
+                // If already loaded, resolve immediately.
+                if(script.readyState === 'complete' && window.THREE){
+                    cleanup()
+                    resolve(window.THREE)
+                }
+            }
+
+            tryLoad(0)
         }).catch((err)=>{
-            console.warn('[View3D] three.js dynamic import failed:', err)
+            console.warn('[View3D] three.js load failed:', err)
+            View3D.$threePromise = null // allow retry
             return null
         })
+
         return View3D.$threePromise.then((THREE)=>{ if(THREE) this.$onThreeLoaded(THREE); return THREE })
+    }
+
+    /**
+     * JQML registers component classes on `window` using their QML names.
+     * That can overwrite native globals like `Map` / `Set`.
+     * Three.js relies on native constructors, so we restore them lazily here.
+     */
+    $ensureNativeGlobalsForThree(){
+        if(typeof window === 'undefined') return
+
+        if(!View3D.$nativeGlobals){
+            View3D.$nativeGlobals = {}
+            try {
+                const frame = document.createElement('iframe')
+                frame.style.display = 'none'
+                document.documentElement.appendChild(frame)
+                const w = frame.contentWindow
+                if(w){
+                    View3D.$nativeGlobals.Map = w.Map
+                    View3D.$nativeGlobals.Set = w.Set
+                    View3D.$nativeGlobals.Image = w.Image
+                    View3D.$nativeGlobals.Text = w.Text
+                    View3D.$nativeGlobals.Animation = w.Animation
+                }
+                frame.remove()
+            } catch (_e) {
+                // ignore; we'll just keep current globals
+            }
+        }
+
+        const ng = View3D.$nativeGlobals || {}
+        if(ng.Map && (!window.Map || window.Map.defaultProperties !== undefined)) window.Map = ng.Map
+        if(ng.Set && (!window.Set || window.Set.defaultProperties !== undefined)) window.Set = ng.Set
+        if(ng.Image && (!window.Image || window.Image.defaultProperties !== undefined)) window.Image = ng.Image
+        if(ng.Text && (!window.Text || window.Text.defaultProperties !== undefined)) window.Text = ng.Text
+        if(ng.Animation && (!window.Animation || window.Animation.defaultProperties !== undefined)) window.Animation = ng.Animation
     }
 
     $onThreeLoaded(THREE){
         if(this.$disposed || this.$THREE) return
+        this.$ensureNativeGlobalsForThree()
         this.$THREE = THREE
         this.$scene = new THREE.Scene()
 
@@ -135,6 +232,7 @@ class View3D extends Item {
             this.$renderer.setPixelRatio(window.devicePixelRatio)
         }
         this.$applyClearColor()
+        this.$environmentChanged()
         this.$handleResize()
 
         // Attach all queued Node3D children (recursively via their own $registerNode3D)
@@ -240,7 +338,19 @@ class View3D extends Item {
     $environmentChanged(){
         if(!this.$THREE || !this.$scene) return
         let env = this.environment
+        if(this.$boundEnvironment && this.$boundEnvironment !== env){
+            this.$boundEnvironment.$onEnvChanged = null
+            this.$boundEnvironment = null
+        }
         if(env && typeof env.$applyToScene === 'function'){
+            if(env !== this.$boundEnvironment){
+                env.$onEnvChanged = ()=>{
+                    if(this.$disposed || !this.$THREE || !this.$scene) return
+                    env.$applyToScene(this.$THREE, this.$scene, this.$renderer)
+                    this.$requestRender()
+                }
+                this.$boundEnvironment = env
+            }
             env.$applyToScene(this.$THREE, this.$scene, this.$renderer)
         }
         this.$requestRender()
@@ -364,5 +474,12 @@ class View3D extends Item {
 
 // shared promise so multiple View3Ds share a single THREE module load
 View3D.$threePromise = null
+
+/**
+ * Override this BEFORE the first View3D is created to use a local file
+ * or a specific CDN version instead of the default jsdelivr CDN, e.g.:
+ *   View3D.threeUrl = '/Resources/three.min.js'
+ */
+View3D.threeUrl = null
 
 module.exports.View3D = View3D

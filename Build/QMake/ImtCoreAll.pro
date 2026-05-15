@@ -205,6 +205,9 @@ SUBDIRS += imtqml
 imtqml.file = ../../Include/imtqml/QMake/imtqml.pro
 imtqml.depends = imtbasesdl
 
+# SUBDIRS += imtqml2d
+# imtqml2d.file = ../../Include/imtqml2d/QMake/imtqml2d.pro
+
 SUBDIRS += imtlic
 imtlic.file = ../../Include/imtlic/QMake/imtlic.pro
 
@@ -221,6 +224,14 @@ imtservergql.depends = imtgql imtcol imtappsdl
 
 SUBDIRS += imtdb
 imtdb.file = ../../Include/imtdb/QMake/imtdb.pro
+
+SUBDIRS += imttest
+imttest.file = ../../Include/imttest/QMake/imttest.pro
+imttest.depends = imtbase imtdb
+
+SUBDIRS += imtupdate
+imtupdate.file = ../../Include/imtupdate/QMake/imtupdate.pro
+imtupdate.depends = imtbase
 
 SUBDIRS += imtdbgql
 imtdbgql.file = ../../Include/imtdbgql/QMake/imtdbgql.pro
@@ -555,6 +566,10 @@ SUBDIRS += ImtMdbxPck
 ImtMdbxPck.file = ../../Impl/ImtMdbxPck/QMake/ImtMdbxPck.pro
 ImtMdbxPck.depends = imtmdbx
 
+SUBDIRS += ImtTestPck
+ImtTestPck.file = ../../Impl/ImtTestPck/QMake/ImtTestPck.pro
+ImtTestPck.depends = imttest imtdb imtbase
+
 # SUBDIRS += ImtControlsGallery
 # ImtControlsGallery.file = ../../Impl/ImtControlsGallery/QMake/ImtControlsGallery.pro
 # ImtControlsGallery.depends = imtgui imtqml imtstyle imtstylecontrolsqml
@@ -584,3 +599,27 @@ imtsdlgenqmltest.depends = imtsdlgenqml imtsdl imtbase
 SUBDIRS += imt3dtest
 imt3dtest.file = ../../Include/imt3d/Test/QMake/imt3dTest.pro
 imt3dtest.depends = imt3d
+
+SUBDIRS += CollectionDocumentManagerTest
+CollectionDocumentManagerTest.file = ../../Tests/CollectionDocumentManagerTest/QMake/CollectionDocumentManagerTest.pro
+CollectionDocumentManagerTest.depends = imtbase imtdoc
+
+SUBDIRS += ImtCoreFileCollectionTest
+ImtCoreFileCollectionTest.file = ../../Tests/FileCollectionTest/QMake/ImtCoreFileCollectionTest.pro
+ImtCoreFileCollectionTest.depends = imtbase imtauth imtrepo
+
+SUBDIRS += ImtCoreObjectCollectionTest
+ImtCoreObjectCollectionTest.file = ../../Tests/ObjectCollectionTest/QMake/ImtCoreObjectCollectionTest.pro
+ImtCoreObjectCollectionTest.depends = imtbase imtauth imtdb imttest
+
+SUBDIRS += PersonalAccessTokenTest
+PersonalAccessTokenTest.file = ../../Tests/PersonalAccessTokenTest/QMake/PersonalAccessTokenTest.pro
+PersonalAccessTokenTest.depends = imtbase imtauth
+
+SUBDIRS += ImtCoreRevisionControllerTest
+ImtCoreRevisionControllerTest.file = ../../Tests/RevisionControllerTest/QMake/ImtCoreRevisionControllerTest.pro
+ImtCoreRevisionControllerTest.depends = imtbase imtauth
+
+SUBDIRS += StructureTest
+StructureTest.file = ../../Tests/StructureTest/QMake/StructureTest.pro
+StructureTest.depends = imtbase imtauth imtdb imttest

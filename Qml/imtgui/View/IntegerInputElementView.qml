@@ -21,7 +21,9 @@ TextInputElementView {
     }
 
     onTextChanged: {
-        value = Number(text)
+        if (acceptableInput){
+            value = Number(text)
+        }
     }
 
     onValueChanged: {

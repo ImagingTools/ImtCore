@@ -33,12 +33,15 @@ Item {
 		tabModel.clear();
 	}
 
-	function addTab(tabId, tabName, tabComp, icon, description, waitName){
+	function addTab(tabId, tabName, tabComp, icon, description, waitName, pinned){
 		if (!waitName){
 			waitName = false;
 		}
+		if (!pinned){
+			pinned = false;
+		}
 
-		tabModel.append({id: tabId, name: tabName, sourceComponent: tabComp, icon: icon, description: description, waitName: waitName})
+		tabModel.append({id: tabId, name: tabName, sourceComponent: tabComp, icon: icon, description: description, waitName: waitName, pinned: pinned})
 	}
 
 	function removeTab(tabId){
