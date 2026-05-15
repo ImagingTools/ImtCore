@@ -87,6 +87,13 @@ Item {
 
     height: (root.showHeader ? root.headerHeight : 0) + visibleModel.count * root.rowHeight
 
+    Timer {
+        id: filterDebounceTimer
+        interval: 120
+        repeat: false
+        onTriggered: root.buildVisibleTree()
+    }
+
     QtObject {
         id: defaultTreeColumn
 
@@ -269,7 +276,7 @@ Item {
             property bool nodeCheckable: model.checkable
             property bool nodeIsEnabled: model.nodeEnabled
             property string nodeText: model.text
-            property int nodeVisibleRow: model.index
+            property int nodeVisibleRow: index
 
             width: listView.width
             height: root.rowHeight
@@ -485,12 +492,12 @@ Item {
 
         var ft = filterText.trim().toLowerCase()
 
-        for (var i = 0; i < __rootKeys.length; ++i) {
-            var rootNode = __nodes[__rootKeys[i]]
-            if (rootNode) {
-                if (ft.length > 0)
-                    appendFilteredBranch(rootNode, ft)
-                else
+        if (ft.length > 0) {
+            buildFilteredVisible(ft)
+        } else {
+            for (var i = 0; i < __rootKeys.length; ++i) {
+                var rootNode = __nodes[__rootKeys[i]]
+                if (rootNode)
                     appendVisibleBranch(rootNode)
             }
         }
@@ -501,30 +508,46 @@ Item {
         return value !== undefined && value !== null && String(value).toLowerCase().indexOf(ft) >= 0
     }
 
-    function subtreeMatchesFilter(node, ft) {
-        if (nodeMatchesFilter(node, ft))
-            return true
+    function buildFilteredVisible(ft) {
+        // Single DFS pass: post-order traversal marks subtrees that match,
+        // then pre-order append of marked nodes
+        var matchMap = ({})
 
-        for (var i = 0; i < node.childrenKeys.length; ++i) {
-            var child = __nodes[node.childrenKeys[i]]
-            if (child && subtreeMatchesFilter(child, ft))
-                return true
+        function markMatches(nodeKey) {
+            var node = __nodes[nodeKey]
+            if (!node)
+                return false
+
+            var selfMatch = nodeMatchesFilter(node, ft)
+            var childMatch = false
+
+            for (var i = 0; i < node.childrenKeys.length; ++i) {
+                if (markMatches(node.childrenKeys[i]))
+                    childMatch = true
+            }
+
+            var matches = selfMatch || childMatch
+            if (matches)
+                matchMap[nodeKey] = true
+            return matches
         }
 
-        return false
-    }
+        for (var r = 0; r < __rootKeys.length; ++r)
+            markMatches(__rootKeys[r])
 
-    function appendFilteredBranch(node, ft) {
-        if (!subtreeMatchesFilter(node, ft))
-            return
-
-        appendVisibleNode(node)
-
-        for (var i = 0; i < node.childrenKeys.length; ++i) {
-            var child = __nodes[node.childrenKeys[i]]
-            if (child)
-                appendFilteredBranch(child, ft)
+        function appendMarked(nodeKey) {
+            if (!matchMap[nodeKey])
+                return
+            var node = __nodes[nodeKey]
+            if (!node)
+                return
+            appendVisibleNode(node)
+            for (var i = 0; i < node.childrenKeys.length; ++i)
+                appendMarked(node.childrenKeys[i])
         }
+
+        for (var j = 0; j < __rootKeys.length; ++j)
+            appendMarked(__rootKeys[j])
     }
 
     function appendVisibleBranch(node) {
@@ -1384,7 +1407,7 @@ Item {
     }
 
     onFilterTextChanged: {
-        buildVisibleTree()
+        filterDebounceTimer.restart()
     }
 
     Component.onCompleted: {
