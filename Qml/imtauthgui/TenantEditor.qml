@@ -757,7 +757,7 @@ DocumentViewBase {
 					}
 				}
 				container.permissionsModel.refresh()
-				tenantPermissionHeaders.updateHeaders()
+				tenantPermissionsTreeView.buildPermissionsModel()
 
 				// Restore checked state from selected permissions
 				var selectedPermissionsIds = []
@@ -771,15 +771,16 @@ DocumentViewBase {
 
 				tenantPermissionsTreeView.treeView.uncheckAll()
 
-				var itemsList = tenantPermissionsTreeView.treeView.getItemsDataAsList()
-				for (var i = 0; i < itemsList.length; i++) {
-					var delegateItem = itemsList[i]
-					if (!delegateItem.hasChild) {
-						var itemData = delegateItem.getItemData()
-						var id = itemData.FeatureId
+				var allNodesList = tenantPermissionsTreeView.treeView.allNodes()
+				for (var i = 0; i < allNodesList.length; i++) {
+					var nodeIdx = allNodesList[i]
+					var nodeChildren = nodeIdx.item && nodeIdx.item.children ? nodeIdx.item.children : []
+					if (nodeChildren.length === 0) {
+						var nodeData = nodeIdx.data || {}
+						var id = nodeData.FeatureId
 
 						if (selectedPermissionsIds.includes(id)) {
-							tenantPermissionsTreeView.treeView.checkItem(delegateItem)
+							tenantPermissionsTreeView.treeView.checkItem(nodeIdx.key)
 						}
 					}
 				}
@@ -789,12 +790,13 @@ DocumentViewBase {
 				if (!container.tenantData)
 					return
 				var selectedPermissionIds = []
-				var itemsList = tenantPermissionsTreeView.treeView.getCheckedItems()
-				for (var j = 0; j < itemsList.length; j++) {
-					var delegate = itemsList[j]
-					if (!delegate.hasChild) {
-						var itemData = delegate.getItemData()
-						var id = itemData.FeatureId
+				var checkedNodes = tenantPermissionsTreeView.treeView.getCheckedNodes()
+				for (var j = 0; j < checkedNodes.length; j++) {
+					var nodeIdx = checkedNodes[j]
+					var nodeChildren = nodeIdx.item && nodeIdx.item.children ? nodeIdx.item.children : []
+					if (nodeChildren.length === 0) {
+						var nodeData = nodeIdx.data || {}
+						var id = nodeData.FeatureId
 						selectedPermissionIds.push(id)
 					}
 				}
@@ -865,25 +867,30 @@ DocumentViewBase {
 								}
 							}
 
-							TreeItemModel {
-								id: tenantPermissionHeaders
+							function buildPermissionsModel() {
+								if (!container.permissionsModel)
+									return
 
-								function updateHeaders() {
-									tenantPermissionHeaders.clear()
+								var nodes = TreeModelBuilder.fromTreeItemModel(
+									container.permissionsModel,
+									function(wrapper, index) {
+										return {
+											key: wrapper.data("FeatureId", ""),
+											text: wrapper.data("FeatureName", ""),
+											checkable: true,
+											expanded: true,
+											data: {
+												FeatureId: wrapper.data("FeatureId", ""),
+												FeatureName: wrapper.data("FeatureName", "")
+											}
+										}
+									},
+									function(wrapper, index) {
+										return wrapper.childModel("ChildModel")
+									}
+								)
 
-									var index = tenantPermissionHeaders.insertNewItem()
-									tenantPermissionHeaders.setData("id", "FeatureName", index)
-									tenantPermissionHeaders.setData("name", qsTr("Permission"), index)
-
-									tenantPermissionHeaders.refresh()
-
-									tenantPermissionsTreeView.treeView.columnModel = tenantPermissionHeaders
-									tenantPermissionsTreeView.treeView.rowModel = container.permissionsModel
-								}
-
-								Component.onCompleted: {
-									tenantPermissionHeaders.updateHeaders()
-								}
+								tenantPermissionsTreeView.treeView.model = nodes
 							}
 						}
 					}
