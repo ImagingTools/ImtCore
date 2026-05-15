@@ -108,6 +108,7 @@ SearchTextInput 1.0 ./Inputs/SearchTextInput.qml
 
 singleton UuidGenerator 1.0 Models/UuidGenerator.qml
 singleton NavigationController 1.0 Models/NavigationController.qml
+singleton TreeModelBuilder 1.0 ./Models/TreeModelBuilder.qml
 ModelIndex 1.0 Models/ModelIndex.qml
 SortController 1.0 Models/SortController.qml
 StateMachine 1.0 Models/StateMachine.qml
@@ -158,6 +159,8 @@ TreeViewCommandsDelegateBase 1.0 ./Views/TreeViewCommandsDelegateBase.qml
 TreeViewItemDelegateBase 1.0 ./Views/TreeViewItemDelegateBase.qml
 
 TreeItemDelegate 1.0 ./Views/TreeItemDelegate.qml
+TreeView 1.0 ./Views/TreeView.qml
+TreeViewColumn 1.0 ./Views/TreeViewColumn.qml
 TreeViewGql 1.0 ./Views/TreeViewGql.qml
 TreeViewSelection 1.0 ./Views/TreeViewSelection.qml
 
