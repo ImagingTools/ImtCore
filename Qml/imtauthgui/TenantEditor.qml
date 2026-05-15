@@ -404,12 +404,6 @@ DocumentViewBase {
 					width: Style.sizeHintXXL
 					spacing: Style.marginXL
 
-					GroupHeaderView {
-						width: parent.width
-						title: qsTr("General")
-						groupView: generalGroup
-					}
-
 					GroupElementView {
 						id: generalGroup
 						width: parent.width
@@ -850,12 +844,6 @@ DocumentViewBase {
 					id: permissionsColumn
 					width: Style.sizeHintXXL
 					spacing: Style.marginXL
-
-					GroupHeaderView {
-						width: parent.width
-						title: qsTr("Permissions")
-						groupView: permissionsGroup
-					}
 
 					GroupElementView {
 						id: permissionsGroup
