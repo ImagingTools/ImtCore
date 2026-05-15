@@ -3,7 +3,13 @@ const fs = require('fs')
 const { Builder, Capabilities, By, until } = require('selenium-webdriver')
 const chrome = require('selenium-webdriver/chrome')
 const path = require('path')
-require('chromedriver')
+const chromedriverModule = require('chromedriver')
+const chromedriverPath = (() => {
+    const p = chromedriverModule.path
+    if (fs.existsSync(p)) return p
+    const globalBin = process.platform === 'win32' ? 'chromedriver.exe' : 'chromedriver'
+    return require('child_process').execSync(`which ${globalBin}`).toString().trim()
+})()
 
 const colors = {
     reset: "\x1b[0m",
@@ -297,7 +303,7 @@ async function runTests() {
             console.log(`${colors.cyan}[Desktop] ${resultDesktop}${colors.reset}`)
             console.log(`${colors.cyan}[Web] ${resultWeb}${colors.reset}`)
 
-            if (resultDesktop.join('') === resultWeb.join('')) {
+            if (resultDesktop && resultWeb && resultDesktop.join('') === resultWeb.join('')) {
                 completedTests++
                 console.log(`${colors.green}[+] Completed test: ${testdir}${colors.reset}`)
             } else {
@@ -343,7 +349,7 @@ async function runWebTest(driver, testDirPath, timeout = 5000) {
     }
 
     try {
-        await driver.get(path.resolve(testDirPath, './_web/test.html'))
+        await driver.get('file://' + path.resolve(testDirPath, './_web/test.html'))
 
         await driver.wait(async () => {
             const readyState = await driver.executeScript('return document.readyState')
@@ -380,18 +386,18 @@ async function createWebDriver() {
     try {
         // Настройка Chrome (опционально: запуск без окна)
         let options = new chrome.Options()
-        options.addArguments('--headless', '--window-size=800,600') // Раскомментировать для headless-режима
-
-        const caps = Capabilities.chrome()
-        caps.setLoggingPrefs({
+        options.addArguments('--headless', '--window-size=800,600', '--no-sandbox', '--disable-dev-shm-usage') // Раскомментировать для headless-режима
+        options.setLoggingPrefs({
             browser: 'ALL', // Собирать все типы сообщений (INFO, WARNING, SEVERE)
             driver: 'WARNING'
         })
 
+        let service = new chrome.ServiceBuilder(chromedriverPath)
+
         let driver = await new Builder()
             .forBrowser('chrome')
             .setChromeOptions(options)
-            .withCapabilities(caps)
+            .setChromeService(service)
             .build()
         
         return driver
