@@ -1,4 +1,4 @@
-import QtQuick 2.12
+import QtQuick
 import imtcontrols 1.0
 
 Item {
@@ -96,10 +96,6 @@ Item {
         property bool editable: true
         property var options: []
         property int horizontalAlignment: Text.AlignLeft
-    }
-
-    onModelChanged: {
-        
     }
 
     ListModel {
@@ -227,6 +223,9 @@ Item {
 
                     delegate: Item {
                         id: cellRoot
+                        Component.onCompleted: {
+                            console.log("cellRoot onCompleted", nodeKey, nodeText)
+                        }
 
                         property var column: root.columnAt(index)
                         property bool treeColumn: root.isTreeColumn(column, index)
@@ -330,7 +329,7 @@ Item {
 
                             Text {
                                 anchors.verticalCenter: parent.verticalCenter
-                                visible: !cellRoot.editingThisCell && cellRoot.editorType !== "bool" && cellRoot.editorType !== "checkState"
+                                // visible: !cellRoot.editingThisCell && cellRoot.editorType !== "bool" && cellRoot.editorType !== "checkState"
                                 width: Math.max(0, parent.width - x)
                                 text: root.displayValue(cellRoot.value, cellRoot.column, delegateRoot.nodeKey)
                                 color: !delegateRoot.nodeIsEnabled ? root.disabledTextColor : delegateRoot.nodeSelected ? root.selectedTextColor : root.normalTextColor
@@ -763,6 +762,7 @@ Item {
     }
 
     function displayValue(value, column, keyValue) {
+        console.log("displayValue", value, column, keyValue)
         if (value === undefined || value === null)
             return ""
 
