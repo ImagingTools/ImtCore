@@ -742,24 +742,16 @@ DocumentViewBase {
 				if (!container.tenantData)
 					return
 
-				// Populate permissions model from server data
+				// Populate permissions model from server tree data
 				container.permissionsModel.clear()
 				var allPermsModel = container.tenantData.m_allProductPermissions
 				if (allPermsModel) {
-					var allCount = allPermsModel.count || 0
-					for (var pi = 0; pi < allCount; pi++) {
-						var perm = allPermsModel.get(pi).item
-						if (perm) {
-							var permIndex = container.permissionsModel.insertNewItem()
-							container.permissionsModel.setData("FeatureId", perm.m_id || "", permIndex)
-							container.permissionsModel.setData("FeatureName", perm.m_name || "", permIndex)
-						}
-					}
+					__populatePermissionsTree(allPermsModel, container.permissionsModel)
 				}
 				container.permissionsModel.refresh()
 				tenantPermissionsTreeView.buildPermissionsModel()
 
-				// Restore checked state from selected permissions
+				// Restore checked state from selected permissions (leaf nodes only)
 				var selectedPermissionsIds = []
 				var permissionsArray = container.tenantData.m_tenantPermissions
 				if (permissionsArray) {
@@ -782,6 +774,23 @@ DocumentViewBase {
 						if (selectedPermissionsIds.includes(id)) {
 							tenantPermissionsTreeView.treeView.checkItem(nodeIdx.key)
 						}
+					}
+				}
+			}
+
+			function __populatePermissionsTree(permsListModel, treeItemModel) {
+				var count = permsListModel.count || 0
+				for (var i = 0; i < count; i++) {
+					var perm = permsListModel.get(i).item
+					if (!perm)
+						continue
+					var idx = treeItemModel.insertNewItem()
+					treeItemModel.setData("FeatureId", perm.m_id || "", idx)
+					treeItemModel.setData("FeatureName", perm.m_name || "", idx)
+					var childrenModel = perm.m_children
+					if (childrenModel && (childrenModel.count || 0) > 0) {
+						var childTreeModel = treeItemModel.addTreeModel("ChildModel", idx)
+						__populatePermissionsTree(childrenModel, childTreeModel)
 					}
 				}
 			}

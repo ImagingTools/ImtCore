@@ -37,9 +37,9 @@ protected:
 				QString& errorMessage) const override;
 
 private:
-	void CollectLeafPermissions(
+	void CollectPermissionsTree(
 				const imtlic::IFeatureInfo* featureInfoPtr,
-				imtsdl::TElementList<sdl::imtauth::Tenants::CTenantPermissionOption::V1_0>& leafPermissions) const;
+				imtsdl::TElementList<sdl::imtauth::Tenants::CTenantPermissionOption::V1_0>& permissions) const;
 
 	I_REF(imtlic::IProductInfo, m_productInfoCompPtr);
 };

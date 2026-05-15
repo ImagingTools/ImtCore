@@ -29,7 +29,7 @@ sdl::imtauth::Tenants::CTenantData CRemoteTenantCollectionDocumentManagerControl
 		return response;
 	}
 
-	// Enrich response with allProductPermissions from local IProductInfo (only leaf permissions)
+	// Enrich response with allProductPermissions as tree from local IProductInfo
 	response.Version_1_0->allProductPermissions.Emplace();
 	if (m_productInfoCompPtr.IsValid()){
 		imtbase::IObjectCollection* featureCollectionPtr = m_productInfoCompPtr->GetFeatures();
@@ -40,7 +40,7 @@ sdl::imtauth::Tenants::CTenantData CRemoteTenantCollectionDocumentManagerControl
 				if (featureCollectionPtr->GetObjectData(elementId, dataPtr)){
 					const imtlic::IFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::IFeatureInfo*>(dataPtr.GetPtr());
 					if (featureInfoPtr != nullptr && featureInfoPtr->IsPermission()){
-						CollectLeafPermissions(featureInfoPtr, *response.Version_1_0->allProductPermissions);
+						CollectPermissionsTree(featureInfoPtr, *response.Version_1_0->allProductPermissions);
 					}
 				}
 			}
@@ -62,30 +62,30 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CRemoteTenantC
 
 // private methods
 
-void CRemoteTenantCollectionDocumentManagerControllerComp::CollectLeafPermissions(
+void CRemoteTenantCollectionDocumentManagerControllerComp::CollectPermissionsTree(
 		const imtlic::IFeatureInfo* featureInfoPtr,
-		imtsdl::TElementList<sdl::imtauth::Tenants::CTenantPermissionOption::V1_0>& leafPermissions) const
+		imtsdl::TElementList<sdl::imtauth::Tenants::CTenantPermissionOption::V1_0>& permissions) const
 {
 	if (featureInfoPtr == nullptr){
 		return;
 	}
 
+	sdl::imtauth::Tenants::CTenantPermissionOption::V1_0 permOpt;
+	permOpt.id = featureInfoPtr->GetFeatureId();
+	permOpt.name = featureInfoPtr->GetFeatureName();
+	permOpt.description = featureInfoPtr->GetFeatureDescription();
+
 	const imtlic::IFeatureInfo::FeatureInfoList& subFeatures = featureInfoPtr->GetSubFeatures();
-	if (subFeatures.isEmpty()){
-		// Leaf node — add to result
-		sdl::imtauth::Tenants::CTenantPermissionOption::V1_0 permOpt;
-		permOpt.id = featureInfoPtr->GetFeatureId();
-		permOpt.name = featureInfoPtr->GetFeatureName();
-		permOpt.description = featureInfoPtr->GetFeatureDescription();
-		leafPermissions.append(permOpt);
-	} else {
-		// Non-leaf — recurse into sub-features
+	if (!subFeatures.isEmpty()){
+		permOpt.children.Emplace();
 		for (const imtlic::IFeatureInfo::FeatureInfoPtr& subFeaturePtr : subFeatures){
 			if (subFeaturePtr.IsValid()){
-				CollectLeafPermissions(subFeaturePtr.GetPtr(), leafPermissions);
+				CollectPermissionsTree(subFeaturePtr.GetPtr(), *permOpt.children);
 			}
 		}
 	}
+
+	permissions.append(permOpt);
 }
 
 

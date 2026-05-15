@@ -46,6 +46,7 @@ type TenantPermissionOption {
 	id: ID!
 	name: String!
 	description: String
+	children: [TenantPermissionOption]
 }
 
 type TenantInvitationEntry {
