@@ -7,7 +7,7 @@ include($$PWD/../../../Config/QMake/Quazip.pri)
 CONFIG += network
 QT += websockets
 
-SOURCES += $$files($$_PRO_FILE_PWD_/../*.c, false)
+SOURCES += $$files($$_PRO_FILE_PWD_/../*.cpp, false)
 RESOURCES += $$files($$_PRO_FILE_PWD_/../*.qrc, false)
 
 
