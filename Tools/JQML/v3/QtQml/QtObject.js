@@ -218,7 +218,7 @@ class QtObject extends QObject {
     //     }
     // }
 
-    SLOT_dataChanged(leftTop, bottonRight, roles){
+    SLOT_dataChanged(...args){
         if(args.length === 3){
             let leftTop = args[0]
             let bottonRight = args[1]
