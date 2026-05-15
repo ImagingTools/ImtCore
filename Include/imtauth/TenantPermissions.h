@@ -31,8 +31,8 @@ namespace TenantPermissions
 	inline const QByteArray ViewMembers()		{ return QByteArrayLiteral("tenant.view_members"); }
 
 	/**
-		Permission to manage existing members (remove, change roles).
-		Required for: RemoveMembership, UpdateMembershipRole
+		Permission to manage existing members (add, remove, change roles).
+		Required for: AddMembership, RemoveMembership, UpdateMembershipRole
 	*/
 	inline const QByteArray ManageMembers()		{ return QByteArrayLiteral("tenant.manage_members"); }
 
