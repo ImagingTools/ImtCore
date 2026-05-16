@@ -17,19 +17,14 @@ namespace imtdoc
 class CCollectionDocumentServiceBase: virtual public CDocumentServiceBase
 {
 public:
-	// reimplemented (imtdoc::IDocumentService)
-	virtual QByteArray CreateNewDocument(
-		const QByteArray& userId,
-		const QByteArray& documentTypeId,
-		const QByteArray& proposedSourceDocumentId = QByteArray()) override;
-	virtual QByteArray OpenDocument(const QByteArray& userId, const QUrl& url) override;
+	// reimplemented (imtdoc::CDocumentServiceBase) — task dispatch
+	virtual void DoCreateNewDocument(const QByteArray& taskId, const TaskParams& params) override;
+	virtual void DoOpenDocument(const QByteArray& taskId, const TaskParams& params) override;
+	virtual void DoSaveDocument(const QByteArray& taskId, const TaskParams& params) override;
+	virtual void DoCloseDocument(const QByteArray& taskId, const TaskParams& params) override;
+
+	// reimplemented (imtdoc::IDocumentService) — synchronous helpers
 	virtual OperationStatus SetDocumentName(const QByteArray& userId, const QByteArray& documentId, const QString& documentName) override;
-	virtual OperationStatus SaveDocument(
-		const QByteArray& userId,
-		const QByteArray& documentId,
-		const QString& documentName = QString(),
-		QString* errorMessage = nullptr) override;
-	virtual OperationStatus CloseDocument(const QByteArray& userId, const QByteArray& documentId) override;
 
 protected:
 	virtual imtbase::IObjectCollection* GetCollection() const = 0;

@@ -3,9 +3,11 @@
 
 
 // Qt includes
+#include <QtCore/QMap>
 #include <QtCore/QMutex>
 #include <QtCore/QString>
 #include <QtCore/QThread>
+#include <QtCore/QWaitCondition>
 
 // STL includes
 #include <atomic>
@@ -34,28 +36,20 @@ public:
 	CDocumentServiceBase();
 	~CDocumentServiceBase();
 
-	// reimplemented (imtdoc::IDocumentService)
+	// reimplemented (imtdoc::IDocumentService) — asynchronous task API
+	virtual QByteArray BeginDocumentTask(
+		TaskType taskType,
+		const TaskParams& params,
+		Error* errorPtr = nullptr) override;
+	virtual TaskResult WaitForTaskFinished(const QByteArray& taskId) override;
+
+	// reimplemented (imtdoc::IDocumentService) — synchronous helpers
 	virtual DocumentList GetOpenedDocumentList(const QByteArray& userId) const override;
-	virtual void CreateNewDocument(
-		const QByteArray& userId,
-		const QByteArray& documentTypeId,
-		DocumentIdCallback callback,
-		const QByteArray& proposedSourceDocumentId = QByteArray()) override;
-	virtual void OpenDocument(const QByteArray& userId, const QUrl& url, DocumentIdCallback callback) override;
 	virtual OperationStatus GetDocumentName(const QByteArray& userId, const QByteArray& documentId, QString& documentName) const override;
 	virtual OperationStatus SetDocumentName(const QByteArray& userId, const QByteArray& documentId, const QString& documentName) override;
 	virtual const istd::IChangeable* GetDocumentPtr(const QByteArray& userId, const QByteArray& documentId) const override;
 	virtual OperationStatus GetDocumentData(const QByteArray& userId, const QByteArray& documentId, istd::IChangeableSharedPtr& documentPtr) const override;
 	virtual OperationStatus SetDocumentData(const QByteArray& userId, const QByteArray& documentId, const istd::IChangeable& document) override;
-	virtual void SaveDocument(
-		const QByteArray& userId,
-		const QByteArray& documentId,
-		OperationResultCallback callback,
-		const QString& documentName = QString()) override;
-	virtual void CloseDocument(
-		const QByteArray& userId,
-		const QByteArray& documentId,
-		OperationResultCallback callback) override;
 	virtual OperationStatus GetDocumentUndoManager(
 		const QByteArray& userId, const QByteArray& documentId, idoc::IUndoManager*& undoManagerPtr) const override;
 	virtual OperationStatus RegisterDocumentObserver(const QByteArray& userId, const QByteArray& documentId, imod::IObserver& observer) override;
@@ -66,6 +60,32 @@ public:
 
 protected:
 	struct WorkingDocument;
+
+	// -----------------------------------------------------------------
+	// Protected virtual methods for task dispatch — override in
+	// subclasses to provide task-type-specific behaviour.
+	// Each method must call \c CompleteTask exactly once (synchronously
+	// or asynchronously) to signal completion.
+	// -----------------------------------------------------------------
+	virtual void DoCreateNewDocument(const QByteArray& taskId, const TaskParams& params);
+	virtual void DoOpenDocument(const QByteArray& taskId, const TaskParams& params);
+	virtual void DoSaveDocument(const QByteArray& taskId, const TaskParams& params);
+	virtual void DoCloseDocument(const QByteArray& taskId, const TaskParams& params);
+
+	/**
+		\brief Close a document internally (shared implementation used by
+		both \c DoCloseDocument and failure paths of \c DoCreateNewDocument /
+		\c DoOpenDocument).
+	*/
+	OperationStatus CloseDocumentInternal(const QByteArray& userId, const QByteArray& documentId);
+
+	/**
+		\brief Mark a pending task as finished.
+
+		Wakes any thread that is blocked in \c WaitForTaskFinished
+		for this task ID.
+	*/
+	void CompleteTask(const QByteArray& taskId, const TaskResult& result);
 
 	bool ValidateInputParams(const QByteArray& userId, const QByteArray& documentId, OperationStatus& status) const;
 	int GetUndoManagerNextModelId(const QByteArray& userId);
@@ -132,6 +152,20 @@ protected:
 		CDocumentServiceBase& m_parent;
 	};
 
+	/**
+		\brief Internal context for a single pending task.
+
+		Shared between \c BeginDocumentTask (producer) and
+		\c WaitForTaskFinished (consumer).
+	*/
+	struct TaskContext
+	{
+		TaskResult result;
+		bool isFinished = false;
+		QMutex mutex;
+		QWaitCondition condition;
+	};
+
 	virtual bool IsSingleCopyMode() const;
 
 	typedef QPair<QByteArray, QByteArray> UserDocumentPair;
@@ -146,6 +180,9 @@ protected:
 
 	UndoManagerObserver m_undoManagerObserver;
 	std::shared_ptr<std::atomic<bool>> m_isAlive;
+
+	QMap<QByteArray, std::shared_ptr<TaskContext>> m_pendingTasks;
+	mutable QMutex m_tasksMutex;
 };
 
 

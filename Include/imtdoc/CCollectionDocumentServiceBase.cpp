@@ -24,51 +24,68 @@ namespace imtdoc
 {
 
 
-// reimplemented (imtdoc::IDocumentService)
+// reimplemented (imtdoc::CDocumentServiceBase) — task dispatch
 
-QByteArray CCollectionDocumentServiceBase::CreateNewDocument(
-	const QByteArray& userId,
-	const QByteArray& documentTypeId,
-	const QByteArray& proposedSourceDocumentId)
+void CCollectionDocumentServiceBase::DoCreateNewDocument(
+	const QByteArray& taskId,
+	const TaskParams& params)
 {
 	QMutexLocker locker(&m_mutex);
 
-	QByteArray documentId = CDocumentServiceBase::CreateNewDocument(userId, documentTypeId, proposedSourceDocumentId);
+	// Delegate to base class which handles UUID generation, events, and
+	// spawning the async object-creation thread.  On completion the base
+	// class calls CompleteTask.
+	CDocumentServiceBase::DoCreateNewDocument(taskId, params);
 
-	if (!documentId.isEmpty() && !proposedSourceDocumentId.isEmpty()) {
-		m_proposedSourceDocumentIds[documentId] = proposedSourceDocumentId;
+	// If the base class already produced a document entry, record the
+	// proposed source document ID for later use by SaveDocument.
+	if (!params.proposedSourceDocumentId.isEmpty()){
+		// Find the document that was just created — it will be the most
+		// recently added entry for this user.
+		const WorkingDocumentList& docs = m_userDocuments[params.userId];
+		for (auto it = docs.constBegin(); it != docs.constEnd(); ++it){
+			if (it.value().typeId == params.documentTypeId && it.value().isLoading){
+				m_proposedSourceDocumentIds[it.key()] = params.proposedSourceDocumentId;
+				break;
+			}
+		}
 	}
-
-	return documentId;
 }
 
 
-QByteArray CCollectionDocumentServiceBase::OpenDocument(const QByteArray& userId, const QUrl& url)
+void CCollectionDocumentServiceBase::DoOpenDocument(
+	const QByteArray& taskId,
+	const TaskParams& params)
 {
-	QByteArray retVal;
+	const QUrl& url = params.url;
+	const QByteArray& userId = params.userId;
 
 	if (url.scheme() != "collection" || !url.host().isEmpty()){
-		return retVal;
+		CompleteTask(taskId, TaskResult{OS_FAILED, QByteArray(), QStringLiteral("Invalid URL scheme")});
+		return;
 	}
 
 	QString path = url.path();
 
 	QStringList parts = path.split('/', Qt::SkipEmptyParts);
 	if (parts.count() != 1){
-		return retVal;
+		CompleteTask(taskId, TaskResult{OS_FAILED, QByteArray(), QStringLiteral("Invalid URL path")});
+		return;
 	}
 
 	QByteArray objectId = parts.first().toUtf8();
 
 	imtbase::IObjectCollection* collectionPtr = GetCollection();
 	if (collectionPtr == nullptr) {
-		return retVal;
+		CompleteTask(taskId, TaskResult{OS_FAILED, QByteArray(), QStringLiteral("No collection available")});
+		return;
 	}
 
 	QByteArray objectTypeId = collectionPtr->GetObjectTypeId(objectId);
 
 	if (objectTypeId.isEmpty()) {
-		return retVal;
+		CompleteTask(taskId, TaskResult{OS_FAILED, QByteArray(), QStringLiteral("Unknown object type")});
+		return;
 	}
 
 	// Single-copy mode: check if this object is already opened by any user
@@ -78,9 +95,9 @@ QByteArray CCollectionDocumentServiceBase::OpenDocument(const QByteArray& userId
 			SharedDocumentData& shared = m_sharedDocuments[objectId];
 			shared.refCount++;
 
-			retVal = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+			QByteArray documentId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
-			WorkingDocument& doc = m_userDocuments[userId][retVal];
+			WorkingDocument& doc = m_userDocuments[userId][documentId];
 			doc.objectId = objectId;
 			doc.typeId = shared.typeId;
 			doc.url = url;
@@ -96,7 +113,7 @@ QByteArray CCollectionDocumentServiceBase::OpenDocument(const QByteArray& userId
 			{
 				DocumentOpenedInfo info;
 				info.userId = userId;
-				info.documentId = retVal;
+				info.documentId = documentId;
 				info.typeId = shared.typeId;
 				info.url = url;
 				info.name = shared.name;
@@ -112,7 +129,7 @@ QByteArray CCollectionDocumentServiceBase::OpenDocument(const QByteArray& userId
 				if (handlerPtr != nullptr){
 					CDocumentOpenedEvent event(
 						userId,
-						retVal,
+						documentId,
 						shared.typeId,
 						shared.name,
 						ObjectIdToUrl(objectId),
@@ -124,10 +141,8 @@ QByteArray CCollectionDocumentServiceBase::OpenDocument(const QByteArray& userId
 			if (!shared.isLoading) {
 				// Defer the notification to ensure the mutation response is sent
 				// to the client before the subscription notification arrives.
-				// Without this, the client receives DocumentDataLoaded before it
-				// knows the documentId from the mutation response and ignores it.
 				QByteArray deferredUserId = userId;
-				QByteArray deferredDocumentId = retVal;
+				QByteArray deferredDocumentId = documentId;
 				std::weak_ptr<std::atomic<bool>> deferredAliveGuard(m_isAlive);
 				QTimer::singleShot(0, QCoreApplication::instance(), [this, deferredAliveGuard, deferredUserId, deferredDocumentId]() {
 					auto isAlive = deferredAliveGuard.lock();
@@ -138,22 +153,24 @@ QByteArray CCollectionDocumentServiceBase::OpenDocument(const QByteArray& userId
 				});
 			}
 
-			return retVal;
+			CompleteTask(taskId, TaskResult{OS_OK, documentId, QString()});
+			return;
 		}
 	}
 
 	idoc::IUndoManagerSharedPtr undoManagerPtr = CreateUndoManager();
 	if (!undoManagerPtr.IsValid()){
-		return retVal;
+		CompleteTask(taskId, TaskResult{OS_FAILED, QByteArray(), QStringLiteral("Failed to create undo manager")});
+		return;
 	}
 
-	retVal = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+	QByteArray documentId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 	QString documentName = collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
 
 	{
 		QMutexLocker locker(&m_mutex);
-		WorkingDocument& doc = m_userDocuments[userId][retVal];
+		WorkingDocument& doc = m_userDocuments[userId][documentId];
 		doc.objectId = objectId;
 		doc.typeId = objectTypeId;
 		doc.url = url;
@@ -175,7 +192,7 @@ QByteArray CCollectionDocumentServiceBase::OpenDocument(const QByteArray& userId
 	{
 		DocumentOpenedInfo info;
 		info.userId = userId;
-		info.documentId = retVal;
+		info.documentId = documentId;
 		info.typeId = objectTypeId;
 		info.url = url;
 		info.name = documentName;
@@ -191,7 +208,7 @@ QByteArray CCollectionDocumentServiceBase::OpenDocument(const QByteArray& userId
 		if (handlerPtr != nullptr){
 			CDocumentOpenedEvent event(
 				userId,
-				retVal,
+				documentId,
 				objectTypeId,
 				documentName,
 				ObjectIdToUrl(objectId),
@@ -201,22 +218,23 @@ QByteArray CCollectionDocumentServiceBase::OpenDocument(const QByteArray& userId
 	}
 
 	// Load document data asynchronously in a separate thread
-	QByteArray documentId = retVal;
 	QThread* thread = new QThread();
 	QObject* worker = new QObject();
 	worker->moveToThread(thread);
 
 	bool singleCopyMode = IsSingleCopyMode();
 	std::weak_ptr<std::atomic<bool>> aliveGuard(m_isAlive);
-	QObject::connect(thread, &QThread::started, worker, [this, aliveGuard, singleCopyMode, objectId, userId, documentId, worker]() {
+	QObject::connect(thread, &QThread::started, worker, [this, aliveGuard, singleCopyMode, objectId, userId, documentId, taskId, worker]() {
 		auto isAlive = aliveGuard.lock();
 		if (!isAlive || !isAlive->load()) {
+			CompleteTask(taskId, TaskResult{OS_FAILED, QByteArray(), QStringLiteral("Service destroyed")});
 			worker->deleteLater();
 			return;
 		}
 
 		imtbase::IObjectCollection* collPtr = GetCollection();
 		if (collPtr == nullptr) {
+			CompleteTask(taskId, TaskResult{OS_FAILED, QByteArray(), QStringLiteral("No collection available")});
 			worker->deleteLater();
 			return;
 		}
@@ -226,10 +244,12 @@ QByteArray CCollectionDocumentServiceBase::OpenDocument(const QByteArray& userId
 
 		isAlive = aliveGuard.lock();
 		if (!isAlive || !isAlive->load()) {
+			CompleteTask(taskId, TaskResult{OS_FAILED, QByteArray(), QStringLiteral("Service destroyed")});
 			worker->deleteLater();
 			return;
 		}
 
+		bool loadSuccess = false;
 		{
 			QMutexLocker locker(&m_mutex);
 
@@ -246,6 +266,7 @@ QByteArray CCollectionDocumentServiceBase::OpenDocument(const QByteArray& userId
 							dp->objectPtr = dataPtr;
 						}
 					}
+					loadSuccess = true;
 				}
 				else {
 					if (m_sharedDocuments.contains(objectId)) {
@@ -257,7 +278,7 @@ QByteArray CCollectionDocumentServiceBase::OpenDocument(const QByteArray& userId
 						WorkingDocument* dp = FindDocument(pair.first, pair.second);
 						if (dp != nullptr) {
 							dp->isLoading = false;
-							CloseDocument(pair.first, pair.second);
+							CloseDocumentInternal(pair.first, pair.second);
 						}
 					}
 				}
@@ -267,19 +288,24 @@ QByteArray CCollectionDocumentServiceBase::OpenDocument(const QByteArray& userId
 
 				if (docPtr != nullptr && success && dataPtr.IsValid()) {
 					docPtr->objectPtr = dataPtr;
+					loadSuccess = true;
 				}
 				else if (docPtr != nullptr) {
 					docPtr->isLoading = false;
-					CloseDocument(userId, documentId);
+					CloseDocumentInternal(userId, documentId);
 				}
 			}
+		}
+
+		if (!loadSuccess){
+			CompleteTask(taskId, TaskResult{OS_FAILED, QByteArray(), QStringLiteral("Failed to load document data")});
 		}
 
 		worker->deleteLater();
 	});
 
 	// Initialize observers and fire events in the main thread after background work completes
-	QObject::connect(thread, &QThread::finished, QCoreApplication::instance(), [this, aliveGuard, singleCopyMode, objectId, userId, documentId]() {
+	QObject::connect(thread, &QThread::finished, QCoreApplication::instance(), [this, aliveGuard, singleCopyMode, objectId, userId, documentId, taskId]() {
 		auto isAlive = aliveGuard.lock();
 		if (!isAlive || !isAlive->load()) {
 			return;
@@ -325,14 +351,14 @@ QByteArray CCollectionDocumentServiceBase::OpenDocument(const QByteArray& userId
 				OnDocumentDataLoaded(userId, documentId);
 			}
 		}
+
+		CompleteTask(taskId, TaskResult{OS_OK, documentId, QString()});
 	});
 
 	QObject::connect(worker, &QObject::destroyed, thread, &QThread::quit);
 	QObject::connect(thread, &QThread::finished, thread, &QObject::deleteLater);
 
 	thread->start();
-
-	return retVal;
 }
 
 
@@ -427,37 +453,44 @@ IDocumentService::OperationStatus CCollectionDocumentServiceBase::SetDocumentNam
 }
 
 
-IDocumentService::OperationStatus CCollectionDocumentServiceBase::SaveDocument(
-	const QByteArray& userId,
-	const QByteArray& documentId,
-	const QString& documentName,
-	QString* errorMessage)
+void CCollectionDocumentServiceBase::DoSaveDocument(
+	const QByteArray& taskId,
+	const TaskParams& params)
 {
+	const QByteArray& userId = params.userId;
+	const QByteArray& documentId = params.documentId;
+	const QString& documentName = params.documentName;
+
 	imtbase::IObjectCollection* collectionPtr = GetCollection();
 	if (collectionPtr == nullptr) {
-		return OS_FAILED;
+		CompleteTask(taskId, TaskResult{OS_FAILED, documentId, QStringLiteral("No collection available")});
+		return;
 	}
 
 	QMutexLocker locker(&m_mutex);
 
 	OperationStatus validationStatus = OS_OK;
 	if (!ValidateInputParams(userId, documentId, validationStatus)){
-		return validationStatus;
+		CompleteTask(taskId, TaskResult{validationStatus, documentId, QString()});
+		return;
 	}
 
 	WorkingDocument* workingDocumentPtr = &m_userDocuments[userId][documentId];
 
 	if (workingDocumentPtr->isLoading) {
-		return OS_FAILED;
+		CompleteTask(taskId, TaskResult{OS_FAILED, documentId, QStringLiteral("Document is still loading")});
+		return;
 	}
 
 	istd::IChangeableSharedPtr documentSnapshotPtr = CreateObject(workingDocumentPtr->typeId);
 	if (!documentSnapshotPtr.IsValid()){
-		return OS_FAILED;
+		CompleteTask(taskId, TaskResult{OS_FAILED, documentId, QStringLiteral("Failed to create snapshot")});
+		return;
 	}
 
 	if (!documentSnapshotPtr->CopyFrom(*workingDocumentPtr->objectPtr)){
-		return OS_FAILED;
+		CompleteTask(taskId, TaskResult{OS_FAILED, documentId, QStringLiteral("Failed to copy document data")});
+		return;
 	}
 
 	WorkingDocument workingDocumentSnapshot = *workingDocumentPtr;
@@ -465,10 +498,9 @@ IDocumentService::OperationStatus CCollectionDocumentServiceBase::SaveDocument(
 
 	QString validationMessage;
 	if (!ValidateDocumentData(workingDocumentSnapshot, validationStatus, &validationMessage)){
-		if (errorMessage != nullptr) {
-			*errorMessage = validationMessage.isEmpty() ? GetInvalidDocumentMessage() : validationMessage;
-		}
-		return validationStatus;
+		QString msg = validationMessage.isEmpty() ? GetInvalidDocumentMessage() : validationMessage;
+		CompleteTask(taskId, TaskResult{validationStatus, documentId, msg});
+		return;
 	}
 
 	istd::CChangeGroup changeGroup(collectionPtr);
@@ -483,7 +515,8 @@ IDocumentService::OperationStatus CCollectionDocumentServiceBase::SaveDocument(
 				workingDocumentPtr->typeId, resultDocumentName, "", documentSnapshotPtr.GetPtr());
 
 			if (newObjectId.isEmpty()){
-				return OS_FAILED;
+				CompleteTask(taskId, TaskResult{OS_FAILED, documentId, QStringLiteral("Failed to insert copy")});
+				return;
 			}
 
 			if (HasDocumentNameProvider(workingDocumentPtr->typeId)){
@@ -543,7 +576,8 @@ IDocumentService::OperationStatus CCollectionDocumentServiceBase::SaveDocument(
 				}
 			}
 
-			return OS_OK;
+			CompleteTask(taskId, TaskResult{OS_OK, documentId, QString()});
+			return;
 		}
 
 		// Update object
@@ -629,7 +663,8 @@ IDocumentService::OperationStatus CCollectionDocumentServiceBase::SaveDocument(
 			}
 		}
 
-		return res ? OS_OK : OS_FAILED;
+		CompleteTask(taskId, TaskResult{res ? OS_OK : OS_FAILED, documentId, res ? QString() : QStringLiteral("Failed to update object data")});
+		return;
 	}
 
 	// Create new object
@@ -679,18 +714,29 @@ IDocumentService::OperationStatus CCollectionDocumentServiceBase::SaveDocument(
 
 	}
 
-	return workingDocumentPtr->objectId.isEmpty() ? OS_FAILED : OS_OK;
+	OperationStatus saveStatus = workingDocumentPtr->objectId.isEmpty() ? OS_FAILED : OS_OK;
+	CompleteTask(taskId, TaskResult{saveStatus, documentId, saveStatus == OS_OK ? QString() : QStringLiteral("Failed to insert new object")});
 }
 
 
-IDocumentService::OperationStatus CCollectionDocumentServiceBase::CloseDocument(
-	const QByteArray& userId, const QByteArray& documentId)
+void CCollectionDocumentServiceBase::DoCloseDocument(
+	const QByteArray& taskId,
+	const TaskParams& params)
 {
 	QMutexLocker locker(&m_mutex);
 
-	m_proposedSourceDocumentIds.remove(documentId);
+	m_proposedSourceDocumentIds.remove(params.documentId);
 
-	return CDocumentServiceBase::CloseDocument(userId, documentId);
+	OperationStatus status = CloseDocumentInternal(params.userId, params.documentId);
+	QString msg;
+	if (status != OS_OK){
+		switch (status){
+			case OS_INVALID_USER_ID:  msg = QStringLiteral("Invalid user ID"); break;
+			case OS_INVALID_DOCUMENT_ID: msg = QStringLiteral("Invalid document ID"); break;
+			default: msg = QStringLiteral("Close failed"); break;
+		}
+	}
+	CompleteTask(taskId, TaskResult{status, params.documentId, msg});
 }
 
 

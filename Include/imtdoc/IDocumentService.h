@@ -2,8 +2,8 @@
 #pragma once
 
 
-// std includes
-#include <functional>
+// STL includes
+#include <memory>
 
 // Qt includes
 #include <QtCore/QUrl>
@@ -41,6 +41,67 @@ public:
 		OS_INVALID_DOCUMENT_ID,
 		OS_INVALID_DOCUMENT_DATA,
 		OS_FAILED
+	};
+
+	/**
+		\brief Identifies the kind of asynchronous document operation
+		started by \c BeginDocumentTask.
+	*/
+	enum TaskType
+	{
+		TT_NEW,   ///< Create a new blank document
+		TT_OPEN,  ///< Open an existing document from a URL
+		TT_SAVE,  ///< Save a document
+		TT_CLOSE  ///< Close a document
+	};
+
+	/**
+		\brief Input parameters for \c BeginDocumentTask.
+
+		Only the fields relevant to the chosen \c TaskType need to be
+		filled in; the rest can be left at their default values.
+
+		| Field                      | TT_NEW | TT_OPEN | TT_SAVE | TT_CLOSE |
+		|----------------------------|:------:|:-------:|:-------:|:--------:|
+		| userId                     |   X    |    X    |    X    |    X     |
+		| documentTypeId             |   X    |         |         |          |
+		| proposedSourceDocumentId   |  (opt) |         |         |          |
+		| url                        |        |    X    |         |          |
+		| documentId                 |        |         |    X    |    X     |
+		| documentName               |        |         |  (opt)  |          |
+	*/
+	struct TaskParams
+	{
+		QByteArray userId;
+		QByteArray documentTypeId;
+		QByteArray proposedSourceDocumentId;
+		QUrl url;
+		QByteArray documentId;
+		QString documentName;
+	};
+
+	/**
+		\brief Result returned by \c WaitForTaskFinished.
+	*/
+	struct TaskResult
+	{
+		OperationStatus status = OS_OK;
+		QByteArray documentId;    ///< Set for TT_NEW and TT_OPEN on success
+		QString errorMessage;
+	};
+
+	/**
+		\brief Immediate-error output for \c BeginDocumentTask.
+
+		Populated only when \c BeginDocumentTask cannot even create
+		the task (e.g.\ missing required parameters).  In that case
+		the method returns an empty task ID.
+	*/
+	struct Error
+	{
+		OperationStatus status = OS_OK;
+		QString message;
+		bool HasError() const { return status != OS_OK; }
 	};
 
 	struct DocumentInfo
@@ -109,49 +170,51 @@ public:
 	static const QByteArray CN_DOCUMENT_DATA_LOADED;
 	typedef DocumentNotification DocumentDataLoadedInfo;
 
-	/**
-		\brief Callback invoked when a document-creating or document-opening
-		operation finishes.
-
-		\param documentId  The new document instance ID, or empty on failure.
-	*/
-	typedef std::function<void(const QByteArray& documentId)> DocumentIdCallback;
+	// -----------------------------------------------------------------
+	// Asynchronous task API
+	// -----------------------------------------------------------------
 
 	/**
-		\brief Callback invoked when a status-returning operation
-		(save, close, …) finishes.
+		\brief Start an asynchronous document operation.
 
-		\param status        Result of the operation.
-		\param errorMessage  Human-readable error text (empty on success).
+		\param taskType  The kind of operation to perform.
+		\param params    Input parameters (see \c TaskParams for which
+		                 fields are required per task type).
+		\param errorPtr  Optional.  Receives an immediate error description
+		                 when the task cannot be created at all.  In that
+		                 case the method returns an empty \c QByteArray.
+		\return          A unique task ID that can be passed to
+		                 \c WaitForTaskFinished, or empty on immediate
+		                 failure.
 	*/
-	typedef std::function<void(OperationStatus status, const QString& errorMessage)> OperationResultCallback;
+	virtual QByteArray BeginDocumentTask(
+		TaskType taskType,
+		const TaskParams& params,
+		Error* errorPtr = nullptr) = 0;
+
+	/**
+		\brief Block until the task identified by \a taskId has finished.
+
+		\param taskId  A task ID previously returned by
+		               \c BeginDocumentTask.
+		\return        The result of the completed task.
+
+		\note If called from the GUI / main thread the implementation
+		      must keep the Qt event loop alive (e.g.\ via
+		      \c QCoreApplication::processEvents) to avoid dead-locks
+		      with completion handlers that are posted to the main
+		      thread.
+	*/
+	virtual TaskResult WaitForTaskFinished(const QByteArray& taskId) = 0;
+
+	// -----------------------------------------------------------------
+	// Synchronous query / mutate helpers
+	// -----------------------------------------------------------------
 
 	/**
 		Get a list of open document instances for a given user-ID
 	*/
 	virtual DocumentList GetOpenedDocumentList(const QByteArray& userId) const = 0;
-
-	/**
-		Create a document of the given type (documentTypeId) for the given
-		user-ID.  The result is delivered asynchronously through \a callback.
-	*/
-	virtual void CreateNewDocument(
-		const QByteArray& userId,
-		const QByteArray& documentTypeId,
-		DocumentIdCallback callback,
-		const QByteArray& proposedSourceDocumentId = QByteArray()) = 0;
-
-	/**
-		Open a document from a given URL for a given user-ID.
-		The result is delivered asynchronously through \a callback.
-
-		From file:
-			file:///etc/fstab					- *nix style path
-			file:///c:/pagefile.sys				- Windows style path
-		From object collection:
-			collection:///objectId				- for single collection document manager (or default collection)
-	*/
-	virtual void OpenDocument(const QByteArray& userId, const QUrl& url, DocumentIdCallback callback) = 0;
 
 	/**
 		Get name of the document with the given user-ID and document-ID
@@ -177,25 +240,6 @@ public:
 		Set document data with the given user-ID and document-ID
 	*/
 	virtual OperationStatus SetDocumentData(const QByteArray& userId, const QByteArray& documentId, const istd::IChangeable& document) = 0;
-
-	/**
-		Save document with the given user-ID and document-ID.
-		The result is delivered asynchronously through \a callback.
-	*/
-	virtual void SaveDocument(
-		const QByteArray& userId,
-		const QByteArray& documentId,
-		OperationResultCallback callback,
-		const QString& documentName = QString()) = 0;
-
-	/**
-		Close document with the given user-ID and document-ID.
-		The result is delivered asynchronously through \a callback.
-	*/
-	virtual void CloseDocument(
-		const QByteArray& userId,
-		const QByteArray& documentId,
-		OperationResultCallback callback) = 0;
 
 	/**
 		Get UndoManager for the document with the given user-ID and document-ID
