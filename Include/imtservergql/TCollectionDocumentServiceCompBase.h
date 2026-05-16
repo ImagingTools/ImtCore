@@ -275,9 +275,16 @@ inline CDM::CDocumentInfo TCollectionDocumentServiceCompBase<Base, ColorCollecti
 		return retVal;
 	}
 
-	QByteArray documentId = GetNonConstThis()->CreateNewDocument(userId, *documentTypeId->typeId);
+	typename BaseClass2::TaskParams taskParams;
+	taskParams.userId = userId;
+	taskParams.documentTypeId = *documentTypeId->typeId;
+	QByteArray taskId = GetNonConstThis()->BeginDocumentTask(BaseClass2::TT_NEW, taskParams);
+	typename BaseClass2::TaskResult taskResult = GetNonConstThis()->WaitForTaskFinished(taskId);
+	QByteArray documentId = taskResult.documentId;
 	if (documentId.isEmpty()) {
-		errorMessage = "Unable to create document or undo manager";
+		errorMessage = taskResult.errorMessage.isEmpty()
+			? "Unable to create document or undo manager"
+			: taskResult.errorMessage;
 
 		return retVal;
 	}
@@ -328,9 +335,16 @@ inline CDM::CDocumentInfo TCollectionDocumentServiceCompBase<Base, ColorCollecti
 		return retVal;
 	}
 
-	QByteArray documentId = GetNonConstThis()->OpenDocument(userId, *objectId->id);
+	typename BaseClass2::TaskParams taskParams;
+	taskParams.userId = userId;
+	taskParams.url = *objectId->id;
+	QByteArray taskId = GetNonConstThis()->BeginDocumentTask(BaseClass2::TT_OPEN, taskParams);
+	typename BaseClass2::TaskResult taskResult = GetNonConstThis()->WaitForTaskFinished(taskId);
+	QByteArray documentId = taskResult.documentId;
 	if (documentId.isEmpty()) {
-		errorMessage = "Unable to open document or create undo manager";
+		errorMessage = taskResult.errorMessage.isEmpty()
+			? "Unable to open document or create undo manager"
+			: taskResult.errorMessage;
 
 		return retVal;
 	}
@@ -384,12 +398,14 @@ inline CDM::CDocumentOperationStatus TCollectionDocumentServiceCompBase<Base, Co
 
 	retVal.Version_1_0.emplace();
 
-	QString saveErrorMessage;
-	OperationStatus status = GetNonConstThis()->SaveDocument(
-		userId,
-		*documentId->id,
-		QString(),
-		&saveErrorMessage);
+	typename BaseClass2::TaskParams taskParams;
+	taskParams.userId = userId;
+	taskParams.documentId = *documentId->id;
+	taskParams.documentName = QString();
+	QByteArray taskId = GetNonConstThis()->BeginDocumentTask(BaseClass2::TT_SAVE, taskParams);
+	typename BaseClass2::TaskResult taskResult = GetNonConstThis()->WaitForTaskFinished(taskId);
+	QString saveErrorMessage = taskResult.errorMessage;
+	OperationStatus status = taskResult.status;
 	switch (status) {
 	case imtdoc::ICollectionDocumentService::OS_OK:
 		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Success;
@@ -472,7 +488,12 @@ inline CDM::CDocumentOperationStatus TCollectionDocumentServiceCompBase<Base, Co
 
 	retVal.Version_1_0.emplace();
 
-	OperationStatus status = GetNonConstThis()->CloseDocument(userId, *documentId->id);
+	typename BaseClass2::TaskParams taskParams;
+	taskParams.userId = userId;
+	taskParams.documentId = *documentId->id;
+	QByteArray taskId = GetNonConstThis()->BeginDocumentTask(BaseClass2::TT_CLOSE, taskParams);
+	typename BaseClass2::TaskResult taskResult = GetNonConstThis()->WaitForTaskFinished(taskId);
+	OperationStatus status = taskResult.status;
 	switch (status) {
 	case imtdoc::ICollectionDocumentService::OS_OK:
 		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Success;

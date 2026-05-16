@@ -71,10 +71,13 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnCreateNewDocument
 		const QByteArray proposedSourceDocumentId = documentTypeId->proposedSourceDocumentId
 			? *documentTypeId->proposedSourceDocumentId
 			: QByteArray();
-		QByteArray documentId = m_documentManagerCompPtr->CreateNewDocument(
-			userId,
-			*documentTypeId->typeId,
-			proposedSourceDocumentId);
+		imtdoc::IDocumentService::TaskParams taskParams;
+		taskParams.userId = userId;
+		taskParams.documentTypeId = *documentTypeId->typeId;
+		taskParams.proposedSourceDocumentId = proposedSourceDocumentId;
+		QByteArray taskId = m_documentManagerCompPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_NEW, taskParams);
+		imtdoc::IDocumentService::TaskResult taskResult = m_documentManagerCompPtr->WaitForTaskFinished(taskId);
+		QByteArray documentId = taskResult.documentId;
 		if (documentId.isEmpty()){
 			errorMessage = "Unable to create document or undo manager";
 
@@ -130,7 +133,12 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnOpenDocument(
 	QUrl url(QString("collection:///%1").arg(*objectId->id));
 
 	if (m_documentManagerCompPtr.IsValid()) {
-		QByteArray documentId = m_documentManagerCompPtr->OpenDocument(userId, url);
+		imtdoc::IDocumentService::TaskParams taskParams;
+		taskParams.userId = userId;
+		taskParams.url = url;
+		QByteArray taskId = m_documentManagerCompPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, taskParams);
+		imtdoc::IDocumentService::TaskResult taskResult = m_documentManagerCompPtr->WaitForTaskFinished(taskId);
+		QByteArray documentId = taskResult.documentId;
 		if (documentId.isEmpty()){
 			errorMessage = "Unable to open document or create undo manager";
 
@@ -285,12 +293,14 @@ CDM::CDocumentOperationStatus CCollectionDocumentServiceControllerComp::OnSaveDo
 	retVal.Version_1_0.emplace();
 
 	if (m_documentManagerCompPtr.IsValid()) {
-		QString saveErrorMessage;
-		imtdoc::IDocumentService::OperationStatus status = m_documentManagerCompPtr->SaveDocument(
-			userId,
-			*saveDocumentInput->documentId,
-			*saveDocumentInput->documentName,
-			&saveErrorMessage);
+		imtdoc::IDocumentService::TaskParams taskParams;
+		taskParams.userId = userId;
+		taskParams.documentId = *saveDocumentInput->documentId;
+		taskParams.documentName = *saveDocumentInput->documentName;
+		QByteArray taskId = m_documentManagerCompPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, taskParams);
+		imtdoc::IDocumentService::TaskResult taskResult = m_documentManagerCompPtr->WaitForTaskFinished(taskId);
+		QString saveErrorMessage = taskResult.errorMessage;
+		imtdoc::IDocumentService::OperationStatus status = taskResult.status;
 		QString responseMessage;
 		switch (status){
 		case imtdoc::IDocumentService::OS_OK:
@@ -355,7 +365,12 @@ CDM::CDocumentOperationStatus CCollectionDocumentServiceControllerComp::OnCloseD
 	retVal.Version_1_0.emplace();
 
 	if (m_documentManagerCompPtr.IsValid()) {
-		imtdoc::IDocumentService::OperationStatus status = m_documentManagerCompPtr->CloseDocument(userId, *documentId->id);
+		imtdoc::IDocumentService::TaskParams taskParams;
+		taskParams.userId = userId;
+		taskParams.documentId = *documentId->id;
+		QByteArray taskId = m_documentManagerCompPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_CLOSE, taskParams);
+		imtdoc::IDocumentService::TaskResult taskResult = m_documentManagerCompPtr->WaitForTaskFinished(taskId);
+		imtdoc::IDocumentService::OperationStatus status = taskResult.status;
 		switch (status){
 		case imtdoc::IDocumentService::OS_OK:
 			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Success;
