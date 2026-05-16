@@ -19,7 +19,7 @@
 
 	- \b CConversationCollectionControllerComp — handles ConversationsList / ConversationItem queries,
 	  ConversationCreate and ConversationUpdate mutations
-	- \b CConversationCollectionDocumentManagerComp — handles GetConversationRepresentation query,
+	- \b CConversationCollectionDocumentServiceComp — handles GetConversationRepresentation query,
 	  UpdateConversationFromRepresentation mutation for the document editor
 	- \b CMessageCollectionControllerComp — handles MessagesList / MessageItem queries,
 	  MessageSend, MessageUpdate and MessageMarkRead mutations

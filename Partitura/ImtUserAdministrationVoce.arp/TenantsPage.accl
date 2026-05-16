@@ -12,7 +12,7 @@
         <Element ComponentName="CollectionHeadersProvider" X="1025" Y="475" Note=""/>
         <Element ComponentName="Demultiplexer" X="550" Y="75" Note=""/>
         <Element ComponentName="TenantCommands" X="425" Y="350" Note=""/>
-        <Element ComponentName="TenantDocumentManager" X="200" Y="200" Note=""/>
+        <Element ComponentName="TenantDocumentService" X="200" Y="200" Note=""/>
         <Element ComponentName="TenantManagerController" X="800" Y="200" Note=""/>
         <Element ComponentName="TenantMembershipInfo" X="200" Y="500" Note=""/>
         <Element ComponentName="TenantMembershipManager" X="525" Y="500" Note=""/>

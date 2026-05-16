@@ -437,8 +437,8 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 	add_subdirectory("${TESTS_DIR}/PersonalAccessTokenTest/CMake" "${AUX_INCLUDE_DIR}/PersonalAccessTokenTest")
 	add_dependencies(PersonalAccessTokenTest imtbase imtauth)
 
-	add_subdirectory("${TESTS_DIR}/CollectionDocumentManagerTest/CMake" "${AUX_INCLUDE_DIR}/CollectionDocumentManagerTest")
-	add_dependencies(CollectionDocumentManagerTest imtbase imtdoc)
+	add_subdirectory("${TESTS_DIR}/CollectionDocumentServiceTest/CMake" "${AUX_INCLUDE_DIR}/CollectionDocumentServiceTest")
+	add_dependencies(CollectionDocumentServiceTest imtbase imtdoc)
 
 	file(COPY ${TESTS_DIR}/Migrations DESTINATION ${TESTS_DIR}/../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
 

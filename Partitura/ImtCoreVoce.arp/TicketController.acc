@@ -7,8 +7,8 @@
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
-    <Description>Ticket collection controller with CollectionDocumentManager</Description>
-    <Keywords>Ticket, Desk, Collection, DocumentManager</Keywords>
+    <Description>Ticket collection controller with CollectionDocumentService</Description>
+    <Keywords>Ticket, Desk, Collection, DocumentService</Keywords>
     <ElementsList>
         <Element Id="Attachment" PackageId="ImtChatPck" ComponentId="Attachment">
             <Data IsEnabled="true" Flags="2">
@@ -116,7 +116,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="CollectionDocumentManager" PackageId="ImtCollectionVoce" ComponentId="CollectionDocumentManager">
+        <Element Id="CollectionDocumentService" PackageId="ImtCollectionVoce" ComponentId="CollectionDocumentService">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Collection" Type="Reference" ExportId="">
@@ -128,7 +128,7 @@
                     <AttributeInfo Id="DocumentServiceEventHandlers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>TicketCollectionDocumentManager</Value>
+                                <Value>TicketCollectionDocumentService</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -252,8 +252,8 @@
                                 <Value>EntityContextTicketsController</Value>
                                 <Value>CollectionCommandsController</Value>
                                 <Value>CollectionCommandsController</Value>
-                                <Value>TicketCollectionDocumentManager</Value>
-                                <Value>CollectionDocumentManager</Value>
+                                <Value>TicketCollectionDocumentService</Value>
+                                <Value>CollectionDocumentService</Value>
                                 <Value>EditorCommandsController</Value>
                                 <Value>UserFilterableSelectController</Value>
                             </Values>
@@ -343,7 +343,7 @@
                     <AttributeInfo Id="SubscriberController" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>CollectionDocumentManager</Value>
+                                <Value>CollectionDocumentService</Value>
                                 <Value>TicketsChangeNotifier</Value>
                                 <Value>TicketMessageNotifier</Value>
                                 <Value>TicketAssigneeNotifier</Value>
@@ -495,7 +495,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="TicketCollectionDocumentManager" PackageId="ImtDeskGqlPck" ComponentId="TicketCollectionDocumentManager">
+        <Element Id="TicketCollectionDocumentService" PackageId="ImtDeskGqlPck" ComponentId="TicketCollectionDocumentService">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
@@ -507,8 +507,8 @@
                     <AttributeInfo Id="ChatService" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ChatService"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="CollectionDocumentManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="CollectionDocumentManager"/>
+                    <AttributeInfo Id="CollectionDocumentService" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="CollectionDocumentService"/>
                     </AttributeInfo>
                     <AttributeInfo Id="EntityReferenceStorage" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="EntityReferenceStorage"/>

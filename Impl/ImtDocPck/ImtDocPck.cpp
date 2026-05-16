@@ -16,12 +16,12 @@ I_EXPORT_PACKAGE(
 			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
 
 I_EXPORT_COMPONENT(
-			CollectionDocumentManager,
+			CollectionDocumentService,
 			"Collection-based document manager",
 			"Collection Document");
 
 I_EXPORT_COMPONENT(
-			DocumentManagerEventHandlerDemultiplexer,
+			DocumentServiceEventHandlerDemultiplexer,
 			"Document service event handler demultiplexer",
 			"Document Manager Event Handler Demultiplexer");
 

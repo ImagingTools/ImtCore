@@ -18,8 +18,8 @@ namespace ImtDocPck
 {
 
 
-typedef icomp::TModelCompWrap<imtdoc::CCollectionDocumentServiceComp> CollectionDocumentManager;
-typedef imtdoc::CDocumentServiceEventHandlerDemultiplexerComp DocumentManagerEventHandlerDemultiplexer;
+typedef icomp::TModelCompWrap<imtdoc::CCollectionDocumentServiceComp> CollectionDocumentService;
+typedef imtdoc::CDocumentServiceEventHandlerDemultiplexerComp DocumentServiceEventHandlerDemultiplexer;
 
 
 } // namespace ImtDocPck

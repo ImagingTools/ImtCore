@@ -8,7 +8,7 @@ import imtbaseImtCollectionSdl 1.0
 Item {
 	id: workspaceView
 
-	property DocumentManager documentManager
+	property DocumentService documentManager
 	property int popupWidth: Style.sizeHintXXS
 	property ObjectVisualStatusProvider visualStatusProvider: null
 

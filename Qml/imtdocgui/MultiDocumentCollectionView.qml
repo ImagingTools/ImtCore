@@ -5,14 +5,14 @@ import imtgui 1.0
 import imtcolgui 1.0
 import imtcontrols 1.0
 import imtbaseImtCollectionSdl 1.0
-import imtbaseCollectionDocumentManagerSdl 1.0
+import imtbaseCollectionDocumentServiceSdl 1.0
 
 Item {
 	id: workspaceView
 
 	property bool showStandardLoading: true
 	property CollectionView collectionView: null
-	property DocumentManagerBase documentManager
+	property DocumentServiceBase documentManager
 	property string collectionTabId: ""
 
 	property bool tabVisible: true
@@ -27,9 +27,9 @@ Item {
 		}
 	}
 
-	onDocumentManagerChanged: {
+	onDocumentServiceChanged: {
 		if (documentManager){
-			documentManager.setDocumentManagerActiveView(workspaceView)
+			documentManager.setDocumentServiceActiveView(workspaceView)
 		}
 	}
 
@@ -204,7 +204,7 @@ Item {
 			}
 		}
 
-		function onDocumentManagerChanged(typeOperation, objectId, documentId, documentName){
+		function onDocumentServiceChanged(typeOperation, objectId, documentId, documentName){
 			if (typeOperation === EDocumentOperationEnum.s_documentClosed){
 				tabView.removeTab(documentId)
 			}

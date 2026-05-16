@@ -727,9 +727,9 @@ void CDocumentCollectionViewDelegateComp::ObjectPersistenceProxy::CreateBackup(c
 }
 
 
-// public methods of the embedded class DocumentManagerObserver
+// public methods of the embedded class DocumentServiceObserver
 
-CDocumentCollectionViewDelegateComp::DocumentManagerObserver::DocumentManagerObserver(CDocumentCollectionViewDelegateComp& parent)
+CDocumentCollectionViewDelegateComp::DocumentServiceObserver::DocumentServiceObserver(CDocumentCollectionViewDelegateComp& parent)
 	:m_parent(parent)
 {
 }
@@ -737,7 +737,7 @@ CDocumentCollectionViewDelegateComp::DocumentManagerObserver::DocumentManagerObs
 
 // reimplemented (imod::CSingleModelObserverBase)
 
-void CDocumentCollectionViewDelegateComp::DocumentManagerObserver::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
+void CDocumentCollectionViewDelegateComp::DocumentServiceObserver::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
 {
 	Q_ASSERT(m_parent.m_documentManagerCompPtr.IsValid());
 

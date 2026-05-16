@@ -119,7 +119,7 @@ void CMultiDocumentWorkspaceGuiCompBase::UpdateAllTitles()
 		istd::IPolymorphic* viewPtr = documentViewPtr->GetView();
 		Q_ASSERT(viewPtr != nullptr);
 
-		CMultiDocumentManagerBase::SingleDocumentData* infoPtr = GetDocumentInfoFromView(*viewPtr);
+		CMultiDocumentServiceBase::SingleDocumentData* infoPtr = GetDocumentInfoFromView(*viewPtr);
 
 		if (infoPtr != nullptr){
 			QString fileText = infoPtr->filePath.isEmpty()?

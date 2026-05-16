@@ -75,7 +75,7 @@
                                 <Value>TenantCommands</Value>
                                 <Value>TenantsCommands</Value>
                                 <Value>TenantsListController</Value>
-                                <Value>TenantDocumentManager</Value>
+                                <Value>TenantDocumentService</Value>
                                 <Value>TenantManagerController</Value>
                             </Values>
                         </Data>
@@ -104,10 +104,10 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="TenantDocumentManager" PackageId="ImtAuthGqlPck" ComponentId="TenantCollectionDocumentManager">
+        <Element Id="TenantDocumentService" PackageId="ImtAuthGqlPck" ComponentId="TenantCollectionDocumentService">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="CollectionDocumentManager" Type="Reference" ExportId="TenantDocumentManager">
+                    <AttributeInfo Id="CollectionDocumentService" Type="Reference" ExportId="TenantDocumentService">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
