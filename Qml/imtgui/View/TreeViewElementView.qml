@@ -17,7 +17,7 @@ ElementView {
 
         FocusScope {
             width: root.contentWidth
-            height: filterInput.height + Style.marginM + Math.min(checkableTree.height, root.maxTreeHeight)
+            height: filterInput.height + Style.marginM + Math.min(checkableTree.implicitHeight, root.maxTreeHeight)
 
             SearchTextInput {
                 id: filterInput
@@ -39,7 +39,7 @@ ElementView {
                 anchors.topMargin: Style.marginM
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.bottom: parent.bottom
+                height: Math.min(implicitHeight, root.maxTreeHeight)
 
                 showHeader: false
                 showToolbar: true

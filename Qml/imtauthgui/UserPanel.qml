@@ -4,6 +4,7 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
 import imtgui 1.0
+import imtauthProfileSdl 1.0
 
 Item {
 	id: root;
@@ -49,11 +50,61 @@ Item {
 	function setVisible(visible){
 		root.visible = visible;
 	}
+
+	// --- Organizations list for submenu ---
+	property var __organizationsList: []
+
+	function __loadOrganizations() {
+		if (!AuthorizationController.userTokenProvider.userId)
+			return
+		organizationsRequest.send(organizationsInput)
+	}
+
+	GqlSdlRequestSender {
+		id: organizationsRequest
+		requestType: 0
+		gqlCommandId: ImtauthProfileSdlCommandIds.s_getProfile
+
+		sdlObjectComp: Component {
+			ProfileData {
+				onFinished: {
+					var orgs = m_organizations
+					var list = []
+					if (orgs) {
+						for (var i = 0; i < orgs.count; i++) {
+							var org = orgs.get(i).item
+							if (org && org.m_isActive) {
+								list.push({ id: org.m_id || "", name: org.m_name || org.m_id || "" })
+							}
+						}
+					}
+					root.__organizationsList = list
+				}
+			}
+		}
+	}
+
+	property GetProfileInput organizationsInput: GetProfileInput {
+		m_id: AuthorizationController.userTokenProvider.userId
+		m_productId: AuthorizationController.productId
+	}
 	
 	function onLocalizationChanged(language){
 		contextMenuModel.fillModel();
 	}
 	
+	Text {
+		id: tenantText;
+		anchors.verticalCenter: root.verticalCenter;
+		anchors.right: usernameText.left;
+		anchors.rightMargin: Style.marginM;
+		color: Style.inactiveTextColor;
+		font.family: Style.fontFamily;
+		font.pixelSize: Style.fontSizeS;
+		text: AuthorizationController.currentTenantName ? AuthorizationController.currentTenantName : "";
+		visible: text !== "";
+	}
+
 	Text {
 		id: usernameText;
 		anchors.verticalCenter: root.verticalCenter;
@@ -125,6 +176,43 @@ Item {
 				ModalDialogManager.openDialog(profileViewComp, {})
 			}
 		}
+
+		Menu {
+			id: organizationsSubmenu
+			title: qsTr("Organization")
+
+			Instantiator {
+				model: root.__organizationsList.length
+
+				delegate: MenuItem {
+					property var orgData: root.__organizationsList[index]
+					text: orgData ? orgData.name : ""
+					checkable: true
+					checked: orgData && orgData.id === AuthorizationController.currentTenantId
+					onTriggered: {
+						if (orgData && orgData.id !== AuthorizationController.currentTenantId) {
+							AuthorizationController.selectTenant(orgData.id)
+						}
+					}
+				}
+
+				onObjectAdded: function(index, object) { organizationsSubmenu.insertItem(index, object) }
+				onObjectRemoved: function(index, object) { organizationsSubmenu.removeItem(object) }
+			}
+
+			MenuSeparator {
+				visible: root.__organizationsList.length > 0
+			}
+
+			MenuItem {
+				text: qsTr("No organization")
+				enabled: AuthorizationController.currentTenantId !== ""
+				onTriggered: {
+					AuthorizationController.selectTenant("")
+				}
+			}
+		}
+
 		MenuSeparator {}
 		MenuItem {
 			text: qsTr("Logout")
@@ -132,6 +220,10 @@ Item {
 			onTriggered: {
 				AuthorizationController.logout()
 			}
+		}
+
+		onAboutToShow: {
+			root.__loadOrganizations()
 		}
 	}
 

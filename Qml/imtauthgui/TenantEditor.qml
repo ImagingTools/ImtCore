@@ -335,7 +335,9 @@ DocumentViewBase {
 			multiPageView.addPage("General", qsTr("General"), generalPageComp, "Icons/Settings")
 			if (!container.isNewTenant) {
 				multiPageView.addPage("Members", qsTr("Members"), membersPageComp, "Icons/MultipleUser")
-				multiPageView.addPage("Permissions", qsTr("Permissions"), permissionsPageComp, "Icons/Role")
+				if (container.__isOwner) {
+					multiPageView.addPage("Permissions", qsTr("Permissions"), permissionsPageComp, "Icons/Role")
+				}
 			}
 			multiPageView.currentIndex = 0
 		}
@@ -511,7 +513,7 @@ DocumentViewBase {
 						collectionId: "Users"
 						emptyText: qsTr("No members")
 						showCount: true
-						editable: container.__isOwnerOrAdmin
+						editable: container.__isOwner
 						nonRemovableIds: container.tenantData && container.tenantData.m_ownerId ? [container.tenantData.m_ownerId] : []
 
 						onItemRemoved: {
@@ -597,15 +599,23 @@ DocumentViewBase {
 													text: qsTr("Owner")
 												}
 
+												BaseText {
+													visible: !memberDelegate.isPending && !memberDelegate.isOwner
+													width: memberDelegate.contentWidth * container.memberRoleComboWidthRatio
+													anchors.verticalCenter: parent.verticalCenter
+													text: modelData.role || qsTr("Member")
+													color: Style.inactiveTextColor
+												}
+
 												ComboBox {
 													id: roleCombo
-													visible: !memberDelegate.isPending && !memberDelegate.isOwner
+													visible: false
 													width: memberDelegate.contentWidth * container.memberRoleComboWidthRatio
 													anchors.verticalCenter: parent.verticalCenter
 													model: container.__getAvailableRolesModel()
 													nameId: "roleName"
 													currentIndex: container.__findRoleIndex(modelData.role)
-													changeable: container.__isOwnerOrAdmin
+													changeable: container.__isOwner
 
 													onCurrentIndexChanged: {
 														if (roleCombo.currentIndex >= 0){
@@ -692,7 +702,7 @@ DocumentViewBase {
 
 												Button {
 													id: resendBtn
-													visible: container.__isOwnerOrAdmin
+													visible: container.__isOwner
 													text: qsTr("Resend")
 													onClicked: {
 														container.resendInvitationInput.m_invitationId = modelData.invitationId
@@ -702,7 +712,7 @@ DocumentViewBase {
 
 												Button {
 													id: revokeBtn
-													visible: container.__isOwnerOrAdmin
+													visible: container.__isOwner
 													text: qsTr("Revoke")
 													onClicked: {
 														container.revokeInvitationInput.m_invitationId = modelData.invitationId
@@ -753,8 +763,6 @@ DocumentViewBase {
 						return (children && (children.count || 0) > 0) ? children : null
 					}
 				)
-				console.log("allPermsModel", allPermsModel.toJson())
-				console.log("nodes", JSON.stringify(nodes))
 				tenantPermissionsTreeView.treeView.model = nodes
 
 				// Restore checked state from selected permissions (leaf nodes only)

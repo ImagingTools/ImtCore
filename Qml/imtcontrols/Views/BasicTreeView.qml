@@ -116,7 +116,7 @@ Item {
     }
 
     Column {
-        anchors.fill: parent
+        width: parent.width
         spacing: 0
 
         Row {
@@ -241,7 +241,7 @@ Item {
             id: listView
 
             width: parent.width
-            height: parent.height - headerRow.height - toolbarRow.height
+            height: visibleModel.count * root.rowHeight
 
             clip: true
             reuseItems: true

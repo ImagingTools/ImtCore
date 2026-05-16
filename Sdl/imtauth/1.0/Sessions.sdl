@@ -31,6 +31,7 @@ type ValidateJwtPayload {
 type UserSession {
 	userId: ID!
 	tenantId: ID
+	tenantName: String
 	accessToken: ID!
 	refreshToken: ID!
 }

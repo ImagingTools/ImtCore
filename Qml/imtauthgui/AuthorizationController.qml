@@ -34,6 +34,7 @@ QtObject {
 	property string lastUser: ""
 	property string storedRefreshToken: ""
 	property string currentTenantId: ""
+	property string currentTenantName: ""
 	
 	// Load settings from LocalStorage on component creation
 	Component.onCompleted: {
@@ -256,6 +257,7 @@ QtObject {
 		userTokenProvider.systemId = ""
 		userTokenProvider.permissions = []
 		currentTenantId = ""
+		currentTenantName = ""
 		setAccessToken("");
 		setRefreshToken("");
 		
@@ -404,6 +406,7 @@ QtObject {
 						root.userTokenProvider.accessToken = m_userSession.m_accessToken;
 						root.userTokenProvider.refreshToken = m_userSession.m_refreshToken;
 						root.currentTenantId = m_userSession.m_tenantId || "";
+						root.currentTenantName = m_userSession.m_tenantName || "";
 
 						root.setAccessToken(m_userSession.m_accessToken);
 						root.setRefreshToken(m_userSession.m_refreshToken);
@@ -442,6 +445,7 @@ QtObject {
 						root.userTokenProvider.userId = m_userSession.m_userId;
 						root.userTokenProvider.login = root.refreshTokenForLoginGqlSender.userName;
 						root.currentTenantId = m_userSession.m_tenantId || "";
+						root.currentTenantName = m_userSession.m_tenantName || "";
 						
 						root.setAccessToken(m_userSession.m_accessToken);
 						root.setRefreshToken(m_userSession.m_refreshToken);
@@ -472,6 +476,7 @@ QtObject {
 						root.userTokenProvider.accessToken = m_userSession.m_accessToken;
 						root.userTokenProvider.refreshToken = m_userSession.m_refreshToken;
 						root.currentTenantId = m_userSession.m_tenantId || "";
+						root.currentTenantName = m_userSession.m_tenantName || "";
 
 						root.setAccessToken(m_userSession.m_accessToken);
 						root.setRefreshToken(m_userSession.m_refreshToken);
