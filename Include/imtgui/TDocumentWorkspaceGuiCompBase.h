@@ -16,7 +16,7 @@
 #include <idoc/IDocumentTemplate.h>
 #include <iqtgui/TDesignerGuiCompBase.h>
 #include <iqtgui/TRestorableGuiWrap.h>
-#include <iqtdoc/TQtDocumentServiceWrap.h>
+#include <iqtdoc/TQtDocumentManagerWrap.h>
 
 // ImtCore includes
 #include <imtbase/IObjectCollectionInfo.h>
@@ -27,17 +27,17 @@ namespace imtgui
 {
 
 
-template <class DocumentServiceBase, class UI>
+template <class DocumentManagerBase, class UI>
 class TDocumentWorkspaceGuiCompBase:
-			public iqtdoc::TQtDocumentServiceWrap<DocumentServiceBase, UI>
+			public iqtdoc::TQtDocumentManagerWrap<DocumentManagerBase, UI>
 {
 	Q_DECLARE_TR_FUNCTIONS(TDocumentWorkspaceGuiCompBase)
 public:
-	typedef iqtdoc::TQtDocumentServiceWrap<DocumentServiceBase, UI> BaseClass;
-	typedef typename DocumentServiceBase::SingleDocumentData SingleDocumentData;
-	typedef typename DocumentServiceBase::Views Views;
+	typedef iqtdoc::TQtDocumentManagerWrap<DocumentManagerBase, UI> BaseClass;
+	typedef typename DocumentManagerBase::SingleDocumentData SingleDocumentData;
+	typedef typename DocumentManagerBase::Views Views;
 	typedef typename Views::ConstIterator ConstIterator;
-	typedef typename DocumentServiceBase::ViewInfo ViewInfo;
+	typedef typename DocumentManagerBase::ViewInfo ViewInfo;
 
 	I_BEGIN_BASE_COMPONENT(TDocumentWorkspaceGuiCompBase);
 		I_REGISTER_INTERFACE(idoc::IDocumentManager);
@@ -66,7 +66,7 @@ protected:
 	virtual void OnDragEnterEvent(QDragEnterEvent* dragEnterEventPtr);
 	virtual void OnDropEvent(QDropEvent* dropEventPtr);
 
-	// reimplemented (DocumentServiceBase)
+	// reimplemented (DocumentManagerBase)
 	virtual istd::IChangeableSharedPtr OpenSingleDocument(
 				const QString& filePath,
 				bool createView,
@@ -85,7 +85,7 @@ protected:
 				bool beQuiet = false,
 				bool* ignoredPtr = nullptr) override;
 
-	// reimplemented (DocumentServiceBase)
+	// reimplemented (DocumentManagerBase)
 	virtual QStringList GetOpenFilePaths(const QByteArray* documentTypeIdPtr = nullptr) const override;
 	virtual bool QueryDocumentSave(const SingleDocumentData& info, bool* ignoredPtr) override;
 
@@ -135,16 +135,16 @@ protected:
 
 // public methods
 
-template <class DocumentServiceBase, class UI>
-TDocumentWorkspaceGuiCompBase<DocumentServiceBase, UI>::TDocumentWorkspaceGuiCompBase()
+template <class DocumentManagerBase, class UI>
+TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::TDocumentWorkspaceGuiCompBase()
 {
 }
 
 
 // reimplemented (iqtgui::IGuiObject)
 
-template <class DocumentServiceBase, class UI>
-void TDocumentWorkspaceGuiCompBase<DocumentServiceBase, UI>::OnTryClose(bool* ignoredPtr)
+template <class DocumentManagerBase, class UI>
+void TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::OnTryClose(bool* ignoredPtr)
 {
 	if (BaseClass::SaveDirtyDocuments(false, ignoredPtr)){
 		int documentInfosCount = BaseClass::GetDocumentsCount();
@@ -165,8 +165,8 @@ void TDocumentWorkspaceGuiCompBase<DocumentServiceBase, UI>::OnTryClose(bool* ig
 
 // protected members
 
-template <class DocumentServiceBase, class UI>
-int TDocumentWorkspaceGuiCompBase<DocumentServiceBase, UI>::GetDocumentIndexFromWidget(const QWidget& widget) const
+template <class DocumentManagerBase, class UI>
+int TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::GetDocumentIndexFromWidget(const QWidget& widget) const
 {
 	int documentInfosCount = BaseClass::GetDocumentsCount();
 	for (int documentIndex = 0; documentIndex < documentInfosCount; ++documentIndex){
@@ -192,8 +192,8 @@ int TDocumentWorkspaceGuiCompBase<DocumentServiceBase, UI>::GetDocumentIndexFrom
 
 // protected methods
 
-template <class DocumentServiceBase, class UI>
-void TDocumentWorkspaceGuiCompBase<DocumentServiceBase, UI>::OnDragEnterEvent(QDragEnterEvent* dragEnterEventPtr)
+template <class DocumentManagerBase, class UI>
+void TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::OnDragEnterEvent(QDragEnterEvent* dragEnterEventPtr)
 {
 	if (dragEnterEventPtr->mimeData()->hasFormat("text/uri-list")){
 		dragEnterEventPtr->acceptProposedAction();
@@ -201,8 +201,8 @@ void TDocumentWorkspaceGuiCompBase<DocumentServiceBase, UI>::OnDragEnterEvent(QD
 }
 
 
-template <class DocumentServiceBase, class UI>
-void TDocumentWorkspaceGuiCompBase<DocumentServiceBase, UI>::OnDropEvent(QDropEvent* dropEventPtr)
+template <class DocumentManagerBase, class UI>
+void TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::OnDropEvent(QDropEvent* dropEventPtr)
 {
 	const QMimeData* mimeData = dropEventPtr->mimeData();
 	if (mimeData->hasUrls()){
@@ -223,10 +223,10 @@ void TDocumentWorkspaceGuiCompBase<DocumentServiceBase, UI>::OnDropEvent(QDropEv
 }
 
 
-// reimplemented (DocumentServiceBase)
+// reimplemented (DocumentManagerBase)
 
-template <class DocumentServiceBase, class UI>
-istd::IChangeableSharedPtr TDocumentWorkspaceGuiCompBase<DocumentServiceBase, UI>::OpenSingleDocument(
+template <class DocumentManagerBase, class UI>
+istd::IChangeableSharedPtr TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::OpenSingleDocument(
 			const QString& filePath,
 			bool createView,
 			const QByteArray& viewTypeId,
@@ -256,8 +256,8 @@ istd::IChangeableSharedPtr TDocumentWorkspaceGuiCompBase<DocumentServiceBase, UI
 
 // reimplemented (idoc::IDocumentManager)
 
-template <class DocumentServiceBase, class UI>
-bool TDocumentWorkspaceGuiCompBase<DocumentServiceBase, UI>::InsertNewDocument(
+template <class DocumentManagerBase, class UI>
+bool TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::InsertNewDocument(
 			const QByteArray& documentTypeId,
 			bool createView,
 			const QByteArray& viewTypeId,
@@ -285,10 +285,10 @@ bool TDocumentWorkspaceGuiCompBase<DocumentServiceBase, UI>::InsertNewDocument(
 }
 
 
-// reimplemented (DocumentServiceBase)
+// reimplemented (DocumentManagerBase)
 
-template <class DocumentServiceBase, class UI>
-QStringList TDocumentWorkspaceGuiCompBase<DocumentServiceBase, UI>::GetOpenFilePaths(const QByteArray* documentTypeIdPtr) const
+template <class DocumentManagerBase, class UI>
+QStringList TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::GetOpenFilePaths(const QByteArray* documentTypeIdPtr) const
 {
 	QStringList files = BaseClass::GetOpenFilePathesFromDialog(documentTypeIdPtr);
 
@@ -300,8 +300,8 @@ QStringList TDocumentWorkspaceGuiCompBase<DocumentServiceBase, UI>::GetOpenFileP
 }
 
 
-template <class DocumentServiceBase, class UI>
-bool TDocumentWorkspaceGuiCompBase<DocumentServiceBase, UI>::QueryDocumentSave(const SingleDocumentData& info, bool* ignoredPtr)
+template <class DocumentManagerBase, class UI>
+bool TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::QueryDocumentSave(const SingleDocumentData& info, bool* ignoredPtr)
 {
 	QMessageBox::StandardButtons buttons = QMessageBox::Yes | QMessageBox::No;
 
@@ -333,8 +333,8 @@ bool TDocumentWorkspaceGuiCompBase<DocumentServiceBase, UI>::QueryDocumentSave(c
 
 // reimplemented (iqt:CGuiObjectBase)
 
-template <class DocumentServiceBase, class UI>
-void TDocumentWorkspaceGuiCompBase<DocumentServiceBase, UI>::OnGuiCreated()
+template <class DocumentManagerBase, class UI>
+void TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
 
@@ -345,8 +345,8 @@ void TDocumentWorkspaceGuiCompBase<DocumentServiceBase, UI>::OnGuiCreated()
 }
 
 
-template <class DocumentServiceBase, class UI>
-void TDocumentWorkspaceGuiCompBase<DocumentServiceBase, UI>::OnGuiDestroyed()
+template <class DocumentManagerBase, class UI>
+void TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::OnGuiDestroyed()
 {
 	this->CloseAllDocuments();
 
@@ -354,8 +354,8 @@ void TDocumentWorkspaceGuiCompBase<DocumentServiceBase, UI>::OnGuiDestroyed()
 }
 
 
-template <class DocumentServiceBase, class UI>
-void TDocumentWorkspaceGuiCompBase<DocumentServiceBase, UI>::OnGuiRetranslate()
+template <class DocumentManagerBase, class UI>
+void TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::OnGuiRetranslate()
 {
 	BaseClass::OnGuiRetranslate();
 
@@ -365,8 +365,8 @@ void TDocumentWorkspaceGuiCompBase<DocumentServiceBase, UI>::OnGuiRetranslate()
 
 // reimplemented (icomp::CComponentBase)
 
-template <class DocumentServiceBase, class UI>
-void TDocumentWorkspaceGuiCompBase<DocumentServiceBase, UI>::OnComponentCreated()
+template <class DocumentManagerBase, class UI>
+void TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
@@ -376,8 +376,8 @@ void TDocumentWorkspaceGuiCompBase<DocumentServiceBase, UI>::OnComponentCreated(
 
 // reimplemented (istd:IChangeable)
 
-template <class DocumentServiceBase, class UI>
-void TDocumentWorkspaceGuiCompBase<DocumentServiceBase, UI>::OnEndChanges(const istd::IChangeable::ChangeSet& changeSet)
+template <class DocumentManagerBase, class UI>
+void TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::OnEndChanges(const istd::IChangeable::ChangeSet& changeSet)
 {
 	BaseClass::OnEndChanges(changeSet);
 
@@ -389,8 +389,8 @@ void TDocumentWorkspaceGuiCompBase<DocumentServiceBase, UI>::OnEndChanges(const 
 
 // reimplemented (QObject)
 
-template <class DocumentServiceBase, class UI>
-bool TDocumentWorkspaceGuiCompBase<DocumentServiceBase, UI>::eventFilter(QObject* sourcePtr, QEvent* eventPtr)
+template <class DocumentManagerBase, class UI>
+bool TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::eventFilter(QObject* sourcePtr, QEvent* eventPtr)
 {
 	if (eventPtr->type() == QEvent::DragEnter){
 		QDragEnterEvent* dragEnterEventPtr = dynamic_cast<QDragEnterEvent*>(eventPtr);
@@ -415,8 +415,8 @@ bool TDocumentWorkspaceGuiCompBase<DocumentServiceBase, UI>::eventFilter(QObject
 
 // protected methods
 
-template <class DocumentServiceBase, class UI>
-void TDocumentWorkspaceGuiCompBase<DocumentServiceBase, UI>::DoUndo()
+template <class DocumentManagerBase, class UI>
+void TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::DoUndo()
 {
 	SingleDocumentData* documentDataPtr = BaseClass::GetActiveDocumentInfo();
 	if ((documentDataPtr != nullptr) && documentDataPtr->undoManagerPtr.IsValid() && documentDataPtr->undoManagerPtr->GetAvailableUndoSteps() > 0){
@@ -425,8 +425,8 @@ void TDocumentWorkspaceGuiCompBase<DocumentServiceBase, UI>::DoUndo()
 }
 
 
-template <class DocumentServiceBase, class UI>
-void TDocumentWorkspaceGuiCompBase<DocumentServiceBase, UI>::DoRedo()
+template <class DocumentManagerBase, class UI>
+void TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::DoRedo()
 {
 	SingleDocumentData* documentDataPtr = BaseClass::GetActiveDocumentInfo();
 	if ((documentDataPtr != nullptr) && documentDataPtr->undoManagerPtr.IsValid() && documentDataPtr->undoManagerPtr->GetAvailableRedoSteps() > 0){
@@ -435,8 +435,8 @@ void TDocumentWorkspaceGuiCompBase<DocumentServiceBase, UI>::DoRedo()
 }
 
 
-template <class DocumentServiceBase, class UI>
-void TDocumentWorkspaceGuiCompBase<DocumentServiceBase, UI>::OpenDocumentForType(const QByteArray& documentTypeId)
+template <class DocumentManagerBase, class UI>
+void TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::OpenDocumentForType(const QByteArray& documentTypeId)
 {
 	bool ignoredFlag = false;
 	if (!BaseClass::OpenDocument(&documentTypeId, nullptr, true, "", nullptr, nullptr, false, &ignoredFlag)){
