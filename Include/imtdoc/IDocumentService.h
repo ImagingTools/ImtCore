@@ -2,6 +2,9 @@
 #pragma once
 
 
+// std includes
+#include <functional>
+
 // Qt includes
 #include <QtCore/QUrl>
 
@@ -107,22 +110,40 @@ public:
 	typedef DocumentNotification DocumentDataLoadedInfo;
 
 	/**
+		\brief Callback invoked when a document-creating or document-opening
+		operation finishes.
+
+		\param documentId  The new document instance ID, or empty on failure.
+	*/
+	typedef std::function<void(const QByteArray& documentId)> DocumentIdCallback;
+
+	/**
+		\brief Callback invoked when a status-returning operation
+		(save, close, …) finishes.
+
+		\param status        Result of the operation.
+		\param errorMessage  Human-readable error text (empty on success).
+	*/
+	typedef std::function<void(OperationStatus status, const QString& errorMessage)> OperationResultCallback;
+
+	/**
 		Get a list of open document instances for a given user-ID
 	*/
 	virtual DocumentList GetOpenedDocumentList(const QByteArray& userId) const = 0;
 
 	/**
-		Create a document of the given type (documentTypeId) for the given user-ID
-		/return		Document instance ID in the document manager
+		Create a document of the given type (documentTypeId) for the given
+		user-ID.  The result is delivered asynchronously through \a callback.
 	*/
-	virtual QByteArray CreateNewDocument(
+	virtual void CreateNewDocument(
 		const QByteArray& userId,
 		const QByteArray& documentTypeId,
+		DocumentIdCallback callback,
 		const QByteArray& proposedSourceDocumentId = QByteArray()) = 0;
 
 	/**
-		Open a document from a given URL for a given user-ID
-		/return		Document instance ID in the document manager
+		Open a document from a given URL for a given user-ID.
+		The result is delivered asynchronously through \a callback.
 
 		From file:
 			file:///etc/fstab					- *nix style path
@@ -130,7 +151,7 @@ public:
 		From object collection:
 			collection:///objectId				- for single collection document manager (or default collection)
 	*/
-	virtual QByteArray OpenDocument(const QByteArray& userId, const QUrl& url) = 0;
+	virtual void OpenDocument(const QByteArray& userId, const QUrl& url, DocumentIdCallback callback) = 0;
 
 	/**
 		Get name of the document with the given user-ID and document-ID
@@ -158,18 +179,23 @@ public:
 	virtual OperationStatus SetDocumentData(const QByteArray& userId, const QByteArray& documentId, const istd::IChangeable& document) = 0;
 
 	/**
-		Save document with the given user-ID and document-ID
+		Save document with the given user-ID and document-ID.
+		The result is delivered asynchronously through \a callback.
 	*/
-		virtual OperationStatus SaveDocument(
-			const QByteArray& userId,
-			const QByteArray& documentId,
-			const QString& documentName = QString(),
-			QString* errorMessage = nullptr) = 0;
+	virtual void SaveDocument(
+		const QByteArray& userId,
+		const QByteArray& documentId,
+		OperationResultCallback callback,
+		const QString& documentName = QString()) = 0;
 
 	/**
-		Close document with the given user-ID and document-ID
+		Close document with the given user-ID and document-ID.
+		The result is delivered asynchronously through \a callback.
 	*/
-	virtual OperationStatus CloseDocument(const QByteArray& userId, const QByteArray& documentId) = 0;
+	virtual void CloseDocument(
+		const QByteArray& userId,
+		const QByteArray& documentId,
+		OperationResultCallback callback) = 0;
 
 	/**
 		Get UndoManager for the document with the given user-ID and document-ID
@@ -178,12 +204,12 @@ public:
 		const QByteArray& userId, const QByteArray& documentId, idoc::IUndoManager*& undoManagerPtr) const = 0;
 
 	/**
-		Register an obserer for the document with the given user-ID and document-ID
+		Register an observer for the document with the given user-ID and document-ID
 	*/
 	virtual OperationStatus RegisterDocumentObserver(const QByteArray& userId, const QByteArray& documentId, imod::IObserver& observer) = 0;
 
 	/**
-		Unregister an obserer for the document with the given user-ID and document-ID
+		Unregister an observer for the document with the given user-ID and document-ID
 	*/
 	virtual OperationStatus UnregisterDocumentObserver(const QByteArray& userId, const QByteArray& documentId, imod::IObserver& observer) = 0;
 };

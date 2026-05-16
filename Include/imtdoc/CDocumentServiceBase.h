@@ -36,22 +36,26 @@ public:
 
 	// reimplemented (imtdoc::IDocumentService)
 	virtual DocumentList GetOpenedDocumentList(const QByteArray& userId) const override;
-	virtual QByteArray CreateNewDocument(
+	virtual void CreateNewDocument(
 		const QByteArray& userId,
 		const QByteArray& documentTypeId,
+		DocumentIdCallback callback,
 		const QByteArray& proposedSourceDocumentId = QByteArray()) override;
-	virtual QByteArray OpenDocument(const QByteArray& userId, const QUrl& url) override;
+	virtual void OpenDocument(const QByteArray& userId, const QUrl& url, DocumentIdCallback callback) override;
 	virtual OperationStatus GetDocumentName(const QByteArray& userId, const QByteArray& documentId, QString& documentName) const override;
 	virtual OperationStatus SetDocumentName(const QByteArray& userId, const QByteArray& documentId, const QString& documentName) override;
 	virtual const istd::IChangeable* GetDocumentPtr(const QByteArray& userId, const QByteArray& documentId) const override;
 	virtual OperationStatus GetDocumentData(const QByteArray& userId, const QByteArray& documentId, istd::IChangeableSharedPtr& documentPtr) const override;
 	virtual OperationStatus SetDocumentData(const QByteArray& userId, const QByteArray& documentId, const istd::IChangeable& document) override;
-	virtual OperationStatus SaveDocument(
+	virtual void SaveDocument(
 		const QByteArray& userId,
 		const QByteArray& documentId,
-		const QString& documentName = QString(),
-		QString* errorMessage = nullptr) override;
-	virtual OperationStatus CloseDocument(const QByteArray& userId, const QByteArray& documentId) override;
+		OperationResultCallback callback,
+		const QString& documentName = QString()) override;
+	virtual void CloseDocument(
+		const QByteArray& userId,
+		const QByteArray& documentId,
+		OperationResultCallback callback) override;
 	virtual OperationStatus GetDocumentUndoManager(
 		const QByteArray& userId, const QByteArray& documentId, idoc::IUndoManager*& undoManagerPtr) const override;
 	virtual OperationStatus RegisterDocumentObserver(const QByteArray& userId, const QByteArray& documentId, imod::IObserver& observer) override;
