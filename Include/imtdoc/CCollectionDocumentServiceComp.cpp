@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include <imtdoc/CCollectionDocumentManagerComp.h>
+#include <imtdoc/CCollectionDocumentServiceComp.h>
 
 namespace imtdoc
 {
@@ -7,17 +7,17 @@ namespace imtdoc
 
 // protected methods
 
-// reimplemented (imtdoc::CCollectionDocumentManagerBase)
+// reimplemented (imtdoc::CCollectionDocumentServiceBase)
 
-imtbase::IObjectCollection* CCollectionDocumentManagerComp::GetCollection() const
+imtbase::IObjectCollection* CCollectionDocumentServiceComp::GetCollection() const
 {
 return m_collectionCompPtr.IsValid() ? m_collectionCompPtr.GetPtr() : nullptr;
 }
 
 
-// reimplemented (imtdoc::CDocumentManagerBase)
+// reimplemented (imtdoc::CDocumentServiceBase)
 
-bool CCollectionDocumentManagerComp::IsSingleCopyMode() const
+bool CCollectionDocumentServiceComp::IsSingleCopyMode() const
 {
 	return m_isSingleCopyModeAttrPtr.IsValid() && *m_isSingleCopyModeAttrPtr;
 }

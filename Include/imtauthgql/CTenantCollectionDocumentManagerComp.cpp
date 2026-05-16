@@ -380,7 +380,7 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTenantCollect
 }
 
 
-// reimplemented (imtdoc::IDocumentManagerEventHandler)
+// reimplemented (imtdoc::IDocumentServiceEventHandler)
 
 bool CTenantCollectionDocumentManagerComp::ProcessEvent(imtdoc::CEventBase* eventPtr)
 {
@@ -392,7 +392,7 @@ bool CTenantCollectionDocumentManagerComp::ProcessEvent(imtdoc::CEventBase* even
 
 		istd::IChangeableSharedPtr documentPtr;
 		imtauth::ITenantInfo* documentTicketPtr = nullptr;
-		if (m_documentManagerCompPtr->GetDocumentData(userId, documentId, documentPtr) == imtdoc::IDocumentManager::OS_OK){
+		if (m_documentManagerCompPtr->GetDocumentData(userId, documentId, documentPtr) == imtdoc::IDocumentService::OS_OK){
 			documentTicketPtr = dynamic_cast<imtauth::ITenantInfo*>(documentPtr.GetPtr());
 		}
 

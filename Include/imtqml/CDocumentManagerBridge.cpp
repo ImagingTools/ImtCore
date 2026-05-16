@@ -39,36 +39,36 @@ void PostToMainThread(Fn&& fn)
 }
 
 
-IDocumentManagerBridge::OperationStatus MapStatus(imtdoc::IDocumentManager::OperationStatus status)
+IDocumentManagerBridge::OperationStatus MapStatus(imtdoc::IDocumentService::OperationStatus status)
 {
 	switch (status){
-		case imtdoc::IDocumentManager::OS_OK:
+		case imtdoc::IDocumentService::OS_OK:
 			return IDocumentManagerBridge::OS_OK;
-		case imtdoc::IDocumentManager::OS_INVALID_USER_ID:
+		case imtdoc::IDocumentService::OS_INVALID_USER_ID:
 			return IDocumentManagerBridge::OS_INVALID_USER_ID;
-		case imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_ID:
+		case imtdoc::IDocumentService::OS_INVALID_DOCUMENT_ID:
 			return IDocumentManagerBridge::OS_INVALID_DOCUMENT_ID;
-		case imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_DATA:
+		case imtdoc::IDocumentService::OS_INVALID_DOCUMENT_DATA:
 			return IDocumentManagerBridge::OS_INVALID_DOCUMENT_DATA;
-		case imtdoc::IDocumentManager::OS_FAILED:
+		case imtdoc::IDocumentService::OS_FAILED:
 		default:
 			return IDocumentManagerBridge::OS_FAILED;
 	}
 }
 
 
-QString StatusToErrorMessage(imtdoc::IDocumentManager::OperationStatus status)
+QString StatusToErrorMessage(imtdoc::IDocumentService::OperationStatus status)
 {
 	switch (status){
-		case imtdoc::IDocumentManager::OS_OK:
+		case imtdoc::IDocumentService::OS_OK:
 			return QString();
-		case imtdoc::IDocumentManager::OS_INVALID_USER_ID:
+		case imtdoc::IDocumentService::OS_INVALID_USER_ID:
 			return QStringLiteral("Invalid user id");
-		case imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_ID:
+		case imtdoc::IDocumentService::OS_INVALID_DOCUMENT_ID:
 			return QStringLiteral("Invalid document id");
-		case imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_DATA:
+		case imtdoc::IDocumentService::OS_INVALID_DOCUMENT_DATA:
 			return QStringLiteral("Invalid document data");
-		case imtdoc::IDocumentManager::OS_FAILED:
+		case imtdoc::IDocumentService::OS_FAILED:
 		default:
 			return QStringLiteral("Operation failed");
 	}
@@ -117,14 +117,14 @@ void CDocumentManagerBridge::GetOpenedDocumentList(
 	if (!callback){
 		return;
 	}
-	imtdoc::IDocumentManager* mgrPtr = m_documentManagerCompPtr.GetPtr();
+	imtdoc::IDocumentService* mgrPtr = m_documentManagerCompPtr.GetPtr();
 	if (mgrPtr == nullptr){
 		PostToMainThread([cb = std::move(callback)]() mutable {
 				cb({}, c_noManagerError);
 			});
 		return;
 	}
-	imtdoc::IDocumentManager::DocumentList list = mgrPtr->GetOpenedDocumentList(QByteArray());
+	imtdoc::IDocumentService::DocumentList list = mgrPtr->GetOpenedDocumentList(QByteArray());
 	QList<OpenedDocumentInfo> result;
 	result.reserve(list.size());
 	for (const auto& item: list){
@@ -151,7 +151,7 @@ void CDocumentManagerBridge::OpenDocument(
 	if (!callback){
 		return;
 	}
-	imtdoc::IDocumentManager* mgrPtr = m_documentManagerCompPtr.GetPtr();
+	imtdoc::IDocumentService* mgrPtr = m_documentManagerCompPtr.GetPtr();
 	if (mgrPtr == nullptr){
 		PostToMainThread([cb = std::move(callback)]() mutable {
 				cb(OpenedDocumentInfo{}, c_noManagerError);
@@ -171,7 +171,7 @@ void CDocumentManagerBridge::OpenDocument(
 	info.typeId = typeId;
 	info.objectId = documentId;
 	QString name;
-	if (mgrPtr->GetDocumentName(QByteArray(), openedId, name) == imtdoc::IDocumentManager::OS_OK){
+	if (mgrPtr->GetDocumentName(QByteArray(), openedId, name) == imtdoc::IDocumentService::OS_OK){
 		info.name = name;
 	}
 	PostToMainThread([cb = std::move(callback), info = std::move(info)]() mutable {
@@ -188,7 +188,7 @@ void CDocumentManagerBridge::CreateDocument(
 	if (!callback){
 		return;
 	}
-	imtdoc::IDocumentManager* mgrPtr = m_documentManagerCompPtr.GetPtr();
+	imtdoc::IDocumentService* mgrPtr = m_documentManagerCompPtr.GetPtr();
 	if (mgrPtr == nullptr){
 		PostToMainThread([cb = std::move(callback)]() mutable {
 				cb(OpenedDocumentInfo{}, c_noManagerError);
@@ -206,7 +206,7 @@ void CDocumentManagerBridge::CreateDocument(
 	info.documentId = QString::fromUtf8(newId);
 	info.typeId = typeId;
 	QString name;
-	if (mgrPtr->GetDocumentName(QByteArray(), newId, name) == imtdoc::IDocumentManager::OS_OK){
+	if (mgrPtr->GetDocumentName(QByteArray(), newId, name) == imtdoc::IDocumentService::OS_OK){
 		info.name = name;
 	}
 	PostToMainThread([cb = std::move(callback), info = std::move(info)]() mutable {
@@ -224,7 +224,7 @@ void CDocumentManagerBridge::SaveDocument(
 	if (!callback){
 		return;
 	}
-	imtdoc::IDocumentManager* mgrPtr = m_documentManagerCompPtr.GetPtr();
+	imtdoc::IDocumentService* mgrPtr = m_documentManagerCompPtr.GetPtr();
 	if (mgrPtr == nullptr){
 		PostToMainThread([cb = std::move(callback)]() mutable {
 				cb(OS_FAILED, c_noManagerError);
@@ -239,7 +239,7 @@ void CDocumentManagerBridge::SaveDocument(
 			&errorMessage);
 	const auto mapped = MapStatus(status);
 	QString msg = errorMessage;
-	if (msg.isEmpty() && status != imtdoc::IDocumentManager::OS_OK){
+	if (msg.isEmpty() && status != imtdoc::IDocumentService::OS_OK){
 		msg = StatusToErrorMessage(status);
 	}
 	PostToMainThread([cb = std::move(callback), mapped, msg = std::move(msg)]() mutable {
@@ -256,7 +256,7 @@ void CDocumentManagerBridge::CloseDocument(
 	if (!callback){
 		return;
 	}
-	imtdoc::IDocumentManager* mgrPtr = m_documentManagerCompPtr.GetPtr();
+	imtdoc::IDocumentService* mgrPtr = m_documentManagerCompPtr.GetPtr();
 	if (mgrPtr == nullptr){
 		PostToMainThread([cb = std::move(callback)]() mutable {
 				cb(c_noManagerError);
@@ -265,7 +265,7 @@ void CDocumentManagerBridge::CloseDocument(
 	}
 	const auto status = mgrPtr->CloseDocument(QByteArray(), documentId.toUtf8());
 	QString msg;
-	if (status != imtdoc::IDocumentManager::OS_OK){
+	if (status != imtdoc::IDocumentService::OS_OK){
 		msg = StatusToErrorMessage(status);
 	}
 	PostToMainThread([cb = std::move(callback), msg = std::move(msg)]() mutable {
@@ -284,7 +284,7 @@ namespace
 	failure.
 */
 idoc::IUndoManager* ResolveUndoManager(
-		imtdoc::IDocumentManager* mgrPtr,
+		imtdoc::IDocumentService* mgrPtr,
 		const QString& documentId,
 		QString& errorMessage)
 {
@@ -295,7 +295,7 @@ idoc::IUndoManager* ResolveUndoManager(
 	idoc::IUndoManager* undoManagerPtr = nullptr;
 	const auto status = mgrPtr->GetDocumentUndoManager(
 			QByteArray(), documentId.toUtf8(), undoManagerPtr);
-	if (status != imtdoc::IDocumentManager::OS_OK || undoManagerPtr == nullptr){
+	if (status != imtdoc::IDocumentService::OS_OK || undoManagerPtr == nullptr){
 		errorMessage = StatusToErrorMessage(status);
 		if (errorMessage.isEmpty()){
 			errorMessage = QStringLiteral("Undo manager is not available");

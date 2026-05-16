@@ -18,23 +18,23 @@
 #include <imod/CMultiModelDispatcherBase.h>
 
 // ImtCore includes
-#include <imtdoc/IDocumentManager.h>
-#include <imtdoc/IDocumentManagerEventHandler.h>
+#include <imtdoc/IDocumentService.h>
+#include <imtdoc/IDocumentServiceEventHandler.h>
 
 
 namespace imtdoc
 {
 
 
-class CDocumentManagerBase:
+class CDocumentServiceBase:
 			protected imod::TMultiModelObserverBase<istd::IChangeable>,
-			virtual public imtdoc::IDocumentManager
+			virtual public imtdoc::IDocumentService
 {
 public:
-	CDocumentManagerBase();
-	~CDocumentManagerBase();
+	CDocumentServiceBase();
+	~CDocumentServiceBase();
 
-	// reimplemented (imtdoc::IDocumentManager)
+	// reimplemented (imtdoc::IDocumentService)
 	virtual DocumentList GetOpenedDocumentList(const QByteArray& userId) const override;
 	virtual QByteArray CreateNewDocument(
 		const QByteArray& userId,
@@ -81,7 +81,7 @@ protected:
 		const WorkingDocument& document,
 		OperationStatus& status,
 		QString* errorMessage = nullptr) const;
-	virtual QList<imtdoc::IDocumentManagerEventHandler*> GetDocumentManagerEventHandlers() const;
+	virtual QList<imtdoc::IDocumentServiceEventHandler*> GetDocumentManagerEventHandlers() const;
 
 	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId) const = 0;
 	virtual idoc::IUndoManagerUniquePtr CreateUndoManager() const = 0;
@@ -119,13 +119,13 @@ protected:
 	class UndoManagerObserver : public imod::CMultiModelDispatcherBase
 	{
 	public:
-		UndoManagerObserver(CDocumentManagerBase& parent);
+		UndoManagerObserver(CDocumentServiceBase& parent);
 
 	protected:
 		virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
 
 	private:
-		CDocumentManagerBase& m_parent;
+		CDocumentServiceBase& m_parent;
 	};
 
 	virtual bool IsSingleCopyMode() const;

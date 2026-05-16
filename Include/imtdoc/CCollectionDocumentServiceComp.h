@@ -3,31 +3,31 @@
 
 
 // ImtCore includes
-#include <imtdoc/CCollectionDocumentManagerBase.h>
-#include <imtdoc/CDocumentManagerCompBase.h>
+#include <imtdoc/CCollectionDocumentServiceBase.h>
+#include <imtdoc/CDocumentServiceCompBase.h>
 
 
 namespace imtdoc
 {
 
 
-class CCollectionDocumentManagerComp: public CDocumentManagerCompBase, public CCollectionDocumentManagerBase
+class CCollectionDocumentServiceComp: public CDocumentServiceCompBase, public CCollectionDocumentServiceBase
 {
 public:
-	typedef CDocumentManagerCompBase BaseClass;
-	typedef CCollectionDocumentManagerBase BaseClass2;
+	typedef CDocumentServiceCompBase BaseClass;
+	typedef CCollectionDocumentServiceBase BaseClass2;
 
-	I_BEGIN_COMPONENT(CCollectionDocumentManagerComp)
-		I_REGISTER_INTERFACE(imtdoc::IDocumentManager)
+	I_BEGIN_COMPONENT(CCollectionDocumentServiceComp)
+		I_REGISTER_INTERFACE(imtdoc::IDocumentService)
 		I_ASSIGN(m_collectionCompPtr, "Collection", "Document collection containing related documents", true, "Collection");
 		I_ASSIGN(m_isSingleCopyModeAttrPtr, "IsSingleCopyMode", "When enabled, all users share a single copy of each document", false, false);
 	I_END_COMPONENT
 
 protected:
-	// reimplemented (imtdoc::CCollectionDocumentManagerBase)
+	// reimplemented (imtdoc::CCollectionDocumentServiceBase)
 	virtual imtbase::IObjectCollection* GetCollection() const override;
 
-	// reimplemented (imtdoc::CDocumentManagerBase)
+	// reimplemented (imtdoc::CDocumentServiceBase)
 	virtual bool IsSingleCopyMode() const override;
 
 private:

@@ -3,12 +3,12 @@
 
 
 // ImtCore includes
-#include <imtdoc/IDocumentManager.h>
+#include <imtdoc/IDocumentService.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtauth/ITenantMembershipManager.h>
 #include <imtauth/ITenantInvitationManager.h>
 #include <imtauth/IUserManager.h>
-#include <imtdoc/IDocumentManagerEventHandler.h>
+#include <imtdoc/IDocumentServiceEventHandler.h>
 
 // Generated includes
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/TenantCollectionDocumentManager.h>
@@ -20,13 +20,13 @@ namespace imtauthgql
 
 class CTenantCollectionDocumentManagerComp:
 			public sdl::imtauth::TenantCollectionDocumentManager::CGraphQlHandlerCompBase,
-			virtual public imtdoc::IDocumentManagerEventHandler
+			virtual public imtdoc::IDocumentServiceEventHandler
 {
 public:
 	typedef sdl::imtauth::TenantCollectionDocumentManager::CGraphQlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CTenantCollectionDocumentManagerComp)
-		I_REGISTER_INTERFACE(imtdoc::IDocumentManagerEventHandler)
+		I_REGISTER_INTERFACE(imtdoc::IDocumentServiceEventHandler)
 		I_ASSIGN(m_documentManagerCompPtr, "CollectionDocumentManager", "Collection document manager", false, "CollectionDocumentManager");
 		I_ASSIGN(m_tenantCollectionCompPtr, "TenantCollection", "Tenant collection for refreshing DB-computed fields after save", false, "TenantCollection");
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager for members", false, "MembershipManager");
@@ -45,11 +45,11 @@ protected:
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 
-	// reimplemented (imtdoc::IDocumentManagerEventHandler)
+	// reimplemented (imtdoc::IDocumentServiceEventHandler)
 	virtual bool ProcessEvent(imtdoc::CEventBase* eventPtr) override;
 
 private:
-	I_REF(imtdoc::IDocumentManager, m_documentManagerCompPtr);
+	I_REF(imtdoc::IDocumentService, m_documentManagerCompPtr);
 	I_REF(imtbase::IObjectCollection, m_tenantCollectionCompPtr);
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
 	I_REF(imtauth::ITenantInvitationManager, m_invitationManagerCompPtr);

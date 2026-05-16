@@ -16,8 +16,8 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
-#include <imtdoc/CCollectionDocumentManagerBase.h>
-#include <imtdoc/IDocumentManagerEventHandler.h>
+#include <imtdoc/CCollectionDocumentServiceBase.h>
+#include <imtdoc/IDocumentServiceEventHandler.h>
 
 
 /**
@@ -427,7 +427,7 @@ private:
 /**
 	Mock event handler that records all events for verification.
 */
-class CMockEventHandler: public imtdoc::IDocumentManagerEventHandler
+class CMockEventHandler: public imtdoc::IDocumentServiceEventHandler
 {
 public:
 	struct RecordedEvent
@@ -462,7 +462,7 @@ public:
 		return count;
 	}
 
-	// reimplemented (imtdoc::IDocumentManagerEventHandler)
+	// reimplemented (imtdoc::IDocumentServiceEventHandler)
 	virtual bool ProcessEvent(imtdoc::CEventBase* eventPtr) override
 	{
 		if (eventPtr == nullptr) {
@@ -498,7 +498,7 @@ private:
 	Concrete subclass of CCollectionDocumentManager for testing.
 	Provides mock implementations for the pure virtual methods.
 */
-class CTestableDocumentManager: public imtdoc::CCollectionDocumentManagerBase
+class CTestableDocumentManager: public imtdoc::CCollectionDocumentServiceBase
 {
 public:
 	CTestableDocumentManager()
@@ -526,15 +526,15 @@ public:
 	void SetSingleCopyMode(bool enabled) { m_singleCopyMode = enabled; }
 
 	// Expose protected methods for testing
-	using imtdoc::CDocumentManagerBase::FindDocument;
-	using imtdoc::CDocumentManagerBase::ValidateInputParams;
-	using imtdoc::CDocumentManagerBase::ObjectIdToUrl;
-	using imtdoc::CDocumentManagerBase::m_userDocuments;
-	using imtdoc::CDocumentManagerBase::m_mutex;
-	using imtdoc::CDocumentManagerBase::m_sharedDocuments;
+	using imtdoc::CDocumentServiceBase::FindDocument;
+	using imtdoc::CDocumentServiceBase::ValidateInputParams;
+	using imtdoc::CDocumentServiceBase::ObjectIdToUrl;
+	using imtdoc::CDocumentServiceBase::m_userDocuments;
+	using imtdoc::CDocumentServiceBase::m_mutex;
+	using imtdoc::CDocumentServiceBase::m_sharedDocuments;
 
 protected:
-	// reimplemented (CCollectionDocumentManagerBase)
+	// reimplemented (CCollectionDocumentServiceBase)
 	virtual imtbase::IObjectCollection* GetCollection() const override
 	{
 		return m_collectionPtr;
@@ -563,7 +563,7 @@ protected:
 		return idoc::IUndoManagerUniquePtr(new CMockUndoManager());
 	}
 
-	virtual QList<imtdoc::IDocumentManagerEventHandler*> GetDocumentManagerEventHandlers() const override
+	virtual QList<imtdoc::IDocumentServiceEventHandler*> GetDocumentManagerEventHandlers() const override
 	{
 		return { const_cast<CMockEventHandler*>(&m_mockEventHandler) };
 	}

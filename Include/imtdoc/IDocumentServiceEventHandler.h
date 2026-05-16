@@ -10,7 +10,7 @@ namespace imtdoc
 {
 
 
-class IDocumentManagerEventHandler : virtual public istd::IPolymorphic
+class IDocumentServiceEventHandler : virtual public istd::IPolymorphic
 {
 public:
 	virtual bool ProcessEvent(CEventBase* eventPtr) = 0;

@@ -22,8 +22,8 @@ CDM::CDocumentList CCollectionDocumentManagerControllerComp::OnGetOpenedDocument
 	if (m_documentManagerCompPtr.IsValid()){
 		QByteArray userId = GetUserId(gqlRequest);
 
-		imtdoc::IDocumentManager::DocumentList list = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
-		for (const imtdoc::IDocumentManager::DocumentListItem& info : list){
+		imtdoc::IDocumentService::DocumentList list = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
+		for (const imtdoc::IDocumentService::DocumentListItem& info : list){
 			CDM::CDocumentInfo sdlInfo;
 			sdlInfo.Version_1_0.emplace();
 
@@ -93,8 +93,8 @@ CDM::CDocumentInfo CCollectionDocumentManagerControllerComp::OnCreateNewDocument
 		retVal.Version_1_0->hasNameProvider = false;
 		retVal.Version_1_0->isLoading = false;
 
-		imtdoc::IDocumentManager::DocumentList list = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
-		for (const imtdoc::IDocumentManager::DocumentListItem& info : list){
+		imtdoc::IDocumentService::DocumentList list = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
+		for (const imtdoc::IDocumentService::DocumentListItem& info : list){
 			if (info.documentId == documentId){
 				retVal.Version_1_0->hasNameProvider = info.hasNameProvider;
 				break;
@@ -144,8 +144,8 @@ CDM::CDocumentInfo CCollectionDocumentManagerControllerComp::OnOpenDocument(
 		retVal.Version_1_0->hasNameProvider = false;
 		retVal.Version_1_0->isLoading = true;
 
-		imtdoc::IDocumentManager::DocumentList list = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
-		for (const imtdoc::IDocumentManager::DocumentListItem& info : list){
+		imtdoc::IDocumentService::DocumentList list = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
+		for (const imtdoc::IDocumentService::DocumentListItem& info : list){
 			if (info.documentId == documentId){
 				retVal.Version_1_0->documentName = info.name;
 				retVal.Version_1_0->objectTypeId = info.typeId;
@@ -183,21 +183,21 @@ CDM::CDocumentInfo CCollectionDocumentManagerControllerComp::OnGetDocumentName(
 
 	if (m_documentManagerCompPtr.IsValid()) {
 		QString name;
-		imtdoc::IDocumentManager::OperationStatus status = m_documentManagerCompPtr->GetDocumentName(userId, *documentId->id, name);
+		imtdoc::IDocumentService::OperationStatus status = m_documentManagerCompPtr->GetDocumentName(userId, *documentId->id, name);
 
 		switch (status){
-		case imtdoc::IDocumentManager::OS_OK:{
+		case imtdoc::IDocumentService::OS_OK:{
 			retVal.Version_1_0.emplace();
 			retVal.Version_1_0->documentId = *documentId->id;
 			retVal.Version_1_0->documentName = name;
 			break;
 		}
 
-		case imtdoc::IDocumentManager::OS_INVALID_USER_ID:
+		case imtdoc::IDocumentService::OS_INVALID_USER_ID:
 			errorMessage = "Invalid user-ID";
 			break;
 
-		case imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_ID:
+		case imtdoc::IDocumentService::OS_INVALID_DOCUMENT_ID:
 			errorMessage = "Invalid document ID";
 			break;
 		default:
@@ -234,20 +234,20 @@ CDM::CDocumentOperationStatus CCollectionDocumentManagerControllerComp::OnSetDoc
 	retVal.Version_1_0.emplace();
 
 	if (m_documentManagerCompPtr.IsValid()) {
-		imtdoc::IDocumentManager::OperationStatus status = m_documentManagerCompPtr->SetDocumentName(userId, *documentId->documentId, *documentId->documentName);
+		imtdoc::IDocumentService::OperationStatus status = m_documentManagerCompPtr->SetDocumentName(userId, *documentId->documentId, *documentId->documentName);
 		switch (status){
-		case imtdoc::IDocumentManager::OS_OK:
+		case imtdoc::IDocumentService::OS_OK:
 			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Success;
 			break;
-		case imtdoc::IDocumentManager::OS_INVALID_USER_ID:
+		case imtdoc::IDocumentService::OS_INVALID_USER_ID:
 			errorMessage = "Invalid user-ID";
 			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidUserId;
 			break;
-		case imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_ID:
+		case imtdoc::IDocumentService::OS_INVALID_DOCUMENT_ID:
 			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidDocumentId;
 			errorMessage = "Invalid document ID";
 			break;
-		case imtdoc::IDocumentManager::OS_FAILED:
+		case imtdoc::IDocumentService::OS_FAILED:
 			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Failed;
 			errorMessage = "Failed to set document name";
 			break;
@@ -286,35 +286,35 @@ CDM::CDocumentOperationStatus CCollectionDocumentManagerControllerComp::OnSaveDo
 
 	if (m_documentManagerCompPtr.IsValid()) {
 		QString saveErrorMessage;
-		imtdoc::IDocumentManager::OperationStatus status = m_documentManagerCompPtr->SaveDocument(
+		imtdoc::IDocumentService::OperationStatus status = m_documentManagerCompPtr->SaveDocument(
 			userId,
 			*saveDocumentInput->documentId,
 			*saveDocumentInput->documentName,
 			&saveErrorMessage);
 		QString responseMessage;
 		switch (status){
-		case imtdoc::IDocumentManager::OS_OK:
+		case imtdoc::IDocumentService::OS_OK:
 			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Success;
 			{
 				QString resolvedName;
-				if (m_documentManagerCompPtr->GetDocumentName(userId, *saveDocumentInput->documentId, resolvedName) == imtdoc::IDocumentManager::OS_OK){
+				if (m_documentManagerCompPtr->GetDocumentName(userId, *saveDocumentInput->documentId, resolvedName) == imtdoc::IDocumentService::OS_OK){
 					retVal.Version_1_0->documentName = resolvedName;
 				}
 			}
 			break;
-		case imtdoc::IDocumentManager::OS_INVALID_USER_ID:
+		case imtdoc::IDocumentService::OS_INVALID_USER_ID:
 			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidUserId;
 			responseMessage = "Invalid user-ID";
 			break;
-		case imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_ID:
+		case imtdoc::IDocumentService::OS_INVALID_DOCUMENT_ID:
 			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidDocumentId;
 			responseMessage = "Invalid document ID";
 			break;
-		case imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_DATA:
+		case imtdoc::IDocumentService::OS_INVALID_DOCUMENT_DATA:
 			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidDocumentData;
 			responseMessage = saveErrorMessage.isEmpty() ? "Document data is invalid" : saveErrorMessage;
 			break;
-		case imtdoc::IDocumentManager::OS_FAILED:
+		case imtdoc::IDocumentService::OS_FAILED:
 			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Failed;
 			responseMessage = "Failed to save document";
 			break;
@@ -355,18 +355,18 @@ CDM::CDocumentOperationStatus CCollectionDocumentManagerControllerComp::OnCloseD
 	retVal.Version_1_0.emplace();
 
 	if (m_documentManagerCompPtr.IsValid()) {
-		imtdoc::IDocumentManager::OperationStatus status = m_documentManagerCompPtr->CloseDocument(userId, *documentId->id);
+		imtdoc::IDocumentService::OperationStatus status = m_documentManagerCompPtr->CloseDocument(userId, *documentId->id);
 		switch (status){
-		case imtdoc::IDocumentManager::OS_OK:
+		case imtdoc::IDocumentService::OS_OK:
 			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Success;
 			break;
-		case imtdoc::IDocumentManager::OS_INVALID_USER_ID:
+		case imtdoc::IDocumentService::OS_INVALID_USER_ID:
 			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidUserId;
 			break;
-		case imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_ID:
+		case imtdoc::IDocumentService::OS_INVALID_DOCUMENT_ID:
 			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidDocumentId;
 			break;
-		case imtdoc::IDocumentManager::OS_FAILED:
+		case imtdoc::IDocumentService::OS_FAILED:
 			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Failed;
 			break;
 		default:
@@ -407,7 +407,7 @@ sdl::imtbase::UndoManager::CUndoInfo CCollectionDocumentManagerControllerComp::O
 
 	if (m_documentManagerCompPtr.IsValid()) {
 		idoc::IUndoManager* undoManagerPtr = nullptr;
-		if (m_documentManagerCompPtr-> GetDocumentUndoManager(userId, *documentId->id, undoManagerPtr) != imtdoc::IDocumentManager::OS_OK){
+		if (m_documentManagerCompPtr-> GetDocumentUndoManager(userId, *documentId->id, undoManagerPtr) != imtdoc::IDocumentService::OS_OK){
 			errorMessage = "Undo manager not available";
 
 			retVal.Version_1_0->status->status = sdl::imtbase::UndoManager::EUndoStatus::Failed;
@@ -479,7 +479,7 @@ sdl::imtbase::UndoManager::CUndoStatus CCollectionDocumentManagerControllerComp:
 
 	if (m_documentManagerCompPtr.IsValid()) {
 		idoc::IUndoManager* undoManagerPtr = nullptr;
-		if (m_documentManagerCompPtr->GetDocumentUndoManager(userId, documentId, undoManagerPtr) != imtdoc::IDocumentManager::OS_OK) {
+		if (m_documentManagerCompPtr->GetDocumentUndoManager(userId, documentId, undoManagerPtr) != imtdoc::IDocumentService::OS_OK) {
 			errorMessage = "Undo manager not available";
 
 			retVal.Version_1_0->status = sdl::imtbase::UndoManager::EUndoStatus::Failed;
@@ -548,7 +548,7 @@ sdl::imtbase::UndoManager::CUndoStatus CCollectionDocumentManagerControllerComp:
 
 	if (m_documentManagerCompPtr.IsValid()) {
 		idoc::IUndoManager* undoManagerPtr = nullptr;
-		if (m_documentManagerCompPtr->GetDocumentUndoManager(userId, documentId, undoManagerPtr) != imtdoc::IDocumentManager::OS_OK) {
+		if (m_documentManagerCompPtr->GetDocumentUndoManager(userId, documentId, undoManagerPtr) != imtdoc::IDocumentService::OS_OK) {
 			errorMessage = "Undo manager not available";
 
 			retVal.Version_1_0->status = sdl::imtbase::UndoManager::EUndoStatus::Failed;
@@ -607,7 +607,7 @@ sdl::imtbase::UndoManager::CUndoStatus CCollectionDocumentManagerControllerComp:
 
 	if (m_documentManagerCompPtr.IsValid()) {
 		idoc::IUndoManager* undoManagerPtr = nullptr;
-		if (m_documentManagerCompPtr->GetDocumentUndoManager(userId, *documentId->id, undoManagerPtr) != imtdoc::IDocumentManager::OS_OK) {
+		if (m_documentManagerCompPtr->GetDocumentUndoManager(userId, *documentId->id, undoManagerPtr) != imtdoc::IDocumentService::OS_OK) {
 			errorMessage = "Undo manager not available";
 
 			retVal.Version_1_0->status = sdl::imtbase::UndoManager::EUndoStatus::Failed;

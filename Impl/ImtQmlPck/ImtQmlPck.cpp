@@ -47,7 +47,7 @@ I_EXPORT_COMPONENT(
 
 I_EXPORT_COMPONENT(
 			DocumentManagerBridge,
-			"In-process implementation of imtqml::IDocumentManagerBridge - forwards every CDocumentManagerController request directly to an injected imtdoc::IDocumentManager. Resolved through icomp; not exposed to QML.",
+			"In-process implementation of imtqml::IDocumentManagerBridge - forwards every CDocumentManagerController request directly to an injected imtdoc::IDocumentService. Resolved through icomp; not exposed to QML.",
 			"In-Process QML Bridge DocumentManager DataController");
 
 I_EXPORT_COMPONENT(

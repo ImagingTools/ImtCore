@@ -259,7 +259,7 @@ void CCollectionDocumentManagerTest::CreateNewDocumentProposedSourceDocumentIdUs
 
 	// Save the document – this should insert it into the collection using the proposed ID
 	auto status = m_managerPtr->SaveDocument(TEST_USER_ID, docId, TEST_DOC_NAME);
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_OK);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_OK);
 
 	// Verify the proposed ID was used as the collection element ID
 	QCOMPARE(m_managerPtr->GetMockCollection().GetLastInsertedId(), proposedId);
@@ -393,7 +393,7 @@ void CCollectionDocumentManagerTest::GetDocumentNameSuccessTest()
 	QString name;
 	auto status = m_managerPtr->GetDocumentName(TEST_USER_ID, docId, name);
 
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_OK);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_OK);
 	QCOMPARE(name, TEST_DOC_NAME);
 }
 
@@ -405,7 +405,7 @@ void CCollectionDocumentManagerTest::GetDocumentNameInvalidUserTest()
 	QString name;
 	auto status = m_managerPtr->GetDocumentName("invalidUser", docId, name);
 
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_INVALID_USER_ID);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_INVALID_USER_ID);
 }
 
 
@@ -416,7 +416,7 @@ void CCollectionDocumentManagerTest::GetDocumentNameInvalidDocumentTest()
 	QString name;
 	auto status = m_managerPtr->GetDocumentName(TEST_USER_ID, "invalidDocId", name);
 
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_ID);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_INVALID_DOCUMENT_ID);
 }
 
 
@@ -431,7 +431,7 @@ void CCollectionDocumentManagerTest::SetDocumentNameSuccessTest()
 
 	QString newName = "Renamed Document";
 	auto status = m_managerPtr->SetDocumentName(TEST_USER_ID, docId, newName);
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_OK);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_OK);
 
 	QString retrievedName;
 	m_managerPtr->GetDocumentName(TEST_USER_ID, docId, retrievedName);
@@ -444,7 +444,7 @@ void CCollectionDocumentManagerTest::SetDocumentNameSameNameTest()
 	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID, TEST_TYPE_ID, TEST_OBJECT_ID, TEST_DOC_NAME);
 
 	auto status = m_managerPtr->SetDocumentName(TEST_USER_ID, docId, TEST_DOC_NAME);
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_OK);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_OK);
 }
 
 
@@ -453,7 +453,7 @@ void CCollectionDocumentManagerTest::SetDocumentNameInvalidUserTest()
 	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID);
 
 	auto status = m_managerPtr->SetDocumentName("invalidUser", docId, "NewName");
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_INVALID_USER_ID);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_INVALID_USER_ID);
 }
 
 
@@ -462,7 +462,7 @@ void CCollectionDocumentManagerTest::SetDocumentNameInvalidDocumentTest()
 	SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID);
 
 	auto status = m_managerPtr->SetDocumentName(TEST_USER_ID, "invalidDocId", "NewName");
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_ID);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_INVALID_DOCUMENT_ID);
 }
 
 
@@ -472,7 +472,7 @@ void CCollectionDocumentManagerTest::SetDocumentNameCollectionUpdateFailTest()
 	m_managerPtr->GetMockCollection().SetSetElementNameShouldFail(true);
 
 	auto status = m_managerPtr->SetDocumentName(TEST_USER_ID, docId, "NewName");
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_FAILED);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_FAILED);
 
 	// Name should not have changed
 	QString name;
@@ -509,7 +509,7 @@ void CCollectionDocumentManagerTest::SetDocumentNameNewDocumentNoCollectionUpdat
 	m_managerPtr->GetMockCollection().SetSetElementNameShouldFail(true);
 
 	auto status = m_managerPtr->SetDocumentName(TEST_USER_ID, docId, "NewName");
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_OK);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_OK);
 
 	QString name;
 	m_managerPtr->GetDocumentName(TEST_USER_ID, docId, name);
@@ -570,7 +570,7 @@ void CCollectionDocumentManagerTest::GetDocumentDataSuccessTest()
 	istd::IChangeableSharedPtr dataPtr;
 	auto status = m_managerPtr->GetDocumentData(TEST_USER_ID, docId, dataPtr);
 
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_OK);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_OK);
 	QVERIFY2(dataPtr.IsValid(), "Document data should be valid");
 }
 
@@ -582,7 +582,7 @@ void CCollectionDocumentManagerTest::GetDocumentDataInvalidUserTest()
 	istd::IChangeableSharedPtr dataPtr;
 	auto status = m_managerPtr->GetDocumentData("invalidUser", docId, dataPtr);
 
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_INVALID_USER_ID);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_INVALID_USER_ID);
 }
 
 
@@ -593,7 +593,7 @@ void CCollectionDocumentManagerTest::GetDocumentDataInvalidDocumentTest()
 	istd::IChangeableSharedPtr dataPtr;
 	auto status = m_managerPtr->GetDocumentData(TEST_USER_ID, "invalidDocId", dataPtr);
 
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_ID);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_INVALID_DOCUMENT_ID);
 }
 
 
@@ -604,7 +604,7 @@ void CCollectionDocumentManagerTest::GetDocumentDataWhileLoadingTest()
 	istd::IChangeableSharedPtr dataPtr;
 	auto status = m_managerPtr->GetDocumentData(TEST_USER_ID, docId, dataPtr);
 
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_FAILED);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_FAILED);
 }
 
 
@@ -619,7 +619,7 @@ void CCollectionDocumentManagerTest::SetDocumentDataSuccessTest()
 	CMockDocumentObject newData("updatedData");
 	auto status = m_managerPtr->SetDocumentData(TEST_USER_ID, docId, newData);
 
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_OK);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_OK);
 
 	// Verify the data was actually updated
 	const istd::IChangeable* docPtr = m_managerPtr->GetDocumentPtr(TEST_USER_ID, docId);
@@ -638,7 +638,7 @@ void CCollectionDocumentManagerTest::SetDocumentDataInvalidUserTest()
 	CMockDocumentObject newData;
 	auto status = m_managerPtr->SetDocumentData("invalidUser", docId, newData);
 
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_INVALID_USER_ID);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_INVALID_USER_ID);
 }
 
 
@@ -649,7 +649,7 @@ void CCollectionDocumentManagerTest::SetDocumentDataInvalidDocumentTest()
 	CMockDocumentObject newData;
 	auto status = m_managerPtr->SetDocumentData(TEST_USER_ID, "invalidDocId", newData);
 
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_ID);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_INVALID_DOCUMENT_ID);
 }
 
 
@@ -660,7 +660,7 @@ void CCollectionDocumentManagerTest::SetDocumentDataWhileLoadingTest()
 	CMockDocumentObject newData;
 	auto status = m_managerPtr->SetDocumentData(TEST_USER_ID, docId, newData);
 
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_FAILED);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_FAILED);
 }
 
 
@@ -673,7 +673,7 @@ void CCollectionDocumentManagerTest::SaveDocumentNewDocumentTest()
 	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID, TEST_TYPE_ID);
 
 	auto status = m_managerPtr->SaveDocument(TEST_USER_ID, docId, TEST_DOC_NAME);
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_OK);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_OK);
 
 	// Verify the document name was set
 	QString name;
@@ -695,7 +695,7 @@ void CCollectionDocumentManagerTest::SaveDocumentExistingDocumentTest()
 	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID, TEST_TYPE_ID, TEST_OBJECT_ID, TEST_DOC_NAME);
 
 	auto status = m_managerPtr->SaveDocument(TEST_USER_ID, docId);
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_OK);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_OK);
 }
 
 
@@ -709,7 +709,7 @@ void CCollectionDocumentManagerTest::SaveDocumentSaveAsTest()
 
 	QString newName = "Saved As Copy";
 	auto status = m_managerPtr->SaveDocument(TEST_USER_ID, docId, newName);
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_OK);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_OK);
 
 	// Verify name was updated
 	QString name;
@@ -723,7 +723,7 @@ void CCollectionDocumentManagerTest::SaveDocumentInvalidUserTest()
 	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID);
 
 	auto status = m_managerPtr->SaveDocument("invalidUser", docId);
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_INVALID_USER_ID);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_INVALID_USER_ID);
 }
 
 
@@ -732,7 +732,7 @@ void CCollectionDocumentManagerTest::SaveDocumentInvalidDocumentTest()
 	SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID);
 
 	auto status = m_managerPtr->SaveDocument(TEST_USER_ID, "invalidDocId");
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_ID);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_INVALID_DOCUMENT_ID);
 }
 
 
@@ -741,7 +741,7 @@ void CCollectionDocumentManagerTest::SaveDocumentWhileLoadingTest()
 	QByteArray docId = m_managerPtr->CreateNewDocument(TEST_USER_ID, TEST_TYPE_ID);
 
 	auto status = m_managerPtr->SaveDocument(TEST_USER_ID, docId);
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_FAILED);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_FAILED);
 }
 
 
@@ -751,7 +751,7 @@ void CCollectionDocumentManagerTest::SaveDocumentCollectionInsertFailTest()
 	m_managerPtr->GetMockCollection().SetInsertShouldFail(true);
 
 	auto status = m_managerPtr->SaveDocument(TEST_USER_ID, docId, TEST_DOC_NAME);
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_FAILED);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_FAILED);
 }
 
 
@@ -765,7 +765,7 @@ void CCollectionDocumentManagerTest::SaveDocumentCollectionSetDataFailTest()
 	m_managerPtr->GetMockCollection().SetSetObjectDataShouldFail(true);
 
 	auto status = m_managerPtr->SaveDocument(TEST_USER_ID, docId);
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_FAILED);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_FAILED);
 }
 
 
@@ -775,7 +775,7 @@ void CCollectionDocumentManagerTest::SaveDocumentValidationFailTest()
 	m_managerPtr->SetValidateShouldFail(true);
 
 	auto status = m_managerPtr->SaveDocument(TEST_USER_ID, docId, TEST_DOC_NAME);
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_DATA);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_INVALID_DOCUMENT_DATA);
 }
 
 
@@ -787,7 +787,7 @@ void CCollectionDocumentManagerTest::SaveDocumentValidationFailWithMessageTest()
 
 	QString errorMessage;
 	auto status = m_managerPtr->SaveDocument(TEST_USER_ID, docId, TEST_DOC_NAME, &errorMessage);
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_DATA);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_INVALID_DOCUMENT_DATA);
 	QCOMPARE(errorMessage, QString("Custom validation error"));
 }
 
@@ -800,7 +800,7 @@ void CCollectionDocumentManagerTest::SaveDocumentWithNameProviderTest()
 	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID, TEST_TYPE_ID);
 
 	auto status = m_managerPtr->SaveDocument(TEST_USER_ID, docId, TEST_DOC_NAME);
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_OK);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_OK);
 
 	QString name;
 	m_managerPtr->GetDocumentName(TEST_USER_ID, docId, name);
@@ -863,7 +863,7 @@ void CCollectionDocumentManagerTest::CloseDocumentSuccessTest()
 	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID);
 
 	auto status = m_managerPtr->CloseDocument(TEST_USER_ID, docId);
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_OK);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_OK);
 }
 
 
@@ -872,7 +872,7 @@ void CCollectionDocumentManagerTest::CloseDocumentInvalidUserTest()
 	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID);
 
 	auto status = m_managerPtr->CloseDocument("invalidUser", docId);
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_INVALID_USER_ID);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_INVALID_USER_ID);
 }
 
 
@@ -881,7 +881,7 @@ void CCollectionDocumentManagerTest::CloseDocumentInvalidDocumentTest()
 	SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID);
 
 	auto status = m_managerPtr->CloseDocument(TEST_USER_ID, "invalidDocId");
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_ID);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_INVALID_DOCUMENT_ID);
 }
 
 
@@ -944,7 +944,7 @@ void CCollectionDocumentManagerTest::GetDocumentUndoManagerSuccessTest()
 	idoc::IUndoManager* undoManagerPtr = nullptr;
 	auto status = m_managerPtr->GetDocumentUndoManager(TEST_USER_ID, docId, undoManagerPtr);
 
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_OK);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_OK);
 	QVERIFY2(undoManagerPtr != nullptr, "Undo manager should not be null");
 }
 
@@ -956,7 +956,7 @@ void CCollectionDocumentManagerTest::GetDocumentUndoManagerInvalidUserTest()
 	idoc::IUndoManager* undoManagerPtr = nullptr;
 	auto status = m_managerPtr->GetDocumentUndoManager("invalidUser", docId, undoManagerPtr);
 
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_INVALID_USER_ID);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_INVALID_USER_ID);
 	QVERIFY2(undoManagerPtr == nullptr, "Undo manager should be null for invalid user");
 }
 
@@ -968,7 +968,7 @@ void CCollectionDocumentManagerTest::GetDocumentUndoManagerInvalidDocumentTest()
 	idoc::IUndoManager* undoManagerPtr = nullptr;
 	auto status = m_managerPtr->GetDocumentUndoManager(TEST_USER_ID, "invalidDocId", undoManagerPtr);
 
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_ID);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_INVALID_DOCUMENT_ID);
 	QVERIFY2(undoManagerPtr == nullptr, "Undo manager should be null for invalid document ID");
 }
 
@@ -983,7 +983,7 @@ void CCollectionDocumentManagerTest::RegisterDocumentObserverSuccessTest()
 
 	CMockObserver observer;
 	auto status = m_managerPtr->RegisterDocumentObserver(TEST_USER_ID, docId, observer);
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_OK);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_OK);
 }
 
 
@@ -993,7 +993,7 @@ void CCollectionDocumentManagerTest::RegisterDocumentObserverInvalidUserTest()
 
 	CMockObserver observer;
 	auto status = m_managerPtr->RegisterDocumentObserver("invalidUser", docId, observer);
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_INVALID_USER_ID);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_INVALID_USER_ID);
 }
 
 
@@ -1003,7 +1003,7 @@ void CCollectionDocumentManagerTest::RegisterDocumentObserverInvalidDocumentTest
 
 	CMockObserver observer;
 	auto status = m_managerPtr->RegisterDocumentObserver(TEST_USER_ID, "invalidDocId", observer);
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_ID);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_INVALID_DOCUMENT_ID);
 }
 
 
@@ -1016,7 +1016,7 @@ void CCollectionDocumentManagerTest::RegisterDocumentObserverAlreadyRegisteredTe
 
 	// Registering the same observer again should fail
 	auto status = m_managerPtr->RegisterDocumentObserver(TEST_USER_ID, docId, observer);
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_FAILED);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_FAILED);
 }
 
 
@@ -1032,7 +1032,7 @@ void CCollectionDocumentManagerTest::UnregisterDocumentObserverSuccessTest()
 	m_managerPtr->RegisterDocumentObserver(TEST_USER_ID, docId, observer);
 
 	auto status = m_managerPtr->UnregisterDocumentObserver(TEST_USER_ID, docId, observer);
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_OK);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_OK);
 }
 
 
@@ -1042,7 +1042,7 @@ void CCollectionDocumentManagerTest::UnregisterDocumentObserverInvalidUserTest()
 
 	CMockObserver observer;
 	auto status = m_managerPtr->UnregisterDocumentObserver("invalidUser", docId, observer);
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_INVALID_USER_ID);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_INVALID_USER_ID);
 }
 
 
@@ -1052,7 +1052,7 @@ void CCollectionDocumentManagerTest::UnregisterDocumentObserverInvalidDocumentTe
 
 	CMockObserver observer;
 	auto status = m_managerPtr->UnregisterDocumentObserver(TEST_USER_ID, "invalidDocId", observer);
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_ID);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_INVALID_DOCUMENT_ID);
 }
 
 
@@ -1062,7 +1062,7 @@ void CCollectionDocumentManagerTest::UnregisterDocumentObserverNotRegisteredTest
 
 	CMockObserver observer;
 	auto status = m_managerPtr->UnregisterDocumentObserver(TEST_USER_ID, docId, observer);
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_FAILED);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_FAILED);
 }
 
 
@@ -1088,7 +1088,7 @@ void CCollectionDocumentManagerTest::ValidateInputParamsSuccessTest()
 {
 	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID);
 
-	imtdoc::IDocumentManager::OperationStatus status;
+	imtdoc::IDocumentService::OperationStatus status;
 	bool result = m_managerPtr->ValidateInputParams(TEST_USER_ID, docId, status);
 
 	QVERIFY2(result, "ValidateInputParams should return true for valid params");
@@ -1099,11 +1099,11 @@ void CCollectionDocumentManagerTest::ValidateInputParamsInvalidUserTest()
 {
 	SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID);
 
-	imtdoc::IDocumentManager::OperationStatus status;
+	imtdoc::IDocumentService::OperationStatus status;
 	bool result = m_managerPtr->ValidateInputParams("invalidUser", "someDoc", status);
 
 	QVERIFY2(!result, "ValidateInputParams should return false for invalid user");
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_INVALID_USER_ID);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_INVALID_USER_ID);
 }
 
 
@@ -1111,11 +1111,11 @@ void CCollectionDocumentManagerTest::ValidateInputParamsInvalidDocumentTest()
 {
 	SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID);
 
-	imtdoc::IDocumentManager::OperationStatus status;
+	imtdoc::IDocumentService::OperationStatus status;
 	bool result = m_managerPtr->ValidateInputParams(TEST_USER_ID, "invalidDocId", status);
 
 	QVERIFY2(!result, "ValidateInputParams should return false for invalid document ID");
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_ID);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_INVALID_DOCUMENT_ID);
 }
 
 
@@ -1205,19 +1205,19 @@ void CCollectionDocumentManagerTest::MultiUserIsolationTest()
 	// User 1 cannot access User 2's documents
 	QString name;
 	auto status = m_managerPtr->GetDocumentName(TEST_USER_ID, docId2, name);
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_ID);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_INVALID_DOCUMENT_ID);
 
 	// User 2 cannot access User 1's documents
 	status = m_managerPtr->GetDocumentName(TEST_USER_ID_2, docId1, name);
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_ID);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_INVALID_DOCUMENT_ID);
 
 	// Each user can access their own documents
 	status = m_managerPtr->GetDocumentName(TEST_USER_ID, docId1, name);
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_OK);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_OK);
 	QCOMPARE(name, QString("User1 Doc"));
 
 	status = m_managerPtr->GetDocumentName(TEST_USER_ID_2, docId2, name);
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_OK);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_OK);
 	QCOMPARE(name, QString("User2 Doc"));
 }
 
@@ -1302,7 +1302,7 @@ void CCollectionDocumentManagerTest::SingleCopySetDocumentDataSharedTest()
 	// User 1 modifies the document
 	CMockDocumentObject newData("modified");
 	auto status = m_managerPtr->SetDocumentData(TEST_USER_ID, docId1, newData);
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_OK);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_OK);
 
 	// User 2 should see the modification (shared objectPtr)
 	const istd::IChangeable* ptr2 = m_managerPtr->GetDocumentPtr(TEST_USER_ID_2, docId2);
@@ -1325,7 +1325,7 @@ void CCollectionDocumentManagerTest::SingleCopyCloseOneUserTest()
 
 	// Close first user's document
 	auto status = m_managerPtr->CloseDocument(TEST_USER_ID, docId1);
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_OK);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_OK);
 
 	// First user should have no documents
 	auto list1 = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
@@ -1384,7 +1384,7 @@ void CCollectionDocumentManagerTest::SingleCopySaveUpdatesAllTest()
 
 	// User 1 saves the document
 	auto status = m_managerPtr->SaveDocument(TEST_USER_ID, docId1);
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_OK);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_OK);
 
 	// Both users should see the document as not dirty
 	auto list1 = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
@@ -1412,7 +1412,7 @@ void CCollectionDocumentManagerTest::SingleCopySetDocumentNameUpdatesAllTest()
 
 	QString newName = "Renamed Shared Document";
 	auto status = m_managerPtr->SetDocumentName(TEST_USER_ID, docId1, newName);
-	QCOMPARE(status, imtdoc::IDocumentManager::OS_OK);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_OK);
 
 	// Both users should see the new name
 	QString name1, name2;

@@ -588,7 +588,7 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CTicketCollect
 }
 
 
-// reimplemented (imtdoc::IDocumentManagerEventHandler)
+// reimplemented (imtdoc::IDocumentServiceEventHandler)
 
 bool CTicketCollectionDocumentManagerComp::ProcessEvent(imtdoc::CEventBase* eventPtr)
 {
@@ -606,7 +606,7 @@ bool CTicketCollectionDocumentManagerComp::ProcessEvent(imtdoc::CEventBase* even
 
 		istd::IChangeableSharedPtr documentPtr;
 		imtdesk::ISupportTicket* documentTicketPtr = nullptr;
-		if (m_documentManagerCompPtr->GetDocumentData(userId, documentId, documentPtr) == imtdoc::IDocumentManager::OS_OK){
+		if (m_documentManagerCompPtr->GetDocumentData(userId, documentId, documentPtr) == imtdoc::IDocumentService::OS_OK){
 			documentTicketPtr = dynamic_cast<imtdesk::ISupportTicket*>(documentPtr.GetPtr());
 		}
 

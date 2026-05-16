@@ -7,17 +7,17 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
-#include <imtdoc/CDocumentManagerBase.h>
+#include <imtdoc/CDocumentServiceBase.h>
 
 
 namespace imtdoc
 {
 
 
-class CCollectionDocumentManagerBase: virtual public CDocumentManagerBase
+class CCollectionDocumentServiceBase: virtual public CDocumentServiceBase
 {
 public:
-	// reimplemented (imtdoc::IDocumentManager)
+	// reimplemented (imtdoc::IDocumentService)
 	virtual QByteArray CreateNewDocument(
 		const QByteArray& userId,
 		const QByteArray& documentTypeId,

@@ -6,28 +6,28 @@
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
-#include <imtdoc/IDocumentManagerEventHandler.h>
+#include <imtdoc/IDocumentServiceEventHandler.h>
 
 
 namespace imtdoc
 {
 
 
-class CDocumentManagerEventHandlerDemultiplexerComp: public ilog::CLoggerComponentBase, virtual public imtdoc::IDocumentManagerEventHandler
+class CDocumentServiceEventHandlerDemultiplexerComp: public ilog::CLoggerComponentBase, virtual public imtdoc::IDocumentServiceEventHandler
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
-	I_BEGIN_COMPONENT(CDocumentManagerEventHandlerDemultiplexerComp);
-		I_REGISTER_INTERFACE(imtdoc::IDocumentManagerEventHandler);
+	I_BEGIN_COMPONENT(CDocumentServiceEventHandlerDemultiplexerComp);
+		I_REGISTER_INTERFACE(imtdoc::IDocumentServiceEventHandler);
 		I_ASSIGN_MULTI_0(m_eventHandlersCompPtr, "DocumentManagerEventHandlers", "Demultiplexer for document manager event handlers", false)
 	I_END_COMPONENT;
 
-	// reimplemented (imtdoc::IDocumentManagerEventHandler)
+	// reimplemented (imtdoc::IDocumentServiceEventHandler)
 	virtual bool ProcessEvent(CEventBase* eventPtr) override;
 
 protected:
-	I_MULTIREF(imtdoc::IDocumentManagerEventHandler, m_eventHandlersCompPtr);
+	I_MULTIREF(imtdoc::IDocumentServiceEventHandler, m_eventHandlersCompPtr);
 };
 
 

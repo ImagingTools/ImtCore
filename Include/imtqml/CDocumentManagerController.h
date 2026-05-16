@@ -31,7 +31,7 @@ class IDocumentManagerBridge;
 	itself. Every transport call is delegated to an
 	\c IDocumentManagerBridge implementation resolved at runtime — by
 	default to \c CDocumentManagerBridge (in-process, on top of
-	\c imtdoc::IDocumentManager).
+	\c imtdoc::IDocumentService).
 
 	\note Bridge resolution currently uses
 	\c CDocumentManagerBridge::Instance() to keep parity with the

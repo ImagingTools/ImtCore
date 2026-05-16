@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include <imtdoc/CDocumentManagerCompBase.h>
+#include <imtdoc/CDocumentServiceCompBase.h>
 
 
 // Qt includes
@@ -12,9 +12,9 @@ namespace imtdoc
 
 // protected methods
 
-// reimplemented (imtdoc::CDocumentManagerBase)
+// reimplemented (imtdoc::CDocumentServiceBase)
 
-QString CDocumentManagerCompBase::GetDefaultDocumentName(const WorkingDocument& document) const
+QString CDocumentServiceCompBase::GetDefaultDocumentName(const WorkingDocument& document) const
 {
 	const imtdoc::IDocumentNameProvider* nameProviderPtr = GetDocumentNameProvider(document.typeId);
 	if (nameProviderPtr == nullptr){
@@ -25,13 +25,13 @@ QString CDocumentManagerCompBase::GetDefaultDocumentName(const WorkingDocument& 
 }
 
 
-bool CDocumentManagerCompBase::HasDocumentNameProvider(const QByteArray& typeId) const
+bool CDocumentServiceCompBase::HasDocumentNameProvider(const QByteArray& typeId) const
 {
 	return GetDocumentNameProvider(typeId) != nullptr;
 }
 
 
-bool CDocumentManagerCompBase::ValidateDocumentData(
+bool CDocumentServiceCompBase::ValidateDocumentData(
 	const WorkingDocument& document,
 	OperationStatus& status,
 	QString* errorMessage) const
@@ -76,9 +76,9 @@ bool CDocumentManagerCompBase::ValidateDocumentData(
 }
 
 
-QList<imtdoc::IDocumentManagerEventHandler*> CDocumentManagerCompBase::GetDocumentManagerEventHandlers() const
+QList<imtdoc::IDocumentServiceEventHandler*> CDocumentServiceCompBase::GetDocumentManagerEventHandlers() const
 {
-	QList<imtdoc::IDocumentManagerEventHandler*> retVal;
+	QList<imtdoc::IDocumentServiceEventHandler*> retVal;
 
 	if (m_handlerCompPtr.IsValid()){
 		for (int i = 0; i < m_handlerCompPtr.GetCount(); i++){
@@ -92,26 +92,26 @@ QList<imtdoc::IDocumentManagerEventHandler*> CDocumentManagerCompBase::GetDocume
 }
 
 
-istd::IChangeableUniquePtr CDocumentManagerCompBase::CreateObject(const QByteArray& typeId) const
+istd::IChangeableUniquePtr CDocumentServiceCompBase::CreateObject(const QByteArray& typeId) const
 {
 	int index = GetObjectFactoryIndex(typeId);
 	if (index >= 0 && m_objectFactListCompPtr[index] != nullptr){
 		return m_objectFactListCompPtr.CreateInstance(index);
 	}
 
-	Q_ASSERT_X(false, "CDocumentManagerCompBase::CreateObject", qPrintable(QString("Factory not found for the type: '%1'").arg(qPrintable(typeId))));
+	Q_ASSERT_X(false, "CDocumentServiceCompBase::CreateObject", qPrintable(QString("Factory not found for the type: '%1'").arg(qPrintable(typeId))));
 
 	return nullptr;
 }
 
 
-idoc::IUndoManagerUniquePtr CDocumentManagerCompBase::CreateUndoManager() const
+idoc::IUndoManagerUniquePtr CDocumentServiceCompBase::CreateUndoManager() const
 {
 	if (m_undoManagerFactPtr.IsValid()){
 		return m_undoManagerFactPtr.CreateInstance();
 	}
 
-	Q_ASSERT_X(false, "CDocumentManagerCompBase::CreateUndoManager", qPrintable(QString("Factory not found")));
+	Q_ASSERT_X(false, "CDocumentServiceCompBase::CreateUndoManager", qPrintable(QString("Factory not found")));
 
 	return nullptr;
 }
@@ -119,7 +119,7 @@ idoc::IUndoManagerUniquePtr CDocumentManagerCompBase::CreateUndoManager() const
 
 // private methods
 
-int CDocumentManagerCompBase::GetObjectFactoryIndex(const QByteArray& typeId) const
+int CDocumentServiceCompBase::GetObjectFactoryIndex(const QByteArray& typeId) const
 {
 	int count = qMin(m_objectTypeIdsAttrPtr.GetCount(), m_objectFactListCompPtr.GetCount());
 	for (int i = 0; i < count; i++){
@@ -132,7 +132,7 @@ int CDocumentManagerCompBase::GetObjectFactoryIndex(const QByteArray& typeId) co
 }
 
 
-const imtdoc::IDocumentNameProvider* CDocumentManagerCompBase::GetDocumentNameProvider(const QByteArray& typeId) const
+const imtdoc::IDocumentNameProvider* CDocumentServiceCompBase::GetDocumentNameProvider(const QByteArray& typeId) const
 {
 	int index = GetObjectFactoryIndex(typeId);
 	if ((index >= 0) && (index < m_documentNameProviderCompPtr.GetCount())){
@@ -143,7 +143,7 @@ const imtdoc::IDocumentNameProvider* CDocumentManagerCompBase::GetDocumentNamePr
 }
 
 
-const imtdoc::IDocumentValidator* CDocumentManagerCompBase::GetDocumentValidator(const QByteArray& typeId) const
+const imtdoc::IDocumentValidator* CDocumentServiceCompBase::GetDocumentValidator(const QByteArray& typeId) const
 {
 	int index = GetObjectFactoryIndex(typeId);
 	if ((index >= 0) && (index < m_documentValidatorCompPtr.GetCount())){

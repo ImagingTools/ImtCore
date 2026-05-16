@@ -12,8 +12,8 @@
 #include <imtchat/IChatMessage.h>
 #include <imtchat/IChatService.h>
 #include <imtchat/IAttachmentStorage.h>
-#include <imtdoc/IDocumentManager.h>
-#include <imtdoc/IDocumentManagerEventHandler.h>
+#include <imtdoc/IDocumentService.h>
+#include <imtdoc/IDocumentServiceEventHandler.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtauth/IUserGroupInfoProvider.h>
 
@@ -27,13 +27,13 @@ namespace imtdeskgql
 
 class CTicketCollectionDocumentManagerComp: 
 			public sdl::imtdesk::TicketCollectionDocumentManager::CGraphQlHandlerCompBase,
-			virtual public imtdoc::IDocumentManagerEventHandler
+			virtual public imtdoc::IDocumentServiceEventHandler
 {
 public:
 	typedef sdl::imtdesk::TicketCollectionDocumentManager::CGraphQlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CTicketCollectionDocumentManagerComp)
-		I_REGISTER_INTERFACE(imtdoc::IDocumentManagerEventHandler)
+		I_REGISTER_INTERFACE(imtdoc::IDocumentServiceEventHandler)
 		I_ASSIGN(m_documentManagerCompPtr, "CollectionDocumentManager", "Collection document manager", false, "CollectionDocumentManager");
 		I_ASSIGN(m_ticketCollectionCompPtr, "TicketCollection", "Ticket collection for refreshing DB-computed fields after save", false, "TicketCollection");
 		I_ASSIGN(m_messageCollectionCompPtr, "MessageCollection", "Collection of chat messages", false, "MessageCollection");
@@ -56,11 +56,11 @@ protected:
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 
-	// reimplemented (imtdoc::IDocumentManagerEventHandler)
+	// reimplemented (imtdoc::IDocumentServiceEventHandler)
 	virtual bool ProcessEvent(imtdoc::CEventBase* eventPtr) override;
 
 private:
-	I_REF(imtdoc::IDocumentManager, m_documentManagerCompPtr);
+	I_REF(imtdoc::IDocumentService, m_documentManagerCompPtr);
 	I_REF(imtbase::IObjectCollection, m_ticketCollectionCompPtr);
 	I_REF(imtbase::IObjectCollection, m_messageCollectionCompPtr);
 	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);

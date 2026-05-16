@@ -6,7 +6,7 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtdoc/IDocumentManager.h>
+#include <imtdoc/IDocumentService.h>
 #include <imtqml/IDocumentManagerBridge.h>
 
 
@@ -19,7 +19,7 @@ namespace imtqml
 
 	\details
 	An icomp component that owns an \c I_REF to an
-	\c imtdoc::IDocumentManager and forwards every
+	\c imtdoc::IDocumentService and forwards every
 	\c IDocumentManagerBridge call directly to it. Intended for the
 	server-side / in-process scenario where a GraphQL client is not
 	used.
@@ -108,7 +108,7 @@ public:
 			UndoInfoCallback callback) override;
 
 private:
-	I_REF(imtdoc::IDocumentManager, m_documentManagerCompPtr);
+	I_REF(imtdoc::IDocumentService, m_documentManagerCompPtr);
 
 	static CDocumentManagerBridge* s_instancePtr;
 };

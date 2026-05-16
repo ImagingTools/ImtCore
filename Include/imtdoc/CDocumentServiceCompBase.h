@@ -8,7 +8,7 @@
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
-#include <imtdoc/CDocumentManagerBase.h>
+#include <imtdoc/CDocumentServiceBase.h>
 #include <imtdoc/IDocumentNameProvider.h>
 #include <imtdoc/IDocumentValidator.h>
 
@@ -17,13 +17,13 @@ namespace imtdoc
 {
 
 
-class CDocumentManagerCompBase: public ilog::CLoggerComponentBase, virtual public imtdoc::CDocumentManagerBase
+class CDocumentServiceCompBase: public ilog::CLoggerComponentBase, virtual public imtdoc::CDocumentServiceBase
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
-	typedef imtdoc::CDocumentManagerBase BaseClass2;
+	typedef imtdoc::CDocumentServiceBase BaseClass2;
 
-	I_BEGIN_BASE_COMPONENT(CDocumentManagerCompBase)
+	I_BEGIN_BASE_COMPONENT(CDocumentServiceCompBase)
 		I_ASSIGN_MULTI_0(m_handlerCompPtr, "DocumentManagerEventHandler", "Document manager event handler", false);
 		I_ASSIGN_MULTI_0(m_objectTypeIdsAttrPtr, "ObjectTypeIdList", "List of the object type-IDs according to the list of factories ('ObjectFactories')", true);
 		I_ASSIGN(m_undoManagerFactPtr, "UndoManager", "Factory of the undo manager", false, "UndoManager");
@@ -33,14 +33,14 @@ public:
 	I_END_COMPONENT
 
 protected:
-	// reimplemented (imtdoc::CDocumentManagerBase)
+	// reimplemented (imtdoc::CDocumentServiceBase)
 	virtual QString GetDefaultDocumentName(const WorkingDocument& document) const override;
 	virtual bool HasDocumentNameProvider(const QByteArray& typeId) const override;
 	virtual bool ValidateDocumentData(
 		const WorkingDocument& document,
 		OperationStatus& status,
 		QString* errorMessage = nullptr) const override;
-	virtual QList<imtdoc::IDocumentManagerEventHandler*> GetDocumentManagerEventHandlers() const override;
+	virtual QList<imtdoc::IDocumentServiceEventHandler*> GetDocumentManagerEventHandlers() const override;
 	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId) const override;
 	virtual idoc::IUndoManagerUniquePtr CreateUndoManager() const override;
 
@@ -54,7 +54,7 @@ private:
 	const imtdoc::IDocumentValidator* GetDocumentValidator(const QByteArray& typeId) const;
 
 protected:
-	I_MULTIREF(imtdoc::IDocumentManagerEventHandler, m_handlerCompPtr);
+	I_MULTIREF(imtdoc::IDocumentServiceEventHandler, m_handlerCompPtr);
 	I_MULTIATTR(QByteArray, m_objectTypeIdsAttrPtr);
 	I_FACT(idoc::IUndoManager, m_undoManagerFactPtr);
 	I_MULTIREF(imtdoc::IDocumentNameProvider, m_documentNameProviderCompPtr);

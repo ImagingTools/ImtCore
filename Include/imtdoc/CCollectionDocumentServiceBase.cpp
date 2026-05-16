@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include <imtdoc/CCollectionDocumentManagerBase.h>
+#include <imtdoc/CCollectionDocumentServiceBase.h>
 
 
 // Qt includes
@@ -24,16 +24,16 @@ namespace imtdoc
 {
 
 
-// reimplemented (imtdoc::IDocumentManager)
+// reimplemented (imtdoc::IDocumentService)
 
-QByteArray CCollectionDocumentManagerBase::CreateNewDocument(
+QByteArray CCollectionDocumentServiceBase::CreateNewDocument(
 	const QByteArray& userId,
 	const QByteArray& documentTypeId,
 	const QByteArray& proposedSourceDocumentId)
 {
 	QMutexLocker locker(&m_mutex);
 
-	QByteArray documentId = CDocumentManagerBase::CreateNewDocument(userId, documentTypeId, proposedSourceDocumentId);
+	QByteArray documentId = CDocumentServiceBase::CreateNewDocument(userId, documentTypeId, proposedSourceDocumentId);
 
 	if (!documentId.isEmpty() && !proposedSourceDocumentId.isEmpty()) {
 		m_proposedSourceDocumentIds[documentId] = proposedSourceDocumentId;
@@ -43,7 +43,7 @@ QByteArray CCollectionDocumentManagerBase::CreateNewDocument(
 }
 
 
-QByteArray CCollectionDocumentManagerBase::OpenDocument(const QByteArray& userId, const QUrl& url)
+QByteArray CCollectionDocumentServiceBase::OpenDocument(const QByteArray& userId, const QUrl& url)
 {
 	QByteArray retVal;
 
@@ -108,7 +108,7 @@ QByteArray CCollectionDocumentManagerBase::OpenDocument(const QByteArray& userId
 				istd::CChangeNotifier notifier(this, &changeSet);
 			}
 
-			for (IDocumentManagerEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
+			for (IDocumentServiceEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
 				if (handlerPtr != nullptr){
 					CDocumentOpenedEvent event(
 						userId,
@@ -187,7 +187,7 @@ QByteArray CCollectionDocumentManagerBase::OpenDocument(const QByteArray& userId
 		istd::CChangeNotifier notifier(this, &changeSet);
 	}
 
-	for (IDocumentManagerEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
+	for (IDocumentServiceEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
 		if (handlerPtr != nullptr){
 			CDocumentOpenedEvent event(
 				userId,
@@ -336,7 +336,7 @@ QByteArray CCollectionDocumentManagerBase::OpenDocument(const QByteArray& userId
 }
 
 
-IDocumentManager::OperationStatus CCollectionDocumentManagerBase::SetDocumentName(const QByteArray& userId, const QByteArray& documentId, const QString& documentName)
+IDocumentService::OperationStatus CCollectionDocumentServiceBase::SetDocumentName(const QByteArray& userId, const QByteArray& documentId, const QString& documentName)
 {
 	QMutexLocker locker(&m_mutex);
 
@@ -386,7 +386,7 @@ IDocumentManager::OperationStatus CCollectionDocumentManagerBase::SetDocumentNam
 					istd::CChangeNotifier notifier(this, &changeSet);
 				}
 
-				for (IDocumentManagerEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
+				for (IDocumentServiceEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
 					if (handlerPtr != nullptr){
 						CDocumentRenamedEvent event(
 							pair.first,
@@ -410,7 +410,7 @@ IDocumentManager::OperationStatus CCollectionDocumentManagerBase::SetDocumentNam
 		istd::CChangeNotifier notifier(this, &changeSet);
 	}
 
-	for (IDocumentManagerEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
+	for (IDocumentServiceEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
 		if (handlerPtr != nullptr){
 			CDocumentRenamedEvent event(
 				userId,
@@ -427,7 +427,7 @@ IDocumentManager::OperationStatus CCollectionDocumentManagerBase::SetDocumentNam
 }
 
 
-IDocumentManager::OperationStatus CCollectionDocumentManagerBase::SaveDocument(
+IDocumentService::OperationStatus CCollectionDocumentServiceBase::SaveDocument(
 	const QByteArray& userId,
 	const QByteArray& documentId,
 	const QString& documentName,
@@ -530,7 +530,7 @@ IDocumentManager::OperationStatus CCollectionDocumentManagerBase::SaveDocument(
 				istd::CChangeNotifier notifier(this, &changeSet);
 			}
 
-			for (IDocumentManagerEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
+			for (IDocumentServiceEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
 				if (handlerPtr != nullptr){
 					CDocumentSavedAsEvent event(
 						userId,
@@ -585,7 +585,7 @@ IDocumentManager::OperationStatus CCollectionDocumentManagerBase::SaveDocument(
 						istd::CChangeNotifier notifier(this, &changeSet);
 					}
 
-					for (IDocumentManagerEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
+					for (IDocumentServiceEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
 						if (handlerPtr != nullptr){
 							CDocumentSavedEvent event(
 								pair.first,
@@ -614,7 +614,7 @@ IDocumentManager::OperationStatus CCollectionDocumentManagerBase::SaveDocument(
 					istd::CChangeNotifier notifier(this, &changeSet);
 				}
 
-				for (IDocumentManagerEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
+				for (IDocumentServiceEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
 					if (handlerPtr != nullptr){
 						CDocumentSavedEvent event(
 							userId,
@@ -664,7 +664,7 @@ IDocumentManager::OperationStatus CCollectionDocumentManagerBase::SaveDocument(
 			istd::CChangeNotifier notifier(this, &changeSet);
 		}
 
-		for (IDocumentManagerEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
+		for (IDocumentServiceEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
 			if (handlerPtr != nullptr){
 				CDocumentSavedEvent event(
 					userId,
@@ -683,14 +683,14 @@ IDocumentManager::OperationStatus CCollectionDocumentManagerBase::SaveDocument(
 }
 
 
-IDocumentManager::OperationStatus CCollectionDocumentManagerBase::CloseDocument(
+IDocumentService::OperationStatus CCollectionDocumentServiceBase::CloseDocument(
 	const QByteArray& userId, const QByteArray& documentId)
 {
 	QMutexLocker locker(&m_mutex);
 
 	m_proposedSourceDocumentIds.remove(documentId);
 
-	return CDocumentManagerBase::CloseDocument(userId, documentId);
+	return CDocumentServiceBase::CloseDocument(userId, documentId);
 }
 
 

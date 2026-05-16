@@ -28,7 +28,7 @@ namespace imtqml
 	The default in-process implementation provided out of the box is:
 
 	- \c CDocumentManagerBridge: forwards every call directly to an
-	  \c imtdoc::IDocumentManager instance (the in-process / server
+	  \c imtdoc::IDocumentService instance (the in-process / server
 	  scenario).
 
 	All operations are asynchronous — the implementation is expected to

@@ -15,7 +15,7 @@ namespace imtdoc
 {
 
 
-class IDocumentManager : virtual public iser::ISerializable
+class IDocumentService : virtual public iser::ISerializable
 {
 public:
 	enum ChangeFlags
@@ -192,6 +192,6 @@ public:
 } // namespace imtdoc
 
 
-Q_DECLARE_METATYPE(imtdoc::IDocumentManager::DocumentNotification);
-Q_DECLARE_METATYPE(imtdoc::IDocumentManager::DocumentUndoRedoNotification);
-Q_DECLARE_METATYPE(imtdoc::IDocumentManager::DocumentClosedNotification);
+Q_DECLARE_METATYPE(imtdoc::IDocumentService::DocumentNotification);
+Q_DECLARE_METATYPE(imtdoc::IDocumentService::DocumentUndoRedoNotification);
+Q_DECLARE_METATYPE(imtdoc::IDocumentService::DocumentClosedNotification);

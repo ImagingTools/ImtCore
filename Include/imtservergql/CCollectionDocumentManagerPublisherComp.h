@@ -3,8 +3,8 @@
 
 
 // ImtCore includes
-#include <imtdoc/IDocumentManager.h>
-#include <imtdoc/IDocumentManagerEventHandler.h>
+#include <imtdoc/IDocumentService.h>
+#include <imtdoc/IDocumentServiceEventHandler.h>
 #include <imtservergql/CGqlPublisherCompBase.h>
 
 // ImtCore includes
@@ -17,13 +17,13 @@ namespace imtservergql
 
 class CCollectionDocumentManagerPublisherComp:
 	public CGqlPublisherCompBase,
-	virtual public imtdoc::IDocumentManagerEventHandler
+	virtual public imtdoc::IDocumentServiceEventHandler
 {
 public:
 	typedef CGqlPublisherCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CCollectionDocumentManagerPublisherComp)
-		I_REGISTER_INTERFACE(imtdoc::IDocumentManagerEventHandler)
+		I_REGISTER_INTERFACE(imtdoc::IDocumentServiceEventHandler)
 		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection ID", true, "DummyCollection");
 	I_END_COMPONENT;
 
@@ -31,7 +31,7 @@ protected:
 	// reimplemented (imtgql::IGqlSubscriberController)
 	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
 
-	// reimplemented (imtdoc::IDocumentManagerEventHandler)
+	// reimplemented (imtdoc::IDocumentServiceEventHandler)
 	virtual bool ProcessEvent(imtdoc::CEventBase* eventPtr) override;
 
 protected:
@@ -48,9 +48,9 @@ protected:
 protected:
 	void FillDocumentNotification(
 		const imtdoc::CEventBase* eventPtr,
-		imtdoc::IDocumentManager::DocumentNotification& notification) const;
+		imtdoc::IDocumentService::DocumentNotification& notification) const;
 	void FillSdlNotification(
-		const imtdoc::IDocumentManager::DocumentNotification& notification,
+		const imtdoc::IDocumentService::DocumentNotification& notification,
 		sdl::imtbase::CollectionDocumentManager::EDocumentOperation operation,
 		sdl::imtbase::CollectionDocumentManager::CDocumentManagerNotification::V1_0& sdlNotification) const;
 	QByteArray ConvertUrlToObjectId(const QUrl& url) const;

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include <imtdoc/CDocumentManagerBase.h>
+#include <imtdoc/CDocumentServiceBase.h>
 
 
 // Qt includes
@@ -30,22 +30,22 @@ namespace imtdoc
 
 // public methods
 
-CDocumentManagerBase::CDocumentManagerBase()
+CDocumentServiceBase::CDocumentServiceBase()
 	:m_undoManagerObserver(*this)
 	,m_isAlive(std::make_shared<std::atomic<bool>>(true))
 {
 }
 
 
-CDocumentManagerBase::~CDocumentManagerBase()
+CDocumentServiceBase::~CDocumentServiceBase()
 {
 	m_isAlive->store(false);
 }
 
 
-// reimplemented (imtdoc::IDocumentManager)
+// reimplemented (imtdoc::IDocumentService)
 
-IDocumentManager::DocumentList CDocumentManagerBase::GetOpenedDocumentList(
+IDocumentService::DocumentList CDocumentServiceBase::GetOpenedDocumentList(
 	const QByteArray& userId) const
 {
 	QMutexLocker locker(&m_mutex);
@@ -74,7 +74,7 @@ IDocumentManager::DocumentList CDocumentManagerBase::GetOpenedDocumentList(
 }
 
 
-QByteArray CDocumentManagerBase::CreateNewDocument(
+QByteArray CDocumentServiceBase::CreateNewDocument(
 	const QByteArray& userId,
 	const QByteArray& documentTypeId,
 	const QByteArray& proposedSourceDocumentId)
@@ -116,7 +116,7 @@ QByteArray CDocumentManagerBase::CreateNewDocument(
 		istd::CChangeNotifier notifier(this, &changeSet);
 	}
 
-	for (IDocumentManagerEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
+	for (IDocumentServiceEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
 		if (handlerPtr != nullptr){
 			CDocumentCreatedEvent event(
 				userId,
@@ -196,13 +196,13 @@ QByteArray CDocumentManagerBase::CreateNewDocument(
 }
 
 
-QByteArray CDocumentManagerBase::OpenDocument(const QByteArray& /*userId*/, const QUrl& /*url*/)
+QByteArray CDocumentServiceBase::OpenDocument(const QByteArray& /*userId*/, const QUrl& /*url*/)
 {
 	return QByteArray();
 }
 
 
-IDocumentManager::OperationStatus CDocumentManagerBase::GetDocumentName(const QByteArray& userId, const QByteArray& documentId, QString& documentName) const
+IDocumentService::OperationStatus CDocumentServiceBase::GetDocumentName(const QByteArray& userId, const QByteArray& documentId, QString& documentName) const
 {
 
 	QMutexLocker locker(&m_mutex);
@@ -218,13 +218,13 @@ IDocumentManager::OperationStatus CDocumentManagerBase::GetDocumentName(const QB
 }
 
 
-IDocumentManager::OperationStatus CDocumentManagerBase::SetDocumentName(const QByteArray& userId, const QByteArray& documentId, const QString& documentName)
+IDocumentService::OperationStatus CDocumentServiceBase::SetDocumentName(const QByteArray& userId, const QByteArray& documentId, const QString& documentName)
 {
 	return OS_FAILED;
 }
 
 
-const istd::IChangeable* CDocumentManagerBase::GetDocumentPtr(const QByteArray& userId, const QByteArray& documentId) const
+const istd::IChangeable* CDocumentServiceBase::GetDocumentPtr(const QByteArray& userId, const QByteArray& documentId) const
 {
 	OperationStatus retVal;
 
@@ -243,7 +243,7 @@ const istd::IChangeable* CDocumentManagerBase::GetDocumentPtr(const QByteArray& 
 }
 
 
-IDocumentManager::OperationStatus CDocumentManagerBase::GetDocumentData(const QByteArray& userId, const QByteArray& documentId, istd::IChangeableSharedPtr& documentPtr) const
+IDocumentService::OperationStatus CDocumentServiceBase::GetDocumentData(const QByteArray& userId, const QByteArray& documentId, istd::IChangeableSharedPtr& documentPtr) const
 {
 	QMutexLocker locker(&m_mutex);
 	OperationStatus validationStatus;
@@ -270,7 +270,7 @@ IDocumentManager::OperationStatus CDocumentManagerBase::GetDocumentData(const QB
 }
 
 
-IDocumentManager::OperationStatus CDocumentManagerBase::SetDocumentData(const QByteArray& userId, const QByteArray& documentId, const istd::IChangeable& document)
+IDocumentService::OperationStatus CDocumentServiceBase::SetDocumentData(const QByteArray& userId, const QByteArray& documentId, const istd::IChangeable& document)
 {
 	QMutexLocker locker(&m_mutex);
 
@@ -291,7 +291,7 @@ IDocumentManager::OperationStatus CDocumentManagerBase::SetDocumentData(const QB
 }
 
 
-IDocumentManager::OperationStatus CDocumentManagerBase::SaveDocument(
+IDocumentService::OperationStatus CDocumentServiceBase::SaveDocument(
 	const QByteArray& /*userId*/,
 	const QByteArray& /*documentId*/,
 	const QString& /*documentName*/,
@@ -301,7 +301,7 @@ IDocumentManager::OperationStatus CDocumentManagerBase::SaveDocument(
 }
 
 
-IDocumentManager::OperationStatus CDocumentManagerBase::CloseDocument(
+IDocumentService::OperationStatus CDocumentServiceBase::CloseDocument(
 	const QByteArray& userId, const QByteArray& documentId)
 {
 	QByteArray typeId;
@@ -361,7 +361,7 @@ IDocumentManager::OperationStatus CDocumentManagerBase::CloseDocument(
 		istd::CChangeNotifier notifier(this, &changeSet);
 	}
 
-	for (IDocumentManagerEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
+	for (IDocumentServiceEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
 		if (handlerPtr != nullptr){
 			CDocumentClosedEvent event(
 				userId,
@@ -378,7 +378,7 @@ IDocumentManager::OperationStatus CDocumentManagerBase::CloseDocument(
 }
 
 
-IDocumentManager::OperationStatus CDocumentManagerBase::GetDocumentUndoManager(
+IDocumentService::OperationStatus CDocumentServiceBase::GetDocumentUndoManager(
 	const QByteArray& userId, const QByteArray& documentId, idoc::IUndoManager*& undoManagerPtr) const
 {
 	undoManagerPtr = nullptr;
@@ -395,7 +395,7 @@ IDocumentManager::OperationStatus CDocumentManagerBase::GetDocumentUndoManager(
 }
 
 
-IDocumentManager::OperationStatus CDocumentManagerBase::RegisterDocumentObserver(
+IDocumentService::OperationStatus CDocumentServiceBase::RegisterDocumentObserver(
 	const QByteArray& userId, const QByteArray& documentId, imod::IObserver& observer)
 {
 	istd::IChangeableSharedPtr objectPtr;
@@ -425,7 +425,7 @@ IDocumentManager::OperationStatus CDocumentManagerBase::RegisterDocumentObserver
 }
 
 
-IDocumentManager::OperationStatus CDocumentManagerBase::UnregisterDocumentObserver(
+IDocumentService::OperationStatus CDocumentServiceBase::UnregisterDocumentObserver(
 	const QByteArray& userId, const QByteArray& documentId, imod::IObserver& observer)
 {
 	istd::IChangeableSharedPtr objectPtr;
@@ -457,7 +457,7 @@ IDocumentManager::OperationStatus CDocumentManagerBase::UnregisterDocumentObserv
 
 // reimplemented (iser::ISerializable)
 
-bool CDocumentManagerBase::Serialize(iser::IArchive& /*archive*/)
+bool CDocumentServiceBase::Serialize(iser::IArchive& /*archive*/)
 {
 	return false;
 }
@@ -465,7 +465,7 @@ bool CDocumentManagerBase::Serialize(iser::IArchive& /*archive*/)
 
 // protected methods
 
-bool CDocumentManagerBase::ValidateInputParams(const QByteArray& userId, const QByteArray& documentId, OperationStatus& status) const
+bool CDocumentServiceBase::ValidateInputParams(const QByteArray& userId, const QByteArray& documentId, OperationStatus& status) const
 {
 	if (!m_userDocuments.contains(userId)){
 		status = OS_INVALID_USER_ID;
@@ -483,7 +483,7 @@ bool CDocumentManagerBase::ValidateInputParams(const QByteArray& userId, const Q
 }
 
 
-int CDocumentManagerBase::GetUndoManagerNextModelId(const QByteArray& userId)
+int CDocumentServiceBase::GetUndoManagerNextModelId(const QByteArray& userId)
 {
 	QSet<int> ids;
 
@@ -507,7 +507,7 @@ int CDocumentManagerBase::GetUndoManagerNextModelId(const QByteArray& userId)
 }
 
 
-void CDocumentManagerBase::InitializeDocumentObservers(
+void CDocumentServiceBase::InitializeDocumentObservers(
 	WorkingDocument& document,
 	const QByteArray& userId)
 {
@@ -533,7 +533,7 @@ void CDocumentManagerBase::InitializeDocumentObservers(
 }
 
 
-CDocumentManagerBase::WorkingDocument* CDocumentManagerBase::FindDocument(
+CDocumentServiceBase::WorkingDocument* CDocumentServiceBase::FindDocument(
 	const QByteArray& userId, const QByteArray& documentId)
 {
 	if (m_userDocuments.contains(userId)){
@@ -546,14 +546,14 @@ CDocumentManagerBase::WorkingDocument* CDocumentManagerBase::FindDocument(
 }
 
 
-const CDocumentManagerBase::WorkingDocument* CDocumentManagerBase::FindDocument(
+const CDocumentServiceBase::WorkingDocument* CDocumentServiceBase::FindDocument(
 	const QByteArray& userId, const QByteArray& documentId) const
 {
-	return const_cast<CDocumentManagerBase*>(this)->FindDocument(userId, documentId);
+	return const_cast<CDocumentServiceBase*>(this)->FindDocument(userId, documentId);
 }
 
 
-bool CDocumentManagerBase::FindDocument(
+bool CDocumentServiceBase::FindDocument(
 	int undoManagerModelId,
 	QByteArray& outUserId,
 	QByteArray& outDocumentId)
@@ -574,7 +574,7 @@ bool CDocumentManagerBase::FindDocument(
 }
 
 
-QUrl CDocumentManagerBase::ObjectIdToUrl(const QByteArray& objectId)
+QUrl CDocumentServiceBase::ObjectIdToUrl(const QByteArray& objectId)
 {
 	QUrl url;
 	url = "collection:///" + objectId;
@@ -583,7 +583,7 @@ QUrl CDocumentManagerBase::ObjectIdToUrl(const QByteArray& objectId)
 }
 
 
-IDocumentManager::DocumentNotificationPtr CDocumentManagerBase::CreateDocumentNotification(
+IDocumentService::DocumentNotificationPtr CDocumentServiceBase::CreateDocumentNotification(
 	const QByteArray& userId,
 	const QByteArray& documentId) const
 {
@@ -604,7 +604,7 @@ IDocumentManager::DocumentNotificationPtr CDocumentManagerBase::CreateDocumentNo
 }
 
 
-void CDocumentManagerBase::OnDocumentDataLoaded(
+void CDocumentServiceBase::OnDocumentDataLoaded(
 	const QByteArray& userId,
 	const QByteArray& documentId)
 {
@@ -627,7 +627,7 @@ void CDocumentManagerBase::OnDocumentDataLoaded(
 		istd::CChangeNotifier notifier(this, &changeSet);
 	}
 
-	for (IDocumentManagerEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
+	for (IDocumentServiceEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
 		if (handlerPtr != nullptr){
 			CDocumentDataLoadedEvent event(
 				userId,
@@ -642,7 +642,7 @@ void CDocumentManagerBase::OnDocumentDataLoaded(
 }
 
 
-void CDocumentManagerBase::OnUndoManagerChanged(int modelId)
+void CDocumentServiceBase::OnUndoManagerChanged(int modelId)
 {
 	QMutexLocker locker(&m_mutex);
 
@@ -666,7 +666,7 @@ void CDocumentManagerBase::OnUndoManagerChanged(int modelId)
 
 				documentPtr->isDirty = documentPtr->undoManagerPtr->GetDocumentChangeFlag() != idoc::IDocumentStateComparator::DCF_EQUAL;
 
-				for (IDocumentManagerEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
+				for (IDocumentServiceEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
 					if (handlerPtr != nullptr){
 						CDocumentUndoRedoChangedEvent event(
 							pair.first,
@@ -703,7 +703,7 @@ void CDocumentManagerBase::OnUndoManagerChanged(int modelId)
 	documentPtr->isDirty = documentPtr->undoManagerPtr->GetDocumentChangeFlag() != idoc::IDocumentStateComparator::DCF_EQUAL;
 	Q_ASSERT(documentPtr->undoManagerPtr.IsValid());
 
-	for (IDocumentManagerEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
+	for (IDocumentServiceEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
 		if (handlerPtr != nullptr){
 			CDocumentUndoRedoChangedEvent event(
 				userId,
@@ -719,19 +719,19 @@ void CDocumentManagerBase::OnUndoManagerChanged(int modelId)
 }
 
 
-QString CDocumentManagerBase::GetDefaultDocumentName(const WorkingDocument& /*document*/) const
+QString CDocumentServiceBase::GetDefaultDocumentName(const WorkingDocument& /*document*/) const
 {
 	return QString();
 }
 
 
-bool CDocumentManagerBase::HasDocumentNameProvider(const QByteArray& /*typeId*/) const
+bool CDocumentServiceBase::HasDocumentNameProvider(const QByteArray& /*typeId*/) const
 {
 	return false;
 }
 
 
-bool CDocumentManagerBase::ValidateDocumentData(
+bool CDocumentServiceBase::ValidateDocumentData(
 	const WorkingDocument& /*document*/,
 	OperationStatus& status,
 	QString* errorMessage) const
@@ -745,25 +745,25 @@ bool CDocumentManagerBase::ValidateDocumentData(
 }
 
 
-QList<imtdoc::IDocumentManagerEventHandler*> CDocumentManagerBase::GetDocumentManagerEventHandlers() const
+QList<imtdoc::IDocumentServiceEventHandler*> CDocumentServiceBase::GetDocumentManagerEventHandlers() const
 {
 	return {};
 }
 
 
-QString CDocumentManagerBase::GetInvalidDocumentMessage()
+QString CDocumentServiceBase::GetInvalidDocumentMessage()
 {
 	return QStringLiteral("Document data is invalid");
 }
 
 
-bool CDocumentManagerBase::IsSingleCopyMode() const
+bool CDocumentServiceBase::IsSingleCopyMode() const
 {
 	return false;
 }
 
 
-CDocumentManagerBase::UserDocumentPairList CDocumentManagerBase::FindDocumentsByObjectId(
+CDocumentServiceBase::UserDocumentPairList CDocumentServiceBase::FindDocumentsByObjectId(
 	const QByteArray& objectId) const
 {
 	UserDocumentPairList result;
@@ -782,7 +782,7 @@ CDocumentManagerBase::UserDocumentPairList CDocumentManagerBase::FindDocumentsBy
 
 // reimplemented (imod::CMultiModelObserverBase)
 
-void CDocumentManagerBase::OnUpdate(imod::IModel* modelPtr, const istd::IChangeable::ChangeSet& changeSet)
+void CDocumentServiceBase::OnUpdate(imod::IModel* modelPtr, const istd::IChangeable::ChangeSet& changeSet)
 {
 	for (const QByteArray& userId : m_userDocuments.keys()){
 		WorkingDocumentList& documents = m_userDocuments[userId];
@@ -790,7 +790,7 @@ void CDocumentManagerBase::OnUpdate(imod::IModel* modelPtr, const istd::IChangea
 			istd::IChangeable* changeablePtr = dynamic_cast<istd::IChangeable*>(modelPtr);
 
 			if (documents[documentId].objectPtr.GetPtr() == changeablePtr){
-				for (IDocumentManagerEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
+				for (IDocumentServiceEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
 					if (handlerPtr != nullptr){
 						WorkingDocument& workingDocument = documents[documentId];
 						CDocumentChangedEvent event(
@@ -817,7 +817,7 @@ void CDocumentManagerBase::OnUpdate(imod::IModel* modelPtr, const istd::IChangea
 
 // public methods of the embedded class UndoManagerObserver
 
-CDocumentManagerBase::UndoManagerObserver::UndoManagerObserver(CDocumentManagerBase& parent)
+CDocumentServiceBase::UndoManagerObserver::UndoManagerObserver(CDocumentServiceBase& parent)
 	:m_parent(parent)
 {
 }
@@ -825,7 +825,7 @@ CDocumentManagerBase::UndoManagerObserver::UndoManagerObserver(CDocumentManagerB
 
 // protected methods of the embedded class UndoManagerObserver
 
-void CDocumentManagerBase::UndoManagerObserver::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& /*changeSet*/)
+void CDocumentServiceBase::UndoManagerObserver::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	m_parent.OnUndoManagerChanged(modelId);
 }

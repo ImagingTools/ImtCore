@@ -7,7 +7,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
-#include <imtdoc/IDocumentManager.h>
+#include <imtdoc/IDocumentService.h>
 #include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentManager.h>
 #include <imtbasesdl/SDL/1.0/CPP/UndoManager.h>
 
@@ -83,7 +83,7 @@ private:
 	QByteArray GetUserId(const ::imtgql::CGqlRequest& gqlRequest) const;
 
 private:
-	I_REF(imtdoc::IDocumentManager, m_documentManagerCompPtr);
+	I_REF(imtdoc::IDocumentService, m_documentManagerCompPtr);
 	I_ATTR(QByteArray, m_collectionIdAttrPtr);
 };
 

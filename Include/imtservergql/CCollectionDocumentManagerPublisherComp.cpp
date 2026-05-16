@@ -44,7 +44,7 @@ bool CCollectionDocumentManagerPublisherComp::IsRequestSupported(const imtgql::C
 }
 
 
-// reimplemented (imtdoc::IDocumentManagerEventHandler)
+// reimplemented (imtdoc::IDocumentServiceEventHandler)
 
 bool CCollectionDocumentManagerPublisherComp::ProcessEvent(imtdoc::CEventBase* eventPtr)
 {
@@ -73,7 +73,7 @@ bool CCollectionDocumentManagerPublisherComp::OnDocumentCreated(imtdoc::CEventBa
 		return false;
 	}
 
-	imtdoc::IDocumentManager::DocumentNotification notification;
+	imtdoc::IDocumentService::DocumentNotification notification;
 	FillDocumentNotification(concreteEventPtr, notification);
 
 	sdl::imtbase::CollectionDocumentManager::CDocumentManagerNotification::V1_0 sdlNotification;
@@ -92,7 +92,7 @@ bool CCollectionDocumentManagerPublisherComp::OnDocumentOpened(imtdoc::CEventBas
 		return false;
 	}
 
-	imtdoc::IDocumentManager::DocumentNotification notification;
+	imtdoc::IDocumentService::DocumentNotification notification;
 	FillDocumentNotification(concreteEventPtr, notification);
 
 	sdl::imtbase::CollectionDocumentManager::CDocumentManagerNotification::V1_0 sdlNotification;
@@ -111,7 +111,7 @@ bool CCollectionDocumentManagerPublisherComp::OnDocumentRenamed(imtdoc::CEventBa
 		return false;
 	}
 
-	imtdoc::IDocumentManager::DocumentNotification notification;
+	imtdoc::IDocumentService::DocumentNotification notification;
 	FillDocumentNotification(concreteEventPtr, notification);
 
 	sdl::imtbase::CollectionDocumentManager::CDocumentManagerNotification::V1_0 sdlNotification;
@@ -130,7 +130,7 @@ bool CCollectionDocumentManagerPublisherComp::OnDocumentChanged(imtdoc::CEventBa
 		return false;
 	}
 
-	imtdoc::IDocumentManager::DocumentNotification notification;
+	imtdoc::IDocumentService::DocumentNotification notification;
 	FillDocumentNotification(concreteEventPtr, notification);
 
 	sdl::imtbase::CollectionDocumentManager::CDocumentManagerNotification::V1_0 sdlNotification;
@@ -187,7 +187,7 @@ bool CCollectionDocumentManagerPublisherComp::OnDocumentSaved(imtdoc::CEventBase
 		return false;
 	}
 
-	imtdoc::IDocumentManager::DocumentNotification notification;
+	imtdoc::IDocumentService::DocumentNotification notification;
 	FillDocumentNotification(concreteEventPtr, notification);
 
 	sdl::imtbase::CollectionDocumentManager::CDocumentManagerNotification::V1_0 sdlNotification;
@@ -206,7 +206,7 @@ bool CCollectionDocumentManagerPublisherComp::OnDocumentSavedAs(imtdoc::CEventBa
 		return false;
 	}
 
-	imtdoc::IDocumentManager::DocumentNotification notification;
+	imtdoc::IDocumentService::DocumentNotification notification;
 	FillDocumentNotification(concreteEventPtr, notification);
 
 	sdl::imtbase::CollectionDocumentManager::CDocumentManagerNotification::V1_0 sdlNotification;
@@ -243,7 +243,7 @@ bool CCollectionDocumentManagerPublisherComp::OnDocumentDataLoaded(imtdoc::CEven
 		return false;
 	}
 
-	imtdoc::IDocumentManager::DocumentNotification notification;
+	imtdoc::IDocumentService::DocumentNotification notification;
 	FillDocumentNotification(concreteEventPtr, notification);
 
 	sdl::imtbase::CollectionDocumentManager::CDocumentManagerNotification::V1_0 sdlNotification;
@@ -257,7 +257,7 @@ bool CCollectionDocumentManagerPublisherComp::OnDocumentDataLoaded(imtdoc::CEven
 
 void CCollectionDocumentManagerPublisherComp::FillDocumentNotification(
 	const imtdoc::CEventBase* eventPtr,
-	imtdoc::IDocumentManager::DocumentNotification& notification) const
+	imtdoc::IDocumentService::DocumentNotification& notification) const
 {
 	notification.userId = eventPtr->GetUserId();
 	notification.documentId = eventPtr->GetDocumentId();
@@ -269,7 +269,7 @@ void CCollectionDocumentManagerPublisherComp::FillDocumentNotification(
 
 
 void CCollectionDocumentManagerPublisherComp::FillSdlNotification(
-	const imtdoc::IDocumentManager::DocumentNotification& notification,
+	const imtdoc::IDocumentService::DocumentNotification& notification,
 	sdl::imtbase::CollectionDocumentManager::EDocumentOperation operation,
 	sdl::imtbase::CollectionDocumentManager::CDocumentManagerNotification::V1_0& sdlNotification) const
 {

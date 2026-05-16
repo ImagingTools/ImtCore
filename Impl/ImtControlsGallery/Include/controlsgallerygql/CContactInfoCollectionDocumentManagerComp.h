@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtdoc/IDocumentManager.h>
+#include <imtdoc/IDocumentService.h>
 #include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentManager.h>
 
 // ControlsGallery includes
@@ -42,7 +42,7 @@ protected:
 				QString& errorMessage) const override;
 
 private:
-	I_REF(imtdoc::IDocumentManager, m_documentManagerCompPtr);
+	I_REF(imtdoc::IDocumentService, m_documentManagerCompPtr);
 };
 
 
