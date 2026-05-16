@@ -3,7 +3,6 @@
 
 // ImtCore includes
 #include <imtauth/ITenantInfo.h>
-#include <imtauth/TenantPermissions.h>
 #include <imtgql/IGqlContext.h>
 
 
@@ -53,16 +52,15 @@ bool IsOwner(const imtauth::ITenantManager& tenantManager, const QByteArray& use
 
 
 /**
-	Check if the user has the required tenant permission.
-	Owner always has all permissions.
-	Non-owners must be active members with the required permission via their role.
+	Check if the user has access to perform tenant operations.
+	Owner always has access.
+	Non-owners must be active members of the tenant.
 */
-bool HasTenantPermission(
+bool HasTenantAccess(
 		const imtauth::ITenantManager& tenantManager,
 		const imtauth::ITenantMembershipManager& membershipManager,
 		const QByteArray& userId,
-		const QByteArray& tenantId,
-		const QByteArray& /*requiredPermission*/)
+		const QByteArray& tenantId)
 {
 	// Owner bypasses all permission checks
 	if (IsOwner(tenantManager, userId, tenantId)){
@@ -70,8 +68,6 @@ bool HasTenantPermission(
 	}
 
 	// Non-owners must be active members of the tenant.
-	// The requiredPermission parameter documents which permission is needed for this operation.
-	// When role-permission mapping is available, this should check if the user's role has the required permission.
 	return membershipManager.HasMinimumRole(userId, tenantId, QByteArray());
 }
 
@@ -325,7 +321,7 @@ sdl::imtauth::TenantMemberships::CGetTenantInvitationsPayload CTenantMembershipM
 		}
 	}
 
-	if (!m_tenantManagerCompPtr.IsValid() || !HasTenantPermission(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), ContextUserId(gqlRequest), tenantId, imtauth::TenantPermissions::ViewMembers())){
+	if (!m_tenantManagerCompPtr.IsValid() || !HasTenantAccess(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), ContextUserId(gqlRequest), tenantId)){
 		response.Version_1_0->errorMessage = QStringLiteral("Access denied");
 		return response;
 	}
@@ -418,7 +414,7 @@ sdl::imtauth::TenantMemberships::CAddMembershipPayload CTenantMembershipManagerC
 	}
 
 	QByteArray contextUserId = ContextUserId(gqlRequest);
-	if (!m_tenantManagerCompPtr.IsValid() || !HasTenantPermission(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), contextUserId, tenantId, imtauth::TenantPermissions::ManageMembers())){
+	if (!m_tenantManagerCompPtr.IsValid() || !HasTenantAccess(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), contextUserId, tenantId)){
 		response.Version_1_0->errorMessage = QStringLiteral("Access denied");
 		return response;
 	}
@@ -461,7 +457,7 @@ sdl::imtauth::TenantMemberships::CRemoveMembershipPayload CTenantMembershipManag
 	if (membershipPtr.IsValid() && m_tenantManagerCompPtr.IsValid()){
 		QByteArray tenantId = membershipPtr->GetTenantId();
 		QByteArray contextUserId = ContextUserId(gqlRequest);
-		if (!HasTenantPermission(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), contextUserId, tenantId, imtauth::TenantPermissions::ManageMembers())){
+		if (!HasTenantAccess(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), contextUserId, tenantId)){
 			response.Version_1_0->success = false;
 			response.Version_1_0->errorMessage = QStringLiteral("Access denied");
 			return response;
@@ -507,7 +503,7 @@ sdl::imtauth::TenantMemberships::CCreateTenantInvitationPayload CTenantMembershi
 	}
 
 	QByteArray contextUserId = ContextUserId(gqlRequest);
-	if (!m_tenantManagerCompPtr.IsValid() || !HasTenantPermission(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), contextUserId, tenantId, imtauth::TenantPermissions::InviteMembers())){
+	if (!m_tenantManagerCompPtr.IsValid() || !HasTenantAccess(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), contextUserId, tenantId)){
 		response.Version_1_0->errorMessage = QStringLiteral("Access denied");
 		return response;
 	}
@@ -600,7 +596,7 @@ sdl::imtauth::TenantMemberships::CRevokeTenantInvitationPayload CTenantMembershi
 
 	imtauth::ITenantInvitationUniquePtr invitationPtr = m_invitationManagerCompPtr->GetInvitation(invitationId);
 	QByteArray contextUserId = ContextUserId(gqlRequest);
-	if (!invitationPtr.IsValid() || !m_tenantManagerCompPtr.IsValid() || !HasTenantPermission(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), contextUserId, invitationPtr->GetTenantId(), imtauth::TenantPermissions::ManageInvitations())){
+	if (!invitationPtr.IsValid() || !m_tenantManagerCompPtr.IsValid() || !HasTenantAccess(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), contextUserId, invitationPtr->GetTenantId())){
 		response.Version_1_0->success = false;
 		response.Version_1_0->errorMessage = QStringLiteral("Access denied");
 		return response;
@@ -636,7 +632,7 @@ sdl::imtauth::TenantMemberships::CResendTenantInvitationPayload CTenantMembershi
 	}
 
 	imtauth::ITenantInvitationUniquePtr invitationPtr = m_invitationManagerCompPtr->GetInvitation(invitationId);
-	if (!invitationPtr.IsValid() || !m_tenantManagerCompPtr.IsValid() || !HasTenantPermission(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), ContextUserId(gqlRequest), invitationPtr->GetTenantId(), imtauth::TenantPermissions::ManageInvitations())){
+	if (!invitationPtr.IsValid() || !m_tenantManagerCompPtr.IsValid() || !HasTenantAccess(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), ContextUserId(gqlRequest), invitationPtr->GetTenantId())){
 		response.Version_1_0->success = false;
 		response.Version_1_0->errorMessage = QStringLiteral("Access denied");
 		return response;
@@ -682,7 +678,7 @@ sdl::imtauth::TenantMemberships::CUpdateMembershipRolePayload CTenantMembershipM
 
 		// Permission check: ManageMembers
 		QByteArray contextUserId = ContextUserId(gqlRequest);
-		if (m_tenantManagerCompPtr.IsValid() && !HasTenantPermission(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), contextUserId, tenantId, imtauth::TenantPermissions::ManageMembers())){
+		if (m_tenantManagerCompPtr.IsValid() && !HasTenantAccess(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), contextUserId, tenantId)){
 			response.Version_1_0->success = false;
 			response.Version_1_0->errorMessage = QStringLiteral("Access denied");
 			return response;

@@ -178,16 +178,6 @@ QByteArray CTenantMembershipManagerComp::AddMembership(const QByteArray& userId,
 }
 
 
-QByteArray CTenantMembershipManagerComp::InviteMembership(const QByteArray& userId, const QByteArray& tenantId, const QByteArray& roleId)
-{
-	Q_UNUSED(userId);
-	Q_UNUSED(tenantId);
-	Q_UNUSED(roleId);
-	SendErrorMessage(0, "Tenant invitations are stored separately; use ITenantInvitationManager::CreateInvitation", "CTenantMembershipManagerComp");
-	return QByteArray();
-}
-
-
 bool CTenantMembershipManagerComp::RemoveMembership(const QByteArray& membershipId)
 {
 	if (!m_membershipCollectionCompPtr.IsValid()){
@@ -210,39 +200,6 @@ bool CTenantMembershipManagerComp::RemoveMembership(const QByteArray& membership
 	SendInfoMessage(0, QString("Removed membership '%1'").arg(QString::fromUtf8(membershipId)), "CTenantMembershipManagerComp");
 
 	return true;
-}
-
-
-bool CTenantMembershipManagerComp::AcceptMembershipInvitation(const QByteArray& membershipId)
-{
-	if (!m_membershipCollectionCompPtr.IsValid()){
-		SendErrorMessage(0, "Membership collection not configured", "CTenantMembershipManagerComp");
-		return false;
-	}
-
-	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (!m_membershipCollectionCompPtr->GetObjectData(membershipId, dataPtr)){
-		return false;
-	}
-
-	ITenantMembership* membershipPtr = dynamic_cast<ITenantMembership*>(dataPtr.GetPtr());
-	if (membershipPtr == nullptr){
-		return false;
-	}
-
-	istd::CChangeNotifier changeNotifier(this);
-
-	membershipPtr->SetActive(true);
-	membershipPtr->SetJoinedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
-	membershipPtr->SetUpdatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
-
-	return m_membershipCollectionCompPtr->SetObjectData(membershipId, *membershipPtr);
-}
-
-
-bool CTenantMembershipManagerComp::RejectMembershipInvitation(const QByteArray& membershipId)
-{
-	return RemoveMembership(membershipId);
 }
 
 

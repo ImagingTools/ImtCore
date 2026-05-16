@@ -258,7 +258,7 @@ sdl::imtauth::Tenants::CUpdateTenantPayload CTenantManagerControllerComp::OnUpda
 		// Add memberships for new users
 		for (const QByteArray& uid : newUserIds){
 			if (!currentUserIds.contains(uid)){
-				m_membershipManagerCompPtr->InviteMembership(uid, tenantId, QByteArray());
+				m_membershipManagerCompPtr->AddMembership(uid, tenantId, QByteArray());
 			}
 		}
 	}

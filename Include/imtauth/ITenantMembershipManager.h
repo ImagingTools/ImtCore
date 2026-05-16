@@ -55,11 +55,6 @@ public:
 	virtual QByteArray AddMembership(const QByteArray& userId, const QByteArray& tenantId, const QByteArray& roleId) = 0;
 
 	/**
-		Invite a user to a tenant. The created membership remains inactive until the user accepts it.
-	*/
-	virtual QByteArray InviteMembership(const QByteArray& userId, const QByteArray& tenantId, const QByteArray& roleId) = 0;
-
-	/**
 		Remove a membership (remove user from tenant).
 		\return true if removed successfully.
 	*/
@@ -70,16 +65,6 @@ public:
 		\return true if updated successfully.
 	*/
 	virtual bool UpdateMembershipRole(const QByteArray& membershipId, const QByteArray& newRoleId) = 0;
-
-	/**
-		Accept a pending membership invitation.
-	*/
-	virtual bool AcceptMembershipInvitation(const QByteArray& membershipId) = 0;
-
-	/**
-		Reject a pending membership invitation.
-	*/
-	virtual bool RejectMembershipInvitation(const QByteArray& membershipId) = 0;
 
 	/**
 		Check if a user is a member of a specific tenant.

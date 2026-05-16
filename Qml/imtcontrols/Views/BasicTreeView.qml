@@ -88,7 +88,7 @@ Item {
     property int __editingColumn: -1
     property var __editingOriginalValue: null
 
-    height: (root.showToolbar ? toolbarRow.height : 0) + (root.showHeader ? root.headerHeight : 0) + visibleModel.count * root.rowHeight
+    implicitHeight: (root.showToolbar ? toolbarRow.height : 0) + (root.showHeader ? root.headerHeight : 0) + visibleModel.count * root.rowHeight
 
     Timer {
         id: filterDebounceTimer
