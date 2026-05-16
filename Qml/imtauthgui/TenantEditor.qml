@@ -607,6 +607,7 @@ DocumentViewBase {
 													color: Style.inactiveTextColor
 												}
 
+												// Role editing ComboBox — temporarily hidden, to be re-enabled later
 												ComboBox {
 													id: roleCombo
 													visible: false
