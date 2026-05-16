@@ -19,13 +19,8 @@ DocumentViewBase {
 	property var pendingMembers: []
 	property var pendingInvitations: []
 	property bool isNewTenant: container.tenantData ? (!container.tenantData.m_id || container.tenantData.m_id === "") : true
-	readonly property real memberRoleNameWidthRatio: 0.55
-	readonly property real memberRoleComboWidthRatio: 0.45
-	readonly property int memberRoleHorizontalMargin: Style.marginL
-	readonly property int totalMemberRoleHorizontalMargin: container.memberRoleHorizontalMargin * 2
 	readonly property int memberRoleRowMargin: Style.marginS
 	readonly property int totalMemberRoleRowMargin: container.memberRoleRowMargin * 2
-	readonly property int memberActionColumnWidth: Style.controlHeightM * 2
 	// Guard: set when members are modified locally, prevents updateGui from overwriting
 	property bool __membersModifiedLocally: false
 
@@ -351,6 +346,11 @@ DocumentViewBase {
 		multiPageView.updatePages()
 	}
 
+	on__IsOwnerChanged: {
+		if (!container.isNewTenant)
+			multiPageView.updatePages()
+	}
+
 	// ===== Page: General =====
 	Component {
 		id: generalPageComp
@@ -552,94 +552,88 @@ DocumentViewBase {
 								Repeater {
 									model: container.__memberRolesListModel
 
-									delegate: Item {
+									delegate: Rectangle {
 										id: memberDelegate
 										width: parent.width
-										height: memberDelegate.isPending
-											? Style.controlHeightM * 1.5 + container.totalMemberRoleRowMargin
-											: Style.controlHeightM + container.totalMemberRoleRowMargin
+										height: memberDelegateColumn.implicitHeight + Style.marginS * 2
+										radius: Style.radiusS
+										color: memberDelegateMouseArea.containsMouse ? Style.buttonHoverColor : "transparent"
+										border.color: memberDelegate.isPending ? Style.borderColor : "transparent"
+										border.width: memberDelegate.isPending ? 1 : 0
 
 										readonly property bool isOwner: container.tenantData && modelData.userId === container.tenantData.m_ownerId
 										readonly property bool isPending: modelData.isPending === true
 										readonly property bool isCurrentUser: container.tenantData && container.tenantData.m_currentUserId && modelData.userId === container.tenantData.m_currentUserId
-										readonly property int actionBtnWidth: container.memberActionColumnWidth
-										readonly property real contentWidth: memberDelegate.width - container.totalMemberRoleRowMargin * 2 - memberDelegate.actionBtnWidth
-											- (memberDelegate.isPending ? Style.iconSizeS + Style.marginL : 0) - Style.marginL
+
+										MouseArea {
+											id: memberDelegateMouseArea
+											anchors.fill: parent
+											hoverEnabled: true
+											acceptedButtons: Qt.NoButton
+										}
 
 										Column {
-											anchors.fill: parent
-											anchors.margins: container.memberRoleRowMargin
+											id: memberDelegateColumn
+											anchors.left: parent.left
+											anchors.right: parent.right
+											anchors.verticalCenter: parent.verticalCenter
+											anchors.margins: Style.marginS
 											spacing: Style.marginXS
 
 											Row {
 												width: parent.width
-												spacing: Style.marginL
-
-												// Pending indicator
-												Text {
-													visible: memberDelegate.isPending
-													anchors.verticalCenter: parent.verticalCenter
-													text: "⏳"
-													font.pixelSize: Style.fontSizeM
-													width: Style.iconSizeS
-												}
+												spacing: Style.marginM
 
 												BaseText {
-													width: memberDelegate.contentWidth * container.memberRoleNameWidthRatio
 													anchors.verticalCenter: parent.verticalCenter
 													text: modelData.userName
 													elide: Text.ElideRight
+													width: parent.width
+														- (ownerBadge.visible ? ownerBadge.width + parent.spacing : 0)
+														- (pendingBadge.visible ? pendingBadge.width + parent.spacing : 0)
+														- (chipRemoveBtn.visible ? chipRemoveBtn.width + parent.spacing : 0)
+														- (leaveBtn.visible ? leaveBtn.width + parent.spacing : 0)
+														- (transferOwnerBtn.visible ? transferOwnerBtn.width + parent.spacing : 0)
 													color: memberDelegate.isPending ? Style.inactiveTextColor : Style.textColor
+													font.bold: memberDelegate.isOwner
 												}
 
-												BaseText {
+												// Owner badge
+												Rectangle {
+													id: ownerBadge
 													visible: !memberDelegate.isPending && memberDelegate.isOwner
-													width: memberDelegate.contentWidth * container.memberRoleComboWidthRatio
 													anchors.verticalCenter: parent.verticalCenter
-													text: qsTr("Owner")
-												}
+													width: ownerBadgeText.implicitWidth + Style.marginM
+													height: ownerBadgeText.implicitHeight + Style.marginXS
+													radius: Style.radiusS
+													color: Style.selectedColor
 
-												BaseText {
-													visible: !memberDelegate.isPending && !memberDelegate.isOwner
-													width: memberDelegate.contentWidth * container.memberRoleComboWidthRatio
-													anchors.verticalCenter: parent.verticalCenter
-													text: modelData.role || qsTr("Member")
-													color: Style.inactiveTextColor
-												}
-
-												// Role editing ComboBox — temporarily hidden, to be re-enabled later
-												ComboBox {
-													id: roleCombo
-													visible: false
-													width: memberDelegate.contentWidth * container.memberRoleComboWidthRatio
-													anchors.verticalCenter: parent.verticalCenter
-													model: container.__getAvailableRolesModel()
-													nameId: "roleName"
-													currentIndex: container.__findRoleIndex(modelData.role)
-													changeable: container.__isOwner
-
-													onCurrentIndexChanged: {
-														if (roleCombo.currentIndex >= 0){
-															var selectedRole = container.__getRoleModelValue(roleCombo.model, roleCombo.currentIndex, "id")
-															if (!selectedRole)
-																return
-															var currentRole = container.__memberRolesMap[modelData.userId] || ""
-															if (selectedRole !== currentRole) {
-																container.__updateMemberRole(modelData.userId, selectedRole)
-															}
-														}
-
+													BaseText {
+														id: ownerBadgeText
+														anchors.centerIn: parent
+														text: qsTr("Owner")
+														font.pixelSize: Style.fontSizeS
+														color: Style.textColor
 													}
 												}
 
-												BaseText {
+												// Pending status badge
+												Rectangle {
+													id: pendingBadge
 													visible: memberDelegate.isPending
-													width: memberDelegate.contentWidth * container.memberRoleComboWidthRatio
 													anchors.verticalCenter: parent.verticalCenter
-													text: modelData.isExpired ? qsTr("Expired") : qsTr("%1 (%2)").arg(modelData.role).arg(modelData.status)
-													color: modelData.isExpired ? "#DA3633" : Style.inactiveTextColor
-													font.bold: modelData.isExpired
-													elide: Text.ElideRight
+													width: pendingBadgeText.implicitWidth + Style.marginM
+													height: pendingBadgeText.implicitHeight + Style.marginXS
+													radius: Style.radiusS
+													color: modelData.isExpired ? "#FFDCE0" : "#FFF3CD"
+
+													BaseText {
+														id: pendingBadgeText
+														anchors.centerIn: parent
+														text: modelData.isExpired ? qsTr("Expired") : qsTr("Invited")
+														font.pixelSize: Style.fontSizeS
+														color: modelData.isExpired ? "#DA3633" : "#856404"
+													}
 												}
 
 												ToolButton {
@@ -662,7 +656,6 @@ DocumentViewBase {
 													id: leaveBtn
 													visible: !memberDelegate.isPending && memberDelegate.isCurrentUser && !memberDelegate.isOwner && !chipRemoveBtn.visible
 													anchors.verticalCenter: parent.verticalCenter
-													width: container.memberActionColumnWidth
 													text: qsTr("Leave")
 													onClicked: {
 														container.__removeMemberById(modelData.userId)
@@ -674,7 +667,6 @@ DocumentViewBase {
 													visible: container.__isOwner && !memberDelegate.isOwner && !memberDelegate.isPending
 													anchors.verticalCenter: parent.verticalCenter
 													iconSource: Style.getIconPath("Icons/Switch", Icon.State.On, Icon.Mode.Normal)
-
 													decorator: Component {
 														ToolButtonDecorator {
 															color: "transparent"
@@ -694,7 +686,7 @@ DocumentViewBase {
 												spacing: Style.marginM
 
 												BaseText {
-													width: parent.width - revokeBtn.width - resendBtn.width - parent.spacing * 2
+													width: parent.width - (revokeBtn.visible ? revokeBtn.width + parent.spacing : 0) - (resendBtn.visible ? resendBtn.width + parent.spacing : 0)
 													text: container.__formatInvitationInfo(modelData.invitedByName, modelData.expiresAt)
 													color: modelData.isExpired ? "#DA3633" : Style.inactiveTextColor
 													font.pixelSize: Style.fontSizeS
