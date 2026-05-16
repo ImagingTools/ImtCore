@@ -161,20 +161,13 @@ function runQmlTest(filePath, timeout = 5000, qmlImportPaths = []) {
             env,
         })
 
-        let logs = []
         let rawOutput = ''
 
         child.stdout.on('data', (data) => {
-            const chunk = data.toString()
-            rawOutput += chunk + '\n'
-            let result = getQmlLog(chunk.trim())
-            logs.push(...result)
+            rawOutput += data.toString()
         })
         child.stderr.on('data', (data) => {
-            const chunk = data.toString()
-            rawOutput += chunk + '\n'
-            let result = getQmlLog(chunk.trim())
-            logs.push(...result)
+            rawOutput += data.toString()
         })
 
         // Тайм-аут на случай зависания теста
@@ -185,6 +178,8 @@ function runQmlTest(filePath, timeout = 5000, qmlImportPaths = []) {
 
         child.on('close', (code) => {
             clearTimeout(timer)
+
+            let logs = getQmlLog(rawOutput)
 
             if (logs.length === 0 && rawOutput) {
                 const rawLines = rawOutput

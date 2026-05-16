@@ -301,10 +301,14 @@ class Item extends QtObject {
         for(let child of this.children){
             if(tree.indexOf(child) < 0){
                 child.focus = false
-                
             }
 
-            child.__setFocusTree(tree)
+            // Don't recurse into FocusScopes — they manage their own children's
+            // internal focus state. In Qt, items inside a FocusScope don't fire
+            // focusChanged when the scope loses focus.
+            if(!(child instanceof JQModules.QtQuick.FocusScope)){
+                child.__setFocusTree(tree)
+            }
         }
     }
 
