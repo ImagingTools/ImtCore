@@ -108,7 +108,7 @@ QByteArray CCollectionDocumentServiceBase::OpenDocument(const QByteArray& userId
 				istd::CChangeNotifier notifier(this, &changeSet);
 			}
 
-			for (IDocumentServiceEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
+			for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
 				if (handlerPtr != nullptr){
 					CDocumentOpenedEvent event(
 						userId,
@@ -187,7 +187,7 @@ QByteArray CCollectionDocumentServiceBase::OpenDocument(const QByteArray& userId
 		istd::CChangeNotifier notifier(this, &changeSet);
 	}
 
-	for (IDocumentServiceEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
+	for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
 		if (handlerPtr != nullptr){
 			CDocumentOpenedEvent event(
 				userId,
@@ -386,7 +386,7 @@ IDocumentService::OperationStatus CCollectionDocumentServiceBase::SetDocumentNam
 					istd::CChangeNotifier notifier(this, &changeSet);
 				}
 
-				for (IDocumentServiceEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
+				for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
 					if (handlerPtr != nullptr){
 						CDocumentRenamedEvent event(
 							pair.first,
@@ -410,7 +410,7 @@ IDocumentService::OperationStatus CCollectionDocumentServiceBase::SetDocumentNam
 		istd::CChangeNotifier notifier(this, &changeSet);
 	}
 
-	for (IDocumentServiceEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
+	for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
 		if (handlerPtr != nullptr){
 			CDocumentRenamedEvent event(
 				userId,
@@ -530,7 +530,7 @@ IDocumentService::OperationStatus CCollectionDocumentServiceBase::SaveDocument(
 				istd::CChangeNotifier notifier(this, &changeSet);
 			}
 
-			for (IDocumentServiceEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
+			for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
 				if (handlerPtr != nullptr){
 					CDocumentSavedAsEvent event(
 						userId,
@@ -585,7 +585,7 @@ IDocumentService::OperationStatus CCollectionDocumentServiceBase::SaveDocument(
 						istd::CChangeNotifier notifier(this, &changeSet);
 					}
 
-					for (IDocumentServiceEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
+					for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
 						if (handlerPtr != nullptr){
 							CDocumentSavedEvent event(
 								pair.first,
@@ -614,7 +614,7 @@ IDocumentService::OperationStatus CCollectionDocumentServiceBase::SaveDocument(
 					istd::CChangeNotifier notifier(this, &changeSet);
 				}
 
-				for (IDocumentServiceEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
+				for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
 					if (handlerPtr != nullptr){
 						CDocumentSavedEvent event(
 							userId,
@@ -664,7 +664,7 @@ IDocumentService::OperationStatus CCollectionDocumentServiceBase::SaveDocument(
 			istd::CChangeNotifier notifier(this, &changeSet);
 		}
 
-		for (IDocumentServiceEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
+		for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
 			if (handlerPtr != nullptr){
 				CDocumentSavedEvent event(
 					userId,

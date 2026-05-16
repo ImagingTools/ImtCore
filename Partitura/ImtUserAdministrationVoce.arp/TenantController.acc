@@ -69,7 +69,7 @@
                     <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Tenants"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DocumentManagerEventHandlers" Type="Reference[]" ExportId="">
+                    <AttributeInfo Id="DocumentServiceEventHandlers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>TenantDocumentManager</Value>

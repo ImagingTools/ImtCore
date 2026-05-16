@@ -24,7 +24,7 @@ public:
 	typedef imtdoc::CDocumentServiceBase BaseClass2;
 
 	I_BEGIN_BASE_COMPONENT(CDocumentServiceCompBase)
-		I_ASSIGN_MULTI_0(m_handlerCompPtr, "DocumentManagerEventHandler", "Document manager event handler", false);
+		I_ASSIGN_MULTI_0(m_handlerCompPtr, "DocumentServiceEventHandler", "Document service event handler", false);
 		I_ASSIGN_MULTI_0(m_objectTypeIdsAttrPtr, "ObjectTypeIdList", "List of the object type-IDs according to the list of factories ('ObjectFactories')", true);
 		I_ASSIGN(m_undoManagerFactPtr, "UndoManager", "Factory of the undo manager", false, "UndoManager");
 		I_ASSIGN_MULTI_0(m_documentNameProviderCompPtr, "DocumentNameProviders", "List of document name providers related to registered type-IDs ('ObjectTypeIdList')", false);
@@ -40,7 +40,7 @@ protected:
 		const WorkingDocument& document,
 		OperationStatus& status,
 		QString* errorMessage = nullptr) const override;
-	virtual QList<imtdoc::IDocumentServiceEventHandler*> GetDocumentManagerEventHandlers() const override;
+	virtual QList<imtdoc::IDocumentServiceEventHandler*> GetDocumentServiceEventHandlers() const override;
 	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId) const override;
 	virtual idoc::IUndoManagerUniquePtr CreateUndoManager() const override;
 

@@ -22,7 +22,7 @@ I_EXPORT_COMPONENT(
 
 I_EXPORT_COMPONENT(
 			DocumentManagerEventHandlerDemultiplexer,
-			"Document manager event handler demultiplexer",
+			"Document service event handler demultiplexer",
 			"Document Manager Event Handler Demultiplexer");
 
 

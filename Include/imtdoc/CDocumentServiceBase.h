@@ -81,7 +81,7 @@ protected:
 		const WorkingDocument& document,
 		OperationStatus& status,
 		QString* errorMessage = nullptr) const;
-	virtual QList<imtdoc::IDocumentServiceEventHandler*> GetDocumentManagerEventHandlers() const;
+	virtual QList<imtdoc::IDocumentServiceEventHandler*> GetDocumentServiceEventHandlers() const;
 
 	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId) const = 0;
 	virtual idoc::IUndoManagerUniquePtr CreateUndoManager() const = 0;

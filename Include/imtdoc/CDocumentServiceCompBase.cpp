@@ -76,7 +76,7 @@ bool CDocumentServiceCompBase::ValidateDocumentData(
 }
 
 
-QList<imtdoc::IDocumentServiceEventHandler*> CDocumentServiceCompBase::GetDocumentManagerEventHandlers() const
+QList<imtdoc::IDocumentServiceEventHandler*> CDocumentServiceCompBase::GetDocumentServiceEventHandlers() const
 {
 	QList<imtdoc::IDocumentServiceEventHandler*> retVal;
 

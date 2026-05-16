@@ -116,7 +116,7 @@ QByteArray CDocumentServiceBase::CreateNewDocument(
 		istd::CChangeNotifier notifier(this, &changeSet);
 	}
 
-	for (IDocumentServiceEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
+	for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
 		if (handlerPtr != nullptr){
 			CDocumentCreatedEvent event(
 				userId,
@@ -361,7 +361,7 @@ IDocumentService::OperationStatus CDocumentServiceBase::CloseDocument(
 		istd::CChangeNotifier notifier(this, &changeSet);
 	}
 
-	for (IDocumentServiceEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
+	for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
 		if (handlerPtr != nullptr){
 			CDocumentClosedEvent event(
 				userId,
@@ -627,7 +627,7 @@ void CDocumentServiceBase::OnDocumentDataLoaded(
 		istd::CChangeNotifier notifier(this, &changeSet);
 	}
 
-	for (IDocumentServiceEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
+	for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
 		if (handlerPtr != nullptr){
 			CDocumentDataLoadedEvent event(
 				userId,
@@ -666,7 +666,7 @@ void CDocumentServiceBase::OnUndoManagerChanged(int modelId)
 
 				documentPtr->isDirty = documentPtr->undoManagerPtr->GetDocumentChangeFlag() != idoc::IDocumentStateComparator::DCF_EQUAL;
 
-				for (IDocumentServiceEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
+				for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
 					if (handlerPtr != nullptr){
 						CDocumentUndoRedoChangedEvent event(
 							pair.first,
@@ -703,7 +703,7 @@ void CDocumentServiceBase::OnUndoManagerChanged(int modelId)
 	documentPtr->isDirty = documentPtr->undoManagerPtr->GetDocumentChangeFlag() != idoc::IDocumentStateComparator::DCF_EQUAL;
 	Q_ASSERT(documentPtr->undoManagerPtr.IsValid());
 
-	for (IDocumentServiceEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
+	for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
 		if (handlerPtr != nullptr){
 			CDocumentUndoRedoChangedEvent event(
 				userId,
@@ -745,7 +745,7 @@ bool CDocumentServiceBase::ValidateDocumentData(
 }
 
 
-QList<imtdoc::IDocumentServiceEventHandler*> CDocumentServiceBase::GetDocumentManagerEventHandlers() const
+QList<imtdoc::IDocumentServiceEventHandler*> CDocumentServiceBase::GetDocumentServiceEventHandlers() const
 {
 	return {};
 }
@@ -790,7 +790,7 @@ void CDocumentServiceBase::OnUpdate(imod::IModel* modelPtr, const istd::IChangea
 			istd::IChangeable* changeablePtr = dynamic_cast<istd::IChangeable*>(modelPtr);
 
 			if (documents[documentId].objectPtr.GetPtr() == changeablePtr){
-				for (IDocumentServiceEventHandler* handlerPtr : GetDocumentManagerEventHandlers()){
+				for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
 					if (handlerPtr != nullptr){
 						WorkingDocument& workingDocument = documents[documentId];
 						CDocumentChangedEvent event(

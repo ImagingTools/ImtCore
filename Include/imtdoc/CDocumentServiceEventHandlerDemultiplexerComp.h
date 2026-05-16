@@ -20,7 +20,7 @@ public:
 
 	I_BEGIN_COMPONENT(CDocumentServiceEventHandlerDemultiplexerComp);
 		I_REGISTER_INTERFACE(imtdoc::IDocumentServiceEventHandler);
-		I_ASSIGN_MULTI_0(m_eventHandlersCompPtr, "DocumentManagerEventHandlers", "Demultiplexer for document manager event handlers", false)
+		I_ASSIGN_MULTI_0(m_eventHandlersCompPtr, "DocumentServiceEventHandlers", "Demultiplexer for document service event handlers", false)
 	I_END_COMPONENT;
 
 	// reimplemented (imtdoc::IDocumentServiceEventHandler)

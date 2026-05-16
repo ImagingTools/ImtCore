@@ -563,7 +563,7 @@ protected:
 		return idoc::IUndoManagerUniquePtr(new CMockUndoManager());
 	}
 
-	virtual QList<imtdoc::IDocumentServiceEventHandler*> GetDocumentManagerEventHandlers() const override
+	virtual QList<imtdoc::IDocumentServiceEventHandler*> GetDocumentServiceEventHandlers() const override
 	{
 		return { const_cast<CMockEventHandler*>(&m_mockEventHandler) };
 	}
