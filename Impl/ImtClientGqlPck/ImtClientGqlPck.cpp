@@ -81,7 +81,7 @@ I_EXPORT_COMPONENT(
 			"Remote Object Collection Controller");
 
 I_EXPORT_COMPONENT(
-			RemoteCollectionDocumentManagerController,
+			RemoteCollectionDocumentServiceController,
 			"Remote collection document manager controller",
 			"Remote Collection Document Manager Controller");
 

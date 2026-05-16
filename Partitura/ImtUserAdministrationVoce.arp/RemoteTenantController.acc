@@ -24,7 +24,7 @@
                                 <Value>TenantRemoteRepresentationController</Value>
                                 <Value>RemoteCommandsController</Value>
                                 <Value>RemoteDocumentRevisionController</Value>
-                                <Value>RemoteCollectionDocumentManagerController</Value>
+                                <Value>RemoteCollectionDocumentServiceController</Value>
                                 <Value>TenantMembershipManagerController</Value>
                             </Values>
                         </Data>
@@ -94,7 +94,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="RemoteCollectionDocumentManagerController" PackageId="ImtClientGqlPck" ComponentId="RemoteCollectionDocumentManagerController">
+        <Element Id="RemoteCollectionDocumentServiceController" PackageId="ImtClientGqlPck" ComponentId="RemoteCollectionDocumentServiceController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">

@@ -8,8 +8,8 @@ import imtguigql 1.0
 import imtdocgui 1.0
 import imtcolgui 1.0
 import imtchatImtChatSdl 1.0
-import imtchatConversationCollectionDocumentManagerSdl 1.0
-import imtbaseCollectionDocumentManagerSdl 1.0
+import imtchatConversationCollectionDocumentServiceSdl 1.0
+import imtbaseCollectionDocumentServiceSdl 1.0
 import imtbaseUndoManagerSdl 1.0
 
 ViewBase {

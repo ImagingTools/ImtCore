@@ -170,10 +170,10 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ContactInfoCollectionDocumentManager" PackageId="ControlsGalleryGqlPck" ComponentId="ContactInfoCollectionDocumentManager">
+        <Element Id="ContactInfoCollectionDocumentService" PackageId="ControlsGalleryGqlPck" ComponentId="ContactInfoCollectionDocumentService">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="CollectionDocumentManager" Type="Reference" ExportId="CollectionDocumentManager">
+                    <AttributeInfo Id="CollectionDocumentService" Type="Reference" ExportId="CollectionDocumentService">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
@@ -230,7 +230,7 @@
                                 <Value>ContactInfoCollectionController</Value>
                                 <Value>CommandsController</Value>
                                 <Value>BaseCollectionCommands</Value>
-                                <Value>ContactInfoCollectionDocumentManager</Value>
+                                <Value>ContactInfoCollectionDocumentService</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

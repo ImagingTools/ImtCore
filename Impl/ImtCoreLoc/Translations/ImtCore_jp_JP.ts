@@ -6619,9 +6619,9 @@
     </message>
 </context>
 <context>
-    <name>DocumentManager</name>
+    <name>DocumentService</name>
     <message>
-        <location filename="../../../Qml/imtdocgui/DocumentManager.qml" line="+9"/>
+        <location filename="../../../Qml/imtdocgui/DocumentService.qml" line="+9"/>
         <source>&lt;no name&gt;</source>
         <translation type="unfinished">&lt;名前なし&gt;</translation>
     </message>
@@ -6638,9 +6638,9 @@
     </message>
 </context>
 <context>
-    <name>DocumentManagerBase</name>
+    <name>DocumentServiceBase</name>
     <message>
-        <location filename="../../../Qml/imtdocgui/DocumentManagerBase.qml" line="+100"/>
+        <location filename="../../../Qml/imtdocgui/DocumentServiceBase.qml" line="+100"/>
         <source>&lt;no name&gt;</source>
         <translation type="unfinished">&lt;名前なし&gt;</translation>
     </message>
@@ -6928,9 +6928,9 @@
     </message>
 </context>
 <context>
-    <name>GqlBasedCollectionDocumentManager</name>
+    <name>GqlBasedCollectionDocumentService</name>
     <message>
-        <location filename="../../../Qml/imtguigql/GqlBasedCollectionDocumentManager.qml" line="+252"/>
+        <location filename="../../../Qml/imtguigql/GqlBasedCollectionDocumentService.qml" line="+252"/>
         <location line="+33"/>
         <location line="+34"/>
         <location line="+37"/>

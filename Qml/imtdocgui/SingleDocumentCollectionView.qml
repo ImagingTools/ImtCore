@@ -5,14 +5,14 @@ import imtgui 1.0
 import imtcolgui 1.0
 import imtcontrols 1.0
 import imtbaseImtCollectionSdl 1.0
-import imtbaseCollectionDocumentManagerSdl 1.0
+import imtbaseCollectionDocumentServiceSdl 1.0
 
 Item {
 	id: workspaceView
 
 	property bool showStandardLoading: true
 	property CollectionView collectionView: null
-	property DocumentManagerBase documentManager
+	property DocumentServiceBase documentManager
 
 	signal startLoading(string documentId)
 	signal stopLoading(string documentId)
@@ -24,9 +24,9 @@ Item {
 		}
 	}
 
-	onDocumentManagerChanged: {
+	onDocumentServiceChanged: {
 		if (documentManager){
-			documentManager.setDocumentManagerActiveView(workspaceView)
+			documentManager.setDocumentServiceActiveView(workspaceView)
 		}
 	}
 
@@ -121,7 +121,7 @@ Item {
 			}
 		}
 
-		function onDocumentManagerChanged(typeOperation, objectId, documentId, documentName){
+		function onDocumentServiceChanged(typeOperation, objectId, documentId, documentName){
 			if (typeOperation === EDocumentOperationEnum.s_documentClosed){
 				if (stackView.count > 1){
 					stackView.removePage(stackView.count - 1)
