@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include <imtdb/CPasswordObfuscator.h>
+#include <imtbase/CPasswordObfuscator.h>
 
 
-namespace imtdb
+namespace imtbase
 {
 
 
@@ -67,5 +67,5 @@ QByteArray CPasswordObfuscator::Transform(const QByteArray& data)
 }
 
 
-} // namespace imtdb
+} // namespace imtbase
 

@@ -7,7 +7,7 @@
 #include <QtCore/QByteArray>
 
 
-namespace imtdb
+namespace imtbase
 {
 
 
@@ -57,5 +57,5 @@ private:
 };
 
 
-} // namespace imtdb
+} // namespace imtbase
 

@@ -11,7 +11,7 @@
 
 // ImtCore includes
 #include <imtcore/Version.h>
-#include <imtdb/CPasswordObfuscator.h>
+#include <imtbase/CPasswordObfuscator.h>
 
 
 namespace imtdb
@@ -170,13 +170,13 @@ bool CDatabaseAccessSettings::Serialize(iser::IArchive& archive)
 	iser::CArchiveTag passwordTag("Password", "Password", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(passwordTag);
 	if (archive.IsStoring()){
-		QString obfuscatedPassword = CPasswordObfuscator::Obfuscate(m_password);
+		QString obfuscatedPassword = imtbase::CPasswordObfuscator::Obfuscate(m_password);
 		retVal = retVal && archive.Process(obfuscatedPassword);
 	}
 	else{
 		QString storedPassword;
 		retVal = retVal && archive.Process(storedPassword);
-		m_password = CPasswordObfuscator::Deobfuscate(storedPassword);
+		m_password = imtbase::CPasswordObfuscator::Deobfuscate(storedPassword);
 	}
 	retVal = retVal && archive.EndTag(passwordTag);
 
