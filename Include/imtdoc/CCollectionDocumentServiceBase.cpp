@@ -338,6 +338,8 @@ void CCollectionDocumentServiceBase::DoOpenDocument(
 						OnDocumentDataLoaded(pair.first, pair.second);
 					}
 				}
+
+				CompleteTask(taskId, TaskResult{OS_OK, documentId, QString()});
 			}
 		}
 		else {
@@ -349,10 +351,10 @@ void CCollectionDocumentServiceBase::DoOpenDocument(
 				InitializeDocumentObservers(*docPtr, userId);
 
 				OnDocumentDataLoaded(userId, documentId);
+
+				CompleteTask(taskId, TaskResult{OS_OK, documentId, QString()});
 			}
 		}
-
-		CompleteTask(taskId, TaskResult{OS_OK, documentId, QString()});
 	});
 
 	QObject::connect(worker, &QObject::destroyed, thread, &QThread::quit);
