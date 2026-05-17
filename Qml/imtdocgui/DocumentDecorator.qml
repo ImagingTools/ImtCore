@@ -1,6 +1,6 @@
 import QtQuick 2.12
 import imtgui 1.0
-import imtbaseCollectionDocumentManagerSdl 1.0
+import imtbaseCollectionDocumentServiceSdl 1.0
 
 QtObject {
 	id: root
@@ -63,7 +63,7 @@ QtObject {
 			}
 		}
 
-		function onDocumentManagerChanged(typeOperation, objectId, documentId, hasChanges){
+		function onDocumentServiceChanged(typeOperation, objectId, documentId, hasChanges){
 			if (documentId !== root.documentId){
 				return
 			}

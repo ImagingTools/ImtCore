@@ -7,8 +7,8 @@
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
-    <Description>Conversation collection controller with CollectionDocumentManager</Description>
-    <Keywords>Conversation, Chat, Collection, DocumentManager</Keywords>
+    <Description>Conversation collection controller with CollectionDocumentService</Description>
+    <Keywords>Conversation, Chat, Collection, DocumentService</Keywords>
     <ElementsList>
         <Element Id="BaseCollectionCommands" PackageId="ImtCollectionVoce" ComponentId="BaseCollectionCommands">
             <Data IsEnabled="true" Flags="0">
@@ -28,7 +28,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="CollectionDocumentManager" PackageId="ImtCollectionVoce" ComponentId="CollectionDocumentManager">
+        <Element Id="CollectionDocumentService" PackageId="ImtCollectionVoce" ComponentId="CollectionDocumentService">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Collection" Type="Reference" ExportId="">
@@ -236,11 +236,11 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ConversationCollectionDocumentManager" PackageId="ImtChatGqlPck" ComponentId="ConversationCollectionDocumentManager">
+        <Element Id="ConversationCollectionDocumentService" PackageId="ImtChatGqlPck" ComponentId="ConversationCollectionDocumentService">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="CollectionDocumentManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="CollectionDocumentManager"/>
+                    <AttributeInfo Id="CollectionDocumentService" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="CollectionDocumentService"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -281,11 +281,11 @@
                     <AttributeInfo Id="GqlRequestHandlers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>CollectionDocumentManager</Value>
+                                <Value>CollectionDocumentService</Value>
                                 <Value>ConversationCollectionController</Value>
                                 <Value>CommandsController</Value>
                                 <Value>BaseCollectionCommands</Value>
-                                <Value>ConversationCollectionDocumentManager</Value>
+                                <Value>ConversationCollectionDocumentService</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -308,7 +308,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>ConversationChangeNotifier</Value>
-                                <Value>CollectionDocumentManager</Value>
+                                <Value>CollectionDocumentService</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

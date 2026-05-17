@@ -600,9 +600,9 @@ SUBDIRS += imt3dtest
 imt3dtest.file = ../../Include/imt3d/Test/QMake/imt3dTest.pro
 imt3dtest.depends = imt3d
 
-SUBDIRS += CollectionDocumentManagerTest
-CollectionDocumentManagerTest.file = ../../Tests/CollectionDocumentManagerTest/QMake/CollectionDocumentManagerTest.pro
-CollectionDocumentManagerTest.depends = imtbase imtdoc
+SUBDIRS += CollectionDocumentServiceTest
+CollectionDocumentServiceTest.file = ../../Tests/CollectionDocumentServiceTest/QMake/CollectionDocumentServiceTest.pro
+CollectionDocumentServiceTest.depends = imtbase imtdoc
 
 SUBDIRS += ImtCoreFileCollectionTest
 ImtCoreFileCollectionTest.file = ../../Tests/FileCollectionTest/QMake/ImtCoreFileCollectionTest.pro

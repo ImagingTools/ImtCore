@@ -5,15 +5,17 @@ import imtgui 1.0
 import imtcolgui 1.0
 import imtcontrols 1.0
 import imtbaseImtCollectionSdl 1.0
-import imtbaseCollectionDocumentManagerSdl 1.0
+import imtbaseCollectionDocumentServiceSdl 1.0
 
 Item {
 	id: workspaceView
 
 	property bool showStandardLoading: true
 	property CollectionView collectionView: null
-	property DocumentManagerBase documentManager
+	property DocumentServiceBase documentManager
 	property string collectionTabId: ""
+
+	property bool tabVisible: true
 
 	signal startLoading(string documentId)
 	signal stopLoading(string documentId)
@@ -25,9 +27,9 @@ Item {
 		}
 	}
 
-	onDocumentManagerChanged: {
+	onDocumentServiceChanged: {
 		if (documentManager){
-			documentManager.setDocumentManagerActiveView(workspaceView)
+			documentManager.setDocumentServiceActiveView(workspaceView)
 		}
 	}
 
@@ -77,6 +79,31 @@ Item {
 
 	function setCurrentTabIndex(index){
 		tabView.currentIndex = index
+	}
+
+
+	function onTryCloseDirtyDocument(documentId, callback){
+		if (!workspaceView.documentManager.documentIsDirty(documentId)){
+			callback(false)
+			return
+		}
+
+		let dialogCallback = function(result){
+			if (result === Enums.yes){
+				callback(true)
+			}
+			else if (result === Enums.no){
+				callback(false)
+			}
+			else{
+				callback(undefined)
+			}
+		}
+
+		ModalDialogManager.showConfirmationDialog(
+					qsTr("Save document"),
+					qsTr("Save all changes ?"),
+					dialogCallback)
 	}
 
 	Component {
@@ -177,7 +204,7 @@ Item {
 			}
 		}
 
-		function onDocumentManagerChanged(typeOperation, objectId, documentId, documentName){
+		function onDocumentServiceChanged(typeOperation, objectId, documentId, documentName){
 			if (typeOperation === EDocumentOperationEnum.s_documentClosed){
 				tabView.removeTab(documentId)
 			}
@@ -314,27 +341,7 @@ Item {
 		}
 
 		function onTryCloseDirtyDocument(documentId, callback){
-			if (!workspaceView.documentManager.documentIsDirty(documentId)){
-				callback(false)
-				return
-			}
-
-			let dialogCallback = function(result){
-				if (result === Enums.yes){
-					callback(true)
-				}
-				else if (result === Enums.no){
-					callback(false)
-				}
-				else{
-					callback(undefined)
-				}
-			}
-
-			ModalDialogManager.showConfirmationDialog(
-						qsTr("Save document"),
-						qsTr("Save all changes ?"),
-						dialogCallback)
+			workspaceView.onTryCloseDirtyDocument(documentId, callback)
 		}
 	}
 
@@ -518,6 +525,7 @@ Item {
 		id: tabView
 		anchors.fill: parent
 		closable: true
+		tabVisible: workspaceView.tabVisible
 
 		onTabLoaded: {
 			if (tabId === workspaceView.collectionTabId){

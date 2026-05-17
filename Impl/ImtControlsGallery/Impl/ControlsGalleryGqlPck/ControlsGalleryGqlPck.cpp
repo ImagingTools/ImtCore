@@ -25,7 +25,7 @@ I_EXPORT_COMPONENT(
 		"ContactInfo Meta Info Delegate");
 
 I_EXPORT_COMPONENT(
-		ContactInfoCollectionDocumentManager,
+		ContactInfoCollectionDocumentService,
 		"Contact info collection document manager",
 		"Contact Info Collection Document Manager");
 

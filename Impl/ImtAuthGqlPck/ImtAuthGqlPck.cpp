@@ -211,7 +211,7 @@ I_EXPORT_COMPONENT(
 			"Tenant Meta Info Delegate");
 
 I_EXPORT_COMPONENT(
-			TenantCollectionDocumentManager,
+			TenantCollectionDocumentService,
 			"Tenant collection document manager",
 			"Tenant Collection Document Manager");
 

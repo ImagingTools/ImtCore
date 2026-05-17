@@ -22,8 +22,8 @@ getImtCoreQmlWebDirs(webdirs "${buildwebdir}")
 list(APPEND webdirs ${AUX_INCLUDE_DIR}/controlsgallerysdl/SDL/1.0/QML/controlsgalleryContactInfosSdl)
 list(APPEND webdirs ${buildwebdir}/src/controlsgalleryContactInfosSdl)
 
-list(APPEND webdirs ${AUX_INCLUDE_DIR}/controlsgallerysdl/SDL/1.0/QML/controlsgalleryContactInfoCollectionDocumentManagerSdl)
-list(APPEND webdirs ${buildwebdir}/src/controlsgalleryContactInfoCollectionDocumentManagerSdl)
+list(APPEND webdirs ${AUX_INCLUDE_DIR}/controlsgallerysdl/SDL/1.0/QML/controlsgalleryContactInfoCollectionDocumentServiceSdl)
+list(APPEND webdirs ${buildwebdir}/src/controlsgalleryContactInfoCollectionDocumentServiceSdl)
 
 list(APPEND webdirs ${AUX_INCLUDE_DIR}/controlsgallerysdl/SDL/1.0/QML/controlsgalleryParamsSetTestSdl)
 list(APPEND webdirs ${buildwebdir}/src/controlsgalleryParamsSetTestSdl)

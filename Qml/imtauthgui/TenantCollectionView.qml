@@ -9,8 +9,8 @@ import imtguigql 1.0
 import imtdocgui 1.0
 import imtauthgui 1.0
 import imtauthTenantsSdl 1.0
-import imtauthTenantCollectionDocumentManagerSdl 1.0
-import imtbaseCollectionDocumentManagerSdl 1.0
+import imtauthTenantCollectionDocumentServiceSdl 1.0
+import imtbaseCollectionDocumentServiceSdl 1.0
 import imtbaseUndoManagerSdl 1.0
 import imtbaseComplexCollectionFilterSdl 1.0
 import imtauthTenantMembershipsSdl 1.0
@@ -427,7 +427,7 @@ RemoteCollectionView {
 
 					property DocumentId documentIdInput: DocumentId {}
 					property GqlSdlRequestSender getTenantRequest: GqlSdlRequestSender {
-						gqlCommandId: ImtauthTenantCollectionDocumentManagerSdlCommandIds.s_getTenantRepresentation
+						gqlCommandId: ImtauthTenantCollectionDocumentServiceSdlCommandIds.s_getTenantRepresentation
 						sdlObjectComp: Component {
 							TenantData {
 								onFinished: {
@@ -444,7 +444,7 @@ RemoteCollectionView {
 
 					property UpdateTenantFromRepresentationInput updateTenantInput: UpdateTenantFromRepresentationInput {}
 					property GqlSdlRequestSender updateTenantRequest: GqlSdlRequestSender {
-						gqlCommandId: ImtauthTenantCollectionDocumentManagerSdlCommandIds.s_updateTenantFromRepresentation
+						gqlCommandId: ImtauthTenantCollectionDocumentServiceSdlCommandIds.s_updateTenantFromRepresentation
 						requestType: 1
 						sdlObjectComp: Component {
 							DocumentOperationStatus {

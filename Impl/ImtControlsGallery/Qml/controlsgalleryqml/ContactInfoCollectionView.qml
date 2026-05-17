@@ -7,8 +7,8 @@ import imtcontrols 1.0
 import imtguigql 1.0
 import imtdocgui 1.0
 import controlsgalleryContactInfosSdl 1.0
-import controlsgalleryContactInfoCollectionDocumentManagerSdl 1.0
-import imtbaseCollectionDocumentManagerSdl 1.0
+import controlsgalleryContactInfoCollectionDocumentServiceSdl 1.0
+import imtbaseCollectionDocumentServiceSdl 1.0
 import imtbaseUndoManagerSdl 1.0
 
 RemoteCollectionView {
@@ -116,7 +116,7 @@ RemoteCollectionView {
 
 					property DocumentId documentIdInput: DocumentId {}
 					property GqlSdlRequestSender getContactInfoRequest: GqlSdlRequestSender {
-						gqlCommandId: ControlsgalleryContactInfoCollectionDocumentManagerSdlCommandIds.s_getContactInfoEmailRepresentation
+						gqlCommandId: ControlsgalleryContactInfoCollectionDocumentServiceSdlCommandIds.s_getContactInfoEmailRepresentation
 						sdlObjectComp: Component {
 							ContactInfoData {
 								onFinished: {
@@ -133,7 +133,7 @@ RemoteCollectionView {
 
 					property UpdateContactInfoEmailInput updateContactInfoInput: UpdateContactInfoEmailInput {}
 					property GqlSdlRequestSender updateContactInfoRequest: GqlSdlRequestSender {
-						gqlCommandId: ControlsgalleryContactInfoCollectionDocumentManagerSdlCommandIds.s_updateContactInfoEmailFromRepresentation
+						gqlCommandId: ControlsgalleryContactInfoCollectionDocumentServiceSdlCommandIds.s_updateContactInfoEmailFromRepresentation
 						requestType: 1
 						sdlObjectComp: Component {
 							DocumentOperationStatus {
@@ -178,7 +178,7 @@ RemoteCollectionView {
 
 					property DocumentId documentIdInput: DocumentId {}
 					property GqlSdlRequestSender getContactInfoRequest: GqlSdlRequestSender {
-						gqlCommandId: ControlsgalleryContactInfoCollectionDocumentManagerSdlCommandIds.s_getContactInfoRepresentation
+						gqlCommandId: ControlsgalleryContactInfoCollectionDocumentServiceSdlCommandIds.s_getContactInfoRepresentation
 						sdlObjectComp: Component {
 							ContactInfoData {
 								onFinished: {
@@ -195,7 +195,7 @@ RemoteCollectionView {
 
 					property UpdateContactInfoInput updateContactInfoInput: UpdateContactInfoInput {}
 					property GqlSdlRequestSender updateContactInfoRequest: GqlSdlRequestSender {
-						gqlCommandId: ControlsgalleryContactInfoCollectionDocumentManagerSdlCommandIds.s_updateContactInfoFromRepresentation
+						gqlCommandId: ControlsgalleryContactInfoCollectionDocumentServiceSdlCommandIds.s_updateContactInfoFromRepresentation
 						requestType: 1
 						sdlObjectComp: Component {
 							DocumentOperationStatus {
