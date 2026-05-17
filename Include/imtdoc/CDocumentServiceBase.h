@@ -29,7 +29,7 @@ namespace imtdoc
 
 class CDocumentServiceBase:
 			protected imod::TMultiModelObserverBase<istd::IChangeable>,
-			virtual public imtdoc::IDocumentService
+			public imtdoc::IDocumentService
 {
 public:
 	CDocumentServiceBase();

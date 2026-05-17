@@ -3,7 +3,7 @@
 
 
 // ImtCore includes
-#include <imtdoc/CCollectionDocumentServiceBase.h>
+#include <imtdoc/TCollectionDocumentServiceWrap.h>
 #include <imtdoc/CDocumentServiceCompBase.h>
 
 
@@ -11,11 +11,10 @@ namespace imtdoc
 {
 
 
-class CCollectionDocumentServiceComp: public CDocumentServiceCompBase, public CCollectionDocumentServiceBase
+class CCollectionDocumentServiceComp: public TCollectionDocumentServiceWrap<CDocumentServiceCompBase>
 {
 public:
-	typedef CDocumentServiceCompBase BaseClass;
-	typedef CCollectionDocumentServiceBase BaseClass2;
+	typedef TCollectionDocumentServiceWrap<CDocumentServiceCompBase> BaseClass;
 
 	I_BEGIN_COMPONENT(CCollectionDocumentServiceComp)
 		I_REGISTER_INTERFACE(imtdoc::IDocumentService)
@@ -24,7 +23,7 @@ public:
 	I_END_COMPONENT
 
 protected:
-	// reimplemented (imtdoc::CCollectionDocumentServiceBase)
+	// reimplemented (imtdoc::TCollectionDocumentServiceWrap)
 	virtual imtbase::IObjectCollection* GetCollection() const override;
 
 	// reimplemented (imtdoc::CDocumentServiceBase)

@@ -9,7 +9,7 @@
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtgql/CGqlRequest.h>
-#include <imtdoc/CCollectionDocumentServiceBase.h>
+#include <imtdoc/TCollectionDocumentServiceWrap.h>
 #include <imtbasesdl/SDL/1.0/CPP/DocumentService.h>
 #include <imtbasesdl/SDL/1.0/CPP/UndoManager.h>
 
@@ -23,12 +23,16 @@ namespace UM = sdl::imtbase::UndoManager;
 
 
 template<class Base, class ColorCollectionDocumentServiceDefs>
-class TCollectionDocumentServiceCompBase : public Base, public imtdoc::CCollectionDocumentServiceBase
+class TCollectionDocumentServiceCompBase : public imtdoc::TCollectionDocumentServiceWrap<Base>
 {
 public:
-	typedef Base BaseClass;
-	typedef imtdoc::CCollectionDocumentServiceBase BaseClass2;
+	typedef imtdoc::TCollectionDocumentServiceWrap<Base> BaseClass;
 	typedef ColorCollectionDocumentServiceDefs Defs;
+
+	using OperationStatus = typename BaseClass::OperationStatus;
+	using DocumentList = typename BaseClass::DocumentList;
+	using DocumentListItem = typename BaseClass::DocumentListItem;
+	using DocumentInfo = typename BaseClass::DocumentInfo;
 
 	I_BEGIN_BASE_COMPONENT(TCollectionDocumentServiceCompBase)
 		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection ID", true, "CollectiondId");
@@ -80,14 +84,14 @@ protected:
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 
-	imtdoc::CCollectionDocumentServiceBase* GetNonConstThis() const;
+	BaseClass* GetNonConstThis() const;
 	int GetObjectFactoryIndex(const QByteArray& typeId) const;
 	QByteArray GetUserId(const ::imtgql::CGqlRequest& gqlRequest) const;
 
-	// reimplemented (imtdoc::CCollectionDocumentServiceBase)
+	// reimplemented (imtdoc::TCollectionDocumentServiceWrap)
 	virtual imtbase::IObjectCollection* GetCollection() const override;
-	virtual istd::IChangeableSharedPtr CreateObject(const QByteArray& typeId) const override;
-	virtual idoc::IUndoManagerSharedPtr CreateUndoManager() const override;
+	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId) const override;
+	virtual idoc::IUndoManagerUniquePtr CreateUndoManager() const override;
 
 	// reimplemented (::imtservergql::CPermissibleGqlRequestHandlerComp)
 	bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
@@ -119,11 +123,12 @@ inline void TCollectionDocumentServiceCompBase<Base, ColorCollectionDocumentServ
 // protected methods
 
 template<class Base, class ColorCollectionDocumentServiceDefs>
-inline imtdoc::CCollectionDocumentServiceBase* TCollectionDocumentServiceCompBase<
+inline typename TCollectionDocumentServiceCompBase<Base, ColorCollectionDocumentServiceDefs>::BaseClass*
+TCollectionDocumentServiceCompBase<
 			Base,
 			ColorCollectionDocumentServiceDefs>::GetNonConstThis() const
 {
-	return const_cast<imtdoc::CCollectionDocumentServiceBase*>(dynamic_cast<const imtdoc::CCollectionDocumentServiceBase*>(this));
+	return const_cast<BaseClass*>(static_cast<const BaseClass*>(this));
 }
 
 
@@ -158,7 +163,7 @@ inline QByteArray TCollectionDocumentServiceCompBase<Base, ColorCollectionDocume
 }
 
 
-// reimplemented (imtdoc::CCollectionDocumentServiceBase)
+// reimplemented (imtdoc::TCollectionDocumentServiceWrap)
 
 template<class Base, class ColorCollectionDocumentServiceDefs>
 inline imtbase::IObjectCollection* TCollectionDocumentServiceCompBase<Base, ColorCollectionDocumentServiceDefs>::
@@ -173,7 +178,7 @@ inline imtbase::IObjectCollection* TCollectionDocumentServiceCompBase<Base, Colo
 
 
 template<class Base, class ColorCollectionDocumentServiceDefs>
-inline istd::IChangeableSharedPtr TCollectionDocumentServiceCompBase<Base, ColorCollectionDocumentServiceDefs>::
+inline istd::IChangeableUniquePtr TCollectionDocumentServiceCompBase<Base, ColorCollectionDocumentServiceDefs>::
 			CreateObject(const QByteArray& typeId) const
 {
 	int index = GetObjectFactoryIndex(typeId);
@@ -187,7 +192,7 @@ inline istd::IChangeableSharedPtr TCollectionDocumentServiceCompBase<Base, Color
 
 
 template<class Base, class ColorCollectionDocumentServiceDefs>
-inline idoc::IUndoManagerSharedPtr TCollectionDocumentServiceCompBase<Base, ColorCollectionDocumentServiceDefs>::
+inline idoc::IUndoManagerUniquePtr TCollectionDocumentServiceCompBase<Base, ColorCollectionDocumentServiceDefs>::
 			CreateUndoManager() const
 {
 	return m_undoManagerFactPtr.CreateInstance();
@@ -232,7 +237,7 @@ inline CDM::CDocumentList TCollectionDocumentServiceCompBase<Base, ColorCollecti
 	QByteArray userId = GetUserId(gqlRequest);
 
 	if (!userId.isEmpty()) {
-		DocumentList list = BaseClass2::GetOpenedDocumentList(userId);
+		DocumentList list = BaseClass::GetOpenedDocumentList(userId);
 		for (const DocumentInfo& info : list) {
 			CDM::CDocumentInfo sdlInfo;
 			sdlInfo.Version_1_0.emplace();
@@ -274,11 +279,11 @@ inline CDM::CDocumentInfo TCollectionDocumentServiceCompBase<Base, ColorCollecti
 		return retVal;
 	}
 
-	typename BaseClass2::TaskParams taskParams;
+	typename BaseClass::TaskParams taskParams;
 	taskParams.userId = userId;
 	taskParams.documentTypeId = *documentTypeId->typeId;
-	QByteArray taskId = GetNonConstThis()->BeginDocumentTask(BaseClass2::TT_NEW, taskParams);
-	typename BaseClass2::TaskResult taskResult = GetNonConstThis()->WaitForTaskFinished(taskId);
+	QByteArray taskId = GetNonConstThis()->BeginDocumentTask(BaseClass::TT_NEW, taskParams);
+	typename BaseClass::TaskResult taskResult = GetNonConstThis()->WaitForTaskFinished(taskId);
 	QByteArray documentId = taskResult.documentId;
 	if (documentId.isEmpty()) {
 		errorMessage = taskResult.errorMessage.isEmpty()
@@ -296,7 +301,7 @@ inline CDM::CDocumentInfo TCollectionDocumentServiceCompBase<Base, ColorCollecti
 	retVal.Version_1_0->hasNameProvider = false;
 	retVal.Version_1_0->isLoading = false;
 
-	DocumentList list = BaseClass2::GetOpenedDocumentList(userId);
+	DocumentList list = BaseClass::GetOpenedDocumentList(userId);
 	for (const DocumentListItem& docInfo : list) {
 		if (docInfo.documentId == documentId) {
 			retVal.Version_1_0->documentName = docInfo.name;
@@ -334,11 +339,11 @@ inline CDM::CDocumentInfo TCollectionDocumentServiceCompBase<Base, ColorCollecti
 		return retVal;
 	}
 
-	typename BaseClass2::TaskParams taskParams;
+	typename BaseClass::TaskParams taskParams;
 	taskParams.userId = userId;
 	taskParams.url = *objectId->id;
-	QByteArray taskId = GetNonConstThis()->BeginDocumentTask(BaseClass2::TT_OPEN, taskParams);
-	typename BaseClass2::TaskResult taskResult = GetNonConstThis()->WaitForTaskFinished(taskId);
+	QByteArray taskId = GetNonConstThis()->BeginDocumentTask(BaseClass::TT_OPEN, taskParams);
+	typename BaseClass::TaskResult taskResult = GetNonConstThis()->WaitForTaskFinished(taskId);
 	QByteArray documentId = taskResult.documentId;
 	if (documentId.isEmpty()) {
 		errorMessage = taskResult.errorMessage.isEmpty()
@@ -355,7 +360,7 @@ inline CDM::CDocumentInfo TCollectionDocumentServiceCompBase<Base, ColorCollecti
 	retVal.Version_1_0->hasNameProvider = false;
 	retVal.Version_1_0->isLoading = true;
 
-	DocumentList list = BaseClass2::GetOpenedDocumentList(userId);
+	DocumentList list = BaseClass::GetOpenedDocumentList(userId);
 	for (const DocumentListItem& docInfo : list) {
 		if (docInfo.documentId == documentId) {
 			retVal.Version_1_0->documentName = docInfo.name;
@@ -397,12 +402,12 @@ inline CDM::CDocumentOperationStatus TCollectionDocumentServiceCompBase<Base, Co
 
 	retVal.Version_1_0.emplace();
 
-	typename BaseClass2::TaskParams taskParams;
+	typename BaseClass::TaskParams taskParams;
 	taskParams.userId = userId;
 	taskParams.documentId = *documentId->id;
 	taskParams.documentName = QString();
-	QByteArray taskId = GetNonConstThis()->BeginDocumentTask(BaseClass2::TT_SAVE, taskParams);
-	typename BaseClass2::TaskResult taskResult = GetNonConstThis()->WaitForTaskFinished(taskId);
+	QByteArray taskId = GetNonConstThis()->BeginDocumentTask(BaseClass::TT_SAVE, taskParams);
+	typename BaseClass::TaskResult taskResult = GetNonConstThis()->WaitForTaskFinished(taskId);
 	QString saveErrorMessage = taskResult.errorMessage;
 	OperationStatus status = taskResult.status;
 	switch (status) {
@@ -487,11 +492,11 @@ inline CDM::CDocumentOperationStatus TCollectionDocumentServiceCompBase<Base, Co
 
 	retVal.Version_1_0.emplace();
 
-	typename BaseClass2::TaskParams taskParams;
+	typename BaseClass::TaskParams taskParams;
 	taskParams.userId = userId;
 	taskParams.documentId = *documentId->id;
-	QByteArray taskId = GetNonConstThis()->BeginDocumentTask(BaseClass2::TT_CLOSE, taskParams);
-	typename BaseClass2::TaskResult taskResult = GetNonConstThis()->WaitForTaskFinished(taskId);
+	QByteArray taskId = GetNonConstThis()->BeginDocumentTask(BaseClass::TT_CLOSE, taskParams);
+	typename BaseClass::TaskResult taskResult = GetNonConstThis()->WaitForTaskFinished(taskId);
 	OperationStatus status = taskResult.status;
 	switch (status) {
 	case imtdoc::ICollectionDocumentService::OS_OK:

@@ -17,7 +17,7 @@ namespace imtdoc
 {
 
 
-class CDocumentServiceCompBase: public ilog::CLoggerComponentBase, virtual public imtdoc::CDocumentServiceBase
+class CDocumentServiceCompBase: public ilog::CLoggerComponentBase, public imtdoc::CDocumentServiceBase
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
