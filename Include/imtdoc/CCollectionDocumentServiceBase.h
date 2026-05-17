@@ -17,13 +17,13 @@ namespace imtdoc
 class CCollectionDocumentServiceBase: virtual public CDocumentServiceBase
 {
 public:
-	// reimplemented (imtdoc::CDocumentServiceBase) — task dispatch
+	// reimplemented (imtdoc::CDocumentServiceBase)
 	virtual void DoCreateNewDocument(const QByteArray& taskId, const TaskParams& params) override;
 	virtual void DoOpenDocument(const QByteArray& taskId, const TaskParams& params) override;
 	virtual void DoSaveDocument(const QByteArray& taskId, const TaskParams& params) override;
 	virtual void DoCloseDocument(const QByteArray& taskId, const TaskParams& params) override;
 
-	// reimplemented (imtdoc::IDocumentService) — synchronous helpers
+	// reimplemented (imtdoc::IDocumentService)
 	virtual OperationStatus SetDocumentName(const QByteArray& userId, const QByteArray& documentId, const QString& documentName) override;
 
 protected:

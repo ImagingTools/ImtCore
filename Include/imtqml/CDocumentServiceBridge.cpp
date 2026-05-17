@@ -165,12 +165,12 @@ void CDocumentServiceBridge::OpenDocument(
 	const QByteArray taskId = mgrPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
 	const imtdoc::IDocumentService::TaskResult result = mgrPtr->WaitForTaskFinished(taskId);
 	if (result.status != imtdoc::IDocumentService::OS_OK || result.documentId.isEmpty()){
-		QString msg = result.errorMessage;
-		if (msg.isEmpty()){
-			msg = QStringLiteral("Failed to open document");
+		QString message = result.errorMessage;
+		if (message.isEmpty()){
+			message = QStringLiteral("Failed to open document");
 		}
-		PostToMainThread([cb = std::move(callback), msg = std::move(msg)]() mutable {
-				cb(OpenedDocumentInfo{}, msg);
+		PostToMainThread([cb = std::move(callback), message = std::move(message)]() mutable {
+				cb(OpenedDocumentInfo{}, message);
 			});
 		return;
 	}
@@ -209,12 +209,12 @@ void CDocumentServiceBridge::CreateDocument(
 	const QByteArray taskId = mgrPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_NEW, params);
 	const imtdoc::IDocumentService::TaskResult result = mgrPtr->WaitForTaskFinished(taskId);
 	if (result.status != imtdoc::IDocumentService::OS_OK || result.documentId.isEmpty()){
-		QString msg = result.errorMessage;
-		if (msg.isEmpty()){
-			msg = QStringLiteral("Failed to create document");
+		QString message = result.errorMessage;
+		if (message.isEmpty()){
+			message = QStringLiteral("Failed to create document");
 		}
-		PostToMainThread([cb = std::move(callback), msg = std::move(msg)]() mutable {
-				cb(OpenedDocumentInfo{}, msg);
+		PostToMainThread([cb = std::move(callback), message = std::move(message)]() mutable {
+				cb(OpenedDocumentInfo{}, message);
 			});
 		return;
 	}
@@ -254,12 +254,12 @@ void CDocumentServiceBridge::SaveDocument(
 	const QByteArray taskId = mgrPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, params);
 	const imtdoc::IDocumentService::TaskResult result = mgrPtr->WaitForTaskFinished(taskId);
 	const auto mapped = MapStatus(result.status);
-	QString msg = result.errorMessage;
-	if (msg.isEmpty() && result.status != imtdoc::IDocumentService::OS_OK){
-		msg = StatusToErrorMessage(result.status);
+	QString message = result.errorMessage;
+	if (message.isEmpty() && result.status != imtdoc::IDocumentService::OS_OK){
+		message = StatusToErrorMessage(result.status);
 	}
-	PostToMainThread([cb = std::move(callback), mapped, msg = std::move(msg)]() mutable {
-			cb(mapped, msg);
+	PostToMainThread([cb = std::move(callback), mapped, message = std::move(message)]() mutable {
+			cb(mapped, message);
 		});
 }
 
@@ -284,15 +284,15 @@ void CDocumentServiceBridge::CloseDocument(
 	params.documentId = documentId.toUtf8();
 	const QByteArray taskId = mgrPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_CLOSE, params);
 	const imtdoc::IDocumentService::TaskResult result = mgrPtr->WaitForTaskFinished(taskId);
-	QString msg;
+	QString message;
 	if (result.status != imtdoc::IDocumentService::OS_OK){
-		msg = result.errorMessage;
-		if (msg.isEmpty()){
-			msg = StatusToErrorMessage(result.status);
+		message = result.errorMessage;
+		if (message.isEmpty()){
+			message = StatusToErrorMessage(result.status);
 		}
 	}
-	PostToMainThread([cb = std::move(callback), msg = std::move(msg)]() mutable {
-			cb(msg);
+	PostToMainThread([cb = std::move(callback), message = std::move(message)]() mutable {
+			cb(message);
 		});
 }
 
@@ -351,12 +351,12 @@ void CDocumentServiceBridge::DoUndo(
 		return;
 	}
 	const bool ok = undoManagerPtr->DoUndo(steps);
-	QString msg;
+	QString message;
 	if (!ok){
-		msg = QStringLiteral("Undo failed");
+		message = QStringLiteral("Undo failed");
 	}
-	PostToMainThread([cb = std::move(callback), msg = std::move(msg)]() mutable {
-			cb(msg);
+	PostToMainThread([cb = std::move(callback), message = std::move(message)]() mutable {
+			cb(message);
 		});
 }
 
@@ -380,12 +380,12 @@ void CDocumentServiceBridge::DoRedo(
 		return;
 	}
 	const bool ok = undoManagerPtr->DoRedo(steps);
-	QString msg;
+	QString message;
 	if (!ok){
-		msg = QStringLiteral("Redo failed");
+		message = QStringLiteral("Redo failed");
 	}
-	PostToMainThread([cb = std::move(callback), msg = std::move(msg)]() mutable {
-			cb(msg);
+	PostToMainThread([cb = std::move(callback), message = std::move(message)]() mutable {
+			cb(message);
 		});
 }
 

@@ -24,11 +24,11 @@ namespace imtdoc
 {
 
 
-// reimplemented (imtdoc::CDocumentServiceBase) — task dispatch
+// reimplemented (imtdoc::CDocumentServiceBase)
 
 void CCollectionDocumentServiceBase::DoCreateNewDocument(
-	const QByteArray& taskId,
-	const TaskParams& params)
+			const QByteArray& taskId,
+			const TaskParams& params)
 {
 	QMutexLocker locker(&m_mutex);
 
@@ -54,8 +54,8 @@ void CCollectionDocumentServiceBase::DoCreateNewDocument(
 
 
 void CCollectionDocumentServiceBase::DoOpenDocument(
-	const QByteArray& taskId,
-	const TaskParams& params)
+			const QByteArray& taskId,
+			const TaskParams& params)
 {
 	const QUrl& url = params.url;
 	const QByteArray& userId = params.userId;
@@ -128,12 +128,12 @@ void CCollectionDocumentServiceBase::DoOpenDocument(
 			for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
 				if (handlerPtr != nullptr){
 					CDocumentOpenedEvent event(
-						userId,
-						documentId,
-						shared.typeId,
-						shared.name,
-						ObjectIdToUrl(objectId),
-						doc.isDirty);
+								userId,
+								documentId,
+								shared.typeId,
+								shared.name,
+								ObjectIdToUrl(objectId),
+								doc.isDirty);
 					handlerPtr->ProcessEvent(&event);
 				}
 			}
@@ -207,12 +207,12 @@ void CCollectionDocumentServiceBase::DoOpenDocument(
 	for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
 		if (handlerPtr != nullptr){
 			CDocumentOpenedEvent event(
-				userId,
-				documentId,
-				objectTypeId,
-				documentName,
-				ObjectIdToUrl(objectId),
-				false);
+						userId,
+						documentId,
+						objectTypeId,
+						documentName,
+						ObjectIdToUrl(objectId),
+						false);
 			handlerPtr->ProcessEvent(&event);
 		}
 	}
@@ -364,7 +364,10 @@ void CCollectionDocumentServiceBase::DoOpenDocument(
 }
 
 
-IDocumentService::OperationStatus CCollectionDocumentServiceBase::SetDocumentName(const QByteArray& userId, const QByteArray& documentId, const QString& documentName)
+IDocumentService::OperationStatus CCollectionDocumentServiceBase::SetDocumentName(
+			const QByteArray& userId,
+			const QByteArray& documentId,
+			const QString& documentName)
 {
 	QMutexLocker locker(&m_mutex);
 
@@ -417,12 +420,12 @@ IDocumentService::OperationStatus CCollectionDocumentServiceBase::SetDocumentNam
 				for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
 					if (handlerPtr != nullptr){
 						CDocumentRenamedEvent event(
-							pair.first,
-							pair.second,
-							dp->typeId,
-							dp->name,
-							ObjectIdToUrl(dp->objectId),
-							dp->isDirty);
+									pair.first,
+									pair.second,
+									dp->typeId,
+									dp->name,
+									ObjectIdToUrl(dp->objectId),
+									dp->isDirty);
 						handlerPtr->ProcessEvent(&event);
 					}
 				}
@@ -441,12 +444,12 @@ IDocumentService::OperationStatus CCollectionDocumentServiceBase::SetDocumentNam
 	for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
 		if (handlerPtr != nullptr){
 			CDocumentRenamedEvent event(
-				userId,
-				documentId,
-				workingDocumentPtr->typeId,
-				workingDocumentPtr->name,
-				ObjectIdToUrl(workingDocumentPtr->objectId),
-				workingDocumentPtr->isDirty);
+						userId,
+						documentId,
+						workingDocumentPtr->typeId,
+						workingDocumentPtr->name,
+						ObjectIdToUrl(workingDocumentPtr->objectId),
+						workingDocumentPtr->isDirty);
 			handlerPtr->ProcessEvent(&event);
 		}
 	}
@@ -456,8 +459,8 @@ IDocumentService::OperationStatus CCollectionDocumentServiceBase::SetDocumentNam
 
 
 void CCollectionDocumentServiceBase::DoSaveDocument(
-	const QByteArray& taskId,
-	const TaskParams& params)
+			const QByteArray& taskId,
+			const TaskParams& params)
 {
 	const QByteArray& userId = params.userId;
 	const QByteArray& documentId = params.documentId;
@@ -568,12 +571,12 @@ void CCollectionDocumentServiceBase::DoSaveDocument(
 			for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
 				if (handlerPtr != nullptr){
 					CDocumentSavedAsEvent event(
-						userId,
-						documentId,
-						workingDocumentPtr->typeId,
-						workingDocumentPtr->name,
-						ObjectIdToUrl(workingDocumentPtr->objectId),
-						workingDocumentPtr->isDirty);
+								userId,
+								documentId,
+								workingDocumentPtr->typeId,
+								workingDocumentPtr->name,
+								ObjectIdToUrl(workingDocumentPtr->objectId),
+								workingDocumentPtr->isDirty);
 					handlerPtr->ProcessEvent(&event);
 				}
 			}
@@ -624,12 +627,12 @@ void CCollectionDocumentServiceBase::DoSaveDocument(
 					for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
 						if (handlerPtr != nullptr){
 							CDocumentSavedEvent event(
-								pair.first,
-								pair.second,
-								dp->typeId,
-								dp->name,
-								ObjectIdToUrl(dp->objectId),
-								dp->isDirty);
+										pair.first,
+										pair.second,
+										dp->typeId,
+										dp->name,
+										ObjectIdToUrl(dp->objectId),
+										dp->isDirty);
 							handlerPtr->ProcessEvent(&event);
 						}
 					}
@@ -653,12 +656,12 @@ void CCollectionDocumentServiceBase::DoSaveDocument(
 				for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
 					if (handlerPtr != nullptr){
 						CDocumentSavedEvent event(
-							userId,
-							documentId,
-							workingDocumentPtr->typeId,
-							workingDocumentPtr->name,
-							ObjectIdToUrl(workingDocumentPtr->objectId),
-							workingDocumentPtr->isDirty);
+									userId,
+									documentId,
+									workingDocumentPtr->typeId,
+									workingDocumentPtr->name,
+									ObjectIdToUrl(workingDocumentPtr->objectId),
+									workingDocumentPtr->isDirty);
 						handlerPtr->ProcessEvent(&event);
 					}
 				}
@@ -704,12 +707,12 @@ void CCollectionDocumentServiceBase::DoSaveDocument(
 		for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
 			if (handlerPtr != nullptr){
 				CDocumentSavedEvent event(
-					userId,
-					documentId,
-					workingDocumentPtr->typeId,
-					workingDocumentPtr->name,
-					ObjectIdToUrl(workingDocumentPtr->objectId),
-					workingDocumentPtr->isDirty);
+							userId,
+							documentId,
+							workingDocumentPtr->typeId,
+							workingDocumentPtr->name,
+							ObjectIdToUrl(workingDocumentPtr->objectId),
+							workingDocumentPtr->isDirty);
 				handlerPtr->ProcessEvent(&event);
 			}
 		}
@@ -722,23 +725,29 @@ void CCollectionDocumentServiceBase::DoSaveDocument(
 
 
 void CCollectionDocumentServiceBase::DoCloseDocument(
-	const QByteArray& taskId,
-	const TaskParams& params)
+			const QByteArray& taskId,
+			const TaskParams& params)
 {
 	QMutexLocker locker(&m_mutex);
 
 	m_proposedSourceDocumentIds.remove(params.documentId);
 
 	OperationStatus status = CloseDocumentInternal(params.userId, params.documentId);
-	QString msg;
+	QString message;
 	if (status != OS_OK){
 		switch (status){
-			case OS_INVALID_USER_ID:  msg = QStringLiteral("Invalid user ID"); break;
-			case OS_INVALID_DOCUMENT_ID: msg = QStringLiteral("Invalid document ID"); break;
-			default: msg = QStringLiteral("Close failed"); break;
+			case OS_INVALID_USER_ID:
+				message = QStringLiteral("Invalid user ID");
+				break;
+			case OS_INVALID_DOCUMENT_ID:
+				message = QStringLiteral("Invalid document ID");
+				break;
+			default:
+				message = QStringLiteral("Close failed");
+				break;
 		}
 	}
-	CompleteTask(taskId, TaskResult{status, params.documentId, msg});
+	CompleteTask(taskId, TaskResult{status, params.documentId, message});
 }
 
 

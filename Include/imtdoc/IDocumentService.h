@@ -170,10 +170,6 @@ public:
 	static const QByteArray CN_DOCUMENT_DATA_LOADED;
 	typedef DocumentNotification DocumentDataLoadedInfo;
 
-	// -----------------------------------------------------------------
-	// Asynchronous task API
-	// -----------------------------------------------------------------
-
 	/**
 		\brief Start an asynchronous document operation.
 
@@ -188,9 +184,9 @@ public:
 		                 failure.
 	*/
 	virtual QByteArray BeginDocumentTask(
-		TaskType taskType,
-		const TaskParams& params,
-		Error* errorPtr = nullptr) = 0;
+					TaskType taskType,
+					const TaskParams& params,
+					Error* errorPtr = nullptr) = 0;
 
 	/**
 		\brief Block until the task identified by \a taskId has finished.
@@ -206,10 +202,6 @@ public:
 		      thread.
 	*/
 	virtual TaskResult WaitForTaskFinished(const QByteArray& taskId) = 0;
-
-	// -----------------------------------------------------------------
-	// Synchronous query / mutate helpers
-	// -----------------------------------------------------------------
 
 	/**
 		Get a list of open document instances for a given user-ID
@@ -245,7 +237,9 @@ public:
 		Get UndoManager for the document with the given user-ID and document-ID
 	*/
 	virtual OperationStatus GetDocumentUndoManager(
-		const QByteArray& userId, const QByteArray& documentId, idoc::IUndoManager*& undoManagerPtr) const = 0;
+					const QByteArray& userId,
+					const QByteArray& documentId,
+					idoc::IUndoManager*& undoManagerPtr) const = 0;
 
 	/**
 		Register an observer for the document with the given user-ID and document-ID
