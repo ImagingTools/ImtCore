@@ -32,49 +32,38 @@ ElementView {
                 }
             }
 
-            BasicTreeView {
-                id: checkableTree
-
-                anchors.top: filterInput.bottom
-                anchors.topMargin: Style.marginM
-                anchors.left: parent.left
-                anchors.right: scrollIndicator.visible ? scrollIndicator.left : parent.right
-                height: Math.min(implicitHeight, root.maxTreeHeight)
-
-                showHeader: false
-                showToolbar: true
-                tristate: true
-
-                Component.onCompleted: root.treeView = checkableTree
-            }
-
-            Rectangle {
-                id: scrollIndicator
-
+            CustomScrollbar {
+                id: scrollbar
+                z: parent.z + 1
                 anchors.right: parent.right
                 anchors.top: checkableTree.top
-                anchors.bottom: checkableTree.bottom
+                anchors.bottom: parent.bottom
+                secondSize: Style.marginM
+                targetItem: flickable
+                radius: Style.radiusS
+            }
 
-                width: 6
-                visible: checkableTree.listView && checkableTree.listView.contentHeight > checkableTree.listView.height
-                color: "transparent"
+            Flickable {
+                id: flickable
+                anchors.fill: parent
+                contentWidth: checkableTree.width
+                contentHeight: checkableTree.implicitHeight + 2 * Style.marginXL
+                boundsBehavior: Flickable.StopAtBounds
 
-                Rectangle {
-                    id: scrollThumb
-
-                    property real viewRatio: checkableTree.listView ? Math.min(1.0, checkableTree.listView.height / Math.max(1, checkableTree.listView.contentHeight)) : 1.0
-                    property real viewPos: checkableTree.listView ? checkableTree.listView.contentY / Math.max(1, checkableTree.listView.contentHeight - checkableTree.listView.height) : 0
-
-                    width: parent.width
-                    height: Math.max(20, parent.height * viewRatio)
-                    y: Math.min(parent.height - height, Math.max(0, viewPos * (parent.height - height)))
-                    radius: 3
-                    color: scrollThumbMa.pressed ? Style.borderColor : scrollThumbMa.containsMouse ? Style.borderColor2 : Qt.rgba(0.6, 0.6, 0.6, 0.4)
-
-                    MouseArea {
-                        id: scrollThumbMa
-                        anchors.fill: parent
-                        hoverEnabled: true
+                BasicTreeView {
+                    id: checkableTree
+    
+                    anchors.top: filterInput.bottom
+                    anchors.topMargin: Style.marginM
+                    anchors.left: parent.left
+                    anchors.right: scrollbar.visible ? scrollbar.left : parent.right
+                    height: Math.min(implicitHeight, root.maxTreeHeight)
+    
+                    showHeader: false
+                    showToolbar: true
+                    tristate: true
+                    Component.onCompleted: {
+                        root.treeView = checkableTree
                     }
                 }
             }

@@ -93,7 +93,7 @@ Item {
                     height: Style.controlHeightM;
                     radius: Style.marginS;
                     color: root.currentIndex === model.index
-                        ? Style.highlightColor
+                        ? Style.selectedColor
                         : navMouseArea.containsMouse ? Style.buttonHoverColor : "transparent"
 
                     Row {
@@ -118,7 +118,7 @@ Item {
                             font.family: Style.fontFamily;
                             font.pixelSize: Style.fontSizeM;
                             font.bold: root.currentIndex === model.index;
-                            color: root.currentIndex === model.index ? Style.titleColor : Style.textColor;
+                            color: root.currentIndex === model.index ? Style.textSelectedColor : Style.textColor;
                             elide: Text.ElideRight;
                             width: parent.width - parent.anchors.leftMargin - parent.anchors.rightMargin - (model.icon ? Style.iconSizeS + parent.spacing : 0);
                         }
