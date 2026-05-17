@@ -547,6 +547,7 @@ DocumentViewBase {
 													id: chipRemoveBtn
 													visible: !memberDelegate.isPending && membersSelector.editable && membersSelector.nonRemovableIds.indexOf(modelData.userId) < 0
 													anchors.verticalCenter: parent.verticalCenter
+													tooltipText: qsTr("Remove member")
 													iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
 													decorator: Component {
 														ToolButtonDecorator {
@@ -564,6 +565,7 @@ DocumentViewBase {
 													visible: !memberDelegate.isPending && memberDelegate.isCurrentUser && !memberDelegate.isOwner && !chipRemoveBtn.visible
 													anchors.verticalCenter: parent.verticalCenter
 													text: qsTr("Leave")
+													tooltipText: qsTr("Leave this organization")
 													onClicked: {
 														container.__removeMemberById(modelData.userId)
 													}
@@ -573,6 +575,7 @@ DocumentViewBase {
 													id: transferOwnerBtn
 													visible: container.isOwner && !memberDelegate.isOwner && !memberDelegate.isPending
 													anchors.verticalCenter: parent.verticalCenter
+													tooltipText: qsTr("Transfer ownership")
 													iconSource: Style.getIconPath("Icons/Switch", Icon.State.On, Icon.Mode.Normal)
 													decorator: Component {
 														ToolButtonDecorator {
@@ -604,6 +607,7 @@ DocumentViewBase {
 													id: resendBtn
 													visible: container.isOwner
 													text: qsTr("Resend")
+													tooltipText: qsTr("Resend invitation")
 													onClicked: {
 														container.resendInvitationInput.m_invitationId = modelData.invitationId
 														container.resendInvitationSender.send(container.resendInvitationInput)
@@ -614,6 +618,7 @@ DocumentViewBase {
 													id: revokeBtn
 													visible: container.isOwner
 													text: qsTr("Revoke")
+													tooltipText: qsTr("Revoke invitation")
 													onClicked: {
 														container.revokeInvitationInput.m_invitationId = modelData.invitationId
 														container.revokeInvitationSender.send(container.revokeInvitationInput)

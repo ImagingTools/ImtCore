@@ -18,6 +18,7 @@ ElementView {
         FocusScope {
             width: root.contentWidth
             height: filterInput.height + Style.marginM + Math.min(checkableTree.implicitHeight, root.maxTreeHeight)
+            clip: true
 
             SearchTextInput {
                 id: filterInput
@@ -32,40 +33,32 @@ ElementView {
                 }
             }
 
+            BasicTreeView {
+                id: checkableTree
+
+                anchors.top: filterInput.bottom
+                anchors.topMargin: Style.marginM
+                anchors.left: parent.left
+                anchors.right: scrollbar.visible ? scrollbar.left : parent.right
+                height: Math.min(implicitHeight, root.maxTreeHeight)
+
+                showHeader: false
+                showToolbar: true
+                tristate: true
+                Component.onCompleted: {
+                    root.treeView = checkableTree
+                }
+            }
+
             CustomScrollbar {
                 id: scrollbar
-                z: parent.z + 1
+                z: 100
                 anchors.right: parent.right
                 anchors.top: checkableTree.top
                 anchors.bottom: parent.bottom
                 secondSize: Style.marginM
-                targetItem: flickable
+                targetItem: checkableTree.listView
                 radius: Style.radiusS
-            }
-
-            Flickable {
-                id: flickable
-                anchors.fill: parent
-                contentWidth: checkableTree.width
-                contentHeight: checkableTree.implicitHeight + 2 * Style.marginXL
-                boundsBehavior: Flickable.StopAtBounds
-
-                BasicTreeView {
-                    id: checkableTree
-    
-                    anchors.top: filterInput.bottom
-                    anchors.topMargin: Style.marginM
-                    anchors.left: parent.left
-                    anchors.right: scrollbar.visible ? scrollbar.left : parent.right
-                    height: Math.min(implicitHeight, root.maxTreeHeight)
-    
-                    showHeader: false
-                    showToolbar: true
-                    tristate: true
-                    Component.onCompleted: {
-                        root.treeView = checkableTree
-                    }
-                }
             }
         }
     }

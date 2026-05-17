@@ -76,6 +76,8 @@ Item {
     signal cellEditCanceled(var index, var column)
     signal nodeTextEdited(var index, string text, string oldText)
 
+    property alias listView: listView
+
     property var __nodes: ({})
     property var __rootKeys: []
     property var __expandedState: ({})
