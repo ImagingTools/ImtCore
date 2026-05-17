@@ -9,8 +9,8 @@ class MenuItem extends Item {
         action: { type: QVar, changed: '$actionChanged' },
         enabled: { type: QBool, value: true, changed: '$enabledChanged' },
         highlighted: { type: QBool, value: false },
-        checkable: { type: QBool, value: false },
-        checked: { type: QBool, value: false },
+        checkable: { type: QBool, value: false, changed: '$checkableChanged' },
+        checked: { type: QBool, value: false, changed: '$checkedChanged' },
         autoExclusive: { type: QBool, value: false },
         down: { type: QBool, value: false },
         subMenu: { type: QVar },
@@ -52,6 +52,12 @@ class MenuItem extends Item {
             transition: 'background-color 0.08s ease',
             pointerEvents: 'auto',
         })
+
+        // Checkmark indicator (visible when checkable && checked)
+        this.$checkIndicator = document.createElement('span')
+        this.$checkIndicator.style.cssText = 'width:16px;flex-shrink:0;text-align:center;font-size:14px;margin-right:4px;visibility:hidden;'
+        this.$checkIndicator.textContent = '\u2713' // ✓
+        this.getDom().appendChild(this.$checkIndicator)
 
         // Icon element (hidden by default, shown when icon.source is set)
         this.$iconImg = document.createElement('img')
@@ -103,8 +109,14 @@ class MenuItem extends Item {
             if (!this.getPropertyValue('enabled')) return
 
             if (this.getPropertyValue('checkable')){
-                let current = this.getPropertyValue('checked')
-                this.getProperty('checked').reset(!current)
+                let checkedProp = this.getProperty('checked')
+                // Only toggle manually if there's no binding (compute).
+                // When a binding exists (e.g. checked: id === currentTenantId),
+                // the onTriggered handler changes the source data and the binding
+                // re-evaluates automatically — manual toggle would break the binding.
+                if (!checkedProp.compute){
+                    checkedProp.reset(!checkedProp.get())
+                }
                 if (this.$signals.toggled) this.$signals.toggled()
             }
 
@@ -113,9 +125,18 @@ class MenuItem extends Item {
             let actionObj = this.getPropertyValue('action')
             if (actionObj && actionObj.trigger) actionObj.trigger()
 
+            // Close the entire menu hierarchy (dismiss walks up parent chain)
             let menuObj = this.getPropertyValue('menu')
-            if (menuObj && menuObj.close) menuObj.close()
+            if (menuObj && menuObj.dismiss) menuObj.dismiss()
+            else if (menuObj && menuObj.close) menuObj.close()
         })
+    }
+
+    $complete(){
+        super.$complete()
+        // Force initial evaluation of checked binding (compute may be pending)
+        this.getProperty('checked').updateOnce()
+        this.$updateCheckIndicator()
     }
 
     $textChanged(){
@@ -141,6 +162,16 @@ class MenuItem extends Item {
             this.setStyle({ opacity: '0.4', cursor: 'default' })
         }
     }
+
+    $updateCheckIndicator(){
+        if (!this.$checkIndicator) return
+        let checkable = this.getPropertyValue('checkable')
+        let checked = this.getPropertyValue('checked')
+        this.$checkIndicator.style.visibility = (checkable && checked) ? 'visible' : 'hidden'
+    }
+
+    $checkableChanged(){ this.$updateCheckIndicator() }
+    $checkedChanged(){ this.$updateCheckIndicator() }
 
     $iconChanged(){
         let icon = this.getProperty('icon')

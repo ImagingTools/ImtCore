@@ -107,7 +107,9 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter;
                             width: Style.iconSizeS;
                             height: Style.iconSizeS;
-                            source: model.icon ? "../../../" + Style.getIconPath(model.icon, Icon.State.On, Icon.Mode.Normal) : ""
+                            source: model.icon ? 
+                                        root.currentIndex === model.index ? "qrc:/" + Style.getIconPath(model.icon, Icon.State.On, Icon.Mode.Selected) : "qrc:/" + Style.getIconPath(model.icon, Icon.State.On, Icon.Mode.Normal) :
+                                        ""
                             sourceSize.width: width
                             sourceSize.height: height
                         }

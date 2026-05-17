@@ -66,15 +66,15 @@ class Loader extends Item {
             // })
             if(item instanceof Item){
                 item.getProperty('width').getNotify().connect(()=>{
-                    this.getProperty('width').setAuto(item.getPropertyValue('width'))
+                    this.getProperty('implicitWidth').set(item.getPropertyValue('width'))
                 })
                 item.getProperty('height').getNotify().connect(()=>{
-                    this.getProperty('height').setAuto(item.getPropertyValue('height'))
+                    this.getProperty('implicitHeight').set(item.getPropertyValue('height'))
                 })
                 // this.getProperty('x').setAuto(item.getPropertyValue('x'))
                 // this.getProperty('y').setAuto(item.getPropertyValue('y'))
-                this.getProperty('width').setAuto(item.getPropertyValue('width'))
-                this.getProperty('height').setAuto(item.getPropertyValue('height'))
+                this.getProperty('implicitWidth').set(item.getPropertyValue('width'))
+                this.getProperty('implicitHeight').set(item.getPropertyValue('height'))
             }
             
 
@@ -184,17 +184,17 @@ class Loader extends Item {
             // })
             if(item instanceof Item){
                 item.getProperty('width').getNotify().connect(()=>{
-                    this.getProperty('width').setAuto(item.getPropertyValue('width'))
+                    this.getProperty('implicitWidth').set(item.getPropertyValue('width'))
                 })
                 item.getProperty('height').getNotify().connect(()=>{
-                    this.getProperty('height').setAuto(item.getPropertyValue('height'))
+                    this.getProperty('implicitHeight').set(item.getPropertyValue('height'))
                 })
             }
             
             // this.getProperty('x').setAuto(item.getPropertyValue('x'))
             // this.getProperty('y').setAuto(item.getPropertyValue('y'))
-            this.getProperty('width').setAuto(item.getPropertyValue('width'))
-            this.getProperty('height').setAuto(item.getPropertyValue('height'))
+            this.getProperty('implicitWidth').set(item.getPropertyValue('width'))
+            this.getProperty('implicitHeight').set(item.getPropertyValue('height'))
             
 
             // while(updateList.length){

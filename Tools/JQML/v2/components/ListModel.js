@@ -80,26 +80,28 @@ class ListModel extends QtObject {
             this.getStatement('data').get().push(new QModelData(this, dict, this.getStatement('data').get().length))
 		}
         
-        this.getStatement('count').reset(this.getStatement('data').get().length)
+        let countProp = this.getStatement('count')
+        let oldCount = countProp.value
+        countProp.value = this.getStatement('data').get().length
         this.$emitDataChanged(this.getStatement('data').get().length-1, this.getStatement('data').get().length, 'append')
+        if(oldCount !== countProp.value) {
+            countProp.subscribersReset()
+            if(countProp.notify) countProp.notify()
+        }
     }
     clear(){
         let leftTop = 0
         let rightBottom = this.getStatement('data').get().length
         this.getStatement('data').value = []
 
-        this.getStatement('count').reset(0)
+        let countProp = this.getStatement('count')
+        let oldCount = countProp.value
+        countProp.value = 0
         this.$emitDataChanged(leftTop, rightBottom, 'remove')
-    }
-    replaceAll(items){
-        if(!Array.isArray(items)) items = []
-        let newData = []
-        for(let i = 0; i < items.length; i++){
-            newData.push(new QModelData(this, items[i], i))
+        if(oldCount !== 0) {
+            countProp.subscribersReset()
+            if(countProp.notify) countProp.notify()
         }
-        this.getStatement('data').value = newData
-        this.getStatement('count').reset(newData.length)
-        this.$emitDataChanged(0, newData.length, 'reset')
     }
     get(index){
         return index >= 0 && index < this.getStatement('data').get().length ? this.getStatement('data').get()[index] : undefined
@@ -111,7 +113,7 @@ class ListModel extends QtObject {
 
       
             for(let i = 0; i < dict.length; i++){
-                this.getStatement('data').get().splice(index, 0, new QModelData(this, dict[i], index+i))
+                this.getStatement('data').get().splice(index + i, 0, new QModelData(this, dict[i], index+i))
             }
 		} else {
             this.getStatement('data').get().splice(index, 0, new QModelData(this, dict, index))
@@ -122,8 +124,15 @@ class ListModel extends QtObject {
             data[i].index = i
         }
         
-        this.getStatement('count').reset(this.getStatement('data').get().length)
-        this.$emitDataChanged(index, index+1, 'insert')
+        let insertedCount = Array.isArray(dict) ? dict.length : 1
+        let countProp = this.getStatement('count')
+        let oldCount = countProp.value
+        countProp.value = data.length
+        this.$emitDataChanged(index, index + insertedCount, 'insert')
+        if(oldCount !== data.length) {
+            countProp.subscribersReset()
+            if(countProp.notify) countProp.notify()
+        }
     }
     set(index, dict){
         let data = this.getStatement('data').get()
@@ -141,7 +150,6 @@ class ListModel extends QtObject {
         } else {
             data[index] = new QModelData(this, dict, index)
         }
-        this.getStatement('count').reset(data.length)
         this.$emitDataChanged(index, index + 1, 'update')
     }
     move(from, to, n = 1){
@@ -152,7 +160,7 @@ class ListModel extends QtObject {
             data[i].index = i
         }
         
-        this.$emitDataChanged(from, from+n, 'move')
+        this.$emitDataChanged(Math.min(from, to), Math.max(from, to) + n, 'move')
     }
     remove(index, count = 1){
         this.getStatement('data').get().splice(index, count)
@@ -160,17 +168,18 @@ class ListModel extends QtObject {
         for(let i = index; i < data.length; i++){
             data[i].index = i
         }
-        this.getStatement('count').reset(this.getStatement('data').get().length)
+        let countProp = this.getStatement('count')
+        let oldCount = countProp.value
+        countProp.value = data.length
         
-        // for(let key in this.$deps){
-        //     this.$deps[key].$remove(index, count)
-        // }
-        // this.dataChanged(index, index+count)
         this.$emitDataChanged(index, index+count, 'remove')
+        if(oldCount !== data.length) {
+            countProp.subscribersReset()
+            if(countProp.notify) countProp.notify()
+        }
     }
     setProperty(index, property, value){
         this.getStatement('data').get()[index][property] = value
-        this.getStatement('count').reset(this.getStatement('data').get().length)
         this.$emitDataChanged(index, index + 1, 'update')
     }
 
@@ -184,17 +193,12 @@ class ListModel extends QtObject {
         
     }
     toJSON(){
-        let retVal = ''
-        if(this.count > 1){
-            retVal += '{'
-        } else {
-            retVal += '['
-        }
+        let retVal = '['
 
         for (var i = 0; i < this.count; i++){
             var modelObject = this.get(i)
             if (i > 0) retVal += ","
-            if (this.count > 1) retVal += "{"
+            retVal += "{"
 
             var j = 0;
             for (var property in modelObject) {
@@ -204,7 +208,7 @@ class ListModel extends QtObject {
                 retVal += "\"" + property + "\":"
                 var modelVal = modelObject[property]
                 if (modelVal === null)
-                    modelVal += "null"
+                    retVal += "null"
                 else if(typeof modelVal === 'object' && modelVal instanceof ListModel){
                     retVal += modelVal.toJSON()
                 }
@@ -216,14 +220,10 @@ class ListModel extends QtObject {
                 }else
                     retVal += modelVal
             }
-            if (this.count > 1) retVal += "}"
+            retVal += "}"
         }
 
-        if(this.count > 1){
-            retVal += '}'
-        } else {
-            retVal += ']'
-        }
+        retVal += ']'
         return retVal
     }
     

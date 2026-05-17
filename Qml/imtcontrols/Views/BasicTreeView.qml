@@ -41,9 +41,6 @@ Item {
 
     property string filterText: ""
     property string filterRole: "text"
-    property int filterDebounceInterval: 120
-
-    property bool showToolbar: false
 
     property int __hoveredRow: -1
 
@@ -76,8 +73,6 @@ Item {
     signal cellEditCanceled(var index, var column)
     signal nodeTextEdited(var index, string text, string oldText)
 
-    property alias listView: listView
-
     property var __nodes: ({})
     property var __rootKeys: []
     property var __expandedState: ({})
@@ -85,16 +80,17 @@ Item {
     property var __visibleKeys: []
     property var __visibleRowsByKey: ({})
     property int __selectedCount: 0
+    property string __lastAppliedFilter: ""
 
     property string __editingKey: ""
     property int __editingColumn: -1
     property var __editingOriginalValue: null
 
-    implicitHeight: (root.showToolbar ? toolbarRow.height : 0) + (root.showHeader ? root.headerHeight : 0) + visibleModel.count * root.rowHeight
+    height: (root.showHeader ? root.headerHeight : 0) + visibleModel.count * root.rowHeight
 
     Timer {
         id: filterDebounceTimer
-        interval: root.filterDebounceInterval
+        interval: 10
         repeat: false
         onTriggered: root.buildVisibleTree()
     }
@@ -118,84 +114,8 @@ Item {
     }
 
     Column {
-        width: parent.width
+        anchors.fill: parent
         spacing: 0
-
-        Row {
-            id: toolbarRow
-
-            width: parent.width
-            height: root.showToolbar ? 28 : 0
-            visible: root.showToolbar
-            spacing: Style.spacingM
-            leftPadding: Style.spacingS
-
-            Text {
-                text: qsTr("Expand All")
-                color: Style.linkColor
-                font.underline: toolbarExpandAllMa.containsMouse
-                verticalAlignment: Text.AlignVCenter
-                height: parent.height
-
-                MouseArea {
-                    id: toolbarExpandAllMa
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: root.expandAll()
-                }
-            }
-
-            Text {
-                text: qsTr("Collapse All")
-                color: Style.linkColor
-                font.underline: toolbarCollapseAllMa.containsMouse
-                verticalAlignment: Text.AlignVCenter
-                height: parent.height
-
-                MouseArea {
-                    id: toolbarCollapseAllMa
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: root.collapseAll()
-                }
-            }
-
-            Text {
-                text: qsTr("Check All")
-                color: Style.linkColor
-                font.underline: toolbarCheckAllMa.containsMouse
-                visible: root.tristate
-                verticalAlignment: Text.AlignVCenter
-                height: parent.height
-
-                MouseArea {
-                    id: toolbarCheckAllMa
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: root.checkAll()
-                }
-            }
-
-            Text {
-                text: qsTr("Uncheck All")
-                color: Style.linkColor
-                font.underline: toolbarUncheckAllMa.containsMouse
-                visible: root.tristate
-                verticalAlignment: Text.AlignVCenter
-                height: parent.height
-
-                MouseArea {
-                    id: toolbarUncheckAllMa
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: root.uncheckAll()
-                }
-            }
-        }
 
         Row {
             id: headerRow
@@ -243,7 +163,7 @@ Item {
             id: listView
 
             width: parent.width
-            height: visibleModel.count * root.rowHeight
+            height: parent.height - headerRow.height
 
             clip: true
             reuseItems: true
@@ -351,6 +271,9 @@ Item {
             property string nodeKey: model.key
             property int nodeLevel: model.level
             property bool nodeExpanded: model.expanded
+            onNodeExpandedChanged: {
+                console.log("onNodeExpandedChanged", nodeKey, nodeExpanded)
+            }
 
             property bool nodeHasChildren: model.hasChildren
             property bool nodeSelected: model.selected
@@ -568,21 +491,28 @@ Item {
     }
 
     function buildVisibleTree() {
-        visibleModel.clear()
+        var items = []
         __visibleKeys = []
         __visibleRowsByKey = ({})
 
         var ft = filterText.trim().toLowerCase()
 
         if (ft.length > 0) {
-            buildFilteredVisible(ft)
+            var filterChanged = ft !== __lastAppliedFilter
+            __lastAppliedFilter = ft
+            buildFilteredVisible(ft, items, filterChanged)
         } else {
+            __lastAppliedFilter = ""
             for (var i = 0; i < __rootKeys.length; ++i) {
                 var rootNode = __nodes[__rootKeys[i]]
                 if (rootNode)
-                    appendVisibleBranch(rootNode)
+                    appendVisibleBranch(rootNode, items)
             }
         }
+
+        visibleModel.clear()
+        if (items.length > 0)
+            visibleModel.append(items)
     }
 
     function nodeMatchesFilter(node, ft) {
@@ -590,9 +520,7 @@ Item {
         return value !== undefined && value !== null && String(value).toLowerCase().indexOf(ft) >= 0
     }
 
-    function buildFilteredVisible(ft) {
-        // Single DFS pass: post-order traversal marks subtrees that match,
-        // then pre-order append of marked nodes
+    function buildFilteredVisible(ft, items, autoExpand) {
         var matchMap = {}
 
         let markMatches = function(nodeKey) {
@@ -617,23 +545,40 @@ Item {
         for (var r = 0; r < __rootKeys.length; ++r)
             markMatches(__rootKeys[r])
 
+        // When the filter text just changed, auto-expand ancestors of matches
+        if (autoExpand) {
+            for (var ek in matchMap) {
+                var en = __nodes[ek]
+                if (!en || en.expanded) continue
+                for (var ci = 0; ci < en.childrenKeys.length; ++ci) {
+                    if (matchMap[en.childrenKeys[ci]]) {
+                        en.expanded = true
+                        __expandedState[ek] = true
+                        break
+                    }
+                }
+            }
+        }
+
         let appendMarked = function(nodeKey) {
             if (!matchMap[nodeKey])
                 return
             var node = __nodes[nodeKey]
             if (!node)
                 return
-            appendVisibleNode(node)
-            for (var i = 0; i < node.childrenKeys.length; ++i)
-                appendMarked(node.childrenKeys[i])
+            appendVisibleNode(node, items)
+            if (node.expanded) {
+                for (var i = 0; i < node.childrenKeys.length; ++i)
+                    appendMarked(node.childrenKeys[i])
+            }
         }
 
         for (var j = 0; j < __rootKeys.length; ++j)
             appendMarked(__rootKeys[j])
     }
 
-    function appendVisibleBranch(node) {
-        appendVisibleNode(node)
+    function appendVisibleBranch(node, items) {
+        appendVisibleNode(node, items)
 
         if (!node.expanded)
             return
@@ -641,15 +586,15 @@ Item {
         for (var i = 0; i < node.childrenKeys.length; ++i) {
             var child = __nodes[node.childrenKeys[i]]
             if (child)
-                appendVisibleBranch(child)
+                appendVisibleBranch(child, items)
         }
     }
 
-    function appendVisibleNode(node) {
+    function appendVisibleNode(node, items) {
         var row = __visibleKeys.length
         __visibleKeys.push(node.key)
         __visibleRowsByKey[node.key] = row
-        visibleModel.append(toVisibleObject(node))
+        items.push(toVisibleObject(node))
     }
 
     function toVisibleObject(node) {
@@ -884,6 +829,7 @@ Item {
         return -1
     }
 
+    
     function toggleExpanded(keyValue) {
         var node = __nodes[keyValue]
         if (!node || node.childrenKeys.length <= 0)
@@ -899,26 +845,33 @@ Item {
         if (!node || node.expanded)
             return
 
+        node.expanded = true
+        __expandedState[keyValue] = true
+        if (node.sourceItem) node.sourceItem.expanded = true
+
+        if (filterText.trim().length > 0) {
+            buildVisibleTree()
+            return
+        }
+
         var row = visibleRowOf(keyValue)
         if (row < 0)
             return
 
-        node.expanded = true
-        __expandedState[keyValue] = true
-        writeBackNode(node)
         visibleModel.setProperty(row, "expanded", true)
 
         var inserted = []
         flattenExpanded(node, inserted)
-        var insertIndex = row + 1
-
-        for (var i = 0; i < inserted.length; ++i) {
-            var child = inserted[i]
-            __visibleKeys.splice(insertIndex + i, 0, child.key)
-            visibleModel.insert(insertIndex + i, toVisibleObject(child))
+        if (inserted.length > 0) {
+            var insertIndex = row + 1
+            var insertObjects = []
+            for (var i = 0; i < inserted.length; ++i) {
+                __visibleKeys.splice(insertIndex + i, 0, inserted[i].key)
+                insertObjects.push(toVisibleObject(inserted[i]))
+            }
+            visibleModel.insert(insertIndex, insertObjects)
+            rebuildVisibleRowsFrom(insertIndex)
         }
-
-        rebuildVisibleRowsFrom(insertIndex)
     }
 
     function collapseNode(keyValue) {
@@ -926,13 +879,19 @@ Item {
         if (!node || !node.expanded)
             return
 
+        node.expanded = false
+        __expandedState[keyValue] = false
+        if (node.sourceItem) node.sourceItem.expanded = false
+
+        if (filterText.trim().length > 0) {
+            buildVisibleTree()
+            return
+        }
+
         var row = visibleRowOf(keyValue)
         if (row < 0)
             return
 
-        node.expanded = false
-        __expandedState[keyValue] = false
-        writeBackNode(node)
         visibleModel.setProperty(row, "expanded", false)
 
         var removeCount = countVisibleDescendants(node)
@@ -950,9 +909,10 @@ Item {
     function expandAll() {
         for (var nodeKey in __nodes) {
             var node = __nodes[nodeKey]
-            if (node && node.childrenKeys.length > 0) {
+            if (node && node.childrenKeys.length > 0 && !node.expanded) {
                 node.expanded = true
                 __expandedState[nodeKey] = true
+                if (node.sourceItem) node.sourceItem.expanded = true
             }
         }
         buildVisibleTree()
@@ -961,9 +921,10 @@ Item {
     function collapseAll() {
         for (var nodeKey in __nodes) {
             var node = __nodes[nodeKey]
-            if (node && node.childrenKeys.length > 0) {
+            if (node && node.expanded) {
                 node.expanded = false
                 __expandedState[nodeKey] = false
+                if (node.sourceItem) node.sourceItem.expanded = false
             }
         }
         buildVisibleTree()
@@ -1402,7 +1363,8 @@ Item {
                 writeBackNode(node)
             }
         }
-        syncAllVisibleChecked()
+        for (var i = 0; i < __visibleKeys.length; ++i)
+            syncVisibleNode(__visibleKeys[i])
         checkedItemsChanged()
     }
 
@@ -1414,16 +1376,9 @@ Item {
                 writeBackNode(node)
             }
         }
-        syncAllVisibleChecked()
+        for (var i = 0; i < __visibleKeys.length; ++i)
+            syncVisibleNode(__visibleKeys[i])
         checkedItemsChanged()
-    }
-
-    function syncAllVisibleChecked() {
-        for (var i = 0; i < __visibleKeys.length; ++i) {
-            var node = __nodes[__visibleKeys[i]]
-            if (node)
-                visibleModel.setProperty(i, "checked", node.checked)
-        }
     }
 
     function checkItem(key) {

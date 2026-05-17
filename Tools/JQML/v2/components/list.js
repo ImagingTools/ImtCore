@@ -59,6 +59,7 @@ module.exports.listComponents = [
     'GqlModel',
     'FileIO',
     'Flow',
+    'Instantiator',
     'BaseClass',
     'BaseModel',
     'DropArea',

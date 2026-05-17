@@ -15,50 +15,130 @@ ElementView {
     Component {
         id: treeViewComp
 
-        FocusScope {
+        Column {
             width: root.contentWidth
-            height: filterInput.height + Style.marginM + Math.min(checkableTree.implicitHeight, root.maxTreeHeight)
             clip: true
 
             SearchTextInput {
                 id: filterInput
 
-                anchors.top: parent.top
-                anchors.left: parent.left
-                anchors.right: parent.right
+                width: parent.width
                 placeHolderText: qsTr("Filter...")
 
                 onSearchChanged: {
                     checkableTree.filterText = filterInput.text
                 }
             }
+            
+            Row {
+                id: toolbarRow
+                width: parent.width
+                height: 28
+                spacing: Style.spacingM
+                leftPadding: Style.spacingS
 
-            BasicTreeView {
-                id: checkableTree
-
-                anchors.top: filterInput.bottom
-                anchors.topMargin: Style.marginM
-                anchors.left: parent.left
-                anchors.right: scrollbar.visible ? scrollbar.left : parent.right
-                height: Math.min(implicitHeight, root.maxTreeHeight)
-
-                showHeader: false
-                showToolbar: true
-                tristate: true
-                Component.onCompleted: {
-                    root.treeView = checkableTree
+                Text {
+                    text: qsTr("Expand All")
+                    color: Style.linkColor
+                    font.underline: toolbarExpandAllMa.containsMouse
+                    verticalAlignment: Text.AlignVCenter
+                    height: parent.height
+    
+                    MouseArea {
+                        id: toolbarExpandAllMa
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: checkableTree.expandAll()
+                    }
+                }
+    
+                Text {
+                    text: qsTr("Collapse All")
+                    color: Style.linkColor
+                    font.underline: toolbarCollapseAllMa.containsMouse
+                    verticalAlignment: Text.AlignVCenter
+                    height: parent.height
+    
+                    MouseArea {
+                        id: toolbarCollapseAllMa
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: checkableTree.collapseAll()
+                    }
+                }
+    
+                Text {
+                    text: qsTr("Check All")
+                    color: Style.linkColor
+                    font.underline: toolbarCheckAllMa.containsMouse
+                    visible: checkableTree.tristate
+                    verticalAlignment: Text.AlignVCenter
+                    height: parent.height
+    
+                    MouseArea {
+                        id: toolbarCheckAllMa
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: checkableTree.checkAll()
+                    }
+                }
+    
+                Text {
+                    text: qsTr("Uncheck All")
+                    color: Style.linkColor
+                    font.underline: toolbarUncheckAllMa.containsMouse
+                    visible: checkableTree.tristate
+                    verticalAlignment: Text.AlignVCenter
+                    height: parent.height
+    
+                    MouseArea {
+                        id: toolbarUncheckAllMa
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: checkableTree.uncheckAll()
+                    }
                 }
             }
 
-            CustomScrollbar {
-                id: scrollbar
-                z: 100
-                anchors.right: parent.right
-                anchors.top: checkableTree.top
-                anchors.bottom: parent.bottom
-                secondSize: Style.marginM
-                targetItem: checkableTree.listView
-                radius: Style.radiusS
+            Item {
+                id: treeContainer
+                width: parent.width
+                height: Math.min(checkableTree.height, root.maxTreeHeight)
+
+                Flickable {
+                    id: flickable
+                    anchors.fill: parent
+
+                    contentWidth: width
+                    contentHeight: checkableTree.height
+                    clip: true
+
+                    BasicTreeView {
+                        id: checkableTree
+                        width: flickable.width - (scrollbar.visible ? scrollbar.width : 0)
+
+                        showHeader: false
+                        tristate: true
+                        Component.onCompleted: {
+                            root.treeView = checkableTree
+                        }
+                    }
+                }
+
+                CustomScrollbar {
+                    id: scrollbar
+                    z: 100
+                    anchors.right: parent.right
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+                    secondSize: Style.marginM
+                    targetItem: flickable
+                    radius: Style.radiusS
+                }
             }
         }
     }

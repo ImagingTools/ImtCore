@@ -250,6 +250,11 @@ class ListView extends Flickable {
         }
     }
 
+    $isModelTransacting(){
+        let model = this.getPropertyValue('model')
+        return model && global.TransactionController && global.TransactionController.level > 0 && global.TransactionController.objects.has(model)
+    }
+
     $transaction(sender, changeset){
         if(changeset && sender === this.getPropertyValue('model')){
             let model = this.getPropertyValue('model')
@@ -281,6 +286,14 @@ class ListView extends Flickable {
                                 this.$createElement(i, info)
                             }
                         }
+                        // Update index statements for shifted items
+                        for(let i = bottomRight; i < this.$items.length; i++){
+                            if(this.$items[i]){
+                                let newIndex = i
+                                this.$items[i].getStatement('index').setCompute(()=>{return newIndex})
+                                this.$items[i].getStatement('index').update()
+                            }
+                        }
                         for(let i = bottomRight; i < this.$items.length; i++){
                             let info = this.$getItemInfo(i)
                             if(!info.inner && info.exist){
@@ -295,32 +308,38 @@ class ListView extends Flickable {
                         }
                     } else if(roles === 'remove'){
                         let removed = this.$items.splice(leftTop, bottomRight - leftTop)
-    
-                        if(this.$items[leftTop] && removed.length){
-                            this.$items[leftTop].getProperty('x').reset(removed[0].getPropertyValue('x'))
-                            this.$items[leftTop].getProperty('y').reset(removed[0].getPropertyValue('y'))
+
+                        let firstRemoved = removed.find(item => item !== undefined)
+                        if(this.$items[leftTop] && firstRemoved){
+                            this.$items[leftTop].getProperty('x').reset(firstRemoved.getPropertyValue('x'))
+                            this.$items[leftTop].getProperty('y').reset(firstRemoved.getPropertyValue('y'))
                         }
     
                         for(let item of removed){
                             this.$toCache(item)
-                        } 
+                        }
+
+                        // Update index statements for shifted items
+                        for(let i = leftTop; i < this.$items.length; i++){
+                            if(this.$items[i]){
+                                let newIndex = i
+                                this.$items[i].getStatement('index').setCompute(()=>{return newIndex})
+                                this.$items[i].getStatement('index').update()
+                            }
+                        }
                     }
                 }
                 if(roles === 'move'){
+                    let data = model.getPropertyValue('data')
                     for(let i = leftTop; i < bottomRight; i++){
-                        let from = i
-                        let to = this.$items[i].index
-        
-                        let fromItem = this.$items[from]
-                        let toItem = this.$items[to]
-        
-                        let toModel = this.getPropertyValue('model').getPropertyValue('data')[from]
-                        let fromModel = this.getPropertyValue('model').getPropertyValue('data')[to]
-        
-                        fromItem.model_ = toModel
-                        if(fromItem.model instanceof QModelData) fromItem.model = toModel
-                        toItem.model_ = fromModel
-                        if(toItem.model instanceof QModelData) toItem.model = fromModel
+                        let item = this.$items[i]
+                        if(item && data[i]){
+                            item.getStatement('model').reset(data[i])
+                            item.getStatement('model_').reset(data[i])
+                            let newIndex = i
+                            item.getStatement('index').setCompute(()=>{return newIndex})
+                            item.getStatement('index').update()
+                        }
                     }
                 }
                 if(roles === 'update'){
@@ -476,13 +495,18 @@ class ListView extends Flickable {
             return
         }
 
-        let firstIndex = 0
-        let lastIndex = 0
+        let firstIndex = -1
+        let lastIndex = -1
         
         for(let i = 0; i < length; i++){
-            if(this.$items[i] && !this.$items[i-1] && !firstIndex) firstIndex = i
-            if(this.$items[i] && !this.$items[i+1] && !lastIndex) lastIndex = i
+            if(this.$items[i]){
+                if(firstIndex < 0) firstIndex = i
+                lastIndex = i
+            }
         }
+
+        if(firstIndex < 0) firstIndex = 0
+        if(lastIndex < 0) lastIndex = 0
 
         let _firstIndex = -1
         let _lastIndex = -1
@@ -582,12 +606,28 @@ class ListView extends Flickable {
 
     $updateGeometry(){
         if(!this.$items.length) {
-            this.middleWidth = 0
-            this.middleHeight = 0
+            // Preserve middleHeight/middleWidth for subsequent $updateView calculations.
+            // But reset contentHeight/contentWidth and origin to 0 for empty model.
+            if(this.getPropertyValue('orientation') === ListView.Horizontal){
+                let contentWidthProperty = this.getProperty('contentWidth')
+                if(contentWidthProperty.value != 0){
+                    contentWidthProperty.value = 0
+                    contentWidthProperty.getNotify()()
+                }
+                this.getStatement('originX').reset(0)
+            } else {
+                let contentHeightProperty = this.getProperty('contentHeight')
+                if(contentHeightProperty.value != 0){
+                    contentHeightProperty.value = 0
+                    contentHeightProperty.getNotify()()
+                }
+                this.getStatement('originY').reset(0)
+            }
             return
         }
 
         let model = this.getPropertyValue('model')
+        let length = 0
         if(model instanceof ListModel){     
             length = model.getPropertyValue('count')
         } else if(Array.isArray(model)){
@@ -754,11 +794,13 @@ class ListView extends Flickable {
     $widthChanged(){
         super.$widthChanged()
 
+        if(this.$isModelTransacting()) return
         this.$updateView()
     }
     $heightChanged(){
         super.$heightChanged()
 
+        if(this.$isModelTransacting()) return
         this.$updateView()
     }
     $cacheBufferChanged(){
@@ -937,6 +979,14 @@ class ListView extends Flickable {
             }
 
             if(obj.$signals['ListView.reused']) obj.$signals['ListView.reused']()
+
+            if(obj instanceof Item) {
+                if(obj.getPropertyValue('width') <= 0 || obj.getPropertyValue('height') <= 0) {
+                    obj.setStyle({ visibility: 'hidden' })
+                } else {
+                    obj.setStyle({ visibility: 'visible' })
+                }
+            }
         } else {
             let delegateValue = this.getProperty('delegate').get()
 

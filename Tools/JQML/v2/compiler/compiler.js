@@ -1089,7 +1089,7 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
         if(tempInstruction.className === 'Loader'){
             isLoader = true
         }
-        if(tempInstruction.className === 'Loader' || tempInstruction.className === 'Repeater' || tempInstruction.className === 'ListView' || tempInstruction.className === 'GridView'){
+        if(tempInstruction.className === 'Loader' || tempInstruction.className === 'Repeater' || tempInstruction.className === 'ListView' || tempInstruction.className === 'GridView' || tempInstruction.className === 'Instantiator'){
             special = true
         }
         tempInstruction = tempInstruction.extends ? tempInstruction.extends.instructions : null
@@ -1375,7 +1375,7 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
             } else {
                 if(property.val.className !== 'Component'){  
                     // TEMP !!!
-                    if((property.name === 'delegate' && (currentInstructions.className === 'MapItemView'|| currentInstructions.className === 'ListView'|| currentInstructions.className === 'GridView' || currentInstructions.className === 'Repeater')) || (property.name === 'sourceComponent' && currentInstructions.className === 'Loader')){
+                    if((property.name === 'delegate' && (currentInstructions.className === 'MapItemView'|| currentInstructions.className === 'ListView'|| currentInstructions.className === 'GridView' || currentInstructions.className === 'Repeater' || currentInstructions.className === 'Instantiator')) || (property.name === 'sourceComponent' && currentInstructions.className === 'Loader')){
                         code.push(`${currentInstructions.name}.$temp = new Component(${currentInstructions.name}, inCtx)`)
 
                         code.push(`${currentInstructions.name}.$temp.createObject=function(currParent,exCtx1=inCtx,exModel,forceUpdate=true,exCtx2=inCtx){`)
