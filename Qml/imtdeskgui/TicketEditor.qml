@@ -11,7 +11,7 @@ import imtguigql 1.0
 import imtdocgui 1.0
 import imtcolgui 1.0
 import imtdeskImtDeskSdl 1.0
-import imtdeskTicketCollectionDocumentManagerSdl 1.0
+import imtdeskTicketCollectionDocumentServiceSdl 1.0
 import imtchatgui 1.0
 import Qt.labs.platform 1.1 as QLP
 

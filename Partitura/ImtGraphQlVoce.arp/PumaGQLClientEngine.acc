@@ -89,7 +89,7 @@
                                 <Value>DocumentRevision</Value>
                                 <Value>JwtSessionControllerProxy</Value>
                                 <Value>RemoteControllers</Value>
-                                <Value>RemoteCollectionDocumentManagerController</Value>
+                                <Value>RemoteCollectionDocumentServiceController</Value>
                                 <Value>RemoteTenantController</Value>
                                 <Value>RemoteProfileController</Value>
                                 <Value>JwtSessionControllerProxy</Value>
@@ -135,7 +135,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="RemoteCollectionDocumentManagerController" PackageId="ImtClientGqlPck" ComponentId="RemoteCollectionDocumentManagerController">
+        <Element Id="RemoteCollectionDocumentServiceController" PackageId="ImtClientGqlPck" ComponentId="RemoteCollectionDocumentServiceController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">

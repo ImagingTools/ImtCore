@@ -1,0 +1,9 @@
+{
+    "includes": [
+        "${PROLIFEDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/prolifesdl/SDL/1.0/QML/generation_info.json"
+    ],
+    "dirs": [
+        "${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseImtCollectionSdl",
+        "${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseImtBaseTypesSdl"
+    ]
+}

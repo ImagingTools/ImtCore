@@ -85,9 +85,9 @@ namespace imtcom
 	\subsection usage_document_management Document Management System
 	
 	\code{.cpp}
-	class DocumentManager : public QObject {
+	class DocumentService : public QObject {
 	public:
-	    DocumentManager(IFileTransfer* transfer, const QUrl& baseUrl)
+	    DocumentService(IFileTransfer* transfer, const QUrl& baseUrl)
 	        : m_transfer(transfer), m_baseUrl(baseUrl) {}
 	    
 	    bool UploadDocument(const QString& localPath, const QString& documentId) {

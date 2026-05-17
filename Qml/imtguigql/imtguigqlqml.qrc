@@ -30,7 +30,7 @@
         <file alias="imtguigql/GqlBasedDataModelProvider.qml">GqlBasedDataModelProvider.qml</file>
         <file alias="imtguigql/GqlBasedDataModelController.qml">GqlBasedDataModelController.qml</file>
         <file alias="imtguigql/GqlBasedOptionManager.qml">GqlBasedOptionManager.qml</file>
-	<file alias="imtguigql/GqlBasedCollectionDocumentManager.qml">GqlBasedCollectionDocumentManager.qml</file>
+	<file alias="imtguigql/GqlBasedCollectionDocumentService.qml">GqlBasedCollectionDocumentService.qml</file>
 	<file alias="imtguigql/GqlCollectionDocManagerPageView.qml">GqlCollectionDocManagerPageView.qml</file>
 	<file alias="imtguigql/GqlSingleDocCollectionPageView.qml">GqlSingleDocCollectionPageView.qml</file>
 	<file alias="imtguigql/RemoteCollectionViewDialog.qml">RemoteCollectionViewDialog.qml</file>

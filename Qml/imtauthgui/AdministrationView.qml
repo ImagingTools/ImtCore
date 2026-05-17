@@ -16,7 +16,7 @@ Item {
     signal multiPageUpdated();
 
 	property string productId: AuthorizationController.productId
-    property var documentManager: MainDocumentManager.getDocumentManager("Administration");
+    property var documentManager: MainDocumentService.getDocumentService("Administration");
 
     Component.onCompleted: {
         Events.subscribeEvent("OnLocalizationChanged", administrationContainer.onLocalizationChanged);
@@ -26,7 +26,7 @@ Item {
         Events.unSubscribeEvent("OnLocalizationChanged", administrationContainer.onLocalizationChanged);
     }
     
-    onDocumentManagerChanged: {
+    onDocumentServiceChanged: {
         if (documentManager){
             if (documentManager.activeView){
                 documentManager.activeView.visualStatusProvider = visualStatusProvider
@@ -117,9 +117,9 @@ Item {
         }
 
         Component.onCompleted: {
-            MainDocumentManager.registerDocumentManager("Administration/Roles", administrationContainer.documentManager)
-            MainDocumentManager.registerDocumentManager("Administration/Users", administrationContainer.documentManager)
-            MainDocumentManager.registerDocumentManager("Administration/Groups", administrationContainer.documentManager)
+            MainDocumentService.registerDocumentService("Administration/Roles", administrationContainer.documentManager)
+            MainDocumentService.registerDocumentService("Administration/Users", administrationContainer.documentManager)
+            MainDocumentService.registerDocumentService("Administration/Groups", administrationContainer.documentManager)
             
             updateModel();
         }
