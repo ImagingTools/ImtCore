@@ -588,7 +588,7 @@ void CCollectionDocumentServiceBase::DoSaveDocument(
 			locker.unlock();
 
 			{
-				QMutexLocker innerLocker(&m_mutex);
+				QMutexLocker locker(&m_mutex);
 				workingDocumentPtr = FindDocument(userId, documentId);
 				if (workingDocumentPtr != nullptr){
 					workingDocumentPtr->objectId = newObjectId;
@@ -649,7 +649,7 @@ void CCollectionDocumentServiceBase::DoSaveDocument(
 					locker.unlock();
 
 					{
-						QMutexLocker innerLocker(&m_mutex);
+						QMutexLocker locker(&m_mutex);
 						dp = FindDocument(pair.first, pair.second);
 						if (dp != nullptr){
 							dp->isDirty = false;
@@ -683,7 +683,7 @@ void CCollectionDocumentServiceBase::DoSaveDocument(
 				locker.unlock();
 
 				{
-					QMutexLocker innerLocker(&m_mutex);
+					QMutexLocker locker(&m_mutex);
 					workingDocumentPtr = FindDocument(userId, documentId);
 					if (workingDocumentPtr != nullptr){
 						if (!updatedName.isEmpty()){
@@ -739,7 +739,7 @@ void CCollectionDocumentServiceBase::DoSaveDocument(
 		locker.unlock();
 
 		{
-			QMutexLocker innerLocker(&m_mutex);
+			QMutexLocker locker(&m_mutex);
 			workingDocumentPtr = FindDocument(userId, documentId);
 			if (workingDocumentPtr != nullptr){
 				workingDocumentPtr->name = resultDocumentName;
