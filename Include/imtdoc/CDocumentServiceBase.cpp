@@ -155,8 +155,7 @@ IDocumentService::TaskResult CDocumentServiceBase::WaitForTaskFinished(const QBy
 
 // reimplemented (imtdoc::IDocumentService) — synchronous helpers
 
-IDocumentService::DocumentList CDocumentServiceBase::GetOpenedDocumentList(
-	const QByteArray& userId) const
+IDocumentService::DocumentList CDocumentServiceBase::GetOpenedDocumentList(const QByteArray& userId) const
 {
 	QMutexLocker locker(&m_mutex);
 
@@ -186,9 +185,7 @@ IDocumentService::DocumentList CDocumentServiceBase::GetOpenedDocumentList(
 
 // protected methods — task dispatch
 
-void CDocumentServiceBase::DoCreateNewDocument(
-	const QByteArray& taskId,
-	const TaskParams& params)
+void CDocumentServiceBase::DoCreateNewDocument(const QByteArray& taskId, const TaskParams& params)
 {
 	idoc::IUndoManagerSharedPtr undoManagerPtr = CreateUndoManager();
 	if (!undoManagerPtr.IsValid()) {
@@ -208,10 +205,10 @@ void CDocumentServiceBase::DoCreateNewDocument(
 	istd::IChangeable::ChangeSet changeSet(CF_NEW_DOCUMENT_CREATED);
 	changeSet.SetChangeInfo(CN_NEW_DOCUMENT_CREATED, QVariant::fromValue(info));
 
+	istd::CChangeNotifier notifier(this, &changeSet);
+
 	QString documentName;
 	{
-		istd::CChangeNotifier notifier(this, &changeSet);
-
 		QMutexLocker locker(&m_mutex);
 		WorkingDocument& doc = m_userDocuments[params.userId][documentId];
 		doc.typeId = params.documentTypeId;
@@ -225,12 +222,12 @@ void CDocumentServiceBase::DoCreateNewDocument(
 	for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
 		if (handlerPtr != nullptr){
 			CDocumentCreatedEvent event(
-				params.userId,
-				documentId,
-				params.documentTypeId,
-				documentName,
-				QUrl(),
-				false);
+						params.userId,
+						documentId,
+						params.documentTypeId,
+						documentName,
+						QUrl(),
+						false);
 			handlerPtr->ProcessEvent(&event);
 		}
 	}

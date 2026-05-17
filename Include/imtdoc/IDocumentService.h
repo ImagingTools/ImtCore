@@ -184,9 +184,9 @@ public:
 		                 failure.
 	*/
 	virtual QByteArray BeginDocumentTask(
-					TaskType taskType,
-					const TaskParams& params,
-					Error* errorPtr = nullptr) = 0;
+				TaskType taskType,
+				const TaskParams& params,
+				Error* errorPtr = nullptr) = 0;
 
 	/**
 		\brief Block until the task identified by \a taskId has finished.
@@ -237,9 +237,9 @@ public:
 		Get UndoManager for the document with the given user-ID and document-ID
 	*/
 	virtual OperationStatus GetDocumentUndoManager(
-					const QByteArray& userId,
-					const QByteArray& documentId,
-					idoc::IUndoManager*& undoManagerPtr) const = 0;
+				const QByteArray& userId,
+				const QByteArray& documentId,
+				idoc::IUndoManager*& undoManagerPtr) const = 0;
 
 	/**
 		Register an observer for the document with the given user-ID and document-ID
@@ -259,3 +259,5 @@ public:
 Q_DECLARE_METATYPE(imtdoc::IDocumentService::DocumentNotification);
 Q_DECLARE_METATYPE(imtdoc::IDocumentService::DocumentUndoRedoNotification);
 Q_DECLARE_METATYPE(imtdoc::IDocumentService::DocumentClosedNotification);
+
+
