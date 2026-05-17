@@ -8,7 +8,7 @@ ElementView {
     id: root
 
     property var treeView: null
-    property int maxTreeHeight: 350
+    property int maxTreeHeight: 500
 
     bottomComp: treeViewComp
 

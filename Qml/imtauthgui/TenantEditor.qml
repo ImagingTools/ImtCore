@@ -23,10 +23,10 @@ DocumentViewBase {
 	property bool __membersModifiedLocally: false
 
 	// Access: only Owner can edit, all others are readOnly (Leave button only)
-	readonly property bool __isOwner: container.tenantData && container.tenantData.m_ownerId && container.tenantData.m_currentUserId
+	readonly property bool isOwner: container.tenantData && container.tenantData.m_ownerId && container.tenantData.m_currentUserId
 		? container.tenantData.m_currentUserId === container.tenantData.m_ownerId
 		: false
-	readonly property bool __isReadOnly: !container.isNewTenant && !container.__isOwner
+	readonly property bool __isReadOnly: !container.isNewTenant && !container.isOwner
 
 	// Members list model used by the Repeater in Members page
 	property var __membersListModel: []
@@ -237,7 +237,7 @@ DocumentViewBase {
 			multiPageView.addPage("General", qsTr("General"), generalPageComp, "Icons/Settings")
 			if (!container.isNewTenant) {
 				multiPageView.addPage("Members", qsTr("Members"), membersPageComp, "Icons/MultipleUser")
-				if (container.__isOwner) {
+				if (container.isOwner) {
 					multiPageView.addPage("Permissions", qsTr("Permissions"), permissionsPageComp, "Icons/Role")
 				}
 			}
@@ -253,7 +253,7 @@ DocumentViewBase {
 		multiPageView.updatePages()
 	}
 
-	on__IsOwnerChanged: {
+	onIsOwnerChanged: {
 		if (!container.isNewTenant)
 			multiPageView.updatePages()
 	}
@@ -319,7 +319,7 @@ DocumentViewBase {
 
 							name: qsTr("Tenant Name")
 							placeHolderText: qsTr("Enter the tenant name")
-							readOnly: !container.__isOwner && !container.isNewTenant
+							readOnly: !container.isOwner && !container.isNewTenant
 
 							onEditingFinished: {
 								let oldText = container.tenantData ? container.tenantData.m_name : ""
@@ -337,7 +337,7 @@ DocumentViewBase {
 
 							name: qsTr("Description")
 							placeHolderText: qsTr("Enter the description")
-							readOnly: !container.__isOwner && !container.isNewTenant
+							readOnly: !container.isOwner && !container.isNewTenant
 
 							onEditingFinished: {
 								let oldText = container.tenantData ? container.tenantData.m_description : ""
@@ -354,7 +354,7 @@ DocumentViewBase {
 							id: isActiveInput
 
 							name: qsTr("Active")
-							readOnly: !container.__isOwner && !container.isNewTenant
+							readOnly: !container.isOwner && !container.isNewTenant
 
 							onCheckedChanged: {
 								container.doUpdateModel()
@@ -420,7 +420,7 @@ DocumentViewBase {
 						collectionId: "Users"
 						emptyText: qsTr("No members")
 						showCount: true
-						editable: container.__isOwner
+						editable: container.isOwner
 						nonRemovableIds: container.tenantData && container.tenantData.m_ownerId ? [container.tenantData.m_ownerId] : []
 
 						onItemRemoved: {
@@ -571,7 +571,7 @@ DocumentViewBase {
 
 												ToolButton {
 													id: transferOwnerBtn
-													visible: container.__isOwner && !memberDelegate.isOwner && !memberDelegate.isPending
+													visible: container.isOwner && !memberDelegate.isOwner && !memberDelegate.isPending
 													anchors.verticalCenter: parent.verticalCenter
 													iconSource: Style.getIconPath("Icons/Switch", Icon.State.On, Icon.Mode.Normal)
 													decorator: Component {
@@ -602,7 +602,7 @@ DocumentViewBase {
 
 												Button {
 													id: resendBtn
-													visible: container.__isOwner
+													visible: container.isOwner
 													text: qsTr("Resend")
 													onClicked: {
 														container.resendInvitationInput.m_invitationId = modelData.invitationId
@@ -612,7 +612,7 @@ DocumentViewBase {
 
 												Button {
 													id: revokeBtn
-													visible: container.__isOwner
+													visible: container.isOwner
 													text: qsTr("Revoke")
 													onClicked: {
 														container.revokeInvitationInput.m_invitationId = modelData.invitationId
