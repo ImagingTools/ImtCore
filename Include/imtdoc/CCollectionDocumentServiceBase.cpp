@@ -90,39 +90,61 @@ void CCollectionDocumentServiceBase::DoOpenDocument(
 
 	// Single-copy mode: check if this object is already opened by any user
 	if (IsSingleCopyMode()) {
-		QMutexLocker locker(&m_mutex);
-		if (m_sharedDocuments.contains(objectId)) {
-			SharedDocumentData& shared = m_sharedDocuments[objectId];
-			shared.refCount++;
+		bool isSharedDocument = false;
+		QByteArray sharedTypeId;
+		QString sharedName;
+		bool sharedIsLoading = false;
+		bool docIsDirty = false;
 
+		{
+			QMutexLocker locker(&m_mutex);
+			if (m_sharedDocuments.contains(objectId)) {
+				isSharedDocument = true;
+				SharedDocumentData& shared = m_sharedDocuments[objectId];
+				sharedTypeId = shared.typeId;
+				sharedName = shared.name;
+				sharedIsLoading = shared.isLoading;
+				docIsDirty = shared.undoManagerPtr.IsValid()
+					? (shared.undoManagerPtr->GetDocumentChangeFlag() != idoc::IDocumentStateComparator::DCF_EQUAL)
+					: false;
+			}
+		}
+
+		if (isSharedDocument) {
 			QByteArray documentId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
-			WorkingDocument& doc = m_userDocuments[userId][documentId];
-			doc.objectId = objectId;
-			doc.typeId = shared.typeId;
-			doc.url = url;
-			doc.name = shared.name;
-			doc.objectPtr = shared.objectPtr;
-			doc.undoManagerPtr = shared.undoManagerPtr;
-			doc.isDirty = shared.undoManagerPtr.IsValid()
-				? (shared.undoManagerPtr->GetDocumentChangeFlag() != idoc::IDocumentStateComparator::DCF_EQUAL)
-				: false;
-			doc.isLoading = shared.isLoading;
-			doc.undoManagerModelId = -1;
+			DocumentOpenedInfo info;
+			info.userId = userId;
+			info.documentId = documentId;
+			info.typeId = sharedTypeId;
+			info.url = url;
+			info.name = sharedName;
+			info.isDirty = docIsDirty;
+			info.isLoading = sharedIsLoading;
+
+			istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_OPENED);
+			changeSet.SetChangeInfo(CN_DOCUMENT_OPENED, QVariant::fromValue(info));
 
 			{
-				DocumentOpenedInfo info;
-				info.userId = userId;
-				info.documentId = documentId;
-				info.typeId = shared.typeId;
-				info.url = url;
-				info.name = shared.name;
-				info.isDirty = doc.isDirty;
-				info.isLoading = shared.isLoading;
-
-				istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_OPENED);
-				changeSet.SetChangeInfo(CN_DOCUMENT_OPENED, QVariant::fromValue(info));
 				istd::CChangeNotifier notifier(this, &changeSet);
+				{
+					QMutexLocker locker(&m_mutex);
+					if (m_sharedDocuments.contains(objectId)) {
+						SharedDocumentData& shared = m_sharedDocuments[objectId];
+						shared.refCount++;
+
+						WorkingDocument& doc = m_userDocuments[userId][documentId];
+						doc.objectId = objectId;
+						doc.typeId = shared.typeId;
+						doc.url = url;
+						doc.name = shared.name;
+						doc.objectPtr = shared.objectPtr;
+						doc.undoManagerPtr = shared.undoManagerPtr;
+						doc.isDirty = docIsDirty;
+						doc.isLoading = shared.isLoading;
+						doc.undoManagerModelId = -1;
+					}
+				}
 			}
 
 			for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
@@ -130,15 +152,15 @@ void CCollectionDocumentServiceBase::DoOpenDocument(
 					CDocumentOpenedEvent event(
 								userId,
 								documentId,
-								shared.typeId,
-								shared.name,
+								sharedTypeId,
+								sharedName,
 								ObjectIdToUrl(objectId),
-								doc.isDirty);
+								docIsDirty);
 					handlerPtr->ProcessEvent(&event);
 				}
 			}
 
-			if (!shared.isLoading) {
+			if (!sharedIsLoading) {
 				// Defer the notification to ensure the mutation response is sent
 				// to the client before the subscription notification arrives.
 				QByteArray deferredUserId = userId;
@@ -168,40 +190,40 @@ void CCollectionDocumentServiceBase::DoOpenDocument(
 
 	QString documentName = collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
 
-	{
-		QMutexLocker locker(&m_mutex);
-		WorkingDocument& doc = m_userDocuments[userId][documentId];
-		doc.objectId = objectId;
-		doc.typeId = objectTypeId;
-		doc.url = url;
-		doc.name = documentName;
-		doc.undoManagerPtr = undoManagerPtr;
-		doc.isDirty = false;
-		doc.isLoading = true;
+	DocumentOpenedInfo info;
+	info.userId = userId;
+	info.documentId = documentId;
+	info.typeId = objectTypeId;
+	info.url = url;
+	info.name = documentName;
+	info.isDirty = false;
+	info.isLoading = true;
 
-		if (IsSingleCopyMode()) {
-			SharedDocumentData& shared = m_sharedDocuments[objectId];
-			shared.typeId = objectTypeId;
-			shared.name = documentName;
-			shared.undoManagerPtr = undoManagerPtr;
-			shared.refCount = 1;
-			shared.isLoading = true;
-		}
-	}
+	istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_OPENED);
+	changeSet.SetChangeInfo(CN_DOCUMENT_OPENED, QVariant::fromValue(info));
 
 	{
-		DocumentOpenedInfo info;
-		info.userId = userId;
-		info.documentId = documentId;
-		info.typeId = objectTypeId;
-		info.url = url;
-		info.name = documentName;
-		info.isDirty = false;
-		info.isLoading = true;
-
-		istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_OPENED);
-		changeSet.SetChangeInfo(CN_DOCUMENT_OPENED, QVariant::fromValue(info));
 		istd::CChangeNotifier notifier(this, &changeSet);
+		{
+			QMutexLocker locker(&m_mutex);
+			WorkingDocument& doc = m_userDocuments[userId][documentId];
+			doc.objectId = objectId;
+			doc.typeId = objectTypeId;
+			doc.url = url;
+			doc.name = documentName;
+			doc.undoManagerPtr = undoManagerPtr;
+			doc.isDirty = false;
+			doc.isLoading = true;
+
+			if (IsSingleCopyMode()) {
+				SharedDocumentData& shared = m_sharedDocuments[objectId];
+				shared.typeId = objectTypeId;
+				shared.name = documentName;
+				shared.undoManagerPtr = undoManagerPtr;
+				shared.refCount = 1;
+				shared.isLoading = true;
+			}
+		}
 	}
 
 	for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
@@ -369,20 +391,29 @@ IDocumentService::OperationStatus CCollectionDocumentServiceBase::SetDocumentNam
 			const QByteArray& documentId,
 			const QString& documentName)
 {
-	QMutexLocker locker(&m_mutex);
+	QByteArray objectId;
+	QByteArray typeId;
+	bool isDirty = false;
 
-	OperationStatus validationStatus;
-	if (!ValidateInputParams(userId, documentId, validationStatus)){
-		return validationStatus;
+	{
+		QMutexLocker locker(&m_mutex);
+
+		OperationStatus validationStatus;
+		if (!ValidateInputParams(userId, documentId, validationStatus)){
+			return validationStatus;
+		}
+
+		WorkingDocument* workingDocumentPtr = &m_userDocuments[userId][documentId];
+
+		if (workingDocumentPtr->name == documentName){
+			return OS_OK;
+		}
+
+		objectId = workingDocumentPtr->objectId;
+		typeId = workingDocumentPtr->typeId;
+		isDirty = workingDocumentPtr->isDirty;
 	}
 
-	WorkingDocument* workingDocumentPtr = &m_userDocuments[userId][documentId];
-
-	if (workingDocumentPtr->name == documentName){
-		return OS_OK;
-	}
-
-	QByteArray objectId = workingDocumentPtr->objectId;
 	if (!objectId.isEmpty()){
 		imtbase::IObjectCollection* collectionPtr = GetCollection();
 		if (collectionPtr == nullptr){
@@ -394,51 +425,100 @@ IDocumentService::OperationStatus CCollectionDocumentServiceBase::SetDocumentNam
 		}
 	}
 
-	workingDocumentPtr->name = documentName;
-
+	// Shared docs: rename and notify each user sharing this object
 	if (IsSingleCopyMode() && !objectId.isEmpty()) {
-		if (m_sharedDocuments.contains(objectId)) {
-			m_sharedDocuments[objectId].name = documentName;
+		UserDocumentPairList sharedDocs;
+		{
+			QMutexLocker locker(&m_mutex);
+			if (m_sharedDocuments.contains(objectId)) {
+				m_sharedDocuments[objectId].name = documentName;
+			}
+			sharedDocs = FindDocumentsByObjectId(objectId);
 		}
 
-		UserDocumentPairList docs = FindDocumentsByObjectId(objectId);
-		for (const UserDocumentPair& pair : docs) {
+		for (const UserDocumentPair& pair : sharedDocs) {
 			if (pair.first == userId && pair.second == documentId) {
 				continue;
 			}
-			WorkingDocument* dp = FindDocument(pair.first, pair.second);
-			if (dp != nullptr) {
-				dp->name = documentName;
 
-				DocumentNotificationPtr notificationPtr = CreateDocumentNotification(pair.first, pair.second);
-				if (notificationPtr != nullptr){
-					istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_RENAMED);
-					changeSet.SetChangeInfo(CN_DOCUMENT_RENAMED, QVariant::fromValue(*notificationPtr));
-					istd::CChangeNotifier notifier(this, &changeSet);
+			QByteArray dpTypeId;
+			QByteArray dpObjectId;
+			bool dpIsDirty = false;
+			bool dpExists = false;
+
+			{
+				QMutexLocker locker(&m_mutex);
+				WorkingDocument* dp = FindDocument(pair.first, pair.second);
+				if (dp != nullptr) {
+					dpExists = true;
+					dpTypeId = dp->typeId;
+					dpObjectId = dp->objectId;
+					dpIsDirty = dp->isDirty;
 				}
+			}
 
-				for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
-					if (handlerPtr != nullptr){
-						CDocumentRenamedEvent event(
-									pair.first,
-									pair.second,
-									dp->typeId,
-									dp->name,
-									ObjectIdToUrl(dp->objectId),
-									dp->isDirty);
-						handlerPtr->ProcessEvent(&event);
+			if (!dpExists) {
+				continue;
+			}
+
+			DocumentNotification notification;
+			notification.userId = pair.first;
+			notification.documentId = pair.second;
+			notification.typeId = dpTypeId;
+			notification.url = ObjectIdToUrl(dpObjectId);
+			notification.name = documentName;
+			notification.isDirty = dpIsDirty;
+
+			istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_RENAMED);
+			changeSet.SetChangeInfo(CN_DOCUMENT_RENAMED, QVariant::fromValue(notification));
+
+			{
+				istd::CChangeNotifier notifier(this, &changeSet);
+				{
+					QMutexLocker locker(&m_mutex);
+					WorkingDocument* dp = FindDocument(pair.first, pair.second);
+					if (dp != nullptr) {
+						dp->name = documentName;
 					}
+				}
+			}
+
+			for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
+				if (handlerPtr != nullptr){
+					CDocumentRenamedEvent event(
+								pair.first,
+								pair.second,
+								dpTypeId,
+								documentName,
+								ObjectIdToUrl(dpObjectId),
+								dpIsDirty);
+					handlerPtr->ProcessEvent(&event);
 				}
 			}
 		}
 	}
 
-	DocumentNotificationPtr notificationPtr = CreateDocumentNotification(userId, documentId);
-	Q_ASSERT(notificationPtr != nullptr);
-	if (notificationPtr != nullptr){
-		istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_RENAMED);
-		changeSet.SetChangeInfo(CN_DOCUMENT_RENAMED, QVariant::fromValue(*notificationPtr));
+	// Primary doc: rename and notify
+	DocumentNotification notification;
+	notification.userId = userId;
+	notification.documentId = documentId;
+	notification.typeId = typeId;
+	notification.url = ObjectIdToUrl(objectId);
+	notification.name = documentName;
+	notification.isDirty = isDirty;
+
+	istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_RENAMED);
+	changeSet.SetChangeInfo(CN_DOCUMENT_RENAMED, QVariant::fromValue(notification));
+
+	{
 		istd::CChangeNotifier notifier(this, &changeSet);
+		{
+			QMutexLocker locker(&m_mutex);
+			WorkingDocument* workingDocumentPtr = FindDocument(userId, documentId);
+			if (workingDocumentPtr != nullptr) {
+				workingDocumentPtr->name = documentName;
+			}
+		}
 	}
 
 	for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
@@ -446,10 +526,10 @@ IDocumentService::OperationStatus CCollectionDocumentServiceBase::SetDocumentNam
 			CDocumentRenamedEvent event(
 						userId,
 						documentId,
-						workingDocumentPtr->typeId,
-						workingDocumentPtr->name,
-						ObjectIdToUrl(workingDocumentPtr->objectId),
-						workingDocumentPtr->isDirty);
+						typeId,
+						documentName,
+						ObjectIdToUrl(objectId),
+						isDirty);
 			handlerPtr->ProcessEvent(&event);
 		}
 	}
@@ -555,17 +635,34 @@ void CCollectionDocumentServiceBase::DoSaveDocument(
 				InitializeDocumentObservers(*workingDocumentPtr, userId);
 			}
 
-			workingDocumentPtr->objectId = newObjectId;
-			workingDocumentPtr->name = resultDocumentName;
-			workingDocumentPtr->isDirty = false;
-			workingDocumentPtr->undoManagerPtr->StoreDocumentState();
+			// Prepare notification with expected new state
+			QByteArray savedTypeId = workingDocumentPtr->typeId;
 
-			DocumentNotificationPtr notificationPtr = CreateDocumentNotification(userId, documentId);
-			Q_ASSERT(notificationPtr != nullptr);
-			if (notificationPtr != nullptr){
-				istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_SAVED_AS);
-				changeSet.SetChangeInfo(CN_DOCUMENT_SAVED_AS, QVariant::fromValue(*notificationPtr));
+			DocumentNotification notification;
+			notification.userId = userId;
+			notification.documentId = documentId;
+			notification.typeId = savedTypeId;
+			notification.url = ObjectIdToUrl(newObjectId);
+			notification.name = resultDocumentName;
+			notification.isDirty = false;
+
+			istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_SAVED_AS);
+			changeSet.SetChangeInfo(CN_DOCUMENT_SAVED_AS, QVariant::fromValue(notification));
+
+			locker.unlock();
+			{
 				istd::CChangeNotifier notifier(this, &changeSet);
+				{
+					locker.relock();
+					workingDocumentPtr = FindDocument(userId, documentId);
+					if (workingDocumentPtr != nullptr) {
+						workingDocumentPtr->objectId = newObjectId;
+						workingDocumentPtr->name = resultDocumentName;
+						workingDocumentPtr->isDirty = false;
+						workingDocumentPtr->undoManagerPtr->StoreDocumentState();
+					}
+					locker.unlock();
+				}
 			}
 
 			for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
@@ -573,10 +670,10 @@ void CCollectionDocumentServiceBase::DoSaveDocument(
 					CDocumentSavedAsEvent event(
 								userId,
 								documentId,
-								workingDocumentPtr->typeId,
-								workingDocumentPtr->name,
-								ObjectIdToUrl(workingDocumentPtr->objectId),
-								workingDocumentPtr->isDirty);
+								savedTypeId,
+								resultDocumentName,
+								ObjectIdToUrl(newObjectId),
+								false);
 					handlerPtr->ProcessEvent(&event);
 				}
 			}
@@ -612,16 +709,35 @@ void CCollectionDocumentServiceBase::DoSaveDocument(
 						continue;
 					}
 
-					dp->isDirty = false;
-					if (!updatedName.isEmpty()) {
-						dp->name = updatedName;
-					}
+					QByteArray dpTypeId = dp->typeId;
+					QByteArray dpObjectId = dp->objectId;
+					QString dpNewName = !updatedName.isEmpty() ? updatedName : dp->name;
 
-					DocumentNotificationPtr nPtr = CreateDocumentNotification(pair.first, pair.second);
-					if (nPtr != nullptr){
-						istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_SAVED);
-						changeSet.SetChangeInfo(CN_DOCUMENT_SAVED, QVariant::fromValue(*nPtr));
-						istd::CChangeNotifier notifier(this, &changeSet);
+					DocumentNotification dpNotification;
+					dpNotification.userId = pair.first;
+					dpNotification.documentId = pair.second;
+					dpNotification.typeId = dpTypeId;
+					dpNotification.url = ObjectIdToUrl(dpObjectId);
+					dpNotification.name = dpNewName;
+					dpNotification.isDirty = false;
+
+					istd::IChangeable::ChangeSet dpChangeSet(CF_DOCUMENT_SAVED);
+					dpChangeSet.SetChangeInfo(CN_DOCUMENT_SAVED, QVariant::fromValue(dpNotification));
+
+					locker.unlock();
+					{
+						istd::CChangeNotifier notifier(this, &dpChangeSet);
+						{
+							locker.relock();
+							dp = FindDocument(pair.first, pair.second);
+							if (dp != nullptr) {
+								dp->isDirty = false;
+								if (!updatedName.isEmpty()) {
+									dp->name = updatedName;
+								}
+							}
+							locker.unlock();
+						}
 					}
 
 					for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
@@ -629,28 +745,47 @@ void CCollectionDocumentServiceBase::DoSaveDocument(
 							CDocumentSavedEvent event(
 										pair.first,
 										pair.second,
-										dp->typeId,
-										dp->name,
-										ObjectIdToUrl(dp->objectId),
-										dp->isDirty);
+										dpTypeId,
+										dpNewName,
+										ObjectIdToUrl(dpObjectId),
+										false);
 							handlerPtr->ProcessEvent(&event);
 						}
 					}
+
+					locker.relock();
 				}
 			}
 			else {
-				if (!updatedName.isEmpty()) {
-					workingDocumentPtr->name = updatedName;
-				}
+				QByteArray savedTypeId = workingDocumentPtr->typeId;
+				QByteArray savedObjectId = workingDocumentPtr->objectId;
+				QString newName = !updatedName.isEmpty() ? updatedName : workingDocumentPtr->name;
 
-				workingDocumentPtr->isDirty = false;
+				DocumentNotification notification;
+				notification.userId = userId;
+				notification.documentId = documentId;
+				notification.typeId = savedTypeId;
+				notification.url = ObjectIdToUrl(savedObjectId);
+				notification.name = newName;
+				notification.isDirty = false;
 
-				DocumentNotificationPtr notificationPtr = CreateDocumentNotification(userId, documentId);
-				Q_ASSERT(notificationPtr != nullptr);
-				if (notificationPtr != nullptr){
-					istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_SAVED);
-					changeSet.SetChangeInfo(CN_DOCUMENT_SAVED, QVariant::fromValue(*notificationPtr));
+				istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_SAVED);
+				changeSet.SetChangeInfo(CN_DOCUMENT_SAVED, QVariant::fromValue(notification));
+
+				locker.unlock();
+				{
 					istd::CChangeNotifier notifier(this, &changeSet);
+					{
+						locker.relock();
+						workingDocumentPtr = FindDocument(userId, documentId);
+						if (workingDocumentPtr != nullptr) {
+							if (!updatedName.isEmpty()) {
+								workingDocumentPtr->name = updatedName;
+							}
+							workingDocumentPtr->isDirty = false;
+						}
+						locker.unlock();
+					}
 				}
 
 				for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
@@ -658,13 +793,15 @@ void CCollectionDocumentServiceBase::DoSaveDocument(
 						CDocumentSavedEvent event(
 									userId,
 									documentId,
-									workingDocumentPtr->typeId,
-									workingDocumentPtr->name,
-									ObjectIdToUrl(workingDocumentPtr->objectId),
-									workingDocumentPtr->isDirty);
+									savedTypeId,
+									newName,
+									ObjectIdToUrl(savedObjectId),
+									false);
 						handlerPtr->ProcessEvent(&event);
 					}
 				}
+
+				locker.relock();
 			}
 		}
 
@@ -673,7 +810,6 @@ void CCollectionDocumentServiceBase::DoSaveDocument(
 	}
 
 	// Create new object
-	// m_mutex is already held by the QMutexLocker above (acquired at function entry)
 	QByteArray proposedElementId;
 	{
 		auto it = m_proposedSourceDocumentIds.find(documentId);
@@ -692,16 +828,33 @@ void CCollectionDocumentServiceBase::DoSaveDocument(
 	}
 
 	if (!workingDocumentPtr->objectId.isEmpty()){
-		workingDocumentPtr->name = resultDocumentName;
-		workingDocumentPtr->isDirty = false;
-		workingDocumentPtr->undoManagerPtr->StoreDocumentState();
+		QByteArray savedTypeId = workingDocumentPtr->typeId;
+		QByteArray savedObjectId = workingDocumentPtr->objectId;
 
-		DocumentNotificationPtr notificationPtr = CreateDocumentNotification(userId, documentId);
-		Q_ASSERT(notificationPtr != nullptr);
-		if (notificationPtr != nullptr){
-			istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_SAVED);
-			changeSet.SetChangeInfo(CN_DOCUMENT_SAVED, QVariant::fromValue(*notificationPtr));
+		DocumentNotification notification;
+		notification.userId = userId;
+		notification.documentId = documentId;
+		notification.typeId = savedTypeId;
+		notification.url = ObjectIdToUrl(savedObjectId);
+		notification.name = resultDocumentName;
+		notification.isDirty = false;
+
+		istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_SAVED);
+		changeSet.SetChangeInfo(CN_DOCUMENT_SAVED, QVariant::fromValue(notification));
+
+		locker.unlock();
+		{
 			istd::CChangeNotifier notifier(this, &changeSet);
+			{
+				locker.relock();
+				workingDocumentPtr = FindDocument(userId, documentId);
+				if (workingDocumentPtr != nullptr) {
+					workingDocumentPtr->name = resultDocumentName;
+					workingDocumentPtr->isDirty = false;
+					workingDocumentPtr->undoManagerPtr->StoreDocumentState();
+				}
+				locker.unlock();
+			}
 		}
 
 		for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
@@ -709,14 +862,15 @@ void CCollectionDocumentServiceBase::DoSaveDocument(
 				CDocumentSavedEvent event(
 							userId,
 							documentId,
-							workingDocumentPtr->typeId,
-							workingDocumentPtr->name,
-							ObjectIdToUrl(workingDocumentPtr->objectId),
-							workingDocumentPtr->isDirty);
+							savedTypeId,
+							resultDocumentName,
+							ObjectIdToUrl(savedObjectId),
+							false);
 				handlerPtr->ProcessEvent(&event);
 			}
 		}
 
+		locker.relock();
 	}
 
 	OperationStatus saveStatus = workingDocumentPtr->objectId.isEmpty() ? OS_FAILED : OS_OK;

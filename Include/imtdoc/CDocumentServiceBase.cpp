@@ -198,8 +198,20 @@ void CDocumentServiceBase::DoCreateNewDocument(
 
 	QByteArray documentId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
+	NewDocumentCreatedInfo info;
+	info.userId = params.userId;
+	info.documentId = documentId;
+	info.typeId = params.documentTypeId;
+	info.name = "";
+	info.isDirty = false;
+
+	istd::IChangeable::ChangeSet changeSet(CF_NEW_DOCUMENT_CREATED);
+	changeSet.SetChangeInfo(CN_NEW_DOCUMENT_CREATED, QVariant::fromValue(info));
+
 	QString documentName;
 	{
+		istd::CChangeNotifier notifier(this, &changeSet);
+
 		QMutexLocker locker(&m_mutex);
 		WorkingDocument& doc = m_userDocuments[params.userId][documentId];
 		doc.typeId = params.documentTypeId;
@@ -208,19 +220,6 @@ void CDocumentServiceBase::DoCreateNewDocument(
 		doc.name = "";
 		doc.isLoading = true;
 		documentName = doc.name;
-	}
-
-	{
-		NewDocumentCreatedInfo info;
-		info.userId = params.userId;
-		info.documentId = documentId;
-		info.typeId = params.documentTypeId;
-		info.name = documentName;
-		info.isDirty = false;
-
-		istd::IChangeable::ChangeSet changeSet(CF_NEW_DOCUMENT_CREATED);
-		changeSet.SetChangeInfo(CN_NEW_DOCUMENT_CREATED, QVariant::fromValue(info));
-		istd::CChangeNotifier notifier(this, &changeSet);
 	}
 
 	for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
@@ -351,11 +350,28 @@ IDocumentService::OperationStatus CDocumentServiceBase::CloseDocumentInternal(
 	QString name;
 	bool isDirty = false;
 	WorkingDocument* workingDocumentPtr = nullptr;
+
 	{
 		QMutexLocker locker(&m_mutex);
 		OperationStatus validationStatus;
 		if (!ValidateInputParams(userId, documentId, validationStatus)){
 			return validationStatus;
+		}
+	}
+
+	DocumentClosedNotification notification;
+	notification.userId = userId;
+	notification.documentId = documentId;
+
+	istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_CLOSED);
+	changeSet.SetChangeInfo(CN_DOCUMENT_CLOSED, QVariant::fromValue(notification));
+
+	{
+		istd::CChangeNotifier notifier(this, &changeSet);
+
+		QMutexLocker locker(&m_mutex);
+		if (!m_userDocuments.contains(userId) || !m_userDocuments[userId].contains(documentId)){
+			return OS_INVALID_DOCUMENT_ID;
 		}
 
 		workingDocumentPtr = &m_userDocuments[userId][documentId];
@@ -391,16 +407,6 @@ IDocumentService::OperationStatus CDocumentServiceBase::CloseDocumentInternal(
 		if (m_userDocuments[userId].isEmpty()) {
 			m_userDocuments.remove(userId);
 		}
-	}
-
-	{
-		DocumentClosedNotification notification;
-		notification.userId = userId;
-		notification.documentId = documentId;
-
-		istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_CLOSED);
-		changeSet.SetChangeInfo(CN_DOCUMENT_CLOSED, QVariant::fromValue(notification));
-		istd::CChangeNotifier notifier(this, &changeSet);
 	}
 
 	for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
