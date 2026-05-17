@@ -19,34 +19,28 @@ DocumentViewBase {
 	property var pendingMembers: []
 	property var pendingInvitations: []
 	property bool isNewTenant: container.tenantData ? (!container.tenantData.m_id || container.tenantData.m_id === "") : true
-	readonly property int memberRoleRowMargin: Style.marginS
-	readonly property int totalMemberRoleRowMargin: container.memberRoleRowMargin * 2
 	// Guard: set when members are modified locally, prevents updateGui from overwriting
 	property bool __membersModifiedLocally: false
 
-	// Role-based access: determine current user's access level from ownerId and membership
+	// Access: only Owner can edit, all others are readOnly (Leave button only)
 	readonly property bool __isOwner: container.tenantData && container.tenantData.m_ownerId && container.tenantData.m_currentUserId
 		? container.tenantData.m_currentUserId === container.tenantData.m_ownerId
 		: false
-	readonly property bool __isOwnerOrAdmin: container.__isOwner
-		|| (container.__memberRolesMap && container.tenantData && container.tenantData.m_currentUserId
-			? container.__memberRolesMap[container.tenantData.m_currentUserId] === "Admin"
-			: false)
-	readonly property bool __isReadOnly: !container.isNewTenant && !container.__isOwnerOrAdmin
+	readonly property bool __isReadOnly: !container.isNewTenant && !container.__isOwner
 
-	// Explicit member-roles list model used by the Repeater in Members page
-	property var __memberRolesListModel: []
+	// Members list model used by the Repeater in Members page
+	property var __membersListModel: []
 
-	function __rebuildMemberRolesListModel() {
-		container.__memberRolesListModel = container.__buildMemberRolesModel()
+	function __rebuildMembersListModel() {
+		container.__membersListModel = container.__buildMembersModel()
 	}
 
 	onPendingMembersChanged: {
-		container.__rebuildMemberRolesListModel()
+		container.__rebuildMembersListModel()
 	}
 
 	onPendingInvitationsChanged: {
-		container.__rebuildMemberRolesListModel()
+		container.__rebuildMembersListModel()
 	}
 
 	function updateGui(){
@@ -79,21 +73,6 @@ DocumentViewBase {
 				}
 			}
 
-			// memberRoles: structured SDL list — use emplace/create/addElement API
-			if (!container.tenantData.hasMemberRoles()) {
-				container.tenantData.emplaceMemberRoles()
-			}
-			container.tenantData.m_memberRoles.clear()
-			var members = container.pendingMembers
-			for (var i = 0; i < members.length; i++) {
-				var entry = container.tenantData.createMemberRolesArrayElement()
-				if (entry) {
-					entry.m_userId = members[i].id
-					entry.m_role = container.__memberRolesMap[members[i].id] || ""
-					container.tenantData.m_memberRoles.addElement(entry)
-				}
-			}
-
 			// tenantPermissions: sync from permissions page
 			var permissionsPage = multiPageView.getPageById("Permissions")
 			if (permissionsPage)
@@ -120,7 +99,7 @@ DocumentViewBase {
 			}
 		}
 		container.pendingMembers = members
-		container.__loadMemberRolesFromModel()
+		container.__rebuildMembersListModel()
 	}
 
 	function __loadInvitationsFromModel() {
@@ -137,7 +116,6 @@ DocumentViewBase {
 						id: invitation.m_id || "",
 						userId: invitation.m_userId || "",
 						userName: invitation.m_userName || invitation.m_userId || "",
-						role: invitation.m_role || "",
 						status: invitation.m_status || "Pending",
 						invitedByUserId: invitation.m_invitedByUserId || "",
 						invitedByName: invitation.m_invitedByName || invitation.m_invitedByUserId || "",
@@ -189,83 +167,13 @@ DocumentViewBase {
 		return name ? name : id
 	}
 
-	// --- Member roles support ---
-	// Roles loaded via RoleCollectionDataProvider from Puma
-	RoleCollectionDataProvider {
-		id: roleCollectionDataProvider
-		productId: AuthorizationController.productId
-		Component.onCompleted: {
-			updateModel()
-		}
-	}
-
-	function __getAvailableRolesModel() {
-		return roleCollectionDataProvider.collectionModel
-	}
-
-	function __getRoleModelValue(rolesModel, index, key) {
-		if (!rolesModel || index < 0 || index >= rolesModel.getItemsCount())
-			return ""
-		var val = rolesModel.getData("m_" + key, index)
-		if (val !== undefined && val !== null)
-			return val || ""
-		val = rolesModel.getData(key, index)
-		if (val !== undefined && val !== null)
-			return val || ""
-		return ""
-	}
-
-	function __findRoleIndex(roleId) {
-		var roles = container.__getAvailableRolesModel()
-		if (!roles)
-			return -1
-
-		var count = roles.getItemsCount()
-		for (var i = 0; i < count; i++) {
-			var id = container.__getRoleModelValue(roles, i, "id")
-			var name = container.__getRoleModelValue(roles, i, "roleName")
-			if (id === roleId || name === roleId)
-				return i
-		}
-
-		return -1
-	}
-
-	// Map of userId -> role string (built from TenantData.memberRoles)
-	property var __memberRolesMap: ({})
-
-	function __loadMemberRolesFromModel() {
-		var rolesMap = {}
-		if (container.tenantData && container.tenantData.m_memberRoles) {
-			var roleEntries = container.tenantData.m_memberRoles
-			var count = roleEntries.count || 0
-			for (var i = 0; i < count; i++) {
-				var entry = roleEntries.get(i).item
-				if (entry && entry.m_userId) {
-					rolesMap[entry.m_userId] = entry.m_role || ""
-				}
-			}
-		}
-		container.__memberRolesMap = rolesMap
-		container.__rebuildMemberRolesListModel()
-	}
-
-	function __updateMemberRole(userId, newRole) {
-		var rolesMap = container.__memberRolesMap
-		rolesMap[userId] = newRole
-		container.__memberRolesMap = rolesMap
-		container.__rebuildMemberRolesListModel()
-		container.doUpdateModel()
-	}
-
-	function __buildMemberRolesModel() {
+	function __buildMembersModel() {
 		var result = []
 		var members = container.pendingMembers
 		for (var i = 0; i < members.length; i++) {
 			var userId = members[i].id
 			var userName = members[i].name || userId
-			var role = container.__memberRolesMap[userId] || ""
-			result.push({ userId: userId, userName: userName, role: role, isPending: false })
+			result.push({ userId: userId, userName: userName, isPending: false })
 		}
 		// Merge pending invitations into the same list
 		var invitations = container.pendingInvitations
@@ -275,7 +183,6 @@ DocumentViewBase {
 			result.push({
 				userId: inv.userId,
 				userName: inv.userName,
-				role: inv.role,
 				isPending: true,
 				invitationId: inv.id,
 				status: isExpired ? "Expired" : inv.status,
@@ -550,7 +457,7 @@ DocumentViewBase {
 								}
 
 								Repeater {
-									model: container.__memberRolesListModel
+									model: container.__membersListModel
 
 									delegate: Rectangle {
 										id: memberDelegate
