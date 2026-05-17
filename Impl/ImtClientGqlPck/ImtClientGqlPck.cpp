@@ -81,6 +81,11 @@ I_EXPORT_COMPONENT(
 			"Remote Object Collection Controller");
 
 I_EXPORT_COMPONENT(
+			RemoteCollectionDocumentServiceController,
+			"Remote collection document manager controller",
+			"Remote Collection Document Manager Controller");
+
+I_EXPORT_COMPONENT(
 			ObjectCollectionSubscriber,
 			"Object collection subscriber",
 			"Object Collection Subscriber");
@@ -92,5 +97,4 @@ I_EXPORT_COMPONENT(
 
 
 } // namespace ImtClientGqlPck
-
 

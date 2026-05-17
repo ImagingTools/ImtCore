@@ -33,6 +33,16 @@ void COperationContext::SetOperationOwnerId(const imtbase::IOperationContext::Id
 }
 
 
+void COperationContext::SetTenantId(const QByteArray& tenantId)
+{
+	if (m_tenantId != tenantId){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_tenantId = tenantId;
+	}
+}
+
+
 void COperationContext::SetOperationDescription(const QString& operationDescription)
 {
 	if (m_operationDescription != operationDescription){
@@ -48,6 +58,12 @@ void COperationContext::SetOperationDescription(const QString& operationDescript
 imtbase::IOperationContext::IdentifableObjectInfo COperationContext::GetOperationOwnerId() const
 {
 	return m_operationOwnerId;
+}
+
+
+QByteArray COperationContext::GetTenantId() const
+{
+	return m_tenantId;
 }
 
 

@@ -90,7 +90,20 @@ I_EXPORT_COMPONENT(
 			"OIDC token database delegate",
 			"OIDC Token Database Delegate");
 
+			TenantDatabaseDelegate,
+			"Tenant database delegate",
+			"Tenant Database Delegate");
+
+
+I_EXPORT_COMPONENT(
+			TenantMembershipDatabaseDelegate,
+			"SQL delegate for tenant memberships (hydration, INSERT/UPDATE/DELETE)",
+			"Tenant Membership Database Delegate");
+
+I_EXPORT_COMPONENT(
+			TenantInvitationDatabaseDelegate,
+			"SQL delegate for tenant invitations (hydration, INSERT/UPDATE/DELETE)",
+			"Tenant Invitation Database Delegate");
 
 } // namespace ImtAuthDbPck
-
 

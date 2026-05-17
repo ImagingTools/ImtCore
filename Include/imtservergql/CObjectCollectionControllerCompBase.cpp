@@ -2825,6 +2825,12 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 {
 	this->SetAdditionalFilters(gqlRequest, inputParamsGql, &filterParams);
 
+	// Inject optional tenant filter
+	imtauth::CTenantFilterParam* tenantFilterPtr = CreateTenantFilterParam(gqlRequest);
+	if (tenantFilterPtr != nullptr){
+		filterParams.SetEditableParameter("TenantFilter", tenantFilterPtr, true);
+	}
+
 	const imtgql::CGqlParamObject* complexFilterModelPtr = inputParamsGql.GetParamArgumentObjectPtr("filterModel");
 	const imtgql::CGqlParamObject* documentFilterModelPtr = inputParamsGql.GetParamArgumentObjectPtr("documentFilterModel");
 
@@ -2901,6 +2907,27 @@ void CObjectCollectionControllerCompBase::SetAdditionalFilters(
 			const imtgql::CGqlRequest& /*gqlRequest*/,
 			imtbase::CComplexCollectionFilter& /*complexFilter*/) const
 {
+}
+
+
+imtauth::CTenantFilterParam* CObjectCollectionControllerCompBase::CreateTenantFilterParam(
+			const imtgql::CGqlRequest& gqlRequest) const
+{
+	bool filterEnabled = m_tenantFilterEnabledAttrPtr.IsValid() ? *m_tenantFilterEnabledAttrPtr : false;
+	if (!filterEnabled){
+		return nullptr;
+	}
+
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr == nullptr){
+		return nullptr;
+	}
+
+	imtauth::CTenantFilterParam* tenantFilterPtr = new imtauth::CTenantFilterParam();
+	tenantFilterPtr->SetTenantId(gqlContextPtr->GetTenantId());
+	tenantFilterPtr->SetOwnerId(gqlContextPtr->GetUserId());
+
+	return tenantFilterPtr;
 }
 
 
@@ -3280,4 +3307,3 @@ bool CObjectCollectionControllerCompBase::CreateUserActionLog(
 
 
 } // namespace imtservergql
-

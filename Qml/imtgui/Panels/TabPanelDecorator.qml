@@ -102,8 +102,8 @@ DecoratorBase {
 				visible: false;
 
 				text: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.text : "";
-				font.family: tabPanelDecorator.baseElement.index === 0 ? Style.fontFamilyBold : Style.fontFamily;
-				font.bold: tabPanelDecorator.baseElement.index === 0;
+				font.family: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.pinned ? Style.fontFamilyBold : Style.fontFamily;
+				font.bold: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.pinned;
 				font.pixelSize: Style.fontSizeM;
 			}
 
@@ -111,14 +111,14 @@ DecoratorBase {
 				id: text;
 
 				anchors.verticalCenter: parent.verticalCenter;
-				anchors.horizontalCenter: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.index === 0 ||
+				anchors.horizontalCenter: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.pinned ||
 										  tabPanelDecorator.baseElement && textHelper.width < tabPanelDecorator.baseElement.minWidth ? parent.horizontalCenter : undefined;
 
-				width: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.index === 0 ? textHelper.width : parent.width;
+				width: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.pinned ? textHelper.width : parent.width;
 
 				color: Style.textColor;
-				font.family: tabPanelDecorator.baseElement.index === 0 ? Style.fontFamilyBold : Style.fontFamily;
-				font.bold: tabPanelDecorator.baseElement.index === 0;
+				font.family: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.pinned ? Style.fontFamilyBold : Style.fontFamily;
+				font.bold: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.pinned;
 				font.pixelSize: Style.fontSizeM;
 				text: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.text : "";
 
@@ -132,7 +132,7 @@ DecoratorBase {
 			anchors.verticalCenter: parent.verticalCenter;
 			width: Style.iconSizeS;
 			height: width;
-			visible: tabPanelDecorator.baseElement && !tabPanelDecorator.baseElement.firstElement && tabPanelDecorator.baseElement.isCloseEnable;
+			visible: tabPanelDecorator.baseElement && !tabPanelDecorator.baseElement.pinned && tabPanelDecorator.baseElement.isCloseEnable;
 			iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
 			decorator: Component {
 				ToolButtonDecorator {

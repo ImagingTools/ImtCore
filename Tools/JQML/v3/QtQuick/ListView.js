@@ -65,6 +65,7 @@ class ListView extends Flickable {
 
     __items = []
     __cache = []
+    __changeSet = []
 
     __middleWidth = 0
     __middleHeight = 0
@@ -152,6 +153,7 @@ class ListView extends Flickable {
 
     __clear() {
         this.blockSignals(true)
+        this.__changeSet = []
 
         let removed = this.__items
         this.__items = []
@@ -448,7 +450,11 @@ class ListView extends Flickable {
         }
     }
 
-    __updateView(changeSet) {
+    __updateChangedSet(changeSet) {
+        this.__changeSet.push(changeSet)
+    }
+
+    __updateView() {
         if (this.delegate && this.model && this.__completed) {
             this.__updating = true
             let length = 0
@@ -474,6 +480,21 @@ class ListView extends Flickable {
             }
 
             this.__self.count = length
+
+            let changeSet = this.__changeSet
+            this.__changeSet = []
+
+            if(changeSet.length > 0){
+                let i = 0
+                while(i < changeSet.length - 1){
+                    if(changeSet[i][0] === changeSet[i+1][0] && changeSet[i][1] === changeSet[i+1][1] && 
+                        (changeSet[i][2] === 'append' || changeSet[i][2] === 'insert') && changeSet[i+1][2] === 'remove'){
+                            changeSet.splice(i, 2)
+                    } else {
+                        i++
+                    }
+                }
+            }
 
             for (let change of changeSet) {
                 let leftTop = change[0]

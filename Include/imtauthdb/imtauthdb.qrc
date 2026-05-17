@@ -5,6 +5,9 @@
 	<file alias="CreateOidcClientsTable.sql">Resources/SQL/Postgres/CreateOidcClientsTable.sql</file>
 	<file alias="CreateOidcAuthCodesTable.sql">Resources/SQL/Postgres/CreateOidcAuthCodesTable.sql</file>
 	<file alias="CreateOidcTokensTable.sql">Resources/SQL/Postgres/CreateOidcTokensTable.sql</file>
+        <file alias="CreateTenantsTable.sql">Resources/SQL/Postgres/CreateTenantsTable.sql</file>
+        <file alias="CreateTenantMembershipsTable.sql">Resources/SQL/Postgres/CreateTenantMembershipsTable.sql</file>
+	<file alias="CreateTenantInvitationsTable.sql">Resources/SQL/Postgres/CreateTenantInvitationsTable.sql</file>
     </qresource>
     <qresource prefix="/SQL/SQLite">
         <file alias="CreatePersonalAccessTokenTable.sql">Resources/SQL/SQLite/CreatePersonalAccessTokenTable.sql</file>
@@ -12,5 +15,8 @@
 	<file alias="CreateOidcClientsTable.sql">Resources/SQL/SQLite/CreateOidcClientsTable.sql</file>
 	<file alias="CreateOidcAuthCodesTable.sql">Resources/SQL/SQLite/CreateOidcAuthCodesTable.sql</file>
 	<file alias="CreateOidcTokensTable.sql">Resources/SQL/SQLite/CreateOidcTokensTable.sql</file>
+        <file alias="CreateTenantsTable.sql">Resources/SQL/SQLite/CreateTenantsTable.sql</file>
+        <file alias="CreateTenantMembershipsTable.sql">Resources/SQL/SQLite/CreateTenantMembershipsTable.sql</file>
+	<file alias="CreateTenantInvitationsTable.sql">Resources/SQL/SQLite/CreateTenantInvitationsTable.sql</file>
     </qresource>
 </RCC>

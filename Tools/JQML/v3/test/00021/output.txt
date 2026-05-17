@@ -1,4 +1,0 @@
-inner.width (после fill): 400
-inner.height (после fill): 300
-parent.width: 400
-parent.height: 300

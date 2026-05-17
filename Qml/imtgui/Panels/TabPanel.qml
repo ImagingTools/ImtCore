@@ -9,7 +9,7 @@ Rectangle {
 	objectName: "TabPanel"
 	
 	width: list.width + externButtons.width;
-	height: Style.controlHeightL;
+	height: visible ? Style.controlHeightL : 0;
 	
 	color: Style.tabPanelBackgroundColor;
 

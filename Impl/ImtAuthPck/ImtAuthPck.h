@@ -54,6 +54,14 @@
 #include <imtauth/COidcAuthorizationCode.h>
 #include <imtauth/COidcTokenInfo.h>
 #include <imtauth/CRs256JwtTokenProviderComp.h>
+#include <imtauth/CTenantInfoComp.h>
+#include <imtauth/CTenantMetaInfoCreatorComp.h>
+#include <imtauth/CTenantManagerComp.h>
+#include <imtauth/CTenantMembershipComp.h>
+#include <imtauth/CTenantMembershipManagerComp.h>
+#include <imtauth/CTenantInvitationComp.h>
+#include <imtauth/CTenantInvitationManagerComp.h>
+#include <imtauth/CTenantDocumentNameProviderComp.h>
 
 
 namespace ImtAuthPck
@@ -162,8 +170,15 @@ typedef icomp::TModelCompWrap<
 						iser::ISerializable,
 						istd::IChangeable>> OidcTokenInfo;
 typedef imtauth::CRs256JwtTokenProviderComp Rs256JwtTokenProvider;
+typedef icomp::TModelCompWrap<imtauth::CTenantInfoComp> TenantInfo;
+typedef imtauth::CTenantMetaInfoCreatorComp TenantMetaInfoCreator;
+typedef imtauth::CTenantManagerComp TenantManager;
+typedef icomp::TModelCompWrap<imtauth::CTenantMembershipComp> TenantMembershipInfo;
+typedef icomp::TModelCompWrap<imtauth::CTenantMembershipManagerComp> TenantMembershipManager;
+typedef icomp::TModelCompWrap<imtauth::CTenantInvitationComp> TenantInvitationInfo;
+typedef icomp::TModelCompWrap<imtauth::CTenantInvitationManagerComp> TenantInvitationManager;
+typedef imtauth::CTenantDocumentNameProviderComp TenantDocumentNameProvider;
 
 
 } // namespace ImtAuthPck
-
 

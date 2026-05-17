@@ -85,7 +85,7 @@
         <Element Id="ContactInfoController" PackageId="ImtControlsGalleryVoce" ComponentId="ContactInfoController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="CollectionDocumentManager" Type="Reference" ExportId="CollectionDocumentManager">
+                    <AttributeInfo Id="CollectionDocumentService" Type="Reference" ExportId="CollectionDocumentService">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ContactInfoCollection" Type="Reference" ExportId="ContactInfoCollection">

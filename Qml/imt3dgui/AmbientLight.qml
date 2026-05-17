@@ -1,0 +1,11 @@
+/**
+ * \brief Web stub — QtQuick3D AmbientLight replacement for JQML.
+ *
+ * Property-only stub; on the desktop the real QtQuick3D type is used.
+ */
+import QtQuick 2.15
+
+Node3D {
+    property color color: "#ffffff"
+    property real brightness: 0.2
+}

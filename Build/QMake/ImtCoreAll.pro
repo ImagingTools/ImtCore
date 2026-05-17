@@ -33,6 +33,10 @@ SUBDIRS += ImtOasPck
 ImtOasPck.file = ../../Impl/ImtOasPck/QMake/ImtOasPck.pro
 ImtOasPck.depends = imtoas
 
+SUBDIRS += OasCodeGenerator
+OasCodeGenerator.file = ../../Impl/OasCodeGeneratorExe/QMake/OasCodeGeneratorExe.pro
+OasCodeGenerator.depends = imtoas ImtOasPck
+
 SUBDIRS += ImtDesignPck
 ImtDesignPck.file = ../../Impl/ImtDesignPck/QMake/ImtDesignPck.pro
 ImtDesignPck.depends = imtdesign
@@ -97,6 +101,18 @@ imtlicsdl.depends = imtbasesdl
 SUBDIRS += imtappsdl
 imtappsdl.file = ../../Sdl/imtapp/QMake/imtappsdl.pro
 imtappsdl.depends = imtbasesdl
+
+SUBDIRS += imtchatsdl
+imtchatsdl.file = ../../Sdl/imtchat/QMake/imtchatsdl.pro
+imtchatsdl.depends = imtbasesdl
+
+SUBDIRS += imtdesksdl
+imtdesksdl.file = ../../Sdl/imtdesk/QMake/imtdesksdl.pro
+imtdesksdl.depends = imtbasesdl
+
+SUBDIRS += imtpaysdl
+imtpaysdl.file = ../../Sdl/imtpay/QMake/imtpaysdl.pro
+imtpaysdl.depends = imtbasesdl
 
 SUBDIRS += imt2dsdl
 imt2dsdl.file = ../../Sdl/imt2d/QMake/imt2dsdl.pro
@@ -189,6 +205,9 @@ SUBDIRS += imtqml
 imtqml.file = ../../Include/imtqml/QMake/imtqml.pro
 imtqml.depends = imtbasesdl
 
+# SUBDIRS += imtqml2d
+# imtqml2d.file = ../../Include/imtqml2d/QMake/imtqml2d.pro
+
 SUBDIRS += imtlic
 imtlic.file = ../../Include/imtlic/QMake/imtlic.pro
 
@@ -205,6 +224,14 @@ imtservergql.depends = imtgql imtcol imtappsdl
 
 SUBDIRS += imtdb
 imtdb.file = ../../Include/imtdb/QMake/imtdb.pro
+
+SUBDIRS += imttest
+imttest.file = ../../Include/imttest/QMake/imttest.pro
+imttest.depends = imtbase imtdb
+
+SUBDIRS += imtupdate
+imtupdate.file = ../../Include/imtupdate/QMake/imtupdate.pro
+imtupdate.depends = imtbase
 
 SUBDIRS += imtdbgql
 imtdbgql.file = ../../Include/imtdbgql/QMake/imtdbgql.pro
@@ -230,6 +257,30 @@ imthypedb.file = ../../Include/imthypedb/QMake/imthypedb.pro
 
 SUBDIRS += imthypegui
 imthypegui.file = ../../Include/imthypegui/QMake/imthypegui.pro
+
+SUBDIRS += imtchat
+imtchat.file = ../../Include/imtchat/QMake/imtchat.pro
+
+SUBDIRS += imtdesk
+imtdesk.file = ../../Include/imtdesk/QMake/imtdesk.pro
+
+SUBDIRS += imtchatgql
+imtchatgql.file = ../../Include/imtchatgql/QMake/imtchatgql.pro
+
+SUBDIRS += imtdeskgql
+imtdeskgql.file = ../../Include/imtdeskgql/QMake/imtdeskgql.pro
+
+SUBDIRS += imtchatdb
+imtchatdb.file = ../../Include/imtchatdb/QMake/imtchatdb.pro
+
+SUBDIRS += imtdeskdb
+imtdeskdb.file = ../../Include/imtdeskdb/QMake/imtdeskdb.pro
+
+SUBDIRS += imtej
+imtej.file = ../../Include/imtej/QMake/imtej.pro
+
+SUBDIRS += imtmongo
+imtmongo.file = ../../Include/imtmongo/QMake/imtmongo.pro
 
 # GUI libraries
 SUBDIRS += imtgui
@@ -298,6 +349,9 @@ imtdeskguiqml.depends = imtdesksdl
 SUBDIRS += imtchatguiqml
 imtchatguiqml.file = ../../Qml/imtchatgui/QMake/imtchatguiqml.pro
 imtchatguiqml.depends = imtchatsdl
+
+SUBDIRS += imtgeoguiqml
+imtgeoguiqml.file = ../../Qml/imtgeogui/QMake/imtgeoguiqml.pro
 
 
 ######### Component packages
@@ -456,6 +510,10 @@ SUBDIRS += EagleView
 EagleView.file = ../../Impl/EagleView/QMake/EagleView.pro
 EagleView.depends = imt3dgui
 
+SUBDIRS += Imt3dDemo
+Imt3dDemo.file = ../../Impl/Imt3dDemo/QMake/Imt3dDemo.pro
+Imt3dDemo.depends = imt3dgui imt3dview
+
 SUBDIRS += ImtHypePck
 ImtHypePck.file = ../../Impl/ImtHypePck/QMake/ImtHypePck.pro
 ImtHypePck.depends = imthype
@@ -467,6 +525,50 @@ ImtHypeDbPck.depends = imthypedb
 SUBDIRS += ImtHypeGuiPck
 ImtHypeGuiPck.file = ../../Impl/ImtHypeGuiPck/QMake/ImtHypeGuiPck.pro
 ImtHypeGuiPck.depends = imthypegui imthype
+
+SUBDIRS += ImtChatPck
+ImtChatPck.file = ../../Impl/ImtChatPck/QMake/ImtChatPck.pro
+ImtChatPck.depends = imtbase imtchat
+
+SUBDIRS += ImtDeskPck
+ImtDeskPck.file = ../../Impl/ImtDeskPck/QMake/ImtDeskPck.pro
+ImtDeskPck.depends = imtbase imtdesk
+
+SUBDIRS += ImtChatDbPck
+ImtChatDbPck.file = ../../Impl/ImtChatDbPck/QMake/ImtChatDbPck.pro
+ImtChatDbPck.depends = imtchatdb imtdb imtchat
+
+SUBDIRS += ImtDeskDbPck
+ImtDeskDbPck.file = ../../Impl/ImtDeskDbPck/QMake/ImtDeskDbPck.pro
+ImtDeskDbPck.depends = imtdeskdb imtdb imtdesk
+
+SUBDIRS += ImtChatGqlPck
+ImtChatGqlPck.file = ../../Impl/ImtChatGqlPck/QMake/ImtChatGqlPck.pro
+ImtChatGqlPck.depends = imtchatgql imtdb imtchat
+
+SUBDIRS += ImtDeskGqlPck
+ImtDeskGqlPck.file = ../../Impl/ImtDeskGqlPck/QMake/ImtDeskGqlPck.pro
+ImtDeskGqlPck.depends = imtdeskgql imtdb imtdesk
+
+SUBDIRS += ImtGeoPck
+ImtGeoPck.file = ../../Impl/ImtGeoPck/QMake/ImtGeoPck.pro
+ImtGeoPck.depends = imtgeo
+
+SUBDIRS += ImtEjPck
+ImtEjPck.file = ../../Impl/ImtEjPck/QMake/ImtEjPck.pro
+ImtEjPck.depends = imtej
+
+SUBDIRS += ImtMongoPck
+ImtMongoPck.file = ../../Impl/ImtMongoPck/QMake/ImtMongoPck.pro
+ImtMongoPck.depends = imtmongo
+
+SUBDIRS += ImtMdbxPck
+ImtMdbxPck.file = ../../Impl/ImtMdbxPck/QMake/ImtMdbxPck.pro
+ImtMdbxPck.depends = imtmdbx
+
+SUBDIRS += ImtTestPck
+ImtTestPck.file = ../../Impl/ImtTestPck/QMake/ImtTestPck.pro
+ImtTestPck.depends = imttest imtdb imtbase
 
 # SUBDIRS += ImtControlsGallery
 # ImtControlsGallery.file = ../../Impl/ImtControlsGallery/QMake/ImtControlsGallery.pro
@@ -497,3 +599,27 @@ imtsdlgenqmltest.depends = imtsdlgenqml imtsdl imtbase
 SUBDIRS += imt3dtest
 imt3dtest.file = ../../Include/imt3d/Test/QMake/imt3dTest.pro
 imt3dtest.depends = imt3d
+
+SUBDIRS += CollectionDocumentServiceTest
+CollectionDocumentServiceTest.file = ../../Tests/CollectionDocumentServiceTest/QMake/CollectionDocumentServiceTest.pro
+CollectionDocumentServiceTest.depends = imtbase imtdoc
+
+SUBDIRS += ImtCoreFileCollectionTest
+ImtCoreFileCollectionTest.file = ../../Tests/FileCollectionTest/QMake/ImtCoreFileCollectionTest.pro
+ImtCoreFileCollectionTest.depends = imtbase imtauth imtrepo
+
+SUBDIRS += ImtCoreObjectCollectionTest
+ImtCoreObjectCollectionTest.file = ../../Tests/ObjectCollectionTest/QMake/ImtCoreObjectCollectionTest.pro
+ImtCoreObjectCollectionTest.depends = imtbase imtauth imtdb imttest
+
+SUBDIRS += PersonalAccessTokenTest
+PersonalAccessTokenTest.file = ../../Tests/PersonalAccessTokenTest/QMake/PersonalAccessTokenTest.pro
+PersonalAccessTokenTest.depends = imtbase imtauth
+
+SUBDIRS += ImtCoreRevisionControllerTest
+ImtCoreRevisionControllerTest.file = ../../Tests/RevisionControllerTest/QMake/ImtCoreRevisionControllerTest.pro
+ImtCoreRevisionControllerTest.depends = imtbase imtauth
+
+SUBDIRS += StructureTest
+StructureTest.file = ../../Tests/StructureTest/QMake/StructureTest.pro
+StructureTest.depends = imtbase imtauth imtdb imttest

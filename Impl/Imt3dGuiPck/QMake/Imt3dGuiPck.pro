@@ -1,6 +1,6 @@
 TARGET = Imt3dGuiPck
 
-greaterThan(QT_MAJOR_VERSION, 5): QT += openglwidgets
+greaterThan(QT_MAJOR_VERSION, 5): QT += openglwidgets gui-private
 
 include($(ACFCONFIGDIR)/QMake/ComponentConfig.pri)
 include($(ACFCONFIGDIR)/QMake/QtBaseConfig.pri)

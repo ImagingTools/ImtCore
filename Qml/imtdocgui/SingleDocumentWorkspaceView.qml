@@ -13,7 +13,7 @@ Rectangle {
 	property string titleSeparation: "/";
 	property bool initialItemTitleVisible: false;
 
-	property DocumentManager documentManager;
+	property DocumentService documentManager;
 	
 	property ObjectVisualStatusProvider visualStatusProvider: null
 	

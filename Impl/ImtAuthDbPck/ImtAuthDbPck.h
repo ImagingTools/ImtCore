@@ -17,6 +17,9 @@
 #include <imtauthdb/CPersonalAccessTokenDatabaseDelegateComp.h>
 #include <imtauthdb/COidcClientDbDelegateComp.h>
 #include <imtauthdb/COidcTokenDbDelegateComp.h>
+#include <imtauthdb/CTenantDbDelegateComp.h>
+#include <imtauthdb/CTenantMembershipDbDelegateComp.h>
+#include <imtauthdb/CTenantInvitationDbDelegateComp.h>
 
 
 /**
@@ -41,8 +44,10 @@ typedef imtauthdb::CUserActionDatabaseDelegateComp UserActionDatabaseDelegate;
 typedef imtauthdb::CPersonalAccessTokenDatabaseDelegateComp PersonalAccessTokenDatabaseDelegate;
 typedef imtauthdb::COidcClientDbDelegateComp OidcClientDatabaseDelegate;
 typedef imtauthdb::COidcTokenDbDelegateComp OidcTokenDatabaseDelegate;
+typedef imtauthdb::CTenantDbDelegateComp TenantDatabaseDelegate;
+typedef imtauthdb::CTenantMembershipDbDelegateComp TenantMembershipDatabaseDelegate;
+typedef imtauthdb::CTenantInvitationDbDelegateComp TenantInvitationDatabaseDelegate;
 
 
 } // namespace ImtAuthDbPck
-
 

@@ -381,6 +381,9 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 
 			add_subdirectory("${IMPL_DIR}/Imt3dGuiPck/CMake" "${AUX_INCLUDE_DIR}/Imt3dGuiPck")
 			add_dependencies(Imt3dGuiPck imt3dview imt3dgui)
+
+			add_subdirectory("${IMPL_DIR}/Imt3dDemo/CMake" "${AUX_INCLUDE_DIR}/Imt3dDemo")
+			add_dependencies(Imt3dDemo imt3dgui imt3dview imt3d)
 		endif()
 
 		if(NOT DEFINED USE_QTQML OR USE_QTQML)
@@ -434,8 +437,8 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 	add_subdirectory("${TESTS_DIR}/PersonalAccessTokenTest/CMake" "${AUX_INCLUDE_DIR}/PersonalAccessTokenTest")
 	add_dependencies(PersonalAccessTokenTest imtbase imtauth)
 
-	add_subdirectory("${TESTS_DIR}/CollectionDocumentManagerTest/CMake" "${AUX_INCLUDE_DIR}/CollectionDocumentManagerTest")
-	add_dependencies(CollectionDocumentManagerTest imtbase imtdoc)
+	add_subdirectory("${TESTS_DIR}/CollectionDocumentServiceTest/CMake" "${AUX_INCLUDE_DIR}/CollectionDocumentServiceTest")
+	add_dependencies(CollectionDocumentServiceTest imtbase imtdoc)
 
 	file(COPY ${TESTS_DIR}/Migrations DESTINATION ${TESTS_DIR}/../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
 

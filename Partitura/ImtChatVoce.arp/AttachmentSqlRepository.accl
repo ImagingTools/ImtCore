@@ -2,17 +2,18 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6379" Description="ACF"/>
+            <Version Id="0" Number="6390" Description="ACF"/>
             <Version Id="1" Number="2306" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
-    <Description></Description>
-    <Keywords></Keywords>
-    <ElementsList/>
-    <EmbeddedRegistriesList>
-        <EmbeddedRegistry RegistryId="AttachmentSqlRepository"/>
-    </EmbeddedRegistriesList>
-    <ExportedInterfaces/>
-    <ExportedComponents/>
+    <PositionMap>
+        <Element ComponentName="Attachment" X="525" Y="225" Note=""/>
+        <Element ComponentName="AttachmentDatabaseDelegate" X="950" Y="275" Note=""/>
+        <Element ComponentName="JsonSerializer" X="225" Y="200" Note=""/>
+        <Element ComponentName="ObjectCollection" X="575" Y="400" Note=""/>
+        <Element ComponentName="Repository" X="700" Y="575" Note=""/>
+        <Element ComponentName="Types" X="275" Y="600" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
 </Acf>

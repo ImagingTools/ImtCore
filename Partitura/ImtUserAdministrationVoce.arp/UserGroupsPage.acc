@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5430" Description="ACF"/>
-            <Version Id="1" Number="2253" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6390" Description="ACF"/>
+            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -187,6 +187,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="RoleInfoProvider" Type="Reference" ExportId="RoleInfoProvider">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantFilterEnabled" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>

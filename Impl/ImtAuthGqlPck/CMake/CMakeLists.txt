@@ -16,6 +16,7 @@ target_link_libraries(${PROJECT_NAME}
 	imtgql
 	imtdb
 	imtcol
+	imtdoc
 	imtmail
 	imtbasesdl
 	imtbase

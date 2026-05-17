@@ -160,6 +160,19 @@ module.exports = {
     init: function(){   
         window.addEventListener('mousemove', (e)=>{
             let event = this.event ? this.event : new QmlMouseEvent({path: this.getObjectsFromPoint(e.pageX, e.pageY)})
+            
+            let modifiers = QtEnums.NoModifier
+            if(e.shiftKey) {
+                modifiers |= QtEnums.ShiftModifier
+            }
+            if(e.altKey) {
+                modifiers |= QtEnums.AltModifier
+            }
+            if(e.ctrlKey) {
+                modifiers |= QtEnums.ControlModifier
+            }
+
+            event.modifiers = modifiers
             event.moveX = event.originX - e.pageX
             event.moveY = event.originY - e.pageY
             event.originX = e.pageX
@@ -217,6 +230,19 @@ module.exports = {
         })
         window.addEventListener('mousedown', (e)=>{
             this.event = new QmlMouseEvent({pressed: true})
+
+            let modifiers = QtEnums.NoModifier
+            if(e.shiftKey) {
+                modifiers |= QtEnums.ShiftModifier
+            }
+            if(e.altKey) {
+                modifiers |= QtEnums.AltModifier
+            }
+            if(e.ctrlKey) {
+                modifiers |= QtEnums.ControlModifier
+            }
+
+            this.event.modifiers = modifiers
             this.event.fillButton(e)
             this.event.originX = e.pageX
             this.event.originY = e.pageY
@@ -232,6 +258,19 @@ module.exports = {
         })
         window.addEventListener('mouseup', (e)=>{
             if(this.event){
+                let modifiers = QtEnums.NoModifier
+                if(e.shiftKey) {
+                    modifiers |= QtEnums.ShiftModifier
+                }
+                if(e.altKey) {
+                    modifiers |= QtEnums.AltModifier
+                }
+                if(e.ctrlKey) {
+                    modifiers |= QtEnums.ControlModifier
+                }
+
+                this.event.modifiers = modifiers
+
                 this.event.fillButton(e)
                 this.event.originX = e.pageX
                 this.event.originY = e.pageY
@@ -243,6 +282,18 @@ module.exports = {
             }
         })
         window.addEventListener('contextmenu', (e)=>{
+            let modifiers = QtEnums.NoModifier
+            if(e.shiftKey) {
+                modifiers |= QtEnums.ShiftModifier
+            }
+            if(e.altKey) {
+                modifiers |= QtEnums.AltModifier
+            }
+            if(e.ctrlKey) {
+                modifiers |= QtEnums.ControlModifier
+            }
+
+            this.event.modifiers = modifiers
             this.event.fillButton(e)
             e.preventDefault()
             this.click(e)

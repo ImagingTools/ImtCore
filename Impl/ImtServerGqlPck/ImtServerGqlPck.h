@@ -38,8 +38,9 @@
 #include <imtservergql/CGqlCollectionImportControllerComp.h>
 #include <imtservergql/CCollectionImportControllerComp.h>
 #include <imtservergql/CCollectionImportJobParamsFillerComp.h>
-#include <imtservergql/CCollectionDocumentManagerControllerComp.h>
-#include <imtservergql/CCollectionDocumentManagerPublisherComp.h>
+#include <imtservergql/CCollectionDocumentServiceControllerComp.h>
+#include <imtservergql/CCollectionDocumentServicePublisherComp.h>
+#include <imtservergql/CPublisherSubscriberBridgeComp.h>
 #include <imtservergql/CGqlContextCreatorComp.h>
 #include <imtservergql/CFilterableSelectControllerComp.h>
 #include <imtservergql/CUserGroupParamsSetJoinerComp.h>
@@ -82,13 +83,13 @@ typedef imtservergql::CProgressManagerPublisherComp ProgressManagerPublisher;
 typedef imtservergql::CGqlCollectionImportControllerComp GqlCollectionImportController;
 typedef imtservergql::CCollectionImportControllerComp CollectionImportController;
 typedef imtservergql::CCollectionImportJobParamsFillerComp CollectionImportJobParamsFiller;
-typedef imtservergql::CCollectionDocumentManagerControllerComp CollectionDocumentManagerController;
-typedef imtservergql::CCollectionDocumentManagerPublisherComp CollectionDocumentManagerPublisher;
+typedef imtservergql::CCollectionDocumentServiceControllerComp CollectionDocumentServiceController;
+typedef imtservergql::CCollectionDocumentServicePublisherComp CollectionDocumentServicePublisher;
+typedef imtservergql::CPublisherSubscriberBridgeComp PublisherSubscriberBridge;
 typedef imtservergql::CGqlContextCreatorComp GqlContextCreator;
 typedef imtservergql::CFilterableSelectControllerComp FilterableSelectController;
 typedef imtservergql::CUserGroupParamsSetJoinerComp UserGroupParamsSetJoiner;
 
 
 } // namespace ImtServerGqlPck
-
 

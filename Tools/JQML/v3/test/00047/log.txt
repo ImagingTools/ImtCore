@@ -1,6 +1,0 @@
-Loader.onWidthChanged 500
-Loader.onItemWidthChanged 500
-item.onWidthChanged 500
-Loader.onHeightChanged 500
-Loader.onItemHeightChanged 500
-item.onHeightChanged 500

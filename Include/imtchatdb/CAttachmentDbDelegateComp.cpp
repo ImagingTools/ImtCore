@@ -190,30 +190,7 @@ void CAttachmentDbDelegateComp::OnComponentCreated()
 
 	const QString tableName = GetTableName();
 	if (TableExists(tableName)){
-		// Table already exists — run orphaned attachment cleanup
 		CleanupOrphanedAttachments();
-		return;
-	}
-
-	QFile scriptFile(imtdb::GetSqlResourcePath(*m_databaseEngineCompPtr, QStringLiteral("CreateAttachmentsTable.sql")));
-	if (!scriptFile.open(QFile::ReadOnly)){
-		SendErrorMessage(0, QString("Attachments table creation script '%1' could not be loaded").arg(scriptFile.fileName()));
-		return;
-	}
-
-	QByteArray query = scriptFile.readAll();
-	scriptFile.close();
-	query.replace("${TableScheme}", "public");
-
-	QSqlError sqlError;
-	m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
-
-	if (sqlError.type() != QSqlError::NoError){
-		qCritical() << __FILE__ << __LINE__
-					<< "\n\t| Attachments table could not be created"
-					<< "\n\t| Error:" << sqlError
-					<< "\n\t| Query:" << query;
-		SendErrorMessage(0, QString("Attachments table could not be created: %1").arg(sqlError.text()));
 	}
 }
 

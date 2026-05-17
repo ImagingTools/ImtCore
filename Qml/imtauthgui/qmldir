@@ -37,3 +37,7 @@ UserGeneralEditor 1.0 UserGeneralEditor.qml
 PasswordRecoveryDialog 1.0 PasswordRecoveryDialog.qml
 UserSettingsController 1.0 UserSettingsController.qml
 UserActionCollectionView 1.0 UserActionCollectionView.qml
+TenantCollectionView 1.0 TenantCollectionView.qml
+TenantEditor 1.0 TenantEditor.qml
+ItemSelectElementView 1.0 ItemSelectElementView.qml
+TenantMembershipSubscriptionClient 1.0 TenantMembershipSubscriptionClient.qml

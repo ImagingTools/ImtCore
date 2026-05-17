@@ -77,6 +77,7 @@ function getBaseStructure(){
         connectionSignals: [],
         defineSignals: {},
         children: [],
+        onProperty: '',
         parent: null,
         name: `el${UID}`,
         UID: UID
@@ -439,9 +440,9 @@ function preCompile(className, meta, on, instructions){
     }
     
 
-    // if(on) {
-    //     instructions.properties.properties = on
-    // }
+    if(on){
+        instructions.onProperty = on
+    }
     if(meta)
     for(let m of meta){
         if(m){
@@ -450,6 +451,10 @@ function preCompile(className, meta, on, instructions){
             }
             if(m[0] === "qmlpropdef"){
                 qmlpropdef(m, instructions)
+            }
+            if(m[0] === "qmldefaultprop"){
+                // "default property" wraps a qmlpropdef node — unwrap and register it
+                qmlpropdef(m[1], instructions)
             }
             if(m[0] === "qmlsignaldef"){
                 qmlsignaldef(m, instructions)
@@ -562,6 +567,17 @@ function testProperty(name, currentInstructions){
         if(prop.name === name) return true
     }
     return false
+}
+
+function getDefaultPropertyDescriptor(className, propName){
+    let component = components[className]
+    while(component && component.defaultProperties){
+        if(component.defaultProperties[propName]){
+            return component.defaultProperties[propName]
+        }
+        component = component.__proto__
+    }
+    return null
 }
 
 function testSignal(name, currentInstructions){
@@ -1039,6 +1055,24 @@ let code = []
 function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], updateList = [], step = 0, innerComponent = false){
     code.push(currentInstructions.UID > 1 ? `let el${currentInstructions.UID} = new ${currentInstructions.getClassName()}(${innerComponent ? 'currParent,inCtx,exModel' : currentInstructions.parent.name+',inCtx'})` : `let el${currentInstructions.UID} = this`)
 
+    // Support QML syntax like: NumberAnimation on x { ... }
+    // Parser passes "x" through qmlelem -> preCompile(on), we translate it
+    // into PropertyAnimation.property so runtime knows what to animate.
+    if(currentInstructions.onProperty){
+        let comp = components[currentInstructions.getClassName()]
+        let supportsPropertyTarget = false
+        while(comp && comp.defaultProperties){
+            if('property' in comp.defaultProperties || 'properties' in comp.defaultProperties){
+                supportsPropertyTarget = true
+                break
+            }
+            comp = comp.__proto__
+        }
+        if(supportsPropertyTarget){
+            code.push(`el${currentInstructions.UID}.property = \`${currentInstructions.onProperty}\``)
+        }
+    }
+
     let extendInstruction = currentInstructions
     while(extendInstruction && listComponents.indexOf(extendInstruction.className) < 0){
         let extendsFile = compiledFiles[path.resolve(path.resolve(__dirname, source), extendInstruction.className.replaceAll('_', '/')).replaceAll('\\', '/') + '.qml']
@@ -1073,6 +1107,7 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
 
     let updateAnchors = false
     let updateFont = false
+    let updateIcon = false
     // let updateList = []
     // let updatePrimaryList = []
 
@@ -1098,7 +1133,7 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
         }
 
         let pathName = property.name.split('.')
-        if(pathName[0] !== 'anchors' && pathName[0] !== 'font') continue
+        if(pathName[0] !== 'anchors' && pathName[0] !== 'font' && pathName[0] !== 'icon') continue
 
         for(let i = 0; i < pathName.length; i++){
             pathName[i] = `getStatement('${pathName[i]}')`
@@ -1180,6 +1215,10 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
             }
             if(!updateFont && property.name.split('.')[0] === 'font'){
                 updateFont = true
+                updatePrimaryList.push(`${currentInstructions.name}.${pathName[0]}.update()`)
+            }
+            if(!updateIcon && property.name.split('.')[0] === 'icon'){
+                updateIcon = true
                 updatePrimaryList.push(`${currentInstructions.name}.${pathName[0]}.update()`)
             }
             
@@ -1349,7 +1388,12 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
                         // updateList.push(`${currentInstructions.name}.getStatement('${property.name}').update()`)
                     } else {
                         treeCompile(compiledFile, property.val)
-                        code.push(`${currentInstructions.name}.${property.name} = ${property.val.name}`)
+                        const propDesc = getDefaultPropertyDescriptor(currentInstructions.getClassName(), property.name)
+                        if(propDesc && propDesc.type === listProperties.QList){
+                            code.push(`${currentInstructions.name}.${property.name} = [${property.val.name}]`)
+                        } else {
+                            code.push(`${currentInstructions.name}.${property.name} = ${property.val.name}`)
+                        }
                     }
                     
                 } else {

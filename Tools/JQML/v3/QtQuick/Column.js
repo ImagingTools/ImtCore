@@ -36,6 +36,10 @@ class Column extends Item {
         this.__updateGeometry(true)
     }
 
+    'SLOT_Component.completed'(){
+        JQApplication.updateLater(this)
+    }
+
     SLOT_paddingChanged(oldValue, newValue){
         this.leftPadding = this.padding
         this.topPadding = this.padding
@@ -109,6 +113,18 @@ class Column extends Item {
     __endUpdate(){
         this.__updateGeometry(this.__completed)
         super.__endUpdate()
+    }
+
+    __removeChild(child){
+        super.__removeChild(child)
+
+        JQApplication.updateLater(this)
+    }
+
+    __addChild(child){
+        super.__addChild(child)
+
+        JQApplication.updateLater(this)
     }
 
     forceLayout(){
