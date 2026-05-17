@@ -311,6 +311,9 @@ public:
 };
 
 
-} // namespace imtdocQ_DECLARE_METATYPE(imtdoc::IDocumentService::DocumentNotification);
+} // namespace imtdoc
+
+
+Q_DECLARE_METATYPE(imtdoc::IDocumentService::DocumentNotification);
 
 
