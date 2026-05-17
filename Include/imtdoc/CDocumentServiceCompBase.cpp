@@ -78,7 +78,7 @@ bool CDocumentServiceCompBase::ValidateDocumentData(
 
 QList<imtdoc::IDocumentServiceEventHandler*> CDocumentServiceCompBase::GetDocumentServiceEventHandlers() const
 {
-	QList<imtdoc::IDocumentServiceEventHandler*> retVal;
+	QList<imtdoc::IDocumentServiceEventHandler*> retVal = CDocumentServiceBase::GetDocumentServiceEventHandlers();
 
 	if (m_handlerCompPtr.IsValid()){
 		for (int i = 0; i < m_handlerCompPtr.GetCount(); i++){

@@ -13,6 +13,9 @@
 #include <iser/ISerializable.h>
 #include <imod/IObserver.h>
 
+// ImtCore includes
+#include <imtdoc/IDocumentServiceEventHandler.h>
+
 
 namespace imtdoc
 {
@@ -193,6 +196,16 @@ public:
 		Unregister an observer for the document with the given user-ID and document-ID
 	*/
 	virtual OperationStatus UnregisterDocumentObserver(const QByteArray& userId, const QByteArray& documentId, imod::IObserver& observer) = 0;
+
+	/**
+		Register an event handler that will be notified about document-level events.
+	*/
+	virtual void RegisterEventHandler(IDocumentServiceEventHandler& handler) = 0;
+
+	/**
+		Unregister a previously registered event handler.
+	*/
+	virtual void UnregisterEventHandler(IDocumentServiceEventHandler& handler) = 0;
 };
 
 

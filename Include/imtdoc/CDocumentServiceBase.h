@@ -53,6 +53,8 @@ public:
 				idoc::IUndoManager*& undoManagerPtr) const override;
 	virtual OperationStatus RegisterDocumentObserver(const QByteArray& userId, const QByteArray& documentId, imod::IObserver& observer) override;
 	virtual OperationStatus UnregisterDocumentObserver(const QByteArray& userId, const QByteArray& documentId, imod::IObserver& observer) override;
+	virtual void RegisterEventHandler(IDocumentServiceEventHandler& handler) override;
+	virtual void UnregisterEventHandler(IDocumentServiceEventHandler& handler) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -178,6 +180,8 @@ protected:
 
 	QMap<QByteArray, std::shared_ptr<TaskContext>> m_pendingTasks;
 	mutable QMutex m_tasksMutex;
+
+	QList<IDocumentServiceEventHandler*> m_registeredEventHandlers;
 };
 
 
