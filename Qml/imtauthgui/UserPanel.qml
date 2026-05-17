@@ -4,6 +4,7 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
 import imtgui 1.0
+import imtguigql 1.0
 import imtauthProfileSdl 1.0
 
 Item {
@@ -24,13 +25,7 @@ Item {
 	Component.onDestruction: {
 		Events.unSubscribeEvent("SetUserPanelEnabled", root.setUserPanelEnabled);
 	}
-	
-	LocalizationEvent {
-		onLocalizationChanged: {
-			contextMenuModel.fillModel();
-		}
-	}
-	
+
 	Connections {
 		target: AuthorizationController;
 		
@@ -88,11 +83,7 @@ Item {
 		m_id: AuthorizationController.userTokenProvider.userId
 		m_productId: AuthorizationController.productId
 	}
-	
-	function onLocalizationChanged(language){
-		contextMenuModel.fillModel();
-	}
-	
+
 	Text {
 		id: tenantText;
 		anchors.verticalCenter: root.verticalCenter;
@@ -134,13 +125,7 @@ Item {
 				AuthorizationController.logout();
 			}
 			else{
-				contextMenuModel.fillModel();
-				
-				var point = mapToItem(null, x - width, y + height);
-				point.x = point.x - 200;
-				
 				menu.open()
-				// ModalDialogManager.openDialog(popupMenu, {"x": point.x, "y": point.y, "model": contextMenuModel});
 			}
 		}
 	}
@@ -180,7 +165,8 @@ Item {
 		Menu {
 			id: organizationsSubmenu
 			title: qsTr("Organization")
-
+			font.pixelSize: Style.fontSizeM
+			font.family: Style.fontFamily
 			Instantiator {
 				model: root.__organizationsList.length
 
@@ -196,8 +182,8 @@ Item {
 					}
 				}
 
-				onObjectAdded: function(index, object) { organizationsSubmenu.insertItem(index, object) }
-				onObjectRemoved: function(index, object) { organizationsSubmenu.removeItem(object) }
+				onObjectAdded:{ organizationsSubmenu.insertItem(index, object) }
+				onObjectRemoved: { organizationsSubmenu.removeItem(object) }
 			}
 
 			MenuSeparator {
@@ -227,21 +213,6 @@ Item {
 		}
 	}
 
-	ListModel {
-		id: contextMenuModel;
-		
-		Component.onCompleted: {
-			fillModel();
-		}
-		
-		function fillModel(){
-			contextMenuModel.clear();
-			contextMenuModel.append({"id": "Profile", "name": qsTr("Profile"), "icon": "Icons/Account", "isEnabled": true});
-			contextMenuModel.append({"id": "", "name": "", "Icon": ""});
-			contextMenuModel.append({"id": "Logout", "name": qsTr("Logout"), "icon": "Icons/Exit", "isEnabled": true});
-		}
-	}
-	
 	Component {
 		id: profileViewComp;
 		

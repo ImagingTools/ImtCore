@@ -140,7 +140,7 @@ RemoteCollectionView {
 				closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
 
 				background: Rectangle {
-					color: Style.panelColor
+					color: Style.baseColor
 					border.color: Style.borderColor
 					border.width: 1
 					radius: Style.radiusM
