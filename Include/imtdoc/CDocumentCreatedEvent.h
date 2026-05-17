@@ -10,6 +10,15 @@ namespace imtdoc
 {
 
 
+/**
+	\ingroup imtdoc
+	\brief Event fired when a new document has been created.
+
+	Produced by \c CDocumentServiceBase when a TT_NEW task has enqueued a new
+	document entry (before the asynchronous object-creation thread completes).
+	At this point the document is still in the loading state;
+	\c CDocumentDataLoadedEvent follows once the data object is available.
+*/
 class CDocumentCreatedEvent : public CEventBase
 {
 public:

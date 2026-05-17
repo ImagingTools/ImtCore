@@ -10,6 +10,18 @@ namespace imtdoc
 {
 
 
+/**
+	\ingroup imtdoc
+	\brief Event fired when a document's data object has finished loading.
+
+	Produced by \c CDocumentServiceBase::OnDocumentDataLoaded once the
+	background loading thread has stored the document's data object and
+	initialised the model observers.  The \c isLoading flag transitions from
+	\c true to \c false at this point.
+
+	Handlers can use this event to perform work that requires the document
+	data to be present (e.g.\ populate UI components).
+*/
 class CDocumentDataLoadedEvent : public CEventBase
 {
 public:

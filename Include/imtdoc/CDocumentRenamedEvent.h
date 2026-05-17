@@ -10,6 +10,15 @@ namespace imtdoc
 {
 
 
+/**
+	\ingroup imtdoc
+	\brief Event fired when the display name of a document has been changed.
+
+	Produced by \c TCollectionDocumentServiceWrap::SetDocumentName.  In
+	single-copy mode the event is fired once per user session that shares the
+	same underlying object, so multiple handlers may observe the same name
+	change in sequence.
+*/
 class CDocumentRenamedEvent : public CEventBase
 {
 public:

@@ -26,6 +26,44 @@ namespace imtdoc
 {
 
 
+/**
+	\ingroup imtdoc
+	\brief CRTP mixin that adds collection-backed document operations to any \c CDocumentServiceBase-derived class.
+
+	\c TCollectionDocumentServiceWrap layers the open/save/close semantics of
+	an \c imtbase::IObjectCollection on top of any class that is derived (directly
+	or indirectly) from \c CDocumentServiceBase.  It overrides the four Do*Document
+	virtual methods and the \c SetDocumentName method:
+
+	- **DoCreateNewDocument** — delegates to the base-class implementation (which
+	  creates a blank object via \c CreateObject) and records an optional proposed
+	  source element ID for later use during save.
+	- **DoOpenDocument** — resolves the URL to a collection object ID, fetches
+	  the object data in a background thread, and supports single-copy sharing of
+	  data across user sessions.
+	- **DoSaveDocument** — validates the data, then either updates an existing
+	  collection element or inserts a new one (creating a copy when the name
+	  changes); fires \c CDocumentSavedEvent or \c CDocumentSavedAsEvent.
+	- **DoCloseDocument** — removes the document entry and fires
+	  \c CDocumentClosedEvent.
+	- **SetDocumentName** — renames the document in the collection and fires
+	  \c CDocumentRenamedEvent for every affected user session.
+
+	Subclasses must implement \c GetCollection() to provide the backing
+	collection.
+
+	\tparam Base  A class that is derived (directly or indirectly) from
+	              \c CDocumentServiceBase (and therefore from
+	              \c IDocumentService).  Typically \c CDocumentServiceCompBase
+	              for ACF-wired components.
+
+	\note The backward-compatibility typedef
+	      \code
+	      typedef TCollectionDocumentServiceWrap<CDocumentServiceBase> CCollectionDocumentServiceBase;
+	      \endcode
+	      is provided so that existing code using the old name continues to
+	      compile.
+*/
 template<class Base>
 class TCollectionDocumentServiceWrap : public Base
 {
@@ -52,10 +90,19 @@ public:
 	virtual OperationStatus SetDocumentName(const QByteArray& userId, const QByteArray& documentId, const QString& documentName) override;
 
 protected:
+	/**
+		\brief Return the backing object collection.
+
+		Must be implemented by concrete subclasses to provide access to the
+		\c IObjectCollection that stores documents.
+
+		\return  Non-null pointer to the collection, or \c nullptr when the
+		         collection is not yet available (tasks will fail gracefully).
+	*/
 	virtual imtbase::IObjectCollection* GetCollection() const = 0;
 
 private:
-	QMap<QByteArray, QByteArray> m_proposedSourceDocumentIds;
+	QMap<QByteArray, QByteArray> m_proposedSourceDocumentIds; ///< Maps new documentId → proposed source element ID for copy-on-create.
 };
 
 
@@ -839,7 +886,8 @@ inline void TCollectionDocumentServiceWrap<Base>::DoCloseDocument(
 }
 
 
-// Backward-compatibility typedef
+/// \brief Backward-compatibility alias: \c CCollectionDocumentServiceBase is now
+///        a typedef for \c TCollectionDocumentServiceWrap<CDocumentServiceBase>.
 typedef TCollectionDocumentServiceWrap<CDocumentServiceBase> CCollectionDocumentServiceBase;
 
 

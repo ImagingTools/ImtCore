@@ -27,6 +27,48 @@ namespace imtdoc
 {
 
 
+/**
+	\ingroup imtdoc
+	\brief Thread-safe implementation base for \c IDocumentService.
+
+	\c CDocumentServiceBase provides the complete \c IDocumentService API
+	except for the two pure-virtual factory methods (\c CreateObject and
+	\c CreateUndoManager) that concrete subclasses must supply.
+
+	## Task dispatch
+
+	All mutating operations are serialised through a task queue.
+	\c BeginDocumentTask creates a \c TaskContext entry, enqueues the
+	appropriate Do*-method call onto the current thread, and returns a
+	task-ID.  \c WaitForTaskFinished blocks (using a \c QWaitCondition)
+	until \c CompleteTask is called, either synchronously inside the
+	Do*-method or from a background thread.
+
+	## Document registry
+
+	Open documents are stored in a two-level map:
+	\c m_userDocuments[userId][documentId].  Each entry is a
+	\c WorkingDocument that holds the data object, undo manager, metadata,
+	and model-observer registration.
+
+	## Single-copy mode
+
+	When \c IsSingleCopyMode() returns \c true, all users that open the
+	same underlying collection object share a single \c SharedDocumentData
+	entry.  The first user to open the object triggers the asynchronous
+	load; subsequent opens attach immediately and receive a
+	\c CDocumentDataLoadedEvent when the first load completes.
+
+	## Subclassing
+
+	Concrete subclasses override:
+	- \c CreateObject / \c CreateUndoManager — mandatory factories.
+	- Do*Document — to implement collection-specific open/save/close logic
+	  (see \c TCollectionDocumentServiceWrap).
+	- \c GetDefaultDocumentName, \c HasDocumentNameProvider,
+	  \c ValidateDocumentData, \c GetDocumentServiceEventHandlers,
+	  \c IsSingleCopyMode — optional policy hooks.
+*/
 class CDocumentServiceBase:
 			protected imod::TMultiModelObserverBase<istd::IChangeable>,
 			public imtdoc::IDocumentService
@@ -66,9 +108,43 @@ protected:
 	// subclasses to provide task-type-specific behaviour.
 	// Each method must call \c CompleteTask exactly once (synchronously
 	// or asynchronously) to signal completion.
+
+	/**
+		\brief Create a new blank document for \a params.userId.
+
+		The base implementation creates a new data object via \c CreateObject
+		and an undo manager via \c CreateUndoManager, registers observers,
+		and fires \c CDocumentCreatedEvent followed by
+		\c CDocumentDataLoadedEvent.
+	*/
 	virtual void DoCreateNewDocument(const QByteArray& taskId, const TaskParams& params);
+
+	/**
+		\brief Open an existing document addressed by \a params.url.
+
+		Resolves the URL to a collection object ID, starts a background
+		thread to fetch the data, and fires \c CDocumentOpenedEvent
+		immediately.  Once the data is available \c CDocumentDataLoadedEvent
+		is fired from the main thread.
+	*/
 	virtual void DoOpenDocument(const QByteArray& taskId, const TaskParams& params);
+
+	/**
+		\brief Persist the document identified by \a params.documentId.
+
+		Validates the data, writes it back to the collection, and fires
+		\c CDocumentSavedEvent (or \c CDocumentSavedAsEvent when a new
+		collection element is created).
+	*/
 	virtual void DoSaveDocument(const QByteArray& taskId, const TaskParams& params);
+
+	/**
+		\brief Close the document identified by \a params.documentId.
+
+		Removes the entry from \c m_userDocuments, decrements the shared
+		reference count (in single-copy mode), and fires
+		\c CDocumentClosedEvent.
+	*/
 	virtual void DoCloseDocument(const QByteArray& taskId, const TaskParams& params);
 
 	/**
@@ -113,30 +189,49 @@ protected:
 	virtual void OnUpdate(imod::IModel* modelPtr, const istd::IChangeable::ChangeSet& changeSet) override;
 
 protected:
+	/**
+		\brief In-memory state of a single open document instance.
+
+		One \c WorkingDocument is kept per (userId, documentId) pair.
+	*/
 	struct WorkingDocument
 	{
-		QByteArray objectId;
-		QByteArray typeId;
-		QUrl url;
-		QString name;
-		istd::IChangeableSharedPtr objectPtr;
-		idoc::IUndoManagerSharedPtr undoManagerPtr;
-		bool isDirty;
-		bool isLoading = false;
-		int undoManagerModelId = -1;
+		QByteArray objectId;                       ///< Backing collection element ID (empty for unsaved documents).
+		QByteArray typeId;                         ///< Registered object type-ID.
+		QUrl url;                                  ///< Source URL (mirrors the open URL).
+		QString name;                              ///< Current display name.
+		istd::IChangeableSharedPtr objectPtr;      ///< The document's data object.
+		idoc::IUndoManagerSharedPtr undoManagerPtr;///< Associated undo/redo manager.
+		bool isDirty;                              ///< \c true when there are unsaved changes.
+		bool isLoading = false;                    ///< \c true while the background load is in progress.
+		int undoManagerModelId = -1;               ///< Model registration ID in \c UndoManagerObserver.
 	};
 
+	/**
+		\brief Shared state for a collection object opened in single-copy mode.
+
+		Multiple \c WorkingDocument entries for different users may point to
+		the same underlying data via a \c SharedDocumentData entry.
+	*/
 	struct SharedDocumentData
 	{
-		QByteArray typeId;
-		QString name;
-		istd::IChangeableSharedPtr objectPtr;
-		idoc::IUndoManagerSharedPtr undoManagerPtr;
-		int refCount = 0;
-		bool isLoading = false;
-		int undoManagerModelId = -1;
+		QByteArray typeId;                         ///< Registered object type-ID.
+		QString name;                              ///< Current display name.
+		istd::IChangeableSharedPtr objectPtr;      ///< Shared data object (loaded once).
+		idoc::IUndoManagerSharedPtr undoManagerPtr;///< Shared undo/redo manager.
+		int refCount = 0;                          ///< Number of user sessions holding this entry.
+		bool isLoading = false;                    ///< \c true while the background load is in progress.
+		int undoManagerModelId = -1;               ///< Model registration ID in \c UndoManagerObserver.
 	};
 
+	/**
+		\brief Internal observer that relays undo-manager model change events.
+
+		Registered once per document undo manager and calls
+		\c CDocumentServiceBase::OnUndoManagerChanged when the manager's
+		state changes (e.g.\ when the dirty flag flips after an edit or a
+		save).
+	*/
 	class UndoManagerObserver : public imod::CMultiModelDispatcherBase
 	{
 	public:
@@ -170,18 +265,18 @@ protected:
 	UserDocumentPairList FindDocumentsByObjectId(const QByteArray& objectId) const;
 
 	typedef QMap<QByteArray, WorkingDocument> WorkingDocumentList;
-	mutable QMap<QByteArray, WorkingDocumentList> m_userDocuments;
-	mutable QRecursiveMutex m_mutex;
+	mutable QMap<QByteArray, WorkingDocumentList> m_userDocuments; ///< Two-level map: userId → documentId → WorkingDocument.
+	mutable QRecursiveMutex m_mutex; ///< Guards \c m_userDocuments and \c m_sharedDocuments.
 
-	QMap<QByteArray, SharedDocumentData> m_sharedDocuments;
+	QMap<QByteArray, SharedDocumentData> m_sharedDocuments; ///< Single-copy-mode shared entries (objectId → SharedDocumentData).
 
-	UndoManagerObserver m_undoManagerObserver;
-	std::shared_ptr<std::atomic<bool>> m_isAlive;
+	UndoManagerObserver m_undoManagerObserver; ///< Receives undo-manager model change callbacks.
+	std::shared_ptr<std::atomic<bool>> m_isAlive; ///< Shared alive-guard passed to background threads to detect early service destruction.
 
-	QMap<QByteArray, std::shared_ptr<TaskContext>> m_pendingTasks;
-	mutable QMutex m_tasksMutex;
+	QMap<QByteArray, std::shared_ptr<TaskContext>> m_pendingTasks; ///< Currently executing or pending tasks (taskId → context).
+	mutable QMutex m_tasksMutex; ///< Guards \c m_pendingTasks.
 
-	QList<IDocumentServiceEventHandler*> m_registeredEventHandlers;
+	QList<IDocumentServiceEventHandler*> m_registeredEventHandlers; ///< Runtime-registered event handlers.
 };
 
 

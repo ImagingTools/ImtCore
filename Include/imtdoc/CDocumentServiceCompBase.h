@@ -17,6 +17,34 @@ namespace imtdoc
 {
 
 
+/**
+	\ingroup imtdoc
+	\brief ACF component base for single-collection document services.
+
+	\c CDocumentServiceCompBase extends \c CDocumentServiceBase with the ACF
+	component wiring needed to use it as a concrete server component.  It
+	provides:
+
+	- **Object factories** — a positionally-matched list of
+	  \c "ObjectFactories" (factories) and \c "ObjectTypeIdList" (type IDs)
+	  that supply document data objects.
+	- **Undo manager factory** — a single \c "UndoManager" factory used to
+	  create per-document undo managers.
+	- **Name providers** — an optional \c "DocumentNameProviders" list
+	  (one per type-ID) that computes default document names from document
+	  data.
+	- **Validators** — an optional \c "DocumentValidators" list (one per
+	  type-ID) that validates document data before saving.
+	- **Event handlers** — an optional \c "DocumentServiceEventHandler"
+	  multi-reference list of \c IDocumentServiceEventHandler components
+	  wired through the ACF component descriptor.  At runtime, these are
+	  merged with handlers registered via
+	  \c IDocumentService::RegisterEventHandler.
+
+	\note This class is an abstract base; it does not implement \c GetCollection
+	or \c IsSingleCopyMode.  Use \c CCollectionDocumentServiceComp for a
+	complete, ready-to-use component.
+*/
 class CDocumentServiceCompBase: public ilog::CLoggerComponentBase, public imtdoc::CDocumentServiceBase
 {
 public:

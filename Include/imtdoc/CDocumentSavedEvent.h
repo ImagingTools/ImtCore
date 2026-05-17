@@ -10,6 +10,15 @@ namespace imtdoc
 {
 
 
+/**
+	\ingroup imtdoc
+	\brief Event fired when a document has been saved to its existing collection object.
+
+	Produced by \c TCollectionDocumentServiceWrap::DoSaveDocument when the
+	document data is written back to the same collection element.  In
+	single-copy mode the event is fired once per user session that holds the
+	same underlying object.
+*/
 class CDocumentSavedEvent : public CEventBase
 {
 public:
