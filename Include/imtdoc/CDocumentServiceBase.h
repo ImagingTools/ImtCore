@@ -14,7 +14,6 @@
 #include <memory>
 
 // ACF includes
-#include <idoc/IDocumentManager.h>
 #include <idoc/IUndoManager.h>
 #include <imod/TMultiModelObserverBase.h>
 #include <imod/CMultiModelDispatcherBase.h>
@@ -36,14 +35,12 @@ public:
 	CDocumentServiceBase();
 	~CDocumentServiceBase();
 
-	// reimplemented (imtdoc::IDocumentService) — asynchronous task API
+	// reimplemented (imtdoc::IDocumentService)
 	virtual QByteArray BeginDocumentTask(
-		TaskType taskType,
-		const TaskParams& params,
-		Error* errorPtr = nullptr) override;
+				TaskType taskType,
+				const TaskParams& params,
+				Error* errorPtr = nullptr) override;
 	virtual TaskResult WaitForTaskFinished(const QByteArray& taskId) override;
-
-	// reimplemented (imtdoc::IDocumentService) — synchronous helpers
 	virtual DocumentList GetOpenedDocumentList(const QByteArray& userId) const override;
 	virtual OperationStatus GetDocumentName(const QByteArray& userId, const QByteArray& documentId, QString& documentName) const override;
 	virtual OperationStatus SetDocumentName(const QByteArray& userId, const QByteArray& documentId, const QString& documentName) override;
@@ -51,7 +48,9 @@ public:
 	virtual OperationStatus GetDocumentData(const QByteArray& userId, const QByteArray& documentId, istd::IChangeableSharedPtr& documentPtr) const override;
 	virtual OperationStatus SetDocumentData(const QByteArray& userId, const QByteArray& documentId, const istd::IChangeable& document) override;
 	virtual OperationStatus GetDocumentUndoManager(
-		const QByteArray& userId, const QByteArray& documentId, idoc::IUndoManager*& undoManagerPtr) const override;
+				const QByteArray& userId,
+				const QByteArray& documentId,
+				idoc::IUndoManager*& undoManagerPtr) const override;
 	virtual OperationStatus RegisterDocumentObserver(const QByteArray& userId, const QByteArray& documentId, imod::IObserver& observer) override;
 	virtual OperationStatus UnregisterDocumentObserver(const QByteArray& userId, const QByteArray& documentId, imod::IObserver& observer) override;
 
@@ -61,12 +60,10 @@ public:
 protected:
 	struct WorkingDocument;
 
-	// -----------------------------------------------------------------
 	// Protected virtual methods for task dispatch — override in
 	// subclasses to provide task-type-specific behaviour.
 	// Each method must call \c CompleteTask exactly once (synchronously
 	// or asynchronously) to signal completion.
-	// -----------------------------------------------------------------
 	virtual void DoCreateNewDocument(const QByteArray& taskId, const TaskParams& params);
 	virtual void DoOpenDocument(const QByteArray& taskId, const TaskParams& params);
 	virtual void DoSaveDocument(const QByteArray& taskId, const TaskParams& params);
@@ -187,3 +184,5 @@ protected:
 
 
 } // namespace imtdoc
+
+

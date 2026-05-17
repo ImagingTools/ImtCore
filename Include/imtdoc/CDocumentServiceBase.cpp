@@ -31,8 +31,8 @@ namespace imtdoc
 // public methods
 
 CDocumentServiceBase::CDocumentServiceBase()
-	:m_undoManagerObserver(*this)
-	,m_isAlive(std::make_shared<std::atomic<bool>>(true))
+	:m_undoManagerObserver(*this),
+	m_isAlive(std::make_shared<std::atomic<bool>>(true))
 {
 }
 
@@ -46,12 +46,12 @@ CDocumentServiceBase::~CDocumentServiceBase()
 	{
 		QMutexLocker locker(&m_tasksMutex);
 		for (auto it = m_pendingTasks.begin(); it != m_pendingTasks.end(); ++it){
-			auto& ctx = it.value();
-			QMutexLocker taskLocker(&ctx->mutex);
-			if (!ctx->isFinished){
-				ctx->result = TaskResult{OS_FAILED, QByteArray(), QStringLiteral("Service destroyed")};
-				ctx->isFinished = true;
-				ctx->condition.wakeAll();
+			auto& taskContext = it.value();
+			QMutexLocker taskLocker(&taskContext->mutex);
+			if (!taskContext->isFinished){
+				taskContext->result = TaskResult{OS_FAILED, QByteArray(), QStringLiteral("Service destroyed")};
+				taskContext->isFinished = true;
+				taskContext->condition.wakeAll();
 			}
 		}
 		m_pendingTasks.clear();
@@ -62,9 +62,9 @@ CDocumentServiceBase::~CDocumentServiceBase()
 // reimplemented (imtdoc::IDocumentService) — asynchronous task API
 
 QByteArray CDocumentServiceBase::BeginDocumentTask(
-	TaskType taskType,
-	const TaskParams& params,
-	Error* errorPtr)
+			TaskType taskType,
+			const TaskParams& params,
+			Error* errorPtr)
 {
 	QByteArray taskId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
@@ -110,14 +110,14 @@ QByteArray CDocumentServiceBase::BeginDocumentTask(
 
 IDocumentService::TaskResult CDocumentServiceBase::WaitForTaskFinished(const QByteArray& taskId)
 {
-	std::shared_ptr<TaskContext> context;
+	std::shared_ptr<TaskContext> taskContext;
 	{
 		QMutexLocker locker(&m_tasksMutex);
 		auto it = m_pendingTasks.find(taskId);
 		if (it == m_pendingTasks.end()){
 			return TaskResult{OS_FAILED, QByteArray(), QStringLiteral("Unknown task ID")};
 		}
-		context = it.value();
+		taskContext = it.value();
 	}
 
 	// If called from the main / GUI thread we must keep the event loop
@@ -127,8 +127,8 @@ IDocumentService::TaskResult CDocumentServiceBase::WaitForTaskFinished(const QBy
 	if (appPtr != nullptr && QThread::currentThread() == appPtr->thread()){
 		while (true){
 			{
-				QMutexLocker locker(&context->mutex);
-				if (context->isFinished){
+				QMutexLocker locker(&taskContext->mutex);
+				if (taskContext->isFinished){
 					break;
 				}
 			}
@@ -136,13 +136,13 @@ IDocumentService::TaskResult CDocumentServiceBase::WaitForTaskFinished(const QBy
 		}
 	}
 	else{
-		QMutexLocker locker(&context->mutex);
-		while (!context->isFinished){
-			context->condition.wait(&context->mutex);
+		QMutexLocker locker(&taskContext->mutex);
+		while (!taskContext->isFinished){
+			taskContext->condition.wait(&taskContext->mutex);
 		}
 	}
 
-	TaskResult result = context->result;
+	TaskResult result = taskContext->result;
 
 	{
 		QMutexLocker locker(&m_tasksMutex);
@@ -324,20 +324,27 @@ void CDocumentServiceBase::DoSaveDocument(const QByteArray& taskId, const TaskPa
 void CDocumentServiceBase::DoCloseDocument(const QByteArray& taskId, const TaskParams& params)
 {
 	OperationStatus status = CloseDocumentInternal(params.userId, params.documentId);
-	QString msg;
+	QString message;
 	if (status != OS_OK){
 		switch (status){
-			case OS_INVALID_USER_ID:  msg = QStringLiteral("Invalid user ID"); break;
-			case OS_INVALID_DOCUMENT_ID: msg = QStringLiteral("Invalid document ID"); break;
-			default: msg = QStringLiteral("Close failed"); break;
+			case OS_INVALID_USER_ID:
+				message = QStringLiteral("Invalid user ID");
+				break;
+			case OS_INVALID_DOCUMENT_ID:
+				message = QStringLiteral("Invalid document ID");
+				break;
+			default:
+				message = QStringLiteral("Close failed");
+				break;
 		}
 	}
-	CompleteTask(taskId, TaskResult{status, params.documentId, msg});
+	CompleteTask(taskId, TaskResult{status, params.documentId, message});
 }
 
 
 IDocumentService::OperationStatus CDocumentServiceBase::CloseDocumentInternal(
-	const QByteArray& userId, const QByteArray& documentId)
+			const QByteArray& userId,
+			const QByteArray& documentId)
 {
 	QByteArray typeId;
 	QByteArray objectId;
@@ -432,7 +439,10 @@ void CDocumentServiceBase::CompleteTask(const QByteArray& taskId, const TaskResu
 }
 
 
-IDocumentService::OperationStatus CDocumentServiceBase::GetDocumentName(const QByteArray& userId, const QByteArray& documentId, QString& documentName) const
+IDocumentService::OperationStatus CDocumentServiceBase::GetDocumentName(
+			const QByteArray& userId,
+			const QByteArray& documentId,
+			QString& documentName) const
 {
 
 	QMutexLocker locker(&m_mutex);
@@ -448,7 +458,10 @@ IDocumentService::OperationStatus CDocumentServiceBase::GetDocumentName(const QB
 }
 
 
-IDocumentService::OperationStatus CDocumentServiceBase::SetDocumentName(const QByteArray& userId, const QByteArray& documentId, const QString& documentName)
+IDocumentService::OperationStatus CDocumentServiceBase::SetDocumentName(
+			const QByteArray& userId,
+			const QByteArray& documentId,
+			const QString& documentName)
 {
 	return OS_FAILED;
 }
@@ -473,7 +486,10 @@ const istd::IChangeable* CDocumentServiceBase::GetDocumentPtr(const QByteArray& 
 }
 
 
-IDocumentService::OperationStatus CDocumentServiceBase::GetDocumentData(const QByteArray& userId, const QByteArray& documentId, istd::IChangeableSharedPtr& documentPtr) const
+IDocumentService::OperationStatus CDocumentServiceBase::GetDocumentData(
+			const QByteArray& userId,
+			const QByteArray& documentId,
+			istd::IChangeableSharedPtr& documentPtr) const
 {
 	QMutexLocker locker(&m_mutex);
 	OperationStatus validationStatus;
@@ -500,7 +516,10 @@ IDocumentService::OperationStatus CDocumentServiceBase::GetDocumentData(const QB
 }
 
 
-IDocumentService::OperationStatus CDocumentServiceBase::SetDocumentData(const QByteArray& userId, const QByteArray& documentId, const istd::IChangeable& document)
+IDocumentService::OperationStatus CDocumentServiceBase::SetDocumentData(
+			const QByteArray& userId,
+			const QByteArray& documentId,
+			const istd::IChangeable& document)
 {
 	QMutexLocker locker(&m_mutex);
 
@@ -522,7 +541,9 @@ IDocumentService::OperationStatus CDocumentServiceBase::SetDocumentData(const QB
 
 
 IDocumentService::OperationStatus CDocumentServiceBase::GetDocumentUndoManager(
-	const QByteArray& userId, const QByteArray& documentId, idoc::IUndoManager*& undoManagerPtr) const
+			const QByteArray& userId,
+			const QByteArray& documentId,
+			idoc::IUndoManager*& undoManagerPtr) const
 {
 	undoManagerPtr = nullptr;
 
@@ -539,7 +560,9 @@ IDocumentService::OperationStatus CDocumentServiceBase::GetDocumentUndoManager(
 
 
 IDocumentService::OperationStatus CDocumentServiceBase::RegisterDocumentObserver(
-	const QByteArray& userId, const QByteArray& documentId, imod::IObserver& observer)
+			const QByteArray& userId,
+			const QByteArray& documentId,
+			imod::IObserver& observer)
 {
 	istd::IChangeableSharedPtr objectPtr;
 	{
@@ -569,7 +592,9 @@ IDocumentService::OperationStatus CDocumentServiceBase::RegisterDocumentObserver
 
 
 IDocumentService::OperationStatus CDocumentServiceBase::UnregisterDocumentObserver(
-	const QByteArray& userId, const QByteArray& documentId, imod::IObserver& observer)
+			const QByteArray& userId,
+			const QByteArray& documentId,
+			imod::IObserver& observer)
 {
 	istd::IChangeableSharedPtr objectPtr;
 	{
@@ -651,8 +676,8 @@ int CDocumentServiceBase::GetUndoManagerNextModelId(const QByteArray& userId)
 
 
 void CDocumentServiceBase::InitializeDocumentObservers(
-	WorkingDocument& document,
-	const QByteArray& userId)
+			WorkingDocument& document,
+			const QByteArray& userId)
 {
 	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(document.objectPtr.GetPtr());
 	imod::IModel* undoModelPtr = dynamic_cast<imod::IModel*>(document.undoManagerPtr.GetPtr());
@@ -690,16 +715,17 @@ CDocumentServiceBase::WorkingDocument* CDocumentServiceBase::FindDocument(
 
 
 const CDocumentServiceBase::WorkingDocument* CDocumentServiceBase::FindDocument(
-	const QByteArray& userId, const QByteArray& documentId) const
+			const QByteArray& userId,
+			const QByteArray& documentId) const
 {
 	return const_cast<CDocumentServiceBase*>(this)->FindDocument(userId, documentId);
 }
 
 
 bool CDocumentServiceBase::FindDocument(
-	int undoManagerModelId,
-	QByteArray& outUserId,
-	QByteArray& outDocumentId)
+			int undoManagerModelId,
+			QByteArray& outUserId,
+			QByteArray& outDocumentId)
 {
 	for (const QByteArray& userId : m_userDocuments.keys()){
 		WorkingDocumentList& documents = m_userDocuments[userId];
@@ -727,8 +753,8 @@ QUrl CDocumentServiceBase::ObjectIdToUrl(const QByteArray& objectId)
 
 
 IDocumentService::DocumentNotificationPtr CDocumentServiceBase::CreateDocumentNotification(
-	const QByteArray& userId,
-	const QByteArray& documentId) const
+			const QByteArray& userId,
+			const QByteArray& documentId) const
 {
 	std::shared_ptr<DocumentNotification> retVal;
 
@@ -748,8 +774,8 @@ IDocumentService::DocumentNotificationPtr CDocumentServiceBase::CreateDocumentNo
 
 
 void CDocumentServiceBase::OnDocumentDataLoaded(
-	const QByteArray& userId,
-	const QByteArray& documentId)
+			const QByteArray& userId,
+			const QByteArray& documentId)
 {
 	WorkingDocument* documentPtr = FindDocument(userId, documentId);
 	if (documentPtr == nullptr) {
@@ -773,12 +799,12 @@ void CDocumentServiceBase::OnDocumentDataLoaded(
 	for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
 		if (handlerPtr != nullptr){
 			CDocumentDataLoadedEvent event(
-				userId,
-				documentId,
-				documentPtr->typeId,
-				documentPtr->name,
-				ObjectIdToUrl(documentPtr->objectId),
-				documentPtr->isDirty);
+						userId,
+						documentId,
+						documentPtr->typeId,
+						documentPtr->name,
+						ObjectIdToUrl(documentPtr->objectId),
+						documentPtr->isDirty);
 			handlerPtr->ProcessEvent(&event);
 		}
 	}
@@ -849,13 +875,13 @@ void CDocumentServiceBase::OnUndoManagerChanged(int modelId)
 	for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
 		if (handlerPtr != nullptr){
 			CDocumentUndoRedoChangedEvent event(
-				userId,
-				documentId,
-				documentPtr->typeId,
-				documentPtr->name,
-				ObjectIdToUrl(documentPtr->objectId),
-				documentPtr->isDirty,
-				*documentPtr->undoManagerPtr);
+						userId,
+						documentId,
+						documentPtr->typeId,
+						documentPtr->name,
+						ObjectIdToUrl(documentPtr->objectId),
+						documentPtr->isDirty,
+						*documentPtr->undoManagerPtr);
 			handlerPtr->ProcessEvent(&event);
 		}
 	}
@@ -937,14 +963,14 @@ void CDocumentServiceBase::OnUpdate(imod::IModel* modelPtr, const istd::IChangea
 					if (handlerPtr != nullptr){
 						WorkingDocument& workingDocument = documents[documentId];
 						CDocumentChangedEvent event(
-							userId,
-							documentId,
-							workingDocument.typeId,
-							workingDocument.name,
-							ObjectIdToUrl(workingDocument.objectId),
-							workingDocument.isDirty,
-							*changeablePtr,
-							changeSet);
+									userId,
+									documentId,
+									workingDocument.typeId,
+									workingDocument.name,
+									ObjectIdToUrl(workingDocument.objectId),
+									workingDocument.isDirty,
+									*changeablePtr,
+									changeSet);
 						handlerPtr->ProcessEvent(&event);
 					}
 				}
@@ -972,7 +998,6 @@ void CDocumentServiceBase::UndoManagerObserver::OnModelChanged(int modelId, cons
 {
 	m_parent.OnUndoManagerChanged(modelId);
 }
-
 
 
 } // namespace imtdoc
