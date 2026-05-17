@@ -333,15 +333,21 @@ void CCollectionDocumentServiceBase::DoOpenDocument(
 			return;
 		}
 
-		QMutexLocker locker(&m_mutex);
+		UserDocumentPairList docsToNotify;
 
-		if (singleCopyMode) {
-			if (!m_sharedDocuments.contains(objectId)) {
-				return;
-			}
+		{
+			QMutexLocker locker(&m_mutex);
 
-			SharedDocumentData& shared = m_sharedDocuments[objectId];
-			if (shared.objectPtr.IsValid() && shared.isLoading) {
+			if (singleCopyMode) {
+				if (!m_sharedDocuments.contains(objectId)) {
+					return;
+				}
+
+				SharedDocumentData& shared = m_sharedDocuments[objectId];
+				if (!shared.objectPtr.IsValid() || !shared.isLoading) {
+					return;
+				}
+
 				shared.isLoading = false;
 
 				bool observersInitialized = false;
@@ -349,34 +355,34 @@ void CCollectionDocumentServiceBase::DoOpenDocument(
 				for (const UserDocumentPair& pair : docs) {
 					WorkingDocument* dp = FindDocument(pair.first, pair.second);
 					if (dp != nullptr && dp->isLoading) {
-						dp->isLoading = false;
-
 						if (!observersInitialized) {
 							InitializeDocumentObservers(*dp, pair.first);
 							shared.undoManagerModelId = dp->undoManagerModelId;
 							observersInitialized = true;
 						}
 
-						OnDocumentDataLoaded(pair.first, pair.second);
+						docsToNotify.append(pair);
 					}
 				}
-
-				CompleteTask(taskId, TaskResult{OS_OK, documentId, QString()});
 			}
-		}
-		else {
-			WorkingDocument* docPtr = FindDocument(userId, documentId);
+			else {
+				WorkingDocument* docPtr = FindDocument(userId, documentId);
 
-			if (docPtr != nullptr && docPtr->objectPtr.IsValid() && docPtr->isLoading) {
-				docPtr->isLoading = false;
+				if (docPtr == nullptr || !docPtr->objectPtr.IsValid() || !docPtr->isLoading) {
+					return;
+				}
 
 				InitializeDocumentObservers(*docPtr, userId);
-
-				OnDocumentDataLoaded(userId, documentId);
-
-				CompleteTask(taskId, TaskResult{OS_OK, documentId, QString()});
+				docsToNotify.append(qMakePair(userId, documentId));
 			}
 		}
+
+		// OnDocumentDataLoaded sets isLoading=false inside its CChangeNotifier scope
+		for (const UserDocumentPair& pair : docsToNotify) {
+			OnDocumentDataLoaded(pair.first, pair.second);
+		}
+
+		CompleteTask(taskId, TaskResult{OS_OK, documentId, QString()});
 	});
 
 	QObject::connect(worker, &QObject::destroyed, thread, &QThread::quit);
