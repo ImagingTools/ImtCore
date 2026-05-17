@@ -76,6 +76,8 @@ Item {
     signal cellEditCanceled(var index, var column)
     signal nodeTextEdited(var index, string text, string oldText)
 
+    property alias listView: listView
+
     property var __nodes: ({})
     property var __rootKeys: []
     property var __expandedState: ({})
@@ -951,7 +953,6 @@ Item {
             if (node && node.childrenKeys.length > 0) {
                 node.expanded = true
                 __expandedState[nodeKey] = true
-                writeBackNode(node)
             }
         }
         buildVisibleTree()
@@ -960,10 +961,9 @@ Item {
     function collapseAll() {
         for (var nodeKey in __nodes) {
             var node = __nodes[nodeKey]
-            if (node) {
+            if (node && node.childrenKeys.length > 0) {
                 node.expanded = false
                 __expandedState[nodeKey] = false
-                writeBackNode(node)
             }
         }
         buildVisibleTree()
@@ -1402,7 +1402,7 @@ Item {
                 writeBackNode(node)
             }
         }
-        buildVisibleTree()
+        syncAllVisibleChecked()
         checkedItemsChanged()
     }
 
@@ -1414,8 +1414,16 @@ Item {
                 writeBackNode(node)
             }
         }
-        buildVisibleTree()
+        syncAllVisibleChecked()
         checkedItemsChanged()
+    }
+
+    function syncAllVisibleChecked() {
+        for (var i = 0; i < __visibleKeys.length; ++i) {
+            var node = __nodes[__visibleKeys[i]]
+            if (node)
+                visibleModel.setProperty(i, "checked", node.checked)
+        }
     }
 
     function checkItem(key) {
