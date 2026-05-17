@@ -37,13 +37,13 @@ bool CDocumentServiceCompBase::ValidateDocumentData(
 	QString* errorMessage) const
 {
 	status = OS_OK;
-	if (errorMessage != nullptr) {
+	if (errorMessage != nullptr){
 		errorMessage->clear();
 	}
 
 	if (!document.objectPtr.IsValid()){
 		status = OS_INVALID_DOCUMENT_DATA;
-		if (errorMessage != nullptr) {
+		if (errorMessage != nullptr){
 			*errorMessage = GetInvalidDocumentMessage();
 		}
 		return false;
@@ -57,7 +57,7 @@ bool CDocumentServiceCompBase::ValidateDocumentData(
 	QString validationMessage;
 	if (!documentValidator->ValidateDocumentData(document.objectId, *document.objectPtr, validationMessage)){
 		status = OS_INVALID_DOCUMENT_DATA;
-		if (errorMessage != nullptr) {
+		if (errorMessage != nullptr){
 			*errorMessage = validationMessage.isEmpty() ? GetInvalidDocumentMessage() : validationMessage;
 		}
 		QString warningMessage = QString("Document validation failed for type '%1'")

@@ -76,20 +76,20 @@ void CCollectionDocumentServiceBase::DoOpenDocument(
 	QByteArray objectId = parts.first().toUtf8();
 
 	imtbase::IObjectCollection* collectionPtr = GetCollection();
-	if (collectionPtr == nullptr) {
+	if (collectionPtr == nullptr){
 		CompleteTask(taskId, TaskResult{OS_FAILED, QByteArray(), QStringLiteral("No collection available")});
 		return;
 	}
 
 	QByteArray objectTypeId = collectionPtr->GetObjectTypeId(objectId);
 
-	if (objectTypeId.isEmpty()) {
+	if (objectTypeId.isEmpty()){
 		CompleteTask(taskId, TaskResult{OS_FAILED, QByteArray(), QStringLiteral("Unknown object type")});
 		return;
 	}
 
 	// Single-copy mode: check if this object is already opened by any user
-	if (IsSingleCopyMode()) {
+	if (IsSingleCopyMode()){
 		bool isSharedDocument = false;
 		QByteArray sharedTypeId;
 		QString sharedName;
@@ -98,7 +98,7 @@ void CCollectionDocumentServiceBase::DoOpenDocument(
 
 		{
 			QMutexLocker locker(&m_mutex);
-			if (m_sharedDocuments.contains(objectId)) {
+			if (m_sharedDocuments.contains(objectId)){
 				isSharedDocument = true;
 				SharedDocumentData& shared = m_sharedDocuments[objectId];
 				sharedTypeId = shared.typeId;
@@ -110,7 +110,7 @@ void CCollectionDocumentServiceBase::DoOpenDocument(
 			}
 		}
 
-		if (isSharedDocument) {
+		if (isSharedDocument){
 			QByteArray documentId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 			DocumentOpenedInfo info;
@@ -129,7 +129,7 @@ void CCollectionDocumentServiceBase::DoOpenDocument(
 				istd::CChangeNotifier notifier(this, &changeSet);
 				{
 					QMutexLocker locker(&m_mutex);
-					if (m_sharedDocuments.contains(objectId)) {
+					if (m_sharedDocuments.contains(objectId)){
 						SharedDocumentData& shared = m_sharedDocuments[objectId];
 						shared.refCount++;
 
@@ -160,15 +160,15 @@ void CCollectionDocumentServiceBase::DoOpenDocument(
 				}
 			}
 
-			if (!sharedIsLoading) {
+			if (!sharedIsLoading){
 				// Defer the notification to ensure the mutation response is sent
 				// to the client before the subscription notification arrives.
 				QByteArray deferredUserId = userId;
 				QByteArray deferredDocumentId = documentId;
 				std::weak_ptr<std::atomic<bool>> deferredAliveGuard(m_isAlive);
-				QTimer::singleShot(0, QCoreApplication::instance(), [this, deferredAliveGuard, deferredUserId, deferredDocumentId]() {
+				QTimer::singleShot(0, QCoreApplication::instance(), [this, deferredAliveGuard, deferredUserId, deferredDocumentId](){
 					auto isAlive = deferredAliveGuard.lock();
-					if (!isAlive || !isAlive->load()) {
+					if (!isAlive || !isAlive->load()){
 						return;
 					}
 					OnDocumentDataLoaded(deferredUserId, deferredDocumentId);
@@ -215,7 +215,7 @@ void CCollectionDocumentServiceBase::DoOpenDocument(
 			doc.isDirty = false;
 			doc.isLoading = true;
 
-			if (IsSingleCopyMode()) {
+			if (IsSingleCopyMode()){
 				SharedDocumentData& shared = m_sharedDocuments[objectId];
 				shared.typeId = objectTypeId;
 				shared.name = documentName;
@@ -246,16 +246,16 @@ void CCollectionDocumentServiceBase::DoOpenDocument(
 
 	bool singleCopyMode = IsSingleCopyMode();
 	std::weak_ptr<std::atomic<bool>> aliveGuard(m_isAlive);
-	QObject::connect(thread, &QThread::started, worker, [this, aliveGuard, singleCopyMode, objectId, userId, documentId, taskId, worker]() {
+	QObject::connect(thread, &QThread::started, worker, [this, aliveGuard, singleCopyMode, objectId, userId, documentId, taskId, worker](){
 		auto isAlive = aliveGuard.lock();
-		if (!isAlive || !isAlive->load()) {
+		if (!isAlive || !isAlive->load()){
 			CompleteTask(taskId, TaskResult{OS_FAILED, QByteArray(), QStringLiteral("Service destroyed")});
 			worker->deleteLater();
 			return;
 		}
 
 		imtbase::IObjectCollection* collPtr = GetCollection();
-		if (collPtr == nullptr) {
+		if (collPtr == nullptr){
 			CompleteTask(taskId, TaskResult{OS_FAILED, QByteArray(), QStringLiteral("No collection available")});
 			worker->deleteLater();
 			return;
@@ -265,7 +265,7 @@ void CCollectionDocumentServiceBase::DoOpenDocument(
 		bool success = collPtr->GetObjectData(objectId, dataPtr);
 
 		isAlive = aliveGuard.lock();
-		if (!isAlive || !isAlive->load()) {
+		if (!isAlive || !isAlive->load()){
 			CompleteTask(taskId, TaskResult{OS_FAILED, QByteArray(), QStringLiteral("Service destroyed")});
 			worker->deleteLater();
 			return;
@@ -275,30 +275,30 @@ void CCollectionDocumentServiceBase::DoOpenDocument(
 		{
 			QMutexLocker locker(&m_mutex);
 
-			if (singleCopyMode) {
-				if (success && dataPtr.IsValid()) {
-					if (m_sharedDocuments.contains(objectId)) {
+			if (singleCopyMode){
+				if (success && dataPtr.IsValid()){
+					if (m_sharedDocuments.contains(objectId)){
 						m_sharedDocuments[objectId].objectPtr = dataPtr;
 					}
 
 					UserDocumentPairList docs = FindDocumentsByObjectId(objectId);
-					for (const UserDocumentPair& pair : docs) {
+					for (const UserDocumentPair& pair : docs){
 						WorkingDocument* dp = FindDocument(pair.first, pair.second);
-						if (dp != nullptr) {
+						if (dp != nullptr){
 							dp->objectPtr = dataPtr;
 						}
 					}
 					loadSuccess = true;
 				}
 				else {
-					if (m_sharedDocuments.contains(objectId)) {
+					if (m_sharedDocuments.contains(objectId)){
 						m_sharedDocuments[objectId].isLoading = false;
 					}
 
 					UserDocumentPairList docs = FindDocumentsByObjectId(objectId);
-					for (const UserDocumentPair& pair : docs) {
+					for (const UserDocumentPair& pair : docs){
 						WorkingDocument* dp = FindDocument(pair.first, pair.second);
-						if (dp != nullptr) {
+						if (dp != nullptr){
 							dp->isLoading = false;
 							CloseDocumentInternal(pair.first, pair.second);
 						}
@@ -308,11 +308,11 @@ void CCollectionDocumentServiceBase::DoOpenDocument(
 			else {
 				WorkingDocument* docPtr = FindDocument(userId, documentId);
 
-				if (docPtr != nullptr && success && dataPtr.IsValid()) {
+				if (docPtr != nullptr && success && dataPtr.IsValid()){
 					docPtr->objectPtr = dataPtr;
 					loadSuccess = true;
 				}
-				else if (docPtr != nullptr) {
+				else if (docPtr != nullptr){
 					docPtr->isLoading = false;
 					CloseDocumentInternal(userId, documentId);
 				}
@@ -327,9 +327,9 @@ void CCollectionDocumentServiceBase::DoOpenDocument(
 	});
 
 	// Initialize observers and fire events in the main thread after background work completes
-	QObject::connect(thread, &QThread::finished, QCoreApplication::instance(), [this, aliveGuard, singleCopyMode, objectId, userId, documentId, taskId]() {
+	QObject::connect(thread, &QThread::finished, QCoreApplication::instance(), [this, aliveGuard, singleCopyMode, objectId, userId, documentId, taskId](){
 		auto isAlive = aliveGuard.lock();
-		if (!isAlive || !isAlive->load()) {
+		if (!isAlive || !isAlive->load()){
 			return;
 		}
 
@@ -338,13 +338,13 @@ void CCollectionDocumentServiceBase::DoOpenDocument(
 		{
 			QMutexLocker locker(&m_mutex);
 
-			if (singleCopyMode) {
-				if (!m_sharedDocuments.contains(objectId)) {
+			if (singleCopyMode){
+				if (!m_sharedDocuments.contains(objectId)){
 					return;
 				}
 
 				SharedDocumentData& shared = m_sharedDocuments[objectId];
-				if (!shared.objectPtr.IsValid() || !shared.isLoading) {
+				if (!shared.objectPtr.IsValid() || !shared.isLoading){
 					return;
 				}
 
@@ -352,10 +352,10 @@ void CCollectionDocumentServiceBase::DoOpenDocument(
 
 				bool observersInitialized = false;
 				UserDocumentPairList docs = FindDocumentsByObjectId(objectId);
-				for (const UserDocumentPair& pair : docs) {
+				for (const UserDocumentPair& pair : docs){
 					WorkingDocument* dp = FindDocument(pair.first, pair.second);
-					if (dp != nullptr && dp->isLoading) {
-						if (!observersInitialized) {
+					if (dp != nullptr && dp->isLoading){
+						if (!observersInitialized){
 							InitializeDocumentObservers(*dp, pair.first);
 							shared.undoManagerModelId = dp->undoManagerModelId;
 							observersInitialized = true;
@@ -368,7 +368,7 @@ void CCollectionDocumentServiceBase::DoOpenDocument(
 			else {
 				WorkingDocument* docPtr = FindDocument(userId, documentId);
 
-				if (docPtr == nullptr || !docPtr->objectPtr.IsValid() || !docPtr->isLoading) {
+				if (docPtr == nullptr || !docPtr->objectPtr.IsValid() || !docPtr->isLoading){
 					return;
 				}
 
@@ -378,7 +378,7 @@ void CCollectionDocumentServiceBase::DoOpenDocument(
 		}
 
 		// OnDocumentDataLoaded sets isLoading=false inside its CChangeNotifier scope
-		for (const UserDocumentPair& pair : docsToNotify) {
+		for (const UserDocumentPair& pair : docsToNotify){
 			OnDocumentDataLoaded(pair.first, pair.second);
 		}
 
@@ -426,24 +426,24 @@ IDocumentService::OperationStatus CCollectionDocumentServiceBase::SetDocumentNam
 			return OS_FAILED;
 		}
 
-		if (!collectionPtr->SetElementName(objectId, documentName)) {
+		if (!collectionPtr->SetElementName(objectId, documentName)){
 			return OS_FAILED;
 		}
 	}
 
 	// Shared docs: rename and notify each user sharing this object
-	if (IsSingleCopyMode() && !objectId.isEmpty()) {
+	if (IsSingleCopyMode() && !objectId.isEmpty()){
 		UserDocumentPairList sharedDocs;
 		{
 			QMutexLocker locker(&m_mutex);
-			if (m_sharedDocuments.contains(objectId)) {
+			if (m_sharedDocuments.contains(objectId)){
 				m_sharedDocuments[objectId].name = documentName;
 			}
 			sharedDocs = FindDocumentsByObjectId(objectId);
 		}
 
-		for (const UserDocumentPair& pair : sharedDocs) {
-			if (pair.first == userId && pair.second == documentId) {
+		for (const UserDocumentPair& pair : sharedDocs){
+			if (pair.first == userId && pair.second == documentId){
 				continue;
 			}
 
@@ -455,7 +455,7 @@ IDocumentService::OperationStatus CCollectionDocumentServiceBase::SetDocumentNam
 			{
 				QMutexLocker locker(&m_mutex);
 				WorkingDocument* dp = FindDocument(pair.first, pair.second);
-				if (dp != nullptr) {
+				if (dp != nullptr){
 					dpExists = true;
 					dpTypeId = dp->typeId;
 					dpObjectId = dp->objectId;
@@ -463,7 +463,7 @@ IDocumentService::OperationStatus CCollectionDocumentServiceBase::SetDocumentNam
 				}
 			}
 
-			if (!dpExists) {
+			if (!dpExists){
 				continue;
 			}
 
@@ -483,7 +483,7 @@ IDocumentService::OperationStatus CCollectionDocumentServiceBase::SetDocumentNam
 				{
 					QMutexLocker locker(&m_mutex);
 					WorkingDocument* dp = FindDocument(pair.first, pair.second);
-					if (dp != nullptr) {
+					if (dp != nullptr){
 						dp->name = documentName;
 					}
 				}
@@ -521,7 +521,7 @@ IDocumentService::OperationStatus CCollectionDocumentServiceBase::SetDocumentNam
 		{
 			QMutexLocker locker(&m_mutex);
 			WorkingDocument* workingDocumentPtr = FindDocument(userId, documentId);
-			if (workingDocumentPtr != nullptr) {
+			if (workingDocumentPtr != nullptr){
 				workingDocumentPtr->name = documentName;
 			}
 		}
@@ -553,7 +553,7 @@ void CCollectionDocumentServiceBase::DoSaveDocument(
 	const QString& documentName = params.documentName;
 
 	imtbase::IObjectCollection* collectionPtr = GetCollection();
-	if (collectionPtr == nullptr) {
+	if (collectionPtr == nullptr){
 		CompleteTask(taskId, TaskResult{OS_FAILED, documentId, QStringLiteral("No collection available")});
 		return;
 	}
@@ -568,7 +568,7 @@ void CCollectionDocumentServiceBase::DoSaveDocument(
 
 	WorkingDocument* workingDocumentPtr = &m_userDocuments[userId][documentId];
 
-	if (workingDocumentPtr->isLoading) {
+	if (workingDocumentPtr->isLoading){
 		CompleteTask(taskId, TaskResult{OS_FAILED, documentId, QStringLiteral("Document is still loading")});
 		return;
 	}
@@ -597,7 +597,7 @@ void CCollectionDocumentServiceBase::DoSaveDocument(
 	istd::CChangeGroup changeGroup(collectionPtr);
 
 	QString resultDocumentName = documentName;
-	if (!workingDocumentPtr->objectId.isEmpty()) {
+	if (!workingDocumentPtr->objectId.isEmpty()){
 		// Create copy of the object
 		if (!resultDocumentName.isEmpty() && workingDocumentPtr->name != resultDocumentName){
 			QByteArray oldObjectId = workingDocumentPtr->objectId;
@@ -616,13 +616,13 @@ void CCollectionDocumentServiceBase::DoSaveDocument(
 			}
 
 			// In single-copy mode, detach from shared document before changing objectId
-			if (IsSingleCopyMode() && m_sharedDocuments.contains(oldObjectId)) {
+			if (IsSingleCopyMode() && m_sharedDocuments.contains(oldObjectId)){
 				SharedDocumentData& shared = m_sharedDocuments[oldObjectId];
 				shared.refCount--;
 				bool isLastUser = (shared.refCount <= 0);
-				if (isLastUser) {
+				if (isLastUser){
 					imod::IModel* undoModelPtr = dynamic_cast<imod::IModel*>(shared.undoManagerPtr.GetPtr());
-					if (undoModelPtr != nullptr && shared.undoManagerModelId >= 0) {
+					if (undoModelPtr != nullptr && shared.undoManagerModelId >= 0){
 						m_undoManagerObserver.UnregisterModel(shared.undoManagerModelId);
 					}
 					m_sharedDocuments.remove(oldObjectId);
@@ -630,7 +630,7 @@ void CCollectionDocumentServiceBase::DoSaveDocument(
 
 				// Create new private objectPtr and undoManagerPtr for this user
 				istd::IChangeableSharedPtr newObjectPtr = CreateObject(workingDocumentPtr->typeId);
-				if (newObjectPtr.IsValid()) {
+				if (newObjectPtr.IsValid()){
 					newObjectPtr->CopyFrom(*documentSnapshotPtr);
 				}
 				idoc::IUndoManagerSharedPtr newUndoManagerPtr = CreateUndoManager();
@@ -661,7 +661,7 @@ void CCollectionDocumentServiceBase::DoSaveDocument(
 				{
 					locker.relock();
 					workingDocumentPtr = FindDocument(userId, documentId);
-					if (workingDocumentPtr != nullptr) {
+					if (workingDocumentPtr != nullptr){
 						workingDocumentPtr->objectId = newObjectId;
 						workingDocumentPtr->name = resultDocumentName;
 						workingDocumentPtr->isDirty = false;
@@ -700,18 +700,18 @@ void CCollectionDocumentServiceBase::DoSaveDocument(
 
 			workingDocumentPtr->undoManagerPtr->StoreDocumentState();
 
-			if (IsSingleCopyMode() && !workingDocumentPtr->objectId.isEmpty()) {
+			if (IsSingleCopyMode() && !workingDocumentPtr->objectId.isEmpty()){
 				// Update all users sharing this document
 				QByteArray sharedObjectId = workingDocumentPtr->objectId;
 
-				if (m_sharedDocuments.contains(sharedObjectId) && !updatedName.isEmpty()) {
+				if (m_sharedDocuments.contains(sharedObjectId) && !updatedName.isEmpty()){
 					m_sharedDocuments[sharedObjectId].name = updatedName;
 				}
 
 				UserDocumentPairList docs = FindDocumentsByObjectId(sharedObjectId);
-				for (const UserDocumentPair& pair : docs) {
+				for (const UserDocumentPair& pair : docs){
 					WorkingDocument* dp = FindDocument(pair.first, pair.second);
-					if (dp == nullptr) {
+					if (dp == nullptr){
 						continue;
 					}
 
@@ -736,9 +736,9 @@ void CCollectionDocumentServiceBase::DoSaveDocument(
 						{
 							locker.relock();
 							dp = FindDocument(pair.first, pair.second);
-							if (dp != nullptr) {
+							if (dp != nullptr){
 								dp->isDirty = false;
-								if (!updatedName.isEmpty()) {
+								if (!updatedName.isEmpty()){
 									dp->name = updatedName;
 								}
 							}
@@ -784,8 +784,8 @@ void CCollectionDocumentServiceBase::DoSaveDocument(
 					{
 						locker.relock();
 						workingDocumentPtr = FindDocument(userId, documentId);
-						if (workingDocumentPtr != nullptr) {
-							if (!updatedName.isEmpty()) {
+						if (workingDocumentPtr != nullptr){
+							if (!updatedName.isEmpty()){
 								workingDocumentPtr->name = updatedName;
 							}
 							workingDocumentPtr->isDirty = false;
@@ -819,7 +819,7 @@ void CCollectionDocumentServiceBase::DoSaveDocument(
 	QByteArray proposedElementId;
 	{
 		auto it = m_proposedSourceDocumentIds.find(documentId);
-		if (it != m_proposedSourceDocumentIds.end()) {
+		if (it != m_proposedSourceDocumentIds.end()){
 			proposedElementId = it.value();
 			m_proposedSourceDocumentIds.erase(it);
 		}
@@ -854,7 +854,7 @@ void CCollectionDocumentServiceBase::DoSaveDocument(
 			{
 				locker.relock();
 				workingDocumentPtr = FindDocument(userId, documentId);
-				if (workingDocumentPtr != nullptr) {
+				if (workingDocumentPtr != nullptr){
 					workingDocumentPtr->name = resultDocumentName;
 					workingDocumentPtr->isDirty = false;
 					workingDocumentPtr->undoManagerPtr->StoreDocumentState();

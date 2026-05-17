@@ -18,13 +18,13 @@ class CDocumentUndoRedoChangedEvent : public CEventBase
 public:
 	CDocumentUndoRedoChangedEvent() = delete;
 	CDocumentUndoRedoChangedEvent(
-		const QByteArray& userId,
-		const QByteArray& documentId,
-		const QByteArray& documentTypeId,
-		const QString& documentName,
-		const QUrl& documentUrl,
-		bool isDirty,
-		const idoc::IUndoManager& undoManager);
+				const QByteArray& userId,
+				const QByteArray& documentId,
+				const QByteArray& documentTypeId,
+				const QString& documentName,
+				const QUrl& documentUrl,
+				bool isDirty,
+				const idoc::IUndoManager& undoManager);
 	const idoc::IUndoManager& GetUndoManager();
 
 	// reimplemented (CEventBase)
