@@ -91,8 +91,6 @@ protected:
 	const WorkingDocument* FindDocument(const QByteArray& userId, const QByteArray& documentId) const;
 	bool FindDocument(int undoManagerModelId, QByteArray& outUserId, QByteArray& outDocumentId);
 	QUrl ObjectIdToUrl(const QByteArray& objectId);
-	DocumentNotificationPtr CreateDocumentNotification(const QByteArray& userId, const QByteArray& documentId) const;
-
 	void OnDocumentDataLoaded(const QByteArray& userId, const QByteArray& documentId);
 	void OnUndoManagerChanged(int modelId);
 

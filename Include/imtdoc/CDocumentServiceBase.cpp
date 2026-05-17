@@ -8,7 +8,6 @@
 #include <QtCore/QThread>
 
 // ACF includes
-#include <istd/CChangeNotifier.h>
 #include <imod/IModel.h>
 #include <imod/IObserver.h>
 
@@ -195,29 +194,16 @@ void CDocumentServiceBase::DoCreateNewDocument(const QByteArray& taskId, const T
 
 	QByteArray documentId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
-	NewDocumentCreatedInfo info;
-	info.userId = params.userId;
-	info.documentId = documentId;
-	info.typeId = params.documentTypeId;
-	info.name = "";
-	info.isDirty = false;
-
-	istd::IChangeable::ChangeSet changeSet(CF_NEW_DOCUMENT_CREATED);
-	changeSet.SetChangeInfo(CN_NEW_DOCUMENT_CREATED, QVariant::fromValue(info));
-
 	QString documentName;
 	{
-		istd::CChangeNotifier notifier(this, &changeSet);
-		{
-			QMutexLocker locker(&m_mutex);
-			WorkingDocument& doc = m_userDocuments[params.userId][documentId];
-			doc.typeId = params.documentTypeId;
-			doc.undoManagerPtr = undoManagerPtr;
-			doc.isDirty = false;
-			doc.name = "";
-			doc.isLoading = true;
-			documentName = doc.name;
-		}
+		QMutexLocker locker(&m_mutex);
+		WorkingDocument& doc = m_userDocuments[params.userId][documentId];
+		doc.typeId = params.documentTypeId;
+		doc.undoManagerPtr = undoManagerPtr;
+		doc.isDirty = false;
+		doc.name = "";
+		doc.isLoading = true;
+		documentName = doc.name;
 	}
 
 	for (IDocumentServiceEventHandler* handlerPtr : GetDocumentServiceEventHandlers()){
@@ -359,54 +345,44 @@ IDocumentService::OperationStatus CDocumentServiceBase::CloseDocumentInternal(
 		}
 	}
 
-	DocumentClosedNotification notification;
-	notification.userId = userId;
-	notification.documentId = documentId;
-
-	istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_CLOSED);
-	changeSet.SetChangeInfo(CN_DOCUMENT_CLOSED, QVariant::fromValue(notification));
-
 	{
-		istd::CChangeNotifier notifier(this, &changeSet);
-		{
-			QMutexLocker locker(&m_mutex);
-			if (!m_userDocuments.contains(userId) || !m_userDocuments[userId].contains(documentId)){
-				return OS_INVALID_DOCUMENT_ID;
-			}
+		QMutexLocker locker(&m_mutex);
+		if (!m_userDocuments.contains(userId) || !m_userDocuments[userId].contains(documentId)){
+			return OS_INVALID_DOCUMENT_ID;
+		}
 
-			workingDocumentPtr = &m_userDocuments[userId][documentId];
+		workingDocumentPtr = &m_userDocuments[userId][documentId];
 
-			bool isLastSharedUser = true;
-			if (IsSingleCopyMode() && !workingDocumentPtr->objectId.isEmpty()
-				&& m_sharedDocuments.contains(workingDocumentPtr->objectId)){
-				SharedDocumentData& shared = m_sharedDocuments[workingDocumentPtr->objectId];
-				shared.refCount--;
-				isLastSharedUser = (shared.refCount <= 0);
-				if (isLastSharedUser){
-					imod::IModel* undoModelPtr = dynamic_cast<imod::IModel*>(shared.undoManagerPtr.GetPtr());
-					if (undoModelPtr != nullptr && shared.undoManagerModelId >= 0){
-						m_undoManagerObserver.UnregisterModel(shared.undoManagerModelId);
-					}
-					m_sharedDocuments.remove(workingDocumentPtr->objectId);
-				}
-			}
-
+		bool isLastSharedUser = true;
+		if (IsSingleCopyMode() && !workingDocumentPtr->objectId.isEmpty()
+			&& m_sharedDocuments.contains(workingDocumentPtr->objectId)){
+			SharedDocumentData& shared = m_sharedDocuments[workingDocumentPtr->objectId];
+			shared.refCount--;
+			isLastSharedUser = (shared.refCount <= 0);
 			if (isLastSharedUser){
-				imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(workingDocumentPtr->undoManagerPtr.GetPtr());
-				if (modelPtr != nullptr){
-					modelPtr->DetachAllObservers();
+				imod::IModel* undoModelPtr = dynamic_cast<imod::IModel*>(shared.undoManagerPtr.GetPtr());
+				if (undoModelPtr != nullptr && shared.undoManagerModelId >= 0){
+					m_undoManagerObserver.UnregisterModel(shared.undoManagerModelId);
 				}
+				m_sharedDocuments.remove(workingDocumentPtr->objectId);
 			}
+		}
 
-			typeId = workingDocumentPtr->typeId;
-			objectId = workingDocumentPtr->objectId;
-			name = workingDocumentPtr->name;
-			isDirty = workingDocumentPtr->isDirty;
-
-			m_userDocuments[userId].remove(documentId);
-			if (m_userDocuments[userId].isEmpty()){
-				m_userDocuments.remove(userId);
+		if (isLastSharedUser){
+			imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(workingDocumentPtr->undoManagerPtr.GetPtr());
+			if (modelPtr != nullptr){
+				modelPtr->DetachAllObservers();
 			}
+		}
+
+		typeId = workingDocumentPtr->typeId;
+		objectId = workingDocumentPtr->objectId;
+		name = workingDocumentPtr->name;
+		isDirty = workingDocumentPtr->isDirty;
+
+		m_userDocuments[userId].remove(documentId);
+		if (m_userDocuments[userId].isEmpty()){
+			m_userDocuments.remove(userId);
 		}
 	}
 
@@ -759,32 +735,10 @@ QUrl CDocumentServiceBase::ObjectIdToUrl(const QByteArray& objectId)
 }
 
 
-IDocumentService::DocumentNotificationPtr CDocumentServiceBase::CreateDocumentNotification(
-			const QByteArray& userId,
-			const QByteArray& documentId) const
-{
-	std::shared_ptr<DocumentNotification> retVal;
-
-	if (m_userDocuments.contains(userId) && m_userDocuments[userId].contains(documentId)){
-		const WorkingDocument document = m_userDocuments[userId][documentId];
-
-		retVal.reset(new DocumentNotification);
-		retVal->userId = userId;
-		retVal->documentId = documentId;
-		retVal->url = "collection:///" + document.objectId;
-		retVal->name = document.name;
-		retVal->isDirty = document.isDirty;
-	}
-
-	return retVal;
-}
-
-
 void CDocumentServiceBase::OnDocumentDataLoaded(
 			const QByteArray& userId,
 			const QByteArray& documentId)
 {
-	DocumentDataLoadedInfo info;
 	QByteArray typeId;
 	QString name;
 	QByteArray objectId;
@@ -803,25 +757,11 @@ void CDocumentServiceBase::OnDocumentDataLoaded(
 		isDirty = documentPtr->isDirty;
 	}
 
-	info.userId = userId;
-	info.documentId = documentId;
-	info.typeId = typeId;
-	info.url = ObjectIdToUrl(objectId);
-	info.name = name;
-	info.isDirty = isDirty;
-	info.isLoading = false;
-
-	istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_DATA_LOADED);
-	changeSet.SetChangeInfo(CN_DOCUMENT_DATA_LOADED, QVariant::fromValue(info));
-
 	{
-		istd::CChangeNotifier notifier(this, &changeSet);
-		{
-			QMutexLocker locker(&m_mutex);
-			WorkingDocument* documentPtr = FindDocument(userId, documentId);
-			if (documentPtr != nullptr){
-				documentPtr->isLoading = false;
-			}
+		QMutexLocker locker(&m_mutex);
+		WorkingDocument* documentPtr = FindDocument(userId, documentId);
+		if (documentPtr != nullptr){
+			documentPtr->isLoading = false;
 		}
 	}
 
@@ -883,26 +823,11 @@ void CDocumentServiceBase::OnUndoManagerChanged(int modelId)
 					newIsDirty = documentPtr->undoManagerPtr->GetDocumentChangeFlag() != idoc::IDocumentStateComparator::DCF_EQUAL;
 				}
 
-				DocumentUndoRedoNotification notification;
-				notification.userId = pair.first;
-				notification.documentId = pair.second;
-				notification.isDirty = newIsDirty;
-				if (docUndoManagerPtr.IsValid()){
-					notification.availableUndoSteps = docUndoManagerPtr->GetAvailableUndoSteps();
-					notification.availableRedoSteps = docUndoManagerPtr->GetAvailableRedoSteps();
-				}
-
-				istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_UNDO_CHANGED);
-				changeSet.SetChangeInfo(CN_DOCUMENT_UNDO_CHANGED, QVariant::fromValue(notification));
-
 				{
-					istd::CChangeNotifier notifier(this, &changeSet);
-					{
-						QMutexLocker locker(&m_mutex);
-						WorkingDocument* documentPtr = FindDocument(pair.first, pair.second);
-						if (documentPtr != nullptr){
-							documentPtr->isDirty = newIsDirty;
-						}
+					QMutexLocker locker(&m_mutex);
+					WorkingDocument* documentPtr = FindDocument(pair.first, pair.second);
+					if (documentPtr != nullptr){
+						documentPtr->isDirty = newIsDirty;
 					}
 				}
 
@@ -955,26 +880,11 @@ void CDocumentServiceBase::OnUndoManagerChanged(int modelId)
 		newIsDirty = documentPtr->undoManagerPtr->GetDocumentChangeFlag() != idoc::IDocumentStateComparator::DCF_EQUAL;
 	}
 
-	DocumentUndoRedoNotification notification;
-	notification.userId = userId;
-	notification.documentId = documentId;
-	notification.isDirty = newIsDirty;
-	if (docUndoManagerPtr.IsValid()){
-		notification.availableUndoSteps = docUndoManagerPtr->GetAvailableUndoSteps();
-		notification.availableRedoSteps = docUndoManagerPtr->GetAvailableRedoSteps();
-	}
-
-	istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_UNDO_CHANGED);
-	changeSet.SetChangeInfo(CN_DOCUMENT_UNDO_CHANGED, QVariant::fromValue(notification));
-
 	{
-		istd::CChangeNotifier notifier(this, &changeSet);
-		{
-			QMutexLocker locker(&m_mutex);
-			WorkingDocument* documentPtr = FindDocument(userId, documentId);
-			if (documentPtr != nullptr){
-				documentPtr->isDirty = newIsDirty;
-			}
+		QMutexLocker locker(&m_mutex);
+		WorkingDocument* documentPtr = FindDocument(userId, documentId);
+		if (documentPtr != nullptr){
+			documentPtr->isDirty = newIsDirty;
 		}
 	}
 

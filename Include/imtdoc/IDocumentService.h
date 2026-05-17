@@ -21,19 +21,6 @@ namespace imtdoc
 class IDocumentService : virtual public iser::ISerializable
 {
 public:
-	enum ChangeFlags
-	{
-		CF_NEW_DOCUMENT_CREATED = 170000,
-		CF_DOCUMENT_OPENED,
-		CF_DOCUMENT_RENAMED,
-		CF_DOCUMENT_CHANGED,
-		CF_DOCUMENT_UNDO_CHANGED,
-		CF_DOCUMENT_SAVED,
-		CF_DOCUMENT_SAVED_AS,
-		CF_DOCUMENT_CLOSED,
-		CF_DOCUMENT_DATA_LOADED
-	};
-
 	enum OperationStatus
 	{
 		OS_OK = 0,
@@ -126,50 +113,6 @@ public:
 	};
 	typedef std::shared_ptr<DocumentNotification> DocumentNotificationPtr;
 
-	struct DocumentUndoRedoNotification
-	{
-		QByteArray userId;
-		QByteArray documentId;
-		bool isDirty = false;
-		int availableUndoSteps = 0;
-		int availableRedoSteps = 0;
-		QStringList undoLevelDescriptions;
-		QStringList redoLevelDescriptions;
-	};
-
-	struct DocumentClosedNotification
-	{
-		QByteArray userId;
-		QByteArray documentId;
-	};
-
-	static const QByteArray CN_NEW_DOCUMENT_CREATED;
-	typedef DocumentNotification NewDocumentCreatedInfo;
-
-	static const QByteArray CN_DOCUMENT_OPENED;
-	typedef DocumentNotification DocumentOpenedInfo;
-
-	static const QByteArray CN_DOCUMENT_RENAMED;
-	typedef DocumentNotification DocumentRenamedInfo;
-
-	static const QByteArray CN_DOCUMENT_CHANGED;
-	typedef DocumentNotification DocumentChangedInfo;
-
-	static const QByteArray CN_DOCUMENT_UNDO_CHANGED;
-	typedef DocumentUndoRedoNotification DocumentUndoRedoChangedInfo;
-
-	static const QByteArray CN_DOCUMENT_SAVED;
-	typedef DocumentNotification DocumentSavedInfo;
-
-	static const QByteArray CN_DOCUMENT_SAVED_AS;
-	typedef DocumentNotification DocumentSavedAsInfo;
-
-	static const QByteArray CN_DOCUMENT_CLOSED;
-	typedef DocumentClosedNotification DocumentClosedInfo;
-
-	static const QByteArray CN_DOCUMENT_DATA_LOADED;
-	typedef DocumentNotification DocumentDataLoadedInfo;
-
 	/**
 		\brief Start an asynchronous document operation.
 
@@ -257,7 +200,5 @@ public:
 
 
 Q_DECLARE_METATYPE(imtdoc::IDocumentService::DocumentNotification);
-Q_DECLARE_METATYPE(imtdoc::IDocumentService::DocumentUndoRedoNotification);
-Q_DECLARE_METATYPE(imtdoc::IDocumentService::DocumentClosedNotification);
 
 
