@@ -33,6 +33,9 @@ protected:
 				const sdl::imtauth::Profile::CSetProfileGqlRequest& setProfileRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+	virtual sdl::imtauth::Profile::CGetUserOrganizationsPayload OnGetUserOrganizations(
+				const sdl::imtauth::Profile::CGetUserOrganizationsGqlRequest& getUserOrganizationsRequest,
+				const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 private:
 	I_REF(imtlic::IProductInfo, m_productInfoCompPtr);
