@@ -68,13 +68,13 @@ CollectionViewCommandsDelegateBase{
 		}
 	}
 
-	onDocumentServiceIdChanged:{
+	onDocumentManagerIdChanged:{
 		if (documentManagerId !== ""){
 			documentManager = MainDocumentService.getDocumentService(documentManagerId)
 		}
 	}
 
-	onDocumentServiceChanged:{
+	onDocumentManagerChanged:{
 		if (documentManager){
 			registerDocumentTypes()
 		}

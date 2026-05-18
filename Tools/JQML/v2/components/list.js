@@ -87,7 +87,6 @@ module.exports.listComponents = [
     'VerticalHeaderView',
     'DelegateChooser',
     'DelegateChoice',
-    'SortFilterProxyModel',
     'SplitView',
     // 3D (Qt Quick 3D analogs, Web runtime backed by Three.js, lazy-loaded)
     'View3D',
