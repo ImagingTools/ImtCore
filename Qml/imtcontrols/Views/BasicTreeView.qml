@@ -273,9 +273,6 @@ Item {
             property string nodeKey: model.key
             property int nodeLevel: model.level
             property bool nodeExpanded: model.expanded
-            onNodeExpandedChanged: {
-                console.log("onNodeExpandedChanged", nodeKey, nodeExpanded)
-            }
 
             property bool nodeHasChildren: model.hasChildren
             property bool nodeSelected: model.selected
