@@ -43,24 +43,49 @@ public:
 	*/
 	virtual QByteArray Type() const;
 
-	/** \return \c true if no handler has called \c Reject(). */
+	/**
+		\return \c true if no handler has called \c Reject().
+	*/
 	bool IsAccepted() const;
-	/** \brief Mark the event as accepted (default state). */
+
+	/**
+		Mark the event as accepted (default state).
+	*/
 	void Accept();
-	/** \brief Mark the event as rejected. */
+
+	/**
+		Mark the event as rejected.
+	*/
 	void Reject();
 
-	/** \return The user-ID of the session that owns the affected document. */
+	/**
+		\return The user-ID of the session that owns the affected document.
+	*/
 	QByteArray GetUserId() const;
-	/** \return The instance ID of the affected document. */
+
+	/**
+		\return The instance ID of the affected document.
+	*/
 	QByteArray GetDocumentId() const;
-	/** \return The registered type-ID of the document's data object. */
+
+	/**
+		\return The registered type-ID of the document's data object.
+	*/
 	QByteArray GetDocumentTypeId() const;
-	/** \return The human-readable name of the document at the time of the event. */
+
+	/**
+		\return The human-readable name of the document at the time of the event.
+	*/
 	QString GetDocumentName() const;
-	/** \return The source URL of the document (e.g.\ \c collection://\<objectId\>). */
+
+	/**
+		\return The source URL of the document (e.g.\ \c collection://\<objectId\>).
+	*/
 	QUrl GetDocumentUrl() const;
-	/** \return \c true when the document had unsaved changes at the time of the event. */
+
+	/**
+		\return \c true when the document had unsaved changes at the time of the event.
+	*/
 	bool IsDocumentDirty() const;
 
 protected:
