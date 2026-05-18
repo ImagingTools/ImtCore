@@ -58,10 +58,10 @@ Item {
 	GqlSdlRequestSender {
 		id: organizationsRequest
 		requestType: 0
-		gqlCommandId: ImtauthProfileSdlCommandIds.s_getProfile
+		gqlCommandId: ImtauthProfileSdlCommandIds.s_getUserOrganizations
 
 		sdlObjectComp: Component {
-			ProfileData {
+			GetUserOrganizationsPayload {
 				onFinished: {
 					var orgs = m_organizations
 					var list = []
