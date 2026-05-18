@@ -1285,7 +1285,7 @@ Item {
         if (!currentIndex || !currentIndex.key)
             return
         var colCount = columnCount()
-        var nextCol = __editingColumn >= 0 ? __editingColumn + 1 : 1
+        var nextCol = __editingColumn >= 0 ? __editingColumn + 1 : 0
         var currentKey = currentIndex.key
 
         // Try next editable column in current row
