@@ -421,6 +421,14 @@ sdl::imtauth::Sessions::CUserSession::V1_0 CGqlJwtSessionControllerComp::CreateU
 	userData.accessToken = userSession.accessToken;
 	userData.refreshToken = userSession.refreshToken;
 
+	// Resolve tenant name if tenant is set
+	if (!userSession.tenantId.isEmpty() && m_tenantManagerCompPtr.IsValid()){
+		imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(userSession.tenantId);
+		if (tenantPtr.IsValid()){
+			userData.tenantName = tenantPtr->GetTenantName();
+		}
+	}
+
 	return userData;
 }
 

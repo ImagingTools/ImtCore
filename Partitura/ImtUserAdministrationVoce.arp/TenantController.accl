@@ -11,13 +11,13 @@
         <Element ComponentName="CheckPermissionOr" X="825" Y="525" Note=""/>
         <Element ComponentName="CollectionCommands" X="525" Y="350" Note=""/>
         <Element ComponentName="CollectionCommandsController" X="525" Y="250" Note=""/>
-        <Element ComponentName="CollectionDocumentManager" X="675" Y="625" Note=""/>
+        <Element ComponentName="CollectionDocumentService" X="675" Y="625" Note=""/>
         <Element ComponentName="CollectionHeadersProvider" X="1025" Y="50" Note=""/>
         <Element ComponentName="Demultiplexer" X="575" Y="75" Note=""/>
         <Element ComponentName="DocumentCommandsController" X="1000" Y="300" Note=""/>
         <Element ComponentName="SlaveSubscriberController" X="750" Y="775" Note=""/>
         <Element ComponentName="TenantCollectionChangeNotifier" X="275" Y="775" Note=""/>
-        <Element ComponentName="TenantDocumentManager" X="200" Y="150" Note=""/>
+        <Element ComponentName="TenantDocumentService" X="200" Y="150" Note=""/>
         <Element ComponentName="TenantDocumentNameProvider" X="475" Y="475" Note=""/>
         <Element ComponentName="TenantInfo" X="425" Y="600" Note=""/>
         <Element ComponentName="TenantInvitationInfo" X="500" Y="150" Note=""/>

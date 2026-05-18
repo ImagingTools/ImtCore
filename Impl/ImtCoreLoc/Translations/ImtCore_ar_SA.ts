@@ -4647,27 +4647,27 @@
     </message>
 </context>
 <context>
-    <name>DocumentManager</name>
+    <name>DocumentService</name>
     <message>
-        <location filename="../../../Include/imtcontrols/Qml/imtcontrols/Document/DocumentManager.qml" line="+352"/>
-        <location filename="../../../Qml/imtdocgui/DocumentManager.qml" line="+836"/>
+        <location filename="../../../Include/imtcontrols/Qml/imtcontrols/Document/DocumentService.qml" line="+352"/>
+        <location filename="../../../Qml/imtdocgui/DocumentService.qml" line="+836"/>
         <source>Save document</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
-        <location filename="../../../Qml/imtdocgui/DocumentManager.qml" line="+2"/>
+        <location filename="../../../Qml/imtdocgui/DocumentService.qml" line="+2"/>
         <source>Save all changes ?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../../../Qml/imtdocgui/DocumentManager.qml" line="+3"/>
+        <location filename="../../../Qml/imtdocgui/DocumentService.qml" line="+3"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../Qml/imtdocgui/DocumentManager.qml" line="-832"/>
+        <location filename="../../../Qml/imtdocgui/DocumentService.qml" line="-832"/>
         <source>&lt;no name&gt;</source>
         <translation type="unfinished"></translation>
     </message>

@@ -53,7 +53,6 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>AuthorizationOptions</Value>
-                                <Value>PermissionsController</Value>
                                 <Value>PagesController</Value>
                                 <Value>ApplicationInfoController</Value>
                                 <Value>UserSettings</Value>
@@ -101,21 +100,6 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="WorkspacePageVisible" Type="Boolean" ExportId="WorkspacePageVisible">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="PermissionsController" PackageId="ImtGraphQlVoce" ComponentId="PermissionsController">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="FeatureContainer" Type="Reference" ExportId="FeatureContainer">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>

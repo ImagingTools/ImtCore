@@ -55,7 +55,7 @@ public:
 		bridge or \c nullptr if none exists.
 
 		\details Mirrors the lookup pattern used by
-		\c CDocumentManagerBridge::Instance() so a QML-facing controller
+		\c CDocumentServiceBridge::Instance() so a QML-facing controller
 		(\c CDataModelController) can resolve the bridge without
 		knowing about icomp. The instance is registered in
 		\c OnComponentCreated() and unregistered in the destructor.

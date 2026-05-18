@@ -8,8 +8,8 @@ import imtguigql 1.0
 import imtdocgui 1.0
 import imtauthgui 1.0
 import imtdeskImtDeskSdl 1.0
-import imtdeskTicketCollectionDocumentManagerSdl 1.0
-import imtbaseCollectionDocumentManagerSdl 1.0
+import imtdeskTicketCollectionDocumentServiceSdl 1.0
+import imtbaseCollectionDocumentServiceSdl 1.0
 import imtbaseUndoManagerSdl 1.0
 import imtbaseComplexCollectionFilterSdl 1.0
 
@@ -241,7 +241,7 @@ RemoteCollectionView {
 
 					property DocumentId documentIdInput: DocumentId {}
 					property GqlSdlRequestSender getTicketRequest: GqlSdlRequestSender {
-						gqlCommandId: ImtdeskTicketCollectionDocumentManagerSdlCommandIds.s_getTicketRepresentation
+						gqlCommandId: ImtdeskTicketCollectionDocumentServiceSdlCommandIds.s_getTicketRepresentation
 						sdlObjectComp: Component {
 							TicketData {
 								onFinished: {
@@ -258,7 +258,7 @@ RemoteCollectionView {
 
 					property UpdateTicketInput updateTicketInput: UpdateTicketInput {}
 					property GqlSdlRequestSender updateTicketRequest: GqlSdlRequestSender {
-						gqlCommandId: ImtdeskTicketCollectionDocumentManagerSdlCommandIds.s_updateTicketFromRepresentation
+						gqlCommandId: ImtdeskTicketCollectionDocumentServiceSdlCommandIds.s_updateTicketFromRepresentation
 						requestType: 1
 						sdlObjectComp: Component {
 							DocumentOperationStatus {

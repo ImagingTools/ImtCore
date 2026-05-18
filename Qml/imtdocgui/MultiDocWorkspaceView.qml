@@ -8,7 +8,7 @@ import imtbaseImtCollectionSdl 1.0
 Item {
 	id: workspaceView
 
-	property DocumentManager documentManager
+	property DocumentService documentManager
 	property int popupWidth: Style.sizeHintXXS
 	property ObjectVisualStatusProvider visualStatusProvider: null
 
@@ -202,7 +202,7 @@ Item {
 			return
 		}
 
-		tabView.addTab(id, name, viewComp)
+		tabView.addTab(id, name, viewComp, "", "", true, true)
 
 		if (forceFocus){
 			tabView.currentIndex = tabView.tabModel.count - 1

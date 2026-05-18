@@ -34,14 +34,11 @@ public:
 	virtual MembershipIds GetMembershipsByUser(const QByteArray& userId) const override;
 	virtual ITenantMembershipUniquePtr GetMembership(const QByteArray& membershipId) const override;
 	virtual ITenantMembershipUniquePtr FindMembership(const QByteArray& userId, const QByteArray& tenantId) const override;
-	virtual QByteArray AddMembership(const QByteArray& userId, const QByteArray& tenantId, ITenantMembership::TenantMemberRole role) override;
-	virtual QByteArray InviteMembership(const QByteArray& userId, const QByteArray& tenantId, ITenantMembership::TenantMemberRole role) override;
+	virtual QByteArray AddMembership(const QByteArray& userId, const QByteArray& tenantId, const QByteArray& roleId) override;
 	virtual bool RemoveMembership(const QByteArray& membershipId) override;
-	virtual bool UpdateMembershipRole(const QByteArray& membershipId, ITenantMembership::TenantMemberRole newRole) override;
-	virtual bool AcceptMembershipInvitation(const QByteArray& membershipId) override;
-	virtual bool RejectMembershipInvitation(const QByteArray& membershipId) override;
+	virtual bool UpdateMembershipRole(const QByteArray& membershipId, const QByteArray& newRoleId) override;
 	virtual bool IsMember(const QByteArray& userId, const QByteArray& tenantId) const override;
-	virtual bool HasMinimumRole(const QByteArray& userId, const QByteArray& tenantId, ITenantMembership::TenantMemberRole minimumRole) const override;
+	virtual bool HasMinimumRole(const QByteArray& userId, const QByteArray& tenantId, const QByteArray& minimumRoleId) const override;
 
 private:
 	bool IsOwnerMembership(const QByteArray& membershipId) const;

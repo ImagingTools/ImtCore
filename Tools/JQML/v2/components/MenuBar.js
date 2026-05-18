@@ -48,8 +48,8 @@ class MenuBar extends Item {
             }
         }
 
-        this.getProperty('width').setAuto(w)
-        this.getProperty('height').setAuto(h)
+        this.getProperty('implicitWidth').set(w)
+        this.getProperty('implicitHeight').set(h)
     }
 }
 

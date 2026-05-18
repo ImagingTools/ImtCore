@@ -93,8 +93,8 @@ class Flow extends Item {
             paddingBottom: this.$properties.bottomPadding ? this.getPropertyValue('bottomPadding')+'px' : this.getPropertyValue('padding')+'px',
         })
 
-        this.getProperty('width').setAuto(this.$dom.scrollWidth)
-        this.getProperty('height').setAuto(this.$dom.scrollHeight)
+        this.getProperty('implicitWidth').set(this.$dom.scrollWidth)
+        this.getProperty('implicitHeight').set(this.$dom.scrollHeight)
     }
 
     addChild(child){

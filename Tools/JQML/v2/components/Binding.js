@@ -22,6 +22,13 @@ class Binding extends QtObject {
     }
     
     $update(){
+        if(!this.getPropertyValue('when')){
+            if(this.$prop){
+                this.getProperty('value').removeSubscriber(this.$prop)
+                this.$prop = undefined
+            }
+            return
+        }
         if(this.getPropertyValue('target') && this.getPropertyValue('property')){
             if(this.$prop) this.getProperty('value').removeSubscriber(this.$prop)
             

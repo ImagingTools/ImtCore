@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS "${TableScheme}"."TenantMemberships"
     "Id"          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     "UserId"      UUID NOT NULL,
     "TenantId"    UUID NOT NULL,
-    "Role"        INTEGER NOT NULL DEFAULT 2,
+    "Role"        TEXT NOT NULL,
     "IsActive"    BOOLEAN NOT NULL DEFAULT TRUE,
     "JoinedAt"    TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
     "UpdatedAt"   TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),

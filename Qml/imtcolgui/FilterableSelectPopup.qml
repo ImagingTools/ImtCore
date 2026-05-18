@@ -733,24 +733,33 @@ PopupView {
 				}
 			}
 
-			// --- Footer (loading more) ---
+			// --- Footer (loading more) — shown as overlay at bottom of list ---
 			Item {
 				id: footerItem
 
 				width: parent.width
-				height: visible ? 30 : 0
-				visible: root.dataProvider
-						&& root.dataProvider.isPageLoading
-						&& root.dataProvider.items.length > 0
-
-				Text {
-					anchors.centerIn: parent
-					color: Style.placeHolderTextColor
-					font.pixelSize: Style.fontSizeS
-					text: qsTr("Loading more...")
-				}
+				height: 0
+				visible: false
 			}
 		}
+	}
+
+	// --- "Loading more..." overlay at the bottom of the list area ---
+	Text {
+		id: loadingMoreOverlay
+
+		anchors.bottom: body.bottom
+		anchors.bottomMargin: Style.marginS
+		anchors.horizontalCenter: body.horizontalCenter
+
+		visible: root.dataProvider
+				&& root.dataProvider.isPageLoading
+				&& root.dataProvider.items.length > 0
+
+		color: Style.placeHolderTextColor
+		font.pixelSize: Style.fontSizeS
+		font.italic: true
+		text: qsTr("Loading more...")
 	}
 
 	// --- Shadow (covers entire background including filter field) ---

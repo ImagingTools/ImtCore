@@ -25,20 +25,6 @@ namespace imtauth
 class ITenantMembership: virtual public iser::IObject
 {
 public:
-	/**
-		Defines the role of a user within a tenant (organization).
-		Analogous to GitHub's organization membership roles.
-	*/
-	enum TenantMemberRole
-	{
-		TMR_OWNER,
-		TMR_ADMIN,
-		TMR_MEMBER,
-		TMR_GUEST
-	};
-
-	I_DECLARE_ENUM(TenantMemberRole, TMR_OWNER, TMR_ADMIN, TMR_MEMBER, TMR_GUEST);
-
 	enum MetaInfoTypes
 	{
 		MIT_MEMBERSHIP_ID = idoc::IDocumentMetaInfo::MIT_USER + 300,
@@ -79,14 +65,15 @@ public:
 	virtual void SetTenantId(const QByteArray& tenantId) = 0;
 
 	/**
-		Get the role of the user within the tenant.
+		Get the role ID of the user within the tenant.
+		This is a dynamic role ID from the external role provider (e.g. Puma).
 	*/
-	virtual TenantMemberRole GetRole() const = 0;
+	virtual QByteArray GetRoleId() const = 0;
 
 	/**
-		Set the role of the user within the tenant.
+		Set the role ID of the user within the tenant.
 	*/
-	virtual void SetRole(TenantMemberRole role) = 0;
+	virtual void SetRoleId(const QByteArray& roleId) = 0;
 
 	/**
 		Get the date when the user joined the tenant.

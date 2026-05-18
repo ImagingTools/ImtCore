@@ -80,4 +80,12 @@ sdl::imtauth::Profile::CSetProfileResponse CRemoteProfileControllerComp::OnSetPr
 }
 
 
+sdl::imtauth::Profile::CGetUserOrganizationsPayload CRemoteProfileControllerComp::OnGetUserOrganizations(
+			const sdl::imtauth::Profile::CGetUserOrganizationsGqlRequest& /*getUserOrganizationsRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	return SendModelRequest<sdl::imtauth::Profile::CGetUserOrganizationsPayload>(gqlRequest, errorMessage);
+}
+
+
 } // namespace imtauthgql

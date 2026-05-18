@@ -60,7 +60,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="CollectionDocumentManager" PackageId="ImtCollectionVoce" ComponentId="CollectionDocumentManager">
+        <Element Id="CollectionDocumentService" PackageId="ImtCollectionVoce" ComponentId="CollectionDocumentService">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Collection" Type="Reference" ExportId="TenantRepository">
@@ -69,10 +69,10 @@
                     <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Tenants"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DocumentManagerEventHandlers" Type="Reference[]" ExportId="">
+                    <AttributeInfo Id="DocumentServiceEventHandlers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>TenantDocumentManager</Value>
+                                <Value>TenantDocumentService</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -173,9 +173,9 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>TenantsListController</Value>
-                                <Value>TenantDocumentManager</Value>
+                                <Value>TenantDocumentService</Value>
                                 <Value>TenantManagerController</Value>
-                                <Value>CollectionDocumentManager</Value>
+                                <Value>CollectionDocumentService</Value>
                                 <Value>DocumentCommandsController</Value>
                                 <Value>CollectionCommandsController</Value>
                                 <Value>TenantMembershipManagerController</Value>
@@ -254,7 +254,7 @@
                     <AttributeInfo Id="SubscriberController" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>CollectionDocumentManager</Value>
+                                <Value>CollectionDocumentService</Value>
                                 <Value>TenantCollectionChangeNotifier</Value>
                                 <Value>TenantMembershipPublisher</Value>
                             </Values>
@@ -291,11 +291,11 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="TenantDocumentManager" PackageId="ImtAuthGqlPck" ComponentId="TenantCollectionDocumentManager">
+        <Element Id="TenantDocumentService" PackageId="ImtAuthGqlPck" ComponentId="TenantCollectionDocumentService">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="CollectionDocumentManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="CollectionDocumentManager"/>
+                    <AttributeInfo Id="CollectionDocumentService" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="CollectionDocumentService"/>
                     </AttributeInfo>
                     <AttributeInfo Id="InvitationManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="TenantInvitationManager"/>
@@ -416,6 +416,9 @@
                     <AttributeInfo Id="MembershipFactory" Type="Factory" ExportId="">
                         <Data IsEnabled="true" Value="TenantMembershipInfo"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="TenantManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TenantManager"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -433,6 +436,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="MembershipManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="TenantMembershipManager"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TenantManager"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>

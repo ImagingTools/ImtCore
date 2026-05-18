@@ -9,7 +9,7 @@ import imtdocgui 1.0
 PageContainer {
 	id: root
 
-	property DocumentManagerBase documentManager: GqlBasedCollectionDocumentManager {
+	property DocumentServiceBase documentManager: GqlBasedCollectionDocumentService {
 		collectionId: root.pageId
 	}
 
@@ -19,7 +19,7 @@ PageContainer {
 
 	onPageIdChanged: {
 		if (pageId !== ""){
-			MainDocumentManager.registerDocumentManager(pageId, documentManager)
+			MainDocumentService.registerDocumentService(pageId, documentManager)
 		}
 	}
 

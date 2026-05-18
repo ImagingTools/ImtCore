@@ -4,7 +4,7 @@
 // ControlsGallery includes
 #include <controlsgallerygql/CContactInfoCollectionControllerComp.h>
 #include <controlsgallerygql/CContactInfoMetaInfoDelegateComp.h>
-#include <controlsgallerygql/CContactInfoCollectionDocumentManagerComp.h>
+#include <controlsgallerygql/CContactInfoCollectionDocumentServiceComp.h>
 #include <controlsgallerygql/CParamsSetTestControllerComp.h>
 
 
@@ -14,7 +14,7 @@ namespace ControlsGalleryGqlPck
 
 typedef controlsgallerygql::CContactInfoCollectionControllerComp ContactInfoCollectionController;
 typedef controlsgallerygql::CContactInfoMetaInfoDelegateComp ContactInfoMetaInfoDelegate;
-typedef controlsgallerygql::CContactInfoCollectionDocumentManagerComp ContactInfoCollectionDocumentManager;
+typedef controlsgallerygql::CContactInfoCollectionDocumentServiceComp ContactInfoCollectionDocumentService;
 typedef controlsgallerygql::CParamsSetTestControllerComp ParamsSetTestController;
 
 

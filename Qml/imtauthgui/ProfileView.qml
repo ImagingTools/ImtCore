@@ -35,38 +35,6 @@ ViewBase {
 		permissionsTable.table.elements = profileData.m_permissions;
 		rolesTable.table.elements = profileData.m_roles;
 		groupsTable.table.elements = profileData.m_groups;
-		__updateOrganizationsTable();
-	}
-	
-	function __updateOrganizationsTable(){
-		if (!organizationsTable.table || !container.profileData)
-			return;
-		
-		organizationsTable.table.elements = container.profileData.m_organizations;
-		__selectCurrentTenantInTable();
-	}
-	
-	function __selectCurrentTenantInTable(){
-		if (!organizationsTable.table || !container.profileData)
-			return;
-		
-		organizationsGroup.__blockSelection = true;
-		organizationsTable.table.uncheckAll();
-		
-		var orgs = container.profileData.m_organizations;
-		if (!orgs){
-			organizationsGroup.__blockSelection = false;
-			return;
-		}
-		
-		for (var i = 0; i < orgs.count; i++){
-			var org = orgs.get(i).item;
-			if (org && org.m_id === AuthorizationController.currentTenantId){
-				organizationsTable.table.checkItem(i);
-				break;
-			}
-		}
-		organizationsGroup.__blockSelection = false;
 	}
 	
 	function updateModel(){
@@ -249,57 +217,6 @@ ViewBase {
 			
 			GroupHeaderView {
 				width: parent.width;
-				title: qsTr("Organizations");
-				groupView: organizationsGroup;
-				visible: organizationsGroup.visible;
-			}
-			
-			GroupElementView {
-				id: organizationsGroup;
-				width: parent.width;
-				visible: organizationsTable.table ? organizationsTable.table.elementsCount > 0 : false;
-				
-				property bool __blockSelection: false;
-				
-				TableElementView {
-					id: organizationsTable;
-					
-					onTableChanged: {
-						if (table){
-							table.checkable = true;
-							table.isMultiCheckable = false;
-						}
-						container.__updateOrganizationsTable();
-					}
-					
-					Connections {
-						target: organizationsTable.table;
-						
-						function onCheckedItemsChanged(){
-							if (organizationsGroup.__blockSelection)
-								return;
-							
-							let indexes = organizationsTable.table.getCheckedItems();
-							if (indexes.length === 0){
-								AuthorizationController.selectTenant("");
-								return;
-							}
-							
-							let selectedIndex = indexes[0];
-							let orgs = container.profileData ? container.profileData.m_organizations : null;
-							if (orgs && selectedIndex < orgs.count){
-								let org = orgs.get(selectedIndex).item;
-								if (org && org.m_id !== AuthorizationController.currentTenantId){
-									AuthorizationController.selectTenant(org.m_id);
-								}
-							}
-						}
-					}
-				}
-			}
-			
-			GroupHeaderView {
-				width: parent.width;
 				title: qsTr("Roles");
 				groupView: rolesGroup;
 				visible: rolesGroup.visible;
@@ -380,10 +297,6 @@ ViewBase {
 			
 			if (groupsTable.table){
 				groupsTable.table.headers = headersModel;
-			}
-			
-			if (organizationsTable.table){
-				organizationsTable.table.headers = headersModel;
 			}
 		}
 		

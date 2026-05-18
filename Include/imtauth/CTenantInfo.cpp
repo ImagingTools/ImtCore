@@ -6,6 +6,7 @@
 #include <istd/CChangeNotifier.h>
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
+#include <iser/CPrimitiveTypesSerializer.h>
 
 
 namespace imtauth
@@ -174,6 +175,22 @@ bool CTenantInfo::RemoveRelationship(const QByteArray& relationshipId)
 }
 
 
+QByteArrayList CTenantInfo::GetTenantPermissions() const
+{
+	return m_tenantPermissions;
+}
+
+
+void CTenantInfo::SetTenantPermissions(const QByteArrayList& permissions)
+{
+	if (m_tenantPermissions != permissions){
+		istd::CChangeNotifier notifier(this);
+
+		m_tenantPermissions = permissions;
+	}
+}
+
+
 // reimplemented (iser::ISerializable)
 
 bool CTenantInfo::Serialize(iser::IArchive& archive)
@@ -267,6 +284,8 @@ bool CTenantInfo::Serialize(iser::IArchive& archive)
 		retVal = retVal && archive.EndTag(relationshipsTag);
 	}
 
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_tenantPermissions, "TenantPermissions", "TenantPermission");
+
 	return retVal;
 }
 
@@ -287,6 +306,7 @@ bool CTenantInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/
 		m_createdAt = sourcePtr->m_createdAt;
 		m_updatedAt = sourcePtr->m_updatedAt;
 		m_relationships = sourcePtr->m_relationships;
+		m_tenantPermissions = sourcePtr->m_tenantPermissions;
 
 		return true;
 	}
@@ -318,6 +338,7 @@ bool CTenantInfo::ResetData(CompatibilityMode /*mode*/)
 	m_createdAt.clear();
 	m_updatedAt.clear();
 	m_relationships.clear();
+	m_tenantPermissions.clear();
 
 	return true;
 }
