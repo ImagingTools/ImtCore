@@ -39,6 +39,8 @@ Item {
     property bool editOnDoubleClick: true
     property bool allowDisabledEditing: false
 
+    property var flickable: null
+
     property string filterText: ""
     property string filterRole: "text"
 
@@ -1419,8 +1421,24 @@ Item {
     function ensureVisible(keyValue) {
         expandParents(keyValue)
         var row = visibleRowOf(keyValue)
-        if (row >= 0)
-            listView.positionViewAtIndex(row, ListView.Contain)
+        if (row < 0)
+            return
+
+        listView.positionViewAtIndex(row, ListView.Contain)
+
+        // Scroll external flickable if present
+        if (root.flickable) {
+            var headerOffset = root.showHeader ? root.headerHeight : 0
+            var itemY = headerOffset + row * root.rowHeight
+            var itemBottom = itemY + root.rowHeight
+            var viewTop = root.flickable.contentY
+            var viewBottom = viewTop + root.flickable.height
+
+            if (itemBottom > viewBottom)
+                root.flickable.contentY = itemBottom - root.flickable.height
+            else if (itemY < viewTop)
+                root.flickable.contentY = itemY
+        }
     }
 
     function expandParents(keyValue) {
