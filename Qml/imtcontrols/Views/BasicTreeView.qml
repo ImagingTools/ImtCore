@@ -1429,7 +1429,7 @@ Item {
         // Scroll external flickable if present
         if (root.flickable) {
             var headerOffset = root.showHeader ? root.headerHeight : 0
-            var itemY = headerOffset + row * root.rowHeight
+            var itemY = root.y + headerOffset + row * root.rowHeight
             var itemBottom = itemY + root.rowHeight
             var viewTop = root.flickable.contentY
             var viewBottom = viewTop + root.flickable.height
