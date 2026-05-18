@@ -34,17 +34,17 @@ RemoteCollectionView {
 	TenantMembershipSubscriptionClient {
 		id: collectionMembershipSubscription
 
-		onInvitationReceived: function(data) {
+		onInvitationReceived: {
 			// New invitation received -> refresh the collection to show it
 			container.doUpdateGui()
 		}
 
-		onInvitationAccepted: function(data) {
+		onInvitationAccepted:{
 			// Invitation accepted -> refresh to update relation scope
 			container.doUpdateGui()
 		}
 
-		onInvitationRejected: function(data) {
+		onInvitationRejected:{
 			// Invitation rejected -> refresh to update relation scope
 			container.doUpdateGui()
 		}
