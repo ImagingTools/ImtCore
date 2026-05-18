@@ -210,22 +210,6 @@ DocumentViewBase {
 		return expDate.getTime() < Date.now()
 	}
 
-	function __removeMemberById(userId) {
-		var arr = membersSelector.items.slice()
-		for (var i = 0; i < arr.length; i++) {
-			if (arr[i].id === userId) {
-				arr.splice(i, 1)
-				break
-			}
-		}
-		membersSelector.__resolvingNames = true
-		membersSelector.items = arr
-		membersSelector.__resolvingNames = false
-		container.pendingMembers = arr
-		container.__membersModifiedLocally = true
-		container.doUpdateModel()
-	}
-
 	// --- MultiPageView ---
 	MultiPageView {
 		id: multiPageView
@@ -378,6 +362,22 @@ DocumentViewBase {
 
 		Item {
 			id: membersPage
+			
+			function __removeMemberById(userId) {
+				var arr = membersSelector.items.slice()
+				for (var i = 0; i < arr.length; i++) {
+					if (arr[i].id === userId) {
+						arr.splice(i, 1)
+						break
+					}
+				}
+				membersSelector.__resolvingNames = true
+				membersSelector.items = arr
+				membersSelector.__resolvingNames = false
+				container.pendingMembers = arr
+				container.__membersModifiedLocally = true
+				container.doUpdateModel()
+			}
 
 			CustomScrollbar {
 				id: membersScrollbar
@@ -556,7 +556,7 @@ DocumentViewBase {
 														}
 													}
 													onClicked: {
-														container.__removeMemberById(modelData.userId)
+														membersPage.__removeMemberById(modelData.userId)
 													}
 												}
 
@@ -567,7 +567,7 @@ DocumentViewBase {
 													text: qsTr("Leave")
 													tooltipText: qsTr("Leave this organization")
 													onClicked: {
-														container.__removeMemberById(modelData.userId)
+														membersPage.__removeMemberById(modelData.userId)
 													}
 												}
 
