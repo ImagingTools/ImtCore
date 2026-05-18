@@ -16,7 +16,6 @@ namespace imtauth
 // public methods
 
 CTenantMembership::CTenantMembership():
-	m_role(TMR_MEMBER),
 	m_isActive(true)
 {
 }
@@ -72,18 +71,18 @@ void CTenantMembership::SetTenantId(const QByteArray& tenantId)
 }
 
 
-ITenantMembership::TenantMemberRole CTenantMembership::GetRole() const
+QByteArray CTenantMembership::GetRoleId() const
 {
-	return m_role;
+	return m_roleId;
 }
 
 
-void CTenantMembership::SetRole(TenantMemberRole role)
+void CTenantMembership::SetRoleId(const QByteArray& roleId)
 {
-	if (m_role != role){
+	if (m_roleId != roleId){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_role = role;
+		m_roleId = roleId;
 	}
 }
 
@@ -161,7 +160,7 @@ bool CTenantMembership::Serialize(iser::IArchive& archive)
 
 	iser::CArchiveTag roleTag("Role", "Role", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(roleTag);
-	retVal = retVal && I_SERIALIZE_ENUM(TenantMemberRole, archive, m_role);
+	retVal = retVal && archive.Process(m_roleId);
 	retVal = retVal && archive.EndTag(roleTag);
 
 	iser::CArchiveTag joinedAtTag("JoinedAt", "Joined at", iser::CArchiveTag::TT_LEAF);
@@ -194,7 +193,7 @@ bool CTenantMembership::CopyFrom(const IChangeable& object, CompatibilityMode /*
 		m_membershipId = sourcePtr->m_membershipId;
 		m_userId = sourcePtr->m_userId;
 		m_tenantId = sourcePtr->m_tenantId;
-		m_role = sourcePtr->m_role;
+		m_roleId = sourcePtr->m_roleId;
 		m_joinedAt = sourcePtr->m_joinedAt;
 		m_updatedAt = sourcePtr->m_updatedAt;
 		m_isActive = sourcePtr->m_isActive;
@@ -224,7 +223,7 @@ bool CTenantMembership::ResetData(CompatibilityMode /*mode*/)
 	m_membershipId.clear();
 	m_userId.clear();
 	m_tenantId.clear();
-	m_role = TMR_MEMBER;
+	m_roleId.clear();
 	m_joinedAt.clear();
 	m_updatedAt.clear();
 	m_isActive = true;

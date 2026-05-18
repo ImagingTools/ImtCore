@@ -34,6 +34,7 @@ QtObject {
 	property string lastUser: ""
 	property string storedRefreshToken: ""
 	property string currentTenantId: ""
+	property string currentTenantName: ""
 	
 	// Load settings from LocalStorage on component creation
 	Component.onCompleted: {
@@ -161,6 +162,7 @@ QtObject {
 		userTokenProvider.productId = LocalStorage.getItem("productId");
 		userTokenProvider.permissions = LocalStorage.getItem("permissions");
 		root.currentTenantId = LocalStorage.getItem("tenantId") || "";
+		root.currentTenantName = LocalStorage.getItem("tenantName") || "";
 	}
 	
 	function saveDataToStorage(){
@@ -172,6 +174,7 @@ QtObject {
 		LocalStorage.setItem("productId", userTokenProvider.productId);
 		LocalStorage.setItem("permissions", userTokenProvider.permissions);
 		LocalStorage.setItem("tenantId", root.currentTenantId);
+		LocalStorage.setItem("tenantName", root.currentTenantName);
 	}
 	
 	function removeDataFromStorage(){
@@ -183,6 +186,7 @@ QtObject {
 		LocalStorage.removeItem("productId");
 		LocalStorage.removeItem("permissions");
 		LocalStorage.removeItem("tenantId");
+		LocalStorage.removeItem("tenantName");
 	}
 
 	function saveRefreshTokenIfRememberMe(){
@@ -256,6 +260,7 @@ QtObject {
 		userTokenProvider.systemId = ""
 		userTokenProvider.permissions = []
 		currentTenantId = ""
+		currentTenantName = ""
 		setAccessToken("");
 		setRefreshToken("");
 		
@@ -404,6 +409,7 @@ QtObject {
 						root.userTokenProvider.accessToken = m_userSession.m_accessToken;
 						root.userTokenProvider.refreshToken = m_userSession.m_refreshToken;
 						root.currentTenantId = m_userSession.m_tenantId || "";
+						root.currentTenantName = m_userSession.m_tenantName || "";
 
 						root.setAccessToken(m_userSession.m_accessToken);
 						root.setRefreshToken(m_userSession.m_refreshToken);
@@ -442,6 +448,7 @@ QtObject {
 						root.userTokenProvider.userId = m_userSession.m_userId;
 						root.userTokenProvider.login = root.refreshTokenForLoginGqlSender.userName;
 						root.currentTenantId = m_userSession.m_tenantId || "";
+						root.currentTenantName = m_userSession.m_tenantName || "";
 						
 						root.setAccessToken(m_userSession.m_accessToken);
 						root.setRefreshToken(m_userSession.m_refreshToken);
@@ -472,6 +479,7 @@ QtObject {
 						root.userTokenProvider.accessToken = m_userSession.m_accessToken;
 						root.userTokenProvider.refreshToken = m_userSession.m_refreshToken;
 						root.currentTenantId = m_userSession.m_tenantId || "";
+						root.currentTenantName = m_userSession.m_tenantName || "";
 
 						root.setAccessToken(m_userSession.m_accessToken);
 						root.setRefreshToken(m_userSession.m_refreshToken);

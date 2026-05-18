@@ -32,10 +32,39 @@ class Menu extends Popup {
             this.$contentBox.style.overflowX = 'visible'
             this.$contentBox.style.overflowY = 'auto'
             this.$contentBox.style.maxHeight = '100vh'
+            // Menu height must auto-size to content (items are dynamic).
+            // Prevent Popup's $applyGeometry from locking a pixel height.
+            this.$contentBox.style.height = 'auto'
         }
+
+        // Menu contentBox should never have a locked pixel height
+        this.$autoContentHeight = true
 
         // Internal ordered list of content items (separate from QML children)
         this.$contentItems = []
+
+        // Override Popup's mouse handlers: also check if click is inside a child submenu
+        this.$onDocumentMouseDown = (e) => {
+            if (!this.getPropertyValue('visible')) return
+            if (this.$contentBox && this.$contentBox.contains(e.target)) return
+            if (this.$isInsideSubmenu(e.target)) return
+            if (this.$isInsideParentMenu(e.target)) return
+            let policy = this.getPropertyValue('closePolicy')
+            if (policy & 3){ // CloseOnPressOutside | CloseOnPressOutsideParent
+                this.close()
+            }
+        }
+
+        this.$onDocumentMouseUp = (e) => {
+            if (!this.getPropertyValue('visible')) return
+            if (this.$contentBox && this.$contentBox.contains(e.target)) return
+            if (this.$isInsideSubmenu(e.target)) return
+            if (this.$isInsideParentMenu(e.target)) return
+            let policy = this.getPropertyValue('closePolicy')
+            if (policy & 12){ // CloseOnReleaseOutside | CloseOnReleaseOutsideParent
+                this.close()
+            }
+        }
 
         // Override Popup's resize handler: recalc geometry then clamp
         this.$onResize = () => {
@@ -52,9 +81,40 @@ class Menu extends Popup {
         }
     }
 
+    // Check if a DOM target is inside any child submenu's content box
+    $isInsideSubmenu(target){
+        let children = this.getProperty('children').get()
+        for (let child of children){
+            if (child instanceof Menu){
+                if (child.$contentBox && child.$contentBox.contains(target)) return true
+                // Recurse into nested submenus
+                if (child.$isInsideSubmenu && child.$isInsideSubmenu(target)) return true
+            }
+        }
+        return false
+    }
+
+    // Check if a DOM target is inside a parent menu's content box (for submenus)
+    $isInsideParentMenu(target){
+        let p = this.getProperty('parent').get()
+        while (p){
+            if (p instanceof Menu){
+                if (p.$contentBox && p.$contentBox.contains(target)) return true
+                if (p.$isInsideSubmenu && p.$isInsideSubmenu(target)) return true
+            }
+            if (p.getProperty) p = p.getProperty('parent').get()
+            else break
+        }
+        return false
+    }
+
     // Override Popup's addDomChild: force children to position:relative
     // so they participate in the flex column layout (Item default is absolute)
     addDomChild(child){
+        // If child is a submenu, don't append its DOM (it lives on document.body as a Popup).
+        // The trigger row was already added in addChild.
+        if (child instanceof Menu) return
+
         super.addDomChild(child)
         if (child.$dom){
             child.$dom.style.position = 'relative'
@@ -66,7 +126,32 @@ class Menu extends Popup {
     // ── Child management ────────────────────────────────────────
 
     addChild(child){
-        // Re-parent if child belongs to a different parent (moves DOM too)
+        // If child is a Menu, treat it as a submenu
+        if (child instanceof Menu){
+            // Re-parent
+            if (child.getProperty && child.getProperty('parent') && child.getProperty('parent').get() !== this){
+                child.getProperty('parent').reset(this)
+            } else {
+                super.addChild(child)
+            }
+
+            // Create a trigger row (looks like a MenuItem)
+            let trigger = this.$createSubmenuTrigger(child)
+
+            // Track the trigger in contentItems (not the Menu itself)
+            if (this.$contentItems.indexOf(trigger) < 0){
+                this.$contentItems.push(trigger)
+            }
+
+            // Store references
+            child.$submenuTrigger = trigger
+            trigger.$submenu = child
+
+            this.$updateCount()
+            return
+        }
+
+        // Non-submenu child: normal flow
         if (child.getProperty && child.getProperty('parent') && child.getProperty('parent').get() !== this){
             child.getProperty('parent').reset(this)
         } else {
@@ -83,6 +168,140 @@ class Menu extends Popup {
         this.$updateCount()
         // Track currentIndex via highlighted
         this.$trackHighlight(child)
+    }
+
+    $createSubmenuTrigger(submenu){
+        let trigger = document.createElement('div')
+        trigger.style.cssText = 'display:flex;flex-direction:row;align-items:center;padding:4px 12px;cursor:pointer;user-select:none;white-space:nowrap;color:#000;background:transparent;min-width:200px;min-height:30px;box-sizing:border-box;position:relative;transition:background-color 0.08s ease;pointer-events:auto;'
+
+        let textSpan = document.createElement('span')
+        textSpan.style.flex = '1'
+        textSpan.style.textAlign = 'left'
+        textSpan.textContent = submenu.getPropertyValue('title') || ''
+        trigger.appendChild(textSpan)
+
+        // Arrow indicator
+        let arrow = document.createElement('span')
+        arrow.style.cssText = 'margin-left:12px;font-size:10px;color:#666;flex-shrink:0;'
+        arrow.textContent = '\u25B6' // ▶
+        trigger.appendChild(arrow)
+
+        // Track title changes
+        submenu.getProperty('title').getNotify().connect(() => {
+            textSpan.textContent = submenu.getPropertyValue('title') || ''
+        })
+
+        // Hover: highlight + open submenu
+        let hideTimer = null
+
+        let scheduleHide = () => {
+            if (hideTimer) clearTimeout(hideTimer)
+            hideTimer = setTimeout(() => {
+                hideTimer = null
+                if (!submenu.getPropertyValue('opened')) return
+                let onTrigger = trigger.matches(':hover')
+                let onSubmenu = submenu.$contentBox && submenu.$contentBox.matches(':hover')
+                if (!onTrigger && !onSubmenu){
+                    submenu.close()
+                } else {
+                    scheduleHide()
+                }
+            }, 300)
+        }
+
+        let cancelHide = () => {
+            if (hideTimer){ clearTimeout(hideTimer); hideTimer = null }
+        }
+
+        trigger.addEventListener('mouseenter', () => {
+            cancelHide()
+            trigger.style.backgroundColor = '#e8e8e8'
+            this.$openSubmenu(submenu, trigger)
+        })
+        trigger.addEventListener('mouseleave', () => {
+            trigger.style.backgroundColor = 'transparent'
+            scheduleHide()
+        })
+
+        // Lazily attach contentBox listeners on first open (contentBox may not
+        // exist yet during construction — Popup constructor runs after Item's
+        // addChild fires, so $contentBox is still undefined at trigger creation)
+        trigger.$contentBoxListenersAttached = false
+        trigger.$attachContentBoxListeners = () => {
+            if (trigger.$contentBoxListenersAttached) return
+            if (!submenu.$contentBox) return
+            trigger.$contentBoxListenersAttached = true
+            submenu.$contentBox.addEventListener('mouseenter', () => cancelHide())
+            submenu.$contentBox.addEventListener('mouseleave', () => scheduleHide())
+        }
+
+        // Append trigger to parent menu's content box
+        if (this.$contentBox){
+            this.$contentBox.appendChild(trigger)
+        }
+
+        // Store DOM reference for reorder/removal
+        trigger.UID = submenu.UID
+        trigger.$dom = trigger
+        trigger.getPropertyValue = (name) => {
+            if (name === 'visible') return true
+            return undefined
+        }
+
+        return trigger
+    }
+
+    $openSubmenu(submenu, triggerEl){
+        if (submenu.getPropertyValue('opened')) return
+
+        // Lazily attach contentBox mouse listeners (contentBox didn't exist at trigger creation)
+        if (triggerEl.$attachContentBoxListeners) triggerEl.$attachContentBoxListeners()
+
+        // Position the submenu relative to the trigger
+        let triggerRect = triggerEl.getBoundingClientRect()
+
+        // Override the Popup geometry computation: position content box directly
+        submenu.open()
+
+        // After open, compute position: prefer right, fall back to left
+        requestAnimationFrame(() => {
+            if (!submenu.$contentBox || !submenu.getPropertyValue('opened')) return
+            let subRect = submenu.$contentBox.getBoundingClientRect()
+            let vw = window.innerWidth
+            let vh = window.innerHeight
+
+            // Find parent menu's content box rect for left-side fallback
+            let parentRect = this.$contentBox ? this.$contentBox.getBoundingClientRect() : triggerRect
+
+            let x, y
+            // Try right side first
+            if (triggerRect.right + subRect.width <= vw){
+                x = triggerRect.right
+            } else {
+                // Not enough room on right — show to the left of parent menu
+                x = parentRect.left - subRect.width
+                if (x < 0) x = 0 // ultimate fallback
+            }
+
+            y = triggerRect.top
+            // Clamp bottom
+            if (y + subRect.height > vh) y = Math.max(0, vh - subRect.height)
+            // Clamp top
+            if (y < 0) y = 0
+
+            submenu.$contentBox.style.left = x + 'px'
+            submenu.$contentBox.style.top = y + 'px'
+            submenu.$originalX = x
+            submenu.$originalY = y
+        })
+    }
+
+    // Menu auto-sizes to content: never lock contentBox to a pixel height
+    $applyGeometry(){
+        super.$applyGeometry()
+        if (this.$autoContentHeight && this.$contentBox){
+            this.$contentBox.style.height = 'auto'
+        }
     }
 
     $trackHighlight(child){
@@ -155,14 +374,16 @@ class Menu extends Popup {
         index = Math.max(0, Math.min(index, this.$contentItems.length))
         // Add as QML child (re-parents & moves DOM)
         this.addChild(item)
+        // For submenus, reorder the trigger, not the menu itself
+        let trackItem = (item instanceof Menu && item.$submenuTrigger) ? item.$submenuTrigger : item
         // Reorder in content items list
-        let curIdx = this.$contentItems.indexOf(item)
+        let curIdx = this.$contentItems.indexOf(trackItem)
         if (curIdx >= 0) this.$contentItems.splice(curIdx, 1)
-        this.$contentItems.splice(index, 0, item)
+        this.$contentItems.splice(index, 0, trackItem)
         // Reorder in DOM
         this.$reorderDom()
         this.$updateCount()
-        this.$trackHighlight(item)
+        if (!(item instanceof Menu)) this.$trackHighlight(item)
     }
 
     insertMenu(index, menu){
@@ -186,6 +407,17 @@ class Menu extends Popup {
 
     removeItem(item){
         if (!item) return
+        // For submenus, find and remove the trigger
+        if (item instanceof Menu && item.$submenuTrigger){
+            let trigger = item.$submenuTrigger
+            let idx = this.$contentItems.indexOf(trigger)
+            if (idx >= 0) this.$contentItems.splice(idx, 1)
+            if (trigger.parentNode) trigger.parentNode.removeChild(trigger)
+            if (item.getPropertyValue('opened')) item.close()
+            delete item.$submenuTrigger
+            this.$updateCount()
+            return
+        }
         let idx = this.$contentItems.indexOf(item)
         if (idx >= 0) {
             this.$contentItems.splice(idx, 1)
@@ -279,10 +511,17 @@ class Menu extends Popup {
         this.getSignal('aboutToHide')()
         this.getProperty('visible').reset(false)
         this.getProperty('opened').reset(false)
-        // Also close sub-menus
+        // Close sub-menus (triggers have $submenu reference)
         for (let item of this.$contentItems){
-            if (item instanceof Menu && item.getPropertyValue('opened')){
-                item.close()
+            if (item.$submenu && item.$submenu.getPropertyValue('opened')){
+                item.$submenu.close()
+            }
+        }
+        // Also close child Menus directly
+        let children = this.getProperty('children').get()
+        for (let child of children){
+            if (child instanceof Menu && child.getPropertyValue('opened')){
+                child.close()
             }
         }
     }
@@ -403,8 +642,10 @@ class Menu extends Popup {
     $reorderDom(){
         if (!this.$contentBox) return
         for (let item of this.$contentItems){
-            if (item.$dom && item.$dom.parentNode === this.$contentBox){
-                this.$contentBox.appendChild(item.$dom)
+            // For submenu triggers (plain DOM objects), use $dom or the object itself
+            let dom = item.$dom || (item.getDom ? item.getDom() : null)
+            if (dom && dom.parentNode === this.$contentBox){
+                this.$contentBox.appendChild(dom)
             }
         }
     }

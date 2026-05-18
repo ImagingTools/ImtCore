@@ -27,7 +27,7 @@ Item {
 		}
 	}
 
-	onDocumentServiceChanged: {
+	onDocumentManagerChanged: {
 		if (documentManager){
 			documentManager.setDocumentServiceActiveView(workspaceView)
 		}

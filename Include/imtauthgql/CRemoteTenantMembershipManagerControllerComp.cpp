@@ -156,4 +156,15 @@ sdl::imtauth::TenantMemberships::CUpdateMembershipRolePayload CRemoteTenantMembe
 }
 
 
+sdl::imtauth::TenantMemberships::CTransferTenantOwnershipPayload CRemoteTenantMembershipManagerControllerComp::OnTransferTenantOwnership(
+			const sdl::imtauth::TenantMemberships::CTransferTenantOwnershipGqlRequest& /*transferTenantOwnershipRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::imtauth::TenantMemberships::CTransferTenantOwnershipPayload>(gqlRequest, errorMessage);
+}
+
+
 } // namespace imtauthgql
+
+

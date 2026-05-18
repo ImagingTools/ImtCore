@@ -338,6 +338,7 @@ global.JQModules = {
             JSONListModel: __components.JSONListModel,
             GqlModel: __components.GqlModel,
             TreeItemModel: __components.TreeItemModel,
+            Instantiator: __components.Instantiator,
         },
         point: __properties.QPoint,
         date: __properties.QVar,

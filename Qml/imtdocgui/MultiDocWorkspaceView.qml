@@ -202,7 +202,7 @@ Item {
 			return
 		}
 
-		tabView.addTab(id, name, viewComp)
+		tabView.addTab(id, name, viewComp, "", "", true, true)
 
 		if (forceFocus){
 			tabView.currentIndex = tabView.tabModel.count - 1

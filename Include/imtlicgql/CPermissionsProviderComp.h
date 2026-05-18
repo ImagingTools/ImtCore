@@ -9,6 +9,7 @@
 #include <imtbase/CTreeItemModel.h>
 #include <imtlic/IProductInfo.h>
 #include <imtlic/CFeatureInfo.h>
+#include <imtauth/ITenantManager.h>
 #include <imtservergql/CGqlRequestHandlerCompBase.h>
 
 
@@ -23,6 +24,7 @@ public:
 
 	I_BEGIN_COMPONENT(CPermissionsProviderComp)
 		I_ASSIGN(m_productInfoCompPtr, "FeatureContainer", "Feature container", true, "FeatureContainer");
+		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager for filtering permissions by tenant scope", false, "TenantManager");
 	I_END_COMPONENT
 
 protected:
@@ -30,6 +32,7 @@ protected:
 				const imtlic::CFeatureInfo& featureInfo,
 				imtbase::CTreeItemModel& representationModel,
 				const QByteArray& languageId,
+				const QSet<QByteArray>* allowedPermissionsPtr,
 				QString& errorMessage) const;
 
 	// reimplemented (imtservergql::CGqlRequestHandlerCompBase)
@@ -37,6 +40,7 @@ protected:
 
 protected:
 	I_REF(imtlic::IProductInfo, m_productInfoCompPtr);
+	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
 };
 
 

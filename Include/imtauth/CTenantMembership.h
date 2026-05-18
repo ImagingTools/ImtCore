@@ -23,8 +23,8 @@ public:
 	virtual void SetUserId(const QByteArray& userId) override;
 	virtual QByteArray GetTenantId() const override;
 	virtual void SetTenantId(const QByteArray& tenantId) override;
-	virtual TenantMemberRole GetRole() const override;
-	virtual void SetRole(TenantMemberRole role) override;
+	virtual QByteArray GetRoleId() const override;
+	virtual void SetRoleId(const QByteArray& roleId) override;
 	virtual QString GetJoinedAt() const override;
 	virtual void SetJoinedAt(const QString& joinedAt) override;
 	virtual bool IsActive() const override;
@@ -44,7 +44,7 @@ protected:
 	QByteArray m_membershipId;
 	QByteArray m_userId;
 	QByteArray m_tenantId;
-	TenantMemberRole m_role;
+	QByteArray m_roleId;
 	QString m_joinedAt;
 	QString m_updatedAt;
 	bool m_isActive;

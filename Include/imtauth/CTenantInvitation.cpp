@@ -14,7 +14,6 @@ namespace imtauth
 
 
 CTenantInvitation::CTenantInvitation():
-	m_role(ITenantMembership::TMR_MEMBER),
 	m_status(TIS_PENDING)
 {
 }
@@ -40,17 +39,17 @@ IMT_TENANT_INVITATION_GET_SET(QString, LastSentAt, m_lastSentAt)
 #undef IMT_TENANT_INVITATION_GET_SET
 
 
-ITenantMembership::TenantMemberRole CTenantInvitation::GetRole() const
+QByteArray CTenantInvitation::GetRoleId() const
 {
-	return m_role;
+	return m_roleId;
 }
 
 
-void CTenantInvitation::SetRole(ITenantMembership::TenantMemberRole role)
+void CTenantInvitation::SetRoleId(const QByteArray& roleId)
 {
-	if (m_role != role){
+	if (m_roleId != roleId){
 		istd::CChangeNotifier notifier(this);
-		m_role = role;
+		m_roleId = roleId;
 	}
 }
 
@@ -93,11 +92,7 @@ bool CTenantInvitation::Serialize(iser::IArchive& archive)
 
 	iser::CArchiveTag roleTag("Role", "Role", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(roleTag);
-	int role = static_cast<int>(m_role);
-	retVal = retVal && archive.Process(role);
-	if (!archive.IsStoring()){
-		m_role = static_cast<ITenantMembership::TenantMemberRole>(role);
-	}
+	retVal = retVal && archive.Process(m_roleId);
 	retVal = retVal && archive.EndTag(roleTag);
 
 	iser::CArchiveTag statusTag("Status", "Status", iser::CArchiveTag::TT_LEAF);
@@ -166,7 +161,7 @@ bool CTenantInvitation::CopyFrom(const IChangeable& object, CompatibilityMode /*
 	m_invitationId = sourcePtr->m_invitationId;
 	m_userId = sourcePtr->m_userId;
 	m_tenantId = sourcePtr->m_tenantId;
-	m_role = sourcePtr->m_role;
+	m_roleId = sourcePtr->m_roleId;
 	m_status = sourcePtr->m_status;
 	m_invitedByUserId = sourcePtr->m_invitedByUserId;
 	m_createdAt = sourcePtr->m_createdAt;
@@ -200,7 +195,7 @@ bool CTenantInvitation::ResetData(CompatibilityMode /*mode*/)
 	m_invitationId.clear();
 	m_userId.clear();
 	m_tenantId.clear();
-	m_role = ITenantMembership::TMR_MEMBER;
+	m_roleId.clear();
 	m_status = TIS_PENDING;
 	m_invitedByUserId.clear();
 	m_createdAt.clear();

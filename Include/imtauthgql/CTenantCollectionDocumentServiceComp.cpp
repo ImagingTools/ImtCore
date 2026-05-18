@@ -18,38 +18,6 @@ namespace
 {
 
 
-QString TenantMemberRoleToString(imtauth::ITenantMembership::TenantMemberRole role)
-{
-	switch (role){
-		case imtauth::ITenantMembership::TMR_OWNER:
-			return QStringLiteral("Owner");
-		case imtauth::ITenantMembership::TMR_ADMIN:
-			return QStringLiteral("Admin");
-		case imtauth::ITenantMembership::TMR_MEMBER:
-			return QStringLiteral("Member");
-		case imtauth::ITenantMembership::TMR_GUEST:
-			return QStringLiteral("Guest");
-		default:
-			return QStringLiteral("Member");
-	}
-}
-
-
-imtauth::ITenantMembership::TenantMemberRole StringToTenantMemberRole(const QString& role)
-{
-	if (role == QStringLiteral("Owner")){
-		return imtauth::ITenantMembership::TMR_OWNER;
-	}
-	if (role == QStringLiteral("Admin")){
-		return imtauth::ITenantMembership::TMR_ADMIN;
-	}
-	if (role == QStringLiteral("Guest")){
-		return imtauth::ITenantMembership::TMR_GUEST;
-	}
-	return imtauth::ITenantMembership::TMR_MEMBER;
-}
-
-
 QString TenantInvitationStatusToString(imtauth::ITenantInvitation::TenantInvitationStatus status)
 {
 	switch (status){
@@ -153,7 +121,7 @@ sdl::imtauth::Tenants::CTenantData CTenantCollectionDocumentServiceComp::OnGetTe
 
 				sdl::imtauth::Tenants::CTenantMemberRoleEntry::V1_0 roleEntry;
 				roleEntry.userId = userId;
-				roleEntry.role = TenantMemberRoleToString(membershipPtr->GetRole());
+				roleEntry.role = QString::fromUtf8(membershipPtr->GetRoleId());
 				response.Version_1_0->memberRoles->push_back(roleEntry);
 			}
 		}
@@ -170,7 +138,7 @@ sdl::imtauth::Tenants::CTenantData CTenantCollectionDocumentServiceComp::OnGetTe
 				sdl::imtauth::Tenants::CTenantInvitationEntry::V1_0 invitationEntry;
 				invitationEntry.id = invitationPtr->GetInvitationId();
 				invitationEntry.userId = invitationPtr->GetUserId();
-				invitationEntry.role = TenantMemberRoleToString(invitationPtr->GetRole());
+				invitationEntry.role = QString::fromUtf8(invitationPtr->GetRoleId());
 				invitationEntry.status = TenantInvitationStatusToString(m_invitationManagerCompPtr->GetEffectiveStatus(*invitationPtr));
 				invitationEntry.invitedByUserId = invitationPtr->GetInvitedByUserId();
 				invitationEntry.createdAt = invitationPtr->GetCreatedAt();
@@ -186,14 +154,10 @@ sdl::imtauth::Tenants::CTenantData CTenantCollectionDocumentServiceComp::OnGetTe
 		}
 	}
 
-	response.Version_1_0->availableRoles.Emplace();
-	static const char* roleNames[] = {"Admin", "Member", "Guest"};
-	for (const char* roleName : roleNames){
-		sdl::imtauth::Tenants::CTenantRoleOption::V1_0 opt;
-		opt.id = QByteArray(roleName);
-		opt.name = QString::fromLatin1(roleName);
-		response.Version_1_0->availableRoles->push_back(opt);
-	}
+	// availableRoles will be provided by the client-side RoleCollectionDataProvider
+
+	// Tenant-scoped permissions (selected subset of product permissions)
+	response.Version_1_0->tenantPermissions.Emplace().FromList(tenantPtr->GetTenantPermissions());
 
 	return response;
 }
@@ -257,8 +221,8 @@ sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CTenantCollect
 	bool isAdmin = false;
 	bool isMember = false;
 	if (!tenantId.isEmpty() && m_membershipManagerCompPtr.IsValid()){
-		isAdmin = m_membershipManagerCompPtr->HasMinimumRole(contextUserId, tenantId, imtauth::ITenantMembership::TMR_ADMIN);
-		isMember = m_membershipManagerCompPtr->HasMinimumRole(contextUserId, tenantId, imtauth::ITenantMembership::TMR_GUEST);
+		isAdmin = isOwner || m_membershipManagerCompPtr->HasMinimumRole(contextUserId, tenantId, QByteArray());
+		isMember = m_membershipManagerCompPtr->IsMember(contextUserId, tenantId);
 	}
 	bool isNewTenant = tenantId.isEmpty();
 
@@ -323,7 +287,7 @@ sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CTenantCollect
 			for (const QByteArray& addUserId : newUserIds){
 				if (!currentUserIds.contains(addUserId)){
 					if (m_invitationManagerCompPtr.IsValid()){
-						m_invitationManagerCompPtr->CreateInvitation(contextUserId, addUserId, tenantId, imtauth::ITenantMembership::TMR_MEMBER);
+						m_invitationManagerCompPtr->CreateInvitation(contextUserId, addUserId, tenantId, QByteArray());
 					}
 				}
 			}
@@ -353,16 +317,17 @@ sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CTenantCollect
 						continue;
 					}
 					QString roleStr = *roleEntry->role;
-					// Owner role cannot be assigned — it is set once at creation
-					if (roleStr == QStringLiteral("Owner")){
-						continue;
-					}
 					if (updatedUserIdToMembershipId.contains(userId)){
-						imtauth::ITenantMembership::TenantMemberRole newRole = StringToTenantMemberRole(roleStr);
-						m_membershipManagerCompPtr->UpdateMembershipRole(updatedUserIdToMembershipId.value(userId), newRole);
+						QByteArray newRoleId = roleStr.toUtf8();
+						m_membershipManagerCompPtr->UpdateMembershipRole(updatedUserIdToMembershipId.value(userId), newRoleId);
 					}
 				}
 			}
+		}
+
+		// Apply tenant permissions (only Owner/Admin)
+		if ((isOwner || isAdmin) && tenantData.tenantPermissions){
+			tenantPtr->SetTenantPermissions(tenantData.tenantPermissions->ToList());
 		}
 	}
 
@@ -407,7 +372,7 @@ bool CTenantCollectionDocumentServiceComp::ProcessEvent(imtdoc::CEventBase* even
 				// Auto-create OWNER membership for the tenant creator
 				QByteArray ownerId = documentTicketPtr->GetOwnerId();
 				if (m_membershipManagerCompPtr.IsValid() && !ownerId.isEmpty()){
-					m_membershipManagerCompPtr->AddMembership(ownerId, objectId, imtauth::ITenantMembership::TMR_OWNER);
+					m_membershipManagerCompPtr->AddMembership(ownerId, objectId, QByteArray());
 				}
 			}
 		}
