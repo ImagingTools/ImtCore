@@ -252,9 +252,9 @@ I_EXPORT_COMPONENT(
 			"Tenant Membership Publisher");
 
 I_EXPORT_COMPONENT(
-			RemoteTenantCollectionDocumentManager,
-			"Remote tenant collection document manager with product permissions enrichment",
-			"Remote Tenant Collection Document Manager");
+			RemoteTenantCollectionDocumentService,
+			"Remote tenant collection document service with product permissions enrichment",
+			"Remote Tenant Collection Document Service");
 
 
 } // namespace ImtAuthGqlPck

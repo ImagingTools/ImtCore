@@ -6,33 +6,33 @@
 #include <imtlic/IProductInfo.h>
 #include <imtsdl/TElementList.h>
 #include <imtclientgql/TClientRequestManagerCompWrap.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/TenantCollectionDocumentManager.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/TenantCollectionDocumentService.h>
 
 
 namespace imtauthgql
 {
 
 
-class CRemoteTenantCollectionDocumentManagerControllerComp:
+class CRemoteTenantCollectionDocumentServiceControllerComp:
 			public imtclientgql::TClientRequestManagerCompWrap<
-							sdl::imtauth::TenantCollectionDocumentManager::CGraphQlHandlerCompBase>
+							sdl::imtauth::TenantCollectionDocumentService::CGraphQlHandlerCompBase>
 {
 public:
 	typedef imtclientgql::TClientRequestManagerCompWrap<
-					sdl::imtauth::TenantCollectionDocumentManager::CGraphQlHandlerCompBase> BaseClass;
+					sdl::imtauth::TenantCollectionDocumentService::CGraphQlHandlerCompBase> BaseClass;
 
-	I_BEGIN_COMPONENT(CRemoteTenantCollectionDocumentManagerControllerComp);
+	I_BEGIN_COMPONENT(CRemoteTenantCollectionDocumentServiceControllerComp);
 		I_ASSIGN(m_productInfoCompPtr, "ProductInfo", "Product info for loading available permissions", true, "ProductInfo");
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::imtauth::TenantCollectionDocumentManager::CGraphQlHandlerCompBase)
+	// reimplemented (sdl::imtauth::TenantCollectionDocumentService::CGraphQlHandlerCompBase)
 	virtual sdl::imtauth::Tenants::CTenantData OnGetTenantRepresentation(
-				const sdl::imtauth::TenantCollectionDocumentManager::CGetTenantRepresentationGqlRequest& getTenantRepresentationRequest,
+				const sdl::imtauth::TenantCollectionDocumentService::CGetTenantRepresentationGqlRequest& getTenantRepresentationRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus OnUpdateTenantFromRepresentation(
-				const sdl::imtauth::TenantCollectionDocumentManager::CUpdateTenantFromRepresentationGqlRequest& updateTenantFromRepresentationRequest,
+	virtual sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus OnUpdateTenantFromRepresentation(
+				const sdl::imtauth::TenantCollectionDocumentService::CUpdateTenantFromRepresentationGqlRequest& updateTenantFromRepresentationRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 

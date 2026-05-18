@@ -14,7 +14,7 @@
         <Element ComponentName="RemoteCollectionDocumentServiceController" X="225" Y="600" Note=""/>
         <Element ComponentName="RemoteCommandsController" X="225" Y="225" Note=""/>
         <Element ComponentName="RemoteDocumentRevisionController" X="225" Y="400" Note=""/>
-        <Element ComponentName="RemoteTenantCollectionDocumentManager" X="200" Y="100" Note=""/>
+        <Element ComponentName="RemoteTenantCollectionDocumentService" X="200" Y="100" Note=""/>
         <Element ComponentName="RemoteTenantController" X="575" Y="225" Note=""/>
         <Element ComponentName="TenantInfo" X="575" Y="425" Note=""/>
         <Element ComponentName="TenantMembershipManagerController" X="625" Y="600" Note=""/>

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include <imtauthgql/CRemoteTenantCollectionDocumentManagerControllerComp.h>
+#include <imtauthgql/CRemoteTenantCollectionDocumentServiceControllerComp.h>
 
 
 // ImtCore includes
@@ -13,10 +13,10 @@ namespace imtauthgql
 
 // protected methods
 
-// reimplemented (sdl::imtauth::TenantCollectionDocumentManager::CGraphQlHandlerCompBase)
+// reimplemented (sdl::imtauth::TenantCollectionDocumentService::CGraphQlHandlerCompBase)
 
-sdl::imtauth::Tenants::CTenantData CRemoteTenantCollectionDocumentManagerControllerComp::OnGetTenantRepresentation(
-		const sdl::imtauth::TenantCollectionDocumentManager::CGetTenantRepresentationGqlRequest& /*getTenantRepresentationRequest*/,
+sdl::imtauth::Tenants::CTenantData CRemoteTenantCollectionDocumentServiceControllerComp::OnGetTenantRepresentation(
+		const sdl::imtauth::TenantCollectionDocumentService::CGetTenantRepresentationGqlRequest& /*getTenantRepresentationRequest*/,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const
 {
@@ -51,18 +51,18 @@ sdl::imtauth::Tenants::CTenantData CRemoteTenantCollectionDocumentManagerControl
 }
 
 
-sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CRemoteTenantCollectionDocumentManagerControllerComp::OnUpdateTenantFromRepresentation(
-		const sdl::imtauth::TenantCollectionDocumentManager::CUpdateTenantFromRepresentationGqlRequest& /*updateTenantFromRepresentationRequest*/,
+sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CRemoteTenantCollectionDocumentServiceControllerComp::OnUpdateTenantFromRepresentation(
+		const sdl::imtauth::TenantCollectionDocumentService::CUpdateTenantFromRepresentationGqlRequest& /*updateTenantFromRepresentationRequest*/,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus>(gqlRequest, errorMessage);
 }
 
 
 // private methods
 
-void CRemoteTenantCollectionDocumentManagerControllerComp::CollectPermissionsTree(
+void CRemoteTenantCollectionDocumentServiceControllerComp::CollectPermissionsTree(
 		const imtlic::IFeatureInfo* featureInfoPtr,
 		imtsdl::TElementList<sdl::imtauth::Tenants::CTenantPermissionOption::V1_0>& permissions) const
 {
