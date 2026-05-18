@@ -397,13 +397,61 @@ Item {
                             }
 
                             Text {
+                                id: cellText
                                 anchors.verticalCenter: parent.verticalCenter
                                 width: Math.max(0, parent.width - x)
                                 text: cellRoot.displayText
+                                visible: !cellEditor.visible
                                 color: !delegateRoot.nodeIsEnabled ? root.disabledTextColor : delegateRoot.nodeSelected ? root.selectedTextColor : root.normalTextColor
                                 horizontalAlignment: cellRoot.column && cellRoot.column.horizontalAlignment !== undefined ? cellRoot.column.horizontalAlignment : Text.AlignLeft
                                 elide: Text.ElideRight
                                 verticalAlignment: Text.AlignVCenter
+                            }
+
+                            TextInput {
+                                id: cellEditor
+                                anchors.verticalCenter: parent.verticalCenter
+                                width: Math.max(0, parent.width - x)
+                                visible: root.editing && root.isEditingCell(delegateRoot.nodeKey, index)
+                                text: visible ? cellRoot.displayText : ""
+                                color: root.normalTextColor
+                                selectByMouse: true
+                                selectedTextColor: "#FFFFFF"
+                                selectionColor: Style.accentColor
+                                clip: true
+
+                                onVisibleChanged: {
+                                    if (visible) {
+                                        text = cellRoot.displayText
+                                        selectAll()
+                                        forceActiveFocus()
+                                    }
+                                }
+
+                                Keys.onEscapePressed: {
+                                    root.cancelEdit()
+                                    listView.forceActiveFocus()
+                                }
+
+                                Keys.onReturnPressed: {
+                                    root.commitEdit(cellEditor.text)
+                                    listView.forceActiveFocus()
+                                }
+
+                                Keys.onEnterPressed: {
+                                    root.commitEdit(cellEditor.text)
+                                    listView.forceActiveFocus()
+                                }
+
+                                Keys.onTabPressed: {
+                                    root.commitEdit(cellEditor.text)
+                                    root.editNextCell()
+                                }
+
+                                Keys.onBacktabPressed: {
+                                    root.commitEdit(cellEditor.text)
+                                    root.editPreviousCell()
+                                }
                             }
                         }
                     }
@@ -1231,6 +1279,68 @@ Item {
         if (columnIndex === undefined || columnIndex === null)
             columnIndex = 0
         beginEditCell(currentIndex.key, columnIndex)
+    }
+
+    function editNextCell() {
+        if (!currentIndex || !currentIndex.key)
+            return
+        var colCount = columnCount()
+        var nextCol = __editingColumn >= 0 ? __editingColumn + 1 : 1
+        var currentKey = currentIndex.key
+
+        // Try next editable column in current row
+        for (var c = nextCol; c < colCount; ++c) {
+            if (isColumnEditable(columnAt(c))) {
+                beginEditCell(currentKey, c)
+                return
+            }
+        }
+
+        // Move to next visible row, first editable column
+        var row = visibleRowOf(currentKey)
+        if (row >= 0 && row < __visibleKeys.length - 1) {
+            var nextKey = __visibleKeys[row + 1]
+            var nextNode = __nodes[nextKey]
+            if (nextNode && (allowDisabledEditing || nextNode.enabled)) {
+                for (var c2 = 0; c2 < colCount; ++c2) {
+                    if (isColumnEditable(columnAt(c2))) {
+                        beginEditCell(nextKey, c2)
+                        return
+                    }
+                }
+            }
+        }
+    }
+
+    function editPreviousCell() {
+        if (!currentIndex || !currentIndex.key)
+            return
+        var colCount = columnCount()
+        var prevCol = __editingColumn >= 0 ? __editingColumn - 1 : colCount - 1
+        var currentKey = currentIndex.key
+
+        // Try previous editable column in current row
+        for (var c = prevCol; c >= 0; --c) {
+            if (isColumnEditable(columnAt(c))) {
+                beginEditCell(currentKey, c)
+                return
+            }
+        }
+
+        // Move to previous visible row, last editable column
+        var row = visibleRowOf(currentKey)
+        if (row > 0) {
+            var prevKey = __visibleKeys[row - 1]
+            var prevNode = __nodes[prevKey]
+            if (prevNode && (allowDisabledEditing || prevNode.enabled)) {
+                for (var c2 = colCount - 1; c2 >= 0; --c2) {
+                    if (isColumnEditable(columnAt(c2))) {
+                        beginEditCell(prevKey, c2)
+                        return
+                    }
+                }
+            }
+        }
     }
 
     function setNodeText(keyValue, value) {

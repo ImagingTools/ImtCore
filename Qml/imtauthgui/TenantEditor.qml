@@ -235,6 +235,10 @@ DocumentViewBase {
 
 	onIsNewTenantChanged: {
 		multiPageView.updatePages()
+		if (!container.isNewTenant) {
+			container.__loadMembersFromModel()
+			container.__loadInvitationsFromModel()
+		}
 	}
 
 	onIsOwnerChanged: {
@@ -776,6 +780,32 @@ DocumentViewBase {
 
 	// --- GQL Request Senders ---
 	property CreateTenantInvitationInput createInvitationInput: CreateTenantInvitationInput {}
+
+	// --- Subscription for real-time membership notifications ---
+	TenantMembershipSubscriptionClient {
+		id: membershipSubscription
+
+		onInvitationAccepted: function(data) {
+			if (!container.tenantData || container.isNewTenant)
+				return
+			if (data.tenantId === container.tenantData.m_id) {
+				// Member accepted -> refresh the editor to show updated members
+				if (container.representationController)
+					container.representationController.updateRepresentationFromDocument()
+			}
+		}
+
+		onInvitationRejected: function(data) {
+			if (!container.tenantData || container.isNewTenant)
+				return
+			if (data.tenantId === container.tenantData.m_id) {
+				// Member rejected -> remove the pending invitation locally and refresh
+				container.__removePendingInvitation(data.membershipId)
+				if (container.representationController)
+					container.representationController.updateRepresentationFromDocument()
+			}
+		}
+	}
 	property GqlSdlRequestSender createInvitationSender: GqlSdlRequestSender {
 		requestType: 1
 		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_createTenantInvitation
