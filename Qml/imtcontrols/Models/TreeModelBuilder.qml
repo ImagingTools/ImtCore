@@ -149,9 +149,12 @@ QtObject {
             },
 
             childModel: function(role) {
-                if (!model || !model.GetTreeItemModel)
+                if (!model)
                     return null
-                return model.GetTreeItemModel(role, row)
+                var fn = model.GetTreeItemModel || model.getTreeItemModel
+                if (!fn)
+                    return null
+                return fn.call(model, role, row)
             }
         }
     }
@@ -203,6 +206,8 @@ QtObject {
             return 0
         if (model.GetItemsCount)
             return model.GetItemsCount()
+        if (model.getItemsCount)
+            return model.getItemsCount()
         if (model.count !== undefined)
             return model.count
         if (model.length !== undefined)

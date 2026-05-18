@@ -162,6 +162,7 @@ QtObject {
 		userTokenProvider.productId = LocalStorage.getItem("productId");
 		userTokenProvider.permissions = LocalStorage.getItem("permissions");
 		root.currentTenantId = LocalStorage.getItem("tenantId") || "";
+		root.currentTenantName = LocalStorage.getItem("tenantName") || "";
 	}
 	
 	function saveDataToStorage(){
@@ -173,6 +174,7 @@ QtObject {
 		LocalStorage.setItem("productId", userTokenProvider.productId);
 		LocalStorage.setItem("permissions", userTokenProvider.permissions);
 		LocalStorage.setItem("tenantId", root.currentTenantId);
+		LocalStorage.setItem("tenantName", root.currentTenantName);
 	}
 	
 	function removeDataFromStorage(){
@@ -184,6 +186,7 @@ QtObject {
 		LocalStorage.removeItem("productId");
 		LocalStorage.removeItem("permissions");
 		LocalStorage.removeItem("tenantId");
+		LocalStorage.removeItem("tenantName");
 	}
 
 	function saveRefreshTokenIfRememberMe(){
