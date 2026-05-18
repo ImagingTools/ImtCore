@@ -207,30 +207,30 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 
 	// Validate token and extract userId — same pattern as CHttpGraphQLServletComp::OnPost
 	QByteArray userId;
-	// if (!accessToken.isEmpty()){
-	// 	if (accessToken.size() > 8 && accessToken.startsWith("imt_pat_")){
-	// 		// PAT token
-	// 		if (m_patManagerCompPtr.IsValid()){
-	// 			QByteArray tokenId;
-	// 			QByteArrayList scopes;
-	// 			if (!m_patManagerCompPtr->ValidateToken(accessToken, userId, tokenId, scopes)){
-	// 				return CreateErrorResponse(QByteArrayLiteral("Forbidden: invalid PAT token"), request);
-	// 			}
-	// 			m_patManagerCompPtr->UpdateLastUsedAt(tokenId);
-	// 		}
-	// 	}
-	// 	else{
-	// 		// JWT token
-	// 		if (m_jwtSessionControllerCompPtr.IsValid()){
-	// 			using JwtState = imtauth::IJwtSessionController::JwtState;
-	// 			JwtState state = m_jwtSessionControllerCompPtr->ValidateJwt(accessToken);
-	// 			if (state == JwtState::JS_EXPIRED || state == JwtState::JS_INVALID){
-	// 				return CreateErrorResponse(QByteArrayLiteral("Forbidden: invalid or expired JWT token"), request);
-	// 			}
-	// 			userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(accessToken);
-	// 		}
-	// 	}
-	// }
+	if (!accessToken.isEmpty()){
+		if (accessToken.size() > 8 && accessToken.startsWith("imt_pat_")){
+			// PAT token
+			if (m_patManagerCompPtr.IsValid()){
+				QByteArray tokenId;
+				QByteArrayList scopes;
+				if (!m_patManagerCompPtr->ValidateToken(accessToken, userId, tokenId, scopes)){
+					return CreateErrorResponse(QByteArrayLiteral("Forbidden: invalid PAT token"), request);
+				}
+				m_patManagerCompPtr->UpdateLastUsedAt(tokenId);
+			}
+		}
+		else{
+			// JWT token
+			if (m_jwtSessionControllerCompPtr.IsValid()){
+				using JwtState = imtauth::IJwtSessionController::JwtState;
+				JwtState state = m_jwtSessionControllerCompPtr->ValidateJwt(accessToken);
+				if (state == JwtState::JS_EXPIRED || state == JwtState::JS_INVALID){
+					return CreateErrorResponse(QByteArrayLiteral("Forbidden: invalid or expired JWT token"), request);
+				}
+				userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(accessToken);
+			}
+		}
+	}
 
 	// Verify request is still alive after auth validation (safety check)
 	if (requestGuard.isNull()){
@@ -252,7 +252,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 		simpleContext->SetProductId(productId);
 
 		// Extract tenant ID from JWT token when available
-		if (m_jwtSessionControllerCompPtr.IsValid() && !accessToken.isEmpty() && !accessToken.startsWith("pat_")){
+		if (m_jwtSessionControllerCompPtr.IsValid() && !accessToken.isEmpty() && !accessToken.startsWith("imt_pat_")){
 			QByteArray tenantId = m_jwtSessionControllerCompPtr->GetTenantFromJwt(accessToken);
 			simpleContext->SetTenantId(tenantId);
 		}

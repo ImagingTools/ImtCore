@@ -785,22 +785,22 @@ DocumentViewBase {
 	TenantMembershipSubscriptionClient {
 		id: membershipSubscription
 
-		onInvitationAccepted: {
+		onInvitationAccepted: function(notification) {
 			if (!container.tenantData || container.isNewTenant)
 				return
-			if (data.tenantId === container.tenantData.m_id) {
+			if (notification.tenantId === container.tenantData.m_id) {
 				// Member accepted -> refresh the editor to show updated members
 				if (container.representationController)
 					container.representationController.updateRepresentationFromDocument()
 			}
 		}
 
-		onInvitationRejected:{
+		onInvitationRejected: function(notification) {
 			if (!container.tenantData || container.isNewTenant)
 				return
-			if (data.tenantId === container.tenantData.m_id) {
+			if (notification.tenantId === container.tenantData.m_id) {
 				// Member rejected -> remove the pending invitation locally and refresh
-				container.__removePendingInvitation(data.membershipId)
+				container.__removePendingInvitation(notification.membershipId)
 				if (container.representationController)
 					container.representationController.updateRepresentationFromDocument()
 			}
