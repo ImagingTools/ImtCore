@@ -33,8 +33,11 @@ bool CSlaveSubscriberControllerComp::RegisterSubscription(
 		imtgql::IGqlSubscriberController* publisherPtr = m_subscriberControllerListCompPtr[index];
 		if (publisherPtr != nullptr){
 			if (publisherPtr->IsRequestSupported(gqlRequest)){
+				QReadLocker readLocker(&m_lock);
 				if (!m_publisherMap.contains(subscriptionId)){
+					readLocker.unlock();
 					if (publisherPtr->RegisterSubscription(subscriptionId, gqlRequest, networkRequest, errorMessage)){
+						QWriteLocker writeLocker(&m_lock);
 						m_publisherMap[subscriptionId] = publisherPtr;
 
 						return true;
@@ -56,10 +59,14 @@ bool CSlaveSubscriberControllerComp::RegisterSubscription(
 bool CSlaveSubscriberControllerComp::UnregisterSubscription(const QByteArray& subscriptionId)
 {
 	if (m_publisherMap.contains(subscriptionId)){
+		QReadLocker readLocker(&m_lock);
 		imtgql::IGqlSubscriberController* publisherPtr = m_publisherMap[subscriptionId];
+		readLocker.unlock();
 		Q_ASSERT(publisherPtr != nullptr);
+
 		bool res = publisherPtr->UnregisterSubscription(subscriptionId);
 		if(res){
+			QWriteLocker writeLocker(&m_lock);
 			m_publisherMap.remove(subscriptionId);
 		}
 		return res;
