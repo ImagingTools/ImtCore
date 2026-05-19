@@ -11,14 +11,14 @@ Item {
     id: collectionStructureContainer;
 
     property string uuid;
-    property DocumentManager documentManagerPtr: null;
+    property DocumentService documentManagerPtr: null;
     property string documentName;
 
     property int contentMargins: 0;
 
     property alias baseCollectionView: collectionStructureBase;
 
-    property bool isUsedDocumentManager: true;
+    property bool isUsedDocumentService: true;
     property bool visibleMetaInfo: true;
     property bool hasFilter: true;
 
@@ -85,7 +85,7 @@ Item {
         }
     }
 
-    onDocumentManagerPtrChanged: {
+    onDocumentServicePtrChanged: {
         if (commandsDelegateLoader.item){
             if (commandsDelegateLoader.item.documentManagerPtr !== undefined){
                 commandsDelegateLoader.item.documentManagerPtr = collectionStructureContainer.documentManagerPtr;
@@ -229,7 +229,7 @@ Item {
             name = "";
         }
 
-        if (collectionStructureContainer.isUsedDocumentManager){
+        if (collectionStructureContainer.isUsedDocumentService){
             if (id === ""){
                 documentManagerPtr.insertNewDocument(documentTypeId);
             }

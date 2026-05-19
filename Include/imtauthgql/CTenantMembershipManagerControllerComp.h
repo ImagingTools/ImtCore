@@ -93,6 +93,10 @@ protected:
 				const sdl::imtauth::TenantMemberships::CUpdateMembershipRoleGqlRequest& request,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+	virtual sdl::imtauth::TenantMemberships::CTransferTenantOwnershipPayload OnTransferTenantOwnership(
+				const sdl::imtauth::TenantMemberships::CTransferTenantOwnershipGqlRequest& request,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 
 private:
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);

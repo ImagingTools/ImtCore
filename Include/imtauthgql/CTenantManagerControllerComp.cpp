@@ -88,6 +88,7 @@ sdl::imtauth::Tenants::CGetTenantPayload CTenantManagerControllerComp::OnGetTena
 	tenantData.isActive = tenantInfoPtr->IsActive();
 	tenantData.createdAt = tenantInfoPtr->GetCreatedAt();
 	tenantData.updatedAt = tenantInfoPtr->GetUpdatedAt();
+	tenantData.tenantPermissions.Emplace().FromList(tenantInfoPtr->GetTenantPermissions());
 
 	// Populate members (id + name) from TenantMemberships
 	if (m_membershipManagerCompPtr.IsValid()){
@@ -151,7 +152,7 @@ sdl::imtauth::Tenants::CCreateTenantPayload CTenantManagerControllerComp::OnCrea
 	}
 
 	if (m_membershipManagerCompPtr.IsValid() && !ownerId.isEmpty()){
-		m_membershipManagerCompPtr->AddMembership(ownerId, tenantId, imtauth::ITenantMembership::TMR_OWNER);
+		m_membershipManagerCompPtr->AddMembership(ownerId, tenantId, QByteArray());
 	}
 
 	response.Version_1_0->tenantId = tenantId;
@@ -257,7 +258,7 @@ sdl::imtauth::Tenants::CUpdateTenantPayload CTenantManagerControllerComp::OnUpda
 		// Add memberships for new users
 		for (const QByteArray& uid : newUserIds){
 			if (!currentUserIds.contains(uid)){
-				m_membershipManagerCompPtr->InviteMembership(uid, tenantId, imtauth::ITenantMembership::TMR_MEMBER);
+				m_membershipManagerCompPtr->AddMembership(uid, tenantId, QByteArray());
 			}
 		}
 	}

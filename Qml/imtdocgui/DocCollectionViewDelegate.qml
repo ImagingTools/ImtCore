@@ -10,7 +10,7 @@ import imtbaseDocumentRevisionSdl 1.0
 CollectionViewCommandsDelegateBase{
 	id: commandsDelegate
 	
-	property DocumentManagerBase documentManager: null
+	property DocumentServiceBase documentManager: null
 	property string documentManagerId: collectionId
 
 	property var documentConfigs: ({})
@@ -70,7 +70,7 @@ CollectionViewCommandsDelegateBase{
 
 	onDocumentManagerIdChanged:{
 		if (documentManagerId !== ""){
-			documentManager = MainDocumentManager.getDocumentManager(documentManagerId)
+			documentManager = MainDocumentService.getDocumentService(documentManagerId)
 		}
 	}
 

@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtauth/ITenantMembershipManager.h>
+#include <imtauth/ITenantManager.h>
 #include <imtservergql/CGqlPublisherCompBase.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/TenantMemberships.h>
 
@@ -43,6 +44,7 @@ public:
 	I_BEGIN_COMPONENT(CTenantMembershipPublisherComp);
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager to observe for changes", true, "TenantMembershipManager");
 		I_ASSIGN_TO(m_membershipManagerModelCompPtr, m_membershipManagerCompPtr, true);
+		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager for resolving tenant owner", false, "TenantManager");
 	I_END_COMPONENT;
 
 protected:
@@ -59,13 +61,14 @@ protected:
 protected:
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
 	I_REF(imod::IModel, m_membershipManagerModelCompPtr);
+	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
 
 private:
 	struct CachedMembership
 	{
 		QByteArray userId;
 		QByteArray tenantId;
-		imtauth::ITenantMembership::TenantMemberRole role;
+		QByteArray roleId;
 		bool isActive;
 	};
 
@@ -76,7 +79,7 @@ private:
 		const QByteArray& userId,
 		const QByteArray& tenantId,
 		const QString& tenantName,
-		imtauth::ITenantMembership::TenantMemberRole role) const;
+		const QByteArray& roleId) const;
 
 	QByteArray FindTenantOwnerUserId(const QByteArray& tenantId) const;
 

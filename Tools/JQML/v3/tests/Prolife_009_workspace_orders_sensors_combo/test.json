@@ -1,0 +1,6 @@
+{
+    "includes": [
+        "${PROLIFEDIR}/Qml/Include/prolifeqml/prolife.json"
+    ],
+    "dirs": []
+}

@@ -17,7 +17,14 @@ public:
 
 	I_BEGIN_COMPONENT(CTenantDbDelegateComp)
 		I_ASSIGN(m_tenantFactCompPtr, "TenantFactory", "Factory used for creation of new tenant instances", true, "TenantFactory");
+		I_ASSIGN(m_permissionsTableNameAttrPtr, "PermissionsTableName", "Name of the TenantPermissions table", false, "TenantPermissions");
+		I_ASSIGN(m_autoCreatePermissionsTableAttrPtr, "AutoCreatePermissionsTable", "Auto-create TenantPermissions table if not exists", false, true);
+		I_ASSIGN(m_createPermissionsTableScriptPathAttrPtr, "CreatePermissionsTableScriptPath", "SQL script path for TenantPermissions table creation", false, "CreateTenantPermissionsTable.sql");
+		I_ASSIGN(m_productIdAttrPtr, "ProductId", "Product ID used when storing permissions (scoped per product)", false, "");
 	I_END_COMPONENT
+
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 	virtual istd::IChangeableUniquePtr CreateObjectFromRecord(
@@ -77,8 +84,17 @@ protected:
 private:
 	static QByteArray ExtractUserId(const iprm::IParamsSet* paramsPtr);
 	QString GetTenantRelationScopeSubquery(const QByteArray& userId) const;
+	QByteArray GetProductId() const;
+	bool CreatePermissionsTableIfNeeded();
+	QByteArrayList LoadTenantPermissions(const QByteArray& tenantId) const;
+	QByteArray CreatePermissionsInsertQuery(const QByteArray& tenantId, const QByteArrayList& permissions) const;
+	QByteArray CreatePermissionsDeleteQuery(const QByteArray& tenantId) const;
 
 	I_FACT(imtauth::ITenantInfo, m_tenantFactCompPtr);
+	I_ATTR(QByteArray, m_permissionsTableNameAttrPtr);
+	I_ATTR(bool, m_autoCreatePermissionsTableAttrPtr);
+	I_ATTR(QByteArray, m_createPermissionsTableScriptPathAttrPtr);
+	I_ATTR(QByteArray, m_productIdAttrPtr);
 };
 
 

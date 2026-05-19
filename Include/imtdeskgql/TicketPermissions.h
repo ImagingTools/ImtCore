@@ -18,11 +18,11 @@
 \brief Free helper functions for ticket-related permission checks.
 
 These helpers are shared between CTicketCollectionControllerComp (list
-visibility filtering), CTicketCollectionDocumentManagerComp (document
+visibility filtering), CTicketCollectionDocumentServiceComp (document
 get/update permission guards) and the ticket message notifier.
 
 All helpers operate on an imtgql::IGqlContext pointer, which is the
-common abstraction holding the current user info. The DocumentManager
+common abstraction holding the current user info. The DocumentService
 obtains it via gqlRequest.GetRequestContext(); the controller and
 notifier obtain it via imtgql::CGqlRequestContextManager::GetContext().
 */

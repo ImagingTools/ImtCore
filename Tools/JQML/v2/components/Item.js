@@ -23,6 +23,8 @@ class Item extends QtObject {
         antialiasing: { type: QBool, value: false },
         width: { type: QAutoGeometry, value: 0, changed: '$widthChanged' },
         height: { type: QAutoGeometry, value: 0, changed: '$heightChanged' },
+        implicitWidth: { type: QReal, value: 0, changed: '$implicitWidthChanged' },
+        implicitHeight: { type: QReal, value: 0, changed: '$implicitHeightChanged' },
         visible: { type: QVisible, value: true, changed: '$visibleChanged' },
         enabled: { type: QBool, value: true, changed: '$enabledChanged' },
         clip: { type: QBool, value: false, changed: '$clipChanged' },
@@ -457,6 +459,14 @@ class Item extends QtObject {
             minHeight: `${this.getProperty('height').get()}px`,
         })
         // this.$dom.style.height = `${this.getProperty('height').get() > 0 ? this.getProperty('height').get() : 0}px`
+    }
+
+    $implicitWidthChanged(){
+        this.getProperty('width').setAuto(this.getPropertyValue('implicitWidth'))
+    }
+
+    $implicitHeightChanged(){
+        this.getProperty('height').setAuto(this.getPropertyValue('implicitHeight'))
     }
 
     $anchorsChanged(){

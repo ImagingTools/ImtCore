@@ -211,7 +211,7 @@ I_EXPORT_COMPONENT(
 			"Tenant Meta Info Delegate");
 
 I_EXPORT_COMPONENT(
-			TenantCollectionDocumentManager,
+			TenantCollectionDocumentService,
 			"Tenant collection document manager",
 			"Tenant Collection Document Manager");
 
@@ -250,6 +250,11 @@ I_EXPORT_COMPONENT(
 			TenantMembershipPublisher,
 			"Publisher for tenant membership invitation/response notifications via WebSocket",
 			"Tenant Membership Publisher");
+
+I_EXPORT_COMPONENT(
+			RemoteTenantCollectionDocumentService,
+			"Remote tenant collection document service with product permissions enrichment",
+			"Remote Tenant Collection Document Service");
 
 
 } // namespace ImtAuthGqlPck

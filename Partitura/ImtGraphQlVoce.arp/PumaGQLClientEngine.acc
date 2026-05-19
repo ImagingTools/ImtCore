@@ -89,7 +89,7 @@
                                 <Value>DocumentRevision</Value>
                                 <Value>JwtSessionControllerProxy</Value>
                                 <Value>RemoteControllers</Value>
-                                <Value>RemoteCollectionDocumentManagerController</Value>
+                                <Value>RemoteCollectionDocumentServiceController</Value>
                                 <Value>RemoteTenantController</Value>
                                 <Value>RemoteProfileController</Value>
                                 <Value>JwtSessionControllerProxy</Value>
@@ -135,7 +135,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="RemoteCollectionDocumentManagerController" PackageId="ImtClientGqlPck" ComponentId="RemoteCollectionDocumentManagerController">
+        <Element Id="RemoteCollectionDocumentServiceController" PackageId="ImtClientGqlPck" ComponentId="RemoteCollectionDocumentServiceController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
@@ -271,6 +271,9 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ProductId" Type="Id" ExportId="ProductId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProductInfo" Type="Reference" ExportId="ProductInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
@@ -643,6 +646,7 @@
         <Component ExportedId="CachedRoleCollection" ComponentId="RemoteRepositories/CachedRoleCollection"/>
         <Component ExportedId="CachedUserCollection" ComponentId="RemoteRepositories/CachedUserCollection"/>
         <Component ExportedId="GroupRemoteRepository" ComponentId="RemoteRepositories/GroupRemoteRepository"/>
+        <Component ExportedId="RemoteTenantController" ComponentId="RemoteTenantController/RemoteTenantController"/>
         <Component ExportedId="RoleRemoteRepository" ComponentId="RemoteRepositories/RoleRemoteRepository"/>
         <Component ExportedId="UserGroupInfoProvider" ComponentId="RemoteRepositories/UserGroupInfoProvider"/>
         <Component ExportedId="UserRemoteRepository" ComponentId="RemoteRepositories/UserRemoteRepository"/>

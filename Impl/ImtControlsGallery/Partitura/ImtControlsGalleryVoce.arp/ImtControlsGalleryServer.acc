@@ -37,7 +37,7 @@
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="CollectionDocumentManager" Type="Reference" ExportId="">
+                    <AttributeInfo Id="CollectionDocumentService" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ContactInfoDocCollectionManager"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ContactInfoCollection" Type="Reference" ExportId="">
@@ -264,16 +264,16 @@
         <EmbeddedRegistry Id="ContactInfoDocCollectionManager">
             <Data Description="" Keywords="">
                 <ElementsList>
-                    <Element Id="CollectionDocumentManager" PackageId="ImtDocPck" ComponentId="CollectionDocumentManager">
+                    <Element Id="CollectionDocumentService" PackageId="ImtDocPck" ComponentId="CollectionDocumentService">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
                                 <AttributeInfo Id="Collection" Type="Reference" ExportId="ContactInfoCollection">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
-                                <AttributeInfo Id="DocumentManagerEventHandler" Type="Reference[]" ExportId="">
+                                <AttributeInfo Id="DocumentServiceEventHandler" Type="Reference[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>CollectionDocumentManagerPublisher</Value>
+                                            <Value>CollectionDocumentServicePublisher</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -303,11 +303,11 @@
                             </AttributeInfoMap>
                         </Data>
                     </Element>
-                    <Element Id="CollectionDocumentManagerController" PackageId="ImtServerGqlPck" ComponentId="CollectionDocumentManagerController">
+                    <Element Id="CollectionDocumentServiceController" PackageId="ImtServerGqlPck" ComponentId="CollectionDocumentServiceController">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
-                                <AttributeInfo Id="CollectionDocumentManager" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="CollectionDocumentManager"/>
+                                <AttributeInfo Id="CollectionDocumentService" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="CollectionDocumentService"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
                                     <Data IsEnabled="true" Value="ContactInfos"/>
@@ -318,7 +318,7 @@
                             </AttributeInfoMap>
                         </Data>
                     </Element>
-                    <Element Id="CollectionDocumentManagerPublisher" PackageId="ImtServerGqlPck" ComponentId="CollectionDocumentManagerPublisher">
+                    <Element Id="CollectionDocumentServicePublisher" PackageId="ImtServerGqlPck" ComponentId="CollectionDocumentServicePublisher">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
                                 <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
@@ -349,9 +349,9 @@
                 </ElementsList>
                 <EmbeddedRegistriesList/>
                 <ExportedInterfaces>
-                    <Interface InterfaceId="imtdoc::IDocumentManager" ComponentId="CollectionDocumentManager"/>
-                    <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="CollectionDocumentManagerController"/>
-                    <Interface InterfaceId="imtgql::IGqlSubscriberController" ComponentId="CollectionDocumentManagerPublisher"/>
+                    <Interface InterfaceId="imtdoc::IDocumentService" ComponentId="CollectionDocumentService"/>
+                    <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="CollectionDocumentServiceController"/>
+                    <Interface InterfaceId="imtgql::IGqlSubscriberController" ComponentId="CollectionDocumentServicePublisher"/>
                 </ExportedInterfaces>
                 <ExportedComponents/>
             </Data>

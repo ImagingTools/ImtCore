@@ -9,7 +9,7 @@
 
 // ImtCore includes
 #include <imtqml/CDataModelController.h>
-#include <imtqml/CDocumentManagerController.h>
+#include <imtqml/CDocumentServiceController.h>
 #include <imtqml/CFileIO.h>
 #include <imtqml/CGqlModel.h>
 #include <imtqml/CGqlRequest.h>
@@ -59,8 +59,8 @@ void CStaticQmlTypeRegistratorComp::OnComponentCreated()
 	if (!m_registerCNetworkEventInterceptorAttrPtr.IsValid() || *m_registerCNetworkEventInterceptorAttrPtr){
 		qmlRegisterSingletonInstance<imtqml::CNetworkEventInterceptor>("com.imtcore.imtqml", 1, 0, "NetworkEventInterceptor", imtqml::CNetworkEventInterceptor::Instance());
 	}
-	if (!m_registerCDocumentManagerControllerAttrPtr.IsValid() || *m_registerCDocumentManagerControllerAttrPtr){
-		qmlRegisterType<imtqml::CDocumentManagerController>("com.imtcore.imtqml", 1, 0, "DocumentManagerController");
+	if (!m_registerCDocumentServiceControllerAttrPtr.IsValid() || *m_registerCDocumentServiceControllerAttrPtr){
+		qmlRegisterType<imtqml::CDocumentServiceController>("com.imtcore.imtqml", 1, 0, "DocumentServiceController");
 	}
 	if (!m_registerCDataModelControllerAttrPtr.IsValid() || *m_registerCDataModelControllerAttrPtr){
 		qmlRegisterType<imtqml::CDataModelController>("com.imtcore.imtqml", 1, 0, "DataModelController");

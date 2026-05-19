@@ -7,8 +7,8 @@ import imtcontrols 1.0
 import imtguigql 1.0
 import imtdocgui 1.0
 import imtchatImtChatSdl 1.0
-import imtchatConversationCollectionDocumentManagerSdl 1.0
-import imtbaseCollectionDocumentManagerSdl 1.0
+import imtchatConversationCollectionDocumentServiceSdl 1.0
+import imtbaseCollectionDocumentServiceSdl 1.0
 import imtbaseUndoManagerSdl 1.0
 
 RemoteCollectionView {
@@ -70,7 +70,7 @@ RemoteCollectionView {
 
 					property DocumentId documentIdInput: DocumentId {}
 					property GqlSdlRequestSender getConversationRequest: GqlSdlRequestSender {
-						gqlCommandId: ImtchatConversationCollectionDocumentManagerSdlCommandIds.s_getConversationRepresentation
+						gqlCommandId: ImtchatConversationCollectionDocumentServiceSdlCommandIds.s_getConversationRepresentation
 						sdlObjectComp: Component {
 							ConversationData {
 								onFinished: {
@@ -87,7 +87,7 @@ RemoteCollectionView {
 
 					property UpdateConversationInput updateConversationInput: UpdateConversationInput {}
 					property GqlSdlRequestSender updateConversationRequest: GqlSdlRequestSender {
-						gqlCommandId: ImtchatConversationCollectionDocumentManagerSdlCommandIds.s_updateConversationFromRepresentation
+						gqlCommandId: ImtchatConversationCollectionDocumentServiceSdlCommandIds.s_updateConversationFromRepresentation
 						requestType: 1
 						sdlObjectComp: Component {
 							DocumentOperationStatus {

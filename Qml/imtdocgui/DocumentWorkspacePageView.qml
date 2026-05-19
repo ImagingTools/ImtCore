@@ -7,7 +7,7 @@ import imtgui 1.0
 PageContainer {
 	id: root;
 	
-	property DocumentManager documentManager: DocumentManager {
+	property DocumentService documentManager: DocumentService {
 		activeView: root.documentManagerView;
 		typeId: root.pageId
 	};
@@ -24,8 +24,8 @@ PageContainer {
 	
 	onPageIdChanged: {
 		if (documentManager){
-			MainDocumentManager.unregisterDocumentManager(documentManager);
-			MainDocumentManager.registerDocumentManager(pageId, documentManager);
+			MainDocumentService.unregisterDocumentService(documentManager);
+			MainDocumentService.registerDocumentService(pageId, documentManager);
 		}
 	}
 	

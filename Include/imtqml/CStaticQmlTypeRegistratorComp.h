@@ -19,7 +19,7 @@ namespace imtqml
 			\c imtqml::CRemoteFileController as \b com.imtcore.imtqml.1.0.RemoteFileController
 			\c imtqml::FileIO as \b com.imtcore.imtqml.1.0.FileIO
 			\c imtqml::CQmlProcess as \b com.imtcore.imtqml.1.0.Process
-			\c imtqml::CDocumentManagerController as \b com.imtcore.imtqml.1.0.DocumentManagerController
+			\c imtqml::CDocumentServiceController as \b com.imtcore.imtqml.1.0.DocumentServiceController
 			\c imtqml::CDataModelController as \b com.imtcore.imtqml.1.0.DataModelController
 		\a singleton types
 			\c imtqml::CNetworkEventInterceptor as \b com.imtcore.imtqml.1.0.NetworkEventInterceptor
@@ -30,7 +30,7 @@ namespace imtqml
 	\sa imtqml::FileIO
 	\sa imtqml::CQmlProcess
 	\sa imtqml::CNetworkEventInterceptor
-	\sa imtqml::CDocumentManagerController
+	\sa imtqml::CDocumentServiceController
 	\sa imtqml::CDataModelController
 
 	\note It is not appropriate to create multiple instances. Modules will be initialized only after first instance of this component has been created.
@@ -50,7 +50,7 @@ public:
 		I_ASSIGN(m_registerFileIOAttrPtr, "RegisterFileIO", "If enabled, a FileIO will be registered for as QML type", true, true)
 		I_ASSIGN(m_registerCQmlProcessAttrPtr, "RegisterCQmlProcess", "If enabled, a CQmlProcess will be registered for as QML type", true, true)
 		I_ASSIGN(m_registerCNetworkEventInterceptorAttrPtr, "RegisterCNetworkEventInterceptor", "If enabled, a CNetworkEventInterceptor will be registered for as QML type", true, true)
-		I_ASSIGN(m_registerCDocumentManagerControllerAttrPtr, "RegisterCDocumentManagerController", "If enabled, a CDocumentManagerController will be registered as QML type", true, true)
+		I_ASSIGN(m_registerCDocumentServiceControllerAttrPtr, "RegisterCDocumentServiceController", "If enabled, a CDocumentServiceController will be registered as QML type", true, true)
 		I_ASSIGN(m_registerCDataModelControllerAttrPtr, "RegisterCDataModelController", "If enabled, a CDataModelController will be registered as QML type", true, true)
 	I_END_COMPONENT
 
@@ -65,7 +65,7 @@ private:
 	I_ATTR(bool, m_registerFileIOAttrPtr);
 	I_ATTR(bool, m_registerCQmlProcessAttrPtr);
 	I_ATTR(bool, m_registerCNetworkEventInterceptorAttrPtr);
-	I_ATTR(bool, m_registerCDocumentManagerControllerAttrPtr);
+	I_ATTR(bool, m_registerCDocumentServiceControllerAttrPtr);
 	I_ATTR(bool, m_registerCDataModelControllerAttrPtr);
 
 	static bool s_isInitialized;

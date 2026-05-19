@@ -43,6 +43,9 @@ type ProfileData {
 	roles: [RoleInfo]
 	groups: [GroupInfo]
 	permissions: [PermissionInfo]
+}
+
+type GetUserOrganizationsPayload {
 	organizations: [ProfileTenantInfo]
 }
 
@@ -63,6 +66,7 @@ type SetProfileInput {
 
 type Query {
 	GetProfile (input: GetProfileInput): ProfileData!
+	GetUserOrganizations (input: GetProfileInput): GetUserOrganizationsPayload!
 }
 
 type Mutation {

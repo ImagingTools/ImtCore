@@ -42,9 +42,11 @@ type TenantMemberRoleEntry {
 	role: String!
 }
 
-type TenantRoleOption {
-	id: String!
+type TenantPermissionOption {
+	id: ID!
 	name: String!
+	description: String
+	children: [TenantPermissionOption]
 }
 
 type TenantInvitationEntry {
@@ -71,7 +73,8 @@ type TenantData {
 	members: [TenantMemberEntry]
 	memberRoles: [TenantMemberRoleEntry]
 	pendingInvitations: [TenantInvitationEntry]
-	availableRoles: [TenantRoleOption]
+	tenantPermissions: [ID]
+	allProductPermissions: [TenantPermissionOption]
 }
 
 input GetTenantListInput {
@@ -127,6 +130,7 @@ input UpdateTenantInput {
 	ownerId: ID
 	members: [TenantMemberEntryInput]
 	memberRoles: [MemberRoleEntryInput]
+	tenantPermissions: [ID]
 }
 
 type UpdateTenantPayload {

@@ -38,10 +38,14 @@ protected:
 				const sdl::imtauth::Profile::CSetProfileGqlRequest& setProfileRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+	virtual sdl::imtauth::Profile::CGetUserOrganizationsPayload OnGetUserOrganizations(
+				const sdl::imtauth::Profile::CGetUserOrganizationsGqlRequest& getUserOrganizationsRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 private:
 	imtsdl::TElementList<sdl::imtauth::Profile::CProfileTenantInfo::V1_0> CreateOrganizationList(
 				const QByteArray& userId) const;
-	QString TenantMembershipRoleToString(imtauth::ITenantMembership::TenantMemberRole role) const;
+	QString TenantMembershipRoleToString(const QByteArray& roleId) const;
 protected:
 	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
 	I_REF(imtbase::IObjectCollection, m_roleCollectionCompPtr);
