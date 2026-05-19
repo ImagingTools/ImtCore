@@ -10,6 +10,7 @@ import imtauthgui 1.0
 import imtauthUsersSdl 1.0
 import imtauthAuthorizationSdl 1.0
 import imtauthSessionsSdl 1.0
+import Qt.labs.settings 1.0
 
 QtObject {
 	id: root;
@@ -35,6 +36,10 @@ QtObject {
 	property string storedRefreshToken: ""
 	property string currentTenantId: ""
 	property string currentTenantName: ""
+
+	property Settings storage: Settings {
+		category: "AuthorizationController"
+	}
 	
 	// Load settings from LocalStorage on component creation
 	Component.onCompleted: {
@@ -53,16 +58,16 @@ QtObject {
 	}
 	
 	function loadLoginSettings() {
-		let rememberMeStr = LocalStorage.getItem("Login_rememberMe");
+		let rememberMeStr = storage.value("Login_rememberMe", "");
 		root.rememberMe = (rememberMeStr === "true");
-		root.lastUser = LocalStorage.getItem("Login_lastUser") || "";
-		root.storedRefreshToken = LocalStorage.getItem("Login_storedRefreshToken") || "";
+		root.lastUser = storage.value("Login_lastUser", "");
+		root.storedRefreshToken = storage.value("Login_storedRefreshToken", "");
 	}
 	
 	function saveLoginSettings() {
-		LocalStorage.setItem("Login_rememberMe", root.rememberMe ? "true" : "false");
-		LocalStorage.setItem("Login_lastUser", root.lastUser);
-		LocalStorage.setItem("Login_storedRefreshToken", root.storedRefreshToken);
+		storage.setValue("Login_rememberMe", root.rememberMe ? "true" : "false");
+		storage.setValue("Login_lastUser", root.lastUser);
+		storage.setValue("Login_storedRefreshToken", root.storedRefreshToken);
 	}
 	
 	function clearLoginSettings() {
@@ -70,9 +75,9 @@ QtObject {
 		root.lastUser = "";
 		root.storedRefreshToken = "";
 		
-		LocalStorage.removeItem("Login_rememberMe");
-		LocalStorage.removeItem("Login_lastUser");
-		LocalStorage.removeItem("Login_storedRefreshToken");
+		storage.remove("Login_rememberMe");
+		storage.remove("Login_lastUser");
+		storage.remove("Login_storedRefreshToken");
 	}
 	
 	property XmlHttpRequestProxy requestProxy: XmlHttpRequestProxy {
@@ -108,9 +113,9 @@ QtObject {
 		onResult: {
 			if (status === "EXISTS"){
 				if (Qt.platform.os === "web"){
-					// For web, also check LocalStorage for existing session tokens
-					let token = LocalStorage.getItem("accessToken");
-					let refreshToken = LocalStorage.getItem("refreshToken");
+					// Check storage for existing session tokens
+					let token = root.storage.value("accessToken", "");
+					let refreshToken = root.storage.value("refreshToken", "");
 					if (token && token !== ""){
 						AuthorizationController.readDataFromStorage();
 						AuthorizationController.setAccessToken(token);
@@ -154,39 +159,39 @@ QtObject {
 	}
 	
 	function readDataFromStorage(){
-		userTokenProvider.accessToken = LocalStorage.getItem("accessToken");
-		userTokenProvider.refreshToken = LocalStorage.getItem("refreshToken");
-		userTokenProvider.userId = LocalStorage.getItem("userId");
-		userTokenProvider.login = LocalStorage.getItem("login");
-		userTokenProvider.systemId = LocalStorage.getItem("systemId");
-		userTokenProvider.productId = LocalStorage.getItem("productId");
-		userTokenProvider.permissions = LocalStorage.getItem("permissions");
-		root.currentTenantId = LocalStorage.getItem("tenantId") || "";
-		root.currentTenantName = LocalStorage.getItem("tenantName") || "";
+		userTokenProvider.accessToken = storage.value("accessToken", "");
+		userTokenProvider.refreshToken = storage.value("refreshToken", "");
+		userTokenProvider.userId = storage.value("userId", "");
+		userTokenProvider.login = storage.value("login", "");
+		userTokenProvider.systemId = storage.value("systemId", "");
+		userTokenProvider.productId = storage.value("productId", "");
+		userTokenProvider.permissions = storage.value("permissions", "");
+		root.currentTenantId = storage.value("tenantId", "");
+		root.currentTenantName = storage.value("tenantName", "");
 	}
 	
 	function saveDataToStorage(){
-		LocalStorage.setItem("accessToken", userTokenProvider.accessToken);
-		LocalStorage.setItem("refreshToken", userTokenProvider.refreshToken);
-		LocalStorage.setItem("userId", userTokenProvider.userId);
-		LocalStorage.setItem("login", userTokenProvider.login);
-		LocalStorage.setItem("systemId", userTokenProvider.systemId);
-		LocalStorage.setItem("productId", userTokenProvider.productId);
-		LocalStorage.setItem("permissions", userTokenProvider.permissions);
-		LocalStorage.setItem("tenantId", root.currentTenantId);
-		LocalStorage.setItem("tenantName", root.currentTenantName);
+		storage.setValue("accessToken", userTokenProvider.accessToken);
+		storage.setValue("refreshToken", userTokenProvider.refreshToken);
+		storage.setValue("userId", userTokenProvider.userId);
+		storage.setValue("login", userTokenProvider.login);
+		storage.setValue("systemId", userTokenProvider.systemId);
+		storage.setValue("productId", userTokenProvider.productId);
+		storage.setValue("permissions", userTokenProvider.permissions);
+		storage.setValue("tenantId", root.currentTenantId);
+		storage.setValue("tenantName", root.currentTenantName);
 	}
 	
 	function removeDataFromStorage(){
-		LocalStorage.removeItem("refreshToken");
-		LocalStorage.removeItem("accessToken");
-		LocalStorage.removeItem("userId");
-		LocalStorage.removeItem("login");
-		LocalStorage.removeItem("systemId");
-		LocalStorage.removeItem("productId");
-		LocalStorage.removeItem("permissions");
-		LocalStorage.removeItem("tenantId");
-		LocalStorage.removeItem("tenantName");
+		storage.remove("refreshToken");
+		storage.remove("accessToken");
+		storage.remove("userId");
+		storage.remove("login");
+		storage.remove("systemId");
+		storage.remove("productId");
+		storage.remove("permissions");
+		storage.remove("tenantId");
+		storage.remove("tenantName");
 	}
 
 	function saveRefreshTokenIfRememberMe(){
@@ -195,10 +200,8 @@ QtObject {
 			root.lastUser = userTokenProvider.login;
 			
 			if (Qt.platform.os === "web"){
-				// For web, also save to the legacy localStorage for session tokens
 				saveDataToStorage();
 			}
-			// PlatformSettings handles persistence automatically for both platforms
 		}
 		else {
 			clearRefreshToken();
@@ -211,10 +214,8 @@ QtObject {
 		root.rememberMe = false;
 		
 		if (Qt.platform.os === "web"){
-			// For web, clear from LocalStorage
-			LocalStorage.removeItem("refreshToken");
+			storage.remove("refreshToken");
 		}
-		// PlatformSettings handles persistence automatically for both platforms
 	}
 
 	function loginWithRefreshToken(userName, refreshToken){
