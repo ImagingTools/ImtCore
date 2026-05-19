@@ -39,6 +39,8 @@ Item {
     property bool editOnDoubleClick: true
     property bool allowDisabledEditing: false
 
+    property var flickable: null
+
     property string filterText: ""
     property string filterRole: "text"
 
@@ -394,13 +396,61 @@ Item {
                             }
 
                             Text {
+                                id: cellText
                                 anchors.verticalCenter: parent.verticalCenter
                                 width: Math.max(0, parent.width - x)
                                 text: cellRoot.displayText
+                                visible: !cellEditor.visible
                                 color: !delegateRoot.nodeIsEnabled ? root.disabledTextColor : delegateRoot.nodeSelected ? root.selectedTextColor : root.normalTextColor
                                 horizontalAlignment: cellRoot.column && cellRoot.column.horizontalAlignment !== undefined ? cellRoot.column.horizontalAlignment : Text.AlignLeft
                                 elide: Text.ElideRight
                                 verticalAlignment: Text.AlignVCenter
+                            }
+
+                            TextInput {
+                                id: cellEditor
+                                anchors.verticalCenter: parent.verticalCenter
+                                width: Math.max(0, parent.width - x)
+                                visible: root.editing && root.isEditingCell(delegateRoot.nodeKey, index)
+                                text: visible ? cellRoot.displayText : ""
+                                color: root.normalTextColor
+                                selectByMouse: true
+                                selectedTextColor: "#FFFFFF"
+                                selectionColor: Style.accentColor
+                                clip: true
+
+                                onVisibleChanged: {
+                                    if (visible) {
+                                        text = cellRoot.displayText
+                                        selectAll()
+                                        forceActiveFocus()
+                                    }
+                                }
+
+                                Keys.onEscapePressed: {
+                                    root.cancelEdit()
+                                    listView.forceActiveFocus()
+                                }
+
+                                Keys.onReturnPressed: {
+                                    root.commitEdit(cellEditor.text)
+                                    listView.forceActiveFocus()
+                                }
+
+                                Keys.onEnterPressed: {
+                                    root.commitEdit(cellEditor.text)
+                                    listView.forceActiveFocus()
+                                }
+
+                                Keys.onTabPressed: {
+                                    root.commitEdit(cellEditor.text)
+                                    root.editNextCell()
+                                }
+
+                                Keys.onBacktabPressed: {
+                                    root.commitEdit(cellEditor.text)
+                                    root.editPreviousCell()
+                                }
                             }
                         }
                     }
@@ -1230,6 +1280,68 @@ Item {
         beginEditCell(currentIndex.key, columnIndex)
     }
 
+    function editNextCell() {
+        if (!currentIndex || !currentIndex.key)
+            return
+        var colCount = columnCount()
+        var nextCol = __editingColumn >= 0 ? __editingColumn + 1 : 0
+        var currentKey = currentIndex.key
+
+        // Try next editable column in current row
+        for (var c = nextCol; c < colCount; ++c) {
+            if (isColumnEditable(columnAt(c))) {
+                beginEditCell(currentKey, c)
+                return
+            }
+        }
+
+        // Move to next visible row, first editable column
+        var row = visibleRowOf(currentKey)
+        if (row >= 0 && row < __visibleKeys.length - 1) {
+            var nextKey = __visibleKeys[row + 1]
+            var nextNode = __nodes[nextKey]
+            if (nextNode && (allowDisabledEditing || nextNode.enabled)) {
+                for (var c2 = 0; c2 < colCount; ++c2) {
+                    if (isColumnEditable(columnAt(c2))) {
+                        beginEditCell(nextKey, c2)
+                        return
+                    }
+                }
+            }
+        }
+    }
+
+    function editPreviousCell() {
+        if (!currentIndex || !currentIndex.key)
+            return
+        var colCount = columnCount()
+        var prevCol = __editingColumn >= 0 ? __editingColumn - 1 : colCount - 1
+        var currentKey = currentIndex.key
+
+        // Try previous editable column in current row
+        for (var c = prevCol; c >= 0; --c) {
+            if (isColumnEditable(columnAt(c))) {
+                beginEditCell(currentKey, c)
+                return
+            }
+        }
+
+        // Move to previous visible row, last editable column
+        var row = visibleRowOf(currentKey)
+        if (row > 0) {
+            var prevKey = __visibleKeys[row - 1]
+            var prevNode = __nodes[prevKey]
+            if (prevNode && (allowDisabledEditing || prevNode.enabled)) {
+                for (var c2 = colCount - 1; c2 >= 0; --c2) {
+                    if (isColumnEditable(columnAt(c2))) {
+                        beginEditCell(prevKey, c2)
+                        return
+                    }
+                }
+            }
+        }
+    }
+
     function setNodeText(keyValue, value) {
         var node = __nodes[keyValue]
         if (!node)
@@ -1306,8 +1418,24 @@ Item {
     function ensureVisible(keyValue) {
         expandParents(keyValue)
         var row = visibleRowOf(keyValue)
-        if (row >= 0)
-            listView.positionViewAtIndex(row, ListView.Contain)
+        if (row < 0)
+            return
+
+        listView.positionViewAtIndex(row, ListView.Contain)
+
+        // Scroll external flickable if present
+        if (root.flickable) {
+            var headerOffset = root.showHeader ? root.headerHeight : 0
+            var itemY = root.y + headerOffset + row * root.rowHeight
+            var itemBottom = itemY + root.rowHeight
+            var viewTop = root.flickable.contentY
+            var viewBottom = viewTop + root.flickable.height
+
+            if (itemBottom > viewBottom)
+                root.flickable.contentY = itemBottom - root.flickable.height
+            else if (itemY < viewTop)
+                root.flickable.contentY = itemY
+        }
     }
 
     function expandParents(keyValue) {

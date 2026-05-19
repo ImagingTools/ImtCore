@@ -17,8 +17,8 @@
         <Element ComponentName="DocumentCommandsController" X="1000" Y="300" Note=""/>
         <Element ComponentName="SlaveSubscriberController" X="750" Y="775" Note=""/>
         <Element ComponentName="TenantCollectionChangeNotifier" X="275" Y="775" Note=""/>
-        <Element ComponentName="TenantDocumentService" X="200" Y="150" Note=""/>
         <Element ComponentName="TenantDocumentNameProvider" X="475" Y="475" Note=""/>
+        <Element ComponentName="TenantDocumentService" X="200" Y="150" Note=""/>
         <Element ComponentName="TenantInfo" X="425" Y="600" Note=""/>
         <Element ComponentName="TenantInvitationInfo" X="500" Y="150" Note=""/>
         <Element ComponentName="TenantInvitationManager" X="175" Y="50" Note=""/>

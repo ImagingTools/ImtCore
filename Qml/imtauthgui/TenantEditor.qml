@@ -210,22 +210,6 @@ DocumentViewBase {
 		return expDate.getTime() < Date.now()
 	}
 
-	function __removeMemberById(userId) {
-		var arr = membersSelector.items.slice()
-		for (var i = 0; i < arr.length; i++) {
-			if (arr[i].id === userId) {
-				arr.splice(i, 1)
-				break
-			}
-		}
-		membersSelector.__resolvingNames = true
-		membersSelector.items = arr
-		membersSelector.__resolvingNames = false
-		container.pendingMembers = arr
-		container.__membersModifiedLocally = true
-		container.doUpdateModel()
-	}
-
 	// --- MultiPageView ---
 	MultiPageView {
 		id: multiPageView
@@ -251,6 +235,10 @@ DocumentViewBase {
 
 	onIsNewTenantChanged: {
 		multiPageView.updatePages()
+		if (!container.isNewTenant) {
+			container.__loadMembersFromModel()
+			container.__loadInvitationsFromModel()
+		}
 	}
 
 	onIsOwnerChanged: {
@@ -378,6 +366,22 @@ DocumentViewBase {
 
 		Item {
 			id: membersPage
+			
+			function __removeMemberById(userId) {
+				var arr = membersSelector.items.slice()
+				for (var i = 0; i < arr.length; i++) {
+					if (arr[i].id === userId) {
+						arr.splice(i, 1)
+						break
+					}
+				}
+				membersSelector.__resolvingNames = true
+				membersSelector.items = arr
+				membersSelector.__resolvingNames = false
+				container.pendingMembers = arr
+				container.__membersModifiedLocally = true
+				container.doUpdateModel()
+			}
 
 			CustomScrollbar {
 				id: membersScrollbar
@@ -556,7 +560,7 @@ DocumentViewBase {
 														}
 													}
 													onClicked: {
-														container.__removeMemberById(modelData.userId)
+														membersPage.__removeMemberById(modelData.userId)
 													}
 												}
 
@@ -567,7 +571,7 @@ DocumentViewBase {
 													text: qsTr("Leave")
 													tooltipText: qsTr("Leave this organization")
 													onClicked: {
-														container.__removeMemberById(modelData.userId)
+														membersPage.__removeMemberById(modelData.userId)
 													}
 												}
 
@@ -776,6 +780,32 @@ DocumentViewBase {
 
 	// --- GQL Request Senders ---
 	property CreateTenantInvitationInput createInvitationInput: CreateTenantInvitationInput {}
+
+	// --- Subscription for real-time membership notifications ---
+	TenantMembershipSubscriptionClient {
+		id: membershipSubscription
+
+		onInvitationAccepted: {
+			if (!container.tenantData || container.isNewTenant)
+				return
+			if (notification.tenantId === container.tenantData.m_id) {
+				// Member accepted -> refresh the editor to show updated members
+				if (container.representationController)
+					container.representationController.updateRepresentationFromDocument()
+			}
+		}
+
+		onInvitationRejected:{
+			if (!container.tenantData || container.isNewTenant)
+				return
+			if (notification.tenantId === container.tenantData.m_id) {
+				// Member rejected -> remove the pending invitation locally and refresh
+				container.__removePendingInvitation(notification.membershipId)
+				if (container.representationController)
+					container.representationController.updateRepresentationFromDocument()
+			}
+		}
+	}
 	property GqlSdlRequestSender createInvitationSender: GqlSdlRequestSender {
 		requestType: 1
 		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_createTenantInvitation
