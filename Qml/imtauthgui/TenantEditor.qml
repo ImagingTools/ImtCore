@@ -49,9 +49,6 @@ DocumentViewBase {
 		return "Member"
 	}
 
-	function __getMemberRole(userId) {
-		return container.__getUserRole(userId)
-	}
 
 	// Trigger UI updates when members/invitations data changes
 	onPendingMembersChanged: {
@@ -540,7 +537,7 @@ DocumentViewBase {
 								readonly property bool isMemberOwner: container.tenantData && modelData.id === container.tenantData.m_ownerId
 								readonly property bool isMemberCreator: container.tenantData && container.tenantData.m_creatorId && modelData.id === container.tenantData.m_creatorId
 								readonly property bool isCurrentUser: container.tenantData && container.tenantData.m_currentUserId && modelData.id === container.tenantData.m_currentUserId
-								readonly property string memberRole: activeMemberDelegate.isMemberCreator ? "Creator" : activeMemberDelegate.isMemberOwner ? "Owner" : container.__getMemberRole(modelData.id)
+								readonly property string memberRole: activeMemberDelegate.isMemberCreator ? "Creator" : activeMemberDelegate.isMemberOwner ? "Owner" : container.__getUserRole(modelData.id)
 
 								MouseArea {
 									id: activeMemberMouseArea
