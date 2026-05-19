@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 import QtQuick 2.12
+import QtQuick.Controls
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtcontrols 1.0
+import imtcolgui 1.0
 import imtdocgui 1.0
 import imtguigql 1.0
 import imtauthTenantsSdl 1.0
@@ -419,14 +421,30 @@ DocumentViewBase {
 							height: 1
 						}
 
-						Button {
+						Text {
 							id: inviteMemberBtn
 							visible: container.isOwner
 							anchors.verticalCenter: parent.verticalCenter
-							text: qsTr("Invite Member")
-							tooltipText: qsTr("Invite a new member to this workspace")
-							onClicked: {
-								ModalDialogManager.openDialog(inviteMemberDialogComp, {})
+							text: "+ " + qsTr("Create invitation")
+							font.pixelSize: Style.fontSizeM
+							font.bold: true
+							color: Style.linkColor
+
+							MouseArea {
+								anchors.fill: parent
+								hoverEnabled: true
+								cursorShape: Qt.PointingHandCursor
+								onClicked: {
+									var ids = []
+									for (var i = 0; i < container.pendingMembers.length; i++)
+										ids.push(container.pendingMembers[i].id)
+									var point = inviteMemberBtn.mapToItem(null, 0, inviteMemberBtn.height)
+									ModalDialogManager.openDialog(membersSelectPopupComp, {
+										"x": point.x,
+										"y": point.y,
+										"preselectedIds": ids
+									})
+								}
 							}
 						}
 
@@ -569,14 +587,6 @@ DocumentViewBase {
 												}
 											}
 										}
-
-										BaseText {
-											text: modelData.id || ""
-											font.pixelSize: Style.fontSizeS
-											color: Style.inactiveTextColor
-											elide: Text.ElideRight
-											width: parent.width
-										}
 									}
 
 									// Status / Role badge
@@ -653,7 +663,7 @@ DocumentViewBase {
 														menuItems.push({ text: qsTr("Leave Workspace"), action: "leave" })
 													}
 												}
-												membersPage.__showActionsMenu(menuItems, modelData.id, modelData.name || modelData.id)
+												membersPage.__showActionsMenu(menuItems, modelData.id, modelData.name || modelData.id, activeMemberDelegate.isMemberOwner, activeMemberDelegate.isCurrentUser)
 											}
 										}
 									}
@@ -823,33 +833,26 @@ DocumentViewBase {
 			}
 
 			// --- Actions Menu handling ---
-			function __showActionsMenu(menuItems, userId, userName) {
+			function __showActionsMenu(menuItems, userId, userName, isOwnerTarget, isCurrentUserTarget) {
 				if (menuItems.length === 0)
 					return
 
-				// Single action: execute directly with confirmation
 				if (menuItems.length === 1) {
 					membersPage.__executeAction(menuItems[0].action, userId, userName)
 					return
 				}
 
-				// Multiple actions: show context menu via ModalDialogManager
-				var actions = []
-				for (var i = 0; i < menuItems.length; i++) {
-					actions.push(menuItems[i])
-				}
 				membersPage.__pendingMenuUserId = userId
 				membersPage.__pendingMenuUserName = userName
-				membersPage.__pendingMenuActions = actions
-				ModalDialogManager.openDialog(actionsPopupMenuComp, {
-					"menuActions": actions,
-					"targetUserId": userId,
-					"targetUserName": userName
-				})
+				membersPage.__pendingMenuIsOwner = isOwnerTarget
+				membersPage.__pendingMenuIsCurrentUser = isCurrentUserTarget
+				memberActionsMenu.popup()
 			}
 
 			property string __pendingMenuUserId: ""
 			property string __pendingMenuUserName: ""
+			property bool __pendingMenuIsOwner: false
+			property bool __pendingMenuIsCurrentUser: false
 			property var __pendingMenuActions: []
 
 			function __showInviteActionsMenu(menuItems, invitationId, userName) {
@@ -859,11 +862,7 @@ DocumentViewBase {
 				}
 				membersPage.__pendingMenuUserId = invitationId
 				membersPage.__pendingMenuUserName = userName
-				ModalDialogManager.openDialog(inviteActionsPopupMenuComp, {
-					"menuActions": menuItems,
-					"targetInvitationId": invitationId,
-					"targetUserName": userName
-				})
+				inviteActionsMenu.popup()
 			}
 
 			function __executeAction(action, userId, userName) {
@@ -922,233 +921,79 @@ DocumentViewBase {
 				}
 			}
 
-			// --- Actions popup menu component for members ---
-			Component {
-				id: actionsPopupMenuComp
+			// --- Standard QML Menu for member actions ---
+			Menu {
+				id: memberActionsMenu
+				font.pixelSize: Style.fontSizeM
+				font.family: Style.fontFamily
 
-				Item {
-					id: actionsPopup
-					anchors.fill: parent
-
-					property var menuActions: []
-					property string targetUserId: ""
-					property string targetUserName: ""
-
-					signal finished(int buttonId)
-
-					MouseArea {
-						anchors.fill: parent
-						onClicked: actionsPopup.finished(Enums.cancel)
-					}
-
-					Rectangle {
-						anchors.centerIn: parent
-						width: Style.sizeHintXS
-						height: actionsMenuColumn.implicitHeight + Style.marginM * 2
-						radius: Style.radiusM
-						color: Style.baseColor
-						border.color: Style.borderColor
-						border.width: 1
-
-						Column {
-							id: actionsMenuColumn
-							anchors.fill: parent
-							anchors.margins: Style.marginS
-
-							Repeater {
-								model: actionsPopup.menuActions
-
-								delegate: Rectangle {
-									width: parent.width
-									height: Style.buttonHeightM
-									radius: Style.radiusS
-									color: actionItemMouse.containsMouse ? Style.buttonHoverColor : "transparent"
-
-									MouseArea {
-										id: actionItemMouse
-										anchors.fill: parent
-										hoverEnabled: true
-										onClicked: {
-											actionsPopup.finished(Enums.yes)
-											membersPage.__executeAction(modelData.action, actionsPopup.targetUserId, actionsPopup.targetUserName)
-										}
-									}
-
-									BaseText {
-										anchors.verticalCenter: parent.verticalCenter
-										anchors.left: parent.left
-										anchors.leftMargin: Style.marginM
-										text: modelData.text
-										font.pixelSize: Style.fontSizeM
-										color: modelData.action === "remove" ? Style.errorTextColor : Style.textColor
-									}
-								}
-							}
-						}
-					}
+				MenuItem {
+					text: qsTr("Remove Member")
+					visible: container.isOwner && !membersPage.__pendingMenuIsOwner
+					height: visible ? implicitHeight : 0
+					onTriggered: membersPage.__executeAction("remove", membersPage.__pendingMenuUserId, membersPage.__pendingMenuUserName)
+				}
+				MenuItem {
+					text: qsTr("Transfer Ownership")
+					visible: container.isOwner
+					height: visible ? implicitHeight : 0
+					onTriggered: membersPage.__executeAction("transfer", membersPage.__pendingMenuUserId, membersPage.__pendingMenuUserName)
+				}
+				MenuItem {
+					text: qsTr("Leave Workspace")
+					visible: !container.isOwner && membersPage.__pendingMenuIsCurrentUser
+					height: visible ? implicitHeight : 0
+					onTriggered: membersPage.__executeAction("leave", membersPage.__pendingMenuUserId, membersPage.__pendingMenuUserName)
 				}
 			}
 
-			// --- Actions popup menu component for invites ---
-			Component {
-				id: inviteActionsPopupMenuComp
+			// --- Standard QML Menu for invite actions ---
+			Menu {
+				id: inviteActionsMenu
+				font.pixelSize: Style.fontSizeM
+				font.family: Style.fontFamily
 
-				Item {
-					id: inviteActionsPopup
-					anchors.fill: parent
-
-					property var menuActions: []
-					property string targetInvitationId: ""
-					property string targetUserName: ""
-
-					signal finished(int buttonId)
-
-					MouseArea {
-						anchors.fill: parent
-						onClicked: inviteActionsPopup.finished(Enums.cancel)
-					}
-
-					Rectangle {
-						anchors.centerIn: parent
-						width: Style.sizeHintXS
-						height: inviteActionsMenuColumn.implicitHeight + Style.marginM * 2
-						radius: Style.radiusM
-						color: Style.baseColor
-						border.color: Style.borderColor
-						border.width: 1
-
-						Column {
-							id: inviteActionsMenuColumn
-							anchors.fill: parent
-							anchors.margins: Style.marginS
-
-							Repeater {
-								model: inviteActionsPopup.menuActions
-
-								delegate: Rectangle {
-									width: parent.width
-									height: Style.buttonHeightM
-									radius: Style.radiusS
-									color: inviteActionItemMouse.containsMouse ? Style.buttonHoverColor : "transparent"
-
-									MouseArea {
-										id: inviteActionItemMouse
-										anchors.fill: parent
-										hoverEnabled: true
-										onClicked: {
-											inviteActionsPopup.finished(Enums.yes)
-											membersPage.__executeInviteAction(modelData.action, inviteActionsPopup.targetInvitationId, inviteActionsPopup.targetUserName)
-										}
-									}
-
-									BaseText {
-										anchors.verticalCenter: parent.verticalCenter
-										anchors.left: parent.left
-										anchors.leftMargin: Style.marginM
-										text: modelData.text
-										font.pixelSize: Style.fontSizeM
-										color: modelData.action === "revoke" ? Style.errorTextColor : Style.textColor
-									}
-								}
-							}
-						}
-					}
+				MenuItem {
+					text: qsTr("Resend Invitation")
+					onTriggered: membersPage.__executeInviteAction("resend", membersPage.__pendingMenuUserId, membersPage.__pendingMenuUserName)
+				}
+				MenuItem {
+					text: qsTr("Revoke Invitation")
+					onTriggered: membersPage.__executeInviteAction("revoke", membersPage.__pendingMenuUserId, membersPage.__pendingMenuUserName)
 				}
 			}
 
-			// --- Invite Member Dialog ---
+			// --- FilterableSelectPopup for user invitation ---
 			Component {
-				id: inviteMemberDialogComp
+				id: membersSelectPopupComp
 
-				Item {
-					id: inviteMemberDialog
-					anchors.fill: parent
-
-					signal finished(int buttonId)
-
-					MouseArea {
-						anchors.fill: parent
-						onClicked: inviteMemberDialog.finished(Enums.cancel)
+				FilterableSelectPopup {
+					dataProvider: FilterableSelectGqlDataProvider {
+						collectionId: "Users"
+						multiSelect: true
 					}
 
-					function __submitInvitation() {
-						var email = inviteEmailInput.text.trim()
-						if (email !== "") {
-							container.__inviteSelectedUsers([{id: email}])
-							inviteMemberDialog.finished(Enums.yes)
+					itemWidth: 280
+					showCheckBox: true
+					showSelectedGroup: true
+					filterPlaceholder: qsTr("Type or choose a user")
+
+					onSelectionChanged: {
+						var arr = []
+						for (var i = 0; i < selectedIds.length; i++) {
+							var selId = selectedIds[i]
+							var selName = dataProvider ? dataProvider.getSelectedItemText(selId) : ""
+							if (!selName)
+								selName = selId
+							arr.push({id: selId, name: selName})
 						}
+						container.__inviteSelectedUsers(arr)
 					}
 
-					Rectangle {
-						anchors.centerIn: parent
-						width: Style.sizeHintL
-						height: inviteDialogColumn.implicitHeight + Style.marginXL * 2
-						radius: Style.radiusM
-						color: Style.baseColor
-						border.color: Style.borderColor
-						border.width: 1
-
-						Column {
-							id: inviteDialogColumn
-							anchors.left: parent.left
-							anchors.right: parent.right
-							anchors.top: parent.top
-							anchors.margins: Style.marginXL
-							spacing: Style.marginL
-
-							BaseText {
-								text: qsTr("Invite Member")
-								font.pixelSize: Style.fontSizeXL
-								font.bold: true
-								color: Style.textColor
-							}
-
-							BaseText {
-								text: qsTr("Enter the email or login of the user you want to invite:")
-								font.pixelSize: Style.fontSizeM
-								color: Style.inactiveTextColor
-								wrapMode: Text.WordWrap
-								width: parent.width
-							}
-
-							TextInput {
-								id: inviteEmailInput
-								width: parent.width
-								font.pixelSize: Style.fontSizeM
-								color: Style.textColor
-
-								Rectangle {
-									anchors.fill: parent
-									anchors.margins: -Style.marginS
-									z: -1
-									radius: Style.radiusS
-									color: "transparent"
-									border.color: Style.borderColor
-									border.width: 1
-								}
-
-								Keys.onReturnPressed: {
-									inviteMemberDialog.__submitInvitation()
-								}
-							}
-
-							Row {
-								spacing: Style.marginM
-								anchors.right: parent.right
-
-								Button {
-									text: qsTr("Cancel")
-									onClicked: inviteMemberDialog.finished(Enums.cancel)
-								}
-
-								Button {
-									text: qsTr("Send Invitation")
-									enabled: inviteEmailInput.text.trim() !== ""
-									onClicked: {
-										inviteMemberDialog.__submitInvitation()
-									}
-								}
-							}
+					Component.onDestruction: {
+						if (container.__membersModifiedLocally) {
+							container.doUpdateModel()
+							container.__membersModifiedLocally = false
 						}
 					}
 				}
