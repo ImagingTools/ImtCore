@@ -48,6 +48,11 @@ RemoteCollectionView {
 			// Invitation rejected -> refresh to update relation scope
 			container.doUpdateGui()
 		}
+
+		onOwnershipTransferred: {
+			// Ownership transferred -> refresh to update owner column
+			container.doUpdateGui()
+		}
 	}
 
 	onHeadersChanged: {

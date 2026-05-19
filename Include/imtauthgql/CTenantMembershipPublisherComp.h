@@ -5,6 +5,9 @@
 // ACF includes
 #include <imod/TSingleModelObserverBase.h>
 
+// Qt includes
+#include <QRecursiveMutex>
+
 // ImtCore includes
 #include <imtauth/ITenantMembershipManager.h>
 #include <imtauth/ITenantManager.h>
@@ -18,7 +21,8 @@ namespace imtauthgql
 
 /**
 	Server-side publisher that broadcasts notifications when tenant membership
-	state changes (invitation, acceptance, rejection).
+	state changes (invitation, acceptance, rejection) or when tenant ownership
+	is transferred.
 
 	The component observes imtauth::ITenantMembershipManager via
 	imod::TSingleModelObserverBase. When a membership changes, it compares
@@ -26,6 +30,10 @@ namespace imtauthgql
 	- New inactive memberships → InvitationReceived (notifies invited user)
 	- Previously inactive membership becoming active → InvitationAccepted (notifies owner)
 	- Previously inactive membership removed → InvitationRejected (notifies owner)
+
+	Additionally, the component observes imtauth::ITenantManager to detect
+	ownership transfers:
+	- Owner changed → OwnershipTransferred (notifies both old and new owner)
 
 	Notifications are delivered only to subscribers whose authenticated user
 	matches the target userId.
@@ -44,7 +52,8 @@ public:
 	I_BEGIN_COMPONENT(CTenantMembershipPublisherComp);
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager to observe for changes", true, "TenantMembershipManager");
 		I_ASSIGN_TO(m_membershipManagerModelCompPtr, m_membershipManagerCompPtr, true);
-		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager for resolving tenant owner", false, "TenantManager");
+		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager for resolving tenant owner and observing ownership changes", false, "TenantManager");
+		I_ASSIGN_TO(m_tenantManagerModelCompPtr, m_tenantManagerCompPtr, false);
 	I_END_COMPONENT;
 
 protected:
@@ -62,6 +71,7 @@ protected:
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
 	I_REF(imod::IModel, m_membershipManagerModelCompPtr);
 	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
+	I_REF(imod::IModel, m_tenantManagerModelCompPtr);
 
 private:
 	struct CachedMembership
@@ -70,6 +80,11 @@ private:
 		QByteArray tenantId;
 		QByteArray roleId;
 		bool isActive;
+	};
+
+	struct CachedTenantOwner
+	{
+		QByteArray ownerId;
 	};
 
 	void PublishNotification(
@@ -85,6 +100,10 @@ private:
 
 	// Cache of membershipId → state for change detection.
 	mutable QMap<QByteArray, CachedMembership> m_cachedMemberships;
+	// Cache of tenantId → ownerId for ownership change detection.
+	mutable QMap<QByteArray, CachedTenantOwner> m_cachedTenantOwners;
+	// Protects m_cachedMemberships and m_cachedTenantOwners from concurrent access.
+	mutable QRecursiveMutex m_cacheMutex;
 };
 
 

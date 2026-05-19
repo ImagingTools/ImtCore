@@ -37,7 +37,13 @@ sdl::imtbase::Settings::CSetSettingsPayload CSettingsControllerComp::OnSetSettin
 	}
 	
 	QByteArray userId = *arguments.input.Version_1_0->userId;
-	
+
+	if (userId.isEmpty()){
+		errorMessage = QString("Unable to set settings. User-ID is empty!");
+		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
+		return response;
+	}
+
 	if (!arguments.input.Version_1_0->settings.has_value()){
 		Q_ASSERT(false);
 		return response;
@@ -121,7 +127,13 @@ sdl::imtbase::ImtBaseTypes::CParamsSet CSettingsControllerComp::OnGetSettings(
 	if (arguments.input.Version_1_0->userId){
 		userId = *arguments.input.Version_1_0->userId;
 	}
-	
+
+	if (userId.isEmpty()){
+		errorMessage = QString("Unable to get settings. User-ID is empty!");
+		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
+		return response;
+	}
+
 	QByteArray languageId;
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	if (gqlContextPtr != nullptr){
@@ -245,6 +257,11 @@ sdl::imtbase::ImtBaseTypes::CUrlParam CSettingsControllerComp::OnGetWebSocketUrl
 
 imtauth::IUserSettingsSharedPtr CSettingsControllerComp::GetOrCreateUserSettings(const QByteArray& userId) const
 {
+	if (userId.isEmpty()){
+		SendErrorMessage(0, QString("Unable to get or create user settings. User-ID is empty!"), "CSettingsControllerComp");
+		return nullptr;
+	}
+
 	if (!m_userSettingsCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'UserSettingsCollection' was not set", "CSettingsControllerComp");
 		return nullptr;
@@ -257,10 +274,8 @@ imtauth::IUserSettingsSharedPtr CSettingsControllerComp::GetOrCreateUserSettings
 	
 	imtauth::IUserSettingsSharedPtr userSettingsPtr;
 	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (!userId.isEmpty()){
-		if (m_userSettingsCollectionCompPtr->GetObjectData(userId, dataPtr)){
-			userSettingsPtr.SetCastedPtr(dataPtr);
-		}
+	if (m_userSettingsCollectionCompPtr->GetObjectData(userId, dataPtr)){
+		userSettingsPtr.SetCastedPtr(dataPtr);
 	}
 	
 	if (!userSettingsPtr.IsValid()){
