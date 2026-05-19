@@ -26,6 +26,11 @@ Rectangle{
 	property real gridStepMinorY: 10
 	property int labelFontSize: Style.fontSizeM//Style.fontSizeXXS
 
+	property var xMinLabelValue
+	property var xMaxLabelValue
+	property var yMinLabelValue
+	property var yMaxLabelValue
+
 	property var linePoints: [];
 	property int pointCount: linePoints.length
 	property bool hasData: true;
@@ -571,6 +576,11 @@ Rectangle{
 		fontSize: graph.labelFontSize
 		lableXOriginMargin: graph.lableXOriginMargin
 		hasMinorGrid: graph.hasMinorGrid
+
+		xMinLabelValue: graph.xMinLabelValue
+		xMaxLabelValue: graph.xMaxLabelValue
+		yMinLabelValue: graph.yMinLabelValue
+		yMaxLabelValue: graph.yMaxLabelValue
 
 		function getLabelX(xArg){//override
 			return graph.getLabelX(xArg)
