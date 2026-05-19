@@ -271,7 +271,7 @@ ViewBase {
         anchors.left: parent.left;
         anchors.right: parent.right;
 
-        readOnly: productViewContainer.readOnly;
+        // readOnly: productViewContainer.readOnly;
 
         tristate: true;
 
@@ -282,52 +282,52 @@ ViewBase {
             tableView_.readOnly = !ok;
         }
 
-        rowDelegate: Component {
-            TreeViewItemDelegateBase {
-                id: delegate;
-                root: tableView_;
-                isCheckable: model.Optional ? model.Optional : false;
-                childModelKey: FeatureItemTypeMetaInfo.s_subFeatures;
+        // rowDelegate: Component {
+        //     TreeViewItemDelegateBase {
+        //         id: delegate;
+        //         root: tableView_;
+        //         isCheckable: model.Optional ? model.Optional : false;
+        //         childModelKey: FeatureItemTypeMetaInfo.s_subFeatures;
 
-                onRootDelegateChanged: {
-                    if (delegate.rootDelegate !== null){
-                        let featureId = model.FeatureId;
-                        let rootFeatureUuid = delegate.rootDelegate.itemData.id;
+        //         onRootDelegateChanged: {
+        //             if (delegate.rootDelegate !== null){
+        //                 let featureId = model.FeatureId;
+        //                 let rootFeatureUuid = delegate.rootDelegate.itemData.id;
 
-                        let id = rootFeatureUuid + "/" + featureId;
+        //                 let id = rootFeatureUuid + "/" + featureId;
 
-                        if (tableView_.selectedOptionalFeatures.includes(id)){
-                            delegate.checkState = Qt.Checked;
-                        }
-                    }
-                }
+        //                 if (tableView_.selectedOptionalFeatures.includes(id)){
+        //                     delegate.checkState = Qt.Checked;
+        //                 }
+        //             }
+        //         }
 
-                onCheckStateChanged: {
-                    let featureId = model.FeatureId;
-                    let rootFeatureUuid = delegate.rootDelegate.itemData.id;
+        //         onCheckStateChanged: {
+        //             let featureId = model.FeatureId;
+        //             let rootFeatureUuid = delegate.rootDelegate.itemData.id;
 
-                    let id = rootFeatureUuid + "/" + featureId;
+        //             let id = rootFeatureUuid + "/" + featureId;
 
-                    let features = productViewContainer.productData.m_features;
+        //             let features = productViewContainer.productData.m_features;
 
-                    let featureIds = []
-                    if (features !== ""){
-                        featureIds = features.split(';')
-                    }
+        //             let featureIds = []
+        //             if (features !== ""){
+        //                 featureIds = features.split(';')
+        //             }
 
-                    if (checkState == Qt.Checked){
-                        if (!featureIds.includes(id)){
-                            productViewContainer.addFeature(id);
-                        }
+        //             if (checkState == Qt.Checked){
+        //                 if (!featureIds.includes(id)){
+        //                     productViewContainer.addFeature(id);
+        //                 }
 
-                    }
-                    else if (checkState == Qt.Unchecked){
-                        if (featureIds.includes(id)){
-                            productViewContainer.removeFeature(id);
-                        }
-                    }
-                }
-            }
-        }
+        //             }
+        //             else if (checkState == Qt.Unchecked){
+        //                 if (featureIds.includes(id)){
+        //                     productViewContainer.removeFeature(id);
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
     }
 }

@@ -785,7 +785,7 @@ DocumentViewBase {
 	TenantMembershipSubscriptionClient {
 		id: membershipSubscription
 
-		onInvitationAccepted: function(notification) {
+		onInvitationAccepted: {
 			if (!container.tenantData || container.isNewTenant)
 				return
 			if (notification.tenantId === container.tenantData.m_id) {
@@ -795,7 +795,7 @@ DocumentViewBase {
 			}
 		}
 
-		onInvitationRejected: function(notification) {
+		onInvitationRejected:{
 			if (!container.tenantData || container.isNewTenant)
 				return
 			if (notification.tenantId === container.tenantData.m_id) {

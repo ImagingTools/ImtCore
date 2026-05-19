@@ -63,7 +63,7 @@ QtObject {
 			}
 		}
 
-		function onDocumentServiceChanged(typeOperation, objectId, documentId, hasChanges){
+		function onDocumentManagerChanged(typeOperation, objectId, documentId, hasChanges){
 			if (documentId !== root.documentId){
 				return
 			}
