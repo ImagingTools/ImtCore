@@ -561,14 +561,14 @@ DocumentViewBase {
 												width: youText.implicitWidth + Style.marginS
 												height: youText.implicitHeight + 2
 												radius: Style.radiusS
-												color: "#E8F0FE"
+												color: Style.selectedColor
 
 												BaseText {
 													id: youText
 													anchors.centerIn: parent
 													text: qsTr("You")
 													font.pixelSize: Style.fontSizeXS
-													color: "#1967D2"
+													color: Style.linkColor
 												}
 											}
 										}
@@ -592,8 +592,8 @@ DocumentViewBase {
 											width: roleBadgeText.implicitWidth + Style.marginM
 											height: roleBadgeText.implicitHeight + Style.marginXS
 											radius: Style.radiusS
-											color: activeMemberDelegate.isMemberOwner ? "#FEF3C7" : Style.baseColor
-											border.color: activeMemberDelegate.isMemberOwner ? "#F59E0B" : Style.borderColor
+											color: activeMemberDelegate.isMemberOwner ? Style.selectedColor : Style.baseColor
+											border.color: activeMemberDelegate.isMemberOwner ? Style.secondColor : Style.borderColor
 											border.width: 1
 
 											BaseText {
@@ -601,7 +601,7 @@ DocumentViewBase {
 												anchors.centerIn: parent
 												text: activeMemberDelegate.isMemberOwner ? qsTr("Owner") : qsTr("Member")
 												font.pixelSize: Style.fontSizeXS
-												color: activeMemberDelegate.isMemberOwner ? "#92400E" : Style.textColor
+												color: activeMemberDelegate.isMemberOwner ? Style.secondColor : Style.textColor
 											}
 										}
 
@@ -609,14 +609,14 @@ DocumentViewBase {
 											width: activeStatusText.implicitWidth + Style.marginS
 											height: activeStatusText.implicitHeight + 2
 											radius: Style.radiusS
-											color: "#DCFCE7"
+											color: Style.selectedColor
 
 											BaseText {
 												id: activeStatusText
 												anchors.centerIn: parent
 												text: qsTr("Active")
 												font.pixelSize: Style.fontSizeXS
-												color: "#166534"
+												color: Style.textColor
 											}
 										}
 									}
@@ -711,11 +711,8 @@ DocumentViewBase {
 								opacity: 0.85
 
 								readonly property bool isExpired: container.__isInvitationExpired(modelData.expiresAt)
-								readonly property string effectiveStatus: {
-									if (inviteDelegate.isExpired) return "Expired"
-									if (modelData.status === "revoked" || modelData.status === "Revoked") return "Revoked"
-									return "Pending"
-								}
+								readonly property bool isRevoked: modelData.status === "revoked" || modelData.status === "Revoked"
+								readonly property string effectiveStatus: inviteDelegate.isExpired ? "Expired" : inviteDelegate.isRevoked ? "Revoked" : "Pending"
 
 								MouseArea {
 									id: inviteMouseArea
@@ -771,7 +768,7 @@ DocumentViewBase {
 										BaseText {
 											text: container.__formatInvitationInfo(modelData.invitedByName || modelData.invitedByUserId || "", modelData.expiresAt || "")
 											font.pixelSize: Style.fontSizeS
-											color: inviteDelegate.isExpired ? "#DA3633" : Style.inactiveTextColor
+											color: inviteDelegate.isExpired ? Style.errorTextColor : Style.inactiveTextColor
 											elide: Text.ElideRight
 											width: parent.width
 										}
@@ -789,26 +786,14 @@ DocumentViewBase {
 											width: inviteStatusText.implicitWidth + Style.marginM
 											height: inviteStatusText.implicitHeight + Style.marginXS
 											radius: Style.radiusS
-											color: {
-												if (inviteDelegate.effectiveStatus === "Expired") return "#FFDCE0"
-												if (inviteDelegate.effectiveStatus === "Revoked") return "#F3E8FF"
-												return "#FFF3CD"
-											}
+											color: Style.backgroundColor2
 
 											BaseText {
 												id: inviteStatusText
 												anchors.centerIn: parent
-												text: {
-													if (inviteDelegate.effectiveStatus === "Expired") return qsTr("Expired")
-													if (inviteDelegate.effectiveStatus === "Revoked") return qsTr("Revoked")
-													return qsTr("Pending")
-												}
+												text: inviteDelegate.effectiveStatus === "Expired" ? qsTr("Expired") : inviteDelegate.effectiveStatus === "Revoked" ? qsTr("Revoked") : qsTr("Pending")
 												font.pixelSize: Style.fontSizeXS
-												color: {
-													if (inviteDelegate.effectiveStatus === "Expired") return "#DA3633"
-													if (inviteDelegate.effectiveStatus === "Revoked") return "#7C3AED"
-													return "#856404"
-												}
+												color: inviteDelegate.effectiveStatus === "Expired" ? Style.errorTextColor : Style.textColor
 											}
 										}
 									}
@@ -1005,7 +990,7 @@ DocumentViewBase {
 										anchors.leftMargin: Style.marginM
 										text: modelData.text
 										font.pixelSize: Style.fontSizeM
-										color: modelData.action === "remove" ? "#DA3633" : Style.textColor
+										color: modelData.action === "remove" ? Style.errorTextColor : Style.textColor
 									}
 								}
 							}
@@ -1072,7 +1057,7 @@ DocumentViewBase {
 										anchors.leftMargin: Style.marginM
 										text: modelData.text
 										font.pixelSize: Style.fontSizeM
-										color: modelData.action === "revoke" ? "#DA3633" : Style.textColor
+										color: modelData.action === "revoke" ? Style.errorTextColor : Style.textColor
 									}
 								}
 							}
