@@ -16,6 +16,7 @@ namespace imtauth
 // public methods
 
 CTenantMembership::CTenantMembership():
+	m_environmentRole(TER_MEMBER),
 	m_isActive(true)
 {
 }
@@ -71,18 +72,35 @@ void CTenantMembership::SetTenantId(const QByteArray& tenantId)
 }
 
 
+TenantEnvironmentRole CTenantMembership::GetEnvironmentRole() const
+{
+	return m_environmentRole;
+}
+
+
+void CTenantMembership::SetEnvironmentRole(TenantEnvironmentRole role)
+{
+	if (m_environmentRole != role){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_environmentRole = role;
+	}
+}
+
+
 QByteArray CTenantMembership::GetRoleId() const
 {
-	return m_roleId;
+	return TenantEnvironmentRoleToString(m_environmentRole).toUtf8();
 }
 
 
 void CTenantMembership::SetRoleId(const QByteArray& roleId)
 {
-	if (m_roleId != roleId){
+	TenantEnvironmentRole newRole = TenantEnvironmentRoleFromString(QString::fromUtf8(roleId));
+	if (m_environmentRole != newRole){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_roleId = roleId;
+		m_environmentRole = newRole;
 	}
 }
 
@@ -160,7 +178,11 @@ bool CTenantMembership::Serialize(iser::IArchive& archive)
 
 	iser::CArchiveTag roleTag("Role", "Role", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(roleTag);
-	retVal = retVal && archive.Process(m_roleId);
+	QByteArray roleStr = TenantEnvironmentRoleToString(m_environmentRole).toUtf8();
+	retVal = retVal && archive.Process(roleStr);
+	if (!archive.IsStoring()){
+		m_environmentRole = TenantEnvironmentRoleFromString(QString::fromUtf8(roleStr));
+	}
 	retVal = retVal && archive.EndTag(roleTag);
 
 	iser::CArchiveTag joinedAtTag("JoinedAt", "Joined at", iser::CArchiveTag::TT_LEAF);
@@ -193,7 +215,7 @@ bool CTenantMembership::CopyFrom(const IChangeable& object, CompatibilityMode /*
 		m_membershipId = sourcePtr->m_membershipId;
 		m_userId = sourcePtr->m_userId;
 		m_tenantId = sourcePtr->m_tenantId;
-		m_roleId = sourcePtr->m_roleId;
+		m_environmentRole = sourcePtr->m_environmentRole;
 		m_joinedAt = sourcePtr->m_joinedAt;
 		m_updatedAt = sourcePtr->m_updatedAt;
 		m_isActive = sourcePtr->m_isActive;
@@ -223,7 +245,7 @@ bool CTenantMembership::ResetData(CompatibilityMode /*mode*/)
 	m_membershipId.clear();
 	m_userId.clear();
 	m_tenantId.clear();
-	m_roleId.clear();
+	m_environmentRole = TER_MEMBER;
 	m_joinedAt.clear();
 	m_updatedAt.clear();
 	m_isActive = true;

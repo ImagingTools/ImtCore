@@ -128,12 +128,11 @@ sdl::imtauth::Tenants::CTenantData CTenantCollectionDocumentServiceComp::OnGetTe
 				sdl::imtauth::Tenants::CTenantMemberRoleEntry::V1_0 roleEntry;
 				roleEntry.userId = userId;
 				if (!creatorId.isEmpty() && userId == creatorId){
-					roleEntry.role = QStringLiteral("Creator");
+					roleEntry.role = TenantEnvironmentRoleToString(imtauth::TER_CREATOR);
 				} else if (!ownerId.isEmpty() && userId == ownerId){
-					roleEntry.role = QStringLiteral("Owner");
+					roleEntry.role = TenantEnvironmentRoleToString(imtauth::TER_OWNER);
 				} else {
-					QString storedRole = QString::fromUtf8(membershipPtr->GetRoleId());
-					roleEntry.role = storedRole.isEmpty() ? QStringLiteral("Member") : storedRole;
+					roleEntry.role = TenantEnvironmentRoleToString(membershipPtr->GetEnvironmentRole());
 				}
 				response.Version_1_0->memberRoles->push_back(roleEntry);
 			}
@@ -239,8 +238,7 @@ sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CTenantCollect
 		imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->FindMembership(contextUserId, tenantId);
 		if (membershipPtr.IsValid() && membershipPtr->IsActive()){
 			isMember = true;
-			QByteArray roleId = membershipPtr->GetRoleId();
-			isAdmin = isOwner || isCreator || (roleId == QByteArrayLiteral("Admin"));
+			isAdmin = isOwner || isCreator || (membershipPtr->GetEnvironmentRole() == imtauth::TER_ADMIN);
 		}
 	}
 	bool isNewTenant = tenantId.isEmpty();
