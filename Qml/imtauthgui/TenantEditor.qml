@@ -417,7 +417,6 @@ DocumentViewBase {
 						}
 
 						Item {
-							Layout.fillWidth: true
 							width: parent.width
 								- parent.children[0].width
 								- (inviteMemberBtn.visible ? inviteMemberBtn.width : 0)
@@ -1103,6 +1102,14 @@ DocumentViewBase {
 						onClicked: inviteMemberDialog.finished(Enums.cancel)
 					}
 
+					function __submitInvitation() {
+						var email = inviteEmailInput.text.trim()
+						if (email !== "") {
+							container.__inviteSelectedUsers([{id: email}])
+							inviteMemberDialog.finished(Enums.yes)
+						}
+					}
+
 					Rectangle {
 						anchors.centerIn: parent
 						width: Style.sizeHintL
@@ -1152,10 +1159,7 @@ DocumentViewBase {
 								}
 
 								Keys.onReturnPressed: {
-									if (inviteEmailInput.text.trim() !== "") {
-										container.__inviteSelectedUsers([{id: inviteEmailInput.text.trim()}])
-										inviteMemberDialog.finished(Enums.yes)
-									}
+									inviteMemberDialog.__submitInvitation()
 								}
 							}
 
@@ -1172,8 +1176,7 @@ DocumentViewBase {
 									text: qsTr("Send Invitation")
 									enabled: inviteEmailInput.text.trim() !== ""
 									onClicked: {
-										container.__inviteSelectedUsers([{id: inviteEmailInput.text.trim()}])
-										inviteMemberDialog.finished(Enums.yes)
+										inviteMemberDialog.__submitInvitation()
 									}
 								}
 							}
