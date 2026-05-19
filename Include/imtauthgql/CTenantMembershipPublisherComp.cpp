@@ -37,23 +37,22 @@ void CTenantMembershipPublisherComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	// Build the initial membership cache.
-	if (m_membershipManagerCompPtr.IsValid()){
-		// Get all memberships across all tenants by iterating known memberships.
-		// We use GetMembershipsByUser with empty userId won't work, so we rely on
-		// the collection being populated before this component is created.
-		// Since ITenantMembershipManager doesn't expose "GetAll", we skip initial cache
-		// and will detect changes from first notification onward.
-	}
-
 	if (m_membershipManagerModelCompPtr.IsValid()){
 		m_membershipManagerModelCompPtr->AttachObserver(this);
+	}
+
+	if (m_tenantManagerModelCompPtr.IsValid()){
+		m_tenantManagerModelCompPtr->AttachObserver(this);
 	}
 }
 
 
 void CTenantMembershipPublisherComp::OnComponentDestroyed()
 {
+	if (m_tenantManagerModelCompPtr.IsValid()){
+		m_tenantManagerModelCompPtr->DetachObserver(this);
+	}
+
 	if (m_membershipManagerModelCompPtr.IsValid()){
 		m_membershipManagerModelCompPtr->DetachObserver(this);
 	}
@@ -65,6 +64,13 @@ void CTenantMembershipPublisherComp::OnComponentDestroyed()
 // reimplemented (imod::CSingleModelObserverBase)
 
 void CTenantMembershipPublisherComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
+{
+	HandleMembershipChanges();
+	HandleOwnershipChanges();
+}
+
+
+void CTenantMembershipPublisherComp::HandleMembershipChanges()
 {
 	if (!m_membershipManagerCompPtr.IsValid()){
 		return;
@@ -177,6 +183,66 @@ void CTenantMembershipPublisherComp::OnUpdate(const istd::IChangeable::ChangeSet
 
 	// Update cache to current state.
 	m_cachedMemberships = currentState;
+}
+
+
+void CTenantMembershipPublisherComp::HandleOwnershipChanges()
+{
+	if (!m_tenantManagerCompPtr.IsValid()){
+		return;
+	}
+
+	// Check all tenants known from membership cache for ownership changes.
+	QSet<QByteArray> tenantIds;
+	for (auto it = m_cachedMemberships.constBegin(); it != m_cachedMemberships.constEnd(); ++it){
+		tenantIds.insert(it.value().tenantId);
+	}
+
+	for (const QByteArray& tenantId : std::as_const(tenantIds)){
+		imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
+		if (!tenantPtr.IsValid()){
+			continue;
+		}
+
+		QByteArray currentOwnerId = tenantPtr->GetOwnerId();
+
+		if (m_cachedTenantOwners.contains(tenantId)){
+			const CachedTenantOwner& cached = m_cachedTenantOwners.value(tenantId);
+			if (cached.ownerId != currentOwnerId){
+				// Ownership has changed — notify both old and new owner.
+				QString tenantName = tenantPtr->GetTenantName();
+
+				// Notify the old owner
+				if (!cached.ownerId.isEmpty()){
+					PublishNotification(
+						cached.ownerId,
+						sdl::imtauth::TenantMemberships::EMembershipNotificationType::OwnershipTransferred,
+						QByteArray(),
+						currentOwnerId,
+						tenantId,
+						tenantName,
+						QByteArray());
+				}
+
+				// Notify the new owner
+				if (!currentOwnerId.isEmpty()){
+					PublishNotification(
+						currentOwnerId,
+						sdl::imtauth::TenantMemberships::EMembershipNotificationType::OwnershipTransferred,
+						QByteArray(),
+						currentOwnerId,
+						tenantId,
+						tenantName,
+						QByteArray());
+				}
+			}
+		}
+
+		// Update cache
+		CachedTenantOwner ownerEntry;
+		ownerEntry.ownerId = currentOwnerId;
+		m_cachedTenantOwners.insert(tenantId, ownerEntry);
+	}
 }
 
 

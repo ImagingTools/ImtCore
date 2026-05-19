@@ -258,6 +258,7 @@ enum EMembershipNotificationType {
 	InvitationReceived
 	InvitationAccepted
 	InvitationRejected
+	OwnershipTransferred
 }
 
 type MembershipNotification {
