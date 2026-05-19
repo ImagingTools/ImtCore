@@ -402,15 +402,9 @@ DocumentViewBase {
 							}
 
 							BaseText {
-								text: {
-									var totalMembers = container.pendingMembers.length
-									var totalInvites = container.pendingInvitations.length
-									var parts = []
-									parts.push(qsTr("%1 member(s)").arg(totalMembers))
-									if (totalInvites > 0)
-										parts.push(qsTr("%1 pending invite(s)").arg(totalInvites))
-									return parts.join(" · ")
-								}
+								text: container.pendingInvitations.length > 0
+									? qsTr("%1 member(s) · %2 pending invite(s)").arg(container.pendingMembers.length).arg(container.pendingInvitations.length)
+									: qsTr("%1 member(s)").arg(container.pendingMembers.length)
 								font.pixelSize: Style.fontSizeS
 								color: Style.inactiveTextColor
 							}
