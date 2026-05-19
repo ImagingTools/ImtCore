@@ -24,11 +24,34 @@ DocumentViewBase {
 	// Guard: set when members are modified locally, prevents updateGui from overwriting
 	property bool __membersModifiedLocally: false
 
-	// Access: only Owner can edit, all others are readOnly (Leave button only)
+	// Environment Roles: Creator > Owner > Admin > Member
+	readonly property bool isCreator: container.tenantData && container.tenantData.m_creatorId && container.tenantData.m_currentUserId
+		? container.tenantData.m_currentUserId === container.tenantData.m_creatorId
+		: false
 	readonly property bool isOwner: container.tenantData && container.tenantData.m_ownerId && container.tenantData.m_currentUserId
 		? container.tenantData.m_currentUserId === container.tenantData.m_ownerId
 		: false
-	readonly property bool __isReadOnly: !container.isNewTenant && !container.isOwner
+	readonly property bool isAdmin: container.__getUserRole(container.tenantData ? container.tenantData.m_currentUserId : "") === "Admin"
+	readonly property bool canManageMembers: container.isCreator || container.isOwner || container.isAdmin
+	readonly property bool __isReadOnly: !container.isNewTenant && !container.canManageMembers
+
+	function __getUserRole(userId) {
+		if (!container.tenantData || !userId)
+			return "Member"
+		var roles = container.tenantData.m_memberRoles
+		if (!roles) return "Member"
+		var count = roles.count || roles.length || 0
+		for (var i = 0; i < count; i++) {
+			var entry = roles.get ? roles.get(i).item : roles[i]
+			if (entry && entry.m_userId === userId)
+				return entry.m_role || "Member"
+		}
+		return "Member"
+	}
+
+	function __getMemberRole(userId) {
+		return container.__getUserRole(userId)
+	}
 
 	// Trigger UI updates when members/invitations data changes
 	onPendingMembersChanged: {
@@ -188,7 +211,11 @@ DocumentViewBase {
 			multiPageView.addPage("General", qsTr("General"), generalPageComp, "Icons/Settings")
 			if (!container.isNewTenant) {
 				multiPageView.addPage("Members", qsTr("Members"), membersPageComp, "Icons/MultipleUser")
-				if (container.isOwner) {
+				if (container.canManageMembers) {
+					multiPageView.addPage("Roles", qsTr("Roles"), rolesPageComp, "Icons/Role")
+					multiPageView.addPage("Groups", qsTr("Groups"), groupsPageComp, "Icons/MultipleUser")
+				}
+				if (container.isCreator) {
 					multiPageView.addPage("Permissions", qsTr("Permissions"), permissionsPageComp, "Icons/Role")
 				}
 			}
@@ -209,6 +236,16 @@ DocumentViewBase {
 	}
 
 	onIsOwnerChanged: {
+		if (!container.isNewTenant)
+			multiPageView.updatePages()
+	}
+
+	onIsCreatorChanged: {
+		if (!container.isNewTenant)
+			multiPageView.updatePages()
+	}
+
+	onCanManageMembersChanged: {
 		if (!container.isNewTenant)
 			multiPageView.updatePages()
 	}
@@ -423,7 +460,7 @@ DocumentViewBase {
 
 						Text {
 							id: inviteMemberBtn
-							visible: container.isOwner
+							visible: container.canManageMembers
 							anchors.verticalCenter: parent.verticalCenter
 							text: "+ " + qsTr("Create invitation")
 							font.pixelSize: Style.fontSizeM
@@ -450,7 +487,7 @@ DocumentViewBase {
 
 						Button {
 							id: leaveWorkspaceBtn
-							visible: !container.isOwner && container.tenantData && container.tenantData.m_currentUserId
+							visible: !container.isOwner && !container.isCreator && container.tenantData && container.tenantData.m_currentUserId
 							anchors.verticalCenter: parent.verticalCenter
 							text: qsTr("Leave Workspace")
 							tooltipText: qsTr("Leave this workspace")
@@ -501,7 +538,9 @@ DocumentViewBase {
 								color: activeMemberMouseArea.containsMouse ? Style.buttonHoverColor : "transparent"
 
 								readonly property bool isMemberOwner: container.tenantData && modelData.id === container.tenantData.m_ownerId
+								readonly property bool isMemberCreator: container.tenantData && container.tenantData.m_creatorId && modelData.id === container.tenantData.m_creatorId
 								readonly property bool isCurrentUser: container.tenantData && container.tenantData.m_currentUserId && modelData.id === container.tenantData.m_currentUserId
+								readonly property string memberRole: activeMemberDelegate.isMemberCreator ? "Creator" : activeMemberDelegate.isMemberOwner ? "Owner" : container.__getMemberRole(modelData.id)
 
 								MouseArea {
 									id: activeMemberMouseArea
@@ -525,7 +564,7 @@ DocumentViewBase {
 										height: Style.iconSizeL
 										radius: width / 2
 										anchors.verticalCenter: parent.verticalCenter
-										color: activeMemberDelegate.isMemberOwner ? Style.selectedColor : Style.borderColor
+										color: (activeMemberDelegate.isMemberOwner || activeMemberDelegate.isMemberCreator) ? Style.selectedColor : Style.borderColor
 
 										BaseText {
 											anchors.centerIn: parent
@@ -537,7 +576,7 @@ DocumentViewBase {
 
 										// Crown icon for owner
 										Image {
-											visible: activeMemberDelegate.isMemberOwner
+											visible: activeMemberDelegate.isMemberOwner || activeMemberDelegate.isMemberCreator
 											anchors.top: parent.top
 											anchors.right: parent.right
 											anchors.topMargin: -Style.marginXS
@@ -563,7 +602,7 @@ DocumentViewBase {
 
 											BaseText {
 												text: modelData.name || modelData.id || ""
-												font.bold: activeMemberDelegate.isMemberOwner
+												font.bold: activeMemberDelegate.isMemberOwner || activeMemberDelegate.isMemberCreator
 												font.pixelSize: Style.fontSizeM
 												color: Style.textColor
 												elide: Text.ElideRight
@@ -590,31 +629,31 @@ DocumentViewBase {
 									}
 
 									// Status / Role badge
-									Column {
+									Row {
 										id: activeMemberStatusBadge
 										anchors.verticalCenter: parent.verticalCenter
-										spacing: 2
+										spacing: Style.marginXS
 
 										Rectangle {
-											width: roleBadgeText.implicitWidth + Style.marginM
-											height: roleBadgeText.implicitHeight + Style.marginXS
+											width: roleBadgeText.implicitWidth + Style.marginL
+											height: roleBadgeText.implicitHeight + Style.marginS
 											radius: Style.radiusS
-											color: activeMemberDelegate.isMemberOwner ? Style.selectedColor : Style.baseColor
-											border.color: activeMemberDelegate.isMemberOwner ? Style.secondColor : Style.borderColor
+											color: (activeMemberDelegate.isMemberOwner || activeMemberDelegate.isMemberCreator) ? Style.selectedColor : Style.baseColor
+											border.color: (activeMemberDelegate.isMemberOwner || activeMemberDelegate.isMemberCreator) ? Style.secondColor : Style.borderColor
 											border.width: 1
 
 											BaseText {
 												id: roleBadgeText
 												anchors.centerIn: parent
-												text: activeMemberDelegate.isMemberOwner ? qsTr("Owner") : qsTr("Member")
-												font.pixelSize: Style.fontSizeXS
-												color: activeMemberDelegate.isMemberOwner ? Style.secondColor : Style.textColor
+												text: activeMemberDelegate.memberRole
+												font.pixelSize: Style.fontSizeS
+												color: (activeMemberDelegate.isMemberOwner || activeMemberDelegate.isMemberCreator) ? Style.secondColor : Style.textColor
 											}
 										}
 
 										Rectangle {
-											width: activeStatusText.implicitWidth + Style.marginS
-											height: activeStatusText.implicitHeight + 2
+											width: activeStatusText.implicitWidth + Style.marginL
+											height: activeStatusText.implicitHeight + Style.marginS
 											radius: Style.radiusS
 											color: Style.selectedColor
 
@@ -622,7 +661,7 @@ DocumentViewBase {
 												id: activeStatusText
 												anchors.centerIn: parent
 												text: qsTr("Active")
-												font.pixelSize: Style.fontSizeXS
+												font.pixelSize: Style.fontSizeS
 												color: Style.textColor
 											}
 										}
@@ -637,7 +676,7 @@ DocumentViewBase {
 
 										ToolButton {
 											id: memberActionsBtn
-											visible: container.isOwner || activeMemberDelegate.isCurrentUser
+											visible: container.canManageMembers || activeMemberDelegate.isCurrentUser
 											anchors.centerIn: parent
 											tooltipText: qsTr("Actions")
 											iconSource: "qrc:/" + Style.getIconPath("Icons/More", Icon.State.On, Icon.Mode.Normal)
@@ -649,13 +688,11 @@ DocumentViewBase {
 											}
 											onClicked: {
 												var menuItems = []
-												if (container.isOwner) {
-													if (activeMemberDelegate.isMemberOwner) {
-														// Owner → Self: only Transfer Ownership
-														menuItems.push({ text: qsTr("Transfer Ownership"), action: "transfer" })
-													} else {
-														// Owner → Regular Member
+												if (container.canManageMembers) {
+													if (!activeMemberDelegate.isMemberOwner && !activeMemberDelegate.isMemberCreator) {
 														menuItems.push({ text: qsTr("Remove Member"), action: "remove" })
+													}
+													if (container.isOwner && !activeMemberDelegate.isMemberOwner) {
 														menuItems.push({ text: qsTr("Transfer Ownership"), action: "transfer" })
 													}
 												} else {
@@ -672,19 +709,26 @@ DocumentViewBase {
 						}
 					}
 
+					// ===== Separator between sections =====
+					Rectangle {
+						width: parent.width
+						height: 1
+						color: Style.borderColor
+						visible: container.canManageMembers || container.pendingInvitations.length > 0
+					}
+
 					// ===== Pending Invitations Section =====
 					Column {
 						id: pendingInvitationsSection
 						width: parent.width
 						spacing: Style.marginS
-						visible: container.isOwner || container.pendingInvitations.length > 0
+						visible: container.canManageMembers || container.pendingInvitations.length > 0
 
 						BaseText {
 							text: qsTr("Pending Invitations")
 							font.pixelSize: Style.fontSizeL
 							font.bold: true
 							color: Style.textColor
-							topPadding: Style.marginL
 						}
 
 						// Empty state
@@ -706,9 +750,6 @@ DocumentViewBase {
 								height: inviteRow.implicitHeight + Style.marginM * 2
 								radius: Style.radiusS
 								color: inviteMouseArea.containsMouse ? Style.buttonHoverColor : "transparent"
-								border.color: Style.borderColor
-								border.width: 1
-								opacity: 0.85
 
 								readonly property bool isExpired: container.__isInvitationExpired(modelData.expiresAt)
 								readonly property bool isRevoked: modelData.status === "revoked" || modelData.status === "Revoked"
@@ -760,7 +801,7 @@ DocumentViewBase {
 										BaseText {
 											text: modelData.userName || modelData.userId || ""
 											font.pixelSize: Style.fontSizeM
-											color: Style.inactiveTextColor
+											color: Style.textColor
 											elide: Text.ElideRight
 											width: parent.width
 										}
@@ -806,7 +847,7 @@ DocumentViewBase {
 										anchors.verticalCenter: parent.verticalCenter
 
 										ToolButton {
-											visible: container.isOwner && inviteDelegate.effectiveStatus === "Pending"
+											visible: container.canManageMembers && inviteDelegate.effectiveStatus === "Pending"
 											anchors.centerIn: parent
 											tooltipText: qsTr("Actions")
 											iconSource: "qrc:/" + Style.getIconPath("Icons/More", Icon.State.On, Icon.Mode.Normal)
@@ -928,7 +969,7 @@ DocumentViewBase {
 
 				MenuItem {
 					text: qsTr("Remove Member")
-					visible: container.isOwner && !membersPage.__pendingMenuIsOwner
+					visible: container.canManageMembers && !membersPage.__pendingMenuIsOwner
 					height: visible ? implicitHeight : 0
 					onTriggered: membersPage.__executeAction("remove", membersPage.__pendingMenuUserId, membersPage.__pendingMenuUserName)
 				}
@@ -940,7 +981,7 @@ DocumentViewBase {
 				}
 				MenuItem {
 					text: qsTr("Leave Workspace")
-					visible: !container.isOwner && membersPage.__pendingMenuIsCurrentUser
+					visible: !container.canManageMembers && membersPage.__pendingMenuIsCurrentUser
 					height: visible ? implicitHeight : 0
 					onTriggered: membersPage.__executeAction("leave", membersPage.__pendingMenuUserId, membersPage.__pendingMenuUserName)
 				}
@@ -994,6 +1035,246 @@ DocumentViewBase {
 							container.doUpdateModel()
 							container.__membersModifiedLocally = false
 						}
+					}
+				}
+			}
+		}
+	}
+
+	// ===== Page: Roles =====
+	Component {
+		id: rolesPageComp
+
+		Item {
+			id: rolesPage
+
+			CustomScrollbar {
+				id: rolesScrollbar
+				z: parent.z + 1
+				anchors.right: parent.right
+				anchors.top: rolesFlickable.top
+				anchors.bottom: rolesFlickable.bottom
+				secondSize: Style.marginM
+				targetItem: rolesFlickable
+			}
+
+			Flickable {
+				id: rolesFlickable
+				anchors.top: parent.top
+				anchors.topMargin: Style.marginXL
+				anchors.bottom: parent.bottom
+				anchors.left: parent.left
+				anchors.leftMargin: Style.marginXL
+				anchors.right: rolesScrollbar.left
+				anchors.rightMargin: Style.marginXL
+				contentWidth: rolesColumn.width
+				contentHeight: rolesColumn.height + 2 * Style.marginXL
+
+				boundsBehavior: Flickable.StopAtBounds
+				clip: true
+
+				Column {
+					id: rolesColumn
+					width: Style.sizeHintXXL
+					spacing: Style.marginXL
+
+					Row {
+						width: parent.width
+						spacing: Style.marginM
+
+						BaseText {
+							text: qsTr("Roles")
+							font.pixelSize: Style.fontSizeXL
+							font.bold: true
+							color: Style.textColor
+							anchors.verticalCenter: parent.verticalCenter
+						}
+
+						Item { width: parent.width - parent.children[0].width - addRoleBtn.width - parent.spacing * 2; height: 1 }
+
+						Text {
+							id: addRoleBtn
+							visible: container.canManageMembers
+							anchors.verticalCenter: parent.verticalCenter
+							text: "+ " + qsTr("Add Role")
+							font.pixelSize: Style.fontSizeM
+							font.bold: true
+							color: Style.linkColor
+
+							MouseArea {
+								anchors.fill: parent
+								hoverEnabled: true
+								cursorShape: Qt.PointingHandCursor
+								onClicked: {
+									// TODO: implement Add Role dialog
+								}
+							}
+						}
+					}
+
+					BaseText {
+						text: qsTr("Define custom roles for your workspace members. Roles control access to workspace features and resources.")
+						font.pixelSize: Style.fontSizeM
+						color: Style.inactiveTextColor
+						wrapMode: Text.WordWrap
+						width: parent.width
+					}
+
+					Rectangle {
+						width: parent.width
+						height: 1
+						color: Style.borderColor
+					}
+
+					// Built-in roles display
+					Column {
+						width: parent.width
+						spacing: Style.marginS
+
+						BaseText {
+							text: qsTr("Built-in Roles")
+							font.pixelSize: Style.fontSizeL
+							font.bold: true
+							color: Style.textColor
+						}
+
+						Repeater {
+							model: [
+								{ name: "Creator", description: qsTr("Full control including Permissions. Permanently assigned to tenant creator.") },
+								{ name: "Owner", description: qsTr("Superuser within the tenant. Can manage all aspects except Permissions.") },
+								{ name: "Admin", description: qsTr("Can invite/remove members and manage roles and groups.") },
+								{ name: "Member", description: qsTr("Default role after accepting invitation. Read-only access.") }
+							]
+
+							delegate: Rectangle {
+								width: parent.width
+								height: roleInfoCol.implicitHeight + Style.marginM * 2
+								radius: Style.radiusS
+								color: "transparent"
+
+								Column {
+									id: roleInfoCol
+									anchors.left: parent.left
+									anchors.right: parent.right
+									anchors.verticalCenter: parent.verticalCenter
+									anchors.margins: Style.marginM
+									spacing: Style.marginXS
+
+									BaseText {
+										text: modelData.name
+										font.pixelSize: Style.fontSizeM
+										font.bold: true
+										color: Style.textColor
+									}
+
+									BaseText {
+										text: modelData.description
+										font.pixelSize: Style.fontSizeS
+										color: Style.inactiveTextColor
+										wrapMode: Text.WordWrap
+										width: parent.width
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// ===== Page: Groups =====
+	Component {
+		id: groupsPageComp
+
+		Item {
+			id: groupsPage
+
+			CustomScrollbar {
+				id: groupsScrollbar
+				z: parent.z + 1
+				anchors.right: parent.right
+				anchors.top: groupsFlickable.top
+				anchors.bottom: groupsFlickable.bottom
+				secondSize: Style.marginM
+				targetItem: groupsFlickable
+			}
+
+			Flickable {
+				id: groupsFlickable
+				anchors.top: parent.top
+				anchors.topMargin: Style.marginXL
+				anchors.bottom: parent.bottom
+				anchors.left: parent.left
+				anchors.leftMargin: Style.marginXL
+				anchors.right: groupsScrollbar.left
+				anchors.rightMargin: Style.marginXL
+				contentWidth: groupsColumn.width
+				contentHeight: groupsColumn.height + 2 * Style.marginXL
+
+				boundsBehavior: Flickable.StopAtBounds
+				clip: true
+
+				Column {
+					id: groupsColumn
+					width: Style.sizeHintXXL
+					spacing: Style.marginXL
+
+					Row {
+						width: parent.width
+						spacing: Style.marginM
+
+						BaseText {
+							text: qsTr("Groups")
+							font.pixelSize: Style.fontSizeXL
+							font.bold: true
+							color: Style.textColor
+							anchors.verticalCenter: parent.verticalCenter
+						}
+
+						Item { width: parent.width - parent.children[0].width - addGroupBtn.width - parent.spacing * 2; height: 1 }
+
+						Text {
+							id: addGroupBtn
+							visible: container.canManageMembers
+							anchors.verticalCenter: parent.verticalCenter
+							text: "+ " + qsTr("Create Group")
+							font.pixelSize: Style.fontSizeM
+							font.bold: true
+							color: Style.linkColor
+
+							MouseArea {
+								anchors.fill: parent
+								hoverEnabled: true
+								cursorShape: Qt.PointingHandCursor
+								onClicked: {
+									// TODO: implement Create Group dialog
+								}
+							}
+						}
+					}
+
+					BaseText {
+						text: qsTr("Organize members into groups for easier permission management. Groups can be assigned roles and permissions collectively.")
+						font.pixelSize: Style.fontSizeM
+						color: Style.inactiveTextColor
+						wrapMode: Text.WordWrap
+						width: parent.width
+					}
+
+					Rectangle {
+						width: parent.width
+						height: 1
+						color: Style.borderColor
+					}
+
+					// Empty state
+					BaseText {
+						text: qsTr("No groups created yet")
+						font.pixelSize: Style.fontSizeM
+						color: Style.inactiveTextColor
+						topPadding: Style.marginM
+						bottomPadding: Style.marginM
 					}
 				}
 			}
