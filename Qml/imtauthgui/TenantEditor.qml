@@ -521,15 +521,15 @@ DocumentViewBase {
 										}
 
 										// Crown icon for owner
-										BaseText {
+										Image {
 											visible: activeMemberDelegate.isMemberOwner
 											anchors.top: parent.top
 											anchors.right: parent.right
 											anchors.topMargin: -Style.marginXS
 											anchors.rightMargin: -Style.marginXS
-											text: "♛"
-											font.pixelSize: Style.fontSizeS
-											color: "#E3A008"
+											width: Style.fontSizeS
+											height: Style.fontSizeS
+											source: "qrc:/" + Style.getIconPath("Icons/Crown", Icon.State.On, Icon.Mode.Normal)
 										}
 									}
 
