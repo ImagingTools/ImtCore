@@ -805,6 +805,16 @@ DocumentViewBase {
 					container.representationController.updateRepresentationFromDocument()
 			}
 		}
+
+		onOwnershipTransferred: {
+			if (!container.tenantData || container.isNewTenant)
+				return
+			if (notification.tenantId === container.tenantData.m_id) {
+				// Ownership transferred -> refresh the editor to reflect new owner
+				if (container.representationController)
+					container.representationController.updateRepresentationFromDocument()
+			}
+		}
 	}
 	property GqlSdlRequestSender createInvitationSender: GqlSdlRequestSender {
 		requestType: 1
