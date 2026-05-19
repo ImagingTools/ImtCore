@@ -58,8 +58,8 @@ bool CSlaveSubscriberControllerComp::RegisterSubscription(
 
 bool CSlaveSubscriberControllerComp::UnregisterSubscription(const QByteArray& subscriptionId)
 {
+	QReadLocker readLocker(&m_lock);
 	if (m_publisherMap.contains(subscriptionId)){
-		QReadLocker readLocker(&m_lock);
 		imtgql::IGqlSubscriberController* publisherPtr = m_publisherMap[subscriptionId];
 		readLocker.unlock();
 		Q_ASSERT(publisherPtr != nullptr);
