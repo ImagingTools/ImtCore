@@ -1,0 +1,267 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+#include <imtbase/CFilter.h>
+
+
+namespace imtbase
+{
+
+
+CFilter::Search::Search(const QString& text, const QByteArrayList& scopes)
+    : text(text)
+    , scopes(scopes)
+{
+}
+
+
+bool CFilter::Search::IsActive() const
+{
+    return !text.isEmpty() && !scopes.isEmpty();
+}
+
+
+bool CFilter::Search::operator==(const Search& other) const
+{
+    return text == other.text && scopes == other.scopes;
+}
+
+
+bool CFilter::Search::operator!=(const Search& other) const
+{
+    return !(*this == other);
+}
+
+
+CFilter::Rule::Rule(const QByteArray& path, const QString& predicate, const QVariant& argument)
+    : path(path)
+    , predicate(predicate)
+    , argument(argument)
+{
+}
+
+
+bool CFilter::Rule::IsValid() const
+{
+    return !path.isEmpty() && !predicate.isEmpty();
+}
+
+
+bool CFilter::Rule::operator==(const Rule& other) const
+{
+    return path == other.path &&
+        predicate == other.predicate &&
+        argument == other.argument;
+}
+
+
+bool CFilter::Rule::operator!=(const Rule& other) const
+{
+    return !(*this == other);
+}
+
+
+CFilter::RuleSet::RuleSet(Join join)
+    : join(join)
+{
+}
+
+
+bool CFilter::RuleSet::IsEmpty() const
+{
+    return rules.isEmpty() && children.isEmpty();
+}
+
+
+bool CFilter::RuleSet::operator==(const RuleSet& other) const
+{
+    return join == other.join &&
+        rules == other.rules &&
+        children == other.children;
+}
+
+
+bool CFilter::RuleSet::operator!=(const RuleSet& other) const
+{
+    return !(*this == other);
+}
+
+
+CFilter::Order::Order(const QByteArray& path, bool descending)
+    : path(path)
+    , descending(descending)
+{
+}
+
+
+bool CFilter::Order::IsValid() const
+{
+    return !path.isEmpty();
+}
+
+
+bool CFilter::Order::operator==(const Order& other) const
+{
+    return path == other.path && descending == other.descending;
+}
+
+
+bool CFilter::Order::operator!=(const Order& other) const
+{
+    return !(*this == other);
+}
+
+
+CFilter::Window::Window(int first, int count)
+    : first(first >= 0 ? first : -1)
+    , count(count > 0 ? count : -1)
+{
+}
+
+
+bool CFilter::Window::IsActive() const
+{
+    return first >= 0 && count > 0;
+}
+
+
+bool CFilter::Window::operator==(const Window& other) const
+{
+    return first == other.first && count == other.count;
+}
+
+
+bool CFilter::Window::operator!=(const Window& other) const
+{
+    return !(*this == other);
+}
+
+
+CFilter::RuleSet CFilter::AllOf(const QVector<Rule>& rules, const QVector<RuleSet>& children)
+{
+    RuleSet ruleSet(RuleSet::All);
+    ruleSet.rules = rules;
+    ruleSet.children = children;
+    return ruleSet;
+}
+
+
+CFilter::RuleSet CFilter::AnyOf(const QVector<Rule>& rules, const QVector<RuleSet>& children)
+{
+    RuleSet ruleSet(RuleSet::Any);
+    ruleSet.rules = rules;
+    ruleSet.children = children;
+    return ruleSet;
+}
+
+
+const CFilter::Search& CFilter::GetSearch() const
+{
+    return m_search;
+}
+
+
+void CFilter::SetSearch(const Search& search)
+{
+    m_search = search;
+}
+
+
+void CFilter::SetSearch(const QString& text, const QByteArrayList& scopes)
+{
+    m_search = Search(text, scopes);
+}
+
+
+const CFilter::RuleSet& CFilter::GetRules() const
+{
+    return m_rules;
+}
+
+
+void CFilter::SetRules(const RuleSet& rules)
+{
+    m_rules = rules;
+}
+
+
+void CFilter::AddRule(const Rule& rule)
+{
+    m_rules.rules << rule;
+}
+
+
+void CFilter::AddRuleSet(const RuleSet& rules)
+{
+    m_rules.children << rules;
+}
+
+
+QVector<CFilter::Order> CFilter::GetOrders() const
+{
+    return m_orders;
+}
+
+
+void CFilter::SetOrders(const QVector<Order>& orders)
+{
+    m_orders = orders;
+}
+
+
+void CFilter::AddOrder(const Order& order)
+{
+    m_orders << order;
+}
+
+
+CFilter::Window CFilter::GetWindow() const
+{
+    return m_window;
+}
+
+
+void CFilter::SetWindow(const Window& window)
+{
+    m_window = window;
+}
+
+
+void CFilter::SetWindow(int first, int count)
+{
+    m_window = Window(first, count);
+}
+
+
+void CFilter::ClearWindow()
+{
+    m_window = Window();
+}
+
+
+int CFilter::GetOffset() const
+{
+    return m_window.IsActive() ? m_window.first : -1;
+}
+
+
+int CFilter::GetLimit() const
+{
+    return m_window.IsActive() ? m_window.count : -1;
+}
+
+
+bool CFilter::HasWindow() const
+{
+    return m_window.IsActive();
+}
+
+
+void CFilter::Clear()
+{
+    m_search = Search();
+    m_rules = RuleSet();
+    m_orders.clear();
+    m_window = Window();
+}
+
+
+} // namespace imtbase
