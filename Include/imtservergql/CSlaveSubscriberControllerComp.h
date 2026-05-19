@@ -2,9 +2,6 @@
 #pragma once
 
 
-// Qt includes
-#include <QReadWriteLock>
-
 // ImtCore includes
 #include <imtservergql/CGqlPublisherCompBase.h>
 
@@ -39,7 +36,6 @@ protected:
 
 	typedef QMap<QByteArray, imtgql::IGqlSubscriberController*> PublisherMap;
 	PublisherMap m_publisherMap;
-	mutable QReadWriteLock m_lock;
 };
 
 

@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6380" Description="ACF"/>
-            <Version Id="1" Number="2324" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395267" Description="Qt Framework"/>
+            <Version Id="0" Number="6154" Description="ACF"/>
+            <Version Id="1" Number="2274" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395778" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>WebSocket server framework</Description>
@@ -118,9 +118,6 @@
                     <AttributeInfo Id="PersonalAccessTokenManager" Type="Reference" ExportId="PersonalAccessTokenManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="WebSocketServer"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -159,8 +156,8 @@
         <Interface InterfaceId="imtclientgql::IGqlSubscriptionManager" ComponentId="SubscriptionManager"/>
         <Interface InterfaceId="imtcom::IConnectionStatusProvider" ComponentId="WebSocketServer"/>
         <Interface InterfaceId="imtrest::IProtocolEngine" ComponentId="WebSocketProtocolEngine"/>
-        <Interface InterfaceId="imtrest::IRequestServlet" ComponentId="WebSocketServlet"/>
         <Interface InterfaceId="imtrest::IResponseDispatcher" ComponentId="WebSocketServer"/>
+        <Interface InterfaceId="imtrest::IRequestServlet" ComponentId="WebSocketServlet"/>
         <Interface InterfaceId="imtrest::IServer" ComponentId="WebSocketServer"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="WebSocketServer"/>
     </ExportedInterfaces>

@@ -121,6 +121,7 @@ ElementView {
                         id: checkableTree
                         width: flickable.width - (scrollbar.visible ? scrollbar.width : 0)
 
+                        flickable: flickable
                         showHeader: false
                         tristate: true
                         Component.onCompleted: {

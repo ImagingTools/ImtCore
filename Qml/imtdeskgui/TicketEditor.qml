@@ -283,6 +283,12 @@ DocumentViewBase {
 		
 		setBlockingUpdateModel(false)
 		ticketData.modelChanged()
+		
+		// Assign a temporary local ID to the newly-added comment so that
+		// subsequent doUpdateModel() calls (e.g. assignee change) do not
+		// re-send it as a new message. The server skips comments that
+		// already have an ID set.
+		newItem.m_id = "local-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8)
 		root.commentSubmitted(commentText)
 	}
 

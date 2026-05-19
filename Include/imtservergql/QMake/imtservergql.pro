@@ -3,5 +3,5 @@ TARGET = imtservergql
 include($(ACFCONFIGDIR)/QMake/StaticConfig.pri)
 include($$PWD/../../../Config/QMake/ImtCore.pri)
 
-QT += network websockets qml quick quickwidgets sql concurrent
+QT += network websockets qml quick quickwidgets sql
 

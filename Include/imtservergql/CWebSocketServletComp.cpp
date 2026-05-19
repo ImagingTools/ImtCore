@@ -5,9 +5,7 @@
 // Qt includes
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
-#include <QtCore/QMutexLocker>
 #include <QtCore/QPointer>
-#include <QtConcurrent/QtConcurrent>
 
 // ImtCore includes
 #include <imtrest/IRequest.h>
@@ -138,62 +136,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 {
 	const auto* webSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&request);
 	if (webSocketRequest == nullptr){
-		SendErrorMessage(0, QStringLiteral("Invalid WebSocket request"), QStringLiteral("CWebSocketServletComp"));
-		return imtrest::ConstResponsePtr();
-	}
-
-	const CWebSocketServletComp* servletGuard(this);
-	QPointer<imtrest::CWebSocketRequest> requestGuard(const_cast<imtrest::CWebSocketRequest*>(webSocketRequest));
-	constexpr int maxPendingSubscriptionFutures = 64;
-	QFuture<void> future = QtConcurrent::run([servletGuard, requestGuard]() {
-		auto* requestPtr = requestGuard.data();
-		if (servletGuard == nullptr || requestPtr == nullptr){
-			return;
-		}
-
-		servletGuard->RegisterSubscriptionImpl(*requestPtr);
-	});
-	{
-		QMutexLocker locker(&m_registerSubscriptionFuturesMutex);
-		m_registerSubscriptionFutures.append(future);
-		if (m_registerSubscriptionFutures.count() > maxPendingSubscriptionFutures){
-			QList<QFuture<void>> activeFutures;
-			activeFutures.reserve(m_registerSubscriptionFutures.count());
-			for (const QFuture<void>& registerFuture : m_registerSubscriptionFutures){
-				if (!registerFuture.isFinished()){
-					activeFutures.append(registerFuture);
-				}
-			}
-			m_registerSubscriptionFutures.swap(activeFutures);
-		}
-	}
-
-	return imtrest::ConstResponsePtr();
-}
-
-
-void CWebSocketServletComp::RegisterSubscriptionImpl(const imtrest::IRequest& request) const
-{
-	const auto sendResponse = [this, &request](imtrest::ConstResponsePtr responsePtr) {
-		if (!responsePtr.IsValid()){
-			return;
-		}
-
-		if (!m_requestManagerCompPtr.IsValid()){
-			SendErrorMessage(0, QStringLiteral("RegisterSubscription response was not sent: RequestManager is not available"), QStringLiteral("CWebSocketServletComp"));
-			return;
-		}
-
-		if (!m_requestManagerCompPtr->SendResponse(request.GetRequestId(), responsePtr)){
-			SendErrorMessage(0, QStringLiteral("Unable to send RegisterSubscription response via RequestManager"), QStringLiteral("CWebSocketServletComp"));
-			return;
-		}
-	};
-
-	const auto* webSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&request);
-	if (webSocketRequest == nullptr){
-		sendResponse(CreateErrorResponse(QByteArrayLiteral("Invalid WebSocket request"), request));
-		return;
+		return CreateErrorResponse(QByteArrayLiteral("Invalid WebSocket request"), request);
 	}
 
 	// Capture all data from the request immediately - the CWebSocketRequest is parented
@@ -204,8 +147,7 @@ void CWebSocketServletComp::RegisterSubscriptionImpl(const imtrest::IRequest& re
 	const QJsonDocument document = QJsonDocument::fromJson(body);
 	if (document.isNull() || !document.isObject()) {
 		QString errorMessage = QString("Error when parsing JSON request for command Id: '%1'").arg(request.GetCommandId());
-		sendResponse(CreateErrorResponse(errorMessage.toUtf8(), request));
-		return;
+		return CreateErrorResponse(errorMessage.toUtf8(), request);
 	}
 
 	const QJsonObject rootObject = document.object();
@@ -231,8 +173,7 @@ void CWebSocketServletComp::RegisterSubscriptionImpl(const imtrest::IRequest& re
 	if (!gqlRequest.ParseQuery(body, errorPosition)){
 		QString errorMessage = QString("Error when parsing request: '%1'; Error position: '%2'")
 								.arg(qPrintable(body)).arg(errorPosition);
-		sendResponse(CreateErrorResponse(errorMessage.toUtf8(), request));
-		return;
+		return CreateErrorResponse(errorMessage.toUtf8(), request);
 	}
 
 	// Track request lifetime with QPointer — the request is a QObject
@@ -273,8 +214,7 @@ void CWebSocketServletComp::RegisterSubscriptionImpl(const imtrest::IRequest& re
 				QByteArray tokenId;
 				QByteArrayList scopes;
 				if (!m_patManagerCompPtr->ValidateToken(accessToken, userId, tokenId, scopes)){
-					sendResponse(CreateErrorResponse(QByteArrayLiteral("Forbidden: invalid PAT token"), request));
-					return;
+					return CreateErrorResponse(QByteArrayLiteral("Forbidden: invalid PAT token"), request);
 				}
 				m_patManagerCompPtr->UpdateLastUsedAt(tokenId);
 			}
@@ -285,8 +225,7 @@ void CWebSocketServletComp::RegisterSubscriptionImpl(const imtrest::IRequest& re
 				using JwtState = imtauth::IJwtSessionController::JwtState;
 				JwtState state = m_jwtSessionControllerCompPtr->ValidateJwt(accessToken);
 				if (state == JwtState::JS_EXPIRED || state == JwtState::JS_INVALID){
-					sendResponse(CreateErrorResponse(QByteArrayLiteral("Forbidden: invalid or expired JWT token"), request));
-					return;
+					return CreateErrorResponse(QByteArrayLiteral("Forbidden: invalid or expired JWT token"), request);
 				}
 				userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(accessToken);
 			}
@@ -296,7 +235,7 @@ void CWebSocketServletComp::RegisterSubscriptionImpl(const imtrest::IRequest& re
 	// Verify request is still alive after auth validation (safety check)
 	if (requestGuard.isNull()){
 		SendErrorMessage(0, QStringLiteral("WebSocket request destroyed during auth validation"), QStringLiteral("CWebSocketServletComp"));
-		return;
+		return imtrest::ConstResponsePtr();
 	}
 
 	// Create simple GqlContext with authenticated user info.
@@ -313,7 +252,7 @@ void CWebSocketServletComp::RegisterSubscriptionImpl(const imtrest::IRequest& re
 		simpleContext->SetProductId(productId);
 
 		// Extract tenant ID from JWT token when available
-		if (m_jwtSessionControllerCompPtr.IsValid() && !accessToken.isEmpty() && !accessToken.startsWith("pat_")){
+		if (m_jwtSessionControllerCompPtr.IsValid() && !accessToken.isEmpty() && !accessToken.startsWith("imt_pat_")){
 			QByteArray tenantId = m_jwtSessionControllerCompPtr->GetTenantFromJwt(accessToken);
 			simpleContext->SetTenantId(tenantId);
 		}
@@ -324,8 +263,7 @@ void CWebSocketServletComp::RegisterSubscriptionImpl(const imtrest::IRequest& re
 	QByteArray commandId = gqlRequest.GetCommandId();
 
 	if (commandId.isEmpty()){
-		sendResponse(CreateErrorResponse(QByteArrayLiteral("Unable to register subscription with empty command-ID"), request));
-		return;
+		return CreateErrorResponse(QByteArrayLiteral("Unable to register subscription with empty command-ID"), request);
 	}
 
 	imtgql::IGqlSubscriberController* subscriberControllerPtr = nullptr;
@@ -344,22 +282,21 @@ void CWebSocketServletComp::RegisterSubscriptionImpl(const imtrest::IRequest& re
 		// Final lifetime check before passing request reference to publisher
 		if (requestGuard.isNull()){
 			SendErrorMessage(0, QStringLiteral("WebSocket request destroyed before subscription registration"), QStringLiteral("CWebSocketServletComp"));
-			return;
+			return imtrest::ConstResponsePtr();
 		}
 
 		QString errorMessage;
 		if (subscriberControllerPtr->RegisterSubscription(subscriptionId, gqlRequest, request, errorMessage)){
-			return;
+			return imtrest::ConstResponsePtr();
 		}
 	}
 	else{
-		QByteArray errorMessage = QString("The requested command could not be executed. No servlet was found for the given command: '%1'")
+		QByteArray errorMessage = QString("The requested command could not be executed. No servlet was found for the given command: '%1")
 		.arg(QString(commandId)).toUtf8();
-		sendResponse(CreateErrorResponse(errorMessage, request));
-		return;
+		return CreateErrorResponse(errorMessage, request);
 	}
 
-	return;
+	return imtrest::ConstResponsePtr();
 }
 
 
@@ -435,3 +372,5 @@ imtrest::ConstResponsePtr CWebSocketServletComp::CreateErrorResponse(const QByte
 
 
 } // namespace imtservergql
+
+

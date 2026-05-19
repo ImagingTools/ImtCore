@@ -30,6 +30,26 @@ RemoteCollectionView {
 		registerFieldFilterDelegate("tenantRelationFilter", tenantRelationDelegateFilterComp)
 	}
 
+	// --- Subscription for real-time invitation notifications ---
+	TenantMembershipSubscriptionClient {
+		id: collectionMembershipSubscription
+
+		onInvitationReceived: {
+			// New invitation received -> refresh the collection to show it
+			container.doUpdateGui()
+		}
+
+		onInvitationAccepted:{
+			// Invitation accepted -> refresh to update relation scope
+			container.doUpdateGui()
+		}
+
+		onInvitationRejected:{
+			// Invitation rejected -> refresh to update relation scope
+			container.doUpdateGui()
+		}
+	}
+
 	onHeadersChanged: {
 		table.setColumnContentById(TenantItemDataTypeMetaInfo.s_membersCount, membersCountCellDelegateComp)
 		table.setColumnContentById(TenantItemDataTypeMetaInfo.s_ownerId, ownerIdCellDelegateComp)

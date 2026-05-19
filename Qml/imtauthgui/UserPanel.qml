@@ -91,7 +91,7 @@ Item {
 		anchors.rightMargin: Style.marginM;
 		color: Style.inactiveTextColor;
 		font.family: Style.fontFamily;
-		font.pixelSize: Style.fontSizeS;
+		font.pixelSize: Style.fontSizeM;
 		text: AuthorizationController.currentTenantName ? AuthorizationController.currentTenantName : "";
 		visible: text !== "";
 	}

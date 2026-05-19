@@ -1,9 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
-// Qt includes
-#include <QtCore/QFuture>
-
 
 // ImtCore includes
 #include <imtrest/CHttpRootServletComp.h>
@@ -30,7 +27,6 @@ public:
 		I_REGISTER_INTERFACE(IRequestServlet);
 		I_ASSIGN_MULTI_0(m_gqlSubscriberControllersCompPtr, "GqlSubscriberControllers", "List of gql subscriber controller for corresponding command-IDs", false);
 		I_ASSIGN(m_workerManagerCompPtr, "WorkerManager", "GraphQl multithread worker manager", false, "WorkerManager");
-		I_ASSIGN(m_requestManagerCompPtr, "RequestManager", "Response dispatcher registered for the server", false, "RequestManager");
 		I_ASSIGN(m_jwtSessionControllerCompPtr, "JwtSessionController", "JWT session controller", false, "JwtSessionController");
 		I_ASSIGN(m_patManagerCompPtr, "PersonalAccessTokenManager", "Personal Access Token manager", false, "PersonalAccessTokenManager");
 	I_END_COMPONENT
@@ -48,7 +44,6 @@ protected:
 	virtual imtrest::ConstResponsePtr KeepAliveAcknowledge(const imtrest::IRequest& request) const;
 	virtual imtrest::ConstResponsePtr ProcessGqlRequest(const imtrest::IRequest& request) const;
 	virtual imtrest::ConstResponsePtr RegisterSubscription(const imtrest::IRequest& request) const;
-	virtual void RegisterSubscriptionImpl(const imtrest::IRequest& request) const;
 	virtual imtrest::ConstResponsePtr UnregisterSubscription(const imtrest::IRequest& request) const;
 	virtual imtrest::ConstResponsePtr CreateDataResponse(const QByteArray& data, const imtrest::IRequest& request) const;
 	virtual imtrest::ConstResponsePtr CreateErrorResponse(const QByteArray& errorMessage, const imtrest::IRequest& request) const;
@@ -56,7 +51,6 @@ protected:
 private:
 	I_MULTIREF(imtgql::IGqlSubscriberController, m_gqlSubscriberControllersCompPtr);
 	I_REF(imtrest::IRequestServlet, m_workerManagerCompPtr);
-	I_REF(imtrest::IResponseDispatcher, m_requestManagerCompPtr);
 	I_REF(imtauth::IJwtSessionController, m_jwtSessionControllerCompPtr);
 	I_REF(imtauth::IPersonalAccessTokenManager, m_patManagerCompPtr);
 
@@ -64,9 +58,9 @@ private:
 
 	SubscriberControllersMap m_subscriberControllersMap;
 	mutable QMutex m_subscriberControllersMapMutex;
-	mutable QList<QFuture<void>> m_registerSubscriptionFutures;
-	mutable QMutex m_registerSubscriptionFuturesMutex;
 };
 
 
 } // namespace imtservergql
+
+

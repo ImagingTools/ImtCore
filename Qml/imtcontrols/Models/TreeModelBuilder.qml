@@ -69,6 +69,65 @@ QtObject {
     }
 
     /*
+        Simplified field-based conversion for list models / JS arrays.
+
+        fields = {
+            key: "id",           // property name for node key
+            text: "name",        // property name for display text
+            children: "children" // property name for child items (array/ListModel)
+        }
+
+        Example:
+            TreeModelBuilder.fromListModelByFields(myArray, {
+                key: "id",
+                text: "name",
+                children: "subItems"
+            })
+
+        Additional optional fields:
+            checkable: "isCheckable"
+            checked: "isChecked"
+            enabled: "isEnabled"
+            expanded: "isExpanded"
+    */
+    function fromListModelByFields(listModel, fields) {
+        if (!listModel || !fields)
+            return []
+
+        var keyProp = fields.key || ""
+        var textProp = fields.text || ""
+        var childrenProp = fields.children || ""
+
+        var mapItem = function(item) {
+            var obj = item && item.item ? item.item : item
+            var result = {}
+            if (keyProp)
+                result.key = obj ? (obj[keyProp] || "") : ""
+            if (textProp)
+                result.text = obj ? (obj[textProp] || "") : ""
+            if (fields.checkable)
+                result.checkable = obj ? (obj[fields.checkable] || false) : false
+            if (fields.checked)
+                result.checked = obj ? (obj[fields.checked] || Qt.Unchecked) : Qt.Unchecked
+            if (fields.enabled)
+                result.enabled = obj ? (obj[fields.enabled] !== undefined ? obj[fields.enabled] : true) : true
+            if (fields.expanded)
+                result.expanded = obj ? (obj[fields.expanded] || false) : false
+            return result
+        }
+
+        var getChildren = childrenProp
+            ? function(item) {
+                var obj = item && item.item ? item.item : item
+                var ch = obj ? obj[childrenProp] : null
+                return (ch && (itemCount(ch) > 0)) ? ch : null
+            }
+            : null
+
+        return fromListModel(listModel, mapItem, getChildren)
+    }
+
+    /*
         Converts tree item models (GetItemsCount/GetData/GetTreeItemModel API).
 
         mapItem(wrapper, index) -> node-like object
@@ -87,6 +146,62 @@ QtObject {
         }
 
         return result
+    }
+
+    /*
+        Simplified field-based conversion for tree item models.
+
+        Instead of callbacks, specify field names (roles) to map data:
+
+        fields = {
+            key: "Id",           // role name for node key
+            text: "Name",        // role name for display text
+            children: "Children" // role name for child tree item model
+        }
+
+        Example:
+            TreeModelBuilder.fromTreeItemModelByFields(myModel, {
+                key: "FeatureId",
+                text: "DisplayName",
+                children: "SubFeatures"
+            })
+
+        Additional optional fields:
+            checkable: "IsCheckable"  // role for checkable flag (default: false)
+            checked: "IsChecked"      // role for checked state
+            enabled: "IsEnabled"      // role for enabled state (default: true)
+            expanded: "IsExpanded"    // role for expanded state (default: false)
+    */
+    function fromTreeItemModelByFields(treeItemModel, fields) {
+        if (!treeItemModel || !fields)
+            return []
+
+        var keyField = fields.key || ""
+        var textField = fields.text || ""
+        var childrenField = fields.children || ""
+
+        var mapItem = function(wrapper) {
+            var result = {}
+            if (keyField)
+                result.key = wrapper.data(keyField, "")
+            if (textField)
+                result.text = wrapper.data(textField, "")
+            if (fields.checkable)
+                result.checkable = wrapper.data(fields.checkable, false)
+            if (fields.checked)
+                result.checked = wrapper.data(fields.checked, Qt.Unchecked)
+            if (fields.enabled)
+                result.enabled = wrapper.data(fields.enabled, true)
+            if (fields.expanded)
+                result.expanded = wrapper.data(fields.expanded, false)
+            return result
+        }
+
+        var getChildren = childrenField
+            ? function(wrapper) { return wrapper.childModel(childrenField) }
+            : null
+
+        return fromTreeItemModel(treeItemModel, mapItem, getChildren)
     }
 
     // --- Internal ---
