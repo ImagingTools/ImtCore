@@ -2,6 +2,9 @@
 #include <imtauthdb/CUsersSettingsDatabaseDelegateComp.h>
 
 
+// Qt includes
+#include <QtCore/QDebug>
+
 // ACF includes
 #include <iser/CCompactXmlMemWriteArchive.h>
 #include <iser/CCompactXmlMemReadArchive.h>
@@ -91,6 +94,10 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUsersSettingsDatabaseDelegateCom
 	}
 
 	QByteArray userId = userSettingsPtr->GetUserId();
+	if (userId.isEmpty()){
+		qWarning() << "CUsersSettingsDatabaseDelegateComp: Cannot insert UserSettings with empty UserId";
+		return NewObjectQuery();
+	}
 
 	QByteArray data;
 	{
