@@ -640,7 +640,7 @@ DocumentViewBase {
 											visible: container.isOwner || activeMemberDelegate.isCurrentUser
 											anchors.centerIn: parent
 											tooltipText: qsTr("Actions")
-											iconSource: Style.getIconPath("Icons/More", Icon.State.On, Icon.Mode.Normal)
+											iconSource: "qrc:/" + Style.getIconPath("Icons/More", Icon.State.On, Icon.Mode.Normal)
 											decorator: Component {
 												ToolButtonDecorator {
 													color: "transparent"
@@ -809,7 +809,7 @@ DocumentViewBase {
 											visible: container.isOwner && inviteDelegate.effectiveStatus === "Pending"
 											anchors.centerIn: parent
 											tooltipText: qsTr("Actions")
-											iconSource: Style.getIconPath("Icons/More", Icon.State.On, Icon.Mode.Normal)
+											iconSource: "qrc:/" + Style.getIconPath("Icons/More", Icon.State.On, Icon.Mode.Normal)
 											decorator: Component {
 												ToolButtonDecorator {
 													color: "transparent"
