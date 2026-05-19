@@ -63,6 +63,7 @@ module.exports.listComponents = [
     'BaseClass',
     'BaseModel',
     'DropArea',
+    'Settings',
     // Menu components (Qt Quick Controls)
     'Action',
     'Menu',
