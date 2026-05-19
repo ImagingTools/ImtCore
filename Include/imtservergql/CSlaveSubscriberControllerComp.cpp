@@ -73,8 +73,6 @@ bool CSlaveSubscriberControllerComp::UnregisterSubscription(const QByteArray& su
 		return false;
 	}
 
-	Q_ASSERT(publisherPtr != nullptr);
-
 	bool res = publisherPtr->UnregisterSubscription(subscriptionId);
 	if (res){
 		QWriteLocker writeLocker(&m_lock);
