@@ -4,6 +4,7 @@
 // Qt includes
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QMutexLocker>
 
 // ImtCore includes
 #include <imtauth/IUserInfo.h>
@@ -65,183 +66,193 @@ void CTenantMembershipPublisherComp::OnComponentDestroyed()
 
 void CTenantMembershipPublisherComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	HandleMembershipChanges();
-	HandleOwnershipChanges();
-}
+	struct PendingNotification
+	{
+		QByteArray targetUserId;
+		sdl::imtauth::TenantMemberships::EMembershipNotificationType notificationType;
+		QByteArray membershipId;
+		QByteArray userId;
+		QByteArray tenantId;
+		QString tenantName;
+		QByteArray roleId;
+	};
 
+	QList<PendingNotification> pendingNotifications;
 
-void CTenantMembershipPublisherComp::HandleMembershipChanges()
-{
-	if (!m_membershipManagerCompPtr.IsValid()){
-		return;
-	}
+	{
+		QMutexLocker locker(&m_cacheMutex);
 
-	// Snapshot current state by iterating all cached tenants + checking for new memberships.
-	// Strategy: compare cached membership states with current states to detect:
-	// 1. New inactive membership → InvitationReceived
-	// 2. Previously inactive → now active → InvitationAccepted
-	// 3. Previously cached membership now gone → InvitationRejected (only if was inactive)
+		// --- Handle membership changes ---
+		if (m_membershipManagerCompPtr.IsValid()){
 
-	// Collect current membership IDs from all tenants known in cache.
-	QSet<QByteArray> currentMembershipIds;
-	QMap<QByteArray, CachedMembership> currentState;
+			QSet<QByteArray> currentMembershipIds;
+			QMap<QByteArray, CachedMembership> currentState;
 
-	// Check all previously known memberships for changes or removal.
-	for (auto it = m_cachedMemberships.constBegin(); it != m_cachedMemberships.constEnd(); ++it){
-		const QByteArray& membershipId = it.key();
-		imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
-		if (membershipPtr.IsValid()){
-			CachedMembership current;
-			current.userId = membershipPtr->GetUserId();
-			current.tenantId = membershipPtr->GetTenantId();
-			current.roleId = membershipPtr->GetRoleId();
-			current.isActive = membershipPtr->IsActive();
-			currentState.insert(membershipId, current);
-			currentMembershipIds.insert(membershipId);
-		}
-	}
-
-	// Detect state transitions.
-	for (auto it = m_cachedMemberships.constBegin(); it != m_cachedMemberships.constEnd(); ++it){
-		const QByteArray& membershipId = it.key();
-		const CachedMembership& cached = it.value();
-
-		if (!currentState.contains(membershipId)){
-			// Membership was removed — if it was inactive, this is a rejection.
-			if (!cached.isActive){
-				QByteArray ownerUserId = FindTenantOwnerUserId(cached.tenantId);
-				if (!ownerUserId.isEmpty()){
-					PublishNotification(
-						ownerUserId,
-						sdl::imtauth::TenantMemberships::EMembershipNotificationType::InvitationRejected,
-						membershipId,
-						cached.userId,
-						cached.tenantId,
-						QString(),
-						cached.roleId);
-				}
-			}
-		}
-		else{
-			const CachedMembership& current = currentState.value(membershipId);
-			// Was inactive, now active → accepted.
-			if (!cached.isActive && current.isActive){
-				QByteArray ownerUserId = FindTenantOwnerUserId(current.tenantId);
-				if (!ownerUserId.isEmpty()){
-					PublishNotification(
-						ownerUserId,
-						sdl::imtauth::TenantMemberships::EMembershipNotificationType::InvitationAccepted,
-						membershipId,
-						current.userId,
-						current.tenantId,
-						QString(),
-						current.roleId);
-				}
-			}
-		}
-	}
-
-	// Detect new memberships (not in cache).
-	// Check all tenants from currentState for new inactive memberships.
-	QSet<QByteArray> tenantsToCheck;
-	for (auto it = currentState.constBegin(); it != currentState.constEnd(); ++it){
-		tenantsToCheck.insert(it.value().tenantId);
-	}
-	for (auto it = m_cachedMemberships.constBegin(); it != m_cachedMemberships.constEnd(); ++it){
-		tenantsToCheck.insert(it.value().tenantId);
-	}
-
-	for (const QByteArray& tenantId : std::as_const(tenantsToCheck)){
-		QByteArrayList membershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
-		for (const QByteArray& membershipId : std::as_const(membershipIds)){
-			if (!m_cachedMemberships.contains(membershipId)){
-				// New membership detected.
+			// Check all previously known memberships for changes or removal.
+			for (auto it = m_cachedMemberships.constBegin(); it != m_cachedMemberships.constEnd(); ++it){
+				const QByteArray& membershipId = it.key();
 				imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
 				if (membershipPtr.IsValid()){
-					CachedMembership newEntry;
-					newEntry.userId = membershipPtr->GetUserId();
-					newEntry.tenantId = membershipPtr->GetTenantId();
-					newEntry.roleId = membershipPtr->GetRoleId();
-					newEntry.isActive = membershipPtr->IsActive();
-					currentState.insert(membershipId, newEntry);
+					CachedMembership current;
+					current.userId = membershipPtr->GetUserId();
+					current.tenantId = membershipPtr->GetTenantId();
+					current.roleId = membershipPtr->GetRoleId();
+					current.isActive = membershipPtr->IsActive();
+					currentState.insert(membershipId, current);
+					currentMembershipIds.insert(membershipId);
+				}
+			}
 
-					// New inactive membership = invitation.
-					if (!newEntry.isActive){
-						PublishNotification(
-							newEntry.userId,
-							sdl::imtauth::TenantMemberships::EMembershipNotificationType::InvitationReceived,
-							membershipId,
-							newEntry.userId,
-							newEntry.tenantId,
-							QString(),
-							newEntry.roleId);
+			// Detect state transitions.
+			for (auto it = m_cachedMemberships.constBegin(); it != m_cachedMemberships.constEnd(); ++it){
+				const QByteArray& membershipId = it.key();
+				const CachedMembership& cached = it.value();
+
+				if (!currentState.contains(membershipId)){
+					// Membership was removed — if it was inactive, this is a rejection.
+					if (!cached.isActive){
+						QByteArray ownerUserId = FindTenantOwnerUserId(cached.tenantId);
+						if (!ownerUserId.isEmpty()){
+							pendingNotifications.append({
+								ownerUserId,
+								sdl::imtauth::TenantMemberships::EMembershipNotificationType::InvitationRejected,
+								membershipId,
+								cached.userId,
+								cached.tenantId,
+								QString(),
+								cached.roleId});
+						}
+					}
+				}
+				else{
+					const CachedMembership& current = currentState.value(membershipId);
+					// Was inactive, now active → accepted.
+					if (!cached.isActive && current.isActive){
+						QByteArray ownerUserId = FindTenantOwnerUserId(current.tenantId);
+						if (!ownerUserId.isEmpty()){
+							pendingNotifications.append({
+								ownerUserId,
+								sdl::imtauth::TenantMemberships::EMembershipNotificationType::InvitationAccepted,
+								membershipId,
+								current.userId,
+								current.tenantId,
+								QString(),
+								current.roleId});
+						}
 					}
 				}
 			}
-		}
-	}
 
-	// Update cache to current state.
-	m_cachedMemberships = currentState;
-}
+			// Detect new memberships (not in cache).
+			QSet<QByteArray> tenantsToCheck;
+			for (auto it = currentState.constBegin(); it != currentState.constEnd(); ++it){
+				tenantsToCheck.insert(it.value().tenantId);
+			}
+			for (auto it = m_cachedMemberships.constBegin(); it != m_cachedMemberships.constEnd(); ++it){
+				tenantsToCheck.insert(it.value().tenantId);
+			}
 
+			for (const QByteArray& tenantId : std::as_const(tenantsToCheck)){
+				QByteArrayList membershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
+				for (const QByteArray& membershipId : std::as_const(membershipIds)){
+					if (!m_cachedMemberships.contains(membershipId)){
+						// New membership detected.
+						imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
+						if (membershipPtr.IsValid()){
+							CachedMembership newEntry;
+							newEntry.userId = membershipPtr->GetUserId();
+							newEntry.tenantId = membershipPtr->GetTenantId();
+							newEntry.roleId = membershipPtr->GetRoleId();
+							newEntry.isActive = membershipPtr->IsActive();
+							currentState.insert(membershipId, newEntry);
 
-void CTenantMembershipPublisherComp::HandleOwnershipChanges()
-{
-	if (!m_tenantManagerCompPtr.IsValid()){
-		return;
-	}
-
-	// Check all tenants known from membership cache for ownership changes.
-	QSet<QByteArray> tenantIds;
-	for (auto it = m_cachedMemberships.constBegin(); it != m_cachedMemberships.constEnd(); ++it){
-		tenantIds.insert(it.value().tenantId);
-	}
-
-	for (const QByteArray& tenantId : std::as_const(tenantIds)){
-		imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
-		if (!tenantPtr.IsValid()){
-			continue;
-		}
-
-		QByteArray currentOwnerId = tenantPtr->GetOwnerId();
-
-		if (m_cachedTenantOwners.contains(tenantId)){
-			const CachedTenantOwner& cached = m_cachedTenantOwners.value(tenantId);
-			if (cached.ownerId != currentOwnerId){
-				// Ownership has changed — notify both old and new owner.
-				QString tenantName = tenantPtr->GetTenantName();
-
-				// Notify the old owner
-				if (!cached.ownerId.isEmpty()){
-					PublishNotification(
-						cached.ownerId,
-						sdl::imtauth::TenantMemberships::EMembershipNotificationType::OwnershipTransferred,
-						QByteArray(),
-						currentOwnerId,
-						tenantId,
-						tenantName,
-						QByteArray());
-				}
-
-				// Notify the new owner
-				if (!currentOwnerId.isEmpty()){
-					PublishNotification(
-						currentOwnerId,
-						sdl::imtauth::TenantMemberships::EMembershipNotificationType::OwnershipTransferred,
-						QByteArray(),
-						currentOwnerId,
-						tenantId,
-						tenantName,
-						QByteArray());
+							// New inactive membership = invitation.
+							if (!newEntry.isActive){
+								pendingNotifications.append({
+									newEntry.userId,
+									sdl::imtauth::TenantMemberships::EMembershipNotificationType::InvitationReceived,
+									membershipId,
+									newEntry.userId,
+									newEntry.tenantId,
+									QString(),
+									newEntry.roleId});
+							}
+						}
+					}
 				}
 			}
+
+			// Update cache to current state.
+			m_cachedMemberships = currentState;
 		}
 
-		// Update cache
-		CachedTenantOwner ownerEntry;
-		ownerEntry.ownerId = currentOwnerId;
-		m_cachedTenantOwners.insert(tenantId, ownerEntry);
+		// --- Handle ownership changes ---
+		if (m_tenantManagerCompPtr.IsValid()){
+
+			QSet<QByteArray> tenantIds;
+			for (auto it = m_cachedMemberships.constBegin(); it != m_cachedMemberships.constEnd(); ++it){
+				tenantIds.insert(it.value().tenantId);
+			}
+
+			for (const QByteArray& tenantId : std::as_const(tenantIds)){
+				imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
+				if (!tenantPtr.IsValid()){
+					continue;
+				}
+
+				QByteArray currentOwnerId = tenantPtr->GetOwnerId();
+
+				if (m_cachedTenantOwners.contains(tenantId)){
+					const CachedTenantOwner& cached = m_cachedTenantOwners.value(tenantId);
+					if (cached.ownerId != currentOwnerId){
+						// Ownership has changed — notify both old and new owner.
+						QString tenantName = tenantPtr->GetTenantName();
+
+						// Notify the old owner
+						if (!cached.ownerId.isEmpty()){
+							pendingNotifications.append({
+								cached.ownerId,
+								sdl::imtauth::TenantMemberships::EMembershipNotificationType::OwnershipTransferred,
+								QByteArray(),
+								currentOwnerId,
+								tenantId,
+								tenantName,
+								QByteArray()});
+						}
+
+						// Notify the new owner
+						if (!currentOwnerId.isEmpty()){
+							pendingNotifications.append({
+								currentOwnerId,
+								sdl::imtauth::TenantMemberships::EMembershipNotificationType::OwnershipTransferred,
+								QByteArray(),
+								currentOwnerId,
+								tenantId,
+								tenantName,
+								QByteArray()});
+						}
+					}
+				}
+
+				// Update cache
+				CachedTenantOwner ownerEntry;
+				ownerEntry.ownerId = currentOwnerId;
+				m_cachedTenantOwners.insert(tenantId, ownerEntry);
+			}
+		}
+	}
+
+	// Publish notifications outside the cache lock to avoid potential deadlocks
+	// with the base class m_mutex used by PublishDataFiltered.
+	for (const PendingNotification& notification : std::as_const(pendingNotifications)){
+		PublishNotification(
+			notification.targetUserId,
+			notification.notificationType,
+			notification.membershipId,
+			notification.userId,
+			notification.tenantId,
+			notification.tenantName,
+			notification.roleId);
 	}
 }
 

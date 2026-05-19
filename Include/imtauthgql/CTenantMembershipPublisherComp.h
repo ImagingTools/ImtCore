@@ -5,6 +5,9 @@
 // ACF includes
 #include <imod/TSingleModelObserverBase.h>
 
+// Qt includes
+#include <QRecursiveMutex>
+
 // ImtCore includes
 #include <imtauth/ITenantMembershipManager.h>
 #include <imtauth/ITenantManager.h>
@@ -84,9 +87,6 @@ private:
 		QByteArray ownerId;
 	};
 
-	void HandleMembershipChanges();
-	void HandleOwnershipChanges();
-
 	void PublishNotification(
 		const QByteArray& targetUserId,
 		sdl::imtauth::TenantMemberships::EMembershipNotificationType notificationType,
@@ -102,6 +102,8 @@ private:
 	mutable QMap<QByteArray, CachedMembership> m_cachedMemberships;
 	// Cache of tenantId → ownerId for ownership change detection.
 	mutable QMap<QByteArray, CachedTenantOwner> m_cachedTenantOwners;
+	// Protects m_cachedMemberships and m_cachedTenantOwners from concurrent access.
+	mutable QRecursiveMutex m_cacheMutex;
 };
 
 
