@@ -240,7 +240,7 @@ sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CTenantCollect
 		if (membershipPtr.IsValid() && membershipPtr->IsActive()){
 			isMember = true;
 			QByteArray roleId = membershipPtr->GetRoleId();
-			isAdmin = isOwner || isCreator || (roleId == "Admin");
+			isAdmin = isOwner || isCreator || (roleId == QByteArrayLiteral("Admin"));
 		}
 	}
 	bool isNewTenant = tenantId.isEmpty();
