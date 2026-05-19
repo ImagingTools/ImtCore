@@ -853,7 +853,6 @@ DocumentViewBase {
 			property string __pendingMenuUserName: ""
 			property bool __pendingMenuIsOwner: false
 			property bool __pendingMenuIsCurrentUser: false
-			property var __pendingMenuActions: []
 
 			function __showInviteActionsMenu(menuItems, invitationId, userName) {
 				if (menuItems.length === 1) {
